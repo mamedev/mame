@@ -38,21 +38,21 @@ protected:
 	void main_map(address_map &map);
 
 private:
-	DECLARE_READ8_MEMBER(mcu_port_r0_r);
-	DECLARE_READ8_MEMBER(mcu_port_r1_r);
-	DECLARE_READ8_MEMBER(mcu_port_r2_r);
-	DECLARE_READ8_MEMBER(mcu_port_r3_r);
-	DECLARE_WRITE8_MEMBER(mcu_port_r0_w);
-	DECLARE_WRITE8_MEMBER(mcu_port_r1_w);
-	DECLARE_WRITE8_MEMBER(mcu_port_r2_w);
-	DECLARE_WRITE8_MEMBER(mcu_port_r3_w);
-	DECLARE_READ8_MEMBER(mcu_portk_r);
-	DECLARE_WRITE8_MEMBER(mcu_port_o_w);
-	DECLARE_WRITE8_MEMBER(mcu_port_p_w);
-	DECLARE_WRITE8_MEMBER(arabian_blitter_w);
-	DECLARE_WRITE8_MEMBER(arabian_videoram_w);
-	DECLARE_WRITE8_MEMBER(ay8910_porta_w);
-	DECLARE_WRITE8_MEMBER(ay8910_portb_w);
+	uint8_t mcu_port_r0_r();
+	uint8_t mcu_port_r1_r();
+	uint8_t mcu_port_r2_r();
+	uint8_t mcu_port_r3_r();
+	void mcu_port_r0_w(uint8_t data);
+	void mcu_port_r1_w(uint8_t data);
+	void mcu_port_r2_w(uint8_t data);
+	void mcu_port_r3_w(uint8_t data);
+	uint8_t mcu_portk_r();
+	void mcu_port_o_w(uint8_t data);
+	void mcu_port_p_w(uint8_t data);
+	void arabian_blitter_w(offs_t offset, uint8_t data);
+	void arabian_videoram_w(offs_t offset, uint8_t data);
+	void ay8910_porta_w(uint8_t data);
+	void ay8910_portb_w(uint8_t data);
 	void arabian_palette(palette_device &palette) const;
 	uint32_t screen_update_arabian(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void blit_area(uint8_t plane, uint16_t src, uint8_t x, uint8_t y, uint8_t sx, uint8_t sy);
@@ -61,17 +61,17 @@ private:
 	required_shared_ptr<uint8_t> m_custom_cpu_ram;
 	required_shared_ptr<uint8_t> m_blitter;
 
-	std::unique_ptr<uint8_t[]>  m_main_bitmap;
-	std::unique_ptr<uint8_t[]>  m_converted_gfx;
+	std::unique_ptr<uint8_t[]>  m_main_bitmap{};
+	std::unique_ptr<uint8_t[]>  m_converted_gfx{};
 
 	/* video-related */
-	uint8_t    m_video_control;
-	uint8_t    m_flip_screen;
+	uint8_t    m_video_control = 0U;
+	uint8_t    m_flip_screen = 0U;
 
 	/* MCU */
-	uint8_t    m_mcu_port_o;
-	uint8_t    m_mcu_port_p;
-	uint8_t    m_mcu_port_r[4];
+	uint8_t    m_mcu_port_o = 0U;
+	uint8_t    m_mcu_port_p = 0U;
+	uint8_t    m_mcu_port_r[4]{};
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mb8841_cpu_device> m_mcu;

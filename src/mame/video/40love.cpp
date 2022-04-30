@@ -36,7 +36,7 @@ TILE_GET_INFO_MEMBER(fortyl_state::get_bg_tile_info)
 		code = (code & 0x3f) | tile_l_bank | 0x100;
 	code |= tile_h_bank;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			(tile_attrib & 0x07) | ((m_color_bank == true) ? 0x20 : 0),
 			0);
@@ -116,7 +116,7 @@ void fortyl_state::fortyl_set_scroll_x( int offset )
  ---- -x-- Pix RAM color bank select
  ---- ---x Flip Screen set
  */
-WRITE8_MEMBER(fortyl_state::fortyl_pixram_sel_w)
+void fortyl_state::fortyl_pixram_sel_w(uint8_t data)
 {
 	int offs;
 	int f = data & 0x01;
@@ -145,7 +145,7 @@ WRITE8_MEMBER(fortyl_state::fortyl_pixram_sel_w)
 	}
 }
 
-READ8_MEMBER(fortyl_state::fortyl_pixram_r)
+uint8_t fortyl_state::fortyl_pixram_r(offs_t offset)
 {
 	if (m_pixram_sel)
 		return m_pixram2[offset];
@@ -155,33 +155,20 @@ READ8_MEMBER(fortyl_state::fortyl_pixram_r)
 
 void fortyl_state::fortyl_plot_pix( int offset )
 {
-	int x, y, i, c, d1, d2;
+	const int x = (offset & 0x1f) * 8;
+	const int y = (offset >> 5) & 0xff;
 
-	x = (offset & 0x1f) * 8;
-	y = (offset >> 5) & 0xff;
+	const int d1 = (m_pixram_sel ? m_pixram2 : m_pixram1)[offset];
+	const int d2 = (m_pixram_sel ? m_pixram2 : m_pixram1)[offset + 0x2000];
 
-	if (m_pixram_sel)
+	for (int i = 0; i < 8; i++)
 	{
-		d1 = m_pixram2[offset];
-		d2 = m_pixram2[offset + 0x2000];
-	}
-	else
-	{
-		d1 = m_pixram1[offset];
-		d2 = m_pixram1[offset + 0x2000];
-	}
-
-	for (i = 0; i < 8; i++)
-	{
-		c = ((d2 >> i) & 1) + ((d1 >> i) & 1) * 2;
-		if (m_pixram_sel)
-			m_tmp_bitmap2->pix16(y, x + i) = m_pix_color[c] | ((m_color_bank == true) ? 0x200 : 0);
-		else
-			m_tmp_bitmap1->pix16(y, x + i) = m_pix_color[c] | ((m_color_bank == true) ? 0x200 : 0);
+		const int c = BIT(d2, i) | (BIT(d1, i) << 1);
+		(m_pixram_sel ? m_tmp_bitmap2 : m_tmp_bitmap1)->pix(y, x + i) = m_pix_color[c] | (m_color_bank ? 0x200 : 0);
 	}
 }
 
-WRITE8_MEMBER(fortyl_state::fortyl_pixram_w)
+void fortyl_state::fortyl_pixram_w(offs_t offset, uint8_t data)
 {
 	if (m_pixram_sel)
 		m_pixram2[offset] = data;
@@ -192,18 +179,18 @@ WRITE8_MEMBER(fortyl_state::fortyl_pixram_w)
 }
 
 
-WRITE8_MEMBER(fortyl_state::fortyl_bg_videoram_w)
+void fortyl_state::fortyl_bg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER(fortyl_state::fortyl_bg_videoram_r)
+uint8_t fortyl_state::fortyl_bg_videoram_r(offs_t offset)
 {
 	return m_videoram[offset];
 }
 
-WRITE8_MEMBER(fortyl_state::fortyl_bg_colorram_w)
+void fortyl_state::fortyl_bg_colorram_w(offs_t offset, uint8_t data)
 {
 	if (m_colorram[offset] != data)
 	{
@@ -217,7 +204,7 @@ WRITE8_MEMBER(fortyl_state::fortyl_bg_colorram_w)
 	}
 }
 
-READ8_MEMBER(fortyl_state::fortyl_bg_colorram_r)
+uint8_t fortyl_state::fortyl_bg_colorram_r(offs_t offset)
 {
 	return m_colorram[offset];
 }

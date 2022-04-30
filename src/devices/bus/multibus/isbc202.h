@@ -27,23 +27,19 @@ public:
 	isbc202_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	virtual ~isbc202_device();
 
-	// device_multibus_interface overrides
-	virtual void install_io_rw(address_space& space) override;
-	virtual void install_mem_rw(address_space& space) override;
-
 	// Access to I/O space by CPU
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
+	uint8_t io_r(address_space &space, offs_t offset);
+	void io_w(address_space &space, offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(co_w);
 
-	DECLARE_READ8_MEMBER(px_r);
+	uint8_t px_r();
 
 protected:
 	// device_t overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	// device_execute_interface overrides
@@ -64,7 +60,7 @@ private:
 	required_device_array<floppy_connector , 4> m_drives;
 
 	address_space_config m_program_config;
-	memory_access_cache<2 , -2 , ENDIANNESS_BIG> *m_cache;
+	memory_access<9, 2 , -2 , ENDIANNESS_BIG>::cache m_cache;
 
 	address_space *m_mem_space;
 

@@ -83,8 +83,8 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(henry_p1_w);
-	DECLARE_WRITE8_MEMBER(henry_p3_w);
+	void henry_p1_w(uint8_t data);
+	void henry_p3_w(uint8_t data);
 	void hprot1_palette(palette_device &palette) const;
 	HD44780_PIXEL_UPDATE(hprot1_pixel_update);
 	void i80c31_io(address_map &map);
@@ -199,13 +199,13 @@ void hprot1_state::machine_reset()
 {
 }
 
-WRITE8_MEMBER(hprot1_state::henry_p1_w)
+void hprot1_state::henry_p1_w(uint8_t data)
 {
 	if (LOG_IO_PORTS && data != 0xFF && data != 0xEF)
 		logerror("Write to P1: %02X\n", data);
 }
 
-WRITE8_MEMBER(hprot1_state::henry_p3_w)
+void hprot1_state::henry_p3_w(uint8_t data)
 {
 	if (LOG_IO_PORTS)
 		logerror("Write to P3: %02X\n", data);
@@ -236,12 +236,12 @@ HD44780_PIXEL_UPDATE(hprot1_state::hprot1_pixel_update)
 {
 	if ( pos < 16 && line==0 )
 	{
-		bitmap.pix16(y, pos*6 + x) = state;
+		bitmap.pix(y, pos*6 + x) = state;
 	}
 
 	if ( pos >= 64 && pos < 80 && line==0 )
 	{
-		bitmap.pix16(y+9,(pos-64)*6 + x) = state;
+		bitmap.pix(y+9,(pos-64)*6 + x) = state;
 	}
 }
 

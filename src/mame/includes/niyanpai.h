@@ -52,43 +52,43 @@ private:
 	int m_clutmode[VRAM_MAX];
 	int m_transparency[VRAM_MAX];
 	int m_clutsel[VRAM_MAX];
-	int m_screen_refresh;
-	int m_nb19010_busyctr;
-	int m_nb19010_busyflag;
+	int m_screen_refresh = 0;
+	int m_nb19010_busyctr = 0;
+	int m_nb19010_busyflag = 0;
 	bitmap_ind16 m_tmpbitmap[VRAM_MAX];
 	std::unique_ptr<uint16_t[]> m_videoram[VRAM_MAX];
 	std::unique_ptr<uint16_t[]> m_videoworkram[VRAM_MAX];
 	std::unique_ptr<uint16_t[]> m_palette_ptr;
 	std::unique_ptr<uint8_t[]> m_clut[VRAM_MAX];
 	int m_flipscreen_old[VRAM_MAX];
-	emu_timer *m_blitter_timer;
+	emu_timer *m_blitter_timer = nullptr;
 
 	// musobana and derived machine configs
-	int m_musobana_inputport;
-	int m_musobana_outcoin_flag;
-	uint8_t m_motor_on;
+	int m_musobana_inputport = 0;
+	int m_musobana_outcoin_flag = 0;
+	uint8_t m_motor_on = 0;
 
 	// common
-	DECLARE_READ16_MEMBER(dipsw_r);
-	DECLARE_READ16_MEMBER(palette_r);
-	DECLARE_WRITE16_MEMBER(palette_w);
-	DECLARE_WRITE8_MEMBER(blitter_0_w);
-	DECLARE_WRITE8_MEMBER(blitter_1_w);
-	DECLARE_WRITE8_MEMBER(blitter_2_w);
-	DECLARE_READ8_MEMBER(blitter_0_r);
-	DECLARE_READ8_MEMBER(blitter_1_r);
-	DECLARE_READ8_MEMBER(blitter_2_r);
-	DECLARE_WRITE8_MEMBER(clut_0_w);
-	DECLARE_WRITE8_MEMBER(clut_1_w);
-	DECLARE_WRITE8_MEMBER(clut_2_w);
-	DECLARE_WRITE8_MEMBER(clutsel_0_w);
-	DECLARE_WRITE8_MEMBER(clutsel_1_w);
-	DECLARE_WRITE8_MEMBER(clutsel_2_w);
-	DECLARE_WRITE16_MEMBER(tmp68301_parallel_port_w);
+	uint16_t dipsw_r();
+	uint16_t palette_r(offs_t offset);
+	void palette_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void blitter_0_w(offs_t offset, uint8_t data);
+	void blitter_1_w(offs_t offset, uint8_t data);
+	void blitter_2_w(offs_t offset, uint8_t data);
+	uint8_t blitter_0_r(offs_t offset);
+	uint8_t blitter_1_r(offs_t offset);
+	uint8_t blitter_2_r(offs_t offset);
+	void clut_0_w(offs_t offset, uint8_t data);
+	void clut_1_w(offs_t offset, uint8_t data);
+	void clut_2_w(offs_t offset, uint8_t data);
+	void clutsel_0_w(uint8_t data);
+	void clutsel_1_w(uint8_t data);
+	void clutsel_2_w(uint8_t data);
+	void tmp68301_parallel_port_w(uint16_t data);
 
 	// musobana and derived machine configs
-	DECLARE_READ16_MEMBER(musobana_inputport_0_r);
-	DECLARE_WRITE16_MEMBER(musobana_inputport_w);
+	uint16_t musobana_inputport_0_r();
+	void musobana_inputport_w(uint16_t data);
 
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(musobana);
@@ -109,5 +109,5 @@ private:
 	void niyanpai_map(address_map &map);
 	void zokumahj_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };

@@ -1,5 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
+/********************************************************************************************************************
+PINBALL
+Bally prototyping system with MC68701 CPU.
+It eventually emerged 5 years later as BY6803.
+
+
+Status:
+- Skeletons
+
+ToDo:
+- Everything
+
+*********************************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6800/m6801.h"
@@ -133,9 +146,9 @@ ROM_START(eballdlxp4)
 ROM_END
 
 
-GAME( 1981, flashgdnp1, flashgdn, by68701, by68701, by68701_state, init_by68701, ROT0, "Bally", "Flash Gordon (prototype rev. 1)",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, flashgdnp2, flashgdn, by68701, by68701, by68701_state, init_by68701, ROT0, "Bally", "Flash Gordon (prototype rev. 2)",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, eballdlxp1, eballdlx, by68701, by68701, by68701_state, init_by68701, ROT0, "Bally", "Eight Ball Deluxe (prototype rev. 1)",  MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, eballdlxp2, eballdlx, by68701, by68701, by68701_state, init_by68701, ROT0, "Bally", "Eight Ball Deluxe (prototype rev. 2)",  MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, eballdlxp3, eballdlx, by68701, by68701, by68701_state, init_by68701, ROT0, "Bally", "Eight Ball Deluxe (prototype rev. 3)",  MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, eballdlxp4, eballdlx, by68701, by68701, by68701_state, init_by68701, ROT0, "Bally", "Eight Ball Deluxe (prototype rev. 4)",  MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1981, flashgdnp1, flashgdn, by68701, by68701, by68701_state, init_by68701, ROT0, "Bally", "Flash Gordon (prototype rev. 1)",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, flashgdnp2, flashgdn, by68701, by68701, by68701_state, init_by68701, ROT0, "Bally", "Flash Gordon (prototype rev. 2)",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, eballdlxp1, eballdlx, by68701, by68701, by68701_state, init_by68701, ROT0, "Bally", "Eight Ball Deluxe (prototype rev. 1)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, eballdlxp2, eballdlx, by68701, by68701, by68701_state, init_by68701, ROT0, "Bally", "Eight Ball Deluxe (prototype rev. 2)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, eballdlxp3, eballdlx, by68701, by68701, by68701_state, init_by68701, ROT0, "Bally", "Eight Ball Deluxe (prototype rev. 3)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, eballdlxp4, eballdlx, by68701, by68701, by68701_state, init_by68701, ROT0, "Bally", "Eight Ball Deluxe (prototype rev. 4)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 
 <softwarelist name="archimedes" description="Acorn Archimedes floppy images">
 
@@ -194,7 +197,7 @@ Zalaga by ProAction (RiscPC & StrongARM)
 Zelanites: The Onslaught by Micro Power (RiscOS2)
 -->
 
-	<!-- Boot OK, !Control throws a "sprite doesn't exist" exception -->
+	<!-- boot OK, !Control throws a "sprite doesn't exist" exception -->
 	<software name="2067bc" supported="partial">
 		<description>2067 BC</description>
 		<year>1992</year>
@@ -668,7 +671,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<!-- Boot OK -->
+	<!-- boot OK -->
 	<software name="caverns">
 		<description>Caverns</description>
 		<year>1991</year>
@@ -1065,7 +1068,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- Hangs at boot screen -->
-	<software name="egoc" cloneof="ego">
+	<software name="egoc" cloneof="ego" supported="no">
 		<description>EGO: Repton 4 [passwords]</description>
 		<year>1992</year>
 		<publisher>ProAction</publisher>
@@ -1771,7 +1774,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<publisher>CDS</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
-				<rom name="leeds utd - champions! (19xx)(cds).adf" size="819200" crc="d4631873" sha1="4ba0835c415bde82742c61328acf711d821619e2" />
+				<rom name="leeds utd - champions (19xx)(cds).adf" size="819200" crc="d4631873" sha1="4ba0835c415bde82742c61328acf711d821619e2" />
 			</dataarea>
 		</part>
 	</software>
@@ -1977,7 +1980,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<!-- Black screen after selecting a course and golfer -->
-	<software name="microdrv">
+	<software name="microdrv" supported="no">
 		<description>MicroDrive 3D</description>
 		<year>1990</year>
 		<publisher>CIS</publisher>
@@ -2122,7 +2125,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<publisher>Krisalis</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
-				<rom name="oh, no! more lemmings! (1992)(krisalis).adf" size="819200" crc="af17d81c" sha1="a8539dedd80abb6746df70b6ac590dfea655927c" />
+				<rom name="oh, no more lemmings (1992)(krisalis).adf" size="819200" crc="af17d81c" sha1="a8539dedd80abb6746df70b6ac590dfea655927c" />
 			</dataarea>
 		</part>
 	</software>
@@ -2135,7 +2138,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<publisher>Krisalis</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
-				<rom name="oh, no! more lemmings! (1992)(krisalis)[a].adf" size="819200" crc="f51f6a00" sha1="ad0928ba5625962fff1130d66b612a7143004f9a" />
+				<rom name="oh, no more lemmings (1992)(krisalis)[a].adf" size="819200" crc="f51f6a00" sha1="ad0928ba5625962fff1130d66b612a7143004f9a" />
 			</dataarea>
 		</part>
 	</software>
@@ -2384,6 +2387,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
+	<!-- boot OK -->
 	<software name="repton3c" cloneof="repton3">
 		<description>Repton 3 [cracked]</description>
 		<year>1988</year>
@@ -2584,7 +2588,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<publisher>Superior Software/Acornsoft</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="337920">
-				<rom name="Speech! v1.3 (1991)(Superior Software).adf" size="337920" crc="afa0caf6" sha1="6bf70e521a803c00665d9402e484ada5decc80dd" />
+				<rom name="Speech v1.3 (1991)(Superior Software).adf" size="337920" crc="afa0caf6" sha1="6bf70e521a803c00665d9402e484ada5decc80dd" />
 			</dataarea>
 		</part>
 	</software>
@@ -3107,12 +3111,13 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<!-- Has trainer and copy protection? -->
-	<software name="zool">
+	<!-- disc swap isn't recognized -->
+	<!-- Has trainer but uncracked copy protection? -->
+	<software name="zool" supported="no">
 		<description>Zool</description>
 		<year>1993</year>
 		<publisher>Gremlin</publisher>
-		<info name="usage" value="Protection requires manual" />
+		<info name="usage" value="Protection requires code wheel" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819200">

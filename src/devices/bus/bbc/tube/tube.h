@@ -52,16 +52,20 @@ class bbc_tube_slot_device : public device_t, public device_single_card_slot_int
 public:
 	// construction/destruction
 	template <typename T>
-	bbc_tube_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&slot_options, const char *default_option)
+	bbc_tube_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&slot_options, char const *default_option)
 		: bbc_tube_slot_device(mconfig, tag, owner)
 	{
 		option_reset();
 		slot_options(*this);
 		set_default_option(default_option);
 		set_fixed(false);
+		set_insert_rom(true);
 	}
 
 	bbc_tube_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
+
+	void set_insert_rom(bool insert_rom) { m_insert_rom = insert_rom; }
+	bool insert_rom() { return m_insert_rom; }
 
 	// callbacks
 	auto irq_handler() { return m_irq_handler.bind(); }
@@ -79,6 +83,8 @@ protected:
 
 private:
 	devcb_write_line m_irq_handler;
+
+	bool m_insert_rom;
 };
 
 

@@ -106,11 +106,11 @@ void dmv_k012_device::device_add_mconfig(machine_config &config)
 void dmv_k012_device::io_read(int ifsel, offs_t offset, uint8_t &data)
 {
 	if ((1 << ifsel) == m_jumpers->read() && !(offset & 0x08))
-		data = m_hdc->read(machine().dummy_space(), offset);
+		data = m_hdc->read(offset);
 }
 
 void dmv_k012_device::io_write(int ifsel, offs_t offset, uint8_t data)
 {
 	if ((1 << ifsel) == m_jumpers->read() && !(offset & 0x08))
-		m_hdc->write(machine().dummy_space(), offset, data);
+		m_hdc->write(offset, data);
 }

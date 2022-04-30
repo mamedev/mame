@@ -24,7 +24,8 @@ wpc_device::wpc_device(const machine_config &mconfig, const char *tag, device_t 
 		m_soundctrl_w(*this),
 		m_sounds11_w(*this),
 		m_bank_w(*this),
-		m_dmdbank_w(*this)
+		m_dmdbank_w(*this),
+		m_io_keyboard(*this, ":X%d", 0U)
 {
 }
 
@@ -54,7 +55,7 @@ void wpc_device::device_reset()
 	m_alpha_pos = 0;
 }
 
-void wpc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void wpc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{
@@ -64,10 +65,9 @@ void wpc_device::device_timer(emu_timer &timer, device_timer_id id, int param, v
 	}
 }
 
-READ8_MEMBER(wpc_device::read)
+uint8_t wpc_device::read(offs_t offset)
 {
 	uint8_t ret = 0x00;
-	char kbdrow[8];
 
 	switch(offset)
 	{
@@ -84,13 +84,12 @@ READ8_MEMBER(wpc_device::read)
 		m_zerocross = false;
 		break;
 	case WPC_SWROWREAD:
-		sprintf(kbdrow,":INP%X",m_switch_col);
-		ret = ~ioport(kbdrow)->read();
-//      for(x=0;x<8;x++)
-//      {
-//          if(m_switch_col & (1<<x))
-//              ret = m_switches[3+x];
-//      }
+		{
+			ret = 0xff;
+			for (u8 i = 0; i < 8; i++)
+				if (BIT(m_switch_col, i))
+					ret &= ~m_io_keyboard[i]->read();
+		}
 		break;
 	case WPC_SWCOINDOOR:
 		ret = ~ioport(":COIN")->read();
@@ -107,10 +106,10 @@ READ8_MEMBER(wpc_device::read)
 			ret = 0x00;
 		break;
 	case WPC_SOUNDIF:
-		ret = m_sounddata_r(space,0);
+		ret = m_sounddata_r(0);
 		break;
 	case WPC_SOUNDBACK:
-		ret = m_soundctrl_r(space,0);
+		ret = m_soundctrl_r(0);
 		break;
 	case WPC_FIRQSRC:
 		if(m_snd_irqsrc)
@@ -135,30 +134,30 @@ READ8_MEMBER(wpc_device::read)
 	return ret;
 }
 
-WRITE8_MEMBER(wpc_device::write)
+void wpc_device::write(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
 	case DMD_PAGE3000:
-		m_dmdbank_w(space,0,data & 0x0f);
+		m_dmdbank_w(0,data & 0x0f);
 		break;
 	case DMD_PAGE3200:
-		m_dmdbank_w(space,1,data & 0x0f);
+		m_dmdbank_w(1,data & 0x0f);
 		break;
 	case DMD_PAGE3400:
-		m_dmdbank_w(space,2,data & 0x0f);
+		m_dmdbank_w(2,data & 0x0f);
 		break;
 	case DMD_PAGE3600:
-		m_dmdbank_w(space,3,data & 0x0f);
+		m_dmdbank_w(3,data & 0x0f);
 		break;
 	case DMD_PAGE3800:
-		m_dmdbank_w(space,4,data & 0x0f);
+		m_dmdbank_w(4,data & 0x0f);
 		break;
 	case DMD_PAGE3A00:
-		m_dmdbank_w(space,5,data & 0x0f);
+		m_dmdbank_w(5,data & 0x0f);
 		break;
 	case DMD_FIRQLINE:
-		m_firq_cb(space,0);
+		m_firq_cb(0);
 		m_dmd_irqsrc = false;
 		m_dmd_irqline = data;
 		if(LOG_WPC) logerror("WPC: DMD FIRQ line set to %i\n",data);
@@ -168,7 +167,7 @@ WRITE8_MEMBER(wpc_device::write)
 		if(LOG_WPC) logerror("WPC: DMD Visible page set to %i\n",data);
 		break;
 	case WPC_ROMBANK:
-		m_bank_w(space,0,data);
+		m_bank_w(0,data);
 		if(LOG_WPC) logerror("WPC: ROM bank set to %02x\n",data);
 		break;
 	case WPC_ALPHAPOS:
@@ -187,13 +186,13 @@ WRITE8_MEMBER(wpc_device::write)
 		m_alpha_data[20+m_alpha_pos] |= (data << 8);
 		break;
 	case WPC_IRQACK:
-		m_irq_cb(space,CLEAR_LINE);
+		m_irq_cb(CLEAR_LINE);
 		break;
 	case WPC_WATCHDOG:
 		if(data & 0x80)
 		{
 			m_irq_count++;
-			m_irq_cb(space,CLEAR_LINE);
+			m_irq_cb(CLEAR_LINE);
 		}
 		break;
 	case WPC_SWCOLSELECT:
@@ -201,16 +200,16 @@ WRITE8_MEMBER(wpc_device::write)
 		if(LOG_WPC) logerror("WPC: Switch column select %02x\n",data);
 		break;
 	case WPC_SOUNDIF:
-		m_sounddata_w(space,0,data);
+		m_sounddata_w(0,data);
 		break;
 	case WPC_SOUNDBACK:
-		m_soundctrl_w(space,0,data);
+		m_soundctrl_w(0,data);
 		break;
 	case WPC_SOUNDS11:
-		m_sounds11_w(space,0,data);
+		m_sounds11_w(0,data);
 		break;
 	case WPC_FIRQSRC:
-		m_firq_cb(space,0);
+		m_firq_cb(0);
 		m_snd_irqsrc = false;
 		break;
 	case WPC_PROTMEMCTRL:

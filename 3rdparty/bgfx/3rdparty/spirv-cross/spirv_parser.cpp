@@ -1,5 +1,6 @@
 /*
- * Copyright 2018-2019 Arm Limited
+ * Copyright 2018-2021 Arm Limited
+ * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,6 +13,12 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ */
+
+/*
+ * At your option, you may choose to accept this material under either:
+ *  1. The Apache License, Version 2.0, found at <http://www.apache.org/licenses/LICENSE-2.0>, or
+ *  2. The MIT License, found at <http://opensource.org/licenses/MIT>.
  */
 
 #include "spirv_parser.hpp"
@@ -86,6 +93,11 @@ void Parser::parse()
 		SPIRV_CROSS_THROW("Invalid SPIRV format.");
 
 	uint32_t bound = s[3];
+
+	const uint32_t MaximumNumberOfIDs = 0x3fffff;
+	if (bound > MaximumNumberOfIDs)
+		SPIRV_CROSS_THROW("ID bound exceeds limit of 0x3fffff.\n");
+
 	ir.set_id_bounds(bound);
 
 	uint32_t offset = 5;
@@ -114,10 +126,22 @@ void Parser::parse()
 	for (auto &i : instructions)
 		parse(i);
 
+	for (auto &fixup : forward_pointer_fixups)
+	{
+		auto &target = get<SPIRType>(fixup.first);
+		auto &source = get<SPIRType>(fixup.second);
+		target.member_types = source.member_types;
+		target.basetype = source.basetype;
+		target.self = source.self;
+	}
+	forward_pointer_fixups.clear();
+
 	if (current_function)
 		SPIRV_CROSS_THROW("Function was not terminated.");
 	if (current_block)
 		SPIRV_CROSS_THROW("Block was not terminated.");
+	if (ir.default_entry_point == 0)
+		SPIRV_CROSS_THROW("There is no entry point in the SPIR-V module.");
 }
 
 const uint32_t *Parser::stream(const Instruction &instr) const
@@ -538,6 +562,11 @@ void Parser::parse(const Instruction &instruction)
 		auto *c = maybe_get<SPIRConstant>(cid);
 		bool literal = c && !c->specialization;
 
+		// We're copying type information into Array types, so we'll need a fixup for any physical pointer
+		// references.
+		if (base.forward_pointer)
+			forward_pointer_fixups.push_back({ id, tid });
+
 		arraybase.array_size_literal.push_back(literal);
 		arraybase.array.push_back(literal ? c->scalar() : cid);
 		// Do NOT set arraybase.self!
@@ -550,6 +579,11 @@ void Parser::parse(const Instruction &instruction)
 
 		auto &base = get<SPIRType>(ops[1]);
 		auto &arraybase = set<SPIRType>(id);
+
+		// We're copying type information into Array types, so we'll need a fixup for any physical pointer
+		// references.
+		if (base.forward_pointer)
+			forward_pointer_fixups.push_back({ id, ops[1] });
 
 		arraybase = base;
 		arraybase.array.push_back(0);
@@ -598,16 +632,24 @@ void Parser::parse(const Instruction &instruction)
 	{
 		uint32_t id = ops[0];
 
-		auto &base = get<SPIRType>(ops[2]);
+		// Very rarely, we might receive a FunctionPrototype here.
+		// We won't be able to compile it, but we shouldn't crash when parsing.
+		// We should be able to reflect.
+		auto *base = maybe_get<SPIRType>(ops[2]);
 		auto &ptrbase = set<SPIRType>(id);
 
-		ptrbase = base;
+		if (base)
+			ptrbase = *base;
+
 		ptrbase.pointer = true;
 		ptrbase.pointer_depth++;
 		ptrbase.storage = static_cast<StorageClass>(ops[1]);
 
 		if (ptrbase.storage == StorageClassAtomicCounter)
 			ptrbase.basetype = SPIRType::AtomicCounter;
+
+		if (base && base->forward_pointer)
+			forward_pointer_fixups.push_back({ id, ops[2] });
 
 		ptrbase.parent_type = ops[2];
 
@@ -622,6 +664,7 @@ void Parser::parse(const Instruction &instruction)
 		ptrbase.pointer = true;
 		ptrbase.pointer_depth++;
 		ptrbase.storage = static_cast<StorageClass>(ops[1]);
+		ptrbase.forward_pointer = true;
 
 		if (ptrbase.storage == StorageClassAtomicCounter)
 			ptrbase.basetype = SPIRType::AtomicCounter;
@@ -678,11 +721,19 @@ void Parser::parse(const Instruction &instruction)
 		break;
 	}
 
-	case OpTypeAccelerationStructureNV:
+	case OpTypeAccelerationStructureKHR:
 	{
 		uint32_t id = ops[0];
 		auto &type = set<SPIRType>(id);
-		type.basetype = SPIRType::AccelerationStructureNV;
+		type.basetype = SPIRType::AccelerationStructure;
+		break;
+	}
+
+	case OpTypeRayQueryKHR:
+	{
+		uint32_t id = ops[0];
+		auto &type = set<SPIRType>(id);
+		type.basetype = SPIRType::RayQuery;
 		break;
 	}
 
@@ -703,15 +754,6 @@ void Parser::parse(const Instruction &instruction)
 		}
 
 		set<SPIRVariable>(id, type, storage, initializer);
-
-		// hlsl based shaders don't have those decorations. force them and then reset when reading/writing images
-		auto &ttype = get<SPIRType>(type);
-		if (ttype.basetype == SPIRType::BaseType::Image)
-		{
-			ir.set_decoration(id, DecorationNonWritable);
-			ir.set_decoration(id, DecorationNonReadable);
-		}
-
 		break;
 	}
 
@@ -775,7 +817,7 @@ void Parser::parse(const Instruction &instruction)
 	{
 		uint32_t id = ops[1];
 		uint32_t type = ops[0];
-		make_constant_null(id, type);
+		ir.make_constant_null(id, type, true);
 		break;
 	}
 
@@ -951,6 +993,22 @@ void Parser::parse(const Instruction &instruction)
 		current_block = nullptr;
 		break;
 	}
+
+	case OpTerminateRayKHR:
+		// NV variant is not a terminator.
+		if (!current_block)
+			SPIRV_CROSS_THROW("Trying to end a non-existing block.");
+		current_block->terminator = SPIRBlock::TerminateRay;
+		current_block = nullptr;
+		break;
+
+	case OpIgnoreIntersectionKHR:
+		// NV variant is not a terminator.
+		if (!current_block)
+			SPIRV_CROSS_THROW("Trying to end a non-existing block.");
+		current_block->terminator = SPIRBlock::IgnoreIntersection;
+		current_block = nullptr;
+		break;
 
 	case OpReturn:
 	{
@@ -1140,46 +1198,4 @@ bool Parser::variable_storage_is_aliased(const SPIRVariable &v) const
 
 	return !is_restrict && (ssbo || image || counter);
 }
-
-void Parser::make_constant_null(uint32_t id, uint32_t type)
-{
-	auto &constant_type = get<SPIRType>(type);
-
-	if (constant_type.pointer)
-	{
-		auto &constant = set<SPIRConstant>(id, type);
-		constant.make_null(constant_type);
-	}
-	else if (!constant_type.array.empty())
-	{
-		assert(constant_type.parent_type);
-		uint32_t parent_id = ir.increase_bound_by(1);
-		make_constant_null(parent_id, constant_type.parent_type);
-
-		if (!constant_type.array_size_literal.back())
-			SPIRV_CROSS_THROW("Array size of OpConstantNull must be a literal.");
-
-		SmallVector<uint32_t> elements(constant_type.array.back());
-		for (uint32_t i = 0; i < constant_type.array.back(); i++)
-			elements[i] = parent_id;
-		set<SPIRConstant>(id, type, elements.data(), uint32_t(elements.size()), false);
-	}
-	else if (!constant_type.member_types.empty())
-	{
-		uint32_t member_ids = ir.increase_bound_by(uint32_t(constant_type.member_types.size()));
-		SmallVector<uint32_t> elements(constant_type.member_types.size());
-		for (uint32_t i = 0; i < constant_type.member_types.size(); i++)
-		{
-			make_constant_null(member_ids + i, constant_type.member_types[i]);
-			elements[i] = member_ids + i;
-		}
-		set<SPIRConstant>(id, type, elements.data(), uint32_t(elements.size()), false);
-	}
-	else
-	{
-		auto &constant = set<SPIRConstant>(id, type);
-		constant.make_null(constant_type);
-	}
-}
-
 } // namespace SPIRV_CROSS_NAMESPACE

@@ -3,7 +3,8 @@
 // thanks-to:Berger
 /******************************************************************************
 
-CXG Chess 2001, also sold by Hanimex as HCG 1900 and by CGL as Computachess Champion.
+CXG Chess 2001, also sold by Hanimex as Computachess (model HCG 1900),
+and by CGL as Computachess Champion.
 CXG Chess 3000 is assumed to be on similar hardware as this.
 
 The chess engine is by Richard Lang, based on Cyrus.
@@ -20,12 +21,13 @@ Hardware notes:
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
+#include "machine/clock.h"
 #include "machine/sensorboard.h"
-#include "machine/timer.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -40,7 +42,6 @@ public:
 	ch2001_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_irq_on(*this, "irq_on"),
 		m_display(*this, "display"),
 		m_board(*this, "board"),
 		m_dac(*this, "dac"),
@@ -56,34 +57,25 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<timer_device> m_irq_on;
 	required_device<pwm_display_device> m_display;
 	required_device<sensorboard_device> m_board;
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<2> m_inputs;
 
-	// periodic interrupts
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
-
 	// address maps
 	void main_map(address_map &map);
 
 	// I/O handlers
-	DECLARE_WRITE8_MEMBER(speaker_w);
-	DECLARE_WRITE8_MEMBER(leds_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void speaker_w(u8 data);
+	void leds_w(u8 data);
+	u8 input_r();
 
-	u16 m_inp_mux;
-	int m_dac_data;
+	u16 m_inp_mux = 0;
+	int m_dac_data = 0;
 };
 
 void ch2001_state::machine_start()
 {
-	// zerofill
-	m_inp_mux = 0;
-	m_dac_data = 0;
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_dac_data));
@@ -97,14 +89,14 @@ void ch2001_state::machine_start()
 
 // TTL
 
-WRITE8_MEMBER(ch2001_state::speaker_w)
+void ch2001_state::speaker_w(u8 data)
 {
 	// 74ls109 toggle to speaker
 	m_dac_data ^= 1;
 	m_dac->write(m_dac_data);
 }
 
-WRITE8_MEMBER(ch2001_state::leds_w)
+void ch2001_state::leds_w(u8 data)
 {
 	// d0-d7: 74ls273 (WR to CLK)
 	// 74ls273 Q1-Q4: 74ls145 A-D
@@ -118,7 +110,7 @@ WRITE8_MEMBER(ch2001_state::leds_w)
 	m_display->matrix(sel, led_data);
 }
 
-READ8_MEMBER(ch2001_state::input_r)
+u8 ch2001_state::input_r()
 {
 	u8 data = 0;
 
@@ -188,10 +180,9 @@ void ch2001_state::ch2001(machine_config &config)
 	Z80(config, m_maincpu, 8_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ch2001_state::main_map);
 
-	const attotime irq_period = attotime::from_hz(533); // theoretical frequency from 555 timer (20nF, 100K+33K, 1K2), measurement was 568Hz
-	TIMER(config, m_irq_on).configure_periodic(FUNC(ch2001_state::irq_on<INPUT_LINE_IRQ0>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(16600)); // active for 16.6us
-	TIMER(config, "irq_off").configure_periodic(FUNC(ch2001_state::irq_off<INPUT_LINE_IRQ0>), irq_period);
+	auto &irq_clock(CLOCK(config, "irq_clock", 568)); // 555 timer (20nF, 100K+33K, 1K2), measured 568Hz
+	irq_clock.set_pulse_width(attotime::from_nsec(16600)); // active for 16.6us
+	irq_clock.signal_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -204,7 +195,6 @@ void ch2001_state::ch2001(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 

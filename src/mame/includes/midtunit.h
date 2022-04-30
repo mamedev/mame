@@ -60,46 +60,47 @@ private:
 
 	required_shared_ptr<uint16_t> m_nvram;
 
-	DECLARE_WRITE16_MEMBER(midtunit_cmos_enable_w);
-	DECLARE_WRITE16_MEMBER(midtunit_cmos_w);
-	DECLARE_READ16_MEMBER(midtunit_cmos_r);
-	DECLARE_READ16_MEMBER(midtunit_sound_state_r);
-	DECLARE_READ16_MEMBER(midtunit_sound_r);
-	DECLARE_WRITE16_MEMBER(midtunit_sound_w);
-	DECLARE_READ16_MEMBER(mk_prot_r);
-	DECLARE_WRITE16_MEMBER(mk_prot_w);
-	DECLARE_READ16_MEMBER(mkturbo_prot_r);
-	DECLARE_READ16_MEMBER(mk2_prot_const_r);
-	DECLARE_READ16_MEMBER(mk2_prot_r);
-	DECLARE_READ16_MEMBER(mk2_prot_shift_r);
-	DECLARE_WRITE16_MEMBER(mk2_prot_w);
-	DECLARE_READ16_MEMBER(nbajam_prot_r);
-	DECLARE_WRITE16_MEMBER(nbajam_prot_w);
-	DECLARE_WRITE16_MEMBER(jdredd_prot_w);
-	DECLARE_READ16_MEMBER(jdredd_prot_r);
+	void midtunit_cmos_enable_w(uint16_t data);
+	void midtunit_cmos_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t midtunit_cmos_r(offs_t offset);
+	uint16_t midtunit_sound_state_r();
+	uint16_t midtunit_sound_r();
+	void midtunit_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t mk_prot_r(offs_t offset);
+	void mk_prot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t mkturbo_prot_r();
+	uint16_t mk2_prot_const_r();
+	uint16_t mk2_prot_r();
+	uint16_t mk2_prot_shift_r();
+	void mk2_prot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t nbajam_prot_r();
+	void nbajam_prot_w(offs_t offset, uint16_t data);
+	void jdredd_prot_w(offs_t offset, uint16_t data);
+	uint16_t jdredd_prot_r(offs_t offset);
 
 	void register_state_saving();
 	void init_tunit_generic(int sound);
 	void init_nbajam_common(int te_protection);
 
 	/* CMOS-related variables */
-	uint8_t    m_cmos_write_enable;
+	uint8_t    m_cmos_write_enable = 0;
 
 	/* sound-related variables */
-	uint8_t    m_chip_type;
-	uint8_t    m_fake_sound_state;
+	uint8_t    m_chip_type = 0;
+	uint8_t    m_fake_sound_state = 0;
 
 	/* protection */
-	uint8_t    m_mk_prot_index;
-	uint16_t   m_mk2_prot_data;
+	uint8_t    m_mk_prot_index = 0;
+	uint16_t   m_mk2_prot_data = 0;
+	std::unique_ptr<uint8_t[]> m_hidden_ram;
 
-	const uint32_t *m_nbajam_prot_table;
-	uint16_t   m_nbajam_prot_queue[5];
-	uint8_t    m_nbajam_prot_index;
+	const uint32_t *m_nbajam_prot_table = nullptr;
+	uint16_t   m_nbajam_prot_queue[5] = {};
+	uint8_t    m_nbajam_prot_index = 0;
 
-	const uint8_t *m_jdredd_prot_table;
-	uint8_t    m_jdredd_prot_index;
-	uint8_t    m_jdredd_prot_max;
+	const uint8_t *m_jdredd_prot_table = nullptr;
+	uint8_t    m_jdredd_prot_index = 0;
+	uint8_t    m_jdredd_prot_max = 0;
 
 	void main_map(address_map &map);
 };

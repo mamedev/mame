@@ -325,14 +325,14 @@ offs_t tms32082_mp_disassembler::disassemble(std::ostream &stream, offs_t pc, co
 				case 0x0c:  util::stream_format(*output, "brcr        R%d", src1); break;
 				case 0x0d:  util::stream_format(*output, "brcr        %s", get_creg_name(imm32)); break;
 
-				case 0x10:  util::stream_format(*output, "shift%s.dz   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
-				case 0x12:  util::stream_format(*output, "shift%s.dm   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
-				case 0x14:  util::stream_format(*output, "shift%s.ds   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
-				case 0x16:  util::stream_format(*output, "shift%s.ez   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
-				case 0x18:  util::stream_format(*output, "shift%s.em   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
-				case 0x1a:  util::stream_format(*output, "shift%s.es   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
-				case 0x1c:  util::stream_format(*output, "shift%s.iz   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
-				case 0x1e:  util::stream_format(*output, "shift%s.im   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x10:  util::stream_format(*output, "shift%s.dz   R%d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x12:  util::stream_format(*output, "shift%s.dm   R%d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x14:  util::stream_format(*output, "shift%s.ds   R%d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x16:  util::stream_format(*output, "shift%s.ez   R%d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x18:  util::stream_format(*output, "shift%s.em   R%d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x1a:  util::stream_format(*output, "shift%s.es   R%d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x1c:  util::stream_format(*output, "shift%s.iz   R%d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x1e:  util::stream_format(*output, "shift%s.im   R%d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
 
 				case 0x22:  util::stream_format(*output, "and         R%d, R%d, R%d", src1, rs, rd); break;
 				case 0x23:  util::stream_format(*output, "and         0x%08X, R%d, R%d", imm32, rs, rd); break;

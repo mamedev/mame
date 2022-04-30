@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="evio" description="Tomy evio Media cartridges">
 	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit
 

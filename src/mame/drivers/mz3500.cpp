@@ -86,23 +86,23 @@ private:
 
 	uint8_t m_fdd_sel;
 
-	DECLARE_READ8_MEMBER(mz3500_master_mem_r);
-	DECLARE_WRITE8_MEMBER(mz3500_master_mem_w);
-	DECLARE_READ8_MEMBER(mz3500_ipl_r);
-	DECLARE_READ8_MEMBER(mz3500_basic_r);
-	DECLARE_READ8_MEMBER(mz3500_work_ram_r);
-	DECLARE_WRITE8_MEMBER(mz3500_work_ram_w);
-	DECLARE_READ8_MEMBER(mz3500_shared_ram_r);
-	DECLARE_WRITE8_MEMBER(mz3500_shared_ram_w);
-	DECLARE_READ8_MEMBER(mz3500_io_r);
-	DECLARE_WRITE8_MEMBER(mz3500_io_w);
-	DECLARE_WRITE8_MEMBER(mz3500_crtc_w);
-	DECLARE_READ8_MEMBER(mz3500_fdc_r);
-	DECLARE_WRITE8_MEMBER(mz3500_fdc_w);
-	DECLARE_READ8_MEMBER(mz3500_fdc_dma_r);
-	DECLARE_WRITE8_MEMBER(mz3500_pa_w);
-	DECLARE_WRITE8_MEMBER(mz3500_pb_w);
-	DECLARE_WRITE8_MEMBER(mz3500_pc_w);
+	uint8_t mz3500_master_mem_r(offs_t offset);
+	void mz3500_master_mem_w(offs_t offset, uint8_t data);
+	uint8_t mz3500_ipl_r(offs_t offset);
+	uint8_t mz3500_basic_r(offs_t offset);
+	uint8_t mz3500_work_ram_r(offs_t offset);
+	void mz3500_work_ram_w(offs_t offset, uint8_t data);
+	uint8_t mz3500_shared_ram_r(offs_t offset);
+	void mz3500_shared_ram_w(offs_t offset, uint8_t data);
+	uint8_t mz3500_io_r(offs_t offset);
+	void mz3500_io_w(offs_t offset, uint8_t data);
+	void mz3500_crtc_w(offs_t offset, uint8_t data);
+	uint8_t mz3500_fdc_r();
+	void mz3500_fdc_w(uint8_t data);
+	uint8_t mz3500_fdc_dma_r();
+	void mz3500_pa_w(uint8_t data);
+	void mz3500_pb_w(uint8_t data);
+	void mz3500_pc_w(uint8_t data);
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -167,39 +167,29 @@ UPD7220_DISPLAY_PIXELS_MEMBER( mz3500_state::hgdc_display_pixels )
 
 UPD7220_DRAW_TEXT_LINE_MEMBER( mz3500_state::hgdc_draw_text )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	int x;
-	int xi,yi;
-	int tile;
-	int attr;
-	uint8_t tile_data;
-	uint8_t width80;
-	uint8_t char_size;
-	uint8_t hires;
-	uint8_t color_mode;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
 //  popmessage("%02x",m_crtc[6]);
 
-	color_mode = m_crtc[4] & 1;
-	width80 = (m_crtc[5] & 2) >> 1;
-	hires = (m_crtc[6] & 1);
-	char_size = (hires) ? 16 : 8;
+	uint8_t color_mode = m_crtc[4] & 1;
+	uint8_t width80 = (m_crtc[5] & 2) >> 1;
+	uint8_t hires = (m_crtc[6] & 1);
+	uint8_t char_size = (hires) ? 16 : 8;
 
-	for( x = 0; x < pitch; x++ )
+	for( int x = 0; x < pitch; x++ )
 	{
-		tile = (m_video_ram[(((addr+x)*2) & 0x1fff) >> 1] & 0xff);
-		attr = ((m_video_ram[(((addr+x)*2+1) & 0x3ffff) >> 1] >> 8) & 0x0f);
+		int tile = (m_video_ram[(((addr+x)*2) & 0x1fff) >> 1] & 0xff);
+		int attr = ((m_video_ram[(((addr+x)*2+1) & 0x3ffff) >> 1] >> 8) & 0x0f);
 
 		//if(hires)
 		//  tile <<= 1;
 
-		for( yi = 0; yi < lr; yi++)
+		for( int yi = 0; yi < lr; yi++)
 		{
-			tile_data = m_char_rom[((tile*16+yi) & 0xfff) | (hires*0x1000)];
+			uint8_t tile_data = m_char_rom[((tile*16+yi) & 0xfff) | (hires*0x1000)];
 
-			for( xi = 0; xi < 8; xi++)
+			for( int xi = 0; xi < 8; xi++)
 			{
-				int res_x,res_y;
 				int pen;
 
 				if(yi >= char_size)
@@ -227,18 +217,18 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( mz3500_state::hgdc_draw_text )
 					}
 				}
 
-				res_x = x * 8 + xi;
-				res_y = y + yi;
+				int res_x = x * 8 + xi;
+				int res_y = y + yi;
 
 				if(pen != -1)
 				{
 					if(!width80)
 					{
-						bitmap.pix32(res_y, res_x*2+0) = palette[pen];
-						bitmap.pix32(res_y, res_x*2+1) = palette[pen];
+						bitmap.pix(res_y, res_x*2+0) = palette[pen];
+						bitmap.pix(res_y, res_x*2+1) = palette[pen];
 					}
 					else
-						bitmap.pix32(res_y, res_x) = palette[pen];
+						bitmap.pix(res_y, res_x) = palette[pen];
 				}
 			}
 		}
@@ -256,81 +246,81 @@ uint32_t mz3500_state::screen_update( screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-READ8_MEMBER(mz3500_state::mz3500_ipl_r)
+uint8_t mz3500_state::mz3500_ipl_r(offs_t offset)
 {
 	return m_ipl_rom[offset];
 }
 
-READ8_MEMBER(mz3500_state::mz3500_basic_r)
+uint8_t mz3500_state::mz3500_basic_r(offs_t offset)
 {
 	return m_basic_rom[offset];
 }
 
-READ8_MEMBER(mz3500_state::mz3500_work_ram_r)
+uint8_t mz3500_state::mz3500_work_ram_r(offs_t offset)
 {
 	return m_work_ram[offset];
 }
 
-WRITE8_MEMBER(mz3500_state::mz3500_work_ram_w)
+void mz3500_state::mz3500_work_ram_w(offs_t offset, uint8_t data)
 {
 	m_work_ram[offset] = data;
 }
 
 
-READ8_MEMBER(mz3500_state::mz3500_master_mem_r)
+uint8_t mz3500_state::mz3500_master_mem_r(offs_t offset)
 {
 	if(m_ms == 0)
 	{
-		if((offset & 0xe000) == 0x0000) { return mz3500_ipl_r(space,(offset & 0xfff) | 0x1000); }
-		if((offset & 0xe000) == 0x2000) { return mz3500_basic_r(space,(offset & 0x1fff) | 0x2000); }
-		if((offset & 0xc000) == 0x4000) { return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x4000); }
-		if((offset & 0xc000) == 0x8000) { return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x8000); }
+		if((offset & 0xe000) == 0x0000) { return mz3500_ipl_r((offset & 0xfff) | 0x1000); }
+		if((offset & 0xe000) == 0x2000) { return mz3500_basic_r((offset & 0x1fff) | 0x2000); }
+		if((offset & 0xc000) == 0x4000) { return mz3500_work_ram_r((offset & 0x3fff) | 0x4000); }
+		if((offset & 0xc000) == 0x8000) { return mz3500_work_ram_r((offset & 0x3fff) | 0x8000); }
 		if((offset & 0xc000) == 0xc000)
 		{
-			if(m_ma == 0x0) { return mz3500_work_ram_r(space,(offset & 0x3fff) | 0xc000); }
-			if(m_ma == 0x1) { return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x0000); }
-			if(m_ma == 0xf) { return mz3500_shared_ram_r(space,(offset & 0x7ff)); }
+			if(m_ma == 0x0) { return mz3500_work_ram_r((offset & 0x3fff) | 0xc000); }
+			if(m_ma == 0x1) { return mz3500_work_ram_r((offset & 0x3fff) | 0x0000); }
+			if(m_ma == 0xf) { return mz3500_shared_ram_r((offset & 0x7ff)); }
 		}
 
 		printf("Read with unmapped memory bank offset %04x MS %02x MA %02x\n",offset,m_ms,m_ma);
 	}
 	else if(m_ms == 1)
 	{
-		return ((offset & 0xf800) == 0xf800) ? mz3500_shared_ram_r(space,(offset & 0x7ff)) : mz3500_work_ram_r(space,offset);
+		return ((offset & 0xf800) == 0xf800) ? mz3500_shared_ram_r((offset & 0x7ff)) : mz3500_work_ram_r(offset);
 	}
 	else if(m_ms == 2) // ROM based BASIC
 	{
-		if((offset & 0xe000) == 0x0000) { return mz3500_basic_r(space,offset & 0x1fff); }
+		if((offset & 0xe000) == 0x0000) { return mz3500_basic_r(offset & 0x1fff); }
 		if((offset & 0xe000) == 0x2000)
 		{
 			switch(m_mo)
 			{
-				case 0x0: return mz3500_basic_r(space,(offset & 0x1fff) | 0x2000);
-				case 0x1: return mz3500_basic_r(space,(offset & 0x1fff) | 0x4000);
-				case 0x2: return mz3500_basic_r(space,(offset & 0x1fff) | 0x6000);
+				case 0x0: return mz3500_basic_r((offset & 0x1fff) | 0x2000);
+				case 0x1: return mz3500_basic_r((offset & 0x1fff) | 0x4000);
+				case 0x2: return mz3500_basic_r((offset & 0x1fff) | 0x6000);
 			}
 		}
-		if((offset & 0xc000) == 0x4000) { return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x4000); }
-		if((offset & 0xc000) == 0x8000) { return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x8000); }
+		if((offset & 0xc000) == 0x4000) { return mz3500_work_ram_r((offset & 0x3fff) | 0x4000); }
+		if((offset & 0xc000) == 0x8000) { return mz3500_work_ram_r((offset & 0x3fff) | 0x8000); }
 		if((offset & 0xc000) == 0xc000)
 		{
 			switch(m_ma)
 			{
-				case 0x0: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x0c000);
-				case 0x1: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x00000);
-				case 0x2: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x10000);
-				case 0x3: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x14000);
-				case 0x4: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x18000);
-				case 0x5: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x1c000);
-				case 0x6: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x20000);
-				case 0x7: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x24000);
-				case 0x8: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x28000);
-				case 0x9: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x2c000);
-				case 0xa: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x30000);
-				case 0xb: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x34000);
-				case 0xc: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x38000);
-				case 0xd: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x3c000);
-				case 0xf: return mz3500_shared_ram_r(space,(offset & 0x7ff));
+				case 0x0: return mz3500_work_ram_r((offset & 0x3fff) | 0x0c000);
+				case 0x1: return mz3500_work_ram_r((offset & 0x3fff) | 0x00000);
+				case 0x2: return mz3500_work_ram_r((offset & 0x3fff) | 0x10000);
+				case 0x3: return mz3500_work_ram_r((offset & 0x3fff) | 0x14000);
+				case 0x4: return mz3500_work_ram_r((offset & 0x3fff) | 0x18000);
+				case 0x5: return mz3500_work_ram_r((offset & 0x3fff) | 0x1c000);
+				case 0x6: return mz3500_work_ram_r((offset & 0x3fff) | 0x20000);
+				case 0x7: return mz3500_work_ram_r((offset & 0x3fff) | 0x24000);
+				case 0x8: return mz3500_work_ram_r((offset & 0x3fff) | 0x28000);
+				case 0x9: return mz3500_work_ram_r((offset & 0x3fff) | 0x2c000);
+				case 0xa: return mz3500_work_ram_r((offset & 0x3fff) | 0x30000);
+				case 0xb: return mz3500_work_ram_r((offset & 0x3fff) | 0x34000);
+				case 0xc: return mz3500_work_ram_r((offset & 0x3fff) | 0x38000);
+				case 0xd: return mz3500_work_ram_r((offset & 0x3fff) | 0x3c000);
+				case 0xf: return mz3500_shared_ram_r((offset & 0x7ff));
 			}
 		}
 
@@ -338,37 +328,37 @@ READ8_MEMBER(mz3500_state::mz3500_master_mem_r)
 	}
 	else if (m_ms == 3) // RAM based BASIC
 	{
-		if((offset & 0xe000) == 0x0000) { return mz3500_work_ram_r(space,offset & 0x1fff); }
+		if((offset & 0xe000) == 0x0000) { return mz3500_work_ram_r(offset & 0x1fff); }
 		if((offset & 0xe000) == 0x2000)
 		{
 			switch(m_mo)
 			{
-				case 0x0: return mz3500_work_ram_r(space,(offset & 0x1fff) | 0x2000);
-				case 0x1: return mz3500_work_ram_r(space,(offset & 0x1fff) | 0xc000);
-				case 0x2: return mz3500_work_ram_r(space,(offset & 0x1fff) | 0xe000);
+				case 0x0: return mz3500_work_ram_r((offset & 0x1fff) | 0x2000);
+				case 0x1: return mz3500_work_ram_r((offset & 0x1fff) | 0xc000);
+				case 0x2: return mz3500_work_ram_r((offset & 0x1fff) | 0xe000);
 			}
 
 			printf("Read with unmapped memory bank offset %04x MS %02x MO %02x\n",offset,m_ms,m_mo);
 		}
-		if((offset & 0xc000) == 0x4000) { return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x4000); }
-		if((offset & 0xc000) == 0x8000) { return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x8000); }
+		if((offset & 0xc000) == 0x4000) { return mz3500_work_ram_r((offset & 0x3fff) | 0x4000); }
+		if((offset & 0xc000) == 0x8000) { return mz3500_work_ram_r((offset & 0x3fff) | 0x8000); }
 		if((offset & 0xc000) == 0xc000)
 		{
 			switch(m_ma)
 			{
-				case 0x0: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x10000);
-				case 0x1: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x14000);
-				case 0x2: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x18000);
-				case 0x3: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x1c000);
-				case 0x4: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x20000);
-				case 0x5: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x24000);
-				case 0x6: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x28000);
-				case 0x7: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x2c000);
-				case 0x8: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x30000);
-				case 0x9: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x34000);
-				case 0xa: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x38000);
-				case 0xb: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x3c000);
-				case 0xf: return mz3500_shared_ram_r(space,(offset & 0x7ff));
+				case 0x0: return mz3500_work_ram_r((offset & 0x3fff) | 0x10000);
+				case 0x1: return mz3500_work_ram_r((offset & 0x3fff) | 0x14000);
+				case 0x2: return mz3500_work_ram_r((offset & 0x3fff) | 0x18000);
+				case 0x3: return mz3500_work_ram_r((offset & 0x3fff) | 0x1c000);
+				case 0x4: return mz3500_work_ram_r((offset & 0x3fff) | 0x20000);
+				case 0x5: return mz3500_work_ram_r((offset & 0x3fff) | 0x24000);
+				case 0x6: return mz3500_work_ram_r((offset & 0x3fff) | 0x28000);
+				case 0x7: return mz3500_work_ram_r((offset & 0x3fff) | 0x2c000);
+				case 0x8: return mz3500_work_ram_r((offset & 0x3fff) | 0x30000);
+				case 0x9: return mz3500_work_ram_r((offset & 0x3fff) | 0x34000);
+				case 0xa: return mz3500_work_ram_r((offset & 0x3fff) | 0x38000);
+				case 0xb: return mz3500_work_ram_r((offset & 0x3fff) | 0x3c000);
+				case 0xf: return mz3500_shared_ram_r((offset & 0x7ff));
 			}
 		}
 	}
@@ -377,17 +367,17 @@ READ8_MEMBER(mz3500_state::mz3500_master_mem_r)
 	return 0xff; // shouldn't happen
 }
 
-WRITE8_MEMBER(mz3500_state::mz3500_master_mem_w)
+void mz3500_state::mz3500_master_mem_w(offs_t offset, uint8_t data)
 {
 	if(m_ms == 0) // Initialize State
 	{
-		if((offset & 0xc000) == 0x4000) { mz3500_work_ram_w(space,(offset & 0x3fff) | 0x4000,data); return; }
-		if((offset & 0xc000) == 0x8000) { mz3500_work_ram_w(space,(offset & 0x3fff) | 0x8000,data); return; }
+		if((offset & 0xc000) == 0x4000) { mz3500_work_ram_w((offset & 0x3fff) | 0x4000,data); return; }
+		if((offset & 0xc000) == 0x8000) { mz3500_work_ram_w((offset & 0x3fff) | 0x8000,data); return; }
 		if((offset & 0xc000) == 0xc000)
 		{
-			if(m_ma == 0x0) { mz3500_work_ram_w(space,(offset & 0x3fff) | 0xc000,data); return; }
-			if(m_ma == 0x1) { mz3500_work_ram_w(space,(offset & 0x3fff) | 0x0000,data); return; }
-			if(m_ma == 0xf) { mz3500_shared_ram_w(space,(offset & 0x7ff),data); return; }
+			if(m_ma == 0x0) { mz3500_work_ram_w((offset & 0x3fff) | 0xc000,data); return; }
+			if(m_ma == 0x1) { mz3500_work_ram_w((offset & 0x3fff) | 0x0000,data); return; }
+			if(m_ma == 0xf) { mz3500_shared_ram_w((offset & 0x7ff),data); return; }
 		}
 
 		printf("Write with unmapped memory bank offset %04x data %02x MS %02x MA %02x\n",offset,data,m_ms,m_ma);
@@ -395,35 +385,35 @@ WRITE8_MEMBER(mz3500_state::mz3500_master_mem_w)
 	else if(m_ms == 1) // System Loading & CP/M
 	{
 		if((offset & 0xf800) == 0xf800)
-			mz3500_shared_ram_w(space,(offset & 0x7ff),data);
+			mz3500_shared_ram_w((offset & 0x7ff),data);
 		else
-			mz3500_work_ram_w(space,offset,data);
+			mz3500_work_ram_w(offset,data);
 
 		return;
 	}
 	else if(m_ms == 2) // ROM based BASIC
 	{
-		if((offset & 0xc000) == 0x4000) { mz3500_work_ram_w(space,(offset & 0x3fff) | 0x4000,data); return; }
-		if((offset & 0xc000) == 0x8000) { mz3500_work_ram_w(space,(offset & 0x3fff) | 0x8000,data); return; }
+		if((offset & 0xc000) == 0x4000) { mz3500_work_ram_w((offset & 0x3fff) | 0x4000,data); return; }
+		if((offset & 0xc000) == 0x8000) { mz3500_work_ram_w((offset & 0x3fff) | 0x8000,data); return; }
 		if((offset & 0xc000) == 0xc000)
 		{
 			switch(m_ma)
 			{
-				case 0x0: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x0c000,data); return;
-				case 0x1: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x00000,data); return;
-				case 0x2: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x10000,data); return;
-				case 0x3: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x14000,data); return;
-				case 0x4: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x18000,data); return;
-				case 0x5: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x1c000,data); return;
-				case 0x6: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x20000,data); return;
-				case 0x7: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x24000,data); return;
-				case 0x8: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x28000,data); return;
-				case 0x9: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x2c000,data); return;
-				case 0xa: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x30000,data); return;
-				case 0xb: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x34000,data); return;
-				case 0xc: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x38000,data); return;
-				case 0xd: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x3c000,data); return;
-				case 0xf: mz3500_shared_ram_w(space,(offset & 0x7ff),data); return;
+				case 0x0: mz3500_work_ram_w((offset & 0x3fff) | 0x0c000,data); return;
+				case 0x1: mz3500_work_ram_w((offset & 0x3fff) | 0x00000,data); return;
+				case 0x2: mz3500_work_ram_w((offset & 0x3fff) | 0x10000,data); return;
+				case 0x3: mz3500_work_ram_w((offset & 0x3fff) | 0x14000,data); return;
+				case 0x4: mz3500_work_ram_w((offset & 0x3fff) | 0x18000,data); return;
+				case 0x5: mz3500_work_ram_w((offset & 0x3fff) | 0x1c000,data); return;
+				case 0x6: mz3500_work_ram_w((offset & 0x3fff) | 0x20000,data); return;
+				case 0x7: mz3500_work_ram_w((offset & 0x3fff) | 0x24000,data); return;
+				case 0x8: mz3500_work_ram_w((offset & 0x3fff) | 0x28000,data); return;
+				case 0x9: mz3500_work_ram_w((offset & 0x3fff) | 0x2c000,data); return;
+				case 0xa: mz3500_work_ram_w((offset & 0x3fff) | 0x30000,data); return;
+				case 0xb: mz3500_work_ram_w((offset & 0x3fff) | 0x34000,data); return;
+				case 0xc: mz3500_work_ram_w((offset & 0x3fff) | 0x38000,data); return;
+				case 0xd: mz3500_work_ram_w((offset & 0x3fff) | 0x3c000,data); return;
+				case 0xf: mz3500_shared_ram_w((offset & 0x7ff),data); return;
 			}
 		}
 
@@ -431,53 +421,53 @@ WRITE8_MEMBER(mz3500_state::mz3500_master_mem_w)
 	}
 	else if (m_ms == 3) // RAM based BASIC
 	{
-		if((offset & 0xe000) == 0x0000) { mz3500_work_ram_w(space,offset & 0x1fff,data); return; }
+		if((offset & 0xe000) == 0x0000) { mz3500_work_ram_w(offset & 0x1fff,data); return; }
 		if((offset & 0xe000) == 0x2000)
 		{
 			switch(m_mo)
 			{
-				case 0x0: mz3500_work_ram_w(space,(offset & 0x1fff) | 0x2000,data); return;
-				case 0x1: mz3500_work_ram_w(space,(offset & 0x1fff) | 0xc000,data); return;
-				case 0x2: mz3500_work_ram_w(space,(offset & 0x1fff) | 0xe000,data); return;
+				case 0x0: mz3500_work_ram_w((offset & 0x1fff) | 0x2000,data); return;
+				case 0x1: mz3500_work_ram_w((offset & 0x1fff) | 0xc000,data); return;
+				case 0x2: mz3500_work_ram_w((offset & 0x1fff) | 0xe000,data); return;
 			}
 
 			printf("Read with unmapped memory bank offset %04x MS %02x MO %02x\n",offset,m_ms,m_mo);
 		}
-		if((offset & 0xc000) == 0x4000) { mz3500_work_ram_w(space,(offset & 0x3fff) | 0x4000,data); return; }
-		if((offset & 0xc000) == 0x8000) { mz3500_work_ram_w(space,(offset & 0x3fff) | 0x8000,data); return; }
+		if((offset & 0xc000) == 0x4000) { mz3500_work_ram_w((offset & 0x3fff) | 0x4000,data); return; }
+		if((offset & 0xc000) == 0x8000) { mz3500_work_ram_w((offset & 0x3fff) | 0x8000,data); return; }
 		if((offset & 0xc000) == 0xc000)
 		{
 			switch(m_ma)
 			{
-				case 0x0: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x10000,data); return;
-				case 0x1: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x14000,data); return;
-				case 0x2: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x18000,data); return;
-				case 0x3: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x1c000,data); return;
-				case 0x4: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x20000,data); return;
-				case 0x5: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x24000,data); return;
-				case 0x6: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x28000,data); return;
-				case 0x7: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x2c000,data); return;
-				case 0x8: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x30000,data); return;
-				case 0x9: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x34000,data); return;
-				case 0xa: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x38000,data); return;
-				case 0xb: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x3c000,data); return;
-				case 0xf: mz3500_shared_ram_w(space,(offset & 0x7ff),data); return;
+				case 0x0: mz3500_work_ram_w((offset & 0x3fff) | 0x10000,data); return;
+				case 0x1: mz3500_work_ram_w((offset & 0x3fff) | 0x14000,data); return;
+				case 0x2: mz3500_work_ram_w((offset & 0x3fff) | 0x18000,data); return;
+				case 0x3: mz3500_work_ram_w((offset & 0x3fff) | 0x1c000,data); return;
+				case 0x4: mz3500_work_ram_w((offset & 0x3fff) | 0x20000,data); return;
+				case 0x5: mz3500_work_ram_w((offset & 0x3fff) | 0x24000,data); return;
+				case 0x6: mz3500_work_ram_w((offset & 0x3fff) | 0x28000,data); return;
+				case 0x7: mz3500_work_ram_w((offset & 0x3fff) | 0x2c000,data); return;
+				case 0x8: mz3500_work_ram_w((offset & 0x3fff) | 0x30000,data); return;
+				case 0x9: mz3500_work_ram_w((offset & 0x3fff) | 0x34000,data); return;
+				case 0xa: mz3500_work_ram_w((offset & 0x3fff) | 0x38000,data); return;
+				case 0xb: mz3500_work_ram_w((offset & 0x3fff) | 0x3c000,data); return;
+				case 0xf: mz3500_shared_ram_w((offset & 0x7ff),data); return;
 			}
 		}
 	}
 }
 
-READ8_MEMBER(mz3500_state::mz3500_shared_ram_r)
+uint8_t mz3500_state::mz3500_shared_ram_r(offs_t offset)
 {
 	return m_shared_ram[offset];
 }
 
-WRITE8_MEMBER(mz3500_state::mz3500_shared_ram_w)
+void mz3500_state::mz3500_shared_ram_w(offs_t offset, uint8_t data)
 {
 	m_shared_ram[offset] = data;
 }
 
-READ8_MEMBER(mz3500_state::mz3500_io_r)
+uint8_t mz3500_state::mz3500_io_r(offs_t offset)
 {
 	/*
 	[2]
@@ -501,7 +491,7 @@ READ8_MEMBER(mz3500_state::mz3500_io_r)
 	return 0;
 }
 
-WRITE8_MEMBER(mz3500_state::mz3500_io_w)
+void mz3500_state::mz3500_io_w(offs_t offset, uint8_t data)
 {
 	/*
 	[0]
@@ -539,7 +529,7 @@ WRITE8_MEMBER(mz3500_state::mz3500_io_w)
 	}
 }
 
-WRITE8_MEMBER(mz3500_state::mz3500_crtc_w)
+void mz3500_state::mz3500_crtc_w(offs_t offset, uint8_t data)
 {
 	if(offset & 8)
 	{
@@ -552,7 +542,7 @@ WRITE8_MEMBER(mz3500_state::mz3500_crtc_w)
 		m_crtc[offset] = data;
 }
 
-READ8_MEMBER(mz3500_state::mz3500_fdc_r)
+uint8_t mz3500_state::mz3500_fdc_r()
 {
 	/*
 	---- -x-- Motor
@@ -565,7 +555,7 @@ READ8_MEMBER(mz3500_state::mz3500_fdc_r)
 	return (floppy->mon_r() << 2) | (floppy->idx_r() << 1) | (m_fdc->get_drq() & 1);
 }
 
-WRITE8_MEMBER(mz3500_state::mz3500_fdc_w)
+void mz3500_state::mz3500_fdc_w(uint8_t data)
 {
 	/*
 	x--- ---- FDC int enable
@@ -591,7 +581,7 @@ WRITE8_MEMBER(mz3500_state::mz3500_fdc_w)
 
 }
 
-READ8_MEMBER(mz3500_state::mz3500_fdc_dma_r)
+uint8_t mz3500_state::mz3500_fdc_dma_r()
 {
 	return m_fdc->dma_r();
 }
@@ -636,12 +626,12 @@ void mz3500_state::mz3500_slave_io(address_map &map)
 	map(0x70, 0x71).rw(m_hgdc1, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
 }
 
-WRITE8_MEMBER(mz3500_state::mz3500_pa_w)
+void mz3500_state::mz3500_pa_w(uint8_t data)
 {
 	// printer data
 }
 
-WRITE8_MEMBER(mz3500_state::mz3500_pb_w)
+void mz3500_state::mz3500_pb_w(uint8_t data)
 {
 	/*
 	x--- ---- CG select (ROM and/or upd7220 clock?)
@@ -654,7 +644,7 @@ WRITE8_MEMBER(mz3500_state::mz3500_pb_w)
 	m_srdy = (data & 0x40) >> 6;
 }
 
-WRITE8_MEMBER(mz3500_state::mz3500_pc_w)
+void mz3500_state::mz3500_pc_w(uint8_t data)
 {
 	/*
 	x--- ---- printer OBF output
@@ -774,19 +764,14 @@ void mz3500_state::machine_reset()
 	//m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_srdy = 0;
 
-	if (m_fdc.found())
+	m_fdd_sel = 0;
+	for(auto & elem : m_floppy_connector)
 	{
-		m_fdd_sel = 0;
-		{
-			for(auto & elem : m_floppy_connector)
-			{
-				elem->get_device()->mon_w(ASSERT_LINE);
-				elem->get_device()->set_rpm(300);
-			}
-
-			m_fdc->set_rate(250000);
-		}
+		elem->get_device()->mon_w(ASSERT_LINE);
+		elem->get_device()->set_rpm(300);
 	}
+
+	m_fdc->set_rate(250000);
 
 	m_beeper->set_state(0);
 }
@@ -829,10 +814,10 @@ void mz3500_state::mz3500(machine_config &config)
 
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_master, INPUT_LINE_IRQ0);
-	FLOPPY_CONNECTOR(config, "upd765a:0", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765a:1", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765a:2", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765a:3", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765a:0", mz3500_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765a:1", mz3500_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765a:2", mz3500_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765a:3", mz3500_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
 
 	UPD7220(config, m_hgdc1, MAIN_CLOCK/5);
 	m_hgdc1->set_addrmap(0, &mz3500_state::upd7220_1_map);

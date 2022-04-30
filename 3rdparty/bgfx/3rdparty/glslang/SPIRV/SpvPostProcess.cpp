@@ -58,6 +58,7 @@ namespace spv {
 
 namespace spv {
 
+#ifndef GLSLANG_WEB
 // Hook to visit each operand type and result type of an instruction.
 // Will be called multiple times for one instruction, once for each typed
 // operand and the result.
@@ -319,9 +320,10 @@ void Builder::postProcess(Instruction& inst)
         }
     }
 }
+#endif
 
 // comment in header
-void Builder::postProcess()
+void Builder::postProcessCFG()
 {
     // reachableBlocks is the set of blockss reached via control flow, or which are
     // unreachable continue targert or unreachable merge.
@@ -377,7 +379,11 @@ void Builder::postProcess()
             return unreachableDefinitions.count(decoration_id) != 0;
         }),
         decorations.end());
+}
 
+#ifndef GLSLANG_WEB
+// comment in header
+void Builder::postProcessFeatures() {
     // Add per-instruction capabilities, extensions, etc.,
 
     // Look for any 8/16 bit type in physical storage buffer class, and set the
@@ -430,6 +436,47 @@ void Builder::postProcess()
             }
         }
     }
+
+    // If any Vulkan memory model-specific functionality is used, update the
+    // OpMemoryModel to match.
+    if (capabilities.find(spv::CapabilityVulkanMemoryModelKHR) != capabilities.end()) {
+        memoryModel = spv::MemoryModelVulkanKHR;
+        addIncorporatedExtension(spv::E_SPV_KHR_vulkan_memory_model, spv::Spv_1_5);
+    }
+
+    // Add Aliased decoration if there's more than one Workgroup Block variable.
+    if (capabilities.find(spv::CapabilityWorkgroupMemoryExplicitLayoutKHR) != capabilities.end()) {
+        assert(entryPoints.size() == 1);
+        auto &ep = entryPoints[0];
+
+        std::vector<Id> workgroup_variables;
+        for (int i = 0; i < (int)ep->getNumOperands(); i++) {
+            if (!ep->isIdOperand(i))
+                continue;
+
+            const Id id = ep->getIdOperand(i);
+            const Instruction *instr = module.getInstruction(id);
+            if (instr->getOpCode() != spv::OpVariable)
+                continue;
+
+            if (instr->getImmediateOperand(0) == spv::StorageClassWorkgroup)
+                workgroup_variables.push_back(id);
+        }
+
+        if (workgroup_variables.size() > 1) {
+            for (size_t i = 0; i < workgroup_variables.size(); i++)
+                addDecoration(workgroup_variables[i], spv::DecorationAliased);
+        }
+    }
+}
+#endif
+
+// comment in header
+void Builder::postProcess() {
+  postProcessCFG();
+#ifndef GLSLANG_WEB
+  postProcessFeatures();
+#endif
 }
 
 }; // end spv namespace

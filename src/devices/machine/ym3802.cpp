@@ -54,7 +54,7 @@ void ym3802_device::device_reset()
 	set_comms_mode();
 }
 
-void ym3802_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ym3802_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	// TODO: support clock and timers
 	switch(id)
@@ -188,7 +188,7 @@ void ym3802_device::set_comms_mode()
 	logerror("MIDI comms set to 1 start bit, %i data bits, %s, parity = %i\n",data_bits, (stop_bits == STOP_BITS_2) ? "2 stop bits" : "1 stop bit", parity);
 }
 
-READ8_MEMBER(ym3802_device::read)
+uint8_t ym3802_device::read(offs_t offset)
 {
 	if(offset < 4)
 	{
@@ -225,7 +225,7 @@ READ8_MEMBER(ym3802_device::read)
 	}
 }
 
-WRITE8_MEMBER(ym3802_device::write)
+void ym3802_device::write(offs_t offset, uint8_t data)
 {
 	m_wdr = data;
 	if(offset == 1)

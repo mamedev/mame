@@ -91,7 +91,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 private:
-	enum class cycle {
+	enum class cycle : u8 {
 		IFETCH_M1, LEA_M2, RDEA_M3,
 
 		BOC_M4, BOC_M5,
@@ -182,13 +182,13 @@ private:
 
 	// address space and cache
 	address_space_config m_space_config;
-	address_space *m_space;
-	memory_access_cache<1, -1, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<16, 1, -1, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<16, 1, -1, ENDIANNESS_LITTLE>::specific m_space;
 
 	// callback objects
 	devcb_read_line m_bps_callback;
-	devcb_read_line m_jc_callback[3];
-	devcb_write_line m_flag_callback[4];
+	devcb_read_line::array<3> m_jc_callback;
+	devcb_write_line::array<4> m_flag_callback;
 
 	// core registers
 	u16 m_fr;

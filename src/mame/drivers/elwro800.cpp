@@ -31,8 +31,11 @@
 #include "machine/bankdev.h"
 
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
 
 class elwro800_state : public spectrum_state
 {
@@ -48,11 +51,14 @@ public:
 		m_bank2(*this, "bank2"),
 		m_io_ports(*this, {"LINE7", "LINE6", "LINE5", "LINE4", "LINE3", "LINE2", "LINE1", "LINE0", "LINE8"}),
 		m_io_line9(*this, "LINE9"),
-		m_io_network_id(*this, "NETWORK ID")
+		m_io_network_id(*this, "NETWORK_ID")
 	{
 	}
 
 	void elwro800(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
 
 private:
 	/* for elwro800 */
@@ -63,13 +69,12 @@ private:
 	uint8_t m_NR;
 
 	uint8_t nmi_r();
-	DECLARE_WRITE8_MEMBER(elwro800jr_fdc_control_w);
-	DECLARE_READ8_MEMBER(elwro800jr_io_r);
-	DECLARE_WRITE8_MEMBER(elwro800jr_io_w);
-	DECLARE_MACHINE_RESET(elwro800);
+	void elwro800jr_fdc_control_w(uint8_t data);
+	uint8_t elwro800jr_io_r(offs_t offset);
+	void elwro800jr_io_w(offs_t offset, uint8_t data);
 	INTERRUPT_GEN_MEMBER(elwro800jr_interrupt);
-	DECLARE_READ8_MEMBER(i8255_port_c_r);
-	DECLARE_WRITE8_MEMBER(i8255_port_c_w);
+	uint8_t i8255_port_c_r();
+	void i8255_port_c_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 
 	void elwro800_bank1(address_map &map);
@@ -117,7 +122,7 @@ uint8_t elwro800_state::nmi_r()
  *
  *************************************/
 
-WRITE8_MEMBER(elwro800_state::elwro800jr_fdc_control_w)
+void elwro800_state::elwro800jr_fdc_control_w(uint8_t data)
 {
 	for (int i = 0; i < 2; i++)
 		if (m_flop[i]->get_device())
@@ -203,12 +208,12 @@ WRITE_LINE_MEMBER(elwro800_state::write_centronics_ack)
 	m_i8255->pc2_w(state);
 }
 
-READ8_MEMBER(elwro800_state::i8255_port_c_r)
+uint8_t elwro800_state::i8255_port_c_r()
 {
 	return m_centronics_ack << 2;
 }
 
-WRITE8_MEMBER(elwro800_state::i8255_port_c_w)
+void elwro800_state::i8255_port_c_w(uint8_t data)
 {
 	m_centronics->write_strobe((data >> 7) & 0x01);
 }
@@ -235,7 +240,7 @@ WRITE8_MEMBER(elwro800_state::i8255_port_c_w)
  *  0x??FE, 0x??7F, 0x??7B (read): keyboard reading
  *************************************/
 
-READ8_MEMBER(elwro800_state::elwro800jr_io_r)
+uint8_t elwro800_state::elwro800jr_io_r(offs_t offset)
 {
 	uint8_t *prom = memregion("proms")->base();
 	uint8_t cs = prom[offset & 0x1ff];
@@ -312,7 +317,7 @@ READ8_MEMBER(elwro800_state::elwro800jr_io_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(elwro800_state::elwro800jr_io_w)
+void elwro800_state::elwro800jr_io_w(offs_t offset, uint8_t data)
 {
 	uint8_t *prom = memregion("proms")->base();
 	uint8_t cs = prom[offset & 0x1ff];
@@ -320,7 +325,7 @@ WRITE8_MEMBER(elwro800_state::elwro800jr_io_w)
 	if (!BIT(cs,0))
 	{
 		// CFE
-		spectrum_port_fe_w(space, 0, data);
+		spectrum_ula_w(offset, data);
 	}
 	else if (!BIT(cs,1))
 	{
@@ -348,7 +353,7 @@ WRITE8_MEMBER(elwro800_state::elwro800jr_io_w)
 	else if (!BIT(cs,5))
 	{
 		// CF1
-		elwro800jr_fdc_control_w(space, 0, data);
+		elwro800jr_fdc_control_w(data);
 	}
 	else
 	{
@@ -408,8 +413,8 @@ static INPUT_PORTS_START( elwro800 )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X)     PORT_CHAR('x') PORT_CHAR('X')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C)     PORT_CHAR('c') PORT_CHAR('C')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V)     PORT_CHAR('v') PORT_CHAR('V')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(":    *") PORT_CODE(KEYCODE_ASTERISK)     PORT_CHAR(':')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(";    +") PORT_CODE(KEYCODE_COLON)        PORT_CHAR(';')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(":    *") PORT_CODE(KEYCODE_EQUALS)       PORT_CHAR(':') PORT_CHAR('*')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(";    +") PORT_CODE(KEYCODE_COLON)        PORT_CHAR(';') PORT_CHAR('+')
 
 	PORT_START("LINE1") /* 0xFDFE */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)     PORT_CHAR('a') PORT_CHAR('A')
@@ -417,8 +422,8 @@ static INPUT_PORTS_START( elwro800 )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D)     PORT_CHAR('d') PORT_CHAR('D')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F)     PORT_CHAR('f') PORT_CHAR('F')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G)     PORT_CHAR('g') PORT_CHAR('G')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("-    =") PORT_CODE(KEYCODE_MINUS)        PORT_CHAR('-')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("[    {") PORT_CODE(KEYCODE_OPENBRACE)    PORT_CHAR('[')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("-    =") PORT_CODE(KEYCODE_MINUS)        PORT_CHAR('-') PORT_CHAR('=')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("[    {") PORT_CODE(KEYCODE_OPENBRACE)    PORT_CHAR('[') PORT_CHAR('{')
 
 	PORT_START("LINE2") /* 0xFBFE */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
@@ -426,26 +431,26 @@ static INPUT_PORTS_START( elwro800 )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(".    >") PORT_CODE(KEYCODE_STOP)         PORT_CHAR('.')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(",    <") PORT_CODE(KEYCODE_COMMA)        PORT_CHAR(',')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(".    >") PORT_CODE(KEYCODE_STOP)         PORT_CHAR('.') PORT_CHAR('>')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(",    <") PORT_CODE(KEYCODE_COMMA)        PORT_CHAR(',') PORT_CHAR('<')
 
 	PORT_START("LINE3") /* 0xF7FE */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1    !") PORT_CODE(KEYCODE_1)    PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2    @") PORT_CODE(KEYCODE_2)    PORT_CHAR('2') PORT_CHAR('@')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3    #") PORT_CODE(KEYCODE_3)    PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4    $") PORT_CODE(KEYCODE_4)    PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5    %") PORT_CODE(KEYCODE_5)    PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("/    ?") PORT_CODE(KEYCODE_SLASH)        PORT_CHAR('/')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("@    \\") PORT_CODE(KEYCODE_BACKSLASH)   PORT_CHAR('@')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1    !") PORT_CODE(KEYCODE_1)    PORT_CHAR('1') PORT_CHAR(0xff) PORT_CHAR('!')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2   \"") PORT_CODE(KEYCODE_2)    PORT_CHAR('2') PORT_CHAR(0xff) PORT_CHAR('"')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3    #") PORT_CODE(KEYCODE_3)    PORT_CHAR('3') PORT_CHAR(0xff) PORT_CHAR('#')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4    $") PORT_CODE(KEYCODE_4)    PORT_CHAR('4') PORT_CHAR(0xff) PORT_CHAR('$')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5    %") PORT_CODE(KEYCODE_5)    PORT_CHAR('5') PORT_CHAR(0xff) PORT_CHAR('%')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("/    ?") PORT_CODE(KEYCODE_SLASH)        PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("@    \\") PORT_CODE(KEYCODE_BACKSLASH)   PORT_CHAR('@') PORT_CHAR('\\')
 
 	PORT_START("LINE4") /* 0xEFFE */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0    _") PORT_CODE(KEYCODE_0)    PORT_CHAR('0') PORT_CHAR('_')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9    )") PORT_CODE(KEYCODE_9)    PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8    (") PORT_CODE(KEYCODE_8)    PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7    '") PORT_CODE(KEYCODE_7)    PORT_CHAR('7') PORT_CHAR('\'')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6    &") PORT_CODE(KEYCODE_6)    PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DEL") PORT_CODE(KEYCODE_DEL)     PORT_CHAR(UCHAR_MAMEKEY(DEL))
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("]    }") PORT_CODE(KEYCODE_CLOSEBRACE)   PORT_CHAR(']')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0    _") PORT_CODE(KEYCODE_0)    PORT_CHAR('0') PORT_CHAR(0xff) PORT_CHAR('_')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9    )") PORT_CODE(KEYCODE_9)    PORT_CHAR('9') PORT_CHAR(0xff) PORT_CHAR(')')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8    (") PORT_CODE(KEYCODE_8)    PORT_CHAR('8') PORT_CHAR(0xff) PORT_CHAR('(')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7    '") PORT_CODE(KEYCODE_7)    PORT_CHAR('7') PORT_CHAR(0xff) PORT_CHAR('\'')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6    &") PORT_CODE(KEYCODE_6)    PORT_CHAR('6') PORT_CHAR(0xff) PORT_CHAR('&')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DEL") PORT_CODE(KEYCODE_DEL)     PORT_CHAR(UCHAR_MAMEKEY(DEL),127)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("]    }") PORT_CODE(KEYCODE_CLOSEBRACE)   PORT_CHAR(']') PORT_CHAR('}')
 
 	PORT_START("LINE5") /* 0xDFFE */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
@@ -453,8 +458,8 @@ static INPUT_PORTS_START( elwro800 )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC)             PORT_CHAR(UCHAR_MAMEKEY(ESC))
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BS") PORT_CODE(KEYCODE_BACKSPACE)        PORT_CHAR(UCHAR_MAMEKEY(BACKSPACE))
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC)             PORT_CHAR(UCHAR_MAMEKEY(ESC),27)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BS") PORT_CODE(KEYCODE_BACKSPACE)        PORT_CHAR(UCHAR_MAMEKEY(BACKSPACE),8)
 
 	PORT_START("LINE6") /* 0xBFFE */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
@@ -472,7 +477,7 @@ static INPUT_PORTS_START( elwro800 )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("^    -") PORT_CODE(KEYCODE_TILDE)    PORT_CHAR('^') PORT_CHAR('-')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("^    -") PORT_CODE(KEYCODE_TILDE)    PORT_CHAR('^')
 
 	PORT_START("LINE8")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xC4\x98") PORT_CODE(KEYCODE_0_PAD) // LATIN CAPITAL LETTER E WITH OGONEK
@@ -499,7 +504,7 @@ static INPUT_PORTS_START( elwro800 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P1 Joystick Up") PORT_CODE(JOYCODE_Y_UP_SWITCH)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P1 Joystick Fire") PORT_CODE(JOYCODE_BUTTON1)
 
-	PORT_START("NETWORK ID")
+	PORT_START("NETWORK_ID")
 	PORT_DIPNAME( 0x3f, 0x01, "Computer network ID" )
 	PORT_DIPSETTING( 0x01, "1" )
 	PORT_DIPSETTING( 0x10, "16" )
@@ -513,7 +518,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(elwro800_state,elwro800)
+void elwro800_state::machine_reset()
 {
 	uint8_t *messram = m_ram->pointer();
 
@@ -568,27 +573,22 @@ void elwro800_state::elwro800(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &elwro800_state::elwro800_m1);
 	m_maincpu->set_vblank_int("screen", FUNC(elwro800_state::elwro800jr_interrupt));
 
-	MCFG_MACHINE_RESET_OVERRIDE(elwro800_state,elwro800)
-
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(14_MHz_XTAL / 2, 448, 0, SPEC_SCREEN_WIDTH, 312, 0, SPEC_SCREEN_HEIGHT);
 	// Sync and interrupt timings determined by 2716 EPROM
 	screen.set_screen_update(FUNC(elwro800_state::screen_update_spectrum));
-	screen.screen_vblank().set(FUNC(elwro800_state::screen_vblank_spectrum));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(elwro800_state::spectrum_palette), 16);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_elwro800);
 
-	MCFG_VIDEO_START_OVERRIDE(elwro800_state, spectrum)
-
 	UPD765A(config, "upd765", 8_MHz_XTAL / 2, true, true);
 
 	I8255A(config, m_i8255, 0);
 	m_i8255->in_pa_callback().set_ioport("JOY");
-	m_i8255->in_pb_callback().set("cent_data_in", FUNC(input_buffer_device::bus_r));
-	m_i8255->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_i8255->in_pb_callback().set("cent_data_in", FUNC(input_buffer_device::read));
+	m_i8255->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_i8255->in_pc_callback().set(FUNC(elwro800_state::i8255_port_c_r));
 	m_i8255->out_pc_callback().set(FUNC(elwro800_state::i8255_port_c_w));
 
@@ -611,15 +611,18 @@ void elwro800_state::elwro800(machine_config &config)
 	m_cassette->set_formats(tzx_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("spectrum_cass");
 
-	FLOPPY_CONNECTOR(config, "upd765:0", elwro800jr_floppies, "525hd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765:1", elwro800jr_floppies, "525hd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:0", elwro800jr_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", elwro800jr_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");
 
 	ADDRESS_MAP_BANK(config, "bank1").set_map(&elwro800_state::elwro800_bank1).set_data_width(8).set_stride(0x2000);
 	ADDRESS_MAP_BANK(config, "bank2").set_map(&elwro800_state::elwro800_bank2).set_data_width(8).set_stride(0x2000);
+
+	SOFTWARE_LIST(config, "cass_list").set_original("spectrum_cass");
 }
 
 /*************************************
@@ -640,7 +643,9 @@ ROM_START( elwro800 )
 	ROM_LOAD( "tv_2716.e11",         0x0400, 0x0800, CRC(6093e80e) SHA1(a4972f336490d15222f4f24369f1f3253cfb9516) )
 ROM_END
 
+} // Anonymous namespace
+
 /* Driver */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME      FLAGS
-COMP( 1986, elwro800, 0,      0,      elwro800, elwro800, elwro800_state, empty_init, "Elwro", "800 Junior", 0 )
+COMP( 1986, elwro800, 0,      0,      elwro800, elwro800, elwro800_state, empty_init, "Elwro", "800-3 Junior", 0 )

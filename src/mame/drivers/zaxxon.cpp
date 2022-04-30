@@ -255,7 +255,7 @@
 
 #include "emu.h"
 #include "includes/zaxxon.h"
-#include "audio/segasnd.h"
+#include "audio/segausb.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
@@ -340,7 +340,7 @@ void zaxxon_state::machine_start()
  *
  *************************************/
 
-READ8_MEMBER(zaxxon_state::razmataz_counter_r)
+uint8_t zaxxon_state::razmataz_counter_r()
 {
 	/* this behavior is really unknown; however, the code is using this */
 	/* counter as a sort of timeout when talking to the sound board */
@@ -381,13 +381,13 @@ CUSTOM_INPUT_MEMBER(zaxxon_state::razmataz_dial_r)
  *
  *************************************/
 
-WRITE8_MEMBER(zaxxon_state::zaxxon_control_w)
+void zaxxon_state::zaxxon_control_w(offs_t offset, uint8_t data)
 {
 	// address decode for E0F8/E0F9 (74LS138 @ U57) has its G2B enable input in common with this latch
 	bool a3 = BIT(offset, 3);
 	m_mainlatch[1]->write_bit((a3 ? 4 : 0) | (offset & 3), BIT(data, 0));
 	if (a3 && !BIT(offset, 1))
-		bg_position_w(space, offset & 1, data);
+		bg_position_w(offset & 1, data);
 }
 
 
@@ -1023,14 +1023,23 @@ void zaxxon_state::razmataze(machine_config &config)
 
 void zaxxon_state::ixion(machine_config &config)
 {
-	razmataze(config);
+	root(config);
 	sega_315_5013_device &maincpu(SEGA_315_5013(config.replace(), m_maincpu, MASTER_CLOCK/16));
 	maincpu.set_addrmap(AS_PROGRAM, &zaxxon_state::ixion_map);
 	maincpu.set_addrmap(AS_OPCODES, &zaxxon_state::decrypted_opcodes_map);
 	maincpu.set_decrypted_tag(":decrypted_opcodes");
 	maincpu.set_size(0x6000);
 
+	config.device_remove("ppi8255");
+
 	m_mainlatch[0]->q_out_cb<6>().set_nop(); // flip screen not used
+
+	/* video hardware */
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(zaxxon_state::screen_update_ixion));
+
+	/* sound hardware */
+	SPEAKER(config, "speaker").front_center();
+	SEGAUSBROM(config, "usbsnd", 0, m_maincpu).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 
@@ -1584,7 +1593,7 @@ void zaxxon_state::init_razmataz()
 	pgmspace.install_read_port(0xc00c, 0xc00c, 0x18f3, "SW0C");
 
 	/* unknown behavior expected here */
-	pgmspace.install_read_handler(0xc80a, 0xc80a, read8_delegate(*this, FUNC(zaxxon_state::razmataz_counter_r)));
+	pgmspace.install_read_handler(0xc80a, 0xc80a, read8smo_delegate(*this, FUNC(zaxxon_state::razmataz_counter_r)));
 
 	/* additional state saving */
 	save_item(NAME(m_razmataz_dial_pos));
@@ -1615,7 +1624,7 @@ GAME( 1984, futspy,   0,      futspye,   futspy,   zaxxon_state,   empty_init,  
 /* these games run on modified Zaxxon hardware with no skewing, extra inputs, and a */
 /* G-80 Universal Sound Board */
 GAME( 1983, razmataz, 0,      razmataze, razmataz, zaxxon_state,   init_razmataz, ROT90,  "Sega",    "Razzmatazz",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ixion,    0,      ixion,     ixion,    zaxxon_state,   empty_init,    ROT270, "Sega",    "Ixion (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1983, ixion,    0,      ixion,     ixion,    zaxxon_state,   empty_init,    ROT270, "Sega",    "Ixion (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* these games run on a slightly newer Zaxxon hardware with more ROM space and a */
 /* custom sprite DMA chip */

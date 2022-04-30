@@ -19,7 +19,9 @@ public:
 	pc1403_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pocketc_state(mconfig, type, tag)
 		, m_keys(*this, "KEY%u", 0U)
-	{ }
+	{
+		std::fill(std::begin(m_reg), std::end(m_reg), 0);
+	}
 
 	void pc1403(machine_config &config);
 	void pc1403h(machine_config &config);
@@ -36,23 +38,23 @@ protected:
 	void pc1421_writemem(address_map &map);
 
 	DECLARE_READ_LINE_MEMBER(reset_r);
-	DECLARE_WRITE8_MEMBER(out_c_w);
-	DECLARE_READ8_MEMBER(in_a_r);
+	void out_c_w(uint8_t data);
+	uint8_t in_a_r();
 
-	DECLARE_READ8_MEMBER(asic_read);
-	DECLARE_WRITE8_MEMBER(asic_write);
-	DECLARE_READ8_MEMBER(lcd_read);
-	DECLARE_WRITE8_MEMBER(lcd_write);
+	uint8_t asic_read(offs_t offset);
+	void asic_write(offs_t offset, uint8_t data);
+	uint8_t lcd_read(offs_t offset);
+	void lcd_write(offs_t offset, uint8_t data);
 
-	int m_down;
-	int m_right;
+	int m_down = 0;
+	int m_right = 0;
 
 private:
 	required_ioport_array<14> m_keys;
 
-	uint8_t m_portc;
-	uint8_t m_asic[4];
-	uint8_t m_reg[0x100];
+	uint8_t m_portc = 0;
+	uint8_t m_asic[4]{};
+	uint8_t m_reg[0x100]{};
 
 	static const char* const s_line[5];
 	static const char* const s_busy[5];

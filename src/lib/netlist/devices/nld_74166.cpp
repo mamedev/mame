@@ -3,25 +3,42 @@
 /*
  * nld_74166.cpp
  *
+ *  74166: Parallel-Load 8-Bit Shift Register
+ *
+ *          +--------------+
+ *      SER |1     ++    16| VCC
+ *        A |2           15| SH/LDQ
+ *        B |3           14| H
+ *        C |4    74166  13| QH
+ *        D |5           12| G
+ *   CLKINH |6           11| F
+ *      CLK |7           10| E
+ *      GND |8            9| CLRQ
+ *          +--------------+
+ *
+ * SH/LDQ: Shift / !Load
+ * CLKINH: Clock Inhibit
+ * SER: Serial In
+ *
+ *  Naming convention attempts to follow Texas Instruments datasheet
+ *
  */
 
-#include "nld_74166.h"
-#include "netlist/nl_base.h"
-#include "nlid_system.h"
+#include "nl_base.h"
 
-namespace netlist
-{
-	namespace devices
-	{
+// FIXME: separate handlers for inputs
+
+namespace netlist::devices {
+
 	NETLIB_OBJECT(74166)
 	{
 		NETLIB_CONSTRUCTOR(74166)
-		, m_DATA(*this, {{ "H", "G", "F", "E", "D", "C", "B", "A" }})
-		, m_SER(*this, "SER")
-		, m_CLRQ(*this, "CLRQ")
-		, m_SH_LDQ(*this, "SH_LDQ")
-		, m_CLK(*this, "CLK")
-		, m_CLKINH(*this, "CLKINH")
+		, m_DATA(*this, { "H", "G", "F", "E", "D", "C", "B", "A" }, NETLIB_DELEGATE(inputs))
+		, m_SER(*this, "SER", NETLIB_DELEGATE(inputs))
+		, m_CLRQ(*this, "CLRQ", NETLIB_DELEGATE(inputs))
+		, m_SH_LDQ(*this, "SH_LDQ", NETLIB_DELEGATE(inputs))
+		, m_CLK(*this, "CLK", NETLIB_DELEGATE(inputs))
+		, m_CLKINH(*this, "CLKINH", NETLIB_DELEGATE(inputs))
 		, m_QH(*this, "QH")
 		, m_shifter(*this, "m_shifter", 0)
 		, m_last_CLRQ(*this, "m_last_CLRQ", 0)
@@ -30,10 +47,60 @@ namespace netlist
 		{
 		}
 
-		NETLIB_RESETI();
-		NETLIB_UPDATEI();
+	private:
+		NETLIB_RESETI()
+		{
+			m_shifter = 0;
+			m_last_CLRQ = 0;
+			m_last_CLK = 0;
+		}
 
-	protected:
+		NETLIB_HANDLERI(inputs)
+		{
+			netlist_sig_t old_qh = m_QH.net().Q();
+			netlist_sig_t qh = 0;
+
+			netlist_time delay = NLTIME_FROM_NS(26);
+			if (m_CLRQ())
+			{
+				bool clear_unset = !m_last_CLRQ;
+				if (clear_unset)
+				{
+					delay = NLTIME_FROM_NS(35);
+				}
+
+				if (!m_CLK() || m_CLKINH())
+				{
+					qh = old_qh;
+				}
+				else if (!m_last_CLK)
+				{
+					if (!m_SH_LDQ())
+					{
+						m_shifter = 0;
+						for (std::size_t i=0; i<8; i++)
+							m_shifter |= (m_DATA[i]() << i);
+					}
+					else
+					{
+						unsigned high_bit = m_SER() ? 0x80 : 0;
+						m_shifter = high_bit | (m_shifter >> 1);
+					}
+
+					qh = m_shifter & 1;
+					if (!qh && !clear_unset)
+					{
+						delay = NLTIME_FROM_NS(30);
+					}
+				}
+			}
+
+			m_last_CLRQ = m_CLRQ();
+			m_last_CLK = m_CLK();
+
+			m_QH.push(qh, delay); //FIXME
+		}
+
 		object_array_t<logic_input_t, 8> m_DATA;
 		logic_input_t m_SER;
 		logic_input_t m_CLRQ;
@@ -48,85 +115,6 @@ namespace netlist
 		nld_power_pins m_power_pins;
 	};
 
-	NETLIB_OBJECT_DERIVED(74166_dip, 74166)
-	{
-		NETLIB_CONSTRUCTOR_DERIVED(74166_dip, 74166)
-		{
-			register_subalias("1", m_SER);
-			register_subalias("2", m_DATA[7]);
-			register_subalias("3", m_DATA[6]);
-			register_subalias("4", m_DATA[5]);
-			register_subalias("5", m_DATA[4]);
-			register_subalias("6", m_CLKINH);
-			register_subalias("7", m_CLK);
-			register_subalias("8", "GND");
-
-			register_subalias("9", m_CLRQ);
-			register_subalias("10", m_DATA[3]);
-			register_subalias("11", m_DATA[2]);
-			register_subalias("12", m_DATA[1]);
-			register_subalias("13", m_QH);
-			register_subalias("14", m_DATA[0]);
-			register_subalias("15", m_SH_LDQ);
-			register_subalias("16", "VCC");
-		}
-	};
-
-	NETLIB_RESET(74166)
-	{
-		m_shifter = 0;
-		m_last_CLRQ = 0;
-		m_last_CLK = 0;
-	}
-
-	NETLIB_UPDATE(74166)
-	{
-		netlist_sig_t old_qh = m_QH.net().Q();
-		netlist_sig_t qh = 0;
-
-		netlist_time delay = NLTIME_FROM_NS(26);
-		if (m_CLRQ())
-		{
-			bool clear_unset = !m_last_CLRQ;
-			if (clear_unset)
-			{
-				delay = NLTIME_FROM_NS(35);
-			}
-
-			if (!m_CLK() || m_CLKINH())
-			{
-				qh = old_qh;
-			}
-			else if (!m_last_CLK)
-			{
-				if (!m_SH_LDQ())
-				{
-					m_shifter = 0;
-					for (std::size_t i=0; i<8; i++)
-						m_shifter |= (m_DATA[i]() << i);
-				}
-				else
-				{
-					unsigned high_bit = m_SER() ? 0x80 : 0;
-					m_shifter = high_bit | (m_shifter >> 1);
-				}
-
-				qh = m_shifter & 1;
-				if (!qh && !clear_unset)
-				{
-					delay = NLTIME_FROM_NS(30);
-				}
-			}
-		}
-
-		m_last_CLRQ = m_CLRQ();
-		m_last_CLK = m_CLK();
-
-		m_QH.push(qh, delay); //FIXME
-	}
-
 	NETLIB_DEVICE_IMPL(74166,    "TTL_74166", "+CLK,+CLKINH,+SH_LDQ,+SER,+A,+B,+C,+D,+E,+F,+G,+H,+CLRQ,@VCC,@GND")
-	NETLIB_DEVICE_IMPL(74166_dip,"TTL_74166_DIP", "")
 
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

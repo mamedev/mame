@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Acorn FileStore Discs -->
+Acorn FileStore Discs
+-->
 
 <softwarelist name="e01_flop" description="Acorn FileStore Discs">
 

@@ -113,7 +113,7 @@
     the PAL is a 16L6 rather than a 20L8 used in later version (only known dump is bruteforced and converted to gal20v8 target.)
     details here: https://web.archive.org/web/20171118171054/http://trastero.speccy.org/cosas/JL/PlusD/PlusD-v1-0.html
 
-    from "pick-poke-it" user manual (reguarding v1.0 unit):
+    from "pick-poke-it" user manual (regarding v1.0 unit):
      "A few PLUS D users are still using Version 1 of the ROM which was used in PLUS D's sold in December 1987-January 1988.
       ... check the serial number on the bottom of your PLUS D. If it's a 4-figure number commencing with 1,
       then you have a PLUS D with the Version 1 ROM."
@@ -136,7 +136,7 @@
     --------------
 
     DISCiPLE
-    GDOS v3: all ok, occassional "no system file" when loading system disk, ok on 2nd attempt
+    GDOS v3: all ok
     GDOS v2: all ok
     UNIDOS:  all ok
 
@@ -145,13 +145,16 @@
     UNIDOS: all ok
 
 
-    Not working with 128K/+2 yet...
+    DISCiPLE and 128K compatibility notes:
+     there is some magic involved and its still not clear how exactly it boots on 128K (but it was confirmed to work on real hardware),
+     currently we assume paging in cannot be triggered for a while after reset.
 
 **********************************************************************/
 
 
 #include "emu.h"
 #include "mgt.h"
+#include "softlist_dev.h"
 
 
 //**************************************************************************
@@ -167,7 +170,7 @@ DEFINE_DEVICE_TYPE(SPECTRUM_DISCIPLE, spectrum_disciple_device, "spectrum_discip
 
 INPUT_PORTS_START(plusd)
 	PORT_START("BUTTON")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Snapshot Button") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHANGED_MEMBER(DEVICE_SELF, spectrum_plusd_device, snapshot_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Snapshot Button") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, spectrum_plusd_device, snapshot_button, 0)
 INPUT_PORTS_END
 
 //-------------------------------------------------
@@ -193,6 +196,11 @@ INPUT_PORTS_START(disciple)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_8WAY PORT_PLAYER(2) PORT_NAME("Sinclair P2 Down")     PORT_CODE(KEYCODE_2_PAD)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_8WAY PORT_PLAYER(2) PORT_NAME("Sinclair P2 Up")       PORT_CODE(KEYCODE_8_PAD)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)                  PORT_PLAYER(2) PORT_NAME("Sinclair P2 Button 1") PORT_CODE(KEYCODE_0_PAD)
+
+	PORT_START("INH")
+	PORT_CONFNAME(0x01, 0x01, "Inhibit Button") PORT_CHANGED_MEMBER(DEVICE_SELF, spectrum_disciple_device, inhibit_button, 0)
+	PORT_CONFSETTING(0x01, "Off (Disciple enabled)")
+	PORT_CONFSETTING(0x00, "On (Disciple disabled)")
 INPUT_PORTS_END
 
 //-------------------------------------------------
@@ -219,12 +227,14 @@ static void plusd_floppies(device_slot_interface &device)
 }
 
 //-------------------------------------------------
-//  floppy_format_type floppy_formats
+//  floppy_formats
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER(spectrum_plusd_device::floppy_formats)
-	FLOPPY_MGT_FORMAT
-FLOPPY_FORMATS_END
+void spectrum_plusd_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_MGT_FORMAT);
+}
 
 //-------------------------------------------------
 //  ROM( plusd )
@@ -298,6 +308,7 @@ void spectrum_disciple_device::device_add_mconfig(machine_config &config)
 	SPECTRUM_EXPANSION_SLOT(config, m_exp, spectrum_expansion_devices, nullptr);
 	m_exp->irq_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::irq_w));
 	m_exp->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::nmi_w));
+	m_exp->fb_r_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::fb_r));
 }
 
 const tiny_rom_entry *spectrum_plusd_device::device_rom_region() const
@@ -343,6 +354,8 @@ spectrum_disciple_device::spectrum_disciple_device(const machine_config &mconfig
 	, m_exp(*this, "exp")
 	, m_joy1(*this, "JOY1")
 	, m_joy2(*this, "JOY2")
+	, m_inhibit(*this, "INH")
+	, m_control(0) // CHECKME: what is 74LS374 power-on state ?
 {
 }
 
@@ -352,6 +365,7 @@ spectrum_disciple_device::spectrum_disciple_device(const machine_config &mconfig
 
 void spectrum_plusd_device::device_start()
 {
+	m_romcs = 0;
 	std::fill(std::begin(m_ram), std::end(m_ram), 0);
 	save_item(NAME(m_romcs));
 	save_item(NAME(m_ram));
@@ -362,6 +376,8 @@ void spectrum_disciple_device::device_start()
 {
 	spectrum_plusd_device::device_start();
 	save_item(NAME(m_map));
+	save_item(NAME(m_control));
+	save_item(NAME(m_reset_delay));
 }
 
 //-------------------------------------------------
@@ -370,13 +386,15 @@ void spectrum_disciple_device::device_start()
 
 void spectrum_plusd_device::device_reset()
 {
-	m_romcs = 0;
+	m_centronics->write_strobe(0);
 }
 
 void spectrum_disciple_device::device_reset()
 {
-	spectrum_plusd_device::device_reset();
+	m_romcs = 0;
 	m_map = false;
+	m_reset_delay = true;
+	timer_set(attotime::from_usec(10), TIMER_RESET); // delay time is a guess
 }
 
 //**************************************************************************
@@ -394,7 +412,6 @@ void spectrum_plusd_device::pre_opcode_fetch(offs_t offset)
 	{
 		switch (offset)
 		{
-		case 0x0000:
 		case 0x0008:
 		case 0x003a:
 		case 0x0066:
@@ -406,21 +423,21 @@ void spectrum_plusd_device::pre_opcode_fetch(offs_t offset)
 
 uint8_t spectrum_plusd_device::iorq_r(offs_t offset)
 {
-	uint8_t data = 0xff;
+	uint8_t data = offset & 1 ? m_slot->fb_r() : 0xff;
 
-	switch (offset & 0xff)
+	switch (offset & 0x7e) // address lines 0 and 7-15 ignored
 	{
-	case 0xe3: // fdc status reg
-	case 0xeb: // fdc track reg
-	case 0xf3: // fdc sector reg
-	case 0xfb: // fdc data reg
+	case 0x62: // fdc status reg
+	case 0x6a: // fdc track reg
+	case 0x72: // fdc sector reg
+	case 0x7a: // fdc data reg
 		data = m_fdc->read((offset >> 3) & 0x03);
 		break;
-	case 0xe7: // page in
+	case 0x66: // page in
 		if (!machine().side_effects_disabled())
 			m_romcs = 1;
 		break;
-	case 0xf7: // bit 7: printer busy
+	case 0x76: // bit 7: printer busy
 		data = m_centronics_busy ? 0x80 : 0x00;
 		break;
 	}
@@ -430,27 +447,30 @@ uint8_t spectrum_plusd_device::iorq_r(offs_t offset)
 
 void spectrum_plusd_device::iorq_w(offs_t offset, uint8_t data)
 {
-	switch (offset & 0xff)
+	switch (offset & 0x7e) // address lines 0 and 7-15 ignored
 	{
-	case 0xe3: // fdc command reg
-	case 0xeb: // fdc track reg
-	case 0xf3: // fdc sector reg
-	case 0xfb: // fdc data reg
+	case 0x62: // fdc command reg
+	case 0x6a: // fdc track reg
+	case 0x72: // fdc sector reg
+	case 0x7a: // fdc data reg
 		m_fdc->write((offset >> 3) & 0x03, data);
 		break;
-	case 0xef: // bit 0-1: drive select, 6: printer strobe, 7: side select
+	case 0x6e: // bit 0-1: drive select, 6: printer strobe, 7: side select
 		{
-			uint8_t drive = data & 3;
-			floppy_image_device* floppy = m_floppy[drive > 0 ? drive-1 : drive]->get_device();
+			floppy_image_device* floppy = nullptr;
+			if (data & 1)
+				floppy = m_floppy[0]->get_device();
+			else if (data & 2)
+				floppy = m_floppy[1]->get_device();
 			m_fdc->set_floppy(floppy);
 			m_centronics->write_strobe(BIT(data, 6));
 			if (floppy) floppy->ss_w(BIT(data, 7));
 		}
 		break;
-	case 0xe7: // page out
+	case 0x66: // page out
 		m_romcs = 0;
 		break;
-	case 0xf7: // printer data
+	case 0x76: // printer data
 		m_centronics->write_data0(BIT(data, 0));
 		m_centronics->write_data1(BIT(data, 1));
 		m_centronics->write_data2(BIT(data, 2));
@@ -524,17 +544,19 @@ READ_LINE_MEMBER(spectrum_disciple_device::romcs)
 
 void spectrum_disciple_device::pre_opcode_fetch(offs_t offset)
 {
-	m_exp->pre_opcode_fetch(offset);
+	if (m_inhibit->read() || !BIT(m_control, 4)) // when inhibit button pressed - /M1 passthrought might be blocked
+		m_exp->pre_opcode_fetch(offset);
 
 	if (!machine().side_effects_disabled())
 	{
 		switch (offset)
 		{
-		case 0x0000:
+		case 0x0001:
 		case 0x0008:
 		case 0x0066:
 		case 0x028e:
-			m_romcs = 1;
+			if (!m_reset_delay && (m_inhibit->read() || BIT(m_control, 4)))
+				m_romcs = 1;
 			break;
 		}
 	}
@@ -558,11 +580,11 @@ uint8_t spectrum_disciple_device::iorq_r(offs_t offset)
 		// 7: network...
 		break;
 	case 0x7b: // reset boot
-		if (!machine().side_effects_disabled())
+		if (!machine().side_effects_disabled() && !m_reset_delay)
 			m_map = false;
 		break;
 	case 0xbb: // page in
-		if (!machine().side_effects_disabled())
+		if (!machine().side_effects_disabled() && !m_reset_delay && (m_inhibit->read() || BIT(m_control, 4)))
 			m_romcs = 1;
 		break;
 	case 0xfe: // sinclair joysticks
@@ -597,16 +619,21 @@ void spectrum_disciple_device::iorq_w(offs_t offset, uint8_t data)
 			// 5: exp select...
 			m_centronics->write_strobe(BIT(data, 6));
 			// 7: network...
+			m_control = data;
+			if (!m_inhibit->read() && !BIT(m_control, 4))
+				m_romcs = 0;
 		}
 		break;
 	case 0x3b: // wait when net=1
 		// ...
 		break;
 	case 0x7b: // set boot
-		m_map = true;
+		if (!m_reset_delay)
+			m_map = true;
 		break;
 	case 0xbb: // page out
-		m_romcs = 0;
+		if (!m_reset_delay)
+			m_romcs = 0;
 		break;
 	case 0xfb: // printer data
 		m_centronics->write_data0(BIT(data, 0));
@@ -687,4 +714,16 @@ void spectrum_disciple_device::mreq_w(offs_t offset, uint8_t data)
 
 	if (m_exp->romcs())
 		m_exp->mreq_w(offset, data);
+}
+
+void spectrum_disciple_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+{
+	switch (id)
+	{
+	case TIMER_RESET:
+		m_reset_delay = false;
+		break;
+	default:
+		throw emu_fatalerror("Unknown id in spectrum_disciple_device::device_timer");
+	}
 }

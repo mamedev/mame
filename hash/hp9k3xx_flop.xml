@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="hp9k3xx_flop" description="HP9000/300 disks">
 	<software name="basic4">
 		<description>HP BASIC 4.0</description>

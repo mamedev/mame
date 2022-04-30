@@ -30,7 +30,6 @@
 #include "cococart.h"
 
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -58,7 +57,7 @@ namespace
 	{
 	public:
 		// construction/destruction
-		coco_orch90_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		coco_orch90_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 			: device_t(mconfig, COCO_ORCH90, tag, owner, clock)
 			, device_cococart_interface(mconfig, *this)
 			, m_eprom(*this, "eprom")
@@ -67,16 +66,16 @@ namespace
 		{
 		}
 
+	protected:
 		// optional information overrides
 		virtual void device_add_mconfig(machine_config &config) override;
 
-	protected:
 		// device-level overrides
 		virtual void device_start() override
 		{
 			// install handlers
-			install_write_handler(0xFF7A, 0xFF7A, write8_delegate(*this, FUNC(coco_orch90_device::write_left)));
-			install_write_handler(0xFF7B, 0xFF7B, write8_delegate(*this, FUNC(coco_orch90_device::write_right)));
+			install_write_handler(0xFF7A, 0xFF7A, write8smo_delegate(*this, FUNC(coco_orch90_device::write_left)));
+			install_write_handler(0xFF7B, 0xFF7B, write8smo_delegate(*this, FUNC(coco_orch90_device::write_right)));
 
 			// Orch-90 ties CART to Q
 			set_line_value(line::CART, line_value::Q);
@@ -88,55 +87,51 @@ namespace
 		}
 
 		// CoCo cartridge level overrides
-		virtual uint8_t *get_cart_base() override
+		virtual u8 *get_cart_base() override
 		{
 			return m_eprom->base();
 		}
 
-		virtual memory_region* get_cart_memregion() override
+		virtual memory_region *get_cart_memregion() override
 		{
 			return m_eprom;
 		}
 
-		virtual DECLARE_READ8_MEMBER(cts_read) override;
+		virtual u8 cts_read(offs_t offset) override;
 
 	private:
-		WRITE8_MEMBER(write_left)   { m_ldac->write(data); }
-		WRITE8_MEMBER(write_right)  { m_rdac->write(data); }
+		void write_left(u8 data)   { m_ldac->write(data); }
+		void write_right(u8 data)  { m_rdac->write(data); }
 
 		// internal state
 		required_memory_region m_eprom;
 		required_device<dac_byte_interface> m_ldac;
 		required_device<dac_byte_interface> m_rdac;
 	};
-};
 
 
-//**************************************************************************
-//  MACHINE AND ROM DECLARATIONS
-//**************************************************************************
+	//**************************************************************************
+	//  MACHINE AND ROM DECLARATIONS
+	//**************************************************************************
 
-void coco_orch90_device::device_add_mconfig(machine_config &config)
-{
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	DAC_8BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // ls374.ic5 + r7 (8x20k) + r9 (8x10k)
-	DAC_8BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // ls374.ic4 + r6 (8x20k) + r8 (8x10k)
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
+	void coco_orch90_device::device_add_mconfig(machine_config &config)
+	{
+		SPEAKER(config, "lspeaker").front_left();
+		SPEAKER(config, "rspeaker").front_right();
+		DAC_8BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // ls374.ic5 + r7 (8x20k) + r9 (8x10k)
+		DAC_8BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // ls374.ic4 + r6 (8x20k) + r8 (8x10k)
+	}
+
+	//-------------------------------------------------
+	//  cts_read
+	//-------------------------------------------------
+
+	u8 coco_orch90_device::cts_read(offs_t offset)
+	{
+		return m_eprom->base()[offset & 0x1fff];
+	}
+
 }
-
-//-------------------------------------------------
-//  cts_read
-//-------------------------------------------------
-
-READ8_MEMBER(coco_orch90_device::cts_read)
-{
-	return m_eprom->base()[offset & 0x1fff];
-}
-
-
 //**************************************************************************
 //  DEVICE DECLARATION
 //**************************************************************************

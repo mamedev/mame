@@ -8,8 +8,8 @@
 #ifdef  ALTO2_DEFINE_CONSTANTS
 
 #else   // ALTO2_DEFINE_CONSTANTS
-#ifndef _A2KWD_H_
-#define _A2KWD_H_
+#ifndef MAME_CPU_ALTO2_A2KWD_H
+#define MAME_CPU_ALTO2_A2KWD_H
 
 //! BUS source for disk word task
 enum {
@@ -45,5 +45,5 @@ void f1_early_kwd_block();                      //!< F1 func: disable the disk w
 void init_kwd(int task = task_kwd);             //!< initialize the disk word task
 void exit_kwd();                                //!< deinitialize the disk word task
 void reset_kwd();                               //!< reset the disk word task
-#endif // _A2KWD_H_
+#endif // MAME_CPU_ALTO2_A2KWD_H
 #endif  // ALTO2_DEFINE_CONSTANTS

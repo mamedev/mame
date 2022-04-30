@@ -252,29 +252,29 @@ inline void i8257_device::advance()
 //-------------------------------------------------
 
 i8257_device::i8257_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, I8257, tag, owner, clock),
-		device_execute_interface(mconfig, *this),
-		m_icount(0),
-		m_reverse_rw(0),
-		m_tc(false),
-		m_msb(0),
-		m_hreq(CLEAR_LINE),
-		m_hack(0),
-		m_ready(1),
-		m_state(0),
-		m_current_channel(0),
-		m_last_channel(0),
-		m_transfer_mode(0),
-		m_status(0),
-		m_request(0),
-		m_temp(0),
-		m_out_hrq_cb(*this),
-		m_out_tc_cb(*this),
-		m_in_memr_cb(*this),
-		m_out_memw_cb(*this),
-		m_in_ior_cb{{*this}, {*this}, {*this}, {*this}},
-		m_out_iow_cb{{*this}, {*this}, {*this}, {*this}},
-		m_out_dack_cb{{*this}, {*this}, {*this}, {*this}}
+	: device_t(mconfig, I8257, tag, owner, clock)
+	, device_execute_interface(mconfig, *this)
+	, m_icount(0)
+	, m_reverse_rw(0)
+	, m_tc(false)
+	, m_msb(0)
+	, m_hreq(CLEAR_LINE)
+	, m_hack(0)
+	, m_ready(1)
+	, m_state(0)
+	, m_current_channel(0)
+	, m_last_channel(0)
+	, m_transfer_mode(0)
+	, m_status(0)
+	, m_request(0)
+	, m_temp(0)
+	, m_out_hrq_cb(*this)
+	, m_out_tc_cb(*this)
+	, m_in_memr_cb(*this)
+	, m_out_memw_cb(*this)
+	, m_in_ior_cb(*this)
+	, m_out_iow_cb(*this)
+	, m_out_dack_cb(*this)
 {
 }
 
@@ -294,12 +294,9 @@ void i8257_device::device_start()
 	m_out_tc_cb.resolve_safe();
 	m_in_memr_cb.resolve_safe(0);
 	m_out_memw_cb.resolve_safe();
-	for (auto &cb : m_in_ior_cb)
-		cb.resolve_safe(0);
-	for (auto &cb : m_out_iow_cb)
-		cb.resolve_safe();
-	for (auto &cb : m_out_dack_cb)
-		cb.resolve_safe();
+	m_in_ior_cb.resolve_all_safe(0);
+	m_out_iow_cb.resolve_all_safe();
+	m_out_dack_cb.resolve_all_safe();
 
 	// state saving
 	save_item(NAME(m_msb));
@@ -431,7 +428,7 @@ void i8257_device::execute_run()
 			if (m_ready)
 			{
 				m_state = STATE_S4;
-				if (m_channel[m_current_channel].m_count == 0)
+				if ((m_channel[m_current_channel].m_count == 0) && (MODE_TRANSFER_MASK != MODE_TRANSFER_READ))
 					set_tc(1);
 			}
 			else
@@ -442,7 +439,7 @@ void i8257_device::execute_run()
 			if (m_ready)
 			{
 				m_state = STATE_S4;
-				if (m_channel[m_current_channel].m_count == 0)
+				if ((m_channel[m_current_channel].m_count == 0) && (MODE_TRANSFER_MASK != MODE_TRANSFER_READ))
 					set_tc(1);
 			}
 			break;
@@ -452,6 +449,8 @@ void i8257_device::execute_run()
 			{
 				dma_write();
 			}
+			if ((m_channel[m_current_channel].m_count == 0) && (MODE_TRANSFER_MASK == MODE_TRANSFER_READ))
+				set_tc(1);
 			advance();
 
 			if(m_hack && next_channel())
@@ -474,7 +473,7 @@ void i8257_device::execute_run()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( i8257_device::read )
+uint8_t i8257_device::read(offs_t offset)
 {
 	LOG("%s\n", FUNCNAME);
 	uint8_t data = 0;
@@ -532,7 +531,7 @@ READ8_MEMBER( i8257_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( i8257_device::write )
+void i8257_device::write(offs_t offset, uint8_t data)
 {
 	LOG("%s \n", FUNCNAME);
 	if (!BIT(offset, 3))
@@ -603,7 +602,7 @@ WRITE8_MEMBER( i8257_device::write )
 //  hlda_w - hold acknowledge
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( i8257_device::hlda_w )
+void i8257_device::hlda_w(int state)
 {
 	LOG("I8257 Hold Acknowledge: %u\n", state);
 
@@ -616,7 +615,7 @@ WRITE_LINE_MEMBER( i8257_device::hlda_w )
 //  ready_w - ready
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( i8257_device::ready_w )
+void i8257_device::ready_w(int state)
 {
 	LOG("I8257 Ready: %u\n", state);
 
@@ -628,7 +627,7 @@ WRITE_LINE_MEMBER( i8257_device::ready_w )
 //  dreq0_w - DMA request for channel 0
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( i8257_device::dreq0_w )
+void i8257_device::dreq0_w(int state)
 {
 	LOG("%s\n", FUNCNAME);
 	dma_request(0, state);
@@ -639,7 +638,7 @@ WRITE_LINE_MEMBER( i8257_device::dreq0_w )
 //  dreq0_w - DMA request for channel 1
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( i8257_device::dreq1_w )
+void i8257_device::dreq1_w(int state)
 {
 	LOG("%s\n", FUNCNAME);
 	dma_request(1, state);
@@ -650,7 +649,7 @@ WRITE_LINE_MEMBER( i8257_device::dreq1_w )
 //  dreq1_w - DMA request for channel 2
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( i8257_device::dreq2_w )
+void i8257_device::dreq2_w(int state)
 {
 	LOG("%s\n", FUNCNAME);
 	dma_request(2, state);
@@ -661,7 +660,7 @@ WRITE_LINE_MEMBER( i8257_device::dreq2_w )
 //  dreq3_w - DMA request for channel 3
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( i8257_device::dreq3_w )
+void i8257_device::dreq3_w(int state)
 {
 	LOG("%s\n", FUNCNAME);
 	dma_request(3, state);

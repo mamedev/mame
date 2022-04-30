@@ -12,6 +12,7 @@
 #include "machine/eepromser.h"
 #include "machine/vt83c461.h"
 #include "imagedev/snapquik.h"
+#include "video/jag_blitter.h"
 #include "cdrom.h"
 #include "imagedev/chd_cd.h"
 #include "screen.h"
@@ -33,6 +34,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_gpu(*this, "gpu")
+		, m_blitter(*this, "blitter")
 		, m_dsp(*this, "dsp")
 		, m_ldac(*this, "ldac")
 		, m_rdac(*this, "rdac")
@@ -109,11 +111,14 @@ protected:
 	virtual void sound_start() override;
 	virtual void video_start() override;
 	virtual void device_postload();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	void video_config(machine_config &config, const XTAL clock);
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<jaguargpu_cpu_device> m_gpu;
+	required_device<jag_blitter_device> m_blitter;
 	required_device<jaguardsp_cpu_device> m_dsp;
 	required_device<dac_word_interface> m_ldac;
 	required_device<dac_word_interface> m_rdac;
@@ -127,7 +132,7 @@ protected:
 	required_shared_ptr<uint32_t> m_shared_ram;
 	required_shared_ptr<uint32_t> m_gpu_ram;
 	required_shared_ptr<uint32_t> m_gpu_clut;
-	optional_memory_region      m_romboard_region;
+	optional_memory_region        m_romboard_region;
 	optional_shared_ptr<uint32_t> m_mainram;
 	optional_shared_ptr<uint32_t> m_mainram2;
 
@@ -141,119 +146,119 @@ protected:
 	optional_ioport m_system;
 
 	// configuration
-	bool m_is_r3000;
-	bool m_is_cojag;
-	bool m_hacks_enabled;
-	int m_pixel_clock;
-	bool m_using_cart;
+	bool m_is_r3000 = false;
+	bool m_is_cojag = false;
+	bool m_hacks_enabled = false;
+	int m_pixel_clock = 0;
+	bool m_using_cart = false;
 
-	uint32_t m_joystick_data;
+	uint32_t m_joystick_data = 0;
 
 private:
-	uint32_t m_misc_control_data;
-	bool m_eeprom_enable;
-	uint32_t *m_gpu_jump_address;
-	bool m_gpu_command_pending;
-	uint32_t m_gpu_spin_pc;
-	uint32_t *m_main_speedup;
-	int m_main_speedup_hits;
-	uint64_t m_main_speedup_last_cycles;
-	uint64_t m_main_speedup_max_cycles;
-	uint32_t *m_main_gpu_wait;
+	uint32_t m_misc_control_data = 0;
+	bool m_eeprom_enable = false;
+	uint32_t *m_gpu_jump_address = 0;
+	bool m_gpu_command_pending = false;
+	uint32_t m_gpu_spin_pc = 0;
+	uint32_t *m_main_speedup = 0;
+	int m_main_speedup_hits = 0;
+	uint64_t m_main_speedup_last_cycles = 0;
+	uint64_t m_main_speedup_max_cycles = 0;
+	uint32_t *m_main_gpu_wait = 0;
 
 	// driver data
-	uint8_t m_eeprom_bit_count;
-	uint8_t m_protection_check;   /* 0 = check hasn't started yet; 1= check in progress; 2 = check is finished. */
+	uint8_t m_eeprom_bit_count = 0;
+	uint8_t m_protection_check = 0;   /* 0 = check hasn't started yet; 1= check in progress; 2 = check is finished. */
 
 	// audio data
-	uint16_t m_dsp_regs[0x40/2];
-	uint16_t m_serial_frequency;
-	uint8_t m_gpu_irq_state;
-	emu_timer *m_serial_timer;
+	uint16_t m_dsp_regs[0x40/2]{};
+	uint16_t m_serial_frequency = 0;
+	uint8_t m_gpu_irq_state = 0;
+	emu_timer *m_serial_timer = nullptr;
 
 	// blitter variables
-	uint32_t m_blitter_regs[40];
-	uint16_t m_gpu_regs[0x100/2];
-	emu_timer *m_object_timer;
-	uint8_t m_cpu_irq_state;
+	uint32_t m_blitter_regs[40]{};
+	uint16_t m_gpu_regs[0x100/2]{};
+	emu_timer *m_object_timer = nullptr;
+	uint8_t m_cpu_irq_state = 0;
 	bitmap_rgb32 m_screen_bitmap;
-	uint8_t m_blitter_status;
-	pen_t m_pen_table[65536];
-	uint8_t m_blend_y[65536];
-	uint8_t m_blend_cc[65536];
+	uint8_t m_blitter_status = 0;
+	pen_t m_pen_table[65536]{};
+	uint8_t m_blend_y[65536]{};
+	uint8_t m_blend_cc[65536]{};
 
 	static void (jaguar_state::*const bitmap4[8])(uint16_t *, int32_t, int32_t, uint32_t *, int32_t, uint16_t *);
 	static void (jaguar_state::*const bitmap8[8])(uint16_t *, int32_t, int32_t, uint32_t *, int32_t, uint16_t *);
 	static void (jaguar_state::*const bitmap16[8])(uint16_t *, int32_t, int32_t, uint32_t *, int32_t);
 	static void (jaguar_state::*const bitmap32[8])(uint16_t *, int32_t, int32_t, uint32_t *, int32_t);
 
-	DECLARE_WRITE32_MEMBER(eeprom_w);
-	DECLARE_READ32_MEMBER(eeprom_clk);
-	DECLARE_READ32_MEMBER(eeprom_cs);
-	DECLARE_READ32_MEMBER(misc_control_r);
-	DECLARE_WRITE32_MEMBER(misc_control_w);
-	DECLARE_READ32_MEMBER(gpuctrl_r);
-	DECLARE_WRITE32_MEMBER(gpuctrl_w);
-	DECLARE_READ32_MEMBER(dspctrl_r);
-	DECLARE_WRITE32_MEMBER(dspctrl_w);
-	DECLARE_READ32_MEMBER(joystick_r);
-	DECLARE_WRITE32_MEMBER(joystick_w);
-	DECLARE_WRITE32_MEMBER(latch_w);
-	DECLARE_READ32_MEMBER(eeprom_data_r);
-	DECLARE_WRITE32_MEMBER(eeprom_enable_w);
-	DECLARE_WRITE32_MEMBER(eeprom_data_w);
-	DECLARE_WRITE32_MEMBER(gpu_jump_w);
-	DECLARE_READ32_MEMBER(gpu_jump_r);
-	DECLARE_READ32_MEMBER(cojagr3k_main_speedup_r);
-	DECLARE_READ32_MEMBER(main_gpu_wait_r);
-	DECLARE_WRITE32_MEMBER(area51_main_speedup_w);
-	DECLARE_WRITE32_MEMBER(area51mx_main_speedup_w);
-	DECLARE_READ16_MEMBER(gpuctrl_r16);
-	DECLARE_WRITE16_MEMBER(gpuctrl_w16);
-	DECLARE_READ16_MEMBER(blitter_r16);
-	DECLARE_WRITE16_MEMBER(blitter_w16);
-	DECLARE_READ16_MEMBER(serial_r16);
-	DECLARE_WRITE16_MEMBER(serial_w16);
-	DECLARE_READ16_MEMBER(dspctrl_r16);
-	DECLARE_WRITE16_MEMBER(dspctrl_w16);
-	DECLARE_READ16_MEMBER(eeprom_cs16);
-	DECLARE_READ16_MEMBER(eeprom_clk16);
-	DECLARE_WRITE16_MEMBER(eeprom_w16);
-	DECLARE_READ16_MEMBER(joystick_r16);
-	DECLARE_WRITE16_MEMBER(joystick_w16);
-	DECLARE_READ32_MEMBER(shared_ram_r);
-	DECLARE_WRITE32_MEMBER(shared_ram_w);
-	DECLARE_READ32_MEMBER(rom_base_r);
-	DECLARE_READ32_MEMBER(wave_rom_r);
-	DECLARE_READ32_MEMBER(dsp_ram_r);
-	DECLARE_WRITE32_MEMBER(dsp_ram_w);
-	DECLARE_READ32_MEMBER(gpu_clut_r);
-	DECLARE_WRITE32_MEMBER(gpu_clut_w);
-	DECLARE_READ32_MEMBER(gpu_ram_r);
-	DECLARE_WRITE32_MEMBER(gpu_ram_w);
-	DECLARE_READ16_MEMBER(shared_ram_r16);
-	DECLARE_WRITE16_MEMBER(shared_ram_w16);
-	DECLARE_READ16_MEMBER(cart_base_r16);
-	DECLARE_READ16_MEMBER(dsp_ram_r16);
-	DECLARE_WRITE16_MEMBER(dsp_ram_w16);
-	DECLARE_READ16_MEMBER(gpu_clut_r16);
-	DECLARE_WRITE16_MEMBER(gpu_clut_w16);
-	DECLARE_READ16_MEMBER(gpu_ram_r16);
-	DECLARE_WRITE16_MEMBER(gpu_ram_w16);
+	void eeprom_w(uint32_t data);
+	uint32_t eeprom_clk();
+	uint32_t eeprom_cs();
+	uint32_t misc_control_r();
+	void misc_control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t gpuctrl_r(offs_t offset, uint32_t mem_mask = ~0);
+	void gpuctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t dspctrl_r(offs_t offset, uint32_t mem_mask = ~0);
+	void dspctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t joystick_r();
+	void joystick_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void latch_w(uint32_t data);
+	uint32_t eeprom_data_r(offs_t offset);
+	void eeprom_enable_w(uint32_t data);
+	void eeprom_data_w(offs_t offset, uint32_t data);
+	void gpu_jump_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t gpu_jump_r();
+	uint32_t cojagr3k_main_speedup_r();
+	uint32_t main_gpu_wait_r();
+	void area51_main_speedup_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void area51mx_main_speedup_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint16_t gpuctrl_r16(offs_t offset, uint16_t mem_mask = ~0);
+	void gpuctrl_w16(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t blitter_r16(offs_t offset, uint16_t mem_mask = ~0);
+	void blitter_w16(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t serial_r16(offs_t offset);
+	void serial_w16(offs_t offset, uint16_t data);
+	uint16_t dspctrl_r16(offs_t offset, uint16_t mem_mask = ~0);
+	void dspctrl_w16(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t eeprom_cs16(offs_t offset);
+	uint16_t eeprom_clk16(offs_t offset);
+	void eeprom_w16(offs_t offset, uint16_t data);
+	uint16_t joystick_r16(offs_t offset);
+	void joystick_w16(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint32_t shared_ram_r(offs_t offset);
+	void shared_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t rom_base_r(offs_t offset);
+	uint32_t wave_rom_r(offs_t offset);
+	uint32_t dsp_ram_r(offs_t offset);
+	void dsp_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t gpu_clut_r(offs_t offset);
+	void gpu_clut_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t gpu_ram_r(offs_t offset);
+	void gpu_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint16_t shared_ram_r16(offs_t offset);
+	void shared_ram_w16(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t cart_base_r16(offs_t offset);
+	uint16_t dsp_ram_r16(offs_t offset);
+	void dsp_ram_w16(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t gpu_clut_r16(offs_t offset);
+	void gpu_clut_w16(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t gpu_ram_r16(offs_t offset);
+	void gpu_ram_w16(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// from audio/jaguar.cpp
-	DECLARE_READ16_MEMBER( jerry_regs_r );
-	DECLARE_WRITE16_MEMBER( jerry_regs_w );
-	DECLARE_READ32_MEMBER( serial_r );
-	DECLARE_WRITE32_MEMBER( serial_w );
+	uint16_t jerry_regs_r(offs_t offset);
+	void jerry_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint32_t serial_r(offs_t offset);
+	void serial_w(offs_t offset, uint32_t data);
 	void serial_update();
 
 	// from video/jaguar.cpp
-	DECLARE_READ32_MEMBER( blitter_r );
-	DECLARE_WRITE32_MEMBER( blitter_w );
-	DECLARE_READ16_MEMBER( tom_regs_r );
-	DECLARE_WRITE16_MEMBER( tom_regs_w );
-	DECLARE_READ32_MEMBER( cojag_gun_input_r );
+	uint32_t blitter_r(offs_t offset, uint32_t mem_mask = ~0);
+	void blitter_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint16_t tom_regs_r(offs_t offset);
+	void tom_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint32_t cojag_gun_input_r(offs_t offset);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void jagpal_ycc(palette_device &palette) const;
 
@@ -261,7 +266,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( dsp_cpu_int );
 	DECLARE_WRITE_LINE_MEMBER( external_int );
 
-	image_init_result quickload_cb(device_image_interface &image, const char *file_type, int quickload_size);
+	image_init_result quickload_cb(device_image_interface &image);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 	void cpu_space_map(address_map &map);
 	void dsp_map(address_map &map);
@@ -293,21 +298,22 @@ private:
 	void cojag_common_init(uint16_t gpu_jump_offs, uint16_t spin_pc);
 	void init_freeze_common(offs_t main_speedup_addr);
 
-	// from audio/jaguar.c
+	// from audio/jaguar.cpp
 	void update_gpu_irq();
-	DECLARE_WRITE32_MEMBER( dsp_flags_w );
+	void dsp_flags_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	// from video/jaguar.c
+	// from video/jaguar.cpp
 	void get_crosshair_xy(int player, int &x, int &y);
 	int effective_hvalue(int value);
 	bool adjust_object_timer(int vc);
-	void update_cpu_irq();
+	inline void trigger_host_cpu_irq(int level);
+	inline void verify_host_cpu_irq();
 	uint8_t *memory_base(uint32_t offset) { return reinterpret_cast<uint8_t *>(m_gpu->space(AS_PROGRAM).get_read_ptr(offset)); }
 	void blitter_run();
 	void scanline_update(int param);
 	void set_palette(uint16_t vmode);
 
-	/* from jagobj.c */
+	/* from jagobj.cpp */
 	void jagobj_init();
 	uint32_t *process_bitmap(uint16_t *scanline, uint32_t *objdata, int vc, bool logit);
 	uint32_t *process_scaled_bitmap(uint16_t *scanline, uint32_t *objdata, int vc, bool logit);
@@ -350,7 +356,7 @@ private:
 	void bitmap_32_6(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos);
 	void bitmap_32_7(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos);
 
-	/* from jagblit.c */
+	/* from jagblit.cpp */
 	void generic_blitter(uint32_t command, uint32_t a1flags, uint32_t a2flags);
 	void blitter_09800001_010020_010020(uint32_t command, uint32_t a1flags, uint32_t a2flags);
 	void blitter_09800009_000020_000020(uint32_t command, uint32_t a1flags, uint32_t a2flags);
@@ -385,12 +391,12 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_READ16_MEMBER(butch_regs_r16);
-	DECLARE_WRITE16_MEMBER(butch_regs_w16);
-	DECLARE_READ32_MEMBER(butch_regs_r);
-	DECLARE_WRITE32_MEMBER(butch_regs_w);
+	uint16_t butch_regs_r16(offs_t offset);
+	void butch_regs_w16(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint32_t butch_regs_r(offs_t offset);
+	void butch_regs_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER(cd_bios_r);
+	uint32_t cd_bios_r(offs_t offset);
 
 	void jaguarcd_map(address_map &map);
 	void jagcd_gpu_dsp_map(address_map &map);
@@ -399,11 +405,11 @@ private:
 	required_device<cdrom_image_device> m_cdrom;
 	required_region_ptr<uint16_t> m_cd_bios;
 
-	uint32_t m_butch_regs[0x40/4];
-	uint32_t m_butch_cmd_response[0x102];
-	uint8_t m_butch_cmd_index;
-	uint8_t m_butch_cmd_size;
+	uint32_t m_butch_regs[0x40/4]{};
+	uint32_t m_butch_cmd_response[0x102]{};
+	uint8_t m_butch_cmd_index = 0U;
+	uint8_t m_butch_cmd_size = 0U;
 
-	cdrom_file  *m_cd_file;
-	//const cdrom_toc*    m_toc;
+	cdrom_file  *m_cd_file = nullptr;
+	//const cdrom_toc*    m_toc = nullptr;
 };

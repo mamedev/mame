@@ -10,7 +10,7 @@
 #include "sound/beep.h"
 #include "diserial.h"
 
-namespace bus { namespace interpro { namespace keyboard {
+namespace bus::interpro::keyboard {
 
 class hle_device_base
 	: public device_t
@@ -31,7 +31,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_buffered_serial_interface overrides
 	virtual void tra_callback() override;
@@ -113,7 +113,7 @@ public:
 	required_ioport m_modifiers;
 };
 
-} } } // namespace bus::interpro::keyboard
+} // namespace bus::interpro::keyboard
 
 DECLARE_DEVICE_TYPE_NS(INTERPRO_HLE_EN_US_KEYBOARD, bus::interpro::keyboard, hle_en_us_device)
 

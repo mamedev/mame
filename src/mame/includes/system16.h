@@ -31,6 +31,7 @@ public:
 		, m_okibank(*this, "okibank")
 		, m_screen(*this, "screen")
 		, m_sprites(*this, "sprites")
+		, m_shinobl_kludge(0)
 		, m_maincpu(*this, "maincpu")
 		, m_soundcpu(*this, "soundcpu")
 		, m_msm(*this, "5205")
@@ -56,8 +57,6 @@ public:
 	void eswatbl2(machine_config &config);
 	void ddcrewbl(machine_config &config);
 	void shdancbla(machine_config &config);
-	void astormbl(machine_config &config);
-	void astormb2(machine_config &config);
 	void passsht4b(machine_config &config);
 	void wb3bb(machine_config &config);
 	void wb3bble(machine_config &config);
@@ -77,7 +76,6 @@ public:
 	void init_wb3bble();
 	void init_fpointbl();
 	void init_eswatbl();
-	void init_astormbl();
 	void init_sys18bl_oki();
 	void init_astormb2();
 	void init_shdancbl();
@@ -94,54 +92,54 @@ public:
 	void init_common();
 
 private:
-	DECLARE_WRITE16_MEMBER(sound_command_nmi_w);
-	DECLARE_WRITE16_MEMBER(sound_command_irq_w);
-	DECLARE_READ8_MEMBER(sound_command_irq_r);
-	DECLARE_WRITE8_MEMBER(soundbank_msm_w);
-	DECLARE_WRITE16_MEMBER(sys16_coinctrl_w);
-	DECLARE_READ16_MEMBER(passht4b_service_r);
-	DECLARE_READ16_MEMBER(passht4b_io1_r);
-	DECLARE_READ16_MEMBER(passht4b_io2_r);
-	DECLARE_READ16_MEMBER(passht4b_io3_r);
-	DECLARE_WRITE16_MEMBER(sys16_tilebank_w);
-	DECLARE_WRITE16_MEMBER(ddcrewbl_spritebank_w);
-	DECLARE_WRITE8_MEMBER(tturfbl_msm5205_data_w);
-	DECLARE_READ8_MEMBER(tturfbl_soundbank_r);
-	DECLARE_WRITE8_MEMBER(tturfbl_soundbank_w);
-	DECLARE_WRITE16_MEMBER(s16bl_bgpage_w);
-	DECLARE_WRITE16_MEMBER(s16bl_fgpage_w);
-	DECLARE_WRITE16_MEMBER(s16bl_fgscrollx_bank_w);
-	DECLARE_WRITE16_MEMBER(s16bl_fgscrollx_w);
-	DECLARE_WRITE16_MEMBER(s16bl_fgscrolly_w);
-	DECLARE_WRITE16_MEMBER(s16bl_bgscrollx_w);
-	DECLARE_WRITE16_MEMBER(s16bl_bgscrolly_w);
-	template<int Page> DECLARE_WRITE16_MEMBER(datsu_page_w);
-	DECLARE_WRITE16_MEMBER(goldnaxeb2_fgscrollx_w);
-	DECLARE_WRITE16_MEMBER(goldnaxeb2_bgscrollx_w);
-	DECLARE_WRITE16_MEMBER(goldnaxeb2_fgscrolly_w);
-	DECLARE_WRITE16_MEMBER(goldnaxeb2_bgscrolly_w);
-	DECLARE_WRITE16_MEMBER(goldnaxeb2_fgpage_w);
-	DECLARE_WRITE16_MEMBER(goldnaxeb2_bgpage_w);
-	DECLARE_WRITE16_MEMBER(eswat_tilebank0_w);
-	DECLARE_WRITE16_MEMBER(altbeastbl_gfx_w);
-	DECLARE_READ16_MEMBER(beautyb_unkx_r);
-	DECLARE_WRITE16_MEMBER(wb3bble_refreshenable_w);
-	DECLARE_WRITE16_MEMBER(sys18_refreshenable_w);
-	DECLARE_WRITE16_MEMBER(sys18_tilebank_w);
-	DECLARE_READ8_MEMBER(system18_bank_r);
-	DECLARE_WRITE8_MEMBER(sys18_soundbank_w);
-	DECLARE_WRITE8_MEMBER(shdancbl_msm5205_data_w);
-	DECLARE_READ8_MEMBER(shdancbl_soundbank_r);
-	DECLARE_WRITE8_MEMBER(shdancbl_bankctrl_w);
-	DECLARE_WRITE8_MEMBER(sys18bl_okibank_w);
-	DECLARE_WRITE16_MEMBER(sys16_tileram_w);
-	DECLARE_WRITE16_MEMBER(sys16_textram_w);
-	DECLARE_WRITE16_MEMBER(s16a_bootleg_bgscrolly_w);
-	DECLARE_WRITE16_MEMBER(s16a_bootleg_bgscrollx_w);
-	DECLARE_WRITE16_MEMBER(s16a_bootleg_fgscrolly_w);
-	DECLARE_WRITE16_MEMBER(s16a_bootleg_fgscrollx_w);
-	DECLARE_WRITE16_MEMBER(s16a_bootleg_tilemapselect_w);
-	DECLARE_WRITE8_MEMBER(upd7759_bank_w);
+	void sound_command_nmi_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_command_irq_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t sound_command_irq_r();
+	void soundbank_msm_w(uint8_t data);
+	void sys16_coinctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t passht4b_service_r();
+	uint16_t passht4b_io1_r();
+	uint16_t passht4b_io2_r();
+	uint16_t passht4b_io3_r();
+	void sys16_tilebank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void ddcrewbl_spritebank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void tturfbl_msm5205_data_w(uint8_t data);
+	uint8_t tturfbl_soundbank_r(offs_t offset);
+	void tturfbl_soundbank_w(uint8_t data);
+	void s16bl_bgpage_w(uint16_t data);
+	void s16bl_fgpage_w(uint16_t data);
+	void s16bl_fgscrollx_bank_w(uint16_t data);
+	void s16bl_fgscrollx_w(uint16_t data);
+	void s16bl_fgscrolly_w(uint16_t data);
+	void s16bl_bgscrollx_w(uint16_t data);
+	void s16bl_bgscrolly_w(uint16_t data);
+	template<int Page> void datsu_page_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void goldnaxeb2_fgscrollx_w(uint16_t data);
+	void goldnaxeb2_bgscrollx_w(uint16_t data);
+	void goldnaxeb2_fgscrolly_w(uint16_t data);
+	void goldnaxeb2_bgscrolly_w(uint16_t data);
+	void goldnaxeb2_fgpage_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void goldnaxeb2_bgpage_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void eswat_tilebank0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void altbeastbl_gfx_w(offs_t offset, uint16_t data);
+	uint16_t beautyb_unkx_r();
+	void wb3bble_refreshenable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sys18_refreshenable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sys18_tilebank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t system18_bank_r(offs_t offset);
+	void sys18_soundbank_w(uint8_t data);
+	void shdancbl_msm5205_data_w(uint8_t data);
+	uint8_t shdancbl_soundbank_r(offs_t offset);
+	void shdancbl_bankctrl_w(uint8_t data);
+	void sys18bl_okibank_w(uint8_t data);
+	void sys16_tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sys16_textram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void s16a_bootleg_bgscrolly_w(uint16_t data);
+	void s16a_bootleg_bgscrollx_w(uint16_t data);
+	void s16a_bootleg_fgscrolly_w(uint16_t data);
+	void s16a_bootleg_fgscrollx_w(uint16_t data);
+	void s16a_bootleg_tilemapselect_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void upd7759_bank_w(uint8_t data);
 
 	DECLARE_MACHINE_RESET(ddcrewbl);
 	TILEMAP_MAPPER_MEMBER(sys16_bg_map);
@@ -175,7 +173,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(shdancbl_msm5205_callback);
 	DECLARE_WRITE_LINE_MEMBER(sound_cause_nmi);
 
-	void astormbl_map(address_map &map);
 	void bayrouteb1_map(address_map &map);
 	void bayrouteb2_map(address_map &map);
 	void beautyb_map(address_map &map);
@@ -230,76 +227,76 @@ private:
 	required_device<screen_device> m_screen;
 	optional_device<sega_16bit_sprite_device> m_sprites;
 
-	uint16_t m_coinctrl;
+	uint16_t m_coinctrl = 0;
 
 	/* game specific */
-	int m_passht4b_io1_val;
-	int m_passht4b_io2_val;
-	int m_passht4b_io3_val;
+	int m_passht4b_io1_val = 0;
+	int m_passht4b_io2_val = 0;
+	int m_passht4b_io3_val = 0;
 
-	int m_beautyb_unkx;
+	int m_beautyb_unkx = 0;
 
-	int m_shinobl_kludge;
+	int m_shinobl_kludge = 0; // TODO: this never gets set, causing unreachable code in get_text_tile_info
 
-	int m_eswat_tilebank0;
+	int m_eswat_tilebank0 = 0;
 
 
 	/* video-related */
-	tilemap_t *m_background[2];
-	tilemap_t *m_foreground[2];
-	tilemap_t *m_text_layer;
-	tilemap_t *m_bg_tilemaps[2];
-	tilemap_t *m_text_tilemap;
-	double m_weights[2][3][6];
+	tilemap_t *m_background[2]{};
+	tilemap_t *m_foreground[2]{};
+	tilemap_t *m_text_layer = nullptr;
+	tilemap_t *m_bg_tilemaps[2]{};
+	tilemap_t *m_text_tilemap = nullptr;
+	double m_weights[2][3][6]{};
 
-	int m_spritebank_type;
-	int m_back_yscroll;
-	int m_fore_yscroll;
-	int m_text_yscroll;
+	int m_spritebank_type = 0;
+	int m_back_yscroll = 0;
+	int m_fore_yscroll = 0;
+	int m_text_yscroll = 0;
 
-	int m_bg1_trans; // alien syn + sys18
+	int m_bg1_trans = 0; // alien syn + sys18
 
-	int m_tile_bank[2];
-	int m_bg_page[2][4];
-	int m_fg_page[2][4];
+	int m_tile_bank[2]{};
+	int m_bg_page[2][4]{};
+	int m_fg_page[2][4]{};
 
-	uint16_t m_datsu_page[4];
+	uint16_t m_datsu_page[4]{};
 
-	int m_old_bg_page[2][4];
-	int m_old_fg_page[2][4];
-	int m_old_tile_bank[2];
+	int m_old_bg_page[2][4]{};
+	int m_old_fg_page[2][4]{};
+	int m_old_tile_bank[2]{};
 
-	int m_bg_scrollx;
-	int m_bg_scrolly;
-	int m_fg_scrollx;
-	int m_fg_scrolly;
-	uint16_t m_tilemapselect;
+	int m_bg_scrollx = 0;
+	int m_bg_scrolly = 0;
+	int m_fg_scrollx = 0;
+	int m_fg_scrolly = 0;
+	uint16_t m_tilemapselect = 0;
 
-	int m_textlayer_lo_min;
-	int m_textlayer_lo_max;
-	int m_textlayer_hi_min;
-	int m_textlayer_hi_max;
+	int m_textlayer_lo_min = 0;
+	int m_textlayer_lo_max = 0;
+	int m_textlayer_hi_min = 0;
+	int m_textlayer_hi_max = 0;
 
-	int m_tilebank_switch;
+	int m_tilebank_switch = 0;
 
 
 	/* sound-related */
-	int m_sample_buffer;
-	int m_sample_select;
+	int m_sample_buffer = 0;
+	int m_sample_select = 0;
 
-	uint8_t *m_soundbank_ptr;     /* Pointer to currently selected portion of ROM */
+	uint8_t *m_soundbank_ptr = nullptr;     /* Pointer to currently selected portion of ROM */
 
 	/* sys18 */
-	uint8_t *m_sound_bank;
-	uint16_t *m_splittab_bg_x;
-	uint16_t *m_splittab_bg_y;
-	uint16_t *m_splittab_fg_x;
-	uint16_t *m_splittab_fg_y;
-	int     m_sound_info[4*2];
-	int     m_refreshenable;
-	int     m_system18;
+	uint8_t *m_sound_bank = nullptr;
+	uint16_t *m_splittab_bg_x = nullptr;
+	uint16_t *m_splittab_bg_y = nullptr;
+	uint16_t *m_splittab_fg_x = nullptr;
+	uint16_t *m_splittab_fg_y = nullptr;
+	int     m_sound_info[4*2]{};
+	int     m_refreshenable = 0;
+	int     m_system18 = 0;
 
-	uint8_t *m_decrypted_region;  // goldnaxeb1 & bayrouteb1
+	uint8_t *m_decrypted_region = nullptr;  // goldnaxeb1 & bayrouteb1
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

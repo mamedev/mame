@@ -33,14 +33,14 @@ public:
 	auto floating_bus_rd_callback() { return m_read_floating_bus.bind(); }
 
 	// read/write
-	DECLARE_READ8_MEMBER( bus_r ) { return read(offset); }
-	DECLARE_WRITE8_MEMBER( bus_w ) { write(offset, data); }
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	// used to turn on/off reading/writing to $FF40-$FF5F
 	bool spare_chip_select_enabled(void) { return m_gime_registers[0] & 0x04 ? true : false; }
 
 	// the GIME seems to intercept writes to $FF22 (not precisely sure how)
-	void ff22_write(uint8_t data) { m_ff22_value = data; }
+	void pia_write(offs_t offset, uint8_t data);
 
 	// updates the cart ROM
 	void update_cart_rom(void);
@@ -66,7 +66,7 @@ protected:
 	// device-level overrides
 	virtual void device_start(void) override;
 	virtual void device_reset(void) override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_pre_save(void) override;
 	virtual void device_post_load(void) override;
 	virtual ioport_constructor device_input_ports() const override;
@@ -122,8 +122,8 @@ protected:
 
 	enum timer_type_t
 	{
-		GIME_TIMER_HBORD,
-		GIME_TIMER_CLOCK
+		GIME_TIMER_63USEC,
+		GIME_TIMER_279NSEC
 	};
 
 	// timer constants
@@ -141,6 +141,7 @@ protected:
 	uint8_t                     m_gime_registers[16];
 	uint8_t                     m_mmu[16];
 	uint8_t                     m_ff22_value;
+	uint8_t                     m_ff23_value;
 	uint8_t                     m_interrupt_value;
 	uint8_t                     m_irq;
 	uint8_t                     m_firq;
@@ -184,12 +185,10 @@ protected:
 	static const device_timer_id TIMER_FSYNC_ON = 4;
 
 	// read/write
-	uint8_t read(offs_t offset);
 	uint8_t read_gime_register(offs_t offset);
 	uint8_t read_mmu_register(offs_t offset);
 	uint8_t read_palette_register(offs_t offset);
 	uint8_t read_floating_bus(void);
-	void write(offs_t offset, uint8_t data);
 	void write_gime_register(offs_t offset, uint8_t data);
 	void write_mmu_register(offs_t offset, uint8_t data);
 	void write_palette_register(offs_t offset, uint8_t data);

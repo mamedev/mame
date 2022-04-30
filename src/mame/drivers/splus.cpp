@@ -77,19 +77,19 @@ private:
 		return 0;
 	}
 
-	DECLARE_WRITE8_MEMBER(splus_p1_w);
-	DECLARE_WRITE8_MEMBER(splus_load_pulse_w);
-	DECLARE_WRITE8_MEMBER(splus_serial_w);
-	DECLARE_WRITE8_MEMBER(splus_7seg_w);
-	DECLARE_WRITE8_MEMBER(splus_duart_w);
-	DECLARE_READ8_MEMBER(splus_serial_r);
-	DECLARE_READ8_MEMBER(splus_m_reel_ram_r);
-	DECLARE_READ8_MEMBER(splus_p3_r);
-	DECLARE_READ8_MEMBER(splus_duart_r);
-	DECLARE_READ8_MEMBER(splus_watchdog_r);
-	DECLARE_READ8_MEMBER(splus_registers_r);
-	DECLARE_WRITE8_MEMBER(i2c_nvram_w);
-	DECLARE_READ8_MEMBER(splus_reel_optics_r);
+	void splus_p1_w(uint8_t data);
+	void splus_load_pulse_w(uint8_t data);
+	void splus_serial_w(uint8_t data);
+	void splus_7seg_w(uint8_t data);
+	void splus_duart_w(uint8_t data);
+	uint8_t splus_serial_r();
+	uint8_t splus_m_reel_ram_r(offs_t offset);
+	uint8_t splus_p3_r();
+	uint8_t splus_duart_r();
+	uint8_t splus_watchdog_r();
+	uint8_t splus_registers_r();
+	void i2c_nvram_w(uint8_t data);
+	uint8_t splus_reel_optics_r();
 
 	void splus_iomap(address_map &map);
 	void splus_map(address_map &map);
@@ -166,7 +166,7 @@ static const uint8_t optics[200] = {
 * Write Handlers *
 ******************/
 
-WRITE8_MEMBER(splus_state::splus_p1_w)
+void splus_state::splus_p1_w(uint8_t data)
 {
 	// P1.0 = Reel 1 Controller
 	// P1.1 = Reel 2 Controller
@@ -220,13 +220,13 @@ WRITE8_MEMBER(splus_state::splus_p1_w)
 	}
 }
 
-WRITE8_MEMBER(splus_state::splus_load_pulse_w)
+void splus_state::splus_load_pulse_w(uint8_t data)
 {
 //  uint8_t out = 0;
 //    out = ((~m_io_port1 & 0xf0)>>4); // Output Bank
 }
 
-WRITE8_MEMBER(splus_state::splus_serial_w)
+void splus_state::splus_serial_w(uint8_t data)
 {
 	uint8_t out = 0;
 	out = ((~m_io_port1 & 0xe0)>>5); // Output Bank
@@ -343,7 +343,7 @@ WRITE8_MEMBER(splus_state::splus_serial_w)
 	}
 }
 
-WRITE8_MEMBER(splus_state::splus_7seg_w)
+void splus_state::splus_7seg_w(uint8_t data)
 {
 	static const uint8_t ls48_map[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
@@ -358,12 +358,12 @@ WRITE8_MEMBER(splus_state::splus_7seg_w)
 		m_digits[seg] = ls48_map[val];
 }
 
-WRITE8_MEMBER(splus_state::splus_duart_w)
+void splus_state::splus_duart_w(uint8_t data)
 {
 	// Used for Slot Accounting System Communication
 }
 
-WRITE8_MEMBER(splus_state::i2c_nvram_w)
+void splus_state::i2c_nvram_w(uint8_t data)
 {
 	m_i2cmem->write_scl(BIT(data, 2));
 	m_sda_dir = BIT(data, 1);
@@ -374,7 +374,7 @@ WRITE8_MEMBER(splus_state::i2c_nvram_w)
 * Read Handlers *
 ****************/
 
-READ8_MEMBER(splus_state::splus_serial_r)
+uint8_t splus_state::splus_serial_r()
 {
 	uint8_t coin_out = 0x00;
 	uint8_t coin_optics = 0x00;
@@ -515,33 +515,33 @@ READ8_MEMBER(splus_state::splus_serial_r)
 	return val;
 }
 
-READ8_MEMBER(splus_state::splus_m_reel_ram_r)
+uint8_t splus_state::splus_m_reel_ram_r(offs_t offset)
 {
 	return m_reel_ram[offset];
 }
 
-READ8_MEMBER(splus_state::splus_p3_r)
+uint8_t splus_state::splus_p3_r()
 {
 	return 0xf3; // Ignore Int0 and Int1, or machine will loop forever waiting
 }
 
-READ8_MEMBER(splus_state::splus_duart_r)
+uint8_t splus_state::splus_duart_r()
 {
 	// Used for Slot Accounting System Communication
 	return 0x00;
 }
 
-READ8_MEMBER(splus_state::splus_watchdog_r)
+uint8_t splus_state::splus_watchdog_r()
 {
 	return 0x00; // Watchdog
 }
 
-READ8_MEMBER(splus_state::splus_registers_r)
+uint8_t splus_state::splus_registers_r()
 {
 	return 0xff; // Reset Registers in Real Time Clock
 }
 
-READ8_MEMBER(splus_state::splus_reel_optics_r)
+uint8_t splus_state::splus_reel_optics_r()
 {
 /*
         Bit 0 = REEL #1
@@ -588,7 +588,7 @@ void splus_state::init_splus()
 
 void splus_state::splus_map(address_map &map)
 {
-	map(0x0000, 0xffff).rom().share("prograram");
+	map(0x0000, 0xffff).rom();
 }
 
 void splus_state::splus_iomap(address_map &map)
@@ -715,8 +715,8 @@ void splus_state::splus(machine_config &config) // basic machine hardware
 ROM_START( spset005 ) /* Set Chip, not sure how it works but archive for future use */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "set005.u52",   0x00000, 0x10000, CRC(43b70e2e) SHA1(30d610c988fc7e7e9fd54ff378c4a1fecfe5fffe) ) /* 09/24/93   @ IGT L93-1769 */
-	ROM_LOAD( "set017.u52",   0x00000, 0x10000, NO_DUMP ) /* When dumped make a seperate romdef */
-	ROM_LOAD( "set020.u52",   0x00000, 0x10000, NO_DUMP ) /* When dumped make a seperate romdef */
+	ROM_LOAD( "set017.u52",   0x00000, 0x10000, NO_DUMP ) /* When dumped make a separate romdef */
+	ROM_LOAD( "set020.u52",   0x00000, 0x10000, NO_DUMP ) /* When dumped make a separate romdef */
 ROM_END
 
 ROM_START( spset015 ) /* Set Chip, not sure how it works but archive for future use */

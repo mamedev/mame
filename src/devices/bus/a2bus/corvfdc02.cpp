@@ -29,10 +29,11 @@ DEFINE_DEVICE_TYPE(A2BUS_CORVFDC02, a2bus_corvfdc02_device, "crvfdc02", "Corvus 
 #define FDC02_ROM_REGION    "fdc02_rom"
 #define FDC02_FDC_TAG       "fdc02_fdc"
 
-FLOPPY_FORMATS_MEMBER( a2bus_corvfdc02_device::corv_floppy_formats )
-	FLOPPY_CONCEPT_525DSDD_FORMAT,
-	FLOPPY_IMD_FORMAT
-FLOPPY_FORMATS_END
+void a2bus_corvfdc02_device::corv_floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_CONCEPT_525DSDD_FORMAT);
+}
 
 static void corv_floppies(device_slot_interface &device)
 {
@@ -117,7 +118,7 @@ void a2bus_corvfdc02_device::device_reset()
 	m_timer->adjust(attotime::never);
 }
 
-void a2bus_corvfdc02_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void a2bus_corvfdc02_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	m_fdc->tc_w(true);
 	m_fdc->tc_w(false);

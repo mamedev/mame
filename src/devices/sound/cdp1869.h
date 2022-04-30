@@ -187,20 +187,20 @@ public:
 	virtual void char_map(address_map &map);
 	virtual void page_map(address_map &map);
 
-	DECLARE_WRITE8_MEMBER( out3_w );
-	DECLARE_WRITE8_MEMBER( out4_w );
-	DECLARE_WRITE8_MEMBER( out5_w );
-	DECLARE_WRITE8_MEMBER( out6_w );
-	DECLARE_WRITE8_MEMBER( out7_w );
+	void out3_w(uint8_t data);
+	void out4_w(offs_t offset);
+	void out5_w(offs_t offset);
+	void out6_w(offs_t offset);
+	void out7_w(offs_t offset);
 
-	DECLARE_READ8_MEMBER( char_ram_r );
-	DECLARE_WRITE8_MEMBER( char_ram_w );
+	uint8_t char_ram_r(offs_t offset);
+	void char_ram_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( page_ram_r );
-	DECLARE_WRITE8_MEMBER( page_ram_w );
+	uint8_t page_ram_r(offs_t offset);
+	void page_ram_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ_LINE_MEMBER( predisplay_r );
-	DECLARE_READ_LINE_MEMBER( pal_ntsc_r );
+	int predisplay_r();
+	int pal_ntsc_r();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -210,13 +210,13 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_post_load() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_sound_interface callbacks
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	inline bool is_ntsc();
 	inline uint8_t read_page_ram_byte(offs_t address);
@@ -264,7 +264,7 @@ private:
 	uint16_t m_hma;                   // home memory address
 
 	// sound state
-	int16_t m_signal;                 // current signal
+	stream_buffer::sample_t m_signal; // current signal
 	int m_incr;                     // initial wave state
 	int m_toneoff;                  // tone off
 	int m_wnoff;                    // white noise off

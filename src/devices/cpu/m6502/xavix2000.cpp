@@ -60,10 +60,10 @@ void xavix2000_device::device_start()
 {
 	xavix_device::device_start();
 
-	state_add(SXAVIX_J, "J", m_j).callimport().formatstr("%8s");;
-	state_add(SXAVIX_K, "K", m_k).callimport().formatstr("%8s");;
-	state_add(SXAVIX_L, "L", m_l).callimport().formatstr("%8s");;
-	state_add(SXAVIX_M, "M", m_m).callimport().formatstr("%8s");;
+	state_add(SXAVIX_J, "J", m_j).callimport().formatstr("%8s");
+	state_add(SXAVIX_K, "K", m_k).callimport().formatstr("%8s");
+	state_add(SXAVIX_L, "L", m_l).callimport().formatstr("%8s");
+	state_add(SXAVIX_M, "M", m_m).callimport().formatstr("%8s");
 	state_add(SXAVIX_PA, "PA", m_pa).callimport().formatstr("%8s");
 	state_add(SXAVIX_PB, "PB", m_pb).callimport().formatstr("%8s");
 }

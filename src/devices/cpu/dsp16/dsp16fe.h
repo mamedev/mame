@@ -66,9 +66,9 @@ protected:
 
 private:
 	// program fetch helpers
-	u16 read_op(opcode_desc const &desc, u16 offset) const;
-	u16 read_op(opcode_desc const &desc) const { return read_op(desc, 0U); }
-	u16 read_imm(opcode_desc const &desc) const { return read_op(desc, 1U); }
+	u16 read_op(opcode_desc const &desc, u16 offset);
+	u16 read_op(opcode_desc const &desc) { return read_op(desc, 0U); }
+	u16 read_imm(opcode_desc const &desc) { return read_op(desc, 1U); }
 
 	// non-trivial instruction helpers
 	bool describe_goto_b(opcode_desc &desc, u16 op);
@@ -98,7 +98,7 @@ private:
 	template <typename... T> static void flag_required_output_reg(opcode_desc &desc, T... reg) { flag_reg(desc.regreq, reg...); }
 
 	// need access to host device for program fetch
-	dsp16_device_base const &m_host;
+	dsp16_device_base &m_host;
 
 	// for making sweeping assumptions
 	u32 m_cache_cycles = 0U, m_cache_last_cycles = 0U, m_cache_flags = 0U;

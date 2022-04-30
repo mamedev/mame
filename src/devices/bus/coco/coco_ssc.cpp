@@ -34,15 +34,23 @@
 #include "coco_ssc.h"
 
 #include "cpu/tms7000/tms7000.h"
-#include "machine/netlist.h"
 #include "machine/ram.h"
-#include "netlist/devices/net_lib.h"
 #include "sound/ay8910.h"
 #include "sound/sp0256.h"
 
 #include "speaker.h"
 
-#define LOG_SSC 0
+#define LOG_INTERFACE   (1U <<  1)
+#define LOG_INTERNAL    (1U <<  2)
+#define VERBOSE (0)
+// #define VERBOSE (LOG_INTERFACE)
+// #define VERBOSE (LOG_INTERFACE|LOG_INTERNAL)
+
+#include "logmacro.h"
+
+#define LOGINTERFACE(...) LOGMASKED(LOG_INTERFACE, __VA_ARGS__)
+#define LOGINTERNAL(...) LOGMASKED(LOG_INTERNAL, __VA_ARGS__)
+
 #define PIC_TAG "pic7040"
 #define AY_TAG "cocossc_ay"
 #define SP0256_TAG "sp0256"
@@ -77,37 +85,34 @@ namespace
 	{
 	public:
 		// construction/destruction
-		coco_ssc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+		coco_ssc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 		// optional information overrides
 		virtual const tiny_rom_entry *device_rom_region() const override;
 		virtual void device_add_mconfig(machine_config &config) override;
 		virtual void device_reset() override;
 
-		DECLARE_READ8_MEMBER(ssc_port_a_r);
-		DECLARE_WRITE8_MEMBER(ssc_port_b_w);
-		DECLARE_READ8_MEMBER(ssc_port_c_r);
-		DECLARE_WRITE8_MEMBER(ssc_port_c_w);
-		DECLARE_READ8_MEMBER(ssc_port_d_r);
-		DECLARE_WRITE8_MEMBER(ssc_port_d_w);
+		u8 ssc_port_a_r();
+		void ssc_port_b_w(u8 data);
+		u8 ssc_port_c_r();
+		void ssc_port_c_w(u8 data);
+		u8 ssc_port_d_r();
+		void ssc_port_d_w(u8 data);
 
 	protected:
 		// device-level overrides
 		virtual void device_start() override;
-		virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-		virtual DECLARE_READ8_MEMBER(ff7d_read);
-		virtual DECLARE_WRITE8_MEMBER(ff7d_write);
+		u8 ff7d_read(offs_t offset);
+		void ff7d_write(offs_t offset, u8 data);
 		virtual void set_sound_enable(bool sound_enable) override;
-		static constexpr device_timer_id BUSY_TIMER_ID  = 0;
 
 	private:
-		uint8_t                                 m_reset_line;
+		u8                                      m_reset_line;
 		bool                                    m_tms7000_busy;
-		uint8_t                                 m_tms7000_porta;
-		uint8_t                                 m_tms7000_portb;
-		uint8_t                                 m_tms7000_portc;
-		uint8_t                                 m_tms7000_portd;
-		emu_timer                               *m_tms7000_busy_timer;
+		u8                                      m_tms7000_porta;
+		u8                                      m_tms7000_portb;
+		u8                                      m_tms7000_portc;
+		u8                                      m_tms7000_portd;
 		required_device<tms7040_device>         m_tms7040;
 		required_device<ram_device>             m_staticram;
 		required_device<ay8910_device>          m_ay;
@@ -121,7 +126,7 @@ namespace
 		public device_sound_interface
 	{
 	public:
-		cocossc_sac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+		cocossc_sac_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 		~cocossc_sac_device() { }
 		bool sound_activity_circuit_output();
 
@@ -130,11 +135,13 @@ namespace
 		virtual void device_start() override;
 
 		// sound stream update overrides
-		virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+		virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
+		// Power of 2
+		static constexpr int BUFFER_SIZE = 4;
 	private:
 		sound_stream*  m_stream;
-		double m_rms[16];
+		float m_rms[BUFFER_SIZE];
 		int m_index;
 	};
 };
@@ -193,7 +200,7 @@ ROM_END
 //  coco_ssc_device - constructor
 //-------------------------------------------------
 
-coco_ssc_device::coco_ssc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+coco_ssc_device::coco_ssc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 		: device_t(mconfig, COCO_SSC, tag, owner, clock),
 		device_cococart_interface(mconfig, *this ),
 		m_tms7040(*this, PIC_TAG),
@@ -210,10 +217,10 @@ coco_ssc_device::coco_ssc_device(const machine_config &mconfig, const char *tag,
 
 void coco_ssc_device::device_start()
 {
-	// install $FF7D-E handler
-	install_readwrite_handler(0xFF7D, 0xFF7E,
-			read8_delegate(*this, FUNC(coco_ssc_device::ff7d_read)),
-			write8_delegate(*this, FUNC(coco_ssc_device::ff7d_write)));
+	// install $ff7d-e handler
+	install_readwrite_handler(0xff7d, 0xff7e,
+			read8sm_delegate(*this, FUNC(coco_ssc_device::ff7d_read)),
+			write8sm_delegate(*this, FUNC(coco_ssc_device::ff7d_write)));
 
 	save_item(NAME(m_reset_line));
 	save_item(NAME(m_tms7000_busy));
@@ -221,9 +228,6 @@ void coco_ssc_device::device_start()
 	save_item(NAME(m_tms7000_portb));
 	save_item(NAME(m_tms7000_portc));
 	save_item(NAME(m_tms7000_portd));
-
-	m_tms7000_busy_timer = timer_alloc(BUSY_TIMER_ID);
-
 }
 
 
@@ -233,28 +237,8 @@ void coco_ssc_device::device_start()
 
 void coco_ssc_device::device_reset()
 {
-	m_reset_line = 0;
+	m_reset_line = 1;
 	m_tms7000_busy = false;
-}
-
-
-//-------------------------------------------------
-//  device_timer - handle timer callbacks
-//-------------------------------------------------
-
-void coco_ssc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch(id)
-	{
-		case BUSY_TIMER_ID:
-			m_tms7000_busy = false;
-			m_tms7000_busy_timer->adjust(attotime::never);
-			break;
-
-		default:
-			break;
-
-	}
 }
 
 
@@ -290,19 +274,15 @@ void coco_ssc_device::set_sound_enable(bool sound_enable)
 //  ff7d_read
 //-------------------------------------------------
 
-READ8_MEMBER(coco_ssc_device::ff7d_read)
+u8 coco_ssc_device::ff7d_read(offs_t offset)
 {
-	uint8_t data = 0xff;
+	u8 data = 0xff;
 
 	switch(offset)
 	{
 		case 0x00:
 			data = 0xff;
-
-			if (LOG_SSC)
-			{
-				logerror( "[%s] ff7d read: %02x\n", machine().describe_context(), data );
-			}
+			LOGINTERFACE( "[%s] ff7d read: %02x\n", machine().describe_context(), data );
 			break;
 
 		case 0x01:
@@ -318,25 +298,22 @@ READ8_MEMBER(coco_ssc_device::ff7d_read)
 				data |= 0x40;
 			}
 
-			if( ! m_sac->sound_activity_circuit_output() )
+			if(  m_sac->sound_activity_circuit_output() )
 			{
 				data |= 0x20;
 			}
 
-			if (LOG_SSC)
-			{
-				logerror( "[%s] ff7e read: %c%c%c%c %c%c%c%c (%02x)\n",
+			LOGINTERFACE( "[%s] ff7e read: %c%c%c%c %c%c%c%c (%02x)\n",
 					machine().describe_context(),
-					data & 0x80 ? '.' : 'B',
-					data & 0x40 ? '.' : 'S',
-					data & 0x20 ? '.' : 'P',
-					data & 0x10 ? '.' : '1',
-					data & 0x08 ? '.' : '1',
-					data & 0x04 ? '.' : '1',
-					data & 0x02 ? '.' : '1',
-					data & 0x01 ? '.' : '1',
+					data & 0x80 ? 'b' : 'B',
+					data & 0x40 ? 's' : 'S',
+					data & 0x20 ? 'p' : 'P',
+					data & 0x10 ? '1' : '0',
+					data & 0x08 ? '1' : '0',
+					data & 0x04 ? '1' : '0',
+					data & 0x02 ? '1' : '0',
+					data & 0x01 ? '1' : '0',
 					data );
-			}
 			break;
 	}
 
@@ -348,37 +325,30 @@ READ8_MEMBER(coco_ssc_device::ff7d_read)
 //  ff7d_write
 //-------------------------------------------------
 
-WRITE8_MEMBER(coco_ssc_device::ff7d_write)
+void coco_ssc_device::ff7d_write(offs_t offset, u8 data)
 {
 	switch(offset)
 	{
 		case 0x00:
-			if (LOG_SSC)
+			LOGINTERFACE( "[%s] ff7d write: %02x\n", machine().describe_context(), data );
+
+			if( (data & 1) == 1 )
 			{
-				logerror( "[%s] ff7d write: %02x\n", machine().describe_context(), data );
+				m_spo->reset();
 			}
 
-			if( (m_reset_line & 1) == 1 )
+			if( ((m_reset_line & 1) == 1) && ((data & 1) == 0) )
 			{
-				if( (data & 1) == 0 )
-				{
-					m_tms7040->reset();
-					m_ay->reset();
-					m_spo->reset();
-					m_tms7000_busy = false;
-				}
+				m_tms7040->reset();
+				m_ay->reset();
+				m_tms7000_busy = false;
 			}
 
 			m_reset_line = data;
 			break;
 
 		case 0x01:
-
-			if (LOG_SSC)
-			{
-				logerror( "[%s] ff7e write: %02x\n", machine().describe_context(), data );
-			}
-
+			LOGINTERFACE( "[%s] ff7e write: %02x\n", machine().describe_context(), data );
 			m_tms7000_porta = data;
 			m_tms7000_busy = true;
 			m_tms7040->set_input_line(TMS7000_INT3_LINE, ASSERT_LINE);
@@ -391,43 +361,37 @@ WRITE8_MEMBER(coco_ssc_device::ff7d_write)
 //  Handlers for secondary CPU ports
 //-------------------------------------------------
 
-READ8_MEMBER(coco_ssc_device::ssc_port_a_r)
+u8 coco_ssc_device::ssc_port_a_r()
 {
-	if (LOG_SSC)
-	{
-		logerror( "[%s] port a read: %02x\n", machine().describe_context(), m_tms7000_porta );
-	}
+	LOGINTERNAL( "[%s] port a read: %02x\n", machine().describe_context(), m_tms7000_porta );
 
-	m_tms7040->set_input_line(TMS7000_INT3_LINE, CLEAR_LINE);
+	if( !machine().side_effects_disabled() )
+	{
+		m_tms7040->set_input_line(TMS7000_INT3_LINE, CLEAR_LINE);
+	}
 
 	return m_tms7000_porta;
 }
 
-WRITE8_MEMBER(coco_ssc_device::ssc_port_b_w)
+void coco_ssc_device::ssc_port_b_w(u8 data)
 {
-	if (LOG_SSC)
-	{
-		logerror( "[%s] port b write: %02x\n", machine().describe_context(), data );
-	}
+	LOGINTERNAL( "[%s] port b write: %02x\n", machine().describe_context(), data );
 
 	m_tms7000_portb = data;
 }
 
-READ8_MEMBER(coco_ssc_device::ssc_port_c_r)
+u8 coco_ssc_device::ssc_port_c_r()
 {
-	if (LOG_SSC)
-	{
-		logerror( "[%s] port c read: %02x\n", machine().describe_context(), m_tms7000_portc );
-	}
+	LOGINTERNAL( "[%s] port c read: %02x\n", machine().describe_context(), m_tms7000_portc );
 
 	return m_tms7000_portc;
 }
 
-WRITE8_MEMBER(coco_ssc_device::ssc_port_c_w)
+void coco_ssc_device::ssc_port_c_w(u8 data)
 {
-	if( (data & C_RCS) == 0 && (data & C_RRW) == 0) /* static RAM write */
+	if( (data & C_RCS) == 0 && (data & C_RRW) == 0 ) /* static RAM write */
 	{
-		uint16_t address = (uint16_t)data << 8;
+		u16 address = u16(data) << 8;
 		address += m_tms7000_portb;
 		address &= 0x7ff;
 
@@ -447,19 +411,17 @@ WRITE8_MEMBER(coco_ssc_device::ssc_port_c_w)
 		}
 	}
 
-	if( (data & C_ALD) == 0 )
+	if( ((m_tms7000_portc & C_ALD) == C_ALD) && ((data & C_ALD) == 0) && (m_tms7000_portd < 64) )
 	{
-		m_spo->ald_w(m_tms7000_portd);
+		m_spo->ald_w(m_tms7000_portd); /* load allophone */
 	}
 
 	if( ((m_tms7000_portc & C_BSY) == 0) && ((data & C_BSY) == C_BSY) )
 	{
-		m_tms7000_busy_timer->adjust(attotime::from_usec(1800));
+		m_tms7000_busy = false;
 	}
 
-	if (LOG_SSC)
-	{
-		logerror( "[%s] port c write: %c%c%c%c %c%c%c%c (%02x)\n",
+	LOGINTERNAL( "[%s] port c write: %c%c%c%c %c%c%c%c (%02x)\n",
 			machine().describe_context(),
 			data & 0x80 ? '.' : 'B',
 			data & 0x40 ? '.' : 'P',
@@ -470,19 +432,18 @@ WRITE8_MEMBER(coco_ssc_device::ssc_port_c_w)
 			data & 0x02 ? '1' : '0',
 			data & 0x40 ? (data & 0x01 ? '1' : '0') : (data & 0x01 ? 'C' : '.'),
 			data );
-	}
 
 	m_tms7000_portc = data;
 }
 
-READ8_MEMBER(coco_ssc_device::ssc_port_d_r)
+u8 coco_ssc_device::ssc_port_d_r()
 {
-	if( ((m_tms7000_portc & C_RCS) == 0) && ((m_tms7000_portc & C_ACS) == 0))
+	if( ((m_tms7000_portc & C_RCS) == 0) && ((m_tms7000_portc & C_ACS) == 0) )
 		logerror( "[%s] Warning: Reading RAM and PSG at the same time!\n", machine().describe_context() );
 
 	if( ((m_tms7000_portc & C_RCS) == 0)  && ((m_tms7000_portc & C_RRW) == C_RRW)) /* static ram chip select (low) and static ram chip read (high) */
 	{
-		uint16_t address = (uint16_t)m_tms7000_portc << 8;
+		u16 address = u16(m_tms7000_portc) << 8;
 		address += m_tms7000_portb;
 		address &= 0x7ff;
 
@@ -497,20 +458,14 @@ READ8_MEMBER(coco_ssc_device::ssc_port_d_r)
 		}
 	}
 
-	if (LOG_SSC)
-	{
-		logerror( "[%s] port d read: %02x\n", machine().describe_context(), m_tms7000_portd );
-	}
+	LOGINTERNAL( "[%s] port d read: %02x\n", machine().describe_context(), m_tms7000_portd );
 
 	return m_tms7000_portd;
 }
 
-WRITE8_MEMBER(coco_ssc_device::ssc_port_d_w)
+void coco_ssc_device::ssc_port_d_w(u8 data)
 {
-	if (LOG_SSC)
-	{
-		logerror( "[%s] port d write: %02x\n", machine().describe_context(), data );
-	}
+	LOGINTERNAL( "[%s] port d write: %02x\n", machine().describe_context(), data );
 
 	m_tms7000_portd = data;
 }
@@ -520,12 +475,13 @@ WRITE8_MEMBER(coco_ssc_device::ssc_port_d_w)
 //  cocossc_sac_device - constructor
 //-------------------------------------------------
 
-cocossc_sac_device::cocossc_sac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+cocossc_sac_device::cocossc_sac_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, COCOSSC_SAC, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
 		m_index(0)
 {
+	std::fill(std::begin(m_rms), std::end(m_rms), 0.0f);
 }
 
 
@@ -543,24 +499,29 @@ void cocossc_sac_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void cocossc_sac_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void cocossc_sac_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *src = inputs[0];
-	stream_sample_t *dst = outputs[0];
+	auto &src = inputs[0];
+	auto &dst = outputs[0];
 
-	double n = samples;
+	int count = dst.samples();
+	m_rms[m_index] = 0;
 
-	while (samples--)
+	if( count > 0 )
 	{
-		m_rms[m_index] += ( (double)*src * (double)*src );
-		*dst++ = (*src++);
+		for( int sampindex = 0; sampindex < count; sampindex++ )
+		{
+			auto source_sample = src.get(sampindex);
+			m_rms[m_index] += source_sample * source_sample;
+			dst.put(sampindex, source_sample);
+		}
+
+		m_rms[m_index] = m_rms[m_index] / count;
+		m_rms[m_index] = sqrt(m_rms[m_index]);
 	}
 
-	m_rms[m_index] = m_rms[m_index] / n;
-	m_rms[m_index] = sqrt(m_rms[m_index]);
-
 	m_index++;
-	m_index &= 0x0f;
+	m_index &= (BUFFER_SIZE-1);
 }
 
 
@@ -570,14 +531,8 @@ void cocossc_sac_device::sound_stream_update(sound_stream &stream, stream_sample
 
 bool cocossc_sac_device::sound_activity_circuit_output()
 {
-  double average = m_rms[0] + m_rms[1] + m_rms[2] + m_rms[3] + m_rms[4] +
-	m_rms[5] + m_rms[6] + m_rms[7] + m_rms[8] + m_rms[9] + m_rms[10] +
-	m_rms[11] + m_rms[12] + m_rms[13] + m_rms[14] + m_rms[15];
+	float sum = std::accumulate(std::begin(m_rms), std::end(m_rms), 0.0f);
+	float average = (sum / BUFFER_SIZE);
 
-	average /= 16.0;
-
-	if( average > 10400.0 )
-		return true;
-
-	return false;
+	return average < 0.317f;
 }

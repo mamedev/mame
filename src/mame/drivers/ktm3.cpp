@@ -65,7 +65,7 @@ private:
 	required_region_ptr<u8> m_chargen;
 	required_shared_ptr_array<u8, 2> m_ram;
 
-	bool m_signal;
+	bool m_signal = false;
 };
 
 void ktm3_state::machine_start()

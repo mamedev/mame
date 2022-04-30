@@ -14,14 +14,14 @@ Custom ICs:
 ----------
 98XX     lamp/coin output
 99XX     sound volume
-CUS27    clock divider
+CUS27    ULA clock divider
 CUS30    sound control
-CUS31
-CUS39    sprite generator
+CUS31    ULA
+CUS39    ULA sprite generator
 CUS41    address decoder
 CUS42    dual scrolling tilemap address generator
-CUS43    dual tilemap generator
-CUS48    sprite address generator
+CUS43    ULA dual tilemap generator
+CUS48    ULA sprite address generator
 CUS60    MCU (63701) aka 60A1
 
 
@@ -116,7 +116,7 @@ DIP locations verified for:
 #include "speaker.h"
 
 
-WRITE8_MEMBER(baraduke_state::inputport_select_w)
+void baraduke_state::inputport_select_w(uint8_t data)
 {
 	if ((data & 0xe0) == 0x60)
 		m_inputport_selected = data & 0x07;
@@ -128,7 +128,7 @@ WRITE8_MEMBER(baraduke_state::inputport_select_w)
 	}
 }
 
-READ8_MEMBER(baraduke_state::inputport_r)
+uint8_t baraduke_state::inputport_r()
 {
 	switch (m_inputport_selected)
 	{
@@ -151,13 +151,13 @@ READ8_MEMBER(baraduke_state::inputport_r)
 	}
 }
 
-WRITE8_MEMBER(baraduke_state::baraduke_lamps_w)
+void baraduke_state::baraduke_lamps_w(uint8_t data)
 {
 	m_lamps[0] = BIT(data, 3);
 	m_lamps[1] = BIT(data, 4);
 }
 
-WRITE8_MEMBER(baraduke_state::baraduke_irq_ack_w)
+void baraduke_state::baraduke_irq_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -177,14 +177,14 @@ void baraduke_state::baraduke_map(address_map &map)
 	map(0x6000, 0xffff).rom();                             /* ROM */
 }
 
-READ8_MEMBER(baraduke_state::soundkludge_r)
+uint8_t baraduke_state::soundkludge_r()
 {
 	return ((m_counter++) >> 4) & 0xff;
 }
 
 void baraduke_state::mcu_map(address_map &map)
 {
-	map(0x0000, 0x001f).rw("mcu", FUNC(hd63701_cpu_device::m6801_io_r), FUNC(hd63701_cpu_device::m6801_io_w));/* internal registers */
+	map(0x0000, 0x001f).m("mcu", FUNC(hd63701v0_cpu_device::m6801_io));/* internal registers */
 	map(0x0080, 0x00ff).ram();                             /* built in RAM */
 	map(0x1000, 0x13ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)); /* PSG device, shared RAM */
 	map(0x1105, 0x1105).r(FUNC(baraduke_state::soundkludge_r));             /* cures speech */
@@ -336,24 +336,11 @@ static const gfx_layout tile_layout =
 	16*8
 };
 
-static const gfx_layout spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-		8*4, 9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
-	{ 8*8*0, 8*8*1, 8*8*2, 8*8*3, 8*8*4, 8*8*5, 8*8*6, 8*8*7,
-	8*8*8, 8*8*9, 8*8*10, 8*8*11, 8*8*12, 8*8*13, 8*8*14, 8*8*15 },
-	128*8
-};
-
 static GFXDECODE_START( gfx_baraduke )
-	GFXDECODE_ENTRY( "gfx1", 0,      text_layout,  0, 512 )
-	GFXDECODE_ENTRY( "gfx2", 0x0000, tile_layout,  0, 256 )
-	GFXDECODE_ENTRY( "gfx2", 0x4000, tile_layout,  0, 256 )
-	GFXDECODE_ENTRY( "gfx3", 0,      spritelayout, 0, 128 )
+	GFXDECODE_ENTRY( "gfx1", 0,      text_layout,            0, 512 )
+	GFXDECODE_ENTRY( "gfx2", 0x0000, tile_layout,            0, 256 )
+	GFXDECODE_ENTRY( "gfx2", 0x4000, tile_layout,            0, 256 )
+	GFXDECODE_ENTRY( "gfx3", 0,      gfx_16x16x4_packed_msb, 0, 128 )
 GFXDECODE_END
 
 
@@ -369,7 +356,7 @@ void baraduke_state::baraduke(machine_config &config)
 	MC6809E(config, m_maincpu, XTAL(49'152'000)/32); // 68A09E
 	m_maincpu->set_addrmap(AS_PROGRAM, &baraduke_state::baraduke_map);
 
-	HD63701(config, m_mcu, XTAL(49'152'000)/8);
+	HD63701V0(config, m_mcu, XTAL(49'152'000)/8);
 	m_mcu->set_addrmap(AS_PROGRAM, &baraduke_state::mcu_map);
 	m_mcu->in_p1_cb().set(FUNC(baraduke_state::inputport_r));         /* input ports read */
 	m_mcu->out_p1_cb().set(FUNC(baraduke_state::inputport_select_w)); /* input port select */

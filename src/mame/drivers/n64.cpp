@@ -34,7 +34,7 @@ public:
 	void n64dd(machine_config &config);
 
 private:
-	DECLARE_READ32_MEMBER(dd_null_r);
+	uint32_t dd_null_r();
 	DECLARE_MACHINE_START(n64dd);
 	INTERRUPT_GEN_MEMBER(n64_reset_poll);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
@@ -45,10 +45,11 @@ private:
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(unload_n64dd);
 	void n64_map(address_map &map);
 	void n64dd_map(address_map &map);
-	void rsp_map(address_map &map);
+	void rsp_imem_map(address_map &map);
+	void rsp_dmem_map(address_map &map);
 };
 
-READ32_MEMBER(n64_mess_state::dd_null_r)
+uint32_t n64_mess_state::dd_null_r()
 {
 	return 0xffffffff;
 }
@@ -96,12 +97,14 @@ void n64_mess_state::n64dd_map(address_map &map)
 	map(0x1fc007c0, 0x1fc007ff).rw("rcp", FUNC(n64_periphs::pif_ram_r), FUNC(n64_periphs::pif_ram_w));
 }
 
-void n64_mess_state::rsp_map(address_map &map)
+void n64_mess_state::rsp_imem_map(address_map &map)
+{
+	map(0x00000000, 0x00000fff).ram().share("rsp_imem");
+}
+
+void n64_mess_state::rsp_dmem_map(address_map &map)
 {
 	map(0x00000000, 0x00000fff).ram().share("rsp_dmem");
-	map(0x00001000, 0x00001fff).ram().share("rsp_imem");
-	map(0x04000000, 0x04000fff).ram().share("rsp_dmem");
-	map(0x04001000, 0x04001fff).ram().share("rsp_imem");
 }
 
 static INPUT_PORTS_START( n64 )
@@ -445,7 +448,8 @@ void n64_mess_state::n64(machine_config &config)
 	m_rsp->sp_reg_r().set(m_rcp_periphs, FUNC(n64_periphs::sp_reg_r));
 	m_rsp->sp_reg_w().set(m_rcp_periphs, FUNC(n64_periphs::sp_reg_w));
 	m_rsp->status_set().set(m_rcp_periphs, FUNC(n64_periphs::sp_set_status));
-	m_rsp->set_addrmap(AS_PROGRAM, &n64_mess_state::rsp_map);
+	m_rsp->set_addrmap(AS_PROGRAM, &n64_mess_state::rsp_imem_map);
+	m_rsp->set_addrmap(AS_DATA, &n64_mess_state::rsp_dmem_map);
 
 	config.set_maximum_quantum(attotime::from_hz(500000));
 

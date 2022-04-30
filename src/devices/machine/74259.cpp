@@ -103,10 +103,10 @@ DEFINE_DEVICE_TYPE(CD4099, cd4099_device, "cd4099", "CD4099B Addressable Latch")
 //**************************************************************************
 
 addressable_latch_device::addressable_latch_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool clear_active)
-	: device_t(mconfig, type, tag, owner, clock),
-		m_q_out_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}},
-		m_parallel_out_cb(*this),
-		m_clear_active(clear_active)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_q_out_cb(*this)
+	, m_parallel_out_cb(*this)
+	, m_clear_active(clear_active)
 {
 }
 
@@ -117,8 +117,7 @@ addressable_latch_device::addressable_latch_device(const machine_config &mconfig
 void addressable_latch_device::device_start()
 {
 	// resolve callbacks
-	for (devcb_write_line &cb : m_q_out_cb)
-		cb.resolve();
+	m_q_out_cb.resolve_all();
 	m_parallel_out_cb.resolve();
 
 	// initial input state

@@ -1,9 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz, David Haywood
 
+#include "emu.h"
 #include "includes/spg2xx.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "softlist_dev.h"
+
 
 class tvgogo_state : public spg2xx_game_state
 {
@@ -17,13 +21,13 @@ public:
 	void tvgogo(machine_config &config);
 
 private:
-	uint8_t m_i2cunk;
+	uint8_t m_i2cunk = 0;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER(tvg_i2c_w);
-	DECLARE_READ8_MEMBER(tvg_i2c_r);
+	void tvg_i2c_w(offs_t offset, uint8_t data);
+	uint8_t tvg_i2c_r(offs_t offset);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load_tvgogo);
 
@@ -207,7 +211,7 @@ DEVICE_IMAGE_LOAD_MEMBER(tvgogo_state::cart_load_tvgogo)
 
 	if (size > 0x800000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 		return image_init_result::FAIL;
 	}
 
@@ -218,14 +222,14 @@ DEVICE_IMAGE_LOAD_MEMBER(tvgogo_state::cart_load_tvgogo)
 }
 
 
-WRITE8_MEMBER(tvgogo_state::tvg_i2c_w)
+void tvgogo_state::tvg_i2c_w(offs_t offset, uint8_t data)
 {
 	// unsure what is mapped here (Camera?) but it expects to be able to read back the same byte it writes before it boots.
 	m_i2cunk = data;
 	logerror("%s: tvg_i2c_w %04x %02x\n", machine().describe_context(), offset, data);
 }
 
-READ8_MEMBER(tvgogo_state::tvg_i2c_r)
+uint8_t tvgogo_state::tvg_i2c_r(offs_t offset)
 {
 	uint8_t ret = m_i2cunk;
 	logerror("%s: tvg_i2c_r %04x %02x\n", machine().describe_context(), offset, ret);

@@ -54,10 +54,8 @@ public:
 
 	void ibm3153(machine_config &config);
 
-protected:
-	virtual void machine_reset() override;
-
 private:
+	virtual void machine_reset() override;
 	void ibm3153_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

@@ -165,7 +165,7 @@ void snk6502_sound_device::device_start()
 	// 38.99 Hz update (according to schematic)
 	set_music_clock(M_LN2 * (RES_K(18) * 2 + RES_K(1)) * CAP_U(1));
 
-	m_tone_stream = machine().sound().stream_alloc(*this, 0, 1, SAMPLE_RATE);
+	m_tone_stream = stream_alloc(0, 1, SAMPLE_RATE);
 
 	for (int i = 0; i < NUM_CHANNELS; i++)
 	{
@@ -512,14 +512,14 @@ void snk6502_sound_device::speech_w(uint8_t data, const uint16_t *table, int sta
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void snk6502_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void snk6502_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *buffer = outputs[0];
+	auto &buffer = outputs[0];
 
 	for (int i = 0; i < NUM_CHANNELS; i++)
 		validate_tone_channel(i);
 
-	while (samples-- > 0)
+	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 	{
 		int32_t data = 0;
 
@@ -541,7 +541,7 @@ void snk6502_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 			}
 		}
 
-		*buffer++ = data;
+		buffer.put_int(sampindex, data, 3768);
 
 		m_tone_clock += FRAC_ONE;
 		if (m_tone_clock >= m_tone_clock_expire)
@@ -572,7 +572,7 @@ vanguard_sound_device::vanguard_sound_device(const machine_config &mconfig, cons
 {
 }
 
-WRITE8_MEMBER(vanguard_sound_device::sound_w)
+void vanguard_sound_device::sound_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -660,7 +660,7 @@ WRITE8_MEMBER(vanguard_sound_device::sound_w)
 	}
 }
 
-WRITE8_MEMBER(vanguard_sound_device::speech_w)
+void vanguard_sound_device::speech_w(uint8_t data)
 {
 	static const uint16_t vanguard_table[16] =
 	{
@@ -757,7 +757,7 @@ fantasy_sound_device::fantasy_sound_device(const machine_config &mconfig, device
 {
 }
 
-WRITE8_MEMBER(fantasy_sound_device::sound_w)
+void fantasy_sound_device::sound_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -857,7 +857,7 @@ WRITE8_MEMBER(fantasy_sound_device::sound_w)
 	}
 }
 
-WRITE8_MEMBER(fantasy_sound_device::speech_w)
+void fantasy_sound_device::speech_w(uint8_t data)
 {
 	static const uint16_t fantasy_table[16] =
 	{
@@ -969,7 +969,7 @@ sasuke_sound_device::sasuke_sound_device(const machine_config &mconfig, const ch
 {
 }
 
-WRITE8_MEMBER(sasuke_sound_device::sound_w)
+void sasuke_sound_device::sound_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -1118,7 +1118,7 @@ satansat_sound_device::satansat_sound_device(const machine_config &mconfig, cons
 {
 }
 
-WRITE8_MEMBER(satansat_sound_device::sound_w)
+void satansat_sound_device::sound_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

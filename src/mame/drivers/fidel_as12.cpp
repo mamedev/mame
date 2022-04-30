@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-// thanks-to:yoyo_chessboard
+// thanks-to:yoyo_chessboard, Berger
 /******************************************************************************
 
-Fidelity Elegance Chess Challenger (AS12)
+Fidelity Elegance Chess Challenger (AS12/6085)
 
 Hardware notes:
-- R65C02P4 CPU @ 4MHz
+- R65C02P4 CPU @ 3/3.57/4MHz
 - 3*8KB ROM(TMM2764), 2*2KB RAM(HM6116)
 - PCB label 510-1084B01
 
@@ -18,16 +18,15 @@ magnetic chess board sensors. See fidel_sc12.cpp for a more technical descriptio
 #include "emu.h"
 #include "machine/fidel_clockdiv.h"
 
-#include "cpu/m6502/r65c02.h"
-#include "machine/sensorboard.h"
-#include "machine/timer.h"
-#include "sound/dac.h"
-#include "sound/volt_reg.h"
-#include "video/pwm.h"
-#include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "cpu/m6502/r65c02.h"
+#include "machine/clock.h"
+#include "machine/sensorboard.h"
+#include "sound/dac.h"
+#include "video/pwm.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 // internal artwork
@@ -43,59 +42,64 @@ class as12_state : public fidel_clockdiv_state
 public:
 	as12_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidel_clockdiv_state(mconfig, type, tag),
-		m_irq_on(*this, "irq_on"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
-		m_cart(*this, "cartslot"),
 		m_inputs(*this, "IN.0")
 	{ }
 
 	// machine configs
-	void as12(machine_config &config);
+	void feleg(machine_config &config);
+	void felega(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(switch_cpu_freq) { set_cpu_freq(); }
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	void set_cpu_freq();
 
 private:
 	// devices/pointers
-	required_device<timer_device> m_irq_on;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
-	required_device<generic_slot_device> m_cart;
 	required_ioport m_inputs;
 
 	// address maps
 	void main_map(address_map &map);
 
-	// periodic interrupts
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
-
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-
 	// I/O handlers
 	void update_display();
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(led_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void control_w(u8 data);
+	void led_w(offs_t offset, u8 data);
+	u8 input_r(offs_t offset);
 
-	u16 m_inp_mux;
-	u8 m_led_data;
+	u16 m_inp_mux = 0;
+	u8 m_led_data = 0;
 };
 
 void as12_state::machine_start()
 {
 	fidel_clockdiv_state::machine_start();
 
-	// zerofill
-	m_inp_mux = 0;
-	m_led_data = 0;
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_data));
+}
+
+void as12_state::machine_reset()
+{
+	set_cpu_freq();
+	fidel_clockdiv_state::machine_reset();
+}
+
+void as12_state::set_cpu_freq()
+{
+	// known official CPU speeds: 3MHz, 3.57MHz, 4MHz
+	static const XTAL xtal[3] = { 3_MHz_XTAL, 3.579545_MHz_XTAL, 4_MHz_XTAL };
+	m_maincpu->set_unscaled_clock(xtal[ioport("FAKE")->read() % 3]);
+	div_refresh();
 }
 
 
@@ -104,27 +108,13 @@ void as12_state::machine_start()
     I/O
 ******************************************************************************/
 
-// cartridge
-
-DEVICE_IMAGE_LOAD_MEMBER(as12_state::cart_load)
-{
-	u32 size = m_cart->common_get_size("rom");
-	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
-
-	return image_init_result::PASS;
-}
-
-
-// TTL/generic
-
 void as12_state::update_display()
 {
 	// 8*8(+1) chessboard leds
 	m_display->matrix(m_inp_mux, m_led_data);
 }
 
-WRITE8_MEMBER(as12_state::control_w)
+void as12_state::control_w(u8 data)
 {
 	// d0-d3: 74245 P0-P3
 	// 74245 Q0-Q8: input mux, led select
@@ -139,14 +129,14 @@ WRITE8_MEMBER(as12_state::control_w)
 	// d6,d7: N/C?
 }
 
-WRITE8_MEMBER(as12_state::led_w)
+void as12_state::led_w(offs_t offset, u8 data)
 {
 	// a0-a2,d0: led data via NE591N
 	m_led_data = (m_led_data & ~(1 << offset)) | ((data & 1) << offset);
 	update_display();
 }
 
-READ8_MEMBER(as12_state::input_r)
+u8 as12_state::input_r(offs_t offset)
 {
 	u8 data = 0;
 
@@ -179,7 +169,8 @@ void as12_state::main_map(address_map &map)
 	map(0x6000, 0x6000).mirror(0x1fff).w(FUNC(as12_state::control_w));
 	map(0x8000, 0x9fff).rom();
 	map(0xa000, 0xa007).mirror(0x1ff8).r(FUNC(as12_state::input_r));
-	map(0xc000, 0xffff).rom();
+	map(0xc000, 0xcfff).mirror(0x1000).rom();
+	map(0xe000, 0xffff).rom();
 }
 
 
@@ -188,7 +179,7 @@ void as12_state::main_map(address_map &map)
     Input Ports
 ******************************************************************************/
 
-static INPUT_PORTS_START( as12 )
+static INPUT_PORTS_START( feleg )
 	PORT_INCLUDE( fidel_clockdiv_4 )
 
 	PORT_START("IN.0")
@@ -200,6 +191,22 @@ static INPUT_PORTS_START( as12 )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("PB / King")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("RE")
+
+	PORT_START("FAKE")
+	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, as12_state, switch_cpu_freq, 0) // factory set
+	PORT_CONFSETTING(    0x00, "3MHz" )
+	PORT_CONFSETTING(    0x01, "3.57MHz" )
+	PORT_CONFSETTING(    0x02, "4MHz" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( felega )
+	PORT_INCLUDE( feleg )
+
+	PORT_MODIFY("FAKE") // default to 3.57MHz
+	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, as12_state, switch_cpu_freq, 0) // factory set
+	PORT_CONFSETTING(    0x00, "3MHz" )
+	PORT_CONFSETTING(    0x01, "3.57MHz" )
+	PORT_CONFSETTING(    0x02, "4MHz" )
 INPUT_PORTS_END
 
 
@@ -208,17 +215,15 @@ INPUT_PORTS_END
     Machine Configs
 ******************************************************************************/
 
-void as12_state::as12(machine_config &config)
+void as12_state::feleg(machine_config &config)
 {
 	/* basic machine hardware */
 	R65C02(config, m_maincpu, 4_MHz_XTAL); // R65C02P4
-	m_maincpu->set_addrmap(AS_PROGRAM, &as12_state::div_trampoline);
-	ADDRESS_MAP_BANK(config, m_mainmap).set_map(&as12_state::main_map).set_options(ENDIANNESS_LITTLE, 8, 16);
+	m_maincpu->set_addrmap(AS_PROGRAM, &as12_state::main_map);
 
-	const attotime irq_period = attotime::from_hz(600); // from 556 timer (22nF, 110K, 1K), ideal frequency is 600Hz
-	TIMER(config, m_irq_on).configure_periodic(FUNC(as12_state::irq_on<M6502_IRQ_LINE>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us
-	TIMER(config, "irq_off").configure_periodic(FUNC(as12_state::irq_off<M6502_IRQ_LINE>), irq_period);
+	auto &irq_clock(CLOCK(config, "irq_clock", 600)); // from 556 timer (22nF, 110K, 1K), ideal frequency is 600Hz
+	irq_clock.set_pulse_width(attotime::from_usec(17)); // active for 17us
+	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -231,13 +236,18 @@ void as12_state::as12(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "fidel_scc", "bin,dat");
-	m_cart->set_device_load(FUNC(as12_state::cart_load));
-
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "fidel_scc");
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_scc");
+}
+
+void as12_state::felega(machine_config &config)
+{
+	feleg(config);
+
+	/* basic machine hardware */
+	m_maincpu->set_clock(3.579545_MHz_XTAL);
 }
 
 
@@ -246,11 +256,19 @@ void as12_state::as12(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START( feleg ) // model AS12(or 6085)
-	ROM_REGION( 0x10000, "mainmap", 0 )
-	ROM_LOAD("feleg.1", 0x8000, 0x2000, CRC(e9df31e8) SHA1(31c52bb8f75580c82093eb950959c1bc294189a8) ) // TMM2764, no label
-	ROM_LOAD("feleg.2", 0xc000, 0x2000, CRC(bed9c84b) SHA1(c12f39765b054d2ad81f747e698715ad4246806d) ) // "
-	ROM_LOAD("feleg.3", 0xe000, 0x2000, CRC(b1fb49aa) SHA1(d8c9687dd564f0fa603e6d684effb1d113ac64b4) ) // "
+ROM_START( feleg ) // model 6085
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("feleg.8000", 0x8000, 0x2000, CRC(e9df31e8) SHA1(31c52bb8f75580c82093eb950959c1bc294189a8) ) // TMM2764, no label
+	ROM_LOAD("feleg.c000", 0xc000, 0x1000, CRC(bed9c84b) SHA1(c12f39765b054d2ad81f747e698715ad4246806d) ) // "
+	ROM_CONTINUE(          0xc000, 0x1000 ) // 1st half empty
+	ROM_LOAD("feleg.e000", 0xe000, 0x2000, CRC(b1fb49aa) SHA1(d8c9687dd564f0fa603e6d684effb1d113ac64b4) ) // "
+ROM_END
+
+ROM_START( felega ) // model AS12
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("blue.8000",   0x8000, 0x2000, CRC(2e07e657) SHA1(3238f21bdbf2277851e5a32e18c043e654123f00) ) // M5L2764K-2
+	ROM_LOAD("yellow.c000", 0xc000, 0x1000, CRC(fcc48302) SHA1(f60d34229721e8659e9f81c267177daec7723d8f) ) // TMS2732AJL-45
+	ROM_LOAD("black.e000",  0xe000, 0x2000, CRC(9142121b) SHA1(264380e7ad36b7b1867658e1af387624d2a72630) ) // TMS2764JL-25
 ROM_END
 
 } // anonymous namespace
@@ -261,5 +279,6 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME   PARENT  CMP MACHINE  INPUT  STATE       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1985, feleg, 0,       0, as12,    as12,  as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+//    YEAR  NAME    PARENT  CMP  MACHINE  INPUT    STATE       INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1986, feleg,  0,       0,  feleg,   feleg,   as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model 6085)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1985, felega, feleg,   0,  felega,  felega,  as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model AS12)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )

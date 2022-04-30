@@ -14,14 +14,13 @@ public:
 	template <unsigned Bit> auto bit_handler() { return m_bit_handlers[Bit].bind(); }
 
 	void write(uint8_t data);
-	DECLARE_WRITE8_MEMBER(bus_w) { write(data); }
 
 protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
 private:
-	devcb_write_line m_bit_handlers[8];
+	devcb_write_line::array<8> m_bit_handlers;
 
 	int m_bits[8];
 };

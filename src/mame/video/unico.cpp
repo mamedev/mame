@@ -82,12 +82,12 @@ TILE_GET_INFO_MEMBER(unico_state::get_tile_info)
 	uint16_t *vram = (uint16_t *)tilemap.user_data();
 	uint16_t code = vram[2 * tile_index + 0 ];
 	uint16_t attr = vram[2 * tile_index + 1 ];
-	SET_TILE_INFO_MEMBER(1, code, attr & 0x1f, TILE_FLIPYX( attr >> 5 ));
+	tileinfo.set(1, code, attr & 0x1f, TILE_FLIPYX( attr >> 5 ));
 }
 
-READ16_MEMBER(unico_state::vram_r) { return m_vram[offset]; }
+uint16_t unico_state::vram_r(offs_t offset) { return m_vram[offset]; }
 
-WRITE16_MEMBER(unico_state::vram_w)
+void unico_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int tile = ((offset / 0x2000) + 1) % 3;
 	COMBINE_DATA(&m_vram[offset]);
@@ -95,10 +95,10 @@ WRITE16_MEMBER(unico_state::vram_w)
 }
 
 
-READ16_MEMBER(unico_state::scroll_r) { return m_scroll[offset]; }
-WRITE16_MEMBER(unico_state::scroll_w) { COMBINE_DATA(&m_scroll[offset]); }
-READ16_MEMBER(unico_state::spriteram_r) { return m_spriteram[offset]; }
-WRITE16_MEMBER(unico_state::spriteram_w)  { COMBINE_DATA(&m_spriteram[offset]); }
+uint16_t unico_state::scroll_r(offs_t offset) { return m_scroll[offset]; }
+void unico_state::scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_scroll[offset]); }
+uint16_t unico_state::spriteram_r(offs_t offset) { return m_spriteram[offset]; }
+void unico_state::spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)  { COMBINE_DATA(&m_spriteram[offset]); }
 
 
 /***************************************************************************

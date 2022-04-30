@@ -1,895 +1,21 @@
 // license:BSD-3-Clause
-// copyright-holders:Nathan Woods
-/*********************************************************************
-
-    flopimg.c
-
-    Floppy disk image abstraction code
-
-*********************************************************************/
-
-#include <cstdlib>
-#include <cstring>
-#include <cstdio>
-#include <cctype>
-#include <climits>
-#include <cassert>
-
-#include "emu.h" // emu_fatalerror
-#include "osdcore.h"
-#include "ioprocs.h"
-#include "flopimg.h"
-#include "pool.h"
-#include "imageutl.h"
-
-#define TRACK_LOADED        0x01
-#define TRACK_DIRTY         0x02
-
-
-struct floppy_image_legacy
-{
-	struct io_generic io;
-
-	const struct FloppyFormat *floppy_option;
-	struct FloppyCallbacks format;
-
-	/* loaded track stuff */
-	int loaded_track_head;
-	int loaded_track_index;
-	uint32_t loaded_track_size;
-	void *loaded_track_data;
-	uint8_t loaded_track_status;
-	uint8_t flags;
-
-	/* tagging system */
-	object_pool *tags;
-	void *tag_data;
-};
-
-
-
-struct floppy_params
-{
-	int param;
-	int value;
-};
-
-
-
-static floperr_t floppy_track_unload(floppy_image_legacy *floppy);
-
-OPTION_GUIDE_START(floppy_option_guide)
-	OPTION_INT('H', "heads",            "Heads")
-	OPTION_INT('T', "tracks",           "Tracks")
-	OPTION_INT('S', "sectors",          "Sectors")
-	OPTION_INT('L', "sectorlength",     "Sector Bytes")
-	OPTION_INT('I', "interleave",       "Interleave")
-	OPTION_INT('F', "firstsectorid",    "First Sector")
-OPTION_GUIDE_END
-
-
-static void floppy_close_internal(floppy_image_legacy *floppy, bool close_file);
-
-/*********************************************************************
-    opening, closing and creating of floppy images
-*********************************************************************/
-
-/* basic floppy_image_legacy initialization common to floppy_open() and floppy_create() */
-static floppy_image_legacy *floppy_init(void *fp, const struct io_procs *procs, int flags)
-{
-	floppy_image_legacy *floppy;
-
-	floppy = (floppy_image_legacy *)malloc(sizeof(floppy_image_legacy));
-	if (!floppy)
-		return nullptr;
-
-	memset(floppy, 0, sizeof(*floppy));
-	floppy->tags = pool_alloc_lib(nullptr);
-	floppy->tag_data = nullptr;
-	floppy->io.file = fp;
-	floppy->io.procs = procs;
-	floppy->io.filler = 0xFF;
-	floppy->flags = (uint8_t) flags;
-	return floppy;
-}
-
-
-
-/* main code for identifying and maybe opening a disk image; not exposed
- * directly because this function is big and hideous */
-static floperr_t floppy_open_internal(void *fp, const struct io_procs *procs, const std::string &extension,
-	const struct FloppyFormat *floppy_options, int max_options, int flags, floppy_image_legacy **outfloppy,
-	int *outoption)
-{
-	floperr_t err;
-	floppy_image_legacy *floppy;
-	int best_option = -1;
-	int best_vote = 0;
-	int vote;
-	size_t i;
-
-	floppy = floppy_init(fp, procs, flags);
-	if (!floppy)
-	{
-		err = FLOPPY_ERROR_OUTOFMEMORY;
-		goto done;
-	}
-
-	/* vote on the best format */
-	for (i = 0; (i < max_options) && floppy_options[i].construct; i++)
-	{
-		if (extension.empty() || !floppy_options[i].extensions || image_find_extension(floppy_options[i].extensions, extension.c_str()))
-		{
-			if (floppy_options[i].identify)
-			{
-				vote = 0;
-				err = floppy_options[i].identify(floppy, &floppy_options[i], &vote);
-				if (err)
-					goto done;
-			}
-			else
-			{
-				vote = 1;
-			}
-
-			/* is this option a better one? */
-			if (vote > best_vote)
-			{
-				best_vote = vote;
-				best_option = i;
-			}
-		}
-	}
-
-	/* did we find a format? */
-	if (best_option == -1)
-	{
-		err = FLOPPY_ERROR_INVALIDIMAGE;
-		goto done;
-	}
-
-	if (outfloppy)
-	{
-		/* call the format constructor */
-		err = floppy_options[best_option].construct(floppy, &floppy_options[best_option], nullptr);
-		if (err)
-			goto done;
-
-		floppy->floppy_option = &floppy_options[best_option];
-	}
-	if (best_vote != 100)
-	{
-		printf("Loading image that is not 100%% recognized\n");
-	}
-	err = FLOPPY_ERROR_SUCCESS;
-
-done:
-	/* if we have a floppy disk and we either errored or are not keeping it, close it */
-	if (floppy && (!outfloppy || err))
-	{
-		floppy_close_internal(floppy, false);
-		floppy = nullptr;
-	}
-
-	if (outoption)
-		*outoption = err ? -1 : best_option;
-	if (outfloppy)
-		*outfloppy = floppy;
-	return err;
-}
-
-
-
-floperr_t floppy_identify(void *fp, const struct io_procs *procs, const char *extension,
-	const struct FloppyFormat *formats, int *identified_format)
-{
-	return floppy_open_internal(fp, procs, extension, formats, INT_MAX, FLOPPY_FLAGS_READONLY, nullptr, identified_format);
-}
-
-
-
-floperr_t floppy_open(void *fp, const struct io_procs *procs, const std::string &extension,
-	const struct FloppyFormat *format, int flags, floppy_image_legacy **outfloppy)
-{
-	return floppy_open_internal(fp, procs, extension, format, 1, flags, outfloppy, nullptr);
-}
-
-
-
-floperr_t floppy_open_choices(void *fp, const struct io_procs *procs, const std::string &extension,
-	const struct FloppyFormat *formats, int flags, floppy_image_legacy **outfloppy)
-{
-	return floppy_open_internal(fp, procs, extension, formats, INT_MAX, flags, outfloppy, nullptr);
-}
-
-
-
-floperr_t floppy_create(void *fp, const struct io_procs *procs, const struct FloppyFormat *format, util::option_resolution *parameters, floppy_image_legacy **outfloppy)
-{
-	floppy_image_legacy *floppy = nullptr;
-	floperr_t err;
-	int heads, tracks, h, t;
-	std::unique_ptr<util::option_resolution> alloc_resolution;
-
-	assert(format);
-
-	/* create the new image */
-	floppy = floppy_init(fp, procs, 0);
-	if (!floppy)
-	{
-		err = FLOPPY_ERROR_OUTOFMEMORY;
-		goto done;
-	}
-
-	/* if this format expects creation parameters and none were specified, create some */
-	if (!parameters && format->param_guidelines)
-	{
-		try { alloc_resolution = std::make_unique<util::option_resolution>(floppy_option_guide); }
-		catch (...)
-		{
-			err = FLOPPY_ERROR_OUTOFMEMORY;
-			goto done;
-		}
-		alloc_resolution->set_specification(format->param_guidelines);
-		parameters = alloc_resolution.get();
-	}
-
-	/* call the format constructor */
-	err = format->construct(floppy, format, parameters);
-	if (err)
-		goto done;
-
-	/* format the disk, ignoring if formatting not implemented */
-	if (floppy->format.format_track)
-	{
-		heads = floppy_get_heads_per_disk(floppy);
-		tracks = floppy_get_tracks_per_disk(floppy);
-
-		for (h = 0; h < heads; h++)
-		{
-			for (t = 0; t < tracks; t++)
-			{
-				err = floppy->format.format_track(floppy, h, t, parameters);
-				if (err)
-					goto done;
-			}
-		}
-	}
-
-	/* call the post_format function, if present */
-	if (floppy->format.post_format)
-	{
-		err = floppy->format.post_format(floppy, parameters);
-		if (err)
-			goto done;
-	}
-
-	floppy->floppy_option = format;
-	err = FLOPPY_ERROR_SUCCESS;
-
-done:
-	if (err && floppy)
-	{
-		floppy_close_internal(floppy, false);
-		floppy = nullptr;
-	}
-
-	if (outfloppy)
-		*outfloppy = floppy;
-	else if (floppy)
-		floppy_close_internal(floppy, false);
-	return err;
-}
-
-
-
-static void floppy_close_internal(floppy_image_legacy *floppy, bool close_file)
-{
-	if (floppy) {
-		floppy_track_unload(floppy);
-
-		if(floppy->floppy_option && floppy->floppy_option->destruct)
-			floppy->floppy_option->destruct(floppy, floppy->floppy_option);
-		if (close_file)
-			io_generic_close(&floppy->io);
-		if (floppy->loaded_track_data)
-			free(floppy->loaded_track_data);
-		pool_free_lib(floppy->tags);
-
-		free(floppy);
-	}
-}
-
-
-
-void floppy_close(floppy_image_legacy *floppy)
-{
-	floppy_close_internal(floppy, true);
-}
-
-
-
-/*********************************************************************
-    functions useful in format constructors
-*********************************************************************/
-
-struct FloppyCallbacks *floppy_callbacks(floppy_image_legacy *floppy)
-{
-	assert(floppy);
-	return &floppy->format;
-}
-
-
-
-void *floppy_tag(floppy_image_legacy *floppy)
-{
-	assert(floppy);
-	return floppy->tag_data;
-}
-
-
-
-void *floppy_create_tag(floppy_image_legacy *floppy, size_t tagsize)
-{
-	floppy->tag_data = pool_malloc_lib(floppy->tags,tagsize);
-	return floppy->tag_data;
-}
-
-
-
-uint8_t floppy_get_filler(floppy_image_legacy *floppy)
-{
-	return floppy->io.filler;
-}
-
-
-
-void floppy_set_filler(floppy_image_legacy *floppy, uint8_t filler)
-{
-	floppy->io.filler = filler;
-}
-
-
-
-/*********************************************************************
-    calls for accessing the raw disk image
-*********************************************************************/
-
-void floppy_image_read(floppy_image_legacy *floppy, void *buffer, uint64_t offset, size_t length)
-{
-	io_generic_read(&floppy->io, buffer, offset, length);
-}
-
-
-
-void floppy_image_write(floppy_image_legacy *floppy, const void *buffer, uint64_t offset, size_t length)
-{
-	io_generic_write(&floppy->io, buffer, offset, length);
-}
-
-
-
-void floppy_image_write_filler(floppy_image_legacy *floppy, uint8_t filler, uint64_t offset, size_t length)
-{
-	io_generic_write_filler(&floppy->io, filler, offset, length);
-}
-
-
-
-uint64_t floppy_image_size(floppy_image_legacy *floppy)
-{
-	return io_generic_size(&floppy->io);
-}
-
-
-
-/*********************************************************************
-    calls for accessing disk image data
-*********************************************************************/
-
-static floperr_t floppy_readwrite_sector(floppy_image_legacy *floppy, int head, int track, int sector, int offset,
-	void *buffer, size_t buffer_len, bool writing, bool indexed, int ddam)
-{
-	floperr_t err;
-	const struct FloppyCallbacks *fmt;
-	size_t this_buffer_len;
-	std::vector<uint8_t> alloc_buf;
-	uint32_t sector_length;
-	uint8_t *buffer_ptr = (uint8_t *)buffer;
-	floperr_t (*read_sector)(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen);
-	floperr_t (*write_sector)(floppy_image_legacy *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam);
-
-	fmt = floppy_callbacks(floppy);
-
-	/* choose proper calls for indexed vs non-indexed */
-	if (indexed)
-	{
-		read_sector = fmt->read_indexed_sector;
-		write_sector = fmt->write_indexed_sector;
-		if (!fmt->get_indexed_sector_info)
-		{
-			err = FLOPPY_ERROR_UNSUPPORTED;
-			goto done;
-		}
-	}
-	else
-	{
-		read_sector = fmt->read_sector;
-		write_sector = fmt->write_sector;
-		if (!fmt->get_sector_length)
-		{
-			err = FLOPPY_ERROR_UNSUPPORTED;
-			goto done;
-		}
-	}
-
-	/* check to make sure that the operation is supported */
-	if (!read_sector || (writing && !write_sector))
-	{
-		err = FLOPPY_ERROR_UNSUPPORTED;
-		goto done;
-	}
-
-	/* main loop */
-	while(buffer_len > 0)
-	{
-		/* find out the size of this sector */
-		if (indexed)
-			err = fmt->get_indexed_sector_info(floppy, head, track, sector, nullptr, nullptr, nullptr, &sector_length, nullptr);
-		else
-			err = fmt->get_sector_length(floppy, head, track, sector, &sector_length);
-		if (err)
-			goto done;
-
-		/* do we even do anything with this sector? */
-		if (offset < sector_length)
-		{
-			/* ok we will be doing something */
-			if ((offset > 0) || (buffer_len < sector_length))
-			{
-				/* we will be doing an partial read/write; in other words we
-				 * will not be reading/writing a full sector */
-				alloc_buf.resize(sector_length);
-
-				/* read the sector (we need to do this even when writing */
-				err = read_sector(floppy, head, track, sector, &alloc_buf[0], sector_length);
-				if (err)
-					goto done;
-
-				this_buffer_len = std::min(buffer_len, size_t(sector_length - offset));
-
-				if (writing)
-				{
-					memcpy(&alloc_buf[offset], buffer_ptr, this_buffer_len);
-
-					err = write_sector(floppy, head, track, sector, &alloc_buf[0], sector_length, ddam);
-					if (err)
-						goto done;
-				}
-				else
-				{
-					memcpy(buffer_ptr, &alloc_buf[offset], this_buffer_len);
-				}
-				offset += this_buffer_len;
-				offset %= sector_length;
-			}
-			else
-			{
-				this_buffer_len = sector_length;
-
-				if (writing)
-					err = write_sector(floppy, head, track, sector, buffer_ptr, sector_length, ddam);
-				else
-					err = read_sector(floppy, head, track, sector, buffer_ptr, sector_length);
-				if (err)
-					goto done;
-			}
-		}
-		else
-		{
-			/* skip this sector */
-			offset -= sector_length;
-			this_buffer_len = 0;
-		}
-
-		buffer_ptr += this_buffer_len;
-		buffer_len -= this_buffer_len;
-		sector++;
-	}
-
-	err = FLOPPY_ERROR_SUCCESS;
-
-done:
-	return err;
-}
-
-
-
-floperr_t floppy_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, int offset,  void *buffer, size_t buffer_len)
-{
-	return floppy_readwrite_sector(floppy, head, track, sector, offset, buffer, buffer_len, false, false, 0);
-}
-
-
-
-floperr_t floppy_write_sector(floppy_image_legacy *floppy, int head, int track, int sector, int offset, const void *buffer, size_t buffer_len, int ddam)
-{
-	return floppy_readwrite_sector(floppy, head, track, sector, offset, (void *) buffer, buffer_len, true, false, ddam);
-}
-
-
-
-floperr_t floppy_read_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector_index, int offset,    void *buffer, size_t buffer_len)
-{
-	return floppy_readwrite_sector(floppy, head, track, sector_index, offset, buffer, buffer_len, false, true, 0);
-}
-
-
-
-floperr_t floppy_write_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector_index, int offset, const void *buffer, size_t buffer_len, int ddam)
-{
-	return floppy_readwrite_sector(floppy, head, track, sector_index, offset, (void *) buffer, buffer_len, true, true, ddam);
-}
-
-
-static floperr_t floppy_get_track_data_offset(floppy_image_legacy *floppy, int head, int track, uint64_t *offset)
-{
-	floperr_t err;
-	const struct FloppyCallbacks *callbacks;
-
-	*offset = 0;
-	callbacks = floppy_callbacks(floppy);
-	if (callbacks->get_track_data_offset)
-	{
-		err = callbacks->get_track_data_offset(floppy, head, track, offset);
-		if (err)
-			return err;
-	}
-	return FLOPPY_ERROR_SUCCESS;
-}
-
-
-
-static floperr_t floppy_read_track_offset(floppy_image_legacy *floppy, int head, int track, uint64_t offset, void *buffer, size_t buffer_len)
-{
-	floperr_t err;
-	const struct FloppyCallbacks *format;
-
-	format = floppy_callbacks(floppy);
-
-	if (!format->read_track)
-		return FLOPPY_ERROR_UNSUPPORTED;
-
-	err = floppy_track_unload(floppy);
-	if (err)
-		return err;
-
-	err = format->read_track(floppy, head, track, offset, buffer, buffer_len);
-	if (err)
-		return err;
-
-	return FLOPPY_ERROR_SUCCESS;
-}
-
-
-
-floperr_t floppy_read_track(floppy_image_legacy *floppy, int head, int track, void *buffer, size_t buffer_len)
-{
-	return floppy_read_track_offset(floppy, head, track, 0, buffer, buffer_len);
-}
-
-
-
-floperr_t floppy_read_track_data(floppy_image_legacy *floppy, int head, int track, void *buffer, size_t buffer_len)
-{
-	floperr_t err;
-	uint64_t offset;
-
-	err = floppy_get_track_data_offset(floppy, head, track, &offset);
-	if (err)
-		return err;
-
-	return floppy_read_track_offset(floppy, head, track, offset, buffer, buffer_len);
-}
-
-
-
-static floperr_t floppy_write_track_offset(floppy_image_legacy *floppy, int head, int track, uint64_t offset, const void *buffer, size_t buffer_len)
-{
-	floperr_t err;
-
-	/* track writing supported? */
-	if (!floppy_callbacks(floppy)->write_track)
-		return FLOPPY_ERROR_UNSUPPORTED;
-
-	/* read only? */
-	if (floppy->flags & FLOPPY_FLAGS_READONLY)
-		return FLOPPY_ERROR_READONLY;
-
-	err = floppy_track_unload(floppy);
-	if (err)
-		return err;
-
-	err = floppy_callbacks(floppy)->write_track(floppy, head, track, offset, buffer, buffer_len);
-	if (err)
-		return err;
-
-	return FLOPPY_ERROR_SUCCESS;
-}
-
-
-
-floperr_t floppy_write_track(floppy_image_legacy *floppy, int head, int track, const void *buffer, size_t buffer_len)
-{
-	return floppy_write_track_offset(floppy, head, track, 0, buffer, buffer_len);
-}
-
-
-
-floperr_t floppy_write_track_data(floppy_image_legacy *floppy, int head, int track, const void *buffer, size_t buffer_len)
-{
-	floperr_t err;
-	uint64_t offset;
-
-	err = floppy_get_track_data_offset(floppy, head, track, &offset);
-	if (err)
-		return err;
-
-	return floppy_write_track_offset(floppy, head, track, offset, buffer, buffer_len);
-}
-
-
-
-floperr_t floppy_format_track(floppy_image_legacy *floppy, int head, int track, util::option_resolution *parameters)
-{
-	floperr_t err;
-	struct FloppyCallbacks *format;
-	std::unique_ptr<util::option_resolution> alloc_resolution;
-
-	/* supported? */
-	format = floppy_callbacks(floppy);
-	if (!format->format_track)
-		return FLOPPY_ERROR_UNSUPPORTED;
-
-	/* create a dummy resolution; if no parameters were specified */
-	if (!parameters)
-	{
-		try
-		{
-			alloc_resolution = std::make_unique<util::option_resolution>(floppy_option_guide);
-		}
-		catch (...)
-		{
-			return FLOPPY_ERROR_OUTOFMEMORY;
-		}
-		alloc_resolution->set_specification(floppy->floppy_option->param_guidelines);
-
-		parameters = alloc_resolution.get();
-	}
-
-	err = format->format_track(floppy, head, track, parameters);
-	if (err)
-		return err;
-
-	return FLOPPY_ERROR_SUCCESS;
-}
-
-
-
-int floppy_get_tracks_per_disk(floppy_image_legacy *floppy)
-{
-	return floppy_callbacks(floppy)->get_tracks_per_disk(floppy);
-}
-
-
-
-int floppy_get_heads_per_disk(floppy_image_legacy *floppy)
-{
-	return floppy_callbacks(floppy)->get_heads_per_disk(floppy);
-}
-
-
-
-uint32_t floppy_get_track_size(floppy_image_legacy *floppy, int head, int track)
-{
-	const struct FloppyCallbacks *fmt;
-
-	fmt = floppy_callbacks(floppy);
-	if (!fmt->get_track_size)
-		return 0;
-
-	return fmt->get_track_size(floppy, head, track);
-}
-
-
-
-floperr_t floppy_get_sector_length(floppy_image_legacy *floppy, int head, int track, int sector, uint32_t *sector_length)
-{
-	const struct FloppyCallbacks *fmt;
-
-	fmt = floppy_callbacks(floppy);
-	if (!fmt->get_sector_length)
-		return FLOPPY_ERROR_UNSUPPORTED;
-
-	return fmt->get_sector_length(floppy, head, track, sector, sector_length);
-}
-
-
-
-floperr_t floppy_get_indexed_sector_info(floppy_image_legacy *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, uint32_t *sector_length, unsigned long *flags)
-{
-	const struct FloppyCallbacks *fmt;
-
-	fmt = floppy_callbacks(floppy);
-	if (!fmt->get_indexed_sector_info)
-		return FLOPPY_ERROR_UNSUPPORTED;
-
-	return fmt->get_indexed_sector_info(floppy, head, track, sector_index, cylinder, side, sector, sector_length, flags);
-}
-
-
-
-floperr_t floppy_get_sector_count(floppy_image_legacy *floppy, int head, int track, int *sector_count)
-{
-	floperr_t err;
-	int sector_index = 0;
-
-	do
-	{
-		err = floppy_get_indexed_sector_info(floppy, head, track, sector_index, nullptr, nullptr, nullptr, nullptr, nullptr);
-		if (!err)
-			sector_index++;
-	}
-	while(!err);
-
-	if (sector_index && (err == FLOPPY_ERROR_SEEKERROR))
-		err = FLOPPY_ERROR_SUCCESS;
-	if (sector_count)
-		*sector_count = err ? 0 : sector_index;
-	return err;
-}
-
-
-
-int floppy_is_read_only(floppy_image_legacy *floppy)
-{
-	return floppy->flags & FLOPPY_FLAGS_READONLY;
-}
-
-
-
-uint8_t floppy_random_byte(floppy_image_legacy *floppy)
-{
-	/* can't use mame_rand(); this might not be in the core */
-#ifdef rand
-#undef rand
-#endif
-	return rand();
-}
-
-
-
-/*********************************************************************
-    calls for track based IO
-*********************************************************************/
-
-floperr_t floppy_load_track(floppy_image_legacy *floppy, int head, int track, int dirtify, void **track_data, size_t *track_length)
-{
-	floperr_t err;
-	void *new_loaded_track_data;
-	uint32_t track_size;
-
-	/* have we already loaded this track? */
-	if (((floppy->loaded_track_status & TRACK_LOADED) == 0) || (head != floppy->loaded_track_head) || (track != floppy->loaded_track_index))
-	{
-		err = floppy_track_unload(floppy);
-		if (err)
-			goto error;
-
-		track_size = floppy_callbacks(floppy)->get_track_size(floppy, head, track);
-
-		if (floppy->loaded_track_data) free(floppy->loaded_track_data);
-		new_loaded_track_data = malloc(track_size);
-		if (!new_loaded_track_data)
-		{
-			err = FLOPPY_ERROR_OUTOFMEMORY;
-			goto error;
-		}
-
-		floppy->loaded_track_data = new_loaded_track_data;
-		floppy->loaded_track_size = track_size;
-		floppy->loaded_track_head = head;
-		floppy->loaded_track_index = track;
-
-		err = floppy_callbacks(floppy)->read_track(floppy, floppy->loaded_track_head, floppy->loaded_track_index, 0, floppy->loaded_track_data, floppy->loaded_track_size);
-		if (err)
-			goto error;
-
-		floppy->loaded_track_status |= TRACK_LOADED | (dirtify ? TRACK_DIRTY : 0);
-	}
-	else
-		floppy->loaded_track_status |= (dirtify ? TRACK_DIRTY : 0);
-
-	if (track_data)
-		*track_data = floppy->loaded_track_data;
-	if (track_length)
-		*track_length = floppy->loaded_track_size;
-	return FLOPPY_ERROR_SUCCESS;
-
-error:
-	if (track_data)
-		*track_data = nullptr;
-	if (track_length)
-		*track_length = 0;
-	return err;
-}
-
-
-
-static floperr_t floppy_track_unload(floppy_image_legacy *floppy)
-{
-	int err;
-	if (floppy->loaded_track_status & TRACK_DIRTY)
-	{
-		err = floppy_callbacks(floppy)->write_track(floppy, floppy->loaded_track_head, floppy->loaded_track_index, 0, floppy->loaded_track_data, floppy->loaded_track_size);
-		if (err)
-			return (floperr_t)err;
-	}
-
-	floppy->loaded_track_status &= ~(TRACK_LOADED | TRACK_DIRTY);
-	return FLOPPY_ERROR_SUCCESS;
-}
-
-
-
-/*********************************************************************
-    accessors for meta information about the image
-*********************************************************************/
-
-const char *floppy_format_description(floppy_image_legacy *floppy)
-{
-	return floppy->floppy_option->description;
-}
-
-
-
-/*********************************************************************
-    misc calls
-*********************************************************************/
-
-const char *floppy_error(floperr_t err)
-{
-	static const char *const error_messages[] =
-	{
-		"The operation completed successfully",
-		"Fatal internal error",
-		"This operation is unsupported",
-		"Out of memory",
-		"Seek error",
-		"Invalid image",
-		"Attempted to write to read only image",
-		"No space left on image",
-		"Parameter out of range",
-		"Required parameter not specified"
-	};
-
-	if ((err < 0) || (err >= ARRAY_LENGTH(error_messages)))
-		return nullptr;
-	return error_messages[err];
-}
-
-
-LEGACY_FLOPPY_OPTIONS_START(default)
-LEGACY_FLOPPY_OPTIONS_END
-
-
-// license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    New implementation
+    flopimg.cpp
+
+    Floppy disk image abstraction code (new implementation)
 
 ****************************************************************************/
+
+#include "flopimg.h"
+
+#include "ioprocs.h"
+#include "strformat.h"
+
+#include <cstdio>
+#include <cstring>
+#include <stdexcept>
 
 
 floppy_image::floppy_image(int _tracks, int _heads, uint32_t _form_factor)
@@ -933,6 +59,9 @@ void floppy_image::get_actual_geometry(int &_tracks, int &_heads)
 					goto head_done;
 			maxh--;
 		}
+	else
+		maxh = -1;
+
 	head_done:
 	_tracks = (maxt+4)/4;
 	_heads = maxh+1;
@@ -952,6 +81,22 @@ int floppy_image::get_resolution() const
 	return 0;
 }
 
+bool floppy_image::track_is_formatted(int track, int head, int subtrack)
+{
+	int idx = track*4 + subtrack;
+	if(int(track_array.size()) <= idx)
+		return false;
+	if(int(track_array[idx].size()) <= head)
+		return false;
+	const auto &data = track_array[idx][head].cell_data;
+	if(data.empty())
+		return false;
+	for(uint32_t mg : data)
+		if((mg & floppy_image::MG_MASK) == floppy_image::MG_F)
+			return true;
+	return false;
+}
+
 const char *floppy_image::get_variant_name(uint32_t form_factor, uint32_t variant)
 {
 	switch(variant) {
@@ -966,24 +111,15 @@ const char *floppy_image::get_variant_name(uint32_t form_factor, uint32_t varian
 	return "Unknown";
 }
 
-floppy_image_format_t::floppy_image_format_t()
+bool floppy_image_format_t::has_variant(const std::vector<uint32_t> &variants, uint32_t variant)
 {
-	next = nullptr;
+	for(uint32_t v : variants)
+		if(variant == v)
+			return true;
+	return false;
 }
 
-floppy_image_format_t::~floppy_image_format_t()
-{
-}
-
-void floppy_image_format_t::append(floppy_image_format_t *_next)
-{
-	if(next)
-		next->append(_next);
-	else
-		next = _next;
-}
-
-bool floppy_image_format_t::save(io_generic *, floppy_image *)
+bool floppy_image_format_t::save(util::random_read_write &io, const std::vector<uint32_t> &, floppy_image *) const
 {
 	return false;
 }
@@ -1009,7 +145,7 @@ bool floppy_image_format_t::extension_matches(const char *file_name) const
 	return false;
 }
 
-bool floppy_image_format_t::type_no_data(int type) const
+bool floppy_image_format_t::type_no_data(int type)
 {
 	return
 		type == CRC_CCITT_START ||
@@ -1026,7 +162,7 @@ bool floppy_image_format_t::type_no_data(int type) const
 		type == END;
 }
 
-bool floppy_image_format_t::type_data_mfm(int type, int p1, const gen_crc_info *crcs) const
+bool floppy_image_format_t::type_data_mfm(int type, int p1, const gen_crc_info *crcs)
 {
 	return
 		type == MFM ||
@@ -1049,7 +185,7 @@ bool floppy_image_format_t::type_data_mfm(int type, int p1, const gen_crc_info *
 		(type == CRC && (crcs[p1].type == CRC_CCITT || crcs[p1].type == CRC_AMIGA));
 }
 
-void floppy_image_format_t::collect_crcs(const desc_e *desc, gen_crc_info *crcs) const
+void floppy_image_format_t::collect_crcs(const desc_e *desc, gen_crc_info *crcs)
 {
 	memset(crcs, 0, MAX_CRC_COUNT * sizeof(*crcs));
 	for(int i=0; i != MAX_CRC_COUNT; i++)
@@ -1091,7 +227,7 @@ void floppy_image_format_t::collect_crcs(const desc_e *desc, gen_crc_info *crcs)
 		}
 }
 
-int floppy_image_format_t::crc_cells_size(int type) const
+int floppy_image_format_t::crc_cells_size(int type)
 {
 	switch(type) {
 	case CRC_CCITT: return 32;
@@ -1361,7 +497,7 @@ int floppy_image_format_t::calc_sector_index(int num, int interleave, int skew, 
 		sec++;
 		// This line prevents lock-ups of the emulator when the interleave is not appropriate
 		if (sec > total_sectors)
-			throw emu_fatalerror("Format error: interleave %d not appropriate for %d sectors per track\n", interleave, total_sectors);
+			throw std::invalid_argument(util::string_format("Format error: interleave %d not appropriate for %d sectors per track", interleave, total_sectors));
 	}
 	// use skew param
 	sec -= track_head * skew;
@@ -1698,24 +834,18 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 	}
 
 	if(int(buffer.size()) != track_size)
-		throw emu_fatalerror("Wrong track size in generate_track, expected %d, got %d\n", track_size, int(buffer.size()));
+		throw std::invalid_argument(util::string_format("Wrong track size in generate_track, expected %d, got %d", track_size, buffer.size()));
 
 	fixup_crcs(buffer, crcs);
 
 	generate_track_from_levels(track, head, buffer, 0, image);
 }
 
-void floppy_image_format_t::normalize_times(std::vector<uint32_t> &buffer)
+void floppy_image_format_t::normalize_times(std::vector<uint32_t> &buffer, uint32_t last_position)
 {
-	unsigned int total_sum = 0;
-	for(unsigned int i=0; i != buffer.size(); i++)
-		total_sum += buffer[i] & floppy_image::TIME_MASK;
-
-	unsigned int current_sum = 0;
 	for(unsigned int i=0; i != buffer.size(); i++) {
 		uint32_t time = buffer[i] & floppy_image::TIME_MASK;
-		buffer[i] = (buffer[i] & floppy_image::MG_MASK) | (200000000ULL * current_sum / total_sum);
-		current_sum += time;
+		buffer[i] = (buffer[i] & floppy_image::MG_MASK) | (200000000ULL * time / last_position);
 	}
 }
 
@@ -1724,36 +854,11 @@ void floppy_image_format_t::generate_track_from_bitstream(int track, int head, c
 	std::vector<uint32_t> &dest = image->get_buffer(track, head, subtrack);
 	dest.clear();
 
-	// If the bitstream has an odd number of inversions, one needs to be added.
-	// Put in in the middle of the half window after the center inversion, where
-	// any fdc ignores it.
-
-	int inversions = 0;
 	for(int i=0; i != track_size; i++)
 		if(trackbuf[i >> 3] & (0x80 >> (i & 7)))
-			inversions++;
-	bool need_flux = inversions & 1;
+			dest.push_back(floppy_image::MG_F | (i*2+1));
 
-	uint32_t cbit = floppy_image::MG_A;
-	uint32_t count = 0;
-	for(int i=0; i != track_size; i++)
-		if(trackbuf[i >> 3] & (0x80 >> (i & 7))) {
-			dest.push_back(cbit | (count+2));
-			cbit = cbit == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
-			if(need_flux) {
-				need_flux = false;
-				dest.push_back(cbit | 1);
-				cbit = cbit == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
-				count = 1;
-			} else
-				count = 2;
-		} else
-			count += 4;
-
-	if(count)
-		dest.push_back(cbit | count);
-
-	normalize_times(dest);
+	normalize_times(dest, track_size*2);
 
 	if(splice >= 0 || splice < track_size) {
 		int splpos = uint64_t(200000000) * splice / track_size;
@@ -1767,81 +872,23 @@ void floppy_image_format_t::generate_track_from_levels(int track, int head, std:
 	splice_pos = splice_pos % trackbuf.size();
 	uint32_t splice_angular_pos = trackbuf[splice_pos] & floppy_image::TIME_MASK;
 
-	// Check if we need to invert a cell to get an even number of
-	// transitions on the whole track
-	//
-	// Also check if all MG values are valid
-
-	int transition_count = 0;
-	for(auto & elem : trackbuf) {
-		switch(elem & floppy_image::MG_MASK) {
-		case MG_1:
-			transition_count++;
-			break;
-
-		case MG_W:
-			throw emu_fatalerror("Weak bits not yet handled, track %d head %d\n", track, head);
-
-		case MG_0:
-		case floppy_image::MG_N:
-		case floppy_image::MG_D:
-			break;
-
-		case floppy_image::MG_A:
-		case floppy_image::MG_B:
-		default:
-			throw emu_fatalerror("Incorrect MG information in generate_track_from_levels, track %d head %d\n", track, head);
-		}
-	}
-
-	if(transition_count & 1) {
-		int pos = splice_pos;
-		while((trackbuf[pos] & floppy_image::MG_MASK) != MG_0 && (trackbuf[pos] & floppy_image::MG_MASK) != MG_1) {
-			pos++;
-			if(pos == int(trackbuf.size()))
-				pos = 0;
-			if(pos == splice_pos)
-				goto meh;
-		}
-		if((trackbuf[pos] & floppy_image::MG_MASK) == MG_0)
-			trackbuf[pos] = (trackbuf[pos] & floppy_image::TIME_MASK) | MG_1;
-		else
-			trackbuf[pos] = (trackbuf[pos] & floppy_image::TIME_MASK) | MG_0;
-
-	meh:
-		;
-
-	}
-
-	// Maximal number of cells which happens when the buffer is all MG_1/MG_N alternated, which would be 3/2
 	std::vector<uint32_t> &dest = image->get_buffer(track, head);
 	dest.clear();
 
-	uint32_t cbit = floppy_image::MG_A;
-	uint32_t count = 0;
+	uint32_t total_time = 0;
 	for(auto & elem : trackbuf) {
 		uint32_t bit = elem & floppy_image::MG_MASK;
 		uint32_t time = elem & floppy_image::TIME_MASK;
-		if(bit == MG_0) {
-			count += time;
-			continue;
-		}
-		if(bit == MG_1) {
-			count += time >> 1;
-			dest.push_back(cbit | count);
-			cbit = cbit == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
-			count = time - (time >> 1);
-			continue;
-		}
-		dest.push_back(cbit | count);
-		dest.push_back(elem);
-		count = 0;
+		if(bit == MG_1)
+			dest.push_back(floppy_image::MG_F | (total_time + (time >> 1)));
+
+		else if(bit != MG_0)
+			dest.push_back(bit | total_time);
+
+		total_time += time;
 	}
 
-	if(count)
-		dest.push_back(cbit | count);
-
-	normalize_times(dest);
+	normalize_times(dest, total_time);
 	image->set_write_splice_position(track, head, splice_angular_pos);
 }
 
@@ -2251,177 +1298,267 @@ const floppy_image_format_t::desc_e floppy_image_format_t::amiga_22[] = {
 	{ END }
 };
 
-void floppy_image_format_t::generate_bitstream_from_track(int track, int head, int cell_size, uint8_t *trackbuf, int &track_size, floppy_image *image, int subtrack)
+std::vector<bool> floppy_image_format_t::generate_bitstream_from_track(int track, int head, int cell_size, floppy_image *image, int subtrack)
 {
+	std::vector<bool> trackbuf;
 	std::vector<uint32_t> &tbuf = image->get_buffer(track, head, subtrack);
-	if(tbuf.size() <= 1) {
+	bool track_has_info = false;
+	for(uint32_t mg : tbuf)
+		if((mg & floppy_image::MG_MASK) == floppy_image::MG_F) {
+			track_has_info = true;
+			break;
+		}
+
+	if(!track_has_info) {
 		// Unformatted track
-		track_size = 200000000/cell_size;
-		memset(trackbuf, 0, (track_size+7)/8);
-		return;
+		int track_size = 200000000/cell_size;
+		trackbuf.resize(track_size, false);
+		return trackbuf;
 	}
 
-	// Start at the write splice
-	uint32_t splice = image->get_write_splice_position(track, head, subtrack);
-	int cur_pos = splice;
-	int cur_entry = 0;
-	while(cur_entry < int(tbuf.size())-1 && (tbuf[cur_entry+1] & floppy_image::TIME_MASK) < cur_pos)
-		cur_entry++;
+	class pll {
+	private:
+		const std::vector<uint32_t> &tbuf;
+		int cur_pos;
+		int cur_entry;
+		int period;
+		int period_adjust_base;
+		int min_period;
+		int max_period;
+		int phase_adjust;
+		int freq_hist;
+		bool next_is_first;
 
-	int cur_bit = 0;
+	public:
+		pll(const std::vector<uint32_t> &_tbuf, int cell_size) : tbuf(_tbuf) {
+			period = cell_size;
+			period_adjust_base = period * 0.05;
 
-	int period = cell_size;
-	int period_adjust_base = period * 0.05;
-
-	int min_period = int(cell_size*0.75);
-	int max_period = int(cell_size*1.25);
-	int phase_adjust = 0;
-	int freq_hist = 0;
-
-	uint32_t scanned = 0;
-	while(scanned < 200000000) {
-		// Note that all magnetic cell type changes are considered
-		// edges.  No randomness added for neutral/damaged cells
-		int edge = tbuf[cur_entry] & floppy_image::TIME_MASK;
-		if(edge < cur_pos)
-			edge += 200000000;
-		int next = cur_pos + period + phase_adjust;
-		scanned += period + phase_adjust;
-
-		if(edge >= next) {
-			// No transition in the window means 0 and pll in free run mode
-			trackbuf[cur_bit >> 3] &= ~(0x80 >> (cur_bit & 7));
-			cur_bit++;
+			min_period = int(cell_size*0.75);
+			max_period = int(cell_size*1.25);
 			phase_adjust = 0;
+			freq_hist = 0;
 
-		} else {
-			// Transition in the window means 1, and the pll is adjusted
-			trackbuf[cur_bit >> 3] |= 0x80 >> (cur_bit & 7);
-			cur_bit++;
+			// Try to go back 16 flux changes from the end of the track, or at most at the start
+			int flux_to_step = 16;
+			cur_entry = tbuf.size()-1;
+			while(cur_entry > 0 && flux_to_step) {
+				if((tbuf[cur_entry] & floppy_image::MG_MASK) == floppy_image::MG_F)
+					flux_to_step --;
+				cur_entry--;
+			}
 
-			int delta = edge - (next - period/2);
+			// Go back by half-a-period
+			cur_pos = (tbuf[cur_entry] & floppy_image::TIME_MASK) - period/2;
 
-			phase_adjust = 0.65*delta;
+			// Adjust the entry accordingly
+			while(cur_entry > 0 && (cur_pos > (tbuf[cur_entry] & floppy_image::TIME_MASK)))
+				cur_entry --;
 
-			if(delta < 0) {
-				if(freq_hist < 0)
-					freq_hist--;
-				else
-					freq_hist = -1;
-			} else if(delta > 0) {
-				if(freq_hist > 0)
-					freq_hist++;
-				else
-					freq_hist = 1;
-			} else
-				freq_hist = 0;
+			// Now go to the next flux change from there (the no-MG_F case has been handled earlier)
+			while((tbuf[cur_entry] & floppy_image::MG_MASK) != floppy_image::MG_F)
+				cur_entry ++;
 
-			if(freq_hist) {
-				int afh = freq_hist < 0 ? -freq_hist : freq_hist;
-				if(afh > 1) {
-					int aper = period_adjust_base*delta/period;
-					if(!aper)
-						aper = freq_hist < 0 ? -1 : 1;
-					period += aper;
+			next_is_first = false;
+		}
 
-					if(period < min_period)
-						period = min_period;
-					else if(period > max_period)
-						period = max_period;
+		std::pair<bool, bool> get() {
+			bool bit, first;
+			int edge = tbuf[cur_entry] & floppy_image::TIME_MASK;
+			if(edge < cur_pos)
+				edge += 200000000;
+			int next = cur_pos + period + phase_adjust;
+
+			if(edge >= next) {
+				// No transition in the window means 0 and pll in free run mode
+				bit = false;
+				phase_adjust = 0;
+
+			} else {
+				// Transition in the window means 1, and the pll is adjusted
+				bit = true;
+
+				int delta = edge - (next - period/2);
+
+				phase_adjust = 0.65*delta;
+
+				if(delta < 0) {
+					if(freq_hist < 0)
+						freq_hist--;
+					else
+						freq_hist = -1;
+				} else if(delta > 0) {
+					if(freq_hist > 0)
+						freq_hist++;
+					else
+						freq_hist = 1;
+				} else
+					freq_hist = 0;
+
+				if(freq_hist) {
+					int afh = freq_hist < 0 ? -freq_hist : freq_hist;
+					if(afh > 1) {
+						int aper = period_adjust_base*delta/period;
+						if(!aper)
+							aper = freq_hist < 0 ? -1 : 1;
+						period += aper;
+
+						if(period < min_period)
+							period = min_period;
+						else if(period > max_period)
+							period = max_period;
+					}
 				}
 			}
-		}
 
-		cur_pos = next;
-		if(cur_pos >= 200000000) {
-			cur_pos -= 200000000;
-			cur_entry = 0;
-		}
-		while(cur_entry < int(tbuf.size())-1 && (tbuf[cur_entry] & floppy_image::TIME_MASK) < cur_pos)
-			cur_entry++;
+			first = next_is_first;
+			next_is_first = false;
 
-		// Wrap around
-		if(cur_entry == int(tbuf.size())-1 &&
-			(tbuf[cur_entry] & floppy_image::TIME_MASK) < cur_pos) {
-			// Wrap to index 0 or 1 depending on whether there is a transition exactly at the index hole
-			cur_entry = (tbuf[int(tbuf.size())-1] & floppy_image::MG_MASK) != (tbuf[0] & floppy_image::MG_MASK) ?
-				0 : 1;
+			cur_pos = next;
+			if(cur_pos >= 200000000) {
+				cur_pos -= 200000000;
+				cur_entry = 0;
+
+				if(cur_pos >= period/2)
+					first = true;
+				else
+					next_is_first = true;
+			}
+			while(cur_entry < int(tbuf.size())-1 && (tbuf[cur_entry] & floppy_image::TIME_MASK) < cur_pos)
+				cur_entry++;
+
+			// Wrap around
+			if(cur_entry == int(tbuf.size())-1 &&
+			   (tbuf[cur_entry] & floppy_image::TIME_MASK) < cur_pos)
+				cur_entry = 0;
+
+			return std::make_pair(bit, first);
+		}
+	};
+
+	pll cpll(tbuf, cell_size);
+
+	for(;;) {
+		auto r = cpll.get();
+		if(r.second) {
+			trackbuf.push_back(r.first);
+			break;
 		}
 	}
-	// Clean the leftover bottom bits just in case
-	trackbuf[cur_bit >> 3] &= ~(0x7f >> (cur_bit & 7));
-	track_size = cur_bit;
+	for(;;) {
+		auto r = cpll.get();
+		if(r.second)
+			break;
+		trackbuf.push_back(r.first);
+	}
+
+	return trackbuf;
 }
 
-int floppy_image_format_t::sbit_r(const uint8_t *bitstream, int pos)
+std::vector<uint8_t> floppy_image_format_t::generate_nibbles_from_bitstream(const std::vector<bool> &bitstream)
 {
-	return (bitstream[pos >> 3] & (0x80 >> (pos & 7))) != 0;
+	std::vector<uint8_t> res;
+	uint32_t pos = 0;
+	while(pos < bitstream.size()) {
+		while(pos < bitstream.size() && bitstream[pos] == 0)
+			pos++;
+		if(pos == bitstream.size()) {
+			pos = 0;
+			while(pos < bitstream.size() && bitstream[pos] == 0)
+				pos++;
+			if(pos == bitstream.size())
+				return res;
+			goto found;
+		}
+		pos += 8;
+	}
+	while(pos >= bitstream.size())
+		pos -= bitstream.size();
+	while(pos < bitstream.size() && bitstream[pos] == 0)
+		pos++;
+ found:
+	for(;;) {
+		uint8_t v = 0;
+		for(uint32_t i=0; i != 8; i++) {
+			if(bitstream[pos++])
+				v |= 0x80 >> i;
+			if(pos == bitstream.size())
+				pos = 0;
+		}
+		res.push_back(v);
+		if(pos < 8)
+			return res;
+		while(pos < bitstream.size() && bitstream[pos] == 0)
+			pos++;
+		if(pos == bitstream.size())
+			return res;
+	}
 }
 
-int floppy_image_format_t::sbit_rp(const uint8_t *bitstream, int &pos, int track_size)
+int floppy_image_format_t::sbit_rp(const std::vector<bool> &bitstream, uint32_t &pos)
 {
-	int res = sbit_r(bitstream, pos);
+	int res = bitstream[pos];
 	pos ++;
-	if(pos == track_size)
+	if(pos == bitstream.size())
 		pos = 0;
 	return res;
 }
 
-uint8_t floppy_image_format_t::sbyte_mfm_r(const uint8_t *bitstream, int &pos, int track_size)
+uint8_t floppy_image_format_t::sbyte_mfm_r(const std::vector<bool> &bitstream, uint32_t &pos)
 {
 	uint8_t res = 0;
 	for(int i=0; i<8; i++) {
-		sbit_rp(bitstream, pos, track_size);
-		if(sbit_rp(bitstream, pos, track_size))
+		sbit_rp(bitstream, pos);
+		if(sbit_rp(bitstream, pos))
 			res |= 0x80 >> i;
 	}
 	return res;
 }
 
-uint8_t floppy_image_format_t::sbyte_gcr5_r(const uint8_t *bitstream, int &pos, int track_size)
+uint8_t floppy_image_format_t::sbyte_gcr5_r(const std::vector<bool> &bitstream, uint32_t &pos)
 {
 	uint16_t gcr = 0;
 	for(int i=0; i<10; i++) {
-		if(sbit_rp(bitstream, pos, track_size))
+		if(sbit_rp(bitstream, pos))
 			gcr |= 0x200 >> i;
 	}
 
 	return (gcr5bw_tb[gcr >> 5] << 4) | gcr5bw_tb[gcr & 0x1f];
 }
 
-void floppy_image_format_t::extract_sectors_from_bitstream_mfm_pc(const uint8_t *bitstream, int track_size, desc_xs *sectors, uint8_t *sectdata, int sectdata_size)
+std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_bitstream_mfm_pc(const std::vector<bool> &bitstream)
 {
-	memset(sectors, 0, 256*sizeof(desc_xs));
+	std::vector<std::vector<uint8_t>> sectors;
 
 	// Don't bother if it's just too small
-	if(track_size < 100)
-		return;
+	if(bitstream.size() < 100)
+		return sectors;
 
 	// Start by detecting all id and data blocks
 
 	// If 100 is not enough, that track is too funky to be worth
 	// bothering anyway
 
-	int idblk[100], dblk[100];
-	int idblk_count = 0, dblk_count = 0;
+	uint32_t idblk[100], dblk[100];
+	uint32_t idblk_count = 0, dblk_count = 0;
 
 	// Precharge the shift register to detect over-the-index stuff
 	uint16_t shift_reg = 0;
-	for(int i=0; i<16; i++)
-		if(sbit_r(bitstream, track_size-16+i))
+	for(uint32_t i=0; i<16; i++)
+		if(bitstream[bitstream.size()-16+i])
 			shift_reg |= 0x8000 >> i;
 
 	// Scan the bitstream for sync marks and follow them to check for
 	// blocks
-	for(int i=0; i<track_size; i++) {
-		shift_reg = (shift_reg << 1) | sbit_r(bitstream, i);
+	for(uint32_t i=0; i<bitstream.size(); i++) {
+		shift_reg = (shift_reg << 1) | bitstream[i];
 		if(shift_reg == 0x4489) {
 			uint16_t header;
-			int pos = i+1;
+			uint32_t pos = i+1;
 			do {
 				header = 0;
 				for(int j=0; j<16; j++)
-					if(sbit_rp(bitstream, pos, track_size))
+					if(sbit_rp(bitstream, pos))
 						header |= 0x8000 >> j;
 				// Accept strings of sync marks as long and they're not wrapping
 
@@ -2445,21 +1582,16 @@ void floppy_image_format_t::extract_sectors_from_bitstream_mfm_pc(const uint8_t 
 	}
 
 	// Then extract the sectors
-	int sectdata_pos = 0;
 	for(int i=0; i<idblk_count; i++) {
-		int pos = idblk[i];
-		uint8_t track = sbyte_mfm_r(bitstream, pos, track_size);
-		uint8_t head = sbyte_mfm_r(bitstream, pos, track_size);
-		uint8_t sector = sbyte_mfm_r(bitstream, pos, track_size);
-		uint8_t size = sbyte_mfm_r(bitstream, pos, track_size);
+		uint32_t pos = idblk[i];
+		[[maybe_unused]] uint8_t track = sbyte_mfm_r(bitstream, pos);
+		[[maybe_unused]] uint8_t head = sbyte_mfm_r(bitstream, pos);
+		uint8_t sector = sbyte_mfm_r(bitstream, pos);
+		uint8_t size = sbyte_mfm_r(bitstream, pos);
 
 		if(size >= 8)
 			continue;
 		int ssize = 128 << size;
-
-		// If we don't have enough space for a sector's data, skip it
-		if(ssize + sectdata_pos > sectdata_size)
-			continue;
 
 		// Start of IDAM and DAM are supposed to be exactly 704 cells
 		// apart in normal format or 1008 cells apart in perpendicular
@@ -2477,13 +1609,15 @@ void floppy_image_format_t::extract_sectors_from_bitstream_mfm_pc(const uint8_t 
 
 		pos = dblk[d_index];
 
-		sectors[sector].track = track;
-		sectors[sector].head = head;
-		sectors[sector].size = ssize;
-		sectors[sector].data = sectdata + sectdata_pos;
+		if(sectors.size() <= sector)
+			sectors.resize(sector+1);
+		auto &sdata = sectors[sector];
+		sdata.resize(ssize);
 		for(int j=0; j<ssize; j++)
-			sectdata[sectdata_pos++] = sbyte_mfm_r(bitstream, pos, track_size);
+			sdata[j] = sbyte_mfm_r(bitstream, pos);
 	}
+
+	return sectors;
 }
 
 void floppy_image_format_t::get_geometry_mfm_pc(floppy_image *image, int cell_size, int &track_count, int &head_count, int &sector_count)
@@ -2495,11 +1629,6 @@ void floppy_image_format_t::get_geometry_mfm_pc(floppy_image *image, int cell_si
 		return;
 	}
 
-	uint8_t bitstream[500000/8];
-	uint8_t sectdata[50000];
-	desc_xs sectors[256];
-	int track_size;
-
 	// Extract an arbitrary track to get an idea of the number of
 	// sectors
 
@@ -2507,29 +1636,23 @@ void floppy_image_format_t::get_geometry_mfm_pc(floppy_image *image, int cell_si
 	// 0-10, not near the end like 70+, no special effects on sync
 	// like 33
 
-	generate_bitstream_from_track(track_count > 20 ? 20 : 0, 0, cell_size, bitstream, track_size, image);
-	extract_sectors_from_bitstream_mfm_pc(bitstream, track_size, sectors, sectdata, sizeof(sectdata));
-
-	for(sector_count = 44; sector_count > 0 && !sectors[sector_count].data; sector_count--);
+	auto buf = generate_bitstream_from_track(track_count > 20 ? 20 : 0, 0, cell_size, image);
+	auto sectors = extract_sectors_from_bitstream_mfm_pc(buf);
+	sector_count = sectors.size();
 }
 
 
 void floppy_image_format_t::get_track_data_mfm_pc(int track, int head, floppy_image *image, int cell_size, int sector_size, int sector_count, uint8_t *sectdata)
 {
-	uint8_t bitstream[500000/8];
-	uint8_t sectbuf[50000];
-	desc_xs sectors[256];
-	int track_size;
-
-	generate_bitstream_from_track(track, head, cell_size, bitstream, track_size, image);
-	extract_sectors_from_bitstream_mfm_pc(bitstream, track_size, sectors, sectbuf, sizeof(sectbuf));
+	auto bitstream = generate_bitstream_from_track(track, head, cell_size, image);
+	auto sectors = extract_sectors_from_bitstream_mfm_pc(bitstream);
 	for(int sector=1; sector <= sector_count; sector++) {
 		uint8_t *sd = sectdata + (sector-1)*sector_size;
-		if(sectors[sector].data && sectors[sector].track == track && sectors[sector].head == head) {
-			int asize = sectors[sector].size;
+		if(sector < sectors.size() && !sectors[sector].empty()) {
+			unsigned int asize = sectors[sector].size();
 			if(asize > sector_size)
 				asize = sector_size;
-			memcpy(sd, sectors[sector].data, asize);
+			memcpy(sd, sectors[sector].data(), asize);
 			if(asize < sector_size)
 				memset(sd+asize, 0, sector_size-asize);
 		} else
@@ -2538,26 +1661,26 @@ void floppy_image_format_t::get_track_data_mfm_pc(int track, int head, floppy_im
 }
 
 
-void floppy_image_format_t::extract_sectors_from_bitstream_fm_pc(const uint8_t *bitstream, int track_size, desc_xs *sectors, uint8_t *sectdata, int sectdata_size)
+std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_bitstream_fm_pc(const std::vector<bool> &bitstream)
 {
-	memset(sectors, 0, 256*sizeof(desc_xs));
+	std::vector<std::vector<uint8_t>> sectors;
 
 	// Don't bother if it's just too small
-	if(track_size < 100)
-		return;
+	if(bitstream.size() < 100)
+		return sectors;
 
 	// Start by detecting all id and data blocks
 
 	// If 100 is not enough, that track is too funky to be worth
 	// bothering anyway
 
-	int idblk[100], dblk[100];
-	int idblk_count = 0, dblk_count = 0;
+	uint32_t idblk[100], dblk[100];
+	uint32_t idblk_count = 0, dblk_count = 0;
 
 	// Precharge the shift register to detect over-the-index stuff
 	uint16_t shift_reg = 0;
 	for(int i=0; i<16; i++)
-		if(sbit_r(bitstream, track_size-16+i))
+		if(bitstream[bitstream.size()-16+i])
 			shift_reg |= 0x8000 >> i;
 
 	// Scan the bitstream for sync marks and follow them to check for
@@ -2565,8 +1688,8 @@ void floppy_image_format_t::extract_sectors_from_bitstream_fm_pc(const uint8_t *
 	// We scan for address marks only, as index marks are not mandatory,
 	// and many formats actually do not use them
 
-	for(int i=0; i<track_size; i++) {
-		shift_reg = (shift_reg << 1) | sbit_r(bitstream, i);
+	for(uint32_t i=0; i<bitstream.size(); i++) {
+		shift_reg = (shift_reg << 1) | bitstream[i];
 
 		// fe
 		if(shift_reg == 0xf57e) {       // address mark
@@ -2582,20 +1705,15 @@ void floppy_image_format_t::extract_sectors_from_bitstream_fm_pc(const uint8_t *
 	}
 
 	// Then extract the sectors
-	int sectdata_pos = 0;
-	for(int i=0; i<idblk_count; i++) {
-		int pos = idblk[i];
-		uint8_t track = sbyte_mfm_r(bitstream, pos, track_size);
-		uint8_t head = sbyte_mfm_r(bitstream, pos, track_size);
-		uint8_t sector = sbyte_mfm_r(bitstream, pos, track_size);
-		uint8_t size = sbyte_mfm_r(bitstream, pos, track_size);
+	for(uint32_t i=0; i<idblk_count; i++) {
+		uint32_t pos = idblk[i];
+		[[maybe_unused]] uint8_t track = sbyte_mfm_r(bitstream, pos);
+		[[maybe_unused]] uint8_t head = sbyte_mfm_r(bitstream, pos);
+		uint8_t sector = sbyte_mfm_r(bitstream, pos);
+		uint8_t size = sbyte_mfm_r(bitstream, pos);
 		if(size >= 8)
 			continue;
 		int ssize = 128 << size;
-
-		// If we don't have enough space for a sector's data, skip it
-		if(ssize + sectdata_pos > sectdata_size)
-			continue;
 
 		// Start of IDAM and DAM are supposed to be exactly 384 cells
 		// apart.  Of course the hardware is tolerant.  Accept +/- 128
@@ -2612,13 +1730,15 @@ void floppy_image_format_t::extract_sectors_from_bitstream_fm_pc(const uint8_t *
 
 		pos = dblk[d_index];
 
-		sectors[sector].track = track;
-		sectors[sector].head = head;
-		sectors[sector].size = ssize;
-		sectors[sector].data = sectdata + sectdata_pos;
+		if(sectors.size() <= sector)
+			sectors.resize(sector+1);
+		auto &sdata = sectors[sector];
+		sdata.resize(ssize);
 		for(int j=0; j<ssize; j++)
-			sectdata[sectdata_pos++] = sbyte_mfm_r(bitstream, pos, track_size);
+			sdata[j] = sbyte_mfm_r(bitstream, pos);
 	}
+
+	return sectors;
 }
 
 void floppy_image_format_t::get_geometry_fm_pc(floppy_image *image, int cell_size, int &track_count, int &head_count, int &sector_count)
@@ -2630,11 +1750,6 @@ void floppy_image_format_t::get_geometry_fm_pc(floppy_image *image, int cell_siz
 		return;
 	}
 
-	uint8_t bitstream[500000/8];
-	uint8_t sectdata[50000];
-	desc_xs sectors[256];
-	int track_size;
-
 	// Extract an arbitrary track to get an idea of the number of
 	// sectors
 
@@ -2642,29 +1757,23 @@ void floppy_image_format_t::get_geometry_fm_pc(floppy_image *image, int cell_siz
 	// 0-10, not near the end like 70+, no special effects on sync
 	// like 33
 
-	generate_bitstream_from_track(track_count > 20 ? 20 : 0, 0, cell_size, bitstream, track_size, image);
-	extract_sectors_from_bitstream_fm_pc(bitstream, track_size, sectors, sectdata, sizeof(sectdata));
-
-	for(sector_count = 44; sector_count > 0 && !sectors[sector_count].data; sector_count--);
+	auto bitstream = generate_bitstream_from_track(track_count > 20 ? 20 : 0, 0, cell_size, image);
+	auto sectors = extract_sectors_from_bitstream_fm_pc(bitstream);
+	sector_count = sectors.size();
 }
 
 
 void floppy_image_format_t::get_track_data_fm_pc(int track, int head, floppy_image *image, int cell_size, int sector_size, int sector_count, uint8_t *sectdata)
 {
-	uint8_t bitstream[500000/8];
-	uint8_t sectbuf[50000];
-	desc_xs sectors[256];
-	int track_size;
-
-	generate_bitstream_from_track(track, head, cell_size, bitstream, track_size, image);
-	extract_sectors_from_bitstream_fm_pc(bitstream, track_size, sectors, sectbuf, sizeof(sectbuf));
-	for(int sector=1; sector <= sector_count; sector++) {
+	auto bitstream = generate_bitstream_from_track(track, head, cell_size, image);
+	auto sectors = extract_sectors_from_bitstream_fm_pc(bitstream);
+	for(unsigned int sector=1; sector < sector_count; sector++) {
 		uint8_t *sd = sectdata + (sector-1)*sector_size;
-		if(sectors[sector].data && sectors[sector].track == track && sectors[sector].head == head) {
-			int asize = sectors[sector].size;
+		if(sector < sectors.size() && !sectors[sector].empty()) {
+			unsigned int asize = sectors[sector].size();
 			if(asize > sector_size)
 				asize = sector_size;
-			memcpy(sd, sectors[sector].data, asize);
+			memcpy(sd, sectors[sector].data(), asize);
 			if(asize < sector_size)
 				memset(sd+asize, 0, sector_size-asize);
 		} else
@@ -2695,7 +1804,7 @@ void floppy_image_format_t::build_pc_track_fm(int track, int head, floppy_image 
 {
 	std::vector<uint32_t> track_data;
 
-	// gap 4a , IAM and gap 1
+	// gap 4a, IAM and gap 1
 	if(gap_4a != -1) {
 		for(int i=0; i<gap_4a; i++) fm_w(track_data, 8, 0xff);
 		for(int i=0; i< 6;     i++) fm_w(track_data, 8, 0x00);
@@ -2710,7 +1819,7 @@ void floppy_image_format_t::build_pc_track_fm(int track, int head, floppy_image 
 	unsigned int etpos = track_data.size() + (sector_count*(6+5+2+gap_2+6+1+2) + total_size)*16;
 
 	if(etpos > cell_count)
-		throw emu_fatalerror("Incorrect layout on track %d head %d, expected_size=%d, current_size=%d", track, head, cell_count, etpos);
+		throw std::invalid_argument(util::string_format("Incorrect layout on track %d head %d, expected_size=%d, current_size=%d", track, head, cell_count, etpos));
 
 	if(etpos + gap_3*16*(sector_count-1) > cell_count)
 		gap_3 = (cell_count - etpos) / 16 / (sector_count-1);
@@ -2761,7 +1870,7 @@ void floppy_image_format_t::build_pc_track_mfm(int track, int head, floppy_image
 {
 	std::vector<uint32_t> track_data;
 
-	// gap 4a , IAM and gap 1
+	// gap 4a, IAM and gap 1
 	if(gap_4a != -1) {
 		for(int i=0; i<gap_4a; i++) mfm_w(track_data, 8, 0x4e);
 		for(int i=0; i<12;     i++) mfm_w(track_data, 8, 0x00);
@@ -2777,7 +1886,7 @@ void floppy_image_format_t::build_pc_track_mfm(int track, int head, floppy_image
 	int etpos = int(track_data.size()) + (sector_count*(12+3+5+2+gap_2+12+3+1+2) + total_size)*16;
 
 	if(etpos > cell_count)
-		throw emu_fatalerror("Incorrect layout on track %d head %d, expected_size=%d, current_size=%d", track, head, cell_count, etpos);
+		throw std::invalid_argument(util::string_format("Incorrect layout on track %d head %d, expected_size=%d, current_size=%d", track, head, cell_count, etpos));
 
 	if(etpos + gap_3*16*(sector_count-1) > cell_count)
 		gap_3 = (cell_count - etpos) / 16 / (sector_count-1);
@@ -2825,32 +1934,255 @@ void floppy_image_format_t::build_pc_track_mfm(int track, int head, floppy_image
 	generate_track_from_levels(track, head, track_data, 0, image);
 }
 
-void floppy_image_format_t::extract_sectors_from_bitstream_gcr5(const uint8_t *bitstream, int track_size, desc_xs *sectors, uint8_t *sectdata, int sectdata_size, int head, int tracks)
+void floppy_image_format_t::build_mac_track_gcr(int track, int head, floppy_image *image, const desc_gcr_sector *sects)
 {
-	memset(sectors, 0, 256*sizeof(desc_xs));
+	// 30318342 = 60.0 / 1.979e-6
+	static const uint32_t cells_per_speed_zone[5] = {
+		30318342 / 394,
+		30318342 / 429,
+		30318342 / 472,
+		30318342 / 525,
+		30318342 / 590
+	};
+
+	static const std::array<uint8_t, 12> notag{};
+
+	uint32_t speed_zone = track/16;
+	if(speed_zone > 4)
+		speed_zone = 4;
+
+	uint32_t sectors = 12 - speed_zone;
+	uint32_t pregap = cells_per_speed_zone[speed_zone] - 6208 * sectors;
+
+	std::vector<uint32_t> buffer;
+
+	uint32_t prepregap = pregap % 48;
+	if(prepregap >= 24) {
+		raw_w(buffer, prepregap - 24, 0xff3fcf);
+		raw_w(buffer, 24, 0xf3fcff);
+	} else
+		raw_w(buffer, prepregap, 0xf3fcff);
+
+	for(uint32_t i = 0; i != pregap / 48; i++) {
+		raw_w(buffer, 24, 0xff3fcf);
+		raw_w(buffer, 24, 0xf3fcff);
+	}
+
+	for(uint32_t s = 0; s != sectors; s++) {
+		for(uint32_t i=0; i != 8; i++) {
+			raw_w(buffer, 24, 0xff3fcf);
+			raw_w(buffer, 24, 0xf3fcff);
+		}
+
+		raw_w(buffer, 24, 0xd5aa96);
+		raw_w(buffer, 8, gcr6fw_tb[sects[s].track & 0x3f]);
+		raw_w(buffer, 8, gcr6fw_tb[sects[s].sector & 0x3f]);
+		raw_w(buffer, 8, gcr6fw_tb[(sects[s].track & 0x40 ? 1 : 0) | (sects[s].head ? 0x20 : 0)]);
+		raw_w(buffer, 8, gcr6fw_tb[sects[s].info & 0x3f]);
+		uint8_t check = sects[s].track ^ sects[s].sector ^ ((sects[s].track & 0x40 ? 1 : 0) | (sects[s].head ? 0x20 : 0)) ^ sects[s].info;
+		raw_w(buffer, 8, gcr6fw_tb[check & 0x3f]);
+		raw_w(buffer, 24, 0xdeaaff);
+
+		raw_w(buffer, 24, 0xff3fcf);
+		raw_w(buffer, 24, 0xf3fcff);
+
+		raw_w(buffer, 24, 0xd5aaad);
+		raw_w(buffer, 8, gcr6fw_tb[sects[s].sector & 0x3f]);
+
+		const uint8_t *data = sects[s].tag;
+		if(!data)
+			data = notag.data();
+
+		uint8_t ca = 0, cb = 0, cc = 0;
+		for(int i=0; i < 175; i ++) {
+			if(i == 4)
+				data = sects[s].data - 3*4;
+
+			uint8_t va = data[3*i];
+			uint8_t vb = data[3*i+1];
+			uint8_t vc = i != 174 ? data[3*i+2] : 0;
+
+			cc = (cc << 1) | (cc >> 7);
+			uint16_t suma = ca + va + (cc & 1);
+			ca = suma;
+			va = va ^ cc;
+			uint16_t sumb = cb + vb + (suma >> 8);
+			cb = sumb;
+			vb = vb ^ ca;
+			if(i != 174)
+				cc = cc + vc + (sumb >> 8);
+			vc = vc ^ cb;
+
+			uint32_t nb = i != 174 ? 32 : 24;
+			raw_w(buffer, nb, gcr6_encode(va, vb, vc) >> (32-nb));
+		}
+
+		raw_w(buffer, 32, gcr6_encode(ca, cb, cc));
+		raw_w(buffer, 32, 0xdeaaffff);
+	}
+
+	generate_track_from_levels(track, head, buffer, 0, image);
+}
+
+std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_track_mac_gcr6(int head, int track, floppy_image *image)
+{
+	// 200000000 / 60.0 * 1.979e-6 ~= 6.5967
+	static const int cell_size_per_speed_zone[5] = {
+		394 * 65967 / 10000,
+		429 * 65967 / 10000,
+		472 * 65967 / 10000,
+		525 * 65967 / 10000,
+		590 * 65967 / 10000
+	};
+
+	uint32_t speed_zone = track/16;
+	if(speed_zone > 4)
+		speed_zone = 4;
+
+	uint32_t sectors = 12 - speed_zone;
+
+	std::vector<std::vector<uint8_t>> sector_data(sectors);
+
+	auto buf = generate_bitstream_from_track(track, head, cell_size_per_speed_zone[speed_zone], image);
+	auto nib = generate_nibbles_from_bitstream(buf);
+
+	if(nib.size() < 300)
+		return sector_data;
+
+	std::vector<uint32_t> hpos;
+
+	uint32_t hstate = (nib[nib.size() - 2] << 8) | nib[nib.size() - 1];
+	for(uint32_t pos = 0; pos != nib.size(); pos++) {
+		hstate = ((hstate << 8) | nib[pos]) & 0xffffff;
+		if(hstate == 0xd5aa96)
+			hpos.push_back(pos == nib.size() - 1 ? 0 : pos+1);
+	}
+
+	for(uint32_t pos : hpos) {
+		uint8_t h[7];
+
+		for(auto &e : h) {
+			e = nib[pos];
+			pos ++;
+			if(pos == nib.size())
+				pos = 0;
+		}
+
+		uint8_t v2 = gcr6bw_tb[h[2]];
+		uint8_t v3 = gcr6bw_tb[h[3]];
+		uint8_t tr = gcr6bw_tb[h[0]] | (v2 & 1 ? 0x40 : 0x00);
+		uint8_t se = gcr6bw_tb[h[1]];
+		//                  uint8_t si = v2 & 0x20 ? 1 : 0;
+		//                  uint8_t ds = v3 & 0x20 ? 1 : 0;
+		//                  uint8_t fmt = v3 & 0x1f;
+		uint8_t c1 = (tr^se^v2^v3) & 0x3f;
+		uint8_t chk = gcr6bw_tb[h[4]];
+		if(chk != c1 || se >= sectors || h[5] != 0xde || h[6] != 0xaa)
+			continue;
+
+		auto &sdata = sector_data[se];
+		uint8_t ca = 0, cb = 0, cc = 0;
+
+		uint32_t hstate = (nib[pos] << 8);
+		pos ++;
+		if(pos == nib.size())
+			pos = 0;
+		hstate |= nib[pos];
+		pos ++;
+		if(pos == nib.size())
+			pos = 0;
+		for(;;) {
+			hstate = ((hstate << 8) | nib[pos]) & 0xffffff;
+			pos ++;
+			if(pos == nib.size())
+				pos = 0;
+			if(hstate == 0xd5aa96)
+				goto no_data_field;
+			if(hstate == 0xd5aaad)
+				break;
+		}
+		pos ++; // skip the sector byte
+		if(pos == nib.size())
+			pos = 0;
+
+		sdata.resize(512+12);
+		for(int i=0; i < 175; i++) {
+			uint8_t e0 = nib[pos++];
+			if(pos == nib.size())
+				pos = 0;
+			uint8_t e1 = nib[pos++];
+			if(pos == nib.size())
+				pos = 0;
+			uint8_t e2 = nib[pos++];
+			if(pos == nib.size())
+				pos = 0;
+			uint8_t e3 = i < 174 ? nib[pos++] : 0x96;
+			if(pos == nib.size())
+				pos = 0;
+
+			uint8_t va, vb, vc;
+			gcr6_decode(e0, e1, e2, e3, va, vb, vc);
+			cc = (cc << 1) | (cc >> 7);
+			va = va ^ cc;
+			uint16_t suma = ca + va + (cc & 1);
+			ca = suma;
+			vb = vb ^ ca;
+			uint16_t sumb = cb + vb + (suma >> 8);
+			cb = sumb;
+			vc = vc ^ cb;
+
+			sdata[3*i] = va;
+			sdata[3*i+1] = vb;
+
+			if(i != 174) {
+				cc = cc + vc + (sumb >> 8);
+				sdata[3*i+2] = vc;
+			}
+		}
+		for(auto &e : h) {
+			e = nib[pos];
+			pos ++;
+			if(pos == nib.size())
+				pos = 0;
+		}
+		uint8_t va, vb, vc;
+		gcr6_decode(h[0], h[1], h[2], h[3], va, vb, vc);
+		if(va != ca || vb != cb || vc != cc || h[4] != 0xde || h[5] != 0xaa)
+			sdata.clear();
+	no_data_field:
+		;
+	}
+
+	return sector_data;
+}
+
+
+std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_bitstream_gcr5(const std::vector<bool> &bitstream, int head, int tracks)
+{
+	std::vector<std::vector<uint8_t>> sectors;
 
 	// Don't bother if it's just too small
-	if(track_size < 100)
-		return;
+	if(bitstream.size() < 100)
+		return sectors;
 
 	// Start by detecting all id and data blocks
-	int hblk[100], dblk[100];
-	int hblk_count = 0, dblk_count = 0;
+	uint32_t hblk[100]{}, dblk[100]{};
+	uint32_t hblk_count = 0, dblk_count = 0;
 
 	// Precharge the shift register to detect over-the-index stuff
 	uint16_t shift_reg = 0;
-	for(int i=0; i<16; i++)
-		if(sbit_r(bitstream, track_size-16+i))
+	for(uint32_t i=0; i<16; i++)
+		if(bitstream[bitstream.size()-16+i])
 			shift_reg |= 0x8000 >> i;
 
 	// Scan the bitstream for sync marks and follow them to check for blocks
 	bool sync = false;
-	for(int i=0; i<track_size; i++) {
-		int bit = sbit_r(bitstream, i);
+	for(uint32_t i=0; i<bitstream.size(); i++) {
+		int bit = bitstream[i];
 		shift_reg = ((shift_reg << 1) | bit) & 0x3ff;
 
 		if (sync && !bit) {
-			uint8_t id = sbyte_gcr5_r(bitstream, i, track_size);
+			uint8_t id = sbyte_gcr5_r(bitstream, i);
 
 			switch (id) {
 			case 0x08:
@@ -2869,67 +2201,70 @@ void floppy_image_format_t::extract_sectors_from_bitstream_gcr5(const uint8_t *b
 	}
 
 	// Then extract the sectors
-	int sectdata_pos = 0;
 	for(int i=0; i<hblk_count; i++) {
-		int pos = hblk[i];
-		ATTR_UNUSED uint8_t block_id = sbyte_gcr5_r(bitstream, pos, track_size);
-		uint8_t crc = sbyte_gcr5_r(bitstream, pos, track_size);
-		uint8_t sector = sbyte_gcr5_r(bitstream, pos, track_size);
-		uint8_t track = sbyte_gcr5_r(bitstream, pos, track_size);
-		uint8_t id2 = sbyte_gcr5_r(bitstream, pos, track_size);
-		uint8_t id1 = sbyte_gcr5_r(bitstream, pos, track_size);
+		uint32_t pos = hblk[i];
+		[[maybe_unused]] uint8_t block_id = sbyte_gcr5_r(bitstream, pos);
+		uint8_t crc = sbyte_gcr5_r(bitstream, pos);
+		uint8_t sector = sbyte_gcr5_r(bitstream, pos);
+		uint8_t track = sbyte_gcr5_r(bitstream, pos);
+		uint8_t id2 = sbyte_gcr5_r(bitstream, pos);
+		uint8_t id1 = sbyte_gcr5_r(bitstream, pos);
 
 		if (crc ^ sector ^ track ^ id2 ^ id1) {
 			// header crc mismatch
+			continue;
 		}
 
 		pos = dblk[i];
-		block_id = sbyte_gcr5_r(bitstream, pos, track_size);
+		block_id = sbyte_gcr5_r(bitstream, pos);
 
 		if (track > tracks) track -= tracks;
-		sectors[sector].track = track;
-		sectors[sector].head = head;
-		sectors[sector].size = 256;
-		sectors[sector].data = sectdata + sectdata_pos;
+		if(sectors.size() <= sector)
+			sectors.resize(sector+1);
+		auto &sdata = sectors[sector];
+		sdata.resize(256);
 		uint8_t data_crc = 0;
-		for(int j=0; j<sectors[sector].size; j++) {
-			uint8_t data = sbyte_gcr5_r(bitstream, pos, track_size);
+		for(int j=0; j<256; j++) {
+			uint8_t data = sbyte_gcr5_r(bitstream, pos);
 			data_crc ^= data;
-			sectdata[sectdata_pos++] = data;
+			sdata[j] = data;
 		}
-		data_crc ^= sbyte_gcr5_r(bitstream, pos, track_size);
+		data_crc ^= sbyte_gcr5_r(bitstream, pos);
 		if (data_crc) {
 			// data crc mismatch
+			sdata.clear();
 		}
 	}
+
+	return sectors;
 }
 
-void floppy_image_format_t::extract_sectors_from_bitstream_victor_gcr5(const uint8_t *bitstream, int track_size, desc_xs *sectors, uint8_t *sectdata, int sectdata_size)
+std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_bitstream_victor_gcr5(const std::vector<bool> &bitstream)
 {
-	memset(sectors, 0, 256*sizeof(desc_xs));
+	std::vector<std::vector<uint8_t>> sectors;
 
 	// Don't bother if it's just too small
-	if(track_size < 100)
-		return;
+	if(bitstream.size() < 100)
+		return sectors;
 
 	// Start by detecting all id and data blocks
-	int hblk[100], dblk[100];
-	int hblk_count = 0, dblk_count = 0;
+	uint32_t hblk[100]{}, dblk[100]{};
+	uint32_t hblk_count = 0, dblk_count = 0;
 
 	// Precharge the shift register to detect over-the-index stuff
 	uint16_t shift_reg = 0;
-	for(int i=0; i<16; i++)
-		if(sbit_r(bitstream, track_size-16+i))
+	for(uint32_t i=0; i<16; i++)
+		if(bitstream[bitstream.size()-16+i])
 			shift_reg |= 0x8000 >> i;
 
 	// Scan the bitstream for sync marks and follow them to check for blocks
 	bool sync = false;
-	for(int i=0; i<track_size; i++) {
-		int bit = sbit_r(bitstream, i);
+	for(uint32_t i=0; i<bitstream.size(); i++) {
+		int bit = bitstream[i];
 		shift_reg = ((shift_reg << 1) | bit) & 0x3ff;
 
 		if (sync && !bit) {
-			uint8_t id = sbyte_gcr5_r(bitstream, i, track_size);
+			uint8_t id = sbyte_gcr5_r(bitstream, i);
 
 			switch (id) {
 			case 0x07:
@@ -2948,23 +2283,23 @@ void floppy_image_format_t::extract_sectors_from_bitstream_victor_gcr5(const uin
 	}
 
 	// Then extract the sectors
-	int sectdata_pos = 0;
 	for(int i=0; i<hblk_count; i++) {
-		int pos = hblk[i];
-		ATTR_UNUSED uint8_t block_id = sbyte_gcr5_r(bitstream, pos, track_size);
-		uint8_t track = sbyte_gcr5_r(bitstream, pos, track_size);
-		uint8_t sector = sbyte_gcr5_r(bitstream, pos, track_size);
+		uint32_t pos = hblk[i];
+		[[maybe_unused]] uint8_t block_id = sbyte_gcr5_r(bitstream, pos);
+		[[maybe_unused]] uint8_t track = sbyte_gcr5_r(bitstream, pos);
+		uint8_t sector = sbyte_gcr5_r(bitstream, pos);
 
 		pos = dblk[i];
-		block_id = sbyte_gcr5_r(bitstream, pos, track_size);
+		block_id = sbyte_gcr5_r(bitstream, pos);
 
-		sectors[sector].track = track & 0x7f;
-		sectors[sector].head = BIT(track, 7);
-		sectors[sector].size = 512;
-		sectors[sector].data = sectdata + sectdata_pos;
-		for(int j=0; j<sectors[sector].size; j++) {
-			uint8_t data = sbyte_gcr5_r(bitstream, pos, track_size);
-			sectdata[sectdata_pos++] = data;
-		}
+		if(sectors.size() <= sector)
+			sectors.resize(sector+1);
+		auto &sdata = sectors[sector];
+		sdata.resize(512);
+
+		for(int j=0; j<512; j++)
+			sdata[j] = sbyte_gcr5_r(bitstream, pos);
 	}
+
+	return sectors;
 }

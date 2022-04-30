@@ -2,7 +2,7 @@
 // copyright-holders:Brad Oliver
 /***************************************************************************
 
-  video/jack.c
+  video/jack.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -13,25 +13,25 @@
 
 
 
-WRITE8_MEMBER(jack_state::jack_videoram_w)
+void jack_state::jack_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(jack_state::jack_colorram_w)
+void jack_state::jack_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER(jack_state::jack_flipscreen_r)
+uint8_t jack_state::jack_flipscreen_r(offs_t offset)
 {
 	flip_screen_set(offset);
 	return 0;
 }
 
-WRITE8_MEMBER(jack_state::jack_flipscreen_w)
+void jack_state::jack_flipscreen_w(offs_t offset, uint8_t data)
 {
 	flip_screen_set(offset);
 }
@@ -46,7 +46,7 @@ TILE_GET_INFO_MEMBER(jack_state::get_bg_tile_info)
 
 	// striv: m_colorram[tile_index] & 0x80 ???
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(jack_state::tilemap_scan_cols_flipy)
@@ -120,7 +120,7 @@ uint32_t jack_state::screen_update_striv(screen_device &screen, bitmap_ind16 &bi
 
 ***************************************************************************/
 
-WRITE8_MEMBER(jack_state::joinem_scroll_w)
+void jack_state::joinem_scroll_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 3)
 	{
@@ -170,7 +170,7 @@ TILE_GET_INFO_MEMBER(jack_state::joinem_get_bg_tile_info)
 	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x03) << 8);
 	int color = (m_colorram[tile_index] & 0x38) >> 3 | m_joinem_palette_bank;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 VIDEO_START_MEMBER(jack_state,joinem)

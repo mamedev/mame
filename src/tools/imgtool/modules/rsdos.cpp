@@ -8,12 +8,17 @@
 
 ****************************************************************************/
 
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
 #include "imgtool.h"
-#include "formats/coco_dsk.h"
+#include "filter.h"
 #include "iflopimg.h"
+
+#include "formats/coco_dsk.h"
+#include "corestr.h"
+#include "opresolv.h"
+
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 /* this structure mirrors the structure of an RS-DOS directory entry on disk */
 struct rsdos_dirent
@@ -320,7 +325,7 @@ eof:
 	}
 	else
 	{
-		/* Not the end of file */
+		/* Note the end of file */
 		err = process_rsdos_file(&rsent, image, nullptr, filesize);
 		if (err)
 			return err;
@@ -340,8 +345,8 @@ eof:
 
 		std::string fname = get_dirent_fname(rsent);
 
-		snprintf(ent.filename, ARRAY_LENGTH(ent.filename), "%s", fname.c_str());
-		snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "%d %c", (int) rsent.ftype, (char) (rsent.asciiflag + 'B'));
+		snprintf(ent.filename, std::size(ent.filename), "%s", fname.c_str());
+		snprintf(ent.attr, std::size(ent.attr), "%d %c", (int) rsent.ftype, (char) (rsent.asciiflag + 'B'));
 	}
 	return IMGTOOLERR_SUCCESS;
 }

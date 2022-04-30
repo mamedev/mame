@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Nascom internal sockets for ROM/RAM -->
+Nascom internal sockets for ROM/RAM
+-->
 
 <softwarelist name="nascom_socket" description="Nascom internal sockets">
 

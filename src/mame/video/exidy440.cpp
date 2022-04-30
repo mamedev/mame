@@ -72,7 +72,7 @@ void topsecex_state::video_start()
  *
  *************************************/
 
-READ8_MEMBER(exidy440_state::exidy440_videoram_r)
+uint8_t exidy440_state::exidy440_videoram_r(offs_t offset)
 {
 	uint8_t *base = &m_local_videoram[(*m_scanline * 256 + offset) * 2];
 
@@ -81,7 +81,7 @@ READ8_MEMBER(exidy440_state::exidy440_videoram_r)
 }
 
 
-WRITE8_MEMBER(exidy440_state::exidy440_videoram_w)
+void exidy440_state::exidy440_videoram_w(offs_t offset, uint8_t data)
 {
 	uint8_t *base = &m_local_videoram[(*m_scanline * 256 + offset) * 2];
 
@@ -98,13 +98,13 @@ WRITE8_MEMBER(exidy440_state::exidy440_videoram_w)
  *
  *************************************/
 
-READ8_MEMBER(exidy440_state::exidy440_paletteram_r)
+uint8_t exidy440_state::exidy440_paletteram_r(offs_t offset)
 {
 	return m_local_paletteram[m_palettebank_io * 512 + offset];
 }
 
 
-WRITE8_MEMBER(exidy440_state::exidy440_paletteram_w)
+void exidy440_state::exidy440_paletteram_w(offs_t offset, uint8_t data)
 {
 	/* update palette ram in the I/O bank */
 	m_local_paletteram[m_palettebank_io * 512 + offset] = data;
@@ -131,7 +131,7 @@ WRITE8_MEMBER(exidy440_state::exidy440_paletteram_w)
  *
  *************************************/
 
-READ8_MEMBER(exidy440_state::exidy440_horizontal_pos_r)
+uint8_t exidy440_state::exidy440_horizontal_pos_r()
 {
 	/* clear the FIRQ on a read here */
 	m_firq_beam = 0;
@@ -143,15 +143,13 @@ READ8_MEMBER(exidy440_state::exidy440_horizontal_pos_r)
 }
 
 
-READ8_MEMBER(exidy440_state::exidy440_vertical_pos_r)
+uint8_t exidy440_state::exidy440_vertical_pos_r()
 {
-	int result;
-
 	/* according to the schems, this value is latched on any FIRQ
 	 * caused by collision or beam, ORed together with CHRCLK,
 	 * which probably goes off once per scanline; for now, we just
 	 * always return the current scanline */
-	result = m_screen->vpos();
+	int result = m_screen->vpos();
 	return (result < 255) ? result : 255;
 }
 
@@ -163,7 +161,7 @@ READ8_MEMBER(exidy440_state::exidy440_vertical_pos_r)
  *
  *************************************/
 
-WRITE8_MEMBER(exidy440_state::exidy440_spriteram_w)
+void exidy440_state::exidy440_spriteram_w(offs_t offset, uint8_t data)
 {
 	m_screen->update_partial(m_screen->vpos());
 	m_spriteram[offset] = data;
@@ -177,7 +175,7 @@ WRITE8_MEMBER(exidy440_state::exidy440_spriteram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(exidy440_state::exidy440_control_w)
+void exidy440_state::exidy440_control_w(offs_t offset, uint8_t data)
 {
 	int oldvis = m_palettebank_vis;
 
@@ -208,7 +206,7 @@ WRITE8_MEMBER(exidy440_state::exidy440_control_w)
 }
 
 
-WRITE8_MEMBER(exidy440_state::exidy440_interrupt_clear_w)
+void exidy440_state::exidy440_interrupt_clear_w(uint8_t data)
 {
 	/* clear the VBLANK FIRQ on a write here */
 	m_firq_vblank = 0;
@@ -308,7 +306,6 @@ void exidy440_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 		int image = (~sprite[3] & 0x3f);
 		int xoffs = (~((sprite[1] << 8) | sprite[2]) & 0x1ff);
 		int yoffs = (~sprite[0] & 0xff) + 1;
-		int x, y, sy;
 		uint8_t *src;
 
 		/* skip if out of range */
@@ -323,8 +320,8 @@ void exidy440_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 			xoffs -= 0x1ff;
 
 		/* loop over y */
-		sy = yoffs + scroll_offset;
-		for (y = 0; y < 16; y++, yoffs--, sy--)
+		int sy = yoffs + scroll_offset;
+		for (int y = 0; y < 16; y++, yoffs--, sy--)
 		{
 			/* wrap at the top and bottom of the screen */
 			if (sy >= VBSTART)
@@ -343,7 +340,7 @@ void exidy440_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 				int currx = xoffs;
 
 				/* loop over x */
-				for (x = 0; x < 8; x++, old += 2)
+				for (int x = 0; x < 8; x++, old += 2)
 				{
 					int ipixel = *src++;
 					int left = ipixel & 0xf0;
@@ -355,7 +352,7 @@ void exidy440_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 					{
 						/* combine with the background */
 						pen = left | old[0];
-						bitmap.pix16(yoffs, currx) = pen;
+						bitmap.pix(yoffs, currx) = pen;
 
 						/* check the collisions bit */
 						if (check_collision && (palette[2 * pen] & 0x80) && (count++ < 128))
@@ -368,7 +365,7 @@ void exidy440_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 					{
 						/* combine with the background */
 						pen = right | old[1];
-						bitmap.pix16(yoffs, currx) = pen;
+						bitmap.pix(yoffs, currx) = pen;
 
 						/* check the collisions bit */
 						if (check_collision && (palette[2 * pen] & 0x80) && (count++ < 128))

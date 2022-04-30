@@ -19,6 +19,8 @@ public:
 		, m_cmc_prot(*this, "cmc50")
 		, m_pcm2_prot(*this, "pcm2")
 		, m_pvc_prot(*this, "pvc")
+		, m_cpu_bank(*this, "cpu_bank")
+		, m_bios_bank(*this, "bios_bank")
 	{
 	}
 
@@ -36,7 +38,7 @@ protected:
 
 	virtual void device_post_load() override;
 
-	DECLARE_WRITE16_MEMBER(write_bankpvc);
+	void write_bankpvc(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void install_common();
 	void install_banked_bios();
@@ -52,6 +54,8 @@ private:
 	required_device<cmc_prot_device> m_cmc_prot;
 	required_device<pcm2_prot_device> m_pcm2_prot;
 	required_device<pvc_prot_device> m_pvc_prot;
+	memory_bank_creator m_cpu_bank;
+	memory_bank_creator m_bios_bank;
 };
 
 
@@ -66,7 +70,7 @@ void neopcb_state::device_post_load()
 {
 	ngarcade_base_state::device_post_load();
 
-	membank("cpu_bank")->set_base(m_region_maincpu->base() + m_bank_base);
+	m_cpu_bank->set_base(m_region_maincpu->base() + m_bank_base);
 }
 
 void neopcb_state::neopcb(machine_config &config)
@@ -86,7 +90,7 @@ void neopcb_state::neopcb(machine_config &config)
 
 INPUT_CHANGED_MEMBER(neopcb_state::select_bios)
 {
-	membank("bios_bank")->set_entry(newval ? 0 : 1);
+	m_bios_bank->set_entry(newval ? 0 : 1);
 }
 
 static INPUT_PORTS_START( dualbios )
@@ -143,7 +147,7 @@ ROM_START( ms5pcb ) /* Encrypted Set, JAMMA PCB */
 
 	ROM_Y_ZOOM
 
-	ROM_REGION( 0x1000000, "ymsnd", 0 )
+	ROM_REGION( 0x1000000, "ymsnd:adpcma", 0 )
 	/* Encrypted */
 	ROM_LOAD( "268-v1.v1", 0x000000, 0x1000000, CRC(8458afe5) SHA1(62b4c6e7db763e9ff2697bbcdb43dc5a56b48c68) )
 
@@ -181,7 +185,7 @@ ROM_START( svcpcb ) /* Encrypted Set, JAMMA PCB */
 
 	ROM_Y_ZOOM
 
-	ROM_REGION( 0x1000000, "ymsnd", 0 )
+	ROM_REGION( 0x1000000, "ymsnd:adpcma", 0 )
 	/* Encrypted */
 	ROM_LOAD( "269-v1.v1", 0x000000, 0x800000, CRC(c659b34c) SHA1(1931e8111ef43946f68699f8707334c96f753a1e) )
 	ROM_LOAD( "269-v2.v2", 0x800000, 0x800000, CRC(dd903835) SHA1(e58d38950a7a8697bb22a1cc7a371ae6664ae8f9) )
@@ -220,7 +224,7 @@ ROM_START( svcpcba ) /* Encrypted Set, JAMMA PCB */
 
 	ROM_Y_ZOOM
 
-	ROM_REGION( 0x1000000, "ymsnd", 0 )
+	ROM_REGION( 0x1000000, "ymsnd:adpcma", 0 )
 	/* Encrypted */
 	ROM_LOAD( "269-v1a.v1", 0x000000, 0x1000000, CRC(a6af4753) SHA1(ec4f61a526b707a7faec4653b773beb3bf3a17ba) )
 
@@ -259,7 +263,7 @@ ROM_START( kf2k3pcb ) /* Encrypted Set, JAMMA PCB */
 
 	ROM_Y_ZOOM
 
-	ROM_REGION( 0x1000000, "ymsnd", 0 )
+	ROM_REGION( 0x1000000, "ymsnd:adpcma", 0 )
 	/* Encrypted */
 	ROM_LOAD( "271-v1.v1", 0x000000, 0x1000000, CRC(1d96154b) SHA1(1d4e262b0d30cee79a4edc83bb9706023c736668) )
 
@@ -437,8 +441,8 @@ void neopcb_state::kf2k3pcb_sp1_decrypt()
 #define spr_region_size memregion("sprites")->bytes()
 #define fix_region memregion("fixed")->base()
 #define fix_region_size memregion("fixed")->bytes()
-#define ym_region memregion("ymsnd")->base()
-#define ym_region_size memregion("ymsnd")->bytes()
+#define ym_region memregion("ymsnd:adpcma")->base()
+#define ym_region_size memregion("ymsnd:adpcma")->bytes()
 #define audiocpu_region memregion("audiocpu")->base()
 #define audio_region_size memregion("audiocpu")->bytes()
 #define audiocrypt_region memregion("audiocrypt")->base()
@@ -448,16 +452,16 @@ void neopcb_state::kf2k3pcb_sp1_decrypt()
 /*********************************************** non-carts */
 
 
-WRITE16_MEMBER(neopcb_state::write_bankpvc)
+void neopcb_state::write_bankpvc(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// write to cart ram
-	m_pvc_prot->protection_w(space, offset, data, mem_mask);
+	m_pvc_prot->protection_w(offset, data, mem_mask);
 
 	// actual bankswitch
 	if (offset >= 0xff8)
 	{
 		m_bank_base = m_pvc_prot->get_bank_base();
-		membank("cpu_bank")->set_base(m_region_maincpu->base() + m_bank_base);
+		m_cpu_bank->set_base(m_region_maincpu->base() + m_bank_base);
 	}
 }
 
@@ -465,11 +469,12 @@ void neopcb_state::install_common()
 {
 	// install memory bank
 	m_maincpu->space(AS_PROGRAM).install_rom(0x000080, 0x0fffff, (uint16_t *)m_region_maincpu->base() + 0x80/2);
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x200000, 0x2fffff, "cpu_bank");
-	membank("cpu_bank")->set_base(m_region_maincpu->base() + 0x100000);
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x200000, 0x2fffff, m_cpu_bank);
+	m_cpu_bank->set_base(m_region_maincpu->base() + 0x100000);
 
 	// install protection handlers + bankswitch handler
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2fe000, 0x2fffff, read16_delegate(*m_pvc_prot, FUNC(pvc_prot_device::protection_r)), write16_delegate(*this, FUNC(neopcb_state::write_bankpvc)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2fe000, 0x2fffff, read16sm_delegate(*m_pvc_prot, FUNC(pvc_prot_device::protection_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x2fe000, 0x2fffff, write16s_delegate(*this, FUNC(neopcb_state::write_bankpvc)));
 
 	// perform basic memory initialization that are usually done on-cart
 	m_curr_slot = 0;
@@ -482,9 +487,9 @@ void neopcb_state::install_common()
 
 void neopcb_state::install_banked_bios()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0xc00000, 0xc1ffff, 0x0e0000, "bios_bank");
-	membank("bios_bank")->configure_entries(0, 2, memregion("mainbios")->base(), 0x20000);
-	membank("bios_bank")->set_entry(1);
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0xc00000, 0xc1ffff, 0x0e0000, m_bios_bank);
+	m_bios_bank->configure_entries(0, 2, memregion("mainbios")->base(), 0x20000);
+	m_bios_bank->set_entry(1);
 
 }
 

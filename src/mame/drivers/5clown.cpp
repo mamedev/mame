@@ -500,23 +500,23 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 
-	uint8_t m_main_latch_d800;
-	uint8_t m_snd_latch_0800;
-	uint8_t m_snd_latch_0a02;
-	uint8_t m_ay8910_addr;
-	int m_mux_data;
+	uint8_t m_main_latch_d800 = 0;
+	uint8_t m_snd_latch_0800 = 0;
+	uint8_t m_snd_latch_0a02 = 0;
+	uint8_t m_ay8910_addr = 0;
+	int m_mux_data = 0;
 
-	DECLARE_WRITE8_MEMBER(cpu_c048_w);
-	DECLARE_WRITE8_MEMBER(cpu_d800_w);
-	DECLARE_READ8_MEMBER(snd_e06_r);
-	DECLARE_WRITE8_MEMBER(snd_800_w);
-	DECLARE_WRITE8_MEMBER(snd_a02_w);
-	DECLARE_READ8_MEMBER(mux_port_r);
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(counters_w);
-	DECLARE_WRITE8_MEMBER(trigsnd_w);
-	DECLARE_READ8_MEMBER(pia0_b_r);
-	DECLARE_READ8_MEMBER(pia1_b_r);
+	void cpu_c048_w(uint8_t data);
+	void cpu_d800_w(uint8_t data);
+	uint8_t snd_e06_r();
+	void snd_800_w(uint8_t data);
+	void snd_a02_w(uint8_t data);
+	uint8_t mux_port_r();
+	void mux_w(uint8_t data);
+	void counters_w(uint8_t data);
+	void trigsnd_w(uint8_t data);
+	uint8_t pia0_b_r();
+	uint8_t pia1_b_r();
 	void fclown_ay8910_w(offs_t offset, u8 data);
 	MC6845_UPDATE_ROW(update_row);
 	void _5clown_palette(palette_device &palette) const;
@@ -527,6 +527,9 @@ private:
 
 void _5clown_state::machine_start()
 {
+	// assumes it can make an address mask with m_videoram.length() - 1
+	assert(!(m_videoram.length() & (m_videoram.length() - 1)));
+
 	m_main_latch_d800 = m_snd_latch_0800 = m_snd_latch_0a02 = m_ay8910_addr = m_mux_data = 0;
 
 	save_item(NAME(m_main_latch_d800));
@@ -553,12 +556,12 @@ MC6845_UPDATE_ROW(_5clown_state::update_row)
     x--- ----   Extra color for 7's.
 */
 
-	uint32_t *pix = &bitmap.pix32(y);
+	uint32_t *pix = &bitmap.pix(y);
 	ra &= 0x07;
 
 	for (int x = 0; x < x_count; x++)
 	{
-		int tile_index = (x + ma) & m_videoram.mask();
+		int tile_index = (x + ma) & (m_videoram.length() - 1);
 		int attr = m_colorram[tile_index];
 		int code = ((attr & 0x01) << 8) | ((attr & 0x40) << 2) | m_videoram[tile_index];    /* bit 8 for extended char set */
 		int bank = (attr & 0x02) >> 1;                                                  /* bit 1 switch the gfx banks */
@@ -619,7 +622,7 @@ void _5clown_state::_5clown_palette(palette_device &palette) const
    There are 4 sets of 5 bits each and are connected to PIA0, portA.
    The selector bits are located in PIA1, portB (bits 4-7).
 */
-READ8_MEMBER(_5clown_state::mux_port_r)
+uint8_t _5clown_state::mux_port_r()
 {
 	switch( m_mux_data & 0xf0 )     /* bits 4-7 */
 	{
@@ -633,13 +636,13 @@ READ8_MEMBER(_5clown_state::mux_port_r)
 }
 
 
-WRITE8_MEMBER(_5clown_state::mux_w)
+void _5clown_state::mux_w(uint8_t data)
 {
 	m_mux_data = data ^ 0xff;   /* Inverted */
 }
 
 
-WRITE8_MEMBER(_5clown_state::counters_w)
+void _5clown_state::counters_w(uint8_t data)
 {
 /*  Counters:
 
@@ -658,7 +661,7 @@ WRITE8_MEMBER(_5clown_state::counters_w)
 }
 
 
-WRITE8_MEMBER(_5clown_state::trigsnd_w)
+void _5clown_state::trigsnd_w(uint8_t data)
 {
 	/************ Interrupts trigger **************
 
@@ -676,13 +679,13 @@ WRITE8_MEMBER(_5clown_state::trigsnd_w)
 
 }
 
-READ8_MEMBER(_5clown_state::pia0_b_r)
+uint8_t _5clown_state::pia0_b_r()
 {
 	/* often read the port */
 	return 0x00;
 }
 
-READ8_MEMBER(_5clown_state::pia1_b_r)
+uint8_t _5clown_state::pia1_b_r()
 {
 	/* constantly read the port */
 	return 0x00;    /* bit 2 shouldn't be active to allow work the key out system */
@@ -692,12 +695,12 @@ READ8_MEMBER(_5clown_state::pia1_b_r)
 /**********************************/
 
 
-WRITE8_MEMBER(_5clown_state::cpu_c048_w)
+void _5clown_state::cpu_c048_w(uint8_t data)
 {
 	logerror("Main: Write to $C048: %02X\n", data);
 }
 
-WRITE8_MEMBER(_5clown_state::cpu_d800_w)
+void _5clown_state::cpu_d800_w(uint8_t data)
 {
 	logerror("Main: Write to $D800: %02x\n", data);
 	m_main_latch_d800 = data;
@@ -719,13 +722,13 @@ void _5clown_state::fclown_ay8910_w(offs_t offset, u8 data)
 *  SOUND  R/W Handlers        *
 ******************************/
 
-READ8_MEMBER(_5clown_state::snd_e06_r)
+uint8_t _5clown_state::snd_e06_r()
 {
 	logerror("Sound: Read from $0E06 \n");
 	return m_main_latch_d800;
 }
 
-WRITE8_MEMBER(_5clown_state::snd_800_w)
+void _5clown_state::snd_800_w(uint8_t data)
 {
 	m_snd_latch_0800 = data;
 
@@ -740,7 +743,7 @@ WRITE8_MEMBER(_5clown_state::snd_800_w)
 	}
 }
 
-WRITE8_MEMBER(_5clown_state::snd_a02_w)
+void _5clown_state::snd_a02_w(uint8_t data)
 {
 	m_snd_latch_0a02 = data & 0xff;
 	logerror("Sound: Write to $0A02: %02x\n", m_snd_latch_0a02);
@@ -758,18 +761,18 @@ void _5clown_state::fclown_map(address_map &map)
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().share("videoram");   /* Init'ed at $2042 */
-	map(0x1800, 0x1bff).ram().share("colorram");   /* Init'ed at $2054 */
-	map(0x2000, 0x7fff).rom();                 /* ROM space */
+	map(0x1000, 0x13ff).ram().share(m_videoram);   // Init'ed at $2042
+	map(0x1800, 0x1bff).ram().share(m_colorram);   // Init'ed at $2054
+	map(0x2000, 0x7fff).rom();                     // ROM space
 
 	map(0xc048, 0xc048).w(FUNC(_5clown_state::cpu_c048_w));
 	map(0xd800, 0xd800).w(FUNC(_5clown_state::cpu_d800_w));
 
-	map(0xc400, 0xc400).portr("SW1");    /* DIP Switches bank */
-	map(0xcc00, 0xcc00).portr("SW2");    /* DIP Switches bank */
-	map(0xd400, 0xd400).portr("SW3");    /* Second DIP Switches bank */
+	map(0xc400, 0xc400).portr("SW1");              // DIP Switches bank
+	map(0xcc00, 0xcc00).portr("SW2");              // DIP Switches bank
+	map(0xd400, 0xd400).portr("SW3");              // Second DIP Switches bank
 
-	map(0xe000, 0xffff).rom();                 /* ROM space */
+	map(0xe000, 0xffff).rom();                     // ROM space
 }
 
 /*
@@ -846,7 +849,7 @@ void _5clown_state::fcaudio_map(address_map &map)
 static INPUT_PORTS_START( fclown )
 	/* Multiplexed - 4x5bits */
 	PORT_START("IN0-0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_BET )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )    PORT_NAME("Record")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )    PORT_NAME("Start")

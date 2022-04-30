@@ -96,12 +96,12 @@ namespace
 	{
 	protected:
 		// construction/destruction
-		dragon_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+		dragon_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 		// device-level overrides
-		virtual DECLARE_READ8_MEMBER(cts_read) override;
-		virtual DECLARE_READ8_MEMBER(scs_read) override;
-		virtual DECLARE_WRITE8_MEMBER(scs_write) override;
+		virtual u8 cts_read(offs_t offset) override;
+		virtual u8 scs_read(offs_t offset) override;
+		virtual void scs_write(offs_t offset, u8 data) override;
 		virtual void device_add_mconfig(machine_config &config) override;
 		virtual void update_lines() override;
 
@@ -111,19 +111,19 @@ namespace
 		required_device_array<floppy_connector, 4>  m_floppies;
 
 		// methods
-		void dskreg_w(uint8_t data);
+		void dskreg_w(u8 data);
 	};
 
 	class premier_fdc_device_base : public coco_family_fdc_device_base
 	{
 	protected:
 		// construction/destruction
-		premier_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+		premier_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 		// device-level overrides
-		virtual DECLARE_READ8_MEMBER(cts_read) override;
-		virtual DECLARE_READ8_MEMBER(scs_read) override;
-		virtual DECLARE_WRITE8_MEMBER(scs_write) override;
+		virtual u8 cts_read(offs_t offset) override;
+		virtual u8 scs_read(offs_t offset) override;
+		virtual void scs_write(offs_t offset, u8 data) override;
 		virtual void device_add_mconfig(machine_config &config) override;
 		virtual void update_lines() override;
 
@@ -133,7 +133,7 @@ namespace
 		required_device_array<floppy_connector, 4>  m_floppies;
 
 		// methods
-		void dskreg_w(uint8_t data);
+		void dskreg_w(u8 data);
 	};
 }
 
@@ -178,7 +178,7 @@ void premier_fdc_device_base::device_add_mconfig(machine_config &config)
 //-------------------------------------------------
 //  dragon_fdc_device_base - constructor
 //-------------------------------------------------
-dragon_fdc_device_base::dragon_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+dragon_fdc_device_base::dragon_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: coco_family_fdc_device_base(mconfig, type, tag, owner, clock)
 	, m_wd2797(*this, "wd2797")
 	, m_floppies(*this, "wd2797:%u", 0)
@@ -186,7 +186,7 @@ dragon_fdc_device_base::dragon_fdc_device_base(const machine_config &mconfig, de
 }
 
 
-premier_fdc_device_base::premier_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+premier_fdc_device_base::premier_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: coco_family_fdc_device_base(mconfig, type, tag, owner, clock)
 	, m_wd2791(*this, "wd2791")
 	, m_floppies(*this, "wd2791:%u", 0)
@@ -219,7 +219,7 @@ void premier_fdc_device_base::update_lines()
 //  Dragon dskreg
 //-------------------------------------------------
 
-void dragon_fdc_device_base::dskreg_w(uint8_t data)
+void dragon_fdc_device_base::dskreg_w(u8 data)
 {
 	if (LOG_FDC)
 	{
@@ -251,7 +251,7 @@ void dragon_fdc_device_base::dskreg_w(uint8_t data)
 }
 
 
-void premier_fdc_device_base::dskreg_w(uint8_t data)
+void premier_fdc_device_base::dskreg_w(u8 data)
 {
 	if (LOG_FDC)
 	{
@@ -293,13 +293,13 @@ void premier_fdc_device_base::dskreg_w(uint8_t data)
 //  cts_read
 //-------------------------------------------------
 
-READ8_MEMBER(dragon_fdc_device_base::cts_read)
+u8 dragon_fdc_device_base::cts_read(offs_t offset)
 {
 	return memregion("eprom")->base()[offset];
 }
 
 
-READ8_MEMBER(premier_fdc_device_base::cts_read)
+u8 premier_fdc_device_base::cts_read(offs_t offset)
 {
 	return memregion("eprom")->base()[offset];
 }
@@ -309,9 +309,9 @@ READ8_MEMBER(premier_fdc_device_base::cts_read)
 //  scs_read
 //-------------------------------------------------
 
-READ8_MEMBER(dragon_fdc_device_base::scs_read)
+u8 dragon_fdc_device_base::scs_read(offs_t offset)
 {
-	uint8_t result = 0;
+	u8 result = 0;
 	switch (offset & 0xef)
 	{
 	case 0:
@@ -325,9 +325,9 @@ READ8_MEMBER(dragon_fdc_device_base::scs_read)
 }
 
 
-READ8_MEMBER(premier_fdc_device_base::scs_read)
+u8 premier_fdc_device_base::scs_read(offs_t offset)
 {
-	uint8_t result = 0;
+	u8 result = 0;
 	switch (offset)
 	{
 	case 0:
@@ -345,7 +345,7 @@ READ8_MEMBER(premier_fdc_device_base::scs_read)
 //  scs_write
 //-------------------------------------------------
 
-WRITE8_MEMBER(dragon_fdc_device_base::scs_write)
+void dragon_fdc_device_base::scs_write(offs_t offset, u8 data)
 {
 	switch (offset & 0xef)
 	{
@@ -363,7 +363,7 @@ WRITE8_MEMBER(dragon_fdc_device_base::scs_write)
 }
 
 
-WRITE8_MEMBER(premier_fdc_device_base::scs_write)
+void premier_fdc_device_base::scs_write(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -395,7 +395,7 @@ namespace
 	{
 	public:
 		// construction/destruction
-		dragon_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		dragon_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 			: dragon_fdc_device_base(mconfig, DRAGON_FDC, tag, owner, clock)
 		{
 		}
@@ -427,7 +427,7 @@ namespace
 	{
 	public:
 		// construction/destruction
-		premier_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		premier_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 			: premier_fdc_device_base(mconfig, PREMIER_FDC, tag, owner, clock)
 		{
 		}
@@ -459,7 +459,7 @@ namespace
 	{
 	public:
 		// construction/destruction
-		sdtandy_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		sdtandy_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 			: dragon_fdc_device_base(mconfig, SDTANDY_FDC, tag, owner, clock)
 		{
 		}

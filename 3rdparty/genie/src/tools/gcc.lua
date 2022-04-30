@@ -278,6 +278,8 @@
 	function premake.gcc.wholearchive(lib)
 		if premake.gcc.llvm then
 			return {"-force_load", lib}
+		elseif os.get() == "macosx" then
+			return {"-Wl,-force_load", lib}
 		else
 			return {"-Wl,--whole-archive", lib, "-Wl,--no-whole-archive"}
 		end

@@ -10,7 +10,7 @@ inline void pgm2_state::draw_sprite_pixel(const rectangle &cliprect, u32 palette
 	{
 		u16 const pix = m_sprites_colour[palette_offset] & 0x3f; // there are some stray 0xff bytes in some roms, so mask
 		u16 const pendat = pix + (pal * 0x40);
-		u16* dstptr_bitmap = &m_sprite_bitmap.pix16(realy);
+		u16 *const dstptr_bitmap = &m_sprite_bitmap.pix(realy);
 		dstptr_bitmap[realx] = pendat;
 	}
 }
@@ -51,14 +51,14 @@ inline void pgm2_state::draw_sprite_chunk(const rectangle &cliprect, u32 &palett
 				}
 
 				palette_offset += palette_inc;
-				palette_offset &= m_sprites_colour.mask();
+				palette_offset &= m_sprites_colour.length() - 1;
 			}
 			else // shrink
 			{
 				if (xzoombit) draw_sprite_pixel(cliprect, palette_offset, x + realxdraw, realy, pal);
 
 				palette_offset += palette_inc;
-				palette_offset &= m_sprites_colour.mask();
+				palette_offset &= m_sprites_colour.length() - 1;
 
 				if (xzoombit) realxdraw += realdraw_inc;
 
@@ -100,7 +100,7 @@ inline void pgm2_state::skip_sprite_chunk(u32 &palette_offset, u32 maskdata, boo
 		palette_offset -= bits;
 	}
 
-	palette_offset &= m_sprites_colour.mask();
+	palette_offset &= m_sprites_colour.length() - 1;
 
 }
 
@@ -130,7 +130,7 @@ inline void pgm2_state::draw_sprite_line(const rectangle &cliprect, u32 &mask_of
 			mask_offset += 4;
 		}
 
-		mask_offset &= m_sprites_mask.mask();
+		mask_offset &= m_sprites_mask.length() - 1;
 
 		if (zoomybit)
 		{
@@ -214,8 +214,8 @@ void pgm2_state::draw_sprites(const rectangle &cliprect)
 			if (reverse)
 				mask_offset -= 2;
 
-			mask_offset &= m_sprites_mask.mask();
-			palette_offset &= m_sprites_colour.mask();
+			mask_offset &= m_sprites_mask.length() - 1;
+			palette_offset &= m_sprites_colour.length() - 1;
 
 			pal |= (pri << 6); // encode priority with the palette for manual mixing later
 
@@ -270,14 +270,12 @@ void pgm2_state::copy_sprites_from_bitmap(bitmap_rgb32 &bitmap, const rectangle 
 {
 	pri <<= 12;
 
-	const pen_t *paldata = m_sp_palette->pens();
-	u16* srcptr_bitmap;
-	u32* dstptr_bitmap;
+	pen_t const *const paldata = m_sp_palette->pens();
 
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		srcptr_bitmap = &m_sprite_bitmap.pix16(y);
-		dstptr_bitmap = &bitmap.pix32(y);
+		u16 const *const srcptr_bitmap = &m_sprite_bitmap.pix(y);
+		u32 *const dstptr_bitmap = &bitmap.pix(y);
 
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
@@ -339,7 +337,7 @@ WRITE_LINE_MEMBER(pgm2_state::screen_vblank)
 	}
 }
 
-WRITE32_MEMBER(pgm2_state::fg_videoram_w)
+void pgm2_state::fg_videoram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_fg_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -351,10 +349,10 @@ TILE_GET_INFO_MEMBER(pgm2_state::get_fg_tile_info)
 	u8 const colour  = (m_fg_videoram[tile_index] & 0x007c0000) >> 18; // 5 bits
 	u8 const flipxy  = (m_fg_videoram[tile_index] & 0x01800000) >> 23;
 
-	SET_TILE_INFO_MEMBER(0, tileno, colour, TILE_FLIPXY(flipxy));
+	tileinfo.set(0, tileno, colour, TILE_FLIPXY(flipxy));
 }
 
-WRITE32_MEMBER(pgm2_state::bg_videoram_w)
+void pgm2_state::bg_videoram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_bg_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -366,11 +364,15 @@ TILE_GET_INFO_MEMBER(pgm2_state::get_bg_tile_info)
 	u8 const colour  = (m_bg_videoram[tile_index] & 0x003c0000) >> 18; // 4 bits
 	u8 const flipxy  = (m_bg_videoram[tile_index] & 0x01800000) >> 23;
 
-	SET_TILE_INFO_MEMBER(0, tileno, colour, TILE_FLIPXY(flipxy));
+	tileinfo.set(0, tileno, colour, TILE_FLIPXY(flipxy));
 }
 
 void pgm2_state::video_start()
 {
+	// assumes it can make an address mask with .length() - 1 on these
+	assert(!(m_sprites_mask.length() & (m_sprites_mask.length() - 1)));
+	assert(!(m_sprites_colour.length() & (m_sprites_colour.length() - 1)));
+
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode2, tilemap_get_info_delegate(*this, FUNC(pgm2_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 96, 64); // 0x6000 bytes
 	m_fg_tilemap->set_transparent_pen(0);
 

@@ -32,9 +32,10 @@
 #include "machine/timer.h"
 #include "sound/i5000.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "layout/generic.h"
 
 
 #define EMULATE_BLITTER 0 // FIXME: code is incomplete
@@ -95,15 +96,15 @@ private:
 	emu_timer *m_blit_done_timer;
 #endif
 
-	template<uint8_t Tilemap> DECLARE_WRITE32_MEMBER(tilemap_w);
-	template<uint8_t Tilemap> DECLARE_READ32_MEMBER(tilemap_r);
-	DECLARE_READ32_MEMBER(randomtmmjprds);
-	DECLARE_READ32_MEMBER(mux_r);
-	template<uint8_t Number> DECLARE_WRITE32_MEMBER(brt_w);
-	DECLARE_WRITE32_MEMBER(eeprom_write);
+	template<uint8_t Tilemap> void tilemap_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template<uint8_t Tilemap> uint32_t tilemap_r(offs_t offset);
+	uint32_t randomtmmjprds();
+	uint32_t mux_r();
+	template<uint8_t Number> void brt_w(uint32_t data);
+	void eeprom_write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 #if EMULATE_BLITTER
-	DECLARE_WRITE32_MEMBER(blitter_w);
+	void blitter_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void do_blit();
 #endif
 
@@ -124,7 +125,7 @@ private:
 };
 
 template<uint8_t Tilemap>
-WRITE32_MEMBER(tmmjprd_state::tilemap_w)
+void tmmjprd_state::tilemap_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_tilemap_ram[Tilemap][offset]);
 }
@@ -235,30 +236,25 @@ void tmmjprd_state::draw_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, i
 	{
 		for (int drawx=x;drawx<x+sizex;drawx++)
 		{
-			uint16_t dat;
-			uint16_t* dst;
-
 			if (!depth)
 			{
 				if (cliprect.contains(drawx, drawy))
 				{
-					dat = (rom[(tileaddr*32)+count] & 0xf0)>>4;
+					uint16_t dat = (rom[(tileaddr*32)+count] & 0xf0)>>4;
 					if (dat!=15)
 					{
 						//dat += (colour<<8);
-						dst = &bitmap.pix16(drawy, drawx);
-						dst[0] = dat;
+						bitmap.pix(drawy, drawx) = dat;
 					}
 				}
 				drawx++;
 				if (cliprect.contains(drawx, drawy))
 				{
-					dat = (rom[(tileaddr*32)+count] & 0x0f);
+					uint16_t dat = (rom[(tileaddr*32)+count] & 0x0f);
 					if (dat!=15)
 					{
 						//dat += (colour<<8);
-						dst = &bitmap.pix16(drawy, drawx);
-						dst[0] = dat;
+						bitmap.pix(drawy, drawx) = dat;
 					}
 				}
 
@@ -268,12 +264,11 @@ void tmmjprd_state::draw_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, i
 			{
 				if (cliprect.contains(drawx, drawy))
 				{
-					dat = (rom[(tileaddr*32)+count] & 0xff);
+					uint16_t dat = (rom[(tileaddr*32)+count] & 0xff);
 					if (dat!=255)
 					{
 						dat += (colour<<8) & 0xf00;
-						dst = &bitmap.pix16(drawy, drawx);
-						dst[0] = dat;
+						bitmap.pix(drawy, drawx) = dat;
 					}
 				}
 				count++;
@@ -382,12 +377,12 @@ void tmmjprd_state::video_start()
 }
 
 template<uint8_t Tilemap>
-READ32_MEMBER(tmmjprd_state::tilemap_r)
+uint32_t tmmjprd_state::tilemap_r(offs_t offset)
 {
 	return m_tilemap_ram[Tilemap][offset];
 }
 
-READ32_MEMBER(tmmjprd_state::randomtmmjprds)
+uint32_t tmmjprd_state::randomtmmjprds()
 {
 	return 0x0000;//machine().rand();
 }
@@ -497,7 +492,7 @@ void tmmjprd_state::do_blit()
 
 
 
-WRITE32_MEMBER(tmmjprd_state::blitter_w)
+void tmmjprd_state::blitter_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_blitterregs[offset]);
 
@@ -518,7 +513,7 @@ void tmmjprd_state::machine_start()
 	save_item(NAME(m_system_in));
 }
 
-WRITE32_MEMBER(tmmjprd_state::eeprom_write)
+void tmmjprd_state::eeprom_write(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// don't disturb the EEPROM if we're not actually writing to it
 	// (in particular, data & 0x100 here with mask = ffff00ff looks to be the watchdog)
@@ -538,7 +533,7 @@ WRITE32_MEMBER(tmmjprd_state::eeprom_write)
 	}
 }
 
-READ32_MEMBER(tmmjprd_state::mux_r)
+uint32_t tmmjprd_state::mux_r()
 {
 	m_system_in = m_system->read();
 
@@ -646,7 +641,7 @@ INPUT_PORTS_END
 /* notice that data & 0x4 is always cleared on brt_1 and set on brt_2.        *
  * My wild guess is that bits 0,1 and 2 controls what palette entries to dim. */
 template<uint8_t Number>
-WRITE32_MEMBER(tmmjprd_state::brt_w)
+void tmmjprd_state::brt_w(uint32_t data)
 {
 	data>>=24;
 	double brt = ((data & 0x78)>>3) / 15.0;

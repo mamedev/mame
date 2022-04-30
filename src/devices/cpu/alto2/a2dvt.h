@@ -8,8 +8,8 @@
 #ifdef  ALTO2_DEFINE_CONSTANTS
 
 #else   // ALTO2_DEFINE_CONSTANTS
-#ifndef _A2DVT_H_
-#define _A2DVT_H_
+#ifndef MAME_CPU_ALTO2_A2DVT_H
+#define MAME_CPU_ALTO2_A2DVT_H
 
 //! F2 functions for display vertical task
 enum {
@@ -30,5 +30,5 @@ void exit_dvt();
 
 //! Reset the display vertical task.
 void reset_dvt();
-#endif  // _A2DVT_H_
+#endif  // MAME_CPU_ALTO2_A2DVT_H
 #endif  // ALTO2_DEFINE_CONSTANTS

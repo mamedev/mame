@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/adam_dsk.h"
 
 adam_format::adam_format() : wd177x_format(formats)
@@ -67,4 +65,4 @@ const adam_format::format adam_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_ADAM_FORMAT = &floppy_image_format_creator<adam_format>;
+const adam_format FLOPPY_ADAM_FORMAT;

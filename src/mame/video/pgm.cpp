@@ -5,7 +5,9 @@
 
 #include "emu.h"
 #include "includes/pgm.h"
+
 #include "screen.h"
+
 
 /******************************************************************************
  Sprites
@@ -18,6 +20,9 @@
 // nothing pri is 0
 // bg pri is 2
 // sprite already here is 1 / 3
+
+static constexpr bool get_flipy(u8 flip) { return BIT(flip, 1); }
+static constexpr bool get_flipx(u8 flip) { return BIT(flip, 0); }
 
 inline void pgm_state::pgm_draw_pix(int xdrawpos, int pri, u16* dest, u8* destpri, const rectangle &cliprect, u16 srcdat)
 {
@@ -71,7 +76,7 @@ inline void pgm_state::pgm_draw_pix_pri(int xdrawpos, u16* dest, u8* destpri, co
 
 inline u8 pgm_state::get_sprite_pix()
 {
-	const u8 srcdat = ((m_adata[m_aoffset & m_adata.mask()] >> m_abit) & 0x1f);
+	const u8 srcdat = ((m_adata[m_aoffset & (m_adata.length() - 1)] >> m_abit) & 0x1f);
 	m_abit += 5; // 5 bit per pixel, 3 pixels in each word; 15 bit used
 	if (m_abit >= 15)
 	{
@@ -94,7 +99,7 @@ void pgm_state::draw_sprite_line(int wide, u16* dest, u8* destpri, const rectang
 
 	for (int xcnt = 0; xcnt < wide; xcnt++)
 	{
-		u16 msk = m_bdata[m_boffset & m_bdata.mask()];
+		u16 msk = m_bdata[m_boffset & (m_bdata.length() - 1)];
 
 		for (int x = 0; x < 16; x++)
 		{
@@ -110,7 +115,7 @@ void pgm_state::draw_sprite_line(int wide, u16* dest, u8* destpri, const rectang
 					if (xzoombit && xgrow)
 					{ // double this column
 
-						if (!(flip & 0x01))
+						if (!get_flipx(flip))
 							xdrawpos = xpos + xcntdraw;
 						else
 							xdrawpos = xpos + realxsize - xcntdraw;
@@ -119,7 +124,7 @@ void pgm_state::draw_sprite_line(int wide, u16* dest, u8* destpri, const rectang
 
 						xcntdraw++;
 
-						if (!(flip & 0x01))
+						if (!get_flipx(flip))
 							xdrawpos = xpos + xcntdraw;
 						else
 							xdrawpos = xpos + realxsize - xcntdraw;
@@ -134,7 +139,7 @@ void pgm_state::draw_sprite_line(int wide, u16* dest, u8* destpri, const rectang
 					}
 					else //normal column
 					{
-						if (!(flip & 0x01))
+						if (!get_flipx(flip))
 							xdrawpos = xpos + xcntdraw;
 						else
 							xdrawpos = xpos + realxsize - xcntdraw;
@@ -167,7 +172,7 @@ void pgm_state::draw_sprite_new_zoomed(int wide, int high, int xpos, int ypos, i
 	int ydrawpos;
 	int xcnt = 0;
 
-	m_aoffset = (m_bdata[(m_boffset + 1) & m_bdata.mask()] << 16) | (m_bdata[(m_boffset + 0) & m_bdata.mask()] << 0);
+	m_aoffset = (m_bdata[(m_boffset + 1) & (m_bdata.length() - 1)] << 16) | (m_bdata[(m_boffset + 0) & (m_bdata.length() - 1)] << 0);
 	m_aoffset = m_aoffset >> 2;
 	m_abit = 0;
 
@@ -219,15 +224,15 @@ void pgm_state::draw_sprite_new_zoomed(int wide, int high, int xpos, int ypos, i
 			const int temp_abit = m_abit;
 			const int temp_boffset = m_boffset;
 
-			if (!(flip & 0x02))
+			if (!get_flipy(flip))
 				ydrawpos = ypos + ycntdraw;
 			else
 				ydrawpos = ypos + realysize - ycntdraw;
 
 			if ((ydrawpos >= cliprect.min_y) && (ydrawpos <= cliprect.max_y))
 			{
-				u16 *dest = &bitmap.pix16(ydrawpos);
-				u8 *destpri = &priority_bitmap.pix8(ydrawpos);
+				u16 *dest = &bitmap.pix(ydrawpos);
+				u8 *destpri = &priority_bitmap.pix(ydrawpos);
 				draw_sprite_line(wide, dest, destpri, cliprect, xzoom, xgrow, flip, xpos, pri, realxsize, palt, true);
 			}
 			else
@@ -242,22 +247,22 @@ void pgm_state::draw_sprite_new_zoomed(int wide, int high, int xpos, int ypos, i
 			m_abit = temp_abit;
 			m_boffset = temp_boffset;
 
-			if (!(flip & 0x02))
+			if (!get_flipy(flip))
 				ydrawpos = ypos + ycntdraw;
 			else
 				ydrawpos = ypos + realysize - ycntdraw;
 
 			if ((ydrawpos >= cliprect.min_y) && (ydrawpos <= cliprect.max_y))
 			{
-				u16 *dest = &bitmap.pix16(ydrawpos);
-				u8 *destpri = &priority_bitmap.pix8(ydrawpos);
+				u16 *dest = &bitmap.pix(ydrawpos);
+				u8 *destpri = &priority_bitmap.pix(ydrawpos);
 				draw_sprite_line(wide, dest, destpri, cliprect, xzoom, xgrow, flip, xpos, pri, realxsize, palt, true);
 			}
 			else
 			{
 				draw_sprite_line(wide, nullptr, nullptr, cliprect, xzoom, xgrow, flip, xpos, pri, realxsize, palt, false);
 
-				if (!(flip & 0x02))
+				if (!get_flipy(flip))
 				{
 					if (ydrawpos >= cliprect.max_y)
 						return;
@@ -279,22 +284,22 @@ void pgm_state::draw_sprite_new_zoomed(int wide, int high, int xpos, int ypos, i
 		}
 		else /* normal line */
 		{
-			if (!(flip & 0x02))
+			if (!get_flipy(flip))
 				ydrawpos = ypos + ycntdraw;
 			else
 				ydrawpos = ypos + realysize - ycntdraw;
 
 			if ((ydrawpos >= cliprect.min_y) && (ydrawpos <= cliprect.max_y))
 			{
-				u16 *dest = &bitmap.pix16(ydrawpos);
-				u8 *destpri = &priority_bitmap.pix8(ydrawpos);
+				u16 *dest = &bitmap.pix(ydrawpos);
+				u8 *destpri = &priority_bitmap.pix(ydrawpos);
 				draw_sprite_line(wide, dest, destpri, cliprect, xzoom, xgrow, flip, xpos, pri, realxsize, palt, true);
 			}
 			else
 			{
 				draw_sprite_line(wide, nullptr, nullptr, cliprect, xzoom, xgrow, flip, xpos, pri, realxsize, palt, false);
 
-				if (!(flip & 0x02))
+				if (!get_flipy(flip))
 				{
 					if (ydrawpos >= cliprect.max_y)
 						return;
@@ -325,7 +330,7 @@ void pgm_state::draw_sprite_line_basic(int wide, u16* dest, u8* destpri, const r
 	{
 		for (int xcnt = 0; xcnt < wide; xcnt++)
 		{
-			u16 msk = m_bdata[m_boffset & m_bdata.mask()];
+			u16 msk = m_bdata[m_boffset & (m_bdata.length() - 1)];
 
 			for (int x = 0; x < 16; x++)
 			{
@@ -337,7 +342,7 @@ void pgm_state::draw_sprite_line_basic(int wide, u16* dest, u8* destpri, const r
 					{
 						xoffset++;
 
-						if (!(flip & 0x01))
+						if (!get_flipx(flip))
 							xdrawpos = xpos + xcntdraw;
 						else
 							xdrawpos = xpos + realxsize - xcntdraw;
@@ -364,7 +369,7 @@ void pgm_state::draw_sprite_line_basic(int wide, u16* dest, u8* destpri, const r
 	{
 		for (int xcnt = 0; xcnt < wide; xcnt++)
 		{
-			u16 msk = m_bdata[m_boffset & m_bdata.mask()];
+			u16 msk = m_bdata[m_boffset & (m_bdata.length() - 1)];
 
 			for (int x = 0; x < 16; x++)
 			{
@@ -376,7 +381,7 @@ void pgm_state::draw_sprite_line_basic(int wide, u16* dest, u8* destpri, const r
 					{
 						xoffset++;
 
-						if (!(flip & 0x01))
+						if (!get_flipx(flip))
 							xdrawpos = xpos + xcntdraw;
 						else
 							xdrawpos = xpos + realxsize - xcntdraw;
@@ -410,7 +415,7 @@ void pgm_state::draw_sprite_new_basic(int wide, int high, int xpos, int ypos, in
 {
 	int ydrawpos;
 
-	m_aoffset = (m_bdata[(m_boffset + 1) & m_bdata.mask()] << 16) | (m_bdata[(m_boffset + 0) & m_bdata.mask()] << 0);
+	m_aoffset = (m_bdata[(m_boffset + 1) & (m_bdata.length() - 1)] << 16) | (m_bdata[(m_boffset + 0) & (m_bdata.length() - 1)] << 0);
 	m_aoffset = m_aoffset >> 2;
 	m_abit = 0;
 
@@ -425,22 +430,22 @@ void pgm_state::draw_sprite_new_basic(int wide, int high, int xpos, int ypos, in
 
 	while (ycnt < high)
 	{
-		if (!(flip & 0x02))
+		if (!get_flipy(flip))
 			ydrawpos = ypos + ycntdraw;
 		else
 			ydrawpos = ypos + realysize - ycntdraw;
 
 		if ((ydrawpos >= cliprect.min_y) && (ydrawpos <= cliprect.max_y))
 		{
-			u16 *dest = &bitmap.pix16(ydrawpos);
-			u8 *destpri = &priority_bitmap.pix8(ydrawpos);
+			u16 *dest = &bitmap.pix(ydrawpos);
+			u8 *destpri = &priority_bitmap.pix(ydrawpos);
 			draw_sprite_line_basic(wide, dest, destpri, cliprect, flip, xpos, pri, realxsize, palt, true);
 		}
 		else
 		{
 			draw_sprite_line_basic(wide, nullptr, nullptr, cliprect, flip, xpos, pri, realxsize, palt, false);
 
-			if (!(flip & 0x02))
+			if (!get_flipy(flip))
 			{
 				if (ydrawpos >= cliprect.max_y)
 					return;
@@ -458,42 +463,85 @@ void pgm_state::draw_sprite_new_basic(int wide, int high, int xpos, int ypos, in
 }
 
 
-void pgm_state::draw_sprites(bitmap_ind16& spritebitmap, const rectangle &cliprect, u16 *sprite_source, bitmap_ind8& priority_bitmap)
+void pgm_state::draw_sprites(bitmap_ind16& spritebitmap, const rectangle &cliprect, bitmap_ind8& priority_bitmap)
 {
-	/* ZZZZ Zxxx xxxx xxxx
-	   zzzz z-yy yyyy yyyy
-	   -ffp pppp Pvvv vvvv
-	   vvvv vvvv vvvv vvvv
-	   wwww wwwh hhhh hhhh
-	*/
+	struct sprite_t *sprite_ptr = m_sprite_ptr_pre;
+	while (sprite_ptr != m_spritelist.get())
+	{
+		sprite_ptr--;
 
-	const u16 *finish = m_spritebufferram.get() + (0xa00 / 2);
+		m_boffset = sprite_ptr->offs;
+		if ((!sprite_ptr->xzoom) && (!sprite_ptr->yzoom))
+		{
+			draw_sprite_new_basic(sprite_ptr->width, sprite_ptr->height,
+				sprite_ptr->x, sprite_ptr->y,
+				sprite_ptr->color, sprite_ptr->flip,
+				spritebitmap, cliprect, priority_bitmap,
+				sprite_ptr->pri);
+		}
+		else
+		{
+			draw_sprite_new_zoomed(sprite_ptr->width, sprite_ptr->height,
+				sprite_ptr->x, sprite_ptr->y,
+				sprite_ptr->color, sprite_ptr->flip,
+				spritebitmap, cliprect, priority_bitmap,
+				sprite_ptr->xzoom, sprite_ptr->xgrow, sprite_ptr->yzoom, sprite_ptr->ygrow, sprite_ptr->pri);
+		}
+	}
+}
 
-	u16* start = sprite_source;
+/*
+        Sprite list format (10 bytes per sprites, 256 entries)
+
+    Offset Bits
+           fedcba98 76543210
+    00     x------- -------- Horizontal Zoom/Shrink mode select
+           -xxxx--- -------- Horizontal Zoom/Shrink table select
+           -----xxx xxxxxxxx X position (11 bit signed)
+
+    02     x------- -------- Vertical Zoom/Shrink mode select
+           -xxxx--- -------- Vertical Zoom/Shrink table select
+           -----xxx xxxxxxxx Y position (10 bit signed)
+
+    04     -x------ -------- Flip Y
+           --x----- -------- Flip X
+           ---xxxxx -------- Palette select (32 color each)
+           -------- x------- Priority (Over(0) or Under(1) background)
+           -------- -xxxxxxx Sprite mask ROM address MSB
+    06     xxxxxxxx xxxxxxxx Sprite mask ROM address LSB
+
+    08     x------- -------- Another sprite width bit?
+           -xxxxxx- -------- Sprite width (16 pixel each)
+           -------x xxxxxxxx Sprite height (1 pixel each)
+
+*/
+void pgm_state::get_sprites()
+{
+	m_sprite_ptr_pre = m_spritelist.get();
+
+	u16 *sprite_source = &m_mainram[0];
+	const u16 *finish = &m_mainram[0xa00 / 2];
+	const u16* sprite_zoomtable = &m_videoregs[0x1000 / 2];
 
 	while (sprite_source < finish)
 	{
 		if (!sprite_source[4]) break; /* is this right? */
-		sprite_source += 5;
-	}
-	sprite_source -= 5;
 
-	while (sprite_source >= start)
-	{
-		int xpos =          sprite_source[0] & 0x07ff;
-		int ypos =          sprite_source[1] & 0x03ff;
-		int xzom =         (sprite_source[0] & 0x7800) >> 11;
-		const bool xgrow = (sprite_source[0] & 0x8000) >> 15;
-		int yzom =         (sprite_source[1] & 0x7800) >> 11;
-		const bool ygrow = (sprite_source[1] & 0x8000) >> 15;
-		const int palt =   (sprite_source[2] & 0x1f00) >> 8;
-		const int flip =   (sprite_source[2] & 0x6000) >> 13;
-		int boff =        ((sprite_source[2] & 0x007f) << 16) | (sprite_source[3] & 0xffff);
-		const int wide =   (sprite_source[4] & 0x7e00) >> 9;
-		const int high =    sprite_source[4] & 0x01ff;
-		const int pri =    (sprite_source[2] & 0x0080) >>  7;
+		int xzom =                 (sprite_source[0] & 0x7800) >> 11;
+		const bool xgrow =         (sprite_source[0] & 0x8000) >> 15;
+		m_sprite_ptr_pre->x =      (sprite_source[0] & 0x03ff) - (sprite_source[0] & 0x0400);
 
-		const u16* sprite_zoomtable = &m_videoregs[0x1000 / 2];
+		int yzom =                 (sprite_source[1] & 0x7800) >> 11;
+		const bool ygrow =         (sprite_source[1] & 0x8000) >> 15;
+		m_sprite_ptr_pre->y =      (sprite_source[1] & 0x01ff) - (sprite_source[1] & 0x0200);
+
+		m_sprite_ptr_pre->flip =   (sprite_source[2] & 0x6000) >> 13;
+		m_sprite_ptr_pre->color =  (sprite_source[2] & 0x1f00) >> 8;
+		m_sprite_ptr_pre->pri =    (sprite_source[2] & 0x0080) >>  7;
+		m_sprite_ptr_pre->offs =  ((sprite_source[2] & 0x007f) << 16) | (sprite_source[3] & 0xffff);
+
+		m_sprite_ptr_pre->width =  (sprite_source[4] & 0x7e00) >> 9;
+		m_sprite_ptr_pre->height =  sprite_source[4] & 0x01ff;
 
 		if (xgrow)
 		{
@@ -507,19 +555,12 @@ void pgm_state::draw_sprites(bitmap_ind16& spritebitmap, const rectangle &clipre
 			yzom = 0x10 - yzom;
 		}
 
-		u32 xzoom = (sprite_zoomtable[xzom * 2] << 16) | sprite_zoomtable[xzom * 2 + 1];
-		u32 yzoom = (sprite_zoomtable[yzom * 2] << 16) | sprite_zoomtable[yzom * 2 + 1];
-
-		if (xpos > 0x3ff) xpos -= 0x800;
-		if (ypos > 0x1ff) ypos -= 0x400;
-
-		//if ((priority == 1) && (pri == 0)) break;
-
-		m_boffset = boff;
-		if ((!xzoom) && (!yzoom)) draw_sprite_new_basic(wide, high, xpos, ypos, palt, flip, spritebitmap, cliprect, priority_bitmap, pri);
-		else draw_sprite_new_zoomed(wide, high, xpos, ypos, palt, flip, spritebitmap, cliprect, priority_bitmap, xzoom, xgrow, yzoom, ygrow, pri);
-
-		sprite_source -= 5;
+		m_sprite_ptr_pre->xzoom = (sprite_zoomtable[xzom * 2] << 16) | sprite_zoomtable[xzom * 2 + 1];
+		m_sprite_ptr_pre->yzoom = (sprite_zoomtable[yzom * 2] << 16) | sprite_zoomtable[yzom * 2 + 1];
+		m_sprite_ptr_pre->xgrow = xgrow;
+		m_sprite_ptr_pre->ygrow = ygrow;
+		m_sprite_ptr_pre++;
+		sprite_source += 5;
 	}
 }
 
@@ -550,7 +591,7 @@ TILE_GET_INFO_MEMBER(pgm_state::get_tx_tile_info)
 	const u32 colour = (m_tx_videoram[tile_index * 2 + 1] & 0x3e) >> 1;
 	const u8  flipyx = (m_tx_videoram[tile_index * 2 + 1] & 0xc0) >> 6;
 
-	SET_TILE_INFO_MEMBER(0,tileno,colour,TILE_FLIPYX(flipyx));
+	tileinfo.set(0,tileno,colour,TILE_FLIPYX(flipyx));
 }
 
 /* BG Layer */
@@ -569,7 +610,7 @@ TILE_GET_INFO_MEMBER(pgm_state::get_bg_tile_info)
 	const u32 colour = (m_bg_videoram[tile_index * 2 + 1] & 0x3e) >> 1;
 	const u8  flipyx = (m_bg_videoram[tile_index * 2 + 1] & 0xc0) >> 6;
 
-	SET_TILE_INFO_MEMBER(1,tileno,colour,TILE_FLIPYX(flipyx));
+	tileinfo.set(1,tileno,colour,TILE_FLIPYX(flipyx));
 }
 
 
@@ -578,6 +619,13 @@ TILE_GET_INFO_MEMBER(pgm_state::get_bg_tile_info)
 
 void pgm_state::video_start()
 {
+	// assumes it can make an address mask with .length() - 1 on these
+	assert(!(m_adata.length() & (m_adata.length() - 1)));
+	assert(!(m_bdata.length() & (m_bdata.length() - 1)));
+
+	m_spritelist = std::make_unique<sprite_t[]>(0xa00/2/5);
+	m_sprite_ptr_pre = m_spritelist.get();
+
 	m_aoffset = 0;
 	m_abit = 0;
 	m_boffset = 0;
@@ -588,10 +636,6 @@ void pgm_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pgm_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 32, 32, 64, 16);
 	m_bg_tilemap->set_transparent_pen(31);
 	m_bg_tilemap->set_scroll_rows(16 * 32);
-
-	m_spritebufferram = make_unique_clear<u16[]>(0xa00/2);
-
-	save_pointer(NAME(m_spritebufferram), 0xa00/2);
 }
 
 u32 pgm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -607,7 +651,7 @@ u32 pgm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const 
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
 
-	draw_sprites(bitmap, cliprect, m_spritebufferram.get(), screen.priority());
+	draw_sprites(bitmap, cliprect, screen.priority());
 
 	m_tx_tilemap->set_scrolly(0, m_videoregs[0x5000/2]);
 	m_tx_tilemap->set_scrollx(0, m_videoregs[0x6000/2]); // Check
@@ -623,6 +667,9 @@ WRITE_LINE_MEMBER(pgm_state::screen_vblank)
 	if (state)
 	{
 		/* first 0xa00 of main ram = sprites, seems to be buffered, DMA? */
-		memcpy(m_spritebufferram.get(), m_mainram, 0xa00);
+		get_sprites();
+
+		// vblank start interrupt
+		m_maincpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
 	}
 }

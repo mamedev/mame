@@ -47,7 +47,7 @@ void alesis_state::update_lcd_symbols(bitmap_ind16 &bitmap, uint8_t pos, uint8_t
 			case 2:
 				if (y == 0)
 				{
-					output().set_value("pattern", state);
+					m_pattern = state;
 				}
 				else if (y < 8)
 				{

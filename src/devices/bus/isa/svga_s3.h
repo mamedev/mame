@@ -23,7 +23,7 @@ public:
 	// construction/destruction
 	isa16_svga_s3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(input_port_0_r);
+	uint8_t input_port_0_r();
 
 protected:
 	// device-level overrides
@@ -47,7 +47,7 @@ public:
 	// construction/destruction
 	isa16_s3virge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(input_port_0_r);
+	uint8_t input_port_0_r();
 
 protected:
 	// device-level overrides
@@ -57,6 +57,8 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	DECLARE_WRITE_LINE_MEMBER(linear_config_changed_w);
 
 private:
 	required_device<s3virge_vga_device> m_vga;
@@ -70,7 +72,7 @@ public:
 	// construction/destruction
 	isa16_s3virgedx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(input_port_0_r);
+	uint8_t input_port_0_r();
 
 protected:
 	// device-level overrides
@@ -81,8 +83,13 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	DECLARE_WRITE_LINE_MEMBER(linear_config_changed_w);
+
 private:
 	required_device<s3virgedx_vga_device> m_vga;
+	bool m_lfb_enable;
+	uint32_t m_lfb_start;
+	uint32_t m_lfb_end;
 };
 
 class isa16_stealth3d2kpro_device :
@@ -93,7 +100,7 @@ public:
 	// construction/destruction
 	isa16_stealth3d2kpro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(input_port_0_r);
+	uint8_t input_port_0_r();
 
 protected:
 	// device-level overrides
@@ -103,6 +110,8 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	DECLARE_WRITE_LINE_MEMBER(linear_config_changed_w);
 
 private:
 	required_device<s3virgedx_vga_device> m_vga;

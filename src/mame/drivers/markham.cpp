@@ -39,12 +39,12 @@
 #define VBEND        (16)
 #define VBSTART      (240)
 
-READ8_MEMBER(markham_state::markham_e004_r)
+uint8_t markham_state::markham_e004_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER(markham_state::coin_output_w)
+void markham_state::coin_output_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 
@@ -61,7 +61,7 @@ WRITE8_MEMBER(markham_state::coin_output_w)
 	}
 }
 
-WRITE8_MEMBER(markham_state::flipscreen_w)
+void markham_state::flipscreen_w(uint8_t data)
 {
 	if (flip_screen() != (BIT(data, 0)))
 	{
@@ -72,17 +72,17 @@ WRITE8_MEMBER(markham_state::flipscreen_w)
 
 /****************************************************************************/
 
-READ8_MEMBER(markham_state::strnskil_d800_r)
+uint8_t markham_state::strnskil_d800_r()
 {
 	// bit0: interrupt type?, bit1: CPU2 busack?
 	return (m_irq_source);
 }
 
-WRITE8_MEMBER(markham_state::strnskil_master_output_w)
+void markham_state::strnskil_master_output_w(uint8_t data)
 {
 	m_scroll_ctrl = data >> 5;
 
-	flipscreen_w(space, 0, (data >> 3) & 1);
+	flipscreen_w((data >> 3) & 1);
 
 	// bit 0: master CPU bus request?
 }
@@ -103,7 +103,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(markham_state::strnskil_scanline)
 
 /****************************************************************************/
 
-READ8_MEMBER(markham_state::banbam_protection_r)
+uint8_t markham_state::banbam_protection_r()
 {
 	const uint8_t *prot_rom = (const uint8_t *)memregion("mcu_rom")->base();
 
@@ -155,7 +155,7 @@ READ8_MEMBER(markham_state::banbam_protection_r)
 	return comm | arg;
 }
 
-WRITE8_MEMBER(markham_state::banbam_protection_w)
+void markham_state::banbam_protection_w(uint8_t data)
 {
 	if (m_packet_write_pos)
 	{
@@ -176,7 +176,7 @@ WRITE8_MEMBER(markham_state::banbam_protection_w)
 	logerror("packet buffer is: %02x %02x, status: %s \n", m_packet_buffer[0], m_packet_buffer[1], m_packet_reset ? "reset" : "active" );
 }
 
-WRITE8_MEMBER(markham_state::mcu_reset_w)
+void markham_state::mcu_reset_w(uint8_t data)
 {
 	// clear or assert?
 	logerror("reset = %02x \n", data);

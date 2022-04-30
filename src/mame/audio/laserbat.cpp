@@ -11,22 +11,22 @@
 #include "includes/laserbat.h"
 
 
-READ8_MEMBER(laserbat_state_base::rhsc_r)
+uint8_t laserbat_state_base::rhsc_r()
 {
 	return m_rhsc;
 }
 
-WRITE8_MEMBER(laserbat_state_base::whsc_w)
+void laserbat_state_base::whsc_w(uint8_t data)
 {
 	m_whsc = data;
 }
 
-WRITE8_MEMBER(laserbat_state_base::csound1_w)
+void laserbat_state_base::csound1_w(uint8_t data)
 {
 	m_csound1 = data;
 }
 
-WRITE8_MEMBER(laserbat_state_base::csound2_w)
+void laserbat_state_base::csound2_w(uint8_t data)
 {
 	m_csound2 = data;
 }
@@ -127,10 +127,10 @@ WRITE8_MEMBER(laserbat_state_base::csound2_w)
 
 */
 
-WRITE8_MEMBER(laserbat_state::csound2_w)
+void laserbat_state::csound2_w(uint8_t data)
 {
 	// there are a bunch of edge-triggered things, so grab changes
-	unsigned const diff = data ^ m_csound2;
+	uint8_t const diff = data ^ m_csound2;
 
 	// SN76477 and distortion control
 	if (data & diff & 0x01)
@@ -233,7 +233,7 @@ WRITE8_MEMBER(laserbat_state::csound2_w)
     circuitry.  Unfortunately we lack a schematic, so all knowledge of
     this board is based on tracing the sound program, examining PCB
     photos and cross-referencing with the schematic for the 1B11142
-    schematic.
+    board.
 
     The 6821 PIA is mapped at addresses $005C..$005F.  The known PIA
     signal assignments are as follows:
@@ -307,20 +307,20 @@ WRITE8_MEMBER(laserbat_state::csound2_w)
     it isn't routed anywhere.
 */
 
-WRITE8_MEMBER(catnmous_state::csound1_w)
+void catnmous_state::csound1_w(uint8_t data)
 {
-	m_audiopcb->sound_w(space, offset, data);
+	m_audiopcb->sound_w(data);
 
 	m_csound1 = data;
 }
 
-WRITE8_MEMBER(catnmous_state::csound2_w)
+void catnmous_state::csound2_w(uint8_t data)
 {
 	// the bottom bit is used for sprite banking, of all things
-	m_gfx2 = memregion("gfx2")->base() + ((data & 0x01) ? 0x0800 : 0x0000);
+	m_gfx2_base = uint16_t(BIT(data, 0)) << 11;
 
 	// the top bit is called RESET on the wiring diagram
-	m_audiopcb->reset_w((data & 0x80) ? 1 : 0);
+	m_audiopcb->reset_w(BIT(data, 7));
 
 	m_csound2 = data;
 }

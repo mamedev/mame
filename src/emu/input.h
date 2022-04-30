@@ -31,13 +31,6 @@
 //  CONSTANTS
 //**************************************************************************
 
-// relative devices return ~512 units per onscreen pixel
-constexpr s32 INPUT_RELATIVE_PER_PIXEL = 512;
-
-// absolute devices return values between -65536 and +65536
-constexpr s32 INPUT_ABSOLUTE_MIN = -65536;
-constexpr s32 INPUT_ABSOLUTE_MAX = 65536;
-
 // maximum number of axis/buttons/hats with ITEM_IDs for use by osd layer
 constexpr int INPUT_MAX_AXIS = 8;
 constexpr int INPUT_MAX_BUTTONS = 32;
@@ -82,6 +75,7 @@ enum input_item_class
 enum input_item_modifier
 {
 	ITEM_MODIFIER_NONE,
+	ITEM_MODIFIER_REVERSE,
 	ITEM_MODIFIER_POS,
 	ITEM_MODIFIER_NEG,
 	ITEM_MODIFIER_LEFT,
@@ -357,9 +351,6 @@ DECLARE_ENUM_INCDEC_OPERATORS(input_item_id)
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// controller alias table typedef
-typedef std::map<std::string, std::string> devicemap_table_type;
-
 // ======================> input_code
 
 // a combined code that describes a particular input on a particular device
@@ -386,6 +377,7 @@ public:
 	// operators
 	constexpr bool operator==(const input_code &rhs) const noexcept { return m_internal == rhs.m_internal; }
 	constexpr bool operator!=(const input_code &rhs) const noexcept { return m_internal != rhs.m_internal; }
+	constexpr bool operator<(const input_code &rhs) const noexcept { return m_internal < rhs.m_internal; }
 
 	// getters
 	constexpr bool internal() const noexcept { return device_class() == DEVICE_CLASS_INTERNAL; }
@@ -499,6 +491,9 @@ private:
 class input_manager
 {
 public:
+	// controller alias table typedef
+	using devicemap_table = std::map<std::string, std::string>;
+
 	// construction/destruction
 	input_manager(running_machine &machine);
 	~input_manager();
@@ -512,19 +507,13 @@ public:
 	bool code_pressed(input_code code) { return code_value(code) != 0; }
 	bool code_pressed_once(input_code code);
 
-	// input code polling
-	void reset_polling();
-	input_code poll_axes();
-	input_code poll_switches();
-	input_code poll_keyboard_switches();
-
 	// input code helpers
 	input_device *device_from_code(input_code code) const;
 	input_device_item *item_from_code(input_code code) const;
 	input_code code_from_itemid(input_item_id itemid) const;
 	std::string code_name(input_code code) const;
 	std::string code_to_token(input_code code) const;
-	input_code code_from_token(const char *_token);
+	input_code code_from_token(std::string_view _token);
 	const char *standard_token(input_item_id itemid) const;
 
 	// input sequence readers
@@ -535,15 +524,14 @@ public:
 	input_seq seq_clean(const input_seq &seq) const;
 	std::string seq_name(const input_seq &seq) const;
 	std::string seq_to_tokens(const input_seq &seq) const;
-	void seq_from_tokens(input_seq &seq, const char *_token);
+	void seq_from_tokens(input_seq &seq, std::string_view _token);
 
 	// misc
-	bool map_device_to_controller(const devicemap_table_type *devicemap_table = nullptr);
+	bool map_device_to_controller(const devicemap_table &table);
 
 private:
 	// internal helpers
 	void reset_memory();
-	bool code_check_axis(input_device_item &item, input_code code);
 
 	// internal state
 	running_machine &   m_machine;

@@ -96,7 +96,7 @@ Stephh's Notes:
  *
  *************************************/
 
-READ8_MEMBER(jack_state::timer_r)
+uint8_t jack_state::timer_r()
 {
 	/* wrong! there should be no need for timer_rate, the same function */
 	/* should work for both games */
@@ -112,7 +112,7 @@ IRQ_CALLBACK_MEMBER(jack_state::jack_sh_irq_ack)
 
 /***************************************************************/
 
-READ8_MEMBER(jack_state::striv_question_r)
+uint8_t jack_state::striv_question_r(offs_t offset)
 {
 	// Set-up the remap table for every 16 bytes
 	if ((offset & 0xc00) == 0x800)
@@ -146,7 +146,7 @@ READ8_MEMBER(jack_state::striv_question_r)
 }
 
 
-WRITE8_MEMBER(jack_state::joinem_control_w)
+void jack_state::joinem_control_w(uint8_t data)
 {
 	// d0: related to test mode?
 	// d1: unused?
@@ -710,7 +710,7 @@ static INPUT_PORTS_START( joinem )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!5")
-	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:!6")
 	PORT_DIPSETTING(    0x00, "Every 30000" )
@@ -904,7 +904,7 @@ MACHINE_START_MEMBER(jack_state,joinem)
 
 MACHINE_RESET_MEMBER(jack_state,joinem)
 {
-	joinem_control_w(m_maincpu->space(AS_PROGRAM), 0, 0, 0xff);
+	joinem_control_w(0);
 }
 
 
@@ -912,22 +912,21 @@ MACHINE_RESET_MEMBER(jack_state,joinem)
 
 void jack_state::jack(machine_config &config)
 {
+	constexpr XTAL MASTER_XTAL = 18_MHz_XTAL; // labeled "18MHz" in the schematics, but might this really be 18.432 (like Galaxian, etc.)?
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(18'000'000)/6);
+	Z80(config, m_maincpu, MASTER_XTAL / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jack_state::jack_map);
 	m_maincpu->set_vblank_int("screen", FUNC(jack_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, XTAL(18'000'000)/6);
+	Z80(config, m_audiocpu, MASTER_XTAL / 6);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &jack_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &jack_state::sound_io_map);
 	m_audiocpu->set_irq_acknowledge_callback(FUNC(jack_state::jack_sh_irq_ack));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_raw(MASTER_XTAL / 3, 384, 0, 256, 264, 16, 240);
 	screen.set_screen_update(FUNC(jack_state::screen_update_jack));
 	screen.set_palette(m_palette);
 
@@ -940,7 +939,7 @@ void jack_state::jack(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0, ASSERT_LINE);
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(18'000'000)/12));
+	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_XTAL / 12));
 	aysnd.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 	aysnd.port_b_read_callback().set(FUNC(jack_state::timer_r));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);

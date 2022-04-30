@@ -88,7 +88,7 @@ void pandoras_state::pandoras_palette(palette_device &palette) const
 TILE_GET_INFO_MEMBER(pandoras_state::get_tile_info0)
 {
 	uint8_t attr = m_colorram[tile_index];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			m_videoram[tile_index] + ((attr & 0x10) << 4),
 			attr & 0x0f,
 			TILE_FLIPYX((attr & 0xc0) >> 6));
@@ -114,19 +114,19 @@ void pandoras_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(pandoras_state::pandoras_vram_w)
+void pandoras_state::pandoras_vram_w(offs_t offset, uint8_t data)
 {
 	m_layer0->mark_tile_dirty(offset);
 	m_videoram[offset] = data;
 }
 
-WRITE8_MEMBER(pandoras_state::pandoras_cram_w)
+void pandoras_state::pandoras_cram_w(offs_t offset, uint8_t data)
 {
 	m_layer0->mark_tile_dirty(offset);
 	m_colorram[offset] = data;
 }
 
-WRITE8_MEMBER(pandoras_state::pandoras_scrolly_w)
+void pandoras_state::pandoras_scrolly_w(uint8_t data)
 {
 	m_layer0->set_scrolly(0, data);
 }

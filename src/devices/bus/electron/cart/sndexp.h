@@ -38,7 +38,7 @@ protected:
 
 private:
 	required_device<sn76489_device> m_sn;
-	required_ioport m_jumper;
+	required_ioport m_link;
 
 	uint8_t m_sound_latch;
 	uint8_t m_sound_enable;

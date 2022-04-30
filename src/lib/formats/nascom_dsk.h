@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Dirk Best
 /***************************************************************************
 
@@ -27,6 +27,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_NASCOM_FORMAT;
+extern const nascom_format FLOPPY_NASCOM_FORMAT;
 
 #endif // MAME_FORMATS_NASCOM_DSK_H

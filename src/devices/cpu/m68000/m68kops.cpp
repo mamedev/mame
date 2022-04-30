@@ -11402,7 +11402,7 @@ void m68000_base_device::x0c80_cmpi_l_071234fc()
 	u32 res = dst - src;
 
 	if (!m_cmpild_instr_callback.isnull())
-		(m_cmpild_instr_callback)(*m_program, m_ir & 7, src, 0xffffffff);
+		(m_cmpild_instr_callback)(m_ir & 7, src);
 
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = MASK_OUT_ABOVE_32(res);
@@ -20216,6 +20216,7 @@ void m68000_base_device::x4e7b_movec_l_4()
 			{
 				m_pmmu_enabled = 0;
 			}
+			m_instruction_restart = m_pmmu_enabled || m_emmu_enabled;
 			break;
 		case 0x004:         /* ITT0 */
 			m_mmu_itt0 = REG_DA()[(word2 >> 12) & 15];
@@ -26542,10 +26543,36 @@ void m68000_base_device::x4e73_rte_l_71()
 			m_instr_mode = INSTRUCTION_YES;
 			m_run_mode = RUN_MODE_NORMAL;
 		} else {
-			m_instr_mode = INSTRUCTION_YES;
-			m_run_mode = RUN_MODE_NORMAL;
-			/* Not handling bus fault (9) */
-			m68ki_exception_format_error();
+			if (format_word == 0x8) /* 68010 - type 1000 stack frame */
+			{
+				new_sr = m68ki_pull_16();
+				new_pc = m68ki_pull_32();
+				m68ki_fake_pull_16();  /* format word */
+				m68ki_fake_pull_16();  /* special status word */
+				m68ki_fake_pull_32();  /* fault address */
+				m68ki_fake_pull_32();  /* reserved and data output buffer */
+				m68ki_fake_pull_32();  /* reserved and data input buffer */
+				m68ki_fake_pull_32();  /* reserved and instruction input buffer */
+				m68ki_fake_pull_32();  /* 8 dwords of CPU specific undocumented data */
+				m68ki_fake_pull_32();
+				m68ki_fake_pull_32();
+				m68ki_fake_pull_32();
+				m68ki_fake_pull_32();
+				m68ki_fake_pull_32();
+				m68ki_fake_pull_32();
+				m68ki_fake_pull_32();
+				m68ki_jump(new_pc);
+				m68ki_set_sr(new_sr);
+				m_instr_mode = INSTRUCTION_YES;
+				m_run_mode = RUN_MODE_NORMAL;
+			}
+			else
+			{
+				m_instr_mode = INSTRUCTION_YES;
+				m_run_mode = RUN_MODE_NORMAL;
+				/* Not handling bus fault (9) */
+				m68ki_exception_format_error();
+			}
 		}
 	} else {
 		m68ki_exception_privilege_violation();
@@ -30141,7 +30168,7 @@ void m68000_base_device::x4ad0_tas_b_ai_071234fc()
 	   In particular, the Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS
 	   to fail to write back in order to function properly. */
 	if (CPU_TYPE_IS_010_LESS() && !m_tas_write_callback.isnull())
-		(m_tas_write_callback)(*m_program, ea, dst | 0x80, 0xff);
+		(m_tas_write_callback)(ea, dst | 0x80);
 	else
 		m68ki_write_8(ea, dst | 0x80);
 
@@ -30163,7 +30190,7 @@ void m68000_base_device::x4ad8_tas_b_pi_071234fc()
 	   In particular, the Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS
 	   to fail to write back in order to function properly. */
 	if (CPU_TYPE_IS_010_LESS() && !m_tas_write_callback.isnull())
-		(m_tas_write_callback)(*m_program, ea, dst | 0x80, 0xff);
+		(m_tas_write_callback)(ea, dst | 0x80);
 	else
 		m68ki_write_8(ea, dst | 0x80);
 
@@ -30185,7 +30212,7 @@ void m68000_base_device::x4adf_tas_b_pi7_071234fc()
 	   In particular, the Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS
 	   to fail to write back in order to function properly. */
 	if (CPU_TYPE_IS_010_LESS() && !m_tas_write_callback.isnull())
-		(m_tas_write_callback)(*m_program, ea, dst | 0x80, 0xff);
+		(m_tas_write_callback)(ea, dst | 0x80);
 	else
 		m68ki_write_8(ea, dst | 0x80);
 
@@ -30207,7 +30234,7 @@ void m68000_base_device::x4ae0_tas_b_pd_071234fc()
 	   In particular, the Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS
 	   to fail to write back in order to function properly. */
 	if (CPU_TYPE_IS_010_LESS() && !m_tas_write_callback.isnull())
-		(m_tas_write_callback)(*m_program, ea, dst | 0x80, 0xff);
+		(m_tas_write_callback)(ea, dst | 0x80);
 	else
 		m68ki_write_8(ea, dst | 0x80);
 
@@ -30229,7 +30256,7 @@ void m68000_base_device::x4ae7_tas_b_pd7_071234fc()
 	   In particular, the Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS
 	   to fail to write back in order to function properly. */
 	if (CPU_TYPE_IS_010_LESS() && !m_tas_write_callback.isnull())
-		(m_tas_write_callback)(*m_program, ea, dst | 0x80, 0xff);
+		(m_tas_write_callback)(ea, dst | 0x80);
 	else
 		m68ki_write_8(ea, dst | 0x80);
 
@@ -30251,7 +30278,7 @@ void m68000_base_device::x4ae8_tas_b_di_071234fc()
 	   In particular, the Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS
 	   to fail to write back in order to function properly. */
 	if (CPU_TYPE_IS_010_LESS() && !m_tas_write_callback.isnull())
-		(m_tas_write_callback)(*m_program, ea, dst | 0x80, 0xff);
+		(m_tas_write_callback)(ea, dst | 0x80);
 	else
 		m68ki_write_8(ea, dst | 0x80);
 
@@ -30273,7 +30300,7 @@ void m68000_base_device::x4af0_tas_b_ix_071234fc()
 	   In particular, the Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS
 	   to fail to write back in order to function properly. */
 	if (CPU_TYPE_IS_010_LESS() && !m_tas_write_callback.isnull())
-		(m_tas_write_callback)(*m_program, ea, dst | 0x80, 0xff);
+		(m_tas_write_callback)(ea, dst | 0x80);
 	else
 		m68ki_write_8(ea, dst | 0x80);
 
@@ -30295,7 +30322,7 @@ void m68000_base_device::x4af8_tas_b_aw_071234fc()
 	   In particular, the Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS
 	   to fail to write back in order to function properly. */
 	if (CPU_TYPE_IS_010_LESS() && !m_tas_write_callback.isnull())
-		(m_tas_write_callback)(*m_program, ea, dst | 0x80, 0xff);
+		(m_tas_write_callback)(ea, dst | 0x80);
 	else
 		m68ki_write_8(ea, dst | 0x80);
 
@@ -30317,7 +30344,7 @@ void m68000_base_device::x4af9_tas_b_al_071234fc()
 	   In particular, the Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS
 	   to fail to write back in order to function properly. */
 	if (CPU_TYPE_IS_010_LESS() && !m_tas_write_callback.isnull())
-		(m_tas_write_callback)(*m_program, ea, dst | 0x80, 0xff);
+		(m_tas_write_callback)(ea, dst | 0x80);
 	else
 		m68ki_write_8(ea, dst | 0x80);
 
@@ -30338,12 +30365,14 @@ void m68000_base_device::x50fc_trapt_234fc()
 }
 void m68000_base_device::x50fa_trapt_w_234fc()
 {
+	m_pc += 2; // increase before else stackframe & return addresses are incorrect
 	m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
 
 
 }
 void m68000_base_device::x50fb_trapt_l_234fc()
 {
+	m_pc += 4; // increase before else stackframe & return addresses are incorrect
 	m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
 
 
@@ -30465,280 +30494,252 @@ void m68000_base_device::x5ffc_traple_234fc()
 }
 void m68000_base_device::x52fa_traphi_w_234fc()
 {
+	m_pc += 2;    /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_HI()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 2;
 	}
 
 
 }
 void m68000_base_device::x53fa_trapls_w_234fc()
 {
+	m_pc += 2;    /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_LS()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 2;
 	}
 
 
 }
 void m68000_base_device::x54fa_trapcc_w_234fc()
 {
+	m_pc += 2;    /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_CC()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 2;
 	}
 
 
 }
 void m68000_base_device::x55fa_trapcs_w_234fc()
 {
+	m_pc += 2;    /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_CS()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 2;
 	}
 
 
 }
 void m68000_base_device::x56fa_trapne_w_234fc()
 {
+	m_pc += 2;    /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_NE()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 2;
 	}
 
 
 }
 void m68000_base_device::x57fa_trapeq_w_234fc()
 {
+	m_pc += 2;    /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_EQ()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 2;
 	}
 
 
 }
 void m68000_base_device::x58fa_trapvc_w_234fc()
 {
+	m_pc += 2;    /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_VC()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 2;
 	}
 
 
 }
 void m68000_base_device::x59fa_trapvs_w_234fc()
 {
+	m_pc += 2;    /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_VS()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 2;
 	}
 
 
 }
 void m68000_base_device::x5afa_trappl_w_234fc()
 {
+	m_pc += 2;    /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_PL()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 2;
 	}
 
 
 }
 void m68000_base_device::x5bfa_trapmi_w_234fc()
 {
+	m_pc += 2;    /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_MI()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 2;
 	}
 
 
 }
 void m68000_base_device::x5cfa_trapge_w_234fc()
 {
+	m_pc += 2;    /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_GE()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 2;
 	}
 
 
 }
 void m68000_base_device::x5dfa_traplt_w_234fc()
 {
+	m_pc += 2;    /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_LT()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 2;
 	}
 
 
 }
 void m68000_base_device::x5efa_trapgt_w_234fc()
 {
+	m_pc += 2;    /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_GT()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 2;
 	}
 
 
 }
 void m68000_base_device::x5ffa_traple_w_234fc()
 {
+	m_pc += 2;    /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_LE()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 2;
 	}
 
 
 }
 void m68000_base_device::x52fb_traphi_l_234fc()
 {
+	m_pc += 4;  /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_HI()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 4;
 	}
 
 
 }
 void m68000_base_device::x53fb_trapls_l_234fc()
 {
+	m_pc += 4;  /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_LS()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 4;
 	}
 
 
 }
 void m68000_base_device::x54fb_trapcc_l_234fc()
 {
+	m_pc += 4;  /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_CC()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 4;
 	}
 
 
 }
 void m68000_base_device::x55fb_trapcs_l_234fc()
 {
+	m_pc += 4;  /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_CS()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 4;
 	}
 
 
 }
 void m68000_base_device::x56fb_trapne_l_234fc()
 {
+	m_pc += 4;  /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_NE()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 4;
 	}
 
 
 }
 void m68000_base_device::x57fb_trapeq_l_234fc()
 {
+	m_pc += 4;  /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_EQ()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 4;
 	}
 
 
 }
 void m68000_base_device::x58fb_trapvc_l_234fc()
 {
+	m_pc += 4;  /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_VC()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 4;
 	}
 
 
 }
 void m68000_base_device::x59fb_trapvs_l_234fc()
 {
+	m_pc += 4;  /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_VS()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 4;
 	}
 
 
 }
 void m68000_base_device::x5afb_trappl_l_234fc()
 {
+	m_pc += 4;  /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_PL()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 4;
 	}
 
 
 }
 void m68000_base_device::x5bfb_trapmi_l_234fc()
 {
+	m_pc += 4;  /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_MI()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 4;
 	}
 
 
 }
 void m68000_base_device::x5cfb_trapge_l_234fc()
 {
+	m_pc += 4;  /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_GE()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 4;
 	}
 
 
 }
 void m68000_base_device::x5dfb_traplt_l_234fc()
 {
+	m_pc += 4;  /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_LT()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 4;
 	}
 
 
 }
 void m68000_base_device::x5efb_trapgt_l_234fc()
 {
+	m_pc += 4;  /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_GT()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 4;
 	}
 
 
 }
 void m68000_base_device::x5ffb_traple_l_234fc()
 {
+	m_pc += 4;  /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(COND_LE()) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 4;
 	}
 
 
@@ -34679,105 +34680,105 @@ const m68000_base_device::opcode_handler_struct m68000_base_device::m68k_opcode_
 	{ 0x50e8, 0xfff8, { 16,  22,  16,  11,  11,  11,  11,   6}},
 	{ 0x50f0, 0xfff8, { 18,  24,  18,  13,  13,  13,  13,   6}},
 	{ 0x51c0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x51c8, 0xfff8, { 12,  14,  12,   6,   4,   4,   4,   4}},
+	{ 0x51c8, 0xfff8, { 12,  14,  10,   6,   4,   4,   4,   4}},
 	{ 0x51d0, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x51d8, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x51e0, 0xfff8, { 14,  20,  14,  11,  11,  11,  11,   6}},
 	{ 0x51e8, 0xfff8, { 16,  22,  16,  11,  11,  11,  11,   6}},
 	{ 0x51f0, 0xfff8, { 18,  24,  18,  13,  13,  13,  13,   6}},
 	{ 0x52c0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x52c8, 0xfff8, { 12,  14,  12,   6,   6,   6,   6,   6}},
+	{ 0x52c8, 0xfff8, { 12,  14,  10,   6,   6,   6,   6,   6}},
 	{ 0x52d0, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x52d8, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x52e0, 0xfff8, { 14,  20,  14,  11,  11,  11,  11,   6}},
 	{ 0x52e8, 0xfff8, { 16,  22,  16,  11,  11,  11,  11,   6}},
 	{ 0x52f0, 0xfff8, { 18,  24,  18,  13,  13,  13,  13,   6}},
 	{ 0x53c0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x53c8, 0xfff8, { 12,  14,  12,   6,   6,   6,   6,   6}},
+	{ 0x53c8, 0xfff8, { 12,  14,  10,   6,   6,   6,   6,   6}},
 	{ 0x53d0, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x53d8, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x53e0, 0xfff8, { 14,  20,  14,  11,  11,  11,  11,   6}},
 	{ 0x53e8, 0xfff8, { 16,  22,  16,  11,  11,  11,  11,   6}},
 	{ 0x53f0, 0xfff8, { 18,  24,  18,  13,  13,  13,  13,   6}},
 	{ 0x54c0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x54c8, 0xfff8, { 12,  14,  12,   6,   6,   6,   6,   6}},
+	{ 0x54c8, 0xfff8, { 12,  14,  10,   6,   6,   6,   6,   6}},
 	{ 0x54d0, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x54d8, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x54e0, 0xfff8, { 14,  20,  14,  11,  11,  11,  11,   6}},
 	{ 0x54e8, 0xfff8, { 16,  22,  16,  11,  11,  11,  11,   6}},
 	{ 0x54f0, 0xfff8, { 18,  24,  18,  13,  13,  13,  13,   6}},
 	{ 0x55c0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x55c8, 0xfff8, { 12,  14,  12,   6,   6,   6,   6,   6}},
+	{ 0x55c8, 0xfff8, { 12,  14,  10,   6,   6,   6,   6,   6}},
 	{ 0x55d0, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x55d8, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x55e0, 0xfff8, { 14,  20,  14,  11,  11,  11,  11,   6}},
 	{ 0x55e8, 0xfff8, { 16,  22,  16,  11,  11,  11,  11,   6}},
 	{ 0x55f0, 0xfff8, { 18,  24,  18,  13,  13,  13,  13,   6}},
 	{ 0x56c0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x56c8, 0xfff8, { 12,  14,  12,   6,   6,   6,   6,   6}},
+	{ 0x56c8, 0xfff8, { 12,  14,  10,   6,   6,   6,   6,   6}},
 	{ 0x56d0, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x56d8, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x56e0, 0xfff8, { 14,  20,  14,  11,  11,  11,  11,   6}},
 	{ 0x56e8, 0xfff8, { 16,  22,  16,  11,  11,  11,  11,   6}},
 	{ 0x56f0, 0xfff8, { 18,  24,  18,  13,  13,  13,  13,   6}},
 	{ 0x57c0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x57c8, 0xfff8, { 12,  14,  12,   6,   6,   6,   6,   6}},
+	{ 0x57c8, 0xfff8, { 12,  14,  10,   6,   6,   6,   6,   6}},
 	{ 0x57d0, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x57d8, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x57e0, 0xfff8, { 14,  20,  14,  11,  11,  11,  11,   6}},
 	{ 0x57e8, 0xfff8, { 16,  22,  16,  11,  11,  11,  11,   6}},
 	{ 0x57f0, 0xfff8, { 18,  24,  18,  13,  13,  13,  13,   6}},
 	{ 0x58c0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x58c8, 0xfff8, { 12,  14,  12,   6,   6,   6,   6,   6}},
+	{ 0x58c8, 0xfff8, { 12,  14,  10,   6,   6,   6,   6,   6}},
 	{ 0x58d0, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x58d8, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x58e0, 0xfff8, { 14,  20,  14,  11,  11,  11,  11,   6}},
 	{ 0x58e8, 0xfff8, { 16,  22,  16,  11,  11,  11,  11,   6}},
 	{ 0x58f0, 0xfff8, { 18,  24,  18,  13,  13,  13,  13,   6}},
 	{ 0x59c0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x59c8, 0xfff8, { 12,  14,  12,   6,   6,   6,   6,   6}},
+	{ 0x59c8, 0xfff8, { 12,  14,  10,   6,   6,   6,   6,   6}},
 	{ 0x59d0, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x59d8, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x59e0, 0xfff8, { 14,  20,  14,  11,  11,  11,  11,   6}},
 	{ 0x59e8, 0xfff8, { 16,  22,  16,  11,  11,  11,  11,   6}},
 	{ 0x59f0, 0xfff8, { 18,  24,  18,  13,  13,  13,  13,   6}},
 	{ 0x5ac0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x5ac8, 0xfff8, { 12,  14,  12,   6,   6,   6,   6,   6}},
+	{ 0x5ac8, 0xfff8, { 12,  14,  10,   6,   6,   6,   6,   6}},
 	{ 0x5ad0, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x5ad8, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x5ae0, 0xfff8, { 14,  20,  14,  11,  11,  11,  11,   6}},
 	{ 0x5ae8, 0xfff8, { 16,  22,  16,  11,  11,  11,  11,   6}},
 	{ 0x5af0, 0xfff8, { 18,  24,  18,  13,  13,  13,  13,   6}},
 	{ 0x5bc0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x5bc8, 0xfff8, { 12,  14,  12,   6,   6,   6,   6,   6}},
+	{ 0x5bc8, 0xfff8, { 12,  14,  10,   6,   6,   6,   6,   6}},
 	{ 0x5bd0, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x5bd8, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x5be0, 0xfff8, { 14,  20,  14,  11,  11,  11,  11,   6}},
 	{ 0x5be8, 0xfff8, { 16,  22,  16,  11,  11,  11,  11,   6}},
 	{ 0x5bf0, 0xfff8, { 18,  24,  18,  13,  13,  13,  13,   6}},
 	{ 0x5cc0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x5cc8, 0xfff8, { 12,  14,  12,   6,   6,   6,   6,   6}},
+	{ 0x5cc8, 0xfff8, { 12,  14,  10,   6,   6,   6,   6,   6}},
 	{ 0x5cd0, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x5cd8, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x5ce0, 0xfff8, { 14,  20,  14,  11,  11,  11,  11,   6}},
 	{ 0x5ce8, 0xfff8, { 16,  22,  16,  11,  11,  11,  11,   6}},
 	{ 0x5cf0, 0xfff8, { 18,  24,  18,  13,  13,  13,  13,   6}},
 	{ 0x5dc0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x5dc8, 0xfff8, { 12,  14,  12,   6,   6,   6,   6,   6}},
+	{ 0x5dc8, 0xfff8, { 12,  14,  10,   6,   6,   6,   6,   6}},
 	{ 0x5dd0, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x5dd8, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x5de0, 0xfff8, { 14,  20,  14,  11,  11,  11,  11,   6}},
 	{ 0x5de8, 0xfff8, { 16,  22,  16,  11,  11,  11,  11,   6}},
 	{ 0x5df0, 0xfff8, { 18,  24,  18,  13,  13,  13,  13,   6}},
 	{ 0x5ec0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x5ec8, 0xfff8, { 12,  14,  12,   6,   6,   6,   6,   6}},
+	{ 0x5ec8, 0xfff8, { 12,  14,  10,   6,   6,   6,   6,   6}},
 	{ 0x5ed0, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x5ed8, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x5ee0, 0xfff8, { 14,  20,  14,  11,  11,  11,  11,   6}},
 	{ 0x5ee8, 0xfff8, { 16,  22,  16,  11,  11,  11,  11,   6}},
 	{ 0x5ef0, 0xfff8, { 18,  24,  18,  13,  13,  13,  13,   6}},
 	{ 0x5fc0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x5fc8, 0xfff8, { 12,  14,  12,   6,   6,   6,   6,   6}},
+	{ 0x5fc8, 0xfff8, { 12,  14,  10,   6,   6,   6,   6,   6}},
 	{ 0x5fd0, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x5fd8, 0xfff8, { 12,  18,  12,  10,  10,  10,  10,   6}},
 	{ 0x5fe0, 0xfff8, { 14,  20,  14,  11,  11,  11,  11,   6}},

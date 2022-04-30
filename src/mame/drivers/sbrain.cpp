@@ -50,6 +50,7 @@ To Do:
 #include "sound/beep.h"
 #include "video/dp8350.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include <algorithm>
 
@@ -79,6 +80,7 @@ public:
 	}
 
 	void sbrain(machine_config &config);
+	void sagafox(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -111,19 +113,19 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(external_rxc_w);
 	DECLARE_WRITE_LINE_MEMBER(internal_txc_rxc_w);
 
-	void sbrain_io(address_map &map);
-	void sbrain_mem(address_map &map);
-	void sbrain_subio(address_map &map);
-	void sbrain_submem(address_map &map);
+	void main_io_map(address_map &map);
+	void main_mem_map(address_map &map);
+	void sub_io_map(address_map &map);
+	void sub_mem_map(address_map &map);
 
-	bool m_busak;
-	u8 m_keydown;
-	u8 m_porta;
-	u8 m_portb;
-	u8 m_portc;
-	u8 m_port10;
-	u8 m_key_data;
-	u8 m_framecnt;
+	bool m_busak = false;
+	u8 m_keydown = 0U;
+	u8 m_porta = 0U;
+	u8 m_portb = 0U;
+	u8 m_portc = 0U;
+	u8 m_port10 = 0U;
+	u8 m_key_data = 0U;
+	u8 m_framecnt = 0U;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -144,12 +146,12 @@ private:
 	required_ioport m_serial_sw;
 };
 
-void sbrain_state::sbrain_mem(address_map &map)
+void sbrain_state::main_mem_map(address_map &map)
 {
 	map(0x0000, 0xffff).rw(FUNC(sbrain_state::mem_r), FUNC(sbrain_state::mem_w));
 }
 
-void sbrain_state::sbrain_io(address_map &map)
+void sbrain_state::main_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x40, 0x41).mirror(6).rw(m_usart[0], FUNC(i8251_device::read), FUNC(i8251_device::write));
@@ -160,13 +162,13 @@ void sbrain_state::sbrain_io(address_map &map)
 	map(0x68, 0x6b).mirror(4).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
-void sbrain_state::sbrain_submem(address_map &map)
+void sbrain_state::sub_mem_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0xf000).rom().region("subcpu", 0);
 	map(0x8800, 0x8bff).mirror(0x7400).ram().share("buffer");
 }
 
-void sbrain_state::sbrain_subio(address_map &map)
+void sbrain_state::sub_io_map(address_map &map)
 {
 	map.global_mask(0x1f);
 	map(0x08, 0x0b).mirror(4).rw(m_fdc, FUNC(fd1791_device::read), FUNC(fd1791_device::write));
@@ -585,6 +587,15 @@ void sbrain_state::machine_start()
 	std::fill_n(m_ram->pointer(), m_ram->size(), 0x00);
 
 	m_usart[0]->write_cts(0);
+
+	save_item(NAME(m_busak));
+	save_item(NAME(m_keydown));
+	save_item(NAME(m_porta));
+	save_item(NAME(m_portb));
+	save_item(NAME(m_portc));
+	save_item(NAME(m_port10));
+	save_item(NAME(m_key_data));
+	save_item(NAME(m_framecnt));
 }
 
 static void sbrain_floppies(device_slot_interface &device)
@@ -615,8 +626,7 @@ u32 sbrain_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 		return 0;
 	}
 
-	u8 y,ra,chr,gfx;
-	uint16_t sy=0,x;
+	uint16_t sy=0;
 
 	// Where attributes come from:
 	// - Most systems use ram for character-based attributes, but this one uses strictly hardware which would seem cumbersome
@@ -630,18 +640,18 @@ u32 sbrain_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 	uint16_t ma = m_crtc->top_of_page();
 	uint16_t cr = m_crtc->cursor_address();
 	uint8_t *videoram = &m_ram->pointer()[m_ram->size() - 0x800];
-	for (y = 0; y < 24; y++)
+	for (uint8_t y = 0; y < 24; y++)
 	{
-		for (ra = 0; ra < 10; ra++)
+		for (uint8_t ra = 0; ra < 10; ra++)
 		{
-			uint32_t *p = &bitmap.pix32(sy++);
+			uint32_t *p = &bitmap.pix(sy++);
 
-			for (x = 0; x < 80; x++)
+			for (uint16_t x = 0; x < 80; x++)
 			{
-				gfx = 0;
+				uint8_t gfx = 0;
 				if (ra > 0)
 				{
-					chr = videoram[(x + ma) & 0x7ff];
+					uint8_t chr = videoram[(x + ma) & 0x7ff];
 
 					if (!BIT(chr, 7) || BIT(m_framecnt, 5))
 					{
@@ -674,12 +684,12 @@ void sbrain_state::sbrain(machine_config &config)
 {
 	// basic machine hardware
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &sbrain_state::sbrain_mem);
-	m_maincpu->set_addrmap(AS_IO, &sbrain_state::sbrain_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sbrain_state::main_mem_map);
+	m_maincpu->set_addrmap(AS_IO, &sbrain_state::main_io_map);
 
 	Z80(config, m_subcpu, 16_MHz_XTAL / 4);
-	m_subcpu->set_addrmap(AS_PROGRAM, &sbrain_state::sbrain_submem);
-	m_subcpu->set_addrmap(AS_IO, &sbrain_state::sbrain_subio);
+	m_subcpu->set_addrmap(AS_PROGRAM, &sbrain_state::sub_mem_map);
+	m_subcpu->set_addrmap(AS_IO, &sbrain_state::sub_io_map);
 
 	RAM(config, m_ram).set_default_size("64K").set_extra_options("32K");
 
@@ -734,12 +744,21 @@ void sbrain_state::sbrain(machine_config &config)
 	FD1791(config, m_fdc, 16_MHz_XTAL / 16);
 	m_fdc->set_force_ready(true);
 
-	FLOPPY_CONNECTOR(config, "fdc:0", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:2", sbrain_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:3", sbrain_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", sbrain_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", sbrain_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:2", sbrain_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:3", sbrain_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	TIMER(config, "timer_a", 0).configure_periodic(FUNC(sbrain_state::kbd_scan), attotime::from_hz(15));
+
+	SOFTWARE_LIST(config, "flop_list").set_original("sbrain");
+}
+
+void sbrain_state::sagafox(machine_config& config)
+{
+	sbrain(config);
+
+	subdevice<software_list_device>("flop_list")->set_original("sagafox");
 }
 
 ROM_START( sbrain )
@@ -759,4 +778,32 @@ ROM_START( sbrain )
 	ROM_LOAD("c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
 ROM_END
 
-COMP( 1981, sbrain, 0, 0, sbrain, sbrain, sbrain_state, empty_init, "Intertec Data Systems", "SuperBrain Video Computer System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+ROM_START( sagafox )
+	ROM_REGION( 0x0800, "subcpu", 0 )
+	ROM_LOAD("1b02.bin", 0x0000, 0x0800, CRC(1cd6e4d2) SHA1(585d2a52840804a3771077bcc77e249b28ea1602))
+
+	ROM_REGION( 0x0800, "chargen", 0 )
+	ROM_LOAD("1cg0.bin", 0x0000, 0x0800, CRC(508c56ef) SHA1(9ba2cceeb3b9f72503693372ae76f54d5919f024))
+
+	ROM_REGION( 0x0400, "keyboard", 0 ) // use with KR3600-PRO
+	ROM_LOAD("1kb1.bin", 0x0000, 0x0400, CRC(92b00014) SHA1(0669ecfc24bf010735a9c14791409e80390a01f7))
+ROM_END
+
+ROM_START( sagafoxf80 )
+	ROM_REGION( 0x0800, "subcpu", 0 )
+	ROM_LOAD("f80_6ms.bin", 0x0000, 0x0800, CRC(81ed0c24) SHA1(411fd7bbb85dfd8c793f0871041f64febf5571e0))
+
+	ROM_REGION( 0x0800, "chargen", 0 ) // minor differences to sagafox, most notable on '6', suffering from bitrot?
+	ROM_LOAD("1cg0.bin", 0x0000, 0x0800, CRC(fba860fc) SHA1(7cd467fe2c11861daf1ed5f9f002874eabe2a47a))
+
+	ROM_REGION( 0x0400, "keyboard", 0 ) // use with KR3600-PRO
+	ROM_LOAD("1kb1.bin", 0x0000, 0x0400, CRC(92b00014) SHA1(0669ecfc24bf010735a9c14791409e80390a01f7))
+
+	ROM_REGION( 0x0800, "oam", 0 ) // software protection module?
+	ROM_LOAD("oam120.bin", 0x0000, 0x0800, CRC(880a8e36) SHA1(c6bee88a294090f039161fe20ce36a4ada3b10d3))
+ROM_END
+
+//    YEAR  NAME        PARENT  COMPAT MACHINE   INPUT   CLASS         INIT        COMPANY                                FULLNAME                            FLAGS
+COMP( 1981, sbrain,     0,      0,     sbrain,   sbrain, sbrain_state, empty_init, "Intertec Data Systems",               "SuperBrain Video Computer System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, sagafox,    sbrain, 0,     sagafox,  sbrain, sbrain_state, empty_init, "Sistemi Avanzati Gestione Aziendale", "Saga Fox",                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, sagafoxf80, sbrain, 0,     sagafox,  sbrain, sbrain_state, empty_init, "Sistemi Avanzati Gestione Aziendale", "Saga Fox/F80",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

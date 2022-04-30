@@ -46,25 +46,25 @@ private:
 	virtual void machine_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(unk_r);
-	DECLARE_WRITE8_MEMBER(tc_w);
-	DECLARE_WRITE8_MEMBER(ctl_w);
+	uint8_t unk_r();
+	void tc_w(uint8_t data);
+	void ctl_w(uint8_t data);
 
 	void ax20_io(address_map &map);
 	void ax20_map(address_map &map);
 };
 
-READ8_MEMBER(ax20_state::unk_r)
+uint8_t ax20_state::unk_r()
 {
 	return 0;
 }
 
-WRITE8_MEMBER(ax20_state::tc_w)
+void ax20_state::tc_w(uint8_t data)
 {
 	m_fdc->tc_w((data & 0xf0) == 0xf0);
 }
 
-WRITE8_MEMBER(ax20_state::ctl_w)
+void ax20_state::ctl_w(uint8_t data)
 {
 	m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(!(data & 1));
 }

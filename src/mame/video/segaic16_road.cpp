@@ -91,7 +91,7 @@ static void segaic16_road_hangon_draw(segaic16_road_device::road_info *info, bit
 	/* loop over scanlines */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		u16 *dest = &bitmap.pix16(y);
+		u16 *const dest = &bitmap.pix(y);
 		const u16 control = roadram[0x000 + y];
 		int hpos = roadram[0x100 + (control & 0xff)];
 		const u16 color0 = roadram[0x200 + (control & 0xff)];
@@ -364,7 +364,7 @@ static void segaic16_road_outrun_draw(segaic16_road_device::road_info *info, bit
 //          { 0x80,0x81,0x81,0x83,0,0,0,0x00 },
 //          { 0x81,0x87,0x87,0x8f,0,0,0,0x00 }
 		};
-		u16 *dest = &bitmap.pix16(y);
+		u16 *const dest = &bitmap.pix(y);
 		const u16 data0 = roadram[0x000 + y];
 		const u16 data1 = roadram[0x100 + y];
 

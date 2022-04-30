@@ -10,6 +10,9 @@ Hardware notes:
 - 2*HLCD0569(also seen with 2*HLCD0601, functionally same?)
 - custom LCD screen with chess squares background
 
+It was also released in the USSR as Электроника ИМ-29 Шахматный партнёр,
+assumed to be an unlicensed clone.
+
 ******************************************************************************/
 
 #include "emu.h"
@@ -49,27 +52,23 @@ private:
 	required_ioport_array<4> m_inputs;
 	output_finder<2, 8, 22> m_out_x;
 
-	u8 m_inp_mux;
-	u8 m_lcd_control;
-
 	void update_reset(ioport_value state);
 
 	// I/O handlers
-	template<int Sel> DECLARE_WRITE32_MEMBER(lcd_output_w);
-	DECLARE_WRITE8_MEMBER(input_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(lcd_w);
-	DECLARE_READ8_MEMBER(lcd_r);
+	template<int Sel> void lcd_output_w(offs_t offset, u32 data);
+	void input_w(u8 data);
+	u8 input_r();
+	void lcd_w(u8 data);
+	u8 lcd_r();
+
+	u8 m_inp_mux = 0;
+	u8 m_lcd_control = 0;
 };
 
 void mchess_state::machine_start()
 {
 	// resolve handlers
 	m_out_x.resolve();
-
-	// zerofill
-	m_inp_mux = 0;
-	m_lcd_control = 0;
 
 	// register for savestates
 	save_item(NAME(m_inp_mux));
@@ -95,7 +94,7 @@ void mchess_state::update_reset(ioport_value state)
 ******************************************************************************/
 
 template<int Sel>
-WRITE32_MEMBER(mchess_state::lcd_output_w)
+void mchess_state::lcd_output_w(offs_t offset, u32 data)
 {
 	int enabled = ~m_inputs[3]->read() & m_lcd_control & 1;
 
@@ -105,13 +104,13 @@ WRITE32_MEMBER(mchess_state::lcd_output_w)
 		m_out_x[Sel][offset][i] = BIT(data, i) & enabled;
 }
 
-WRITE8_MEMBER(mchess_state::input_w)
+void mchess_state::input_w(u8 data)
 {
 	// d0,d5,d6: input mux
 	m_inp_mux = (~data >> 4 & 6) | (~data & 1);
 }
 
-READ8_MEMBER(mchess_state::input_r)
+u8 mchess_state::input_r()
 {
 	u8 data = 0;
 
@@ -123,7 +122,7 @@ READ8_MEMBER(mchess_state::input_r)
 	return ~data;
 }
 
-WRITE8_MEMBER(mchess_state::lcd_w)
+void mchess_state::lcd_w(u8 data)
 {
 	// d0: both LCDC VDRIVE
 	// d1: N/C
@@ -144,13 +143,13 @@ WRITE8_MEMBER(mchess_state::lcd_w)
 	m_lcd_control = data;
 }
 
-READ8_MEMBER(mchess_state::lcd_r)
+u8 mchess_state::lcd_r()
 {
 	// d2: 1st LCDC DATA OUT
 	// d7: 2nd LCDC DATA OUT
 	u8 r0 = m_lcd[0]->data_r();
 	u8 r1 = m_lcd[1]->data_r();
-	return (0x84^0xff) | r0 << 2 | r1 << 7;
+	return ~0x84 | r0 << 2 | r1 << 7;
 }
 
 
@@ -193,14 +192,14 @@ INPUT_PORTS_END
 
 void mchess_state::mchess(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	I8050(config, m_maincpu, 6_MHz_XTAL);
 	m_maincpu->p1_out_cb().set(FUNC(mchess_state::input_w));
 	m_maincpu->p1_in_cb().set(FUNC(mchess_state::input_r));
 	m_maincpu->p2_out_cb().set(FUNC(mchess_state::lcd_w));
 	m_maincpu->p2_in_cb().set(FUNC(mchess_state::lcd_r));
 
-	/* video hardware */
+	// video hardware
 	HLCD0569(config, m_lcd[0], 500); // C=0.01uF
 	m_lcd[0]->write_cols().set(FUNC(mchess_state::lcd_output_w<0>));
 	HLCD0569(config, m_lcd[1], 500); // C=0.01uF
@@ -225,7 +224,7 @@ ROM_START( mchess )
 	ROM_LOAD("ins8050-6hwu_n", 0x0000, 0x1000, CRC(de272323) SHA1(9ba323b614504e20b25c86d290c0667f0bbf6c6b) )
 
 	ROM_REGION( 796406, "screen", 0)
-	ROM_LOAD( "mchess.svg", 0, 796406, CRC(795d66e0) SHA1(5f786c00bf33793bfba7065d8e9ec476e02e5c46) )
+	ROM_LOAD("mchess.svg", 0, 796406, CRC(795d66e0) SHA1(5f786c00bf33793bfba7065d8e9ec476e02e5c46) )
 ROM_END
 
 } // anonymous namespace
@@ -237,4 +236,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME    PARENT CMP MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1980, mchess, 0,      0, mchess,  mchess, mchess_state, empty_init, "Mattel", "Computer Chess (Mattel)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, mchess, 0,      0, mchess,  mchess, mchess_state, empty_init, "Mattel Electronics", "Computer Chess (Mattel)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK )

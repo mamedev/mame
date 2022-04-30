@@ -23,8 +23,8 @@ public:
 	hp_1ma6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// Register read/write
-	DECLARE_WRITE8_MEMBER(reg_w);
-	DECLARE_READ8_MEMBER(reg_r);
+	void reg_w(offs_t offset, uint8_t data);
+	uint8_t reg_r(offs_t offset);
 
 	DECLARE_WRITE_LINE_MEMBER(cart_out_w);
 	DECLARE_WRITE_LINE_MEMBER(hole_w);

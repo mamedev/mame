@@ -51,10 +51,10 @@ private:
 	uint8_t m_bus;
 	uint8_t m_keylatch;
 
-	DECLARE_READ8_MEMBER( bus_r );
-	DECLARE_WRITE8_MEMBER( bus_w );
-	DECLARE_READ8_MEMBER( p1_r );
-	DECLARE_READ8_MEMBER( p2_r );
+	uint8_t bus_r();
+	void bus_w(uint8_t data);
+	uint8_t p1_r();
+	uint8_t p2_r();
 };
 
 

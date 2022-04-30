@@ -51,7 +51,7 @@ TILE_GET_INFO_MEMBER(nycaptor_state::get_tile_info)
 	}
 #endif
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_videoram[tile_index * 2] + ((m_videoram[tile_index * 2 + 1] & 0xc0) << 2) + 0x400 * m_char_bank,
 			pal, 0
 			);
@@ -77,13 +77,13 @@ void nycaptor_state::video_start()
 	save_item(NAME(m_paletteram_ext));
 }
 
-WRITE8_MEMBER(nycaptor_state::nycaptor_videoram_w)
+void nycaptor_state::nycaptor_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE8_MEMBER(nycaptor_state::nycaptor_palette_w)
+void nycaptor_state::nycaptor_palette_w(offs_t offset, uint8_t data)
 {
 	if (offset & 0x100)
 		m_palette->write8_ext((offset & 0xff) + (m_palette_bank << 8), data);
@@ -91,7 +91,7 @@ WRITE8_MEMBER(nycaptor_state::nycaptor_palette_w)
 		m_palette->write8((offset & 0xff) + (m_palette_bank << 8), data);
 }
 
-READ8_MEMBER(nycaptor_state::nycaptor_palette_r)
+uint8_t nycaptor_state::nycaptor_palette_r(offs_t offset)
 {
 	if (offset & 0x100)
 		return m_paletteram_ext[(offset & 0xff) + (m_palette_bank << 8)];
@@ -99,7 +99,7 @@ READ8_MEMBER(nycaptor_state::nycaptor_palette_r)
 		return m_paletteram[(offset & 0xff) + (m_palette_bank << 8)];
 }
 
-WRITE8_MEMBER(nycaptor_state::nycaptor_gfxctrl_w)
+void nycaptor_state::nycaptor_gfxctrl_w(uint8_t data)
 {
 	m_gfxctrl = data;
 
@@ -113,12 +113,12 @@ WRITE8_MEMBER(nycaptor_state::nycaptor_gfxctrl_w)
 
 }
 
-READ8_MEMBER(nycaptor_state::nycaptor_gfxctrl_r)
+uint8_t nycaptor_state::nycaptor_gfxctrl_r()
 {
 	return m_gfxctrl;
 }
 
-WRITE8_MEMBER(nycaptor_state::nycaptor_scrlram_w)
+void nycaptor_state::nycaptor_scrlram_w(offs_t offset, uint8_t data)
 {
 	m_scrlram[offset] = data;
 	m_bg_tilemap->set_scrolly(offset, data);
@@ -126,9 +126,7 @@ WRITE8_MEMBER(nycaptor_state::nycaptor_scrlram_w)
 
 void nycaptor_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
-	int i;
-
-	for (i = 0; i < 0x20; i++)
+	for (int i = 0; i < 0x20; i++)
 	{
 		int pr = m_spriteram[0x9f - i];
 		int offs = (pr & 0x1f) * 4;

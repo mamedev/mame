@@ -42,8 +42,6 @@ protected:
 	virtual void host_w(offs_t offset, uint8_t data) override;
 
 private:
-	uint8_t m_irq_latch;
-
 	IRQ_CALLBACK_MEMBER( irq_callback );
 
 	required_device<i80286_cpu_device> m_i80286;
@@ -51,8 +49,8 @@ private:
 	required_device<ram_device> m_ram;
 	required_memory_region m_bootstrap;
 
+	uint8_t m_irq_latch;
 	uint8_t disable_boot_rom();
-	void irq_latch_w(uint8_t data);
 
 	void tube_80286_io(address_map &map);
 	void tube_80286_mem(address_map &map);

@@ -59,8 +59,8 @@ void decobsmt_device::device_add_mconfig(machine_config &config)
 	BSMT2000(config, m_bsmt, XTAL(24'000'000));
 	m_bsmt->set_addrmap(0, &decobsmt_device::bsmt_map);
 	m_bsmt->set_ready_callback(FUNC(decobsmt_device::bsmt_ready_callback));
-	m_bsmt->add_route(0, "lspeaker", 2.0);
-	m_bsmt->add_route(1, "rspeaker", 2.0);
+	m_bsmt->add_route(0, "lspeaker", 1.0);
+	m_bsmt->add_route(1, "rspeaker", 1.0);
 }
 
 //**************************************************************************

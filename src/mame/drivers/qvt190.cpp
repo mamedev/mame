@@ -64,7 +64,7 @@ MC6845_UPDATE_ROW(qvt190_state::update_row)
 			gfx = ~gfx;
 
 		for (int i = 0; i < 9; i++)
-			bitmap.pix32(y, x*9 + (8-i)) = palette[BIT(gfx, i) ? 2 : 0];
+			bitmap.pix(y, x*9 + (8-i)) = palette[BIT(gfx, i) ? 2 : 0];
 	}
 }
 

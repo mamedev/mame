@@ -50,12 +50,12 @@ private:
 	uint8_t m_p1;
 	uint8_t m_bus;
 
-	DECLARE_READ8_MEMBER( kb_p1_r );
-	DECLARE_WRITE8_MEMBER( kb_p1_w );
-	DECLARE_READ8_MEMBER( kb_p2_r );
+	uint8_t kb_p1_r();
+	void kb_p1_w(uint8_t data);
+	uint8_t kb_p2_r();
 	DECLARE_READ_LINE_MEMBER( kb_t0_r );
 	DECLARE_READ_LINE_MEMBER( kb_t1_r );
-	DECLARE_WRITE8_MEMBER( kb_bus_w );
+	void kb_bus_w(uint8_t data);
 };
 
 

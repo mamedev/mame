@@ -121,7 +121,7 @@ TILE_GET_INFO_MEMBER(galaga_state::get_tile_info)
 	   We reproduce this here, but since the tilemap system automatically flips
 	   characters when screen is flipped, we have to flip them back. */
 	int color = m_videoram[tile_index + 0x400] & 0x3f;
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			(m_videoram[tile_index] & 0x7f) | (flip_screen() ? 0x80 : 0) | (m_galaga_gfxbank << 8),
 			color,
 			flip_screen() ? TILE_FLIPX : 0);
@@ -136,7 +136,7 @@ TILE_GET_INFO_MEMBER(galaga_state::get_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(galaga_state,galaga)
+void galaga_state::video_start()
 {
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(galaga_state::get_tile_info)), tilemap_mapper_delegate(*this, FUNC(galaga_state::tilemap_scan)), 8,8,36,28);
 	m_fg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 0x1f);
@@ -155,7 +155,7 @@ VIDEO_START_MEMBER(galaga_state,galaga)
 ***************************************************************************/
 
 
-WRITE8_MEMBER(galaga_state::galaga_videoram_w)
+void galaga_state::galaga_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
@@ -177,28 +177,25 @@ WRITE_LINE_MEMBER(galaga_state::gatsbee_bank_w)
 
 void galaga_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	uint8_t *spriteram = m_galaga_ram1 + 0x380;
-	uint8_t *spriteram_2 = m_galaga_ram2 + 0x380;
-	uint8_t *spriteram_3 = m_galaga_ram3 + 0x380;
-	int offs;
+	uint8_t *spriteram = &m_galaga_ram1[0x380];
+	uint8_t *spriteram_2 = &m_galaga_ram2[0x380];
+	uint8_t *spriteram_3 = &m_galaga_ram3[0x380];
 
-
-	for (offs = 0;offs < 0x80;offs += 2)
+	for (int offs = 0; offs < 0x80; offs += 2)
 	{
 		static const int gfx_offs[2][2] =
 		{
 			{ 0, 1 },
 			{ 2, 3 }
 		};
-		int sprite = spriteram[offs] & 0x7f;
-		int color = spriteram[offs+1] & 0x3f;
-		int sx = spriteram_2[offs+1] - 40 + 0x100*(spriteram_3[offs+1] & 3);
+		const int sprite = spriteram[offs] & 0x7f;
+		const int color = spriteram[offs + 1] & 0x3f;
+		int sx = spriteram_2[offs + 1] - 40 + 0x100*(spriteram_3[offs + 1] & 3);
 		int sy = 256 - spriteram_2[offs] + 1;   // sprites are buffered and delayed by one scanline
 		int flipx = (spriteram_3[offs] & 0x01);
 		int flipy = (spriteram_3[offs] & 0x02) >> 1;
-		int sizex = (spriteram_3[offs] & 0x04) >> 2;
-		int sizey = (spriteram_3[offs] & 0x08) >> 3;
-		int x,y;
+		const int sizex = (spriteram_3[offs] & 0x04) >> 2;
+		const int sizey = (spriteram_3[offs] & 0x08) >> 3;
 
 		sy -= 16 * sizey;
 		sy = (sy & 0xff) - 32;  // fix wraparound
@@ -209,9 +206,9 @@ void galaga_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 			flipy ^= 1;
 		}
 
-		for (y = 0;y <= sizey;y++)
+		for (int y = 0; y <= sizey; y++)
 		{
-			for (x = 0;x <= sizex;x++)
+			for (int x = 0; x <= sizex; x++)
 			{
 				m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
 					sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
@@ -229,9 +226,9 @@ void galaga_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 uint32_t galaga_state::screen_update_galaga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
-	m_starfield->draw_starfield(bitmap,cliprect,0);
+	m_starfield->draw_starfield(bitmap,cliprect, 0);
 	draw_sprites(bitmap,cliprect);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect);
 	return 0;
 }
 

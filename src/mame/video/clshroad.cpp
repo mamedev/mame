@@ -109,10 +109,12 @@ TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_0a)
 	tile_index = (tile_index & 0x1f) + (tile_index & ~0x1f)*2;
 	code    =   m_vram_0[ tile_index * 2 + 0x40 ];
 //  color   =   m_vram_0[ tile_index * 2 + 0x41 ];
-	SET_TILE_INFO_MEMBER(1,
-			code,
-			0,
-			0);
+	tileinfo.set(
+		1,
+		code,
+		m_color_bank,
+		0
+	);
 }
 
 TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_0b)
@@ -121,13 +123,15 @@ TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_0b)
 	tile_index = (tile_index & 0x1f) + (tile_index & ~0x1f)*2;
 	code    =   m_vram_0[ tile_index * 2 + 0x00 ];
 //  color   =   m_vram_0[ tile_index * 2 + 0x01 ];
-	SET_TILE_INFO_MEMBER(1,
-			code,
-			0,
-			0);
+	tileinfo.set(
+		1,
+		code,
+		m_color_bank,
+		0
+	);
 }
 
-WRITE8_MEMBER(clshroad_state::vram_0_w)
+void clshroad_state::vram_0_w(offs_t offset, uint8_t data)
 {
 	int tile_index = offset / 2;
 	int tile = (tile_index & 0x1f) + (tile_index & ~0x3f)/2;
@@ -176,7 +180,7 @@ TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_fb1)
 	uint8_t code  =   m_vram_1[ tile_index + 0x000 ];
 	uint8_t color =   m_vram_1[ tile_index + 0x400 ] & 0x3f;
 	tileinfo.group = color;
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			code,
 			color,
 			0);
@@ -186,18 +190,38 @@ TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_1)
 {
 	uint8_t code  =   m_vram_1[ tile_index + 0x000 ];
 	uint8_t color =   m_vram_1[ tile_index + 0x400 ];
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			code + ((color & 0xf0)<<4),
 			color & 0x0f,
 			0);
 }
 
-WRITE8_MEMBER(clshroad_state::vram_1_w)
+void clshroad_state::vram_1_w(offs_t offset, uint8_t data)
 {
 	m_vram_1[offset] = data;
 	m_tilemap_1->mark_tile_dirty(offset % 0x400);
 }
 
+void clshroad_state::color_bank_w(offs_t offset, u8 data)
+{
+	// - Clash Road: always 9 during gameplay and 0 when title screen displays
+	//  (further disabling it out)
+	// - Fire Battle: variable depending on what happens on screen
+	//  (makes background to flash when lightning occurs, has additional color cycling effects)
+	m_color_bank = data & 0xf;
+	m_tilemap_0a->mark_all_dirty();
+	m_tilemap_0b->mark_all_dirty();
+	if (data & 0xf0)
+		logerror("%s: unknown vreg [2] write %02x\n", machine().describe_context(), data);
+}
+
+void clshroad_state::video_unk_w(offs_t offset, u8 data)
+{
+	// Clash Road: inited to 0 at POST, never touched anywhere else
+	// Fire Battle: always bit 7 held, normally 0x80,
+	// increments bits 0-3 from 0x80 to 0x8f when lightning is about to strike and decrements back to 0x80
+	// after section has been passed, color gain control? sprite color bank (on unmapped color proms)?
+}
 
 VIDEO_START_MEMBER(clshroad_state,firebatl)
 {

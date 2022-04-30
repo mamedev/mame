@@ -88,6 +88,10 @@ TODO general:
     - Add 1 cycle in Emulation mode (E=1) for (dir),y; abs,x; and abs,y
       addressing modes.
 
+    - Rename g65* to w65*? (including filenames)
+
+    - Any difference between W65C8* and G65SC8*?
+
 */
 /* ======================================================================== */
 /* ================================= DATA ================================= */
@@ -97,27 +101,34 @@ TODO general:
 #include "g65816.h"
 
 
-DEFINE_DEVICE_TYPE(G65816, g65816_device, "g65c816", "Western Design Center G65C816")
+DEFINE_DEVICE_TYPE(G65816, g65816_device, "w65c816", "WDC W65C816")
+DEFINE_DEVICE_TYPE(G65802, g65802_device, "w65c802", "WDC W65C802")
 DEFINE_DEVICE_TYPE(_5A22,  _5a22_device,  "5a22",    "Ricoh 5A22")
 
 enum
 {
-	CPU_TYPE_G65816 = 0,
-	CPU_TYPE_5A22 = 1
+	CPU_TYPE_W65C816 = 0,
+	CPU_TYPE_W65C802 = 1,
+	CPU_TYPE_5A22 = 2
 };
 
 
 g65816_device::g65816_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: g65816_device(mconfig, G65816, tag, owner, clock, CPU_TYPE_G65816, address_map_constructor())
+	: g65816_device(mconfig, G65816, tag, owner, clock, CPU_TYPE_W65C816, address_map_constructor())
+{
+}
+
+g65802_device::g65802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: g65816_device(mconfig, G65802, tag, owner, clock, CPU_TYPE_W65C802, address_map_constructor())
 {
 }
 
 
 g65816_device::g65816_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type, address_map_constructor internal)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 8, 24, 0, internal)
-	, m_data_config("data", ENDIANNESS_LITTLE, 8, 24, 0, internal)
-	, m_opcode_config("opcodes", ENDIANNESS_LITTLE, 8, 24, 0, internal)
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, (cpu_type == CPU_TYPE_W65C802) ? 16 : 24, 0, internal)
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, (cpu_type == CPU_TYPE_W65C802) ? 16 : 24, 0, internal)
+	, m_opcode_config("opcodes", ENDIANNESS_LITTLE, 8, (cpu_type == CPU_TYPE_W65C802) ? 16 : 24, 0, internal)
 	, m_vector_config("vectors", ENDIANNESS_LITTLE, 8, 5, 0)
 	, m_wdm_w(*this)
 	, m_cpu_type(cpu_type)
@@ -658,7 +669,7 @@ void g65816_device::g65816i_check_maskable_interrupt()
 	{
 		g65816i_interrupt_hardware((FLAG_E) ? VECTOR_IRQ_E : VECTOR_IRQ_N);
 		CPU_STOPPED &= ~STOP_LEVEL_WAI;
-		LINE_IRQ=0;
+		LINE_IRQ=0; // FIXME: IRQ is level triggered, this makes it act as a HOLD_LINE
 	}
 }
 
@@ -673,13 +684,13 @@ unsigned g65816_device::EA_DX()    {return MAKE_UINT_16(REGISTER_D + g65816i_rea
 unsigned g65816_device::EA_DY()    {return MAKE_UINT_16(REGISTER_D + g65816i_read_8_immediate(EA_IMM8()) + REGISTER_Y);}
 unsigned g65816_device::EA_AX()    {unsigned tmp = EA_A(); if((tmp^(tmp+REGISTER_X))&0xff00) CLK(1); return tmp + REGISTER_X;}
 unsigned g65816_device::EA_ALX()   {return EA_AL() + REGISTER_X;}
-unsigned g65816_device::EA_AY()    {unsigned tmp = EA_A(); if((tmp^(tmp+REGISTER_X))&0xff00) CLK(1); return tmp + REGISTER_Y;}
+unsigned g65816_device::EA_AY()    {unsigned tmp = EA_A(); if((tmp^(tmp+REGISTER_Y))&0xff00) CLK(1); return tmp + REGISTER_Y;}
 unsigned g65816_device::EA_DI()    {return REGISTER_DB | g65816i_read_16_direct(EA_D());}
 unsigned g65816_device::EA_DLI()   {return g65816i_read_24_direct(EA_D());}
 unsigned g65816_device::EA_AI()    {return g65816i_read_16_normal(g65816i_read_16_immediate(EA_IMM16()));}
 unsigned g65816_device::EA_ALI()   {return g65816i_read_24_normal(EA_A());}
 unsigned g65816_device::EA_DXI()   {return REGISTER_DB | g65816i_read_16_direct(EA_DX());}
-unsigned g65816_device::EA_DIY()   {unsigned tmp = REGISTER_DB | g65816i_read_16_direct(EA_D()); if((tmp^(tmp+REGISTER_X))&0xff00) CLK(1); return tmp + REGISTER_Y;}
+unsigned g65816_device::EA_DIY()   {unsigned tmp = REGISTER_DB | g65816i_read_16_direct(EA_D()); if((tmp^(tmp+REGISTER_Y))&0xff00) CLK(1); return tmp + REGISTER_Y;}
 unsigned g65816_device::EA_DLIY()  {return g65816i_read_24_direct(EA_D()) + REGISTER_Y;}
 unsigned g65816_device::EA_AXI()   {return g65816i_read_16_normal(MAKE_UINT_16(g65816i_read_16_immediate(EA_IMM16()) + REGISTER_X));}
 unsigned g65816_device::EA_S()     {return MAKE_UINT_16(REGISTER_S + g65816i_read_8_immediate(EA_IMM8()));}
@@ -860,10 +871,9 @@ void g65816_device::device_start()
 	m_execute = nullptr;
 	m_debugger_temp = 0;
 
-	address_space &program_space = space(AS_PROGRAM);
-	m_data_space = has_space(AS_DATA) ? &space(AS_DATA) : &program_space;
-	m_program_cache = program_space.cache<0, 0, ENDIANNESS_LITTLE>();
-	m_opcode_cache = (has_space(AS_OPCODES) ? space(AS_OPCODES) : program_space).cache<0, 0, ENDIANNESS_LITTLE>();
+	space(AS_PROGRAM).cache(m_program);
+	(has_space(AS_OPCODES) ? space(AS_OPCODES) : space(AS_PROGRAM)).cache(m_opcode);
+	(has_space(AS_DATA) ? space(AS_DATA) : space(AS_PROGRAM)).specific(m_data);
 
 	m_wdm_w.resolve_safe();
 
@@ -912,7 +922,6 @@ void g65816_device::device_start()
 
 	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callimport().callexport().formatstr("%06X").noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_debugger_temp).callimport().callexport().formatstr("%06X").noshow();
-	state_add( STATE_GENSP, "GENSP", m_debugger_temp).callimport().callexport().formatstr("%06X").noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%8s").noshow();
 
 	set_icountptr(m_ICount);
@@ -925,9 +934,6 @@ void g65816_device::state_import(const device_state_entry &entry)
 		case STATE_GENPC:
 		case STATE_GENPCBASE:
 			g65816_set_pc(m_debugger_temp);
-			break;
-		case STATE_GENSP:
-			g65816_set_sp(m_debugger_temp);
 			break;
 		case G65816_PC:
 		case G65816_PB:
@@ -972,9 +978,6 @@ void g65816_device::state_export(const device_state_entry &entry)
 		case STATE_GENPCBASE:
 		case G65816_PC:
 			m_debugger_temp = g65816_get_pc();
-			break;
-		case STATE_GENSP:
-			m_debugger_temp = g65816_get_sp();
 			break;
 		case G65816_PB:
 			m_debugger_temp = m_pb>>16;
@@ -1024,7 +1027,7 @@ SNES specific, used to handle master cycles, based off byuu's BSNES code
 
 int g65816_device::bus_5A22_cycle_burst(unsigned addr)
 {
-	if(m_cpu_type == CPU_TYPE_G65816)
+	if(m_cpu_type != CPU_TYPE_5A22)
 		return 0;
 
 	if(addr & 0x408000) {
@@ -1092,29 +1095,29 @@ translation of Breath of Fire 2 to work. More weirdness: we might need to leave
 8 CPU cycles for division at first, since using 16 produces bugs (see e.g.
 Triforce pieces in Zelda 3 intro) */
 
-WRITE8_MEMBER( _5a22_device::wrmpya_w )
+void _5a22_device::wrmpya_w(uint8_t data)
 {
 	m_wrmpya = data;
 }
 
-WRITE8_MEMBER( _5a22_device::wrmpyb_w )
+void _5a22_device::wrmpyb_w(uint8_t data)
 {
 	m_wrmpyb = data;
 	m_rdmpy = m_wrmpya * m_wrmpyb;
 	/* TODO: m_rddiv == 0? */
 }
 
-WRITE8_MEMBER( _5a22_device::wrdivl_w )
+void _5a22_device::wrdivl_w(uint8_t data)
 {
 	m_wrdiv = (data) | (m_wrdiv & 0xff00);
 }
 
-WRITE8_MEMBER( _5a22_device::wrdivh_w )
+void _5a22_device::wrdivh_w(uint8_t data)
 {
 	m_wrdiv = (data << 8) | (m_wrdiv & 0xff);
 }
 
-WRITE8_MEMBER( _5a22_device::wrdvdd_w )
+void _5a22_device::wrdvdd_w(uint8_t data)
 {
 	uint16_t quotient, remainder;
 
@@ -1127,27 +1130,27 @@ WRITE8_MEMBER( _5a22_device::wrdvdd_w )
 	m_rdmpy = remainder;
 }
 
-WRITE8_MEMBER( _5a22_device::memsel_w )
+void _5a22_device::memsel_w(uint8_t data)
 {
 	m_fastROM = data & 1;
 }
 
-READ8_MEMBER( _5a22_device::rddivl_r )
+uint8_t _5a22_device::rddivl_r()
 {
 	return m_rddiv & 0xff;
 }
 
-READ8_MEMBER( _5a22_device::rddivh_r )
+uint8_t _5a22_device::rddivh_r()
 {
 	return m_rddiv >> 8;
 }
 
-READ8_MEMBER( _5a22_device::rdmpyl_r )
+uint8_t _5a22_device::rdmpyl_r()
 {
 	return m_rdmpy & 0xff;
 }
 
-READ8_MEMBER( _5a22_device::rdmpyh_r )
+uint8_t _5a22_device::rdmpyh_r()
 {
 	return m_rdmpy >> 8;
 }
@@ -1155,16 +1158,16 @@ READ8_MEMBER( _5a22_device::rdmpyh_r )
 
 void _5a22_device::set_5a22_map()
 {
-	space(AS_PROGRAM).install_write_handler(0x4202, 0x4202, 0, 0xbf0000, 0, write8_delegate(*this, FUNC(_5a22_device::wrmpya_w)));
-	space(AS_PROGRAM).install_write_handler(0x4203, 0x4203, 0, 0xbf0000, 0, write8_delegate(*this, FUNC(_5a22_device::wrmpyb_w)));
-	space(AS_PROGRAM).install_write_handler(0x4204, 0x4204, 0, 0xbf0000, 0, write8_delegate(*this, FUNC(_5a22_device::wrdivl_w)));
-	space(AS_PROGRAM).install_write_handler(0x4205, 0x4205, 0, 0xbf0000, 0, write8_delegate(*this, FUNC(_5a22_device::wrdivh_w)));
-	space(AS_PROGRAM).install_write_handler(0x4206, 0x4206, 0, 0xbf0000, 0, write8_delegate(*this, FUNC(_5a22_device::wrdvdd_w)));
+	space(AS_PROGRAM).install_write_handler(0x4202, 0x4202, 0, 0xbf0000, 0, write8smo_delegate(*this, FUNC(_5a22_device::wrmpya_w)));
+	space(AS_PROGRAM).install_write_handler(0x4203, 0x4203, 0, 0xbf0000, 0, write8smo_delegate(*this, FUNC(_5a22_device::wrmpyb_w)));
+	space(AS_PROGRAM).install_write_handler(0x4204, 0x4204, 0, 0xbf0000, 0, write8smo_delegate(*this, FUNC(_5a22_device::wrdivl_w)));
+	space(AS_PROGRAM).install_write_handler(0x4205, 0x4205, 0, 0xbf0000, 0, write8smo_delegate(*this, FUNC(_5a22_device::wrdivh_w)));
+	space(AS_PROGRAM).install_write_handler(0x4206, 0x4206, 0, 0xbf0000, 0, write8smo_delegate(*this, FUNC(_5a22_device::wrdvdd_w)));
 
-	space(AS_PROGRAM).install_write_handler(0x420d, 0x420d, 0, 0xbf0000, 0, write8_delegate(*this, FUNC(_5a22_device::memsel_w)));
+	space(AS_PROGRAM).install_write_handler(0x420d, 0x420d, 0, 0xbf0000, 0, write8smo_delegate(*this, FUNC(_5a22_device::memsel_w)));
 
-	space(AS_PROGRAM).install_read_handler(0x4214, 0x4214, 0, 0xbf0000, 0, read8_delegate(*this, FUNC(_5a22_device::rddivl_r)));
-	space(AS_PROGRAM).install_read_handler(0x4215, 0x4215, 0, 0xbf0000, 0, read8_delegate(*this, FUNC(_5a22_device::rddivh_r)));
-	space(AS_PROGRAM).install_read_handler(0x4216, 0x4216, 0, 0xbf0000, 0, read8_delegate(*this, FUNC(_5a22_device::rdmpyl_r)));
-	space(AS_PROGRAM).install_read_handler(0x4217, 0x4217, 0, 0xbf0000, 0, read8_delegate(*this, FUNC(_5a22_device::rdmpyh_r)));
+	space(AS_PROGRAM).install_read_handler(0x4214, 0x4214, 0, 0xbf0000, 0, read8smo_delegate(*this, FUNC(_5a22_device::rddivl_r)));
+	space(AS_PROGRAM).install_read_handler(0x4215, 0x4215, 0, 0xbf0000, 0, read8smo_delegate(*this, FUNC(_5a22_device::rddivh_r)));
+	space(AS_PROGRAM).install_read_handler(0x4216, 0x4216, 0, 0xbf0000, 0, read8smo_delegate(*this, FUNC(_5a22_device::rdmpyl_r)));
+	space(AS_PROGRAM).install_read_handler(0x4217, 0x4217, 0, 0xbf0000, 0, read8smo_delegate(*this, FUNC(_5a22_device::rdmpyh_r)));
 }

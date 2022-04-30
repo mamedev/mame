@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="next_cdrom" description="NeXT CD-ROM software">
+
+	<!-- Collections and samplers -->
+
+	<software name="3p_prod_93">
+		<description>3rd Party Products 1993</description>
+		<year>1993</year>
+		<publisher>NeXT</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="next_3rd_party_products_93" sha1="be4583233cb3485304b2e43e3a4edf79b900ef08" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="3p_prod_fall_95">
+		<description>3rd Party Products Fall 1995</description>
+		<year>1995</year>
+		<publisher>NeXT</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: unknown -->
+			<diskarea name="cdrom">
+				<disk name="3rd_party_products_fall_95" sha1="81560984906652f23ce7ed9d774af3b7c3e3ef9f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="3p_sampl_fall_93">
+		<description>3rd Party Software Sampler Fall 1993</description>
+		<year>1993</year>
+		<publisher>NeXT</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: unknown -->
+			<diskarea name="cdrom">
+				<disk name="3rd_party_sampler_fall_93" sha1="b28e80f82dc79186e286bb3f9f8ef0e14950f2e4" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="edu_sampl_92">
+		<description>NeXT Education Software Sampler 1992</description>
+		<year>1992</year>
+		<publisher>NeXT</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="education_1992_sampler" sha1="f0b468ac8f7388b5e620ae9beae7b0183e2b9eee" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Applications -->
+
+	<software name="app_wrapper_2">
+		<description>Electronic AppWrapper 2</description>
+		<year>1991</year>
+		<publisher>Paget Press</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: unknown -->
+			<diskarea name="cdrom">
+				<disk name="the_electronic_app_wrapper" sha1="30ccb94b896566ffdf5c310f47dd41f9c83b3285" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="softpc_3_0">
+		<description>SoftPC 3.0</description>
+		<year>1993</year>
+		<publisher>Insigna Solutions</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: fsck.technology -->
+			<diskarea name="cdrom">
+				<disk name="softpc30_win" sha1="530a900663a1a49498c7f779385da98c6f363293" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -14,6 +14,10 @@
 
 #include "unicode.h"
 
+#include <sstream>
+#include <utility>
+#include <vector>
+
 namespace imgtool
 {
 	// ======================> charconverter
@@ -22,11 +26,8 @@ namespace imgtool
 	class charconverter
 	{
 	public:
-		virtual void from_utf8(std::ostream &dest, const char *src, size_t src_length) const = 0;
-		virtual void to_utf8(std::ostream &dest, const char *src, size_t src_length) const = 0;
-
-		void from_utf8(std::ostream &dest, const std::string &src) const;
-		void to_utf8(std::ostream &dest, const std::string &src) const;
+		virtual void from_utf8(std::ostream &dest, std::string_view src) const = 0;
+		virtual void to_utf8(std::ostream &dest, std::string_view src) const = 0;
 
 		std::string from_utf8(const std::string &src) const
 		{
@@ -59,8 +60,8 @@ namespace imgtool
 
 		simple_charconverter(const char32_t lowpage[0x80], const char32_t highpage[0x80], unicode_normalization_form norm = unicode_normalization_form::C);
 
-		virtual void from_utf8(std::ostream &dest, const char *src, size_t src_length) const override;
-		virtual void to_utf8(std::ostream &dest, const char *src, size_t src_length) const override;
+		virtual void from_utf8(std::ostream &dest, std::string_view src) const override;
+		virtual void to_utf8(std::ostream &dest, std::string_view src) const override;
 
 	private:
 		std::vector<std::pair<char32_t, char> > m_reverse_lookup;

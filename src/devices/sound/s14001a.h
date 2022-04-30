@@ -17,10 +17,10 @@ public:
 	auto bsy() { return m_bsy_handler.bind(); }
 	auto ext_read() { return m_ext_read_handler.bind(); }
 
-	DECLARE_READ_LINE_MEMBER(busy_r);   // /BUSY (pin 40)
-	DECLARE_READ_LINE_MEMBER(romen_r);  // ROM /EN (pin 9)
-	DECLARE_WRITE_LINE_MEMBER(start_w); // START (pin 10)
-	DECLARE_WRITE8_MEMBER(data_w);      // 6-bit word
+	int busy_r();              // /BUSY (pin 40)
+	int romen_r();             // ROM /EN (pin 9)
+	void start_w(int state);   // START (pin 10)
+	void data_w(uint8_t data); // 6-bit word
 
 	void set_clock(uint32_t clock);       // set new CLK frequency
 	void set_clock(const XTAL &xtal) { set_clock(xtal.value()); }
@@ -31,7 +31,7 @@ protected:
 	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	uint8_t readmem(uint16_t offset, bool phase);

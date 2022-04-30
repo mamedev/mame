@@ -55,20 +55,19 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_tile_ram;
 	required_shared_ptr<uint8_t> m_tile_control_ram;
-	bool m_ld_video_visible;
-	DECLARE_READ8_MEMBER(ldp_read);
-	DECLARE_WRITE8_MEMBER(ldp_write);
-	DECLARE_WRITE8_MEMBER(misc_write);
-	DECLARE_WRITE8_MEMBER(led_writes);
-	DECLARE_WRITE8_MEMBER(nmi_line_w);
-	bool m_nmi_enable;
+	bool m_ld_video_visible = false;
+	uint8_t ldp_read();
+	void misc_write(uint8_t data);
+	void led_writes(offs_t offset, uint8_t data);
+	void nmi_line_w(uint8_t data);
+	bool m_nmi_enable = false;
 	void esh_palette(palette_device &palette) const;
 	uint32_t screen_update_esh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback_esh);
@@ -119,7 +118,7 @@ uint32_t esh_state::screen_update_esh(screen_device &screen, bitmap_rgb32 &bitma
 
 				for(int yi=0;yi<8;yi++)
 					for(int xi=0;xi<8;xi++)
-						bitmap.pix32(yi+chary*8, xi+charx*8) = m_palette->pen(palIndex * 8 + pal_bank * 0x100);
+						bitmap.pix(yi+chary*8, xi+charx*8) = m_palette->pen(palIndex * 8 + pal_bank * 0x100);
 
 				continue;
 			}
@@ -145,17 +144,13 @@ uint32_t esh_state::screen_update_esh(screen_device &screen, bitmap_rgb32 &bitma
 
 
 /* MEMORY HANDLERS */
-READ8_MEMBER(esh_state::ldp_read)
+
+uint8_t esh_state::ldp_read()
 {
 	return m_laserdisc->status_r();
 }
 
-WRITE8_MEMBER(esh_state::ldp_write)
-{
-	m_laserdisc->data_w(data);
-}
-
-WRITE8_MEMBER(esh_state::misc_write)
+void esh_state::misc_write(uint8_t data)
 {
 	/* Bit 0 unknown */
 
@@ -169,7 +164,7 @@ WRITE8_MEMBER(esh_state::misc_write)
 	/* They cycle through a repeating pattern though */
 }
 
-WRITE8_MEMBER(esh_state::led_writes)
+void esh_state::led_writes(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -200,7 +195,7 @@ WRITE8_MEMBER(esh_state::led_writes)
 	}
 }
 
-WRITE8_MEMBER(esh_state::nmi_line_w)
+void esh_state::nmi_line_w(uint8_t data)
 {
 	// 0 -> 1 transition enables this, else disabled?
 	m_nmi_enable = (data & 1) == 1;
@@ -232,7 +227,7 @@ void esh_state::z80_0_io(address_map &map)
 	map(0xf1, 0xf1).portr("IN1");
 	map(0xf2, 0xf2).portr("IN2");
 	map(0xf3, 0xf3).portr("IN3");
-	map(0xf4, 0xf4).rw(FUNC(esh_state::ldp_read), FUNC(esh_state::ldp_write));
+	map(0xf4, 0xf4).r(FUNC(esh_state::ldp_read)).w(m_laserdisc, FUNC(pioneer_ldv1000_device::data_w));
 	map(0xf5, 0xf5).w(FUNC(esh_state::misc_write));    /* Continuously writes repeating patterns */
 	map(0xf8, 0xfd).w(FUNC(esh_state::led_writes));
 	map(0xfe, 0xfe).w(FUNC(esh_state::nmi_line_w));    /* Both 0xfe and 0xff flip quickly between 0 and 1 */
@@ -323,20 +318,9 @@ void esh_state::esh_palette(palette_device &palette) const
 	}
 }
 
-static const gfx_layout esh_gfx_layout =
-{
-	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
-	{ 0,1,2,3,4,5,6,7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
 static GFXDECODE_START( gfx_esh )
-	GFXDECODE_ENTRY("gfx1", 0, esh_gfx_layout, 0x0, 0x20)
-	GFXDECODE_ENTRY("gfx2", 0, esh_gfx_layout, 0x0, 0x20)
+	GFXDECODE_ENTRY("gfx1", 0, gfx_8x8x3_planar, 0x0, 0x20)
+	GFXDECODE_ENTRY("gfx2", 0, gfx_8x8x3_planar, 0x0, 0x20)
 GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(esh_state::vblank_callback_esh)

@@ -11,9 +11,11 @@ ROM_START( microdisc )
 	ROM_LOAD ("microdis.rom", 0, 0x02000, CRC(a9664a9c) SHA1(0d2ef6e67322f48f4b7e08d8bbe68827e2074561) )
 ROM_END
 
-FLOPPY_FORMATS_MEMBER( oric_microdisc_device::floppy_formats )
-	FLOPPY_ORIC_DSK_FORMAT
-FLOPPY_FORMATS_END
+void oric_microdisc_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ORIC_DSK_FORMAT);
+}
 
 static void microdisc_floppies(device_slot_interface &device)
 {
@@ -30,7 +32,9 @@ void oric_microdisc_device::map(address_map &map)
 oric_microdisc_device::oric_microdisc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ORIC_MICRODISC, tag, owner, clock),
 	device_oricext_interface(mconfig, *this),
-	fdc(*this, "fdc"), microdisc_rom(nullptr), port_314(0), intrq_state(false), drq_state(false), hld_state(false)
+	fdc(*this, "fdc"), microdisc_rom(nullptr),
+	floppies(*this, "fdc:%u", 0U),
+	port_314(0), intrq_state(false), drq_state(false), hld_state(false)
 {
 }
 
@@ -43,11 +47,6 @@ void oric_microdisc_device::device_start()
 	microdisc_rom = device().machine().root_device().memregion(this->subtag("microdisc").c_str())->base();
 	cpu->space(AS_PROGRAM).install_device(0x0000, 0xffff, *this, &oric_microdisc_device::map);
 
-	for(int i=0; i<4; i++) {
-		char name[32];
-		sprintf(name, "fdc:%d", i);
-		floppies[i] = subdevice<floppy_connector>(name)->get_device();
-	}
 	intrq_state = drq_state = hld_state = false;
 }
 
@@ -56,7 +55,7 @@ void oric_microdisc_device::device_reset()
 	port_314 = 0x00;
 	irq_w(false);
 	remap();
-	fdc->set_floppy(floppies[0]);
+	fdc->set_floppy(floppies[0]->get_device());
 
 	// The bootstrap checksums part of the high ram and if the sum is
 	// 0 it goes wrong.
@@ -108,11 +107,11 @@ void oric_microdisc_device::remap()
 	}
 }
 
-WRITE8_MEMBER(oric_microdisc_device::port_314_w)
+void oric_microdisc_device::port_314_w(uint8_t data)
 {
 	port_314 = data;
 	remap();
-	floppy_image_device *floppy = floppies[(port_314 >> 5) & 3];
+	floppy_image_device *floppy = floppies[(port_314 >> 5) & 3]->get_device();
 	fdc->set_floppy(floppy);
 	fdc->dden_w(port_314 & P_DDEN);
 	if(floppy) {
@@ -122,12 +121,12 @@ WRITE8_MEMBER(oric_microdisc_device::port_314_w)
 	irq_w(intrq_state && (port_314 & P_IRQEN));
 }
 
-READ8_MEMBER(oric_microdisc_device::port_314_r)
+uint8_t oric_microdisc_device::port_314_r()
 {
 	return (intrq_state && (port_314 & P_IRQEN)) ? 0x7f : 0xff;
 }
 
-READ8_MEMBER(oric_microdisc_device::port_318_r)
+uint8_t oric_microdisc_device::port_318_r()
 {
 	return drq_state ? 0x7f : 0xff;
 }
@@ -147,5 +146,7 @@ WRITE_LINE_MEMBER(oric_microdisc_device::fdc_hld_w)
 {
 	logerror("hld %d\n", state);
 	hld_state = state;
-	floppies[(port_314 >> 5) & 3]->mon_w(!hld_state);
+	floppy_image_device *floppy = floppies[(port_314 >> 5) & 3]->get_device();
+	if(floppy)
+		floppy->mon_w(!hld_state);
 }

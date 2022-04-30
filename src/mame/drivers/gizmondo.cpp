@@ -66,8 +66,8 @@ private:
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	required_device<cpu_device> m_maincpu;
 	required_device<gf4500_device> m_gf4500;
-	DECLARE_READ32_MEMBER(s3c2440_gpio_port_r);
-	DECLARE_WRITE32_MEMBER(s3c2440_gpio_port_w);
+	uint32_t s3c2440_gpio_port_r(offs_t offset);
+	void s3c2440_gpio_port_w(offs_t offset, uint32_t data);
 
 	bitmap_rgb32 m_bitmap;
 	void gizmondo_map(address_map &map);
@@ -92,7 +92,7 @@ inline void gizmondo_state::verboselog( int n_level, const char *s_fmt, ...)
 
 // I/O PORT
 
-READ32_MEMBER(gizmondo_state::s3c2440_gpio_port_r)
+uint32_t gizmondo_state::s3c2440_gpio_port_r(offs_t offset)
 {
 	uint32_t data = m_port[offset];
 	switch (offset)
@@ -131,7 +131,7 @@ READ32_MEMBER(gizmondo_state::s3c2440_gpio_port_r)
 	return data;
 }
 
-WRITE32_MEMBER(gizmondo_state::s3c2440_gpio_port_w)
+void gizmondo_state::s3c2440_gpio_port_w(offs_t offset, uint32_t data)
 {
 	m_port[offset] = data;
 }

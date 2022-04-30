@@ -117,7 +117,7 @@ void ampoker2_state::ampoker2_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(ampoker2_state::videoram_w)
+void ampoker2_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
@@ -132,7 +132,7 @@ TILE_GET_INFO_MEMBER(ampoker2_state::get_bg_tile_info)
 	code = code + (256 * (color & 0x03));   /* code = color.bit1 + color.bit0 + code */
 	color = color >> 1;                     /* color = color - bit0 (bit1..bit7) */
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(ampoker2_state::s2k_get_bg_tile_info)
@@ -144,7 +144,7 @@ TILE_GET_INFO_MEMBER(ampoker2_state::s2k_get_bg_tile_info)
 	code = code + (256 * (color & 0x0f));   /* the game uses 2 extra bits */
 	color = color >> 1;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void ampoker2_state::video_start()

@@ -53,7 +53,7 @@ TILE_GET_INFO_MEMBER(lordgun_state::get_tile_info)
 	uint16_t attr = m_vram[Layer][tile_index * 2 + 0 ];
 	uint16_t code = m_vram[Layer][ tile_index * 2 + 1 ];
 	uint16_t pri  = (attr & 0x0e00) >> 9;
-	SET_TILE_INFO_MEMBER(Layer, code, ((attr & 0x0030) >> 4) + 0x10 + 0x4 * ((Layer + 1) & 3) + pri*0x800/0x40, TILE_FLIPXY(attr >> 14));
+	tileinfo.set(Layer, code, ((attr & 0x0030) >> 4) + 0x10 + 0x4 * ((Layer + 1) & 3) + pri*0x800/0x40, TILE_FLIPXY(attr >> 14));
 }
 
 /***************************************************************************
@@ -145,7 +145,7 @@ float lordgun_crosshair_mapper(ioport_field *field, float linear_value)
 {
 	int x = linear_value - 0x3c;
 
-	if ( (x < 0) || (x > ARRAY_LENGTH(lordgun_gun_x_table)) )
+	if ( (x < 0) || (x > std::size(lordgun_gun_x_table)) )
 		x = 0;
 
 	return lordgun_gun_x_table[x] * 1.0f / 0x1BF;
@@ -157,7 +157,7 @@ void lordgun_state::lorddgun_calc_gun_scr(int i)
 
 	int x = ioport(gunnames[i])->read() - 0x3c;
 
-	if ( (x < 0) || (x > ARRAY_LENGTH(lordgun_gun_x_table)) )
+	if ( (x < 0) || (x > std::size(lordgun_gun_x_table)) )
 		x = 0;
 
 	m_gun[i].scr_x = lordgun_gun_x_table[x];
@@ -309,12 +309,10 @@ uint32_t lordgun_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 	// Scrolling
 
-	int x, y;
-
 	m_tilemap[0]->set_scrollx(0, *m_scroll_x[0] );
 	m_tilemap[0]->set_scrolly(0, *m_scroll_y[0] );
 
-	for (y = 0; y < 0x200; y++)
+	for (int y = 0; y < 0x200; y++)
 		m_tilemap[1]->set_scrollx(y, (*m_scroll_x[1]) + m_scrollram[y * 4/2 + 2/2]);
 	m_tilemap[1]->set_scrolly(0, *m_scroll_y[1] );
 
@@ -331,8 +329,7 @@ uint32_t lordgun_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 	pen_t trans_pen = 0 * 0x800 + 0x3f; // pri = 0, pen = 3f (transparent)
 
-	int l;
-	for (l = 0; l < 5; l++)
+	for (int l = 0; l < 5; l++)
 		m_bitmaps[l]->fill(trans_pen, cliprect);
 
 	if (layers_ctrl & 1)    m_tilemap[0]->draw(screen, *m_bitmaps[0], cliprect, 0, 0);
@@ -348,18 +345,18 @@ uint32_t lordgun_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	// layer index (0-3, 4 for sprites) -> priority address bit
 	const int layer2bit[5] = {0,1,2,4,3};
 
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			uint16_t pens[5];
 
 			int pri_addr = 0;
 
 			// bits 0-4: layer transparency
-			for (l = 0; l < 5; l++)
+			for (int l = 0; l < 5; l++)
 			{
-				pens[l] = m_bitmaps[l]->pix16(y, x);
+				pens[l] = m_bitmaps[l]->pix(y, x);
 				if (pens[l] == trans_pen)
 					pri_addr |= 1 << layer2bit[l];
 			}
@@ -375,9 +372,9 @@ uint32_t lordgun_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 			pri_addr &= 0x7fff;
 
-			l   =   pri2layer[m_priority_ram[pri_addr] & 7];
+			int l = pri2layer[m_priority_ram[pri_addr] & 7];
 
-			bitmap.pix16(y, x) = pens[l] & 0x7ff;
+			bitmap.pix(y, x) = pens[l] & 0x7ff;
 		}
 	}
 

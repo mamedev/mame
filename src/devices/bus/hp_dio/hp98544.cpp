@@ -19,10 +19,9 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_NS(HPDIO_98544, bus::hp_dio, dio16_98544_device, "dio98544", "HP98544 high-res monochrome DIO video card")
+DEFINE_DEVICE_TYPE(HPDIO_98544, bus::hp_dio::dio16_98544_device, "dio98544", "HP98544 high-res monochrome DIO video card")
 
-namespace bus {
-	namespace hp_dio {
+namespace bus::hp_dio {
 
 ROM_START( hp98544 )
 	ROM_REGION( 0x2000, HP98544_ROM_REGION, 0 )
@@ -78,7 +77,8 @@ dio16_98544_device::dio16_98544_device(const machine_config &mconfig, device_typ
 	m_topcat(*this, "topcat"),
 	m_space_config("vram", ENDIANNESS_BIG, 8, 20, 0, address_map_constructor(FUNC(dio16_98544_device::map), this)),
 	m_rom(*this, HP98544_ROM_REGION),
-	m_vram(*this, "vram")
+	m_vram(*this, "vram"),
+	m_intreg(0)
 {
 }
 
@@ -101,12 +101,12 @@ void dio16_98544_device::device_start()
 	save_item(NAME(m_intreg));
 	dio().install_memory(
 			0x200000, 0x2fffff,
-			read16_delegate(*m_topcat, FUNC(topcat_device::vram_r)),
-			write16_delegate(*m_topcat, FUNC(topcat_device::vram_w)));
+			read16s_delegate(*m_topcat, FUNC(topcat_device::vram_r)),
+			write16s_delegate(*m_topcat, FUNC(topcat_device::vram_w)));
 	dio().install_memory(
 			0x560000, 0x563fff,
-			read16_delegate(*this, FUNC(dio16_98544_device::rom_r)),
-			write16_delegate(*this, FUNC(dio16_98544_device::rom_w)));
+			read16sm_delegate(*this, FUNC(dio16_98544_device::rom_r)),
+			write16sm_delegate(*this, FUNC(dio16_98544_device::rom_w)));
 	dio().install_memory(
 			0x564000, 0x567fff,
 			read16_delegate(*m_topcat, FUNC(topcat_device::ctrl_r)),
@@ -119,9 +119,10 @@ void dio16_98544_device::device_start()
 
 void dio16_98544_device::device_reset()
 {
+	m_intreg = 0;
 }
 
-READ16_MEMBER(dio16_98544_device::rom_r)
+uint16_t dio16_98544_device::rom_r(offs_t offset)
 {
 	if (offset == 1)
 		return m_intreg;
@@ -130,7 +131,7 @@ READ16_MEMBER(dio16_98544_device::rom_r)
 }
 
 // the video chip registers live here, so these writes are valid
-WRITE16_MEMBER(dio16_98544_device::rom_w)
+void dio16_98544_device::rom_w(offs_t offset, uint16_t data)
 {
 	if (offset == 1) {
 		m_intreg = data;
@@ -165,29 +166,22 @@ WRITE_LINE_MEMBER(dio16_98544_device::int_w)
 
 uint32_t dio16_98544_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int startx, starty, endx, endy;
-
-
 	if (!m_topcat->has_changed())
 		return UPDATE_HAS_NOT_CHANGED;
 
 	for (int y = 0; y < m_v_pix; y++) {
-		uint32_t *scanline = &bitmap.pix32(y);
+		uint32_t *scanline = &bitmap.pix(y);
 		for (int x = 0; x < m_h_pix; x++) {
 			uint8_t tmp = m_vram[y * m_h_pix + x];
 			*scanline++ = tmp ? rgb_t(255,255,255) : rgb_t(0, 0, 0);
 		}
 	}
 
+	int startx, starty, endx, endy;
 	m_topcat->get_cursor_pos(startx, starty, endx, endy);
-
-	for (int y = starty; y <= endy; y++) {
-		uint32_t *scanline = &bitmap.pix32(y);
-		memset(scanline + startx, 0xff, (endx - startx) << 2);
-	}
+	bitmap.fill(rgb_t(255, 255, 255), rectangle(startx, endx, starty, endy));
 
 	return 0;
 }
 
 } // namespace bus::hp_dio
-} // namespace bus

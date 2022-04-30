@@ -33,6 +33,7 @@ public:
 	void set_lcd_size(int lines, int chars) { m_lines = lines; m_chars = chars; }
 	template <typename... T> void set_pixel_update_cb(T &&... args) { m_pixel_update_cb.set(std::forward<T>(args)...); }
 	void set_busy_factor(float f) { m_busy_factor = f; } // it's a workaround for inaccurate busy flag emulation
+	void set_function_set_at_any_time(bool v = true) { m_function_set_at_any_time = v; }
 
 	// device interface
 	void write(offs_t offset, u8 data);
@@ -57,7 +58,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -66,6 +67,7 @@ protected:
 	enum
 	{
 		CHARSET_HD44780_A00,
+		CHARSET_SED1278_0B,
 		CHARSET_KS0066_F05 /*,
 		CHARSET_HD44780_A01,
 		CHARSET_HD44780_A02,
@@ -134,8 +136,18 @@ private:
 	bool        m_nibble;
 	int         m_charset_type;
 	u8          m_render_buf[80 * 16];
+	bool        m_function_set_at_any_time;
 
 	enum        { DDRAM, CGRAM };
+};
+
+// ======================> sed1278_0b_device
+
+class sed1278_0b_device :  public hd44780_device
+{
+public:
+	// construction/destruction
+	sed1278_0b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 // ======================> ks0066_f05_device
@@ -149,6 +161,7 @@ public:
 
 // device type definition
 DECLARE_DEVICE_TYPE(HD44780,    hd44780_device)
+DECLARE_DEVICE_TYPE(SED1278_0B, sed1278_0b_device)
 DECLARE_DEVICE_TYPE(KS0066_F05, ks0066_f05_device)
 
 #endif // MAME_VIDEO_HD44780_H

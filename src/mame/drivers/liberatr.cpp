@@ -138,6 +138,7 @@
 
 #include "emu.h"
 #include "includes/liberatr.h"
+#include "machine/rescap.h"
 #include "speaker.h"
 
 #define MASTER_CLOCK 20000000 /* 20Mhz Main Clock Xtal */
@@ -169,7 +170,7 @@ void liberatr_state::machine_reset()
  *
  *************************************/
 
-WRITE8_MEMBER(liberatr_state::output_latch_w)
+void liberatr_state::output_latch_w(offs_t offset, uint8_t data)
 {
 	m_outlatch->write_bit(offset, BIT(data, 4));
 }
@@ -208,7 +209,7 @@ WRITE_LINE_MEMBER(liberatr_state::trackball_reset_w)
 }
 
 
-READ8_MEMBER( liberatr_state::port0_r )
+uint8_t liberatr_state::port0_r()
 {
 	/* if ctrld is high, the /ld signal on the LS191 is NOT set, meaning that the trackball is counting */
 	if (m_ctrld)
@@ -230,14 +231,14 @@ READ8_MEMBER( liberatr_state::port0_r )
  *
  *************************************/
 
-READ8_MEMBER( liberatr_state::earom_r )
+uint8_t liberatr_state::earom_r()
 {
 	// return data latched from previous clock
 	return m_earom->data();
 }
 
 
-WRITE8_MEMBER( liberatr_state::earom_w )
+void liberatr_state::earom_w(offs_t offset, uint8_t data)
 {
 	// remember the value written
 	m_earom_data = data;
@@ -251,7 +252,7 @@ WRITE8_MEMBER( liberatr_state::earom_w )
 }
 
 
-WRITE8_MEMBER( liberatr_state::earom_control_w )
+void liberatr_state::earom_control_w(uint8_t data)
 {
 	// remember the control state
 	m_earom_control = data;

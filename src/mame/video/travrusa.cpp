@@ -195,7 +195,7 @@ TILE_GET_INFO_MEMBER(travrusa_state::get_tile_info)
 
 	tileinfo.group = ((attr & 0x0f) == 0x0f) ? 1 : 0;   /* tunnels */
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_videoram[2 * tile_index] + ((attr & 0xc0) << 2),
 			attr & 0x0f,
 			flags);
@@ -229,7 +229,7 @@ void travrusa_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(travrusa_state::travrusa_videoram_w)
+void travrusa_state::travrusa_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
@@ -246,20 +246,20 @@ void travrusa_state::set_scroll(  )
 	m_bg_tilemap->set_scrollx(3, 0);
 }
 
-WRITE8_MEMBER(travrusa_state::travrusa_scroll_x_low_w)
+void travrusa_state::travrusa_scroll_x_low_w(uint8_t data)
 {
 	m_scrollx[0] = data;
 	set_scroll();
 }
 
-WRITE8_MEMBER(travrusa_state::travrusa_scroll_x_high_w)
+void travrusa_state::travrusa_scroll_x_high_w(uint8_t data)
 {
 	m_scrollx[1] = data;
 	set_scroll();
 }
 
 
-WRITE8_MEMBER(travrusa_state::travrusa_flipscreen_w)
+void travrusa_state::travrusa_flipscreen_w(uint8_t data)
 {
 	/* screen flip is handled both by software and hardware */
 	data ^= ~ioport("DSW2")->read() & 1;

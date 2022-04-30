@@ -13,7 +13,7 @@
 
 #include "screen.h"
 
-#define VERBOSE 1
+#define VERBOSE 0
 #include "logmacro.h"
 
 
@@ -397,7 +397,7 @@ void crtc_ega_device::handle_line_timer()
 }
 
 
-void crtc_ega_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void crtc_ega_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

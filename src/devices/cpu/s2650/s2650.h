@@ -68,7 +68,7 @@ private:
 
 	devcb_read_line m_sense_handler;
 	devcb_write_line m_flag_handler;
-	devcb_write_line m_intack_handler;
+	devcb_read8 m_intack_handler;
 
 	uint16_t  m_ppc;    /* previous program counter (page + iar) */
 	uint16_t  m_page;   /* 8K page select register (A14..A13) */
@@ -84,7 +84,10 @@ private:
 	uint8_t   m_irq_state;
 
 	int     m_icount;
-	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
+	memory_access<15, 0, 0, ENDIANNESS_BIG>::cache m_cprogram;
+	memory_access<15, 0, 0, ENDIANNESS_BIG>::specific m_program;
+	memory_access< 1, 0, 0, ENDIANNESS_BIG>::specific m_data;
+	memory_access< 8, 0, 0, ENDIANNESS_BIG>::specific m_io;
 
 	// For debugger
 	uint16_t  m_debugger_temp;

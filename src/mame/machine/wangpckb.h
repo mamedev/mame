@@ -34,13 +34,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( write_rxd );
 
-	// not really public
-	DECLARE_READ8_MEMBER( kb_p1_r );
-	DECLARE_WRITE8_MEMBER( kb_p1_w );
-	DECLARE_WRITE8_MEMBER( kb_p2_w );
-	DECLARE_WRITE8_MEMBER( kb_p3_w );
-
 	void wangpc_keyboard_io(address_map &map);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -66,8 +61,13 @@ private:
 	uint8_t m_keylatch;
 	int m_rxd;
 
-	DECLARE_READ8_MEMBER( mcs51_rx_callback );
-	DECLARE_WRITE8_MEMBER( mcs51_tx_callback );
+	uint8_t mcs51_rx_callback();
+	void mcs51_tx_callback(uint8_t data);
+
+	uint8_t kb_p1_r();
+	void kb_p1_w(uint8_t data);
+	void kb_p2_w(uint8_t data);
+	void kb_p3_w(uint8_t data);
 };
 
 

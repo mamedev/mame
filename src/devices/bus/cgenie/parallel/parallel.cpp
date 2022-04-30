@@ -56,7 +56,7 @@ void cg_parallel_slot_device::device_start()
 //  I/O PORTS
 //**************************************************************************
 
-READ8_MEMBER( cg_parallel_slot_device::pa_r )
+uint8_t cg_parallel_slot_device::pa_r()
 {
 	if (m_cart)
 		return m_cart->pa_r();
@@ -64,13 +64,13 @@ READ8_MEMBER( cg_parallel_slot_device::pa_r )
 		return 0xff;
 }
 
-WRITE8_MEMBER( cg_parallel_slot_device::pa_w )
+void cg_parallel_slot_device::pa_w(uint8_t data)
 {
 	if (m_cart)
 		m_cart->pa_w(data);
 }
 
-READ8_MEMBER( cg_parallel_slot_device::pb_r )
+uint8_t cg_parallel_slot_device::pb_r()
 {
 	if (m_cart)
 		return m_cart->pb_r();
@@ -78,7 +78,7 @@ READ8_MEMBER( cg_parallel_slot_device::pb_r )
 		return 0xff;
 }
 
-WRITE8_MEMBER( cg_parallel_slot_device::pb_w )
+void cg_parallel_slot_device::pb_w(uint8_t data)
 {
 	if (m_cart)
 		m_cart->pb_w(data);

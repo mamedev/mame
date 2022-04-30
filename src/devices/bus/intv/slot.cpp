@@ -74,9 +74,9 @@
 
  ***********************************************************************************************************/
 
-
 #include "emu.h"
 #include "slot.h"
+
 #include "hashfile.h"
 
 #define INTELLIVOICE_MASK   0x02
@@ -146,7 +146,7 @@ void device_intv_cart_interface::ram_alloc(uint32_t size)
 //-------------------------------------------------
 intv_cart_slot_device::intv_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, INTV_CART_SLOT, tag, owner, clock),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_intv_cart_interface>(mconfig, *this),
 	m_type(INTV_STD),
 	m_cart(nullptr)
@@ -198,7 +198,7 @@ static int intv_get_pcb_id(const char *slot)
 {
 	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(elem.slot_option, slot))
+		if (!strcmp(elem.slot_option, slot))
 			return elem.pcb_id;
 	}
 
@@ -385,7 +385,7 @@ image_init_result intv_cart_slot_device::call_load()
 		else
 		{
 			uint16_t offset[] = { 0x400, 0x2000, 0x4000, 0x4800, 0x5000, 0x6000, 0x7000, 0x8000, 0x8800, 0x9000, 0xa000, 0xb000, 0xc000, 0xd000, 0xe000, 0xf000};
-			const char* region_name[] = {"0400", "2000", "4000", "4800", "5000", "6000", "7000", "8000", "8800", "9000", "A000", "B000", "C000", "D000", "E000", "F000"};
+			const char* region_name[] = {"0400", "2000", "4000", "4800", "5000", "6000", "7000", "8000", "8800", "9000", "a000", "b000", "c000", "d000", "e000", "f000"};
 			const char *pcb_name = get_feature("slot");
 			bool extra_bank = false;
 
@@ -440,13 +440,14 @@ std::string intv_cart_slot_device::get_default_card_software(get_default_card_so
 {
 	if (hook.image_file())
 	{
-		const char *slot_string;
-		uint32_t len = hook.image_file()->size();
+		uint64_t len;
+		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large files
 		std::vector<uint8_t> rom(len);
+
+		size_t actual;
+		hook.image_file()->read(&rom[0], len, actual); // FIXME: check error return or read returning short
+
 		int type = INTV_STD;
-
-		hook.image_file()->read(&rom[0], len);
-
 		if (rom[0] == 0xa8 && (rom[1] == (rom[2] ^ 0xff)))
 		{
 			// it's .ROM file, so that we don't have currently any way to distinguish RAM-equipped carts
@@ -454,18 +455,17 @@ std::string intv_cart_slot_device::get_default_card_software(get_default_card_so
 		else
 		{
 			// assume it's .BIN and try to use .hsi file to determine type (just RAM)
-			int start;
-			int mapper, rom[5], ram, extra;
 			std::string extrainfo;
 
 			if (hook.hashfile_extrainfo(extrainfo))
 			{
+				int mapper, rom[5], ram, extra;
 				sscanf(extrainfo.c_str() ,"%d %d %d %d %d %d %d", &mapper, &rom[0], &rom[1], &rom[2],
 						&rom[3], &ram, &extra);
 
 				if (ram)
 				{
-					start = ((ram & 0xf0) >> 4) * 0x1000;
+					int const start = ((ram & 0xf0) >> 4) * 0x1000;
 					if (start == 0xd000)
 						type = INTV_RAM;
 					if (start == 0x8800)
@@ -475,7 +475,7 @@ std::string intv_cart_slot_device::get_default_card_software(get_default_card_so
 
 		}
 
-		slot_string = intv_get_slot(type);
+		char const *const slot_string = intv_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
 

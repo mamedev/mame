@@ -3,7 +3,7 @@
 #ifndef MAME_BUS_COCO_COCO_DWSOCKH_H
 #define MAME_BUS_COCO_COCO_DWSOCKH_H
 
-#include "osdcore.h"
+#include "osdfile.h"
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -24,7 +24,7 @@
 class beckerport_device : public device_t
 {
 public:
-	beckerport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	beckerport_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	virtual ~beckerport_device();
 
 	// optional information overrides
@@ -39,8 +39,8 @@ public:
 	// driver update handlers
 	DECLARE_INPUT_CHANGED_MEMBER(drivewire_port_changed);
 
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 	// types
 	enum dwsock_ports {
@@ -67,6 +67,6 @@ private:
 DECLARE_DEVICE_TYPE(COCO_DWSOCK, beckerport_device)
 
 // device iterator
-typedef device_type_iterator<beckerport_device> beckerport_device_iterator;
+typedef device_type_enumerator<beckerport_device> beckerport_device_enumerator;
 
 #endif // MAME_BUS_COCO_COCO_DWSOCKH_H

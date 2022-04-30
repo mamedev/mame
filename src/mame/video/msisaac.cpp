@@ -17,7 +17,7 @@
 TILE_GET_INFO_MEMBER(msisaac_state::get_fg_tile_info)
 {
 	int tile_number = m_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			0x10,
 			0);
@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(msisaac_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(msisaac_state::get_bg_tile_info)
 {
 	int tile_number = m_videoram2[tile_index];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			0x100 + tile_number,
 			0x30,
 			0);
@@ -39,7 +39,7 @@ TILE_GET_INFO_MEMBER(msisaac_state::get_bg2_tile_info)
 	/* graphics 0 or 1 */
 	int gfx_b = (m_bg2_textbank >> 3) & 1;
 
-	SET_TILE_INFO_MEMBER(gfx_b,
+	tileinfo.set(gfx_b,
 			tile_number,
 			0x20,
 			0);
@@ -68,39 +68,39 @@ void msisaac_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(msisaac_state::msisaac_fg_scrolly_w)
+void msisaac_state::msisaac_fg_scrolly_w(uint8_t data)
 {
 	m_fg_tilemap->set_scrolly(0, data);
 }
 
-WRITE8_MEMBER(msisaac_state::msisaac_fg_scrollx_w)
+void msisaac_state::msisaac_fg_scrollx_w(uint8_t data)
 {
 	m_fg_tilemap->set_scrollx(0, 9 + data);
 }
 
-WRITE8_MEMBER(msisaac_state::msisaac_bg2_scrolly_w)
+void msisaac_state::msisaac_bg2_scrolly_w(uint8_t data)
 {
 	m_bg2_tilemap->set_scrolly(0, data);
 }
 
-WRITE8_MEMBER(msisaac_state::msisaac_bg2_scrollx_w)
+void msisaac_state::msisaac_bg2_scrollx_w(uint8_t data)
 {
 	m_bg2_tilemap->set_scrollx(0, 9 + 2 + data);
 }
 
-WRITE8_MEMBER(msisaac_state::msisaac_bg_scrolly_w)
+void msisaac_state::msisaac_bg_scrolly_w(uint8_t data)
 {
 	m_bg_tilemap->set_scrolly(0, data);
 }
 
-WRITE8_MEMBER(msisaac_state::msisaac_bg_scrollx_w)
+void msisaac_state::msisaac_bg_scrollx_w(uint8_t data)
 {
 	m_bg_tilemap->set_scrollx(0, 9 + 4 + data);
 }
 
 
 #ifdef UNUSED_FUNCTION
-WRITE8_MEMBER(msisaac_state::msisaac_textbank1_w)
+void msisaac_state::msisaac_textbank1_w(uint8_t data)
 {
 	if (textbank1!=data)
 	{
@@ -110,7 +110,7 @@ WRITE8_MEMBER(msisaac_state::msisaac_textbank1_w)
 }
 #endif
 
-WRITE8_MEMBER(msisaac_state::msisaac_bg2_textbank_w)
+void msisaac_state::msisaac_bg2_textbank_w(uint8_t data)
 {
 	if (m_bg2_textbank != data )
 	{
@@ -125,19 +125,19 @@ WRITE8_MEMBER(msisaac_state::msisaac_bg2_textbank_w)
 	}
 }
 
-WRITE8_MEMBER(msisaac_state::msisaac_bg_videoram_w)
+void msisaac_state::msisaac_bg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram2[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(msisaac_state::msisaac_bg2_videoram_w)
+void msisaac_state::msisaac_bg2_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram3[offset] = data;
 	m_bg2_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(msisaac_state::msisaac_fg_videoram_w)
+void msisaac_state::msisaac_fg_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);

@@ -61,9 +61,9 @@
     with the trailing edge of writes to PIA0 CB1).  DEMO does not attempt
     to synchronize on horizontal sync; it relies on CPU timing.
 
-    MOON: SockMaster demo.  Uses GIME interrupts; FIRQ gets TMR interrupts
-    and IRQ gets VBORD interrupts.  Since it does not use the PIA field
-    sync, it can be used to demonstrate how the GIME's VBORD interrupt
+    MOON: SockMaster demo.  Uses GIME interrupts; FIRQ gets fast interrupts
+    and IRQ gets slow interrupts.  Since it does not use the PIA field
+    sync, it can be used to demonstrate how the GIME's slow interrupt
     is distinct.
 
     BOINK: SockMaster demo.  Like DEMO, it SYNCs on the trailing edge
@@ -74,6 +74,10 @@
 
     CRYSTAL CITY: Jeremy Spiller game.  The intro uses an attribute-less
     GIME text mode
+
+    ARKANOID: Abuses TIMER = 0 for ball ricochet sounds
+
+    POP*STAR PILOT: Timer is synchronized with scanlines.
 
 **********************************************************************/
 
@@ -95,10 +99,35 @@
 #define GIME_TYPE_1987          0
 #define NO_ATTRIBUTE            0x80
 
-#define LOG_INT_MASKING         0
-#define LOG_GIME                0
-#define LOG_TIMER               0
-#define LOG_PALETTE             0
+#define LOG_INT_MASKING (1U <<  1)
+#define LOG_GIME        (1U <<  2)
+#define LOG_TIMER       (1U <<  3)
+#define LOG_PALETTE     (1U <<  4)
+#define LOG_MMU         (1U <<  5)
+#define LOG_FBITS       (1U <<  6)
+#define LOG_VBITS       (1U <<  7)
+#define LOG_PBITS       (1U <<  8)
+#define LOG_TBITS       (1U <<  9)
+#define LOG_MBITS       (1U << 10)
+#define LOG_RBITS       (1U << 11)
+
+#define VERBOSE (0)
+//#define VERBOSE (LOG_GIME|LOG_PBITS|LOG_PBITS|LOG_MMU)
+
+#include "logmacro.h"
+
+#define LOGINTMASKING(...) LOGMASKED(LOG_INT_MASKING, __VA_ARGS__)
+#define LOGGIME(...) LOGMASKED(LOG_GIME, __VA_ARGS__)
+#define LOGTIMER(...) LOGMASKED(LOG_TIMER, __VA_ARGS__)
+#define LOGPALETTE(...) LOGMASKED(LOG_PALETTE, __VA_ARGS__)
+#define LOGMMU(...) LOGMASKED(LOG_MMU, __VA_ARGS__)
+#define LOGFBITS(...) LOGMASKED(LOG_FBITS, __VA_ARGS__)
+#define LOGVBITS(...) LOGMASKED(LOG_VBITS, __VA_ARGS__)
+#define LOGPBITS(...) LOGMASKED(LOG_PBITS, __VA_ARGS__)
+#define LOGTBITS(...) LOGMASKED(LOG_TBITS, __VA_ARGS__)
+#define LOGMBITS(...) LOGMASKED(LOG_MBITS, __VA_ARGS__)
+#define LOGRBITS(...) LOGMASKED(LOG_RBITS, __VA_ARGS__)
+
 
 
 
@@ -154,13 +183,13 @@ void gime_device::device_start(void)
 	m_gime_clock_timer = timer_alloc(TIMER_GIME_CLOCK);
 
 	// setup banks
-	assert(ARRAY_LENGTH(m_read_banks) == ARRAY_LENGTH(m_write_banks));
-	for (int i = 0; i < ARRAY_LENGTH(m_read_banks); i++)
+	assert(std::size(m_read_banks) == std::size(m_write_banks));
+	for (int i = 0; i < std::size(m_read_banks); i++)
 	{
 		char buffer[8];
-		snprintf(buffer, ARRAY_LENGTH(buffer), "rbank%d", i);
+		snprintf(buffer, std::size(buffer), "rbank%d", i);
 		m_read_banks[i] = machine().root_device().membank(buffer);
-		snprintf(buffer, ARRAY_LENGTH(buffer), "wbank%d", i);
+		snprintf(buffer, std::size(buffer), "wbank%d", i);
 		m_write_banks[i] = machine().root_device().membank(buffer);
 	}
 
@@ -180,10 +209,11 @@ void gime_device::device_start(void)
 	update_composite_palette();
 
 	// set up save states
-	save_pointer(NAME(m_gime_registers), ARRAY_LENGTH(m_gime_registers));
-	save_pointer(NAME(m_mmu), ARRAY_LENGTH(m_mmu));
+	save_item(NAME(m_gime_registers));
+	save_item(NAME(m_mmu));
 	save_item(NAME(m_sam_state));
 	save_item(NAME(m_ff22_value));
+	save_item(NAME(m_ff23_value));
 	save_item(NAME(m_interrupt_value));
 	save_item(NAME(m_irq));
 	save_item(NAME(m_firq));
@@ -301,6 +331,9 @@ void gime_device::device_reset(void)
 
 	m_displayed_rgb = false;
 
+	m_ff22_value = 0;
+	m_ff23_value = 0;
+
 	update_memory();
 	reset_timer();
 }
@@ -311,7 +344,7 @@ void gime_device::device_reset(void)
 //  device_timer - handle timer callbacks
 //-------------------------------------------------
 
-void gime_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void gime_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{
@@ -320,7 +353,7 @@ void gime_device::device_timer(emu_timer &timer, device_timer_id id, int param, 
 			break;
 
 		default:
-			super::device_timer(timer, id, param, ptr);
+			super::device_timer(timer, id, param);
 			break;
 	}
 }
@@ -373,20 +406,18 @@ ioport_constructor gime_device::device_input_ports() const
 //**************************************************************************
 //  TIMER
 //
-//  The CoCo 3 had a timer that had would activate when first written to, and
+//  The CoCo 3 had a timer that was always running, it
 //  would decrement over and over again until zero was reached, and at that
 //  point, would flag an interrupt.  At this point, the timer starts back up
 //  again.
 //
 //  I am deducing that the timer interrupt line was asserted if the timer was
-//  zero and unasserted if the timer was non-zero.  Since we never truly track
-//  the timer, we just use timer callback (coco3_timer_callback() asserts the
-//  line)
+//  zero and unasserted if the timer was non-zero.
 //
 //  Most CoCo 3 docs, including the specs that Tandy released, say that the
 //  high speed timer is 70ns (half of the speed of the main clock crystal).
 //  However, it seems that this is in error, and the GIME timer is really a
-//  280ns timer (one eighth the speed of the main clock crystal.  Gault's
+//  279ns timer (one eighth the speed of the main clock crystal.  Gault's
 //  FAQ agrees with this
 //
 //**************************************************************************
@@ -398,7 +429,7 @@ ioport_constructor gime_device::device_input_ports() const
 gime_device::timer_type_t gime_device::timer_type(void)
 {
 	// wraps the GIME register access and returns an enumeration
-	return (m_gime_registers[0x01] & 0x20) ? GIME_TIMER_CLOCK : GIME_TIMER_HBORD;
+	return (m_gime_registers[0x01] & 0x20) ? GIME_TIMER_279NSEC : GIME_TIMER_63USEC;
 }
 
 
@@ -412,11 +443,11 @@ const char *gime_device::timer_type_string(void)
 	const char *result;
 	switch(timer_type())
 	{
-		case GIME_TIMER_CLOCK:
-			result = "CLOCK";
+		case GIME_TIMER_63USEC:
+			result = "63USEC";
 			break;
-		case GIME_TIMER_HBORD:
-			result = "HBORD";
+		case GIME_TIMER_279NSEC:
+			result = "279NSEC";
 			break;
 		default:
 			fatalerror("Should not get here\n");
@@ -452,7 +483,7 @@ void gime_device::timer_elapsed(void)
 void gime_device::reset_timer(void)
 {
 	/* value is from 0-4095 */
-	m_timer_value = ((m_gime_registers[0x04] & 0x0F) * 0x100) | m_gime_registers[0x05];
+	m_timer_value = ((m_gime_registers[0x04] & 0x0F) << 8) | m_gime_registers[0x05];
 
 	/* depending on the GIME type, canonicalize the value */
 	if (m_timer_value > 0)
@@ -461,22 +492,24 @@ void gime_device::reset_timer(void)
 			m_timer_value += 1; /* the 1987 GIME reset to the value plus one */
 		else
 			m_timer_value += 2; /* the 1986 GIME reset to the value plus two */
-	}
 
-	if ((timer_type() == GIME_TIMER_CLOCK) && (m_timer_value > 0))
-	{
-		/* we're starting a countdown on the GIME clock timer */
-		attotime duration = clocks_to_attotime(m_timer_value * 8);
-		m_gime_clock_timer->adjust(duration);
+		if (timer_type() == GIME_TIMER_63USEC)
+		{
+			// master clock divided by 8, divided by 228, divided by 2
+			m_gime_clock_timer->adjust(attotime::from_hz(clock()) * 3648 * m_timer_value / 2);
+		}
+		else
+		{
+			// master clock divided by 8, divided by 2
+			m_gime_clock_timer->adjust(attotime::from_hz(clock()) * 16 * m_timer_value / 2);
+		}
 	}
 	else
 	{
-		/* either the timer is off, or were not using the GIME clock timer */
 		m_gime_clock_timer->adjust(attotime::never);
 	}
 
-	if (LOG_TIMER)
-		logerror("%s: reset_timer(): timer_type=%s value=%d\n", describe_context(), timer_type_string(), m_timer_value);
+	LOGTIMER("%s: reset_timer(): timer_type=%s value=%d\n", describe_context(), timer_type_string(), m_timer_value);
 }
 
 
@@ -506,7 +539,7 @@ inline void gime_device::update_memory(void)
 void gime_device::update_memory(int bank)
 {
 	// choose bank
-	assert((bank >= 0) && (bank < ARRAY_LENGTH(m_read_banks)) && (bank < ARRAY_LENGTH(m_write_banks)));
+	assert((bank >= 0) && (bank < std::size(m_read_banks)) && (bank < std::size(m_write_banks)));
 	memory_bank *read_bank = m_read_banks[bank];
 	memory_bank *write_bank = m_write_banks[bank];
 
@@ -518,7 +551,7 @@ void gime_device::update_memory(int bank)
 	{
 		bank = 7;
 		offset = 0x1E00;
-		force_ram = true;
+		force_ram = (m_gime_registers[0] & 0x08);
 		enable_mmu = enable_mmu && !(m_gime_registers[0] & 0x08);
 	}
 	else
@@ -552,29 +585,24 @@ void gime_device::update_memory(int bank)
 	if (((block & 0x3F) >= 0x3C) && !(m_sam_state & SAM_STATE_TY) && !force_ram)
 	{
 		// we're in ROM
-		static const uint8_t rom_map[4][4] =
-		{
-			{ 0, 1, 4, 5 },
-			{ 0, 1, 4, 5 },
-			{ 0, 1, 2, 3 },
-			{ 6, 7, 4, 5 }
-		};
-
-		// Pin ROM page to MMU slot
-		block = (block & 0xfc) | (bank & 0x03);
-
-		// look up the block in the ROM map
-		block = rom_map[m_gime_registers[0] & 3][(block & 0x3F) - 0x3C];
+		const uint8_t rom_mode = m_gime_registers[0] & 3;
 
 		// are we in onboard ROM or cart ROM?
-		if (BIT(block, 2) && m_cart_rom != nullptr)
+		if (rom_mode == 3 || (rom_mode < 2 && (block & 0x3F) >= 0x3E))
 		{
-			// perform the look up
-			memory = &m_cart_rom[((block & 3) * 0x2000) % m_cart_size];
+			if (m_cart_rom)
+			{
+				// perform the look up (ROM page is pinned to MMU slot)
+				memory = &m_cart_rom[(((bank & 3) ^ 2) * 0x2000) % m_cart_size];
+			}
+			else
+			{
+				memory = 0;
+			}
 		}
 		else
 		{
-			memory = &m_rom[(block & 3) * 0x2000];
+			memory = &m_rom[(bank & 3) * 0x2000];
 		}
 		is_read_only = true;
 	}
@@ -589,8 +617,16 @@ void gime_device::update_memory(int bank)
 	memory += offset;
 
 	// set the banks
-	read_bank->set_base(memory);
-	write_bank->set_base(is_read_only ? m_dummy_bank : memory);
+	if (memory)
+	{
+		read_bank->set_base(memory);
+		write_bank->set_base(is_read_only ? m_dummy_bank : memory);
+	}
+	else
+	{
+		read_bank->set_base(m_dummy_bank);
+		write_bank->set_base(m_dummy_bank);
+	}
 }
 
 
@@ -602,6 +638,22 @@ void gime_device::update_memory(int bank)
 uint8_t *gime_device::memory_pointer(uint32_t address)
 {
 	return &m_ram->pointer()[address % m_ram->size()];
+}
+
+
+
+//-------------------------------------------------
+//  pia_write - observe writes to pia 1
+//-------------------------------------------------
+
+void gime_device::pia_write(offs_t offset, uint8_t data)
+{
+	if (offset == 0x03)
+		m_ff23_value = data;
+
+	/* only cache writes to $FF22 if the data register is addressed */
+	if (offset == 0x02 && ((m_ff23_value & 0x04) == 0x04))
+		m_ff22_value = data;
 }
 
 
@@ -765,15 +817,10 @@ void gime_device::write(offs_t offset, uint8_t data)
 
 inline void gime_device::write_gime_register(offs_t offset, uint8_t data)
 {
-	// this is needed for writes to FF95
-	bool timer_was_off = (m_gime_registers[0x04] == 0x00) && (m_gime_registers[0x05] == 0x00);
-
 	// sanity check input
 	offset &= 0x0F;
 
-	// perform logging
-	if (LOG_GIME)
-		logerror("%s: CoCo3 GIME: $%04x <== $%02x\n", describe_context(), offset + 0xff90, data);
+	LOGGIME("%s: CoCo3 GIME: $%04x <== $%02x\n", describe_context(), offset + 0xff90, data);
 
 	// make the change, and track the difference
 	uint8_t xorval = m_gime_registers[offset] ^ data;
@@ -793,6 +840,24 @@ inline void gime_device::write_gime_register(offs_t offset, uint8_t data)
 			//        Bit 0 MC0 ROM map control
 			if (xorval & 0x4B)
 				update_memory();
+
+			// IRQ master switch changed?
+			if (xorval & 0x20)
+			{
+				if (data & 0x20)
+					m_write_irq(irq_r());
+				else
+					m_write_irq(false);
+			}
+
+			// FIRQ master switch changed?
+			if (xorval & 0x10)
+			{
+				if (data & 0x10)
+					m_write_firq(firq_r());
+				else
+					m_write_firq(false);
+			}
 			break;
 
 		case 0x01:
@@ -823,17 +888,14 @@ inline void gime_device::write_gime_register(offs_t offset, uint8_t data)
 			//      ! Bit 2 EI2 Serial data interrupt
 			//        Bit 1 EI1 Keyboard interrupt
 			//        Bit 0 EI0 Cartridge interrupt
-			if (LOG_INT_MASKING)
-			{
-				logerror("%s: GIME IRQ: Interrupts { %s%s%s%s%s%s} enabled\n",
-					describe_context(),
-					(data & 0x20) ? "TMR " : "",
-					(data & 0x10) ? "HBORD " : "",
-					(data & 0x08) ? "VBORD " : "",
-					(data & 0x04) ? "EI2 " : "",
-					(data & 0x02) ? "EI1 " : "",
-					(data & 0x01) ? "EI0 " : "");
-			}
+			LOGINTMASKING("%s: GIME IRQ: Interrupts { %s%s%s%s%s%s} enabled\n",
+				describe_context(),
+				(data & 0x20) ? "TMR " : "",
+				(data & 0x10) ? "HBORD " : "",
+				(data & 0x08) ? "VBORD " : "",
+				(data & 0x04) ? "EI2 " : "",
+				(data & 0x02) ? "EI1 " : "",
+				(data & 0x01) ? "EI0 " : "");
 
 			// While normally interrupts are acknowledged by reading from this
 			// register and not writing to it, the act of disabling these interrupts
@@ -841,6 +903,13 @@ inline void gime_device::write_gime_register(offs_t offset, uint8_t data)
 			//
 			// Kudos to Glen Hewlett for identifying this problem
 			change_gime_irq(m_irq & data);
+
+			// special case timer reset value of zero
+			if (m_timer_value == 0 && (xorval & INTERRUPT_TMR ))
+			{
+				set_interrupt_value(INTERRUPT_TMR, true);
+				set_interrupt_value(INTERRUPT_TMR, false);
+			}
 			break;
 
 		case 0x03:
@@ -853,17 +922,14 @@ inline void gime_device::write_gime_register(offs_t offset, uint8_t data)
 			//      ! Bit 2 EI2 Serial data interrupt
 			//        Bit 1 EI1 Keyboard interrupt
 			//        Bit 0 EI0 Cartridge interrupt
-			if (LOG_INT_MASKING)
-			{
-				logerror("%s: GIME FIRQ: Interrupts { %s%s%s%s%s%s} enabled\n",
-					describe_context(),
-					(data & 0x20) ? "TMR " : "",
-					(data & 0x10) ? "HBORD " : "",
-					(data & 0x08) ? "VBORD " : "",
-					(data & 0x04) ? "EI2 " : "",
-					(data & 0x02) ? "EI1 " : "",
-					(data & 0x01) ? "EI0 " : "");
-			}
+			LOGINTMASKING("%s: GIME FIRQ: Interrupts { %s%s%s%s%s%s} enabled\n",
+				describe_context(),
+				(data & 0x20) ? "TMR " : "",
+				(data & 0x10) ? "HBORD " : "",
+				(data & 0x08) ? "VBORD " : "",
+				(data & 0x04) ? "EI2 " : "",
+				(data & 0x02) ? "EI1 " : "",
+				(data & 0x01) ? "EI0 " : "");
 
 			// While normally interrupts are acknowledged by reading from this
 			// register and not writing to it, the act of disabling these interrupts
@@ -871,6 +937,14 @@ inline void gime_device::write_gime_register(offs_t offset, uint8_t data)
 			//
 			// Kudos to Glen Hewlett for identifying this problem
 			change_gime_firq(m_firq & data);
+
+			// Special case timer reset value of zero
+			if (m_timer_value == 0 && (xorval & INTERRUPT_TMR))
+			{
+				set_interrupt_value(INTERRUPT_TMR, true);
+				set_interrupt_value(INTERRUPT_TMR, false);
+			}
+
 			break;
 
 		case 0x04:
@@ -883,20 +957,6 @@ inline void gime_device::write_gime_register(offs_t offset, uint8_t data)
 		case 0x05:
 			//  $FF95 Timer register LSB
 			//        Bits 0-7 Low order eight bits of the timer
-			if (timer_was_off && (m_gime_registers[0x05] != 0x00))
-			{
-				// Writes to $FF95 do not cause the timer to reset, but MESS
-				// will invoke coco3_timer_reset() if $FF94/5 was previously
-				// $0000.  The reason for this is because the timer is not
-				// actually off when $FF94/5 are loaded with $0000; rather it
-				// is continuously reloading the GIME's internal countdown
-				// register, even if it isn't causing interrupts to be raised.
-				//
-				// Failure to do this was the cause of bug #1065.  Special
-				// thanks to John Kowalski for pointing me in the right
-				// direction
-				reset_timer();
-			}
 			break;
 
 		case 0x08:
@@ -998,6 +1058,8 @@ inline void gime_device::write_mmu_register(offs_t offset, uint8_t data)
 		m_mmu[offset] = data;
 		update_memory(offset & 0x07);
 	}
+
+	LOGMMU("%s: MMU Write: $%04x <== $%02X\n",describe_context(), 0xffa0+offset, data );
 }
 
 
@@ -1010,9 +1072,7 @@ inline void gime_device::write_palette_register(offs_t offset, uint8_t data)
 {
 	offset &= 0x0F;
 
-	// perform logging
-	if (LOG_PALETTE)
-		logerror("%s: CoCo3 Palette: $%04x <== $%02x\n", describe_context(), offset + 0xffB0, data);
+	LOGPALETTE("%s: CoCo3 Palette: $%04x <== $%02x\n", describe_context(), offset + 0xffB0, data);
 
 	/* has this entry changed? */
 	if (m_palette_rotated[m_palette_rotated_position][offset] != data)
@@ -1021,10 +1081,10 @@ inline void gime_device::write_palette_register(offs_t offset, uint8_t data)
 		if (m_palette_rotated_position_used)
 		{
 			/* identify the new position */
-			uint16_t new_palette_rotated_position = (m_palette_rotated_position + 1) % ARRAY_LENGTH(m_palette_rotated);
+			uint16_t new_palette_rotated_position = (m_palette_rotated_position + 1) % std::size(m_palette_rotated);
 
 			/* copy the palette */
-			for (int i = 0; i < ARRAY_LENGTH(m_palette_rotated[0]); i++)
+			for (int i = 0; i < std::size(m_palette_rotated[0]); i++)
 				m_palette_rotated[new_palette_rotated_position][i] = m_palette_rotated[m_palette_rotated_position][i];
 
 			/* and advance */
@@ -1054,6 +1114,48 @@ inline void gime_device::write_sam_register(offs_t offset)
 
 	if (xorval & (SAM_STATE_R1|SAM_STATE_R0))
 		update_cpu_clock();
+
+	if (xorval & (SAM_STATE_F6|SAM_STATE_F5|SAM_STATE_F4|SAM_STATE_F3|SAM_STATE_F2|SAM_STATE_F1|SAM_STATE_F0))
+	{
+		LOGFBITS("%s: SAM F Address: $%04x\n",
+			describe_context(),
+			display_offset());
+	}
+
+	if (xorval & (SAM_STATE_V0|SAM_STATE_V1|SAM_STATE_V2))
+	{
+		LOGVBITS("%s: SAM V Bits: $%02x\n",
+			describe_context(),
+			(m_sam_state & (SAM_STATE_V0|SAM_STATE_V1|SAM_STATE_V2)));
+	}
+
+	if (xorval & (SAM_STATE_P1))
+	{
+		LOGPBITS("%s: SAM P1 Bit: $%02x\n",
+			describe_context(),
+			(m_sam_state & (SAM_STATE_P1)) >> 10);
+	}
+
+	if (xorval & (SAM_STATE_TY))
+	{
+		LOGTBITS("%s: SAM TY Bits: $%02x\n",
+			describe_context(),
+			(m_sam_state & (SAM_STATE_TY)) >> 15);
+	}
+
+	if (xorval & (SAM_STATE_M0|SAM_STATE_M1))
+	{
+		LOGMBITS("%s: SAM M Bits: $%02x\n",
+			describe_context(),
+			(m_sam_state & (SAM_STATE_M0|SAM_STATE_M1)) >> 9);
+	}
+
+	if (xorval & (SAM_STATE_R0|SAM_STATE_R1))
+	{
+		LOGRBITS("%s: SAM R Bits: $%02x\n",
+			describe_context(),
+			(m_sam_state & (SAM_STATE_R0|SAM_STATE_R1)) >> 11);
+	}
 }
 
 
@@ -1064,11 +1166,11 @@ inline void gime_device::write_sam_register(offs_t offset)
 void gime_device::interrupt_rising_edge(uint8_t interrupt)
 {
 	// evaluate IRQ
-	if ((m_gime_registers[0x00] & 0x20) && (m_gime_registers[0x02] & interrupt))
+	if (m_gime_registers[0x02] & interrupt)
 		change_gime_irq(m_irq | interrupt);
 
 	// evaluate FIRQ
-	if ((m_gime_registers[0x00] & 0x10) && (m_gime_registers[0x03] & interrupt))
+	if (m_gime_registers[0x03] & interrupt)
 		change_gime_firq(m_firq | interrupt);
 }
 
@@ -1083,7 +1185,10 @@ void gime_device::change_gime_irq(uint8_t data)
 	if (m_irq != data)
 	{
 		m_irq = data;
-		m_write_irq(irq_r());
+		if (m_gime_registers[0x00] & 0x20)
+			m_write_irq(irq_r());
+		else
+			m_write_irq(false);
 	}
 }
 
@@ -1098,7 +1203,10 @@ void gime_device::change_gime_firq(uint8_t data)
 	if (m_firq != data)
 	{
 		m_firq = data;
-		m_write_firq(firq_r());
+		if (m_gime_registers[0x00] & 0x10)
+			m_write_firq(firq_r());
+		else
+			m_write_firq(false);
 	}
 }
 
@@ -1175,14 +1283,6 @@ void gime_device::new_frame(void)
 void gime_device::horizontal_sync_changed(bool line)
 {
 	set_interrupt_value(INTERRUPT_HBORD, line);
-
-	/* decrement timer if appropriate */
-	if ((timer_type() == GIME_TIMER_HBORD) && (m_timer_value > 0) && line)
-	{
-		if (--m_timer_value == 0)
-			timer_elapsed();
-	}
-
 }
 
 
@@ -1969,8 +2069,8 @@ const uint8_t gime_device::hires_font[128][12] =
 	{ 0x10, 0x28, 0x00, 0x44, 0x44, 0x4C, 0x34, 0x00}, { 0x20, 0x10, 0x44, 0x44, 0x44, 0x4C, 0x34, 0x00},
 	{ 0x38, 0x4C, 0x54, 0x54, 0x54, 0x64, 0x38, 0x00}, { 0x44, 0x38, 0x44, 0x44, 0x44, 0x44, 0x38, 0x00},
 	{ 0x28, 0x44, 0x44, 0x44, 0x44, 0x44, 0x38, 0x00}, { 0x38, 0x40, 0x38, 0x44, 0x38, 0x04, 0x38, 0x00},
-	{ 0x08, 0x14, 0x10, 0x38, 0x10, 0x50, 0x3C, 0x00}, { 0x10, 0x10, 0x7C, 0x10, 0x10, 0x00, 0x7C, 0x00},
-	{ 0x10, 0x28, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00}, { 0x08, 0x14, 0x10, 0x38, 0x10, 0x10, 0x20, 0x40},
+	{ 0x08, 0x14, 0x10, 0x38, 0x10, 0x14, 0x78, 0x00}, { 0x10, 0x10, 0x7C, 0x10, 0x10, 0x00, 0x7C, 0x00},
+	{ 0x10, 0x28, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00}, { 0x08, 0x14, 0x10, 0x38, 0x10, 0x10, 0x50, 0x20},
 	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, { 0x10, 0x10, 0x10, 0x10, 0x10, 0x00, 0x10, 0x00},
 	{ 0x28, 0x28, 0x28, 0x00, 0x00, 0x00, 0x00, 0x00}, { 0x28, 0x28, 0x7C, 0x28, 0x7C, 0x28, 0x28, 0x00},
 	{ 0x10, 0x3C, 0x50, 0x38, 0x14, 0x78, 0x10, 0x00}, { 0x60, 0x64, 0x08, 0x10, 0x20, 0x4C, 0x0C, 0x00},

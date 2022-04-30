@@ -47,9 +47,9 @@ void isa8_lpt_device::device_reset()
 	m_is_primary = (ioport("DSW")->read() & 1) ? false : true;
 	pc_lpt_device &lpt(*subdevice<pc_lpt_device>("lpt"));
 	if (m_is_primary)
-		m_isa->install_device(0x0378, 0x037b, read8_delegate(lpt, FUNC(pc_lpt_device::read)), write8_delegate(lpt, FUNC(pc_lpt_device::write)));
+		m_isa->install_device(0x0378, 0x037b, read8sm_delegate(lpt, FUNC(pc_lpt_device::read)), write8sm_delegate(lpt, FUNC(pc_lpt_device::write)));
 	else
-		m_isa->install_device(0x0278, 0x027b, read8_delegate(lpt, FUNC(pc_lpt_device::read)), write8_delegate(lpt, FUNC(pc_lpt_device::write)));
+		m_isa->install_device(0x0278, 0x027b, read8sm_delegate(lpt, FUNC(pc_lpt_device::read)), write8sm_delegate(lpt, FUNC(pc_lpt_device::write)));
 }
 
 WRITE_LINE_MEMBER(isa8_lpt_device::pc_cpu_line)

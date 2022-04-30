@@ -53,13 +53,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(bus_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(bus_so_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(read_cassette);
-	DECLARE_READ8_MEMBER(via_0_in_a);
-	DECLARE_WRITE8_MEMBER(via_0_out_a);
-	DECLARE_WRITE8_MEMBER(via_0_out_b);
+	uint8_t via_0_in_a();
+	void via_0_out_a(uint8_t data);
+	void via_0_out_b(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via_0_out_ca2);
 	DECLARE_WRITE_LINE_MEMBER(via_0_out_cb2);
-	DECLARE_WRITE8_MEMBER(via_1_out_a);
-	DECLARE_WRITE8_MEMBER(via_1_out_b);
+	void via_1_out_a(uint8_t data);
+	void via_1_out_b(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via_1_out_ca2);
 	DECLARE_WRITE_LINE_MEMBER(via_1_out_cb2);
 

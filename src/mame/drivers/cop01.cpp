@@ -2,18 +2,17 @@
 // copyright-holders:Carlos A. Lozano
 /***************************************************************************
 
-Cops 01      (c) 1985 Nichibutsu
+Cop 01       (c) 1985 Nichibutsu
 Mighty Guy   (c) 1986 Nichibutsu
 
 driver by Carlos A. Lozano <calb@gsyc.inf.uc3m.es>
 
 TODO:
-----
 - Fix priority kludge (see video/cop01.c)
-mightguy:
-- missing emulation of the 1412M2 protection chip, used by the sound CPU.
+- Inaccurate 1412M2 protection chip emulation in mightguy, used by the sound CPU.
   This is probably an extra CPU (program rom is the ic2 one), presumably
   with data / address line scrambling
+- Some sound problems remaining, not just 1412M2, but see also MT7949
 
 
 Mighty Guy board layout:
@@ -59,11 +58,10 @@ Mighty Guy board layout:
 
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "sound/3526intf.h"
+#include "sound/ymopl.h"
 #include "screen.h"
 #include "speaker.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 
 
 #define MIGHTGUY_HACK    0
@@ -78,13 +76,13 @@ Mighty Guy board layout:
  *
  *************************************/
 
-WRITE8_MEMBER(cop01_state::cop01_sound_command_w)
+void cop01_state::cop01_sound_command_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
-READ8_MEMBER(cop01_state::cop01_sound_command_r)
+uint8_t cop01_state::cop01_sound_command_r()
 {
 	int res = (m_soundlatch->read() & 0x7f) << 1;
 
@@ -109,12 +107,12 @@ READ_LINE_MEMBER(cop01_state::mightguy_area_r)
 	return (ioport("FAKE")->read() & Mask) ? 1 : 0;
 }
 
-WRITE8_MEMBER(cop01_state::cop01_irq_ack_w)
+void cop01_state::cop01_irq_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE );
 }
 
-READ8_MEMBER(cop01_state::cop01_sound_irq_ack_w)
+uint8_t cop01_state::cop01_sound_irq_ack_w()
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE );
 	return 0;
@@ -235,7 +233,9 @@ static INPUT_PORTS_START( cop01 )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_6C ) )
-	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x10, 0x10, "Invulnerability (Cheat, 1/2)" ) // Undocumented invulnerability cheat (both DIP switches need to be ON)
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
@@ -275,7 +275,9 @@ static INPUT_PORTS_START( cop01 )
 	PORT_DIPSETTING(    0x20, "30k 80k 50k+" )
 	PORT_DIPSETTING(    0x40, "30k 130k 100k+" )
 	PORT_DIPSETTING(    0x00, "30k 180k 150k+" )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x80, 0x80, "Invulnerability (Cheat, 2/2)" ) // Undocumented invulnerability cheat (both DIP switches need to be ON)
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 /* There is an ingame bug at 0x00e4 to 0x00e6 that performs 3 times 'rrca' instead of 'rlca'
@@ -374,28 +376,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
-static const gfx_layout tilelayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 4+8*0, 0+8*0, 4+8*1, 0+8*1, 4+8*2, 0+8*2, 4+8*3, 0+8*3 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
 static const gfx_layout spritelayout =
 {
 	16,16,
@@ -416,9 +396,9 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_cop01 )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,         0,  1 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,        16,  8 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 16+8*16, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb,  0,  1 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_lsb, 16,  8 )
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   16+8*16, 16 )
 GFXDECODE_END
 
 
@@ -450,15 +430,14 @@ void cop01_state::machine_reset()
 void cop01_state::cop01(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, MAINCPU_CLOCK/2);   /* unknown clock / divider */
+	Z80(config, m_maincpu, MAINCPU_CLOCK/2); // unknown clock / divider
 	m_maincpu->set_addrmap(AS_PROGRAM, &cop01_state::cop01_map);
 	m_maincpu->set_addrmap(AS_IO, &cop01_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cop01_state::irq0_line_assert));
 
-	Z80(config, m_audiocpu, XTAL(3'000'000));    /* unknown clock / divider, hand-tuned to match audio reference */
+	Z80(config, m_audiocpu, XTAL(3'000'000)); // unknown clock / divider, hand-tuned to match audio reference
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cop01_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &cop01_state::audio_io_map);
-
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -477,22 +456,20 @@ void cop01_state::cop01(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	AY8910(config, "ay1", 1250000).add_route(ALL_OUTPUTS, "mono", 0.50); /* unknown clock / divider, hand-tuned to match audio reference */
-
-	AY8910(config, "ay2", 1250000).add_route(ALL_OUTPUTS, "mono", 0.25); /* unknown clock / divider, hand-tuned to match audio reference */
-
-	AY8910(config, "ay3", 1250000).add_route(ALL_OUTPUTS, "mono", 0.25); /* unknown clock / divider, hand-tuned to match audio reference */
+	AY8910(config, "ay1", 1250000).add_route(ALL_OUTPUTS, "mono", 0.50); // unknown clock / divider, hand-tuned to match audio reference
+	AY8910(config, "ay2", 1250000).add_route(ALL_OUTPUTS, "mono", 0.25); // "
+	AY8910(config, "ay3", 1250000).add_route(ALL_OUTPUTS, "mono", 0.25); // "
 }
 
 void mightguy_state::mightguy(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, MAINCPU_CLOCK/2);   /* unknown divider */
+	Z80(config, m_maincpu, MAINCPU_CLOCK/2); // unknown divider
 	m_maincpu->set_addrmap(AS_PROGRAM, &mightguy_state::cop01_map);
 	m_maincpu->set_addrmap(AS_IO, &mightguy_state::mightguy_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cop01_state::irq0_line_assert));
 
-	Z80(config, m_audiocpu, AUDIOCPU_CLOCK/2); /* unknown divider */
+	Z80(config, m_audiocpu, AUDIOCPU_CLOCK/2); // unknown divider
 	m_audiocpu->set_addrmap(AS_PROGRAM, &mightguy_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &mightguy_state::mightguy_audio_io_map);
 
@@ -516,12 +493,9 @@ void mightguy_state::mightguy(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM3526(config, "ymsnd", AUDIOCPU_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 1.0); /* unknown divider */
+	YM3526(config, "ymsnd", AUDIOCPU_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 1.0); // unknown divider
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 
@@ -667,6 +641,6 @@ void cop01_state::init_mightguy()
  *
  *************************************/
 
-GAME( 1985, cop01,    0,     cop01,    cop01,    cop01_state,    empty_init,    ROT0,   "Nichibutsu", "Cop 01 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, cop01a,   cop01, cop01,    cop01,    cop01_state,    empty_init,    ROT0,   "Nichibutsu", "Cop 01 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, cop01,    0,     cop01,    cop01,    cop01_state,    empty_init,    ROT0,   "Nichibutsu", "Cop 01 (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, cop01a,   cop01, cop01,    cop01,    cop01_state,    empty_init,    ROT0,   "Nichibutsu", "Cop 01 (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, mightguy, 0,     mightguy, mightguy, mightguy_state, init_mightguy, ROT270, "Nichibutsu", "Mighty Guy",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

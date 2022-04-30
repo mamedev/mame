@@ -44,15 +44,15 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
-	tilemap_t    *m_bg_tilemap;
-	int        m_palette_offset;
+	tilemap_t    *m_bg_tilemap = nullptr;
+	int        m_palette_offset = 0;
 
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(pal_offs_w);
-	DECLARE_WRITE8_MEMBER(scroll_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	void pal_offs_w(uint8_t data);
+	void scroll_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_y_w);
 

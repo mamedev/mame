@@ -24,7 +24,7 @@
 #include "machine/74153.h"
 #include "machine/6821pia.h"
 #include "screen.h"
-
+#include "speaker.h"
 
 
 /*************************************
@@ -208,21 +208,10 @@ static const gfx_layout goallayout =
 	0
 };
 
-static const gfx_layout alphalayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	8*8
-};
-
 static GFXDECODE_START( gfx_carpolo )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0,         12 )
 	GFXDECODE_ENTRY( "gfx2", 0, goallayout,   12*2,      2 )
-	GFXDECODE_ENTRY( "gfx3", 0, alphalayout,  12*2+2*16, 4 )
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x1,    12*2+2*16, 4 )
 GFXDECODE_END
 
 /*************************************
@@ -290,6 +279,21 @@ void carpolo_state::carpolo(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_carpolo);
 	PALETTE(config, m_palette, FUNC(carpolo_state::carpolo_palette), 12*2+2*16+4*2);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+
+	NETLIST_SOUND(config, "sound_nl", 48000)
+		.set_source(NETLIST_NAME(carpolo))
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	NETLIST_LOGIC_INPUT(config, "sound_nl:player_crash1", "PL1_CRASH.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:player_crash2", "PL2_CRASH.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:player_crash3", "PL3_CRASH.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:player_crash4", "PL4_CRASH.IN", 0);
+
+	// Temporarily just tied to an arbitrary value to preserve lack of audio.
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "PL1_CRASH.GND").set_mult_offset(10000.0 / 32768.0, 0.0);
 }
 
 

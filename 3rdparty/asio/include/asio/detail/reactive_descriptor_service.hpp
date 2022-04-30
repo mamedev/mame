@@ -2,7 +2,7 @@
 // detail/reactive_descriptor_service.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -21,8 +21,10 @@
   && !defined(ASIO_WINDOWS_RUNTIME) \
   && !defined(__CYGWIN__)
 
+#include "asio/associated_cancellation_slot.hpp"
 #include "asio/buffer.hpp"
-#include "asio/io_context.hpp"
+#include "asio/cancellation_type.hpp"
+#include "asio/execution_context.hpp"
 #include "asio/detail/bind_handler.hpp"
 #include "asio/detail/buffer_sequence_adapter.hpp"
 #include "asio/detail/descriptor_ops.hpp"
@@ -42,7 +44,7 @@ namespace asio {
 namespace detail {
 
 class reactive_descriptor_service :
-  public service_base<reactive_descriptor_service>
+  public execution_context_service_base<reactive_descriptor_service>
 {
 public:
   // The native type of a descriptor.
@@ -75,8 +77,7 @@ public:
   };
 
   // Constructor.
-  ASIO_DECL reactive_descriptor_service(
-      asio::io_context& io_context);
+  ASIO_DECL reactive_descriptor_service(execution_context& context);
 
   // Destroy all user-defined handler objects owned by the service.
   ASIO_DECL void shutdown();
@@ -86,7 +87,7 @@ public:
 
   // Move-construct a new descriptor implementation.
   ASIO_DECL void move_construct(implementation_type& impl,
-      implementation_type& other_impl);
+      implementation_type& other_impl) ASIO_NOEXCEPT;
 
   // Move-assign from another descriptor implementation.
   ASIO_DECL void move_assign(implementation_type& impl,
@@ -190,18 +191,22 @@ public:
 
   // Asynchronously wait for the descriptor to become ready to read, ready to
   // write, or to have pending error conditions.
-  template <typename Handler>
+  template <typename Handler, typename IoExecutor>
   void async_wait(implementation_type& impl,
-      posix::descriptor_base::wait_type w, Handler& handler)
+      posix::descriptor_base::wait_type w,
+      Handler& handler, const IoExecutor& io_ex)
   {
     bool is_continuation =
       asio_handler_cont_helpers::is_continuation(handler);
 
+    typename associated_cancellation_slot<Handler>::type slot
+      = asio::get_associated_cancellation_slot(handler);
+
     // Allocate and construct an operation to wrap the handler.
-    typedef reactive_wait_op<Handler> op;
+    typedef reactive_wait_op<Handler, IoExecutor> op;
     typename op::ptr p = { asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
-    p.p = new (p.v) op(handler);
+    p.p = new (p.v) op(success_ec_, handler, io_ex);
 
     ASIO_HANDLER_CREATION((reactor_.context(), *p.p, "descriptor",
           &impl, impl.descriptor_, "async_wait"));
@@ -225,6 +230,14 @@ public:
         return;
     }
 
+    // Optionally register for per-operation cancellation.
+    if (slot.is_connected())
+    {
+      p.p->cancellation_key_ =
+        &slot.template emplace<reactor_op_cancellation>(
+            &reactor_, &impl.reactor_data_, impl.descriptor_, op_type);
+    }
+
     start_op(impl, op_type, p.p, is_continuation, false, false);
     p.v = p.p = 0;
   }
@@ -234,11 +247,22 @@ public:
   size_t write_some(implementation_type& impl,
       const ConstBufferSequence& buffers, asio::error_code& ec)
   {
-    buffer_sequence_adapter<asio::const_buffer,
-        ConstBufferSequence> bufs(buffers);
+    typedef buffer_sequence_adapter<asio::const_buffer,
+        ConstBufferSequence> bufs_type;
 
-    return descriptor_ops::sync_write(impl.descriptor_, impl.state_,
-        bufs.buffers(), bufs.count(), bufs.all_empty(), ec);
+    if (bufs_type::is_single_buffer)
+    {
+      return descriptor_ops::sync_write1(impl.descriptor_,
+          impl.state_, bufs_type::first(buffers).data(),
+          bufs_type::first(buffers).size(), ec);
+    }
+    else
+    {
+      bufs_type bufs(buffers);
+
+      return descriptor_ops::sync_write(impl.descriptor_, impl.state_,
+          bufs.buffers(), bufs.count(), bufs.all_empty(), ec);
+    }
   }
 
   // Wait until data can be written without blocking.
@@ -253,18 +277,31 @@ public:
 
   // Start an asynchronous write. The data being sent must be valid for the
   // lifetime of the asynchronous operation.
-  template <typename ConstBufferSequence, typename Handler>
+  template <typename ConstBufferSequence, typename Handler, typename IoExecutor>
   void async_write_some(implementation_type& impl,
-      const ConstBufferSequence& buffers, Handler& handler)
+      const ConstBufferSequence& buffers, Handler& handler,
+      const IoExecutor& io_ex)
   {
     bool is_continuation =
       asio_handler_cont_helpers::is_continuation(handler);
 
+    typename associated_cancellation_slot<Handler>::type slot
+      = asio::get_associated_cancellation_slot(handler);
+
     // Allocate and construct an operation to wrap the handler.
-    typedef descriptor_write_op<ConstBufferSequence, Handler> op;
+    typedef descriptor_write_op<ConstBufferSequence, Handler, IoExecutor> op;
     typename op::ptr p = { asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
-    p.p = new (p.v) op(impl.descriptor_, buffers, handler);
+    p.p = new (p.v) op(success_ec_, impl.descriptor_, buffers, handler, io_ex);
+
+    // Optionally register for per-operation cancellation.
+    if (slot.is_connected())
+    {
+      p.p->cancellation_key_ =
+        &slot.template emplace<reactor_op_cancellation>(
+            &reactor_, &impl.reactor_data_,
+            impl.descriptor_, reactor::write_op);
+    }
 
     ASIO_HANDLER_CREATION((reactor_.context(), *p.p, "descriptor",
           &impl, impl.descriptor_, "async_write_some"));
@@ -276,18 +313,30 @@ public:
   }
 
   // Start an asynchronous wait until data can be written without blocking.
-  template <typename Handler>
+  template <typename Handler, typename IoExecutor>
   void async_write_some(implementation_type& impl,
-      const null_buffers&, Handler& handler)
+      const null_buffers&, Handler& handler, const IoExecutor& io_ex)
   {
     bool is_continuation =
       asio_handler_cont_helpers::is_continuation(handler);
 
+    typename associated_cancellation_slot<Handler>::type slot
+      = asio::get_associated_cancellation_slot(handler);
+
     // Allocate and construct an operation to wrap the handler.
-    typedef reactive_null_buffers_op<Handler> op;
+    typedef reactive_null_buffers_op<Handler, IoExecutor> op;
     typename op::ptr p = { asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
-    p.p = new (p.v) op(handler);
+    p.p = new (p.v) op(success_ec_, handler, io_ex);
+
+    // Optionally register for per-operation cancellation.
+    if (slot.is_connected())
+    {
+      p.p->cancellation_key_ =
+        &slot.template emplace<reactor_op_cancellation>(
+            &reactor_, &impl.reactor_data_,
+            impl.descriptor_, reactor::write_op);
+    }
 
     ASIO_HANDLER_CREATION((reactor_.context(), *p.p, "descriptor",
           &impl, impl.descriptor_, "async_write_some(null_buffers)"));
@@ -301,11 +350,22 @@ public:
   size_t read_some(implementation_type& impl,
       const MutableBufferSequence& buffers, asio::error_code& ec)
   {
-    buffer_sequence_adapter<asio::mutable_buffer,
-        MutableBufferSequence> bufs(buffers);
+    typedef buffer_sequence_adapter<asio::mutable_buffer,
+        MutableBufferSequence> bufs_type;
 
-    return descriptor_ops::sync_read(impl.descriptor_, impl.state_,
-        bufs.buffers(), bufs.count(), bufs.all_empty(), ec);
+    if (bufs_type::is_single_buffer)
+    {
+      return descriptor_ops::sync_read1(impl.descriptor_,
+          impl.state_, bufs_type::first(buffers).data(),
+          bufs_type::first(buffers).size(), ec);
+    }
+    else
+    {
+      bufs_type bufs(buffers);
+
+      return descriptor_ops::sync_read(impl.descriptor_, impl.state_,
+          bufs.buffers(), bufs.count(), bufs.all_empty(), ec);
+    }
   }
 
   // Wait until data can be read without blocking.
@@ -320,18 +380,32 @@ public:
 
   // Start an asynchronous read. The buffer for the data being read must be
   // valid for the lifetime of the asynchronous operation.
-  template <typename MutableBufferSequence, typename Handler>
+  template <typename MutableBufferSequence,
+      typename Handler, typename IoExecutor>
   void async_read_some(implementation_type& impl,
-      const MutableBufferSequence& buffers, Handler& handler)
+      const MutableBufferSequence& buffers,
+      Handler& handler, const IoExecutor& io_ex)
   {
     bool is_continuation =
       asio_handler_cont_helpers::is_continuation(handler);
 
+    typename associated_cancellation_slot<Handler>::type slot
+      = asio::get_associated_cancellation_slot(handler);
+
     // Allocate and construct an operation to wrap the handler.
-    typedef descriptor_read_op<MutableBufferSequence, Handler> op;
+    typedef descriptor_read_op<MutableBufferSequence, Handler, IoExecutor> op;
     typename op::ptr p = { asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
-    p.p = new (p.v) op(impl.descriptor_, buffers, handler);
+    p.p = new (p.v) op(success_ec_, impl.descriptor_, buffers, handler, io_ex);
+
+    // Optionally register for per-operation cancellation.
+    if (slot.is_connected())
+    {
+      p.p->cancellation_key_ =
+        &slot.template emplace<reactor_op_cancellation>(
+            &reactor_, &impl.reactor_data_,
+            impl.descriptor_, reactor::read_op);
+    }
 
     ASIO_HANDLER_CREATION((reactor_.context(), *p.p, "descriptor",
           &impl, impl.descriptor_, "async_read_some"));
@@ -343,18 +417,30 @@ public:
   }
 
   // Wait until data can be read without blocking.
-  template <typename Handler>
+  template <typename Handler, typename IoExecutor>
   void async_read_some(implementation_type& impl,
-      const null_buffers&, Handler& handler)
+      const null_buffers&, Handler& handler, const IoExecutor& io_ex)
   {
     bool is_continuation =
       asio_handler_cont_helpers::is_continuation(handler);
 
+    typename associated_cancellation_slot<Handler>::type slot
+      = asio::get_associated_cancellation_slot(handler);
+
     // Allocate and construct an operation to wrap the handler.
-    typedef reactive_null_buffers_op<Handler> op;
+    typedef reactive_null_buffers_op<Handler, IoExecutor> op;
     typename op::ptr p = { asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
-    p.p = new (p.v) op(handler);
+    p.p = new (p.v) op(success_ec_, handler, io_ex);
+
+    // Optionally register for per-operation cancellation.
+    if (slot.is_connected())
+    {
+      p.p->cancellation_key_ =
+        &slot.template emplace<reactor_op_cancellation>(
+            &reactor_, &impl.reactor_data_,
+            impl.descriptor_, reactor::read_op);
+    }
 
     ASIO_HANDLER_CREATION((reactor_.context(), *p.p, "descriptor",
           &impl, impl.descriptor_, "async_read_some(null_buffers)"));
@@ -368,8 +454,43 @@ private:
   ASIO_DECL void start_op(implementation_type& impl, int op_type,
       reactor_op* op, bool is_continuation, bool is_non_blocking, bool noop);
 
+  // Helper class used to implement per-operation cancellation
+  class reactor_op_cancellation
+  {
+  public:
+    reactor_op_cancellation(reactor* r,
+        reactor::per_descriptor_data* p, int d, int o)
+      : reactor_(r),
+        reactor_data_(p),
+        descriptor_(d),
+        op_type_(o)
+    {
+    }
+
+    void operator()(cancellation_type_t type)
+    {
+      if (!!(type &
+            (cancellation_type::terminal
+              | cancellation_type::partial
+              | cancellation_type::total)))
+      {
+        reactor_->cancel_ops_by_key(descriptor_,
+            *reactor_data_, op_type_, this);
+      }
+    }
+
+  private:
+    reactor* reactor_;
+    reactor::per_descriptor_data* reactor_data_;
+    int descriptor_;
+    int op_type_;
+  };
+
   // The selector that performs event demultiplexing for the service.
   reactor& reactor_;
+
+  // Cached success value to avoid accessing category singleton.
+  const asio::error_code success_ec_;
 };
 
 } // namespace detail

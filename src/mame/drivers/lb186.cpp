@@ -7,7 +7,7 @@
 #include "machine/mc68681.h"
 #include "bus/nscsi/hd.h"
 #include "bus/rs232/rs232.h"
-#include "machine/ncr5380n.h"
+#include "machine/ncr5380.h"
 #include "imagedev/floppy.h"
 #include "formats/pc_dsk.h"
 #include "formats/naslite_dsk.h"
@@ -28,14 +28,14 @@ public:
 private:
 	void sio_out_w(uint8_t data);
 	void drive_sel_w(uint8_t data);
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 	static void ncr5380(device_t *device);
 	void lb186_io(address_map &map);
 	void lb186_map(address_map &map);
 
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<wd1772_device> m_fdc;
-	required_device<ncr5380n_device> m_scsi;
+	required_device<ncr5380_device> m_scsi;
 };
 
 void lb186_state::sio_out_w(uint8_t data)
@@ -88,9 +88,9 @@ void lb186_state::lb186_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x1000, 0x101f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff);
-	map(0x1080, 0x108f).rw(m_scsi, FUNC(ncr5380n_device::read), FUNC(ncr5380n_device::write)).umask16(0x00ff);
+	map(0x1080, 0x108f).rw(m_scsi, FUNC(ncr5380_device::read), FUNC(ncr5380_device::write)).umask16(0x00ff);
 	map(0x1100, 0x1107).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
-	map(0x1180, 0x1180).rw(m_scsi, FUNC(ncr5380n_device::dma_r), FUNC(ncr5380n_device::dma_w));
+	map(0x1180, 0x1180).rw(m_scsi, FUNC(ncr5380_device::dma_r), FUNC(ncr5380_device::dma_w));
 	map(0x1200, 0x1200).w(FUNC(lb186_state::drive_sel_w));
 }
 
@@ -103,20 +103,21 @@ void lb186_state::ncr5380(device_t *device)
 {
 	devcb_base *devcb;
 	(void)devcb;
-	downcast<ncr5380n_device &>(*device).irq_handler().set(":maincpu", FUNC(i80186_cpu_device::int1_w));
-	downcast<ncr5380n_device &>(*device).drq_handler().set(":maincpu", FUNC(i80186_cpu_device::drq0_w));
+	downcast<ncr5380_device &>(*device).irq_handler().set(":maincpu", FUNC(i80186_cpu_device::int1_w));
+	downcast<ncr5380_device &>(*device).drq_handler().set(":maincpu", FUNC(i80186_cpu_device::drq0_w));
 }
 
 static void scsi_devices(device_slot_interface &device)
 {
 	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add_internal("ncr5380", NCR5380N);
+	device.option_add_internal("ncr5380", NCR5380);
 }
 
-FLOPPY_FORMATS_MEMBER( lb186_state::floppy_formats )
-	FLOPPY_PC_FORMAT,
-	FLOPPY_NASLITE_FORMAT
-FLOPPY_FORMATS_END
+void lb186_state::floppy_formats(format_registration &fr)
+{
+	fr.add_pc_formats();
+	fr.add(FLOPPY_NASLITE_FORMAT);
+}
 
 void lb186_state::lb186(machine_config &config)
 {

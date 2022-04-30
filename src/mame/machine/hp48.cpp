@@ -147,7 +147,7 @@ void hp48_state::rs232_send_byte()
 
 
 /* CPU sets OUT register (keyboard + beeper) */
-WRITE32_MEMBER( hp48_state::reg_out )
+void hp48_state::reg_out(uint32_t data)
 {
 	LOG(("%s %f hp48_state::reg_out: %03x\n", machine().describe_context(), machine().time().as_double(), data));
 
@@ -182,7 +182,7 @@ int hp48_state::get_in()
 }
 
 /* CPU reads IN register (keyboard) */
-READ32_MEMBER( hp48_state::reg_in )
+uint32_t hp48_state::reg_in()
 {
 	int in = get_in();
 	LOG(("%s %f hp48_state::reg_in: %04x\n", machine().describe_context(), machine().time().as_double(), in));
@@ -246,12 +246,12 @@ void hp48_state::update_annunciators()
 	   bit 7: master enable
 	*/
 	int markers = HP48_IO_8(0xb);
-	output().set_value( "lshift0",   (markers & 0x81) == 0x81 );
-	output().set_value( "rshift0",   (markers & 0x82) == 0x82 );
-	output().set_value( "alpha0",    (markers & 0x84) == 0x84 );
-	output().set_value( "alert0",    (markers & 0x88) == 0x88 );
-	output().set_value( "busy0",     (markers & 0x90) == 0x90 );
-	output().set_value( "transmit0", (markers & 0xb0) == 0xb0 );
+	m_lshift0   = (markers & 0x81) == 0x81;
+	m_rshift0   = (markers & 0x82) == 0x82;
+	m_alpha0    = (markers & 0x84) == 0x84;
+	m_alert0    = (markers & 0x88) == 0x88;
+	m_busy0     = (markers & 0x90) == 0x90;
+	m_transmit0 = (markers & 0xb0) == 0xb0;
 }
 
 
@@ -263,7 +263,7 @@ void hp48_state::update_annunciators()
    - perform some action on read / write
  */
 
-WRITE8_MEMBER(hp48_state::io_w)
+void hp48_state::io_w(offs_t offset, uint8_t data)
 {
 	LOG(("%s %f hp48_state::io_w: off=%02x data=%x\n", machine().describe_context(), machine().time().as_double(), offset, data));
 
@@ -375,7 +375,7 @@ WRITE8_MEMBER(hp48_state::io_w)
 }
 
 
-READ8_MEMBER(hp48_state::io_r)
+uint8_t hp48_state::io_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -494,7 +494,7 @@ READ8_MEMBER(hp48_state::io_r)
 
 /* ---------- bank switcher --------- */
 
-READ8_MEMBER(hp48_state::bank_r)
+uint8_t hp48_state::bank_r(offs_t offset)
 {
 	/* HP48 GX
 	   bit 0: ignored
@@ -518,7 +518,7 @@ READ8_MEMBER(hp48_state::bank_r)
 }
 
 
-WRITE8_MEMBER(hp48_state::hp49_bank_w)
+void hp48_state::hp49_bank_w(offs_t offset, uint8_t data)
 {
 	offset &= 0x7e;
 	if ( m_bank_switch != offset )
@@ -638,12 +638,10 @@ void hp48_state::apply_modules()
 		int bank_hi = (m_bank_switch >> 1) & 15;
 		LOG(("hp48_state::apply_modules: low ROM bank is %i\n", bank_lo));
 		LOG(("hp48_state::apply_modules: high ROM bank is %i\n", bank_hi));
-		space.install_read_bank(0x00000, 0x3ffff, 0x80000, "bank5");
-		space.install_read_bank(0x40000, 0x7ffff, 0x80000, "bank6");
 		if (m_rom)
 		{
-			membank("bank5")->set_base(m_rom + bank_lo * 0x40000);
-			membank("bank6")->set_base(m_rom + bank_hi * 0x40000);
+			space.install_rom(0x00000, 0x3ffff, 0x80000, m_rom + bank_lo * 0x40000);
+			space.install_rom(0x40000, 0x7ffff, 0x80000, m_rom + bank_hi * 0x40000);
 		}
 	}
 	else if (HP48_G_SERIES)
@@ -662,27 +660,22 @@ void hp48_state::apply_modules()
 			/* A19 */
 			LOG(("hp48_state::apply_modules: A19 enabled, NCE3 disabled\n"));
 			nce3_enable = 0;
-			space.install_read_bank(0, 0xfffff, "bank5");
+			if (m_rom)
+				space.install_rom(0, 0xfffff, m_rom);
 		}
 		else
 		{
 			/* NCE3 */
 			nce3_enable = m_bank_switch >> 6;
 			LOG(("hp48_apply_modules: A19 disabled, NCE3 %s\n", nce3_enable ? "enabled" : "disabled"));
-			space.install_read_bank(0, 0x7ffff, 0x80000, "bank5");
-		}
-		if (m_rom)
-		{
-			membank("bank5")->set_base(m_rom);
+			if (m_rom)
+				space.install_rom(0, 0x7ffff, 0x80000, m_rom);
 		}
 	}
 	else
 	{
-		space.install_read_bank(0, 0x7ffff, 0x80000, "bank5");
 		if (m_rom)
-		{
-			membank("bank5")->set_base(m_rom);
-		}
+			space.install_rom(0, 0x7ffff, 0x80000, m_rom);
 	}
 
 
@@ -695,8 +688,6 @@ void hp48_state::apply_modules()
 		uint32_t off_mask = m_modules[i].off_mask;
 		uint32_t mirror = nselect_mask & ~off_mask;
 		uint32_t end = base + (off_mask & nselect_mask);
-		char bank[10];
-		sprintf(bank,"bank%d",i);
 
 		if (m_modules[i].state != HP48_MODULE_CONFIGURED) continue;
 		if ((i == 4) && !nce3_enable) continue;
@@ -710,7 +701,7 @@ void hp48_state::apply_modules()
 
 		if (m_modules[i].data)
 		{
-			space.install_read_bank(base, end, mirror, bank);
+			space.install_rom(base, end, mirror, m_modules[i].data);
 		}
 		else
 		{
@@ -728,7 +719,7 @@ void hp48_state::apply_modules()
 		{
 			if (m_modules[i].data)
 			{
-				space.install_write_bank(base, end, mirror, bank);
+				space.install_writeonly(base, end, mirror, m_modules[i].data);
 			}
 			else
 			{
@@ -740,11 +731,6 @@ void hp48_state::apply_modules()
 		}
 
 		LOG(("hp48_apply_modules: module %s configured at %05x-%05x, mirror %05x\n", hp48_module_names[i], base, end, mirror));
-
-		if (m_modules[i].data)
-		{
-			membank(bank)->set_base(m_modules[i].data);
-		}
 
 		if (i == 0)
 		{
@@ -784,7 +770,7 @@ WRITE_LINE_MEMBER( hp48_state::mem_reset )
 
 
 /* CONFIG opcode */
-WRITE32_MEMBER( hp48_state::mem_config )
+void hp48_state::mem_config(uint32_t data)
 {
 	LOG(("%s %f hp48_state::mem_config: %05x\n", machine().describe_context(), machine().time().as_double(), data));
 
@@ -813,7 +799,7 @@ WRITE32_MEMBER( hp48_state::mem_config )
 
 
 /* UNCFG opcode */
-WRITE32_MEMBER( hp48_state::mem_unconfig )
+void hp48_state::mem_unconfig(uint32_t data)
 {
 	LOG(("%s %f hp48_state::mem_unconfig: %05x\n", machine().describe_context(), machine().time().as_double(), data));
 
@@ -833,7 +819,7 @@ WRITE32_MEMBER( hp48_state::mem_unconfig )
 
 
 /* C=ID opcode */
-READ32_MEMBER( hp48_state::mem_id )
+uint32_t hp48_state::mem_id()
 {
 	int data = 0; /* 0 = everything is configured */
 
@@ -865,7 +851,7 @@ READ32_MEMBER( hp48_state::mem_id )
 /* --------- CRC ---------- */
 
 /* each memory read by the CPU updates the internal CRC state */
-WRITE32_MEMBER( hp48_state::mem_crc )
+void hp48_state::mem_crc(offs_t offset, uint32_t data)
 {
 	/* no CRC for I/O RAM */
 	if (offset >= m_io_addr && offset < m_io_addr + 0x40) return;
@@ -906,11 +892,14 @@ void hp48_state::init_hp48()
 	LOG(( "hp48: driver init called\n" ));
 	for (int i = 0; i < 6; i++)
 	{
-		m_modules[i].off_mask = 0x00fff;  /* 2 KB */
-		m_modules[i].read     = read8_delegate(*this);
-		m_modules[i].write    = write8_delegate(*this);
+		m_modules[i].off_mask = 0x00fff;  // 2 KB
+		m_modules[i].read     = read8sm_delegate(*this);
+		m_modules[i].write    = write8sm_delegate(*this);
 		m_modules[i].data     = nullptr;
 		m_modules[i].isnop    = 0;
+		m_modules[i].state    = 0;
+		m_modules[i].base     = 0;
+		m_modules[i].mask     = 0;
 	}
 	m_rom = nullptr;
 }
@@ -919,6 +908,7 @@ void hp48_state::machine_reset()
 {
 	LOG(("hp48: machine reset called\n"));
 	m_bank_switch = 0;
+	m_cur_screen = 0;
 	reset_modules();
 	update_annunciators();
 }
@@ -934,19 +924,20 @@ void hp48_state::base_machine_start(hp48_models model)
 		HP49_G_MODEL  ? (512 * 1024) :
 		HP48_GX_MODEL ? (128 * 1024) : (32 * 1024);
 
-	uint8_t *ram = auto_alloc_array(machine(), uint8_t, 2 * ram_size);
-	subdevice<nvram_device>("nvram")->set_base(ram, 2 * ram_size);
+	m_allocated_ram = std::make_unique<uint8_t[]>(2 * ram_size);
+	subdevice<nvram_device>("nvram")->set_base(m_allocated_ram.get(), 2 * ram_size);
 
 
 	/* ROM load */
 	uint32_t rom_size =
 		HP49_G_MODEL  ? (2048 * 1024) :
 		HP48_S_SERIES ?  (256 * 1024) : (512 * 1024);
-	m_rom = auto_alloc_array(machine(), uint8_t, 2 * rom_size);
-	decode_nibble(m_rom, memregion("maincpu")->base(), rom_size);
+	m_allocated_rom = std::make_unique<uint8_t[]>(2 * rom_size);
+	decode_nibble(m_allocated_rom.get(), memregion("maincpu")->base(), rom_size);
+	m_rom = m_allocated_rom.get();
 
 	/* init state */
-	memset(ram, 0, 2 * ram_size);
+	std::fill_n(&m_allocated_ram[0], 2 * ram_size, 0);
 	memset(m_io, 0, sizeof(m_io));
 	m_out = 0;
 	m_kdn = 0;
@@ -957,31 +948,31 @@ void hp48_state::base_machine_start(hp48_models model)
 
 	/* I/O RAM */
 	m_modules[HP48_HDW].off_mask = 0x0003f;  /* 32 B */
-	m_modules[HP48_HDW].read     = read8_delegate(*this, FUNC(hp48_state::io_r));
-	m_modules[HP48_HDW].write    = write8_delegate(*this, FUNC(hp48_state::io_w));
+	m_modules[HP48_HDW].read     = read8sm_delegate(*this, FUNC(hp48_state::io_r));
+	m_modules[HP48_HDW].write    = write8sm_delegate(*this, FUNC(hp48_state::io_w));
 
 	/* internal RAM */
 	if (HP49_G_MODEL)
 	{
 		m_modules[HP48_NCE2].off_mask = 2 * 256 * 1024 - 1;
-		m_modules[HP48_NCE2].data     = ram;
+		m_modules[HP48_NCE2].data     = &m_allocated_ram[0];
 		m_modules[HP48_CE2].off_mask  = 2 * 128 * 1024 - 1;
-		m_modules[HP48_CE2].data      = ram + 2 * 256 * 1024;
+		m_modules[HP48_CE2].data      = &m_allocated_ram[2 * 256 * 1024];
 		m_modules[HP48_NCE3].off_mask = 2 * 128 * 1024 - 1;
-		m_modules[HP48_NCE3].data     = ram + 2 * (128+256) * 1024;
+		m_modules[HP48_NCE3].data     = &m_allocated_ram[2 * (128+256) * 1024];
 	}
 	else
 	{
 		m_modules[HP48_NCE2].off_mask = 2 * ram_size - 1;
-		m_modules[HP48_NCE2].data     = ram;
+		m_modules[HP48_NCE2].data     = &m_allocated_ram[0];
 	}
 
 	/* bank switcher */
 	if (HP48_G_SERIES)
 	{
 		m_modules[HP48_CE1].off_mask = 0x00fff;  /* 2 KB */
-		m_modules[HP48_CE1].read     = read8_delegate(*this, FUNC(hp48_state::bank_r));
-		m_modules[HP48_CE1].write    = HP49_G_MODEL ? write8_delegate(*this, FUNC(hp48_state::hp49_bank_w)) : write8_delegate(*this);
+		m_modules[HP48_CE1].read     = read8sm_delegate(*this, FUNC(hp48_state::bank_r));
+		m_modules[HP48_CE1].write    = HP49_G_MODEL ? write8sm_delegate(*this, FUNC(hp48_state::hp49_bank_w)) : write8sm_delegate(*this);
 	}
 
 	/* timers */
@@ -994,6 +985,13 @@ void hp48_state::base_machine_start(hp48_models model)
 	/* 1ms keyboard polling */
 	m_kbd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp48_state::kbd_cb), this));
 	m_kbd_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
+
+	m_lshift0.resolve();
+	m_rshift0.resolve();
+	m_alpha0.resolve();
+	m_alert0.resolve();
+	m_busy0.resolve();
+	m_transmit0.resolve();
 
 	/* save state */
 	save_item(NAME(m_out));

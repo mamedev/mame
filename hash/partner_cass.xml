@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="partner_cass" description="Partner-01.01 cassettes">
 <!--
   Info from http://rk86.ru/catalog/

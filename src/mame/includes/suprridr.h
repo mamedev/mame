@@ -49,22 +49,22 @@ private:
 	required_shared_ptr<uint8_t> m_bgram;
 	required_shared_ptr<uint8_t> m_spriteram;
 
-	uint8_t m_nmi_enable;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_bg_tilemap_noscroll;
-	uint8_t m_flipx;
-	uint8_t m_flipy;
+	uint8_t m_nmi_enable = 0;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap_noscroll = nullptr;
+	uint8_t m_flipx = 0;
+	uint8_t m_flipy = 0;
 
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(coin_lock_w);
-	DECLARE_WRITE8_MEMBER(flipx_w);
-	DECLARE_WRITE8_MEMBER(flipy_w);
-	DECLARE_WRITE8_MEMBER(fgdisable_w);
-	DECLARE_WRITE8_MEMBER(fgscrolly_w);
-	DECLARE_WRITE8_MEMBER(bgscrolly_w);
-	DECLARE_WRITE8_MEMBER(bgram_w);
-	DECLARE_WRITE8_MEMBER(fgram_w);
+	void nmi_enable_w(uint8_t data);
+	void coin_lock_w(uint8_t data);
+	void flipx_w(uint8_t data);
+	void flipy_w(uint8_t data);
+	void fgdisable_w(uint8_t data);
+	void fgscrolly_w(uint8_t data);
+	void bgscrolly_w(uint8_t data);
+	void bgram_w(offs_t offset, uint8_t data);
+	void fgram_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info2);

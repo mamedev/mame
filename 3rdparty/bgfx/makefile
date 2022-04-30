@@ -1,5 +1,5 @@
 #
-# Copyright 2011-2019 Branimir Karadzic. All rights reserved.
+# Copyright 2011-2021 Branimir Karadzic. All rights reserved.
 # License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
 #
 
@@ -14,6 +14,11 @@ else
 OS=linux
 endif
 endif
+
+help:
+	@echo Available targets:
+	@grep -E "^[a-zA-Z0-9_-]+:.*?## .*$$" $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
 else
 OS=windows
 
@@ -24,14 +29,10 @@ endif
 # $(info $(OS))
 
 BX_DIR?=../bx
-GENIE?=$(BX_DIR)/tools/bin/$(OS)/genie
+GENIE?=$(BX_DIR)/tools/bin/$(OS)/genie $(EXTRA_GENIE_ARGS)
 NINJA?=$(BX_DIR)/tools/bin/$(OS)/ninja
 
 .PHONY: help
-
-help:
-	@echo Available targets:
-	@grep -E "^[a-zA-Z0-9_-]+:.*?## .*$$" $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 clean: ## Clean all intermediate files.
 	@echo Cleaning...
@@ -43,14 +44,15 @@ projgen: ## Generate project files for all configurations.
 	$(GENIE) --with-tools --with-combined-examples                   --vs=winstore100      vs2017
 	$(GENIE) --with-tools --with-combined-examples --with-shared-lib --gcc=mingw-gcc       gmake
 	$(GENIE) --with-tools --with-combined-examples --with-shared-lib --gcc=linux-gcc       gmake
-	$(GENIE) --with-tools --with-combined-examples --with-shared-lib --gcc=osx             gmake
-	$(GENIE) --with-tools --with-combined-examples --with-shared-lib --xcode=osx           xcode8
-	$(GENIE) --with-tools --with-combined-examples --with-shared-lib --xcode=ios           xcode8
+	$(GENIE) --with-tools --with-combined-examples --with-shared-lib --gcc=osx-x64         gmake
+	$(GENIE) --with-tools --with-combined-examples --with-shared-lib --gcc=osx-arm64       gmake
+	$(GENIE) --with-tools --with-combined-examples --with-shared-lib --xcode=osx           xcode9
+	$(GENIE) --with-tools --with-combined-examples --with-shared-lib --xcode=ios           xcode9
 	$(GENIE)              --with-combined-examples --with-shared-lib --gcc=freebsd         gmake
 	$(GENIE)              --with-combined-examples                   --gcc=android-arm     gmake
 	$(GENIE)              --with-combined-examples                   --gcc=android-arm64   gmake
 	$(GENIE)              --with-combined-examples                   --gcc=android-x86     gmake
-	$(GENIE)              --with-examples                            --gcc=asmjs           gmake
+	$(GENIE)              --with-examples                            --gcc=wasm2js         gmake
 	$(GENIE)              --with-combined-examples                   --gcc=ios-arm         gmake
 	$(GENIE)              --with-combined-examples                   --gcc=ios-arm64       gmake
 	$(GENIE)              --with-combined-examples                   --gcc=ios-simulator   gmake
@@ -59,7 +61,7 @@ projgen: ## Generate project files for all configurations.
 
 idl: ## Generate code from IDL.
 	@echo Generating code from IDL.
-	$(GENIE) idl
+	cd scripts && ../$(GENIE) idl
 
 .build/projects/gmake-android-arm:
 	$(GENIE) --gcc=android-arm gmake
@@ -85,13 +87,21 @@ android-x86-release: .build/projects/gmake-android-x86 ## Build - Android x86 De
 	$(MAKE) -R -C .build/projects/gmake-android-x86 config=release
 android-x86: android-x86-debug android-x86-release ## Build - Android x86 Debug and Release
 
-.build/projects/gmake-asmjs:
-	$(GENIE) --gcc=asmjs gmake
-asmjs-debug: .build/projects/gmake-asmjs ## Build - Emscripten Debug
-	$(MAKE) -R -C .build/projects/gmake-asmjs config=debug
-asmjs-release: .build/projects/gmake-asmjs ## Build - Emscripten Release
-	$(MAKE) -R -C .build/projects/gmake-asmjs config=release
-asmjs: asmjs-debug asmjs-release ## Build - Emscripten Debug and Release
+.build/projects/gmake-wasm2js: # Wasm2JS: The JavaScript fallback for web builds when Wasm is not supported by browser
+	$(GENIE) --gcc=wasm2js --with-combined-examples gmake
+wasm2js-debug: .build/projects/gmake-wasm2js ## Build - Emscripten Debug
+	$(MAKE) -R -C .build/projects/gmake-wasm2js config=debug
+wasm2js-release: .build/projects/gmake-wasm2js ## Build - Emscripten Release
+	$(MAKE) -R -C .build/projects/gmake-wasm2js config=release
+wasm2js: wasm2js-debug wasm2js-release ## Build - Emscripten Debug and Release
+
+.build/projects/gmake-wasm:
+	$(GENIE) --gcc=wasm --with-combined-examples gmake
+wasm-debug: .build/projects/gmake-wasm ## Build - Emscripten Debug
+	$(MAKE) -R -C .build/projects/gmake-wasm config=debug
+wasm-release: .build/projects/gmake-wasm ## Build - Emscripten Release
+	$(MAKE) -R -C .build/projects/gmake-wasm config=release
+wasm: wasm-debug wasm-release ## Build - Emscripten Debug and Release
 
 .build/projects/gmake-linux:
 	$(GENIE) --with-tools --with-combined-examples --with-shared-lib --gcc=linux-gcc gmake
@@ -161,13 +171,26 @@ vs2017-winstore100-release64: .build/projects/vs2017-winstore100 ## Build - vs20
 	devenv .build/projects/vs2017-winstore100/bgfx.sln /Build "Release|x64"
 vs2017-winstore100: vs2017-winstore100-debug32 vs2017-winstore100-release32 vs2017-winstore100-debug64 vs2017-winstore100-release64 ## Build - vs2017-winstore100 x86/x64 Debug and Release
 
-.build/projects/gmake-osx:
-	$(GENIE) --with-tools --with-combined-examples --with-shared-lib --gcc=osx gmake
-osx-debug64: .build/projects/gmake-osx ## Build - OSX x64 Debug
-	$(MAKE) -C .build/projects/gmake-osx config=debug64
-osx-release64: .build/projects/gmake-osx ## Build - OSX x64 Release
-	$(MAKE) -C .build/projects/gmake-osx config=release64
-osx: osx-debug64 osx-release64 ## Build - OSX x64 Debug and Release
+.build/projects/gmake-osx-x64:
+	$(GENIE) --with-tools --with-combined-examples --with-shared-lib --gcc=osx-x64 gmake
+.build/projects/gmake-osx-arm64:
+	$(GENIE) --with-tools --with-combined-examples --with-shared-lib --gcc=osx-arm64 gmake
+
+osx-debug: osx-x64-debug osx-arm64-debug ## Build - macOS Universal Debug
+osx-release: osx-x64-release osx-arm64-release ## Build - macOS Universal Release
+osx: osx-debug osx-release ## Build - macOS Universal Debug and Release
+
+osx-x64-debug: .build/projects/gmake-osx-x64 ## Build - macOS x64 Debug
+	$(MAKE) -C .build/projects/gmake-osx-x64 config=debug
+osx-x64-release: .build/projects/gmake-osx-x64 ## Build - macOS x64 Release
+	$(MAKE) -C .build/projects/gmake-osx-x64 config=release
+osx-x64: osx-x64-debug osx-x64-release ## Build - macOS x64 Debug and Release
+
+osx-arm64-debug: .build/projects/gmake-osx-arm64 ## Build - macOS ARM Debug
+	$(MAKE) -C .build/projects/gmake-osx-arm64 config=debug
+osx-arm64-release: .build/projects/gmake-osx-arm64 ## Build - macOS ARM Release
+	$(MAKE) -C .build/projects/gmake-osx-arm64 config=release
+osx-arm: osx-arm64-debug osx-arm64-release ## Build - macOS ARM Debug and Release
 
 .build/projects/gmake-ios-arm:
 	$(GENIE) --gcc=ios-arm gmake
@@ -209,7 +232,7 @@ rpi-release: .build/projects/gmake-rpi ## Build - RasberryPi Release
 	$(MAKE) -R -C .build/projects/gmake-rpi config=release
 rpi: rpi-debug rpi-release ## Build - RasberryPi Debug and Release
 
-build-darwin: osx
+build-darwin: osx-x64
 
 build-linux: linux-debug64 linux-release64
 
@@ -239,9 +262,9 @@ UNAME := $(shell uname)
 ifeq ($(UNAME),$(filter $(UNAME),Linux Darwin FreeBSD GNU/kFreeBSD))
 ifeq ($(UNAME),$(filter $(UNAME),Darwin))
 OS=darwin
-BUILD_PROJECT_DIR=gmake-osx
-BUILD_OUTPUT_DIR=osx64_clang
-BUILD_TOOLS_CONFIG=release64
+BUILD_PROJECT_DIR=gmake-osx-x64
+BUILD_OUTPUT_DIR=osx-x64
+BUILD_TOOLS_CONFIG=release
 BUILD_TOOLS_SUFFIX=Release
 EXE=
 else
@@ -319,16 +342,16 @@ dist-linux: .build/projects/gmake-linux
 	$(SILENT) $(MAKE) -C .build/projects/gmake-linux     config=release64 -j 6 texturev
 	$(SILENT) cp .build/linux64_gcc/bin/texturevRelease  tools/bin/linux/texturev
 
-dist-darwin: .build/projects/gmake-osx
-	$(SILENT) $(MAKE) -C .build/projects/gmake-osx       config=release64 -j 6 geometryc
-	$(SILENT) cp .build/osx64_clang/bin/geometrycRelease tools/bin/darwin/geometryc
-	$(SILENT) $(MAKE) -C .build/projects/gmake-osx       config=release64 -j 6 geometryv
-	$(SILENT) cp .build/osx64_clang/bin/geometryvRelease tools/bin/darwin/geometryv
-	$(SILENT) $(MAKE) -C .build/projects/gmake-osx       config=release64 -j 6 shaderc
-	$(SILENT) cp .build/osx64_clang/bin/shadercRelease   tools/bin/darwin/shaderc
-	$(SILENT) $(MAKE) -C .build/projects/gmake-osx       config=release64 -j 6 texturec
-	$(SILENT) cp .build/osx64_clang/bin/texturecRelease  tools/bin/darwin/texturec
-	$(SILENT) $(MAKE) -C .build/projects/gmake-osx       config=release64 -j 6 texturev
-	$(SILENT) cp .build/osx64_clang/bin/texturevRelease  tools/bin/darwin/texturev
+dist-darwin: .build/projects/gmake-osx-x64
+	$(SILENT) $(MAKE) -C .build/projects/gmake-osx-x64 config=release -j 6 geometryc
+	$(SILENT) cp .build/osx-x64/bin/geometrycRelease tools/bin/darwin/geometryc
+	$(SILENT) $(MAKE) -C .build/projects/gmake-osx-x64 config=release -j 6 geometryv
+	$(SILENT) cp .build/osx-x64/bin/geometryvRelease tools/bin/darwin/geometryv
+	$(SILENT) $(MAKE) -C .build/projects/gmake-osx-x64 config=release -j 6 shaderc
+	$(SILENT) cp .build/osx-x64/bin/shadercRelease tools/bin/darwin/shaderc
+	$(SILENT) $(MAKE) -C .build/projects/gmake-osx-x64 config=release -j 6 texturec
+	$(SILENT) cp .build/osx-x64/bin/texturecRelease tools/bin/darwin/texturec
+	$(SILENT) $(MAKE) -C .build/projects/gmake-osx-x64 config=release -j 6 texturev
+	$(SILENT) cp .build/osx-x64/bin/texturevRelease tools/bin/darwin/texturev
 
 dist: clean dist-windows dist-linux dist-darwin

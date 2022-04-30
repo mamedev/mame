@@ -133,10 +133,10 @@ private:
 	required_ioport m_stop_bits;
 	required_ioport m_acia_baud_rate;
 
-	DECLARE_READ8_MEMBER(pia0_pa_r);
-	DECLARE_READ8_MEMBER(pia0_pb_r);
-	DECLARE_WRITE8_MEMBER(pia0_pa_w);
-	DECLARE_WRITE8_MEMBER(pia0_pb_w);
+	uint8_t pia0_pa_r();
+	uint8_t pia0_pb_r();
+	void pia0_pa_w(uint8_t data);
+	void pia0_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia0_cb2_w);
 
 	// Clocks
@@ -150,7 +150,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(write_f11_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_f13_clock);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	emu_timer *m_bit_rate_timer;
 	emu_timer *m_bit_rate_half_timer;
@@ -218,12 +218,12 @@ INPUT_PORTS_END
 
 
 
-READ8_MEMBER(mekd1_state::pia0_pa_r)
+uint8_t mekd1_state::pia0_pa_r()
 {
 	return m_rs232->rxd_r() << 7;
 }
 
-READ8_MEMBER(mekd1_state::pia0_pb_r)
+uint8_t mekd1_state::pia0_pb_r()
 {
 	bool timer_out;
 	uint8_t stop_bits = m_stop_bits->read();
@@ -236,12 +236,12 @@ READ8_MEMBER(mekd1_state::pia0_pb_r)
 	return (timer_out << 7) | (stop_bits << 6);
 }
 
-WRITE8_MEMBER(mekd1_state::pia0_pa_w)
+void mekd1_state::pia0_pa_w(uint8_t data)
 {
 	m_rs232->write_txd(BIT(data, 0));
 }
 
-WRITE8_MEMBER(mekd1_state::pia0_pb_w)
+void mekd1_state::pia0_pb_w(uint8_t data)
 {
 	m_bit_rate_select = BIT(data, 2);
 
@@ -277,7 +277,7 @@ WRITE_LINE_MEMBER(mekd1_state::pia0_cb2_w)
 	// This is a tape reader control line.
 }
 
-void mekd1_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mekd1_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -404,7 +404,6 @@ void mekd1_state::machine_start()
 static DEVICE_INPUT_DEFAULTS_START(terminal)
 	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_2400)
 	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_2400)
-	DEVICE_INPUT_DEFAULTS("RS232_STARTBITS", 0xff, RS232_STARTBITS_1)
 	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_7)
 	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_SPACE)
 	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)

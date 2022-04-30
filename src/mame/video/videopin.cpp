@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(videopin_state::get_tile_info)
 {
 	uint8_t code = m_video_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code, 0, (code & 0x40) ? TILE_FLIPY : 0);
+	tileinfo.set(0, code, 0, (code & 0x40) ? TILE_FLIPY : 0);
 }
 
 

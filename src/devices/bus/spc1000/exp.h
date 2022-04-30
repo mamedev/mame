@@ -14,8 +14,8 @@ public:
 	virtual ~device_spc1000_card_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write) { }
+	virtual uint8_t read(offs_t offset) { return 0xff; }
+	virtual void write(offs_t offset, uint8_t data) { }
 
 protected:
 	device_spc1000_card_interface(const machine_config &mconfig, device_t &device);
@@ -41,8 +41,8 @@ public:
 	virtual ~spc1000_exp_device();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides

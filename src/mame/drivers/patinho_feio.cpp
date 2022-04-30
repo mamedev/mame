@@ -83,7 +83,7 @@ void patinho_feio_state::update_panel(uint8_t ACC, uint8_t opcode, uint8_t mem_d
 	m_prev_FLAGS = FLAGS;
 }
 
-WRITE8_MEMBER(patinho_feio_state::decwriter_data_w)
+void patinho_feio_state::decwriter_data_w(uint8_t data)
 {
 	m_decwriter->write(data);
 
@@ -111,7 +111,7 @@ void patinho_feio_state::decwriter_kbd_input(u8 data)
 	m_maincpu->transfer_byte_from_external_device(0xA, ~data);
 }
 
-WRITE8_MEMBER(patinho_feio_state::teletype_data_w)
+void patinho_feio_state::teletype_data_w(uint8_t data)
 {
 	m_tty->write(data);
 

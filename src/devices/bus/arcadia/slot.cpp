@@ -7,7 +7,6 @@
 
  ***********************************************************************************************************/
 
-
 #include "emu.h"
 #include "slot.h"
 
@@ -64,7 +63,7 @@ void device_arcadia_cart_interface::rom_alloc(uint32_t size, const char *tag)
 //-------------------------------------------------
 arcadia_cart_slot_device::arcadia_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, EA2001_CART_SLOT, tag, owner, clock),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_arcadia_cart_interface>(mconfig, *this),
 	m_type(ARCADIA_STD), m_cart(nullptr)
 {
@@ -110,7 +109,7 @@ static int arcadia_get_pcb_id(const char *slot)
 {
 	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(elem.slot_option, slot))
+		if (!strcmp(elem.slot_option, slot))
 			return elem.pcb_id;
 	}
 
@@ -120,7 +119,7 @@ static int arcadia_get_pcb_id(const char *slot)
 #if 0
 static const char *arcadia_get_slot(int type)
 {
-	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
+	for (int i = 0; i < std::size(slot_list); i++)
 	{
 		if (slot_list[i].pcb_id == type)
 			return slot_list[i].slot_option;
@@ -215,10 +214,10 @@ std::string arcadia_cart_slot_device::get_default_card_software(get_default_card
  read
  -------------------------------------------------*/
 
-READ8_MEMBER(arcadia_cart_slot_device::read_rom)
+uint8_t arcadia_cart_slot_device::read_rom(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_rom(space, offset);
+		return m_cart->read_rom(offset);
 	else
 		return 0xff;
 }
@@ -227,10 +226,10 @@ READ8_MEMBER(arcadia_cart_slot_device::read_rom)
  write
  -------------------------------------------------*/
 
-READ8_MEMBER(arcadia_cart_slot_device::extra_rom)
+uint8_t arcadia_cart_slot_device::extra_rom(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->extra_rom(space, offset);
+		return m_cart->extra_rom(offset);
 	else
 		return 0xff;
 }

@@ -14,8 +14,9 @@ They can be divided in three "families":
    The hardware consists of two 6809, and several Namco custom ICs that provide
    a static tilemap and 2bpp sprites.
    Grobda is the only Namco game of this era that has speech (just a short
-   sample). At this time, it is still unknown how speech samples are transmitted
-   to the DAC (almost certainly the same resistor network used by the 15XX).
+   sample). It appears to do this by manipulating 15XX channels to deliver
+   non-waveform outputs (removing the 15XX from the board causes sound to
+   disappear completely).
 2) Phozon. This game runs on an unique board: the large number of sprites on
    screen at the same time required a 3rd 6809 to help with the calculations.
    The sprite hardware is also different from Super Pacman, featuring 8x8 sprites.
@@ -63,7 +64,7 @@ The I/O interface chips vary from game to game (see machine/namcoio.c)
 
 Super Pac-Man memory map
 ------------------------
-Pac & Pal is the same. Grobda appears to have a DAC hacked in.
+Pac & Pal and Grobda are the same.
 Note: Part of the address decoding is done by PALs (SPC-5 and SPC-6) so the
 tables are inferred by program behaviour.
 
@@ -555,7 +556,6 @@ TODO:
 #include "machine/74157.h"
 #include "machine/74259.h"
 #include "machine/watchdog.h"
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 
@@ -929,7 +929,7 @@ static INPUT_PORTS_START( grobda )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Level_Select ) ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x00, "10k, 50k & Every 50k" )  PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(    0x40, "10k & 30k Only" )
 	PORT_DIPSETTING(    0xc0, "10k Only" )
@@ -1294,7 +1294,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-WRITE8_MEMBER(mappy_state::out_lamps)
+void mappy_state::out_lamps(uint8_t data)
 {
 	m_leds[0] = BIT(data, 0);
 	m_leds[1] = BIT(data, 1);
@@ -1413,12 +1413,6 @@ void mappy_state::grobda(machine_config &config)
 	m_namcoio[1]->in_callback<2>().set_ioport("DSW1").rshift(4);
 	m_namcoio[1]->in_callback<3>().set_ioport("DSW0");
 	m_namcoio[1]->out_callback<0>().set("dipmux", FUNC(ls157_device::select_w)).bit(0);
-
-	/* sound hardware */
-	DAC_4BIT_BINARY_WEIGHTED(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.275); // alternate route to 15XX-related DAC?
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void mappy_state::phozon(machine_config &config)
@@ -2053,23 +2047,6 @@ ROM_START( motos )
 ROM_END
 
 
-
-void mappy_state::init_grobda()
-{
-	/* The speech in Grobda might not be a standard Namco sound feature, but rather a hack.
-	   The hardware automatically cycles the bottom 6 address lines of sound RAM, so they
-	   probably added a latch loaded when the bottom 4 lines are 0010 (which corresponds
-	   to locations not used by the sound hardware).
-	   The program writes the same value to 0x02, 0x12, 0x22 and 0x32.
-	   However, removing the 15XX from the board causes sound to disappear completely, so
-	   the 15XX may still play some part in conveying speech to the DAC.
-	  */
-	write8_delegate dac_w(*this);
-	dac_w.set(*m_dac, FUNC(dac_byte_interface::data_w));
-	m_subcpu->space(AS_PROGRAM).install_write_handler(0x0002, 0x0002, dac_w);
-}
-
-
 void mappy_state::init_digdug2()
 {
 	/* appears to not use the watchdog */
@@ -2083,9 +2060,9 @@ GAME( 1982, superpacm, superpac, superpac, superpac,  mappy_state, empty_init,  
 GAME( 1983, pacnpal,   0,        pacnpal,  pacnpal,   mappy_state, empty_init,   ROT90, "Namco", "Pac & Pal", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, pacnpal2,  pacnpal,  pacnpal,  pacnpal,   mappy_state, empty_init,   ROT90, "Namco", "Pac & Pal (older)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, pacnchmp,  pacnpal,  pacnpal,  pacnpal,   mappy_state, empty_init,   ROT90, "Namco", "Pac-Man & Chomp Chomp", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, grobda,    0,        grobda,   grobda,    mappy_state, init_grobda,  ROT90, "Namco", "Grobda (New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, grobda2,   grobda,   grobda,   grobda,    mappy_state, init_grobda,  ROT90, "Namco", "Grobda (Old Ver. set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, grobda3,   grobda,   grobda,   grobda,    mappy_state, init_grobda,  ROT90, "Namco", "Grobda (Old Ver. set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, grobda,    0,        grobda,   grobda,    mappy_state, empty_init,   ROT90, "Namco", "Grobda (New Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, grobda2,   grobda,   grobda,   grobda,    mappy_state, empty_init,   ROT90, "Namco", "Grobda (Old Ver. set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, grobda3,   grobda,   grobda,   grobda,    mappy_state, empty_init,   ROT90, "Namco", "Grobda (Old Ver. set 2)", MACHINE_SUPPORTS_SAVE )
 
 /* 3x6809, static tilemap, 2bpp sprites (Gaplus type) */
 GAME( 1983, phozon,    0,        phozon,    phozon,   mappy_state, empty_init,   ROT90, "Namco", "Phozon (Japan)", MACHINE_SUPPORTS_SAVE )

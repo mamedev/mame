@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:CC0
 // copyright-holders:Couriersud
 /*
  * ne555_astable.c
@@ -25,6 +25,7 @@ NETLIST_START(ls629)
 	SN74LS629(OSC, 0.022e-6)
 
 	NET_C(GND, OSC.GND)
+	NET_C(V5, OSC.VCC)
 	NET_C(VR, OSC.RNG)
 	NET_C(VF, OSC.FC)
 	NET_C(GND, OSC.ENQ)

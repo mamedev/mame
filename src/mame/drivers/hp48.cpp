@@ -12,7 +12,6 @@
 #include "includes/hp48.h"
 
 #include "machine/nvram.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -1170,8 +1169,6 @@ void hp48_state::hp48_common(machine_config &config)
 	/* sound */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 void hp48_state::hp48gx(machine_config &config)

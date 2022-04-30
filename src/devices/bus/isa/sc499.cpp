@@ -16,7 +16,7 @@
 
 #include "emu.h"
 #include "sc499.h"
-#include "formats/ioprocs.h"
+
 
 #define VERBOSE 0
 
@@ -334,8 +334,8 @@ void sc499_device::device_start()
 
 	LOG1(("start sc499"));
 
-	m_timer = timer_alloc(0, nullptr);
-	m_timer1 = timer_alloc(1, nullptr);
+	m_timer = timer_alloc(0);
+	m_timer1 = timer_alloc(1);
 
 	m_installed = false;
 
@@ -389,7 +389,7 @@ void sc499_device::device_reset()
 		m_irq = m_irqdrq->read() & 7;
 		m_drq = m_irqdrq->read()>>4;
 
-		m_isa->install_device(base, base+7, read8_delegate(*this, FUNC(sc499_device::read)), write8_delegate(*this, FUNC(sc499_device::write)));
+		m_isa->install_device(base, base+7, read8sm_delegate(*this, FUNC(sc499_device::read)), write8sm_delegate(*this, FUNC(sc499_device::write)));
 		m_isa->set_dma_channel(m_drq, this, true);
 
 		m_installed = true;
@@ -489,7 +489,7 @@ void sc499_device::check_tape()
  timer_func - handle timer interrupts
  -------------------------------------------------*/
 
-void sc499_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void sc499_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	LOG2(("timer_func param=%d status=%x", param, m_status));
 
@@ -1014,7 +1014,7 @@ void sc499_device::write_dma_reset( uint8_t data)
 	m_control = 0;
 }
 
-WRITE8_MEMBER(sc499_device::write)
+void sc499_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -1036,7 +1036,7 @@ WRITE8_MEMBER(sc499_device::write)
 	}
 }
 
-READ8_MEMBER(sc499_device::read)
+uint8_t sc499_device::read(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -1285,8 +1285,7 @@ void sc499_device::block_set_filemark()
 DEFINE_DEVICE_TYPE(SC499_CTAPE, sc499_ctape_image_device, "sc499_ctape", "SC-499 Cartridge Tape")
 
 sc499_ctape_image_device::sc499_ctape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SC499_CTAPE, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	: microtape_image_device(mconfig, SC499_CTAPE, tag, owner, clock)
 {
 }
 
@@ -1310,18 +1309,17 @@ void sc499_ctape_image_device::write_block(int block_num, uint8_t *ptr)
 
 image_init_result sc499_ctape_image_device::call_load()
 {
-	uint32_t size;
-	io_generic io;
-	io.file = (device_image_interface *)this;
-	io.procs = &image_ioprocs;
-	io.filler = 0xff;
-
-	size = io_generic_size(&io);
-	m_ctape_data.resize(size);
-
-	io_generic_read(&io, &m_ctape_data[0], 0, size);
-
-	return image_init_result::PASS;
+	try
+	{
+		auto const size = length();
+		m_ctape_data.resize(size);
+		if (!fseek(0, SEEK_SET) && (fread(m_ctape_data.data(), size) == size))
+			return image_init_result::PASS;
+	}
+	catch (...)
+	{
+	}
+	return image_init_result::FAIL;
 }
 
 void sc499_ctape_image_device::call_unload()

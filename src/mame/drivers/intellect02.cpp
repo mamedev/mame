@@ -10,7 +10,7 @@ announced(can't say for certain how many released). PCB labels have prefix ДМ�
 it's assumed to have been designed by НИИ БРЭА (SRI BREA). First shown in 1983,
 produced during around 1985-1992.
 
-hardware notes:
+Hardware notes:
 - КР580ВМ80А CPU (i8080A clone) @ 1.5MHz
 - КР580ИК55 (i8255 clone)
 - 1 KB RAM (8*КР565РУ2), cartridge port
@@ -26,7 +26,7 @@ The 2nd(4-level) chess cartridge is completely different, not a CC3 clone.
 Intellect-01 looks like it didn't get further than a prototype. It was a dedicated
 chess computer, probably a clone of CC3.
 
-keypad legend:
+Keypad legend:
 
 СБ - сброс (reset)
 ВВ - ввод (input)
@@ -39,13 +39,14 @@ keypad legend:
 
 #include "emu.h"
 
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
 #include "sound/beep.h"
 #include "video/pwm.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
-#include "softlist.h"
+
+#include "softlist_dev.h"
 #include "speaker.h"
 
 // internal artwork
@@ -63,7 +64,6 @@ public:
 		m_ppi8255(*this, "ppi8255"),
 		m_display(*this, "display"),
 		m_beeper(*this, "beeper"),
-		m_cart(*this, "cartslot"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
@@ -81,31 +81,24 @@ private:
 	required_device<i8255_device> m_ppi8255;
 	required_device<pwm_display_device> m_display;
 	required_device<beep_device> m_beeper;
-	required_device<generic_slot_device> m_cart;
 	required_ioport_array<2> m_inputs;
 
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-
 	// I/O handlers
 	void update_display();
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_WRITE8_MEMBER(control_w);
+	u8 input_r();
+	void digit_w(u8 data);
+	void control_w(u8 data);
 
-	u8 m_digit_data;
-	u8 m_led_select;
+	u8 m_digit_data = 0;
+	u8 m_led_select = 0;
 };
 
 void intel02_state::machine_start()
 {
-	// zerofill
-	m_digit_data = 0;
-	m_led_select = 0;
-
 	// register for savestates
 	save_item(NAME(m_digit_data));
 	save_item(NAME(m_led_select));
@@ -125,18 +118,6 @@ INPUT_CHANGED_MEMBER(intel02_state::reset_button)
     I/O
 ******************************************************************************/
 
-// cartridge
-
-DEVICE_IMAGE_LOAD_MEMBER(intel02_state::cart_load)
-{
-	u32 size = m_cart->common_get_size("rom");
-	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
-
-	return image_init_result::PASS;
-}
-
-
 // I8255 PPI
 
 void intel02_state::update_display()
@@ -144,24 +125,24 @@ void intel02_state::update_display()
 	m_display->matrix(m_led_select, m_digit_data);
 }
 
-READ8_MEMBER(intel02_state::input_r)
+u8 intel02_state::input_r()
 {
 	// d0-d3: buttons through a maze of logic gates
 	// basically giving each button its own 4-bit scancode
-	u8 data = count_leading_zeros(m_inputs[0]->read()) - 17;
+	u8 data = count_leading_zeros_32(m_inputs[0]->read()) - 17;
 
 	// d4: Vcc, d5-d7: buttons (direct)
 	return data | (~m_inputs[1]->read() << 4 & 0xf0);
 }
 
-WRITE8_MEMBER(intel02_state::digit_w)
+void intel02_state::digit_w(u8 data)
 {
 	// d0-d6: digit segment data, d7: N/C
 	m_digit_data = bitswap<7>(data,0,1,2,3,4,5,6);
 	update_display();
 }
 
-WRITE8_MEMBER(intel02_state::control_w)
+void intel02_state::control_w(u8 data)
 {
 	// d0-d5: select digit/leds
 	m_led_select = data;
@@ -200,8 +181,8 @@ void intel02_state::main_io(address_map &map)
 static INPUT_PORTS_START( intel02 )
 	PORT_START("IN.0")
 	PORT_BIT(0x0007, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("ПП (View Position)")
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("УИ (Game Level)")
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME(u8"ПП (View Position)")
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME(u8"УИ (Game Level)")
 	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
 	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_H) PORT_NAME("H8")
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CODE(KEYCODE_G) PORT_NAME("G7")
@@ -215,12 +196,12 @@ static INPUT_PORTS_START( intel02 )
 
 	PORT_START("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("ВВ (Input)")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("ВИ (Game Select)")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("СТ (Erase)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME(u8"ВВ (Input)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME(u8"ВИ (Game Select)")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME(u8"СТ (Erase)")
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, intel02_state, reset_button, 0) PORT_NAME("СБ (Reset)")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, intel02_state, reset_button, 0) PORT_NAME(u8"СБ (Reset)")
 INPUT_PORTS_END
 
 
@@ -231,7 +212,7 @@ INPUT_PORTS_END
 
 void intel02_state::intel02(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	I8080A(config, m_maincpu, 1500000); // measured (no XTAL)
 	m_maincpu->set_addrmap(AS_PROGRAM, &intel02_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &intel02_state::main_io);
@@ -243,21 +224,18 @@ void intel02_state::intel02(machine_config &config)
 	m_ppi8255->out_pc_callback().set(FUNC(intel02_state::control_w));
 	m_ppi8255->tri_pc_callback().set_constant(0x80);
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(6, 7);
 	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_intellect02);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	BEEP(config, m_beeper, 3640); // measured, from RC circuit
 	m_beeper->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	/* cartridge */
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "intellect02", "bin");
-	m_cart->set_device_load(FUNC(intel02_state::cart_load));
-	m_cart->set_must_be_loaded(true);
-
+	// cartridge
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "intellect02").set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("intellect02");
 }
 

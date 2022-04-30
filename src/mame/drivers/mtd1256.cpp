@@ -63,9 +63,9 @@ HD44780_PIXEL_UPDATE(mtd1256_state::pixel_update)
 {
 	// Is this the right layout?
 	if (pos < 20)
-		bitmap.pix16(line * 16 + y, pos * 6 + x) = state;
+		bitmap.pix(line * 16 + y, pos * 6 + x) = state;
 	else if (pos < 40)
-		bitmap.pix16(line * 16 + 8 + y, (pos - 20) * 6 + x) = state;
+		bitmap.pix(line * 16 + 8 + y, (pos - 20) * 6 + x) = state;
 }
 
 

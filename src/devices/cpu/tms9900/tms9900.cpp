@@ -221,8 +221,8 @@ void tms99xx_device::device_start()
 		// callexport = need to use the state_export method to read the state variable
 		state_add(i, s_statename[i], m_state_any).callimport().callexport().formatstr("%04X");
 	}
-	state_add(STATE_GENPC, "GENPC", PC).formatstr("%4s").noshow();
-	state_add(STATE_GENPCBASE, "CURPC", PC).formatstr("%4s").noshow();
+	state_add(STATE_GENPC, "GENPC", PC).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", PC).noshow();
 	state_add(STATE_GENFLAGS, "status", m_state_any).callimport().callexport().formatstr("%16s").noshow();
 
 	build_command_lookup_table();

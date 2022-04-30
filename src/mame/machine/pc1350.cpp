@@ -7,19 +7,19 @@
 #include "includes/pc1350.h"
 #include "machine/ram.h"
 
-WRITE8_MEMBER(pc1350_state::out_b_w)
+void pc1350_state::out_b_w(uint8_t data)
 {
 	m_outb = data;
 }
 
-WRITE8_MEMBER(pc1350_state::out_c_w)
+void pc1350_state::out_c_w(uint8_t data)
 {
 }
 
-READ8_MEMBER(pc1350_state::in_a_r)
+uint8_t pc1350_state::in_a_r()
 {
 	int data = m_outa;
-	int t = keyboard_line_r(space, 0);
+	int t = keyboard_line_r();
 
 	for (int bit = 0; bit < 6; bit++)
 		if (BIT(t, bit))
@@ -50,7 +50,7 @@ READ8_MEMBER(pc1350_state::in_a_r)
 	return data;
 }
 
-READ8_MEMBER(pc1350_state::in_b_r)
+uint8_t pc1350_state::in_b_r()
 {
 	return m_outb;
 }
@@ -61,13 +61,11 @@ void pc1350_state::machine_start()
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	space.install_readwrite_bank(0x6000, 0x6fff, "bank1");
-	membank("bank1")->set_base(&m_ram->pointer()[0x0000]);
+	space.install_ram(0x6000, 0x6fff, &m_ram->pointer()[0x0000]);
 
 	if (m_ram->size() >= 0x3000)
 	{
-		space.install_readwrite_bank(0x4000, 0x5fff, "bank2");
-		membank("bank2")->set_base(&m_ram->pointer()[0x1000]);
+		space.install_ram(0x4000, 0x5fff, &m_ram->pointer()[0x1000]);
 	}
 	else
 	{
@@ -76,8 +74,7 @@ void pc1350_state::machine_start()
 
 	if (m_ram->size() >= 0x5000)
 	{
-		space.install_readwrite_bank(0x2000, 0x3fff, "bank3");
-		membank("bank3")->set_base(&m_ram->pointer()[0x3000]);
+		space.install_ram(0x2000, 0x3fff, &m_ram->pointer()[0x3000]);
 	}
 	else
 	{

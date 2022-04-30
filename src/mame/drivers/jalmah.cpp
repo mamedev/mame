@@ -119,6 +119,8 @@ OSC:    12.000MHz
 #include "tilemap.h"
 
 
+namespace {
+
 class jalmah_state : public driver_device
 {
 public:
@@ -127,6 +129,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
 		m_tmap(*this, "scroll%u", 0),
+		m_jmcu_rom_region(*this, "jmcu_rom"),
+		m_jmcu_rom_share(*this, "jmcu_rom"),
 		m_sharedram(*this, "sharedram"),
 		m_prirom(*this, "prirom"),
 		m_p1_key_io(*this, "P1_KEY%u", 0U),
@@ -136,18 +140,18 @@ public:
 		m_dsw_io(*this, "DSW")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(tilebank_w);
-	DECLARE_WRITE8_MEMBER(okirom_w);
-	DECLARE_WRITE8_MEMBER(okibank_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_w);
-	DECLARE_READ16_MEMBER(urashima_mcu_r);
-	DECLARE_WRITE16_MEMBER(urashima_mcu_w);
-	DECLARE_READ16_MEMBER(daireika_mcu_r);
-	DECLARE_WRITE16_MEMBER(daireika_mcu_w);
-	DECLARE_READ16_MEMBER(mjzoomin_mcu_r);
-	DECLARE_WRITE16_MEMBER(mjzoomin_mcu_w);
-	DECLARE_READ16_MEMBER(kakumei_mcu_r);
-	DECLARE_READ16_MEMBER(suchiesp_mcu_r);
+	void tilebank_w(uint8_t data);
+	void okirom_w(uint8_t data);
+	void okibank_w(uint8_t data);
+	void flip_screen_w(uint8_t data);
+	uint16_t urashima_mcu_r();
+	void urashima_mcu_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t daireika_mcu_r();
+	void daireika_mcu_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t mjzoomin_mcu_r();
+	void mjzoomin_mcu_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t kakumei_mcu_r();
+	uint16_t suchiesp_mcu_r();
 	void init_suchiesp();
 	void init_kakumei();
 	void init_urashima();
@@ -174,6 +178,8 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	optional_device_array<megasys1_tilemap_device, 4> m_tmap;
+	optional_region_ptr<uint16_t> m_jmcu_rom_region;
+	optional_shared_ptr<uint16_t> m_jmcu_rom_share;
 
 	uint16_t m_tile_bank;
 	uint16_t m_pri;
@@ -231,14 +237,14 @@ public:
 		  m_gfxdecode(*this, "gfxdecode")
 	{}
 
-	template<int TileChip> DECLARE_READ16_MEMBER(urashima_vregs_r);
-	template<int TileChip> DECLARE_WRITE16_MEMBER(urashima_vregs_w);
+	template<int TileChip> uint16_t urashima_vregs_r(offs_t offset);
+	template<int TileChip> void urashima_vregs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	template<int TileChip> DECLARE_READ16_MEMBER(urashima_vram_r);
-	template<int TileChip> DECLARE_WRITE16_MEMBER(urashima_vram_w);
+	template<int TileChip> uint16_t urashima_vram_r(offs_t offset);
+	template<int TileChip> void urashima_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE16_MEMBER(urashima_vreg_log_w);
-	DECLARE_WRITE8_MEMBER(urashima_priority_w);
+	void urashima_vreg_log_w(offs_t offset, uint16_t data);
+	void urashima_priority_w(uint8_t data);
 
 	template<int TileChip> TILE_GET_INFO_MEMBER(get_tile_info_urashima);
 
@@ -246,7 +252,7 @@ public:
 	void urashima_map(address_map &map);
 
 	uint32_t screen_update_urashima(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER(urashima_bank_w);
+	void urashima_bank_w(uint8_t data);
 
 protected:
 	virtual void video_start() override;
@@ -257,7 +263,7 @@ private:
 	required_shared_ptr_array<uint16_t, 2> m_vreg;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	tilemap_t *m_layer[2];
+	tilemap_t *m_layer[2]{};
 
 	TILEMAP_MAPPER_MEMBER(range0_16x16);
 	TILEMAP_MAPPER_MEMBER(range3_8x8);
@@ -271,6 +277,7 @@ Video Hardware start
 
 void jalmah_state::video_start()
 {
+	m_tile_bank = 0;
 	// ...
 }
 
@@ -281,7 +288,7 @@ TILE_GET_INFO_MEMBER(urashima_state::get_tile_info_urashima)
 	uint16_t tile = code & 0xfff;
 	int region = (TileChip == 0) ? m_tile_bank : 3;
 
-	SET_TILE_INFO_MEMBER(region,
+	tileinfo.set(region,
 			tile,
 			code >> 12,
 			0);
@@ -420,7 +427,7 @@ uint32_t urashima_state::screen_update_urashima(screen_device &screen, bitmap_in
 	return 0;
 }
 
-WRITE8_MEMBER(jalmah_state::tilebank_w)
+void jalmah_state::tilebank_w(uint8_t data)
 {
 	/*
 	 --xx ---- fg bank (used by suchiesp)
@@ -438,7 +445,7 @@ WRITE8_MEMBER(jalmah_state::tilebank_w)
 	}
 }
 
-WRITE8_MEMBER(urashima_state::urashima_bank_w)
+void urashima_state::urashima_bank_w(uint8_t data)
 {
 	if (m_tile_bank != (data & 0x03))
 	{
@@ -451,39 +458,39 @@ WRITE8_MEMBER(urashima_state::urashima_bank_w)
 }
 
 template<int TileChip>
-READ16_MEMBER(urashima_state::urashima_vram_r)
+uint16_t urashima_state::urashima_vram_r(offs_t offset)
 {
 	return m_videoram[TileChip][offset];
 }
 
 template<int TileChip>
-WRITE16_MEMBER(urashima_state::urashima_vram_w)
+void urashima_state::urashima_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[TileChip][offset]);
 	m_layer[TileChip]->mark_tile_dirty(offset);
 }
 
 template<int TileChip>
-READ16_MEMBER(urashima_state::urashima_vregs_r)
+uint16_t urashima_state::urashima_vregs_r(offs_t offset)
 {
 	return m_vreg[TileChip][offset];
 }
 
 template<int TileChip>
-WRITE16_MEMBER(urashima_state::urashima_vregs_w)
+void urashima_state::urashima_vregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vreg[TileChip][offset]);
 }
 
 // Urashima Mahjong uses a bigger video register area (mostly mirrored?)
 // we use this fallback so that it doesn't pollute logerror and get the info we want
-WRITE16_MEMBER(urashima_state::urashima_vreg_log_w)
+void urashima_state::urashima_vreg_log_w(offs_t offset, uint16_t data)
 {
 	if(data)
 		logerror("Warning vreg write to [%04x] -> %04x\n",offset*2,data);
 }
 
-WRITE8_MEMBER(urashima_state::urashima_priority_w)
+void urashima_state::urashima_priority_w(uint8_t data)
 {
 	m_pri = data & 1;
 }
@@ -629,7 +636,7 @@ Basic driver start
 ******************************************************************************************/
 
 
-WRITE8_MEMBER(jalmah_state::okirom_w)
+void jalmah_state::okirom_w(uint8_t data)
 {
 	m_oki_rom = data & 1;
 
@@ -642,7 +649,7 @@ WRITE8_MEMBER(jalmah_state::okirom_w)
 	//popmessage("PC=%06x %02x %02x %02x %08x",m_maincpu->pc(),m_oki_rom,m_oki_za,m_oki_bank,(m_oki_rom * 0x80000) + ((m_oki_bank+m_oki_za) * 0x20000) + 0x40000);
 }
 
-WRITE8_MEMBER(jalmah_state::okibank_w)
+void jalmah_state::okibank_w(uint8_t data)
 {
 	m_oki_bank = data & 3;
 
@@ -652,7 +659,7 @@ WRITE8_MEMBER(jalmah_state::okibank_w)
 	//popmessage("PC=%06x %02x %02x %02x %08x",m_maincpu->pc(),m_oki_rom,m_oki_za,m_oki_bank,(m_oki_rom * 0x80000) + ((m_oki_bank+m_oki_za) * 0x20000) + 0x40000);
 }
 
-WRITE8_MEMBER(jalmah_state::flip_screen_w)
+void jalmah_state::flip_screen_w(uint8_t data)
 {
 	/*---- ----x flip screen*/
 	flip_screen_set(data & 1);
@@ -691,7 +698,7 @@ void jalmah_state::jalmah_map(address_map &map)
 void jalmah_state::jalmahv1_map(address_map &map)
 {
 	jalmah_map(map);
-	map(0x100000, 0x10ffff).ram().region("jmcu_rom", 0); // extended ROM functions (not on real HW)
+	map(0x100000, 0x10ffff).ram().share("jmcu_rom"); // extended ROM functions (not on real HW)
 }
 
 void urashima_state::urashima_map(address_map &map)
@@ -721,7 +728,7 @@ void urashima_state::urashima_map(address_map &map)
 	map(0x0a0000, 0x0a1fff).noprw();
 	map(0x0f0000, 0x0f0fff).ram().share("sharedram");/*shared with MCU*/
 	map(0x0f1000, 0x0fffff).ram(); /*Work Ram*/
-	map(0x100000, 0x10ffff).ram().region("jmcu_rom", 0);/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
+	map(0x100000, 0x10ffff).ram().share("jmcu_rom");/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
 }
 
 void jalmah_state::oki_map(address_map &map)
@@ -1057,6 +1064,11 @@ void jalmah_state::machine_start()
 	const int okimax = (memregion("oki")->bytes() - 0x40000) / 0x20000;
 	m_okibank->configure_entries(0,okimax,memregion("oki")->base() + 0x40000,0x20000);
 
+	m_prg_prot = 0;
+	m_oki_rom = 0;
+	m_oki_bank = 0;
+	m_oki_za = 0;
+
 	save_item(NAME(m_respcount));
 	save_item(NAME(m_test_mode));
 	save_item(NAME(m_prg_prot));
@@ -1067,6 +1079,9 @@ void jalmah_state::machine_start()
 
 void jalmah_state::machine_reset()
 {
+	if(m_jmcu_rom_share)
+		memcpy(m_jmcu_rom_share, m_jmcu_rom_region, 0x10000);
+
 	m_pri = 0;
 	refresh_priority_system();
 
@@ -1075,6 +1090,9 @@ void jalmah_state::machine_reset()
 
 void urashima_state::machine_reset()
 {
+	if(m_jmcu_rom_share)
+		memcpy(m_jmcu_rom_share, m_jmcu_rom_region, 0x10000);
+
 //  m_pri = 0;
 
 	// initialize tilemap vram to sane defaults (test mode cares)
@@ -1476,7 +1494,7 @@ MCU code snippets
 
 ******************************************************************************************/
 
-READ16_MEMBER(jalmah_state::urashima_mcu_r)
+uint16_t jalmah_state::urashima_mcu_r()
 {
 	static const int resp[] = { 0x99, 0xd8, 0x00,
 							0x2a, 0x6a, 0x00,
@@ -1491,7 +1509,7 @@ READ16_MEMBER(jalmah_state::urashima_mcu_r)
 	int res;
 
 	res = resp[m_respcount++];
-	if (m_respcount >= ARRAY_LENGTH(resp)) m_respcount = 0;
+	if (m_respcount >= std::size(resp)) m_respcount = 0;
 
 //  logerror("%s: mcu_r %02x\n",machine().dscribe_context(),res);
 
@@ -1507,7 +1525,7 @@ READ16_MEMBER(jalmah_state::urashima_mcu_r)
 /*
 data value is REQ under mjzoomin video test menu. Is it related to the MCU?
 */
-WRITE16_MEMBER(jalmah_state::urashima_mcu_w)
+void jalmah_state::urashima_mcu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7 && data)
 	{
@@ -1535,7 +1553,7 @@ WRITE16_MEMBER(jalmah_state::urashima_mcu_w)
 	}
 }
 
-READ16_MEMBER(jalmah_state::daireika_mcu_r)
+uint16_t jalmah_state::daireika_mcu_r()
 {
 	static const int resp[] = { 0x99, 0xd8, 0x00,
 							0x2a, 0x6a, 0x00,
@@ -1550,14 +1568,14 @@ READ16_MEMBER(jalmah_state::daireika_mcu_r)
 	int res;
 
 	res = resp[m_respcount++];
-	if (m_respcount >= ARRAY_LENGTH(resp)) m_respcount = 0;
+	if (m_respcount >= std::size(resp)) m_respcount = 0;
 
 //  logerror("%s: mcu_r %02x\n",machine().describe_context(),res);
 
 	return res;
 }
 
-WRITE16_MEMBER(jalmah_state::daireika_mcu_w)
+void jalmah_state::daireika_mcu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7 && data)
 	{
@@ -1604,7 +1622,7 @@ WRITE16_MEMBER(jalmah_state::daireika_mcu_w)
 	}
 }
 
-READ16_MEMBER(jalmah_state::mjzoomin_mcu_r)
+uint16_t jalmah_state::mjzoomin_mcu_r()
 {
 	static const int resp[] = { 0x9c, 0xd8, 0x00,
 							0x2a, 0x6a, 0x00,
@@ -1618,7 +1636,7 @@ READ16_MEMBER(jalmah_state::mjzoomin_mcu_r)
 	int res;
 
 	res = resp[m_respcount++];
-	if (m_respcount >= ARRAY_LENGTH(resp)) m_respcount = 0;
+	if (m_respcount >= std::size(resp)) m_respcount = 0;
 
 //  logerror("%04x: mcu_r %02x\n",machine().describe_context(),res);
 
@@ -1628,7 +1646,7 @@ READ16_MEMBER(jalmah_state::mjzoomin_mcu_r)
 /*
 data value is REQ under mjzoomin video test menu.It is related to the MCU?
 */
-WRITE16_MEMBER(jalmah_state::mjzoomin_mcu_w)
+void jalmah_state::mjzoomin_mcu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7 && data)
 	{
@@ -1657,7 +1675,7 @@ WRITE16_MEMBER(jalmah_state::mjzoomin_mcu_w)
 	}
 }
 
-READ16_MEMBER(jalmah_state::kakumei_mcu_r)
+uint16_t jalmah_state::kakumei_mcu_r()
 {
 	static const int resp[] = { 0x8a, 0xd8, 0x00,
 							0x3c, 0x7c, 0x00,
@@ -1671,14 +1689,14 @@ READ16_MEMBER(jalmah_state::kakumei_mcu_r)
 	int res;
 
 	res = resp[m_respcount++];
-	if (m_respcount >= ARRAY_LENGTH(resp)) m_respcount = 0;
+	if (m_respcount >= std::size(resp)) m_respcount = 0;
 
 //  popmessage("%s: mcu_r %02x",machine().describe_context(),res);
 
 	return res;
 }
 
-READ16_MEMBER(jalmah_state::suchiesp_mcu_r)
+uint16_t jalmah_state::suchiesp_mcu_r()
 {
 	static const int resp[] = { 0x8a, 0xd8, 0x00,
 							0x3c, 0x7c, 0x00,
@@ -1692,7 +1710,7 @@ READ16_MEMBER(jalmah_state::suchiesp_mcu_r)
 	int res;
 
 	res = resp[m_respcount++];
-	if (m_respcount >= ARRAY_LENGTH(resp)) m_respcount = 0;
+	if (m_respcount >= std::size(resp)) m_respcount = 0;
 
 //  popmessage("%s: mcu_r %02x",machine().describe_context(),res);
 
@@ -1701,48 +1719,50 @@ READ16_MEMBER(jalmah_state::suchiesp_mcu_r)
 
 void jalmah_state::init_urashima()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(*this, FUNC(jalmah_state::urashima_mcu_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16_delegate(*this, FUNC(jalmah_state::urashima_mcu_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16smo_delegate(*this, FUNC(jalmah_state::urashima_mcu_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16s_delegate(*this, FUNC(jalmah_state::urashima_mcu_w)));
 
 	m_mcu_prg = URASHIMA_MCU;
 }
 
 void jalmah_state::init_daireika()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(*this, FUNC(jalmah_state::daireika_mcu_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16_delegate(*this, FUNC(jalmah_state::daireika_mcu_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16smo_delegate(*this, FUNC(jalmah_state::daireika_mcu_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16s_delegate(*this, FUNC(jalmah_state::daireika_mcu_w)));
 
 	m_mcu_prg = DAIREIKA_MCU;
 }
 
 void jalmah_state::init_mjzoomin()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(*this, FUNC(jalmah_state::mjzoomin_mcu_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16_delegate(*this, FUNC(jalmah_state::mjzoomin_mcu_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16smo_delegate(*this, FUNC(jalmah_state::mjzoomin_mcu_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16s_delegate(*this, FUNC(jalmah_state::mjzoomin_mcu_w)));
 
 	m_mcu_prg = MJZOOMIN_MCU;
 }
 
 void jalmah_state::init_kakumei()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(*this, FUNC(jalmah_state::kakumei_mcu_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16smo_delegate(*this, FUNC(jalmah_state::kakumei_mcu_r)));
 
 	m_mcu_prg = KAKUMEI_MCU;
 }
 
 void jalmah_state::init_kakumei2()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(*this, FUNC(jalmah_state::kakumei_mcu_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16smo_delegate(*this, FUNC(jalmah_state::kakumei_mcu_r)));
 
 	m_mcu_prg = KAKUMEI2_MCU;
 }
 
 void jalmah_state::init_suchiesp()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(*this, FUNC(jalmah_state::suchiesp_mcu_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16smo_delegate(*this, FUNC(jalmah_state::suchiesp_mcu_r)));
 
 	m_mcu_prg = SUCHIESP_MCU;
 }
+
+} // Anonymous namespace
 
 /*First version of the MCU*/
 GAME( 1989, urashima, 0, urashima,  urashima, urashima_state, init_urashima, ROT0, "UPL",          "Otogizoushi Urashima Mahjong (Japan)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )

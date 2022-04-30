@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -116,4 +116,36 @@ TEST_CASE("uint64_roX", "")
 {
 	REQUIRE(bx::uint64_rol(0x8000000000000000, 1) == 1);
 	REQUIRE(bx::uint64_ror(1, 1) == 0x8000000000000000);
+}
+
+TEST_CASE("align", "")
+{
+	REQUIRE( bx::isAligned(0,  8) );
+	REQUIRE(!bx::isAligned(7,  8) );
+	REQUIRE( bx::isAligned(64, 8) );
+	REQUIRE(!bx::isAligned(63, 8) );
+
+	REQUIRE(  0 == bx::alignUp(  0, 16) );
+	REQUIRE( 16 == bx::alignUp(  1, 16) );
+	REQUIRE( 16 == bx::alignUp( 15, 16) );
+	REQUIRE( 16 == bx::alignUp( 16, 16) );
+	REQUIRE(256 == bx::alignUp(255, 16) );
+	REQUIRE(  0 == bx::alignUp(-1,  16)  );
+	REQUIRE(-16 == bx::alignUp(-31, 16) );
+
+	REQUIRE(  0 == bx::alignUp(  0, 256) );
+	REQUIRE(256 == bx::alignUp(  1, 256) );
+	REQUIRE(256 == bx::alignUp( 15, 256) );
+	REQUIRE(256 == bx::alignUp(255, 256) );
+	REQUIRE(256 == bx::alignUp(256, 256) );
+	REQUIRE(256 == bx::alignUp(256, 256) );
+	REQUIRE(512 == bx::alignUp(511, 256) );
+
+	REQUIRE(  0 == bx::alignDown(  0, 16) );
+	REQUIRE(  0 == bx::alignDown(  1, 16) );
+	REQUIRE(  0 == bx::alignDown( 15, 16) );
+	REQUIRE( 16 == bx::alignDown( 16, 16) );
+	REQUIRE(240 == bx::alignDown(255, 16) );
+	REQUIRE(-16 == bx::alignDown(-1,  16)  );
+	REQUIRE(-32 == bx::alignDown(-31, 16) );
 }

@@ -99,7 +99,7 @@ void gaelco_wrally_sprites_device::draw_sprites(const rectangle &cliprect, uint1
 		{
 			/* get a pointer to the current line in the screen bitmap */
 			int ypos = ((sy + py) & 0x1ff);
-			uint16_t *srcy = &m_temp_bitmap_sprites.pix16(ypos);
+			uint16_t *const srcy = &m_temp_bitmap_sprites.pix(ypos);
 
 			int gfx_py = yflip ? (gfx->height() - 1 - py) : py;
 
@@ -109,7 +109,7 @@ void gaelco_wrally_sprites_device::draw_sprites(const rectangle &cliprect, uint1
 			{
 				/* get current pixel */
 				int xpos = (((sx + px) & 0x3ff) - 0x0f) & 0x3ff;
-				uint16_t *pixel = srcy + xpos;
+				uint16_t *const pixel = srcy + xpos;
 				int gfx_px = xflip ? (gfx->width() - 1 - px) : px;
 
 				/* get asociated pen for the current sprite pixel */
@@ -152,8 +152,8 @@ void gaelco_wrally_sprites_device::mix_sprites(bitmap_ind16 &bitmap, const recta
 {
 	for (int y = cliprect.min_y; y < cliprect.max_y; y++)
 	{
-		const uint16_t* spriteptr = &m_temp_bitmap_sprites.pix16(y);
-		uint16_t* dstptr = &bitmap.pix16(y);
+		uint16_t const *const spriteptr = &m_temp_bitmap_sprites.pix(y);
+		uint16_t *const dstptr = &bitmap.pix(y);
 
 		for (int x = cliprect.min_x; x < cliprect.max_x; x++)
 		{

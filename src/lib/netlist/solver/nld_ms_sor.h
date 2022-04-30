@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Couriersud
 
 #ifndef NLD_MS_SOR_H_
@@ -12,8 +12,8 @@
 /// Fow w==1 we will do the classic Gauss-Seidel approach.
 ///
 
+#include "nld_matrix_solver_ext.h"
 #include "nld_ms_direct.h"
-#include "nld_solver.h"
 
 #include <algorithm>
 
@@ -29,17 +29,17 @@ namespace solver
 
 		using float_type = FT;
 
-		matrix_solver_SOR_t(netlist_state_t &anetlist, const pstring &name,
-			analog_net_t::list_t &nets,
+		matrix_solver_SOR_t(devices::nld_solver &main_solver, const pstring &name,
+			matrix_solver_t::net_list_t &nets,
 			const solver_parameters_t *params, const std::size_t size)
-			: matrix_solver_direct_t<FT, SIZE>(anetlist, name, nets, params, size)
+			: matrix_solver_direct_t<FT, SIZE>(main_solver, name, nets, params, size)
 			, m_lp_fact(*this, "m_lp_fact", 0)
 			, w(size, plib::constants<FT>::zero())
 			, one_m_w(size, plib::constants<FT>::zero())
 			{
 			}
 
-		unsigned vsolve_non_dynamic(bool newton_raphson) override;
+		void vsolve_non_dynamic() override;
 
 	private:
 		state_var<float_type> m_lp_fact;
@@ -52,7 +52,7 @@ namespace solver
 	// ----------------------------------------------------------------------------------------
 
 	template <typename FT, int SIZE>
-	unsigned matrix_solver_SOR_t<FT, SIZE>::vsolve_non_dynamic(bool newton_raphson)
+	void matrix_solver_SOR_t<FT, SIZE>::vsolve_non_dynamic()
 	{
 		const std::size_t iN = this->size();
 		bool resched = false;
@@ -70,17 +70,20 @@ namespace solver
 
 		for (std::size_t k = 0; k < iN; k++)
 		{
-			nl_fptype gtot_t = nlconst::zero();
-			nl_fptype gabs_t = nlconst::zero();
-			nl_fptype RHS_t = nlconst::zero();
 
 			const std::size_t term_count = this->m_terms[k].count();
-			const nl_fptype * const gt = this->m_gtn[k];
-			const nl_fptype * const go = this->m_gonn[k];
-			const nl_fptype * const Idr = this->m_Idrn[k];
+			const auto * const gt = this->m_gtn[k];
+			const auto * const go = this->m_gonn[k];
+			const auto * const Idr = this->m_Idrn[k];
 			auto other_cur_analog = this->m_connected_net_Vn[k];
 
-			this->m_new_V[k] = this->m_terms[k].template getV<float_type>();
+			using fpaggtype = std::remove_reference_t<std::remove_cv_t<decltype(this->m_gtn[0][0])>>;
+
+			fpaggtype gtot_t = nlconst_base<fpaggtype>::zero();
+			fpaggtype gabs_t = nlconst_base<fpaggtype>::zero();
+			fpaggtype RHS_t  = nlconst_base<fpaggtype>::zero();
+
+			this->m_new_V[k] = static_cast<float_type>(this->m_terms[k].getV());
 
 			for (std::size_t i = 0; i < term_count; i++)
 			{
@@ -98,7 +101,7 @@ namespace solver
 				for (std::size_t i = 0; i < term_count; i++)
 					gabs_t = gabs_t + plib::abs(go[i]);
 
-				gabs_t *= nlconst::magic(0.5); // derived by try and error
+				gabs_t *= nlconst::half(); // derived by try and error
 				if (gabs_t <= gtot_t)
 				{
 					w[k] = ws / static_cast<float_type>(gtot_t);
@@ -126,7 +129,7 @@ namespace solver
 			{
 				const int * net_other = this->m_terms[k].m_connected_net_idx.data();
 				const std::size_t railstart = this->m_terms[k].railstart();
-				const nl_fptype * go = this->m_gonn[k];
+				const auto * go = this->m_gonn[k];
 
 				float_type Idrive = plib::constants<float_type>::zero();
 				for (std::size_t i = 0; i < railstart; i++)
@@ -150,14 +153,9 @@ namespace solver
 		{
 			// Fallback to direct solver ...
 			this->m_iterative_fail++;
-			return matrix_solver_direct_t<FT, SIZE>::vsolve_non_dynamic(newton_raphson);
+			matrix_solver_direct_t<FT, SIZE>::vsolve_non_dynamic();
 		}
 
-		bool err(false);
-		if (newton_raphson)
-			err = this->check_err();
-		this->store();
-		return (err) ? 2 : 1;
 	}
 
 } // namespace solver

@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz, David Haywood
 
+#include "emu.h"
 #include "includes/spg2xx.h"
+
 
 class shredmjr_game_state : public spg2xx_game_state
 {
@@ -14,12 +16,13 @@ public:
 
 	void shredmjr(machine_config &config);
 	void taikeegr(machine_config &config);
+	void taikeegrp(machine_config &config);
 
 	void init_taikeegr();
 
 protected:
-	DECLARE_READ16_MEMBER(porta_r);
-	virtual  DECLARE_WRITE16_MEMBER(porta_w) override;
+	uint16_t porta_r();
+	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 private:
 	uint16_t m_porta_data;
@@ -28,8 +31,8 @@ private:
 };
 
 
-// Shredmaster Jr uses the same input order as the regular Taikee Guitar, but reads all inputs through a single multplexed bit
-WRITE16_MEMBER(shredmjr_game_state::porta_w)
+// Shredmaster Jr uses the same input order as the regular Taikee Guitar, but reads all inputs through a single multiplexed bit
+void shredmjr_game_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data != m_porta_data)
 	{
@@ -75,7 +78,7 @@ WRITE16_MEMBER(shredmjr_game_state::porta_w)
 	m_porta_data = data;
 }
 
-READ16_MEMBER(shredmjr_game_state::porta_r)
+uint16_t shredmjr_game_state::porta_r()
 {
 	//logerror("porta_r with shift amount %d \n", m_shiftamount);
 	uint16_t ret = 0x0000;
@@ -109,6 +112,26 @@ static INPUT_PORTS_START( taikeegr )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( guitarstp )
+	PORT_START("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )   PORT_NAME("Strum Bar Down")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Strum Bar Up")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Whamming Bar")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Yellow")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Blue")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Red")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Green")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Orange")
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
 void shredmjr_game_state::shredmjr(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
@@ -124,16 +147,18 @@ void shredmjr_game_state::taikeegr(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
 	m_maincpu->set_addrmap(AS_PROGRAM, &shredmjr_game_state::mem_map_4m);
-	m_maincpu->set_pal(true);
 
 	spg2xx_base(config);
 
-	m_screen->set_refresh_hz(50);
-//  m_screen->set_size(320, 312);
-
 	m_maincpu->porta_in().set_ioport("P1");
-//  m_maincpu->portb_in().set_ioport("P2");
-//  m_maincpu->portc_in().set_ioport("P3");
+}
+
+void shredmjr_game_state::taikeegrp(machine_config &config)
+{
+	taikeegr(config);
+
+	m_maincpu->set_pal(true);
+	m_screen->set_refresh_hz(50);
 }
 
 
@@ -178,13 +203,47 @@ ROM_START( taikeegr )
 	ROM_LOAD16_WORD_SWAP( "taikee_guitar.bin", 0x000000, 0x800000, CRC(8cbe2feb) SHA1(d72e816f259ba6a6260d6bbaf20c5e9b2cf7140b) )
 ROM_END
 
+ROM_START( rockstar )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "29gl064.bin", 0x000000, 0x800000, CRC(40de50ff) SHA1(b33ae7a3d32911addf833998d7419f4830be5a07) )
+ROM_END
+
 ROM_START( shredmjr )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "shredmasterjr.bin", 0x000000, 0x800000, CRC(95a6dcf1) SHA1(44893cd6ebe6b7f33a73817b72ae7be70c3126dc) )
 ROM_END
 
-// there are multiple versions of this with different songs, was also sold by dreamGEAR as 'Shredmaster Jr.' (different title screen)
-// for the UK version the title screen always shows "Guitar Rock", however there are multiple boxes with different titles and song selections.
-// ROM is glued on the underside and soldered to the PCB, very difficult to remove without damaging.
-CONS( 2007, taikeegr,    0,        0,        taikeegr,     taikeegr, shredmjr_game_state, init_taikeegr, "TaiKee", "Rockstar Guitar / Guitar Rock (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // bad music timings (too slow)
-CONS( 2007, shredmjr,    taikeegr, 0,        shredmjr,     taikeegr, shredmjr_game_state, init_taikeegr, "dreamGEAR", "Shredmaster Jr (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // bad music timings (too slow)
+ROM_START( guitarst )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "guitarstar_s29gl064m11tfir4_0001227e.bin", 0x000000, 0x800000, CRC(feaace47) SHA1(dd426bb4f03a16b1b96b63b4e0d79ea75097bf72) )
+ROM_END
+
+ROM_START( guitarstp )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "29gl064.u2", 0x000000, 0x800000, CRC(1dbcff73) SHA1(b179e4da6f38e7d5ec796bf846a63492d30eb0f5) )
+ROM_END
+
+
+
+
+
+
+// These were all sold as different products, use a different sets of songs / presentation styles (2D or perspective gameplay, modified titlescreens etc.)
+// and sometimes even slightly different hardware, so aren't set as clones of each other
+
+// box title not confirmed, Guitar Rock on title screen, has Bon Jovi etc.
+CONS( 2007, taikeegr,    0,        0,        taikeegrp,    taikeegr, shredmjr_game_state, init_taikeegr, "TaiKee", "Guitar Rock (PAL)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // timing not quite correct yet
+
+// Plug 'N' Play Rockstar Guitar on box, Guitar Rock on title screen, has Manic Street Preachers etc.
+CONS( 2007, rockstar,    0,        0,        taikeegrp,    taikeegr, shredmjr_game_state, init_taikeegr, "Ultimate Products / TaiKee", "Plug 'N' Play Rockstar Guitar / Guitar Rock (PAL)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // timing not quite correct yet
+
+// dreamGEAR branded presentation, modified hardware (buttons read in a different way) same song seletion as taikeegr
+CONS( 2007, shredmjr,    0,        0,        shredmjr,     taikeegr, shredmjr_game_state, init_taikeegr, "dreamGEAR", "Shredmaster Jr (NTSC)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^
+
+// doesn't have a Senario logo ingame, but does on box.  unique song selection
+CONS( 200?, guitarst,    0,        0,        taikeegr,     taikeegr, shredmjr_game_state, init_taikeegr, "Senario", "Guitar Star (US, Senario, NTSC)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^
+
+// This one has the same songs as 'rockstar' but different game style / presentation.
+// Unit found in Ireland "imported by Cathay Product Sourcing Ltd." on the box, with address in Ireland
+// ITEM #01109 on instruction sheet, no manufacturer named on either box or instructions
+CONS( 200?, guitarstp,   0,        0,        taikeegrp,    guitarstp,shredmjr_game_state, init_taikeegr, "<unknown>", "Guitar Star (Europe, PAL)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^

@@ -59,8 +59,8 @@ private:
 
 	std::unique_ptr<bitmap_ind16> m_tmpbitmap0;
 	std::unique_ptr<bitmap_ind16> m_tmpbitmap1;
-	int m_disable_video;
-	tilemap_t *m_tilemap[3];
+	int m_disable_video = 0;
+	tilemap_t *m_tilemap[3]{};
 
 	// common
 	template<int Layer> void vram_w(offs_t offset, u16 data, u16 mem_mask);

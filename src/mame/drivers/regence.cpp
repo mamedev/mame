@@ -14,18 +14,12 @@ Hardware notes:
 - 2KB RAM (MSM5128-15RS), 3 sockets, only middle one used
 - TTL, piezo, 8*8+4 LEDs, magnetic sensors
 
-TODO:
-- verify irq source/frequency, probably a 555 ic, current approximation is from
-  comparing led blink rate with a video recording
-- ARC0/ARC2 rom labels might be the wrong way around
-
 ******************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/pwm.h"
 #include "speaker.h"
 
@@ -66,9 +60,9 @@ private:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(leds_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void control_w(u8 data);
+	void leds_w(u8 data);
+	u8 input_r();
 
 	u8 m_inp_mux = 0;
 	u8 m_led_data = 0;
@@ -92,7 +86,7 @@ void regence_state::update_display()
 	m_display->matrix(1 << m_inp_mux, m_led_data);
 }
 
-WRITE8_MEMBER(regence_state::control_w)
+void regence_state::control_w(u8 data)
 {
 	// d0-d3: input mux/led select
 	m_inp_mux = data & 0xf;
@@ -104,14 +98,14 @@ WRITE8_MEMBER(regence_state::control_w)
 	// other: ?
 }
 
-WRITE8_MEMBER(regence_state::leds_w)
+void regence_state::leds_w(u8 data)
 {
 	// d0-d7: led data
 	m_led_data = data;
 	update_display();
 }
 
-READ8_MEMBER(regence_state::input_r)
+u8 regence_state::input_r()
 {
 	u8 data = 0;
 
@@ -152,7 +146,7 @@ void regence_state::main_map(address_map &map)
 static INPUT_PORTS_START( regence )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Changement de Position (Set Up)") // Veränderung
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Retour en Arrière (Take Back)") // Zug Zurück
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME(u8"Retour en Arrière (Take Back)") // Zug Zurück
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("Nouvelle Partie (New Game)") // Neues Spiel (press after setup)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("King")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Queen")
@@ -183,7 +177,7 @@ void regence_state::regence(machine_config &config)
 	Z80(config, m_maincpu, 8_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &regence_state::main_map);
 
-	m_maincpu->set_periodic_int(FUNC(regence_state::irq0_line_hold), attotime::from_hz(400)); // approximation
+	m_maincpu->set_periodic_int(FUNC(regence_state::irq0_line_hold), attotime::from_hz(448)); // from 555, measured
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -196,7 +190,6 @@ void regence_state::regence(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 
@@ -207,9 +200,9 @@ void regence_state::regence(machine_config &config)
 
 ROM_START( regence )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("arc0.ic13", 0x0000, 0x1000, CRC(ac6a0a67) SHA1(52b115c7cd372dfbad14b00854aa4f6f75a937d3) )
-	ROM_LOAD("arc1.ic12", 0x4000, 0x1000, CRC(5c2fb0c7) SHA1(811ab3d7cefcf872741eb2265115080aaf913f0f) )
-	ROM_LOAD("arc2.ic11", 0x8000, 0x1000, CRC(e4c39dbd) SHA1(b6a6d1d39f73a2ff1ade6205bdf180be13e84df3) )
+	ROM_LOAD("arc0.ic13", 0x0000, 0x1000, CRC(ac6a0a67) SHA1(52b115c7cd372dfbad14b00854aa4f6f75a937d3) ) // M5L2732K
+	ROM_LOAD("arc1.ic12", 0x4000, 0x1000, CRC(5c2fb0c7) SHA1(811ab3d7cefcf872741eb2265115080aaf913f0f) ) // "
+	ROM_LOAD("arc2.ic11", 0x8000, 0x1000, CRC(e4c39dbd) SHA1(b6a6d1d39f73a2ff1ade6205bdf180be13e84df3) ) // "
 ROM_END
 
 } // anonymous namespace
@@ -221,4 +214,4 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS */
-CONS( 1982, regence, 0,      0,      regence, regence, regence_state, empty_init, "France Double R", "La Regence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1982, regence, 0,      0,      regence, regence, regence_state, empty_init, "France Double R", u8"La Régence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

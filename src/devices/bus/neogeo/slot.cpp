@@ -27,8 +27,8 @@ device_neogeo_cart_interface::device_neogeo_cart_interface(const machine_config 
 	m_region_audio(*this, "^audiocpu"),
 	m_region_audiocrypt(*this, "^audiocrypt"),
 	m_region_spr(*this, "^sprites"),
-	m_region_ym(*this, "^ymsnd"),
-	m_region_ymd(*this, "^ymsnd.deltat")
+	m_region_ym(*this, "^ymsnd:adpcma"),
+	m_region_ymd(*this, "^ymsnd:adpcmb")
 {
 }
 
@@ -99,7 +99,7 @@ void device_neogeo_cart_interface::optimize_sprites(uint8_t* region_sprites, uin
 //-------------------------------------------------
 neogeo_cart_slot_device::neogeo_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock) :
 	device_t(mconfig, NEOGEO_CART_SLOT, tag, owner, clock),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_neogeo_cart_interface>(mconfig, *this),
 	m_cart(nullptr)
 {
@@ -196,6 +196,7 @@ static const neogeo_slot slot_list[] =
 	{ NEOGEO_SAMSHO5B, "boot_samsho5b" },
 	{ NEOGEO_MSLUG3B6, "boot_mslug3b6" },
 	{ NEOGEO_MSLUG5P, "boot_ms5plus" },
+	{ NEOGEO_MSLUG5B, "boot_mslug5b" },
 	{ NEOGEO_KOG, "boot_kog" },
 	{ NEOGEO_SBP, "boot_sbp" },
 	{ NEOGEO_KOF10TH, "boot_kf10th" },
@@ -206,7 +207,7 @@ static int neogeo_get_pcb_id(const char *slot)
 {
 	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(elem.slot_option, slot))
+		if (!strcmp(elem.slot_option, slot))
 			return elem.pcb_id;
 	}
 
@@ -258,17 +259,17 @@ image_init_result neogeo_cart_slot_device::call_load()
 				memcpy(ROM8 + 0x10000, get_software_region("audiocpu"), len); // avoid reloading in XML, should just improve banking instead tho?
 			}
 
-			len = get_software_region_length("ymsnd");
+			len = get_software_region_length("ymsnd:adpcma");
 			m_cart->ym_alloc(len);
 			ROM8 = m_cart->get_ym_base();
-			memcpy(ROM8, get_software_region("ymsnd"), len);
+			memcpy(ROM8, get_software_region("ymsnd:adpcma"), len);
 
-			if (get_software_region("ymsnd.deltat") != nullptr)
+			if (get_software_region("ymsnd:adpcmb") != nullptr)
 			{
-				len = get_software_region_length("ymsnd.deltat");
+				len = get_software_region_length("ymsnd:adpcmb");
 				m_cart->ymdelta_alloc(len);
 				ROM8 = m_cart->get_ymdelta_base();
-				memcpy(ROM8, get_software_region("ymsnd.deltat"), len);
+				memcpy(ROM8, get_software_region("ymsnd:adpcmb"), len);
 			}
 			else
 			{
@@ -333,10 +334,10 @@ std::string neogeo_cart_slot_device::get_default_card_software(get_default_card_
  rom_r
  -------------------------------------------------*/
 
-READ16_MEMBER(neogeo_cart_slot_device::rom_r)
+uint16_t neogeo_cart_slot_device::rom_r(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->rom_r(space, offset, mem_mask);
+		return m_cart->rom_r(offset);
 	else
 		return 0xffff;
 }
@@ -345,20 +346,20 @@ READ16_MEMBER(neogeo_cart_slot_device::rom_r)
  write_banksel
  -------------------------------------------------*/
 
-WRITE16_MEMBER(neogeo_cart_slot_device::banksel_w)
+void neogeo_cart_slot_device::banksel_w(uint16_t data)
 {
 	if (m_cart)
-		m_cart->banksel_w(space, offset, data, mem_mask);
+		m_cart->banksel_w(data);
 }
 
 /*-------------------------------------------------
  ram_r
  -------------------------------------------------*/
 
-READ16_MEMBER(neogeo_cart_slot_device::ram_r)
+uint16_t neogeo_cart_slot_device::ram_r(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->ram_r(space, offset, mem_mask);
+		return m_cart->ram_r(offset);
 	else
 		return 0xffff;
 }
@@ -367,20 +368,20 @@ READ16_MEMBER(neogeo_cart_slot_device::ram_r)
  ram_w
  -------------------------------------------------*/
 
-WRITE16_MEMBER(neogeo_cart_slot_device::ram_w)
+void neogeo_cart_slot_device::ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_cart)
-		m_cart->ram_w(space, offset, data, mem_mask);
+		m_cart->ram_w(offset, data, mem_mask);
 }
 
 /*-------------------------------------------------
  addon_r
  -------------------------------------------------*/
 
-READ16_MEMBER(neogeo_cart_slot_device::addon_r)
+uint16_t neogeo_cart_slot_device::addon_r(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->addon_r(space, offset, mem_mask);
+		return m_cart->addon_r(offset);
 	else
 		return 0xffff;
 }
@@ -389,10 +390,10 @@ READ16_MEMBER(neogeo_cart_slot_device::addon_r)
  protection_r
  -------------------------------------------------*/
 
-READ16_MEMBER(neogeo_cart_slot_device::protection_r)
+uint16_t neogeo_cart_slot_device::protection_r(address_space &space, offs_t offset)
 {
 	if (m_cart)
-		return m_cart->protection_r(space, offset, mem_mask);
+		return m_cart->protection_r(space, offset);
 	else
 		return 0xffff;
 }
@@ -401,8 +402,8 @@ READ16_MEMBER(neogeo_cart_slot_device::protection_r)
  protection_w
  -------------------------------------------------*/
 
-WRITE16_MEMBER(neogeo_cart_slot_device::protection_w)
+void neogeo_cart_slot_device::protection_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_cart)
-		m_cart->protection_w(space, offset, data, mem_mask);
+		m_cart->protection_w(offset, data, mem_mask);
 }

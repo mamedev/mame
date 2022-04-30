@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
+license:CC0
+
 Info Taken from here: http://www.samdal.com/SVIDOCS/SVI_Softwares_for_SVI318-328.pdf
                       http://www.samdal.com/svsoftware.htm
 
@@ -114,8 +116,6 @@ Grave Digger (198x)
 Fortune Valley (198x)
 Trach Man (198x)
 Ballonies (198x)
-
-
 -->
 
 <softwarelist name="svi318_cass" description="Spectravision SVI-318 cassettes">
@@ -701,7 +701,7 @@ Ballonies (198x)
 		<info name="serial" value="SD-669T" />
 
 		<part name="cass1" interface="svi318_cass">
-			<dataarea name="cass" size="17124">
+			<dataarea name="cass" size="32768">
 				<rom name="planet patrol (1983)(spectravideo)[a][bload'cas-',r].cas" size="32768" crc="6adb5186" sha1="c26700c5159c9349d9be6cc4631067e43a2319fc"/>
 			</dataarea>
 		</part>
@@ -846,7 +846,7 @@ Ballonies (198x)
 		<info name="serial" value="SD-232C" />
 
 		<part name="cass1" interface="svi318_cass">
-			<dataarea name="cass" size="16700">
+			<dataarea name="cass" size="32768">
 				<rom name="frantic freddy (1983)(spectravideo)[a][bload'cas-',r].cas" size="32768" crc="5bd12860" sha1="255d8a90d26eb9c1ecdda16ae4da68d44198b47f"/>
 			</dataarea>
 		</part>

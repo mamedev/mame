@@ -1,4 +1,5 @@
-// license:BSD-3-Clause copyright-holders:Joakim Larsson Edstrom
+// license:BSD-3-Clause
+// copyright-holders:Joakim Larsson Edstrom
 /*
   Diablo Printer TTL CPU
 */
@@ -72,9 +73,9 @@ protected:
 	int m_icount;
 
 	// address spaces
-	address_space *m_program;
-	address_space *m_data;
-	memory_access_cache<1, -1, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<9, 1, -1, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<9, 1, -1, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access<5, 0,  0, ENDIANNESS_LITTLE>::specific m_data;
 
 	// rom regions
 	memory_region *m_table;

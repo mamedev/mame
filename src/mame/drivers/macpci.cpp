@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-  macpci.c: second-generation Old World PowerMacs based on PCI instead of NuBus
+  macpci.cpp: second-generation Old World PowerMacs based on PCI instead of NuBus
 
   Preliminary driver by R. Belmont (based on pippin.c skeleton by Angelo Salese)
 
@@ -39,6 +39,7 @@
 #include "emu.h"
 #include "includes/macpci.h"
 #include "cpu/powerpc/ppc.h"
+#include "cpu/mn1880/mn1880.h"
 #include "imagedev/chd_cd.h"
 #include "sound/cdda.h"
 #include "emupal.h"
@@ -46,14 +47,14 @@
 #include "softlist.h"
 #include "speaker.h"
 
-READ64_MEMBER( macpci_state::unk1_r )
+uint64_t macpci_state::unk1_r()
 {
 	m_unk1_test ^= 0x0400; //PC=ff808760
 
 	return m_unk1_test << 16;
 }
 
-READ64_MEMBER( macpci_state::unk2_r )
+uint64_t macpci_state::unk2_r(offs_t offset, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_47)
 		return (uint64_t)0xe1 << 32; //PC=fff04810
@@ -79,6 +80,32 @@ void macpci_state::pippin_mem(address_map &map)
 	map(0xf3016000, 0xf3017fff).rw(FUNC(macpci_state::mac_via_r), FUNC(macpci_state::mac_via_w));
 
 	map(0xffc00000, 0xffffffff).rom().region("bootrom", 0);
+}
+
+void macpci_state::cdmcu_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rom().region("cdrom", 0);
+}
+
+void macpci_state::cdmcu_data(address_map &map)
+{
+	map(0x0000, 0x0001).noprw();
+	map(0x0003, 0x0003).noprw();
+	map(0x0004, 0x0008).nopw();
+	map(0x0008, 0x0008).nopr();
+	map(0x0009, 0x0009).noprw();
+	map(0x000f, 0x000f).noprw();
+	map(0x001f, 0x0021).nopw();
+	map(0x0031, 0x0031).noprw();
+	map(0x0033, 0x0033).nopw();
+	map(0x0036, 0x0036).noprw();
+	map(0x0060, 0x031f).ram();
+	map(0x802a, 0x802a).nopw();
+	map(0x802f, 0x8034).nopw();
+	map(0x8032, 0x8032).nopr();
+	map(0x8035, 0x8035).lr8(NAME([]() { return 0x40; }));
+	map(0x8037, 0x8037).noprw();
+	map(0x8038, 0x8039).nopw();
 }
 
 /* Input ports */
@@ -123,7 +150,7 @@ void macpci_state::pippin(machine_config &config)
 	RAM(config, m_ram);
 	m_ram->set_default_size("32M");
 
-	VIA6522(config, m_via1, C7M/10);
+	R65NC22(config, m_via1, C7M/10);
 	m_via1->readpa_handler().set(FUNC(macpci_state::mac_via_in_a));
 	m_via1->readpb_handler().set(FUNC(macpci_state::mac_via_in_b));
 	m_via1->writepa_handler().set(FUNC(macpci_state::mac_via_out_a));
@@ -140,6 +167,10 @@ void macpci_state::pippin(machine_config &config)
 	m_cuda->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
 	m_cuda->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
 	config.set_perfect_quantum(m_maincpu);
+
+	mn1880_device &cdmcu(MN1880(config, "cdmcu", 8388608)); // type and clock unknown
+	cdmcu.set_addrmap(AS_PROGRAM, &macpci_state::cdmcu_mem);
+	cdmcu.set_addrmap(AS_DATA, &macpci_state::cdmcu_data);
 }
 
 /* ROM definition */

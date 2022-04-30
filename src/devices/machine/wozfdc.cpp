@@ -178,7 +178,7 @@ void appleiii_fdc_device::device_reset()
 	enable1 = 1;
 }
 
-void wozfdc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void wozfdc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if(active)
 		lss_sync();
@@ -217,7 +217,7 @@ void wozfdc_device::write(offs_t offset, uint8_t data)
 	last_6502_write = data;
 }
 
-WRITE8_MEMBER(wozfdc_device::set_phase)
+void wozfdc_device::set_phase(uint8_t data)
 {
 	if (floppy && active)
 		floppy->seek_phase_w(data);

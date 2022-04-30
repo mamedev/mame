@@ -124,6 +124,7 @@
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/votrax.h"
+#include "sound/flt_rc.h"
 
 #include "speaker.h"
 
@@ -141,20 +142,20 @@
  *
  *************************************/
 
-WRITE8_MEMBER(astrocde_state::protected_ram_enable_w)
+void astrocde_state::protected_ram_enable_w(uint8_t data)
 {
 	m_ram_write_enable = true;
 }
 
 
-READ8_MEMBER(astrocde_state::protected_ram_r)
+uint8_t astrocde_state::protected_ram_r(offs_t offset)
 {
 	m_ram_write_enable = false;
 	return m_protected_ram ? m_protected_ram[offset] : m_nvram[offset];
 }
 
 
-WRITE8_MEMBER(astrocde_state::protected_ram_w)
+void astrocde_state::protected_ram_w(offs_t offset, uint8_t data)
 {
 	if (m_ram_write_enable)
 		(m_protected_ram ? m_protected_ram : m_nvram)[offset] = data;
@@ -169,7 +170,7 @@ WRITE8_MEMBER(astrocde_state::protected_ram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(seawolf2_state::sound_1_w)// Port 40
+void seawolf2_state::sound_1_w(uint8_t data) // Port 40
 {
 	uint8_t rising_bits = data & ~m_port_1_last;
 	m_port_1_last = data;
@@ -183,7 +184,7 @@ WRITE8_MEMBER(seawolf2_state::sound_1_w)// Port 40
 }
 
 
-WRITE8_MEMBER(seawolf2_state::sound_2_w)// Port 41
+void seawolf2_state::sound_2_w(uint8_t data) // Port 41
 {
 	uint8_t rising_bits = data & ~m_port_2_last;
 	m_port_2_last = data;
@@ -220,7 +221,7 @@ WRITE8_MEMBER(seawolf2_state::sound_2_w)// Port 41
  *
  *************************************/
 
-READ8_MEMBER(astrocde_state::input_mux_r)
+uint8_t astrocde_state::input_mux_r(offs_t offset)
 {
 	return m_handle[offset & 3].read_safe(0xff);
 }
@@ -253,13 +254,13 @@ CUSTOM_INPUT_MEMBER(ebases_state::trackball_r)
 }
 
 
-WRITE8_MEMBER(ebases_state::trackball_select_w)
+void ebases_state::trackball_select_w(uint8_t data)
 {
 	m_input_select = data & 3;
 }
 
 
-WRITE8_MEMBER(ebases_state::coin_w)
+void ebases_state::coin_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
@@ -286,7 +287,7 @@ WRITE_LINE_MEMBER(astrocde_state::gorf_sound_switch_w)
  *
  *************************************/
 
-WRITE8_MEMBER(astrocde_state::demndrgn_banksw_w)
+void astrocde_state::demndrgn_banksw_w(uint8_t data)
 {
 	int bank = (data >> 5) & 3;
 	m_bank4000->set_bank(bank);
@@ -304,7 +305,7 @@ CUSTOM_INPUT_MEMBER(demndrgn_state::joystick_r)
 }
 
 
-WRITE8_MEMBER(demndrgn_state::sound_w)
+void demndrgn_state::sound_w(uint8_t data)
 {
 	logerror("Trigger sound sample 0x%02x\n",data);
 }
@@ -318,9 +319,9 @@ WRITE8_MEMBER(demndrgn_state::sound_w)
  *************************************/
 
 
-WRITE8_MEMBER(astrocde_state::profpac_banksw_w)
+void astrocde_state::profpac_banksw_w(uint8_t data)
 {
-	demndrgn_banksw_w(space, 0, data);
+	demndrgn_banksw_w(data);
 
 	if (data & 0x80)
 	{
@@ -343,7 +344,7 @@ WRITE8_MEMBER(astrocde_state::profpac_banksw_w)
  *
  *************************************/
 
-WRITE8_MEMBER(tenpindx_state::lamp_w)
+void tenpindx_state::lamp_w(offs_t offset, uint8_t data)
 {
 	/* lamps */
 	if (offset == 0)
@@ -365,14 +366,14 @@ WRITE8_MEMBER(tenpindx_state::lamp_w)
 }
 
 
-WRITE8_MEMBER(tenpindx_state::counter_w)
+void tenpindx_state::counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 	if (data & 0xfc) osd_printf_debug("tenpindx_counter_w = %02X\n", data);
 }
 
 
-WRITE8_MEMBER(tenpindx_state::lights_w)
+void tenpindx_state::lights_w(uint8_t data)
 {
 	/* "flashlights" */
 	int which = data >> 4;
@@ -395,12 +396,13 @@ WRITE8_MEMBER(tenpindx_state::lights_w)
  *
  *************************************/
 
-WRITE8_MEMBER(astrocde_state::votrax_speech_w)
+void astrocde_state::votrax_speech_w(uint8_t data)
 {
-	m_votrax->inflection_w(data >> 6);
+	// Note that the frequency change is smooth, but we just can't
+	// handle that.
+	m_votrax->set_clock(data & 0x40 ? 782000 : 756000);
+	m_votrax->inflection_w(data & 0x80 ? 0 : 2);
 	m_votrax->write(data & 0x3f);
-
-	/* Note : We should really also use volume in this as well as frequency */
 }
 
 
@@ -537,8 +539,8 @@ void seawolf2_state::port_map_discrete(address_map &map)
 	map(0x19, 0x19).w(FUNC(astrocde_state::expand_register_w));
 	map(0x40, 0x40).mirror(0x18).w(FUNC(seawolf2_state::sound_1_w));
 	map(0x41, 0x41).mirror(0x18).w(FUNC(seawolf2_state::sound_2_w));
-	map(0x42, 0x42).mirror(0x18).w("lamplatch2", FUNC(output_latch_device::bus_w));
-	map(0x43, 0x43).mirror(0x18).w("lamplatch1", FUNC(output_latch_device::bus_w));
+	map(0x42, 0x42).mirror(0x18).w("lamplatch2", FUNC(output_latch_device::write));
+	map(0x43, 0x43).mirror(0x18).w("lamplatch1", FUNC(output_latch_device::write));
 }
 
 
@@ -561,7 +563,7 @@ void astrocde_state::port_map_mono_pattern(address_map &map)
 void astrocde_state::port_map_stereo_pattern(address_map &map)
 {
 	port_map_mono_pattern(map);
-	map(0x0050, 0x0058).select(0xff00).w("astrocade2", FUNC(astrocade_io_device::write));
+	map(0x0050, 0x0058).select(0xff00).w(m_astrocade_sound2, FUNC(astrocade_io_device::write));
 }
 
 
@@ -770,7 +772,9 @@ static INPUT_PORTS_START( spacezap )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL PORT_NAME("P2 Aim Left")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_COCKTAIL PORT_NAME("P2 Aim Right")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "JU:1" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Lives ) ) PORT_DIPLOCATION("JU:1")
+	PORT_DIPSETTING(    0x20, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P3HANDLE")
@@ -1234,9 +1238,9 @@ void astrocde_state::astrocade_stereo_sound(machine_config &config)
 	ASTROCADE_IO(config, m_astrocade_sound1, ASTROCADE_CLOCK/4);
 	m_astrocade_sound1->si_cb().set(FUNC(astrocde_state::input_mux_r));
 	m_astrocade_sound1->so_cb<0>().set("watchdog", FUNC(watchdog_timer_device::reset_w));
-	m_astrocade_sound1->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_astrocade_sound1->add_route(ALL_OUTPUTS, "lspeaker", 1.00);
 
-	ASTROCADE_IO(config, "astrocade2", ASTROCADE_CLOCK/4).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	ASTROCADE_IO(config, m_astrocade_sound2, ASTROCADE_CLOCK/4).add_route(ALL_OUTPUTS, "rspeaker", 1.00);
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // MC14024B on CPU board at U18, CLK = VERTDR, Q7 used for RESET
 }
@@ -1318,7 +1322,7 @@ void astrocde_state::spacezap(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &astrocde_state::port_map_mono_pattern);
 
 	m_astrocade_sound1->so_cb<0>().set("watchdog", FUNC(watchdog_timer_device::reset_w));
-	m_astrocade_sound1->so_cb<3>().set("outlatch", FUNC(output_latch_device::bus_w));
+	m_astrocade_sound1->so_cb<3>().set("outlatch", FUNC(output_latch_device::write));
 
 	output_latch_device &outlatch(OUTPUT_LATCH(config, "outlatch", 0)); // MC14174B on game board at U16
 	outlatch.bit_handler<0>().set(FUNC(astrocde_state::coin_counter_w<0>));
@@ -1355,8 +1359,19 @@ void astrocde_state::wow(machine_config &config)
 	m_astrocade_sound1->so_cb<5>().set("outlatch", FUNC(cd4099_device::write_nibble_d0));
 	m_astrocade_sound1->so_cb<7>().set(FUNC(astrocde_state::votrax_speech_w));
 
-	VOTRAX_SC01(config, m_votrax, 720000);
-	m_votrax->add_route(ALL_OUTPUTS, "center", 0.85);
+	m_astrocade_sound1->reset_routes();
+	m_astrocade_sound1->add_route(ALL_OUTPUTS, "lspeaker", 0.35);
+
+	m_astrocade_sound2->reset_routes();
+	m_astrocade_sound2->add_route(ALL_OUTPUTS, "lspeaker", 0.35);
+
+	VOTRAX_SC01(config, m_votrax, 756000);
+
+	m_votrax->add_route(0, "f1", 0.65);
+	FILTER_RC(config, "f1").set_lowpass(110e3, 560e-12).add_route(0, "f2", 1.00);
+	FILTER_RC(config, "f2").set_lowpass(110e3, 560e-12).add_route(0, "f3", 1.00);
+	FILTER_RC(config, "f3").set_lowpass(110e3, 560e-12).add_route(0, "f4", 1.00);
+	FILTER_RC(config, "f4").set_lowpass(110e3, 560e-12).add_route(0, "center", 1.00);
 }
 
 void astrocde_state::gorf(machine_config &config)
@@ -1402,12 +1417,12 @@ void astrocde_state::gorf(machine_config &config)
 	m_astrocade_sound1->so_cb<5>().set("outlatch", FUNC(cd4099_device::write_nibble_d0));
 	m_astrocade_sound1->so_cb<6>().set("lamplatch", FUNC(cd4099_device::write_nibble_d0));
 	m_astrocade_sound1->so_cb<7>().set(FUNC(astrocde_state::votrax_speech_w));
-	m_astrocade_sound1->add_route(ALL_OUTPUTS, "upper", 1.0);
+	m_astrocade_sound1->add_route(ALL_OUTPUTS, "upper", 0.45);
 
-	ASTROCADE_IO(config, "astrocade2", ASTROCADE_CLOCK/4).add_route(ALL_OUTPUTS, "lower", 1.0);
+	ASTROCADE_IO(config, m_astrocade_sound2, ASTROCADE_CLOCK/4).add_route(ALL_OUTPUTS, "lower", 0.45);
 
-	VOTRAX_SC01(config, m_votrax, 720000);
-	m_votrax->add_route(ALL_OUTPUTS, "upper", 0.85);
+	VOTRAX_SC01(config, m_votrax, 756000);
+	m_votrax->add_route(ALL_OUTPUTS, "upper", 0.55);
 }
 
 void astrocde_state::robby(machine_config &config)
@@ -1457,8 +1472,8 @@ void astrocde_state::profpac(machine_config &config)
 	lamplatch.bit_handler<5>().set_output("lamp4");   // right lamp B
 	lamplatch.bit_handler<6>().set_output("lamp5");   // right lamp C
 
-	m_astrocade_sound1->so_cb<4>().set("outlatch", FUNC(output_latch_device::bus_w));
-	m_astrocade_sound1->so_cb<5>().set("lamplatch", FUNC(output_latch_device::bus_w));
+	m_astrocade_sound1->so_cb<4>().set("outlatch", FUNC(output_latch_device::write));
+	m_astrocade_sound1->so_cb<5>().set("lamplatch", FUNC(output_latch_device::write));
 }
 
 void demndrgn_state::demndrgn(machine_config &config)
@@ -1477,7 +1492,7 @@ void demndrgn_state::demndrgn(machine_config &config)
 	outlatch.bit_handler<3>().set_output("led1");
 	outlatch.bit_handler<4>().set(FUNC(demndrgn_state::input_select_w));
 
-	m_astrocade_sound1->so_cb<4>().set("outlatch", FUNC(output_latch_device::bus_w));
+	m_astrocade_sound1->so_cb<4>().set("outlatch", FUNC(output_latch_device::write));
 	m_astrocade_sound1->pot_cb<0>().set_ioport("FIREX");
 	m_astrocade_sound1->pot_cb<1>().set_ioport("FIREY");
 }
@@ -1553,7 +1568,7 @@ ROM_START( wow )
 	ROM_LOAD( "wow.x5",       0x8000, 0x1000, CRC(16912c2b) SHA1(faf9c96d99bc111c5f1618f6863f22fd9269027b) )
 	ROM_LOAD( "wow.x6",       0x9000, 0x1000, CRC(35797f82) SHA1(376bba29e88c16d95438fa996913b76581df0937) )
 	ROM_LOAD( "wow.x7",       0xa000, 0x1000, CRC(ce404305) SHA1(a52c6c7b77842f25c79515460be6b7ed959b5edb) )
-/*  ROM_LOAD( "wow.x11",      0xc000, CRC(00001000) , ? )   here would go the foreign language ROM */
+	//ROM_LOAD( "wow.x11",      0xc000, 0x1000 NO_DUMP ) // here would go the foreign language ROM
 ROM_END
 
 

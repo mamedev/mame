@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Andrew Gardner, Vas Crabb
 /*********************************************************************
 
-    dvwpoints.c
+    dvwpoints.cpp
 
     Watchpoint debugger view.
 
@@ -11,87 +11,89 @@
 #include "emu.h"
 #include "dvwpoints.h"
 
+#include "points.h"
+
 #include <algorithm>
 #include <iomanip>
 
 
 
-static bool cIndexAscending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
+static bool cIndexAscending(const debug_watchpoint *a, const debug_watchpoint *b)
 {
 	return a->index() < b->index();
 }
 
-static bool cIndexDescending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
+static bool cIndexDescending(const debug_watchpoint *a, const debug_watchpoint *b)
 {
 	return cIndexAscending(b, a);
 }
 
-static bool cEnabledAscending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
+static bool cEnabledAscending(const debug_watchpoint *a, const debug_watchpoint *b)
 {
 	return !a->enabled() && b->enabled();
 }
 
-static bool cEnabledDescending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
+static bool cEnabledDescending(const debug_watchpoint *a, const debug_watchpoint *b)
 {
 	return cEnabledAscending(b, a);
 }
 
-static bool cCpuAscending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
+static bool cCpuAscending(const debug_watchpoint *a, const debug_watchpoint *b)
 {
 	return strcmp(a->debugInterface()->device().tag(), b->debugInterface()->device().tag()) < 0;
 }
 
-static bool cCpuDescending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
+static bool cCpuDescending(const debug_watchpoint *a, const debug_watchpoint *b)
 {
 	return cCpuAscending(b, a);
 }
 
-static bool cSpaceAscending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
+static bool cSpaceAscending(const debug_watchpoint *a, const debug_watchpoint *b)
 {
 	return strcmp(a->space().name(), b->space().name()) < 0;
 }
 
-static bool cSpaceDescending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
+static bool cSpaceDescending(const debug_watchpoint *a, const debug_watchpoint *b)
 {
 	return cSpaceAscending(b, a);
 }
 
-static bool cAddressAscending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
+static bool cAddressAscending(const debug_watchpoint *a, const debug_watchpoint *b)
 {
 	return a->address() < b->address();
 }
 
-static bool cAddressDescending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
+static bool cAddressDescending(const debug_watchpoint *a, const debug_watchpoint *b)
 {
 	return cAddressAscending(b, a);
 }
 
-static bool cTypeAscending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
+static bool cTypeAscending(const debug_watchpoint *a, const debug_watchpoint *b)
 {
 	return int(a->type()) < int(b->type());
 }
 
-static bool cTypeDescending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
+static bool cTypeDescending(const debug_watchpoint *a, const debug_watchpoint *b)
 {
 	return cTypeAscending(b, a);
 }
 
-static bool cConditionAscending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
+static bool cConditionAscending(const debug_watchpoint *a, const debug_watchpoint *b)
 {
 	return strcmp(a->condition(), b->condition()) < 0;
 }
 
-static bool cConditionDescending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
+static bool cConditionDescending(const debug_watchpoint *a, const debug_watchpoint *b)
 {
 	return cConditionAscending(b, a);
 }
 
-static bool cActionAscending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
+static bool cActionAscending(const debug_watchpoint *a, const debug_watchpoint *b)
 {
 	return a->action() < b->action();
 }
 
-static bool cActionDescending(const device_debug::watchpoint *a, const device_debug::watchpoint *b)
+static bool cActionDescending(const debug_watchpoint *a, const debug_watchpoint *b)
 {
 	return cActionAscending(b, a);
 }
@@ -138,7 +140,7 @@ void debug_view_watchpoints::enumerate_sources()
 	m_source_list.clear();
 
 	// iterate over devices with disassembly interfaces
-	for (device_disasm_interface &dasm : disasm_interface_iterator(machine().root_device()))
+	for (device_disasm_interface &dasm : disasm_interface_enumerator(machine().root_device()))
 	{
 		m_source_list.emplace_back(
 				std::make_unique<debug_view_source>(
@@ -238,7 +240,7 @@ void debug_view_watchpoints::view_update()
 	gather_watchpoints();
 
 	// Set the view region so the scroll bars update
-	m_total.x = tableBreaks[ARRAY_LENGTH(tableBreaks) - 1];
+	m_total.x = tableBreaks[std::size(tableBreaks) - 1];
 	m_total.y = m_buffer.size() + 1;
 	if (m_total.y < 10)
 		m_total.y = 10;
@@ -246,7 +248,7 @@ void debug_view_watchpoints::view_update()
 	// Draw
 	debug_view_char     *dest = &m_viewdata[0];
 	util::ovectorstream linebuf;
-	linebuf.reserve(ARRAY_LENGTH(tableBreaks) - 1);
+	linebuf.reserve(std::size(tableBreaks) - 1);
 
 	// Header
 	if (m_visible.y > 0)
@@ -301,7 +303,7 @@ void debug_view_watchpoints::view_update()
 		if ((wpi < m_buffer.size()) && wpi >= 0)
 		{
 			static char const *const types[] = { "unkn ", "read ", "write", "r/w  " };
-			device_debug::watchpoint *const wp = m_buffer[wpi];
+			debug_watchpoint *const wp = m_buffer[wpi];
 
 			linebuf.clear();
 			linebuf.rdbuf()->clear();

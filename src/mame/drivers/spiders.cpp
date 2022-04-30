@@ -285,8 +285,6 @@ MC6845_UPDATE_ROW( spiders_state::crtc_update_row )
 
 	for (uint8_t cx = 0; cx < x_count; cx++)
 	{
-		uint8_t data1, data2, data3;
-
 		/* the memory is hooked up to the MA, RA lines this way */
 		offs_t offs = ((ma << 3) & 0x3f00) |
 						((ra << 5) & 0x00e0) |
@@ -295,9 +293,9 @@ MC6845_UPDATE_ROW( spiders_state::crtc_update_row )
 		if (m_flipscreen)
 			offs = offs ^ 0x3fff;
 
-		data1 = m_ram[0x0000 | offs];
-		data2 = m_ram[0x4000 | offs];
-		data3 = m_ram[0x8000 | offs];
+		uint8_t data1 = m_ram[0x0000 | offs];
+		uint8_t data2 = m_ram[0x4000 | offs];
+		uint8_t data3 = m_ram[0x8000 | offs];
 
 		for (int i = 0; i < 8; i++)
 		{
@@ -309,9 +307,9 @@ MC6845_UPDATE_ROW( spiders_state::crtc_update_row )
 						((data2 & 0x80) >> 6) |
 						((data1 & 0x80) >> 7);
 
-				data1 = data1 << 1;
-				data2 = data2 << 1;
-				data3 = data3 << 1;
+				data1 <<= 1;
+				data2 <<= 1;
+				data3 <<= 1;
 			}
 			else
 			{
@@ -319,17 +317,17 @@ MC6845_UPDATE_ROW( spiders_state::crtc_update_row )
 						((data2 & 0x01) << 1) |
 						((data1 & 0x01) << 0);
 
-				data1 = data1 >> 1;
-				data2 = data2 >> 1;
-				data3 = data3 >> 1;
+				data1 >>= 1;
+				data2 >>= 1;
+				data3 >>= 1;
 			}
 
-			bitmap.pix32(y, x) = m_palette->pen_color(color);
+			bitmap.pix(y, x) = m_palette->pen_color(color);
 
-			x = x + 1;
+			x++;
 		}
 
-		ma = ma + 1;
+		ma++;
 	}
 }
 
@@ -342,7 +340,7 @@ MC6845_UPDATE_ROW( spiders_state::crtc_update_row )
  *
  *************************************/
 
-WRITE8_MEMBER(spiders_state::gfx_rom_intf_w)
+void spiders_state::gfx_rom_intf_w(uint8_t data)
 {
 	m_gfx_rom_ctrl_mode  = ( data >> 7) & 0x01;
 	m_gfx_rom_ctrl_latch = ( data >> 4) & 0x03;
@@ -350,7 +348,7 @@ WRITE8_MEMBER(spiders_state::gfx_rom_intf_w)
 }
 
 
-READ8_MEMBER(spiders_state::gfx_rom_r)
+uint8_t spiders_state::gfx_rom_r()
 {
 	uint8_t ret;
 
@@ -517,7 +515,7 @@ void spiders_state::spiders(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256);   /* temporary, CRTC will configure screen */
+	screen.set_raw(PIXEL_CLOCK, 360, 0, 256, 276, 0, 224);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	PALETTE(config, m_palette, palette_device::RGB_3BIT);

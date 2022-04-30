@@ -78,7 +78,7 @@ WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::tpi_irq_w )
 	m_slot->nmi_w(state);
 }
 
-READ8_MEMBER( c64_magic_voice_cartridge_device::tpi_pa_r )
+uint8_t c64_magic_voice_cartridge_device::tpi_pa_r()
 {
 	/*
 
@@ -104,7 +104,7 @@ READ8_MEMBER( c64_magic_voice_cartridge_device::tpi_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( c64_magic_voice_cartridge_device::tpi_pa_w )
+void c64_magic_voice_cartridge_device::tpi_pa_w(uint8_t data)
 {
 	/*
 
@@ -125,7 +125,7 @@ WRITE8_MEMBER( c64_magic_voice_cartridge_device::tpi_pa_w )
 	m_fifo->si_w(BIT(data, 4));
 }
 
-READ8_MEMBER( c64_magic_voice_cartridge_device::tpi_pb_r )
+uint8_t c64_magic_voice_cartridge_device::tpi_pb_r()
 {
 	/*
 
@@ -149,7 +149,7 @@ READ8_MEMBER( c64_magic_voice_cartridge_device::tpi_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( c64_magic_voice_cartridge_device::tpi_pb_w )
+void c64_magic_voice_cartridge_device::tpi_pb_w(uint8_t data)
 {
 	/*
 

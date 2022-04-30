@@ -169,7 +169,7 @@ TILE_GET_INFO_MEMBER(_1943_state::get_bg2_tile_info)
 	const u32 color = (attr & 0x3c) >> 2;
 	const int flags = TILE_FLIPYX((attr & 0xc0) >> 6);
 
-	SET_TILE_INFO_MEMBER(2, code, color, flags);
+	tileinfo.set(2, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(_1943_state::get_bg_tile_info)
@@ -181,7 +181,7 @@ TILE_GET_INFO_MEMBER(_1943_state::get_bg_tile_info)
 	const int flags = TILE_FLIPYX((attr & 0xc0) >> 6);
 
 	tileinfo.group = color;
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.set(1, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(_1943_state::get_fg_tile_info)
@@ -190,7 +190,7 @@ TILE_GET_INFO_MEMBER(_1943_state::get_fg_tile_info)
 	const u32 code = m_videoram[tile_index] + ((attr & 0xe0) << 3);
 	const u32 color = attr & 0x1f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void _1943_state::video_start()
@@ -201,6 +201,13 @@ void _1943_state::video_start()
 
 	m_bg_tilemap->configure_groups(*m_gfxdecode->gfx(1), 0x0f);
 	m_fg_tilemap->set_transparent_pen(0);
+
+	m_bg_tilemap->set_scrolldx(128, 128);
+	m_bg_tilemap->set_scrolldy(  6,   6);
+	m_bg2_tilemap->set_scrolldx(128, 128);
+	m_bg2_tilemap->set_scrolldy(  6,   6);
+	m_fg_tilemap->set_scrolldx(128, 128);
+	m_fg_tilemap->set_scrolldy(  6,   6);
 
 	save_item(NAME(m_char_on));
 	save_item(NAME(m_obj_on));
@@ -257,15 +264,15 @@ void _1943_state::_1943_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx
 	{ // skip if inner loop doesn't draw anything
 		for (int y = sy; y < ey; y++)
 		{
-			const u8 *source = source_base + y_index * gfx->rowbytes();
-			u16 *dest = &dest_bmp.pix16(y);
-			u8 *pri = &priority_bitmap.pix8(y);
+			u8 const *const source = source_base + y_index * gfx->rowbytes();
+			u16 *const dest = &dest_bmp.pix(y);
+			u8 *const pri = &priority_bitmap.pix(y);
 			int x_index = x_index_base;
 			for (int x = sx; x < ex; x++)
 			{
 				if (!(pri[x] & 0x80))
 				{
-					u8 c = source[x_index];
+					u8 const c = source[x_index];
 					if (c != transparent_color)
 					{
 						// the priority is actually selected by bit 3 of BMPROM.07
@@ -284,7 +291,7 @@ void _1943_state::_1943_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx
 
 void _1943_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int offs = 0; offs <= m_spriteram.bytes(); offs += 32)
+	for (int offs = 0; offs < m_spriteram.bytes(); offs += 32)
 	{
 		const u8 attr = m_spriteram[offs + 1];
 		const u32 code = m_spriteram[offs] + ((attr & 0xe0) << 3);
@@ -298,7 +305,7 @@ void _1943_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			sy = 240 - sy;
 		}
 
-		_1943_drawgfx(bitmap,cliprect, m_gfxdecode->gfx(3), code, color, flip_screen(), flip_screen(), sx, sy, 0);
+		_1943_drawgfx(bitmap,cliprect, m_gfxdecode->gfx(3), code, color, flip_screen(), flip_screen(), sx+128, sy+6, 0);
 	}
 }
 

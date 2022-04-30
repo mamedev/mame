@@ -98,6 +98,7 @@ acorn_8k_device::acorn_8k_device(const machine_config &mconfig, const char *tag,
 
 void acorn_8k_device::device_start()
 {
+	save_item(NAME(m_ram));
 }
 
 //-------------------------------------------------
@@ -112,11 +113,11 @@ void acorn_8k_device::device_reset()
 
 	if (ram_addr == 0x0000) // BLK0
 	{
-		space.install_ram(0x1000, 0x1fff);
+		space.install_ram(0x1000, 0x1fff, m_ram);
 	}
 	else
 	{
-		space.install_ram(ram_addr, ram_addr + 0x1fff);
+		space.install_ram(ram_addr, ram_addr + 0x1fff, m_ram);
 	}
 
 	uint16_t rom_addr = (m_links->read() & 0xf0) << 9;
@@ -143,7 +144,7 @@ image_init_result acorn_8k_device::load_rom(device_image_interface &image, gener
 	// socket accepts 2K and 4K ROM only
 	if (size != 0x0800 && size != 0x1000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size: Only 2K/4K is supported");
+		image.seterror(image_error::INVALIDIMAGE, "Invalid size: Only 2K/4K is supported");
 		return image_init_result::FAIL;
 	}
 

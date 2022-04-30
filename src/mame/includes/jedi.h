@@ -46,7 +46,7 @@ public:
 		m_sacklatch(*this, "sacklatch"),
 		m_tms(*this, "tms"),
 		m_novram(*this, "novram12%c", 'b'),
-#ifdef DEBUG_GFXDECODE
+#if DEBUG_GFXDECODE
 		m_gfxdecode(*this, "gfxdecode"),
 #endif
 		m_palette(*this, "palette"),
@@ -67,8 +67,8 @@ private:
 	void rom_banksel_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
-	DECLARE_READ8_MEMBER(novram_data_r);
-	DECLARE_WRITE8_MEMBER(novram_data_w);
+	u8 novram_data_r(address_space &space, offs_t offset);
+	void novram_data_w(offs_t offset, u8 data);
 	void novram_recall_w(offs_t offset, u8 data);
 	void novram_store_w(u8 data);
 	void vscroll_w(offs_t offset, u8 data);
@@ -93,7 +93,7 @@ private:
 	void main_map(address_map &map);
 
 	/* machine state */
-	emu_timer *m_interrupt_timer;
+	emu_timer *m_interrupt_timer = nullptr;
 
 	/* video state */
 	required_shared_ptr<u8> m_backgroundram;
@@ -104,10 +104,10 @@ private:
 	required_region_ptr<u8> m_bg_gfx;
 	required_region_ptr<u8> m_spr_gfx;
 	required_region_ptr<u8> m_proms;
-	u32 m_vscroll;
-	u32 m_hscroll;
-	bool m_foreground_bank;
-	bool m_video_off;
+	u32 m_vscroll = 0;
+	u32 m_hscroll = 0;
+	bool m_foreground_bank = false;
+	bool m_video_off = false;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -115,8 +115,9 @@ private:
 	required_device<generic_latch_8_device> m_sacklatch;
 	required_device<tms5220_device> m_tms;
 	required_device_array<x2212_device, 2> m_novram;
-#ifdef DEBUG_GFXDECODE
+#if DEBUG_GFXDECODE
 	required_device<gfxdecode_device> m_gfxdecode;
+	std::unique_ptr<u8[]> m_gfxdata;
 #endif
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;

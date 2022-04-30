@@ -17,10 +17,9 @@ Bruce Tomlin (hardware info)
 #include "machine/6522via.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
-#include "sound/volt_reg.h"
 #include "video/vector.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -112,9 +111,6 @@ void vectrex_base_state::vectrex_base(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	MC1408(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // mc1408.ic301 (also used for vector generation)
-	voltage_regulator_device &vreg(VOLTAGE_REGULATOR(config, "vref", 0));
-	vreg.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vreg.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	AY8912(config, m_ay8912, 6_MHz_XTAL / 4);
 	m_ay8912->port_a_read_callback().set_ioport("BUTTONS");
@@ -122,7 +118,7 @@ void vectrex_base_state::vectrex_base(machine_config &config)
 	m_ay8912->add_route(ALL_OUTPUTS, "speaker", 0.2);
 
 	/* via */
-	VIA6522(config, m_via6522_0, 6_MHz_XTAL / 4);
+	MOS6522(config, m_via6522_0, 6_MHz_XTAL / 4);
 	m_via6522_0->readpa_handler().set(FUNC(vectrex_base_state::vectrex_via_pa_r));
 	m_via6522_0->readpb_handler().set(FUNC(vectrex_base_state::vectrex_via_pb_r));
 	m_via6522_0->writepa_handler().set(FUNC(vectrex_base_state::v_via_pa_w));
@@ -154,7 +150,7 @@ ROM_START(vectrex)
 
 //  The following fastboots are listed here for reference and documentation
 //  ROM_SYSTEM_BIOS(2, "bios2", "us-fastboot hack")
-//  ROMX_LOAD("us-fastboot.bin", 0x0000, 0x2000, CRa6e4dac4) SHA1(e0900be6d6858b985fd7f0999d864b2fceaf01a1), ROM_BIOS(2) )
+//  ROMX_LOAD("us-fastboot.bin", 0x0000, 0x2000, CRC(a6e4dac4) SHA1(e0900be6d6858b985fd7f0999d864b2fceaf01a1), ROM_BIOS(2) )
 //  ROM_SYSTEM_BIOS(3, "bios3", "intl-fastboot hack")
 //  ROMX_LOAD("intl-fastboot.bin", 0x0000, 0x2000, CRC(71dcf0f4) SHA1(2a257c5111f5cee841bd14acaa9df6496aaf3d8b), ROM_BIOS(3) )
 

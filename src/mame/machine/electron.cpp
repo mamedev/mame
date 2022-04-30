@@ -1,11 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol, Nigel Barnes
 /******************************************************************************
+
     Acorn Electron driver
-
-    MESS Driver By:
-
-    Wilbert Pol
 
 ******************************************************************************/
 
@@ -28,18 +25,18 @@ void electron_state::waitforramsync()
 }
 
 
-void electron_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void electron_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_TAPE_HANDLER:
-		electron_tape_timer_handler(ptr, param);
+		electron_tape_timer_handler(param);
 		break;
 	case TIMER_SETUP_BEEP:
-		setup_beep(ptr, param);
+		setup_beep(param);
 		break;
 	case TIMER_SCANLINE_INTERRUPT:
-		electron_scanline_interrupt(ptr, param);
+		electron_scanline_interrupt(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in electron_state::device_timer");
@@ -142,15 +139,19 @@ TIMER_CALLBACK_MEMBER(electron_state::electron_tape_timer_handler)
 	}
 }
 
-READ8_MEMBER(electron_state::electron64_fetch_r)
+uint8_t electron_state::electron64_fetch_r(offs_t offset)
 {
 	m_vdu_drivers = (offset & 0xe000) == 0xc000 ? true : false;
 
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-READ8_MEMBER(electron_state::electron_mem_r)
+uint8_t electron_state::electron_mem_r(offs_t offset)
 {
+	uint8_t data = 0xff;
+
+	data &= m_exp->expbus_r(offset);
+
 	switch (m_mrb.read_safe(0))
 	{
 	case 0x00: /* Normal */
@@ -167,11 +168,15 @@ READ8_MEMBER(electron_state::electron_mem_r)
 		if (m_mrb_mapped && (offset < 0x3000 || !m_vdu_drivers)) offset += 0x8000;
 		break;
 	}
-	return m_ram->read(offset);
+	data &= m_ram->read(offset);
+
+	return data;
 }
 
-WRITE8_MEMBER(electron_state::electron_mem_w)
+void electron_state::electron_mem_w(offs_t offset, uint8_t data)
 {
+	m_exp->expbus_w(offset, data);
+
 	switch (m_mrb.read_safe(0))
 	{
 	case 0x00: /* Normal */
@@ -191,7 +196,7 @@ WRITE8_MEMBER(electron_state::electron_mem_w)
 	m_ram->write(offset, data);
 }
 
-READ8_MEMBER(electron_state::electron_paged_r)
+uint8_t electron_state::electron_paged_r(offs_t offset)
 {
 	/*  0 Second external socket on the expansion module (SK2) */
 	/*  1 Second external socket on the expansion module (SK2) */
@@ -232,7 +237,7 @@ READ8_MEMBER(electron_state::electron_paged_r)
 	case 10:
 	case 11:
 		/* BASIC */
-		data = m_region_basic->base()[offset & 0x3fff];
+		data = m_region_mos->base()[offset & 0x3fff];
 		break;
 
 	default:
@@ -243,7 +248,7 @@ READ8_MEMBER(electron_state::electron_paged_r)
 	return data;
 }
 
-WRITE8_MEMBER(electron_state::electron_paged_w)
+void electron_state::electron_paged_w(offs_t offset, uint8_t data)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
 	m_maincpu->set_clock_scale(1.0f);
@@ -251,7 +256,7 @@ WRITE8_MEMBER(electron_state::electron_paged_w)
 	m_exp->expbus_w(0x8000 + offset, data);
 }
 
-READ8_MEMBER(electronsp_state::electron_paged_r)
+uint8_t electronsp_state::electron_paged_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -279,14 +284,14 @@ READ8_MEMBER(electronsp_state::electron_paged_r)
 			break;
 
 		default:
-			data = electron_state::electron_paged_r(space, offset, mem_mask);
+			data = electron_state::electron_paged_r(offset);
 			break;
 		}
 	}
 	return data;
 }
 
-WRITE8_MEMBER(electronsp_state::electron_paged_w)
+void electronsp_state::electron_paged_w(offs_t offset, uint8_t data)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
 	m_maincpu->set_clock_scale(1.0f);
@@ -308,21 +313,21 @@ WRITE8_MEMBER(electronsp_state::electron_paged_w)
 			break;
 
 		default:
-			electronsp_state::electron_paged_w(space, offset, data, mem_mask);
+			electronsp_state::electron_paged_w(offset, data);
 			break;
 		}
 	}
 }
 
-READ8_MEMBER(electron_state::electron_mos_r)
+uint8_t electron_state::electron_mos_r(offs_t offset)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
 	m_maincpu->set_clock_scale(1.0f);
 
-	return m_region_mos->base()[offset & 0x3fff];
+	return m_region_mos->base()[0x4000 | offset];
 }
 
-WRITE8_MEMBER(electron_state::electron_mos_w)
+void electron_state::electron_mos_w(offs_t offset, uint8_t data)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
 	m_maincpu->set_clock_scale(1.0f);
@@ -331,7 +336,7 @@ WRITE8_MEMBER(electron_state::electron_mos_w)
 	m_exp->expbus_w(0xc000 + offset, data);
 }
 
-READ8_MEMBER(electron_state::electron_fred_r)
+uint8_t electron_state::electron_fred_r(offs_t offset)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
 	m_maincpu->set_clock_scale(1.0f);
@@ -341,7 +346,7 @@ READ8_MEMBER(electron_state::electron_fred_r)
 	return m_exp->expbus_r(0xfc00 + offset);
 }
 
-WRITE8_MEMBER(electron_state::electron_fred_w)
+void electron_state::electron_fred_w(offs_t offset, uint8_t data)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
 	m_maincpu->set_clock_scale(1.0f);
@@ -353,7 +358,7 @@ WRITE8_MEMBER(electron_state::electron_fred_w)
 	m_exp->expbus_w(0xfc00 + offset, data);
 }
 
-READ8_MEMBER(electronsp_state::electron_fred_r)
+uint8_t electronsp_state::electron_fred_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -366,17 +371,17 @@ READ8_MEMBER(electronsp_state::electron_fred_r)
 	}
 	else
 	{
-		data = electron_state::electron_fred_r(space, offset, mem_mask);
+		data = electron_state::electron_fred_r(offset);
 	}
 	return data;;
 }
 
-WRITE8_MEMBER(electronsp_state::electron_fred_w)
+void electronsp_state::electron_fred_w(offs_t offset, uint8_t data)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
 	m_maincpu->set_clock_scale(1.0f);
 
-	electron_state::electron_fred_w(space, offset, data, mem_mask);
+	electron_state::electron_fred_w(offset, data);
 
 	if ((offset & 0xf0) == 0xb0)
 	{
@@ -388,7 +393,7 @@ WRITE8_MEMBER(electronsp_state::electron_fred_w)
 	}
 }
 
-READ8_MEMBER(electron_state::electron_jim_r)
+uint8_t electron_state::electron_jim_r(offs_t offset)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
 	m_maincpu->set_clock_scale(1.0f);
@@ -398,7 +403,7 @@ READ8_MEMBER(electron_state::electron_jim_r)
 	return m_exp->expbus_r(0xfd00 + offset);
 }
 
-WRITE8_MEMBER(electron_state::electron_jim_w)
+void electron_state::electron_jim_w(offs_t offset, uint8_t data)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
 	m_maincpu->set_clock_scale(1.0f);
@@ -407,7 +412,7 @@ WRITE8_MEMBER(electron_state::electron_jim_w)
 	m_exp->expbus_w(0xfd00 + offset, data);
 }
 
-READ8_MEMBER(electron_state::electron_sheila_r)
+uint8_t electron_state::electron_sheila_r(offs_t offset)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
 	m_maincpu->set_clock_scale(1.0f);
@@ -436,7 +441,7 @@ static const int electron_palette_offset[4] = { 0, 4, 5, 1 };
 static const uint16_t electron_screen_base[8] = { 0x3000, 0x3000, 0x3000, 0x4000, 0x5800, 0x5800, 0x6000, 0x6000 };
 static const int electron_mode_end[8] = { 255, 255, 255 ,249 ,255, 255, 249, 249 };
 
-WRITE8_MEMBER(electron_state::electron_sheila_w)
+void electron_state::electron_sheila_w(offs_t offset, uint8_t data)
 {
 	/* The processor will run at 2MHz during an access cycle to the ROM */
 	m_maincpu->set_clock_scale(1.0f);
@@ -533,7 +538,7 @@ WRITE8_MEMBER(electron_state::electron_sheila_w)
 		m_ula.cassette_motor_mode = ( data >> 6 ) & 0x01;
 		m_cassette->change_state(m_ula.cassette_motor_mode ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MOTOR_DISABLED );
 		m_ula.capslock_mode = ( data >> 7 ) & 0x01;
-		output().set_value("capslock_led", m_ula.capslock_mode);
+		m_capslock_led = m_ula.capslock_mode;
 		break;
 	case 0x08: case 0x0a: case 0x0c: case 0x0e:
 		/* colour palette */
@@ -586,6 +591,8 @@ TIMER_CALLBACK_MEMBER(electron_state::setup_beep)
 
 void electron_state::machine_start()
 {
+	m_capslock_led.resolve();
+
 	m_ula.interrupt_status = 0x82;
 	m_ula.interrupt_control = 0x00;
 	timer_set(attotime::zero, TIMER_SETUP_BEEP);
@@ -644,7 +651,7 @@ image_init_result electronsp_state::load_rom(device_image_interface &image, gene
 	// socket accepts 8K and 16K ROM only
 	if (size != 0x2000 && size != 0x4000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size: Only 8K/16K is supported");
+		image.seterror(image_error::INVALIDIMAGE, "Invalid size: Only 8K/16K is supported");
 		return image_init_result::FAIL;
 	}
 

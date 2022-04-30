@@ -41,9 +41,9 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	DECLARE_WRITE8_MEMBER( port_f2_w );
+	void port_f2_w(uint8_t data);
 
-	uint8_t m_port_f2;
+	uint8_t m_port_f2 = 0;
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(h89_irq_timer);
 	void h89_io(address_map &map);
@@ -167,7 +167,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(h89_state::h89_irq_timer)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // Z80
 }
 
-WRITE8_MEMBER( h89_state::port_f2_w )
+void h89_state::port_f2_w(uint8_t data)
 {
 	// Bit 0 - Single-step
 	// Bit 1 - Enable timer interrupt (2mSec Clock)
@@ -178,7 +178,6 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	// TODO - baud rate should be controlled by SW501 setting
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )

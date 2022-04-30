@@ -96,7 +96,7 @@ void lh5810_device::device_reset()
 //  data_r - data read
 //-------------------------------------------------
 
-READ8_MEMBER( lh5810_device::data_r )
+uint8_t lh5810_device::data_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -139,7 +139,7 @@ READ8_MEMBER( lh5810_device::data_r )
 //  data_w - data write
 //-------------------------------------------------
 
-WRITE8_MEMBER( lh5810_device::data_w )
+void lh5810_device::data_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

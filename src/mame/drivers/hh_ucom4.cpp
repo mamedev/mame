@@ -3,26 +3,14 @@
 // thanks-to:Kevin Horton, Sean Riddle
 /***************************************************************************
 
-  NEC uCOM4 MCU tabletops/handhelds or other simple devices,
-  most of them (emulated ones) are VFD electronic games/toys.
+NEC uCOM4 MCU tabletops/handhelds or other simple devices,
+most of them (emulated ones) are VFD electronic games/toys.
 
-  Commonly used VFD(vacuum fluorescent display) are by NEC or Futaba.
-
-  NEC FIP9AM20T (example, Epoch Astro Command)
-         grcss
-
-  FIP = fluorescent indicator panel
-  g = number of grids
-  r = revision of the VFD
-  c = custom display
-  s = unique display part number
-
-
-  known chips:
+known chips:
 
   serial  device   etc.
 ----------------------------------------------------------------
- *055     uPD546C  1979, Fidelity Checker Challenger (CR)
+  055     uPD546C  1978, Fidelity Checker Challenger (CR) -> fidel_checkc2.cpp
 
  @017     uPD552C  1979, Bambino UFO Master-Blaster Station (ET-02)
  @042     uPD552C  1980, Tomy Cosmic Combat (TN-??)
@@ -55,20 +43,44 @@
  @513     uPD557LC 1980, Castle Toy Name That Tune
 
  @060     uPD650C  1979, Mattel Computer Gin
- *085     uPD650C  1980, Roland TR-808
+  085     uPD650C  1980, Roland TR-808 -> roland_tr808.cpp
  *127     uPD650C  198?, Sony OA-S1100 Typecorder (subcpu, have dump)
-  128     uPD650C  1981, Roland TR-606 -> tr606.cpp
-  133     uPD650C  1982, Roland TB-303 -> tb303.cpp
+  128     uPD650C  1981, Roland TR-606 -> roland_tr606.cpp
+  133     uPD650C  1982, Roland TB-303 -> roland_tb303.cpp
 
   (* means undumped unless noted, @ denotes it's in this driver)
+
+
+Commonly used VFD(vacuum fluorescent display) are by NEC or Futaba.
+
+NEC FIP9AM20T (example, Epoch Astro Command)
+       grcss
+
+FIP = fluorescent indicator panel
+g = number of grids
+r = revision of the VFD
+c = custom display
+s = unique display part number
+
+============================================================================
+
+ROM source notes when dumped from another publisher, but confident it's the same:
+- astrocmd: Tandy Astro Command
+- caveman: Tandy Caveman
+- grobot9: Mego Fabulous Fred
+
+TODO:
+- get rid of hardcoded color overlay from SVGs, use MAME internal artwork
 
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/ucom4/ucom4.h"
 #include "video/pwm.h"
 #include "video/hlcd0515.h"
 #include "sound/spkrdev.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -110,12 +122,12 @@ protected:
 	optional_ioport_array<6> m_inputs; // max 6
 
 	// misc common
-	u8 m_port[9];                   // MCU port A-I write data (optional)
-	u8 m_int;                       // MCU INT pin state
-	u16 m_inp_mux;                  // multiplexed inputs mask
+	u8 m_port[9] = { };             // MCU port A-I write data (optional)
+	u8 m_int = 0;                   // MCU INT pin state
+	u16 m_inp_mux = 0;              // multiplexed inputs mask
 
-	u32 m_grid;                     // VFD current row data
-	u32 m_plate;                    // VFD current column data
+	u32 m_grid = 0;                 // VFD current row data
+	u32 m_plate = 0;                // VFD current column data
 
 	u8 read_inputs(int columns);
 	void refresh_interrupts(void);
@@ -140,13 +152,6 @@ protected:
 
 void hh_ucom4_state::machine_start()
 {
-	// zerofill
-	memset(m_port, 0, sizeof(m_port));
-	m_int = 0;
-	m_inp_mux = 0;
-	m_grid = 0;
-	m_plate = 0;
-
 	// register for savestates
 	save_item(NAME(m_port));
 	save_item(NAME(m_int));
@@ -227,12 +232,12 @@ namespace {
   This is Bambino's first game, it is not known if ET-01 exists. Emix Corp.
   wasn't initially a toy company, the first release was through Tomy. Emix
   created the Bambino brand afterwards. It is claimed to be the first
-  computerized VFD game (true, unless TI Speak & Spell(1978), or even Invicta
-  Electronic Mastermind(1977) are considered games)
+  computerized VFD game (true, unless TI Speak & Spell or M.E.M. Memoquiz
+  from 1978 are considered VFD games)
 
   known releases:
   - Japan: "Missile Guerilla Warfare Maneuvers", published by Tomy
-  - World: UFO Master-Blaster Station
+  - World: UFO Master-Blaster Station, published by Bambino
 
 ***************************************************************************/
 
@@ -243,11 +248,13 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void update_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE8_MEMBER(speaker_w);
 	void ufombs(machine_config &config);
+
+private:
+	void update_display();
+	void grid_w(offs_t offset, u8 data);
+	void plate_w(offs_t offset, u8 data);
+	void speaker_w(u8 data);
 };
 
 // handlers
@@ -259,7 +266,7 @@ void ufombs_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-WRITE8_MEMBER(ufombs_state::grid_w)
+void ufombs_state::grid_w(offs_t offset, u8 data)
 {
 	// F,G,H0: vfd grid
 	int shift = (offset - PORTF) * 4;
@@ -267,7 +274,7 @@ WRITE8_MEMBER(ufombs_state::grid_w)
 	update_display();
 }
 
-WRITE8_MEMBER(ufombs_state::plate_w)
+void ufombs_state::plate_w(offs_t offset, u8 data)
 {
 	// C,D012,I: vfd plate
 	int shift = (offset == PORTI) ? 8 : (offset - PORTC) * 4;
@@ -275,7 +282,7 @@ WRITE8_MEMBER(ufombs_state::plate_w)
 	update_display();
 }
 
-WRITE8_MEMBER(ufombs_state::speaker_w)
+void ufombs_state::speaker_w(u8 data)
 {
 	// E01: speaker out
 	m_speaker->level_w(data & 3);
@@ -300,7 +307,7 @@ INPUT_PORTS_END
 
 void ufombs_state::ufombs(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	NEC_D552(config, m_maincpu, 400000); // approximation
 	m_maincpu->read_a().set_ioport("IN.0");
 	m_maincpu->read_b().set_ioport("IN.1");
@@ -312,7 +319,7 @@ void ufombs_state::ufombs(machine_config &config)
 	m_maincpu->write_h().set(FUNC(ufombs_state::grid_w));
 	m_maincpu->write_i().set(FUNC(ufombs_state::plate_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(243, 1080);
@@ -320,10 +327,10 @@ void ufombs_state::ufombs(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(9, 10);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	static const s16 speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
+	static const double speaker_levels[] = { 0.0, 1.0, -1.0, 0.0 };
 	m_speaker->set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -365,11 +372,13 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void update_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_READ8_MEMBER(input_b_r);
 	void ssfball(machine_config &config);
+
+private:
+	void update_display();
+	void grid_w(offs_t offset, u8 data);
+	void plate_w(offs_t offset, u8 data);
+	u8 input_b_r();
 };
 
 // handlers
@@ -380,7 +389,7 @@ void ssfball_state::update_display()
 	m_display->matrix(m_grid, plate);
 }
 
-WRITE8_MEMBER(ssfball_state::grid_w)
+void ssfball_state::grid_w(offs_t offset, u8 data)
 {
 	// C,D(,E3): vfd grid 0-7(,8)
 	int shift = (offset - PORTC) * 4;
@@ -388,7 +397,7 @@ WRITE8_MEMBER(ssfball_state::grid_w)
 	update_display();
 }
 
-WRITE8_MEMBER(ssfball_state::plate_w)
+void ssfball_state::plate_w(offs_t offset, u8 data)
 {
 	m_port[offset] = data;
 
@@ -402,12 +411,12 @@ WRITE8_MEMBER(ssfball_state::plate_w)
 
 	// E3: vfd grid 8
 	if (offset == PORTE)
-		grid_w(space, offset, data >> 3 & 1);
+		grid_w(offset, data >> 3 & 1);
 	else
 		update_display();
 }
 
-READ8_MEMBER(ssfball_state::input_b_r)
+u8 ssfball_state::input_b_r()
 {
 	// B: input port 2, where B3 is multiplexed
 	return m_inputs[2]->read() | read_inputs(2);
@@ -415,7 +424,7 @@ READ8_MEMBER(ssfball_state::input_b_r)
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
     [A]    [B]    [C]    [PASS]  [KICK/
        ^FORMATION^                DISPLAY]
@@ -444,19 +453,15 @@ static INPUT_PORTS_START( ssfball )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) // multiplexed, handled in input_b_r
 
 	PORT_START("IN.3") // port A
-	PORT_BIT( 0x01, 0x01, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // left/right
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Forward")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pass")
-
-	PORT_START("FAKE") // fake port for left/right combination
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("P1 Left/Right")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("P1 Left/Right")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Pass")
 INPUT_PORTS_END
 
 void ssfball_state::ssfball(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	NEC_D553(config, m_maincpu, 400000); // approximation
 	m_maincpu->read_a().set_ioport("IN.3");
 	m_maincpu->read_b().set(FUNC(ssfball_state::input_b_r));
@@ -468,7 +473,7 @@ void ssfball_state::ssfball(machine_config &config)
 	m_maincpu->write_h().set(FUNC(ssfball_state::plate_w));
 	m_maincpu->write_i().set(FUNC(ssfball_state::plate_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 482);
@@ -476,10 +481,10 @@ void ssfball_state::ssfball(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(9, 16);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	static const s16 speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
+	static const double speaker_levels[] = { 0.0, 1.0, -1.0, 0.0 };
 	m_speaker->set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -526,11 +531,13 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void update_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_READ8_MEMBER(input_a_r);
 	void bmsoccer(machine_config &config);
+
+private:
+	void update_display();
+	void grid_w(offs_t offset, u8 data);
+	void plate_w(offs_t offset, u8 data);
+	u8 input_a_r();
 };
 
 // handlers
@@ -541,7 +548,7 @@ void bmsoccer_state::update_display()
 	m_display->matrix(m_grid, plate);
 }
 
-WRITE8_MEMBER(bmsoccer_state::grid_w)
+void bmsoccer_state::grid_w(offs_t offset, u8 data)
 {
 	// C01: input mux
 	if (offset == PORTC)
@@ -553,7 +560,7 @@ WRITE8_MEMBER(bmsoccer_state::grid_w)
 	update_display();
 }
 
-WRITE8_MEMBER(bmsoccer_state::plate_w)
+void bmsoccer_state::plate_w(offs_t offset, u8 data)
 {
 	// G3: speaker out
 	if (offset == PORTG)
@@ -565,12 +572,12 @@ WRITE8_MEMBER(bmsoccer_state::plate_w)
 
 	// E3: grid 8
 	if (offset == PORTE)
-		grid_w(space, offset, data >> 3 & 1);
+		grid_w(offset, data >> 3 & 1);
 	else
 		update_display();
 }
 
-READ8_MEMBER(bmsoccer_state::input_a_r)
+u8 bmsoccer_state::input_a_r()
 {
 	// port A: multiplexed inputs
 	return read_inputs(2);
@@ -603,7 +610,7 @@ INPUT_PORTS_END
 
 void bmsoccer_state::bmsoccer(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	NEC_D552(config, m_maincpu, 400000); // approximation
 	m_maincpu->read_a().set(FUNC(bmsoccer_state::input_a_r));
 	m_maincpu->read_b().set_ioport("IN.2");
@@ -615,7 +622,7 @@ void bmsoccer_state::bmsoccer(machine_config &config)
 	m_maincpu->write_h().set(FUNC(bmsoccer_state::plate_w));
 	m_maincpu->write_i().set(FUNC(bmsoccer_state::plate_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(271, 1080);
@@ -623,7 +630,7 @@ void bmsoccer_state::bmsoccer(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(9, 16);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -659,11 +666,13 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void update_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE8_MEMBER(speaker_w);
 	void bmsafari(machine_config &config);
+
+private:
+	void update_display();
+	void grid_w(offs_t offset, u8 data);
+	void plate_w(offs_t offset, u8 data);
+	void speaker_w(u8 data);
 };
 
 // handlers
@@ -675,7 +684,7 @@ void bmsafari_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-WRITE8_MEMBER(bmsafari_state::grid_w)
+void bmsafari_state::grid_w(offs_t offset, u8 data)
 {
 	// C,D(,E3): vfd grid
 	int shift = (offset - PORTC) * 4;
@@ -683,7 +692,7 @@ WRITE8_MEMBER(bmsafari_state::grid_w)
 	update_display();
 }
 
-WRITE8_MEMBER(bmsafari_state::plate_w)
+void bmsafari_state::plate_w(offs_t offset, u8 data)
 {
 	// E012,H,I: vfd plate
 	int shift = (offset == PORTE) ? 8 : (offset - PORTH) * 4;
@@ -691,12 +700,12 @@ WRITE8_MEMBER(bmsafari_state::plate_w)
 
 	// E3: grid 0
 	if (offset == PORTE)
-		grid_w(space, offset, data >> 3 & 1);
+		grid_w(offset, data >> 3 & 1);
 	else
 		update_display();
 }
 
-WRITE8_MEMBER(bmsafari_state::speaker_w)
+void bmsafari_state::speaker_w(u8 data)
 {
 	// G0: speaker out
 	m_speaker->level_w(data & 1);
@@ -721,7 +730,7 @@ INPUT_PORTS_END
 
 void bmsafari_state::bmsafari(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	NEC_D552(config, m_maincpu, 400000); // approximation
 	m_maincpu->read_a().set_ioport("IN.0");
 	m_maincpu->read_b().set_ioport("IN.1");
@@ -732,7 +741,7 @@ void bmsafari_state::bmsafari(machine_config &config)
 	m_maincpu->write_h().set(FUNC(bmsafari_state::plate_w));
 	m_maincpu->write_i().set(FUNC(bmsafari_state::plate_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(248, 1080);
@@ -740,7 +749,7 @@ void bmsafari_state::bmsafari(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(9, 10);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -779,11 +788,13 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void update_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_READ8_MEMBER(input_b_r);
 	void splasfgt(machine_config &config);
+
+private:
+	void update_display();
+	void grid_w(offs_t offset, u8 data);
+	void plate_w(offs_t offset, u8 data);
+	u8 input_b_r();
 };
 
 // handlers
@@ -794,7 +805,7 @@ void splasfgt_state::update_display()
 	m_display->matrix(m_grid, plate);
 }
 
-WRITE8_MEMBER(splasfgt_state::grid_w)
+void splasfgt_state::grid_w(offs_t offset, u8 data)
 {
 	// G,H,I0: vfd grid
 	int shift = (offset - PORTG) * 4;
@@ -805,12 +816,12 @@ WRITE8_MEMBER(splasfgt_state::grid_w)
 
 	// I2: vfd plate 6
 	if (offset == PORTI)
-		plate_w(space, 4 + PORTC, data >> 2 & 1);
+		plate_w(4 + PORTC, data >> 2 & 1);
 	else
 		update_display();
 }
 
-WRITE8_MEMBER(splasfgt_state::plate_w)
+void splasfgt_state::plate_w(offs_t offset, u8 data)
 {
 	// F01: speaker out
 	if (offset == PORTF)
@@ -822,7 +833,7 @@ WRITE8_MEMBER(splasfgt_state::plate_w)
 	update_display();
 }
 
-READ8_MEMBER(splasfgt_state::input_b_r)
+u8 splasfgt_state::input_b_r()
 {
 	// B: multiplexed buttons
 	return read_inputs(4);
@@ -830,7 +841,7 @@ READ8_MEMBER(splasfgt_state::input_b_r)
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
     * left = P1 side *                                         * right = P2 side * (note: in 1P mode, switch sides between turns)
 
@@ -879,7 +890,7 @@ INPUT_PORTS_END
 
 void splasfgt_state::splasfgt(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	NEC_D553(config, m_maincpu, 400000); // approximation
 	m_maincpu->read_a().set_ioport("IN.4");
 	m_maincpu->read_b().set(FUNC(splasfgt_state::input_b_r));
@@ -891,7 +902,7 @@ void splasfgt_state::splasfgt(machine_config &config)
 	m_maincpu->write_h().set(FUNC(splasfgt_state::grid_w));
 	m_maincpu->write_i().set(FUNC(splasfgt_state::grid_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 476);
@@ -899,10 +910,10 @@ void splasfgt_state::splasfgt(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(9, 16);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
-	static const s16 speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
+	static const double speaker_levels[] = { 0.0, 1.0, -1.0, 0.0 };
 	m_speaker->set_levels(4, speaker_levels);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -929,8 +940,8 @@ ROM_END
   * cyan/red/green VFD display NEC FIP6AM2-T no. 1-8 2, with partial color overlay and bezel
 
   known releases:
-  - Japan: FL Crazy Climbing
-  - USA: Crazy Climber
+  - Japan: FL Crazy Climbing, published by Bandai
+  - USA: Crazy Climber, published by Bandai
 
 ***************************************************************************/
 
@@ -941,10 +952,12 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void update_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
 	void bcclimbr(machine_config &config);
+
+private:
+	void update_display();
+	void grid_w(offs_t offset, u8 data);
+	void plate_w(offs_t offset, u8 data);
 };
 
 // handlers
@@ -956,7 +969,7 @@ void bcclimbr_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-WRITE8_MEMBER(bcclimbr_state::grid_w)
+void bcclimbr_state::grid_w(offs_t offset, u8 data)
 {
 	// I2: speaker out
 	if (offset == PORTI)
@@ -968,7 +981,7 @@ WRITE8_MEMBER(bcclimbr_state::grid_w)
 	update_display();
 }
 
-WRITE8_MEMBER(bcclimbr_state::plate_w)
+void bcclimbr_state::plate_w(offs_t offset, u8 data)
 {
 	// C,D,E,F: vfd plate
 	int shift = (offset - PORTC) * 4;
@@ -994,7 +1007,7 @@ INPUT_PORTS_END
 
 void bcclimbr_state::bcclimbr(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	NEC_D553(config, m_maincpu, 400_kHz_XTAL);
 	m_maincpu->read_a().set_ioport("IN.0");
 	m_maincpu->read_b().set_ioport("IN.1");
@@ -1006,7 +1019,7 @@ void bcclimbr_state::bcclimbr(machine_config &config)
 	m_maincpu->write_h().set(FUNC(bcclimbr_state::grid_w));
 	m_maincpu->write_i().set(FUNC(bcclimbr_state::grid_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(310, 1080);
@@ -1014,7 +1027,7 @@ void bcclimbr_state::bcclimbr(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(6, 20);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -1056,36 +1069,38 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(leds_w);
-	DECLARE_WRITE8_MEMBER(speaker_w);
-	DECLARE_WRITE8_MEMBER(input_w);
-	DECLARE_READ8_MEMBER(input_r);
 	void tactix(machine_config &config);
+
+private:
+	void leds_w(offs_t offset, u8 data);
+	void speaker_w(u8 data);
+	void input_w(offs_t offset, u8 data);
+	u8 input_r();
 };
 
 // handlers
 
-WRITE8_MEMBER(tactix_state::leds_w)
+void tactix_state::leds_w(offs_t offset, u8 data)
 {
 	// D,F: 4*4 led matrix
 	m_port[offset] = data;
 	m_display->matrix(m_port[PORTF], m_port[PORTD]);
 }
 
-WRITE8_MEMBER(tactix_state::speaker_w)
+void tactix_state::speaker_w(u8 data)
 {
 	// G0: speaker out
 	m_speaker->level_w(data & 1);
 }
 
-WRITE8_MEMBER(tactix_state::input_w)
+void tactix_state::input_w(offs_t offset, u8 data)
 {
 	// C,E0: input mux
 	m_port[offset] = data;
 	m_inp_mux = (m_port[PORTE] << 4 & 0x10) | m_port[PORTC];
 }
 
-READ8_MEMBER(tactix_state::input_r)
+u8 tactix_state::input_r()
 {
 	// A: multiplexed inputs
 	return read_inputs(5);
@@ -1127,7 +1142,7 @@ INPUT_PORTS_END
 
 void tactix_state::tactix(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	NEC_D557L(config, m_maincpu, 200000); // approximation
 	m_maincpu->read_a().set(FUNC(tactix_state::input_r));
 	m_maincpu->write_c().set(FUNC(tactix_state::input_w));
@@ -1136,11 +1151,11 @@ void tactix_state::tactix(machine_config &config)
 	m_maincpu->write_f().set(FUNC(tactix_state::leds_w));
 	m_maincpu->write_g().set(FUNC(tactix_state::speaker_w));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 4);
 	config.set_default_layout(layout_tactix);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -1175,15 +1190,17 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
+	void ctntune(machine_config &config);
+
 	// start button powers unit back on
 	DECLARE_INPUT_CHANGED_MEMBER(start_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE); }
 
+private:
 	void update_display();
-	DECLARE_WRITE8_MEMBER(_7seg_w);
-	DECLARE_WRITE8_MEMBER(speaker_w);
-	DECLARE_WRITE8_MEMBER(input_w);
-	DECLARE_READ8_MEMBER(input_r);
-	void ctntune(machine_config &config);
+	void _7seg_w(offs_t offset, u8 data);
+	void speaker_w(u8 data);
+	void input_w(offs_t offset, u8 data);
+	u8 input_r();
 };
 
 // handlers
@@ -1197,20 +1214,20 @@ void ctntune_state::update_display()
 	m_display->matrix(sel, lamps << 7 | digit);
 }
 
-WRITE8_MEMBER(ctntune_state::_7seg_w)
+void ctntune_state::_7seg_w(offs_t offset, u8 data)
 {
 	// E,F012: 7seg data, F3: N/C
 	m_port[offset] = data;
 	update_display();
 }
 
-WRITE8_MEMBER(ctntune_state::speaker_w)
+void ctntune_state::speaker_w(u8 data)
 {
 	// G0: speaker out
 	m_speaker->level_w(data & 1);
 }
 
-WRITE8_MEMBER(ctntune_state::input_w)
+void ctntune_state::input_w(offs_t offset, u8 data)
 {
 	// D3: trigger power-off on falling edge
 	if (offset == PORTD && ~data & m_port[PORTD] & 8)
@@ -1223,7 +1240,7 @@ WRITE8_MEMBER(ctntune_state::input_w)
 	update_display();
 }
 
-READ8_MEMBER(ctntune_state::input_r)
+u8 ctntune_state::input_r()
 {
 	// A: multiplexed inputs
 	return read_inputs(6);
@@ -1267,7 +1284,7 @@ INPUT_PORTS_END
 
 void ctntune_state::ctntune(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	NEC_D557L(config, m_maincpu, 200000); // approximation
 	m_maincpu->read_a().set(FUNC(ctntune_state::input_r));
 	m_maincpu->write_c().set(FUNC(ctntune_state::input_w));
@@ -1276,12 +1293,12 @@ void ctntune_state::ctntune(machine_config &config)
 	m_maincpu->write_f().set(FUNC(ctntune_state::_7seg_w));
 	m_maincpu->write_g().set(FUNC(ctntune_state::speaker_w));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 7+2);
 	m_display->set_segmask(1, 0x7f);
 	config.set_default_layout(layout_ctntune);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -1306,7 +1323,7 @@ ROM_END
   * cyan VFD display NEC FIP9AM18T tube no. 0D, with color overlay
 
   known releases:
-  - USA: Invader From Space
+  - USA: Invader From Space, published by Epoch
   - UK: Invader From Space, published by Grandstand
 
 ***************************************************************************/
@@ -1318,10 +1335,12 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void update_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
 	void invspace(machine_config &config);
+
+private:
+	void update_display();
+	void grid_w(offs_t offset, u8 data);
+	void plate_w(offs_t offset, u8 data);
 };
 
 // handlers
@@ -1333,7 +1352,7 @@ void invspace_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-WRITE8_MEMBER(invspace_state::grid_w)
+void invspace_state::grid_w(offs_t offset, u8 data)
 {
 	// I0: speaker out
 	if (offset == PORTI)
@@ -1345,7 +1364,7 @@ WRITE8_MEMBER(invspace_state::grid_w)
 	update_display();
 }
 
-WRITE8_MEMBER(invspace_state::plate_w)
+void invspace_state::plate_w(offs_t offset, u8 data)
 {
 	// E,F,G,H123: vfd plate
 	int shift = (offset - PORTE) * 4;
@@ -1370,7 +1389,7 @@ INPUT_PORTS_END
 
 void invspace_state::invspace(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	NEC_D552(config, m_maincpu, 400_kHz_XTAL);
 	m_maincpu->read_a().set_ioport("IN.0");
 	m_maincpu->read_b().set_ioport("IN.1");
@@ -1382,7 +1401,7 @@ void invspace_state::invspace(machine_config &config)
 	m_maincpu->write_h().set(FUNC(invspace_state::plate_w));
 	m_maincpu->write_i().set(FUNC(invspace_state::grid_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(289, 1080);
@@ -1390,7 +1409,7 @@ void invspace_state::invspace(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(9, 19);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -1418,8 +1437,8 @@ ROM_END
   * cyan VFD display NEC FIP10AM15T tube no. 0F, with bezel overlay
 
   known releases:
-  - USA: Electronic Football (aka Pro-Bowl Football)
-  - Japan: American Football
+  - USA: Electronic Football (aka Pro-Bowl Football), published by Epoch
+  - Japan: American Football, published by Epoch
 
 ***************************************************************************/
 
@@ -1430,10 +1449,12 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void update_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
 	void efball(machine_config &config);
+
+private:
+	void update_display();
+	void grid_w(offs_t offset, u8 data);
+	void plate_w(offs_t offset, u8 data);
 };
 
 // handlers
@@ -1444,7 +1465,7 @@ void efball_state::update_display()
 	m_display->matrix(m_grid, plate);
 }
 
-WRITE8_MEMBER(efball_state::grid_w)
+void efball_state::grid_w(offs_t offset, u8 data)
 {
 	// H2: speaker out
 	if (offset == PORTH)
@@ -1456,7 +1477,7 @@ WRITE8_MEMBER(efball_state::grid_w)
 	update_display();
 }
 
-WRITE8_MEMBER(efball_state::plate_w)
+void efball_state::plate_w(offs_t offset, u8 data)
 {
 	// D,E,I: vfd plate
 	int shift = (offset == PORTI) ? 8 : (offset - PORTD) * 4;
@@ -1474,29 +1495,25 @@ static INPUT_PORTS_START( efball )
 	PORT_CONFNAME( 0x02, 0x02, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x02, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("P1 Down-Field")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_NAME("P1 Score-Time")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("P1 Down-Field")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("P1 Score-Time")
 
 	PORT_START("IN.1") // port B
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
-	PORT_BIT( 0x04, 0x04, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // left/right
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Pass")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Forward")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Pass")
 
 	PORT_START("IN.2") // port C
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL PORT_16WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Kick Return")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Kick")
-
-	PORT_START("FAKE") // fake port for left/right combination
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("P1 Left/Right")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("P1 Left/Right")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Kick")
 INPUT_PORTS_END
 
 void efball_state::efball(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	NEC_D553(config, m_maincpu, 400_kHz_XTAL);
 	m_maincpu->read_a().set_ioport("IN.0");
 	m_maincpu->read_b().set_ioport("IN.1");
@@ -1508,11 +1525,11 @@ void efball_state::efball(machine_config &config)
 	m_maincpu->write_h().set(FUNC(efball_state::grid_w));
 	m_maincpu->write_i().set(FUNC(efball_state::plate_w));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 11);
 	config.set_default_layout(layout_efball);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -1538,8 +1555,8 @@ ROM_END
     revisions exist, with different graphics: rev B no. 1-8, rev. D no. 2-21.
 
   known releases:
-  - USA: Galaxy II
-  - Japan: Astro Wars
+  - USA: Galaxy II, published by Epoch
+  - Japan: Astro Wars, published by Epoch
   - UK: Astro Wars, published by Grandstand
 
 ***************************************************************************/
@@ -1551,11 +1568,13 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void update_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
 	void galaxy2b(machine_config &config);
 	void galaxy2(machine_config &config);
+
+private:
+	void update_display();
+	void grid_w(offs_t offset, u8 data);
+	void plate_w(offs_t offset, u8 data);
 };
 
 // handlers
@@ -1567,7 +1586,7 @@ void galaxy2_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-WRITE8_MEMBER(galaxy2_state::grid_w)
+void galaxy2_state::grid_w(offs_t offset, u8 data)
 {
 	// E3: speaker out
 	if (offset == PORTE)
@@ -1579,7 +1598,7 @@ WRITE8_MEMBER(galaxy2_state::grid_w)
 	update_display();
 }
 
-WRITE8_MEMBER(galaxy2_state::plate_w)
+void galaxy2_state::plate_w(offs_t offset, u8 data)
 {
 	// F,G,H,I: vfd plate
 	int shift = (offset - PORTF) * 4;
@@ -1604,7 +1623,7 @@ INPUT_PORTS_END
 
 void galaxy2_state::galaxy2(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	NEC_D553(config, m_maincpu, 400_kHz_XTAL);
 	m_maincpu->read_a().set_ioport("IN.0");
 	m_maincpu->read_b().set_ioport("IN.1");
@@ -1616,7 +1635,7 @@ void galaxy2_state::galaxy2(machine_config &config)
 	m_maincpu->write_h().set(FUNC(galaxy2_state::plate_w));
 	m_maincpu->write_i().set(FUNC(galaxy2_state::plate_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(304, 1080);
@@ -1624,7 +1643,7 @@ void galaxy2_state::galaxy2(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(10, 15);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -1634,7 +1653,7 @@ void galaxy2_state::galaxy2b(machine_config &config)
 {
 	galaxy2(config);
 
-	/* video hardware */
+	// video hardware
 	screen_device *screen = subdevice<screen_device>("screen");
 	screen->set_size(306, 1080);
 	screen->set_visarea_full();
@@ -1670,7 +1689,7 @@ ROM_END
   * cyan/red VFD display NEC FIP9AM20T no. 42-42, with color overlay + bezel
 
   known releases:
-  - Japan: Astro Command
+  - Japan: Astro Command, published by Epoch
   - USA: Astro Command, published by Tandy
   - UK: Scramble, published by Grandstand
 
@@ -1683,10 +1702,12 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void update_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
 	void astrocmd(machine_config &config);
+
+private:
+	void update_display();
+	void grid_w(offs_t offset, u8 data);
+	void plate_w(offs_t offset, u8 data);
 };
 
 // handlers
@@ -1698,7 +1719,7 @@ void astrocmd_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-WRITE8_MEMBER(astrocmd_state::grid_w)
+void astrocmd_state::grid_w(offs_t offset, u8 data)
 {
 	// C,D(,E3): vfd grid
 	int shift = (offset - PORTC) * 4;
@@ -1706,7 +1727,7 @@ WRITE8_MEMBER(astrocmd_state::grid_w)
 	update_display();
 }
 
-WRITE8_MEMBER(astrocmd_state::plate_w)
+void astrocmd_state::plate_w(offs_t offset, u8 data)
 {
 	// E01,F,G,H,I: vfd plate
 	int shift = (offset - PORTE) * 4;
@@ -1718,7 +1739,7 @@ WRITE8_MEMBER(astrocmd_state::plate_w)
 		m_speaker->level_w(data >> 2 & 1);
 
 		// E3: vfd grid 8
-		grid_w(space, offset, data >> 3 & 1);
+		grid_w(offset, data >> 3 & 1);
 	}
 	else
 		update_display();
@@ -1742,7 +1763,7 @@ INPUT_PORTS_END
 
 void astrocmd_state::astrocmd(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	NEC_D553(config, m_maincpu, 400_kHz_XTAL);
 	m_maincpu->read_a().set_ioport("IN.0");
 	m_maincpu->read_b().set_ioport("IN.1");
@@ -1754,7 +1775,7 @@ void astrocmd_state::astrocmd(machine_config &config)
 	m_maincpu->write_h().set(FUNC(astrocmd_state::plate_w));
 	m_maincpu->write_i().set(FUNC(astrocmd_state::plate_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 525);
@@ -1762,7 +1783,7 @@ void astrocmd_state::astrocmd(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(9, 17);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -1790,8 +1811,8 @@ ROM_END
   * cyan/red/green VFD display NEC FIP8BM20T no. 2-42
 
   known releases:
-  - Japan: Dracula House, yellow case
-  - USA: Dracula, red case
+  - Japan: Dracula House, yellow case, published by Epoch
+  - USA: Dracula, red case, published by Epoch
   - Other: Dracula, yellow case, published by Hales
 
 ***************************************************************************/
@@ -1803,10 +1824,12 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void update_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
 	void edracula(machine_config &config);
+
+private:
+	void update_display();
+	void grid_w(offs_t offset, u8 data);
+	void plate_w(offs_t offset, u8 data);
 };
 
 // handlers
@@ -1816,7 +1839,7 @@ void edracula_state::update_display()
 	m_display->matrix(m_grid, m_plate);
 }
 
-WRITE8_MEMBER(edracula_state::grid_w)
+void edracula_state::grid_w(offs_t offset, u8 data)
 {
 	// C,D: vfd grid
 	int shift = (offset - PORTC) * 4;
@@ -1824,7 +1847,7 @@ WRITE8_MEMBER(edracula_state::grid_w)
 	update_display();
 }
 
-WRITE8_MEMBER(edracula_state::plate_w)
+void edracula_state::plate_w(offs_t offset, u8 data)
 {
 	// I2: speaker out
 	if (offset == PORTI)
@@ -1854,7 +1877,7 @@ INPUT_PORTS_END
 
 void edracula_state::edracula(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	NEC_D553(config, m_maincpu, 400_kHz_XTAL);
 	m_maincpu->read_a().set_ioport("IN.0");
 	m_maincpu->read_b().set_ioport("IN.1");
@@ -1866,7 +1889,7 @@ void edracula_state::edracula(machine_config &config)
 	m_maincpu->write_h().set(FUNC(edracula_state::plate_w));
 	m_maincpu->write_i().set(FUNC(edracula_state::plate_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 526);
@@ -1874,7 +1897,7 @@ void edracula_state::edracula(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(8, 18);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -1910,22 +1933,24 @@ public:
 		m_lcd(*this, "lcd")
 	{ }
 
+	void mcompgin(machine_config &config);
+
+private:
 	required_device<hlcd0530_device> m_lcd;
 
-	DECLARE_WRITE32_MEMBER(lcd_output_w);
-	DECLARE_WRITE8_MEMBER(lcd_w);
-	void mcompgin(machine_config &config);
+	void lcd_output_w(offs_t offset, u32 data);
+	void lcd_w(u8 data);
 };
 
 // handlers
 
-WRITE32_MEMBER(mcompgin_state::lcd_output_w)
+void mcompgin_state::lcd_output_w(offs_t offset, u32 data)
 {
 	// uses ROW0-4, COL11-24
 	m_display->matrix(1 << offset, data);
 }
 
-WRITE8_MEMBER(mcompgin_state::lcd_w)
+void mcompgin_state::lcd_w(u8 data)
 {
 	// E0: HLCD0530 _CS
 	// E1: HLCD0530 clock
@@ -1952,13 +1977,13 @@ INPUT_PORTS_END
 
 void mcompgin_state::mcompgin(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	NEC_D650(config, m_maincpu, 400_kHz_XTAL); // TDK FCR400K
 	m_maincpu->read_a().set_ioport("IN.0");
 	m_maincpu->read_b().set_ioport("IN.1");
 	m_maincpu->write_e().set(FUNC(mcompgin_state::lcd_w));
 
-	/* video hardware */
+	// video hardware
 	HLCD0530(config, m_lcd, 500); // C=0.01uF
 	m_lcd->write_cols().set(FUNC(mcompgin_state::lcd_output_w));
 
@@ -1966,7 +1991,7 @@ void mcompgin_state::mcompgin(machine_config &config)
 
 	config.set_default_layout(layout_mcompgin);
 
-	/* no sound! */
+	// no sound!
 }
 
 // roms
@@ -1996,11 +2021,13 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void update_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE8_MEMBER(speaker_w);
 	void mvbfree(machine_config &config);
+
+private:
+	void update_display();
+	void grid_w(offs_t offset, u8 data);
+	void plate_w(offs_t offset, u8 data);
+	void speaker_w(u8 data);
 };
 
 // handlers
@@ -2012,7 +2039,7 @@ void mvbfree_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-WRITE8_MEMBER(mvbfree_state::grid_w)
+void mvbfree_state::grid_w(offs_t offset, u8 data)
 {
 	// E23,F,G,H: vfd grid
 	int shift = (offset - PORTE) * 4;
@@ -2020,12 +2047,12 @@ WRITE8_MEMBER(mvbfree_state::grid_w)
 
 	// E01: plate 0,1
 	if (offset == PORTE)
-		plate_w(space, 2 + PORTC, data & 3);
+		plate_w(2 + PORTC, data & 3);
 	else
 		update_display();
 }
 
-WRITE8_MEMBER(mvbfree_state::plate_w)
+void mvbfree_state::plate_w(offs_t offset, u8 data)
 {
 	// C,D(,E01): vfd plate
 	int shift = (offset - PORTC) * 4;
@@ -2033,7 +2060,7 @@ WRITE8_MEMBER(mvbfree_state::plate_w)
 	update_display();
 }
 
-WRITE8_MEMBER(mvbfree_state::speaker_w)
+void mvbfree_state::speaker_w(u8 data)
 {
 	// I0: speaker out
 	m_speaker->level_w(data & 1);
@@ -2058,7 +2085,7 @@ INPUT_PORTS_END
 
 void mvbfree_state::mvbfree(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	NEC_D553(config, m_maincpu, 400000); // approximation
 	m_maincpu->read_a().set_ioport("IN.0");
 	m_maincpu->read_b().set_ioport("IN.1");
@@ -2070,11 +2097,11 @@ void mvbfree_state::mvbfree(machine_config &config)
 	m_maincpu->write_h().set(FUNC(mvbfree_state::grid_w));
 	m_maincpu->write_i().set(FUNC(mvbfree_state::speaker_w));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(14, 10);
 	config.set_default_layout(layout_mvbfree);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -2099,7 +2126,7 @@ ROM_END
   * 9 lamps behind buttons
 
   known releases:
-  - Japan: Game Robot 9
+  - Japan: Game Robot 9, published by Takatoku Toys
   - USA: Fabulous Fred - The Ultimate Electronic Game, published by Mego
   - Mexico: Fabuloso Fred, published by Ensueño Toys (also released as
     12-button version, a clone of Tandy-12)
@@ -2115,16 +2142,18 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(lamps_w);
-	DECLARE_WRITE8_MEMBER(speaker_w);
-	DECLARE_WRITE8_MEMBER(input_w);
-	DECLARE_READ8_MEMBER(input_r);
 	void grobot9(machine_config &config);
+
+private:
+	void lamps_w(offs_t offset, u8 data);
+	void speaker_w(u8 data);
+	void input_w(u8 data);
+	u8 input_r();
 };
 
 // handlers
 
-WRITE8_MEMBER(grobot9_state::lamps_w)
+void grobot9_state::lamps_w(offs_t offset, u8 data)
 {
 	if (offset == PORTE)
 	{
@@ -2140,13 +2169,13 @@ WRITE8_MEMBER(grobot9_state::lamps_w)
 	m_display->matrix(1, m_port[PORTD] | m_port[PORTF] << 4 | m_port[PORTE] << 8);
 }
 
-WRITE8_MEMBER(grobot9_state::input_w)
+void grobot9_state::input_w(u8 data)
 {
 	// C012: input mux low
 	m_inp_mux = (m_inp_mux & 8) | (data & 7);
 }
 
-READ8_MEMBER(grobot9_state::input_r)
+u8 grobot9_state::input_r()
 {
 	// A: multiplexed inputs
 	return read_inputs(5);
@@ -2185,7 +2214,7 @@ INPUT_PORTS_END
 
 void grobot9_state::grobot9(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	NEC_D557L(config, m_maincpu, 160000); // approximation
 	m_maincpu->read_a().set(FUNC(grobot9_state::input_r));
 	m_maincpu->write_c().set(FUNC(grobot9_state::input_w));
@@ -2193,11 +2222,11 @@ void grobot9_state::grobot9(machine_config &config)
 	m_maincpu->write_e().set(FUNC(grobot9_state::lamps_w));
 	m_maincpu->write_f().set(FUNC(grobot9_state::lamps_w));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 9);
 	config.set_default_layout(layout_grobot9);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -2222,8 +2251,8 @@ ROM_END
   * cyan VFD display NEC FIP32AM18Y tube no. 0E, with color overlay
 
   known releases:
-  - USA: Cosmic Combat
-  - Japan: Space Attack
+  - USA: Cosmic Combat, published by Tomy
+  - Japan: Space Attack, published by Tomy
 
 ***************************************************************************/
 
@@ -2234,10 +2263,12 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void update_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
 	void tccombat(machine_config &config);
+
+private:
+	void update_display();
+	void grid_w(offs_t offset, u8 data);
+	void plate_w(offs_t offset, u8 data);
 };
 
 // handlers
@@ -2249,7 +2280,7 @@ void tccombat_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-WRITE8_MEMBER(tccombat_state::grid_w)
+void tccombat_state::grid_w(offs_t offset, u8 data)
 {
 	// I1: speaker out
 	if (offset == PORTI)
@@ -2261,7 +2292,7 @@ WRITE8_MEMBER(tccombat_state::grid_w)
 	update_display();
 }
 
-WRITE8_MEMBER(tccombat_state::plate_w)
+void tccombat_state::plate_w(offs_t offset, u8 data)
 {
 	// E,F123,G,H: vfd plate
 	int shift = (offset - PORTE) * 4;
@@ -2283,7 +2314,7 @@ INPUT_PORTS_END
 
 void tccombat_state::tccombat(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	NEC_D552(config, m_maincpu, 400000); // approximation
 	m_maincpu->read_a().set_ioport("IN.0");
 	m_maincpu->write_c().set(FUNC(tccombat_state::grid_w));
@@ -2294,7 +2325,7 @@ void tccombat_state::tccombat(machine_config &config)
 	m_maincpu->write_h().set(FUNC(tccombat_state::plate_w));
 	m_maincpu->write_i().set(FUNC(tccombat_state::grid_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(300, 1080);
@@ -2302,7 +2333,7 @@ void tccombat_state::tccombat(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(9, 20);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -2344,18 +2375,20 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void update_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE8_MEMBER(port_e_w);
-	DECLARE_READ8_MEMBER(input_r);
-
-	void set_clock();
-	DECLARE_INPUT_CHANGED_MEMBER(difficulty_switch) { set_clock(); }
 	void tmtennis(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(difficulty_switch) { set_clock(); }
 
 protected:
 	virtual void machine_reset() override;
+
+private:
+	void set_clock();
+	void update_display();
+	void grid_w(offs_t offset, u8 data);
+	void plate_w(offs_t offset, u8 data);
+	void port_e_w(u8 data);
+	u8 input_r(offs_t offset);
 };
 
 void tmtennis_state::machine_reset()
@@ -2379,7 +2412,7 @@ void tmtennis_state::update_display()
 	m_display->matrix(m_grid, m_plate);
 }
 
-WRITE8_MEMBER(tmtennis_state::grid_w)
+void tmtennis_state::grid_w(offs_t offset, u8 data)
 {
 	// G,H,I: vfd grid
 	int shift = (offset - PORTG) * 4;
@@ -2387,7 +2420,7 @@ WRITE8_MEMBER(tmtennis_state::grid_w)
 	update_display();
 }
 
-WRITE8_MEMBER(tmtennis_state::plate_w)
+void tmtennis_state::plate_w(offs_t offset, u8 data)
 {
 	// C,D,F: vfd plate
 	int shift = (offset == PORTF) ? 8 : (offset - PORTC) * 4;
@@ -2395,7 +2428,7 @@ WRITE8_MEMBER(tmtennis_state::plate_w)
 	update_display();
 }
 
-WRITE8_MEMBER(tmtennis_state::port_e_w)
+void tmtennis_state::port_e_w(u8 data)
 {
 	// E01: input mux
 	// E2: speaker out
@@ -2404,7 +2437,7 @@ WRITE8_MEMBER(tmtennis_state::port_e_w)
 	m_speaker->level_w(data >> 2 & 1);
 }
 
-READ8_MEMBER(tmtennis_state::input_r)
+u8 tmtennis_state::input_r(offs_t offset)
 {
 	// A,B: multiplexed buttons
 	return ~read_inputs(2) >> (offset*4);
@@ -2412,7 +2445,7 @@ READ8_MEMBER(tmtennis_state::input_r)
 
 // config
 
-/* Pro-Tennis physical button layout and labels is like this:
+/* Pro-Tennis physical button layout and labels are like this:
 
     * left = P2/CPU side *    * right = P1 side *
 
@@ -2451,7 +2484,7 @@ INPUT_PORTS_END
 
 void tmtennis_state::tmtennis(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	NEC_D552(config, m_maincpu, 360000); // see set_clock
 	m_maincpu->read_a().set(FUNC(tmtennis_state::input_r));
 	m_maincpu->read_b().set(FUNC(tmtennis_state::input_r));
@@ -2463,7 +2496,7 @@ void tmtennis_state::tmtennis(machine_config &config)
 	m_maincpu->write_h().set(FUNC(tmtennis_state::grid_w));
 	m_maincpu->write_i().set(FUNC(tmtennis_state::grid_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 417);
@@ -2472,7 +2505,7 @@ void tmtennis_state::tmtennis(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(12, 12);
 	config.set_default_layout(layout_tmtennis);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -2501,8 +2534,8 @@ ROM_END
   * bright yellow round casing
 
   known releases:
-  - Japan: Puck Man
-  - USA: Pac Man
+  - Japan: Puck Man, published by Tomy
+  - USA: Pac Man, published by Tomy
   - UK: Puckman (Tomy), and also published by Grandstand as Munchman
   - Australia: Pac Man-1, published by Futuretronics
 
@@ -2518,10 +2551,12 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void update_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
 	void tmpacman(machine_config &config);
+
+private:
+	void update_display();
+	void grid_w(offs_t offset, u8 data);
+	void plate_w(offs_t offset, u8 data);
 };
 
 // handlers
@@ -2533,7 +2568,7 @@ void tmpacman_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-WRITE8_MEMBER(tmpacman_state::grid_w)
+void tmpacman_state::grid_w(offs_t offset, u8 data)
 {
 	// C,D: vfd grid
 	int shift = (offset - PORTC) * 4;
@@ -2541,7 +2576,7 @@ WRITE8_MEMBER(tmpacman_state::grid_w)
 	update_display();
 }
 
-WRITE8_MEMBER(tmpacman_state::plate_w)
+void tmpacman_state::plate_w(offs_t offset, u8 data)
 {
 	// E1: speaker out
 	if (offset == PORTE)
@@ -2571,7 +2606,7 @@ INPUT_PORTS_END
 
 void tmpacman_state::tmpacman(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	NEC_D553(config, m_maincpu, 430_kHz_XTAL);
 	m_maincpu->read_a().set_ioport("IN.0");
 	m_maincpu->read_b().set_ioport("IN.1");
@@ -2583,7 +2618,7 @@ void tmpacman_state::tmpacman(machine_config &config)
 	m_maincpu->write_h().set(FUNC(tmpacman_state::plate_w));
 	m_maincpu->write_i().set(FUNC(tmpacman_state::plate_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 508);
@@ -2591,7 +2626,7 @@ void tmpacman_state::tmpacman(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(8, 19);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -2619,10 +2654,10 @@ ROM_END
   * cyan/red/green VFD display NEC FIP10CM20T no. 2-41
 
   known releases:
-  - World: Scramble
+  - World: Scramble, published by Tomy
   - USA: Scramble, published by Tandy
   - UK: Astro Blaster, published by Hales (Epoch Astro Command was named Scramble)
-  - Germany: Rambler
+  - Germany: Rambler, published by Tomy
 
 ***************************************************************************/
 
@@ -2633,10 +2668,12 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void update_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
 	void tmscramb(machine_config &config);
+
+private:
+	void update_display();
+	void grid_w(offs_t offset, u8 data);
+	void plate_w(offs_t offset, u8 data);
 };
 
 // handlers
@@ -2647,7 +2684,7 @@ void tmscramb_state::update_display()
 	m_display->matrix(m_grid, plate);
 }
 
-WRITE8_MEMBER(tmscramb_state::grid_w)
+void tmscramb_state::grid_w(offs_t offset, u8 data)
 {
 	// I2: speaker out
 	if (offset == PORTI)
@@ -2659,7 +2696,7 @@ WRITE8_MEMBER(tmscramb_state::grid_w)
 	update_display();
 }
 
-WRITE8_MEMBER(tmscramb_state::plate_w)
+void tmscramb_state::plate_w(offs_t offset, u8 data)
 {
 	// E,F,G,H: vfd plate
 	int shift = (offset - PORTE) * 4;
@@ -2684,7 +2721,7 @@ INPUT_PORTS_END
 
 void tmscramb_state::tmscramb(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	NEC_D553(config, m_maincpu, 400_kHz_XTAL);
 	m_maincpu->read_a().set_ioport("IN.0");
 	m_maincpu->read_b().set_ioport("IN.1");
@@ -2696,7 +2733,7 @@ void tmscramb_state::tmscramb(machine_config &config)
 	m_maincpu->write_h().set(FUNC(tmscramb_state::plate_w));
 	m_maincpu->write_i().set(FUNC(tmscramb_state::grid_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 556);
@@ -2704,7 +2741,7 @@ void tmscramb_state::tmscramb(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(10, 17);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -2716,8 +2753,8 @@ ROM_START( tmscramb )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-192", 0x0000, 0x0800, CRC(00fcc501) SHA1(a7771e934bf8268c83f38c7ec0acc668836e0939) )
 
-	ROM_REGION( 235601, "screen", 0)
-	ROM_LOAD( "tmscramb.svg", 0, 235601, CRC(9e76219a) SHA1(275273b98d378c9313dd73a3b86cc661a824b7af) )
+	ROM_REGION( 243830, "screen", 0)
+	ROM_LOAD( "tmscramb.svg", 0, 243830, CRC(300b098a) SHA1(9fde58ac0f4e4cfea05301346cbf5b1ced9fe973) )
 ROM_END
 
 
@@ -2732,7 +2769,7 @@ ROM_END
   * cyan/red/green VFD display NEC FIP8AM20T no. 2-42
 
   known releases:
-  - World: Caveman
+  - World: Caveman, published by Tomy
   - USA: Caveman, published by Tandy
   - UK: Cave Man - Jr. Caveman vs Dinosaur, published by Grandstand
 
@@ -2745,10 +2782,12 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void update_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
 	void tcaveman(machine_config &config);
+
+private:
+	void update_display();
+	void grid_w(offs_t offset, u8 data);
+	void plate_w(offs_t offset, u8 data);
 };
 
 // handlers
@@ -2760,7 +2799,7 @@ void tcaveman_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-WRITE8_MEMBER(tcaveman_state::grid_w)
+void tcaveman_state::grid_w(offs_t offset, u8 data)
 {
 	// C,D: vfd grid
 	int shift = (offset - PORTC) * 4;
@@ -2768,7 +2807,7 @@ WRITE8_MEMBER(tcaveman_state::grid_w)
 	update_display();
 }
 
-WRITE8_MEMBER(tcaveman_state::plate_w)
+void tcaveman_state::plate_w(offs_t offset, u8 data)
 {
 	// E3: speaker out
 	if (offset == PORTE)
@@ -2794,7 +2833,7 @@ INPUT_PORTS_END
 
 void tcaveman_state::tcaveman(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	NEC_D553(config, m_maincpu, 400_kHz_XTAL);
 	m_maincpu->read_a().set_ioport("IN.0");
 	m_maincpu->write_c().set(FUNC(tcaveman_state::grid_w));
@@ -2805,7 +2844,7 @@ void tcaveman_state::tcaveman(machine_config &config)
 	m_maincpu->write_h().set(FUNC(tcaveman_state::plate_w));
 	m_maincpu->write_i().set(FUNC(tcaveman_state::plate_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 559);
@@ -2813,7 +2852,7 @@ void tcaveman_state::tcaveman(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(8, 19);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -2855,14 +2894,16 @@ public:
 		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_READ8_MEMBER(input_r);
 	void alnchase(machine_config &config);
+
+private:
+	void output_w(offs_t offset, u8 data);
+	u8 input_r();
 };
 
 // handlers
 
-WRITE8_MEMBER(alnchase_state::output_w)
+void alnchase_state::output_w(offs_t offset, u8 data)
 {
 	if (offset <= PORTE)
 	{
@@ -2889,7 +2930,7 @@ WRITE8_MEMBER(alnchase_state::output_w)
 	m_display->matrix(m_grid, m_plate);
 }
 
-READ8_MEMBER(alnchase_state::input_r)
+u8 alnchase_state::input_r()
 {
 	// A: multiplexed buttons
 	return read_inputs(2);
@@ -2897,7 +2938,7 @@ READ8_MEMBER(alnchase_state::input_r)
 
 // config
 
-/* physical button layout and labels is like this:
+/* physical button layout and labels are like this:
 
     POWER SOUND LEVEL PLAYER
      ON    ON    PRO   TWO        START
@@ -2936,7 +2977,7 @@ INPUT_PORTS_END
 
 void alnchase_state::alnchase(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	NEC_D553(config, m_maincpu, 400_kHz_XTAL);
 	m_maincpu->read_a().set(FUNC(alnchase_state::input_r));
 	m_maincpu->read_b().set_ioport("IN.2");
@@ -2948,7 +2989,7 @@ void alnchase_state::alnchase(machine_config &config)
 	m_maincpu->write_h().set(FUNC(alnchase_state::output_w));
 	m_maincpu->write_i().set(FUNC(alnchase_state::output_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(365, 1080);
@@ -2956,7 +2997,7 @@ void alnchase_state::alnchase(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(9, 17);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -3002,7 +3043,7 @@ CONS( 1981, galaxy2b, galaxy2,  0, galaxy2b, galaxy2,  galaxy2_state,  empty_ini
 CONS( 1982, astrocmd, 0,        0, astrocmd, astrocmd, astrocmd_state, empty_init, "Epoch", "Astro Command", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, edracula, 0,        0, edracula, edracula, edracula_state, empty_init, "Epoch", "Dracula (Epoch)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1979, mcompgin, 0,        0, mcompgin, mcompgin, mcompgin_state, empty_init, "Mattel", "Computer Gin", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+CONS( 1979, mcompgin, 0,        0, mcompgin, mcompgin, mcompgin_state, empty_init, "Mattel Electronics", "Computer Gin", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 CONS( 1979, mvbfree,  0,        0, mvbfree,  mvbfree,  mvbfree_state,  empty_init, "Mego", "Mini-Vid: Break Free", MACHINE_SUPPORTS_SAVE )
 
@@ -3016,4 +3057,4 @@ CONS( 1982, tcaveman, 0,        0, tcaveman, tcaveman, tcaveman_state, empty_ini
 CONS( 1984, alnchase, 0,        0, alnchase, alnchase, alnchase_state, empty_init, "Tomy", "Alien Chase", MACHINE_SUPPORTS_SAVE )
 
 // ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
-// with other, unemulatable, things eg. game board/pieces, playing cards, pen & paper, etc.
+// with other, unemulatable, things eg. game board/pieces, book, playing cards, pen & paper, etc.

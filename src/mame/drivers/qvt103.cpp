@@ -11,7 +11,7 @@ Skeleton driver for Qume QVT-103 video display terminal.
 #include "cpu/mcs48/mcs48.h"
 #include "machine/nvram.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "video/crt9007.h"
 #include "emupal.h"
 #include "screen.h"
@@ -52,7 +52,7 @@ u32 qvt103_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 				uint16_t gfx = m_p_chargen[code << 4 | y];
 
 				for (int x = 0; x < 8; x++)
-					bitmap.pix32(col*12 + y, row*8 + (7 - x)) = BIT(gfx, x) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(col*12 + y, row*8 + (7 - x)) = BIT(gfx, x) ? rgb_t::white() : rgb_t::black();
 			}
 		}
 	}

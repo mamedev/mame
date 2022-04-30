@@ -121,7 +121,6 @@
 #include "emu.h"
 #include "includes/meadows.h"
 
-#include "sound/volt_reg.h"
 #include "speaker.h"
 
 #include "deadeye.lh"
@@ -138,21 +137,21 @@
  *
  *************************************/
 
-READ8_MEMBER(meadows_state::hsync_chain_r)
+uint8_t meadows_state::hsync_chain_r()
 {
 	uint8_t val = m_screen->hpos();
 	return bitswap<8>(val,0,1,2,3,4,5,6,7);
 }
 
 
-READ8_MEMBER(meadows_state::vsync_chain_hi_r)
+uint8_t meadows_state::vsync_chain_hi_r()
 {
 	uint8_t val = m_screen->vpos();
 	return ((val >> 1) & 0x08) | ((val >> 3) & 0x04) | ((val >> 5) & 0x02) | (val >> 7);
 }
 
 
-READ8_MEMBER(meadows_state::vsync_chain_lo_r)
+uint8_t meadows_state::vsync_chain_lo_r()
 {
 	uint8_t val = m_screen->vpos();
 	return val & 0x0f;
@@ -166,7 +165,7 @@ READ8_MEMBER(meadows_state::vsync_chain_lo_r)
  *
  *************************************/
 
-WRITE8_MEMBER(meadows_state::meadows_audio_w)
+void meadows_state::meadows_audio_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -201,7 +200,7 @@ WRITE8_MEMBER(meadows_state::meadows_audio_w)
 
 INPUT_CHANGED_MEMBER(meadows_state::coin_inserted)
 {
-	m_maincpu->set_input_line_and_vector(0, (newval ? ASSERT_LINE : CLEAR_LINE), 0x82); // S2650
+	m_maincpu->set_input_line(0, (newval ? ASSERT_LINE : CLEAR_LINE));
 }
 
 
@@ -235,7 +234,7 @@ WRITE_LINE_MEMBER(meadows_state::minferno_vblank_irq)
 	if (state)
 	{
 		m_main_sense_state++;
-		m_maincpu->set_input_line(1, (m_main_sense_state & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->set_input_line(S2650_SENSE_LINE, (m_main_sense_state & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -247,7 +246,7 @@ WRITE_LINE_MEMBER(meadows_state::minferno_vblank_irq)
  *
  *************************************/
 
-WRITE8_MEMBER(meadows_state::audio_hardware_w)
+void meadows_state::audio_hardware_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 3)
 	{
@@ -289,7 +288,7 @@ WRITE8_MEMBER(meadows_state::audio_hardware_w)
  *
  *************************************/
 
-READ8_MEMBER(meadows_state::audio_hardware_r)
+uint8_t meadows_state::audio_hardware_r(offs_t offset)
 {
 	int data = 0;
 
@@ -445,44 +444,42 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( bowl3d )
 	PORT_START("INPUTS1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4        ) PORT_PLAYER(1) PORT_NAME("P1 Hook right")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3        ) PORT_PLAYER(1) PORT_NAME("P1 Hook left")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_PLAYER(1) PORT_NAME("P1 Bowl slow")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_PLAYER(1) PORT_NAME("P1 Bowl fast")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1         )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("INPUTS2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4        ) PORT_PLAYER(2) PORT_NAME("P2 Hook right")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3        ) PORT_PLAYER(2) PORT_NAME("P2 Hook left")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_PLAYER(2) PORT_NAME("P2 Bowl slow")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_PLAYER(2) PORT_NAME("P2 Bowl fast")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2         )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x00, "CPU bowls ball after" )
+	PORT_DIPSETTING(    0x00, "120 seconds" )
+	PORT_DIPSETTING(    0x01, "3 seconds" )
+	PORT_DIPSETTING(    0x02, "4 seconds" )
+	PORT_DIPSETTING(    0x03, "5 seconds" )
 	PORT_DIPNAME( 0x04, 0x00, "Coin Option" )
 	PORT_DIPSETTING(    0x00, "2 Players / 1 Coin" )
 	PORT_DIPSETTING(    0x04, "1/2 Player(s) / 1/2 Coin(s)" )
 	PORT_DIPNAME( 0x08, 0x00, "Beer Frame" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x30, 0x00, "Extended play" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x10, "250" )
+	PORT_DIPSETTING(    0x20, "275" )
+	PORT_DIPSETTING(    0x30, "300" )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
@@ -626,6 +623,7 @@ void meadows_state::meadows(machine_config &config)
 	/* basic machine hardware */
 	S2650(config, m_maincpu, MASTER_CLOCK/8);  /* 5MHz / 8 = 625 kHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &meadows_state::meadows_main_map);
+	m_maincpu->intack_handler().set([]() { return 0x82; });
 
 	S2650(config, m_audiocpu, MASTER_CLOCK/8); /* 5MHz / 8 = 625 kHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &meadows_state::audio_map);
@@ -648,9 +646,6 @@ void meadows_state::meadows(machine_config &config)
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(2);
@@ -686,6 +681,7 @@ void meadows_state::bowl3d(machine_config &config)
 	/* basic machine hardware */
 	S2650(config, m_maincpu, MASTER_CLOCK/8);  /* 5MHz / 8 = 625 kHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &meadows_state::bowl3d_main_map);
+	m_maincpu->intack_handler().set([]() { return 0x82; });
 
 	S2650(config, m_audiocpu, MASTER_CLOCK/8); /* 5MHz / 8 = 625 kHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &meadows_state::audio_map);
@@ -708,9 +704,6 @@ void meadows_state::bowl3d(machine_config &config)
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(2);

@@ -44,7 +44,7 @@ public:
 	seattle_comp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_pic(*this, "pic%u", 1)
+		, m_pic(*this, "pic%u", 1U)
 		, m_monitor(*this, "monitor")
 	{ }
 
@@ -99,7 +99,6 @@ INPUT_PORTS_END
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_19200 )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_19200 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
@@ -152,4 +151,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS               INIT        COMPANY            FULLNAME    FLAGS
-COMP( 1986, scp300f, 0,      0,      seattle, seattle, seattle_comp_state, empty_init, "Seattle Computer", "SCP-300F", MACHINE_NO_SOUND_HW )
+COMP( 1986, scp300f, 0,      0,      seattle, seattle, seattle_comp_state, empty_init, "Seattle Computer", "SCP-300F", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

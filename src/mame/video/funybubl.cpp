@@ -15,7 +15,7 @@ rgb_t funybubl_state::funybubl_R6B6G6(uint32_t raw)
 	return rgb_t(pal6bit(raw >> 12), pal6bit(raw >>  0), pal6bit(raw >>  6));
 }
 
-WRITE8_MEMBER(funybubl_state::tilemap_w)
+void funybubl_state::tilemap_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_tilemapram[offset]);
 	m_tilemap->mark_tile_dirty(offset>>1);
@@ -24,7 +24,7 @@ WRITE8_MEMBER(funybubl_state::tilemap_w)
 TILE_GET_INFO_MEMBER(funybubl_state::get_tile_info)
 {
 	uint16_t const code = m_tilemapram[tile_index << 1] | (m_tilemapram[(tile_index << 1) | 1] << 8);
-	SET_TILE_INFO_MEMBER(0, code & 0x7fff, BIT(code, 15), 0);
+	tileinfo.set(0, code & 0x7fff, BIT(code, 15), 0);
 }
 
 void funybubl_state::video_start()

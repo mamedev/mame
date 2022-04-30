@@ -226,7 +226,7 @@ int vicdual_state::is_cabinet_color()
  *************************************/
 
 
-WRITE8_MEMBER(vicdual_state::videoram_w)
+void vicdual_state::videoram_w(offs_t offset, uint8_t data)
 {
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
@@ -234,7 +234,7 @@ WRITE8_MEMBER(vicdual_state::videoram_w)
 }
 
 
-WRITE8_MEMBER(vicdual_state::characterram_w)
+void vicdual_state::characterram_w(offs_t offset, uint8_t data)
 {
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
@@ -273,6 +273,27 @@ void carnival_state::machine_start()
 	save_item(NAME(m_musicBus));
 }
 
+void carnivalh_state::machine_start()
+{
+	carnival_state::machine_start();
+
+	m_previousaddress = 0;
+	m_previousvalue = 0;
+
+	save_item(NAME(m_previousaddress));
+	save_item(NAME(m_previousvalue));
+}
+
+
+void tranqgun_state::machine_start()
+{
+	vicdual_state::machine_start();
+
+	m_tranqgun_prot_return = 0;
+
+	save_item(NAME(m_tranqgun_prot_return));
+}
+
 
 void vicdual_state::vicdual_root(machine_config &config)
 {
@@ -294,7 +315,7 @@ void vicdual_state::vicdual_root(machine_config &config)
  *
  *************************************/
 
-READ8_MEMBER(vicdual_state::depthch_io_r)
+uint8_t vicdual_state::depthch_io_r(offs_t offset)
 {
 	uint8_t ret = 0;
 
@@ -305,10 +326,10 @@ READ8_MEMBER(vicdual_state::depthch_io_r)
 }
 
 
-WRITE8_MEMBER(vicdual_state::depthch_io_w)
+void vicdual_state::depthch_io_w(offs_t offset, uint8_t data)
 {
 	if (offset & 0x01)  assert_coin_status();
-	if (offset & 0x04)  depthch_audio_w(space, 0, data);
+	if (offset & 0x04)  depthch_audio_w(data);
 }
 
 
@@ -378,7 +399,7 @@ void vicdual_state::depthch(machine_config &config)
  *
  *************************************/
 
-READ8_MEMBER(vicdual_state::safari_io_r)
+uint8_t vicdual_state::safari_io_r(offs_t offset)
 {
 	uint8_t ret = 0;
 
@@ -389,7 +410,7 @@ READ8_MEMBER(vicdual_state::safari_io_r)
 }
 
 
-WRITE8_MEMBER(vicdual_state::safari_io_w)
+void vicdual_state::safari_io_w(offs_t offset, uint8_t data)
 {
 	if (offset & 0x01)  assert_coin_status();
 	if (offset & 0x02) { /* safari_audio_w(0, data) */ }
@@ -463,7 +484,7 @@ void vicdual_state::safari(machine_config &config)
  *
  *************************************/
 
-READ8_MEMBER(vicdual_state::frogs_io_r)
+uint8_t vicdual_state::frogs_io_r(offs_t offset)
 {
 	uint8_t ret = 0;
 
@@ -474,10 +495,10 @@ READ8_MEMBER(vicdual_state::frogs_io_r)
 }
 
 
-WRITE8_MEMBER(vicdual_state::frogs_io_w)
+void vicdual_state::frogs_io_w(offs_t offset, uint8_t data)
 {
 	if (offset & 0x01)  assert_coin_status();
-	if (offset & 0x02)  frogs_audio_w(space, 0, data);
+	if (offset & 0x02)  m_vicdual_sound->write(data);
 }
 
 
@@ -557,14 +578,12 @@ void vicdual_state::frogs(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vicdual_state::frogs_map);
 	m_maincpu->set_addrmap(AS_IO, &vicdual_state::frogs_io_map);
 
-	MCFG_MACHINE_START_OVERRIDE(vicdual_state,frogs_audio)
-
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(vicdual_state::screen_update_bw));
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
-	frogs_audio(config);
+	FROGS_AUDIO(config, m_vicdual_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -576,7 +595,7 @@ void vicdual_state::frogs(machine_config &config)
  *
  *************************************/
 
-READ8_MEMBER(vicdual_state::headon_io_r)
+uint8_t vicdual_state::headon_io_r(offs_t offset)
 {
 	uint8_t ret = 0;
 
@@ -587,7 +606,7 @@ READ8_MEMBER(vicdual_state::headon_io_r)
 }
 
 
-READ8_MEMBER(vicdual_state::sspaceat_io_r)
+uint8_t vicdual_state::sspaceat_io_r(offs_t offset)
 {
 	uint8_t ret = 0;
 
@@ -599,11 +618,11 @@ READ8_MEMBER(vicdual_state::sspaceat_io_r)
 }
 
 
-WRITE8_MEMBER(vicdual_state::headon_io_w)
+void vicdual_state::headon_io_w(offs_t offset, uint8_t data)
 {
 	if (offset & 0x01)  assert_coin_status();
-	if (offset & 0x02)  headon_audio_w(space, 0, data);
-	if (offset & 0x04) { /* palette_bank_w(0, data)  */ }    /* not written to */
+	if (offset & 0x02)  headon_audio_w(data);
+	if (offset & 0x04) { /* palette_bank_w(data)  */ }    /* not written to */
 }
 
 
@@ -697,6 +716,17 @@ static INPUT_PORTS_START( headons )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) /* no color/bw option */
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( hocrash )
+	PORT_INCLUDE( headons )
+
+	PORT_MODIFY("IN0")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x01, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x03, "4" )
+INPUT_PORTS_END
+
 // e7f1: coin counter
 static INPUT_PORTS_START( headonsa )
 	PORT_INCLUDE( headons )
@@ -757,7 +787,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( carnivalh )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // IPT_START2, but not implemented in game? - it goes game-over after player 1's turn
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
@@ -866,7 +896,7 @@ void vicdual_state::sspaceat(machine_config &config)
  *
  *************************************/
 
-READ8_MEMBER( vicdual_state::headon2_io_r )
+uint8_t vicdual_state::headon2_io_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -878,20 +908,20 @@ READ8_MEMBER( vicdual_state::headon2_io_r )
 	return data;
 }
 
-WRITE8_MEMBER(vicdual_state::headon2_io_w)
+void vicdual_state::headon2_io_w(offs_t offset, uint8_t data)
 {
 	if (offset & 0x01) assert_coin_status();
-	if (offset & 0x02) headon_audio_w(space, 0, data);
+	if (offset & 0x02) headon_audio_w(data);
 }
 
 
-WRITE8_MEMBER(vicdual_state::digger_io_w)
+void vicdual_state::digger_io_w(offs_t offset, uint8_t data)
 {
 	if (offset & 0x01)  assert_coin_status();
 	if (offset & 0x02) { /* digger_audio_1_w(0, data) */ }
 	if (offset & 0x04)
 	{
-		palette_bank_w(space, 0, data & 0x03);
+		palette_bank_w(data & 0x03);
 		/* digger_audio_2_w(0, data & 0xfc); */
 	}
 
@@ -1105,89 +1135,85 @@ void vicdual_state::digger(machine_config &config)
  *
  *************************************/
 
-WRITE8_MEMBER(vicdual_state::invho2_io_w)
+void vicdual_state::invho2_io_w(offs_t offset, uint8_t data)
 {
-	if (offset & 0x01)  invho2_audio_w(space, 0, data);
-	if (offset & 0x02)  invinco_audio_w(space, 0, data);
+	if (offset & 0x01)  invho2_audio_w(data);
+	if (offset & 0x02)  invinco_audio_w(data);
 	if (offset & 0x08)  assert_coin_status();
-	if (offset & 0x40)  palette_bank_w(space, 0, data);
+	if (offset & 0x40)  palette_bank_w(data);
 }
 
 
-WRITE8_MEMBER(vicdual_state::invds_io_w)
+void vicdual_state::invds_io_w(offs_t offset, uint8_t data)
 {
-	if (offset & 0x01)  invinco_audio_w(space, 0, data);
+	if (offset & 0x01)  invinco_audio_w(data);
 	if (offset & 0x02) { /* deepscan_audio_w(0, data) */ }
 	if (offset & 0x08)  assert_coin_status();
-	if (offset & 0x40)  palette_bank_w(space, 0, data);
+	if (offset & 0x40)  palette_bank_w(data);
 }
 
-WRITE8_MEMBER(vicdual_state::carhntds_io_w)
+void vicdual_state::carhntds_io_w(offs_t offset, uint8_t data)
 {
-	if (offset & 0x01) { /* invinco_audio_w(space, 0, data); */ }
+	if (offset & 0x01) { /* invinco_audio_w(data); */ }
 	if (offset & 0x02) { /* deepscan_audio_w(0, data) */ }
 	if (offset & 0x08)  assert_coin_status();
-	if (offset & 0x40)  palette_bank_w(space, 0, data);
+	if (offset & 0x40)  palette_bank_w(data);
 }
 
 
-WRITE8_MEMBER(vicdual_state::sspacaho_io_w)
+void vicdual_state::sspacaho_io_w(offs_t offset, uint8_t data)
 {
-	if (offset & 0x01)  invho2_audio_w(space, 0, data);
-	if (offset & 0x02) { /* sspaceatt_audio_w(space, 0, data) */ }
+	if (offset & 0x01)  invho2_audio_w(data);
+	if (offset & 0x02) { /* sspaceatt_audio_w(data) */ }
 	if (offset & 0x08)  assert_coin_status();
-	if (offset & 0x40)  palette_bank_w(space, 0, data);
+	if (offset & 0x40)  palette_bank_w(data);
 }
 
 
-WRITE8_MEMBER(vicdual_state::tranqgun_io_w)
+void tranqgun_state::tranqgun_io_w(offs_t offset, uint8_t data)
 {
-	if (offset & 0x01)  tranqgun_audio_w(space, 0, data);
-	if (offset & 0x02)  palette_bank_w(space, 0, data);
-	if (offset & 0x08)  assert_coin_status();
-}
-
-
-WRITE8_MEMBER(vicdual_state::spacetrk_io_w)
-{
-	if (offset & 0x01) { /* spacetrk_audio_w(space, 0, data) */ }
-	if (offset & 0x02) { /* spacetrk_audio_w(space, 0, data) */ }
-	if (offset & 0x08)  assert_coin_status();
-	if (offset & 0x40)  palette_bank_w(space, 0, data);
-}
-
-
-WRITE8_MEMBER(carnival_state::carnival_io_w)
-{
-	if (offset & 0x01)  carnival_audio_1_w(space, 0, data);
-	if (offset & 0x02)  carnival_audio_2_w(space, 0, data);
-	if (offset & 0x08)  assert_coin_status();
-	if (offset & 0x40)  palette_bank_w(space, 0, data);
-}
-
-
-WRITE8_MEMBER(vicdual_state::brdrline_io_w)
-{
-	if (offset & 0x01)  brdrline_audio_w(space, 0, data);
-	if (offset & 0x02)
-	{
-		palette_bank_w(space, 0, data);
-		brdrline_audio_aux_w(space,0, data);
-	}
+	if (offset & 0x01)  m_vicdual_sound->write(data);
+	if (offset & 0x02)  palette_bank_w(data);
 	if (offset & 0x08)  assert_coin_status();
 }
 
 
-WRITE8_MEMBER(vicdual_state::pulsar_io_w)
+void vicdual_state::spacetrk_io_w(offs_t offset, uint8_t data)
 {
-	if (offset & 0x01)  pulsar_audio_1_w(space, 0, data);
-	if (offset & 0x02)  pulsar_audio_2_w(space, 0, data);
+	if (offset & 0x01) { /* spacetrk_audio_w(data) */ }
+	if (offset & 0x02) { /* spacetrk_audio_w(data) */ }
 	if (offset & 0x08)  assert_coin_status();
-	if (offset & 0x40)  palette_bank_w(space, 0, data);
+	if (offset & 0x40)  palette_bank_w(data);
 }
 
 
-WRITE8_MEMBER(vicdual_state::heiankyo_io_w)
+void carnival_state::carnival_io_w(offs_t offset, uint8_t data)
+{
+	if (offset & 0x01)  carnival_audio_1_w(data);
+	if (offset & 0x02)  carnival_audio_2_w(data);
+	if (offset & 0x08)  assert_coin_status();
+	if (offset & 0x40)  palette_bank_w(data);
+}
+
+
+void vicdual_state::brdrline_io_w(offs_t offset, uint8_t data)
+{
+	if (offset & 0x01)  m_vicdual_sound->write(data);
+	if (offset & 0x02)  palette_bank_w(data);
+	if (offset & 0x08)  assert_coin_status();
+}
+
+
+void vicdual_state::pulsar_io_w(offs_t offset, uint8_t data)
+{
+	if (offset & 0x01)  pulsar_audio_1_w(data);
+	if (offset & 0x02)  pulsar_audio_2_w(data);
+	if (offset & 0x08)  assert_coin_status();
+	if (offset & 0x40)  palette_bank_w(data);
+}
+
+
+void vicdual_state::heiankyo_io_w(offs_t offset, uint8_t data)
 {
 	if (offset & 0x01) { /* heiankyo_audio_1_w(0, data) */ }
 	if (offset & 0x02) { /* heiankyo_audio_2_w(0, data) */ }
@@ -1195,25 +1221,25 @@ WRITE8_MEMBER(vicdual_state::heiankyo_io_w)
 }
 
 
-WRITE8_MEMBER(vicdual_state::alphaho_io_w)
+void vicdual_state::alphaho_io_w(offs_t offset, uint8_t data)
 {
 	if (offset & 0x01) { /* headon_audio_w(0, data) */ }
 	if (offset & 0x02) { /* alphaf_audio_w(0, data) */ }
 	if (offset & 0x08)  assert_coin_status();
-	if (offset & 0x40)  palette_bank_w(space, 0, data);
+	if (offset & 0x40)  palette_bank_w(data);
 }
 
 
-WRITE8_MEMBER(vicdual_state::headonn_io_w)
+void vicdual_state::headonn_io_w(offs_t offset, uint8_t data)
 {
-	if (offset & 0x01) invho2_audio_w(space, 0, data);
+	if (offset & 0x01) invho2_audio_w(data);
 	if (offset & 0x02)
 	{
 		// 7654----  unused?
 		// ----32--  always 1
 		// ------10  palette bank (bit 0 inverted)
 
-		palette_bank_w(space, 0, (data & 3) ^ 1);
+		palette_bank_w((data & 3) ^ 1);
 	}
 	if (offset & 0x08) assert_coin_status();
 }
@@ -1225,6 +1251,81 @@ void vicdual_state::vicdual_dualgame_map(address_map &map)
 	map(0x8000, 0x83ff).mirror(0x7000).ram().w(FUNC(vicdual_state::videoram_w)).share("videoram");
 	map(0x8400, 0x87ff).mirror(0x7000).ram();
 	map(0x8800, 0x8fff).mirror(0x7000).ram().w(FUNC(vicdual_state::characterram_w)).share("characterram");
+}
+
+// see code at 0x3f04 (game over) and 0x3eba (passing level 3) in ROM
+// both functions make the same 3 checks, assume we never want the 'fail' result
+uint8_t tranqgun_state::tranqgun_prot_r(offs_t offset)
+{
+	logerror("%s: tranqgun_prot_r %04x\n", machine().describe_context(), offset);
+
+	if (offset == 0x3800)
+		return m_tranqgun_prot_return;
+
+	return 0x00;
+}
+
+void tranqgun_state::tranqgun_prot_w(offs_t offset, uint8_t data)
+{
+	logerror("%s: tranqgun_prot_w %04x %02x\n", machine().describe_context(), offset, data);
+
+	if (offset == 0x0000)
+	{
+		if (data == 0xd8)
+			m_tranqgun_prot_return = 0x02;
+		else if (data == 0x3a)
+			m_tranqgun_prot_return = 0x01;
+		else if (data == 0x6a)
+			m_tranqgun_prot_return = 0x06;
+	}
+}
+
+
+void tranqgun_state::tranqgun_dualgame_map(address_map &map)
+{
+	vicdual_dualgame_map(map);
+	map(0x4000, 0x7fff).rw(FUNC(tranqgun_state::tranqgun_prot_r), FUNC(tranqgun_state::tranqgun_prot_w));
+}
+
+uint8_t carnivalh_state::carnivalh_prot_r(offs_t offset)
+{
+	// There appear to be 2 protection functions in the code
+	// The first one is called if a duck gets to the bottom of the screen, or if Player 1 Game Over condition is reached and Player 2 needs to start
+	// The second one is called when you complete a bonus round
+
+	uint8_t retdat = 0;
+
+	if (/*((m_previousaddress == 0xe3d4) || (m_previousaddress == 0xe76b))*/ true && (m_previousvalue == 0x24))
+		retdat = 0x02;
+	else if (/*((m_previousaddress == 0xe3d4) || (m_previousaddress == 0xe76d))*/ true && (m_previousvalue == 0x66))
+		retdat = 0x07;
+	else if (/*((m_previousaddress == 0xe3d4) || (m_previousaddress == 0xe76f))*/ true && (m_previousvalue == 0x48))
+		retdat = 0x03;
+	else
+		popmessage("%s: carnivalh_prot_r %04x %04x %02x\n", machine().describe_context(), offset, m_previousaddress, m_previousvalue);
+
+	return retdat;
+}
+
+void carnivalh_state::carnivalh_prot_w(offs_t offset, uint8_t data)
+{
+	// the protection writes appear to overlay regular RAM areas?
+	// protection writes are to 0xe76b, 0xe76d, 0xe76f for one function and 0xe3d4 for the other (see code at 0x26AF & 0x2892)
+
+	m_previousaddress = offset+0xe000;
+	m_previousvalue = data;
+
+	// fall through to usual accesses (write to the non-mirror address so we're not recursive)
+	address_space& spc = m_maincpu->space(AS_PROGRAM);
+	spc.write_byte(0x8000+offset, data);
+}
+
+
+void carnivalh_state::carnivalh_dualgame_map(address_map &map)
+{
+	vicdual_dualgame_map(map);
+	map(0x4000, 0x7fff).r(FUNC(carnivalh_state::carnivalh_prot_r));
+	map(0xe000, 0xefff).w(FUNC(carnivalh_state::carnivalh_prot_w));
 }
 
 void vicdual_state::carhntds_dualgame_map(address_map &map)
@@ -1293,7 +1394,7 @@ void vicdual_state::sspacaho_io_map(address_map &map)
 }
 
 
-void vicdual_state::tranqgun_io_map(address_map &map)
+void tranqgun_state::tranqgun_io_map(address_map &map)
 {
 	map.global_mask(0x0f);
 
@@ -1304,7 +1405,7 @@ void vicdual_state::tranqgun_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	map(0x00, 0x0f).w(FUNC(vicdual_state::tranqgun_io_w));
+	map(0x00, 0x0f).w(FUNC(tranqgun_state::tranqgun_io_w));
 }
 
 
@@ -1560,9 +1661,9 @@ static INPUT_PORTS_START( wantsega )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
 
 	PORT_MODIFY("IN3")
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x04, "20k" )
+	PORT_DIPSETTING(    0x00, "30k" )
 
 	PORT_MODIFY("IN3")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) // teleport
@@ -2080,9 +2181,9 @@ static INPUT_PORTS_START( alphaho )
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "Alpha Fighter Bonus Life" )      PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "1000" )
+	PORT_DIPSETTING(    0x04, "1500" )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(vicdual_state, timer_value_r)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -2091,11 +2192,11 @@ static INPUT_PORTS_START( alphaho )
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_DIPNAME( 0x04, 0x00, "Alpha Fighter Unknown" ) PORT_DIPLOCATION("SW1:4") // related to soccer frequency (code at 0x4950)
-	PORT_DIPSETTING(    0x00, DEF_STR ( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR ( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "Alpha Fighter Final UFO Bonus" )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(vicdual_state, coin_status_r)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Game Select") PORT_TOGGLE
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Game Select") PORT_TOGGLE
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -2103,6 +2204,33 @@ static INPUT_PORTS_START( alphaho )
 
 	PORT_START("FAKE_LIVES.0")
 	PORT_DIPNAME( 0x03, 0x03, "Alpha Fighter Lives" )   PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x00, "6" )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( alphahob )
+	PORT_INCLUDE( alphaho )
+
+	PORT_MODIFY("IN0")
+	PORT_DIPNAME( 0x08, 0x00, "Circuit Lives" )           PORT_DIPLOCATION("SW1:5") // SW1 @ C1, 6-pos (is #6 unconnected?)
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x08, "4" )
+
+	PORT_MODIFY("IN2")
+	PORT_DIPNAME( 0x04, 0x00, "Missile Bonus Life" )      PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "10k" )
+	PORT_DIPSETTING(    0x04, "15k" )
+
+	PORT_MODIFY("IN3")
+	PORT_DIPNAME( 0x04, 0x00, "Missile Final UFO Bonus" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("FAKE_LIVES.0")
+	PORT_DIPNAME( 0x03, 0x03, "Missile Lives" )           PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
@@ -2248,25 +2376,27 @@ void carnival_state::carnivalb(machine_config &config)
 	carnivalb_audio(config);
 }
 
-void carnival_state::carnivalh(machine_config &config)
+void carnivalh_state::carnivalh(machine_config &config)
 {
 	carnival(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &carnival_state::headon_io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &carnivalh_state::carnivalh_dualgame_map);
+	m_maincpu->set_addrmap(AS_IO, &carnivalh_state::headon_io_map);
 }
 
 
-void vicdual_state::tranqgun(machine_config &config)
+void tranqgun_state::tranqgun(machine_config &config)
 {
 	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &vicdual_state::tranqgun_io_map);
+	m_maincpu->set_addrmap(AS_IO, &tranqgun_state::tranqgun_io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tranqgun_state::tranqgun_dualgame_map);
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
-	tranqgun_audio(config);
+	BORDERLINE_AUDIO(config, m_vicdual_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -2279,7 +2409,7 @@ void vicdual_state::brdrline(machine_config &config)
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
-	brdrline_audio(config);
+	BORDERLINE_AUDIO(config, m_vicdual_sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -2333,7 +2463,7 @@ void vicdual_state::headonn(machine_config &config)
  *
  *************************************/
 
-WRITE8_MEMBER(vicdual_state::samurai_protection_w)
+void vicdual_state::samurai_protection_w(uint8_t data)
 {
 	m_samurai_protection_data = data;
 }
@@ -2353,11 +2483,10 @@ READ_LINE_MEMBER(vicdual_state::samurai_protection_r)
 }
 
 
-WRITE8_MEMBER(vicdual_state::samurai_io_w)
+void vicdual_state::samurai_io_w(offs_t offset, uint8_t data)
 {
-	if (offset & 0x02) { /* samurai_audio_w(0, data) */ }
+	if (offset & 0x02) { palette_bank_w(data); /* samurai_audio_w(0, data >> 4) */ }
 	if (offset & 0x08)  assert_coin_status();
-	if (offset & 0x40)  palette_bank_w(space, 0, data);
 }
 
 
@@ -2467,7 +2596,7 @@ void vicdual_state::samurai(machine_config &config)
  *
  *************************************/
 
-READ8_MEMBER(nsub_state::nsub_io_r)
+uint8_t nsub_state::nsub_io_r(offs_t offset)
 {
 	uint8_t ret = 0;
 
@@ -2478,7 +2607,7 @@ READ8_MEMBER(nsub_state::nsub_io_r)
 }
 
 
-WRITE8_MEMBER(nsub_state::nsub_io_w)
+void nsub_state::nsub_io_w(offs_t offset, uint8_t data)
 {
 	if (offset & 0x01)  assert_coin_status();
 	if (offset & 0x02)
@@ -2487,7 +2616,7 @@ WRITE8_MEMBER(nsub_state::nsub_io_w)
 	}
 	if (offset & 0x04)
 	{
-		palette_bank_w(space, 0, data);
+		palette_bank_w(data);
 		m_s97269pb->palette_bank_w(data);
 	}
 }
@@ -2664,7 +2793,7 @@ void nsub_state::nsub(machine_config &config)
  *
  *************************************/
 
-READ8_MEMBER(vicdual_state::invinco_io_r)
+uint8_t vicdual_state::invinco_io_r(offs_t offset)
 {
 	uint8_t ret = 0;
 
@@ -2676,11 +2805,11 @@ READ8_MEMBER(vicdual_state::invinco_io_r)
 }
 
 
-WRITE8_MEMBER(vicdual_state::invinco_io_w)
+void vicdual_state::invinco_io_w(offs_t offset, uint8_t data)
 {
 	if (offset & 0x01)  assert_coin_status();
-	if (offset & 0x02)  invinco_audio_w(space, 0, data);
-	if (offset & 0x04)  palette_bank_w(space, 0, data);
+	if (offset & 0x02)  invinco_audio_w(data);
+	if (offset & 0x04)  palette_bank_w(data);
 }
 
 
@@ -2933,8 +3062,8 @@ ROM_START( nsub )
 	ROM_LOAD( "pr-69.u11", 0x0000, 0x0020, CRC(c94dd091) SHA1(f88cfb033ff83adb7375652be1fa32ba489d8418) )
 
 	ROM_REGION( 0x0040, "user1", 0 )    /* timing PROMs */
-	ROM_LOAD( "pr33.u82", 0x0000, 0x0020, CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) )    /* control PROM */
-	ROM_LOAD( "pr34.u83", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )    /* sequence PROM */
+	ROM_LOAD( "pr-33.u82", 0x0000, 0x0020, CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) )    /* control PROM */
+	ROM_LOAD( "pr-34.u83", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )    /* sequence PROM */
 ROM_END
 
 ROM_START( sspaceat )
@@ -3083,7 +3212,7 @@ ROM_START( headonn )
 	ROM_LOAD( "prom.g2", 0x0000, 0x0020, CRC(67104ea9) SHA1(26b6bd2a1973b83bb9af4e3385d8cb14cb3f62f2) )
 
 	ROM_REGION( 0x0040, "user1", 0 )    /* timing PROMs */
-	ROM_LOAD( "prom.b6", 0x0000, 0x0020, CRC(67104ea9) SHA1(26b6bd2a1973b83bb9af4e3385d8cb14cb3f62f2) )    /* control PROM */
+	ROM_LOAD( "prom.b6", 0x0000, 0x0020, CRC(7e1cb76b) SHA1(3366ead65d49cab076ccdafbb13726c7e05f8b9a) )    /* control PROM */
 	ROM_LOAD( "prom.f2", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )    /* sequence PROM */
 ROM_END
 
@@ -3296,6 +3425,33 @@ ROM_START( invho2 )
 	ROM_LOAD( "316-0206.u14", 0x0000, 0x0020, CRC(9617d796) SHA1(7cff2741866095ff42eadd8022bea349ec8d2f39) )    /* control PROM */
 ROM_END
 
+ROM_START( invho2a ) // found on a Gremlin 'EXTENDED ROM VIDEO LOGIC ASSY NO 800-003' PCB, with a 'S-96674-P-BK' sticker and 'rev. D' handwritten
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "326.u33", 0x0000, 0x0400, CRC(35bc6216) SHA1(92a98694807009c41335c2b039a06205102daf44) )
+	ROM_LOAD( "327.u32", 0x0400, 0x0400, CRC(9484a3db) SHA1(73908de15197bfcdbadfd6cadaa8b01863b60e18) )
+	ROM_LOAD( "328.u31", 0x0800, 0x0400, CRC(000cf180) SHA1(685c4bec01a34223cfb68917efdd8873d8d5bac6) )
+	ROM_LOAD( "329.u30", 0x0c00, 0x0400, CRC(12ce15c4) SHA1(56aed8127e02f0ee7ee7a2b617624c8fb968fe7f) )
+	ROM_LOAD( "330.u29", 0x1000, 0x0400, CRC(2f02f721) SHA1(9124eb2eed0cbab02a3f3b5c811da0ef4b1d1a48) )
+	ROM_LOAD( "331.u28", 0x1400, 0x0400, CRC(38f4ab51) SHA1(588c9adbe2cb3c1c287b1f090383ba544b9109fa) )
+	ROM_LOAD( "332.u27", 0x1800, 0x0400, CRC(94b1cacb) SHA1(005e40957926624d8d60cdd96f27c2cfbcd07d6e) )
+	ROM_LOAD( "333.u26", 0x1c00, 0x0400, CRC(455a8f42) SHA1(4609839ff502c128e5692fa6c1ce31e6d32b79eb) )
+	ROM_LOAD( "334.u8",  0x2000, 0x0400, CRC(9c578f37) SHA1(88b97295d0375ada227ade8b9ec5f70086410927) )
+	ROM_LOAD( "335.u7",  0x2400, 0x0400, CRC(56df9e11) SHA1(6e02f0de8621244282504526c99a0e2f5aedf5ed) )
+	ROM_LOAD( "336.u6",  0x2800, 0x0400, CRC(219b2513) SHA1(c5f92c266d6cd82d36961aefbbf8b4d522824e82) )
+	ROM_LOAD( "337.u5",  0x2c00, 0x0400, CRC(d6410227) SHA1(bcdace3d0759df5e6f7dd10a9541db551b129399) )
+	ROM_LOAD( "338.u4",  0x3000, 0x0400, CRC(e4550755) SHA1(f5874cb0d0a8e950de555762cc5bb6697e04888f) )
+	ROM_LOAD( "339.u3",  0x3400, 0x0400, CRC(426dd538) SHA1(cf591b380895478d54018cfbe5fb41c24146c2ea) )
+	ROM_LOAD( "340.u2",  0x3800, 0x0400, CRC(aec47500) SHA1(4500a63967b2b2c52d41cbde9e5e6fe3d39322c2) )
+	ROM_LOAD( "341.u1",  0x3c00, 0x0400, CRC(0b7a0607) SHA1(bdb58da071d9b7d2796b3f244c6a95ce1c9f2833) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "pr-16.u49", 0x0000, 0x0020, CRC(733eac6f) SHA1(3cf488155992977875a76f8aa0ce73c1faf8a1a4) ) // TODO: multiple dump attempts give consistent results, but with this Head On 2 is completely black, while Invinco shows unexpected colors
+
+	ROM_REGION( 0x0040, "user1", 0 )    // timing PROMs
+	ROM_LOAD( "pr-34.u14", 0x0000, 0x0020, CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) ) // == 316-0043 - control PROM
+	ROM_LOAD( "pr-33.u15", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) ) // == 316-0042 - sequence PROM
+ROM_END
+
 ROM_START( sspacaho )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-0001.bin", 0x0000, 0x0800, CRC(ba62f57a) SHA1(7cfc079c6afe317b6c389c06802fdf1f83858510) )
@@ -3355,6 +3511,33 @@ ROM_START( invinco )
 	ROM_LOAD( "316-0246.u44", 0x0000, 0x0020, CRC(fe4406cb) SHA1(92e2459420a7f7412f02cfaf68604fc233b0a245) )    /* color PROM */
 ROM_END
 
+ROM_START( invcarht ) // found on a Gremlin 'DUAL GAME VIC ASSY NO 800-0058' PCB
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "411.u33", 0x0000, 0x0400, CRC(efefba5f) SHA1(9b17a56ffaf178e734f9ca7927174556d469f629) )
+	ROM_CONTINUE(0x4000, 0x400)
+	ROM_LOAD( "412.u32", 0x0400, 0x0400, CRC(8fe401e2) SHA1(5e9ed75ab7ad91ca095e5d92a697933ff7c93eca) )
+	ROM_LOAD( "413.u31", 0x0800, 0x0400, CRC(61ba1046) SHA1(0b4d83e40706df428d0bde1d739e44fd8eac6179) )
+	ROM_LOAD( "414.u30", 0x0c00, 0x0400, CRC(4a521dbb) SHA1(1c105810900b4e036d4ab665e43451da4acdeed7) )
+	ROM_LOAD( "415.u29", 0x1000, 0x0400, CRC(ce12b71c) SHA1(26c34a034ab4ba4e0ba83b4ea0535d8e112c5e16) )
+	ROM_LOAD( "416.u28", 0x1400, 0x0400, CRC(6899d59c) SHA1(5234ddd6d38ad3d8fe9d2468e05049d4b242ce0f) )
+	ROM_LOAD( "417.u27", 0x1800, 0x0400, CRC(26cef14e) SHA1(b819bebcd64464b5898b6787d312b6f1eb87b08b) )
+	ROM_LOAD( "418.u26", 0x1c00, 0x0400, CRC(02b1f507) SHA1(649171358a0653fcafc8e341367be61f1495d0a1) )
+	ROM_LOAD( "419.u8",  0x2000, 0x0400, CRC(42385c4d) SHA1(c85e9435d3f1bcd7432757a897e236f713db6e0b) )
+	ROM_LOAD( "420.u7",  0x2400, 0x0400, CRC(ee83d873) SHA1(e3c649165b5496d1d3788cbd8d44052bbc2c0ec2) )
+	ROM_LOAD( "421.u6",  0x2800, 0x0400, CRC(2faa2e76) SHA1(63929a8be150be1be88e54c18c7b79d4d24fbf5f) )
+	ROM_LOAD( "422.u5",  0x2c00, 0x0400, CRC(f8e5dc61) SHA1(c51d3195b93f921ba39e9bf566aab5d4ca5dfc97) )
+	ROM_LOAD( "423.u4",  0x3000, 0x0400, CRC(d783eb72) SHA1(8086d183f4486005e8b2db54b2d219a606c62766) )
+	ROM_LOAD( "424.u3",  0x3400, 0x0400, CRC(8fd4f3d4) SHA1(1c6efa2ff1863ca08c170232cdcc77db3836442a) )
+	ROM_LOAD( "425.u2",  0x3800, 0x0400, CRC(b0552cd4) SHA1(7f2b930ad97731124f3b7128bba7dfed7d50dd9d) )
+	ROM_LOAD( "426.u1",  0x3c00, 0x0400, CRC(b611061b) SHA1(70b400aece52ca73f0b88d6d20576aee6a549beb) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "316-0389.u49", 0x0000, 0x0020, CRC(95cfe0d2) SHA1(baee94207d361e35aa6cb2dc7c003444f039e5b4) )    // color PROM
+
+	ROM_REGION( 0x0020, "user1", 0 )    // timing PROM
+	ROM_LOAD( "316-0206.u14", 0x0000, 0x0020, CRC(9617d796) SHA1(7cff2741866095ff42eadd8022bea349ec8d2f39) )    // control PROM
+ROM_END
+
 ROM_START( invds )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "367.u33",      0x0000, 0x0400, CRC(e6a33eae) SHA1(16de70e8fcd093964a448a86bc89b1c607152ead) )
@@ -3402,7 +3585,7 @@ ROM_START( carhntds )
 	ROM_LOAD( "epr632.u1",       0x3c00, 0x0400, CRC(ae68b7d5) SHA1(de449b62ba39331a4ecf3dfe81511b21b7c881d5) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "316.0390.u49", 0x0000, 0x0020, CRC(a0811288) SHA1(a6e78c26f7eeb70125eee715eb6a3e3c82ed7fc8) )    /* color PROM */
+	ROM_LOAD( "316-0390.u49", 0x0000, 0x0020, CRC(a0811288) SHA1(a6e78c26f7eeb70125eee715eb6a3e3c82ed7fc8) )    /* color PROM */
 ROM_END
 
 ROM_START( tranqgun )
@@ -3506,7 +3689,7 @@ ROM_START( carnival )
 	ROM_LOAD( "epr-666.u1",    0x3c00, 0x0400, CRC(4eec7fae) SHA1(cdc858165136c55b01511805c9d4dc6bc598fe1f) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "316-633",       0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) )
+	ROM_LOAD( "316-0633.u49",  0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) )
 
 	ROM_REGION( 0x0400, "audiocpu", 0 ) /* sound ROM */
 	ROM_LOAD( "epr-412.u5",    0x0000, 0x0400, CRC(0dbaa2b0) SHA1(eae7fc362a0ff8f908c42e093c7dbb603659373c) )
@@ -3535,7 +3718,7 @@ ROM_START( carnivalb )
 	ROM_LOAD( "epr-666.u1",    0x3c00, 0x0400, CRC(4eec7fae) SHA1(cdc858165136c55b01511805c9d4dc6bc598fe1f) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "316-633",       0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) )
+	ROM_LOAD( "316-0633.u49",  0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) )
 
 	ROM_REGION( 0x0400, "audiocpu", 0 ) /* sound ROM */
 	ROM_LOAD( "carnival_b.u5", 0x0000, 0x0400, CRC(422abb43) SHA1(edb6f74ccf9382624353e927ac225e1455bb1144) )
@@ -3564,13 +3747,42 @@ ROM_START( carnivalc )
 	ROM_LOAD( "epr-516.u1",  0x3c00, 0x0400, CRC(7c32b352) SHA1(8cb472a7f71a301417c6a8e4a26a9bdcd43b6062) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "316-633",      0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) )
+	ROM_LOAD( "316-0633.u49", 0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) )
 
 	ROM_REGION( 0x0400, "audiocpu", 0 ) /* sound ROM */
 	ROM_LOAD( "epr-412.u5",   0x0000, 0x0400, CRC(0dbaa2b0) SHA1(eae7fc362a0ff8f908c42e093c7dbb603659373c) )
 
 	ROM_REGION( 0x0020, "user1", 0 )    /* timing PROM */
 	ROM_LOAD( "316-0206.u14", 0x0000, 0x0020, CRC(9617d796) SHA1(7cff2741866095ff42eadd8022bea349ec8d2f39) )    /* control PROM */
+ROM_END
+
+ROM_START( carnivalca ) // S-97095-P + 97093-P-B
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "epr-479.u33", 0x0000, 0x0400, CRC(620bff59) SHA1(87d3b4991cacb0a8cd7eeef652eb3f1c1eaadb17) )
+	ROM_LOAD( "epr-480.u32", 0x0400, 0x0400, CRC(90768717) SHA1(a34e6c28d486614b0a084a088d75feb8ecb6ef15) )
+	ROM_LOAD( "epr-481.u31", 0x0800, 0x0400, CRC(5c903af9) SHA1(5f11c6c800cfb012ba592b890d9849cc03192aaa) )
+	ROM_LOAD( "epr-482.u30", 0x0c00, 0x0400, CRC(fb2398a1) SHA1(abab2cd43054b719b0bee0f7452908df062e34bc) )
+	ROM_LOAD( "epr-483.u29", 0x1000, 0x0400, CRC(306f50d2) SHA1(93faa3e2a8e49f3afb591a2fe7bb401278a354e2) )
+	ROM_LOAD( "epr-484.u28", 0x1400, 0x0400, CRC(e80a6ebc) SHA1(5ef94a2ee7040b56951ef68ee4198f64af1449b0) )
+	ROM_LOAD( "epr-485.u27", 0x1800, 0x0400, CRC(993e2885) SHA1(82a04258d5c25bddb6556a73f0e85a9af9d510d2) )
+	ROM_LOAD( "epr-486.u26", 0x1c00, 0x0400, CRC(e6b7eb05) SHA1(1b998cdf39d38437b5d32958dbde80b29c1b2736) )
+	ROM_LOAD( "epr-487.u8",  0x2000, 0x0400, CRC(41abf6f8) SHA1(1a02c268368ea761113c831d4a6dfc0a1853ebc7) )
+	ROM_LOAD( "epr-488.u7",  0x2400, 0x0400, CRC(b0288f2a) SHA1(c02311f4f640a17b68cc10ca01ab3e919a9355b0) )
+	ROM_LOAD( "epr-489.u6",  0x2800, 0x0400, CRC(c9c529ab) SHA1(98bb99afc1e23dff13ab73c051beec44750eb1b3) )
+	ROM_LOAD( "epr-490.u5",  0x2c00, 0x0400, CRC(9d4ffe25) SHA1(b0dec556f16d505190b8703c367ecb4d07147156) )
+	ROM_LOAD( "epr-491.u4",  0x3000, 0x0400, CRC(5d086aec) SHA1(d7b9125b0f9dd71d5ffcac321ec2c0f3f7953031) )
+	ROM_LOAD( "epr-492.u3",  0x3400, 0x0400, CRC(0e20e4a5) SHA1(82c8ad21a72c8dff81eb4bb97e64faff33a8b46f) )
+	ROM_LOAD( "epr-493.u2",  0x3800, 0x0400, CRC(b4a7c5c9) SHA1(832597a2b586bffebaf2d67be8dff316d8120974) )
+	ROM_LOAD( "epr-494.u1",  0x3c00, 0x0400, NO_DUMP ) // missing on PCB, but listed on the ROM sheet it came with
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "pr-62.u49",      0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) )
+
+	ROM_REGION( 0x0400, "audiocpu", 0 )
+	ROM_LOAD( "epr-412.u5",   0x0000, 0x0400, BAD_DUMP CRC(0dbaa2b0) SHA1(eae7fc362a0ff8f908c42e093c7dbb603659373c) ) // not dumped for this set (sound PCB wasn't available), so taken from carnivalc
+
+	ROM_REGION( 0x0020, "user1", 0 )
+	ROM_LOAD( "bin.u14", 0x0000, 0x0020, CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) )    // control PROM, possibly pr-34 but unreadable
 ROM_END
 
 ROM_START( carnivalh )
@@ -3585,7 +3797,7 @@ ROM_START( carnivalh )
 	ROM_LOAD( "epr-162.u41",   0x3800, 0x0800, CRC(56e1c120) SHA1(24816b6a9bc238571ab8ea79bb876cf249ed4d60) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "pr-62.u44",      0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) ) /* Same as 316-633 */
+	ROM_LOAD( "pr-62.u44",      0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) ) /* Same as 316-0633 */
 
 	ROM_REGION( 0x0400, "audiocpu", 0 ) /* sound ROM */
 	ROM_LOAD( "epr-412.u5",     0x0000, 0x0400, CRC(0dbaa2b0) SHA1(eae7fc362a0ff8f908c42e093c7dbb603659373c) )
@@ -3607,7 +3819,7 @@ ROM_START( carnivalha )
 	ROM_LOAD( "epr-162.u41",   0x3800, 0x0800, CRC(56e1c120) SHA1(24816b6a9bc238571ab8ea79bb876cf249ed4d60) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "pr-62.u44",      0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) ) /* Same as 316-633 */
+	ROM_LOAD( "pr-62.u44",      0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) ) /* Same as 316-0633 */
 
 	ROM_REGION( 0x0400, "audiocpu", 0 ) /* sound ROM */
 	ROM_LOAD( "epr-412.u5",     0x0000, 0x0400, CRC(0dbaa2b0) SHA1(eae7fc362a0ff8f908c42e093c7dbb603659373c) )
@@ -3637,10 +3849,10 @@ ROM_START( verbena )
 	ROM_LOAD( "1v.u1",     0x3c00, 0x0400, CRC(6e10c057) SHA1(743a28bb6f4f395fd3db36d5e40acc3475f55f5d) ) // handwritten label
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "mmi6331.u4",       0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) )
+	ROM_LOAD( "mmi6331.u4",       0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) ) // == 316-0633 / pr-62.u44
 
 	ROM_REGION( 0x0400, "audiocpu", 0 ) /* sound ROM */
-	ROM_LOAD( "sound.u25",    0x0000, 0x0400, CRC(0dbaa2b0) SHA1(eae7fc362a0ff8f908c42e093c7dbb603659373c) ) // 2708
+	ROM_LOAD( "sound.u25",    0x0000, 0x0400, CRC(0dbaa2b0) SHA1(eae7fc362a0ff8f908c42e093c7dbb603659373c) ) // == epr-412.u5 - 2708
 
 	ROM_REGION( 0x0020, "user1", 0 )    /* timing PROM */
 	ROM_LOAD( "mmi6331.u14",  0x0000, 0x0020, CRC(9617d796) SHA1(7cff2741866095ff42eadd8022bea349ec8d2f39) )    /* control PROM */
@@ -3955,7 +4167,34 @@ ROM_START( alphaho )
 	ROM_LOAD( "cf.bin",       0x3c00, 0x0400, CRC(d03c5a09) SHA1(eebc1d2302bd2bae28c25187bb099ae618c5cd05) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "alphaho.col",  0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "alphaho.col", 0x0000, 0x0020, BAD_DUMP CRC(67104ea9) SHA1(26b6bd2a1973b83bb9af4e3385d8cb14cb3f62f2) ) // wasn't dumped for this set, use the one from sspacaho (the game Data East cloned and modified) for now
+ROM_END
+
+ROM_START( alphahob ) // PCB marked NNS
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "03.bin", 0x0000, 0x0400, CRC(87de1bb0) SHA1(63626ac2b1f1419fd93dca33417834922ffc8634) )
+	ROM_LOAD( "13.bin", 0x0400, 0x0400, CRC(bd6dbd8e) SHA1(a001392b32be8218d5aebb1c02fc88a41ce995b0) )
+	ROM_LOAD( "16.bin", 0x0800, 0x0400, CRC(4c043d8b) SHA1(72f7db24fc60dae9879d8daf01ef2bb14e9597aa) )
+	ROM_LOAD( "04.bin", 0x0c00, 0x0400, CRC(10005956) SHA1(2e742b1764520c3de5b44018f94dc6476c9a4e84) )
+	ROM_LOAD( "05.bin", 0x1000, 0x0400, CRC(bbdaf42a) SHA1(57e5e72613c0852bc91e12a5713d93c222ed5b32) )
+	ROM_LOAD( "06.bin", 0x1400, 0x0400, CRC(07d4c69a) SHA1(7bb7dad200526a642debe3406ef9c0a74f6fc374) )
+	ROM_LOAD( "07.bin", 0x1800, 0x0400, CRC(8f766b30) SHA1(91e4c8ccb479dcd89f1c76f619bfac832ca7910e) )
+	ROM_LOAD( "08.bin", 0x1c00, 0x0400, CRC(88032202) SHA1(64e087c0a9a97f19c1c5ba5ca1d249d38efab391) )
+	ROM_LOAD( "01.bin", 0x2000, 0x0400, CRC(eb8278b3) SHA1(6349c64f718fc23f78788a612378681d9e6ef69b) )
+	ROM_LOAD( "09.bin", 0x2400, 0x0400, CRC(e5f622f7) SHA1(57858b6abbf34fc4ab2b19a469cbd945a0e14a0e) )
+	ROM_LOAD( "11.bin", 0x2800, 0x0400, CRC(5673be86) SHA1(d8f6bcc0231163c40c217e73dff9dd410fcd488c) )
+	ROM_LOAD( "12.bin", 0x2c00, 0x0400, CRC(939903c6) SHA1(2a570b9880bb8594501fa9b3d1320e5ad2abc86a) )
+	ROM_LOAD( "02.bin", 0x3000, 0x0400, CRC(404f120c) SHA1(7359c819f8a355783c00a972cb65a10aeff6bde4) )
+	ROM_LOAD( "14.bin", 0x3400, 0x0400, CRC(be76baac) SHA1(4b6a46c9484cfc90fa405f8568df44cfc96b1d7a) )
+	ROM_LOAD( "15.bin", 0x3800, 0x0400, CRC(ced0a642) SHA1(7f90803af926861261c9467fda293093409aff83) )
+	ROM_LOAD( "10.bin", 0x3c00, 0x0400, CRC(ba978bca) SHA1(69ee157d1aee8cf323d15630b99cff2747ed0189) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "prom.u49", 0x0000, 0x0020, CRC(67104ea9) SHA1(26b6bd2a1973b83bb9af4e3385d8cb14cb3f62f2) )
+
+	ROM_REGION( 0x0040, "timing_proms", 0 )
+	ROM_LOAD( "prom.u14", 0x0000, 0x0020, CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) ) // control PROM
+	ROM_LOAD( "prom.u15", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) ) // sequence PROM
 ROM_END
 
 // Wanted uses 2 sound boards. One from Head On and one from Space Attack. The sound board has the name printed on the bottom
@@ -3994,52 +4233,56 @@ ROM_END
  *
  *************************************/
 
-//    YEAR  NAME        PARENT    MACHINE    INPUT      CLASS           INIT        ORIENT. COMPANY, FULLNAME, FLAGS
-GAMEL(1977, depthch,    0,        depthch,   depthch,   vicdual_state,  empty_init, ROT0,   "Gremlin", "Depthcharge", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_depthch )
-GAMEL(1977, depthcho,   depthch,  depthch,   depthch,   vicdual_state,  empty_init, ROT0,   "Gremlin", "Depthcharge (older)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_depthch )
-GAMEL(1977, subhunt,    depthch,  depthch,   depthch,   vicdual_state,  empty_init, ROT0,   "Gremlin (Taito license)", "Sub Hunter (Gremlin / Taito)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_depthch )
-GAME( 1977, safari,     0,        safari,    safari,    vicdual_state,  empty_init, ROT0,   "Gremlin", "Safari (set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1977, safaria,    safari,   safari,    safari,    vicdual_state,  empty_init, ROT0,   "Gremlin", "Safari (set 2, bootleg?)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // on a bootleg board, but seems a different code revision too
-GAME( 1978, frogs,      0,        frogs,     frogs,     vicdual_state,  empty_init, ROT0,   "Gremlin", "Frogs", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, sspaceat,   0,        sspaceat,  sspaceat,  vicdual_state,  empty_init, ROT270, "Sega", "Space Attack (upright set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, sspaceat2,  sspaceat, sspaceat,  sspaceat,  vicdual_state,  empty_init, ROT270, "Sega", "Space Attack (upright set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, sspaceat3,  sspaceat, sspaceat,  sspaceat,  vicdual_state,  empty_init, ROT270, "Sega", "Space Attack (upright set 3)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, sspaceatc,  sspaceat, sspaceat,  sspaceat,  vicdual_state,  empty_init, ROT270, "Sega", "Space Attack (cocktail)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, sspacaho,   0,        sspacaho,  sspacaho,  vicdual_state,  empty_init, ROT270, "Sega", "Space Attack / Head On", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, headon,     0,        headon,    headon,    vicdual_state,  empty_init, ROT0,   "Gremlin", "Head On (2 players)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, headon1,    headon,   headon,    headon,    vicdual_state,  empty_init, ROT0,   "Gremlin", "Head On (1 player)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, headonn,    headon,   headonn,   headonn,   vicdual_state,  empty_init, ROT270, "Nintendo", "Head On N", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, headons,    headon,   headons,   headons,   vicdual_state,  empty_init, ROT0,   "bootleg (Sidam)", "Head On (Sidam bootleg, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, headonsa,   headon,   headons,   headonsa,  headonsa_state, empty_init, ROT0,   "bootleg (Sidam)", "Head On (Sidam bootleg, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, headonmz,   headon,   headon,    headonmz,  vicdual_state,  empty_init, ROT0,   "bootleg", "Head On (bootleg, alt maze)", MACHINE_SUPPORTS_SAVE )
-GAME( 1979, supcrash,   headon,   headons,   supcrash,  vicdual_state,  empty_init, ROT0,   "bootleg (VGG)", "Super Crash (bootleg of Head On)", MACHINE_NO_SOUND  | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, hocrash,    headon,   headons,   headons,   vicdual_state,  empty_init, ROT0,   "bootleg (Fraber)", "Crash (bootleg of Head On)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, headon2,    0,        headon2,   headon2,   vicdual_state,  empty_init, ROT0,   "Sega", "Head On 2",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, headon2s,   headon2,  headon2bw, headon2s,  headonsa_state, empty_init, ROT0,   "bootleg (Sidam)", "Head On 2 (Sidam bootleg)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, car2,       headon2,  headon2bw, car2,      vicdual_state,  empty_init, ROT0,   "bootleg (RZ Bologna)", "Car 2 (bootleg of Head On 2)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // title still says 'HeadOn 2'
-GAME( 1979, invho2,     0,        invho2,    invho2,    vicdual_state,  empty_init, ROT270, "Sega", "Invinco / Head On 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, nsub,       0,        nsub,      nsub,      nsub_state,     empty_init, ROT270, "Sega", "N-Sub (upright)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // this is the upright set. cocktail set still needs to be dumped
-GAME( 1980, samurai,    0,        samurai,   samurai,   vicdual_state,  empty_init, ROT270, "Sega", "Samurai", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, invinco,    0,        invinco,   invinco,   vicdual_state,  empty_init, ROT270, "Sega", "Invinco", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, invds,      0,        invds,     invds,     vicdual_state,  empty_init, ROT270, "Sega", "Invinco / Deep Scan", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, carhntds,   0,        carhntds,  carhntds,  vicdual_state,  empty_init, ROT270, "Sega", "Car Hunt / Deep Scan (France)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, tranqgun,   0,        tranqgun,  tranqgun,  vicdual_state,  empty_init, ROT270, "Sega", "Tranquillizer Gun", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacetrk,   0,        spacetrk,  spacetrk,  vicdual_state,  empty_init, ROT270, "Sega", "Space Trek (upright)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacetrkc,  spacetrk, spacetrk,  spacetrkc, vicdual_state,  empty_init, ROT270, "Sega", "Space Trek (cocktail)", MACHINE_IMPERFECT_GRAPHICS |MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, carnival,   0,        carnival,  carnival,  carnival_state, empty_init, ROT270, "Sega", "Carnival (upright, AY8912 music)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, carnivalb,  carnival, carnivalb, carnival,  carnival_state, empty_init, ROT270, "Sega", "Carnival (upright, PIT8253 music)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, carnivalc,  carnival, carnival,  carnivalc, carnival_state, empty_init, ROT270, "Sega", "Carnival (cocktail)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, carnivalh,  carnival, carnivalh, carnivalh, carnival_state, empty_init, ROT270, "Sega", "Carnival (Head On hardware, set 1)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, carnivalha, carnival, carnivalh, carnivalh, carnival_state, empty_init, ROT270, "Sega", "Carnival (Head On hardware, set 2)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, verbena,    carnival, carnival,  carnival,  carnival_state, empty_init, ROT270, "bootleg (Cocamatic)", "Verbena (bootleg of Carnival)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, brdrline,   0,        brdrline,  brdrline,  vicdual_state,  empty_init, ROT270, "Sega", "Borderline", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, starrkr,    brdrline, brdrline,  starrkr,   vicdual_state,  empty_init, ROT270, "Sega", "Star Raker", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, brdrlins,   brdrline, brdrline,  brdrline,  vicdual_state,  empty_init, ROT270, "bootleg (Sidam)", "Borderline (Sidam bootleg)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, brdrlinb,   brdrline, brdrline,  brdrline,  vicdual_state,  empty_init, ROT270, "bootleg (Karateco)", "Borderline (Karateco bootleg)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, brdrlinet,  brdrline, tranqgun,  tranqgun,  vicdual_state,  empty_init, ROT270, "Sega", "Borderline (Tranquillizer Gun conversion)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // official factory conversion
-GAME( 198?, startrks,   0,        headons,   headons,   vicdual_state,  empty_init, ROT0,   "bootleg (Sidam)", "Star Trek (Head On hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, digger,     0,        digger,    digger,    vicdual_state,  empty_init, ROT270, "Sega", "Digger", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pulsar,     0,        pulsar,    pulsar,    vicdual_state,  empty_init, ROT270, "Sega", "Pulsar", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, heiankyo,   0,        heiankyo,  heiankyo,  vicdual_state,  empty_init, ROT270, "Denki Onkyo", "Heiankyo Alien", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 19??, alphaho,    0,        alphaho,   alphaho,   vicdual_state,  empty_init, ROT270, "Data East Corporation", "Alpha Fighter / Head On", MACHINE_WRONG_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, wantsega,   0,        carhntds,  wantsega,  vicdual_state,  empty_init, ROT270, "Sega", "Wanted (Sega)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_CONTROLS | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT    MACHINE    INPUT      CLASS            INIT        ORIENT. COMPANY,                    FULLNAME,      FLAGS
+GAMEL(1977, depthch,    0,        depthch,   depthch,   vicdual_state,   empty_init, ROT0,   "Gremlin",                 "Depthcharge", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_depthch )
+GAMEL(1977, depthcho,   depthch,  depthch,   depthch,   vicdual_state,   empty_init, ROT0,   "Gremlin",                 "Depthcharge (older)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_depthch )
+GAMEL(1977, subhunt,    depthch,  depthch,   depthch,   vicdual_state,   empty_init, ROT0,   "Gremlin (Taito license)", "Sub Hunter (Gremlin / Taito)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_depthch )
+GAME( 1977, safari,     0,        safari,    safari,    vicdual_state,   empty_init, ROT0,   "Gremlin",                 "Safari (set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1977, safaria,    safari,   safari,    safari,    vicdual_state,   empty_init, ROT0,   "Gremlin",                 "Safari (set 2, bootleg?)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // on a bootleg board, but seems a different code revision too
+GAME( 1978, frogs,      0,        frogs,     frogs,     vicdual_state,   empty_init, ROT0,   "Gremlin",                 "Frogs", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, sspaceat,   0,        sspaceat,  sspaceat,  vicdual_state,   empty_init, ROT270, "Sega",                    "Space Attack (upright set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, sspaceat2,  sspaceat, sspaceat,  sspaceat,  vicdual_state,   empty_init, ROT270, "Sega",                    "Space Attack (upright set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, sspaceat3,  sspaceat, sspaceat,  sspaceat,  vicdual_state,   empty_init, ROT270, "Sega",                    "Space Attack (upright set 3)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, sspaceatc,  sspaceat, sspaceat,  sspaceat,  vicdual_state,   empty_init, ROT270, "Sega",                    "Space Attack (cocktail)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, sspacaho,   0,        sspacaho,  sspacaho,  vicdual_state,   empty_init, ROT270, "Sega",                    "Space Attack / Head On", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headon,     0,        headon,    headon,    vicdual_state,   empty_init, ROT0,   "Gremlin",                 "Head On (2 players)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headon1,    headon,   headon,    headon,    vicdual_state,   empty_init, ROT0,   "Gremlin",                 "Head On (1 player)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headonn,    headon,   headonn,   headonn,   vicdual_state,   empty_init, ROT270, "Nintendo",                "Head On N", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headons,    headon,   headons,   headons,   vicdual_state,   empty_init, ROT0,   "bootleg (Sidam)",         "Head On (Sidam bootleg, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headonsa,   headon,   headons,   headonsa,  headonsa_state,  empty_init, ROT0,   "bootleg (Sidam)",         "Head On (Sidam bootleg, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headonmz,   headon,   headon,    headonmz,  vicdual_state,   empty_init, ROT0,   "bootleg",                 "Head On (bootleg, alt maze)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, supcrash,   headon,   headons,   supcrash,  vicdual_state,   empty_init, ROT0,   "bootleg (VGG)",           "Super Crash (bootleg of Head On)", MACHINE_NO_SOUND  | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, hocrash,    headon,   headons,   hocrash,   vicdual_state,   empty_init, ROT0,   "bootleg (Fraber)",        "Crash (bootleg of Head On)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headon2,    0,        headon2,   headon2,   vicdual_state,   empty_init, ROT0,   "Sega",                    "Head On 2",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headon2s,   headon2,  headon2bw, headon2s,  headonsa_state,  empty_init, ROT0,   "bootleg (Sidam)",         "Head On 2 (Sidam bootleg)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, car2,       headon2,  headon2bw, car2,      vicdual_state,   empty_init, ROT0,   "bootleg (RZ Bologna)",    "Car 2 (bootleg of Head On 2)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // title still says 'HeadOn 2'
+GAME( 1979, invho2,     0,        invho2,    invho2,    vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco / Head On 2 (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, invho2a,    invho2,   invho2,    invho2,    vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco / Head On 2 (set 2)", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // wrong colors make Head On 2 unplayable (all black)
+GAME( 1980, nsub,       0,        nsub,      nsub,      nsub_state,      empty_init, ROT270, "Sega",                    "N-Sub (upright)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // this is the upright set. cocktail set still needs to be dumped
+GAME( 1980, samurai,    0,        samurai,   samurai,   vicdual_state,   empty_init, ROT270, "Sega",                    "Samurai", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, invinco,    0,        invinco,   invinco,   vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, invcarht,   0,        carhntds,  carhntds,  vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco / Car Hunt (Germany)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, invds,      0,        invds,     invds,     vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco / Deep Scan", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, carhntds,   0,        carhntds,  carhntds,  vicdual_state,   empty_init, ROT270, "Sega",                    "Car Hunt / Deep Scan (France)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tranqgun,   0,        tranqgun,  tranqgun,  tranqgun_state,  empty_init, ROT270, "Sega",                    "Tranquillizer Gun", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacetrk,   0,        spacetrk,  spacetrk,  vicdual_state,   empty_init, ROT270, "Sega",                    "Space Trek (upright)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacetrkc,  spacetrk, spacetrk,  spacetrkc, vicdual_state,   empty_init, ROT270, "Sega",                    "Space Trek (cocktail)", MACHINE_IMPERFECT_GRAPHICS |MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, carnival,   0,        carnival,  carnival,  carnival_state,  empty_init, ROT270, "Sega",                    "Carnival (upright, AY8912 music)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, carnivalb,  carnival, carnivalb, carnival,  carnival_state,  empty_init, ROT270, "Sega",                    "Carnival (upright, PIT8253 music)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, carnivalc,  carnival, carnival,  carnivalc, carnival_state,  empty_init, ROT270, "Sega",                    "Carnival (cocktail)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, carnivalca, carnival, carnival,  carnivalc, carnival_state,  empty_init, ROT270, "Sega",                    "Carnival (cocktail, earlier)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // one missing ROM
+GAME( 1980, carnivalh,  carnival, carnivalh, carnivalh, carnivalh_state, empty_init, ROT270, "Sega",                    "Carnival (Head On hardware, set 1)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, carnivalha, carnival, carnivalh, carnivalh, carnivalh_state, empty_init, ROT270, "Sega",                    "Carnival (Head On hardware, set 2)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, verbena,    carnival, carnival,  carnival,  carnival_state,  empty_init, ROT270, "bootleg (Cocamatic)",     "Verbena (bootleg of Carnival)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, brdrline,   0,        brdrline,  brdrline,  vicdual_state,   empty_init, ROT270, "Sega",                    "Borderline", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, starrkr,    brdrline, brdrline,  starrkr,   vicdual_state,   empty_init, ROT270, "Sega",                    "Star Raker", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, brdrlins,   brdrline, brdrline,  brdrline,  vicdual_state,   empty_init, ROT270, "bootleg (Sidam)",         "Borderline (Sidam bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, brdrlinb,   brdrline, brdrline,  brdrline,  vicdual_state,   empty_init, ROT270, "bootleg (Karateco)",      "Borderline (Karateco bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, brdrlinet,  brdrline, tranqgun,  tranqgun,  tranqgun_state,  empty_init, ROT270, "Sega",                    "Borderline (Tranquillizer Gun conversion)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // official factory conversion
+GAME( 198?, startrks,   0,        headons,   headons,   vicdual_state,   empty_init, ROT0,   "bootleg (Sidam)",         "Star Trek (Head On hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, digger,     0,        digger,    digger,    vicdual_state,   empty_init, ROT270, "Sega",                    "Digger", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pulsar,     0,        pulsar,    pulsar,    vicdual_state,   empty_init, ROT270, "Sega",                    "Pulsar", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, heiankyo,   0,        heiankyo,  heiankyo,  vicdual_state,   empty_init, ROT270, "Denki Onkyo",             "Heiankyo Alien", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, alphaho,    0,        alphaho,   alphaho,   vicdual_state,   empty_init, ROT270, "Data East Corporation",   "Alpha Fighter / Head On", MACHINE_WRONG_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, alphahob,   alphaho,  alphaho,   alphahob,  vicdual_state,   empty_init, ROT270, "bootleg",                 "Missile / Circuit (bootleg of Alpha Fighter / Head On)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, wantsega,   0,        carhntds,  wantsega,  vicdual_state,   empty_init, ROT270, "Sega",                    "Wanted (Sega)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_CONTROLS | MACHINE_SUPPORTS_SAVE )

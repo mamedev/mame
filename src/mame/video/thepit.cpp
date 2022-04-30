@@ -112,7 +112,7 @@ TILE_GET_INFO_MEMBER(thepit_state::get_tile_info)
 {
 	uint8_t fore_color = m_colorram[tile_index] % m_gfxdecode->gfx(0)->colors();
 	uint8_t code = m_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(2 * m_graphics_bank, code, fore_color, 0);
+	tileinfo.set(2 * m_graphics_bank, code, fore_color, 0);
 }
 
 
@@ -150,14 +150,14 @@ void thepit_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(thepit_state::videoram_w)
+void thepit_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(thepit_state::colorram_w)
+void thepit_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
@@ -201,7 +201,7 @@ WRITE_LINE_MEMBER(thepit_state::intrepid_graphics_bank_w)
 }
 
 
-READ8_MEMBER(thepit_state::input_port_0_r)
+uint8_t thepit_state::input_port_0_r()
 {
 	/* Read either the real or the fake input ports depending on the
 	   horizontal flip switch. (This is how the real PCB does it) */

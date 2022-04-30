@@ -239,28 +239,32 @@ FS 0 to F
 ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6809/m6809.h"
-#include "machine/input_merger.h"
-#include "machine/bankdev.h"
-#include "machine/6821pia.h"
-#include "machine/6850acia.h"
-#include "machine/mc14411.h"
-#include "machine/clock.h"
-#include "machine/timer.h"
-#include "sound/wave.h"
-#include "speaker.h"
+
 #include "bus/rs232/rs232.h"
-#include "mekd4.lh"
+#include "cpu/m6809/m6809.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
+#include "machine/6821pia.h"
+#include "machine/6850acia.h"
+#include "machine/bankdev.h"
+#include "machine/clock.h"
+#include "machine/input_merger.h"
+#include "machine/mc14411.h"
+#include "machine/timer.h"
+#include "sound/wave.h"
 #include "video/pwm.h"
 
 // MEK68R2
 #include "machine/terminal.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
-#include "screen.h"
 #include "render.h"
+#include "screen.h"
+#include "speaker.h"
+
+#include "mekd4.lh"
+
 
 class mekd4_state : public driver_device
 {
@@ -303,14 +307,14 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(rs232_dcd_route_change);
 
 private:
-	DECLARE_READ8_MEMBER(main_r);
-	DECLARE_WRITE8_MEMBER(main_w);
-	DECLARE_READ8_MEMBER(config_r);
-	DECLARE_WRITE8_MEMBER(page_w);
-	DECLARE_READ8_MEMBER(stop_pia_r);
-	DECLARE_WRITE8_MEMBER(stop_pia_w);
-	DECLARE_WRITE8_MEMBER(stop_pia_pa_w);
-	DECLARE_WRITE8_MEMBER(stop_pia_pb_w);
+	uint8_t main_r(offs_t offset);
+	void main_w(offs_t offset, uint8_t data);
+	uint8_t config_r();
+	void page_w(uint8_t data);
+	uint8_t stop_pia_r(offs_t offset);
+	void stop_pia_w(offs_t offset, uint8_t data);
+	void stop_pia_pa_w(uint8_t data);
+	void stop_pia_pb_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(stop_pia_ca2_r);
 	uint16_t m_stop_address;
 
@@ -326,9 +330,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(write_f13_clock);
 
 	DECLARE_READ_LINE_MEMBER(keypad_cb1_r);
-	DECLARE_READ8_MEMBER(keypad_key_r);
-	DECLARE_WRITE8_MEMBER(led_digit_w);
-	DECLARE_WRITE8_MEMBER(led_segment_w);
+	uint8_t keypad_key_r();
+	void led_digit_w(uint8_t data);
+	void led_segment_w(uint8_t data);
 
 	DECLARE_READ_LINE_MEMBER(stop_pia_cb1_r);
 	DECLARE_WRITE_LINE_MEMBER(stop_pia_cb2_w);
@@ -368,8 +372,8 @@ private:
 
 	// MEK68R2
 	MC6845_UPDATE_ROW(update_row);
-	DECLARE_READ8_MEMBER(r2_pia_pa_r);
-	DECLARE_READ8_MEMBER(r2_pia_pb_r);
+	uint8_t r2_pia_pa_r();
+	uint8_t r2_pia_pb_r();
 	DECLARE_WRITE_LINE_MEMBER(r2_hsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(r2_vsync_changed);
 	DECLARE_READ_LINE_MEMBER(r2_pia_cb1_r);
@@ -550,7 +554,7 @@ INPUT_PORTS_END
 
 ************************************************************/
 
-READ8_MEMBER(mekd4_state::main_r)
+uint8_t mekd4_state::main_r(offs_t offset)
 {
 	if (offset == m_stop_address && !machine().side_effects_disabled())
 	{
@@ -561,7 +565,7 @@ READ8_MEMBER(mekd4_state::main_r)
 	return m_banked_space->read_byte(offset);
 }
 
-WRITE8_MEMBER(mekd4_state::main_w)
+void mekd4_state::main_w(offs_t offset, uint8_t data)
 {
 	if (offset == m_stop_address && !machine().side_effects_disabled())
 	{
@@ -572,33 +576,33 @@ WRITE8_MEMBER(mekd4_state::main_w)
 	m_banked_space->write_byte(offset, data);
 }
 
-READ8_MEMBER(mekd4_state::config_r)
+uint8_t mekd4_state::config_r()
 {
 	return 0xf0 | m_jumper1->read();
 }
 
 // The design reversed the A0 and A1 lines so that
 // a 16 bit write could write both data addresses.
-READ8_MEMBER(mekd4_state::stop_pia_r)
+uint8_t mekd4_state::stop_pia_r(offs_t offset)
 {
 	// Reverse the A0 and A1 address lines;
 	int8_t reversed = BIT(offset, 0) << 1 | BIT(offset, 1);
 	return m_stop_pia->read(reversed);
 }
 
-WRITE8_MEMBER(mekd4_state::stop_pia_w)
+void mekd4_state::stop_pia_w(offs_t offset, uint8_t data)
 {
 	// Reverse the A0 and A1 address lines;
 	int8_t reversed = BIT(offset, 0) << 1 | BIT(offset, 1);
 	m_stop_pia->write(reversed, data);
 }
 
-WRITE8_MEMBER(mekd4_state::stop_pia_pa_w)
+void mekd4_state::stop_pia_pa_w(uint8_t data)
 {
 	m_stop_address = (m_stop_address & 0x00ff) | (data << 8);
 }
 
-WRITE8_MEMBER(mekd4_state::stop_pia_pb_w)
+void mekd4_state::stop_pia_pb_w(uint8_t data)
 {
 	m_stop_address = (m_stop_address & 0xff00) | data;
 }
@@ -615,7 +619,7 @@ READ_LINE_MEMBER(mekd4_state::stop_pia_ca2_r)
 
 ************************************************************/
 
-WRITE8_MEMBER(mekd4_state::page_w)
+void mekd4_state::page_w(uint8_t data)
 {
 	m_rom_page = data & 0x07;
 	m_ram_page = (data >> 4) & 0x07;
@@ -652,7 +656,7 @@ READ_LINE_MEMBER(mekd4_state::keypad_cb1_r)
 	return mekd4_state::keypad_key_pressed();
 }
 
-READ8_MEMBER(mekd4_state::keypad_key_r)
+uint8_t mekd4_state::keypad_key_r()
 {
 	uint8_t mux = (m_digit & 0xc0) >> 6;
 	uint8_t i = (m_keypad_columns[mux]->read() & m_digit) ? 0 : 0x80;
@@ -667,14 +671,14 @@ READ8_MEMBER(mekd4_state::keypad_key_r)
 ************************************************************/
 
 // PA
-WRITE8_MEMBER(mekd4_state::led_segment_w)
+void mekd4_state::led_segment_w(uint8_t data)
 {
 	m_segment = data & 0x7f;
 	m_display->matrix(m_digit, ~m_segment);
 }
 
 // PB
-WRITE8_MEMBER(mekd4_state::led_digit_w)
+void mekd4_state::led_digit_w(uint8_t data)
 {
 	m_digit = data;
 	m_display->matrix(m_digit, ~m_segment);
@@ -818,7 +822,7 @@ void mekd4_state::kbd_put(uint8_t data)
 
 // PA0 to PA6 - Keyboard data.
 // PA7 - Display nationality, 0 USA, 1 Europe.
-READ8_MEMBER(mekd4_state::r2_pia_pa_r)
+uint8_t mekd4_state::r2_pia_pa_r()
 {
 	uint8_t ret = m_term_data;
 	int8_t display_nationality = m_r2_display_nationality->read();
@@ -835,7 +839,7 @@ READ8_MEMBER(mekd4_state::r2_pia_pa_r)
 //       01 - 16 lines of 64 characters.
 //       10 - 20 lines of 80 characters.
 //       11 - User defined.
-READ8_MEMBER(mekd4_state::r2_pia_pb_r)
+uint8_t mekd4_state::r2_pia_pb_r()
 {
 	int8_t display_format = m_r2_display_format->read();
 	int8_t mode = m_r2_mode->read();
@@ -870,29 +874,29 @@ MC6845_UPDATE_ROW(mekd4_state::update_row)
 		int dcursor = (column == cursor_x);
 
 		if (BIT(code, 7)) {
-		  /* Lores 6 pixel character.
-		       -----------
-		       | D1 | D0 |
-		       | D3 | D2 |
-		       | D5 | D4 |
-		       -----------
-		       D6 - 1 Grey tone, 0 brightness.
-		  */
-		  int pixel = ((ra & 0x0c) >> 1) + 1;
-		  int dout = BIT(code, pixel);
-		  int grey = BIT(code, 6);
-		  int color = ((dcursor ^ dout) && de) << (grey ^ 1);
-		  bitmap.pix32(y, x++) = pen[color];
-		  bitmap.pix32(y, x++) = pen[color];
-		  bitmap.pix32(y, x++) = pen[color];
-		  bitmap.pix32(y, x++) = pen[color];
-		  pixel--;
-		  dout = BIT(code, pixel);
-		  color = ((dcursor ^ dout) && de) << (grey ^ 1);
-		  bitmap.pix32(y, x++) = pen[color];
-		  bitmap.pix32(y, x++) = pen[color];
-		  bitmap.pix32(y, x++) = pen[color];
-		  bitmap.pix32(y, x++) = pen[color];
+			/* Lores 6 pixel character.
+			     -----------
+			     | D1 | D0 |
+			     | D3 | D2 |
+			     | D5 | D4 |
+			     -----------
+			     D6 - 1 Grey tone, 0 brightness.
+			*/
+			int pixel = ((ra & 0x0c) >> 1) + 1;
+			int dout = BIT(code, pixel);
+			int grey = BIT(code, 6);
+			int color = ((dcursor ^ dout) && de) << (grey ^ 1);
+			bitmap.pix(y, x++) = pen[color];
+			bitmap.pix(y, x++) = pen[color];
+			bitmap.pix(y, x++) = pen[color];
+			bitmap.pix(y, x++) = pen[color];
+			pixel--;
+			dout = BIT(code, pixel);
+			color = ((dcursor ^ dout) && de) << (grey ^ 1);
+			bitmap.pix(y, x++) = pen[color];
+			bitmap.pix(y, x++) = pen[color];
+			bitmap.pix(y, x++) = pen[color];
+			bitmap.pix(y, x++) = pen[color];
 		} else {
 			offs_t address = ra < 8 ? ((code & 0x7f) << 3) | (ra & 0x07) : 0;
 			uint8_t data = m_p_chargen[address];
@@ -902,7 +906,7 @@ MC6845_UPDATE_ROW(mekd4_state::update_row)
 				int dout = BIT(data, 7);
 				int color = ((dcursor ^ dout) && de) << 1;
 
-				bitmap.pix32(y, x++) = pen[color];
+				bitmap.pix(y, x++) = pen[color];
 
 				data <<= 1;
 			}
@@ -973,7 +977,6 @@ void mekd4_state::machine_reset()
 static DEVICE_INPUT_DEFAULTS_START(terminal)
 	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_9600)
 	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_9600)
-	DEVICE_INPUT_DEFAULTS("RS232_STARTBITS", 0xff, RS232_STARTBITS_1)
 	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_8)
 	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_NONE)
 	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)

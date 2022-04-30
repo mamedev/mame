@@ -136,12 +136,14 @@ Find lamps/reels after UPD changes.
 #include "machine/mc68681.h"
 #include "machine/nvram.h"
 #include "sound/upd7759.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 /*************************************
  *
@@ -161,7 +163,7 @@ Find lamps/reels after UPD changes.
  *************************************/
 
 
-#define VREG(a)     i82716.r[a]
+#define VREG(a)     m_i82716.r[a]
 
 enum
 {
@@ -201,14 +203,6 @@ static const uint32_t banks[4] = { 0, 0x40000/2, 0x20000/2, 0x60000/2 };
 
 #define DRAM_BANK_SEL       (banks[(VREG(DSBA) >> 7) & 3])
 
-struct i82716_t
-{
-	uint16_t  r[16];
-	std::unique_ptr<uint16_t[]>  dram;
-
-	std::unique_ptr<uint8_t[]>   line_buf;  // there's actually two
-};
-
 
 class maygayv1_state : public driver_device
 {
@@ -220,6 +214,7 @@ public:
 		m_upd7759(*this, "upd"),
 		m_duart68681(*this, "duart68681"),
 		m_palette(*this, "palette"),
+		m_kbd_ports(*this, "STROBE%u", 1U),
 		m_lamp(*this, "lamp%u", 0U)
 	{ }
 
@@ -227,23 +222,28 @@ public:
 
 	void init_screenpl();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
-	DECLARE_WRITE16_MEMBER(i82716_w);
-	DECLARE_READ16_MEMBER(i82716_r);
-	DECLARE_WRITE16_MEMBER(write_odd);
-	DECLARE_READ16_MEMBER(read_odd);
-	DECLARE_WRITE16_MEMBER(vsync_int_ctrl);
-	DECLARE_READ8_MEMBER(mcu_r);
-	DECLARE_WRITE8_MEMBER(mcu_w);
-	DECLARE_READ8_MEMBER(b_read);
-	DECLARE_WRITE8_MEMBER(b_writ);
-	DECLARE_WRITE8_MEMBER(strobe_w);
-	DECLARE_WRITE8_MEMBER(lamp_data_w);
-	DECLARE_READ8_MEMBER(kbd_r);
+	void i82716_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t i82716_r(offs_t offset);
+	void write_odd(uint16_t data);
+	uint16_t read_odd();
+	void vsync_int_ctrl(uint16_t data);
+	uint8_t mcu_r(offs_t offset);
+	void mcu_w(offs_t offset, uint8_t data);
+	uint8_t b_read();
+	void b_writ(uint8_t data);
+	void strobe_w(uint8_t data);
+	void lamp_data_w(uint8_t data);
+	uint8_t kbd_r();
 	uint32_t screen_update_maygayv1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_maygayv1);
-	DECLARE_WRITE8_MEMBER(data_from_i8031);
-	DECLARE_READ8_MEMBER(data_to_i8031);
+	void data_from_i8031(uint8_t data);
+	uint8_t data_to_i8031();
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_txa);
 	void main_map(address_map &map);
@@ -252,22 +252,27 @@ private:
 	void sound_prg(address_map &map);
 	void cpu_space_map(address_map &map);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
 	required_device<cpu_device> m_maincpu;
 	required_device<i8052_device> m_soundcpu;
 	required_device<upd7759_device> m_upd7759;
 	required_device<mc68681_device> m_duart68681;
 	required_device<palette_device> m_palette;
+	required_ioport_array<8> m_kbd_ports;
 
-	int m_lamp_strobe;
-	int m_old_lamp_strobe;
-	int m_vsync_latch_preset;
-	uint8_t m_p1;
-	uint8_t m_p3;
-	int m_d68681_val;
+	struct i82716_t
+	{
+		uint16_t  r[16];
+		std::unique_ptr<uint16_t[]>  dram;
+
+		std::unique_ptr<uint8_t[]>   line_buf;  // there's actually two
+	};
+
+	int m_lamp_strobe = 0;
+	int m_old_lamp_strobe = 0;
+	int m_vsync_latch_preset = 0;
+	uint8_t m_p1 = 0;
+	uint8_t m_p3 = 0;
+	int m_d68681_val = 0;
 	i82716_t m_i82716;
 	output_finder<8 * 256> m_lamp;
 };
@@ -275,14 +280,13 @@ private:
 
 
 
-WRITE16_MEMBER(maygayv1_state::i82716_w)
+void maygayv1_state::i82716_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	i82716_t &i82716 = m_i82716;
 	// Accessing register window?
 	if ((VREG(RWBA) & 0xfff0) == (offset & 0xfff0))
 	{
 		// Register segment is fixed at start of DRAM
-		COMBINE_DATA(&i82716.dram[offset & 0xf]);
+		COMBINE_DATA(&m_i82716.dram[offset & 0xf]);
 	}
 
 	// Accessing data window?
@@ -290,17 +294,16 @@ WRITE16_MEMBER(maygayv1_state::i82716_w)
 	if (offset >= (VREG(DWBA) & 0xf800))
 	{
 		offset -= (VREG(DWBA) & 0xf800);
-		COMBINE_DATA(&i82716.dram[DRAM_BANK_SEL + (VREG(DSBA) & 0xf800) + offset]);
+		COMBINE_DATA(&m_i82716.dram[DRAM_BANK_SEL + (VREG(DSBA) & 0xf800) + offset]);
 	}
 }
 
-READ16_MEMBER(maygayv1_state::i82716_r)
+uint16_t maygayv1_state::i82716_r(offs_t offset)
 {
-	i82716_t &i82716 = m_i82716;
 	// Accessing register window?
 	if ((VREG(RWBA) & ~0xf) == (offset & ~0xf))
 	{
-		return(i82716.r[offset & 0xf]);
+		return(m_i82716.r[offset & 0xf]);
 	}
 
 	// Accessing data window? TODO: mask?
@@ -309,7 +312,7 @@ READ16_MEMBER(maygayv1_state::i82716_r)
 		if (offset >= (VREG(DWBA) & 0xf800))
 		{
 			offset -= (VREG(DWBA) & 0xf800);
-			return i82716.dram[DRAM_BANK_SEL +(VREG(DSBA) & 0xf800) + (offset)];
+			return m_i82716.dram[DRAM_BANK_SEL +(VREG(DSBA) & 0xf800) + (offset)];
 		}
 	}
 
@@ -323,11 +326,9 @@ void maygayv1_state::video_start()
 
 uint32_t maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	i82716_t &i82716 = m_i82716;
-	uint16_t *atable = &i82716.dram[VREG(ATBA)];
-	uint16_t *otable = &i82716.dram[VREG(ODTBA) & 0xfc00];  // both must be bank 0
+	uint16_t *atable = &m_i82716.dram[VREG(ATBA)];
+	uint16_t *otable = &m_i82716.dram[VREG(ODTBA) & 0xfc00];  // both must be bank 0
 
-	int sl, sx;
 	int slmask = 0xffff;     // TODO: Save if using scanline callbacks
 	int xbound = (VREG(DWBA) & 0x3f8) | 7;
 
@@ -342,22 +343,21 @@ uint32_t maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_in
 	}
 
 	/* For every scanline... */
-	for (sl = cliprect.min_x; sl <= cliprect.max_y; ++sl)
+	for (int sl = cliprect.min_x; sl <= cliprect.max_y; ++sl)
 	{
-		int obj;
 		uint16_t aflags = atable[sl];
 		uint16_t slmask_old = slmask;
 
-		uint16_t *bmp_ptr = &bitmap.pix16(sl);
+		uint16_t *bmp_ptr = &bitmap.pix(sl);
 
 		slmask = 0xffff ^ (slmask ^ aflags);
 
 		/* Clear the frame buffer on each line to BG colour (palette entry 2) */
 		/* 4bpp only ! */
-		memset(i82716.line_buf.get(), 0x22, 512);
+		memset(m_i82716.line_buf.get(), 0x22, 512);
 
 		/* Parse the list of 16 objects */
-		for (obj = 0; obj < 16; ++obj)
+		for (int obj = 0; obj < 16; ++obj)
 		{
 			int offs = obj * 4;
 
@@ -365,7 +365,7 @@ uint32_t maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_in
 			if ( !BIT(slmask, obj) )
 			{
 				uint32_t  objbase, trans, width;
-				int32_t   x, xpos;
+				int32_t   xpos;
 				uint16_t  w0, w1, w2;
 				uint16_t  *objptr;
 				uint8_t *bmpptr; // ?
@@ -411,13 +411,13 @@ uint32_t maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_in
 
 				/* Bitmap data pointer */
 				objbase = ((w0 & 0x00c0) << 10) | w2;
-				objptr = &i82716.dram[objbase + ((4 * width) * otable[offs + 3])];
+				objptr = &m_i82716.dram[objbase + ((4 * width) * otable[offs + 3])];
 
 				// endian alert
 				bmpptr = (uint8_t*)objptr;
 
 				// 4bpp
-				for (x = xpos; x < std::min(xbound, int(xpos + width * 8)); ++x)
+				for (int x = xpos; x < std::min(xbound, int(xpos + width * 8)); ++x)
 				{
 					if (x >= 0)
 					{
@@ -425,10 +425,10 @@ uint32_t maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_in
 						uint8_t p2 = *bmpptr >> 4;
 
 						if (!trans || p1)
-							i82716.line_buf[x] = p1;
+							m_i82716.line_buf[x] = p1;
 
 						if (!trans || p2)
-							i82716.line_buf[x] |= p2 << 4;
+							m_i82716.line_buf[x] |= p2 << 4;
 					}
 					bmpptr++;
 				}
@@ -439,9 +439,9 @@ uint32_t maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_in
 		}
 
 		// Write it out
-		for (sx = cliprect.min_x; sx < cliprect.max_x; sx += 2)
+		for (int sx = cliprect.min_x; sx < cliprect.max_x; sx += 2)
 		{
-			uint8_t pix = i82716.line_buf[sx / 2];
+			uint8_t pix = m_i82716.line_buf[sx / 2];
 
 			bmp_ptr[sx + 0] = pix & 0xf;
 			bmp_ptr[sx + 1] = pix >> 4;
@@ -456,25 +456,24 @@ WRITE_LINE_MEMBER(maygayv1_state::screen_vblank_maygayv1)
 	// rising edge
 	if (state)
 	{
-		i82716_t &i82716 = m_i82716;
 		// UCF
 		if (VREG(VCR0) & VCR0_UCF)
 		{
 			int i;
 
 			for (i = 0; i < 16; ++i)
-				VREG(i) = i82716.dram[i];
+				VREG(i) = m_i82716.dram[i];
 		}
 		else
 		{
-			VREG(VCR0) = i82716.dram[VCR0];
-			VREG(ATBA) = i82716.dram[ATBA];
+			VREG(VCR0) = m_i82716.dram[VCR0];
+			VREG(ATBA) = m_i82716.dram[ATBA];
 		}
 
 		if (!(VREG(VCR0) & VCR0_DEI))
 		{
 			int i;
-			uint16_t *palbase = &i82716.dram[VREG(CTBA)];
+			uint16_t *palbase = &m_i82716.dram[VREG(CTBA)];
 
 			for (i = 0; i < 16; ++i)
 			{
@@ -511,12 +510,12 @@ WRITE_LINE_MEMBER(maygayv1_state::screen_vblank_maygayv1)
 
 
 
-WRITE16_MEMBER(maygayv1_state::write_odd)
+void maygayv1_state::write_odd(uint16_t data)
 {
 }
 
 //;860008 is a latch of some sort
-READ16_MEMBER(maygayv1_state::read_odd)
+uint16_t maygayv1_state::read_odd()
 {
 	return 0;
 }
@@ -527,12 +526,12 @@ READ16_MEMBER(maygayv1_state::read_odd)
  *
  *************************************/
 
-WRITE8_MEMBER( maygayv1_state::strobe_w )
+void maygayv1_state::strobe_w(uint8_t data)
 {
 	m_lamp_strobe = data;
 }
 
-WRITE8_MEMBER( maygayv1_state::lamp_data_w )
+void maygayv1_state::lamp_data_w(uint8_t data)
 {
 	//The two A/B ports are merged back into one, to make one row of 8 lamps.
 
@@ -551,14 +550,12 @@ WRITE8_MEMBER( maygayv1_state::lamp_data_w )
 
 }
 
-READ8_MEMBER( maygayv1_state::kbd_r )
+uint8_t maygayv1_state::kbd_r()
 {
-	static const char *const portnames[] = { "STROBE1","STROBE2","STROBE3","STROBE4","STROBE5","STROBE6","STROBE7","STROBE8" };
-
-	return ioport(portnames[m_lamp_strobe&0x07])->read();
+	return m_kbd_ports[m_lamp_strobe & 0x07]->read();
 }
 
-WRITE16_MEMBER(maygayv1_state::vsync_int_ctrl)
+void maygayv1_state::vsync_int_ctrl(uint16_t data)
 {
 	m_vsync_latch_preset = data & 0x0100;
 
@@ -572,9 +569,8 @@ void maygayv1_state::main_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x080000, 0x083fff).ram().share("nvram");
 	map(0x100000, 0x17ffff).rom().region("maincpu", 0x80000);
-	map(0x820001, 0x820001).rw("i8279", FUNC(i8279_device::data_r), FUNC(i8279_device::data_w));
-	map(0x820003, 0x820003).rw("i8279", FUNC(i8279_device::status_r), FUNC(i8279_device::cmd_w));
 	map(0x800000, 0x800003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0xff00);
+	map(0x820000, 0x820003).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write)).umask16(0x00ff);
 	map(0x860000, 0x86000d).rw(FUNC(maygayv1_state::read_odd), FUNC(maygayv1_state::write_odd));
 	map(0x86000e, 0x86000f).w(FUNC(maygayv1_state::vsync_int_ctrl));
 	map(0x880000, 0x89ffff).rw(FUNC(maygayv1_state::i82716_r), FUNC(maygayv1_state::i82716_w));
@@ -619,7 +615,7 @@ void maygayv1_state::main_map(address_map &map)
 
 */
 
-READ8_MEMBER(maygayv1_state::mcu_r)
+uint8_t maygayv1_state::mcu_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -636,7 +632,7 @@ READ8_MEMBER(maygayv1_state::mcu_r)
 	return 0;
 }
 
-WRITE8_MEMBER(maygayv1_state::mcu_w)
+void maygayv1_state::mcu_w(offs_t offset, uint8_t data)
 {
 			logerror("O %x D %x",offset,data);
 
@@ -842,23 +838,23 @@ WRITE_LINE_MEMBER(maygayv1_state::duart_txa)
 	m_soundcpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);  // ?
 }
 
-READ8_MEMBER(maygayv1_state::data_to_i8031)
+uint8_t maygayv1_state::data_to_i8031()
 {
 	return m_d68681_val;
 }
 
-WRITE8_MEMBER(maygayv1_state::data_from_i8031)
+void maygayv1_state::data_from_i8031(uint8_t data)
 {
 	m_duart68681->rx_a_w(data);
 }
 
-READ8_MEMBER(maygayv1_state::b_read)
+uint8_t maygayv1_state::b_read()
 {
 	// Meters - upper nibble?
 	return 0xff;
 }
 
-WRITE8_MEMBER(maygayv1_state::b_writ)
+void maygayv1_state::b_writ(uint8_t data)
 {
 	logerror("B WRITE %x\n",data);
 }
@@ -867,19 +863,18 @@ WRITE8_MEMBER(maygayv1_state::b_writ)
 void maygayv1_state::machine_start()
 {
 	m_lamp.resolve();
-	i82716_t &i82716 = m_i82716;
-	i82716.dram = std::make_unique<uint16_t[]>(0x80000/2);   // ???
-	i82716.line_buf = std::make_unique<uint8_t[]>(512);
+	m_i82716.dram = std::make_unique<uint16_t[]>(0x80000/2);   // ???
+	m_i82716.line_buf = std::make_unique<uint8_t[]>(512);
 
-	save_pointer(NAME(i82716.dram), 0x40000);
+	save_pointer(NAME(m_i82716.dram), 0x40000);
 }
 
 void maygayv1_state::machine_reset()
 {
-	i82716_t &i82716 = m_i82716;
 	// ?
-	memset(i82716.dram.get(), 0, 0x40000);
-	i82716.r[RWBA] = 0x0200;
+	memset(m_i82716.dram.get(), 0, 0x40000);
+	std::fill(std::begin(m_i82716.r), std::end(m_i82716.r), 0);
+	m_i82716.r[RWBA] = 0x0200;
 }
 
 
@@ -919,7 +914,7 @@ void maygayv1_state::maygayv1(machine_config &config)
 
 	MC68681(config, m_duart68681, DUART_CLOCK);
 	m_duart68681->irq_cb().set(FUNC(maygayv1_state::duart_irq_handler));
-	m_duart68681->a_tx_cb().set(FUNC(maygayv1_state::duart_txa));;
+	m_duart68681->a_tx_cb().set(FUNC(maygayv1_state::duart_txa));
 
 	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/4));         // unknown clock
 	kbdc.out_sl_callback().set(FUNC(maygayv1_state::strobe_w));         // scan SL lines
@@ -1270,6 +1265,9 @@ void maygayv1_state::init_screenpl()
 {
 	m_p1 = m_p3 = 0xff;
 }
+
+} // Anonymous namespace
+
 
 #define GAME_FLAGS MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK
 

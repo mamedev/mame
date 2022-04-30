@@ -62,7 +62,7 @@
 
 #pragma once
 
-#include "softlist_dev.h"
+#include "imagedev/cartrom.h"
 
 
 //**************************************************************************
@@ -79,7 +79,7 @@ class device_vboy_cart_interface;
 
 class vboy_cart_slot_device :
 		public device_t,
-		public device_image_interface,
+		public device_cartrom_image_interface,
 		public device_single_card_slot_interface<device_vboy_cart_interface>
 {
 public:
@@ -103,11 +103,6 @@ public:
 	// device_image_interface implementation
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
-	virtual bool is_readable() const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return false; }
-	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return true; }
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual char const *image_interface() const noexcept override { return "vboy_cart"; }
 	virtual char const *file_extensions() const noexcept override { return "vb,bin"; }
@@ -120,9 +115,6 @@ protected:
 	virtual void device_validity_check(validity_checker &valid) const override ATTR_COLD;
 	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
-
-	// device_image_interface implementation
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 private:
 	devcb_write_line m_intcro;

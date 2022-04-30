@@ -37,11 +37,11 @@
 class upscope_state : public amiga_state
 {
 public:
-	upscope_state(const machine_config &mconfig, device_type type, const char *tag) :
-		amiga_state(mconfig, type, tag),
-		m_prev_cia1_porta(0xff),
-		m_parallel_data(0xff),
-		m_ppi(*this, "ppi")
+	upscope_state(const machine_config &mconfig, device_type type, const char *tag)
+		: amiga_state(mconfig, type, tag)
+		, m_prev_cia1_porta(0xff)
+		, m_parallel_data(0xff)
+		, m_ppi(*this, "ppi")
 	{ }
 
 	void upscope(machine_config &config);
@@ -52,16 +52,16 @@ private:
 	uint8_t m_nvram[0x100];
 	uint8_t m_prev_cia1_porta;
 	uint8_t m_parallel_data;
-	uint8_t m_nvram_address_latch;
-	uint8_t m_nvram_data_latch;
+	uint8_t m_nvram_address_latch = 0;
+	uint8_t m_nvram_data_latch = 0;
 
-	DECLARE_READ8_MEMBER(upscope_cia_0_portb_r);
-	DECLARE_WRITE8_MEMBER(upscope_cia_0_portb_w);
-	DECLARE_READ8_MEMBER(upscope_cia_1_porta_r);
-	DECLARE_WRITE8_MEMBER(upscope_cia_1_porta_w);
+	uint8_t upscope_cia_0_portb_r();
+	void upscope_cia_0_portb_w(uint8_t data);
+	uint8_t upscope_cia_1_porta_r();
+	void upscope_cia_1_porta_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(lamps_w);
-	DECLARE_WRITE8_MEMBER(coin_counter_w);
+	void lamps_w(uint8_t data);
+	void coin_counter_w(uint8_t data);
 
 
 	void a500_mem(address_map &map);
@@ -99,12 +99,12 @@ void upscope_state::machine_reset()
 }
 
 
-WRITE8_MEMBER( upscope_state::upscope_cia_0_portb_w )
+void upscope_state::upscope_cia_0_portb_w(uint8_t data)
 {
 	m_parallel_data = data;
 }
 
-READ8_MEMBER( upscope_state::upscope_cia_0_portb_r )
+uint8_t upscope_state::upscope_cia_0_portb_r()
 {
 	return m_nvram_data_latch;
 }
@@ -126,12 +126,12 @@ READ8_MEMBER( upscope_state::upscope_cia_0_portb_r )
  *
  *************************************/
 
-READ8_MEMBER( upscope_state::upscope_cia_1_porta_r )
+uint8_t upscope_state::upscope_cia_1_porta_r()
 {
 	return 0xf8 | (m_prev_cia1_porta & 0x07);
 }
 
-WRITE8_MEMBER( upscope_state::upscope_cia_1_porta_w )
+void upscope_state::upscope_cia_1_porta_w(uint8_t data)
 {
 	/* on a low transition of POUT, we latch stuff for the NVRAM */
 	if ((m_prev_cia1_porta & 2) && !(data & 2))
@@ -185,7 +185,7 @@ WRITE8_MEMBER( upscope_state::upscope_cia_1_porta_w )
 	m_prev_cia1_porta = data;
 }
 
-WRITE8_MEMBER( upscope_state::lamps_w )
+void upscope_state::lamps_w(uint8_t data)
 {
 	// 7-------  bubble light
 	// -6------  sight
@@ -197,7 +197,7 @@ WRITE8_MEMBER( upscope_state::lamps_w )
 	// -------0  enemy right
 }
 
-WRITE8_MEMBER( upscope_state::coin_counter_w )
+void upscope_state::coin_counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
@@ -221,10 +221,10 @@ void upscope_state::a500_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap16));
 	map(0xa00000, 0xbfffff).rw(FUNC(upscope_state::cia_r), FUNC(upscope_state::cia_w));
-	map(0xc00000, 0xd7ffff).rw(FUNC(upscope_state::custom_chip_r), FUNC(upscope_state::custom_chip_w));
+	map(0xc00000, 0xd7ffff).m(m_chipset, FUNC(address_map_bank_device::amap16));
 	map(0xd80000, 0xddffff).noprw();
-	map(0xde0000, 0xdeffff).rw(FUNC(upscope_state::custom_chip_r), FUNC(upscope_state::custom_chip_w));
-	map(0xdf0000, 0xdfffff).rw(FUNC(upscope_state::custom_chip_r), FUNC(upscope_state::custom_chip_w));
+	map(0xde0000, 0xdeffff).m(m_chipset, FUNC(address_map_bank_device::amap16));
+	map(0xdf0000, 0xdfffff).m(m_chipset, FUNC(address_map_bank_device::amap16));
 	map(0xe00000, 0xe7ffff).nopw().r(FUNC(upscope_state::rom_mirror_r));
 	map(0xe80000, 0xefffff).noprw(); // autoconfig space (installed by devices)
 	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
@@ -271,7 +271,13 @@ void upscope_state::upscope(machine_config &config)
 	M68000(config, m_maincpu, amiga_state::CLK_7M_NTSC);
 	m_maincpu->set_addrmap(AS_PROGRAM, &upscope_state::main_map);
 
-	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
+	ADDRESS_MAP_BANK(config, m_overlay).set_map(&upscope_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
+	ADDRESS_MAP_BANK(config, m_chipset).set_map(&upscope_state::ocs_map).set_options(ENDIANNESS_BIG, 16, 9, 0x200);
+
+	AMIGA_COPPER(config, m_copper, amiga_state::CLK_7M_NTSC);
+	m_copper->set_host_cpu_tag(m_maincpu);
+	m_copper->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
+	m_copper->set_ecs_mode(false);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -286,13 +292,13 @@ void upscope_state::upscope(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	paula_8364_device &paula(PAULA_8364(config, "amiga", amiga_state::CLK_C1_NTSC));
-	paula.add_route(0, "rspeaker", 0.50);
-	paula.add_route(1, "lspeaker", 0.50);
-	paula.add_route(2, "lspeaker", 0.50);
-	paula.add_route(3, "rspeaker", 0.50);
-	paula.mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
-	paula.int_cb().set(FUNC(amiga_state::paula_int_w));
+	PAULA_8364(config, m_paula, amiga_state::CLK_C1_NTSC);
+	m_paula->add_route(0, "rspeaker", 0.50);
+	m_paula->add_route(1, "lspeaker", 0.50);
+	m_paula->add_route(2, "lspeaker", 0.50);
+	m_paula->add_route(3, "rspeaker", 0.50);
+	m_paula->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
+	m_paula->int_cb().set(FUNC(amiga_state::paula_int_w));
 
 	/* cia */
 	MOS8520(config, m_cia_0, amiga_state::CLK_E_NTSC);
@@ -320,7 +326,6 @@ void upscope_state::upscope(machine_config &config)
 	m_ppi->out_pb_callback().set(FUNC(upscope_state::lamps_w));
 	m_ppi->out_pc_callback().set(FUNC(upscope_state::coin_counter_w));
 }
-
 
 
 /*************************************

@@ -158,7 +158,7 @@ void pci_cirrus_svga_device::pci_write(pci_bus_device *pcibus, int function, int
  *
  *************************************/
 
-WRITE8_MEMBER( pci_cirrus_svga_device::cirrus_42E8_w )
+void pci_cirrus_svga_device::cirrus_42E8_w(uint8_t data)
 {
 	if (data & 0x80)
 		m_vga->reset();

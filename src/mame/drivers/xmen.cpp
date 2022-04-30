@@ -8,13 +8,19 @@ driver by Nicola Salmoria
 
 notes:
 
-the way the double screen works in xmen6p is not fully understood
+The way the double screen works in xmen6p is not fully understood.
 
-the board only has one of each gfx chip, the only additional chip not found
+One of the screens probably has a buffer to delay it by 1 frame. If you
+hardcode buffering to the right screen, the intro is synced correctly,
+but in-game is not. Buffer the left screen and then in-game is correct,
+but the intro is not.
+
+The board only has one of each gfx chip, the only additional chip not found
 on the 2/4p board is 053253.  This chip is also on Run n Gun which is
-likewise a 2 screen game
+likewise a 2 screen game.
 
 ***************************************************************************/
+
 #include "emu.h"
 #include "includes/xmen.h"
 #include "includes/konamipt.h"
@@ -23,10 +29,11 @@ likewise a 2 screen game
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "speaker.h"
+
+#include "layout/generic.h"
 
 
 /***************************************************************************
@@ -35,7 +42,7 @@ likewise a 2 screen game
 
 ***************************************************************************/
 
-WRITE16_MEMBER(xmen_state::eeprom_w)
+void xmen_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%06x: write %04x to 108000\n", m_maincpu->pc(),data);
 	if (ACCESSING_BITS_0_7)
@@ -46,8 +53,11 @@ WRITE16_MEMBER(xmen_state::eeprom_w)
 		/* bit 2 is data */
 		/* bit 3 is clock (active high) */
 		/* bit 4 is cs (active low) */
-		/* bit 5 is enabled in IRQ3, disabled in IRQ5 (sprite DMA start?) */
 		ioport("EEPROMOUT")->write(data, 0xff);
+
+		/* bit 5 is enabled in IRQ3, disabled in IRQ5 (sprite DMA start?) */
+		/* bit 7 used in xmen6p to select other tilemap bank (see halfway level 5) */
+		m_xmen6p_tilemap_select = BIT(data, 7);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
@@ -56,14 +66,14 @@ WRITE16_MEMBER(xmen_state::eeprom_w)
 		/* bit 9 = enable char ROM reading through the video RAM */
 		/* bit 10 = sound irq, but with some kind of hold */
 		m_k052109->set_rmrd_line((data & 0x0200) ? ASSERT_LINE : CLEAR_LINE);
-		if(data & 0x4) {
+		if(data & 0x400) {
 			logerror("tick!\n");
 			m_audiocpu->set_input_line(0, HOLD_LINE);
 		}
 	}
 }
 
-WRITE16_MEMBER(xmen_state::xmen_18fa00_w)
+void xmen_state::xmen_18fa00_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7)
 	{
@@ -72,7 +82,7 @@ WRITE16_MEMBER(xmen_state::xmen_18fa00_w)
 	}
 }
 
-WRITE8_MEMBER(xmen_state::sound_bankswitch_w)
+void xmen_state::sound_bankswitch_w(uint8_t data)
 {
 	m_z80bank->set_entry(data & 0x07);
 }
@@ -114,9 +124,9 @@ void xmen_state::_6p_main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x080000, 0x0fffff).rom();
-	map(0x100000, 0x100fff).ram().share("spriteramleft");   /* sprites (screen 1) */
+	map(0x100000, 0x100fff).ram().share("spriteram0"); // left screen
 	map(0x101000, 0x101fff).ram();
-	map(0x102000, 0x102fff).ram().share("spriteramright");  /* sprites (screen 2) */
+	map(0x102000, 0x102fff).ram().share("spriteram1"); // right screen
 	map(0x103000, 0x103fff).ram();     /* 6p - a buffer? */
 	map(0x104000, 0x104fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x108000, 0x108001).w(FUNC(xmen_state::eeprom_w));
@@ -130,7 +140,7 @@ void xmen_state::_6p_main_map(address_map &map)
 	map(0x10a00c, 0x10a00d).r(m_k053246, FUNC(k053247_device::k053246_r)); /* sprites */
 	map(0x110000, 0x113fff).ram();     /* main RAM */
 /*  map(0x18c000, 0x197fff).w("k052109", FUNC(k052109_device:write)).umask16(0x00ff).share("tilemapleft"); */
-	map(0x18c000, 0x197fff).ram().share("tilemapleft"); /* left tilemap (p1,p2,p3 counters) */
+	map(0x18c000, 0x197fff).ram().share("tilemap0"); // left screen
 	map(0x18fa00, 0x18fa01).w(FUNC(xmen_state::xmen_18fa00_w));
 /*
     map(0x1ac000, 0x1af7ff).readonly();
@@ -142,7 +152,7 @@ void xmen_state::_6p_main_map(address_map &map)
     map(0x1b4000, 0x1b77ff).readonly();
     map(0x1b4000, 0x1b77ff).writeonly();
 */
-	map(0x1ac000, 0x1b7fff).ram().share("tilemapright"); /* right tilemap */
+	map(0x1ac000, 0x1b7fff).ram().share("tilemap1"); // right screen
 
 	/* what are the regions below buffers? (used by hw or software?) */
 /*
@@ -152,7 +162,7 @@ void xmen_state::_6p_main_map(address_map &map)
     map(0x1d0000, 0x1d37ff).readonly();
     map(0x1d0000, 0x1d37ff).writeonly();
 */
-	map(0x1cc000, 0x1d7fff).ram(); /* tilemap ? */
+	map(0x1cc000, 0x1d7fff).ram().share("tilemap2"); // left screen
 
 	/* whats the stuff below, buffers? */
 /*
@@ -163,7 +173,7 @@ void xmen_state::_6p_main_map(address_map &map)
     map(0x1f4000, 0x1f77ff).readonly();
     map(0x1f4000, 0x1f77ff).writeonly();
 */
-	map(0x1ec000, 0x1f7fff).ram(); /* tilemap ? */
+	map(0x1ec000, 0x1f7fff).ram().share("tilemap3"); // right screen
 }
 
 
@@ -270,13 +280,12 @@ void xmen_state::machine_start()
 	save_item(NAME(m_layer_colorbase));
 	save_item(NAME(m_layerpri));
 	save_item(NAME(m_vblank_irq_mask));
+	save_item(NAME(m_xmen6p_tilemap_select));
 }
 
 void xmen_state::machine_reset()
 {
-	int i;
-
-	for (i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		m_layerpri[i] = 0;
 		m_layer_colorbase[i] = 0;
@@ -295,7 +304,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(xmen_state::xmen_scanline)
 
 	if(scanline == 0) // sprite DMA irq?
 		m_maincpu->set_input_line(5, HOLD_LINE);
-
 }
 
 void xmen_state::xmen(machine_config &config)
@@ -472,6 +480,33 @@ void xmen_state::xmen6p(machine_config &config)
 
 ROM_START( xmen )
 	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "065-eba04.10d",  0x00000, 0x20000, CRC(3588c5ec) SHA1(7966e7259038468845dafd19e5f7fc576c2901fa) ) /* Europe 4 Player version */
+	ROM_LOAD16_BYTE( "065-eba05.10f",  0x00001, 0x20000, CRC(79ce32f8) SHA1(1a21b38d4a82103d78e246aca68ed3e4afaf60f3) )
+	ROM_LOAD16_BYTE( "065-a02.9d",     0x80000, 0x40000, CRC(b31dc44c) SHA1(4bdac05826b4d6d4fe46686ede5190e2f73eefc5) )
+	ROM_LOAD16_BYTE( "065-a03.9f",     0x80001, 0x40000, CRC(13842fe6) SHA1(b61f094eb94336edb8708d3437ead9b853b2d6e6) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_LOAD( "065-a01.6f",   0x00000, 0x20000, CRC(147d3a4d) SHA1(a14409fe991e803b9e7812303e3a9ebd857d8b01) )
+
+	ROM_REGION( 0x200000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "065-a08.15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )
+	ROM_LOAD32_WORD( "065-a07.16l", 0x000002, 0x100000, CRC(c5dc8fc4) SHA1(9887cb002c8b72be7ce933cb397f00cdc5506c8c) )
+
+	ROM_REGION( 0x400000, "k053246", 0 )   /* graphics (addressable by the main CPU) */
+	ROM_LOAD64_WORD( "065-a09.2h",  0x000000, 0x100000, CRC(ea05d52f) SHA1(7f2c14f907355856fb94e3a67b73aa1919776835) ) /* sprites */
+	ROM_LOAD64_WORD( "065-a10.2l",  0x000002, 0x100000, CRC(96b91802) SHA1(641943557b59b91f0edd49ec8a73cef7d9268b32) )
+	ROM_LOAD64_WORD( "065-a12.1h",  0x000004, 0x100000, CRC(321ed07a) SHA1(5b00ed676daeea974bdce6701667cfe573099dad) )
+	ROM_LOAD64_WORD( "065-a11.1l",  0x000006, 0x100000, CRC(46da948e) SHA1(168ac9178ee5bad5931557fb549e1237971d7839) )
+
+	ROM_REGION( 0x200000, "k054539", 0 )    /* samples for the 054539 */
+	ROM_LOAD( "065-a06.1f",  0x000000, 0x200000, CRC(5adbcee0) SHA1(435feda697193bc51db80eba46be474cbbc1de4b) )
+
+	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_LOAD( "xmen_eba.nv", 0x0000, 0x0080, CRC(37f8e77a) SHA1(0b92caba33486c6fd104806aa96f735743bb2221) )
+ROM_END
+
+ROM_START( xmenu )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "065-ubb04.10d",  0x00000, 0x20000, CRC(f896c93b) SHA1(0bee89fe4d36a9b2ded864770198eb2df6903580) ) /* US 4 Player version */
 	ROM_LOAD16_BYTE( "065-ubb05.10f",  0x00001, 0x20000, CRC(e02e5d64) SHA1(9838c1cf9862db3ca70a23ef5f3c5883729c4e0c) )
 	ROM_LOAD16_BYTE( "065-a02.9d",     0x80000, 0x40000, CRC(b31dc44c) SHA1(4bdac05826b4d6d4fe46686ede5190e2f73eefc5) )
@@ -495,6 +530,33 @@ ROM_START( xmen )
 
 	ROM_REGION( 0x80, "eeprom", 0 )
 	ROM_LOAD( "xmen_ubb.nv", 0x0000, 0x0080, CRC(52f334ba) SHA1(171c22b5ac41bcbbcfc31528cf49c096f6829a72) )
+ROM_END
+
+ROM_START( xmenua )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "065-ueb04.10d",  0x00000, 0x20000, CRC(eee4e7ef) SHA1(72fe588bc58c692e7f9891f3e89c7d6fcc28c480) ) /* US 4 Player version */
+	ROM_LOAD16_BYTE( "065-ueb05.10f",  0x00001, 0x20000, CRC(c3b2ffde) SHA1(27b32429c8c35cf15d1e5437535c4c335eee2118) )
+	ROM_LOAD16_BYTE( "065-a02.9d",     0x80000, 0x40000, CRC(b31dc44c) SHA1(4bdac05826b4d6d4fe46686ede5190e2f73eefc5) )
+	ROM_LOAD16_BYTE( "065-a03.9f",     0x80001, 0x40000, CRC(13842fe6) SHA1(b61f094eb94336edb8708d3437ead9b853b2d6e6) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_LOAD( "065-a01.6f",   0x00000, 0x20000, CRC(147d3a4d) SHA1(a14409fe991e803b9e7812303e3a9ebd857d8b01) )
+
+	ROM_REGION( 0x200000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "065-a08.15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )
+	ROM_LOAD32_WORD( "065-a07.16l", 0x000002, 0x100000, CRC(c5dc8fc4) SHA1(9887cb002c8b72be7ce933cb397f00cdc5506c8c) )
+
+	ROM_REGION( 0x400000, "k053246", 0 )   /* graphics (addressable by the main CPU) */
+	ROM_LOAD64_WORD( "065-a09.2h",  0x000000, 0x100000, CRC(ea05d52f) SHA1(7f2c14f907355856fb94e3a67b73aa1919776835) ) /* sprites */
+	ROM_LOAD64_WORD( "065-a10.2l",  0x000002, 0x100000, CRC(96b91802) SHA1(641943557b59b91f0edd49ec8a73cef7d9268b32) )
+	ROM_LOAD64_WORD( "065-a12.1h",  0x000004, 0x100000, CRC(321ed07a) SHA1(5b00ed676daeea974bdce6701667cfe573099dad) )
+	ROM_LOAD64_WORD( "065-a11.1l",  0x000006, 0x100000, CRC(46da948e) SHA1(168ac9178ee5bad5931557fb549e1237971d7839) )
+
+	ROM_REGION( 0x200000, "k054539", 0 )    /* samples for the 054539 */
+	ROM_LOAD( "065-a06.1f",  0x000000, 0x200000, CRC(5adbcee0) SHA1(435feda697193bc51db80eba46be474cbbc1de4b) )
+
+	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_LOAD( "xmen_ueb.nv", 0x0000, 0x0080, CRC(db85fef4) SHA1(9387d2f4dbb3cb5cdf59d2304393ac50b3c12ebe) )
 ROM_END
 
 ROM_START( xmenj )
@@ -549,33 +611,6 @@ ROM_START( xmenja )
 
 	ROM_REGION( 0x80, "eeprom", 0 )
 	ROM_LOAD( "xmen_jea.nv", 0x0000, 0x0080, CRC(df5b6bc6) SHA1(42fff0793bb1488bcdd69c39a8c5f58cdf39e1ff) )
-ROM_END
-
-ROM_START( xmene )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "065-eba04.10d",  0x00000, 0x20000, CRC(3588c5ec) SHA1(7966e7259038468845dafd19e5f7fc576c2901fa) ) /* Europe 4 Player version */
-	ROM_LOAD16_BYTE( "065-eba05.10f",  0x00001, 0x20000, CRC(79ce32f8) SHA1(1a21b38d4a82103d78e246aca68ed3e4afaf60f3) )
-	ROM_LOAD16_BYTE( "065-a02.9d",     0x80000, 0x40000, CRC(b31dc44c) SHA1(4bdac05826b4d6d4fe46686ede5190e2f73eefc5) )
-	ROM_LOAD16_BYTE( "065-a03.9f",     0x80001, 0x40000, CRC(13842fe6) SHA1(b61f094eb94336edb8708d3437ead9b853b2d6e6) )
-
-	ROM_REGION( 0x20000, "audiocpu", 0 )
-	ROM_LOAD( "065-a01.6f",   0x00000, 0x20000, CRC(147d3a4d) SHA1(a14409fe991e803b9e7812303e3a9ebd857d8b01) )
-
-	ROM_REGION( 0x200000, "k052109", 0 )    /* tiles */
-	ROM_LOAD32_WORD( "065-a08.15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )
-	ROM_LOAD32_WORD( "065-a07.16l", 0x000002, 0x100000, CRC(c5dc8fc4) SHA1(9887cb002c8b72be7ce933cb397f00cdc5506c8c) )
-
-	ROM_REGION( 0x400000, "k053246", 0 )   /* graphics (addressable by the main CPU) */
-	ROM_LOAD64_WORD( "065-a09.2h",  0x000000, 0x100000, CRC(ea05d52f) SHA1(7f2c14f907355856fb94e3a67b73aa1919776835) ) /* sprites */
-	ROM_LOAD64_WORD( "065-a10.2l",  0x000002, 0x100000, CRC(96b91802) SHA1(641943557b59b91f0edd49ec8a73cef7d9268b32) )
-	ROM_LOAD64_WORD( "065-a12.1h",  0x000004, 0x100000, CRC(321ed07a) SHA1(5b00ed676daeea974bdce6701667cfe573099dad) )
-	ROM_LOAD64_WORD( "065-a11.1l",  0x000006, 0x100000, CRC(46da948e) SHA1(168ac9178ee5bad5931557fb549e1237971d7839) )
-
-	ROM_REGION( 0x200000, "k054539", 0 )    /* samples for the 054539 */
-	ROM_LOAD( "065-a06.1f",  0x000000, 0x200000, CRC(5adbcee0) SHA1(435feda697193bc51db80eba46be474cbbc1de4b) )
-
-	ROM_REGION( 0x80, "eeprom", 0 )
-	ROM_LOAD( "xmen_eba.nv", 0x0000, 0x0080, CRC(37f8e77a) SHA1(0b92caba33486c6fd104806aa96f735743bb2221) )
 ROM_END
 
 ROM_START( xmena )
@@ -686,33 +721,6 @@ ROM_START( xmen2pu )
 	ROM_LOAD( "xmen_uab.nv", 0x0000, 0x0080, CRC(79b76593) SHA1(f9921a2963f249fa341bfb57cc9e213e2efed9b9) )
 ROM_END
 
-ROM_START( xmen2pa )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "065-aaa04.10d",  0x00000, 0x20000, CRC(7f8b27c2) SHA1(052db1f47671564a440544a41fc397a19d1aff3a) ) /* Asia 2 Player version */
-	ROM_LOAD16_BYTE( "065-aaa05.10f",  0x00001, 0x20000, CRC(841ed636) SHA1(33f96022ce3dae9b49eb51fd4e8f7387a1777002) )
-	ROM_LOAD16_BYTE( "065-a02.9d",     0x80000, 0x40000, CRC(b31dc44c) SHA1(4bdac05826b4d6d4fe46686ede5190e2f73eefc5) )
-	ROM_LOAD16_BYTE( "065-a03.9f",     0x80001, 0x40000, CRC(13842fe6) SHA1(b61f094eb94336edb8708d3437ead9b853b2d6e6) )
-
-	ROM_REGION( 0x20000, "audiocpu", 0 )
-	ROM_LOAD( "065-a01.6f",   0x00000, 0x20000, CRC(147d3a4d) SHA1(a14409fe991e803b9e7812303e3a9ebd857d8b01) )
-
-	ROM_REGION( 0x200000, "k052109", 0 )    /* tiles */
-	ROM_LOAD32_WORD( "065-a08.15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )
-	ROM_LOAD32_WORD( "065-a07.16l", 0x000002, 0x100000, CRC(c5dc8fc4) SHA1(9887cb002c8b72be7ce933cb397f00cdc5506c8c) )
-
-	ROM_REGION( 0x400000, "k053246", 0 )   /* graphics (addressable by the main CPU) */
-	ROM_LOAD64_WORD( "065-a09.2h",  0x000000, 0x100000, CRC(ea05d52f) SHA1(7f2c14f907355856fb94e3a67b73aa1919776835) ) /* sprites */
-	ROM_LOAD64_WORD( "065-a10.2l",  0x000002, 0x100000, CRC(96b91802) SHA1(641943557b59b91f0edd49ec8a73cef7d9268b32) )
-	ROM_LOAD64_WORD( "065-a12.1h",  0x000004, 0x100000, CRC(321ed07a) SHA1(5b00ed676daeea974bdce6701667cfe573099dad) )
-	ROM_LOAD64_WORD( "065-a11.1l",  0x000006, 0x100000, CRC(46da948e) SHA1(168ac9178ee5bad5931557fb549e1237971d7839) )
-
-	ROM_REGION( 0x200000, "k054539", 0 )    /* samples for the 054539 */
-	ROM_LOAD( "065-a06.1f",  0x000000, 0x200000, CRC(5adbcee0) SHA1(435feda697193bc51db80eba46be474cbbc1de4b) )
-
-	ROM_REGION( 0x80, "eeprom", 0 )
-	ROM_LOAD( "xmen_aaa.nv", 0x0000, 0x0080, CRC(750fd447) SHA1(27884c1ceb0b5174f7d06e1e06bbbd6d6c5b47e7) )
-ROM_END
-
 ROM_START( xmen2pj )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "065-jaa04.10d",  0x00000, 0x20000, CRC(66746339) SHA1(8cc5f5deb4178b0444ffc5974940a30cb003114e) ) /* Japan 2 Player version */
@@ -738,6 +746,33 @@ ROM_START( xmen2pj )
 
 	ROM_REGION( 0x80, "eeprom", 0 )
 	ROM_LOAD( "xmen_jaa.nv", 0x0000, 0x0080, CRC(849a9e19) SHA1(bd335a2d33bf4433de4fd57b8108b216eb3a2cf1) )
+ROM_END
+
+ROM_START( xmen2pa )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "065-aaa04.10d",  0x00000, 0x20000, CRC(7f8b27c2) SHA1(052db1f47671564a440544a41fc397a19d1aff3a) ) /* Asia 2 Player version */
+	ROM_LOAD16_BYTE( "065-aaa05.10f",  0x00001, 0x20000, CRC(841ed636) SHA1(33f96022ce3dae9b49eb51fd4e8f7387a1777002) )
+	ROM_LOAD16_BYTE( "065-a02.9d",     0x80000, 0x40000, CRC(b31dc44c) SHA1(4bdac05826b4d6d4fe46686ede5190e2f73eefc5) )
+	ROM_LOAD16_BYTE( "065-a03.9f",     0x80001, 0x40000, CRC(13842fe6) SHA1(b61f094eb94336edb8708d3437ead9b853b2d6e6) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_LOAD( "065-a01.6f",   0x00000, 0x20000, CRC(147d3a4d) SHA1(a14409fe991e803b9e7812303e3a9ebd857d8b01) )
+
+	ROM_REGION( 0x200000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "065-a08.15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )
+	ROM_LOAD32_WORD( "065-a07.16l", 0x000002, 0x100000, CRC(c5dc8fc4) SHA1(9887cb002c8b72be7ce933cb397f00cdc5506c8c) )
+
+	ROM_REGION( 0x400000, "k053246", 0 )   /* graphics (addressable by the main CPU) */
+	ROM_LOAD64_WORD( "065-a09.2h",  0x000000, 0x100000, CRC(ea05d52f) SHA1(7f2c14f907355856fb94e3a67b73aa1919776835) ) /* sprites */
+	ROM_LOAD64_WORD( "065-a10.2l",  0x000002, 0x100000, CRC(96b91802) SHA1(641943557b59b91f0edd49ec8a73cef7d9268b32) )
+	ROM_LOAD64_WORD( "065-a12.1h",  0x000004, 0x100000, CRC(321ed07a) SHA1(5b00ed676daeea974bdce6701667cfe573099dad) )
+	ROM_LOAD64_WORD( "065-a11.1l",  0x000006, 0x100000, CRC(46da948e) SHA1(168ac9178ee5bad5931557fb549e1237971d7839) )
+
+	ROM_REGION( 0x200000, "k054539", 0 )    /* samples for the 054539 */
+	ROM_LOAD( "065-a06.1f",  0x000000, 0x200000, CRC(5adbcee0) SHA1(435feda697193bc51db80eba46be474cbbc1de4b) )
+
+	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_LOAD( "xmen_aaa.nv", 0x0000, 0x0080, CRC(750fd447) SHA1(27884c1ceb0b5174f7d06e1e06bbbd6d6c5b47e7) )
 ROM_END
 
 /*
@@ -848,19 +883,30 @@ ROM_START( xmen6pu )
 	ROM_LOAD( "xmen_ucb.nv", 0x0000, 0x0080, CRC(f3d0f682) SHA1(b0d4655c651238ae028ffb59a704acba798f93f8) )
 ROM_END
 
-/* Second "version" letter denotes players, A=2 players, B=4 players, C=6 players ??? - For the Asia versions both D & E are 4 players */
+/*
 
-GAME( 1992, xmen,    0,    xmen,   xmen,   xmen_state,  empty_init, ROT0, "Konami", "X-Men (4 Players ver UBB)", MACHINE_SUPPORTS_SAVE )
+Second "version" letter denotes cabinet type:
+
+A = 2 players, 2 coin slots, can set coin/credit by coin slot, COINs common/independent (when independent, premium start & continue values can be set), FREE PLAY option, requires start buttons
+B = 4 players, 4 coin slots, can set premium start & continue value, with or without start buttons
+C = 6 players, 6 coin slots, can set premium start & continue value, no support for START buttons, 2 monitors
+D = 4 players, 4 coin slots, 4 separate service coins, can set premium start & continue value, with or without start buttons
+E = 4 players, 2 coin slots, can set coin/credit by coin slot, FREE PLAY option, requires start buttons
+
+*/
+
+GAME( 1992, xmen,    0,    xmen,   xmen,   xmen_state,  empty_init, ROT0, "Konami", "X-Men (4 Players ver EBA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmenu,   xmen, xmen,   xmen,   xmen_state,  empty_init, ROT0, "Konami", "X-Men (4 Players ver UBB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmenua,  xmen, xmen,   xmen,   xmen_state,  empty_init, ROT0, "Konami", "X-Men (4 Players ver UEB)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, xmenj,   xmen, xmen,   xmen,   xmen_state,  empty_init, ROT0, "Konami", "X-Men (4 Players ver JBA)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, xmenja,  xmen, xmen,   xmen,   xmen_state,  empty_init, ROT0, "Konami", "X-Men (4 Players ver JEA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, xmene,   xmen, xmen,   xmen,   xmen_state,  empty_init, ROT0, "Konami", "X-Men (4 Players ver EBA)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, xmena,   xmen, xmen,   xmen,   xmen_state,  empty_init, ROT0, "Konami", "X-Men (4 Players ver AEA)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, xmenaa,  xmen, xmen,   xmen,   xmen_state,  empty_init, ROT0, "Konami", "X-Men (4 Players ver ADA)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1992, xmen2pe, xmen, xmen,   xmen2p, xmen_state,  empty_init, ROT0, "Konami", "X-Men (2 Players ver EAA)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, xmen2pu, xmen, xmen,   xmen2p, xmen_state,  empty_init, ROT0, "Konami", "X-Men (2 Players ver UAB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, xmen2pa, xmen, xmen,   xmen2p, xmen_state,  empty_init, ROT0, "Konami", "X-Men (2 Players ver AAA)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, xmen2pj, xmen, xmen,   xmen2p, xmen_state,  empty_init, ROT0, "Konami", "X-Men (2 Players ver JAA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmen2pa, xmen, xmen,   xmen2p, xmen_state,  empty_init, ROT0, "Konami", "X-Men (2 Players ver AAA)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1992, xmen6p,  xmen, xmen6p, xmen6p, xmen_state,  empty_init, ROT0, "Konami", "X-Men (6 Players ver ECB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, xmen6pu, xmen, xmen6p, xmen6p, xmen_state,  empty_init, ROT0, "Konami", "X-Men (6 Players ver UCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

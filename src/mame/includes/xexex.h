@@ -62,18 +62,18 @@ private:
 	required_memory_bank m_z80bank;
 
 	/* video-related */
-	int        m_layer_colorbase[4];
-	int        m_sprite_colorbase;
-	int        m_layerpri[4];
-	int        m_cur_alpha;
+	int        m_layer_colorbase[4]{};
+	int        m_sprite_colorbase = 0;
+	int        m_layerpri[4]{};
+	int        m_cur_alpha = 0;
 
 	/* misc */
-	uint16_t     m_cur_control2;
-	int32_t      m_strip_0x1a;
-	int        m_suspension_active;
-	int        m_resume_trigger;
-	emu_timer  *m_dmadelay_timer;
-	int        m_frame;
+	uint16_t     m_cur_control2 = 0;
+	int32_t      m_strip_0x1a = 0;
+	int        m_suspension_active = 0;
+	int        m_resume_trigger = 0;
+	emu_timer  *m_dmadelay_timer = nullptr;
+	int        m_frame = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -91,13 +91,13 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<k054321_device> m_k054321;
 
-	DECLARE_READ16_MEMBER(spriteram_mirror_r);
-	DECLARE_WRITE16_MEMBER(spriteram_mirror_w);
-	DECLARE_READ16_MEMBER(xexex_waitskip_r);
-	DECLARE_READ16_MEMBER(control2_r);
-	DECLARE_WRITE16_MEMBER(control2_w);
-	DECLARE_WRITE16_MEMBER(sound_irq_w);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	uint16_t spriteram_mirror_r(offs_t offset);
+	void spriteram_mirror_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t xexex_waitskip_r();
+	uint16_t control2_r();
+	void control2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_irq_w(uint16_t data);
+	void sound_bankswitch_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

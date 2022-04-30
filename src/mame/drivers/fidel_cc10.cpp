@@ -14,23 +14,27 @@ TODO:
 Fidelity Chess Challenger 10 (CCX)
 -------------------
 3 versions are known to exist: A,B,C. Strangely, version C(UCC10) has an 8080
-instead of Z80 and no beeper, it's on CC1-based hardware.
+instead of Z80 and no beeper, it's on CC1-based hardware (see fidel_cc1.cpp).
 
 Z80A CPU @ 4MHz, NEC D8255C
 4KB ROM(NEC 2332A), 2*256 bytes RAM(4*NEC 2111AL-4)
 The beeper is via a 556 timer, fixed-frequency at around 1300-1400Hz.
 
-Checker Challenger 4 (ACR) is on the same PCB, twice less RAM and the beeper gone.
+Checker Challenger (ACR) is on the same PCB, twice less RAM and the beeper gone.
+In the 1980s, Fidelity started naming it Checker Challenger "4" in some of their
+advertisements, but box and manual still simply name it Checker Challenger.
 
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/bankdev.h"
 #include "machine/i8255.h"
 #include "machine/timer.h"
 #include "sound/beep.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -87,23 +91,18 @@ private:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_WRITE8_MEMBER(ppi_porta_w);
-	DECLARE_WRITE8_MEMBER(ppi_portb_w);
-	DECLARE_READ8_MEMBER(ppi_portc_r);
-	DECLARE_WRITE8_MEMBER(ppi_portc_w);
+	void ppi_porta_w(u8 data);
+	void ppi_portb_w(u8 data);
+	u8 ppi_portc_r();
+	void ppi_portc_w(u8 data);
 
-	u8 m_inp_mux;
-	u8 m_led_select;
-	u8 m_7seg_data;
+	u8 m_inp_mux = 0;
+	u8 m_led_select = 0;
+	u8 m_7seg_data = 0;
 };
 
 void ccx_state::machine_start()
 {
-	// zerofill
-	m_inp_mux = 0;
-	m_led_select = 0;
-	m_7seg_data = 0;
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_select));
@@ -124,7 +123,7 @@ void ccx_state::update_display()
 	m_display->matrix(m_led_select, m_7seg_data);
 }
 
-WRITE8_MEMBER(ccx_state::ppi_porta_w)
+void ccx_state::ppi_porta_w(u8 data)
 {
 	// d7: enable beeper on falling edge (556 monostable) (unpopulated on ACR)
 	if (m_beeper != nullptr && ~data & m_7seg_data & 0x80 && !m_beeper_off->enabled())
@@ -138,7 +137,7 @@ WRITE8_MEMBER(ccx_state::ppi_porta_w)
 	update_display();
 }
 
-WRITE8_MEMBER(ccx_state::ppi_portb_w)
+void ccx_state::ppi_portb_w(u8 data)
 {
 	// d0: lose led, d1: check(win) led
 	// d2-d5: digit select
@@ -146,7 +145,7 @@ WRITE8_MEMBER(ccx_state::ppi_portb_w)
 	update_display();
 }
 
-READ8_MEMBER(ccx_state::ppi_portc_r)
+u8 ccx_state::ppi_portc_r()
 {
 	u8 data = 0;
 
@@ -158,7 +157,7 @@ READ8_MEMBER(ccx_state::ppi_portc_r)
 	return ~data & 0xf;
 }
 
-WRITE8_MEMBER(ccx_state::ppi_portc_w)
+void ccx_state::ppi_portc_w(u8 data)
 {
 	// d4-d7: input mux (inverted)
 	m_inp_mux = ~data >> 4 & 0xf;
@@ -358,7 +357,7 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME     PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1978, cc10,    0,      0, ccx,     ccx,   ccx_state, empty_init, "Fidelity Electronics", "Chess Challenger 10 (model CCX, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1978, cc10a,   cc10,   0, ccx,     ccx,   ccx_state, empty_init, "Fidelity Electronics", "Chess Challenger 10 (model CCX)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka version A
+CONS( 1978, cc10,    0,      0, ccx,     ccx,   ccx_state, empty_init, "Fidelity Electronics", "Chess Challenger \"10\" (model CCX, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1978, cc10a,   cc10,   0, ccx,     ccx,   ccx_state, empty_init, "Fidelity Electronics", "Chess Challenger \"10\" (model CCX)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka version A
 
-CONS( 1978, checkc4, 0,      0, acr,     acr,   ccx_state, empty_init, "Fidelity Electronics", "Checker Challenger 4", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
+CONS( 1978, checkc4, 0,      0, acr,     acr,   ccx_state, empty_init, "Fidelity Electronics", "Checker Challenger (model ACR, 4 levels)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )

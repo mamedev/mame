@@ -9,7 +9,7 @@
 #include "modules/osdmodule.h"
 #include "monitor_module.h"
 
-#if defined(OSD_WINDOWS) || defined(OSD_UWP)
+#if defined(OSD_WINDOWS)
 
 // standard windows headers
 #include <windows.h>
@@ -79,7 +79,6 @@ public:
 		if (!m_initialized)
 			return nullptr;
 
-#if defined(OSD_WINDOWS)
 		RECT p;
 		p.top = rect.top();
 		p.left = rect.left();
@@ -89,13 +88,6 @@ public:
 		auto nearest = monitor_from_handle(reinterpret_cast<std::uintptr_t>(MonitorFromRect(&p, MONITOR_DEFAULTTONEAREST)));
 		assert(nearest != nullptr);
 		return nearest;
-#elif defined(OSD_UWP)
-		if (list().size() == 0)
-			return nullptr;
-
-		// For now just return first monitor
-		return list()[0];
-#endif
 	}
 
 	// Currently this method implementation is duplicated from the win32 module
@@ -105,17 +97,9 @@ public:
 		if (!m_initialized)
 			return nullptr;
 
-#if defined(OSD_WINDOWS)
 		auto nearest = monitor_from_handle(reinterpret_cast<std::uintptr_t>(MonitorFromWindow(static_cast<const win_window_info &>(window).platform_window(), MONITOR_DEFAULTTONEAREST)));
 		assert(nearest != nullptr);
 		return nearest;
-#elif defined(OSD_UWP)
-		if (list().size() == 0)
-			return nullptr;
-
-		// For now just return first monitor
-		return list()[0];
-#endif
 	}
 
 protected:
@@ -166,7 +150,7 @@ protected:
 		{
 			for (const auto &monitor : list())
 			{
-				osd_printf_verbose("Video: Monitor %I64u = \"%s\" %s\n", monitor->oshandle(), monitor->devicename(), monitor->is_primary() ? "(primary)" : "");
+				osd_printf_verbose("Video: Monitor %u = \"%s\" %s\n", monitor->oshandle(), monitor->devicename(), monitor->is_primary() ? "(primary)" : "");
 			}
 		}
 

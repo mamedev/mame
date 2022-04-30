@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="mbc200" description="Sanyo MBC-200/MBC-1200 diskettes">
 
 	<software name="boot">

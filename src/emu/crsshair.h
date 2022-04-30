@@ -5,6 +5,7 @@
     crsshair.h
 
     Crosshair handling.
+
 ***************************************************************************/
 
 #ifndef MAME_EMU_CRSSHAIR_H
@@ -73,6 +74,7 @@ public:
 private:
 	// private helpers
 	void create_bitmap();
+	void update_position();
 
 	// private state
 	running_machine &   m_machine;  // reference to our machine
@@ -116,7 +118,7 @@ private:
 	void exit();
 	void animate(screen_device &device, bool vblank_state);
 
-	void config_load(config_type cfg_type, util::xml::data_node const *parentnode);
+	void config_load(config_type cfg_type, config_level cfg_lvl, util::xml::data_node const *parentnode);
 	void config_save(config_type cfg_type, util::xml::data_node *parentnode);
 
 	// internal state

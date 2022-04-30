@@ -45,13 +45,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(battles_state::nmi_generate)
 }
 
 
-READ8_MEMBER( battles_state::customio0_r )
+uint8_t battles_state::customio0_r()
 {
 	logerror("%s: custom I/O Read = %02x\n", machine().describe_context(), m_customio_command);
 	return m_customio_command;
 }
 
-READ8_MEMBER( battles_state::customio3_r )
+uint8_t battles_state::customio3_r()
 {
 	int return_data;
 
@@ -71,7 +71,7 @@ READ8_MEMBER( battles_state::customio3_r )
 }
 
 
-WRITE8_MEMBER( battles_state::customio0_w )
+void battles_state::customio0_w(uint8_t data)
 {
 	logerror("%s: custom I/O Write = %02x\n", machine().describe_context(), data);
 
@@ -88,7 +88,7 @@ WRITE8_MEMBER( battles_state::customio0_w )
 
 }
 
-WRITE8_MEMBER( battles_state::customio3_w )
+void battles_state::customio3_w(uint8_t data)
 {
 	logerror("%s: custom I/O Write = %02x\n", machine().describe_context(), data);
 
@@ -97,34 +97,34 @@ WRITE8_MEMBER( battles_state::customio3_w )
 
 
 
-READ8_MEMBER( battles_state::customio_data0_r )
+uint8_t battles_state::customio_data0_r(offs_t offset)
 {
 	logerror("%s: custom I/O parameter %02x Read = %02x\n", machine().describe_context(), offset, m_customio_data);
 
 	return m_customio_data;
 }
 
-READ8_MEMBER( battles_state::customio_data3_r )
+uint8_t battles_state::customio_data3_r(offs_t offset)
 {
 	logerror("%s: custom I/O parameter %02x Read = %02x\n", machine().describe_context(), offset, m_customio_data);
 	return m_customio_data;
 }
 
 
-WRITE8_MEMBER( battles_state::customio_data0_w )
+void battles_state::customio_data0_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: custom I/O parameter %02x Write = %02x\n", machine().describe_context(), offset, data);
 	m_customio_data = data;
 }
 
-WRITE8_MEMBER( battles_state::customio_data3_w )
+void battles_state::customio_data3_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: custom I/O parameter %02x Write = %02x\n", machine().describe_context(), offset, data);
 	m_customio_data = data;
 }
 
 
-WRITE8_MEMBER( battles_state::cpu4_coin_w )
+void battles_state::cpu4_coin_w(uint8_t data)
 {
 	m_leds[0] = BIT(data, 1); // Start 1
 	m_leds[1] = BIT(data, 0); // Start 2
@@ -135,7 +135,7 @@ WRITE8_MEMBER( battles_state::cpu4_coin_w )
 }
 
 
-WRITE8_MEMBER( battles_state::noise_sound_w )
+void battles_state::noise_sound_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: 50%02x Write = %02x\n", machine().describe_context(), offset, data);
 	if( (m_sound_played == 0) && (data == 0xFF) ){
@@ -150,15 +150,15 @@ WRITE8_MEMBER( battles_state::noise_sound_w )
 }
 
 
-READ8_MEMBER( battles_state::input_port_r )
+uint8_t battles_state::input_port_r(offs_t offset)
 {
 	switch ( offset )
 	{
 		default:
-		case 0: return ~bitswap<8>(ioport("IN0H")->read(),7,6,5,4,2,3,1,0);
-		case 1: return ~ioport("IN1L")->read();
-		case 2: return ~ioport("IN1H")->read();
-		case 3: return ~ioport("IN0L")->read();
+		case 0: return ~bitswap<8>(ioport("IN1")->read(),2,3,1,0,6,7,5,4);
+		case 1: return ~ioport("IN0")->read() & 15;
+		case 2: return ~ioport("IN0")->read() >> 4;
+		case 3: return ~ioport("IN1")->read() & 15;
 	}
 }
 

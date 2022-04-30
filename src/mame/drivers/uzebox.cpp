@@ -22,7 +22,7 @@
 #include "bus/snes_ctrl/ctrl.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 // overclocked to 8 * NTSC burst frequency
@@ -53,33 +53,32 @@ private:
 	required_device<snes_control_port_device> m_ctrl2;
 	required_device<speaker_sound_device> m_speaker;
 
-	DECLARE_READ8_MEMBER(port_a_r);
-	DECLARE_WRITE8_MEMBER(port_a_w);
-	DECLARE_READ8_MEMBER(port_b_r);
-	DECLARE_WRITE8_MEMBER(port_b_w);
-	DECLARE_READ8_MEMBER(port_c_r);
-	DECLARE_WRITE8_MEMBER(port_c_w);
-	DECLARE_READ8_MEMBER(port_d_r);
-	DECLARE_WRITE8_MEMBER(port_d_w);
+	uint8_t port_a_r();
+	void port_a_w(uint8_t data);
+	uint8_t port_b_r();
+	void port_b_w(uint8_t data);
+	uint8_t port_c_r();
+	void port_c_w(uint8_t data);
+	uint8_t port_d_r();
+	void port_d_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void line_update();
-	uint32_t screen_update_uzebox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
-	void uzebox_data_map(address_map &map);
-	void uzebox_io_map(address_map &map);
-	void uzebox_prg_map(address_map &map);
+	void data_map(address_map &map);
+	void prg_map(address_map &map);
 
-	int             m_vpos;
-	uint64_t          m_line_start_cycles;
-	uint32_t          m_line_pos_cycles;
-	uint8_t           m_port_a;
-	uint8_t           m_port_b;
-	uint8_t           m_port_c;
-	uint8_t           m_port_d;
-	bitmap_rgb32    m_bitmap;
+	int               m_vpos = 0;
+	uint64_t          m_line_start_cycles = 0;
+	uint32_t          m_line_pos_cycles = 0;
+	uint8_t           m_port_a = 0;
+	uint8_t           m_port_b = 0;
+	uint8_t           m_port_c = 0;
+	uint8_t           m_port_d = 0;
+	bitmap_rgb32      m_bitmap;
 };
 
 void uzebox_state::machine_start()
@@ -102,7 +101,7 @@ void uzebox_state::machine_reset()
 }
 
 
-WRITE8_MEMBER(uzebox_state::port_a_w)
+void uzebox_state::port_a_w(uint8_t data)
 {
 	//  xxxx ----   NC
 	//  ---- x---   SNES controller clk
@@ -124,12 +123,12 @@ WRITE8_MEMBER(uzebox_state::port_a_w)
 	m_port_a = (data & 0x0c) | (m_port_a & 0x03);
 }
 
-READ8_MEMBER(uzebox_state::port_a_r)
+uint8_t uzebox_state::port_a_r()
 {
 	return  m_port_a | 0xf0;
 }
 
-WRITE8_MEMBER(uzebox_state::port_b_w)
+void uzebox_state::port_b_w(uint8_t data)
 {
 	//  xxx- ----   SDCard
 	//  ---x ----   AD725 CE
@@ -143,25 +142,25 @@ WRITE8_MEMBER(uzebox_state::port_b_w)
 		{
 			line_update();
 
-			uint32_t cycles = (uint32_t)(m_maincpu->get_elapsed_cycles() - m_line_start_cycles);
+			uint32_t cycles = (uint32_t)(machine().time().as_ticks(MASTER_CLOCK) - m_line_start_cycles);
 			if (cycles < 1000 && m_vpos >= 448)
 				m_vpos = INTERLACED ? ((m_vpos ^ 0x01) & 0x01) : 0;
 			else if (cycles > 1000)
 				m_vpos += 2;
 
-			m_line_start_cycles = m_maincpu->get_elapsed_cycles();
+			m_line_start_cycles = machine().time().as_ticks(MASTER_CLOCK);
 			m_line_pos_cycles = 0;
 		}
 
 	m_port_b = data;
 }
 
-READ8_MEMBER(uzebox_state::port_b_r)
+uint8_t uzebox_state::port_b_r()
 {
 	return m_port_b;
 }
 
-WRITE8_MEMBER(uzebox_state::port_c_w)
+void uzebox_state::port_c_w(uint8_t data)
 {
 	//  xx-- ----   blue
 	//  --xx x---   green
@@ -171,12 +170,12 @@ WRITE8_MEMBER(uzebox_state::port_c_w)
 	m_port_c = data;
 }
 
-READ8_MEMBER(uzebox_state::port_c_r)
+uint8_t uzebox_state::port_c_r()
 {
 	return m_port_c;
 }
 
-WRITE8_MEMBER(uzebox_state::port_d_w)
+void uzebox_state::port_d_w(uint8_t data)
 {
 	//  x--- ----   sound
 	//  -x-- ----   SDCard CS
@@ -191,7 +190,7 @@ WRITE8_MEMBER(uzebox_state::port_d_w)
 	m_port_d = data;
 }
 
-READ8_MEMBER(uzebox_state::port_d_r)
+uint8_t uzebox_state::port_d_r()
 {
 	return m_port_d;
 }
@@ -201,22 +200,14 @@ READ8_MEMBER(uzebox_state::port_d_r)
 * Address maps                                       *
 \****************************************************/
 
-void uzebox_state::uzebox_prg_map(address_map &map)
+void uzebox_state::prg_map(address_map &map)
 {
 	map(0x0000, 0xffff).rom(); // 64 KB internal eprom  ATmega644
 }
 
-void uzebox_state::uzebox_data_map(address_map &map)
+void uzebox_state::data_map(address_map &map)
 {
 	map(0x0100, 0x10ff).ram(); //  4KB RAM
-}
-
-void uzebox_state::uzebox_io_map(address_map &map)
-{
-	map(AVR8_REG_A, AVR8_REG_A).rw(FUNC(uzebox_state::port_a_r), FUNC(uzebox_state::port_a_w));
-	map(AVR8_REG_B, AVR8_REG_B).rw(FUNC(uzebox_state::port_b_r), FUNC(uzebox_state::port_b_w));
-	map(AVR8_REG_C, AVR8_REG_C).rw(FUNC(uzebox_state::port_c_r), FUNC(uzebox_state::port_c_w));
-	map(AVR8_REG_D, AVR8_REG_D).rw(FUNC(uzebox_state::port_d_r), FUNC(uzebox_state::port_d_w));
 }
 
 /****************************************************\
@@ -236,22 +227,22 @@ INPUT_PORTS_END
 
 void uzebox_state::line_update()
 {
-	uint32_t cycles = (uint32_t)(m_maincpu->get_elapsed_cycles() - m_line_start_cycles) / 2;
+	uint32_t cycles = (uint32_t)(machine().time().as_ticks(MASTER_CLOCK) - m_line_start_cycles) / 2;
 	rgb_t color = rgb_t(pal3bit(m_port_c >> 0), pal3bit(m_port_c >> 3), pal2bit(m_port_c >> 6));
 
 	for (uint32_t x = m_line_pos_cycles; x < cycles; x++)
 	{
 		if (m_bitmap.cliprect().contains(x, m_vpos))
-			m_bitmap.pix32(m_vpos, x) = color;
+			m_bitmap.pix(m_vpos, x) = color;
 		if (!INTERLACED)
 			if (m_bitmap.cliprect().contains(x, m_vpos + 1))
-				m_bitmap.pix32(m_vpos + 1, x) = color;
+				m_bitmap.pix(m_vpos + 1, x) = color;
 	}
 
 	m_line_pos_cycles = cycles;
 }
 
-uint32_t uzebox_state::screen_update_uzebox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t uzebox_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
@@ -268,7 +259,7 @@ DEVICE_IMAGE_LOAD_MEMBER(uzebox_state::cart_load)
 		std::vector<uint8_t> data(size);
 		image.fread(&data[0], size);
 
-		if (!strncmp((const char*)&data[0], "UZEBOX", 6))
+		if (image.is_filetype("uze"))
 			memcpy(m_cart->get_rom_base(), &data[0x200], size - 0x200);
 		else
 			memcpy(m_cart->get_rom_base(), &data[0], size);
@@ -288,18 +279,24 @@ void uzebox_state::uzebox(machine_config &config)
 {
 	/* basic machine hardware */
 	ATMEGA644(config, m_maincpu, MASTER_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &uzebox_state::uzebox_prg_map);
-	m_maincpu->set_addrmap(AS_DATA, &uzebox_state::uzebox_data_map);
-	m_maincpu->set_addrmap(AS_IO, &uzebox_state::uzebox_io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &uzebox_state::prg_map);
+	m_maincpu->set_addrmap(AS_DATA, &uzebox_state::data_map);
 	m_maincpu->set_eeprom_tag("eeprom");
-
+	m_maincpu->gpio_in<AVR8_IO_PORTA>().set(FUNC(uzebox_state::port_a_r));
+	m_maincpu->gpio_in<AVR8_IO_PORTB>().set(FUNC(uzebox_state::port_b_r));
+	m_maincpu->gpio_in<AVR8_IO_PORTC>().set(FUNC(uzebox_state::port_c_r));
+	m_maincpu->gpio_in<AVR8_IO_PORTD>().set(FUNC(uzebox_state::port_d_r));
+	m_maincpu->gpio_out<AVR8_IO_PORTA>().set(FUNC(uzebox_state::port_a_w));
+	m_maincpu->gpio_out<AVR8_IO_PORTB>().set(FUNC(uzebox_state::port_b_w));
+	m_maincpu->gpio_out<AVR8_IO_PORTC>().set(FUNC(uzebox_state::port_c_w));
+	m_maincpu->gpio_out<AVR8_IO_PORTD>().set(FUNC(uzebox_state::port_d_w));
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(59.99);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1395));
 	m_screen->set_size(870, 525);
 	m_screen->set_visarea(150, 870-1, 40, 488-1);
-	m_screen->set_screen_update(FUNC(uzebox_state::screen_update_uzebox));
+	m_screen->set_screen_update(FUNC(uzebox_state::screen_update));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

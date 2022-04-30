@@ -18,8 +18,8 @@ public:
 	// construction/destruction
 	isa8_eistwib_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(twib_r);
-	DECLARE_WRITE8_MEMBER(twib_w);
+	uint8_t twib_r(offs_t offset);
+	void twib_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
@@ -27,7 +27,7 @@ protected:
 	virtual void device_reset() override;
 
 	// devices
-	required_device<i8274_new_device> m_uart8274;
+	required_device<i8274_device> m_uart8274;
 	required_device<sdlc_logger_device> m_sdlclogger;
 
 	// optional information overrides

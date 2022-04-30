@@ -136,12 +136,12 @@ cpu #0 (PC=00001A1A): unmapped memory word write to 00090030 = 00F7 & 00FF
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "sound/ymopl.h"
 #include "speaker.h"
 
 
-WRITE16_MEMBER(spbactn_state::main_irq_ack_w)
+void spbactn_state::main_irq_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
 }
@@ -214,10 +214,7 @@ void spbactn_state::spbactnp_map(address_map &map)
 	map(0x90124, 0x90125).w(FUNC(spbactn_state::spbatnp_90124_w)); // bg scroll
 	map(0x9012c, 0x9012d).w(FUNC(spbactn_state::spbatnp_9012c_w)); // bg scroll
 
-
-
 	map(0x90000, 0x900ff).r(FUNC(spbactn_state::temp_read_handler_r)); // temp
-
 }
 
 void spbactn_state::spbactn_sound_map(address_map &map)
@@ -384,24 +381,12 @@ static const gfx_layout proto_fgtilelayout =
 
 
 
-static const gfx_layout proto_spr_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
-
 static GFXDECODE_START( gfx_spbactnp )
 	GFXDECODE_ENTRY( "gfx1", 0, proto_fgtilelayout,   0x0200, 16 + 240 )
 	GFXDECODE_ENTRY( "gfx2", 0, proto_fgtilelayout,   0x0300, 16 + 128 ) // wrong
-	GFXDECODE_ENTRY( "gfx3", 0, proto_spr_layout,   0x0000, 16 + 384 )
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_packed_msb, 0x0000, 16 + 384 )
 
-	GFXDECODE_ENTRY( "gfx4", 0, proto_spr_layout,   0x0000, 16 + 384 ) // more sprites maybe?
+	GFXDECODE_ENTRY( "gfx4", 0, gfx_8x8x4_packed_msb, 0x0000, 16 + 384 ) // more sprites maybe?
 
 GFXDECODE_END
 

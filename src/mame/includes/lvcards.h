@@ -28,8 +28,8 @@ public:
 protected:
 	virtual void video_start() override;
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
 
 	required_device<cpu_device> m_maincpu;
 
@@ -38,7 +38,7 @@ private:
 	required_shared_ptr<uint8_t> m_colorram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void lvcards_palette(palette_device &palette) const;
 	uint32_t screen_update_lvcards(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -61,16 +61,16 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(control_port_2_w);
-	DECLARE_WRITE8_MEMBER(control_port_2a_w);
-	DECLARE_READ8_MEMBER(payout_r);
+	void control_port_2_w(uint8_t data);
+	void control_port_2a_w(uint8_t data);
+	uint8_t payout_r();
 
 	void lvpoker_map(address_map &map);
 	void ponttehk_map(address_map &map);
 
-	uint8_t m_payout;
-	uint8_t m_pulse;
-	uint8_t m_result;
+	uint8_t m_payout = 0U;
+	uint8_t m_pulse = 0U;
+	uint8_t m_result = 0U;
 };
 
 #endif // MAME_INCLUDES_LVCARDS_H

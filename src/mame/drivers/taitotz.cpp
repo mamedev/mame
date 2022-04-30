@@ -175,9 +175,10 @@ Notes:
 #include "bus/ata/ataintf.h"
 #include "bus/ata/idehd.h"
 #include "cpu/powerpc/ppc.h"
-#include "cpu/tlcs900/tlcs900.h"
+#include "cpu/tlcs900/tmp95c063.h"
 #include "machine/nvram.h"
 #include "video/poly.h"
+#include "screen.h"
 
 /*
     Interesting mem areas
@@ -213,6 +214,7 @@ Notes:
         0x7004:            0x4003d554()
         0x7005:            0x4003d168()
         0x8000:            ?                                        Used by vibration (force feedback?) on pwrshovl
+        0x9100:            ?                                        Dendego3 speedometer and brake meter. io_shared[0x1c3c] = speed, io_shared[0x1c3e] = brake
         0xa000:            ?                                        Used by vibration (force feedback?) on pwrshovl
         0xf000:            0x4002f328() TLCS_Init
         0xf010:            0x4002f074()                             Enables TLCS watchdog timer
@@ -506,6 +508,9 @@ Notes:
     0x10000105:
 */
 
+
+namespace {
+
 #define LOG_PPC_TO_TLCS_COMMANDS        1
 #define LOG_TLCS_TO_PPC_COMMANDS        1
 
@@ -545,7 +550,9 @@ public:
 		m_iocpu(*this, "iocpu"),
 		m_work_ram(*this, "work_ram"),
 		m_mbox_ram(*this, "mbox_ram"),
-		m_ata(*this, "ata")
+		m_ata(*this, "ata"),
+		m_scr_base(0),
+		m_hdd_serial_number(nullptr)
 	{
 	}
 
@@ -556,6 +563,7 @@ public:
 	void init_batlgr2();
 	void init_pwrshovl();
 	void init_batlgear();
+	void init_dendego3();
 	void init_landhigh();
 	void init_landhigha();
 	void init_raizpin();
@@ -564,6 +572,11 @@ public:
 
 	required_device<screen_device> m_screen;
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	required_device<ppc_device> m_maincpu;
 	required_device<tmp95c063_device> m_iocpu;
@@ -571,50 +584,47 @@ private:
 	required_shared_ptr<uint16_t> m_mbox_ram;
 	required_device<ata_interface_device> m_ata;
 
-	DECLARE_READ64_MEMBER(ppc_common_r);
-	DECLARE_WRITE64_MEMBER(ppc_common_w);
-	DECLARE_READ64_MEMBER(ieee1394_r);
-	DECLARE_WRITE64_MEMBER(ieee1394_w);
-	DECLARE_READ64_MEMBER(video_chip_r);
-	DECLARE_WRITE64_MEMBER(video_chip_w);
-	DECLARE_READ64_MEMBER(video_fifo_r);
-	DECLARE_WRITE64_MEMBER(video_fifo_w);
+	uint64_t ppc_common_r(offs_t offset, uint64_t mem_mask = ~0);
+	void ppc_common_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t ieee1394_r(offs_t offset, uint64_t mem_mask = ~0);
+	void ieee1394_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t video_chip_r(offs_t offset, uint64_t mem_mask = ~0);
+	void video_chip_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t video_fifo_r(offs_t offset, uint64_t mem_mask = ~0);
+	void video_fifo_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 
 	std::unique_ptr<uint32_t[]> m_screen_ram;
 	std::unique_ptr<uint32_t[]> m_frame_ram;
 	std::unique_ptr<uint32_t[]> m_texture_ram;
-	uint32_t m_video_unk_reg[0x10];
+	uint32_t m_video_unk_reg[0x10]{};
 
-	uint32_t m_video_fifo_ptr;
-	uint32_t m_video_ram_ptr;
-	uint32_t m_video_reg;
-	uint32_t m_scr_base;
+	uint32_t m_video_fifo_ptr = 0;
+	uint32_t m_video_ram_ptr = 0;
+	uint32_t m_video_reg = 0;
+	uint32_t m_scr_base = 0;
 
-	//uint64_t m_video_fifo_mem[4];
+	//uint64_t m_video_fifo_mem[4]{};
 
-	uint16_t m_io_share_ram[0x2000];
+	uint16_t m_io_share_ram[0x2000]{};
 
-	const char *m_hdd_serial_number;
+	const char *m_hdd_serial_number = nullptr;
 
-	DECLARE_READ8_MEMBER(tlcs_common_r);
-	DECLARE_WRITE8_MEMBER(tlcs_common_w);
-	DECLARE_READ8_MEMBER(tlcs_rtc_r);
-	DECLARE_WRITE8_MEMBER(tlcs_rtc_w);
+	uint8_t tlcs_common_r(offs_t offset);
+	void tlcs_common_w(offs_t offset, uint8_t data);
+	uint8_t tlcs_rtc_r(offs_t offset);
+	void tlcs_rtc_w(offs_t offset, uint8_t data);
 
-	uint8_t m_rtcdata[8];
+	uint8_t m_rtcdata[8]{};
 
 
-	uint32_t m_reg105;
+	uint32_t m_reg105 = 0;
 
 	std::unique_ptr<taitotz_renderer> m_renderer;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update_taitotz(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(taitotz_vbi);
-	DECLARE_READ16_MEMBER(tlcs_ide0_r);
-	DECLARE_READ16_MEMBER(tlcs_ide1_r);
+	uint16_t tlcs_ide0_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t tlcs_ide1_r(offs_t offset, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	void draw_tile(uint32_t pos, uint32_t tile);
 	uint32_t video_mem_r(uint32_t address);
@@ -629,11 +639,11 @@ private:
 	void tlcs900h_mem(address_map &map);
 };
 
-class taitotz_renderer : public poly_manager<float, taitotz_polydata, 6, 50000>
+class taitotz_renderer : public poly_manager<float, taitotz_polydata, 6>
 {
 public:
 	taitotz_renderer(taitotz_state &state, int width, int height, uint32_t *scrram, uint32_t *texram)
-		: poly_manager<float, taitotz_polydata, 6, 50000>(state.machine()),
+		: poly_manager<float, taitotz_polydata, 6>(state.machine()),
 			m_state(state)
 	{
 		m_fb = std::make_unique<bitmap_rgb32>(width, height);
@@ -682,47 +692,47 @@ private:
 	taitotz_state &m_state;
 	std::unique_ptr<bitmap_rgb32> m_fb;
 	std::unique_ptr<bitmap_ind32> m_zbuffer;
-	uint32_t *m_texture;
-	uint32_t *m_screen_ram;
+	uint32_t *m_texture = nullptr;
+	uint32_t *m_screen_ram = nullptr;
 
 	rectangle m_cliprect;
 
-	PLANE m_clip_plane[6];
-	float m_matrix[4][3];
+	PLANE m_clip_plane[6]{};
+	float m_matrix[4][3]{};
 
-	float m_diffuse_intensity;
-	float m_ambient_intensity;
-	float m_specular_intensity;
-	float m_specular_power;
+	float m_diffuse_intensity = 0;
+	float m_ambient_intensity = 0;
+	float m_specular_intensity = 0;
+	float m_specular_power = 0;
 
-	int m_ambient_r;
-	int m_ambient_g;
-	int m_ambient_b;
-	int m_diffuse_r;
-	int m_diffuse_g;
-	int m_diffuse_b;
-	int m_specular_r;
-	int m_specular_g;
-	int m_specular_b;
+	int m_ambient_r = 0;
+	int m_ambient_g = 0;
+	int m_ambient_b = 0;
+	int m_diffuse_r = 0;
+	int m_diffuse_g = 0;
+	int m_diffuse_b = 0;
+	int m_specular_r = 0;
+	int m_specular_g = 0;
+	int m_specular_b = 0;
 
-	float m_vp_center_x;
-	float m_vp_center_y;
-	float m_vp_focus;
-	float m_vp_x;
-	float m_vp_y;
-	float m_vp_mul;
+	float m_vp_center_x = 0;
+	float m_vp_center_y = 0;
+	float m_vp_focus = 0;
+	float m_vp_x = 0;
+	float m_vp_y = 0;
+	float m_vp_mul = 0;
 
-	uint32_t m_reg_100;
-	uint32_t m_reg_101;
-	uint32_t m_reg_102;
+	uint32_t m_reg_100 = 0;
+	uint32_t m_reg_101 = 0;
+	uint32_t m_reg_102 = 0;
 
-	uint32_t m_reg_10000100;
-	uint32_t m_reg_10000101;
+	uint32_t m_reg_10000100 = 0;
+	uint32_t m_reg_10000101 = 0;
 
-	uint32_t m_tnl_fifo[64];
-	uint32_t m_direct_fifo[64];
-	int m_tnl_fifo_ptr;
-	int m_direct_fifo_ptr;
+	uint32_t m_tnl_fifo[64]{};
+	uint32_t m_direct_fifo[64]{};
+	int m_tnl_fifo_ptr = 0;
+	int m_direct_fifo_ptr = 0;
 };
 
 
@@ -780,6 +790,8 @@ void taitotz_state::video_start()
 	m_renderer = std::make_unique<taitotz_renderer>(*this, width, height, m_screen_ram.get(), m_texture_ram.get());
 
 	//machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&taitotz_exit, &machine()));
+
+	m_video_reg = 0;
 }
 
 static const float dot3_tex_table[32] =
@@ -844,12 +856,12 @@ static inline uint32_t generate_texel_address(int iu, int iv)
 
 void taitotz_renderer::draw_scanline_noz(int32_t scanline, const extent_t &extent, const taitotz_polydata &extradata, int threadid)
 {
-	uint32_t *fb = &m_fb->pix32(scanline);
+	uint32_t *const fb = &m_fb->pix(scanline);
 
 	float u = extent.param[POLY_U].start;
 	float v = extent.param[POLY_V].start;
-	float du = extent.param[POLY_U].dpdx;
-	float dv = extent.param[POLY_V].dpdx;
+	float const du = extent.param[POLY_U].dpdx;
+	float const dv = extent.param[POLY_V].dpdx;
 
 	uint32_t *texram = &m_texture[extradata.texture * 0x1000];
 
@@ -878,24 +890,24 @@ void taitotz_renderer::draw_scanline_noz(int32_t scanline, const extent_t &exten
 
 void taitotz_renderer::draw_scanline(int32_t scanline, const extent_t &extent, const taitotz_polydata &extradata, int threadid)
 {
-	uint32_t *fb = &m_fb->pix32(scanline);
-	float *zb = (float*)&m_zbuffer->pix32(scanline);
+	uint32_t *const fb = &m_fb->pix(scanline);
+	float *const zb = (float*)&m_zbuffer->pix(scanline);
 
 	float ooz = extent.param[POLY_Z].start;
 	float uoz = extent.param[POLY_U].start;
 	float voz = extent.param[POLY_V].start;
-	float dooz = extent.param[POLY_Z].dpdx;
-	float duoz = extent.param[POLY_U].dpdx;
-	float dvoz = extent.param[POLY_V].dpdx;
+	const float dooz = extent.param[POLY_Z].dpdx;
+	const float duoz = extent.param[POLY_U].dpdx;
+	const float dvoz = extent.param[POLY_V].dpdx;
 
 	float nx= extent.param[POLY_NX].start;
 	float dnx = extent.param[POLY_NX].dpdx;
 	float ny = extent.param[POLY_NY].start;
-	float dny = extent.param[POLY_NY].dpdx;
+	const float dny = extent.param[POLY_NY].dpdx;
 	float nz = extent.param[POLY_NZ].start;
-	float dnz = extent.param[POLY_NZ].dpdx;
+	const float dnz = extent.param[POLY_NZ].dpdx;
 
-	uint32_t *texram = &m_texture[extradata.texture * 0x1000];
+	uint32_t *const texram = &m_texture[extradata.texture * 0x1000];
 	uint32_t alpha = extradata.alpha & 0x1f;
 	uint32_t alpha_enable = extradata.alpha & 0x80;
 
@@ -1244,7 +1256,7 @@ void taitotz_renderer::render_tnl_object(uint32_t address, float scale, uint8_t 
 	int index = 0;
 	do
 	{
-		taitotz_polydata &extra = object_data_alloc();
+		taitotz_polydata &extra = object_data().next();
 
 		int num_verts;
 
@@ -1333,7 +1345,7 @@ void taitotz_renderer::render_tnl_object(uint32_t address, float scale, uint8_t 
 
 		for (int i=2; i < num_verts; i++)
 		{
-			render_triangle(m_cliprect, render_delegate(&taitotz_renderer::draw_scanline, this), 6, v[0], v[i-1], v[i]);
+			render_triangle<6>(m_cliprect, render_delegate(&taitotz_renderer::draw_scanline, this), v[0], v[i-1], v[i]);
 		}
 	}
 	while (!end);
@@ -1405,7 +1417,7 @@ void taitotz_renderer::push_direct_poly_fifo(uint32_t data)
 	if (m_direct_fifo_ptr >= expected_size)
 	{
 		vertex_t v[8];
-		taitotz_polydata &extra = object_data_alloc();
+		taitotz_polydata &extra = object_data().next();
 
 		int index = 4;
 		for (int i=0; i < num_verts; i++)
@@ -1423,7 +1435,7 @@ void taitotz_renderer::push_direct_poly_fifo(uint32_t data)
 
 		for (int i=2; i < num_verts; i++)
 		{
-			render_triangle(m_cliprect, render_delegate(&taitotz_renderer::draw_scanline_noz, this), 3, v[0], v[i-1], v[i]);
+			render_triangle<3>(m_cliprect, render_delegate(&taitotz_renderer::draw_scanline_noz, this), v[0], v[i-1], v[i]);
 		}
 
 		m_direct_fifo_ptr = 0;
@@ -1434,11 +1446,11 @@ uint32_t taitotz_state::screen_update_taitotz(screen_device &screen, bitmap_rgb3
 {
 	m_renderer->draw(bitmap, cliprect);
 
-	uint16_t *screen_src = (uint16_t*)&m_screen_ram[m_scr_base];
+	uint16_t const *screen_src = (uint16_t*)&m_screen_ram[m_scr_base];
 
 	for (int j=0; j < 384; j++)
 	{
-		uint32_t *fb = &bitmap.pix32(j);
+		uint32_t *const fb = &bitmap.pix(j);
 		for (int i=0; i < 512; i++)
 		{
 			uint16_t p = *screen_src++;
@@ -1648,7 +1660,7 @@ void taitotz_state::video_reg_w(uint32_t reg, uint32_t data)
 	}
 }
 
-READ64_MEMBER(taitotz_state::video_chip_r)
+uint64_t taitotz_state::video_chip_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t r = 0;
 	uint32_t reg = offset * 8;
@@ -1697,7 +1709,7 @@ READ64_MEMBER(taitotz_state::video_chip_r)
 	return r;
 }
 
-WRITE64_MEMBER(taitotz_state::video_chip_w)
+void taitotz_state::video_chip_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	uint32_t reg = offset * 8;
 	uint32_t regdata;
@@ -1772,7 +1784,7 @@ WRITE64_MEMBER(taitotz_state::video_chip_w)
 	}
 }
 
-READ64_MEMBER(taitotz_state::video_fifo_r)
+uint64_t taitotz_state::video_fifo_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t r = 0;
 	if (ACCESSING_BITS_32_63)
@@ -1789,7 +1801,7 @@ READ64_MEMBER(taitotz_state::video_fifo_r)
 	return r;
 }
 
-WRITE64_MEMBER(taitotz_state::video_fifo_w)
+void taitotz_state::video_fifo_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	int command = (m_video_reg >> 28) & 0xf;
 	if (command == 0xb)
@@ -1882,7 +1894,7 @@ WRITE64_MEMBER(taitotz_state::video_fifo_w)
 	//COMBINE_DATA(m_video_fifo_mem + offset);
 }
 
-READ64_MEMBER(taitotz_state::ieee1394_r)
+uint64_t taitotz_state::ieee1394_r(offs_t offset, uint64_t mem_mask)
 {
 	if (offset == 4)
 	{
@@ -1893,7 +1905,7 @@ READ64_MEMBER(taitotz_state::ieee1394_r)
 	return 0;
 }
 
-WRITE64_MEMBER(taitotz_state::ieee1394_w)
+void taitotz_state::ieee1394_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	//logerror("ieee1394_w: %08X, %08X%08X, %08X%08X\n", offset, (uint32_t)(data >> 32), (uint32_t)(data), (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask));
 	if (ACCESSING_BITS_32_63)
@@ -1904,7 +1916,7 @@ WRITE64_MEMBER(taitotz_state::ieee1394_w)
 	}
 }
 
-READ64_MEMBER(taitotz_state::ppc_common_r)
+uint64_t taitotz_state::ppc_common_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t res = 0;
 
@@ -1920,7 +1932,7 @@ READ64_MEMBER(taitotz_state::ppc_common_r)
 	return res;
 }
 
-WRITE64_MEMBER(taitotz_state::ppc_common_w)
+void taitotz_state::ppc_common_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_0_15)
 	{
@@ -2015,7 +2027,7 @@ WRITE64_MEMBER(taitotz_state::ppc_common_w)
 				m_io_share_ram[0xfff] == 0x6000 || m_io_share_ram[0xfff] == 0x6010)
 			{
 				//m_maincpu->spin_until_trigger(PPC_TLCS_COMM_TRIGGER);
-				m_maincpu->spin_until_interrupt();
+				//m_maincpu->spin_until_interrupt();
 			}
 
 			// pwrshovl sometimes writes commands during command handling... make sure that doesn't happen
@@ -2080,7 +2092,7 @@ void taitotz_state::ppc603e_mem(address_map &map)
 
 
 
-READ8_MEMBER(taitotz_state::tlcs_common_r)
+uint8_t taitotz_state::tlcs_common_r(offs_t offset)
 {
 	if (offset & 1)
 	{
@@ -2092,7 +2104,7 @@ READ8_MEMBER(taitotz_state::tlcs_common_r)
 	}
 }
 
-WRITE8_MEMBER(taitotz_state::tlcs_common_w)
+void taitotz_state::tlcs_common_w(offs_t offset, uint8_t data)
 {
 	if (offset & 1)
 	{
@@ -2139,8 +2151,8 @@ WRITE8_MEMBER(taitotz_state::tlcs_common_w)
 	}
 }
 
-// RTC could be Epson RTC-64613, same as taitopjc.c
-READ8_MEMBER(taitotz_state::tlcs_rtc_r)
+// RTC could be Epson RTC-64613, same as taitopjc.cpp
+uint8_t taitotz_state::tlcs_rtc_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -2164,7 +2176,7 @@ READ8_MEMBER(taitotz_state::tlcs_rtc_r)
 	return 0;
 }
 
-WRITE8_MEMBER(taitotz_state::tlcs_rtc_w)
+void taitotz_state::tlcs_rtc_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -2185,18 +2197,18 @@ WRITE8_MEMBER(taitotz_state::tlcs_rtc_w)
 	}
 }
 
-READ16_MEMBER(taitotz_state::tlcs_ide0_r)
+uint16_t taitotz_state::tlcs_ide0_r(offs_t offset, uint16_t mem_mask)
 {
-	uint16_t d = m_ata->read_cs0(offset, mem_mask);
+	uint16_t d = m_ata->cs0_r(offset, mem_mask);
 	if (offset == 7)
 		d &= ~0x2;      // Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up...
 						// The status check explicitly checks for 0x50 (drive ready, seek complete).
 	return d;
 }
 
-READ16_MEMBER(taitotz_state::tlcs_ide1_r)
+uint16_t taitotz_state::tlcs_ide1_r(offs_t offset, uint16_t mem_mask)
 {
-	uint16_t d = m_ata->read_cs1(offset, mem_mask);
+	uint16_t d = m_ata->cs1_r(offset, mem_mask);
 	if (offset == 6)
 		d &= ~0x2;      // Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up...
 						// The status check explicitly checks for 0x50 (drive ready, seek complete).
@@ -2536,6 +2548,56 @@ static INPUT_PORTS_START( styphp )
 	PORT_START("ANALOG8")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(dendego3)
+	PORT_START("INPUTS1")
+	PORT_BIT(0x00000001, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_SERVICE_NO_TOGGLE(0x00000002, IP_ACTIVE_LOW) /* Test Button */
+	PORT_BIT(0x00000004, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000008, IP_ACTIVE_LOW, IPT_SERVICE) PORT_NAME("Service") PORT_CODE(KEYCODE_7)
+	PORT_BIT(0x00000010, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000020, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000040, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000080, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("INPUTS2")
+	PORT_BIT(0x00000001, IP_ACTIVE_LOW, IPT_COIN1)                                    // Coin
+	PORT_BIT(0x00000002, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000004, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000008, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000010, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000020, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000040, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000080, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("INPUTS3")
+	PORT_BIT(0x00000001, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000002, IP_ACTIVE_LOW, IPT_START1)                                   // Start
+	PORT_BIT(0x00000004, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000008, IP_ACTIVE_LOW, IPT_BUTTON7)                                  // Train Horn
+	PORT_BIT(0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1)                                  // "NOCH0"
+	PORT_BIT(0x000000e0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("INPUTS4")
+	PORT_BIT(0x00000001, IP_ACTIVE_LOW, IPT_BUTTON3)                                  // "NOCH2"
+	PORT_BIT(0x00000002, IP_ACTIVE_LOW, IPT_BUTTON5)                                  // "NOCH4"
+	PORT_BIT(0x00000004, IP_ACTIVE_LOW, IPT_BUTTON2)                                  // "NOCH1"
+	PORT_BIT(0x00000008, IP_ACTIVE_LOW, IPT_BUTTON4)                                  // "NOCH3"
+	PORT_BIT(0x00000010, IP_ACTIVE_LOW, IPT_BUTTON6)                                  // "NOCH5"
+	PORT_BIT(0x00000020, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000040, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x00000080, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("ANALOG1")
+	PORT_BIT(0x3ff, 0x000, IPT_PADDLE) PORT_MINMAX(0x000, 0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_CENTERDELTA(0) PORT_NAME("Brake Lever")
+	PORT_START("ANALOG2")
+	PORT_START("ANALOG3")
+	PORT_START("ANALOG4")
+	PORT_START("ANALOG5")
+	PORT_START("ANALOG6")
+	PORT_START("ANALOG7")
+	PORT_START("ANALOG8")
+INPUT_PORTS_END
+
 void taitotz_state::machine_reset()
 {
 	if (m_hdd_serial_number != nullptr)
@@ -2659,6 +2721,15 @@ static const char RAIZPINJ_HDD_SERIAL[] =           // "824915745143        "
 
 static const char STYPHP_HDD_SERIAL[] =             // "            05872160"
 	{ 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x30, 0x35, 0x38, 0x37, 0x32, 0x31, 0x36, 0x30 };
+
+void taitotz_state::init_dendego3()
+{
+	init_taitotz_152();
+
+	m_hdd_serial_number = nullptr; // serial is in the CHD metadata
+
+	m_scr_base = 0x1e0000;
+}
 
 void taitotz_state::init_landhigh()
 {
@@ -2961,6 +3032,30 @@ ROM_START( styphp )
 	DISK_IMAGE( "styphp", 0, SHA1(c232d3460e37523346132544b8e23a5f9b447150) )
 ROM_END
 
+ROM_START( dendego3 )
+	ROM_REGION64_BE( 0x100000, "user1", 0 )
+	TAITOTZ_BIOS_V152
+
+	ROM_REGION16_LE( 0x40000, "io_cpu", 0 )
+	ROM_LOAD16_BYTE( "e85-01.ic14", 0x000000, 0x020000, CRC(e16eba2a) SHA1(bd45117bb39cb98d93cdeb17dc72815e6000196b) )
+	ROM_LOAD16_BYTE( "e85-02.ic15", 0x000001, 0x020000, CRC(aa44e992) SHA1(9d176c150c18b085e2c2058507a34151214c1a02) )
+
+	ROM_REGION( 0x10000, "sound_cpu", 0 ) // Internal ROM
+	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
+
+	ROM_REGION16_LE( 0x20000, "io_cpu2", 0 ) // another TMP95C063F, not hooked up yet
+	ROM_LOAD( "e85-03.ic2", 0x000000, 0x020000, CRC(47712427) SHA1(69756f0331ae0a47214d430bc8942937878ddee4) ) // located on the I/O PCB
+
+	ROM_REGION( 0x20000, "oki1", 0 )
+	ROM_LOAD( "e74-07.ic6", 0x000000, 0x020000, CRC(ca5baccc) SHA1(4594b7a6232b912d698fff053f7e3f51d8e1bfb6) ) // located on the I/O PCB
+
+	DISK_REGION( "ata:0:hdd:image" ) // Fujitsu MPF3102AT
+	DISK_IMAGE( "ddg3", 0, SHA1(468d699e02ef0a0242de4e7038613cc5d0545591) )
+ROM_END
+
+} // Anonymous namespace
+
+
 GAME( 1999, taitotz,   0,        taitotz,  taitotz,  taitotz_state, empty_init,    ROT0, "Taito", "Type Zero BIOS", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )
 GAME( 1998, batlgear,  taitotz,  taitotz,  batlgr2,  taitotz_state, init_batlgear, ROT0, "Taito", "Battle Gear (Ver 2.40 A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_LAN )
 GAME( 1999, landhigh,  taitotz,  landhigh, landhigh, taitotz_state, init_landhigh, ROT0, "Taito", "Landing High Japan (Ver 2.01 OK)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
@@ -2969,6 +3064,7 @@ GAME( 1999, pwrshovl,  taitotz,  taitotz,  pwrshovl, taitotz_state, init_pwrshov
 GAME( 1999, pwrshovla, pwrshovl, taitotz,  pwrshovl, taitotz_state, init_pwrshovl, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator (v2.07J, alt)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // seem to be some differences in drive content, but identifies as the same revision, is it just user data changes??
 GAME( 2000, batlgr2,   taitotz,  taitotz,  batlgr2,  taitotz_state, init_batlgr2,  ROT0, "Taito", "Battle Gear 2 (v2.04J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_LAN )
 GAME( 2000, batlgr2a,  batlgr2,  taitotz,  batlgr2,  taitotz_state, init_batlgr2a, ROT0, "Taito", "Battle Gear 2 (v2.01J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 2000, dendego3,  taitotz,  taitotz,  dendego3, taitotz_state, init_dendego3, ROT0, "Taito", "Densha de GO 3! Tsukin-hen (V2.03J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 2001/01/27 09:52:56
 GAME( 2000, styphp,    taitotz,  taitotz,  styphp,   taitotz_state, init_styphp,   ROT0, "Taito", "Stunt Typhoon Plus (Ver 2.04 J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2002, raizpin,   taitotz,  taitotz,  taitotz,  taitotz_state, init_raizpin,  ROT0, "Taito", "Raizin Ping Pong (V2.01O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2002, raizpinj,  raizpin,  taitotz,  taitotz,  taitotz_state, init_raizpinj, ROT0, "Taito", "Raizin Ping Pong (V2.01J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

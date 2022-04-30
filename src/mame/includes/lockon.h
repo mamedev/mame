@@ -70,34 +70,34 @@ private:
 	required_shared_ptr<uint16_t> m_object_ram;
 
 	/* video-related */
-	tilemap_t       *m_tilemap;
-	uint8_t           m_ground_ctrl;
-	uint16_t          m_scroll_h;
-	uint16_t          m_scroll_v;
-	std::unique_ptr<bitmap_ind16> m_front_buffer;
-	std::unique_ptr<bitmap_ind16> m_back_buffer;
-	emu_timer       *m_bufend_timer;
-	emu_timer       *m_cursor_timer;
+	tilemap_t       *m_tilemap = nullptr;
+	uint8_t           m_ground_ctrl = 0U;
+	uint16_t          m_scroll_h = 0U;
+	uint16_t          m_scroll_v = 0U;
+	std::unique_ptr<bitmap_ind16> m_front_buffer{};
+	std::unique_ptr<bitmap_ind16> m_back_buffer{};
+	emu_timer       *m_bufend_timer = nullptr;
+	emu_timer       *m_cursor_timer = nullptr;
 
 	/* Rotation Control */
-	uint16_t      m_xsal;
-	uint16_t      m_x0ll;
-	uint16_t      m_dx0ll;
-	uint16_t      m_dxll;
-	uint16_t      m_ysal;
-	uint16_t      m_y0ll;
-	uint16_t      m_dy0ll;
-	uint16_t      m_dyll;
+	uint16_t      m_xsal = 0U;
+	uint16_t      m_x0ll = 0U;
+	uint16_t      m_dx0ll = 0U;
+	uint16_t      m_dxll = 0U;
+	uint16_t      m_ysal = 0U;
+	uint16_t      m_y0ll = 0U;
+	uint16_t      m_dy0ll = 0U;
+	uint16_t      m_dyll = 0U;
 
 	/* Object palette RAM control */
-	uint32_t      m_iden;
-	std::unique_ptr<uint8_t[]>       m_obj_pal_ram;
-	uint32_t      m_obj_pal_latch;
-	uint32_t      m_obj_pal_addr;
+	uint32_t      m_iden = 0U;
+	std::unique_ptr<uint8_t[]>       m_obj_pal_ram{};
+	uint32_t      m_obj_pal_latch = 0U;
+	uint32_t      m_obj_pal_addr = 0U;
 
 	/* misc */
-	uint8_t       m_ctrl_reg;
-	uint32_t      m_main_inten;
+	uint8_t       m_ctrl_reg = 0U;
+	uint32_t      m_main_inten = 0U;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -116,29 +116,29 @@ private:
 	required_device<palette_device> m_palette;
 	output_finder<> m_lamp;
 
-	DECLARE_READ16_MEMBER(lockon_crtc_r);
-	DECLARE_WRITE16_MEMBER(lockon_crtc_w);
-	DECLARE_WRITE16_MEMBER(lockon_char_w);
-	DECLARE_WRITE16_MEMBER(lockon_scene_h_scr_w);
-	DECLARE_WRITE16_MEMBER(lockon_scene_v_scr_w);
-	DECLARE_WRITE16_MEMBER(lockon_ground_ctrl_w);
-	DECLARE_WRITE16_MEMBER(lockon_tza112_w);
-	DECLARE_READ16_MEMBER(lockon_obj_4000_r);
-	DECLARE_WRITE16_MEMBER(lockon_obj_4000_w);
-	DECLARE_WRITE16_MEMBER(lockon_fb_clut_w);
-	DECLARE_WRITE16_MEMBER(lockon_rotate_w);
-	DECLARE_WRITE16_MEMBER(adrst_w);
-	DECLARE_READ16_MEMBER(main_gnd_r);
-	DECLARE_WRITE16_MEMBER(main_gnd_w);
-	DECLARE_READ16_MEMBER(main_obj_r);
-	DECLARE_WRITE16_MEMBER(main_obj_w);
-	DECLARE_WRITE16_MEMBER(tst_w);
-	DECLARE_READ16_MEMBER(main_z80_r);
-	DECLARE_WRITE16_MEMBER(main_z80_w);
-	DECLARE_WRITE16_MEMBER(inten_w);
-	DECLARE_WRITE16_MEMBER(emres_w);
-	DECLARE_WRITE8_MEMBER(sound_vol);
-	DECLARE_WRITE8_MEMBER(ym2203_out_b);
+	uint16_t lockon_crtc_r();
+	void lockon_crtc_w(offs_t offset, uint16_t data);
+	void lockon_char_w(offs_t offset, uint16_t data);
+	void lockon_scene_h_scr_w(uint16_t data);
+	void lockon_scene_v_scr_w(uint16_t data);
+	void lockon_ground_ctrl_w(uint16_t data);
+	void lockon_tza112_w(offs_t offset, uint16_t data);
+	uint16_t lockon_obj_4000_r();
+	void lockon_obj_4000_w(uint16_t data);
+	void lockon_fb_clut_w(offs_t offset, uint16_t data);
+	void lockon_rotate_w(offs_t offset, uint16_t data);
+	void adrst_w(uint16_t data);
+	uint16_t main_gnd_r(offs_t offset);
+	void main_gnd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t main_obj_r(offs_t offset);
+	void main_obj_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void tst_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t main_z80_r(offs_t offset);
+	void main_z80_w(offs_t offset, uint16_t data);
+	void inten_w(uint16_t data);
+	void emres_w(uint16_t data);
+	void sound_vol(uint8_t data);
+	void ym2203_out_b(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_lockon_tile_info);
 	void lockon_palette(palette_device &palette) const;
 	uint32_t screen_update_lockon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

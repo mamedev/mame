@@ -82,7 +82,7 @@ WRITE_LINE_MEMBER( a8sio_cassette_device::motor_w )
 	}
 }
 
-void a8sio_cassette_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void a8sio_cassette_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

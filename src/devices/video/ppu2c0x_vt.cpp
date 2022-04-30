@@ -27,8 +27,6 @@ ppu_vt03_device::ppu_vt03_device(const machine_config& mconfig, device_type type
 	m_read_bg(*this),
 	m_read_sp(*this)
 {
-	for (int i = 0; i < 6; i++)
-		m_2012_2017_descramble[i] = 2 + i;
 }
 
 ppu_vt03_device::ppu_vt03_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
@@ -47,16 +45,12 @@ ppu_vt03pal_device::ppu_vt03pal_device(const machine_config& mconfig, const char
 }
 
 
-READ8_MEMBER(ppu_vt03_device::palette_read)
+uint8_t ppu_vt03_device::palette_read(offs_t offset)
 {
-	if (m_201x_regs[0] & 0x80)
-	{
-		return m_newpal[offset];
-	}
+	if (offset < 0x20)
+		return ppu2c0x_device::palette_read(offset);
 	else
-	{
-		return ppu2c0x_device::palette_read(space, offset);
-	}
+		return m_palette_ram[offset];
 }
 
 void ppu_vt03_device::set_201x_descramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5)
@@ -69,40 +63,134 @@ void ppu_vt03_device::set_201x_descramble(uint8_t reg0, uint8_t reg1, uint8_t re
 	m_2012_2017_descramble[5] = reg5;
 }
 
-void ppu_vt03_device::set_new_pen(int i)
+
+
+void ppu_vt03_device::palette_write(offs_t offset, uint8_t data)
 {
-	if ((i < 0x20) && ((i & 0x3) == 0))
+	if (offset < 0x20)
 	{
-		set_pen_color(i & 0x7f, rgb_t(0, 0, 0));
+		ppu2c0x_device::palette_write(offset, data);
 	}
 	else
 	{
-		if (m_pal_mode == PAL_MODE_NEW_RGB)
+		m_palette_ram[offset] = data;
+	}
+}
+
+
+uint8_t ppu_vt03_device::read_extended(offs_t offset)
+{
+	offset += 0x10;
+	logerror("%s: read from extended PPU reg %02x\n", machine().describe_context(), offset);
+
+	switch (offset)
+	{
+	case 0x10:
+		return m_201x_regs[0x0];
+
+	case 0x11:
+		return m_201x_regs[0x1];
+
+	case 0x12:
+		return m_201x_regs[m_2012_2017_descramble[0]];
+
+	case 0x13:
+		return m_201x_regs[m_2012_2017_descramble[1]];
+
+	case 0x14:
+		return m_201x_regs[m_2012_2017_descramble[2]];
+
+	case 0x15:
+		return m_201x_regs[m_2012_2017_descramble[3]];
+
+	case 0x16:
+		return m_201x_regs[m_2012_2017_descramble[4]];
+
+	case 0x17:
+		return m_201x_regs[m_2012_2017_descramble[5]];
+
+	case 0x18:
+		return m_201x_regs[0x8];
+
+	case 0x19:
+		return 0x00;
+
+	case 0x1a:
+		return m_201x_regs[0xa];
+
+	case 0x1b:
+		return 0x00;
+
+	case 0x1c:
+		return 0x00;
+
+	case 0x1d:
+		return 0x00;
+
+	case 0x1e:
+		return 0x00;
+
+	case 0x1f:
+		return 0x00;
+	}
+
+	return 0x00;
+}
+
+
+
+void ppu_vt03_device::init_vtxx_rgb555_palette_tables()
+{
+	int entry = 0;
+	for (int emp = 0; emp < 8; emp++)
+	{
+		for (int palval = 0; palval < 0x8000; palval++)
 		{
-			uint16_t rgbval = (m_newpal[i & 0x7f] & 0xff) | ((m_newpal[(i & 0x7f) + 0x80] & 0xff) << 8);
-			uint8_t blue = (rgbval & 0x001f) << 3;
-			uint8_t green = (rgbval & 0x3e0) >> 2;
-			uint8_t red = (rgbval & 0x7C00) >> 7;
-			set_pen_color(i & 0x7f, rgb_t(red, green, blue));
+		//  uint16_t rgbval = (m_palette_ram[i & 0x7f] & 0xff) | ((m_palette_ram[(i & 0x7f) + 0x80] & 0xff) << 8);
+			uint8_t blue = (palval & 0x001f) << 3;
+			uint8_t green = (palval & 0x3e0) >> 2;
+			uint8_t red = (palval & 0x7C00) >> 7;
+
+			// TODO: apply emphasis values if they work in this mode
+			m_vtpens_rgb555[entry] = rgb_t(red, green, blue);
+			entry++;
 		}
-		else if (m_pal_mode == PAL_MODE_NEW_RGB12)
+	}
+}
+
+void ppu_vt03_device::init_vtxx_rgb444_palette_tables()
+{
+	int entry = 0;
+	for (int emp = 0; emp < 8; emp++)
+	{
+		for (int palval = 0; palval < 0x1000; palval++)
 		{
-			uint16_t rgbval = (m_newpal[i & 0x7f] & 0x3f) | ((m_newpal[(i & 0x7f) + 0x80] & 0x3f) << 6);
-			uint8_t red = (rgbval & 0x000f) << 4;
-			uint8_t green = (rgbval & 0x0f0);
-			uint8_t blue = (rgbval & 0xf00) >> 4;
-			set_pen_color(i & 0x7f, rgb_t(red, green, blue));
+			//uint16_t rgbval = (m_palette_ram[i & 0x7f] & 0x3f) | ((m_palette_ram[(i & 0x7f) + 0x80] & 0x3f) << 6);
+			uint8_t red = (palval & 0x000f) << 4;
+			uint8_t green = (palval & 0x0f0);
+			uint8_t blue = (palval & 0xf00) >> 4;
+
+			// TODO: apply emphasis values if they work in this mode
+			m_vtpens_rgb444[entry] = rgb_t(red, green, blue);
+			entry++;
 		}
-		else
+	}
+}
+// what cases are palmode 1 anyway?
+void ppu_vt03_device::init_vt03_palette_tables(int palmode)
+{
+	// the 12-bit VT HSV format, Credit to NewRisingSun
+	int entry = 0;
+	for (int color_emphasis = 0; color_emphasis < 8; color_emphasis++)
+	{
+		for (int palval = 0; palval < 0x1000; palval++)
 		{
-			// Credit to NewRisingSun
-			uint16_t palval = (m_newpal[i & 0x7f] & 0x3f) | ((m_newpal[(i & 0x7f) + 0x80] & 0x3f) << 6);
 			int nPhase = (palval >> 0) & 0xF;
 			int nLuma = (palval >> 4) & 0xF;
 			int nChroma = (palval >> 8) & 0xF;
 			float phaseOffset = -11.0;
 			//bool inverted = false;
-			if ((nLuma < (nChroma + 1) >> 1 || nLuma > 15 - (nChroma >> 1)) && (m_pal_mode != PAL_MODE_NEW_VG))
+			if ((nLuma < (nChroma + 1) >> 1 || nLuma > 15 - (nChroma >> 1)) && (palmode != 1))
 			{
 				//inverted = true;
 				// Strange color number wrap-around. Is this for protection reasons, or a bug of the original hardware?
@@ -119,7 +207,7 @@ void ppu_vt03_device::set_new_pen(int i)
 			float fChroma = nChroma / 18.975;      // Value determined from matching phases 0 and 13 across all luminance and saturation levels
 			float fPhase = ((nPhase - 2) * 30.0 + phaseOffset) * M_PI / 180.0;
 
-			if (m_pal_mode == PAL_MODE_NEW_VG)
+			if (palmode == 1)
 			{
 				if (fPhase > 0 && fPhase < 13)
 				{
@@ -150,115 +238,31 @@ void ppu_vt03_device::set_new_pen(int i)
 			int GV = G * 255.0;
 			int BV = B * 255.0;
 
-			set_pen_color(i & 0x7f, rgb_t(RV, GV, BV));
+			// does this really apply to the VT palette?
+			//bool is_pal = m_scanlines_per_frame != NTSC_SCANLINES_PER_FRAME;
+			//apply_color_emphasis_and_clamp(is_pal, color_emphasis, R, G, B);
+
+			m_vtpens[entry] = rgb_t(RV, GV, BV);
+			entry++;
 		}
 	}
-
-
-}
-
-WRITE8_MEMBER(ppu_vt03_device::palette_write)
-{
-	//logerror("pal write %d %02x\n", offset, data);
-	// why is the check pal_mask = (m_pal_mode == PAL_MODE_NEW_VG) ? 0x08 : 0x80 in set_2010_reg and 0x04 : 0x80 here?
-	uint8_t pal_mask = (m_pal_mode == PAL_MODE_NEW_VG) ? 0x04 : 0x80;
-
-	if (m_201x_regs[0] & pal_mask)
-	{
-		m_newpal[offset & 0xff] = data;
-		set_new_pen(offset);
-	}
-	else
-	{
-		//if(m_pal_mode == PAL_MODE_NEW_VG) // ddrdismx writes the palette before setting the register but doesn't use 'PAL_MODE_NEW_VG', Konami logo is missing if you don't allow writes to be stored for when we switch
-		m_newpal[offset & 0xff] = data;
-		ppu2c0x_device::palette_write(space, offset, data);
-	}
-}
-
-READ8_MEMBER(ppu_vt03_device::read)
-{
-	if (offset <= 0xf)
-	{
-		return ppu2c0x_device::read(space, offset);
-	}
-	else if (offset <= 0x1f)
-	{
-		logerror("%s: read from reg %02x\n", machine().describe_context(), offset);
-
-		switch (offset)
-		{
-		case 0x10:
-			return m_201x_regs[0x0];
-
-		case 0x11:
-			return m_201x_regs[0x1];
-
-		case 0x12:
-			return m_201x_regs[m_2012_2017_descramble[0]];
-
-		case 0x13:
-			return m_201x_regs[m_2012_2017_descramble[1]];
-
-		case 0x14:
-			return m_201x_regs[m_2012_2017_descramble[2]];
-
-		case 0x15:
-			return m_201x_regs[m_2012_2017_descramble[3]];
-
-		case 0x16:
-			return m_201x_regs[m_2012_2017_descramble[4]];
-
-		case 0x17:
-			return m_201x_regs[m_2012_2017_descramble[5]];
-
-		case 0x18:
-			return m_201x_regs[0x8];
-
-		case 0x19:
-			return 0x00;
-
-		case 0x1a:
-			return m_201x_regs[0xa];
-
-		case 0x1b:
-			return 0x00;
-
-		case 0x1c:
-			return 0x00;
-
-		case 0x1d:
-			return 0x00;
-
-		case 0x1e:
-			return 0x00;
-
-		case 0x1f:
-			return 0x00;
-		}
-	}
-	else
-	{
-		return 0x00;
-	}
-
-	return 0x00;
-}
-
-void ppu_vt03_device::init_palette()
-{
-	// todo, work out the format of the 12 palette bits instead of just calling the main init
-	ppu2c0x_device::init_palette(true);
 }
 
 void ppu_vt03_device::device_start()
 {
-	ppu2c0x_device::device_start();
+	start_nopalram();
 
-	m_newpal = std::make_unique<uint8_t[]>(0x100);
-	save_pointer(NAME(m_newpal), 0x100);
+	m_palette_ram.resize(0x100);
 
+	for (int i = 0; i < 0x100; i++)
+		m_palette_ram[i] = 0x00;
+
+	save_item(NAME(m_palette_ram));
 	save_item(NAME(m_201x_regs));
+
+	init_vt03_palette_tables(0);
+	init_vtxx_rgb555_palette_tables();
+	init_vtxx_rgb444_palette_tables();
 }
 
 uint8_t ppu_vt03_device::get_201x_reg(int reg)
@@ -280,15 +284,11 @@ void ppu_vt03_device::device_reset()
 	m_read_bg.resolve_safe(0);
 	m_read_sp.resolve_safe(0);
 	for (int i = 0; i < 0xff; i++)
-		m_newpal[i] = 0x0;
+		m_palette_ram[i] = 0x0;
 
 	// todo: what are the actual defaults for these?
 	for (int i = 0; i < 0x20; i++)
 		set_201x_reg(i, 0x00);
-
-	//m_201x_regs[0] = 0x86; // alt fix for ddrdismx would be to set the default palette mode here
-
-	init_palette();
 
 	m_read_bg4_bg3 = 0;
 	m_va34 = 0;
@@ -363,7 +363,8 @@ void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u
 	{
 		if (!is16pix)
 		{
-			bitmap.pix32(m_scanline, sprite_xpos + pixel) = pen(pixel_data + (4 * color));
+			uint8_t pen = pixel_data + (4 * color);
+			draw_tile_pixel_inner(pen, &bitmap.pix(m_scanline, sprite_xpos + pixel));
 		}
 		else
 		{
@@ -371,9 +372,16 @@ void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u
 			    we probably need to split them out again and draw them at xpos+8 with a
 			    cliprect - not seen used yet */
 			if ((pixel_data & 0x03) != 0)
-				bitmap.pix32(m_scanline, sprite_xpos + pixel) = pen((pixel_data & 0x03) + (4 * color));
+			{
+				uint8_t pen = (pixel_data & 0x03) + (4 * color);
+				draw_tile_pixel_inner(pen, &bitmap.pix(m_scanline, sprite_xpos + pixel));
+			}
+
 			if (((pixel_data >> 5) & 0x03) != 0)
-				bitmap.pix32(m_scanline, sprite_xpos + pixel + 8) = pen(((pixel_data >> 5) & 0x03) + (4 * color));
+			{
+				uint8_t pen = ((pixel_data >> 5) & 0x03) + (4 * color);
+				draw_tile_pixel_inner(pen, &bitmap.pix(m_scanline, sprite_xpos + pixel + 8));
+			}
 			//ppu2c0x_device::draw_sprite_pixel(sprite_xpos, color, pixel, pixel_data & 0x03, bitmap);
 			//ppu2c0x_device::draw_sprite_pixel(sprite_xpos, color, pixel + 8, (pixel_data >> 5) & 0x03, bitmap);
 		}
@@ -424,13 +432,100 @@ void ppu_vt03_device::shift_tile_plane_data(uint8_t& pix)
 	}
 }
 
-void ppu_vt03_device::draw_tile_pixel(uint8_t pix, int color, pen_t back_pen, uint32_t*& dest, const pen_t* color_table)
+
+void ppu_vt03_device::draw_back_pen(uint32_t* dst, int back_pen)
+{
+	if (m_201x_regs[0] & 0x80)
+	{
+		// is the back_pen always just pen 0 in VT modes? (using last data written to a transparent pen as per NES logic doesn't work as writes are split across 2 bytes)
+		draw_tile_pixel_inner(0, dst);
+	}
+	else
+	{
+		// in normal modes we still have the data from the palette writes as the 'backpen' so treat it as before
+		uint32_t pix;
+		pix = m_nespens[back_pen & 0x1ff];
+		*dst = pix;
+	}
+}
+
+
+void ppu_vt03_device::draw_tile_pixel_inner(uint8_t pen, uint32_t *dest)
+{
+	if (m_201x_regs[0] & 0x80)
+	{
+		if (m_pal_mode == PAL_MODE_NEW_RGB) // unknown newer VT mode
+		{
+			uint32_t palval;
+			palval = (m_palette_ram[pen & 0x7f] & 0xff) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x7f) << 8);
+
+			// does grayscale mode exist here? (we haven't calculated any colours for it)
+			//if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
+			//  palval &= 0x30;
+
+			// apply colour emphasis (does it really exist here?) (we haven't calculated any colours for it, so ths has no effect)
+			palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 10);
+
+			uint32_t pix;
+			pix = m_vtpens_rgb555[palval & 0x3ffff];
+			*dest = pix;
+		}
+		else if (m_pal_mode == PAL_MODE_NEW_RGB12) // unknown newer VT mode
+		{
+			uint32_t palval;
+			palval = (m_palette_ram[pen & 0x7f] & 0x3f) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x3f) << 6);
+
+			// does grayscale mode exist here? (we haven't calculated any colours for it)
+			//if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
+			//  palval &= 0x30;
+
+			// apply colour emphasis (does it really exist here?) (we haven't calculated any colours for it, so ths has no effect)
+			palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 7);
+
+			uint32_t pix;
+			pix = m_vtpens_rgb444[palval & 0x7fff];
+			*dest = pix;
+		}
+		else // VT03 mode
+		{
+			uint32_t palval;
+			palval = (m_palette_ram[pen & 0x7f] & 0x3f) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x3f) << 6);
+
+			// does grayscale mode exist here? (we haven't calculated any colours for it)
+			//if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
+			//  palval &= 0x30;
+
+			// apply colour emphasis (does it really exist here?) (we calculate values for it when building the palette lookup)
+			palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 7);
+
+			uint32_t pix;
+			pix = m_vtpens[palval  & 0x7fff];
+			*dest = pix;
+		}
+	}
+	else // old colour compatible mode
+	{
+		uint16_t palval;
+		palval = (m_palette_ram[pen & 0x7f] & 0x3f);
+
+		if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
+			palval &= 0x30;
+
+		// apply colour emphasis
+		palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 1);
+
+		uint32_t pix;
+		pix = m_nespens[palval & 0x1ff];
+		*dest = pix;
+	}
+}
+void ppu_vt03_device::draw_tile_pixel(uint8_t pix, int color, uint32_t back_pen, uint32_t*& dest)
 {
 	int is4bpp = get_201x_reg(0x0) & 0x02;
 
 	if (!is4bpp)
 	{
-		ppu2c0x_device::draw_tile_pixel(pix, color, back_pen, dest, color_table);
+		ppu2c0x_device::draw_tile_pixel(pix, color, back_pen, dest);
 	}
 	else
 	{
@@ -452,9 +547,10 @@ void ppu_vt03_device::draw_tile_pixel(uint8_t pix, int color, pen_t back_pen, ui
 		}
 		else
 		{
-			pen = 0; // fixme backpen logic probably differs on vt03 due to extra colours
+			pen = 0; // back_pen; // fixme backpen logic probably differs on vt03 due to extra colours
 		}
-		*dest = this->pen(pen);
+
+		draw_tile_pixel_inner(pen, dest);
 	}
 }
 
@@ -478,105 +574,82 @@ void ppu_vt03_device::set_2010_reg(uint8_t data)
 	    2   : SP16EN
 	    1   : BK16EN
 	    0   : PIX16EN */
-	uint8_t pal_mask = (m_pal_mode == PAL_MODE_NEW_VG) ? 0x08 : 0x80;
-	if ((m_201x_regs[0x0] & pal_mask) != (data & pal_mask))
-	{
-		if (data & pal_mask)
-		{
-			for (int i = 0; i < 256; i++)
-			{
-				set_new_pen(i);
-			}
-		}
-		else
-		{
-			for (int i = 0; i < 256; i++)
-			{
-				set_pen_indirect(i, i);
-			}
-		}
-	}
 
 	m_201x_regs[0x0] = data;
 }
 
-WRITE8_MEMBER(ppu_vt03_device::write)
+void ppu_vt03_device::write_extended(offs_t offset, uint8_t data)
 {
-	if (offset < 0x10)
+	offset += 0x10;
+	logerror("%s: write to extended PPU reg 0x20%02x %02x\n", machine().describe_context(), offset, data);
+	switch (offset)
 	{
-		ppu2c0x_device::write(space, offset, data);
-	}
-	else
-	{
-		logerror("%s: write to reg 0x20%02x %02x\n", machine().describe_context(), offset, data);
-		switch (offset)
-		{
-		case 0x10:
-			set_2010_reg(data);
-			break;
+	case 0x10:
+		set_2010_reg(data);
+		break;
 
-		case 0x11:
-			m_201x_regs[0x1] = data;
-			break;
+	case 0x11:
+		m_201x_regs[0x1] = data;
+		break;
 
-		case 0x12:
-			m_201x_regs[m_2012_2017_descramble[0]] = data;
-			break;
+	case 0x12:
+		m_201x_regs[m_2012_2017_descramble[0]] = data;
+		break;
 
-		case 0x13:
-			m_201x_regs[m_2012_2017_descramble[1]] = data;
-			break;
+	case 0x13:
+		m_201x_regs[m_2012_2017_descramble[1]] = data;
+		break;
 
-		case 0x14:
-			m_201x_regs[m_2012_2017_descramble[2]] = data;
-			break;
+	case 0x14:
+		m_201x_regs[m_2012_2017_descramble[2]] = data;
+		break;
 
-		case 0x15:
-			m_201x_regs[m_2012_2017_descramble[3]] = data;
-			break;
+	case 0x15:
+		m_201x_regs[m_2012_2017_descramble[3]] = data;
+		break;
 
-		case 0x16:
-			m_201x_regs[m_2012_2017_descramble[4]] = data;
-			break;
+	case 0x16:
+		m_201x_regs[m_2012_2017_descramble[4]] = data;
+		break;
 
-		case 0x17:
-			logerror("set reg 7 %02x\n", data);
-			m_201x_regs[m_2012_2017_descramble[5]] = data;
-			break;
+	case 0x17:
+		logerror("set reg 7 %02x\n", data);
+		m_201x_regs[m_2012_2017_descramble[5]] = data;
+		break;
 
-		case 0x18:
-			logerror("set reg 8 %02x\n", data);
-			m_201x_regs[0x8] = data;
-			break;
+	case 0x18:
+		logerror("set reg 8 %02x\n", data);
+		m_201x_regs[0x8] = data;
+		break;
 
-		case 0x19:
-			// reset gun port (value doesn't matter)
-			break;
+	case 0x19:
+		// reset gun port (value doesn't matter)
+		break;
 
-		case 0x1a:
-			m_201x_regs[0xa] = data;
-			break;
+	case 0x1a:
+		m_201x_regs[0xa] = data;
+		break;
 
-		case 0x1b:
-			// unused
-			break;
+	case 0x1b:
+		// unused
+		break;
 
-		case 0x1c:
-			// (READ) x-coordinate of gun
-			break;
+	case 0x1c:
+		// (READ) x-coordinate of gun
+		break;
 
-		case 0x1d:
-			// (READ) y-coordinate of gun
-			break;
+	case 0x1d:
+		// (READ) y-coordinate of gun
+		break;
 
-		case 0x1e:
-			// (READ) x-coordinate of gun 2
-			break;
+	case 0x1e:
+		// (READ) x-coordinate of gun 2
+		break;
 
-		case 0x1f:
-			// (READ) y-coordinate of gun 2
-			break;
-		}
+	case 0x1f:
+		// (READ) y-coordinate of gun 2
+		break;
 	}
 }
+
 

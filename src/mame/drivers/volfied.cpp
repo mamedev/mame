@@ -52,7 +52,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 #include "emupal.h"
 #include "speaker.h"
 
@@ -199,7 +199,7 @@ void volfied_state::machine_reset()
 {
 }
 
-WRITE8_MEMBER(volfied_state::counters_w)
+void volfied_state::counters_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_w(1, data & 0x80);
 	machine().bookkeeping().coin_lockout_w(0, data & 0x40);

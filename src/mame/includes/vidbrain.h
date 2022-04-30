@@ -64,7 +64,7 @@ private:
 	required_ioport m_joy4_x;
 	required_ioport m_joy4_y;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -73,23 +73,23 @@ private:
 		TIMER_JOYSTICK
 	};
 
-	DECLARE_WRITE8_MEMBER( keyboard_w );
-	DECLARE_READ8_MEMBER( keyboard_r );
-	DECLARE_WRITE8_MEMBER( sound_w );
+	void keyboard_w(uint8_t data);
+	uint8_t keyboard_r();
+	void sound_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( ext_int_w );
 	DECLARE_WRITE_LINE_MEMBER( hblank_w );
-	DECLARE_READ8_MEMBER(memory_read_byte);
+	uint8_t memory_read_byte(offs_t offset);
 
 	// keyboard state
-	uint8_t m_keylatch;
-	int m_joy_enable;
+	uint8_t m_keylatch = 0;
+	int m_joy_enable = 0;
 
 	// sound state
-	int m_sound_clk;
+	int m_sound_clk = 0;
 
 	// timers
-	emu_timer *m_timer_ne555;
+	emu_timer *m_timer_ne555 = nullptr;
 	void vidbrain_io(address_map &map);
 	void vidbrain_mem(address_map &map);
 };

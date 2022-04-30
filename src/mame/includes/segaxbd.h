@@ -46,28 +46,28 @@ public:
 	required_device<m68000_device> m_maincpu;
 
 	// custom I/O
-	DECLARE_READ8_MEMBER(aburner2_motor_r);
-	DECLARE_WRITE8_MEMBER(aburner2_motor_w);
-	DECLARE_READ8_MEMBER(smgp_motor_r);
-	DECLARE_WRITE8_MEMBER(smgp_motor_w);
-	DECLARE_READ8_MEMBER(lastsurv_port_r);
-	DECLARE_WRITE8_MEMBER(lastsurv_muxer_w);
+	uint8_t aburner2_motor_r();
+	void aburner2_motor_w(uint8_t data);
+	uint8_t smgp_motor_r();
+	void smgp_motor_w(uint8_t data);
+	uint8_t lastsurv_port_r();
+	void lastsurv_muxer_w(uint8_t data);
 
 	// game-specific main CPU read/write handlers
-	DECLARE_WRITE16_MEMBER(loffire_sync0_w);
-	DECLARE_READ16_MEMBER(smgp_excs_r);
-	DECLARE_WRITE16_MEMBER(smgp_excs_w);
+	void loffire_sync0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t smgp_excs_r(offs_t offset);
+	void smgp_excs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 protected:
 	// main CPU read/write handlers
 	uint8_t analog_r();
-	DECLARE_WRITE16_MEMBER(iocontrol_w);
+	void iocontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// palette helpers
-	DECLARE_WRITE16_MEMBER(paletteram_w);
+	void paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void decrypted_opcodes_map(address_map &map);
 	void main_map(address_map &map);
@@ -93,7 +93,7 @@ protected:
 	// device overrides
 //  virtual void machine_reset();
 	virtual void video_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// internal helpers
 	void update_main_irqs();
@@ -103,8 +103,8 @@ protected:
 	// compare/timer chip callbacks
 	DECLARE_WRITE_LINE_MEMBER(timer_irq_w);
 
-	DECLARE_WRITE8_MEMBER(pc_0_w);
-	DECLARE_WRITE8_MEMBER(pd_0_w);
+	void pc_0_w(uint8_t data);
+	void pd_0_w(uint8_t data);
 
 	// devices
 	required_device<m68000_device> m_subcpu;
@@ -120,28 +120,28 @@ protected:
 	required_shared_ptr<uint16_t> m_subram0;
 
 	// configuration
-	bool            m_adc_reverse[8];
-	uint8_t           m_road_priority;
+	bool            m_adc_reverse[8]{};
+	uint8_t           m_road_priority = 0;
 
 	// internal state
-	emu_timer *     m_scanline_timer;
-	uint8_t           m_timer_irq_state;
-	uint8_t           m_vblank_irq_state;
-	uint8_t           m_pc_0;
+	emu_timer *     m_scanline_timer = nullptr;
+	uint8_t           m_timer_irq_state = 0;
+	uint8_t           m_vblank_irq_state = 0;
+	uint8_t           m_pc_0 = 0;
 
 	// game-specific state
-	uint16_t *        m_loffire_sync;
-	uint8_t           m_lastsurv_mux;
+	uint16_t *        m_loffire_sync = 0;
+	uint8_t           m_lastsurv_mux = 0;
 
 	// memory pointers
 	required_shared_ptr<uint16_t> m_paletteram;
-	bool            m_gprider_hack;
+	bool            m_gprider_hack = false;
 
 	void palette_init();
-	uint32_t      m_palette_entries;          // number of palette entries
-	uint8_t       m_palette_normal[32];       // RGB translations for normal pixels
-	uint8_t       m_palette_shadow[32];       // RGB translations for shadowed pixels
-	uint8_t       m_palette_hilight[32];      // RGB translations for hilighted pixels
+	uint32_t      m_palette_entries = 0;          // number of palette entries
+	uint8_t       m_palette_normal[32]{};       // RGB translations for normal pixels
+	uint8_t       m_palette_shadow[32]{};       // RGB translations for shadowed pixels
+	uint8_t       m_palette_hilight[32]{};      // RGB translations for hilighted pixels
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_ioport m_io0_porta;
@@ -234,9 +234,9 @@ protected:
 	virtual void device_start() override;
 
 private:
-	DECLARE_READ8_MEMBER(commram_r);
-	DECLARE_WRITE8_MEMBER(commram_w);
-	DECLARE_WRITE8_MEMBER(commram_bank_w);
+	uint8_t commram_r(offs_t offset);
+	void commram_w(offs_t offset, uint8_t data);
+	void commram_bank_w(uint8_t data);
 
 	void sub_map(address_map &map);
 	void comm_map(address_map &map);
@@ -244,7 +244,7 @@ private:
 	required_device<mb8421_device> m_commram;
 	required_device<i8251_device> m_usart;
 
-	uint8_t m_commram_bank;
+	uint8_t m_commram_bank = 0;
 };
 
 #endif // MAME_INCLUDES_SEGAXBD_H

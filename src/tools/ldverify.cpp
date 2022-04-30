@@ -8,17 +8,18 @@
 
 ****************************************************************************/
 
-#include <cstdio>
-#include <cstdlib>
-#include <cctype>
-#include <new>
-#include <cassert>
-#include "coretmpl.h"
-#include "aviio.h"
 #include "avhuff.h"
+#include "aviio.h"
 #include "bitmap.h"
 #include "chd.h"
+#include "coretmpl.h"
 #include "vbiparse.h"
+
+#include <cassert>
+#include <cctype>
+#include <cstdio>
+#include <cstdlib>
+#include <new>
 
 
 
@@ -174,10 +175,10 @@ static void *open_chd(const char *filename, movie_info &info)
 	auto chd = new chd_file;
 
 	// open the file
-	chd_error chderr = chd->open(filename);
-	if (chderr != CHDERR_NONE)
+	std::error_condition chderr = chd->open(filename);
+	if (chderr)
 	{
-		fprintf(stderr, "Error opening CHD file: %s\n", chd_file::error_string(chderr));
+		fprintf(stderr, "Error opening CHD file: %s\n", chderr.message().c_str());
 		delete chd;
 		return nullptr;
 	}
@@ -185,9 +186,9 @@ static void *open_chd(const char *filename, movie_info &info)
 	// get the metadata
 	std::string metadata;
 	chderr = chd->read_metadata(AV_METADATA_TAG, 0, metadata);
-	if (chderr != CHDERR_NONE)
+	if (chderr)
 	{
-		fprintf(stderr, "Error getting A/V metadata: %s\n", chd_file::error_string(chderr));
+		fprintf(stderr, "Error getting A/V metadata: %s\n", chderr.message().c_str());
 		delete chd;
 		return nullptr;
 	}
@@ -235,8 +236,10 @@ static int read_chd(void *file, int frame, bitmap_yuy16 &bitmap, int16_t *lsound
 	for (int fieldnum = 0; fieldnum < interlace_factor; fieldnum++)
 	{
 		// make a fake bitmap for this field
-		avhuff_decompress_config avconfig;
-		avconfig.video.wrap(&bitmap.pix16(fieldnum), bitmap.width(), bitmap.height() / interlace_factor, bitmap.rowpixels() * interlace_factor);
+		bitmap_yuy16 video;
+		video.wrap(&bitmap.pix(fieldnum), bitmap.width(), bitmap.height() / interlace_factor, bitmap.rowpixels() * interlace_factor);
+		avhuff_decoder::config avconfig;
+		avconfig.video = &video;
 
 		// configure the codec
 		uint32_t numsamples;
@@ -249,8 +252,8 @@ static int read_chd(void *file, int frame, bitmap_yuy16 &bitmap, int16_t *lsound
 		chdfile->codec_configure(CHD_CODEC_AVHUFF, AVHUFF_CODEC_DECOMPRESS_CONFIG, &avconfig);
 
 		// read the frame
-		chd_error chderr = chdfile->read_hunk(frame * interlace_factor + fieldnum, nullptr);
-		if (chderr != CHDERR_NONE)
+		std::error_condition chderr = chdfile->read_hunk(frame * interlace_factor + fieldnum, nullptr);
+		if (chderr)
 			return false;
 
 		// account for samples read
@@ -320,7 +323,7 @@ static void verify_video(video_info &video, int frame, bitmap_yuy16 &bitmap)
 
 		// parse the VBI data
 		vbi_metadata metadata;
-		vbi_parse_all(&bitmap.pix16(fieldnum), bitmap.rowpixels() * 2, bitmap.width(), 8, &metadata);
+		vbi_parse_all(&bitmap.pix(fieldnum), bitmap.rowpixels() * 2, bitmap.width(), 8, &metadata);
 
 		// if we have data in both 17 and 18, it should match
 		if (metadata.line17 != 0 && metadata.line18 != 0 && metadata.line17 != metadata.line18)
@@ -484,11 +487,11 @@ static void verify_video(video_info &video, int frame, bitmap_yuy16 &bitmap)
 		{
 			for (int x = 16; x < 720 - 16; x++)
 			{
-				yhisto[bitmap.pix16(y, x) >> 8]++;
+				yhisto[bitmap.pix(y, x) >> 8]++;
 				if (x % 2 == 0)
-					cbhisto[bitmap.pix16(y, x) & 0xff]++;
+					cbhisto[bitmap.pix(y, x) & 0xff]++;
 				else
-					crhisto[bitmap.pix16(y, x) & 0xff]++;
+					crhisto[bitmap.pix(y, x) & 0xff]++;
 			}
 			pixels += 720 - 16 - 16;
 		}

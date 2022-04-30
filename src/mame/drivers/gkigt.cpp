@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, R. Belmont, Angelo Salese, Dirk Best
 /*
 
 TODO:
@@ -124,22 +124,22 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ32_MEMBER(igt_gk_28010008_r)
+	uint32_t igt_gk_28010008_r()
 	{
 		return machine().rand();  // don't quite understand this one
 	};
 
-	DECLARE_READ32_MEMBER(uart_status_r);
-	DECLARE_WRITE32_MEMBER(uart_w);
-	DECLARE_WRITE8_MEMBER(irq_enable_w);
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_READ8_MEMBER(irq_vector_r);
-	DECLARE_WRITE8_MEMBER(unk_w);
-	DECLARE_READ8_MEMBER(frame_number_r);
+	uint32_t uart_status_r();
+	void uart_w(uint32_t data);
+	void irq_enable_w(uint8_t data);
+	void irq_ack_w(uint8_t data);
+	uint8_t irq_vector_r();
+	void unk_w(uint8_t data);
+	uint8_t frame_number_r();
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
-	DECLARE_READ8_MEMBER(timer_r);
-	DECLARE_READ16_MEMBER(version_r);
+	uint8_t timer_r();
+	uint16_t version_r();
 
 	void igt_gameking_map(address_map &map);
 	void igt_ms72c_map(address_map &map);
@@ -151,9 +151,9 @@ private:
 	required_shared_ptr<uint32_t> m_vram;
 	required_device<sc28c94_device> m_quart1;
 
-	uint8_t m_irq_enable;
-	uint8_t m_irq_pend;
-	uint8_t m_timer_count;
+	uint8_t m_irq_enable = 0;
+	uint8_t m_irq_pend = 0;
+	uint8_t m_timer_count = 0;
 };
 
 void igt_gameking_state::video_start()
@@ -162,22 +162,18 @@ void igt_gameking_state::video_start()
 
 uint32_t igt_gameking_state::screen_update_igt_gameking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	for(y = 0; y < 480; y++)
+	for(int y = 0; y < 480; y++)
 	{
-		for(x = 0; x < 640; x+=4)
+		for(int x = 0; x < 640; x+=4)
 		{
 			for(int xi=0;xi<4;xi++)
 			{
-				uint32_t color;
-
-				color = (m_vram[(x+y*1024)/4] >> (xi*8)) & 0xff;
+				uint32_t const color = (m_vram[(x+y*1024)/4] >> (xi*8)) & 0xff;
 
 				if(cliprect.contains(x+xi, y))
-					bitmap.pix16(y, x+xi) = m_palette->pen(color);
+					bitmap.pix(y, x+xi) = m_palette->pen(color);
 
 			}
 		}
@@ -188,40 +184,40 @@ uint32_t igt_gameking_state::screen_update_igt_gameking(screen_device &screen, b
 }
 
 
-READ32_MEMBER(igt_gameking_state::uart_status_r)
+uint32_t igt_gameking_state::uart_status_r()
 {
 	return 0x00040004;
 }
 
-WRITE32_MEMBER(igt_gameking_state::uart_w)
+void igt_gameking_state::uart_w(uint32_t data)
 {
 	printf("%c", (data>>16) & 0x7f);
 }
 
-WRITE8_MEMBER(igt_gameking_state::irq_enable_w)
+void igt_gameking_state::irq_enable_w(uint8_t data)
 {
 	m_irq_enable = data;
 }
 
-WRITE8_MEMBER(igt_gameking_state::irq_ack_w)
+void igt_gameking_state::irq_ack_w(uint8_t data)
 {
 	//logerror("%02x\n",data);
 	m_maincpu->set_input_line(I960_IRQ0,CLEAR_LINE);
 	m_irq_pend = 0;
 }
 
-READ8_MEMBER(igt_gameking_state::irq_vector_r)
+uint8_t igt_gameking_state::irq_vector_r()
 {
 	return m_irq_pend;
 }
 
-READ8_MEMBER(igt_gameking_state::frame_number_r)
+uint8_t igt_gameking_state::frame_number_r()
 {
 	// TODO: likely not right, checked in irq 0
 	return 0;//m_screen->frame_number() & 7;
 }
 
-WRITE8_MEMBER(igt_gameking_state::unk_w)
+void igt_gameking_state::unk_w(uint8_t data)
 {
 	// bit 7 toggled, unknown purpose
 }
@@ -229,16 +225,16 @@ WRITE8_MEMBER(igt_gameking_state::unk_w)
 
 void igt_gameking_state::igt_gameking_map(address_map &map)
 {
-	map(0x00000000, 0x0007ffff).rom().region("maincpu", 0);
-	map(0x08000000, 0x081fffff).rom().region("game", 0);
-	map(0x08200000, 0x083fffff).rom().region("plx", 0);
+	map(0x00000000, 0x0007ffff).flags(i960_cpu_device::BURST).rom().region("maincpu", 0);
+	map(0x08000000, 0x081fffff).flags(i960_cpu_device::BURST).rom().region("game", 0);
+	map(0x08200000, 0x083fffff).flags(i960_cpu_device::BURST).rom().region("plx", 0);
 
 
 	// it's unclear how much of this is saved and how much total RAM there is.
-	map(0x10000000, 0x1001ffff).ram().share("nvram");
-	map(0x10020000, 0x17ffffff).ram();
+	map(0x10000000, 0x1001ffff).flags(i960_cpu_device::BURST).ram().share("nvram");
+	map(0x10020000, 0x17ffffff).flags(i960_cpu_device::BURST).ram();
 
-	map(0x18000000, 0x181fffff).ram().share("vram"); // igtsc writes from 18000000 to 1817ffff, ms3 all the way to 181fffff.
+	map(0x18000000, 0x181fffff).flags(i960_cpu_device::BURST).ram().share("vram"); // igtsc writes from 18000000 to 1817ffff, ms3 all the way to 181fffff.
 
 	// 28000000: MEZ2 SEL, also connected to ymz chip select?
 	// 28010000: first 28C94 QUART (QRT1 SEL)
@@ -253,7 +249,7 @@ void igt_gameking_state::igt_gameking_map(address_map &map)
 	map(0x2801001c, 0x2801001f).nopw();
 	map(0x28010030, 0x28010033).r(FUNC(igt_gameking_state::uart_status_r)); // channel D
 	map(0x28010034, 0x28010037).w(FUNC(igt_gameking_state::uart_w));       // channel D
-	map(0x28020000, 0x280205ff).ram(); // CMOS?
+	map(0x28020000, 0x280205ff).flags(i960_cpu_device::BURST).ram();       // CMOS?
 //  map(0x28020000, 0x2802007f).r(FUNC(igt_gameking_state::igt_gk_28010008_r)).nopw();
 	map(0x28030000, 0x28030003).portr("IN0");
 //  map(0x28040000, 0x2804007f).rw("quart2", FUNC(sc28c94_device::read), FUNC(sc28c94_device::write)).umask32(0x00ff00ff);
@@ -275,18 +271,18 @@ void igt_gameking_state::igt_gameking_map(address_map &map)
 	map(0x28060002, 0x28060002).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x28060004, 0x28060004).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	map(0x3b000000, 0x3b1fffff).rom().region("snd", 0);
+	map(0x3b000000, 0x3b1fffff).flags(i960_cpu_device::BURST).rom().region("snd", 0);
 
-	map(0xa1000000, 0xa1011fff).ram(); // used by gkkey for restart IAC
+	map(0xa1000000, 0xa1011fff).flags(i960_cpu_device::BURST).ram(); // used by gkkey for restart IAC
 }
 
-READ16_MEMBER(igt_gameking_state::version_r)
+uint16_t igt_gameking_state::version_r()
 {
 	// TODO: unknown value required, checked at "Cold powerup machine setup"
 	return 0xf777;
 }
 
-READ8_MEMBER(igt_gameking_state::timer_r)
+uint8_t igt_gameking_state::timer_r()
 {
 	// TODO: ms72c 8011ab0 "init_io" check, gets printed as "New security latch value = %x"
 	return m_timer_count++;
@@ -601,7 +597,6 @@ WRITE_LINE_MEMBER(igt_gameking_state::vblank_irq)
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_38400 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_38400 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )

@@ -15,10 +15,12 @@
 
 #include <functional>
 #include <iterator>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
 #include <utility>
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -143,7 +145,7 @@ public:
 
 	/// \brief Get constant iterator beyond last element
 	///
-	/// Returns aconstant iterator one past the last element in the
+	/// Returns a constant iterator one past the last element in the
 	/// array.
 	/// \return Constant iterator one past last element.
 	const_iterator cend() const { return m_array + Count; }
@@ -163,7 +165,7 @@ public:
 
 	/// \brief Does array have no elements
 	///
-	/// Returns whether the arary has no elements (compile-time
+	/// Returns whether the array has no elements (compile-time
 	/// constant).
 	/// \return True if the array has no elements, false otherwise.
 	constexpr bool empty() const { return !Count; }
@@ -196,7 +198,7 @@ public:
 	/// \return Reference to element at specified index.
 	T &operator[](unsigned index) { assert(index < Count); return m_array[index]; }
 
-	/// \brief Checked element accesor
+	/// \brief Checked element accessor
 	///
 	/// Returns a reference to the element at the supplied index if less
 	/// than the size of the array, or throws std::out_of_range
@@ -236,11 +238,12 @@ public:
 	/// Should return false if the object is required but not found, or
 	/// true otherwise (the report_missing member function can assist
 	/// in implementing this behaviour).
-	/// \param [in] isvalidation Pass true if this is a dry run (i.e. no
-	///   intention to actually start the device), or false otherwise.
+	/// \param [in] valid Pass a pointer to the validity checker if this
+	///   is a dry run (i.e. no intention to actually start the device),
+	///   or nullptr otherwise.
 	/// \return False if the object is required but not found, or true
 	///   otherwise.
-	virtual bool findit(bool isvalidation = false) = 0;
+	virtual bool findit(validity_checker *valid) = 0;
 
 	/// \brief Clear temporary binding from configuration
 	///
@@ -305,7 +308,7 @@ public:
 	}
 
 	/// \brief Dummy tag always treated as not found
-	constexpr static char DUMMY_TAG[17] = "finder_dummy_tag";
+	static constexpr char DUMMY_TAG[17] = "finder_dummy_tag";
 
 protected:
 	/// \brief Designated constructor
@@ -347,13 +350,11 @@ protected:
 	/// report_missing to print an error message if the region is
 	/// not found.  Returns true if the region is required but no
 	/// matching region is found, or false otherwise.
-	/// \param [in] bytes Desired region length in bytes, or 0U to match
-	///   any length.
 	/// \param [in] required True if the region is required, or false if
 	///   it is optional.
 	/// \return True if the region is optional, or if the region is
 	///   required and a matching region is found, or false otherwise.
-	bool validate_memregion(size_t bytes, bool required) const;
+	bool validate_memregion(bool required) const;
 
 	/// \brief Find a memory share
 	///
@@ -417,20 +418,12 @@ protected:
 	/// \return True if found or not required, false otherwise.
 	bool report_missing(bool found, char const *objname, bool required) const;
 
-	/// \brief Print a message at warning level
-	///
-	/// Prints a message if logging is enabled at warning level or more
-	/// detailed.  Uses printf semantics of the C runtime library.
-	/// \param [in] format Format string as used by printf function in
-	///   runtime library
-	void printf_warning(char const *format, ...) ATTR_PRINTF(2,3);
-
 
 	/// \brief Pointer to next registered discovery helper
 	///
-	/// This is a polymorphic class, so it can't be held in a standardlist
-	/// container that requires elements of the same type.  Hence it
-	/// implements basic single-linked list behaviour.
+	/// This is a polymorphic class, so it can't be held in a standard
+	/// list container that requires elements of the same type.  Hence
+	/// it implements basic intrusive single-linked list behaviour.
 	finder_base *const m_next;
 
 	/// \brief Base device to search from
@@ -453,7 +446,7 @@ protected:
 /// Assumes that non-null pointer is found, and null pointer is not
 /// found.
 template <class ObjectClass, bool Required>
-class object_finder_base : public finder_base
+class object_finder_common_base : public finder_base
 {
 public:
 	/// \brief Clear temporary binding from configuration
@@ -465,15 +458,9 @@ public:
 	virtual void end_configuration() override { assert(!m_resolved); m_target = nullptr; }
 
 	/// \brief Get pointer to target object
+	///
 	/// \return Pointer to target object if found, or nullptr otherwise.
 	ObjectClass *target() const { return m_target; }
-
-	/// \brief Return whether target has been found
-	///
-	/// Works on the assumption that the target object pointer will be
-	/// non-null if the target has been found, and null otherwise.
-	/// \return True if object has been found, or false otherwise.
-	bool found() const { return m_target != nullptr; }
 
 	/// \brief Cast-to-pointer operator
 	///
@@ -488,7 +475,7 @@ public:
 	/// Allows pointer-member-style access to members of the target
 	/// object.  Asserts that the target object has been found.
 	/// \return Pointer to target object if found, or nullptr otherwise.
-	virtual ObjectClass *operator->() const { assert(m_target); return m_target; }
+	ObjectClass *operator->() const { assert(m_target); return m_target; }
 
 protected:
 	/// \brief Designated constructor
@@ -500,7 +487,7 @@ protected:
 	/// \param [in] tag Object tag to search for.  This is not copied,
 	///   it is the caller's responsibility to ensure this pointer
 	///   remains valid until resolution time.
-	object_finder_base(device_t &base, const char *tag) : finder_base(base, tag) { }
+	object_finder_common_base(device_t &base, const char *tag) : finder_base(base, tag) { }
 
 	/// \brief Log if object was not found
 	///
@@ -510,7 +497,7 @@ protected:
 	/// implementation for more detail.
 	/// \param [in] objname Display name for target object type.
 	/// \return True if found or not required, false otherwise.
-	bool report_missing(char const *objname) const { return finder_base::report_missing(found(), objname, Required); }
+	bool report_missing(char const *objname) const { return finder_base::report_missing(m_target != nullptr, objname, Required); }
 
 	/// \brief Pointer to target object
 	///
@@ -518,6 +505,48 @@ protected:
 	/// attempted or the search failed.  Concrete derived classes must
 	/// set this in their implementation of the findit member function.
 	ObjectClass *m_target = nullptr;
+};
+
+
+/// \brief Base class for object discovery helpers
+///
+/// Allows partial specialisations to add members based on object class
+/// and/or whether the object is required.  Template arguments are the
+/// type of object to discover, and whether failure to find the object
+/// is considered an error.
+template <class ObjectClass, bool Required>
+class object_finder_base : public object_finder_common_base<ObjectClass, Required>
+{
+	using object_finder_common_base<ObjectClass, Required>::object_finder_common_base;
+};
+
+
+/// \brief Base class for optional object discovery helpers
+///
+/// Adds helpers for to test whether the object was found, and by
+/// extension whether it's safe to dereference.  Template argument is
+/// the type of object to discover.
+template <class ObjectClass>
+class object_finder_base<ObjectClass, false> : public object_finder_common_base<ObjectClass, false>
+{
+public:
+	/// \brief Return whether target has been found
+	///
+	/// Works on the assumption that the target object pointer will
+	/// be non-null if the target has been found, and null
+	/// otherwise.
+	/// \return True if object has been found, or false otherwise.
+	bool found() const { return this->m_target != nullptr; }
+
+	/// \brief Cast-to-Boolean operator
+	///
+	/// Allows truth tests to test whether it's safe to dereference
+	/// the object, similar to pointers and various C++ standard
+	/// library objects.
+	/// \return True if safe to dereference, or false otherwise.
+	explicit operator bool() const { return this->m_target != nullptr; }
+
+	using object_finder_common_base<ObjectClass, false>::object_finder_common_base;
 };
 
 
@@ -598,13 +627,14 @@ private:
 	/// with the requested tag is found but the type is incorrect, a
 	/// warning message will be printed.  This method is called by the
 	/// base device at resolution time.
-	/// \param [in] isvalidation True if this is a dry run (not
-	///   intending to run the machine, just checking for errors).
+	/// \param [in] valid Pass a pointer to the validity checker if this
+	///   is a dry run (i.e. no intention to actually start the device),
+	///   or nullptr otherwise.
 	/// \return True if the device is optional or if a matching device
 	///   is found, false otherwise.
-	virtual bool findit(bool isvalidation) override
+	virtual bool findit(validity_checker *valid) override
 	{
-		if (!isvalidation)
+		if (!valid)
 		{
 			assert(!this->m_resolved);
 			this->m_resolved = true;
@@ -613,7 +643,7 @@ private:
 		device_t *const device = this->m_base.get().subdevice(this->m_tag);
 		this->m_target = dynamic_cast<DeviceClass *>(device);
 		if (device && !this->m_target)
-			this->printf_warning("Device '%s' found but is of incorrect type (actual type is %s)\n", this->m_tag, device->name());
+			osd_printf_warning("Device '%s' found but is of incorrect type (actual type is %s)\n", this->m_tag, device->name());
 
 		return this->report_missing("device");
 	}
@@ -621,7 +651,7 @@ private:
 
 /// \brief Optional device finder
 ///
-/// Finds device with maching type and tag.  If a device with matching
+/// Finds device with matching type and tag.  If a device with matching
 /// tag is found but the type does not match, a message is printed at
 /// warning level.  No error is generated if a matching device is not
 /// found (the target object pointer will be null).  If you have a
@@ -632,7 +662,7 @@ template <class DeviceClass> using optional_device = device_finder<DeviceClass, 
 
 /// \brief Required device finder
 ///
-/// Finds device with maching type and tag.  If a device with matching
+/// Finds device with matching type and tag.  If a device with matching
 /// tag is found but the type does not match, a message is printed at
 /// warning level.  A validation error is generated if a matching device
 /// is not found.  If you have a number of similar required devices,
@@ -661,7 +691,7 @@ public:
 	/// \param [in] tag Memory region tag to search for.  This is not
 	///   copied, it is the caller's responsibility to ensure this
 	///   pointer remains valid until resolution time.
-	memory_region_finder(device_t &base, char const *tag) : object_finder_base<memory_region, Required>(base, tag) { }
+	memory_region_finder(device_t &base, char const *tag);
 
 private:
 	/// \brief Find memory region
@@ -669,25 +699,17 @@ private:
 	/// Find memory region with requested tag.  For a dry run, the
 	/// target object pointer will not be set.  This method is called by
 	/// the base device at resolution time.
-	/// \param [in] isvalidation True if this is a dry run (not
-	///   intending to run the machine, just checking for errors).
+	/// \param [in] valid Pass a pointer to the validity checker if this
+	///   is a dry run (i.e. no intention to actually start the device),
+	///   or nullptr otherwise.
 	/// \return True if the memory region is optional or if a matching
 	///   memory region is found, false otherwise.
-	virtual bool findit(bool isvalidation) override
-	{
-		if (isvalidation)
-			return this->validate_memregion(0, Required);
-
-		assert(!this->m_resolved);
-		this->m_resolved = true;
-		this->m_target = this->m_base.get().memregion(this->m_tag);
-		return this->report_missing("memory region");
-	}
+	virtual bool findit(validity_checker *valid) override;
 };
 
 /// \brief Optional memory region finder
 ///
-/// Finds memory region with maching tag.  No error is generated if a
+/// Finds memory region with matching tag.  No error is generated if a
 /// matching memory region is not found (the target object pointer will
 /// be null).  If you have a number of similar optional memory regions,
 /// consider using optional_memory_region_array.
@@ -697,7 +719,7 @@ using optional_memory_region = memory_region_finder<false>;
 
 /// \brief Required memory region finder
 ///
-/// Finds memory region with maching tag.  A validation error is
+/// Finds memory region with matching tag.  A validation error is
 /// generated if a matching memory region is not found.  If you have a
 /// number of similar required memory regions, consider using
 /// required_memory_region_array.
@@ -726,32 +748,24 @@ public:
 	/// \param [in] tag Memory bank tag to search for.  This is not
 	///   copied, it is the caller's responsibility to ensure this
 	///   pointer remains valid until resolution time.
-	memory_bank_finder(device_t &base, char const *tag) : object_finder_base<memory_bank, Required>(base, tag) { }
+	memory_bank_finder(device_t &base, char const *tag);
 
 	/// \brief Find memory bank
 	///
 	/// Find memory bank with requested tag.  Just returns true for a
 	/// dry run.  This method is called by the base device at resolution
 	/// time.
-	/// \param [in] isvalidation True if this is a dry run (not
-	///   intending to run the machine, just checking for errors).
+	/// \param [in] valid Pass a pointer to the validity checker if this
+	///   is a dry run (i.e. no intention to actually start the device),
+	///   or nullptr otherwise.
 	/// \return True if the memory bank is optional, a matching memory
 	///   bank is found or this is a dry run, false otherwise.
-	virtual bool findit(bool isvalidation) override
-	{
-		if (isvalidation)
-			return true;
-
-		assert(!this->m_resolved);
-		this->m_resolved = true;
-		this->m_target = this->m_base.get().membank(this->m_tag);
-		return this->report_missing("memory bank");
-	}
+	virtual bool findit(validity_checker *valid) override;
 };
 
 /// \brief Optional memory bank finder
 ///
-/// Finds memory bank with maching tag.  No error is generated if a
+/// Finds memory bank with matching tag.  No error is generated if a
 /// matching memory bank is not found (the target object pointer will
 /// be null).  If you have a number of similar optional memory banks,
 /// consider using optional_memory_bank_array.
@@ -761,7 +775,7 @@ using optional_memory_bank = memory_bank_finder<false>;
 
 /// \brief Required memory bank finder
 ///
-/// Finds memory bank with maching tag.  A validation error is
+/// Finds memory bank with matching tag.  A validation error is
 /// generated if a matching memory bank is not found.  If you have a
 /// number of similar required memory banks, consider using
 /// required_memory_bank_array.
@@ -772,6 +786,90 @@ using required_memory_bank = memory_bank_finder<true>;
 template <unsigned Count, bool Required> using memory_bank_array_finder = object_array_finder<memory_bank_finder<Required>, Count>;
 template <unsigned Count> using optional_memory_bank_array = memory_bank_array_finder<Count, false>;
 template <unsigned Count> using required_memory_bank_array = memory_bank_array_finder<Count, true>;
+
+
+/// \brief Memory bank creator
+///
+/// Creates a memory bank or finds an existing one instantiated via an
+/// address map.
+class memory_bank_creator : public finder_base
+{
+public:
+	/// \brief Memory bank creator constructor
+	/// \param [in] base Base device to search from.
+	/// \param [in] tag Memory bank tag to search for or create.  This
+	///   is not copied, it is the caller's responsibility to ensure
+	///   this pointer remains valid until resolution time.
+	memory_bank_creator(device_t &base, char const *tag) : finder_base(base, tag) { }
+
+	/// \brief Get pointer to memory bank object
+	/// \return Pointer to found or created bank object.
+	memory_bank *target() const { return m_target; }
+
+	/// \brief Cast-to-pointer operator
+	///
+	/// Allows implicit casting to a pointer to the target
+	/// memory bank object.
+	/// \return Pointer to found or created memory bank object.
+	operator memory_bank *() const { return m_target; }
+
+	/// \brief Pointer member access operator
+	///
+	/// Allows pointer-member-style access to members of the target
+	/// memory bank object.  Asserts that the target has been found.
+	/// \return Pointer to found or created bank object.
+	memory_bank *operator->() const { assert(m_target); return m_target; }
+
+protected:
+	virtual bool findit(validity_checker *valid) override;
+	virtual void end_configuration() override;
+
+	/// \brief Pointer to target object
+	///
+	/// Pointer to target memory bank object, or nullptr if creation has
+	/// not been attempted yet.
+	memory_bank *m_target = nullptr;
+};
+
+template <unsigned Count> using memory_bank_array_creator = object_array_finder<memory_bank_creator, Count>;
+
+
+/// \brief Base class for optional I/O port finders
+///
+/// Adds helpers for to test whether the I/O port was found, and to read
+/// the port value or return a default if the I/O port was not found.
+template <>
+class object_finder_base<ioport_port, false> : public object_finder_common_base<ioport_port, false>
+{
+public:
+	/// \brief Read I/O port if found or return default value
+	///
+	/// If the I/O port was found, this reads a value from the I/O port
+	/// and returns it.  If the I/O port was not found, the default
+	/// value (supplied as a parameter) is returned.
+	/// \param [in] defval Value to return if I/O port was not found.
+	/// \return Value read from I/O port if found, or supplied default
+	///   value otherwise.
+	ioport_value read_safe(ioport_value defval) { return this->m_target ? this->m_target->read() : defval; }
+
+	/// \brief Return whether target has been found
+	///
+	/// Works on the assumption that the target object pointer will
+	/// be non-null if the target has been found, and null
+	/// otherwise.
+	/// \return True if object has been found, or false otherwise.
+	bool found() const { return this->m_target != nullptr; }
+
+	/// \brief Cast-to-Boolean operator
+	///
+	/// Allows truth tests to test whether it's safe to dereference
+	/// the object, similar to pointers and various C++ standard
+	/// library objects.
+	/// \return True if safe to dereference, or false otherwise.
+	explicit operator bool() const { return this->m_target != nullptr; }
+
+	using object_finder_common_base<ioport_port, false>::object_finder_common_base;
+};
 
 
 /// \brief I/O port finder template
@@ -790,17 +888,7 @@ public:
 	/// \param [in] tag I/O port tag to search for.  This is not copied,
 	///   it is the caller's responsibility to ensure this pointer
 	///   remains valid until resolution time.
-	ioport_finder(device_t &base, char const *tag) : object_finder_base<ioport_port, Required>(base, tag) { }
-
-	/// \brief Read I/O port if found or return default value
-	///
-	/// If the I/O port was found, this reads a value from the I/O port
-	/// and returns it.  If the I/O port was not found, the default
-	/// value (supplied as a parameter) is returned.
-	/// \param [in] defval Value to return if I/O port was not found.
-	/// \return Value read from I/O port if found, or supplied default
-	///   value otherwise.
-	ioport_value read_safe(ioport_value defval) { return this->m_target ? this->m_target->read() : defval; }
+	ioport_finder(device_t &base, char const *tag);
 
 private:
 	/// \brief Find I/O port
@@ -808,25 +896,17 @@ private:
 	/// Find I/O port with requested tag.  Just returns true for a dry
 	/// run.  This method is called by the base device at resolution
 	/// time.
-	/// \param [in] isvalidation True if this is a dry run (not
-	///   intending to run the machine, just checking for errors).
+	/// \param [in] valid Pass a pointer to the validity checker if this
+	///   is a dry run (i.e. no intention to actually start the device),
+	///   or nullptr otherwise.
 	/// \return True if the I/O port is optional, a matching I/O port is
 	///   is found or this is a dry run, false otherwise.
-	virtual bool findit(bool isvalidation) override
-	{
-		if (isvalidation)
-			return true;
-
-		assert(!this->m_resolved);
-		this->m_resolved = true;
-		this->m_target = this->m_base.get().ioport(this->m_tag);
-		return this->report_missing("I/O port");
-	}
+	virtual bool findit(validity_checker *valid) override;
 };
 
 /// \brief Optional I/O port finder
 ///
-/// Finds I/O port with maching tag.  No error is generated if a
+/// Finds I/O port with matching tag.  No error is generated if a
 /// matching I/O port is not found (the target object pointer will be
 /// null).  If you have a number of similar optional I/O ports, consider
 /// using optional_ioport_array.
@@ -835,9 +915,9 @@ using optional_ioport = ioport_finder<false>;
 
 /// \brief Required I/O port finder
 ///
-/// Finds I/O port with maching tag.  A validation error is generated if
-/// a matching I/O port is not found.  If you have a number of similar
-/// required I/O ports, consider using required_ioport_array.
+/// Finds I/O port with matching tag.  A validation error is generated
+/// if a matching I/O port is not found.  If you have a number of
+/// similar required I/O ports, consider using required_ioport_array.
 /// \sa optional_ioport required_ioport_array ioport_finder
 using required_ioport = ioport_finder<true>;
 
@@ -849,9 +929,9 @@ template <unsigned Count> using required_ioport_array = ioport_array_finder<Coun
 /// \brief Address space finder template
 ///
 /// Template argument is whether the address space is required.  It is a
-/// validation error if a required address space is not found.  This class is
-/// generally not used directly, instead the optional_address_space and
-/// required_address_space helpers are used.
+/// validation error if a required address space is not found.  This
+/// class is generally not used directly, instead the
+/// optional_address_space and required_address_space helpers are used.
 /// \sa optional_address_space required_address_space
 template <bool Required>
 class address_space_finder : public object_finder_base<address_space, Required>
@@ -859,12 +939,13 @@ class address_space_finder : public object_finder_base<address_space, Required>
 public:
 	/// \brief Address space finder constructor
 	/// \param [in] base Base device to search from.
-	/// \param [in] tag Address space tag to search for.  This is not copied,
-	///   it is the caller's responsibility to ensure this pointer
-	///   remains valid until resolution time.
+	/// \param [in] tag Address space device tag to search for.
+	///   This is not copied, it is the caller's responsibility to
+	///   ensure this pointer remains valid until resolution time.
 	/// \param [in] spacenum Address space number.
-	/// \param [in] width Specific data width (optional).
-	address_space_finder(device_t &base, char const *tag, int spacenum, u8 width = 0) : object_finder_base<address_space, Required>(base, tag), m_spacenum(spacenum), m_data_width(width) { }
+	/// \param [in] width Required data width in bits, or zero if
+	///   any data width is acceptable.
+	address_space_finder(device_t &base, char const *tag, int spacenum, u8 width = 0);
 
 	/// \brief Set search tag and space number
 	///
@@ -881,9 +962,9 @@ public:
 
 	/// \brief Set search tag and space number
 	///
-	/// Allows search tag to be changed after construction.  Note that
-	/// this must be done before resolution time to take effect.  Also
-	/// note that the tag is not copied.
+	/// Allows search tag and address space number to be changed after
+	/// construction.  Note that this must be done before resolution
+	/// time to take effect.  Also note that the tag is not copied.
 	/// \param [in] tag Updated search tag relative to the current
 	///   device being configured.  This is not copied, it is the
 	///   caller's responsibility to ensure this pointer remains valid
@@ -893,19 +974,30 @@ public:
 
 	/// \brief Set search tag and space number
 	///
-	/// Allows search tag to be changed after construction.  Note that
-	/// this must be done before resolution time to take effect.
+	/// Allows search tag and address space number to be changed after
+	/// construction.  Note that this must be done before resolution
+	/// time to take effect.  Also note that the tag is not copied.
 	/// \param [in] finder Object finder to take the search base and tag
 	///   from.
 	/// \param [in] spacenum Address space number.
 	void set_tag(finder_base const &finder, int spacenum) { finder_base::set_tag(finder); this->m_spacenum = spacenum; }
 
+	/// \brief Set search tag and space number
+	///
+	/// Allows search tag and address space number to be changed after
+	/// construction.  Note that this must be done before resolution
+	/// time to take effect.  Also note that the tag is not copied.
+	/// \param [in] finder Address space finder to take the search base,
+	///   tag and address space number from.
+	template <bool R> void set_tag(address_space_finder<R> const &finder) { set_tag(finder, finder.spacenum()); }
+
 	/// \brief Set data width of space
 	///
-	/// Allows data width to be specified after construction.  Note that
-	/// this must be done before resolution time to take effect.
-	/// \param [in] width Data width in bits (0 = don't care).
-	void set_data_width(u8 width) { this->m_data_width = width; }
+	/// Allows data width to be specified after construction.  Note
+	/// that this must be done before resolution time to take effect.
+	/// \param [in] width Required data width in bits, or zero if any
+	///   data width is acceptable.
+	void set_data_width(u8 width) { assert(!this->m_resolved); this->m_data_width = width; }
 
 	/// \brief Get space number
 	///
@@ -919,20 +1011,12 @@ private:
 	/// Find address space with requested tag.  For a dry run, the
 	/// target object pointer will not be set.  This method is called by
 	/// the base device at resolution time.
-	/// \param [in] isvalidation True if this is a dry run (not
-	///   intending to run the machine, just checking for errors).
-	/// \return True if the address space is optional, a matching address space is
-	///   is found or this is a dry run, false otherwise.
-	virtual bool findit(bool isvalidation) override
-	{
-		if (isvalidation)
-			return this->validate_addrspace(this->m_spacenum, this->m_data_width, Required);
-
-		assert(!this->m_resolved);
-		this->m_resolved = true;
-		this->m_target = this->find_addrspace(this->m_spacenum, this->m_data_width, Required);
-		return this->report_missing("address space");
-	}
+	/// \param [in] valid Pass a pointer to the validity checker if this
+	///   is a dry run (i.e. no intention to actually start the device),
+	///   or nullptr otherwise.
+	/// \return True if the address space is optional, a matching
+	///   address space is found or this is a dry run, false otherwise.
+	virtual bool findit(validity_checker *valid) override;
 
 	int m_spacenum;
 	u8 m_data_width;
@@ -940,16 +1024,16 @@ private:
 
 /// \brief Optional address space finder
 ///
-/// Finds address space with maching tag and number.  No error is generated if a
-/// matching address space is not found (the target object pointer will be
-/// null).
+/// Finds address space with matching tag and number.  No error is
+/// generated if a matching address space is not found (the target
+/// object pointer will be null).
 /// \sa required_address_space address_space_finder
 using optional_address_space = address_space_finder<false>;
 
 /// \brief Required address space finder
 ///
-/// Finds address space with maching tag and number.  A validation error is generated if
-/// a matching address space is not found.
+/// Finds address space with matching tag and number.  A validation
+/// error is generated if a matching address space is not found.
 /// \sa optional_address_space address_space_finder
 using required_address_space = address_space_finder<true>;
 
@@ -973,11 +1057,8 @@ public:
 	/// \param [in] tag Memory region tag to search for.  This is not
 	///   copied, it is the caller's responsibility to ensure this
 	///   pointer remains valid until resolution time.
-	/// \param [in] length Desired memory region length in units of the
-	///   size of the element type, or zero to match any region length.
-	region_ptr_finder(device_t &base, char const *tag, size_t length = 0)
+	region_ptr_finder(device_t &base, char const *tag)
 		: object_finder_base<PointerType, Required>(base, tag)
-		, m_desired_length(length)
 		, m_length(0)
 	{
 	}
@@ -985,29 +1066,23 @@ public:
 	/// \brief Array access operator
 	///
 	/// Returns a non-const reference to the element of the memory
-	/// region at the supplied zero-based index.
-	/// Behaviour is undefined for negative element indices.
+	/// region at the supplied zero-based index.  Behaviour is undefined
+	/// for negative element indices.
 	/// \param [in] index Non-negative element index.
 	/// \return Non-const reference to element at requested index.
 	PointerType &operator[](int index) const { assert(index < m_length); return this->m_target[index]; }
 
 	/// \brief Get length in units of elements
+	///
 	/// \return Length in units of elements or zero if no matching
 	///   memory region has been found.
-	u32 length() const { return m_length; }
+	size_t length() const { return m_length; }
 
 	/// \brief Get length in units of bytes
+	///
 	/// \return Length in units of bytes or zero if no matching memory
 	///   region has been found.
-	u32 bytes() const { return m_length * sizeof(PointerType); }
-
-	/// \brief Get index mask
-	///
-	/// Returns the length in units of elements minus one, which can be
-	/// used as a mask for index values if the length is a power of two.
-	/// Result is undefined if no matching memory region has been found.
-	/// \return Length in units of elements minus one.
-	u32 mask() const { return m_length - 1; }
+	size_t bytes() const { return m_length * sizeof(PointerType); }
 
 private:
 	/// \brief Find memory region base pointer
@@ -1018,28 +1093,23 @@ private:
 	/// checked - the width is not checked and the target pointer is not
 	/// set.  This method is called by the base device at resolution
 	/// time.
-	/// \param [in] isvalidation True if this is a dry run (not
-	///   intending to run the machine, just checking for errors).
+	/// \param [in] valid Pass a pointer to the validity checker if this
+	///   is a dry run (i.e. no intention to actually start the device),
+	///   or nullptr otherwise.
 	/// \return True if the memory region is optional or a matching
 	///   memory region is found, or false otherwise.
-	virtual bool findit(bool isvalidation) override
+	virtual bool findit(validity_checker *valid) override
 	{
-		if (isvalidation)
-			return this->validate_memregion(sizeof(PointerType) * m_desired_length, Required);
+		if (valid)
+			return this->validate_memregion(Required);
 
 		assert(!this->m_resolved);
 		this->m_resolved = true;
-		m_length = m_desired_length;
 		this->m_target = reinterpret_cast<PointerType *>(this->find_memregion(sizeof(PointerType), m_length, Required));
 		return this->report_missing("memory region");
 	}
 
-	/// \brief Desired region length
-	///
-	/// Desired region length in units of elements.
-	size_t const m_desired_length;
-
-	/// \brief Matched region length
+	/// \brief Region length
 	///
 	/// Actual length of the region that was found in units of
 	/// elements, or zero if no matching region has been found.
@@ -1048,7 +1118,7 @@ private:
 
 /// \brief Optional memory region base pointer finder
 ///
-/// Finds base pointer of memory region with maching tag, width and
+/// Finds base pointer of memory region with matching tag, width and
 /// length.  No error is generated if a matching memory region is not
 /// found (the target pointer will be null).  If you have a number of
 /// similar optional memory regions, consider using
@@ -1058,7 +1128,7 @@ template <typename PointerType> using optional_region_ptr = region_ptr_finder<Po
 
 /// \brief Required memory region base pointer finder
 ///
-/// Finds base pointer of memory region with maching tag, width and
+/// Finds base pointer of memory region with matching tag, width and
 /// length.  A validation error is generated if a matching memory region
 /// is not found.  If you have a number of similar required memory
 /// regions, consider using required_region_ptr_array.
@@ -1070,66 +1140,199 @@ template <typename PointerType, unsigned Count> using optional_region_ptr_array 
 template <typename PointerType, unsigned Count> using required_region_ptr_array = region_ptr_array_finder<PointerType, Count, true>;
 
 
-// ======================> shared_ptr_finder
-
-// shared pointer finder template
+/// \brief Memory share base pointer finder
+///
+/// Template arguments are the element type of the memory share and
+/// whether the memory share is required.  It is a validation error if a
+/// required memory share is not found.  This class is generally not
+/// used directly, instead the optional_shared_ptr and
+/// required_shared_ptr helpers are used.
+/// \sa optional_shared_ptr required_shared_ptr
 template <typename PointerType, bool Required>
 class shared_ptr_finder : public object_finder_base<PointerType, Required>
 {
 public:
-	// construction/destruction
-	shared_ptr_finder(device_t &base, char const *tag, u8 width = sizeof(PointerType) * 8)
+	/// \brief Memory share finder constructor
+	///
+	/// Desired width is implied by sizeof(PointerType).
+	/// \param [in] base Base device to search from.
+	/// \param [in] tag Memory share tag to search for.  This is not
+	///   copied, it is the caller's responsibility to ensure this
+	///   pointer remains valid until resolution time.
+	shared_ptr_finder(device_t &base, char const *tag)
 		: object_finder_base<PointerType, Required>(base, tag)
-		, m_width(width)
 		, m_bytes(0)
-		, m_allocated(0)
 	{
 	}
 
-	// operators to make use transparent
+	/// \brief Array access operator
+	///
+	/// Returns a non-const reference to the element of the memory
+	/// share at the supplied zero-based index.  Behaviour is undefined
+	/// for negative element indices.
+	/// \param [in] index Non-negative element index.
+	/// \return Non-const reference to element at requested index.
 	PointerType &operator[](int index) const { return this->m_target[index]; }
 
-	// getter for explicit fetching
-	u32 bytes() const { return m_bytes; }
-	u32 mask() const { return m_bytes - 1; } // FIXME: wrong when sizeof(PointerType) != 1
+	/// \brief Get length in units of elements
+	///
+	/// \return Length in units of elements or zero if no matching
+	///   memory region has been found.
+	size_t length() const { return m_bytes / sizeof(PointerType); }
 
-	// setter for setting the object
-	void set_target(PointerType *target, size_t bytes) { this->m_target = target; m_bytes = bytes; }
-
-	// dynamic allocation of a shared pointer
-	void allocate(u32 entries)
-	{
-		assert(m_allocated.empty());
-		m_allocated.resize(entries);
-		this->m_target = &m_allocated[0];
-		m_bytes = entries * sizeof(PointerType);
-		this->m_base.get().save_item(m_allocated, this->m_tag);
-	}
+	/// \brief Get length in bytes
+	///
+	/// \return Length in bytes or zero if no matching memory share has
+	///   been found.
+	size_t bytes() const { return m_bytes; }
 
 private:
-	// finder
-	virtual bool findit(bool isvalidation) override
+	/// \brief Find memory share base pointer
+	///
+	/// Find base pointer of memory share with with requested tag.
+	/// Width of memory share is checked against sizeof(PointerType).
+	/// This method is called by the base device at resolution time.
+	/// \param [in] valid Pass a pointer to the validity checker if this
+	///   is a dry run (i.e. no intention to actually start the device),
+	///   or nullptr otherwise.
+	/// \return True if the memory share is optional or a matching
+	///   memory share is found, or false otherwise.
+	virtual bool findit(validity_checker *valid) override
 	{
-		if (isvalidation)
+		if (valid)
 			return true;
 
 		assert(!this->m_resolved);
 		this->m_resolved = true;
-		this->m_target = reinterpret_cast<PointerType *>(this->find_memshare(m_width, m_bytes, Required));
+		this->m_target = reinterpret_cast<PointerType *>(this->find_memshare(sizeof(PointerType)*8, m_bytes, Required));
 		return this->report_missing("shared pointer");
 	}
 
-	// internal state
-	u8 const m_width;
+	/// \brief Memory share length
+	///
+	/// Actual length of the memory share that was found in bytes, or
+	/// zero if no matching region has been found.
 	size_t m_bytes;
-	std::vector<PointerType> m_allocated;
 };
 
+/// \brief Optional memory share base pointer finder
+///
+/// Finds base pointer of memory share with matching tag and width.  No
+/// error is generated if a matching memory share is not found (the
+/// target pointer will be null).  If you have a number of similar
+/// optional memory regions, consider using optional_shared_ptr_array.
+/// \sa required_shared_ptr optional_shared_ptr_array shared_ptr_finder
 template <typename PointerType> using optional_shared_ptr = shared_ptr_finder<PointerType, false>;
+
+/// \brief Required memory share base pointer finder
+///
+/// Finds base pointer of memory share with matching tag and width.  A
+/// validation error is generated if a matching memory share is not
+/// found.  If you have a number of similar required memory shares,
+/// consider using required_shared_ptr_array.
+/// \sa optional_shared_ptr required_shared_ptr_array shared_ptr_finder
 template <typename PointerType> using required_shared_ptr = shared_ptr_finder<PointerType, true>;
+
 template <typename PointerType, unsigned Count, bool Required> using shared_ptr_array_finder = object_array_finder<shared_ptr_finder<PointerType, Required>, Count>;
 template <typename PointerType, unsigned Count> using optional_shared_ptr_array = shared_ptr_array_finder<PointerType, Count, false>;
 template <typename PointerType, unsigned Count> using required_shared_ptr_array = shared_ptr_array_finder<PointerType, Count, true>;
+
+
+/// \brief Memory share creator template
+///
+/// Creates a memory share or finds an existing one instantiated via an
+/// address map.  Template argument is the element type of the memory
+/// share.  If an existing memory share is found, it is an error if it
+/// doesn't match the requested width, length and endianness.
+template <typename PointerType>
+class memory_share_creator : public finder_base
+{
+public:
+	/// \brief Memory share creator constructor
+	///
+	/// Desired width is implied by sizeof(PointerType).
+	/// \param [in] base Base device to search from.
+	/// \param [in] tag Memory share tag to search for or create.  This
+	///   is not copied, it is the caller's responsibility to ensure
+	///   this pointer remains valid until resolution time.
+	/// \param [in] bytes Desired memory share length in bytes.
+	/// \param [in] endianness Desired endianness of the memory share.
+	memory_share_creator(device_t &base, char const *tag, size_t bytes, endianness_t endianness);
+
+	/// \brief Get target memory share base pointer
+	///
+	/// Must not be called before creation is attempted.
+	/// \return Base pointer of found or created memory share.
+	PointerType *target() const { return reinterpret_cast<PointerType *>(m_target->ptr()); }
+
+	/// \brief Cast-to-pointer operator
+	///
+	/// Allows implicit casting to the base pointer of the target memory
+	/// share.  Must not be called before creation is attempted.
+	/// \return Base pointer of found or created memory share.
+	operator PointerType *() const { return target(); }
+
+	/// \brief Array access operator
+	///
+	/// Returns a non-const reference to the element of the memory
+	/// share at the supplied zero-based index.  Behaviour is undefined
+	/// for negative element indices.  Must not be called before
+	/// creation is attempted.
+	/// \param [in] index Non-negative element index.
+	/// \return Non-const reference to element at requested index.
+	PointerType &operator[](int index) const { return target()[index]; }
+
+	/// \brief Get length in units of elements
+	///
+	/// Must not be called before creation is attempted.
+	/// \return Length of memory share in units of elements.
+	size_t length() const { return m_target->bytes() / sizeof(PointerType); }
+
+	/// \brief Get length in bytes
+	///
+	/// Must not be called before creation is attempted.
+	/// \return Length of memory share in bytes.
+	size_t bytes() const { return m_target->bytes(); }
+
+	/// \brief Get endianness
+	///
+	/// Must not be called before creation is attempted.
+	/// \return Endianness of memory share.
+	endianness_t endianness() const { return m_target->endianness(); }
+
+	/// \brief Get width in bits
+	///
+	/// Must not be called before creation is attempted.
+	/// \return Memory share width in bits.
+	u8 bitwidth() const { return m_target->bitwidth(); }
+
+	/// \brief Get width in bytes
+	///
+	/// Must not be called before creation is attempted.
+	/// \return Memory share width in bytes.
+	u8 bytewidth() const { return m_target->bytewidth(); }
+
+protected:
+	virtual bool findit(validity_checker *valid) override;
+	virtual void end_configuration() override;
+
+	/// \brief Pointer to target object
+	///
+	/// Pointer to target memory share object, or nullptr if creation
+	/// has not been attempted yet.
+	memory_share *m_target = nullptr;
+
+	/// \brief Requested memory share width in bits
+	u8 const m_width;
+
+	/// \brief Requested memory share length in bytes
+	size_t const m_bytes;
+
+	/// \brief Requested memory share endianness
+	endianness_t const m_endianness;
+};
+
+template <typename PointerType, unsigned Count> using memory_share_array_creator = object_array_finder<memory_share_creator<PointerType>, Count>;
 
 
 
@@ -1171,6 +1374,9 @@ extern template class memory_bank_finder<true>;
 extern template class ioport_finder<false>;
 extern template class ioport_finder<true>;
 
+extern template class address_space_finder<false>;
+extern template class address_space_finder<true>;
+
 extern template class region_ptr_finder<u8, false>;
 extern template class region_ptr_finder<u8, true>;
 extern template class region_ptr_finder<u16, false>;
@@ -1206,6 +1412,16 @@ extern template class shared_ptr_finder<s32, false>;
 extern template class shared_ptr_finder<s32, true>;
 extern template class shared_ptr_finder<s64, false>;
 extern template class shared_ptr_finder<s64, true>;
+
+extern template class memory_share_creator<u8>;
+extern template class memory_share_creator<u16>;
+extern template class memory_share_creator<u32>;
+extern template class memory_share_creator<u64>;
+
+extern template class memory_share_creator<s8>;
+extern template class memory_share_creator<s16>;
+extern template class memory_share_creator<s32>;
+extern template class memory_share_creator<s64>;
 
 #endif // MAME_EMU_DEVFIND_H
 /// \}

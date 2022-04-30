@@ -13,6 +13,7 @@
 #include "pce_rom.h"
 
 
+
 //-------------------------------------------------
 //  pce_rom_device - constructor
 //-------------------------------------------------
@@ -111,28 +112,30 @@ void pce_tennokoe_device::nvram_default()
 	memcpy(m_bram + 0x1800, m_rom + 0x8800, 0x800);
 }
 
-void pce_tennokoe_device::nvram_read(emu_file &file)
+bool pce_tennokoe_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_bram, m_bram_size);
+	size_t actual_size;
+	return !file.read(m_bram, m_bram_size, actual_size) && actual_size == m_bram_size;
 }
 
-void pce_tennokoe_device::nvram_write(emu_file &file)
+bool pce_tennokoe_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_bram, m_bram_size);
+	size_t actual_size;
+	return !file.write(m_bram, m_bram_size, actual_size) && actual_size == m_bram_size;
 }
 
 /*-------------------------------------------------
  mapper specific handlers
  -------------------------------------------------*/
 
-READ8_MEMBER(pce_rom_device::read_cart)
+uint8_t pce_rom_device::read_cart(offs_t offset)
 {
 	int bank = offset / 0x20000;
 	return m_rom[rom_bank_map[bank] * 0x20000 + (offset & 0x1ffff)];
 }
 
 
-READ8_MEMBER(pce_cdsys3_device::read_cart)
+uint8_t pce_cdsys3_device::read_cart(offs_t offset)
 {
 	int bank = offset / 0x20000;
 	if (!m_ram.empty() && offset >= 0xd0000)
@@ -141,14 +144,14 @@ READ8_MEMBER(pce_cdsys3_device::read_cart)
 	return m_rom[rom_bank_map[bank] * 0x20000 + (offset & 0x1ffff)];
 }
 
-WRITE8_MEMBER(pce_cdsys3_device::write_cart)
+void pce_cdsys3_device::write_cart(offs_t offset, uint8_t data)
 {
 	if (!m_ram.empty() && offset >= 0xd0000)
 		m_ram[offset - 0xd0000] = data;
 }
 
 
-READ8_MEMBER(pce_populous_device::read_cart)
+uint8_t pce_populous_device::read_cart(offs_t offset)
 {
 	int bank = offset / 0x20000;
 	if (!m_ram.empty() && offset >= 0x80000 && offset < 0x88000)
@@ -157,14 +160,14 @@ READ8_MEMBER(pce_populous_device::read_cart)
 	return m_rom[rom_bank_map[bank] * 0x20000 + (offset & 0x1ffff)];
 }
 
-WRITE8_MEMBER(pce_populous_device::write_cart)
+void pce_populous_device::write_cart(offs_t offset, uint8_t data)
 {
 	if (!m_ram.empty() && offset >= 0x80000 && offset < 0x88000)
 		m_ram[offset & 0x7fff] = data;
 }
 
 
-READ8_MEMBER(pce_sf2_device::read_cart)
+uint8_t pce_sf2_device::read_cart(offs_t offset)
 {
 	if (offset < 0x80000)
 		return m_rom[offset];
@@ -172,13 +175,13 @@ READ8_MEMBER(pce_sf2_device::read_cart)
 		return m_rom[0x80000 + m_bank_base * 0x80000 + (offset & 0x7ffff)];
 }
 
-WRITE8_MEMBER(pce_sf2_device::write_cart)
+void pce_sf2_device::write_cart(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x1ff0 && offset < 0x1ff4)
 		m_bank_base = offset & 3;
 }
 
-READ8_MEMBER(pce_tennokoe_device::read_cart)
+uint8_t pce_tennokoe_device::read_cart(offs_t offset)
 {
 	switch((offset & 0xf0000) >> 16)
 	{
@@ -202,7 +205,7 @@ READ8_MEMBER(pce_tennokoe_device::read_cart)
 	return 0xff;
 }
 
-WRITE8_MEMBER(pce_tennokoe_device::write_cart)
+void pce_tennokoe_device::write_cart(offs_t offset, uint8_t data)
 {
 	switch((offset & 0xf0000) >> 16)
 	{
@@ -214,6 +217,7 @@ WRITE8_MEMBER(pce_tennokoe_device::write_cart)
 			// TODO: lock/unlock mechanism is a complete guess, needs real HW study
 			// (writes to ports $c0000, $d0000, $f0000)
 			m_bram_locked = (data == 0);
+			[[fallthrough]];
 		default:
 			logerror("tennokoe: ROM writing at %06x %02x\n",offset,data);
 			break;

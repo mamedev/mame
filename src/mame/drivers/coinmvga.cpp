@@ -301,13 +301,13 @@ uint32_t coinmvga_state::screen_update_coinmvga(screen_device &screen, bitmap_in
 *  Read / Write Handlers  *
 **************************/
 
-//WRITE8_MEMBER(coinmvga_state::debug_w)
+//void coinmvga_state::debug_w(uint8_t data)
 //{
 //  popmessage("written : %02X", data);
 //}
 
 /*
-READ16_MEMBER(coinmvga_state::test_r)
+uint16_t coinmvga_state::test_r()
 {
     return machine().rand();
 }*/

@@ -19,21 +19,21 @@ TODO:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
-#include "sound/ym2151.h"
 #include "sound/k053260.h"
+#include "sound/ymopm.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 
 #if 0
-READ16_MEMBER(asterix_state::control2_r)
+uint16_t asterix_state::control2_r()
 {
 	return m_cur_control2;
 }
 #endif
 
-WRITE16_MEMBER(asterix_state::control2_w)
+void asterix_state::control2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -65,7 +65,7 @@ INTERRUPT_GEN_MEMBER(asterix_state::asterix_interrupt)
 	device.execute().set_input_line(5, HOLD_LINE); /* ??? All irqs have the same vector, and the mask used is 0 or 7 */
 }
 
-void asterix_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void asterix_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -77,13 +77,13 @@ void asterix_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 }
 
-WRITE8_MEMBER(asterix_state::sound_arm_nmi_w)
+void asterix_state::sound_arm_nmi_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	timer_set(attotime::from_usec(5), TIMER_NMI);
 }
 
-WRITE16_MEMBER(asterix_state::sound_irq_w)
+void asterix_state::sound_irq_w(uint16_t data)
 {
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
@@ -92,7 +92,7 @@ WRITE16_MEMBER(asterix_state::sound_irq_w)
 // You're not supposed to laugh.
 // This emulation is grossly overkill but hey, I'm having fun.
 #if 0
-WRITE16_MEMBER(asterix_state::protection_w)
+void asterix_state::protection_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_prot + offset);
 
@@ -130,7 +130,7 @@ WRITE16_MEMBER(asterix_state::protection_w)
 }
 #endif
 
-WRITE16_MEMBER(asterix_state::protection_w)
+void asterix_state::protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_prot + offset);
 
@@ -200,7 +200,7 @@ void asterix_state::sound_map(address_map &map)
 	map(0xf801, 0xf801).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w));
 	map(0xfa00, 0xfa2f).rw("k053260", FUNC(k053260_device::read), FUNC(k053260_device::write));
 	map(0xfc00, 0xfc00).w(FUNC(asterix_state::sound_arm_nmi_w));
-	map(0xfe00, 0xfe00).w("ymsnd", FUNC(ym2151_device::register_w));
+	map(0xfe00, 0xfe00).w("ymsnd", FUNC(ym2151_device::address_w));
 }
 
 

@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "debugger.h"
-#include "debug/debugcpu.h"
+#include "debug/debugcon.h"
 #include "debug/debugvw.h"
 
 
@@ -30,7 +30,7 @@
 
 - (NSSize)maximumFrameSize {
 	debug_view_xy           max;
-	device_t                *curcpu = machine->debugger().cpu().get_visible_cpu();
+	device_t                *curcpu = machine->debugger().console().get_visible_cpu();
 	const debug_view_source *source = view->source_for_device(curcpu);
 
 	max.x = max.y = 0;

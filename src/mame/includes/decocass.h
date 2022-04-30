@@ -50,10 +50,12 @@ public:
 		, m_tileram(*this, "tileram")
 		, m_objectram(*this, "objectram")
 		, m_paletteram(*this, "paletteram")
+		, m_bank1(*this, "bank1")
 	{
 	}
 
 	void decocass(machine_config &config);
+	void decocrom(machine_config &config);
 
 	void init_decocass();
 	void init_decocrom();
@@ -65,14 +67,14 @@ protected:
 	required_device<upi41_cpu_device> m_mcu;
 
 	/* dongles-related */
-	read8_delegate    m_dongle_r; // TODO: why isn't this a virtual method?
-	write8_delegate   m_dongle_w; // TODO: why isn't this a virtual method?
+	read8sm_delegate    m_dongle_r; // TODO: why isn't this a virtual method?
+	write8sm_delegate   m_dongle_w; // TODO: why isn't this a virtual method?
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	int32_t     m_firsttime;
-	uint8_t     m_latch1;
+	int32_t     m_firsttime = 0U;
+	uint8_t     m_latch1 = 0U;
 
 private:
 	/* devices */
@@ -90,54 +92,55 @@ private:
 	required_shared_ptr<uint8_t> m_charram;
 	required_shared_ptr<uint8_t> m_fgvideoram;
 	required_shared_ptr<uint8_t> m_colorram;
-	uint8_t *   m_bgvideoram; /* shares bits D0-3 with tileram! */
+	uint8_t *   m_bgvideoram = nullptr; /* shares bits D0-3 with tileram! */
 	required_shared_ptr<uint8_t> m_tileram;
 	required_shared_ptr<uint8_t> m_objectram;
 	required_shared_ptr<uint8_t> m_paletteram;
+	optional_memory_bank         m_bank1;
 
-	size_t    m_bgvideoram_size;
+	size_t    m_bgvideoram_size = 0U;
 
 	/* video-related */
-	tilemap_t   *m_fg_tilemap;
-	tilemap_t   *m_bg_tilemap_l;
-	tilemap_t   *m_bg_tilemap_r;
-	uint8_t     m_empty_tile[16*16];
-	int32_t     m_watchdog_count;
-	int32_t     m_watchdog_flip;
-	int32_t     m_color_missiles;
-	int32_t     m_color_center_bot;
-	int32_t     m_mode_set;
-	int32_t     m_back_h_shift;
-	int32_t     m_back_vl_shift;
-	int32_t     m_back_vr_shift;
-	int32_t     m_part_h_shift;
-	int32_t     m_part_v_shift;
-	int32_t     m_center_h_shift_space;
-	int32_t     m_center_v_shift;
-	rectangle m_bg_tilemap_l_clip;
-	rectangle m_bg_tilemap_r_clip;
+	tilemap_t   *m_fg_tilemap = nullptr;
+	tilemap_t   *m_bg_tilemap_l = nullptr;
+	tilemap_t   *m_bg_tilemap_r = nullptr;
+	uint8_t     m_empty_tile[16*16]{};
+	int32_t     m_watchdog_count = 0;
+	int32_t     m_watchdog_flip = 0;
+	int32_t     m_color_missiles = 0;
+	int32_t     m_color_center_bot = 0;
+	int32_t     m_mode_set = 0;
+	int32_t     m_back_h_shift = 0;
+	int32_t     m_back_vl_shift = 0;
+	int32_t     m_back_vr_shift = 0;
+	int32_t     m_part_h_shift = 0;
+	int32_t     m_part_v_shift = 0;
+	int32_t     m_center_h_shift_space = 0;
+	int32_t     m_center_v_shift = 0;
+	rectangle m_bg_tilemap_l_clip{};
+	rectangle m_bg_tilemap_r_clip{};
 
 	/* sound-related */
-	uint8_t     m_sound_ack;  /* sound latches, ACK status bits and NMI timer */
-	uint8_t     m_audio_nmi_enabled;
-	uint8_t     m_audio_nmi_state;
+	uint8_t     m_sound_ack = 0U;  /* sound latches, ACK status bits and NMI timer */
+	uint8_t     m_audio_nmi_enabled = 0U;
+	uint8_t     m_audio_nmi_state = 0U;
 
 	/* misc */
-	uint8_t     m_decocass_reset;
-	int32_t     m_de0091_enable;  /* DE-0091xx daughter board enable */
-	uint8_t     m_quadrature_decoder[4];  /* four inputs from the quadrature decoder (H1, V1, H2, V2) */
-	int       m_showmsg;        // for debugging purposes
+	uint8_t     m_decocass_reset = 0U;
+	int32_t     m_de0091_enable = 0;  /* DE-0091xx daughter board enable */
+	uint8_t     m_quadrature_decoder[4]{};  /* four inputs from the quadrature decoder (H1, V1, H2, V2) */
+	int       m_showmsg = 0;        // for debugging purposes
 
 	/* i8041 */
-	uint8_t     m_i8041_p1;
-	uint8_t     m_i8041_p2;
-	int       m_i8041_p1_write_latch;
-	int       m_i8041_p1_read_latch;
-	int       m_i8041_p2_write_latch;
-	int       m_i8041_p2_read_latch;
+	uint8_t     m_i8041_p1 = 0U;
+	uint8_t     m_i8041_p2 = 0U;
+	int       m_i8041_p1_write_latch = 0;
+	int       m_i8041_p1_read_latch = 0;
+	int       m_i8041_p2_write_latch = 0;
+	int       m_i8041_p2_read_latch = 0;
 
 	/* DS Telejan */
-	uint8_t     m_mux_data;
+	uint8_t     m_mux_data = 0U;
 
 	TILEMAP_MAPPER_MEMBER(fgvideoram_scan_cols);
 	TILEMAP_MAPPER_MEMBER(bgvideoram_scan_cols);
@@ -148,68 +151,69 @@ private:
 	void decocass_palette(palette_device &palette) const;
 
 	uint32_t screen_update_decocass(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER(decocass_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(decocass_sound_command_w);
-	DECLARE_READ8_MEMBER(decocass_sound_command_main_r);
-	DECLARE_READ8_MEMBER(decocass_sound_data_r);
-	DECLARE_READ8_MEMBER(decocass_sound_ack_r);
-	DECLARE_WRITE8_MEMBER(decocass_sound_data_w);
-	DECLARE_READ8_MEMBER(decocass_sound_command_r);
-	DECLARE_WRITE8_MEMBER(decocass_sound_nmi_enable_w);
-	DECLARE_READ8_MEMBER(decocass_sound_nmi_enable_r);
-	DECLARE_READ8_MEMBER(decocass_sound_data_ack_reset_r);
-	DECLARE_WRITE8_MEMBER(decocass_sound_data_ack_reset_w);
-	DECLARE_WRITE8_MEMBER(decocass_nmi_reset_w);
-	DECLARE_WRITE8_MEMBER(decocass_quadrature_decoder_reset_w);
-	DECLARE_WRITE8_MEMBER(decocass_adc_w);
-	DECLARE_READ8_MEMBER(decocass_input_r);
+	void decocass_coin_counter_w(uint8_t data);
+	void decocass_sound_command_w(uint8_t data);
+	uint8_t decocass_sound_command_main_r();
+	uint8_t decocass_sound_data_r();
+	uint8_t decocass_sound_ack_r();
+	void decocass_sound_data_w(uint8_t data);
+	uint8_t decocass_sound_command_r();
+	void decocass_sound_nmi_enable_w(uint8_t data);
+	uint8_t decocass_sound_nmi_enable_r();
+	uint8_t decocass_sound_data_ack_reset_r();
+	void decocass_sound_data_ack_reset_w(uint8_t data);
+	void decocass_nmi_reset_w(uint8_t data);
+	void decocass_quadrature_decoder_reset_w(uint8_t data);
+	void decocass_adc_w(uint8_t data);
+	uint8_t decocass_input_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER(decocass_reset_w);
+	void decocass_reset_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(decocass_e5xx_r);
-	DECLARE_WRITE8_MEMBER(decocass_e5xx_w);
-	DECLARE_WRITE8_MEMBER(decocass_de0091_w);
-	DECLARE_WRITE8_MEMBER(decocass_e900_w);
+	uint8_t decocass_e5xx_r(offs_t offset);
+	void decocass_e5xx_w(offs_t offset, uint8_t data);
+	void decocass_de0091_w(offs_t offset, uint8_t data);
+	void decocass_e900_w(uint8_t data);
 
 
-	DECLARE_WRITE8_MEMBER(i8041_p1_w);
-	DECLARE_READ8_MEMBER(i8041_p1_r);
-	DECLARE_WRITE8_MEMBER(i8041_p2_w);
-	DECLARE_READ8_MEMBER(i8041_p2_r);
+	void i8041_p1_w(uint8_t data);
+	uint8_t i8041_p1_r();
+	void i8041_p2_w(uint8_t data);
+	uint8_t i8041_p2_r();
 
 	void decocass_machine_state_save_init();
 
-	DECLARE_WRITE8_MEMBER(decocass_paletteram_w);
-	DECLARE_WRITE8_MEMBER(decocass_charram_w);
-	DECLARE_WRITE8_MEMBER(decocass_fgvideoram_w);
-	DECLARE_WRITE8_MEMBER(decocass_colorram_w);
-	DECLARE_WRITE8_MEMBER(decocass_bgvideoram_w);
-	DECLARE_WRITE8_MEMBER(decocass_tileram_w);
-	DECLARE_WRITE8_MEMBER(decocass_objectram_w);
+	void decocass_paletteram_w(offs_t offset, uint8_t data);
+	void decocass_charram_w(offs_t offset, uint8_t data);
+	void decocass_fgvideoram_w(offs_t offset, uint8_t data);
+	void decocass_colorram_w(offs_t offset, uint8_t data);
+	void decocass_bgvideoram_w(offs_t offset, uint8_t data);
+	void decocass_tileram_w(offs_t offset, uint8_t data);
+	void decocass_objectram_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(decocass_watchdog_count_w);
-	DECLARE_WRITE8_MEMBER(decocass_watchdog_flip_w);
-	DECLARE_WRITE8_MEMBER(decocass_color_missiles_w);
-	DECLARE_WRITE8_MEMBER(decocass_mode_set_w);
-	DECLARE_WRITE8_MEMBER(decocass_color_center_bot_w);
-	DECLARE_WRITE8_MEMBER(decocass_back_h_shift_w);
-	DECLARE_WRITE8_MEMBER(decocass_back_vl_shift_w);
-	DECLARE_WRITE8_MEMBER(decocass_back_vr_shift_w);
-	DECLARE_WRITE8_MEMBER(decocass_part_h_shift_w);
-	DECLARE_WRITE8_MEMBER(decocass_part_v_shift_w);
-	DECLARE_WRITE8_MEMBER(decocass_center_h_shift_space_w);
-	DECLARE_WRITE8_MEMBER(decocass_center_v_shift_w);
+	void decocass_watchdog_count_w(uint8_t data);
+	void decocass_watchdog_flip_w(uint8_t data);
+	void decocass_color_missiles_w(uint8_t data);
+	void decocass_mode_set_w(uint8_t data);
+	void decocass_color_center_bot_w(uint8_t data);
+	void decocass_back_h_shift_w(uint8_t data);
+	void decocass_back_vl_shift_w(uint8_t data);
+	void decocass_back_vr_shift_w(uint8_t data);
+	void decocass_part_h_shift_w(uint8_t data);
+	void decocass_part_v_shift_w(uint8_t data);
+	void decocass_center_h_shift_space_w(uint8_t data);
+	void decocass_center_v_shift_w(uint8_t data);
 
 	void decocass_video_state_save_init();
 
-	DECLARE_WRITE8_MEMBER(mirrorvideoram_w);
-	DECLARE_WRITE8_MEMBER(mirrorcolorram_w);
-	DECLARE_READ8_MEMBER(mirrorvideoram_r);
-	DECLARE_READ8_MEMBER(mirrorcolorram_r);
-	DECLARE_READ8_MEMBER(cdsteljn_input_r);
-	DECLARE_WRITE8_MEMBER(cdsteljn_mux_w);
+	void mirrorvideoram_w(offs_t offset, uint8_t data);
+	void mirrorcolorram_w(offs_t offset, uint8_t data);
+	uint8_t mirrorvideoram_r(offs_t offset);
+	uint8_t mirrorcolorram_r(offs_t offset);
+	uint8_t cdsteljn_input_r(offs_t offset);
+	void cdsteljn_mux_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(decocass_audio_nmi_gen);
 	void decocass_map(address_map &map);
+	void decocrom_map(address_map &map);
 	void decocass_sound_map(address_map &map);
 
 	void draw_edge(bitmap_ind16 &bitmap, const rectangle &cliprect, int which, bool opaque);
@@ -276,12 +280,12 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(decocass_type1_r);
+	uint8_t decocass_type1_r(offs_t offset);
 
 	/* dongle type #1 */
-	uint32_t    m_type1_inmap;
-	uint32_t    m_type1_outmap;
-	uint8_t* m_type1_map;
+	uint32_t    m_type1_inmap = 0U;
+	uint32_t    m_type1_outmap = 0U;
+	uint8_t* m_type1_map = 0U;
 };
 
 
@@ -297,13 +301,13 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(decocass_type2_r);
-	DECLARE_WRITE8_MEMBER(decocass_type2_w);
+	uint8_t decocass_type2_r(offs_t offset);
+	void decocass_type2_w(offs_t offset, uint8_t data);
 
 	/* dongle type #2: status of the latches */
-	int32_t     m_type2_d2_latch; /* latched 8041-STATUS D2 value */
-	int32_t     m_type2_xx_latch; /* latched value (D7-4 == 0xc0) ? 1 : 0 */
-	int32_t     m_type2_promaddr; /* latched PROM address A0-A7 */
+	int32_t     m_type2_d2_latch = 0; /* latched 8041-STATUS D2 value */
+	int32_t     m_type2_xx_latch = 0; /* latched value (D7-4 == 0xc0) ? 1 : 0 */
+	int32_t     m_type2_promaddr = 0; /* latched PROM address A0-A7 */
 };
 
 
@@ -350,14 +354,14 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(decocass_type3_r);
-	DECLARE_WRITE8_MEMBER(decocass_type3_w);
+	uint8_t decocass_type3_r(offs_t offset);
+	void decocass_type3_w(offs_t offset, uint8_t data);
 
 	/* dongle type #3: status and patches */
-	int32_t     m_type3_ctrs;     /* 12 bit counter stage */
-	int32_t     m_type3_d0_latch; /* latched 8041-D0 value */
-	int32_t     m_type3_pal_19;       /* latched 1 for PAL input pin-19 */
-	int32_t     m_type3_swap;
+	int32_t     m_type3_ctrs = 0;     /* 12 bit counter stage */
+	int32_t     m_type3_d0_latch = 0; /* latched 8041-D0 value */
+	int32_t     m_type3_pal_19 = 0;       /* latched 1 for PAL input pin-19 */
+	int32_t     m_type3_swap = 0;
 };
 
 
@@ -375,12 +379,12 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(decocass_type4_r);
-	DECLARE_WRITE8_MEMBER(decocass_type4_w);
+	uint8_t decocass_type4_r(offs_t offset);
+	void decocass_type4_w(offs_t offset, uint8_t data);
 
 	/* dongle type #4: status */
-	int32_t     m_type4_ctrs;     /* latched PROM address (E5x0 LSB, E5x1 MSB) */
-	int32_t     m_type4_latch;        /* latched enable PROM (1100xxxx written to E5x1) */
+	int32_t     m_type4_ctrs = 0;     /* latched PROM address (E5x0 LSB, E5x1 MSB) */
+	int32_t     m_type4_latch = 0;        /* latched enable PROM (1100xxxx written to E5x1) */
 };
 
 
@@ -397,11 +401,11 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(decocass_type5_r);
-	DECLARE_WRITE8_MEMBER(decocass_type5_w);
+	uint8_t decocass_type5_r(offs_t offset);
+	void decocass_type5_w(offs_t offset, uint8_t data);
 
 	/* dongle type #5: status */
-	int32_t     m_type5_latch;        /* latched enable PROM (1100xxxx written to E5x1) */
+	int32_t     m_type5_latch = 0;        /* latched enable PROM (1100xxxx written to E5x1) */
 };
 
 
@@ -418,7 +422,7 @@ private:
 	//virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(decocass_nodong_r);
+	uint8_t decocass_nodong_r(offs_t offset);
 };
 
 
@@ -435,12 +439,12 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(decocass_widel_r);
-	DECLARE_WRITE8_MEMBER(decocass_widel_w);
+	uint8_t decocass_widel_r(offs_t offset);
+	void decocass_widel_w(offs_t offset, uint8_t data);
 
 	/* dongle type widel: status */
-	int32_t     m_widel_ctrs;     /* latched PROM address (E5x0 LSB, E5x1 MSB) */
-	int32_t     m_widel_latch;        /* latched enable PROM (1100xxxx written to E5x1) */
+	int32_t     m_widel_ctrs = 0;     /* latched PROM address (E5x0 LSB, E5x1 MSB) */
+	int32_t     m_widel_latch = 0;        /* latched enable PROM (1100xxxx written to E5x1) */
 };
 
 #endif // MAME_INCLUDES_DECOCASS_H

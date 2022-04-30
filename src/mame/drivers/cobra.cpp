@@ -328,6 +328,7 @@
 #include "sound/rf5c400.h"
 #include "sound/dmadac.h"
 #include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
 
 #define GFXFIFO_IN_VERBOSE          0
@@ -355,11 +356,13 @@ struct cobra_polydata
 	uint32_t tex_address;
 };
 
-class cobra_renderer : public poly_manager<float, cobra_polydata, 8, 10000>
+class cobra_renderer : public poly_manager<float, cobra_polydata, 8>
 {
 public:
 	cobra_renderer(screen_device &screen)
-		: poly_manager<float, cobra_polydata, 8, 10000>(screen)
+		: poly_manager<float, cobra_polydata, 8>(screen.machine())
+		, m_screen(screen)
+		, m_framebuffer_size(0, 511, 0, 399)
 	{
 		m_texture_ram = std::make_unique<uint32_t[]>(0x100000);
 
@@ -386,6 +389,7 @@ public:
 		}
 	}
 
+	screen_device &screen() const { return m_screen; }
 	void render_texture_scan(int32_t scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid);
 	void render_color_scan(int32_t scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid);
 	void draw_point(const rectangle &visarea, vertex_t &v, uint32_t color);
@@ -403,6 +407,7 @@ public:
 	void display(bitmap_rgb32 *bitmap, const rectangle &cliprect);
 	inline rgb_t texture_fetch(uint32_t *texture, int u, int v, int width, int format);
 private:
+	screen_device &m_screen;
 	std::unique_ptr<bitmap_rgb32> m_framebuffer;
 	std::unique_ptr<bitmap_rgb32> m_backbuffer;
 	std::unique_ptr<bitmap_rgb32> m_overlay;
@@ -418,6 +423,8 @@ private:
 	std::unique_ptr<uint64_t[]> m_gfx_register;
 
 	uint32_t m_texram_ptr;
+
+	rectangle m_framebuffer_size;
 
 	enum
 	{
@@ -736,53 +743,51 @@ public:
 	required_shared_ptr<uint64_t> m_gfx_ram0;
 	required_shared_ptr<uint64_t> m_gfx_ram1;
 
-	DECLARE_READ64_MEMBER(main_comram_r);
-	DECLARE_WRITE64_MEMBER(main_comram_w);
-	DECLARE_READ64_MEMBER(main_fifo_r);
-	DECLARE_WRITE64_MEMBER(main_fifo_w);
-	DECLARE_READ64_MEMBER(main_mpc106_r);
-	DECLARE_WRITE64_MEMBER(main_mpc106_w);
-	DECLARE_WRITE32_MEMBER(main_cpu_dc_store);
+	uint64_t main_comram_r(offs_t offset, uint64_t mem_mask = ~0);
+	void main_comram_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t main_fifo_r(offs_t offset, uint64_t mem_mask = ~0);
+	void main_fifo_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	void main_cpu_dc_store(offs_t offset, uint32_t data);
 
-	DECLARE_READ32_MEMBER(sub_comram_r);
-	DECLARE_WRITE32_MEMBER(sub_comram_w);
-	DECLARE_READ32_MEMBER(sub_unk7e_r);
-	DECLARE_WRITE32_MEMBER(sub_debug_w);
-	DECLARE_READ32_MEMBER(sub_unk1_r);
-	DECLARE_WRITE32_MEMBER(sub_unk1_w);
-	DECLARE_READ32_MEMBER(sub_config_r);
-	DECLARE_WRITE32_MEMBER(sub_config_w);
-	DECLARE_READ32_MEMBER(sub_mainbd_r);
-	DECLARE_WRITE32_MEMBER(sub_mainbd_w);
-	DECLARE_READ16_MEMBER(sub_ata0_r);
-	DECLARE_WRITE16_MEMBER(sub_ata0_w);
-	DECLARE_READ16_MEMBER(sub_ata1_r);
-	DECLARE_WRITE16_MEMBER(sub_ata1_w);
-	DECLARE_READ32_MEMBER(sub_psac2_r);
-	DECLARE_WRITE32_MEMBER(sub_psac2_w);
-	DECLARE_WRITE32_MEMBER(sub_psac_palette_w);
-	DECLARE_WRITE32_MEMBER(sub_sound_dma_w);
+	uint32_t sub_comram_r(offs_t offset);
+	void sub_comram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t sub_unk7e_r();
+	void sub_debug_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t sub_unk1_r(offs_t offset, uint32_t mem_mask = ~0);
+	void sub_unk1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t sub_config_r(offs_t offset, uint32_t mem_mask = ~0);
+	void sub_config_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t sub_mainbd_r(offs_t offset, uint32_t mem_mask = ~0);
+	void sub_mainbd_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint16_t sub_ata0_r(offs_t offset, uint16_t mem_mask = ~0);
+	void sub_ata0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t sub_ata1_r(offs_t offset, uint16_t mem_mask = ~0);
+	void sub_ata1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint32_t sub_psac2_r();
+	void sub_psac2_w(uint32_t data);
+	void sub_psac_palette_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void sub_sound_dma_w(offs_t offset, uint32_t data);
 
-	DECLARE_WRITE64_MEMBER(gfx_fifo0_w);
-	DECLARE_WRITE64_MEMBER(gfx_fifo1_w);
-	DECLARE_WRITE64_MEMBER(gfx_fifo2_w);
-	DECLARE_WRITE64_MEMBER(gfx_debug_state_w);
-	DECLARE_READ64_MEMBER(gfx_unk1_r);
-	DECLARE_WRITE64_MEMBER(gfx_unk1_w);
-	DECLARE_READ64_MEMBER(gfx_fifo_r);
-	DECLARE_WRITE64_MEMBER(gfx_buf_w);
-	DECLARE_WRITE32_MEMBER(gfx_cpu_dc_store);
+	void gfx_fifo0_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	void gfx_fifo1_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	void gfx_fifo2_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	void gfx_debug_state_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t gfx_unk1_r(offs_t offset, uint64_t mem_mask = ~0);
+	void gfx_unk1_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint64_t gfx_fifo_r(offs_t offset, uint64_t mem_mask = ~0);
+	void gfx_buf_w(uint64_t data);
+	void gfx_cpu_dc_store(offs_t offset, uint32_t data);
 
-	DECLARE_WRITE8_MEMBER(sub_jvs_w);
+	void sub_jvs_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 
 	std::unique_ptr<cobra_renderer> m_renderer;
 
-	cobra_fifo *m_gfxfifo_in;
-	cobra_fifo *m_gfxfifo_out;
-	cobra_fifo *m_m2sfifo;
-	cobra_fifo *m_s2mfifo;
+	std::unique_ptr<cobra_fifo> m_gfxfifo_in;
+	std::unique_ptr<cobra_fifo> m_gfxfifo_out;
+	std::unique_ptr<cobra_fifo> m_m2sfifo;
+	std::unique_ptr<cobra_fifo> m_s2mfifo;
 
 	void gfxfifo_in_event_callback(cobra_fifo::EventType event);
 	void gfxfifo_out_event_callback(cobra_fifo::EventType event);
@@ -795,48 +800,48 @@ public:
 		MAIN_INT_S2M = 0x02
 	};
 
-	uint8_t m_m2s_int_enable;
-	uint8_t m_s2m_int_enable;
-	uint8_t m_vblank_enable;
+	uint8_t m_m2s_int_enable = 0;
+	uint8_t m_s2m_int_enable = 0;
+	uint8_t m_vblank_enable = 0;
 
-	uint8_t m_m2s_int_mode;
-	uint8_t m_s2m_int_mode;
+	uint8_t m_m2s_int_mode = 0;
+	uint8_t m_s2m_int_mode = 0;
 
-	uint8_t m_main_int_active;
+	uint8_t m_main_int_active = 0;
 
 
 	std::unique_ptr<uint32_t[]> m_comram[2];
-	int m_comram_page;
+	int m_comram_page = 0;
 
-	int m_main_debug_state;
-	int m_main_debug_state_wc;
-	int m_sub_debug_state;
-	int m_sub_debug_state_wc;
-	int m_gfx_debug_state;
-	int m_gfx_debug_state_wc;
+	int m_main_debug_state = 0;
+	int m_main_debug_state_wc = 0;
+	int m_sub_debug_state = 0;
+	int m_sub_debug_state_wc = 0;
+	int m_gfx_debug_state = 0;
+	int m_gfx_debug_state_wc = 0;
 
-	uint32_t m_sub_psac_reg;
-	int m_sub_psac_count;
-	uint32_t m_sub_interrupt;
+	uint32_t m_sub_psac_reg = 0;
+	int m_sub_psac_count = 0;
+	uint32_t m_sub_interrupt = 0;
 
-	uint8_t m_gfx_unk_flag;
-	uint32_t m_gfx_re_command_word1;
-	uint32_t m_gfx_re_command_word2;
-	int m_gfx_re_word_count;
-	int m_gfx_re_status;
-	uint32_t m_gfx_unk_status;
+	uint8_t m_gfx_unk_flag = 0;
+	uint32_t m_gfx_re_command_word1 = 0;
+	uint32_t m_gfx_re_command_word2 = 0;
+	int m_gfx_re_word_count = 0;
+	int m_gfx_re_status = 0;
+	uint32_t m_gfx_unk_status = 0;
 
-	uint64_t m_gfx_fifo_mem[256];
-	int m_gfx_fifo_cache_addr;
-	int m_gfx_fifo_loopback;
-	int m_gfx_unknown_v1;
-	int m_gfx_status_byte;
+	uint64_t m_gfx_fifo_mem[256]{};
+	int m_gfx_fifo_cache_addr = 0;
+	int m_gfx_fifo_loopback = 0;
+	int m_gfx_unknown_v1 = 0;
+	int m_gfx_status_byte = 0;
 
-	bool m_has_psac;
+	bool m_has_psac = false;
 
 	std::unique_ptr<int16_t[]> m_sound_dma_buffer_l;
 	std::unique_ptr<int16_t[]> m_sound_dma_buffer_r;
-	uint32_t m_sound_dma_ptr;
+	uint32_t m_sound_dma_ptr = 0;
 
 	void init_racjamdx();
 	void init_bujutsu();
@@ -854,6 +859,8 @@ public:
 	void cobra_main_map(address_map &map);
 	void cobra_sub_map(address_map &map);
 
+	void rf5c400_map(address_map& map);
+
 	uint32_t mpc106_pci_r(int function, int reg, uint32_t mem_mask);
 	void mpc106_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
 
@@ -862,8 +869,8 @@ public:
 
 void cobra_renderer::render_color_scan(int32_t scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid)
 {
-	uint32_t *fb = &m_backbuffer->pix32(scanline);
-	float *zb = (float*)&m_zbuffer->pix32(scanline);
+	uint32_t *const fb = &m_backbuffer->pix(scanline);
+	float *const zb = (float*)&m_zbuffer->pix(scanline);
 
 	float z = extent.param[POLY_Z].start;
 	float dz = extent.param[POLY_Z].dpdx;
@@ -874,8 +881,8 @@ void cobra_renderer::render_color_scan(int32_t scanline, const extent_t &extent,
 	float dgg = extent.param[POLY_G].dpdx;
 	float gb = extent.param[POLY_B].start;
 	float dgb = extent.param[POLY_B].dpdx;
-	float ga = extent.param[POLY_A].start;
-	float dga = extent.param[POLY_A].dpdx;
+	[[maybe_unused]] float ga = extent.param[POLY_A].start;
+	[[maybe_unused]] float dga = extent.param[POLY_A].dpdx;
 
 	uint32_t zmode = extradata.zmode;
 
@@ -960,11 +967,11 @@ void cobra_renderer::render_texture_scan(int32_t scanline, const extent_t &exten
 	float dgg = extent.param[POLY_G].dpdx;
 	float gb = extent.param[POLY_B].start;
 	float dgb = extent.param[POLY_B].dpdx;
-	float ga = extent.param[POLY_A].start;
-	float dga = extent.param[POLY_A].dpdx;
+	[[maybe_unused]] float ga = extent.param[POLY_A].start;
+	[[maybe_unused]] float dga = extent.param[POLY_A].dpdx;
 
-	uint32_t *fb = &m_backbuffer->pix32(scanline);
-	float *zb = (float*)&m_zbuffer->pix32(scanline);
+	uint32_t *const fb = &m_backbuffer->pix(scanline);
+	float *const zb = (float*)&m_zbuffer->pix(scanline);
 
 	uint32_t texture_width  = 1 << ((extradata.tex_format >> 28) & 0xf);
 	uint32_t texture_height = 1 << ((extradata.tex_format >> 24) & 0xf);
@@ -1068,7 +1075,7 @@ void cobra_renderer::draw_point(const rectangle &visarea, vertex_t &v, uint32_t 
 	if (x >= visarea.min_x && x <= visarea.max_x &&
 		y >= visarea.min_y && y <= visarea.max_y)
 	{
-		uint32_t *fb = &m_backbuffer->pix32(y);
+		uint32_t *const fb = &m_backbuffer->pix(y);
 		fb[x] = color;
 	}
 }
@@ -1096,7 +1103,7 @@ void cobra_renderer::draw_line(const rectangle &visarea, vertex_t &v1, vertex_t 
 		{
 			int y = y1 + (dy * (float)(x - x1) / (float)(dx));
 
-			uint32_t *fb = &m_backbuffer->pix32(y);
+			uint32_t *const fb = &m_backbuffer->pix(y);
 			fb[x] = color;
 
 			x++;
@@ -1109,7 +1116,7 @@ void cobra_renderer::draw_line(const rectangle &visarea, vertex_t &v1, vertex_t 
 		{
 			int x = x1 + (dx * (float)(y - y1) / (float)(dy));
 
-			uint32_t *fb = &m_backbuffer->pix32(y);
+			uint32_t *const fb = &m_backbuffer->pix(y);
 			fb[x] = color;
 
 			y++;
@@ -1133,12 +1140,12 @@ void cobra_state::video_start()
 uint32_t cobra_state::screen_update_cobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (m_has_psac)
-	{
-		m_k001604->draw_back_layer(bitmap, cliprect);
-		m_k001604->draw_front_layer(screen, bitmap, cliprect);
-	}
+		m_k001604->draw_back_layer(screen, bitmap, cliprect);
 
 	m_renderer->display(&bitmap, cliprect);
+
+	if (m_has_psac)
+		m_k001604->draw_front_layer(screen, bitmap, cliprect);
 	return 0;
 }
 
@@ -1408,17 +1415,7 @@ void cobra_state::mpc106_pci_w(int function, int reg, uint32_t data, uint32_t me
 	COMBINE_DATA(&m_mpc106_regs[reg/4]);
 }
 
-READ64_MEMBER(cobra_state::main_mpc106_r)
-{
-	return m_legacy_pci->read_64be(space, offset, mem_mask);
-}
-
-WRITE64_MEMBER(cobra_state::main_mpc106_w)
-{
-	m_legacy_pci->write_64be(space, offset, data, mem_mask);
-}
-
-READ64_MEMBER(cobra_state::main_fifo_r)
+uint64_t cobra_state::main_fifo_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t r = 0;
 
@@ -1488,7 +1485,7 @@ READ64_MEMBER(cobra_state::main_fifo_r)
 	return r;
 }
 
-WRITE64_MEMBER(cobra_state::main_fifo_w)
+void cobra_state::main_fifo_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_40_47)
 	{
@@ -1658,7 +1655,7 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 	}
 }
 
-READ64_MEMBER(cobra_state::main_comram_r)
+uint64_t cobra_state::main_comram_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t r = 0;
 	int page = m_comram_page;
@@ -1675,7 +1672,7 @@ READ64_MEMBER(cobra_state::main_comram_r)
 	return r;
 }
 
-WRITE64_MEMBER(cobra_state::main_comram_w)
+void cobra_state::main_comram_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	int page = m_comram_page;
 
@@ -1690,7 +1687,7 @@ WRITE64_MEMBER(cobra_state::main_comram_w)
 	m_comram[page][(offset << 1) + 1] = (w2 & ~m2) | (d2 & m2);
 }
 
-WRITE32_MEMBER(cobra_state::main_cpu_dc_store)
+void cobra_state::main_cpu_dc_store(offs_t offset, uint32_t data)
 {
 	if ((offset & 0xf0000000) == 0xc0000000)
 	{
@@ -1703,7 +1700,7 @@ void cobra_state::cobra_main_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).ram().share("main_ram");
 	map(0x07c00000, 0x07ffffff).ram();
-	map(0x80000cf8, 0x80000cff).rw(FUNC(cobra_state::main_mpc106_r), FUNC(cobra_state::main_mpc106_w));
+	map(0x80000cf8, 0x80000cff).rw(m_legacy_pci, FUNC(pci_bus_legacy_device::read_64be), FUNC(pci_bus_legacy_device::write_64be));
 	map(0xc0000000, 0xc03fffff).ram().share("gfx_main_ram_0");              // GFX board main ram, bank 0
 	map(0xc7c00000, 0xc7ffffff).ram().share("gfx_main_ram_1");              // GFX board main ram, bank 1
 	map(0xfff00000, 0xfff7ffff).rom().region("user1", 0);                   /* Boot ROM */
@@ -1727,7 +1724,7 @@ void cobra_state::cobra_main_map(address_map &map)
 
 //static int ucount = 0;
 
-READ32_MEMBER(cobra_state::sub_unk1_r)
+uint32_t cobra_state::sub_unk1_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -1739,7 +1736,7 @@ READ32_MEMBER(cobra_state::sub_unk1_r)
 	return r;
 }
 
-WRITE32_MEMBER(cobra_state::sub_unk1_w)
+void cobra_state::sub_unk1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/*
 	if (!ACCESSING_BITS_24_31)
@@ -1756,7 +1753,7 @@ WRITE32_MEMBER(cobra_state::sub_unk1_w)
 	*/
 }
 
-READ32_MEMBER(cobra_state::sub_mainbd_r)
+uint32_t cobra_state::sub_mainbd_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -1803,7 +1800,7 @@ READ32_MEMBER(cobra_state::sub_mainbd_r)
 	return r;
 }
 
-WRITE32_MEMBER(cobra_state::sub_mainbd_w)
+void cobra_state::sub_mainbd_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
@@ -1855,12 +1852,12 @@ WRITE32_MEMBER(cobra_state::sub_mainbd_w)
 	}
 }
 
-READ32_MEMBER(cobra_state::sub_unk7e_r)
+uint32_t cobra_state::sub_unk7e_r()
 {
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER(cobra_state::sub_debug_w)
+void cobra_state::sub_debug_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
@@ -1887,7 +1884,7 @@ WRITE32_MEMBER(cobra_state::sub_debug_w)
 	}
 }
 
-READ32_MEMBER(cobra_state::sub_config_r)
+uint32_t cobra_state::sub_config_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -1903,67 +1900,67 @@ READ32_MEMBER(cobra_state::sub_config_r)
 	return r;
 }
 
-WRITE32_MEMBER(cobra_state::sub_config_w)
+void cobra_state::sub_config_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 
-READ16_MEMBER(cobra_state::sub_ata0_r)
+uint16_t cobra_state::sub_ata0_r(offs_t offset, uint16_t mem_mask)
 {
 	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
 
-	uint32_t data = m_ata->read_cs0(offset, mem_mask);
+	uint32_t data = m_ata->cs0_r(offset, mem_mask);
 	data = ( data << 8 ) | ( data >> 8 );
 
 	return data;
 }
 
-WRITE16_MEMBER(cobra_state::sub_ata0_w)
+void cobra_state::sub_ata0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
 	data = ( data << 8 ) | ( data >> 8 );
 
-	m_ata->write_cs0(offset, data, mem_mask);
+	m_ata->cs0_w(offset, data, mem_mask);
 }
 
-READ16_MEMBER(cobra_state::sub_ata1_r)
+uint16_t cobra_state::sub_ata1_r(offs_t offset, uint16_t mem_mask)
 {
 	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
 
-	uint32_t data = m_ata->read_cs1(offset, mem_mask);
+	uint32_t data = m_ata->cs1_r(offset, mem_mask);
 
 	return ( data << 8 ) | ( data >> 8 );
 }
 
-WRITE16_MEMBER(cobra_state::sub_ata1_w)
+void cobra_state::sub_ata1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
 	data = ( data << 8 ) | ( data >> 8 );
 
-	m_ata->write_cs1(offset, data, mem_mask);
+	m_ata->cs1_w(offset, data, mem_mask);
 }
 
-READ32_MEMBER(cobra_state::sub_comram_r)
+uint32_t cobra_state::sub_comram_r(offs_t offset)
 {
 	int page = m_comram_page ^ 1;
 
 	return m_comram[page][offset];
 }
 
-WRITE32_MEMBER(cobra_state::sub_comram_w)
+void cobra_state::sub_comram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int page = m_comram_page ^ 1;
 
 	COMBINE_DATA(m_comram[page].get() + offset);
 }
 
-WRITE32_MEMBER(cobra_state::sub_psac_palette_w)
+void cobra_state::sub_psac_palette_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	data = m_generic_paletteram_32[offset];
 	m_palette->set_pen_color(offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
-READ32_MEMBER(cobra_state::sub_psac2_r)
+uint32_t cobra_state::sub_psac2_r()
 {
 	m_sub_psac_count++;
 	if (m_sub_psac_count >= 0x8000)
@@ -1974,11 +1971,11 @@ READ32_MEMBER(cobra_state::sub_psac2_r)
 	return m_sub_psac_reg;
 }
 
-WRITE32_MEMBER(cobra_state::sub_psac2_w)
+void cobra_state::sub_psac2_w(uint32_t data)
 {
 }
 
-WRITE32_MEMBER(cobra_state::sub_sound_dma_w)
+void cobra_state::sub_sound_dma_w(offs_t offset, uint32_t data)
 {
 	//printf("DMA write to unknown: size %d, data %08X\n", address, data);
 
@@ -2009,7 +2006,7 @@ WRITE32_MEMBER(cobra_state::sub_sound_dma_w)
 	}
 }
 
-WRITE8_MEMBER(cobra_state::sub_jvs_w)
+void cobra_state::sub_jvs_w(uint8_t data)
 {
 #if LOG_JVS
 	printf("sub_jvs_w: %02X\n", data);
@@ -2097,25 +2094,23 @@ void cobra_renderer::display(bitmap_rgb32 *bitmap, const rectangle &cliprect)
 {
 	if (m_gfx_register[0] & 0x4)
 	{
-		copybitmap_trans(*bitmap, *m_framebuffer, 0, 0, 0, 0, cliprect, 0);
+		copybitmap_trans(*bitmap, *m_framebuffer, 0, 0, cliprect.min_x, cliprect.min_y, cliprect, 0);
 	}
 	else
 	{
-		copybitmap_trans(*bitmap, *m_backbuffer, 0, 0, 0, 0, cliprect, 0);
+		copybitmap_trans(*bitmap, *m_backbuffer, 0, 0, cliprect.min_x, cliprect.min_y, cliprect, 0);
 	}
 }
 
 void cobra_renderer::gfx_init()
 {
-	const rectangle& visarea = screen().visible_area();
-
 	m_gfx_gram = std::make_unique<uint32_t[]>(0x40000);
 
 	m_gfx_register = std::make_unique<uint64_t[]>(0x3000);
 	m_gfx_register_select = 0;
 
 	float zvalue = 10000000.0f;
-	m_zbuffer->fill(*(int*)&zvalue, visarea);
+	m_zbuffer->fill(*(int*)&zvalue, m_framebuffer_size);
 }
 
 void cobra_renderer::gfx_exit()
@@ -2136,7 +2131,7 @@ void cobra_renderer::gfx_exit()
 
 void cobra_renderer::gfx_reset()
 {
-	cobra_state *cobra = machine().driver_data<cobra_state>();
+	cobra_state *cobra = screen().machine().driver_data<cobra_state>();
 
 	cobra->m_gfx_re_status = RE_STATUS_IDLE;
 }
@@ -2222,13 +2217,11 @@ void cobra_renderer::gfx_write_reg(uint64_t data)
 	{
 		case 0x0000:
 		{
-			const rectangle& visarea = screen().visible_area();
-
-			copybitmap_trans(*m_framebuffer, *m_backbuffer, 0, 0, 0, 0, visarea, 0);
-			m_backbuffer->fill(0xff000000, visarea);
+			copybitmap_trans(*m_framebuffer, *m_backbuffer, 0, 0, 0, 0, m_framebuffer_size, 0);
+			m_backbuffer->fill(0xff000000, m_framebuffer_size);
 
 			float zvalue = 10000000.0f;
-			m_zbuffer->fill(*(int*)&zvalue, visarea);
+			m_zbuffer->fill(*(int*)&zvalue, m_framebuffer_size);
 			break;
 		}
 	}
@@ -2238,16 +2231,15 @@ void cobra_renderer::gfx_write_reg(uint64_t data)
 
 void cobra_renderer::gfx_fifo_exec()
 {
-	cobra_state *cobra = machine().driver_data<cobra_state>();
+	cobra_state *cobra = screen().machine().driver_data<cobra_state>();
 
 	if (cobra->m_gfx_fifo_loopback != 0)
 		return;
 
-	const rectangle& visarea = screen().visible_area();
 	vertex_t vert[32];
 
-	cobra_fifo *fifo_in = cobra->m_gfxfifo_in;
-	cobra_fifo *fifo_out = cobra->m_gfxfifo_out;
+	cobra_fifo *fifo_in = cobra->m_gfxfifo_in.get();
+	cobra_fifo *fifo_out = cobra->m_gfxfifo_out.get();
 
 	while (fifo_in->current_num() >= 2)
 	{
@@ -2525,7 +2517,7 @@ void cobra_renderer::gfx_fifo_exec()
 				}
 
 
-				cobra_polydata &extra = object_data_alloc();
+				cobra_polydata &extra = object_data().next();
 
 				int texture = (m_gfx_gram[0x400f4/4] >> 29);
 
@@ -2545,7 +2537,7 @@ void cobra_renderer::gfx_fifo_exec()
 							render_delegate rd = render_delegate(&cobra_renderer::render_texture_scan, this);
 							for (int i=2; i < units; i++)
 							{
-								render_triangle(visarea, rd, 8, vert[i-2], vert[i-1], vert[i]);
+								render_triangle<8>(m_framebuffer_size, rd, vert[i-2], vert[i-1], vert[i]);
 							}
 						}
 						else
@@ -2553,7 +2545,7 @@ void cobra_renderer::gfx_fifo_exec()
 							render_delegate rd = render_delegate(&cobra_renderer::render_color_scan, this);
 							for (int i=2; i < units; i++)
 							{
-								render_triangle(visarea, rd, 5, vert[i-2], vert[i-1], vert[i]);
+								render_triangle<5>(m_framebuffer_size, rd, vert[i-2], vert[i-1], vert[i]);
 							}
 						}
 						break;
@@ -2563,7 +2555,7 @@ void cobra_renderer::gfx_fifo_exec()
 					{
 						for (int i=0; i < units; i++)
 						{
-							draw_point(visarea, vert[i], 0xffffffff);
+							draw_point(m_framebuffer_size, vert[i], 0xffffffff);
 						}
 						break;
 					}
@@ -2574,7 +2566,7 @@ void cobra_renderer::gfx_fifo_exec()
 						{
 							for (i=0; i < units; i+=2)
 							{
-								draw_line(visarea, vert[i], vert[i+1]);
+								draw_line(m_framebuffer_size, vert[i], vert[i+1]);
 							}
 						}
 						else                        // line strip
@@ -2622,11 +2614,11 @@ void cobra_renderer::gfx_fifo_exec()
 					uint32_t *buffer;
 					switch (m_gfx_gram[0x80104/4])
 					{
-						case 0x800000:      buffer = &m_framebuffer->pix32(y); break;
-						case 0x200000:      buffer = &m_backbuffer->pix32(y); break;
-						case 0x0e0000:      buffer = &m_overlay->pix32(y); break;
-						case 0x000800:      buffer = &m_zbuffer->pix32(y); break;
-						case 0x000200:      buffer = &m_stencil->pix32(y); break;
+						case 0x800000:      buffer = &m_framebuffer->pix(y); break;
+						case 0x200000:      buffer = &m_backbuffer->pix(y); break;
+						case 0x0e0000:      buffer = &m_overlay->pix(y); break;
+						case 0x000800:      buffer = &m_zbuffer->pix(y); break;
+						case 0x000200:      buffer = &m_stencil->pix(y); break;
 
 						default:
 						{
@@ -2678,11 +2670,11 @@ void cobra_renderer::gfx_fifo_exec()
 					uint32_t *buffer;
 					switch (m_gfx_gram[0x80104/4])
 					{
-						case 0x800000:      buffer = &m_framebuffer->pix32(y+i); break;
-						case 0x200000:      buffer = &m_backbuffer->pix32(y+i); break;
-						case 0x0e0000:      buffer = &m_overlay->pix32(y+i); break;
-						case 0x000800:      buffer = &m_zbuffer->pix32(y+i); break;
-						case 0x000200:      buffer = &m_stencil->pix32(y+i); break;
+						case 0x800000:      buffer = &m_framebuffer->pix(y+i); break;
+						case 0x200000:      buffer = &m_backbuffer->pix(y+i); break;
+						case 0x0e0000:      buffer = &m_overlay->pix(y+i); break;
+						case 0x000800:      buffer = &m_zbuffer->pix(y+i); break;
+						case 0x000200:      buffer = &m_stencil->pix(y+i); break;
 
 						default:
 						{
@@ -2923,7 +2915,7 @@ void cobra_renderer::gfx_fifo_exec()
 	wait();
 }
 
-READ64_MEMBER(cobra_state::gfx_fifo_r)
+uint64_t cobra_state::gfx_fifo_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t r = 0;
 
@@ -2952,25 +2944,25 @@ READ64_MEMBER(cobra_state::gfx_fifo_r)
 	return r;
 }
 
-WRITE64_MEMBER(cobra_state::gfx_fifo0_w)
+void cobra_state::gfx_fifo0_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	m_gfx_fifo_cache_addr = 2;
 	COMBINE_DATA(m_gfx_fifo_mem + offset);
 }
 
-WRITE64_MEMBER(cobra_state::gfx_fifo1_w)
+void cobra_state::gfx_fifo1_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	m_gfx_fifo_cache_addr = 0;
 	COMBINE_DATA(m_gfx_fifo_mem + offset);
 }
 
-WRITE64_MEMBER(cobra_state::gfx_fifo2_w)
+void cobra_state::gfx_fifo2_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	m_gfx_fifo_cache_addr = 1;
 	COMBINE_DATA(m_gfx_fifo_mem + offset);
 }
 
-READ64_MEMBER(cobra_state::gfx_unk1_r)
+uint64_t cobra_state::gfx_unk1_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t r = 0;
 
@@ -3003,7 +2995,7 @@ READ64_MEMBER(cobra_state::gfx_unk1_r)
 	return r;
 }
 
-WRITE64_MEMBER(cobra_state::gfx_unk1_w)
+void cobra_state::gfx_unk1_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 //  printf("gfx_unk1_w: %08X %08X, %08X%08X\n", (uint32_t)(data >> 32), (uint32_t)(data), (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask));
 
@@ -3042,7 +3034,7 @@ WRITE64_MEMBER(cobra_state::gfx_unk1_w)
 	}
 }
 
-WRITE64_MEMBER(cobra_state::gfx_buf_w)
+void cobra_state::gfx_buf_w(uint64_t data)
 {
 //  printf("buf_w: top = %08X\n", gfxfifo_get_top());
 
@@ -3086,13 +3078,13 @@ WRITE64_MEMBER(cobra_state::gfx_buf_w)
 	}
 }
 
-WRITE32_MEMBER(cobra_state::gfx_cpu_dc_store)
+void cobra_state::gfx_cpu_dc_store(offs_t offset, uint32_t data)
 {
 	uint32_t addr = offset >> 24;
 	if (addr == 0x10 || addr == 0x18 || addr == 0x1e)
 	{
 		uint64_t i = (uint64_t)(m_gfx_fifo_cache_addr) << 32;
-		cobra_fifo *fifo_in = m_gfxfifo_in;
+		cobra_fifo *fifo_in = m_gfxfifo_in.get();
 
 		uint32_t a = (offset / 8) & 0xff;
 
@@ -3113,7 +3105,7 @@ WRITE32_MEMBER(cobra_state::gfx_cpu_dc_store)
 	}
 }
 
-WRITE64_MEMBER(cobra_state::gfx_debug_state_w)
+void cobra_state::gfx_debug_state_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_40_47)
 	{
@@ -3295,7 +3287,7 @@ void cobra_state::cobra(machine_config &config)
 	m_gfxcpu->set_bus_frequency(XTAL(66'666'700));   /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 	m_gfxcpu->set_addrmap(AS_PROGRAM, &cobra_state::cobra_gfx_map);
 
-	config.set_maximum_quantum(attotime::from_hz(15005));
+	config.set_maximum_quantum(attotime::from_hz(55005));
 
 	PCI_BUS_LEGACY(config, m_legacy_pci, 0, 0);
 	m_legacy_pci->set_device(0, FUNC(cobra_state::mpc106_pci_r), FUNC(cobra_state::mpc106_pci_w));
@@ -3307,8 +3299,8 @@ void cobra_state::cobra(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_size(512, 400);
-	m_screen->set_visarea_full();
+	m_screen->set_size(1024, 1024);
+	m_screen->set_visarea(40, 511+40, 31, 399+31);
 	m_screen->set_screen_update(FUNC(cobra_state::screen_update_cobra));
 	PALETTE(config, m_palette).set_entries(65536);
 
@@ -3316,6 +3308,7 @@ void cobra_state::cobra(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	rf5c400_device &rfsnd(RF5C400(config, "rfsnd", XTAL(16'934'400)));
+	rfsnd.set_addrmap(0, &cobra_state::rf5c400_map);
 	rfsnd.add_route(0, "lspeaker", 1.0);
 	rfsnd.add_route(1, "rspeaker", 1.0);
 
@@ -3326,10 +3319,6 @@ void cobra_state::cobra(machine_config &config)
 	M48T58(config, "m48t58", 0);
 
 	K001604(config, m_k001604, 0);     // on the LAN board in Racing Jam DX
-	m_k001604->set_layer_size(0);
-	m_k001604->set_roz_size(1);
-	m_k001604->set_txt_mem_offset(0);  // correct?
-	m_k001604->set_roz_mem_offset(0);  // correct?
 	m_k001604->set_palette(m_palette);
 
 	COBRA_JVS_HOST(config, m_jvs_host, 4000000);
@@ -3338,50 +3327,51 @@ void cobra_state::cobra(machine_config &config)
 	COBRA_JVS(config, m_jvs3, 0, m_jvs_host, true);
 }
 
+void cobra_state::rf5c400_map(address_map& map)
+{
+	map(0x000000, 0xffffff).ram().share("rf5c400_ram");
+}
+
 /*****************************************************************************/
 
 /*****************************************************************************/
 
 void cobra_state::init_cobra()
 {
-	m_gfxfifo_in  = auto_alloc(machine(),
-								cobra_fifo(machine(),
+	m_gfxfifo_in  = std::make_unique<cobra_fifo>(machine(),
 								8192,
 								"GFXFIFO_IN",
 								GFXFIFO_IN_VERBOSE != 0,
-								cobra_fifo::event_delegate(&cobra_state::gfxfifo_in_event_callback, this))
+								cobra_fifo::event_delegate(&cobra_state::gfxfifo_in_event_callback, this)
 								);
 
-	m_gfxfifo_out = auto_alloc(machine(),
-								cobra_fifo(machine(),
+	m_gfxfifo_out = std::make_unique<cobra_fifo>(machine(),
 								8192,
 								"GFXFIFO_OUT",
 								GFXFIFO_OUT_VERBOSE != 0,
-								cobra_fifo::event_delegate(&cobra_state::gfxfifo_out_event_callback, this))
+								cobra_fifo::event_delegate(&cobra_state::gfxfifo_out_event_callback, this)
 								);
 
-	m_m2sfifo     = auto_alloc(machine(),
-								cobra_fifo(machine(),
+	m_m2sfifo     = std::make_unique<cobra_fifo>(machine(),
 								2048,
 								"M2SFIFO",
 								M2SFIFO_VERBOSE != 0,
-								cobra_fifo::event_delegate(&cobra_state::m2sfifo_event_callback, this))
+								cobra_fifo::event_delegate(&cobra_state::m2sfifo_event_callback, this)
 								);
 
-	m_s2mfifo     = auto_alloc(machine(),
-								cobra_fifo(machine(),
+	m_s2mfifo     = std::make_unique<cobra_fifo>(machine(),
 								2048,
 								"S2MFIFO",
 								S2MFIFO_VERBOSE != 0,
-								cobra_fifo::event_delegate(&cobra_state::s2mfifo_event_callback, this))
+								cobra_fifo::event_delegate(&cobra_state::s2mfifo_event_callback, this)
 								);
 
-	m_maincpu->ppc_set_dcstore_callback(write32_delegate(*this, FUNC(cobra_state::main_cpu_dc_store)));
+	m_maincpu->ppc_set_dcstore_callback(write32sm_delegate(*this, FUNC(cobra_state::main_cpu_dc_store)));
 
-	m_gfxcpu->ppc_set_dcstore_callback(write32_delegate(*this, FUNC(cobra_state::gfx_cpu_dc_store)));
+	m_gfxcpu->ppc_set_dcstore_callback(write32sm_delegate(*this, FUNC(cobra_state::gfx_cpu_dc_store)));
 
-	m_subcpu->ppc4xx_set_dma_write_handler(0, write32_delegate(*this, FUNC(cobra_state::sub_sound_dma_w)), 44100);
-	m_subcpu->ppc4xx_spu_set_tx_handler(write8_delegate(*this, FUNC(cobra_state::sub_jvs_w)));
+	m_subcpu->ppc4xx_set_dma_write_handler(0, write32sm_delegate(*this, FUNC(cobra_state::sub_sound_dma_w)), 44100);
+	m_subcpu->ppc4xx_spu_set_tx_handler(write8smo_delegate(*this, FUNC(cobra_state::sub_jvs_w)));
 
 
 	m_comram[0] = std::make_unique<uint32_t[]>(0x40000/4);
@@ -3585,8 +3575,6 @@ ROM_START(bujutsu)
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)
 	ROM_LOAD( "m48t58-70pc1.17l", 0x000000, 0x002000, NO_DUMP )
 
-	ROM_REGION16_LE(0x1000000, "rfsnd", ROMREGION_ERASE00)
-
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE_READONLY( "645c04", 0, SHA1(c0aabe69f6eb4e4cf748d606ae50674297af6a04) )
 ROM_END
@@ -3604,13 +3592,11 @@ ROM_START(racjamdx)
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)
 	ROM_LOAD( "m48t58-70pc1.17l", 0x000000, 0x002000, NO_DUMP )
 
-	ROM_REGION16_LE(0x1000000, "rfsnd", ROMREGION_ERASE00)
-
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE_READONLY( "676a04", 0, SHA1(8e89d3e5099e871b99fccba13adaa3cf8a6b71f0) )
 ROM_END
 
 /*************************************************************************/
 
-GAME( 1997, bujutsu,  0, cobra, cobra, cobra_state, init_bujutsu,  ROT0, "Konami", "Fighting Bujutsu", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
-GAME( 1997, racjamdx, 0, cobra, cobra, cobra_state, init_racjamdx, ROT0, "Konami", "Racing Jam DX",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING | MACHINE_NODEVICE_LAN )
+GAME( 1997, bujutsu,  0, cobra, cobra, cobra_state, init_bujutsu,  ROT0, "Konami", "Fighting Wu-Shu 2nd! (ver JAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
+GAME( 1997, racjamdx, 0, cobra, cobra, cobra_state, init_racjamdx, ROT0, "Konami", "Racing Jam DX", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING | MACHINE_NODEVICE_LAN )

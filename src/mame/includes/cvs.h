@@ -22,11 +22,6 @@
 #define CVS_S2636_X_OFFSET     (-26)
 #define CVS_MAX_STARS          250
 
-struct cvs_star
-{
-	int x, y, code;
-};
-
 class cvs_state : public driver_device
 {
 public:
@@ -49,6 +44,9 @@ public:
 		, m_palette(*this, "palette")
 		, m_soundlatch(*this, "soundlatch")
 		, m_lamps(*this, "lamp%u", 1U)
+		, m_color_ram(*this, "color_ram", 0x400, ENDIANNESS_BIG)
+		, m_palette_ram(*this, "palette_ram", 0x10, ENDIANNESS_BIG)
+		, m_character_ram(*this, "character_ram", 3 * 0x800, ENDIANNESS_BIG)
 	{ }
 
 	void init_raiders();
@@ -59,38 +57,36 @@ public:
 	void cvs(machine_config &config);
 
 protected:
-
 	DECLARE_WRITE_LINE_MEMBER(write_s2650_flag); // used by galaxia_state
-	DECLARE_READ8_MEMBER(huncholy_prot_r);
-	DECLARE_READ8_MEMBER(superbik_prot_r);
-	DECLARE_READ8_MEMBER(hero_prot_r);
+	uint8_t huncholy_prot_r(offs_t offset);
+	uint8_t superbik_prot_r();
+	uint8_t hero_prot_r(offs_t offset);
 	DECLARE_READ_LINE_MEMBER(speech_rom_read_bit);
 	DECLARE_WRITE_LINE_MEMBER(cvs_slave_cpu_interrupt);
-	DECLARE_READ8_MEMBER(cvs_input_r);
-	DECLARE_WRITE8_MEMBER(cvs_speech_rom_address_lo_w);
-	DECLARE_WRITE8_MEMBER(cvs_speech_rom_address_hi_w);
-	DECLARE_READ8_MEMBER(cvs_speech_command_r);
-	DECLARE_WRITE8_MEMBER(audio_command_w);
-	DECLARE_READ8_MEMBER(cvs_video_or_color_ram_r);
-	DECLARE_WRITE8_MEMBER(cvs_video_or_color_ram_w);
-	DECLARE_READ8_MEMBER(cvs_bullet_ram_or_palette_r);
-	DECLARE_WRITE8_MEMBER(cvs_bullet_ram_or_palette_w);
-	DECLARE_READ8_MEMBER(cvs_s2636_0_or_character_ram_r);
-	DECLARE_WRITE8_MEMBER(cvs_s2636_0_or_character_ram_w);
-	DECLARE_READ8_MEMBER(cvs_s2636_1_or_character_ram_r);
-	DECLARE_WRITE8_MEMBER(cvs_s2636_1_or_character_ram_w);
-	DECLARE_READ8_MEMBER(cvs_s2636_2_or_character_ram_r);
-	DECLARE_WRITE8_MEMBER(cvs_s2636_2_or_character_ram_w);
-	DECLARE_WRITE8_MEMBER(cvs_video_fx_w);
-	DECLARE_READ8_MEMBER(cvs_collision_r);
-	DECLARE_READ8_MEMBER(cvs_collision_clear);
-	DECLARE_WRITE8_MEMBER(cvs_scroll_w);
+	uint8_t cvs_input_r(offs_t offset);
+	void cvs_speech_rom_address_lo_w(uint8_t data);
+	void cvs_speech_rom_address_hi_w(uint8_t data);
+	uint8_t cvs_speech_command_r();
+	void audio_command_w(uint8_t data);
+	uint8_t cvs_video_or_color_ram_r(offs_t offset);
+	void cvs_video_or_color_ram_w(offs_t offset, uint8_t data);
+	uint8_t cvs_bullet_ram_or_palette_r(offs_t offset);
+	void cvs_bullet_ram_or_palette_w(offs_t offset, uint8_t data);
+	uint8_t cvs_s2636_0_or_character_ram_r(offs_t offset);
+	void cvs_s2636_0_or_character_ram_w(offs_t offset, uint8_t data);
+	uint8_t cvs_s2636_1_or_character_ram_r(offs_t offset);
+	void cvs_s2636_1_or_character_ram_w(offs_t offset, uint8_t data);
+	uint8_t cvs_s2636_2_or_character_ram_r(offs_t offset);
+	void cvs_s2636_2_or_character_ram_w(offs_t offset, uint8_t data);
+	void cvs_video_fx_w(uint8_t data);
+	uint8_t cvs_collision_r();
+	uint8_t cvs_collision_clear();
+	void cvs_scroll_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(tms_clock_r);
-	DECLARE_WRITE8_MEMBER(cvs_4_bit_dac_data_w);
-	DECLARE_WRITE8_MEMBER(cvs_unknown_w);
-	DECLARE_WRITE8_MEMBER(cvs_tms5110_ctl_w);
-	DECLARE_WRITE8_MEMBER(cvs_tms5110_pdc_w);
-	DECLARE_VIDEO_START(cvs);
+	void cvs_4_bit_dac_data_w(offs_t offset, uint8_t data);
+	void cvs_unknown_w(offs_t offset, uint8_t data);
+	void cvs_tms5110_ctl_w(offs_t offset, uint8_t data);
+	void cvs_tms5110_pdc_w(offs_t offset, uint8_t data);
 	void cvs_palette(palette_device &palette) const;
 	uint32_t screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cvs_main_cpu_interrupt);
@@ -108,6 +104,7 @@ protected:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_video_ram;
@@ -117,25 +114,30 @@ protected:
 	optional_shared_ptr<uint8_t> m_dac3_state;
 
 	/* video-related */
-	struct cvs_star m_stars[CVS_MAX_STARS];
-	bitmap_ind16   m_collision_background;
-	bitmap_ind16   m_background_bitmap;
-	bitmap_ind16   m_scrolled_collision_background;
-	int        m_collision_register;
-	int        m_total_stars;
-	int        m_stars_on;
-	uint8_t      m_scroll_reg;
-	int        m_stars_scroll;
+	struct cvs_star
+	{
+		int x = 0, y = 0, code = 0;
+	};
+
+	cvs_star m_stars[CVS_MAX_STARS]{};
+	bitmap_ind16   m_collision_background = 0;
+	bitmap_ind16   m_background_bitmap = 0;
+	bitmap_ind16   m_scrolled_collision_background = 0;
+	int        m_collision_register = 0;
+	int        m_total_stars = 0;
+	int        m_stars_on = 0;
+	uint8_t      m_scroll_reg = 0U;
+	int        m_stars_scroll = 0;
 
 	/* misc */
-	int m_s2650_flag;
-	emu_timer  *m_cvs_393hz_timer;
-	uint8_t      m_cvs_393hz_clock;
-	uint8_t      m_protection_counter;
+	int m_s2650_flag = 0;
+	emu_timer  *m_cvs_393hz_timer = nullptr;
+	uint8_t      m_cvs_393hz_clock = 0U;
+	uint8_t      m_protection_counter = 0U;
 
-	uint8_t      m_character_banking_mode;
-	uint16_t     m_character_ram_page_start;
-	uint16_t     m_speech_rom_bit_address;
+	uint8_t      m_character_banking_mode = 0U;
+	uint16_t     m_character_ram_page_start = 0U;
+	uint16_t     m_speech_rom_bit_address = 0U;
 
 	/* devices */
 	required_device<s2650_device> m_maincpu;
@@ -152,11 +154,11 @@ protected:
 	output_finder<2> m_lamps;
 
 	/* memory */
-	uint8_t      m_color_ram[0x400];
-	uint8_t      m_palette_ram[0x10];
-	uint8_t      m_character_ram[3 * 0x800];  /* only half is used, but
-	                                           by allocating twice the amount,
-	                                           we can use the same gfx_layout */
+	memory_share_creator<uint8_t> m_color_ram;
+	memory_share_creator<uint8_t> m_palette_ram;
+	memory_share_creator<uint8_t> m_character_ram;  /* only half is used, but
+	                                                    by allocating twice the amount,
+	                                                    we can use the same gfx_layout */
 };
 
 #endif // MAME_INCLUDES_CVS_H

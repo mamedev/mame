@@ -32,6 +32,12 @@ public:
 		m_bgscrollram(*this, "bgscrollram"),
 		m_gfxram(*this, "gfxram") { }
 
+	void init_bwing();
+	void bwing(machine_config &config);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	DECLARE_INPUT_CHANGED_MEMBER(tilt_pressed);
+
+private:
 	/* device */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -50,38 +56,34 @@ public:
 	required_shared_ptr<uint8_t> m_gfxram;
 
 	/* video-related */
-	tilemap_t *m_charmap;
-	tilemap_t *m_fgmap;
-	tilemap_t *m_bgmap;
-	unsigned m_sreg[8];
-	unsigned m_palatch;
-	unsigned m_mapmask;
+	tilemap_t *m_charmap = nullptr;
+	tilemap_t *m_fgmap = nullptr;
+	tilemap_t *m_bgmap = nullptr;
+	unsigned m_sreg[8]{};
+	unsigned m_palatch = 0U;
+	unsigned m_mapmask = 0U;
 
 	/* sound-related */
-	int m_bwp3_nmimask;
-	int m_bwp3_u8F_d;
+	int m_bwp3_nmimask = 0;
+	int m_bwp3_u8F_d = 0;
 
-	DECLARE_WRITE8_MEMBER(bwp3_u8F_w);
-	DECLARE_WRITE8_MEMBER(bwp3_nmimask_w);
-	DECLARE_WRITE8_MEMBER(bwp3_nmiack_w);
-	DECLARE_WRITE8_MEMBER(bwp1_ctrl_w);
-	DECLARE_WRITE8_MEMBER(bwp2_ctrl_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(fgscrollram_w);
-	DECLARE_WRITE8_MEMBER(bgscrollram_w);
-	DECLARE_WRITE8_MEMBER(gfxram_w);
-	DECLARE_WRITE8_MEMBER(scrollreg_w);
-	DECLARE_WRITE8_MEMBER(paletteram_w);
-
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	DECLARE_INPUT_CHANGED_MEMBER(tilt_pressed);
+	void bwp3_u8F_w(uint8_t data);
+	void bwp3_nmimask_w(uint8_t data);
+	void bwp3_nmiack_w(uint8_t data);
+	void bwp1_ctrl_w(offs_t offset, uint8_t data);
+	void bwp2_ctrl_w(offs_t offset, uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	void fgscrollram_w(offs_t offset, uint8_t data);
+	void bgscrollram_w(offs_t offset, uint8_t data);
+	void gfxram_w(offs_t offset, uint8_t data);
+	void scrollreg_w(offs_t offset, uint8_t data);
+	void paletteram_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_fgtileinfo);
 	TILE_GET_INFO_MEMBER(get_bgtileinfo);
 	TILE_GET_INFO_MEMBER(get_charinfo);
 	TILEMAP_MAPPER_MEMBER(scan_cols);
 
-	void init_bwing();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -91,7 +93,6 @@ public:
 	void draw_sprites( bitmap_ind16 &bmp, const rectangle &clip, uint8_t *ram, int pri );
 
 	INTERRUPT_GEN_MEMBER(bwp3_interrupt);
-	void bwing(machine_config &config);
 	void bank_map(address_map &map);
 	void bwp1_map(address_map &map);
 	void bwp2_map(address_map &map);

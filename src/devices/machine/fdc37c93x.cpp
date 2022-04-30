@@ -235,10 +235,11 @@ static void pc_hd_floppies(device_slot_interface &device)
 	device.option_add("35dd", FLOPPY_35_DD);
 }
 
-FLOPPY_FORMATS_MEMBER(fdc37c93x_device::floppy_formats)
-	FLOPPY_PC_FORMAT,
-	FLOPPY_NASLITE_FORMAT
-FLOPPY_FORMATS_END
+void fdc37c93x_device::floppy_formats(format_registration &fr)
+{
+	fr.add_pc_formats();
+	fr.add(FLOPPY_NASLITE_FORMAT);
+}
 
 void fdc37c93x_device::device_add_mconfig(machine_config &config)
 {
@@ -254,13 +255,13 @@ void fdc37c93x_device::device_add_mconfig(machine_config &config)
 	pc_lpt_lptdev->irq_handler().set(FUNC(fdc37c93x_device::irq_parallel_w));
 
 	// serial ports
-	NS16450(config, pc_serial1_comdev, XTAL(1'843'200)); // or NS16550 ?
+	NS16550(config, pc_serial1_comdev, XTAL(1'843'200));
 	pc_serial1_comdev->out_int_callback().set(FUNC(fdc37c93x_device::irq_serial1_w));
 	pc_serial1_comdev->out_tx_callback().set(FUNC(fdc37c93x_device::txd_serial1_w));
 	pc_serial1_comdev->out_dtr_callback().set(FUNC(fdc37c93x_device::dtr_serial1_w));
 	pc_serial1_comdev->out_rts_callback().set(FUNC(fdc37c93x_device::rts_serial1_w));
 
-	NS16450(config, pc_serial2_comdev, XTAL(1'843'200));
+	NS16550(config, pc_serial2_comdev, XTAL(1'843'200));
 	pc_serial2_comdev->out_int_callback().set(FUNC(fdc37c93x_device::irq_serial2_w));
 	pc_serial2_comdev->out_tx_callback().set(FUNC(fdc37c93x_device::txd_serial2_w));
 	pc_serial2_comdev->out_dtr_callback().set(FUNC(fdc37c93x_device::dtr_serial2_w));
@@ -274,7 +275,9 @@ void fdc37c93x_device::device_add_mconfig(machine_config &config)
 	// keyboard
 	KBDC8042(config, m_kbdc);
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_PS2);
+	m_kbdc->set_interrupt_type(kbdc8042_device::KBDC8042_DOUBLE);
 	m_kbdc->input_buffer_full_callback().set(FUNC(fdc37c93x_device::irq_keyboard_w));
+	m_kbdc->input_buffer_full_mouse_callback().set(FUNC(fdc37c93x_device::irq_mouse_w));
 	m_kbdc->system_reset_callback().set(FUNC(fdc37c93x_device::kbdp20_gp20_reset_w));
 	m_kbdc->gate_a20_callback().set(FUNC(fdc37c93x_device::kbdp21_gp25_gatea20_w));
 }
@@ -420,6 +423,13 @@ WRITE_LINE_MEMBER(fdc37c93x_device::irq_keyboard_w)
 	request_irq(configuration_registers[LogicalDevice::Keyboard][0x70], state ? ASSERT_LINE : CLEAR_LINE);
 }
 
+WRITE_LINE_MEMBER(fdc37c93x_device::irq_mouse_w)
+{
+	if (enabled_logical[LogicalDevice::Keyboard] == false)
+		return;
+	request_irq(configuration_registers[LogicalDevice::Keyboard][0x72], state ? ASSERT_LINE : CLEAR_LINE);
+}
+
 WRITE_LINE_MEMBER(fdc37c93x_device::kbdp21_gp25_gatea20_w)
 {
 	if (enabled_logical[LogicalDevice::Keyboard] == false)
@@ -434,7 +444,7 @@ WRITE_LINE_MEMBER(fdc37c93x_device::kbdp20_gp20_reset_w)
 	m_gp20_reset_callback(state);
 }
 
-READ8_MEMBER(fdc37c93x_device::read_fdc37c93x)
+uint8_t fdc37c93x_device::read(offs_t offset)
 {
 	if (offset == 0)
 	{
@@ -455,7 +465,7 @@ READ8_MEMBER(fdc37c93x_device::read_fdc37c93x)
 		return 0;
 }
 
-WRITE8_MEMBER(fdc37c93x_device::write_fdc37c93x)
+void fdc37c93x_device::write(offs_t offset, uint8_t data)
 {
 	uint8_t byt;
 
@@ -491,7 +501,7 @@ WRITE8_MEMBER(fdc37c93x_device::write_fdc37c93x)
 		if (config_index < 0x30)
 			write_global_configuration_register(config_index, byt);
 		else
-			write_logical_configuration_register(config_index, byt);;
+			write_logical_configuration_register(config_index, byt);
 	}
 	else
 		return;
@@ -499,44 +509,31 @@ WRITE8_MEMBER(fdc37c93x_device::write_fdc37c93x)
 
 /* Map/unmap internal devices */
 
-#if 1
-READ8_MEMBER(fdc37c93x_device::disabled_read)
+uint8_t fdc37c93x_device::disabled_read()
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER(fdc37c93x_device::disabled_write)
+void fdc37c93x_device::disabled_write(uint8_t data)
 {
 }
 
 void fdc37c93x_device::unmap_fdc(address_map &map)
 {
-	map(0x0, 0x0).rw(FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
-	map(0x1, 0x1).rw(FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
+	//map(0x0, 0x0).rw(FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
+	//map(0x1, 0x1).rw(FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
 	map(0x2, 0x2).rw(FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
 	map(0x3, 0x3).rw(FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
 	map(0x4, 0x4).rw(FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
 	map(0x5, 0x5).rw(FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
 	map(0x7, 0x7).rw(FUNC(fdc37c93x_device::disabled_read), FUNC(fdc37c93x_device::disabled_write));
 }
-#else
-void fdc37c93x_device::unmap_fdc(address_map &map)
-{
-	map(0x0, 0x0).noprw();
-	map(0x1, 0x1).noprw();
-	map(0x2, 0x2).noprw();
-	map(0x3, 0x3).noprw();
-	map(0x4, 0x4).noprw();
-	map(0x5, 0x5).noprw();
-	map(0x7, 0x7).noprw();
-}
-#endif
 
 void fdc37c93x_device::map_fdc_addresses()
 {
 	uint16_t base = get_base_address(LogicalDevice::FDC, 0);
 
-	m_isa->install_device(base, base + 7, *floppy_controller_fdcdev, &pc_fdc_interface::map);
+	m_isa->install_device(base, base + 7, *floppy_controller_fdcdev, &smc37c78_device::map);
 }
 
 void fdc37c93x_device::unmap_fdc_addresses()
@@ -548,17 +545,7 @@ void fdc37c93x_device::unmap_fdc_addresses()
 
 void fdc37c93x_device::map_lpt(address_map &map)
 {
-	map(0x0, 0x3).rw(FUNC(fdc37c93x_device::lpt_read), FUNC(fdc37c93x_device::lpt_write));
-}
-
-READ8_MEMBER(fdc37c93x_device::lpt_read)
-{
-	return pc_lpt_lptdev->read(space, offset, mem_mask);
-}
-
-WRITE8_MEMBER(fdc37c93x_device::lpt_write)
-{
-	pc_lpt_lptdev->write(space, offset, data, mem_mask);
+	map(0x0, 0x3).rw(pc_lpt_lptdev, FUNC(pc_lpt_device::read), FUNC(pc_lpt_device::write));
 }
 
 void fdc37c93x_device::map_lpt_addresses()
@@ -577,17 +564,7 @@ void fdc37c93x_device::unmap_lpt_addresses()
 
 void fdc37c93x_device::map_serial1(address_map &map)
 {
-	map(0x0, 0x7).rw(FUNC(fdc37c93x_device::serial1_read), FUNC(fdc37c93x_device::serial1_write));
-}
-
-READ8_MEMBER(fdc37c93x_device::serial1_read)
-{
-	return pc_serial1_comdev->ins8250_r(offset);
-}
-
-WRITE8_MEMBER(fdc37c93x_device::serial1_write)
-{
-	pc_serial1_comdev->ins8250_w(offset, data);
+	map(0x0, 0x7).rw(pc_serial1_comdev, FUNC(ns16450_device::ins8250_r), FUNC(ns16450_device::ins8250_w));
 }
 
 void fdc37c93x_device::map_serial1_addresses()
@@ -606,17 +583,7 @@ void fdc37c93x_device::unmap_serial1_addresses()
 
 void fdc37c93x_device::map_serial2(address_map &map)
 {
-	map(0x0, 0x7).rw(FUNC(fdc37c93x_device::serial2_read), FUNC(fdc37c93x_device::serial2_write));
-}
-
-READ8_MEMBER(fdc37c93x_device::serial2_read)
-{
-	return pc_serial2_comdev->ins8250_r(offset);
-}
-
-WRITE8_MEMBER(fdc37c93x_device::serial2_write)
-{
-	pc_serial2_comdev->ins8250_w(offset, data);
+	map(0x0, 0x7).rw(pc_serial2_comdev, FUNC(ns16450_device::ins8250_r), FUNC(ns16450_device::ins8250_w));
 }
 
 void fdc37c93x_device::map_serial2_addresses()
@@ -635,17 +602,7 @@ void fdc37c93x_device::unmap_serial2_addresses()
 
 void fdc37c93x_device::map_rtc(address_map &map)
 {
-	map(0x0, 0xf).rw(FUNC(fdc37c93x_device::rtc_read), FUNC(fdc37c93x_device::rtc_write));
-}
-
-READ8_MEMBER(fdc37c93x_device::rtc_read)
-{
-	return ds12885_rtcdev->read(offset);
-}
-
-WRITE8_MEMBER(fdc37c93x_device::rtc_write)
-{
-	ds12885_rtcdev->write(offset, data);
+	map(0x0, 0xf).rw(ds12885_rtcdev, FUNC(ds12885_device::read), FUNC(ds12885_device::write));
 }
 
 void fdc37c93x_device::map_rtc_addresses()
@@ -674,34 +631,34 @@ void fdc37c93x_device::unmap_keyboard(address_map &map)
 	map(0x4, 0x4).noprw();
 }
 
-READ8_MEMBER(fdc37c93x_device::at_keybc_r)
+uint8_t fdc37c93x_device::at_keybc_r(offs_t offset)
 {
 	switch (offset) //m_kbdc
 	{
 	case 0:
-		return m_kbdc->data_r(space, 0);
+		return m_kbdc->data_r(0);
 	}
 
 	return 0xff;
 }
 
-WRITE8_MEMBER(fdc37c93x_device::at_keybc_w)
+void fdc37c93x_device::at_keybc_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
 	case 0:
-		m_kbdc->data_w(space, 0, data);
+		m_kbdc->data_w(0, data);
 	}
 }
 
-READ8_MEMBER(fdc37c93x_device::keybc_status_r)
+uint8_t fdc37c93x_device::keybc_status_r()
 {
-	return (m_kbdc->data_r(space, 4) & 0xfb) | 0x10; // bios needs bit 2 to be 0 as powerup and bit 4 to be 1
+	return (m_kbdc->data_r(4) & 0xfb) | 0x10; // bios needs bit 2 to be 0 as powerup and bit 4 to be 1
 }
 
-WRITE8_MEMBER(fdc37c93x_device::keybc_command_w)
+void fdc37c93x_device::keybc_command_w(uint8_t data)
 {
-	m_kbdc->data_w(space, 4, data);
+	m_kbdc->data_w(4, data);
 }
 
 void fdc37c93x_device::map_keyboard_addresses()
@@ -723,9 +680,9 @@ void fdc37c93x_device::remap(int space_id, offs_t start, offs_t end)
 	if (space_id == AS_IO)
 	{
 		if (sysopt_pin == 0)
-			m_isa->install_device(0x03f0, 0x03f3, read8_delegate(*this, FUNC(fdc37c93x_device::read_fdc37c93x)), write8_delegate(*this, FUNC(fdc37c93x_device::write_fdc37c93x)));
+			m_isa->install_device(0x03f0, 0x03f3, read8sm_delegate(*this, FUNC(fdc37c93x_device::read)), write8sm_delegate(*this, FUNC(fdc37c93x_device::write)));
 		else
-			m_isa->install_device(0x0370, 0x0373, read8_delegate(*this, FUNC(fdc37c93x_device::read_fdc37c93x)), write8_delegate(*this, FUNC(fdc37c93x_device::write_fdc37c93x)));
+			m_isa->install_device(0x0370, 0x0373, read8sm_delegate(*this, FUNC(fdc37c93x_device::read)), write8sm_delegate(*this, FUNC(fdc37c93x_device::write)));
 		if (enabled_logical[LogicalDevice::FDC] == true)
 			map_fdc_addresses();
 		if (enabled_logical[LogicalDevice::Parallel] == true)
@@ -812,6 +769,8 @@ void fdc37c93x_device::write_fdd_configuration_register(int index, int data)
 	}
 	if (index == 0x74)
 		update_dreq_mapping(configuration_registers[LogicalDevice::FDC][0x74], LogicalDevice::FDC);
+	if (index == 0xF0)
+		logerror("FDD Mode Register changed: Floppy Mode %d FDC DMA Mode %d Interface Mode %d Swap Drives %d\n", (data >> 0) & 1, (data >> 1) & 1, (data >> 2) & 3, (data >> 4) & 1);
 }
 
 void fdc37c93x_device::write_parallel_configuration_register(int index, int data)
@@ -922,12 +881,12 @@ void fdc37c93x_device::write_auxio_configuration_register(int index, int data)
 	if (index == 0xe8)
 	{
 		if (data & 16)
-			logerror("GP20 used as 8042 P20 keyboard reset line\n");;
+			logerror("GP20 used as 8042 P20 keyboard reset line\n");
 	}
 	if (index == 0xed)
 	{
 		if (data & 8)
-			logerror("GP25 used as GATEA20 line\n");;
+			logerror("GP25 used as GATEA20 line\n");
 	}
 }
 

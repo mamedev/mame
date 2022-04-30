@@ -32,14 +32,14 @@ enum
     DEVICE
 ***************************************************************************/
 
-DEFINE_DEVICE_TYPE(SWIM, swim_device, "swim", "Apple SWIM (Steve Woz Integrated Machine)")
+DEFINE_DEVICE_TYPE(LEGACY_SWIM, swim_device, "swiml", "Apple SWIM (Sander/Woz Integrated Machine) (legacy)")
 
 //-------------------------------------------------
 //  ctor
 //-------------------------------------------------
 
 swim_device::swim_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: applefdc_base_device(APPLEFDC_SWIM, mconfig, SWIM, tag, owner, clock)
+	: applefdc_base_device(APPLEFDC_SWIM, mconfig, LEGACY_SWIM, tag, owner, clock)
 {
 }
 
@@ -94,7 +94,7 @@ void swim_device::device_reset()
 //  read - reads a byte from the FDC
 //-------------------------------------------------
 
-uint8_t swim_device::read(uint8_t offset)
+uint8_t swim_device::read(offs_t offset)
 {
 	uint8_t result = 0;
 
@@ -128,7 +128,7 @@ uint8_t swim_device::read(uint8_t offset)
 //  write - write a byte to the FDC
 //-------------------------------------------------
 
-void swim_device::write(uint8_t offset, uint8_t data)
+void swim_device::write(offs_t offset, uint8_t data)
 {
 	if (m_swim_mode == SWIM_MODE_IWM)
 	{

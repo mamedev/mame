@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Acorn BBC Master Compact Disks -->
+Acorn BBC Master Compact Disks
 
-<!-- Loading Instructions:
+    Loading Instructions:
 
       Hold down the SHIFT key and press and release the BREAK key.
 -->
@@ -252,7 +254,7 @@
 		<info name="author" value="Jamie Woodhouse" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="45312">
-				<rom name="Zap! (2009)(Retro Software).adf" size="45312" crc="3554bc34" sha1="e8f206bf93c6b30295fd9926a37fb5743b8a3c93" />
+				<rom name="Zap (2009)(Retro Software).adf" size="45312" crc="3554bc34" sha1="e8f206bf93c6b30295fd9926a37fb5743b8a3c93" />
 			</dataarea>
 		</part>
 	</software>

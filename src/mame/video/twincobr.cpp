@@ -27,7 +27,7 @@ TILE_GET_INFO_MEMBER(twincobr_state::get_bg_tile_info)
 	const u16 code = m_bgvideoram16[tile_index+m_bg_ram_bank];
 	const u32 tile_number = code & 0x0fff;
 	const u32 color = (code & 0xf000) >> 12;
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile_number,
 			color,
 			0);
@@ -38,7 +38,7 @@ TILE_GET_INFO_MEMBER(twincobr_state::get_fg_tile_info)
 	const u16 code = m_fgvideoram16[tile_index];
 	const u32 tile_number = (code & 0x0fff) | m_fg_rom_bank;
 	const u32 color = (code & 0xf000) >> 12;
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			tile_number,
 			color,
 			0);
@@ -49,7 +49,7 @@ TILE_GET_INFO_MEMBER(twincobr_state::get_tx_tile_info)
 	const u16 code = m_txvideoram16[tile_index];
 	const u32 tile_number = code & 0x07ff;
 	const u32 color = (code & 0xf800) >> 11;
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			color,
 			0);
@@ -78,8 +78,6 @@ void twincobr_state::twincobr_create_tilemaps()
 
 void twincobr_state::video_start()
 {
-	m_spritegen->alloc_sprite_bitmap(*m_screen);
-
 	/* the video RAM is accessed via ports, it's not memory mapped */
 	m_txvideoram_size = 0x0800;
 	m_bgvideoram_size = 0x2000; /* banked two times 0x1000 */
@@ -364,22 +362,21 @@ void twincobr_state::log_vram()
 }
 
 
+void twincobr_state::pri_cb(u8 priority, u32 &pri_mask)
+{
+	switch (priority)
+	{
+		case 0: pri_mask = GFX_PMASK_1|GFX_PMASK_2|GFX_PMASK_4; break; // disable?
+		case 1: pri_mask = GFX_PMASK_2|GFX_PMASK_4;             break; // over background, under foreground/text
+		case 2: pri_mask = GFX_PMASK_4;                         break; // over background/foreground, under text
+		case 3: pri_mask = 0;                                   break; // over everything
+	}
+}
+
+
 u32 twincobr_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	log_vram();
-
-	u16 *buffered_spriteram16;
-	u32 bytes;
-	if (m_spriteram16 != nullptr)
-	{
-		buffered_spriteram16 = m_spriteram16->buffer();
-		bytes = m_spriteram16->bytes();
-	}
-	else
-	{
-		buffered_spriteram16 = reinterpret_cast<u16 *>(m_spriteram8->buffer());
-		bytes = m_spriteram8->bytes();
-	}
 
 	if (!m_display_on)
 	{
@@ -387,14 +384,25 @@ u32 twincobr_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	}
 	else
 	{
-		m_spritegen->draw_sprites_to_tempbitmap(cliprect, buffered_spriteram16, bytes);
+		screen.priority().fill(0, cliprect);
 
-		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-		m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,1);
-		m_fg_tilemap->draw(screen, bitmap, cliprect, 0,0);
-		m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,2);
-		m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
-		m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,3);
+		u16 *buffered_spriteram16;
+		u32 bytes;
+		if (m_spriteram16 != nullptr)
+		{
+			buffered_spriteram16 = m_spriteram16->buffer();
+			bytes = m_spriteram16->bytes();
+		}
+		else
+		{
+			buffered_spriteram16 = reinterpret_cast<u16 *>(m_spriteram8->buffer());
+			bytes = m_spriteram8->bytes();
+		}
+
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE,1);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0,2);
+		m_tx_tilemap->draw(screen, bitmap, cliprect, 0,4);
+		m_spritegen->draw_sprites(bitmap, cliprect, buffered_spriteram16, bytes);
 	}
 
 	return 0;

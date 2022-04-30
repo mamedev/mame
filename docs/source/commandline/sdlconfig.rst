@@ -11,7 +11,7 @@ Performance Options
 
 .. _mame-scommandline-sdlvideofps:
 
-**-sdlvideofps**
+**-[no]sdlvideofps**
 
 	Enable output of benchmark data on the SDL video subsystem, including your system's video driver, X server (if applicable), and OpenGL stack in **-video opengl** mode.
 

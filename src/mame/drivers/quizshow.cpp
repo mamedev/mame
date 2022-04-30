@@ -9,22 +9,27 @@
   stream questions, totaling 1000, divided into 4 categories.
 
 TODO:
-- preserve tape and hook it up, the game is not playable without it
+- tape recordings are available, but there are DC offset problems
+- MAME needs multi-track cassette support
 - is timing accurate?
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
+#include "imagedev/cassette.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
+
 #include "quizshow.lh"
 
+
+namespace {
 
 static constexpr XTAL MASTER_CLOCK  = 12.096_MHz_XTAL;
 static constexpr XTAL PIXEL_CLOCK   = MASTER_CLOCK / 2;
@@ -49,6 +54,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
+		m_cass(*this, "cassette"),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
@@ -57,40 +63,43 @@ public:
 	void init_quizshow();
 	void quizshow(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void mem_map(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(lamps1_w);
-	DECLARE_WRITE8_MEMBER(lamps2_w);
-	DECLARE_WRITE8_MEMBER(lamps3_w);
-	DECLARE_WRITE8_MEMBER(tape_control_w);
-	DECLARE_WRITE8_MEMBER(audio_w);
-	DECLARE_WRITE8_MEMBER(video_disable_w);
-	DECLARE_READ8_MEMBER(timing_r);
-	DECLARE_READ_LINE_MEMBER(tape_signal_r);
-	DECLARE_WRITE_LINE_MEMBER(flag_output_w);
-	DECLARE_WRITE8_MEMBER(main_ram_w);
-	TILE_GET_INFO_MEMBER(get_tile_info);
-	void quizshow_palette(palette_device &palette) const;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(clock_timer_cb);
-
+private:
 	required_device<s2650_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;
 	required_shared_ptr<uint8_t> m_main_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
+	required_device<cassette_image_device> m_cass;
 	output_finder<11> m_lamps;
 
-	tilemap_t *m_tilemap;
-	uint32_t m_clocks;
-	int m_blink_state;
-	int m_category_enable;
-	int m_tape_head_pos;
+	void mem_map(address_map &map);
+
+	void lamps1_w(uint8_t data);
+	void lamps2_w(uint8_t data);
+	void lamps3_w(uint8_t data);
+	void tape_control_w(uint8_t data);
+	void audio_w(uint8_t data);
+	void video_disable_w(uint8_t data);
+	uint8_t timing_r();
+	DECLARE_READ_LINE_MEMBER(tape_signal_r);
+	DECLARE_WRITE_LINE_MEMBER(flag_output_w);
+	void main_ram_w(offs_t offset, uint8_t data);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	void quizshow_palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(clock_timer_cb);
+
+	tilemap_t *m_tilemap = nullptr;
+	uint32_t m_clocks = 0;
+	int m_blink_state = 0;
+	int m_category_enable = 0;
+	int m_tape_head_pos = 0;
 };
 
 
@@ -124,7 +133,7 @@ TILE_GET_INFO_MEMBER(quizshow_state::get_tile_info)
 	// d6: blink, d7: invert
 	uint8_t const color = (code & (m_blink_state | 0x80)) >> 6;
 
-	SET_TILE_INFO_MEMBER(0, code & 0x3f, color, 0);
+	tileinfo.set(0, code & 0x3f, color, 0);
 }
 
 void quizshow_state::video_start()
@@ -145,7 +154,7 @@ uint32_t quizshow_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 ***************************************************************************/
 
-WRITE8_MEMBER(quizshow_state::lamps1_w)
+void quizshow_state::lamps1_w(uint8_t data)
 {
 	// d0-d3: P1 answer button lamps
 	for (int i = 0; i < 4; i++)
@@ -154,7 +163,7 @@ WRITE8_MEMBER(quizshow_state::lamps1_w)
 	// d4-d7: N/C
 }
 
-WRITE8_MEMBER(quizshow_state::lamps2_w)
+void quizshow_state::lamps2_w(uint8_t data)
 {
 	// d0-d3: P2 answer button lamps
 	for (int i = 0; i < 4; i++)
@@ -163,7 +172,7 @@ WRITE8_MEMBER(quizshow_state::lamps2_w)
 	// d4-d7: N/C
 }
 
-WRITE8_MEMBER(quizshow_state::lamps3_w)
+void quizshow_state::lamps3_w(uint8_t data)
 {
 	// d0-d1: start button lamps
 	m_lamps[8] = BIT(data, 0);
@@ -173,20 +182,20 @@ WRITE8_MEMBER(quizshow_state::lamps3_w)
 	// d4-d7: N/C
 }
 
-WRITE8_MEMBER(quizshow_state::tape_control_w)
+void quizshow_state::tape_control_w(uint8_t data)
 {
 	// d2: enable user category select (changes tape head position)
 	m_lamps[10] = BIT(data, 2);
 	m_category_enable = (data & 0xc) == 0xc;
 
 	// d3: tape motor
-	// TODO
+	m_cass->set_motor(BIT(data, 3));
 
 	// d0-d1: unused? (chip is shared with lamps3_w)
 	// d4-d7: N/C
 }
 
-WRITE8_MEMBER(quizshow_state::audio_w)
+void quizshow_state::audio_w(uint8_t data)
 {
 	// d1: audio out
 	m_dac->write(BIT(data, 1));
@@ -194,13 +203,13 @@ WRITE8_MEMBER(quizshow_state::audio_w)
 	// d0, d2-d7: N/C
 }
 
-WRITE8_MEMBER(quizshow_state::video_disable_w)
+void quizshow_state::video_disable_w(uint8_t data)
 {
 	// d0: video disable (looked glitchy when I implemented it, maybe there's more to it)
 	// d1-d7: N/C
 }
 
-READ8_MEMBER(quizshow_state::timing_r)
+uint8_t quizshow_state::timing_r()
 {
 	uint8_t ret = 0x80;
 
@@ -222,8 +231,7 @@ READ8_MEMBER(quizshow_state::timing_r)
 
 READ_LINE_MEMBER(quizshow_state::tape_signal_r)
 {
-	// TODO (for now, hold INS to fastforward and it'll show garbage questions where D is always(?) the right answer)
-	return BIT(machine().rand(), 7); // better than machine().rand() & 1 for some reason
+	return (m_cass->input() > 0.0) ? 1 : 0;
 }
 
 WRITE_LINE_MEMBER(quizshow_state::flag_output_w)
@@ -231,7 +239,7 @@ WRITE_LINE_MEMBER(quizshow_state::flag_output_w)
 	logerror("Flag output: %d\n", state);
 }
 
-WRITE8_MEMBER(quizshow_state::main_ram_w)
+void quizshow_state::main_ram_w(offs_t offset, uint8_t data)
 {
 	m_main_ram[offset]=data;
 	m_tilemap->mark_tile_dirty(offset);
@@ -389,11 +397,12 @@ void quizshow_state::machine_reset()
 {
 	m_category_enable = 0;
 	m_tape_head_pos = 0;
+	m_clocks = 0;
 }
 
 void quizshow_state::quizshow(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	S2650(config, m_maincpu, MASTER_CLOCK / 16); // divider guessed
 	m_maincpu->set_addrmap(AS_PROGRAM, &quizshow_state::mem_map);
 	m_maincpu->sense_handler().set(FUNC(quizshow_state::tape_signal_r));
@@ -401,7 +410,7 @@ void quizshow_state::quizshow(machine_config &config)
 
 	TIMER(config, "clock_timer").configure_periodic(FUNC(quizshow_state::clock_timer_cb), attotime::from_hz(PIXEL_CLOCK / (HTOTAL * 8))); // 8V
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(quizshow_state::screen_update));
@@ -410,12 +419,13 @@ void quizshow_state::quizshow(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_quizshow);
 	PALETTE(config, m_palette, FUNC(quizshow_state::quizshow_palette), 8*2, 2);
 
-	/* sound hardware (discrete) */
+	// sound hardware (discrete)
 	SPEAKER(config, "speaker").front_center();
-
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+
+	// cassette
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
 }
 
 
@@ -463,6 +473,8 @@ void quizshow_state::init_quizshow()
 		}
 	}
 }
+
+} // Anonymous namespace
 
 
 GAMEL( 1976, quizshow, 0, quizshow, quizshow, quizshow_state, init_quizshow, ROT0, "Atari (Kee Games)", "Quiz Show", MACHINE_NOT_WORKING, layout_quizshow )

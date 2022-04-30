@@ -5,8 +5,6 @@
 #include "unsp.h"
 #include "unspfe.h"
 
-#include "debugger.h"
-
 #include "unspdasm.h"
 
 void unsp_device::execute_remaining(const uint16_t op)
@@ -41,23 +39,22 @@ void unsp_device::execute_remaining(const uint16_t op)
 		if (op == 0x9a98) // reti
 		{
 			m_core->m_icount -= 8;
+			if (m_core->m_ine)
+			{
+				set_fr(pop(&m_core->m_r[REG_SP]));
+			}
+
 			m_core->m_r[REG_SR] = pop(&m_core->m_r[REG_SP]);
 			m_core->m_r[REG_PC] = pop(&m_core->m_r[REG_SP]);
 
 			if (m_core->m_fiq)
 			{
 				m_core->m_fiq = 0;
-				m_core->m_saved_sb[2] = m_core->m_sb;
-				m_core->m_sb = m_core->m_saved_sb[m_core->m_irq ? 1 : 0];
 			}
 			else if (m_core->m_irq)
 			{
 				m_core->m_irq = 0;
-				m_core->m_saved_sb[1] = m_core->m_sb;
-				m_core->m_sb = m_core->m_saved_sb[0];
 			}
-			m_core->m_curirq = 0;
-			check_irqs();
 			return;
 		}
 		else // pop
@@ -257,7 +254,7 @@ void unsp_device::execute_remaining(const uint16_t op)
 		break;
 	}
 
-	case 0x07: // Direct 8
+	case 0x07: // Direct 6
 		m_core->m_icount -= (opa == 7 ? 6 : 5);
 		r2 = op & 0x3f;
 		r1 = read16(r2);
@@ -351,7 +348,9 @@ bool unsp_device::do_basic_alu_ops(const uint16_t &op0, uint32_t &lres, uint16_t
 		return false;
 
 	default:
-		fatalerror("UNSP: illegal ALU optype %02x at %04x\n", op0, UNSP_LPC);
+		// pcp87xx 'Elevator Action' explicitly jumps into the middle of an earlier opcode (off-by-one error in the code)
+		// It looks like the illegal op should have no meaningful effect so just log rather than fatalerroring
+		logerror("UNSP: illegal ALU optype %02x at %04x\n", op0, UNSP_LPC);
 		return false;
 	}
 

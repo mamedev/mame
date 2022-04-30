@@ -45,13 +45,13 @@ void blueprnt_state::blueprnt_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(blueprnt_state::blueprnt_videoram_w)
+void blueprnt_state::blueprnt_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(blueprnt_state::blueprnt_colorram_w)
+void blueprnt_state::blueprnt_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -67,7 +67,7 @@ WRITE8_MEMBER(blueprnt_state::blueprnt_colorram_w)
 
 }
 
-WRITE8_MEMBER(blueprnt_state::blueprnt_flipscreen_w)
+void blueprnt_state::blueprnt_flipscreen_w(uint8_t data)
 {
 	flip_screen_set(~data & 0x02);
 
@@ -108,12 +108,12 @@ TILE_GET_INFO_MEMBER(blueprnt_state::get_bg_tile_info)
 	tileinfo.category = (attr & 0x80) ? 1 : 0;
 	if (bank) code += m_gfx_bank * 0x100;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 
 
-VIDEO_START_MEMBER(blueprnt_state,blueprnt)
+void blueprnt_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(blueprnt_state::get_bg_tile_info)), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);
@@ -123,11 +123,9 @@ VIDEO_START_MEMBER(blueprnt_state,blueprnt)
 }
 
 
-void blueprnt_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void blueprnt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int offs;
-
-	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
+	for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
 		int code = m_spriteram[offs + 1];
 		int sx = m_spriteram[offs + 3];

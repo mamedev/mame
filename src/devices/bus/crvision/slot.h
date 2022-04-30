@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "softlist_dev.h"
+#include "imagedev/cartrom.h"
 
 
 /***************************************************************************
@@ -36,8 +36,8 @@ public:
 	virtual ~device_crvision_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom40) { return 0xff; }
-	virtual DECLARE_READ8_MEMBER(read_rom80) { return 0xff; }
+	virtual uint8_t read_rom40(offs_t offset) { return 0xff; }
+	virtual uint8_t read_rom80(offs_t offset) { return 0xff; }
 
 	void rom_alloc(uint32_t size, const char *tag);
 	uint8_t* get_rom_base() { return m_rom; }
@@ -55,7 +55,7 @@ protected:
 // ======================> crvision_cart_slot_device
 
 class crvision_cart_slot_device : public device_t,
-								public device_image_interface,
+								public device_cartrom_image_interface,
 								public device_single_card_slot_interface<device_crvision_cart_interface>
 {
 public:
@@ -76,11 +76,6 @@ public:
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override { }
 
-	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return false; }
-	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "crvision_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "bin,rom"; }
@@ -91,15 +86,12 @@ public:
 	int get_type() { return m_type; }
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom40);
-	virtual DECLARE_READ8_MEMBER(read_rom80);
+	uint8_t read_rom40(offs_t offset);
+	uint8_t read_rom80(offs_t offset);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-
-	// device_image_interface implementation
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	int m_type;
 	device_crvision_cart_interface*       m_cart;

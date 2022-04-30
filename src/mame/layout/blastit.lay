@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
+	<element name="white"><rect><color red="0.8" green="0.8" blue="0.8" /></rect></element>
+	<element name="text_score"><text string="SCORE" align="2"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
+	</element>
+
+	<element name="led" defstate="0">
+		<rect state="0"><color red="0.1" green="0.01" blue="0.015" /></rect>
+		<rect state="1"><color red="0.8" green="0.08" blue="0.12" /></rect>
+		<rect state="2"><color red="1.0" green="0.2" blue="0.2" /></rect>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="5" right="71" top="4.5" bottom="81.1" />
+
+		<!-- score display -->
+		<element ref="white"><bounds x="24.5" y="9" width="27.5" height="13" /></element>
+		<element ref="black"><bounds x="25.0" y="9.5" width="26.5" height="12" /></element>
+		<element ref="text_score"><bounds x="3.5" y="12.75" width="20" height="5.5" /></element>
+		<element ref="digit"><bounds x="26" y="11" width="6" height="9" /></element> <!-- unpopulated -->
+		<element name="digit7" ref="digit"><bounds x="32" y="11" width="6" height="9" /></element>
+		<element name="digit8" ref="digit"><bounds x="38" y="11" width="6" height="9" /></element>
+		<element name="digit9" ref="digit"><bounds x="44" y="11" width="6" height="9" /></element>
+
+		<!-- other leds -->
+		<repeat count="7">
+			<param name="y" start="30" increment="7.3" />
+			<param name="i2" start="6" increment="-1" />
+
+			<repeat count="7">
+				<param name="x" start="10" increment="8.5" />
+				<param name="i1" start="0" increment="1" />
+				<element name="~i1~.~i2~" ref="led"><bounds x="~x~" y="~y~" width="5" height="1.7" /></element>
+			</repeat>
+		</repeat>
+
+		<!-- 3 of the rows have a different shape -->
+		<element ref="black"><bounds x="0" y="50" width="80" height="20" /></element>
+
+		<repeat count="3">
+			<param name="y" start="51.9" increment="7.3" />
+			<param name="i2" start="3" increment="-1" />
+
+			<repeat count="7">
+				<param name="x" start="11.5" increment="8.5" />
+				<param name="i1" start="0" increment="1" />
+				<element name="~i1~.~i2~" ref="led"><bounds x="~x~" y="~y~" width="2" height="2" /></element>
+			</repeat>
+		</repeat>
+
+	</view>
+</mamelayout>

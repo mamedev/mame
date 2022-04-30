@@ -25,7 +25,7 @@
  */
 TILE_GET_INFO_MEMBER(mcr_state::mcr_90009_get_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], 0, 0);
+	tileinfo.set(0, m_videoram[tile_index], 0, 0);
 
 	/* sprite color base is constant 0x10 */
 	tileinfo.category = 1;
@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(mcr_state::mcr_90010_get_tile_info)
 	int data = m_videoram[tile_index * 2] | (m_videoram[tile_index * 2 + 1] << 8);
 	int code = data & 0x1ff;
 	int color = (data >> 11) & 3;
-	SET_TILE_INFO_MEMBER(0, code, color, TILE_FLIPYX(data >> 9));
+	tileinfo.set(0, code, color, TILE_FLIPYX(data >> 9));
 
 	/* sprite color base comes from the top 2 bits */
 	tileinfo.category = (data >> 14) & 3;
@@ -75,7 +75,7 @@ TILE_GET_INFO_MEMBER(mcr_state::mcr_91490_get_tile_info)
 	int data = m_videoram[tile_index * 2] | (m_videoram[tile_index * 2 + 1] << 8);
 	int code = data & 0x3ff;
 	int color = (data >> 12) & 3;
-	SET_TILE_INFO_MEMBER(0, code, color, TILE_FLIPYX(data >> 10));
+	tileinfo.set(0, code, color, TILE_FLIPYX(data >> 10));
 
 	/* sprite color base might come from the top 2 bits */
 	tileinfo.category = (data >> 14) & 3;
@@ -159,7 +159,7 @@ void mcr_state::journey_set_color(int index, int data)
 }
 
 
-WRITE8_MEMBER(mcr_state::mcr_paletteram9_w)
+void mcr_state::mcr_paletteram9_w(offs_t offset, uint8_t data)
 {
 	// palette RAM is actually 9 bit (a 93419 SRAM)
 	// however, there is no way for the CPU to read back
@@ -177,14 +177,14 @@ WRITE8_MEMBER(mcr_state::mcr_paletteram9_w)
  *
  *************************************/
 
-WRITE8_MEMBER(mcr_state::mcr_90009_videoram_w)
+void mcr_state::mcr_90009_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(mcr_state::mcr_90010_videoram_w)
+void mcr_state::mcr_90010_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
@@ -200,14 +200,14 @@ WRITE8_MEMBER(mcr_state::mcr_90010_videoram_w)
 }
 
 
-READ8_MEMBER(mcr_state::twotiger_videoram_r)
+uint8_t mcr_state::twotiger_videoram_r(offs_t offset)
 {
 	/* Two Tigers swizzles the address bits on videoram */
 	int effoffs = ((offset << 1) & 0x7fe) | ((offset >> 10) & 1);
 	return m_videoram[effoffs];
 }
 
-WRITE8_MEMBER(mcr_state::twotiger_videoram_w)
+void mcr_state::twotiger_videoram_w(offs_t offset, uint8_t data)
 {
 	/* Two Tigers swizzles the address bits on videoram */
 	int effoffs = ((offset << 1) & 0x7fe) | ((offset >> 10) & 1);
@@ -221,7 +221,7 @@ WRITE8_MEMBER(mcr_state::twotiger_videoram_w)
 }
 
 
-WRITE8_MEMBER(mcr_state::mcr_91490_videoram_w)
+void mcr_state::mcr_91490_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
@@ -272,9 +272,9 @@ void mcr_state::render_sprites_91399(screen_device &screen, bitmap_ind16 &bitmap
 		for (int y = 0; y < 32; y++, sy = (sy + 1) & 0x1ff)
 			if (sy >= cliprect.min_y && sy <= cliprect.max_y)
 			{
-				const uint8_t *src = gfx->get_data(code) + gfx->rowbytes() * (y ^ vflip);
-				uint16_t *dst = &bitmap.pix16(sy);
-				uint8_t *pri = &screen.priority().pix8(sy);
+				uint8_t const *const src = gfx->get_data(code) + gfx->rowbytes() * (y ^ vflip);
+				uint16_t *const dst = &bitmap.pix(sy);
+				uint8_t *const pri = &screen.priority().pix(sy);
 
 				/* loop over columns */
 				for (int x = 0; x < 32; x++)
@@ -339,9 +339,9 @@ void mcr_state::render_sprites_91464(screen_device &screen, bitmap_ind16 &bitmap
 		for (int y = 0; y < 32; y++, sy = (sy + 1) & 0x1ff)
 			if (sy >= 2 && sy >= cliprect.min_y && sy <= cliprect.max_y)
 			{
-				const uint8_t *src = gfx->get_data(code) + gfx->rowbytes() * (y ^ vflip);
-				uint16_t *dst = &bitmap.pix16(sy);
-				uint8_t *pri = &screen.priority().pix8(sy);
+				uint8_t const *const src = gfx->get_data(code) + gfx->rowbytes() * (y ^ vflip);
+				uint16_t *const dst = &bitmap.pix(sy);
+				uint8_t *const pri = &screen.priority().pix(sy);
 
 				/* loop over columns */
 				for (int x = 0; x < 32; x++)

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Andrew Gardner, Vas Crabb
 /*********************************************************************
 
     dvbpoints.h
@@ -7,19 +7,15 @@
     Breakpoint debugger view.
 
 ***************************************************************************/
-
 #ifndef MAME_EMU_DEBUG_DVBPOINTS_H
 #define MAME_EMU_DEBUG_DVBPOINTS_H
 
 #pragma once
 
-#include "debugvw.h"
 #include "debugcpu.h"
+#include "debugvw.h"
 
-
-//**************************************************************************
-//  CONSTANTS
-//**************************************************************************
+#include <vector>
 
 
 //**************************************************************************
@@ -46,10 +42,9 @@ private:
 	void pad_ostream_to_length(std::ostream& str, int len);
 	void gather_breakpoints();
 
-
 	// internal state
-	bool (*m_sortType)(const device_debug::breakpoint *, const device_debug::breakpoint *);
-	std::vector<const device_debug::breakpoint *> m_buffer;
+	bool (*m_sortType)(const debug_breakpoint *, const debug_breakpoint *);
+	std::vector<const debug_breakpoint *> m_buffer;
 };
 
 #endif // MAME_EMU_DEBUG_DVBPOINTS_H

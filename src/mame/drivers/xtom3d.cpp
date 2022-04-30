@@ -49,6 +49,8 @@ MX29F1610MC 16M FlashROM (x7)
 #include "video/pc_vga.h"
 
 
+namespace {
+
 class xtom3d_state : public pcat_base_state
 {
 public:
@@ -59,6 +61,10 @@ public:
 	}
 
 	void xtom3d(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	std::unique_ptr<uint32_t[]> m_bios_ram;
@@ -71,17 +77,15 @@ private:
 	uint8_t m_mtxc_config_reg[256];
 	uint8_t m_piix4_config_reg[4][256];
 
-	DECLARE_WRITE32_MEMBER( isa_ram1_w );
-	DECLARE_WRITE32_MEMBER( isa_ram2_w );
+	void isa_ram1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void isa_ram2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE32_MEMBER( bios_ext1_ram_w );
-	DECLARE_WRITE32_MEMBER( bios_ext2_ram_w );
-	DECLARE_WRITE32_MEMBER( bios_ext3_ram_w );
-	DECLARE_WRITE32_MEMBER( bios_ext4_ram_w );
+	void bios_ext1_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void bios_ext2_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void bios_ext3_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void bios_ext4_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE32_MEMBER( bios_ram_w );
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void intel82439tx_init();
 
 	void xtom3d_io(address_map &map);
@@ -298,7 +302,7 @@ void xtom3d_state::intel82371ab_pci_w(int function, int reg, uint32_t data, uint
 }
 
 
-WRITE32_MEMBER(xtom3d_state::isa_ram1_w)
+void xtom3d_state::isa_ram1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x5a] & 0x2)      // write to RAM if this region is write-enabled
 	{
@@ -306,7 +310,7 @@ WRITE32_MEMBER(xtom3d_state::isa_ram1_w)
 	}
 }
 
-WRITE32_MEMBER(xtom3d_state::isa_ram2_w)
+void xtom3d_state::isa_ram2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x5a] & 0x2)      // write to RAM if this region is write-enabled
 	{
@@ -314,7 +318,7 @@ WRITE32_MEMBER(xtom3d_state::isa_ram2_w)
 	}
 }
 
-WRITE32_MEMBER(xtom3d_state::bios_ext1_ram_w)
+void xtom3d_state::bios_ext1_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x5e] & 0x2)      // write to RAM if this region is write-enabled
 	{
@@ -323,7 +327,7 @@ WRITE32_MEMBER(xtom3d_state::bios_ext1_ram_w)
 }
 
 
-WRITE32_MEMBER(xtom3d_state::bios_ext2_ram_w)
+void xtom3d_state::bios_ext2_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x5e] & 0x20)     // write to RAM if this region is write-enabled
 	{
@@ -332,7 +336,7 @@ WRITE32_MEMBER(xtom3d_state::bios_ext2_ram_w)
 }
 
 
-WRITE32_MEMBER(xtom3d_state::bios_ext3_ram_w)
+void xtom3d_state::bios_ext3_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x5f] & 0x2)      // write to RAM if this region is write-enabled
 	{
@@ -341,7 +345,7 @@ WRITE32_MEMBER(xtom3d_state::bios_ext3_ram_w)
 }
 
 
-WRITE32_MEMBER(xtom3d_state::bios_ext4_ram_w)
+void xtom3d_state::bios_ext4_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x5f] & 0x20)     // write to RAM if this region is write-enabled
 	{
@@ -350,7 +354,7 @@ WRITE32_MEMBER(xtom3d_state::bios_ext4_ram_w)
 }
 
 
-WRITE32_MEMBER(xtom3d_state::bios_ram_w)
+void xtom3d_state::bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x59] & 0x20)     // write to RAM if this region is write-enabled
 	{
@@ -396,6 +400,9 @@ void xtom3d_state::machine_start()
 	m_bios_ext4_ram = std::make_unique<uint32_t[]>(0x4000/4);
 	m_isa_ram1 = std::make_unique<uint32_t[]>(0x4000/4);
 	m_isa_ram2 = std::make_unique<uint32_t[]>(0x4000/4);
+
+	for (int i = 0; i < 4; i++)
+		std::fill(std::begin(m_piix4_config_reg[i]), std::end(m_piix4_config_reg[i]), 0);
 
 	intel82439tx_init();
 }
@@ -448,5 +455,7 @@ ROM_START( xtom3d )
 	ROM_LOAD( "u20", 0xc00000, 0x200000, CRC(452131d9) SHA1(f62a0f1a7da9025ac1f7d5de4df90166871ac1e5) )
 ROM_END
 
+} // Anonymous namespace
 
-GAME(1999, xtom3d, 0, xtom3d, at_keyboard, xtom3d_state, empty_init, ROT0, "Jamie System Development", "X Tom 3D", MACHINE_IS_SKELETON)
+
+GAME(1999, xtom3d, 0, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Jamie System Development", "X Tom 3D", MACHINE_IS_SKELETON)

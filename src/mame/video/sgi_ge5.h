@@ -90,6 +90,7 @@ private:
 	int m_icount;
 	enum ge5_state : unsigned
 	{
+		STALL,
 		DECODE,   // fetch and decode instruction, update pointers
 		READ,     // read source
 		CONTROL,  // flow control

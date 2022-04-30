@@ -2,7 +2,7 @@
 // server.cpp
 // ~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -13,18 +13,19 @@
 #include <deque>
 #include <iostream>
 #include <set>
-#include <boost/bind.hpp>
+#include <string>
+#include <boost/bind/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
-#include "asio/deadline_timer.hpp"
+#include "asio/buffer.hpp"
 #include "asio/io_context.hpp"
 #include "asio/ip/tcp.hpp"
 #include "asio/ip/udp.hpp"
 #include "asio/read_until.hpp"
-#include "asio/streambuf.hpp"
+#include "asio/steady_timer.hpp"
 #include "asio/write.hpp"
 
-using asio::deadline_timer;
+using asio::steady_timer;
 using asio::ip::tcp;
 using asio::ip::udp;
 
@@ -57,7 +58,8 @@ public:
   void deliver(const std::string& msg)
   {
     std::for_each(subscribers_.begin(), subscribers_.end(),
-        boost::bind(&subscriber::deliver, _1, boost::ref(msg)));
+        boost::bind(&subscriber::deliver,
+          boost::placeholders::_1, boost::ref(msg)));
   }
 
 private:
@@ -121,8 +123,8 @@ private:
 //  +-------------+               +--------------+
 //
 // The output actor first waits for an output message to be enqueued. It does
-// this by using a deadline_timer as an asynchronous condition variable. The
-// deadline_timer will be signalled whenever the output queue is non-empty.
+// this by using a steady_timer as an asynchronous condition variable. The
+// steady_timer will be signalled whenever the output queue is non-empty.
 //
 // Once a message is available, it is sent to the client. The deadline for
 // sending a complete message is 30 seconds. After the message is successfully
@@ -140,13 +142,13 @@ public:
       non_empty_output_queue_(io_context),
       output_deadline_(io_context)
   {
-    input_deadline_.expires_at(boost::posix_time::pos_infin);
-    output_deadline_.expires_at(boost::posix_time::pos_infin);
+    input_deadline_.expires_at(steady_timer::time_point::max());
+    output_deadline_.expires_at(steady_timer::time_point::max());
 
-    // The non_empty_output_queue_ deadline_timer is set to pos_infin whenever
-    // the output queue is empty. This ensures that the output actor stays
-    // asleep until a message is put into the queue.
-    non_empty_output_queue_.expires_at(boost::posix_time::pos_infin);
+    // The non_empty_output_queue_ steady_timer is set to the maximum time
+    // point whenever the output queue is empty. This ensures that the output
+    // actor stays asleep until a message is put into the queue.
+    non_empty_output_queue_.expires_at(steady_timer::time_point::max());
   }
 
   tcp::socket& socket()
@@ -195,20 +197,22 @@ private:
 
     // Signal that the output queue contains messages. Modifying the expiry
     // will wake the output actor, if it is waiting on the timer.
-    non_empty_output_queue_.expires_at(boost::posix_time::neg_infin);
+    non_empty_output_queue_.expires_at(steady_timer::time_point::min());
   }
 
   void start_read()
   {
     // Set a deadline for the read operation.
-    input_deadline_.expires_from_now(boost::posix_time::seconds(30));
+    input_deadline_.expires_after(asio::chrono::seconds(30));
 
     // Start an asynchronous operation to read a newline-delimited message.
-    asio::async_read_until(socket_, input_buffer_, '\n',
-        boost::bind(&tcp_session::handle_read, shared_from_this(), _1));
+    asio::async_read_until(socket_,
+        asio::dynamic_buffer(input_buffer_), '\n',
+        boost::bind(&tcp_session::handle_read, shared_from_this(),
+          boost::placeholders::_1, boost::placeholders::_2));
   }
 
-  void handle_read(const asio::error_code& ec)
+  void handle_read(const asio::error_code& ec, std::size_t n)
   {
     if (stopped())
       return;
@@ -216,9 +220,8 @@ private:
     if (!ec)
     {
       // Extract the newline-delimited message from the buffer.
-      std::string msg;
-      std::istream is(&input_buffer_);
-      std::getline(is, msg);
+      std::string msg(input_buffer_.substr(0, n - 1));
+      input_buffer_.erase(0, n);
 
       if (!msg.empty())
       {
@@ -234,7 +237,7 @@ private:
 
           // Signal that the output queue contains messages. Modifying the
           // expiry will wake the output actor, if it is waiting on the timer.
-          non_empty_output_queue_.expires_at(boost::posix_time::neg_infin);
+          non_empty_output_queue_.expires_at(steady_timer::time_point::min());
         }
       }
 
@@ -256,7 +259,7 @@ private:
       // There are no messages that are ready to be sent. The actor goes to
       // sleep by waiting on the non_empty_output_queue_ timer. When a new
       // message is added, the timer will be modified and the actor will wake.
-      non_empty_output_queue_.expires_at(boost::posix_time::pos_infin);
+      non_empty_output_queue_.expires_at(steady_timer::time_point::max());
       non_empty_output_queue_.async_wait(
           boost::bind(&tcp_session::await_output, shared_from_this()));
     }
@@ -269,12 +272,13 @@ private:
   void start_write()
   {
     // Set a deadline for the write operation.
-    output_deadline_.expires_from_now(boost::posix_time::seconds(30));
+    output_deadline_.expires_after(asio::chrono::seconds(30));
 
     // Start an asynchronous operation to send a message.
     asio::async_write(socket_,
         asio::buffer(output_queue_.front()),
-        boost::bind(&tcp_session::handle_write, shared_from_this(), _1));
+        boost::bind(&tcp_session::handle_write,
+          shared_from_this(), boost::placeholders::_1));
   }
 
   void handle_write(const asio::error_code& ec)
@@ -294,7 +298,7 @@ private:
     }
   }
 
-  void check_deadline(deadline_timer* deadline)
+  void check_deadline(steady_timer* deadline)
   {
     if (stopped())
       return;
@@ -302,7 +306,7 @@ private:
     // Check whether the deadline has passed. We compare the deadline against
     // the current time since a new asynchronous operation may have moved the
     // deadline before this actor had a chance to run.
-    if (deadline->expires_at() <= deadline_timer::traits_type::now())
+    if (deadline->expiry() <= steady_timer::clock_type::now())
     {
       // The deadline has passed. Stop the session. The other actors will
       // terminate as soon as possible.
@@ -319,11 +323,11 @@ private:
 
   channel& channel_;
   tcp::socket socket_;
-  asio::streambuf input_buffer_;
-  deadline_timer input_deadline_;
+  std::string input_buffer_;
+  steady_timer input_deadline_;
   std::deque<std::string> output_queue_;
-  deadline_timer non_empty_output_queue_;
-  deadline_timer output_deadline_;
+  steady_timer non_empty_output_queue_;
+  steady_timer output_deadline_;
 };
 
 typedef boost::shared_ptr<tcp_session> tcp_session_ptr;
@@ -339,6 +343,7 @@ public:
     : socket_(io_context)
   {
     socket_.connect(broadcast_endpoint);
+    socket_.set_option(udp::socket::broadcast(true));
   }
 
 private:
@@ -373,7 +378,8 @@ public:
     tcp_session_ptr new_session(new tcp_session(io_context_, channel_));
 
     acceptor_.async_accept(new_session->socket(),
-        boost::bind(&server::handle_accept, this, new_session, _1));
+        boost::bind(&server::handle_accept,
+          this, new_session, boost::placeholders::_1));
   }
 
   void handle_accept(tcp_session_ptr session,

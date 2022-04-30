@@ -48,17 +48,17 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE16_MEMBER(fgram_w);
-	DECLARE_WRITE16_MEMBER(bgram_w);
-	DECLARE_WRITE16_MEMBER(bg2ram_w);
-	DECLARE_WRITE16_MEMBER(actionhw_snd_w);
+	void fgram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void bgram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void bg2ram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void actionhw_snd_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	DECLARE_WRITE8_MEMBER(soundio_port_a_w);
-	DECLARE_READ8_MEMBER(soundio_port_b_r);
-	DECLARE_WRITE8_MEMBER(soundio_port_b_w);
-	DECLARE_READ8_MEMBER(soundio_port_c_r);
-	DECLARE_WRITE8_MEMBER(soundio_port_c_w);
-	DECLARE_WRITE16_MEMBER(to_pic_w);
+	void soundio_port_a_w(u8 data);
+	u8 soundio_port_b_r();
+	void soundio_port_b_w(u8 data);
+	u8 soundio_port_c_r();
+	void soundio_port_c_w(u8 data);
+	void to_pic_w(u16 data);
 
 	TILE_GET_INFO_MEMBER(get_kickgoal_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -78,28 +78,28 @@ private:
 	void oki_map(address_map &map);
 
 	/* video-related */
-	tilemap_t     *m_fgtm;
-	tilemap_t     *m_bgtm;
-	tilemap_t     *m_bg2tm;
+	tilemap_t     *m_fgtm = nullptr;
+	tilemap_t     *m_bgtm = nullptr;
+	tilemap_t     *m_bg2tm = nullptr;
 
 	/* misc */
-	int         m_snd_new;
-	int         m_snd_sam[4];
+	int         m_snd_new = 0;
+	int         m_snd_sam[4]{};
 
-	u8 m_pic_portc;
-	u8 m_pic_portb;
-	int m_sound_command_sent;
+	u8 m_pic_portc = 0;
+	u8 m_pic_portb = 0;
+	int m_sound_command_sent = 0;
 
-	int m_fg_base;
+	int m_fg_base = 0;
 
-	int m_bg_base;
-	int m_bg_mask;
+	int m_bg_base = 0;
+	int m_bg_mask = 0;
 
-	int m_bg2_base;
-	int m_bg2_mask;
-	int m_bg2_region;
+	int m_bg2_base = 0;
+	int m_bg2_mask = 0;
+	int m_bg2_region = 0;
 
-	int m_sprbase;
+	int m_sprbase = 0;
 
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 

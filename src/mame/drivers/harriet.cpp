@@ -28,9 +28,10 @@ public:
 	}
 
 	void harriet(machine_config &config);
+
 private:
-	DECLARE_READ8_MEMBER(zpram_r);
-	DECLARE_WRITE8_MEMBER(zpram_w);
+	uint8_t zpram_r(offs_t offset);
+	void zpram_w(offs_t offset, uint8_t data);
 
 	void harriet_map(address_map &map);
 
@@ -41,12 +42,12 @@ private:
 	std::unique_ptr<u8[]> m_zpram_data;
 };
 
-READ8_MEMBER(harriet_state::zpram_r)
+uint8_t harriet_state::zpram_r(offs_t offset)
 {
 	return m_zpram_data[offset];
 }
 
-WRITE8_MEMBER(harriet_state::zpram_w)
+void harriet_state::zpram_w(offs_t offset, uint8_t data)
 {
 	m_zpram_data[offset] = data;
 }
@@ -86,7 +87,6 @@ static const input_device_default terminal_defaults[] =
 {
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_19200 )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_19200 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )

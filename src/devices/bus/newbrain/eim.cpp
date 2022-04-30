@@ -113,7 +113,7 @@ newbrain_eim_device::newbrain_eim_device(const machine_config &mconfig, const ch
 	device_newbrain_expansion_slot_interface(mconfig, *this),
 	m_ctc(*this, Z80CTC_TAG),
 	m_acia(*this, MC6850_TAG),
-	m_exp(*this, NEWBRAIN_EXPANSION_SLOT_TAG),
+	m_exp(*this, "exp"),
 	m_rom(*this, "eim"),
 	m_ram(*this, RAM_TAG)
 {
@@ -185,7 +185,7 @@ void newbrain_eim_device::iorq_w(offs_t offset, uint8_t data, bool &prtov)
 //  anout_r -
 //-------------------------------------------------
 
-READ8_MEMBER( newbrain_eim_device::anout_r )
+uint8_t newbrain_eim_device::anout_r()
 {
 	return 0xff;
 }
@@ -195,7 +195,7 @@ READ8_MEMBER( newbrain_eim_device::anout_r )
 //  anout_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( newbrain_eim_device::anout_w )
+void newbrain_eim_device::anout_w(uint8_t data)
 {
 }
 
@@ -204,7 +204,7 @@ WRITE8_MEMBER( newbrain_eim_device::anout_w )
 //  anin_r -
 //-------------------------------------------------
 
-READ8_MEMBER( newbrain_eim_device::anin_r )
+uint8_t newbrain_eim_device::anin_r()
 {
 	return 0;
 }
@@ -214,7 +214,7 @@ READ8_MEMBER( newbrain_eim_device::anin_r )
 //  anio_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( newbrain_eim_device::anio_w )
+void newbrain_eim_device::anio_w(uint8_t data)
 {
 }
 

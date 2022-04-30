@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="sf7000" description="Sega Super Control Station SF-7000 disk images">
 	<software name="102examp">
 		<description>Progs for Yeno (Fra)</description>
@@ -254,7 +257,7 @@
 
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="163840">
-				<rom name="sega logo v1.0e (sf-7000) [!].sf7" size="163840" crc="a7b1da17" sha1="1a54fbf5bd1442a96e7806249a6812ea2006e092"/>
+				<rom name="sega logo v1.0e (sf-7000).sf7" size="163840" crc="a7b1da17" sha1="1a54fbf5bd1442a96e7806249a6812ea2006e092"/>
 			</dataarea>
 		</part>
 	</software>

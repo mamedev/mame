@@ -48,30 +48,42 @@ static const double unknown_game_angles[3] = {0,0.16666666, 0.33333333};
 
 
 
-void vectrex_base_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void vectrex_base_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_VECTREX_IMAGER_CHANGE_COLOR:
-		vectrex_imager_change_color(ptr, param);
+		vectrex_imager_change_color(param);
 		break;
 	case TIMER_UPDATE_LEVEL:
-		update_level(ptr, param);
+		update_level(param);
 		break;
 	case TIMER_VECTREX_IMAGER_EYE:
-		vectrex_imager_eye(ptr, param);
+		vectrex_imager_eye(param);
 		break;
 	case TIMER_LIGHTPEN_TRIGGER:
-		lightpen_trigger(ptr, param);
+		lightpen_trigger(param);
 		break;
 	case TIMER_VECTREX_REFRESH:
-		vectrex_refresh(ptr, param);
+		vectrex_refresh(param);
 		break;
 	case TIMER_VECTREX_ZERO_INTEGRATORS:
-		vectrex_zero_integrators(ptr, param);
+		vectrex_zero_integrators(param);
 		break;
-	case TIMER_UPDATE_SIGNAL:
-		update_signal(ptr, param);
+	case TIMER_UPDATE_ANALOG:
+		update_vector();
+		m_analog[param] = m_via_out[PORTA];
+		break;
+	case TIMER_UPDATE_BLANK:
+		update_vector();
+		m_blank = param;
+		break;
+	case TIMER_UPDATE_MUX_ENABLE:
+		update_vector();
+		break;
+	case TIMER_UPDATE_RAMP:
+		update_vector();
+		m_ramp = param;
 		break;
 	default:
 		fatalerror("Unknown id in vectrex_base_state::device_timer");
@@ -187,7 +199,7 @@ WRITE_LINE_MEMBER(vectrex_base_state::vectrex_via_irq)
 }
 
 
-READ8_MEMBER(vectrex_base_state::vectrex_via_pb_r)
+uint8_t vectrex_base_state::vectrex_via_pb_r()
 {
 	int pot = m_io_contr[(m_via_out[PORTB] & 0x6) >> 1]->read() - 0x80;
 
@@ -200,7 +212,7 @@ READ8_MEMBER(vectrex_base_state::vectrex_via_pb_r)
 }
 
 
-READ8_MEMBER(vectrex_base_state::vectrex_via_pa_r)
+uint8_t vectrex_base_state::vectrex_via_pa_r()
 {
 	if ((!(m_via_out[PORTB] & 0x10)) && (m_via_out[PORTB] & 0x08))
 		/* BDIR inactive, we can read the PSG. BC1 has to be active. */
@@ -212,7 +224,7 @@ READ8_MEMBER(vectrex_base_state::vectrex_via_pa_r)
 }
 
 
-READ8_MEMBER(raaspec_state::vectrex_s1_via_pb_r)
+uint8_t raaspec_state::vectrex_s1_via_pb_r()
 {
 	return (m_via_out[PORTB] & ~0x40) | (m_io_coin->read() & 0x40);
 }
@@ -232,8 +244,7 @@ TIMER_CALLBACK_MEMBER(vectrex_base_state::vectrex_imager_change_color)
 
 TIMER_CALLBACK_MEMBER(vectrex_base_state::update_level)
 {
-	if (ptr)
-		* (uint8_t *) ptr = param;
+	m_imager_pinlevel = param;
 }
 
 
@@ -258,13 +269,13 @@ TIMER_CALLBACK_MEMBER(vectrex_base_state::vectrex_imager_eye)
 			m_via6522_0->write_ca1(1);
 			m_via6522_0->write_ca1(0);
 			m_imager_pinlevel |= 0x80;
-			timer_set(attotime::from_double(rtime / 360.0), TIMER_UPDATE_LEVEL, 0, &m_imager_pinlevel);
+			timer_set(attotime::from_double(rtime / 360.0), TIMER_UPDATE_LEVEL, 0);
 		}
 	}
 }
 
 
-WRITE8_MEMBER(vectrex_base_state::vectrex_psg_port_w)
+void vectrex_base_state::vectrex_psg_port_w(uint8_t data)
 {
 	double wavel, ang_acc, tmp;
 	int mcontrol;
@@ -328,9 +339,9 @@ void vectrex_state::machine_start()
 	{
 		// install cart accesses
 		if (m_cart->get_type() == VECTREX_SRAM)
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000, 0x7fff, read8_delegate(*m_cart, FUNC(vectrex_cart_slot_device::read_rom)), write8_delegate(*m_cart, FUNC(vectrex_cart_slot_device::write_ram)));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000, 0x7fff, read8sm_delegate(*m_cart, FUNC(vectrex_cart_slot_device::read_rom)), write8sm_delegate(*m_cart, FUNC(vectrex_cart_slot_device::write_ram)));
 		else
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x7fff, read8_delegate(*m_cart, FUNC(vectrex_cart_slot_device::read_rom)));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x7fff, read8sm_delegate(*m_cart, FUNC(vectrex_cart_slot_device::read_rom)));
 
 		// setup 3d imager and refresh timer
 

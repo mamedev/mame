@@ -30,7 +30,7 @@ inline void m72_state::m72_m81_get_tile_info(tile_data &tileinfo,int tile_index,
 	else pri = 0;
 /* attr & 0x0010 is used in bchopper and hharry, more priority? */
 
-	SET_TILE_INFO_MEMBER(gfxnum,
+	tileinfo.set(gfxnum,
 			code & 0x3fff,
 			attr & 0x000f,
 			TILE_FLIPYX((code & 0xc000) >> 14));
@@ -70,7 +70,7 @@ TILE_GET_INFO_MEMBER(m72_state::rtype2_get_tile_info)
 /* (m_videoram[N][tile_index+2] & 0x10) is used by majtitle on the green, but it's not clear for what */
 /* (m_videoram[N][tile_index+3] & 0xfe) are used as well */
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			attr & 0x000f,
 			TILE_FLIPYX((attr & 0x0060) >> 5));
@@ -106,7 +106,7 @@ VIDEO_START_MEMBER(m72_state,m72)
 	m_bg_tilemap->set_transmask(1,0x00ff,0xff00);
 
 	//m_bg_tilemap->set_transmask(2,0x0001,0xfffe);
-	m_bg_tilemap->set_transmask(2,0x0007,0xfff8); // needed for lohtj japan warning to look correct
+	m_bg_tilemap->set_transmask(2,0x0007,0xfff8); // needed for lohtj Japan warning to look correct
 
 	memset(m_spriteram->buffer(),0,m_spriteram->bytes());
 
@@ -149,22 +149,22 @@ VIDEO_START_MEMBER(m72_state,hharry)
 	m_bg_tilemap->set_scrolldy(-128,16);
 }
 
-VIDEO_START_MEMBER(m72_state,imgfightj)
+VIDEO_START_MEMBER(m72_state,imgfight)
 {
 	VIDEO_START_CALL_MEMBER(m72);
-	m_bg_tilemap->set_transmask(2,0xff00,0x00ff); // for japan message
+	m_bg_tilemap->set_transmask(2,0xff00,0x00ff); // for RAM/ROM & Japan message
 }
 
 VIDEO_START_MEMBER(m72_state,nspiritj)
 {
 	VIDEO_START_CALL_MEMBER(m72);
-	m_bg_tilemap->set_transmask(2,0x001f,0xffe0); // for japan message
+	m_bg_tilemap->set_transmask(2,0x001f,0xffe0); // for Japan message
 }
 
 VIDEO_START_MEMBER(m72_state,mrheli)
 {
 	VIDEO_START_CALL_MEMBER(m72);
-	m_bg_tilemap->set_transmask(2,0x00ff,0xff00); // for japan message
+	m_bg_tilemap->set_transmask(2,0x00ff,0xff00); // for Japan message
 }
 
 
@@ -435,7 +435,7 @@ void m72_state::majtitle_draw_sprites(bitmap_ind16 &bitmap,const rectangle &clip
 {
 	u16 *spriteram16_2 = m_spriteram2;
 
-	for (int offs = 0; offs < m_spriteram2.bytes(); offs += 4)
+	for (int offs = 0; offs < m_spriteram2.length(); offs += 4)
 	{
 		const int code = spriteram16_2[offs+1];
 		const u32 color = spriteram16_2[offs+2] & 0x0f;

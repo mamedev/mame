@@ -36,11 +36,11 @@
     ROM declarations:
 
     (oti 037 chip)
-    ROM_LOAD("oakvga.bin", 0xc0000, 0x8000, 0x318c5f43)
+    ROM_LOAD("oakvga.bin", 0xc0000, 0x8000, CRC(318c5f43) SHA1(2aeb6cf737fd87dfd08c9f5b5bc421fcdbab4ce9) )
     (tseng labs famous et4000 isa vga card (oem))
-    ROM_LOAD("et4000b.bin", 0xc0000, 0x8000, 0xa903540d)
+    ROM_LOAD("et4000b.bin", 0xc0000, 0x8000, CRC(a903540d) SHA1(unknown) )
     (tseng labs famous et4000 isa vga card)
-    ROM_LOAD("et4000.bin", 0xc0000, 0x8000, 0xf01e4be0)
+    ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f01e4be0) SHA1(95d75ff41bcb765e50bd87a8da01835fd0aa01d5) )
 
 ***************************************************************************/
 
@@ -129,6 +129,8 @@ DEFINE_DEVICE_TYPE(GAMTOR_VGA, gamtor_vga_device, "gamtor_vga", "GAMTOR VGA")
 DEFINE_DEVICE_TYPE(ATI_VGA,    ati_vga_device,    "ati_vga",    "ATi VGA")
 DEFINE_DEVICE_TYPE(IBM8514A,   ibm8514a_device,   "ibm8514a",   "IBM 8514/A Video")
 DEFINE_DEVICE_TYPE(MACH8,      mach8_device,      "mach8",      "Mach8")
+DEFINE_DEVICE_TYPE(XGA_COPRO,  xga_copro_device,  "xga_copro",  "IBM XGA Coprocessor")
+DEFINE_DEVICE_TYPE(OTI111,     oak_oti111_vga_device,  "oti111_vga",  "Oak Technologies Spitfire 64111")
 
 vga_device::vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
@@ -202,8 +204,8 @@ mach8_device::mach8_device(const machine_config &mconfig, const char *tag, devic
 // zero everything, keep vtbls
 void vga_device::zero()
 {
-	memset(&vga.svga_intf, 0, sizeof(vga.svga_intf));
-	vga.memory.resize(0);
+	vga.svga_intf.seq_regcount = 0;
+	vga.svga_intf.crtc_regcount = 0;
 	memset(vga.pens, 0, sizeof(vga.pens));
 	vga.miscellaneous_output = 0;
 	vga.feature_control = 0;
@@ -244,8 +246,7 @@ void vga_device::device_start()
 {
 	zero();
 
-	int i;
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 		set_pen_color(i, 0, 0, 0);
 
 	// Avoid an infinite loop when displaying.  0 is not possible anyway.
@@ -256,11 +257,10 @@ void vga_device::device_start()
 	vga.read_dipswitch.set(nullptr); //read_dipswitch;
 	vga.svga_intf.seq_regcount = 0x05;
 	vga.svga_intf.crtc_regcount = 0x19;
-	vga.svga_intf.vram_size = 0x100000;
 
-	vga.memory.resize(vga.svga_intf.vram_size);
+	vga.memory = std::make_unique<uint8_t []>(vga.svga_intf.vram_size);
 	memset(&vga.memory[0], 0, vga.svga_intf.vram_size);
-	save_item(NAME(vga.memory));
+	save_pointer(NAME(vga.memory), vga.svga_intf.vram_size);
 	save_item(NAME(vga.pens));
 
 	save_item(NAME(vga.miscellaneous_output));
@@ -449,42 +449,37 @@ uint32_t vga_device::start_addr()
 
 void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t ch, attr;
-	uint8_t bits;
-	uint32_t font_base;
-	uint32_t *bitmapline;
 	int width=VGA_CH_WIDTH, height = (vga.crtc.maximum_scan_line) * (vga.crtc.scan_doubling + 1);
-	int pos, line, column, mask, w, h, addr;
-	uint8_t blink_en,fore_col,back_col;
-	pen_t pen;
 
 	if(vga.crtc.cursor_enable)
 		vga.cursor.visible = screen().frame_number() & 0x10;
 	else
 		vga.cursor.visible = 0;
 
-	for (addr = vga.crtc.start_addr, line = -vga.crtc.preset_row_scan; line < TEXT_LINES;
+	for (int addr = vga.crtc.start_addr, line = -vga.crtc.preset_row_scan; line < TEXT_LINES;
 			line += height, addr += (offset()>>1))
 	{
-		for (pos = addr, column=0; column<TEXT_COLUMNS; column++, pos++)
+		for (int pos = addr, column=0; column<TEXT_COLUMNS; column++, pos++)
 		{
-			ch   = vga.memory[(pos<<1) + 0];
-			attr = vga.memory[(pos<<1) + 1];
-			font_base = 0x20000+(ch<<5);
+			uint8_t ch   = vga.memory[(pos<<1) + 0];
+			uint8_t attr = vga.memory[(pos<<1) + 1];
+			uint32_t font_base = 0x20000+(ch<<5);
 			font_base += ((attr & 8) ? vga.sequencer.char_sel.A : vga.sequencer.char_sel.B)*0x2000;
-			blink_en = (vga.attribute.data[0x10]&8&&screen().frame_number() & 0x20) ? attr & 0x80 : 0;
+			uint8_t blink_en = (vga.attribute.data[0x10]&8&&screen().frame_number() & 0x20) ? attr & 0x80 : 0;
 
-			fore_col = attr & 0xf;
-			back_col = (attr & 0x70) >> 4;
+			uint8_t fore_col = attr & 0xf;
+			uint8_t back_col = (attr & 0x70) >> 4;
 			back_col |= (vga.attribute.data[0x10]&8) ? 0 : ((attr & 0x80) >> 4);
 
-			for (h = std::max(-line, 0); (h < height) && (line+h < std::min(TEXT_LINES, bitmap.height())); h++)
+			for (int h = std::max(-line, 0); (h < height) && (line+h < std::min(TEXT_LINES, bitmap.height())); h++)
 			{
-				bitmapline = &bitmap.pix32(line+h);
-				bits = vga.memory[font_base+(h>>(vga.crtc.scan_doubling))];
+				uint32_t *const bitmapline = &bitmap.pix(line+h);
+				uint8_t bits = vga.memory[font_base+(h>>(vga.crtc.scan_doubling))];
 
+				int mask, w;
 				for (mask=0x80, w=0; (w<width)&&(w<8); w++, mask>>=1)
 				{
+					pen_t pen;
 					if (bits&mask)
 						pen = vga.pens[blink_en ? back_col : fore_col];
 					else
@@ -498,6 +493,7 @@ void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				if (w<width)
 				{
 					/* 9 column */
+					pen_t pen;
 					if (TEXT_COPY_9COLUMN(ch)&&(bits&1))
 						pen = vga.pens[blink_en ? back_col : fore_col];
 					else
@@ -510,7 +506,7 @@ void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			}
 			if (vga.cursor.visible&&(pos==vga.crtc.cursor_addr))
 			{
-				for (h=vga.crtc.cursor_scan_start;
+				for (int h=vga.crtc.cursor_scan_start;
 						(h<=vga.crtc.cursor_scan_end)&&(h<height)&&(line+h<TEXT_LINES);
 						h++)
 				{
@@ -525,34 +521,29 @@ void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 void vga_device::vga_vh_ega(bitmap_rgb32 &bitmap,  const rectangle &cliprect)
 {
-	int pos, line, column, c, addr, i, yi;
 	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
-	uint32_t *bitmapline;
-	pen_t pen;
 	int pel_shift = (vga.attribute.pel_shift & 7);
 
 //  popmessage("%08x %02x",EGA_START_ADDRESS,pel_shift);
 
 	/**/
-	for (addr=EGA_START_ADDRESS, pos=0, line=0; line<LINES;
-			line += height, addr += offset())
+	for (int addr=EGA_START_ADDRESS, line=0; line<LINES; line += height, addr += offset())
 	{
-		for(yi=0;yi<height;yi++)
+		for (int yi=0;yi<height;yi++)
 		{
-			bitmapline = &bitmap.pix32(line + yi);
+			uint32_t *const bitmapline = &bitmap.pix(line + yi);
 
-			for (pos=addr, c=0, column=0; column<EGA_COLUMNS+1; column++, c+=8, pos=(pos+1)&0xffff)
+			for (int pos=addr, c=0, column=0; column<EGA_COLUMNS+1; column++, c+=8, pos=(pos+1)&0xffff)
 			{
-				int data[4];
+				int data[4] = {
+						vga.memory[(pos & 0xffff)],
+						vga.memory[(pos & 0xffff)+0x10000]<<1,
+						vga.memory[(pos & 0xffff)+0x20000]<<2,
+						vga.memory[(pos & 0xffff)+0x30000]<<3 };
 
-				data[0]=vga.memory[(pos & 0xffff)];
-				data[1]=vga.memory[(pos & 0xffff)+0x10000]<<1;
-				data[2]=vga.memory[(pos & 0xffff)+0x20000]<<2;
-				data[3]=vga.memory[(pos & 0xffff)+0x30000]<<3;
-
-				for (i = 7; i >= 0; i--)
+				for (int i = 7; i >= 0; i--)
 				{
-					pen = vga.pens[(data[0]&1) | (data[1]&2) | (data[2]&4) | (data[3]&8)];
+					pen_t pen = vga.pens[(data[0]&1) | (data[1]&2) | (data[2]&4) | (data[3]&8)];
 
 					data[0]>>=1;
 					data[1]>>=1;
@@ -571,26 +562,21 @@ void vga_device::vga_vh_ega(bitmap_rgb32 &bitmap,  const rectangle &cliprect)
 /* TODO: I'm guessing that in 256 colors mode every pixel actually outputs two pixels. Is it right? */
 void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int pos, line, column, c, addr, curr_addr;
-	uint32_t *bitmapline;
-	uint16_t mask_comp;
 	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
-	int yi;
-	int xi;
 	int pel_shift = (vga.attribute.pel_shift & 6);
 	int addrmask = vga.crtc.no_wrap ? -1 : 0xffff;
 
 	/* line compare is screen sensitive */
-	mask_comp = 0x3ff; //| (LINES & 0x300);
+	uint16_t mask_comp = 0x3ff; //| (LINES & 0x300);
 
 //  popmessage("%02x %02x",vga.attribute.pel_shift,vga.sequencer.data[4] & 0x08);
 
-	curr_addr = 0;
+	int curr_addr = 0;
 	if(!(vga.sequencer.data[4] & 0x08))
 	{
-		for (addr = start_addr(), line=0; line<LINES; line+=height, addr+=offset(), curr_addr+=offset())
+		for (int addr = start_addr(), line=0; line<LINES; line+=height, addr+=offset(), curr_addr+=offset())
 		{
-			for(yi = 0;yi < height; yi++)
+			for(int yi = 0;yi < height; yi++)
 			{
 				if((line + yi) < (vga.crtc.line_compare & mask_comp))
 					curr_addr = addr;
@@ -599,15 +585,15 @@ void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 					curr_addr = 0;
 					pel_shift = 0;
 				}
-				bitmapline = &bitmap.pix32(line + yi);
-				for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS+1; column++, c+=8, pos++)
+				uint32_t *const bitmapline = &bitmap.pix(line + yi);
+				for (int pos=curr_addr, c=0, column=0; column<VGA_COLUMNS+1; column++, c+=8, pos++)
 				{
 					if(pos > 0x80000/4)
 						return;
 
-					for(xi=0;xi<8;xi++)
+					for(int xi=0;xi<8;xi++)
 					{
-						if(!screen().visible_area().contains(c+xi-(pel_shift), line + yi))
+						if (!screen().visible_area().contains(c+xi-(pel_shift), line + yi))
 							continue;
 						bitmapline[c+xi-(pel_shift)] = pen(vga.memory[(pos & addrmask)+((xi >> 1)*0x10000)]);
 					}
@@ -617,22 +603,22 @@ void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	}
 	else
 	{
-		for (addr = start_addr(), line=0; line<LINES; line+=height, addr+=offset(), curr_addr+=offset())
+		for (int addr = start_addr(), line=0; line<LINES; line+=height, addr+=offset(), curr_addr+=offset())
 		{
-			for(yi = 0;yi < height; yi++)
+			for(int yi = 0;yi < height; yi++)
 			{
 				if((line + yi) < (vga.crtc.line_compare & mask_comp))
 					curr_addr = addr;
 				if((line + yi) == (vga.crtc.line_compare & mask_comp))
 					curr_addr = 0;
-				bitmapline = &bitmap.pix32(line + yi);
+				uint32_t *const bitmapline = &bitmap.pix(line + yi);
 				//addr %= 0x80000;
-				for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS+1; column++, c+=0x10, pos+=0x8)
+				for (int pos=curr_addr, c=0, column=0; column<VGA_COLUMNS+1; column++, c+=0x10, pos+=0x8)
 				{
 					if(pos + 0x08 > 0x80000)
 						return;
 
-					for(xi=0;xi<0x10;xi++)
+					for (int xi=0;xi<0x10;xi++)
 					{
 						if(!screen().visible_area().contains(c+xi-(pel_shift), line + yi))
 							continue;
@@ -646,28 +632,23 @@ void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 void vga_device::vga_vh_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint32_t *bitmapline;
 	int height = (vga.crtc.scan_doubling + 1);
-	int x,xi,y,yi;
-	uint32_t addr;
-	pen_t pen;
-	int width;
 
-	width = (vga.crtc.horz_disp_end + 1) * 8;
+	int width = (vga.crtc.horz_disp_end + 1) * 8;
 
-	for(y=0;y<LINES;y++)
+	for(int y=0;y<LINES;y++)
 	{
-		addr = ((y & 1) * 0x2000) + (((y & ~1) >> 1) * width/4);
+		uint32_t addr = ((y & 1) * 0x2000) + (((y & ~1) >> 1) * width/4);
 
-		for(x=0;x<width;x+=4)
+		for(int x=0;x<width;x+=4)
 		{
-			for(yi=0;yi<height;yi++)
+			for(int yi=0;yi<height;yi++)
 			{
-				bitmapline = &bitmap.pix32(y * height + yi);
+				uint32_t *const bitmapline = &bitmap.pix(y * height + yi);
 
-				for(xi=0;xi<4;xi++)
+				for(int xi=0;xi<4;xi++)
 				{
-					pen = vga.pens[(vga.memory[addr] >> (6-xi*2)) & 3];
+					pen_t pen = vga.pens[(vga.memory[addr] >> (6-xi*2)) & 3];
 					if(!screen().visible_area().contains(x+xi, y * height + yi))
 						continue;
 					bitmapline[x+xi] = pen;
@@ -681,28 +662,23 @@ void vga_device::vga_vh_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 void vga_device::vga_vh_mono(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint32_t *bitmapline;
 	int height = (vga.crtc.scan_doubling + 1);
-	int x,xi,y,yi;
-	uint32_t addr;
-	pen_t pen;
-	int width;
 
-	width = (vga.crtc.horz_disp_end + 1) * 8;
+	int width = (vga.crtc.horz_disp_end + 1) * 8;
 
-	for(y=0;y<LINES;y++)
+	for(int y=0;y<LINES;y++)
 	{
-		addr = ((y & 1) * 0x2000) + (((y & ~1) >> 1) * width/8);
+		uint32_t addr = ((y & 1) * 0x2000) + (((y & ~1) >> 1) * width/8);
 
-		for(x=0;x<width;x+=8)
+		for(int x=0;x<width;x+=8)
 		{
-			for(yi=0;yi<height;yi++)
+			for(int yi=0;yi<height;yi++)
 			{
-				bitmapline = &bitmap.pix32(y * height + yi);
+				uint32_t *const bitmapline = &bitmap.pix(y * height + yi);
 
-				for(xi=0;xi<8;xi++)
+				for(int xi=0;xi<8;xi++)
 				{
-					pen = vga.pens[(vga.memory[addr] >> (7-xi)) & 1];
+					pen_t pen = vga.pens[(vga.memory[addr] >> (7-xi)) & 1];
 					if(!screen().visible_area().contains(x+xi, y * height + yi))
 						continue;
 					bitmapline[x+xi] = pen;
@@ -716,18 +692,12 @@ void vga_device::vga_vh_mono(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 void svga_device::svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int pos, line, column, c, addr, curr_addr;
-	uint32_t *bitmapline;
-	uint16_t mask_comp;
 	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
-	int yi;
-	int xi;
-	uint8_t start_shift;
-//  uint16_t line_length;
 
 	/* line compare is screen sensitive */
-	mask_comp = 0x3ff;
-	curr_addr = 0;
+	uint16_t  mask_comp = 0x3ff;
+	int curr_addr = 0;
+//  uint16_t line_length;
 //  if(vga.crtc.dw)
 //      line_length = vga.crtc.offset << 3;  // doubleword mode
 //  else
@@ -735,29 +705,27 @@ void svga_device::svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 //      line_length = vga.crtc.offset << 4;
 //  }
 
-	start_shift = (!(vga.sequencer.data[4] & 0x08)) ? 2 : 0;
+	uint8_t start_shift = (!(vga.sequencer.data[4] & 0x08)) ? 2 : 0;
+	for (int addr = VGA_START_ADDRESS << start_shift, line=0; line<LINES; line+=height, addr+=offset(), curr_addr+=offset())
 	{
-		for (addr = VGA_START_ADDRESS << start_shift, line=0; line<LINES; line+=height, addr+=offset(), curr_addr+=offset())
+		for (int yi = 0;yi < height; yi++)
 		{
-			for(yi = 0;yi < height; yi++)
+			if((line + yi) < (vga.crtc.line_compare & mask_comp))
+				curr_addr = addr;
+			if((line + yi) == (vga.crtc.line_compare & mask_comp))
+				curr_addr = 0;
+			uint32_t *const bitmapline = &bitmap.pix(line + yi);
+			addr %= vga.svga_intf.vram_size;
+			for (int pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=8, pos+=0x8)
 			{
-				if((line + yi) < (vga.crtc.line_compare & mask_comp))
-					curr_addr = addr;
-				if((line + yi) == (vga.crtc.line_compare & mask_comp))
-					curr_addr = 0;
-				bitmapline = &bitmap.pix32(line + yi);
-				addr %= vga.svga_intf.vram_size;
-				for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=8, pos+=0x8)
-				{
-					if(pos + 0x08 >= vga.svga_intf.vram_size)
-						return;
+				if(pos + 0x08 >= vga.svga_intf.vram_size)
+					return;
 
-					for(xi=0;xi<8;xi++)
-					{
-						if(!screen().visible_area().contains(c+xi, line + yi))
-							continue;
-						bitmapline[c+xi] = pen(vga.memory[(pos+(xi))]);
-					}
+				for (int xi=0;xi<8;xi++)
+				{
+					if(!screen().visible_area().contains(c+xi, line + yi))
+						continue;
+					bitmapline[c+xi] = pen(vga.memory[(pos+(xi))]);
 				}
 			}
 		}
@@ -767,38 +735,29 @@ void svga_device::svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 void svga_device::svga_vh_rgb15(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	#define MV(x) (vga.memory[x]+(vga.memory[x+1]<<8))
-	#define IV 0xff000000
+	constexpr uint32_t IV = 0xff000000;
 	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
-	int xi;
-	int yi;
-	int xm;
-	int pos, line, column, c, addr, curr_addr;
-
-	uint32_t *bitmapline;
-//  uint16_t mask_comp;
 
 	/* line compare is screen sensitive */
-//  mask_comp = 0xff | (TLINES & 0x300);
-	curr_addr = 0;
-	yi=0;
-	for (addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=offset(), curr_addr+=offset())
+//  uint16_t mask_comp = 0xff | (TLINES & 0x300);
+	int curr_addr = 0;
+	int yi=0;
+	for (int addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=offset(), curr_addr+=offset())
 	{
-		bitmapline = &bitmap.pix32(line);
+		uint32_t *const bitmapline = &bitmap.pix(line);
 		addr %= vga.svga_intf.vram_size;
-		for (pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=0x10)
+		for (int pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=0x10)
 		{
 			if(pos + 0x10 >= vga.svga_intf.vram_size)
 				return;
-			for(xi=0,xm=0;xi<8;xi++,xm+=2)
+			for(int xi=0,xm=0;xi<8;xi++,xm+=2)
 			{
-				int r,g,b;
-
 				if(!screen().visible_area().contains(c+xi, line + yi))
 					continue;
 
-				r = (MV(pos+xm)&0x7c00)>>10;
-				g = (MV(pos+xm)&0x03e0)>>5;
-				b = (MV(pos+xm)&0x001f)>>0;
+				int r = (MV(pos+xm)&0x7c00)>>10;
+				int g = (MV(pos+xm)&0x03e0)>>5;
+				int b = (MV(pos+xm)&0x001f)>>0;
 				r = (r << 3) | (r & 0x7);
 				g = (g << 3) | (g & 0x7);
 				b = (b << 3) | (b & 0x7);
@@ -811,38 +770,29 @@ void svga_device::svga_vh_rgb15(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 void svga_device::svga_vh_rgb16(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	#define MV(x) (vga.memory[x]+(vga.memory[x+1]<<8))
-	#define IV 0xff000000
+	constexpr uint32_t IV = 0xff000000;
 	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
-	int xi;
-	int yi;
-	int xm;
-	int pos, line, column, c, addr, curr_addr;
-
-	uint32_t *bitmapline;
-//  uint16_t mask_comp;
 
 	/* line compare is screen sensitive */
-//  mask_comp = 0xff | (TLINES & 0x300);
-	curr_addr = 0;
-	yi=0;
-	for (addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=offset(), curr_addr+=offset())
+//  uint16_t mask_comp = 0xff | (TLINES & 0x300);
+	int curr_addr = 0;
+	int yi=0;
+	for (int addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=offset(), curr_addr+=offset())
 	{
-		bitmapline = &bitmap.pix32(line);
+		uint32_t *const bitmapline = &bitmap.pix(line);
 		addr %= vga.svga_intf.vram_size;
-		for (pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=0x10)
+		for (int pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=0x10)
 		{
 			if(pos + 0x10 >= vga.svga_intf.vram_size)
 				return;
-			for(xi=0,xm=0;xi<8;xi++,xm+=2)
+			for (int xi=0,xm=0;xi<8;xi++,xm+=2)
 			{
-				int r,g,b;
-
 				if(!screen().visible_area().contains(c+xi, line + yi))
 					continue;
 
-				r = (MV(pos+xm)&0xf800)>>11;
-				g = (MV(pos+xm)&0x07e0)>>5;
-				b = (MV(pos+xm)&0x001f)>>0;
+				int r = (MV(pos+xm)&0xf800)>>11;
+				int g = (MV(pos+xm)&0x07e0)>>5;
+				int b = (MV(pos+xm)&0x001f)>>0;
 				r = (r << 3) | (r & 0x7);
 				g = (g << 2) | (g & 0x3);
 				b = (b << 3) | (b & 0x7);
@@ -855,39 +805,30 @@ void svga_device::svga_vh_rgb16(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 void svga_device::svga_vh_rgb24(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	#define MD(x) (vga.memory[x]+(vga.memory[x+1]<<8)+(vga.memory[x+2]<<16))
-	#define ID 0xff000000
+	constexpr uint32_t ID = 0xff000000;
 	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
-	int xi;
-	int yi;
-	int xm;
-	int pos, line, column, c, addr, curr_addr;
-	uint32_t *bitmapline;
-
-//  uint16_t mask_comp;
 
 	/* line compare is screen sensitive */
-//  mask_comp = 0xff | (TLINES & 0x300);
-	curr_addr = 0;
-	yi=0;
-	for (addr = TGA_START_ADDRESS<<1, line=0; line<TLINES; line+=height, addr+=offset(), curr_addr+=offset())
+//  uint16_t mask_comp = 0xff | (TLINES & 0x300);
+	int curr_addr = 0;
+	int yi=0;
+	for (int addr = TGA_START_ADDRESS<<1, line=0; line<TLINES; line+=height, addr+=offset(), curr_addr+=offset())
 	{
-		bitmapline = &bitmap.pix32(line);
+		uint32_t *const bitmapline = &bitmap.pix(line);
 		addr %= vga.svga_intf.vram_size;
-		for (pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=24)
+		for (int pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=24)
 		{
 			if(pos + 24 >= vga.svga_intf.vram_size)
 				return;
-			for(xi=0,xm=0;xi<8;xi++,xm+=3)
+			for (int xi=0,xm=0;xi<8;xi++,xm+=3)
 			{
-				int r,g,b;
-
 				if(!screen().visible_area().contains(c+xi, line + yi))
 					continue;
 
-				r = (MD(pos+xm)&0xff0000)>>16;
-				g = (MD(pos+xm)&0x00ff00)>>8;
-				b = (MD(pos+xm)&0x0000ff)>>0;
-				bitmapline[c+xi] = IV|(r<<16)|(g<<8)|(b<<0);
+				int r = (MD(pos+xm)&0xff0000)>>16;
+				int g = (MD(pos+xm)&0x00ff00)>>8;
+				int b = (MD(pos+xm)&0x0000ff)>>0;
+				bitmapline[c+xi] = ID|(r<<16)|(g<<8)|(b<<0);
 			}
 		}
 	}
@@ -896,39 +837,32 @@ void svga_device::svga_vh_rgb24(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 void svga_device::svga_vh_rgb32(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	#define MD(x) (vga.memory[x]+(vga.memory[x+1]<<8)+(vga.memory[x+2]<<16))
-	#define ID 0xff000000
+	constexpr uint32_t ID = 0xff000000;
 	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
-	int xi;
-	int yi;
-	int xm;
-	int pos, line, column, c, addr, curr_addr;
-	uint32_t *bitmapline;
 
 //  uint16_t mask_comp;
 
 	/* line compare is screen sensitive */
 //  mask_comp = 0xff | (TLINES & 0x300);
-	curr_addr = 0;
-	yi=0;
-	for (addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=(offset()), curr_addr+=(offset()))
+	int curr_addr = 0;
+	int yi=0;
+	for (int addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=(offset()), curr_addr+=(offset()))
 	{
-		bitmapline = &bitmap.pix32(line);
+		uint32_t *const bitmapline = &bitmap.pix(line);
 		addr %= vga.svga_intf.vram_size;
-		for (pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=0x20)
+		for (int pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=0x20)
 		{
 			if(pos + 0x20 >= vga.svga_intf.vram_size)
 				return;
-			for(xi=0,xm=0;xi<8;xi++,xm+=4)
+			for (int xi=0,xm=0;xi<8;xi++,xm+=4)
 			{
-				int r,g,b;
-
 				if(!screen().visible_area().contains(c+xi, line + yi))
 					continue;
 
-				r = (MD(pos+xm)&0xff0000)>>16;
-				g = (MD(pos+xm)&0x00ff00)>>8;
-				b = (MD(pos+xm)&0x0000ff)>>0;
-				bitmapline[c+xi] = IV|(r<<16)|(g<<8)|(b<<0);
+				int r = (MD(pos+xm)&0xff0000)>>16;
+				int g = (MD(pos+xm)&0x00ff00)>>8;
+				int b = (MD(pos+xm)&0x0000ff)>>0;
+				bitmapline[c+xi] = ID|(r<<16)|(g<<8)|(b<<0);
 			}
 		}
 	}
@@ -936,13 +870,11 @@ void svga_device::svga_vh_rgb32(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 uint8_t vga_device::pc_vga_choosevideomode()
 {
-	int i;
-
 	if (vga.crtc.sync_en)
 	{
 		if (vga.dac.dirty)
 		{
-			for (i=0; i<256;i++)
+			for (int i=0; i<256;i++)
 			{
 				/* TODO: color shifters? */
 				set_pen_color(i, (vga.dac.color[3*(i & vga.dac.mask)] & 0x3f) << 2,
@@ -954,7 +886,7 @@ uint8_t vga_device::pc_vga_choosevideomode()
 
 		if (vga.attribute.data[0x10] & 0x80)
 		{
-			for (i=0; i<16;i++)
+			for (int i=0; i<16;i++)
 			{
 				vga.pens[i] = pen((vga.attribute.data[i]&0x0f)
 											|((vga.attribute.data[0x14]&0xf)<<4));
@@ -962,7 +894,7 @@ uint8_t vga_device::pc_vga_choosevideomode()
 		}
 		else
 		{
-			for (i=0; i<16;i++)
+			for (int i=0; i<16;i++)
 			{
 				vga.pens[i] = pen((vga.attribute.data[i]&0x3f)
 											|((vga.attribute.data[0x14]&0xc)<<4));
@@ -997,13 +929,11 @@ uint8_t vga_device::pc_vga_choosevideomode()
 
 uint8_t svga_device::pc_vga_choosevideomode()
 {
-	int i;
-
 	if (vga.crtc.sync_en)
 	{
 		if (vga.dac.dirty)
 		{
-			for (i=0; i<256;i++)
+			for (int i=0; i<256;i++)
 			{
 				/* TODO: color shifters? */
 				set_pen_color(i, (vga.dac.color[3*(i & vga.dac.mask)] & 0x3f) << 2,
@@ -1015,7 +945,7 @@ uint8_t svga_device::pc_vga_choosevideomode()
 
 		if (vga.attribute.data[0x10] & 0x80)
 		{
-			for (i=0; i<16;i++)
+			for (int i=0; i<16;i++)
 			{
 				vga.pens[i] = pen((vga.attribute.data[i]&0x0f)
 											|((vga.attribute.data[0x14]&0xf)<<4));
@@ -1023,7 +953,7 @@ uint8_t svga_device::pc_vga_choosevideomode()
 		}
 		else
 		{
-			for (i=0; i<16;i++)
+			for (int i=0; i<16;i++)
 			{
 				vga.pens[i] = pen((vga.attribute.data[i]&0x3f)
 											|((vga.attribute.data[0x14]&0xc)<<4));
@@ -1132,32 +1062,26 @@ uint32_t svga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 uint32_t s3_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t cur_mode;
-
 	svga_device::screen_update(screen, bitmap, cliprect);
 
-	cur_mode = pc_vga_choosevideomode();
+	uint8_t cur_mode = pc_vga_choosevideomode();
 
 	// draw hardware graphics cursor
 	// TODO: support 16 bit and greater video modes
 	if(s3.cursor_mode & 0x01)  // if cursor is enabled
 	{
-		uint32_t src;
-		uint32_t* dst;
-		uint8_t val;
-		int x,y;
 		uint16_t cx = s3.cursor_x & 0x07ff;
 		uint16_t cy = s3.cursor_y & 0x07ff;
-		uint32_t bg_col;
-		uint32_t fg_col;
-		int r,g,b;
-		uint32_t datax;
 
 		if(cur_mode == SCREEN_OFF || cur_mode == TEXT_MODE || cur_mode == MONO_MODE || cur_mode == CGA_MODE || cur_mode == EGA_MODE)
 			return 0;  // cursor only works in VGA or SVGA modes
 
-		src = s3.cursor_start_addr * 1024;  // start address is in units of 1024 bytes
+		uint32_t src = s3.cursor_start_addr * 1024;  // start address is in units of 1024 bytes
 
+		uint32_t bg_col;
+		uint32_t fg_col;
+		int r,g,b;
+		uint32_t datax;
 		switch(cur_mode)
 		{
 		case RGB15_MODE:
@@ -1204,16 +1128,16 @@ uint32_t s3_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		//                    ,(s3.cursor_fg[0])|(s3.cursor_fg[1]<<8)|(s3.cursor_fg[2]<<16)|(s3.cursor_fg[3]<<24));
 //      for(x=0;x<64;x++)
 //          printf("%08x: %02x %02x %02x %02x\n",src+x*4,vga.memory[src+x*4],vga.memory[src+x*4+1],vga.memory[src+x*4+2],vga.memory[src+x*4+3]);
-		for(y=0;y<64;y++)
+		for(int y=0;y<64;y++)
 		{
 			if(cy + y < cliprect.max_y && cx < cliprect.max_x)
 			{
-				dst = &bitmap.pix32(cy + y, cx);
-				for(x=0;x<64;x++)
+				uint32_t *const dst = &bitmap.pix(cy + y, cx);
+				for(int x=0;x<64;x++)
 				{
 					uint16_t bita = (vga.memory[(src+1) % vga.svga_intf.vram_size] | ((vga.memory[(src+0) % vga.svga_intf.vram_size]) << 8)) >> (15-(x % 16));
 					uint16_t bitb = (vga.memory[(src+3) % vga.svga_intf.vram_size] | ((vga.memory[(src+2) % vga.svga_intf.vram_size]) << 8)) >> (15-(x % 16));
-					val = ((bita & 0x01) << 1) | (bitb & 0x01);
+					uint8_t val = ((bita & 0x01) << 1) | (bitb & 0x01);
 					if(s3.extended_dac_ctrl & 0x10)
 					{  // X11 mode
 						switch(val)
@@ -1635,7 +1559,7 @@ uint8_t vga_device::vga_vblank()
 	return res;
 }
 
-READ8_MEMBER(vga_device::vga_crtc_r)
+uint8_t vga_device::vga_crtc_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -1685,7 +1609,7 @@ READ8_MEMBER(vga_device::vga_crtc_r)
 	return data;
 }
 
-WRITE8_MEMBER(vga_device::vga_crtc_w)
+void vga_device::vga_crtc_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -1718,11 +1642,11 @@ WRITE8_MEMBER(vga_device::vga_crtc_w)
 
 
 
-READ8_MEMBER(vga_device::port_03b0_r)
+uint8_t vga_device::port_03b0_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 	if (CRTC_PORT_ADDR==0x3b0)
-		data=vga_crtc_r(space, offset, mem_mask);
+		data = vga_crtc_r(offset);
 	return data;
 }
 
@@ -1750,7 +1674,7 @@ uint8_t vga_device::gc_reg_read(uint8_t index)
 			break;
 		case 0x05:
 			res  = (vga.gc.shift256 & 1) << 6;
-			res |= (vga.gc.shift_reg & 1) << 5;;
+			res |= (vga.gc.shift_reg & 1) << 5;
 			res |= (vga.gc.host_oe & 1) << 4;
 			res |= (vga.gc.read_mode & 1) << 3;
 			res |= (vga.gc.write_mode & 3);
@@ -1774,7 +1698,7 @@ uint8_t vga_device::gc_reg_read(uint8_t index)
 	return res;
 }
 
-READ8_MEMBER(vga_device::port_03c0_r)
+uint8_t vga_device::port_03c0_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -1797,25 +1721,25 @@ READ8_MEMBER(vga_device::port_03c0_r)
 			switch ((vga.miscellaneous_output>>2)&3)
 			{
 				case 3:
-					if (!vga.read_dipswitch.isnull() && vga.read_dipswitch(space, 0, mem_mask) & 0x01)
+					if (!vga.read_dipswitch.isnull() && vga.read_dipswitch() & 0x01)
 						data |= 0x10;
 					else
 						data |= 0x10;
 					break;
 				case 2:
-					if (!vga.read_dipswitch.isnull() && vga.read_dipswitch(space, 0, mem_mask) & 0x02)
+					if (!vga.read_dipswitch.isnull() && vga.read_dipswitch() & 0x02)
 						data |= 0x10;
 					else
 						data |= 0x10;
 					break;
 				case 1:
-					if (!vga.read_dipswitch.isnull() && vga.read_dipswitch(space, 0, mem_mask) & 0x04)
+					if (!vga.read_dipswitch.isnull() && vga.read_dipswitch() & 0x04)
 						data |= 0x10;
 					else
 						data |= 0x10;
 					break;
 				case 0:
-					if (!vga.read_dipswitch.isnull() && vga.read_dipswitch(space, 0, mem_mask) & 0x08)
+					if (!vga.read_dipswitch.isnull() && vga.read_dipswitch() & 0x08)
 						data |= 0x10;
 					else
 						data |= 0x10;
@@ -1891,11 +1815,11 @@ READ8_MEMBER(vga_device::port_03c0_r)
 	return data;
 }
 
-READ8_MEMBER(vga_device::port_03d0_r)
+uint8_t vga_device::port_03d0_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 	if (CRTC_PORT_ADDR == 0x3d0)
-		data = vga_crtc_r(space, offset, mem_mask);
+		data = vga_crtc_r(offset);
 	if(offset == 8)
 	{
 		logerror("VGA: 0x3d8 read %s\n", machine().describe_context());
@@ -1905,13 +1829,13 @@ READ8_MEMBER(vga_device::port_03d0_r)
 	return data;
 }
 
-WRITE8_MEMBER(vga_device::port_03b0_w)
+void vga_device::port_03b0_w(offs_t offset, uint8_t data)
 {
 	if (LOG_ACCESSES)
 		logerror("vga_port_03b0_w(): port=0x%04x data=0x%02x\n", offset + 0x3b0, data);
 
 	if (CRTC_PORT_ADDR == 0x3b0)
-		vga_crtc_w(space, offset, data, mem_mask);
+		vga_crtc_w(offset, data);
 }
 
 void vga_device::attribute_reg_write(uint8_t index, uint8_t data)
@@ -1980,7 +1904,7 @@ void vga_device::gc_reg_write(uint8_t index,uint8_t data)
 	}
 }
 
-WRITE8_MEMBER(vga_device::port_03c0_w)
+void vga_device::port_03c0_w(offs_t offset, uint8_t data)
 {
 	if (LOG_ACCESSES)
 		logerror("vga_port_03c0_w(): port=0x%04x data=0x%02x\n", offset + 0x3c0, data);
@@ -2068,13 +1992,13 @@ WRITE8_MEMBER(vga_device::port_03c0_w)
 
 
 
-WRITE8_MEMBER(vga_device::port_03d0_w)
+void vga_device::port_03d0_w(offs_t offset, uint8_t data)
 {
 	if (LOG_ACCESSES)
 		logerror("vga_port_03d0_w(): port=0x%04x data=0x%02x\n", offset + 0x3d0, data);
 
 	if (CRTC_PORT_ADDR == 0x3d0)
-		vga_crtc_w(space, offset, data, mem_mask);
+		vga_crtc_w(offset, data);
 }
 
 void vga_device::device_reset()
@@ -2116,7 +2040,7 @@ void s3_vga_device::device_reset()
 	s3.sr11 = 0x41;
 }
 
-READ8_MEMBER(vga_device::mem_r)
+uint8_t vga_device::mem_r(offs_t offset)
 {
 	/* TODO: check me */
 	switch(vga.gc.memory_map_sel & 0x03)
@@ -2183,7 +2107,7 @@ READ8_MEMBER(vga_device::mem_r)
 	//return 0;
 }
 
-WRITE8_MEMBER(vga_device::mem_w)
+void vga_device::mem_w(offs_t offset, uint8_t data)
 {
 	//Inside each case must prevent writes to non-mapped VGA memory regions, not only mask the offset.
 	switch(vga.gc.memory_map_sel & 0x03)
@@ -2221,12 +2145,12 @@ WRITE8_MEMBER(vga_device::mem_w)
 	}
 }
 
-READ8_MEMBER(vga_device::mem_linear_r)
+uint8_t vga_device::mem_linear_r(offs_t offset)
 {
 	return vga.memory[offset % vga.svga_intf.vram_size];
 }
 
-WRITE8_MEMBER(vga_device::mem_linear_w)
+void vga_device::mem_linear_w(offs_t offset, uint8_t data)
 {
 	vga.memory[offset % vga.svga_intf.vram_size] = data;
 }
@@ -2400,7 +2324,7 @@ void tseng_vga_device::tseng_seq_reg_write(uint8_t index, uint8_t data)
 	}
 }
 
-READ8_MEMBER(tseng_vga_device::port_03b0_r)
+uint8_t tseng_vga_device::port_03b0_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 
@@ -2415,7 +2339,7 @@ READ8_MEMBER(tseng_vga_device::port_03b0_r)
 				res = et4k.reg_3d8;
 				break;
 			default:
-				res = vga_device::port_03b0_r(space,offset,mem_mask);
+				res = vga_device::port_03b0_r(offset);
 				break;
 		}
 	}
@@ -2423,7 +2347,7 @@ READ8_MEMBER(tseng_vga_device::port_03b0_r)
 	return res;
 }
 
-WRITE8_MEMBER(tseng_vga_device::port_03b0_w)
+void tseng_vga_device::port_03b0_w(offs_t offset, uint8_t data)
 {
 	if (CRTC_PORT_ADDR == 0x3b0)
 	{
@@ -2441,7 +2365,7 @@ WRITE8_MEMBER(tseng_vga_device::port_03b0_w)
 					et4k.ext_reg_ena = false;
 				break;
 			default:
-				vga_device::port_03b0_w(space,offset,data,mem_mask);
+				vga_device::port_03b0_w(offset,data);
 				break;
 		}
 	}
@@ -2482,7 +2406,7 @@ void tseng_vga_device::tseng_attribute_reg_write(uint8_t index, uint8_t data)
 
 }
 
-READ8_MEMBER(tseng_vga_device::port_03c0_r)
+uint8_t tseng_vga_device::port_03c0_r(offs_t offset)
 {
 	uint8_t res;
 
@@ -2494,7 +2418,7 @@ READ8_MEMBER(tseng_vga_device::port_03c0_r)
 				case 0x16: res = et4k.misc1; break;
 				case 0x17: res = et4k.misc2; break;
 				default:
-					res = vga_device::port_03c0_r(space,offset,mem_mask);
+					res = vga_device::port_03c0_r(offset);
 					break;
 			}
 
@@ -2516,19 +2440,20 @@ READ8_MEMBER(tseng_vga_device::port_03c0_r)
 				break;
 			}
 			et4k.dac_state++;
-			res = vga_device::port_03c0_r(space,offset,mem_mask);
+			res = vga_device::port_03c0_r(offset);
 			break;
 		case 0x08:
 			et4k.dac_state = 0;
+			[[fallthrough]];
 		default:
-			res = vga_device::port_03c0_r(space,offset,mem_mask);
+			res = vga_device::port_03c0_r(offset);
 			break;
 	}
 
 	return res;
 }
 
-WRITE8_MEMBER(tseng_vga_device::port_03c0_w)
+void tseng_vga_device::port_03c0_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -2557,14 +2482,15 @@ WRITE8_MEMBER(tseng_vga_device::port_03c0_w)
 				et4k.dac_ctrl = data;
 				break;
 			}
+			[[fallthrough]];
 		default:
-			vga_device::port_03c0_w(space,offset,data,mem_mask);
+			vga_device::port_03c0_w(offset,data);
 			break;
 	}
 	tseng_define_video_mode();
 }
 
-READ8_MEMBER(tseng_vga_device::port_03d0_r)
+uint8_t tseng_vga_device::port_03d0_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 
@@ -2579,7 +2505,7 @@ READ8_MEMBER(tseng_vga_device::port_03d0_r)
 				res = et4k.reg_3d8;
 				break;
 			default:
-				res = vga_device::port_03d0_r(space,offset,mem_mask);
+				res = vga_device::port_03d0_r(offset);
 				break;
 		}
 	}
@@ -2587,7 +2513,7 @@ READ8_MEMBER(tseng_vga_device::port_03d0_r)
 	return res;
 }
 
-WRITE8_MEMBER(tseng_vga_device::port_03d0_w)
+void tseng_vga_device::port_03d0_w(offs_t offset, uint8_t data)
 {
 	if (CRTC_PORT_ADDR == 0x3d0)
 	{
@@ -2607,14 +2533,14 @@ WRITE8_MEMBER(tseng_vga_device::port_03d0_w)
 					et4k.ext_reg_ena = false;
 				break;
 			default:
-				vga_device::port_03d0_w(space,offset,data,mem_mask);
+				vga_device::port_03d0_w(offset,data);
 				break;
 		}
 	}
 	tseng_define_video_mode();
 }
 
-READ8_MEMBER(tseng_vga_device::mem_r)
+uint8_t tseng_vga_device::mem_r(offs_t offset)
 {
 	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
 	{
@@ -2622,10 +2548,10 @@ READ8_MEMBER(tseng_vga_device::mem_r)
 		return vga.memory[(offset+svga.bank_r*0x10000)];
 	}
 
-	return vga_device::mem_r(space,offset,mem_mask);
+	return vga_device::mem_r(offset);
 }
 
-WRITE8_MEMBER(tseng_vga_device::mem_w)
+void tseng_vga_device::mem_w(offs_t offset, uint8_t data)
 {
 	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
 	{
@@ -2633,7 +2559,7 @@ WRITE8_MEMBER(tseng_vga_device::mem_w)
 		vga.memory[(offset+svga.bank_w*0x10000)] = data;
 	}
 	else
-		vga_device::mem_w(space,offset,data,mem_mask);
+		vga_device::mem_w(offset,data);
 }
 
 /******************************************
@@ -3202,7 +3128,7 @@ void s3_vga_device::s3_seq_reg_write(uint8_t index, uint8_t data)
 
 
 
-READ8_MEMBER(s3_vga_device::port_03b0_r)
+uint8_t s3_vga_device::port_03b0_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 
@@ -3214,7 +3140,7 @@ READ8_MEMBER(s3_vga_device::port_03b0_r)
 				res = s3_crtc_reg_read(vga.crtc.index);
 				break;
 			default:
-				res = vga_device::port_03b0_r(space,offset,mem_mask);
+				res = vga_device::port_03b0_r(offset);
 				break;
 		}
 	}
@@ -3222,7 +3148,7 @@ READ8_MEMBER(s3_vga_device::port_03b0_r)
 	return res;
 }
 
-WRITE8_MEMBER(s3_vga_device::port_03b0_w)
+void s3_vga_device::port_03b0_w(offs_t offset, uint8_t data)
 {
 	if (CRTC_PORT_ADDR == 0x3b0)
 	{
@@ -3233,13 +3159,13 @@ WRITE8_MEMBER(s3_vga_device::port_03b0_w)
 				s3_crtc_reg_write(vga.crtc.index,data);
 				break;
 			default:
-				vga_device::port_03b0_w(space,offset,data,mem_mask);
+				vga_device::port_03b0_w(offset,data);
 				break;
 		}
 	}
 }
 
-READ8_MEMBER(s3_vga_device::port_03c0_r)
+uint8_t s3_vga_device::port_03c0_r(offs_t offset)
 {
 	uint8_t res;
 
@@ -3249,14 +3175,14 @@ READ8_MEMBER(s3_vga_device::port_03c0_r)
 			res = s3_seq_reg_read(vga.sequencer.index);
 			break;
 		default:
-			res = vga_device::port_03c0_r(space,offset,mem_mask);
+			res = vga_device::port_03c0_r(offset);
 			break;
 	}
 
 	return res;
 }
 
-WRITE8_MEMBER(s3_vga_device::port_03c0_w)
+void s3_vga_device::port_03c0_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -3264,12 +3190,12 @@ WRITE8_MEMBER(s3_vga_device::port_03c0_w)
 			s3_seq_reg_write(vga.sequencer.index,data);
 			break;
 		default:
-			vga_device::port_03c0_w(space,offset,data,mem_mask);
+			vga_device::port_03c0_w(offset,data);
 			break;
 	}
 }
 
-READ8_MEMBER(s3_vga_device::port_03d0_r)
+uint8_t s3_vga_device::port_03d0_r(offs_t offset)
 {
 	uint8_t res = 0xff;
 
@@ -3281,7 +3207,7 @@ READ8_MEMBER(s3_vga_device::port_03d0_r)
 				res = s3_crtc_reg_read(vga.crtc.index);
 				break;
 			default:
-				res = vga_device::port_03d0_r(space,offset,mem_mask);
+				res = vga_device::port_03d0_r(offset);
 				break;
 		}
 	}
@@ -3289,7 +3215,7 @@ READ8_MEMBER(s3_vga_device::port_03d0_r)
 	return res;
 }
 
-WRITE8_MEMBER(s3_vga_device::port_03d0_w)
+void s3_vga_device::port_03d0_w(offs_t offset, uint8_t data)
 {
 	if (CRTC_PORT_ADDR == 0x3d0)
 	{
@@ -3300,13 +3226,13 @@ WRITE8_MEMBER(s3_vga_device::port_03d0_w)
 				s3_crtc_reg_write(vga.crtc.index,data);
 				break;
 			default:
-				vga_device::port_03d0_w(space,offset,data,mem_mask);
+				vga_device::port_03d0_w(offset,data);
 				break;
 		}
 	}
 }
 
-READ8_MEMBER(ati_vga_device::port_03c0_r)
+uint8_t ati_vga_device::port_03c0_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -3317,7 +3243,7 @@ READ8_MEMBER(ati_vga_device::port_03c0_r)
 			data = vga.attribute.data[vga.attribute.index&0x1f];
 		break;
 	default:
-		data = vga_device::port_03c0_r(space,offset,mem_mask);
+		data = vga_device::port_03c0_r(offset);
 		break;
 	}
 	return data;
@@ -3328,9 +3254,8 @@ READ8_MEMBER(ati_vga_device::port_03c0_r)
 
 void ibm8514a_device::ibm8514_write_fg(uint32_t offset)
 {
-	address_space &space = machine().dummy_space();
 	offset %= m_vga->vga.svga_intf.vram_size;
-	uint8_t dst = m_vga->mem_linear_r(space,offset,0xff);
+	uint8_t dst = m_vga->mem_linear_r(offset);
 	uint8_t src = 0;
 
 	// check clipping rectangle
@@ -3357,7 +3282,7 @@ void ibm8514a_device::ibm8514_write_fg(uint32_t offset)
 		break;
 	case 0x0060:
 		// video memory - presume the memory is sourced from the current X/Y co-ords
-		src = m_vga->mem_linear_r(space,((ibm8514.curr_y * IBM8514_LINE_LENGTH) + ibm8514.curr_x),0xff);
+		src = m_vga->mem_linear_r(((ibm8514.curr_y * IBM8514_LINE_LENGTH) + ibm8514.curr_x));
 		break;
 	}
 
@@ -3365,61 +3290,60 @@ void ibm8514a_device::ibm8514_write_fg(uint32_t offset)
 	switch(ibm8514.fgmix & 0x000f)
 	{
 	case 0x0000:
-		m_vga->mem_linear_w(space,offset,~dst,0xff);
+		m_vga->mem_linear_w(offset,~dst);
 		break;
 	case 0x0001:
-		m_vga->mem_linear_w(space,offset,0x00,0xff);
+		m_vga->mem_linear_w(offset,0x00);
 		break;
 	case 0x0002:
-		m_vga->mem_linear_w(space,offset,0xff,0xff);
+		m_vga->mem_linear_w(offset,0xff);
 		break;
 	case 0x0003:
-		m_vga->mem_linear_w(space,offset,dst,0xff);
+		m_vga->mem_linear_w(offset,dst);
 		break;
 	case 0x0004:
-		m_vga->mem_linear_w(space,offset,~src,0xff);
+		m_vga->mem_linear_w(offset,~src);
 		break;
 	case 0x0005:
-		m_vga->mem_linear_w(space,offset,src ^ dst,0xff);
+		m_vga->mem_linear_w(offset,src ^ dst);
 		break;
 	case 0x0006:
-		m_vga->mem_linear_w(space,offset,~(src ^ dst),0xff);
+		m_vga->mem_linear_w(offset,~(src ^ dst));
 		break;
 	case 0x0007:
-		m_vga->mem_linear_w(space,offset,src,0xff);
+		m_vga->mem_linear_w(offset,src);
 		break;
 	case 0x0008:
-		m_vga->mem_linear_w(space,offset,~(src & dst),0xff);
+		m_vga->mem_linear_w(offset,~(src & dst));
 		break;
 	case 0x0009:
-		m_vga->mem_linear_w(space,offset,(~src) | dst,0xff);
+		m_vga->mem_linear_w(offset,(~src) | dst);
 		break;
 	case 0x000a:
-		m_vga->mem_linear_w(space,offset,src | (~dst),0xff);
+		m_vga->mem_linear_w(offset,src | (~dst));
 		break;
 	case 0x000b:
-		m_vga->mem_linear_w(space,offset,src | dst,0xff);
+		m_vga->mem_linear_w(offset,src | dst);
 		break;
 	case 0x000c:
-		m_vga->mem_linear_w(space,offset,src & dst,0xff);
+		m_vga->mem_linear_w(offset,src & dst);
 		break;
 	case 0x000d:
-		m_vga->mem_linear_w(space,offset,src & (~dst),0xff);
+		m_vga->mem_linear_w(offset,src & (~dst));
 		break;
 	case 0x000e:
-		m_vga->mem_linear_w(space,offset,(~src) & dst,0xff);
+		m_vga->mem_linear_w(offset,(~src) & dst);
 		break;
 	case 0x000f:
-		m_vga->mem_linear_w(space,offset,~(src | dst),0xff);
+		m_vga->mem_linear_w(offset,~(src | dst));
 		break;
 	}
 }
 
 void ibm8514a_device::ibm8514_write_bg(uint32_t offset)
 {
-	address_space &space = machine().dummy_space();
 	offset %= m_vga->vga.svga_intf.vram_size;
-	uint8_t dst = m_vga->mem_linear_r(space,offset,0xff);
+	uint8_t dst = m_vga->mem_linear_r(offset);
 	uint8_t src = 0;
 
 	// check clipping rectangle
@@ -3446,7 +3370,7 @@ void ibm8514a_device::ibm8514_write_bg(uint32_t offset)
 		break;
 	case 0x0060:
 		// video memory - presume the memory is sourced from the current X/Y co-ords
-		src = m_vga->mem_linear_r(space,((ibm8514.curr_y * IBM8514_LINE_LENGTH) + ibm8514.curr_x),0xff);
+		src = m_vga->mem_linear_r(((ibm8514.curr_y * IBM8514_LINE_LENGTH) + ibm8514.curr_x));
 		break;
 	}
 
@@ -3454,52 +3378,52 @@ void ibm8514a_device::ibm8514_write_bg(uint32_t offset)
 	switch(ibm8514.bgmix & 0x000f)
 	{
 	case 0x0000:
-		m_vga->mem_linear_w(space,offset,~dst,0xff);
+		m_vga->mem_linear_w(offset,~dst);
 		break;
 	case 0x0001:
-		m_vga->mem_linear_w(space,offset,0x00,0xff);
+		m_vga->mem_linear_w(offset,0x00);
 		break;
 	case 0x0002:
-		m_vga->mem_linear_w(space,offset,0xff,0xff);
+		m_vga->mem_linear_w(offset,0xff);
 		break;
 	case 0x0003:
-		m_vga->mem_linear_w(space,offset,dst,0xff);
+		m_vga->mem_linear_w(offset,dst);
 		break;
 	case 0x0004:
-		m_vga->mem_linear_w(space,offset,~src,0xff);
+		m_vga->mem_linear_w(offset,~src);
 		break;
 	case 0x0005:
-		m_vga->mem_linear_w(space,offset,src ^ dst,0xff);
+		m_vga->mem_linear_w(offset,src ^ dst);
 		break;
 	case 0x0006:
-		m_vga->mem_linear_w(space,offset,~(src ^ dst),0xff);
+		m_vga->mem_linear_w(offset,~(src ^ dst));
 		break;
 	case 0x0007:
-		m_vga->mem_linear_w(space,offset,src,0xff);
+		m_vga->mem_linear_w(offset,src);
 		break;
 	case 0x0008:
-		m_vga->mem_linear_w(space,offset,~(src & dst),0xff);
+		m_vga->mem_linear_w(offset,~(src & dst));
 		break;
 	case 0x0009:
-		m_vga->mem_linear_w(space,offset,(~src) | dst,0xff);
+		m_vga->mem_linear_w(offset,(~src) | dst);
 		break;
 	case 0x000a:
-		m_vga->mem_linear_w(space,offset,src | (~dst),0xff);
+		m_vga->mem_linear_w(offset,src | (~dst));
 		break;
 	case 0x000b:
-		m_vga->mem_linear_w(space,offset,src | dst,0xff);
+		m_vga->mem_linear_w(offset,src | dst);
 		break;
 	case 0x000c:
-		m_vga->mem_linear_w(space,offset,src & dst,0xff);
+		m_vga->mem_linear_w(offset,src & dst);
 		break;
 	case 0x000d:
-		m_vga->mem_linear_w(space,offset,src & (~dst),0xff);
+		m_vga->mem_linear_w(offset,src & (~dst));
 		break;
 	case 0x000e:
-		m_vga->mem_linear_w(space,offset,(~src) & dst,0xff);
+		m_vga->mem_linear_w(offset,(~src) & dst);
 		break;
 	case 0x000f:
-		m_vga->mem_linear_w(space,offset,~(src | dst),0xff);
+		m_vga->mem_linear_w(offset,~(src | dst));
 		break;
 	}
 }
@@ -3547,7 +3471,7 @@ void ibm8514a_device::ibm8514_write(uint32_t offset, uint32_t src)
 			ibm8514.src_x = 0;
 		break;
 	case 0x00c0:  // use source plane
-		if (m_vga->mem_linear_r(machine().dummy_space(), src, 0xff) != 0x00)
+		if (m_vga->mem_linear_r(src) != 0x00)
 			ibm8514_write_fg(offset);
 		else
 			ibm8514_write_bg(offset);
@@ -3565,12 +3489,12 @@ bit  0-12  (911/924) LINE PARAMETER/ERROR TERM. For Line Drawing this is the
             the major or independent axis).
      0-13  (80x +) LINE PARAMETER/ERROR TERM. See above.
  */
-READ16_MEMBER(ibm8514a_device::ibm8514_line_error_r)
+uint16_t ibm8514a_device::ibm8514_line_error_r()
 {
 	return ibm8514.line_errorterm;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_line_error_w)
+void ibm8514a_device::ibm8514_line_error_w(uint16_t data)
 {
 	ibm8514.line_errorterm = data;
 	if(LOG_8514) logerror("8514/A: Line Parameter/Error Term write %04x\n",data);
@@ -3597,7 +3521,7 @@ bit   0-7  Queue State.
             available, Fh for 9 words, 7 for 10 words, 3 for 11 words, 1 for
             12 words and 0 for 13 words available.
  */
-READ16_MEMBER(ibm8514a_device::ibm8514_gpstatus_r)
+uint16_t ibm8514a_device::ibm8514_gpstatus_r()
 {
 	uint16_t ret = 0x0000;
 
@@ -3737,7 +3661,7 @@ bit     0  (911-928) ~RD/WT. Read/Write Data. If set VRAM write operations are
                 rectangle, which is copied repeatably to the destination
                 rectangle.
  */
-WRITE16_MEMBER(ibm8514a_device::ibm8514_cmd_w)
+void ibm8514a_device::ibm8514_cmd_w(uint16_t data)
 {
 	int x,y;
 	int pattern_x,pattern_y;
@@ -3885,7 +3809,7 @@ WRITE16_MEMBER(ibm8514a_device::ibm8514_cmd_w)
 				if((ibm8514.pixel_control & 0xc0) == 0xc0)
 				{
 					// only check read mask if Mix Select is set to 11 (VRAM determines mix)
-					if(m_vga->mem_linear_r(space,(src+x),0xff) & ~readmask)
+					if(m_vga->mem_linear_r((src+x)) & ~readmask)
 					{
 						// presumably every program is going to be smart enough to set the FG mix to use VRAM (0x6x)
 						if(data & 0x0020)
@@ -4033,12 +3957,12 @@ bit  0-11  DESTINATION Y-POSITION. During BITBLT operations this is the Y
      0-13  (80 x+) LINE PARAMETER AXIAL STEP CONSTANT. Se above
 
  */
-READ16_MEMBER(ibm8514a_device::ibm8514_desty_r)
+uint16_t ibm8514a_device::ibm8514_desty_r()
 {
 	return ibm8514.line_axial_step;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_desty_w)
+void ibm8514a_device::ibm8514_desty_w(uint16_t data)
 {
 	ibm8514.line_axial_step = data;
 	ibm8514.dest_y = data;
@@ -4058,12 +3982,12 @@ bit  0-11  DESTINATION X-POSITION. During BITBLT operations this is the X
      0-13  (80x +) LINE PARAMETER DIAGONAL STEP CONSTANT. Se above
 
  */
-READ16_MEMBER(ibm8514a_device::ibm8514_destx_r)
+uint16_t ibm8514a_device::ibm8514_destx_r()
 {
 	return ibm8514.line_diagonal_step;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_destx_w)
+void ibm8514a_device::ibm8514_destx_w(uint16_t data)
 {
 	ibm8514.line_diagonal_step = data;
 	ibm8514.dest_x = data;
@@ -4189,12 +4113,12 @@ void ibm8514a_device::ibm8514_draw_ssv(uint8_t data)
 	ibm8514_draw_vector(len,dir,draw);
 }
 
-READ16_MEMBER(ibm8514a_device::ibm8514_ssv_r)
+uint16_t ibm8514a_device::ibm8514_ssv_r()
 {
 	return ibm8514.ssv;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_ssv_w)
+void ibm8514a_device::ibm8514_ssv_w(uint16_t data)
 {
 	ibm8514.ssv = data;
 
@@ -4301,58 +4225,58 @@ bit  0-10  (911/924)  RECTANGLE WIDTH/LINE PARAMETER MAX. For BITBLT and
             independent axis). Must be positive.
      0-11  (80x +) RECTANGLE WIDTH/LINE PARAMETER MAX. See above
  */
-READ16_MEMBER(ibm8514a_device::ibm8514_width_r)
+uint16_t ibm8514a_device::ibm8514_width_r()
 {
 	return ibm8514.rect_width;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_width_w)
+void ibm8514a_device::ibm8514_width_w(uint16_t data)
 {
 	ibm8514.rect_width = data & 0x1fff;
 	if(LOG_8514) logerror("8514/A: Major Axis Pixel Count / Rectangle Width write %04x\n",data);
 }
 
-READ16_MEMBER(ibm8514a_device::ibm8514_currentx_r)
+uint16_t ibm8514a_device::ibm8514_currentx_r()
 {
 	return ibm8514.curr_x;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_currentx_w)
+void ibm8514a_device::ibm8514_currentx_w(uint16_t data)
 {
 	ibm8514.curr_x = data;
 	ibm8514.prev_x = data;
 	if(LOG_8514) logerror("8514/A: Current X set to %04x (%i)\n",data,ibm8514.curr_x);
 }
 
-READ16_MEMBER(ibm8514a_device::ibm8514_currenty_r)
+uint16_t ibm8514a_device::ibm8514_currenty_r()
 {
 	return ibm8514.curr_y;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_currenty_w)
+void ibm8514a_device::ibm8514_currenty_w(uint16_t data)
 {
 	ibm8514.curr_y = data;
 	ibm8514.prev_y = data;
 	if(LOG_8514) logerror("8514/A: Current Y set to %04x (%i)\n",data,ibm8514.curr_y);
 }
 
-READ16_MEMBER(ibm8514a_device::ibm8514_fgcolour_r)
+uint16_t ibm8514a_device::ibm8514_fgcolour_r()
 {
 	return ibm8514.fgcolour;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_fgcolour_w)
+void ibm8514a_device::ibm8514_fgcolour_w(uint16_t data)
 {
 	ibm8514.fgcolour = data;
 	if(LOG_8514) logerror("8514/A: Foreground Colour write %04x\n",data);
 }
 
-READ16_MEMBER(ibm8514a_device::ibm8514_bgcolour_r)
+uint16_t ibm8514a_device::ibm8514_bgcolour_r()
 {
 	return ibm8514.bgcolour;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_bgcolour_w)
+void ibm8514a_device::ibm8514_bgcolour_w(uint16_t data)
 {
 	ibm8514.bgcolour = data;
 	if(LOG_8514) logerror("8514/A: Background Colour write %04x\n",data);
@@ -4369,12 +4293,12 @@ bit   0-7  (911/924) Read Mask affects the following commands: CMD_RECT,
             which 16 bits are accessible and each access toggles to the other
             16 bits.
  */
-READ16_MEMBER(ibm8514a_device::ibm8514_read_mask_r)
+uint16_t ibm8514a_device::ibm8514_read_mask_r()
 {
 	return ibm8514.read_mask & 0xffff;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_read_mask_w)
+void ibm8514a_device::ibm8514_read_mask_w(uint16_t data)
 {
 	ibm8514.read_mask = (ibm8514.read_mask & 0xffff0000) | data;
 	if(LOG_8514) logerror("8514/A: Read Mask (Low) write = %08x\n",ibm8514.read_mask);
@@ -4390,18 +4314,18 @@ bit   0-7  (911/924) Writemask. A plane can only be modified if the
             which 16 bits are accessible and each access toggles to the other
             16 bits.
  */
-READ16_MEMBER(ibm8514a_device::ibm8514_write_mask_r)
+uint16_t ibm8514a_device::ibm8514_write_mask_r()
 {
 	return ibm8514.write_mask & 0xffff;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_write_mask_w)
+void ibm8514a_device::ibm8514_write_mask_w(uint16_t data)
 {
 	ibm8514.write_mask = (ibm8514.write_mask & 0xffff0000) | data;
 	if(LOG_8514) logerror("8514/A: Write Mask (Low) write = %08x\n",ibm8514.write_mask);
 }
 
-READ16_MEMBER(ibm8514a_device::ibm8514_multifunc_r )
+uint16_t ibm8514a_device::ibm8514_multifunc_r()
 {
 	switch(ibm8514.multifunc_sel)
 	{
@@ -4422,7 +4346,7 @@ READ16_MEMBER(ibm8514a_device::ibm8514_multifunc_r )
 	}
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_multifunc_w )
+void ibm8514a_device::ibm8514_multifunc_w(uint16_t data)
 {
 	switch(data & 0xf000)
 	{
@@ -4512,6 +4436,7 @@ bit   0-2  (911-928) READ-REG-SEL. Read Register Select. Selects the register
 	case 0xf000:
 		ibm8514.multifunc_sel = data & 0x000f;
 		if(LOG_8514) logerror("S3: Multifunction select write %04x\n",data);
+		break;
 	default:
 		if(LOG_8514) logerror("S3: Unimplemented multifunction register %i write %03x\n",data >> 12,data & 0x0fff);
 	}
@@ -4701,29 +4626,29 @@ bit   0-3  Background MIX (BACKMIX).
              2  BSS is Pixel Data from the PIX_TRANS register (E2E8h)
              3  BSS is Bitmap Data (Source data from display buffer).
  */
-READ16_MEMBER(ibm8514a_device::ibm8514_backmix_r)
+uint16_t ibm8514a_device::ibm8514_backmix_r()
 {
 	return ibm8514.bgmix;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_backmix_w)
+void ibm8514a_device::ibm8514_backmix_w(uint16_t data)
 {
 	ibm8514.bgmix = data;
 	if(LOG_8514) logerror("8514/A: BG Mix write %04x\n",data);
 }
 
-READ16_MEMBER(ibm8514a_device::ibm8514_foremix_r)
+uint16_t ibm8514a_device::ibm8514_foremix_r()
 {
 	return ibm8514.fgmix;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_foremix_w)
+void ibm8514a_device::ibm8514_foremix_w(uint16_t data)
 {
 	ibm8514.fgmix = data;
 	if(LOG_8514) logerror("8514/A: FG Mix write %04x\n",data);
 }
 
-READ16_MEMBER(ibm8514a_device::ibm8514_pixel_xfer_r)
+uint16_t ibm8514a_device::ibm8514_pixel_xfer_r(offs_t offset)
 {
 	if(offset == 1)
 		return (ibm8514.pixel_xfer & 0xffff0000) >> 16;
@@ -4731,7 +4656,7 @@ READ16_MEMBER(ibm8514a_device::ibm8514_pixel_xfer_r)
 		return ibm8514.pixel_xfer & 0x0000ffff;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_pixel_xfer_w)
+void ibm8514a_device::ibm8514_pixel_xfer_w(offs_t offset, uint16_t data)
 {
 	if(offset == 1)
 		ibm8514.pixel_xfer = (ibm8514.pixel_xfer & 0x0000ffff) | (data << 16);
@@ -4750,7 +4675,7 @@ WRITE16_MEMBER(ibm8514a_device::ibm8514_pixel_xfer_w)
 	if(LOG_8514) logerror("8514/A: Pixel Transfer = %08x\n",ibm8514.pixel_xfer);
 }
 
-READ8_MEMBER(s3_vga_device::mem_r)
+uint8_t s3_vga_device::mem_r(offs_t offset)
 {
 	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb32_en)
 	{
@@ -4779,12 +4704,12 @@ READ8_MEMBER(s3_vga_device::mem_r)
 		return data;
 	}
 	if((offset + (svga.bank_r*0x10000)) < vga.svga_intf.vram_size)
-		return vga_device::mem_r(space,offset,mem_mask);
+		return vga_device::mem_r(offset);
 	else
 		return 0xff;
 }
 
-WRITE8_MEMBER(s3_vga_device::mem_w)
+void s3_vga_device::mem_w(offs_t offset, uint8_t data)
 {
 	ibm8514a_device* dev = get_8514();
 	// bit 4 of CR53 enables memory-mapped I/O
@@ -4884,7 +4809,7 @@ WRITE8_MEMBER(s3_vga_device::mem_w)
 		case 0x8119:
 		case 0x9ae9:
 			s3.mmio_9ae8 = (s3.mmio_9ae8 & 0x00ff) | (data << 8);
-			dev->ibm8514_cmd_w(space,0,s3.mmio_9ae8,0xffff);
+			dev->ibm8514_cmd_w(s3.mmio_9ae8);
 			break;
 		case 0x8120:
 		case 0xa2e8:
@@ -5004,14 +4929,14 @@ WRITE8_MEMBER(s3_vga_device::mem_w)
 			break;
 		case 0xbee9:
 			s3.mmio_bee8 = (s3.mmio_bee8 & 0x00ff) | (data << 8);
-			dev->ibm8514_multifunc_w(space,0,s3.mmio_bee8,0xffff);
+			dev->ibm8514_multifunc_w(s3.mmio_bee8);
 			break;
 		case 0x96e8:
 			s3.mmio_96e8 = (s3.mmio_96e8 & 0xff00) | data;
 			break;
 		case 0x96e9:
 			s3.mmio_96e8 = (s3.mmio_96e8 & 0x00ff) | (data << 8);
-			dev->ibm8514_width_w(space,0,s3.mmio_96e8,0xffff);
+			dev->ibm8514_width_w(s3.mmio_96e8);
 			break;
 		case 0xe2e8:
 			dev->ibm8514.pixel_xfer = (dev->ibm8514.pixel_xfer & 0xffffff00) | data;
@@ -5049,7 +4974,7 @@ WRITE8_MEMBER(s3_vga_device::mem_w)
 	}
 
 	if((offset + (svga.bank_w*0x10000)) < vga.svga_intf.vram_size)
-		vga_device::mem_w(space,offset,data,mem_mask);
+		vga_device::mem_w(offset,data);
 }
 
 /******************************************
@@ -5058,85 +4983,85 @@ gamtor.c implementation (TODO: identify the video card)
 
 ******************************************/
 
-READ8_MEMBER(gamtor_vga_device::mem_r)
+uint8_t gamtor_vga_device::mem_r(offs_t offset)
 {
 	return vga.memory[offset];
 }
 
-WRITE8_MEMBER(gamtor_vga_device::mem_w)
+void gamtor_vga_device::mem_w(offs_t offset, uint8_t data)
 {
 	vga.memory[offset] = data;
 }
 
 
-READ8_MEMBER(gamtor_vga_device::port_03b0_r)
+uint8_t gamtor_vga_device::port_03b0_r(offs_t offset)
 {
 	uint8_t res;
 
 	switch(offset)
 	{
 		default:
-			res = vga_device::port_03b0_r(space,offset ^ 3,mem_mask);
+			res = vga_device::port_03b0_r(offset ^ 3);
 			break;
 	}
 
 	return res;
 }
 
-WRITE8_MEMBER(gamtor_vga_device::port_03b0_w)
+void gamtor_vga_device::port_03b0_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
 		default:
-			vga_device::port_03b0_w(space,offset ^ 3,data,mem_mask);
+			vga_device::port_03b0_w(offset ^ 3,data);
 			break;
 	}
 }
 
-READ8_MEMBER(gamtor_vga_device::port_03c0_r)
+uint8_t gamtor_vga_device::port_03c0_r(offs_t offset)
 {
 	uint8_t res;
 
 	switch(offset)
 	{
 		default:
-			res = vga_device::port_03c0_r(space,offset ^ 3,mem_mask);
+			res = vga_device::port_03c0_r(offset ^ 3);
 			break;
 	}
 
 	return res;
 }
 
-WRITE8_MEMBER(gamtor_vga_device::port_03c0_w)
+void gamtor_vga_device::port_03c0_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
 		default:
-			vga_device::port_03c0_w(space,offset ^ 3,data,mem_mask);
+			vga_device::port_03c0_w(offset ^ 3,data);
 			break;
 	}
 }
 
-READ8_MEMBER(gamtor_vga_device::port_03d0_r)
+uint8_t gamtor_vga_device::port_03d0_r(offs_t offset)
 {
 	uint8_t res;
 
 	switch(offset)
 	{
 		default:
-			res = vga_device::port_03d0_r(space,offset ^ 3,mem_mask);
+			res = vga_device::port_03d0_r(offset ^ 3);
 			break;
 	}
 
 	return res;
 }
 
-WRITE8_MEMBER(gamtor_vga_device::port_03d0_w)
+void gamtor_vga_device::port_03d0_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
 		default:
-			vga_device::port_03d0_w(space,offset ^ 3,data,mem_mask);
+			vga_device::port_03d0_w(offset ^ 3,data);
 			break;
 	}
 }
@@ -5232,7 +5157,7 @@ void ati_vga_device::ati_define_video_mode()
 	set_dot_clock();
 }
 
-READ8_MEMBER(ati_vga_device::mem_r)
+uint8_t ati_vga_device::mem_r(offs_t offset)
 {
 	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
 	{
@@ -5248,10 +5173,10 @@ READ8_MEMBER(ati_vga_device::mem_r)
 		}
 	}
 
-	return vga_device::mem_r(space,offset,mem_mask);
+	return vga_device::mem_r(offset);
 }
 
-WRITE8_MEMBER(ati_vga_device::mem_w)
+void ati_vga_device::mem_w(offs_t offset, uint8_t data)
 {
 	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
 	{
@@ -5267,11 +5192,11 @@ WRITE8_MEMBER(ati_vga_device::mem_w)
 		}
 	}
 	else
-		vga_device::mem_w(space,offset,data,mem_mask);
+		vga_device::mem_w(offset,data);
 }
 
 
-READ8_MEMBER(ati_vga_device::ati_port_ext_r)
+uint8_t ati_vga_device::ati_port_ext_r(offs_t offset)
 {
 	uint8_t ret = 0xff;
 
@@ -5319,7 +5244,7 @@ READ8_MEMBER(ati_vga_device::ati_port_ext_r)
 	return ret;
 }
 
-WRITE8_MEMBER(ati_vga_device::ati_port_ext_w)
+void ati_vga_device::ati_port_ext_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -5440,25 +5365,25 @@ bit     0  SENSE is the result of a wired-OR of 3 comparators, one
            This bit toggles every time a HSYNC pulse starts
      3-15  Reserved(0)
  */
-READ8_MEMBER(ibm8514a_device::ibm8514_status_r)
+uint8_t ibm8514a_device::ibm8514_status_r(offs_t offset)
 {
 	switch(offset)
 	{
 		case 0:
 			return m_vga->vga_vblank() << 1;
 		case 2:
-			return m_vga->port_03c0_r(space,6,mem_mask);
+			return m_vga->port_03c0_r(6);
 		case 3:
-			return m_vga->port_03c0_r(space,7,mem_mask);
+			return m_vga->port_03c0_r(7);
 		case 4:
-			return m_vga->port_03c0_r(space,8,mem_mask);
+			return m_vga->port_03c0_r(8);
 		case 5:
-			return m_vga->port_03c0_r(space,9,mem_mask);
+			return m_vga->port_03c0_r(9);
 	}
 	return 0;
 }
 
-WRITE8_MEMBER(ibm8514a_device::ibm8514_htotal_w)
+void ibm8514a_device::ibm8514_htotal_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -5466,16 +5391,16 @@ WRITE8_MEMBER(ibm8514a_device::ibm8514_htotal_w)
 			ibm8514.htotal = data & 0xff;
 			break;
 		case 2:
-			m_vga->port_03c0_w(space,6,data,mem_mask);
+			m_vga->port_03c0_w(6,data);
 			break;
 		case 3:
-			m_vga->port_03c0_w(space,7,data,mem_mask);
+			m_vga->port_03c0_w(7,data);
 			break;
 		case 4:
-			m_vga->port_03c0_w(space,8,data,mem_mask);
+			m_vga->port_03c0_w(8,data);
 			break;
 		case 5:
-			m_vga->port_03c0_w(space,9,data,mem_mask);
+			m_vga->port_03c0_w(9,data);
 			break;
 	}
 	//vga.crtc.horz_total = data & 0x01ff;
@@ -5502,7 +5427,7 @@ bit   0-3  Interrupt requests. These bits show the state of internal interrupt
      8-11  CHIP_REV. Chip revision number.
     12-15  (CT82c480) CHIP_ID. 0=CT 82c480.
  */
-READ16_MEMBER(ibm8514a_device::ibm8514_substatus_r)
+uint16_t ibm8514a_device::ibm8514_substatus_r()
 {
 	// TODO:
 	if(m_vga->vga_vblank() != 0)  // not correct, but will do for now
@@ -5527,14 +5452,14 @@ bit   0-3  Interrupt Reset. Write 1 to a bit to reset the interrupt.
     12-13  CHPTEST. Used for chip testing.
     14-15  Graphics Processor Control (GPCTRL).
  */
-WRITE16_MEMBER(ibm8514a_device::ibm8514_subcontrol_w)
+void ibm8514a_device::ibm8514_subcontrol_w(uint16_t data)
 {
 	ibm8514.subctrl = data;
 	ibm8514.substatus &= ~(data & 0x0f);  // reset interrupts
 //  if(LOG_8514) logerror("8514/A: Subsystem control write %04x\n",data);
 }
 
-READ16_MEMBER(ibm8514a_device::ibm8514_subcontrol_r)
+uint16_t ibm8514a_device::ibm8514_subcontrol_r()
 {
 	return ibm8514.subctrl;
 }
@@ -5546,7 +5471,7 @@ READ16_MEMBER(ibm8514a_device::ibm8514_subcontrol_r)
  *  bit    4: Interlace
  *  bits 5-6: Emable Display - 0=no change, 1=enable 8514/A, 2 or 3=8514/A reset
  */
-WRITE16_MEMBER(ibm8514a_device::ibm8514_display_ctrl_w)
+void ibm8514a_device::ibm8514_display_ctrl_w(uint16_t data)
 {
 	ibm8514.display_ctrl = data & 0x7e;
 	switch(data & 0x60)
@@ -5563,47 +5488,47 @@ WRITE16_MEMBER(ibm8514a_device::ibm8514_display_ctrl_w)
 	}
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_advfunc_w)
+void ibm8514a_device::ibm8514_advfunc_w(uint16_t data)
 {
 	ibm8514.advfunction_ctrl = data;
 	ibm8514.passthrough = data & 0x0001;
 }
 
-READ16_MEMBER(ibm8514a_device::ibm8514_htotal_r)
+uint16_t ibm8514a_device::ibm8514_htotal_r()
 {
 	return ibm8514.htotal;
 }
 
-READ16_MEMBER(ibm8514a_device::ibm8514_vtotal_r)
+uint16_t ibm8514a_device::ibm8514_vtotal_r()
 {
 	return ibm8514.vtotal;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_vtotal_w)
+void ibm8514a_device::ibm8514_vtotal_w(uint16_t data)
 {
 	ibm8514.vtotal = data;
 //  vga.crtc.vert_total = data;
 	if(LOG_8514) logerror("8514/A: Vertical total write %04x\n",data);
 }
 
-READ16_MEMBER(ibm8514a_device::ibm8514_vdisp_r)
+uint16_t ibm8514a_device::ibm8514_vdisp_r()
 {
 	return ibm8514.vdisp;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_vdisp_w)
+void ibm8514a_device::ibm8514_vdisp_w(uint16_t data)
 {
 	ibm8514.vdisp = data;
 //  vga.crtc.vert_disp_end = data >> 3;
 	if(LOG_8514) logerror("8514/A: Vertical Displayed write %04x\n",data);
 }
 
-READ16_MEMBER(ibm8514a_device::ibm8514_vsync_r)
+uint16_t ibm8514a_device::ibm8514_vsync_r()
 {
 	return ibm8514.vsync;
 }
 
-WRITE16_MEMBER(ibm8514a_device::ibm8514_vsync_w)
+void ibm8514a_device::ibm8514_vsync_w(uint16_t data)
 {
 	ibm8514.vsync = data;
 	if(LOG_8514) logerror("8514/A: Vertical Sync write %04x\n",data);
@@ -5615,78 +5540,78 @@ void ibm8514a_device::enabled()
 	ibm8514.gpbusy = false;
 }
 
-READ16_MEMBER(mach8_device::mach8_ec0_r)
+uint16_t mach8_device::mach8_ec0_r()
 {
 	return ibm8514.ec0;
 }
 
-WRITE16_MEMBER(mach8_device::mach8_ec0_w)
+void mach8_device::mach8_ec0_w(uint16_t data)
 {
 	ibm8514.ec0 = data;
 	if(LOG_8514) logerror("8514/A: Extended configuration 0 write %04x\n",data);
 }
 
-READ16_MEMBER(mach8_device::mach8_ec1_r)
+uint16_t mach8_device::mach8_ec1_r()
 {
 	return ibm8514.ec1;
 }
 
-WRITE16_MEMBER(mach8_device::mach8_ec1_w)
+void mach8_device::mach8_ec1_w(uint16_t data)
 {
 	ibm8514.ec1 = data;
 	if(LOG_8514) logerror("8514/A: Extended configuration 1 write %04x\n",data);
 }
 
-READ16_MEMBER(mach8_device::mach8_ec2_r)
+uint16_t mach8_device::mach8_ec2_r()
 {
 	return ibm8514.ec2;
 }
 
-WRITE16_MEMBER(mach8_device::mach8_ec2_w)
+void mach8_device::mach8_ec2_w(uint16_t data)
 {
 	ibm8514.ec2 = data;
 	if(LOG_8514) logerror("8514/A: Extended configuration 2 write %04x\n",data);
 }
 
-READ16_MEMBER(mach8_device::mach8_ec3_r)
+uint16_t mach8_device::mach8_ec3_r()
 {
 	return ibm8514.ec3;
 }
 
-WRITE16_MEMBER(mach8_device::mach8_ec3_w)
+void mach8_device::mach8_ec3_w(uint16_t data)
 {
 	ibm8514.ec3 = data;
 	if(LOG_8514) logerror("8514/A: Extended configuration 3 write %04x\n",data);
 }
 
-READ16_MEMBER(mach8_device::mach8_ext_fifo_r)
+uint16_t mach8_device::mach8_ext_fifo_r()
 {
 	return 0x00;  // for now, report all FIFO slots as free
 }
 
-WRITE16_MEMBER(mach8_device::mach8_linedraw_index_w)
+void mach8_device::mach8_linedraw_index_w(uint16_t data)
 {
 	mach8.linedraw = data & 0x07;
 	if(LOG_8514) logerror("Mach8: Line Draw Index write %04x\n",data);
 }
 
-READ16_MEMBER(mach8_device::mach8_bresenham_count_r)
+uint16_t mach8_device::mach8_bresenham_count_r()
 {
 	return ibm8514.rect_width & 0x1fff;
 }
 
-WRITE16_MEMBER(mach8_device::mach8_bresenham_count_w)
+void mach8_device::mach8_bresenham_count_w(uint16_t data)
 {
 	ibm8514.rect_width = data & 0x1fff;
 	if(LOG_8514) logerror("Mach8: Bresenham count write %04x\n",data);
 }
 
-READ16_MEMBER(mach8_device::mach8_linedraw_r)
+uint16_t mach8_device::mach8_linedraw_r()
 {
 	return 0xff;
 }
 
-WRITE16_MEMBER(mach8_device::mach8_linedraw_w)
+void mach8_device::mach8_linedraw_w(uint16_t data)
 {
 	// TODO: actually draw the lines
 	switch(mach8.linedraw)
@@ -5719,74 +5644,74 @@ WRITE16_MEMBER(mach8_device::mach8_linedraw_w)
 	logerror("ATI: Linedraw register write %04x, mode %i\n",data,mach8.linedraw);
 }
 
-READ16_MEMBER(mach8_device::mach8_sourcex_r)
+uint16_t mach8_device::mach8_sourcex_r()
 {
 	return ibm8514.dest_x & 0x07ff;
 }
 
-READ16_MEMBER(mach8_device::mach8_sourcey_r)
+uint16_t mach8_device::mach8_sourcey_r()
 {
 	return ibm8514.dest_y & 0x07ff;
 }
 
-WRITE16_MEMBER(mach8_device::mach8_ext_leftscissor_w)
+void mach8_device::mach8_ext_leftscissor_w(uint16_t data)
 {
 	// TODO
 }
 
-WRITE16_MEMBER(mach8_device::mach8_ext_topscissor_w)
+void mach8_device::mach8_ext_topscissor_w(uint16_t data)
 {
 	// TODO
 }
 
-READ16_MEMBER(mach8_device::mach8_scratch0_r)
+uint16_t mach8_device::mach8_scratch0_r()
 {
 	return mach8.scratch0;
 }
 
-WRITE16_MEMBER(mach8_device::mach8_scratch0_w)
+void mach8_device::mach8_scratch0_w(uint16_t data)
 {
 	mach8.scratch0 = data;
 	if(LOG_8514) logerror("Mach8: Scratch Pad 0 write %04x\n",data);
 }
 
-READ16_MEMBER(mach8_device::mach8_scratch1_r)
+uint16_t mach8_device::mach8_scratch1_r()
 {
 	return mach8.scratch1;
 }
 
-WRITE16_MEMBER(mach8_device::mach8_scratch1_w)
+void mach8_device::mach8_scratch1_w(uint16_t data)
 {
 	mach8.scratch1 = data;
 	if(LOG_8514) logerror("Mach8: Scratch Pad 1 write %04x\n",data);
 }
 
-WRITE16_MEMBER(mach8_device::mach8_crt_pitch_w)
+void mach8_device::mach8_crt_pitch_w(uint16_t data)
 {
 	mach8.crt_pitch = data & 0x00ff;
 	m_vga->set_offset(mach8.crt_pitch);
 	if(LOG_8514) logerror("Mach8: CRT pitch write %04x\n",mach8.crt_pitch);
 }
 
-WRITE16_MEMBER(mach8_device::mach8_ge_offset_l_w)
+void mach8_device::mach8_ge_offset_l_w(uint16_t data)
 {
 	mach8.ge_offset = (mach8.ge_offset & 0x0f0000) | data;
 	if(LOG_8514) logerror("Mach8: Graphics Engine Offset (Low) write %05x\n",mach8.ge_offset);
 }
 
-WRITE16_MEMBER(mach8_device::mach8_ge_offset_h_w)
+void mach8_device::mach8_ge_offset_h_w(uint16_t data)
 {
 	mach8.ge_offset = (mach8.ge_offset & 0x00ffff) | ((data & 0x000f) << 16);
 	if(LOG_8514) logerror("Mach8: Graphics Engine Offset (High) write %05x\n",mach8.ge_offset);
 }
 
-WRITE16_MEMBER(mach8_device::mach8_ge_pitch_w)
+void mach8_device::mach8_ge_pitch_w(uint16_t data)
 {
 	mach8.ge_pitch = data & 0x00ff;
 	if(LOG_8514) logerror("Mach8: Graphics Engine pitch write %04x\n",mach8.ge_pitch);
 }
 
-WRITE16_MEMBER(mach8_device::mach8_scan_x_w)
+void mach8_device::mach8_scan_x_w(uint16_t data)
 {
 	mach8.scan_x = data & 0x07ff;
 
@@ -5800,9 +5725,9 @@ WRITE16_MEMBER(mach8_device::mach8_scan_x_w)
 	if(LOG_8514) logerror("Mach8: Scan To X write %04x\n",mach8.scan_x);
 }
 
-WRITE16_MEMBER(mach8_device::mach8_pixel_xfer_w)
+void mach8_device::mach8_pixel_xfer_w(offs_t offset, uint16_t data)
 {
-	ibm8514_pixel_xfer_w(space,offset,data,mem_mask);
+	ibm8514_pixel_xfer_w(offset, data);
 
 	if(ibm8514.state == MACH8_DRAWING_SCAN)
 		mach8_wait_scan();
@@ -5860,7 +5785,7 @@ void mach8_device::mach8_wait_scan()
  *     12: LSB First (ignored in mach8 mode when data width is not set)
  *  13-15: Foreground Colour Source (as Background Source, plus 5=Colour pattern shift register)
  */
-WRITE16_MEMBER(mach8_device::mach8_dp_config_w)
+void mach8_device::mach8_dp_config_w(uint16_t data)
 {
 	mach8.dp_config = data;
 	if(LOG_8514) logerror("Mach8: Data Path Configuration write %04x\n",mach8.dp_config);
@@ -5879,7 +5804,7 @@ bit    0  CLK_MODE. Set to use clock chip, clear to use crystals.
     9-15  ROM_LOCATION. If bit 2 and 3 are 0 the ROM will be at this location:
            0: C000h, 1: C080h, 2: C100h, .. 127: FF80h (unlikely)
  */
-READ16_MEMBER(mach8_device::mach8_config1_r)
+uint16_t mach8_device::mach8_config1_r()
 {
 	return 0x0082;
 }
@@ -5892,7 +5817,7 @@ bit    0  SHARE_CLOCK. If set the Mach8 shares clock with the VGA
        3  WRITE_PER_BIT. Write masked VRAM operations supported if set
        4  FLASH_ENA. Flash page writes supported if set
  */
-READ16_MEMBER(mach8_device::mach8_config2_r)
+uint16_t mach8_device::mach8_config2_r()
 {
 	return 0x0002;
 }
@@ -5905,9 +5830,864 @@ READ16_MEMBER(mach8_device::mach8_config2_r)
  * bit      14  EEPROM Chip Select
  * bit      15  EEPROM Select (Enables read/write of external EEPROM)
  */
-WRITE16_MEMBER(mach8_device::mach8_ge_ext_config_w)
+void mach8_device::mach8_ge_ext_config_w(uint16_t data)
 {
 	mach8.ge_ext_config = data;
 	if(data & 0x8000)
 		popmessage("EEPROM enabled via 7AEE");
+}
+
+xga_copro_device::xga_copro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, XGA_COPRO, tag, owner, clock)
+	, m_var(TYPE::XGA)
+	, m_mem_read_cb(*this)
+	, m_mem_write_cb(*this)
+{
+}
+
+void xga_copro_device::start_command()
+{
+	switch((m_pelop >> 24) & 15)
+	{
+		case 11:
+			if(m_var == TYPE::OTI111)
+			{
+				logerror("oak specific textblt\n");
+				break;
+			}
+			[[fallthrough]];
+		case 12:
+			if(m_var == TYPE::OTI111)
+			{
+				logerror("oak specific fast pattern copy\n");
+				break;
+			}
+			[[fallthrough]];
+		default:
+			logerror("invalid pel op step func %d\n", (m_pelop >> 24) & 15);
+			break;
+		case 2:
+			logerror("draw and step read\n");
+			break;
+		case 3:
+			logerror("line draw read\n");
+			break;
+		case 4:
+			logerror("draw and step write\n");
+			break;
+		case 5:
+			logerror("line draw write\n");
+			break;
+		case 8:
+			do_pxblt();
+			break;
+		case 9:
+			logerror("inverting pxblt\n");
+			break;
+		case 10:
+			logerror("area fill pxblt\n");
+			break;
+	}
+}
+
+// Can maps be not byte aligned? XGA manual says they must be 32bit aligned in at least some cases.
+u32 xga_copro_device::read_map_pixel(int x, int y, int map)
+{
+	offs_t addr = m_pelmap_base[map];
+	int width = m_pelmap_width[map] + 1;
+	int height = m_pelmap_height[map] + 1;
+	int endian = m_pelmap_format[map] & 8;
+	int wbytes, bits;
+	u8 byte;
+	if((x > width) || (y > height) || (x < 0) || (y < 0))
+		return 0;
+	switch(m_pelmap_format[map] & 7)
+	{
+		case 0:
+			wbytes = width / 8;
+			addr += y * wbytes;
+			addr += x / 8;
+			byte = m_mem_read_cb(addr);
+			bits = (x % 8) - (endian ? 8 : 0);
+			return (byte >> bits) & 1;
+		case 1:
+			wbytes = width / 4;
+			addr += y * wbytes;
+			addr += x / 4;
+			byte = m_mem_read_cb(addr);
+			bits = (x % 4) - (endian ? 4 : 0);
+			return (byte >> (bits * 2)) & 3;
+		case 2:
+			wbytes = width / 2;
+			addr += y * wbytes;
+			addr += x / 2;
+			byte = m_mem_read_cb(addr);
+			bits = (x % 2) - (endian ? 2 : 0);
+			return (byte >> (bits * 4)) & 0xf;
+		case 3:
+			wbytes = width;
+			addr += y * wbytes;
+			addr += x;
+			//logerror("r %d %d %d %d %d %x\n",map,width, height,x,y, addr);
+			return m_mem_read_cb(addr);
+		case 4:
+			wbytes = width * 2;
+			addr += y * wbytes;
+			addr += x * 2;
+			if(endian)
+				return m_mem_read_cb(addr + 1) | (m_mem_read_cb(addr) << 8);
+			return m_mem_read_cb(addr) | (m_mem_read_cb(addr + 1) << 8);
+		case 5:
+			wbytes = width * 4;
+			addr += y * wbytes;
+			addr += x * 4;
+			if(endian)
+				return m_mem_read_cb(addr + 3) | (m_mem_read_cb(addr + 2) << 8) |
+						(m_mem_read_cb(addr + 1) << 16) | (m_mem_read_cb(addr) << 24);
+			return m_mem_read_cb(addr) | (m_mem_read_cb(addr + 1) << 8) |
+					(m_mem_read_cb(addr + 2) << 16) | (m_mem_read_cb(addr + 3) << 24);
+	}
+	logerror("invalid pixel map mode %d %d\n", map, m_pelmap_format[map] & 7);
+	return 0;
+}
+
+void xga_copro_device::write_map_pixel(int x, int y, int map, u32 pixel)
+{
+	offs_t addr = m_pelmap_base[map];
+	int width = m_pelmap_width[map] + 1;
+	int height = m_pelmap_height[map] + 1;
+	int endian = m_pelmap_format[map] & 8;
+	int wbytes;
+	u8 byte, mask;
+	if((x > width) || (y > height) || (x < 0) || (y < 0))
+		return;
+	switch(m_pelmap_format[map] & 7)
+	{
+		case 0:
+			wbytes = width / 8;
+			addr += y * wbytes;
+			addr += x / 8;
+			byte = m_mem_read_cb(addr);
+			mask = 1 << ((x % 8) - (endian ? 8 : 0));
+			byte = (byte & ~mask) | ((pixel ? 0xff : 0) & mask);
+			m_mem_write_cb(addr, byte);
+			break;
+		case 1:
+			wbytes = width / 4;
+			addr += y * wbytes;
+			addr += x / 4;
+			byte = m_mem_read_cb(addr);
+			mask = 3 << (((x % 4) - (endian ? 4 : 0)) * 2);
+			byte = (byte & ~mask) | ((pixel ? 0xff : 0) & mask);
+			m_mem_write_cb(addr, byte);
+			break;
+		case 2:
+			wbytes = width / 2;
+			addr += y * wbytes;
+			addr += x / 2;
+			byte = m_mem_read_cb(addr);
+			mask = 0xf << (((x % 2) - (endian ? 2 : 0)) * 4);
+			byte = (byte & ~mask) | ((pixel ? 0xff : 0) & mask);
+			m_mem_write_cb(addr, byte);
+			break;
+		case 3:
+			wbytes = width;
+			addr += y * wbytes;
+			addr += x;
+			//logerror("w %d %d %d %d %d %x %x\n",map,width, height,x,y, addr, pixel);
+			m_mem_write_cb(addr, (u8)pixel);
+			break;
+		case 4:
+			wbytes = width * 2;
+			addr += y * wbytes;
+			addr += x * 2;
+			if(endian)
+			{
+				m_mem_write_cb(addr + 1, pixel & 0xff);
+				m_mem_write_cb(addr, pixel >> 8);
+			}
+			else
+			{
+				m_mem_write_cb(addr, pixel & 0xff);
+				m_mem_write_cb(addr + 1, pixel >> 8);
+			}
+			break;
+		case 5:
+			wbytes = width * 4;
+			addr += y * wbytes;
+			addr += x * 4;
+			if(endian)
+			{
+				m_mem_write_cb(addr + 3, pixel & 0xff);
+				m_mem_write_cb(addr + 2, pixel >> 8);
+				m_mem_write_cb(addr + 1, pixel >> 16);
+				m_mem_write_cb(addr, pixel >> 24);
+			}
+			else
+			{
+				m_mem_write_cb(addr, pixel & 0xff);
+				m_mem_write_cb(addr + 1, pixel >> 8);
+				m_mem_write_cb(addr + 2, pixel >> 16);
+				m_mem_write_cb(addr + 3, pixel >> 24);
+			}
+			break;
+		default:
+			logerror("invalid pixel map mode %d %d\n", map, m_pelmap_format[map] & 7);
+			break;
+	}
+}
+
+u32 xga_copro_device::rop(u32 s, u32 d, u8 op)
+{
+	if(m_var == TYPE::OTI111)
+	{
+		switch(op)
+		{
+			default:
+			case 0:
+				return 0;
+			case 1:
+				return ~s & ~d;
+			case 2:
+				return ~s & d;
+			case 3:
+				return ~s;
+			case 4:
+				return s & ~d;
+			case 5:
+				return ~d;
+			case 6:
+				return s ^ d;
+			case 7:
+				return ~s | ~d;
+			case 8:
+				return s & d;
+			case 9:
+				return s ^ ~d;
+			case 10:
+				return d;
+			case 11:
+				return ~s | d;
+			case 12:
+				return s;
+			case 13:
+				return s | ~d;
+			case 14:
+				return s | d;
+			case 15:
+				return -1;
+		}
+	}
+	switch(op)
+	{
+		default:
+		case 0:
+			return 0;
+		case 1:
+			return s & d;
+		case 2:
+			return s & ~d;
+		case 3:
+			return s;
+		case 4:
+			return ~s & d;
+		case 5:
+			return d;
+		case 6:
+			return s ^ d;
+		case 7:
+			return s | d;
+		case 8:
+			return ~s & ~d;
+		case 9:
+			return s ^ ~d;
+		case 10:
+			return ~d;
+		case 11:
+			return s | ~d;
+		case 12:
+			return ~s;
+		case 13:
+			return ~s | d;
+		case 14:
+			return ~s | ~d;
+		case 15:
+			return -1;
+		case 16:
+			return std::max(s, d);
+		case 17:
+			return std::min(s, d);
+		case 18:
+			return 0; // saturate add
+		case 19:
+			return 0; // saturate sub d - s
+		case 20:
+			return 0; // saturate sub s - d
+		case 21:
+			return 0; // avg
+	}
+}
+
+void xga_copro_device::do_pxblt()
+{
+	u8 dir = (m_pelop >> 25) & 2;
+	int xstart, xend, xdir, ystart, yend, ydir;
+	u8 srcmap = ((m_pelop >> 20) & 0xf) - 1;
+	u8 dstmap = ((m_pelop >> 16) & 0xf) - 1;
+	u8 patmap = ((m_pelop >> 12) & 0xf) - 1;
+	logerror("pxblt src %d pat %d dst %d dim1 %d dim2 %d srcbase %x dstbase %x\n", srcmap+1, dstmap+1, patmap+1, m_opdim1 & 0xfff, m_opdim2 & 0xfff, m_pelmap_base[srcmap+1], m_pelmap_base[dstmap+1]);
+	logerror("%d %d %d %d\n", m_srcxaddr & 0xfff, m_srcyaddr & 0xfff, m_dstxaddr & 0xfff, m_dstyaddr & 0xfff);
+	if((srcmap > 2) || (dstmap > 2) || ((patmap > 2) && (patmap != 7) && (patmap != 8)))
+	{
+		logerror("invalid pelmap\n");
+		return;
+	}
+	if(dir & 1)
+	{
+		ystart = (m_opdim2 & 0xfff) + 1;
+		yend = 0;
+		ydir = -1;
+	}
+	else
+	{
+		ystart = 0;
+		yend = (m_opdim2 & 0xfff) + 1;
+		ydir = 1;
+	}
+	if(dir & 2)
+	{
+		xstart = (m_opdim1 & 0xfff) + 1;
+		xend = 0;
+		xdir = -1;
+	}
+	else
+	{
+		xstart = 0;
+		xend = (m_opdim1 & 0xfff) + 1;
+		xdir = 1;
+	}
+
+	std::function<s16(s16)> dstwrap;
+	if(m_var == TYPE::OTI111)
+		dstwrap = [](s16 addr) { return addr & 0xfff; };
+	else
+	{
+		dstwrap = [](s16 addr)
+		{
+			addr = addr & 0x1fff;
+			return (addr & 0x1800) == 0x1800 ? addr | 0xf800 : addr;
+		};
+	}
+
+	for(int y = ystart; y != yend; y += ydir)
+	{
+		u16 patxaddr = m_patxaddr & 0xfff;
+		u16 srcxaddr = m_srcxaddr & 0xfff;
+		s16 dstxaddr = dstwrap(m_dstxaddr);
+		s16 dstyaddr = dstwrap(m_dstyaddr);
+		for(int x = xstart; x != xend; x += xdir)
+		{
+			u32 src, dst, pat;
+			if(patmap < 3)
+			{
+				pat = read_map_pixel(patxaddr, m_patyaddr & 0xfff, patmap + 1);
+				patxaddr += xdir;
+			}
+			else
+				pat = 1; //TODO: generate from source mode
+			if(pat)
+				src = (((m_pelop >> 28) & 3) == 2) ? read_map_pixel(srcxaddr, m_srcyaddr & 0xfff, srcmap + 1) : m_fcolor;
+			else
+				src = (((m_pelop >> 30) & 3) == 2) ? read_map_pixel(srcxaddr, m_srcyaddr & 0xfff, srcmap + 1) : m_bcolor;
+			srcxaddr += xdir;
+			dst = read_map_pixel(dstxaddr, dstyaddr, dstmap + 1);
+			dst = (dst & ~m_pelbmask) | (rop(src, dst, pat ? m_fmix : m_bmix) & m_pelbmask);
+			write_map_pixel(dstxaddr, dstyaddr, dstmap + 1, dst); // TODO: color compare
+			dstxaddr = dstwrap(dstxaddr + xdir);
+		}
+		m_patyaddr += ydir;
+		m_srcyaddr += ydir;
+		m_dstyaddr += ydir;
+	}
+}
+
+u8 xga_copro_device::xga_read(offs_t offset)
+{
+	switch(offset)
+	{
+		case 0x12:
+			return m_pelmap;
+		case 0x14:
+			return m_pelmap_base[m_pelmap];
+		case 0x15:
+			return m_pelmap_base[m_pelmap] >> 8;
+		case 0x16:
+			return m_pelmap_base[m_pelmap] >> 16;
+		case 0x17:
+			return m_pelmap_base[m_pelmap] >> 24;
+		case 0x18:
+			return m_pelmap_width[m_pelmap];
+		case 0x19:
+			return m_pelmap_width[m_pelmap] >> 8;
+		case 0x1a:
+			return m_pelmap_height[m_pelmap];
+		case 0x1b:
+			return m_pelmap_height[m_pelmap] >> 8;
+		case 0x1c:
+			return m_pelmap_format[m_pelmap];
+		case 0x20:
+			return m_bresh_err;
+		case 0x21:
+			return m_bresh_err >> 8;
+		case 0x24:
+			return m_bresh_k1;
+		case 0x25:
+			return m_bresh_k1 >> 8;
+		case 0x28:
+			return m_bresh_k2;
+		case 0x29:
+			return m_bresh_k2 >> 8;
+		case 0x2c:
+			return m_dir;
+		case 0x2d:
+			return m_dir >> 8;
+		case 0x2e:
+			return m_dir >> 16;
+		case 0x2f:
+			return m_dir >> 24;
+		case 0x48:
+			if(m_var == TYPE::OTI111)
+				return m_fmix << 4 | m_bmix;
+			return m_fmix;
+		case 0x49:
+			if(m_var == TYPE::OTI111)
+				return 0;
+			return m_bmix;
+		case 0x4a:
+			return m_destccc;
+		case 0x4c:
+			return m_destccv;
+		case 0x4d:
+			return m_destccv >> 8;
+		case 0x4e:
+			return m_destccv >> 16;
+		case 0x4f:
+			return m_destccv >> 24;
+		case 0x50:
+			return m_pelbmask;
+		case 0x51:
+			return m_pelbmask >> 8;
+		case 0x52:
+			return m_pelbmask >> 16;
+		case 0x53:
+			return m_pelbmask >> 24;
+		case 0x54:
+			return m_carrychain;
+		case 0x55:
+			return m_carrychain >> 8;
+		case 0x56:
+			return m_carrychain >> 16;
+		case 0x57:
+			return m_carrychain >> 24;
+		case 0x58:
+			return m_fcolor;
+		case 0x59:
+			return m_fcolor >> 8;
+		case 0x5a:
+			return m_fcolor >> 16;
+		case 0x5b:
+			return m_fcolor >> 24;
+		case 0x5c:
+			return m_bcolor;
+		case 0x5d:
+			return m_bcolor >> 8;
+		case 0x5e:
+			return m_bcolor >> 16;
+		case 0x5f:
+			return m_bcolor >> 24;
+		case 0x60:
+			return m_opdim1;
+		case 0x61:
+			return m_opdim1 >> 8;
+		case 0x62:
+			return m_opdim2;
+		case 0x63:
+			return m_opdim2 >> 8;
+		case 0x6c:
+			return m_maskorigx;
+		case 0x6d:
+			return m_maskorigx >> 8;
+		case 0x6e:
+			return m_maskorigy;
+		case 0x6f:
+			return m_maskorigy >> 8;
+		case 0x70:
+			return m_srcxaddr;
+		case 0x71:
+			return m_srcxaddr >> 8;
+		case 0x72:
+			return m_srcyaddr;
+		case 0x73:
+			return m_srcyaddr >> 8;
+		case 0x74:
+			return m_patxaddr;
+		case 0x75:
+			return m_patxaddr >> 8;
+		case 0x76:
+			return m_patyaddr;
+		case 0x77:
+			return m_patyaddr >> 8;
+		case 0x78:
+			return m_dstxaddr;
+		case 0x79:
+			return m_dstxaddr >> 8;
+		case 0x7a:
+			return m_dstyaddr;
+		case 0x7b:
+			return m_dstyaddr >> 8;
+		case 0x7c:
+			return m_pelop;
+		case 0x7d:
+			return m_pelop >> 8;
+		case 0x7e:
+			return m_pelop >> 16;
+		case 0x7f:
+			return m_pelop >> 24;
+	}
+	return 0;
+}
+
+void xga_copro_device::xga_write(offs_t offset, u8 data)
+{
+	switch(offset)
+	{
+		case 0x12:
+			m_pelmap = data & 3;
+			break;
+		case 0x14:
+			m_pelmap_base[m_pelmap] = (m_pelmap_base[m_pelmap] & ~0xff) | data;
+			break;
+		case 0x15:
+			m_pelmap_base[m_pelmap] = (m_pelmap_base[m_pelmap] & ~0xff00) | (data << 8);
+			break;
+		case 0x16:
+			m_pelmap_base[m_pelmap] = (m_pelmap_base[m_pelmap] & ~0xff0000) | (data << 16);
+			break;
+		case 0x17:
+			m_pelmap_base[m_pelmap] = (m_pelmap_base[m_pelmap] & ~0xff000000) | (data << 24);
+			break;
+		case 0x18:
+			m_pelmap_width[m_pelmap] = (m_pelmap_width[m_pelmap] & ~0xff) | data;
+			break;
+		case 0x19:
+			m_pelmap_width[m_pelmap] = (m_pelmap_width[m_pelmap] & ~0xff00) | (data << 8);
+			break;
+		case 0x1a:
+			m_pelmap_height[m_pelmap] = (m_pelmap_height[m_pelmap] & ~0xff) | data;
+			break;
+		case 0x1b:
+			m_pelmap_height[m_pelmap] = (m_pelmap_height[m_pelmap] & ~0xff00) | (data << 8);
+			break;
+		case 0x1c:
+			m_pelmap_format[m_pelmap] = data;
+			break;
+		case 0x20:
+			m_bresh_err = (m_bresh_err & ~0xff) | data;
+			break;
+		case 0x21:
+			m_bresh_err = (m_bresh_err & ~0xff00) | (data << 8);
+			break;
+		case 0x24:
+			m_bresh_k1 = (m_bresh_k1 & ~0xff) | data;
+			break;
+		case 0x25:
+			m_bresh_k1 = (m_bresh_k1 & ~0xff00) | (data << 8);
+			break;
+		case 0x28:
+			m_bresh_k2 = (m_bresh_k2 & ~0xff) | data;
+			break;
+		case 0x29:
+			m_bresh_k2 = (m_bresh_k2 & ~0xff00) | (data << 8);
+			break;
+		case 0x2c:
+			m_dir = (m_dir & ~0xff) | data;
+			break;
+		case 0x2d:
+			m_dir = (m_dir & ~0xff00) | (data << 8);
+			break;
+		case 0x2e:
+			m_dir = (m_dir & ~0xff0000) | (data << 16);
+			break;
+		case 0x2f:
+			m_dir = (m_dir & ~0xff000000) | (data << 24);
+			break;
+		case 0x48:
+			if(m_var == TYPE::OTI111)
+			{
+				m_fmix = data >> 4;
+				m_bmix = data & 0xf;
+				break;
+			}
+			m_fmix = data;
+			break;
+		case 0x49:
+			if(m_var == TYPE::OTI111)
+				break;
+			m_bmix = data;
+			break;
+		case 0x4a:
+			m_destccc = data;
+			break;
+		case 0x4c:
+			m_destccv = (m_destccv & ~0xff) | data;
+			break;
+		case 0x4d:
+			m_destccv = (m_destccv & ~0xff00) | (data << 8);
+			break;
+		case 0x4e:
+			m_destccv = (m_destccv & ~0xff0000) | (data << 16);
+			break;
+		case 0x4f:
+			m_destccv = (m_destccv & ~0xff000000) | (data << 24);
+			break;
+		case 0x50:
+			m_pelbmask = (m_pelbmask & ~0xff) | data;
+			break;
+		case 0x51:
+			m_pelbmask = (m_pelbmask & ~0xff00) | (data << 8);
+			break;
+		case 0x52:
+			m_pelbmask = (m_pelbmask & ~0xff0000) | (data << 16);
+			break;
+		case 0x53:
+			m_pelbmask = (m_pelbmask & ~0xff000000) | (data << 24);
+			break;
+		case 0x54:
+			m_carrychain = (m_carrychain & ~0xff) | data;
+			break;
+		case 0x55:
+			m_carrychain = (m_carrychain & ~0xff00) | (data << 8);
+			break;
+		case 0x56:
+			m_carrychain = (m_carrychain & ~0xff0000) | (data << 16);
+			break;
+		case 0x57:
+			m_carrychain = (m_carrychain & ~0xff000000) | (data << 24);
+			break;
+		case 0x58:
+			m_fcolor = (m_fcolor & ~0xff) | data;
+			break;
+		case 0x59:
+			m_fcolor = (m_fcolor & ~0xff00) | (data << 8);
+			break;
+		case 0x5a:
+			m_fcolor = (m_fcolor & ~0xff0000) | (data << 16);
+			break;
+		case 0x5b:
+			m_fcolor = (m_fcolor & ~0xff000000) | (data << 24);
+			break;
+		case 0x5c:
+			m_bcolor = (m_bcolor & ~0xff) | data;
+			break;
+		case 0x5d:
+			m_bcolor = (m_bcolor & ~0xff00) | (data << 8);
+			break;
+		case 0x5e:
+			m_bcolor = (m_bcolor & ~0xff0000) | (data << 16);
+			break;
+		case 0x5f:
+			m_bcolor = (m_bcolor & ~0xff000000) | (data << 24);
+			break;
+		case 0x60:
+			m_opdim1 = (m_opdim1 & ~0xff) | data;
+			break;
+		case 0x61:
+			m_opdim1 = (m_opdim1 & ~0xff00) | (data << 8);
+			break;
+		case 0x62:
+			m_opdim2 = (m_opdim2 & ~0xff) | data;
+			break;
+		case 0x63:
+			m_opdim2 = (m_opdim2 & ~0xff00) | (data << 8);
+			break;
+		case 0x6c:
+			m_maskorigx = (m_maskorigx & ~0xff) | data;
+			break;
+		case 0x6d:
+			m_maskorigx = (m_maskorigx & ~0xff00) | (data << 8);
+			break;
+		case 0x6e:
+			m_maskorigy = (m_maskorigy & ~0xff) | data;
+			break;
+		case 0x6f:
+			m_maskorigy = (m_maskorigy & ~0xff00) | (data << 8);
+			break;
+		case 0x70:
+			m_srcxaddr = (m_srcxaddr & ~0xff) | data;
+			break;
+		case 0x71:
+			m_srcxaddr = (m_srcxaddr & ~0xff00) | (data << 8);
+			break;
+		case 0x72:
+			m_srcyaddr = (m_srcyaddr & ~0xff) | data;
+			break;
+		case 0x73:
+			m_srcyaddr = (m_srcyaddr & ~0xff00) | (data << 8);
+			break;
+		case 0x74:
+			m_patxaddr = (m_patxaddr & ~0xff) | data;
+			break;
+		case 0x75:
+			m_patxaddr = (m_patxaddr & ~0xff00) | (data << 8);
+			break;
+		case 0x76:
+			m_patyaddr = (m_patyaddr & ~0xff) | data;
+			break;
+		case 0x77:
+			m_patyaddr = (m_patyaddr & ~0xff00) | (data << 8);
+			break;
+		case 0x78:
+			m_dstxaddr = (m_dstxaddr & ~0xff) | data;
+			break;
+		case 0x79:
+			m_dstxaddr = (m_dstxaddr & ~0xff00) | (data << 8);
+			break;
+		case 0x7a:
+			m_dstyaddr = (m_dstyaddr & ~0xff) | data;
+			break;
+		case 0x7b:
+			m_dstyaddr = (m_dstyaddr & ~0xff00) | (data << 8);
+			break;
+		case 0x7c:
+			m_pelop = (m_pelop & ~0xff) | data;
+			break;
+		case 0x7d:
+			m_pelop = (m_pelop & ~0xff00) | (data << 8);
+			break;
+		case 0x7e:
+			m_pelop = (m_pelop & ~0xff0000) | (data << 16);
+			break;
+		case 0x7f:
+			m_pelop = (m_pelop & ~0xff000000) | (data << 24);
+			start_command();
+			break;
+	}
+}
+
+void xga_copro_device::device_start()
+{
+	m_mem_read_cb.resolve_safe(0);
+	m_mem_write_cb.resolve_safe();
+}
+
+void xga_copro_device::device_reset()
+{
+	m_pelmap = 0;
+}
+
+oak_oti111_vga_device::oak_oti111_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: svga_device(mconfig, OTI111, tag, owner, clock)
+	, m_xga(*this, "xga")
+{
+}
+
+void oak_oti111_vga_device::device_add_mconfig(machine_config &config)
+{
+	XGA_COPRO(config, m_xga, 0);
+	m_xga->mem_read_callback().set(FUNC(oak_oti111_vga_device::mem_linear_r));
+	m_xga->mem_write_callback().set(FUNC(oak_oti111_vga_device::mem_linear_w));
+	m_xga->set_type(xga_copro_device::TYPE::OTI111);
+}
+
+u8 oak_oti111_vga_device::xga_read(offs_t offset)
+{
+	switch(offset)
+	{
+		case 0x13: //fifo status
+			return 0xf;
+		default:
+			return m_xga->xga_read(offset);
+	}
+	return 0;
+}
+
+void oak_oti111_vga_device::xga_write(offs_t offset, u8 data)
+{
+	m_xga->xga_write(offset, data);
+}
+
+void oak_oti111_vga_device::device_start()
+{
+	svga_device::device_start();
+	std::fill(std::begin(m_oak_regs), std::end(m_oak_regs), 0);
+}
+
+u8 oak_oti111_vga_device::dac_read(offs_t offset)
+{
+	if(offset >= 6)
+		return vga_device::port_03c0_r(offset);
+	return 0;
+}
+
+void oak_oti111_vga_device::dac_write(offs_t offset, u8 data)
+{
+	if(offset >= 6)
+		vga_device::port_03c0_w(offset, data);
+}
+
+
+u8 oak_oti111_vga_device::port_03d0_r(offs_t offset)
+{
+	uint8_t res = 0xff;
+	switch(offset)
+	{
+		case 14:
+			return m_oak_idx;
+		case 15:
+			return m_oak_idx <= 0x3a ? m_oak_regs[m_oak_idx] : 0;
+		default:
+			if (CRTC_PORT_ADDR == 0x3d0)
+				res = vga_device::port_03d0_r(offset);
+			break;
+	}
+
+	return res;
+}
+
+void oak_oti111_vga_device::port_03d0_w(offs_t offset, uint8_t data)
+{
+	switch(offset)
+	{
+		case 14:
+			m_oak_idx = data;
+			break;
+		case 15:
+			if(m_oak_idx > 0x3a)
+				break;
+			m_oak_regs[m_oak_idx] = data;
+			switch(m_oak_idx)
+			{
+				case 0x21:
+					svga.rgb8_en = BIT(data, 2);
+					break;
+				case 0x33:
+					vga.crtc.no_wrap = BIT(data, 0);
+					break;
+			}
+			break;
+		default:
+			if (CRTC_PORT_ADDR == 0x3d0)
+				vga_device::port_03d0_w(offset,data);
+			break;
+	}
+}
+
+uint16_t oak_oti111_vga_device::offset()
+{
+	uint16_t off = svga_device::offset();
+
+	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb32_en)
+		return vga.crtc.offset << 4;  // TODO: there must a register to control this
+	else
+		return off;
 }

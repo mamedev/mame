@@ -36,7 +36,7 @@ void ps2_intc_device::device_reset()
 	m_mask = 0;
 }
 
-READ32_MEMBER(ps2_intc_device::read)
+uint32_t ps2_intc_device::read(offs_t offset, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -52,7 +52,7 @@ READ32_MEMBER(ps2_intc_device::read)
 	}
 }
 
-WRITE32_MEMBER(ps2_intc_device::write)
+void ps2_intc_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{

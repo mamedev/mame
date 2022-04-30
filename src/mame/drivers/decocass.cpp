@@ -1,45 +1,58 @@
 // license:GPL-2.0+
 // copyright-holders:Juergen Buchmueller, David Haywood
-/***********************************************************************
+/*******************************************************************************
 
     DECO Cassette System driver
     by Juergen Buchmueller
-    with contributions by:
-    David Widel
-    Nicola Salmoria
-    Aaron Giles
-    Brian Troha
-    Fabio Priuli
-    Lord Nightmare
-    The Dumping Union
-    Team Japump!!!
-    Hau
-    Jean-Francois Del Nero
-    Omar Cornut
-    Game Preservation Society
-    Joseph Redon
 
-    The DECO cassette system consists of three PCBS in a card cage:
-    Early boardset: (1980-1983) (proms unknown for this boardset, no schematics for this boardset)
-    One DE-0069C-0 RMS-3 pcb with a 6502 processor, D8041C MCU (DECO Cassette control), two ay-3-8910s, and one 2708 eprom holding the audio bios. (audio, needs external amp and volume control)
-    One DE-0068B-0 DSP-3 pcb with a 'DECO CPU-3' custom, two 2716 eproms. (main processor and bios, graphics, dipswitches?)
+    with contributions by: David Widel, Nicola Salmoria, Aaron Giles, Brian Troha,
+    Fabio Priuli, Lord Nightmare, The Dumping Union, Team Japump!!!, Hau,
+    Jean-Francois Del Nero, Omar Cornut, Game Preservation Society, Joseph Redon
+
+
+    The DECO cassette system consists of three PCBs in a card cage:
+
+    **** Early boardset: (1980-1983) (proms unknown for this boardset, no schematics for this boardset) ****
+
+    One DE-0069C-0 RMS-3 pcb with a 6502 processor, D8041C MCU (DECO Cassette control),
+    two ay-3-8910s, and one 2708 eprom holding the audio bios. (audio, needs external
+    amp and volume control)
+
+    One DE-0068B-0 DSP-3 pcb with a 'DECO CPU-3' custom, two 2716 eproms. (main processor
+    and bios, graphics, dipswitches?)
+
     One DE-0070C-0 BIO-3 pcb with an analog ADC0908 8-bit adc.
+
     One DE-0066B-0 card rack board that the other three boards plug into.
-    This boardset has two versions : MD, known as "shokase" in Japan, and MT, known as "daikase" which is using bigger data tapes. (MT was only sold in Japan, not emulated yet)
+    This boardset has two versions: MD, known as "shokase" in Japan, and MT, known as "daikase",
+    which is using bigger data tapes. (MT was only sold in Japan, not emulated yet)
 
-    Later boardset: (1984 onward, schematic is dated October 1983)
-    One DE-0097C-0 RMS-8 pcb with a 6502 processor, two ay-3-8910s, two eproms (2716 and 2732) plus one prom, and 48k worth of 4116 16kx1 DRAMs; the 6502 processor has its own 4K of SRAM. (audio processor and RAM, Main processor's dram, dipswitches)
-    One DE-0096C-0 DSP-8 board with a 'DECO 222' custom on it (labeled '8049 // C10707-2') which appears to really be a 'cleverly' disguised 6502, and two proms, plus 4K of sram, and three hm2511-1 1kx1 srams. (main processor, sprites, missiles, palette)
-    One DE-0098C-0 B10-8 (BIO-8 on schematics) board with an 8041, an analog devices ADC0908 8-bit adc, and 4K of SRAM on it. (DECO Cassette control, inputs, tilemaps, headlights)
-    One DE-0109C-0 card rack board that the other three boards plug into. (fourth connector for DE-109C-0 is shorter than in earlier versions)
+    **** Later boardset: (1984 onward, schematic is dated October 1983) ****
 
-    The actual cassettes use a custom player hooked to the BIO board, and are roughly microcassette form factor, but are larger and will not fit in a conventional microcassette player.
-    Each cassette has one track on it and is separated into clock and data by two Magtek IC in the player, for a form of synchronous serial.
-    The data is stored in blocks with headers and CRC16 checksums.
-    The first block contains information such as the region (A:Japan, B:USA, C:UK, D:Europe) and the total number of blocks left to read.
-    The last physical block on the cassette is a dummy block not used by the system. (only used to mark the end of last block)
+    One DE-0097C-0 RMS-8 pcb with a 6502 processor, two ay-3-8910s, two eproms (2716 and 2732)
+    plus one prom, and 48k worth of 4116 16kx1 DRAMs; the 6502 processor has its own 4K of SRAM.
+    (audio processor and RAM, Main processor's dram, dipswitches)
 
- ***********************************************************************/
+    One DE-0096C-0 DSP-8 board with a 'DECO 222' custom on it (labeled '8049 // C10707-2') which
+    appears to really be a 'cleverly' disguised 6502, and two proms, plus 4K of sram, and three
+    hm2511-1 1kx1 srams. (main processor, sprites, missiles, palette)
+
+    One DE-0098C-0 B10-8 (BIO-8 on schematics) board with an 8041, an analog devices ADC0908 8-bit adc,
+    and 4K of SRAM on it. (DECO Cassette control, inputs, tilemaps, headlights)
+
+    One DE-0109C-0 card rack board that the other three boards plug into. (fourth connector for
+    DE-109C-0 is shorter than in earlier versions)
+
+
+    The actual cassettes use a custom player hooked to the BIO board, and are roughly microcassette
+    form factor, but are larger and will not fit in a conventional microcassette player. Each cassette
+    has one track on it and is separated into clock and data by two Magtek IC in the player, for
+    a form of synchronous serial. The data is stored in blocks with headers and CRC16 checksums.
+    The first block contains information such as the region (A:Japan, B:USA, C:UK, D:Europe)
+    and the total number of blocks left to read. The last physical block on the cassette is a dummy
+    block not used by the system. (only used to mark the end of last block)
+
+*******************************************************************************/
 
 #include "emu.h"
 #include "includes/decocass.h"
@@ -64,16 +77,16 @@
  *
  ***************************************************************************/
 
-WRITE8_MEMBER(decocass_state::mirrorvideoram_w) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); decocass_fgvideoram_w(space, offset, data, mem_mask); }
-WRITE8_MEMBER(decocass_state::mirrorcolorram_w) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); decocass_colorram_w(space, offset, data, mem_mask); }
+void decocass_state::mirrorvideoram_w(offs_t offset, uint8_t data) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); decocass_fgvideoram_w(offset, data); }
+void decocass_state::mirrorcolorram_w(offs_t offset, uint8_t data) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); decocass_colorram_w(offset, data); }
 
-READ8_MEMBER(decocass_state::mirrorvideoram_r)
+uint8_t decocass_state::mirrorvideoram_r(offs_t offset)
 {
 	offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5);
 	return m_fgvideoram[offset];
 }
 
-READ8_MEMBER(decocass_state::mirrorcolorram_r)
+uint8_t decocass_state::mirrorcolorram_r(offs_t offset)
 {
 	offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5);
 	return m_colorram[offset];
@@ -120,6 +133,13 @@ void decocass_state::decocass_map(address_map &map)
 	map(0xe701, 0xe701).r(FUNC(decocass_state::decocass_sound_ack_r));  /* read sound CPU ack status */
 
 	map(0xf000, 0xffff).rom();
+}
+
+void decocass_state::decocrom_map(address_map &map)
+{
+	decocass_map(map);
+	map(0x6000, 0xafff).bankr("bank1").w(FUNC(decocass_state::decocass_de0091_w));
+	map(0xe900, 0xe900).w(FUNC(decocass_state::decocass_e900_w));
 }
 
 void decocass_state::decocass_sound_map(address_map &map)
@@ -336,6 +356,35 @@ static INPUT_PORTS_START( cprogolf )
 	/* Switches 6, 7 & 8 are listed as "Country Code" A through F and "Don't Change" */
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ctower )
+	PORT_INCLUDE( decocass )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_JOYSTICKRIGHT_RIGHT )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH,IPT_JOYSTICKRIGHT_LEFT )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH,IPT_JOYSTICKRIGHT_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH,IPT_JOYSTICKRIGHT_DOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH,IPT_JOYSTICKLEFT_RIGHT )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH,IPT_JOYSTICKLEFT_LEFT )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH,IPT_JOYSTICKLEFT_UP )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH,IPT_JOYSTICKLEFT_DOWN )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_JOYSTICKRIGHT_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH,IPT_JOYSTICKRIGHT_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH,IPT_JOYSTICKRIGHT_UP ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH,IPT_JOYSTICKRIGHT_DOWN ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH,IPT_JOYSTICKLEFT_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH,IPT_JOYSTICKLEFT_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH,IPT_JOYSTICKLEFT_UP ) PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH,IPT_JOYSTICKLEFT_DOWN ) PORT_COCKTAIL
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )                        PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, "2" )
+	PORT_DIPSETTING(    0x00, "4" )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( cdsteljn )
 	PORT_INCLUDE( decocass )
 
@@ -351,7 +400,6 @@ static INPUT_PORTS_START( cdsteljn )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_MAHJONG_F ) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_MAHJONG_G ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
-
 
 	PORT_START("P1_MP2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_H ) PORT_PLAYER(1)
@@ -861,7 +909,16 @@ static INPUT_PORTS_START( cptennis )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )                        PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
-	/* other dips not verified */
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) )                   PORT_DIPLOCATION("SW2:2,3")
+	PORT_DIPSETTING(    0x06, "10000" )
+	PORT_DIPSETTING(    0x04, "20000" )
+	PORT_DIPSETTING(    0x02, "30000" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Difficulty ) )                   PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, "Amateur" )
+	PORT_DIPSETTING(    0x00, "Professional" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5")
+	// DIPs verified from DIPSW sheet
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cprobowl )
@@ -990,6 +1047,12 @@ void decocass_state::decocass(machine_config &config)
 	AY8910(config, "ay1", HCLK2).add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	AY8910(config, "ay2", HCLK2).add_route(ALL_OUTPUTS, "mono", 0.40);
+}
+
+void decocass_state::decocrom(machine_config &config)
+{
+	decocass(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &decocass_state::decocrom_map);
 }
 
 
@@ -1124,7 +1187,7 @@ void decocass_type1_state::cluckypo(machine_config &config)
 
 void decocass_type1_state::ctisland(machine_config &config)
 {
-	decocass(config);
+	decocrom(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,ctisland)
@@ -1132,7 +1195,7 @@ void decocass_type1_state::ctisland(machine_config &config)
 
 void decocass_type1_state::ctisland3(machine_config &config)
 {
-	decocass(config);
+	decocrom(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,ctisland3)
@@ -1140,7 +1203,7 @@ void decocass_type1_state::ctisland3(machine_config &config)
 
 void decocass_type1_state::cexplore(machine_config &config)
 {
-	decocass(config);
+	decocrom(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cexplore)
@@ -1324,7 +1387,7 @@ void decocass_type3_state::cfghtice(machine_config &config)
 
 /* rms8.7e, New boardset bios, country code D */ \
 #define DECOCASS_BIOS_D_MAINCPU \
-	ROM_SYSTEM_BIOS( 4, "d",   "Bios D (unknown region)" ) \
+	ROM_SYSTEM_BIOS( 4, "d",   "Bios D (Europe?)" ) \
 	ROM_LOAD_BIOS( 4, "v0d-.7e",    0xf000, 0x1000, CRC(1e0c22b1) SHA1(5fec8fef500bbebc13d0173406afc55235d3affb) ) /* handcrafted (single byte changed) because ctisland3 requires region D */
 #define DECOCASS_BIOS_D_AUDIOCPU \
 	ROM_LOAD_BIOS( 4, "v1-.5a",     0xf800, 0x0800, CRC(b66b2c2a) SHA1(0097f38beb4872e735e560148052e258a26b08fd) ) /* from RMS-8 board: 2716 eprom @5A w/V1- label,  contains audio cpu code */
@@ -1445,6 +1508,21 @@ ROM_START( castfant )
 
 	ROM_REGION( 0x10000, "cassette", 0 )      /* (max) 64k for cassette image */
 	ROM_LOAD( "castfant.cas", 0x0000, 0x8000, CRC(6d77d1b5) SHA1(821bd65fbe887cbeac9281a2ad3f88595918f886) )
+ROM_END
+
+/* 08 The Tower */
+ROM_START( ctower ) // no copyright display? (possibly by design, as it lifts a lot from Crazy Climber)
+	DECOCASS_BIOS_D_ROMS
+
+	ROM_REGION( 0x10000, "cassette", 0 )  /* (max) 64k for cassette image */
+	ROM_LOAD( "ctower.cas", 0x0000, 0x6900, CRC(94ad1dd6) SHA1(d54691ad8802b63ff4533202d6e6b29d4652c4f6) )
+
+	/* this is handcrafted, it ends up being the same as ctisland3 but with the lower data and address lines
+	   both swapped.  ctisland3 is also handcrafted and could in turn just be a transformation of one of the
+	   standard PROMs, the data order ends up being arbitrary for these handcrafted PROMs as there are
+	   multiple places transformations could be occurring */
+	ROM_REGION( 0x00020, "dongle", 0 )    /* dongle data */
+	ROM_LOAD( "ctower.pro",   0x0000, 0x0020, CRC(32e9dcd7) SHA1(956b593911f6337008c375cda4dac43043d921dd) )
 ROM_END
 
 /* 09 Super Astro Fighter */
@@ -2052,9 +2130,9 @@ ROM_END
 
 void decocass_state::init_decocass()
 {
-	/* Call the state save setup code in machine/decocass.c */
+	/* Call the state save setup code in machine/decocass.cpp */
 	decocass_machine_state_save_init();
-	/* and in video/decocass.c, too */
+	/* and in video/decocass.cpp, too */
 	decocass_video_state_save_init();
 }
 
@@ -2064,18 +2142,13 @@ void decocass_state::init_decocrom()
 	init_decocass();
 
 	/* convert charram to a banked ROM */
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x6000, 0xafff, "bank1");
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6000, 0xafff, write8_delegate(*this, FUNC(decocass_state::decocass_de0091_w)));
 	membank("bank1")->configure_entry(0, m_charram);
 	membank("bank1")->configure_entry(1, memregion("user3")->base());
 	membank("bank1")->configure_entry(2, memregion("user3")->base()+0x5000);
 	membank("bank1")->set_entry(0);
-
-	/* install the bank selector */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe900, 0xe900, write8_delegate(*this, FUNC(decocass_state::decocass_e900_w)));
 }
 
-READ8_MEMBER(decocass_state::cdsteljn_input_r )
+uint8_t decocass_state::cdsteljn_input_r(offs_t offset)
 {
 	uint8_t res;
 	static const char *const portnames[2][4] = {
@@ -2083,14 +2156,14 @@ READ8_MEMBER(decocass_state::cdsteljn_input_r )
 		{"P2_MP0", "P2_MP1", "P2_MP2", "P2_MP3"}         };
 
 	if(offset & 6)
-		return decocass_input_r(space,offset);
+		return decocass_input_r(offset);
 
 	res = ioport(portnames[offset & 1][m_mux_data])->read();
 
 	return res;
 }
 
-WRITE8_MEMBER(decocass_state::cdsteljn_mux_w )
+void decocass_state::cdsteljn_mux_w(uint8_t data)
 {
 	m_mux_data = (data & 0xc) >> 2;
 	/* bit 0 and 1 are p1/p2 lamps */
@@ -2105,8 +2178,8 @@ void decocass_state::init_cdsteljn()
 	init_decocass();
 
 	/* install custom mahjong panel */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe413, 0xe413, write8_delegate(*this, FUNC(decocass_state::cdsteljn_mux_w)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xe600, 0xe6ff, read8_delegate(*this, FUNC(decocass_state::cdsteljn_input_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe413, 0xe413, write8smo_delegate(*this, FUNC(decocass_state::cdsteljn_mux_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xe600, 0xe6ff, read8sm_delegate(*this, FUNC(decocass_state::cdsteljn_input_r)));
 }
 
 /* -- */ GAME( 1981, decocass,  0,        decocass, decocass, decocass_state,        init_decocass, ROT270, "Data East Corporation", "DECO Cassette System", MACHINE_IS_BIOS_ROOT )
@@ -2118,7 +2191,7 @@ void decocass_state::init_cdsteljn()
 /* 05 */ // 1981.?? Missile Sprinter
 /* 06 */ // 1980.12 Nebula
 /* 07 */ GAME( 1981, castfant,  decocass, castfant, castfant, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Astro Fantasia (DECO Cassette) (US)", 0 )
-/* 08 */ // 1981.03 The Tower
+/* 08 */ GAME( 1981, ctower,    decocass, cfboy0a1, ctower,   decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "The Tower (DECO Cassette) (Europe?)", 0 ) // 1981.03 The Tower (1981.02.04 in cassette data)
 /* 09 */ GAME( 1981, csuperas,  decocass, csuperas, csuperas, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Super Astro Fighter (DECO Cassette) (US)", 0 )
 /* 10 */ GAME( 1981, cocean1a,  decocass, cocean1a, cocean1a, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Ocean to Ocean (Medal) (DECO Cassette MD) (No.10/Ver.1,Japan)", 0 ) /* no lever, 1P/2P buttons used to switch player, cocktail mode not emulated */
 /*    */ GAME( 1981, cocean6b,  cocean1a, cocean1a, cocean1a, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Ocean to Ocean (Medal) (DECO Cassette MD) (No.10/Ver.6,US)", 0 ) /* lever, 1P/2P buttons used to switch player, cocktail mode not emulated */
@@ -2131,7 +2204,7 @@ void decocass_state::init_cdsteljn()
 /* 15 */ GAME( 1981, cluckypo,  decocass, cluckypo, cluckypo, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Lucky Poker (DECO Cassette) (US)", 0 )
 /* 16 */ GAME( 1981, ctisland,  decocass, ctisland, ctisland, decocass_type1_state,  init_decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette) (US) (set 1)", 0 )
 /*    */ GAME( 1981, ctisland2, ctisland, ctisland, ctisland, decocass_type1_state,  init_decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette) (US) (set 2)", 0 ) /* newer? has instructions in attract */
-/*    */ GAME( 1981, ctisland3, ctisland, ctisland3,ctisland, decocass_type1_state,  init_decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette) (Region D)", 0 ) /* region code 'D' unknown region */
+/*    */ GAME( 1981, ctisland3, ctisland, ctisland3,ctisland, decocass_type1_state,  init_decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette) (Europe?)", 0 )
 /* 17 */ // 1981.10 Bobbitto
 /* 18 */ GAME( 1982, cexplore,  decocass, cexplore, cexplore, decocass_type1_state,  init_decocrom, ROT270, "Data East Corporation", "Explorer (DECO Cassette) (US)", 0 )
 /* 19 */ GAME( 1982, cdiscon1,  decocass, decocass, cdiscon1, decocass_type2_state,  init_decocass, ROT270, "Data East Corporation", "Disco No.1 (DECO Cassette) (US)", 0 )
@@ -2180,4 +2253,3 @@ void decocass_state::init_cdsteljn()
 /* UX9 */ // 1985.05 Geinoujin Shikaku Shiken
 
 /* xx */ GAME( 2008, decomult,  decocass, decocass, decocass, decocass_widel_state,  init_decocass, ROT270, "bootleg (David Widel)", "Deco Cassette System Multigame (ROM based)", 0 )
-

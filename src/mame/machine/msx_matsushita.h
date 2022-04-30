@@ -19,8 +19,8 @@ public:
 
 	auto turbo_callback() { return m_turbo_out_cb.bind(); }
 
-	virtual DECLARE_READ8_MEMBER(switched_read) override;
-	virtual DECLARE_WRITE8_MEMBER(switched_write) override;
+	virtual uint8_t switched_read(offs_t offset) override;
+	virtual void switched_write(offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -29,8 +29,8 @@ protected:
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
-	virtual void nvram_read(emu_file &file) override;
-	virtual void nvram_write(emu_file &file) override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 
 private:
 	required_ioport m_io_config;

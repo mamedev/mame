@@ -14,7 +14,7 @@ TILE_GET_INFO_MEMBER(wgp_state::get_piv_tile_info)
 	const u16 tilenum = m_pivram[tile_index + Offset];    /* 3 blocks of $2000 */
 	const u16 attr = m_pivram[tile_index + Offset + 0x8000];  /* 3 blocks of $2000 */
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			tilenum & 0x3fff,
 			(attr & 0x3f),  /* attr & 0x1 ?? */
 			TILE_FLIPYX((attr & 0xc0) >> 6));
@@ -453,8 +453,8 @@ void wgp_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const 
 static inline void bryan2_drawscanline(bitmap_ind16 &bitmap, int x, int y, int length,
 		const u16 *src, bool transparent, u32 orient, bitmap_ind8 &priority, u8 pri, u8 primask = 0xff)
 {
-	u16 *dsti = &bitmap.pix16(y, x);
-	u8 *dstp = &priority.pix8(y, x);
+	u16 *dsti = &bitmap.pix(y, x);
+	u8 *dstp = &priority.pix(y, x);
 
 	if (transparent)
 	{
@@ -558,8 +558,8 @@ void wgp_state::piv_layer_draw(screen_device &screen, bitmap_ind16 &bitmap, cons
 			x_step += (((0x7f - row_zoom) << 8) & 0xffff);
 		}
 
-		u16 *src16 = &srcbitmap.pix16(src_y_index);
-		u8 *tsrc   = &flagsbitmap.pix8(src_y_index);
+		const u16 *const src16 = &srcbitmap.pix(src_y_index);
+		const u8 *const  tsrc  = &flagsbitmap.pix(src_y_index);
 		u16 *dst16 = scanline;
 
 		if (flags & TILEMAP_DRAW_OPAQUE)

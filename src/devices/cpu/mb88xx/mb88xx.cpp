@@ -18,7 +18,6 @@
 #include "emu.h"
 #include "mb88xx.h"
 #include "mb88dasm.h"
-#include "debugger.h"
 
 
 DEFINE_DEVICE_TYPE(MB88201, mb88201_cpu_device, "mb88201", "Fujitsu MB88201")
@@ -47,10 +46,10 @@ DEFINE_DEVICE_TYPE(MB8844,  mb8844_cpu_device,  "mb8844",  "Fujitsu MB8844")
     MACROS
 ***************************************************************************/
 
-#define READOP(a)           (m_cache->read_byte(a))
+#define READOP(a)           (m_cache.read_byte(a))
 
-#define RDMEM(a)            (m_data->read_byte(a))
-#define WRMEM(a,v)          (m_data->write_byte((a), (v)))
+#define RDMEM(a)            (m_data.read_byte(a))
+#define WRMEM(a,v)          (m_data.write_byte((a), (v)))
 
 #define TEST_ST()           (m_st & 1)
 #define TEST_ZF()           (m_zf & 1)
@@ -121,8 +120,8 @@ mb88_cpu_device::mb88_cpu_device(const machine_config &mconfig, device_type type
 	, m_read_k(*this)
 	, m_write_o(*this)
 	, m_write_p(*this)
-	, m_read_r{{*this}, {*this}, {*this}, {*this}}
-	, m_write_r{{*this}, {*this}, {*this}, {*this}}
+	, m_read_r(*this)
+	, m_write_r(*this)
 	, m_read_si(*this)
 	, m_write_so(*this)
 {
@@ -182,17 +181,15 @@ std::unique_ptr<util::disasm_interface> mb88_cpu_device::create_disassembler()
 
 void mb88_cpu_device::device_start()
 {
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
-	m_data = &space(AS_DATA);
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
+	space(AS_DATA).specific(m_data);
 
 	m_read_k.resolve_safe(0);
 	m_write_o.resolve_safe();
 	m_write_p.resolve_safe();
-	for (auto &cb : m_read_r)
-		cb.resolve_safe(0);
-	for (auto &cb : m_write_r)
-		cb.resolve_safe();
+	m_read_r.resolve_all_safe(0);
+	m_write_r.resolve_all_safe();
 	m_read_si.resolve_safe(0);
 	m_write_so.resolve_safe();
 
@@ -370,13 +367,15 @@ int mb88_cpu_device::pla( int inA, int inB )
 
 void mb88_cpu_device::execute_set_input(int inputnum, int state)
 {
-	/* on falling edge trigger interrupt */
-	if ( (m_pio & 0x04) && m_nf && state == CLEAR_LINE )
+	/* On rising edge trigger interrupt.
+	 * Note this is a logical level, the actual pin is high-to-low voltage
+	 * triggered. */
+	if ( (m_pio & INT_CAUSE_EXTERNAL) && !m_nf && state != CLEAR_LINE )
 	{
 		m_pending_interrupt |= INT_CAUSE_EXTERNAL;
 	}
 
-	m_nf = (state != CLEAR_LINE) ? 1 : 0;
+	m_nf = state != CLEAR_LINE;
 }
 
 void mb88_cpu_device::update_pio_enable( uint8_t newpio )
@@ -439,6 +438,9 @@ void mb88_cpu_device::update_pio( int cycles )
 		{
 			/* if we have a live external source, call the irqcallback */
 			standard_irq_callback( 0 );
+			/* The datasheet doesn't mention if the interrupt flag
+			 * is cleared, but it seems to be only for this case. */
+			m_pio &= ~INT_CAUSE_EXTERNAL;
 			m_PC = 0x02;
 		}
 		else if (m_pending_interrupt & m_pio & INT_CAUSE_TIMER)

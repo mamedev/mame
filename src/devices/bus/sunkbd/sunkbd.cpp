@@ -95,13 +95,6 @@
 DEFINE_DEVICE_TYPE(SUNKBD_PORT, sun_keyboard_port_device, "sunkbd", "Sun Keyboard Port")
 
 
-int const device_sun_keyboard_port_interface::START_BIT_COUNT;
-int const device_sun_keyboard_port_interface::DATA_BIT_COUNT;
-device_serial_interface::parity_t const device_sun_keyboard_port_interface::PARITY;
-device_serial_interface::stop_bits_t const device_sun_keyboard_port_interface::STOP_BITS;
-int const device_sun_keyboard_port_interface::BAUD;
-
-
 
 sun_keyboard_port_device::sun_keyboard_port_device(
 		machine_config const &mconfig,

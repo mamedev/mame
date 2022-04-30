@@ -20,7 +20,7 @@
 TILE_GET_INFO_MEMBER(mosaic_state::get_fg_tile_info)
 {
 	tile_index *= 2;
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_fgvideoram[tile_index] + (m_fgvideoram[tile_index+1] << 8),
 			0,
 			0);
@@ -29,7 +29,7 @@ TILE_GET_INFO_MEMBER(mosaic_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(mosaic_state::get_bg_tile_info)
 {
 	tile_index *= 2;
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			m_bgvideoram[tile_index] + (m_bgvideoram[tile_index+1] << 8),
 			0,
 			0);
@@ -58,13 +58,13 @@ void mosaic_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(mosaic_state::fgvideoram_w)
+void mosaic_state::fgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(mosaic_state::bgvideoram_w)
+void mosaic_state::bgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);

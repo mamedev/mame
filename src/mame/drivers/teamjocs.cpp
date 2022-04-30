@@ -32,7 +32,7 @@
 */
 
 #include "emu.h"
-#include "cpu/pic16c5x/pic16c5x.h"
+#include "cpu/pic17/pic17c4x.h"
 #include "machine/nvram.h"
 #include "sound/okim6376.h"
 #include "speaker.h"
@@ -59,7 +59,7 @@ INPUT_PORTS_END
 
 void teamjocs_state::teamjocs(machine_config &config)
 {
-	PIC16C55(config, m_maincpu, 4_MHz_XTAL); // actually PIC17C44-16
+	PIC17C44(config, m_maincpu, 4_MHz_XTAL);
 
 	SPEAKER(config, "mono").front_center();
 

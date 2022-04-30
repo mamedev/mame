@@ -143,18 +143,26 @@ public:
 	// for ISA8, put the 8-bit configs in the primary slots and the 16-bit configs in the secondary
 	virtual space_config_vector memory_space_config() const override;
 
-	template<typename R, typename W> void install_device(offs_t start, offs_t end, R rhandler, W whandler);
+	template<typename R, typename W> void install_device(offs_t start, offs_t end, R rhandler, W whandler)
+	{
+		install_space(AS_ISA_IO, start, end, rhandler, whandler);
+	}
 	template<typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(class address_map &map), uint64_t unitmask = ~u64(0))
 	{
 		m_iospace->install_device(addrstart, addrend, device, map, unitmask);
 	}
-	void install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data);
-	void install_rom(device_t *dev, offs_t start, offs_t end, const char *tag, const char *region);
-	template<typename R, typename W> void install_memory(offs_t start, offs_t end, R rhandler, W whandler);
+	void install_bank(offs_t start, offs_t end, uint8_t *data);
+	void install_bank(offs_t start, offs_t end, memory_bank *bank);
+	void install_rom(device_t *dev, offs_t start, offs_t end, const char *region);
+	template<typename R, typename W> void install_memory(offs_t start, offs_t end, R rhandler, W whandler)
+	{
+		install_space(AS_ISA_MEM, start, end, rhandler, whandler);
+	}
 
 	void unmap_device(offs_t start, offs_t end) const { m_iospace->unmap_readwrite(start, end); }
 	void unmap_bank(offs_t start, offs_t end);
 	void unmap_rom(offs_t start, offs_t end);
+	void unmap_readwrite(offs_t start, offs_t end);
 	bool is_option_rom_space_available(offs_t start, int size);
 
 	// FIXME: shouldn't need to expose this
@@ -172,10 +180,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( drq3_w );
 
 	// 8 bit accessors for ISA-defined address spaces
-	DECLARE_READ8_MEMBER(mem_r);
-	DECLARE_WRITE8_MEMBER(mem_w);
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
+	uint8_t mem_r(offs_t offset);
+	void mem_w(offs_t offset, uint8_t data);
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint8_t data);
 
 	uint8_t dack_r(int line);
 	void dack_w(int line, uint8_t data);
@@ -311,7 +319,7 @@ public:
 	auto drq6_callback() { return m_out_drq6_cb.bind(); }
 	auto drq7_callback() { return m_out_drq7_cb.bind(); }
 
-	void install16_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler);
+	template<typename R, typename W> void install16_device(offs_t start, offs_t end, R rhandler, W whandler);
 
 	// for ISA16, put the 16-bit configs in the primary slots and the 8-bit configs in the secondary
 	virtual space_config_vector memory_space_config() const override;
@@ -332,15 +340,15 @@ public:
 	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 	// 16 bit accessors for ISA-defined address spaces
-	DECLARE_READ16_MEMBER(mem16_r);
-	DECLARE_WRITE16_MEMBER(mem16_w);
-	DECLARE_READ16_MEMBER(io16_r);
-	DECLARE_WRITE16_MEMBER(io16_w);
+	uint16_t mem16_r(offs_t offset, uint16_t mem_mask = 0xffff);
+	void mem16_w(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t io16_r(offs_t offset, uint16_t mem_mask = 0xffff);
+	void io16_w(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	// byte-swapped versions of 16-bit accessors
-	DECLARE_READ16_MEMBER(mem16_swap_r);
-	DECLARE_WRITE16_MEMBER(mem16_swap_w);
-	DECLARE_READ16_MEMBER(io16_swap_r);
-	DECLARE_WRITE16_MEMBER(io16_swap_w);
+	uint16_t mem16_swap_r(offs_t offset, uint16_t mem_mask = 0xffff);
+	void mem16_swap_w(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t io16_swap_r(offs_t offset, uint16_t mem_mask = 0xffff);
+	void io16_swap_w(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	// device-level overrides

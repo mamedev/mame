@@ -17,8 +17,8 @@ DECLARE_DEVICE_TYPE(ATARI_136095_0072, atari_136095_0072_device)
 class atari_xga_device : public device_t
 {
 public:
-	virtual DECLARE_WRITE32_MEMBER(write) = 0;
-	virtual DECLARE_READ32_MEMBER(read) = 0;
+	virtual void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) = 0;
+	virtual uint32_t read(offs_t offset, uint32_t mem_mask = ~0) = 0;
 
 protected:
 	// construction/destruction
@@ -38,8 +38,8 @@ class atari_136094_0072_device : public atari_xga_device
 public:
 	atari_136094_0072_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE32_MEMBER(write) override;
-	virtual DECLARE_READ32_MEMBER(read) override;
+	virtual void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) override;
+	virtual uint32_t read(offs_t offset, uint32_t mem_mask = ~0) override;
 
 protected:
 	virtual void device_start() override;
@@ -60,9 +60,9 @@ private:
 		FPGA_DECIPHER
 	};
 
-	fpga_mode m_mode;
-	uint16_t m_address;    // last written address
-	uint16_t m_ciphertext; // last written ciphertext
+	fpga_mode m_mode{};
+	uint16_t m_address = 0;    // last written address
+	uint16_t m_ciphertext = 0; // last written ciphertext
 };
 
 class atari_136095_0072_device : public atari_xga_device
@@ -70,11 +70,11 @@ class atari_136095_0072_device : public atari_xga_device
 public:
 	atari_136095_0072_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE32_MEMBER(polylsb_write);
-	DECLARE_READ32_MEMBER(polylsb_read);
+	void polylsb_write(offs_t offset, uint32_t data);
+	uint32_t polylsb_read(offs_t offset, uint32_t mem_mask = ~0);
 
-	virtual DECLARE_WRITE32_MEMBER(write) override;
-	virtual DECLARE_READ32_MEMBER(read) override;
+	virtual void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0) override;
+	virtual uint32_t read(offs_t offset, uint32_t mem_mask = ~0) override;
 
 protected:
 	virtual void device_start() override;
@@ -98,13 +98,13 @@ private:
 
 	struct
 	{
-		uint16_t addr;
-		uint32_t data[64];
+		uint16_t addr = 0;
+		uint32_t data[64]{};
 	} m_update;
 
-	fpga_mode m_mode;
-	uint8_t m_poly_lsb;
-	uint16_t m_reply;
+	fpga_mode m_mode{};
+	uint8_t m_poly_lsb = 0;
+	uint16_t m_reply = 0;
 };
 
 

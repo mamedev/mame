@@ -40,6 +40,12 @@ public:
 
 	void videopin(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
 private:
 	enum
 	{
@@ -57,10 +63,6 @@ private:
 	TILEMAP_MAPPER_MEMBER(get_memory_offset);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void main_map(address_map &map);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -80,12 +82,12 @@ private:
 
 	attotime m_time_pushed;
 	attotime m_time_released;
-	uint8_t m_prev;
-	uint8_t m_mask;
-	int m_ball_x;
-	int m_ball_y;
-	tilemap_t* m_bg_tilemap;
-	emu_timer *m_interrupt_timer;
+	uint8_t m_prev = 0;
+	uint8_t m_mask = 0;
+	int m_ball_x = 0;
+	int m_ball_y = 0;
+	tilemap_t* m_bg_tilemap = nullptr;
+	emu_timer *m_interrupt_timer = nullptr;
 };
 
 /*----------- defined in audio/videopin.c -----------*/

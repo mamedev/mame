@@ -58,6 +58,8 @@ public:
 
 	void vblank_callback(screen_device &screen, bool state);
 
+	void set_xy_offset(int dx, int dy);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -85,6 +87,8 @@ private:
 	int32_t    m_rmrd_line;
 	uint8_t    m_irq_enabled;
 	uint8_t    m_romsubbank, m_scrollctrl;
+
+	int        m_dx, m_dy;
 
 	optional_region_ptr<uint8_t> m_char_rom;
 

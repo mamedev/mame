@@ -13,7 +13,6 @@
 
 #include "exp.h"
 #include "bus/pofo/ccm.h"
-#include "machine/nvram.h"
 
 
 
@@ -44,8 +43,8 @@ protected:
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override { }
-	virtual void nvram_read(emu_file &file) override { if (m_nvram != nullptr) { file.read(m_nvram, m_nvram.bytes()); } }
-	virtual void nvram_write(emu_file &file) override { if (m_nvram != nullptr) { file.write(m_nvram, m_nvram.bytes()); } }
+	virtual bool nvram_read(util::read_stream &file) override { size_t actual; return !file.read(m_nvram, 0x40000, actual) && actual == 0x40000; }
+	virtual bool nvram_write(util::write_stream &file) override { size_t actual; return !file.write(m_nvram, 0x40000, actual) && actual == 0x40000; }
 
 	// device_portfolio_expansion_slot_interface overrides
 	virtual bool nmd1() override { return m_ccm->cdet_r(); }
@@ -58,7 +57,7 @@ protected:
 private:
 	required_device<portfolio_memory_card_slot_device> m_ccm;
 	required_device<portfolio_expansion_slot_device> m_exp;
-	optional_shared_ptr<uint8_t> m_nvram;
+	memory_share_creator<uint8_t> m_nvram;
 	required_ioport m_io_sw1;
 
 	bool m_sw1;

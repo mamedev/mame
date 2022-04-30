@@ -24,7 +24,7 @@ void lviv_state::update_memory()
 {
 	uint8_t *ram = m_ram->pointer();
 
-	if (m_ppi_port_outputs[0][2] & 0x02)
+	if (BIT(m_ppi_port_outputs[0][2], 1))
 	{
 		m_bank[0]->set_base(ram);
 		m_bank[1]->set_base(ram + 0x4000);
@@ -41,17 +41,17 @@ INPUT_CHANGED_MEMBER(lviv_state::reset_button)
 	machine().schedule_soft_reset();
 }
 
-READ8_MEMBER(lviv_state::ppi_0_porta_r)
+uint8_t lviv_state::ppi0_porta_r()
 {
 	return 0xff;
 }
 
-READ8_MEMBER(lviv_state::ppi_0_portb_r)
+uint8_t lviv_state::ppi0_portb_r()
 {
 	return 0xff;
 }
 
-READ8_MEMBER(lviv_state::ppi_0_portc_r)
+uint8_t lviv_state::ppi0_portc_r()
 {
 	uint8_t data = m_ppi_port_outputs[0][2] & 0x0f;
 	if (m_cassette->input() > 0.038)
@@ -61,32 +61,32 @@ READ8_MEMBER(lviv_state::ppi_0_portc_r)
 	return data;
 }
 
-WRITE8_MEMBER(lviv_state::ppi_0_porta_w)
+void lviv_state::ppi0_porta_w(uint8_t data)
 {
 	m_ppi_port_outputs[0][0] = data;
 }
 
-WRITE8_MEMBER(lviv_state::ppi_0_portb_w)
+void lviv_state::ppi0_portb_w(uint8_t data)
 {
 	m_ppi_port_outputs[0][1] = data;
 	update_palette(data&0x7f);
 }
 
-WRITE8_MEMBER(lviv_state::ppi_0_portc_w)/* tape in/out, video memory on/off */
+void lviv_state::ppi0_portc_w(uint8_t data)/* tape in/out, video memory on/off */
 {
 	m_ppi_port_outputs[0][2] = data;
-	if (m_ppi_port_outputs[0][1]&0x80)
-		m_speaker->level_w(data & 0x01);
-	m_cassette->output((data & 0x01) ? -1.0 : 1.0);
+	if (BIT(m_ppi_port_outputs[0][1], 7))
+		m_speaker->level_w(BIT(data, 0));
+	m_cassette->output(BIT(data, 0) ? -1.0 : 1.0);
 	update_memory();
 }
 
-READ8_MEMBER(lviv_state::ppi_1_porta_r)
+uint8_t lviv_state::ppi1_porta_r()
 {
 	return 0xff;
 }
 
-READ8_MEMBER(lviv_state::ppi_1_portb_r)/* keyboard reading */
+uint8_t lviv_state::ppi1_portb_r()/* keyboard reading */
 {
 	return ((m_ppi_port_outputs[1][0] & 0x01) ? 0xff : m_key[0]->read()) &
 		   ((m_ppi_port_outputs[1][0] & 0x02) ? 0xff : m_key[1]->read()) &
@@ -98,7 +98,7 @@ READ8_MEMBER(lviv_state::ppi_1_portb_r)/* keyboard reading */
 		   ((m_ppi_port_outputs[1][0] & 0x80) ? 0xff : m_key[7]->read());
 }
 
-READ8_MEMBER(lviv_state::ppi_1_portc_r)/* keyboard reading */
+uint8_t lviv_state::ppi1_portc_r()/* keyboard reading */
 {
 	return ((m_ppi_port_outputs[1][2] & 0x01) ? 0xff : m_key[ 8]->read()) &
 		   ((m_ppi_port_outputs[1][2] & 0x02) ? 0xff : m_key[ 9]->read()) &
@@ -106,24 +106,24 @@ READ8_MEMBER(lviv_state::ppi_1_portc_r)/* keyboard reading */
 		   ((m_ppi_port_outputs[1][2] & 0x08) ? 0xff : m_key[11]->read());
 }
 
-WRITE8_MEMBER(lviv_state::ppi_1_porta_w)/* kayboard scaning */
+void lviv_state::ppi1_porta_w(uint8_t data)/* kayboard scanning */
 {
 	m_ppi_port_outputs[1][0] = data;
 }
 
-WRITE8_MEMBER(lviv_state::ppi_1_portb_w)
+void lviv_state::ppi1_portb_w(uint8_t data)
 {
 	m_ppi_port_outputs[1][1] = data;
 }
 
-WRITE8_MEMBER(lviv_state::ppi_1_portc_w)/* kayboard scaning */
+void lviv_state::ppi1_portc_w(uint8_t data)/* kayboard scanning */
 {
 	m_ppi_port_outputs[1][2] = data;
 }
 
 
 /* I/O */
-READ8_MEMBER(lviv_state::io_r)
+uint8_t lviv_state::io_r(offs_t offset)
 {
 	if (m_startup_mem_map)
 	{
@@ -131,7 +131,7 @@ READ8_MEMBER(lviv_state::io_r)
 	}
 	else
 	{
-		const uint8_t switch_val = (offset >> 4) & 0x3;
+		const uint8_t switch_val = BIT(offset, 4, 2);
 		switch (switch_val)
 		{
 		case 0:
@@ -147,7 +147,7 @@ READ8_MEMBER(lviv_state::io_r)
 	}
 }
 
-WRITE8_MEMBER(lviv_state::io_w)
+void lviv_state::io_w(offs_t offset, uint8_t data)
 {
 	address_space &cpuspace = m_maincpu->space(AS_PROGRAM);
 	if (m_startup_mem_map)
@@ -156,19 +156,19 @@ WRITE8_MEMBER(lviv_state::io_w)
 
 		m_startup_mem_map = 0;
 
-		cpuspace.install_write_bank(0x0000, 0x3fff, "bank1");
-		cpuspace.install_write_bank(0x4000, 0x7fff, "bank2");
-		cpuspace.install_write_bank(0x8000, 0xbfff, "bank3");
+		cpuspace.install_write_bank(0x0000, 0x3fff, m_bank[0]);
+		cpuspace.install_write_bank(0x4000, 0x7fff, m_bank[1]);
+		cpuspace.install_write_bank(0x8000, 0xbfff, m_bank[2]);
 		cpuspace.unmap_write(0xC000, 0xffff);
 
 		m_bank[0]->set_base(ram);
 		m_bank[1]->set_base(ram + 0x4000);
 		m_bank[2]->set_base(ram + 0x8000);
-		m_bank[3]->set_base(m_maincpu_region->base() + 0x010000);
+		m_bank[3]->set_base(m_maincpu_region->base());
 	}
 	else
 	{
-		const uint8_t switch_val = (offset >> 4) & 0x3;
+		const uint8_t switch_val = BIT(offset, 4, 2);
 		switch (switch_val)
 		{
 		case 0:
@@ -189,7 +189,7 @@ void lviv_state::machine_reset()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	m_video_ram = m_ram->pointer() + 0xc000;
+	m_vram = m_ram->pointer() + 0xc000;
 
 	m_startup_mem_map = 1;
 
@@ -199,14 +199,18 @@ void lviv_state::machine_reset()
 	space.unmap_write(0xC000, 0xffff);
 
 	uint8_t *mem = m_maincpu_region->base();
-	m_bank[0]->set_base(mem + 0x010000);
-	m_bank[1]->set_base(mem + 0x010000);
-	m_bank[2]->set_base(mem + 0x010000);
-	m_bank[3]->set_base(mem + 0x010000);
-
-	/*memset(m_ram->pointer(), 0, sizeof(unsigned char)*0xffff);*/
+	m_bank[0]->set_base(mem);
+	m_bank[1]->set_base(mem);
+	m_bank[2]->set_base(mem);
+	m_bank[3]->set_base(mem);
 }
 
+void lviv_state::machine_start()
+{
+	save_item(NAME(m_colortable));
+	save_item(NAME(m_ppi_port_outputs));
+	save_item(NAME(m_startup_mem_map));
+}
 
 /*******************************************************************************
 Lviv snapshot files (SAV)
@@ -293,7 +297,7 @@ SNAPSHOT_LOAD_MEMBER(lviv_state::snapshot_cb)
 
 	image.fread(&snapshot_data[0], LVIV_SNAPSHOT_SIZE);
 
-	if (verify_snapshot(&snapshot_data[0], snapshot_size) != image_verify_result::PASS)
+	if (verify_snapshot(&snapshot_data[0], image.length()) != image_verify_result::PASS)
 	{
 		return image_init_result::FAIL;
 	}

@@ -82,9 +82,9 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	int m_test_x;
-	int m_test_y;
-	int m_start_offs;
+	int m_test_x = 0;
+	int m_test_y = 0;
+	int m_start_offs = 0;
 
 	void itgambl2_palette(palette_device &palette) const;
 	uint32_t screen_update_itgambl2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -145,7 +145,7 @@ uint32_t itgambl2_state::screen_update_itgambl2(screen_device &screen, bitmap_rg
 			uint32_t const color = (blit_ram[count] & 0xff) >> 0;
 
 			if(cliprect.contains(x, y))
-				bitmap.pix32(y, x) = m_palette->pen(color);
+				bitmap.pix(y, x) = m_palette->pen(color);
 
 			count++;
 		}

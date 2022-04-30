@@ -108,19 +108,19 @@ private:
 	INTERRUPT_GEN_MEMBER(interrupt);
 
 
-	DECLARE_WRITE8_MEMBER(porta_dir_w);
-	DECLARE_WRITE8_MEMBER(portb_dir_w);
-	DECLARE_WRITE8_MEMBER(portc_dir_w);
+	void porta_dir_w(uint8_t data);
+	void portb_dir_w(uint8_t data);
+	void portc_dir_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(porta_dat_w);
-	DECLARE_WRITE8_MEMBER(portb_dat_w);
-	DECLARE_WRITE8_MEMBER(portc_dat_w);
+	void porta_dat_w(uint8_t data);
+	void portb_dat_w(uint8_t data);
+	void portc_dat_w(uint8_t data);
 
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 
 	// for callback
-	DECLARE_READ8_MEMBER(read_full_space);
+	uint8_t read_full_space(offs_t offset);
 
 	void bank_map(address_map &map);
 	void radica_eu3a14_map(address_map &map);
@@ -166,39 +166,39 @@ uint32_t elan_eu3a14_state::screen_update(screen_device& screen, bitmap_ind16& b
 }
 
 // sound callback
-READ8_MEMBER(elan_eu3a14_state::read_full_space)
+uint8_t elan_eu3a14_state::read_full_space(offs_t offset)
 {
 	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
 	return fullbankspace.read_byte(offset);
 }
 
-WRITE8_MEMBER(elan_eu3a14_state::porta_dir_w)
+void elan_eu3a14_state::porta_dir_w(uint8_t data)
 {
 	m_portdir[0] = data;
 	// update state
 }
 
-WRITE8_MEMBER(elan_eu3a14_state::portb_dir_w)
+void elan_eu3a14_state::portb_dir_w(uint8_t data)
 {
 	m_portdir[1] = data;
 	// update state
 }
 
-WRITE8_MEMBER(elan_eu3a14_state::portc_dir_w)
+void elan_eu3a14_state::portc_dir_w(uint8_t data)
 {
 	m_portdir[2] = data;
 	// update state
 }
 
-WRITE8_MEMBER(elan_eu3a14_state::porta_dat_w)
+void elan_eu3a14_state::porta_dat_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER(elan_eu3a14_state::portb_dat_w)
+void elan_eu3a14_state::portb_dat_w(uint8_t data)
 {
 }
 
-WRITE8_MEMBER(elan_eu3a14_state::portc_dat_w)
+void elan_eu3a14_state::portc_dat_w(uint8_t data)
 {
 }
 
@@ -726,24 +726,12 @@ static const gfx_layout helper8x8x8_layout =
 	8 * 8 * 8
 };
 
-static const gfx_layout helper8x8x4_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,8*4)  },
-	8 * 8 * 4
-};
-
-
 static GFXDECODE_START( gfx_helper )
 	// dummy standard decodes to see background tiles, not used for drawing
 	GFXDECODE_ENTRY( "maincpu", 0, helper16x16x8_layout,  0x0, 2  )
 	GFXDECODE_ENTRY( "maincpu", 0, helper16x16x4_layout,  0x0, 32  )
 	GFXDECODE_ENTRY( "maincpu", 0, helper8x8x8_layout,    0x0, 2  )
-	GFXDECODE_ENTRY( "maincpu", 0, helper8x8x4_layout,    0x0, 32  )
+	GFXDECODE_ENTRY( "maincpu", 0, gfx_8x8x4_packed_msb,  0x0, 32  )
 GFXDECODE_END
 
 

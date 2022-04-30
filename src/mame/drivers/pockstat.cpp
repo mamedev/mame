@@ -4,7 +4,7 @@
 
     Sony PocketStation
 
-    PocketStation games were dowloaded from PS1 games into flash RAM after
+    PocketStation games were downloaded from PS1 games into flash RAM after
     the unit had been inserted in the memory card slot, and so this should
     be emulated alongside the PS1.  However, as many flash dumps exist, it
     is possible to emulate the PocketStation in the meantime.
@@ -36,7 +36,6 @@
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -56,6 +55,9 @@
 #define VERBOSE     (0)
 #include "logmacro.h"
 
+
+namespace {
+
 class pockstat_state : public driver_device
 {
 public:
@@ -70,10 +72,11 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(input_update);
 
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+private:
 	void mem_map(address_map &map);
 
 	uint32_t screen_update_pockstat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -86,7 +89,7 @@ private:
 	required_shared_ptr<uint32_t> m_lcd_buffer;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
-	memory_region *m_cart_rom;
+	memory_region *m_cart_rom = nullptr;
 
 	static constexpr uint32_t TIMER_COUNT = 3;
 
@@ -118,67 +121,67 @@ private:
 
 	struct ftlb_regs_t
 	{
-		uint32_t control;
-		uint32_t stat;
-		uint32_t valid;
-		uint32_t wait1;
-		uint32_t wait2;
-		uint32_t entry[16];
-		uint32_t serial;
+		uint32_t control = 0;
+		uint32_t stat = 0;
+		uint32_t valid = 0;
+		uint32_t wait1 = 0;
+		uint32_t wait2 = 0;
+		uint32_t entry[16]{};
+		uint32_t serial = 0;
 	} m_ftlb_regs;
 
 	struct intc_regs_t
 	{
-		uint32_t hold;
-		uint32_t status;
-		uint32_t enable;
-		uint32_t mask;
+		uint32_t hold = 0;
+		uint32_t status = 0;
+		uint32_t enable = 0;
+		uint32_t mask = 0;
 	} m_intc_regs;
 
 	struct timer_t
 	{
-		uint32_t period;
-		uint32_t count;
-		uint32_t control;
-		emu_timer *timer;
+		uint32_t period = 0;
+		uint32_t count = 0;
+		uint32_t control = 0;
+		emu_timer *timer = nullptr;
 	} m_timers[TIMER_COUNT];
 
 	struct clock_regs_t
 	{
-		uint32_t mode;
-		uint32_t control;
+		uint32_t mode = 0;
+		uint32_t control = 0;
 	} m_clock_regs;
 
 	struct rtc_regs_t
 	{
-		uint32_t mode;
-		uint32_t control;
-		uint32_t time;
-		uint32_t date;
-		emu_timer *timer;
+		uint32_t mode = 0;
+		uint32_t control = 0;
+		uint32_t time = 0;
+		uint32_t date = 0;
+		emu_timer *timer = nullptr;
 	} m_rtc_regs;
 
-	uint32_t m_lcd_control;
-	int32_t m_flash_write_enable_count;
-	int32_t m_flash_write_count;
+	uint32_t m_lcd_control = 0;
+	int32_t m_flash_write_enable_count = 0;
+	int32_t m_flash_write_count = 0;
 
-	DECLARE_READ32_MEMBER(ftlb_r);
-	DECLARE_WRITE32_MEMBER(ftlb_w);
-	DECLARE_READ32_MEMBER(intc_r);
-	DECLARE_WRITE32_MEMBER(intc_w);
-	DECLARE_READ32_MEMBER(timer_r);
-	DECLARE_WRITE32_MEMBER(timer_w);
-	DECLARE_READ32_MEMBER(clock_r);
-	DECLARE_WRITE32_MEMBER(clock_w);
-	DECLARE_READ32_MEMBER(rtc_r);
-	DECLARE_WRITE32_MEMBER(rtc_w);
-	DECLARE_READ32_MEMBER(lcd_r);
-	DECLARE_WRITE32_MEMBER(lcd_w);
-	DECLARE_READ32_MEMBER(rombank_r);
-	DECLARE_READ32_MEMBER(flash_r);
-	DECLARE_WRITE32_MEMBER(flash_w);
-	DECLARE_READ32_MEMBER(audio_r);
-	DECLARE_WRITE32_MEMBER(audio_w);
+	uint32_t ftlb_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ftlb_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t intc_r(offs_t offset, uint32_t mem_mask = ~0);
+	void intc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t timer_r(offs_t offset, uint32_t mem_mask = ~0);
+	void timer_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t clock_r(offs_t offset, uint32_t mem_mask = ~0);
+	void clock_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t rtc_r(offs_t offset, uint32_t mem_mask = ~0);
+	void rtc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t lcd_r(offs_t offset, uint32_t mem_mask = ~0);
+	void lcd_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t rombank_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t flash_r(offs_t offset, uint32_t mem_mask = ~0);
+	void flash_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t audio_r(offs_t offset, uint32_t mem_mask = ~0);
+	void audio_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	TIMER_CALLBACK_MEMBER(timer_tick);
 	TIMER_CALLBACK_MEMBER(rtc_tick);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(flash_load);
@@ -206,7 +209,7 @@ const int pockstat_state::CPU_FREQ[16] =
 	0x7a0000
 };
 
-READ32_MEMBER(pockstat_state::ftlb_r)
+uint32_t pockstat_state::ftlb_r(offs_t offset, uint32_t mem_mask)
 {
 	switch(offset)
 	{
@@ -254,7 +257,7 @@ READ32_MEMBER(pockstat_state::ftlb_r)
 	return 0;
 }
 
-WRITE32_MEMBER(pockstat_state::ftlb_w)
+void pockstat_state::ftlb_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch(offset)
 	{
@@ -351,7 +354,7 @@ void pockstat_state::set_interrupt_line(uint32_t line, int state)
 	}
 }
 
-READ32_MEMBER(pockstat_state::intc_r)
+uint32_t pockstat_state::intc_r(offs_t offset, uint32_t mem_mask)
 {
 	switch(offset)
 	{
@@ -377,7 +380,7 @@ READ32_MEMBER(pockstat_state::intc_r)
 	return 0;
 }
 
-WRITE32_MEMBER(pockstat_state::intc_w)
+void pockstat_state::intc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch(offset)
 	{
@@ -444,7 +447,7 @@ void pockstat_state::timer_start(int index)
 	m_timers[index].timer->adjust(period, index);
 }
 
-READ32_MEMBER(pockstat_state::timer_r)
+uint32_t pockstat_state::timer_r(offs_t offset, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -488,7 +491,7 @@ READ32_MEMBER(pockstat_state::timer_r)
 	return 0;
 }
 
-WRITE32_MEMBER(pockstat_state::timer_w)
+void pockstat_state::timer_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -533,7 +536,7 @@ WRITE32_MEMBER(pockstat_state::timer_w)
 	}
 }
 
-READ32_MEMBER(pockstat_state::clock_r)
+uint32_t pockstat_state::clock_r(offs_t offset, uint32_t mem_mask)
 {
 	switch(offset)
 	{
@@ -550,7 +553,7 @@ READ32_MEMBER(pockstat_state::clock_r)
 	return 0;
 }
 
-WRITE32_MEMBER(pockstat_state::clock_w)
+void pockstat_state::clock_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch(offset)
 	{
@@ -614,7 +617,7 @@ TIMER_CALLBACK_MEMBER(pockstat_state::rtc_tick)
 	m_rtc_regs.timer->adjust(attotime::from_hz(1));
 }
 
-READ32_MEMBER(pockstat_state::rtc_r)
+uint32_t pockstat_state::rtc_r(offs_t offset, uint32_t mem_mask)
 {
 	switch(offset)
 	{
@@ -637,7 +640,7 @@ READ32_MEMBER(pockstat_state::rtc_r)
 	return 0;
 }
 
-WRITE32_MEMBER(pockstat_state::rtc_w)
+void pockstat_state::rtc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -749,7 +752,7 @@ WRITE32_MEMBER(pockstat_state::rtc_w)
 }
 
 
-READ32_MEMBER(pockstat_state::lcd_r)
+uint32_t pockstat_state::lcd_r(offs_t offset, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -763,7 +766,7 @@ READ32_MEMBER(pockstat_state::lcd_r)
 	return 0;
 }
 
-WRITE32_MEMBER(pockstat_state::lcd_w)
+void pockstat_state::lcd_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -788,7 +791,7 @@ INPUT_CHANGED_MEMBER(pockstat_state::input_update)
 	set_interrupt_line(INT_BTN_UP,     (buttons & 16) ? 1 : 0);
 }
 
-READ32_MEMBER(pockstat_state::rombank_r)
+uint32_t pockstat_state::rombank_r(offs_t offset, uint32_t mem_mask)
 {
 	int32_t bank = (offset >> 11) & 0x0f;
 	for (int index = 0; index < 32; index++)
@@ -806,7 +809,7 @@ READ32_MEMBER(pockstat_state::rombank_r)
 
 
 // Horrible hack, probably wrong
-WRITE32_MEMBER(pockstat_state::flash_w)
+void pockstat_state::flash_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset == (0x55a8/4))
 	{
@@ -831,18 +834,18 @@ WRITE32_MEMBER(pockstat_state::flash_w)
 	}
 }
 
-READ32_MEMBER(pockstat_state::flash_r)
+uint32_t pockstat_state::flash_r(offs_t offset, uint32_t mem_mask)
 {
 	return m_cart->read32_rom(offset, mem_mask);
 }
 
-READ32_MEMBER(pockstat_state::audio_r)
+uint32_t pockstat_state::audio_r(offs_t offset, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_AUDIO | LOG_UNKNOWN, "%s: Unknown Audio Read: %08x = %08x & %08x\n", machine().describe_context(), 0xd800000 + (offset << 2), 0x10, mem_mask);
 	return 0;
 }
 
-WRITE32_MEMBER(pockstat_state::audio_w)
+void pockstat_state::audio_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_AUDIO | LOG_UNKNOWN, "%s: Unknown Audio Write: %08x = %08x & %08x\n", machine().describe_context(), 0xd800000 + (offset << 2), data, mem_mask);
 }
@@ -881,6 +884,7 @@ void pockstat_state::machine_start()
 	{
 		m_timers[index].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pockstat_state::timer_tick), this));
 		m_timers[index].timer->adjust(attotime::never, index);
+		m_timers[index].count = 0;
 	}
 
 	m_rtc_regs.time = 0x01000000;
@@ -940,7 +944,7 @@ uint32_t pockstat_state::screen_update_pockstat(screen_device &screen, bitmap_rg
 {
 	for (int y = 0; y < 32; y++)
 	{
-		uint32_t *scanline = &bitmap.pix32(y);
+		uint32_t *const scanline = &bitmap.pix(y);
 		for (int x = 0; x < 32; x++)
 		{
 			if (m_lcd_control != 0) // Hack
@@ -1000,9 +1004,6 @@ void pockstat_state::pockstat(machine_config &config)
 
 	SPEAKER(config, "speaker").front_center();
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "pockstat_cart", "gme");
@@ -1016,6 +1017,9 @@ ROM_START( pockstat )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "kernel.bin", 0x0000, 0x4000, CRC(5fb47dd8) SHA1(6ae880493ddde880827d1e9f08e9cb2c38f9f2ec) )
 ROM_END
+
+} // Anonymous namespace
+
 
 /* Driver */
 

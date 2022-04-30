@@ -84,14 +84,14 @@ void gottlieb_state::laserdisc_video_control_w(u8 data)
  *
  *************************************/
 
-WRITE8_MEMBER(gottlieb_state::videoram_w)
+void gottlieb_state::videoram_w(offs_t offset, u8 data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(gottlieb_state::charram_w)
+void gottlieb_state::charram_w(offs_t offset, u8 data)
 {
 	if (m_charram[offset] != data)
 	{
@@ -111,18 +111,18 @@ TILE_GET_INFO_MEMBER(gottlieb_state::get_bg_tile_info)
 {
 	int code = m_videoram[tile_index];
 	if ((code & 0x80) == 0)
-		SET_TILE_INFO_MEMBER(m_gfxcharlo, code, 0, 0);
+		tileinfo.set(m_gfxcharlo, code, 0, 0);
 	else
-		SET_TILE_INFO_MEMBER(m_gfxcharhi, code, 0, 0);
+		tileinfo.set(m_gfxcharhi, code, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(gottlieb_state::get_screwloo_bg_tile_info)
 {
 	int code = m_videoram[tile_index];
 	if ((code & 0xc0) == 0)
-		SET_TILE_INFO_MEMBER(m_gfxcharlo, code, 0, 0);
+		tileinfo.set(m_gfxcharlo, code, 0, 0);
 	else
-		SET_TILE_INFO_MEMBER(m_gfxcharhi, code, 0, 0);
+		tileinfo.set(m_gfxcharhi, code, 0, 0);
 }
 
 

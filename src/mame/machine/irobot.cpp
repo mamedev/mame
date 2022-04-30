@@ -29,7 +29,7 @@
 			"%s, scanline: %d\n", machine().describe_context(), m_screen->vpos())
 
 
-READ8_MEMBER(irobot_state::irobot_sharedmem_r)
+uint8_t irobot_state::irobot_sharedmem_r(offs_t offset)
 {
 	if (m_outx == 3)
 		return m_mbRAM[BYTE_XOR_BE(offset)];
@@ -47,7 +47,7 @@ READ8_MEMBER(irobot_state::irobot_sharedmem_r)
 }
 
 /* Comment out the mbRAM =, comRAM2 = or comRAM1 = and it will start working */
-WRITE8_MEMBER(irobot_state::irobot_sharedmem_w)
+void irobot_state::irobot_sharedmem_w(offs_t offset, uint8_t data)
 {
 	if (m_outx == 3)
 		m_mbRAM[BYTE_XOR_BE(offset)] = data;
@@ -62,7 +62,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(irobot_state::irobot_irvg_done_callback)
 	m_irvg_running = 0;
 }
 
-WRITE8_MEMBER(irobot_state::irobot_statwr_w)
+void irobot_state::irobot_statwr_w(uint8_t data)
 {
 	logerror("write %2x ", data);
 	IR_CPU_STATE();
@@ -96,7 +96,7 @@ WRITE8_MEMBER(irobot_state::irobot_statwr_w)
 	m_statwr = data;
 }
 
-WRITE8_MEMBER(irobot_state::irobot_out0_w)
+void irobot_state::irobot_out0_w(uint8_t data)
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 
@@ -118,7 +118,7 @@ WRITE8_MEMBER(irobot_state::irobot_out0_w)
 	m_alphamap = (data & 0x80);
 }
 
-WRITE8_MEMBER(irobot_state::irobot_rom_banksel_w)
+void irobot_state::irobot_rom_banksel_w(uint8_t data)
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 
@@ -188,16 +188,15 @@ void irobot_state::machine_reset()
 	m_irvg_running = 0;
 	m_irmb_running = 0;
 
-	address_space &space = machine().dummy_space();
-	irobot_rom_banksel_w(space, 0, 0);
-	irobot_out0_w(space, 0, 0);
-	irobot_statwr_w(space, 0, 0);
+	irobot_rom_banksel_w(0);
+	irobot_out0_w(0);
+	irobot_statwr_w(0);
 	m_outx = 0;
 }
 
 /*  we allow irmb_running and irvg_running to appear running before clearing
     them to simulate the mathbox and vector generator running in real time */
-READ8_MEMBER(irobot_state::irobot_status_r)
+uint8_t irobot_state::irobot_status_r()
 {
 	int d=0;
 

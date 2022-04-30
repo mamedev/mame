@@ -19,8 +19,8 @@ class isa8_pds_device :
 public:
 	isa8_pds_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(ppi_r);
-	DECLARE_WRITE8_MEMBER(ppi_w);
+	uint8_t ppi_r(offs_t offset);
+	void ppi_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides

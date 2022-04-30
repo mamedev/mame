@@ -49,7 +49,7 @@ private:
 	required_device<amd_29f040_device> m_flash_roml;
 	required_device<amd_29f040_device> m_flash_romh;
 	required_ioport m_jp1;
-	optional_shared_ptr<uint8_t> m_ram;
+	memory_share_creator<uint8_t> m_ram;
 
 	uint8_t m_bank;
 	uint8_t m_mode;

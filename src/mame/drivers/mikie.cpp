@@ -66,7 +66,7 @@ Stephh's notes (based on the games M6809 code and some tests) :
  *
  *************************************/
 
-READ8_MEMBER(mikie_state::mikie_sh_timer_r)
+uint8_t mikie_state::mikie_sh_timer_r()
 {
 	int clock = m_audiocpu->total_cycles() / MIKIE_TIMER_RATE;
 

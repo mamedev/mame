@@ -55,12 +55,12 @@ public:
 private:
 	void update_fdc_int();
 
-	DECLARE_READ16_MEMBER(rom_r);
+	uint16_t rom_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER( br1_w );
 	DECLARE_WRITE_LINE_MEMBER( br2_w );
-	DECLARE_WRITE8_MEMBER( ppi0_pc_w );
-	DECLARE_READ8_MEMBER( ppi1_pb_r );
-	DECLARE_WRITE8_MEMBER( ppi1_pc_w );
+	void ppi0_pc_w(uint8_t data);
+	uint8_t ppi1_pb_r();
+	void ppi1_pc_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
 
@@ -89,12 +89,12 @@ private:
 	required_device<ieee488_device> m_ieee488;
 
 	// floppy state
-	int m_fdc_int;
-	int m_fdie;
+	int m_fdc_int = 0;
+	int m_fdie = 0;
 
-	int m_centronics_busy;
-	int m_centronics_perror;
-	int m_centronics_select;
-	int m_centronics_fault;
+	int m_centronics_busy = 0;
+	int m_centronics_perror = 0;
+	int m_centronics_select = 0;
+	int m_centronics_fault = 0;
 	output_finder<> m_led;
 };

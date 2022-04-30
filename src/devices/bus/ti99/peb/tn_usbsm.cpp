@@ -48,9 +48,9 @@
 #include "logmacro.h"
 
 
-DEFINE_DEVICE_TYPE_NS(TI99_USBSM, bus::ti99::peb, nouspikel_usb_smartmedia_device, "ti99_usbsm", "Nouspikel USB/Smartmedia card")
+DEFINE_DEVICE_TYPE(TI99_USBSM, bus::ti99::peb::nouspikel_usb_smartmedia_device, "ti99_usbsm", "Nouspikel USB/Smartmedia card")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 #define STRATA_TAG "strata"
 
@@ -88,7 +88,7 @@ nouspikel_usb_smartmedia_device::nouspikel_usb_smartmedia_device(const machine_c
 /*
     CRU read
 */
-READ8Z_MEMBER(nouspikel_usb_smartmedia_device::crureadz)
+void nouspikel_usb_smartmedia_device::crureadz(offs_t offset, uint8_t *value)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{
@@ -188,7 +188,7 @@ void nouspikel_usb_smartmedia_device::cruwrite(offs_t offset, uint8_t data)
     Memory read
     TODO: Check whether AMA/B/C is actually checked
 */
-READ8Z_MEMBER(nouspikel_usb_smartmedia_device::readz)
+void nouspikel_usb_smartmedia_device::readz(offs_t offset, uint8_t *value)
 {
 	if (machine().side_effects_disabled()) return;
 
@@ -367,4 +367,5 @@ ioport_constructor nouspikel_usb_smartmedia_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(tn_usbsm);
 }
-} } } // end namespace bus::ti99::peb
+
+} // end namespace bus::ti99::peb

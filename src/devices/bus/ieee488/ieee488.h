@@ -15,6 +15,7 @@
 void cbm_ieee488_devices(device_slot_interface &device);
 void hp_ieee488_devices(device_slot_interface &device);
 void remote488_devices(device_slot_interface &device);
+void grid_ieee488_devices(device_slot_interface &device);
 
 DECLARE_DEVICE_TYPE(IEEE488,      ieee488_device)
 DECLARE_DEVICE_TYPE(IEEE488_SLOT, ieee488_slot_device)
@@ -60,8 +61,7 @@ public:
 	void add_device(ieee488_slot_device *slot, device_t *target);
 
 	// reads for both host and peripherals
-	uint8_t read_dio() { return get_data(); }
-	DECLARE_READ8_MEMBER( dio_r ) { return get_data(); }
+	uint8_t dio_r() { return get_data(); }
 	DECLARE_READ_LINE_MEMBER( eoi_r ) { return get_signal(EOI); }
 	DECLARE_READ_LINE_MEMBER( dav_r ) { return get_signal(DAV); }
 	DECLARE_READ_LINE_MEMBER( nrfd_r ) { return get_signal(NRFD); }
@@ -72,8 +72,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( ren_r ) { return get_signal(REN); }
 
 	// writes for host (driver_device)
-	void write_dio(uint8_t data) { set_data(this, data); }
-	DECLARE_WRITE8_MEMBER( host_dio_w ) { set_data(this, data); }
+	void host_dio_w(uint8_t data) { set_data(this, data); }
 	DECLARE_WRITE_LINE_MEMBER( host_eoi_w ) { set_signal(this, EOI, state); }
 	DECLARE_WRITE_LINE_MEMBER( host_dav_w ) { set_signal(this, DAV, state); }
 	DECLARE_WRITE_LINE_MEMBER( host_nrfd_w ) { set_signal(this, NRFD, state); }

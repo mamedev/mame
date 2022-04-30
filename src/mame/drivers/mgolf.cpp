@@ -32,11 +32,11 @@ public:
 	void mgolf(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(wram_r);
-	DECLARE_READ8_MEMBER(dial_r);
-	DECLARE_READ8_MEMBER(misc_r);
-	DECLARE_WRITE8_MEMBER(wram_w);
+	void vram_w(offs_t offset, uint8_t data);
+	uint8_t wram_r(offs_t offset);
+	uint8_t dial_r();
+	uint8_t misc_r();
+	void wram_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
@@ -52,7 +52,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	void cpu_map(address_map &map);
 
 	/* devices */
@@ -65,14 +65,14 @@ private:
 	required_shared_ptr<uint8_t> m_video_ram;
 
 	/* video-related */
-	tilemap_t* m_bg_tilemap;
+	tilemap_t* m_bg_tilemap = nullptr;
 
 	/* misc */
-	uint8_t m_prev;
-	uint8_t m_mask;
+	uint8_t m_prev = 0;
+	uint8_t m_mask = 0;
 	attotime m_time_pushed;
 	attotime m_time_released;
-	emu_timer *m_interrupt_timer;
+	emu_timer *m_interrupt_timer = nullptr;
 };
 
 
@@ -80,11 +80,11 @@ TILE_GET_INFO_MEMBER(mgolf_state::get_tile_info)
 {
 	uint8_t code = m_video_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code, code >> 7, 0);
+	tileinfo.set(0, code, code >> 7, 0);
 }
 
 
-WRITE8_MEMBER(mgolf_state::vram_w)
+void mgolf_state::vram_w(offs_t offset, uint8_t data)
 {
 	m_video_ram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -146,12 +146,12 @@ void mgolf_state::update_plunger(  )
 }
 
 
-void mgolf_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mgolf_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_INTERRUPT:
-		interrupt_callback(ptr, param);
+		interrupt_callback(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in mgolf_state::device_timer");
@@ -182,13 +182,13 @@ double mgolf_state::calc_plunger_pos()
 }
 
 
-READ8_MEMBER(mgolf_state::wram_r)
+uint8_t mgolf_state::wram_r(offs_t offset)
 {
 	return m_video_ram[0x380 + offset];
 }
 
 
-READ8_MEMBER(mgolf_state::dial_r)
+uint8_t mgolf_state::dial_r()
 {
 	uint8_t val = ioport("41")->read();
 
@@ -205,7 +205,7 @@ READ8_MEMBER(mgolf_state::dial_r)
 }
 
 
-READ8_MEMBER(mgolf_state::misc_r)
+uint8_t mgolf_state::misc_r()
 {
 	double plunger = calc_plunger_pos(); /* see Video Pinball */
 
@@ -224,7 +224,7 @@ READ8_MEMBER(mgolf_state::misc_r)
 }
 
 
-WRITE8_MEMBER(mgolf_state::wram_w)
+void mgolf_state::wram_w(offs_t offset, uint8_t data)
 {
 	m_video_ram[0x380 + offset] = data;
 }
@@ -409,4 +409,4 @@ ROM_START( mgolf )
 ROM_END
 
 
-GAME( 1978, mgolf, 0, mgolf, mgolf, mgolf_state, empty_init, ROT270, "Atari", "Atari Mini Golf (prototype)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1978, mgolf, 0, mgolf, mgolf, mgolf_state, empty_init, ROT270, "Atari", "Mini Golf (Atari, prototype)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

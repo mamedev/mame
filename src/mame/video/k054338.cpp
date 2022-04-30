@@ -110,7 +110,7 @@ void k054338_device::fill_backcolor(bitmap_rgb32 &bitmap, const rectangle &clipr
 	}
 	else
 	{
-		uint32_t *dst_ptr = &bitmap.pix32(cliprect.min_y);
+		uint32_t *dst_ptr = &bitmap.pix(cliprect.min_y);
 		int dst_pitch = bitmap.rowpixels();
 
 		if ((mode & 0x01) == 0) // vertical gradient fill

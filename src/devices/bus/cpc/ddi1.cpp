@@ -6,7 +6,7 @@
 
 #include "emu.h"
 #include "ddi1.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 void cpc_exp_cards(device_slot_interface &device);
 
@@ -43,7 +43,7 @@ const tiny_rom_entry *cpc_ddi1_device::device_rom_region() const
 void cpc_ddi1_device::device_add_mconfig(machine_config &config)
 {
 	UPD765A(config, m_fdc, DERIVED_CLOCK(1, 1), true, true); // pin 50 clock multiplied to 8 MHz, then divided back down through SMC FDC9229BT
-	FLOPPY_CONNECTOR(config, m_connector, ddi1_floppies, "3ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_connector, ddi1_floppies, "3ssdd", floppy_image_device::default_mfm_floppy_formats);
 	SOFTWARE_LIST(config, "flop_list").set_original("cpc_flop");
 
 	// pass-through
@@ -75,9 +75,9 @@ void cpc_ddi1_device::device_start()
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 	address_space &space = m_slot->cpu().space(AS_IO);
 
-	space.install_write_handler(0xfa7e,0xfa7f, write8_delegate(*this, FUNC(cpc_ddi1_device::motor_w)));
-	space.install_readwrite_handler(0xfb7e,0xfb7f, read8_delegate(*this, FUNC(cpc_ddi1_device::fdc_r)), write8_delegate(*this, FUNC(cpc_ddi1_device::fdc_w)));
-	space.install_write_handler(0xdf00,0xdfff, write8_delegate(*this, FUNC(cpc_ddi1_device::rombank_w)));
+	space.install_write_handler(0xfa7e,0xfa7f, write8sm_delegate(*this, FUNC(cpc_ddi1_device::motor_w)));
+	space.install_readwrite_handler(0xfb7e,0xfb7f, read8sm_delegate(*this, FUNC(cpc_ddi1_device::fdc_r)), write8sm_delegate(*this, FUNC(cpc_ddi1_device::fdc_w)));
+	space.install_write_handler(0xdf00,0xdfff, write8smo_delegate(*this, FUNC(cpc_ddi1_device::rombank_w)));
 }
 
 //-------------------------------------------------
@@ -89,7 +89,7 @@ void cpc_ddi1_device::device_reset()
 	m_rom_active = false;
 }
 
-WRITE8_MEMBER(cpc_ddi1_device::motor_w)
+void cpc_ddi1_device::motor_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -111,7 +111,7 @@ WRITE8_MEMBER(cpc_ddi1_device::motor_w)
 	}
 }
 
-WRITE8_MEMBER(cpc_ddi1_device::fdc_w)
+void cpc_ddi1_device::fdc_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -121,7 +121,7 @@ WRITE8_MEMBER(cpc_ddi1_device::fdc_w)
 	}
 }
 
-READ8_MEMBER(cpc_ddi1_device::fdc_r)
+uint8_t cpc_ddi1_device::fdc_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -137,13 +137,13 @@ READ8_MEMBER(cpc_ddi1_device::fdc_r)
 	return data;
 }
 
-WRITE8_MEMBER(cpc_ddi1_device::rombank_w)
+void cpc_ddi1_device::rombank_w(uint8_t data)
 {
 	if(data == 0x07)
 		m_rom_active = true;
 	else
 		m_rom_active = false;
-	m_slot->rom_select(space,0,data);
+	m_slot->rom_select(data);
 }
 
 void cpc_ddi1_device::set_mapping(uint8_t type)

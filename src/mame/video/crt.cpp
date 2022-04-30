@@ -134,19 +134,16 @@ void crt_device::eof()
 //
 void crt_device::update(bitmap_ind16 &bitmap)
 {
-	int i, p_i;
-	int y;
-
 	//if (m_decay_counter)
 	{
 		/* some time has elapsed: let's update the screen */
-		for (y=0; y<m_window_height; y++)
+		for (int y=0; y<m_window_height; y++)
 		{
-			uint16_t *line = &bitmap.pix16(y+m_window_offset_y);
+			uint16_t *const line = &bitmap.pix(y+m_window_offset_y);
 
-			p_i = -1;
+			int p_i = -1;
 
-			for (i=m_list_head[y]; (i != -1); i=m_list[i].next)
+			for (int i=m_list_head[y]; (i != -1); i=m_list[i].next)
 			{
 				crt_point *node = &m_list[i];
 				int x = (i % m_window_width) + m_window_offset_x;

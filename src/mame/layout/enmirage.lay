@@ -1,0 +1,210 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+copyright-holders:tim lindner
+-->
+
+<mamelayout version="2">
+
+	<!-- Backgrounds -->
+	<element name="background"><rect><color red="0.243" green="0.203" blue="0.164" /></rect></element>
+	<element name="lcd_background"><rect><color red="0.360" green="0.274" blue="0.180" /></rect></element>
+
+	<!-- Labels -->
+	<element name="label_1"> <text string="1"></text></element>
+	<element name="label_2"> <text string="2"></text></element>
+	<element name="label_3"> <text string="3"></text></element>
+	<element name="label_Rec"> <text string="Rec"></text></element>
+	<element name="label_Upper"> <text string="Upper"></text></element>
+	<element name="label_4"> <text string="4"></text></element>
+	<element name="label_5"> <text string="5"></text></element>
+	<element name="label_6"> <text string="6"></text></element>
+	<element name="label_Play"> <text string="Play"></text></element>
+	<element name="label_Lower"> <text string="Lower"></text></element>
+	<element name="label_Param"> <text string="Param"></text></element>
+	<element name="label_Value"> <text string="Value"></text></element>
+	<element name="label_7"> <text string="7"></text></element>
+	<element name="label_8"> <text string="8"></text></element>
+	<element name="label_9"> <text string="9"></text></element>
+	<element name="label_Load"> <text string="Load"></text></element>
+	<element name="label_Off"> <text string="Off/&#9662;"></text></element>
+	<element name="label_On"> <text string="On/&#9650;"></text></element>
+	<element name="label_Cancel"> <text string="Cancel"></text></element>
+	<element name="label_0"> <text string="0/Prog"></text></element>
+	<element name="label_Enter"> <text string="Enter"></text></element>
+	<element name="label_Save"> <text string="Save"></text></element>
+	<element name="label_CONTROL"> <text string="CONTROL"></text></element>
+	<element name="label_SELECT"> <text string="SELECT"></text></element>
+	<element name="label_SEQ"> <text string="SEQ"></text></element>
+	<element name="label_SAMPLE"> <text string="SAMPLE"></text></element>
+	<element name="label_LOAD"> <text string="LOAD"></text></element>
+
+	<!-- Buttons -->
+	<element name="button_yellow"><rect><color red="0.996" green="0.874" blue="0.016" /></rect></element>
+	<element name="button_grey"><rect><color red="0.5" green="0.5" blue="0.5" /></rect></element>
+	<element name="button_black"><rect><color red="0" green="0" blue="0" /></rect></element>
+	<element name="button_white"><rect><color red="0.978" green="0.888" blue="0.825" /></rect></element>
+
+	<element name="led_segement" defstate="0">
+		<rect state="0"><color red="0.85" green="0.87" blue="0.36" alpha="0.1" /></rect>
+		<rect state="1"><color red="0.85" green="0.87" blue="0.36" /></rect>
+	</element>
+
+	<element name="led_indicator" defstate="0">
+		<disk state="0"><color red="0.85" green="0.87" blue="0.36" alpha="0.1" /></disk>
+		<disk state="1"><color red="0.85" green="0.87" blue="0.36" /></disk>
+	</element>
+
+	<view name="Default Layout">
+		<bounds left="0" top="0" right="1000" bottom="437" />
+
+		<!-- bezel -->
+		<element ref="background">
+			<bounds x="0" y="0" width="1000" height="437" />
+		</element>
+
+		<element ref="lcd_background">
+			<bounds x="54" y="64" width="127" height="87" />
+		</element>
+
+		<!-- Buttons, row 1 -->
+		<element name="button_1" ref="button_yellow" inputtag="pb7" inputmask="0x01"><bounds x="282" y="46" width="44" height="24" /></element>
+		<element name="button_2" ref="button_yellow" inputtag="pb6" inputmask="0x40"><bounds x="375" y="46" width="44" height="24" /></element>
+		<element name="button_3" ref="button_yellow" inputtag="pb6" inputmask="0x01"><bounds x="468" y="46" width="44" height="24" /></element>
+		<element name="button_Rec" ref="button_grey" inputtag="pb5" inputmask="0x40"><bounds x="597" y="46" width="44" height="24" /></element>
+		<element name="button_Sample_Upper" ref="button_black" inputtag="pb5" inputmask="0x04"><bounds x="724" y="46" width="44" height="24" /></element>
+		<element name="button_Load_Upper" ref="button_white" inputtag="pb5" inputmask="0x01"><bounds x="895" y="46" width="44" height="24" /></element>
+
+		<!-- Buttons, row 2 -->
+		<element name="button_4" ref="button_yellow" inputtag="pb7" inputmask="0x02"><bounds x="282" y="139" width="44" height="24" /></element>
+		<element name="button_5" ref="button_yellow" inputtag="pb6" inputmask="0x08"><bounds x="375" y="139" width="44" height="24" /></element>
+		<element name="button_6" ref="button_grey" inputtag="pb6" inputmask="0x02"><bounds x="468" y="139" width="44" height="24" /></element>
+		<element name="button_Play" ref="button_grey" inputtag="pb5" inputmask="0x08"><bounds x="597" y="139" width="44" height="24" /></element>
+		<element name="button_Sample_Lower" ref="button_black" inputtag="pb5" inputmask="0x80"><bounds x="724" y="139" width="44" height="24" /></element>
+		<element name="button_Load_Lower" ref="button_white" inputtag="pb5" inputmask="0x02"><bounds x="895" y="139" width="44" height="24" /></element>
+
+		<!-- Buttons, row 3 -->
+		<element name="button_Param" ref="button_grey" inputtag="pb7" inputmask="0x10"><bounds x="38" y="232" width="44" height="24" /></element>
+		<element name="button_Value" ref="button_grey" inputtag="pb7" inputmask="0x40"><bounds x="149" y="232" width="44" height="24" /></element>
+		<element name="button_7" ref="button_grey" inputtag="pb7" inputmask="0x04"><bounds x="282" y="232" width="44" height="24" /></element>
+		<element name="button_8" ref="button_grey" inputtag="pb6" inputmask="0x10"><bounds x="375" y="232" width="44" height="24" /></element>
+		<element name="button_9" ref="button_grey" inputtag="pb6" inputmask="0x04"><bounds x="468" y="232" width="44" height="24" /></element>
+		<element name="button_Load" ref="button_grey" inputtag="pb5" inputmask="0x10"><bounds x="597" y="232" width="44" height="24" /></element>
+
+		<!-- Buttons, row 4 -->
+		<element name="button_Off/Down" ref="button_grey" inputtag="pb7" inputmask="0x20"><bounds x="38" y="325" width="44" height="24" /></element>
+		<element name="button_On/Up" ref="button_grey" inputtag="pb7" inputmask="0x08"><bounds x="149" y="325" width="44" height="24" /></element>
+		<element name="button_Cancel" ref="button_grey" inputtag="pb7" inputmask="0x80"><bounds x="282" y="325" width="44" height="24" /></element>
+		<element name="button_0/Prog" ref="button_white" inputtag="pb6" inputmask="0x20"><bounds x="375" y="325" width="44" height="24" /></element>
+		<element name="button_Enter" ref="button_grey" inputtag="pb6" inputmask="0x80"><bounds x="468" y="325" width="44" height="24" /></element>
+		<element name="button_Save" ref="button_grey" inputtag="pb5" inputmask="0x20"><bounds x="597" y="325" width="44" height="24" /></element>
+
+		<!-- Lines -->
+		<element ref="button_white"><bounds x="281" y="82" width="659" height="6" /></element>
+		<element ref="button_white"><bounds x="281" y="175" width="659" height="6" /></element>
+		<element ref="button_white"><bounds x="34" y="268" width="649" height="6" /></element>
+		<element ref="button_white"><bounds x="0" y="361" width="939" height="6" /></element>11
+		<element ref="button_white"><bounds x="38" y="367" width="155" height="6" /></element>
+		<element ref="button_white"><bounds x="282" y="367" width="230" height="6" /></element>
+		<element ref="button_white"><bounds x="597" y="367" width="44" height="6" /></element>
+		<element ref="button_white"><bounds x="711" y="367" width="71" height="6" /></element>
+		<element ref="button_white"><bounds x="895" y="367" width="44" height="6" /></element>
+		<element ref="button_white"><bounds x="60" y="149" width="3" height="29" /></element>
+		<element ref="button_white"><bounds x="123" y="149" width="3" height="29" /></element>
+		<element ref="button_white"><bounds x="38" y="175" width="44" height="3" /></element>
+		<element ref="button_white"><bounds x="123" y="175" width="75" height="3" /></element>
+
+		<!-- Labels, row 1 -->
+		<element ref="label_1"><bounds x="269" y="12" width="71" height="22" /></element>
+		<element ref="label_2"><bounds x="362" y="12" width="71" height="22" /></element>
+		<element ref="label_3"><bounds x="455" y="12" width="71" height="22" /></element>
+		<element ref="label_Rec"><bounds x="584" y="12" width="71" height="22" /></element>
+		<element ref="label_Upper"><bounds x="711" y="12" width="71" height="22" /></element>
+		<element ref="label_Upper"><bounds x="882" y="12" width="71" height="22" /></element>
+
+		<!-- Labels, row 2 -->
+		<element ref="label_4"><bounds x="269" y="105" width="71" height="22" /></element>
+		<element ref="label_5"><bounds x="362" y="105" width="71" height="22" /></element>
+		<element ref="label_6"><bounds x="455" y="105" width="71" height="22" /></element>
+		<element ref="label_Play"><bounds x="584" y="105" width="71" height="22" /></element>
+		<element ref="label_Lower"><bounds x="711" y="105" width="71" height="22" /></element>
+		<element ref="label_Lower"><bounds x="882" y="105" width="71" height="22" /></element>
+
+		<!-- Labels, row 3 -->
+		<element ref="label_Param"><bounds x="24" y="198" width="71" height="22" /></element>
+		<element ref="label_Value"><bounds x="136" y="198" width="71" height="22" /></element>
+		<element ref="label_7"><bounds x="269" y="198" width="71" height="22" /></element>
+		<element ref="label_8"><bounds x="362" y="198" width="71" height="22" /></element>
+		<element ref="label_9"><bounds x="455" y="198" width="71" height="22" /></element>
+		<element ref="label_Load"><bounds x="584" y="198" width="71" height="22" /></element>
+
+		<!-- Labels, row 4 -->
+		<element ref="label_Off"><bounds x="24" y="291" width="71" height="22" /></element>
+		<element ref="label_On"><bounds x="136" y="291" width="71" height="22" /></element>
+		<element ref="label_Cancel"><bounds x="269" y="291" width="71" height="22" /></element>
+		<element ref="label_0"><bounds x="362" y="291" width="71" height="22" /></element>
+		<element ref="label_Enter"><bounds x="455" y="291" width="71" height="22" /></element>
+		<element ref="label_Save"><bounds x="584" y="291" width="71" height="22" /></element>
+
+		<!-- Labels, row 5 -->
+		<element ref="label_CONTROL"><bounds x="58" y="374" width="111" height="22" /></element>
+		<element ref="label_SELECT"><bounds x="362" y="374" width="71" height="22" /></element>
+		<element ref="label_SEQ"><bounds x="584" y="374" width="71" height="22" /></element>
+		<element ref="label_SAMPLE"><bounds x="711" y="374" width="71" height="22" /></element>
+		<element ref="label_LOAD"><bounds x="882" y="374" width="71" height="22" /></element>
+
+		<!-- hand built LEDs, left side-->
+		<element name="0.0" ref="led_segement">
+			<bounds left="76" top="75" right="100" bottom="81" />
+		</element>
+		<element name="0.1" ref="led_segement">
+			<bounds left="101" top="78" right="107" bottom="107" />
+		</element>
+		<element name="0.2" ref="led_segement">
+			<bounds left="101" top="108" right="107" bottom="137" />
+		</element>
+		<element name="0.3" ref="led_segement">
+			<bounds left="76" top="132" right="100" bottom="138" />
+		</element>
+		<element name="0.4" ref="led_segement">
+			<bounds left="69" top="108" right="75" bottom="137" />
+		</element>
+		<element name="0.5" ref="led_segement">
+			<bounds left="69" top="78" right="75" bottom="107" />
+		</element>
+		<element name="0.6" ref="led_segement">
+			<bounds left="76" top="105" right="100" bottom="111" />
+		</element>
+		<element name="0.7" ref="led_indicator">
+			<bounds left="59" top="138" right="67" bottom="146" />
+		</element>
+
+		<!-- hand built LEDs, right side-->
+		<element name="1.0" ref="led_segement">
+			<bounds left="139" top="75" right="163" bottom="81" />
+		</element>
+		<element name="1.1" ref="led_segement">
+			<bounds left="164" top="78" right="170" bottom="107" />
+		</element>
+		<element name="1.2" ref="led_segement">
+			<bounds left="164" top="108" right="170" bottom="137" />
+		</element>
+		<element name="1.3" ref="led_segement">
+			<bounds left="139" top="132" right="163" bottom="138" />
+		</element>
+		<element name="1.4" ref="led_segement">
+			<bounds left="132" top="108" right="138" bottom="137" />
+		</element>
+		<element name="1.5" ref="led_segement">
+			<bounds left="132" top="78" right="138" bottom="107" />
+		</element>
+		<element name="1.6" ref="led_segement">
+			<bounds left="139" top="105" right="163" bottom="111" />
+		</element>
+		<element name="1.7" ref="led_indicator">
+			<bounds left="122" top="138" right="130" bottom="146" />
+		</element>
+
+	</view>
+
+</mamelayout>

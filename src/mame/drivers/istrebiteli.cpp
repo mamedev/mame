@@ -5,7 +5,7 @@
     Istrebiteli driver by MetalliC
 
     TODO:
-      hardware-like noice sound generation
+      hardware-like noise sound generation
       accurate sprite collision
 
     how to play:
@@ -16,8 +16,8 @@
       insert 12 or more coins then press 2 player start
 
     notes:
-      dumped PCB is early game version, have several bugs, possible test/prototype.
-      later version was seen in St.Petersburg arcade museum, CPU board have single 8Kx8 ROM.
+      dumped PCB is early game version, has several bugs, possible test/prototype.
+      later version was seen in St.Petersburg arcade museum, CPU board has single 8Kx8 ROM.
 
 **************************************************************************/
 
@@ -36,6 +36,12 @@
 class istrebiteli_sound_device : public device_t, public device_sound_interface
 {
 public:
+	template <typename T> istrebiteli_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&region_tag)
+		: istrebiteli_sound_device(mconfig, tag, owner, clock)
+	{
+		m_rom.set_tag(std::forward<T>(region_tag));
+	}
+
 	istrebiteli_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void sound_w(uint8_t data);
@@ -45,15 +51,15 @@ protected:
 	virtual void device_start() override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	// internal state
 	sound_stream *m_channel;
-	uint8_t *m_rom;
-	int m_rom_cnt;
-	int m_rom_incr;
-	int m_sample_num;
+	required_region_ptr<uint8_t> m_rom;
+	uint16_t m_rom_cnt;
+	uint8_t m_rom_incr;
+	uint8_t m_sample_num;
 	bool m_cnt_reset;
 	bool m_rom_out_en;
 	uint8_t m_prev_data;
@@ -69,7 +75,7 @@ istrebiteli_sound_device::istrebiteli_sound_device(const machine_config &mconfig
 	: device_t(mconfig, ISTREBITELI_SOUND, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_channel(nullptr),
-		m_rom(nullptr),
+		m_rom(*this, finder_base::DUMMY_TAG),
 		m_rom_cnt(0),
 		m_rom_incr(0),
 		m_sample_num(0),
@@ -82,25 +88,31 @@ istrebiteli_sound_device::istrebiteli_sound_device(const machine_config &mconfig
 void istrebiteli_sound_device::device_start()
 {
 	m_channel = stream_alloc(0, 1, clock() / 2);
-	m_rom = machine().root_device().memregion("soundrom")->base();
+
+	save_item(NAME(m_rom_cnt));
+	save_item(NAME(m_rom_incr));
+	save_item(NAME(m_sample_num));
+	save_item(NAME(m_cnt_reset));
+	save_item(NAME(m_rom_out_en));
+	save_item(NAME(m_prev_data));
 }
 
-void istrebiteli_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void istrebiteli_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *sample = outputs[0];
+	auto &buffer = outputs[0];
 
-	while (samples-- > 0)
+	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 	{
 		int smpl = 0;
 		if (m_rom_out_en)
 			smpl = (m_rom[m_rom_cnt] >> m_sample_num) & 1;
 
 		// below is huge guess
-		if ((m_prev_data & 0x40) == 0)              // b6 noice enable ?
+		if ((m_prev_data & 0x40) == 0)              // b6 noise enable ?
 			smpl &= machine().rand() & 1;
 		smpl *= (m_prev_data & 0x80) ? 1000 : 4000; // b7 volume ?
 
-		*sample++ = smpl;
+		buffer.put_int(sampindex, smpl, 32768);
 		m_rom_cnt = (m_rom_cnt + m_rom_incr) & 0x1ff;
 	}
 }
@@ -124,6 +136,8 @@ void istrebiteli_sound_device::sound_w(uint8_t data)
 }
 
 //////////////////////////////////////////////////////////////
+
+namespace {
 
 class istrebiteli_state : public driver_device
 {
@@ -157,18 +171,18 @@ protected:
 private:
 	void istrebiteli_palette(palette_device &palette) const;
 	void motogonki_palette(palette_device &palette) const;
-	DECLARE_READ8_MEMBER(ppi0_r);
-	DECLARE_WRITE8_MEMBER(ppi0_w);
-	DECLARE_READ8_MEMBER(ppi1_r);
-	DECLARE_WRITE8_MEMBER(ppi1_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(spr0_ctrl_w);
-	DECLARE_WRITE8_MEMBER(spr1_ctrl_w);
-	DECLARE_WRITE8_MEMBER(spr_xy_w);
-	DECLARE_WRITE8_MEMBER(moto_spr_xy_w);
-	DECLARE_WRITE8_MEMBER(tileram_w);
-	DECLARE_WRITE8_MEMBER(moto_tileram_w);
-	DECLARE_WRITE8_MEMBER(road_ctrl_w);
+	uint8_t ppi0_r(offs_t offset);
+	void ppi0_w(offs_t offset, uint8_t data);
+	uint8_t ppi1_r(offs_t offset);
+	void ppi1_w(offs_t offset, uint8_t data);
+	void sound_w(uint8_t data);
+	void spr0_ctrl_w(uint8_t data);
+	void spr1_ctrl_w(uint8_t data);
+	void spr_xy_w(offs_t offset, uint8_t data);
+	void moto_spr_xy_w(offs_t offset, uint8_t data);
+	void tileram_w(offs_t offset, uint8_t data);
+	void moto_tileram_w(offs_t offset, uint8_t data);
+	void road_ctrl_w(uint8_t data);
 	DECLARE_VIDEO_START(moto);
 
 	required_device<cpu_device> m_maincpu;
@@ -178,16 +192,16 @@ private:
 	required_device<istrebiteli_sound_device> m_sound_dev;
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	tilemap_t *m_tilemap;
+	tilemap_t *m_tilemap = nullptr;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t moto_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	uint8_t coin_count;
-	uint8_t m_spr_ctrl[2];
-	uint8_t m_spr_collision[2];
-	uint8_t m_spr_xy[8];
-	uint8_t m_tileram[16];
-	uint8_t m_road_scroll;
+	uint8_t coin_count = 0;
+	uint8_t m_spr_ctrl[2]{};
+	uint8_t m_spr_collision[2]{};
+	uint8_t m_spr_xy[8]{};
+	uint8_t m_tileram[16]{};
+	uint8_t m_road_scroll = 0;
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
@@ -237,7 +251,7 @@ void istrebiteli_state::motogonki_palette(palette_device &palette) const
 
 TILE_GET_INFO_MEMBER(istrebiteli_state::get_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0, m_tileram[tile_index] & 0x1f, 0, 0);
+	tileinfo.set(0, m_tileram[tile_index] & 0x1f, 0, 0);
 }
 
 void istrebiteli_state::init_istreb()
@@ -349,42 +363,42 @@ uint32_t istrebiteli_state::moto_screen_update(screen_device &screen, bitmap_ind
 	return 0;
 }
 
-WRITE8_MEMBER(istrebiteli_state::tileram_w)
+void istrebiteli_state::tileram_w(offs_t offset, uint8_t data)
 {
 	offset ^= 15;
 	m_tileram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(istrebiteli_state::moto_tileram_w)
+void istrebiteli_state::moto_tileram_w(offs_t offset, uint8_t data)
 {
 	m_tileram[offset] = data ^ 0xff;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(istrebiteli_state::road_ctrl_w)
+void istrebiteli_state::road_ctrl_w(uint8_t data)
 {
 	m_road_scroll = data;
 }
 
-READ8_MEMBER(istrebiteli_state::ppi0_r)
+uint8_t istrebiteli_state::ppi0_r(offs_t offset)
 {
 	return m_ppi0->read(offset ^ 3) ^ 0xff;
 }
-WRITE8_MEMBER(istrebiteli_state::ppi0_w)
+void istrebiteli_state::ppi0_w(offs_t offset, uint8_t data)
 {
 	m_ppi0->write(offset ^ 3, data ^ 0xff);
 }
-READ8_MEMBER(istrebiteli_state::ppi1_r)
+uint8_t istrebiteli_state::ppi1_r(offs_t offset)
 {
 	return m_ppi1->read(offset ^ 3) ^ 0xff;
 }
-WRITE8_MEMBER(istrebiteli_state::ppi1_w)
+void istrebiteli_state::ppi1_w(offs_t offset, uint8_t data)
 {
 	m_ppi1->write(offset ^ 3, data ^ 0xff);
 }
 
-WRITE8_MEMBER(istrebiteli_state::sound_w)
+void istrebiteli_state::sound_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_w(0, data & 1);
 	if (data & 1)
@@ -392,26 +406,26 @@ WRITE8_MEMBER(istrebiteli_state::sound_w)
 	m_sound_dev->sound_w(data);
 }
 
-WRITE8_MEMBER(istrebiteli_state::spr0_ctrl_w)
+void istrebiteli_state::spr0_ctrl_w(uint8_t data)
 {
 	m_spr_ctrl[0] = data;
 	if (data & 0x80)
 		m_spr_collision[0] = 0;
 }
 
-WRITE8_MEMBER(istrebiteli_state::spr1_ctrl_w)
+void istrebiteli_state::spr1_ctrl_w(uint8_t data)
 {
 	m_spr_ctrl[1] = data;
 	if (data & 0x80)
 		m_spr_collision[1] = 0;
 }
 
-WRITE8_MEMBER(istrebiteli_state::spr_xy_w)
+void istrebiteli_state::spr_xy_w(offs_t offset, uint8_t data)
 {
 	m_spr_xy[offset ^ 7] = data;
 }
 
-WRITE8_MEMBER(istrebiteli_state::moto_spr_xy_w)
+void istrebiteli_state::moto_spr_xy_w(offs_t offset, uint8_t data)
 {
 	m_spr_xy[offset] = data;
 }
@@ -613,7 +627,7 @@ void istrebiteli_state::istreb(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ISTREBITELI_SOUND(config, m_sound_dev, XTAL(8'000'000) / 2 / 256).add_route(ALL_OUTPUTS, "mono", 1.00);
+	ISTREBITELI_SOUND(config, m_sound_dev, XTAL(8'000'000) / 2 / 256, "soundrom").add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 void istrebiteli_state::motogonki(machine_config &config)
@@ -644,7 +658,7 @@ void istrebiteli_state::motogonki(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ISTREBITELI_SOUND(config, m_sound_dev, XTAL(8'000'000) / 2 / 256).add_route(ALL_OUTPUTS, "mono", 1.00);
+	ISTREBITELI_SOUND(config, m_sound_dev, XTAL(8'000'000) / 2 / 256, "soundrom").add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 ROM_START( istreb )
@@ -690,6 +704,9 @@ ROM_START( motogonki )
 	ROM_LOAD( "006_01.d3",  0x100, 0x100, CRC(b53b83c9) SHA1(8f9733c827cc9aacc7c182585dcbc5da01357468) ) // sprite generators outputs combine prom
 	ROM_LOAD( "006_04.w13", 0x200, 0x100, CRC(e43a500c) SHA1(c9a90b54587d0dc9d7d66c419790627088f2546e) ) // ports 30-37 address decoder prom
 ROM_END
+
+} // Anonymous namespace
+
 
 GAME( 198?, istreb,    0, istreb,    istreb, istrebiteli_state, init_istreb, ROT0, "Terminal", "Istrebiteli", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
 GAME( 198?, motogonki, 0, motogonki, moto,   istrebiteli_state, init_moto,   ROT0, "Terminal", "Motogonki", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

@@ -43,7 +43,7 @@ void skyraid_state::skyraid_palette(palette_device &palette) const
 	palette.set_pen_color(19, rgb_t(0xe0, 0xe0, 0xe0));
 }
 
-READ8_MEMBER(skyraid_state::skyraid_port_0_r)
+uint8_t skyraid_state::skyraid_port_0_r()
 {
 	uint8_t val = ioport("LANGUAGE")->read();
 
@@ -56,19 +56,19 @@ READ8_MEMBER(skyraid_state::skyraid_port_0_r)
 }
 
 
-WRITE8_MEMBER(skyraid_state::skyraid_range_w)
+void skyraid_state::skyraid_range_w(uint8_t data)
 {
 	m_analog_range = data & 0x3f;
 }
 
 
-WRITE8_MEMBER(skyraid_state::skyraid_offset_w)
+void skyraid_state::skyraid_offset_w(uint8_t data)
 {
 	m_analog_offset = data & 0x3f;
 }
 
 
-WRITE8_MEMBER(skyraid_state::skyraid_scroll_w)
+void skyraid_state::skyraid_scroll_w(uint8_t data)
 {
 	m_scroll = data;
 }

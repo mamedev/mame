@@ -24,7 +24,7 @@ public:
 	util::core_file::ptr &image_file() { return m_image_file;  }
 
 	// checks to see if image is of the specified "file type" (in practice, file extension)
-	bool is_filetype(const char *candidate_filetype) const { return !core_stricmp(m_file_type.c_str(), candidate_filetype); }
+	bool is_filetype(std::string_view candidate_filetype) const;
 
 	// extra info from hashfile
 	bool hashfile_extrainfo(std::string &extrainfo);
@@ -132,6 +132,10 @@ public:
 	///   configuration.
 	slot_option &option_add_internal(const char *option, const device_type &devtype);
 
+	slot_option &option_replace(const char *option, const device_type &devtype);
+	slot_option &option_replace_internal(const char *option, const device_type &devtype);
+	void option_remove(const char *option);
+
 	void set_option_default_bios(const char *option, const char *default_bios) { config_option(option)->default_bios(default_bios); }
 	template <typename T> void set_option_machine_config(const char *option, T &&machine_config) { config_option(option)->machine_config(std::forward<T>(machine_config)); }
 	void set_option_device_input_defaults(const char *option, const input_device_default *default_input) { config_option(option)->input_device_defaults(default_input); }
@@ -227,6 +231,6 @@ protected:
 	}
 };
 
-typedef device_interface_iterator<device_slot_interface> slot_interface_iterator;
+typedef device_interface_enumerator<device_slot_interface> slot_interface_enumerator;
 
 #endif // MAME_EMU_DISLOT_H

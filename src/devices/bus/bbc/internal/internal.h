@@ -39,6 +39,8 @@ public:
 	virtual void mos_w(offs_t offset, uint8_t data) { }
 	virtual void latch_fe60_w(uint8_t data) { }
 
+	virtual DECLARE_WRITE_LINE_MEMBER(irq6502_w) { }
+
 protected:
 	device_bbc_internal_interface(const machine_config &mconfig, device_t &device);
 
@@ -88,6 +90,8 @@ public:
 	virtual uint8_t mos_r(offs_t offset);
 	virtual void mos_w(offs_t offset, uint8_t data);
 	virtual void latch_fe60_w(uint8_t data);
+
+	virtual DECLARE_WRITE_LINE_MEMBER(irq6502_w);
 
 protected:
 	// device-level overrides

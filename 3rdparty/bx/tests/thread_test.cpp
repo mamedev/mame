@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -42,7 +42,9 @@ TEST_CASE("Thread", "")
 
 	REQUIRE(!th.isRunning() );
 
-	th.init(threadExit0);
+	bool init = th.init(threadExit0, NULL, 0, NULL);
+	REQUIRE(init);
+
 	REQUIRE(th.isRunning() );
 	th.push(NULL);
 	th.shutdown();

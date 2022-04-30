@@ -18,14 +18,17 @@
     - check allocation bitmap against corruption when an image is opened
 */
 
-#include <climits>
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
-#include <ctime>
 #include "imgtool.h"
 #include "harddisk.h"
 #include "imghd.h"
+
+#include "opresolv.h"
+
+#include <climits>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
 
 /*
     Concepts shared by both disk structures:
@@ -976,17 +979,15 @@ static imgtoolerr_t open_image_lvl1(imgtool::stream::ptr &&file_handle, ti99_img
 
 	if (img_format == if_harddisk)
 	{
-		const hard_disk_info *info;
-
 		err = imghd_open(*file_handle, &l1_img->harddisk_handle);
 		if (err)
 			return err;
 
-		info = imghd_get_header(&l1_img->harddisk_handle);
-		l1_img->geometry.cylinders = info->cylinders;
-		l1_img->geometry.heads = info->heads;
-		l1_img->geometry.secspertrack = info->sectors;
-		if (info->sectorbytes != 256)
+		const auto &info = imghd_get_header(&l1_img->harddisk_handle);
+		l1_img->geometry.cylinders = info.cylinders;
+		l1_img->geometry.heads = info.heads;
+		l1_img->geometry.secspertrack = info.sectors;
+		if (info.sectorbytes != 256)
 		{
 			imghd_close(&l1_img->harddisk_handle);
 			return IMGTOOLERR_CORRUPTIMAGE; /* TODO: support 512-byte sectors */
@@ -1300,15 +1301,13 @@ static void dsk_aphysrec_to_sector_address(int aphysrec, const ti99_geometry *ge
     geometry (I): disk image geometry
     address (O): physical sector address
 */
-#ifdef UNUSED_FUNCTION
-static void win_aphysrec_to_sector_address(int aphysrec, const ti99_geometry *geometry, ti99_sector_address *address)
+[[maybe_unused]] static void win_aphysrec_to_sector_address(int aphysrec, const ti99_geometry &geometry, ti99_sector_address &address)
 {
-	address.sector = aphysrec % l1_img->geometry.secspertrack;
-	aphysrec /= l1_img->geometry.secspertrack;
-	address.side = aphysrec % l1_img->geometry.heads;
-	address.cylinder = aphysrec / l1_img->geometry.heads;
+	address.sector = aphysrec % geometry.secspertrack;
+	aphysrec /= geometry.secspertrack;
+	address.side = aphysrec % geometry.heads;
+	address.cylinder = aphysrec / geometry.heads;
 }
-#endif
 
 /*
     Read one 256-byte physical record from a disk image
@@ -1327,7 +1326,7 @@ static int read_absolute_physrec(ti99_lvl1_imgref *l1_img, unsigned aphysrec, vo
 	if (l1_img->img_format == if_harddisk)
 	{
 #if 0
-		win_aphysrec_to_sector_address(aphysrec, & l1_img->geometry, & address);
+		win_aphysrec_to_sector_address(aphysrec, l1_img->geometry, address);
 		return read_sector(l1_img, & address, dest);
 #endif
 
@@ -1837,7 +1836,7 @@ static int dsk_read_catalog(struct ti99_lvl2_imgref *l2_img, int aphysrec, ti99_
 			|| ((dest->files[i].fdr_ptr && dest->files[i+1].fdr_ptr) && (memcmp(dest->files[i].name, dest->files[i+1].name, 10) >= 0)))
 		{
 			/* if the catalog is not sorted, we repair it */
-			qsort(dest->files, ARRAY_LENGTH(dest->files), sizeof(dest->files[0]),
+			qsort(dest->files, std::size(dest->files), sizeof(dest->files[0]),
 					cat_file_compare_qsort);
 			break;
 		}
@@ -3304,8 +3303,7 @@ static int write_file_physrec(struct ti99_lvl2_fileref *l2_file, unsigned fphysr
 /*
     Write a field in every fdr record associated to a file
 */
-#ifdef UNUSED_FUNCTION
-static int set_win_fdr_field(struct ti99_lvl2_fileref *l2_file, size_t offset, size_t size, void *data)
+[[maybe_unused]] static int set_win_fdr_field(struct ti99_lvl2_fileref *l2_file, size_t offset, size_t size, void *data)
 {
 	win_fdr fdr_buf;
 	unsigned fdr_aphysrec;
@@ -3313,7 +3311,7 @@ static int set_win_fdr_field(struct ti99_lvl2_fileref *l2_file, size_t offset, s
 
 	for (fdr_aphysrec = l2_file->win.eldestfdr_aphysrec;
 			fdr_aphysrec && ((errorcode = (read_absolute_physrec(&l2_file->win.l2_img->l1_img, fdr_aphysrec, &fdr_buf) ? IMGTOOLERR_READERROR : 0)) == 0);
-			fdr_aphysrec = get_win_fdr_nextsibFDR_physrec(l2_file->win.l2_img, &fdr_buf))
+			fdr_aphysrec = get_win_fdr_nextsibFDR_aphysrec(l2_file->win.l2_img, &fdr_buf))
 	{
 		memcpy(((uint8_t *) &fdr_buf) + offset, data, size);
 		if (write_absolute_physrec(&l2_file->win.l2_img->l1_img, fdr_aphysrec, &fdr_buf))
@@ -3325,7 +3323,6 @@ static int set_win_fdr_field(struct ti99_lvl2_fileref *l2_file, size_t offset, s
 
 	return errorcode;
 }
-#endif
 
 static uint8_t get_file_flags(struct ti99_lvl2_fileref *l2_file)
 {
@@ -3675,11 +3672,10 @@ static void set_file_update_date(struct ti99_lvl2_fileref *l2_file, ti99_date_ti
 	}
 }
 
-#ifdef UNUSED_FUNCTION
-static void current_date_time(ti99_date_time *reply)
+[[maybe_unused]] static void current_date_time(ti99_date_time *reply)
 {
 	/* All these functions should be ANSI */
-	time_t cur_time = time(NULL);
+	time_t cur_time = time(nullptr);
 	struct tm expanded_time = *localtime(& cur_time);
 
 	reply->time_MSB = (expanded_time.tm_hour << 3) | (expanded_time.tm_min >> 3);
@@ -3687,7 +3683,6 @@ static void current_date_time(ti99_date_time *reply)
 	reply->date_MSB = ((expanded_time.tm_year % 100) << 1) | ((expanded_time.tm_mon+1) >> 3);
 	reply->date_LSB = ((expanded_time.tm_mon+1) << 5) | expanded_time.tm_mday;
 }
-#endif
 
 #if 0
 #pragma mark -
@@ -3712,14 +3707,13 @@ struct ti99_lvl3_fileref
 	int cur_pos_in_phys_rec;
 };
 
-#ifdef UNUSED_FUNCTION
 /*
     Open a file on level 3.
 
     To open a file on level 3, you must open (or create) the file on level 2,
     then pass the file reference to open_file_lvl3.
 */
-static int open_file_lvl3(ti99_lvl3_fileref *l3_file)
+[[maybe_unused]] static int open_file_lvl3(ti99_lvl3_fileref *l3_file)
 {
 	l3_file->cur_log_rec = 0;
 	l3_file->cur_phys_rec = 0;
@@ -3754,7 +3748,7 @@ static int is_eof(ti99_lvl3_fileref *l3_file)
 /*
     Read next record from a file
 */
-static int read_next_record(ti99_lvl3_fileref *l3_file, void *dest, int *out_reclen)
+[[maybe_unused]] static int read_next_record(ti99_lvl3_fileref *l3_file, void *dest, int *out_reclen)
 {
 	int errorcode;
 	uint8_t physrec_buf[256];
@@ -3824,7 +3818,6 @@ static int read_next_record(ti99_lvl3_fileref *l3_file, void *dest, int *out_rec
 
 	return 0;
 }
-#endif
 
 #if 0
 #pragma mark -
@@ -4275,10 +4268,10 @@ static imgtoolerr_t dsk_image_nextenum(imgtool::directory &enumeration, imgtool_
 	{
 		if (iter->listing_subdirs)
 		{
-			fname_to_str(ent.filename, iter->image->dsk.catalogs[0].subdirs[iter->index[iter->level]].name, ARRAY_LENGTH(ent.filename));
+			fname_to_str(ent.filename, iter->image->dsk.catalogs[0].subdirs[iter->index[iter->level]].name, std::size(ent.filename));
 
 			/* set type of DIR */
-			snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "DIR");
+			snprintf(ent.attr, std::size(ent.attr), "DIR");
 
 			/* len in physrecs */
 			/* @BN@ return length in bytes */
@@ -4299,7 +4292,7 @@ static imgtoolerr_t dsk_image_nextenum(imgtool::directory &enumeration, imgtool_
 			if (reply)
 				return IMGTOOLERR_READERROR;
 #if 0
-			fname_to_str(ent.filename, fdr.name, ARRAY_LENGTH(ent.filename));
+			fname_to_str(ent.filename, fdr.name, std::size(ent.filename));
 #else
 			{
 				char buf[11];
@@ -4307,19 +4300,19 @@ static imgtoolerr_t dsk_image_nextenum(imgtool::directory &enumeration, imgtool_
 				ent.filename[0] = '\0';
 				if (iter->level)
 				{
-					fname_to_str(ent.filename, iter->image->dsk.catalogs[0].subdirs[iter->index[0]].name, ARRAY_LENGTH(ent.filename));
-					strncat(ent.filename, ".", ARRAY_LENGTH(ent.filename) - 1);
+					fname_to_str(ent.filename, iter->image->dsk.catalogs[0].subdirs[iter->index[0]].name, std::size(ent.filename));
+					strncat(ent.filename, ".", std::size(ent.filename) - 1);
 				}
 				fname_to_str(buf, fdr.name, 11);
-				strncat(ent.filename, buf, ARRAY_LENGTH(ent.filename) - 1);
+				strncat(ent.filename, buf, std::size(ent.filename) - 1);
 			}
 #endif
 			/* parse flags */
 			if (fdr.flags & fdr99_f_program)
-				snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "PGM%s",
+				snprintf(ent.attr, std::size(ent.attr), "PGM%s",
 							(fdr.flags & fdr99_f_wp) ? " R/O" : "");
 			else
-				snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "%c/%c %d%s",
+				snprintf(ent.attr, std::size(ent.attr), "%c/%c %d%s",
 							(fdr.flags & fdr99_f_int) ? 'I' : 'D',
 							(fdr.flags & fdr99_f_var) ? 'V' : 'F',
 							fdr.reclen,
@@ -4399,7 +4392,7 @@ static imgtoolerr_t win_image_nextenum(imgtool::directory &enumeration, imgtool_
 		if (iter->listing_subdirs)
 		{
 #if 0
-			fname_to_str(ent.filename, iter->catalog[iter->level].subdirs[iter->index[iter->level]].name, ARRAY_LENGTH(ent.filename));
+			fname_to_str(ent.filename, iter->catalog[iter->level].subdirs[iter->index[iter->level]].name, std::size(ent.filename));
 #else
 			{
 				char buf[11];
@@ -4408,16 +4401,16 @@ static imgtoolerr_t win_image_nextenum(imgtool::directory &enumeration, imgtool_
 				for (i=0; i<iter->level; i++)
 				{
 					fname_to_str(buf, iter->catalog[i].subdirs[iter->index[i]].name, 11);
-					strncat(ent.filename, buf, ARRAY_LENGTH(ent.filename) - 1);
-					strncat(ent.filename, ".", ARRAY_LENGTH(ent.filename) - 1);
+					strncat(ent.filename, buf, std::size(ent.filename) - 1);
+					strncat(ent.filename, ".", std::size(ent.filename) - 1);
 				}
 				fname_to_str(buf, iter->catalog[iter->level].subdirs[iter->index[iter->level]].name, 11);
-				strncat(ent.filename, buf, ARRAY_LENGTH(ent.filename) - 1);
+				strncat(ent.filename, buf, std::size(ent.filename) - 1);
 			}
 #endif
 
 			/* set type of DIR */
-			snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "DIR");
+			snprintf(ent.attr, std::size(ent.attr), "DIR");
 
 			/* len in physrecs */
 			/* @BN@ return length in bytes */
@@ -4442,7 +4435,7 @@ static imgtoolerr_t win_image_nextenum(imgtool::directory &enumeration, imgtool_
 			if (reply)
 				return IMGTOOLERR_READERROR;
 #if 0
-			fname_to_str(ent.filename, iter->catalog[iter->level].files[iter->index[iter->level]].name, ARRAY_LENGTH(ent.filename));
+			fname_to_str(ent.filename, iter->catalog[iter->level].files[iter->index[iter->level]].name, std::size(ent.filename));
 #else
 			{
 				char buf[11];
@@ -4451,19 +4444,19 @@ static imgtoolerr_t win_image_nextenum(imgtool::directory &enumeration, imgtool_
 				for (i=0; i<iter->level; i++)
 				{
 					fname_to_str(buf, iter->catalog[i].subdirs[iter->index[i]].name, 11);
-					strncat(ent.filename, buf, ARRAY_LENGTH(ent.filename) - 1);
-					strncat(ent.filename, ".", ARRAY_LENGTH(ent.filename) - 1);
+					strncat(ent.filename, buf, std::size(ent.filename) - 1);
+					strncat(ent.filename, ".", std::size(ent.filename) - 1);
 				}
 				fname_to_str(buf, iter->catalog[iter->level].files[iter->index[iter->level]].name, 11);
-				strncat(ent.filename, buf, ARRAY_LENGTH(ent.filename) - 1);
+				strncat(ent.filename, buf, std::size(ent.filename) - 1);
 			}
 #endif
 			/* parse flags */
 			if (fdr.flags & fdr99_f_program)
-				snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "PGM%s",
+				snprintf(ent.attr, std::size(ent.attr), "PGM%s",
 							(fdr.flags & fdr99_f_wp) ? " R/O" : "");
 			else
-				snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "%c/%c %d%s",
+				snprintf(ent.attr, std::size(ent.attr), "%c/%c %d%s",
 							(fdr.flags & fdr99_f_int) ? 'I' : 'D',
 							(fdr.flags & fdr99_f_var) ? 'V' : 'F',
 							fdr.reclen,
@@ -4948,7 +4941,7 @@ static imgtoolerr_t dsk_image_deletefile(imgtool::partition &partition, const ch
 
 		/* free data AUs */
 //      fphysrecs =
-			get_UINT16BE(fdr.fphysrecs);
+		get_UINT16BE(fdr.fphysrecs);
 
 		i = 0;
 		cluster_index = 0;

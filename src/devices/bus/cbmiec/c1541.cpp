@@ -634,7 +634,7 @@ const tiny_rom_entry *msd_sd2_device::device_rom_region() const
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( c1541_prologic_dos_classic_device::read )
+uint8_t c1541_prologic_dos_classic_device::read()
 {
 	return 0;
 }
@@ -644,7 +644,7 @@ READ8_MEMBER( c1541_prologic_dos_classic_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( c1541_prologic_dos_classic_device::write )
+void c1541_prologic_dos_classic_device::write(uint8_t data)
 {
 }
 
@@ -716,13 +716,13 @@ WRITE_LINE_MEMBER( c1541_device_base::via0_irq_w )
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_via0_irq || m_via1_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER( c1541_device_base::via0_pa_r )
+uint8_t c1541_device_base::via0_pa_r()
 {
 	// dummy read to acknowledge ATN IN interrupt
 	return m_parallel_data;
 }
 
-WRITE8_MEMBER( c1541_device_base::via0_pa_w )
+void c1541_device_base::via0_pa_w(uint8_t data)
 {
 	if (m_other != nullptr)
 	{
@@ -730,7 +730,7 @@ WRITE8_MEMBER( c1541_device_base::via0_pa_w )
 	}
 }
 
-READ8_MEMBER( c1541_device_base::via0_pb_r )
+uint8_t c1541_device_base::via0_pb_r()
 {
 	/*
 
@@ -764,7 +764,7 @@ READ8_MEMBER( c1541_device_base::via0_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( c1541_device_base::via0_pb_w )
+void c1541_device_base::via0_pb_w(uint8_t data)
 {
 	/*
 
@@ -799,7 +799,7 @@ WRITE_LINE_MEMBER( c1541_device_base::via0_ca2_w )
 	}
 }
 
-READ8_MEMBER( c1541c_device::via0_pa_r )
+uint8_t c1541c_device::via0_pa_r()
 {
 	/*
 
@@ -827,7 +827,7 @@ WRITE_LINE_MEMBER( c1541_device_base::via1_irq_w )
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_via0_irq || m_via1_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER( c1541_device_base::via1_pb_r )
+uint8_t c1541_device_base::via1_pb_r()
 {
 	/*
 
@@ -855,7 +855,7 @@ READ8_MEMBER( c1541_device_base::via1_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( c1541_device_base::via1_pb_w )
+void c1541_device_base::via1_pb_w(uint8_t data)
 {
 	/*
 
@@ -907,23 +907,24 @@ WRITE_LINE_MEMBER( c1541_device_base::byte_w )
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( c1541_device_base::floppy_formats )
-	FLOPPY_D64_FORMAT,
-	FLOPPY_G64_FORMAT
-FLOPPY_FORMATS_END
+void c1541_device_base::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_D64_FORMAT);
+	fr.add(FLOPPY_G64_FORMAT);
+}
 
 
-READ8_MEMBER( c1541_prologic_dos_classic_device::pia_r )
+uint8_t c1541_prologic_dos_classic_device::pia_r(offs_t offset)
 {
 	return m_pia->read((offset >> 2) & 0x03);
 }
 
-WRITE8_MEMBER( c1541_prologic_dos_classic_device::pia_w )
+void c1541_prologic_dos_classic_device::pia_w(offs_t offset, uint8_t data)
 {
 	m_pia->write((offset >> 2) & 0x03, data);
 }
 
-WRITE8_MEMBER( c1541_prologic_dos_classic_device::pia_pa_w )
+void c1541_prologic_dos_classic_device::pia_pa_w(uint8_t data)
 {
 	/*
 
@@ -941,12 +942,12 @@ WRITE8_MEMBER( c1541_prologic_dos_classic_device::pia_pa_w )
 	*/
 }
 
-READ8_MEMBER( c1541_prologic_dos_classic_device::pia_pb_r )
+uint8_t c1541_prologic_dos_classic_device::pia_pb_r()
 {
 	return m_parallel_data;
 }
 
-WRITE8_MEMBER( c1541_prologic_dos_classic_device::pia_pb_w )
+void c1541_prologic_dos_classic_device::pia_pb_w(uint8_t data)
 {
 	m_parallel_data = data;
 
@@ -964,7 +965,7 @@ void c1541_device_base::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &c1541_device_base::c1541_mem);
 	//config.set_perfect_quantum(m_maincpu); FIXME: not safe in a slot device - add barriers
 
-	VIA6522(config, m_via0, XTAL(16'000'000)/16);
+	MOS6522(config, m_via0, XTAL(16'000'000)/16);
 	m_via0->readpa_handler().set(FUNC(c1541_device_base::via0_pa_r));
 	m_via0->readpb_handler().set(FUNC(c1541_device_base::via0_pb_r));
 	m_via0->writepa_handler().set(FUNC(c1541_device_base::via0_pa_w));
@@ -972,7 +973,7 @@ void c1541_device_base::device_add_mconfig(machine_config &config)
 	m_via0->cb2_handler().set(FUNC(c1541_device_base::via0_ca2_w));
 	m_via0->irq_handler().set(FUNC(c1541_device_base::via0_irq_w));
 
-	VIA6522(config, m_via1, XTAL(16'000'000)/16);
+	MOS6522(config, m_via1, XTAL(16'000'000)/16);
 	m_via1->readpa_handler().set(C64H156_TAG, FUNC(c64h156_device::yb_r));
 	m_via1->readpb_handler().set(FUNC(c1541_device_base::via1_pb_r));
 	m_via1->writepa_handler().set(C64H156_TAG, FUNC(c64h156_device::yb_w));
@@ -990,6 +991,7 @@ void c1541_device_base::device_add_mconfig(machine_config &config)
 	connector.set_default_option("525ssqd");
 	connector.set_fixed(true);
 	connector.set_formats(c1541_device_base::floppy_formats);
+	connector.enable_sound(true);
 }
 
 

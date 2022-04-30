@@ -4,6 +4,10 @@
 
     DEC RX01 microcode disassembler
 
+    DEC's firmware listing is based on a modified PDP-8 cross-assembler.
+    The syntax used here differs slightly to improve the disassembly of
+    double-length instructions (which the PDP-8 generally lacks).
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -60,19 +64,19 @@ offs_t rx01_disassembler::disassemble(std::ostream &stream, offs_t pc, const rx0
 		util::stream_format(stream, "%sBR %s ",
 							BIT(opcode, 7) ? "W" : "",
 							s_conditions[(opcode & 074) >> 2]);
-		if ((opcode & 074) == 020)
+		if ((opcode & 074) == 010 || (opcode & 074) == 020)
 			stream << s_0_or_1[BIT(opcode, 1)];
 		else
 			stream << (BIT(opcode, 1) ? "T" : "F");
 		if (BIT(opcode, 0))
 		{
 			stream << " IND";
-			return 1 | (BIT(opcode, 7) ? STEP_OVER : 0) | SUPPORTED;
+			return 1 | STEP_COND | SUPPORTED;
 		}
 		else
 		{
 			util::stream_format(stream, " %04o", ((pc + 2) & 07400) | opcodes.r8(pc + 1));
-			return 2 | (BIT(opcode, 7) ? STEP_OVER : 0) | SUPPORTED;
+			return 2 | STEP_COND | SUPPORTED;
 		}
 	}
 	else if (BIT(opcode, 7))

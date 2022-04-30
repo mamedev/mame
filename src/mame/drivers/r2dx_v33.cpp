@@ -68,9 +68,8 @@ Then it puts settings at 0x9e08 and 0x9e0a (bp 91acb)
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
-#include "sound/3812intf.h"
-//#include "sound/ym2151.h"
 #include "sound/okim6295.h"
+#include "sound/ymopl.h"
 #include "machine/r2crypt.h"
 
 #include "speaker.h"
@@ -358,7 +357,7 @@ void r2dx_v33_state::tilemapdma_w(address_space &space, u16 data)
 	{
 		u16 tileval = space.read_word(src);
 		src += 2;
-		m_videoram_private_w(space, i, tileval, 0xffff);
+		m_videoram_private_w(i, tileval);
 	}
 }
 
@@ -628,19 +627,19 @@ static INPUT_PORTS_START( nzerotea )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:!1,!2")
+	PORT_DIPSETTING(      0x0100, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
 	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:!3,!4")
-	PORT_DIPSETTING(      0x0c00, "2" )
-	PORT_DIPSETTING(      0x0800, "4" )
-	PORT_DIPSETTING(      0x0400, "3" )
 	PORT_DIPSETTING(      0x0000, "1" )
+	PORT_DIPSETTING(      0x0c00, "2" )
+	PORT_DIPSETTING(      0x0400, "3" )
+	PORT_DIPSETTING(      0x0800, "4" )
 	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:!5,!6")
-	PORT_DIPSETTING(      0x3000, "1000000" )
-	PORT_DIPSETTING(      0x2000, "2000000" )
-	PORT_DIPSETTING(      0x1000, "Every 1000000" )
+	PORT_DIPSETTING(      0x2000, "1000000" )
+	PORT_DIPSETTING(      0x3000, "2000000" )
+	PORT_DIPSETTING(      0x1000, "3000000" )
 	PORT_DIPSETTING(      0x0000, "No Extend" )
 	PORT_DIPNAME( 0x4000, 0x4000, "Demo Sound" ) PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
@@ -1083,6 +1082,7 @@ GAME( 1997, nzeroteama,  zeroteam, nzerotea, nzerotea, r2dx_v33_state, init_nzer
 
 // 'V33 SYSTEM TYPE_C' - uses V33 CPU, basically the same board as TYPE_C VER2
 // there is a version of New Zero Team on "V33 SYSTEM TYPE_C" board with EEPROM rather than dipswitches like Zero Team 2000
+// 1998 release of New Zero team on this hardware also exists, but not dumped: https://youtu.be/8mnFjXCc9BI
 
 // 'V33 SYSTEM TYPE_C VER2' - uses V33 CPU, COPX-D3 external protection rom, but still has the proper sound system, unencrypted sprites, EEPROM for settings.  PCB also seen without 'VER2', looks the same
 GAME( 2000, zerotm2k,    zeroteam, zerotm2k, zerotm2k, r2dx_v33_state, init_zerotm2k,  ROT0,  "Seibu Kaihatsu", "Zero Team 2000", MACHINE_SUPPORTS_SAVE)

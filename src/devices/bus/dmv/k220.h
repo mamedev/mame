@@ -39,8 +39,8 @@ protected:
 	virtual bool write(offs_t offset, uint8_t data) override;
 
 private:
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_WRITE8_MEMBER(portc_w);
+	void porta_w(uint8_t data);
+	void portc_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(write_out0);
 	DECLARE_WRITE_LINE_MEMBER(write_out1);
 	DECLARE_WRITE_LINE_MEMBER(write_out2);

@@ -327,7 +327,7 @@ TILE_GET_INFO_MEMBER(tc0080vco_device::get_bg0_tile_info)
 
 	tileinfo.category = 0;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			TILE_FLIPYX((m_bg0_ram_1[tile_index] & 0x00c0) >> 6));
@@ -342,7 +342,7 @@ TILE_GET_INFO_MEMBER(tc0080vco_device::get_bg1_tile_info)
 
 	tileinfo.category = 0;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			TILE_FLIPYX((m_bg1_ram_1[tile_index] & 0x00c0) >> 6));
@@ -369,7 +369,7 @@ TILE_GET_INFO_MEMBER(tc0080vco_device::get_tx_tile_info)
 		tileinfo.category = 0;
 	}
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			tile,
 			0,
 			0);
@@ -603,8 +603,8 @@ void tc0080vco_device::bg0_tilemap_draw(screen_device &screen, bitmap_ind16 &bit
 
 			int x_index = sx - ((m_bgscroll_ram[row_index] << 16));
 
-			u16 *src16 = &srcbitmap.pix16(src_y_index);
-			u8 *tsrc  = &flagsbitmap.pix8(src_y_index);
+			u16 const *src16 = &srcbitmap.pix(src_y_index);
+			u8 const *tsrc = &flagsbitmap.pix(src_y_index);
 			u16 *dst16 = scanline;
 
 			int x_step = zoomx;

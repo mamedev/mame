@@ -633,7 +633,7 @@ void norautp_state::norautp_palette(palette_device &palette) const
 *      R/W Handlers      *
 *************************/
 
-WRITE8_MEMBER(norautp_state::mainlamps_w)
+void norautp_state::mainlamps_w(uint8_t data)
 {
 /*  PPI-0 (60h-63h); PortB OUT.
     Lamps:
@@ -660,7 +660,7 @@ WRITE8_MEMBER(norautp_state::mainlamps_w)
 //  popmessage("lamps: %02x", data);
 }
 
-WRITE8_MEMBER(norautp_state::soundlamps_w)
+void norautp_state::soundlamps_w(uint8_t data)
 {
 /*  PPI-1 (a0h-a3h); PortC OUT.
     Sound & Lamps:
@@ -683,7 +683,7 @@ WRITE8_MEMBER(norautp_state::soundlamps_w)
 //  popmessage("sound bits 4-5-6-7: %02x, %02x, %02x, %02x", ((data >> 4) & 0x01), ((data >> 5) & 0x01), ((data >> 6) & 0x01), ((data >> 7) & 0x01));
 }
 
-WRITE8_MEMBER(norautp_state::counterlamps_w)
+void norautp_state::counterlamps_w(uint8_t data)
 {
 /*  PPI-0 (60h-63h); PortC OUT.
     Lamps & Coin Counters:
@@ -712,12 +712,12 @@ WRITE8_MEMBER(norautp_state::counterlamps_w)
    PC0-PC2 could be set as input or output.
 */
 
-//READ8_MEMBER(norautp_state::ppi2_portc_r )
+//uint8_t norautp_state::ppi2_portc_r()
 //{
 //  return;
 //}
 
-//WRITE8_MEMBER(norautp_state::ppi2_portc_w )
+//void norautp_state::ppi2_portc_w(uint8_t data)
 //{
 //  /* PC0-PC2 don't seems to be connected to any output */
 //}
@@ -741,17 +741,17 @@ TIMER_CALLBACK_MEMBER(norautp_state::ppi2_ack)
 
 #ifdef UNUSED_FUNCTION // old implementation
 /*game waits for /OBF signal (bit 7) to be set.*/
-READ8_MEMBER(norautp_state::test_r)
+uint8_t norautp_state::test_r()
 {
 	return 0xff;
 }
 
-READ8_MEMBER(norautp_state::vram_data_r)
+uint8_t norautp_state::vram_data_r()
 {
 	return m_np_vram[m_np_addr];
 }
 
-WRITE8_MEMBER(norautp_state::vram_data_w)
+void norautp_state::vram_data_w(uint8_t data)
 {
 	m_np_vram[m_np_addr] = data & 0xff;
 
@@ -761,14 +761,14 @@ WRITE8_MEMBER(norautp_state::vram_data_w)
 
 }
 
-WRITE8_MEMBER(norautp_state::vram_addr_w)
+void norautp_state::vram_addr_w(uint8_t data)
 {
 	m_np_addr = data;
 }
 #endif
 
 /* game waits for bit 4 (0x10) to be reset.*/
-READ8_MEMBER(norautp_state::test2_r)
+uint8_t norautp_state::test2_r()
 {
 	return 0x00;
 }
@@ -994,7 +994,7 @@ static INPUT_PORTS_START( norautp )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Draw")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_BET )   PORT_NAME("Bet / Collect")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_NAME("Bet / Collect")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  /* Coin A */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)  /* Coin B */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_K) PORT_NAME("IN0-5")
@@ -1049,7 +1049,7 @@ static INPUT_PORTS_START( norautrh )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Draw")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_BET )   PORT_NAME("Bet / Change Card")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_NAME("Bet / Change Card")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  /* Coin A */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)  /* Coin B */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Readout")
@@ -1103,7 +1103,7 @@ static INPUT_PORTS_START( norautpn )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Start")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_BET )   PORT_NAME("Bet / Change Card")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_NAME("Bet / Change Card")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  /* Coin A */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)  /* Coin B */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Readout")
@@ -1212,7 +1212,7 @@ static INPUT_PORTS_START( cdrawpkr )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_BET )  PORT_NAME("Bet / Half Gamble")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Bet / Half Gamble")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
@@ -2022,7 +2022,7 @@ ROM_END
   NVRAM: 6116
 
   Two jumpers on card , game will not boot if these are removed or placed on other pins
-  cabinet beeps and shows grapics on screen. Removing while game is on cause game to freeze.
+  cabinet beeps and shows graphics on screen. Removing while game is on cause game to freeze.
   Unknown what their for.
 
   Charcter Eprom is mounted on main board
@@ -2031,7 +2031,7 @@ ROM_END
 
   No date info found in rom. Program eprom sticker: "Euro 27C512 20MAR02"
 
-  This version contains a hidden menu with lots of differnt options
+  This version contains a hidden menu with lots of different options
   to access this menu you must hold the HI and LOW button and press the readout/test switch
   the screen will go blank then you release the 3 buttons and the menu appears.
 
@@ -2293,6 +2293,25 @@ ROM_START( cgip30cs )
 	ROM_FILL(                     0x0000, 0x0800, 0xff )
 	ROM_LOAD( "graphics2716.bin", 0x0800, 0x0800, CRC(174a5eec) SHA1(44d84a0cf29a0bf99674d95084c905d3bb0445ad) )
 ROM_END
+
+ROM_START( cgip30b )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Program ROM is 0000-3fff, duplicated to fit the ROM size */
+	ROM_LOAD( "u11", 0x0000, 0x8000, CRC(e32400cc) SHA1(f219aa4f35d92581b223a2172ff54cb3a6eaf7fe) ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_FILL(                     0x0000, 0x0800, 0xff )
+	ROM_LOAD( "u27",   0x0800, 0x0800, CRC(d94be899) SHA1(b7212162324fa2d67383a475052e3b351bb1af5f) ) // 0xxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(                 0x0800, 0x0800 )
+ROM_END
+
+ROM_START( cgip23b ) // PCB marked 'POKER Version 1.1'. Z0840004PSC + 4 x NEC 82C55AC-2
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u29", 0x0000, 0x8000, CRC(e8ac2803) SHA1(fe545fcc7dad5eb8786fae853262392ba9b067ca) ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_LOAD( "u16", 0x0000, 0x1000, CRC(d94be899) SHA1(b7212162324fa2d67383a475052e3b351bb1af5f) ) // 0xxxxxxxxxxx = 0xFF
+ROM_END
+
 
 // PCB has a sticker: Casino Games Innovation Incorporating GS Research POKER PCB
 ROM_START( cgidjp )
@@ -3763,7 +3782,9 @@ GAMEL( 198?, norautub, 0,       norautp,  norautp,  norautp_state, init_enc,   R
 GAMEL( 198?, mainline, 0,       norautp,  mainline, norautp_state, empty_init, ROT0, "Mainline London",          "Mainline Double Joker Poker",         0,                   layout_noraut12 )
 GAMEL( 199?, df_djpkr, 0,       norautp,  mainline, norautp_state, empty_init, ROT0, "DellFern Ltd.",            "Double Joker Poker (45%-75% payout)", 0,                   layout_noraut12 )
 GAMEL( 2005, ndxron10, 0,       norautp,  ndxron10, norautp_state, empty_init, ROT0, "<unknown>",                "Royal on Ten (Noraut Deluxe hack)",   0,                   layout_noraut12 )
-GAMEL( 1999, cgip30cs, 0,       norautx4, norautkl, norautp_state, init_deb,   ROT0, "CGI",                      "Credit Poker (ver.30c, standard)",    0,                   layout_noraut12 )
+GAMEL( 1999, cgip30cs, 0,       norautx4, norautkl, norautp_state, init_deb,   ROT0, "CGI",                      "Credit Poker (ver.30c, standard)",    0,                   layout_noraut12 ) // CGI - Credit Poker, VERSION 30C, 21/12/99
+GAMEL( 1999, cgip30b,  cgip30cs,norautx4, norautkl, norautp_state, empty_init, ROT0, "CGI",                      "Credit Poker (ver.30b, 7 & 9 bonus)", 0,                   layout_noraut12 ) // CGI - Credit Poker, VERSION 30B, 7 &9 BONUS, 21/12/99 BY V.S. for CGI
+GAMEL( 1998, cgip23b,  cgip30cs,norautx4, norautkl, norautp_state, empty_init, ROT0, "CGI",                      "Credit Poker (ver.23b, 7 & 9 bonus)", 0,                   layout_noraut12 ) // CGI - Credit Poker, VERSION 23B, 7 &9 BONUS, 31.03.98. BY V.S.
 GAMEL( 19??, cgidjp,   0,       cgidjp,   mainline, norautp_state, empty_init, ROT0, "CGI",                      "Double Joker Poker (CGI)",            0,                   layout_noraut12 ) // very similar to df_djpkr
 GAME(  198?, kimblz80, 0,       kimble,   norautp,  norautp_state, empty_init, ROT0, "Kimble Ireland",           "Kimble Double HI-LO (z80 version)",   MACHINE_NOT_WORKING )
 GAME(  1983, pma,      0,       nortest1, norautp,  norautp_state, empty_init, ROT0, "PMA",                      "PMA Poker",                           MACHINE_NOT_WORKING )

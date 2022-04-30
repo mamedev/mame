@@ -20,9 +20,11 @@
 #include "bus/astrocde/ctrl.h"
 #include "bus/astrocde/accessory.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
 
 class astrocde_home_state : public astrocde_state
 {
@@ -37,9 +39,14 @@ public:
 	{ }
 
 	void astrocde(machine_config &config);
+
+	void init_astrocde();
+
+protected:
+	virtual void machine_start() override;
+
 private:
-	DECLARE_READ8_MEMBER(inputs_r);
-	DECLARE_MACHINE_START(astrocde);
+	uint8_t inputs_r(offs_t offset);
 
 	void astrocade_io(address_map &map);
 	void astrocade_mem(address_map &map);
@@ -105,7 +112,7 @@ void astrocde_home_state::astrocade_io(address_map &map)
  *
  *************************************/
 
-READ8_MEMBER(astrocde_home_state::inputs_r)
+uint8_t astrocde_home_state::inputs_r(offs_t offset)
 {
 	if (BIT(offset, 2))
 		return m_keypad[offset & 3]->read();
@@ -186,8 +193,6 @@ void astrocde_home_state::astrocde(machine_config &config)
 
 	config.set_perfect_quantum(m_maincpu);
 
-	MCFG_MACHINE_START_OVERRIDE(astrocde_home_state, astrocde)
-
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(ASTROCADE_CLOCK, 455, 0, 352, 262, 0, 240);
@@ -255,24 +260,27 @@ ROM_END
  *
  *************************************/
 
-void astrocde_state::init_astrocde()
+void astrocde_home_state::init_astrocde()
 {
 	m_video_config = AC_SOUND_PRESENT;
 }
 
-MACHINE_START_MEMBER(astrocde_home_state, astrocde)
+void astrocde_home_state::machine_start()
 {
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x3fff, read8_delegate(*m_cart, FUNC(astrocade_cart_slot_device::read_rom)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x3fff, read8sm_delegate(*m_cart, FUNC(astrocade_cart_slot_device::read_rom)));
 
 	// if no RAM is mounted and the handlers are installed, the system starts with garbage on screen and a RESET is necessary
 	// thus, install RAM only if an expansion is mounted
 	if (m_exp->get_card_mounted())
 	{
-		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x5000, 0xffff, read8_delegate(*m_exp, FUNC(astrocade_exp_device::read)), write8_delegate(*m_exp, FUNC(astrocade_exp_device::write)));
-		m_maincpu->space(AS_IO).install_readwrite_handler(0x0080, 0x00ff, 0x0000, 0x0000, 0xff00, read8_delegate(*m_exp, FUNC(astrocade_exp_device::read_io)), write8_delegate(*m_exp, FUNC(astrocade_exp_device::write_io)));
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x5000, 0xffff, read8sm_delegate(*m_exp, FUNC(astrocade_exp_device::read)), write8sm_delegate(*m_exp, FUNC(astrocade_exp_device::write)));
+		m_maincpu->space(AS_IO).install_readwrite_handler(0x0080, 0x00ff, 0x0000, 0x0000, 0xff00, read8sm_delegate(*m_exp, FUNC(astrocade_exp_device::read_io)), write8sm_delegate(*m_exp, FUNC(astrocade_exp_device::write_io)));
 	}
 }
+
+} // Anonymous namespace
+
 
 /*************************************
  *

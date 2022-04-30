@@ -8,7 +8,8 @@
     the rather brisk rate of 200 ns per machine cycle. However, it has no
     ALU or general-purpose data bus, so most of its operations amount to
     simple manipulations of an assortment of synchronous up counters, shift
-    registers and flip-flops.
+    registers and flip-flops, plus a 16-location scratchpad made up of two
+    7489 16x4 register files.
 
     The instruction memory is organized as a series of 256-byte "fields"
     which limit the extent of conditional branches. The architecture allows
@@ -37,9 +38,8 @@ DEFINE_DEVICE_TYPE(RX01_CPU, rx01_cpu_device, "rx01_cpu", "DEC RX01 CPU")
 rx01_cpu_device::rx01_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: cpu_device(mconfig, RX01_CPU, tag, owner, clock)
 	, m_inst_config("program", ENDIANNESS_LITTLE, 8, 12, 0)
-	, m_sp_config("scratchpad", ENDIANNESS_LITTLE, 8, 4, 0, address_map_constructor(FUNC(rx01_cpu_device::scratchpad_map), this))
-	, m_inst_cache(nullptr)
-	, m_sp_cache(nullptr)
+	, m_data_config("sectordata", ENDIANNESS_LITTLE, 8, 10, 0) // actually 1 bit wide
+	, m_interface_callback(*this)
 	, m_pc(0)
 	, m_ppc(0)
 	, m_mb(0)
@@ -52,12 +52,16 @@ rx01_cpu_device::rx01_cpu_device(const machine_config &mconfig, const char *tag,
 	, m_bar(0)
 	, m_crc(0)
 	, m_flags(0)
+	, m_run(false)
+	, m_12_bit(false)
+	, m_data_in(false)
 	, m_unit(false)
 	, m_load_head(false)
+	, m_syn_index(false)
 	, m_icount(0)
 {
+	std::fill(std::begin(m_sp), std::end(m_sp), 0);
 	m_inst_config.m_is_octal = true;
-	m_sp_config.m_is_octal = true;
 }
 
 std::unique_ptr<util::disasm_interface> rx01_cpu_device::create_disassembler()
@@ -65,23 +69,23 @@ std::unique_ptr<util::disasm_interface> rx01_cpu_device::create_disassembler()
 	return std::make_unique<rx01_disassembler>();
 }
 
-void rx01_cpu_device::scratchpad_map(address_map &map)
-{
-	map(0, 15).ram().share("scratchpad"); // two 7489 16x4 register files
-}
-
 device_memory_interface::space_config_vector rx01_cpu_device::memory_space_config() const
 {
 	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_inst_config),
-		std::make_pair(AS_DATA, &m_sp_config)
+		std::make_pair(AS_DATA, &m_data_config)
 	};
+}
+
+void rx01_cpu_device::device_resolve_objects()
+{
+	m_interface_callback.resolve_all_safe();
 }
 
 void rx01_cpu_device::device_start()
 {
-	m_inst_cache = space(AS_PROGRAM).cache<0, 0, ENDIANNESS_LITTLE>();
-	m_sp_cache = space(AS_DATA).cache<0, 0, ENDIANNESS_LITTLE>();
+	space(AS_PROGRAM).cache(m_inst_cache);
+	space(AS_DATA).cache(m_data_cache);
 
 	set_icountptr(m_icount);
 
@@ -93,13 +97,13 @@ void rx01_cpu_device::device_start()
 	state_add(RX01_CNTR, "CNTR", m_cntr).formatstr("%03O");
 	state_add(RX01_SR, "SR", m_sr).formatstr("%03O");
 	state_add(RX01_SPAR, "SPAR", m_spar).mask(15).formatstr("%3s");
-	u8 *sp = static_cast<u8 *>(memshare("scratchpad")->ptr());
 	for (int r = 0; r < 16; r++)
-		state_add(RX01_R0 + r, string_format("R%d", r).c_str(), sp[r]).formatstr("%03O");
+		state_add(RX01_R0 + r, string_format("R%d", r).c_str(), m_sp[r]).formatstr("%03O");
 	state_add(RX01_BAR, "BAR", m_bar).mask(07777).formatstr("%04O");
 	state_add(RX01_CRC, "CRC", m_crc).formatstr("%06O");
 	state_add(RX01_UNIT, "UNIT", m_unit);
 	state_add(RX01_LDHD, "LDHD", m_load_head);
+	state_add(RX01_INDEX, "INDEX", m_syn_index);
 
 	// Save state registration
 	save_item(NAME(m_pc));
@@ -114,8 +118,12 @@ void rx01_cpu_device::device_start()
 	save_item(NAME(m_bar));
 	save_item(NAME(m_crc));
 	save_item(NAME(m_flags));
+	save_item(NAME(m_run));
+	save_item(NAME(m_12_bit));
+	save_item(NAME(m_data_in));
 	save_item(NAME(m_unit));
 	save_item(NAME(m_load_head));
+	save_item(NAME(m_syn_index));
 }
 
 void rx01_cpu_device::device_reset()
@@ -125,24 +133,68 @@ void rx01_cpu_device::device_reset()
 	m_mb = 0;
 	m_inst_disable = false;
 	m_inst_repeat = false;
-	m_bar = 0;
+	set_bar(0);
 	m_cntr = 0;
 	m_sr = 0;
 	m_spar = 0;
 	m_flags = 0;
 	m_unit = false;
 	m_load_head = false;
+
+	// Clear interface outputs (inactive high)
+	for (auto &cb : m_interface_callback)
+		cb(1);
+}
+
+void rx01_cpu_device::execute_set_input(int linenum, int state)
+{
+	// All inputs (and outputs) are active low
+	switch (linenum)
+	{
+	case RX_RUN:
+		m_run = (state == ASSERT_LINE);
+		break;
+
+	case RX_12_BIT:
+		m_12_bit = (state == ASSERT_LINE);
+		break;
+
+	case RX_DATA:
+		m_data_in = (state == ASSERT_LINE);
+		break;
+	}
 }
 
 u8 rx01_cpu_device::mux_out()
 {
 	if (BIT(m_mb, 0))
-		return m_sp_cache->read_byte(m_spar);
+		return m_sp[m_spar];
 	else
-		return m_inst_cache->read_byte(m_pc);
+		return m_inst_cache.read_byte(m_pc);
+}
+
+bool rx01_cpu_device::data_in()
+{
+	if (m_data_in)
+		return true;
+	else if (m_flags & FF_IOB3)
+	{
+		if (m_flags & FF_IOB6)
+			return bool(m_data_cache.read_byte(m_bar));
+		else
+			return BIT(m_sr, 7);
+	}
+	else
+		return false;
 }
 
 bool rx01_cpu_device::sep_data()
+{
+	// TODO
+	return false;
+}
+
+bool rx01_cpu_device::sep_clk()
 {
 	// TODO
 	return false;
@@ -160,17 +212,33 @@ bool rx01_cpu_device::drv_sel_trk0()
 	return false;
 }
 
+bool rx01_cpu_device::sec_buf_in()
+{
+	if (m_flags & FF_IOB0)
+		return sep_data();
+	else
+		return data_in();
+}
+
 bool rx01_cpu_device::test_condition()
 {
 	switch (m_mb & 074)
 	{
 	case 000:
-		// Interface transfer request or command pending (TODO)
-		return false;
+		// Interface transfer request or command pending
+		return m_run;
 
 	case 004:
 		// Output buffer bit 3
 		return (m_flags & FF_IOB3) != 0;
+
+	case 010:
+		// Serial data from interface
+		return data_in();
+
+	case 014:
+		// Drive index latch
+		return m_syn_index;
 
 	case 020:
 		// MSB of shift register
@@ -188,6 +256,18 @@ bool rx01_cpu_device::test_condition()
 		// Track zero of selected drive on head
 		return (m_flags & FF_IOB0) && (m_flags & FF_IOB3) && drv_sel_trk0();
 
+	case 040:
+		// Drive write protect (TODO)
+		return false;
+
+	case 044:
+		// Separated clock
+		return sep_clk();
+
+	case 050:
+		// 12-bit interface mode selected
+		return m_12_bit;
+
 	case 054:
 		// Separated data equals shift register MSB
 		return BIT(m_sr, 7) == sep_data();
@@ -200,14 +280,29 @@ bool rx01_cpu_device::test_condition()
 		// Missing clock equals shift register MSB
 		return BIT(m_sr, 7) == missing_clk();
 
+	case 070:
+		// Sector buffer output
+		if (m_flags & FF_WRTBUF)
+			return sec_buf_in();
+		else
+			return bool(m_data_cache.read_byte(m_bar));
+
 	case 074:
 		// Flag state equals one
 		return (m_flags & FF_FLAG) != 0;
 
 	default:
-		LOG("%04o: Unhandled branch condition %d\n", m_ppc, (m_mb & 074) >> 2);
+		// Shouldn't happen
+		logerror("%04o: Unhandled branch condition %d\n", m_ppc, (m_mb & 074) >> 2);
 		return true;
 	}
+}
+
+void rx01_cpu_device::set_bar(u16 bar)
+{
+	if (m_bar != bar && (m_flags & FF_WRTBUF))
+		m_data_cache.write_byte(m_bar, sec_buf_in());
+	m_bar = bar;
 }
 
 void rx01_cpu_device::shift_crc(bool data)
@@ -250,7 +345,7 @@ void rx01_cpu_device::execute_run()
 				m_ppc = m_pc;
 				debugger_instruction_hook(m_pc);
 
-				m_mb = m_inst_cache->read_byte(m_pc);
+				m_mb = m_inst_cache.read_byte(m_pc);
 				m_pc = (m_pc + 1) & 03777;
 			}
 
@@ -276,52 +371,140 @@ void rx01_cpu_device::execute_run()
 			else switch (m_mb & 074)
 			{
 			case 000:
-				if (BIT(m_mb, 1))
+				if (BIT(m_mb, 1) && (m_flags & FF_IOB0) == 0)
+				{
+					LOG("%04o: Drive bus selected\n", m_ppc);
 					m_flags |= FF_IOB0;
-				else
+					for (int i = 0; i < 5; i++)
+						if (m_flags & (FF_IOB1 << i))
+							m_interface_callback[i](1);
+				}
+				else if (!BIT(m_mb, 1) && (m_flags & FF_IOB0) != 0)
+				{
+					LOG("%04o: Interface bus selected\n", m_ppc);
 					m_flags &= ~FF_IOB0;
+					for (int i = 0; i < 5; i++)
+						if (m_flags & (FF_IOB1 << i))
+							m_interface_callback[i](0);
+				}
 				break;
 
 			case 004:
-				if (BIT(m_mb, 1))
+				if (BIT(m_mb, 1) && (m_flags & FF_IOB1) == 0)
+				{
 					m_flags |= FF_IOB1;
-				else
+					if ((m_flags & FF_IOB0) == 0)
+					{
+						LOG("%04o: RX ERROR asserted\n", m_ppc);
+						m_interface_callback[0](0);
+					}
+				}
+				else if (!BIT(m_mb, 1) && (m_flags & FF_IOB1) != 0)
+				{
 					m_flags &= ~FF_IOB1;
+					if ((m_flags & FF_IOB0) == 0)
+					{
+						LOG("%04o: RX ERROR cleared\n", m_ppc);
+						m_interface_callback[0](1);
+					}
+				}
 				break;
 
 			case 010:
-				if (BIT(m_mb, 1))
+				if (BIT(m_mb, 1) && (m_flags & FF_IOB2) == 0)
+				{
 					m_flags |= FF_IOB2;
-				else
+					if ((m_flags & FF_IOB0) == 0)
+					{
+						LOG("%04o: RX TRANSFER REQUEST asserted\n", m_ppc);
+						m_interface_callback[1](0);
+					}
+				}
+				else if (!BIT(m_mb, 1) && (m_flags & FF_IOB2) != 0)
+				{
 					m_flags &= ~FF_IOB2;
+					if ((m_flags & FF_IOB0) == 0)
+					{
+						LOG("%04o: RX TRANSFER REQUEST cleared\n", m_ppc);
+						m_interface_callback[1](1);
+					}
+				}
 				break;
 
 			case 014:
-				if (BIT(m_mb, 1))
+				if (BIT(m_mb, 1) && (m_flags & FF_IOB3) == 0)
+				{
 					m_flags |= FF_IOB3;
-				else
+					if ((m_flags & FF_IOB0) == 0)
+					{
+						LOG("%04o: RX OUT mode selected\n", m_ppc);
+						m_interface_callback[2](0);
+					}
+				}
+				else if (!BIT(m_mb, 1) && (m_flags & FF_IOB3) != 0)
+				{
 					m_flags &= ~FF_IOB3;
+					if ((m_flags & FF_IOB0) == 0)
+					{
+						LOG("%04o: RX IN mode selected\n", m_ppc);
+						m_interface_callback[2](1);
+					}
+				}
 				break;
 
 			case 020:
-				if (BIT(m_mb, 1))
+				if (BIT(m_mb, 1) && (m_flags & FF_IOB4) == 0)
+				{
 					m_flags |= FF_IOB4;
-				else
+					if ((m_flags & FF_IOB0) == 0)
+					{
+						LOG("%04o: RX DONE asserted\n", m_ppc);
+						m_interface_callback[3](0);
+					}
+				}
+				else if (!BIT(m_mb, 1) && (m_flags & FF_IOB4) != 0)
+				{
 					m_flags &= ~FF_IOB4;
+					if ((m_flags & FF_IOB0) == 0)
+					{
+						LOG("%04o: RX DONE cleared\n", m_ppc);
+						m_interface_callback[3](1);
+					}
+				}
 				break;
 
 			case 024:
-				if (BIT(m_mb, 1))
+				if (BIT(m_mb, 1) && (m_flags & FF_IOB5) == 0)
+				{
 					m_flags |= FF_IOB5;
-				else
+					if ((m_flags & FF_IOB0) == 0)
+					{
+						LOG("%04o: RX SHIFT asserted\n", m_ppc);
+						m_interface_callback[4](0);
+					}
+				}
+				else if (!BIT(m_mb, 1) && (m_flags & FF_IOB5) != 0)
+				{
 					m_flags &= ~FF_IOB5;
+					if ((m_flags & FF_IOB0) == 0)
+					{
+						LOG("%04o: RX SHIFT cleared\n", m_ppc);
+						m_interface_callback[4](1);
+					}
+				}
 				break;
 
 			case 030:
 				if (BIT(m_mb, 1))
+				{
+					LOG("%04o: SEC BUF selected for output\n", m_ppc);
 					m_flags |= FF_IOB6;
+				}
 				else
+				{
+					LOG("%04o: SR selected for output\n", m_ppc);
 					m_flags &= ~FF_IOB6;
+				}
 				break;
 
 			case 034:
@@ -330,20 +513,24 @@ void rx01_cpu_device::execute_run()
 
 			case 040:
 				m_load_head = BIT(m_mb, 1);
+				m_syn_index = false;
 				break;
 
 			case 044:
 				if (BIT(m_mb, 1))
-					m_bar = (m_bar + 1) & 07777;
+					set_bar((m_bar + 1) & 07777);
 				else
-					m_bar = BIT(m_mb, 0) ? 0 : 06000;
+					set_bar(BIT(m_mb, 0) ? 0 : 06000);
 				break;
 
 			case 050:
 				if (BIT(m_mb, 0))
 					m_flags |= FF_WRTBUF;
-				else
+				else if (m_flags & FF_WRTBUF)
+				{
+					m_data_cache.write_byte(m_bar, sec_buf_in());
 					m_flags &= ~FF_WRTBUF;
+				}
 				break;
 
 			case 054:
@@ -360,7 +547,7 @@ void rx01_cpu_device::execute_run()
 				break;
 
 			case 064:
-				m_sp_cache->write_byte(m_spar, m_sr);
+				m_sp[m_spar] = m_sr;
 				break;
 
 			case 070:

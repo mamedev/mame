@@ -90,7 +90,7 @@ List of known B-System games:
 
     Violence Fight                  (YM2203 sound, 1xMSM6295 )
     Hit The Ice                     (YM2203 sound, 1xMSM6295 )
-    Master of Weapons               (YM2203 sound)
+    Master of Weapon                (YM2203 sound)
 
     Quiz Sekai wa SHOW by shobai    (YM2610-B sound, MB87078 - electronic volume control)
     Puzzle Bobble                   (YM2610-B sound, MB87078 - electronic volume control)
@@ -168,6 +168,72 @@ Notes:
             Vsync: 60Hz
 
 
+***************************************************************************
+
+Master of Weapon, Taito 1989
+Hardware info by Guru
+
+PCB Layout
+----------
+
+B SYSTEM
+K1100424A
+J1100181A
+K1100426A MAST OF WEAPON (sticker)
+|------------------------------------------------------------------|
+|VOL 4556  Y3014    YM2203       PC060HA       CXK58257  CXK58257  |
+|  MB3735           Z80                B72-10.IC32                 |
+|                   2018         B72_07.IC30                       |
+|                                              CXK58257  CXK58257  |
+|      62064  |-----|            TMM2063                           |
+|             |TC0260                                              |
+|J            |DAR  |            27.164MHz     CXK58257  CXK58257  |
+|A            |-----|                                              |
+|M                              |--------|                         |
+|M                              |TAITO   |     CXK58257  CXK58257  |
+|A                              |TC0180  |                         |
+|    48CR-1                     |VCU     |                         |
+|    48CR-1                     |--------|              B72-02.IC6 |
+|    48CR-1                                                        |
+|    48CR-1         TMM2063      TMM2063                B72-01.IC5 |
+|            MB3771                                                |
+| 48CR-1            B72_04.IC34  B72_03.IC25 B72-09.IC23 B72-08.IC3|
+|       TC0040IOC                                            24MHz |
+|   SW2   SW1       B72_06.IC33  B72_12.IC24          68000        |
+|------------------------------------------------------------------|
+Notes:
+      68000 - Motorola MC68000P12 CPU. Clock input 12.000MHz [24/2]
+        Z80 - Zilog Z0840006PSC CPU. Clock input 6.000MHz [24/4]
+     YM2203 - Yamaha YM2203 FM Operator Type-N sound chip. Clock input 3.000MHz [24/8]
+      Y3014 - Yamaha YM3014B Serial Input Floating D/A Converter. Clock input 1.0000MHz [24/24] on pin 5
+    PC060HA - Taito PC060HA CIU custom IC (68K<>Z80 communication)
+  TC0260DAR - Taito TC0260DAR custom IC (palette and RGB output)
+  TC0180VCU - Taito TC0180VCU custom IC (tilemap)
+  TC0040IOC - Taito TC0040IOC custom IC (controls, coin lockout, coin meter, DIP switch management and master reset/watchdog)
+   CXK58257 - Sony CXK58257 32kBx8-bit SRAM (video RAM)
+       2018 - Motorola MCM2018 2kBx8-bit SRAM (palette RAM)
+    TMM2063 - Toshiba TMM2063 8kBx8-bit SRAM (program RAM for 68000 & Z80)
+      62064 - Toshiba TD62064 4-Channel Darlington Sink Driver
+     MB3771 - Fujitsu MB3771 Master Reset IC
+      SW1/2 - 8-position DIP switch
+     48CR-1 - Custom resistor array
+       4556 - NEC uPC4556 Dual Operational Amplifier
+    MBB3735 - Fujitsu MB3735 Audio Power Amplifier
+B72_04.IC34 \
+B72_03.IC25  \ M5M27C101 128kBx8-bit EPROM (main program)
+B72_06.IC33  /
+B72_12.IC24 /
+B72_07.IC30 - 27C512 64kBx8-bit EPROM (sound program)
+ B72-02.IC6 \ 234000 512kBx8-bit mask ROM (equivalent to AM27C400, graphics)
+ B72-01.IC5 /
+B72-09.IC23 - MMI PAL16L8 (PCB marked 'INT')
+ B72-08.IC3 - MMI PAL16L8 (PCB marked 'DEC')
+B72-10.IC32 - MMI PAL16L8
+      HSync - 15.1782kHz \
+      VSync - 60.00000Hz / <-- actual measurements on PCB
+
+***************************************************************************
+
 Real Puncher
 Taito, 1994
 
@@ -187,37 +253,36 @@ TODO!
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
-#include "sound/2203intf.h"
-#include "sound/2610intf.h"
 #include "sound/okim6295.h"
+#include "sound/ymopn.h"
 #include "speaker.h"
 
 
-WRITE8_MEMBER(taitob_state::bankswitch_w)
+void taitob_state::bankswitch_w(uint8_t data)
 {
 	m_audiobank->set_entry(data & 3);
 }
 
 template<int Player>
-READ16_MEMBER(taitob_state::tracky_hi_r)
+uint16_t taitob_state::tracky_hi_r()
 {
 	return m_trackx_io[Player]->read();
 }
 
 template<int Player>
-READ16_MEMBER(taitob_state::tracky_lo_r)
+uint16_t taitob_state::tracky_lo_r()
 {
 	return (m_trackx_io[Player]->read() & 0xff) << 8;
 }
 
 template<int Player>
-READ16_MEMBER(taitob_state::trackx_hi_r)
+uint16_t taitob_state::trackx_hi_r()
 {
 	return m_tracky_io[Player]->read();
 }
 
 template<int Player>
-READ16_MEMBER(taitob_state::trackx_lo_r)
+uint16_t taitob_state::trackx_lo_r()
 {
 	return (m_tracky_io[Player]->read() & 0xff) << 8;
 }
@@ -233,12 +298,12 @@ INPUT_CHANGED_MEMBER(taitob_c_state::realpunc_sensor)
 
 ***************************************************************************/
 
-READ16_MEMBER(taitob_state::eep_latch_r)
+uint16_t taitob_state::eep_latch_r()
 {
 	return m_eep_latch;
 }
 
-WRITE16_MEMBER(taitob_state::eeprom_w)
+void taitob_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_eep_latch);
 
@@ -267,7 +332,7 @@ WRITE16_MEMBER(taitob_state::eeprom_w)
 *************************************************************************/
 
 
-WRITE8_MEMBER(taitob_state::player_12_coin_ctrl_w)
+void taitob_state::player_12_coin_ctrl_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
@@ -275,12 +340,12 @@ WRITE8_MEMBER(taitob_state::player_12_coin_ctrl_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x08);
 }
 
-READ16_MEMBER(taitob_state::player_34_coin_ctrl_r)
+uint16_t taitob_state::player_34_coin_ctrl_r()
 {
 	return m_coin_word;
 }
 
-WRITE16_MEMBER(taitob_state::player_34_coin_ctrl_w)
+void taitob_state::player_34_coin_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_coin_word);
 
@@ -291,7 +356,7 @@ WRITE16_MEMBER(taitob_state::player_34_coin_ctrl_w)
 	machine().bookkeeping().coin_counter_w(3,  data & 0x0800);
 }
 
-WRITE16_MEMBER(taitob_state::spacedxo_tc0220ioc_w)
+void taitob_state::spacedxo_tc0220ioc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_tc0220ioc->write(offset, data & 0xff);
@@ -302,7 +367,7 @@ WRITE16_MEMBER(taitob_state::spacedxo_tc0220ioc_w)
 	}
 }
 
-WRITE16_MEMBER(taitob_c_state::realpunc_output_w)
+void taitob_c_state::realpunc_output_w(uint16_t data)
 {
 /*
    15 = Camera Enable?
@@ -559,8 +624,7 @@ void taitob_c_state::realpunc_map(address_map &map)
 	map(0x18c000, 0x18c001).w(FUNC(taitob_c_state::realpunc_output_w));
 	map(0x200000, 0x27ffff).m(m_tc0180vcu, FUNC(tc0180vcu_device::tc0180vcu_memrw));
 	map(0x280000, 0x281fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x300000, 0x300001).rw("hd63484", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
-	map(0x300002, 0x300003).rw("hd63484", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
+	map(0x300000, 0x300003).rw("hd63484", FUNC(hd63484_device::read16), FUNC(hd63484_device::write16));
 //  map(0x320000, 0x320001).nop(); // ?
 	map(0x320002, 0x320003).nopr();
 	map(0x320002, 0x320002).w("tc0140syt", FUNC(tc0140syt_device::master_comm_w));
@@ -586,7 +650,7 @@ void taitob_state::sound_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x7fff).bankr("audiobank");
 	map(0xc000, 0xdfff).ram();
-	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym_generic_device::read), FUNC(ym_generic_device::write));
 	map(0xe200, 0xe200).nopr().w("tc0140syt", FUNC(tc0140syt_device::slave_port_w));
 	map(0xe201, 0xe201).rw("tc0140syt", FUNC(tc0140syt_device::slave_comm_r), FUNC(tc0140syt_device::slave_comm_w));
 	map(0xe400, 0xe403).nopw(); /* pan */
@@ -1522,52 +1586,82 @@ static INPUT_PORTS_START( ryujin )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+
+	PORT_START("IN3")
+	PORT_BIT(  0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN4")
+	PORT_BIT(  0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN5")
+	PORT_BIT(  0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sbm )
-	PORT_START("DSWA") //+-ok
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x01, 0x01, "Tickets" )                   PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Win Bonus Tickets" )         PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC(  0x04, IP_ACTIVE_LOW, "SW1:3" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x08, DEF_STR( On ))
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSWB") //+-ok
+	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x0c, "Punch Power" )               PORT_DIPLOCATION("SW2:3,4")
+	/* Modifies the power of the player's punch by a set amount. Table is at 0x0A614:
+	    DIP 00: 0000 ;+00
+	    DIP 01: FFFB ;-05
+	    DIP 10: 0005 :+05
+	    DIP 11: 000A :+10
+	    For example, if the player had an initial power of 200t and Dip Switches 2-3 and 2-4 were both set, the power would be increased to 210t.
+	    This bonus (or penalty) is applied before the game floors the punch power at 1t and before it caps the punch power at 300t. So, if in MAME, you hold Pad Photosensors 1 and 2 and then immediately hit Pad Photosensor 3, you'll still get a punch power of 300t even if Dip Switch 2-3 was set and Dip Switch 2-4 wasn't.
+	    Just for reference, the initial power of the player's punch is calculated by taking 24000 and dividing it by the timer at 105048 in RAM. This is performed in the subroutine at 0x0A5B0 in the main CPU.
+	*/
+	PORT_DIPSETTING(    0x08, "Lower" )
+	PORT_DIPSETTING(    0x0c, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Higher ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Highest ) )
+	PORT_DIPNAME( 0x30, 0x30, "Tickets Payout" )            PORT_DIPLOCATION("SW2:5,6")
+	/* Controls the power divider. The game calculates the base ticket total by taking the total power of the player's three punches and then dividing it by one of four values in the table at 0x7FFC0:
+	    DIP 00: 50
+	    DIP 01: 40
+	    DIP 10: 80
+	    DIP 11: 120
+	    For example, if the player got a combined total of 640t power and dip switch 2-6 was set but 2-5 was not, they'll have a base of 8 tickets.
+	*/
+	PORT_DIPSETTING(    0x00, "Total Power / 120" )
+	PORT_DIPSETTING(    0x10, "Total Power / 80" )
+	PORT_DIPSETTING(    0x30, "Total Power / 50" )
+	PORT_DIPSETTING(    0x20, "Total Power / 40" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Win Bonus Tickets Payout" )  PORT_DIPLOCATION("SW2:7,8")
+	/* Controls the value of the round completion ticket bonus. Each round has its own ticket table: The first value is for 00, the second is for 01, third for 10, fourth for 11:
+	    7FFC8: 0001 0002 0003 0002 #ROUND 1 BONUS TABLE - 01 / 02 / 03 / 02
+	    7FFD0: 0002 0004 0004 0004 #ROUND 2 BONUS TABLE - 02 / 04 / 04 / 04
+	    7FFD8: 0003 0006 0005 0008 #ROUND 3 BONUS TABLE - 03 / 06 / 05 / 08
+	    7FFE0: 0004 0008 0006 0010 #ROUND 4 BONUS TABLE - 04 / 08 / 06 / 16
+	    7FFE8: 0005 000A 0007 0020 #ROUND 5 BONUS TABLE - 05 / 10 / 07 / 32
+	    For example, if the player beat round 4 and dip switch 2-7 was set but 2-8 was not, they'd have a bonus of 8 tickets.
+	*/
+	PORT_DIPSETTING(    0xc0, "1, 2, 3, 4, 5" )
+	PORT_DIPSETTING(    0x80, "2, 4, 6, 8, 10" )
+	PORT_DIPSETTING(    0x40, "3, 4, 5, 6, 7" )
+	PORT_DIPSETTING(    0x00, "2, 4, 8, 16, 32" )
 
 	PORT_START("JOY")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)//sound select UP
@@ -1580,8 +1674,8 @@ static INPUT_PORTS_START( sbm )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)//LADY ????
 
 	PORT_START("START")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )//select; ok (1P in object test)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )//start ; ok (2P in object test)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Select")//select; ok (1P in object test)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Start")//start ; ok (2P in object test)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1606,6 +1700,42 @@ static INPUT_PORTS_START( sbm )
 	    The longer the time - the less power.
 	*/
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Pad Photosensor 4")//PHOTO 4  ??? ACTIVE_LOW  ??? (punching pad photosensor 4)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( sbmj )
+	PORT_INCLUDE(sbm)
+
+	PORT_MODIFY("DSWA")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
+
+	PORT_MODIFY("DSWB")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( realpunc )
@@ -1702,7 +1832,7 @@ INPUT_PORTS_END
     Both ym2610 and ym2610b generate 3 (PSG like) + 2 (fm left,right) channels.
     I use mixer_set_volume() to emulate the effect.
 */
-WRITE8_MEMBER(taitob_state::mb87078_gain_changed)
+void taitob_state::mb87078_gain_changed(offs_t offset, uint8_t data)
 {
 	if (offset == 1)
 	{
@@ -2419,7 +2549,7 @@ void taitob_state::viofight(machine_config &config)
 }
 
 
-void taitob_state::silentd(machine_config &config)
+void taitob_state::silentd(machine_config &config) /* ET910000B PCB */
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 24_MHz_XTAL / 2);   /* 12 MHz */
@@ -2473,70 +2603,7 @@ void taitob_state::silentd(machine_config &config)
 }
 
 
-void taitob_state::selfeena(machine_config &config)
-{
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 24_MHz_XTAL / 2);   /* 12 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &taitob_state::selfeena_map);
-
-	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);  /* 4 MHz */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &taitob_state::sound_map);
-
-	config.set_maximum_quantum(attotime::from_hz(600));
-
-	TC0220IOC(config, m_tc0220ioc, 0);
-	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
-	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
-	m_tc0220ioc->read_2_callback().set_ioport("IN0");
-	m_tc0220ioc->read_3_callback().set_ioport("IN1");
-	m_tc0220ioc->write_4_callback().set(FUNC(taitob_state::player_12_coin_ctrl_w));
-	m_tc0220ioc->read_7_callback().set_ioport("IN2");
-
-	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(taitob_state::screen_update_taitob));
-	m_screen->set_palette(m_palette);
-
-	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
-
-	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
-	m_tc0180vcu->set_fb_colorbase(0x10);
-	m_tc0180vcu->set_bg_colorbase(0x30);
-	m_tc0180vcu->set_fg_colorbase(0x20);
-	m_tc0180vcu->set_tx_colorbase(0x00);
-	m_tc0180vcu->set_palette(m_palette);
-	m_tc0180vcu->inth_callback().set_inputline(m_maincpu, M68K_IRQ_6, HOLD_LINE);
-	m_tc0180vcu->intl_callback().set_inputline(m_maincpu, M68K_IRQ_4, HOLD_LINE);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16_MHz_XTAL / 2));  /* 8 MHz */
-	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "mono", 0.25);
-	ymsnd.add_route(1, "mono", 1.0);;
-	ymsnd.add_route(2, "mono", 1.0);
-
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
-	tc0140syt.set_master_tag(m_maincpu);
-	tc0140syt.set_slave_tag(m_audiocpu);
-}
-
-#if 0
-void taitob_state::ryujin_patch(void)
-{
-	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
-	rom[ 0x62/2 ] = 1;
-	//0 (already in rom) - Taito Corporation 1993
-	//1 - Taito America corp with blue FBI logo
-}
-#endif
-
-void taitob_state::ryujin(machine_config &config)
+void taitob_state::selfeena(machine_config &config) /* ET910000A PCB */
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 24_MHz_XTAL / 2);   /* 12 MHz */
@@ -2588,6 +2655,17 @@ void taitob_state::ryujin(machine_config &config)
 	tc0140syt.set_master_tag(m_maincpu);
 	tc0140syt.set_slave_tag(m_audiocpu);
 }
+
+#if 0
+void taitob_state::ryujin_patch(void)
+{
+	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
+	rom[ 0x62/2 ] = 1;
+	//0 (already in rom) - Taito Corporation 1993
+	//1 - Taito America corp with blue FBI logo
+}
+#endif
+
 
 #if 0
 void taitob_state::sbm_patch(void)
@@ -2728,10 +2806,10 @@ ROM_START( rastsag2 )
 	ROM_LOAD( "b81-03.14", 0x000000, 0x080000, CRC(551b75e6) SHA1(5b8388ee2c6262f359c9e6d04c951ea8dc3901c9) )
 	ROM_LOAD( "b81-04.15", 0x080000, 0x080000, CRC(cf734e12) SHA1(4201a74468058761454515738fbf3a7b22a66e00) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "b81-02.2", 0x00000, 0x80000, CRC(20ec3b86) SHA1(fcdcc7f0a09feb824d8d73b1af0aae7ec30fd1ed) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "b81-01.1", 0x00000, 0x80000, CRC(b33f796b) SHA1(6cdb32f56283acdf20eb46a1e658e3bd7c97978c) )
 ROM_END
 
@@ -2749,10 +2827,10 @@ ROM_START( nastarw )
 	ROM_LOAD( "b81-03.14", 0x000000, 0x080000, CRC(551b75e6) SHA1(5b8388ee2c6262f359c9e6d04c951ea8dc3901c9) )
 	ROM_LOAD( "b81-04.15", 0x080000, 0x080000, CRC(cf734e12) SHA1(4201a74468058761454515738fbf3a7b22a66e00) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "b81-02.2", 0x00000, 0x80000, CRC(20ec3b86) SHA1(fcdcc7f0a09feb824d8d73b1af0aae7ec30fd1ed) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "b81-01.1", 0x00000, 0x80000, CRC(b33f796b) SHA1(6cdb32f56283acdf20eb46a1e658e3bd7c97978c) )
 ROM_END
 
@@ -2770,10 +2848,10 @@ ROM_START( nastar )
 	ROM_LOAD( "b81-03.14", 0x000000, 0x080000, CRC(551b75e6) SHA1(5b8388ee2c6262f359c9e6d04c951ea8dc3901c9) )
 	ROM_LOAD( "b81-04.15", 0x080000, 0x080000, CRC(cf734e12) SHA1(4201a74468058761454515738fbf3a7b22a66e00) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "b81-02.2", 0x00000, 0x80000, CRC(20ec3b86) SHA1(fcdcc7f0a09feb824d8d73b1af0aae7ec30fd1ed) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "b81-01.1", 0x00000, 0x80000, CRC(b33f796b) SHA1(6cdb32f56283acdf20eb46a1e658e3bd7c97978c) )
 
 	ROM_REGION( 0x0400, "plds", 0 )
@@ -2795,7 +2873,7 @@ ROM_START( crimec )
 	ROM_LOAD( "b99-02.18", 0x000000, 0x080000, CRC(2a5d4a26) SHA1(94bdfca9365970a80a639027b195b71cebc5ab9c) )
 	ROM_LOAD( "b99-01.19", 0x080000, 0x080000, CRC(a19e373a) SHA1(2208c9142473dc2218fd8b97fd6d0c861aeba011) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "b99-03.37", 0x000000, 0x080000, CRC(dda10df7) SHA1(ffbe1423794035e6f049fddb096b7282610b7cee) )
 ROM_END
 
@@ -2813,7 +2891,7 @@ ROM_START( crimecu )
 	ROM_LOAD( "b99-02.18", 0x000000, 0x080000, CRC(2a5d4a26) SHA1(94bdfca9365970a80a639027b195b71cebc5ab9c) )
 	ROM_LOAD( "b99-01.19", 0x080000, 0x080000, CRC(a19e373a) SHA1(2208c9142473dc2218fd8b97fd6d0c861aeba011) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "b99-03.37", 0x000000, 0x080000, CRC(dda10df7) SHA1(ffbe1423794035e6f049fddb096b7282610b7cee) )
 ROM_END
 
@@ -2831,7 +2909,7 @@ ROM_START( crimecj )
 	ROM_LOAD( "b99-02.18", 0x000000, 0x080000, CRC(2a5d4a26) SHA1(94bdfca9365970a80a639027b195b71cebc5ab9c) )
 	ROM_LOAD( "b99-01.19", 0x080000, 0x080000, CRC(a19e373a) SHA1(2208c9142473dc2218fd8b97fd6d0c861aeba011) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "b99-03.37", 0x000000, 0x080000, CRC(dda10df7) SHA1(ffbe1423794035e6f049fddb096b7282610b7cee) )
 ROM_END
 
@@ -2849,7 +2927,7 @@ ROM_START( ashura )
 	ROM_LOAD( "c43-02",  0x00000, 0x80000, CRC(105722ae) SHA1(1de5d396d2a4d5948544082c471a15ca1b8e756c) )
 	ROM_LOAD( "c43-03",  0x80000, 0x80000, CRC(426606ba) SHA1(961ec0a9dc18044adae433337bfa89d951c5207c) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "c43-01",  0x00000, 0x80000, CRC(db953f37) SHA1(252591b676366d4828acb20c77aa9960ad9b367e) )
 ROM_END
 
@@ -2867,7 +2945,7 @@ ROM_START( ashuraj )
 	ROM_LOAD( "c43-02",  0x00000, 0x80000, CRC(105722ae) SHA1(1de5d396d2a4d5948544082c471a15ca1b8e756c) )
 	ROM_LOAD( "c43-03",  0x80000, 0x80000, CRC(426606ba) SHA1(961ec0a9dc18044adae433337bfa89d951c5207c) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "c43-01",  0x00000, 0x80000, CRC(db953f37) SHA1(252591b676366d4828acb20c77aa9960ad9b367e) )
 ROM_END
 
@@ -2885,7 +2963,7 @@ ROM_START( ashurau )
 	ROM_LOAD( "c43-02",  0x00000, 0x80000, CRC(105722ae) SHA1(1de5d396d2a4d5948544082c471a15ca1b8e756c) )
 	ROM_LOAD( "c43-03",  0x80000, 0x80000, CRC(426606ba) SHA1(961ec0a9dc18044adae433337bfa89d951c5207c) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "c43-01",  0x00000, 0x80000, CRC(db953f37) SHA1(252591b676366d4828acb20c77aa9960ad9b367e) )
 ROM_END
 
@@ -2911,10 +2989,10 @@ ROM_START( tetrist ) // Nastar / Nastar Warrior / Rastan Saga 2 conversion with 
 	ROM_LOAD( "b81-03.14", 0x000000, 0x080000, CRC(551b75e6) SHA1(5b8388ee2c6262f359c9e6d04c951ea8dc3901c9) )
 	ROM_LOAD( "b81-04.15", 0x080000, 0x080000, CRC(cf734e12) SHA1(4201a74468058761454515738fbf3a7b22a66e00) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "b81-02.2", 0x00000, 0x80000, CRC(20ec3b86) SHA1(fcdcc7f0a09feb824d8d73b1af0aae7ec30fd1ed) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "b81-01.1", 0x00000, 0x80000, CRC(b33f796b) SHA1(6cdb32f56283acdf20eb46a1e658e3bd7c97978c) )
 ROM_END
 
@@ -3035,7 +3113,7 @@ ROM_START( rambo3 ) /* all of the following roms should most likely have the nam
 	ROM_LOAD( "ramb3-01.bin",  0x100000, 0x80000, CRC(c55fcf54) SHA1(6a26ed2541be9e3341f20e74cc49b5366ce7d424) )
 	ROM_LOAD( "ramb3-02.bin",  0x180000, 0x80000, CRC(9dd014c6) SHA1(0f046d9de57db0272810adde7d49cc348b78f1f7) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "ramb3-05.bin", 0x00000, 0x80000, CRC(0179dc40) SHA1(89feb708618ae7fa96883473d5c7a09dcc6f452a) )
 ROM_END
 
@@ -3055,7 +3133,7 @@ ROM_START( rambo3u )
 	ROM_LOAD( "ramb3-01.bin",  0x100000, 0x80000, CRC(c55fcf54) SHA1(6a26ed2541be9e3341f20e74cc49b5366ce7d424) )
 	ROM_LOAD( "ramb3-02.bin",  0x180000, 0x80000, CRC(9dd014c6) SHA1(0f046d9de57db0272810adde7d49cc348b78f1f7) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "ramb3-05.bin", 0x00000, 0x80000, CRC(0179dc40) SHA1(89feb708618ae7fa96883473d5c7a09dcc6f452a) )
 ROM_END
 
@@ -3093,7 +3171,7 @@ ROM_START( rambo3p ) /* Is this set a prototype or possible bootleg? */
 	ROM_LOAD16_BYTE( "r3-ch2lh.rom", 0x180001, 0x020000, CRC(df3bc48f) SHA1(6747a453da4bca0b837f4ef1f1bbe871f15332ed) )
 	ROM_LOAD16_BYTE( "r3-ch2hh.rom", 0x1c0001, 0x020000, CRC(bf37dfac) SHA1(27e825bd0a4d7ae65714fefeb6fedac501984ba9) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "r3-a1.rom", 0x00000, 0x20000, CRC(4396fa19) SHA1(cb6d983f210249676c500723041d74fa3fdc517d) )
 	ROM_LOAD( "r3-a2.rom", 0x20000, 0x20000, CRC(41fe53a8) SHA1(1723046111d0115d3f64c3111c50d51306e88ad0) )
 	ROM_LOAD( "r3-a3.rom", 0x40000, 0x20000, CRC(e89249ba) SHA1(cd94492a0643e9e1e25b121160914822a6a7723e) )
@@ -3112,8 +3190,26 @@ ROM_START( pbobble )
 	ROM_LOAD( "pb-ic14.bin", 0x00000, 0x80000, CRC(55f90ea4) SHA1(793c79e5b72171124368ad09dd31235252c541f5) )
 	ROM_LOAD( "pb-ic9.bin",  0x80000, 0x80000, CRC(3253aac9) SHA1(916d85aa96e2914630833292a0655b0389b4a39b) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "pb-ic15.bin", 0x000000, 0x100000, CRC(0840cbc4) SHA1(1adbd7aef44fa80832f63dfb8efdf69fd7256a57) )
+ROM_END
+
+ROM_START( bublbust ) // Purportedly a location test version, but has the same version number and build date as the released Japanese set below
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 512k for 68000 code - located on Taito C0503005B main board
+	ROM_LOAD16_BYTE( "p.bobble_prg_h_kyotsu_6-15_c681.ic18", 0x00000, 0x40000, CRC(ba83e398) SHA1(2512ea5a805f0e5c470c4d216d679f3dc3c4aa82) ) // hand written label P.ボブル PRG H 共通 6/15 C681
+	ROM_LOAD16_BYTE( "p.bobble_prg_l_usa_6-15_e9e1.ic2",  0x00001, 0x40000, CRC(a12cb3f2) SHA1(06271d3a0af101a959e6e777f1f9e99bae1e6076) ) // hand written label P.ボブル PRG L USA 6/15 E9E1
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // 128k for Z80 code - located on Taito C0503005B main board
+	ROM_LOAD( "prg_snd.ic27", 0x00000, 0x20000, CRC(2f288fe0) SHA1(4ba707f4b3a1ca0e573652d1c733ee889f9fef8a) ) // hand written label PRG SND IC 27 - no checksum listed
+
+	ROM_REGION( 0x100000, "tc0180vcu", 0 ) // located on Taito C0503002A ROM PCB
+	ROM_LOAD16_BYTE( "p.bobble_chr-1l_6-14_eaa0.ic11_ch_1_0l", 0x00000, 0x40000, CRC(8d3fa2f0) SHA1(3d36944e35081740469df61a40e538eb94ea2ef6) ) // hand written label P.ボブル CHR 1L 6/14 EAA0
+	ROM_LOAD16_BYTE( "p.bobble_chr-1h_6-14_1515.ic12_ch_1_0h", 0x00001, 0x40000, CRC(a2eb4d32) SHA1(571811a543af50cc5e0f1d7aad9fc388919e93e6) ) // hand written label P.ボブル CHR 1H 6/14 1515
+	ROM_LOAD16_BYTE( "p.bobble_chr-0l_6-14_86d5.ic7_ch_0_0l",  0x80000, 0x40000, CRC(80f1aab0) SHA1(f5cdb93aa702fb8ba91eaf8f470b6e2a61a581b5) ) // hand written label P.ボブル CHR 0L 6/14 86D5
+	ROM_LOAD16_BYTE( "p.bobble_chr-0h_6-14_d180.ic8_ch_0_0h",  0x80001, 0x40000, CRC(d773cac8) SHA1(b008a21c39650a28cba402cd1c4de0567e275bc9) ) // hand written label P.ボブル CHR 0H 6/14 D180 (label torn, checksum illegible besides final 0)
+
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) // located on Taito C0503002A ROM PCB - Half the size of the Japanese ADPCMA sample ROM
+	ROM_LOAD( "cr40-kaigai-7bec.ic15_ach_0", 0x00000, 0x80000, CRC(f203ae52) SHA1(d41b880ef17eea6614e2911318db5cd070473381) ) // hand written label CR40 海外 7BEC
 ROM_END
 
 ROM_START( spacedx )
@@ -3128,7 +3224,7 @@ ROM_START( spacedx )
 	ROM_LOAD( "d89-02.14", 0x00000, 0x80000, CRC(c36544b9) SHA1(6bd5257dfb27532621b75f43e31aa351ad2192a2) )
 	ROM_LOAD( "d89-01.9",  0x80000, 0x80000, CRC(fffa0660) SHA1(de1abe1b1e9d14405b5663103ea4a6119fce7cc5) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "d89-03.15", 0x00000, 0x80000, CRC(218f31a4) SHA1(9f52b9fa8f02003888180524a6e9ee7c9230f55d) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
@@ -3152,7 +3248,7 @@ ROM_START( spacedxj )
 	ROM_LOAD( "d89-02.14", 0x00000, 0x80000, CRC(c36544b9) SHA1(6bd5257dfb27532621b75f43e31aa351ad2192a2) )
 	ROM_LOAD( "d89-01.9" , 0x80000, 0x80000, CRC(fffa0660) SHA1(de1abe1b1e9d14405b5663103ea4a6119fce7cc5) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "d89-03.15", 0x00000, 0x80000, CRC(218f31a4) SHA1(9f52b9fa8f02003888180524a6e9ee7c9230f55d) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
@@ -3176,7 +3272,7 @@ ROM_START( spacedxo ) // different PCB type, similar to Silent Dragon
 	ROM_LOAD( "d89-12.bin",0x00000, 0x80000, CRC(53df86f1) SHA1(f03d77dd54eb455462133a29dd8fec007abedcfd) )
 	ROM_LOAD( "d89-13.bin",0x80000, 0x80000, CRC(c44c1352) SHA1(78a04fe0ade6e8f9e6bbda7652a54a79b6208fdd) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "d89-03.15", 0x00000, 0x80000, CRC(218f31a4) SHA1(9f52b9fa8f02003888180524a6e9ee7c9230f55d) )
 ROM_END
 
@@ -3192,7 +3288,7 @@ ROM_START( qzshowby )
 	ROM_LOAD( "d72-03.bin", 0x000000, 0x200000, CRC(1de257d0) SHA1(df03b1fb5cd69e2d2eb2088f96f26b0ea9756fb7) )
 	ROM_LOAD( "d72-02.bin", 0x200000, 0x200000, CRC(bf0da640) SHA1(2b2493904ed0b94dc12b56dae71cc5c25701aef9) )
 
-	ROM_REGION( 0x200000, "ymsnd", 0 )
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "d72-01.bin", 0x00000, 0x200000, CRC(b82b8830) SHA1(4b2dca16fe072a5ee51de5cf40637e3f1b39f695) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
@@ -3289,6 +3385,11 @@ ROM_START( masterw )
 	ROM_REGION( 0x100000, "tc0180vcu", 0 )
 	ROM_LOAD( "b72-02.6", 0x000000, 0x080000, CRC(843444eb) SHA1(2b466045f882996c80e0090009ee957e11d32825) )
 	ROM_LOAD( "b72-01.5", 0x080000, 0x080000, CRC(a24ac26e) SHA1(895715a2bb0cb15334cba2283bd228b4fc08cd0c) )
+
+	ROM_REGION( 0x00600, "plds", 0 )
+	ROM_LOAD( "b72-08.ic3",  0x0000, 0x0104, CRC(1501a44a) SHA1(4dcda59238f17ce9d8654c27f45e217e6460fc03) )
+	ROM_LOAD( "b72-09.ic23", 0x0200, 0x0104, CRC(a1d19d49) SHA1(5ca983147ef57240f6b6a05a07a821f72bb13001) )
+	ROM_LOAD( "b72-10.ic32", 0x0400, 0x0104, CRC(20b0450b) SHA1(235ebbfd5b4cd179bb4d87e30d0e449028bb1df6) )
 ROM_END
 
 ROM_START( masterwu )
@@ -3304,6 +3405,11 @@ ROM_START( masterwu )
 	ROM_REGION( 0x100000, "tc0180vcu", 0 )
 	ROM_LOAD( "b72-02.6", 0x000000, 0x080000, CRC(843444eb) SHA1(2b466045f882996c80e0090009ee957e11d32825) )
 	ROM_LOAD( "b72-01.5", 0x080000, 0x080000, CRC(a24ac26e) SHA1(895715a2bb0cb15334cba2283bd228b4fc08cd0c) )
+
+	ROM_REGION( 0x00600, "plds", 0 )
+	ROM_LOAD( "b72-08.ic3",  0x0000, 0x0104, CRC(1501a44a) SHA1(4dcda59238f17ce9d8654c27f45e217e6460fc03) )
+	ROM_LOAD( "b72-09.ic23", 0x0200, 0x0104, CRC(a1d19d49) SHA1(5ca983147ef57240f6b6a05a07a821f72bb13001) )
+	ROM_LOAD( "b72-10.ic32", 0x0400, 0x0104, CRC(20b0450b) SHA1(235ebbfd5b4cd179bb4d87e30d0e449028bb1df6) )
 ROM_END
 
 ROM_START( masterwj )
@@ -3319,9 +3425,14 @@ ROM_START( masterwj )
 	ROM_REGION( 0x100000, "tc0180vcu", 0 )
 	ROM_LOAD( "b72-02.6", 0x000000, 0x080000, CRC(843444eb) SHA1(2b466045f882996c80e0090009ee957e11d32825) )
 	ROM_LOAD( "b72-01.5", 0x080000, 0x080000, CRC(a24ac26e) SHA1(895715a2bb0cb15334cba2283bd228b4fc08cd0c) )
+
+	ROM_REGION( 0x00600, "plds", 0 )
+	ROM_LOAD( "b72-08.ic3",  0x0000, 0x0104, CRC(1501a44a) SHA1(4dcda59238f17ce9d8654c27f45e217e6460fc03) )
+	ROM_LOAD( "b72-09.ic23", 0x0200, 0x0104, CRC(a1d19d49) SHA1(5ca983147ef57240f6b6a05a07a821f72bb13001) )
+	ROM_LOAD( "b72-10.ic32", 0x0400, 0x0104, CRC(20b0450b) SHA1(235ebbfd5b4cd179bb4d87e30d0e449028bb1df6) )
 ROM_END
 
-ROM_START( yukiwo ) /* Prototype of Master of Weapons */
+ROM_START( yukiwo ) /* Prototype of Master of Weapon */
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
 	ROM_LOAD16_BYTE( "ic33-rom0e.bin", 0x00000, 0x20000, CRC(a0dd51d9) SHA1(a4740bf08e26e1e576344c95d945df5d970738f2) )
 	ROM_LOAD16_BYTE( "ic24-e882.bin",  0x00001, 0x20000, CRC(d66f29d4) SHA1(0854f1a0943a20693e6cd02825666e39b4fe28ca) )
@@ -3359,10 +3470,10 @@ ROM_START( silentd ) /* Silkscreened PCB number ET910000B */
 	ROM_LOAD( "east-03.ic39", 0x200000, 0x100000, CRC(1b9b2846) SHA1(d9c87e130bc3baa949d8a8738daad648fcf284df) )
 	ROM_LOAD( "east-05.ic40", 0x300000, 0x100000, CRC(e02472c5) SHA1(35572610f6823ec980a928a75abd689197ebe207) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "east-01.ic1", 0x00000, 0x80000, CRC(b41fff1a) SHA1(54920d13fa2b3000eedab9d0050a299ae743c663) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "east-02.ic3", 0x00000, 0x80000, CRC(e0de5c39) SHA1(75d0e193d882e67921c216c3293454e34304d25e) )
 ROM_END
 
@@ -3382,10 +3493,10 @@ ROM_START( silentdj ) /* Silkscreened PCB number ET910000B */
 	ROM_LOAD( "east-03.ic39", 0x200000, 0x100000, CRC(1b9b2846) SHA1(d9c87e130bc3baa949d8a8738daad648fcf284df) )
 	ROM_LOAD( "east-05.ic40", 0x300000, 0x100000, CRC(e02472c5) SHA1(35572610f6823ec980a928a75abd689197ebe207) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "east-01.ic1", 0x00000, 0x80000, CRC(b41fff1a) SHA1(54920d13fa2b3000eedab9d0050a299ae743c663) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "east-02.ic3", 0x00000, 0x80000, CRC(e0de5c39) SHA1(75d0e193d882e67921c216c3293454e34304d25e) )
 ROM_END
 
@@ -3405,10 +3516,10 @@ ROM_START( silentdu ) /* Dumped from an original Taito PCB (ET910000B) */
 	ROM_LOAD( "east-03.ic39", 0x200000, 0x100000, CRC(1b9b2846) SHA1(d9c87e130bc3baa949d8a8738daad648fcf284df) )
 	ROM_LOAD( "east-05.ic40", 0x300000, 0x100000, CRC(e02472c5) SHA1(35572610f6823ec980a928a75abd689197ebe207) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "east-01.ic1", 0x00000, 0x80000, CRC(b41fff1a) SHA1(54920d13fa2b3000eedab9d0050a299ae743c663) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "east-02.ic3", 0x00000, 0x80000, CRC(e0de5c39) SHA1(75d0e193d882e67921c216c3293454e34304d25e) )
 ROM_END
 
@@ -3424,26 +3535,48 @@ ROM_START( selfeena ) /* Silkscreened PCB number ET910000A */
 	ROM_LOAD( "se-04.2",  0x000000, 0x80000, CRC(920ad100) SHA1(69cd2af6218db90632f09a131d2956ab69034643) )
 	ROM_LOAD( "se-05.1",  0x080000, 0x80000, CRC(d297c995) SHA1(e5ad5a8ce222621c9156c2949916bee6b3099c4e) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "se-06.11", 0x00000, 0x80000, CRC(80d5e772) SHA1(bee4982a3d65210ff86495e36a0b656934b00c7d) )
 ROM_END
 
-ROM_START( ryujin ) /* Silkscreened PCB number ET910000A */
+ROM_START( ryujin ) /* Silkscreened PCB number ET910000B */
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 256k for 68000 code */
-	ROM_LOAD16_BYTE( "ruj02.27", 0x00000, 0x20000, CRC(0d223aee) SHA1(33f5498a650b244c5a4a22415408a269da597abf) )
-	ROM_LOAD16_BYTE( "ruj01.26", 0x00001, 0x20000, CRC(c6bcdd1e) SHA1(d8620995ad1bc256eab4ed7e1c549e8b6ec5c3fb) )
-	ROM_LOAD16_BYTE( "ruj04.29", 0x40000, 0x20000, CRC(0c153cab) SHA1(16fac3863c1394c9f41173174a4aca20cded6278) )
-	ROM_LOAD16_BYTE( "ruj03.28", 0x40001, 0x20000, CRC(7695f89c) SHA1(755eb7ef40da190d55de80ee5e0e0a537c22e5f1) )
+	ROM_LOAD16_BYTE( "rjn_02.ic32", 0x00000, 0x20000, CRC(5fd353d5) SHA1(76c5e173f5945f9d69f805961ffc190f4f1532d7) ) /* Yes!, these were labeled RJN 02 & RJN 01 (unlike the rest labeled RUJ xx) */
+	ROM_LOAD16_BYTE( "rjn_01.ic10", 0x00001, 0x20000, CRC(f775e4b6) SHA1(1b85b217daf4784e35e0beb088bee229244f1207) )
+	ROM_LOAD16_BYTE( "ruj_04.ic31", 0x40000, 0x20000, CRC(0c153cab) SHA1(16fac3863c1394c9f41173174a4aca20cded6278) ) /* ET910000B PCB uses different IC locations */
+	ROM_LOAD16_BYTE( "ruj_03.ic9",  0x40001, 0x20000, CRC(7695f89c) SHA1(755eb7ef40da190d55de80ee5e0e0a537c22e5f1) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
-	ROM_LOAD( "ruj05.39",0x00000, 0x10000, CRC(95270b16) SHA1(c1ad76268679cf198e9f1514360f280b73e49ab5) )
+	ROM_LOAD( "ruj_05.ic15",0x00000, 0x10000, CRC(95270b16) SHA1(c1ad76268679cf198e9f1514360f280b73e49ab5) )
 
 	ROM_REGION( 0x200000, "tc0180vcu", 0 )
-	ROM_LOAD( "ryujin07.2", 0x000000, 0x100000, CRC(34f50980) SHA1(432384bd283389bca17611602eb310726c9d78a4) )
-	ROM_LOAD( "ryujin06.1", 0x100000, 0x100000, CRC(1b85ff34) SHA1(5ad259e6f7aa4a0c08975da73bf41400495f2e61) )
+	ROM_LOAD( "ryujin-07.ic28", 0x000000, 0x100000, CRC(34f50980) SHA1(432384bd283389bca17611602eb310726c9d78a4) )
+	ROM_LOAD( "ryujin-06.ic39", 0x100000, 0x100000, CRC(1b85ff34) SHA1(5ad259e6f7aa4a0c08975da73bf41400495f2e61) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
-	ROM_LOAD( "ryujin08.11", 0x00000, 0x80000, CRC(480d040d) SHA1(50add2f304ef34f7f45f25a2a2cf0568d58259ad) )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
+	ROM_LOAD( "ryujin-08.ic1", 0x00000, 0x80000, CRC(480d040d) SHA1(50add2f304ef34f7f45f25a2a2cf0568d58259ad) )
+
+	ROM_REGION( 0x00400, "plds", 0 )
+	ROM_LOAD( "pal16l8b-east-07.ic46", 0x0000, 0x0104, CRC(0cb80f64) SHA1(53c38fc795d05277172391d7994c96d8c66b49c4) )
+	ROM_LOAD( "pal16l8b-east-08.ic47", 0x0200, 0x0104, CRC(bdce045f) SHA1(cc67b2afa1b57345a4b91f5fafd99cae5286827a) )
+ROM_END
+
+ROM_START( ryujina ) /* Silkscreened PCB number ET910000A */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* 256k for 68000 code */
+	ROM_LOAD16_BYTE( "ruj_02.27", 0x00000, 0x20000, CRC(0d223aee) SHA1(33f5498a650b244c5a4a22415408a269da597abf) )
+	ROM_LOAD16_BYTE( "ruj_01.26", 0x00001, 0x20000, CRC(c6bcdd1e) SHA1(d8620995ad1bc256eab4ed7e1c549e8b6ec5c3fb) )
+	ROM_LOAD16_BYTE( "ruj_04.29", 0x40000, 0x20000, CRC(0c153cab) SHA1(16fac3863c1394c9f41173174a4aca20cded6278) )
+	ROM_LOAD16_BYTE( "ruj_03.28", 0x40001, 0x20000, CRC(7695f89c) SHA1(755eb7ef40da190d55de80ee5e0e0a537c22e5f1) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
+	ROM_LOAD( "ruj_05.39",0x00000, 0x10000, CRC(95270b16) SHA1(c1ad76268679cf198e9f1514360f280b73e49ab5) )
+
+	ROM_REGION( 0x200000, "tc0180vcu", 0 )
+	ROM_LOAD( "ryujin-07.2", 0x000000, 0x100000, CRC(34f50980) SHA1(432384bd283389bca17611602eb310726c9d78a4) )
+	ROM_LOAD( "ryujin-06.1", 0x100000, 0x100000, CRC(1b85ff34) SHA1(5ad259e6f7aa4a0c08975da73bf41400495f2e61) )
+
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
+	ROM_LOAD( "ryujin-08.11", 0x00000, 0x80000, CRC(480d040d) SHA1(50add2f304ef34f7f45f25a2a2cf0568d58259ad) )
 ROM_END
 
 ROM_START( sbm )
@@ -3466,7 +3599,7 @@ ROM_START( sbm )
 	ROM_LOAD16_BYTE( "c69-14.ic3", 0x300001, 0x020000, CRC(0ed0272a) SHA1(03b15654213ff71ffc96d3a87657bdeb724e9269) )
 	/* 340000-3fffff empty */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c69-26.ic36", 0x00000, 0x80000, CRC(8784058b) SHA1(c3d9c620704fb5e80719e996e97f6191a5bd9f8c) )
 
 	ROM_REGION( 0x1800, "plds", 0 )
@@ -3495,7 +3628,7 @@ ROM_START( sbmj )
 	ROM_LOAD16_BYTE( "c69-14.ic3", 0x300001, 0x020000, CRC(0ed0272a) SHA1(03b15654213ff71ffc96d3a87657bdeb724e9269) )
 	/* 340000-3fffff empty */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c69-03.36", 0x00000, 0x80000, CRC(63e6b6e7) SHA1(72574ca7505eee15fabc4996f253505d9dd65898) )
 ROM_END
 
@@ -3511,7 +3644,7 @@ ROM_START( realpunc )
 	ROM_LOAD( "d76_02.76", 0x000000, 0x100000, CRC(57691b93) SHA1(570dbefda40f8be5f1da58c5433b8a8084f49cac) )
 	ROM_LOAD( "d76_03.45", 0x200000, 0x100000, CRC(9f0aefd8) SHA1(d516c64baabd268f99dc5e67b7adf135b4eb45fd) )
 
-	ROM_REGION( 0x200000, "ymsnd", 0 )      /* ADPCM samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 )      /* ADPCM samples */
 	ROM_LOAD( "d76_01.93", 0x000000, 0x200000, CRC(2bc265f2) SHA1(409b822989e2aad50872f80f5160d4909c42206c) )
 ROM_END
 
@@ -3527,7 +3660,7 @@ ROM_START( realpuncj )
 	ROM_LOAD( "d76_02.76", 0x000000, 0x100000, CRC(57691b93) SHA1(570dbefda40f8be5f1da58c5433b8a8084f49cac) )
 	ROM_LOAD( "d76_03.45", 0x200000, 0x100000, CRC(9f0aefd8) SHA1(d516c64baabd268f99dc5e67b7adf135b4eb45fd) )
 
-	ROM_REGION( 0x200000, "ymsnd", 0 )      /* ADPCM samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 )      /* ADPCM samples */
 	ROM_LOAD( "d76_01.93", 0x000000, 0x200000, CRC(2bc265f2) SHA1(409b822989e2aad50872f80f5160d4909c42206c) )
 ROM_END
 
@@ -3574,11 +3707,13 @@ GAME( 1992, silentd,  0,       silentd,  silentd,   taitob_state, init_taito_b, 
 GAME( 1992, silentdj, silentd, silentd,  silentdj,  taitob_state, init_taito_b, ROT0,   "Taito Corporation",         "Silent Dragon (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, silentdu, silentd, silentd,  silentdu,  taitob_state, init_taito_b, ROT0,   "Taito America Corporation", "Silent Dragon (US)",    MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, ryujin,   0,       ryujin,   ryujin,    taitob_state, init_taito_b, ROT270, "Taito Corporation", "Ryu Jin (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ryujin,   0,       silentd,  ryujin,    taitob_state, init_taito_b, ROT270, "Taito Corporation", "Ryu Jin (Japan, ET910000B PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ryujina,  ryujin,  selfeena, ryujin,    taitob_state, init_taito_b, ROT270, "Taito Corporation", "Ryu Jin (Japan, ET910000A PCB)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1993, qzshowby, 0,       qzshowby, qzshowby,  taitob_state, init_taito_b, ROT0,   "Taito Corporation", "Quiz Sekai wa SHOW by shobai (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, pbobble,  0,       pbobble,  pbobble,   taitob_state, init_taito_b, ROT0,   "Taito Corporation", "Puzzle Bobble (Japan, B-System)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, pbobble,  0,       pbobble,  pbobble,   taitob_state, init_taito_b, ROT0,   "Taito Corporation",         "Puzzle Bobble (Japan, B-System)", MACHINE_SUPPORTS_SAVE ) // PUZZLE  VER 2.0J   1994/06/15  15:28:30
+GAME( 1994, bublbust, pbobble, pbobble,  pbobble,   taitob_state, init_taito_b, ROT0,   "Taito America Corporation", "Bubble Buster (USA, B-System)",   MACHINE_SUPPORTS_SAVE ) // PUZZLE  VER 2.0A   1994/06/15  15:28:30 - Location test but same build as Japan release?
 
 GAME( 1994, spacedx,  0,       spacedx,  pbobble,   taitob_state, init_taito_b, ROT0,   "Taito Corporation", "Space Invaders DX (US, v2.1)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1994, spacedxj, spacedx, spacedx,  pbobble,   taitob_state, init_taito_b, ROT0,   "Taito Corporation", "Space Invaders DX (Japan, v2.1)", MACHINE_SUPPORTS_SAVE )
@@ -3591,6 +3726,6 @@ GAME( 1994, spacedxo, spacedx, spacedxo, spacedxo,  taitob_state, init_taito_b, 
     the enemy.
 */
 GAME( 1990, sbm,      0,       sbm,      sbm,       taitob_state,   init_taito_b, ROT0, "Taito Corporation",       "Sonic Blast Man (US)",    MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
-GAME( 1990, sbmj,     sbm,     sbm,      sbm,       taitob_state,   init_taito_b, ROT0, "Taito Corporation",       "Sonic Blast Man (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
+GAME( 1990, sbmj,     sbm,     sbm,      sbmj,      taitob_state,   init_taito_b, ROT0, "Taito Corporation",       "Sonic Blast Man (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
 GAME( 1994, realpunc, 0,       realpunc, realpunc,  taitob_c_state, init_taito_b, ROT0, "Taito Corporation Japan", "Real Puncher (World, v2.12O)",   MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
 GAME( 1994, realpuncj,realpunc,realpunc, realpunc,  taitob_c_state, init_taito_b, ROT0, "Taito Corporation Japan", "Real Puncher (Japan, v2.12J)",   MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )

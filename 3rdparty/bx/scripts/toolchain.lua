@@ -1,5 +1,5 @@
 --
--- Copyright 2010-2019 Branimir Karadzic. All rights reserved.
+-- Copyright 2010-2021 Branimir Karadzic. All rights reserved.
 -- License: https://github.com/bkaradzic/bx#license-bsd-2-clause
 --
 
@@ -52,7 +52,8 @@ function toolchain(_buildDir, _libDir)
 			{ "android-arm",     "Android - ARM"              },
 			{ "android-arm64",   "Android - ARM64"            },
 			{ "android-x86",     "Android - x86"              },
-			{ "asmjs",           "Emscripten/asm.js"          },
+			{ "wasm2js",         "Emscripten/Wasm2JS"         },
+			{ "wasm",            "Emscripten/Wasm"            },
 			{ "freebsd",         "FreeBSD"                    },
 			{ "linux-gcc",       "Linux (GCC compiler)"       },
 			{ "linux-gcc-afl",   "Linux (GCC + AFL fuzzer)"   },
@@ -70,11 +71,11 @@ function toolchain(_buildDir, _libDir)
 			{ "mingw-gcc",       "MinGW"                      },
 			{ "mingw-clang",     "MinGW (clang compiler)"     },
 			{ "netbsd",          "NetBSD"                     },
-			{ "osx",             "OSX"                        },
+			{ "osx-x64",         "OSX - x64"                  },
+			{ "osx-arm64",       "OSX - ARM64"                },
 			{ "orbis",           "Orbis"                      },
 			{ "riscv",           "RISC-V"                     },
 			{ "rpi",             "RaspberryPi"                },
-			{ "haiku",           "Haiku"                      },
 		},
 	}
 
@@ -251,17 +252,18 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.llvm = true
 			location (path.join(_buildDir, "projects", _ACTION .. "-android-x86"))
 
-		elseif "asmjs" == _OPTIONS["gcc"] then
+		elseif "wasm2js" == _OPTIONS["gcc"] or "wasm" == _OPTIONS["gcc"] then
 
-			if not os.getenv("EMSDK") then
-				print("Set EMSDK environment variable.")
+			if not os.getenv("EMSCRIPTEN") then
+				print("Set EMSCRIPTEN environment variable to root directory of your Emscripten installation. (e.g. by entering the EMSDK command prompt)")
 			end
 
-			premake.gcc.cc   = "\"$(EMSDK)/fastcomp/bin/emcc\""
-			premake.gcc.cxx  = "\"$(EMSDK)/fastcomp/bin/em++\""
-			premake.gcc.ar   = "\"$(EMSDK)/fastcomp/bin/emar\""
+			premake.gcc.cc   = "\"$(EMSCRIPTEN)/emcc\""
+			premake.gcc.cxx  = "\"$(EMSCRIPTEN)/em++\""
+			premake.gcc.ar   = "\"$(EMSCRIPTEN)/emar\""
 			premake.gcc.llvm = true
-			location (path.join(_buildDir, "projects", _ACTION .. "-asmjs"))
+			premake.gcc.namestyle = "Emscripten"
+			location (path.join(_buildDir, "projects", _ACTION .. "-" .. _OPTIONS["gcc"]))
 
 		elseif "freebsd" == _OPTIONS["gcc"] then
 			location (path.join(_buildDir, "projects", _ACTION .. "-freebsd"))
@@ -330,16 +332,6 @@ function toolchain(_buildDir, _libDir)
 		elseif "linux-arm-gcc" == _OPTIONS["gcc"] then
 			location (path.join(_buildDir, "projects", _ACTION .. "-linux-arm-gcc"))
 
-		elseif "linux-steamlink" == _OPTIONS["gcc"] then
-			if not os.getenv("MARVELL_SDK_PATH") then
-				print("Set MARVELL_SDK_PATH environment variable.")
-			end
-
-			premake.gcc.cc  = "$(MARVELL_SDK_PATH)/toolchain/bin/armv7a-cros-linux-gnueabi-gcc"
-			premake.gcc.cxx = "$(MARVELL_SDK_PATH)/toolchain/bin/armv7a-cros-linux-gnueabi-g++"
-			premake.gcc.ar  = "$(MARVELL_SDK_PATH)/toolchain/bin/armv7a-cros-linux-gnueabi-ar"
-			location (path.join(_buildDir, "projects", _ACTION .. "-linux-steamlink"))
-
 		elseif "mingw-gcc" == _OPTIONS["gcc"] then
 			if not os.getenv("MINGW") then
 				print("Set MINGW environment variable.")
@@ -370,7 +362,9 @@ function toolchain(_buildDir, _libDir)
 		elseif "netbsd" == _OPTIONS["gcc"] then
 			location (path.join(_buildDir, "projects", _ACTION .. "-netbsd"))
 
-		elseif "osx" == _OPTIONS["gcc"] then
+		elseif "osx-x64"   == _OPTIONS["gcc"]
+			or "osx-arm64" == _OPTIONS["gcc"] then
+
 
 			if os.is("linux") then
 				if not os.getenv("OSXCROSS") then
@@ -382,7 +376,8 @@ function toolchain(_buildDir, _libDir)
 				premake.gcc.cxx = "$(OSXCROSS)/target/bin/" .. osxToolchain .. "clang++"
 				premake.gcc.ar  = "$(OSXCROSS)/target/bin/" .. osxToolchain .. "ar"
 			end
-			location (path.join(_buildDir, "projects", _ACTION .. "-osx"))
+
+			location (path.join(_buildDir, "projects", _ACTION .. "-" .. _OPTIONS["gcc"]))
 
 		elseif "orbis" == _OPTIONS["gcc"] then
 
@@ -471,9 +466,7 @@ function toolchain(_buildDir, _libDir)
 
 		end
 
-	elseif _ACTION == "xcode4"
-		or _ACTION == "xcode8"
-		or _ACTION == "xcode9" then
+	elseif _ACTION and _ACTION:match("^xcode.+$") then
 		local action = premake.action.current()
 		local str_or = function(str, def)
 			return #str > 0 and str or def
@@ -556,8 +549,6 @@ function toolchain(_buildDir, _libDir)
 			"WIN32",
 			"_WIN32",
 			"_HAS_EXCEPTIONS=0",
-			"_HAS_ITERATOR_DEBUGGING=0",
-			"_ITERATOR_DEBUG_LEVEL=0",
 			"_SCL_SECURE=0",
 			"_SECURE_SCL=0",
 			"_SCL_SECURE_NO_WARNINGS",
@@ -857,29 +848,6 @@ function toolchain(_buildDir, _libDir)
 			"-Wl,-z,now",
 		}
 
-	configuration { "linux-steamlink" }
-		targetdir (path.join(_buildDir, "steamlink/bin"))
-		objdir (path.join(_buildDir, "steamlink/obj"))
-		libdirs { path.join(_libDir, "lib/steamlink") }
-		includedirs { path.join(bxDir, "include/compat/linux") }
-		defines {
-			"__STEAMLINK__=1", -- There is no special prefedined compiler symbol to detect SteamLink, faking it.
-		}
-		buildoptions {
-			"-Wfatal-errors",
-			"-Wunused-value",
-			"-Wundef",
-			"-pthread",
-			"-marm",
-			"-mfloat-abi=hard",
-			"--sysroot=$(MARVELL_SDK_PATH)/rootfs",
-		}
-		linkoptions {
-			"-static-libgcc",
-			"-static-libstdc++",
-			"--sysroot=$(MARVELL_SDK_PATH)/rootfs",
-		}
-
 	configuration { "android-arm" }
 		targetdir (path.join(_buildDir, "android-arm/bin"))
 		objdir (path.join(_buildDir, "android-arm/obj"))
@@ -907,7 +875,6 @@ function toolchain(_buildDir, _libDir)
 			path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-arm/usr/lib/crtend_so.o"),
 			"-target armv7-none-linux-androideabi",
 			"-march=armv7-a",
-			"-Wl,--fix-cortex-a8",
 		}
 
 	configuration { "android-arm64" }
@@ -934,7 +901,6 @@ function toolchain(_buildDir, _libDir)
 			path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-arm64/usr/lib/crtend_so.o"),
 			"-target aarch64-none-linux-androideabi",
 			"-march=armv8-a",
-			"-Wl,--fix-cortex-a8",
 		}
 
 	configuration { "android-x86" }
@@ -966,15 +932,28 @@ function toolchain(_buildDir, _libDir)
 			"-target i686-none-linux-android",
 		}
 
-	configuration { "asmjs" }
-		targetdir (path.join(_buildDir, "asmjs/bin"))
-		objdir (path.join(_buildDir, "asmjs/obj"))
-		libdirs { path.join(_libDir, "lib/asmjs") }
+	configuration { "wasm*" }
 		buildoptions {
-			"-isystem \"$(EMSDK)/fastcomp/emscripten\"",
 			"-Wunused-value",
 			"-Wundef",
 		}
+
+		linkoptions {
+			"-s MAX_WEBGL_VERSION=2"
+		}
+
+	configuration { "wasm2js" }
+		targetdir (path.join(_buildDir, "wasm2js/bin"))
+		objdir (path.join(_buildDir, "wasm2js/obj"))
+		libdirs { path.join(_libDir, "lib/wasm2js") }
+		linkoptions {
+			"-s WASM=0"
+		}
+
+	configuration { "wasm" }
+		targetdir (path.join(_buildDir, "wasm/bin"))
+		objdir (path.join(_buildDir, "wasm/obj"))
+		libdirs { path.join(_libDir, "lib/wasm") }
 
 	configuration { "freebsd" }
 		targetdir (path.join(_buildDir, "freebsd/bin"))
@@ -1011,33 +990,35 @@ function toolchain(_buildDir, _libDir)
 			path.join(bxDir, "include/compat/freebsd"),
 		}
 
-	configuration { "osx", "x32" }
-		targetdir (path.join(_buildDir, "osx32_clang/bin"))
-		objdir (path.join(_buildDir, "osx32_clang/obj"))
-		--libdirs { path.join(_libDir, "lib/osx32_clang") }
+	configuration { "osx-x64" }
+		targetdir (path.join(_buildDir, "osx-x64/bin"))
+		objdir (path.join(_buildDir, "osx-x64/obj"))
+		linkoptions {
+			"-arch x86_64",
+		}
 		buildoptions {
-			"-m32",
+			"-arch x86_64",
+			"-msse2",
+			"-target x86_64-apple-macos" .. (#macosPlatform > 0 and macosPlatform or "10.11"),
 		}
 
-	configuration { "osx", "x64" }
-		targetdir (path.join(_buildDir, "osx64_clang/bin"))
-		objdir (path.join(_buildDir, "osx64_clang/obj"))
-		--libdirs { path.join(_libDir, "lib/osx64_clang") }
+	configuration { "osx-arm64" }
+		targetdir (path.join(_buildDir, "osx-arm64/bin"))
+		objdir (path.join(_buildDir, "osx-arm64/obj"))
+		linkoptions {
+			"-arch arm64",
+		}
 		buildoptions {
-			"-m64",
+			"-arch arm64",
+			"-Wno-error=unused-command-line-argument",
+			"-Wno-unused-command-line-argument",
 		}
 
-	configuration { "osx", "Universal" }
-		targetdir (path.join(_buildDir, "osx_universal/bin"))
-		objdir (path.join(_buildDir, "osx_universal/bin"))
-
-	configuration { "osx" }
+	configuration { "osx*" }
 		buildoptions {
 			"-Wfatal-errors",
-			"-msse2",
 			"-Wunused-value",
 			"-Wundef",
-			"-target x86_64-apple-macos" .. (#macosPlatform > 0 and macosPlatform or "10.11"),
 		}
 		includedirs { path.join(bxDir, "include/compat/osx") }
 
@@ -1080,14 +1061,14 @@ function toolchain(_buildDir, _libDir)
 
 	configuration { "ios-arm*" }
 		linkoptions {
-			"-miphoneos-version-min=7.0",
+			"-miphoneos-version-min=9.0",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk",
 			"-L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk/usr/lib/system",
 			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk/System/Library/Frameworks",
 			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk/System/Library/PrivateFrameworks",
 		}
 		buildoptions {
-			"-miphoneos-version-min=7.0",
+			"-miphoneos-version-min=9.0",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk",
 			"-fembed-bitcode",
 		}
@@ -1097,7 +1078,7 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "ios-simulator/obj"))
 		libdirs { path.join(_libDir, "lib/ios-simulator") }
 		linkoptions {
-			"-mios-simulator-version-min=7.0",
+			"-mios-simulator-version-min=9.0",
 			"-arch i386",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
 			"-L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/usr/lib/system",
@@ -1105,7 +1086,7 @@ function toolchain(_buildDir, _libDir)
 			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/System/Library/PrivateFrameworks",
 		}
 		buildoptions {
-			"-mios-simulator-version-min=7.0",
+			"-mios-simulator-version-min=9.0",
 			"-arch i386",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
 		}
@@ -1115,7 +1096,7 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "ios-simulator64/obj"))
 		libdirs { path.join(_libDir, "lib/ios-simulator64") }
 		linkoptions {
-			"-mios-simulator-version-min=7.0",
+			"-mios-simulator-version-min=9.0",
 			"-arch x86_64",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
 			"-L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/usr/lib/system",
@@ -1123,7 +1104,7 @@ function toolchain(_buildDir, _libDir)
 			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/System/Library/PrivateFrameworks",
 		}
 		buildoptions {
-			"-mios-simulator-version-min=7.0",
+			"-mios-simulator-version-min=9.0",
 			"-arch x86_64",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
 		}
@@ -1259,13 +1240,7 @@ function strip()
 			"$(SILENT) $(ANDROID_NDK_X86)/bin/i686-linux-android-strip -s \"$(TARGET)\""
 		}
 
-	configuration { "linux-steamlink", "Release" }
-		postbuildcommands {
-			"$(SILENT) echo Stripping symbols.",
-			"$(SILENT) $(MARVELL_SDK_PATH)/toolchain/bin/armv7a-cros-linux-gnueabi-strip -s \"$(TARGET)\""
-		}
-
-	configuration { "linux-* or rpi", "not linux-steamlink", "Release" }
+	configuration { "linux-* or rpi", "Release" }
 		postbuildcommands {
 			"$(SILENT) echo Stripping symbols.",
 			"$(SILENT) strip -s \"$(TARGET)\""
@@ -1275,24 +1250,6 @@ function strip()
 		postbuildcommands {
 			"$(SILENT) echo Stripping symbols.",
 			"$(SILENT) $(MINGW)/bin/strip -s \"$(TARGET)\""
-		}
-
-	configuration { "asmjs" }
-		postbuildcommands {
-			"$(SILENT) echo Running asmjs finalize.",
-			"$(SILENT) \"$(EMSDK)/fastcomp/bin/emcc\" -O2 "
-
---				.. "-s ALLOW_MEMORY_GROWTH=1 "
---				.. "-s ASSERTIONS=2 "
---				.. "-s EMTERPRETIFY=1 "
---				.. "-s EMTERPRETIFY_ASYNC=1 "
-				.. "-s PRECISE_F32=1 "
-				.. "-s TOTAL_MEMORY=268435456 "
---				.. "-s USE_WEBGL2=1 "
-
-				.. "--memory-init-file 1 "
-				.. "\"$(TARGET)\" -o \"$(TARGET)\".html "
---				.. "--preload-file ../../../examples/runtime@/ "
 		}
 
 	configuration { "riscv" }

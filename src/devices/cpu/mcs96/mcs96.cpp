@@ -9,7 +9,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "mcs96.h"
 
 mcs96_device::mcs96_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_width, address_map_constructor regs_map) :
@@ -26,11 +25,11 @@ void mcs96_device::device_start()
 {
 	program = &space(AS_PROGRAM);
 	if(program->data_width() == 8) {
-		auto cache = program->cache<0, 0, ENDIANNESS_LITTLE>();
-		m_pr8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
+		program->cache(m_cache8);
+		m_pr8 = [this](offs_t address) -> u8 { return m_cache8.read_byte(address); };
 	} else {
-		auto cache = program->cache<1, 0, ENDIANNESS_LITTLE>();
-		m_pr8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
+		program->cache(m_cache16);
+		m_pr8 = [this](offs_t address) -> u8 { return m_cache16.read_byte(address); };
 	}
 	regs = &space(AS_DATA);
 
@@ -38,7 +37,6 @@ void mcs96_device::device_start()
 
 	state_add(STATE_GENPC,     "GENPC",     PC).noshow();
 	state_add(STATE_GENPCBASE, "CURPC",     PPC).noshow();
-	state_add(STATE_GENSP,     "GENSP",     register_file[0]).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  PSW).formatstr("%16s").noshow();
 	state_add(MCS96_PC,        "PC",        PC);
 	state_add(MCS96_PSW,       "PSW",       PSW);
@@ -87,11 +85,6 @@ uint32_t mcs96_device::execute_min_cycles() const noexcept
 uint32_t mcs96_device::execute_max_cycles() const noexcept
 {
 	return 33;
-}
-
-uint32_t mcs96_device::execute_input_lines() const noexcept
-{
-	return 1;
 }
 
 void mcs96_device::recompute_bcount(uint64_t event_time)
@@ -149,19 +142,6 @@ void mcs96_device::execute_run()
 			internal_update(total_cycles() + icount - bcount);
 		//      if(inst_substate)
 		//          do_exec_partial();
-	}
-}
-
-void mcs96_device::execute_set_input(int inputnum, int state)
-{
-	switch(inputnum) {
-	case EXINT_LINE:
-		if(state)
-			pending_irq |= 0x80;
-		else
-			pending_irq &= 0x7f;
-		check_irq();
-		break;
 	}
 }
 

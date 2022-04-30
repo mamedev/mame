@@ -2,25 +2,20 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-http.cpp
+    http.h
 
-HTTP server handling
+    HTTP server handling
 
 ***************************************************************************/
 
 #pragma once
 
-#ifndef __EMU_H__
-#error Dont include this file directly; include emu.h instead.
-#endif
-
 #ifndef MAME_EMU_HTTP_H
 #define MAME_EMU_HTTP_H
 
+#include <mutex>
 #include <thread>
 #include <ctime>
-#include "server_http.hpp"
-#include "server_ws.hpp"
 
 //**************************************************************************
 //    TYPE DEFINITIONS
@@ -30,6 +25,13 @@ HTTP server handling
 namespace asio
 {
 	class io_context;
+}
+
+namespace webpp
+{
+	class http_server;
+	class ws_server;
+	struct Connection;
 }
 
 class http_manager

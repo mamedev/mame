@@ -16,6 +16,7 @@
 
 #include "emu.h"
 #include "hd64610.h"
+
 #include "coreutil.h"
 
 #define VERBOSE 1
@@ -188,7 +189,7 @@ void hd64610_device::device_start()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void hd64610_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void hd64610_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -255,9 +256,10 @@ void hd64610_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void hd64610_device::nvram_read(emu_file &file)
+bool hd64610_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_regs, 0x10);
+	size_t actual;
+	return !file.read(m_regs, 0x10, actual) && actual == 0x10;
 }
 
 
@@ -266,9 +268,10 @@ void hd64610_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void hd64610_device::nvram_write(emu_file &file)
+bool hd64610_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_regs, 0x10);
+	size_t actual;
+	return !file.write(m_regs, 0x10, actual) && actual == 0x10;
 }
 
 
@@ -276,7 +279,7 @@ void hd64610_device::nvram_write(emu_file &file)
 //  hardware start/stop
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( hd64610_device::h_w )
+void hd64610_device::h_w(int state)
 {
 	m_hline_state = state;
 }
@@ -286,7 +289,7 @@ WRITE_LINE_MEMBER( hd64610_device::h_w )
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( hd64610_device::read )
+uint8_t hd64610_device::read(offs_t offset)
 {
 	uint8_t data =  m_regs[offset & 0x0f];
 
@@ -300,7 +303,7 @@ READ8_MEMBER( hd64610_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( hd64610_device::write )
+void hd64610_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x0f)
 	{

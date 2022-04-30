@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -41,6 +41,16 @@ namespace ImGui
 #define IMGUI_FLAGS_NONE        UINT8_C(0x00)
 #define IMGUI_FLAGS_ALPHA_BLEND UINT8_C(0x01)
 
+	///
+	inline ImTextureID toId(bgfx::TextureHandle _handle, uint8_t _flags, uint8_t _mip)
+	{
+		union { struct { bgfx::TextureHandle handle; uint8_t flags; uint8_t mip; } s; ImTextureID id; } tex;
+		tex.s.handle = _handle;
+		tex.s.flags  = _flags;
+		tex.s.mip    = _mip;
+		return tex.id;
+	}
+
 	// Helper function for passing bgfx::TextureHandle to ImGui::Image.
 	inline void Image(bgfx::TextureHandle _handle
 		, uint8_t _flags
@@ -52,11 +62,7 @@ namespace ImGui
 		, const ImVec4& _borderCol = ImVec4(0.0f, 0.0f, 0.0f, 0.0f)
 		)
 	{
-		union { struct { bgfx::TextureHandle handle; uint8_t flags; uint8_t mip; } s; ImTextureID ptr; } texture;
-		texture.s.handle = _handle;
-		texture.s.flags  = _flags;
-		texture.s.mip    = _mip;
-		Image(texture.ptr, _size, _uv0, _uv1, _tintCol, _borderCol);
+		Image(toId(_handle, _flags, _mip), _size, _uv0, _uv1, _tintCol, _borderCol);
 	}
 
 	// Helper function for passing bgfx::TextureHandle to ImGui::Image.
@@ -83,11 +89,7 @@ namespace ImGui
 		, const ImVec4& _tintCol = ImVec4(1.0f, 1.0f, 1.0f, 1.0f)
 		)
 	{
-		union { struct { bgfx::TextureHandle handle; uint8_t flags; uint8_t mip; } s; ImTextureID ptr; } texture;
-		texture.s.handle = _handle;
-		texture.s.flags  = _flags;
-		texture.s.mip    = _mip;
-		return ImageButton(texture.ptr, _size, _uv0, _uv1, _framePadding, _bgCol, _tintCol);
+		return ImageButton(toId(_handle, _flags, _mip), _size, _uv0, _uv1, _framePadding, _bgCol, _tintCol);
 	}
 
 	// Helper function for passing bgfx::TextureHandle to ImGui::ImageButton.
@@ -103,18 +105,28 @@ namespace ImGui
 		return ImageButton(_handle, IMGUI_FLAGS_ALPHA_BLEND, 0, _size, _uv0, _uv1, _framePadding, _bgCol, _tintCol);
 	}
 
+	///
 	inline void NextLine()
 	{
 		SetCursorPosY(GetCursorPosY() + GetTextLineHeightWithSpacing() );
 	}
 
+	///
 	inline bool MouseOverArea()
 	{
 		return false
+			|| ImGui::IsAnyItemActive()
 			|| ImGui::IsAnyItemHovered()
 			|| ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)
+//			|| ImGuizmo::IsOver()
 			;
 	}
+
+	///
+	void PushEnabled(bool _enabled);
+
+	///
+	void PopEnabled();
 
 } // namespace ImGui
 

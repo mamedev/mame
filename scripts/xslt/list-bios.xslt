@@ -2,7 +2,7 @@
 <!--
 Prints BIOS options for machines and devices that have them.
 
-$ ./mame64d -listxml osborne1 saturn | xsltproc scripts/xslt/list-bios.xslt -
+$ ./mamed -listxml osborne1 saturn | xsltproc scripts/xslt/list-bios.xslt -
 osborne1         Osborne-1
     vera             BIOS version A
     ver12            BIOS version 1.2

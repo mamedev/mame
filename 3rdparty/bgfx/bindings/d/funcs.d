@@ -17,14 +17,17 @@ version(BindBgfx_Static)
 	 * Params:
 	 * _handle = Render target texture handle.
 	 * _access = Access. See `Access::Enum`.
-	 * _layer = Cubemap side or depth layer/slice.
+	 * _layer = Cubemap side or depth layer/slice to use.
+	 * _numLayers = Number of texture layer/slice(s) in array to use.
 	 * _mip = Mip level.
 	 * _resolve = Resolve flags. See: `BGFX_RESOLVE_*`
 	 */
-	void bgfx_attachment_init(bgfx_attachment_t* _this, bgfx_texture_handle_t _handle, bgfx_access_t _access, ushort _layer, ushort _mip, byte _resolve);
+	void bgfx_attachment_init(bgfx_attachment_t* _this, bgfx_texture_handle_t _handle, bgfx_access_t _access, ushort _layer, ushort _numLayers, ushort _mip, byte _resolve);
 	
 	/**
 	 * Start VertexLayout.
+	 * Params:
+	 * _rendererType = Renderer backend type. See: `bgfx::RendererType`
 	 */
 	bgfx_vertex_layout_t* bgfx_vertex_layout_begin(bgfx_vertex_layout_t* _this, bgfx_renderer_type_t _rendererType);
 	
@@ -57,7 +60,7 @@ version(BindBgfx_Static)
 	void bgfx_vertex_layout_decode(const(bgfx_vertex_layout_t)* _this, bgfx_attrib_t _attrib, byte* _num, bgfx_attrib_type_t* _type, bool* _normalized, bool* _asInt);
 	
 	/**
-	 * Returns true if VertexLayout contains attribute.
+	 * Returns `true` if VertexLayout contains attribute.
 	 * Params:
 	 * _attrib = Attribute semantics. See: `bgfx::Attrib`
 	 */
@@ -65,6 +68,8 @@ version(BindBgfx_Static)
 	
 	/**
 	 * Skip `_num` bytes in vertex stream.
+	 * Params:
+	 * _num = Number of bytes to skip.
 	 */
 	bgfx_vertex_layout_t* bgfx_vertex_layout_skip(bgfx_vertex_layout_t* _this, byte _num);
 	
@@ -115,9 +120,10 @@ version(BindBgfx_Static)
 	 * _layout = Vertex stream layout.
 	 * _data = Vertex stream.
 	 * _num = Number of vertices in vertex stream.
+	 * _index32 = Set to `true` if input indices are 32-bit.
 	 * _epsilon = Error tolerance for vertex position comparison.
 	 */
-	ushort bgfx_weld_vertices(ushort* _output, const(bgfx_vertex_layout_t)* _layout, const(void)* _data, ushort _num, float _epsilon);
+	uint bgfx_weld_vertices(void* _output, const(bgfx_vertex_layout_t)* _layout, const(void)* _data, uint _num, bool _index32, float _epsilon);
 	
 	/**
 	 * Convert index buffer for use with different primitive topologies.
@@ -199,7 +205,7 @@ version(BindBgfx_Static)
 	 *   - `BGFX_RESET_CAPTURE` - Begin screen capture.
 	 *   - `BGFX_RESET_FLUSH_AFTER_RENDER` - Flush rendering after submitting to GPU.
 	 *   - `BGFX_RESET_FLIP_AFTER_RENDER` - This flag  specifies where flip
-	 *     occurs. Default behavior is that flip occurs before rendering new
+	 *     occurs. Default behaviour is that flip occurs before rendering new
 	 *     frame. This flag only has effect when `BGFX_CONFIG_MULTITHREADED=0`.
 	 *   - `BGFX_RESET_SRGB_BACKBUFFER` - Enable sRGB backbuffer.
 	 * _format = Texture format. See: `TextureFormat::Enum`.
@@ -537,8 +543,9 @@ version(BindBgfx_Static)
 	 * Returns number of requested or maximum available indices.
 	 * Params:
 	 * _num = Number of required indices.
+	 * _index32 = Set to `true` if input indices will be 32-bit.
 	 */
-	uint bgfx_get_avail_transient_index_buffer(uint _num);
+	uint bgfx_get_avail_transient_index_buffer(uint _num, bool _index32);
 	
 	/**
 	 * Returns number of requested or maximum available vertices.
@@ -558,15 +565,14 @@ version(BindBgfx_Static)
 	
 	/**
 	 * Allocate transient index buffer.
-	 * Remarks:
-	 *   Only 16-bit index buffer is supported.
 	 * Params:
 	 * _tib = TransientIndexBuffer structure is filled and is valid
 	 * for the duration of frame, and it can be reused for multiple draw
 	 * calls.
 	 * _num = Number of indices to allocate.
+	 * _index32 = Set to `true` if input indices will be 32-bit.
 	 */
-	void bgfx_alloc_transient_index_buffer(bgfx_transient_index_buffer_t* _tib, uint _num);
+	void bgfx_alloc_transient_index_buffer(bgfx_transient_index_buffer_t* _tib, uint _num, bool _index32);
 	
 	/**
 	 * Allocate transient vertex buffer.
@@ -583,8 +589,6 @@ version(BindBgfx_Static)
 	 * Check for required space and allocate transient vertex and index
 	 * buffers. If both space requirements are satisfied function returns
 	 * true.
-	 * Remarks:
-	 *   Only 16-bit index buffer is supported.
 	 * Params:
 	 * _tvb = TransientVertexBuffer structure is filled and is valid
 	 * for the duration of frame, and it can be reused for multiple draw
@@ -595,8 +599,9 @@ version(BindBgfx_Static)
 	 * for the duration of frame, and it can be reused for multiple draw
 	 * calls.
 	 * _numIndices = Number of indices to allocate.
+	 * _index32 = Set to `true` if input indices will be 32-bit.
 	 */
-	bool bgfx_alloc_transient_buffers(bgfx_transient_vertex_buffer_t* _tvb, const(bgfx_vertex_layout_t)* _layout, uint _numVertices, bgfx_transient_index_buffer_t* _tib, uint _numIndices);
+	bool bgfx_alloc_transient_buffers(bgfx_transient_vertex_buffer_t* _tvb, const(bgfx_vertex_layout_t)* _layout, uint _numVertices, bgfx_transient_index_buffer_t* _tib, uint _numIndices, bool _index32);
 	
 	/**
 	 * Allocate instance data buffer.
@@ -694,6 +699,14 @@ version(BindBgfx_Static)
 	 * _flags = Texture flags. See `BGFX_TEXTURE_*`.
 	 */
 	bool bgfx_is_texture_valid(ushort _depth, bool _cubeMap, ushort _numLayers, bgfx_texture_format_t _format, ulong _flags);
+	
+	/**
+	 * Validate frame buffer parameters.
+	 * Params:
+	 * _num = Number of attachments.
+	 * _attachment = Attachment texture info. See: `bgfx::Attachment`.
+	 */
+	bool bgfx_is_frame_buffer_valid(byte _num, const(bgfx_attachment_t)* _attachment);
 	
 	/**
 	 * Calculate amount of memory required for texture.
@@ -953,7 +966,7 @@ version(BindBgfx_Static)
 	 * Create MRT frame buffer from texture handles with specific layer and
 	 * mip level.
 	 * Params:
-	 * _num = Number of attachements.
+	 * _num = Number of attachments.
 	 * _attachment = Attachment texture info. See: `bgfx::Attachment`.
 	 * _destroyTexture = If true, textures will be destroyed when
 	 * frame buffer is destroyed.
@@ -1206,6 +1219,11 @@ version(BindBgfx_Static)
 	void bgfx_set_view_order(bgfx_view_id_t _id, ushort _num, const(bgfx_view_id_t)* _order);
 	
 	/**
+	 * Reset all view settings to default.
+	 */
+	void bgfx_reset_view(bgfx_view_id_t _id);
+	
+	/**
 	 * Begin submitting draw calls from thread.
 	 * Params:
 	 * _forThread = Explicitly request an encoder for a worker thread.
@@ -1362,9 +1380,21 @@ version(BindBgfx_Static)
 	 * _handle = Vertex buffer.
 	 * _startVertex = First vertex to render.
 	 * _numVertices = Number of vertices to render.
-	 * _layoutHandle = Vertex layout for aliasing vertex buffer.
 	 */
-	void bgfx_encoder_set_vertex_buffer(bgfx_encoder_t* _this, byte _stream, bgfx_vertex_buffer_handle_t _handle, uint _startVertex, uint _numVertices, bgfx_vertex_layout_handle_t _layoutHandle);
+	void bgfx_encoder_set_vertex_buffer(bgfx_encoder_t* _this, byte _stream, bgfx_vertex_buffer_handle_t _handle, uint _startVertex, uint _numVertices);
+	
+	/**
+	 * Set vertex buffer for draw primitive.
+	 * Params:
+	 * _stream = Vertex stream.
+	 * _handle = Vertex buffer.
+	 * _startVertex = First vertex to render.
+	 * _numVertices = Number of vertices to render.
+	 * _layoutHandle = Vertex layout for aliasing vertex buffer. If invalid
+	 * handle is used, vertex layout used for creation
+	 * of vertex buffer will be used.
+	 */
+	void bgfx_encoder_set_vertex_buffer_with_layout(bgfx_encoder_t* _this, byte _stream, bgfx_vertex_buffer_handle_t _handle, uint _startVertex, uint _numVertices, bgfx_vertex_layout_handle_t _layoutHandle);
 	
 	/**
 	 * Set vertex buffer for draw primitive.
@@ -1373,9 +1403,10 @@ version(BindBgfx_Static)
 	 * _handle = Dynamic vertex buffer.
 	 * _startVertex = First vertex to render.
 	 * _numVertices = Number of vertices to render.
-	 * _layoutHandle = Vertex layout for aliasing vertex buffer.
 	 */
-	void bgfx_encoder_set_dynamic_vertex_buffer(bgfx_encoder_t* _this, byte _stream, bgfx_dynamic_vertex_buffer_handle_t _handle, uint _startVertex, uint _numVertices, bgfx_vertex_layout_handle_t _layoutHandle);
+	void bgfx_encoder_set_dynamic_vertex_buffer(bgfx_encoder_t* _this, byte _stream, bgfx_dynamic_vertex_buffer_handle_t _handle, uint _startVertex, uint _numVertices);
+	
+	void bgfx_encoder_set_dynamic_vertex_buffer_with_layout(bgfx_encoder_t* _this, byte _stream, bgfx_dynamic_vertex_buffer_handle_t _handle, uint _startVertex, uint _numVertices, bgfx_vertex_layout_handle_t _layoutHandle);
 	
 	/**
 	 * Set vertex buffer for draw primitive.
@@ -1384,9 +1415,21 @@ version(BindBgfx_Static)
 	 * _tvb = Transient vertex buffer.
 	 * _startVertex = First vertex to render.
 	 * _numVertices = Number of vertices to render.
-	 * _layoutHandle = Vertex layout for aliasing vertex buffer.
 	 */
-	void bgfx_encoder_set_transient_vertex_buffer(bgfx_encoder_t* _this, byte _stream, const(bgfx_transient_vertex_buffer_t)* _tvb, uint _startVertex, uint _numVertices, bgfx_vertex_layout_handle_t _layoutHandle);
+	void bgfx_encoder_set_transient_vertex_buffer(bgfx_encoder_t* _this, byte _stream, const(bgfx_transient_vertex_buffer_t)* _tvb, uint _startVertex, uint _numVertices);
+	
+	/**
+	 * Set vertex buffer for draw primitive.
+	 * Params:
+	 * _stream = Vertex stream.
+	 * _tvb = Transient vertex buffer.
+	 * _startVertex = First vertex to render.
+	 * _numVertices = Number of vertices to render.
+	 * _layoutHandle = Vertex layout for aliasing vertex buffer. If invalid
+	 * handle is used, vertex layout used for creation
+	 * of vertex buffer will be used.
+	 */
+	void bgfx_encoder_set_transient_vertex_buffer_with_layout(bgfx_encoder_t* _this, byte _stream, const(bgfx_transient_vertex_buffer_t)* _tvb, uint _startVertex, uint _numVertices, bgfx_vertex_layout_handle_t _layoutHandle);
 	
 	/**
 	 * Set number of vertices for auto generated vertices use in conjuction
@@ -1449,7 +1492,9 @@ version(BindBgfx_Static)
 	
 	/**
 	 * Submit an empty primitive for rendering. Uniforms and draw state
-	 * will be applied but no geometry will be submitted.
+	 * will be applied but no geometry will be submitted. Useful in cases
+	 * when no other draw/compute primitive is submitted to view, but it's
+	 * desired to execute clear view.
 	 * Remarks:
 	 *   These empty draw calls will sort before ordinary draw calls.
 	 * Params:
@@ -1463,9 +1508,9 @@ version(BindBgfx_Static)
 	 * _id = View id.
 	 * _program = Program.
 	 * _depth = Depth for sorting.
-	 * _preserveState = Preserve internal draw state for next draw call submit.
+	 * _flags = Discard or preserve states. See `BGFX_DISCARD_*`.
 	 */
-	void bgfx_encoder_submit(bgfx_encoder_t* _this, bgfx_view_id_t _id, bgfx_program_handle_t _program, uint _depth, bool _preserveState);
+	void bgfx_encoder_submit(bgfx_encoder_t* _this, bgfx_view_id_t _id, bgfx_program_handle_t _program, uint _depth, byte _flags);
 	
 	/**
 	 * Submit primitive with occlusion query for rendering.
@@ -1474,9 +1519,9 @@ version(BindBgfx_Static)
 	 * _program = Program.
 	 * _occlusionQuery = Occlusion query.
 	 * _depth = Depth for sorting.
-	 * _preserveState = Preserve internal draw state for next draw call submit.
+	 * _flags = Discard or preserve states. See `BGFX_DISCARD_*`.
 	 */
-	void bgfx_encoder_submit_occlusion_query(bgfx_encoder_t* _this, bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_occlusion_query_handle_t _occlusionQuery, uint _depth, bool _preserveState);
+	void bgfx_encoder_submit_occlusion_query(bgfx_encoder_t* _this, bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_occlusion_query_handle_t _occlusionQuery, uint _depth, byte _flags);
 	
 	/**
 	 * Submit primitive for rendering with index and instance data info from
@@ -1488,9 +1533,9 @@ version(BindBgfx_Static)
 	 * _start = First element in indirect buffer.
 	 * _num = Number of dispatches.
 	 * _depth = Depth for sorting.
-	 * _preserveState = Preserve internal draw state for next draw call submit.
+	 * _flags = Discard or preserve states. See `BGFX_DISCARD_*`.
 	 */
-	void bgfx_encoder_submit_indirect(bgfx_encoder_t* _this, bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_indirect_buffer_handle_t _indirectHandle, ushort _start, ushort _num, uint _depth, bool _preserveState);
+	void bgfx_encoder_submit_indirect(bgfx_encoder_t* _this, bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_indirect_buffer_handle_t _indirectHandle, ushort _start, ushort _num, uint _depth, byte _flags);
 	
 	/**
 	 * Set compute index buffer.
@@ -1556,8 +1601,9 @@ version(BindBgfx_Static)
 	 * _numX = Number of groups X.
 	 * _numY = Number of groups Y.
 	 * _numZ = Number of groups Z.
+	 * _flags = Discard or preserve states. See `BGFX_DISCARD_*`.
 	 */
-	void bgfx_encoder_dispatch(bgfx_encoder_t* _this, bgfx_view_id_t _id, bgfx_program_handle_t _program, uint _numX, uint _numY, uint _numZ);
+	void bgfx_encoder_dispatch(bgfx_encoder_t* _this, bgfx_view_id_t _id, bgfx_program_handle_t _program, uint _numX, uint _numY, uint _numZ, byte _flags);
 	
 	/**
 	 * Dispatch compute indirect.
@@ -1567,13 +1613,16 @@ version(BindBgfx_Static)
 	 * _indirectHandle = Indirect buffer.
 	 * _start = First element in indirect buffer.
 	 * _num = Number of dispatches.
+	 * _flags = Discard or preserve states. See `BGFX_DISCARD_*`.
 	 */
-	void bgfx_encoder_dispatch_indirect(bgfx_encoder_t* _this, bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_indirect_buffer_handle_t _indirectHandle, ushort _start, ushort _num);
+	void bgfx_encoder_dispatch_indirect(bgfx_encoder_t* _this, bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_indirect_buffer_handle_t _indirectHandle, ushort _start, ushort _num, byte _flags);
 	
 	/**
-	 * Discard all previously set state for draw or compute call.
+	 * Discard previously set state for draw or compute call.
+	 * Params:
+	 * _flags = Discard or preserve states. See `BGFX_DISCARD_*`.
 	 */
-	void bgfx_encoder_discard(bgfx_encoder_t* _this);
+	void bgfx_encoder_discard(bgfx_encoder_t* _this, byte _flags);
 	
 	/**
 	 * Blit 2D texture region between two 2D textures.
@@ -1829,6 +1878,19 @@ version(BindBgfx_Static)
 	 * Set vertex buffer for draw primitive.
 	 * Params:
 	 * _stream = Vertex stream.
+	 * _handle = Vertex buffer.
+	 * _startVertex = First vertex to render.
+	 * _numVertices = Number of vertices to render.
+	 * _layoutHandle = Vertex layout for aliasing vertex buffer. If invalid
+	 * handle is used, vertex layout used for creation
+	 * of vertex buffer will be used.
+	 */
+	void bgfx_set_vertex_buffer_with_layout(byte _stream, bgfx_vertex_buffer_handle_t _handle, uint _startVertex, uint _numVertices, bgfx_vertex_layout_handle_t _layoutHandle);
+	
+	/**
+	 * Set vertex buffer for draw primitive.
+	 * Params:
+	 * _stream = Vertex stream.
 	 * _handle = Dynamic vertex buffer.
 	 * _startVertex = First vertex to render.
 	 * _numVertices = Number of vertices to render.
@@ -1839,11 +1901,37 @@ version(BindBgfx_Static)
 	 * Set vertex buffer for draw primitive.
 	 * Params:
 	 * _stream = Vertex stream.
+	 * _handle = Dynamic vertex buffer.
+	 * _startVertex = First vertex to render.
+	 * _numVertices = Number of vertices to render.
+	 * _layoutHandle = Vertex layout for aliasing vertex buffer. If invalid
+	 * handle is used, vertex layout used for creation
+	 * of vertex buffer will be used.
+	 */
+	void bgfx_set_dynamic_vertex_buffer_with_layout(byte _stream, bgfx_dynamic_vertex_buffer_handle_t _handle, uint _startVertex, uint _numVertices, bgfx_vertex_layout_handle_t _layoutHandle);
+	
+	/**
+	 * Set vertex buffer for draw primitive.
+	 * Params:
+	 * _stream = Vertex stream.
 	 * _tvb = Transient vertex buffer.
 	 * _startVertex = First vertex to render.
 	 * _numVertices = Number of vertices to render.
 	 */
 	void bgfx_set_transient_vertex_buffer(byte _stream, const(bgfx_transient_vertex_buffer_t)* _tvb, uint _startVertex, uint _numVertices);
+	
+	/**
+	 * Set vertex buffer for draw primitive.
+	 * Params:
+	 * _stream = Vertex stream.
+	 * _tvb = Transient vertex buffer.
+	 * _startVertex = First vertex to render.
+	 * _numVertices = Number of vertices to render.
+	 * _layoutHandle = Vertex layout for aliasing vertex buffer. If invalid
+	 * handle is used, vertex layout used for creation
+	 * of vertex buffer will be used.
+	 */
+	void bgfx_set_transient_vertex_buffer_with_layout(byte _stream, const(bgfx_transient_vertex_buffer_t)* _tvb, uint _startVertex, uint _numVertices, bgfx_vertex_layout_handle_t _layoutHandle);
 	
 	/**
 	 * Set number of vertices for auto generated vertices use in conjuction
@@ -1920,9 +2008,9 @@ version(BindBgfx_Static)
 	 * _id = View id.
 	 * _program = Program.
 	 * _depth = Depth for sorting.
-	 * _preserveState = Preserve internal draw state for next draw call submit.
+	 * _flags = Which states to discard for next draw. See `BGFX_DISCARD_*`.
 	 */
-	void bgfx_submit(bgfx_view_id_t _id, bgfx_program_handle_t _program, uint _depth, bool _preserveState);
+	void bgfx_submit(bgfx_view_id_t _id, bgfx_program_handle_t _program, uint _depth, byte _flags);
 	
 	/**
 	 * Submit primitive with occlusion query for rendering.
@@ -1931,9 +2019,9 @@ version(BindBgfx_Static)
 	 * _program = Program.
 	 * _occlusionQuery = Occlusion query.
 	 * _depth = Depth for sorting.
-	 * _preserveState = Preserve internal draw state for next draw call submit.
+	 * _flags = Which states to discard for next draw. See `BGFX_DISCARD_*`.
 	 */
-	void bgfx_submit_occlusion_query(bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_occlusion_query_handle_t _occlusionQuery, uint _depth, bool _preserveState);
+	void bgfx_submit_occlusion_query(bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_occlusion_query_handle_t _occlusionQuery, uint _depth, byte _flags);
 	
 	/**
 	 * Submit primitive for rendering with index and instance data info from
@@ -1945,9 +2033,9 @@ version(BindBgfx_Static)
 	 * _start = First element in indirect buffer.
 	 * _num = Number of dispatches.
 	 * _depth = Depth for sorting.
-	 * _preserveState = Preserve internal draw state for next draw call submit.
+	 * _flags = Which states to discard for next draw. See `BGFX_DISCARD_*`.
 	 */
-	void bgfx_submit_indirect(bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_indirect_buffer_handle_t _indirectHandle, ushort _start, ushort _num, uint _depth, bool _preserveState);
+	void bgfx_submit_indirect(bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_indirect_buffer_handle_t _indirectHandle, ushort _start, ushort _num, uint _depth, byte _flags);
 	
 	/**
 	 * Set compute index buffer.
@@ -2013,8 +2101,9 @@ version(BindBgfx_Static)
 	 * _numX = Number of groups X.
 	 * _numY = Number of groups Y.
 	 * _numZ = Number of groups Z.
+	 * _flags = Discard or preserve states. See `BGFX_DISCARD_*`.
 	 */
-	void bgfx_dispatch(bgfx_view_id_t _id, bgfx_program_handle_t _program, uint _numX, uint _numY, uint _numZ);
+	void bgfx_dispatch(bgfx_view_id_t _id, bgfx_program_handle_t _program, uint _numX, uint _numY, uint _numZ, byte _flags);
 	
 	/**
 	 * Dispatch compute indirect.
@@ -2024,13 +2113,16 @@ version(BindBgfx_Static)
 	 * _indirectHandle = Indirect buffer.
 	 * _start = First element in indirect buffer.
 	 * _num = Number of dispatches.
+	 * _flags = Discard or preserve states. See `BGFX_DISCARD_*`.
 	 */
-	void bgfx_dispatch_indirect(bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_indirect_buffer_handle_t _indirectHandle, ushort _start, ushort _num);
+	void bgfx_dispatch_indirect(bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_indirect_buffer_handle_t _indirectHandle, ushort _start, ushort _num, byte _flags);
 	
 	/**
-	 * Discard all previously set state for draw or compute call.
+	 * Discard previously set state for draw or compute call.
+	 * Params:
+	 * _flags = Draw/compute states to discard.
 	 */
-	void bgfx_discard();
+	void bgfx_discard(byte _flags);
 	
 	/**
 	 * Blit 2D texture region between two 2D textures.
@@ -2069,15 +2161,18 @@ else
 		 * Params:
 		 * _handle = Render target texture handle.
 		 * _access = Access. See `Access::Enum`.
-		 * _layer = Cubemap side or depth layer/slice.
+		 * _layer = Cubemap side or depth layer/slice to use.
+		 * _numLayers = Number of texture layer/slice(s) in array to use.
 		 * _mip = Mip level.
 		 * _resolve = Resolve flags. See: `BGFX_RESOLVE_*`
 		 */
-		alias da_bgfx_attachment_init = void function(bgfx_attachment_t* _this, bgfx_texture_handle_t _handle, bgfx_access_t _access, ushort _layer, ushort _mip, byte _resolve);
+		alias da_bgfx_attachment_init = void function(bgfx_attachment_t* _this, bgfx_texture_handle_t _handle, bgfx_access_t _access, ushort _layer, ushort _numLayers, ushort _mip, byte _resolve);
 		da_bgfx_attachment_init bgfx_attachment_init;
 		
 		/**
 		 * Start VertexLayout.
+		 * Params:
+		 * _rendererType = Renderer backend type. See: `bgfx::RendererType`
 		 */
 		alias da_bgfx_vertex_layout_begin = bgfx_vertex_layout_t* function(bgfx_vertex_layout_t* _this, bgfx_renderer_type_t _rendererType);
 		da_bgfx_vertex_layout_begin bgfx_vertex_layout_begin;
@@ -2113,7 +2208,7 @@ else
 		da_bgfx_vertex_layout_decode bgfx_vertex_layout_decode;
 		
 		/**
-		 * Returns true if VertexLayout contains attribute.
+		 * Returns `true` if VertexLayout contains attribute.
 		 * Params:
 		 * _attrib = Attribute semantics. See: `bgfx::Attrib`
 		 */
@@ -2122,6 +2217,8 @@ else
 		
 		/**
 		 * Skip `_num` bytes in vertex stream.
+		 * Params:
+		 * _num = Number of bytes to skip.
 		 */
 		alias da_bgfx_vertex_layout_skip = bgfx_vertex_layout_t* function(bgfx_vertex_layout_t* _this, byte _num);
 		da_bgfx_vertex_layout_skip bgfx_vertex_layout_skip;
@@ -2177,9 +2274,10 @@ else
 		 * _layout = Vertex stream layout.
 		 * _data = Vertex stream.
 		 * _num = Number of vertices in vertex stream.
+		 * _index32 = Set to `true` if input indices are 32-bit.
 		 * _epsilon = Error tolerance for vertex position comparison.
 		 */
-		alias da_bgfx_weld_vertices = ushort function(ushort* _output, const(bgfx_vertex_layout_t)* _layout, const(void)* _data, ushort _num, float _epsilon);
+		alias da_bgfx_weld_vertices = uint function(void* _output, const(bgfx_vertex_layout_t)* _layout, const(void)* _data, uint _num, bool _index32, float _epsilon);
 		da_bgfx_weld_vertices bgfx_weld_vertices;
 		
 		/**
@@ -2269,7 +2367,7 @@ else
 		 *   - `BGFX_RESET_CAPTURE` - Begin screen capture.
 		 *   - `BGFX_RESET_FLUSH_AFTER_RENDER` - Flush rendering after submitting to GPU.
 		 *   - `BGFX_RESET_FLIP_AFTER_RENDER` - This flag  specifies where flip
-		 *     occurs. Default behavior is that flip occurs before rendering new
+		 *     occurs. Default behaviour is that flip occurs before rendering new
 		 *     frame. This flag only has effect when `BGFX_CONFIG_MULTITHREADED=0`.
 		 *   - `BGFX_RESET_SRGB_BACKBUFFER` - Enable sRGB backbuffer.
 		 * _format = Texture format. See: `TextureFormat::Enum`.
@@ -2637,8 +2735,9 @@ else
 		 * Returns number of requested or maximum available indices.
 		 * Params:
 		 * _num = Number of required indices.
+		 * _index32 = Set to `true` if input indices will be 32-bit.
 		 */
-		alias da_bgfx_get_avail_transient_index_buffer = uint function(uint _num);
+		alias da_bgfx_get_avail_transient_index_buffer = uint function(uint _num, bool _index32);
 		da_bgfx_get_avail_transient_index_buffer bgfx_get_avail_transient_index_buffer;
 		
 		/**
@@ -2661,15 +2760,14 @@ else
 		
 		/**
 		 * Allocate transient index buffer.
-		 * Remarks:
-		 *   Only 16-bit index buffer is supported.
 		 * Params:
 		 * _tib = TransientIndexBuffer structure is filled and is valid
 		 * for the duration of frame, and it can be reused for multiple draw
 		 * calls.
 		 * _num = Number of indices to allocate.
+		 * _index32 = Set to `true` if input indices will be 32-bit.
 		 */
-		alias da_bgfx_alloc_transient_index_buffer = void function(bgfx_transient_index_buffer_t* _tib, uint _num);
+		alias da_bgfx_alloc_transient_index_buffer = void function(bgfx_transient_index_buffer_t* _tib, uint _num, bool _index32);
 		da_bgfx_alloc_transient_index_buffer bgfx_alloc_transient_index_buffer;
 		
 		/**
@@ -2688,8 +2786,6 @@ else
 		 * Check for required space and allocate transient vertex and index
 		 * buffers. If both space requirements are satisfied function returns
 		 * true.
-		 * Remarks:
-		 *   Only 16-bit index buffer is supported.
 		 * Params:
 		 * _tvb = TransientVertexBuffer structure is filled and is valid
 		 * for the duration of frame, and it can be reused for multiple draw
@@ -2700,8 +2796,9 @@ else
 		 * for the duration of frame, and it can be reused for multiple draw
 		 * calls.
 		 * _numIndices = Number of indices to allocate.
+		 * _index32 = Set to `true` if input indices will be 32-bit.
 		 */
-		alias da_bgfx_alloc_transient_buffers = bool function(bgfx_transient_vertex_buffer_t* _tvb, const(bgfx_vertex_layout_t)* _layout, uint _numVertices, bgfx_transient_index_buffer_t* _tib, uint _numIndices);
+		alias da_bgfx_alloc_transient_buffers = bool function(bgfx_transient_vertex_buffer_t* _tvb, const(bgfx_vertex_layout_t)* _layout, uint _numVertices, bgfx_transient_index_buffer_t* _tib, uint _numIndices, bool _index32);
 		da_bgfx_alloc_transient_buffers bgfx_alloc_transient_buffers;
 		
 		/**
@@ -2811,6 +2908,15 @@ else
 		 */
 		alias da_bgfx_is_texture_valid = bool function(ushort _depth, bool _cubeMap, ushort _numLayers, bgfx_texture_format_t _format, ulong _flags);
 		da_bgfx_is_texture_valid bgfx_is_texture_valid;
+		
+		/**
+		 * Validate frame buffer parameters.
+		 * Params:
+		 * _num = Number of attachments.
+		 * _attachment = Attachment texture info. See: `bgfx::Attachment`.
+		 */
+		alias da_bgfx_is_frame_buffer_valid = bool function(byte _num, const(bgfx_attachment_t)* _attachment);
+		da_bgfx_is_frame_buffer_valid bgfx_is_frame_buffer_valid;
 		
 		/**
 		 * Calculate amount of memory required for texture.
@@ -3086,7 +3192,7 @@ else
 		 * Create MRT frame buffer from texture handles with specific layer and
 		 * mip level.
 		 * Params:
-		 * _num = Number of attachements.
+		 * _num = Number of attachments.
 		 * _attachment = Attachment texture info. See: `bgfx::Attachment`.
 		 * _destroyTexture = If true, textures will be destroyed when
 		 * frame buffer is destroyed.
@@ -3362,6 +3468,12 @@ else
 		da_bgfx_set_view_order bgfx_set_view_order;
 		
 		/**
+		 * Reset all view settings to default.
+		 */
+		alias da_bgfx_reset_view = void function(bgfx_view_id_t _id);
+		da_bgfx_reset_view bgfx_reset_view;
+		
+		/**
 		 * Begin submitting draw calls from thread.
 		 * Params:
 		 * _forThread = Explicitly request an encoder for a worker thread.
@@ -3533,10 +3645,23 @@ else
 		 * _handle = Vertex buffer.
 		 * _startVertex = First vertex to render.
 		 * _numVertices = Number of vertices to render.
-		 * _layoutHandle = Vertex layout for aliasing vertex buffer.
 		 */
-		alias da_bgfx_encoder_set_vertex_buffer = void function(bgfx_encoder_t* _this, byte _stream, bgfx_vertex_buffer_handle_t _handle, uint _startVertex, uint _numVertices, bgfx_vertex_layout_handle_t _layoutHandle);
+		alias da_bgfx_encoder_set_vertex_buffer = void function(bgfx_encoder_t* _this, byte _stream, bgfx_vertex_buffer_handle_t _handle, uint _startVertex, uint _numVertices);
 		da_bgfx_encoder_set_vertex_buffer bgfx_encoder_set_vertex_buffer;
+		
+		/**
+		 * Set vertex buffer for draw primitive.
+		 * Params:
+		 * _stream = Vertex stream.
+		 * _handle = Vertex buffer.
+		 * _startVertex = First vertex to render.
+		 * _numVertices = Number of vertices to render.
+		 * _layoutHandle = Vertex layout for aliasing vertex buffer. If invalid
+		 * handle is used, vertex layout used for creation
+		 * of vertex buffer will be used.
+		 */
+		alias da_bgfx_encoder_set_vertex_buffer_with_layout = void function(bgfx_encoder_t* _this, byte _stream, bgfx_vertex_buffer_handle_t _handle, uint _startVertex, uint _numVertices, bgfx_vertex_layout_handle_t _layoutHandle);
+		da_bgfx_encoder_set_vertex_buffer_with_layout bgfx_encoder_set_vertex_buffer_with_layout;
 		
 		/**
 		 * Set vertex buffer for draw primitive.
@@ -3545,10 +3670,12 @@ else
 		 * _handle = Dynamic vertex buffer.
 		 * _startVertex = First vertex to render.
 		 * _numVertices = Number of vertices to render.
-		 * _layoutHandle = Vertex layout for aliasing vertex buffer.
 		 */
-		alias da_bgfx_encoder_set_dynamic_vertex_buffer = void function(bgfx_encoder_t* _this, byte _stream, bgfx_dynamic_vertex_buffer_handle_t _handle, uint _startVertex, uint _numVertices, bgfx_vertex_layout_handle_t _layoutHandle);
+		alias da_bgfx_encoder_set_dynamic_vertex_buffer = void function(bgfx_encoder_t* _this, byte _stream, bgfx_dynamic_vertex_buffer_handle_t _handle, uint _startVertex, uint _numVertices);
 		da_bgfx_encoder_set_dynamic_vertex_buffer bgfx_encoder_set_dynamic_vertex_buffer;
+		
+		alias da_bgfx_encoder_set_dynamic_vertex_buffer_with_layout = void function(bgfx_encoder_t* _this, byte _stream, bgfx_dynamic_vertex_buffer_handle_t _handle, uint _startVertex, uint _numVertices, bgfx_vertex_layout_handle_t _layoutHandle);
+		da_bgfx_encoder_set_dynamic_vertex_buffer_with_layout bgfx_encoder_set_dynamic_vertex_buffer_with_layout;
 		
 		/**
 		 * Set vertex buffer for draw primitive.
@@ -3557,10 +3684,23 @@ else
 		 * _tvb = Transient vertex buffer.
 		 * _startVertex = First vertex to render.
 		 * _numVertices = Number of vertices to render.
-		 * _layoutHandle = Vertex layout for aliasing vertex buffer.
 		 */
-		alias da_bgfx_encoder_set_transient_vertex_buffer = void function(bgfx_encoder_t* _this, byte _stream, const(bgfx_transient_vertex_buffer_t)* _tvb, uint _startVertex, uint _numVertices, bgfx_vertex_layout_handle_t _layoutHandle);
+		alias da_bgfx_encoder_set_transient_vertex_buffer = void function(bgfx_encoder_t* _this, byte _stream, const(bgfx_transient_vertex_buffer_t)* _tvb, uint _startVertex, uint _numVertices);
 		da_bgfx_encoder_set_transient_vertex_buffer bgfx_encoder_set_transient_vertex_buffer;
+		
+		/**
+		 * Set vertex buffer for draw primitive.
+		 * Params:
+		 * _stream = Vertex stream.
+		 * _tvb = Transient vertex buffer.
+		 * _startVertex = First vertex to render.
+		 * _numVertices = Number of vertices to render.
+		 * _layoutHandle = Vertex layout for aliasing vertex buffer. If invalid
+		 * handle is used, vertex layout used for creation
+		 * of vertex buffer will be used.
+		 */
+		alias da_bgfx_encoder_set_transient_vertex_buffer_with_layout = void function(bgfx_encoder_t* _this, byte _stream, const(bgfx_transient_vertex_buffer_t)* _tvb, uint _startVertex, uint _numVertices, bgfx_vertex_layout_handle_t _layoutHandle);
+		da_bgfx_encoder_set_transient_vertex_buffer_with_layout bgfx_encoder_set_transient_vertex_buffer_with_layout;
 		
 		/**
 		 * Set number of vertices for auto generated vertices use in conjuction
@@ -3629,7 +3769,9 @@ else
 		
 		/**
 		 * Submit an empty primitive for rendering. Uniforms and draw state
-		 * will be applied but no geometry will be submitted.
+		 * will be applied but no geometry will be submitted. Useful in cases
+		 * when no other draw/compute primitive is submitted to view, but it's
+		 * desired to execute clear view.
 		 * Remarks:
 		 *   These empty draw calls will sort before ordinary draw calls.
 		 * Params:
@@ -3644,9 +3786,9 @@ else
 		 * _id = View id.
 		 * _program = Program.
 		 * _depth = Depth for sorting.
-		 * _preserveState = Preserve internal draw state for next draw call submit.
+		 * _flags = Discard or preserve states. See `BGFX_DISCARD_*`.
 		 */
-		alias da_bgfx_encoder_submit = void function(bgfx_encoder_t* _this, bgfx_view_id_t _id, bgfx_program_handle_t _program, uint _depth, bool _preserveState);
+		alias da_bgfx_encoder_submit = void function(bgfx_encoder_t* _this, bgfx_view_id_t _id, bgfx_program_handle_t _program, uint _depth, byte _flags);
 		da_bgfx_encoder_submit bgfx_encoder_submit;
 		
 		/**
@@ -3656,9 +3798,9 @@ else
 		 * _program = Program.
 		 * _occlusionQuery = Occlusion query.
 		 * _depth = Depth for sorting.
-		 * _preserveState = Preserve internal draw state for next draw call submit.
+		 * _flags = Discard or preserve states. See `BGFX_DISCARD_*`.
 		 */
-		alias da_bgfx_encoder_submit_occlusion_query = void function(bgfx_encoder_t* _this, bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_occlusion_query_handle_t _occlusionQuery, uint _depth, bool _preserveState);
+		alias da_bgfx_encoder_submit_occlusion_query = void function(bgfx_encoder_t* _this, bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_occlusion_query_handle_t _occlusionQuery, uint _depth, byte _flags);
 		da_bgfx_encoder_submit_occlusion_query bgfx_encoder_submit_occlusion_query;
 		
 		/**
@@ -3671,9 +3813,9 @@ else
 		 * _start = First element in indirect buffer.
 		 * _num = Number of dispatches.
 		 * _depth = Depth for sorting.
-		 * _preserveState = Preserve internal draw state for next draw call submit.
+		 * _flags = Discard or preserve states. See `BGFX_DISCARD_*`.
 		 */
-		alias da_bgfx_encoder_submit_indirect = void function(bgfx_encoder_t* _this, bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_indirect_buffer_handle_t _indirectHandle, ushort _start, ushort _num, uint _depth, bool _preserveState);
+		alias da_bgfx_encoder_submit_indirect = void function(bgfx_encoder_t* _this, bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_indirect_buffer_handle_t _indirectHandle, ushort _start, ushort _num, uint _depth, byte _flags);
 		da_bgfx_encoder_submit_indirect bgfx_encoder_submit_indirect;
 		
 		/**
@@ -3746,8 +3888,9 @@ else
 		 * _numX = Number of groups X.
 		 * _numY = Number of groups Y.
 		 * _numZ = Number of groups Z.
+		 * _flags = Discard or preserve states. See `BGFX_DISCARD_*`.
 		 */
-		alias da_bgfx_encoder_dispatch = void function(bgfx_encoder_t* _this, bgfx_view_id_t _id, bgfx_program_handle_t _program, uint _numX, uint _numY, uint _numZ);
+		alias da_bgfx_encoder_dispatch = void function(bgfx_encoder_t* _this, bgfx_view_id_t _id, bgfx_program_handle_t _program, uint _numX, uint _numY, uint _numZ, byte _flags);
 		da_bgfx_encoder_dispatch bgfx_encoder_dispatch;
 		
 		/**
@@ -3758,14 +3901,17 @@ else
 		 * _indirectHandle = Indirect buffer.
 		 * _start = First element in indirect buffer.
 		 * _num = Number of dispatches.
+		 * _flags = Discard or preserve states. See `BGFX_DISCARD_*`.
 		 */
-		alias da_bgfx_encoder_dispatch_indirect = void function(bgfx_encoder_t* _this, bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_indirect_buffer_handle_t _indirectHandle, ushort _start, ushort _num);
+		alias da_bgfx_encoder_dispatch_indirect = void function(bgfx_encoder_t* _this, bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_indirect_buffer_handle_t _indirectHandle, ushort _start, ushort _num, byte _flags);
 		da_bgfx_encoder_dispatch_indirect bgfx_encoder_dispatch_indirect;
 		
 		/**
-		 * Discard all previously set state for draw or compute call.
+		 * Discard previously set state for draw or compute call.
+		 * Params:
+		 * _flags = Discard or preserve states. See `BGFX_DISCARD_*`.
 		 */
-		alias da_bgfx_encoder_discard = void function(bgfx_encoder_t* _this);
+		alias da_bgfx_encoder_discard = void function(bgfx_encoder_t* _this, byte _flags);
 		da_bgfx_encoder_discard bgfx_encoder_discard;
 		
 		/**
@@ -4043,6 +4189,20 @@ else
 		 * Set vertex buffer for draw primitive.
 		 * Params:
 		 * _stream = Vertex stream.
+		 * _handle = Vertex buffer.
+		 * _startVertex = First vertex to render.
+		 * _numVertices = Number of vertices to render.
+		 * _layoutHandle = Vertex layout for aliasing vertex buffer. If invalid
+		 * handle is used, vertex layout used for creation
+		 * of vertex buffer will be used.
+		 */
+		alias da_bgfx_set_vertex_buffer_with_layout = void function(byte _stream, bgfx_vertex_buffer_handle_t _handle, uint _startVertex, uint _numVertices, bgfx_vertex_layout_handle_t _layoutHandle);
+		da_bgfx_set_vertex_buffer_with_layout bgfx_set_vertex_buffer_with_layout;
+		
+		/**
+		 * Set vertex buffer for draw primitive.
+		 * Params:
+		 * _stream = Vertex stream.
 		 * _handle = Dynamic vertex buffer.
 		 * _startVertex = First vertex to render.
 		 * _numVertices = Number of vertices to render.
@@ -4054,12 +4214,40 @@ else
 		 * Set vertex buffer for draw primitive.
 		 * Params:
 		 * _stream = Vertex stream.
+		 * _handle = Dynamic vertex buffer.
+		 * _startVertex = First vertex to render.
+		 * _numVertices = Number of vertices to render.
+		 * _layoutHandle = Vertex layout for aliasing vertex buffer. If invalid
+		 * handle is used, vertex layout used for creation
+		 * of vertex buffer will be used.
+		 */
+		alias da_bgfx_set_dynamic_vertex_buffer_with_layout = void function(byte _stream, bgfx_dynamic_vertex_buffer_handle_t _handle, uint _startVertex, uint _numVertices, bgfx_vertex_layout_handle_t _layoutHandle);
+		da_bgfx_set_dynamic_vertex_buffer_with_layout bgfx_set_dynamic_vertex_buffer_with_layout;
+		
+		/**
+		 * Set vertex buffer for draw primitive.
+		 * Params:
+		 * _stream = Vertex stream.
 		 * _tvb = Transient vertex buffer.
 		 * _startVertex = First vertex to render.
 		 * _numVertices = Number of vertices to render.
 		 */
 		alias da_bgfx_set_transient_vertex_buffer = void function(byte _stream, const(bgfx_transient_vertex_buffer_t)* _tvb, uint _startVertex, uint _numVertices);
 		da_bgfx_set_transient_vertex_buffer bgfx_set_transient_vertex_buffer;
+		
+		/**
+		 * Set vertex buffer for draw primitive.
+		 * Params:
+		 * _stream = Vertex stream.
+		 * _tvb = Transient vertex buffer.
+		 * _startVertex = First vertex to render.
+		 * _numVertices = Number of vertices to render.
+		 * _layoutHandle = Vertex layout for aliasing vertex buffer. If invalid
+		 * handle is used, vertex layout used for creation
+		 * of vertex buffer will be used.
+		 */
+		alias da_bgfx_set_transient_vertex_buffer_with_layout = void function(byte _stream, const(bgfx_transient_vertex_buffer_t)* _tvb, uint _startVertex, uint _numVertices, bgfx_vertex_layout_handle_t _layoutHandle);
+		da_bgfx_set_transient_vertex_buffer_with_layout bgfx_set_transient_vertex_buffer_with_layout;
 		
 		/**
 		 * Set number of vertices for auto generated vertices use in conjuction
@@ -4143,9 +4331,9 @@ else
 		 * _id = View id.
 		 * _program = Program.
 		 * _depth = Depth for sorting.
-		 * _preserveState = Preserve internal draw state for next draw call submit.
+		 * _flags = Which states to discard for next draw. See `BGFX_DISCARD_*`.
 		 */
-		alias da_bgfx_submit = void function(bgfx_view_id_t _id, bgfx_program_handle_t _program, uint _depth, bool _preserveState);
+		alias da_bgfx_submit = void function(bgfx_view_id_t _id, bgfx_program_handle_t _program, uint _depth, byte _flags);
 		da_bgfx_submit bgfx_submit;
 		
 		/**
@@ -4155,9 +4343,9 @@ else
 		 * _program = Program.
 		 * _occlusionQuery = Occlusion query.
 		 * _depth = Depth for sorting.
-		 * _preserveState = Preserve internal draw state for next draw call submit.
+		 * _flags = Which states to discard for next draw. See `BGFX_DISCARD_*`.
 		 */
-		alias da_bgfx_submit_occlusion_query = void function(bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_occlusion_query_handle_t _occlusionQuery, uint _depth, bool _preserveState);
+		alias da_bgfx_submit_occlusion_query = void function(bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_occlusion_query_handle_t _occlusionQuery, uint _depth, byte _flags);
 		da_bgfx_submit_occlusion_query bgfx_submit_occlusion_query;
 		
 		/**
@@ -4170,9 +4358,9 @@ else
 		 * _start = First element in indirect buffer.
 		 * _num = Number of dispatches.
 		 * _depth = Depth for sorting.
-		 * _preserveState = Preserve internal draw state for next draw call submit.
+		 * _flags = Which states to discard for next draw. See `BGFX_DISCARD_*`.
 		 */
-		alias da_bgfx_submit_indirect = void function(bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_indirect_buffer_handle_t _indirectHandle, ushort _start, ushort _num, uint _depth, bool _preserveState);
+		alias da_bgfx_submit_indirect = void function(bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_indirect_buffer_handle_t _indirectHandle, ushort _start, ushort _num, uint _depth, byte _flags);
 		da_bgfx_submit_indirect bgfx_submit_indirect;
 		
 		/**
@@ -4245,8 +4433,9 @@ else
 		 * _numX = Number of groups X.
 		 * _numY = Number of groups Y.
 		 * _numZ = Number of groups Z.
+		 * _flags = Discard or preserve states. See `BGFX_DISCARD_*`.
 		 */
-		alias da_bgfx_dispatch = void function(bgfx_view_id_t _id, bgfx_program_handle_t _program, uint _numX, uint _numY, uint _numZ);
+		alias da_bgfx_dispatch = void function(bgfx_view_id_t _id, bgfx_program_handle_t _program, uint _numX, uint _numY, uint _numZ, byte _flags);
 		da_bgfx_dispatch bgfx_dispatch;
 		
 		/**
@@ -4257,14 +4446,17 @@ else
 		 * _indirectHandle = Indirect buffer.
 		 * _start = First element in indirect buffer.
 		 * _num = Number of dispatches.
+		 * _flags = Discard or preserve states. See `BGFX_DISCARD_*`.
 		 */
-		alias da_bgfx_dispatch_indirect = void function(bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_indirect_buffer_handle_t _indirectHandle, ushort _start, ushort _num);
+		alias da_bgfx_dispatch_indirect = void function(bgfx_view_id_t _id, bgfx_program_handle_t _program, bgfx_indirect_buffer_handle_t _indirectHandle, ushort _start, ushort _num, byte _flags);
 		da_bgfx_dispatch_indirect bgfx_dispatch_indirect;
 		
 		/**
-		 * Discard all previously set state for draw or compute call.
+		 * Discard previously set state for draw or compute call.
+		 * Params:
+		 * _flags = Draw/compute states to discard.
 		 */
-		alias da_bgfx_discard = void function();
+		alias da_bgfx_discard = void function(byte _flags);
 		da_bgfx_discard bgfx_discard;
 		
 		/**

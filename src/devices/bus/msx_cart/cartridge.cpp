@@ -9,11 +9,13 @@
 #include "crossblaim.h"
 #include "disk.h"
 #include "dooly.h"
+#include "easi_speech.h"
 #include "fmpac.h"
 #include "fs_sr022.h"
 #include "halnote.h"
 #include "hfox.h"
 #include "holy_quran.h"
+#include "ink.h"
 #include "konami.h"
 #include "korean.h"
 #include "majutsushi.h"
@@ -46,6 +48,7 @@ void msx_cart(device_slot_interface &device)
 	device.option_add_internal("fs_sr022", MSX_CART_FS_SR022);
 	device.option_add_internal("superloderunner", MSX_CART_SUPERLODERUNNER);
 	device.option_add_internal("synthesizer", MSX_CART_SYNTHESIZER);
+	device.option_add_internal("easispeech", MSX_CART_EASISPEECH);
 	device.option_add_internal("cross_blaim", MSX_CART_CROSSBLAIM);
 	device.option_add_internal("korean_80in1", MSX_CART_KOREAN_80IN1);
 	device.option_add_internal("korean_90in1", MSX_CART_KOREAN_90IN1);
@@ -58,6 +61,7 @@ void msx_cart(device_slot_interface &device)
 	device.option_add_internal("msxaud_nms1205", MSX_CART_MSX_AUDIO_NMS1205);
 	device.option_add_internal("super_swangi", MSX_CART_SUPER_SWANGI);
 	device.option_add_internal("hfox", MSX_CART_HFOX);
+	device.option_add_internal("ink", MSX_CART_INK);
 	device.option_add_internal("keyboard_master", MSX_CART_KEYBOARD_MASTER);
 	device.option_add_internal("holy_quran", MSX_CART_HOLY_QURAN);
 	device.option_add_internal("dooly", MSX_CART_DOOLY);

@@ -108,20 +108,20 @@ protected:
 	output_finder<32 + 2> m_digits;
 
 	// serial vfd
-	int vfd_enabled;
-	bool vfd_old_clock;
+	int vfd_enabled = 0;
+	bool vfd_old_clock = false;
 
-	uint8_t vfd_ser_value;
-	int vfd_ser_count;
+	uint8_t vfd_ser_value = 0U;
+	int vfd_ser_count = 0;
 
 	// 34 segment custom encoding used by some sc4/5 machines such as Box Clever, Break The Bank, The Big Deal, The Crazy Chair, The Perfect Game
-	bool m_segment_34_encoding;
-	uint8_t m_segment_34_cache[32];
+	bool m_segment_34_encoding = false;
+	uint8_t m_segment_34_cache[32]{};
 
 	virtual void machine_start() override;
 
-	DECLARE_WRITE8_MEMBER(mux_output_w);
-	DECLARE_WRITE8_MEMBER(mux_output2_w);
+	void mux_output_w(offs_t offset, uint8_t data);
+	void mux_output2_w(offs_t offset, uint8_t data);
 	void bfm_sc4_reset_serial_vfd();
 	void bfm_sc45_write_serial_vfd(bool cs, bool clock, bool data);
 };
@@ -156,38 +156,38 @@ public:
 	required_ioport m_in_coin;
 	optional_device_array<stepper_device, 6> m_reel;
 
-	int m_reel12_latch;
-	int m_reel3_latch;
-	int m_reel4_latch;
-	int m_reel56_latch;
-	int m_optic_pattern;
+	int m_reel12_latch = 0;
+	int m_reel3_latch = 0;
+	int m_reel4_latch = 0;
+	int m_reel56_latch = 0;
+	int m_optic_pattern = 0;
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 
-	int m_meterstatus;
+	int m_meterstatus = 0;
 
 	int m_chk41addr;
 	bool m_dochk41;
 
-	uint16_t m_mainram[0x10000/2];
+	uint16_t m_mainram[0x10000/2]{};
 
 	uint8_t read_input_matrix(int row);
 
 
 	DECLARE_WRITE_LINE_MEMBER(bfmdm01_busy);
 
-	DECLARE_READ16_MEMBER(sc4_mem_r);
-	DECLARE_WRITE16_MEMBER(sc4_mem_w);
+	uint16_t sc4_mem_r(offs_t offset, uint16_t mem_mask = ~0);
+	void sc4_mem_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER(sc4_cs1_r);
+	uint16_t sc4_cs1_r(offs_t offset, uint16_t mem_mask = ~0);
 
 	DECLARE_WRITE_LINE_MEMBER(bfm_sc4_duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(bfm_sc4_duart_txa);
-	DECLARE_READ8_MEMBER(bfm_sc4_duart_input_r);
-	DECLARE_WRITE8_MEMBER(bfm_sc4_duart_output_w);
+	uint8_t bfm_sc4_duart_input_r();
+	void bfm_sc4_duart_output_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txa);
-	DECLARE_READ8_MEMBER(m68307_duart_input_r);
-	DECLARE_WRITE8_MEMBER(m68307_duart_output_w);
+	uint8_t m68307_duart_input_r();
+	void m68307_duart_output_w(uint8_t data);
 
 	void init_sc4();
 	void init_sc4mbus();
@@ -605,8 +605,8 @@ public:
 	virtual void machine_reset() override;
 
 	void bfm_sc4_68307_porta_w(address_space &space, bool dedicated, uint8_t data, uint8_t line_mask);
-	DECLARE_WRITE8_MEMBER( bfm_sc4_reel3_w );
-	DECLARE_WRITE8_MEMBER( bfm_sc4_reel4_w );
+	void bfm_sc4_reel3_w(uint8_t data);
+	void bfm_sc4_reel4_w(uint8_t data);
 	void bfm_sc4_68307_portb_w(address_space &space, bool dedicated, uint16_t data, uint16_t line_mask);
 	uint8_t bfm_sc4_68307_porta_r(address_space &space, bool dedicated, uint8_t line_mask);
 	uint16_t bfm_sc4_68307_portb_r(address_space &space, bool dedicated, uint16_t line_mask);
@@ -654,10 +654,10 @@ public:
 	{ }
 
 	required_region_ptr<uint32_t> m_adder4cpuregion;
-	std::unique_ptr<uint32_t[]> m_adder4ram;
+	std::unique_ptr<uint32_t[]> m_adder4ram{};
 
-	DECLARE_READ32_MEMBER(adder4_mem_r);
-	DECLARE_WRITE32_MEMBER(adder4_mem_w);
+	uint32_t adder4_mem_r(offs_t offset, uint32_t mem_mask = ~0);
+	void adder4_mem_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	virtual void machine_start() override;
 
 	// devices

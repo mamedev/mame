@@ -108,7 +108,6 @@ protected:
 	uint8_t m_IF;
 	int m_irq_state;
 	bool m_handle_ei_delay;
-	lr35902_cpu_device *m_device;
 	address_space *m_program;
 	int m_icount;
 

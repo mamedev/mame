@@ -57,20 +57,20 @@ private:
 	required_shared_ptr<uint16_t> m_dsp56156_p_mirror;
 	required_shared_ptr<uint16_t> m_dsp56156_p_8000;
 
-	ioport_port *m_inputs[4];
-	uint8_t m_sys0;
-	uint8_t m_sys1;
+	ioport_port *m_inputs[4]{};
+	uint8_t m_sys0 = 0;
+	uint8_t m_sys1 = 0;
 
 	/* TTL text plane stuff */
-	int m_ttl_gfx_index;
-	tilemap_t *m_ttl_tilemap;
-	tilemap_t *m_roz_tilemap;
+	int m_ttl_gfx_index = 0;
+	tilemap_t *m_ttl_tilemap = nullptr;
+	tilemap_t *m_roz_tilemap = nullptr;
 	uint16_t m_ttl_vram[0x800];
 	uint16_t m_roz_vram[0x800];
 
 	/* sound */
-	uint8_t m_sound_ctrl;
-	uint8_t m_sound_intck;
+	uint8_t m_sound_ctrl = 0;
+	uint8_t m_sound_intck = 0;
 
 	/* memory buffers */
 	uint16_t m_dsp56156_bank00_ram[2 * 8 * dsp56156_bank00_size]; /* 2 bank sets, 8 potential banks each */
@@ -79,30 +79,30 @@ private:
 	uint16_t m_dsp56156_shared_ram_16[2 * 8 * dsp56156_shared_ram_16_size];
 	uint16_t m_dsp56156_bank04_ram[2 * 8 * dsp56156_bank04_size];
 
-	DECLARE_WRITE8_MEMBER(polygonet_sys_w);
-	DECLARE_READ8_MEMBER(polygonet_inputs_r);
-	DECLARE_WRITE32_MEMBER(sound_irq_w);
-	DECLARE_READ32_MEMBER(dsp_host_interface_r);
-	DECLARE_WRITE32_MEMBER(shared_ram_write);
-	DECLARE_WRITE32_MEMBER(dsp_w_lines);
-	DECLARE_WRITE32_MEMBER(dsp_host_interface_w);
-	DECLARE_READ32_MEMBER(network_r);
-	DECLARE_READ16_MEMBER(dsp56156_bootload_r);
-	DECLARE_READ16_MEMBER(dsp56156_ram_bank00_read);
-	DECLARE_WRITE16_MEMBER(dsp56156_ram_bank00_write);
-	DECLARE_READ16_MEMBER(dsp56156_ram_bank01_read);
-	DECLARE_WRITE16_MEMBER(dsp56156_ram_bank01_write);
-	DECLARE_READ16_MEMBER(dsp56156_ram_bank02_read);
-	DECLARE_WRITE16_MEMBER(dsp56156_ram_bank02_write);
-	DECLARE_READ16_MEMBER(dsp56156_shared_ram_read);
-	DECLARE_WRITE16_MEMBER(dsp56156_shared_ram_write);
-	DECLARE_READ16_MEMBER(dsp56156_ram_bank04_read);
-	DECLARE_WRITE16_MEMBER(dsp56156_ram_bank04_write);
-	DECLARE_WRITE8_MEMBER(sound_ctrl_w);
-	DECLARE_READ32_MEMBER(polygonet_ttl_ram_r);
-	DECLARE_WRITE32_MEMBER(polygonet_ttl_ram_w);
-	DECLARE_READ32_MEMBER(polygonet_roz_ram_r);
-	DECLARE_WRITE32_MEMBER(polygonet_roz_ram_w);
+	void polygonet_sys_w(offs_t offset, uint8_t data);
+	uint8_t polygonet_inputs_r(offs_t offset);
+	void sound_irq_w(uint32_t data);
+	uint32_t dsp_host_interface_r(offs_t offset, uint32_t mem_mask = ~0);
+	void shared_ram_write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void dsp_w_lines(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void dsp_host_interface_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t network_r();
+	uint16_t dsp56156_bootload_r();
+	uint16_t dsp56156_ram_bank00_read(offs_t offset);
+	void dsp56156_ram_bank00_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t dsp56156_ram_bank01_read(offs_t offset);
+	void dsp56156_ram_bank01_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t dsp56156_ram_bank02_read(offs_t offset);
+	void dsp56156_ram_bank02_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t dsp56156_shared_ram_read(offs_t offset);
+	void dsp56156_shared_ram_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t dsp56156_ram_bank04_read(offs_t offset);
+	void dsp56156_ram_bank04_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_ctrl_w(uint8_t data);
+	uint32_t polygonet_ttl_ram_r(offs_t offset);
+	void polygonet_ttl_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t polygonet_roz_ram_r(offs_t offset);
+	void polygonet_roz_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	TILE_GET_INFO_MEMBER(ttl_get_tile_info);
 	TILE_GET_INFO_MEMBER(roz_get_tile_info);

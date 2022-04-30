@@ -64,8 +64,8 @@ public:
 	void set_rx_clock(int clock) { m_rx_clock = clock; }
 	void set_tx_clock(int clock) { m_tx_clock = clock; }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( i0_w );
 	DECLARE_WRITE_LINE_MEMBER( i1_w );
@@ -148,7 +148,7 @@ private:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_serial_interface overrides
 	virtual void tra_callback() override;

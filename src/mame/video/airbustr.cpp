@@ -47,7 +47,7 @@
             Bg Y    Bg X    Fg Y    Fg X    <-Scroll High Bits (complemented!)
 */
 
-WRITE8_MEMBER(airbustr_state::scrollregs_w)
+void airbustr_state::scrollregs_w(offs_t offset, uint8_t data)
 {
 	switch (offset)     // offset 0 <-> port 4
 	{
@@ -74,7 +74,7 @@ TILE_GET_INFO_MEMBER(airbustr_state::get_tile_info)
 	int code = m_videoram[Layer][tile_index] + ((attr & 0x0f) << 8);
 	int color = (attr >> 4) + ((Layer ^ 1) << 4);
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void airbustr_state::video_start()

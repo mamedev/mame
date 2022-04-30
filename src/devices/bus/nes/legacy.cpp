@@ -59,19 +59,6 @@ nes_ffe8_device::nes_ffe8_device(const machine_config &mconfig, const char *tag,
 
 
 
-void nes_ffe3_device::device_start()
-{
-	common_start();
-}
-
-void nes_ffe3_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-
 void nes_ffe4_device::device_start()
 {
 	common_start();
@@ -156,7 +143,7 @@ void nes_ffe3_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_ffe4_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_ffe4_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_IRQ)
 	{

@@ -18,7 +18,7 @@ void rf5c296_device::device_start()
 {
 }
 
-void rf5c296_device::reg_w(ATTR_UNUSED uint8_t reg, uint8_t data)
+void rf5c296_device::reg_w(uint8_t reg, uint8_t data)
 {
 	//  fprintf(stderr, "%s rf5c296_reg_w %02x, %02x\n", machine().describe_context().c_str(), reg, data);
 	switch (reg)
@@ -37,13 +37,13 @@ void rf5c296_device::reg_w(ATTR_UNUSED uint8_t reg, uint8_t data)
 	}
 }
 
-uint8_t rf5c296_device::reg_r(ATTR_UNUSED uint8_t reg)
+uint8_t rf5c296_device::reg_r(uint8_t reg)
 {
 	//  fprintf(stderr, "%s rf5c296_reg_r %02x\n", machine().describe_context().c_str(), reg);
 	return 0x00;
 }
 
-WRITE16_MEMBER(rf5c296_device::io_w)
+void rf5c296_device::io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/// TODO: find out if this should be done here.
 	offset *= 2;
@@ -65,12 +65,12 @@ WRITE16_MEMBER(rf5c296_device::io_w)
 		break;
 
 	default:
-		m_pccard->write_memory(space, offset, data, mem_mask);
+		m_pccard->write_memory(offset, data, mem_mask);
 		break;
 	}
 }
 
-READ16_MEMBER(rf5c296_device::io_r)
+uint16_t rf5c296_device::io_r(offs_t offset, uint16_t mem_mask)
 {
 	/// TODO: find out if this should be done here.
 	offset *= 2;
@@ -95,7 +95,7 @@ READ16_MEMBER(rf5c296_device::io_r)
 		break;
 
 	default:
-		data = m_pccard->read_memory(space, offset, mem_mask);
+		data = m_pccard->read_memory(offset, mem_mask);
 		break;
 	}
 
@@ -104,12 +104,12 @@ READ16_MEMBER(rf5c296_device::io_r)
 
 // Hardcoded to reach the pcmcia CIS
 
-READ16_MEMBER(rf5c296_device::mem_r)
+uint16_t rf5c296_device::mem_r(offs_t offset, uint16_t mem_mask)
 {
-	return m_pccard->read_reg(space, offset, mem_mask);
+	return m_pccard->read_reg(offset, mem_mask);
 }
 
-WRITE16_MEMBER(rf5c296_device::mem_w)
+void rf5c296_device::mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_pccard->write_reg(space, offset, data, mem_mask);
+	m_pccard->write_reg(offset, data, mem_mask);
 }

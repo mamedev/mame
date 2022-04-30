@@ -190,9 +190,9 @@ void vt52_state::vert_count_w(u8 data)
 void vt52_state::uart_xd_w(u8 data)
 {
 	if (BIT(m_data_sw->read(), 2))
-		m_uart->set_transmit_data(data | 0x80);
+		m_uart->transmit(data | 0x80);
 	else
-		m_uart->set_transmit_data(data & 0x7f);
+		m_uart->transmit(data & 0x7f);
 }
 
 void vt52_state::gated_serial_output(bool state)
@@ -224,9 +224,12 @@ WRITE_LINE_MEMBER(vt52_state::rec_data_w)
 {
 	m_rec_data = state;
 
-	ioport_value baud = m_baud_sw->read();
-	if (BIT(baud, 9) && ((~baud & 0x0880) == 0 || (m_serial_out && m_break_key->read())))
-		m_uart->write_si(state);
+	if (machine().ioport().safe_to_read())
+	{
+		ioport_value baud = m_baud_sw->read();
+		if (BIT(baud, 9) && ((~baud & 0x0880) == 0 || (m_serial_out && m_break_key->read())))
+			m_uart->write_si(state);
+	}
 }
 
 READ_LINE_MEMBER(vt52_state::xrdy_eoc_r)

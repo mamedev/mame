@@ -94,7 +94,7 @@ TODO:
 #include "bus/rs232/rs232.h"
 #include "speaker.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 
 
 static constexpr XTAL MAIN_CLOCK = 15.9744_MHz_XTAL;
@@ -258,7 +258,7 @@ INPUT_PORTS_END
 static void osborne1_floppies(device_slot_interface &device)
 {
 	device.option_add("525sssd", FLOPPY_525_SSSD); // Siemens FDD 100-5, custom Osborne electronics
-	device.option_add("525ssdd", FLOPPY_525_QD); // SSDD) // MPI 52(?), custom Osborne electronics
+	device.option_add("525ssdd", FLOPPY_525_SSDD); // MPI 52(?), custom Osborne electronics
 }
 
 
@@ -329,8 +329,8 @@ void osborne1_state::osborne1_base(machine_config &config)
 
 	MB8877(config, m_fdc, MAIN_CLOCK/16);
 	m_fdc->set_force_ready(true);
-	FLOPPY_CONNECTOR(config, m_floppy0, osborne1_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, osborne1_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy0, osborne1_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, osborne1_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("68K"); // 64kB main RAM and 4kbit video attribute RAM

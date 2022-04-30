@@ -89,9 +89,8 @@ void cave_state::sailormn_get_banked_code(bool tiledim, u32 &color, u32 &pri, u3
 
 ***************************************************************************/
 
-void cave_state::vh_start(u16 sprcol_base, u16 sprcol_granularity)
+void cave_state::vh_start(u16 sprcol_granularity)
 {
-	m_sprite_base_pal = sprcol_base;
 	m_sprite_granularity = sprcol_granularity;
 
 	sprite_init();
@@ -125,25 +124,19 @@ void cave_state::vh_start(u16 sprcol_base, u16 sprcol_granularity)
 // 4 bit sprite granularity
 VIDEO_START_MEMBER(cave_state,spr_4bpp)
 {
-	vh_start(0, 16);
+	vh_start(16);
 }
 
 // 8 bit sprite granularity
 VIDEO_START_MEMBER(cave_state,spr_8bpp)
 {
-	vh_start(0, 256);
-}
-
-// korokoro (different sprite base palette)
-VIDEO_START_MEMBER(cave_state,korokoro)
-{
-	vh_start(0x3c00, 16);
+	vh_start(256);
 }
 
 // ppsatan (3 screen)
 VIDEO_START_MEMBER(cave_state,ppsatan)
 {
-	vh_start(0x3c00, 16);
+	vh_start(16);
 	for (int chip = 1; chip < 3; chip++)
 	{
 		m_background_pen[chip] = m_gfxdecode[chip]->gfx(0)->colorbase() +
@@ -162,15 +155,15 @@ VIDEO_START_MEMBER(cave_state,ppsatan)
 
 /***************************************************************************
 
-                                Sprites Drawing
+                            Zoomed Sprites Drawing
+
+    Sprite format with zoom, 16 bytes per each sprites
 
     Offset:     Bits:                   Value:
 
-    00.w        fedc ba98 76-- ----     X Position
-                ---- ---- --54 3210
+    00.w                                X Position*
 
-    02.w        fedc ba98 76-- ----     Y Position
-                ---- ---- --54 3210
+    02.w                                Y Position*
 
     04.w        fe-- ---- ---- ----
                 --dc ba98 ---- ----     Color
@@ -189,18 +182,53 @@ VIDEO_START_MEMBER(cave_state,ppsatan)
 
     0E.w                                Unused
 
+    * S.9.6 Fixed point or 10 bit signed integer,
+      Configured from videoregs
+
+
+                                Sprites Drawing
+
+    Sprite format without zoom, 16 bytes per each sprites
+
+    Offset:     Bits:                   Value:
+
+    00.w        fe-- ---- ---- ----
+                --dc ba98 ---- ----     Color
+                ---- ---- 76-- ----
+                ---- ---- --54 ----     Priority
+                ---- ---- ---- 3---     Flip X
+                ---- ---- ---- -2--     Flip Y
+                ---- ---- ---- --10     Code High Bit(s?)
+
+    02.w                                Code Low Bits
+
+    04.w        fedc ba-- ---- ----
+                ---- --98 7654 3210     X Position**
+
+    06.w        fedc ba-- ---- ----
+                ---- --98 7654 3210     Y Position**
+
+    08.w        fedc ba98 ---- ----     Tile Size X
+                ---- ---- 7654 3210     Tile Size Y
+
+    0A.w                                Unused
+
+    0C.w                                Unused
+
+    0E.w                                Unused
+
+    ** 10 bit signed only? need verifications.
 
 ***************************************************************************/
 
 void cave_state::get_sprite_info_cave(int chip)
 {
 	chip %= 4;
-	const u8 *base_gfx = m_spriteregion[chip]->base();
-	const int code_max = m_spriteregion[chip]->bytes() / (16*16);
 
 	if (m_sprite[chip] == nullptr)
 		return;
 
+	gfx_element *gfx = m_spr_gfxdecode[chip]->gfx(0);
 	sprite_cave *sprite = m_sprite[chip].get();
 
 	const int glob_flipx = m_videoregs[chip][0] & 0x8000;
@@ -209,20 +237,25 @@ void cave_state::get_sprite_info_cave(int chip)
 	const int max_x = m_screen[chip]->width();
 	const int max_y = m_screen[chip]->height();
 
-	const u16 *source = m_spriteram[chip] + (0x4000 / 2) * m_spriteram_bank[chip];
+	const u16 *source = &m_spriteram[chip][(0x4000 / 2) * m_spriteram_bank[chip]];
 	const u16 *finish = source + (0x4000 / 2);
+	u32 clk = 0; // used clock cycle for sprites
 
 	for (; source < finish; source += 8)
 	{
+		clk += 32; // 32 clock per each sprites
+		if (clk > m_max_sprite_clk[chip])
+			break;
+
 		int x, y;
 		int total_width_f, total_height_f;
 
-		if (m_spritetype[0] == 2)    /* Hot Dog Storm */
+		if ((m_videoregs[chip][5] & 0x3000) == 0)    // if bit 12/13 is 0 (or separated per X and Y?)
 		{
 			x = (source[0] & 0x3ff) << 8;
 			y = (source[1] & 0x3ff) << 8;
 		}
-		else                        /* all others */
+		else
 		{
 			x = source[0] << 2;
 			y = source[1] << 2;
@@ -239,9 +272,12 @@ void cave_state::get_sprite_info_cave(int chip)
 		if (!sprite->tile_width || !sprite->tile_height)
 			continue;
 
+		clk += sprite->tile_width * sprite->tile_height; // 256 clock per each sprite blocks
+		if (clk > m_max_sprite_clk[chip])
+			break;
+
 		/* Bound checking */
-		code %= code_max;
-		sprite->pen_data = base_gfx + (16 * 16) * code;
+		sprite->pen_data = &m_sprite_gfx[chip][(code << 8) & m_sprite_gfx_mask[chip]];
 
 		int flipx = attr & 0x0008;
 		int flipy = attr & 0x0004;
@@ -275,7 +311,7 @@ void cave_state::get_sprite_info_cave(int chip)
 			sprite->ycount0 = sprite->zoomy_re - 1;
 		}
 
-		if (m_spritetype[0] == 2)
+		if ((m_videoregs[chip][5] & 0x3000) == 0)
 		{
 			x >>= 8;
 			y >>= 8;
@@ -299,7 +335,7 @@ void cave_state::get_sprite_info_cave(int chip)
 		sprite->priority    = (attr & 0x0030) >> 4;
 		sprite->flags       = SPRITE_VISIBLE_CAVE;
 		sprite->line_offset = sprite->tile_width;
-		sprite->base_pen    = m_sprite_base_pal + (((attr & 0x3f00) >> 8) * m_sprite_granularity);   // first 0x4000 colors
+		sprite->base_pen    = gfx->colorbase() + (((attr & 0x3f00) >> 8) * gfx->granularity());   // first 0x4000 colors
 
 		if (glob_flipx) { x = max_x - x - sprite->total_width;  flipx = !flipx; }
 		if (glob_flipy) { y = max_y - y - sprite->total_height; flipy = !flipy; }
@@ -318,12 +354,11 @@ void cave_state::get_sprite_info_cave(int chip)
 void cave_state::get_sprite_info_donpachi(int chip)
 {
 	chip %= 4;
-	const u8 *base_gfx = m_spriteregion[chip]->base();
-	const int code_max = m_spriteregion[chip]->bytes() / (16*16);
 
 	if (m_sprite[chip] == nullptr)
 		return;
 
+	gfx_element *gfx = m_spr_gfxdecode[chip]->gfx(0);
 	sprite_cave *sprite = m_sprite[chip].get();
 
 	const int glob_flipx = m_videoregs[chip][0] & 0x8000;
@@ -332,18 +367,23 @@ void cave_state::get_sprite_info_donpachi(int chip)
 	const int max_x = m_screen[chip]->width();
 	const int max_y = m_screen[chip]->height();
 
-	const u16 *source = m_spriteram[chip] + (0x4000 / 2) * m_spriteram_bank[chip];
+	const u16 *source = &m_spriteram[chip][(0x4000 / 2) * m_spriteram_bank[chip]];
 	const u16 *finish = source + (0x4000 / 2);
+	u32 clk = 0; // used clock cycle for sprites
 
 	for (; source < finish; source += 8)
 	{
+		clk += 32; // 32 clock per each sprites
+		if (clk > m_max_sprite_clk[chip])
+			break;
+
 		int y;
 
 		const u16 attr = source[0];
 		u32 code       = source[1] + ((attr & 3) << 16);
 		int x          = source[2] & 0x3ff;
 
-		if (m_spritetype[0] == 3)    /* pwrinst2 */
+		if (m_spritetype[0] & TYPE_ISPWRINST2)    /* pwrinst2 */
 			y = (source[3] + 1) & 0x3ff;
 		else
 			y = source[3] & 0x3ff;
@@ -354,8 +394,7 @@ void cave_state::get_sprite_info_donpachi(int chip)
 		sprite->tile_height = sprite->total_height = ((size >> 0) & 0x1f) * 16;
 
 		/* Bound checking */
-		code %= code_max;
-		sprite->pen_data = base_gfx + (16*16) * code;
+		sprite->pen_data = &m_sprite_gfx[chip][(code << 8) & m_sprite_gfx_mask[chip]];
 
 		if (x > 0x1ff)  x -= 0x400;
 		if (y > 0x1ff)  y -= 0x400;
@@ -364,18 +403,22 @@ void cave_state::get_sprite_info_donpachi(int chip)
 			x + sprite->total_width <= 0 || x >= max_x || y + sprite->total_height <= 0 || y >= max_y)
 		{continue;}
 
+		clk += sprite->tile_width * sprite->tile_height; // 256 clock per each sprite blocks
+		if (clk > m_max_sprite_clk[chip])
+			break;
+
 		int flipx    = attr & 0x0008;
 		int flipy    = attr & 0x0004;
 
-		if (m_spritetype[0] == 3)    /* pwrinst2 */
+		if (m_spritetype[0] & TYPE_ISPWRINST2)    /* pwrinst2 */
 		{
 			sprite->priority = ((attr & 0x0010) >> 4) + 2;
-			sprite->base_pen = m_sprite_base_pal + ((((attr & 0x3f00) >> 8) + ((attr & 0x0020) << 1)) * m_sprite_granularity);
+			sprite->base_pen = gfx->colorbase() + ((((attr & 0x3f00) >> 8) + ((attr & 0x0020) << 1)) * gfx->granularity());
 		}
 		else
 		{
 			sprite->priority = (attr & 0x0030) >> 4;
-			sprite->base_pen = m_sprite_base_pal + (((attr & 0x3f00) >> 8) * m_sprite_granularity);  // first 0x4000 colors
+			sprite->base_pen = gfx->colorbase() + (((attr & 0x3f00) >> 8) * gfx->granularity());  // first 0x4000 colors
 		}
 
 		sprite->flags = SPRITE_VISIBLE_CAVE;
@@ -398,7 +441,7 @@ void cave_state::get_sprite_info_donpachi(int chip)
 
 void cave_state::sprite_init()
 {
-	if (m_spritetype[0] == 0 || m_spritetype[0] == 2) // most of the games
+	if ((m_spritetype[0] & TYPE_NOZOOM) == 0) // most of the games
 	{
 		m_get_sprite_info = &cave_state::get_sprite_info_cave;
 		m_spritetype[1] = CAVE_SPRITETYPE_ZOOM;
@@ -422,10 +465,23 @@ void cave_state::sprite_init()
 
 	for (int chip = 0; chip < 4; chip++)
 	{
-		if (m_videoregs[chip])
+		m_max_sprite_clk[chip] = 0;
+		if (m_videoregs[chip] && m_spr_gfxdecode[chip])
 		{
+			for (int screen = 0; screen < 4; screen++)
+			{
+				if (m_screen[screen])
+				{
+					const u32 new_clk = (m_screen[screen]->visible_area().width() > 360 ? 512 : 448) * 272 * 2; // whole screen size related?
+					if (m_max_sprite_clk[chip] < new_clk)
+					{
+						m_max_sprite_clk[chip] = new_clk;
+					}
+				}
+			}
 			m_num_sprites[chip] = m_spriteram[chip].bytes() / 0x10 / 2;
 			m_sprite[chip] = std::make_unique<sprite_cave []>(m_num_sprites[chip]);
+			m_spr_gfxdecode[chip]->gfx(0)->set_granularity(m_sprite_granularity);
 		}
 		else
 		{
@@ -840,7 +896,8 @@ void cave_state::do_blit_32(int chip, const sprite_cave *sprite)
 			return;
 		y1--; y2--;
 	}
-	else {
+	else
+	{
 		y1 = sprite->y;
 		y2 = y1 + sprite->total_height;
 		dy = 1;
@@ -1038,7 +1095,7 @@ void cave_state::sprite_draw_donpachi_zbuf(int chip, int priority)
                                 Screen Drawing
 
 
-                Layers Control Registers (cave_vctrl_0..2)
+                  Layers Control Registers (vctrl_0..3)
 
 
         Offset:     Bits:                   Value:
@@ -1069,7 +1126,7 @@ void cave_state::sprite_draw_donpachi_zbuf(int chip, int priority)
         Row-scroll:     a different scroll value is specified for each scan line.
 
 
-                    Sprites Registers (cave_videoregs)
+                      Sprites Registers (videoregs)
 
 
     Offset:     Bits:                   Value:
@@ -1338,6 +1395,7 @@ void cave_state::get_sprite_info(int chip)
 		}
 	}
 }
+
 void cave_state::device_post_load()
 {
 	for (int chip = 0; chip < 4; chip++)

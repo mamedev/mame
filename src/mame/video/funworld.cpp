@@ -86,13 +86,13 @@ void funworld_state::funworld_palette(palette_device &palette) const
 }
 
 
-WRITE8_MEMBER(funworld_state::funworld_videoram_w)
+void funworld_state::funworld_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(funworld_state::funworld_colorram_w)
+void funworld_state::funworld_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -119,7 +119,7 @@ TILE_GET_INFO_MEMBER(funworld_state::get_bg_tile_info)
 	int code = attr & 0xfff;
 	int color = m_colorram[offs] >> 4;  // 4 bits for color.
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 

@@ -162,7 +162,7 @@ TILE_GET_INFO_MEMBER(galivan_state::get_bg_tile_info)
 	uint8_t *BGROM = memregion("gfx4")->base();
 	int attr = BGROM[tile_index + 0x4000];
 	int code = BGROM[tile_index] | ((attr & 0x03) << 8);
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			(attr & 0x78) >> 3,     /* seems correct */
 			0);
@@ -172,7 +172,7 @@ TILE_GET_INFO_MEMBER(galivan_state::get_tx_tile_info)
 {
 	int attr = m_videoram[tile_index + 0x400];
 	int code = m_videoram[tile_index] | ((attr & 0x01) << 8);
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			(attr & 0x78) >> 3,     /* seems correct */
 			0);
@@ -184,7 +184,7 @@ TILE_GET_INFO_MEMBER(galivan_state::ninjemak_get_bg_tile_info)
 	uint8_t *BGROM = memregion("gfx4")->base();
 	int attr = BGROM[tile_index + 0x4000];
 	int code = BGROM[tile_index] | ((attr & 0x03) << 8);
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			((attr & 0x60) >> 3) | ((attr & 0x0c) >> 2),    /* seems correct */
 			0);
@@ -199,7 +199,7 @@ TILE_GET_INFO_MEMBER(galivan_state::ninjemak_get_tx_tile_info)
 
 	int attr = m_videoram[index + 0x400];
 	int code = m_videoram[index] | ((attr & 0x03) << 8);
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			(attr & 0x1c) >> 2,     /* seems correct ? */
 			0);
@@ -237,14 +237,14 @@ VIDEO_START_MEMBER(galivan_state,ninjemak)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(galivan_state::galivan_videoram_w)
+void galivan_state::galivan_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 /* Written through port 40 */
-WRITE8_MEMBER(galivan_state::galivan_gfxbank_w)
+void galivan_state::galivan_gfxbank_w(uint8_t data)
 {
 	/* bits 0 and 1 coin counters */
 	machine().bookkeeping().coin_counter_w(0,data & 1);
@@ -259,7 +259,7 @@ WRITE8_MEMBER(galivan_state::galivan_gfxbank_w)
 	/*  logerror("%s port 40 = %02x\n", machine().describe_context(), data); */
 }
 
-WRITE8_MEMBER(galivan_state::ninjemak_gfxbank_w)
+void galivan_state::ninjemak_gfxbank_w(uint8_t data)
 {
 	/* bits 0 and 1 coin counters */
 	machine().bookkeeping().coin_counter_w(0,data & 1);
@@ -295,7 +295,7 @@ WRITE8_MEMBER(galivan_state::ninjemak_gfxbank_w)
 
 
 /* Written through port 41-42 */
-WRITE8_MEMBER(galivan_state::galivan_scrollx_w)
+void galivan_state::galivan_scrollx_w(offs_t offset, uint8_t data)
 {
 	if (offset == 1)
 	{
@@ -305,7 +305,7 @@ WRITE8_MEMBER(galivan_state::galivan_scrollx_w)
 }
 
 /* Written through port 43-44 */
-WRITE8_MEMBER(galivan_state::galivan_scrolly_w)
+void galivan_state::galivan_scrolly_w(offs_t offset, uint8_t data)
 {
 	m_galivan_scrolly[offset] = data;
 }

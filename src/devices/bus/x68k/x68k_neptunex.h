@@ -27,8 +27,8 @@ public:
 	// construction/destruction
 	x68k_neptune_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER(x68k_neptune_port_r);
-	DECLARE_WRITE16_MEMBER(x68k_neptune_port_w);
+	uint16_t x68k_neptune_port_r(offs_t offset, uint16_t mem_mask = ~0);
+	void x68k_neptune_port_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 protected:
 	// device-level overrides
@@ -40,8 +40,8 @@ protected:
 	virtual uint8_t iack2() override;
 
 private:
-	DECLARE_READ8_MEMBER(x68k_neptune_mem_read);
-	DECLARE_WRITE8_MEMBER(x68k_neptune_mem_write);
+	uint8_t x68k_neptune_mem_read(offs_t offset);
+	void x68k_neptune_mem_write(offs_t offset, uint8_t data);
 	void x68k_neptune_irq_w(int state);
 
 	x68k_expansion_slot_device *m_slot;

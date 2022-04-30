@@ -17,7 +17,7 @@ The LCD is likely to be a SSD1828 LCD.
 #include "bus/generic/carts.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -51,7 +51,7 @@ protected:
 		TIMER_PRC
 	};
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void video_start() override;
 	virtual void machine_start() override;
@@ -59,34 +59,34 @@ protected:
 private:
 	struct PRC
 	{
-		uint8_t       colors_inverted;
-		uint8_t       background_enabled;
-		uint8_t       sprites_enabled;
-		uint8_t       copy_enabled;
-		uint8_t       map_size;
-		uint8_t       map_size_x;
-		uint8_t       frame_count;
-		uint8_t       max_frame_count;
-		uint32_t      bg_tiles;
-		uint32_t      spr_tiles;
-		uint8_t       count;
-		emu_timer   *count_timer;
+		uint8_t       colors_inverted = 0;
+		uint8_t       background_enabled = 0;
+		uint8_t       sprites_enabled = 0;
+		uint8_t       copy_enabled = 0;
+		uint8_t       map_size = 0;
+		uint8_t       map_size_x = 0;
+		uint8_t       frame_count = 0;
+		uint8_t       max_frame_count = 0;
+		uint32_t      bg_tiles = 0;
+		uint32_t      spr_tiles = 0;
+		uint8_t       count = 0;
+		emu_timer   *count_timer = nullptr;
 	};
 
 
 	struct TIMERS
 	{
-		emu_timer   *seconds_timer;
-		emu_timer   *hz256_timer;
-		emu_timer   *timer1;                // Timer 1 low or 16bit
-		emu_timer   *timer1_hi;             // Timer 1 hi
-		emu_timer   *timer2;                // Timer 2 low or 16bit
-		emu_timer   *timer2_hi;             // Timer 2 high
-		emu_timer   *timer3;                // Timer 3 low or 16bit
-		emu_timer   *timer3_hi;             // Timer 3 high
+		emu_timer   *seconds_timer = nullptr;
+		emu_timer   *hz256_timer = nullptr;
+		emu_timer   *timer1 = nullptr;                // Timer 1 low or 16bit
+		emu_timer   *timer1_hi = nullptr;             // Timer 1 hi
+		emu_timer   *timer2 = nullptr;                // Timer 2 low or 16bit
+		emu_timer   *timer2_hi = nullptr;             // Timer 2 high
+		emu_timer   *timer3 = nullptr;                // Timer 3 low or 16bit
+		emu_timer   *timer3_hi = nullptr;             // Timer 3 high
 	};
 
-	uint8_t m_pm_reg[0x100];
+	uint8_t m_pm_reg[0x100]{};
 	PRC m_prc;
 	TIMERS m_timers;
 	bitmap_ind16 m_bitmap;
@@ -101,9 +101,9 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void pokemini_palette(palette_device &palette) const;
-	DECLARE_WRITE8_MEMBER(hwreg_w);
-	DECLARE_READ8_MEMBER(hwreg_r);
-	DECLARE_READ8_MEMBER(rom_r);
+	void hwreg_w(offs_t offset, uint8_t data);
+	uint8_t hwreg_r(offs_t offset);
+	uint8_t rom_r(offs_t offset);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void pokemini_mem_map(address_map &map);
@@ -119,11 +119,10 @@ private:
 	void timer3_callback();
 	void timer3_hi_callback();
 	void prc_counter_callback();
-
 };
 
 
-READ8_MEMBER( pokemini_state::rom_r )
+uint8_t pokemini_state::rom_r(offs_t offset)
 {
 	offset += 0x2100;
 	return m_cart->read_rom(offset & 0x1fffff);
@@ -528,7 +527,7 @@ void pokemini_state::timer3_hi_callback()
 }
 
 
-WRITE8_MEMBER(pokemini_state::hwreg_w)
+void pokemini_state::hwreg_w(offs_t offset, uint8_t data)
 {
 	static const int timer_to_cycles_fast[8] = { 2, 8, 32, 64, 128, 256, 1024, 4096 };
 	static const int timer_to_cycles_slow[8] = { 128, 256, 512, 1024, 2048, 4096, 8192, 16384 };
@@ -1485,7 +1484,7 @@ WRITE8_MEMBER(pokemini_state::hwreg_w)
 	m_pm_reg[offset] = data;
 }
 
-READ8_MEMBER(pokemini_state::hwreg_r)
+uint8_t pokemini_state::hwreg_r(offs_t offset)
 {
 	uint8_t data = m_pm_reg[offset];
 
@@ -1516,14 +1515,14 @@ DEVICE_IMAGE_LOAD_MEMBER( pokemini_state::cart_load )
 	/* Verify that the image is big enough */
 	if (size <= 0x2100)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid ROM image: ROM image is too small");
+		image.seterror(image_error::INVALIDIMAGE, "Invalid ROM image: ROM image is too small");
 		return image_init_result::FAIL;
 	}
 
 	/* Verify that the image is not too big */
 	if (size > 0x1fffff)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid ROM image: ROM image is too big");
+		image.seterror(image_error::INVALIDIMAGE, "Invalid ROM image: ROM image is too big");
 		return image_init_result::FAIL;
 	}
 
@@ -1554,12 +1553,10 @@ void pokemini_state::prc_counter_callback()
 			/* Check if the background should be drawn */
 			if ( m_prc.background_enabled )
 			{
-				int x, y;
-				for ( y = 0; y < 8; y++ ) {
-					for ( x = 0; x < 12; x++ ) {
+				for ( int y = 0; y < 8; y++ ) {
+					for ( int x = 0; x < 12; x++ ) {
 						uint8_t tile = m_p_ram[ 0x360 + ( y * m_prc.map_size_x ) + x ];
-						int i;
-						for( i = 0; i < 8; i++ ) {
+						for( int i = 0; i < 8; i++ ) {
 							m_p_ram[ ( y * 96 ) + ( x * 8 ) + i ] = space.read_byte( m_prc.bg_tiles + ( tile * 8 ) + i );
 						}
 					}
@@ -1569,9 +1566,7 @@ void pokemini_state::prc_counter_callback()
 			/* Check if the sprites should be drawn */
 			if ( m_prc.sprites_enabled )
 			{
-				uint16_t  spr;
-
-				for ( spr = 0x35C; spr >= 0x300; spr -= 4 )
+				for ( uint16_t spr = 0x35C; spr >= 0x300; spr -= 4 )
 				{
 					int     spr_x = ( m_p_ram[ spr + 0 ] & 0x7F ) - 16;
 					int     spr_y = ( m_p_ram[ spr + 1 ] & 0x7F ) - 16;
@@ -1580,19 +1575,17 @@ void pokemini_state::prc_counter_callback()
 
 					if ( spr_flag & 0x08 )
 					{
-						uint16_t  gfx, mask;
 						uint32_t  spr_base = m_prc.spr_tiles + spr_tile * 64;
-						int     i, j;
 
-						for ( i = 0; i < 16; i++ )
+						for ( int i = 0; i < 16; i++ )
 						{
 							if ( spr_x + i >= 0 && spr_x + i < 96 )
 							{
 								int rel_x = ( spr_flag & 0x01 ) ? 15 - i : i;
 								uint32_t  s = spr_base + ( ( rel_x & 0x08 ) << 2 ) + ( rel_x & 0x07 );
 
-								mask = ~ ( space.read_byte( s ) | ( space.read_byte( s + 8 ) << 8 ) );
-								gfx = space.read_byte( s + 16 ) | ( space.read_byte( s + 24 ) << 8 );
+								uint16_t mask = ~ ( space.read_byte( s ) | ( space.read_byte( s + 8 ) << 8 ) );
+								uint16_t gfx = space.read_byte( s + 16 ) | ( space.read_byte( s + 24 ) << 8 );
 
 								/* Are the colors inverted? */
 								if ( spr_flag & 0x04 )
@@ -1600,7 +1593,7 @@ void pokemini_state::prc_counter_callback()
 									gfx = ~gfx;
 								}
 
-								for ( j = 0; j < 16; j++ )
+								for ( int j = 0; j < 16; j++ )
 								{
 									if ( spr_y + j >= 0 && spr_y + j < 64 )
 									{
@@ -1647,20 +1640,18 @@ void pokemini_state::prc_counter_callback()
 			/* Check if the rendered data should be copied to the LCD */
 			if ( m_prc.copy_enabled )
 			{
-				int x, y;
-
-				for( y = 0; y < 64; y += 8 ) {
-					for( x = 0; x < 96; x++ ) {
+				for( int y = 0; y < 64; y += 8 ) {
+					for( int x = 0; x < 96; x++ ) {
 						uint8_t data = m_p_ram[ ( y * 12 ) + x ];
 
-						m_bitmap.pix16(y + 0, x) = ( data & 0x01 ) ? 3 : 0;
-						m_bitmap.pix16(y + 1, x) = ( data & 0x02 ) ? 3 : 0;
-						m_bitmap.pix16(y + 2, x) = ( data & 0x04 ) ? 3 : 0;
-						m_bitmap.pix16(y + 3, x) = ( data & 0x08 ) ? 3 : 0;
-						m_bitmap.pix16(y + 4, x) = ( data & 0x10 ) ? 3 : 0;
-						m_bitmap.pix16(y + 5, x) = ( data & 0x20 ) ? 3 : 0;
-						m_bitmap.pix16(y + 6, x) = ( data & 0x40 ) ? 3 : 0;
-						m_bitmap.pix16(y + 7, x) = ( data & 0x80 ) ? 3 : 0;
+						m_bitmap.pix(y + 0, x) = ( data & 0x01 ) ? 3 : 0;
+						m_bitmap.pix(y + 1, x) = ( data & 0x02 ) ? 3 : 0;
+						m_bitmap.pix(y + 2, x) = ( data & 0x04 ) ? 3 : 0;
+						m_bitmap.pix(y + 3, x) = ( data & 0x08 ) ? 3 : 0;
+						m_bitmap.pix(y + 4, x) = ( data & 0x10 ) ? 3 : 0;
+						m_bitmap.pix(y + 5, x) = ( data & 0x20 ) ? 3 : 0;
+						m_bitmap.pix(y + 6, x) = ( data & 0x40 ) ? 3 : 0;
+						m_bitmap.pix(y + 7, x) = ( data & 0x80 ) ? 3 : 0;
 					}
 				}
 
@@ -1704,7 +1695,7 @@ void pokemini_state::machine_start()
 }
 
 
-void pokemini_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pokemini_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -1747,7 +1738,7 @@ void pokemini_state::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
-static const int16_t speaker_levels[] = {-32768, 0, 32767};
+static const double speaker_levels[] = {-1.0, 0.0, 1.0};
 
 void pokemini_state::video_start()
 {
@@ -1770,7 +1761,7 @@ void pokemini_state::pokemini(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 
-	I2CMEM(config, m_i2cmem, 0).set_data_size(0x2000);
+	I2C_24C64(config, m_i2cmem, 0); // ?
 
 	/* This still needs to be improved to actually match the hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);

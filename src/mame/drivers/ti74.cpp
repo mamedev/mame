@@ -51,9 +51,8 @@
 
 
   Overall, the hardware is very similar to TI CC-40. A lot has been shuffled around
-  to cut down on complexity (and probably for protection too). To reduce power usage
-  even more, the OS often idles while waiting for any keypress that triggers an interrupt
-  and wakes the processor up.
+  to cut down on complexity. To reduce power usage even more, the OS often idles while
+  waiting for any keypress that triggers an interrupt and wakes the processor up.
 
   The machine is powered by 4 AAA batteries. These will also save internal RAM,
   provided that the machine is turned off properly.
@@ -70,18 +69,22 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "cpu/tms7000/tms7000.h"
 #include "machine/nvram.h"
 #include "video/hd44780.h"
+
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 #include "ti74.lh"
 #include "ti95.lh"
 
+
+namespace {
 
 class ti74_state : public driver_device
 {
@@ -89,10 +92,11 @@ public:
 	ti74_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_sysbank(*this, "sysbank"),
 		m_cart(*this, "cartslot"),
 		m_key_matrix(*this, "IN.%u", 0),
 		m_battery_inp(*this, "BATTERY"),
-		m_lamps(*this, "lamp%u", 0U)
+		m_segs(*this, "seg%u", 0U)
 	{ }
 
 	void ti74(machine_config &config);
@@ -108,9 +112,9 @@ private:
 	void update_lcd_indicator(u8 y, u8 x, int state);
 	void update_battery_status(int state);
 
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	u8 keyboard_r();
+	void keyboard_w(u8 data);
+	void bankswitch_w(u8 data);
 
 	void ti74_palette(palette_device &palette) const;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
@@ -119,14 +123,14 @@ private:
 	void main_map(address_map &map);
 
 	required_device<tms70c46_device> m_maincpu;
+	required_memory_bank m_sysbank;
 	required_device<generic_slot_device> m_cart;
 	required_ioport_array<8> m_key_matrix;
 	required_ioport m_battery_inp;
+	output_finder<80> m_segs;
 
-	u8 m_key_select;
-	u8 m_power;
-
-	output_finder<80> m_lamps;
+	u8 m_key_select = 0;
+	u8 m_power = 0;
 };
 
 
@@ -144,7 +148,7 @@ DEVICE_IMAGE_LOAD_MEMBER(ti74_state::cart_load)
 	// max size is 32KB
 	if (size > 0x8000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid file size");
+		image.seterror(image_error::INVALIDIMAGE, "Invalid file size");
 		return image_init_result::FAIL;
 	}
 
@@ -165,7 +169,7 @@ DEVICE_IMAGE_LOAD_MEMBER(ti74_state::cart_load)
 void ti74_state::ti74_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
-	palette.set_pen_color(1, rgb_t(92, 83, 88)); // LCD pixel on
+	palette.set_pen_color(1, rgb_t(50, 45, 60)); // LCD pixel on
 	palette.set_pen_color(2, rgb_t(131, 136, 139)); // LCD pixel off
 }
 
@@ -183,7 +187,7 @@ void ti74_state::update_lcd_indicator(u8 y, u8 x, int state)
 	// above    | _LOW _ERROR  2nd  INV  ALPHA  LC  INS  DEGRAD  HEX  OCT  I/O
 	// screen-  | _P{70} <{71}                                             RUN{3}
 	//   area   .                                                          SYS{4}
-	m_lamps[y * 10 + x] = state ? 1 : 0;
+	m_segs[y * 10 + x] = state ? 1 : 0;
 }
 
 HD44780_PIXEL_UPDATE(ti74_state::ti74_pixel_update)
@@ -201,7 +205,7 @@ HD44780_PIXEL_UPDATE(ti74_state::ti74_pixel_update)
 	{
 		// internal: 2*16, external: 1*31
 		if (y == 7) y++; // the cursor is slightly below the character
-		bitmap.pix16(1 + y, 1 + line*16*6 + pos*6 + x) = state ? 1 : 2;
+		bitmap.pix(1 + y, 1 + line*16*6 + pos*6 + x) = state ? 1 : 2;
 	}
 }
 
@@ -220,7 +224,7 @@ HD44780_PIXEL_UPDATE(ti74_state::ti95_pixel_update)
 	{
 		// 1st line is simply 16 chars
 		if (y == 7) y++; // the cursor is slightly below the char
-		bitmap.pix16(10 + y, 1 + pos*6 + x) = state ? 1 : 2;
+		bitmap.pix(10 + y, 1 + pos*6 + x) = state ? 1 : 2;
 	}
 	else if (line == 1 && pos < 15 && y < 7)
 	{
@@ -228,7 +232,7 @@ HD44780_PIXEL_UPDATE(ti74_state::ti95_pixel_update)
 		// note: the chars are smaller than on the 1st line (this is handled in .lay file)
 		const int gap = 9;
 		int group = pos / 3;
-		bitmap.pix16(1 + y, 1 + group*gap + pos*6 + x) = state ? 1 : 2;
+		bitmap.pix(1 + y, 1 + group*gap + pos*6 + x) = state ? 1 : 2;
 	}
 }
 
@@ -240,30 +244,30 @@ HD44780_PIXEL_UPDATE(ti74_state::ti95_pixel_update)
 
 ***************************************************************************/
 
-READ8_MEMBER(ti74_state::keyboard_r)
+u8 ti74_state::keyboard_r()
 {
-	u8 ret = 0;
+	u8 data = 0;
 
 	// read selected keyboard rows
 	for (int i = 0; i < 8; i++)
 	{
 		if (m_key_select >> i & 1)
-			ret |= m_key_matrix[i]->read();
+			data |= m_key_matrix[i]->read();
 	}
 
-	return ret;
+	return data;
 }
 
-WRITE8_MEMBER(ti74_state::keyboard_w)
+void ti74_state::keyboard_w(u8 data)
 {
-	// d(0-7): select keyboard column
+	// d0-d7: select keyboard column
 	m_key_select = data;
 }
 
-WRITE8_MEMBER(ti74_state::bankswitch_w)
+void ti74_state::bankswitch_w(u8 data)
 {
 	// d0-d1: system rom bankswitch
-	membank("sysbank")->set_entry(data & 3);
+	m_sysbank->set_entry(data & 3);
 
 	// d2: power-on latch
 	if (~data & 4 && m_power)
@@ -378,10 +382,10 @@ static INPUT_PORTS_START( ti74 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.7")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD)) PORT_NAME("+     s(y)")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR('+') PORT_NAME("+     s(y)")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_NAME("-     s(x)")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR(UCHAR_MAMEKEY(ASTERISK)) PORT_NAME("*     y" UTF8_NONSPACE_MACRON)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD)) PORT_NAME("/     x" UTF8_NONSPACE_MACRON)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR('*') PORT_NAME("*     y" UTF8_NONSPACE_MACRON)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_NAME("/     x" UTF8_NONSPACE_MACRON)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LALT) PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_NAME("FN     hyp")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_SHIFT_2) PORT_NAME("CTL     STAT")
@@ -496,22 +500,18 @@ void ti74_state::machine_reset()
 {
 	m_power = 1;
 
+	m_sysbank->set_entry(0);
 	update_battery_status(m_battery_inp->read());
 }
 
 void ti74_state::machine_start()
 {
-	m_lamps.resolve();
+	m_segs.resolve();
 
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0xbfff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 
-	membank("sysbank")->configure_entries(0, 4, memregion("system")->base(), 0x2000);
-	membank("sysbank")->set_entry(0);
-
-	// zerofill
-	m_key_select = 0;
-	m_power = 0;
+	m_sysbank->configure_entries(0, 4, memregion("system")->base(), 0x2000);
 
 	// register for savestates
 	save_item(NAME(m_key_select));
@@ -520,8 +520,8 @@ void ti74_state::machine_start()
 
 void ti74_state::ti74(machine_config &config)
 {
-	/* basic machine hardware */
-	TMS70C46(config, m_maincpu, XTAL(4'000'000));
+	// basic machine hardware
+	TMS70C46(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ti74_state::main_map);
 	m_maincpu->in_porta().set(FUNC(ti74_state::keyboard_r));
 	m_maincpu->out_portb().set(FUNC(ti74_state::bankswitch_w));
@@ -529,7 +529,7 @@ void ti74_state::ti74(machine_config &config)
 
 	NVRAM(config, "sysram.ic3", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60); // arbitrary
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
@@ -546,16 +546,15 @@ void ti74_state::ti74(machine_config &config)
 	hd44780.set_lcd_size(2, 16); // 2*16 internal
 	hd44780.set_pixel_update_cb(FUNC(ti74_state::ti74_pixel_update));
 
-	/* cartridge */
+	// cartridge
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "ti74_cart", "bin,rom,256").set_device_load(FUNC(ti74_state::cart_load));
-
 	SOFTWARE_LIST(config, "cart_list").set_original("ti74_cart");
 }
 
 void ti74_state::ti95(machine_config &config)
 {
-	/* basic machine hardware */
-	TMS70C46(config, m_maincpu, XTAL(4'000'000));
+	// basic machine hardware
+	TMS70C46(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ti74_state::main_map);
 	m_maincpu->in_porta().set(FUNC(ti74_state::keyboard_r));
 	m_maincpu->out_portb().set(FUNC(ti74_state::bankswitch_w));
@@ -563,7 +562,7 @@ void ti74_state::ti95(machine_config &config)
 
 	NVRAM(config, "sysram.ic3", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60); // arbitrary
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
@@ -580,9 +579,8 @@ void ti74_state::ti95(machine_config &config)
 	hd44780.set_lcd_size(2, 16);
 	hd44780.set_pixel_update_cb(FUNC(ti74_state::ti95_pixel_update));
 
-	/* cartridge */
+	// cartridge
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "ti95_cart", "bin,rom,256").set_device_load(FUNC(ti74_state::cart_load));
-
 	SOFTWARE_LIST(config, "cart_list").set_original("ti95_cart");
 }
 
@@ -611,7 +609,9 @@ ROM_START( ti95 )
 	ROM_LOAD( "hn61256pc95.ic1", 0x0000, 0x8000, CRC(c46d29ae) SHA1(c653f08590dbc28241a9f5a6c2541641bdb0208b) ) // system rom, banked
 ROM_END
 
+} // anonymous namespace
+
 
 //    YEAR  NAME  PARENT CMP MACHINE  INPUT  CLASS       INIT        COMPANY              FULLNAME          FLAGS
-COMP( 1985, ti74, 0,      0, ti74,    ti74,  ti74_state, empty_init, "Texas Instruments", "TI-74 BASICALC", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1986, ti95, 0,      0, ti95,    ti95,  ti74_state, empty_init, "Texas Instruments", "TI-95 PROCALC",  MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1985, ti74, 0,      0, ti74,    ti74,  ti74_state, empty_init, "Texas Instruments", "TI-74 Basicalc", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1986, ti95, 0,      0, ti95,    ti95,  ti74_state, empty_init, "Texas Instruments", "TI-95 Procalc",  MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

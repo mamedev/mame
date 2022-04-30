@@ -28,11 +28,14 @@ upd4701_device::upd4701_device(const machine_config &mconfig, const char *tag, d
 	, m_starty(0)
 	, m_x(0)
 	, m_y(0)
+	, m_last_x_read(0)
+	, m_last_y_read(0)
 	, m_switches(0)
 	, m_latchswitches(0)
 	, m_cf(true)
 	, m_cf_cb(*this)
 	, m_sf_cb(*this)
+	, m_open_bus_cb(*this)
 {
 }
 
@@ -45,6 +48,7 @@ void upd4701_device::device_start()
 	// resolve callbacks
 	m_cf_cb.resolve_safe();
 	m_sf_cb.resolve_safe();
+	m_open_bus_cb.resolve_safe(0);
 
 	// register state for saving
 	save_item(NAME(m_cs));
@@ -58,13 +62,15 @@ void upd4701_device::device_start()
 	save_item(NAME(m_starty));
 	save_item(NAME(m_x));
 	save_item(NAME(m_y));
+	save_item(NAME(m_last_x_read));
+	save_item(NAME(m_last_y_read));
 	save_item(NAME(m_switches));
 	save_item(NAME(m_latchswitches));
 	save_item(NAME(m_cf));
 
-	// register special callback for analog inputs
+	// register special callback for inputs
 	if (m_portx.found() || m_porty.found())
-		machine().add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(&upd4701_device::analog_update, this));
+		machine().add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(&upd4701_device::update, this));
 }
 
 //-------------------------------------------------
@@ -148,17 +154,17 @@ WRITE_LINE_MEMBER(upd4701_device::resety_w)
 //  reset_x - pulse the X counter reset line
 //-------------------------------------------------
 
-READ8_MEMBER(upd4701_device::reset_x_r)
+u8 upd4701_device::reset_x_r()
 {
 	if (!machine().side_effects_disabled())
 	{
 		resetx_w(1);
 		resetx_w(0);
 	}
-	return space.unmap();
+	return m_open_bus_cb();
 }
 
-WRITE8_MEMBER(upd4701_device::reset_x_w)
+void upd4701_device::reset_x_w(u8 data)
 {
 	resetx_w(1);
 	resetx_w(0);
@@ -168,17 +174,17 @@ WRITE8_MEMBER(upd4701_device::reset_x_w)
 //  reset_y - pulse the Y counter reset line
 //-------------------------------------------------
 
-READ8_MEMBER(upd4701_device::reset_y_r)
+u8 upd4701_device::reset_y_r()
 {
 	if (!machine().side_effects_disabled())
 	{
 		resety_w(1);
 		resety_w(0);
 	}
-	return space.unmap();
+	return m_open_bus_cb();
 }
 
-WRITE8_MEMBER(upd4701_device::reset_y_w)
+void upd4701_device::reset_y_w(u8 data)
 {
 	resety_w(1);
 	resety_w(0);
@@ -188,7 +194,7 @@ WRITE8_MEMBER(upd4701_device::reset_y_w)
 //  reset_xy - pulse the counter reset lines
 //-------------------------------------------------
 
-READ8_MEMBER(upd4701_device::reset_xy_r)
+u8 upd4701_device::reset_xy_r()
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -197,10 +203,10 @@ READ8_MEMBER(upd4701_device::reset_xy_r)
 		resetx_w(0);
 		resety_w(0);
 	}
-	return space.unmap();
+	return m_open_bus_cb();
 }
 
-WRITE8_MEMBER(upd4701_device::reset_xy_w)
+void upd4701_device::reset_xy_w(u8 data)
 {
 	resetx_w(1);
 	resety_w(1);
@@ -209,15 +215,36 @@ WRITE8_MEMBER(upd4701_device::reset_xy_w)
 }
 
 //-------------------------------------------------
-//  analog_update - per-frame input update
+//  update - per-frame input update
 //-------------------------------------------------
 
-void upd4701_device::analog_update()
+void upd4701_device::update()
 {
 	if (m_portx.found())
-		x_add(m_portx->read() & MASK_COUNTER);
+	{
+		u16 x = m_portx->read() & MASK_COUNTER;
+		x_add(x - m_last_x_read);
+		m_last_x_read = x;
+	}
 	if (m_porty.found())
-		y_add(m_porty->read() & MASK_COUNTER);
+	{
+		u16 y = m_porty->read() & MASK_COUNTER;
+		y_add(y - m_last_y_read);
+		m_last_y_read = y;
+	}
+}
+
+//-------------------------------------------------
+//  recalibrate - refresh saved X & Y inputs
+//  (to be used if the input source changes)
+//-------------------------------------------------
+
+void upd4701_device::recalibrate()
+{
+	if (m_portx.found())
+		m_last_x_read = m_portx->read() & MASK_COUNTER;
+	if (m_porty.found())
+		m_last_y_read = m_porty->read() & MASK_COUNTER;
 }
 
 //-------------------------------------------------
@@ -313,12 +340,12 @@ WRITE_LINE_MEMBER(upd4701_device::middle_w)
 //  d_r - read data lines directly
 //-------------------------------------------------
 
-READ8_MEMBER(upd4701_device::d_r)
+u8 upd4701_device::d_r()
 {
 	if (m_cs)
 	{
 		logerror("Read while CS inactive\n");
-		return space.unmap();
+		return m_open_bus_cb();
 	}
 
 	u16 data = m_xy ? m_latchy : m_latchx;
@@ -334,31 +361,31 @@ READ8_MEMBER(upd4701_device::d_r)
 //  read_x - read X axis through data/address bus
 //-------------------------------------------------
 
-READ8_MEMBER(upd4701_device::read_x)
+u8 upd4701_device::read_x(offs_t offset)
 {
-	return read_xy(space, (offset & 1) | 0);
+	return read_xy((offset & 1) | 0);
 }
 
 //-------------------------------------------------
 //  read_y - read Y axis through data/address bus
 //-------------------------------------------------
 
-READ8_MEMBER(upd4701_device::read_y)
+u8 upd4701_device::read_y(offs_t offset)
 {
-	return read_xy(space, (offset & 1) | 2);
+	return read_xy((offset & 1) | 2);
 }
 
 //-------------------------------------------------
 //  read_xy - read either axis through bus
 //-------------------------------------------------
 
-READ8_MEMBER(upd4701_device::read_xy)
+u8 upd4701_device::read_xy(offs_t offset)
 {
 	bool old_cs = m_cs;
 	cs_w(0);
 	xy_w(BIT(offset, 1));
 	ul_w(BIT(offset, 0));
-	u8 result = d_r(space, 0);
+	u8 result = d_r();
 	cs_w(old_cs);
 	return result;
 }

@@ -106,8 +106,8 @@ void device_matrix_keyboard_interface<ROW_COUNT>::typematic_stop()
 template <uint8_t ROW_COUNT>
 TIMER_CALLBACK_MEMBER(device_matrix_keyboard_interface<ROW_COUNT>::scan_row)
 {
-	assert(m_next_row < ARRAY_LENGTH(m_key_rows));
-	assert(m_next_row < ARRAY_LENGTH(m_key_states));
+	assert(m_next_row < std::size(m_key_rows));
+	assert(m_next_row < std::size(m_key_states));
 
 	will_scan_row(m_next_row);
 
@@ -128,7 +128,7 @@ TIMER_CALLBACK_MEMBER(device_matrix_keyboard_interface<ROW_COUNT>::scan_row)
 		}
 	}
 
-	m_next_row = (m_next_row + 1) % ARRAY_LENGTH(m_key_rows);
+	m_next_row = (m_next_row + 1) % std::size(m_key_rows);
 	if (m_next_row == 0)
 		scan_complete();
 }

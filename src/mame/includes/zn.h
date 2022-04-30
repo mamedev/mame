@@ -27,10 +27,10 @@
 #include "machine/vt83c461.h"
 #include "machine/watchdog.h"
 #include "machine/znmcu.h"
-#include "sound/2610intf.h"
 #include "sound/okim6295.h"
 #include "sound/qsound.h"
 #include "sound/spu.h"
+#include "sound/ymopn.h"
 #include "sound/ymf271.h"
 #include "sound/ymz280b.h"
 #include "video/psx.h"
@@ -51,6 +51,7 @@ public:
 		m_cat702(*this, "cat702_%u", 1),
 		m_znmcu(*this, "znmcu"),
 		m_maincpu(*this, "maincpu"),
+		m_spu(*this, "spu"),
 		m_ram(*this, "maincpu:ram"),
 		m_znmcu_dataout(1)
 	{
@@ -66,21 +67,22 @@ protected:
 	template<int Chip> DECLARE_WRITE_LINE_MEMBER(cat702_dataout) { m_cat702_dataout[Chip] = state; update_sio0_rxd(); }
 	DECLARE_WRITE_LINE_MEMBER(znmcu_dataout) { m_znmcu_dataout = state; update_sio0_rxd(); }
 	void update_sio0_rxd() { m_sio0->write_rxd(m_cat702_dataout[0] && m_cat702_dataout[1] && m_znmcu_dataout); }
-	DECLARE_READ8_MEMBER(znsecsel_r);
-	DECLARE_WRITE8_MEMBER(znsecsel_w);
-	DECLARE_READ8_MEMBER(boardconfig_r);
-	DECLARE_READ16_MEMBER(unknown_r);
-	DECLARE_WRITE8_MEMBER(coin_w);
+	uint8_t znsecsel_r(offs_t offset, uint8_t mem_mask = ~0);
+	void znsecsel_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	uint8_t boardconfig_r();
+	uint16_t unknown_r(offs_t offset, uint16_t mem_mask = ~0);
+	void coin_w(uint8_t data);
 
 	void zn_base_map(address_map &map);
 	void zn_rom_base_map(address_map &map);
 
 	virtual void machine_start() override;
 
-	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
-	inline void psxwriteword( uint32_t *p_n_psxram, uint32_t n_address, uint16_t n_data );
+	void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
+	static uint16_t psxreadword( uint32_t *p_n_psxram, uint32_t n_address );
+	static void psxwriteword( uint32_t *p_n_psxram, uint32_t n_address, uint16_t n_data );
 
-	uint8_t m_n_znsecsel;
+	uint8_t m_n_znsecsel = 0;
 
 	required_device<psxgpu_device> m_gpu;
 	required_device<screen_device> m_gpu_screen;
@@ -88,9 +90,10 @@ protected:
 	required_device_array<cat702_device, 2> m_cat702;
 	required_device<znmcu_device> m_znmcu;
 	required_device<cpu_device> m_maincpu;
+	required_device<spu_device> m_spu;
 	required_device<ram_device> m_ram;
 
-	int m_cat702_dataout[2];
+	int m_cat702_dataout[2]{};
 	int m_znmcu_dataout;
 };
 
@@ -128,9 +131,9 @@ private:
 	void qsound_map(address_map &map);
 	void qsound_portmap(address_map &map);
 
-	DECLARE_READ16_MEMBER(kickharness_r);
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_WRITE8_MEMBER(qsound_bankswitch_w);
+	uint16_t kickharness_r(offs_t offset, uint16_t mem_mask = ~0);
+	void bank_w(uint8_t data);
+	void qsound_bankswitch_w(uint8_t data);
 	INTERRUPT_GEN_MEMBER(qsound_interrupt);
 };
 
@@ -187,8 +190,8 @@ protected:
 	void coh1000a_map(address_map &map);
 
 private:
-	DECLARE_WRITE16_MEMBER(acpsx_00_w);
-	DECLARE_WRITE16_MEMBER(acpsx_10_w);
+	void acpsx_00_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void acpsx_10_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 };
 
 class nbajamex_state : public acclaim_zn_state
@@ -210,17 +213,17 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE16_MEMBER(bank_w);
-	DECLARE_WRITE16_MEMBER(sound_80_w);
-	DECLARE_WRITE8_MEMBER(backup_w);
-	DECLARE_READ16_MEMBER(sound_08_r);
-	DECLARE_READ16_MEMBER(sound_80_r);
+	void bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_80_w(uint16_t data);
+	void backup_w(offs_t offset, uint8_t data);
+	uint16_t sound_08_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t sound_80_r(offs_t offset, uint16_t mem_mask = ~0);
 
 	void main_map(address_map &map);
 	void bank_map(address_map &map);
 
 	std::unique_ptr<uint8_t[]> m_sram;
-	uint32_t m_curr_rombank[2];
+	uint32_t m_curr_rombank[2]{};
 
 	required_device<acclaim_rax_device> m_rax;
 	required_device<address_map_bank_device> m_bankmap;
@@ -251,7 +254,7 @@ private:
 
 	required_ioport_array<2> m_gun_x;
 	required_ioport_array<2> m_gun_y;
-	bool m_gun_mux;
+	bool m_gun_mux = false;
 };
 
 //
@@ -276,8 +279,8 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_WRITE16_MEMBER(sound_unk_w);
+	void bank_w(uint8_t data);
+	void sound_unk_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
@@ -308,7 +311,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER(bank_w);
+	void bank_w(uint8_t data);
 
 	void main_map(address_map &map);
 
@@ -341,8 +344,8 @@ protected:
 	void main_map(address_map &map);
 	void psarc_sound_map(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_WRITE8_MEMBER(sound_irq_w);
+	void bank_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	void sound_irq_w(uint8_t data);
 
 	required_memory_region m_bankedroms;
 	required_memory_bank m_rombank;
@@ -389,11 +392,11 @@ private:
 
 	void main_map(address_map &map);
 
-	uint16_t m_mcu_command;
+	uint16_t m_mcu_command = 0;
 
-	DECLARE_WRITE16_MEMBER(mcu_w);
-	DECLARE_READ16_MEMBER(mcu_r);
-	DECLARE_READ16_MEMBER(unk_r);
+	void mcu_w(offs_t offset, uint16_t data);
+	uint16_t mcu_r(offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t unk_r();
 
 	required_memory_region m_bankedroms;
 	required_memory_bank m_rombank;
@@ -418,7 +421,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER(bank_w);
+	void bank_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 
 	required_memory_region m_bankedroms;
 	required_memory_bank m_rombank;
@@ -444,7 +447,7 @@ private:
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	void sound_bankswitch_w(uint8_t data);
 
 	required_device<cpu_device> m_audiocpu;
 	required_memory_bank m_soundbank;
@@ -468,8 +471,8 @@ private:
 
 	void main_map(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(fram_w);
-	DECLARE_READ8_MEMBER(fram_r);
+	void fram_w(offs_t offset, uint8_t data);
+	uint8_t fram_r(offs_t offset);
 
 	required_device<taito_zoom_device> m_zoom;
 	required_device<nvram_device> m_fm1208s;
@@ -511,14 +514,14 @@ private:
 	void dma_read(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size);
 	void dma_write(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size);
 
-	DECLARE_READ16_MEMBER(vt83c461_16_r);
-	DECLARE_WRITE16_MEMBER(vt83c461_16_w);
-	DECLARE_READ16_MEMBER(vt83c461_32_r);
-	DECLARE_WRITE16_MEMBER(vt83c461_32_w);
+	uint16_t vt83c461_16_r(offs_t offset, uint16_t mem_mask = ~0);
+	void vt83c461_16_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t vt83c461_32_r(offs_t offset, uint16_t mem_mask = ~0);
+	void vt83c461_32_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	required_device<vt83c461_device> m_vt83c461;
 
-	uint16_t m_vt83c461_latch;
+	uint16_t m_vt83c461_latch = 0;
 };
 
 //
@@ -548,7 +551,7 @@ private:
 	void link_map(address_map &map);
 	void link_port_map(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(bank_w);
+	void bank_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 
 	required_memory_region m_bankedroms;
 	required_memory_bank m_rombank;
@@ -572,8 +575,8 @@ private:
 	void z80_map(address_map &map);
 	void z80_port_map(address_map &map);
 
-	DECLARE_READ8_MEMBER(sound_main_status_r);
-	DECLARE_READ8_MEMBER(sound_z80_status_r);
+	uint8_t sound_main_status_r();
+	uint8_t sound_z80_status_r();
 
 	required_device<cpu_device> m_audiocpu;
 	required_device_array<fifo7200_device, 2> m_fifo;

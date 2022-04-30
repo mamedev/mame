@@ -21,8 +21,8 @@ public:
 
 	es5510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(host_r);
-	DECLARE_WRITE8_MEMBER(host_w);
+	uint8_t host_r(address_space &space, offs_t offset);
+	void host_w(offs_t offset, uint8_t data);
 
 	int16_t ser_r(int offset);
 	void ser_w(int offset, int16_t data);
@@ -187,7 +187,8 @@ private:
 	int32_t  gpr_latch;     // 24 bits, holding up to 20 address bits, left justified
 	uint64_t instr_latch;   // 48 bits, right justified
 	uint8_t  ram_sel;       // effectively a boolean
-	uint8_t  host_control;  //
+	uint8_t  host_control;  // ESP state / host control register
+	uint8_t  host_serial;   // serial I/O format and control
 
 	// currently executing instruction(s)
 	alu_t alu;

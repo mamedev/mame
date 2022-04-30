@@ -33,26 +33,26 @@ public:
 	// construction/destruction
 	k7659_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(read);
+	uint8_t read();
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	emu_timer *m_timer;
+	emu_timer *m_timer = nullptr;
 
 private:
 	uint8_t key_pos(uint8_t val);
-	uint8_t m_lookup;
-	uint8_t m_key;
-	const uint8_t *m_p_rom;
+	uint8_t m_lookup = 0;
+	uint8_t m_key = 0;
+	const uint8_t *m_p_rom = nullptr;
 };
 
 

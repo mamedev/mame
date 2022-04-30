@@ -207,7 +207,7 @@ TILE_GET_INFO_MEMBER(efdt_state::get_tile_info_0)
 	//int code = data + (xtra << 8);
 	int code = data + m_tilebank;
 
-	SET_TILE_INFO_MEMBER(0, code, pal, 0);
+	tileinfo.set(0, code, pal, 0);
 }
 
 TILE_GET_INFO_MEMBER(efdt_state::get_tile_info_1)
@@ -216,7 +216,7 @@ TILE_GET_INFO_MEMBER(efdt_state::get_tile_info_1)
 
 	int code = data;
 
-	SET_TILE_INFO_MEMBER(1, code, 0x1c, 0);
+	tileinfo.set(1, code, 0x1c, 0);
 }
 
 void efdt_state::video_start()
@@ -431,12 +431,12 @@ void efdt_state::machine_reset()
 *               Sound Latches                *
 *********************************************/
 
-READ8_MEMBER(efdt_state::main_soundlatch_r)
+uint8_t efdt_state::main_soundlatch_r(offs_t offset)
 {
 	return m_soundlatch[offset];
 }
 
-WRITE8_MEMBER(efdt_state::main_soundlatch_w)
+void efdt_state::main_soundlatch_w(offs_t offset, uint8_t data)
 {
 	m_soundlatch[offset] = data;
 	switch (offset)
@@ -452,22 +452,22 @@ WRITE8_MEMBER(efdt_state::main_soundlatch_w)
 	}
 }
 
-READ8_MEMBER(efdt_state::soundlatch_0_r)
+uint8_t efdt_state::soundlatch_0_r()
 {
 	return m_soundCommand;
 }
 
-READ8_MEMBER(efdt_state::soundlatch_1_r)
+uint8_t efdt_state::soundlatch_1_r()
 {
 	return m_soundControl;
 }
 
-WRITE8_MEMBER(efdt_state::soundlatch_0_w)
+void efdt_state::soundlatch_0_w(uint8_t data)
 {
 	//m_soundCommand;
 }
 
-WRITE8_MEMBER(efdt_state::soundlatch_1_w)
+void efdt_state::soundlatch_1_w(uint8_t data)
 {
 	if (!(data == 0xfd || data == 0xf5))
 	{
@@ -481,22 +481,22 @@ WRITE8_MEMBER(efdt_state::soundlatch_1_w)
 	//  m_soundControl &= ~1;
 }
 
-READ8_MEMBER(efdt_state::soundlatch_2_r)
+uint8_t efdt_state::soundlatch_2_r()
 {
 	return m_soundControl;
 }
 
-READ8_MEMBER(efdt_state::soundlatch_3_r)
+uint8_t efdt_state::soundlatch_3_r()
 {
 	return m_soundControl;
 }
 
-WRITE8_MEMBER(efdt_state::soundlatch_2_w)
+void efdt_state::soundlatch_2_w(uint8_t data)
 {
 	//m_soundCommand;
 }
 
-WRITE8_MEMBER(efdt_state::soundlatch_3_w)
+void efdt_state::soundlatch_3_w(uint8_t data)
 {
 	m_soundControl = data;
 }
@@ -517,17 +517,6 @@ static const gfx_layout tilelayout3bpp =
 	8 * 8
 };
 
-static const gfx_layout tilelayout1bpp =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	8 * 8
-};
-
 
 /**************************************************
 *           Graphics Decode Information           *
@@ -535,7 +524,7 @@ static const gfx_layout tilelayout1bpp =
 
 static GFXDECODE_START( gfx_efdt )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout3bpp, 0, 256*6 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout1bpp, 0, 256 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x1,      0, 256 )
 GFXDECODE_END
 
 

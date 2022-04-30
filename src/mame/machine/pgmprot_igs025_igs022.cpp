@@ -347,7 +347,7 @@ void pgm_022_025_state::init_killbld()
 	pgm_killbld_decrypt();
 
 	// install and configure protection device(s)
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xd40000, 0xd40003, read16_delegate(*m_igs025, FUNC(igs025_device::killbld_igs025_prot_r)), write16_delegate(*m_igs025, FUNC(igs025_device::killbld_igs025_prot_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xd40000, 0xd40003, read16sm_delegate(*m_igs025, FUNC(igs025_device::killbld_igs025_prot_r)), write16sm_delegate(*m_igs025, FUNC(igs025_device::killbld_igs025_prot_w)));
 	m_igs025->m_kb_source_data = killbld_source_data;
 }
 
@@ -357,7 +357,7 @@ void pgm_022_025_state::init_drgw3()
 	pgm_dw3_decrypt();
 
 	// install and configure protection device(s)
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xda5610, 0xda5613, read16_delegate(*m_igs025, FUNC(igs025_device::killbld_igs025_prot_r)), write16_delegate(*m_igs025, FUNC(igs025_device::killbld_igs025_prot_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xda5610, 0xda5613, read16sm_delegate(*m_igs025, FUNC(igs025_device::killbld_igs025_prot_r)), write16sm_delegate(*m_igs025, FUNC(igs025_device::killbld_igs025_prot_w)));
 	m_igs025->m_kb_source_data = dw3_source_data;
 }
 

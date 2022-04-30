@@ -98,7 +98,7 @@ void artmagic_state::machine_reset()
  *
  *************************************/
 
-WRITE16_MEMBER(artmagic_state::control_w)
+void artmagic_state::control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_control[offset]);
 
@@ -119,7 +119,7 @@ WRITE16_MEMBER(artmagic_state::control_w)
  *
  *************************************/
 
-void artmagic_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void artmagic_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -133,7 +133,7 @@ void artmagic_state::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
-READ16_MEMBER(artmagic_state::ultennis_hack_r)
+uint16_t artmagic_state::ultennis_hack_r()
 {
 	/* IRQ5 points to: jsr (a5); rte */
 	uint32_t pc = m_maincpu->pc();
@@ -377,7 +377,7 @@ READ_LINE_MEMBER(artmagic_state::prot_r)
 }
 
 
-WRITE16_MEMBER(artmagic_state::protection_bit_w)
+void artmagic_state::protection_bit_w(offs_t offset, uint16_t data)
 {
 	/* shift in the new bit based on the offset */
 	m_prot_input[m_prot_input_index] <<= 1;
@@ -903,7 +903,7 @@ ROM_START( cheesech )
 	ROM_LOAD( "u151", 0x00000, 0x80000, CRC(65d5ebdb) SHA1(0d905b9a60b86e51de3bdcf6eeb059fe29606431) )
 ROM_END
 
-/* There is known to exist an Ultimate Tennis with ROMs labeled  A&M001C1293 13B and A&M001C1293 12B, it not known if they are the same data as below */
+/* There is known to exist an Ultimate Tennis with ROMs labeled A&M001C1293 13B, A&M001C1293 12B, and A&M001C1293 14A and are confirmed to be same data as below */
 ROM_START( ultennis )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for 68000 code */
 	ROM_LOAD16_BYTE( "a+m001b1093_13b_u102.u102", 0x00000, 0x40000, CRC(ec31385e) SHA1(244e78619c549712d5541fb252656afeba639bb7) ) /* labeled  A&M001B1093  13B  U102 */
@@ -1157,7 +1157,7 @@ void artmagic_state::init_ultennis()
 	m_protection_handler = &artmagic_state::ultennis_protection;
 
 	/* additional (protection?) hack */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, read16_delegate(*this, FUNC(artmagic_state::ultennis_hack_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, read16smo_delegate(*this, FUNC(artmagic_state::ultennis_hack_r)));
 }
 
 

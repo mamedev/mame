@@ -28,10 +28,9 @@ TODO:
 #include "cpu/m6800/m6800.h"
 #include "cpu/z80/z80.h"
 #include "machine/clock.h"
-#include "sound/2203intf.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
+#include "sound/ymopn.h"
 #include "video/jangou_blitter.h"
 #include "video/resnet.h"
 #include "emupal.h"
@@ -94,24 +93,24 @@ private:
 	optional_device<cpu_device> m_audiocpu;
 
 	/* memory */
-	//DECLARE_WRITE8_MEMBER(sexygal_nsc_true_blitter_w);
-	DECLARE_WRITE8_MEMBER(royalqn_blitter_0_w);
-	DECLARE_WRITE8_MEMBER(royalqn_blitter_1_w);
-	DECLARE_WRITE8_MEMBER(royalqn_blitter_2_w);
-	DECLARE_READ8_MEMBER(royalqn_nsc_blit_r);
-	DECLARE_READ8_MEMBER(royalqn_comm_r);
-	DECLARE_WRITE8_MEMBER(royalqn_comm_w);
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_READ8_MEMBER(input_1p_r);
-	DECLARE_READ8_MEMBER(input_2p_r);
-	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_READ8_MEMBER(sexygal_soundram_r);
-	DECLARE_READ8_MEMBER(sexygal_unknown_sound_r);
-	DECLARE_WRITE8_MEMBER(sexygal_audioff_w);
-	DECLARE_WRITE8_MEMBER(sexygal_audionmi_w);
+	//void sexygal_nsc_true_blitter_w(uint8_t data);
+	void royalqn_blitter_0_w(uint8_t data);
+	void royalqn_blitter_1_w(uint8_t data);
+	void royalqn_blitter_2_w(uint8_t data);
+	uint8_t royalqn_nsc_blit_r(offs_t offset);
+	uint8_t royalqn_comm_r(offs_t offset);
+	void royalqn_comm_w(offs_t offset, uint8_t data);
+	void mux_w(uint8_t data);
+	uint8_t input_1p_r();
+	uint8_t input_2p_r();
+	void output_w(uint8_t data);
+	uint8_t sexygal_soundram_r(offs_t offset);
+	uint8_t sexygal_unknown_sound_r();
+	void sexygal_audioff_w(uint8_t data);
+	void sexygal_audionmi_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(ngalsumr_prot_latch_w);
-	DECLARE_READ8_MEMBER(ngalsumr_prot_value_r);
+	void ngalsumr_prot_latch_w(uint8_t data);
+	uint8_t ngalsumr_prot_value_r();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -175,14 +174,12 @@ void nightgal_state::video_start()
 
 uint32_t nightgal_state::screen_update_nightgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y;
-
-	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
 		const uint8_t *src = &m_blitter->blit_buffer(y, cliprect.min_x);
-		uint16_t *dst = &m_tmp_bitmap->pix16(y, cliprect.min_x);
+		uint16_t *dst = &m_tmp_bitmap->pix(y, cliprect.min_x);
 
-		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
 			uint32_t srcpix = *src++;
 			*dst++ = m_palette->pen((srcpix & 0xf) | m_pal_bank);
@@ -243,23 +240,23 @@ void nightgal_state::nightgal_palette(palette_device &palette) const
    There are three unidirectional latches that also sends an irq from z80 to MCU.
  */
 // TODO: simplify this (error in the document)
-WRITE8_MEMBER(nightgal_state::royalqn_blitter_0_w)
+void nightgal_state::royalqn_blitter_0_w(uint8_t data)
 {
 	m_blit_raw_data[0] = data;
 }
 
-WRITE8_MEMBER(nightgal_state::royalqn_blitter_1_w)
+void nightgal_state::royalqn_blitter_1_w(uint8_t data)
 {
 	m_blit_raw_data[1] = data;
 }
 
-WRITE8_MEMBER(nightgal_state::royalqn_blitter_2_w)
+void nightgal_state::royalqn_blitter_2_w(uint8_t data)
 {
 	m_blit_raw_data[2] = data;
 	m_subcpu->set_input_line(0, ASSERT_LINE );
 }
 
-READ8_MEMBER(nightgal_state::royalqn_nsc_blit_r)
+uint8_t nightgal_state::royalqn_nsc_blit_r(offs_t offset)
 {
 	if(offset == 2)
 		m_subcpu->set_input_line(0, CLEAR_LINE );
@@ -281,7 +278,7 @@ void nightgal_state::z80_wait_assert_cb()
 	m_z80_wait_ack_timer->adjust(m_maincpu->cycles_to_attotime(4));
 }
 
-READ8_MEMBER(nightgal_state::royalqn_comm_r)
+uint8_t nightgal_state::royalqn_comm_r(offs_t offset)
 {
 	z80_wait_assert_cb();
 	machine().scheduler().synchronize(); // force resync
@@ -289,7 +286,7 @@ READ8_MEMBER(nightgal_state::royalqn_comm_r)
 	return (m_comms_ram[offset] & 0x80) | (0x7f); //bits 6-0 are undefined, presumably open bus
 }
 
-WRITE8_MEMBER(nightgal_state::royalqn_comm_w)
+void nightgal_state::royalqn_comm_w(offs_t offset, uint8_t data)
 {
 	z80_wait_assert_cb();
 	machine().scheduler().synchronize(); // force resync
@@ -303,13 +300,13 @@ WRITE8_MEMBER(nightgal_state::royalqn_comm_w)
 *
 ********************************************/
 
-WRITE8_MEMBER(nightgal_state::mux_w)
+void nightgal_state::mux_w(uint8_t data)
 {
 	m_mux_data = ~data;
 	//printf("%02x\n", m_mux_data);
 }
 
-READ8_MEMBER(nightgal_state::input_1p_r)
+uint8_t nightgal_state::input_1p_r()
 {
 	uint8_t cr_clear = m_io_cr_clear->read();
 
@@ -328,7 +325,7 @@ READ8_MEMBER(nightgal_state::input_1p_r)
 			m_io_pl1_4->read() & m_io_pl1_5->read() & m_io_pl1_6->read()) | cr_clear;
 }
 
-READ8_MEMBER(nightgal_state::input_2p_r)
+uint8_t nightgal_state::input_2p_r()
 {
 	uint8_t coin_port = m_io_coins->read();
 
@@ -347,7 +344,7 @@ READ8_MEMBER(nightgal_state::input_2p_r)
 			m_io_pl2_4->read() & m_io_pl2_5->read() & m_io_pl2_6->read()) | coin_port;
 }
 
-WRITE8_MEMBER(nightgal_state::output_w)
+void nightgal_state::output_w(uint8_t data)
 {
 	/*
 	Doesn't match Charles notes?
@@ -384,20 +381,20 @@ void nightgal_state::common_nsc_map(address_map &map)
 * Sexy Gal
 ********************************/
 
-READ8_MEMBER(nightgal_state::sexygal_soundram_r)
+uint8_t nightgal_state::sexygal_soundram_r(offs_t offset)
 {
 	// bit 7 set = contention?
 	return BIT(m_sound_ram[offset], 7) ? 0x00 : 0x40;
 }
 
-READ8_MEMBER(nightgal_state::sexygal_unknown_sound_r)
+uint8_t nightgal_state::sexygal_unknown_sound_r()
 {
 	// value read here stored in (1-bit) shared RAM but not used?
 	return 0;
 }
 
 // flip flop from main to audio CPU
-WRITE8_MEMBER(nightgal_state::sexygal_audioff_w)
+void nightgal_state::sexygal_audioff_w(uint8_t data)
 {
 	// causes an irq
 	m_audiocpu->set_input_line(0, BIT(data, 6) ? ASSERT_LINE : CLEAR_LINE);
@@ -408,7 +405,7 @@ WRITE8_MEMBER(nightgal_state::sexygal_audioff_w)
 	m_sexygal_audioff = data;
 }
 
-WRITE8_MEMBER(nightgal_state::sexygal_audionmi_w)
+void nightgal_state::sexygal_audionmi_w(uint8_t data)
 {
 	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
@@ -420,8 +417,8 @@ WRITE8_MEMBER(nightgal_state::sexygal_audionmi_w)
 void nightgal_state::sweetgal_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x807f).ram().share("sound_ram");
-	map(0xe000, 0xefff).rw(FUNC(nightgal_state::royalqn_comm_r), FUNC(nightgal_state::royalqn_comm_w)).share("comms_ram");
+	map(0x8000, 0x807f).lrw8([this](offs_t off) { return m_sound_ram[off]; }, "snd_r", [this](offs_t off, u8 data) { m_sound_ram[off] = data; }, "snd_w");
+	map(0xe000, 0xefff).rw(FUNC(nightgal_state::royalqn_comm_r), FUNC(nightgal_state::royalqn_comm_w));
 	map(0xf000, 0xffff).ram();
 }
 
@@ -454,9 +451,9 @@ void nightgal_state::sgaltrop_io(address_map &map)
 	common_sexygal_io(map);
 
 	// not actually a YM2203?
-	map(0x01, 0x01).r("ymsnd", FUNC(ym2203_device::read_port_r));
-	map(0x02, 0x02).w("ymsnd", FUNC(ym2203_device::write_port_w));
-	map(0x03, 0x03).w("ymsnd", FUNC(ym2203_device::control_port_w));
+	map(0x01, 0x01).r("ymsnd", FUNC(ym2203_device::data_r));
+	map(0x02, 0x02).w("ymsnd", FUNC(ym2203_device::data_w));
+	map(0x03, 0x03).w("ymsnd", FUNC(ym2203_device::address_w));
 }
 
 void nightgal_state::sexygal_nsc_map(address_map &map)
@@ -783,7 +780,7 @@ void nightgal_state::machine_reset()
 	m_z80_latch = 0;
 	m_mux_data = 0;
 
-	memset(m_blit_raw_data, 0, ARRAY_LENGTH(m_blit_raw_data));
+	std::fill(std::begin(m_blit_raw_data), std::end(m_blit_raw_data), 0);
 }
 
 void nightgal_state::royalqn(machine_config &config)
@@ -836,9 +833,6 @@ void nightgal_state::sexygal(machine_config &config)
 	sampleclk.signal_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	config.device_remove("aysnd");
 
@@ -883,7 +877,7 @@ Night Gal
 OSC:20MHz
 CPU:Z80
 SND:AY-3-8910
-ETC:CUSTOM(The surface of the chip is scrached, so the name of the chip is unknown), MemoryBackup
+ETC:CUSTOM(The surface of the chip is scratched, so the name of the chip is unknown), MemoryBackup
 
 NGAL_01.BIN graphic
 NGAL_02.BIN graphic
@@ -935,7 +929,7 @@ Night Bunny
 CPU: Z80
 Sound: AY-3-8910
 OSC: 20.000MHz
-Other: surface scrached DIP40 (NB1413M3?)
+Other: surface scratched DIP40 (NB1413M3?)
 
 ROMs:
 1.3A
@@ -1271,12 +1265,12 @@ void nightgal_state::init_royalqn()
 }
 
 // Night Gal Summer uses a protection latch device to get some layer clearances width/height values.
-WRITE8_MEMBER(nightgal_state::ngalsumr_prot_latch_w)
+void nightgal_state::ngalsumr_prot_latch_w(uint8_t data)
 {
 	m_z80_latch = data;
 }
 
-READ8_MEMBER(nightgal_state::ngalsumr_prot_value_r)
+uint8_t nightgal_state::ngalsumr_prot_value_r()
 {
 	switch(m_z80_latch)
 	{
@@ -1323,8 +1317,8 @@ READ8_MEMBER(nightgal_state::ngalsumr_prot_value_r)
 
 void nightgal_state::init_ngalsumr()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6000, 0x6000, write8_delegate(*this, FUNC(nightgal_state::ngalsumr_prot_latch_w)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6001, 0x6001, read8_delegate(*this, FUNC(nightgal_state::ngalsumr_prot_value_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6000, 0x6000, write8smo_delegate(*this, FUNC(nightgal_state::ngalsumr_prot_latch_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6001, 0x6001, read8smo_delegate(*this, FUNC(nightgal_state::ngalsumr_prot_value_r)));
 	// 0x6003 some kind of f/f state
 }
 

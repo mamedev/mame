@@ -25,10 +25,11 @@ public:
 
 	void init_igs_fear();
 
+protected:
+	virtual void video_start() override;
+
 private:
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
-	//virtual void video_start();
-	virtual void video_start_igs_fear();
 	uint32_t screen_update_igs_fear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void pgm_create_dummy_internal_arm_region();
 	required_device<cpu_device> m_maincpu;
@@ -38,7 +39,7 @@ private:
 };
 
 
-void igs_fear_state::video_start_igs_fear()
+void igs_fear_state::video_start()
 {
 }
 
@@ -94,14 +95,12 @@ void igs_fear_state::igs_fear(machine_config &config)
 	screen.set_screen_update(FUNC(igs_fear_state::screen_update_igs_fear));
 	screen.set_palette(m_palette);
 
-	MCFG_VIDEO_START_OVERRIDE(igs_fear_state, igs_fear)
-
 	PALETTE(config, m_palette).set_entries(0x200);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_igs_fear);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ics2115_device &ics(ICS2115(config, "ics", 0));
+	ics2115_device &ics(ICS2115(config, "ics", 33.8688_MHz_XTAL)); // TODO : Correct?
 	ics.irq().set(FUNC(igs_fear_state::sound_irq));
 	ics.add_route(ALL_OUTPUTS, "mono", 5.0);
 }

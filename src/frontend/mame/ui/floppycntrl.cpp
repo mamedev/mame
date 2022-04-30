@@ -26,14 +26,10 @@ menu_control_floppy_image::menu_control_floppy_image(mame_ui_manager &mui, rende
 	fd(dynamic_cast<floppy_image_device &>(image)),
 	input_format(nullptr),
 	output_format(nullptr),
+	create_fs(nullptr),
 	input_filename(),
 	output_filename()
 {
-	int fcnt = 0;
-	for(const floppy_image_format_t *i = fd.get_formats(); i; i = i->next)
-		fcnt++;
-
-	format_array = std::make_unique<floppy_image_format_t * []>(fcnt);
 }
 
 menu_control_floppy_image::~menu_control_floppy_image()
@@ -47,6 +43,14 @@ void menu_control_floppy_image::do_load_create()
 		if (err != image_init_result::PASS) {
 			machine().popmessage("Error: %s", fd.error());
 			return;
+		}
+		if (create_fs) {
+			// HACK: ensure the floppy_image structure is created since device_image_interface may not otherwise do so during "init phase"
+			err = fd.finish_load();
+			if (err == image_init_result::PASS) {
+				fs::meta_data meta;
+				fd.init_fs(create_fs, meta);
+			}
 		}
 	} else {
 		image_init_result err = fd.load(input_filename);
@@ -70,60 +74,101 @@ void menu_control_floppy_image::hook_load(const std::string &filename)
 	{
 		machine().popmessage("Error: %s\n", m_image.error());
 		stack_pop();
-		return;
 	}
-
-	bool can_in_place = input_format->supports_save();
-	if(can_in_place) {
-		osd_file::error filerr;
-		std::string tmp_path;
-		util::core_file::ptr tmp_file;
-		// attempt to open the file for writing but *without* create
-		filerr = util::zippath_fopen(filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE, tmp_file, tmp_path);
-		if(filerr == osd_file::error::NONE)
-			tmp_file.reset();
-		else
-			can_in_place = false;
+	else
+	{
+		bool can_in_place = input_format->supports_save();
+		if(can_in_place) {
+			std::string tmp_path;
+			util::core_file::ptr tmp_file;
+			// attempt to open the file for writing but *without* create
+			std::error_condition const filerr = util::zippath_fopen(filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE, tmp_file, tmp_path);
+			if(!filerr)
+				tmp_file.reset();
+			else
+				can_in_place = false;
+		}
+		m_submenu_result.rw = menu_select_rw::result::INVALID;
+		menu::stack_push<menu_select_rw>(ui(), container(), can_in_place, m_submenu_result.rw);
+		m_state = SELECT_RW;
 	}
-	m_submenu_result.rw = menu_select_rw::result::INVALID;
-	menu::stack_push<menu_select_rw>(ui(), container(), can_in_place, m_submenu_result.rw);
-	m_state = SELECT_RW;
 }
 
-void menu_control_floppy_image::handle()
+bool menu_control_floppy_image::can_format(const floppy_image_device::fs_info &fs)
+{
+	return !fs.m_manager || fs.m_manager->can_format();
+}
+
+void menu_control_floppy_image::menu_activated()
 {
 	switch (m_state) {
 	case DO_CREATE: {
-		floppy_image_format_t *fif_list = fd.get_formats();
-			int ext_match;
-			int total_usable = 0;
-			for(floppy_image_format_t *i = fif_list; i; i = i->next) {
+		std::vector<const floppy_image_format_t *> format_array;
+		for(const floppy_image_format_t *i : fd.get_formats()) {
 			if(!i->supports_save())
 				continue;
 			if (i->extension_matches(m_current_file.c_str()))
-				format_array[total_usable++] = i;
+				format_array.push_back(i);
 		}
-		ext_match = total_usable;
-		for(floppy_image_format_t *i = fif_list; i; i = i->next) {
+		int ext_match = format_array.size();
+		for(const floppy_image_format_t *i : fd.get_formats()) {
 			if(!i->supports_save())
 				continue;
 			if (!i->extension_matches(m_current_file.c_str()))
-				format_array[total_usable++] = i;
+				format_array.push_back(i);
 		}
-		m_submenu_result.i = -1;
-		menu::stack_push<menu_select_format>(ui(), container(), format_array.get(), ext_match, total_usable, &m_submenu_result.i);
+		output_format = nullptr;
+		menu::stack_push<menu_select_format>(ui(), container(), format_array, ext_match, &output_format);
 
 		m_state = SELECT_FORMAT;
 		break;
 	}
 
 	case SELECT_FORMAT:
-		if(m_submenu_result.i == -1) {
+		if(!output_format) {
 			m_state = START_FILE;
-			handle();
+			menu_activated();
 		} else {
+			// get all formatable file systems
+			std::vector<std::reference_wrapper<const floppy_image_device::fs_info>> fs;
+			for (const auto &this_fs : fd.get_fs()) {
+				if (can_format(this_fs))
+					fs.emplace_back(std::ref(this_fs));
+			}
+
 			output_filename = util::zippath_combine(m_current_directory, m_current_file);
-			output_format = format_array[m_submenu_result.i];
+			if(fs.size() == 1) {
+				create_fs = &(fs[0].get());
+				do_load_create();
+				stack_pop();
+			} else {
+				m_submenu_result.i = -1;
+				menu::stack_push<menu_select_floppy_init>(ui(), container(), std::move(fs), &m_submenu_result.i);
+				m_state = SELECT_INIT;
+			}
+		}
+		break;
+
+	case SELECT_INIT:
+		// figure out which (if any) create file system was selected
+		create_fs = nullptr;
+		if(m_submenu_result.i >= 0) {
+			int i = 0;
+			for (const auto &this_fs : fd.get_fs()) {
+				if (can_format(this_fs)) {
+					if (i == m_submenu_result.i) {
+						create_fs = &this_fs;
+						break;
+					}
+					i++;
+				}
+			}
+		}
+
+		if(!create_fs) {
+			m_state = START_FILE;
+			menu_activated();
+		} else {
 			do_load_create();
 			stack_pop();
 		}
@@ -155,12 +200,13 @@ void menu_control_floppy_image::handle()
 
 		case menu_select_rw::result::INVALID:
 			m_state = START_FILE;
+			menu_activated();
 			break;
 		}
 		break;
 
 	default:
-		menu_control_device_image::handle();
+		menu_control_device_image::menu_activated();
 	}
 }
 

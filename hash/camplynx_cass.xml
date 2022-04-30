@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 
 <softwarelist name="camplynx_cass" description="Camputers Lynx cassettes">
 
@@ -51,7 +54,7 @@
 		<info name="usage" value="MLOAD &quot;CENTIPEDE&quot;" />
 		<part name="cass1" interface="camplynx_cass">
 			<dataarea name="cass" size="11157">
-				<rom name="Centipede (19xx)(Play It!).tap" size="11157" crc="8c3b3109" sha1="d4f9081e89ddf4d0ba7b1734aef4fbf494ca31ec"/>
+				<rom name="Centipede (19xx)(Play It).tap" size="11157" crc="8c3b3109" sha1="d4f9081e89ddf4d0ba7b1734aef4fbf494ca31ec"/>
 			</dataarea>
 		</part>
 	</software>
@@ -450,7 +453,7 @@
 		<info name="usage" value="MLOAD &quot;PENGO&quot;" />
 		<part name="cass1" interface="camplynx_cass">
 			<dataarea name="cass" size="10385">
-				<rom name="Pengo (1984)(Play It!).tap" size="10385" crc="f37d0240" sha1="41a2e0d36e6b3226a6c946e4d10e96c8e207ce6f"/>
+				<rom name="Pengo (1984)(Play It).tap" size="10385" crc="f37d0240" sha1="41a2e0d36e6b3226a6c946e4d10e96c8e207ce6f"/>
 			</dataarea>
 		</part>
 	</software>

@@ -5,8 +5,6 @@
 
 #pragma once
 
-#pragma once
-
 #include "rs232.h"
 #include "machine/keyboard.h"
 
@@ -35,7 +33,6 @@ private:
 	virtual void received_byte(uint8_t byte) override;
 
 	required_ioport m_rs232_txbaud;
-	required_ioport m_rs232_startbits;
 	required_ioport m_rs232_databits;
 	required_ioport m_rs232_parity;
 	required_ioport m_rs232_stopbits;

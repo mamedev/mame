@@ -14,7 +14,7 @@ TODO:
 - granits has a module slot, is it usable?
 - granits overlock + dynamic /2 cpu divider? (like SC12) instead of static /2 divider
 
-*******************************************************************************
+-------------------------------------------------------------------------------
 
 Voice Excellence (model 6092)
 ----------------
@@ -115,7 +115,7 @@ VFD display, and some buttons for controlling the clock. IRQ frequency is double
 presumedly for using the blinking led as seconds counter. It only tracks player time,
 not of the opponent. And it obviously doesn't show chessmove coordinates either.
 
-*******************************************************************************
+-------------------------------------------------------------------------------
 
 Designer 2000 (model 6102)
 ----------------
@@ -126,19 +126,20 @@ basically same as (Par) Excellence hardware, reskinned board
 
 Designer 2100 (model 6103): exactly same, but running at 5MHz
 
-(Designer 1500 is on 80C50 hardware)
+(Designer 1500 is on 80C50 hardware, same ROM as The Gambit, see fidel_sc6.cpp)
 
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/r65c02.h"
 #include "cpu/m6502/m65sc02.h"
+#include "machine/clock.h"
 #include "machine/sensorboard.h"
-#include "machine/timer.h"
-#include "sound/s14001a.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
+#include "sound/s14001a.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -157,7 +158,6 @@ public:
 	excel_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_irq_on(*this, "irq_on"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
@@ -185,7 +185,6 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<timer_device> m_irq_on;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
@@ -197,29 +196,19 @@ private:
 	void fexcel_map(address_map &map);
 	void fexcelb_map(address_map &map);
 
-	// periodic interrupts
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
-
 	// I/O handlers
-	DECLARE_READ8_MEMBER(speech_r);
-	DECLARE_WRITE8_MEMBER(ttl_w);
-	DECLARE_READ8_MEMBER(ttl_r);
+	u8 speech_r(offs_t offset);
+	void ttl_w(offs_t offset, u8 data);
+	u8 ttl_r(offs_t offset);
 
-	u8 m_select;
-	u8 m_7seg_data;
-	u8 m_speech_data;
-	u8 m_speech_bank;
+	u8 m_select = 0;
+	u8 m_7seg_data = 0;
+	u8 m_speech_data = 0;
+	u8 m_speech_bank = 0;
 };
 
 void excel_state::machine_start()
 {
-	// zerofill
-	m_select = 0;
-	m_7seg_data = 0;
-	m_speech_data = 0;
-	m_speech_bank = 0;
-
 	// register for savestates
 	save_item(NAME(m_select));
 	save_item(NAME(m_7seg_data));
@@ -242,7 +231,7 @@ INPUT_CHANGED_MEMBER(excel_state::speech_bankswitch)
 	m_speech_bank = (m_speech_bank & 1) | newval << 1;
 }
 
-READ8_MEMBER(excel_state::speech_r)
+u8 excel_state::speech_r(offs_t offset)
 {
 	// TSI A11 is A12, program controls A11, user controls A13,A14(language switches)
 	offset = (offset & 0x7ff) | (offset << 1 & 0x1000);
@@ -252,7 +241,7 @@ READ8_MEMBER(excel_state::speech_r)
 
 // TTL
 
-WRITE8_MEMBER(excel_state::ttl_w)
+void excel_state::ttl_w(offs_t offset, u8 data)
 {
 	// a0-a2,d0: 74259(1)
 	u8 mask = 1 << offset;
@@ -274,7 +263,7 @@ WRITE8_MEMBER(excel_state::ttl_w)
 	u8 seg_data = bitswap<8>(m_7seg_data,0,1,3,2,7,5,6,4);
 
 	// update display: 4 7seg leds, 2*8 chessboard leds
-	m_display->matrix_partial(0, 2, led_sel, led_data, false);
+	m_display->matrix_partial(0, 2, led_sel, led_data);
 	m_display->matrix_partial(2, 4, led_sel >> 2, seg_data); // 6093
 
 	// speech (model 6092)
@@ -289,12 +278,12 @@ WRITE8_MEMBER(excel_state::ttl_w)
 
 		// Q0-Q5: TSI C0-C5
 		// Q7: TSI START line
-		m_speech->data_w(space, 0, m_speech_data & 0x3f);
+		m_speech->data_w(m_speech_data & 0x3f);
 		m_speech->start_w(m_speech_data >> 7 & 1);
 	}
 }
 
-READ8_MEMBER(excel_state::ttl_r)
+u8 excel_state::ttl_r(offs_t offset)
 {
 	u8 sel = m_select & 0xf;
 	u8 d7 = 0x80;
@@ -399,10 +388,9 @@ void excel_state::fexcel(machine_config &config)
 	M65SC02(config, m_maincpu, 12_MHz_XTAL/4); // G65SC102P-3, 12.0M ceramic resonator
 	m_maincpu->set_addrmap(AS_PROGRAM, &excel_state::fexcel_map);
 
-	const attotime irq_period = attotime::from_hz(600); // from 556 timer (22nF, 102K, 1K), ideal frequency is 600Hz
-	TIMER(config, m_irq_on).configure_periodic(FUNC(excel_state::irq_on<M6502_IRQ_LINE>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us
-	TIMER(config, "irq_off").configure_periodic(FUNC(excel_state::irq_off<M6502_IRQ_LINE>), irq_period);
+	auto &irq_clock(CLOCK(config, "irq_clock", 600)); // from 556 timer (22nF, 102K, 1K), ideal frequency is 600Hz
+	irq_clock.set_pulse_width(attotime::from_nsec(15250)); // active for 15.25us
+	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -416,7 +404,6 @@ void excel_state::fexcel(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 void excel_state::fexcel4(machine_config &config)

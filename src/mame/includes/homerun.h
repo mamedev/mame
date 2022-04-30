@@ -54,20 +54,20 @@ private:
 
 	required_memory_bank m_mainbank;
 
-	u8 m_control;
-	u8 m_sample;
+	u8 m_control = 0;
+	u8 m_sample = 0;
 
-	tilemap_t *m_tilemap;
-	int m_gfx_ctrl;
-	int m_scrollx;
-	int m_scrolly;
+	tilemap_t *m_tilemap = nullptr;
+	int m_gfx_ctrl = 0;
+	int m_scrollx = 0;
+	int m_scrolly = 0;
 
 	void control_w(u8 data);
 	void d7756_sample_w(u8 data);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(scrollhi_w);
-	DECLARE_WRITE8_MEMBER(scrolly_w);
-	DECLARE_WRITE8_MEMBER(scrollx_w);
+	void videoram_w(offs_t offset, u8 data);
+	void scrollhi_w(u8 data);
+	void scrolly_w(u8 data);
+	void scrollx_w(u8 data);
 
 	static rgb_t homerun_RGB332(u32 raw);
 	TILE_GET_INFO_MEMBER(get_tile_info);

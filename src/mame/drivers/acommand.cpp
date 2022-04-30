@@ -88,18 +88,18 @@ public:
 	void acommand(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(oki_bank_w);
-	DECLARE_WRITE16_MEMBER(output_7seg0_w);
-	DECLARE_WRITE16_MEMBER(output_7seg1_w);
-	DECLARE_WRITE16_MEMBER(output_lamps_w);
+	void oki_bank_w(uint8_t data);
+	void output_7seg0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void output_7seg1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void output_lamps_w(uint16_t data);
 
-	DECLARE_READ16_MEMBER(ext_devices_0_r);
-	DECLARE_WRITE16_MEMBER(ext_devices_0_w);
-	DECLARE_READ16_MEMBER(ext_devices_1_r);
-	DECLARE_WRITE16_MEMBER(ext_devices_1_w);
-	DECLARE_WRITE16_MEMBER(ext_devices_2_w);
+	uint16_t ext_devices_0_r();
+	void ext_devices_0_w(uint16_t data);
+	uint16_t ext_devices_1_r();
+	void ext_devices_1_w(uint16_t data);
+	void ext_devices_2_w(uint16_t data);
 
-	DECLARE_WRITE16_MEMBER(ac_unk2_w);
+	void ac_unk2_w(uint16_t data);
 	TILEMAP_MAPPER_MEMBER(bg_scan);
 	uint32_t screen_update_acommand(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(acommand_scanline);
@@ -118,10 +118,10 @@ private:
 	required_device<megasys1_tilemap_device> m_txtmap;
 	output_finder<8> m_digits;
 
-	uint16_t m_7seg0;
-	uint16_t m_7seg1;
-	uint16_t m_ufo_lane[5];
-	uint8_t m_boss_door;
+	uint16_t m_7seg0 = 0;
+	uint16_t m_7seg1 = 0;
+	uint16_t m_ufo_lane[5]{};
+	uint8_t m_boss_door = 0;
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int pri_mask);
 };
@@ -209,7 +209,7 @@ uint32_t acommand_state::screen_update_acommand(screen_device &screen, bitmap_in
 /******************************************************************************************/
 
 /*This is always zero ATM*/
-WRITE16_MEMBER(acommand_state::ac_unk2_w)
+void acommand_state::ac_unk2_w(uint16_t data)
 {
 	if(data)
 		popmessage("UNK-2 enabled %04x",data);
@@ -221,7 +221,7 @@ WRITE16_MEMBER(acommand_state::ac_unk2_w)
  *
  ************************************/
 
-WRITE8_MEMBER(acommand_state::oki_bank_w)
+void acommand_state::oki_bank_w(uint8_t data)
 {
 	m_oki1->set_rom_bank(data & 0x3);
 	m_oki2->set_rom_bank((data & 0x30) >> 4);
@@ -231,20 +231,20 @@ WRITE8_MEMBER(acommand_state::oki_bank_w)
 /*                                    0    1    2    3    4    5    6    7    8    9    a    b    c    d    e    f*/
 static const uint8_t led_fill[0x10] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x00,0x00,0x00,0x00,0x00,0x00};
 
-WRITE16_MEMBER(acommand_state::output_7seg0_w)
+void acommand_state::output_7seg0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_7seg0);
 
-	// nybble 0,1,2: left 7segs, nybble 3: right 7seg 1st digit
+	// nibble 0,1,2: left 7segs, nibble 3: right 7seg 1st digit
 	for (int i = 0; i < 4; i++)
 		m_digits[i] = led_fill[m_7seg0 >> (i*4) & 0xf];
 }
 
-WRITE16_MEMBER(acommand_state::output_7seg1_w)
+void acommand_state::output_7seg1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_7seg1);
 
-	// nybble 0,1: right 7seg 2nd,3rd digit
+	// nibble 0,1: right 7seg 2nd,3rd digit
 	for (int i = 0; i < 2; i++)
 		m_digits[i+4] = led_fill[m_7seg1 >> (i*4) & 0xf];
 
@@ -282,12 +282,12 @@ WRITE16_MEMBER(acommand_state::output_7seg1_w)
     0xe astronaut switch or jamming
     0xf ""
 */
-READ16_MEMBER(acommand_state::ext_devices_0_r)
+uint16_t acommand_state::ext_devices_0_r()
 {
 	return 0xfffc | m_boss_door;
 }
 
-WRITE16_MEMBER(acommand_state::ext_devices_0_w)
+void acommand_state::ext_devices_0_w(uint16_t data)
 {
 	printf("%04x EXT 0\n",data);
 	m_boss_door = data & 3;
@@ -300,26 +300,26 @@ WRITE16_MEMBER(acommand_state::ext_devices_0_w)
     ---- ---- ---- --x- Lower Switch - 4 (active high)
     ---- ---- ---- ---x Upper Switch - 4 (active low)
 */
-READ16_MEMBER(acommand_state::ext_devices_1_r)
+uint16_t acommand_state::ext_devices_1_r()
 {
 	return 0xffff;
 }
 
-WRITE16_MEMBER(acommand_state::ext_devices_1_w)
+void acommand_state::ext_devices_1_w(uint16_t data)
 {
 	//printf("%04x EXT 1\n",data);
 	m_ufo_lane[1] = (data >> 0) & 0x1f;
 	m_ufo_lane[2] = (data >> 8) & 0x1f;
 }
 
-WRITE16_MEMBER(acommand_state::ext_devices_2_w)
+void acommand_state::ext_devices_2_w(uint16_t data)
 {
 	//printf("%04x EXT 2\n",data);
 	m_ufo_lane[3] = (data >> 0) & 0x1f;
 	m_ufo_lane[4] = (data >> 8) & 0x1f;
 }
 
-WRITE16_MEMBER(acommand_state::output_lamps_w)
+void acommand_state::output_lamps_w(uint16_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x40);
 	machine().bookkeeping().coin_counter_w(1, data & 0x80);
@@ -440,21 +440,8 @@ static INPUT_PORTS_START( acommand )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static const gfx_layout tilelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-			16*32+0*4, 16*32+1*4, 16*32+2*4, 16*32+3*4, 16*32+4*4, 16*32+5*4, 16*32+6*4, 16*32+7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
-	32*32
-};
-
 static GFXDECODE_START( gfx_acommand )
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 0x1800, 256 )
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x1800, 256 )
 GFXDECODE_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(acommand_state::acommand_scanline)

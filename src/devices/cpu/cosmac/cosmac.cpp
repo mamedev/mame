@@ -16,9 +16,7 @@ TODO:
 **********************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "cosmac.h"
-#include "coreutil.h"
 
 // permit our enums to be saved
 ALLOW_SAVE_TYPE(cosmac_device::cosmac_mode);
@@ -367,7 +365,7 @@ cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, co
 		m_io_config("io", ENDIANNESS_LITTLE, 8, 3),
 		m_read_wait(*this),
 		m_read_clear(*this),
-		m_read_ef{{*this}, {*this}, {*this}, {*this}},
+		m_read_ef(*this),
 		m_write_q(*this),
 		m_read_dma(*this),
 		m_write_dma(*this),
@@ -381,10 +379,7 @@ cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, co
 		m_clear(true),
 		m_irq(CLEAR_LINE),
 		m_dmain(CLEAR_LINE),
-		m_dmaout(CLEAR_LINE),
-		m_program(nullptr),
-		m_io(nullptr),
-		m_cache(nullptr)
+		m_dmaout(CLEAR_LINE)
 {
 	for (auto & elem : m_ef)
 		elem = CLEAR_LINE;
@@ -459,8 +454,7 @@ void cosmac_device::device_start()
 	// resolve callbacks
 	m_read_wait.resolve();
 	m_read_clear.resolve();
-	for (auto &cb : m_read_ef)
-		cb.resolve();
+	m_read_ef.resolve_all();
 	m_write_q.resolve_safe();
 	m_read_dma.resolve_safe(0);
 	m_write_dma.resolve_safe();
@@ -468,9 +462,9 @@ void cosmac_device::device_start()
 	m_write_tpb.resolve_safe();
 
 	// get our address spaces
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
-	m_io = &space(AS_IO);
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
+	space(AS_IO).specific(m_io);
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,      "GENPC",        m_pc).callimport().callexport().noshow();
@@ -532,8 +526,8 @@ void cosmac_device::device_reset()
 	m_df = 0;
 	m_p = 0;
 
-	for (int i = 0; i < ARRAY_LENGTH(m_r); i++)
-		m_r[i] = machine().rand() & 0xffff;
+	for (uint16_t &r : m_r)
+		r = machine().rand() & 0xffff;
 }
 
 
@@ -645,7 +639,7 @@ std::unique_ptr<util::disasm_interface> cdp1805_device::create_disassembler()
 
 inline uint8_t cosmac_device::read_opcode(offs_t pc)
 {
-	return m_cache->read_byte(pc);
+	return m_cache.read_byte(pc);
 }
 
 
@@ -655,7 +649,7 @@ inline uint8_t cosmac_device::read_opcode(offs_t pc)
 
 inline uint8_t cosmac_device::read_byte(offs_t address)
 {
-	return m_program->read_byte(address);
+	return m_program.read_byte(address);
 }
 
 
@@ -666,7 +660,7 @@ inline uint8_t cosmac_device::read_byte(offs_t address)
 
 inline uint8_t cosmac_device::read_io_byte(offs_t address)
 {
-	return m_io->read_byte(address);
+	return m_io.read_byte(address);
 }
 
 
@@ -676,7 +670,7 @@ inline uint8_t cosmac_device::read_io_byte(offs_t address)
 
 inline void cosmac_device::write_byte(offs_t address, uint8_t data)
 {
-	m_program->write_byte(address, data);
+	m_program.write_byte(address, data);
 }
 
 
@@ -687,7 +681,7 @@ inline void cosmac_device::write_byte(offs_t address, uint8_t data)
 
 inline void cosmac_device::write_io_byte(offs_t address, uint8_t data)
 {
-	m_io->write_byte(address, data);
+	m_io.write_byte(address, data);
 }
 
 
@@ -864,7 +858,7 @@ inline void cosmac_device::run_state()
 	{
 	case cosmac_state::STATE_0_FETCH:
 		m_op = 0;
-
+		[[fallthrough]];
 	case cosmac_state::STATE_0_FETCH_2ND:
 		fetch_instruction();
 		break;
@@ -876,7 +870,7 @@ inline void cosmac_device::run_state()
 
 	case cosmac_state::STATE_1_EXECUTE:
 		sample_ef_lines();
-
+		[[fallthrough]];
 	case cosmac_state::STATE_1_EXECUTE_2ND:
 		execute_instruction();
 		debug();

@@ -2,7 +2,7 @@
 // copyright-holders:Mirko Buffoni
 /***************************************************************************
 
-  video.c
+  bombjack.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -11,19 +11,19 @@
 #include "emu.h"
 #include "includes/bombjack.h"
 
-WRITE8_MEMBER(bombjack_state::bombjack_videoram_w)
+void bombjack_state::bombjack_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bombjack_state::bombjack_colorram_w)
+void bombjack_state::bombjack_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bombjack_state::bombjack_background_w)
+void bombjack_state::bombjack_background_w(uint8_t data)
 {
 	if (m_background_image != data)
 	{
@@ -32,7 +32,7 @@ WRITE8_MEMBER(bombjack_state::bombjack_background_w)
 	}
 }
 
-WRITE8_MEMBER(bombjack_state::bombjack_flipscreen_w)
+void bombjack_state::bombjack_flipscreen_w(uint8_t data)
 {
 	if (flip_screen() != (data & 0x01))
 	{
@@ -51,7 +51,7 @@ TILE_GET_INFO_MEMBER(bombjack_state::get_bg_tile_info)
 	int color = attr & 0x0f;
 	int flags = (attr & 0x80) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.set(1, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(bombjack_state::get_fg_tile_info)
@@ -59,7 +59,7 @@ TILE_GET_INFO_MEMBER(bombjack_state::get_fg_tile_info)
 	int code = m_videoram[tile_index] + 16 * (m_colorram[tile_index] & 0x10);
 	int color = m_colorram[tile_index] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void bombjack_state::video_start()

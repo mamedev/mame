@@ -57,7 +57,7 @@ DEFINE_DEVICE_TYPE(WANGPC_MCC, wangpc_mcc_device, "wangpc_mcc", "Wang PC-PM043 M
 
 void wangpc_mcc_device::device_add_mconfig(machine_config &config)
 {
-	Z80SIO2(config, m_sio, 4000000);
+	Z80SIO(config, m_sio, 4000000); // SIO/2?
 	Z80DART(config, m_dart, 4000000);
 }
 

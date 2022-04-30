@@ -46,18 +46,18 @@ TIMER_CALLBACK_MEMBER(tankbust_state::soundlatch_callback)
 	m_latch = param;
 }
 
-WRITE8_MEMBER(tankbust_state::soundlatch_w)
+void tankbust_state::soundlatch_w(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(tankbust_state::soundlatch_callback),this), data);
 }
 
-READ8_MEMBER(tankbust_state::soundlatch_r)
+uint8_t tankbust_state::soundlatch_r()
 {
 	return m_latch;
 }
 
 //port B of ay8910#0
-READ8_MEMBER(tankbust_state::soundtimer_r)
+uint8_t tankbust_state::soundtimer_r()
 {
 	int ret;
 
@@ -76,7 +76,7 @@ TIMER_CALLBACK_MEMBER(tankbust_state::soundirqline_callback)
 
 
 
-WRITE8_MEMBER(tankbust_state::e0xx_w)
+void tankbust_state::e0xx_w(offs_t offset, uint8_t data)
 {
 	m_e0xx_data[offset] = data;
 
@@ -120,7 +120,7 @@ WRITE8_MEMBER(tankbust_state::e0xx_w)
 	}
 }
 
-READ8_MEMBER(tankbust_state::debug_output_area_r)
+uint8_t tankbust_state::debug_output_area_r(offs_t offset)
 {
 	return m_e0xx_data[offset];
 }
@@ -175,13 +175,13 @@ void tankbust_state::tankbust_palette(palette_device &palette) const
 }
 
 #if 0
-READ8_MEMBER(tankbust_state::read_from_unmapped_memory)
+uint8_t tankbust_state::read_from_unmapped_memory()
 {
 	return 0xff;
 }
 #endif
 
-READ8_MEMBER(tankbust_state::some_changing_input)
+uint8_t tankbust_state::some_changing_input()
 {
 	m_variable_data += 8;
 	return m_variable_data;

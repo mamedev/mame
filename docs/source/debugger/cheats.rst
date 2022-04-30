@@ -3,144 +3,191 @@
 Cheat Debugger Commands
 =======================
 
+:ref:`debugger-command-cheatinit`
+    initialize the cheat search to the selected memory area
+:ref:`debugger-command-cheatrange`
+    add selected memory area to cheat search
+:ref:`debugger-command-cheatnext`
+    filter cheat candidates by comparing to previous values
+:ref:`debugger-command-cheatnextf`
+    filter cheat candidates by comparing to initial value
+:ref:`debugger-command-cheatlist`
+    show the list of cheat search matches or save them to a file
+:ref:`debugger-command-cheatundo`
+    undo the last cheat search (state only)
 
-You can also type **help <command>** for further details on each command in the MAME Debugger interface.
+The debugger includes basic cheat search functionality, which works
+by saving the contents of memory, and then filtering locations according
+to how the values change.
 
-| :ref:`debugger-command-cheatinit` -- initialize the cheat search to the selected memory area
-| :ref:`debugger-command-cheatrange` -- add to the cheat search the selected memory area
-| :ref:`debugger-command-cheatnext` -- continue cheat search comparing with the last value
-| :ref:`debugger-command-cheatnextf` -- continue cheat search comparing with the first value
-| :ref:`debugger-command-cheatlist` -- show the list of cheat search matches or save them to <filename>
-| :ref:`debugger-command-cheatundo` -- undo the last cheat search (state only)
+We’ll demonstrate use of the cheat search functionality to make an
+infinite lives cheat for Raiden (``raiden``):
 
- .. _debugger-command-cheatinit:
+* Start the game with the debugger active.  Allow the game to run,
+  insert a coin, and start a game, then break into the debugger.
+* Ensure the main CPU is visible, and start a search for 8-bit unsigned
+  values using the
+  :ref:`cheatinit command <debugger-command-cheatinit>`::
+
+      >cheatinit ub
+      36928 cheat locations initialized for NEC V30 ':maincpu' program space
+* Allow the game to run, lose a life and break into the debugger.
+* Use the :ref:`cheatnext command <debugger-command-cheatnext>` to
+  filter locations that have decreased by 1::
+
+      >cheatnext -,1
+      12 cheats found
+* Allow the game to run, lose another life, break into the
+  debugger, and filter locations that have decreased by 1 again::
+
+      >cheatnext -,1
+      Address=0B85 Start=03 Current=01
+      1 cheats found
+* Use the :ref:`cheatlist command <debugger-command-cheatlist>` to save
+  the cheat candidate to a file::
+
+      >cheatlist raiden-p1-lives.xml
+* The file now contains an XML fragment with cheat to set the candidate
+  location to the initial value:
+
+  .. code-block:: XML
+
+      <cheat desc="Possibility 1: 00B85 (01)">
+        <script state="run">
+          <action>:maincpu.pb@0x00B85=0x03</action>
+        </script>
+      </cheat>
+
+
+.. _debugger-command-cheatinit:
 
 cheatinit
 ---------
 
-|  **cheatinit [<sign><width><swap>,[<address>,<length>[,<cpu>]]]**
-|
-| The cheatinit command initializes the cheat search to the selected memory area.
-|
-| If no parameter is specified the cheat search is initialized to all changeable memory of the main CPU.
-|
-| <sign> can be s(signed) or u(unsigned)
-| <width> can be b(8 bit), w(16 bit), d(32 bit) or q(64 bit)
-| <swap> append s for swapped search
-|
-| Examples:
-|
-|  cheatinit ub,0x1000,0x10
-|
-| Initialize the cheat search from 0x1000 to 0x1010 of the first CPU.
-|
-|  cheatinit sw,0x2000,0x1000,1
-|
-| Initialize the cheat search with width of 2 byte in signed mode from 0x2000 to 0x3000 of the second CPU.
-|
-|  cheatinit uds,0x0000,0x1000
-|
-| Initialize the cheat search with width of 4 byte swapped from 0x0000 to 0x1000.
-|
-| Back to :ref:`debugger-cheats-list`
+**cheatinit [[<sign>[<width>[<swap>]]],[<address>,<length>[,<space>]]]**
+
+Initialize the cheat search to writable RAM areas in the specified
+address space.  May be abbreviated to ``ci``.
+
+The first argument specifies the data format to search for.  The
+**<sign>** may be **u** for unsigned or **s** for signed, the
+**<width>** may be **b** for 8-bit (byte), **w** for 16-bit (word),
+**d** for 32-bit (double word), or **q** for 64-bit (quadruple word);
+**<swap>** may be **s** for reversed byte order.  If the first argument
+is omitted or empty, the data format from the previous cheat search is
+used, or unsigned 8-bit format if this is the first cheat search.
+
+The **<address>** specifies the address to start searching from, and the
+**<length>** specifies how much memory to search.  If specified,
+writable RAM in the range **<address>** through
+**<address>+<length>-1**, inclusive, will be searched; otherwise, all
+writable RAM in the address space will be searched.
+
+See :ref:`debugger-devicespec` for details on specifying address spaces.
+If the address space is not specified, it defaults to the first address
+space exposed by the visible CPU.
+
+Examples:
+
+``cheatinit ub,0x1000,0x10``
+    Initialize the cheat search for unsigned 8-bit values in addresses
+    0x1000-0x100f in the program space of the visible CPU.
+``cheatinit sw,0x2000,0x1000,1``
+    Initialize the cheat search for signed 16-bit values in addresses
+    0x2000-0x2fff in the program space of the second CPU in the system
+    (zero-based index).
+``cheatinit uds,0x0000,0x1000``
+    Initialize the cheat search for unsigned 64-bit values with reverse
+    byte order in addresses 0x0000-0x0fff in the program space of the
+    visible CPU.
+
+Back to :ref:`debugger-cheats-list`
 
 
- .. _debugger-command-cheatrange:
+.. _debugger-command-cheatrange:
 
 cheatrange
 ----------
 
-|  **cheatrange <address>,<length>**
-|
-| The cheatrange command adds the selected memory area to the cheat search.
-|
-| Before using cheatrange it is necessary to initialize the cheat search with cheatinit.
-|
-| Examples:
-|
-|  cheatrange 0x1000,0x10
-|
-| Add the bytes from 0x1000 to 0x1010 to the cheat search.
-|
-| Back to :ref:`debugger-cheats-list`
+**cheatrange <address>,<length>**
+
+Add writable RAM areas to the cheat search.  May be abbreviated to
+``cr``.  Before using this command, the
+:ref:`cheatinit command <debugger-command-cheatinit>` must be used to
+initialize the cheat search and set the address space and data format.
+
+The **<address>** specifies the address to start searching from, and the
+**<length>** specifies how much memory to search.  Writable RAM in the
+range **<address>** through **<address>+<length>-1**, inclusive, will be
+added to the areas to search.
+
+Examples:
+
+``cheatrange 0x1000,0x10``
+    Add addresses 0x1000-0x100f to the areas to search for cheats.
+
+Back to :ref:`debugger-cheats-list`
 
 
- .. _debugger-command-cheatnext:
+.. _debugger-command-cheatnext:
 
 cheatnext
 ---------
 
-|  **cheatnext <condition>[,<comparisonvalue>]**
-|
-| The cheatnext command will make comparisons with the last search matches.
-|
-| Possible <condition>:
-|
-|  **all**
-|
-| No <comparisonvalue> needed.
-|
-| Use to update the last value without changing the current matches.
-|
-|  **equal [eq]**
-|
-| Without <comparisonvalue> search for all bytes that are equal to the last search.
-| With <comparisonvalue> search for all bytes that are equal to the <comparisonvalue>.
-|
-|  **notequal [ne]**
-|
-| Without <comparisonvalue> search for all bytes that are not equal to the last search.
-| With <comparisonvalue> search for all bytes that are not equal to the <comparisonvalue>.
-|
-|  **decrease [de, +]**
-|
-| Without <comparisonvalue> search for all bytes that have decreased since the last search.
-| With <comparisonvalue> search for all bytes that have decreased by the <comparisonvalue> since the last search.
-|
-|  **increase [in, -]**
-|
-| Without <comparisonvalue> search for all bytes that have increased since the last search.
-| With <comparisonvalue> search for all bytes that have increased by the <comparisonvalue> since the last search.
-|
-|  **decreaseorequal [deeq]**
-|
-| No <comparisonvalue> needed.
-|
-| Search for all bytes that have decreased or have same value since the last search.
-|
-|  **increaseorequal [ineq]**
-|
-| No <comparisonvalue> needed.
-|
-| Search for all bytes that have decreased or have same value since the last search.
-|
-|  **smallerof [lt]**
-|
-| Without <comparisonvalue> this condition is invalid
-| With <comparisonvalue> search for all bytes that are smaller than the <comparisonvalue>.
-|
-|  **greaterof [gt]**
-|
-| Without <comparisonvalue> this condition is invalid
-| With <comparisonvalue> search for all bytes that are larger than the <comparisonvalue>.
-|
-|  **changedby [ch, ~]**
-|
-| Without <comparisonvalue> this condition is invalid
-| With <comparisonvalue> search for all bytes that have changed by the <comparisonvalue> since the last search.
-|
-|
-| Examples:
-|
-|  cheatnext increase
-|
-| Search for all bytes that have increased since the last search.
-|
-|  cheatnext decrease, 1
-|
-| Search for all bytes that have decreased by 1 since the last search.
-|
-| Back to :ref:`debugger-cheats-list`
+**cheatnext <condition>[,<comparisonvalue>]**
+
+Filter candidates by comparing to the previous search values.  If five
+or fewer candidates remain, they will be shown in the debugger console.
+May be abbreviated to ``cn``.
+
+Possible **<condition>** arguments:
+
+``all``
+    Use to update the last value without changing the current matches
+    (the **<comparisonvalue>** is not used).
+``equal`` (``eq``)
+    Without **<comparisonvalue>**, search for values that are equal to
+    the previous search; with **<comparisonvalue>**, search for values
+    that are equal to the **<comparisonvalue>**.
+``notequal`` (``ne``)
+    Without **<comparisonvalue>**, search for values that are not equal
+    to the previous search; with **<comparisonvalue>**, search for
+    values that are not equal to the **<comparisonvalue>**.
+``decrease`` (``de``, ``-``)
+    Without **<comparisonvalue>**, search for values that have decreased
+    since the previous search; with **<comparisonvalue>**, search for
+    values that have decreased by the **<comparisonvalue>** since the
+    previous search.
+``increase`` (``in``, ``+``)
+    Without **<comparisonvalue>**, search for values that have increased
+    since the previous search; with **<comparisonvalue>**, search for
+    values that have increased by the **<comparisonvalue>** since the
+    previous search.
+``decreaseorequal`` (``deeq``)
+    Search for values that have decreased or are unchanged since the
+    previous search (the **<comparisonvalue>** is not used).
+``increaseorequal`` (``ineq``)
+    Search for values that have increased or are unchanged since the
+    previous search (the **<comparisonvalue>** is not used).
+``smallerof`` (``lt``, ``<``)
+    Search for values that are less than the **<comparisonvalue>** (the
+    **<comparisonvalue>** is required).
+``greaterof`` (``gt``, ``>``)
+    Search for values that are greater than the **<comparisonvalue>**
+    (the **<comparisonvalue>** is required).
+``changedby`` (``ch``, ``~``)
+    Search for values that have changed by the **<comparisonvalue>**
+    since the previous search (the **<comparisonvalue>** is required).
+
+Examples:
+
+``cheatnext increase``
+    Search for all values that have increased since the previous search.
+``cheatnext decrease,1``
+    Search for all values that have decreased by 1 since the previous
+    search.
+
+Back to :ref:`debugger-cheats-list`
 
 
  .. _debugger-command-cheatnextf:
@@ -148,120 +195,100 @@ cheatnext
 cheatnextf
 ----------
 
-|  **cheatnextf <condition>[,<comparisonvalue>]**
-|
-| The cheatnextf command will make comparisons with the initial search.
-|
-| Possible <condition>:
-|
-|  **all**
-|
-| No <comparisonvalue> needed.
-|
-| Use to update the last value without changing the current matches.
-|
-|  **equal [eq]**
-|
-| Without <comparisonvalue> search for all bytes that are equal to the initial search.
-| With <comparisonvalue> search for all bytes that are equal to the <comparisonvalue>.
-|
-|  **notequal [ne]**
-|
-| Without <comparisonvalue> search for all bytes that are not equal to the initial search.
-| With <comparisonvalue> search for all bytes that are not equal to the <comparisonvalue>.
-|
-|  **decrease [de, +]**
-|
-| Without <comparisonvalue> search for all bytes that have decreased since the initial search.
-| With <comparisonvalue> search for all bytes that have decreased by the <comparisonvalue> since the initial search.
-|
-|  **increase [in, -]**
-|
-| Without <comparisonvalue> search for all bytes that have increased since the initial search.
-|
-| With <comparisonvalue> search for all bytes that have increased by the <comparisonvalue> since the initial search.
-|
-|  **decreaseorequal [deeq]**
-|
-| No <comparisonvalue> needed.
-|
-| Search for all bytes that have decreased or have same value since the initial search.
-|
-|  **increaseorequal [ineq]**
-|
-| No <comparisonvalue> needed.
-|
-| Search for all bytes that have decreased or have same value since the initial search.
-|
-|  **smallerof [lt]**
-|
-| Without <comparisonvalue> this condition is invalid.
-| With <comparisonvalue> search for all bytes that are smaller than the <comparisonvalue>.
-|
-|  **greaterof [gt]**
-|
-| Without <comparisonvalue> this condition is invalid.
-| With <comparisonvalue> search for all bytes that are larger than the <comparisonvalue>.
-|
-|  **changedby [ch, ~]**
-|
-| Without <comparisonvalue> this condition is invalid
-| With <comparisonvalue> search for all bytes that have changed by the <comparisonvalue> since the initial search.
-|
-|
-| Examples:
-|
-|  cheatnextf increase
-|
-| Search for all bytes that have increased since the initial search.
-|
-|  cheatnextf decrease, 1
-|
-| Search for all bytes that have decreased by 1 since the initial search.
-|
-| Back to :ref:`debugger-cheats-list`
+**cheatnextf <condition>[,<comparisonvalue>]**
+
+Filter candidates by comparing to the initial search values.  If five or
+fewer candidates remain, they will be shown in the debugger console.
+May be abbreviated to ``cn``.
+
+Possible **<condition>** arguments:
+
+``all``
+    Use to update the last value without changing the current matches
+    (the **<comparisonvalue>** is not used).
+``equal`` (``eq``)
+    Without **<comparisonvalue>**, search for values that are equal to
+    the initial search; with **<comparisonvalue>**, search for values
+    that are equal to the **<comparisonvalue>**.
+``notequal`` (``ne``)
+    Without **<comparisonvalue>**, search for values that are not equal
+    to the initial search; with **<comparisonvalue>**, search for values
+    that are not equal to the **<comparisonvalue>**.
+``decrease`` (``de``, ``-``)
+    Without **<comparisonvalue>**, search for values that have decreased
+    since the initial search; with **<comparisonvalue>**, search for
+    values that have decreased by the **<comparisonvalue>** since the
+    initial search.
+``increase`` (``in``, ``+``)
+    Without **<comparisonvalue>**, search for values that have increased
+    since the initial search; with **<comparisonvalue>**, search for
+    values that have increased by the **<comparisonvalue>** since the
+    initial search.
+``decreaseorequal`` (``deeq``)
+    Search for values that have decreased or are unchanged since the
+    initial search (the **<comparisonvalue>** is not used).
+``increaseorequal`` (``ineq``)
+    Search for values that have increased or are unchanged since the
+    initial search (the **<comparisonvalue>** is not used).
+``smallerof`` (``lt``, ``<``)
+    Search for values that are less than the **<comparisonvalue>** (the
+    **<comparisonvalue>** is required).
+``greaterof`` (``gt``, ``>``)
+    Search for values that are greater than the **<comparisonvalue>**
+    (the **<comparisonvalue>** is required).
+``changedby`` (``ch``, ``~``)
+    Search for values that have changed by the **<comparisonvalue>**
+    since the initial search (the **<comparisonvalue>** is required).
+
+Examples:
+
+``cheatnextf increase``
+    Search for all values that have increased since the initial search.
+``cheatnextf decrease,1``
+    Search for all values that have decreased by 1 since the initial
+    search.
+
+Back to :ref:`debugger-cheats-list`
 
 
- .. _debugger-command-cheatlist:
+.. _debugger-command-cheatlist:
 
 cheatlist
 ---------
 
-|  **cheatlist [<filename>]**
-|
-| Without <filename> show the list of matches in the debug console.
-| With <filename> save the list of matches in basic XML format to <filename>.
-|
-| Examples:
-|
-|  cheatlist
-|
-| Show the current matches in the debug console.
-|
-|  cheatlist cheat.txt
-|
-| Save the current matches in XML format to cheat.txt.
-|
-| Back to :ref:`debugger-cheats-list`
+**cheatlist [<filename>]**
+
+Without **<filename>**, show the current cheat matches in the debugger
+console; with **<filename>**, save the current cheat matches in basic
+XML format to the specified file.  May be abbreviated to ``cl``.
+
+Examples:
+
+``cheatlist``
+    Show the current matches in the console.
+``cheatlist cheat.xml``
+    Save the current matches to the file **cheat.xml** in XML format.
+
+Back to :ref:`debugger-cheats-list`
 
 
- .. _debugger-command-cheatundo:
+.. _debugger-command-cheatundo:
 
 cheatundo
 ---------
 
-|  **cheatundo**
-|
-| Undo the results of the last search.
-|
-| The undo command has no effect on the last value.
-|
-|
-| Examples:
-|
-|  cheatundo
-|
-| Undo the last search (state only).
-|
-| Back to :ref:`debugger-cheats-list`
+**cheatundo**
 
+Undo filtering of cheat candidates by the most recent
+:ref:`cheatnext <debugger-command-cheatnext>` or
+:ref:`cheatnextf <debugger-command-cheatnextf>` command.  Note that the
+previous values *are not* rolled back.  May be abbreviated to ``cu``.
+
+Examples:
+
+``cheatundo``
+    Restore cheat candidates filtered out by the most recent
+    :ref:`cheatnext <debugger-command-cheatnext>` or
+    :ref:`cheatnextf <debugger-command-cheatnextf>` command.
+
+Back to :ref:`debugger-cheats-list`

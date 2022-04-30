@@ -36,12 +36,12 @@
 #include "machine/ram.h"
 #include "machine/victor9k_kb.h"
 #include "machine/victor9k_fdc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "sound/hc55516.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #define I8088_TAG       "8l"
@@ -122,20 +122,18 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER( via1_pa_w );
+	void via1_pa_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( write_nfrd );
 	DECLARE_WRITE_LINE_MEMBER( write_ndac );
-	DECLARE_WRITE8_MEMBER( via1_pb_w );
+	void via1_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( via1_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( codec_vol_w );
 
-	DECLARE_WRITE8_MEMBER( via2_pa_w );
-	DECLARE_WRITE8_MEMBER( via2_pb_w );
-	DECLARE_WRITE_LINE_MEMBER( write_ria );
-	DECLARE_WRITE_LINE_MEMBER( write_rib );
+	void via2_pa_w(uint8_t data);
+	void via2_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( via2_irq_w );
 
-	DECLARE_WRITE8_MEMBER( via3_pb_w );
+	void via3_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( via3_irq_w );
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
@@ -306,7 +304,7 @@ MC6845_UPDATE_ROW( victor9k_state::crtc_update_row )
 				color = palette[pen];
 			}
 
-			bitmap.pix32(vbp + y, x++) = color;
+			bitmap.pix(vbp + y, x++) = color;
 		}
 
 		aa += 2;
@@ -369,7 +367,7 @@ WRITE_LINE_MEMBER( victor9k_state::ssda_sm_dtr_w )
 }
 
 
-WRITE8_MEMBER( victor9k_state::via1_pa_w )
+void victor9k_state::via1_pa_w(uint8_t data)
 {
 	/*
 
@@ -397,7 +395,7 @@ WRITE8_MEMBER( victor9k_state::via1_pa_w )
 	m_centronics->write_data7(BIT(data, 7));
 
 	// IEEE-488
-	m_ieee488->write_dio(data);
+	m_ieee488->host_dio_w(data);
 }
 
 DECLARE_WRITE_LINE_MEMBER( victor9k_state::write_nfrd )
@@ -412,7 +410,7 @@ DECLARE_WRITE_LINE_MEMBER( victor9k_state::write_ndac )
 	m_via1->write_ca2(state);
 }
 
-WRITE8_MEMBER( victor9k_state::via1_pb_w )
+void victor9k_state::via1_pb_w(uint8_t data)
 {
 	/*
 
@@ -454,7 +452,7 @@ WRITE_LINE_MEMBER( victor9k_state::via1_irq_w )
 	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via3_irq || m_fdc_irq);
 }
 
-WRITE8_MEMBER( victor9k_state::via2_pa_w )
+void victor9k_state::via2_pa_w(uint8_t data)
 {
 	/*
 
@@ -479,7 +477,7 @@ void victor9k_state::update_kback()
 	m_kb->kback_w(kback);
 }
 
-WRITE8_MEMBER( victor9k_state::via2_pb_w )
+void victor9k_state::via2_pb_w(uint8_t data)
 {
 	/*
 
@@ -518,20 +516,6 @@ WRITE_LINE_MEMBER( victor9k_state::via2_irq_w )
 }
 
 
-WRITE_LINE_MEMBER( victor9k_state::write_ria )
-{
-	m_upd7201->ria_w(state);
-	m_via2->write_pa2(state);
-}
-
-
-WRITE_LINE_MEMBER( victor9k_state::write_rib )
-{
-	m_upd7201->rib_w(state);
-	m_via2->write_pa4(state);
-}
-
-
 /*
     bit    description
 
@@ -557,7 +541,7 @@ WRITE_LINE_MEMBER( victor9k_state::write_rib )
     CB2    J5-50
 */
 
-WRITE8_MEMBER( victor9k_state::via3_pb_w )
+void victor9k_state::via3_pb_w(uint8_t data)
 {
 	// codec clock output
 	m_ssda->rx_clk_w(!BIT(data, 7));
@@ -747,19 +731,19 @@ void victor9k_state::victor9k(machine_config &config)
 	m_ssda->sm_dtr_callback().set(FUNC(victor9k_state::ssda_sm_dtr_w));
 	m_ssda->irq_callback().set(FUNC(victor9k_state::ssda_irq_w));
 
-	VIA6522(config, m_via1, XTAL(30'000'000)/30);
+	MOS6522(config, m_via1, XTAL(30'000'000)/30);
 	m_via1->readpa_handler().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
 	m_via1->writepa_handler().set(FUNC(victor9k_state::via1_pa_w));
 	m_via1->writepb_handler().set(FUNC(victor9k_state::via1_pb_w));
 	m_via1->cb2_handler().set(FUNC(victor9k_state::codec_vol_w));
 	m_via1->irq_handler().set(FUNC(victor9k_state::via1_irq_w));
 
-	VIA6522(config, m_via2, XTAL(30'000'000)/30);
+	MOS6522(config, m_via2, XTAL(30'000'000)/30);
 	m_via2->writepa_handler().set(FUNC(victor9k_state::via2_pa_w));
 	m_via2->writepb_handler().set(FUNC(victor9k_state::via2_pb_w));
 	m_via2->irq_handler().set(FUNC(victor9k_state::via2_irq_w));
 
-	VIA6522(config, m_via3, XTAL(30'000'000)/30);
+	MOS6522(config, m_via3, XTAL(30'000'000)/30);
 	m_via3->writepb_handler().set(FUNC(victor9k_state::via3_pb_w));
 	m_via3->irq_handler().set(FUNC(victor9k_state::via3_irq_w));
 
@@ -769,18 +753,18 @@ void victor9k_state::victor9k(machine_config &config)
 	m_centronics->select_handler().set(M6522_1_TAG, FUNC(via6522_device::write_pb7));
 
 	RS232_PORT(config, m_rs232a, default_rs232_devices, nullptr);
-	m_rs232a->rxd_handler().set(UPD7201_TAG, FUNC(z80dart_device::rxa_w));
-	m_rs232a->dcd_handler().set(UPD7201_TAG, FUNC(z80dart_device::dcda_w));
-	m_rs232a->ri_handler().set(FUNC(victor9k_state::write_ria));
-	m_rs232a->cts_handler().set(UPD7201_TAG, FUNC(z80dart_device::ctsa_w));
-	m_rs232a->dsr_handler().set(M6522_2_TAG, FUNC(via6522_device::write_pa3));
+	m_rs232a->rxd_handler().set(m_upd7201, FUNC(upd7201_device::rxa_w));
+	m_rs232a->dcd_handler().set(m_upd7201, FUNC(upd7201_device::dcda_w));
+	m_rs232a->ri_handler().set(m_via2, FUNC(via6522_device::write_pa2));
+	m_rs232a->cts_handler().set(m_upd7201, FUNC(upd7201_device::ctsa_w));
+	m_rs232a->dsr_handler().set(m_via2, FUNC(via6522_device::write_pa3));
 
 	RS232_PORT(config, m_rs232b, default_rs232_devices, nullptr);
-	m_rs232b->rxd_handler().set(UPD7201_TAG, FUNC(z80dart_device::rxb_w));
-	m_rs232b->dcd_handler().set(UPD7201_TAG, FUNC(z80dart_device::dcdb_w));
-	m_rs232b->ri_handler().set(FUNC(victor9k_state::write_ria));
-	m_rs232b->cts_handler().set(UPD7201_TAG, FUNC(z80dart_device::ctsb_w));
-	m_rs232b->dsr_handler().set(M6522_2_TAG, FUNC(via6522_device::write_pa5));
+	m_rs232b->rxd_handler().set(m_upd7201, FUNC(upd7201_device::rxb_w));
+	m_rs232b->dcd_handler().set(m_upd7201, FUNC(upd7201_device::dcdb_w));
+	m_rs232b->ri_handler().set(m_via2, FUNC(via6522_device::write_pa4));
+	m_rs232b->cts_handler().set(m_upd7201, FUNC(upd7201_device::ctsb_w));
+	m_rs232b->dsr_handler().set(m_via2, FUNC(via6522_device::write_pa5));
 
 	VICTOR9K_KEYBOARD(config, m_kb, 0);
 	m_kb->kbrdy_handler().set(FUNC(victor9k_state::kbrdy_w));

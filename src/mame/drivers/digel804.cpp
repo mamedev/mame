@@ -79,7 +79,10 @@ public:
 		m_vfd(*this, "vfd"),
 		m_kb(*this, "74c923"),
 		m_rambank(*this, "bankedram"),
-		m_func_leds(*this, "func_led%u", 0U)
+		m_func_leds(*this, "func_led%u", 0U),
+		m_input_led(*this, "input_led"),
+		m_busy_led(*this, "busy_led"),
+		m_error_led(*this, "error_led")
 	{
 	}
 
@@ -91,27 +94,27 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER( op00 );
-	DECLARE_READ8_MEMBER( ip40 );
-	DECLARE_WRITE8_MEMBER( op40 );
-	DECLARE_WRITE8_MEMBER( op41 );
-	DECLARE_WRITE8_MEMBER( op42 );
-	DECLARE_READ8_MEMBER( ip43 );
-	DECLARE_WRITE8_MEMBER( op43 );
-	DECLARE_WRITE8_MEMBER( op43_1_4 );
-	DECLARE_WRITE8_MEMBER( op44 );
-	DECLARE_WRITE8_MEMBER( op45 );
-	DECLARE_READ8_MEMBER( ip46 );
-	DECLARE_WRITE8_MEMBER( op46 );
-	DECLARE_WRITE8_MEMBER( op47 );
-	DECLARE_READ8_MEMBER( acia_rxd_r );
-	DECLARE_WRITE8_MEMBER( acia_txd_w );
-	DECLARE_READ8_MEMBER( acia_status_r );
-	DECLARE_WRITE8_MEMBER( acia_reset_w );
-	DECLARE_READ8_MEMBER( acia_command_r );
-	DECLARE_WRITE8_MEMBER( acia_command_w );
-	DECLARE_READ8_MEMBER( acia_control_r );
-	DECLARE_WRITE8_MEMBER( acia_control_w );
+	void op00(uint8_t data);
+	uint8_t ip40();
+	void op40(uint8_t data);
+	void op41(uint8_t data);
+	void op42(uint8_t data);
+	uint8_t ip43();
+	void op43(uint8_t data);
+	void op43_1_4(uint8_t data);
+	void op44(uint8_t data);
+	void op45(uint8_t data);
+	uint8_t ip46();
+	void op46(uint8_t data);
+	void op47(uint8_t data);
+	uint8_t acia_rxd_r();
+	void acia_txd_w(uint8_t data);
+	uint8_t acia_status_r();
+	void acia_reset_w(uint8_t data);
+	uint8_t acia_command_r();
+	void acia_command_w(uint8_t data);
+	uint8_t acia_control_r();
+	void acia_control_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( da_w );
 
@@ -129,6 +132,9 @@ private:
 	required_memory_bank m_rambank;
 
 	output_finder<16> m_func_leds;
+	output_finder<> m_input_led;
+	output_finder<> m_busy_led;
+	output_finder<> m_error_led;
 
 	// current speaker state for port 45
 	uint8_t m_speaker_state;
@@ -169,6 +175,9 @@ enum { MODE_OFF, MODE_KEY, MODE_REM, MODE_SIM };
 void digel804_state::machine_start()
 {
 	m_func_leds.resolve();
+	m_input_led.resolve();
+	m_busy_led.resolve();
+	m_error_led.resolve();
 
 	save_item(NAME(m_speaker_state));
 	save_item(NAME(m_ram_bank));
@@ -205,19 +214,19 @@ void digel804_state::machine_reset()
 	m_vfd->reset();
 }
 
-READ8_MEMBER( digel804_state::ip40 ) // eprom data bus read
+uint8_t digel804_state::ip40() // eprom data bus read
 {
 	// TODO: would be nice to have a 'fake eprom' here
 	return 0xFF;
 }
 
-WRITE8_MEMBER( digel804_state::op40 ) // eprom data bus write
+void digel804_state::op40(uint8_t data) // eprom data bus write
 {
 	// TODO: would be nice to have a 'fake eprom' here
 	logerror("Digel804: port 40, eprom databus had %02X written to it!\n", data);
 }
 
-WRITE8_MEMBER( digel804_state::op41 ) // eprom address low write AND SIM write, d6 also controls memory map somehow
+void digel804_state::op41(uint8_t data) // eprom address low write AND SIM write, d6 also controls memory map somehow
 {
 	// TODO: would be nice to have a 'fake eprom' here
 	logerror("Digel804: port 41, eprom address low/sim/memorybank had %02X written to it!\n", data);
@@ -225,13 +234,13 @@ WRITE8_MEMBER( digel804_state::op41 ) // eprom address low write AND SIM write, 
 	m_op41 = data;
 }
 
-WRITE8_MEMBER( digel804_state::op42 ) // eprom address hi and control write
+void digel804_state::op42(uint8_t data) // eprom address hi and control write
 {
 	// TODO: would be nice to have a 'fake eprom' here
 	logerror("Digel804: port 42, eprom address hi/control had %02X written to it!\n", data);
 }
 
-READ8_MEMBER( digel804_state::ip43 )
+uint8_t digel804_state::ip43()
 {
 	/* Register 0x43: status/mode register read
 	 bits 76543210
@@ -274,13 +283,13 @@ READ8_MEMBER( digel804_state::ip43 )
 
 }
 
-WRITE8_MEMBER( digel804_state::op00 )
+void digel804_state::op00(uint8_t data)
 {
 	m_ram_bank = data;
 	m_rambank->set_base(m_ram->pointer() + ((m_ram_bank * 0x8000) & m_ram->mask()));
 }
 
-WRITE8_MEMBER( digel804_state::op43 )
+void digel804_state::op43(uint8_t data)
 {
 	/* writes to 0x43 control the ram banking on firmware which supports it
 	 * bits:76543210
@@ -301,12 +310,12 @@ WRITE8_MEMBER( digel804_state::op43 )
 	m_rambank->set_base(m_ram->pointer() + ((m_ram_bank * 0x8000) & m_ram->mask()));
 }
 
-WRITE8_MEMBER( digel804_state::op43_1_4 )
+void digel804_state::op43_1_4(uint8_t data)
 {
 	m_overload_state = 0; // writes to port 43 clear overload state
 }
 
-WRITE8_MEMBER( digel804_state::op44 ) // state write
+void digel804_state::op44(uint8_t data) // state write
 {
 	/* writes to 0x44 control the 10937 vfd chip, z80 power/busrq, eprom driving and some eprom power ctl lines
 	 * bits:76543210
@@ -331,7 +340,7 @@ WRITE8_MEMBER( digel804_state::op44 ) // state write
 	m_vfd->sclk(data&1);
 }
 
-WRITE8_MEMBER( digel804_state::op45 ) // speaker write
+void digel804_state::op45(uint8_t data) // speaker write
 {
 	// all writes to here invert the speaker state, verified from schematics
 #ifdef PORT45_W_VERBOSE
@@ -341,7 +350,7 @@ WRITE8_MEMBER( digel804_state::op45 ) // speaker write
 	m_speaker->level_w(m_speaker_state);
 }
 
-READ8_MEMBER( digel804_state::ip46 ) // keypad read
+uint8_t digel804_state::ip46() // keypad read
 {
 	/* reads E* for a keypad number 0-F
 	 * reads F0 for enter
@@ -361,7 +370,7 @@ READ8_MEMBER( digel804_state::ip46 ) // keypad read
 	return bitswap<8>(kbd,7,6,5,4,1,0,3,2);   // verified from schematics
 }
 
-WRITE8_MEMBER( digel804_state::op46 )
+void digel804_state::op46(uint8_t data)
 {
 	/* writes to 0x46 control the LEDS on the front panel
 	 * bits:76543210
@@ -377,15 +386,15 @@ WRITE8_MEMBER( digel804_state::op46 )
 		//popmessage("LEDS: %s %s %s Func: %s%d\n", (data&0x80)?"INPUT":"-----", (data&0x40)?"BUSY":"----", (data&0x20)?"ERROR":"-----", (data&0x10)?"None":"", (data&0x10)?-1:(~data&0xF));
 		//fprintf("LEDS: %s %s %s Func: %s%d\n", (data&0x80)?"INPUT":"-----", (data&0x40)?"BUSY":"----", (data&0x20)?"ERROR":"-----", (data&0x10)?"None":"", (data&0x10)?-1:(~data&0xF));
 
-	output().set_value("input_led", BIT(data,7));
-	output().set_value("busy_led",  BIT(data,6));
-	output().set_value("error_led", BIT(data,5));
+	m_input_led = BIT(data,7);
+	m_busy_led  = BIT(data,6);
+	m_error_led = BIT(data,5);
 
 	for (int i = 0; i < 16; i++)
 		m_func_leds[i] = (!(data & 0x10) && ((~data & 0x0f) == i)) ? 1 : 0;
 }
 
-WRITE8_MEMBER( digel804_state::op47 ) // eprom timing/power and control write
+void digel804_state::op47(uint8_t data) // eprom timing/power and control write
 {
 	// TODO: would be nice to have a 'fake eprom' here
 	logerror("Digel804: port 47, eprom timing/power and control had %02X written to it!\n", data);
@@ -422,44 +431,44 @@ INPUT_CHANGED_MEMBER( digel804_state::mode_change )
 }
 
 /* ACIA Trampolines */
-READ8_MEMBER( digel804_state::acia_rxd_r )
+uint8_t digel804_state::acia_rxd_r()
 {
 	return m_acia->read(0);
 }
 
-WRITE8_MEMBER( digel804_state::acia_txd_w )
+void digel804_state::acia_txd_w(uint8_t data)
 {
 	m_acia->write(0, data);
 }
 
-READ8_MEMBER( digel804_state::acia_status_r )
+uint8_t digel804_state::acia_status_r()
 {
 	return m_acia->read(1);
 }
 
-WRITE8_MEMBER( digel804_state::acia_reset_w )
+void digel804_state::acia_reset_w(uint8_t data)
 {
 	m_acia->write(1, data);
 }
 
-READ8_MEMBER( digel804_state::acia_command_r )
+uint8_t digel804_state::acia_command_r()
 {
 	return m_acia->read(2);
 }
 
-WRITE8_MEMBER( digel804_state::acia_command_w )
+void digel804_state::acia_command_w(uint8_t data)
 {
 	data |= 0x08;   // HACK for ep804 remote mode
 
 	m_acia->write(2, data);
 }
 
-READ8_MEMBER( digel804_state::acia_control_r )
+uint8_t digel804_state::acia_control_r()
 {
 	return m_acia->read(3);
 }
 
-WRITE8_MEMBER( digel804_state::acia_control_w )
+void digel804_state::acia_control_w(uint8_t data)
 {
 	m_acia->write(3, data);
 }
@@ -605,7 +614,6 @@ INPUT_PORTS_END
 static DEVICE_INPUT_DEFAULTS_START( digel804_rs232_defaults )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_ODD )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )

@@ -50,18 +50,18 @@ CUSTOM_INPUT_MEMBER(scramble_state::darkplnt_dial_r)
 /* state of the security PAL (6J) */
 
 
-READ8_MEMBER(scramble_state::mariner_protection_1_r )
+uint8_t scramble_state::mariner_protection_1_r()
 {
 	return 7;
 }
 
-READ8_MEMBER(scramble_state::mariner_protection_2_r )
+uint8_t scramble_state::mariner_protection_2_r()
 {
 	return 3;
 }
 
 
-READ8_MEMBER(scramble_state::triplep_pip_r )
+uint8_t scramble_state::triplep_pip_r()
 {
 	logerror("PC %04x: triplep read port 2\n",m_maincpu->pc());
 	if (m_maincpu->pc() == 0x015a) return 0xff;
@@ -69,7 +69,7 @@ READ8_MEMBER(scramble_state::triplep_pip_r )
 	else return 0;
 }
 
-READ8_MEMBER(scramble_state::triplep_pap_r )
+uint8_t scramble_state::triplep_pap_r()
 {
 	logerror("PC %04x: triplep read port 3\n",m_maincpu->pc());
 	if (m_maincpu->pc() == 0x015d) return 0x04;
@@ -85,10 +85,10 @@ void scramble_state::cavelon_banksw()
 	   to keep the CPU core happy at the boundaries */
 
 	m_cavelon_bank = !m_cavelon_bank;
-	membank("bank1")->set_entry(m_cavelon_bank);
+	m_cavelon_bank_object->set_entry(m_cavelon_bank);
 }
 
-READ8_MEMBER(scramble_state::cavelon_banksw_r )
+uint8_t scramble_state::cavelon_banksw_r(offs_t offset)
 {
 	cavelon_banksw();
 
@@ -100,7 +100,7 @@ READ8_MEMBER(scramble_state::cavelon_banksw_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER(scramble_state::cavelon_banksw_w )
+void scramble_state::cavelon_banksw_w(offs_t offset, uint8_t data)
 {
 	cavelon_banksw();
 
@@ -111,12 +111,12 @@ WRITE8_MEMBER(scramble_state::cavelon_banksw_w )
 }
 
 
-READ8_MEMBER(scramble_state::hunchbks_mirror_r )
+uint8_t scramble_state::hunchbks_mirror_r(address_space &space, offs_t offset)
 {
 	return space.read_byte(0x1000+offset);
 }
 
-WRITE8_MEMBER(scramble_state::hunchbks_mirror_w )
+void scramble_state::hunchbks_mirror_w(address_space &space, offs_t offset, uint8_t data)
 {
 	space.write_byte(0x1000+offset,data);
 }
@@ -129,13 +129,13 @@ void scramble_state::init_scramble_ppi()
 
 void scramble_state::init_scobra()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa803, 0xa803, write8_delegate(*this, FUNC(scramble_state::scrambold_background_enable_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa803, 0xa803, write8smo_delegate(*this, FUNC(scramble_state::scrambold_background_enable_w)));
 }
 
 #ifdef UNUSED_FUNCTION
 void scramble_state::init_atlantis()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6803, 0x6803, write8_delegate(*this, FUNC(scramble_state::scrambold_background_enable_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6803, 0x6803, write8smo_delegate(*this, FUNC(scramble_state::scrambold_background_enable_w)));
 }
 
 void scramble_state::init_scramble()
@@ -146,14 +146,14 @@ void scramble_state::init_scramble()
 
 void scramble_state::init_stratgyx()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb000, 0xb000, write8_delegate(*this, FUNC(scramble_state::scrambold_background_green_w)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb002, 0xb002, write8_delegate(*this, FUNC(scramble_state::scrambold_background_blue_w)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb00a, 0xb00a, write8_delegate(*this, FUNC(scramble_state::scrambold_background_red_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb000, 0xb000, write8smo_delegate(*this, FUNC(scramble_state::scrambold_background_green_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb002, 0xb002, write8smo_delegate(*this, FUNC(scramble_state::scrambold_background_blue_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb00a, 0xb00a, write8smo_delegate(*this, FUNC(scramble_state::scrambold_background_red_w)));
 }
 
 void scramble_state::init_tazmani2()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb002, 0xb002, write8_delegate(*this, FUNC(scramble_state::scrambold_background_enable_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb002, 0xb002, write8smo_delegate(*this, FUNC(scramble_state::scrambold_background_enable_w)));
 }
 
 void scramble_state::init_tazmaniet()
@@ -178,12 +178,11 @@ void scramble_state::init_tazmaniet()
 void scramble_state::init_mariner()
 {
 	/* extra ROM */
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x5800, 0x67ff, "bank1");
+	m_maincpu->space(AS_PROGRAM).install_rom(0x5800, 0x67ff, memregion("maincpu")->base() + 0x5800);
 	m_maincpu->space(AS_PROGRAM).unmap_write(0x5800, 0x67ff);
-	membank("bank1")->set_base(memregion("maincpu")->base() + 0x5800);
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x9008, 0x9008, read8_delegate(*this, FUNC(scramble_state::mariner_protection_2_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xb401, 0xb401, read8_delegate(*this, FUNC(scramble_state::mariner_protection_1_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x9008, 0x9008, read8smo_delegate(*this, FUNC(scramble_state::mariner_protection_2_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xb401, 0xb401, read8smo_delegate(*this, FUNC(scramble_state::mariner_protection_1_r)));
 
 	/* ??? (it's NOT a background enable) */
 	/*m_maincpu->space(AS_PROGRAM).nop_write(0x6803, 0x6803);*/
@@ -254,12 +253,12 @@ void scramble_state::init_cavelon()
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	/* banked ROM */
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, "bank1");
-	membank("bank1")->configure_entries(0, 2, &ROM[0x00000], 0x10000);
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, m_cavelon_bank_object);
+	m_cavelon_bank_object->configure_entries(0, 2, &ROM[0x00000], 0x10000);
 	cavelon_banksw();
 
 	/* A15 switches memory banks */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8000, 0xffff, read8_delegate(*this, FUNC(scramble_state::cavelon_banksw_r)), write8_delegate(*this, FUNC(scramble_state::cavelon_banksw_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8000, 0xffff, read8sm_delegate(*this, FUNC(scramble_state::cavelon_banksw_r)), write8sm_delegate(*this, FUNC(scramble_state::cavelon_banksw_w)));
 
 	m_maincpu->space(AS_PROGRAM).nop_write(0x2000, 0x2000);  /* ??? */
 	m_maincpu->space(AS_PROGRAM).nop_write(0x3800, 0x3801);  /* looks suspicously like
@@ -271,51 +270,7 @@ void scramble_state::init_cavelon()
 
 void scramble_state::init_darkplnt()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb00a, 0xb00a, write8_delegate(*this, FUNC(scramble_state::darkplnt_bullet_color_w)));
-}
-
-void scramble_state::init_mimonkey()
-{
-	static const uint8_t xortable[16][16] =
-	{
-		{ 0x03,0x03,0x05,0x07,0x85,0x00,0x85,0x85,0x80,0x80,0x06,0x03,0x03,0x00,0x00,0x81 },
-		{ 0x83,0x87,0x03,0x87,0x06,0x00,0x06,0x04,0x02,0x00,0x84,0x84,0x04,0x00,0x01,0x83 },
-		{ 0x82,0x82,0x84,0x02,0x04,0x00,0x00,0x03,0x82,0x00,0x06,0x80,0x03,0x00,0x81,0x07 },
-		{ 0x06,0x06,0x82,0x81,0x85,0x00,0x04,0x07,0x81,0x05,0x04,0x00,0x03,0x00,0x82,0x84 },
-		{ 0x07,0x07,0x80,0x07,0x07,0x00,0x85,0x86,0x00,0x07,0x06,0x04,0x85,0x00,0x86,0x85 },
-		{ 0x81,0x83,0x02,0x02,0x87,0x00,0x86,0x03,0x04,0x06,0x80,0x05,0x87,0x00,0x81,0x81 },
-		{ 0x01,0x01,0x00,0x07,0x07,0x00,0x01,0x01,0x07,0x07,0x06,0x00,0x06,0x00,0x07,0x07 },
-		{ 0x80,0x87,0x81,0x87,0x83,0x00,0x84,0x01,0x01,0x86,0x86,0x80,0x86,0x00,0x86,0x86 },
-		{ 0x03,0x03,0x05,0x07,0x85,0x00,0x85,0x85,0x80,0x80,0x06,0x03,0x03,0x00,0x00,0x81 },
-		{ 0x83,0x87,0x03,0x87,0x06,0x00,0x06,0x04,0x02,0x00,0x84,0x84,0x04,0x00,0x01,0x83 },
-		{ 0x82,0x82,0x84,0x02,0x04,0x00,0x00,0x03,0x82,0x00,0x06,0x80,0x03,0x00,0x81,0x07 },
-		{ 0x06,0x06,0x82,0x81,0x85,0x00,0x04,0x07,0x81,0x05,0x04,0x00,0x03,0x00,0x82,0x84 },
-		{ 0x07,0x07,0x80,0x07,0x07,0x00,0x85,0x86,0x00,0x07,0x06,0x04,0x85,0x00,0x86,0x85 },
-		{ 0x81,0x83,0x02,0x02,0x87,0x00,0x86,0x03,0x04,0x06,0x80,0x05,0x87,0x00,0x81,0x81 },
-		{ 0x01,0x01,0x00,0x07,0x07,0x00,0x01,0x01,0x07,0x07,0x06,0x00,0x06,0x00,0x07,0x07 },
-		{ 0x80,0x87,0x81,0x87,0x83,0x00,0x84,0x01,0x01,0x86,0x86,0x80,0x86,0x00,0x86,0x86 }
-	};
-
-	uint8_t *ROM = memregion("maincpu")->base();
-	int ctr = 0;
-	for (int A = 0; A < 0x4000; A++)
-	{
-		int line = (ctr & 0x07) | ((ctr & 0x200) >> 6);
-		int col = ((ROM[A] & 0x80) >> 4) | (ROM[A] & 0x07);
-		ROM[A] = ROM[A] ^ xortable[line][col];
-		ctr++;
-	}
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa804, 0xa804, write8_delegate(*this, FUNC(scramble_state::scrambold_background_enable_w)));
-}
-
-void scramble_state::init_mimonsco()
-{
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa804, 0xa804, write8_delegate(*this, FUNC(scramble_state::scrambold_background_enable_w)));
-}
-
-void scramble_state::init_mimonscr()
-{
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6804, 0x6804, write8_delegate(*this, FUNC(scramble_state::scrambold_background_enable_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb00a, 0xb00a, write8smo_delegate(*this, FUNC(scramble_state::darkplnt_bullet_color_w)));
 }
 
 
@@ -448,7 +403,7 @@ void scramble_state::init_hustler()
 	{
 		int bits[8];
 		for (int i = 0;i < 8;i++)
-			bits[i] = BIT(A, i);;
+			bits[i] = BIT(A, i);
 
 		uint8_t xormask = 0xff;
 		if (bits[0] ^ bits[1]) xormask ^= 0x01;
@@ -540,12 +495,12 @@ void scramble_state::init_ad2083()
  Harem run-time decryption
 *************************************************************/
 
-WRITE8_MEMBER(scramble_state::harem_decrypt_bit_w)
+void scramble_state::harem_decrypt_bit_w(uint8_t data)
 {
 	m_harem_decrypt_bit = data;
 }
 
-WRITE8_MEMBER(scramble_state::harem_decrypt_clk_w)
+void scramble_state::harem_decrypt_clk_w(uint8_t data)
 {
 	if ((data & 1) && !(m_harem_decrypt_clk & 1))
 	{
@@ -580,7 +535,7 @@ WRITE8_MEMBER(scramble_state::harem_decrypt_clk_w)
 	}
 }
 
-WRITE8_MEMBER(scramble_state::harem_decrypt_rst_w)
+void scramble_state::harem_decrypt_rst_w(uint8_t data)
 {
 	m_harem_decrypt_mode = 0;
 	m_harem_decrypt_count = 0;
@@ -638,6 +593,6 @@ void scramble_state::init_newsin7a()
 //  ROM[0x0067] ^= 0x22;          /* rst $00         - should be push hl - the NMI routine is corrupt in this set, but the IRQ routine bypasses it? intentional? */
 
 	// attempts to access port at c20x instead of 820x in one location, mirror or bitrot?
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc200, 0xc20f, read8_delegate(*this, FUNC(scramble_state::mars_ppi8255_1_r)), write8_delegate(*this, FUNC(scramble_state::mars_ppi8255_1_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc200, 0xc20f, read8sm_delegate(*this, FUNC(scramble_state::mars_ppi8255_1_r)), write8sm_delegate(*this, FUNC(scramble_state::mars_ppi8255_1_w)));
 
 }

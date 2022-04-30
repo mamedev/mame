@@ -1,7 +1,7 @@
-{	"name": "Default Nearest-Neighbor Filter",
+{   "name": "Default Nearest-Neighbor Filter",
 	"author": "Ryan Holtz",
 	"passes": [
-		{	"effect": "misc/blit",
+		{   "effect": "misc/blit",
 			"applytint": true,
 			"name": "Unfiltered Upscale",
 			"input": [

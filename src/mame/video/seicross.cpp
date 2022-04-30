@@ -54,13 +54,13 @@ void seicross_state::seicross_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(seicross_state::videoram_w)
+void seicross_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(seicross_state::colorram_w)
+void seicross_state::colorram_w(offs_t offset, uint8_t data)
 {
 	/* bit 5 of the address is not used for color memory. There is just */
 	/* 512k of memory; every two consecutive rows share the same memory */
@@ -81,7 +81,7 @@ TILE_GET_INFO_MEMBER(seicross_state::get_bg_tile_info)
 	int color = m_colorram[tile_index] & 0x0f;
 	int flags = ((m_colorram[tile_index] & 0x40) ? TILE_FLIPX : 0) | ((m_colorram[tile_index] & 0x80) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 void seicross_state::video_start()

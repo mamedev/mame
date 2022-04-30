@@ -79,7 +79,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 TILE_GET_INFO_MEMBER(ginganin_state::get_bg_tile_info)
 {
 	const u32 code = m_bgrom[2 * tile_index + 0] * 256 + m_bgrom[2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(BG_GFX,
+	tileinfo.set(BG_GFX,
 			code,
 			code >> 12,
 			0);
@@ -95,7 +95,7 @@ TILE_GET_INFO_MEMBER(ginganin_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(ginganin_state::get_fg_tile_info)
 {
 	const u16 code = m_fgram[tile_index];
-	SET_TILE_INFO_MEMBER(FG_GFX,
+	tileinfo.set(FG_GFX,
 			code,
 			code >> 12,
 			0);
@@ -117,7 +117,7 @@ void ginganin_state::fgram_w(offs_t offset, u16 data, u16 mem_mask)
 TILE_GET_INFO_MEMBER(ginganin_state::get_txt_tile_info)
 {
 	const u16 code = m_txtram[tile_index];
-	SET_TILE_INFO_MEMBER(TXT_GFX,
+	tileinfo.set(TXT_GFX,
 			code,
 			code >> 12,
 			0);

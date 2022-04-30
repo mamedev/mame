@@ -160,9 +160,10 @@ void rtc9701_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void rtc9701_device::nvram_read(emu_file &file)
+bool rtc9701_device::nvram_read(util::read_stream &file)
 {
-	file.read(rtc9701_data, 0x200);
+	size_t actual;
+	return !file.read(rtc9701_data, 0x200, actual) && actual == 0x200;
 }
 
 
@@ -171,9 +172,10 @@ void rtc9701_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void rtc9701_device::nvram_write(emu_file &file)
+bool rtc9701_device::nvram_write(util::write_stream &file)
 {
-	file.write(rtc9701_data, 0x200);
+	size_t actual;
+	return !file.write(rtc9701_data, 0x200, actual) && actual == 0x200;
 }
 
 //-------------------------------------------------
@@ -377,7 +379,7 @@ WRITE_LINE_MEMBER( rtc9701_device::set_clock_line )
 					if (cmd_stream_pos>4)
 					{
 						rtc9701_data_pos++;
-						rtc9701_current_data = (rtc9701_current_data << 1) | (m_latch&1);;
+						rtc9701_current_data = (rtc9701_current_data << 1) | (m_latch&1);
 					}
 
 					if (cmd_stream_pos==12)
@@ -438,7 +440,7 @@ WRITE_LINE_MEMBER( rtc9701_device::set_clock_line )
 					if (cmd_stream_pos>12)
 					{
 						rtc9701_data_pos++;
-						rtc9701_current_data = (rtc9701_current_data << 1) | (m_latch&1);;
+						rtc9701_current_data = (rtc9701_current_data << 1) | (m_latch&1);
 					}
 
 					if (cmd_stream_pos==28)

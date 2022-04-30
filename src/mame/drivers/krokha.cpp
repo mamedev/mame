@@ -28,6 +28,7 @@
 
 #include "cpu/i8085/i8085.h"
 #include "sound/spkrdev.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -56,8 +57,8 @@ private:
 
 	void krokha_mem(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(status_callback);
-	DECLARE_WRITE8_MEMBER(speaker_w);
+	void status_callback(uint8_t data);
+	void speaker_w(uint8_t data);
 
 	required_device<i8080_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -65,12 +66,12 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 	required_device<speaker_sound_device> m_speaker;
 
-	int m_speaker_state;
+	int m_speaker_state = 0;
 };
 
 //
 
-WRITE8_MEMBER(krokha_state::status_callback)
+void krokha_state::status_callback(uint8_t data)
 {
 	if (data & i8080_cpu_device::STATUS_INTA)
 	{
@@ -79,7 +80,7 @@ WRITE8_MEMBER(krokha_state::status_callback)
 	}
 }
 
-WRITE8_MEMBER(krokha_state::speaker_w)
+void krokha_state::speaker_w(uint8_t data)
 {
 	m_speaker_state = BIT(data, 1);
 	m_speaker->level_w(m_speaker_state);
@@ -116,22 +117,19 @@ void krokha_state::machine_reset()
 
 uint32_t krokha_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y, ra, gfx;
-	uint16_t chr, ma = 0, x = 0;
-
-	for (y = 0; y < 32; y++)
+	for (uint8_t y = 0; y < 32; y++)
 	{
-		ma = 0xe0 + y;
-		for (ra = 0; ra < 8; ra++)
+		uint16_t ma = 0xe0 + y;
+		for (uint8_t ra = 0; ra < 8; ra++)
 		{
-			for (x = ma; x < ma + 64*32; x += 32)
+			for (uint16_t x = ma; x < ma + 64 * 32; x += 32)
 			{
-				chr = m_p_videoram[x] << 3;
-				gfx = m_p_chargen[chr | ra];
+				uint16_t chr = m_p_videoram[x] << 3;
+				uint8_t gfx = m_p_chargen[chr | ra];
 
 				for (int i = 0; i < 8; i++)
 				{
-					bitmap.pix16(y * 8 + ra, (x - ma) / 4 + i) = BIT(gfx, 7 - i);
+					bitmap.pix(y * 8 + ra, (x - ma) / 4 + i) = BIT(gfx, 7 - i);
 				}
 			}
 		}
@@ -149,9 +147,9 @@ void krokha_state::krokha(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(50);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // XXX
-	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(9*8, (48+9)*8-1, 0*8, 32*8-1);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_size(64 * 8, 32 * 8);
+	m_screen->set_visarea(9 * 8, (48 + 9) * 8 - 1, 0 * 8, 32 * 8 - 1);
 	m_screen->set_screen_update(FUNC(krokha_state::screen_update));
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -172,5 +170,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY        FULLNAME   FLAGS */
-COMP( 1990, krokha,  0,      0,      krokha,  krokha, krokha_state, empty_init, "SKB Kontur",  "Krokha",  0 )
+//    YEAR  NAME     PARENT  MACHINE  INPUT   CLASS         INIT        ROT,   COMPANY        FULLNAME
+GAME( 1990, krokha,  0,      krokha,  krokha, krokha_state, empty_init, ROT0,  "SKB Kontur",  "Krokha",  0 )

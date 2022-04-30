@@ -45,9 +45,9 @@ Chipsets (VIA Pro133A):
 - VT82C694X Northbridge
 - VT82C686A Southbridge
 
-Note: Not only a beefed up Quicksilver II but acts like a normal PC. You get the normal bios startup, a Windows 2000 startup sequence and
-then the game launcher starts. Another difference is the storage device has a copy protection scheme that "locks" the storage device to the
-motherboard's serial number. If a drive doesn't match the motherboard's serial number, the game launcher will give an error.
+Note: Entirely different motherboard/chipset hardware (most likely needs its own driver). This game's storage device has a
+copy protection scheme that "locks" the storage device to the motherboard's serial number. If a drive doesn't match the
+motherboard's serial number, the game launcher will give an error.
 
 I/O boards:
 
@@ -90,9 +90,10 @@ Notes:
     JP10: 9 pin connector for coin meter
     JP11: 2 pin connector for watchdog reset
     JP12: connector for development use, not used
-    JP13-15: connectors, not used
+    JP13-14: connectors, not used
+    JP15: Alternate serial port
     JP16: Power connector
-    P1: DB9 RS-232 port to computer
+    P1: DB9 serial port to computer
     Q2: ULN2064B Darlington Transistor
     S1: Dip Switches (8).
          S1-3: *Off: Game Mode, On: Test Mode
@@ -100,11 +101,11 @@ Notes:
          S1-8: Off: Watchdog Disabled, *On: Watchdog Enabled
     U1: Texas Instruments LS85A Logic Gate
     U2-3: EL244CS Amplifier
-    U4: 109B Instrumentation Amplifier
+    U4: LTC1098 8-bit Serial A/D converter
     U5: PC16550DV UART Interface IC
     U6: Motorola MC74HC273A Octal D Flip-Flop (LS273 based)
     U7: DS14185WM RS-232 Interface IC
-    U8: CY7C63513-PVC 8-bit RISC Microcontroller
+    U8: CY7C63513-PVC 8-bit RISC Microcontroller @12MHz (6MHz OSC)
     U10: Atmel 24C01A Serial EEPROM
     U12: MAX707CSA Supervisory Circuit
     Y2: Crystal/XTAL 6.000 MHz
@@ -157,13 +158,13 @@ Notes:
     JP20: connector for development use, not used
     JP21: 2 pin connector for watchdog reset
     JP22: 9 pin connector for coin meter
-    JP23: Alternate RS232 port
+    JP23: Alternate serial port
     JP24: connector, not used
-    P1: DB9 RS-232 port to computer
+    P1: DB9 serial port to computer
     Q4: ULN2064B Darlington Transistor
     S1: Dip Switches (8)
          S1-7: *Off: UART, On: USB
-         S1-8: Off: Watchdog Disabled, *On: Watchdog Enabled
+         S1-8: *Off: Watchdog Enabled, On: Watchdog Disabled
     S2: Dip Switches (8), all set to "off"
     U1: LS85A Logic Gate
     U2-3: EL244CS Amplifier
@@ -172,14 +173,13 @@ Notes:
     U11: ADC0834 Serial I/O Converter
     U12-15: HC541 Octal Buffer
     U17: Atmel 24C01A Serial EEPROM
-    U18: CY7C63513-PVC 8-bit RISC Microcontroller
+    U18: CY7C63513-PVC 8-bit RISC Microcontroller @12MHz (6MHz OSC)
     U19: DS14185WM RS-232 Interface IC
     U20: PC16550DV UART Interface IC
-    U21: Oscilator 3.6864 MHz
+    U21: Oscillator 3.6864 MHz
     U22: HC04 Hex Inverter
     Y1: Crystal/XTAL 6.000 MHz
 
-(Incomplete)
 MIDWAY GAMES INC.
 SUBSTITUTE MAGICBUS
 5770-16367-02
@@ -223,24 +223,25 @@ Notes:
     JP20: connector for development use, not used
     JP21: 2 pin connector for watchdog reset
     JP22: 9 pin connector for coin meter
-    JP23: Alternate RS232 port
+    JP23: Alternate serial port
     JP24: connector, not used
-    P1: DB9 RS-232 port to computer
+    P1: DB9 serial port to computer
     S1: Dip Switches (8)
     S1: Dip Switches (8)
          S1-7: *Off: UART, On: USB
-         S1-8: Off: Watchdog Disabled, *On: Watchdog Enabled
+         S1-8: *Off: Watchdog Enabled, On: Watchdog Disabled
     S2: Dip Switches (8)
     U4-5: MC74HC273A Octal D Flip-Flop (LS273 based)
-    U6: Not known yet
-    U7/U11: Atmel 24C01A Serial EEPROM
-    U8: MAX707CSA Supervisory Circuit
+    U6: 74HC04D Hex inverter
+    U7: MAX707CSA Supervisory Circuit
+    U8: MAX765CSA Switching Voltage Regulator
+    U11: Atmel 24C01A Serial EEPROM
     U12-19: HC541 Octal Buffer
-    U20: Philips P87C51/2 8-bit Microcontroller
+    U20: 87C552 8-bit Microcontroller (Intel MCS-51 based with a 10-bit A/D converter) @ 16MHz
     U21: DS14185WM RS-232 Interface IC
     U22-24: ULN2064B Darlington Transistor
-    U25: Not known yet
-    Y2: FS14.74 Crystal/Oscilator
+    U25: 74HC367D Hex Buffer/Line Driver
+    Y2: Crystal/XTAL 16.000 MHz
 
 ***************************************************************************/
 
@@ -253,6 +254,9 @@ Notes:
 #include "machine/idectrl.h"
 #include "video/pc_vga.h"
 
+
+namespace {
+
 class midqslvr_state : public pcat_base_state
 {
 public:
@@ -263,6 +267,10 @@ public:
 
 	void midqslvr(machine_config &config);
 	void graphite(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	std::unique_ptr<uint32_t[]> m_bios_ram;
@@ -275,17 +283,15 @@ private:
 	uint8_t m_mtxc_config_reg[256];
 	uint8_t m_piix4_config_reg[4][256];
 
-	DECLARE_WRITE32_MEMBER( isa_ram1_w );
-	DECLARE_WRITE32_MEMBER( isa_ram2_w );
+	void isa_ram1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void isa_ram2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE32_MEMBER( bios_ext1_ram_w );
-	DECLARE_WRITE32_MEMBER( bios_ext2_ram_w );
-	DECLARE_WRITE32_MEMBER( bios_ext3_ram_w );
-	DECLARE_WRITE32_MEMBER( bios_ext4_ram_w );
+	void bios_ext1_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void bios_ext2_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void bios_ext3_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void bios_ext4_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE32_MEMBER( bios_ram_w );
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void intel82439tx_init();
 	void midqslvr_io(address_map &map);
 	void midqslvr_map(address_map &map);
@@ -526,7 +532,7 @@ void midqslvr_state::intel82371ab_pci_w(int function, int reg, uint32_t data, ui
 }
 
 
-WRITE32_MEMBER(midqslvr_state::isa_ram1_w)
+void midqslvr_state::isa_ram1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x5a] & 0x2)      // write to RAM if this region is write-enabled
 	{
@@ -534,7 +540,7 @@ WRITE32_MEMBER(midqslvr_state::isa_ram1_w)
 	}
 }
 
-WRITE32_MEMBER(midqslvr_state::isa_ram2_w)
+void midqslvr_state::isa_ram2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x5a] & 0x2)      // write to RAM if this region is write-enabled
 	{
@@ -542,7 +548,7 @@ WRITE32_MEMBER(midqslvr_state::isa_ram2_w)
 	}
 }
 
-WRITE32_MEMBER(midqslvr_state::bios_ext1_ram_w)
+void midqslvr_state::bios_ext1_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x5e] & 0x2)      // write to RAM if this region is write-enabled
 	{
@@ -551,7 +557,7 @@ WRITE32_MEMBER(midqslvr_state::bios_ext1_ram_w)
 }
 
 
-WRITE32_MEMBER(midqslvr_state::bios_ext2_ram_w)
+void midqslvr_state::bios_ext2_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x5e] & 0x20)     // write to RAM if this region is write-enabled
 	{
@@ -560,7 +566,7 @@ WRITE32_MEMBER(midqslvr_state::bios_ext2_ram_w)
 }
 
 
-WRITE32_MEMBER(midqslvr_state::bios_ext3_ram_w)
+void midqslvr_state::bios_ext3_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x5f] & 0x2)      // write to RAM if this region is write-enabled
 	{
@@ -569,7 +575,7 @@ WRITE32_MEMBER(midqslvr_state::bios_ext3_ram_w)
 }
 
 
-WRITE32_MEMBER(midqslvr_state::bios_ext4_ram_w)
+void midqslvr_state::bios_ext4_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x5f] & 0x20)     // write to RAM if this region is write-enabled
 	{
@@ -578,7 +584,7 @@ WRITE32_MEMBER(midqslvr_state::bios_ext4_ram_w)
 }
 
 
-WRITE32_MEMBER(midqslvr_state::bios_ram_w)
+void midqslvr_state::bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x59] & 0x20)     // write to RAM if this region is write-enabled
 	{
@@ -684,7 +690,11 @@ ROM_START( hydrthnd )
 	ROM_REGION32_LE(0x80000, "bios", 0)
 	ROM_LOAD( "lh28f004sct.u8b1", 0x000000, 0x080000, CRC(ab04a343) SHA1(ba77933400fe470f45ab187bc0d315922caadb12) )
 
-	ROM_REGION( 0x2000, "iocpu", 0 )   /* Diego board CY7C63513-PVC MCU code */
+	ROM_REGION( 0x8000, "video_bios", ROMREGION_ERASEFF ) // TODO: Voodoo 2 has no bios, to be removed once the driver is updated not to look for this region
+//  ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
+//  ROM_CONTINUE(                                 0x0001, 0x4000 )
+
+	ROM_REGION( 0x2000, "iocpu", 0 )   /* Diego board CY7C63513 MCU code */
 	ROM_LOAD( "diego.u8", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
 
 	DISK_REGION( "ide:0:hdd:image" )
@@ -695,7 +705,11 @@ ROM_START( offrthnd )
 	ROM_REGION32_LE(0x80000, "bios", 0)
 	ROM_LOAD( "lh28f004sct.u8b1", 0x000000, 0x080000, CRC(ab04a343) SHA1(ba77933400fe470f45ab187bc0d315922caadb12) )
 
-	ROM_REGION( 0x2000, "iocpu", 0 )   /* Magicbus board CY7C63513-PVC MCU code */
+	ROM_REGION( 0x8000, "video_bios", ROMREGION_ERASEFF ) // TODO: Voodoo 2 has no bios, to be removed once the driver is updated not to look for this region
+//  ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
+//  ROM_CONTINUE(                                 0x0001, 0x4000 )
+
+	ROM_REGION( 0x2000, "iocpu", 0 )   /* Magicbus board CY7C63513 MCU code */
 	ROM_LOAD( "magicbus.u18", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
 
 	DISK_REGION( "ide:0:hdd:image" )
@@ -706,8 +720,12 @@ ROM_START( arctthnd )
 	ROM_REGION32_LE(0x80000, "bios", ROMREGION_ERASEFF)
 	ROM_LOAD( "m29f002bt.u6", 0x040000, 0x040000, CRC(012c9290) SHA1(cdee6f19d5e5ea5bb1dd6a5ec397ac70b3452790) )
 
-	ROM_REGION( 0x2000, "iocpu", 0 )   /* Substitute board P87C51/2 MCU code */
-	ROM_LOAD( "substitute.u20", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
+	ROM_REGION( 0x8000, "video_bios", ROMREGION_ERASEFF ) // TODO: Voodoo 2 has no bios, to be removed once the driver is updated not to look for this region
+//  ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
+//  ROM_CONTINUE(                                 0x0001, 0x4000 )
+
+	ROM_REGION( 0x2000, "iocpu", 0 )   /* Substitute board 87C552 MCU code */
+	ROM_LOAD( "87c552.bin", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "arctthnd", 0,  SHA1(f4373e57c3f453ac09c735b5d8d99ff811416a23) )
@@ -717,8 +735,12 @@ ROM_START( ultarctc )
 	ROM_REGION32_LE(0x80000, "bios", ROMREGION_ERASEFF)
 	ROM_LOAD( "m29f002bt.u6", 0x040000, 0x040000, CRC(012c9290) SHA1(cdee6f19d5e5ea5bb1dd6a5ec397ac70b3452790) )
 
-	ROM_REGION( 0x2000, "iocpu", 0 )   /* Substitute board P87C51/2 MCU code */
-	ROM_LOAD( "substitute.u20", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
+	ROM_REGION( 0x8000, "video_bios", ROMREGION_ERASEFF ) // TODO: Voodoo 2 has no bios, to be removed once the driver is updated not to look for this region
+//  ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
+//  ROM_CONTINUE(                                 0x0001, 0x4000 )
+
+	ROM_REGION( 0x2000, "iocpu", 0 )   /* Substitute board 87C552 MCU code */
+	ROM_LOAD( "87c552.bin", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "uarctict", 0, SHA1(8557a1d7ae8dc41c879350cb1c228f4c27a0dd09) )
@@ -731,8 +753,12 @@ ROM_START( ultarctcup )
 	ROM_REGION32_LE(0x80000, "bios", ROMREGION_ERASEFF)
 	ROM_LOAD( "m29f002bt.u6", 0x040000, 0x040000, CRC(012c9290) SHA1(cdee6f19d5e5ea5bb1dd6a5ec397ac70b3452790) )
 
-	ROM_REGION( 0x2000, "iocpu", 0 )   /* Substitute board P87C51/2 MCU code */
-	ROM_LOAD( "substitute.u20", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
+	ROM_REGION( 0x8000, "video_bios", ROMREGION_ERASEFF ) // TODO: Voodoo 2 has no bios, to be removed once the driver is updated not to look for this region
+//  ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
+//  ROM_CONTINUE(                                 0x0001, 0x4000 )
+
+	ROM_REGION( 0x2000, "iocpu", 0 )   /* Substitute board 87C552 MCU code */
+	ROM_LOAD( "87c552.bin", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "uarctict", 0, SHA1(8557a1d7ae8dc41c879350cb1c228f4c27a0dd09) )
@@ -745,12 +771,15 @@ ROM_START( ultarctcup )
 
 ROM_END
 
+} // Anonymous namespace
+
+
 // there are almost certainly multiple versions of these; updates were offered on floppy disk.  The version numbers for the existing CHDs are unknown.
-GAME(1999, hydrthnd,    0,        midqslvr, at_keyboard, midqslvr_state, empty_init, ROT0, "Midway Games", "Hydro Thunder", MACHINE_IS_SKELETON)
+GAME(1999, hydrthnd,    0,        midqslvr, 0, midqslvr_state, empty_init, ROT0, "Midway Games", "Hydro Thunder", MACHINE_IS_SKELETON)
 
-GAME(2000, offrthnd,    0,        midqslvr, at_keyboard, midqslvr_state, empty_init, ROT0, "Midway Games", "Offroad Thunder", MACHINE_IS_SKELETON)
+GAME(2000, offrthnd,    0,        midqslvr, 0, midqslvr_state, empty_init, ROT0, "Midway Games", "Offroad Thunder", MACHINE_IS_SKELETON)
 
-GAME(2001, arctthnd,    0,        graphite, at_keyboard, midqslvr_state, empty_init, ROT0, "Midway Games", "Arctic Thunder (v1.002)", MACHINE_IS_SKELETON)
+GAME(2001, arctthnd,    0,        graphite, 0, midqslvr_state, empty_init, ROT0, "Midway Games", "Arctic Thunder (v1.002)", MACHINE_IS_SKELETON)
 
-GAME(2001, ultarctc,    0,        graphite, at_keyboard, midqslvr_state, empty_init, ROT0, "Midway Games", "Ultimate Arctic Thunder", MACHINE_IS_SKELETON)
-GAME(2004, ultarctcup,  ultarctc, graphite, at_keyboard, midqslvr_state, empty_init, ROT0, "Midway Games", "Ultimate Arctic Thunder Update CD ver 1.950 (5/3/04)", MACHINE_IS_SKELETON)
+GAME(2001, ultarctc,    0,        graphite, 0, midqslvr_state, empty_init, ROT0, "Midway Games", "Ultimate Arctic Thunder", MACHINE_IS_SKELETON)
+GAME(2004, ultarctcup,  ultarctc, graphite, 0, midqslvr_state, empty_init, ROT0, "Midway Games", "Ultimate Arctic Thunder Update CD ver 1.950 (5/3/04)", MACHINE_IS_SKELETON)

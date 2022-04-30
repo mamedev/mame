@@ -61,6 +61,10 @@ void bbc_autocue_device::device_start()
 	/* ram disk - board with 8 x HM62256LFP-12 - 256K expandable to 512K */
 	m_ram = make_unique_clear<uint8_t[]>(0x40000);
 	m_nvram->set_base(m_ram.get(), 0x40000);
+
+	/* register for save states */
+	save_item(NAME(m_ram_page));
+	save_pointer(NAME(m_ram), 0x40000);
 }
 
 
@@ -72,10 +76,9 @@ void bbc_autocue_device::fred_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
-	case 0xff: m_ram_page = (m_ram_page & 0x00ff) | (data << 8); break;
-	case 0xfe: m_ram_page = (m_ram_page & 0xff00) | (data << 0); break;
+	case 0xfe: m_ram_page = (m_ram_page & 0x00ff) | (data << 8); break;
+	case 0xff: m_ram_page = (m_ram_page & 0xff00) | (data << 0); break;
 	}
-	//logerror("Write ram_page=%04x\n", m_ram_page);
 }
 
 uint8_t bbc_autocue_device::jim_r(offs_t offset)
@@ -86,13 +89,12 @@ uint8_t bbc_autocue_device::jim_r(offs_t offset)
 	{
 		data = m_ram[(m_ram_page << 8) | offset];
 	}
-	//logerror("Read %04x -> %02x\n", offset | 0xfd00, data);
+
 	return data;
 }
 
 void bbc_autocue_device::jim_w(offs_t offset, uint8_t data)
 {
-	//logerror("Write %04x <- %02x\n", offset | 0xfd00, data);
 	if (m_ram_page < 0x400)
 	{
 		m_ram[(m_ram_page << 8) | offset] = data;

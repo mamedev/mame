@@ -34,8 +34,8 @@ protected:
 
 	class memory_interface {
 	public:
-		address_space *m_program, *m_sprogram;
-		memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache, *m_scache;
+		memory_access<16, 0, 0, ENDIANNESS_BIG>::cache cprogram, csprogram;
+		memory_access<16, 0, 0, ENDIANNESS_BIG>::specific program;
 
 		virtual ~memory_interface() {}
 		virtual uint8_t read(uint16_t adr) = 0;
@@ -79,7 +79,7 @@ protected:
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	virtual bool is_6809() { return true; };
+	virtual bool is_6809() { return true; }
 
 	// addressing modes
 	enum
@@ -207,10 +207,12 @@ protected:
 	// read_opcode() and bump the program counter
 	inline uint8_t read_opcode()                           { return read_opcode(m_pc.w++); }
 	inline uint8_t read_opcode_arg()                       { return read_opcode_arg(m_pc.w++); }
+	inline void dummy_read_opcode_arg(uint16_t delta)      { read_opcode_arg(m_pc.w + delta); }
+	inline void dummy_vma(int count)                       { for(int i=0; i != count; i++) { read_opcode_arg(0xffff); } }
 
 	// state stack - implemented as a uint32_t
-	void push_state(uint8_t state)                    { m_state = (m_state << 8) | state; }
-	uint8_t pop_state()                               { uint8_t result = (uint8_t) m_state; m_state >>= 8; return result; }
+	void push_state(uint16_t state)                    { m_state = (m_state << 9) | state; }
+	uint16_t pop_state()                               { uint16_t result = m_state & 0x1ff; m_state >>= 9; return result; }
 	void reset_state()                              { m_state = 0; }
 
 	// effective address reading/writing
@@ -332,5 +334,6 @@ enum
 
 #define M6809_IRQ_LINE  0   /* IRQ line number */
 #define M6809_FIRQ_LINE 1   /* FIRQ line number */
+#define M6809_SWI       2   /* Virtual SWI line to be used during SWI acknowledge cycle */
 
 #endif // MAME_CPU_M6809_M6809_H

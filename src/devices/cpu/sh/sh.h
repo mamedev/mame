@@ -94,7 +94,7 @@ enum
 {
 	SH4_PC = 1, SH_SR, SH4_PR, SH4_GBR, SH4_VBR, SH4_DBR, SH4_MACH, SH4_MACL,
 	SH4_R0, SH4_R1, SH4_R2, SH4_R3, SH4_R4, SH4_R5, SH4_R6, SH4_R7,
-	SH4_R8, SH4_R9, SH4_R10, SH4_R11, SH4_R12, SH4_R13, SH4_R14, SH4_R15, SH4_EA
+	SH4_R8, SH4_R9, SH4_R10, SH4_R11, SH4_R12, SH4_R13, SH4_R14, SH4_R15, SH4_EA, SH4_SP
 };
 
 class sh_common_execution : public cpu_device
@@ -385,6 +385,9 @@ public:
 	std::function<u16 (offs_t)> m_pr16;
 	std::function<const void * (offs_t)> m_prptr;
 	address_space *m_program;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::cache m_cache32;
+	memory_access<32, 3, 0, ENDIANNESS_BIG>::cache m_cache64be;
+	memory_access<32, 3, 0, ENDIANNESS_LITTLE>::cache m_cache64le;
 
 	std::unique_ptr<drcuml_state>      m_drcuml;                 /* DRC UML generator state */
 	uint32_t              m_drcoptions;         /* configurable DRC options */
@@ -417,7 +420,7 @@ public:
 		uml::code_label  labelnum;                   /* index for local labels */
 	};
 
-	virtual void sh2_exception(const char *message, int irqline) { fatalerror("sh2_exception in base classs\n"); };
+	virtual void sh2_exception(const char *message, int irqline) { fatalerror("sh2_exception in base classs\n"); }
 
 	virtual void generate_update_cycles(drcuml_block &block, compiler_state &compiler, uml::parameter param, bool allow_exception) = 0;
 

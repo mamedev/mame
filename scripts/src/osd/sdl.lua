@@ -239,21 +239,16 @@ end
 
 BASE_TARGETOS       = "unix"
 SDLOS_TARGETOS      = "unix"
-SDL_NETWORK         = ""
 if _OPTIONS["targetos"]=="linux" then
-	SDL_NETWORK         = "taptun"
 elseif _OPTIONS["targetos"]=="openbsd" then
 elseif _OPTIONS["targetos"]=="netbsd" then
-	SDL_NETWORK         = "pcap"
 elseif _OPTIONS["targetos"]=="haiku" then
 elseif _OPTIONS["targetos"]=="asmjs" then
 elseif _OPTIONS["targetos"]=="windows" then
 	BASE_TARGETOS       = "win32"
 	SDLOS_TARGETOS      = "win32"
-	SDL_NETWORK         = "pcap"
 elseif _OPTIONS["targetos"]=="macosx" then
 	SDLOS_TARGETOS      = "macosx"
-	SDL_NETWORK         = "pcap"
 end
 
 if _OPTIONS["with-bundled-sdl2"]~=nil then
@@ -281,6 +276,7 @@ if BASE_TARGETOS=="unix" then
 		end
 		if _OPTIONS["with-bundled-sdl2"]~=nil then
 			linkoptions {
+				"-framework AudioToolbox",
 				"-framework AudioUnit",
 				"-framework CoreAudio",
 				"-framework Carbon",
@@ -385,12 +381,6 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/sdl",
 	}
 
-	if _OPTIONS["targetos"]=="windows" then
-		files {
-			MAME_DIR .. "src/osd/windows/main.cpp",
-		}
-	end
-
 	if _OPTIONS["targetos"]=="macosx" then
 		files {
 			MAME_DIR .. "src/osd/modules/debugger/debugosx.mm",
@@ -424,6 +414,8 @@ project ("osd_" .. _OPTIONS["osd"])
 			MAME_DIR .. "src/osd/modules/debugger/osx/memoryviewer.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/pointsviewer.mm",
 			MAME_DIR .. "src/osd/modules/debugger/osx/pointsviewer.h",
+			MAME_DIR .. "src/osd/modules/debugger/osx/registerpointsview.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/registerpointsview.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/registersview.mm",
 			MAME_DIR .. "src/osd/modules/debugger/osx/registersview.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/watchpointsview.mm",
@@ -472,6 +464,7 @@ project ("ocore_" .. _OPTIONS["osd"])
 	files {
 		MAME_DIR .. "src/osd/osdcore.cpp",
 		MAME_DIR .. "src/osd/osdcore.h",
+		MAME_DIR .. "src/osd/osdfile.h",
 		MAME_DIR .. "src/osd/strconv.cpp",
 		MAME_DIR .. "src/osd/strconv.h",
 		MAME_DIR .. "src/osd/osdsync.cpp",
@@ -485,7 +478,6 @@ project ("ocore_" .. _OPTIONS["osd"])
 	if BASE_TARGETOS=="unix" then
 		files {
 			MAME_DIR .. "src/osd/modules/file/posixdir.cpp",
-			MAME_DIR .. "src/osd/modules/file/posixdomain.cpp",
 			MAME_DIR .. "src/osd/modules/file/posixfile.cpp",
 			MAME_DIR .. "src/osd/modules/file/posixfile.h",
 			MAME_DIR .. "src/osd/modules/file/posixptty.cpp",

@@ -22,10 +22,10 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
-	virtual DECLARE_READ8_MEMBER(read_io) override;
-	virtual DECLARE_WRITE8_MEMBER(write_io) override;
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_io(offs_t offset) override;
+	virtual void write_io(offs_t offset, uint8_t data) override;
 
 	uint8_t porta_r();
 	uint8_t portb_r();
@@ -79,8 +79,8 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 
 protected:
 	virtual void device_start() override { m_ram.resize(0x4000); save_item(NAME(m_ram)); }
@@ -103,8 +103,8 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 
 protected:
 	virtual void device_start() override { m_ram.resize(0x8000); save_item(NAME(m_ram)); }
@@ -127,8 +127,8 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 
 protected:
 	virtual void device_start() override { m_ram.resize(0xb000); save_item(NAME(m_ram)); }

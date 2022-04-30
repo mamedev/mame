@@ -10,7 +10,7 @@
     Alcon / Slap Fight
     Guardian / Get Star
     Performan
-    Tiger Heli
+    Tiger-Heli
 
   TODO:
   - proper MCU emulation (mame/machine/slapfght.cpp)
@@ -36,7 +36,7 @@ $f000-$f7ff    READ:SF_S16       WRITE:Character RAM
 $f800-$ffff    READ:Unknown H/W  WRITE:Attribute RAM
 
 $c800-$cfff    Appears to be RAM BUT 1st 0x10 bytes are swapped with
-               the sound CPU and visversa for READ OPERATIONS
+               the sound CPU and vice versa for READ OPERATIONS
 
 
 Write I/O MAP
@@ -63,7 +63,7 @@ $0f
 Read I/O Map
 ------------
 
-$00     Status regsiter - cycle 0xc7, 0x55, 0x00  (Thanks to Dave Spicer for the info)
+$00     Status register - cycle 0xc7, 0x55, 0x00  (Thanks to Dave Spicer for the info)
 
 
 Known Info
@@ -210,7 +210,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
   - US version, licensed to Kitkorp - name "Guardian".
   - MCU dumped and emulated.
   - Difficulty determines the number of energy bars you get.
-  - Each hit removes 1 enegy bar.
+  - Each hit removes 1 energy bar.
   - According to the manual, default difficulty shall be set to "Hard".
   - You can only get ONE extra life.
   - I don't know if it's an ingame bug, but you always have to enter
@@ -236,7 +236,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
   - Bootleg based on 'getstarj'
   - MCU reads/writes are patched, but this hasn't been done in the "test mode".
   - The game seems to have its own protection (check code at 0x0569 and 0x0ac6).
-  - Patches are coded diffrently than in 'getstarb1' and code isn't always perfect
+  - Patches are coded differently than in 'getstarb1' and code isn't always perfect
     (lazy coding ?) which causes LOTS of ingames bugs or strange behaviours :
       * patched command 0x20 : NO continue play
       * patched command 0x21 : as soon as a player loses all his lives,
@@ -250,7 +250,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
         (thus the need of a specific INPUT_PORTS definition for this game)
       * patched command 0x2a : player flag (which determines if player 1 or
         player 2 is playing) is NOT updated, causing the following things :
-          . current player score will ALWAYS be dusplayed under player 1
+          . current player score will ALWAYS be displayed under player 1
           . when cabinet is set to "Cocktail", player 2 uses player 1 inputs
       * patched command 0x38 : laser position does NOT change according to
         player position (it ALWATS starts from the middle of the screen)
@@ -394,7 +394,7 @@ WRITE_LINE_MEMBER(slapfght_state::sound_reset_w)
 		m_sound_nmi_enabled = false;
 }
 
-READ8_MEMBER(slapfght_state::vblank_r)
+uint8_t slapfght_state::vblank_r()
 {
 	return m_screen->vblank() ? 1 : 0;
 }
@@ -441,7 +441,7 @@ INTERRUPT_GEN_MEMBER(slapfght_state::sound_nmi)
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE8_MEMBER(slapfght_state::sound_nmi_enable_w)
+void slapfght_state::sound_nmi_enable_w(offs_t offset, uint8_t data)
 {
 	m_sound_nmi_enabled = offset ? false : true;
 }
@@ -789,7 +789,7 @@ void slapfght_state::init_getstarb1()
 	init_banks();
 
 	/* requires this or it gets stuck with 'rom test' on screen */
-	/* it is possible the program roms are slighly corrupt like the gfx roms, or
+	/* it is possible the program roms are slightly corrupt like the gfx roms, or
 	   that the bootleg simply shouldn't execute the code due to the modified roms */
 	/* TODO: find & fix the cause of the following happening. */
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -909,15 +909,9 @@ void slapfght_state::perfrman(machine_config &config)
 	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
-	BUFFERED_SPRITERAM8(config, m_spriteram);
-
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 32*8-1);
+	m_screen->set_raw(36_MHz_XTAL/6, 388, 0, 296, 270, 0, 240);
 	m_screen->set_screen_update(FUNC(slapfght_state::screen_update_perfrman));
-	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	m_screen->screen_vblank().append(FUNC(slapfght_state::vblank_irq));
 	m_screen->set_palette(m_palette);
 
@@ -943,7 +937,7 @@ void slapfght_state::perfrman(machine_config &config)
 void slapfght_state::tigerh(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(36'000'000)/6); // 6MHz
+	Z80(config, m_maincpu, 36_MHz_XTAL/6); // 6MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &slapfght_state::tigerh_map_mcu);
 	m_maincpu->set_addrmap(AS_IO, &slapfght_state::io_map_mcu);
 
@@ -952,7 +946,7 @@ void slapfght_state::tigerh(machine_config &config)
 	mainlatch.q_out_cb<1>().set(FUNC(slapfght_state::flipscreen_w));
 	mainlatch.q_out_cb<3>().set(FUNC(slapfght_state::irq_enable_w));
 
-	Z80(config, m_audiocpu, XTAL(36'000'000)/12); // 3MHz
+	Z80(config, m_audiocpu, 36_MHz_XTAL/12); // 3MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &slapfght_state::tigerh_sound_map);
 	m_audiocpu->set_periodic_int(FUNC(slapfght_state::sound_nmi), attotime::from_hz(360)); // music speed, verified with pcb recording
 
@@ -961,15 +955,9 @@ void slapfght_state::tigerh(machine_config &config)
 	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
-	BUFFERED_SPRITERAM8(config, m_spriteram);
-
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(1*8, 36*8-1, 2*8-1, 32*8-1-1);
+	m_screen->set_raw(36_MHz_XTAL/6, 388, 0, 296, 270, 0, 240);
 	m_screen->set_screen_update(FUNC(slapfght_state::screen_update_slapfight));
-	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	m_screen->screen_vblank().append(FUNC(slapfght_state::vblank_irq));
 	m_screen->set_palette(m_palette);
 
@@ -980,12 +968,12 @@ void slapfght_state::tigerh(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &ay1(AY8910(config, "ay1", XTAL(36'000'000)/24)); // 1.5MHz
+	ay8910_device &ay1(AY8910(config, "ay1", 36_MHz_XTAL/24)); // 1.5MHz
 	ay1.port_a_read_callback().set_ioport("IN0");
 	ay1.port_b_read_callback().set_ioport("IN1");
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	ay8910_device &ay2(AY8910(config, "ay2", XTAL(36'000'000)/24)); // 1.5MHz
+	ay8910_device &ay2(AY8910(config, "ay2", 36_MHz_XTAL/24)); // 1.5MHz
 	ay2.port_a_read_callback().set_ioport("DSW1");
 	ay2.port_b_read_callback().set_ioport("DSW2");
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -1027,7 +1015,7 @@ void slapfght_state::tigerhb4(machine_config &config)
 void slapfght_state::slapfigh(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(36'000'000)/6); // 6MHz
+	Z80(config, m_maincpu, 36_MHz_XTAL/6); // 6MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &slapfght_state::slapfigh_map_mcu);
 	m_maincpu->set_addrmap(AS_IO, &slapfght_state::io_map_mcu);
 
@@ -1037,7 +1025,7 @@ void slapfght_state::slapfigh(machine_config &config)
 	mainlatch.q_out_cb<3>().set(FUNC(slapfght_state::irq_enable_w));
 	mainlatch.q_out_cb<4>().set_membank("bank1");
 
-	Z80(config, m_audiocpu, XTAL(36'000'000)/12); // 3MHz
+	Z80(config, m_audiocpu, 36_MHz_XTAL/12); // 3MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &slapfght_state::tigerh_sound_map);
 	m_audiocpu->set_periodic_int(FUNC(slapfght_state::sound_nmi), attotime::from_hz(180));
 
@@ -1047,15 +1035,9 @@ void slapfght_state::slapfigh(machine_config &config)
 	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
-	BUFFERED_SPRITERAM8(config, m_spriteram);
-
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(1*8, 36*8-1, 2*8-1, 32*8-1-1);
+	m_screen->set_raw(36_MHz_XTAL/6, 388, 0, 296, 270, 0, 240);
 	m_screen->set_screen_update(FUNC(slapfght_state::screen_update_slapfight));
-	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	m_screen->screen_vblank().append(FUNC(slapfght_state::vblank_irq));
 	m_screen->set_palette(m_palette);
 
@@ -1066,12 +1048,12 @@ void slapfght_state::slapfigh(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &ay1(AY8910(config, "ay1", XTAL(36'000'000)/24)); // 1.5MHz
+	ay8910_device &ay1(AY8910(config, "ay1", 36_MHz_XTAL/24)); // 1.5MHz
 	ay1.port_a_read_callback().set_ioport("IN0");
 	ay1.port_b_read_callback().set_ioport("IN1");
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	ay8910_device &ay2(AY8910(config, "ay2", XTAL(36'000'000)/24)); // 1.5MHz
+	ay8910_device &ay2(AY8910(config, "ay2", 36_MHz_XTAL/24)); // 1.5MHz
 	ay2.port_a_read_callback().set_ioport("DSW1");
 	ay2.port_b_read_callback().set_ioport("DSW2");
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -1181,19 +1163,19 @@ ROM_END
 
 
 /*
-Tiger Heli
+Tiger-Heli
 1985 Taito Corporation
 
-The Tiger Heli PCB is almost exactly the same PCB as Slap Fight/Alcon but a few chips
+The Tiger-Heli PCB is almost exactly the same PCB as Slap Fight/Alcon but a few chips
 have different placings and there's more EPROM locations on one of the boards
 (although they're not populated).
-Also, Tiger Heli has a 22-way edge connector, while Alcon/Slap Fight is JAMMA.
+Also, Tiger-Heli has a 22-way edge connector, while Alcon/Slap Fight is JAMMA.
 
 
 PCB Layouts - Top Board
 -----------------------
 
-Tiger Heli -   M6100111A
+Tiger-Heli -   M6100111A
                850011401
 
 GX-511-A MADE IN JAPAN
@@ -1563,6 +1545,37 @@ Notes:
       A77_05 to A77_08 - 27256 EPROM
       A77_03, A77_04 - 2764 EPROM (replace with A77_03-1, A77_04-1 on Alcon)
       A77_13 - Motorola MC68705P5S Micro-Controller (protected). Clock 3.000MHz
+
+Non-color PROM usage (slap fight board names, seem common for all games):
+  ROM14.2C:
+    Horizontal signals.  In normal mode hpos goes from 0 to 387, in
+    flipped mode hpos goes from 291 to -96.  The prom address is:
+      ((hpos >> 2) & 0x7f) | (flip ? 0x80 : 0x00)
+
+    Bits are:
+      0: 1 = sync active
+      1: 1 = blank active
+      2: unused
+      3: 0 = reset hpos
+
+  ROM15.8B:
+    Vertical signals.  Vpos goes from 0 to 269.  The prom address is
+      vpos >> 1.
+
+    Bits are:
+      0: 0 = sync active
+      1: 1 = blank active
+      2: unused
+      3: 0 = reset vpos
+
+  ROM16.1E, ROM17.1C:
+    Two nibbles providing a byte (1E high, 1C low).  Seems linked with
+    reading the sprite ram, addressing is a little weird and usage not
+    obvious.  Low 3 bits seem to choose a target (0=none,
+    1,3=position, 4=code, 2=misc, 5+ unknown).
+
+  ROM18.2B:
+    Something to do with sprites, even less clear.
 */
 
 ROM_START( alcon )
@@ -1593,10 +1606,15 @@ ROM_START( alcon )
 	ROM_LOAD( "a77_09.7h", 0x18000, 0x8000, CRC(587113ae) SHA1(90abe961494a1af7c87693a419fbabf7a58a5dee) )
 
 
-	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_REGION( 0x0720, "proms", 0 )
 	ROM_LOAD( "21_82s129.12q", 0x0000, 0x0100, CRC(a0efaf99) SHA1(5df01663480acad1f89abab8662d437617a66d1c) ) /* Silkscreened as ROM21 */
 	ROM_LOAD( "20_82s129.12m", 0x0100, 0x0100, CRC(a56d57e5) SHA1(bfbd0db52b23fe1b4994e05103be3d412c1c013e) ) /* Silkscreened as ROM20 */
 	ROM_LOAD( "19_82s129.12n", 0x0200, 0x0100, CRC(5cbf9fbf) SHA1(abfa58fa4e44ebc56f2e0fac9bcc36164c845fa3) ) /* Silkscreened as ROM19 */
+	ROM_LOAD( "14_82s129.2c",  0x0300, 0x0100, CRC(4dc04453) SHA1(524e5a212ab496c52adc0def995b75e89aba48e7) ) /* Silkscreened as ROM14 */
+	ROM_LOAD( "15_82s129.8b",  0x0400, 0x0100, CRC(48ac3db4) SHA1(6a73fe21529bc760b8df1893aee9e89fb60976eb) ) /* Silkscreened as ROM15 */
+	ROM_LOAD( "16_82s129.1e",  0x0500, 0x0100, CRC(59490887) SHA1(c894edecbcfc67972ad893cd7c8197d07862a20a) ) /* Silkscreened as ROM16 */
+	ROM_LOAD( "17_82s129.1c",  0x0600, 0x0100, CRC(d492e6c2) SHA1(5789adda3a63ef8656ebd012416fcf3f991241fe) ) /* Silkscreened as ROM17 */
+	ROM_LOAD( "18_82s123.2b",  0x0700, 0x0020, CRC(aa0ca5a5) SHA1(4c45be71658f40ebb05634febba5822f1a8a7f79) ) /* Silkscreened as ROM18 */
 ROM_END
 
 ROM_START( slapfigh )
@@ -1626,17 +1644,22 @@ ROM_START( slapfigh )
 	ROM_LOAD( "a77_10.8h", 0x10000, 0x8000, CRC(422d946b) SHA1(c251ef9597a11ec8de39be4fcbddaba84e649ef2) )
 	ROM_LOAD( "a77_09.7h", 0x18000, 0x8000, CRC(587113ae) SHA1(90abe961494a1af7c87693a419fbabf7a58a5dee) )
 
-	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_REGION( 0x0720, "proms", 0 )
 	ROM_LOAD( "21_82s129.12q", 0x0000, 0x0100, CRC(a0efaf99) SHA1(5df01663480acad1f89abab8662d437617a66d1c) ) /* Silkscreened as ROM21 */
 	ROM_LOAD( "20_82s129.12m", 0x0100, 0x0100, CRC(a56d57e5) SHA1(bfbd0db52b23fe1b4994e05103be3d412c1c013e) ) /* Silkscreened as ROM20 */
 	ROM_LOAD( "19_82s129.12n", 0x0200, 0x0100, CRC(5cbf9fbf) SHA1(abfa58fa4e44ebc56f2e0fac9bcc36164c845fa3) ) /* Silkscreened as ROM19 */
+	ROM_LOAD( "14_82s129.2c",  0x0300, 0x0100, CRC(4dc04453) SHA1(524e5a212ab496c52adc0def995b75e89aba48e7) ) /* Silkscreened as ROM14 */
+	ROM_LOAD( "15_82s129.8b",  0x0400, 0x0100, CRC(48ac3db4) SHA1(6a73fe21529bc760b8df1893aee9e89fb60976eb) ) /* Silkscreened as ROM15 */
+	ROM_LOAD( "16_82s129.1e",  0x0500, 0x0100, CRC(59490887) SHA1(c894edecbcfc67972ad893cd7c8197d07862a20a) ) /* Silkscreened as ROM16 */
+	ROM_LOAD( "17_82s129.1c",  0x0600, 0x0100, CRC(d492e6c2) SHA1(5789adda3a63ef8656ebd012416fcf3f991241fe) ) /* Silkscreened as ROM17 */
+	ROM_LOAD( "18_82s123.2b",  0x0700, 0x0020, CRC(aa0ca5a5) SHA1(4c45be71658f40ebb05634febba5822f1a8a7f79) ) /* Silkscreened as ROM18 */
 ROM_END
 
 /*
 
 This set comes from a different type of board with unique Taito ID code of "A76"
 PCBs are labeled GX-006-A & GX-006-B  It has a 22pin edge connector and closely
-resembles the Tigher Heli PCB (shown above) with rom placement and components.
+resembles the Tiger-Heli PCB (shown above) with rom placement and components.
 
 */
 
@@ -1668,10 +1691,15 @@ ROM_START( slapfigha )
 	ROM_LOAD( "a76_11.8h", 0x10000, 0x8000, CRC(422d946b) SHA1(c251ef9597a11ec8de39be4fcbddaba84e649ef2) )
 	ROM_LOAD( "a76_10.6h", 0x18000, 0x8000, CRC(587113ae) SHA1(90abe961494a1af7c87693a419fbabf7a58a5dee) )
 
-	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_REGION( 0x0720, "proms", 0 )
 	ROM_LOAD( "a76-17.12q", 0x0000, 0x0100, CRC(a0efaf99) SHA1(5df01663480acad1f89abab8662d437617a66d1c) ) /* 82S129 Biploar PROM, Silkscreened as ROM21 */
 	ROM_LOAD( "a76-15.12m", 0x0100, 0x0100, CRC(a56d57e5) SHA1(bfbd0db52b23fe1b4994e05103be3d412c1c013e) ) /* 82S129 Biploar PROM, Silkscreened as ROM20 */
 	ROM_LOAD( "a76-16.12n", 0x0200, 0x0100, CRC(5cbf9fbf) SHA1(abfa58fa4e44ebc56f2e0fac9bcc36164c845fa3) ) /* 82S129 Biploar PROM, Silkscreened as ROM19 */
+	ROM_LOAD( "14_82s129.2c",  0x0300, 0x0100, CRC(4dc04453) SHA1(524e5a212ab496c52adc0def995b75e89aba48e7) ) /* Silkscreened as ROM14 */
+	ROM_LOAD( "15_82s129.8b",  0x0400, 0x0100, CRC(48ac3db4) SHA1(6a73fe21529bc760b8df1893aee9e89fb60976eb) ) /* Silkscreened as ROM15 */
+	ROM_LOAD( "16_82s129.1e",  0x0500, 0x0100, CRC(59490887) SHA1(c894edecbcfc67972ad893cd7c8197d07862a20a) ) /* Silkscreened as ROM16 */
+	ROM_LOAD( "17_82s129.1c",  0x0600, 0x0100, CRC(d492e6c2) SHA1(5789adda3a63ef8656ebd012416fcf3f991241fe) ) /* Silkscreened as ROM17 */
+	ROM_LOAD( "18_82s123.2b",  0x0700, 0x0020, CRC(aa0ca5a5) SHA1(4c45be71658f40ebb05634febba5822f1a8a7f79) ) /* Silkscreened as ROM18 */
 ROM_END
 
 /*
@@ -1813,7 +1841,7 @@ ROM_END
 Guardian
 1986 Taito Corporation
 
-The Guardian PCB is exactly the same PCB as Tiger Heli, including the
+The Guardian PCB is exactly the same PCB as Tiger-Heli, including the
 edge connector pinout.
 
 PCB Layout
@@ -1899,7 +1927,6 @@ A68_02 & 06 to 09 - 27256 EPROM
  A68_04/05 - 2764 EPROM
     A68_14 - Motorola MC68705P5 Micro-Controller (protected). Clock 3.000MHz [36/12]
          X - Unpopulated socket
-
 */
 
 ROM_START( grdian )
@@ -2049,12 +2076,12 @@ ROM_END
 GAME( 1985, perfrman,   0,        perfrman,   perfrman,  slapfght_state, empty_init,     ROT270, "Toaplan / Data East Corporation", "Performan (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, perfrmanu,  perfrman, perfrman,   perfrman,  slapfght_state, empty_init,     ROT270, "Toaplan / Data East USA",         "Performan (US)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, tigerh,     0,        tigerh,     tigerh,    slapfght_state, empty_init,     ROT270, "Toaplan / Taito America Corp.",   "Tiger Heli (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tigerhj,    tigerh,   tigerh,     tigerh,    slapfght_state, empty_init,     ROT270, "Toaplan / Taito",                 "Tiger Heli (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tigerhb1,   tigerh,   tigerhb1,   tigerh,    slapfght_state, empty_init,     ROT270, "bootleg",                         "Tiger Heli (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tigerhb2,   tigerh,   tigerhb2,   tigerh,    slapfght_state, empty_init,     ROT270, "bootleg",                         "Tiger Heli (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tigerhb3,   tigerh,   tigerhb2,   tigerh,    slapfght_state, empty_init,     ROT270, "bootleg",                         "Tiger Heli (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tigerhb4,   tigerh,   tigerhb4,   tigerh,    slapfght_state, empty_init,     ROT270, "bootleg",                         "Tiger Heli (bootleg set 4)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // MCU not hooked up
+GAME( 1985, tigerh,     0,        tigerh,     tigerh,    slapfght_state, empty_init,     ROT270, "Toaplan / Taito America Corp.",   "Tiger-Heli (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tigerhj,    tigerh,   tigerh,     tigerh,    slapfght_state, empty_init,     ROT270, "Toaplan / Taito",                 "Tiger-Heli (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tigerhb1,   tigerh,   tigerhb1,   tigerh,    slapfght_state, empty_init,     ROT270, "bootleg",                         "Tiger-Heli (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tigerhb2,   tigerh,   tigerhb2,   tigerh,    slapfght_state, empty_init,     ROT270, "bootleg",                         "Tiger-Heli (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tigerhb3,   tigerh,   tigerhb2,   tigerh,    slapfght_state, empty_init,     ROT270, "bootleg",                         "Tiger-Heli (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tigerhb4,   tigerh,   tigerhb4,   tigerh,    slapfght_state, empty_init,     ROT270, "bootleg",                         "Tiger-Heli (bootleg set 4)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // MCU not hooked up
 
 GAME( 1986, alcon,      0,        slapfigh,   slapfigh,  slapfght_state, init_slapfigh,  ROT270, "Toaplan / Taito America Corp.",   "Alcon (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1986, slapfigh,   alcon,    slapfigh,   slapfigh,  slapfght_state, init_slapfigh,  ROT270, "Toaplan / Taito",                 "Slap Fight (A77 set, 8606M PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

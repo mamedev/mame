@@ -52,7 +52,6 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual void write_o_output(u8 index) override { tms1k_base_device::write_o_output(index); }
-	virtual u8 read_k_input() override { return tms1k_base_device::read_k_input(); }
 
 	virtual void op_setr() override { tms1k_base_device::op_setr(); }
 	virtual void op_tdo() override;

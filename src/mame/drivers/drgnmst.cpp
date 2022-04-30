@@ -8,6 +8,8 @@ the hardware seems to fall somewhere between the
 hardware playmark commonly used and the hardware
 unico used for zero point etc.
 
+(also seems to be related to cps1 bootlegs?)
+
 PCB Layout
 ----------
 
@@ -34,44 +36,91 @@ Notes:
       HSync: 15.625kHz
   68K clock: 12MHz
 
+***********************************************************
+
+Master's Fury (c)1996 Unico
+
+PCB Layout
++---------------------------------------------------------+
+|               MF-01       MCM2018                       |
+|                           MCM2018                M  M   |
+|  VOL          M6295       MCM2018                F  F   |
+|                           MCM2018                0  0   |
+|    YM3012     YM2151                             4  5   |
+|                                      6116               |
+|                                      6116               |
+|                 GM76C28K             6116               |
+|J                GM76C28K             6116     +-------+ |
+|A                                              |  AMD  | |
+|M                                              |MACH210| |
+|M                                              +-------+ |
+|A     KM62256BPL KM62256BPL      +--------+  +--------+  |
+|                                 |  ACTEL |  |  ACTEL |  |
+|          MF-02   MF-03          | A1020B |  |A40MX04F|  |
+| DIP-SW   +----------+           | PLCC84 |  | PLCC84 |  |
+|          |MC68000P12|           +--------+  +--------+  |
+| DIP-SW   +----------+                            M  M   |
+|                                                  F  F   |
+|LED      14.31818MHz   32.000MHz KM62256BPL       0  0   |
+|                       20.000MHz KM62256BPL       6  7   |
++---------------------------------------------------------+
+
+  CPU: MC68000P12
+Sound: OKI M6295 & YM3012/YM2151 rebadged as 7105/BS901
+  OSC: 14.31818MHz, 20.000MHz & 32.000MHz
+  DSW: 8-switch dipswitch x 2
+  VOL: Volume pot
+  LED: Power on LED
+Other: Actel A1020B (labeled LOGIC-A), Actel A40MX04-F (labeled LOGIC-B)
+       AMD MACH210 (labeled LOGIC-C)
+
+ROMS:
+MF-01 - UNICO 1        - Sound sample       - 27C020
+MF-02 - UNICO 2        - Program ROM (Even) - 27C040
+MF-03 - UNICO 3        - Program ROM (Odd)  - 27C040
+MF-04 - MF0032-1 UNICO - Sprites            - mask ROM read as 27C322
+MF-05 - MF0032-2 UNICO - Sprites            - mask ROM read as 27C322
+MF-06 - MF0016-3 UNICO - Background         - mask ROM read as 27C160
+MF-07 - MF0016-4 UNICO - Background         - mask ROM read as 27C160
+
+MF-0x are locations silkscreened on the PCB
+
 */
 
 #include "emu.h"
 #include "includes/drgnmst.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/pic16c5x/pic16c5x.h"
-#include "sound/okim6295.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-WRITE16_MEMBER(drgnmst_state::coin_w)
+void drgnmst_base_state::coin_w(uint16_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x100);
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x400);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x800);
 }
 
-WRITE8_MEMBER(drgnmst_state::snd_command_w)
+void drgnmst_pic_state::snd_command_w(uint8_t data)
 {
 	m_snd_command = data;
 	m_maincpu->yield();
 }
 
-WRITE8_MEMBER(drgnmst_state::snd_flag_w)
+void drgnmst_pic_state::snd_flag_w(uint8_t data)
 {
 	/* Enables the following 68K write operation to latch through to the PIC */
 	m_snd_flag = 1;
 }
 
 
-READ8_MEMBER(drgnmst_state::pic16c5x_port0_r)
+uint8_t drgnmst_pic_state::pic16c5x_port0_r()
 {
 	return m_pic16c5x_port0;
 }
 
-READ8_MEMBER(drgnmst_state::snd_command_r)
+uint8_t drgnmst_pic_state::snd_command_r()
 {
 	uint8_t data = 0;
 
@@ -87,7 +136,7 @@ READ8_MEMBER(drgnmst_state::snd_command_r)
 	return data;
 }
 
-READ8_MEMBER(drgnmst_state::snd_flag_r)
+uint8_t drgnmst_pic_state::snd_flag_r()
 {
 	if (m_snd_flag)
 	{
@@ -98,7 +147,7 @@ READ8_MEMBER(drgnmst_state::snd_flag_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(drgnmst_state::pcm_banksel_w)
+void drgnmst_pic_state::pcm_banksel_w(uint8_t data)
 {
 	/*  This is a 4 bit port.
 	    Each pair of bits is used in part of the OKI PCM ROM bank selectors.
@@ -108,12 +157,12 @@ WRITE8_MEMBER(drgnmst_state::pcm_banksel_w)
 	m_pic16c5x_port0 = data;
 }
 
-WRITE8_MEMBER(drgnmst_state::oki_w)
+void drgnmst_pic_state::oki_w(uint8_t data)
 {
 	m_oki_command = data;
 }
 
-WRITE8_MEMBER(drgnmst_state::snd_control_w)
+void drgnmst_pic_state::snd_control_w(uint8_t data)
 {
 	/*  This port controls communications to and from the 68K, both OKI
 	    devices, and part of the OKI PCM ROM bank selection.
@@ -177,32 +226,43 @@ WRITE8_MEMBER(drgnmst_state::snd_control_w)
 
 /***************************** 68000 Memory Map *****************************/
 
-void drgnmst_state::drgnmst_main_map(address_map &map)
+void drgnmst_base_state::drgnmst_main_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x800000, 0x800001).portr("P1_P2");
 	map(0x800018, 0x800019).portr("SYSTEM");
 	map(0x80001a, 0x80001b).portr("DSW1");
 	map(0x80001c, 0x80001d).portr("DSW2");
-	map(0x800030, 0x800031).w(FUNC(drgnmst_state::coin_w));
-	map(0x800100, 0x80011f).writeonly().share("vidregs");
-	map(0x800120, 0x800121).nopw();
-	map(0x80014a, 0x80014b).nopw();
+	map(0x800030, 0x800031).w(FUNC(drgnmst_base_state::coin_w));
+	map(0x800100, 0x800121).writeonly().share("vidregs");
 	map(0x800154, 0x800155).writeonly().share("vidregs2"); // seems to be priority control
 	map(0x800176, 0x800177).portr("EXTRA");
-	map(0x800181, 0x800181).w(FUNC(drgnmst_state::snd_command_w));
-	map(0x800189, 0x800189).w(FUNC(drgnmst_state::snd_flag_w));
 	map(0x8001e0, 0x8001e1).nopw();
 	map(0x900000, 0x903fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x904000, 0x907fff).ram().w(FUNC(drgnmst_state::md_videoram_w)).share("md_videoram");
-	map(0x908000, 0x90bfff).ram().w(FUNC(drgnmst_state::bg_videoram_w)).share("bg_videoram");
-	map(0x90c000, 0x90ffff).ram().w(FUNC(drgnmst_state::fg_videoram_w)).share("fg_videoram");
+	map(0x904000, 0x907fff).ram().w(FUNC(drgnmst_base_state::md_videoram_w)).share("md_videoram");
+	map(0x908000, 0x90bfff).ram().w(FUNC(drgnmst_base_state::bg_videoram_w)).share("bg_videoram");
+	map(0x90c000, 0x90ffff).ram().w(FUNC(drgnmst_base_state::fg_videoram_w)).share("fg_videoram");
 	map(0x920000, 0x923fff).ram().share("rowscrollram"); // rowscroll ram
 	map(0x930000, 0x9307ff).ram().share("spriteram");   // Sprites
 	map(0xff0000, 0xffffff).ram();
 }
 
-void drgnmst_state::drgnmst_oki1_map(address_map &map)
+void drgnmst_pic_state::drgnmst_main_map_with_pic(address_map& map)
+{
+	drgnmst_main_map(map);
+	map(0x800181, 0x800181).w(FUNC(drgnmst_pic_state::snd_command_w));
+	map(0x800189, 0x800189).w(FUNC(drgnmst_pic_state::snd_flag_w));
+}
+
+void drgnmst_ym_state::drgnmst_main_map_with_ym(address_map& map)
+{
+	drgnmst_main_map(map);
+	map(0x800180, 0x800183).umask16(0x00ff).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x800189, 0x800189).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
+
+
+void drgnmst_pic_state::drgnmst_oki1_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).rom();
 	map(0x20000, 0x3ffff).bankr("oki1bank");
@@ -354,8 +414,13 @@ static GFXDECODE_START( gfx_drgnmst )
 GFXDECODE_END
 
 
-void drgnmst_state::machine_start()
+void drgnmst_base_state::machine_start()
 {
+}
+
+void drgnmst_pic_state::machine_start()
+{
+	drgnmst_base_state::machine_start();
 	save_item(NAME(m_snd_flag));
 	save_item(NAME(m_oki_control));
 	save_item(NAME(m_oki_command));
@@ -363,8 +428,14 @@ void drgnmst_state::machine_start()
 	save_item(NAME(m_oki_bank));
 }
 
-void drgnmst_state::machine_reset()
+void drgnmst_base_state::machine_reset()
 {
+}
+
+void drgnmst_pic_state::machine_reset()
+{
+	drgnmst_base_state::machine_reset();
+
 	m_snd_flag = 0;
 	m_oki_control = 0;
 	m_oki_command = 0;
@@ -373,19 +444,12 @@ void drgnmst_state::machine_reset()
 	m_oki_bank[0] = 0;
 }
 
-void drgnmst_state::drgnmst(machine_config &config)
+
+void drgnmst_base_state::drgnmst(machine_config &config)
 {
 	M68000(config, m_maincpu, 12_MHz_XTAL); /* Confirmed */
-	m_maincpu->set_addrmap(AS_PROGRAM, &drgnmst_state::drgnmst_main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(drgnmst_state::irq2_line_hold));
-
-	PIC16C55(config, m_audiocpu, 32_MHz_XTAL / 8);  /* 4MHz - Confirmed */
-	m_audiocpu->read_a().set(FUNC(drgnmst_state::pic16c5x_port0_r));
-	m_audiocpu->write_a().set(FUNC(drgnmst_state::pcm_banksel_w));
-	m_audiocpu->read_b().set(FUNC(drgnmst_state::snd_command_r));
-	m_audiocpu->write_b().set(FUNC(drgnmst_state::oki_w));
-	m_audiocpu->read_c().set(FUNC(drgnmst_state::snd_flag_r));
-	m_audiocpu->write_c().set(FUNC(drgnmst_state::snd_control_w));
+	m_maincpu->set_addrmap(AS_PROGRAM, &drgnmst_base_state::drgnmst_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(drgnmst_base_state::irq2_line_hold));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_drgnmst);
 
@@ -394,21 +458,85 @@ void drgnmst_state::drgnmst(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(8*8, 56*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(drgnmst_state::screen_update));
+	screen.set_screen_update(FUNC(drgnmst_base_state::screen_update));
 	screen.set_palette(m_palette);
+	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 
-	PALETTE(config, m_palette).set_format(2, &drgnmst_state::drgnmst_IIIIRRRRGGGGBBBB, 0x2000);
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+
+	PALETTE(config, m_palette).set_format(2, &drgnmst_base_state::drgnmst_IIIIRRRRGGGGBBBB, 0x2000);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
+}
+
+void drgnmst_pic_state::drgnmst_with_pic(machine_config& config)
+{
+	drgnmst(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &drgnmst_pic_state::drgnmst_main_map_with_pic);
+
+	PIC16C55(config, m_audiocpu, 32_MHz_XTAL / 8);  /* 4MHz - Confirmed */
+	m_audiocpu->read_a().set(FUNC(drgnmst_pic_state::pic16c5x_port0_r));
+	m_audiocpu->write_a().set(FUNC(drgnmst_pic_state::pcm_banksel_w));
+	m_audiocpu->read_b().set(FUNC(drgnmst_pic_state::snd_command_r));
+	m_audiocpu->write_b().set(FUNC(drgnmst_pic_state::oki_w));
+	m_audiocpu->read_c().set(FUNC(drgnmst_pic_state::snd_flag_r));
+	m_audiocpu->write_c().set(FUNC(drgnmst_pic_state::snd_control_w));
+
 	OKIM6295(config, m_oki[0], 32_MHz_XTAL / 32, okim6295_device::PIN7_HIGH);
-	m_oki[0]->set_addrmap(0, &drgnmst_state::drgnmst_oki1_map);
+	m_oki[0]->set_addrmap(0, &drgnmst_pic_state::drgnmst_oki1_map);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	OKIM6295(config, m_oki[1], 32_MHz_XTAL / 32, okim6295_device::PIN7_HIGH);
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.00);
 }
+
+void drgnmst_ym_state::drgnmst_ym(machine_config& config)
+{
+	drgnmst(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &drgnmst_ym_state::drgnmst_main_map_with_ym);
+
+	ym2151_device &ym2151(YM2151(config, "ymsnd", XTAL(14'318'181)/4));  /* verified on pcb */
+	ym2151.add_route(0, "mono", 0.05);
+	ym2151.add_route(1, "mono", 0.05);
+
+	OKIM6295(config, m_oki, 32_MHz_XTAL/32, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.90);
+}
+
+ROM_START( mastfury )
+	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "master012.4m", 0x000000, 0x080000, CRC(020a3c50) SHA1(d6762b66f06fe91f3bff8cdcbff42c247df64671) )
+	ROM_LOAD16_BYTE( "master013.4m", 0x000001, 0x080000, CRC(1e7dd287) SHA1(67764aa054731a0548f6c7d3b898597792d96eec) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "dmast96_voi1x", 0x00000, 0x40000, CRC(fc5161a1) SHA1(999e73e36df317aabefebf94444690f439d64559) )
+
+	ROM_REGION( 0x800000, "gfx1", 0 ) /* Sprites (16x16x4) */
+	// Some versions of the game use 2x32MBit ROMs instead.
+	// This set comes from a PCB marked "Dragon Master 96" but the PCB was missing program ROMs, was Dragon Master 96
+	// an alt title for the Chinese market?
+	ROM_LOAD16_BYTE( "dmast96_mvo1x", 0x000000, 0x080000, CRC(9a597497) SHA1(4f63e17629a00fa505e2165f7fa46f0c5ef2bc60) )
+	ROM_CONTINUE(0x400000, 0x080000)
+	ROM_CONTINUE(0x100000, 0x080000)
+	ROM_CONTINUE(0x500000, 0x080000)
+	ROM_LOAD16_BYTE( "dmast96_mvo3x", 0x000001, 0x080000, CRC(be01b829) SHA1(ab9858aadb0bba8415c674e27f9ea905de27871c) )
+	ROM_CONTINUE(0x400001, 0x080000)
+	ROM_CONTINUE(0x100001, 0x080000)
+	ROM_CONTINUE(0x500001, 0x080000)
+	ROM_LOAD16_BYTE( "dmast96_mvo2x", 0x200000, 0x080000, CRC(3eab296c) SHA1(d2add71e01aa6bd1b6539e72ed373bb71f65c437) )
+	ROM_CONTINUE(0x600000, 0x080000)
+	ROM_LOAD16_BYTE( "dmast96_mvo4x", 0x200001, 0x080000, CRC(d870b6ce) SHA1(e81c24eeaa5b857910436bfb6cac2b9fa05839e8) )
+	ROM_CONTINUE(0x600001, 0x080000)
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* BG Tiles (8x8x4, 16x16x4 and 32x32x4) */
+	ROM_LOAD16_BYTE( "mf0016-3", 0x000000, 0x200000, CRC(0946bc61) SHA1(8b10c7f76daf21afb2aa6961100d83b1f6ca89bb) )
+	ROM_LOAD16_BYTE( "mf0016-4", 0x000001, 0x200000, CRC(8f5b7c82) SHA1(5947c015c8a13539a3125c7ffe07cca0691b4348) )
+ROM_END
+
 
 
 ROM_START( drgnmst )
@@ -485,7 +613,7 @@ ROM_START( drgnmst2 ) // only the maincpu ROMs were provided for this set
 	ROM_LOAD16_BYTE( "dm1008", 0x000000, 0x100000, CRC(b8572be3) SHA1(29aab76821e0a56033cf06b0a1890b11804da8d8) )
 ROM_END
 
-uint8_t drgnmst_state::drgnmst_asciitohex( uint8_t data )
+uint8_t drgnmst_pic_state::drgnmst_asciitohex( uint8_t data )
 {
 	/* Convert ASCII data to HEX */
 
@@ -497,7 +625,7 @@ uint8_t drgnmst_state::drgnmst_asciitohex( uint8_t data )
 }
 
 
-void drgnmst_state::init_drgnmst()
+void drgnmst_pic_state::init_drgnmst()
 {
 	uint8_t *drgnmst_PICROM_HEX = memregion("user1")->base();
 	uint16_t *drgnmst_PICROM = (uint16_t *)memregion("audiocpu")->base();
@@ -566,5 +694,7 @@ void drgnmst_state::init_drgnmst()
 }
 
 
-GAME( 1994, drgnmst,        0, drgnmst,  drgnmst, drgnmst_state, init_drgnmst, ROT0, "Unico", "Dragon Master (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, drgnmst2, drgnmst, drgnmst,  drgnmst, drgnmst_state, init_drgnmst, ROT0, "Unico", "Dragon Master (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, drgnmst,        0, drgnmst_with_pic,  drgnmst, drgnmst_pic_state, init_drgnmst, ROT0, "Unico", "Dragon Master (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, drgnmst2, drgnmst, drgnmst_with_pic,  drgnmst, drgnmst_pic_state, init_drgnmst, ROT0, "Unico", "Dragon Master (set 2)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1996, mastfury,       0, drgnmst_ym,  drgnmst, drgnmst_ym_state, empty_init, ROT0, "Unico", "Master's Fury", MACHINE_IMPERFECT_GRAPHICS )

@@ -17,13 +17,13 @@
  for writes to Video Ram
 *******************************************************************************/
 
-WRITE16_MEMBER(wwfsstar_state::fg0_videoram_w)
+void wwfsstar_state::fg0_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg0_videoram[offset]);
 	m_fg0_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_MEMBER(wwfsstar_state::bg0_videoram_w)
+void wwfsstar_state::bg0_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg0_videoram[offset]);
 	m_bg0_tilemap->mark_tile_dirty(offset/2);
@@ -57,7 +57,7 @@ TILE_GET_INFO_MEMBER(wwfsstar_state::get_fg0_tile_info)
 	tilebase =  &m_fg0_videoram[tile_index*2];
 	tileno =  (tilebase[1] & 0x00ff) | ((tilebase[0] & 0x000f) << 8);
 	colbank = (tilebase[0] & 0x00f0) >> 4;
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tileno,
 			colbank,
 			0);
@@ -93,7 +93,7 @@ TILE_GET_INFO_MEMBER(wwfsstar_state::get_bg0_tile_info)
 	tileno =  (tilebase[1] & 0x00ff) | ((tilebase[0] & 0x000f) << 8);
 	colbank = (tilebase[0] & 0x0070) >> 4;
 	flipx   = (tilebase[0] & 0x0080) >> 7;
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tileno,
 			colbank,
 			flipx ? TILE_FLIPX : 0);

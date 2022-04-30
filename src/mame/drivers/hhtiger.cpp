@@ -90,33 +90,33 @@ private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER(disable_rom_r);
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t disable_rom_r();
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
+	uint8_t io_read_byte(offs_t offset);
+	void io_write_byte(offs_t offset, uint8_t data);
 
 	UPD7220_DISPLAY_PIXELS_MEMBER(display_pixels);
 	UPD7220_DRAW_TEXT_LINE_MEMBER(draw_text);
 
 	/* handlers for logging only, can be removed when more is known */
-	DECLARE_READ8_MEMBER(pio_pa_r);
-	DECLARE_WRITE8_MEMBER(pio_pa_w);
-	DECLARE_WRITE8_MEMBER(pio_pb_w);
+	uint8_t pio_pa_r();
+	void pio_pa_w(uint8_t data);
+	void pio_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ardy_w);
 	DECLARE_WRITE_LINE_MEMBER(brdy_w);
 
-	DECLARE_READ8_MEMBER(via_0_in_a);
-	DECLARE_WRITE8_MEMBER(via_0_out_a);
-	DECLARE_WRITE8_MEMBER(via_0_out_b);
+	uint8_t via_0_in_a();
+	void via_0_out_a(uint8_t data);
+	void via_0_out_b(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via_0_out_ca2);
 	DECLARE_WRITE_LINE_MEMBER(via_0_out_cb2);
 
-	DECLARE_WRITE8_MEMBER(via_1_out_a);
-	DECLARE_WRITE8_MEMBER(via_1_out_b);
+	void via_1_out_a(uint8_t data);
+	void via_1_out_b(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via_1_out_ca2);
 	DECLARE_WRITE_LINE_MEMBER(via_1_out_cb2);
 
@@ -184,18 +184,18 @@ GFXDECODE_END
 UPD7220_DISPLAY_PIXELS_MEMBER(hhtiger_state::display_pixels)
 {
 	/* 96KB video RAM (32KB green + 32KB red + 32KB blue) */
-	uint16_t green = m_video_ram[(0x00000 + (address & 0x7fff)) >> 1];
-	uint16_t red   = m_video_ram[(0x08000 + (address & 0x7fff)) >> 1];
-	uint16_t blue  = m_video_ram[(0x10000 + (address & 0x7fff)) >> 1];
+	uint16_t const green = m_video_ram[(0x00000 + (address & 0x3fff))];
+	uint16_t const red   = m_video_ram[(0x04000 + (address & 0x3fff))];
+	uint16_t const blue  = m_video_ram[(0x08000 + (address & 0x3fff))];
 
 	for (int xi = 0; xi<16; xi++)
 	{
-		int r = ((red   >> xi) & 1) ? 255 : 0;
-		int g = ((green >> xi) & 1) ? 255 : 0;
-		int b = ((blue  >> xi) & 1) ? 255 : 0;
+		int const r = BIT(red,   xi) ? 255 : 0;
+		int const g = BIT(green, xi) ? 255 : 0;
+		int const b = BIT(blue,  xi) ? 255 : 0;
 
 		if (bitmap.cliprect().contains(x + xi, y))
-			bitmap.pix32(y, x + xi) = rgb_t(r, g, b);
+			bitmap.pix(y, x + xi) = rgb_t(r, g, b);
 	}
 }
 
@@ -226,14 +226,14 @@ UPD7220_DRAW_TEXT_LINE_MEMBER(hhtiger_state::draw_text)
 					pen = 0;
 
 				if (!m_screen->visible_area().contains(res_x, res_y))
-					bitmap.pix32(res_y, res_x) = palette[pen];
+					bitmap.pix(res_y, res_x) = palette[pen];
 			}
 		}
 	}
 }
 
 
-READ8_MEMBER(hhtiger_state::disable_rom_r)
+uint8_t hhtiger_state::disable_rom_r()
 {
 	if (!machine().side_effects_disabled())
 		m_rom_mirror = false;
@@ -241,7 +241,7 @@ READ8_MEMBER(hhtiger_state::disable_rom_r)
 	return 0xff;
 }
 
-READ8_MEMBER(hhtiger_state::read)
+uint8_t hhtiger_state::read(offs_t offset)
 {
 	uint8_t data;
 
@@ -265,7 +265,7 @@ READ8_MEMBER(hhtiger_state::read)
 	return data;
 }
 
-WRITE8_MEMBER(hhtiger_state::write)
+void hhtiger_state::write(offs_t offset, uint8_t data)
 {
 	m_ram->pointer()[offset] = data;
 }
@@ -278,25 +278,25 @@ WRITE_LINE_MEMBER(hhtiger_state::busreq_w)
 	m_dma->bai_w(state); // tell dma that bus has been granted
 }
 
-READ8_MEMBER(hhtiger_state::memory_read_byte)
+uint8_t hhtiger_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(hhtiger_state::memory_write_byte)
+void hhtiger_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset, data);
 }
 
-READ8_MEMBER(hhtiger_state::io_read_byte)
+uint8_t hhtiger_state::io_read_byte(offs_t offset)
 {
 	address_space& io_space = m_maincpu->space(AS_IO);
 	return io_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(hhtiger_state::io_write_byte)
+void hhtiger_state::io_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& io_space = m_maincpu->space(AS_IO);
 	io_space.write_byte(offset, data);
@@ -315,7 +315,7 @@ void hhtiger_state::z80_mem(address_map &map)
 void hhtiger_state::z80_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x03).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0x00, 0x03).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	map(0x04, 0x07).rw(m_pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x10, 0x17).rw(m_tms9914, FUNC(tms9914_device::read), FUNC(tms9914_device::write)); // ??
 	map(0x1e, 0x1e).r(FUNC(hhtiger_state::disable_rom_r));
@@ -362,7 +362,7 @@ static INPUT_PORTS_START(hhtiger)
 INPUT_PORTS_END
 
 
-READ8_MEMBER(hhtiger_state::pio_pa_r)
+uint8_t hhtiger_state::pio_pa_r()
 {
 	uint8_t data = 0xff;
 
@@ -370,13 +370,13 @@ READ8_MEMBER(hhtiger_state::pio_pa_r)
 	return data;
 }
 
-WRITE8_MEMBER(hhtiger_state::pio_pa_w)
+void hhtiger_state::pio_pa_w(uint8_t data)
 {
 	LOG("pio_pa_w %02X\n", data);
 	m_via[0]->write_pa(data);
 }
 
-WRITE8_MEMBER(hhtiger_state::pio_pb_w)
+void hhtiger_state::pio_pb_w(uint8_t data)
 {
 	LOG("pio_pb_w %02X\n", data);
 	m_via[0]->write_pb(data);
@@ -395,7 +395,7 @@ WRITE_LINE_MEMBER(hhtiger_state::brdy_w)
 }
 
 
-READ8_MEMBER(hhtiger_state::via_0_in_a)
+uint8_t hhtiger_state::via_0_in_a()
 {
 	uint8_t data = 0xff;
 
@@ -404,13 +404,13 @@ READ8_MEMBER(hhtiger_state::via_0_in_a)
 	return data;
 }
 
-WRITE8_MEMBER(hhtiger_state::via_0_out_a)
+void hhtiger_state::via_0_out_a(uint8_t data)
 {
 	LOG("via0_out_a %02X\n", data);
 	m_pio->port_a_write(data);
 }
 
-WRITE8_MEMBER(hhtiger_state::via_0_out_b)
+void hhtiger_state::via_0_out_b(uint8_t data)
 {
 	LOG("via0_out_b %02X\n", data);
 }
@@ -427,12 +427,12 @@ WRITE_LINE_MEMBER(hhtiger_state::via_0_out_cb2)
 }
 
 
-WRITE8_MEMBER(hhtiger_state::via_1_out_a)
+void hhtiger_state::via_1_out_a(uint8_t data)
 {
 	LOG("via1_out_a %02X\n", data);
 }
 
-WRITE8_MEMBER(hhtiger_state::via_1_out_b)
+void hhtiger_state::via_1_out_b(uint8_t data)
 {
 	LOG("via1_out_b %02X\n", data);
 }
@@ -481,9 +481,9 @@ void hhtiger_state::hhtiger(machine_config &config)
 	RAM(config, m_ram).set_default_size("64K");
 
 	/* unknown fdc - floppy drives are housed with monitor so maybe fdc is external */
-	FLOPPY_CONNECTOR(config, "0", hhtiger_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "1", hhtiger_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "2", hhtiger_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "0", hhtiger_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "1", hhtiger_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "2", hhtiger_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	/* unknown sound hardware - maybe connected to square-wave timer output from via */
 	SPEAKER(config, "mono").front_center();
@@ -512,7 +512,7 @@ void hhtiger_state::hhtiger(machine_config &config)
 	m_gdc->set_draw_text(FUNC(hhtiger_state::draw_text));
 	m_gdc->set_screen(m_screen);
 
-	VIA6522(config, m_via[0], 16_MHz_XTAL / 16);
+	MOS6522(config, m_via[0], 16_MHz_XTAL / 16);
 	m_via[0]->readpa_handler().set(FUNC(hhtiger_state::via_0_in_a));
 	m_via[0]->writepa_handler().set(FUNC(hhtiger_state::via_0_out_a));
 	m_via[0]->writepb_handler().set(FUNC(hhtiger_state::via_0_out_b));
@@ -520,7 +520,7 @@ void hhtiger_state::hhtiger(machine_config &config)
 	m_via[0]->cb2_handler().set(FUNC(hhtiger_state::via_0_out_cb2));
 	m_via[0]->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 
-	VIA6522(config, m_via[1], 16_MHz_XTAL / 16);
+	MOS6522(config, m_via[1], 16_MHz_XTAL / 16);
 	m_via[1]->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 	m_via[1]->writepa_handler().set(FUNC(hhtiger_state::via_1_out_a));
 	m_via[1]->writepb_handler().set(FUNC(hhtiger_state::via_1_out_b));
@@ -580,13 +580,17 @@ void hhtiger_state::hhtiger(machine_config &config)
 
 ROM_START(hhtiger)
 	ROM_REGION(0x1000, "rom_z80", 0)
-	ROM_DEFAULT_BIOS("rel12")
+	ROM_DEFAULT_BIOS("rel13")
 	ROM_SYSTEM_BIOS(0, "rel12", "Rel1.2")
 	ROMX_LOAD("rel1.2-0ea0.ic79", 0x0000, 0x1000, CRC(2f81e48c) SHA1(a4a1d7fde9f92abd6d8f8a1c24e35d713a5cbcb2), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "rel13", "Rel1.3")
+	ROMX_LOAD("rel1.3-0ea0.ic79", 0x0000, 0x1000, CRC(2f81e48c) SHA1(a4a1d7fde9f92abd6d8f8a1c24e35d713a5cbcb2), ROM_BIOS(1))
 	/* Rel1.4 also known to exist */
 	ROM_REGION(0x4000, "rom_m6809", 0)
 	ROMX_LOAD("rel1.2-cfd3.ic16", 0x0000, 0x2000, CRC(1ae4d2e0) SHA1(c379c5f1be24835ae4b4bd7bed35800faa3a9af6), ROM_BIOS(0))
 	ROMX_LOAD("rel1.2-8fd2.ic15", 0x2000, 0x2000, CRC(0ef23968) SHA1(d46ce3b965ce51d0c90a10121661199b51e33d8b), ROM_BIOS(0))
+	ROMX_LOAD("rel1.3-789a.ic16", 0x0000, 0x2000, CRC(7fa6fd33) SHA1(0b2768c170ca7077ef5164bfa13d9bf033528115), ROM_BIOS(1))
+	ROMX_LOAD("rel1.3-77c1.ic15", 0x2000, 0x2000, CRC(dd2f15d5) SHA1(139a2b97cb8c27a50e3bfa3f42a9572203e453e0), ROM_BIOS(1))
 ROM_END
 
 

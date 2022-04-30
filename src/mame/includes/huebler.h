@@ -17,7 +17,7 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/z80pio.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/z80ctc.h"
 #include "emupal.h"
 
@@ -49,7 +49,7 @@ protected:
 private:
 	required_device<z80_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
-	required_device<z80dart_device> m_sio;
+	required_device<z80sio_device> m_sio;
 	required_device<palette_device> m_palette;
 	required_memory_region m_kb_rom;
 	required_memory_region m_char_rom;
@@ -59,15 +59,15 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( keyboard_r );
+	uint8_t keyboard_r(offs_t offset);
 
 	void scan_keyboard();
 
 	// keyboard state
 	int m_key_d6;
 	int m_key_d7;
-	int m_key_a4;
-	int m_key_a5;
+	int m_key_a4 = 0;
+	int m_key_a5 = 0;
 	int m_key_a8;
 
 	// video state
@@ -79,8 +79,8 @@ private:
 	void amu880_mem(address_map &map);
 
 	// cassette variables
-	u8 m_cnt;
-	bool m_cassbit;
+	u8 m_cnt = 0;
+	bool m_cassbit = false;
 };
 
 #endif

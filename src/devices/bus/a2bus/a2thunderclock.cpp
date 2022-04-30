@@ -28,15 +28,14 @@
 #include "emu.h"
 #include "a2thunderclock.h"
 
+#include "machine/upd1990a.h"
+
+
+namespace {
+
 /***************************************************************************
     PARAMETERS
 ***************************************************************************/
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(A2BUS_THUNDERCLOCK, a2bus_thunderclock_device, "a2thunpl", "ThunderWare ThunderClock Plus")
 
 #define THUNDERCLOCK_ROM_REGION  "thunclk_rom"
 #define THUNDERCLOCK_UPD1990_TAG "thunclk_upd"
@@ -45,6 +44,41 @@ ROM_START( thunderclock )
 	ROM_REGION(0x800, THUNDERCLOCK_ROM_REGION, 0)
 	ROM_LOAD( "thunderclock plus rom.bin", 0x0000, 0x0800, CRC(1b99c4e3) SHA1(60f434f5325899d7ea257a6e56e6f53eae65146a) )
 ROM_END
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+class a2bus_thunderclock_device:
+	public device_t,
+	public device_a2bus_card_interface
+{
+public:
+	// construction/destruction
+	a2bus_thunderclock_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	a2bus_thunderclock_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	// overrides of standard a2bus slot functions
+	virtual uint8_t read_c0nx(uint8_t offset) override;
+	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+	virtual uint8_t read_cnxx(uint8_t offset) override;
+	virtual uint8_t read_c800(uint16_t offset) override;
+
+	required_device<upd1990a_device> m_upd1990ac;
+	required_region_ptr<uint8_t> m_rom;
+
+private:
+	DECLARE_WRITE_LINE_MEMBER( upd_dataout_w );
+
+	int m_dataout;
+};
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -76,7 +110,9 @@ const tiny_rom_entry *a2bus_thunderclock_device::device_rom_region() const
 a2bus_thunderclock_device::a2bus_thunderclock_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
-	m_upd1990ac(*this, THUNDERCLOCK_UPD1990_TAG), m_rom(nullptr), m_dataout(0)
+	m_upd1990ac(*this, THUNDERCLOCK_UPD1990_TAG),
+	m_rom(*this, THUNDERCLOCK_ROM_REGION),
+	m_dataout(0)
 {
 }
 
@@ -91,8 +127,6 @@ a2bus_thunderclock_device::a2bus_thunderclock_device(const machine_config &mconf
 
 void a2bus_thunderclock_device::device_start()
 {
-	m_rom = device().machine().root_device().memregion(this->subtag(THUNDERCLOCK_ROM_REGION).c_str())->base();
-
 	save_item(NAME(m_dataout));
 }
 
@@ -169,3 +203,12 @@ WRITE_LINE_MEMBER( a2bus_thunderclock_device::upd_dataout_w )
 		m_dataout = 0;
 	}
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_THUNDERCLOCK, device_a2bus_card_interface, a2bus_thunderclock_device, "a2thunpl", "ThunderWare ThunderClock Plus")

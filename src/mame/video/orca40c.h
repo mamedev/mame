@@ -32,10 +32,10 @@ public:
 	void set_percuss_hardware(bool percuss_hardware) { m_percuss_hardware = percuss_hardware; }
 
 	// memory handlers
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(videoram2_w);
-	DECLARE_WRITE8_MEMBER(attributes_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void videoram2_w(offs_t offset, uint8_t data);
+	void attributes_w(offs_t offset, uint8_t data);
+	void flipscreen_w(uint8_t data);
 
 protected:
 	// device-level overrides
@@ -58,8 +58,8 @@ private:
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 
 	// internal state
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
 	bool m_flip_screen;
 
 	// helpers

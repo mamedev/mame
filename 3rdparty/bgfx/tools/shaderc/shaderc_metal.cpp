@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -8,6 +8,9 @@
 BX_PRAGMA_DIAGNOSTIC_PUSH()
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4100) // error C4100: 'inclusionDepth' : unreferenced formal parameter
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4265) // error C4265: 'spv::spirvbin_t': class has virtual functions, but destructor is not virtual
+BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wattributes") // warning: attribute ignored
+BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wdeprecated-declarations") // warning: ‘MSLVertexAttr’ is deprecated
+BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wtype-limits") // warning: comparison of unsigned expression in ‘< 0’ is always false
 BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wshadow") // warning: declaration of 'userData' shadows a member of 'glslang::TShader::Includer::IncludeResult'
 #define ENABLE_OPT 1
 #include <ShaderLang.h>
@@ -37,7 +40,7 @@ namespace bgfx
 #include <tinystl/vector.h>
 namespace stl = tinystl;
 
-#include "../../src/shader_spirv.h"
+#include "../../src/shader.h"
 
 namespace bgfx { namespace metal
 {
@@ -126,15 +129,16 @@ namespace bgfx { namespace metal
 		8,     // MaxCullDistances
 		8,     // MaxCombinedClipAndCullDistances
 		4,     // MaxSamples
-		0,     // maxMeshOutputVerticesNV;
-		0,     // maxMeshOutputPrimitivesNV;
-		0,     // maxMeshWorkGroupSizeX_NV;
-		0,     // maxMeshWorkGroupSizeY_NV;
-		0,     // maxMeshWorkGroupSizeZ_NV;
-		0,     // maxTaskWorkGroupSizeX_NV;
-		0,     // maxTaskWorkGroupSizeY_NV;
-		0,     // maxTaskWorkGroupSizeZ_NV;
+		0,     // maxMeshOutputVerticesNV
+		0,     // maxMeshOutputPrimitivesNV
+		0,     // maxMeshWorkGroupSizeX_NV
+		0,     // maxMeshWorkGroupSizeY_NV
+		0,     // maxMeshWorkGroupSizeZ_NV
+		0,     // maxTaskWorkGroupSizeX_NV
+		0,     // maxTaskWorkGroupSizeY_NV
+		0,     // maxTaskWorkGroupSizeZ_NV
 		0,     // maxMeshViewCountNV
+		0,     // maxDualSourceDrawBuffersEXT
 
 		{ // limits
 			true, // nonInductiveForLoops
@@ -148,374 +152,6 @@ namespace bgfx { namespace metal
 			true, // generalConstantMatrixVectorIndexing
 		},
 	};
-
-	bool printAsm(uint32_t _offset, const SpvInstruction& _instruction, void* _userData)
-	{
-		BX_UNUSED(_userData);
-		char temp[512];
-		toString(temp, sizeof(temp), _instruction);
-		BX_TRACE("%5d: %s", _offset, temp);
-		return true;
-	}
-
-	struct SpvReflection
-	{
-		struct TypeId
-		{
-			enum Enum
-			{
-				Void,
-				Bool,
-				Int32,
-				Int64,
-				Uint32,
-				Uint64,
-				Float,
-				Double,
-
-				Vector,
-				Matrix,
-
-				Count
-			};
-
-			TypeId()
-				: baseType(Enum::Count)
-				, type(Enum::Count)
-				, numComponents(0)
-			{
-			}
-
-			Enum baseType;
-			Enum type;
-			uint32_t numComponents;
-
-			stl::string toString()
-			{
-				stl::string result;
-
-				switch (type)
-				{
-				case Float:
-					result.append("float");
-					break;
-
-				case Vector:
-					bx::stringPrintf(result, "vec%d"
-						, numComponents
-						);
-					break;
-
-				case Matrix:
-					bx::stringPrintf(result, "mat%d"
-						, numComponents
-						);
-
-				default:
-					break;
-				}
-
-				return result;
-			}
-		};
-
-		struct Id
-		{
-			struct Variable
-			{
-				Variable()
-					: decoration(SpvDecoration::Count)
-					, builtin(SpvBuiltin::Count)
-					, storageClass(SpvStorageClass::Count)
-					, location(UINT32_MAX)
-					, offset(UINT32_MAX)
-					, type(UINT32_MAX)
-				{
-				}
-
-				stl::string name;
-				SpvDecoration::Enum decoration;
-				SpvBuiltin::Enum builtin;
-				SpvStorageClass::Enum storageClass;
-				uint32_t location;
-				uint32_t offset;
-				uint32_t type;
-			};
-
-			typedef stl::vector<Variable> MemberArray;
-
-			Variable var;
-			MemberArray members;
-		};
-
-		typedef stl::unordered_map<uint32_t, TypeId> TypeIdMap;
-		typedef stl::unordered_map<uint32_t, Id> IdMap;
-
-		TypeIdMap typeIdMap;
-		IdMap idMap;
-
-		stl::string getTypeName(uint32_t _typeId)
-		{
-			return getTypeId(_typeId).toString();
-		}
-
-		Id& getId(uint32_t _id)
-		{
-			IdMap::iterator it = idMap.find(_id);
-			if (it == idMap.end() )
-			{
-				Id id;
-				stl::pair<IdMap::iterator, bool> result = idMap.insert(stl::make_pair(_id, id) );
-				it = result.first;
-			}
-
-			return it->second;
-		}
-
-		Id::Variable& get(uint32_t _id, uint32_t _idx)
-		{
-			Id& id = getId(_id);
-			id.members.resize(bx::uint32_max(_idx+1, uint32_t(id.members.size() ) ) );
-			return id.members[_idx];
-		}
-
-		TypeId& getTypeId(uint32_t _id)
-		{
-			TypeIdMap::iterator it = typeIdMap.find(_id);
-			if (it == typeIdMap.end() )
-			{
-				TypeId id;
-				stl::pair<TypeIdMap::iterator, bool> result = typeIdMap.insert(stl::make_pair(_id, id) );
-				it = result.first;
-			}
-
-			return it->second;
-		}
-
-		void update(uint32_t _id, const stl::string& _name)
-		{
-			getId(_id).var.name = _name;
-		}
-
-		BX_NO_INLINE void update(Id::Variable& _variable, SpvDecoration::Enum _decoration, uint32_t _literal)
-		{
-			_variable.decoration = _decoration;
-			switch (_decoration)
-			{
-			case SpvDecoration::Location:
-				_variable.location = _literal;
-				break;
-
-			case SpvDecoration::Offset:
-				_variable.offset = _literal;
-				break;
-
-			case SpvDecoration::BuiltIn:
-				_variable.builtin = SpvBuiltin::Enum(_literal);
-				break;
-
-			default:
-				break;
-			}
-		}
-
-		BX_NO_INLINE void update(Id::Variable& _variable, uint32_t _type, SpvStorageClass::Enum _storageClass)
-		{
-			_variable.type         = _type;
-			_variable.storageClass = _storageClass;
-		}
-
-		void update(uint32_t _id, SpvDecoration::Enum _decoration, uint32_t _literal)
-		{
-			update(getId(_id).var, _decoration, _literal);
-		}
-
-		void update(uint32_t _id, uint32_t _type, SpvStorageClass::Enum _storageClass)
-		{
-			update(getId(_id).var, _type, _storageClass);
-		}
-
-		void update(uint32_t _id, uint32_t _idx, const stl::string& _name)
-		{
-			Id::Variable& var = get(_id, _idx);
-			var.name = _name;
-		}
-
-		BX_NO_INLINE void update(uint32_t _id, uint32_t _idx, SpvDecoration::Enum _decoration, uint32_t _literal)
-		{
-			update(get(_id, _idx), _decoration, _literal);
-		}
-
-		void update(uint32_t _id, TypeId::Enum _type)
-		{
-			TypeId& type = getTypeId(_id);
-			type.type = _type;
-		}
-
-		void update(uint32_t _id, TypeId::Enum _type, uint32_t _baseTypeId, uint32_t _numComonents)
-		{
-			TypeId& type = getTypeId(_id);
-			type.type = _type;
-
-			type.baseType = getTypeId(_baseTypeId).type;
-			type.numComponents = _numComonents;
-		}
-	};
-
-	bool spvParse(uint32_t _offset, const SpvInstruction& _instruction, void* _userData)
-	{
-		BX_UNUSED(_offset);
-		SpvReflection* spv = (SpvReflection*)_userData;
-
-		switch (_instruction.opcode)
-		{
-		case SpvOpcode::Name:
-			spv->update(_instruction.result
-				, _instruction.operand[0].literalString
-				);
-			break;
-
-		case SpvOpcode::Decorate:
-			spv->update(_instruction.operand[0].data
-				, SpvDecoration::Enum(_instruction.operand[1].data)
-				, _instruction.operand[2].data
-				);
-			break;
-
-		case SpvOpcode::MemberName:
-			spv->update(_instruction.result
-				, _instruction.operand[0].data
-				, _instruction.operand[1].literalString
-				);
-			break;
-
-		case SpvOpcode::MemberDecorate:
-			spv->update(_instruction.operand[0].data
-				, _instruction.operand[1].data
-				, SpvDecoration::Enum(_instruction.operand[2].data)
-				, _instruction.operand[3].data
-				);
-			break;
-
-		case SpvOpcode::Variable:
-			spv->update(_instruction.result
-				, _instruction.type
-				, SpvStorageClass::Enum(_instruction.operand[0].data)
-				);
-			break;
-
-		case SpvOpcode::TypeVoid:
-			spv->update(_instruction.result, SpvReflection::TypeId::Void);
-			break;
-
-		case SpvOpcode::TypeBool:
-			spv->update(_instruction.result, SpvReflection::TypeId::Bool);
-			break;
-
-		case SpvOpcode::TypeInt:
-			spv->update(_instruction.result
-				, 32 == _instruction.operand[0].data
-				?	0 == _instruction.operand[1].data
-					? SpvReflection::TypeId::Uint32
-					: SpvReflection::TypeId::Int32
-				:	0 == _instruction.operand[1].data
-					? SpvReflection::TypeId::Uint64
-					: SpvReflection::TypeId::Int64
-				);
-			break;
-
-		case SpvOpcode::TypeFloat:
-			spv->update(_instruction.result
-				, 32 == _instruction.operand[0].data
-				? SpvReflection::TypeId::Float
-				: SpvReflection::TypeId::Double
-				);
-			break;
-
-		case SpvOpcode::TypeVector:
-			spv->update(_instruction.result
-				, SpvReflection::TypeId::Vector
-				, _instruction.operand[0].data
-				, _instruction.operand[1].data
-				);
-			break;
-
-		case SpvOpcode::TypeMatrix:
-			spv->update(_instruction.result
-				, SpvReflection::TypeId::Matrix
-				, _instruction.operand[0].data
-				, _instruction.operand[1].data
-				);
-			break;
-
-		case SpvOpcode::TypeImage:
-		case SpvOpcode::TypeSampler:
-		case SpvOpcode::TypeSampledImage:
-			break;
-
-		case SpvOpcode::TypeStruct:
-			for (uint32_t ii = 0, num = _instruction.numOperands; ii < num; ++ii)
-			{
-				SpvReflection::Id::Variable& var = spv->get(_instruction.result, ii);
-				var.type = _instruction.operand[ii].data;
-			}
-			break;
-
-		default:
-			break;
-		}
-
-		return true;
-	}
-
-#define DBG(...) // bx::debugPrintf(__VA_ARGS__)
-
-	void disassemble(bx::WriterI* _writer, bx::ReaderSeekerI* _reader, bx::Error* _err)
-	{
-		BX_UNUSED(_writer);
-
-		uint32_t magic;
-		bx::peek(_reader, magic);
-
-		SpvReflection spvx;
-
-		if (magic == SPV_CHUNK_HEADER)
-		{
-			SpirV spirv;
-			read(_reader, spirv, _err);
-			parse(spirv.shader, spvParse, &spvx, _err);
-
-			for (SpvReflection::IdMap::const_iterator it = spvx.idMap.begin(), itEnd = spvx.idMap.end(); it != itEnd; ++it)
-			{
-				const SpvReflection::Id& id = it->second;
-				uint32_t num = uint32_t(id.members.size() );
-				if (0 < num
-				&&  0 != bx::strCmp(id.var.name.c_str(), "gl_PerVertex") )
-				{
-					DBG("%3d: %s %d %s\n"
-						, it->first
-						, id.var.name.c_str()
-						, id.var.location
-						, getName(id.var.storageClass)
-						);
-					DBG("{\n");
-					for (uint32_t ii = 0; ii < num; ++ii)
-					{
-						const SpvReflection::Id::Variable& var = id.members[ii];
-						DBG("\t\t%s %s %d %s\n"
-							, spvx.getTypeName(var.type).c_str()
-							, var.name.c_str()
-							, var.offset
-							, getName(var.storageClass)
-							);
-						BX_UNUSED(var);
-					}
-					DBG("}\n");
-				}
-			}
-
-		}
-	}
 
 	static EShLanguage getLang(char _p)
 	{
@@ -584,10 +220,10 @@ namespace bgfx { namespace metal
 	{
 		uint16_t size = 0;
 
-		uint16_t count = static_cast<uint16_t>(uniforms.size());
+		uint16_t count = static_cast<uint16_t>(uniforms.size() );
 		bx::write(_writer, count);
 
-		uint32_t fragmentBit = isFragmentShader ? BGFX_UNIFORM_FRAGMENTBIT : 0;
+		uint32_t fragmentBit = isFragmentShader ? kUniformFragmentBit : 0;
 		for (uint16_t ii = 0; ii < count; ++ii)
 		{
 			const Uniform& un = uniforms[ii];
@@ -597,10 +233,13 @@ namespace bgfx { namespace metal
 			uint8_t nameSize = (uint8_t)un.name.size();
 			bx::write(_writer, nameSize);
 			bx::write(_writer, un.name.c_str(), nameSize);
-			bx::write(_writer, uint8_t(un.type | fragmentBit));
+			bx::write(_writer, uint8_t(un.type | fragmentBit) );
 			bx::write(_writer, un.num);
 			bx::write(_writer, un.regIndex);
 			bx::write(_writer, un.regCount);
+			bx::write(_writer, un.texComponent);
+			bx::write(_writer, un.texDimension);
+			bx::write(_writer, un.texFormat);
 
 			BX_TRACE("%s, %s, %d, %d, %d"
 				, un.name.c_str()
@@ -619,15 +258,15 @@ namespace bgfx { namespace metal
 
 		glslang::InitializeProcess();
 
-		glslang::TProgram* program = new glslang::TProgram;
-
 		EShLanguage stage = getLang(_options.shaderType);
 		if (EShLangCount == stage)
 		{
 			bx::printf("Error: Unknown shader type '%c'.\n", _options.shaderType);
 			return false;
 		}
-		glslang::TShader* shader = new glslang::TShader(stage);
+
+		glslang::TProgram* program = new glslang::TProgram;
+		glslang::TShader* shader   = new glslang::TShader(stage);
 
 		EShMessages messages = EShMessages(0
 			| EShMsgDefault
@@ -716,57 +355,74 @@ namespace bgfx { namespace metal
 					// first time through, we just find unused uniforms and get rid of them
 					std::string output;
 					bx::Error err;
-					LineReader reader(_code.c_str() );
-					while (err.isOk() )
+					bx::LineReader reader(_code.c_str() );
+					while (!reader.isDone() )
 					{
-						char str[4096];
-						int32_t len = bx::read(&reader, str, BX_COUNTOF(str), &err);
-						if (err.isOk() )
+						bx::StringView strLine = reader.next();
+						bx::StringView str = strFind(strLine, "uniform ");
+
+						if (!str.isEmpty() )
 						{
-							std::string strLine(str, len);
+							// If the line declares a uniform, merge all next
+							// lines until we encounter a semicolon.
+							bx::StringView lineEnd = strFind(strLine, ";");
+							while (lineEnd.isEmpty() && !reader.isDone()) {
+								bx::StringView nextLine = reader.next();
+								strLine.set(strLine.getPtr(), nextLine.getTerm());
+								lineEnd = strFind(nextLine, ";");
+							}
 
-							size_t index = strLine.find("uniform ");
-							if (index != std::string::npos)
+							bool found = false;
+
+							for (uint32_t ii = 0; ii < BX_COUNTOF(s_samplerTypes); ++ii)
 							{
-								bool found = false;
-
-								for (uint32_t ii = 0; ii < BX_COUNTOF(s_samplerTypes); ++ii)
+								if (!bx::findIdentifierMatch(strLine, s_samplerTypes[ii]).isEmpty() )
 								{
-									if (!bx::findIdentifierMatch(strLine.c_str(), s_samplerTypes[ii]).isEmpty())
+									found = true;
+									break;
+								}
+							}
+
+							if (!found)
+							{
+								for (int32_t ii = 0, num = program->getNumLiveUniformVariables(); ii < num; ++ii)
+								{
+									// matching lines like:  uniform u_name;
+									// we want to replace "uniform" with "static" so that it's no longer
+									// included in the uniform blob that the application must upload
+									// we can't just remove them, because unused functions might still reference
+									// them and cause a compile error when they're gone
+									if (!bx::findIdentifierMatch(strLine, program->getUniformName(ii) ).isEmpty() )
 									{
 										found = true;
 										break;
 									}
 								}
-
-								if (!found)
-								{
-									for (int32_t ii = 0, num = program->getNumLiveUniformVariables(); ii < num; ++ii)
-									{
-										// matching lines like:  uniform u_name;
-										// we want to replace "uniform" with "static" so that it's no longer
-										// included in the uniform blob that the application must upload
-										// we can't just remove them, because unused functions might still reference
-										// them and cause a compile error when they're gone
-										if (!bx::findIdentifierMatch(strLine.c_str(), program->getUniformName(ii)).isEmpty())
-										{
-											found = true;
-											break;
-										}
-									}
-								}
-
-								if (!found)
-								{
-									strLine = strLine.replace(index, 7 /* uniform */, "static");
-								}
 							}
 
-							output += strLine;
+							if (!found)
+							{
+								output.append(strLine.getPtr(), str.getPtr() );
+								output += "static ";
+								output.append(str.getTerm(), strLine.getTerm() );
+								output += "\n";
+							}
+							else
+							{
+								output.append(strLine.getPtr(), strLine.getTerm() );
+								output += "\n";
+							}
+						}
+						else
+						{
+							output.append(strLine.getPtr(), strLine.getTerm() );
+							output += "\n";
 						}
 					}
 
 					// recompile with the unused uniforms converted to statics
+					delete program;
+					delete shader;
 					return compile(_options, _version, output.c_str(), _writer, false);
 				}
 
@@ -785,7 +441,7 @@ namespace bgfx { namespace metal
 						un.regIndex = uint16_t(offset);
 						un.regCount = un.num;
 
-						switch (program->getUniformType(ii))
+						switch (program->getUniformType(ii) )
 						{
 						case 0x1404: // GL_INT:
 							un.type = UniformType::Sampler;
@@ -855,10 +511,10 @@ namespace bgfx { namespace metal
 				}
 				else
 				{
-					bx::Error err;
-					bx::WriterI* writer = bx::getDebugOut();
-					bx::MemoryReader reader(spirv.data(), uint32_t(spirv.size()*4) );
-					disassemble(writer, &reader, &err);
+					if (g_verbose)
+					{
+						glslang::SpirvToolsDisassemble(std::cout, spirv, SPV_ENV_VULKAN_1_0);
+					}
 
 					spirv_cross::CompilerReflection refl(spirv);
 					spirv_cross::ShaderResources resourcesrefl = refl.get_shader_resources();
@@ -867,31 +523,26 @@ namespace bgfx { namespace metal
 					for (auto &resource : resourcesrefl.separate_images)
 					{
 						std::string name = refl.get_name(resource.id);
-						if (name.size() > 7 && 0 == bx::strCmp(name.c_str() + name.length() - 7, "Texture") )
+						if (name.size() > 7 && 0 == bx::strCmp(name.c_str() + name.length() - 7, "Texture"))
 						{
-							auto uniform_name = name.substr(0, name.length() - 7);
-
-							Uniform un;
-							un.name = uniform_name;
-							un.type = UniformType::Sampler;
-
-							un.num = 0;			// needed?
-							un.regIndex = 0;	// needed?
-							un.regCount = 0;	// needed?
-
-							uniforms.push_back(un);
+							name = name.substr(0, name.length() - 7);
 						}
+
+						Uniform un;
+						un.name = name;
+						un.type = UniformType::Sampler;
+
+						un.num = 0;			// needed?
+						un.regIndex = 0;	// needed?
+						un.regCount = 0;	// needed?
+
+						uniforms.push_back(un);
 					}
 					uint16_t size = writeUniformArray( _writer, uniforms, _options.shaderType == 'f');
 
-					if (_version == BX_MAKEFOURCC('M', 'T', 'L', 0))
+					if (_version == BX_MAKEFOURCC('M', 'T', 'L', 0) )
 					{
-						if (g_verbose)
-						{
-							glslang::SpirvToolsDisassemble(std::cout, spirv);
-						}
-
-						spirv_cross::CompilerMSL msl(std::move(spirv));
+						spirv_cross::CompilerMSL msl(std::move(spirv) );
 
 						auto executionModel = msl.get_execution_model();
 						spirv_cross::MSLResourceBinding newBinding;
@@ -900,7 +551,7 @@ namespace bgfx { namespace metal
 						spirv_cross::ShaderResources resources = msl.get_shader_resources();
 
 						spirv_cross::SmallVector<spirv_cross::EntryPoint> entryPoints = msl.get_entry_points_and_stages();
-						if (!entryPoints.empty())
+						if (!entryPoints.empty() )
 							msl.rename_entry_point(entryPoints[0].name, "xlatMtlMain", entryPoints[0].execution_model);
 
 						for (auto &resource : resources.uniform_buffers)
@@ -940,7 +591,9 @@ namespace bgfx { namespace metal
 						{
 							std::string name = msl.get_name(resource.id);
 							if (name.size() > 7 && 0 == bx::strCmp(name.c_str() + name.length() - 7, "Texture") )
-								msl.set_name(resource.id, name.substr(0, name.length() - 7));
+							{
+								msl.set_name(resource.id, name.substr(0, name.length() - 7) );
+							}
 
 							unsigned set = msl.get_decoration( resource.id, spv::DecorationDescriptorSet );
 							unsigned binding = msl.get_decoration( resource.id, spv::DecorationBinding );
@@ -954,8 +607,6 @@ namespace bgfx { namespace metal
 						for (auto &resource : resources.storage_images)
 						{
 							std::string name = msl.get_name(resource.id);
-							if (name.size() > 7 && 0 == bx::strCmp(name.c_str() + name.length() - 7, "Texture") )
-								msl.set_name(resource.id, name.substr(0, name.length() - 7));
 
 							unsigned set = msl.get_decoration( resource.id, spv::DecorationDescriptorSet );
 							unsigned binding = msl.get_decoration( resource.id, spv::DecorationBinding );

@@ -11,24 +11,59 @@
 #include "emu.h"
 #include "a1cassette.h"
 
+#include "imagedev/cassette.h"
+
+#include "speaker.h"
+
+
+namespace {
+
 /***************************************************************************
     PARAMETERS
 ***************************************************************************/
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
 #define CASSETTE_ROM_REGION "casrom"
 
-DEFINE_DEVICE_TYPE(A1BUS_CASSETTE, a1bus_cassette_device, "a1cass", "Apple I cassette board")
-
 ROM_START( cassette )
-	/* 256-byte cassette interface ROM, in two 82s129 or mmi6301 256x4 proms at locations 3 and 4 on the cassette interface daughtercard (they are labeled "MMI 6301-IJ // 7623L // APPLE-A3" and "MMI 6301-IJ // 7623L // APPLE-A4") */
+	// 256-byte cassette interface ROM, in two 82s129 or mmi6301 256x4 proms at locations 3 and 4 on the cassette interface daughtercard (they are labeled "MMI 6301-IJ // 7623L // APPLE-A3" and "MMI 6301-IJ // 7623L // APPLE-A4")
 	ROM_REGION(0x100, CASSETTE_ROM_REGION, 0)
 	ROM_LOAD_NIB_HIGH( "apple-a3.3",    0x0000, 0x0100, CRC(6eae8f52) SHA1(71906932727ef70952ef6afe6b08708df15cd67d) )
 	ROM_LOAD_NIB_LOW( "apple-a4.4",    0x0000, 0x0100, CRC(94efa977) SHA1(851f3bd6863859a1a6909179a5e5bf744b3d807e) )
 ROM_END
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+class a1bus_cassette_device:
+	public device_t,
+	public device_a1bus_card_interface
+{
+public:
+	// construction/destruction
+	a1bus_cassette_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	uint8_t cassette_r(offs_t offset);
+	void cassette_w(offs_t offset, uint8_t data);
+
+protected:
+	a1bus_cassette_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+
+	void cassette_toggle_output();
+
+	optional_device<cassette_image_device> m_cassette;
+
+private:
+	required_region_ptr<uint8_t> m_rom;
+	int m_cassette_output_flipflop;
+};
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -38,9 +73,11 @@ ROM_END
 
 void a1bus_cassette_device::device_add_mconfig(machine_config &config)
 {
+	SPEAKER(config, "mono").front_center();
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
 	m_cassette->set_interface("apple1_cass");
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.08);
 }
 
 const tiny_rom_entry *a1bus_cassette_device::device_rom_region() const
@@ -72,8 +109,8 @@ a1bus_cassette_device::a1bus_cassette_device(const machine_config &mconfig, devi
 
 void a1bus_cassette_device::device_start()
 {
-	install_device(0xc000, 0xc0ff, read8_delegate(*this, FUNC(a1bus_cassette_device::cassette_r)), write8_delegate(*this, FUNC(a1bus_cassette_device::cassette_w)));
-	install_bank(0xc100, 0xc1ff, "bank_a1cas", &m_rom[0]);
+	install_device(0xc000, 0xc0ff, read8sm_delegate(*this, FUNC(a1bus_cassette_device::cassette_r)), write8sm_delegate(*this, FUNC(a1bus_cassette_device::cassette_w)));
+	install_bank(0xc100, 0xc1ff, &m_rom[0]);
 
 	save_item(NAME(m_cassette_output_flipflop));
 }
@@ -145,9 +182,10 @@ void a1bus_cassette_device::cassette_toggle_output()
 	m_cassette->output(m_cassette_output_flipflop ? 1.0 : -1.0);
 }
 
-READ8_MEMBER(a1bus_cassette_device::cassette_r)
+uint8_t a1bus_cassette_device::cassette_r(offs_t offset)
 {
-	cassette_toggle_output();
+	if (!machine().side_effects_disabled())
+		cassette_toggle_output();
 
 	if (offset <= 0x7f)
 	{
@@ -180,7 +218,7 @@ READ8_MEMBER(a1bus_cassette_device::cassette_r)
 	}
 }
 
-WRITE8_MEMBER(a1bus_cassette_device::cassette_w)
+void a1bus_cassette_device::cassette_w(offs_t offset, uint8_t data)
 {
 	/* Writes toggle the output flip-flop in the same way that reads
 	   do; other than that they have no effect.  Any repeated accesses
@@ -191,3 +229,12 @@ WRITE8_MEMBER(a1bus_cassette_device::cassette_w)
 
 	cassette_toggle_output();
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(A1BUS_CASSETTE, device_a1bus_card_interface, a1bus_cassette_device, "a1cass", "Apple I cassette board")

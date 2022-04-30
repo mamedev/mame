@@ -305,6 +305,9 @@ protected:
 	const address_space_config m_program_config;
 	const address_space_config m_io_config;
 	address_space *m_program;
+	memory_access<32, 1, 0, ENDIANNESS_BIG>::cache m_cache16;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::cache m_cache32;
+
 	std::function<u16 (offs_t)> m_pr16;
 	std::function<const void * (offs_t)> m_prptr;
 	address_space *m_io;

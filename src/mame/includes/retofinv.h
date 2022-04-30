@@ -38,16 +38,16 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(cpu2_m6000_w);
-	DECLARE_READ8_MEMBER(cpu0_mf800_r);
+	void cpu2_m6000_w(uint8_t data);
+	uint8_t cpu0_mf800_r();
 	DECLARE_WRITE_LINE_MEMBER(irq0_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(irq1_ack_w);
-	DECLARE_WRITE8_MEMBER(coincounter_w);
+	void coincounter_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coinlockout_w);
-	DECLARE_READ8_MEMBER(mcu_status_r);
-	DECLARE_WRITE8_MEMBER(bg_videoram_w);
-	DECLARE_WRITE8_MEMBER(fg_videoram_w);
-	DECLARE_WRITE8_MEMBER(gfx_ctrl_w);
+	uint8_t mcu_status_r();
+	void bg_videoram_w(offs_t offset, uint8_t data);
+	void fg_videoram_w(offs_t offset, uint8_t data);
+	void gfx_ctrl_w(offs_t offset, uint8_t data);
 
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
@@ -80,13 +80,13 @@ private:
 	required_shared_ptr<uint8_t> m_sharedram;
 	required_shared_ptr<uint8_t> m_bg_videoram;
 
-	uint8_t m_main_irq_mask;
-	uint8_t m_sub_irq_mask;
-	uint8_t m_cpu2_m6000;
-	int m_fg_bank;
-	int m_bg_bank;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_fg_tilemap;
+	uint8_t m_main_irq_mask = 0;
+	uint8_t m_sub_irq_mask = 0;
+	uint8_t m_cpu2_m6000 = 0;
+	int m_fg_bank = 0;
+	int m_bg_bank = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
 };
 
 #endif // MAME_INCLUDES_RETOFINV_H

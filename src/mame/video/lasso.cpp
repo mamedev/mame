@@ -115,7 +115,7 @@ TILE_GET_INFO_MEMBER(lasso_state::lasso_get_bg_tile_info)
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 					code + ((uint16_t)m_gfxbank << 8),
 					color & 0x0f,
 					0);
@@ -127,7 +127,7 @@ TILE_GET_INFO_MEMBER(lasso_state::wwjgtin_get_track_tile_info)
 	int code = ROM[tile_index];
 	int color = ROM[tile_index + 0x2000];
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 					code,
 					color & 0x0f,
 					0);
@@ -138,7 +138,7 @@ TILE_GET_INFO_MEMBER(lasso_state::pinbo_get_bg_tile_info)
 	int code  = m_videoram[tile_index];
 	int color = m_colorram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 					code + ((color & 0x30) << 4),
 					color & 0x0f,
 					0);
@@ -183,20 +183,20 @@ VIDEO_START_MEMBER(lasso_state,pinbo)
  *
  *************************************/
 
-WRITE8_MEMBER(lasso_state::lasso_videoram_w)
+void lasso_state::lasso_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(lasso_state::lasso_colorram_w)
+void lasso_state::lasso_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(lasso_state::lasso_flip_screen_w)
+void lasso_state::lasso_flip_screen_w(uint8_t data)
 {
 	/* don't know which is which, but they are always set together */
 	flip_screen_x_set(data & 0x01);
@@ -206,7 +206,7 @@ WRITE8_MEMBER(lasso_state::lasso_flip_screen_w)
 }
 
 
-WRITE8_MEMBER(lasso_state::lasso_video_control_w)
+void lasso_state::lasso_video_control_w(uint8_t data)
 {
 	int bank = (data & 0x04) >> 2;
 
@@ -216,10 +216,10 @@ WRITE8_MEMBER(lasso_state::lasso_video_control_w)
 		machine().tilemap().mark_all_dirty();
 	}
 
-	lasso_flip_screen_w(space, offset, data);
+	lasso_flip_screen_w(data);
 }
 
-WRITE8_MEMBER(lasso_state::wwjgtin_video_control_w)
+void lasso_state::wwjgtin_video_control_w(uint8_t data)
 {
 	int bank = ((data & 0x04) ? 0 : 1) + ((data & 0x10) ? 2 : 0);
 	m_track_enable = data & 0x08;
@@ -230,15 +230,15 @@ WRITE8_MEMBER(lasso_state::wwjgtin_video_control_w)
 		machine().tilemap().mark_all_dirty();
 	}
 
-	lasso_flip_screen_w(space, offset, data);
+	lasso_flip_screen_w(data);
 }
 
-WRITE8_MEMBER(lasso_state::pinbo_video_control_w)
+void lasso_state::pinbo_video_control_w(uint8_t data)
 {
 	/* no need to dirty the tilemap -- only the sprites use the global bank */
 	m_gfxbank = (data & 0x0c) >> 2;
 
-	lasso_flip_screen_w(space, offset, data);
+	lasso_flip_screen_w(data);
 }
 
 
@@ -303,14 +303,10 @@ void lasso_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect,
 
 void lasso_state::draw_lasso( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	offs_t offs;
 	pen_t pen = 0x3f;
 
-	for (offs = 0; offs < 0x2000; offs++)
+	for (offs_t offs = 0; offs < 0x2000; offs++)
 	{
-		int bit;
-		uint8_t data;
-		uint8_t x;
 		uint8_t y = offs >> 5;
 
 		if (flip_screen_y())
@@ -319,23 +315,23 @@ void lasso_state::draw_lasso( bitmap_ind16 &bitmap, const rectangle &cliprect )
 		if ((y < cliprect.min_y) || (y > cliprect.max_y))
 			continue;
 
-		x = (offs & 0x1f) << 3;
-		data = m_bitmap_ram[offs];
+		uint8_t x = (offs & 0x1f) << 3;
+		uint8_t data = m_bitmap_ram[offs];
 
 		if (flip_screen_x())
 			x = ~x;
 
-		for (bit = 0; bit < 8; bit++)
+		for (int bit = 0; bit < 8; bit++)
 		{
 			if ((data & 0x80) && (x >= cliprect.min_x) && (x <= cliprect.max_x))
-				bitmap.pix16(y, x) = pen;
+				bitmap.pix(y, x) = pen;
 
 			if (flip_screen_x())
-				x = x - 1;
+				x--;
 			else
-				x = x + 1;
+				x++;
 
-			data = data << 1;
+			data <<= 1;
 		}
 	}
 }

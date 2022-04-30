@@ -119,7 +119,7 @@ public:
 
 protected:
 	// state machine
-	void step(void *ptr = nullptr, int param = 0);
+	void step(s32 param = 0);
 	void execute();
 
 	// drawing functions

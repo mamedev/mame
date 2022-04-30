@@ -50,12 +50,13 @@
 #include "emu.h"
 #include "namco52.h"
 
-TIMER_CALLBACK_MEMBER( namco_52xx_device::latch_callback )
+WRITE_LINE_MEMBER( namco_52xx_device::reset )
 {
-	m_latched_cmd = param;
+	// The incoming signal is active low
+	m_cpu->set_input_line(INPUT_LINE_RESET, !state);
 }
 
-READ8_MEMBER( namco_52xx_device::K_r )
+uint8_t namco_52xx_device::K_r()
 {
 	return m_latched_cmd & 0x0f;
 }
@@ -65,33 +66,33 @@ READ_LINE_MEMBER( namco_52xx_device::SI_r )
 	return m_si(0) ? 1 : 0;
 }
 
-READ8_MEMBER( namco_52xx_device::R0_r )
+uint8_t namco_52xx_device::R0_r()
 {
 	return m_romread(m_address) & 0x0f;
 }
 
-READ8_MEMBER( namco_52xx_device::R1_r )
+uint8_t namco_52xx_device::R1_r()
 {
 	return m_romread(m_address) >> 4;
 }
 
 
-WRITE8_MEMBER( namco_52xx_device::P_w )
+void namco_52xx_device::P_w(uint8_t data)
 {
 	m_discrete->write(NAMCO_52XX_P_DATA(m_basenode), data & 0x0f);
 }
 
-WRITE8_MEMBER( namco_52xx_device::R2_w )
+void namco_52xx_device::R2_w(uint8_t data)
 {
 	m_address = (m_address & 0xfff0) | ((data & 0xf) << 0);
 }
 
-WRITE8_MEMBER( namco_52xx_device::R3_w )
+void namco_52xx_device::R3_w(uint8_t data)
 {
 	m_address = (m_address & 0xff0f) | ((data & 0xf) << 4);
 }
 
-WRITE8_MEMBER( namco_52xx_device::O_w )
+void namco_52xx_device::O_w(uint8_t data)
 {
 	if (data & 0x10)
 		m_address = (m_address & 0x0fff) | ((data & 0xf) << 12);
@@ -99,28 +100,21 @@ WRITE8_MEMBER( namco_52xx_device::O_w )
 		m_address = (m_address & 0xf0ff) | ((data & 0xf) << 8);
 }
 
-TIMER_CALLBACK_MEMBER( namco_52xx_device::irq_clear )
+
+void namco_52xx_device::write(uint8_t data)
 {
-	m_cpu->set_input_line(0, CLEAR_LINE);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_52xx_device::write_sync),this), data);
 }
 
-WRITE8_MEMBER( namco_52xx_device::write )
+TIMER_CALLBACK_MEMBER( namco_52xx_device::write_sync )
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_52xx_device::latch_callback),this), data);
-
-	m_cpu->set_input_line(0, ASSERT_LINE);
-
-	// The execution time of one instruction is ~4us, so we must make sure to
-	// give the cpu time to poll the /IRQ input before we clear it.
-	// The input clock to the 06XX interface chip is 64H, that is
-	// 18432000/6/64 = 48kHz, so it makes sense for the irq line to be
-	// asserted for one clock cycle ~= 21us.
-
-	/* the 52xx uses TSTI to check for an interrupt; it also may be handling
-	   a timer interrupt, so we need to ensure the IRQ line is held long enough */
-	machine().scheduler().timer_set(attotime::from_usec(5*21), timer_expired_delegate(FUNC(namco_52xx_device::irq_clear),this), 0);
+	m_latched_cmd = param;
 }
 
+WRITE_LINE_MEMBER( namco_52xx_device::chip_select )
+{
+	m_cpu->set_input_line(0, state);
+}
 
 TIMER_CALLBACK_MEMBER( namco_52xx_device::external_clock_pulse )
 {

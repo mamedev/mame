@@ -11,25 +11,73 @@
 ***************************************************************************/
 
 #include "hash.h"
-#include "hashing.h"
+
+#include "ioprocs.h"
+
+#include <cassert>
 #include <cctype>
+#include <optional>
 
 
 namespace util {
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
-
-char const hash_collection::HASH_CRC;
-char const hash_collection::HASH_SHA1;
 
 char const *const hash_collection::HASH_TYPES_CRC = "R";
 char const *const hash_collection::HASH_TYPES_CRC_SHA1 = "RS";
 char const *const hash_collection::HASH_TYPES_ALL = "RS";
 
-char const hash_collection::FLAG_NO_DUMP;
-char const hash_collection::FLAG_BAD_DUMP;
 
+//**************************************************************************
+//  HASH CREATOR
+//**************************************************************************
+
+class hash_collection::hash_creator
+{
+public:
+	// constructor
+	hash_creator(bool doing_crc32, bool doing_sha1)
+	{
+		if (doing_crc32)
+			m_crc32_creator.emplace();
+		if (doing_sha1)
+			m_sha1_creator.emplace();
+	}
+
+	// add the given buffer to the hash
+	void append(void const *buffer, std::size_t length)
+	{
+		// append to each active hash
+		if (m_crc32_creator)
+			m_crc32_creator->append(buffer, length);
+		if (m_sha1_creator)
+			m_sha1_creator->append(buffer, length);
+	}
+
+	// stop hashing
+	void finish(hash_collection &hashes)
+	{
+		// finish up the CRC32
+		if (m_crc32_creator)
+		{
+			hashes.add_crc(m_crc32_creator->finish());
+			m_crc32_creator.reset();
+		}
+
+		// finish up the SHA1
+		if (m_sha1_creator)
+		{
+			hashes.add_sha1(m_sha1_creator->finish());
+			m_sha1_creator.reset();
+		}
+	}
+
+private:
+	std::optional<crc32_creator> m_crc32_creator;
+	std::optional<sha1_creator> m_sha1_creator;
+};
 
 
 //**************************************************************************
@@ -41,38 +89,9 @@ char const hash_collection::FLAG_BAD_DUMP;
 //-------------------------------------------------
 
 hash_collection::hash_collection()
-	: m_has_crc32(false),
-		m_has_sha1(false),
-		m_creator(nullptr)
+	: m_has_crc32(false)
+	, m_has_sha1(false)
 {
-}
-
-
-hash_collection::hash_collection(const char *string)
-	: m_has_crc32(false),
-		m_has_sha1(false),
-		m_creator(nullptr)
-{
-	from_internal_string(string);
-}
-
-
-hash_collection::hash_collection(const hash_collection &src)
-	: m_has_crc32(false),
-		m_has_sha1(false),
-		m_creator(nullptr)
-{
-	copyfrom(src);
-}
-
-
-//-------------------------------------------------
-//  ~hash_collection - destructor
-//-------------------------------------------------
-
-hash_collection::~hash_collection()
-{
-	delete m_creator;
 }
 
 
@@ -142,8 +161,6 @@ void hash_collection::reset()
 {
 	m_flags.clear();
 	m_has_crc32 = m_has_sha1 = false;
-	delete m_creator;
-	m_creator = nullptr;
 }
 
 
@@ -152,15 +169,15 @@ void hash_collection::reset()
 //  from a string
 //-------------------------------------------------
 
-bool hash_collection::add_from_string(char type, const char *buffer, int length)
+bool hash_collection::add_from_string(char type, std::string_view string)
 {
 	// handle CRCs
 	if (type == HASH_CRC)
-		return m_has_crc32 = m_crc32.from_string(buffer, length);
+		return m_has_crc32 = m_crc32.from_string(string);
 
 	// handle SHA1s
 	else if (type == HASH_SHA1)
-		return m_has_sha1 = m_sha1.from_string(buffer, length);
+		return m_has_sha1 = m_sha1.from_string(string);
 
 	return false;
 }
@@ -240,7 +257,13 @@ std::string hash_collection::macro_string() const
 		buffer.append("NO_DUMP ");
 	if (flag(FLAG_BAD_DUMP))
 		buffer.append("BAD_DUMP ");
-	strtrimspace(buffer);
+
+	// remove trailing space
+	if (!buffer.empty())
+	{
+		assert(buffer.back() == ' ');
+		buffer = buffer.substr(0, buffer.length() - 1);
+	}
 	return buffer;
 }
 
@@ -267,7 +290,10 @@ std::string hash_collection::attribute_string() const
 		buffer.append("status=\"nodump\"");
 	if (flag(FLAG_BAD_DUMP))
 		buffer.append("status=\"baddump\"");
-	strtrimspace(buffer);
+
+	// remove trailing space
+	if (!buffer.empty() && buffer.back() == ' ')
+		buffer = buffer.substr(0, buffer.length() - 1);
 	return buffer;
 }
 
@@ -277,24 +303,19 @@ std::string hash_collection::attribute_string() const
 //  compact string to set of hashes and flags
 //-------------------------------------------------
 
-bool hash_collection::from_internal_string(const char *string)
+bool hash_collection::from_internal_string(std::string_view string)
 {
-	assert(string != nullptr);
-
 	// start fresh
 	reset();
 
-	// determine the end of the string
-	const char *stringend = string + strlen(string);
-	const char *ptr = string;
-
-	// loop until we hit it
+	// loop until we hit the end of the string
 	bool errors = false;
 	int skip_digits = 0;
-	while (ptr < stringend)
+	while (!string.empty())
 	{
-		char c = *ptr++;
+		char c = string[0];
 		char uc = toupper(c);
+		string.remove_prefix(1);
 
 		// non-hex alpha values specify a hash type
 		if (uc >= 'G' && uc <= 'Z')
@@ -303,13 +324,13 @@ bool hash_collection::from_internal_string(const char *string)
 			if (uc == HASH_CRC)
 			{
 				m_has_crc32 = true;
-				errors = !m_crc32.from_string(ptr, stringend - ptr);
+				errors = !m_crc32.from_string(string);
 				skip_digits = 2 * sizeof(crc32_t);
 			}
 			else if (uc == HASH_SHA1)
 			{
 				m_has_sha1 = true;
-				errors = !m_sha1.from_string(ptr, stringend - ptr);
+				errors = !m_sha1.from_string(string);
 				skip_digits = 2 * sizeof(sha1_t);
 			}
 			else
@@ -336,69 +357,75 @@ bool hash_collection::from_internal_string(const char *string)
 
 
 //-------------------------------------------------
-//  begin - begin hashing
+//  create - begin hashing
 //-------------------------------------------------
 
-void hash_collection::begin(const char *types)
+std::unique_ptr<hash_collection::hash_creator> hash_collection::create(const char *types)
 {
-	// nuke previous creator and make a new one
-	delete m_creator;
-	m_creator = new hash_creator;
-
 	// by default use all types
 	if (types == nullptr)
-		m_creator->m_doing_crc32 = m_creator->m_doing_sha1 = true;
+		return std::make_unique<hash_creator>(true, true);
 
 	// otherwise, just allocate the ones that are specified
 	else
-	{
-		m_creator->m_doing_crc32 = (strchr(types, HASH_CRC) != nullptr);
-		m_creator->m_doing_sha1 = (strchr(types, HASH_SHA1) != nullptr);
-	}
+		return std::make_unique<hash_creator>(strchr(types, HASH_CRC) != nullptr, strchr(types, HASH_SHA1) != nullptr);
 }
 
 
 //-------------------------------------------------
-//  buffer - add the given buffer to the hash
+//  compute - hash a block of data
 //-------------------------------------------------
 
-void hash_collection::buffer(const uint8_t *data, uint32_t length)
+void hash_collection::compute(const uint8_t *data, uint32_t length, const char *types)
 {
-	assert(m_creator != nullptr);
+	// begin
+	std::unique_ptr<hash_creator> creator = create(types);
 
-	// append to each active hash
-	if (m_creator->m_doing_crc32)
-		m_creator->m_crc32_creator.append(data, length);
-	if (m_creator->m_doing_sha1)
-		m_creator->m_sha1_creator.append(data, length);
+	// run the hashes
+	creator->append(data, length);
+
+	// end
+	creator->finish(*this);
 }
 
 
 //-------------------------------------------------
-//  end - stop hashing
+//  compute - hash data from a stream
 //-------------------------------------------------
 
-void hash_collection::end()
+std::error_condition hash_collection::compute(random_read &stream, uint64_t offset, size_t length, size_t &actual, const char *types)
 {
-	assert(m_creator != nullptr);
+	// begin
+	std::unique_ptr<hash_creator> creator = create(types);
 
-	// finish up the CRC32
-	if (m_creator->m_doing_crc32)
+	// local buffer of arbitrary size
+	uint8_t buffer[2048];
+
+	// run the hashes
+	actual = 0U;
+	while (length)
 	{
-		m_has_crc32 = true;
-		m_crc32 = m_creator->m_crc32_creator.finish();
+		// determine the size of the next chunk
+		unsigned const chunk_length = std::min(length, sizeof(buffer));
+
+		// read one chunk
+		std::size_t bytes_read;
+		std::error_condition err = stream.read_at(offset, buffer, chunk_length, bytes_read);
+		if (err)
+			return err;
+		if (!bytes_read) // EOF?
+			break;
+		offset += bytes_read;
+		length -= chunk_length;
+
+		// append the chunk
+		creator->append(buffer, bytes_read);
+		actual += bytes_read;
 	}
 
-	// finish up the SHA1
-	if (m_creator->m_doing_sha1)
-	{
-		m_has_sha1 = true;
-		m_sha1 = m_creator->m_sha1_creator.finish();
-	}
-
-	// nuke the creator
-	delete m_creator;
-	m_creator = nullptr;
+	// end
+	creator->finish(*this);
+	return std::error_condition();
 }
 
 
@@ -417,9 +444,6 @@ void hash_collection::copyfrom(const hash_collection &src)
 	m_crc32 = src.m_crc32;
 	m_has_sha1 = src.m_has_sha1;
 	m_sha1 = src.m_sha1;
-
-	// don't copy creators
-	m_creator = nullptr;
 }
 
 } // namespace util

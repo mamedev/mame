@@ -64,10 +64,8 @@
  *
  */
 
-#ifndef __PLIB_PREPROCESSOR__
-	#define NL_PROHIBIT_BASEH_INCLUDE   1
-	#include "netlist/devices/net_lib.h"
-#endif
+#define NL_PROHIBIT_BASEH_INCLUDE   1
+#include "netlist/devices/net_lib.h"
 
 static NETLIST_START(rebound_schematics)
 

@@ -116,7 +116,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
 	DECLARE_WRITE_LINE_MEMBER( reset_w );
 	DECLARE_WRITE_LINE_MEMBER( romdis_w );
-	DECLARE_WRITE8_MEMBER( rom_select );
+	void rom_select(uint8_t data);
 
 	void set_rom_bank(uint8_t sel) { if(m_card) m_card->set_rom_bank(sel); }  // tell device the currently selected ROM
 	void set_mapping(uint8_t type) { if(m_card) m_card->set_mapping(type); }  // tell device to enable any ROM or RAM mapping

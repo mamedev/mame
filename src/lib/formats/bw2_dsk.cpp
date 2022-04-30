@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/bw2_dsk.h"
 
 bw2_format::bw2_format() : upd765_format(formats)
@@ -43,4 +41,4 @@ const bw2_format::format bw2_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_BW2_FORMAT = &floppy_image_format_creator<bw2_format>;
+const bw2_format FLOPPY_BW2_FORMAT;

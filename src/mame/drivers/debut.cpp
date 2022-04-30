@@ -29,7 +29,7 @@ A bit more detailed, list of other Soviet standard TTL chips used and their equi
 - К561ЛЕ5А = CD4001
 - PC74HC259P = the odd one out
 
-keypad legend:
+Keypad legend:
 
 АН  - анализ (analysis, switches view info)
 ХОД - ходи (force move)
@@ -44,11 +44,12 @@ keypad legend:
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i86/i86.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -94,24 +95,21 @@ private:
 
 	// I/O handlers
 	INTERRUPT_GEN_MEMBER(interrupt);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(latch_w);
+	u8 input_r(offs_t offset);
+	void latch_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(lcd_update_w);
 
 	u8 m_latch[5];
-	u8 m_dac_data;
-	u8 m_lcd_update;
+	u8 m_dac_data = 0;
+	u8 m_lcd_update = 0;
 };
 
 void debut_state::machine_start()
 {
+	memset(m_latch, 0, sizeof(m_latch));
+
 	// resolve handlers
 	m_out_digit.resolve();
-
-	// zerofill
-	memset(m_latch, 0, sizeof(m_latch));
-	m_dac_data = 0;
-	m_lcd_update = 0;
 
 	// register for savestates
 	save_item(NAME(m_latch));
@@ -130,7 +128,7 @@ INTERRUPT_GEN_MEMBER(debut_state::interrupt)
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // I8086
 }
 
-READ8_MEMBER(debut_state::input_r)
+u8 debut_state::input_r(offs_t offset)
 {
 	u8 data = 0;
 	u8 sel = m_latch[0] & 0xf;
@@ -147,7 +145,7 @@ READ8_MEMBER(debut_state::input_r)
 	return ~data;
 }
 
-WRITE8_MEMBER(debut_state::latch_w)
+void debut_state::latch_w(offs_t offset, u8 data)
 {
 	u8 mask = 1 << offset;
 	u8 prev = m_latch[0];
@@ -209,17 +207,17 @@ void debut_state::main_io(address_map &map)
 
 static INPUT_PORTS_START( debutm )
 	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("АН (Analysis)")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("ХОД (Force Move)")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("ИНТ (Switch 1P/2P)")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("ПОЗ (Position Mode)")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("ВФ (Select Piece)")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("ВП (Take Back)")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("УР (Level)")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("ВВ (Enter Position)")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME(u8"АН (Analysis)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME(u8"ХОД (Force Move)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME(u8"ИНТ (Switch 1P/2P)")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME(u8"ПОЗ (Position Mode)")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME(u8"ВФ (Select Piece)")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME(u8"ВП (Take Back)")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME(u8"УР (Level)")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME(u8"ВВ (Enter Position)")
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, debut_state, reset_button, 0) PORT_NAME("СБ (Reset)")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, debut_state, reset_button, 0) PORT_NAME(u8"СБ (Reset)")
 INPUT_PORTS_END
 
 
@@ -230,7 +228,7 @@ INPUT_PORTS_END
 
 void debut_state::debutm(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	I8086(config, m_maincpu, 16.2_MHz_XTAL / 3);
 	m_maincpu->set_periodic_int(FUNC(debut_state::interrupt), attotime::from_hz(380));
 	m_maincpu->set_addrmap(AS_PROGRAM, &debut_state::main_map);
@@ -241,15 +239,14 @@ void debut_state::debutm(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(2, 9);
 	m_display->set_bri_maximum(0.5);
 	config.set_default_layout(layout_debutm);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 

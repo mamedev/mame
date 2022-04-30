@@ -1,15 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese
+// copyright-holders:Angelo Salese, Ryan Holtz
 /****************************************************************************************************************************************
 
     Sharp Zaurus PDA skeleton driver (SL, ARM/Linux based, 4th generation)
 
     TODO:
-    - PXA-255 ID opcode fails on this
-    - ARM TLB look-up errors?
-    - RTC irq doesn't fire?
-    - For whatever reason, after RTC check ARM executes invalid code at 0-0x200
-    - Dumps are questionable to say the least
+    - Dumps are questionable
 
 =========================================================================================================================================
 Sharp Zaurus
@@ -1406,92 +1402,141 @@ Note:
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
+#include "machine/locomo.h"
 #include "machine/pxa255.h"
+#include "machine/sa1110.h"
+#include "machine/scoop.h"
 #include "machine/timer.h"
+#include "machine/ucb1200.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+#define SA1110_CLOCK 206000000
+#define PXA250_CLOCK 400000000
+#define PXA255_CLOCK 400000000
+#define PXA270_CLOCK 416000000
 
-#define MAIN_CLOCK XTAL(8'000'000)
+namespace
+{
 
 class zaurus_state : public driver_device
 {
 public:
 	zaurus_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_pxa_periphs(*this, "pxa_periphs")
 		, m_maincpu(*this, "maincpu")
 		, m_ram(*this, "ram")
 	{ }
 
-	void zaurus(machine_config &config);
-
-private:
-	// devices
-	required_device<pxa255_periphs_device> m_pxa_periphs;
-	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<uint32_t> m_ram;
-
-	uint8_t m_rtc_tick;
-	DECLARE_READ32_MEMBER(pxa255_rtc_r);
-	DECLARE_WRITE32_MEMBER(pxa255_rtc_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(rtc_irq_callback);
-
-	// screen updates
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	void zaurus_map(address_map &map);
-
+protected:
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual void video_start() override;
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint32_t> m_ram;
 };
 
-
-void zaurus_state::video_start()
+class zaurus_sa_state : public zaurus_state
 {
+public:
+	zaurus_sa_state(const machine_config &mconfig, device_type type, const char *tag)
+		: zaurus_state(mconfig, type, tag)
+		, m_sa_periphs(*this, "sa_periphs")
+		, m_locomo(*this, "locomo")
+		, m_scoop(*this, "scoop")
+		, m_codec(*this, "codec")
+	{ }
+
+	void zaurus_sa1110(machine_config &config);
+
+private:
+	virtual void device_reset_after_children() override;
+
+	void main_map(address_map &map);
+
+	required_device<sa1110_periphs_device> m_sa_periphs;
+	required_device<locomo_device> m_locomo;
+	required_device<scoop_device> m_scoop;
+	required_device<ucb1200_device> m_codec;
+};
+
+class zaurus_pxa_state : public zaurus_state
+{
+public:
+	zaurus_pxa_state(const machine_config &mconfig, device_type type, const char *tag)
+		: zaurus_state(mconfig, type, tag)
+		, m_pxa_periphs(*this, "pxa_periphs")
+		, m_power(*this, "PWR")
+	{ }
+
+	void zaurus_pxa_base(machine_config &config);
+	void zaurus_pxa250(machine_config &config);
+	void zaurus_pxa255(machine_config &config);
+	void zaurus_pxa270(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER( system_start );
+
+private:
+	void main_map(address_map &map);
+
+	required_device<pxa255_periphs_device> m_pxa_periphs;
+	required_ioport m_power;
+};
+
+void zaurus_sa_state::main_map(address_map &map)
+{
+	map(0x00000000, 0x00ffffff).rom().region("firmware", 0);
+	map(0x40000000, 0x40001fff).rw(m_locomo, FUNC(locomo_device::read), FUNC(locomo_device::write));
+	map(0x40800000, 0x4080002b).rw(m_scoop, FUNC(scoop_device::read), FUNC(scoop_device::write));
+	map(0x80050000, 0x80050023).rw(m_sa_periphs, FUNC(sa1110_periphs_device::uart3_r), FUNC(sa1110_periphs_device::uart3_w));
+	map(0x80060000, 0x8006001b).rw(m_sa_periphs, FUNC(sa1110_periphs_device::mcp_r), FUNC(sa1110_periphs_device::mcp_w));
+	map(0x90000000, 0x9000001f).rw(m_sa_periphs, FUNC(sa1110_periphs_device::ostimer_r), FUNC(sa1110_periphs_device::ostimer_w));
+	map(0x90010000, 0x9001000f).rw(m_sa_periphs, FUNC(sa1110_periphs_device::rtc_r), FUNC(sa1110_periphs_device::rtc_w));
+	map(0x90020000, 0x9002001f).rw(m_sa_periphs, FUNC(sa1110_periphs_device::power_r), FUNC(sa1110_periphs_device::power_w));
+	map(0x90030000, 0x90030007).rw(m_sa_periphs, FUNC(sa1110_periphs_device::reset_r), FUNC(sa1110_periphs_device::reset_w));
+	map(0x90040000, 0x90040023).rw(m_sa_periphs, FUNC(sa1110_periphs_device::gpio_r), FUNC(sa1110_periphs_device::gpio_w));
+	map(0x90050000, 0x90050023).rw(m_sa_periphs, FUNC(sa1110_periphs_device::intc_r), FUNC(sa1110_periphs_device::intc_w));
+	map(0xc0000000, 0xc3ffffff).ram().share("ram");
 }
 
-uint32_t zaurus_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+void zaurus_pxa_state::main_map(address_map &map)
 {
-	return 0;
-}
-
-
-READ32_MEMBER(zaurus_state::pxa255_rtc_r)
-{
-	printf("%08x\n",offset << 2);
-
-	return 0;
-}
-
-WRITE32_MEMBER(zaurus_state::pxa255_rtc_w)
-{
-	printf("%08x %08x\n",offset << 2,data);
-
-}
-
-void zaurus_state::zaurus_map(address_map &map)
-{
-	map(0x00000000, 0x001fffff).ram().region("firmware", 0);
-	map(0x40900000, 0x4090000f).rw(FUNC(zaurus_state::pxa255_rtc_r), FUNC(zaurus_state::pxa255_rtc_w));
-	map(0x40000000, 0x400002ff).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::pxa255_dma_r), FUNC(pxa255_periphs_device::pxa255_dma_w));
-	map(0x40400000, 0x40400083).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::pxa255_i2s_r), FUNC(pxa255_periphs_device::pxa255_i2s_w));
-	map(0x40a00000, 0x40a0001f).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::pxa255_ostimer_r), FUNC(pxa255_periphs_device::pxa255_ostimer_w));
-	map(0x40d00000, 0x40d00017).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::pxa255_intc_r), FUNC(pxa255_periphs_device::pxa255_intc_w));
-	map(0x40e00000, 0x40e0006b).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::pxa255_gpio_r), FUNC(pxa255_periphs_device::pxa255_gpio_w));
-	map(0x44000000, 0x4400021f).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::pxa255_lcd_r), FUNC(pxa255_periphs_device::pxa255_lcd_w));
+	map(0x00000000, 0x001fffff).rom().region("firmware", 0);
+	map(0x40000000, 0x400002ff).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::dma_r), FUNC(pxa255_periphs_device::dma_w));
+	map(0x40400000, 0x40400083).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::i2s_r), FUNC(pxa255_periphs_device::i2s_w));
+	map(0x40900000, 0x4090000f).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::rtc_r), FUNC(pxa255_periphs_device::rtc_w));
+	map(0x40a00000, 0x40a0001f).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::ostimer_r), FUNC(pxa255_periphs_device::ostimer_w));
+	map(0x40d00000, 0x40d00017).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::intc_r), FUNC(pxa255_periphs_device::intc_w));
+	map(0x40e00000, 0x40e0006b).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::gpio_r), FUNC(pxa255_periphs_device::gpio_w));
+	map(0x40f00000, 0x40f00037).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::power_r), FUNC(pxa255_periphs_device::power_w));
+	map(0x41300000, 0x4130000b).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::clocks_r), FUNC(pxa255_periphs_device::clocks_w));
+	map(0x44000000, 0x4400021f).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::lcd_r), FUNC(pxa255_periphs_device::lcd_w));
 	map(0xa0000000, 0xa07fffff).ram().share("ram");
 }
 
+void zaurus_sa_state::device_reset_after_children()
+{
+	m_sa_periphs->gpio_in<1>(1);
+	m_sa_periphs->gpio_in<24>(1);
+	//m_scoop->gpio_in<2>(1); // DIAG_BOOT1
+	//m_scoop->gpio_in<3>(1); // DIAG_BOOT2
+}
 
-static INPUT_PORTS_START( zaurus )
+INPUT_CHANGED_MEMBER( zaurus_pxa_state::system_start )
+{
+	m_pxa_periphs->gpio_bit_w(10, m_power->read());
+}
+
+static INPUT_PORTS_START( zaurus_sa )
 INPUT_PORTS_END
 
-
+static INPUT_PORTS_START( zaurus_pxa )
+	PORT_START("PWR")
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start System") PORT_CHANGED_MEMBER(DEVICE_SELF, zaurus_pxa_state, system_start, 0)
+INPUT_PORTS_END
 
 void zaurus_state::machine_start()
 {
@@ -1501,49 +1546,46 @@ void zaurus_state::machine_reset()
 {
 }
 
-
-/* TODO: Hack */
-TIMER_DEVICE_CALLBACK_MEMBER(zaurus_state::rtc_irq_callback)
+void zaurus_sa_state::zaurus_sa1110(machine_config &config)
 {
-#if 0
-	m_rtc_tick++;
-	m_rtc_tick&=1;
+	SA1110(config, m_maincpu, SA1110_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zaurus_sa_state::main_map);
 
-	if(m_rtc_tick & 1)
-		pxa255_set_irq_line(PXA255_INT_RTC_HZ,1);
-	else
-		pxa255_set_irq_line(PXA255_INT_RTC_HZ,0);
-#else
-	(void)m_rtc_tick;
-#endif
+	SA1110_PERIPHERALS(config, m_sa_periphs, SA1110_CLOCK, m_maincpu);
+	m_sa_periphs->set_codec_tag(m_codec);
+
+	LOCOMO(config, m_locomo);
+	SCOOP(config, m_scoop);
+
+	UCB1200(config, m_codec);
+	m_codec->adc_in<0>().set_constant(460); // Battery temperature monitor. HACK: Value is arbitrary, taken from Linux
+	m_codec->adc_in<1>().set_constant(255); // Battery voltage monitor. HACK: Value is arbitrary, taken from Linux
+	m_codec->irq_out().set(m_sa_periphs, FUNC(sa1110_periphs_device::gpio_in<23>));
 }
 
-// TODO: main CPU differs greatly between versions!
-void zaurus_state::zaurus(machine_config &config)
+void zaurus_pxa_state::zaurus_pxa250(machine_config &config)
 {
-	/* basic machine hardware */
-	PXA255(config, m_maincpu, MAIN_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &zaurus_state::zaurus_map);
+	PXA250(config, m_maincpu, PXA250_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zaurus_pxa_state::main_map);
 
-	TIMER(config, "rtc_timer").configure_periodic(FUNC(zaurus_state::rtc_irq_callback), attotime::from_hz(XTAL(32'768)));
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_screen_update(FUNC(zaurus_state::screen_update));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
-
-	PALETTE(config, "palette").set_entries(8);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-//  AY8910(config, "aysnd", MAIN_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.30);
-
-	PXA255_PERIPHERALS(config, m_pxa_periphs, MAIN_CLOCK, m_maincpu);
+	PXA255_PERIPHERALS(config, m_pxa_periphs, PXA250_CLOCK, m_maincpu);
 }
 
+void zaurus_pxa_state::zaurus_pxa255(machine_config &config)
+{
+	PXA255(config, m_maincpu, PXA255_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zaurus_pxa_state::main_map);
+
+	PXA255_PERIPHERALS(config, m_pxa_periphs, PXA255_CLOCK, m_maincpu);
+}
+
+void zaurus_pxa_state::zaurus_pxa270(machine_config &config)
+{
+	PXA270(config, m_maincpu, PXA270_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zaurus_pxa_state::main_map);
+
+	PXA255_PERIPHERALS(config, m_pxa_periphs, PXA270_CLOCK, m_maincpu); // TODO: Correct peripherals
+}
 
 /***************************************************************************
 
@@ -1551,8 +1593,16 @@ void zaurus_state::zaurus(machine_config &config)
 
 ***************************************************************************/
 
-/* was labeled SL-C500 */
 ROM_START( zsl5500 )
+	ROM_REGION32_LE( 0x1000000, "firmware", ROMREGION_ERASE00 )
+	ROM_SYSTEM_BIOS( 0, "2.58", "OS Pack 2.58" ) \
+	ROMX_LOAD( "ospack-2.58", 0x0000000, 0x1000000, CRC(31c4d3ef) SHA1(a3b67fb45160bdb990e34dca5c389ed345c000c6), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "3.10", "OS Pack 3.10" ) \
+	ROMX_LOAD( "ospack-3.10", 0x0000000, 0x1000000, CRC(d4b28f84) SHA1(fb7839ccde92f71fd80c4e04718783e684010398), ROM_BIOS(1) )
+ROM_END
+
+/* was labeled SL-C500 */
+ROM_START( zslc500 )
 	ROM_REGION32_LE( 0x200000, "firmware", ROMREGION_ERASE00 )
 	ROM_LOAD( "sl-c500 v1.20,zimage.bin", 0x000000, 0x13c000, BAD_DUMP CRC(dc1c259f) SHA1(8150744196a72821ae792462d0381182274c2ce0) )
 ROM_END
@@ -1582,9 +1632,12 @@ ROM_START( zslc1000 )
 	ROM_LOAD( "openzaurus 3.5.3 - zimage-sharp sl-c1000-20050427214434.bin", 0x000000, 0x128980, BAD_DUMP  CRC(1e1a9279) SHA1(909ac3f00385eced55822d6a155b79d9d25f43b3) )
 ROM_END
 
-COMP( 2002, zsl5500,  0, 0, zaurus, zaurus, zaurus_state, empty_init, "Sharp", "Zaurus SL-5500 \"Collie\"",           MACHINE_IS_SKELETON )
-COMP( 2002, zsl5600,  0, 0, zaurus, zaurus, zaurus_state, empty_init, "Sharp", "Zaurus SL-5600 / SL-B500 \"Poodle\"", MACHINE_IS_SKELETON )
-COMP( 2003, zslc750,  0, 0, zaurus, zaurus, zaurus_state, empty_init, "Sharp", "Zaurus SL-C750 \"Shepherd\" (Japan)", MACHINE_IS_SKELETON )
-COMP( 2004, zslc760,  0, 0, zaurus, zaurus, zaurus_state, empty_init, "Sharp", "Zaurus SL-C760 \"Husky\" (Japan)",    MACHINE_IS_SKELETON )
-COMP( 200?, zslc3000, 0, 0, zaurus, zaurus, zaurus_state, empty_init, "Sharp", "Zaurus SL-C3000 \"Spitz\" (Japan)",   MACHINE_IS_SKELETON )
-COMP( 200?, zslc1000, 0, 0, zaurus, zaurus, zaurus_state, empty_init, "Sharp", "Zaurus SL-C3000 \"Akita\" (Japan)",   MACHINE_IS_SKELETON )
+} // anonymous namespace
+
+COMP( 2002, zsl5500,  0, 0, zaurus_sa1110, zaurus_sa,  zaurus_sa_state,  empty_init, "Sharp", "Zaurus SL-5500 \"Collie\"",           MACHINE_IS_SKELETON )
+COMP( 2002, zslc500,  0, 0, zaurus_pxa250, zaurus_pxa, zaurus_pxa_state, empty_init, "Sharp", "Zaurus SL-C500",                      MACHINE_IS_SKELETON )
+COMP( 2002, zsl5600,  0, 0, zaurus_pxa250, zaurus_pxa, zaurus_pxa_state, empty_init, "Sharp", "Zaurus SL-5600 / SL-B500 \"Poodle\"", MACHINE_IS_SKELETON )
+COMP( 2003, zslc750,  0, 0, zaurus_pxa255, zaurus_pxa, zaurus_pxa_state, empty_init, "Sharp", "Zaurus SL-C750 \"Shepherd\" (Japan)", MACHINE_IS_SKELETON )
+COMP( 2004, zslc760,  0, 0, zaurus_pxa255, zaurus_pxa, zaurus_pxa_state, empty_init, "Sharp", "Zaurus SL-C760 \"Husky\" (Japan)",    MACHINE_IS_SKELETON )
+COMP( 200?, zslc3000, 0, 0, zaurus_pxa270, zaurus_pxa, zaurus_pxa_state, empty_init, "Sharp", "Zaurus SL-C3000 \"Spitz\" (Japan)",   MACHINE_IS_SKELETON )
+COMP( 200?, zslc1000, 0, 0, zaurus_pxa270, zaurus_pxa, zaurus_pxa_state, empty_init, "Sharp", "Zaurus SL-C3000 \"Akita\" (Japan)",   MACHINE_IS_SKELETON )

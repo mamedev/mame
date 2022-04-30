@@ -138,7 +138,7 @@ TILE_GET_INFO_MEMBER(champbas_state::champbas_get_bg_tile_info)
 	int const code = m_vram[tile_index] | (m_gfx_bank << 8);
 	int const color = (m_vram[tile_index + 0x400] & 0x1f) | 0x20;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(exctsccr_state::exctsccr_get_bg_tile_info)
@@ -146,7 +146,7 @@ TILE_GET_INFO_MEMBER(exctsccr_state::exctsccr_get_bg_tile_info)
 	int const code = m_vram[tile_index] | (m_gfx_bank << 8);
 	int const color = m_vram[tile_index + 0x400] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 
@@ -175,7 +175,7 @@ void exctsccr_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(champbas_state::tilemap_w)
+void champbas_state::tilemap_w(offs_t offset, uint8_t data)
 {
 	m_vram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);

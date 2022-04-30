@@ -29,6 +29,8 @@ public:
 	i82371sb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto smi() { return m_smi_callback.bind(); }
+	auto nmi() { return m_nmi_callback.bind(); }
+	auto stpclk() { return m_stpclk_callback.bind(); }
 	auto boot_state_hook() { return m_boot_state_hook.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(pc_pirqa_w);
@@ -38,6 +40,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pc_mirq0_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_mirq1_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_ferr_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_extsmi_w);
 
 	DECLARE_WRITE_LINE_MEMBER(pc_irq1_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_irq3_w);
@@ -71,20 +74,20 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(at_pit8254_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(at_pit8254_out1_changed);
 	DECLARE_WRITE_LINE_MEMBER(at_pit8254_out2_changed);
-	DECLARE_READ8_MEMBER(pc_dma8237_0_dack_r);
-	DECLARE_READ8_MEMBER(pc_dma8237_1_dack_r);
-	DECLARE_READ8_MEMBER(pc_dma8237_2_dack_r);
-	DECLARE_READ8_MEMBER(pc_dma8237_3_dack_r);
-	DECLARE_READ8_MEMBER(pc_dma8237_5_dack_r);
-	DECLARE_READ8_MEMBER(pc_dma8237_6_dack_r);
-	DECLARE_READ8_MEMBER(pc_dma8237_7_dack_r);
-	DECLARE_WRITE8_MEMBER(pc_dma8237_0_dack_w);
-	DECLARE_WRITE8_MEMBER(pc_dma8237_1_dack_w);
-	DECLARE_WRITE8_MEMBER(pc_dma8237_2_dack_w);
-	DECLARE_WRITE8_MEMBER(pc_dma8237_3_dack_w);
-	DECLARE_WRITE8_MEMBER(pc_dma8237_5_dack_w);
-	DECLARE_WRITE8_MEMBER(pc_dma8237_6_dack_w);
-	DECLARE_WRITE8_MEMBER(pc_dma8237_7_dack_w);
+	uint8_t pc_dma8237_0_dack_r();
+	uint8_t pc_dma8237_1_dack_r();
+	uint8_t pc_dma8237_2_dack_r();
+	uint8_t pc_dma8237_3_dack_r();
+	uint8_t pc_dma8237_5_dack_r();
+	uint8_t pc_dma8237_6_dack_r();
+	uint8_t pc_dma8237_7_dack_r();
+	void pc_dma8237_0_dack_w(uint8_t data);
+	void pc_dma8237_1_dack_w(uint8_t data);
+	void pc_dma8237_2_dack_w(uint8_t data);
+	void pc_dma8237_3_dack_w(uint8_t data);
+	void pc_dma8237_5_dack_w(uint8_t data);
+	void pc_dma8237_6_dack_w(uint8_t data);
+	void pc_dma8237_7_dack_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack0_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack1_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
@@ -95,72 +98,73 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(pc_dack7_w);
 	DECLARE_WRITE_LINE_MEMBER(at_dma8237_out_eop);
 	DECLARE_WRITE_LINE_MEMBER(pc_dma_hrq_changed);
-	DECLARE_READ8_MEMBER(pc_dma_read_byte);
-	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
-	DECLARE_READ8_MEMBER(pc_dma_read_word);
-	DECLARE_WRITE8_MEMBER(pc_dma_write_word);
-	DECLARE_READ8_MEMBER(get_slave_ack);
+	uint8_t pc_dma_read_byte(offs_t offset);
+	void pc_dma_write_byte(offs_t offset, uint8_t data);
+	uint8_t pc_dma_read_word(offs_t offset);
+	void pc_dma_write_word(offs_t offset,uint8_t data);
+	uint8_t get_slave_ack(offs_t offset);
 
 	void internal_io_map(address_map &map);
 
-	DECLARE_WRITE8_MEMBER (boot_state_w);
-	DECLARE_WRITE8_MEMBER (nop_w);
+	void boot_state_w(uint8_t data);
+	void nop_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER  (iort_r);
-	DECLARE_WRITE8_MEMBER (iort_w);
-	DECLARE_READ16_MEMBER (xbcs_r);
-	DECLARE_WRITE16_MEMBER(xbcs_w);
-	DECLARE_READ8_MEMBER  (pirqrc_r);
-	DECLARE_WRITE8_MEMBER (pirqrc_w);
-	DECLARE_READ8_MEMBER  (tom_r);
-	DECLARE_WRITE8_MEMBER (tom_w);
-	DECLARE_READ16_MEMBER (mstat_r);
-	DECLARE_WRITE16_MEMBER(mstat_w);
-	DECLARE_READ8_MEMBER  (mbirq01_r);
-	DECLARE_WRITE8_MEMBER (mbirq01_w);
-	DECLARE_READ8_MEMBER  (mbdma_r);
-	DECLARE_WRITE8_MEMBER (mbdma_w);
-	DECLARE_READ16_MEMBER (pcsc_r);
-	DECLARE_WRITE16_MEMBER(pcsc_w);
-	DECLARE_READ8_MEMBER  (apicbase_r);
-	DECLARE_WRITE8_MEMBER (apicbase_w);
-	DECLARE_READ8_MEMBER  (dlc_r);
-	DECLARE_WRITE8_MEMBER (dlc_w);
-	DECLARE_READ8_MEMBER  (smicntl_r);
-	DECLARE_WRITE8_MEMBER (smicntl_w);
-	DECLARE_READ16_MEMBER (smien_r);
-	DECLARE_WRITE16_MEMBER(smien_w);
-	DECLARE_READ32_MEMBER (see_r);
-	DECLARE_WRITE32_MEMBER(see_w);
-	DECLARE_READ8_MEMBER  (ftmr_r);
-	DECLARE_WRITE8_MEMBER (ftmr_w);
-	DECLARE_READ16_MEMBER (smireq_r);
-	DECLARE_WRITE16_MEMBER(smireq_w);
-	DECLARE_READ8_MEMBER  (ctltmr_r);
-	DECLARE_WRITE8_MEMBER (ctltmr_w);
-	DECLARE_READ8_MEMBER  (cthtmr_r);
-	DECLARE_WRITE8_MEMBER (cthtmr_w);
+	void status_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint8_t iort_r();
+	void iort_w(uint8_t data);
+	uint16_t xbcs_r();
+	void xbcs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t pirqrc_r(offs_t offset);
+	void pirqrc_w(offs_t offset, uint8_t data);
+	uint8_t tom_r();
+	void tom_w(uint8_t data);
+	uint16_t mstat_r();
+	void mstat_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t mbirq01_r(offs_t offset);
+	void mbirq01_w(offs_t offset, uint8_t data);
+	uint8_t mbdma_r(offs_t offset);
+	void mbdma_w(offs_t offset, uint8_t data);
+	uint16_t pcsc_r();
+	void pcsc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t apicbase_r();
+	void apicbase_w(uint8_t data);
+	uint8_t dlc_r();
+	void dlc_w(uint8_t data);
+	uint8_t smicntl_r();
+	void smicntl_w(uint8_t data);
+	uint16_t smien_r();
+	void smien_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint32_t see_r();
+	void see_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t ftmr_r();
+	void ftmr_w(uint8_t data);
+	uint16_t smireq_r();
+	void smireq_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t ctltmr_r();
+	void ctltmr_w(uint8_t data);
+	uint8_t cthtmr_r();
+	void cthtmr_w(uint8_t data);
 
 	// southbridge
-	DECLARE_READ8_MEMBER(at_page8_r);
-	DECLARE_WRITE8_MEMBER(at_page8_w);
-	DECLARE_READ8_MEMBER(at_portb_r);
-	DECLARE_WRITE8_MEMBER(at_portb_w);
+	uint8_t at_page8_r(offs_t offset);
+	void at_page8_w(offs_t offset, uint8_t data);
+	uint8_t at_portb_r();
+	void at_portb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(iochck_w);
-	DECLARE_READ8_MEMBER(ide_read_cs1_r);
-	DECLARE_WRITE8_MEMBER(ide_write_cs1_w);
-	DECLARE_READ8_MEMBER(ide2_read_cs1_r);
-	DECLARE_WRITE8_MEMBER(ide2_write_cs1_w);
-	DECLARE_READ8_MEMBER(at_dma8237_2_r);
-	DECLARE_WRITE8_MEMBER(at_dma8237_2_w);
-	DECLARE_READ8_MEMBER(eisa_irq_read);
-	DECLARE_WRITE8_MEMBER(eisa_irq_write);
-	DECLARE_READ8_MEMBER(read_apmcapms);
-	DECLARE_WRITE8_MEMBER(write_apmcapms);
+	uint8_t at_dma8237_2_r(offs_t offset);
+	void at_dma8237_2_w(offs_t offset, uint8_t data);
+	uint8_t eisa_irq_read(offs_t offset);
+	void eisa_irq_write(offs_t offset, uint8_t data);
+	uint8_t read_apmcapms(offs_t offset);
+	void write_apmcapms(offs_t offset, uint8_t data);
+	uint8_t reset_control_r(offs_t offset);
+	void reset_control_w(offs_t offset, uint8_t data);
 
 	void update_smireq_line();
 
 	devcb_write_line m_smi_callback;
+	devcb_write_line m_nmi_callback;
+	devcb_write_line m_stpclk_callback;
 	devcb_write8 m_boot_state_hook;
 
 	uint32_t see;
@@ -168,6 +172,7 @@ private:
 	uint8_t apmc, apms;
 	uint8_t iort, pirqrc[4], tom, mbirq0, mbirq1, mbdma[2], apicbase;
 	uint8_t dlc, smicntl, ftmr, ctlmtr, cthmtr;
+	uint8_t reset_control;
 
 	void map_bios(address_space *memory_space, uint32_t start, uint32_t end);
 
@@ -226,29 +231,30 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(secondary_int);
 
 private:
-	DECLARE_READ16_MEMBER(command_r);
-	DECLARE_WRITE16_MEMBER(command_w);
-	DECLARE_READ32_MEMBER(bmiba_r);
-	DECLARE_WRITE32_MEMBER(bmiba_w);
-	DECLARE_READ16_MEMBER(idetim_primary_r);
-	DECLARE_WRITE16_MEMBER(idetim_primary_w);
-	DECLARE_READ16_MEMBER(idetim_secondary_r);
-	DECLARE_WRITE16_MEMBER(idetim_secondary_w);
-	DECLARE_READ8_MEMBER(sidetim_r);
-	DECLARE_WRITE8_MEMBER(sidetim_w);
+	void status_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	virtual uint8_t latency_timer_r() override;
+	void latency_timer_w(uint8_t data);
+	uint32_t bmiba_r();
+	void bmiba_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint16_t idetim_primary_r();
+	void idetim_primary_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t idetim_secondary_r();
+	void idetim_secondary_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint8_t sidetim_r();
+	void sidetim_w(uint8_t data);
 
-	DECLARE_READ32_MEMBER(ide1_read32_cs0_r);
-	DECLARE_WRITE32_MEMBER(ide1_write32_cs0_w);
-	DECLARE_READ32_MEMBER(ide2_read32_cs0_r);
-	DECLARE_WRITE32_MEMBER(ide2_write32_cs0_w);
-	DECLARE_READ8_MEMBER(ide1_read_cs1_r);
-	DECLARE_WRITE8_MEMBER(ide1_write_cs1_w);
-	DECLARE_READ8_MEMBER(ide2_read_cs1_r);
-	DECLARE_WRITE8_MEMBER(ide2_write_cs1_w);
+	uint32_t ide1_read32_cs0_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ide1_write32_cs0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t ide2_read32_cs0_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ide2_write32_cs0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t ide1_read_cs1_r();
+	void ide1_write_cs1_w(uint8_t data);
+	uint8_t ide2_read_cs1_r();
+	void ide2_write_cs1_w(uint8_t data);
 
 	void internal_io_map(address_map &map);
 
-	uint16_t command;
+	uint8_t latency_timer;
 	uint32_t bmiba;
 	int idetim_primary, idetim_secondary;
 	int sidetim;

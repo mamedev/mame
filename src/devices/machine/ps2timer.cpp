@@ -190,7 +190,7 @@ TIMER_CALLBACK_MEMBER(ps2_timer_device::overflow)
 {
 }
 
-READ32_MEMBER(ps2_timer_device::read)
+uint32_t ps2_timer_device::read(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = 0;
 	switch (offset)
@@ -226,7 +226,7 @@ READ32_MEMBER(ps2_timer_device::read)
 	return ret;
 }
 
-WRITE32_MEMBER(ps2_timer_device::write)
+void ps2_timer_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{

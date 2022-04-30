@@ -200,7 +200,7 @@ TILEMAP_MAPPER_MEMBER(decocass_state::bgvideoram_scan_cols )
 TILE_GET_INFO_MEMBER(decocass_state::get_bg_l_tile_info)
 {
 	int color = (m_color_center_bot >> 7) & 1;
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			m_bgvideoram[tile_index] >> 4,
 			color * 4 + 1,
 			0);
@@ -211,7 +211,7 @@ TILE_GET_INFO_MEMBER(decocass_state::get_bg_l_tile_info)
 TILE_GET_INFO_MEMBER(decocass_state::get_bg_r_tile_info )
 {
 	int color = (m_color_center_bot >> 7) & 1;
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			m_bgvideoram[tile_index] >> 4,
 			color * 4 + 1,
 			TILE_FLIPY);
@@ -223,7 +223,7 @@ TILE_GET_INFO_MEMBER(decocass_state::get_fg_tile_info )
 {
 	uint8_t code = m_fgvideoram[tile_index];
 	uint8_t attr = m_colorram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			256 * (attr & 3) + code,
 			BIT(m_color_center_bot, 0),
 			0);
@@ -279,13 +279,13 @@ void decocass_state::draw_special_priority(bitmap_ind16 &bitmap, bitmap_ind8 &pr
 					(dy >= 0 && dy < 64 && dx >= 0 && dx < 64 && objdata1[dy * 64 + dx] != 0))
 				{
 					pri2 = true;
-					if (BIT(m_mode_set, 5) && priority.pix8(y, x) == 0) // least priority?
-						bitmap.pix16(y, x) = color;
+					if (BIT(m_mode_set, 5) && priority.pix(y, x) == 0) // least priority?
+						bitmap.pix(y, x) = color;
 				}
 			}
 
 			if (!pri2)
-				bitmap.pix16(y, x) |= 0x10;
+				bitmap.pix(y, x) |= 0x10;
 		}
 	}
 }
@@ -313,7 +313,7 @@ void decocass_state::draw_center(bitmap_ind16 &bitmap, const rectangle &cliprect
 			if (((sy + y) & m_color_center_bot & 3) == (sy & m_color_center_bot & 3))
 				for (x = 0; x < 256; x++)
 					if (0 != (x & 16) || 0 != (m_center_h_shift_space & 1))
-						bitmap.pix16(sy + y, (sx + x) & 255) = color;
+						bitmap.pix(sy + y, (sx + x) & 255) = color;
 		}
 }
 
@@ -321,7 +321,7 @@ void decocass_state::draw_center(bitmap_ind16 &bitmap, const rectangle &cliprect
     memory handlers
  ********************************************/
 
-WRITE8_MEMBER(decocass_state::decocass_paletteram_w )
+void decocass_state::decocass_paletteram_w(offs_t offset, uint8_t data)
 {
 	/*
 	 * RGB output is inverted and A4 is inverted too
@@ -333,7 +333,7 @@ WRITE8_MEMBER(decocass_state::decocass_paletteram_w )
 	m_palette->set_indirect_color(offset, rgb_t(pal3bit(~data >> 0), pal3bit(~data >> 3), pal2bit(~data >> 6)));
 }
 
-WRITE8_MEMBER(decocass_state::decocass_charram_w )
+void decocass_state::decocass_charram_w(offs_t offset, uint8_t data)
 {
 	m_charram[offset] = data;
 	/* dirty sprite */
@@ -343,13 +343,13 @@ WRITE8_MEMBER(decocass_state::decocass_charram_w )
 }
 
 
-WRITE8_MEMBER(decocass_state::decocass_fgvideoram_w )
+void decocass_state::decocass_fgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(decocass_state::decocass_colorram_w )
+void decocass_state::decocass_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -361,7 +361,7 @@ void decocass_state::mark_bg_tile_dirty(offs_t offset )
 	m_bg_tilemap_l->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(decocass_state::decocass_tileram_w )
+void decocass_state::decocass_tileram_w(offs_t offset, uint8_t data)
 {
 	m_tileram[offset] = data;
 	/* dirty tile (64 bytes per tile) */
@@ -371,7 +371,7 @@ WRITE8_MEMBER(decocass_state::decocass_tileram_w )
 		mark_bg_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(decocass_state::decocass_objectram_w )
+void decocass_state::decocass_objectram_w(offs_t offset, uint8_t data)
 {
 	m_objectram[offset] = data;
 	/* dirty the object */
@@ -379,26 +379,26 @@ WRITE8_MEMBER(decocass_state::decocass_objectram_w )
 	m_gfxdecode->gfx(3)->mark_dirty(1);
 }
 
-WRITE8_MEMBER(decocass_state::decocass_bgvideoram_w )
+void decocass_state::decocass_bgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_bgvideoram[offset] = data;
 	mark_bg_tile_dirty(offset);
 }
 
 /* The watchdog is a 4bit counter counting down every frame */
-WRITE8_MEMBER(decocass_state::decocass_watchdog_count_w )
+void decocass_state::decocass_watchdog_count_w(uint8_t data)
 {
 	LOG(1,("decocass_watchdog_count_w: $%02x\n", data));
 	m_watchdog_count = data & 0x0f;
 }
 
-WRITE8_MEMBER(decocass_state::decocass_watchdog_flip_w )
+void decocass_state::decocass_watchdog_flip_w(uint8_t data)
 {
 	LOG(1,("decocass_watchdog_flip_w: $%02x\n", data));
 	m_watchdog_flip = data;
 }
 
-WRITE8_MEMBER(decocass_state::decocass_color_missiles_w )
+void decocass_state::decocass_color_missiles_w(uint8_t data)
 {
 	LOG(1,("decocass_color_missiles_w: $%02x\n", data));
 	/* only bits D0-D2 and D4-D6 are connected to
@@ -419,7 +419,7 @@ WRITE8_MEMBER(decocass_state::decocass_color_missiles_w )
  * D6 - tunnel
  * D7 - part h enable
  */
-WRITE8_MEMBER(decocass_state::decocass_mode_set_w )
+void decocass_state::decocass_mode_set_w(uint8_t data)
 {
 	if (data == m_mode_set)
 		return;
@@ -436,7 +436,7 @@ WRITE8_MEMBER(decocass_state::decocass_mode_set_w )
 	m_mode_set = data;
 }
 
-WRITE8_MEMBER(decocass_state::decocass_color_center_bot_w )
+void decocass_state::decocass_color_center_bot_w(uint8_t data)
 {
 	if (data == m_color_center_bot)
 		return;
@@ -462,7 +462,7 @@ WRITE8_MEMBER(decocass_state::decocass_color_center_bot_w )
 	m_color_center_bot = data;
 }
 
-WRITE8_MEMBER(decocass_state::decocass_back_h_shift_w )
+void decocass_state::decocass_back_h_shift_w(uint8_t data)
 {
 	if (data == m_back_h_shift)
 		return;
@@ -470,7 +470,7 @@ WRITE8_MEMBER(decocass_state::decocass_back_h_shift_w )
 	m_back_h_shift = data;
 }
 
-WRITE8_MEMBER(decocass_state::decocass_back_vl_shift_w )
+void decocass_state::decocass_back_vl_shift_w(uint8_t data)
 {
 	if (data == m_back_vl_shift)
 		return;
@@ -478,7 +478,7 @@ WRITE8_MEMBER(decocass_state::decocass_back_vl_shift_w )
 	m_back_vl_shift = data;
 }
 
-WRITE8_MEMBER(decocass_state::decocass_back_vr_shift_w )
+void decocass_state::decocass_back_vr_shift_w(uint8_t data)
 {
 	if (data == m_back_vr_shift)
 		return;
@@ -486,7 +486,7 @@ WRITE8_MEMBER(decocass_state::decocass_back_vr_shift_w )
 	m_back_vr_shift = data;
 }
 
-WRITE8_MEMBER(decocass_state::decocass_part_h_shift_w )
+void decocass_state::decocass_part_h_shift_w(uint8_t data)
 {
 	if (data == m_part_h_shift )
 		return;
@@ -494,7 +494,7 @@ WRITE8_MEMBER(decocass_state::decocass_part_h_shift_w )
 	m_part_h_shift = data;
 }
 
-WRITE8_MEMBER(decocass_state::decocass_part_v_shift_w )
+void decocass_state::decocass_part_v_shift_w(uint8_t data)
 {
 	if (data == m_part_v_shift )
 		return;
@@ -502,7 +502,7 @@ WRITE8_MEMBER(decocass_state::decocass_part_v_shift_w )
 	m_part_v_shift = data;
 }
 
-WRITE8_MEMBER(decocass_state::decocass_center_h_shift_space_w )
+void decocass_state::decocass_center_h_shift_space_w(uint8_t data)
 {
 	if (data == m_center_h_shift_space)
 		return;
@@ -510,7 +510,7 @@ WRITE8_MEMBER(decocass_state::decocass_center_h_shift_space_w )
 	m_center_h_shift_space = data;
 }
 
-WRITE8_MEMBER(decocass_state::decocass_center_v_shift_w )
+void decocass_state::decocass_center_v_shift_w(uint8_t data)
 {
 	LOG(1,("decocass_center_v_shift_w: $%02x\n", data));
 	m_center_v_shift = data;
@@ -572,16 +572,12 @@ void decocass_state::draw_missiles(bitmap_ind16 &bitmap, bitmap_ind8 &priority, 
 						int missile_y_adjust, int missile_y_adjust_flip_screen,
 						uint8_t *missile_ram, int interleave)
 {
-	int i, offs, x;
-
 	/* Draw the missiles (16 of them) seemingly with alternating colors
 	 * from the E302 latch (color_missiles) */
-	for (i = 0, offs = 0; i < 8; i++, offs += 4 * interleave)
+	for (int i = 0, offs = 0; i < 8; i++, offs += 4 * interleave)
 	{
-		int sx, sy;
-
-		sy = 255 - missile_ram[offs + 0 * interleave];
-		sx = 255 - missile_ram[offs + 2 * interleave];
+		int sy = 255 - missile_ram[offs + 0 * interleave];
+		int sx = 255 - missile_ram[offs + 2 * interleave];
 		if (flip_screen())
 		{
 			sx = 240 - sx;
@@ -589,12 +585,12 @@ void decocass_state::draw_missiles(bitmap_ind16 &bitmap, bitmap_ind8 &priority, 
 		}
 		sy -= missile_y_adjust;
 		if (sy >= cliprect.top() && sy <= cliprect.bottom())
-			for (x = 0; x < 4; x++)
+			for (int x = 0; x < 4; x++)
 			{
 				if (sx >= cliprect.left() && sx <= cliprect.right())
 				{
-					bitmap.pix16(sy, sx) = (m_color_missiles & 7) | 8;
-					priority.pix8(sy, sx) |= 1 << 2;
+					bitmap.pix(sy, sx) = (m_color_missiles & 7) | 8;
+					priority.pix(sy, sx) |= 1 << 2;
 				}
 				sx++;
 			}
@@ -608,12 +604,12 @@ void decocass_state::draw_missiles(bitmap_ind16 &bitmap, bitmap_ind8 &priority, 
 		}
 		sy -= missile_y_adjust;
 		if (sy >= cliprect.top() && sy <= cliprect.bottom())
-			for (x = 0; x < 4; x++)
+			for (int x = 0; x < 4; x++)
 			{
 				if (sx >= cliprect.left() && sx <= cliprect.right())
 				{
-					bitmap.pix16(sy, sx) = ((m_color_missiles >> 4) & 7) | 8;
-					priority.pix8(sy, sx) |= 1 << 3;
+					bitmap.pix(sy, sx) = ((m_color_missiles >> 4) & 7) | 8;
+					priority.pix(sy, sx) |= 1 << 3;
 				}
 				sx++;
 			}
@@ -657,19 +653,17 @@ void decocass_state::draw_edge(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 		srcbitmap = &m_bg_tilemap_r->pixmap();
 	}
 
-	int y,x;
-
 //  printf("m_mode_set %d\n", m_mode_set & 0x3);
 
 	// technically our y drawing probably shouldn't wrap / mask, but simply draw the 128pixel high 'edge' at the requested position
 	//  see note above this funciton
-	for (y=clip.top(); y<=clip.bottom(); y++)
+	for (int y=clip.top(); y<=clip.bottom(); y++)
 	{
 		int srcline = (y + scrolly) & 0x1ff;
-		uint16_t* src = &srcbitmap->pix16(srcline);
-		uint16_t* dst = &bitmap.pix16(y);
+		uint16_t const *const src = &srcbitmap->pix(srcline);
+		uint16_t *const dst = &bitmap.pix(y);
 
-		for (x=clip.left(); x<=clip.right(); x++)
+		for (int x=clip.left(); x<=clip.right(); x++)
 		{
 			int srccol = 0;
 
@@ -683,7 +677,7 @@ void decocass_state::draw_edge(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 				case 0x03: srccol = (x + scrollx) & 0x1ff; break; // hwy, burnrub etc.
 			}
 
-			uint16_t pix = src[srccol];
+			uint16_t const pix = src[srccol];
 
 			if ((pix & 0x3) || opaque)
 				dst[x] = pix;

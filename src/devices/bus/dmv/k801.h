@@ -7,7 +7,7 @@
 #pragma once
 
 #include "dmvbus.h"
-#include "machine/mc2661.h"
+#include "machine/scn_pci.h"
 #include "bus/rs232/rs232.h"
 
 
@@ -40,12 +40,14 @@ protected:
 	virtual void io_read(int ifsel, offs_t offset, uint8_t &data) override;
 	virtual void io_write(int ifsel, offs_t offset, uint8_t data) override;
 
-	required_device<mc2661_device> m_epci;
+	void pci_mconfig(machine_config &config, bool epci, const char *default_option);
+
+	required_device<scn_pci_device> m_pci;
 	required_device<rs232_port_device> m_rs232;
 	required_ioport m_dsw;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(epci_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(pci_irq_w);
 };
 
 

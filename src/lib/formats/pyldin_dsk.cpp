@@ -8,7 +8,6 @@
 
 *********************************************************************/
 
-#include <cassert>
 #include "formats/pyldin_dsk.h"
 
 pyldin_format::pyldin_format() : upd765_format(formats)
@@ -44,4 +43,4 @@ const pyldin_format::format pyldin_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_PYLDIN_FORMAT = &floppy_image_format_creator<pyldin_format>;
+const pyldin_format FLOPPY_PYLDIN_FORMAT;

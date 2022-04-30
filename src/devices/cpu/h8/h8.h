@@ -113,8 +113,9 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	address_space_config program_config, io_config;
-	address_space *program, *io;
-	memory_access_cache<1, 0, ENDIANNESS_BIG> *cache;
+	memory_access<32, 1, 0, ENDIANNESS_BIG>::cache cache;
+	memory_access<32, 1, 0, ENDIANNESS_BIG>::specific program;
+	memory_access<16, 1, -1, ENDIANNESS_BIG>::specific io;
 	h8_dma_device *dma_device;
 	h8_dtc_device *dtc_device;
 	h8_dma_state *current_dma;
@@ -134,6 +135,7 @@ protected:
 	uint32_t  TMPR;                   /* For debugger ER register import */
 
 	bool has_exr, has_trace, supports_advanced, mode_advanced, mode_a20, mac_saturating;
+	bool has_hc; // GT913's CCR bit 5 is I, not H
 
 	int inst_state, inst_substate, requested_state;
 	int icount, bcount, count_before_instruction_step;
@@ -333,7 +335,7 @@ protected:
 	O(divxu_b_r8h_r16l);
 	O(eepmov_b);
 	O(inc_b_one_r8l);
-	O(jmp_abs8i); O(jmp_abs16e);
+	O(jmp_abs8i); O(jmp_abs16e); O(jmp_r16h);
 	O(jsr_abs8i); O(jsr_abs16e); O(jsr_r16h);
 	O(ldc_imm8_ccr); O(ldc_r8l_ccr);
 	O(mov_b_abs16_r8l); O(mov_b_abs8_r8u); O(mov_b_imm8_r8u); O(mov_b_r8h_r8l); O(mov_b_r8l_abs16); O(mov_b_r8u_abs8); O(mov_b_r16ih_r8l); O(mov_b_r8l_r16ih); O(mov_b_r16d16h_r8l); O(mov_b_r8l_r16d16h); O(mov_b_r16ph_r8l); O(mov_b_r8l_pr16h);

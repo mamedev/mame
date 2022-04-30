@@ -32,11 +32,11 @@ public:
 		m_spritexoffs = offset;
 	}
 
-	DECLARE_WRITE16_MEMBER(bg_videoram_w);
-	DECLARE_WRITE16_MEMBER(mlow_videoram_w);
-	DECLARE_WRITE16_MEMBER(mhigh_videoram_w);
-	DECLARE_WRITE16_MEMBER(tx_videoram_w);
-	DECLARE_WRITE16_MEMBER(sprites_commands_w);
+	void bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void mlow_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void mhigh_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void tx_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sprites_commands_w(uint16_t data);
 
 	uint32_t draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -48,10 +48,10 @@ protected:
 private:
 
 	/* video-related */
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_mlow_tilemap;
-	tilemap_t *m_mhigh_tilemap;
-	tilemap_t *m_tx_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_mlow_tilemap = nullptr;
+	tilemap_t *m_mhigh_tilemap = nullptr;
+	tilemap_t *m_tx_tilemap = nullptr;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_mlow_tile_info);
@@ -75,7 +75,7 @@ private:
 	required_device<palette_device> m_palette;
 
 	/* misc */
-	int m_which;
+	int m_which = 0;
 	int m_spritexoffs;
 };
 

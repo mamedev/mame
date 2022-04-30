@@ -34,7 +34,7 @@ INPUT_PORTS_START( dmv_keyboard )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V)         PORT_CHAR('v') PORT_CHAR('V')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7_PAD)     PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9_PAD)     PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R)         PORT_CHAR('R') PORT_CHAR('r')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R)         PORT_CHAR('r') PORT_CHAR('R')
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4)         PORT_CHAR('4') PORT_CHAR('$')
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F5)        PORT_CHAR(UCHAR_MAMEKEY(F5))
 
@@ -89,12 +89,12 @@ INPUT_PORTS_START( dmv_keyboard )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2)    PORT_CHAR(UCHAR_MAMEKEY(F2))
 
 	PORT_START("COL.6")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(UCHAR_MAMEKEY(BACKSPACE)) PORT_NAME("Backspace")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(UCHAR_MAMEKEY(BACKSPACE),8) PORT_NAME("Backspace")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L)     PORT_CHAR('l') PORT_CHAR('L')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP)  PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O)     PORT_CHAR('0') PORT_CHAR(')')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O)     PORT_CHAR('o') PORT_CHAR('O')
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9)     PORT_CHAR('9') PORT_CHAR('(')
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F10)   PORT_CHAR(UCHAR_MAMEKEY(F10))
 
@@ -150,7 +150,7 @@ INPUT_PORTS_START( dmv_keyboard )
 
 	PORT_START("COL.12")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME)  PORT_CHAR(UCHAR_MAMEKEY(HOME))
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K)     PORT_CHAR('e') PORT_CHAR('E')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K)     PORT_CHAR('k') PORT_CHAR('K')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F20")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
@@ -254,7 +254,7 @@ const tiny_rom_entry *dmv_keyboard_device::device_rom_region() const
 //  port1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( dmv_keyboard_device::port1_r )
+uint8_t dmv_keyboard_device::port1_r()
 {
 	return m_keyboard[m_col]->read();
 }
@@ -263,7 +263,7 @@ READ8_MEMBER( dmv_keyboard_device::port1_r )
 //  port2_r
 //-------------------------------------------------
 
-READ8_MEMBER( dmv_keyboard_device::port2_r )
+uint8_t dmv_keyboard_device::port2_r()
 {
 	return ((m_sd_data_state | m_sd_poll_state) << 7) | m_col;
 }
@@ -272,7 +272,7 @@ READ8_MEMBER( dmv_keyboard_device::port2_r )
 //  port2_w
 //-------------------------------------------------
 
-WRITE8_MEMBER( dmv_keyboard_device::port2_w )
+void dmv_keyboard_device::port2_w(uint8_t data)
 {
 	/*
 	   P2.0    col 0
@@ -293,7 +293,7 @@ WRITE8_MEMBER( dmv_keyboard_device::port2_w )
 DECLARE_WRITE_LINE_MEMBER(dmv_keyboard_device::sd_poll_w)
 {
 	if (m_sd_poll_state && !state)
-		m_maincpu->upi41_master_w(m_maincpu->space(), 0, 0);
+		m_maincpu->upi41_master_w(0, 0);
 
 	m_sd_poll_state = state;
 }

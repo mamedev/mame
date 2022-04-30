@@ -8,7 +8,7 @@
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "sound/sn76496.h"
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -59,22 +59,22 @@ private:
 	optional_memory_bank m_audiobank;
 
 	/* video-related */
-	tilemap_t *m_bg_tilemap[2][4];
-	int      m_visible_page;
-	int      m_priority;
-	uint8_t    m_reikaids_which;
-	int      m_flipscreen;
-	uint8_t      m_gfx_bank[2];   // pteacher only uses the first one
-	uint8_t      m_blitter_bank;
-	int      m_blitter_param_count;
-	uint8_t      m_blitter_param[4];      /* buffers last 4 writes to 0x8006 */
+	tilemap_t *m_bg_tilemap[2][4]{};
+	int      m_visible_page = 0;
+	int      m_priority = 0;
+	uint8_t  m_reikaids_which = 0;
+	int      m_flipscreen = 0;
+	uint8_t  m_gfx_bank[2]{};   // pteacher only uses the first one
+	uint8_t  m_blitter_bank = 0;
+	int      m_blitter_param_count = 0;
+	uint8_t  m_blitter_param[4]{};      /* buffers last 4 writes to 0x8006 */
 
 
 	/* misc */
-	int      m_vblank;
-	int      m_keyb;
-	int      m_upd7807_porta;
-	int      m_upd7807_portc;
+	int      m_vblank = 0;
+	int      m_keyb = 0;
+	int      m_upd7807_porta = 0;
+	int      m_upd7807_portc = 0;
 
 	/* device */
 	required_device<cpu_device> m_maincpu;
@@ -89,34 +89,34 @@ private:
 
 	optional_ioport_array<12> m_keys;
 
-	uint8_t m_prot_data;
-	DECLARE_READ8_MEMBER(mrokumei_keyboard_r);
-	DECLARE_WRITE8_MEMBER(mrokumei_keyboard_select_w);
-	DECLARE_WRITE8_MEMBER(mrokumei_sound_bank_w);
-	DECLARE_WRITE8_MEMBER(mrokumei_sound_cmd_w);
-	DECLARE_READ8_MEMBER(reikaids_upd7807_porta_r);
-	DECLARE_WRITE8_MEMBER(reikaids_upd7807_porta_w);
-	DECLARE_WRITE8_MEMBER(reikaids_upd7807_portc_w);
-	DECLARE_READ8_MEMBER(reikaids_io_r);
-	DECLARE_READ8_MEMBER(pteacher_io_r);
-	DECLARE_READ8_MEMBER(pteacher_keyboard_r);
-	DECLARE_READ8_MEMBER(pteacher_upd7807_porta_r);
-	DECLARE_WRITE8_MEMBER(pteacher_upd7807_porta_w);
-	DECLARE_WRITE8_MEMBER(pteacher_upd7807_portc_w);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_READ8_MEMBER(mirderby_prot_r);
-	DECLARE_WRITE8_MEMBER(mirderby_prot_w);
+	uint8_t m_prot_data = 0;
+	uint8_t mrokumei_keyboard_r(offs_t offset);
+	void mrokumei_keyboard_select_w(uint8_t data);
+	void mrokumei_sound_bank_w(uint8_t data);
+	void mrokumei_sound_cmd_w(uint8_t data);
+	uint8_t reikaids_upd7807_porta_r();
+	void reikaids_upd7807_porta_w(uint8_t data);
+	void reikaids_upd7807_portc_w(uint8_t data);
+	uint8_t reikaids_io_r();
+	uint8_t pteacher_io_r();
+	uint8_t pteacher_keyboard_r();
+	uint8_t pteacher_upd7807_porta_r();
+	void pteacher_upd7807_porta_w(uint8_t data);
+	void pteacher_upd7807_portc_w(uint8_t data);
+	void bankswitch_w(uint8_t data);
+	uint8_t mirderby_prot_r();
+	void mirderby_prot_w(uint8_t data);
 	void mrokumei_videoram_w(offs_t offset, u8 data);
 	void reikaids_videoram_w(offs_t offset, u8 data);
-	DECLARE_WRITE8_MEMBER(reikaids_gfx_bank_w);
-	DECLARE_WRITE8_MEMBER(pteacher_gfx_bank_w);
-	DECLARE_WRITE8_MEMBER(homedata_blitter_param_w);
-	DECLARE_WRITE8_MEMBER(mrokumei_blitter_bank_w);
-	DECLARE_WRITE8_MEMBER(reikaids_blitter_bank_w);
-	DECLARE_WRITE8_MEMBER(pteacher_blitter_bank_w);
-	DECLARE_WRITE8_MEMBER(mrokumei_blitter_start_w);
-	DECLARE_WRITE8_MEMBER(reikaids_blitter_start_w);
-	DECLARE_WRITE8_MEMBER(pteacher_blitter_start_w);
+	void reikaids_gfx_bank_w(uint8_t data);
+	void pteacher_gfx_bank_w(uint8_t data);
+	void homedata_blitter_param_w(uint8_t data);
+	void mrokumei_blitter_bank_w(uint8_t data);
+	void reikaids_blitter_bank_w(uint8_t data);
+	void pteacher_blitter_bank_w(uint8_t data);
+	void mrokumei_blitter_start_w(uint8_t data);
+	void reikaids_blitter_start_w(uint8_t data);
+	void pteacher_blitter_start_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(mrokumei_get_info0_0);
 	TILE_GET_INFO_MEMBER(mrokumei_get_info1_0);
 	TILE_GET_INFO_MEMBER(mrokumei_get_info0_1);

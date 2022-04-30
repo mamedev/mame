@@ -18,26 +18,6 @@
 #define INTVKBD_X_SCALE             2
 #define INTVKBD_Y_SCALE             INTV_Y_SCALE
 
-struct intv_sprite_type
-{
-	int visible;
-	int xpos;
-	int ypos;
-	int coll;
-	int collision;
-	int doublex;
-	int doubley;
-	int quady;
-	int xflip;
-	int yflip;
-	int behind_foreground;
-	int grom;
-	int card;
-	int color;
-	int doubleyres;
-	int dirty;
-};
-
 
 // ======================> stic_device
 
@@ -84,11 +64,11 @@ public:
 	stic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~stic_device();
 
-	DECLARE_READ16_MEMBER(read);
-	DECLARE_READ16_MEMBER(gram_read);
-	DECLARE_READ16_MEMBER(grom_read) { if (offset > 0x800) printf("help! %X\n", offset); return (0xff00 | m_grom[offset]); }
-	DECLARE_WRITE16_MEMBER(write);
-	DECLARE_WRITE16_MEMBER(gram_write);
+	uint16_t read(offs_t offset);
+	uint16_t gram_read(offs_t offset);
+	uint16_t grom_read(offs_t offset) { if (offset > 0x800) printf("help! %X\n", offset); return (0xff00 | m_grom[offset]); }
+	void write(offs_t offset, uint16_t data);
+	void gram_write(offs_t offset, uint16_t data);
 
 	void write_to_btb(int h, int w, uint16_t data) { m_backtab_buffer[h][w] = data; }
 	int read_row_delay() { return m_row_delay; }
@@ -136,6 +116,26 @@ private:
 		CSRS
 	};
 
+	struct intv_sprite_type
+	{
+		int visible = 0;
+		int xpos = 0;
+		int ypos = 0;
+		int coll = 0;
+		int collision = 0;
+		int doublex = 0;
+		int doubley = 0;
+		int quady = 0;
+		int xflip = 0;
+		int yflip = 0;
+		int behind_foreground = 0;
+		int grom = 0;
+		int card = 0;
+		int color = 0;
+		int doubleyres = 0;
+		int dirty = 0;
+	};
+
 
 	required_region_ptr<uint8_t> m_grom;
 
@@ -153,31 +153,29 @@ private:
 	void render_background(bitmap_ind16 &bitmap);
 	void draw_borders(bitmap_ind16 &bitmap);
 
-#ifdef UNUSED_CODE
-	void draw_background(bitmap_ind16 &bitmap, int transparency);
-	void draw_sprites(bitmap_ind16 &bitmap, int behind_foreground);
-#endif
+	[[maybe_unused]] void draw_background(bitmap_ind16 &bitmap, int transparency);
+	[[maybe_unused]] void draw_sprites(bitmap_ind16 &bitmap, int behind_foreground);
 
 	bitmap_ind16 m_bitmap;
 
 	intv_sprite_type m_sprite[MOBS];
 	uint8_t m_sprite_buffers[MOBS][CARD_WIDTH * 2][CARD_HEIGHT * 4 * 2 * 2];
 	uint16_t m_backtab_buffer[BACKTAB_HEIGHT][BACKTAB_WIDTH];
-	int m_color_stack_mode;
-	int m_stic_registers[STIC_REGISTERS];
-	int m_color_stack_offset;
-	int m_stic_handshake;
-	int m_border_color;
-	int m_col_delay;
-	int m_row_delay;
-	int m_left_edge_inhibit;
-	int m_top_edge_inhibit;
+	int m_color_stack_mode = 0;
+	int m_stic_registers[STIC_REGISTERS]{};
+	int m_color_stack_offset = 0;
+	int m_stic_handshake = 0;
+	int m_border_color = 0;
+	int m_col_delay = 0;
+	int m_row_delay = 0;
+	int m_left_edge_inhibit = 0;
+	int m_top_edge_inhibit = 0;
 	int m_x_scale;
 	int m_y_scale;
 
-	uint8_t m_gramdirty;
-	uint8_t m_gram[512];
-	uint8_t m_gramdirtybytes[512];
+	uint8_t m_gramdirty = 0;
+	uint8_t m_gram[512]{};
+	uint8_t m_gramdirtybytes[512]{};
 };
 
 // device type definition

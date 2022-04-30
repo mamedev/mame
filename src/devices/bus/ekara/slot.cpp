@@ -56,7 +56,7 @@ void device_ekara_cart_interface::rom_alloc(uint32_t size, const char *tag)
 //-------------------------------------------------
 ekara_cart_slot_device::ekara_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, EKARA_CART_SLOT, tag, owner, clock),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_ekara_cart_interface>(mconfig, *this),
 	m_type(EKARA_PLAIN),
 	m_cart(nullptr)
@@ -104,7 +104,7 @@ static int ekara_get_pcb_id(const char *slot)
 {
 	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(elem.slot_option, slot))
+		if (!strcmp(elem.slot_option, slot))
 			return elem.pcb_id;
 	}
 
@@ -184,17 +184,17 @@ std::string ekara_cart_slot_device::get_default_card_software(get_default_card_s
 {
 	if (hook.image_file())
 	{
-		const char *slot_string;
-		uint32_t len = hook.image_file()->size();
+		uint64_t len;
+		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large files
 		std::vector<uint8_t> rom(len);
-		int type;
 
-		hook.image_file()->read(&rom[0], len);
+		size_t actual;
+		hook.image_file()->read(&rom[0], len, actual); // FIXME: check error return or read returning short
 
-		type = get_cart_type(&rom[0], len);
-		slot_string = ekara_get_slot(type);
+		int const type = get_cart_type(&rom[0], len);
+		char const *const slot_string = ekara_get_slot(type);
 
-		printf("type: %s\n", slot_string);
+		//printf("type: %s\n", slot_string);
 
 		return std::string(slot_string);
 	}
@@ -206,45 +206,45 @@ std::string ekara_cart_slot_device::get_default_card_software(get_default_card_s
  read
  -------------------------------------------------*/
 
-READ8_MEMBER(ekara_cart_slot_device::read_cart)
+uint8_t ekara_cart_slot_device::read_cart(offs_t offset)
 {
-	return m_cart->read_cart(space, offset);
+	return m_cart->read_cart(offset);
 }
 
 /*-------------------------------------------------
  write
  -------------------------------------------------*/
 
-WRITE8_MEMBER(ekara_cart_slot_device::write_cart)
+void ekara_cart_slot_device::write_cart(offs_t offset, uint8_t data)
 {
-	m_cart->write_cart(space, offset, data);
+	m_cart->write_cart(offset, data);
 }
 
 /*-------------------------------------------------
  read extra
  -------------------------------------------------*/
 
-READ8_MEMBER(ekara_cart_slot_device::read_extra)
+uint8_t ekara_cart_slot_device::read_extra(offs_t offset)
 {
-	return m_cart->read_extra(space, offset);
+	return m_cart->read_extra(offset);
 }
 
 /*-------------------------------------------------
  write extra
  -------------------------------------------------*/
 
-WRITE8_MEMBER(ekara_cart_slot_device::write_extra)
+void ekara_cart_slot_device::write_extra(offs_t offset, uint8_t data)
 {
-	m_cart->write_extra(space, offset, data);
+	m_cart->write_extra(offset, data);
 }
 
 /*-------------------------------------------------
  write control
  -------------------------------------------------*/
 
-WRITE8_MEMBER(ekara_cart_slot_device::write_bus_control)
+void ekara_cart_slot_device::write_bus_control(offs_t offset, uint8_t data)
 {
-	m_cart->write_bus_control(space, offset, data);
+	m_cart->write_bus_control(offset, data);
 }
 
 bool ekara_cart_slot_device::is_read_access_not_rom(void)

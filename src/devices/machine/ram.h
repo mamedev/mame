@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders: Dirk Best
+// copyright-holders:Nathan Woods, Dirk Best
 /*************************************************************************
 
     RAM device
@@ -42,7 +42,7 @@ public:
 	u32 size() const { return m_size; }
 	u32 mask() const { return m_size - 1; }
 	u8 *pointer() { return &m_pointer[0]; }
-	char const *default_size_string() const { return m_default_size; };
+	char const *default_size_string() const { return m_default_size; }
 	u32 default_size() const;
 	extra_option_vector const &extra_options() const;
 
@@ -83,6 +83,6 @@ private:
 DECLARE_DEVICE_TYPE(RAM, ram_device)
 
 // device iterator
-typedef device_type_iterator<ram_device> ram_device_iterator;
+typedef device_type_enumerator<ram_device> ram_device_enumerator;
 
 #endif // MAME_MACHINE_RAM_H

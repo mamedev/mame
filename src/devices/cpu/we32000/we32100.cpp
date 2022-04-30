@@ -18,8 +18,6 @@ DEFINE_DEVICE_TYPE(WE32100, we32100_device, "we32100", "AT&T WE32100")
 we32100_device::we32100_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: cpu_device(mconfig, WE32100, tag, owner, clock)
 	, m_space_config("program", ENDIANNESS_BIG, 32, 32, 0)
-	, m_space(nullptr)
-	, m_cache(nullptr)
 	, m_r{0}
 	, m_icount(0)
 {
@@ -39,8 +37,8 @@ device_memory_interface::space_config_vector we32100_device::memory_space_config
 
 void we32100_device::device_start()
 {
-	m_space = &space(AS_PROGRAM);
-	m_cache = m_space->cache<2, 0, ENDIANNESS_BIG>();
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_space);
 
 	set_icountptr(m_icount);
 
@@ -70,10 +68,10 @@ void we32100_device::device_reset()
 void we32100_device::execute_run()
 {
 	// On-reset sequence: load PCBP, then load PSW, PC and SP from there
-	m_r[13] = m_space->read_dword(0x00000080);
-	m_r[11] = m_space->read_dword(m_r[13]);
-	m_r[15] = m_space->read_dword(m_r[13] + 4);
-	m_r[12] = m_space->read_dword(m_r[13] + 8);
+	m_r[13] = m_space.read_dword(0x00000080);
+	m_r[11] = m_space.read_dword(m_r[13]);
+	m_r[15] = m_space.read_dword(m_r[13] + 4);
+	m_r[12] = m_space.read_dword(m_r[13] + 8);
 
 	debugger_instruction_hook(m_r[15]);
 

@@ -52,17 +52,17 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(paletteram_w);
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_WRITE8_MEMBER(output0_w);
-	DECLARE_WRITE8_MEMBER(output1_w);
-	DECLARE_WRITE8_MEMBER(output2_w);
-	DECLARE_WRITE8_MEMBER(output3_w);
-	DECLARE_WRITE8_MEMBER(video_mirror_w);
-	DECLARE_READ8_MEMBER(earom_read);
-	DECLARE_WRITE8_MEMBER(earom_write);
-	DECLARE_WRITE8_MEMBER(earom_control_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void paletteram_w(offs_t offset, uint8_t data);
+	void irq_ack_w(uint8_t data);
+	void output0_w(uint8_t data);
+	void output1_w(uint8_t data);
+	void output2_w(uint8_t data);
+	void output3_w(uint8_t data);
+	void video_mirror_w(uint8_t data);
+	uint8_t earom_read();
+	void earom_write(offs_t offset, uint8_t data);
+	void earom_control_w(uint8_t data);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<er2055_device> m_earom;
@@ -74,8 +74,8 @@ private:
 	required_device<screen_device> m_screen;
 	output_finder<26> m_lamps;
 
-	tilemap_t * m_tilemap[4];
-	uint8_t m_video_mirror;
+	tilemap_t * m_tilemap[4]{};
+	uint8_t m_video_mirror = 0;
 };
 
 static constexpr XTAL MASTER_CLOCK = 12.096_MHz_XTAL;
@@ -157,10 +157,10 @@ TILE_GET_INFO_MEMBER(akkaarrh_state::get_tile_info)
 {
 	int data = m_videoram[tile_index];
 	int data2 = m_videoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(0, data, data2 & 0xf, TILE_FLIPYX(data2 >> 6));
+	tileinfo.set(0, data, data2 & 0xf, TILE_FLIPYX(data2 >> 6));
 }
 
-WRITE8_MEMBER(akkaarrh_state::videoram_w)
+void akkaarrh_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 
@@ -171,7 +171,7 @@ WRITE8_MEMBER(akkaarrh_state::videoram_w)
 	m_tilemap[3]->mark_tile_dirty(tile);
 }
 
-WRITE8_MEMBER(akkaarrh_state::paletteram_w)
+void akkaarrh_state::paletteram_w(offs_t offset, uint8_t data)
 {
 	m_palette_ram[offset] = data;
 	m_palette->set_pen_color(offset, pal3bit(data >> 5), pal2bit(data >> 3), pal3bit(data >> 0));
@@ -185,17 +185,17 @@ WRITE8_MEMBER(akkaarrh_state::paletteram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(akkaarrh_state::video_mirror_w)
+void akkaarrh_state::video_mirror_w(uint8_t data)
 {
 	m_video_mirror = data;
 }
 
-WRITE8_MEMBER(akkaarrh_state::irq_ack_w)
+void akkaarrh_state::irq_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(akkaarrh_state::output0_w)
+void akkaarrh_state::output0_w(uint8_t data)
 {
 	// 765----- unknown (always 0?)
 	// ---4---- unknown (1 in attract mode, 0 when playing)
@@ -211,7 +211,7 @@ WRITE8_MEMBER(akkaarrh_state::output0_w)
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 }
 
-WRITE8_MEMBER(akkaarrh_state::output1_w)
+void akkaarrh_state::output1_w(uint8_t data)
 {
 	// 7------- lamp 1 left bezel (top)
 	// -6------ lamp 2 left bezel
@@ -224,7 +224,7 @@ WRITE8_MEMBER(akkaarrh_state::output1_w)
 		m_lamps[2 + i] = BIT(data, i);
 }
 
-WRITE8_MEMBER(akkaarrh_state::output2_w)
+void akkaarrh_state::output2_w(uint8_t data)
 {
 	// 7------- lamp 3 right bezel
 	// -6------ lamp 1 top bezel (left)
@@ -239,7 +239,7 @@ WRITE8_MEMBER(akkaarrh_state::output2_w)
 		m_lamps[10 + i] = BIT(data, i);
 }
 
-WRITE8_MEMBER(akkaarrh_state::output3_w)
+void akkaarrh_state::output3_w(uint8_t data)
 {
 	// 7------- lamp zoomed in
 	// -6------ lamp warning
@@ -260,18 +260,18 @@ WRITE8_MEMBER(akkaarrh_state::output3_w)
  *
  *************************************/
 
-READ8_MEMBER(akkaarrh_state::earom_read)
+uint8_t akkaarrh_state::earom_read()
 {
 	return m_earom->data();
 }
 
-WRITE8_MEMBER(akkaarrh_state::earom_write)
+void akkaarrh_state::earom_write(offs_t offset, uint8_t data)
 {
 	m_earom->set_address(offset & 0x3f);
 	m_earom->set_data(data);
 }
 
-WRITE8_MEMBER(akkaarrh_state::earom_control_w)
+void akkaarrh_state::earom_control_w(uint8_t data)
 {
 	// CK = DB0, C1 = /DB2, C2 = DB1, CS1 = DB3, /CS2 = GND
 	m_earom->set_control(BIT(data, 3), 1, !BIT(data, 2), BIT(data, 1));
@@ -359,31 +359,9 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout pflayout =
-{
-	8,8,
-	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-static const gfx_layout spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16, 8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
-	16*16
-};
-
 static GFXDECODE_START( gfx_akkaarrh )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, pflayout,      0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0x0000, spritelayout,  0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_8x8x4_planar,   0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x0000, gfx_16x16x4_planar, 0, 16 )
 GFXDECODE_END
 
 

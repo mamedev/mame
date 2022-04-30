@@ -24,6 +24,7 @@
 #include "debugger.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
+#include "debug/points.h"
 
 #include "util/xmlfile.h"
 
@@ -181,7 +182,7 @@
 	[dasmSplit setFrame:rhsFrame];
 
 	// select the current processor
-	[self setCPU:machine->debugger().cpu().get_visible_cpu()];
+	[self setCPU:machine->debugger().console().get_visible_cpu()];
 
 	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(auxiliaryWindowWillClose:)
@@ -219,7 +220,7 @@
 	NSString *command = [sender stringValue];
 	if ([command length] == 0)
 	{
-		machine->debugger().cpu().get_visible_cpu()->debug()->single_step();
+		machine->debugger().console().get_visible_cpu()->debug()->single_step();
 		[history reset];
 	}
 	else
@@ -234,10 +235,10 @@
 
 - (IBAction)debugToggleBreakpoint:(id)sender {
 	device_t &device = *[dasmView source]->device();
-	if ([dasmView cursorVisible] && (machine->debugger().cpu().get_visible_cpu() == &device))
+	if ([dasmView cursorVisible] && (machine->debugger().console().get_visible_cpu() == &device))
 	{
 		offs_t const address = [dasmView selectedAddress];
-		const device_debug::breakpoint *bp = [dasmView source]->device()->debug()->breakpoint_find(address);
+		const debug_breakpoint *bp = [dasmView source]->device()->debug()->breakpoint_find(address);
 
 		// if it doesn't exist, add a new one
 		NSString *command;
@@ -252,9 +253,9 @@
 
 - (IBAction)debugToggleBreakpointEnable:(id)sender {
 	device_t &device = *[dasmView source]->device();
-	if ([dasmView cursorVisible] && (machine->debugger().cpu().get_visible_cpu() == &device))
+	if ([dasmView cursorVisible] && (machine->debugger().console().get_visible_cpu() == &device))
 	{
-		const device_debug::breakpoint *bp = [dasmView source]->device()->debug()->breakpoint_find([dasmView selectedAddress]);
+		const debug_breakpoint *bp = [dasmView source]->device()->debug()->breakpoint_find([dasmView selectedAddress]);
 		if (bp != nullptr)
 		{
 			NSString *command;
@@ -270,7 +271,7 @@
 
 - (IBAction)debugRunToCursor:(id)sender {
 	device_t &device = *[dasmView source]->device();
-	if ([dasmView cursorVisible] && (machine->debugger().cpu().get_visible_cpu() == &device))
+	if ([dasmView cursorVisible] && (machine->debugger().console().get_visible_cpu() == &device))
 	{
 		NSString *command = [NSString stringWithFormat:@"go 0x%lX", (unsigned long)[dasmView selectedAddress]];
 		machine->debugger().console().execute_command([command UTF8String], 1);
@@ -499,7 +500,7 @@
 		[[NSNotificationCenter defaultCenter] postNotificationName:MAMEHideDebuggerNotification
 															object:self
 														  userInfo:info];
-		machine->debugger().cpu().get_visible_cpu()->debug()->go();
+		machine->debugger().console().get_visible_cpu()->debug()->go();
 	}
 }
 
@@ -562,9 +563,9 @@
 	SEL const action = [item action];
 	BOOL const inContextMenu = ([item menu] == [dasmView menu]);
 	BOOL const haveCursor = [dasmView cursorVisible];
-	BOOL const isCurrent = (machine->debugger().cpu().get_visible_cpu() == [dasmView source]->device());
+	BOOL const isCurrent = (machine->debugger().console().get_visible_cpu() == [dasmView source]->device());
 
-	const device_debug::breakpoint *breakpoint = nullptr;
+	const debug_breakpoint *breakpoint = nullptr;
 	if (haveCursor)
 	{
 		breakpoint = [dasmView source]->device()->debug()->breakpoint_find([dasmView selectedAddress]);

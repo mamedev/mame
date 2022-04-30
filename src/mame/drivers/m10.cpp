@@ -97,7 +97,7 @@ Notes (couriersud)
     ipminvad:       N/A
     spacbeam:       not listed
     headon:         not listed
-    greenber:       N/A
+    greenber:       M-15T, M-24S
 
     M10-Board: Has SN76477
 
@@ -139,7 +139,7 @@ WRITE_LINE_MEMBER(m10_state::ic8j1_output_changed)
 
 WRITE_LINE_MEMBER(m10_state::ic8j2_output_changed)
 {
-	/* written from /Q to A with slight delight */
+	// written from /Q to A with slight delight
 	LOG(("ic8j2: %d\n", state));
 	m_ic8j2->a_w(state);
 	m_ic8j1->a_w(state);
@@ -151,7 +151,7 @@ WRITE_LINE_MEMBER(m10_state::ic8j2_output_changed)
  *
  *************************************/
 
-void m10_state::m10_palette(palette_device &palette) const
+void m1x_state::palette(palette_device &palette) const
 {
 	for (int i = 0; i < 0x10; i++)
 	{
@@ -160,22 +160,31 @@ void m10_state::m10_palette(palette_device &palette) const
 	}
 }
 
-MACHINE_START_MEMBER(m10_state,m10)
+void m1x_state::machine_start()
 {
-	m_interrupt_timer = timer_alloc(TIMER_INTERRUPT);
+	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m1x_state::interrupt_callback), this));
 
-	save_item(NAME(m_bottomline));
 	save_item(NAME(m_flip));
 	save_item(NAME(m_last));
 }
 
-MACHINE_RESET_MEMBER(m10_state,m10)
+void m10_state::machine_start()
 {
-	m_bottomline = 0;
+	m1x_state::machine_start();
+	save_item(NAME(m_bottomline));
+}
+
+void m1x_state::machine_reset()
+{
 	m_flip = 0;
 	m_last = 0;
 }
 
+void m10_state::machine_reset()
+{
+	m1x_state::machine_reset();
+	m_bottomline = 0;
+}
 /*************************************
  *
  *  I/O handling
@@ -201,57 +210,57 @@ MACHINE_RESET_MEMBER(m10_state,m10)
  *              0x06: SAUCER HIT
  */
 
-WRITE8_MEMBER(m10_state::m10_ctrl_w)
+void m10_state::m10_ctrl_w(uint8_t data)
 {
 #if M10_DEBUG
 	if (data & 0x40)
 		popmessage("ctrl: %02x",data);
 #endif
 
-	/* I have NO IDEA if this is correct or not */
+	// I have NO IDEA if this is correct or not
 	m_bottomline = ~data & 0x20;
 
-	if (ioport("CAB")->read() & 0x01)
+	if (m_cab->read() & 0x01)
 		m_flip = ~data & 0x10;
 
-	if (!(ioport("CAB")->read() & 0x02))
+	if (!(m_cab->read() & 0x02))
 		machine().sound().system_mute(data & 0x80);
 
-	/* sound command in lower 4 bytes */
+	// sound command in lower 4 bytes
 	switch (data & 0x07)
 	{
 		case 0x00:
-			/* no sound mapped */
+			// no sound mapped
 			break;
 		case 0x01:
-			/* MISSILE sound */
+			// MISSILE sound
 			m_samples->start(0, 0);
 			break;
 		case 0x02:
-			/* EXPLOSION sound */
+			// EXPLOSION sound
 			m_samples->start(1, 1);
 			break;
 		case 0x03:
-			/* INVADER HIT sound */
+			// INVADER HIT sound
 			m_samples->start(2, 2);
 			break;
 		case 0x04:
-			/* BONUS BASE sound */
+			// BONUS BASE sound
 			m_samples->start(3, 8);
 			break;
 		case 0x05:
-			/* FLEET MOVE sound */
+			// FLEET MOVE sound
 			m_samples->start(3, 3);
 			break;
 		case 0x06:
-			/* SAUCER HIT SOUND */
+			// SAUCER HIT SOUND
 			m_samples->start(2, 7);
 			break;
 		default:
 			popmessage("Unknown sound M10: %02x\n", data & 0x07);
 			break;
 	}
-	/* UFO SOUND */
+	// UFO SOUND
 	if (data & 0x08)
 		m_samples->stop(4);
 	else
@@ -276,7 +285,7 @@ WRITE8_MEMBER(m10_state::m10_ctrl_w)
  *              Will be updated only in attract mode
  */
 
-WRITE8_MEMBER(m10_state::m11_ctrl_w)
+void m10_state::m11_ctrl_w(uint8_t data)
 {
 #if M10_DEBUG
 	if (data & 0x4c)
@@ -285,10 +294,10 @@ WRITE8_MEMBER(m10_state::m11_ctrl_w)
 
 	m_bottomline = ~data & 0x20;
 
-	if (ioport("CAB")->read() & 0x01)
+	if (m_cab->read() & 0x01)
 		m_flip = ~data & 0x10;
 
-	if (!(ioport("CAB")->read() & 0x02))
+	if (!(m_cab->read() & 0x02))
 		machine().sound().system_mute(data & 0x80);
 }
 
@@ -307,15 +316,15 @@ WRITE8_MEMBER(m10_state::m11_ctrl_w)
  *              Will be updated only in attract mode
  */
 
-WRITE8_MEMBER(m10_state::m15_ctrl_w)
+void m15_state::ctrl_w(uint8_t data)
 {
 #if M10_DEBUG
 	if (data & 0xf0)
 		popmessage("M15 ctrl: %02x",data);
 #endif
-	if (ioport("CAB")->read() & 0x01)
+	if (m_cab->read() & 0x01)
 		m_flip = ~data & 0x04;
-	if (!(ioport("CAB")->read() & 0x02))
+	if (!(m_cab->read() & 0x02))
 		machine().sound().system_mute(data & 0x08);
 }
 
@@ -333,7 +342,7 @@ WRITE8_MEMBER(m10_state::m15_ctrl_w)
  *              Will be updated only in attract mode
  */
 
-WRITE8_MEMBER(m10_state::m10_a500_w)
+void m10_state::m10_a500_w(uint8_t data)
 {
 #if M10_DEBUG
 	if (data & 0xfc)
@@ -341,7 +350,7 @@ WRITE8_MEMBER(m10_state::m10_a500_w)
 #endif
 }
 
-WRITE8_MEMBER(m10_state::m11_a100_w)
+void m10_state::m11_a100_w(uint8_t data)
 {
 	int raising_bits = data & ~m_last;
 	//int falling_bits = ~data & m_last;
@@ -355,19 +364,19 @@ WRITE8_MEMBER(m10_state::m11_a100_w)
 	m_last = data;
 
 	// audio control!
-	/* MISSILE sound */
+	// MISSILE sound
 	if (raising_bits & 0x01)
 		m_samples->start(0, 0);
 
-	/* EXPLOSION sound */
+	// EXPLOSION sound
 	if (raising_bits & 0x02)
 		m_samples->start(1, 1);
 
-	/* Rapidly falling parachute */
+	// Rapidly falling parachute
 	if (raising_bits & 0x04)
 		m_samples->start(3, 8);
 
-	/* Background sound ? */
+	// Background sound ?
 	if (data & 0x10)
 		m_samples->start(4, 9, true);
 	else
@@ -375,7 +384,7 @@ WRITE8_MEMBER(m10_state::m11_a100_w)
 
 }
 
-WRITE8_MEMBER(m10_state::m15_a100_w)
+void m15_state::a100_w(uint8_t data)
 {
 	//int raising_bits = data & ~m_last;
 	int falling_bits = ~data & m_last;
@@ -397,7 +406,7 @@ WRITE8_MEMBER(m10_state::m15_a100_w)
 	if ((m_last & 0x82) != (data & 0x82))
 		popmessage("A100: %02x\n", data);
 #endif
-	/* DOT sound */
+	// DOT sound
 	if (falling_bits & 0x40)
 		m_samples->start(0, 0);
 #if 0
@@ -405,7 +414,7 @@ WRITE8_MEMBER(m10_state::m15_a100_w)
 		m_samples->stop(0);
 #endif
 
-	/* EXPLOSION sound */
+	// EXPLOSION sound
 	if (falling_bits & 0x08)
 		m_samples->start(1, 1);
 #if 0
@@ -413,7 +422,7 @@ WRITE8_MEMBER(m10_state::m15_a100_w)
 		m_samples->stop(1);
 #endif
 
-	/* player changes lane */
+	// player changes lane
 	if (falling_bits & 0x10)
 		m_samples->start(3, 3);
 #if 0
@@ -421,7 +430,7 @@ WRITE8_MEMBER(m10_state::m15_a100_w)
 		m_samples->stop(3);
 #endif
 
-	/* computer car changes lane */
+	// computer car changes lane
 	if (falling_bits & 0x20)
 		m_samples->start(4, 4);
 #if 0
@@ -432,7 +441,7 @@ WRITE8_MEMBER(m10_state::m15_a100_w)
 	m_last = data;
 }
 
-READ8_MEMBER(m10_state::m10_a700_r)
+uint8_t m10_state::m10_a700_r()
 {
 	//LOG(("rd:%d\n",m_screen->vpos()));
 	LOG(("clear\n"));
@@ -441,7 +450,7 @@ READ8_MEMBER(m10_state::m10_a700_r)
 	return 0x00;
 }
 
-READ8_MEMBER(m10_state::m11_a700_r)
+uint8_t m10_state::m11_a700_r()
 {
 	//LOG(("rd:%d\n",m_screen->vpos()));
 	//m_maincpu->set_input_line(0, CLEAR_LINE);
@@ -457,14 +466,14 @@ READ8_MEMBER(m10_state::m11_a700_r)
  *
  *************************************/
 
-INPUT_CHANGED_MEMBER(m10_state::coin_inserted)
+INPUT_CHANGED_MEMBER(m1x_state::coin_inserted)
 {
-	/* coin insertion causes an NMI */
+	// coin insertion causes an NMI
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-TIMER_CALLBACK_MEMBER(m10_state::interrupt_callback)
+TIMER_CALLBACK_MEMBER(m1x_state::interrupt_callback)
 {
 	if (param == 0)
 	{
@@ -480,18 +489,6 @@ TIMER_CALLBACK_MEMBER(m10_state::interrupt_callback)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-void m10_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_INTERRUPT:
-		interrupt_callback(ptr, param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in m10_state::device_timer");
-	}
-}
-
 #if 0
 INTERRUPT_GEN_MEMBER(m10_state::m11_interrupt)
 {
@@ -505,7 +502,7 @@ INTERRUPT_GEN_MEMBER(m10_state::m10_interrupt)
 }
 #endif
 
-INTERRUPT_GEN_MEMBER(m10_state::m15_interrupt)
+INTERRUPT_GEN_MEMBER(m15_state::interrupt)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
 	m_interrupt_timer->adjust(m_screen->time_until_pos(IREMM10_VBSTART + 1, 80), -1);
@@ -519,47 +516,47 @@ INTERRUPT_GEN_MEMBER(m10_state::m15_interrupt)
 
 void m10_state::m10_main(address_map &map)
 {
-	map(0x0000, 0x02ff).ram().share("memory"); /* scratch ram */
-	map(0x1000, 0x2fff).rom().share("rom");
-	map(0x4000, 0x43ff).ram().share("videoram");
-	map(0x4800, 0x4bff).ram().w(FUNC(m10_state::m10_colorram_w)).share("colorram"); /* foreground colour  */
-	map(0x5000, 0x53ff).ram().w(FUNC(m10_state::m10_chargen_w)).share("chargen"); /* background ????? */
+	map(0x0000, 0x02ff).ram(); // scratch ram
+	map(0x1000, 0x2fff).rom();
+	map(0x4000, 0x43ff).ram().share(m_videoram);
+	map(0x4800, 0x4bff).ram().w(FUNC(m10_state::colorram_w)).share(m_colorram); // foreground colour
+	map(0x5000, 0x53ff).ram().w(FUNC(m10_state::chargen_w)).share(m_chargen); // background ?????
 	map(0xa200, 0xa200).portr("DSW");
 	map(0xa300, 0xa300).portr("INPUTS");
-	map(0xa400, 0xa400).w(FUNC(m10_state::m10_ctrl_w));   /* line at bottom of screen?, sound, flip screen */
-	map(0xa500, 0xa500).w(FUNC(m10_state::m10_a500_w));   /* ??? */
+	map(0xa400, 0xa400).w(FUNC(m10_state::m10_ctrl_w));   // line at bottom of screen?, sound, flip screen
+	map(0xa500, 0xa500).w(FUNC(m10_state::m10_a500_w));   // ???
 	map(0xa700, 0xa700).r(FUNC(m10_state::m10_a700_r));
-	map(0xfc00, 0xffff).rom(); /* for the reset / interrupt vectors */
+	map(0xfc00, 0xffff).rom(); // for the reset / interrupt vectors
 }
 
 void m10_state::m11_main(address_map &map)
 {
-	map(0x0000, 0x02ff).ram().share("memory"); /* scratch ram */
-	map(0x1000, 0x2fff).rom().share("rom");
-	map(0x4000, 0x43ff).ram().share("videoram");
-	map(0x4800, 0x4bff).ram().w(FUNC(m10_state::m10_colorram_w)).share("colorram"); /* foreground colour  */
-	map(0x5000, 0x53ff).ram().share("chargen"); /* background ????? */
-	map(0xa100, 0xa100).w(FUNC(m10_state::m11_a100_w)); /* sound writes ???? */
+	map(0x0000, 0x02ff).ram(); // scratch ram
+	map(0x1000, 0x2fff).rom();
+	map(0x4000, 0x43ff).ram().share(m_videoram);
+	map(0x4800, 0x4bff).ram().w(FUNC(m10_state::colorram_w)).share(m_colorram); // foreground colour
+	map(0x5000, 0x53ff).ram().share(m_chargen); // background ?????
+	map(0xa100, 0xa100).w(FUNC(m10_state::m11_a100_w)); // sound writes ????
 	map(0xa200, 0xa200).portr("DSW");
 	map(0xa300, 0xa300).portr("INPUTS");
-	map(0xa400, 0xa400).w(FUNC(m10_state::m11_ctrl_w));   /* line at bottom of screen?, sound, flip screen */
+	map(0xa400, 0xa400).w(FUNC(m10_state::m11_ctrl_w));   // line at bottom of screen?, sound, flip screen
 	map(0xa700, 0xa700).r(FUNC(m10_state::m11_a700_r));
-	map(0xfc00, 0xffff).rom(); /* for the reset / interrupt vectors */
+	map(0xfc00, 0xffff).rom(); // for the reset / interrupt vectors
 }
 
-void m10_state::m15_main(address_map &map)
+void m15_state::m15_main(address_map &map)
 {
-	map(0x0000, 0x02ff).ram().share("memory"); /* scratch ram */
-	map(0x1000, 0x33ff).rom().share("rom");
-	map(0x4000, 0x43ff).ram().share("videoram");
-	map(0x4800, 0x4bff).ram().w(FUNC(m10_state::m10_colorram_w)).share("colorram"); /* foreground colour  */
-	map(0x5000, 0x57ff).ram().w(FUNC(m10_state::m15_chargen_w)).share("chargen"); /* background ????? */
+	map(0x0000, 0x02ff).ram(); // scratch ram
+	map(0x1000, 0x33ff).rom();
+	map(0x4000, 0x43ff).ram().share(m_videoram);
+	map(0x4800, 0x4bff).ram().w(FUNC(m15_state::colorram_w)).share(m_colorram); // foreground colour
+	map(0x5000, 0x57ff).ram().w(FUNC(m15_state::chargen_w)).share(m_chargen); // background ?????
 	map(0xa000, 0xa000).portr("P2");
-	map(0xa100, 0xa100).w(FUNC(m10_state::m15_a100_w)); /* sound writes ???? */
+	map(0xa100, 0xa100).w(FUNC(m15_state::a100_w)); // sound writes ????
 	map(0xa200, 0xa200).portr("DSW");
 	map(0xa300, 0xa300).portr("P1");
-	map(0xa400, 0xa400).w(FUNC(m10_state::m15_ctrl_w));   /* sound, flip screen */
-	map(0xfc00, 0xffff).rom(); /* for the reset / interrupt vectors */
+	map(0xa400, 0xa400).w(FUNC(m15_state::ctrl_w));   // sound, flip screen
+	map(0xfc00, 0xffff).rom(); // for the reset / interrupt vectors
 }
 
 /*************************************
@@ -616,7 +613,7 @@ static INPUT_PORTS_START( skychut )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("FAKE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, m10_state,coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, m10_state, coin_inserted, 0)
 
 	CAB_PORTENV
 INPUT_PORTS_END
@@ -657,7 +654,7 @@ static INPUT_PORTS_START( ipminvad )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("FAKE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, m10_state,coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, m10_state, coin_inserted, 0)
 
 	CAB_PORTENV
 INPUT_PORTS_END
@@ -671,7 +668,7 @@ static INPUT_PORTS_START( spacbeam )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 
 	PORT_START("P2")
-	PORT_BIT( 0x03, 0, IPT_UNUSED )
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
@@ -687,11 +684,11 @@ static INPUT_PORTS_START( spacbeam )
 	PORT_DIPSETTING (  0x08, DEF_STR( None ) )
 	PORT_DIPNAME(0x30, 0x10, DEF_STR( Coinage ) )
 	PORT_DIPSETTING (  0x00, "Testmode" )
-	PORT_DIPSETTING (  0x10, "1 Coin 1 Play" )
-	PORT_DIPSETTING (  0x20, "1 Coin 2 Plays" )
+	PORT_DIPSETTING (  0x10, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING (  0x20, DEF_STR( 1C_2C ) )
 
 	PORT_START("FAKE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, m10_state,coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, m10_state, coin_inserted, 0)
 
 	CAB_PORTENV
 INPUT_PORTS_END
@@ -708,7 +705,7 @@ static INPUT_PORTS_START( headoni )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("P2")
-	PORT_BIT( 0x03, 0x00, IPT_UNUSED )
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
@@ -727,8 +724,8 @@ static INPUT_PORTS_START( headoni )
 	PORT_DIPSETTING (  0x08, DEF_STR( None ) )
 	PORT_DIPNAME(0x30, 0x10, DEF_STR( Coinage ) )
 	PORT_DIPSETTING (  0x00, "Testmode" )
-	PORT_DIPSETTING (  0x10, "1 Coin 1 Play" )
-	PORT_DIPSETTING (  0x20, "1 Coin 2 Plays" )
+	PORT_DIPSETTING (  0x10, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING (  0x20, DEF_STR( 1C_2C ) )
 
 //  PORT_START("VR1")
 //  PORT_ADJUSTER( 50, "Car Rumble Volume" )
@@ -746,7 +743,45 @@ static INPUT_PORTS_START( headoni )
 //  PORT_ADJUSTER( 50, "Master Volume" )
 
 	PORT_START("FAKE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, m10_state,coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, m10_state, coin_inserted, 0)
+
+	CAB_PORTENV
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( greenber )
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+
+	PORT_START("P2")
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+
+	PORT_START("DSW")
+	PORT_DIPNAME(0x03, 0x01, DEF_STR( Lives ) )
+	PORT_DIPSETTING (  0x03, "2" )
+//  PORT_DIPSETTING (  0x02, "3" ) // dupe
+	PORT_DIPSETTING (  0x01, "3" )
+	PORT_DIPSETTING (  0x00, "4" )
+	PORT_DIPNAME(0x08, 0x00, "Replay" )
+	PORT_DIPSETTING (  0x00, "5000" )
+	PORT_DIPSETTING (  0x08, "7000" )
+	PORT_DIPNAME(0x30, 0x20, DEF_STR( Coinage ) )
+	PORT_DIPSETTING (  0x00, "Testmode" )
+	PORT_DIPSETTING (  0x20, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING (  0x10, DEF_STR( 1C_2C ) )
+
+	PORT_START("FAKE")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, m10_state, coin_inserted, 0)
 
 	CAB_PORTENV
 INPUT_PORTS_END
@@ -762,13 +797,13 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,    /* 8*8 characters */
-	256,    /* 256 characters */
-	1,  /* 1 bits per pixel */
+	8,8,    // 8*8 characters
+	256,    // 256 characters
+	1,  // 1 bits per pixel
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8 /* every char takes 8 consecutive bytes */
+	8*8 // every char takes 8 consecutive bytes
 };
 
 
@@ -785,16 +820,16 @@ GFXDECODE_END
 static const char *const m10_sample_names[] =
 {
 	"*ipminvad",
-	"1",        /* shot/missle */
-	"2",        /* base hit/explosion */
-	"3",        /* invader hit */
-	"4",        /* fleet move 1 */
-	"5",        /* fleet move 2 */
-	"6",        /* fleet move 3 */
-	"7",        /* fleet move 4 */
-	"8",        /* UFO/saucer hit */
-	"9",        /* bonus base */
-	"0",        /* UFO sound */
+	"1",        // shot/missile
+	"2",        // base hit/explosion
+	"3",        // invader hit
+	"4",        // fleet move 1
+	"5",        // fleet move 2
+	"6",        // fleet move 3
+	"7",        // fleet move 4
+	"8",        // UFO/saucer hit
+	"9",        // bonus base
+	"0",        // UFO sound
 	nullptr
 };
 
@@ -806,46 +841,39 @@ static const char *const m10_sample_names[] =
 
 void m10_state::m10(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M6502(config, m_maincpu, IREMM10_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m10_state::m10_main);
 
-	MCFG_MACHINE_START_OVERRIDE(m10_state,m10)
-	MCFG_MACHINE_RESET_OVERRIDE(m10_state,m10)
-
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(IREMM10_PIXEL_CLOCK, IREMM10_HTOTAL, IREMM10_HBEND, IREMM10_HBSTART, IREMM10_VTOTAL, IREMM10_VBEND, IREMM10_VBSTART);
-	m_screen->set_screen_update(FUNC(m10_state::screen_update_m10));
+	m_screen->set_screen_update(FUNC(m10_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_m10);
-	PALETTE(config, m_palette, FUNC(m10_state::m10_palette), 2 * 8);
+	PALETTE(config, m_palette, FUNC(m10_state::palette), 2 * 8);
 
-	MCFG_VIDEO_START_OVERRIDE(m10_state,m10)
-
-	/* 74LS123 */
-
-	TTL74123(config, m_ic8j1, 0); /* completely illegible */
-	m_ic8j1->set_connection_type(TTL74123_NOT_GROUNDED_DIODE);  /* the hook up type */
-	m_ic8j1->set_resistor_value(RES_K(1));                      /* resistor connected to RCext */
-	m_ic8j1->set_capacitor_value(CAP_U(1));                     /* capacitor connected to Cext and RCext */
-	m_ic8j1->set_a_pin_value(1);                                /* A pin - driven by the CRTC */
-	m_ic8j1->set_b_pin_value(1);                                /* B pin - pulled high */
-	m_ic8j1->set_clear_pin_value(1);                            /* Clear pin - pulled high */
+	TTL74123(config, m_ic8j1, 0); // completely illegible
+	m_ic8j1->set_connection_type(TTL74123_NOT_GROUNDED_DIODE);  // the hook up type
+	m_ic8j1->set_resistor_value(RES_K(1));                      // resistor connected to RCext
+	m_ic8j1->set_capacitor_value(CAP_U(1));                     // capacitor connected to Cext and RCext
+	m_ic8j1->set_a_pin_value(1);                                // A pin - driven by the CRTC
+	m_ic8j1->set_b_pin_value(1);                                // B pin - pulled high
+	m_ic8j1->set_clear_pin_value(1);                            // Clear pin - pulled high
 	m_ic8j1->out_cb().set(FUNC(m10_state::ic8j1_output_changed));
 
 	TTL74123(config, m_ic8j2, 0);
-	m_ic8j2->set_connection_type(TTL74123_NOT_GROUNDED_DIODE);  /* the hook up type */
-	/* 10k + 20k variable resistor */
-	m_ic8j2->set_resistor_value(RES_K(22));                     /* resistor connected to RCext */
-	m_ic8j2->set_capacitor_value(CAP_U(2.2));                   /* capacitor connected to Cext and RCext */
-	m_ic8j2->set_a_pin_value(1);                                /* A pin - driven by the CRTC */
-	m_ic8j2->set_b_pin_value(1);                                /* B pin - pulled high */
-	m_ic8j2->set_clear_pin_value(1);                            /* Clear pin - pulled high */
+	m_ic8j2->set_connection_type(TTL74123_NOT_GROUNDED_DIODE);  // the hook up type
+	// 10k + 20k variable resistor
+	m_ic8j2->set_resistor_value(RES_K(22));                     // resistor connected to RCext
+	m_ic8j2->set_capacitor_value(CAP_U(2.2));                   // capacitor connected to Cext and RCext
+	m_ic8j2->set_a_pin_value(1);                                // A pin - driven by the CRTC
+	m_ic8j2->set_b_pin_value(1);                                // B pin - pulled high
+	m_ic8j2->set_clear_pin_value(1);                            // Clear pin - pulled high
 	m_ic8j2->out_cb().set(FUNC(m10_state::ic8j2_output_changed));
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	SAMPLES(config, m_samples);
@@ -858,32 +886,27 @@ void m10_state::m11(machine_config &config)
 {
 	m10(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &m10_state::m11_main);
 }
 
-void m10_state::m15(machine_config &config)
+void m15_state::m15(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M6502(config, m_maincpu, IREMM15_CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &m10_state::m15_main);
-	m_maincpu->set_vblank_int("screen", FUNC(m10_state::m15_interrupt));
+	m_maincpu->set_addrmap(AS_PROGRAM, &m15_state::m15_main);
+	m_maincpu->set_vblank_int("screen", FUNC(m15_state::interrupt));
 
-	MCFG_MACHINE_START_OVERRIDE(m10_state,m10)
-	MCFG_MACHINE_RESET_OVERRIDE(m10_state,m10)
-
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(IREMM15_PIXEL_CLOCK, IREMM15_HTOTAL, IREMM15_HBEND, IREMM15_HBSTART, IREMM15_VTOTAL, IREMM15_VBEND, IREMM15_VBSTART);
-	m_screen->set_screen_update(FUNC(m10_state::screen_update_m15));
+	m_screen->set_screen_update(FUNC(m15_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
-	PALETTE(config, m_palette, FUNC(m10_state::m10_palette), 2 * 8);
+	PALETTE(config, m_palette, FUNC(m15_state::palette), 2 * 8);
 
-	MCFG_VIDEO_START_OVERRIDE(m10_state, m15)
-
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	SAMPLES(config, m_samples);
@@ -892,33 +915,12 @@ void m10_state::m15(machine_config &config)
 	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void m10_state::headoni(machine_config &config)
+void m15_state::headoni(machine_config &config)
 {
 	m15(config);
 	m_maincpu->set_clock(11730000/16);
 }
 
-/*************************************
- *
- *  Driver Initialization
- *
- *************************************/
-
-/*
- * Hacks to work around missing roms to get at least some
- * video output
- */
-void m10_state::init_andromed()
-{
-	for (int i = 0x1c00; i < 0x2000; i++)
-		m_rom[i] = 0x60;
-}
-
-void m10_state::init_ipminva1()
-{
-	for (int i = 0x1400; i < 0x17ff; i++)
-		m_rom[i] = 0x60;
-}
 
 /***************************************************************************
 
@@ -926,30 +928,13 @@ void m10_state::init_ipminva1()
 
 ***************************************************************************/
 
-ROM_START( andromed )//Jumps to an unmapped sub-routine at $2fc9
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "am1",  0x1000, 0x0400, CRC(53df0152) SHA1(d27113740094d219b0e05a930d8daa4c22129183) )
-	ROM_LOAD( "am2",  0x1400, 0x0400, CRC(dab64957) SHA1(77ced520f8e78bb08ddab4213646cf55d834e63e) )
-	ROM_LOAD( "am3",  0x1800, 0x0400, CRC(f983f35c) SHA1(1bfee6cf7d18b56594831f2efa7dcc53b47d7e30) )
-	ROM_LOAD( "am4",  0x1c00, 0x0400, CRC(09f20717) SHA1(c54c9b7d16b40a7ab49eac255906b43b03939d2b) )
-	ROM_RELOAD(       0xfc00, 0x0400 )  /* for the reset and interrupt vectors */
-	ROM_LOAD( "am5",  0x2000, 0x0400, CRC(518a3b88) SHA1(5e20c905c2190b381a105327e112fcc0a127bb2f) )
-	ROM_LOAD( "am6",  0x2400, 0x0400, CRC(ce3d5fff) SHA1(c34178aca9ffb8b2dd468d9e3369a985f52daf9a) )
-	ROM_LOAD( "am7",  0x2800, 0x0400, CRC(30d3366f) SHA1(aa73bba194fa6d1f3909f8df517a0bff07583ea9) )
-	ROM_LOAD( "am8",  0x2c00, 0x0400, NO_DUMP ) // $60 entries
-
-	ROM_REGION( 0x0800, "gfx1", 0 )
-	ROM_LOAD( "am9",  0x0000, 0x0400, CRC(a1c8f4db) SHA1(bedf5d7126c7e9b91ad595188c69aa2c043c71e8) )
-	ROM_LOAD( "am10", 0x0400, 0x0400, CRC(be2de8f3) SHA1(7eb3d1eb88b4481b0dcb7d001207f516a5db32b3) )
-ROM_END
-
 ROM_START( ipminvad )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "b1r",  0x1000, 0x0400, CRC(f9a7eb9b) SHA1(93ac65d3ac725d3e4c2fb769816ee808ab609911) )
 	ROM_LOAD( "b2r",  0x1400, 0x0400, CRC(af11c1aa) SHA1(6a74fcc7cb1627b1c427a77da89b69ccf3175800) )
 	ROM_LOAD( "b3r",  0x1800, 0x0400, CRC(ed49e481) SHA1(8771a34f432e6d88acc5f7529f16c980a77485db) )
 	ROM_LOAD( "b4r",  0x1c00, 0x0400, CRC(6d5db95b) SHA1(135500fc17524e8608c3bcfe26321144aa0afb91) )
-	ROM_RELOAD(       0xfc00, 0x0400 )  /* for the reset and interrupt vectors */
+	ROM_RELOAD(       0xfc00, 0x0400 ) // for the reset and interrupt vectors
 	ROM_LOAD( "b5r",  0x2000, 0x0400, CRC(eabba7aa) SHA1(75e47eacd429f48f0a3a4539e5ecb4b1ea7281b1) )
 	ROM_LOAD( "b6r",  0x2400, 0x0400, CRC(3d0e7fa6) SHA1(14903bfc9506cb8e37807fb397be79f5eab99e3b) )
 	ROM_LOAD( "b7r",  0x2800, 0x0400, CRC(cf04864f) SHA1(6fe3ce208334321b63ada779fed69ec7cf4051ad) )
@@ -965,14 +950,33 @@ ROM_START( ipminvad1 )
 	ROM_LOAD( "b2f",  0x1400, 0x0400, CRC(a6aa5879) SHA1(959ab207110785c03e57ca69c0e62356dd974085) )
 	ROM_LOAD( "b3f",  0x1800, 0x0400, CRC(0c09feb9) SHA1(0db43f480162f8e3fb8b61fcceb2884d19ff115b) )
 	ROM_LOAD( "b4f",  0x1c00, 0x0400, CRC(a4d32207) SHA1(ea9a01d09d82b8c27701601f03989735558d975c) )
-	ROM_RELOAD(       0xfc00, 0x0400 )  /* for the reset and interrupt vectors */
+	ROM_RELOAD(       0xfc00, 0x0400 ) // for the reset and interrupt vectors
 	ROM_LOAD( "b5f",  0x2000, 0x0400, CRC(192361c7) SHA1(b13e80429a9183ce78c4df52a32070416d4ec988) )
 	ROM_LOAD( "b6f",  0x2400, 0x0400, NO_DUMP )
+	ROM_FILL(         0x2400, 0x0400, 0x60)
 	ROM_LOAD( "b7f",  0x2800, 0x0400, CRC(0f5115ab) SHA1(3bdd3fc1cfe6bfacb5820ee12c15f2909d2f58d1) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "b9",  0x0000, 0x0400, CRC(f6cfa53c) SHA1(ec1076982edee95efb24a1bb08e733bcccacb922) )
 	ROM_LOAD( "b10", 0x0400, 0x0400, CRC(63672cd2) SHA1(3d9fa15509a363e1a32e58a2242b266b1162e9a6) )
+ROM_END
+
+ROM_START( andromed ) // Jumps to an unmapped sub-routine at $2fc9
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "am1",  0x1000, 0x0400, CRC(53df0152) SHA1(d27113740094d219b0e05a930d8daa4c22129183) )
+	ROM_LOAD( "am2",  0x1400, 0x0400, CRC(dab64957) SHA1(77ced520f8e78bb08ddab4213646cf55d834e63e) )
+	ROM_LOAD( "am3",  0x1800, 0x0400, CRC(f983f35c) SHA1(1bfee6cf7d18b56594831f2efa7dcc53b47d7e30) )
+	ROM_LOAD( "am4",  0x1c00, 0x0400, CRC(09f20717) SHA1(c54c9b7d16b40a7ab49eac255906b43b03939d2b) )
+	ROM_RELOAD(       0xfc00, 0x0400 ) // for the reset and interrupt vectors
+	ROM_LOAD( "am5",  0x2000, 0x0400, CRC(518a3b88) SHA1(5e20c905c2190b381a105327e112fcc0a127bb2f) )
+	ROM_LOAD( "am6",  0x2400, 0x0400, CRC(ce3d5fff) SHA1(c34178aca9ffb8b2dd468d9e3369a985f52daf9a) )
+	ROM_LOAD( "am7",  0x2800, 0x0400, CRC(30d3366f) SHA1(aa73bba194fa6d1f3909f8df517a0bff07583ea9) )
+	ROM_LOAD( "am8",  0x2c00, 0x0400, NO_DUMP ) // $60 entries
+	ROM_FILL(         0x2c00, 0x0400, 0x60)
+
+	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_LOAD( "am9",  0x0000, 0x0400, CRC(a1c8f4db) SHA1(bedf5d7126c7e9b91ad595188c69aa2c043c71e8) )
+	ROM_LOAD( "am10", 0x0400, 0x0400, CRC(be2de8f3) SHA1(7eb3d1eb88b4481b0dcb7d001207f516a5db32b3) )
 ROM_END
 
 ROM_START( skychut )
@@ -981,7 +985,7 @@ ROM_START( skychut )
 	ROM_LOAD( "sc2d",  0x1400, 0x0400, CRC(fd1f4b9e) SHA1(e5606979abe1fa4cc9eae0c4f61516769db35c39) )
 	ROM_LOAD( "sc3d",  0x1800, 0x0400, CRC(67ed201e) SHA1(589b1efdc1bbccff296f6420e2b320cd54b4ac8e) )
 	ROM_LOAD( "sc4d",  0x1c00, 0x0400, CRC(9b23a679) SHA1(a101f9b0fdde927a43e53e9b7d0dffb9dcca9e16) )
-	ROM_RELOAD(        0xfc00, 0x0400 ) /* for the reset and interrupt vectors */
+	ROM_RELOAD(        0xfc00, 0x0400 ) // for the reset and interrupt vectors
 	ROM_LOAD( "sc5a",  0x2000, 0x0400, CRC(51d975e6) SHA1(7d345025ef28c8a81f599cde445eeb336c368fce) )
 	ROM_LOAD( "sc6e",  0x2400, 0x0400, CRC(617f302f) SHA1(4277ef97279eb63fc68b6c40f8545b31abaab474) )
 	ROM_LOAD( "sc7",   0x2800, 0x0400, CRC(dd4c8e1a) SHA1(b5a141d8ac256ba6522308e5f194bfaf5c75fa5b) )
@@ -998,7 +1002,7 @@ ROM_START( spacbeam )
 	ROM_LOAD( "m2b", 0x1400, 0x0400, CRC(a02bd9d7) SHA1(d25dfa66b422bdbb29b1922007c84f1947fe9be1) )
 	ROM_LOAD( "m3b", 0x1800, 0x0400, CRC(78040843) SHA1(0b8a3ab09dff951aa527649f82b8877cf01126c1) )
 	ROM_LOAD( "m4b", 0x1c00, 0x0400, CRC(74705a44) SHA1(8fa9d22a58f08086bf2d89e3d92eca097cdd2cbf) )
-	ROM_RELOAD(      0xfc00, 0x0400 )   /* for the reset and interrupt vectors */
+	ROM_RELOAD(      0xfc00, 0x0400 ) // for the reset and interrupt vectors
 	ROM_LOAD( "m5b", 0x2000, 0x0400, CRC(afdf1242) SHA1(e26a8e91edb3d8ba96b3d225813760f42238b003) )
 	ROM_LOAD( "m6b", 0x2400, 0x0400, CRC(12afb0c2) SHA1(bf6ed90cf4815f0fb41d435954d4c346a55098f5) )
 ROM_END
@@ -1009,29 +1013,29 @@ ROM_START( headoni )
 	ROM_LOAD( "e2.9b", 0x1400, 0x0400, CRC(dada26a8) SHA1(1368ade1c0c57d33d15594370cf1edf95fc44fd1) )
 	ROM_LOAD( "e3.9c", 0x1800, 0x0400, CRC(61ff24f5) SHA1(0e68aedd01b765fb2af76f914b3d287ecf30f716) )
 	ROM_LOAD( "e4.9d", 0x1c00, 0x0400, CRC(ce4c5a67) SHA1(8db493d43f311a29127405aad7693bc08b570b14) )
-	ROM_RELOAD(        0xfc00, 0x0400 ) /* for the reset and interrupt vectors */
+	ROM_RELOAD(        0xfc00, 0x0400 ) // for the reset and interrupt vectors
 	ROM_LOAD( "e5.9f", 0x2000, 0x0400, CRC(b5232439) SHA1(39b8fb4bbd00a73b9a2b68bc3e88fb45d3f62d7c) )
 	ROM_LOAD( "e6.9g", 0x2400, 0x0400, CRC(99acd1a6) SHA1(799382c1b079aad3034a1cc738dc06954978a0ac) )
 ROM_END
 
 ROM_START( greenber )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "gb1", 0x1000, 0x0400, CRC(018ff672) SHA1(54d082a332831afc28b47704a5656da0a8a902fa) ) // ok
-	ROM_LOAD( "gb2", 0x1400, 0x0400, CRC(ea8f2267) SHA1(ad5bb38a80fbc7c70c8fa6f41086a7ade81655bc) ) // ok
-	ROM_LOAD( "gb3", 0x1800, 0x0400, CRC(8f337920) SHA1(ac3d76eb368645ba23f5823b39c04fae49d481e1) ) // ok
-	ROM_LOAD( "gb4", 0x1c00, 0x0400, CRC(7eeac4eb) SHA1(c668ad45ebc4aca558371539031efc4ec3990e44) ) // ok
-	ROM_RELOAD(      0xfc00, 0x0400 )   /* for the reset and interrupt vectors */
+	ROM_LOAD( "gb1", 0x1000, 0x0400, CRC(018ff672) SHA1(54d082a332831afc28b47704a5656da0a8a902fa) )
+	ROM_LOAD( "gb2", 0x1400, 0x0400, CRC(ea8f2267) SHA1(ad5bb38a80fbc7c70c8fa6f41086a7ade81655bc) )
+	ROM_LOAD( "gb3", 0x1800, 0x0400, CRC(8f337920) SHA1(ac3d76eb368645ba23f5823b39c04fae49d481e1) )
+	ROM_LOAD( "gb4", 0x1c00, 0x0400, CRC(7eeac4eb) SHA1(c668ad45ebc4aca558371539031efc4ec3990e44) )
+	ROM_RELOAD(      0xfc00, 0x0400 ) // for the reset and interrupt vectors
 	ROM_LOAD( "gb5", 0x2000, 0x0400, CRC(b2f8e69a) SHA1(44295e58da890a8c4aba6fe90defe9c578c95592) )
 	ROM_LOAD( "gb6", 0x2400, 0x0400, CRC(50ea8bd3) SHA1(a816c5fcc603b28c2ae59f217871a7e85fb794e1) )
-	ROM_LOAD( "gb7", 0x2800, 0x0400, NO_DUMP ) // 2be8 entry
+	ROM_LOAD( "gb7", 0x2800, 0x0400, CRC(695124aa) SHA1(0715b1ebc5e08f91ebff7fb6c2a9dca457a7c13c) )
 	ROM_LOAD( "gb8", 0x2c00, 0x0400, CRC(34700b31) SHA1(c148e2475eaaa0e9d1e2412eea359a7ba744e563) )
-	ROM_LOAD( "gb9", 0x3000, 0x0400, CRC(c27b9ba3) SHA1(a2f4f0c4b61eb03bba13ae5d25dc01009a4f86ee) ) // ok ?
+	ROM_LOAD( "gb9", 0x3000, 0x0400, CRC(c27b9ba3) SHA1(a2f4f0c4b61eb03bba13ae5d25dc01009a4f86ee) )
 ROM_END
 
-GAME( 1979, andromed,  0,        m11,     skychut,  m10_state, init_andromed, ROT270, "IPM",  "Andromeda (Japan?)",            MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, ipminvad,  0,        m10,     ipminvad, m10_state, empty_init,    ROT270, "IPM",  "IPM Invader",                   MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, ipminvad1, ipminvad, m10,     ipminvad, m10_state, init_ipminva1, ROT270, "IPM",  "IPM Invader (Incomplete Dump)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, ipminvad,  0,        m10,     ipminvad, m10_state, empty_init,    ROT270, "IPM",  "IPM Invader (set 1)",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, ipminvad1, ipminvad, m10,     ipminvad, m10_state, empty_init,    ROT270, "IPM",  "IPM Invader (set 2)",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // incomplete dump
+GAME( 1980, andromed,  0,        m11,     skychut,  m10_state, empty_init,    ROT270, "Irem", "Andromeda SS (Japan?)",         MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // incomplete dump, export version known as simply "Andromeda"
 GAME( 1980, skychut,   0,        m11,     skychut,  m10_state, empty_init,    ROT270, "Irem", "Sky Chuter",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, spacbeam,  0,        m15,     spacbeam, m10_state, empty_init,    ROT270, "Irem", "Space Beam",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // IPM or Irem?
-GAME( 1979, headoni,   0,        headoni, headoni,  m10_state, empty_init,    ROT270, "Irem", "Head On (Irem, M-15 Hardware)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, greenber,  0,        m15,     spacbeam, m10_state, empty_init,    ROT270, "Irem", "Green Beret (Irem)",            MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headoni,   0,        headoni, headoni,  m15_state, empty_init,    ROT270, "Irem", "Head On (Irem, M-15 Hardware)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spacbeam,  0,        m15,     spacbeam, m15_state, empty_init,    ROT270, "Irem", "Space Beam",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // IPM or Irem?
+GAME( 1980, greenber,  0,        m15,     greenber, m15_state, empty_init,    ROT270, "Irem", "Green Beret (Irem)",            MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

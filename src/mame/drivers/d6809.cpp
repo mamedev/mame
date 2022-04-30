@@ -121,28 +121,29 @@ public:
 	void d6809(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER( term_r );
-	DECLARE_WRITE8_MEMBER( term_w );
+	u8 term_r();
+	void term_w(u8 data);
 	void kbd_put(u8 data);
 
 	void mem_map(address_map &map);
 
-	uint8_t m_term_data;
-	virtual void machine_reset() override;
+	u8 m_term_data = 0U;
+	void machine_start() override;
+	void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	required_device<upd765a_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 };
 
-READ8_MEMBER( d6809_state::term_r )
+u8 d6809_state::term_r()
 {
-	uint8_t ret = m_term_data;
+	u8 ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-WRITE8_MEMBER( d6809_state::term_w )
+void d6809_state::term_w(u8 data)
 {
 	if ((data > 0) && (data < 0x80))
 		m_terminal->write(data);
@@ -172,6 +173,11 @@ INPUT_PORTS_END
 void d6809_state::kbd_put(u8 data)
 {
 	m_term_data = data;
+}
+
+void d6809_state::machine_start()
+{
+	save_item(NAME(m_term_data));
 }
 
 void d6809_state::machine_reset()
@@ -205,7 +211,7 @@ void d6809_state::d6809(machine_config &config)
 	// Floppy
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	//m_fdc->drq_wr_callback().set(m_fdc, FUNC(upd765a_device::dack_w));   // pin not emulated
-	FLOPPY_CONNECTOR(config, "fdc:0", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 /* ROM definition */
@@ -217,4 +223,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME         FLAGS
-COMP( 1983, d6809, 0,      0,      d6809,   d6809, d6809_state, empty_init, "Dunfield", "6809 Portable", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1983, d6809, 0,      0,      d6809,   d6809, d6809_state, empty_init, "Dunfield", "6809 Portable", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

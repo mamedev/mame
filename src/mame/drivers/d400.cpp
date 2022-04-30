@@ -26,8 +26,8 @@ public:
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(novram_recall_r);
-	DECLARE_READ8_MEMBER(novram_store_r);
+	u8 novram_recall_r();
+	u8 novram_store_r();
 	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
@@ -39,7 +39,7 @@ u32 d400_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	return 0;
 }
 
-READ8_MEMBER(d400_state::novram_recall_r)
+u8 d400_state::novram_recall_r()
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -49,7 +49,7 @@ READ8_MEMBER(d400_state::novram_recall_r)
 	return 0xff;
 }
 
-READ8_MEMBER(d400_state::novram_store_r)
+u8 d400_state::novram_store_r()
 {
 	if (!machine().side_effects_disabled())
 	{

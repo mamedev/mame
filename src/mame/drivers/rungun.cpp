@@ -50,7 +50,7 @@
 
 
 
-READ16_MEMBER(rungun_state::sysregs_r)
+uint16_t rungun_state::sysregs_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 
@@ -86,7 +86,7 @@ READ16_MEMBER(rungun_state::sysregs_r)
 	return m_sysreg[offset];
 }
 
-WRITE16_MEMBER(rungun_state::sysregs_w)
+void rungun_state::sysregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_sysreg + offset);
 
@@ -136,7 +136,7 @@ WRITE16_MEMBER(rungun_state::sysregs_w)
 	}
 }
 
-WRITE16_MEMBER(rungun_state::sound_irq_w)
+void rungun_state::sound_irq_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		m_soundcpu->set_input_line(0, HOLD_LINE);
@@ -152,7 +152,7 @@ INTERRUPT_GEN_MEMBER(rungun_state::rng_interrupt)
 		device.execute().set_input_line(M68K_IRQ_5, ASSERT_LINE);
 }
 
-READ8_MEMBER(rungun_state::k53936_rom_r)
+uint8_t rungun_state::k53936_rom_r(offs_t offset)
 {
 	// TODO: odd addresses returns ...?
 	uint32_t rom_addr = offset;
@@ -160,12 +160,12 @@ READ8_MEMBER(rungun_state::k53936_rom_r)
 	return m_roz_rom[rom_addr];
 }
 
-READ16_MEMBER(rungun_state::palette_read)
+uint16_t rungun_state::palette_read(offs_t offset)
 {
 	return m_pal_ram[offset + m_video_mux_bank*0x800/2];
 }
 
-WRITE16_MEMBER(rungun_state::palette_write)
+void rungun_state::palette_write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	palette_device &cur_paldevice = m_video_mux_bank == 0 ? *m_palette : *m_palette2;
 	uint32_t addr = offset + m_video_mux_bank*0x800/2;
@@ -204,12 +204,12 @@ void rungun_state::rungun_map(address_map &map)
 
 /**********************************************************************************/
 
-WRITE8_MEMBER(rungun_state::sound_status_w)
+void rungun_state::sound_status_w(uint8_t data)
 {
 	m_sound_status = data;
 }
 
-WRITE8_MEMBER(rungun_state::sound_ctrl_w)
+void rungun_state::sound_ctrl_w(uint8_t data)
 {
 	/*
 	    .... xxxx - Z80 ROM bank
@@ -343,21 +343,8 @@ INPUT_PORTS_END
 
 /**********************************************************************************/
 
-static const gfx_layout bglayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4, 8*4,
-		9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-			8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8
-};
-
 static GFXDECODE_START( gfx_rungun )
-	GFXDECODE_ENTRY( "gfx1", 0, bglayout, 0x0000, 64 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_16x16x4_packed_msb, 0x0000, 64 )
 GFXDECODE_END
 
 
@@ -423,7 +410,7 @@ void rungun_state::rng(machine_config &config)
 
 	K055673(config, m_k055673, 0);
 	m_k055673->set_sprite_callback(FUNC(rungun_state::sprite_callback));
-	m_k055673->set_config(K055673_LAYOUT_RNG, -8, -15);
+	m_k055673->set_config(K055673_LAYOUT_RNG, -8, 15);
 	m_k055673->set_palette(m_palette);
 	m_k055673->set_screen(m_screen);
 

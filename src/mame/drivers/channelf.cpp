@@ -22,7 +22,7 @@
 #include "includes/channelf.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -49,12 +49,12 @@ uint8_t channelf_state::port_read_with_latch(uint8_t ext, uint8_t latch_state)
 	return (~ext | latch_state);
 }
 
-READ8_MEMBER( channelf_state::port_0_r )
+uint8_t channelf_state::port_0_r()
 {
 	return port_read_with_latch(ioport("PANEL")->read(), m_latch[0]);
 }
 
-READ8_MEMBER( channelf_state::port_1_r )
+uint8_t channelf_state::port_1_r()
 {
 	uint8_t ext_value;
 
@@ -66,7 +66,7 @@ READ8_MEMBER( channelf_state::port_1_r )
 	return port_read_with_latch(ext_value,m_latch[1]);
 }
 
-READ8_MEMBER( channelf_state::port_4_r )
+uint8_t channelf_state::port_4_r()
 {
 	uint8_t ext_value;
 
@@ -78,12 +78,12 @@ READ8_MEMBER( channelf_state::port_4_r )
 	return port_read_with_latch(ext_value,m_latch[2]);
 }
 
-READ8_MEMBER( channelf_state::port_5_r )
+uint8_t channelf_state::port_5_r()
 {
 	return port_read_with_latch(0xff, m_latch[3]);
 }
 
-WRITE8_MEMBER( channelf_state::port_0_w )
+void channelf_state::port_0_w(uint8_t data)
 {
 	int offs;
 
@@ -96,19 +96,19 @@ WRITE8_MEMBER( channelf_state::port_0_w )
 	}
 }
 
-WRITE8_MEMBER( channelf_state::port_1_w )
+void channelf_state::port_1_w(uint8_t data)
 {
 	m_latch[1] = data;
 	m_val_reg = ((data ^ 0xff) >> 6) & 0x03;
 }
 
-WRITE8_MEMBER( channelf_state::port_4_w )
+void channelf_state::port_4_w(uint8_t data)
 {
 	m_latch[2] = data;
 	m_col_reg = (data | 0x80) ^ 0xff;
 }
 
-WRITE8_MEMBER( channelf_state::port_5_w )
+void channelf_state::port_5_w(uint8_t data)
 {
 	m_latch[3] = data;
 	m_custom->sound_w((data>>6)&3);
@@ -168,18 +168,18 @@ void channelf_state::machine_start()
 		switch (m_cart->get_type())
 		{
 			case CF_MAZE:
-				m_maincpu->space(AS_IO).install_readwrite_handler(0x24, 0x25, read8_delegate(*m_cart, FUNC(channelf_cart_slot_device::read_ram)), write8_delegate(*m_cart, FUNC(channelf_cart_slot_device::write_ram)));
+				m_maincpu->space(AS_IO).install_readwrite_handler(0x24, 0x25, read8sm_delegate(*m_cart, FUNC(channelf_cart_slot_device::read_ram)), write8sm_delegate(*m_cart, FUNC(channelf_cart_slot_device::write_ram)));
 				break;
 			case CF_HANGMAN:
-				m_maincpu->space(AS_IO).install_readwrite_handler(0x20, 0x21, read8_delegate(*m_cart, FUNC(channelf_cart_slot_device::read_ram)), write8_delegate(*m_cart, FUNC(channelf_cart_slot_device::write_ram)));
+				m_maincpu->space(AS_IO).install_readwrite_handler(0x20, 0x21, read8sm_delegate(*m_cart, FUNC(channelf_cart_slot_device::read_ram)), write8sm_delegate(*m_cart, FUNC(channelf_cart_slot_device::write_ram)));
 				break;
 			case CF_CHESS:
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2800, 0x2fff, read8_delegate(*m_cart, FUNC(channelf_cart_slot_device::read_ram)), write8_delegate(*m_cart, FUNC(channelf_cart_slot_device::write_ram)));
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2800, 0x2fff, read8sm_delegate(*m_cart, FUNC(channelf_cart_slot_device::read_ram)), write8sm_delegate(*m_cart, FUNC(channelf_cart_slot_device::write_ram)));
 				break;
 			case CF_MULTI:
 			case CF_MULTI_OLD:
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2800, 0x2fff, read8_delegate(*m_cart, FUNC(channelf_cart_slot_device::read_ram)), write8_delegate(*m_cart, FUNC(channelf_cart_slot_device::write_ram)));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0x3000, 0x3fff, write8_delegate(*m_cart, FUNC(channelf_cart_slot_device::write_bank)));
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2800, 0x2fff, read8sm_delegate(*m_cart, FUNC(channelf_cart_slot_device::read_ram)), write8sm_delegate(*m_cart, FUNC(channelf_cart_slot_device::write_ram)));
+				m_maincpu->space(AS_PROGRAM).install_write_handler(0x3000, 0x3fff, write8smo_delegate(*m_cart, FUNC(channelf_cart_slot_device::write_bank)));
 				break;
 		}
 
@@ -216,11 +216,8 @@ void channelf_state::channelf(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(128, 64);
-	screen.set_visarea(4, 112 - 7, 4, 64 - 3);
-	screen.set_screen_update(FUNC(channelf_state::screen_update_channelf));
+	screen.set_raw(3.579545_MHz_XTAL * 8 / 7, 256, 8, 212, 264, 16, 248);
+	screen.set_screen_update(FUNC(channelf_state::screen_update_ntsc));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(channelf_state::channelf_palette), 8);
@@ -241,11 +238,8 @@ void channelf_state::sabavdpl(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(4623)); /* approximate */
-	screen.set_size(128, 64);
-	screen.set_visarea(4, 112 - 7, 4, 64 - 3);
-	screen.set_screen_update(FUNC(channelf_state::screen_update_channelf));
+	screen.set_raw(4_MHz_XTAL, 256, 8, 212, 312, 20, 310);
+	screen.set_screen_update(FUNC(channelf_state::screen_update_pal));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(channelf_state::channelf_palette), 8);
@@ -267,11 +261,8 @@ void channelf_state::channlf2(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(128, 64);
-	screen.set_visarea(4, 112 - 7, 4, 64 - 3);
-	screen.set_screen_update(FUNC(channelf_state::screen_update_channelf));
+	screen.set_raw(3.579545_MHz_XTAL * 8 / 7, 256, 8, 212, 264, 16, 248);
+	screen.set_screen_update(FUNC(channelf_state::screen_update_ntsc));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(channelf_state::channelf_palette), 8);
@@ -293,11 +284,8 @@ void channelf_state::sabavpl2(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(4623)); /* approximate */
-	screen.set_size(128, 64);
-	screen.set_visarea(4, 112 - 7, 4, 64 - 3);
-	screen.set_screen_update(FUNC(channelf_state::screen_update_channelf));
+	screen.set_raw(4_MHz_XTAL, 256, 8, 212, 312, 20, 310);
+	screen.set_screen_update(FUNC(channelf_state::screen_update_pal));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(channelf_state::channelf_palette), 8);

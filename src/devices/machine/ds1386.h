@@ -85,8 +85,8 @@ public:
 	auto intb() { return m_intb_cb.bind(); }
 	auto sqw() { return m_sqw_cb.bind(); }
 
-	DECLARE_WRITE8_MEMBER( data_w );
-	DECLARE_READ8_MEMBER( data_r );
+	void data_w(offs_t offset, uint8_t data);
+	uint8_t data_r(offs_t offset);
 
 	DECLARE_WRITE_LINE_MEMBER( ce_w );
 	DECLARE_WRITE_LINE_MEMBER( oe_w );
@@ -125,12 +125,12 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
-	virtual void nvram_read(emu_file &file) override;
-	virtual void nvram_write(emu_file &file) override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 
 	// device_rtc_interface overrides
 	virtual bool rtc_feature_y2k() const override { return false; }

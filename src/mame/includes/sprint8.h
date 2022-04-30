@@ -31,12 +31,12 @@ public:
 	void sprint8(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(collision_r);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(lockout_w);
+	uint8_t collision_r();
+	uint8_t input_r(offs_t offset);
+	void lockout_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(int_reset_w);
 	DECLARE_WRITE_LINE_MEMBER(team_w);
-	DECLARE_WRITE8_MEMBER(video_ram_w);
+	void video_ram_w(offs_t offset, uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -67,18 +67,18 @@ private:
 	required_shared_ptr<uint8_t> m_pos_v_ram;
 	required_shared_ptr<uint8_t> m_pos_d_ram;
 
-	int m_steer_dir[8];
-	int m_steer_flag[8];
-	int m_collision_reset;
-	int m_collision_index;
-	uint8_t m_dial[8];
-	int m_team;
+	int m_steer_dir[8]{};
+	int m_steer_flag[8]{};
+	int m_collision_reset = 0;
+	int m_collision_index = 0;
+	uint8_t m_dial[8]{};
+	int m_team = 0;
 
-	tilemap_t* m_tilemap1;
-	tilemap_t* m_tilemap2;
+	tilemap_t* m_tilemap1 = nullptr;
+	tilemap_t* m_tilemap2 = nullptr;
 	bitmap_ind16 m_helper1;
 	bitmap_ind16 m_helper2;
-	emu_timer *m_collision_timer;
+	emu_timer *m_collision_timer = nullptr;
 };
 
 /*----------- defined in audio/sprint8.c -----------*/

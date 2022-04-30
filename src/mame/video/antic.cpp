@@ -1131,7 +1131,7 @@ void antic_device::cclk_init()
  * Read ANTIC hardware registers
  *
  **************************************************************/
-READ8_MEMBER ( antic_device::read )
+uint8_t antic_device::read(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -1197,7 +1197,7 @@ READ8_MEMBER ( antic_device::read )
  *
  **************************************************************/
 
-WRITE8_MEMBER ( antic_device::write )
+void antic_device::write(offs_t offset, uint8_t data)
 {
 	int temp;
 
@@ -1227,16 +1227,14 @@ WRITE8_MEMBER ( antic_device::write )
 	case  2:
 		LOG("ANTIC 02 write DLISTL $%02X\n", data);
 		m_w.dlistl = data;
-		temp = (m_w.dlisth << 8) + m_w.dlistl;
-		m_dpage = temp & DPAGE;
-		m_doffs = temp & DOFFS;
+		m_doffs = (m_doffs & 0x300) | (data & 0xff);  // keep bits 9 and 8 of m_doffs
 		break;
 	case  3:
 		LOG("ANTIC 03 write DLISTH $%02X\n", data);
 		m_w.dlisth = data;
 		temp = (m_w.dlisth << 8) + m_w.dlistl;
 		m_dpage = temp & DPAGE;
-		m_doffs = temp & DOFFS;
+		m_doffs = (m_doffs & 0xff) | (temp & 0x300);  // keep bits 7 to 0 of m_doffs
 		break;
 	case  4:
 		if( data == m_w.hscrol )
@@ -1853,12 +1851,14 @@ void antic_device::linerefresh()
 		if( (m_cmd & 0x0f) == 2 || (m_cmd & 0x0f) == 3 )
 		{
 			artifacts_txt(src, (uint8_t*)(dst + 3), HCHARS);
+			draw_scanline8(*m_bitmap, 12, y, std::min(size_t(m_bitmap->width() - 12), sizeof(scanline)), (const uint8_t *) scanline, nullptr);
 			return;
 		}
 		else
 			if( (m_cmd & 0x0f) == 15 )
 			{
 				artifacts_gfx(src, (uint8_t*)(dst + 3), HCHARS);
+				draw_scanline8(*m_bitmap, 12, y, std::min(size_t(m_bitmap->width() - 12), sizeof(scanline)), (const uint8_t *) scanline, nullptr);
 				return;
 			}
 	}
@@ -1936,21 +1936,21 @@ void antic_device::linerefresh()
 #define ANTIC_TIME_FROM_CYCLES(cycles)  \
 (attotime)(screen().scan_period() * (cycles) / CYCLES_PER_LINE)
 
-void antic_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void antic_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 		case TIMER_CYCLE_STEAL:
-			steal_cycles(ptr, param);
+			steal_cycles(param);
 			break;
 		case TIMER_ISSUE_DLI:
-			issue_dli(ptr, param);
+			issue_dli(param);
 			break;
 		case TIMER_LINE_REND:
-			scanline_render(ptr, param);
+			scanline_render(param);
 			break;
 		case TIMER_LINE_DONE:
-			line_done(ptr, param);
+			line_done(param);
 			break;
 	}
 }
@@ -2043,16 +2043,16 @@ TIMER_CALLBACK_MEMBER( antic_device::scanline_render )
 			if( m_w.dmactl & DMA_MISSILE )
 			{
 				m_steal_cycles += 1;
-				m_gtia->write(space, 0x11, RDPMGFXD(space, 3*256));
+				m_gtia->write(0x11, RDPMGFXD(space, 3*256));
 			}
 			/* transport player data to GTIA ? */
 			if( m_w.dmactl & DMA_PLAYER )
 			{
 				m_steal_cycles += 4;
-				m_gtia->write(space, 0x0d, RDPMGFXD(space, 4*256));
-				m_gtia->write(space, 0x0e, RDPMGFXD(space, 5*256));
-				m_gtia->write(space, 0x0f, RDPMGFXD(space, 6*256));
-				m_gtia->write(space, 0x10, RDPMGFXD(space, 7*256));
+				m_gtia->write(0x0d, RDPMGFXD(space, 4*256));
+				m_gtia->write(0x0e, RDPMGFXD(space, 5*256));
+				m_gtia->write(0x0f, RDPMGFXD(space, 6*256));
+				m_gtia->write(0x10, RDPMGFXD(space, 7*256));
 			}
 		}
 		else
@@ -2062,17 +2062,17 @@ TIMER_CALLBACK_MEMBER( antic_device::scanline_render )
 			{
 				if( (m_scanline & 1) == 0 )      /* even line ? */
 					m_steal_cycles += 1;
-				m_gtia->write(space, 0x11, RDPMGFXS(space, 3*128));
+				m_gtia->write(0x11, RDPMGFXS(space, 3*128));
 			}
 			/* transport player data to GTIA ? */
 			if( m_w.dmactl & DMA_PLAYER )
 			{
 				if( (m_scanline & 1) == 0 )      /* even line ? */
 					m_steal_cycles += 4;
-				m_gtia->write(space, 0x0d, RDPMGFXS(space, 4*128));
-				m_gtia->write(space, 0x0e, RDPMGFXS(space, 5*128));
-				m_gtia->write(space, 0x0f, RDPMGFXS(space, 6*128));
-				m_gtia->write(space, 0x10, RDPMGFXS(space, 7*128));
+				m_gtia->write(0x0d, RDPMGFXS(space, 4*128));
+				m_gtia->write(0x0e, RDPMGFXS(space, 5*128));
+				m_gtia->write(0x0f, RDPMGFXS(space, 6*128));
+				m_gtia->write(0x10, RDPMGFXS(space, 7*128));
 			}
 		}
 	}

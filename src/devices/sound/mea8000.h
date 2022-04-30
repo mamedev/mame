@@ -23,13 +23,13 @@ public:
 
 	auto req() { return m_write_req.bind(); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	/* filter coefficients from frequencies */
@@ -111,7 +111,7 @@ private:
 
 	emu_timer *m_timer = nullptr;
 	sound_stream * m_stream = nullptr;
-	stream_sample_t m_output = 0;
+	int32_t m_output = 0;
 
 	int m_cos_table[TABLE_LEN];  /* fm => cos coefficient */
 	int m_exp_table[TABLE_LEN];  /* bw => exp coefficient */

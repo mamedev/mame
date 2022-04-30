@@ -60,7 +60,6 @@
           (Addendum - all known issues seem to be correct - see Sprite Priority Notes below).
         * There may be some kind of fullscreen palette effect (controlled by bit 3 in priority
           word - used at end of each level, and on final boss).
-        * A shadow effect (used in level 1) is not implemented.
         * ACE Chip aren't fully emulated.
 
     Sprite Priority Notes:
@@ -90,15 +89,14 @@
 #include "machine/deco102.h"
 #include "machine/decocrpt.h"
 #include "machine/gen_latch.h"
-#include "sound/ym2151.h"
 #include "sound/okim6295.h"
-#include "screen.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 
 #define MAIN_XTAL XTAL(28'000'000)
 #define SOUND_XTAL XTAL(32'220'000)
 
-READ16_MEMBER( boogwing_state::boogwing_protection_region_0_104_r )
+uint16_t boogwing_state::boogwing_protection_region_0_104_r(offs_t offset)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -107,7 +105,7 @@ READ16_MEMBER( boogwing_state::boogwing_protection_region_0_104_r )
 	return data;
 }
 
-WRITE16_MEMBER( boogwing_state::boogwing_protection_region_0_104_w )
+void boogwing_state::boogwing_protection_region_0_104_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -115,10 +113,9 @@ WRITE16_MEMBER( boogwing_state::boogwing_protection_region_0_104_w )
 	m_deco104->write_data( deco146_addr, data, mem_mask, cs );
 }
 
-WRITE16_MEMBER( boogwing_state::priority_w )
+void boogwing_state::priority_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_priority);
-	m_deco_ace->set_palette_effect_max((m_priority & 0x8) ? 0x6ff : 0xfff);
 }
 
 
@@ -290,7 +287,7 @@ static const gfx_layout tile_16x16_layout =
 
 
 static GFXDECODE_START( gfx_boogwing )
-	GFXDECODE_ENTRY( "tiles1",   0, tile_8x8_layout,            0, 16 ) /* Tiles (8x8) */
+	GFXDECODE_ENTRY( "tiles1",   0, tile_8x8_layout,        0x800, 16 ) /* Tiles (8x8) */
 	GFXDECODE_ENTRY( "tiles2",   0, tile_16x16_layout_5bpp, 0x100, 16 ) /* Tiles (16x16) */
 	GFXDECODE_ENTRY( "tiles3",   0, tile_16x16_layout,      0x300, 32 ) /* Tiles (16x16) */
 	GFXDECODE_ENTRY( "sprites1", 0, tile_16x16_layout,      0x500, 32 ) /* Sprites (16x16) */
@@ -304,7 +301,7 @@ void boogwing_state::machine_reset()
 	m_priority = 0;
 }
 
-WRITE8_MEMBER(boogwing_state::sound_bankswitch_w)
+void boogwing_state::sound_bankswitch_w(uint8_t data)
 {
 	m_oki[1]->set_rom_bank((data & 2) >> 1);
 	m_oki[0]->set_rom_bank(data & 1);
@@ -339,9 +336,9 @@ void boogwing_state::boogwing(machine_config &config)
 	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(MAIN_XTAL / 4, 442, 0, 320, 274, 8, 248); // same as robocop2(cninja.cpp)? verify this from real pcb.
-	screen.set_screen_update(FUNC(boogwing_state::screen_update_boogwing));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MAIN_XTAL / 4, 442, 0, 320, 274, 8, 248); // same as robocop2(cninja.cpp)? verify this from real pcb.
+	m_screen->set_screen_update(FUNC(boogwing_state::screen_update_boogwing));
 
 	GFXDECODE(config, "gfxdecode", m_deco_ace, gfx_boogwing);
 
@@ -353,8 +350,6 @@ void boogwing_state::boogwing(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_trans_mask(0x1f);  // pf2 has 5bpp graphics
 	m_deco_tilegen[0]->set_pf1_col_bank(0);
 	m_deco_tilegen[0]->set_pf2_col_bank(0);   // pf2 is non default
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
@@ -368,8 +363,6 @@ void boogwing_state::boogwing(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[1], 0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[1]->set_pf1_col_bank(0);
 	m_deco_tilegen[1]->set_pf2_col_bank(16);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
@@ -403,16 +396,16 @@ void boogwing_state::boogwing(machine_config &config)
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_XTAL/9));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 1); /* IRQ2 */
 	ymsnd.port_write_handler().set(FUNC(boogwing_state::sound_bankswitch_w));
-	ymsnd.add_route(0, "lspeaker", 0.80);
-	ymsnd.add_route(1, "rspeaker", 0.80);
+	ymsnd.add_route(0, "lspeaker", 0.32);
+	ymsnd.add_route(1, "rspeaker", 0.32);
 
 	OKIM6295(config, m_oki[0], SOUND_XTAL/32, okim6295_device::PIN7_HIGH);
-	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.40);
-	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.40);
+	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.56);
+	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.56);
 
 	OKIM6295(config, m_oki[1], SOUND_XTAL/16, okim6295_device::PIN7_HIGH);
-	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.30);
-	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.30);
+	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.12);
+	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.12);
 }
 
 /**********************************************************************************/

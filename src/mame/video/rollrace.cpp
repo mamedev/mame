@@ -14,7 +14,7 @@ TILE_GET_INFO_MEMBER(rollrace_state::get_fg_tile_info)
 	int code = m_videoram[tile_index];
 	int color = m_colorram[(tile_index & 0x1f)*2+1] & 0x1f;
 
-	SET_TILE_INFO_MEMBER(RA_FGCHAR_BASE + m_chrbank,
+	tileinfo.set(RA_FGCHAR_BASE + m_chrbank,
 		code,
 		color,
 		TILE_FLIPY);
@@ -28,13 +28,13 @@ void rollrace_state::video_start()
 	m_fg_tilemap->set_scroll_cols(32);
 }
 
-WRITE8_MEMBER(rollrace_state::vram_w)
+void rollrace_state::vram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(rollrace_state::cram_w)
+void rollrace_state::cram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	if(offset & 1)
@@ -105,7 +105,7 @@ WRITE_LINE_MEMBER(rollrace_state::charbank_1_w)
 	m_fg_tilemap->mark_all_dirty();
 }
 
-WRITE8_MEMBER(rollrace_state::bkgpen_w)
+void rollrace_state::bkgpen_w(uint8_t data)
 {
 	m_bkgpen = data;
 }
@@ -115,7 +115,7 @@ WRITE_LINE_MEMBER(rollrace_state::spritebank_w)
 	m_spritebank = state;
 }
 
-WRITE8_MEMBER(rollrace_state::backgroundpage_w)
+void rollrace_state::backgroundpage_w(uint8_t data)
 {
 	m_bkgpage = data & 0x1f;
 	m_bkgflip = ( data & 0x80 ) >> 7;
@@ -123,12 +123,12 @@ WRITE8_MEMBER(rollrace_state::backgroundpage_w)
 	/* 0x80 flip vertical */
 }
 
-WRITE8_MEMBER(rollrace_state::backgroundcolor_w)
+void rollrace_state::backgroundcolor_w(uint8_t data)
 {
 	m_bkgcol = data;
 }
 
-WRITE8_MEMBER(rollrace_state::flipy_w)
+void rollrace_state::flipy_w(uint8_t data)
 {
 	m_flipy = data & 0x01;
 	// bit 2: cleared at night stage in attract, unknown purpose

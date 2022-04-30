@@ -13,16 +13,16 @@ class namco_c169roz_device : public device_t, public device_gfx_interface
 {
 public:
 	// construction/destruction
-	namco_c169roz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	namco_c169roz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	void set_is_namcofl(bool state) { m_is_namcofl = state; }
 	void set_ram_words(uint32_t size) { m_ramsize = size; }
 	void set_color_base(int color) { m_color_base = color; }
 
-	DECLARE_READ16_MEMBER( control_r );
-	DECLARE_WRITE16_MEMBER( control_w );
-	DECLARE_READ16_MEMBER( videoram_r );
-	DECLARE_WRITE16_MEMBER( videoram_w );
+	uint16_t control_r(offs_t offset);
+	void control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t videoram_r(offs_t offset);
+	void videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	typedef delegate<void (uint16_t, int*, int*, int)> c169_tilemap_delegate;
 	void set_tile_callback(c169_tilemap_delegate tilemap_cb) { m_c169_cb = tilemap_cb; }
@@ -53,12 +53,12 @@ private:
 	TILEMAP_MAPPER_MEMBER( mapper );
 
 	static const int ROZ_TILEMAP_COUNT = 2;
-	tilemap_t *m_tilemap[ROZ_TILEMAP_COUNT];
+	tilemap_t *m_tilemap[ROZ_TILEMAP_COUNT]{};
 	uint16_t m_control[0x20/2];
 	std::vector<uint16_t> m_videoram;
 	int m_color_base;
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
-	uint32_t m_ramsize;
+	uint32_t m_ramsize = 0;
 
 	// per-game hacks
 	bool m_is_namcofl;

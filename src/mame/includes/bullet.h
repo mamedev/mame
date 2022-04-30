@@ -13,9 +13,9 @@
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
 #include "machine/z80dma.h"
 #include "machine/z80pio.h"
+#include "machine/z80sio.h"
 
 #define Z80_TAG         "u20"
 #define Z80CTC_TAG      "u1"
@@ -57,20 +57,20 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER( mreq_r );
-	DECLARE_WRITE8_MEMBER( mreq_w );
-	DECLARE_READ8_MEMBER( info_r );
-	DECLARE_READ8_MEMBER( brom_r );
-	DECLARE_WRITE8_MEMBER( brom_w );
-	DECLARE_READ8_MEMBER( win_r );
-	DECLARE_WRITE8_MEMBER( wstrobe_w );
-	DECLARE_WRITE8_MEMBER( exdsk_w );
-	DECLARE_WRITE8_MEMBER( exdma_w );
-	DECLARE_WRITE8_MEMBER( hdcon_w );
-	DECLARE_WRITE8_MEMBER( segst_w );
-	DECLARE_READ8_MEMBER( dma_mreq_r );
-	DECLARE_WRITE8_MEMBER( dma_mreq_w );
-	DECLARE_READ8_MEMBER( pio_pb_r );
+	uint8_t mreq_r(offs_t offset);
+	void mreq_w(offs_t offset, uint8_t data);
+	uint8_t info_r();
+	uint8_t brom_r();
+	void brom_w(uint8_t data);
+	uint8_t win_r();
+	void wstrobe_w(uint8_t data);
+	void exdsk_w(uint8_t data);
+	void exdma_w(uint8_t data);
+	void hdcon_w(uint8_t data);
+	void segst_w(uint8_t data);
+	uint8_t dma_mreq_r(offs_t offset);
+	void dma_mreq_w(offs_t offset, uint8_t data);
+	uint8_t pio_pb_r();
 	DECLARE_WRITE_LINE_MEMBER( dartardy_w );
 	DECLARE_WRITE_LINE_MEMBER( dartbrdy_w );
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
@@ -81,8 +81,8 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	DECLARE_WRITE_LINE_MEMBER(dart_rxtxca_w);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
+	uint8_t io_read_byte(offs_t offset);
+	void io_write_byte(offs_t offset, uint8_t data);
 
 	void bullet(machine_config &config);
 	void bullet_io(address_map &map);
@@ -113,25 +113,25 @@ protected:
 	required_ioport m_sw1;
 
 	// memory state
-	int m_segst;
-	int m_brom;
+	int m_segst = 0;
+	int m_brom = 0;
 
 	// DMA state
-	uint8_t m_exdma;
-	int m_buf;
+	uint8_t m_exdma = 0U;
+	int m_buf = 0;
 	bool m_fdrdy;
-	int m_dartardy;
-	int m_dartbrdy;
-	int m_winrdy;
-	int m_exrdy1;
-	int m_exrdy2;
+	int m_dartardy = 0;
+	int m_dartbrdy = 0;
+	int m_winrdy = 0;
+	int m_exrdy1 = 0;
+	int m_exrdy2 = 0;
 	bool m_exdsk_sw;
 	bool m_hdcon_sw;
 
-	int m_centronics_busy;
-	int m_centronics_perror;
-	int m_centronics_select;
-	int m_centronics_fault;
+	int m_centronics_busy = 0;
+	int m_centronics_perror = 0;
+	int m_centronics_select = 0;
+	int m_centronics_fault = 0;
 };
 
 class bulletf_state : public bullet_state
@@ -148,22 +148,24 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER( mreq_r );
-	DECLARE_WRITE8_MEMBER( mreq_w );
-	DECLARE_WRITE8_MEMBER( xdma0_w );
-	DECLARE_WRITE8_MEMBER( xfdc_w );
-	DECLARE_WRITE8_MEMBER( mbank_w );
-	DECLARE_READ8_MEMBER( hwsts_r );
-	DECLARE_READ8_MEMBER( scsi_r );
-	DECLARE_WRITE8_MEMBER( scsi_w );
+	void bulletf(machine_config &config);
 
-	DECLARE_READ8_MEMBER( dma_mreq_r );
-	DECLARE_WRITE8_MEMBER( dma_mreq_w );
-	DECLARE_WRITE8_MEMBER( pio_pa_w );
+private:
+	uint8_t mreq_r(offs_t offset);
+	void mreq_w(offs_t offset, uint8_t data);
+	void xdma0_w(uint8_t data);
+	void xfdc_w(uint8_t data);
+	void mbank_w(uint8_t data);
+	uint8_t hwsts_r();
+	uint8_t scsi_r();
+	void scsi_w(uint8_t data);
+
+	uint8_t dma_mreq_r(offs_t offset);
+	void dma_mreq_w(offs_t offset, uint8_t data);
+	void pio_pa_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( cstrb_w );
 	DECLARE_WRITE_LINE_MEMBER( req_w );
 
-	void bulletf(machine_config &config);
 	void bulletf_io(address_map &map);
 	void bulletf_mem(address_map &map);
 protected:
@@ -179,11 +181,11 @@ protected:
 	required_device<output_latch_device> m_scsi_data_out;
 	required_device<input_buffer_device> m_scsi_ctrl_in;
 
-	int m_rome;
-	uint8_t m_xdma0;
-	uint8_t m_mbank;
-	int m_wack;
-	int m_wrdy;
+	int m_rome = 0;
+	uint8_t m_xdma0 = 0U;
+	uint8_t m_mbank = 0U;
+	int m_wack = 0;
+	int m_wrdy = 0;
 };
 
 #endif // MAME_INCLUDES_BULLET_H

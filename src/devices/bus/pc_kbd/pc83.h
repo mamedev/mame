@@ -41,13 +41,13 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// device_pc_kbd_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER( clock_write ) override { };
-	virtual DECLARE_WRITE_LINE_MEMBER( data_write ) override { };
+	virtual DECLARE_WRITE_LINE_MEMBER( clock_write ) override { }
+	virtual DECLARE_WRITE_LINE_MEMBER( data_write ) override { }
 
 private:
-	DECLARE_WRITE8_MEMBER( bus_w );
-	DECLARE_READ8_MEMBER( p1_r );
-	DECLARE_WRITE8_MEMBER( p2_w );
+	void bus_w(uint8_t data);
+	uint8_t p1_r();
+	void p2_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( t0_r );
 
 	required_device<i8048_device> m_maincpu;

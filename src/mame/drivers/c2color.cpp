@@ -33,7 +33,7 @@
 
 #include "screen.h"
 #include "emupal.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 class c2_color_state : public driver_device

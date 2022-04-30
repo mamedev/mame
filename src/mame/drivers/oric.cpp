@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-/*********************************************************************
+/*****************************************************************************************************
 
-    drivers/oric.c
+    drivers/oric.cpp
 
     Systems supported by this driver:
 
@@ -17,7 +17,9 @@
     This driver originally by Paul Cook, rewritten by Kevin Thacker,
     re-rewritten by Olivier Galibert.
 
-*********************************************************************/
+
+
+*****************************************************************************************************/
 
 #include "emu.h"
 
@@ -76,13 +78,13 @@ public:
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_pressed);
-	DECLARE_WRITE8_MEMBER(via_a_w);
-	DECLARE_WRITE8_MEMBER(via_b_w);
+	void via_a_w(uint8_t data);
+	void via_b_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(via_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(via_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(ext_irq_w);
-	DECLARE_WRITE8_MEMBER(psg_a_w);
+	void psg_a_w(uint8_t data);
 	TIMER_CALLBACK_MEMBER(update_tape);
 
 	virtual void machine_start() override;
@@ -142,8 +144,8 @@ public:
 		m_joy2(*this, "JOY2")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(via2_a_w);
-	DECLARE_WRITE8_MEMBER(via2_b_w);
+	void via2_a_w(uint8_t data);
+	void via2_b_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via2_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(via2_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(via2_irq_w);
@@ -154,7 +156,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_hld_w);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -233,7 +235,7 @@ uint32_t oric_state::screen_update_oric(screen_device &screen, bitmap_rgb32 &bit
 		uint32_t fgcol = m_palette->pen_color(7);
 		uint32_t bgcol = m_palette->pen_color(0);
 
-		uint32_t *p = &bitmap.pix32(y);
+		uint32_t *p = &bitmap.pix(y);
 
 		for(int x=0; x<40; x++) {
 			// Lookup the byte and, if needed, the pattern data
@@ -323,14 +325,14 @@ INPUT_CHANGED_MEMBER(oric_state::nmi_pressed)
 	m_maincpu->set_input_line(m6502_device::NMI_LINE, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(oric_state::via_a_w)
+void oric_state::via_a_w(uint8_t data)
 {
 	m_via_a = data;
 	m_cent_data_out->write(m_via_a);
 	update_psg();
 }
 
-WRITE8_MEMBER(oric_state::via_b_w)
+void oric_state::via_b_w(uint8_t data)
 {
 	m_via_b = data;
 	update_keyboard();
@@ -364,7 +366,7 @@ WRITE_LINE_MEMBER(oric_state::ext_irq_w)
 	update_irq();
 }
 
-WRITE8_MEMBER(oric_state::psg_a_w)
+void oric_state::psg_a_w(uint8_t data)
 {
 	m_psg_a = data;
 	update_keyboard();
@@ -400,6 +402,16 @@ void oric_state::machine_start_common()
 
 	if (!m_tape_timer)
 		m_tape_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(oric_state::update_tape), this));
+
+	save_item(NAME(m_blink_counter));
+	save_item(NAME(m_pattr));
+	save_item(NAME(m_via_a));
+	save_item(NAME(m_via_b));
+	save_item(NAME(m_psg_a));
+	save_item(NAME(m_via_ca2));
+	save_item(NAME(m_via_cb2));
+	save_item(NAME(m_via_irq));
+	save_item(NAME(m_ext_irq));
 }
 
 void oric_state::machine_start()
@@ -410,7 +422,6 @@ void oric_state::machine_start()
 	m_bank_f800_r->set_base(m_rom->base() + 0x3800);
 }
 
-
 void oric_state::machine_reset()
 {
 	m_tape_timer->adjust(attotime::from_hz(4800), 0, attotime::from_hz(4800));
@@ -419,7 +430,8 @@ void oric_state::machine_reset()
 void telestrat_state::machine_start()
 {
 	machine_start_common();
-	for(int i=0; i<4; i++) {
+	for(u8 i=0; i<4; i++)
+	{
 		char name[32];
 		sprintf(name, "fdc:%d", i);
 		m_floppies[i] = subdevice<floppy_connector>(name)->get_device();
@@ -429,6 +441,17 @@ void telestrat_state::machine_start()
 
 	memset(m_junk_read, 0x00, sizeof(m_junk_read));
 	memset(m_junk_write, 0x00, sizeof(m_junk_write));
+
+	save_item(NAME(m_port_314));
+	save_item(NAME(m_via2_a));
+	save_item(NAME(m_via2_b));
+	save_item(NAME(m_via2_ca2));
+	save_item(NAME(m_via2_cb2));
+	save_item(NAME(m_via2_irq));
+	save_item(NAME(m_acia_irq));
+	save_item(NAME(m_fdc_irq));
+	save_item(NAME(m_fdc_drq));
+	save_item(NAME(m_fdc_hld));
 }
 
 void telestrat_state::machine_reset()
@@ -449,13 +472,13 @@ void telestrat_state::update_irq()
 								m_acia_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(telestrat_state::via2_a_w)
+void telestrat_state::via2_a_w(uint8_t data)
 {
 	m_via2_a = data;
 	remap();
 }
 
-WRITE8_MEMBER(telestrat_state::via2_b_w)
+void telestrat_state::via2_b_w(uint8_t data)
 {
 	m_via2_b = data;
 	uint8_t port = 0xff;
@@ -570,43 +593,43 @@ void telestrat_state::remap()
 static INPUT_PORTS_START(oric)
 	PORT_START("ROW0")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)           PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)           PORT_CHAR('x') PORT_CHAR('X')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)           PORT_CHAR('x') PORT_CHAR('X') PORT_CHAR(24)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)           PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)           PORT_CHAR('v') PORT_CHAR('V')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)           PORT_CHAR('v') PORT_CHAR('V') PORT_CHAR(22)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)           PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)           PORT_CHAR('n') PORT_CHAR('N')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)           PORT_CHAR('n') PORT_CHAR('N') PORT_CHAR(14)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)           PORT_CHAR('7') PORT_CHAR('&')
 
 	PORT_START("ROW1")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)           PORT_CHAR('d') PORT_CHAR('D')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)           PORT_CHAR('q') PORT_CHAR('Q')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB)         PORT_CHAR(UCHAR_MAMEKEY(ESC))
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)           PORT_CHAR('d') PORT_CHAR('D') PORT_CHAR(4)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)           PORT_CHAR('q') PORT_CHAR('Q') PORT_CHAR(17)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB)         PORT_CHAR(27)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)           PORT_CHAR('f') PORT_CHAR('F')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)           PORT_CHAR('r') PORT_CHAR('R')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)           PORT_CHAR('t') PORT_CHAR('T')
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)           PORT_CHAR('j') PORT_CHAR('J')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)           PORT_CHAR('f') PORT_CHAR('F') PORT_CHAR(6)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)           PORT_CHAR('r') PORT_CHAR('R') PORT_CHAR(18)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)           PORT_CHAR('t') PORT_CHAR('T') PORT_CHAR(20)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)           PORT_CHAR('j') PORT_CHAR('J') PORT_CHAR(10)
 
 	PORT_START("ROW2")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)           PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)           PORT_CHAR('c') PORT_CHAR('C') PORT_CHAR(3)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)           PORT_CHAR('2') PORT_CHAR('@')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)           PORT_CHAR('z') PORT_CHAR('Z')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)           PORT_CHAR('z') PORT_CHAR('Z') PORT_CHAR(26)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)           PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)           PORT_CHAR('b') PORT_CHAR('B')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)           PORT_CHAR('b') PORT_CHAR('B') PORT_CHAR(2)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)           PORT_CHAR('6') PORT_CHAR('^')
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)           PORT_CHAR('m') PORT_CHAR('M')
 
 	PORT_START("ROW3")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)       PORT_CHAR('\'') PORT_CHAR('"')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH2)  PORT_CHAR('\\') PORT_CHAR('|')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)   PORT_CHAR('\\') PORT_CHAR('|')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)       PORT_CHAR('-') PORT_CHAR(0xA3)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)       PORT_CHAR(';') PORT_CHAR(':')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)           PORT_CHAR('9') PORT_CHAR('(')
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)           PORT_CHAR('k') PORT_CHAR('K')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)           PORT_CHAR('k') PORT_CHAR('K') PORT_CHAR(11)
 
 	PORT_START("ROW4")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT)       PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
@@ -620,32 +643,32 @@ static INPUT_PORTS_START(oric)
 
 	PORT_START("ROW5")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)   PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE)  PORT_CHAR(']') PORT_CHAR('}')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Del") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE)  PORT_CHAR(']') PORT_CHAR('}') PORT_CHAR(29)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Del")               PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)           PORT_CHAR('p') PORT_CHAR('P')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)           PORT_CHAR('o') PORT_CHAR('O')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)           PORT_CHAR('i') PORT_CHAR('I')
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)           PORT_CHAR('u') PORT_CHAR('U')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)           PORT_CHAR('p') PORT_CHAR('P') PORT_CHAR(16)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)           PORT_CHAR('o') PORT_CHAR('O') PORT_CHAR(15)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)           PORT_CHAR('i') PORT_CHAR('I') PORT_CHAR(9)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)           PORT_CHAR('u') PORT_CHAR('U') PORT_CHAR(21)
 
 	PORT_START("ROW6")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)           PORT_CHAR('w') PORT_CHAR('W')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)           PORT_CHAR('s') PORT_CHAR('S')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)           PORT_CHAR('a') PORT_CHAR('A')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)           PORT_CHAR('w') PORT_CHAR('W') PORT_CHAR(23)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)           PORT_CHAR('s') PORT_CHAR('S') PORT_CHAR(19)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)           PORT_CHAR('a') PORT_CHAR('A') PORT_CHAR(1)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)           PORT_CHAR('e') PORT_CHAR('E')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)           PORT_CHAR('g') PORT_CHAR('G')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)           PORT_CHAR('h') PORT_CHAR('H')
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)           PORT_CHAR('y') PORT_CHAR('Y')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)           PORT_CHAR('e') PORT_CHAR('E') PORT_CHAR(5)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)           PORT_CHAR('g') PORT_CHAR('G') PORT_CHAR(7)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)           PORT_CHAR('h') PORT_CHAR('H') PORT_CHAR(8)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)           PORT_CHAR('y') PORT_CHAR('Y') PORT_CHAR(25)
 
 	PORT_START("ROW7")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)      PORT_CHAR('=') PORT_CHAR('+')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT)      PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Return")            PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)       PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)           PORT_CHAR('0') PORT_CHAR(')')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)           PORT_CHAR('l') PORT_CHAR('L')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)           PORT_CHAR('l') PORT_CHAR('L') PORT_CHAR(12)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)           PORT_CHAR('8') PORT_CHAR('*')
 
 	PORT_START("NMI")
@@ -681,7 +704,7 @@ static INPUT_PORTS_START(prav8d)
 	PORT_START("ROW1")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D \xd0\x94") PORT_CODE(KEYCODE_D)           PORT_CHAR('D')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Q \xd0\xaf") PORT_CODE(KEYCODE_Q)           PORT_CHAR('Q')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_ESC)                PORT_CHAR(UCHAR_MAMEKEY(ESC))
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_ESC)                PORT_CHAR(27)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F \xd0\xa4") PORT_CODE(KEYCODE_F)           PORT_CHAR('F')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R \xd0\xa0") PORT_CODE(KEYCODE_R)           PORT_CHAR('R')
@@ -700,7 +723,7 @@ static INPUT_PORTS_START(prav8d)
 
 	PORT_START("ROW3")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("] \xd0\xa9") PORT_CODE(KEYCODE_QUOTE)       PORT_CHAR(']')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH2)                          PORT_CHAR(';') PORT_CHAR('+')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE)                           PORT_CHAR(';') PORT_CHAR('+')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C/L") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) // this one is 5th line, 1st key from right
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)                               PORT_CHAR(':') PORT_CHAR('*')
@@ -709,11 +732,11 @@ static INPUT_PORTS_START(prav8d)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("K \xd0\x9a") PORT_CODE(KEYCODE_K)           PORT_CHAR('K')
 
 	PORT_START("ROW4")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT)     PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN)       PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT)       PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT)                              PORT_CHAR(UCHAR_MAMEKEY(LSHIFT))
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP)       PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT)         PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN)           PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT)           PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT)                              PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP)               PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)                                PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)                               PORT_CHAR(',') PORT_CHAR('<')
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)                               PORT_CHAR(' ')
@@ -721,7 +744,7 @@ static INPUT_PORTS_START(prav8d)
 	PORT_START("ROW5")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("@ \xd0\xae") PORT_CODE(KEYCODE_OPENBRACE)   PORT_CHAR('@')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\\ \xd0\xad") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('\\')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Del") PORT_CODE(KEYCODE_BACKSPACE)          PORT_CHAR(8) // this one is 5th line, 1st key from left
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Del") PORT_CODE(KEYCODE_DEL)                PORT_CHAR(8) // this one is 5th line, 1st key from left
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P \xd0\x9f") PORT_CODE(KEYCODE_P)           PORT_CHAR('P')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O \xd0\x9e") PORT_CODE(KEYCODE_O)           PORT_CHAR('O')
@@ -742,7 +765,7 @@ static INPUT_PORTS_START(prav8d)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)                              PORT_CHAR('-') PORT_CHAR('=')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("^ \xd0\xa7") PORT_CODE(KEYCODE_BACKSLASH)   PORT_CHAR('^') // this one would be on 2nd line, 3rd key from 'P'
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER)           PORT_CHAR(13)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT)                              PORT_CHAR(UCHAR_MAMEKEY(RSHIFT))
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)                               PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)                                   PORT_CHAR('0')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L \xd0\x9b") PORT_CODE(KEYCODE_L)           PORT_CHAR('L')
@@ -783,7 +806,7 @@ static INPUT_PORTS_START(telstrat)
 INPUT_PORTS_END
 
 
-void oric_state::oric(machine_config &config, bool add_ext)
+void oric_state::oric(machine_config &config, bool add_ext) // this variable not used
 {
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 12_MHz_XTAL / 12);
@@ -822,7 +845,7 @@ void oric_state::oric(machine_config &config, bool add_ext)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* via */
-	VIA6522(config, m_via, 12_MHz_XTAL / 12);
+	MOS6522(config, m_via, 12_MHz_XTAL / 12);
 	m_via->writepa_handler().set(FUNC(oric_state::via_a_w));
 	m_via->writepb_handler().set(FUNC(oric_state::via_b_w));
 	m_via->ca2_handler().set(FUNC(oric_state::via_ca2_w));
@@ -838,9 +861,11 @@ void oric_state::prav8d(machine_config &config)
 	oric(config, true);
 }
 
-FLOPPY_FORMATS_MEMBER( telestrat_state::floppy_formats )
-	FLOPPY_ORIC_DSK_FORMAT
-FLOPPY_FORMATS_END
+void telestrat_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ORIC_DSK_FORMAT);
+}
 
 static void telestrat_floppies(device_slot_interface &device)
 {
@@ -858,7 +883,7 @@ void telestrat_state::telstrat(machine_config &config)
 	acia.irq_handler().set(FUNC(telestrat_state::acia_irq_w));
 
 	/* via */
-	VIA6522(config, m_via2, 12_MHz_XTAL / 12);
+	MOS6522(config, m_via2, 12_MHz_XTAL / 12);
 	m_via2->writepa_handler().set(FUNC(telestrat_state::via2_a_w));
 	m_via2->writepb_handler().set(FUNC(telestrat_state::via2_b_w));
 	m_via2->ca2_handler().set(FUNC(telestrat_state::via2_ca2_w));
@@ -881,7 +906,10 @@ void telestrat_state::telstrat(machine_config &config)
 
 ROM_START(oric1)
 	ROM_REGION(0x4000, "maincpu", 0)
-	ROM_LOAD ("basic10.rom", 0, 0x04000, CRC(f18710b4) SHA1(333116e6884d85aaa4dfc7578a91cceeea66d016))
+	ROM_SYSTEM_BIOS( 0, "ver10", "Basic 1.0")
+	ROMX_LOAD ("basic10.rom", 0, 0x04000, CRC(f18710b4) SHA1(333116e6884d85aaa4dfc7578a91cceeea66d016), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS( 1, "ver10uk", "Basic 1.0 UK")
+	ROMX_LOAD( "basic10uk.rom", 0, 0x04000, CRC(d6006a01) SHA1(84759cc8faae53070f1c8ce8408982a0edcb0796), ROM_BIOS(1))
 ROM_END
 
 ROM_START(orica)
@@ -970,8 +998,8 @@ ROM_END
 
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT        COMPANY      FULLNAME                 FLAGS
-COMP( 1983, oric1,    0,      0,      oric,     oric,     oric_state,      empty_init, "Tangerine", "Oric 1" ,               0 )
-COMP( 1984, orica,    oric1,  0,      oric,     orica,    oric_state,      empty_init, "Tangerine", "Oric Atmos" ,           0 )
-COMP( 1985, prav8d,   oric1,  0,      prav8d,   prav8d,   oric_state,      empty_init, "Pravetz",   "Pravetz 8D",            0 )
-COMP( 1989, prav8dd,  oric1,  0,      prav8d,   prav8d,   oric_state,      empty_init, "Pravetz",   "Pravetz 8D (Disk ROM)", MACHINE_UNOFFICIAL )
-COMP( 1986, telstrat, oric1,  0,      telstrat, telstrat, telestrat_state, empty_init, "Tangerine", "Oric Telestrat",        0 )
+COMP( 1983, oric1,    0,      0,      oric,     oric,     oric_state,      empty_init, "Tangerine", "Oric 1" ,               MACHINE_SUPPORTS_SAVE )
+COMP( 1984, orica,    oric1,  0,      oric,     orica,    oric_state,      empty_init, "Tangerine", "Oric Atmos" ,           MACHINE_SUPPORTS_SAVE )
+COMP( 1985, prav8d,   oric1,  0,      prav8d,   prav8d,   oric_state,      empty_init, "Pravetz",   "Pravetz 8D",            MACHINE_SUPPORTS_SAVE )
+COMP( 1989, prav8dd,  oric1,  0,      prav8d,   prav8d,   oric_state,      empty_init, "Pravetz",   "Pravetz 8D (Disk ROM)", MACHINE_UNOFFICIAL | MACHINE_SUPPORTS_SAVE )
+COMP( 1986, telstrat, oric1,  0,      telstrat, telstrat, telestrat_state, empty_init, "Tangerine", "Oric Telestrat",        MACHINE_SUPPORTS_SAVE )

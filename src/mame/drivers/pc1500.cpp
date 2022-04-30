@@ -32,12 +32,27 @@ public:
 		, m_lcd_data(*this, "lcd_data")
 		, m_keyboard(*this, "KEY.%u", 0)
 		, m_io_on(*this, "ON")
+		, m_busy(*this, "BUSY")
+		, m_shift(*this, "SHIFT")
+		, m_sml(*this, "SML")
+		, m_small(*this, "SMALL")
+		, m_iii(*this, "III")
+		, m_ii(*this, "II")
+		, m_i(*this, "I")
+		, m_def(*this, "DEF")
+		, m_de(*this, "DE")
+		, m_g(*this, "G")
+		, m_rad(*this, "RAD")
+		, m_reserve(*this, "RESERVE")
+		, m_pro(*this, "PRO")
+		, m_run(*this, "RUN")
 	{
 	}
 
 	void pc1500(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 private:
@@ -48,16 +63,31 @@ private:
 	required_ioport_array<8> m_keyboard;
 	required_ioport m_io_on;
 
+	output_finder<> m_busy;
+	output_finder<> m_shift;
+	output_finder<> m_sml;
+	output_finder<> m_small;
+	output_finder<> m_iii;
+	output_finder<> m_ii;
+	output_finder<> m_i;
+	output_finder<> m_def;
+	output_finder<> m_de;
+	output_finder<> m_g;
+	output_finder<> m_rad;
+	output_finder<> m_reserve;
+	output_finder<> m_pro;
+	output_finder<> m_run;
+
 	uint8_t m_kb_matrix;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER( kb_matrix_w );
-	DECLARE_READ8_MEMBER( port_a_r );
-	DECLARE_READ8_MEMBER( port_b_r );
-	DECLARE_WRITE8_MEMBER( port_c_w );
+	void kb_matrix_w(uint8_t data);
+	uint8_t port_a_r();
+	uint8_t port_b_r();
+	void port_c_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( pc1500_kb_r );
+	uint8_t pc1500_kb_r();
 	void pc1500_palette(palette_device &palette) const;
 	void pc1500_mem(address_map &map);
 	void pc1500_mem_io(address_map &map);
@@ -66,13 +96,13 @@ private:
 void pc1500_state::pc1500_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x3fff).rom();    //module ROM/RAM
+	//  map(0x0000, 0x3fff).rom();    //module ROM/RAM
 	map(0x4000, 0x47ff).ram();    //user RAM
 	map(0x4800, 0x6fff).ram();    //expansion RAM
 	map(0x7000, 0x71ff).ram().mirror(0x0600).share("lcd_data");
-	map(0x7800, 0x7bff).ram().region("maincpu", 0x7800).mirror(0x0400);
-	map(0xa000, 0xbfff).rom();    //expansion ROM
-	map(0xc000, 0xffff).rom();    //system ROM
+	map(0x7800, 0x7bff).ram().mirror(0x0400);
+	//  map(0xa000, 0xbfff).rom();    //expansion ROM
+	map(0xc000, 0xffff).rom().region("maincpu", 0);    //system ROM
 }
 
 void pc1500_state::pc1500_mem_io(address_map &map)
@@ -81,7 +111,7 @@ void pc1500_state::pc1500_mem_io(address_map &map)
 	map(0xf000, 0xf00f).rw("lh5810", FUNC(lh5810_device::data_r), FUNC(lh5810_device::data_w));
 }
 
-READ8_MEMBER( pc1500_state::pc1500_kb_r )
+uint8_t pc1500_state::pc1500_kb_r()
 {
 	uint8_t data = 0xff;
 
@@ -107,28 +137,46 @@ uint32_t pc1500_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 			for (int b=0; b<8; b++)
 			{
 				if(b<4)
-					bitmap.pix16(b + 4 * (BIT( a, 0)), (a>>1) + 0x00 + 0x27*p) = BIT(data, b);
+					bitmap.pix(b + 4 * (BIT( a, 0)), (a>>1) + 0x00 + 0x27*p) = BIT(data, b);
 				else
-					bitmap.pix16(b - 4 * (BIT(~a, 0)), (a>>1) + 0x4e + 0x27*p) = BIT(data, b);
+					bitmap.pix(b - 4 * (BIT(~a, 0)), (a>>1) + 0x4e + 0x27*p) = BIT(data, b);
 			}
 		}
 
-	output().set_value("BUSY",  BIT(m_lcd_data[0x4e], 0));
-	output().set_value("SHIFT", BIT(m_lcd_data[0x4e], 1));
-	output().set_value("SML",   BIT(m_lcd_data[0x4e], 2));
-	output().set_value("SMALL", BIT(m_lcd_data[0x4e], 3));
-	output().set_value("III",   BIT(m_lcd_data[0x4e], 4));
-	output().set_value("II",    BIT(m_lcd_data[0x4e], 5));
-	output().set_value("I",     BIT(m_lcd_data[0x4e], 6));
-	output().set_value("DEF",   BIT(m_lcd_data[0x4e], 7));
-	output().set_value("DE",    BIT(m_lcd_data[0x4f], 0));
-	output().set_value("G",     BIT(m_lcd_data[0x4f], 1));
-	output().set_value("RAD",   BIT(m_lcd_data[0x4f], 2));
-	output().set_value("RESERVE", BIT(m_lcd_data[0x4f], 4));
-	output().set_value("PRO",   BIT(m_lcd_data[0x4f], 5));
-	output().set_value("RUN",   BIT(m_lcd_data[0x4f], 6));
+	m_busy =  BIT(m_lcd_data[0x4e], 0);
+	m_shift = BIT(m_lcd_data[0x4e], 1);
+	m_sml =   BIT(m_lcd_data[0x4e], 2);
+	m_small = BIT(m_lcd_data[0x4e], 3);
+	m_iii =   BIT(m_lcd_data[0x4e], 4);
+	m_ii =    BIT(m_lcd_data[0x4e], 5);
+	m_i =     BIT(m_lcd_data[0x4e], 6);
+	m_def =   BIT(m_lcd_data[0x4e], 7);
+	m_de =    BIT(m_lcd_data[0x4f], 0);
+	m_g =     BIT(m_lcd_data[0x4f], 1);
+	m_rad =   BIT(m_lcd_data[0x4f], 2);
+	m_reserve = BIT(m_lcd_data[0x4f], 4);
+	m_pro =   BIT(m_lcd_data[0x4f], 5);
+	m_run =   BIT(m_lcd_data[0x4f], 6);
 
 	return 0;
+}
+
+void pc1500_state::machine_start()
+{
+	m_busy.resolve();
+	m_shift.resolve();
+	m_sml.resolve();
+	m_small.resolve();
+	m_iii.resolve();
+	m_ii.resolve();
+	m_i.resolve();
+	m_def.resolve();
+	m_de.resolve();
+	m_g.resolve();
+	m_rad.resolve();
+	m_reserve.resolve();
+	m_pro.resolve();
+	m_run.resolve();
 }
 
 void pc1500_state::machine_reset()
@@ -224,12 +272,12 @@ static INPUT_PORTS_START( pc1500 )
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER( pc1500_state::kb_matrix_w )
+void pc1500_state::kb_matrix_w(uint8_t data)
 {
 	m_kb_matrix = data;
 }
 
-WRITE8_MEMBER( pc1500_state::port_c_w )
+void pc1500_state::port_c_w(uint8_t data)
 {
 	m_rtc->data_in_w(BIT(data, 0));
 	m_rtc->stb_w(BIT(data, 1));
@@ -240,7 +288,7 @@ WRITE8_MEMBER( pc1500_state::port_c_w )
 	m_rtc->c2_w(BIT(data, 5));
 }
 
-READ8_MEMBER( pc1500_state::port_b_r )
+uint8_t pc1500_state::port_b_r()
 {
 	/*
 	x--- ---- ON/Break key
@@ -261,7 +309,7 @@ READ8_MEMBER( pc1500_state::port_b_r )
 	return data;
 }
 
-READ8_MEMBER( pc1500_state::port_a_r )
+uint8_t pc1500_state::port_a_r()
 {
 	return 0xff;
 }
@@ -302,9 +350,9 @@ void pc1500_state::pc1500(machine_config &config)
 
 
 ROM_START( pc1500 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "sys1500.rom", 0xc000, 0x4000, CRC(d480b50d) SHA1(4bf748ba4d7c2b7cd7da7f3fdefcdd2e4cd41c4e))
-	ROM_REGION( 0x10000, "ce150", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "sys1500.rom", 0x0000, 0x4000, CRC(d480b50d) SHA1(4bf748ba4d7c2b7cd7da7f3fdefcdd2e4cd41c4e))
+	ROM_REGION( 0x2000, "ce150", ROMREGION_ERASEFF )
 	ROM_LOAD( "ce-150.rom", 0x0000, 0x2000, CRC(8fa1df6d) SHA1(a3aa02a641a46c27c0d4c0dc025b0dbe9b5b79c8))
 ROM_END
 

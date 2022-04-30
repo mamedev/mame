@@ -14,17 +14,21 @@ Hardware notes:
 
 I/O is similar to supercon
 
+TODO:
+- add power-off NMI? does nothing, it will just go into an infinite loop
+
 ******************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/m6502/r65c02.h"
-#include "machine/sensorboard.h"
+#include "machine/clock.h"
 #include "machine/nvram.h"
-#include "machine/timer.h"
+#include "machine/sensorboard.h"
 #include "sound/beep.h"
 #include "video/hlcd0538.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -39,7 +43,6 @@ public:
 	cforte_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_irq_on(*this, "irq_on"),
 		m_display(*this, "display"),
 		m_board(*this, "board"),
 		m_lcd(*this, "hlcd0538"),
@@ -56,7 +59,6 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<timer_device> m_irq_on;
 	required_device<pwm_display_device> m_display;
 	required_device<sensorboard_device> m_board;
 	required_device<hlcd0538_device> m_lcd;
@@ -66,28 +68,20 @@ private:
 	// address maps
 	void main_map(address_map &map);
 
-	// periodic interrupts
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
-
 	// I/O handlers
 	void update_display();
-	DECLARE_WRITE64_MEMBER(lcd_output_w);
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(input1_r);
-	DECLARE_READ8_MEMBER(input2_r);
+	void lcd_output_w(u64 data);
+	void mux_w(u8 data);
+	void control_w(u8 data);
+	u8 input1_r();
+	u8 input2_r();
 
-	u8 m_inp_mux;
-	u8 m_led_select;
+	u8 m_inp_mux = 0;
+	u8 m_led_select = 0;
 };
 
 void cforte_state::machine_start()
 {
-	// zerofill
-	m_inp_mux = 0;
-	m_led_select = 0;
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_select));
@@ -101,7 +95,7 @@ void cforte_state::machine_start()
 
 // HLCD0538
 
-WRITE64_MEMBER(cforte_state::lcd_output_w)
+void cforte_state::lcd_output_w(u64 data)
 {
 	// 4 rows used
 	u32 rowdata[4];
@@ -118,8 +112,6 @@ WRITE64_MEMBER(cforte_state::lcd_output_w)
 		data = bitswap<8>(data,7,2,0,4,6,5,3,1);
 		m_display->write_row(dig+3, data);
 	}
-
-	m_display->update();
 }
 
 
@@ -131,14 +123,14 @@ void cforte_state::update_display()
 	m_display->matrix_partial(0, 3, m_led_select, m_inp_mux);
 }
 
-WRITE8_MEMBER(cforte_state::mux_w)
+void cforte_state::mux_w(u8 data)
 {
 	// d0-d7: input mux, led data
 	m_inp_mux = data;
 	update_display();
 }
 
-WRITE8_MEMBER(cforte_state::control_w)
+void cforte_state::control_w(u8 data)
 {
 	// d0: HLCD0538 data in
 	// d1: HLCD0538 clk
@@ -147,7 +139,7 @@ WRITE8_MEMBER(cforte_state::control_w)
 	m_lcd->clk_w(data >> 1 & 1);
 	m_lcd->lcd_w(data >> 2 & 1);
 
-	// d3: unused?
+	// d3: ? (goes high at power-off NMI)
 
 	// d4-d6: select led row
 	m_led_select = data >> 4 & 7;
@@ -157,7 +149,7 @@ WRITE8_MEMBER(cforte_state::control_w)
 	m_beeper->set_state(data >> 7 & 1);
 }
 
-READ8_MEMBER(cforte_state::input1_r)
+u8 cforte_state::input1_r()
 {
 	u8 data = 0;
 
@@ -169,15 +161,16 @@ READ8_MEMBER(cforte_state::input1_r)
 	return ~data;
 }
 
-READ8_MEMBER(cforte_state::input2_r)
+u8 cforte_state::input2_r()
 {
 	u8 data = 0;
 
-	// d0-d5: ?
 	// d6,d7: multiplexed inputs (side panel)
 	for (int i = 0; i < 8; i++)
 		if (BIT(m_inp_mux, i))
 			data |= m_inputs[i]->read() << 6;
+
+	// other: ?
 
 	return ~data;
 }
@@ -191,8 +184,8 @@ READ8_MEMBER(cforte_state::input2_r)
 void cforte_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("nvram");
-	map(0x1c00, 0x1c00).nopw(); // printer?
-	map(0x1d00, 0x1d00).nopw(); // printer?
+	map(0x1c00, 0x1c00).nopw(); // accessory?
+	map(0x1d00, 0x1d00).nopw(); // "
 	map(0x1e00, 0x1e00).rw(FUNC(cforte_state::input2_r), FUNC(cforte_state::mux_w));
 	map(0x1f00, 0x1f00).rw(FUNC(cforte_state::input1_r), FUNC(cforte_state::control_w));
 	map(0x2000, 0xffff).rom();
@@ -250,16 +243,16 @@ void cforte_state::cforte(machine_config &config)
 	R65C02(config, m_maincpu, 10_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cforte_state::main_map);
 
-	const attotime irq_period = attotime::from_hz(32.768_kHz_XTAL/128); // 256Hz
-	TIMER(config, m_irq_on).configure_periodic(FUNC(cforte_state::irq_on<M6502_IRQ_LINE>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_usec(11)); // active for 11us
-	TIMER(config, "irq_off").configure_periodic(FUNC(cforte_state::irq_off<M6502_IRQ_LINE>), irq_period);
+	auto &irq_clock(CLOCK(config, "irq_clock", 32.768_kHz_XTAL/128)); // 256Hz
+	irq_clock.set_pulse_width(attotime::from_usec(11)); // active for 11us
+	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(200));
+	m_board->set_nvram_enable(true);
 
 	/* video hardware */
 	HLCD0538(config, m_lcd).write_cols().set(FUNC(cforte_state::lcd_output_w));

@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+
+<!--
+license: CC0
+copyright-holders: Dirk Best
+
+Speed Basketball (Sega)
+-->
+
+<mamelayout version="2">
+
+	<element name="hole" defstate="0">
+		<disk state="3">
+			<color red="0.8" green="0.8" blue="0.2" />
+		</disk>
+		<disk state="2">
+			<color red="0.2" green="0.8" blue="0.2" />
+		</disk>
+		<disk state="1">
+			<color red="0.8" green="0.2" blue="0.2" />
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+		</disk>
+	</element>
+
+	<view name="Default Layout">
+
+		<bounds x="0" y="0" width="1720" height="1200" />
+
+		<element ref="hole" name="hole_1"><bounds x="40" y="160" width="200" height="200" /></element>
+		<element ref="hole" name="hole_2"><bounds x="40" y="400" width="200" height="200" /></element>
+		<element ref="hole" name="hole_3"><bounds x="40" y="640" width="200" height="200" /></element>
+		<element ref="hole" name="hole_4"><bounds x="280" y="40" width="200" height="200" /></element>
+		<element ref="hole" name="hole_5"><bounds x="280" y="280" width="200" height="200" /></element>
+		<element ref="hole" name="hole_6"><bounds x="280" y="520" width="200" height="200" /></element>
+		<element ref="hole" name="hole_7"><bounds x="280" y="760" width="200" height="200" /></element>
+		<element ref="hole" name="hole_8"><bounds x="520" y="160" width="200" height="200" /></element>
+		<element ref="hole" name="hole_9"><bounds x="520" y="400" width="200" height="200" /></element>
+		<element ref="hole" name="hole_10"><bounds x="520" y="640" width="200" height="200" /></element>
+		<element ref="hole" name="hole_11"><bounds x="760" y="40" width="200" height="200" /></element>
+		<element ref="hole" name="hole_12"><bounds x="760" y="280" width="200" height="200" /></element>
+		<element ref="hole" name="hole_13"><bounds x="760" y="520" width="200" height="200" /></element>
+		<element ref="hole" name="hole_14"><bounds x="760" y="760" width="200" height="200" /></element>
+		<element ref="hole" name="hole_15"><bounds x="1000" y="160" width="200" height="200" /></element>
+		<element ref="hole" name="hole_16"><bounds x="1000" y="400" width="200" height="200" /></element>
+		<element ref="hole" name="hole_17"><bounds x="1000" y="640" width="200" height="200" /></element>
+		<element ref="hole" name="hole_18"><bounds x="1240" y="40" width="200" height="200" /></element>
+		<element ref="hole" name="hole_19"><bounds x="1240" y="280" width="200" height="200" /></element>
+		<element ref="hole" name="hole_20"><bounds x="1240" y="520" width="200" height="200" /></element>
+		<element ref="hole" name="hole_21"><bounds x="1240" y="760" width="200" height="200" /></element>
+		<element ref="hole" name="hole_22"><bounds x="1480" y="160" width="200" height="200" /></element>
+		<element ref="hole" name="hole_23"><bounds x="1480" y="400" width="200" height="200" /></element>
+		<element ref="hole" name="hole_24"><bounds x="1480" y="640" width="200" height="200" /></element>
+
+		<screen tag="screen">
+			<bounds x="520" y="1040" width="680" height="120" />
+		</screen>
+
+	</view>
+
+</mamelayout>

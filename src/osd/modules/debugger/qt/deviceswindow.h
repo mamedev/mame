@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
-#ifndef __DEBUG_QT_DEVICES_WINDOW_H__
-#define __DEBUG_QT_DEVICES_WINDOW_H__
-
-#include <QtWidgets/QTreeView>
+#ifndef MAME_DEBUGGER_QT_DEVICESWINDOW_H
+#define MAME_DEBUGGER_QT_DEVICESWINDOW_H
 
 #include "windowqt.h"
+
+#include <QtWidgets/QTreeView>
 
 
 //============================================================
@@ -17,21 +17,19 @@ class DevicesWindowModel : public QAbstractItemModel
 	Q_OBJECT
 
 public:
-	explicit DevicesWindowModel(running_machine *machine, QObject *parent = 0);
+	explicit DevicesWindowModel(running_machine &machine, QObject *parent = nullptr);
 	~DevicesWindowModel();
 
 	QVariant data(const QModelIndex &index, int role) const;
 	Qt::ItemFlags flags(const QModelIndex &index) const;
-	QVariant headerData(int section, Qt::Orientation orientation,
-						int role = Qt::DisplayRole) const;
-	QModelIndex index(int row, int column,
-						const QModelIndex &parent = QModelIndex()) const;
+	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+	QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
 	QModelIndex parent(const QModelIndex &index) const;
 	int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	int columnCount(const QModelIndex &parent = QModelIndex()) const;
 
 private:
-	running_machine *m_machine;
+	running_machine &m_machine;
 };
 
 //============================================================
@@ -42,7 +40,7 @@ class DevicesWindow : public WindowQt
 	Q_OBJECT
 
 public:
-	DevicesWindow(running_machine* machine, QWidget* parent=nullptr);
+	DevicesWindow(running_machine &machine, QWidget *parent = nullptr);
 	virtual ~DevicesWindow();
 
 public slots:
@@ -71,11 +69,11 @@ public:
 
 	~DevicesWindowQtConfig() {}
 
-	void buildFromQWidget(QWidget* widget);
-	void applyToQWidget(QWidget* widget);
+	void buildFromQWidget(QWidget *widget);
+	void applyToQWidget(QWidget *widget);
 	void addToXmlDataNode(util::xml::data_node &node) const;
 	void recoverFromXmlNode(util::xml::data_node const &node);
 };
 
 
-#endif
+#endif // MAME_DEBUGGER_QT_DEVICESWINDOW_H

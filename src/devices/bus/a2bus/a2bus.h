@@ -149,6 +149,7 @@ public:
 	virtual void write_inh_rom(uint16_t offset, uint8_t data) { }
 	virtual uint16_t inh_start() { return INH_START_INVALID; }
 	virtual uint16_t inh_end() { return INH_END_INVALID; }
+	virtual bool inh_check(uint16_t offset, bool bIsWrite) { return false; }
 	virtual int inh_type() { return INH_NONE; }
 
 	device_a2bus_card_interface *next() const { return m_next; }

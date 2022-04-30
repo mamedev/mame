@@ -80,13 +80,17 @@ protected:
 		DASM_four,     /* immediate value 4 */
 
 		DASM_imm2,     /* 2-bit immediate in bits 4-5 (trapa) */
+		DASM_imm2l,    /* 2-bit immediate in bits 0-1 (GT913) */
 		DASM_imm3,     /* 3-bit immediate in bits 4-6 (bit selection */
+		DASM_imm4l,    /* 4-bit immediate in bits 0-3 (GT913) */
 		DASM_imm8,     /* 8-bit immediate at +1 */
 		DASM_imm16,    /* 16-bit immediate at +2 */
 		DASM_imm32,    /* 32-bit immediate at +2 */
 
 		DASM_ccr,      /* internal register ccr */
 		DASM_exr,      /* internal register exr */
+		DASM_bankl,    /* internal register bankl (GT913) */
+		DASM_bankh,    /* internal register bankl (GT913) */
 		DASM_macl,     /* internal register macl */
 		DASM_mach      /* internal register mach */
 	};

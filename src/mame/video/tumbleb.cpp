@@ -24,7 +24,7 @@ to switch between 8*8 tiles and 16*16 tiles.
 
 /******************************************************************************/
 
-WRITE16_MEMBER(tumbleb_state::bcstory_tilebank_w)
+void tumbleb_state::bcstory_tilebank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= mem_mask;
 
@@ -34,7 +34,7 @@ WRITE16_MEMBER(tumbleb_state::bcstory_tilebank_w)
 	m_pf2_tilemap->mark_all_dirty();
 }
 
-WRITE16_MEMBER(tumbleb_state::chokchok_tilebank_w)
+void tumbleb_state::chokchok_tilebank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= mem_mask;
 
@@ -44,7 +44,7 @@ WRITE16_MEMBER(tumbleb_state::chokchok_tilebank_w)
 	m_pf2_tilemap->mark_all_dirty();
 }
 
-WRITE16_MEMBER(tumbleb_state::wlstar_tilebank_w)
+void tumbleb_state::wlstar_tilebank_w(uint16_t data)
 {
 	/* it just writes 0000 or ffff */
 	m_tilebank = data & 0x4000;
@@ -54,7 +54,7 @@ WRITE16_MEMBER(tumbleb_state::wlstar_tilebank_w)
 }
 
 
-WRITE16_MEMBER(tumbleb_state::suprtrio_tilebank_w)
+void tumbleb_state::suprtrio_tilebank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= mem_mask;
 
@@ -65,14 +65,14 @@ WRITE16_MEMBER(tumbleb_state::suprtrio_tilebank_w)
 }
 
 
-WRITE16_MEMBER(tumbleb_state::tumblepb_pf1_data_w)
+void tumbleb_state::tumblepb_pf1_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pf1_data[offset]);
 	m_pf1_tilemap->mark_tile_dirty(offset);
 	m_pf1_alt_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(tumbleb_state::tumblepb_pf2_data_w)
+void tumbleb_state::tumblepb_pf2_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pf2_data[offset]);
 	m_pf2_tilemap->mark_tile_dirty(offset);
@@ -81,33 +81,33 @@ WRITE16_MEMBER(tumbleb_state::tumblepb_pf2_data_w)
 		m_pf2_alt_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(tumbleb_state::fncywld_pf1_data_w)
+void tumbleb_state::fncywld_pf1_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pf1_data[offset]);
 	m_pf1_tilemap->mark_tile_dirty(offset / 2);
 	m_pf1_alt_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(tumbleb_state::fncywld_pf2_data_w)
+void tumbleb_state::fncywld_pf2_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pf2_data[offset]);
 	m_pf2_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(tumbleb_state::tumblepb_control_0_w)
+void tumbleb_state::tumblepb_control_0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_control_0[offset]);
 }
 
 
-WRITE16_MEMBER(tumbleb_state::pangpang_pf1_data_w)
+void tumbleb_state::pangpang_pf1_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pf1_data[offset]);
 	m_pf1_tilemap->mark_tile_dirty(offset / 2);
 	m_pf1_alt_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(tumbleb_state::pangpang_pf2_data_w)
+void tumbleb_state::pangpang_pf2_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pf2_data[offset]);
 	m_pf2_tilemap->mark_tile_dirty(offset / 2);
@@ -128,7 +128,7 @@ inline void tumbleb_state::get_bg_tile_info( tile_data &tileinfo, int tile_index
 {
 	int data = gfx_base[tile_index];
 
-	SET_TILE_INFO_MEMBER(gfx_bank,
+	tileinfo.set(gfx_bank,
 			(data & 0x0fff) | (m_tilebank >> 2),
 			data >> 12,
 			0);
@@ -141,7 +141,7 @@ TILE_GET_INFO_MEMBER(tumbleb_state::get_fg_tile_info)
 {
 	int data = m_pf1_data[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			(data & 0x0fff) | m_tilebank,
 			data >> 12,
 			0);
@@ -152,7 +152,7 @@ inline void tumbleb_state::get_fncywld_bg_tile_info( tile_data &tileinfo, int ti
 	int data = gfx_base[tile_index * 2];
 	int attr = gfx_base[tile_index * 2 + 1];
 
-	SET_TILE_INFO_MEMBER(gfx_bank,
+	tileinfo.set(gfx_bank,
 			data & 0x1fff,
 			attr & 0x1f,
 			0);
@@ -166,7 +166,7 @@ TILE_GET_INFO_MEMBER(tumbleb_state::get_fncywld_fg_tile_info)
 	int data = m_pf1_data[tile_index * 2];
 	int attr = m_pf1_data[tile_index * 2 + 1];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			data & 0x1fff,
 			attr & 0x1f,
 			0);
@@ -178,7 +178,7 @@ inline void tumbleb_state::pangpang_get_bg_tile_info( tile_data &tileinfo, int t
 	int data = gfx_base[tile_index * 2 + 1];
 	int attr = gfx_base[tile_index * 2];
 
-	SET_TILE_INFO_MEMBER(gfx_bank,
+	tileinfo.set(gfx_bank,
 			data & 0x1fff,
 			(attr >>12) & 0xf,
 			0);
@@ -189,7 +189,7 @@ inline void tumbleb_state::pangpang_get_bg2x_tile_info( tile_data &tileinfo, int
 	int data = gfx_base[tile_index * 2 + 1];
 	int attr = gfx_base[tile_index * 2];
 
-	SET_TILE_INFO_MEMBER(gfx_bank,
+	tileinfo.set(gfx_bank,
 			(data & 0xfff) + 0x1000,
 			(attr >>12) & 0xf,
 			0);
@@ -204,7 +204,7 @@ TILE_GET_INFO_MEMBER(tumbleb_state::pangpang_get_fg_tile_info)
 	int data = m_pf1_data[tile_index * 2 + 1];
 	int attr = m_pf1_data[tile_index * 2];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			data & 0x1fff,
 			(attr >> 12)& 0x1f,
 			0);

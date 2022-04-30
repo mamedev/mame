@@ -2,7 +2,7 @@
 // copyright-holders:Paul Leaman, Curt Coder
 /***************************************************************************
 
-  sidearms.c
+  sidearms.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -11,19 +11,19 @@
 #include "emu.h"
 #include "includes/sidearms.h"
 
-WRITE8_MEMBER(sidearms_state::videoram_w)
+void sidearms_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sidearms_state::colorram_w)
+void sidearms_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sidearms_state::c804_w)
+void sidearms_state::c804_w(uint8_t data)
 {
 	/* bits 0 and 1 are coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -67,13 +67,13 @@ WRITE8_MEMBER(sidearms_state::c804_w)
 	}
 }
 
-WRITE8_MEMBER(sidearms_state::gfxctrl_w)
+void sidearms_state::gfxctrl_w(uint8_t data)
 {
 	m_objon = data & 0x01;
 	m_bgon = data & 0x02;
 }
 
-WRITE8_MEMBER(sidearms_state::star_scrollx_w)
+void sidearms_state::star_scrollx_w(uint8_t data)
 {
 	uint32_t last_state = m_hcount_191;
 
@@ -85,7 +85,7 @@ WRITE8_MEMBER(sidearms_state::star_scrollx_w)
 		m_hflop_74a_n ^= 1;
 }
 
-WRITE8_MEMBER(sidearms_state::star_scrolly_w)
+void sidearms_state::star_scrolly_w(uint8_t data)
 {
 	m_vcount_191++;
 	m_vcount_191 &= 0xff;
@@ -102,7 +102,7 @@ TILE_GET_INFO_MEMBER(sidearms_state::get_sidearms_bg_tile_info)
 	color = attr>>3 & 0x1f;
 	flags = attr>>1 & 0x03;
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.set(1, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(sidearms_state::get_philko_bg_tile_info)
@@ -115,7 +115,7 @@ TILE_GET_INFO_MEMBER(sidearms_state::get_philko_bg_tile_info)
 	color = attr>>3 & 0x0f;
 	flags = attr>>1 & 0x03;
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.set(1, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(sidearms_state::get_fg_tile_info)
@@ -124,7 +124,7 @@ TILE_GET_INFO_MEMBER(sidearms_state::get_fg_tile_info)
 	int code = m_videoram[tile_index] + (attr<<2 & 0x300);
 	int color = attr & 0x3f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(sidearms_state::tilemap_scan)
@@ -207,17 +207,16 @@ void sidearms_state::draw_sprites_region(bitmap_ind16 &bitmap, const rectangle &
 
 void sidearms_state::draw_starfield( bitmap_ind16 &bitmap )
 {
-	int x, y, i;
 	uint32_t hadd_283, vadd_283, _hflop_74a_n, _hcount_191, _vcount_191;
 	uint8_t *sf_rom;
 	uint16_t *lineptr;
 	int pixadv, lineadv;
 
 	// clear starfield background
-	lineptr = &bitmap.pix16(16, 64);
+	lineptr = &bitmap.pix(16, 64);
 	lineadv = bitmap.rowpixels();
 
-	for (i=224; i; i--) { memset(lineptr, 0, 768); lineptr += lineadv; }
+	for (int i=224; i; i--) { memset(lineptr, 0, 768); lineptr += lineadv; }
 
 	// bail if not Side Arms or the starfield has been disabled
 	if (m_gameid || !m_staron) return;
@@ -240,16 +239,16 @@ void sidearms_state::draw_starfield( bitmap_ind16 &bitmap )
 	}
 	else
 	{
-		lineptr = &bitmap.pix16(255, 512 - 1);
+		lineptr = &bitmap.pix(255, 512 - 1);
 		pixadv  = -1;
 		lineadv = -lineadv + 512;
 	}
 
-	for (y=0; y<256; y++) // 8-bit V-clock input
+	for (int y=0; y<256; y++) // 8-bit V-clock input
 	{
-		for (x=0; x<512; lineptr+=pixadv,x++) // 9-bit H-clock input
+		for (int x=0; x<512; lineptr+=pixadv,x++) // 9-bit H-clock input
 		{
-			i = hadd_283; // store horizontal adder's previous state in i
+			int i = hadd_283; // store horizontal adder's previous state in i
 			hadd_283 = _hcount_191 + (x & 0xff); // add lower 8 bits and preserve carry
 
 			if (x<64 || x>447 || y<16 || y>239) continue; // clip rejection
@@ -277,31 +276,31 @@ void sidearms_state::draw_starfield( bitmap_ind16 &bitmap )
 #else // optimized loop
 	if (!m_flipon)
 	{
-		lineptr = &bitmap.pix16(16, 64);
+		lineptr = &bitmap.pix(16, 64);
 		pixadv  = 1;
 		lineadv = lineadv - 384;
 	}
 	else
 	{
-		lineptr = &bitmap.pix16(239, 512 - 64 - 1);
+		lineptr = &bitmap.pix(239, 512 - 64 - 1);
 		pixadv  = -1;
 		lineadv = -lineadv + 384;
 	}
 
-	for (y=16; y<240; y++) // 8-bit V-clock input (clipped against vertical visible area)
+	for (int y=16; y<240; y++) // 8-bit V-clock input (clipped against vertical visible area)
 	{
 		// inner loop pre-entry conditioning
 		hadd_283 = (_hcount_191 + 64) & ~0x1f;
 		vadd_283 = _vcount_191 + y;
 
-		i = vadd_283<<4 & 0xff0;                // to starfield EPROM A04-A11 (8 bits)
+		int i = vadd_283<<4 & 0xff0;            // to starfield EPROM A04-A11 (8 bits)
 		i |= (_hflop_74a_n^(hadd_283>>8)) << 3; // to starfield EPROM A03     (1 bit)
 		i |= hadd_283>>5 & 7;                   // to starfield EPROM A00-A02 (3 bits)
 		m_latch_374 = sf_rom[i + 0x3000];            // lines A12-A13 are always high
 
 		hadd_283 = _hcount_191 + 63;
 
-		for (x=64; x<448; lineptr+=pixadv,x++) // 9-bit H-clock input (clipped against horizontal visible area)
+		for (int x=64; x<448; lineptr+=pixadv,x++) // 9-bit H-clock input (clipped against horizontal visible area)
 		{
 			i = hadd_283;                           // store horizontal adder's previous state in i
 			hadd_283 = _hcount_191 + (x & 0xff);    // add lower 8 bits and preserve carry

@@ -6,9 +6,17 @@ Updated by Dan Boris, 2000-04-03
 Rewrite in progress, Dirk Best, 2007-07-31
 Updated by Robbbert 2019-04-14
 
+Since 0.226, if you want to use the TTY, you must do these things:
+- Use the KB/TTY dipswitch to choose TTY
+- Use the TAB menu to choose "Keyboard Mode"
+- Make sure that both keyboards are "Enabled"
+- Quit to save the settings, then restart
+- Press DELETE to start using the terminal
+- For subsequent runs, just press DELETE to get started.
+
 ToDo:
-    - Implement punchtape reader/writer
-    - Front panel Run/Step switch (switch S2)
+- Implement punchtape reader/writer
+- Front panel Run/Step switch (switch S2)
 
 
 ******************************************************************************/
@@ -16,7 +24,7 @@ ToDo:
 #include "emu.h"
 #include "includes/aim65.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "aim65.lh"
@@ -176,7 +184,7 @@ image_init_result aim65_state::load_cart(device_image_interface &image, generic_
 
 	if (size > 0x1000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported ROM size");
+		image.seterror(image_error::INVALIDIMAGE, "Unsupported ROM size");
 		return image_init_result::FAIL;
 	}
 
@@ -185,7 +193,7 @@ image_init_result aim65_state::load_cart(device_image_interface &image, generic_
 		std::string errmsg = string_format(
 				"Attempted to load file with wrong extension\nSocket '%s' only accepts files with '.%s' extension",
 				slot_tag, slot_tag);
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, errmsg.c_str());
+		image.seterror(image_error::INVALIDIMAGE, errmsg.c_str());
 		return image_init_result::FAIL;
 	}
 
@@ -199,7 +207,6 @@ image_init_result aim65_state::load_cart(device_image_interface &image, generic_
 static DEVICE_INPUT_DEFAULTS_START( serial_term )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_1200 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_1200 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_ODD )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
@@ -245,7 +252,7 @@ void aim65_state::aim65(machine_config &config)
 	m_riot->pb_rd_callback().set([this] () { return aim65_state::z33_pb_r(); });
 	m_riot->irq_wr_callback().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
-	VIA6522(config, m_via0, AIM65_CLOCK);
+	MOS6522(config, m_via0, AIM65_CLOCK);
 	m_via0->readpb_handler().set([this] () { return aim65_state::z32_pb_r(); });
 	m_via0->writepa_handler().set([this] (u8 data) { aim65_state::z32_pa_w(data); });
 	m_via0->writepb_handler().set([this] (u8 data) { aim65_state::z32_pb_w(data); });
@@ -258,7 +265,7 @@ void aim65_state::aim65(machine_config &config)
 	m_via0->cb2_handler().set([this] (bool state) { aim65_state::z32_cb2_w(state); });
 	m_via0->irq_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
-	VIA6522(config, m_via1, AIM65_CLOCK);
+	MOS6522(config, m_via1, AIM65_CLOCK);
 	m_via1->irq_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	PIA6821(config, m_pia, 0);

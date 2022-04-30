@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Dirk Best
 /**********************************************************************
 
@@ -16,7 +16,9 @@
 
 #include "emu.h"
 #include "epson_lx800.h"
+
 #include "speaker.h"
+
 #include "lx800.lh"
 
 
@@ -114,54 +116,44 @@ INPUT_PORTS_START( epson_lx800 )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Line Feed") PORT_CODE(KEYCODE_L)
 
 	PORT_START("DIPSW1")
-	PORT_DIPNAME(0x01, 0x00, "Typeface")
-	PORT_DIPLOCATION("DIP:8")
-	PORT_DIPSETTING(0x01, "Condensed")
-	PORT_DIPSETTING(0x00, DEF_STR(Normal))
-	PORT_DIPNAME(0x02, 0x00, "ZERO font")
-	PORT_DIPLOCATION("DIP:7")
-	PORT_DIPSETTING(0x02, "0")
-	PORT_DIPSETTING(0x00, "0")
-	PORT_DIPNAME(0x04, 0x00, "Character Table")
-	PORT_DIPLOCATION("DIP:6")
-	PORT_DIPSETTING(0x04, "Graphic")
-	PORT_DIPSETTING(0x00, "Italic")
-	PORT_DIPNAME(0x08, 0x00, "Paper-out detection")
-	PORT_DIPLOCATION("DIP:5")
-	PORT_DIPSETTING(0x08, "Valid")
-	PORT_DIPSETTING(0x00, "Invalid")
-	PORT_DIPNAME(0x10, 0x00, "Printing quality")
-	PORT_DIPLOCATION("DIP:4")
-	PORT_DIPSETTING(0x10, "NLQ")
-	PORT_DIPSETTING(0x00, "Draft")
-	PORT_DIPNAME(0xe0, 0xe0, "International character set")
-	PORT_DIPLOCATION("DIP:3,2,1")
-	PORT_DIPSETTING(0xe0, "U.S.A.")
-	PORT_DIPSETTING(0x60, "France")
-	PORT_DIPSETTING(0xa0, "Germany")
-	PORT_DIPSETTING(0x20, "U.K.")
-	PORT_DIPSETTING(0xc0, "Denmark")
-	PORT_DIPSETTING(0x40, "Sweden")
-	PORT_DIPSETTING(0x80, "Italy")
-	PORT_DIPSETTING(0x00, "Spain")
+	PORT_DIPNAME(0x01, 0x00, "Typeface")                      PORT_DIPLOCATION("SW 1:!1")
+	PORT_DIPSETTING(   0x00, "Normal")
+	PORT_DIPSETTING(   0x01, "Condensed")
+	PORT_DIPNAME(0x02, 0x00, "Shape of zero")                 PORT_DIPLOCATION("SW 1:!2")
+	PORT_DIPSETTING(   0x00, "Not slashed")
+	PORT_DIPSETTING(   0x02, "Slashed")
+	PORT_DIPNAME(0x04, 0x00, "Character table")               PORT_DIPLOCATION("SW 1:!3")
+	PORT_DIPSETTING(   0x00, "Italics")
+	PORT_DIPSETTING(   0x04, "Graphics")
+	PORT_DIPNAME(0x08, 0x00, "Paper-out detection")           PORT_DIPLOCATION("SW 1:!4")
+	PORT_DIPSETTING(   0x00, "Invalid")
+	PORT_DIPSETTING(   0x08, "Valid")
+	PORT_DIPNAME(0x10, 0x00, "Printing quality")              PORT_DIPLOCATION("SW 1:!5")
+	PORT_DIPSETTING(   0x00, "Draft")
+	PORT_DIPSETTING(   0x10, "NLQ")
+	PORT_DIPNAME(0xe0, 0xe0, "International character set")   PORT_DIPLOCATION("SW 1:!6,!7,!8")
+	PORT_DIPSETTING(   0xe0, "USA")
+	PORT_DIPSETTING(   0x60, "France")
+	PORT_DIPSETTING(   0xa0, "Germany")
+	PORT_DIPSETTING(   0x20, "UK")
+	PORT_DIPSETTING(   0xc0, "Denmark")
+	PORT_DIPSETTING(   0x40, "Sweden")
+	PORT_DIPSETTING(   0x80, "Italy")
+	PORT_DIPSETTING(   0x00, "Spain")
 
 	PORT_START("DIPSW2")
-	PORT_DIPNAME(0x01, 0x00, "Page length")
-	PORT_DIPLOCATION("DIP:4")
-	PORT_DIPSETTING(0x01, "12\"")
-	PORT_DIPSETTING(0x00, "11\"")
-	PORT_DIPNAME(0x02, 0x00, "Cut sheet feeder mode")
-	PORT_DIPLOCATION("DIP:3")
-	PORT_DIPSETTING(0x02, "Valid")
-	PORT_DIPSETTING(0x00, "Invalid")
-	PORT_DIPNAME(0x04, 0x00, "1\" skip over perforation")
-	PORT_DIPLOCATION("DIP:2")
-	PORT_DIPSETTING(0x04, "Valid")
-	PORT_DIPSETTING(0x00, "Invalid")
-	PORT_DIPNAME(0x08, 0x00, "AUTO FEED XT control")
-	PORT_DIPLOCATION("DIP:1")
-	PORT_DIPSETTING(0x08, "Fix to LOW")
-	PORT_DIPSETTING(0x00, "Depends on external signal")
+	PORT_DIPNAME(0x01, 0x00, "Page length")                   PORT_DIPLOCATION("SW 2:!1")
+	PORT_DIPSETTING(   0x00, "11\"")
+	PORT_DIPSETTING(   0x01, "12\"")
+	PORT_DIPNAME(0x02, 0x00, "Cut-sheet feeder mode")         PORT_DIPLOCATION("SW 2:!2")
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x02, DEF_STR(On))
+	PORT_DIPNAME(0x04, 0x00, "Skip over perforation")         PORT_DIPLOCATION("SW 2:!3")
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x04, "1\"")
+	PORT_DIPNAME(0x08, 0x00, "Auto line feed")                PORT_DIPLOCATION("SW 2:!4")
+	PORT_DIPSETTING(   0x00, DEF_STR(Off)) // controlled by /AUTO FEED XT signal (Centronics pin 14)
+	PORT_DIPSETTING(   0x08, DEF_STR(On))
 INPUT_PORTS_END
 
 
@@ -232,7 +224,7 @@ void epson_lx800_device::device_reset()
  * PA6             not used
  * PA7  R   P/S    P/S signal from the optional interface
  */
-READ8_MEMBER( epson_lx800_device::porta_r )
+uint8_t epson_lx800_device::porta_r(offs_t offset)
 {
 	uint8_t result = 0;
 
@@ -247,7 +239,7 @@ READ8_MEMBER( epson_lx800_device::porta_r )
 	return result;
 }
 
-WRITE8_MEMBER( epson_lx800_device::porta_w )
+void epson_lx800_device::porta_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: lx800_porta_w(%02x): %02x\n", machine().describe_context(), offset, data);
 	logerror("--> carriage: %d, paper feed: %d\n", BIT(data, 0), BIT(data, 2));
@@ -262,7 +254,7 @@ WRITE8_MEMBER( epson_lx800_device::porta_w )
  * PC6   W  FIRE       drive pulse width signal
  * PC7   W  BUZZER     buzzer signal
  */
-READ8_MEMBER( epson_lx800_device::portc_r )
+uint8_t epson_lx800_device::portc_r(offs_t offset)
 {
 	uint8_t result = 0;
 
@@ -273,7 +265,7 @@ READ8_MEMBER( epson_lx800_device::portc_r )
 	return result;
 }
 
-WRITE8_MEMBER( epson_lx800_device::portc_w )
+void epson_lx800_device::portc_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: lx800_portc_w(%02x): %02x\n", machine().describe_context(), offset, data);
 	logerror("--> err: %d, ack: %d, fire: %d, buzzer: %d\n", BIT(data, 4), BIT(data, 5), BIT(data, 6), BIT(data, 7));
@@ -317,7 +309,7 @@ READ_LINE_MEMBER( epson_lx800_device::an5_r )
     GATE ARRAY
 ***************************************************************************/
 
-READ8_MEMBER( epson_lx800_device::centronics_data_r )
+uint8_t epson_lx800_device::centronics_data_r()
 {
 	logerror("centronics: data read\n");
 	return 0x55;

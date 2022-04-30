@@ -15,7 +15,6 @@
 
 #include "emucore.h"
 #include "osdcore.h"
-#include "unicode.h"
 #include "../frontend/mame/ui/menuitem.h"
 
 #include <memory>
@@ -91,7 +90,7 @@ public:
 	virtual bool execute_command(const char *command) = 0;
 
 	// midi interface
-	virtual osd_midi_device *create_midi_device() = 0;
+	virtual std::unique_ptr<osd_midi_device> create_midi_device() = 0;
 
 protected:
 	virtual ~osd_interface() { }

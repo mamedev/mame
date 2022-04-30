@@ -65,12 +65,12 @@ void k007420_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-READ8_MEMBER( k007420_device::read )
+uint8_t k007420_device::read(offs_t offset)
 {
 	return m_ram[offset];
 }
 
-WRITE8_MEMBER( k007420_device::write )
+void k007420_device::write(offs_t offset, uint8_t data)
 {
 	m_ram[offset] = data;
 }

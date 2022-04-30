@@ -18,6 +18,7 @@
 #include "debugger.h"
 
 #include "emuopts.h" // Used by PNG logging
+#include "fileio.h" // Used by PNG logging
 #include "png.h" // Used by PNG logging
 
 #include <rapidjson/prettywriter.h> // Used by JSON logging
@@ -72,22 +73,22 @@ void midtunit_video_device::debug_init()
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("midblit", CMDFLAG_CUSTOM_HELP, 0, 1, 4, std::bind(&midtunit_video_device::debug_commands, this, _1, _2));
+		machine().debugger().console().register_command("midblit", CMDFLAG_CUSTOM_HELP, 1, 4, std::bind(&midtunit_video_device::debug_commands, this, _1));
 	}
 }
 
-void midtunit_video_device::debug_commands(int ref, const std::vector<std::string> &params)
+void midtunit_video_device::debug_commands(const std::vector<std::string> &params)
 {
 	if (params.size() < 1)
 		return;
 
 	if (params[0] == "pngdma")
-		debug_png_dma_command(ref, params);
+		debug_png_dma_command(params);
 	else
-		debug_help_command(ref, params);
+		debug_help_command(params);
 }
 
-void midtunit_video_device::debug_help_command(int ref, const std::vector<std::string> &params)
+void midtunit_video_device::debug_help_command(const std::vector<std::string> &params)
 {
 	debugger_console &con = machine().debugger().console();
 
@@ -96,7 +97,7 @@ void midtunit_video_device::debug_help_command(int ref, const std::vector<std::s
 	con.printf("  midblit help -- this list\n");
 }
 
-void midtunit_video_device::debug_png_dma_command(int ref, const std::vector<std::string> &params)
+void midtunit_video_device::debug_png_dma_command(const std::vector<std::string> &params)
 {
 	debugger_console &con = machine().debugger().console();
 
@@ -227,7 +228,7 @@ void midxunit_video_device::device_start()
  *
  *************************************/
 
-READ16_MEMBER(midtunit_video_device::midtunit_gfxrom_r)
+uint16_t midtunit_video_device::midtunit_gfxrom_r(offs_t offset)
 {
 	uint8_t *base = m_gfxrom->base() + m_gfxbank_offset[(offset >> 21) & 1];
 	offset = (offset & 0x01fffff) * 2;
@@ -235,7 +236,7 @@ READ16_MEMBER(midtunit_video_device::midtunit_gfxrom_r)
 }
 
 
-READ16_MEMBER(midwunit_video_device::midwunit_gfxrom_r)
+uint16_t midwunit_video_device::midwunit_gfxrom_r(offs_t offset)
 {
 	uint8_t *base = m_gfxrom->base() + m_gfxbank_offset[0];
 	offset *= 2;
@@ -250,7 +251,7 @@ READ16_MEMBER(midwunit_video_device::midwunit_gfxrom_r)
  *
  *************************************/
 
-WRITE16_MEMBER(midtunit_video_device::midtunit_vram_w)
+void midtunit_video_device::midtunit_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset *= 2;
 	if (m_videobank_select)
@@ -270,7 +271,7 @@ WRITE16_MEMBER(midtunit_video_device::midtunit_vram_w)
 }
 
 
-WRITE16_MEMBER(midtunit_video_device::midtunit_vram_data_w)
+void midtunit_video_device::midtunit_vram_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset *= 2;
 	if (ACCESSING_BITS_0_7)
@@ -280,7 +281,7 @@ WRITE16_MEMBER(midtunit_video_device::midtunit_vram_data_w)
 }
 
 
-WRITE16_MEMBER(midtunit_video_device::midtunit_vram_color_w)
+void midtunit_video_device::midtunit_vram_color_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset *= 2;
 	if (ACCESSING_BITS_0_7)
@@ -290,7 +291,7 @@ WRITE16_MEMBER(midtunit_video_device::midtunit_vram_color_w)
 }
 
 
-READ16_MEMBER(midtunit_video_device::midtunit_vram_r)
+uint16_t midtunit_video_device::midtunit_vram_r(offs_t offset)
 {
 	offset *= 2;
 	if (m_videobank_select)
@@ -300,14 +301,14 @@ READ16_MEMBER(midtunit_video_device::midtunit_vram_r)
 }
 
 
-READ16_MEMBER(midtunit_video_device::midtunit_vram_data_r)
+uint16_t midtunit_video_device::midtunit_vram_data_r(offs_t offset)
 {
 	offset *= 2;
 	return (m_local_videoram[offset] & 0x00ff) | (m_local_videoram[offset + 1] << 8);
 }
 
 
-READ16_MEMBER(midtunit_video_device::midtunit_vram_color_r)
+uint16_t midtunit_video_device::midtunit_vram_color_r(offs_t offset)
 {
 	offset *= 2;
 	return (m_local_videoram[offset] >> 8) | (m_local_videoram[offset + 1] & 0xff00);
@@ -340,7 +341,7 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(midtunit_video_device::from_shiftreg)
  *
  *************************************/
 
-WRITE16_MEMBER(midtunit_video_device::midtunit_control_w)
+void midtunit_video_device::midtunit_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	    other important bits:
@@ -361,7 +362,7 @@ WRITE16_MEMBER(midtunit_video_device::midtunit_control_w)
 }
 
 
-WRITE16_MEMBER(midwunit_video_device::midwunit_control_w)
+void midwunit_video_device::midwunit_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	    other important bits:
@@ -379,7 +380,7 @@ WRITE16_MEMBER(midwunit_video_device::midwunit_control_w)
 }
 
 
-READ16_MEMBER(midwunit_video_device::midwunit_control_r)
+uint16_t midwunit_video_device::midwunit_control_r()
 {
 	return m_midtunit_control;
 }
@@ -392,14 +393,14 @@ READ16_MEMBER(midwunit_video_device::midwunit_control_r)
  *
  *************************************/
 
-WRITE16_MEMBER(midxunit_video_device::midxunit_paletteram_w)
+void midxunit_video_device::midxunit_paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!(offset & 1))
 		m_palette->write16(offset / 2, data, mem_mask);
 }
 
 
-READ16_MEMBER(midxunit_video_device::midxunit_paletteram_r)
+uint16_t midxunit_video_device::midxunit_paletteram_r(offs_t offset)
 {
 	return m_palette->read16(offset / 2);
 }
@@ -440,7 +441,7 @@ void midtunit_video_device::dma_draw()
 	while (iy < height)
 	{
 		int startskip = m_dma_state.startskip << 8;
-		int endskip = m_dma_state.endskip << 8;
+		[[maybe_unused]] int endskip = m_dma_state.endskip << 8;
 		int width = m_dma_state.width << 8;
 		int sx = m_dma_state.xpos;
 		int ix = 0;
@@ -616,7 +617,7 @@ DEFINE_TEMPLATED_DMA_DRAW_GROUP(false, false);
  *
  *************************************/
 
-void midtunit_video_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void midtunit_video_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -637,7 +638,7 @@ void midtunit_video_device::device_timer(emu_timer &timer, device_timer_id id, i
  *
  *************************************/
 
-READ16_MEMBER(midtunit_video_device::midtunit_dma_r)
+uint16_t midtunit_video_device::midtunit_dma_r(offs_t offset)
 {
 	/* rmpgwt sometimes reads register 0, expecting it to return the */
 	/* current DMA status; thus we map register 0 to register 1 */
@@ -694,7 +695,7 @@ READ16_MEMBER(midtunit_video_device::midtunit_dma_r)
  *           | ----------2----- | select top/bottom or left/right for reg 12/13
  */
 
-WRITE16_MEMBER(midtunit_video_device::midtunit_dma_w)
+void midtunit_video_device::midtunit_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	static const uint8_t register_map[2][16] =
 	{
@@ -849,8 +850,8 @@ skipdma:
 
 TMS340X0_SCANLINE_IND16_CB_MEMBER(midtunit_video_device::scanline_update)
 {
-	uint16_t *src = &m_local_videoram[(params->rowaddr << 9) & 0x3fe00];
-	uint16_t *dest = &bitmap.pix16(scanline);
+	uint16_t const *const src = &m_local_videoram[(params->rowaddr << 9) & 0x3fe00];
+	uint16_t *const dest = &bitmap.pix(scanline);
 	int coladdr = params->coladdr << 1;
 
 	/* copy the non-blanked portions of this scanline */
@@ -861,8 +862,8 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(midtunit_video_device::scanline_update)
 TMS340X0_SCANLINE_IND16_CB_MEMBER(midxunit_video_device::scanline_update)
 {
 	uint32_t fulladdr = ((params->rowaddr << 16) | params->coladdr) >> 3;
-	uint16_t *src = &m_local_videoram[fulladdr & 0x3fe00];
-	uint16_t *dest = &bitmap.pix16(scanline);
+	uint16_t const *const src = &m_local_videoram[fulladdr & 0x3fe00];
+	uint16_t *const dest = &bitmap.pix(scanline);
 
 	/* copy the non-blanked portions of this scanline */
 	for (int x = params->heblnk; x < params->hsblnk; x++)
@@ -902,7 +903,7 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 	char name_buf[256];
 	snprintf(name_buf, 255, "0x%08x.png", raw_offset);
 	auto const filerr = file.open(name_buf);
-	if (filerr != osd_file::error::NONE)
+	if (filerr)
 	{
 		return;
 	}
@@ -922,7 +923,7 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 	for (int y = 0; y < m_dma_state.height; y++)
 	{
 		int startskip = m_dma_state.startskip;
-		int endskip = m_dma_state.endskip;
+		[[maybe_unused]] int endskip = m_dma_state.endskip;
 		int width = m_dma_state.width;
 		int ix = 0;
 		int tx;
@@ -1018,7 +1019,7 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 		}
 	}
 
-	png_write_bitmap(file, nullptr, m_log_bitmap, 0, nullptr);
+	util::png_write_bitmap(file, nullptr, m_log_bitmap, 0, nullptr);
 
 	if (m_log_json)
 	{
@@ -1029,7 +1030,7 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 
 		snprintf(name_buf, 255, "0x%08x.json", raw_offset);
 		auto const jsonerr = json.open(name_buf);
-		if (jsonerr != osd_file::error::NONE)
+		if (jsonerr)
 		{
 			return;
 		}

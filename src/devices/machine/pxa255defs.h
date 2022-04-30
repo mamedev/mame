@@ -214,6 +214,20 @@
 
 /*
 
+  PXA255 Real-Time Clock
+
+  pg. 132 to 138, PXA255 Processor Developers Manual [278693-002].pdf
+
+*/
+
+#define PXA255_RTC_BASE_ADDR    (0x40900000)
+#define PXA255_RCNR             (PXA255_RTC_BASE_ADDR + 0x00000000)
+#define PXA255_RTAR             (PXA255_RTC_BASE_ADDR + 0x00000004)
+#define PXA255_RTSR             (PXA255_RTC_BASE_ADDR + 0x00000008)
+#define PXA255_RTTR             (PXA255_RTC_BASE_ADDR + 0x0000000c)
+
+/*
+
   PXA255 OS Timer register
 
   pg. 138 to 142, PXA255 Processor Developers Manual [278693-002].pdf
@@ -375,5 +389,38 @@
 #define PXA255_FSADR1           (PXA255_LCD_BASE_ADDR + 0x00000214)
 #define PXA255_FIDR1            (PXA255_LCD_BASE_ADDR + 0x00000218)
 #define PXA255_LDCMD1           (PXA255_LCD_BASE_ADDR + 0x0000021c)
+
+/*
+  PXA255 Power controller
+
+  pg. 85 to 96, PXA255 Processor Developers Manual [278693-002].pdf
+*/
+
+#define PXA255_POWER_BASE_ADDR  (0x40f00000)
+#define PXA255_PMCR             (PXA255_POWER_BASE_ADDR + 0x00000000)
+#define PXA255_PSSR             (PXA255_POWER_BASE_ADDR + 0x00000004)
+#define PXA255_PSPR             (PXA255_POWER_BASE_ADDR + 0x00000008)
+#define PXA255_PWER             (PXA255_POWER_BASE_ADDR + 0x0000000c)
+#define PXA255_PRER             (PXA255_POWER_BASE_ADDR + 0x00000010)
+#define PXA255_PFER             (PXA255_POWER_BASE_ADDR + 0x00000014)
+#define PXA255_PEDR             (PXA255_POWER_BASE_ADDR + 0x00000018)
+#define PXA255_PCFR             (PXA255_POWER_BASE_ADDR + 0x0000001c)
+#define PXA255_PGSR0            (PXA255_POWER_BASE_ADDR + 0x00000020)
+#define PXA255_PGSR1            (PXA255_POWER_BASE_ADDR + 0x00000024)
+#define PXA255_PGSR2            (PXA255_POWER_BASE_ADDR + 0x00000028)
+#define PXA255_RCSR             (PXA255_POWER_BASE_ADDR + 0x00000030)
+#define PXA255_PMFW             (PXA255_POWER_BASE_ADDR + 0x00000034)
+
+/*
+  PXA255 Clock controller
+
+  pg. 96 to 100, PXA255 Processor Developers Manual [278693-002].pdf
+
+*/
+
+#define PXA255_CLOCKS_BASE_ADDR (0x41300000)
+#define PXA255_CCCR             (PXA255_CLOCKS_BASE_ADDR + 0x00000000)
+#define PXA255_CKEN             (PXA255_CLOCKS_BASE_ADDR + 0x00000004)
+#define PXA255_OSCC             (PXA255_CLOCKS_BASE_ADDR + 0x00000008)
 
 #endif // MAME_MACHINE_PXA255DEFS

@@ -21,9 +21,7 @@
  *
  *************************************/
 
-#define DEFAULT_SAMPLE_RATE         (44100)
-
-#define BUFFER_SIZE                 32768
+#define DEFAULT_SAMPLE_RATE         (48000)
 
 
 /*************************************
@@ -38,25 +36,28 @@
 
 void dmadac_sound_device::device_start()
 {
-	/* allocate a clear a buffer */
-	m_buffer = make_unique_clear<int16_t[]>(BUFFER_SIZE);
-
-	/* reset the state */
-	m_volume = 0x100;
+	initialize_state();
 
 	/* allocate a stream channel */
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, DEFAULT_SAMPLE_RATE);
+	m_channel = stream_alloc(0, 1, DEFAULT_SAMPLE_RATE);
 
 	/* register with the save state system */
 	save_item(NAME(m_bufin));
 	save_item(NAME(m_bufout));
 	save_item(NAME(m_volume));
 	save_item(NAME(m_enabled));
-	save_item(NAME(m_frequency));
-	save_pointer(NAME(m_buffer), BUFFER_SIZE);
+	save_item(NAME(m_buffer));
 }
 
+void dmadac_sound_device::initialize_state()
+{
+	/* reset the state */
+	m_volume = 1.0;
+	m_bufin = m_bufout = 0;
+	m_enabled = 0;
 
+	std::fill_n(m_buffer.begin(), BUFFER_SIZE, 0);
+}
 
 /*************************************
  *
@@ -85,36 +86,6 @@ void dmadac_sound_device::flush()
 {
 	m_channel->update();
 }
-
-void dmadac_sound_device::transfer(int channel, offs_t channel_spacing, offs_t frame_spacing, offs_t total_frames, int16_t *data)
-{
-	int j;
-
-	/* loop over all channels and accumulate the data */
-	if (m_enabled)
-	{
-		int maxin = (m_bufout + BUFFER_SIZE - 1) % BUFFER_SIZE;
-		int16_t *src = data + channel * channel_spacing;
-		int curin = m_bufin;
-
-		/* copy the data */
-		for (j = 0; j < total_frames && curin != maxin; j++)
-		{
-			m_buffer[curin] = *src;
-			curin = (curin + 1) % BUFFER_SIZE;
-			src += frame_spacing;
-		}
-		m_bufin = curin;
-
-		/* log overruns */
-		if (j != total_frames)
-			logerror("dmadac_transfer: buffer overrun (short %d frames)\n", total_frames - j);
-	}
-
-	// FIXME: this line has rotted and can no longer compile - it should be fixed and uncommented or removed
-	//LOG("dmadac_transfer - %d samples, %d effective, %d in buffer\n", total_frames, int(total_frames * double(DEFAULT_SAMPLE_RATE) / dmadac[first_channel].frequency), dmadac[first_channel].curinpos - dmadac[first_channel].curoutpos);
-}
-
 
 
 /*************************************
@@ -187,7 +158,7 @@ void dmadac_set_volume(dmadac_sound_device **devlist, uint8_t num_channels, uint
 void dmadac_sound_device::set_volume(uint16_t volume)
 {
 	m_channel->update();
-	m_volume = volume;
+	m_volume = stream_buffer::sample_t(volume) * (1.0 / 256.0);
 }
 
 DEFINE_DEVICE_TYPE(DMADAC, dmadac_sound_device, "dmadac", "DMA-driven DAC")
@@ -195,12 +166,11 @@ DEFINE_DEVICE_TYPE(DMADAC, dmadac_sound_device, "dmadac", "DMA-driven DAC")
 dmadac_sound_device::dmadac_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DMADAC, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
-		m_buffer(nullptr),
+		m_buffer(BUFFER_SIZE),
 		m_bufin(0),
 		m_bufout(0),
 		m_volume(0),
-		m_enabled(0),
-		m_frequency(0)
+		m_enabled(0)
 {
 }
 
@@ -208,24 +178,22 @@ dmadac_sound_device::dmadac_sound_device(const machine_config &mconfig, const ch
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void dmadac_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void dmadac_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *output = outputs[0];
-	int16_t *source = m_buffer.get();
+	auto &output = outputs[0];
 	uint32_t curout = m_bufout;
 	uint32_t curin = m_bufin;
-	int volume = m_volume;
 
 	/* feed as much as we can */
-	while (curout != curin && samples-- > 0)
+	int sampindex;
+	for (sampindex = 0; curout != curin && sampindex < output.samples(); sampindex++)
 	{
-		*output++ = (source[curout] * volume) >> 8;
+		output.put(sampindex, stream_buffer::sample_t(m_buffer[curout]) * m_volume);
 		curout = (curout + 1) % BUFFER_SIZE;
 	}
 
 	/* fill the rest with silence */
-	while (samples-- > 0)
-		*output++ = 0;
+	output.fill(0, sampindex);
 
 	/* save the new output pointer */
 	m_bufout = curout;

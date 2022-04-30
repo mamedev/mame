@@ -66,7 +66,7 @@ ROM_END
 
 void bbc_tube_80186_device::device_add_mconfig(machine_config &config)
 {
-	I80186(config, m_i80186, 20_MHz_XTAL / 2);
+	I80186(config, m_i80186, 20_MHz_XTAL);
 	m_i80186->set_addrmap(AS_PROGRAM, &bbc_tube_80186_device::tube_80186_mem);
 	m_i80186->set_addrmap(AS_IO, &bbc_tube_80186_device::tube_80186_io);
 	m_i80186->tmrout0_handler().set_inputline(m_i80186, INPUT_LINE_HALT).invert();
@@ -81,6 +81,7 @@ void bbc_tube_80186_device::device_add_mconfig(machine_config &config)
 
 	/* software lists */
 	SOFTWARE_LIST(config, "flop_ls_80186").set_original("bbc_flop_80186");
+	SOFTWARE_LIST(config, "pc_disk_list").set_compatible("ibm5150");
 }
 
 void bbc_tube_pcplus_device::device_add_mconfig(machine_config &config)

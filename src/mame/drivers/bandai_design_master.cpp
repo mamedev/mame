@@ -41,6 +41,7 @@
 #include "bus/generic/carts.h"
 
 #include "screen.h"
+#include "softlist_dev.h"
 //#include "speaker.h"
 
 class bdsm_state : public driver_device
@@ -64,8 +65,8 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	DECLARE_READ16_MEMBER(io_p7_r);
-	DECLARE_WRITE16_MEMBER(io_p7_w);
+	uint16_t io_p7_r();
+	void io_p7_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
@@ -86,7 +87,8 @@ void bdsm_state::machine_start()
 		m_cartslot_region = memregion(region_tag.assign(m_cartslot->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 		m_bank->configure_entries(0, (m_cartslot_region->bytes() / 0x8000), m_cartslot_region->base(), 0x8000);
 		m_bank->set_entry(0); // only the first bank seems to contain a valid reset vector '0x50' which points at the first code in the ROM.  The other banks contain 0x5a00 as the reset vector.  IRQ vector seems valid in all banks.
-	}
+	} else
+		m_bank->set_base(memregion("roms")->base());
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(bdsm_state::cart_load_bdesignm)
@@ -105,12 +107,12 @@ void bdsm_state::mem_map(address_map &map)
 	map(0x8000, 0x895f).ram().share("unkram");
 }
 
-READ16_MEMBER(bdsm_state::io_p7_r)
+uint16_t bdsm_state::io_p7_r()
 {
 	return machine().rand();
 }
 
-WRITE16_MEMBER(bdsm_state::io_p7_w)
+void bdsm_state::io_p7_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: io_p7_w %04x %04x\n", machine().describe_context(), data, mem_mask);
 }

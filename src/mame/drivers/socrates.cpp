@@ -3,7 +3,7 @@
 /******************************************************************************
 *
 *  V-tech Socrates-series devices
-*  Copyright (C) 2009-2020 Jonathan Gevaryahu AKA Lord Nightmare
+*  Copyright (C) 2009-2021 Jonathan Gevaryahu AKA Lord Nightmare
 *  with dumping help from Kevin 'kevtris' Horton
 *
 *  The devices in this driver all use a similar ASIC, presumably produced by
@@ -95,7 +95,7 @@ TODO (socrates):
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -139,7 +139,7 @@ protected:
 	optional_device<generic_slot_device> m_cart;
 	memory_region *m_cart_reg;
 	required_memory_region m_bios_reg;
-	required_memory_region m_vram_reg;
+	required_shared_ptr<u8> m_vram_reg;
 	required_device<address_map_bank_device> m_rombank1;
 	optional_device<address_map_bank_device> m_rombank2; // iqunlimz only
 	required_device<address_map_bank_device> m_rambank1;
@@ -176,25 +176,25 @@ protected:
 
 	void socrates_palette(palette_device &palete) const;
 
-	DECLARE_READ8_MEMBER(common_rom_bank_r);
-	DECLARE_WRITE8_MEMBER(common_rom_bank_w);
-	DECLARE_READ8_MEMBER(common_ram_bank_r);
-	DECLARE_WRITE8_MEMBER(common_ram_bank_w);
-	DECLARE_READ8_MEMBER(socrates_cart_r);
-	DECLARE_READ8_MEMBER(read_f3);
-	DECLARE_WRITE8_MEMBER(kbmcu_reset);
-	DECLARE_READ8_MEMBER(socrates_status_r);
-	DECLARE_WRITE8_MEMBER(speech_command);
-	DECLARE_READ8_MEMBER(keyboard_buffer_read);
-	DECLARE_WRITE8_MEMBER(keyboard_buffer_update);
+	uint8_t common_rom_bank_r(offs_t offset);
+	void common_rom_bank_w(offs_t offset, uint8_t data);
+	uint8_t common_ram_bank_r();
+	void common_ram_bank_w(uint8_t data);
+	uint8_t socrates_cart_r(offs_t offset);
+	uint8_t read_f3();
+	void kbmcu_reset(uint8_t data);
+	uint8_t socrates_status_r();
+	void speech_command(uint8_t data);
+	uint8_t keyboard_buffer_read(offs_t offset);
+	void keyboard_buffer_update(uint8_t data);
 	void kbmcu_sim_reset();
 	void kbmcu_sim_fifo_enqueue(uint16_t data);
 	uint16_t kbmcu_sim_fifo_dequeue();
 	uint16_t kbmcu_sim_fifo_peek();
 	void kbmcu_sim_fifo_head_clear();
-	DECLARE_WRITE8_MEMBER(reset_speech);
-	DECLARE_WRITE8_MEMBER(socrates_scroll_w);
-	DECLARE_WRITE8_MEMBER(socrates_sound_w);
+	void reset_speech(uint8_t data);
+	void socrates_scroll_w(offs_t offset, uint8_t data);
+	void socrates_sound_w(offs_t offset, uint8_t data);
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -214,7 +214,7 @@ protected:
 	void socrates_io(address_map &map);
 	void socrates_mem(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 
@@ -234,10 +234,10 @@ protected:
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER( colors_w );
-	DECLARE_READ8_MEMBER( video_regs_r );
-	DECLARE_WRITE8_MEMBER( video_regs_w );
-	DECLARE_READ8_MEMBER( status_r );
+	void colors_w(offs_t offset, uint8_t data);
+	uint8_t video_regs_r(offs_t offset);
+	void video_regs_w(offs_t offset, uint8_t data);
+	uint8_t status_r();
 
 	void iqunlimz_io(address_map &map);
 	void iqunlimz_mem(address_map &map);
@@ -386,18 +386,18 @@ void socrates_state::machine_reset()
 	m_speech_load_settings_count = 0;
 }
 
-void socrates_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void socrates_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_KBMCU_SIM:
-		kbmcu_sim_cb(ptr, param);
+		kbmcu_sim_cb(param);
 		break;
 	case TIMER_CLEAR_SPEECH:
-		clear_speech_cb(ptr, param);
+		clear_speech_cb(param);
 		break;
 	case TIMER_CLEAR_IRQ:
-		clear_irq_cb(ptr, param);
+		clear_irq_cb(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in socrates_state::device_timer");
@@ -406,43 +406,37 @@ void socrates_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 void socrates_state::init_socrates()
 {
-	uint8_t *gfx = memregion("vram")->base();
-
 	/* fill vram with its init powerup bit pattern, so startup has the checkerboard screen */
 	for (int i = 0; i < 0x10000; i++)
-		gfx[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
+		m_vram_reg[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
 	m_maincpu->set_clock_scale(0.45f); /// TODO: RAM access waitstates etc. aren't emulated - slow the CPU to compensate
 	m_kbmcu_type = 0;
 }
 
 void socrates_state::init_iqunlimz()
 {
-	uint8_t *gfx = memregion("vram")->base();
-
 	/* fill vram with its init powerup bit pattern, so startup has the checkerboard screen... is this even right for the iqunlimz? */
 	for (int i = 0; i < 0x20000; i++)
-		gfx[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
+		m_vram_reg[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
 	//m_maincpu->set_clock_scale(0.45f); /// TODO: RAM access waitstates etc. aren't emulated - slow the CPU to compensate
 	m_kbmcu_type = 1;
 }
 
 void socrates_state::init_vpainter()
 {
-	uint8_t *gfx = memregion("vram")->base();
-
 	/* fill vram with its init powerup bit pattern, so startup has the checkerboard screen */
 	for (int i = 0; i < 0x10000; i++)
-		gfx[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
+		m_vram_reg[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
 	m_maincpu->set_clock_scale(0.45f); /// TODO: RAM access waitstates etc. aren't emulated - slow the CPU to compensate
 	m_kbmcu_type = 2;
 }
 
-READ8_MEMBER(socrates_state::common_rom_bank_r)
+uint8_t socrates_state::common_rom_bank_r(offs_t offset)
 {
 	return m_rom_bank[offset];
 }
 
-WRITE8_MEMBER(socrates_state::common_rom_bank_w)
+void socrates_state::common_rom_bank_w(offs_t offset, uint8_t data)
 {
 	m_rom_bank[offset] = data;
 	if (offset && m_rombank2)
@@ -451,19 +445,19 @@ WRITE8_MEMBER(socrates_state::common_rom_bank_w)
 		m_rombank1->set_bank(data);
 }
 
-READ8_MEMBER(socrates_state::common_ram_bank_r)
+uint8_t socrates_state::common_ram_bank_r()
 {
 	return m_ram_bank;
 }
 
-WRITE8_MEMBER(socrates_state::common_ram_bank_w)
+void socrates_state::common_ram_bank_w(uint8_t data)
 {
 	m_ram_bank = data;
 	m_rambank1->set_bank(((data>>2) & 0x0c) | ((data>>0) & 0x03));
 	m_rambank2->set_bank(((data>>4) & 0x0c) | ((data>>2) & 0x03));
 }
 
-READ8_MEMBER(socrates_state::socrates_cart_r)
+uint8_t socrates_state::socrates_cart_r(offs_t offset)
 {
 	///TODO: do m_rombank->space(AS_PROGRAM).install_write_handler(0x0002, 0x0002, write8_delegate(FUNC(dac_byte_interface::data_w), (dac_byte_interface *)m_dac)); style stuff
 	// demangle the offset, offset passed is bits 11111111 11111111 00000000 00000000
@@ -479,18 +473,18 @@ READ8_MEMBER(socrates_state::socrates_cart_r)
 		return 0xF3;
 }
 
-READ8_MEMBER(socrates_state::read_f3)// used for read-only i/o ports as mame/mess doesn't have a way to set the unmapped area to read as 0xF3
+uint8_t socrates_state::read_f3()// used for read-only i/o ports as mame/mess doesn't have a way to set the unmapped area to read as 0xF3
 {
 	return 0xF3;
 }
 
-WRITE8_MEMBER(socrates_state::kbmcu_reset) // reset the keyboard MCU, clear its fifo
+void socrates_state::kbmcu_reset(uint8_t data) // reset the keyboard MCU, clear its fifo
 {
 	//logerror("0x%04X: kbmcu written with %02X!\n", m_maincpu->pc(), data); //if (m_maincpu->pc() != 0x31D)
 	kbmcu_sim_reset();
 }
 
-READ8_MEMBER(socrates_state::socrates_status_r)// read 0x4x, some sort of status reg
+uint8_t socrates_state::socrates_status_r()// read 0x4x, some sort of status reg
 {
 // bit 7 - speech status: high when speech is playing, low when it is not (or when speech cart is not present)
 // bit 6 - unknown, usually set, possibly mcu ready state?
@@ -500,8 +494,8 @@ READ8_MEMBER(socrates_state::socrates_status_r)// read 0x4x, some sort of status
 // bit 2 - speech chip bit 2
 // bit 1 - speech chip bit 1
 // bit 0 - speech chip bit 0
-uint8_t *speechromint = memregion("speechint")->base();
-uint8_t *speechromext = memregion("speechext")->base();
+	uint8_t *speechromint = memregion("speechint")->base();
+	uint8_t *speechromext = memregion("speechext")->base();
 	int temp = 0;
 	temp |= (m_speech_running)?0x80:0;
 	temp |= (1)?0x40:0; // unknown, possibly IR mcu ready?
@@ -544,7 +538,7 @@ TIMER_CALLBACK_MEMBER(socrates_state::clear_speech_cb)
 	m_speech_load_settings_count = 0;
 }
 
-WRITE8_MEMBER(socrates_state::speech_command) // write 0x4x
+void socrates_state::speech_command(uint8_t data) // write 0x4x
 {
 	/*
 	 * 76543210
@@ -651,7 +645,7 @@ SEL 5 4 3 2 1 0
 	m_io40_latch = data;
 }
 
-READ8_MEMBER( socrates_state::keyboard_buffer_read )
+uint8_t socrates_state::keyboard_buffer_read(offs_t offset)
 {
 	if (m_kbmcu_type == 0)
 	{
@@ -665,13 +659,13 @@ READ8_MEMBER( socrates_state::keyboard_buffer_read )
 	}
 }
 
-WRITE8_MEMBER( socrates_state::keyboard_buffer_update )
+void socrates_state::keyboard_buffer_update(uint8_t data)
 {
 	m_kb_spi_request = true;
 	m_kb_spi_buffer = 0x0001;
 }
 
-WRITE8_MEMBER(socrates_state::reset_speech)// i/o 60: reset speech synth
+void socrates_state::reset_speech(uint8_t data)// i/o 60: reset speech synth
 {
 	m_speech_running = 0;
 	m_speech_address = 0;
@@ -689,7 +683,7 @@ logerror("write to i/o 0x60 of %x\n",data);
     0x21 - W - msb offset of screen display
     resulting screen line is one of 512 total offsets on 128-byte boundaries in the whole 64k ram
     */
-WRITE8_MEMBER(socrates_state::socrates_scroll_w)
+void socrates_state::socrates_scroll_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	m_scroll_offset = (m_scroll_offset&0x100) | data;
@@ -809,44 +803,41 @@ void socrates_state::video_start()
 
 uint32_t socrates_state::screen_update_socrates(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	static const uint8_t fixedcolors[8] =
-	{
-	0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0xF7
-	};
-	uint8_t *videoram = m_vram_reg->base();
-	int x, y, colidx, color;
+	static const uint8_t fixedcolors[8] = {
+			0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0xF7 };
+	uint8_t const *const videoram = m_vram_reg;
 	int lineoffset = 0; // if display ever tries to display data at 0xfxxx, offset line displayed by 0x1000
-	for (y = 0; y < 228; y++)
+	for (int y = 0; y < 228; y++)
 	{
 		if ((((y+m_scroll_offset)*128)&0xffff) >= 0xf000) lineoffset = 0x1000; // see comment above
-		for (x = 0; x < 264; x++)
+		for (int x = 0; x < 264; x++)
 		{
+			int color;
 			if (x < 256)
 			{
-				colidx =videoram[(((y+m_scroll_offset)*128)+(x>>1)+lineoffset)&0xffff];
+				int colidx =videoram[(((y+m_scroll_offset)*128)+(x>>1)+lineoffset)&0xffff];
 				if (x&1) colidx >>=4;
 				colidx &= 0xF;
 				if (colidx > 7) color=videoram[0xF000+(colidx<<8)+((y+m_scroll_offset)&0xFF)];
 				else color=fixedcolors[colidx];
-				bitmap.pix16(y, x) = color;
 			}
 			else
 			{
-				colidx = videoram[(((y+m_scroll_offset)*128)+(127)+lineoffset)&0xffff];
+				int colidx = videoram[(((y+m_scroll_offset)*128)+(127)+lineoffset)&0xffff];
 				colidx >>=4;
 				colidx &= 0xF;
 				if (colidx > 7) color=videoram[0xF000+(colidx<<8)+((y+m_scroll_offset)&0xFF)];
 				else color=fixedcolors[colidx];
-				bitmap.pix16(y, x) = color;
 			}
+			bitmap.pix(y, x) = color;
 		}
 	}
 	return 0;
 }
 
-/* below belongs in sound/socrates.c */
+/* below belongs in audio/socrates.cpp */
 
-WRITE8_MEMBER(socrates_state::socrates_sound_w)
+void socrates_state::socrates_sound_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -881,12 +872,12 @@ int iqunlimz_state::get_color(int index, int y)
 	if (index < 8)
 		return m_colors[index];
 	else
-		return m_vram_reg->as_u8(0xf000 + ((index & 0x0f) << 8) + ((m_scroll_offset + y + 1) & 0xff));
+		return m_vram_reg[0xf000 + ((index & 0x0f) << 8) + ((m_scroll_offset + y + 1) & 0xff)];
 }
 
 uint32_t iqunlimz_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *videoram = m_vram_reg->base();
+	uint8_t *videoram = m_vram_reg;
 
 	// bitmap layer
 	for (int y=0; y<224; y++)
@@ -898,7 +889,7 @@ uint32_t iqunlimz_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 			for(int b=0; b<2; b++)
 			{
-				bitmap.pix16(y, x*2 + b) = get_color(data & 0x0f, y);
+				bitmap.pix(y, x*2 + b) = get_color(data & 0x0f, y);
 				data >>= 4;
 			}
 		}
@@ -932,7 +923,7 @@ uint32_t iqunlimz_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 					for (int cx=0; cx<6; cx++)
 					{
 						int px = 8 + x*6 + cx;
-						bitmap.pix16(py, px) = BIT(data, 7) ? col1 : col0;
+						bitmap.pix(py, px) = BIT(data, 7) ? col1 : col0;
 						data <<= 1;
 					}
 				}
@@ -943,7 +934,7 @@ uint32_t iqunlimz_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-READ8_MEMBER( iqunlimz_state::status_r )
+uint8_t iqunlimz_state::status_r()
 {
 	// ---x ----    main battery status
 	// --x- ----    backup battery status
@@ -951,12 +942,12 @@ READ8_MEMBER( iqunlimz_state::status_r )
 	return 0x30;
 }
 
-READ8_MEMBER( iqunlimz_state::video_regs_r )
+uint8_t iqunlimz_state::video_regs_r(offs_t offset)
 {
 	return m_video_regs[offset];
 }
 
-WRITE8_MEMBER( iqunlimz_state::video_regs_w )
+void iqunlimz_state::video_regs_w(offs_t offset, uint8_t data)
 {
 	if (offset == 2 && ((m_video_regs[offset] ^ data) & 0x02))
 	{
@@ -977,7 +968,7 @@ void iqunlimz_state::machine_reset()
 	kbmcu_sim_reset();
 }
 
-WRITE8_MEMBER( iqunlimz_state::colors_w )
+void iqunlimz_state::colors_w(offs_t offset, uint8_t data)
 {
 	m_colors[offset] = data;
 }
@@ -1019,7 +1010,7 @@ void socrates_state::socrates_rombank_map(address_map &map)
 void socrates_state::socrates_rambank_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).ram().region("vram", 0).mirror(0x30000);
+	map(0x0000, 0xffff).ram().share("vram").mirror(0x30000);
 }
 
 void socrates_state::socrates_io(address_map &map)
@@ -1068,7 +1059,7 @@ void iqunlimz_state::iqunlimz_rombank_map(address_map &map)
 void iqunlimz_state::iqunlimz_rambank_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x3ffff).ram().region("vram", 0);
+	map(0x0000, 0x3ffff).ram().share("vram");
 }
 
 void iqunlimz_state::iqunlimz_io(address_map &map)
@@ -1616,8 +1607,6 @@ ROM_START(socrates)
 	*/
 	ROM_LOAD("27-00817-000-000.u1", 0x00000, 0x40000, CRC(80f5aa20) SHA1(4fd1ff7f78b5dd2582d5de6f30633e4e4f34ca8f)) // Label: "(Vtech) 27-00817-000-000 // (C)1987 VIDEO TECHNOLOGY // 8811 D"
 
-	ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
-
 	ROM_REGION(0x800, "kbmcu", ROMREGION_ERASEFF)
 	ROM_LOAD("tmp42c40p1844.u6", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
 
@@ -1636,8 +1625,6 @@ ROM_START(socratfc)
 	ROM_REGION(0x80000, "maincpu", ROMREGION_ERASEVAL(0xF3))
 	/* Socrates SAITOUT (French Canadian) NTSC */
 	ROM_LOAD("27-00884-001-000.u1", 0x00000, 0x40000, CRC(042d9d21) SHA1(9ffc67b2721683b2536727d0592798fbc4d061cb)) // Label: "(Vtech) 27-00884-001-000 // (C)1988 VIDEO TECHNOLOGY // 8911 D"
-
-	ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
 
 	ROM_REGION(0x800, "kbmcu", ROMREGION_ERASEFF)
 	ROM_LOAD("tmp42c40p1844.u6", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
@@ -1660,8 +1647,6 @@ ROM_START(profweis)
 	ROM_SYSTEM_BIOS(1, "88", "1988")
 	ROMX_LOAD("27-00885-000-000.u1", 0x00000, 0x40000, CRC(fcaf8850) SHA1(a99011ee6a1ef63461c00d062278951252f117db), ROM_BIOS(1)) // Label: "(Vtech) 27-00885-000-000 // (C)1988 VIDEO TECHNOLOGY // 8844 D"
 
-	ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
-
 	ROM_REGION(0x800, "kbmcu", ROMREGION_ERASEFF)
 	ROM_LOAD("tmp42c40p1844.u6", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
 
@@ -1679,8 +1664,6 @@ ROM_START( iqunlimz )
 
 	ROM_REGION(0x1000, "kbmcu", ROMREGION_ERASEFF)
 	ROM_LOAD("kbmcu.bin", 0x0000, 0x1000, NO_DUMP) /* keyboard reader MCU */
-
-	ROM_REGION( 0x40000, "vram", ROMREGION_ERASE )
 ROM_END
 
 ROM_START( vpainter )
@@ -1693,8 +1676,6 @@ ROM_START( vpainter )
 	///TODO: get rid of these regions in the status_read function or make it socrates-specific
 	ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // doesn't exist? on vpainter, presumably reads as all zeroes
 	ROM_REGION(0x10000, "speechext", ROMREGION_ERASE00) // doesn't exist? on vpainter, presumably reads as all zeroes
-
-	ROM_REGION( 0x10000, "vram", ROMREGION_ERASE )
 ROM_END
 
 /******************************************************************************

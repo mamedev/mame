@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "softlist_dev.h"
+#include "imagedev/cartrom.h"
 
 
 /***************************************************************************
@@ -49,14 +49,14 @@ public:
 	virtual ~device_a78_cart_interface();
 
 	// memory accessor
-	virtual DECLARE_READ8_MEMBER(read_04xx) { return 0xff; }
-	virtual DECLARE_READ8_MEMBER(read_10xx) { return 0xff; }
-	virtual DECLARE_READ8_MEMBER(read_30xx) { return 0xff; }
-	virtual DECLARE_READ8_MEMBER(read_40xx) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_04xx) {}
-	virtual DECLARE_WRITE8_MEMBER(write_10xx) {}
-	virtual DECLARE_WRITE8_MEMBER(write_30xx) {}
-	virtual DECLARE_WRITE8_MEMBER(write_40xx) {}
+	virtual uint8_t read_04xx(offs_t offset) { return 0xff; }
+	virtual uint8_t read_10xx(offs_t offset) { return 0xff; }
+	virtual uint8_t read_30xx(offs_t offset) { return 0xff; }
+	virtual uint8_t read_40xx(offs_t offset) { return 0xff; }
+	virtual void write_04xx(offs_t offset, uint8_t data) {}
+	virtual void write_10xx(offs_t offset, uint8_t data) {}
+	virtual void write_30xx(offs_t offset, uint8_t data) {}
+	virtual void write_40xx(offs_t offset, uint8_t data) {}
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void ram_alloc(uint32_t size);
@@ -85,7 +85,7 @@ protected:
 // ======================> a78_cart_slot_device
 
 class a78_cart_slot_device : public device_t,
-								public device_image_interface,
+								public device_cartrom_image_interface,
 								public device_slot_interface
 {
 public:
@@ -106,38 +106,30 @@ public:
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 
-	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return false; }
-	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "a7800_cart"; }
-	virtual const char *file_extensions() const noexcept override { return "bin,a78"; }
+	virtual const char *file_extensions() const noexcept override { return "a78"; }
 	virtual u32 unhashed_header_length() const noexcept override { return 128; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
-	int get_cart_type() { return m_type; };
+	int get_cart_type() { return m_type; }
 	bool has_cart() { return m_cart != nullptr; }
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_04xx);
-	virtual DECLARE_READ8_MEMBER(read_10xx);
-	virtual DECLARE_READ8_MEMBER(read_30xx);
-	virtual DECLARE_READ8_MEMBER(read_40xx);
-	virtual DECLARE_WRITE8_MEMBER(write_04xx);
-	virtual DECLARE_WRITE8_MEMBER(write_10xx);
-	virtual DECLARE_WRITE8_MEMBER(write_30xx);
-	virtual DECLARE_WRITE8_MEMBER(write_40xx);
+	uint8_t read_04xx(offs_t offset);
+	uint8_t read_10xx(offs_t offset);
+	uint8_t read_30xx(offs_t offset);
+	uint8_t read_40xx(offs_t offset);
+	void write_04xx(offs_t offset, uint8_t data);
+	void write_10xx(offs_t offset, uint8_t data);
+	void write_30xx(offs_t offset, uint8_t data);
+	void write_40xx(offs_t offset, uint8_t data);
 
 private:
 	// device-level overrides
 	virtual void device_start() override;
-
-	// device_image_interface implementation
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	device_a78_cart_interface*       m_cart;
 	int m_type;

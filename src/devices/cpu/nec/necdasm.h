@@ -11,7 +11,13 @@
 class nec_disassembler : public util::disasm_interface
 {
 public:
-	nec_disassembler(const u8 *decryption_table = nullptr);
+	struct config {
+	public:
+		virtual ~config() = default;
+		virtual int get_mode() const = 0;
+	};
+
+	nec_disassembler(config *conf, const u8 *decryption_table = nullptr);
 	virtual ~nec_disassembler() = default;
 
 	virtual u32 opcode_alignment() const override;
@@ -107,6 +113,7 @@ private:
 	static const char *const nec_sreg[8];
 	static const char *const nec_sfreg[256];
 
+	config *m_config;
 	const u8 *m_decryption_table;
 
 	u8 m_modrm;
@@ -123,6 +130,7 @@ private:
 	void handle_fpu(std::ostream &stream, uint8_t op1, uint8_t op2, offs_t pc_base, offs_t &pc, const data_buffer &params);
 
 	void decode_opcode(std::ostream &stream, const NEC_I386_OPCODE *op, uint8_t op1, offs_t pc_base, offs_t &pc, const data_buffer &opcodes, const data_buffer &params);
+	offs_t dis80(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params);
 };
 
 

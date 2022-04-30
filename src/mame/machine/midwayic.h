@@ -43,15 +43,14 @@ protected:
 
 	required_ioport m_io_serial_digit;
 
-	uint8_t   m_data[16]; // reused by other devices
-	int     m_upper;
+	uint8_t   m_data[16]{}; // reused by other devices
+	int     m_upper = 0;
 
 private:
-	uint8_t   m_buff;
-	uint8_t   m_idx;
-	uint8_t   m_status;
-	uint8_t   m_bits;
-	uint8_t   m_ormask;
+	uint8_t   m_buff = 0;
+	uint8_t   m_idx = 0;
+	uint8_t   m_status = 0;
+	uint8_t   m_bits = 0;
 };
 
 
@@ -66,6 +65,11 @@ public:
 	// construction/destruction
 	midway_serial_pic_emu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	u8 read();
+	void write(u8 data);
+	u8 status_r();
+	DECLARE_WRITE_LINE_MEMBER(reset_w);
+
 protected:
 	midway_serial_pic_emu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -74,12 +78,15 @@ protected:
 	virtual void device_start() override;
 
 private:
-	DECLARE_READ8_MEMBER(read_a);
-	DECLARE_READ8_MEMBER(read_b);
-	DECLARE_READ8_MEMBER(read_c);
-	DECLARE_WRITE8_MEMBER(write_a);
-	DECLARE_WRITE8_MEMBER(write_b);
-	DECLARE_WRITE8_MEMBER(write_c);
+	required_device<pic16c57_device> m_pic;
+
+	u8 read_c();
+	void write_c(u8 data);
+
+	u8 m_command = 0;
+	u8 m_data_out = 0;
+	u8 m_clk = 0;
+	u8 m_status = 0;
 };
 
 
@@ -114,28 +121,28 @@ protected:
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
-	virtual void nvram_read(emu_file &file) override;
-	virtual void nvram_write(emu_file &file) override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 
 private:
 
 	void pic_register_state();
 	TIMER_CALLBACK_MEMBER( reset_timer );
 
-	uint16_t  m_latch;
-	attotime m_latch_expire_time;
-	uint8_t   m_state;
-	uint8_t   m_index;
-	uint8_t   m_total;
-	uint8_t   m_nvram_addr;
-	uint8_t   m_buffer[0x10];
-	uint8_t   m_nvram[0x100];
-	uint8_t   m_default_nvram[0x100];
-	uint8_t   m_time_buf[8];
-	uint8_t   m_time_index;
-	uint8_t   m_time_just_written;
-	uint16_t  m_yearoffs;
-	emu_timer *m_time_write_timer;
+	uint16_t  m_latch = 0;
+	attotime m_latch_expire_time{};
+	uint8_t   m_state = 0;
+	uint8_t   m_index = 0;
+	uint8_t   m_total = 0;
+	uint8_t   m_nvram_addr = 0;
+	uint8_t   m_buffer[0x10]{};
+	uint8_t   m_nvram[0x100]{};
+	uint8_t   m_default_nvram[0x100]{};
+	uint8_t   m_time_buf[8]{};
+	uint8_t   m_time_index = 0;
+	uint8_t   m_time_just_written = 0;
+	uint16_t  m_yearoffs = 0;
+	emu_timer *m_time_write_timer = nullptr;
 };
 
 
@@ -164,18 +171,18 @@ public:
 	void fifo_full_w(uint16_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(fifo_reset_w);
-	DECLARE_READ16_MEMBER(fifo_r);
-	DECLARE_READ16_MEMBER(fifo_status_r);
+	uint16_t fifo_r();
+	uint16_t fifo_status_r(address_space &space);
 
 	DECLARE_WRITE_LINE_MEMBER(ioasic_input_empty);
 	DECLARE_WRITE_LINE_MEMBER(ioasic_output_full);
 
-	DECLARE_READ32_MEMBER( read );
-	DECLARE_WRITE32_MEMBER( write );
-	DECLARE_READ32_MEMBER( packed_r );
-	DECLARE_WRITE32_MEMBER( packed_w );
+	uint32_t read(address_space &space, offs_t offset);
+	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t packed_r(address_space &space, offs_t offset, uint32_t mem_mask = ~0);
+	void packed_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE8_MEMBER(cage_irq_handler);
+	void cage_irq_handler(uint8_t data);
 
 	void serial_rx_w(u8 data);
 
@@ -188,6 +195,7 @@ protected:
 private:
 	void ioasic_register_state();
 	void update_ioasic_irq();
+	uint16_t get_fifo_status();
 
 	required_ioport m_io_dips;
 	required_ioport m_io_system;
@@ -197,25 +205,25 @@ private:
 	devcb_write8    m_serial_tx_cb;
 	devcb_write32   m_aux_output_cb;
 
-	uint32_t  m_reg[16];
-	uint8_t   m_has_dcs;
-	uint8_t   m_has_cage;
-	cpu_device *m_dcs_cpu;
-	uint8_t   m_shuffle_type;
-	uint8_t   m_shuffle_default;
-	uint8_t   m_shuffle_active;
-	const uint8_t *   m_shuffle_map;
+	uint32_t  m_reg[16]{};
+	uint8_t   m_has_dcs = 0;
+	uint8_t   m_has_cage = 0;
+	cpu_device *m_dcs_cpu = nullptr;
+	uint8_t   m_shuffle_type = 0;
+	uint8_t   m_shuffle_default = 0;
+	uint8_t   m_shuffle_active = 0;
+	const uint8_t *   m_shuffle_map = nullptr;
 	devcb_write8 m_irq_callback;
-	uint8_t   m_irq_state;
-	uint16_t  m_sound_irq_state;
-	uint8_t   m_auto_ack;
-	uint8_t   m_force_fifo_full;
+	uint8_t   m_irq_state = 0;
+	uint16_t  m_sound_irq_state = 0;
+	uint8_t   m_auto_ack = 0;
+	uint8_t   m_force_fifo_full = 0;
 
-	uint16_t  m_fifo[512];
-	uint16_t  m_fifo_in;
-	uint16_t  m_fifo_out;
-	uint16_t  m_fifo_bytes;
-	offs_t  m_fifo_force_buffer_empty_pc;
+	uint16_t  m_fifo[512]{};
+	uint16_t  m_fifo_in = 0;
+	uint16_t  m_fifo_out = 0;
+	uint16_t  m_fifo_bytes = 0;
+	offs_t  m_fifo_force_buffer_empty_pc = 0;
 
 	optional_device<atari_cage_device> m_cage;
 	optional_device<dcs_audio_device> m_dcs;

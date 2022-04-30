@@ -20,10 +20,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(txd_w);
 
 protected:
-	DECLARE_READ8_MEMBER(mcu_pa_r);
-	DECLARE_READ8_MEMBER(mcu_pb_r);
-	DECLARE_WRITE8_MEMBER(mcu_pb_w);
-	DECLARE_WRITE8_MEMBER(mcu_pc_w);
+	u8 mcu_pa_r();
+	u8 mcu_pb_r();
+	void mcu_pb_w(u8 data);
+	void mcu_pc_w(u8 data);
 
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -32,6 +32,8 @@ protected:
 
 	required_ioport_array<16>       m_rows;
 	required_device<beep_device>    m_beeper;
+	output_finder<>                 m_led_key_caps_lock;
+	output_finder<>                 m_led_key_shift_lock;
 	devcb_write_line                m_rxd_cb;
 
 	bool    m_txd_high;

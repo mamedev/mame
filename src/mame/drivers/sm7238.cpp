@@ -11,6 +11,7 @@
     - graphics options
     - colors
     - document hardware and ROM variants, verify if pixel stretching is done
+    - verify blink frequency
 
 ****************************************************************************/
 
@@ -21,26 +22,27 @@
 #include "machine/bankdev.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
-#include "machine/pit8253.h"
-#include "machine/pic8259.h"
 #include "machine/km035.h"
 #include "machine/nvram.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
+
 #include "emupal.h"
 #include "screen.h"
 
 
+static constexpr int KSM_COLUMNS_MAX = 132;
+
+static constexpr int KSM_TOTAL_HORZ = KSM_COLUMNS_MAX * 10;
+static constexpr int KSM_DISP_HORZ = KSM_COLUMNS_MAX * 8;
+
+static constexpr int KSM_TOTAL_VERT = 260;
+static constexpr int KSM_DISP_VERT = 250;
+
+
 //#define VERBOSE (LOG_DEBUG)
-//#define LOG_OUTPUT_FUNC printf
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
-
-
-#define KSM_COLUMNS_MAX 132
-
-#define KSM_TOTAL_HORZ (KSM_COLUMNS_MAX*10)
-#define KSM_DISP_HORZ  (KSM_COLUMNS_MAX*8)
-
-#define KSM_TOTAL_VERT 260
-#define KSM_DISP_VERT  250
 
 
 class sm7238_state : public driver_device
@@ -68,17 +70,15 @@ public:
 		, m_screen(*this, "screen")
 	{ }
 
-	static constexpr feature_type unemulated_features() { return feature::KEYBOARD; }
-
 	void sm7238(machine_config &config);
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_printer_clock);
 
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(text_control_w);
-	DECLARE_WRITE8_MEMBER(vmem_w);
+	void control_w(uint8_t data);
+	void text_control_w(uint8_t data);
+	void vmem_w(offs_t offset, uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -90,15 +90,15 @@ private:
 
 	struct
 	{
-		uint8_t control;
-		uint16_t ptr;
-		int stride;
-		bool reverse;
+		uint8_t control = 0;
+		uint16_t ptr = 0;
+		int stride = 0;
+		bool reverse = false;
 	} m_video;
 
 	virtual void machine_reset() override;
-	virtual void video_start() override;
-	required_device<cpu_device> m_maincpu;
+
+	required_device<i8080_cpu_device> m_maincpu;
 	required_device<nvram_device> m_nvram;
 	required_device<address_map_bank_device> m_videobank;
 	required_shared_ptr<u8> m_p_videoram;
@@ -156,17 +156,13 @@ void sm7238_state::machine_reset()
 	m_videobank->set_bank(0);
 }
 
-void sm7238_state::video_start()
-{
-}
-
-WRITE8_MEMBER(sm7238_state::control_w)
+void sm7238_state::control_w(uint8_t data)
 {
 	LOG("Control Write: %02xh: lut %d nvram %d c2 %d iack %d\n",
 		data, BIT(data, 0), BIT(data, 2), BIT(data, 3), BIT(data, 5));
 }
 
-WRITE8_MEMBER(sm7238_state::text_control_w)
+void sm7238_state::text_control_w(uint8_t data)
 {
 	if (data ^ m_video.control)
 	{
@@ -189,7 +185,7 @@ WRITE8_MEMBER(sm7238_state::text_control_w)
 	m_video.control = data;
 }
 
-WRITE8_MEMBER(sm7238_state::vmem_w)
+void sm7238_state::vmem_w(offs_t offset, uint8_t data)
 {
 	m_p_videoram[offset] = data;
 	m_p_videoram[offset + 0x1000] = data;
@@ -228,30 +224,30 @@ void sm7238_state::recompute_parameters()
 
 uint32_t sm7238_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y, ra, gfx, fg, bg, attr, ctl1, ctl2 = 0;
-	uint16_t chr, chraddr, sy = 0, ma = 0, x = 0;
-	bool double_width = false, double_height = false, bottom_half = false;
-	bool blink((m_screen->frame_number() % 30) > 14); // XXX guess
-
 	if (!BIT(m_video.control, 3))
 	{
 		bitmap.fill(0);
 		return 0;
 	}
 
-	for (y = 0; y < 26; y++)
+	uint8_t ctl2 = 0;
+	uint16_t sy = 0, ma = 0;
+	bool double_width = false, double_height = false, bottom_half = false;
+	bool blink((m_screen->frame_number() % 30) > 14);
+
+	for (uint8_t y = 0; y < 26; y++)
 	{
-		for (ra = 0; ra < 10; ra++)
+		for (uint8_t ra = 0; ra < 10; ra++)
 		{
 			if (y == 1 && ctl2 && ra < ctl2)
 				continue;
 
-			uint16_t *p = &bitmap.pix16(sy++, 0);
+			uint16_t *p = &bitmap.pix(sy++, 0);
 
-			for (x = ma; x < ma + m_video.stride; x++)
+			for (uint16_t x = ma; x < ma + m_video.stride; x++)
 			{
-				chr = m_p_videoram[x] << 4;
-				attr = m_p_videoram[x + 0x1000];
+				uint16_t chr = m_p_videoram[x] << 4;
+				uint8_t const attr = m_p_videoram[x + 0x1000];
 
 				// alternate font 1
 				if (BIT(attr, 6))
@@ -259,9 +255,10 @@ uint32_t sm7238_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 					chr += 0x1000;
 				}
 
-				bg = 0;
-				fg = 1;
+				uint8_t bg = 0;
+				uint8_t fg = 1;
 
+				uint16_t chraddr;
 				if (double_height)
 				{
 					chraddr = chr | (bottom_half ? (5 + (ra >> 1)) : (ra >> 1));
@@ -272,6 +269,7 @@ uint32_t sm7238_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 				}
 
 				// alternate font 2 (downloadable font) -- only in models .05 and .06
+				uint8_t gfx;
 				if (BIT(attr, 7) && m_p_charram[chr + 15])
 				{
 					gfx = m_p_charram[chraddr] ^ 255;
@@ -318,7 +316,7 @@ uint32_t sm7238_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 				if (double_width) x++;
 			}
 		}
-		ctl1 = m_p_videoram[ma + 0x1000 + m_video.stride];
+		uint8_t const ctl1 = m_p_videoram[ma + 0x1000 + m_video.stride];
 		double_width = BIT(ctl1, 6);
 		double_height = BIT(ctl1, 7);
 		bottom_half = BIT(ctl1, 5);
@@ -354,10 +352,10 @@ GFXDECODE_END
 
 void sm7238_state::sm7238(machine_config &config)
 {
-	I8080(config, m_maincpu, 16.5888_MHz_XTAL/9);
+	I8080(config, m_maincpu, 16.5888_MHz_XTAL / 9);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sm7238_state::sm7238_mem);
 	m_maincpu->set_addrmap(AS_IO, &sm7238_state::sm7238_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
+	m_maincpu->in_inta_func().set("pic8259", FUNC(pic8259_device::acknowledge));
 
 	ADDRESS_MAP_BANK(config, "videobank").set_map(&sm7238_state::videobank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);
 
@@ -376,19 +374,19 @@ void sm7238_state::sm7238(machine_config &config)
 	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
 	PIT8253(config, m_t_hblank, 0);
-	m_t_hblank->set_clk<1>(16.384_MHz_XTAL/9); // XXX workaround -- keyboard is slower and doesn't sync otherwise
+	m_t_hblank->set_clk<1>(16.384_MHz_XTAL / 9); // FIXME -- keyboard is slower and doesn't sync otherwise
 	m_t_hblank->out_handler<1>().set(FUNC(sm7238_state::write_keyboard_clock));
 
 	PIT8253(config, m_t_vblank, 0);
-	m_t_vblank->set_clk<2>(16.5888_MHz_XTAL/9);
+	m_t_vblank->set_clk<2>(16.5888_MHz_XTAL / 9);
 	m_t_vblank->out_handler<2>().set(FUNC(sm7238_state::write_printer_clock));
 
 	PIT8253(config, m_t_color, 0);
 
 	PIT8253(config, m_t_iface, 0);
-	m_t_iface->set_clk<1>(16.5888_MHz_XTAL/9);
+	m_t_iface->set_clk<1>(16.5888_MHz_XTAL / 9);
 	m_t_iface->out_handler<1>().set(m_i8251line, FUNC(i8251_device::write_txc));
-	m_t_iface->set_clk<2>(16.5888_MHz_XTAL/9);
+	m_t_iface->set_clk<2>(16.5888_MHz_XTAL / 9);
 	m_t_iface->out_handler<2>().set(m_i8251line, FUNC(i8251_device::write_rxc));
 
 	// serial connection to host

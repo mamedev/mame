@@ -3,13 +3,15 @@
 
 [![Join the chat at https://gitter.im/mamedev/mame](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mamedev/mame?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-Build status for tiny build only, containing just core parts of project:
+Build status:
 
-| OS/Compiler        | Status           | 
+| OS/Compiler   | Status        | 
 | ------------- |:-------------:| 
-|Linux GCC / OSX Clang| [![Build Status](https://travis-ci.org/mamedev/mame.svg?branch=master)](https://travis-ci.org/mamedev/mame) |
-|Windows MinGW | [![Build Status](https://tea-ci.org/api/badges/mamedev/mame/status.svg)](https://tea-ci.org/mamedev/mame) |
-|Windows MSVC | [![Build status](https://ci.appveyor.com/api/projects/status/te0qy56b72tp5kmo?svg=true)](https://ci.appveyor.com/project/startaq/mame) |
+| Linux/GCC and clang | ![CI (Linux)](https://github.com/mamedev/mame/workflows/CI%20(Linux)/badge.svg) |
+| Windows/MinGW GCC | ![CI (Windows)](https://github.com/mamedev/mame/workflows/CI%20(Windows)/badge.svg) |
+| macOS/clang | ![CI (macOS)](https://github.com/mamedev/mame/workflows/CI%20(macOS)/badge.svg) |
+| UI Translations | ![Compile UI translations](https://github.com/mamedev/mame/workflows/Compile%20UI%20translations/badge.svg) |
+| Documentation | ![Build documentation](https://github.com/mamedev/mame/workflows/Build%20documentation/badge.svg) |
 
 Static analysis status for entire build (except for third-party parts of project):
 
@@ -25,7 +27,7 @@ MAME's purpose is to preserve decades of software history. As electronic technol
 How to compile?
 ===============
 
-If you're on a *NIX or OSX system, it could be as easy as typing
+If you're on a UNIX-like system (including Linux and macOS), it could be as easy as typing
 
 ```
 make
@@ -43,11 +45,11 @@ for an arcade-only build, or
 make SUBTARGET=mess
 ```
 
-for MESS build.
+for a MESS build.
 
-See the [Compiling MAME](http://docs.mamedev.org/initialsetup/compilingmame.html) page on our documentation site for more information, including prerequisites for Mac OS X and popular Linux distributions.
+See the [Compiling MAME](http://docs.mamedev.org/initialsetup/compilingmame.html) page on our documentation site for more information, including prerequisites for macOS and popular Linux distributions.
 
-For recent versions of OSX you need to install [Xcode](https://developer.apple.com/xcode/) including command-line tools and [SDL 2.0](https://www.libsdl.org/download-2.0.php).
+For recent versions of macOS you need to install [Xcode](https://developer.apple.com/xcode/) including command-line tools and [SDL 2.0](https://www.libsdl.org/download-2.0.php).
 
 For Windows users, we provide a ready-made [build environment](http://mamedev.org/tools/) based on MinGW-w64.
 
@@ -55,19 +57,19 @@ Visual Studio builds are also possible, but you still need [build environment](h
 In order to generate solution and project files just run:
 
 ```
-make vs2017
+make vs2019
 ```
 or use this command to build it directly using msbuild
 
 ```
-make vs2017 MSBUILD=1
+make vs2019 MSBUILD=1
 ```
 
 
 Where can I find out more?
 =============
 
-* [Official MAME Development Team Site](http://mamedev.org/) (includes binary downloads for MAME and MESS, wiki, forums, and more)
+* [Official MAME Development Team Site](http://mamedev.org/) (includes binary downloads, wiki, forums, and more)
 * [Official MESS Wiki](http://mess.redump.net/)
 * [MAME Testers](http://mametesters.org/) (official bug tracker for MAME and MESS)
 
@@ -85,28 +87,31 @@ All contributors need to either add a standard header for license info (on new f
 
 License
 =======
-The MAME project as a whole is distributed under the terms of the [GNU General Public License, version 2](http://opensource.org/licenses/GPL-2.0) or later (GPL-2.0+), since it contains code made available under multiple GPL-compatible licenses. A great majority of files (over 90% including core files) are under the [BSD-3-Clause License](http://opensource.org/licenses/BSD-3-Clause) and we would encourage new contributors to distribute files under this license.
+The MAME project as a whole is made available under the terms of the
+[GNU General Public License, version 2](http://opensource.org/licenses/GPL-2.0)
+or later (GPL-2.0+), since it contains code made available under multiple
+GPL-compatible licenses.  A great majority of the source files (over 90%
+including core files) are made available under the terms of the
+[3-clause BSD License](http://opensource.org/licenses/BSD-3-Clause), and we
+would encourage new contributors to make their contributions available under the
+terms of this license.
 
-Please note that MAME is a registered trademark of Gregory Ember, and permission is required to use the "MAME" name, logo, or wordmark.
+Please note that MAME is a registered trademark of Gregory Ember, and permission
+is required to use the "MAME" name, logo, or wordmark.
 
 <a href="http://opensource.org/licenses/GPL-2.0" target="_blank">
 <img align="right" src="http://opensource.org/trademarks/opensource/OSI-Approved-License-100x137.png">
 </a>
 
-    Copyright (C) 1997-2020  MAMEDev and contributors
+    Copyright (C) 1997-2021  MAMEDev and contributors
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License version 2, as provided in
+    docs/legal/GPL-2.0.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    This program is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+    more details.
 
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-
-Please see [LICENSE.md](LICENSE.md) for further details.
+Please see COPYING for more details.

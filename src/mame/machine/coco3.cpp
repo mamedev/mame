@@ -50,12 +50,12 @@
 //  ff20_write
 //-------------------------------------------------
 
-WRITE8_MEMBER( coco3_state::ff20_write )
+void coco3_state::ff20_write(offs_t offset, uint8_t data)
 {
-	coco_state::ff20_write(space, offset, data, mem_mask);
+	coco_state::ff20_write(offset, data);
 
-	if (offset == 0x02)
-		m_gime->ff22_write(data);
+	/* The GIME monitors writes to the PIA to simulate a VDG */
+	m_gime->pia_write(offset, data);
 }
 
 
@@ -64,11 +64,11 @@ WRITE8_MEMBER( coco3_state::ff20_write )
 //  ff40_read
 //-------------------------------------------------
 
-READ8_MEMBER( coco3_state::ff40_read )
+uint8_t coco3_state::ff40_read(offs_t offset)
 {
 	uint8_t result = 0x00;
 	if (m_gime->spare_chip_select_enabled())
-		result = coco_state::ff40_read(space, offset, mem_mask);
+		result = coco_state::ff40_read(offset);
 	return result;
 }
 
@@ -78,32 +78,10 @@ READ8_MEMBER( coco3_state::ff40_read )
 //  ff40_write
 //-------------------------------------------------
 
-WRITE8_MEMBER( coco3_state::ff40_write )
+void coco3_state::ff40_write(offs_t offset, uint8_t data)
 {
 	if (m_gime->spare_chip_select_enabled())
-		coco_state::ff40_write(space, offset, data, mem_mask);
-}
-
-
-
-//-------------------------------------------------
-//  firq_get_line
-//-------------------------------------------------
-
-bool coco3_state::firq_get_line(void)
-{
-	return coco_state::firq_get_line() || m_gime->firq_r();
-}
-
-
-
-//-------------------------------------------------
-//  irq_get_line
-//-------------------------------------------------
-
-bool coco3_state::irq_get_line(void)
-{
-	return coco_state::irq_get_line() || m_gime->irq_r();
+		coco_state::ff40_write(offset, data);
 }
 
 
@@ -149,20 +127,5 @@ void coco3_state::update_cart_base(uint8_t *cart_base)
 
 uint32_t coco3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bool result;
-	if (!strcmp(screen.tag(), ":" COMPOSITE_SCREEN_TAG))
-	{
-		/* composite screen */
-		result = m_gime->update_composite(bitmap, cliprect);
-	}
-	else if (!strcmp(screen.tag(), ":" RGB_SCREEN_TAG))
-	{
-		/* rgb screen */
-		result = m_gime->update_rgb(bitmap, cliprect);
-	}
-	else
-	{
-		fatalerror("Called screen_update() with invalid tag '%s'\n", screen.tag());
-	}
-	return result;
+	return (m_screen_config->read() & 1) ? m_gime->update_rgb(bitmap, cliprect) : m_gime->update_composite(bitmap, cliprect);
 }

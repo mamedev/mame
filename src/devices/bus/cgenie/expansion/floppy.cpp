@@ -14,7 +14,7 @@
 #include "floppy.h"
 #include "formats/cgenie_dsk.h"
 #include "bus/generic/carts.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 //**************************************************************************
 //  CONSTANTS/MACROS
@@ -38,9 +38,11 @@ void cgenie_fdc_device::mmio(address_map &map)
 	map(0xef, 0xef).mirror(0x10).rw("wd2793", FUNC(wd2793_device::data_r), FUNC(wd2793_device::data_w));
 }
 
-FLOPPY_FORMATS_MEMBER( cgenie_fdc_device::floppy_formats )
-	FLOPPY_CGENIE_FORMAT
-FLOPPY_FORMATS_END
+void cgenie_fdc_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_CGENIE_FORMAT);
+}
 
 static void cgenie_floppies(device_slot_interface &device)
 {
@@ -155,13 +157,15 @@ void cgenie_fdc_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER( cgenie_fdc_device::irq_r )
+uint8_t cgenie_fdc_device::irq_r()
 {
 	uint8_t data = m_irq_status;
 
-	m_irq_status &= ~IRQ_TIMER;
-	m_slot->int_w(m_irq_status ? ASSERT_LINE : CLEAR_LINE);
-
+	if (!machine().side_effects_disabled())
+	{
+		m_irq_status &= ~IRQ_TIMER;
+		m_slot->int_w(m_irq_status ? ASSERT_LINE : CLEAR_LINE);
+	}
 	return data;
 }
 
@@ -177,7 +181,7 @@ DEVICE_IMAGE_LOAD_MEMBER( cgenie_fdc_device::socket_load )
 
 	if (size > 0x1000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported ROM size");
+		image.seterror(image_error::INVALIDIMAGE, "Unsupported ROM size");
 		return image_init_result::FAIL;
 	}
 
@@ -200,7 +204,7 @@ WRITE_LINE_MEMBER( cgenie_fdc_device::intrq_w )
 	m_slot->int_w(m_irq_status ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER( cgenie_fdc_device::select_w )
+void cgenie_fdc_device::select_w(uint8_t data)
 {
 	if (VERBOSE)
 		logerror("cgenie_fdc_device::motor_w: 0x%02x\n", data);
@@ -221,7 +225,7 @@ WRITE8_MEMBER( cgenie_fdc_device::select_w )
 	}
 }
 
-WRITE8_MEMBER( cgenie_fdc_device::command_w )
+void cgenie_fdc_device::command_w(uint8_t data)
 {
 	// density select is encoded into this pseudo-command
 	if ((data & 0xfe) == 0xfe)

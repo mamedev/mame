@@ -43,30 +43,30 @@ void kopunch_state::kopunch_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(kopunch_state::vram_fg_w)
+void kopunch_state::vram_fg_w(offs_t offset, uint8_t data)
 {
 	m_vram_fg[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(kopunch_state::vram_bg_w)
+void kopunch_state::vram_bg_w(offs_t offset, uint8_t data)
 {
 	m_vram_bg[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(kopunch_state::scroll_x_w)
+void kopunch_state::scroll_x_w(uint8_t data)
 {
 	m_scrollx = data;
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
-WRITE8_MEMBER(kopunch_state::scroll_y_w)
+void kopunch_state::scroll_y_w(uint8_t data)
 {
 	m_bg_tilemap->set_scrolly(0, data);
 }
 
-WRITE8_MEMBER(kopunch_state::gfxbank_w)
+void kopunch_state::gfxbank_w(uint8_t data)
 {
 	// d0-d2: bg gfx bank
 	if (m_gfxbank != (data & 0x07))
@@ -83,7 +83,7 @@ TILE_GET_INFO_MEMBER(kopunch_state::get_fg_tile_info)
 {
 	int code = m_vram_fg[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	tileinfo.set(0, code, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(kopunch_state::get_bg_tile_info)
@@ -91,7 +91,7 @@ TILE_GET_INFO_MEMBER(kopunch_state::get_bg_tile_info)
 	// note: highest bit is unused
 	int code = (m_vram_bg[tile_index] & 0x7f) | m_gfxbank << 7;
 
-	SET_TILE_INFO_MEMBER(1, code, 0, 0);
+	tileinfo.set(1, code, 0, 0);
 }
 
 void kopunch_state::video_start()

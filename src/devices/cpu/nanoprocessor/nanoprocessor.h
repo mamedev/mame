@@ -50,6 +50,17 @@
 // The HP manual of Nanoprocessor is available here:
 // http://www.hp9845.net/9845/downloads/manuals/Nanoprocessor.pdf
 // Thanks to anyone who made the manual available.
+//
+// My reverse engineering of Nanoprocessor from mask set
+// https://github.com/fulivi/nanoprocessor_re
+//
+// Mask set is published here
+// http://cpushack.com/2020/08/20/hp-nanoprocessor-mask-set/
+//
+// Ken Shirriff's articles
+// http://www.righto.com/2020/09/inside-hp-nanoprocessor-high-speed.html
+// http://www.righto.com/2020/09/hp-nanoprocessor-part-ii-reverse.html
+//
 #ifndef MAME_CPU_NANOPROCESSOR_NANOPROCESSOR_H
 #define MAME_CPU_NANOPROCESSOR_NANOPROCESSOR_H
 
@@ -71,6 +82,9 @@ public:
 	// Callback to read the input state of DC lines
 	// All lines that are not in input are to be reported at "1"
 	auto read_dc() { return m_read_dc_func.bind(); }
+
+	// Callback to fetch interrupt vector
+	auto int_ack() { return m_int_ack_func.bind(); }
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 2; }
@@ -95,6 +109,8 @@ private:
 
 	devcb_write8 m_dc_changed_func;
 	devcb_read8 m_read_dc_func;
+	devcb_read8 m_int_ack_func;
+
 	int m_icount;
 
 	// State of processor
@@ -105,12 +121,17 @@ private:
 	uint16_t m_reg_ISR; // Interrupt stack register
 	uint16_t m_flags;   // Flags: extend flag (E) & direct control lines (DC0-7)
 
+	// Bits in m_flags
+	static constexpr unsigned NANO_DC0_BIT  = 0;    // DC0
+	static constexpr unsigned NANO_E_BIT    = NANO_DC0_BIT + HP_NANO_DC_NO; // Extend flag
+	static constexpr unsigned NANO_I_BIT    = NANO_E_BIT + 1;   // Interrupt flag
+
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
-	address_space *m_program;
-	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
-	address_space *m_io;
+	memory_access<11, 0, 0, ENDIANNESS_BIG>::cache m_cache;
+	memory_access<11, 0, 0, ENDIANNESS_BIG>::specific m_program;
+	memory_access< 4, 0, 0, ENDIANNESS_BIG>::specific m_io;
 
 	// device_t overrides
 	virtual void device_start() override;

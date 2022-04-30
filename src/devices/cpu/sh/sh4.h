@@ -288,7 +288,7 @@ protected:
 	int m_md[9];
 	int m_clock;
 
-	// hack 1 = Naomi hack, hack 2 = Work in Progress implementation
+	// hack 1 = Naomi hack, hack 2 = WIP implementation
 	int m_mmuhack;
 
 	uint32_t  m_exception_priority[128];
@@ -377,8 +377,7 @@ protected:
 
 	//void    (*m_ftcsr_read_callback)(uint32_t data);
 
-	/* This MMU simulation is good for the simple remap used on Naomi GD-ROM SQ access *ONLY* */
-	uint8_t m_sh4_mmu_enabled;
+	bool m_sh4_mmu_enabled;
 
 	// sh3 internal
 	uint32_t  m_sh3internal_upper[0x3000/4];
@@ -682,11 +681,11 @@ private:
 class sh3_base_device : public sh34_base_device
 {
 public:
-	DECLARE_WRITE32_MEMBER( sh3_internal_w );
-	DECLARE_READ32_MEMBER( sh3_internal_r );
+	void sh3_internal_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t sh3_internal_r(offs_t offset, uint32_t mem_mask = ~0);
 
-	DECLARE_WRITE32_MEMBER( sh3_internal_high_w );
-	DECLARE_READ32_MEMBER( sh3_internal_high_r );
+	void sh3_internal_high_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t sh3_internal_high_r(offs_t offset, uint32_t mem_mask = ~0);
 
 	void sh3_internal_map(address_map &map);
 protected:
@@ -700,15 +699,15 @@ protected:
 class sh4_base_device : public sh34_base_device
 {
 public:
-	DECLARE_WRITE32_MEMBER( sh4_internal_w );
-	DECLARE_READ32_MEMBER( sh4_internal_r );
+	void sh4_internal_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t sh4_internal_r(offs_t offset, uint32_t mem_mask = ~0);
 
-	DECLARE_READ64_MEMBER( sh4_utlb_address_array_r );
-	DECLARE_WRITE64_MEMBER( sh4_utlb_address_array_w );
-	DECLARE_READ64_MEMBER( sh4_utlb_data_array1_r );
-	DECLARE_WRITE64_MEMBER( sh4_utlb_data_array1_w );
-	DECLARE_READ64_MEMBER( sh4_utlb_data_array2_r );
-	DECLARE_WRITE64_MEMBER( sh4_utlb_data_array2_w );
+	uint64_t sh4_utlb_address_array_r(offs_t offset);
+	void sh4_utlb_address_array_w(offs_t offset, uint64_t data);
+	uint64_t sh4_utlb_data_array1_r(offs_t offset);
+	void sh4_utlb_data_array1_w(offs_t offset, uint64_t data);
+	uint64_t sh4_utlb_data_array2_r(offs_t offset);
+	void sh4_utlb_data_array2_w(offs_t offset, uint64_t data);
 
 	virtual void LDTLB(const uint16_t opcode) override;
 

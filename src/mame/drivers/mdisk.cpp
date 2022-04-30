@@ -55,7 +55,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(uart1_txrdy_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_motor_w);
-	DECLARE_WRITE8_MEMBER(fdc_side_w);
+	void fdc_side_w(uint8_t data);
 
 	void update_irq(uint8_t vector);
 
@@ -116,7 +116,7 @@ WRITE_LINE_MEMBER(mdisk_state::fdc_motor_w)
 	if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->mon_w(!state);
 }
 
-WRITE8_MEMBER(mdisk_state::fdc_side_w)
+void mdisk_state::fdc_side_w(uint8_t data)
 {
 	if (m_floppy[0]->get_device()) m_floppy[0]->get_device()->ss_w(BIT(data, 0));
 	if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->ss_w(BIT(data, 0));
@@ -130,7 +130,7 @@ WRITE8_MEMBER(mdisk_state::fdc_side_w)
 void mdisk_state::machine_start()
 {
 	// timer to switch rom to ram
-	m_rom_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mdisk_state::rom_timer_callback), this), nullptr);
+	m_rom_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mdisk_state::rom_timer_callback), this));
 
 	// register for save states
 	save_item(NAME(m_uart1_rxrdy));
@@ -242,8 +242,8 @@ void mdisk_state::mdisk(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(mdisk_state::fdc_irq_w));
 	m_fdc->drq_wr_callback().set_inputline(m_cpu, INPUT_LINE_NMI);
 	m_fdc->hdl_wr_callback().set(FUNC(mdisk_state::fdc_motor_w));
-	FLOPPY_CONNECTOR(config, m_floppy[0], mdisk_floppies, "525qd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[1], mdisk_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], mdisk_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], mdisk_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 }
 
 

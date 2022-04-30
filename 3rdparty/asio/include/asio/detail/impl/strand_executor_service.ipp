@@ -2,7 +2,7 @@
 // detail/impl/strand_executor_service.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -40,8 +40,11 @@ void strand_executor_service::shutdown()
   strand_impl* impl = impl_list_;
   while (impl)
   {
+    impl->mutex_->lock();
+    impl->shutdown_ = true;
     ops.push(impl->waiting_queue_);
     ops.push(impl->ready_queue_);
+    impl->mutex_->unlock();
     impl = impl->next_;
   }
 }
@@ -51,6 +54,7 @@ strand_executor_service::create_implementation()
 {
   implementation_type new_impl(new strand_impl);
   new_impl->locked_ = false;
+  new_impl->shutdown_ = false;
 
   asio::detail::mutex::scoped_lock lock(mutex_);
 
@@ -92,7 +96,13 @@ bool strand_executor_service::enqueue(const implementation_type& impl,
     scheduler_operation* op)
 {
   impl->mutex_->lock();
-  if (impl->locked_)
+  if (impl->shutdown_)
+  {
+    impl->mutex_->unlock();
+    op->destroy();
+    return false;
+  }
+  else if (impl->locked_)
   {
     // Some other function already holds the strand lock. Enqueue for later.
     impl->waiting_queue_.push(op);
@@ -114,6 +124,30 @@ bool strand_executor_service::running_in_this_thread(
     const implementation_type& impl)
 {
   return !!call_stack<strand_impl>::contains(impl.get());
+}
+
+bool strand_executor_service::push_waiting_to_ready(implementation_type& impl)
+{
+  impl->mutex_->lock();
+  impl->ready_queue_.push(impl->waiting_queue_);
+  bool more_handlers = impl->locked_ = !impl->ready_queue_.empty();
+  impl->mutex_->unlock();
+  return more_handlers;
+}
+
+void strand_executor_service::run_ready_handlers(implementation_type& impl)
+{
+  // Indicate that this strand is executing on the current thread.
+  call_stack<strand_impl>::context ctx(impl.get());
+
+  // Run all ready handlers. No lock is required since the ready queue is
+  // accessed only within the strand.
+  asio::error_code ec;
+  while (scheduler_operation* o = impl->ready_queue_.front())
+  {
+    impl->ready_queue_.pop();
+    o->complete(impl.get(), ec, 0);
+  }
 }
 
 } // namespace detail

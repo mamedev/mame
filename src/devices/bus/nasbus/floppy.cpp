@@ -24,9 +24,11 @@
 
 DEFINE_DEVICE_TYPE(NASCOM_FDC, nascom_fdc_device, "nascom_fdc", "Nascom Floppy Disc Controller")
 
-FLOPPY_FORMATS_MEMBER( nascom_fdc_device::floppy_formats )
-	FLOPPY_NASCOM_FORMAT
-FLOPPY_FORMATS_END
+void nascom_fdc_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_NASCOM_FORMAT);
+}
 
 static void nascom_floppies(device_slot_interface &device)
 {
@@ -90,8 +92,8 @@ void nascom_fdc_device::device_start()
 void nascom_fdc_device::device_reset()
 {
 	io_space().install_readwrite_handler(0xe0, 0xe3, read8sm_delegate(*m_fdc, FUNC(fd1793_device::read)), write8sm_delegate(*m_fdc, FUNC(fd1793_device::write)));
-	io_space().install_readwrite_handler(0xe4, 0xe4, read8_delegate(*this, FUNC(nascom_fdc_device::select_r)), write8_delegate(*this, FUNC(nascom_fdc_device::select_w)));
-	io_space().install_read_handler(0xe5, 0xe5, read8_delegate(*this, FUNC(nascom_fdc_device::status_r)));
+	io_space().install_readwrite_handler(0xe4, 0xe4, read8smo_delegate(*this, FUNC(nascom_fdc_device::select_r)), write8smo_delegate(*this, FUNC(nascom_fdc_device::select_w)));
+	io_space().install_read_handler(0xe5, 0xe5, read8smo_delegate(*this, FUNC(nascom_fdc_device::status_r)));
 }
 
 //-------------------------------------------------
@@ -130,7 +132,7 @@ TIMER_CALLBACK_MEMBER( nascom_fdc_device::motor_off )
 		m_floppy3->get_device()->mon_w(1);
 }
 
-READ8_MEMBER( nascom_fdc_device::select_r )
+uint8_t nascom_fdc_device::select_r()
 {
 	m_select |= (0x80 | 0x20);
 
@@ -154,7 +156,7 @@ READ8_MEMBER( nascom_fdc_device::select_r )
 	return m_select;
 }
 
-WRITE8_MEMBER( nascom_fdc_device::select_w )
+void nascom_fdc_device::select_w(uint8_t data)
 {
 	if (VERBOSE)
 		logerror("nascom_fdc_device::select_w: 0x%02x\n", data);
@@ -182,7 +184,7 @@ WRITE8_MEMBER( nascom_fdc_device::select_w )
 	m_select = data;
 }
 
-READ8_MEMBER( nascom_fdc_device::status_r )
+uint8_t nascom_fdc_device::status_r()
 {
 	uint8_t data = 0;
 

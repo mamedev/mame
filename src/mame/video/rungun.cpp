@@ -25,7 +25,7 @@ TILE_GET_INFO_MEMBER(rungun_state::ttl_get_tile_info)
 	attr = (lvram[BYTE_XOR_LE(tile_index<<2)] & 0xf0) >> 4;
 	code = ((lvram[BYTE_XOR_LE(tile_index<<2)] & 0x0f) << 8) | (lvram[BYTE_XOR_LE((tile_index<<2)+2)]);
 
-	SET_TILE_INFO_MEMBER(m_ttl_gfx_index, code, attr, 0);
+	tileinfo.set(m_ttl_gfx_index, code, attr, 0);
 }
 
 K055673_CB_MEMBER(rungun_state::sprite_callback)
@@ -33,24 +33,24 @@ K055673_CB_MEMBER(rungun_state::sprite_callback)
 	*color = m_sprite_colorbase | (*color & 0x001f);
 }
 
-READ16_MEMBER(rungun_state::ttl_ram_r)
+uint16_t rungun_state::ttl_ram_r(offs_t offset)
 {
 	return m_ttl_vram[offset+(m_video_mux_bank*0x1000)];
 }
 
-WRITE16_MEMBER(rungun_state::ttl_ram_w)
+void rungun_state::ttl_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ttl_vram[offset+(m_video_mux_bank*0x1000)]);
 	m_ttl_tilemap[m_video_mux_bank]->mark_tile_dirty(offset / 2);
 }
 
 /* 53936 (PSAC2) rotation/zoom plane */
-READ16_MEMBER(rungun_state::psac2_videoram_r)
+uint16_t rungun_state::psac2_videoram_r(offs_t offset)
 {
 	return m_psac2_vram[offset+(m_video_mux_bank*0x80000)];
 }
 
-WRITE16_MEMBER(rungun_state::psac2_videoram_w)
+void rungun_state::psac2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_psac2_vram[offset+(m_video_mux_bank*0x80000)]);
 	m_936_tilemap[m_video_mux_bank]->mark_tile_dirty(offset / 2);
@@ -65,7 +65,7 @@ TILE_GET_INFO_MEMBER(rungun_state::get_rng_936_tile_info)
 	flipx = (m_psac2_vram[tile_index * 2 + 1 + base_addr] & 0xc000) >> 14;
 	colour = 0x10 + (m_psac2_vram[tile_index * 2 + base_addr] & 0x000f);
 
-	SET_TILE_INFO_MEMBER(0, tileno, colour, TILE_FLIPYX(flipx));
+	tileinfo.set(0, tileno, colour, TILE_FLIPYX(flipx));
 }
 
 
@@ -154,7 +154,7 @@ uint32_t rungun_state::screen_update_rng_dual_left(screen_device &screen, bitmap
 	return 0;
 }
 
-// this depends upon the fisrt screen being updated, and the bitmap being copied to the temp bitmap
+// this depends upon the first screen being updated, and the bitmap being copied to the temp bitmap
 uint32_t rungun_state::screen_update_rng_dual_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap( bitmap, m_rng_dual_demultiplex_right_temp, 0, 0, 0, 0, cliprect);

@@ -11,16 +11,17 @@
 #pragma once
 
 #include "cpu/dsp16/dsp16.h"
+#include "dirom.h"
 
 
-class qsound_hle_device : public device_t, public device_sound_interface, public device_rom_interface
+class qsound_hle_device : public device_t, public device_sound_interface, public device_rom_interface<24>
 {
 public:
 	// default 60MHz clock (divided by 2 for DSP core clock, and then by 1248 for sample rate)
 	qsound_hle_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 60'000'000);
 
-	DECLARE_WRITE8_MEMBER(qsound_w);
-	DECLARE_READ8_MEMBER(qsound_r);
+	void qsound_w(offs_t offset, uint8_t data);
+	uint8_t qsound_r();
 
 protected:
 	// device_t implementation
@@ -29,7 +30,7 @@ protected:
 	virtual void device_reset() override;
 
 	// device_sound_interface implementation
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// device_rom_interface implementation
 	virtual void rom_bank_updated() override;

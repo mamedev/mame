@@ -47,11 +47,11 @@ public:
 protected:
 	struct atarisy4_polydata
 	{
-		uint16_t color;
-		uint16_t *screen_ram;
+		uint16_t color = 0;
+		uint16_t *screen_ram = nullptr;
 	};
 
-	class atarisy4_renderer : public poly_manager<float, atarisy4_polydata, 2, 8192>
+	class atarisy4_renderer : public poly_manager<float, atarisy4_polydata, 2, POLY_FLAG_NO_WORK_QUEUE>
 	{
 	public:
 		atarisy4_renderer(atarisy4_state &state, screen_device &screen);
@@ -69,64 +69,64 @@ protected:
 		uint32_t xy_to_screen_addr(uint32_t x, uint32_t y) const;
 
 		/* Memory-mapped registers */
-		uint16_t gr[8];   /* Command parameters */
+		uint16_t gr[8]{};   /* Command parameters */
 
-		uint16_t bcrw;    /* Screen buffer W control */
-		uint16_t bcrx;    /* Screen buffer X control */
-		uint16_t bcry;    /* Screen buffer Y control */
-		uint16_t bcrz;    /* Screen buffer Z control */
-		uint16_t psrw;
-		uint16_t psrx;
-		uint16_t psry;
-		uint16_t psrz;
+		uint16_t bcrw = 0;    /* Screen buffer W control */
+		uint16_t bcrx = 0;    /* Screen buffer X control */
+		uint16_t bcry = 0;    /* Screen buffer Y control */
+		uint16_t bcrz = 0;    /* Screen buffer Z control */
+		uint16_t psrw = 0;
+		uint16_t psrx = 0;
+		uint16_t psry = 0;
+		uint16_t psrz = 0;
 
-		uint16_t dpr;
-		uint16_t ctr;
-		uint16_t lfr;
-		uint16_t ifr;
-		uint16_t ecr;     /* Execute command register */
-		uint16_t far;
-		uint16_t mcr;     /* Interrupt control */
-		uint16_t qlr;
-		uint16_t qar;
+		uint16_t dpr = 0;
+		uint16_t ctr = 0;
+		uint16_t lfr = 0;
+		uint16_t ifr = 0;
+		uint16_t ecr = 0;     /* Execute command register */
+		uint16_t far = 0;
+		uint16_t mcr = 0;     /* Interrupt control */
+		uint16_t qlr = 0;
+		uint16_t qar = 0;
 
-		uint16_t dhr;     /* Scanline counter */
-		uint16_t dlr;
+		uint16_t dhr = 0;     /* Scanline counter */
+		uint16_t dlr = 0;
 
 		/* Others */
-		uint16_t idr;
-		uint16_t icd;
+		uint16_t idr = 0;
+		uint16_t icd = 0;
 
-		uint8_t  transpose;
-		uint8_t  vblank_wait;
+		uint8_t  transpose = 0;
+		uint8_t  vblank_wait = 0;
 
 		/* Polygon points */
 		struct
 		{
-			int16_t x;
-			int16_t y;
+			int16_t x = 0;
+			int16_t y = 0;
 		} points[16];
 
-		uint16_t pt_idx;
-		bool   poly_open;
+		uint16_t pt_idx = 0;
+		bool   poly_open = false;
 
-		uint16_t clip_min_x;
-		uint16_t clip_max_x;
-		uint16_t clip_min_y;
-		uint16_t clip_max_y;
+		uint16_t clip_min_x = 0;
+		uint16_t clip_max_x = 0;
+		uint16_t clip_min_y = 0;
+		uint16_t clip_max_y = 0;
 	};
 
-	DECLARE_WRITE16_MEMBER(gpu_w);
-	DECLARE_READ16_MEMBER(gpu_r);
-	DECLARE_READ16_MEMBER(m68k_shared_0_r);
-	DECLARE_WRITE16_MEMBER(m68k_shared_0_w);
-	DECLARE_READ16_MEMBER(m68k_shared_1_r);
-	DECLARE_WRITE16_MEMBER(m68k_shared_1_w);
-	DECLARE_READ16_MEMBER(dsp0_status_r);
-	DECLARE_WRITE16_MEMBER(dsp0_control_w);
+	void gpu_w(offs_t offset, uint16_t data);
+	uint16_t gpu_r(offs_t offset);
+	uint16_t m68k_shared_0_r(offs_t offset);
+	void m68k_shared_0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t m68k_shared_1_r(offs_t offset);
+	void m68k_shared_1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t dsp0_status_r();
+	void dsp0_control_w(uint16_t data);
 	DECLARE_READ_LINE_MEMBER(dsp0_bio_r);
-	DECLARE_WRITE16_MEMBER(dsp0_bank_w);
-	DECLARE_READ16_MEMBER(analog_r);
+	void dsp0_bank_w(uint16_t data);
+	uint16_t analog_r();
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -151,8 +151,8 @@ protected:
 
 	required_memory_bank m_dsp0_bank1;
 
-	uint16_t m_dsp_bank[2];
-	uint8_t m_csr[2];
+	uint16_t m_dsp_bank[2]{};
+	uint8_t m_csr[2]{};
 	std::unique_ptr<uint16_t[]> m_shared_ram[2];
 
 private:
@@ -168,9 +168,9 @@ private:
 
 	gpu m_gpu;
 
-	uint8_t m_r_color_table[256];
-	uint8_t m_g_color_table[256];
-	uint8_t m_b_color_table[256];
+	uint8_t m_r_color_table[256]{};
+	uint8_t m_g_color_table[256]{};
+	uint8_t m_b_color_table[256]{};
 };
 
 
@@ -189,10 +189,10 @@ public:
 	void airrace(machine_config &config);
 
 protected:
-	DECLARE_READ16_MEMBER(dsp1_status_r);
-	DECLARE_WRITE16_MEMBER(dsp1_control_w);
+	uint16_t dsp1_status_r();
+	void dsp1_control_w(uint16_t data);
 	DECLARE_READ_LINE_MEMBER(dsp1_bio_r);
-	DECLARE_WRITE16_MEMBER(dsp1_bank_w);
+	void dsp1_bank_w(uint16_t data);
 
 	virtual void machine_reset() override;
 
@@ -214,7 +214,7 @@ private:
  *************************************/
 
 atarisy4_state::atarisy4_renderer::atarisy4_renderer(atarisy4_state &state, screen_device &screen) :
-	poly_manager<float, atarisy4_polydata, 2, 8192>(screen, FLAG_NO_WORK_QUEUE),
+	poly_manager<float, atarisy4_polydata, 2, POLY_FLAG_NO_WORK_QUEUE>(screen.machine()),
 	m_state(state)
 {
 }
@@ -231,7 +231,6 @@ void atarisy4_state::video_reset()
 
 uint32_t atarisy4_state::screen_update_atarisy4(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int y;
 	uint32_t offset = 0;
 
 	if (m_gpu.bcrw & 0x80)
@@ -245,15 +244,14 @@ uint32_t atarisy4_state::screen_update_atarisy4(screen_device &screen, bitmap_rg
 
 	//uint32_t offset = m_gpu.dpr << 5;
 
-	for (y = cliprect.top(); y <= cliprect.bottom(); ++y)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); ++y)
 	{
-		uint16_t *src = &m_screen_ram[(offset + (4096 * y)) / 2];
-		uint32_t *dest = &bitmap.pix32(y, cliprect.left());
-		int x;
+		uint16_t const *src = &m_screen_ram[(offset + (4096 * y)) / 2];
+		uint32_t *dest = &bitmap.pix(y, cliprect.left());
 
-		for (x = cliprect.left(); x < cliprect.right(); x += 2)
+		for (int x = cliprect.left(); x < cliprect.right(); x += 2)
 		{
-			uint16_t data = *src++;
+			uint16_t const data = *src++;
 
 			*dest++ = m_palette->pen(data & 0xff);
 			*dest++ = m_palette->pen(data >> 8);
@@ -340,8 +338,8 @@ void atarisy4_state::atarisy4_renderer::draw_scanline(int32_t scanline, const ex
 void atarisy4_state::atarisy4_renderer::draw_polygon(uint16_t color)
 {
 	rectangle clip;
-	vertex_t v1, v2, v3;
-	atarisy4_polydata &extradata = object_data_alloc();
+	vertex_t v1{}, v2{}, v3{};
+	atarisy4_polydata &extradata = object_data().next();
 	render_delegate rd_scan = render_delegate(&atarisy4_renderer::draw_scanline, this);
 
 	clip.set(0, 511, 0, 511);
@@ -361,7 +359,7 @@ void atarisy4_state::atarisy4_renderer::draw_polygon(uint16_t color)
 		v3.x = m_state.m_gpu.points[i].x;
 		v3.y = m_state.m_gpu.points[i].y;
 
-		render_triangle(clip, rd_scan, 1, v1, v2, v3);
+		render_triangle<1>(clip, rd_scan, v1, v2, v3);
 		v2 = v3;
 	}
 }
@@ -518,7 +516,7 @@ void atarisy4_state::execute_gpu_command()
 	}
 }
 
-WRITE16_MEMBER(atarisy4_state::gpu_w)
+void atarisy4_state::gpu_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -565,7 +563,7 @@ WRITE16_MEMBER(atarisy4_state::gpu_w)
 	}
 }
 
-READ16_MEMBER(atarisy4_state::gpu_r)
+uint16_t atarisy4_state::gpu_r(offs_t offset)
 {
 	uint16_t res = 0;
 
@@ -600,7 +598,7 @@ INTERRUPT_GEN_MEMBER(atarisy4_state::vblank_int)
  *
  *************************************/
 
-READ16_MEMBER(atarisy4_state::m68k_shared_0_r)
+uint16_t atarisy4_state::m68k_shared_0_r(offs_t offset)
 {
 	if (!BIT(m_csr[0], 3))
 		return (m_shared_ram[0][offset]);
@@ -608,13 +606,13 @@ READ16_MEMBER(atarisy4_state::m68k_shared_0_r)
 		return 0xffff;
 }
 
-WRITE16_MEMBER(atarisy4_state::m68k_shared_0_w)
+void atarisy4_state::m68k_shared_0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!BIT(m_csr[0], 3))
 		COMBINE_DATA(&m_shared_ram[0][offset]);
 }
 
-READ16_MEMBER(atarisy4_state::m68k_shared_1_r)
+uint16_t atarisy4_state::m68k_shared_1_r(offs_t offset)
 {
 	if (!BIT(m_csr[1], 3))
 		return (m_shared_ram[1][offset]);
@@ -622,18 +620,18 @@ READ16_MEMBER(atarisy4_state::m68k_shared_1_r)
 		return 0xffff;
 }
 
-WRITE16_MEMBER(atarisy4_state::m68k_shared_1_w)
+void atarisy4_state::m68k_shared_1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!BIT(m_csr[1], 3))
 		COMBINE_DATA(&m_shared_ram[1][offset]);
 }
 
-READ16_MEMBER(atarisy4_state::dsp0_status_r)
+uint16_t atarisy4_state::dsp0_status_r()
 {
 	return m_csr[0];
 }
 
-WRITE16_MEMBER(atarisy4_state::dsp0_control_w)
+void atarisy4_state::dsp0_control_w(uint16_t data)
 {
 	m_dsp0->set_input_line(INPUT_LINE_RESET, data & 0x01 ? CLEAR_LINE : ASSERT_LINE);
 	m_dsp0->set_input_line(0, data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
@@ -646,7 +644,7 @@ READ_LINE_MEMBER(atarisy4_state::dsp0_bio_r)
 	return BIT(m_csr[0], 2);
 }
 
-WRITE16_MEMBER(atarisy4_state::dsp0_bank_w)
+void atarisy4_state::dsp0_bank_w(uint16_t data)
 {
 	if (data & 0x4000)
 	{
@@ -662,12 +660,12 @@ WRITE16_MEMBER(atarisy4_state::dsp0_bank_w)
 	m_dsp_bank[0] = data;
 }
 
-READ16_MEMBER(airrace_state::dsp1_status_r)
+uint16_t airrace_state::dsp1_status_r()
 {
 	return m_csr[1];
 }
 
-WRITE16_MEMBER(airrace_state::dsp1_control_w)
+void airrace_state::dsp1_control_w(uint16_t data)
 {
 	m_dsp1->set_input_line(INPUT_LINE_RESET, data & 0x01 ? CLEAR_LINE : ASSERT_LINE);
 	m_dsp1->set_input_line(0, data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
@@ -680,7 +678,7 @@ READ_LINE_MEMBER(airrace_state::dsp1_bio_r)
 	return BIT(m_csr[1], 2);
 }
 
-WRITE16_MEMBER(airrace_state::dsp1_bank_w)
+void airrace_state::dsp1_bank_w(uint16_t data)
 {
 	if (data & 0x4000)
 	{
@@ -769,7 +767,7 @@ void airrace_state::dsp1_io_map(address_map &map)
  *
  *************************************/
 
-READ16_MEMBER(atarisy4_state::analog_r)
+uint16_t atarisy4_state::analog_r()
 {
 	return (m_stick[0]->read() << 8) | m_stick[1]->read();
 }

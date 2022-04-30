@@ -49,7 +49,7 @@ TILE_GET_INFO_MEMBER(atarigt_state::get_alpha_tile_info)
 	uint16_t data = m_alpha_tilemap->basemem_read(tile_index);
 	int code = data & 0xfff;
 	int color = (data >> 12) & 0x0f;
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	tileinfo.set(1, code, color, 0);
 }
 
 
@@ -58,11 +58,11 @@ TILE_GET_INFO_MEMBER(atarigt_state::get_playfield_tile_info)
 	uint16_t data = m_playfield_tilemap->basemem_read(tile_index);
 	int code = (m_playfield_tile_bank << 12) | (data & 0xfff);
 	int color = (data >> 12) & 7;
-	SET_TILE_INFO_MEMBER(0, code, color, (data >> 15) & 1);
+	tileinfo.set(0, code, color, (data >> 15) & 1);
 }
 
 
-TILEMAP_MAPPER_MEMBER(atarigt_state::atarigt_playfield_scan)
+TILEMAP_MAPPER_MEMBER(atarigt_state::playfield_scan)
 {
 	return (((col & 0x40) ^ 0x40) << 6) | ((row & 0x3f) << 6) | (col & 0x3f);
 }
@@ -75,7 +75,7 @@ TILEMAP_MAPPER_MEMBER(atarigt_state::atarigt_playfield_scan)
  *
  *************************************/
 
-VIDEO_START_MEMBER(atarigt_state,atarigt)
+void atarigt_state::video_start()
 {
 	/* blend the playfields and free the temporary one */
 	blend_gfx(0, 2, 0x0f, 0x30);
@@ -103,7 +103,7 @@ VIDEO_START_MEMBER(atarigt_state,atarigt)
  *
  *************************************/
 
-void atarigt_state::atarigt_colorram_w(offs_t address, uint16_t data, uint16_t mem_mask)
+void atarigt_state::colorram_w(offs_t address, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t olddata;
 
@@ -127,7 +127,7 @@ void atarigt_state::atarigt_colorram_w(offs_t address, uint16_t data, uint16_t m
 }
 
 
-uint16_t atarigt_state::atarigt_colorram_r(offs_t address)
+uint16_t atarigt_state::colorram_r(offs_t address)
 {
 	address &= 0x7ffff;
 	return m_colorram[address >> 1];
@@ -141,9 +141,9 @@ uint16_t atarigt_state::atarigt_colorram_r(offs_t address)
  *
  *************************************/
 
-void atarigt_state::scanline_update(screen_device &screen, int scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(atarigt_state::scanline_update)
 {
-	int i;
+	int scanline = param;
 
 	/* keep in range */
 	int offset = ((scanline & ~7) << 3) + 48;
@@ -151,7 +151,7 @@ void atarigt_state::scanline_update(screen_device &screen, int scanline)
 		return;
 
 	/* update the playfield scrolls */
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		uint16_t word = m_alpha_tilemap->basemem_read(offset++);
 
@@ -162,14 +162,14 @@ void atarigt_state::scanline_update(screen_device &screen, int scanline)
 			if (newscroll != m_playfield_xscroll)
 			{
 				if (scanline + i > 0)
-					screen.update_partial(scanline + i - 1);
+					m_screen->update_partial(scanline + i - 1);
 				m_playfield_tilemap->set_scrollx(0, newscroll);
 				m_playfield_xscroll = newscroll;
 			}
 			if (newbank != m_playfield_color_bank)
 			{
 				if (scanline + i > 0)
-					screen.update_partial(scanline + i - 1);
+					m_screen->update_partial(scanline + i - 1);
 				m_playfield_tilemap->set_palette_offset((newbank & 0x1f) << 8);
 				m_playfield_color_bank = newbank;
 			}
@@ -183,14 +183,14 @@ void atarigt_state::scanline_update(screen_device &screen, int scanline)
 			if (newscroll != m_playfield_yscroll)
 			{
 				if (scanline + i > 0)
-					screen.update_partial(scanline + i - 1);
+					m_screen->update_partial(scanline + i - 1);
 				m_playfield_tilemap->set_scrolly(0, newscroll);
 				m_playfield_yscroll = newscroll;
 			}
 			if (newbank != m_playfield_tile_bank)
 			{
 				if (scanline + i > 0)
-					screen.update_partial(scanline + i - 1);
+					m_screen->update_partial(scanline + i - 1);
 				m_playfield_tilemap->mark_all_dirty();
 				m_playfield_tile_bank = newbank;
 			}
@@ -486,9 +486,6 @@ uint32_t atarigt_state::screen_update_atarigt(screen_device &screen, bitmap_rgb3
 {
 	bitmap_ind16 &mo_bitmap = m_rle->vram(0);
 	bitmap_ind16 &tm_bitmap = m_rle->vram(1);
-	uint16_t *cram, *tram;
-	int color_latch;
-	int x, y;
 
 	/* draw the playfield */
 	m_playfield_tilemap->draw(screen, m_pf_bitmap, cliprect, 0, 0);
@@ -497,32 +494,31 @@ uint32_t atarigt_state::screen_update_atarigt(screen_device &screen, bitmap_rgb3
 	m_alpha_tilemap->draw(screen, m_an_bitmap, cliprect, 0, 0);
 
 	/* cache pointers */
-	color_latch = m_colorram[0x30000>>1];
-	cram = (uint16_t *)&m_colorram[0x00000>>1] + ((color_latch & 0x08) << 10);
-	tram = (uint16_t *)&m_colorram[0x20000>>1] + ((color_latch & 0x30) << 8);
-	const pen_t *mram = &m_palette->pens()[(color_latch & 0xc0) << 7];
+	int const color_latch = m_colorram[0x30000>>1];
+	uint16_t const *const cram = (uint16_t *)&m_colorram[0x00000>>1] + ((color_latch & 0x08) << 10);
+	uint16_t const *const tram = (uint16_t *)&m_colorram[0x20000>>1] + ((color_latch & 0x30) << 8);
+	pen_t const *const mram = &m_palette->pens()[(color_latch & 0xc0) << 7];
 
 	/* now do the nasty blend */
-	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		uint16_t *an = &m_an_bitmap.pix16(y);
-		uint16_t *pf = &m_pf_bitmap.pix16(y);
-		uint16_t *mo = &mo_bitmap.pix16(y);
-		uint16_t *tm = &tm_bitmap.pix16(y);
-		uint32_t *dst = &bitmap.pix32(y);
+		uint16_t const *const an = &m_an_bitmap.pix(y);
+		uint16_t const *const pf = &m_pf_bitmap.pix(y);
+		uint16_t const *const mo = &mo_bitmap.pix(y);
+		uint16_t const *const tm = &tm_bitmap.pix(y);
+		uint32_t *const dst = &bitmap.pix(y);
 
 		/* Primal Rage: no TRAM, slightly different priorities */
 		if (m_is_primrage)
 		{
-			for (x = cliprect.left(); x <= cliprect.right(); x++)
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
 			{
 				uint8_t pfpri = (pf[x] >> 10) & 7;
 				uint8_t mopri = mo[x] >> ATARIRLE_PRIORITY_SHIFT;
 				uint8_t mgep = (mopri >= pfpri) && !(pfpri & 4);
-				uint16_t cra;
-				uint32_t rgb;
 
 				/* compute CRA -- unlike T-Mek, MVID11 enforces MO priority and is ignored */
+				uint16_t cra;
 				if (an[x] & 0x8f)
 					cra = an[x] & 0xff;
 				else if ((mo[x] & 0x3f) && ((mo[x] & 0x800) || mgep || !(pf[x] & 0x3f)))
@@ -532,6 +528,7 @@ uint32_t atarigt_state::screen_update_atarigt(screen_device &screen, bitmap_rgb3
 				cra = cram[cra];
 
 				/* compute the result */
+				uint32_t rgb;
 				rgb  = mram[((cra >> 10) & 0x01f)] & 0xff0000;
 				rgb |= mram[((cra >>  5) & 0x01f)] & 0x00ff00;
 				rgb |= mram[((cra >>  0) & 0x01f)] & 0x0000ff;
@@ -548,16 +545,14 @@ uint32_t atarigt_state::screen_update_atarigt(screen_device &screen, bitmap_rgb3
 		/* T-Mek: full TRAM and all effects */
 		else
 		{
-			for (x = cliprect.left(); x <= cliprect.right(); x++)
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
 			{
-				uint8_t pfpri = (pf[x] >> 10) & 7;
-				uint8_t mopri = mo[x] >> ATARIRLE_PRIORITY_SHIFT;
-				uint8_t mgep = (mopri >= pfpri) && !(pfpri & 4);
-				int no_tra = 0, no_cra = 0;
-				uint16_t cra, tra, mra;
-				uint32_t rgb;
+				uint8_t const pfpri = (pf[x] >> 10) & 7;
+				uint8_t const mopri = mo[x] >> ATARIRLE_PRIORITY_SHIFT;
+				uint8_t const mgep = (mopri >= pfpri) && !(pfpri & 4);
 
 				/* compute CRA/TRA */
+				uint16_t cra, tra;
 				if (an[x] & 0x8f)
 				{
 					cra = an[x] & 0xff;
@@ -577,9 +572,10 @@ uint32_t atarigt_state::screen_update_atarigt(screen_device &screen, bitmap_rgb3
 				tra = tram[tra];
 
 				/* compute MRA */
-				mra = (tm[x] & 0xe00) << 1;
+				uint16_t const mra = (tm[x] & 0xe00) << 1;
 
 				/* turn off CRA/TRA as appropriate */
+				int no_tra = 0, no_cra = 0;
 				if (!(pf[x] & 0x1000) && (tra & 0x8000))
 					no_cra = 1;
 				if (!(!(cra & 0x8000) && (!(pf[x] & 0x1000) || !(pf[x] & 0x3f))))
@@ -590,6 +586,7 @@ uint32_t atarigt_state::screen_update_atarigt(screen_device &screen, bitmap_rgb3
 					tra = 0;
 
 				/* compute the result */
+				uint32_t rgb;
 				rgb  = mram[mra | ((cra >> 10) & 0x01f) | ((tra >> 5) & 0x3e0)] & 0xff0000;
 				rgb |= mram[mra | ((cra >>  5) & 0x01f) | ((tra >> 0) & 0x3e0)] & 0x00ff00;
 				rgb |= mram[mra | ((cra >>  0) & 0x01f) | ((tra << 5) & 0x3e0)] & 0x0000ff;

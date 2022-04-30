@@ -21,17 +21,17 @@
 8 i/o device error
 9 other errors*/
 
-WRITE8_MEMBER(pc1401_state::out_b_w)
+void pc1401_state::out_b_w(uint8_t data)
 {
 	m_outb = data;
 }
 
-WRITE8_MEMBER(pc1401_state::out_c_w)
+void pc1401_state::out_c_w(uint8_t data)
 {
 	m_portc = data;
 }
 
-READ8_MEMBER(pc1401_state::in_a_r)
+uint8_t pc1401_state::in_a_r()
 {
 	int data = m_outa;
 
@@ -55,7 +55,7 @@ READ8_MEMBER(pc1401_state::in_a_r)
 	return data;
 }
 
-READ8_MEMBER(pc1401_state::in_b_r)
+uint8_t pc1401_state::in_b_r()
 {
 	int data = m_outb;
 

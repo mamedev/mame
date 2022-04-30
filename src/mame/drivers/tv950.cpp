@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont, Robbbert
+// copyright-holders:R. Belmont
 /***************************************************************************
 
     2013-09-10 Skeleton driver for Televideo TV950
@@ -70,21 +70,21 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(via_a_w);
-	DECLARE_WRITE8_MEMBER(via_b_w);
-	DECLARE_READ8_MEMBER(via_b_r);
+	void via_a_w(uint8_t data);
+	void via_b_w(uint8_t data);
+	uint8_t via_b_r();
 	DECLARE_WRITE_LINE_MEMBER(crtc_vs_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
-	DECLARE_WRITE8_MEMBER(row_addr_w);
+	void row_addr_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via_crtc_reset_w);
 
 	void tv950_mem(address_map &map);
 
-	uint8_t m_via_row;
-	uint8_t m_attr_row;
-	uint8_t m_attr_screen;
+	uint8_t m_via_row = 0;
+	uint8_t m_attr_row = 0;
+	uint8_t m_attr_screen = 0;
 
 	required_device<m6502_device> m_maincpu;
 	required_device<via6522_device> m_via;
@@ -95,8 +95,8 @@ private:
 	required_region_ptr<uint16_t> m_gfx;
 	required_ioport_array<4> m_dsw;
 
-	int m_row_addr;
-	int m_row;
+	int m_row_addr = 0;
+	int m_row = 0;
 };
 
 void tv950_state::machine_start()
@@ -222,24 +222,24 @@ WRITE_LINE_MEMBER(tv950_state::via_crtc_reset_w)
 	}
 }
 
-WRITE8_MEMBER(tv950_state::row_addr_w)
+void tv950_state::row_addr_w(uint8_t data)
 {
 	m_row_addr = data;
 }
 
-WRITE8_MEMBER(tv950_state::via_a_w)
+void tv950_state::via_a_w(uint8_t data)
 {
 	m_via_row = ~data & 15;
 	// PA4, 5, 7 to do
 }
 
-WRITE8_MEMBER(tv950_state::via_b_w)
+void tv950_state::via_b_w(uint8_t data)
 {
 	// bit 3 of m_via_row must be active as well?
 	m_keyboard->rx_w(!BIT(data, 7));
 }
 
-READ8_MEMBER(tv950_state::via_b_r)
+uint8_t tv950_state::via_b_r()
 {
 	uint8_t data = 0xff;
 	for (int n = 0; n < 4; n++)
@@ -259,7 +259,7 @@ MC6845_UPDATE_ROW( tv950_state::crtc_update_row )
 	else
 		m_attr_screen = m_attr_row;
 
-	uint32_t *p = &bitmap.pix32(m_row);
+	uint32_t *p = &bitmap.pix(m_row);
 	rgb_t fg(255,255,255,255);
 	rgb_t bg(0,0,0,0);
 
@@ -304,7 +304,7 @@ void tv950_state::tv950(machine_config &config)
 	m_crtc->out_vsync_callback().set(FUNC(tv950_state::crtc_vs_w));
 	m_crtc->set_screen(nullptr);
 
-	VIA6522(config, m_via, MASTER_CLOCK/14);
+	MOS6522(config, m_via, MASTER_CLOCK/14);
 	//m_via->irq_handler().set_inputline(m_maincpu, M6502_NMI_LINE);
 	m_via->writepa_handler().set(FUNC(tv950_state::via_a_w));
 	m_via->writepb_handler().set(FUNC(tv950_state::via_b_w));

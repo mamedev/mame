@@ -89,8 +89,8 @@ void rohga_state::mixwizdfirelayer(bitmap_rgb32 &bitmap, const rectangle &clipre
 
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		const u16* srcline = &sprite_bitmap->pix16(y,0);
-		u32* dstline = &bitmap.pix32(y,0);
+		u16 const *const srcline = &sprite_bitmap->pix(y,0);
+		u32 *const dstline = &bitmap.pix(y,0);
 
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
@@ -168,11 +168,11 @@ void rohga_state::mixnitroballlayer(screen_device &screen, bitmap_rgb32 &bitmap,
 
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		const u16 *srcline1 = &sprite_bitmap1->pix16(y,0);
-		const u16 *srcline2 = &sprite_bitmap2->pix16(y,0);
-		const u8 *srcpriline = &priority_bitmap->pix8(y,0);
+		u16 const *const srcline1 = &sprite_bitmap1->pix(y,0);
+		u16 const *const srcline2 = &sprite_bitmap2->pix(y,0);
+		u8 const *const srcpriline = &priority_bitmap->pix(y,0);
 
-		u32* dstline = &bitmap.pix32(y,0);
+		u32 *const dstline = &bitmap.pix(y,0);
 
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{

@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="eti660_quik" description="ETI-660 quickload">
+
+	<software name="maze" supported="no"><!-- maze is garbage (works in Emma02 v1.21) -->
+		<description>Maze 2</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="8 to start"/>
+		<part name="quik" interface="etiquik">
+			<dataarea name="quik" size="38">
+				<rom name="maze.ch8" size="38" crc="002ca8c4" sha1="ec617d44bd64e5decc7dce3d8e9797b5852c015c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musicm">
+		<description>Music Maker</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Peter Collins"/>
+		<info name="usage" value="8 to start, then one of 0,1,2,4,5,6"/>
+		<part name="quik" interface="etiquik">
+			<dataarea name="quik" size="510">
+				<rom name="musicm.ch8" size="510" crc="c84e7543" sha1="d813e28e122faa3aad99357da37ae0df8fff9b7c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pong"><!-- game never ends -->
+		<description>Pong</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="8 to start, then 1=up, 4=down"/>
+		<part name="quik" interface="etiquik">
+			<dataarea name="quik" size="246">
+				<rom name="pong.ch8" size="246" crc="9d86b621" sha1="551faa5787451200838be0a3a0a8e4114e5aaa48"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spaceinv" supported="no"><!-- cannnot shoot aliens -->
+		<description>Space Invaders</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="P Easdown"/>
+		<info name="usage" value="8 to start, then 4=left, 6=right, 5=fire"/>
+		<part name="quik" interface="etiquik">
+			<dataarea name="quik" size="400">
+				<rom name="spaceinv.ch8" size="400" crc="4cda1787" sha1="1133f02166486a7ed973dc635e4f7a222735ab29"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wipeout">
+		<description>Wipeout</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="W F Kreykes"/>
+		<info name="usage" value="8 to start, then A=left, D=right"/>
+		<part name="quik" interface="etiquik">
+			<dataarea name="quik" size="606">
+				<rom name="wipeout.c8" size="606" crc="cf30e8eb" sha1="2fb4c14104b58b0df28368393b3fc0aaabe9e8ae"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

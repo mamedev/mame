@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont, Sergey Svishchev
 /***************************************************************************
 
-    Super Games ][
+    Nippel Super Games ][
 
     An arcade board designed to run modified games from Apple ][.
     Most of Apple hardware is missing, keyboard port is reused for joysticks.
@@ -11,8 +11,9 @@
 
     Info: http://agatcomp.ru/Pravetz/SuperGames.shtml
 
-    To do
+    To do:
     - verify palette, pixel and cpu clocks
+    - proper bootstrap (is there another ROM?)
 
 ************************************************************************/
 
@@ -38,18 +39,18 @@
 class superga2_state : public driver_device
 {
 public:
-	superga2_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, A2_CPU_TAG),
-		m_screen(*this, "screen"),
-		m_ram(*this, RAM_TAG),
-		m_video(*this, A2_VIDEO_TAG),
-		m_a2common(*this, "a2common"),
-		m_speaker(*this, "speaker"),
-		m_softlatch(*this, "softlatch")
+	superga2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, A2_CPU_TAG)
+		, m_screen(*this, "screen")
+		, m_ram(*this, RAM_TAG)
+		, m_video(*this, A2_VIDEO_TAG)
+		, m_a2common(*this, "a2common")
+		, m_speaker(*this, "speaker")
+		, m_softlatch(*this, "softlatch")
 	{ }
 
-	static constexpr feature_type imperfect_features() { return feature::PALETTE | feature::CONTROLS; }
+	static constexpr feature_type imperfect_features() { return feature::PALETTE; }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -64,21 +65,21 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(ram_r);
-	DECLARE_WRITE8_MEMBER(ram_w);
-	DECLARE_READ8_MEMBER(speaker_toggle_r);
-	DECLARE_WRITE8_MEMBER(speaker_toggle_w);
-	DECLARE_READ8_MEMBER(switches_r);
-	DECLARE_READ8_MEMBER(reset_r);
+	uint8_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint8_t data);
+	uint8_t speaker_toggle_r();
+	void speaker_toggle_w(uint8_t data);
+	uint8_t switches_r(offs_t offset);
+	uint8_t reset_r(offs_t offset);
 
-	void kuzmich(machine_config &config);
-	void kuzmich_map(address_map &map);
+	void superga2(machine_config &config);
+	void superga2_map(address_map &map);
 
 private:
-	int m_speaker_state;
+	int m_speaker_state = 0;
 
-	uint8_t *m_ram_ptr;
-	int m_ram_size;
+	uint8_t *m_ram_ptr = nullptr;
+	int m_ram_size = 0;
 
 	uint8_t read_floatingbus();
 };
@@ -127,27 +128,27 @@ uint32_t superga2_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
     I/O
 ***************************************************************************/
 
-READ8_MEMBER(superga2_state::speaker_toggle_r)
+uint8_t superga2_state::speaker_toggle_r()
 {
 	if (!machine().side_effects_disabled())
-		speaker_toggle_w(space, offset, 0);
+		speaker_toggle_w(0);
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(superga2_state::speaker_toggle_w)
+void superga2_state::speaker_toggle_w(uint8_t data)
 {
 	m_speaker_state ^= 1;
 	m_speaker->level_w(m_speaker_state);
 }
 
-READ8_MEMBER(superga2_state::switches_r)
+uint8_t superga2_state::switches_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 		m_softlatch->write_bit((offset & 0x0e) >> 1, offset & 0x01);
 	return read_floatingbus();
 }
 
-READ8_MEMBER(superga2_state::reset_r)
+uint8_t superga2_state::reset_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -166,7 +167,7 @@ uint8_t superga2_state::read_floatingbus()
     ADDRESS MAP
 ***************************************************************************/
 
-READ8_MEMBER(superga2_state::ram_r)
+uint8_t superga2_state::ram_r(offs_t offset)
 {
 	if (offset < m_ram_size)
 	{
@@ -176,7 +177,7 @@ READ8_MEMBER(superga2_state::ram_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(superga2_state::ram_w)
+void superga2_state::ram_w(offs_t offset, uint8_t data)
 {
 	if (offset < m_ram_size)
 	{
@@ -184,7 +185,7 @@ WRITE8_MEMBER(superga2_state::ram_w)
 	}
 }
 
-void superga2_state::kuzmich_map(address_map &map)
+void superga2_state::superga2_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rw(FUNC(superga2_state::ram_r), FUNC(superga2_state::ram_w));
 	map(0xc000, 0xc000).mirror(0xf).portr("P1").nopw();
@@ -197,7 +198,7 @@ void superga2_state::kuzmich_map(address_map &map)
     INPUT PORTS
 ***************************************************************************/
 
-static INPUT_PORTS_START( kuzmich )
+static INPUT_PORTS_START( superga2 )
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -209,11 +210,11 @@ static INPUT_PORTS_START( kuzmich )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 INPUT_PORTS_END
 
-void superga2_state::kuzmich(machine_config &config)
+void superga2_state::superga2(machine_config &config)
 {
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 1021800);
-	m_maincpu->set_addrmap(AS_PROGRAM, &superga2_state::kuzmich_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &superga2_state::superga2_map);
 
 	APPLE2_VIDEO(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
 	APPLE2_COMMON(config, m_a2common, XTAL(14'318'181));
@@ -228,7 +229,7 @@ void superga2_state::kuzmich(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* soft switches */
-	F9334(config, m_softlatch); // F14 (labeled 74LS259 on some boards and in the Apple ][ Reference Manual)
+	F9334(config, m_softlatch);
 	m_softlatch->q_out_cb<0>().set(m_video, FUNC(a2_video_device::txt_w));
 	m_softlatch->q_out_cb<1>().set(m_video, FUNC(a2_video_device::mix_w));
 	m_softlatch->q_out_cb<2>().set(m_video, FUNC(a2_video_device::scr_w));
@@ -250,5 +251,5 @@ ROM_START(kuzmich)
 	ROM_LOAD("ke.bin", 0x0000, 0x8000, CRC(102d246b) SHA1(492dcdf0cc31190a97057a69010e2c9c23b6e59d))
 ROM_END
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS           INIT        COMPANY    FULLNAME
-COMP( 199?, kuzmich,  0,      0,      kuzmich,  kuzmich, superga2_state, empty_init, "Nippel",  "Kuzmich-Egorych", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROT,   COMPANY    FULLNAME
+GAME( 199?, kuzmich,  0,      superga2, superga2, superga2_state, empty_init, ROT0,  "Nippel",  "Kuzmich-Egorych", MACHINE_SUPPORTS_SAVE )

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -142,7 +142,7 @@ namespace bx
 
 		if (NULL != _data)
 		{
-			const uint8_t* data = reinterpret_cast<const uint8_t*>(_data);
+			const uint8_t* data = (const uint8_t*)_data;
 			char hex[HEX_DUMP_WIDTH*3+1];
 			char ascii[HEX_DUMP_WIDTH+1];
 			uint32_t hexPos = 0;

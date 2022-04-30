@@ -307,9 +307,9 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "cpu/mcs51/mcs51.h" // for semicom mcu
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/decocrpt.h"
-#include "sound/ym2151.h"
-#include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "sound/ymopm.h"
+#include "sound/ymopl.h"
 #include "speaker.h"
 
 
@@ -319,7 +319,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 /******************************************************************************/
 
-WRITE16_MEMBER(tumbleb_state::tumblepb_oki_w)
+void tumbleb_state::tumblepb_oki_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (mem_mask == 0xffff)
 	{
@@ -334,14 +334,14 @@ WRITE16_MEMBER(tumbleb_state::tumblepb_oki_w)
 	/* STUFF IN OTHER BYTE TOO..*/
 }
 
-READ16_MEMBER(tumbleb_state::tumblepb_prot_r)
+uint16_t tumbleb_state::tumblepb_prot_r()
 {
 	return ~0;
 }
 
 /******************************************************************************/
 
-READ16_MEMBER(tumbleb_state::tumblepopb_controls_r)
+uint16_t tumbleb_state::tumblepopb_controls_r(offs_t offset)
 {
 	switch (offset << 1)
 	{
@@ -607,7 +607,7 @@ void tumbleb_state::process_tumbleb2_music_command( okim6295_device *oki, int da
 }
 
 
-WRITE16_MEMBER(tumbleb_state::tumbleb2_soundmcu_w)
+void tumbleb_state::tumbleb2_soundmcu_w(uint16_t data)
 {
 	int sound = tumbleb_sound_lookup[data & 0xff];
 
@@ -638,7 +638,7 @@ void tumbleb_state::tumblepopb_main_map(address_map &map)
 	map(0x120000, 0x123fff).ram().share("mainram");
 	map(0x140000, 0x1407ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x160000, 0x1607ff).ram().share("spriteram"); /* Bootleg sprite buffer */
-	map(0x160800, 0x160807).writeonly(); /* writes past the end of spriteram */
+	map(0x160800, 0x160807).nopw(); /* writes past the end of spriteram */
 	map(0x180000, 0x18000f).r(FUNC(tumbleb_state::tumblepopb_controls_r));
 	map(0x18000c, 0x18000d).nopw();
 	map(0x1a0000, 0x1a07ff).ram();
@@ -657,10 +657,11 @@ void tumbleb_state::tumblepopba_main_map(address_map &map)
 #if TUMBLEP_HACK
 	map(0x000000, 0x07ffff).writeonly();   /* To write levels modifications */
 #endif
-	//map(0x100000, 0x100001).rw(FUNC(tumbleb_state::tumblepb_prot_r), FUNC(tumbleb_state::tumblepb_oki_w)); // where's the oki mapped?
 	map(0x120000, 0x123fff).ram().share("mainram");
 	map(0x140000, 0x1407ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x180000, 0x18000f).r(FUNC(tumbleb_state::tumblepopb_controls_r));
+	map(0x180005, 0x180005).lw8(NAME([this] (uint8_t data) { m_oki->set_rom_bank((data >> 4) & 0x03); })); // TODO: verify this
+	map(0x180007, 0x180007).w(m_oki, FUNC(okim6295_device::write));
 	map(0x1a0000, 0x1a07ff).ram().share("spriteram"); /* Bootleg sprite buffer */
 	map(0x1a1000, 0x1a1fff).ram(); // ?
 	map(0x200000, 0x200fff).ram(); // ?
@@ -697,7 +698,7 @@ void tumbleb_state::unico_base_map(address_map &map)
 	map(0x100005, 0x100005).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x160000, 0x1607ff).ram().share("spriteram"); /* sprites */
-	map(0x160800, 0x16080f).writeonly(); /* goes slightly past the end of spriteram? */
+	map(0x160800, 0x16080f).nopw(); /* goes slightly past the end of spriteram? */
 	map(0x180000, 0x18000f).r(FUNC(tumbleb_state::tumblepopb_controls_r));
 	map(0x18000c, 0x18000d).nopw();
 	map(0x1a0000, 0x1a07ff).ram();
@@ -730,7 +731,7 @@ void tumbleb_state::magipur_main_map(address_map &map)
 }
 
 
-READ16_MEMBER(tumbleb_state::semibase_unknown_r)
+uint16_t tumbleb_state::semibase_unknown_r()
 {
 	return machine().rand();
 }
@@ -756,7 +757,7 @@ void tumbleb_state::htchctch_main_map(address_map &map)
 
 
 
-WRITE16_MEMBER(tumbleb_state::jumpkids_sound_w)
+void tumbleb_state::jumpkids_sound_w(uint16_t data)
 {
 	m_soundlatch->write(data & 0xff);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
@@ -783,7 +784,7 @@ void tumbleb_state::pangpang_main_map(address_map &map)
 	map(0x120000, 0x123fff).ram().share("mainram");
 	map(0x140000, 0x1407ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x160000, 0x1607ff).ram().share("spriteram"); /* Bootleg sprite buffer */
-	map(0x160800, 0x160807).writeonly(); // writes past the end of spriteram
+	map(0x160800, 0x160807).nopw(); // writes past the end of spriteram
 	map(0x180000, 0x18000f).r(FUNC(tumbleb_state::tumblepopb_controls_r));
 	map(0x1a0000, 0x1a07ff).ram();
 	map(0x300000, 0x30000f).w(FUNC(tumbleb_state::tumblepb_control_0_w));
@@ -838,7 +839,7 @@ void tumbleb_pic_state::driver_start()
 
 /******************************************************************************/
 
-WRITE16_MEMBER(tumbleb_state::semicom_soundcmd_w)
+void tumbleb_state::semicom_soundcmd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -850,7 +851,7 @@ WRITE16_MEMBER(tumbleb_state::semicom_soundcmd_w)
 	}
 }
 
-WRITE8_MEMBER(tumbleb_state::oki_sound_bank_w)
+void tumbleb_state::oki_sound_bank_w(uint8_t data)
 {
 	uint8_t *oki = memregion("oki")->base();
 	memcpy(&oki[0x30000], &oki[(data * 0x10000) + 0x40000], 0x10000);
@@ -886,7 +887,7 @@ void tumbleb_state::jumpkids_main_map(address_map &map)
 	map(0x120000, 0x123fff).ram().share("mainram");
 	map(0x140000, 0x1407ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x160000, 0x1607ff).ram().share("spriteram"); /* Bootleg sprite buffer */
-	map(0x160800, 0x160807).writeonly(); /* writes past the end of spriteram */
+	map(0x160800, 0x160807).nopw(); /* writes past the end of spriteram */
 	map(0x180000, 0x18000f).r(FUNC(tumbleb_state::tumblepopb_controls_r));
 	map(0x18000c, 0x18000d).nopw();
 	map(0x1a0000, 0x1a07ff).ram();
@@ -899,7 +900,7 @@ void tumbleb_state::jumpkids_main_map(address_map &map)
 	map(0x342400, 0x34247f).nopw();
 }
 
-WRITE8_MEMBER(tumbleb_state::jumpkids_oki_bank_w)
+void tumbleb_state::jumpkids_oki_bank_w(uint8_t data)
 {
 	uint8_t* sound1 = memregion("oki")->base();
 	uint8_t* sound2 = memregion("oki2")->base();
@@ -921,7 +922,7 @@ void tumbleb_state::jumpkids_sound_map(address_map &map)
 /* Semicom AT89C52 MCU */
 
 // probably not endian safe
-WRITE8_MEMBER(tumbleb_state::prot_p0_w)
+void tumbleb_state::prot_p0_w(uint8_t data)
 {
 	uint16_t word = m_mainram[(m_protbase/2) + m_semicom_prot_offset];
 	word = (word & 0xff00) | (data << 0);
@@ -929,14 +930,14 @@ WRITE8_MEMBER(tumbleb_state::prot_p0_w)
 }
 
 // probably not endian safe
-WRITE8_MEMBER(tumbleb_state::prot_p1_w)
+void tumbleb_state::prot_p1_w(uint8_t data)
 {
 	uint16_t word = m_mainram[(m_protbase/2) + m_semicom_prot_offset];
 	word = (word & 0x00ff) | (data << 8);
 	m_mainram[(m_protbase/2) + m_semicom_prot_offset] = word;
 }
 
-WRITE8_MEMBER(tumbleb_state::prot_p2_w)
+void tumbleb_state::prot_p2_w(uint8_t data)
 {
 	m_semicom_prot_offset = data;
 }
@@ -2115,6 +2116,7 @@ MACHINE_RESET_MEMBER(tumbleb_state,tumbleb)
 	m_music_is_playing = 0;
 	m_tilebank = 0;
 	memset(m_control_0, 0, sizeof(m_control_0));
+	m_semicom_prot_offset = 0;
 }
 
 void tumbleb_state::tumblepb(machine_config &config)
@@ -2610,9 +2612,8 @@ ROM_START( tumblepba )
 	ROM_LOAD16_BYTE( "7.ic115",  0x80000, 0x40000, CRC(0273eec0) SHA1(305d1a111f04650b7e3616fb6ecac1c579312acc) )
 	ROM_LOAD16_BYTE( "6.ic117",  0x80001, 0x40000, CRC(7f8daf52) SHA1(aa5f111a9c75c260bb77878bb95c1e34d70ea7b6) )
 
-	ROM_REGION( 0x100000, "oki", 0 ) /* Oki samples */
+	ROM_REGION( 0x80000, "oki", 0 ) /* Oki samples */
 	ROM_LOAD( "3.ic24", 0x00000, 0x80000, CRC(63e45de7) SHA1(417f945ee8cf820b1733c4dee26ef05e91e80457) )
-	ROM_RELOAD(0x80000,0x80000)
 ROM_END
 
 ROM_START( funkyjetb )
@@ -3703,7 +3704,7 @@ void tumbleb_state::init_tumbleb2()
 	#if TUMBLEP_HACK
 	tumblepb_patch_code(0x000132);
 	#endif
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100000, 0x100001, write16_delegate(*this, FUNC(tumbleb_state::tumbleb2_soundmcu_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100000, 0x100001, write16smo_delegate(*this, FUNC(tumbleb_state::tumbleb2_soundmcu_w)));
 
 }
 
@@ -3737,7 +3738,7 @@ void tumbleb_state::init_magipur()
 }
 
 
-READ16_MEMBER(tumbleb_state::bcstory_1a0_read)
+uint16_t tumbleb_state::bcstory_1a0_read()
 {
 	//osd_printf_debug("bcstory_io %06x\n",m_maincpu->pc());
 
@@ -3748,7 +3749,7 @@ READ16_MEMBER(tumbleb_state::bcstory_1a0_read)
 void tumbleb_state::init_bcstory()
 {
 	tumblepb_gfx_rearrange(1);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x180008, 0x180009, read16_delegate(*this, FUNC(tumbleb_state::bcstory_1a0_read))); // io should be here??
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x180008, 0x180009, read16smo_delegate(*this, FUNC(tumbleb_state::bcstory_1a0_read))); // io should be here??
 }
 
 
@@ -3816,7 +3817,7 @@ void tumbleb_state::init_chokchok()
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x140000, 0x140fff, write16s_delegate(*m_palette, FUNC(palette_device::write16)));
 
 	// slightly different banking
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100002, 0x100003, write16_delegate(*this, FUNC(tumbleb_state::chokchok_tilebank_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100002, 0x100003, write16s_delegate(*this, FUNC(tumbleb_state::chokchok_tilebank_w)));
 }
 
 void tumbleb_state::init_carket()
@@ -3824,7 +3825,7 @@ void tumbleb_state::init_carket()
 	init_htchctch();
 
 	// slightly different banking
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100002, 0x100003, write16_delegate(*this, FUNC(tumbleb_state::chokchok_tilebank_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100002, 0x100003, write16s_delegate(*this, FUNC(tumbleb_state::chokchok_tilebank_w)));
 }
 
 void tumbleb_state::init_wlstar()
@@ -3832,7 +3833,7 @@ void tumbleb_state::init_wlstar()
 	tumblepb_gfx_rearrange(1);
 
 	// slightly different banking
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100002, 0x100003, write16_delegate(*this, FUNC(tumbleb_state::wlstar_tilebank_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100002, 0x100003, write16smo_delegate(*this, FUNC(tumbleb_state::wlstar_tilebank_w)));
 
 	m_protbase = 0x0000;
 }
@@ -3857,7 +3858,7 @@ void tumbleb_state::init_dquizgo()
 /* Misc 'bootleg' hardware - close to base Tumble Pop */
 GAME( 1991, tumbleb,  tumblep, tumblepb,     tumblepb, tumbleb_state, init_tumblepb, ROT0, "bootleg", "Tumble Pop (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, tumbleb2, tumblep, tumbleb2,     tumblepb, tumbleb_state, init_tumbleb2, ROT0, "bootleg", "Tumble Pop (bootleg with PIC)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // PIC is protected, sound simulation not 100%
-GAME( 1991, tumblepba,tumblep, tumblepba,    tumblepb, tumbleb_state, init_tumblepba,ROT0, "bootleg (Playmark)", "Tumble Pop (Playmark bootleg)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // Playmark stickers on ROMs, offset pf1_alt tilemap, OKI not hooked up
+GAME( 1991, tumblepba,tumblep, tumblepba,    tumblepb, tumbleb_state, init_tumblepba,ROT0, "bootleg (Playmark)", "Tumble Pop (Playmark bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // Playmark stickers on ROMs, offset pf1_alt tilemap, OKI banking not confirmed + volume issues?
 
 GAME( 1992, funkyjetb,funkyjet,funkyjetb,    tumblepb, tumbleb_pic_state, init_tumblepb, ROT0, "bootleg", "Funky Jet (bootleg)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // wrong palette, inputs not working, PIC driving an OKI
 

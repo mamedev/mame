@@ -51,7 +51,7 @@
 			],
 			"output": "scaled_out"
 		},
-		{	"effect": "misc/blit",
+		{   "effect": "misc/blit",
 			"name": "Final Blit",
 			"input": [
 				{ "sampler": "s_tex", "target": "scaled_out" }

@@ -15,8 +15,8 @@ public:
 	template <typename T> void set_palette(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 	void set_entries(int entries) { m_palram.resize(entries*2); }
 
-	DECLARE_READ8_MEMBER(palette_r);
-	DECLARE_WRITE8_MEMBER(palette_w);
+	uint8_t palette_r(offs_t offset);
+	void palette_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides

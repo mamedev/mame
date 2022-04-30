@@ -13,23 +13,19 @@
 
 #pragma once
 
+#include "imagedev/memcard.h"
+
 
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-class fmt_icmem_device : public device_t, public device_image_interface
+class fmt_icmem_device : public device_t, public device_memcard_image_interface
 {
 public:
 	// construction/destruction
 	fmt_icmem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual iodevice_t image_type() const noexcept override { return IO_MEMCARD; }
-
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return true; }
-	virtual bool is_creatable() const noexcept override { return true; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "icm"; }
 
@@ -37,13 +33,13 @@ public:
 	virtual void call_unload() override;
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 
-	DECLARE_READ8_MEMBER(static_mem_read);
-	DECLARE_WRITE8_MEMBER(static_mem_write);
-	DECLARE_READ8_MEMBER(mem_read);
-	DECLARE_WRITE8_MEMBER(mem_write);
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_READ8_MEMBER(bank_r);
-	DECLARE_WRITE8_MEMBER(bank_w);
+	uint8_t static_mem_read(offs_t offset);
+	void static_mem_write(offs_t offset, uint8_t data);
+	uint8_t mem_read(offs_t offset);
+	void mem_write(offs_t offset, uint8_t data);
+	uint8_t status_r();
+	uint8_t bank_r(offs_t offset);
+	void bank_w(offs_t offset, uint8_t data);
 
 protected:
 	// device_t implementation

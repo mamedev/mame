@@ -30,6 +30,8 @@
 #include "emu.h"
 #include "hp_dc100_tape.h"
 
+#include "util/ioprocsfilter.h"
+
 // Debugging
 #include "logmacro.h"
 #define LOG_TMR_MASK (LOG_GENERAL << 1)
@@ -76,14 +78,14 @@ constexpr double MOTION_MARGIN = 1e-5;  // Margin to ensure motion events have p
 constexpr hti_format_t::tape_pos_t TAPE_INIT_POS = 80 * hti_format_t::ONE_INCH_POS; // Initial tape position: 80" from beginning (just past the punched part)
 
 hp_dc100_tape_device::hp_dc100_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig , HP_DC100_TAPE , tag , owner , clock)
-	, device_image_interface(mconfig , *this)
+	: microtape_image_device(mconfig , HP_DC100_TAPE , tag , owner , clock)
 	, m_cart_out_handler(*this)
 	, m_hole_handler(*this)
 	, m_tacho_tick_handler(*this)
 	, m_motion_handler(*this)
 	, m_rd_bit_handler(*this)
 	, m_wr_bit_handler(*this)
+	, m_unit_name()
 	, m_image()
 	, m_image_dirty(false)
 {
@@ -106,12 +108,12 @@ void hp_dc100_tape_device::call_unload()
 	device_reset();
 
 	if (m_image_dirty) {
-		io_generic io;
-		io.file = (device_image_interface *)this;
-		io.procs = &image_ioprocs;
-		io.filler = 0;
-		m_image.save_tape(&io);
-		m_image_dirty = false;
+		check_for_file();
+		auto io = util::random_read_write_fill(image_core_file(), 0);
+		if (io) {
+			m_image.save_tape(*io);
+			m_image_dirty = false;
+		}
 	}
 
 	m_image.clear_tape();
@@ -128,7 +130,14 @@ std::string hp_dc100_tape_device::call_display()
 		return buffer;
 	}
 
-	char track = m_track ? 'B' : 'A';
+	if (!m_unit_name.empty()) {
+		buffer += m_unit_name;
+		buffer += " ";
+	}
+
+	if (m_image.no_of_tracks() > 1) {
+		buffer += m_track ? "B " : "A ";
+	}
 	char r_w = m_current_op == OP_WRITE || m_current_op == OP_ERASE ? 'W' : 'R';
 	char m1;
 	char m2;
@@ -143,7 +152,7 @@ std::string hp_dc100_tape_device::call_display()
 
 	int pos_in = get_approx_pos() / hti_format_t::ONE_INCH_POS;
 
-	buffer = string_format("%c %c %c%c [%04d/1824]" , track , r_w , m1 , m2 , pos_in);
+	buffer += string_format("%c %c%c [%04d/1824]" , r_w , m1 , m2 , pos_in);
 
 	return buffer;
 }
@@ -169,9 +178,9 @@ void hp_dc100_tape_device::set_tick_size(hti_format_t::tape_pos_t size)
 	m_tick_size = size;
 }
 
-void hp_dc100_tape_device::set_bits_per_word(unsigned bits)
+void hp_dc100_tape_device::set_image_format(hti_format_t::image_format_t fmt)
 {
-	m_image.set_bits_per_word(bits);
+	m_image.set_image_format(fmt);
 }
 
 void hp_dc100_tape_device::set_go_threshold(double threshold)
@@ -179,9 +188,14 @@ void hp_dc100_tape_device::set_go_threshold(double threshold)
 	m_go_threshold = threshold;
 }
 
+void hp_dc100_tape_device::set_name(const std::string& name)
+{
+	m_unit_name = name;
+}
+
 void hp_dc100_tape_device::set_track_no(unsigned track)
 {
-	if (m_track != track) {
+	if (m_track != track && track < m_image.no_of_tracks()) {
 		LOG_DBG("Setting track %u (op=%d)\n" , track , static_cast<int>(m_current_op));
 		auto saved_op = m_current_op;
 		if (m_current_op != OP_IDLE) {
@@ -434,7 +448,7 @@ void hp_dc100_tape_device::time_to_next_gap(hti_format_t::tape_pos_t min_gap_siz
 		hti_format_t::track_iterator_t it;
 		found = m_image.next_data(get_track_no() , tmp , fwd , true , it);
 		if (found) {
-			tmp = hti_format_t::farthest_end(it , !fwd);
+			tmp = m_image.farthest_end(it , !fwd);
 		}
 	}
 	if (found && m_image.next_gap(get_track_no() , tmp , fwd , min_gap_size)) {
@@ -490,7 +504,7 @@ void hp_dc100_tape_device::device_reset()
 	clear_state();
 }
 
-void hp_dc100_tape_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void hp_dc100_tape_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	LOG_TMR("%.6f TMR %d p=%d s=%.3f(%.3f) a=%d\n" , machine().time().as_double() , id , m_tape_pos , m_speed , m_set_point , m_accelerating);
 	update_speed_pos();
@@ -589,18 +603,31 @@ image_init_result hp_dc100_tape_device::internal_load(bool is_create)
 
 	device_reset();
 
-	io_generic io;
-	io.file = (device_image_interface *)this;
-	io.procs = &image_ioprocs;
-	io.filler = 0;
+	check_for_file();
 	if (is_create) {
+		auto io = util::random_read_write_fill(image_core_file(), 0);
+		if (!io) {
+			LOG("out of memory\n");
+			seterror(std::errc::not_enough_memory, nullptr);
+			set_tape_present(false);
+			return image_init_result::FAIL;
+		}
 		m_image.clear_tape();
-		m_image.save_tape(&io);
-	} else if (!m_image.load_tape(&io)) {
-		LOG("load failed\n");
-		seterror(IMAGE_ERROR_INVALIDIMAGE , "Wrong format");
-		set_tape_present(false);
-		return image_init_result::FAIL;
+		m_image.save_tape(*io);
+	} else {
+		auto io = util::random_read_fill(image_core_file(), 0);
+		if (!io) {
+			LOG("out of memory\n");
+			seterror(std::errc::not_enough_memory, nullptr);
+			set_tape_present(false);
+			return image_init_result::FAIL;
+		}
+		if (!m_image.load_tape(*io)) {
+			LOG("load failed\n");
+			seterror(image_error::INVALIDIMAGE , "Wrong format");
+			set_tape_present(false);
+			return image_init_result::FAIL;
+		}
 	}
 	LOG("load OK\n");
 
@@ -875,7 +902,7 @@ void hp_dc100_tape_device::load_rd_word()
 			m_bit_idx = 0;
 		}
 		// This is actually the nearest end (dir is inverted)
-		m_rw_pos = m_next_bit_pos = hti_format_t::farthest_end(m_rd_it , !fwd);
+		m_rw_pos = m_next_bit_pos = m_image.farthest_end(m_rd_it , !fwd);
 		// Compute end of bit cell
 		hti_format_t::tape_pos_t bit_len = m_image.bit_length(BIT(m_rd_it->second , m_bit_idx));
 		if (!fwd) {

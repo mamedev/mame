@@ -25,6 +25,8 @@ Year + Game                     PCB        CPU    Sound         Custom          
 99  Tarzan (V107)               NO-0228?   Z180   M6295         IGS031 IGS025 IGS029  Battery
 99  Tarzan (V109C)              NO-0248-1  Z180   M6295         IGS031 IGS025         Battery
 00? Super Tarzan (V100I)        NO-0230-1  Z180   M6295         IGS031 IGS025         Battery
+01? Happy Skill (V611)          NO-0281    Z180   M6295 (K668)  IGS031 IGS025         Battery
+01? unknown (V100A)             unreadable Z180   M6295         IGS031 IGS025         Battery
 ??  Super Poker / Formosa       NO-0187    Z180   M6295 YM2413  IGS017 IGS025         Battery
 -------------------------------------------------------------------------------------------------------------
                                                                                     * not present in one set
@@ -50,8 +52,8 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z180/z180.h"
 #include "machine/i8255.h"
-#include "sound/ym2413.h"
 #include "sound/okim6295.h"
+#include "sound/ymopl.h"
 #include "machine/igs025.h"
 #include "machine/igs022.h"
 #include "machine/ticket.h"
@@ -93,6 +95,7 @@ public:
 	auto out_pa_callback() { return m_out_pa_cb.bind(); }
 	auto out_pb_callback() { return m_out_pb_cb.bind(); }
 	auto out_pc_callback() { return m_out_pc_cb.bind(); }
+	auto out_pd_callback() { return m_out_pd_cb.bind(); }
 
 	void address_w(u8 data);
 	void data_w(u8 data);
@@ -114,6 +117,7 @@ private:
 	devcb_write8       m_out_pa_cb;
 	devcb_write8       m_out_pb_cb;
 	devcb_write8       m_out_pc_cb;
+	devcb_write8       m_out_pd_cb;
 
 	u8 m_address, m_m3, m_mf;
 	u16 m_val, m_word;
@@ -171,7 +175,8 @@ igs_bitswap_device::igs_bitswap_device(const machine_config &mconfig, const char
 	m_in_pc_cb(*this),
 	m_out_pa_cb(*this),
 	m_out_pb_cb(*this),
-	m_out_pc_cb(*this)
+	m_out_pc_cb(*this),
+	m_out_pd_cb(*this)
 {
 }
 
@@ -184,6 +189,7 @@ void igs_bitswap_device::device_start()
 	m_out_pa_cb.resolve();
 	m_out_pb_cb.resolve();
 	m_out_pc_cb.resolve();
+	m_out_pd_cb.resolve();
 
 	// register for save states
 	save_item(NAME(m_address));
@@ -226,6 +232,13 @@ void igs_bitswap_device::data_w(u8 data)
 			if (!m_out_pc_cb.isnull())
 			{
 				m_out_pc_cb(data);
+				return;
+			}
+			break;
+		case 0x03:
+			if (!m_out_pd_cb.isnull())
+			{
+				m_out_pd_cb(data);
 				return;
 			}
 			break;
@@ -397,7 +410,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	u8 m_val;
+	u8 m_val = 0;
 };
 
 void igs_incdec_device::reset_w(u8 data)
@@ -487,6 +500,7 @@ public:
 	void starzan(machine_config &config);
 	void spkrform(machine_config &config);
 	void sdmg2(machine_config &config);
+	void tarzan(machine_config &config);
 
 	void init_iqblocka();
 	void init_mgdh();
@@ -501,10 +515,13 @@ public:
 	void init_tarzana();
 	void init_lhzb2a();
 	void init_mgdha();
+	void init_happyskl();
+	void init_unkigs();
 
 protected:
-	virtual void video_start() override;
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	int m_remap_addr;
@@ -526,7 +543,7 @@ private:
 	optional_ioport m_io_player2;
 	optional_ioport m_io_hopper;
 	optional_ioport_array<5> m_io_key;
-	optional_ioport_array<2> m_io_dsw;
+	optional_ioport_array<3> m_io_dsw;
 
 	void igs025_to_igs022_callback(void);
 
@@ -536,6 +553,7 @@ private:
 	u8 m_scramble_data;
 
 	u8 m_dsw_select;
+	u8 m_i8255_portc_mux;
 
 	// IGS029 protection (communication)
 	u8 m_igs029_send_data, m_igs029_recv_data;
@@ -584,6 +602,8 @@ private:
 	u16 slqz2_magic_r();
 	u8 mgcs_keys_r();
 
+	u8 i8255_port_c_mux_r(); // starzan, happyskl, unkigs (maybe tarzanc and clones, too)
+
 	DECLARE_MACHINE_RESET(iqblocka);
 	DECLARE_MACHINE_RESET(mgcs);
 	DECLARE_MACHINE_RESET(lhzb2a);
@@ -601,7 +621,7 @@ private:
 	void tarzan_decrypt_tiles();
 	void tarzan_decrypt_program_rom();
 	void tarzana_decrypt_program_rom();
-	void starzan_decrypt(u8 *ROM, int size, bool isOpcode);
+	void starzan_decrypt_program_rom();
 	void lhzb2_patch_rom();
 	void lhzb2_decrypt_tiles();
 	void lhzb2_decrypt_sprites();
@@ -623,6 +643,24 @@ private:
 	void tjsb_io(address_map &map);
 	void tjsb_map(address_map &map);
 };
+
+void igs017_state::machine_start()
+{
+	save_item(NAME(m_remap_addr));
+	save_item(NAME(m_input_select));
+	save_item(NAME(m_hopper));
+	save_item(NAME(m_igs_magic));
+	save_item(NAME(m_scramble_data));
+	save_item(NAME(m_dsw_select));
+	save_item(NAME(m_i8255_portc_mux));
+	save_item(NAME(m_igs029_send_data));
+	save_item(NAME(m_igs029_recv_data));
+	save_item(NAME(m_igs029_send_buf));
+	save_item(NAME(m_igs029_recv_buf));
+	save_item(NAME(m_igs029_send_len));
+	save_item(NAME(m_igs029_recv_len));
+	save_item(NAME(m_igs029_mgcs_long));
+}
 
 void igs017_state::machine_reset()
 {
@@ -889,46 +927,34 @@ void igs017_state::tarzan_decrypt_tiles()
 	}
 }
 
-// decryption is incomplete, the first part of code doesn't seem right.
+// decryption should be good
 void igs017_state::tarzan_decrypt_program_rom()
 {
-	u16 *ROM = (u16 *)memregion("maincpu")->base();
-	int size = 0x40000;
+	u8 *rom = memregion("maincpu")->base();
 
-	for(int i=0; i<size/2; i++)
+	for (int i = 0; i < 0x40000; i++)
 	{
-		u16 x = ROM[i];
+		u8 x = rom[i];
 
-		if ((i & 0x10c0) == 0x0000)
-			x ^= 0x0001;
-
-		if ((i & 0x0010) == 0x0010 || (i & 0x0130) == 0x0020)
-			x ^= 0x0404;
-
-		if ((i & 0x00d0) != 0x0010)
-			x ^= 0x1010;
-
-		if (((i & 0x0008) == 0x0008)^((i & 0x10c0) == 0x0000))
-			x ^= 0x0100;
-
-		ROM[i] = x;
-	}
-}
-// by iq_132
-void igs017_state::tarzana_decrypt_program_rom()
-{
-	u8 *ROM = memregion("maincpu")->base();
-	int size = 0x80000;
-
-	for (int i = 0; i < size; i++)
-	{
-		u8 x = 0;
 		if ((i & 0x00011) == 0x00011) x ^= 0x01;
 		if ((i & 0x02180) == 0x00000) x ^= 0x01;
-		if ((i & 0x001a0) != 0x00020) x ^= 0x20;
-		if ((i & 0x00260) != 0x00200) x ^= 0x40;
-		if ((i & 0x00060) != 0x00000 && (i & 0x00260) != 0x00240)   x ^= 0x80;
-		ROM[i] ^= x;
+		if ((i & 0x001a0) != 0x00020) x ^= 0x04;
+		if ((i & 0x00080) != 0x00080) x ^= 0x10;
+		if ((i & 0x000e0) == 0x000c0) x ^= 0x10;
+
+		m_decrypted_opcodes[i] = x;
+	}
+
+	for (int i = 0; i < 0x40000; i++)
+	{
+		u8 x = rom[i];
+
+		if ((i & 0x00011) == 0x00011) x ^= 0x01;
+		if ((i & 0x02180) == 0x00000) x ^= 0x01;
+		if (((i & 0x00020) == 0x00020) || ((i & 0x000260) == 0x00040)) x ^= 0x04;
+		if ((i & 0x001a0) != 0x00020) x ^= 0x10;
+
+		rom[i] = x;
 	}
 }
 
@@ -938,52 +964,69 @@ void igs017_state::init_tarzan()
 	tarzan_decrypt_tiles();
 }
 
+void igs017_state::tarzana_decrypt_program_rom()
+{
+	u8 *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x40000; i++)
+	{
+		u8 x = rom[i];
+
+		if ((i & 0x00011) == 0x00011) x ^= 0x01;
+		if ((i & 0x02180) == 0x00000) x ^= 0x01;
+		if ((i & 0x00080) != 0x00080) x ^= 0x20;
+		if ((i & 0x000e0) == 0x000c0) x ^= 0x20;
+		if ((i & 0x00280) != 0x00080) x ^= 0x40;
+		if ((i & 0x001a0) != 0x00020) x ^= 0x80;
+
+		m_decrypted_opcodes[i] = x;
+	}
+
+	for (int i = 0; i < 0x40000; i++) // by iq_132
+	{
+		u8 x = rom[i];
+
+		if ((i & 0x00011) == 0x00011) x ^= 0x01;
+		if ((i & 0x02180) == 0x00000) x ^= 0x01;
+		if ((i & 0x001a0) != 0x00020) x ^= 0x20;
+		if ((i & 0x00260) != 0x00200) x ^= 0x40;
+		if ((i & 0x00060) != 0x00000 && (i & 0x00260) != 0x00240)   x ^= 0x80;
+
+		rom[i] = x;
+	}
+}
+
 void igs017_state::init_tarzana()
 {
 	tarzana_decrypt_program_rom();
-//  tarzana_decrypt_tiles();    // to do
+//  tarzana_decrypt_tiles();    // to do when dumped
 }
 
 
 // starzan
 
-// decryption is incomplete: data decryption is correct but opcodes are encrypted differently.
-
-void igs017_state::starzan_decrypt(u8 *ROM, int size, bool isOpcode)
+void igs017_state::starzan_decrypt_program_rom()
 {
-	for(int i=0; i<size; i++)
+	u8 *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x40000; i++)
 	{
-#if 1
-		u8 x = ROM[i];
+		u8 x = rom[i];
 
-		// this seems ok for opcodes too
-		if ((i & 0x10) && (i & 0x01))
-		{
-			if (!(!(i & 0x2000) && !(i & 0x100) && !(i & 0x80)))
-				x ^= 0x01;
-		}
-		else
-		{
-			if (!(i & 0x2000) && !(i & 0x100) && !(i & 0x80))
-				x ^= 0x01;
-		}
+		if ((i & 0x00011) == 0x00011) x ^= 0x01;
+		if ((i & 0x02180) == 0x00000) x ^= 0x01;
+		if ((i & 0x00020) != 0x00020) x ^= 0x20;
+		if ((i & 0x002a0) == 0x00220) x ^= 0x20;
+		if ((i & 0x00220) != 0x00200) x ^= 0x40;
+		if ((i & 0x001c0) != 0x00040) x ^= 0x80;
 
-		// 2x no xor (opcode)
-		// 3x no xor (opcode)
-		// 60-66 no xor (opcode)
-		if (!(i & 0x100) || (i & 0x80) || (i & 0x20))
-			x ^= 0x20;
+		m_decrypted_opcodes[i] = x;
+	}
 
-		// 2x needs xor (opcode)
-		// 3x needs xor (opcode)
-		if ((i & 0x200) || (i & 0x40) || !(i & 0x20))
-			x ^= 0x40;
+	for (int i = 0; i < 0x40000; i++) // by iq_132
+	{
+		u8 x = rom[i];
 
-		if ((!(i & 0x100) && (i & 0x80)) || (i & 0x20))
-			x ^= 0x80;
-
-#else
-		// by iq_132
 		if ((i & 0x00011) == 0x00011) x ^= 0x01;
 		if ((i & 0x02180) == 0x00000) x ^= 0x01;
 		if ((i & 0x000a0) != 0x00000) x ^= 0x20;
@@ -992,23 +1035,78 @@ void igs017_state::starzan_decrypt(u8 *ROM, int size, bool isOpcode)
 		if ((i & 0x00260) == 0x00220) x ^= 0x40;
 		if ((i & 0x00020) == 0x00020) x ^= 0x80;
 		if ((i & 0x001a0) == 0x00080) x ^= 0x80;
-#endif
-		ROM[i] = x;
+
+		rom[i] = x;
 	}
 }
 
 void igs017_state::init_starzan()
 {
-	int size = 0x040000;
+	starzan_decrypt_program_rom();
+	tarzan_decrypt_tiles();
+	mgcs_flip_sprites(); // ?
+}
 
-	u8 *data = memregion("maincpu")->base();
-	u8 *code = m_decrypted_opcodes;
-	memcpy(code, data, size);
 
-	starzan_decrypt(data, size, false); // data
-	starzan_decrypt(code, size, true);  // opcodes
+void igs017_state::init_happyskl()
+{
+	u8 *rom = memregion("maincpu")->base();
 
-	mgcs_flip_sprites();
+	for (int i = 0; i < 0x40000; i++)
+	{
+		u8 x = rom[i];
+
+		if ((i & 0x00011) == 0x00011) x ^= 0x01;
+		if ((i & 0x02180) == 0x00000) x ^= 0x01;
+		if ((i & 0x0280) != 0x00080) x ^= 0x20;
+		if ((i & 0x02a0) == 0x00280) x ^= 0x20;
+		if ((i & 0x0280) != 0x00080) x ^= 0x40;
+		if ((i & 0x01a0) != 0x00080) x ^= 0x80;
+
+		m_decrypted_opcodes[i] = x;
+	}
+
+	for (int i = 0; i < 0x40000; i++) // adapted from starzan, seems ok
+	{
+		u8 x = rom[i];
+
+		if ((i & 0x00011) == 0x00011) x ^= 0x01;
+		if ((i & 0x02180) == 0x00000) x ^= 0x01;
+		if ((i & 0x000a0) != 0x00000) x ^= 0x20;
+		if ((i & 0x001a0) == 0x00000) x ^= 0x20;
+		if ((i & 0x00060) != 0x00040) x ^= 0x40;
+		if ((i & 0x00260) == 0x00240) x ^= 0x40;
+		if ((i & 0x00020) == 0x00020) x ^= 0x80;
+		if ((i & 0x00260) == 0x00040) x ^= 0x80;
+
+		rom[i] = x;
+	}
+
+	tarzan_decrypt_tiles(); // enough for chars
+}
+
+
+void igs017_state::init_unkigs()
+{
+	u8 *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x40000; i++)
+	{
+		u8 x = rom[i];
+
+		if ((i & 0x00011) == 0x00011) x ^= 0x01;
+		if ((i & 0x02180) == 0x00000) x ^= 0x01;
+		if ((i & 0x001a0) != 0x00020) x ^= 0x20;
+		if ((i & 0x00260) != 0x00020) x ^= 0x40;
+		if ((i & 0x00020) == 0x00020) x ^= 0x80;
+		if ((i & 0x00260) == 0x00240) x ^= 0x80;
+
+		// this hasn't got split data / opcodes encryption like happyskl, but let's keep the same machine_config for easier testing
+		m_decrypted_opcodes[i] = x;
+		rom[i] = x;
+	}
+
+	tarzan_decrypt_tiles(); // enough for chars
 }
 
 
@@ -2359,6 +2457,18 @@ void igs017_state::slqz2_map(address_map &map)
 	map(0x910001, 0x910001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
+u8 igs017_state::i8255_port_c_mux_r()
+{
+	switch(m_i8255_portc_mux)
+	{
+		case 0x01: return m_io_dsw[2]->read();
+		case 0x02: return m_io_dsw[1]->read();
+		case 0x03: return m_io_dsw[0]->read();
+	}
+
+	return 0xff;
+}
+
 
 /***************************************************************************
                                 Input Ports
@@ -3474,7 +3584,245 @@ static INPUT_PORTS_START( spkrform )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( starzan )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "System Limit" )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING( 0x02, "Unlimited" )
+	PORT_DIPSETTING( 0x00, "Limited" )
+	PORT_DIPNAME( 0x04, 0x04, "W-Up Game" )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Back Color" )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING( 0x08, "Black" )
+	PORT_DIPSETTING( 0x00, "Color" )
+	PORT_DIPNAME( 0x10, 0x10, "Stop Status" )  PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING( 0x10, "Non Stop" )
+	PORT_DIPSETTING( 0x00, "Auto Stop" )
+	PORT_DIPNAME( 0x20, 0x20, "Key" )  PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING( 0x20, "Mode 1" )
+	PORT_DIPSETTING( 0x00, "Mode 2" )
+	PORT_DIPNAME( 0x40, 0x40, "Credit Level" )  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Odds Table" )  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING( 0x80, "Show" )
+	PORT_DIPSETTING( 0x00, "No Show" )
 
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Normal Level" )  PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING( 0x01, DEF_STR( Low ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( High ) )
+	PORT_DIPUNUSED_DIPLOC(0x02, 0x02, "SW2:2") // not used from here on according to test mode, PCB does have 3 8-dip banks
+	PORT_DIPUNUSED_DIPLOC(0x04, 0x04, "SW2:3")
+	PORT_DIPUNUSED_DIPLOC(0x08, 0x08, "SW2:4")
+	PORT_DIPUNUSED_DIPLOC(0x10, 0x10, "SW2:5")
+	PORT_DIPUNUSED_DIPLOC(0x20, 0x20, "SW2:6")
+	PORT_DIPUNUSED_DIPLOC(0x40, 0x40, "SW2:7")
+	PORT_DIPUNUSED_DIPLOC(0x80, 0x80, "SW2:8")
+
+	PORT_START("DSW3")
+	PORT_DIPUNUSED_DIPLOC(0x01, 0x01, "SW3:1")
+	PORT_DIPUNUSED_DIPLOC(0x02, 0x02, "SW3:2")
+	PORT_DIPUNUSED_DIPLOC(0x04, 0x04, "SW3:3")
+	PORT_DIPUNUSED_DIPLOC(0x08, 0x08, "SW3:4")
+	PORT_DIPUNUSED_DIPLOC(0x10, 0x10, "SW3:5")
+	PORT_DIPUNUSED_DIPLOC(0x20, 0x20, "SW3:6")
+	PORT_DIPUNUSED_DIPLOC(0x40, 0x40, "SW3:7")
+	PORT_DIPUNUSED_DIPLOC(0x80, 0x80, "SW3:8")
+
+	PORT_START("PLAYER1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_NAME( "HP SW" ) // called like this in key test, not clear what it does
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN        ) // no effects in key test
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN        ) // no effects in key test
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN        ) // no effects in key test
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN        ) // no effects in key test
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START          )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP3     )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL  )
+
+	PORT_START("PLAYER2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP2  )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP4     )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP1     )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN        ) // no effects in key test
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN        ) // no effects in key test
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN        ) // no effects in key test
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN        ) // no effects in key test
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN        ) // no effects in key test
+
+	PORT_START("COINS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN   )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1          ) PORT_IMPULSE(5) // 'gettone C'
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2          ) PORT_IMPULSE(5) // 'gettone A'
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT  )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT  )
+	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW       ) // keep pressed while booting
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK    ) // enters book-keeping menu
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN        ) // no effects in key test
+
+	PORT_START("BUTTONS")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN        ) // no effects in key test
+INPUT_PORTS_END
+
+// Test mode is in Italian (probably machine translated given how literal it is).
+static INPUT_PORTS_START( happyskl )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:1") // 'demo audio'
+	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "System Limit" )  PORT_DIPLOCATION("SW1:2") // 'lim. sistema'
+	PORT_DIPSETTING( 0x02, "Unlimited" )
+	PORT_DIPSETTING( 0x00, "Limited" )
+	PORT_DIPNAME( 0x04, 0x04, "W-Up Game" )  PORT_DIPLOCATION("SW1:3") // 'gioco radd.'
+	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Game Speed" )  PORT_DIPLOCATION("SW1:4") // 'velocitá gioco'
+	PORT_DIPSETTING( 0x08, DEF_STR( Normal ) )
+	PORT_DIPSETTING( 0x00, "Quick" )
+	PORT_DIPNAME( 0x10, 0x10, "Replay Game" )  PORT_DIPLOCATION("SW1:5") // not translated for some reason
+	PORT_DIPSETTING( 0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Show Table" )  PORT_DIPLOCATION("SW1:6") // 'vedi tabella'
+	PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Skill" )  PORT_DIPLOCATION("SW1:7") // 'abilitá'
+	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Payment Type" )  PORT_DIPLOCATION("SW1:8") // 'tipo pagam.'
+	PORT_DIPSETTING( 0x80, DEF_STR( Normal ) )
+	PORT_DIPSETTING( 0x00, "Automatic" )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Auto Payment" )  PORT_DIPLOCATION("SW2:1") // 'pagam. autom.'
+	PORT_DIPSETTING( 0x01, "1" )
+	PORT_DIPSETTING( 0x00, "10" )
+	PORT_DIPNAME( 0x06, 0x06, "Enable Payment" )  PORT_DIPLOCATION("SW2:2,3") // 'abilitá pagam.', they probably meant "abilita" instead of "abilitá"
+	PORT_DIPSETTING( 0x06, "Everything" ) // 'tutto'
+	PORT_DIPSETTING( 0x04, "1/Tickets" )
+	PORT_DIPSETTING( 0x02, "10/Tickets" )
+	PORT_DIPSETTING( 0x00, "1/Tickets" ) // same as 0x04, why?
+	PORT_DIPNAME( 0x08, 0x08, "Select Balls" )  PORT_DIPLOCATION("SW2:4") // 'sel. palloni'
+	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Select Cubes" )  PORT_DIPLOCATION("SW2:5") // 'sel. cubi'
+	PORT_DIPSETTING( 0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Select Cans" )  PORT_DIPLOCATION("SW2:6") // 'sel. lattine'
+	PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Select Cards" )  PORT_DIPLOCATION("SW2:7") // 'sel. carte'
+	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Credit Limit" )  PORT_DIPLOCATION("SW2:8") // 'lim. crediti'
+	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x01, "Level Limit" )  PORT_DIPLOCATION("SW3:1") // 'lim. livello'
+	PORT_DIPSETTING( 0x01, DEF_STR( Low ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( High ) )
+	PORT_DIPNAME( 0x02, 0x02, "Background" )  PORT_DIPLOCATION("SW3:2") // 'sfondo'
+	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC(0x04, 0x04, "SW3:3") // not used from here on according to test mode
+	PORT_DIPUNUSED_DIPLOC(0x08, 0x08, "SW3:4")
+	PORT_DIPUNUSED_DIPLOC(0x10, 0x10, "SW3:5")
+	PORT_DIPUNUSED_DIPLOC(0x20, 0x20, "SW3:6")
+	PORT_DIPUNUSED_DIPLOC(0x40, 0x40, "SW3:7")
+	PORT_DIPUNUSED_DIPLOC(0x80, 0x80, "SW3:8")
+
+	PORT_START("PLAYER1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_NAME( "HP SW" ) // called like this in key test, not clear what it does
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN        ) // no effects in key test
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN        ) // no effects in key test
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN        ) // no effects in key test
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN        ) // no effects in key test
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START          )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD1    )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD5    )
+
+	PORT_START("PLAYER2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2    )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3    )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD4    )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN        ) // no effects in key test
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN        ) // no effects in key test
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN        ) // no effects in key test
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN        ) // no effects in key test
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN        ) // no effects in key test
+
+	PORT_START("COINS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN   )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1          ) PORT_IMPULSE(5) // 'gettone C'
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2          ) PORT_IMPULSE(5) // 'gettone A'
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT  )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT  )
+	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW       ) // keep pressed while booting
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK    ) // enters book-keeping menu
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN        ) // no effects in key test
+
+	PORT_START("BUTTONS")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN        ) // no effects in key test
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( unkigs )
+	PORT_INCLUDE(happyskl)
+
+	PORT_MODIFY("PLAYER1")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD3    )
+
+	PORT_MODIFY("PLAYER2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1    )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2    )
+
+	// dips definitions taken from test mode, to be verified when the game will be playable
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "System Limit" )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING( 0x02, "Unlimited" )
+	PORT_DIPSETTING( 0x00, "Limited" )
+	PORT_DIPNAME( 0x04, 0x04, "W-Up Game" )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "W-Up Type" )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING( 0x08, "Big-Small" )
+	PORT_DIPSETTING( 0x00, "Red-Black" )
+	PORT_DIPNAME( 0x10, 0x10, "Game Speed" )  PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING( 0x10, DEF_STR( Normal ) )
+	PORT_DIPSETTING( 0x00, "Quick" )
+	PORT_DIPNAME( 0x20, 0x20, "Card Type" )  PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING( 0x20, "Poker" )
+	PORT_DIPSETTING( 0x00, "Symbol" )
+	PORT_DIPNAME( 0x40, 0x40, "Sexy Girl" )  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Title Name" )  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Show Hold" )  PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Number Type" )  PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING( 0x02, "Number" )
+	PORT_DIPSETTING( 0x00, "AJQK" )
+	PORT_DIPUNUSED_DIPLOC(0x04, 0x04, "SW2:3") // not used from here on according to test mode, PCB does have 3 8-dip banks
+	PORT_DIPUNUSED_DIPLOC(0x08, 0x08, "SW2:4")
+	PORT_DIPUNUSED_DIPLOC(0x10, 0x10, "SW2:5")
+	PORT_DIPUNUSED_DIPLOC(0x20, 0x20, "SW2:6")
+	PORT_DIPUNUSED_DIPLOC(0x40, 0x40, "SW2:7")
+	PORT_DIPUNUSED_DIPLOC(0x80, 0x80, "SW2:8")
+
+	PORT_MODIFY("DSW3")
+	PORT_DIPUNUSED_DIPLOC(0x01, 0x01, "SW3:1")
+	PORT_DIPUNUSED_DIPLOC(0x02, 0x02, "SW3:2")
+INPUT_PORTS_END
 /***************************************************************************
                                 Machine Drivers
 ***************************************************************************/
@@ -3492,6 +3840,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::iqblocka_interrupt)
 
 MACHINE_RESET_MEMBER(igs017_state,iqblocka)
 {
+	machine_reset();
 	m_input_select = 0;
 }
 
@@ -3565,12 +3914,25 @@ void igs017_state::genius6(machine_config &config)
 	m_igs_bitswap->set_m3_bits<3>( 3, ~5,  ~6, ~15);
 }
 
-void igs017_state::starzan(machine_config &config)
+void igs017_state::tarzan(machine_config &config)
 {
 	iqblocka(config);
+
 	m_maincpu->set_addrmap(AS_OPCODES, &igs017_state::decrypted_opcodes_map);
 }
 
+void igs017_state::starzan(machine_config &config)
+{
+	tarzan(config);
+
+	subdevice<i8255_device>("ppi8255")->in_pa_callback().set_ioport("COINS");
+	subdevice<i8255_device>("ppi8255")->in_pb_callback().set_ioport("PLAYER1");
+	subdevice<i8255_device>("ppi8255")->in_pc_callback().set(FUNC(igs017_state::i8255_port_c_mux_r));
+
+	m_igs_bitswap->in_pa_callback().set_constant(0xff);
+	m_igs_bitswap->in_pc_callback().set_constant(0xff);
+	m_igs_bitswap->out_pd_callback().set([this](u8 data){ m_i8255_portc_mux = data >> 1; });
+}
 
 // mgcs
 
@@ -4034,6 +4396,36 @@ ROM_START( genius6 )
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "speech.u17", 0x00000, 0x40000, CRC(d9e3d39f) SHA1(bec85d1ac2dfca77453cbca0e7dd53fee8fb438b) ) // same as iqblocka
 ROM_END
+
+// strangely identifies as V133F and has 1997 copyright, while the parent is V110F but with 1998 copyright
+ROM_START( genius6a )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "genius6_v133.u18", 0x00000, 0x40000, CRC(b34ce8c6) SHA1(845e6c4f5b1f06229a4046cf085ce08802458bd8) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "genius6_cg.u7", 0x000000, 0x080000, CRC(1842d021) SHA1(78bfb5108741d39bd19b603cc97623fba7b2a31e) )   // FIXED BITS (xxxxxxxx0xxxxxxx)
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "text.u8", 0x000000, 0x040000, CRC(7716b601) SHA1(363cddd930fdec4821ebfaced64276f8fa943eae) ) // half sized if compared to the parent and identical to its 1st half, confirmed correct
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "speech.u17", 0x00000, 0x40000, CRC(d9e3d39f) SHA1(bec85d1ac2dfca77453cbca0e7dd53fee8fb438b) ) // same as iqblocka
+ROM_END
+
+ROM_START( genius6b ) // PCB N0 - 0132, identical to V133F but for the main CPU ROM
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "genius6_v-132f.u18", 0x00000, 0x40000, CRC(231be791) SHA1(1684395dc93902893dca32952c236617ccdbc269) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "genius6_cg.u7", 0x000000, 0x080000, CRC(1842d021) SHA1(78bfb5108741d39bd19b603cc97623fba7b2a31e) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "text.u8", 0x000000, 0x040000, CRC(7716b601) SHA1(363cddd930fdec4821ebfaced64276f8fa943eae) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "speech.u17", 0x00000, 0x40000, CRC(d9e3d39f) SHA1(bec85d1ac2dfca77453cbca0e7dd53fee8fb438b) )
+ROM_END
+
 
 /***************************************************************************
 
@@ -4587,20 +4979,70 @@ ROM_START( starzan )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "v100i.u9", 0x00000, 0x40000, CRC(64180bff) SHA1(b08dbe8a17ca33024442ebee41f111c8f98a2109) )
 
-	ROM_REGION( 0x100000, "igs017_igs031:sprites", 0 )
-	ROM_LOAD( "cg.u2",             0x00000, 0x80000, CRC(884f95f5) SHA1(2e526aa966e90dc696a8b392a5a99e14f03c4bd4) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
-	ROM_LOAD( "t2105_cg_v110.u11", 0x80000, 0x80000, NO_DUMP )
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", ROMREGION_ERASEFF )
+	ROM_LOAD( "c0057209.u3", 0x00000, 0x400000, NO_DUMP ) // this is also probably the same as tarzanc. Current theory is the 0x400000 mask ROM at u3 is the same for all games of the same type, with EPROM at u2 providing an overlay for game specific sprites
+	ROM_LOAD( "cg.u2",       0x00000, 0x080000, CRC(884f95f5) SHA1(2e526aa966e90dc696a8b392a5a99e14f03c4bd4) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD( "c0057209.u3", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD( "t2105_cg_v110.u11", 0x00000, 0x80000, BAD_DUMP CRC(1d4be260) SHA1(6374c61735144b3ff54d5e490f26adac4a10b14d) ) // not dumped for this board, but same label as the one from tarzanc, assuming same contents for now
 
-	ROM_REGION( 0x80000, "oki", ROMREGION_ERASE )
-	ROM_LOAD( "s2102_sp_v102.u8", 0x00000, 0x80000, NO_DUMP )
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "s2102_sp_v102.u8", 0x00000, 0x80000, BAD_DUMP CRC(90dda82d) SHA1(67fbc1e8d76b85e124136e2f1df09c8b6c5a8f97) ) // not dumped for this board, but same label as the one from tarzanc, assuming same contents for now
 
 	ROM_REGION( 0x2dd * 2, "plds", 0 )
 	ROM_LOAD( "palce22v10h_tar97_u10-1.u10", 0x000, 0x2dd, NO_DUMP )
 	ROM_LOAD( "palce22v10h_tar97_u20.u20",   0x2dd, 0x2dd, NO_DUMP )
 ROM_END
+
+
+// IGS PCB NO-0281
+// Main CPU is a Zilog Z180 clocked @16MHz (XTAL and EXTAL pins directly tied to a 16MHz crystal)
+// OKI MSM6295 (actually a rebadged one marked 'K668 0003') clocked @1MHz, pin 7 is HIGH
+// A QFP208 custom ASIC marked 'IGS 031'
+// A PLCC68 custom IC marked 'IGS025 A9B2201 9931'
+// A Ni-MH 3.6V battery as seen in other IGS hardware
+ROM_START( happyskl )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "v611.u8", 0x00000, 0x40000, CRC(1fb3da98) SHA1(60674af9f5c53298b8ef856f1986c905b9bd7b96) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "igs_a2701_cg_v100.u3", 0x00000, 0x400000, CRC(f3756a51) SHA1(8dd4677584f309cec4b068be9f9370a7a172a031) ) // FIXED BITS (xxxxxxx0xxxxxxxx) - 1xxxxxxxxxxxxxxxxxxxxx = 0x00
+	ROM_LOAD( "happyskill_cg.u2",     0x00000, 0x080000, CRC(297a1893) SHA1(9be9e2cdaba1615ea376f3fb7087bf990e68b3b4) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "happyskill_text.u11", 0x00000, 0x80000, CRC(c6f51041) SHA1(81a9a03e92c1c67f299113dec9e05ba77395ea31) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "igs_s2702_sp_v100.u8", 0x00000, 0x80000, CRC(0ec9b1b5) SHA1(b8c7e068ddf6777a184339e6796be33e442a3df4) )
+
+	ROM_REGION( 0x2dd * 2, "plds", 0 )
+	ROM_LOAD( "atf22v10c.u10",   0x000, 0x2dd, NO_DUMP )
+	ROM_LOAD( "peel22cv10a.u20", 0x2dd, 0x2dd, NO_DUMP )
+ROM_END
+
+
+// PCB was heavily corroded and not working
+ROM_START( unkigs )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "u9.bin", 0x00000, 0x40000, CRC(8d79eb4d) SHA1(9cad09013f83335ec78c3ff78715bc5d9a989eb7) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	// the following ROM wasn't readable on this PCB, but it's the same as the one in happyskl. Assuming same contents for now
+	ROM_LOAD( "igs_a2701_cg_v100.u3", 0x00000, 0x400000, BAD_DUMP CRC(f3756a51) SHA1(8dd4677584f309cec4b068be9f9370a7a172a031) ) // FIXED BITS (xxxxxxx0xxxxxxxx) - 1xxxxxxxxxxxxxxxxxxxxx = 0x00
+	//ROM_LOAD( "u2",                   0x00000, 0x080000, NO_DUMP ) // not populated. Never there or removed? Possibly never there,  current theory is the 0x400000 mask ROM at u3 is the same for all games of the same type, with EPROM at u2 providing an overlay for game specific sprites
+
+	ROM_REGION( 0x40000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "u11.bin", 0x00000, 0x40000, CRC(34475c83) SHA1(376ff68d89c25471483b074dcf7542f42f954e67) )
+	ROM_IGNORE(0x040000) // 1xxxxxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x80000, "oki", 0 ) // same as happyskl
+	ROM_LOAD( "igs_s2702_sp_v100.u8", 0x00000, 0x80000, CRC(0ec9b1b5) SHA1(b8c7e068ddf6777a184339e6796be33e442a3df4) )
+
+	ROM_REGION( 0x2dd * 2, "plds", 0 )
+	ROM_LOAD( "peel22cv10h.u10", 0x000, 0x2dd, NO_DUMP )
+	ROM_LOAD( "peel22cv10h.u20", 0x2dd, 0x2dd, NO_DUMP )
+ROM_END
+
 
 /***************************************************************************
 
@@ -4642,14 +5084,18 @@ GAME( 1997,  mgdha,    mgdh,     mgdha,    mgdh ,    igs017_state, init_mgdha,  
 GAME( 1997,  sdmg2,    0,        sdmg2,    sdmg2,    igs017_state, init_sdmg2,    ROT0, "IGS",                      "Mahjong Super Da Man Guan II (China, V754C)", 0 )
 GAME( 1997,  tjsb,     0,        tjsb,     tjsb,     igs017_state, init_tjsb,     ROT0, "IGS",                      "Mahjong Tian Jiang Shen Bing (V137C)",        MACHINE_UNEMULATED_PROTECTION )
 GAME( 1998,  genius6,  0,        genius6,  genius6,  igs017_state, init_iqblocka, ROT0, "IGS",                      "Genius 6 (V110F)",                            0 )
+GAME( 1997,  genius6a, genius6,  genius6,  genius6,  igs017_state, init_iqblocka, ROT0, "IGS",                      "Genius 6 (V133F)",                            0 ) // clone because it has older copyright year
+GAME( 1997,  genius6b, genius6,  genius6,  genius6,  igs017_state, init_iqblocka, ROT0, "IGS",                      "Genius 6 (V132F)",                            0 ) // "
 GAME( 1998,  mgcs,     0,        mgcs,     mgcs,     igs017_state, init_mgcs,     ROT0, "IGS",                      "Mahjong Man Guan Caishen (V103CS)",           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND )
-GAME( 1998,  lhzb2,    0,        lhzb2,    lhzb2,    igs017_state, init_lhzb2,    ROT0, "IGS",                      "Mahjong Long Hu Zhengba 2 (set 1)",           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1998,  lhzb2a,   lhzb2,    lhzb2a,   lhzb2a,   igs017_state, init_lhzb2a,   ROT0, "IGS",                      "Mahjong Long Hu Zhengba 2 (VS221M)",          0 )
+GAME( 1998,  lhzb2,    0,        lhzb2,    lhzb2,    igs017_state, init_lhzb2,    ROT0, "IGS",                      "Mahjong Long Hu Zhengba 2 (set 1)",           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸2
+GAME( 1998,  lhzb2a,   lhzb2,    lhzb2a,   lhzb2a,   igs017_state, init_lhzb2a,   ROT0, "IGS",                      "Mahjong Long Hu Zhengba 2 (VS221M)",          0 ) // 龙虎争霸2
 GAME( 1998,  slqz2,    0,        slqz2,    slqz2,    igs017_state, init_slqz2,    ROT0, "IGS",                      "Mahjong Shuang Long Qiang Zhu 2 (VS203J)",    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1999,  tarzanc,  0,        iqblocka, iqblocka, igs017_state, init_tarzan,   ROT0, "IGS",                      "Tarzan Chuang Tian Guan (V109C, set 1)",      MACHINE_NOT_WORKING )
-GAME( 1999,  tarzan,   tarzanc,  iqblocka, iqblocka, igs017_state, init_tarzan,   ROT0, "IGS",                      "Tarzan Chuang Tian Guan (V109C, set 2)",      MACHINE_NOT_WORKING )
-GAME( 1999,  tarzana,  tarzanc,  iqblocka, iqblocka, igs017_state, init_tarzana,  ROT0, "IGS",                      "Tarzan (V107)",                               MACHINE_NOT_WORKING )
-GAME( 2000?, starzan,  0,        starzan,  iqblocka, igs017_state, init_starzan,  ROT0, "IGS (G.F. Gioca license)", "Super Tarzan (Italy, V100I)",                 MACHINE_NOT_WORKING )
+GAME( 1999,  tarzanc,  0,        tarzan,   iqblocka, igs017_state, init_tarzan,   ROT0, "IGS",                      "Tarzan Chuang Tian Guan (V109C, set 1)",      MACHINE_NOT_WORKING ) // IGS031 protection's game specific parameters not emulated yet, sprites' decryption missing, inputs to be done
+GAME( 1999,  tarzan,   tarzanc,  tarzan,   iqblocka, igs017_state, init_tarzan,   ROT0, "IGS",                      "Tarzan Chuang Tian Guan (V109C, set 2)",      MACHINE_NOT_WORKING ) // IGS031 protection's game specific parameters not emulated yet, sprites' decryption missing, inputs to be done
+GAME( 1999,  tarzana,  tarzanc,  tarzan,   iqblocka, igs017_state, init_tarzana,  ROT0, "IGS",                      "Tarzan (V107)",                               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // IGS029 needs to be emulated, sprites' decryption missing, inputs to be done
+GAME( 2000?, starzan,  0,        starzan,  starzan,  igs017_state, init_starzan,  ROT0, "IGS (G.F. Gioca license)", "Super Tarzan (Italy, V100I)",                 MACHINE_NOT_WORKING ) // IGS031 protection's game specific parameters not emulated yet, incomplete dump, sprites' decryption missing
+GAME( 2001?, happyskl, 0,        starzan,  happyskl, igs017_state, init_happyskl, ROT0, "IGS",                      "Happy Skill (Italy, V611IT)",                 MACHINE_NOT_WORKING ) // IGS031 protection's game specific parameters not emulated yet, sprites' decryption missing
+GAME( 2001?, unkigs,   happyskl, starzan,  unkigs,   igs017_state, init_unkigs,   ROT0, "IGS",                      "unknown IGS game (V100A)",                    MACHINE_NOT_WORKING ) // possibly titled 'Champion 2', definitely derived from Happy Skill or vice versa, missing ROM, IGS031 protection's game specific parameters not emulated yet, sprites' decryption missing
 
 // Parent spk306us in driver spoker.cpp. Move this set to that driver?
 GAME( ????,  spkrform, spk306us, spkrform, spkrform, igs017_state, init_spkrform, ROT0, "IGS",                      "Super Poker (v100xD03) / Formosa",            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

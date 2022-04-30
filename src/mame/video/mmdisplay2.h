@@ -2,7 +2,7 @@
 // copyright-holders:Sandro Ronco
 /**********************************************************************
 
-    Mephisto Display Module (2nd version)
+    Mephisto Modular Display Module (2nd version)
 
 *********************************************************************/
 
@@ -11,26 +11,23 @@
 
 #pragma once
 
+#include "sound/spkrdev.h"
 #include "video/hd44780.h"
-#include "sound/dac.h"
 
 #include "emupal.h"
-#include "screen.h"
-#include "speaker.h"
 
 
-// ======================> mephisto_display_module2_device
-
-class mephisto_display_module2_device : public device_t
+class mephisto_display2_device : public device_t
 {
 public:
 	// construction/destruction
-	mephisto_display_module2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	mephisto_display2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	hd44780_device *get() { return m_lcdc; }
+	hd44780_device *get() { return m_lcd; }
 
-	DECLARE_WRITE8_MEMBER(latch_w);
-	DECLARE_WRITE8_MEMBER(io_w);
+	void latch_w(u8 data);
+	void io_w(u8 data);
+	u8 io_r() { return m_ctrl; }
 
 protected:
 	// device-level overrides
@@ -38,17 +35,18 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	void lcd_palette(palette_device &palette) const;
-
 private:
-	optional_device<hd44780_device> m_lcdc;
-	required_device<dac_byte_interface> m_dac;
-	uint8_t m_latch;
-	uint8_t m_ctrl;
+	required_device<hd44780_device> m_lcd;
+	required_device<speaker_sound_device> m_dac;
+
+	void lcd_palette(palette_device &palette) const;
+	HD44780_PIXEL_UPDATE(lcd_pixel_update);
+
+	u8 m_latch = 0;
+	u8 m_ctrl = 0;
 };
 
 
-// device type definition
-DECLARE_DEVICE_TYPE(MEPHISTO_DISPLAY_MODULE2, mephisto_display_module2_device)
+DECLARE_DEVICE_TYPE(MEPHISTO_DISPLAY_MODULE2, mephisto_display2_device)
 
 #endif // MAME_VIDEO_MMDISPLAY2_H

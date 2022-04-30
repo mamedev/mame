@@ -6,11 +6,25 @@
   HFS images, including floppy images (DD and HD) and vMac/Basilisk HDD
   volumes up to 256 MB in size.
 
+  TODO:
+  * Get get directory and get listing commands have no way to indicate
+    that the path/name is too long for the buffer.
+  * The set directory command doesn't work well with host filesystems that
+    have roots (e.g. Windows drive letters).
+  * The set directory command assumes '/' is a valid host directory
+    separator character.
+  * The get listing commands have no way to indicate whether an entry is
+    a directory.
+
 ***************************************************************************/
 
 #include "emu.h"
 #include "nubus_image.h"
+
 #include "osdcore.h"
+
+#include <algorithm>
+
 
 #define IMAGE_ROM_REGION    "image_rom"
 #define IMAGE_DISK0_TAG     "nb_disk"
@@ -27,16 +41,13 @@ public:
 	messimg_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const noexcept override { return IO_QUICKLOAD; }
-
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "img"; }
-	virtual const char *custom_instance_name() const noexcept override { return "disk"; }
-	virtual const char *custom_brief_instance_name() const noexcept override { return "disk"; }
+	virtual const char *image_type_name() const noexcept override { return "disk"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "disk"; }
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
@@ -54,7 +65,7 @@ public:
 
 
 // device type definition
-DEFINE_DEVICE_TYPE_NS(MESSIMG_DISK, nubus_image_device, messimg_disk_image_device, "messimg_disk_image", "Mac image")
+DEFINE_DEVICE_TYPE(MESSIMG_DISK, nubus_image_device::messimg_disk_image_device, "messimg_disk_image", "Mac image")
 
 nubus_image_device::messimg_disk_image_device::messimg_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, MESSIMG_DISK, tag, owner, clock),
@@ -72,16 +83,16 @@ void nubus_image_device::messimg_disk_image_device::device_start()
 {
 	m_data = nullptr;
 
-	if (exists() && fseek(0, SEEK_END) == 0)
+	if (exists() && !fseek(0, SEEK_END))
 	{
-		m_size = (uint32_t)ftell();
+		m_size = uint32_t(ftell());
 	}
 }
 
 image_init_result nubus_image_device::messimg_disk_image_device::call_load()
 {
 	fseek(0, SEEK_END);
-	m_size = (uint32_t)ftell();
+	m_size = uint32_t(ftell());
 	if (m_size > (256*1024*1024))
 	{
 		osd_printf_error("Mac image too large: must be 256MB or less!\n");
@@ -89,9 +100,8 @@ image_init_result nubus_image_device::messimg_disk_image_device::call_load()
 		return image_init_result::FAIL;
 	}
 
-	m_data = make_unique_clear<uint8_t[]>(m_size);
 	fseek(0, SEEK_SET);
-	fread(m_data.get(), m_size);
+	fread(m_data, m_size);
 	m_ejected = false;
 
 	return image_init_result::PASS;
@@ -180,20 +190,19 @@ void nubus_image_device::device_start()
 
 //  printf("[image %p] slotspace = %x, super = %x\n", this, slotspace, superslotspace);
 
-	nubus().install_device(slotspace, slotspace+3, read32_delegate(*this, FUNC(nubus_image_device::image_r)), write32_delegate(*this, FUNC(nubus_image_device::image_w)));
-	nubus().install_device(slotspace+4, slotspace+7, read32_delegate(*this, FUNC(nubus_image_device::image_status_r)), write32_delegate(*this, FUNC(nubus_image_device::image_status_w)));
-	nubus().install_device(slotspace+8, slotspace+11, read32_delegate(*this, FUNC(nubus_image_device::file_cmd_r)), write32_delegate(*this, FUNC(nubus_image_device::file_cmd_w)));
-	nubus().install_device(slotspace+12, slotspace+15, read32_delegate(*this, FUNC(nubus_image_device::file_data_r)), write32_delegate(*this, FUNC(nubus_image_device::file_data_w)));
-	nubus().install_device(slotspace+16, slotspace+19, read32_delegate(*this, FUNC(nubus_image_device::file_len_r)), write32_delegate(*this, FUNC(nubus_image_device::file_len_w)));
-	nubus().install_device(slotspace+20, slotspace+147, read32_delegate(*this, FUNC(nubus_image_device::file_name_r)), write32_delegate(*this, FUNC(nubus_image_device::file_name_w)));
-	nubus().install_device(superslotspace, superslotspace+((256*1024*1024)-1), read32_delegate(*this, FUNC(nubus_image_device::image_super_r)), write32_delegate(*this, FUNC(nubus_image_device::image_super_w)));
+	nubus().install_device(slotspace, slotspace+3, read32smo_delegate(*this, FUNC(nubus_image_device::image_r)), write32smo_delegate(*this, FUNC(nubus_image_device::image_w)));
+	nubus().install_device(slotspace+4, slotspace+7, read32smo_delegate(*this, FUNC(nubus_image_device::image_status_r)), write32smo_delegate(*this, FUNC(nubus_image_device::image_status_w)));
+	nubus().install_device(slotspace+8, slotspace+11, read32smo_delegate(*this, FUNC(nubus_image_device::file_cmd_r)), write32smo_delegate(*this, FUNC(nubus_image_device::file_cmd_w)));
+	nubus().install_device(slotspace+12, slotspace+15, read32smo_delegate(*this, FUNC(nubus_image_device::file_data_r)), write32smo_delegate(*this, FUNC(nubus_image_device::file_data_w)));
+	nubus().install_device(slotspace+16, slotspace+19, read32smo_delegate(*this, FUNC(nubus_image_device::file_len_r)), write32smo_delegate(*this, FUNC(nubus_image_device::file_len_w)));
+	nubus().install_device(slotspace+20, slotspace+147, read32sm_delegate(*this, FUNC(nubus_image_device::file_name_r)), write32sm_delegate(*this, FUNC(nubus_image_device::file_name_w)));
+	nubus().install_device(superslotspace, superslotspace+((256*1024*1024)-1), read32s_delegate(*this, FUNC(nubus_image_device::image_super_r)), write32s_delegate(*this, FUNC(nubus_image_device::image_super_w)));
 
 	m_image = subdevice<messimg_disk_image_device>(IMAGE_DISK0_TAG);
 
-	filectx.curdir[0] = '.';
-	filectx.curdir[1] = '\0';
-	filectx.dirp = nullptr;
-	filectx.fd = nullptr;
+	filectx.curdir = ".";
+	filectx.dirp.reset();
+	filectx.fd.reset();
 }
 
 //-------------------------------------------------
@@ -204,12 +213,12 @@ void nubus_image_device::device_reset()
 {
 }
 
-WRITE32_MEMBER( nubus_image_device::image_status_w )
+void nubus_image_device::image_status_w(uint32_t data)
 {
 	m_image->m_ejected = true;
 }
 
-READ32_MEMBER( nubus_image_device::image_status_r )
+uint32_t nubus_image_device::image_status_r()
 {
 	if(m_image->m_ejected) {
 		return 0;
@@ -221,16 +230,16 @@ READ32_MEMBER( nubus_image_device::image_status_r )
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_image_device::image_w )
+void nubus_image_device::image_w(uint32_t data)
 {
 }
 
-READ32_MEMBER( nubus_image_device::image_r )
+uint32_t nubus_image_device::image_r()
 {
 	return m_image->m_size;
 }
 
-WRITE32_MEMBER( nubus_image_device::image_super_w )
+void nubus_image_device::image_super_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t *image = (uint32_t*)m_image->m_data.get();
 	data = ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
@@ -239,83 +248,82 @@ WRITE32_MEMBER( nubus_image_device::image_super_w )
 	COMBINE_DATA(&image[offset]);
 }
 
-READ32_MEMBER( nubus_image_device::image_super_r )
+uint32_t nubus_image_device::image_super_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t *image = (uint32_t*)m_image->m_data.get();
 	uint32_t data = image[offset];
 	return ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
 }
 
-WRITE32_MEMBER( nubus_image_device::file_cmd_w )
+void nubus_image_device::file_cmd_w(uint32_t data)
 {
 //  data = ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
 	filectx.curcmd = data;
-	switch(data) {
+	switch (data) {
 	case kFileCmdGetDir:
-		strcpy((char*)filectx.filename, (char*)filectx.curdir);
+		strncpy(filectx.filename, filectx.curdir.c_str(), std::size(filectx.filename));
 		break;
 	case kFileCmdSetDir:
 		if ((filectx.filename[0] == '/') || (filectx.filename[0] == '$')) {
-			strcpy((char*)filectx.curdir, (char*)filectx.filename);
+			filectx.curdir.assign(std::begin(filectx.filename), std::find(std::begin(filectx.filename), std::end(filectx.filename), '\0'));
 		} else {
-			strcat((char*)filectx.curdir, "/");
-			strcat((char*)filectx.curdir, (char*)filectx.filename);
+			filectx.curdir += '/';
+			filectx.curdir.append(std::begin(filectx.filename), std::find(std::begin(filectx.filename), std::end(filectx.filename), '\0'));
 		}
 		break;
 	case kFileCmdGetFirstListing:
-		filectx.dirp = osd::directory::open((const char *)filectx.curdir);
+		filectx.dirp = osd::directory::open(filectx.curdir);
+		[[fallthrough]];
 	case kFileCmdGetNextListing:
 		if (filectx.dirp) {
 			osd::directory::entry const *const dp = filectx.dirp->read();
-			if(dp) {
-				strncpy((char*)filectx.filename, dp->name, sizeof(filectx.filename));
+			if (dp) {
+				strncpy(filectx.filename, dp->name, std::size(filectx.filename));
 			} else {
-				memset(filectx.filename, 0, sizeof(filectx.filename));
+				std::fill(std::begin(filectx.filename), std::end(filectx.filename), '\0');
 			}
 		}
 		else {
-			memset(filectx.filename, 0, sizeof(filectx.filename));
+			std::fill(std::begin(filectx.filename), std::end(filectx.filename), '\0');
 		}
 		break;
 	case kFileCmdGetFile:
 		{
-			std::string fullpath;
-			fullpath.reserve(1024);
-			fullpath.assign((const char *)filectx.curdir);
-			fullpath.append(PATH_SEPARATOR);
-			fullpath.append((const char*)filectx.filename);
-			if(osd_file::open(fullpath, OPEN_FLAG_READ, filectx.fd, filectx.filelen) != osd_file::error::NONE)
-				osd_printf_error("Error opening %s\n", fullpath);
+			std::string fullpath(filectx.curdir);
+			fullpath += PATH_SEPARATOR;
+			fullpath.append(std::begin(filectx.filename), std::find(std::begin(filectx.filename), std::end(filectx.filename), '\0'));
+			std::error_condition const filerr = osd_file::open(fullpath, OPEN_FLAG_READ, filectx.fd, filectx.filelen);
+			if (filerr)
+				osd_printf_error("%s: Error opening %s (%s:%d %s)\n", tag(), fullpath, filerr.category().name(), filerr.value(), filerr.message());
 			filectx.bytecount = 0;
 		}
 		break;
 	case kFileCmdPutFile:
 		{
-			std::string fullpath;
-			fullpath.reserve(1024);
-			fullpath.assign((const char *)filectx.curdir);
-			fullpath.append(PATH_SEPARATOR);
-			fullpath.append((const char*)filectx.filename);
+			std::string fullpath(filectx.curdir);
+			fullpath += PATH_SEPARATOR;
+			fullpath.append(std::begin(filectx.filename), std::find(std::begin(filectx.filename), std::end(filectx.filename), '\0'));
 			uint64_t filesize; // unused, but it's an output from the open call
-			if(osd_file::open(fullpath, OPEN_FLAG_WRITE|OPEN_FLAG_CREATE, filectx.fd, filesize) != osd_file::error::NONE)
-				osd_printf_error("Error opening %s\n", fullpath);
+			std::error_condition const filerr = osd_file::open(fullpath, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, filectx.fd, filesize);
+			if (filerr)
+				osd_printf_error("%s: Error opening %s (%s:%d %s)\n", tag(), fullpath, filerr.category().name(), filerr.value(), filerr.message());
 			filectx.bytecount = 0;
 		}
 		break;
 	}
 }
 
-READ32_MEMBER( nubus_image_device::file_cmd_r )
+uint32_t nubus_image_device::file_cmd_r()
 {
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_image_device::file_data_w )
+void nubus_image_device::file_data_w(uint32_t data)
 {
 	std::uint32_t count = 4;
 	std::uint32_t actualcount = 0;
 
-	data = ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
+	data = swapendian_int32(data);
 	if(filectx.fd) {
 		//data = big_endianize_int32(data);
 		if((filectx.bytecount + count) > filectx.filelen) count = filectx.filelen - filectx.bytecount;
@@ -328,7 +336,7 @@ WRITE32_MEMBER( nubus_image_device::file_data_w )
 	}
 }
 
-READ32_MEMBER( nubus_image_device::file_data_r )
+uint32_t nubus_image_device::file_data_r()
 {
 	if(filectx.fd) {
 		std::uint32_t ret;
@@ -343,25 +351,23 @@ READ32_MEMBER( nubus_image_device::file_data_r )
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_image_device::file_len_w )
+void nubus_image_device::file_len_w(uint32_t data)
 {
-	data = ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
+	data = swapendian_int32(data);
 	filectx.filelen = big_endianize_int32(data);
 }
 
-READ32_MEMBER( nubus_image_device::file_len_r )
+uint32_t nubus_image_device::file_len_r()
 {
 	return filectx.filelen;
 }
 
-WRITE32_MEMBER( nubus_image_device::file_name_w )
+void nubus_image_device::file_name_w(offs_t offset, uint32_t data)
 {
-	((uint32_t*)(filectx.filename))[offset] = big_endianize_int32(data);
+	reinterpret_cast<uint32_t *>(filectx.filename)[offset] = big_endianize_int32(data);
 }
 
-READ32_MEMBER( nubus_image_device::file_name_r )
+uint32_t nubus_image_device::file_name_r(offs_t offset)
 {
-	uint32_t ret;
-	ret = big_endianize_int32(((uint32_t*)(filectx.filename))[offset]);
-	return ret;
+	return big_endianize_int32(reinterpret_cast<uint32_t const *>(filectx.filename)[offset]);
 }

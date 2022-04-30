@@ -16,7 +16,6 @@
 #include "machine/mc68328.h"
 #include "machine/ram.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -50,11 +49,11 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(palm_port_f_out);
-	DECLARE_READ8_MEMBER(palm_port_c_in);
-	DECLARE_READ8_MEMBER(palm_port_f_in);
-	DECLARE_WRITE16_MEMBER(palm_spim_out);
-	DECLARE_READ16_MEMBER(palm_spim_in);
+	void palm_port_f_out(uint8_t data);
+	uint8_t palm_port_c_in();
+	uint8_t palm_port_f_in();
+	void palm_spim_out(uint16_t data);
+	uint16_t palm_spim_in();
 	DECLARE_WRITE_LINE_MEMBER(palm_spim_exchange);
 	void palm_palette(palette_device &palette) const;
 
@@ -92,27 +91,27 @@ INPUT_CHANGED_MEMBER(palm_state::button_check)
 	m_maincpu->set_port_d_lines(button_state, (int)param);
 }
 
-WRITE8_MEMBER(palm_state::palm_port_f_out)
+void palm_state::palm_port_f_out(uint8_t data)
 {
 	m_port_f_latch = data;
 }
 
-READ8_MEMBER(palm_state::palm_port_c_in)
+uint8_t palm_state::palm_port_c_in()
 {
 	return 0x10;
 }
 
-READ8_MEMBER(palm_state::palm_port_f_in)
+uint8_t palm_state::palm_port_f_in()
 {
 	return m_port_f_latch;
 }
 
-WRITE16_MEMBER(palm_state::palm_spim_out)
+void palm_state::palm_spim_out(uint16_t data)
 {
 	m_spim_data = data;
 }
 
-READ16_MEMBER(palm_state::palm_spim_in)
+uint16_t palm_state::palm_spim_in()
 {
 	return m_spim_data;
 }
@@ -137,9 +136,7 @@ WRITE_LINE_MEMBER(palm_state::palm_spim_exchange)
 void palm_state::machine_start()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_read_bank (0x000000, m_ram->size() - 1, "bank1");
-	space.install_write_bank(0x000000, m_ram->size() - 1, "bank1");
-	membank("bank1")->set_base(m_ram->pointer());
+	space.install_ram(0x000000, m_ram->size() - 1, m_ram->pointer());
 
 	save_item(NAME(m_port_f_latch));
 	save_item(NAME(m_spim_data));
@@ -206,8 +203,6 @@ void palm_state::palm(machine_config &config)
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 static INPUT_PORTS_START( palm )

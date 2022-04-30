@@ -202,7 +202,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 
 private:
-	DECLARE_READ8_MEMBER(_4roses_opcode_r);
+	uint8_t _4roses_opcode_r(offs_t offset);
 
 	void _4roses_map(address_map &map);
 	void _4roses_opcodes_map(address_map &map);
@@ -220,7 +220,7 @@ public:
 	void rugby(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(rugby_opcode_r);
+	uint8_t rugby_opcode_r(offs_t offset);
 
 	void rugby_map(address_map &map);
 	void rugby_opcodes_map(address_map &map);
@@ -248,7 +248,7 @@ void _4roses_state::_4roses_map(address_map &map)
 	map(0x6000, 0xffff).rom().region("maincpu", 0x6000);
 }
 
-READ8_MEMBER(_4roses_state::_4roses_opcode_r)
+uint8_t _4roses_state::_4roses_opcode_r(offs_t offset)
 {
 	uint8_t data = m_maincpu->space(AS_PROGRAM).read_byte(offset);
 
@@ -300,7 +300,7 @@ void rugby_state::rugby_map(address_map &map)
 	map(0x7000, 0x7fff).ram().w(FUNC(rugby_state::funworld_colorram_w)).share("colorram");
 }
 
-READ8_MEMBER(rugby_state::rugby_opcode_r)
+uint8_t rugby_state::rugby_opcode_r(offs_t offset)
 {
 	uint8_t data = m_maincpu->space(AS_PROGRAM).read_byte(offset);
 	if ((offset >> 12) == 4)

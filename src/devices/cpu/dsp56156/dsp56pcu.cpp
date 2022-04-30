@@ -146,8 +146,8 @@ void pcu_reset(dsp56156_core* cpustate)
 				/* ... */
 				/* P:$cffe -> Internal P:$07ff low byte */
 				/* P:$cfff -> Internal P:$07ff high byte */
-				uint8_t mem_value_low  = cpustate->program->read_byte(mem_offset);        /* TODO: IS THIS READING RIGHT? */
-				uint8_t mem_value_high = cpustate->program->read_byte(mem_offset);
+				uint8_t mem_value_low  = cpustate->program.read_byte(mem_offset);        /* TODO: IS THIS READING RIGHT? */
+				uint8_t mem_value_high = cpustate->program.read_byte(mem_offset);
 				cpustate->program_ram[i] = (mem_value_high << 8) | mem_value_low;
 			}
 
@@ -168,7 +168,7 @@ void pcu_reset(dsp56156_core* cpustate)
 			/*        they need.  Once they've had their fill, they turn bootstrap mode off */
 			/*        and the CPU begins execution at 0x0000; */
 			/* HACK - Read bit 15 at 0xc000 to see if we're working with the SSIO or host interface. */
-			if (cpustate->program->read_word(0xc000<<1) & 0x8000)
+			if (cpustate->program.read_word(0xc000<<1) & 0x8000)
 			{
 				cpustate->bootstrap_mode = BOOTSTRAP_SSIX;
 				cpustate->device->logerror("DSP56156 : Currently in (hacked) bootstrap mode - reading from SSIx.\n");

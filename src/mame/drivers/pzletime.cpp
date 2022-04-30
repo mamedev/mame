@@ -59,17 +59,17 @@ private:
 	required_shared_ptr<uint16_t> m_spriteram;
 
 	/* video-related */
-	tilemap_t      *m_mid_tilemap;
-	tilemap_t      *m_txt_tilemap;
+	tilemap_t      *m_mid_tilemap = nullptr;
+	tilemap_t      *m_txt_tilemap = nullptr;
 
 	/* misc */
-	int            m_ticket;
-	DECLARE_WRITE16_MEMBER(mid_videoram_w);
-	DECLARE_WRITE16_MEMBER(txt_videoram_w);
-	DECLARE_WRITE16_MEMBER(ticket_w);
-	DECLARE_WRITE16_MEMBER(video_regs_w);
-	DECLARE_WRITE16_MEMBER(eeprom_w);
-	DECLARE_WRITE16_MEMBER(oki_bank_w);
+	int            m_ticket = 0;
+	void mid_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void txt_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void ticket_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void video_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void oki_bank_w(uint16_t data);
 	TILE_GET_INFO_MEMBER(get_mid_tile_info);
 	TILE_GET_INFO_MEMBER(get_txt_tile_info);
 	virtual void machine_start() override;
@@ -92,7 +92,7 @@ TILE_GET_INFO_MEMBER(pzletime_state::get_mid_tile_info)
 	int tileno = m_mid_videoram[tile_index] & 0x0fff;
 	int colour = m_mid_videoram[tile_index] & 0xf000;
 	colour = colour >> 12;
-	SET_TILE_INFO_MEMBER(2, tileno, colour, 0);
+	tileinfo.set(2, tileno, colour, 0);
 }
 
 TILE_GET_INFO_MEMBER(pzletime_state::get_txt_tile_info)
@@ -101,7 +101,7 @@ TILE_GET_INFO_MEMBER(pzletime_state::get_txt_tile_info)
 	int colour = m_txt_videoram[tile_index] & 0xf000;
 	colour = colour >> 12;
 
-	SET_TILE_INFO_MEMBER(0, tileno, colour, 0);
+	tileinfo.set(0, tileno, colour, 0);
 
 	tileinfo.category = BIT(colour, 3);
 }
@@ -117,9 +117,6 @@ void pzletime_state::video_start()
 
 uint32_t pzletime_state::screen_update_pzletime(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int count;
-	int y, x;
-
 	bitmap.fill(m_palette[0]->pen(0), cliprect); //bg pen
 
 	m_txt_tilemap->set_scrolly(0, m_tilemap_regs[0] - 3);
@@ -130,14 +127,14 @@ uint32_t pzletime_state::screen_update_pzletime(screen_device &screen, bitmap_rg
 
 	if (m_video_regs[2] & 1)
 	{
-		count = 0;
+		int count = 0;
 
-		for (y = 255; y >= 0; y--)
+		for (int y = 255; y >= 0; y--)
 		{
-			for (x = 0; x < 512; x++)
+			for (int x = 0; x < 512; x++)
 			{
 				if (m_bg_videoram[count] & 0x8000)
-					bitmap.pix32((y - 18) & 0xff, (x - 32) & 0x1ff) = m_palette[1]->pen(m_bg_videoram[count] & 0x7fff);
+					bitmap.pix((y - 18) & 0xff, (x - 32) & 0x1ff) = m_palette[1]->pen(m_bg_videoram[count] & 0x7fff);
 
 				count++;
 			}
@@ -146,24 +143,20 @@ uint32_t pzletime_state::screen_update_pzletime(screen_device &screen, bitmap_rg
 
 	m_mid_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
+	uint16_t const *const spriteram = m_spriteram;
+	for (int offs = 0; offs < 0x2000 / 2; offs += 4)
 	{
-		uint16_t *spriteram = m_spriteram;
-		int offs, spr_offs, colour, sx, sy;
+		if(spriteram[offs + 0] == 8)
+			break;
 
-		for(offs = 0; offs < 0x2000 / 2; offs += 4)
-		{
-			if(spriteram[offs + 0] == 8)
-				break;
+		int spr_offs = spriteram[offs + 3] & 0x0fff;
+		int sy = 0x200 - (spriteram[offs + 0] & 0x1ff) - 35;
+		int sx = (spriteram[offs + 1] & 0x1ff) - 30;
+		int colour = (spriteram[offs + 0] & 0xf000) >> 12;
 
-			spr_offs = spriteram[offs + 3] & 0x0fff;
-			sy = 0x200 - (spriteram[offs + 0] & 0x1ff) - 35;
-			sx = (spriteram[offs + 1] & 0x1ff) - 30;
-			colour = (spriteram[offs + 0] & 0xf000) >> 12;
+		// is spriteram[offs + 0] & 0x200 flipy? it's always set
 
-			// is spriteram[offs + 0] & 0x200 flipy? it's always set
-
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, spr_offs, colour, 0, 1, sx, sy, 0);
-		}
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, spr_offs, colour, 0, 1, sx, sy, 0);
 	}
 
 	m_txt_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -173,19 +166,19 @@ uint32_t pzletime_state::screen_update_pzletime(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-WRITE16_MEMBER(pzletime_state::mid_videoram_w)
+void pzletime_state::mid_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mid_videoram[offset]);
 	m_mid_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(pzletime_state::txt_videoram_w)
+void pzletime_state::txt_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_txt_videoram[offset]);
 	m_txt_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(pzletime_state::eeprom_w)
+void pzletime_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -195,13 +188,13 @@ WRITE16_MEMBER(pzletime_state::eeprom_w)
 	}
 }
 
-WRITE16_MEMBER(pzletime_state::ticket_w)
+void pzletime_state::ticket_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_ticket = data & 1;
 }
 
-WRITE16_MEMBER(pzletime_state::video_regs_w)
+void pzletime_state::video_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_video_regs[offset]);
 
@@ -214,7 +207,7 @@ WRITE16_MEMBER(pzletime_state::video_regs_w)
 	}
 }
 
-WRITE16_MEMBER(pzletime_state::oki_bank_w)
+void pzletime_state::oki_bank_w(uint16_t data)
 {
 	m_oki->set_rom_bank(data & 0x3);
 }
@@ -273,32 +266,11 @@ static INPUT_PORTS_START( pzletime )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 INPUT_PORTS_END
 
-static const gfx_layout layout8x8 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
-static const gfx_layout layout16x16 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 4, 0, 12, 8, 20, 16, 28, 24, 16*32+4, 16*32+0, 16*32+12, 16*32+8, 16*32+20, 16*32+16, 16*32+28, 16*32+24 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32, 8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
-	32*32
-};
 
 static GFXDECODE_START( gfx_pzletime )
-	GFXDECODE_ENTRY( "gfx1", 0, layout8x8,   0x100, 0x10 )
-	GFXDECODE_ENTRY( "gfx2", 0, layout16x16, 0x200, 0x10 )
-	GFXDECODE_ENTRY( "gfx3", 0, layout16x16, 0x000, 0x10 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb,               0x100, 0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_col_2x2_group_packed_lsb, 0x200, 0x10 )
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_col_2x2_group_packed_lsb, 0x000, 0x10 )
 GFXDECODE_END
 
 void pzletime_state::machine_start()

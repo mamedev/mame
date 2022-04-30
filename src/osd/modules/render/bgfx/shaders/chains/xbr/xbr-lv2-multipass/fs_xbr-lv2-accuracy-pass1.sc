@@ -5,7 +5,7 @@ $input v_texcoord0, v_texcoord1, v_texcoord2, v_color0
 
 /*
    Hyllian's xBR LV2 Accuracy - pass1 Shader
-   
+
    Copyright (C) 2011-2016 Hyllian - sergiogdb@gmail.com
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -85,7 +85,7 @@ vec4 unpack_info(float i)
 	float frac_val = fract(i / 2.0f);
 	info.w = round(frac_val);
 	i = i / 2.0f - frac_val;
-	
+
 	frac_val = fract(i / 2.0f);
 	info.z = round(frac_val);
 	i = i / 2.0f - frac_val;
@@ -118,7 +118,7 @@ void main()
 	mat4 h = mat4(H, F, B, D);
 
 	// These inequations define the line below which interpolation occurs.
-	vec4 fx      = (Ao*fp.y+Bo*fp.x); 
+	vec4 fx      = (Ao*fp.y+Bo*fp.x);
 	vec4 fx_left = (Ax*fp.y+Bx*fp.x);
 	vec4 fx_up   = (Ay*fp.y+By*fp.x);
 
@@ -148,11 +148,11 @@ void main()
 	vec4 res1 = E;
 	res1 = mix(res1, mix(H, F, px.x), maximos.x);
 	res1 = mix(res1, mix(B, D, px.z), maximos.z);
-	
+
 	vec4 res2 = E;
 	res2 = mix(res2, mix(F, B, px.y), maximos.y);
 	res2 = mix(res2, mix(D, H, px.w), maximos.w);
-	
+
 	vec3 E_mix = (df1(E, res2) >= df1(E, res1)) ? vec3(1.0, 1.0, 1.0) : vec3(0.0, 0.0, 0.0);
 	vec3 res = mix(res1.xyz, res2.xyz, E_mix);
 

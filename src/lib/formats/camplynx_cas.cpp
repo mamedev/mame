@@ -23,9 +23,10 @@ Each byte is 8 bits (MSB first) with no start or stop bits.
 
 ********************************************************************/
 
-#include "emu.h"   // for popmessage and <string>
-
 #include "camplynx_cas.h"
+
+#include "osdcore.h" // osd_printf_*
+
 
 #define WAVEENTRY_LOW  -32768
 #define WAVEENTRY_HIGH  32767
@@ -192,7 +193,7 @@ static int camplynx_cassette_calculate_size_in_samples(const uint8_t *bytes, int
 	return camplynx_handle_cassette(nullptr, bytes);
 }
 
-static const struct CassetteLegacyWaveFiller lynx48k_legacy_fill_wave =
+static const cassette_image::LegacyWaveFiller lynx48k_legacy_fill_wave =
 {
 	camplynx_cassette_fill_wave,                 /* fill_wave */
 	-1,                                          /* chunk_size */
@@ -203,7 +204,7 @@ static const struct CassetteLegacyWaveFiller lynx48k_legacy_fill_wave =
 	0                                            /* trailer_samples */
 };
 
-static const struct CassetteLegacyWaveFiller lynx128k_legacy_fill_wave =
+static const cassette_image::LegacyWaveFiller lynx128k_legacy_fill_wave =
 {
 	camplynx_cassette_fill_wave,                 /* fill_wave */
 	-1,                                          /* chunk_size */
@@ -214,27 +215,27 @@ static const struct CassetteLegacyWaveFiller lynx128k_legacy_fill_wave =
 	0                                            /* trailer_samples */
 };
 
-static cassette_image::error lynx48k_cassette_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error lynx48k_cassette_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
-	return cassette_legacy_identify(cassette, opts, &lynx48k_legacy_fill_wave);
+	return cassette->legacy_identify(opts, &lynx48k_legacy_fill_wave);
 }
 
-static cassette_image::error lynx128k_cassette_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error lynx128k_cassette_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
-	return cassette_legacy_identify(cassette, opts, &lynx128k_legacy_fill_wave);
+	return cassette->legacy_identify(opts, &lynx128k_legacy_fill_wave);
 }
 
 static cassette_image::error lynx48k_cassette_load(cassette_image *cassette)
 {
-	return cassette_legacy_construct(cassette, &lynx48k_legacy_fill_wave);
+	return cassette->legacy_construct(&lynx48k_legacy_fill_wave);
 }
 
 static cassette_image::error lynx128k_cassette_load(cassette_image *cassette)
 {
-	return cassette_legacy_construct(cassette, &lynx128k_legacy_fill_wave);
+	return cassette->legacy_construct(&lynx128k_legacy_fill_wave);
 }
 
-static const struct CassetteFormat lynx48k_cassette_image_format =
+static const cassette_image::Format lynx48k_cassette_image_format =
 {
 	"tap",
 	lynx48k_cassette_identify,
@@ -242,7 +243,7 @@ static const struct CassetteFormat lynx48k_cassette_image_format =
 	nullptr
 };
 
-static const struct CassetteFormat lynx128k_cassette_image_format =
+static const cassette_image::Format lynx128k_cassette_image_format =
 {
 	"tap",
 	lynx128k_cassette_identify,

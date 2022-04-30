@@ -17,7 +17,7 @@
 #include "bus/mtx/exp.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/z80ctc.h"
 #include "sound/sn76496.h"
 #include "machine/ram.h"
@@ -40,6 +40,12 @@ public:
 		, m_exp(*this, "exp")
 		, m_extrom(*this, "extrom")
 		, m_rompak(*this, "rompak")
+		, m_rammap_bank1(*this, "rammap_bank1")
+		, m_rammap_bank2(*this, "rammap_bank2")
+		, m_rammap_bank3(*this, "rammap_bank3")
+		, m_rommap_bank1(*this, "rommap_bank1")
+		, m_rommap_bank2(*this, "rommap_bank2")
+		, m_rommap_bank3(*this, "rommap_bank3")
 	{ }
 
 	void rs128(machine_config &config);
@@ -62,45 +68,51 @@ private:
 	required_device<mtx_exp_slot_device> m_exp;
 	required_device<generic_slot_device> m_extrom;
 	required_device<generic_slot_device> m_rompak;
+	memory_bank_creator m_rammap_bank1;
+	memory_bank_creator m_rammap_bank2;
+	memory_bank_creator m_rammap_bank3;
+	memory_bank_creator m_rommap_bank1;
+	memory_bank_creator m_rommap_bank2;
+	memory_bank_creator m_rommap_bank3;
 
 	/* keyboard state */
-	uint8_t m_key_sense;
+	uint8_t m_key_sense = 0;
 
 	/* video state */
-	uint8_t *m_video_ram;
-	uint8_t *m_attr_ram;
+	uint8_t *m_video_ram = nullptr;
+	uint8_t *m_attr_ram = nullptr;
 
 	/* sound state */
-	uint8_t m_sound_latch;
+	uint8_t m_sound_latch = 0;
 
 	/* timers */
-	device_t *m_cassette_timer;
+	device_t *m_cassette_timer = nullptr;
 
-	int m_centronics_busy;
-	int m_centronics_fault;
-	int m_centronics_perror;
-	int m_centronics_select;
+	int m_centronics_busy = 0;
+	int m_centronics_fault = 0;
+	int m_centronics_perror = 0;
+	int m_centronics_select = 0;
 
-	DECLARE_WRITE8_MEMBER(mtx_subpage_w);
-	DECLARE_WRITE8_MEMBER(mtx_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(mtx_sound_latch_w);
-	DECLARE_WRITE8_MEMBER(mtx_sense_w);
-	DECLARE_READ8_MEMBER(mtx_key_lo_r);
-	DECLARE_READ8_MEMBER(mtx_key_hi_r);
-	DECLARE_WRITE8_MEMBER(hrx_address_w);
-	DECLARE_READ8_MEMBER(hrx_data_r);
-	DECLARE_WRITE8_MEMBER(hrx_data_w);
-	DECLARE_READ8_MEMBER(hrx_attr_r);
-	DECLARE_WRITE8_MEMBER(hrx_attr_w);
+	void mtx_subpage_w(uint8_t data);
+	void mtx_bankswitch_w(uint8_t data);
+	void mtx_sound_latch_w(uint8_t data);
+	void mtx_sense_w(uint8_t data);
+	uint8_t mtx_key_lo_r();
+	uint8_t mtx_key_hi_r();
+	void hrx_address_w(offs_t offset, uint8_t data);
+	uint8_t hrx_data_r();
+	void hrx_data_w(uint8_t data);
+	uint8_t hrx_attr_r();
+	void hrx_attr_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_tick);
 	DECLARE_WRITE_LINE_MEMBER(ctc_trg1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_trg2_w);
-	DECLARE_READ8_MEMBER(mtx_strobe_r);
-	DECLARE_READ8_MEMBER(mtx_sound_strobe_r);
-	DECLARE_WRITE8_MEMBER(mtx_cst_w);
-	DECLARE_WRITE8_MEMBER(mtx_cst_motor_w);
-	DECLARE_READ8_MEMBER(mtx_prt_r);
+	uint8_t mtx_strobe_r();
+	uint8_t mtx_sound_strobe_r();
+	void mtx_cst_w(uint8_t data);
+	void mtx_cst_motor_w(uint8_t data);
+	uint8_t mtx_prt_r();
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);

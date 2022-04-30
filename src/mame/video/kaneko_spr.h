@@ -51,8 +51,8 @@ public:
 	void copybitmap(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
 	void copybitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
 
-	template<class _BitmapClass>
-	void copybitmap_common(_BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
+	template<class BitmapClass>
+	void copybitmap_common(BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
 
 	void bootleg_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, u16* spriteram16, int spriteram16_bytes);
 
@@ -124,7 +124,7 @@ public:
 
 	kaneko_vu002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	void get_sprite_attributes(struct tempsprite_t *s, u16 attr) override;
-	int get_sprite_type(void) override{ return 0; };
+	int get_sprite_type(void) override{ return 0; }
 
 protected:
 	virtual void device_start() override;
@@ -143,7 +143,7 @@ public:
 
 	kaneko_kc002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	void get_sprite_attributes(struct tempsprite_t *s, u16 attr) override;
-	int get_sprite_type(void) override{ return 1; };
+	int get_sprite_type(void) override{ return 1; }
 
 protected:
 	virtual void device_start() override;

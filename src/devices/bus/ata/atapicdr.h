@@ -21,6 +21,8 @@ class atapi_cdrom_device : public atapi_hle_device, public t10mmc
 public:
 	atapi_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void set_ultra_dma_mode(uint16_t mode);
+
 	uint16_t *identify_device_buffer() { return m_identify_buffer; }
 
 protected:
@@ -36,6 +38,7 @@ protected:
 	virtual void process_buffer() override;
 	virtual void ExecCommand() override;
 	bool m_media_change;
+	uint16_t ultra_dma_mode;
 };
 
 class atapi_fixed_cdrom_device : public atapi_cdrom_device

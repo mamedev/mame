@@ -20,8 +20,8 @@ public:
 	gf4500_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 
-	DECLARE_READ32_MEMBER( read );
-	DECLARE_WRITE32_MEMBER( write );
+	uint32_t read(offs_t offset);
+	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	uint32_t screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

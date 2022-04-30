@@ -193,7 +193,7 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
@@ -225,11 +225,11 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(counters_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	void counters_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
 	virtual void video_start() override;
@@ -244,13 +244,13 @@ private:
 *********************************************/
 
 
-WRITE8_MEMBER(gluck2_state::videoram_w)
+void gluck2_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(gluck2_state::colorram_w)
+void gluck2_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -270,7 +270,7 @@ TILE_GET_INFO_MEMBER(gluck2_state::get_tile_info)
 	int bank = ((attr & 0xc0) >> 5 ) + ((attr & 0x02) >> 1 );   /* bits 1-6-7 handle the gfx banks */
 	int color = (attr & 0x3c) >> 2;                             /* bits 2-3-4-5 handle the color */
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+	tileinfo.set(bank, code, color, 0);
 }
 
 
@@ -291,7 +291,7 @@ uint32_t gluck2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 *                R/W Handlers                 *
 **********************************************/
 
-WRITE8_MEMBER(gluck2_state::counters_w)
+void gluck2_state::counters_w(uint8_t data)
 {
 /*  - bits -
     7654 3210

@@ -2,9 +2,9 @@
 // copyright-holders: Dirk Best
 /****************************************************************************
 
-    Qume QVT-70 terminal
+    Qume QVT-70/QVT-82 terminal
 
-    Hardware:
+    QVT-70:
     - Z80 (Z8040008VSC)
     - Z80 DART (Z0847006PSC)
     - QUME 303489-01 QFP144
@@ -22,11 +22,21 @@
     - 64 background/foreground colors
     - 80/132 columns
 
+    QVT-82:
+    - Z80 (Z0840008PSC)
+    - Z80 DART (Z0847006PSC)
+    - QUME 303489-01 QFP144
+    - ROM 64k * 2
+    - RAM 8k UM6264AK-10L (above Z80) + 8k UM6264K-70L * 3 (below Z80)
+    - DS1231
+    - 54.2857MHz XTAL
+    - Battery
+
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
 #include "emupal.h"
@@ -35,8 +45,8 @@
 class qvt70_state : public driver_device
 {
 public:
-	qvt70_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	qvt70_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_rombank(*this, "rom"),
 		m_rambank(*this, "ram%d", 0U),
@@ -85,11 +95,11 @@ private:
 
 void qvt70_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x7fff).bankr("rom");
+	map(0x0000, 0x7fff).bankr(m_rombank);
 	map(0x8000, 0x8000).w(FUNC(qvt70_state::rombank_w));
 	map(0xa000, 0xbfff).ram();
-	map(0xc000, 0xdfff).bankrw("ram0");
-	map(0xe000, 0xffff).bankrw("ram1");
+	map(0xc000, 0xdfff).bankrw(m_rambank[0]);
+	map(0xe000, 0xffff).bankrw(m_rambank[1]);
 }
 
 void qvt70_state::io_map(address_map &map)
@@ -216,7 +226,7 @@ uint32_t qvt70_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 				// 8 pixels of the character
 				for (int p = 0; p < 8; p++)
-					bitmap.pix32(y * 16 + i, x * 8 + p) = BIT(data, 7 - p) ? rgb_t::white() : rgb_t::black();
+					bitmap.pix(y * 16 + i, x * 8 + p) = BIT(data, 7 - p) ? rgb_t::white() : rgb_t::black();
 			}
 		}
 	}
@@ -331,12 +341,13 @@ void qvt70_state::unk_60_w(uint8_t data)
 
 void qvt70_state::rombank_w(uint8_t data)
 {
-//  logerror("rombank_w: %02x\n", data);
+	if (data & ~0x19)
+		logerror("rombank_w: %02x\n", data);
 
-	// 765----- unknown
-	// ---43--- bankswitching
-	// -----21- unknown
-	// -------0 bankswitching
+	// 765-----  unknown
+	// ---43---  bankswitching
+	// -----21-  unknown
+	// -------0  bankswitching
 
 	switch (data & 0x19)
 	{
@@ -407,4 +418,11 @@ ROM_START( qvt70 )
 	ROM_LOAD( "251513-04_revj.u12", 0x20000, 0x10000, CRC(3960bbd5) SHA1(9db306cef09be21ff43c081ebe11e9b46f617861) ) // 251513-04  C/S:18D0  95' REV.J (checksum matches)
 ROM_END
 
+ROM_START( qvt82 )
+	ROM_REGION(0x30000, "maincpu", 0)
+	ROM_LOAD( "304229-02d_revd.u6", 0x00000, 0x10000, CRC(597431df) SHA1(10c4669b759dd7cfd6746e54dc12807197cf841a) ) // 304229-02D  QVT-82 REV. D  U6 (BF7F) (checksum matches)
+	ROM_LOAD( "304229-01d_revd.u5", 0x20000, 0x10000, CRC(9ebd09b6) SHA1(ef9f002016d05b770e7b66d15f05fc286bd022d9) ) // 304229-01D  QVT-82 REV. D  U5 (462B) (checksum matches)
+ROM_END
+
 COMP( 1992, qvt70, 0, 0, qvt70, qvt70, qvt70_state, empty_init, "Qume", "QVT-70", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1993, qvt82, 0, 0, qvt70, qvt70, qvt70_state, empty_init, "Qume", "QVT-82", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

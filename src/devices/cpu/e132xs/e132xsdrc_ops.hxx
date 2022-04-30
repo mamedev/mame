@@ -2704,9 +2704,55 @@ void hyperstone_device::generate_shri(drcuml_block &block, compiler_state &compi
 template <hyperstone_device::shift_type HI_N>
 void hyperstone_device::generate_sardi(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
-	printf("Unimplemented: generate_sardi (%08x)\n", desc->pc);
-	fflush(stdout);
-	fatalerror(" ");
+	UML_MOV(block, I7, mem(&m_core->clock_cycles_2));
+
+	uint16_t op = desc->opptr.w[0];
+
+	const uint32_t dst_code = (op & 0xf0) >> 4;
+	const uint32_t dstf_code = dst_code + 1;
+
+	generate_check_delay_pc(block, compiler, desc);
+
+	UML_ROLAND(block, I3, DRC_SR, 7, 0x7f);
+
+	UML_ADD(block, I2, I3, dst_code);
+	UML_AND(block, I4, I2, 0x3f);
+	UML_LOAD(block, I0, (void *)m_core->local_regs, I4, SIZE_DWORD, SCALE_x4);
+
+	UML_ADD(block, I2, I3, dstf_code);
+	UML_AND(block, I5, I2, 0x3f);
+	UML_LOAD(block, I1, (void *)m_core->local_regs, I5, SIZE_DWORD, SCALE_x4);
+
+#ifndef PTR64
+	UML_DAND(block, I1, I1, 0x00000000ffffffff);
+#endif
+
+	UML_DSHL(block, I2, I0, 32);
+	UML_DOR(block, I0, I1, I2);
+
+	UML_AND(block, I4, DRC_SR, ~(C_MASK | Z_MASK | N_MASK));
+
+	const uint32_t n = HI_N ? (0x10 | (op & 0xf)) : (op & 0xf);
+	if (HI_N || n)
+	{
+		int no_carry = compiler.m_labelnum++;
+		UML_DTEST(block, I2, (1 << (n - 1)));
+		UML_JMPc(block, uml::COND_Z, no_carry);
+		UML_OR(block, I4, I4, 1);
+		UML_LABEL(block, no_carry);
+
+		UML_DSAR(block, I2, I2, n);
+	}
+
+	UML_DTEST(block, I2, ~0ULL);
+	UML_MOVc(block, uml::COND_Z, I5, Z_MASK);
+	UML_MOVc(block, uml::COND_NZ, I5, 0);
+	UML_DROLINS(block, I5, I2, 3, N_MASK);
+	UML_OR(block, DRC_SR, I4, I5);
+
+	UML_STORE(block, (void *)m_core->local_regs, I6, I2, SIZE_DWORD, SCALE_x4);
+	UML_DSHR(block, I0, I2, 32);
+	UML_STORE(block, (void *)m_core->local_regs, I1, I0, SIZE_DWORD, SCALE_x4);
 }
 
 

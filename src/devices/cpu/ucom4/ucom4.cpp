@@ -23,7 +23,6 @@
 #include "emu.h"
 #include "ucom4.h"
 #include "ucom4d.h"
-#include "debugger.h"
 
 
 // uCOM-43 products: 2000x8 ROM, 96x4 RAM, supports full instruction set
@@ -151,12 +150,6 @@ std::unique_ptr<util::disasm_interface> ucom4_cpu_device::create_disassembler()
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-enum
-{
-	UCOM4_PC=1, UCOM4_DPL, UCOM4_DPH,
-	UCOM4_ACC
-};
-
 void ucom4_cpu_device::device_start()
 {
 	assert(PORTA == 0);
@@ -219,14 +212,15 @@ void ucom4_cpu_device::device_start()
 	save_item(NAME(m_int_line));
 
 	// register state for debugger
-	state_add(UCOM4_PC, "PC",  m_pc).formatstr("%04X");
-	state_add(UCOM4_DPL, "DPL", m_dpl).formatstr("%01X");
-	state_add(UCOM4_DPH, "DPH", m_dph).formatstr("%01X");
-	state_add(UCOM4_ACC, "ACC", m_acc).formatstr("%01X");
-
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_carry_f).formatstr("%5s").noshow(); // dummy
+
+	m_state_count = 0;
+	state_add(++m_state_count, "PC", m_pc).formatstr("%04X"); // 1
+	state_add(++m_state_count, "DPL", m_dpl).formatstr("%01X"); // 2
+	state_add(++m_state_count, "DPH", m_dph).formatstr("%01X"); // 3
+	state_add(++m_state_count, "ACC", m_acc).formatstr("%01X"); // 4
 
 	set_icountptr(m_icount);
 }
@@ -277,7 +271,7 @@ u8 ucom4_cpu_device::input_r(int index)
 		case PORTD: inp = m_read_d(index, 0xff) | m_port_out[index]; break;
 
 		default:
-			logerror("%s read from unknown port %c at $%03X\n", tag(), 'A' + index, m_prev_pc);
+			logerror("read from unknown port %c at $%03X\n", 'A' + index, m_prev_pc);
 			break;
 	}
 
@@ -300,7 +294,7 @@ void ucom4_cpu_device::output_w(int index, u8 data)
 		case PORTI: m_write_i(index, data & 7, 0xff); break;
 
 		default:
-			logerror("%s write to unknown port %c = $%X at $%03X\n", tag(), 'A' + index, data, m_prev_pc);
+			logerror("write to unknown port %c = $%X at $%03X\n", 'A' + index, data, m_prev_pc);
 			break;
 	}
 
@@ -315,7 +309,7 @@ u8 upd557l_cpu_device::input_r(int index)
 	index &= 0xf;
 
 	if (index == PORTB)
-		logerror("%s read from unknown port %c at $%03X\n", tag(), 'A' + index, m_prev_pc);
+		logerror("read from unknown port %c at $%03X\n", 'A' + index, m_prev_pc);
 	else
 		return ucom4_cpu_device::input_r(index);
 
@@ -328,7 +322,7 @@ void upd557l_cpu_device::output_w(int index, u8 data)
 	data &= 0xf;
 
 	if (index == PORTH || index == PORTI)
-		logerror("%s write to unknown port %c = $%X at $%03X\n", tag(), 'A' + index, data, m_prev_pc);
+		logerror("write to unknown port %c = $%X at $%03X\n", 'A' + index, data, m_prev_pc);
 	else
 	{
 		// only G0 for port G
@@ -402,18 +396,15 @@ void ucom4_cpu_device::execute_run()
 	{
 		// handle interrupt, but not during LI($9x) or EI($31) or while skipping
 		if (m_int_f && m_inte_f && (m_op & 0xf0) != 0x90 && m_op != 0x31 && !m_skip)
-		{
 			do_interrupt();
-			if (m_icount <= 0)
-				break;
-		}
 
 		// remember previous state
 		m_prev_op = m_op;
 		m_prev_pc = m_pc;
 
 		// fetch next opcode
-		debugger_instruction_hook(m_pc);
+		if (!m_skip)
+			debugger_instruction_hook(m_pc);
 		m_icount--;
 		m_op = m_program->read_byte(m_pc);
 		m_bitmask = 1 << (m_op & 0x03);

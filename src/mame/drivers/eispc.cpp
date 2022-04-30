@@ -148,8 +148,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(dreq0_ck_w);
 	DECLARE_WRITE_LINE_MEMBER( epc_dma_hrq_changed );
 	DECLARE_WRITE_LINE_MEMBER( epc_dma8237_out_eop );
-	DECLARE_READ8_MEMBER( epc_dma_read_byte );
-	DECLARE_WRITE8_MEMBER( epc_dma_write_byte );
+	uint8_t epc_dma_read_byte(offs_t offset);
+	void epc_dma_write_byte(offs_t offset, uint8_t data);
 	template <int Channel> uint8_t epc_dma8237_io_r(offs_t offset);
 	template <int Channel> void epc_dma8237_io_w(offs_t offset, uint8_t data);
 	template <int Channel> DECLARE_WRITE_LINE_MEMBER(epc_dack_w);
@@ -164,8 +164,8 @@ private:
 
 	// PPI
 	required_device<i8255_device> m_ppi8255;
-	DECLARE_WRITE8_MEMBER(ppi_portb_w);
-	DECLARE_READ8_MEMBER(ppi_portc_r);
+	void ppi_portb_w(uint8_t data);
+	uint8_t ppi_portc_r();
 	uint8_t m_ppi_portb;
 	required_ioport m_io_dsw;
 	required_ioport m_io_j10;
@@ -217,7 +217,6 @@ private:
 	bool m_fdc_drq; // FDC output pin
 
 	optional_device_array<floppy_connector, 4> m_floppy_connectors;
-	DECLARE_FLOPPY_FORMATS( epc_floppy_formats );
 
 	// UART
 	required_device<ins8250_device> m_uart;
@@ -445,17 +444,17 @@ void epc_state::epc_io(address_map &map)
 	map(0x03f4, 0x03f5).m(m_fdc, FUNC(i8272a_device::map));
 
 	map(0x03bc, 0x03be).lrw8(
-		[this](address_space &space, offs_t offset, uint8_t mem_mask) -> uint8_t
+		[this](offs_t offset, uint8_t mem_mask) -> uint8_t
 		{
-			uint8_t data = m_lpt->read(space, offset);
+			uint8_t data = m_lpt->read(offset);
 			LOGLPT("LPT read offset %02x: %02x\n", offset, data);
 			return data;
 		},
 		"lpt_r",
-		[this](address_space &space, offs_t offset, uint8_t data)
+		[this](offs_t offset, uint8_t data)
 		{
 			LOGLPT("LPT write offset %02x: %02x\n", offset, data);
-			m_lpt->write(space, offset, data);
+			m_lpt->write(offset, data);
 		},
 		"lpt_w"
 	);
@@ -695,7 +694,7 @@ WRITE_LINE_MEMBER(epc_state::speaker_ck_w)
  *
  **********************************************************/
 
-READ8_MEMBER( epc_state::ppi_portc_r )
+uint8_t epc_state::ppi_portc_r()
 {
 	uint8_t data;
 
@@ -710,7 +709,7 @@ READ8_MEMBER( epc_state::ppi_portc_r )
 	return data;
 }
 
-WRITE8_MEMBER( epc_state::ppi_portb_w )
+void epc_state::ppi_portb_w(uint8_t data)
 {
 	LOGPPI("PPI Port B write: %02x\n", data);
 	LOGPPI(" PB0 - Enable beeper             : %d\n", (data & 0x01)  ? 1 : 0);
@@ -769,11 +768,6 @@ static void epc_isa8_cards(device_slot_interface &device)
 	// device.option_add("epc_hdc1065", ISA8_EPC_HDC1065);
 	// device.option_add("epc_mb1080", ISA8_EPC_MB1080);
 }
-
-FLOPPY_FORMATS_MEMBER( epc_state::epc_floppy_formats )
-	FLOPPY_PC_FORMAT,
-	FLOPPY_IMD_FORMAT
-FLOPPY_FORMATS_END
 
 static void epc_sd_floppies(device_slot_interface &device)
 {
@@ -933,8 +927,8 @@ void epc_state::epc(machine_config &config)
 	I8272A(config, m_fdc, XTAL(16'000'000) / 2, false); // TEW crystal marked X3 verified
 	m_fdc->intrq_wr_callback().set([this] (int state){ m_fdc_irq = state; check_fdc_irq(); });
 	m_fdc->drq_wr_callback().set([this] (int state){ m_fdc_drq = state; check_fdc_drq(); });
-	FLOPPY_CONNECTOR(config, m_floppy_connectors[0], epc_sd_floppies, "525sd", epc_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy_connectors[1], epc_sd_floppies, "525sd", epc_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy_connectors[0], epc_sd_floppies, "525sd", floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy_connectors[1], epc_sd_floppies, "525sd", floppy_image_device::default_pc_floppy_formats);
 	//SOFTWARE_LIST(config, "epc_flop_list").set_original("epc_flop");
 
 	// system board UART
@@ -987,7 +981,7 @@ WRITE_LINE_MEMBER( epc_state::epc_dma_hrq_changed )
 }
 
 
-READ8_MEMBER( epc_state::epc_dma_read_byte )
+uint8_t epc_state::epc_dma_read_byte(offs_t offset)
 {
 	if ((m_dma_active & 0x0f) == 0)
 	{
@@ -999,7 +993,7 @@ READ8_MEMBER( epc_state::epc_dma_read_byte )
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset | u32(m_dma_segment[seg]) << 16);
 }
 
-WRITE8_MEMBER( epc_state::epc_dma_write_byte )
+void epc_state::epc_dma_write_byte(offs_t offset, uint8_t data)
 {
 	if ((m_dma_active & 0x0f) == 0)
 	{

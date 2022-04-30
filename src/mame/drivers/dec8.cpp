@@ -48,10 +48,9 @@ To do:
 #include "cpu/m6809/hd6309.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/deco222.h"
-#include "sound/2203intf.h"
-#include "sound/3526intf.h"
-#include "sound/3812intf.h"
 #include "sound/msm5205.h"
+#include "sound/ymopn.h"
+#include "sound/ymopl.h"
 
 #include "speaker.h"
 
@@ -59,7 +58,7 @@ To do:
 /******************************************************************************/
 
 
-WRITE8_MEMBER(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)
+void dec8_state::dec8_mxc06_karn_buffer_spriteram_w(uint8_t data)
 {
 	uint8_t* spriteram = m_spriteram->live();
 	// copy to a 16-bit region for the sprite chip
@@ -75,22 +74,21 @@ WRITE_LINE_MEMBER(dec8_state::screen_vblank_dec8)
 	// rising edge
 	if (state)
 	{
-		address_space &space = m_maincpu->space(AS_PROGRAM);
-		dec8_mxc06_karn_buffer_spriteram_w(space, 0, 0);
+		dec8_mxc06_karn_buffer_spriteram_w(0);
 	}
 }
 
-READ8_MEMBER(dec8_state::i8751_h_r)
+uint8_t dec8_state::i8751_h_r()
 {
 	return m_i8751_return >> 8; /* MSB */
 }
 
-READ8_MEMBER(dec8_state::i8751_l_r)
+uint8_t dec8_state::i8751_l_r()
 {
 	return m_i8751_return & 0xff; /* LSB */
 }
 
-WRITE8_MEMBER(dec8_state::i8751_reset_w)
+void dec8_state::i8751_reset_w(uint8_t data)
 {
 	// ? reset the actual MCU?
 	//m_i8751_return = 0;
@@ -98,7 +96,7 @@ WRITE8_MEMBER(dec8_state::i8751_reset_w)
 
 /******************************************************************************/
 
-READ8_MEMBER(dec8_state::gondo_player_1_r)
+uint8_t dec8_state::gondo_player_1_r(offs_t offset)
 {
 	int val = 1 << ioport("AN0")->read();
 
@@ -112,7 +110,7 @@ READ8_MEMBER(dec8_state::gondo_player_1_r)
 	return 0xff;
 }
 
-READ8_MEMBER(dec8_state::gondo_player_2_r)
+uint8_t dec8_state::gondo_player_2_r(offs_t offset)
 {
 	int val = 1 << ioport("AN1")->read();
 
@@ -134,7 +132,7 @@ READ8_MEMBER(dec8_state::gondo_player_2_r)
 *
 ***************************************************/
 
-void dec8_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void dec8_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -153,7 +151,7 @@ void dec8_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 	}
 }
 
-WRITE8_MEMBER(dec8_state::dec8_i8751_w)
+void dec8_state::dec8_i8751_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -168,89 +166,15 @@ WRITE8_MEMBER(dec8_state::dec8_i8751_w)
 	}
 }
 
-/********************************
-*
-* MCU simulations
-*
-********************************/
-
-WRITE8_MEMBER(dec8_state::csilver_i8751_w)
-{
-	/* Japan coinage first, then World coinage - US coinage shall be the same as the Japan one */
-	int lneed1[2][4] = {{1, 1, 1, 2}, {1, 1, 1, 1}};   /* slot 1 : coins needed */
-	int lcred1[2][4] = {{1, 2, 3, 1}, {2, 3, 4, 6}};   /* slot 1 : credits awarded */
-	int lneed2[2][4] = {{1, 1, 1, 2}, {1, 2, 3, 4}};   /* slot 2 : coins needed */
-	int lcred2[2][4] = {{1, 2, 3, 1}, {1, 1, 1, 1}};   /* slot 2 : credits awarded */
-
-	m_i8751_return = 0;
-
-	switch (offset)
-	{
-	case 0: /* High byte */
-		m_i8751_value = (m_i8751_value & 0xff) | (data << 8);
-		m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE); /* Signal main cpu */
-		break;
-	case 1: /* Low byte */
-		m_i8751_value = (m_i8751_value & 0xff00) | data;
-		break;
-	}
-
-	/* Coins are controlled by the i8751 */
-	if ((ioport("IN2")->read() & 3) == 3) m_latch = 1;
-	if ((ioport("IN2")->read() & 1) != 1 && m_latch)
-	{
-		m_coin1++;
-		m_latch = 0;
-		m_snd = 0x1200;
-		m_i8751_return = 0x1200;
-		if (m_coin1>=m_need1)
-		{
-			m_coin1-=m_need1;
-			m_credits+=m_cred1;
-		}
-	}
-	if ((ioport("IN2")->read() & 2) != 2 && m_latch)
-	{
-		m_coin2++;
-		m_latch = 0;
-		m_snd = 0x1200;
-		m_i8751_return = 0x1200;
-		if (m_coin2>=m_need2)
-		{
-			m_coin2-=m_need2;
-			m_credits+=m_cred2;
-		}
-	}
-	if (m_credits>99) m_credits=99; /* not handled by main CPU */
-
-	if (m_i8751_value == 0x054a) { m_i8751_return = 0xb5; m_coinage_id = 0; }  /* Japanese version ID */
-	if (m_i8751_value == 0x054c) { m_i8751_return = 0xb3; m_coinage_id = 1; }  /* World version ID */
-
-	if (offset == 0)
-	{
-		if ((m_i8751_value >> 8) == 0x01) /* Coinage settings */
-		{
-			m_i8751_return = m_i8751_value;
-			m_need1 = lneed1[m_coinage_id][(m_i8751_value & 0x03) >> 0];
-			m_need2 = lneed2[m_coinage_id][(m_i8751_value & 0x0c) >> 2];
-			m_cred1 = lcred1[m_coinage_id][(m_i8751_value & 0x03) >> 0];
-			m_cred2 = lcred2[m_coinage_id][(m_i8751_value & 0x0c) >> 2];
-		}
-		if ((m_i8751_value >> 8) == 0x02) { m_i8751_return = m_snd | m_credits; m_snd = 0; }   /* Credits request */
-		if ((m_i8751_value >> 8) == 0x03 && m_credits) { m_i8751_return = 0; m_credits--; } /* Credits clear */
-	}
-}
-
-
 /******************************************************************************/
 
-WRITE8_MEMBER(dec8_state::dec8_bank_w)
+void dec8_state::dec8_bank_w(uint8_t data)
 {
 	m_mainbank->set_entry(data & 0x0f);
 }
 
 /* Used by Ghostbusters, Meikyuu Hunter G & Gondomania */
-WRITE8_MEMBER(dec8_state::ghostb_bank_w)
+void dec8_state::ghostb_bank_w(uint8_t data)
 {
 	/* Bit 0: SECCLR - acknowledge interrupt from I8751
 	   Bit 1: NMI enable/disable
@@ -278,7 +202,7 @@ WRITE8_MEMBER(dec8_state::ghostb_bank_w)
 	flip_screen_set(BIT(data, 3));
 }
 
-WRITE8_MEMBER(dec8_state::csilver_control_w)
+void csilver_state::csilver_control_w(uint8_t data)
 {
 	/*
 	    Bit 0x0f - ROM bank switch.
@@ -290,74 +214,74 @@ WRITE8_MEMBER(dec8_state::csilver_control_w)
 	m_mainbank->set_entry(data & 0x0f);
 }
 
-WRITE8_MEMBER(dec8_state::dec8_sound_w)
+void dec8_state::dec8_sound_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(m6502_device::NMI_LINE, ASSERT_LINE);
 	m_m6502_timer->adjust(m_audiocpu->cycles_to_attotime(3));
 }
 
-WRITE_LINE_MEMBER(dec8_state::csilver_adpcm_int)
+WRITE_LINE_MEMBER(csilver_state::csilver_adpcm_int)
 {
 	m_toggle ^= 1;
 	if (m_toggle)
 		m_audiocpu->set_input_line(m6502_device::IRQ_LINE, HOLD_LINE);
 
-	m_msm->write_data(m_msm5205next >> 4);
+	m_msm->data_w(m_msm5205next >> 4);
 	m_msm5205next <<= 4;
 }
 
-READ8_MEMBER(dec8_state::csilver_adpcm_reset_r)
+uint8_t csilver_state::csilver_adpcm_reset_r()
 {
 	m_msm->reset_w(0);
 	return 0;
 }
 
-WRITE8_MEMBER(dec8_state::csilver_adpcm_data_w)
+void csilver_state::csilver_adpcm_data_w(uint8_t data)
 {
 	m_msm5205next = data;
 }
 
-WRITE8_MEMBER(dec8_state::csilver_sound_bank_w)
+void csilver_state::csilver_sound_bank_w(uint8_t data)
 {
 	m_soundbank->set_entry((data & 0x08) >> 3);
 }
 
 /******************************************************************************/
 
-WRITE8_MEMBER(dec8_state::main_irq_on_w)
+void dec8_state::main_irq_on_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(dec8_state::main_irq_off_w)
+void dec8_state::main_irq_off_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(dec8_state::main_firq_off_w)
+void dec8_state::main_firq_off_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(dec8_state::sub_irq_on_w)
+void dec8_state::sub_irq_on_w(uint8_t data)
 {
 	m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(dec8_state::sub_irq_off_w)
+void dec8_state::sub_irq_off_w(uint8_t data)
 {
 	m_subcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(dec8_state::sub_firq_off_w)
+void dec8_state::sub_firq_off_w(uint8_t data)
 {
 	m_subcpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 /******************************************************************************/
 
-WRITE8_MEMBER(dec8_state::flip_screen_w){ flip_screen_set(data); }
+void dec8_state::flip_screen_w(uint8_t data) { flip_screen_set(data); }
 
 /******************************************************************************/
 
@@ -530,48 +454,48 @@ void dec8_state::meikyuh_map(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
-void dec8_state::csilver_map(address_map &map)
+void csilver_state::csilver_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("share1");
 	map(0x1000, 0x13ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
-	map(0x1800, 0x1800).portr("IN1").w(FUNC(dec8_state::sub_irq_off_w));
-	map(0x1801, 0x1801).portr("IN0").w(FUNC(dec8_state::main_irq_off_w));
-	map(0x1802, 0x1802).w(FUNC(dec8_state::main_firq_off_w));
-	map(0x1803, 0x1803).portr("IN2").w(FUNC(dec8_state::main_irq_on_w));
-	map(0x1804, 0x1804).portr("DSW1").w(FUNC(dec8_state::sub_irq_on_w));
-	map(0x1805, 0x1805).portr("DSW0").w(FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)); /* Dip 1, DMA */
-	map(0x1807, 0x1807).w(FUNC(dec8_state::flip_screen_w));
-	map(0x1808, 0x180b).w(FUNC(dec8_state::dec8_scroll2_w));
-	map(0x180c, 0x180c).w(FUNC(dec8_state::dec8_sound_w));
-	map(0x180d, 0x180d).w(FUNC(dec8_state::csilver_control_w));
-	map(0x180e, 0x180f).w(FUNC(dec8_state::csilver_i8751_w));
-	map(0x1c00, 0x1c00).r(FUNC(dec8_state::i8751_h_r));
-	map(0x1e00, 0x1e00).r(FUNC(dec8_state::i8751_l_r));
-	map(0x2000, 0x27ff).ram().w(FUNC(dec8_state::dec8_videoram_w));
+	map(0x1800, 0x1800).portr("IN1").w(FUNC(csilver_state::sub_irq_off_w));
+	map(0x1801, 0x1801).portr("IN0").w(FUNC(csilver_state::main_irq_off_w));
+	map(0x1802, 0x1802).w(FUNC(csilver_state::main_firq_off_w));
+	map(0x1803, 0x1803).portr("IN2").w(FUNC(csilver_state::main_irq_on_w));
+	map(0x1804, 0x1804).portr("DSW1").w(FUNC(csilver_state::sub_irq_on_w));
+	map(0x1805, 0x1805).portr("DSW0").w(FUNC(csilver_state::dec8_mxc06_karn_buffer_spriteram_w)); /* Dip 1, DMA */
+	map(0x1807, 0x1807).w(FUNC(csilver_state::flip_screen_w));
+	map(0x1808, 0x180b).w(FUNC(csilver_state::dec8_scroll2_w));
+	map(0x180c, 0x180c).w(FUNC(csilver_state::dec8_sound_w));
+	map(0x180d, 0x180d).w(FUNC(csilver_state::csilver_control_w));
+	map(0x180e, 0x180f).w(FUNC(csilver_state::dec8_i8751_w));
+	map(0x1c00, 0x1c00).r(FUNC(csilver_state::i8751_h_r));
+	map(0x1e00, 0x1e00).r(FUNC(csilver_state::i8751_l_r));
+	map(0x2000, 0x27ff).ram().w(FUNC(csilver_state::dec8_videoram_w));
 	map(0x2800, 0x2fff).ram().share("spriteram");
 	map(0x3000, 0x37ff).ram().share("share2");
-	map(0x3800, 0x3fff).rw(FUNC(dec8_state::dec8_bg_data_r), FUNC(dec8_state::dec8_bg_data_w)).share("bg_data");
+	map(0x3800, 0x3fff).rw(FUNC(csilver_state::dec8_bg_data_r), FUNC(csilver_state::dec8_bg_data_w)).share("bg_data");
 	map(0x4000, 0x7fff).bankr("mainbank");
 	map(0x8000, 0xffff).rom();
 }
 
-void dec8_state::csilver_sub_map(address_map &map)
+void csilver_state::csilver_sub_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("share1");
 	map(0x1000, 0x13ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
-	map(0x1800, 0x1800).w(FUNC(dec8_state::sub_irq_off_w));
-	map(0x1801, 0x1801).w(FUNC(dec8_state::main_irq_off_w));
-	map(0x1802, 0x1802).w(FUNC(dec8_state::main_firq_off_w));
-	map(0x1803, 0x1803).portr("IN2").w(FUNC(dec8_state::main_irq_on_w));
-	map(0x1804, 0x1804).portr("DSW1").w(FUNC(dec8_state::sub_irq_on_w));
-	map(0x1805, 0x1805).portr("DSW0").w(FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)); /* DMA */
-	map(0x180c, 0x180c).w(FUNC(dec8_state::dec8_sound_w));
-	map(0x2000, 0x27ff).ram().w(FUNC(dec8_state::dec8_videoram_w)).share("videoram");
+	map(0x1800, 0x1800).w(FUNC(csilver_state::sub_irq_off_w));
+	map(0x1801, 0x1801).w(FUNC(csilver_state::main_irq_off_w));
+	map(0x1802, 0x1802).w(FUNC(csilver_state::main_firq_off_w));
+	map(0x1803, 0x1803).portr("IN2").w(FUNC(csilver_state::main_irq_on_w));
+	map(0x1804, 0x1804).portr("DSW1").w(FUNC(csilver_state::sub_irq_on_w));
+	map(0x1805, 0x1805).portr("DSW0").w(FUNC(csilver_state::dec8_mxc06_karn_buffer_spriteram_w)); /* DMA */
+	map(0x180c, 0x180c).w(FUNC(csilver_state::dec8_sound_w));
+	map(0x2000, 0x27ff).ram().w(FUNC(csilver_state::dec8_videoram_w)).share("videoram");
 	map(0x2800, 0x2fff).ram().share("spriteram");
 	map(0x3000, 0x37ff).ram().share("share2");
-	map(0x3800, 0x3fff).rw(FUNC(dec8_state::dec8_bg_data_r), FUNC(dec8_state::dec8_bg_data_w));
+	map(0x3800, 0x3fff).rw(FUNC(csilver_state::dec8_bg_data_r), FUNC(csilver_state::dec8_bg_data_w));
 	map(0x4000, 0xffff).rom();
 }
 
@@ -648,7 +572,7 @@ void dec8_state::cobra_map(address_map &map)
 	map(0x2000, 0x27ff).ram().w(FUNC(dec8_state::dec8_videoram_w)).share("videoram");
 	map(0x2800, 0x2fff).ram().share("spriteram");
 	map(0x3000, 0x31ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
-	map(0x3200, 0x37ff).writeonly(); /* Unused */
+	map(0x3200, 0x37ff).nopw(); /* Unused */
 	map(0x3800, 0x3800).portr("IN0");    /* Player 1 */
 	map(0x3801, 0x3801).portr("IN1");    /* Player 2 */
 	map(0x3802, 0x3802).portr("DSW0");   /* Dip 1 */
@@ -698,15 +622,15 @@ void dec8_state::ym3526_s_map(address_map &map)
 }
 
 /* Captain Silver - same sound system as Pocket Gal */
-void dec8_state::csilver_s_map(address_map &map)
+void csilver_state::csilver_s_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
 	map(0x0800, 0x0801).w("ym1", FUNC(ym2203_device::write));
 	map(0x1000, 0x1001).w("ym2", FUNC(ym3526_device::write));
-	map(0x1800, 0x1800).w(FUNC(dec8_state::csilver_adpcm_data_w)); /* ADPCM data for the MSM5205 chip */
-	map(0x2000, 0x2000).w(FUNC(dec8_state::csilver_sound_bank_w));
+	map(0x1800, 0x1800).w(FUNC(csilver_state::csilver_adpcm_data_w)); /* ADPCM data for the MSM5205 chip */
+	map(0x2000, 0x2000).w(FUNC(csilver_state::csilver_sound_bank_w));
 	map(0x3000, 0x3000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x3400, 0x3400).r(FUNC(dec8_state::csilver_adpcm_reset_r)); /* ? not sure */
+	map(0x3400, 0x3400).r(FUNC(csilver_state::csilver_adpcm_reset_r)); /* ? not sure */
 	map(0x4000, 0x7fff).bankr("soundbank");
 	map(0x8000, 0xffff).rom();
 }
@@ -725,27 +649,27 @@ void dec8_state::csilver_s_map(address_map &map)
 
 */
 
-READ8_MEMBER(dec8_state::i8751_port0_r)
+uint8_t dec8_state::i8751_port0_r()
 {
 	return m_i8751_port0;
 }
 
-WRITE8_MEMBER(dec8_state::i8751_port0_w)
+void dec8_state::i8751_port0_w(uint8_t data)
 {
 	m_i8751_port0 = data;
 }
 
-READ8_MEMBER(dec8_state::i8751_port1_r)
+uint8_t dec8_state::i8751_port1_r()
 {
 	return m_i8751_port1;
 }
 
-WRITE8_MEMBER(dec8_state::i8751_port1_w)
+void dec8_state::i8751_port1_w(uint8_t data)
 {
 	m_i8751_port1 = data;
 }
 
-WRITE8_MEMBER(dec8_state::gondo_mcu_to_main_w)
+void dec8_state::gondo_mcu_to_main_w(uint8_t data)
 {
 	// P2 - controls latches for main CPU communication
 	if ((data&0x10)==0)
@@ -763,7 +687,7 @@ WRITE8_MEMBER(dec8_state::gondo_mcu_to_main_w)
 	m_i8751_p2 = data;
 }
 
-WRITE8_MEMBER(dec8_state::shackled_mcu_to_main_w)
+void dec8_state::shackled_mcu_to_main_w(uint8_t data)
 {
 	// P2 - controls latches for main CPU communication
 	if ((data&0x10)==0)
@@ -796,7 +720,7 @@ WRITE8_MEMBER(dec8_state::shackled_mcu_to_main_w)
     Super Real Darwin is similar but only appears to have a single port
 */
 
-WRITE8_MEMBER(dec8_state::srdarwin_mcu_to_main_w)
+void dec8_state::srdarwin_mcu_to_main_w(uint8_t data)
 {
 	// P2 - controls latches for main CPU communication
 	if ((data & 0x10) == 0)
@@ -819,6 +743,27 @@ WRITE8_MEMBER(dec8_state::srdarwin_mcu_to_main_w)
 	// guess, toggled after above.
 	if ((data&0x02)==0)
 		m_maincpu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
+}
+
+
+void csilver_state::csilver_mcu_to_main_w(uint8_t data)
+{
+	if (~data & 0x10)
+		m_i8751_port0 = m_i8751_value >> 8;
+
+	if (~data & 0x20)
+		m_i8751_port1 = m_i8751_value & 0xff;
+
+	if (~data & 0x40)
+	{
+		m_i8751_return = (m_i8751_return & 0xff) | (m_i8751_port0 << 8);
+		m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE); // FIRQ to main cpu
+	}
+
+	if (~data & 0x80)
+		m_i8751_return = (m_i8751_return & 0xff00) | m_i8751_port1;
+
+	m_i8751_p2 = data;
 }
 
 /******************************************************************************/
@@ -869,46 +814,46 @@ static INPUT_PORTS_START( lastmisn )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<2>)
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )          PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )              PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)")
+	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)")        PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Infinite Lives (Cheat)")
+	PORT_DIPNAME( 0x80, 0x80, "Infinite Lives (Cheat)")         PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )                PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) )       /* tables at 0x82c1 (4 words) and 0xde38 (3 words) in 'lastmisn', 0x82c1 and 0xde17 in 'lastmisno' */
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) )           PORT_DIPLOCATION("SW2:2,3") /* tables at 0x82c1 (4 words) and 0xde38 (3 words) in 'lastmisn', 0x82c1 and 0xde17 in 'lastmisno' */
 	PORT_DIPSETTING(    0x06, "30k 70k 70k+" )
 	PORT_DIPSETTING(    0x04, "40k 90k 90k+" )
 	PORT_DIPSETTING(    0x02, "40k and 80k" )
 	PORT_DIPSETTING(    0x00, "50k only" )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:6")
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )       PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END
@@ -918,17 +863,17 @@ static INPUT_PORTS_START( lastmisnj )
 	PORT_INCLUDE(lastmisn)
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) )       /* tables at 0x82b7 (4 words) and 0xdd29 (3 words) */
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) )           PORT_DIPLOCATION("SW2:2,3") /* tables at 0x82b7 (4 words) and 0xdd29 (3 words) */
 	PORT_DIPSETTING(    0x06, "30k 50k 50k+" )
 	PORT_DIPSETTING(    0x04, "30k 70k 70k+" )
 	PORT_DIPSETTING(    0x02, "50k 100k 100k+" )
 	PORT_DIPSETTING(    0x00, "50k only" )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )             /* "difficult" */
 	PORT_DIPSETTING(    0x08, DEF_STR( Very_Hard ) )        /* "very difficult" */
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )          /* "top difficult" */
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:8")
 INPUT_PORTS_END
 
 
@@ -965,24 +910,24 @@ static INPUT_PORTS_START( shackled )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<2>)
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )          PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x10, 0x10, "Leave Off" )                 /* game doesn't boot when this is On - code at 0x401a - related to MCU - "dias" in Dip Switches page */
+	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:2")
+	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:3")
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x10, "Leave Off" )                     PORT_DIPLOCATION("SW1:5") /* game doesn't boot when this is On - code at 0x401a - related to MCU - "dias" in Dip Switches page */
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x80, 0x80, "Freeze" )
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:6")
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x80, 0x80, "Freeze" )                        PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW1")
 	/* tables in main CPU : 0x859b (Help), 0x85e9 (6-Help), 0x8fbe (Coin), 0x91b6 (Heart) */
-	PORT_DIPNAME( 0x07, 0x07, "Coin/Heart/Help/6-Help" )    /* name from Dip Switches page */
+	PORT_DIPNAME( 0x07, 0x07, "Coin/Heart/Help/6-Help" )        PORT_DIPLOCATION("SW2:1,2,3") /* name from Dip Switches page */
 	PORT_DIPSETTING( 0x00, "2/100/50/200" )
 	PORT_DIPSETTING( 0x01, "4/100/60/300" )
 	PORT_DIPSETTING( 0x02, "6/200/70/300" )
@@ -991,14 +936,14 @@ static INPUT_PORTS_START( shackled )
 	PORT_DIPSETTING( 0x06, "12/300/100/600" )
 	PORT_DIPSETTING( 0x05, "18/400/200/700" )
 	PORT_DIPSETTING( 0x04, "20/500/200/800" )
-	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Very_Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )          PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1008,7 +953,7 @@ static INPUT_PORTS_START( breywood )
 	PORT_INCLUDE(shackled)
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x0f, 0x0f, "Power" )                     /* table at 0x41be in sub CPU */
+	PORT_DIPNAME( 0x0f, 0x0f, "Power" )                         PORT_DIPLOCATION("SW2:1,2,3,4") /* table at 0x41be in sub CPU */
 	PORT_DIPSETTING( 0x07, "200" )
 	PORT_DIPSETTING( 0x0b, "300" )
 	PORT_DIPSETTING( 0x03, "400" )
@@ -1060,6 +1005,7 @@ static INPUT_PORTS_START( gondo )
 
 	PORT_START("I8751") /* hooked up on the i8751 */
 	/* Low 4 bits not connected on schematics */
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1072,44 +1018,44 @@ static INPUT_PORTS_START( gondo )
 	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )           /* table at 0x01b8 in MCU (4 bytes : coins in 4 MSbits and credits in 4 LSbits) */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2") /* table at 0x01b8 in MCU (4 bytes : coins in 4 MSbits and credits in 4 LSbits) */
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )           /* table at 0x01bc in MCU (4 bytes : coins in 4 MSbits and credits in 4 LSbits) */
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:3,4") /* table at 0x01bc in MCU (4 bytes : coins in 4 MSbits and credits in 4 LSbits) */
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
-	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )          PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )          PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Swap buttons" )              /* code at 0x8a2b in 'gondo', 0x88c5 in 'makyosen' - undocumented in the manual */
+	PORT_DIPNAME( 0x80, 0x80, "Swap buttons" )                  PORT_DIPLOCATION("SW1:8") /* code at 0x8a2b in 'gondo', 0x88c5 in 'makyosen' - undocumented in the manual */
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPSETTING(    0x00, "Infinite (Cheat)")           /* gives 99 lives */
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x00, "99 (Cheat)")  // gives 99 lives
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Allow_Continue ) )       PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:6")
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:7")
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:8")
 INPUT_PORTS_END
 
 
@@ -1130,47 +1076,48 @@ static INPUT_PORTS_START( garyoret )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("I8751") /* hooked up on the (fake) i8751 */
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )              /* produces sound but gives 0 credits - coinage not initialised in the (fake) MCU */
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
-	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )          PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )          PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                   /* not tested - no cocktail when simultaneous players anyway */
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:8") /* not tested - no cocktail when simultaneous players anyway */
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )                PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
+	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:2")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x40, 0x40, "Leave Off" )                 /* game doesn't boot when this is On - code at 0x807f and test at 0x819e */
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:5")
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x40, 0x40, "Leave Off" )                     PORT_DIPLOCATION("SW2:7")  /* game doesn't boot when this is On - code at 0x807f and test at 0x819e */
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:8")
 INPUT_PORTS_END
 
 
@@ -1202,47 +1149,51 @@ static INPUT_PORTS_START( ghostb )
 
 	PORT_START("I8751")
 	/* Low 4 bits not connected on schematics */
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )              /* produce sound but gives 0 credits - "ANDA" instruction at 0x8a5a */
 
 	PORT_START("DSW0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )     // Tested on real hardware     PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )     // 1-2 should be coinage.      PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+																				// PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+																				// PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+																				// PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")          // PORT_DIPLOCATION("SW1:3") // Manual says 'Must Be Off'. Note: Turning on 3+4+5+8 does nothing on real hardware.
+	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:4") // Manual says 'Must Be Off'. See note
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:5") // Manual says 'Must Be Off'. See note
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )          PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )          PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                   /* not tested - no cocktail when simultaneous players anyway */
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:8") // not tested - no cocktail when simultaneous players anyway. Manual says 'Must Be Off'. See note
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )            /* lives are added when STARTn is pressed */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                PORT_DIPLOCATION("SW2:1,2") /* lives are added when STARTn is pressed */
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPSETTING(    0x00, "Invulnerability (Cheat)")    /* gives 1 life */
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x00, "Invulnerability (Cheat)")  // gives 1 life and energy does not decrease
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x30, 0x30, "Max Scene Time" )            /* 1:00 is added when STARTn is pressed until max scene time is reached */
+	PORT_DIPNAME( 0x30, 0x30, "Max Scene Time" )                PORT_DIPLOCATION("SW2:5,6") /* 1:00 is added when STARTn is pressed until max scene time is reached */
 	PORT_DIPSETTING(    0x00, "4:00" )
 	PORT_DIPSETTING(    0x10, "4:30" )
 	PORT_DIPSETTING(    0x30, "5:00" )
 	PORT_DIPSETTING(    0x20, "6:00" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )       PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, "Energy Bonus" )              /* energy is set to value each new life */
-	PORT_DIPSETTING(    0x80, DEF_STR( None ) )             /* 0x0100 */
-	PORT_DIPSETTING(    0x00, "+25%" )                      /* 0x0140 */
+	PORT_DIPNAME( 0x80, 0x80, "Energy Bonus" )                  PORT_DIPLOCATION("SW2:8") /* energy is set to value each new life */
+	PORT_DIPSETTING(    0x80, DEF_STR( None ) )                                           /* 0x0100 */
+	PORT_DIPSETTING(    0x00, "+25%" )                                                    /* 0x0140 */
 INPUT_PORTS_END
 
 /* verified from HD6309 code */
@@ -1253,6 +1204,7 @@ static INPUT_PORTS_START( ghostb2a )
 
 	PORT_MODIFY("I8751")
 	/* Low 4 bits not connected on schematics */
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1262,13 +1214,19 @@ static INPUT_PORTS_START( ghostb2a )
 	/* NO start buttons - to start a game, press any button from any player */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+// 1 & 2 should be coinage
+// PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )                   PORT_DIPLOCATION("SW1:1,2")
+// PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+// PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+// PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+// PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
 
 	PORT_MODIFY("DSW1")
 	/* lives are added when COINn is pressed */
 	/* 1:00 is added when COINn is pressed until max scene time is reached */
-	PORT_DIPNAME( 0x80, 0x80, "Energy Bonus" )              /* energy is added when COINn is pressed */
-	PORT_DIPSETTING(    0x80, DEF_STR( None ) )             /* 0x0040 */
-	PORT_DIPSETTING(    0x00, "+50%" )                      /* 0x0060 */
+	PORT_DIPNAME( 0x80, 0x80, "Energy Bonus" )                  PORT_DIPLOCATION("SW2:8") /* energy is added when COINn is pressed */
+	PORT_DIPSETTING(    0x80, DEF_STR( None ) )                                           /* 0x0040 */
+	PORT_DIPSETTING(    0x00, "+50%" )                                                    /* 0x0060 */
 INPUT_PORTS_END
 
 /* verified from HD6309 code */
@@ -1285,6 +1243,7 @@ static INPUT_PORTS_START( ghostb3 )
 
 	PORT_MODIFY("I8751")
 	/* Low 4 bits not connected on schematics */
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1306,11 +1265,11 @@ static INPUT_PORTS_START( meikyuh )
 	PORT_MODIFY("DSW1")
 	/* lives are added when STARTn is pressed - 1 extra life is awarded on 2nd credit and after for the same player who gets then 2, 4 or 6 additional lives */
 	/* max time scene is always 6:00 at start - 0:30 is subed every 8 levels - 1:00 is added when STARTn is pressed until max scene time is reached */
-	PORT_DIPNAME( 0x10, 0x10, "Energy Bonus" )              /* energy is added when STARTn is pressed */
-	PORT_DIPSETTING(    0x10, DEF_STR( None ) )             /* 0x0020 */
-	PORT_DIPSETTING(    0x00, "+50%" )                      /* 0x0030 */
-	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x80, 0x80, "Freeze" )
+	PORT_DIPNAME( 0x10, 0x10, "Energy Bonus" )                  PORT_DIPLOCATION("SW2:5") /* energy is added when STARTn is pressed */
+	PORT_DIPSETTING(    0x10, DEF_STR( None ) )                                           /* 0x0020 */
+	PORT_DIPSETTING(    0x00, "+50%" )                                                    /* 0x0030 */
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x80, 0x80, "Freeze" )                        PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1333,8 +1292,8 @@ static INPUT_PORTS_START( csilver )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) // coins read through MCU
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED ) // ^
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1343,46 +1302,53 @@ static INPUT_PORTS_START( csilver )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )          PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )          PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )              PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x00, "255 (Cheat)")
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Allow_Continue ) )       PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x40, 0x40, "No Key for Door (Cheat)")    /* code at 0x9816 in sub CPU */
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x40, 0x40, "No Key for Door (Cheat)")        PORT_DIPLOCATION("SW2:7")  /* code at 0x9816 in sub CPU */
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:8")
+
+	PORT_START("I8751") /* hooked up on the i8751 */
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
 INPUT_PORTS_END
 
 /* verified from M6809 code - coinage needs further checking when the MCU is available */
@@ -1390,17 +1356,18 @@ static INPUT_PORTS_START( csilverj )
 	PORT_INCLUDE(csilver)
 
 	PORT_MODIFY("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
 INPUT_PORTS_END
+
 
 
 /* verified from HD6309 code */
@@ -1430,49 +1397,49 @@ static INPUT_PORTS_START( oscar )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )           /* table at 0xf8e3 (4 * 2 bytes : coins then credits) */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")  /* table at 0xf8e3 (4 * 2 bytes : coins then credits) */
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )           /* table at 0xf8eb (4 * 2 bytes : coins then credits) */
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:3,4")  /* table at 0xf8eb (4 * 2 bytes : coins then credits) */
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x10, 0x10, "Freeze Mode" )
+	PORT_DIPNAME( 0x10, 0x10, "Freeze Mode" )                   PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )          PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )          PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )              PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x00, "Infinite (Cheat)")
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )       /* tables at 0x82d8 (4 words) and 0xf3fe (3 words) */
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )           PORT_DIPLOCATION("SW2:5,6")  /* tables at 0x82d8 (4 words) and 0xf3fe (3 words) */
 	PORT_DIPSETTING(    0x30, "40k 100k 60k+" )
 	PORT_DIPSETTING(    0x20, "60k 160k 100k+" )
 	PORT_DIPSETTING(    0x10, "90k 240k 150k+" )
 	PORT_DIPSETTING(    0x00, "50k only" )
-	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)")    /* not when falling into void or water - also gives infinite time */
+	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)")        PORT_DIPLOCATION("SW2:7")  /* not when falling into void or water - also gives infinite time */
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )       PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 INPUT_PORTS_END
@@ -1482,12 +1449,12 @@ static INPUT_PORTS_START( oscarj )
 	PORT_INCLUDE(oscar)
 
 	PORT_MODIFY("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )           /* table at 0xf8d6 (4 * 2 bytes : coins then credits) in 'oscarj1', 0xf8e6 in 'oscarj2', 0xf8f2 in 'oscaru' */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")  /* table at 0xf8d6 (4 * 2 bytes : coins then credits) in 'oscarj1', 0xf8e6 in 'oscarj2', 0xf8f2 in 'oscaru' */
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )           /* table at 0xf8de (4 * 2 bytes : coins then credits) in 'oscarj1', 0xf8ee in 'oscarj2', 0xf8fa in 'oscaru' */
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:3,4")  /* table at 0xf8de (4 * 2 bytes : coins then credits) in 'oscarj1', 0xf8ee in 'oscarj2', 0xf8fa in 'oscaru' */
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
@@ -1520,52 +1487,53 @@ static INPUT_PORTS_START( srdarwin )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("I8751") /* hooked up on the i8751 */
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )          PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )          PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )              PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x00, "28 (Cheat)")
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Bonus_Life ) )           PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, "Every 50k" )                 /* table at 0xab06 - last bonus life at 850k */
 	PORT_DIPSETTING(    0x00, "Every 100k" )                /* table at 0xab17 - last bonus life at 900k */
-	PORT_DIPNAME( 0x20, 0x20, "After Stage 10" )            /* code at 0xab94 */
+	PORT_DIPNAME( 0x20, 0x20, "After Stage 10" )                PORT_DIPLOCATION("SW2:6")  /* code at 0xab94 */
 	PORT_DIPSETTING(    0x20, "Back to Stage 1" )
 	PORT_DIPSETTING(    0x00, "Game Over" )
-	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )       PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 INPUT_PORTS_END
@@ -1575,12 +1543,12 @@ static INPUT_PORTS_START( srdarwinj )
 	PORT_INCLUDE(srdarwin)
 
 	PORT_MODIFY("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
@@ -1615,48 +1583,48 @@ static INPUT_PORTS_START( cobracom )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )           /* code at 0x88b7 in 'cobracom', 0x890e in 'cobracomj' */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")  /* code at 0x88b7 in 'cobracom', 0x890e in 'cobracomj' */
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )           /* code at 0x889b in 'cobracom', 0x88f2 in 'cobracomj' */
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:3,4")  /* code at 0x889b in 'cobracom', 0x88f2 in 'cobracomj' */
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )              PORT_DIPLOCATION("SW1:5")  // Manual says 'Off'
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )          PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )          PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )              PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "99 (Cheat)")                 /* lose a life before getting 2nd bonus life ! */
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Allow_Continue ) )       PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Bonus_Life ) )       /* table at 0xa898 (2* 2 words) in 'cobracomj', 0xa8fe in 'cobracomj' */
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Bonus_Life ) )           PORT_DIPLOCATION("SW2:6")  /* table at 0xa898 (2* 2 words) in 'cobracomj', 0xa8fe in 'cobracomj' */
 	PORT_DIPSETTING(    0x20, "50k and 150k" )
 	PORT_DIPSETTING(    0x00, "100k and 200k" )
-	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                   /* previously "Freeze" : code at 0x8849 in 'cobracomj', 0x88a0 in 'cobracomj' */
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:7")
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:8")  /* previously "Freeze" : code at 0x8849 in 'cobracomj', 0x88a0 in 'cobracomj' */
 INPUT_PORTS_END
 
 /******************************************************************************/
@@ -1807,7 +1775,7 @@ WRITE_LINE_MEMBER(dec8_state::oscar_coin_irq)
 	m_coin_state = bool(state);
 }
 
-WRITE8_MEMBER(dec8_state::oscar_coin_clear_w)
+void dec8_state::oscar_coin_clear_w(uint8_t data)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
@@ -1824,9 +1792,15 @@ WRITE_LINE_MEMBER(dec8_state::shackled_coin_irq)
 
 void dec8_state::machine_start()
 {
+	uint8_t *ROM = memregion("maincpu")->base();
+	uint32_t max_bank = (memregion("maincpu")->bytes() - 0x10000) / 0x4000;
+	m_mainbank->configure_entries(0, max_bank, &ROM[0x10000], 0x4000);
+
 	m_i8751_timer = timer_alloc(TIMER_DEC8_I8751);
 	m_m6502_timer = timer_alloc(TIMER_DEC8_M6502);
+
 	m_i8751_p2 = 0xff;
+	m_latch = 0;
 
 	save_item(NAME(m_secclr));
 	save_item(NAME(m_i8751_p2));
@@ -1845,8 +1819,6 @@ void dec8_state::machine_start()
 	save_item(NAME(m_cred2));
 	save_item(NAME(m_credits));
 	save_item(NAME(m_snd));
-	save_item(NAME(m_msm5205next));
-	save_item(NAME(m_toggle));
 
 	save_item(NAME(m_scroll2));
 	save_item(NAME(m_bg_control));
@@ -1855,18 +1827,14 @@ void dec8_state::machine_start()
 
 void dec8_state::machine_reset()
 {
-	int i;
-
 	m_i8751_port0 = m_i8751_port1 = 0;
 	m_i8751_return = m_i8751_value = 0;
 	m_coinage_id = 0;
 	m_coin1 = m_coin2 = m_credits = m_snd = 0;
 	m_need1 = m_need2 = m_cred1 = m_cred2 = 1;
-	m_msm5205next = 0;
-	m_toggle = 0;
 
 	m_scroll2[0] = m_scroll2[1] = m_scroll2[2] = m_scroll2[3] = 0;
-	for (i = 0; i < 0x20; i++)
+	for (int i = 0; i < 0x20; i++)
 	{
 		m_bg_control[i] = 0;
 		m_pf1_control[i] = 0;
@@ -1874,7 +1842,27 @@ void dec8_state::machine_reset()
 
 	// reset clears LS273 latch, which disables NMI
 	if (m_nmigate.found())
-		ghostb_bank_w(machine().dummy_space(), 0, 0);
+		ghostb_bank_w(0);
+}
+
+
+void csilver_state::machine_start()
+{
+	dec8_state::machine_start();
+
+	uint8_t *RAM = memregion("audiocpu")->base();
+	m_soundbank->configure_entries(0, 2, &RAM[0], 0x4000);
+
+	save_item(NAME(m_msm5205next));
+	save_item(NAME(m_toggle));
+}
+
+void csilver_state::machine_reset()
+{
+	dec8_state::machine_reset();
+
+	m_msm5205next = 0;
+	m_toggle = 0;
 }
 
 
@@ -2182,19 +2170,30 @@ void dec8_state::meikyuh(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dec8_state::dec8_s_map);
 }
 
-void dec8_state::csilver(machine_config &config)
+
+void csilver_state::csilver(machine_config &config)
 {
 	/* basic machine hardware */
 	MC6809E(config, m_maincpu, XTAL(12'000'000)/8); /* verified on pcb */
-	m_maincpu->set_addrmap(AS_PROGRAM, &dec8_state::csilver_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &csilver_state::csilver_map);
 
 	MC6809E(config, m_subcpu, XTAL(12'000'000)/8); /* verified on pcb */
-	m_subcpu->set_addrmap(AS_PROGRAM, &dec8_state::csilver_sub_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &csilver_state::csilver_sub_map);
 
 	M6502(config, m_audiocpu, XTAL(12'000'000)/8); /* verified on pcb */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &dec8_state::csilver_s_map); /* NMIs are caused by the main CPU */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &csilver_state::csilver_s_map); /* NMIs are caused by the main CPU */
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
+
+	I8751(config, m_mcu, XTAL(8'000'000));
+	m_mcu->port_in_cb<0>().set(FUNC(csilver_state::i8751_port0_r));
+	m_mcu->port_out_cb<0>().set(FUNC(csilver_state::i8751_port0_w));
+	m_mcu->port_in_cb<1>().set(FUNC(csilver_state::i8751_port1_r));
+	m_mcu->port_out_cb<1>().set(FUNC(csilver_state::i8751_port1_w));
+	m_mcu->port_out_cb<2>().set(FUNC(csilver_state::csilver_mcu_to_main_w));
+	m_mcu->port_in_cb<3>().set_ioport("I8751");
+
+	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
 	BUFFERED_SPRITERAM8(config, m_spriteram);
@@ -2207,14 +2206,14 @@ void dec8_state::csilver(machine_config &config)
 //  m_screen->set_size(32*8, 32*8);
 //  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	set_screen_raw_params_data_east(config);
-	m_screen->set_screen_update(FUNC(dec8_state::screen_update_lastmisn));
+	m_screen->set_screen_update(FUNC(csilver_state::screen_update_lastmisn));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline(m_subcpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_shackled);
 	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 
-	MCFG_VIDEO_START_OVERRIDE(dec8_state,lastmisn)
+	MCFG_VIDEO_START_OVERRIDE(csilver_state,lastmisn)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2232,7 +2231,7 @@ void dec8_state::csilver(machine_config &config)
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.70);
 
 	MSM5205(config, m_msm, XTAL(384'000)); /* verified on pcb */
-	m_msm->vck_legacy_callback().set(FUNC(dec8_state::csilver_adpcm_int));  /* interrupt function */
+	m_msm->vck_legacy_callback().set(FUNC(csilver_state::csilver_adpcm_int));  /* interrupt function */
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);      /* 8KHz */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.88);
 }
@@ -2259,6 +2258,7 @@ void dec8_state::oscar(machine_config &config)
 	DECO_BAC06(config, m_tilegen[0], 0);
 	m_tilegen[0]->set_gfx_region_wide(2, 2, 0);
 	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
+	m_tilegen[0]->set_tile_callback(FUNC(dec8_state::oscar_tile_cb));
 
 	DECO_MXC06(config, m_spritegen_mxc, 0);
 
@@ -2630,17 +2630,17 @@ ROM_START( gondo )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "dt00-e.f3", 0x08000, 0x08000, CRC(912a7eee) SHA1(15af89babf166dadaa77640e1973d7ebb4c078db) ) // Verified only DT00-E & DT03-E have the "-E" extention
 	ROM_LOAD( "dt01.f5",   0x10000, 0x10000, CRC(c39bb877) SHA1(9beb59ba19f38417c5d4d36e8f3c41f2b017d2d6) )
-	ROM_LOAD( "dt02.f6",   0x20000, 0x10000, CRC(bb5e674b) SHA1(8057dc7464a8b6987536f248d607957923b223cf) )
+	ROM_LOAD( "dt02.f6",   0x20000, 0x10000, CRC(925307a4) SHA1(1e8b8eb21df1a11b14c981b343b34c6cc3676517) ) // same label as the US version, but content identical to Japanese version
 	ROM_LOAD( "dt03-e.f7", 0x30000, 0x10000, CRC(ee7475eb) SHA1(8c68198ea1c3e89c9c2c4ba0e5d3f47afb8eecd4) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dt05-e.h5", 0x8000, 0x8000, CRC(ec08aa29) SHA1(ce83974ae095d9518d1ebf9f7e712f0cbc2c1b42) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
-	ROM_LOAD( "dt-e.b1", 0x0000, 0x1000, NO_DUMP ) // No decapped dump or hand crafted code for this set
+	ROM_LOAD( "dt-e.b1", 0x0000, 0x1000, BAD_DUMP CRC(0d0532ec) SHA1(30894f69ff24c1be4b684e07729bbb3e0f353086) ) // hand-crafted from the US version
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
-	ROM_LOAD( "dt14.b18", 0x00000, 0x08000, CRC(4bef16e1) SHA1(b8157a7a1b8f36cea1fd353267a4e03d920cb4aa) )
+	ROM_LOAD( "dt14-e.b18", 0x00000, 0x08000, CRC(00cbe9c8) SHA1(de7b640de8fd54ee79194945c96d5768d09f483b) ) // identical to Japanese version
 
 	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites */
 	ROM_LOAD( "dt19.f13",   0x00000, 0x10000, CRC(da2abe4b) SHA1(d53e4769671f3fd437edcff7e7ea05156bbcb45d) ) // All sprite data matches the Japanese set
@@ -3230,6 +3230,7 @@ Lower board (DATA EAST DE-0251-2):
 
 */
 
+
 ROM_START( csilver )
 	ROM_REGION( 0x48000, "maincpu", 0 )
 	ROM_LOAD( "dx03-12.18d", 0x08000, 0x08000, CRC(2d926e7c) SHA1(cf38e92904edb1870b0a4965f9049d67efe8cf6a) )
@@ -3244,7 +3245,7 @@ ROM_START( csilver )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
 	// 017F: B4 4C 0D : cjne  a,#$4C,$018F   (ID code 0x4c = World version)
-	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, CRC(ca663965) SHA1(a5fb7afdfd324761bde4bb90ba12efc9954627af) ) // dx-8.19a ?
+	ROM_LOAD( "dx-8.19a", 0x0000, 0x1000, CRC(c0266263) SHA1(27ac6fa4af7195f04249c04dec168ab82158704e) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "dx00.3d",  0x00000, 0x08000, CRC(f01ef985) SHA1(d5b823bd7c0efcf3137f8643c5d99a260bed5675) )
@@ -3281,7 +3282,8 @@ ROM_START( csilverj )
 	ROM_LOAD( "dx05.a6", 0x00000, 0x10000,  CRC(eb32cf25) SHA1(9390c88033259c65eb15320e31f5d696970987cc) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
-	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
+	// hand modified version of csilver ROM
+	ROM_LOAD( "id8751h_japan.mcu", 0x0000, 0x1000, BAD_DUMP CRC(6e801217) SHA1(2d8f7ae533dd8146acf8461d61ddd839544adf55) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "dx00.a1",  0x00000, 0x08000, CRC(f01ef985) SHA1(d5b823bd7c0efcf3137f8643c5d99a260bed5675) )
@@ -3319,7 +3321,8 @@ ROM_START( csilverja ) // DE-0250-3 + DE-0251-2
 	ROM_LOAD( "dx05.3f", 0x00000, 0x10000,  CRC(eb32cf25) SHA1(9390c88033259c65eb15320e31f5d696970987cc) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
-	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
+	// hand modified version of csilver ROM
+	ROM_LOAD( "id8751h_japan.mcu", 0x0000, 0x1000, BAD_DUMP CRC(6e801217) SHA1(2d8f7ae533dd8146acf8461d61ddd839544adf55) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "dx00.3d",  0x00000, 0x08000, CRC(f01ef985) SHA1(d5b823bd7c0efcf3137f8643c5d99a260bed5675) )
@@ -3461,223 +3464,303 @@ ROM_END
 
 ROM_START( srdarwin )
 	ROM_REGION( 0x28000, "maincpu", 0 )
-	ROM_LOAD( "dy01-e.b14", 0x20000, 0x08000, CRC(176e9299) SHA1(20cd44ab610e384ab4f0172054c9adc432b12e9c) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
-	ROM_LOAD( "dy00.b16", 0x10000, 0x10000, CRC(2bf6b461) SHA1(435d922c7b9df7f2b2f774346caed81d330be8a0) )
+	ROM_LOAD( "dy_01-e.b14", 0x20000, 0x08000, CRC(176e9299) SHA1(20cd44ab610e384ab4f0172054c9adc432b12e9c) )
+	ROM_CONTINUE(            0x08000, 0x08000 )
+	ROM_LOAD( "dy_00.b16",   0x10000, 0x10000, CRC(2bf6b461) SHA1(435d922c7b9df7f2b2f774346caed81d330be8a0) )
 
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )    /* 64K for sound CPU + 64k for decrypted opcodes */
-	ROM_LOAD( "dy04.d7", 0x8000, 0x8000, CRC(2ae3591c) SHA1(f21b06d84e2c3d3895be0812024641fd006e45cf) )
+	ROM_LOAD( "dy_04.d7", 0x8000, 0x8000, CRC(2ae3591c) SHA1(f21b06d84e2c3d3895be0812024641fd006e45cf) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
 	// 0160: B4 6B 0D : cjne  a,#$6B,$0170   (ID code 0x6b = World version)
-	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, CRC(11cd6ca4) SHA1(ec70f84228e37f9fc1bda85fa52a009f61c500b2) )
+	ROM_LOAD( "dy-e.d11", 0x0000, 0x1000, CRC(11cd6ca4) SHA1(ec70f84228e37f9fc1bda85fa52a009f61c500b2) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
-	ROM_LOAD( "dy05.b6", 0x00000, 0x4000, CRC(8780e8a3) SHA1(03ea91fdc5aba8e139201604fb3bf9b69f71f056) )
+	ROM_LOAD( "dy_05.b6", 0x00000, 0x4000, CRC(8780e8a3) SHA1(03ea91fdc5aba8e139201604fb3bf9b69f71f056) )
 
 	ROM_REGION( 0x30000, "gfx2", 0 )    /* sprites */
-	ROM_LOAD( "dy07.h16", 0x00000, 0x8000, CRC(97eaba60) SHA1(e3252b67bad7babcf4ece39f46ae4aeb950eb92b) )
-	ROM_LOAD( "dy06.h14", 0x08000, 0x8000, CRC(c279541b) SHA1(eb3737413499d07b6c2af99a95b27b2590e670c5) )
-	ROM_LOAD( "dy09.k13", 0x10000, 0x8000, CRC(d30d1745) SHA1(647b6121ab6fa812368da45e1295cc41f73be89d) )
-	ROM_LOAD( "dy08.k11", 0x18000, 0x8000, CRC(71d645fd) SHA1(a74a9b9697fc39b4e675e732a9d7d82976cc95dd) )
-	ROM_LOAD( "dy11.k16", 0x20000, 0x8000, CRC(fd9ccc5b) SHA1(b38c44c01acdc455d4192e4c8be1d68d9eb0c7b6) )
-	ROM_LOAD( "dy10.k14", 0x28000, 0x8000, CRC(88770ab8) SHA1(0a4a807a8d3b0653864bd984872d5567836f8cf8) )
+	ROM_LOAD( "dy_07.h16", 0x00000, 0x8000, CRC(97eaba60) SHA1(e3252b67bad7babcf4ece39f46ae4aeb950eb92b) )
+	ROM_LOAD( "dy_06.h14", 0x08000, 0x8000, CRC(c279541b) SHA1(eb3737413499d07b6c2af99a95b27b2590e670c5) )
+	ROM_LOAD( "dy_09.k13", 0x10000, 0x8000, CRC(d30d1745) SHA1(647b6121ab6fa812368da45e1295cc41f73be89d) )
+	ROM_LOAD( "dy_08.k11", 0x18000, 0x8000, CRC(71d645fd) SHA1(a74a9b9697fc39b4e675e732a9d7d82976cc95dd) )
+	ROM_LOAD( "dy_11.k16", 0x20000, 0x8000, CRC(fd9ccc5b) SHA1(b38c44c01acdc455d4192e4c8be1d68d9eb0c7b6) )
+	ROM_LOAD( "dy_10.k14", 0x28000, 0x8000, CRC(88770ab8) SHA1(0a4a807a8d3b0653864bd984872d5567836f8cf8) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 )    /* tiles */
-	ROM_LOAD( "dy03.b4",  0x00000, 0x4000, CRC(44f2a4f9) SHA1(97368dd112451cd630f2fa5ba54679e84e7d4d97) )
-	ROM_CONTINUE(         0x10000, 0x4000 )
-	ROM_CONTINUE(         0x20000, 0x4000 )
-	ROM_CONTINUE(         0x30000, 0x4000 )
-	ROM_LOAD( "dy02.b5",  0x08000, 0x4000, CRC(522d9a9e) SHA1(248274ed6df604357cad386fcf0521b26810aa0e) )
-	ROM_CONTINUE(         0x18000, 0x4000 )
-	ROM_CONTINUE(         0x28000, 0x4000 )
-	ROM_CONTINUE(         0x38000, 0x4000 )
+	ROM_LOAD( "dy_03.b4",  0x00000, 0x4000, CRC(44f2a4f9) SHA1(97368dd112451cd630f2fa5ba54679e84e7d4d97) )
+	ROM_CONTINUE(          0x10000, 0x4000 )
+	ROM_CONTINUE(          0x20000, 0x4000 )
+	ROM_CONTINUE(          0x30000, 0x4000 )
+	ROM_LOAD( "dy_02.b5",  0x08000, 0x4000, CRC(522d9a9e) SHA1(248274ed6df604357cad386fcf0521b26810aa0e) )
+	ROM_CONTINUE(          0x18000, 0x4000 )
+	ROM_CONTINUE(          0x28000, 0x4000 )
+	ROM_CONTINUE(          0x38000, 0x4000 )
 
 	ROM_REGION( 256, "proms", 0 )
-	ROM_LOAD( "dy12.f4",  0x00000,  0x100,  CRC(ebfaaed9) SHA1(5723dbfa3eb3fc4df8c8975b320a5c49848309d8) )    /* Priority (Not yet used) */
+	ROM_LOAD( "dy_12.f4",  0x00000,  0x100,  CRC(ebfaaed9) SHA1(5723dbfa3eb3fc4df8c8975b320a5c49848309d8) )    /* Priority (Not yet used) */
 ROM_END
 
 ROM_START( srdarwinj )
 	ROM_REGION( 0x28000, "maincpu", 0 )
-	ROM_LOAD( "dy_01.rom", 0x20000, 0x08000, CRC(1eeee4ff) SHA1(89a70de8bd61c671582b11773ce69b2edcd9c2f8) )
+	ROM_LOAD( "dy_01.b14", 0x20000, 0x08000, CRC(1eeee4ff) SHA1(89a70de8bd61c671582b11773ce69b2edcd9c2f8) )
 	ROM_CONTINUE(          0x08000, 0x08000 )
-	ROM_LOAD( "dy00.b16", 0x10000, 0x10000, CRC(2bf6b461) SHA1(435d922c7b9df7f2b2f774346caed81d330be8a0) )
+	ROM_LOAD( "dy_00.b16", 0x10000, 0x10000, CRC(2bf6b461) SHA1(435d922c7b9df7f2b2f774346caed81d330be8a0) )
 
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )    /* 64K for sound CPU + 64k for decrypted opcodes */
-	ROM_LOAD( "dy04.d7", 0x8000, 0x8000, CRC(2ae3591c) SHA1(f21b06d84e2c3d3895be0812024641fd006e45cf) )
+	ROM_LOAD( "dy_04.d7", 0x8000, 0x8000, CRC(2ae3591c) SHA1(f21b06d84e2c3d3895be0812024641fd006e45cf) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
-	ROM_LOAD( "id8751h_japan.mcu", 0x0000, 0x1000, BAD_DUMP CRC(4ac2ca9d) SHA1(6e07788df9fcf4248a9d3e87b8c5f54776bd269e) ) // hand-modified copy of world version to correct region + coinage
+	ROM_LOAD( "dy.d11", 0x0000, 0x1000, BAD_DUMP CRC(4ac2ca9d) SHA1(6e07788df9fcf4248a9d3e87b8c5f54776bd269e) ) // hand-modified copy of world version to correct region + coinage
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
-	ROM_LOAD( "dy05.b6", 0x00000, 0x4000, CRC(8780e8a3) SHA1(03ea91fdc5aba8e139201604fb3bf9b69f71f056) )
+	ROM_LOAD( "dy_05.b6", 0x00000, 0x4000, CRC(8780e8a3) SHA1(03ea91fdc5aba8e139201604fb3bf9b69f71f056) )
 
 	ROM_REGION( 0x30000, "gfx2", 0 )    /* sprites */
-	ROM_LOAD( "dy07.h16", 0x00000, 0x8000, CRC(97eaba60) SHA1(e3252b67bad7babcf4ece39f46ae4aeb950eb92b) )
-	ROM_LOAD( "dy06.h14", 0x08000, 0x8000, CRC(c279541b) SHA1(eb3737413499d07b6c2af99a95b27b2590e670c5) )
-	ROM_LOAD( "dy09.k13", 0x10000, 0x8000, CRC(d30d1745) SHA1(647b6121ab6fa812368da45e1295cc41f73be89d) )
-	ROM_LOAD( "dy08.k11", 0x18000, 0x8000, CRC(71d645fd) SHA1(a74a9b9697fc39b4e675e732a9d7d82976cc95dd) )
-	ROM_LOAD( "dy11.k16", 0x20000, 0x8000, CRC(fd9ccc5b) SHA1(b38c44c01acdc455d4192e4c8be1d68d9eb0c7b6) )
-	ROM_LOAD( "dy10.k14", 0x28000, 0x8000, CRC(88770ab8) SHA1(0a4a807a8d3b0653864bd984872d5567836f8cf8) )
+	ROM_LOAD( "dy_07.h16", 0x00000, 0x8000, CRC(97eaba60) SHA1(e3252b67bad7babcf4ece39f46ae4aeb950eb92b) )
+	ROM_LOAD( "dy_06.h14", 0x08000, 0x8000, CRC(c279541b) SHA1(eb3737413499d07b6c2af99a95b27b2590e670c5) )
+	ROM_LOAD( "dy_09.k13", 0x10000, 0x8000, CRC(d30d1745) SHA1(647b6121ab6fa812368da45e1295cc41f73be89d) )
+	ROM_LOAD( "dy_08.k11", 0x18000, 0x8000, CRC(71d645fd) SHA1(a74a9b9697fc39b4e675e732a9d7d82976cc95dd) )
+	ROM_LOAD( "dy_11.k16", 0x20000, 0x8000, CRC(fd9ccc5b) SHA1(b38c44c01acdc455d4192e4c8be1d68d9eb0c7b6) )
+	ROM_LOAD( "dy_10.k14", 0x28000, 0x8000, CRC(88770ab8) SHA1(0a4a807a8d3b0653864bd984872d5567836f8cf8) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 )    /* tiles */
-	ROM_LOAD( "dy03.b4",  0x00000, 0x4000, CRC(44f2a4f9) SHA1(97368dd112451cd630f2fa5ba54679e84e7d4d97) )
-	ROM_CONTINUE(         0x10000, 0x4000 )
-	ROM_CONTINUE(         0x20000, 0x4000 )
-	ROM_CONTINUE(         0x30000, 0x4000 )
-	ROM_LOAD( "dy02.b5",  0x08000, 0x4000, CRC(522d9a9e) SHA1(248274ed6df604357cad386fcf0521b26810aa0e) )
-	ROM_CONTINUE(         0x18000, 0x4000 )
-	ROM_CONTINUE(         0x28000, 0x4000 )
-	ROM_CONTINUE(         0x38000, 0x4000 )
+	ROM_LOAD( "dy_03.b4",  0x00000, 0x4000, CRC(44f2a4f9) SHA1(97368dd112451cd630f2fa5ba54679e84e7d4d97) )
+	ROM_CONTINUE(          0x10000, 0x4000 )
+	ROM_CONTINUE(          0x20000, 0x4000 )
+	ROM_CONTINUE(          0x30000, 0x4000 )
+	ROM_LOAD( "dy_02.b5",  0x08000, 0x4000, CRC(522d9a9e) SHA1(248274ed6df604357cad386fcf0521b26810aa0e) )
+	ROM_CONTINUE(          0x18000, 0x4000 )
+	ROM_CONTINUE(          0x28000, 0x4000 )
+	ROM_CONTINUE(          0x38000, 0x4000 )
 
 	ROM_REGION( 256, "proms", 0 )
-	ROM_LOAD( "dy12.f4",  0x00000,  0x100,  CRC(ebfaaed9) SHA1(5723dbfa3eb3fc4df8c8975b320a5c49848309d8) )    /* Priority (Not yet used) */
+	ROM_LOAD( "dy_12.f4",  0x00000,  0x100,  CRC(ebfaaed9) SHA1(5723dbfa3eb3fc4df8c8975b320a5c49848309d8) )    /* Priority (Not yet used) */
 ROM_END
 
 ROM_START( cobracom )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "el11-5.bin",  0x08000, 0x08000, CRC(af0a8b05) SHA1(096e4e7f2785a20bfaec14277413ce4e20e90214) )
-	ROM_LOAD( "el12-4.bin",  0x10000, 0x10000, CRC(7a44ef38) SHA1(d7dc277dce08f9d073290e100be4a7ca2e2b82cb) )
-	ROM_LOAD( "el13.bin",    0x20000, 0x10000, CRC(04505acb) SHA1(2220efb277884588859375dab9960f04f07273a7) )
+	ROM_LOAD( "el11-5.5j", 0x08000, 0x08000, CRC(af0a8b05) SHA1(096e4e7f2785a20bfaec14277413ce4e20e90214) )
+	ROM_LOAD( "el12-4.7j", 0x10000, 0x10000, CRC(7a44ef38) SHA1(d7dc277dce08f9d073290e100be4a7ca2e2b82cb) )
+	ROM_LOAD( "el13.9j",   0x20000, 0x10000, CRC(04505acb) SHA1(2220efb277884588859375dab9960f04f07273a7) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "el10-4.bin",  0x8000,  0x8000,  CRC(edfad118) SHA1(10de8805472346fead62460a3fdc09ae26a4e0d5) )
+	ROM_LOAD( "el10-4.1f", 0x8000, 0x8000, CRC(edfad118) SHA1(10de8805472346fead62460a3fdc09ae26a4e0d5) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
-	ROM_LOAD( "el14.bin",    0x00000, 0x08000, CRC(47246177) SHA1(51b025740dc03b04009ac97d8d110ab521894386) )
+	ROM_LOAD( "el14.14j", 0x00000, 0x08000, CRC(47246177) SHA1(51b025740dc03b04009ac97d8d110ab521894386) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites */
-	ROM_LOAD( "el00-4.bin",  0x00000, 0x10000, CRC(122da2a8) SHA1(ce72f16abf7e5449c7d044d4b827e8735c3be0ff) )
-	ROM_LOAD( "el01-4.bin",  0x20000, 0x10000, CRC(27bf705b) SHA1(196c35aaf3816d3eef4c2af6d146a90a48365d33) )
-	ROM_LOAD( "el02-4.bin",  0x40000, 0x10000, CRC(c86fede6) SHA1(97584fa19591651fcfb39d1b2b6306165e93554c) )
-	ROM_LOAD( "el03-4.bin",  0x60000, 0x10000, CRC(1d8a855b) SHA1(429261c200dddc62a330be8aea150b2037133188) )
+	ROM_LOAD( "el00-4.2a", 0x00000, 0x10000, CRC(122da2a8) SHA1(ce72f16abf7e5449c7d044d4b827e8735c3be0ff) )
+	ROM_LOAD( "el01-4.3a", 0x20000, 0x10000, CRC(27bf705b) SHA1(196c35aaf3816d3eef4c2af6d146a90a48365d33) )
+	ROM_LOAD( "el02-4.5a", 0x40000, 0x10000, CRC(c86fede6) SHA1(97584fa19591651fcfb39d1b2b6306165e93554c) )
+	ROM_LOAD( "el03-4.6a", 0x60000, 0x10000, CRC(1d8a855b) SHA1(429261c200dddc62a330be8aea150b2037133188) )
 
 	ROM_REGION( 0x80000, "gfx3", 0 )    /* tiles 1 */
-	ROM_LOAD( "el05.bin",    0x00000, 0x10000, CRC(1c4f6033) SHA1(4a7dece911166d1ff5f41df6ec5140596206d8d4) )
-	ROM_LOAD( "el06.bin",    0x20000, 0x10000, CRC(d24ba794) SHA1(b34b7bbaab4ebdd81c87d363f087cc92e27e8d1c) )
-	ROM_LOAD( "el04.bin",    0x40000, 0x10000, CRC(d80a49ce) SHA1(1a92413b5ab53f80e44a954433e69ec5fe2c0aa6) )
-	ROM_LOAD( "el07.bin",    0x60000, 0x10000, CRC(6d771fc3) SHA1(f29979f3aa07bdb544fb0c1d773c5558b4533390) )
+	ROM_LOAD( "el05.15a", 0x00000, 0x10000, CRC(1c4f6033) SHA1(4a7dece911166d1ff5f41df6ec5140596206d8d4) )
+	ROM_LOAD( "el06.16a", 0x20000, 0x10000, CRC(d24ba794) SHA1(b34b7bbaab4ebdd81c87d363f087cc92e27e8d1c) )
+	ROM_LOAD( "el04.13a", 0x40000, 0x10000, CRC(d80a49ce) SHA1(1a92413b5ab53f80e44a954433e69ec5fe2c0aa6) )
+	ROM_LOAD( "el07.18a", 0x60000, 0x10000, CRC(6d771fc3) SHA1(f29979f3aa07bdb544fb0c1d773c5558b4533390) )
 
 	ROM_REGION( 0x80000, "gfx4", 0 )    /* tiles 2 */
-	ROM_LOAD( "el08.bin",    0x00000, 0x08000, CRC(cb0dcf4c) SHA1(e14853f83ee9ba5cbf2eb1e085fee4e65af3cc25) )
-	ROM_CONTINUE(            0x40000, 0x08000 )
-	ROM_LOAD( "el09.bin",    0x20000, 0x08000, CRC(1fae5be7) SHA1(be6e090b0b82648b385d9b6d11775f3ff40f0af3) )
-	ROM_CONTINUE(            0x60000, 0x08000 )
+	ROM_LOAD( "el08.7d", 0x00000, 0x08000, CRC(cb0dcf4c) SHA1(e14853f83ee9ba5cbf2eb1e085fee4e65af3cc25) )
+	ROM_CONTINUE(        0x40000, 0x08000 )
+	ROM_LOAD( "el09.9d", 0x20000, 0x08000, CRC(1fae5be7) SHA1(be6e090b0b82648b385d9b6d11775f3ff40f0af3) )
+	ROM_CONTINUE(        0x60000, 0x08000 )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "eh15.12f", 0x0000, 0x0200, CRC(279e540c) SHA1(9e5e707da9f7c403c63d77fa378f22da9906d4e5) )
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "pt-0.16h", 0x0000, 0x0117, CRC(add5074f) SHA1(352d984ba4d50c437ee9e5d8e8d00b0da6b3b8f3) )
 ROM_END
 
 ROM_START( cobracoma )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "el11-4.bin",  0x08000, 0x08000, CRC(6dca6734) SHA1(1d165845680df2f1febd2b7d2f3163d68523496e) )
-	ROM_LOAD( "el12-4.bin",  0x10000, 0x10000, CRC(7a44ef38) SHA1(d7dc277dce08f9d073290e100be4a7ca2e2b82cb) )
-	ROM_LOAD( "el13.bin",    0x20000, 0x10000, CRC(04505acb) SHA1(2220efb277884588859375dab9960f04f07273a7) )
+	ROM_LOAD( "el11-4.5j", 0x08000, 0x08000, CRC(6dca6734) SHA1(1d165845680df2f1febd2b7d2f3163d68523496e) )
+	ROM_LOAD( "el12-4.7j", 0x10000, 0x10000, CRC(7a44ef38) SHA1(d7dc277dce08f9d073290e100be4a7ca2e2b82cb) )
+	ROM_LOAD( "el13.9j",   0x20000, 0x10000, CRC(04505acb) SHA1(2220efb277884588859375dab9960f04f07273a7) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "el10-4.bin",  0x8000,  0x8000,  CRC(edfad118) SHA1(10de8805472346fead62460a3fdc09ae26a4e0d5) )
+	ROM_LOAD( "el10-4.1f", 0x8000, 0x8000, CRC(edfad118) SHA1(10de8805472346fead62460a3fdc09ae26a4e0d5) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
-	ROM_LOAD( "el14.bin",    0x00000, 0x08000, CRC(47246177) SHA1(51b025740dc03b04009ac97d8d110ab521894386) )
+	ROM_LOAD( "el14.14j", 0x00000, 0x08000, CRC(47246177) SHA1(51b025740dc03b04009ac97d8d110ab521894386) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites */
-	ROM_LOAD( "el00-4.bin",  0x00000, 0x10000, CRC(122da2a8) SHA1(ce72f16abf7e5449c7d044d4b827e8735c3be0ff) )
-	ROM_LOAD( "el01-4.bin",  0x20000, 0x10000, CRC(27bf705b) SHA1(196c35aaf3816d3eef4c2af6d146a90a48365d33) )
-	ROM_LOAD( "el02-4.bin",  0x40000, 0x10000, CRC(c86fede6) SHA1(97584fa19591651fcfb39d1b2b6306165e93554c) )
-	ROM_LOAD( "el03-4.bin",  0x60000, 0x10000, CRC(1d8a855b) SHA1(429261c200dddc62a330be8aea150b2037133188) )
+	ROM_LOAD( "el00-4.2a", 0x00000, 0x10000, CRC(122da2a8) SHA1(ce72f16abf7e5449c7d044d4b827e8735c3be0ff) )
+	ROM_LOAD( "el01-4.3a", 0x20000, 0x10000, CRC(27bf705b) SHA1(196c35aaf3816d3eef4c2af6d146a90a48365d33) )
+	ROM_LOAD( "el02-4.5a", 0x40000, 0x10000, CRC(c86fede6) SHA1(97584fa19591651fcfb39d1b2b6306165e93554c) )
+	ROM_LOAD( "el03-4.6a", 0x60000, 0x10000, CRC(1d8a855b) SHA1(429261c200dddc62a330be8aea150b2037133188) )
 
 	ROM_REGION( 0x80000, "gfx3", 0 )    /* tiles 1 */
-	ROM_LOAD( "el05.bin",    0x00000, 0x10000, CRC(1c4f6033) SHA1(4a7dece911166d1ff5f41df6ec5140596206d8d4) )
-	ROM_LOAD( "el06.bin",    0x20000, 0x10000, CRC(d24ba794) SHA1(b34b7bbaab4ebdd81c87d363f087cc92e27e8d1c) )
-	ROM_LOAD( "el04.bin",    0x40000, 0x10000, CRC(d80a49ce) SHA1(1a92413b5ab53f80e44a954433e69ec5fe2c0aa6) )
-	ROM_LOAD( "el07.bin",    0x60000, 0x10000, CRC(6d771fc3) SHA1(f29979f3aa07bdb544fb0c1d773c5558b4533390) )
+	ROM_LOAD( "el05.15a", 0x00000, 0x10000, CRC(1c4f6033) SHA1(4a7dece911166d1ff5f41df6ec5140596206d8d4) )
+	ROM_LOAD( "el06.16a", 0x20000, 0x10000, CRC(d24ba794) SHA1(b34b7bbaab4ebdd81c87d363f087cc92e27e8d1c) )
+	ROM_LOAD( "el04.13a", 0x40000, 0x10000, CRC(d80a49ce) SHA1(1a92413b5ab53f80e44a954433e69ec5fe2c0aa6) )
+	ROM_LOAD( "el07.18a", 0x60000, 0x10000, CRC(6d771fc3) SHA1(f29979f3aa07bdb544fb0c1d773c5558b4533390) )
 
 	ROM_REGION( 0x80000, "gfx4", 0 )    /* tiles 2 */
-	ROM_LOAD( "el08.bin",    0x00000, 0x08000, CRC(cb0dcf4c) SHA1(e14853f83ee9ba5cbf2eb1e085fee4e65af3cc25) )
-	ROM_CONTINUE(            0x40000, 0x08000 )
-	ROM_LOAD( "el09.bin",    0x20000, 0x08000, CRC(1fae5be7) SHA1(be6e090b0b82648b385d9b6d11775f3ff40f0af3) )
-	ROM_CONTINUE(            0x60000, 0x08000 )
+	ROM_LOAD( "el08.7d", 0x00000, 0x08000, CRC(cb0dcf4c) SHA1(e14853f83ee9ba5cbf2eb1e085fee4e65af3cc25) )
+	ROM_CONTINUE(        0x40000, 0x08000 )
+	ROM_LOAD( "el09.9d", 0x20000, 0x08000, CRC(1fae5be7) SHA1(be6e090b0b82648b385d9b6d11775f3ff40f0af3) )
+	ROM_CONTINUE(        0x60000, 0x08000 )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "eh15.12f", 0x0000, 0x0200, CRC(279e540c) SHA1(9e5e707da9f7c403c63d77fa378f22da9906d4e5) )
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "pt-0.16h", 0x0000, 0x0117, CRC(add5074f) SHA1(352d984ba4d50c437ee9e5d8e8d00b0da6b3b8f3) )
+ROM_END
+
+ROM_START( cobracomb )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "el11.5j", 0x08000, 0x08000, CRC(c6a102e3) SHA1(51d9781d13a8a98c9bbdf34fa79ebfd8a152567e) ) /* "zero" revision - IE: Original version */
+	ROM_LOAD( "el12.7j", 0x10000, 0x10000, CRC(72b2dab4) SHA1(ff84a04cfe920a0d8105fbbd1f44ee86822cf0d3) ) /* "zero" revision - IE: Original version */
+	ROM_LOAD( "el13.9j", 0x20000, 0x10000, CRC(04505acb) SHA1(2220efb277884588859375dab9960f04f07273a7) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "el10.1f", 0x8000, 0x8000, CRC(62ca5e89) SHA1(b04acaccc58846e0d277868a873a440b7f8071b0) )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
+	ROM_LOAD( "el14.14j", 0x00000, 0x08000, CRC(47246177) SHA1(51b025740dc03b04009ac97d8d110ab521894386) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites */
+	ROM_LOAD( "el00.2a", 0x00000, 0x10000, CRC(d96b6797) SHA1(01c4a9f2bebb13cba14636690cd5356db73f045e) )
+	ROM_LOAD( "el01.3a", 0x20000, 0x10000, CRC(3fef9c02) SHA1(e4b731faf6a2f4e5fed8ba9bd07e0f203981ffec) )
+	ROM_LOAD( "el02.5a", 0x40000, 0x10000, CRC(bfae6c34) SHA1(9503a120e11e9466cd9a2931fd44a631d72ca5f0) )
+	ROM_LOAD( "el03.6a", 0x60000, 0x10000, CRC(d56790f8) SHA1(1cc7cb9f7102158de14a737e9317a54f01790ba8) )
+
+	ROM_REGION( 0x80000, "gfx3", 0 )    /* tiles 1 */
+	ROM_LOAD( "el05.15a", 0x00000, 0x10000, CRC(1c4f6033) SHA1(4a7dece911166d1ff5f41df6ec5140596206d8d4) )
+	ROM_LOAD( "el06.16a", 0x20000, 0x10000, CRC(d24ba794) SHA1(b34b7bbaab4ebdd81c87d363f087cc92e27e8d1c) )
+	ROM_LOAD( "el04.13a", 0x40000, 0x10000, CRC(d80a49ce) SHA1(1a92413b5ab53f80e44a954433e69ec5fe2c0aa6) )
+	ROM_LOAD( "el07.18a", 0x60000, 0x10000, CRC(6d771fc3) SHA1(f29979f3aa07bdb544fb0c1d773c5558b4533390) )
+
+	ROM_REGION( 0x80000, "gfx4", 0 )    /* tiles 2 */
+	ROM_LOAD( "el08.7d", 0x00000, 0x08000, CRC(cb0dcf4c) SHA1(e14853f83ee9ba5cbf2eb1e085fee4e65af3cc25) )
+	ROM_CONTINUE(        0x40000, 0x08000 )
+	ROM_LOAD( "el09.9d", 0x20000, 0x08000, CRC(1fae5be7) SHA1(be6e090b0b82648b385d9b6d11775f3ff40f0af3) )
+	ROM_CONTINUE(        0x60000, 0x08000 )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "eh15.12f", 0x0000, 0x0200, CRC(279e540c) SHA1(9e5e707da9f7c403c63d77fa378f22da9906d4e5) )
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "pt-0.16h", 0x0000, 0x0117, CRC(add5074f) SHA1(352d984ba4d50c437ee9e5d8e8d00b0da6b3b8f3) )
 ROM_END
 
 ROM_START( cobracomj )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "eh-11.rom",    0x08000, 0x08000, CRC(868637e1) SHA1(8b1e3e045e341bb94b1f6c7d89198b22e6c19de7) )
-	ROM_LOAD( "eh-12.rom",    0x10000, 0x10000, CRC(7c878a83) SHA1(9b2a3083c6dae69626fdab16d97517d30eaa1859) )
-	ROM_LOAD( "el13.bin",     0x20000, 0x10000, CRC(04505acb) SHA1(2220efb277884588859375dab9960f04f07273a7) )
+	ROM_LOAD( "eh11.5j", 0x08000, 0x08000, CRC(868637e1) SHA1(8b1e3e045e341bb94b1f6c7d89198b22e6c19de7) )
+	ROM_LOAD( "eh12.7j", 0x10000, 0x10000, CRC(7c878a83) SHA1(9b2a3083c6dae69626fdab16d97517d30eaa1859) )
+	ROM_LOAD( "el13.9j", 0x20000, 0x10000, CRC(04505acb) SHA1(2220efb277884588859375dab9960f04f07273a7) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "eh-10.rom",    0x8000,  0x8000,  CRC(62ca5e89) SHA1(b04acaccc58846e0d277868a873a440b7f8071b0) )
+	ROM_LOAD( "eh10.1f", 0x8000, 0x8000, CRC(62ca5e89) SHA1(b04acaccc58846e0d277868a873a440b7f8071b0) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
-	ROM_LOAD( "el14.bin",    0x00000, 0x08000, CRC(47246177) SHA1(51b025740dc03b04009ac97d8d110ab521894386) )
+	ROM_LOAD( "eh14.14j", 0x00000, 0x08000, CRC(47246177) SHA1(51b025740dc03b04009ac97d8d110ab521894386) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites */
-	ROM_LOAD( "eh-00.rom",    0x00000, 0x10000, CRC(d96b6797) SHA1(01c4a9f2bebb13cba14636690cd5356db73f045e) )
-	ROM_LOAD( "eh-01.rom",    0x20000, 0x10000, CRC(3fef9c02) SHA1(e4b731faf6a2f4e5fed8ba9bd07e0f203981ffec) )
-	ROM_LOAD( "eh-02.rom",    0x40000, 0x10000, CRC(bfae6c34) SHA1(9503a120e11e9466cd9a2931fd44a631d72ca5f0) )
-	ROM_LOAD( "eh-03.rom",    0x60000, 0x10000, CRC(d56790f8) SHA1(1cc7cb9f7102158de14a737e9317a54f01790ba8) )
+	ROM_LOAD( "eh00.2a", 0x00000, 0x10000, CRC(d96b6797) SHA1(01c4a9f2bebb13cba14636690cd5356db73f045e) )
+	ROM_LOAD( "eh01.3a", 0x20000, 0x10000, CRC(3fef9c02) SHA1(e4b731faf6a2f4e5fed8ba9bd07e0f203981ffec) )
+	ROM_LOAD( "eh02.5a", 0x40000, 0x10000, CRC(bfae6c34) SHA1(9503a120e11e9466cd9a2931fd44a631d72ca5f0) )
+	ROM_LOAD( "eh03.6a", 0x60000, 0x10000, CRC(d56790f8) SHA1(1cc7cb9f7102158de14a737e9317a54f01790ba8) )
 
 	ROM_REGION( 0x80000, "gfx3", 0 )    /* tiles 1 */
-	ROM_LOAD( "el05.bin",    0x00000, 0x10000, CRC(1c4f6033) SHA1(4a7dece911166d1ff5f41df6ec5140596206d8d4) )
-	ROM_LOAD( "el06.bin",    0x20000, 0x10000, CRC(d24ba794) SHA1(b34b7bbaab4ebdd81c87d363f087cc92e27e8d1c) )
-	ROM_LOAD( "el04.bin",    0x40000, 0x10000, CRC(d80a49ce) SHA1(1a92413b5ab53f80e44a954433e69ec5fe2c0aa6) )
-	ROM_LOAD( "el07.bin",    0x60000, 0x10000, CRC(6d771fc3) SHA1(f29979f3aa07bdb544fb0c1d773c5558b4533390) )
+	ROM_LOAD( "eh05.15a", 0x00000, 0x10000, CRC(1c4f6033) SHA1(4a7dece911166d1ff5f41df6ec5140596206d8d4) )
+	ROM_LOAD( "eh06.16a", 0x20000, 0x10000, CRC(d24ba794) SHA1(b34b7bbaab4ebdd81c87d363f087cc92e27e8d1c) )
+	ROM_LOAD( "eh04.13a", 0x40000, 0x10000, CRC(d80a49ce) SHA1(1a92413b5ab53f80e44a954433e69ec5fe2c0aa6) )
+	ROM_LOAD( "eh07.18a", 0x60000, 0x10000, CRC(6d771fc3) SHA1(f29979f3aa07bdb544fb0c1d773c5558b4533390) )
 
 	ROM_REGION( 0x80000, "gfx4", 0 )    /* tiles 2 */
-	ROM_LOAD( "el08.bin",    0x00000, 0x08000, CRC(cb0dcf4c) SHA1(e14853f83ee9ba5cbf2eb1e085fee4e65af3cc25) )
-	ROM_CONTINUE(            0x40000, 0x08000 )
-	ROM_LOAD( "el09.bin",    0x20000, 0x08000, CRC(1fae5be7) SHA1(be6e090b0b82648b385d9b6d11775f3ff40f0af3) )
-	ROM_CONTINUE(            0x60000, 0x08000 )
+	ROM_LOAD( "eh08.7d", 0x00000, 0x08000, CRC(cb0dcf4c) SHA1(e14853f83ee9ba5cbf2eb1e085fee4e65af3cc25) )
+	ROM_CONTINUE(        0x40000, 0x08000 )
+	ROM_LOAD( "eh09.9d", 0x20000, 0x08000, CRC(1fae5be7) SHA1(be6e090b0b82648b385d9b6d11775f3ff40f0af3) )
+	ROM_CONTINUE(        0x60000, 0x08000 )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "eh15.12f", 0x0000, 0x0200, CRC(279e540c) SHA1(9e5e707da9f7c403c63d77fa378f22da9906d4e5) )
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "pt-0.16h", 0x0000, 0x0117, CRC(add5074f) SHA1(352d984ba4d50c437ee9e5d8e8d00b0da6b3b8f3) )
 ROM_END
 
+// bootleg of the Japanese release manufactured in Italy. Contents are the same but for PROMs and PAL
+// main PCB is marked: "LC" on component side ("LC" is the Italian for "Lato Componenti" which translates to "Components Side")
+// main PCB is marked: "LS" on solder side ("LS" is the Italian for "Lato Saldature" which translates to "Solders Side")
+ROM_START( cobracomjb )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "cobra4.bin", 0x08000, 0x08000, CRC(868637e1) SHA1(8b1e3e045e341bb94b1f6c7d89198b22e6c19de7) )
+	ROM_LOAD( "cobra3.bin", 0x10000, 0x10000, CRC(7c878a83) SHA1(9b2a3083c6dae69626fdab16d97517d30eaa1859) )
+	ROM_LOAD( "cobra2.bin", 0x20000, 0x10000, CRC(04505acb) SHA1(2220efb277884588859375dab9960f04f07273a7) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "cobra5.bin", 0x8000, 0x8000, CRC(62ca5e89) SHA1(b04acaccc58846e0d277868a873a440b7f8071b0) )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )    // characters
+	ROM_LOAD( "cobra1.bin", 0x00000, 0x08000, CRC(47246177) SHA1(51b025740dc03b04009ac97d8d110ab521894386) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )    // sprites
+	ROM_LOAD( "cob17.bin", 0x00000, 0x10000, CRC(d96b6797) SHA1(01c4a9f2bebb13cba14636690cd5356db73f045e) )
+	ROM_LOAD( "cob16.bin", 0x20000, 0x10000, CRC(3fef9c02) SHA1(e4b731faf6a2f4e5fed8ba9bd07e0f203981ffec) )
+	ROM_LOAD( "cob15.bin", 0x40000, 0x10000, CRC(bfae6c34) SHA1(9503a120e11e9466cd9a2931fd44a631d72ca5f0) )
+	ROM_LOAD( "cob14.bin", 0x60000, 0x10000, CRC(d56790f8) SHA1(1cc7cb9f7102158de14a737e9317a54f01790ba8) )
+
+	ROM_REGION( 0x80000, "gfx3", 0 )    // tiles 1
+	ROM_LOAD( "cob13.bin", 0x00000, 0x10000, CRC(1c4f6033) SHA1(4a7dece911166d1ff5f41df6ec5140596206d8d4) )
+	ROM_LOAD( "cob12.bin", 0x20000, 0x10000, CRC(d24ba794) SHA1(b34b7bbaab4ebdd81c87d363f087cc92e27e8d1c) )
+	ROM_LOAD( "cob11.bin", 0x40000, 0x10000, CRC(d80a49ce) SHA1(1a92413b5ab53f80e44a954433e69ec5fe2c0aa6) )
+	ROM_LOAD( "cob10.bin", 0x60000, 0x10000, CRC(6d771fc3) SHA1(f29979f3aa07bdb544fb0c1d773c5558b4533390) )
+
+	ROM_REGION( 0x80000, "gfx4", 0 )    // tiles 2
+	ROM_LOAD( "cobra6.bin", 0x00000, 0x08000, CRC(c991298f) SHA1(3f79773a8def6b79b77c2ca6b8e8dbde5bdcd127) )
+	ROM_LOAD( "cobra8.bin", 0x20000, 0x08000, CRC(6bcc5982) SHA1(5bafa9a7a115d2b67f4fd582dc79f7e2848e5010) )
+	ROM_LOAD( "cobra7.bin", 0x40000, 0x08000, CRC(f5e267e5) SHA1(4abda964b8ebceeaba7717d4df23a85862934490) )
+	ROM_LOAD( "cobra9.bin", 0x60000, 0x08000, CRC(c90443b5) SHA1(2ede9a05e54a662c1b08672921a0390d8ce128a7) )
+
+	ROM_REGION( 0x0500, "proms", 0 )
+	ROM_LOAD( "63s481n.3",   0x0000, 0x0200, CRC(279e540c) SHA1(9e5e707da9f7c403c63d77fa378f22da9906d4e5) )
+	ROM_LOAD( "am27s21pc.1", 0x0200, 0x0100, CRC(9f6aa3e5) SHA1(518247d4581eee3a078269fcf0c86d182cf622cd) )
+	ROM_LOAD( "am27s21pc.2", 0x0300, 0x0100, CRC(af46d1ee) SHA1(281bcc61d9d67b007c1399e228ec6baf6ab5d4ff) )
+	ROM_LOAD( "am27s21pc.3", 0x0400, 0x0100, CRC(1e4189e8) SHA1(ce62b19005f565b734d8db3ee49d7c070ed53ad6) )
+
+	ROM_REGION( 0x0104, "plds", 0 )
+	ROM_LOAD( "pal16l8a-2cn.bin", 0x0000, 0x0104, CRC(3ef8cf68) SHA1(9410a139fb10628bc612d198f5c9f04b2b34f52f) )
+ROM_END
+
+
 /******************************************************************************/
 
-void dec8_state::init_dec8()
-{
-	if (m_mainbank.found())
-	{
-		uint8_t *ROM = memregion("maincpu")->base();
-		uint32_t max_bank = (memregion("maincpu")->bytes() - 0x10000) / 0x4000;
-		m_mainbank->configure_entries(0, max_bank, &ROM[0x10000], 0x4000);
-	}
-	m_latch = 0;
-}
-
-void dec8_state::init_csilver()
-{
-	uint8_t *RAM = memregion("audiocpu")->base();
-	m_soundbank->configure_entries(0, 2, &RAM[0], 0x4000);
-	init_dec8();
-}
-
-
-/******************************************************************************/
-
-GAME( 1986, lastmisn,   0,        lastmisn, lastmisn,  dec8_state, init_dec8,    ROT270, "Data East Corporation", "Last Mission (World revision 8)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lastmisnu6, lastmisn, lastmisn, lastmisn,  dec8_state, init_dec8,    ROT270, "Data East USA",         "Last Mission (US revision 6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lastmisnu5, lastmisn, lastmisn, lastmisn,  dec8_state, init_dec8,    ROT270, "Data East USA",         "Last Mission (US revision 5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lastmisnj,  lastmisn, lastmisn, lastmisnj, dec8_state, init_dec8,    ROT270, "Data East Corporation", "Last Mission (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, shackled,   0,        shackled, shackled,  dec8_state, init_dec8,    ROT0,   "Data East USA",         "Shackled (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, breywood,   shackled, shackled, breywood,  dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Breywood (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, gondo,      0,        gondo,    gondo,     dec8_state, init_dec8,    ROT270, "Data East Corporation", "Gondomania (World)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // i8751 protection MCU not dumped
-GAME( 1987, gondou,     gondo,    gondo,    gondo,     dec8_state, init_dec8,    ROT270, "Data East USA",         "Gondomania (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, makyosen,   gondo,    gondo,    gondo,     dec8_state, init_dec8,    ROT270, "Data East Corporation", "Makyou Senshi (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, garyoret,   0,        garyoret, garyoret,  dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Garyo Retsuden (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb,     0,        ghostb,   ghostb,    dec8_state, init_dec8,    ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players, revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb2a,   ghostb,   ghostb,   ghostb2a,  dec8_state, init_dec8,    ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb3,    ghostb,   ghostb,   ghostb3,   dec8_state, init_dec8,    ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 3B?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb3a,   ghostb,   ghostb,   ghostb3,   dec8_state, init_dec8,    ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // ROMs confirmed working on PCB - stalls in demo mode
-GAME( 1987, meikyuh,    ghostb,   meikyuh,  meikyuh,   dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, meikyuha,   ghostb,   meikyuh,  meikyuh,   dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, csilver,    0,        csilver,  csilver,   dec8_state, init_csilver, ROT0,   "Data East Corporation", "Captain Silver (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, csilverj,   csilver,  csilver,  csilverj,  dec8_state, init_csilver, ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, csilverja,  csilver,  csilver,  csilverj,  dec8_state, init_csilver, ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, oscar,      0,        oscar,    oscar,     dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Psycho-Nics Oscar (World revision 0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, oscaru,     oscar,    oscar,    oscarj,    dec8_state, init_dec8,    ROT0,   "Data East USA",         "Psycho-Nics Oscar (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, oscarj1,    oscar,    oscar,    oscarj,    dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, oscarj2,    oscar,    oscar,    oscarj,    dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, srdarwin,   0,        srdarwin, srdarwin,  dec8_state, init_dec8,    ROT270, "Data East Corporation", "Super Real Darwin (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, srdarwinj,  srdarwin, srdarwin, srdarwinj, dec8_state, init_dec8,    ROT270, "Data East Corporation", "Super Real Darwin (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisn,   0,        lastmisn, lastmisn,  dec8_state,    empty_init, ROT270, "Data East Corporation", "Last Mission (World revision 8)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisnu6, lastmisn, lastmisn, lastmisn,  dec8_state,    empty_init, ROT270, "Data East USA",         "Last Mission (US revision 6)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisnu5, lastmisn, lastmisn, lastmisn,  dec8_state,    empty_init, ROT270, "Data East USA",         "Last Mission (US revision 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisnj,  lastmisn, lastmisn, lastmisnj, dec8_state,    empty_init, ROT270, "Data East Corporation", "Last Mission (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, shackled,   0,        shackled, shackled,  dec8_state,    empty_init, ROT0,   "Data East USA",         "Shackled (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, breywood,   shackled, shackled, breywood,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Breywood (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, gondo,      0,        gondo,    gondo,     dec8_state,    empty_init, ROT270, "Data East Corporation", "Gondomania (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, gondou,     gondo,    gondo,    gondo,     dec8_state,    empty_init, ROT270, "Data East USA",         "Gondomania (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, makyosen,   gondo,    gondo,    gondo,     dec8_state,    empty_init, ROT270, "Data East Corporation", "Makyou Senshi (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, garyoret,   0,        garyoret, garyoret,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Garyo Retsuden (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb,     0,        ghostb,   ghostb,    dec8_state,    empty_init, ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players, revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb2a,   ghostb,   ghostb,   ghostb2a,  dec8_state,    empty_init, ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb3,    ghostb,   ghostb,   ghostb3,   dec8_state,    empty_init, ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 3B?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb3a,   ghostb,   ghostb,   ghostb3,   dec8_state,    empty_init, ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // ROMs confirmed working on PCB - stalls in demo mode
+GAME( 1987, meikyuh,    ghostb,   meikyuh,  meikyuh,   dec8_state,    empty_init, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, meikyuha,   ghostb,   meikyuh,  meikyuh,   dec8_state,    empty_init, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, csilver,    0,        csilver,  csilver,   csilver_state, empty_init, ROT0,   "Data East Corporation", "Captain Silver (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, csilverj,   csilver,  csilver,  csilverj,  csilver_state, empty_init, ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, csilverja,  csilver,  csilver,  csilverj,  csilver_state, empty_init, ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscar,      0,        oscar,    oscar,     dec8_state,    empty_init, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (World revision 0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, oscaru,     oscar,    oscar,    oscarj,    dec8_state,    empty_init, ROT0,   "Data East USA",         "Psycho-Nics Oscar (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscarj1,    oscar,    oscar,    oscarj,    dec8_state,    empty_init, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscarj2,    oscar,    oscar,    oscarj,    dec8_state,    empty_init, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, srdarwin,   0,        srdarwin, srdarwin,  dec8_state,    empty_init, ROT270, "Data East Corporation", "Super Real Darwin (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, srdarwinj,  srdarwin, srdarwin, srdarwinj, dec8_state,    empty_init, ROT270, "Data East Corporation", "Super Real Darwin (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // Unlike most Deco games of this period Cobra Command does not seem to have a Data East USA release.  Instead the Data East Corporation release
 // was used in the US as evidenced by boards with the EL romset bearing AAMA seal stickers (American Amusement Machine Association)
-GAME( 1988, cobracom,   0,        cobracom, cobracom,  dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cobracoma,  cobracom, cobracom, cobracom,  dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cobracomj,  cobracom, cobracom, cobracom,  dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Cobra-Command (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracom,   0,        cobracom, cobracom,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracoma,  cobracom, cobracom, cobracom,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracomb,  cobracom, cobracom, cobracom,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Cobra-Command (World/US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracomj,  cobracom, cobracom, cobracom,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Cobra-Command (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracomjb, cobracom, cobracom, cobracom,  dec8_state,    empty_init, ROT0,   "bootleg",               "Cobra-Command (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )

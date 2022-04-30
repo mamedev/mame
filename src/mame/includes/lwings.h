@@ -46,38 +46,38 @@ private:
 	optional_shared_ptr<uint8_t> m_soundlatch2;
 
 	/* video-related */
-	tilemap_t  *m_fg_tilemap;
-	tilemap_t  *m_bg1_tilemap;
-	tilemap_t  *m_bg2_tilemap;
-	uint8_t    m_bg2_image;
-	int      m_bg2_avenger_hw;
-	int      m_spr_avenger_hw;
-	uint8_t    m_scroll_x[2];
-	uint8_t    m_scroll_y[2];
+	tilemap_t  *m_fg_tilemap = nullptr;
+	tilemap_t  *m_bg1_tilemap = nullptr;
+	tilemap_t  *m_bg2_tilemap = nullptr;
+	uint8_t    m_bg2_image = 0U;
+	int      m_bg2_avenger_hw = 0;
+	int      m_spr_avenger_hw = 0;
+	uint8_t    m_scroll_x[2]{};
+	uint8_t    m_scroll_y[2]{};
 
 	/* misc */
-	uint8_t    m_param[4];
-	int      m_palette_pen;
-	uint8_t    m_soundstate;
-	uint8_t    m_adpcm;
-	uint8_t    m_nmi_mask;
-	int      m_sprbank;
+	uint8_t    m_param[4]{};
+	int      m_palette_pen = 0;
+	uint8_t    m_soundstate = 0U;
+	uint8_t    m_adpcm = 0U;
+	uint8_t    m_nmi_mask = 0U;
+	int      m_sprbank = 0;
 
-	DECLARE_WRITE8_MEMBER(avengers_adpcm_w);
-	DECLARE_READ8_MEMBER(avengers_adpcm_r);
-	DECLARE_WRITE8_MEMBER(lwings_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(avengers_protection_w);
-	DECLARE_WRITE8_MEMBER(avengers_prot_bank_w);
-	DECLARE_READ8_MEMBER(avengers_protection_r);
-	DECLARE_READ8_MEMBER(avengers_soundlatch2_r);
-	DECLARE_WRITE8_MEMBER(lwings_fgvideoram_w);
-	DECLARE_WRITE8_MEMBER(lwings_bg1videoram_w);
-	DECLARE_WRITE8_MEMBER(lwings_bg1_scrollx_w);
-	DECLARE_WRITE8_MEMBER(lwings_bg1_scrolly_w);
-	DECLARE_WRITE8_MEMBER(trojan_bg2_scrollx_w);
-	DECLARE_WRITE8_MEMBER(trojan_bg2_image_w);
-	DECLARE_WRITE8_MEMBER(msm5205_w);
-	DECLARE_WRITE8_MEMBER(fball_oki_bank_w);
+	void avengers_adpcm_w(uint8_t data);
+	uint8_t avengers_adpcm_r();
+	void lwings_bankswitch_w(uint8_t data);
+	void avengers_protection_w(uint8_t data);
+	void avengers_prot_bank_w(uint8_t data);
+	uint8_t avengers_protection_r();
+	uint8_t avengers_soundlatch2_r();
+	void lwings_fgvideoram_w(offs_t offset, uint8_t data);
+	void lwings_bg1videoram_w(offs_t offset, uint8_t data);
+	void lwings_bg1_scrollx_w(offs_t offset, uint8_t data);
+	void lwings_bg1_scrolly_w(offs_t offset, uint8_t data);
+	void trojan_bg2_scrollx_w(uint8_t data);
+	void trojan_bg2_image_w(uint8_t data);
+	void msm5205_w(uint8_t data);
+	void fball_oki_bank_w(uint8_t data);
 
 	TILEMAP_MAPPER_MEMBER(get_bg2_memory_offset);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

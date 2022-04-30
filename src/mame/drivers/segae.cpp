@@ -374,6 +374,7 @@ private:
 	optional_memory_bank m_bank1d;
 	optional_ioport_array<2> m_analog_ports;
 	output_finder<> m_lamp;
+	std::unique_ptr<uint8_t[]> m_banked_decrypted_opcodes;
 
 	// Analog input related
 	uint8_t m_port_select;
@@ -699,10 +700,10 @@ static INPUT_PORTS_START( segae_ridleofp_generic )
 	//PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNUSED )
 
 	PORT_START("PAD1")
-	PORT_BIT( 0xfff, 0x000, IPT_DIAL ) PORT_SENSITIVITY(60) PORT_KEYDELTA(125) PORT_RESET
+	PORT_BIT( 0xfff, 0x000, IPT_DIAL ) PORT_SENSITIVITY(60) PORT_KEYDELTA(125)
 
 	PORT_START("PAD2")
-	PORT_BIT( 0xfff, 0x000, IPT_DIAL ) PORT_SENSITIVITY(60) PORT_KEYDELTA(125) PORT_RESET PORT_COCKTAIL
+	PORT_BIT( 0xfff, 0x000, IPT_DIAL ) PORT_SENSITIVITY(60) PORT_KEYDELTA(125) PORT_COCKTAIL
 
 	PORT_START("BUTTONS")
 	PORT_BIT( 0x1, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701", upd4701_device, middle_w) // is this used in the game?
@@ -858,16 +859,16 @@ INPUT_PORTS_END
 
 uint32_t systeme_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap_rgb32 &vdp1_bitmap = m_vdp1->get_bitmap();
-	bitmap_rgb32 &vdp2_bitmap = m_vdp2->get_bitmap();
-	bitmap_ind8 &vdp2_y1 = m_vdp2->get_y1_bitmap();
+	bitmap_rgb32 const &vdp1_bitmap = m_vdp1->get_bitmap();
+	bitmap_rgb32 const &vdp2_bitmap = m_vdp2->get_bitmap();
+	bitmap_ind8 const &vdp2_y1 = m_vdp2->get_y1_bitmap();
 
 	for( int y = cliprect.min_y; y <= cliprect.max_y; y++ )
 	{
-		uint32_t *dest_ptr = &bitmap.pix32(y);
-		uint32_t *vdp1_ptr = &vdp1_bitmap.pix32(y);
-		uint32_t *vdp2_ptr = &vdp2_bitmap.pix32(y);
-		uint8_t *y1_ptr = &vdp2_y1.pix8(y);
+		uint32_t *const dest_ptr = &bitmap.pix(y);
+		uint32_t const *const vdp1_ptr = &vdp1_bitmap.pix(y);
+		uint32_t const *const vdp2_ptr = &vdp2_bitmap.pix(y);
+		uint8_t const *const y1_ptr = &vdp2_y1.pix(y);
 
 		for ( int x = cliprect.min_x; x <= cliprect.max_x; x++ )
 		{
@@ -971,11 +972,11 @@ void systeme_state::systemeb(machine_config &config)
 
 void systeme_state::init_opaopa()
 {
-	uint8_t *banked_decrypted_opcodes = auto_alloc_array(machine(), uint8_t, m_maincpu_region->bytes());
-	downcast<mc8123_device &>(*m_maincpu).decode(m_maincpu_region->base(), banked_decrypted_opcodes, m_maincpu_region->bytes());
+	m_banked_decrypted_opcodes = std::make_unique<uint8_t[]>(m_maincpu_region->bytes());
+	downcast<mc8123_device &>(*m_maincpu).decode(m_maincpu_region->base(), m_banked_decrypted_opcodes.get(), m_maincpu_region->bytes());
 
-	m_bank0d->set_base(banked_decrypted_opcodes);
-	m_bank1d->configure_entries(0, 16, banked_decrypted_opcodes + 0x10000, 0x4000);
+	m_bank0d->set_base(m_banked_decrypted_opcodes.get());
+	m_bank1d->configure_entries(0, 16, &m_banked_decrypted_opcodes[0x10000], 0x4000);
 }
 
 

@@ -2,12 +2,28 @@
 // copyright-holders:David Haywood
 /*
 
-Astro Russian Fruit Machines
-
-I *think* these are PC based ...
+Astro Russian Fruit Machines on SVGA "Pallas" hardware (PC based).
 
 Some of the games have HDD/CD/Flash images I think, but they're in a format I don't understand.
 We need to figure this out and convert them to CHDs (I think.. unless they're flash)
+
+Known games
+
+Title            Dumped  Notes
+Fairy Tales          NO  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=30
+Arabian Night        NO  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=31
+Black Beard         YES  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=32
+Dragon Slayer       YES  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=33
+Flying Age           NO  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=34
+Halloween Party      NO  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=35
+Olympian Games      YES  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=36
+The Circus           NO  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=37
+Treasure Hunting     NO  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=38
+World War II         NO  https://www.astrocorp.com.tw/eng/game_1_1.php?gid=39
+Ra's Scepter        YES
+Hawaii              YES
+
+Note: It's "Hawaii" the same game as "Treasure Hunting"?
 
 */
 
@@ -180,4 +196,4 @@ GAME( 2002, hawaii,   0,       astropc, astropc, astropc_state, init_astropc, RO
 
 GAME( 2002, oligam,   0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Olympian Games (Russia)", MACHINE_IS_SKELETON )
 
-GAME( 2002, rasce,    0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Ra Sceptor (Russia)", MACHINE_IS_SKELETON )
+GAME( 2002, rasce,    0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro", "Ra's Scepter (Russia)", MACHINE_IS_SKELETON )

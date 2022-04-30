@@ -7,12 +7,11 @@
 #include "screen.h"
 
 
-WRITE8_MEMBER(playch10_state::playch10_videoram_w)
+void playch10_state::playch10_videoram_w(offs_t offset, uint8_t data)
 {
-	uint8_t *videoram = m_videoram;
 	if (m_pc10_sdcs)
 	{
-		videoram[offset] = data;
+		m_videoram[offset] = data;
 		m_bg_tilemap->mark_tile_dirty(offset / 2);
 	}
 }
@@ -68,19 +67,10 @@ TILE_GET_INFO_MEMBER(playch10_state::get_bg_tile_info)
 	int code = videoram[offs] + ((videoram[offs + 1] & 0x07) << 8);
 	int color = (videoram[offs + 1] >> 3) & 0x1f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void playch10_state::video_start()
-{
-	const uint8_t *bios = memregion("maincpu")->base();
-	m_pc10_bios = (bios[3] == 0x2a) ? 1 : 2;
-
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(playch10_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS,
-			8, 8, 32, 32);
-}
-
-VIDEO_START_MEMBER(playch10_state,playch10_hboard)
 {
 	const uint8_t *bios = memregion("maincpu")->base();
 	m_pc10_bios = (bios[3] == 0x2a) ? 1 : 2;

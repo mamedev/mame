@@ -144,6 +144,6 @@ void tanbus_devices(device_slot_interface &device);
 void tanbus6809_devices(device_slot_interface &device);
 
 
-typedef device_type_iterator<tanbus_slot_device> tanbus_slot_device_iterator;
+typedef device_type_enumerator<tanbus_slot_device> tanbus_slot_device_enumerator;
 
 #endif // MAME_BUS_TANBUS_TANBUS_H

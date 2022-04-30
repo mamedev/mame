@@ -25,9 +25,9 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_MEMEX, bus::ti99::peb, geneve_memex_device, "ti99_memex", "Geneve memory expansion card")
+DEFINE_DEVICE_TYPE(TI99_MEMEX, bus::ti99::peb::geneve_memex_device, "ti99_memex", "Geneve memory expansion card")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 #define RAMREGION "ram2meg"
 
@@ -99,7 +99,7 @@ bool geneve_memex_device::access_enabled(offs_t offset)
     Note that the incomplete decoding of the standard Geneve must be
     considered.
 */
-READ8Z_MEMBER( geneve_memex_device::readz )
+void geneve_memex_device::readz(offs_t offset, uint8_t *value)
 {
 	/* If not Genmod, add the upper two address bits 10 */
 //  if (!m_genmod) offset |= 0x100000;
@@ -181,4 +181,4 @@ ioport_constructor geneve_memex_device::device_input_ports() const
 	return INPUT_PORTS_NAME( memex );
 }
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb

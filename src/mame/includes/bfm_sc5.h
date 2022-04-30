@@ -25,18 +25,18 @@ protected:
 
 	required_device<m68000_base_device> m_maincpu;
 
-	DECLARE_READ8_MEMBER( sc5_10202F0_r );
-	DECLARE_WRITE8_MEMBER( sc5_10202F0_w );
-	DECLARE_WRITE16_MEMBER( sc5_duart_w );
+	uint8_t sc5_10202F0_r(offs_t offset);
+	void sc5_10202F0_w(offs_t offset, uint8_t data);
+	void sc5_duart_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ8_MEMBER( sc5_mux1_r );
-	DECLARE_WRITE8_MEMBER( sc5_mux1_w );
-	DECLARE_WRITE8_MEMBER( sc5_mux2_w );
+	uint8_t sc5_mux1_r(offs_t offset);
+	void sc5_mux1_w(offs_t offset, uint8_t data);
+	void sc5_mux2_w(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(bfm_sc5_duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(bfm_sc5_duart_txa);
-	DECLARE_READ8_MEMBER(bfm_sc5_duart_input_r);
-	DECLARE_WRITE8_MEMBER(bfm_sc5_duart_output_w);
+	uint8_t bfm_sc5_duart_input_r();
+	void bfm_sc5_duart_output_w(uint8_t data);
 };
 
 INPUT_PORTS_EXTERN( bfm_sc5 );

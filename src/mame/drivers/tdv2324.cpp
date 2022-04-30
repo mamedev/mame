@@ -28,7 +28,7 @@
     *40-pin: P8085AH-2, F4265030, C INTEL '80 (cpus, there are 2 of these)
     *28-pin: JAPAN 8442, 00009SS0, HN4827128G-25 (eprom, sticker: "962107")
     *22-pin: ER3400, GI 8401HHA (EAROM)
-    *  -pin: MOSTEK C 8424, MK3887N-4 (Z80 Serial I/O Controller)
+    *  -pin: MOSTEK C 8424, MK3887N-4 (Z80-SIO/2 Serial I/O Controller)
     *20-pin: (pal, sticker: "961420 0")
     *24-pin: D2716, L3263271, INTEL '77 (eprom, sticker: "962058 1")
     *3 tiny 16-pins which look socketed (proms)
@@ -108,18 +108,18 @@
 #include "softlist.h"
 
 
-READ8_MEMBER( tdv2324_state::tdv2324_main_io_30 )
+uint8_t tdv2324_state::tdv2324_main_io_30()
 {
 	return 0xff;
 }
 
 // Not sure what this is for, i/o read at 0xE6 on maincpu, post fails if it does not return bit 4 set
-READ8_MEMBER( tdv2324_state::tdv2324_main_io_e6 )
+uint8_t tdv2324_state::tdv2324_main_io_e6()
 {
 	return 0x10; // TODO: this should actually return something meaningful, for now is enough to pass early boot test
 }
 
-WRITE8_MEMBER( tdv2324_state::tdv2324_main_io_e2 )
+void tdv2324_state::tdv2324_main_io_e2(uint8_t data)
 {
 	printf("%c\n", data);
 }
@@ -158,7 +158,7 @@ void tdv2324_state::tdv2324_io(address_map &map)
 //  map(0xe2, 0xe2).w(FUNC(tdv2324_state::tdv2324_main_io_e2)); console output
 	map(0xe6, 0xe6).r(FUNC(tdv2324_state::tdv2324_main_io_e6));
 //  map(0x, 0x).rw(P8253_5_0_TAG, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-//  map(0x, 0x).rw(MK3887N4_TAG, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
+//  map(0x, 0x).rw(MK3887N4_TAG, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 //  map(0x, 0x).rw(P8259A_TAG, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 }
 
@@ -267,9 +267,10 @@ static void tdv2324_floppies(device_slot_interface &device)
 void tdv2324_state::tdv2324(machine_config &config)
 {
 	// basic system hardware
-	I8085A(config, m_maincpu, 8700000/2); // ???
-	m_maincpu->set_addrmap(AS_PROGRAM, &tdv2324_state::tdv2324_mem);
-	m_maincpu->set_addrmap(AS_IO, &tdv2324_state::tdv2324_io);
+	i8085a_cpu_device &maincpu(I8085A(config, m_maincpu, 8700000/2)); // ???
+	maincpu.set_addrmap(AS_PROGRAM, &tdv2324_state::tdv2324_mem);
+	maincpu.set_addrmap(AS_IO, &tdv2324_state::tdv2324_io);
+	maincpu.in_inta_func().set(P8259A_TAG, FUNC(pic8259_device::acknowledge));
 
 	I8085A(config, m_subcpu, 8000000/2); // ???
 	m_subcpu->set_addrmap(AS_PROGRAM, &tdv2324_state::tdv2324_sub_mem);
@@ -291,17 +292,17 @@ void tdv2324_state::tdv2324(machine_config &config)
 	TMS9927(config, m_tms, 25.39836_MHz_XTAL / 8).set_char_width(8);
 
 	// devices
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 
-	PIT8253(config, m_pit0, 0);
+	PIT8253(config, m_pit0);
 
-	PIT8253(config, m_pit1, 0);
+	PIT8253(config, m_pit1);
 
-	Z80SIO2(config, MK3887N4_TAG, 8000000/2);
+	Z80SIO(config, MK3887N4_TAG, 8000000/2);
 
 	FD1797(config, FD1797PL02_TAG, 8000000/4);
-	FLOPPY_CONNECTOR(config, FD1797PL02_TAG":0", tdv2324_floppies, "8dsdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, FD1797PL02_TAG":1", tdv2324_floppies, "8dsdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1797PL02_TAG":0", tdv2324_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1797PL02_TAG":1", tdv2324_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");

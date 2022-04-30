@@ -68,23 +68,23 @@ private:
 	required_device<tigeroad_spr_device> m_spritegen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	tilemap_t     *m_text_tilemap;
-	tilemap_t     *m_fore_tilemap;
-	tilemap_t     *m_back_tilemap;
+	tilemap_t     *m_text_tilemap = nullptr;
+	tilemap_t     *m_fore_tilemap = nullptr;
+	tilemap_t     *m_back_tilemap = nullptr;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE16_MEMBER(text_videoram_w);
-	DECLARE_WRITE16_MEMBER(fore_videoram_w);
-	DECLARE_WRITE16_MEMBER(back_videoram_w);
-	DECLARE_WRITE16_MEMBER(supduck_scroll_w);
+	void text_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void fore_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void back_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void supduck_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_WRITE16_MEMBER(supduck_4000_w);
-	DECLARE_WRITE16_MEMBER(supduck_4002_w);
+	void supduck_4000_w(uint16_t data);
+	void supduck_4002_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	TILEMAP_MAPPER_MEMBER(supduk_tilemap_scan);
 
-	DECLARE_WRITE8_MEMBER(okibank_w);
+	void okibank_w(uint8_t data);
 
 	void main_map(address_map &map);
 	void oki_map(address_map &map);
@@ -131,6 +131,12 @@ void supduck_state::video_start()
 	m_text_tilemap->set_transparent_pen(0x3);
 	m_fore_tilemap->set_transparent_pen(0xf);
 
+	m_text_tilemap->set_scrolldx(128, 128);
+	m_text_tilemap->set_scrolldy(  6,   6);
+	m_fore_tilemap->set_scrolldx(128, 128);
+	m_fore_tilemap->set_scrolldy(  6,   6);
+	m_back_tilemap->set_scrolldx(128, 128);
+	m_back_tilemap->set_scrolldy(  6,   6);
 }
 
 uint32_t supduck_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -147,19 +153,19 @@ uint32_t supduck_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-WRITE16_MEMBER(supduck_state::text_videoram_w)
+void supduck_state::text_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_text_videoram[offset]);
 	m_text_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(supduck_state::fore_videoram_w)
+void supduck_state::fore_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fore_videoram[offset]);
 	m_fore_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(supduck_state::back_videoram_w)
+void supduck_state::back_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_back_videoram[offset]);
 	m_back_tilemap->mark_tile_dirty(offset);
@@ -175,7 +181,7 @@ TILE_GET_INFO_MEMBER(supduck_state::get_text_tile_info) // same as tigeroad.c
 	int color = attr & 0x0f;
 	int flags = (attr & 0x10) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(supduck_state::get_fore_tile_info)
@@ -191,7 +197,7 @@ TILE_GET_INFO_MEMBER(supduck_state::get_fore_tile_info)
 		flags |=(data & 0x1000) ? TILE_FLIPY : 0;
 
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.set(1, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(supduck_state::get_back_tile_info)
@@ -207,17 +213,17 @@ TILE_GET_INFO_MEMBER(supduck_state::get_back_tile_info)
 	int flags = (data & 0x2000) ? TILE_FLIPX : 0;
 		flags |=(data & 0x1000) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO_MEMBER(2, code, color, flags);
+	tileinfo.set(2, code, color, flags);
 }
 
 
 
-WRITE16_MEMBER(supduck_state::supduck_4000_w)
+void supduck_state::supduck_4000_w(uint16_t data)
 {
 }
 
 
-WRITE16_MEMBER(supduck_state::supduck_4002_w)
+void supduck_state::supduck_4002_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= mem_mask;
 
@@ -226,7 +232,7 @@ WRITE16_MEMBER(supduck_state::supduck_4002_w)
 
 }
 
-WRITE16_MEMBER(supduck_state::supduck_scroll_w)
+void supduck_state::supduck_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= mem_mask;
 
@@ -283,7 +289,7 @@ void supduck_state::oki_map(address_map &map)
 	map(0x20000, 0x3ffff).bankr("okibank");
 }
 
-WRITE8_MEMBER(supduck_state::okibank_w)
+void supduck_state::okibank_w(uint8_t data)
 {
 	// bit 0x80 is written on startup?
 
@@ -425,11 +431,8 @@ void supduck_state::supduck(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_raw(6000000, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
 	screen.set_screen_update(FUNC(supduck_state::screen_update));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 

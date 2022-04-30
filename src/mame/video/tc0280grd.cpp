@@ -84,7 +84,7 @@ void tc0280grd_device::device_reset()
 TILE_GET_INFO_MEMBER(tc0280grd_device::get_tile_info)
 {
 	int attr = m_ram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			attr & 0x3fff,
 			((attr & 0xc000) >> 14) + m_base_color,
 			0);

@@ -25,7 +25,6 @@
 
  ***********************************************************************************************************/
 
-
 #include "emu.h"
 #include "a78_slot.h"
 
@@ -114,7 +113,7 @@ void device_a78_cart_interface::nvram_alloc(uint32_t size)
 //-------------------------------------------------
 a78_cart_slot_device::a78_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, A78_CART_SLOT, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	, device_cartrom_image_interface(mconfig, *this)
 	, device_slot_interface(mconfig, *this)
 	, m_cart(nullptr)
 	, m_type(0)
@@ -315,7 +314,7 @@ static int a78_get_pcb_id(const char *slot)
 {
 	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(elem.slot_option, slot))
+		if (!strcmp(elem.slot_option, slot))
 			return elem.pcb_id;
 	}
 
@@ -492,6 +491,7 @@ image_verify_result a78_cart_slot_device::verify_header(char *header)
 	if (strncmp(magic, header + 1, 9))
 	{
 		logerror("Not a valid A7800 image\n");
+		seterror(image_error::INVALIDIMAGE, "File is not a valid A7800 image");
 		return image_verify_result::FAIL;
 	}
 
@@ -508,16 +508,18 @@ std::string a78_cart_slot_device::get_default_card_software(get_default_card_sof
 {
 	if (hook.image_file())
 	{
-		const char *slot_string;
-		std::vector<uint8_t> head(128);
-		int type = A78_TYPE0, mapper;
+		uint64_t len;
+		hook.image_file()->length(len); // FIXME: check error return
 
 		// Load and check the header
-		hook.image_file()->read(&head[0], 128);
+		uint8_t head[128];
+		std::size_t actual;
+		hook.image_file()->read(&head[0], 128, actual); // FIXME: check error return or read returning short
 
 		// let's try to auto-fix some common errors in the header
-		mapper = validate_header((head[53] << 8) | head[54], false);
+		int const mapper = validate_header((head[53] << 8) | head[54], false);
 
+		int type = A78_TYPE0;
 		switch (mapper & 0x2e)
 		{
 			case 0x0000:
@@ -534,7 +536,7 @@ std::string a78_cart_slot_device::get_default_card_software(get_default_card_sof
 				break;
 			case 0x0022:
 			case 0x0026:
-				if (hook.image_file()->size() > 0x40000)
+				if (len > 0x40000)
 					type = A78_MEGACART;
 				else
 					type = A78_VERSABOARD;
@@ -560,7 +562,7 @@ std::string a78_cart_slot_device::get_default_card_software(get_default_card_sof
 			type = A78_TYPE8;
 
 		logerror("Cart type: %x\n", type);
-		slot_string = a78_get_slot(type);
+		char const *const slot_string = a78_get_slot(type);
 
 		return std::string(slot_string);
 	}
@@ -573,34 +575,34 @@ std::string a78_cart_slot_device::get_default_card_software(get_default_card_sof
  read
  -------------------------------------------------*/
 
-READ8_MEMBER(a78_cart_slot_device::read_04xx)
+uint8_t a78_cart_slot_device::read_04xx(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_04xx(space, offset, mem_mask);
+		return m_cart->read_04xx(offset);
 	else
 		return 0xff;
 }
 
-READ8_MEMBER(a78_cart_slot_device::read_10xx)
+uint8_t a78_cart_slot_device::read_10xx(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_10xx(space, offset, mem_mask);
+		return m_cart->read_10xx(offset);
 	else
 		return 0xff;
 }
 
-READ8_MEMBER(a78_cart_slot_device::read_30xx)
+uint8_t a78_cart_slot_device::read_30xx(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_30xx(space, offset, mem_mask);
+		return m_cart->read_30xx(offset);
 	else
 		return 0xff;
 }
 
-READ8_MEMBER(a78_cart_slot_device::read_40xx)
+uint8_t a78_cart_slot_device::read_40xx(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_40xx(space, offset, mem_mask);
+		return m_cart->read_40xx(offset);
 	else
 		return 0xff;
 }
@@ -610,28 +612,28 @@ READ8_MEMBER(a78_cart_slot_device::read_40xx)
  write
  -------------------------------------------------*/
 
-WRITE8_MEMBER(a78_cart_slot_device::write_04xx)
+void a78_cart_slot_device::write_04xx(offs_t offset, uint8_t data)
 {
 	if (m_cart)
-		m_cart->write_04xx(space, offset, data, mem_mask);
+		m_cart->write_04xx(offset, data);
 }
 
-WRITE8_MEMBER(a78_cart_slot_device::write_10xx)
+void a78_cart_slot_device::write_10xx(offs_t offset, uint8_t data)
 {
 	if (m_cart)
-		m_cart->write_10xx(space, offset, data, mem_mask);
+		m_cart->write_10xx(offset, data);
 }
 
-WRITE8_MEMBER(a78_cart_slot_device::write_30xx)
+void a78_cart_slot_device::write_30xx(offs_t offset, uint8_t data)
 {
 	if (m_cart)
-		m_cart->write_30xx(space, offset, data, mem_mask);
+		m_cart->write_30xx(offset, data);
 }
 
-WRITE8_MEMBER(a78_cart_slot_device::write_40xx)
+void a78_cart_slot_device::write_40xx(offs_t offset, uint8_t data)
 {
 	if (m_cart)
-		m_cart->write_40xx(space, offset, data, mem_mask);
+		m_cart->write_40xx(offset, data);
 }
 
 

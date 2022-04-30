@@ -444,12 +444,12 @@ uint8_t corvus_hdc_device::corvus_write_sector(uint8_t drv, uint32_t sector, uin
 	// wonderful functionality.
 	//
 	if(len == 512) {
-		hard_disk_write(disk, sector, buffer);
+		disk->write(sector, buffer);
 	} else {
-		hard_disk_read(disk, sector, tbuffer);      // Read the existing data into our temporary buffer
+		disk->read(sector, tbuffer);      // Read the existing data into our temporary buffer
 		memcpy(tbuffer, buffer, len);                   // Overlay the data with the buffer passed
 		m_delay += INTERSECTOR_DELAY;                  // Add another delay because of the Read / Write
-		hard_disk_write(disk, sector, tbuffer);     // Re-write the data
+		disk->write(sector, tbuffer);     // Re-write the data
 	}
 
 	m_last_cylinder = cylinder;
@@ -545,7 +545,7 @@ uint8_t corvus_hdc_device::corvus_read_sector(uint8_t drv, uint32_t sector, uint
 	cylinder = (double) sector / (double) m_sectors_per_track / (double) m_tracks_per_cylinder;
 	m_delay = abs(m_last_cylinder - cylinder) * TRACK_SEEK_TIME + INTERSECTOR_DELAY;
 
-	hard_disk_read(disk, sector, tbuffer);
+	disk->read(sector, tbuffer);
 
 	memcpy(buffer, tbuffer, len);
 
@@ -1119,12 +1119,12 @@ hard_disk_file *corvus_hdc_device::corvus_hdc_file(int drv) {
 
 	// Pick up the Head/Cylinder/Sector info
 	hard_disk_file *file = img->get_hard_disk_file();
-	hard_disk_info *info = hard_disk_get_info(file);
-	m_sectors_per_track = info->sectors;
-	m_tracks_per_cylinder = info->heads;
-	m_cylinders_per_drive = info->cylinders;
+	const auto &info = file->get_info();
+	m_sectors_per_track = info.sectors;
+	m_tracks_per_cylinder = info.heads;
+	m_cylinders_per_drive = info.cylinders;
 
-	LOG(("corvus_hdc_file: Attached to drive %u image: H:%d, C:%d, S:%d\n", drv, info->heads, info->cylinders, info->sectors));
+	LOG(("corvus_hdc_file: Attached to drive %u image: H:%d, C:%d, S:%d\n", drv, info.heads, info.cylinders, info.sectors));
 
 	return file;
 }
@@ -1317,7 +1317,7 @@ void corvus_hdc_device::corvus_process_command_packet(bool invalid_command_flag)
 // Returns:
 //      Nothing
 //
-void corvus_hdc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void corvus_hdc_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	int function = param;
 
@@ -1502,7 +1502,7 @@ void corvus_hdc_device::device_start() {
 // Returns:
 //      Value in the controller status register
 //
-READ8_MEMBER ( corvus_hdc_device::status_r ) {
+uint8_t corvus_hdc_device::status_r() {
 	return m_status;
 }
 
@@ -1521,7 +1521,7 @@ READ8_MEMBER ( corvus_hdc_device::status_r ) {
 // Returns:
 //      Value in the controller data register
 //
-READ8_MEMBER ( corvus_hdc_device::read ) {
+uint8_t corvus_hdc_device::read() {
 	uint8_t result;
 
 	if((m_status & CONTROLLER_DIRECTION) == 0) {   // Check to see if we're in Controller-to-Host mode
@@ -1569,7 +1569,7 @@ READ8_MEMBER ( corvus_hdc_device::read ) {
 // Returns:
 //      Nothing
 //
-WRITE8_MEMBER ( corvus_hdc_device::write ) {
+void corvus_hdc_device::write(uint8_t data) {
 	//
 	// Received a byte -- check to see if we should really respond
 	//

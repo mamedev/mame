@@ -35,11 +35,11 @@ private:
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_spriteram;
 
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 
-	DECLARE_WRITE16_MEMBER(irq2_ack_w);
-	DECLARE_WRITE16_MEMBER(irq6_ack_w);
-	DECLARE_WRITE16_MEMBER(videoram_w);
+	void irq2_ack_w(uint16_t data);
+	void irq6_ack_w(uint16_t data);
+	void videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 

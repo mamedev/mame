@@ -6,7 +6,6 @@
 #include "imagedev/cassette.h"
 #include "machine/i8255.h"
 #include "machine/ins8250.h"
-#include "machine/pc_fdc.h"
 #include "machine/pc_lpt.h"
 #include "machine/pckeybrd.h"
 #include "machine/pic8259.h"
@@ -26,7 +25,7 @@
 #include "bus/rs232/terminal.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -67,15 +66,15 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(out2_changed);
 	DECLARE_WRITE_LINE_MEMBER(keyb_interrupt);
 
-	DECLARE_WRITE8_MEMBER(pc_nmi_enable_w);
-	DECLARE_READ8_MEMBER(pcjr_nmi_enable_r);
+	void pc_nmi_enable_w(uint8_t data);
+	uint8_t pcjr_nmi_enable_r();
 	DECLARE_WRITE_LINE_MEMBER(pic8259_set_int_line);
 
-	DECLARE_WRITE8_MEMBER(pcjr_ppi_portb_w);
-	DECLARE_READ8_MEMBER(pcjr_ppi_portc_r);
-	DECLARE_WRITE8_MEMBER(pcjr_fdc_dor_w);
-	DECLARE_READ8_MEMBER(pcjx_port_1ff_r);
-	DECLARE_WRITE8_MEMBER(pcjx_port_1ff_w);
+	void pcjr_ppi_portb_w(uint8_t data);
+	uint8_t pcjr_ppi_portc_r();
+	void pcjr_fdc_dor_w(uint8_t data);
+	uint8_t pcjx_port_1ff_r();
+	void pcjx_port_1ff_w(uint8_t data);
 	void pcjx_set_bank(int unk1, int unk2, int unk3);
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
@@ -83,27 +82,27 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart2_load) { return load_cart(image, m_cart2); }
 	void pc_speaker_set_spkrdata(uint8_t data);
 
-	uint8_t m_pc_spkrdata;
-	uint8_t m_pit_out2;
-	uint8_t m_pcjr_dor;
-	uint8_t m_pcjx_1ff_count;
-	uint8_t m_pcjx_1ff_val;
-	uint8_t m_pcjx_1ff_bankval;
-	uint8_t m_pcjx_1ff_bank[20][2];
-	int m_ppi_portc_switch_high;
-	uint8_t m_ppi_portb;
+	uint8_t m_pc_spkrdata = 0;
+	uint8_t m_pit_out2 = 0;
+	uint8_t m_pcjr_dor = 0;
+	uint8_t m_pcjx_1ff_count = 0;
+	uint8_t m_pcjx_1ff_val = 0;
+	uint8_t m_pcjx_1ff_bankval = 0;
+	uint8_t m_pcjx_1ff_bank[20][2]{};
+	int m_ppi_portc_switch_high = 0;
+	uint8_t m_ppi_portb = 0;
 
-	uint8_t m_pc_keyb_data;
-	uint8_t m_transferring;
-	uint8_t m_latch;
-	uint32_t m_raw_keyb_data;
-	int m_signal_count;
-	uint8_t m_nmi_enabled;
+	uint8_t m_pc_keyb_data = 0;
+	uint8_t m_transferring = 0;
+	uint8_t m_latch = 0;
+	uint32_t m_raw_keyb_data = 0;
+	int m_signal_count = 0;
+	uint8_t m_nmi_enabled = 0;
 
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	emu_timer *m_pc_int_delay_timer;
-	emu_timer *m_pcjr_watchdog;
-	emu_timer *m_keyb_signal_timer;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	emu_timer *m_pc_int_delay_timer = nullptr;
+	emu_timer *m_pcjr_watchdog = nullptr;
+	emu_timer *m_keyb_signal_timer = nullptr;
 
 	enum
 	{
@@ -120,8 +119,6 @@ private:
 };
 
 static INPUT_PORTS_START( ibmpcjr )
-	PORT_INCLUDE(pc_keyboard)
-
 	PORT_START("IN0") /* IN0 */
 	PORT_BIT ( 0xf0, 0xf0,   IPT_UNUSED )
 	PORT_BIT ( 0x08, 0x08,   IPT_CUSTOM ) PORT_VBLANK("pcvideo_pcjr:screen")
@@ -156,7 +153,7 @@ void pcjr_state::machine_reset()
 	m_nmi_enabled = 0x80;
 }
 
-void pcjr_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pcjr_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{
@@ -227,6 +224,7 @@ WRITE_LINE_MEMBER(pcjr_state::out2_changed)
 {
 	m_pit_out2 = state ? 1 : 0;
 	m_speaker->level_w(m_pc_spkrdata & m_pit_out2);
+	m_cassette->output(state ? 1.0 : -1.0);
 }
 
 /*************************************************************
@@ -271,7 +269,7 @@ WRITE_LINE_MEMBER(pcjr_state::keyb_interrupt)
 {
 	int data;
 
-	if(state && (data = m_keyboard->read(machine().dummy_space(), 0)))
+	if(state && (data = m_keyboard->read()))
 	{
 		uint8_t   parity = 0;
 		int     i;
@@ -311,20 +309,20 @@ WRITE_LINE_MEMBER(pcjr_state::keyb_interrupt)
 	}
 }
 
-READ8_MEMBER(pcjr_state::pcjr_nmi_enable_r)
+uint8_t pcjr_state::pcjr_nmi_enable_r()
 {
 	m_latch = 0;
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return m_nmi_enabled;
 }
 
-WRITE8_MEMBER(pcjr_state::pc_nmi_enable_w)
+void pcjr_state::pc_nmi_enable_w(uint8_t data)
 {
 	m_nmi_enabled = data & 0x80;
 	m_maincpu->set_input_line(INPUT_LINE_NMI, m_nmi_enabled && m_latch);
 }
 
-WRITE8_MEMBER(pcjr_state::pcjr_ppi_portb_w)
+void pcjr_state::pcjr_ppi_portb_w(uint8_t data)
 {
 	/* KB controller port B */
 	m_ppi_portb = data;
@@ -346,7 +344,7 @@ WRITE8_MEMBER(pcjr_state::pcjr_ppi_portb_w)
  * PC6 - KYBD IN
  * PC7 - (keyboard) CABLE CONNECTED
  */
-READ8_MEMBER(pcjr_state::pcjr_ppi_portc_r)
+uint8_t pcjr_state::pcjr_ppi_portc_r()
 {
 	int data=0xff;
 
@@ -381,7 +379,7 @@ READ8_MEMBER(pcjr_state::pcjr_ppi_portc_r)
 	return data;
 }
 
-WRITE8_MEMBER(pcjr_state::pcjr_fdc_dor_w)
+void pcjr_state::pcjr_fdc_dor_w(uint8_t data)
 {
 	logerror("fdc: dor = %02x\n", data);
 	uint8_t pdor = m_pcjr_dor;
@@ -404,8 +402,7 @@ WRITE8_MEMBER(pcjr_state::pcjr_fdc_dor_w)
 	else
 		m_fdc->set_floppy(nullptr);
 
-	if((pdor^m_pcjr_dor) & 0x80)
-		m_fdc->soft_reset();
+	m_fdc->reset_w(!BIT(m_pcjr_dor, 7));
 
 	if(m_pcjr_dor & 0x20) {
 		if((pdor & 0x40) && !(m_pcjr_dor & 0x40))
@@ -423,7 +420,7 @@ void pcjr_state::pcjx_set_bank(int unk1, int unk2, int unk3)
 	logerror("pcjx: 0x1ff 0:%02x 1:%02x 2:%02x\n", unk1, unk2, unk3);
 }
 
-WRITE8_MEMBER(pcjr_state::pcjx_port_1ff_w)
+void pcjr_state::pcjx_port_1ff_w(uint8_t data)
 {
 	switch(m_pcjx_1ff_count) {
 	case 0:
@@ -442,7 +439,7 @@ WRITE8_MEMBER(pcjr_state::pcjx_port_1ff_w)
 	}
 }
 
-READ8_MEMBER(pcjr_state::pcjx_port_1ff_r)
+uint8_t pcjr_state::pcjx_port_1ff_r()
 {
 	if(m_pcjx_1ff_count == 2)
 		pcjx_set_bank(m_pcjx_1ff_bankval, m_pcjx_1ff_bank[m_pcjx_1ff_bankval & 0x1f][0], m_pcjx_1ff_bank[m_pcjx_1ff_bankval & 0x1f][1]);
@@ -470,7 +467,7 @@ image_init_result pcjr_state::load_cart(device_image_interface &image, generic_s
 				header_size = 0x200;
 				break;
 			default:
-				image.seterror(IMAGE_ERROR_UNSUPPORTED, "Invalid header size" );
+				image.seterror(image_error::INVALIDIMAGE, "Invalid header size");
 				return image_init_result::FAIL;
 		}
 		if (size - header_size == 0xa000)
@@ -583,8 +580,8 @@ void pcjr_state::ibmpcjr_io(address_map &map)
 void pcjr_state::ibmpcjx_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x80000, 0xb7fff).rom().region("kanji", 0);
 	map(0x80000, 0x9ffff).ram().share("vram"); // TODO: remove this part of vram hack
+	map(0x80000, 0xb7fff).rom().region("kanji", 0);
 	map(0xb8000, 0xbffff).m("pcvideo_pcjr:vram", FUNC(address_map_bank_device::amap8));
 	map(0xd0000, 0xdffff).r(m_cart1, FUNC(generic_slot_device::read_rom));
 	map(0xe0000, 0xfffff).rom().region("bios", 0);
@@ -600,7 +597,7 @@ void pcjr_state::ibmpcjx_io(address_map &map)
 void pcjr_state::ibmpcjr(machine_config &config)
 {
 	/* basic machine hardware */
-	I8088(config, m_maincpu, 4900000);
+	I8088(config, m_maincpu, XTAL(14'318'181)/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pcjr_state::ibmpcjr_map);
 	m_maincpu->set_addrmap(AS_IO, &pcjr_state::ibmpcjr_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
@@ -657,6 +654,7 @@ void pcjr_state::ibmpcjr(machine_config &config)
 	/* cassette */
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	UPD765A(config, m_fdc, 8'000'000, false, false);
 

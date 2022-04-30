@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Couriersud
 #ifndef NLID_SYSTEM_H_
 #define NLID_SYSTEM_H_
@@ -7,72 +7,16 @@
 /// \file nlid_system.h
 ///
 
-#include "netlist/analog/nlid_twoterm.h"
-#include "netlist/nl_base.h"
-#include "netlist/nl_setup.h"
-#include "netlist/plib/putil.h"
+#include "analog/nlid_twoterm.h"
+#include "nl_base.h"
+#include "nl_factory.h"
+#include "plib/prandom.h"
+#include "plib/pstonum.h"
+#include "plib/putil.h"
 
-namespace netlist
-{
-namespace devices
-{
-	// -----------------------------------------------------------------------------
-	// netlistparams
-	// -----------------------------------------------------------------------------
+#include <random>
 
-	NETLIB_OBJECT(netlistparams)
-	{
-		NETLIB_CONSTRUCTOR(netlistparams)
-		, m_use_deactivate(*this, "USE_DEACTIVATE", false)
-		, m_startup_strategy(*this, "STARTUP_STRATEGY", 1)
-		, m_mos_capmodel(*this, "DEFAULT_MOS_CAPMODEL", 2)
-		, m_max_link_loops(*this, "MAX_LINK_RESOLVE_LOOPS", 100)
-		{
-		}
-		NETLIB_UPDATEI() { }
-		//NETLIB_RESETI() { }
-		//NETLIB_UPDATE_PARAMI() { }
-	public:
-		param_logic_t m_use_deactivate;
-		param_num_t<unsigned>   m_startup_strategy;
-		param_num_t<unsigned>   m_mos_capmodel;
-		//! How many times do we try to resolve links (connections)
-		param_num_t<unsigned>   m_max_link_loops;
-	};
-
-	// -----------------------------------------------------------------------------
-	// power pins - not a device, but a helper
-	// -----------------------------------------------------------------------------
-
-	/// \brief Power pins class.
-	///
-	/// Power Pins are passive inputs. Delegate noop will silently ignore any
-	/// updates.
-
-	class nld_power_pins
-	{
-	public:
-		explicit nld_power_pins(device_t &owner, const pstring &sVCC = sPowerVCC,
-			const pstring &sGND = sPowerGND)
-		: m_VCC(owner, sVCC, NETLIB_DELEGATE(power_pins, noop))
-		, m_GND(owner, sGND, NETLIB_DELEGATE(power_pins, noop))
-		{
-		}
-
-		const analog_input_t &VCC() const noexcept
-		{
-			return m_VCC;
-		}
-		const analog_input_t &GND() const noexcept
-		{
-			return m_GND;
-		}
-
-	private:
-		void noop() { }
-		analog_input_t m_VCC;
-		analog_input_t m_GND;
-	};
+namespace netlist::devices {
 
 	// -----------------------------------------------------------------------------
 	// clock
@@ -81,26 +25,24 @@ namespace devices
 	NETLIB_OBJECT(clock)
 	{
 		NETLIB_CONSTRUCTOR(clock)
-		, m_feedback(*this, "FB")
+		, m_feedback(*this, "FB", NETLIB_DELEGATE(fb))
 		, m_Q(*this, "Q")
 		, m_freq(*this, "FREQ", nlconst::magic(7159000.0 * 5.0))
-		, m_FAMILY(*this, "FAMILY", "FAMILY(TYPE=TTL)")
 		, m_supply(*this)
 		{
 			m_inc = netlist_time::from_fp(plib::reciprocal(m_freq()*nlconst::two()));
 
-			connect(m_feedback, m_Q);
+			connect("FB", "Q");
 		}
-		//NETLIB_RESETI();
 
 		NETLIB_UPDATE_PARAMI()
 		{
 			m_inc = netlist_time::from_fp(plib::reciprocal(m_freq()*nlconst::two()));
 		}
 
-		NETLIB_UPDATEI()
+		NETLIB_HANDLERI(fb)
 		{
-			m_Q.push(!m_feedback(), m_inc);
+			m_Q.push(m_feedback() ^ 1, m_inc);
 		}
 
 	private:
@@ -110,7 +52,6 @@ namespace devices
 		param_fp_t m_freq;
 		netlist_time m_inc;
 
-		param_model_t m_FAMILY;
 		NETLIB_NAME(power_pins) m_supply;
 };
 
@@ -121,99 +62,55 @@ namespace devices
 	NETLIB_OBJECT(varclock)
 	{
 		NETLIB_CONSTRUCTOR(varclock)
-		, m_feedback(*this, "FB")
+		, m_N(*this, "N", 1)
+		, m_func(*this,"FUNC", "T")
+		, m_feedback(*this, "FB", NETLIB_DELEGATE(fb))
 		, m_Q(*this, "Q")
-		, m_func(*this,"FUNC", "")
-		, m_compiled(this->name() + ".FUNCC", this, this->state().run_state_manager())
-		, m_funcparam({nlconst::zero()})
+		, m_compiled(*this, "m_compiled")
+		, m_supply(*this)
 		{
-			if (m_func() != "")
-				m_compiled.compile(m_func(), std::vector<pstring>({{pstring("T")}}));
-			connect(m_feedback, m_Q);
+			if (!m_func().empty())
+			{
+				std::vector<pstring> inps;
+				inps.emplace_back("T");
+				m_vals.push_back(nlconst::zero());
+				for (int i=0; i < m_N(); i++)
+				{
+					pstring inpname = plib::pfmt("A{1}")(i);
+					m_I.push_back(owner.template make_pool_object<analog_input_t>(*this, inpname, NETLIB_DELEGATE(fb)));
+					inps.push_back(inpname);
+					m_vals.push_back(nlconst::zero());
+				}
+				m_compiled->compile(m_func(), inps);
+			}
+			connect("FB", "Q");
 		}
 		//NETLIB_RESETI();
 		//NETLIB_UPDATE_PARAMI()
 
-		NETLIB_UPDATEI()
+	private:
+		NETLIB_HANDLERI(fb)
 		{
-			m_funcparam[0] = exec().time().as_fp<nl_fptype>();
-			const netlist_time m_inc = netlist_time::from_fp(m_compiled.evaluate(m_funcparam));
-			m_Q.push(!m_feedback(), m_inc);
+			m_vals[0] = exec().time().as_fp<nl_fptype>();
+			for (std::size_t i = 0; i < static_cast<unsigned>(m_N()); i++)
+			{
+				m_vals[i+1] = (*m_I[i])();
+			}
+			const netlist_time m_inc = netlist_time::from_fp(m_compiled->evaluate(m_vals));
+			m_Q.push(m_feedback() ^ 1, m_inc);
 		}
 
-	private:
-		logic_input_t m_feedback;
-		logic_output_t m_Q;
-
+		using pf_type = plib::pfunction<nl_fptype>;
+		param_int_t m_N;
 		param_str_t m_func;
-		plib::pfunction<nl_fptype> m_compiled;
-		std::vector<nl_fptype> m_funcparam;
-	};
-
-	// -----------------------------------------------------------------------------
-	// extclock
-	// -----------------------------------------------------------------------------
-
-	NETLIB_OBJECT(extclock)
-	{
-		NETLIB_CONSTRUCTOR(extclock)
-		, m_freq(*this, "FREQ", nlconst::magic(7159000.0 * 5.0))
-		, m_pattern(*this, "PATTERN", "1,1")
-		, m_offset(*this, "OFFSET", nlconst::zero())
-		, m_feedback(*this, "FB")
-		, m_Q(*this, "Q")
-		, m_cnt(*this, "m_cnt", 0)
-		, m_off(*this, "m_off", netlist_time::zero())
-		{
-			m_inc[0] = netlist_time::from_fp(plib::reciprocal(m_freq()*nlconst::two()));
-
-			connect(m_feedback, m_Q);
-
-			netlist_time base = netlist_time::from_fp(plib::reciprocal(m_freq()*nlconst::two()));
-			std::vector<pstring> pat(plib::psplit(m_pattern(),","));
-			m_off = netlist_time::from_fp(m_offset());
-
-			std::array<std::int64_t, 32> pati = { 0 };
-
-			m_size = static_cast<std::uint8_t>(pat.size());
-			netlist_time::mult_type total = 0;
-			for (unsigned i=0; i<m_size; i++)
-			{
-				// FIXME: use pstonum_ne
-				//pati[i] = plib::pstonum<decltype(pati[i])>(pat[i]);
-				pati[i] = plib::pstonum<std::int64_t>(pat[i]);
-				total += pati[i];
-			}
-			netlist_time ttotal = netlist_time::zero();
-			auto sm1 = static_cast<uint8_t>(m_size - 1);
-			for (unsigned i=0; i < sm1; i++)
-			{
-				m_inc[i] = base * pati[i];
-				ttotal += m_inc[i];
-			}
-			m_inc[sm1] = base * total - ttotal;
-
-		}
-
-		NETLIB_UPDATEI();
-		NETLIB_RESETI();
-		//NETLIB_UPDATE_PARAMI();
-
-		NETLIB_HANDLERI(clk2);
-		NETLIB_HANDLERI(clk2_pow2);
-
-	private:
-
-		param_fp_t m_freq;
-		param_str_t m_pattern;
-		param_fp_t m_offset;
-
 		logic_input_t m_feedback;
 		logic_output_t m_Q;
-		state_var_u8 m_cnt;
-		std::uint8_t m_size;
-		state_var<netlist_time> m_off;
-		std::array<netlist_time, 32> m_inc;
+		std::vector<device_arena::unique_ptr<analog_input_t>> m_I;
+
+		pf_type::values_container m_vals;
+		state_var<pf_type> m_compiled;
+
+		NETLIB_NAME(power_pins) m_supply;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -225,15 +122,10 @@ namespace devices
 		NETLIB_CONSTRUCTOR(logic_input)
 		, m_Q(*this, "Q")
 		, m_IN(*this, "IN", false)
-		// make sure we get the family first
-		, m_FAMILY(*this, "FAMILY", "FAMILY(TYPE=TTL)")
 		, m_supply(*this)
 		{
-			set_logic_family(state().setup().family_from_model(m_FAMILY()));
-			m_Q.set_logic_family(this->logic_family());
 		}
 
-		NETLIB_UPDATEI() { }
 		NETLIB_RESETI() { m_Q.initial(0); }
 		NETLIB_UPDATE_PARAMI()
 		{
@@ -245,7 +137,31 @@ namespace devices
 		logic_output_t m_Q;
 
 		param_logic_t m_IN;
-		param_model_t m_FAMILY;
+		NETLIB_NAME(power_pins) m_supply;
+	};
+
+	template<std::size_t N>
+	NETLIB_OBJECT(logic_inputN)
+	{
+		NETLIB_CONSTRUCTOR(logic_inputN)
+		, m_Q(*this, "Q{}")
+		, m_IN(*this, "IN", 0)
+		, m_supply(*this)
+		{
+		}
+
+		NETLIB_RESETI() { for (auto &q : m_Q) q.initial(0); }
+		NETLIB_UPDATE_PARAMI()
+		{
+			//printf("%s %d\n", name().c_str(), m_IN());
+			for (std::size_t i=0; i<N; i++)
+				m_Q[i].push((m_IN()>>i) & 1, netlist_time::from_nsec(1));
+		}
+
+	private:
+		object_array_t<logic_output_t, N> m_Q;
+
+		param_int_t m_IN;
 		NETLIB_NAME(power_pins) m_supply;
 	};
 
@@ -257,7 +173,6 @@ namespace devices
 		{
 		}
 
-		NETLIB_UPDATEI() {  }
 		NETLIB_RESETI() { m_Q.initial(nlconst::zero()); }
 		NETLIB_UPDATE_PARAMI() { m_Q.push(m_IN()); }
 
@@ -266,85 +181,90 @@ namespace devices
 		param_fp_t m_IN;
 	};
 
-	// -----------------------------------------------------------------------------
-	// nld_gnd
-	// -----------------------------------------------------------------------------
-
-	NETLIB_OBJECT(gnd)
-	{
-		NETLIB_CONSTRUCTOR(gnd)
-		, m_Q(*this, "Q")
-		{
-		}
-		NETLIB_UPDATEI()
-		{
-			m_Q.push(nlconst::zero());
-		}
-		NETLIB_RESETI() { }
-	protected:
-		analog_output_t m_Q;
-	};
-
-	// -----------------------------------------------------------------------------
-	// nld_nc_pin
-	// -----------------------------------------------------------------------------
-
-	NETLIB_OBJECT(nc_pin)
-	{
-	public:
-		NETLIB_CONSTRUCTOR(nc_pin)
-		, m_I(*this, "I")
-		{
-		}
-
-	protected:
-		NETLIB_RESETI() { }
-		NETLIB_UPDATEI() { }
-
-	private:
-		analog_input_t m_I;
-
-	};
 
 	// -----------------------------------------------------------------------------
 	// nld_frontier
 	// -----------------------------------------------------------------------------
 
+
+	/// \brief Frontiers divides a netlist into sub netlist
+	///
+	/// Example:
+	///
+	/// Consider the following mixing stage
+	///
+	///                 R1
+	///      I1 >-----1RRRR2---------+
+	///                              |
+	///                 R2           |
+	///      I2 >-----1RRRR2---------+----------> Out
+	///                              |
+	///                              R
+	///                           R3 R
+	///                              R
+	///                              |
+	///                             GND
+	///
+	/// With OPTIMIZE_FRONTIER(R2.1, R2, RX) where RX is the impedance of the
+	/// output connected to I2 this becomes:
+	///
+	///                 R1
+	///      I1 >-----1RRRR2--------------------------------+
+	///                                                     |
+	///               ##########################            |
+	///               #                  RX    #     R2     |
+	///      I2 >----->--+-AnIn AnOut>--RRRR--->---1RRRR2---+----------> Out
+	///               #  |                     #            |
+	///               #  R                     #            R
+	///               #  R R2                  #         R3 R
+	///               #  R                     #            R
+	///               #  |                     #            |
+	///               # GND          Frontier  #           GND
+	///               #                        #
+	///               ##########################
+	///
+	/// As a result, provided there are no other connections between the parts
+	/// generating S1 and S2 the "S2 part" will now have a separate solver.
+	///
+	/// The size (aka number of nets) of the solver for I1 will be smaller.
+	/// The size of the solver for I2 and the rest of the circuit will be smaller
+	/// as well.
+	///
+
 	NETLIB_OBJECT(frontier)
 	{
-	public:
 		NETLIB_CONSTRUCTOR(frontier)
-		, m_RIN(*this, "m_RIN", true)
-		, m_ROUT(*this, "m_ROUT", true)
-		, m_I(*this, "_I")
+		, m_RIN(*this, "m_RIN", NETLIB_DELEGATE(input)) // FIXME: does not look right
+		, m_ROUT(*this, "m_ROUT", NETLIB_DELEGATE(input)) // FIXME: does not look right
+		, m_I(*this, "_I", NETLIB_DELEGATE(input))
 		, m_Q(*this, "_Q")
 		, m_p_RIN(*this, "RIN", nlconst::magic(1.0e6))
 		, m_p_ROUT(*this, "ROUT", nlconst::magic(50.0))
 
 		{
-			register_subalias("I", m_RIN.m_P);
-			register_subalias("G", m_RIN.m_N);
-			connect(m_I, m_RIN.m_P);
+			register_subalias("I", "m_RIN.1");
+			register_subalias("G", "m_RIN.2");
+			connect("_I", "m_RIN.1");
 
-			register_subalias("_OP", m_ROUT.m_P);
-			register_subalias("Q", m_ROUT.m_N);
-			connect(m_Q, m_ROUT.m_P);
+			register_subalias("_OP", "m_ROUT.1");
+			register_subalias("Q", "m_ROUT.2");
+			connect("_Q", "m_ROUT.1");
 		}
 
+	private:
 		NETLIB_RESETI()
 		{
+			//printf("%s: in %f out %f\n", name().c_str(), m_p_RIN(), m_p_ROUT());
 			m_RIN.set_G_V_I(plib::reciprocal(m_p_RIN()),0,0);
 			m_ROUT.set_G_V_I(plib::reciprocal(m_p_ROUT()),0,0);
 		}
 
-		NETLIB_UPDATEI()
+		NETLIB_HANDLERI(input)
 		{
 			m_Q.push(m_I());
 		}
 
-	private:
 		analog::NETLIB_NAME(twoterm) m_RIN;
-		// Fixme: only works if the device is time-stepped - need to rework
 		analog::NETLIB_NAME(twoterm) m_ROUT;
 		analog_input_t m_I;
 		analog_output_t m_Q;
@@ -355,8 +275,6 @@ namespace devices
 
 	// -----------------------------------------------------------------------------
 	// nld_function
-	//
-	// FIXME: Currently a proof of concept to get congo bongo working
 	// ----------------------------------------------------------------------------- */
 
 	NETLIB_OBJECT(function)
@@ -364,18 +282,20 @@ namespace devices
 		NETLIB_CONSTRUCTOR(function)
 		, m_N(*this, "N", 1)
 		, m_func(*this, "FUNC", "A0")
+		, m_thresh(*this, "THRESH", nlconst::zero())
 		, m_Q(*this, "Q")
-		, m_compiled(this->name() + ".FUNCC", this, this->state().run_state_manager())
+		, m_compiled(*this, "m_compiled")
+		, m_last(*this, "m_last")
 		{
 			std::vector<pstring> inps;
 			for (int i=0; i < m_N(); i++)
 			{
-				pstring n = plib::pfmt("A{1}")(i);
-				m_I.push_back(state().make_object<analog_input_t>(*this, n));
-				inps.push_back(n);
+				pstring inpname = plib::pfmt("A{1}")(i);
+				m_I.push_back(owner.template make_pool_object<analog_input_t>(*this, inpname, NETLIB_DELEGATE(inputs)));
+				inps.push_back(inpname);
 				m_vals.push_back(nlconst::zero());
 			}
-			m_compiled.compile(m_func(), inps);
+			m_compiled->compile(m_func(), inps);
 		}
 
 	protected:
@@ -384,42 +304,49 @@ namespace devices
 			//m_Q.initial(0.0);
 		}
 
-		NETLIB_UPDATEI()
+		NETLIB_HANDLERI(inputs)
 		{
 			for (std::size_t i = 0; i < static_cast<unsigned>(m_N()); i++)
 			{
 				m_vals[i] = (*m_I[i])();
 			}
-			m_Q.push(m_compiled.evaluate(m_vals));
+			auto result = m_compiled->evaluate(m_vals);
+			if (plib::abs(m_last - result) >= m_thresh)
+			{
+				m_Q.push(result);
+				m_last = result;
+			}
 		}
 
 	private:
+		using pf_type = plib::pfunction<nl_fptype>;
 		param_int_t m_N;
 		param_str_t m_func;
+		param_fp_t m_thresh;
 		analog_output_t m_Q;
-		std::vector<unique_pool_ptr<analog_input_t>> m_I;
+		std::vector<device_arena::unique_ptr<analog_input_t>> m_I;
 
-		std::vector<nl_fptype> m_vals;
-		plib::pfunction<nl_fptype> m_compiled;
+		pf_type::values_container m_vals;
+		state_var<pf_type> m_compiled;
+		state_var<nl_fptype> m_last;
 
 	};
 
 	// -----------------------------------------------------------------------------
-	// nld_res_sw
+	// nld_sys_dsw1
 	// -----------------------------------------------------------------------------
 
-	NETLIB_OBJECT(res_sw)
+	NETLIB_OBJECT(sys_dsw1)
 	{
-	public:
-		NETLIB_CONSTRUCTOR(res_sw)
-		, m_R(*this, "_R")
-		, m_I(*this, "I")
+		NETLIB_CONSTRUCTOR(sys_dsw1)
 		, m_RON(*this, "RON", nlconst::one())
 		, m_ROFF(*this, "ROFF", nlconst::magic(1.0E20))
+		, m_R(*this, "_R")
+		, m_I(*this, "I", NETLIB_DELEGATE(input))
 		, m_last_state(*this, "m_last_state", 0)
 		{
-			register_subalias("1", m_R.m_P);
-			register_subalias("2", m_R.m_N);
+			register_subalias("1", "_R.1");
+			register_subalias("2", "_R.2");
 		}
 
 		NETLIB_RESETI()
@@ -428,34 +355,228 @@ namespace devices
 			m_R.set_R(m_ROFF());
 		}
 
-		NETLIB_UPDATEI()
+		//NETLIB_UPDATE_PARAMI();
+
+		//FIXME: used by 74123
+
+		const terminal_t &P() const noexcept { return m_R.P(); }
+		const terminal_t &N() const noexcept { return m_R.N(); }
+		const logic_input_t &I() const noexcept { return m_I; }
+
+		param_fp_t m_RON;
+		param_fp_t m_ROFF;
+
+	private:
+		NETLIB_HANDLERI(input)
 		{
 			const netlist_sig_t state = m_I();
 			if (state != m_last_state)
 			{
 				m_last_state = state;
-				const nl_fptype R = state ? m_RON() : m_ROFF();
+				const nl_fptype R = (state != 0) ? m_RON() : m_ROFF();
 
-				// FIXME: We only need to update the net first if this is a time stepping net
-				m_R.update();
-				m_R.set_R(R);
-				m_R.solve_later();
+				m_R.change_state([this, &R]()
+				{
+					m_R.set_R(R);
+				});
 			}
+		}
+
+		analog::NETLIB_SUB(R_base) m_R;
+		logic_input_t m_I;
+
+		state_var<netlist_sig_t> m_last_state;
+	};
+
+	// -----------------------------------------------------------------------------
+	// nld_sys_dsw2
+	// -----------------------------------------------------------------------------
+
+	NETLIB_OBJECT(sys_dsw2)
+	{
+		NETLIB_CONSTRUCTOR(sys_dsw2)
+		, m_R1(*this, "_R1")
+		, m_R2(*this, "_R2")
+		, m_I(*this, "I", NETLIB_DELEGATE(input))
+		, m_GON(*this, "GON", nlconst::magic(1e9)) // FIXME: all switches should have some on value
+		, m_GOFF(*this, "GOFF", nlconst::cgmin())
+		, m_power_pins(*this)
+		{
+			// connect and register pins
+			register_subalias("1", "_R1.1");
+			register_subalias("2", "_R1.2");
+			register_subalias("3", "_R2.2");
+			connect("_R1.2", "_R2.1");
+		}
+
+	private:
+		NETLIB_RESETI()
+		{
+			m_R1.set_G(m_GOFF());
+			m_R2.set_G(m_GON());
 		}
 
 		//NETLIB_UPDATE_PARAMI();
 
-		// used by 74123
-		analog::NETLIB_SUB(R_base) m_R;
+		NETLIB_HANDLERI(input)
+		{
+			const netlist_sig_t state = m_I();
+
+			//printf("Here %d\n", state);
+			const nl_fptype G1 = (state != 0) ? m_GON() : m_GOFF();
+			const nl_fptype G2 = (state != 0) ? m_GOFF() : m_GON();
+			if (m_R1.solver() == m_R2.solver())
+			{
+				m_R1.change_state([this, &G1, &G2]()
+				{
+					m_R1.set_G(G1);
+					m_R2.set_G(G2);
+				});
+			}
+			else
+			{
+				m_R1.change_state([this, &G1]()
+				{
+					m_R1.set_G(G1);
+				});
+				m_R2.change_state([this, &G2]()
+				{
+					m_R2.set_G(G2);
+				});
+			}
+		}
+
+		analog::NETLIB_SUB(R_base) m_R1;
+		analog::NETLIB_SUB(R_base) m_R2;
 		logic_input_t m_I;
-		param_fp_t m_RON;
-		param_fp_t m_ROFF;
+		param_fp_t m_GON;
+		param_fp_t m_GOFF;
+
+		nld_power_pins m_power_pins;
+	};
+
+
+	// -----------------------------------------------------------------------------
+	// nld_sys_comp
+	// -----------------------------------------------------------------------------
+
+	NETLIB_OBJECT(sys_compd)
+	{
+		NETLIB_CONSTRUCTOR(sys_compd)
+		, m_IP(*this, "IP", NETLIB_DELEGATE(inputs))
+		, m_IN(*this, "IN", NETLIB_DELEGATE(inputs))
+		, m_Q(*this, "Q")
+		, m_QQ(*this, "QQ")
+		, m_power_pins(*this)
+		, m_last_state(*this, "m_last_state", 2) // ensure first execution
+		{
+		}
 
 	private:
+		NETLIB_RESETI()
+		{
+			m_last_state = 0;
+		}
+
+		//NETLIB_UPDATE_PARAMI();
+
+		NETLIB_HANDLERI(inputs)
+		{
+			const netlist_sig_t state = (m_IP() > m_IN());
+			if (state != m_last_state)
+			{
+				m_last_state = state;
+				// FIXME: make timing a parameter
+				m_Q.push(state, NLTIME_FROM_NS(10));
+				m_QQ.push(!state, NLTIME_FROM_NS(10));
+			}
+		}
+
+		analog_input_t m_IP;
+		analog_input_t m_IN;
+		logic_output_t m_Q;
+		logic_output_t m_QQ;
+		nld_power_pins m_power_pins;
+
 		state_var<netlist_sig_t> m_last_state;
 	};
 
-} // namespace devices
-} // namespace netlist
+	///
+	/// \brief  noise source
+	///
+	/// An externally clocked noise source. The noise acts as a voltage source
+	/// with internal resistance RI.
+	///
+	/// Since a new random value is used on each state change on I the effective
+	/// frequency is clock source frequency times two!
+	///
+	/// Typical application:
+	///
+	///             VCC
+	///              |
+	///              R
+	///              R
+	///              R
+	///              |
+	///              +-----> Output
+	///              |
+	///         +-------+
+	///         |    1  |
+	///     --->| I     |
+	///         |    2  |
+	///         +-------+
+	///              |
+	///              R
+	///              R
+	///              R
+	///              |
+	///             GND
+	///
+	// -----------------------------------------------------------------------------
+	template <typename E, template<class> class D>
+	NETLIB_OBJECT(sys_noise)
+	{
+	public:
+
+		using engine = E;
+		using distribution = D<nl_fptype>;
+
+		NETLIB_CONSTRUCTOR(sys_noise)
+		, m_T(*this, "m_T")
+		, m_I(*this, "I", NETLIB_DELEGATE(input))
+		, m_RI(*this, "RI", nlconst::magic(0.1))
+		, m_sigma(*this, "SIGMA", nlconst::zero())
+		, m_mt(*this, "m_mt")
+		, m_dis(*this, "m_dis",m_sigma())
+		{
+
+			register_subalias("1", "m_T.1");
+			register_subalias("2", "m_T.2");
+		}
+
+	private:
+		NETLIB_HANDLERI(input)
+		{
+			nl_fptype val = m_dis()(m_mt());
+			m_T.change_state([this, val]()
+			{
+				m_T.set_G_V_I(plib::reciprocal(m_RI()), val, nlconst::zero());
+			});
+		}
+
+		NETLIB_RESETI()
+		{
+			m_T.set_G_V_I(plib::reciprocal(m_RI()), nlconst::zero(), nlconst::zero());
+		}
+
+		analog::NETLIB_SUB(twoterm) m_T;
+		logic_input_t m_I;
+		param_fp_t m_RI;
+		param_fp_t m_sigma;
+		state_var<engine> m_mt;
+		state_var<distribution> m_dis;
+	};
+
+} // namespace netlist::devices
 
 #endif // NLD_SYSTEM_H_

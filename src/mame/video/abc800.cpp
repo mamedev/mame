@@ -12,10 +12,9 @@
 
 
 
-// these are needed because the MC6845 emulation does
+// this is needed because the MC6845 emulation does
 // not position the active display area correctly
 #define HORIZONTAL_PORCH_HACK   115
-#define VERTICAL_PORCH_HACK     29
 
 
 
@@ -27,7 +26,7 @@
 //  hrs_w - high resolution scanline write
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc800_state::hrs_w )
+void abc800_state::hrs_w(uint8_t data)
 {
 	m_hrs = data;
 }
@@ -37,7 +36,7 @@ WRITE8_MEMBER( abc800_state::hrs_w )
 //  hrc_w - high resolution color write
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc800_state::hrc_w )
+void abc800_state::hrc_w(uint8_t data)
 {
 	m_fgctl = data;
 }
@@ -74,16 +73,16 @@ void abc800c_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 				if (color)
 				{
-					bool black = bitmap.pix32(y, x) == rgb_t::black();
+					bool black = bitmap.pix(y, x) == rgb_t::black();
 					bool opaque = !BIT(fgctl, 3);
 
 					if (black || opaque)
 					{
-						bitmap.pix32(y, x) = pen[color];
-						bitmap.pix32(y, x + 1) = pen[color];
+						bitmap.pix(y, x) = pen[color];
+						bitmap.pix(y, x + 1) = pen[color];
 
-						bitmap.pix32(y + 1, x) = pen[color];
-						bitmap.pix32(y + 1, x + 1) = pen[color];
+						bitmap.pix(y + 1, x) = pen[color];
+						bitmap.pix(y + 1, x + 1) = pen[color];
 					}
 				}
 
@@ -121,7 +120,7 @@ uint32_t abc800c_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 //  SAA5050_INTERFACE( trom_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( abc800c_state::char_ram_r )
+uint8_t abc800c_state::char_ram_r(offs_t offset)
 {
 	int row = offset / 40;
 	int col = offset % 40;
@@ -188,7 +187,7 @@ void abc800m_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 	const pen_t *pen = m_palette->pens();
 
-	for (int y = m_hrs + VERTICAL_PORCH_HACK; y < std::min(cliprect.max_y + 1, m_hrs + VERTICAL_PORCH_HACK + 240); y++)
+	for (int y = m_hrs; y < std::min(cliprect.max_y + 1, m_hrs + 240); y++)
 	{
 		int x = HORIZONTAL_PORCH_HACK;
 
@@ -201,8 +200,8 @@ void abc800m_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				uint16_t fgctl_addr = ((m_fgctl & 0x7f) << 2) | ((data >> 6) & 0x03);
 				int color = (m_fgctl_prom->base()[fgctl_addr] & 0x07) ? 1 : 0;
 
-				bitmap.pix32(y, x++) = pen[color];
-				bitmap.pix32(y, x++) = pen[color];
+				bitmap.pix(y, x++) = pen[color];
+				bitmap.pix(y, x++) = pen[color];
 
 				data <<= 2;
 			}
@@ -242,7 +241,7 @@ MC6845_UPDATE_ROW( abc800m_state::abc800m_update_row )
 
 			if (BIT(data, 7) && de)
 			{
-				bitmap.pix32(y, x) = fgpen;
+				bitmap.pix(y, x) = fgpen;
 			}
 
 			data <<= 1;
@@ -271,6 +270,15 @@ uint32_t abc800m_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	return 0;
 }
+
+
+void abc800_state::video_start()
+{
+	// register for state saving
+	save_item(NAME(m_hrs));
+	save_item(NAME(m_fgctl));
+}
+
 
 
 //-------------------------------------------------

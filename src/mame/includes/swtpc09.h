@@ -12,7 +12,6 @@
 #pragma once
 
 #include "cpu/m6809/m6809.h"
-#include "video/generic.h"
 #include "machine/wd_fdc.h"
 #include "imagedev/floppy.h"
 #include "machine/6840ptm.h"
@@ -59,22 +58,24 @@ public:
 	void swtpc09d3(machine_config &config);
 	void swtpc09u(machine_config &config);
 	void swtpc09(machine_config &config);
+	void swtpc09o(machine_config &config);
 
 	void init_swtpc09();
 	void init_swtpc09i();
 	void init_swtpc09u();
 	void init_swtpc09d3();
+	void init_swtpc09o();
 
 	DECLARE_INPUT_CHANGED_MEMBER(maincpu_clock_change);
 	DECLARE_INPUT_CHANGED_MEMBER(fdc_clock_change);
 	DECLARE_INPUT_CHANGED_MEMBER(baud_rate_high_change);
 
 private:
-	DECLARE_FLOPPY_FORMATS(floppy_flex_formats);
-	DECLARE_FLOPPY_FORMATS(floppy_uniflex_formats);
+	static void floppy_flex_formats(format_registration &fr);
+	static void floppy_uniflex_formats(format_registration &fr);
 
-	DECLARE_READ8_MEMBER(pia0_a_r);
-	DECLARE_READ8_MEMBER(pia0_ca1_r);
+	uint8_t pia0_a_r();
+	uint8_t pia0_ca1_r();
 	DECLARE_WRITE_LINE_MEMBER( pia0_irq_a );
 
 	DECLARE_WRITE_LINE_MEMBER(io_irq_w);
@@ -87,54 +88,54 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_sso_w );
 
-	DECLARE_READ8_MEMBER( dmaf3_via_read_porta );
-	DECLARE_READ8_MEMBER( dmaf3_via_read_portb );
-	DECLARE_WRITE8_MEMBER( dmaf3_via_write_porta );
-	DECLARE_WRITE8_MEMBER( dmaf3_via_write_portb );
+	uint8_t dmaf3_via_read_porta();
+	uint8_t dmaf3_via_read_portb();
+	void dmaf3_via_write_porta(uint8_t data);
+	void dmaf3_via_write_portb(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( dmaf3_via_irq );
 
 	TIMER_CALLBACK_MEMBER(floppy_motor_callback);
 
-	DECLARE_READ8_MEMBER( dmaf2_fdc_r );
-	DECLARE_WRITE8_MEMBER( dmaf2_fdc_w );
-	DECLARE_READ8_MEMBER ( dmaf2_dma_address_reg_r );
-	DECLARE_WRITE8_MEMBER ( dmaf2_dma_address_reg_w );
-	DECLARE_READ8_MEMBER ( dmaf2_control_reg_r );
-	DECLARE_WRITE8_MEMBER ( dmaf2_control_reg_w );
+	uint8_t dmaf2_fdc_r(offs_t offset);
+	void dmaf2_fdc_w(offs_t offset, uint8_t data);
+	uint8_t dmaf2_dma_address_reg_r();
+	void dmaf2_dma_address_reg_w(uint8_t data);
+	uint8_t dmaf2_control_reg_r();
+	void dmaf2_control_reg_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( dmaf3_fdc_r );
-	DECLARE_WRITE8_MEMBER( dmaf3_fdc_w );
-	DECLARE_READ8_MEMBER ( dmaf3_dma_address_reg_r );
-	DECLARE_WRITE8_MEMBER ( dmaf3_dma_address_reg_w );
-	DECLARE_READ8_MEMBER ( dmaf3_control_reg_r );
-	DECLARE_WRITE8_MEMBER ( dmaf3_control_reg_w );
+	uint8_t dmaf3_fdc_r(offs_t offset);
+	void dmaf3_fdc_w(offs_t offset, uint8_t data);
+	uint8_t dmaf3_dma_address_reg_r();
+	void dmaf3_dma_address_reg_w(uint8_t data);
+	uint8_t dmaf3_control_reg_r();
+	void dmaf3_control_reg_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(dmaf3_hdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER( dmaf3_hdc_drq_w );
-	DECLARE_READ8_MEMBER( dmaf3_hdc_control_r );
-	DECLARE_WRITE8_MEMBER( dmaf3_hdc_control_w );
-	DECLARE_READ8_MEMBER( dmaf3_hdc_reset_r );
-	DECLARE_WRITE8_MEMBER( dmaf3_hdc_reset_w );
-	DECLARE_READ8_MEMBER( dmaf3_archive_reset_r );
-	DECLARE_WRITE8_MEMBER( dmaf3_archive_reset_w );
-	DECLARE_READ8_MEMBER( dmaf3_archive_clear_r );
-	DECLARE_WRITE8_MEMBER( dmaf3_archive_clear_w );
+	uint8_t dmaf3_hdc_control_r();
+	void dmaf3_hdc_control_w(uint8_t data);
+	uint8_t dmaf3_hdc_reset_r();
+	void dmaf3_hdc_reset_w(uint8_t data);
+	uint8_t dmaf3_archive_reset_r();
+	void dmaf3_archive_reset_w(uint8_t data);
+	uint8_t dmaf3_archive_clear_r();
+	void dmaf3_archive_clear_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(dat_w);
-	DECLARE_READ8_MEMBER(main_r);
-	DECLARE_WRITE8_MEMBER(main_w);
+	uint8_t main_r(offs_t offset);
+	void main_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER ( m6844_r );
-	DECLARE_WRITE8_MEMBER ( m6844_w );
+	uint8_t m6844_r(offs_t offset);
+	void m6844_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER ( unmapped_r );
-	DECLARE_WRITE8_MEMBER ( unmapped_w );
+	uint8_t unmapped_r(offs_t offset);
+	void unmapped_w(offs_t offset, uint8_t data);
 
 	void flex_dc5_piaide_mem(address_map &map);
 	void flex_dmaf2_mem(address_map &map);
 	void mp09_mem(address_map &map);
 	void uniflex_dmaf2_mem(address_map &map);
 	void uniflex_dmaf3_mem(address_map &map);
+	void os9_mem(address_map &map);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -175,32 +176,33 @@ private:
 	required_ioport m_sbug_double_density;
 	required_ioport m_piaide_flex_boot_cd00;
 
-	uint8_t m_pia_counter;             // this is the counter on pia porta
+	uint8_t m_pia_counter = 0;             // this is the counter on pia porta
 
-	uint8_t m_dmaf_high_address[4];    // dmaf2 or dmaf3 dma extended address reg
-	uint8_t m_dmaf2_interrupt_enable;
+	uint8_t m_dmaf_high_address[4]{};    // dmaf2 or dmaf3 dma extended address reg
+	uint8_t m_dmaf2_interrupt_enable = 0;
 
-	uint8_t m_system_type;             // flag to indicate hw and rom combination
-	uint8_t m_fdc_status;              // for floppy controller
-	int m_floppy_motor_on;
-	emu_timer *m_floppy_motor_timer;
-	floppy_image_device *m_fdc_floppy; // Current selected floppy.
-	uint8_t m_fdc_side;                // Current floppy side.
-	uint8_t m_dmaf3_via_porta;
-	uint8_t m_dmaf3_via_portb;
-	uint8_t m_active_interrupt;
-	uint8_t m_interrupt;
+	uint8_t m_system_type = 0;             // flag to indicate hw and rom combination
+	uint8_t m_fdc_status = 0;              // for floppy controller
+	int m_floppy_motor_on = 0;
+	emu_timer *m_floppy_motor_timer = nullptr;
+	floppy_image_device *m_fdc_floppy = nullptr; // Current selected floppy.
+	uint8_t m_fdc_side = 0;                // Current floppy side.
+	uint8_t m_fdc_dden = 0;                // Current dden state.
+	uint8_t m_dmaf3_via_porta = 0;
+	uint8_t m_dmaf3_via_portb = 0;
+	uint8_t m_active_interrupt = 0;
+	uint8_t m_interrupt = 0;
 
-	address_space *m_banked_space;
+	address_space *m_banked_space = nullptr;
 
 	// TODO: move this in proper device
 
 	/* channel_data structure holds info about each 6844 DMA channel */
 	struct m6844_channel_data
 	{
-		int active;
-		int address;
-		int counter;
+		int active = 0;
+		int address = 0;
+		int counter = 0;
 		// Channel control register.
 		//  bit 0: Read / Write mode
 		//  bit 1: Mode control B
@@ -215,22 +217,22 @@ private:
 		//          read. Sets IRQ.
 		// Mode control A,B: 0,0 Mode2; 0,1 Mode 3; 1,0 Mode 0;
 		//                   1,1 Undefined.
-		uint8_t control;
-		int start_address;
-		int start_counter;
+		uint8_t control = 0;
+		int start_address = 0;
+		int start_counter = 0;
 	};
 
 	/* 6844 description */
 	m6844_channel_data m_m6844_channel[4];
-	uint8_t m_m6844_priority;
+	uint8_t m_m6844_priority = 0;
 	// Interrupt control register.
 	// Bit 0-3: channel interrupt enable, 1 enabled, 0 masked.
 	// Bit 4-6: unused
 	// Bit 7: Read only. Set to 1 when IRQ asserted. Clear when the
 	// control register associated with the channel that caused the
 	// interrut is read.
-	uint8_t m_m6844_interrupt;
-	uint8_t m_m6844_chain;
+	uint8_t m_m6844_interrupt = 0;
+	uint8_t m_m6844_chain = 0;
 	void m6844_update_interrupt();
 	void m6844_fdc_dma_transfer(uint8_t channel);
 	void m6844_hdc_dma_transfer(uint8_t channel);

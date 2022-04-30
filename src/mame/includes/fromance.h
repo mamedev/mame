@@ -28,13 +28,11 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
-		m_spriteram(*this, "spriteram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_gga(*this, "gga"),
-		m_spr_old(*this, "vsystem_spr_old"),
-		m_videoram(*this, "videoram"),
+		m_rombank(*this, "rombank"),
 		m_sublatch(*this, "sublatch"),
 		m_msm(*this, "msm")
 	{ }
@@ -45,79 +43,71 @@ public:
 
 	void init_common();
 
-	DECLARE_WRITE8_MEMBER(fromance_gga_data_w);
-
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	DECLARE_VIDEO_START(fromance);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
-	optional_shared_ptr<uint8_t> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<vsystem_gga_device> m_gga;
-	optional_device<vsystem_spr2_device> m_spr_old; // only used by pipe dream, split this state up and clean things...
+	required_memory_bank m_rombank;
 
-	DECLARE_WRITE8_MEMBER(fromance_gfxreg_w);
-	DECLARE_READ8_MEMBER(fromance_videoram_r);
-	DECLARE_WRITE8_MEMBER(fromance_videoram_w);
-	DECLARE_WRITE8_MEMBER(fromance_scroll_w);
+	void fromance_gfxreg_w(uint8_t data);
+	uint8_t fromance_videoram_r(offs_t offset);
+	void fromance_videoram_w(offs_t offset, uint8_t data);
+	void fromance_scroll_w(offs_t offset, uint8_t data);
+	void fromance_gga_data_w(offs_t offset, uint8_t data);
 
-	uint32_t   m_scrolly_ofs;
-	uint32_t   m_scrollx_ofs;
-	uint32_t   m_scrollx[2];
-	uint32_t   m_scrolly[2];
-	uint8_t    m_gfxreg;
-	uint8_t    m_flipscreen;
-	uint8_t    m_flipscreen_old;
-	uint8_t    m_selected_videoram;
-	uint8_t    m_selected_paletteram;
-
-	DECLARE_VIDEO_START(hatris);
-	DECLARE_VIDEO_START(pipedrm);
+	uint32_t   m_scrolly_ofs = 0;
+	uint32_t   m_scrollx_ofs = 0;
+	uint32_t   m_scrollx[2]{};
+	uint32_t   m_scrolly[2]{};
+	uint8_t    m_gfxreg = 0;
+	uint8_t    m_flipscreen = 0;
+	uint8_t    m_flipscreen_old = 0;
+	uint8_t    m_selected_videoram = 0;
+	uint8_t    m_selected_paletteram = 0;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	tilemap_t  *m_fg_tilemap = nullptr;
 
 	uint32_t screen_update_fromance(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_pipedrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
-	/* memory pointers (used by pipedrm) */
-	optional_shared_ptr<uint8_t> m_videoram;
-
 	optional_device<generic_latch_8_device> m_sublatch;
 	optional_device<msm5205_device> m_msm;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_fg_tilemap;
 	std::unique_ptr<uint8_t[]>   m_local_videoram[2];
 	std::unique_ptr<uint8_t[]>  m_local_paletteram;
 
 	emu_timer *m_crtc_timer;
 
 	/* misc */
-	uint8_t    m_portselect;
-	uint8_t    m_adpcm_reset;
-	uint8_t    m_adpcm_data;
-	uint8_t    m_vclk_left;
+	uint8_t    m_portselect = 0;
+	uint8_t    m_adpcm_reset = 0;
+	uint8_t    m_adpcm_data = 0;
+	uint8_t    m_vclk_left = 0;
 
 	/* devices */
-	DECLARE_READ8_MEMBER(fromance_busycheck_main_r);
-	DECLARE_READ8_MEMBER(fromance_busycheck_sub_r);
-	DECLARE_WRITE8_MEMBER(fromance_rombank_w);
-	DECLARE_WRITE8_MEMBER(fromance_adpcm_w);
-	DECLARE_WRITE8_MEMBER(fromance_portselect_w);
-	DECLARE_READ8_MEMBER(fromance_keymatrix_r);
-	DECLARE_WRITE8_MEMBER(fromance_coinctr_w);
-	DECLARE_READ8_MEMBER(fromance_paletteram_r);
-	DECLARE_WRITE8_MEMBER(fromance_paletteram_w);
-	DECLARE_WRITE8_MEMBER(fromance_adpcm_reset_w);
+	uint8_t fromance_busycheck_main_r();
+	uint8_t fromance_busycheck_sub_r();
+	void fromance_rombank_w(uint8_t data);
+	void fromance_adpcm_w(uint8_t data);
+	void fromance_portselect_w(uint8_t data);
+	uint8_t fromance_keymatrix_r();
+	void fromance_coinctr_w(uint8_t data);
+	uint8_t fromance_paletteram_r(offs_t offset);
+	void fromance_paletteram_w(offs_t offset, uint8_t data);
+	void fromance_adpcm_reset_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_fromance_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fromance_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_nekkyoku_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_nekkyoku_fg_tile_info);
-	DECLARE_MACHINE_START(fromance);
-	DECLARE_MACHINE_RESET(fromance);
 	DECLARE_VIDEO_START(nekkyoku);
-	DECLARE_VIDEO_START(fromance);
 	TIMER_CALLBACK_MEMBER(crtc_interrupt_gen);
 	inline void get_fromance_tile_info(tile_data &tileinfo, int tile_index, int layer);
 	inline void get_nekkyoku_tile_info(tile_data &tileinfo, int tile_index, int layer);

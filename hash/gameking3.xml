@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- see gameking.xml for information about cartridge types -->
+see gameking.xml for information about cartridge types
+-->
 
 <softwarelist name="gameking3" description="TimeTop GameKing 3 cartridges">
 

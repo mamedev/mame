@@ -217,6 +217,7 @@ void sgi_gr1_device::device_reset()
 	m_dr4 = DR4_MEGOPT;
 
 	m_fifo.clear();
+	m_int_fifo_cb(CLEAR_LINE);
 }
 
 u8 sgi_gr1_device::dr0_r()
@@ -324,9 +325,6 @@ void sgi_gr1_device::fifo_w(offs_t offset, u32 data, u32 mem_mask)
 		m_dr3 &= ~DR3_FIFOFULL;
 		m_int_fifo_cb(ASSERT_LINE);
 	}
-
-	if (m_ge->suspended())
-		m_ge->resume(SUSPEND_REASON_TRIGGER);
 }
 
 void sgi_gr1_device::reset_w(int state)

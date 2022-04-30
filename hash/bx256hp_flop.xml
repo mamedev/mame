@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="bx256hp_flop" description="Commodore BX256-80HP / CBM 730 diskettes">
 
 	<software name="cpm10">

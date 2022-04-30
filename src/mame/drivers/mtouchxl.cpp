@@ -77,10 +77,10 @@ private:
 	optional_device<ds1205_device> m_multikey;
 	void machine_start() override;
 	void machine_reset() override;
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_READ8_MEMBER(key_r);
-	DECLARE_WRITE8_MEMBER(key_w);
-	DECLARE_READ8_MEMBER(coin_r);
+	uint8_t coin_r();
+	void bank_w(uint8_t data);
+	uint8_t key_r();
+	void key_w(uint8_t data);
 	static void cdrom(device_t *device);
 	static void hdd(device_t *device);
 	void at32_io(address_map &map);
@@ -88,22 +88,22 @@ private:
 	void dbank_map(address_map &map);
 };
 
-WRITE8_MEMBER(mtxl_state::bank_w)
+void mtxl_state::bank_w(uint8_t data)
 {
 	m_iocard->set_bank(data & 0x1f);
 }
 
-READ8_MEMBER(mtxl_state::key_r)
+uint8_t mtxl_state::key_r()
 {
 	return m_multikey->read_dq() ? 0xff : 0xdf;
 }
 
-READ8_MEMBER(mtxl_state::coin_r)
+uint8_t mtxl_state::coin_r()
 {
 	return ioport("Coin")->read();
 }
 
-WRITE8_MEMBER(mtxl_state::key_w)
+void mtxl_state::key_w(uint8_t data)
 {
 	m_multikey->write_rst((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	m_multikey->write_clk((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
@@ -176,15 +176,13 @@ void mtxl_state::machine_start()
 #ifndef REAL_PCI_CHIPSET
 	address_space& space = m_maincpu->space(AS_PROGRAM);
 
-	/* MESS managed RAM */
+	/* managed RAM */
 	membank("bank10")->set_base(m_ram->pointer());
 
 	if (m_ram->size() > 0xa0000)
 	{
 		offs_t ram_limit = 0x100000 + m_ram->size() - 0xa0000;
-		space.install_read_bank(0x100000,  ram_limit - 1, "bank1");
-		space.install_write_bank(0x100000,  ram_limit - 1, "bank1");
-		membank("bank1")->set_base(m_ram->pointer() + 0xa0000);
+		space.install_ram(0x100000,  ram_limit - 1, m_ram->pointer() + 0xa0000);
 	}
 #endif
 }
@@ -236,7 +234,7 @@ void mtxl_state::at486(machine_config &config)
 #ifndef REAL_PCI_CHIPSET
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	AT_MB(config, "mb", 0);
+	AT_MB(config, "mb");
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// on board devices
@@ -257,7 +255,6 @@ void mtxl_state::at486(machine_config &config)
 
 	// remove the keyboard controller and use the HLE one which allow keys to be unmapped
 	config.device_remove("mb:keybc");
-	config.device_remove("mb:pc_kbdc");
 	kbdc8042_device &kbdc(KBDC8042(config, "kbdc"));
 	kbdc.set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
 	kbdc.system_reset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);
@@ -296,7 +293,7 @@ void mtxl_state::at486hd(machine_config &config)
 #ifndef REAL_PCI_CHIPSET
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	AT_MB(config, "mb", 0);
+	AT_MB(config, "mb");
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// on board devices
@@ -317,7 +314,6 @@ void mtxl_state::at486hd(machine_config &config)
 
 	// remove the keyboard controller and use the HLE one which allow keys to be unmapped
 	config.device_remove("mb:keybc");
-	config.device_remove("mb:pc_kbdc");
 	kbdc8042_device &kbdc(KBDC8042(config, "kbdc"));
 	kbdc.set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
 	kbdc.system_reset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);

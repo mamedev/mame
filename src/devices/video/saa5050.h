@@ -51,6 +51,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( crs_w );
 	DECLARE_WRITE_LINE_MEMBER( dew_w );
 	DECLARE_WRITE_LINE_MEMBER( lose_w );
+	DECLARE_READ_LINE_MEMBER( tlc_r );
 	void write(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( f1_w );
 	DECLARE_WRITE_LINE_MEMBER( tr6_w );

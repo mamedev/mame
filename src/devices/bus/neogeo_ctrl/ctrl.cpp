@@ -200,6 +200,12 @@ void neogeo_arc_edge(device_slot_interface &device)
 	device.option_add("joy",     NEOGEO_JOY_AC);
 }
 
+void neogeo_arc_edge_irrmaze(device_slot_interface &device)
+{
+	device.option_add("joy",     NEOGEO_JOY_AC);
+	device.option_add("irrmaze", NEOGEO_IRRMAZE);
+}
+
 void neogeo_arc_edge_fixed(device_slot_interface &device)
 {
 	device.option_add("joy",     NEOGEO_JOY_AC);

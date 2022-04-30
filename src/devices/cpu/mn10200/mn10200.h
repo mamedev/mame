@@ -40,8 +40,8 @@ public:
 	template <std::size_t Port> auto read_port() { return m_read_port[Port].bind(); }
 	template <std::size_t Port> auto write_port() { return m_write_port[Port].bind(); }
 
-	DECLARE_READ8_MEMBER(io_control_r);
-	DECLARE_WRITE8_MEMBER(io_control_w);
+	uint8_t io_control_r(offs_t offset);
+	void io_control_w(offs_t offset, uint8_t data);
 
 	void mn1020012a_internal_map(address_map &map);
 protected:
@@ -80,8 +80,8 @@ private:
 	address_space *m_program;
 
 	// i/o handlers
-	devcb_read8 m_read_port[5];
-	devcb_write8 m_write_port[5];
+	devcb_read8::array<5> m_read_port;
+	devcb_write8::array<5> m_write_port;
 
 	int m_cycles;
 

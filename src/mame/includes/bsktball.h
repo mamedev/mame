@@ -12,7 +12,9 @@
 
 #include "machine/timer.h"
 #include "sound/discrete.h"
+
 #include "emupal.h"
+#include "screen.h"
 #include "tilemap.h"
 
 /* Discrete Sound Input Nodes */
@@ -27,12 +29,13 @@ class bsktball_state : public driver_device
 public:
 	bsktball_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
-		m_motion(*this, "motion"),
-		m_discrete(*this, "discrete"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_discrete(*this, "discrete"),
+		m_videoram(*this, "videoram"),
+		m_motion(*this, "motion")
 	{ }
 
 	void bsktball(machine_config &config);
@@ -41,14 +44,14 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(nmion_w);
 	DECLARE_WRITE_LINE_MEMBER(ld1_w);
 	DECLARE_WRITE_LINE_MEMBER(ld2_w);
-	DECLARE_READ8_MEMBER(bsktball_in0_r);
-	DECLARE_WRITE8_MEMBER(bsktball_videoram_w);
+	uint8_t bsktball_in0_r();
+	void bsktball_videoram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void bsktball_palette(palette_device &palette) const;
 	uint32_t screen_update_bsktball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(bsktball_scanline);
-	DECLARE_WRITE8_MEMBER(bsktball_bounce_w);
-	DECLARE_WRITE8_MEMBER(bsktball_note_w);
+	void bsktball_bounce_w(uint8_t data);
+	void bsktball_note_w(uint8_t data);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
@@ -58,36 +61,36 @@ protected:
 	void main_map(address_map &map);
 
 private:
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<discrete_device> m_discrete;
+
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_motion;
-	required_device<discrete_device> m_discrete;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
+	tilemap_t  *m_bg_tilemap = nullptr;
 
 	/* misc */
-	uint32_t   m_nmi_on;
-//  int      m_i256v;
+	uint32_t   m_nmi_on = 0U;
 
 	/* input-related */
-	int m_ld1;
-	int m_ld2;
-	int m_dir0;
-	int m_dir1;
-	int m_dir2;
-	int m_dir3;
-	int m_last_p1_horiz;
-	int m_last_p1_vert;
-	int m_last_p2_horiz;
-	int m_last_p2_vert;
-
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+	int m_ld1 = 0;
+	int m_ld2 = 0;
+	int m_dir0 = 0;
+	int m_dir1 = 0;
+	int m_dir2 = 0;
+	int m_dir3 = 0;
+	int m_last_p1_horiz = 0;
+	int m_last_p1_vert = 0;
+	int m_last_p2_horiz = 0;
+	int m_last_p2_vert = 0;
 };
 
-/*----------- defined in audio/bsktball.c -----------*/
+/*----------- defined in audio/bsktball.cpp -----------*/
 
 DISCRETE_SOUND_EXTERN( bsktball_discrete );
 

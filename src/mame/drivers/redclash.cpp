@@ -31,12 +31,12 @@ TODO:
 #include "speaker.h"
 
 
-WRITE8_MEMBER( redclash_state::irqack_w )
+void redclash_state::irqack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-template <unsigned B> WRITE8_MEMBER(redclash_state::star_w)
+template <unsigned B> void redclash_state::star_w(uint8_t data)
 {
 	m_stars->set_speed(BIT(data, 0) << B, 1U << B);
 }

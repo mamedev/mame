@@ -91,7 +91,7 @@ protected:
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 4 - 1) / 4; } // 4 cycles per machine cycle
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 4); } // "
 	virtual u32 execute_min_cycles() const noexcept override { return 1; }
-	virtual u32 execute_max_cycles() const noexcept override { return 2; }
+	virtual u32 execute_max_cycles() const noexcept override { return 2+1; } // max 2 + interrupt
 	virtual u32 execute_input_lines() const noexcept override { return 1; }
 	virtual void execute_set_input(int line, int state) override;
 	virtual void execute_run() override;
@@ -116,6 +116,9 @@ protected:
 	address_space *m_program;
 	address_space *m_data;
 
+	int m_icount;
+	int m_state_count;
+
 	int m_prgwidth;
 	int m_datawidth;
 	int m_prgmask;
@@ -129,7 +132,6 @@ protected:
 	u8 m_arg;            // opcode argument for 2-byte opcodes
 	u8 m_bitmask;        // opcode bit argument
 	bool m_skip;         // skip next opcode
-	int m_icount;
 	emu_timer *m_timer;
 
 	u16 m_pc;            // program counter

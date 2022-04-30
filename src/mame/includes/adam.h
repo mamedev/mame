@@ -35,9 +35,7 @@ public:
 		m_psg(*this, SN76489A_TAG),
 		m_ram(*this, RAM_TAG),
 		m_adamnet(*this, "adamnet"),
-		m_slot1(*this, ADAM_LEFT_EXPANSION_SLOT_TAG),
-		m_slot2(*this, ADAM_CENTER_EXPANSION_SLOT_TAG),
-		m_slot3(*this, ADAM_RIGHT_EXPANSION_SLOT_TAG),
+		m_slot(*this, "slot%u", 1U),
 		m_cart(*this, COLECOVISION_CARTRIDGE_SLOT_TAG),
 		m_joy1(*this, CONTROL1_TAG),
 		m_joy2(*this, CONTROL2_TAG),
@@ -51,15 +49,16 @@ public:
 		m_spindis(1)
 	{ }
 
+	void adam(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<m6801_cpu_device> m_netcpu;
 	required_device<tms9928a_device> m_vdc;
 	required_device<sn76489a_device> m_psg;
 	required_device<ram_device> m_ram;
 	required_device<adamnet_device> m_adamnet;
-	required_device<adam_expansion_slot_device> m_slot1;
-	required_device<adam_expansion_slot_device> m_slot2;
-	required_device<adam_expansion_slot_device> m_slot3;
+	required_device_array<adam_expansion_slot_device, 3> m_slot;
 	required_device<colecovision_cartridge_slot_device> m_cart;
 	required_device<colecovision_control_port_device> m_joy1;
 	required_device<colecovision_control_port_device> m_joy2;
@@ -69,22 +68,22 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( mreq_r );
-	DECLARE_WRITE8_MEMBER( mreq_w );
-	DECLARE_READ8_MEMBER( iorq_r );
-	DECLARE_WRITE8_MEMBER( iorq_w );
+	uint8_t mreq_r(offs_t offset);
+	void mreq_w(offs_t offset, uint8_t data);
+	uint8_t iorq_r(offs_t offset);
+	void iorq_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( adamnet_r );
-	DECLARE_WRITE8_MEMBER( adamnet_w );
-	DECLARE_READ8_MEMBER( mioc_r );
-	DECLARE_WRITE8_MEMBER( mioc_w );
+	uint8_t adamnet_r();
+	void adamnet_w(uint8_t data);
+	uint8_t mioc_r();
+	void mioc_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER( m6801_p1_w );
-	DECLARE_READ8_MEMBER( m6801_p2_r );
-	DECLARE_WRITE8_MEMBER( m6801_p2_w );
-	DECLARE_READ8_MEMBER( m6801_p3_r );
-	DECLARE_WRITE8_MEMBER( m6801_p3_w );
-	DECLARE_WRITE8_MEMBER( m6801_p4_w );
+	void m6801_p1_w(uint8_t data);
+	uint8_t m6801_p2_r();
+	void m6801_p2_w(uint8_t data);
+	uint8_t m6801_p3_r();
+	void m6801_p3_w(uint8_t data);
+	void m6801_p4_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( vdc_int_w );
 
@@ -101,18 +100,17 @@ public:
 	uint8_t m_an;
 
 	// DMA state
-	uint16_t m_ba;
+	uint16_t m_ba = 0U;
 	int m_dma;
 	int m_bwr;
-	uint8_t m_data_in;
-	uint8_t m_data_out;
+	uint8_t m_data_in = 0U;
+	uint8_t m_data_out = 0U;
 
 	// paddle state
 	int m_spindis;
 
 	// video state
-	int m_vdp_nmi;
-	void adam(machine_config &config);
+	int m_vdp_nmi = 0;
 	void adam_io(address_map &map);
 	void adam_mem(address_map &map);
 	void m6801_mem(address_map &map);

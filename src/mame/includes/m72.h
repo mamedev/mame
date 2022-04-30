@@ -57,12 +57,19 @@ public:
 		m_upd4701(*this, {"upd4701l", "upd4701h"}),
 		m_samples_region(*this, "samples"),
 		m_io_dsw(*this, "DSW"),
+		m_fg_tilemap(nullptr),
+		m_bg_tilemap(nullptr),
+		m_bg_tilemap_large(nullptr),
+		m_video_off(0),
 		m_fg_source(0),
 		m_bg_source(0),
 		m_m81_b_b_j3(*this, "JumperJ3"),
 		m_m82_rowscroll(0),
 		m_m82_tmcontrol(0)
-	{ }
+	{
+		m_scrollx[0] = m_scrollx[1] = 0;
+		m_scrolly[0] = m_scrolly[1] = 0;
+	}
 
 	void m72_base(machine_config &config);
 	void m72_audio_chips(machine_config &config);
@@ -84,7 +91,7 @@ public:
 	void rtype(machine_config &config);
 	void imgfightb(machine_config &config);
 	void lohtb(machine_config &config);
-	void imgfightj(machine_config &config);
+	void imgfight(machine_config &config);
 	void mrheli(machine_config &config);
 	void nspiritj(machine_config &config);
 
@@ -93,8 +100,8 @@ public:
 	void init_gallop();
 	void init_m72_8751();
 	void init_dbreedm72();
+	void init_airduelm72();
 	void init_nspirit();
-	void init_imgfight();
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -122,28 +129,28 @@ private:
 	optional_ioport m_io_dsw;
 
 	std::unique_ptr<u16[]> m_protection_ram;
-	emu_timer *m_scanline_timer;
-	const u8 *m_protection_code;
-	const u8 *m_protection_crc;
-	u32 m_raster_irq_position;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_bg_tilemap_large;
-	s32 m_scrollx[2];
-	s32 m_scrolly[2];
-	s32 m_video_off;
+	emu_timer *m_scanline_timer = nullptr;
+	const u8 *m_protection_code = nullptr;
+	const u8 *m_protection_crc = nullptr;
+	u32 m_raster_irq_position = 0;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap_large = nullptr;
+	s32 m_scrollx[2]{};
+	s32 m_scrolly[2]{};
+	s32 m_video_off = 0;
 
-	int m_fg_source;
-	int m_bg_source;
+	int m_fg_source = 0;
+	int m_bg_source = 0;
 	optional_ioport m_m81_b_b_j3;
 
 	// majtitle specific
-	int m_m82_rowscroll;
-	u16 m_m82_tmcontrol;
+	int m_m82_rowscroll = 0;
+	u16 m_m82_tmcontrol = 0;
 
 	// m72_i8751 specific
-	u8 m_mcu_sample_latch;
-	u32 m_mcu_sample_addr;
+	u8 m_mcu_sample_latch = 0;
+	u32 m_mcu_sample_addr = 0;
 
 	// common
 	template<unsigned N> u16 palette_r(offs_t offset);
@@ -166,17 +173,17 @@ private:
 	void mcu_low_w(u8 data);
 	void mcu_high_w(u8 data);
 
-	DECLARE_READ16_MEMBER(protection_r);
-	DECLARE_WRITE16_MEMBER(protection_w);
+	u16 protection_r(offs_t offset, u16 mem_mask = ~0);
+	void protection_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	// game specific
-	DECLARE_WRITE16_MEMBER(bchopper_sample_trigger_w);
-	DECLARE_WRITE16_MEMBER(nspirit_sample_trigger_w);
-	DECLARE_WRITE16_MEMBER(imgfight_sample_trigger_w);
-	DECLARE_WRITE16_MEMBER(loht_sample_trigger_w);
-	DECLARE_WRITE16_MEMBER(dbreedm72_sample_trigger_w);
-	DECLARE_WRITE16_MEMBER(dkgenm72_sample_trigger_w);
-	DECLARE_WRITE16_MEMBER(gallop_sample_trigger_w);
+	void bchopper_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void nspirit_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void loht_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void dbreedm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void airduelm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void dkgenm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void gallop_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void rtype2_port02_w(u8 data);
 	void poundfor_port02_w(u8 data);
 	void m82_gfx_ctrl_w(offs_t offset, u16 data, u16 mem_mask);
@@ -192,7 +199,7 @@ private:
 	void machine_start() override;
 	void machine_reset() override;
 	DECLARE_VIDEO_START(m72);
-	DECLARE_VIDEO_START(imgfightj);
+	DECLARE_VIDEO_START(imgfight);
 	DECLARE_VIDEO_START(mrheli);
 	DECLARE_VIDEO_START(nspiritj);
 	DECLARE_VIDEO_START(xmultipl);

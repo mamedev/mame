@@ -36,6 +36,10 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void init_circusc();
+	void circusc(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_scroll;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -44,11 +48,11 @@ public:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
-	tilemap_t        *m_bg_tilemap;
-	bool             m_spritebank;
+	tilemap_t        *m_bg_tilemap = nullptr;
+	bool             m_spritebank = false;
 
 	/* sound-related */
-	uint8_t          m_sn_latch;
+	uint8_t          m_sn_latch = 0U;
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
@@ -57,19 +61,18 @@ public:
 	required_device<dac_byte_interface> m_dac;
 	required_device<discrete_device> m_discrete;
 
-	bool             m_irq_mask;
+	bool             m_irq_mask = false;
 
-	DECLARE_READ8_MEMBER(circusc_sh_timer_r);
-	DECLARE_WRITE8_MEMBER(circusc_sh_irqtrigger_w);
+	uint8_t circusc_sh_timer_r();
+	void circusc_sh_irqtrigger_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
-	DECLARE_WRITE8_MEMBER(circusc_sound_w);
+	void circusc_sound_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
-	DECLARE_WRITE8_MEMBER(circusc_videoram_w);
-	DECLARE_WRITE8_MEMBER(circusc_colorram_w);
+	void circusc_videoram_w(offs_t offset, uint8_t data);
+	void circusc_colorram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE_LINE_MEMBER(spritebank_w);
-	void init_circusc();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -81,7 +84,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void circusc(machine_config &config);
 	void circusc_map(address_map &map);
 	void sound_map(address_map &map);
 };

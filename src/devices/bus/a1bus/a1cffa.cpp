@@ -11,23 +11,54 @@
 #include "emu.h"
 #include "a1cffa.h"
 
+#include "bus/ata/ataintf.h"
+
+
+namespace {
+
 /***************************************************************************
     PARAMETERS
 ***************************************************************************/
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
 #define CFFA_ROM_REGION "cffa_rom"
 #define CFFA_ATA_TAG    "cffa_ata"
-
-DEFINE_DEVICE_TYPE(A1BUS_CFFA, a1bus_cffa_device, "cffa1", "CFFA Compact Flash for Apple I")
 
 ROM_START( cffa )
 	ROM_REGION(0x2000, CFFA_ROM_REGION, 0)
 	ROM_LOAD ("cffaromv1.1.bin", 0x0000, 0x1fe0, CRC(bf6b55ad) SHA1(6a290be18485a06f243a3561c4e01be5aafa4bfe) )
 ROM_END
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+class a1bus_cffa_device:
+		public device_t,
+		public device_a1bus_card_interface
+{
+public:
+	// construction/destruction
+	a1bus_cffa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	uint8_t cffa_r(offs_t offset);
+	void cffa_w(offs_t offset, uint8_t data);
+
+protected:
+	a1bus_cffa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	required_device<ata_interface_device> m_ata;
+
+private:
+	required_region_ptr<uint8_t> m_rom;
+	uint16_t m_lastdata;
+	bool m_writeprotect;
+};
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -68,8 +99,8 @@ a1bus_cffa_device::a1bus_cffa_device(const machine_config &mconfig, device_type 
 
 void a1bus_cffa_device::device_start()
 {
-	install_device(0xafe0, 0xafff, read8_delegate(*this, FUNC(a1bus_cffa_device::cffa_r)), write8_delegate(*this, FUNC(a1bus_cffa_device::cffa_w)));
-	install_bank(0x9000, 0xafdf, "bank_cffa1", &m_rom[0]);
+	install_device(0xafe0, 0xafff, read8sm_delegate(*this, FUNC(a1bus_cffa_device::cffa_r)), write8sm_delegate(*this, FUNC(a1bus_cffa_device::cffa_w)));
+	install_bank(0x9000, 0xafdf, &m_rom[0]);
 
 	save_item(NAME(m_lastdata));
 	save_item(NAME(m_writeprotect));
@@ -81,7 +112,7 @@ void a1bus_cffa_device::device_reset()
 	m_lastdata = 0;
 }
 
-READ8_MEMBER(a1bus_cffa_device::cffa_r)
+uint8_t a1bus_cffa_device::cffa_r(offs_t offset)
 {
 	switch (offset & 0xf)
 	{
@@ -97,7 +128,7 @@ READ8_MEMBER(a1bus_cffa_device::cffa_r)
 			break;
 
 		case 0x8:
-			m_lastdata = m_ata->read_cs0((offset & 0xf) - 8, 0xff);
+			m_lastdata = m_ata->cs0_r((offset & 0xf) - 8, 0xff);
 			return m_lastdata & 0x00ff;
 
 		case 0x9:
@@ -107,13 +138,13 @@ READ8_MEMBER(a1bus_cffa_device::cffa_r)
 		case 0xd:
 		case 0xe:
 		case 0xf:
-			return m_ata->read_cs0((offset & 0xf) - 8, 0xff);
+			return m_ata->cs0_r((offset & 0xf) - 8, 0xff);
 	}
 
 	return 0xff;
 }
 
-WRITE8_MEMBER(a1bus_cffa_device::cffa_w)
+void a1bus_cffa_device::cffa_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 0xf)
 	{
@@ -132,7 +163,7 @@ WRITE8_MEMBER(a1bus_cffa_device::cffa_w)
 
 
 		case 0x8:
-			m_ata->write_cs0((offset & 0xf) - 8, data, 0xff);
+			m_ata->cs0_w((offset & 0xf) - 8, data, 0xff);
 			break;
 
 		case 0x9:
@@ -142,8 +173,17 @@ WRITE8_MEMBER(a1bus_cffa_device::cffa_w)
 		case 0xd:
 		case 0xe:
 		case 0xf:
-			m_ata->write_cs0((offset & 0xf) - 8, data, 0xff);
+			m_ata->cs0_w((offset & 0xf) - 8, data, 0xff);
 			break;
 
 	}
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(A1BUS_CFFA, device_a1bus_card_interface, a1bus_cffa_device, "cffa1", "CFFA Compact Flash for Apple I")

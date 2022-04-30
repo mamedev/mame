@@ -86,10 +86,10 @@ Memory:         54x 64KBit RAM, 18 empty sockets, 9 bit and 4 bit wire straps
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/i8279.h"
-#include "machine/mc2661.h"
 #include "machine/mm58167.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
+#include "machine/scn_pci.h"
 #include "machine/wd2010.h"
 #include "machine/wd_fdc.h"
 #include "video/mc6845.h"
@@ -124,17 +124,17 @@ private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_UPDATE_ROW(crtc_update_row_oua12);
 
-	DECLARE_READ8_MEMBER(f9f04_r);
-	DECLARE_WRITE8_MEMBER(f9f04_w);
-	DECLARE_READ8_MEMBER(f9f24_r);
-	DECLARE_WRITE8_MEMBER(f9f24_w);
-	DECLARE_WRITE8_MEMBER(f9f32_w);
-	DECLARE_READ8_MEMBER(f9f33_r);
-	DECLARE_WRITE8_MEMBER(f9f3e_w);
-	DECLARE_READ8_MEMBER(f9f3f_r);
-	DECLARE_READ8_MEMBER(f9f78_r);
-	DECLARE_WRITE8_MEMBER(f9f78_w);
-	DECLARE_WRITE8_MEMBER(f9f79_w);
+	uint8_t f9f04_r();
+	void f9f04_w(uint8_t data);
+	uint8_t f9f24_r();
+	void f9f24_w(uint8_t data);
+	void f9f32_w(uint8_t data);
+	uint8_t f9f33_r();
+	void f9f3e_w(uint8_t data);
+	uint8_t f9f3f_r();
+	uint8_t f9f78_r();
+	void f9f78_w(uint8_t data);
+	void f9f79_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 
@@ -187,7 +187,7 @@ void pg685_state::pg685_mem(address_map &map)
 	map.unmap_value_high();
 	pg675_mem(map);
 	map(0xf9f34, 0xf9f37).rw(m_bppit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0xf9f38, 0xf9f3b).rw("bpuart", FUNC(mc2661_device::read), FUNC(mc2661_device::write));
+	map(0xf9f38, 0xf9f3b).rw("bpuart", FUNC(scn2661b_device::read), FUNC(scn2661b_device::write));
 	map(0xf9f3c, 0xf9f3d).rw("bppic", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xf9f3e, 0xf9f3e).w(FUNC(pg685_state::f9f3e_w));
 	map(0xf9f70, 0xf9f77).rw("hdc", FUNC(wd2010_device::read), FUNC(wd2010_device::write));
@@ -213,7 +213,7 @@ void pg685_state::pg685oua12_mem(address_map &map)
 	map(0xf9f32, 0xf9f32).w(FUNC(pg685_state::f9f32_w));
 	map(0xf9f33, 0xf9f33).r(FUNC(pg685_state::f9f33_r));
 	map(0xf9f34, 0xf9f37).rw(m_bppit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0xf9f38, 0xf9f3b).rw("bpuart", FUNC(mc2661_device::read), FUNC(mc2661_device::write));
+	map(0xf9f38, 0xf9f3b).rw("bpuart", FUNC(scn2661b_device::read), FUNC(scn2661b_device::write));
 	map(0xf9f3c, 0xf9f3d).rw("bppic", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xf9f3e, 0xf9f3e).w(FUNC(pg685_state::f9f3e_w));
 	map(0xf9f3f, 0xf9f3f).r(FUNC(pg685_state::f9f3f_r));
@@ -235,33 +235,33 @@ void pg685_state::pg685oua12_mem(address_map &map)
 static INPUT_PORTS_START( pg685 )
 INPUT_PORTS_END
 
-READ8_MEMBER(pg685_state::f9f04_r)
+uint8_t pg685_state::f9f04_r()
 {
 	// PCP/M-86 keyboard handling code also checks a couple of bits read
 	logerror("Reading byte from F9F04\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER(pg685_state::f9f04_w)
+void pg685_state::f9f04_w(uint8_t data)
 {
 	// PCP/M-86 keyboard handling code also checks a couple of bits read
 	logerror("Writing %02X to F9F04\n", data);
 }
 
-WRITE8_MEMBER(pg685_state::f9f32_w)
+void pg685_state::f9f32_w(uint8_t data)
 {
 	// 1D written at startup
 	logerror("Writing %02X to F9F32\n", data);
 }
 
-READ8_MEMBER(pg685_state::f9f33_r)
+uint8_t pg685_state::f9f33_r()
 {
 	// Printer present?
 	logerror("Reading from F9F33\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER(pg685_state::f9f3e_w)
+void pg685_state::f9f3e_w(uint8_t data)
 {
 	m_bppit->write_gate0(BIT(data, 6));
 	m_bppit->write_gate1(BIT(data, 7));
@@ -269,7 +269,7 @@ WRITE8_MEMBER(pg685_state::f9f3e_w)
 	// On PC16-11, D5 is AND-ed with the PIT's OUT2, and other bits are used to select the baud rate for a 8251.
 }
 
-READ8_MEMBER(pg685_state::f9f3f_r)
+uint8_t pg685_state::f9f3f_r()
 {
 	logerror("Reading from F9F3F\n");
 	return 0xff;
@@ -290,13 +290,13 @@ static void pg685_floppies(device_slot_interface &device)
 }
 
 
-READ8_MEMBER(pg685_state::f9f24_r)
+uint8_t pg685_state::f9f24_r()
 {
 	logerror("Reading from F9F24\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER(pg685_state::f9f24_w)
+void pg685_state::f9f24_w(uint8_t data)
 {
 	logerror("Writing %02X to F9F24\n", data);
 }
@@ -306,19 +306,19 @@ WRITE8_MEMBER(pg685_state::f9f24_w)
 //  HARDDISK
 //**************************************************************************
 
-READ8_MEMBER(pg685_state::f9f78_r)
+uint8_t pg685_state::f9f78_r()
 {
 	logerror("Reading from F9F78\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER(pg685_state::f9f78_w)
+void pg685_state::f9f78_w(uint8_t data)
 {
 	// WD 1010 separate drive/head select register
 	logerror("Writing %02X to F9F78\n", data);
 }
 
-WRITE8_MEMBER(pg685_state::f9f79_w)
+void pg685_state::f9f79_w(uint8_t data)
 {
 	// another write-only register (possibly reset or interrupt control)
 	logerror("Writing %02X to F9F79\n", data);
@@ -339,13 +339,12 @@ void pg685_state::video_start()
 MC6845_UPDATE_ROW( pg685_state::crtc_update_row )
 {
 	static const uint32_t palette[2] = { 0x00d000, 0 };
-	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix(y);
 	uint16_t  chr_base = ra;
-	int i;
-	uint8_t *vram = (uint8_t *)m_vram.target();
-	uint8_t *fontram = (uint8_t *)m_fontram.target();
+	uint8_t const *const vram = (uint8_t *)m_vram.target();
+	uint8_t const *const fontram = (uint8_t *)m_fontram.target();
 
-	for ( i = 0; i < x_count; i++ )
+	for ( int i = 0; i < x_count; i++ )
 	{
 		uint16_t offset = ( ma + i ) & 0x7ff;
 		uint8_t chr = vram[ offset ];
@@ -353,27 +352,26 @@ MC6845_UPDATE_ROW( pg685_state::crtc_update_row )
 		uint8_t fg = 1;
 		uint8_t bg = 0;
 
-		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
+		*p++ = palette[( data & 0x80 ) ? fg : bg];
+		*p++ = palette[( data & 0x40 ) ? fg : bg];
+		*p++ = palette[( data & 0x20 ) ? fg : bg];
+		*p++ = palette[( data & 0x10 ) ? fg : bg];
+		*p++ = palette[( data & 0x08 ) ? fg : bg];
+		*p++ = palette[( data & 0x04 ) ? fg : bg];
+		*p++ = palette[( data & 0x02 ) ? fg : bg];
+		*p++ = palette[( data & 0x01 ) ? fg : bg];
 	}
 }
 
 MC6845_UPDATE_ROW( pg685_state::crtc_update_row_oua12 )
 {
 	static const uint32_t palette[2] = { 0x00d000, 0 };
-	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix(y);
 	uint16_t  chr_base = ra;
-	int i;
-	uint16_t *vram = (uint16_t *)m_vram16.target();
-	uint8_t *fontram = (uint8_t *)memregion("chargen")->base();
+	uint16_t const *const vram = (uint16_t *)m_vram16.target();
+	uint8_t const *const fontram = (uint8_t *)memregion("chargen")->base();
 
-	for ( i = 0; i < x_count; i++ )
+	for ( int i = 0; i < x_count; i++ )
 	{
 		uint16_t offset = ( ma + i ) & 0x7ff;
 		uint16_t chr = vram[ offset ] & 0xff;
@@ -381,14 +379,14 @@ MC6845_UPDATE_ROW( pg685_state::crtc_update_row_oua12 )
 		uint8_t fg = 1;
 		uint8_t bg = 0;
 
-		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
+		*p++ = palette[( data & 0x80 ) ? fg : bg];
+		*p++ = palette[( data & 0x40 ) ? fg : bg];
+		*p++ = palette[( data & 0x20 ) ? fg : bg];
+		*p++ = palette[( data & 0x10 ) ? fg : bg];
+		*p++ = palette[( data & 0x08 ) ? fg : bg];
+		*p++ = palette[( data & 0x04 ) ? fg : bg];
+		*p++ = palette[( data & 0x02 ) ? fg : bg];
+		*p++ = palette[( data & 0x01 ) ? fg : bg];
 	}
 }
 
@@ -406,7 +404,7 @@ void pg685_state::pg685_backplane(machine_config &config)
 	pic8259_device &bppic(PIC8259(config, "bppic", 0));
 	bppic.out_int_callback().set_nop(); // configured in single 8086 mode?
 
-	MC2661(config, "bpuart", 4915200);
+	SCN2661B(config, "bpuart", 4915200);
 }
 
 void pg685_state::pg685_module(machine_config &config)
@@ -466,8 +464,8 @@ void pg685_state::pg675(machine_config &config)
 	// floppy
 	// m_fdc->intrq_wr_callback(FUNC(zorba_state::fdc_intrq_w));
 	// m_fdc->drq_wr_callback(FUNC(zorba_state::fdc_drq_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", pg675_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", pg675_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", pg675_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", pg675_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 void pg685_state::pg685(machine_config &config)
@@ -515,7 +513,7 @@ void pg685_state::pg685(machine_config &config)
 	// floppy
 
 	// m_fdc->drq_wr_callback(FUNC(zorba_state::fdc_drq_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", pg685_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", pg685_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	// harddisk
 	wd2010_device& hdc(WD2010(config, "hdc", XTAL(10'000'000) / 2)); // divider guessed
@@ -566,7 +564,7 @@ void pg685_state::pg685oua12(machine_config &config)
 
 	// floppy
 	// m_fdc->drq_wr_callback(FUNC(zorba_state::fdc_drq_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", pg685_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", pg685_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	// harddisk
 	wd2010_device& hdc(WD2010(config, "hdc", XTAL(10'000'000) / 2)); // divider guessed

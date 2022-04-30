@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include "6800dasm.h"
-
 enum
 {
 	M6800_PC=1, M6800_S, M6800_A, M6800_B, M6800_X, M6800_CC,
@@ -81,11 +79,11 @@ protected:
 	uint8_t   m_wai_state;      /* WAI opcode state ,(or sleep opcode state) */
 	uint8_t   m_nmi_state;      /* NMI line state */
 	uint8_t   m_nmi_pending;    /* NMI pending */
-	uint8_t   m_irq_state[3];   /* IRQ line state [IRQ1,TIN,SC1] */
+	uint8_t   m_irq_state[4];   /* IRQ line state [IRQ1,TIN,SC1,IS] */
 
 	/* Memory spaces */
-	address_space *m_program, *m_opcodes;
-	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache, *m_opcodes_cache;
+	memory_access<16, 0, 0, ENDIANNESS_BIG>::cache m_cprogram, m_copcodes;
+	memory_access<16, 0, 0, ENDIANNESS_BIG>::specific m_program;
 
 	const op_func *m_insn;
 	const uint8_t *m_cycles;            /* clock cycle of instruction table */
@@ -105,11 +103,11 @@ protected:
 	void WM16(uint32_t Addr, PAIR *p );
 	void enter_interrupt(const char *message,uint16_t irq_vector);
 	virtual void m6800_check_irq2() { }
-	void CHECK_IRQ_LINES();
+	void check_irq_lines();
 	virtual void increment_counter(int amount);
-	virtual void EAT_CYCLES();
-	virtual void CLEANUP_COUNTERS() { }
-	virtual void TAKE_TRAP() { }
+	virtual void eat_cycles();
+	virtual void cleanup_counters() { }
+	virtual void take_trap() { }
 
 	void aba();
 	void abx();

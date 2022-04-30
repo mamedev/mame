@@ -6,7 +6,7 @@
 
 ============================================
 TODO:
-- Video: weird palette changes, Laserbase colors, missing bg scrolling between stages (CRT address lines + m_hset ( or m_vset ?))
+- Video: weird palette changes, Laserbase colors, gfx rendering in general needs verification
 - Sound: sound related i/o writes ( out_w handler )
 - Interrupts - NMI/Int timing is wrong, it's based on measures of broken PCB
 TS 20.01.2017
@@ -60,15 +60,19 @@ expected: 43 FB CC 9A D4 23 6C 01 3E  <- From ROM 4
 ********************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/pit8253.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+
+namespace {
 
 class laserbas_state : public driver_device
 {
@@ -77,7 +81,9 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
-		m_dac(*this, "dac%u", 1U)
+		m_dac(*this, "dac%u", 1U),
+		m_vrambank(*this, "vram"),
+		m_track(*this, { "TRACK_X", "TRACK_Y" })
 	{ }
 
 	void laserbas(machine_config &config);
@@ -87,31 +93,35 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	/* misc */
-	int m_dac_data;
-	int m_counter[6];
-	int m_cnt_out[6];
-	int m_nmi;
-	/* video-related */
-	int      m_vrambank;
-	uint8_t  m_vram[0x10000];
-	int m_hset, m_vset;
-	int m_bset;
-	int m_scl;
-	bool     m_flipscreen;
-	uint64_t m_z1data;
-
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device_array<dac_byte_interface, 6> m_dac;
+	required_memory_bank m_vrambank;
+	required_ioport_array<2> m_track;
 
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(videoctrl_w);
-	DECLARE_READ8_MEMBER(z1_r);
-	DECLARE_READ8_MEMBER(track_lo_r);
-	DECLARE_READ8_MEMBER(track_hi_r);
-	DECLARE_WRITE8_MEMBER(out_w);
+	// misc
+	uint8_t  m_counter[6];
+	uint8_t  m_cnt_out[6];
+	int m_nmi;
+
+	// input-related
+	uint8_t  m_track_prv[2];
+	int8_t   m_track_cnt[2];
+
+	// video-related
+	uint8_t  m_vram[0x10000];
+	uint8_t  m_hset, m_vset;
+	uint8_t  m_bset;
+	uint8_t  m_scl;
+	bool     m_flipscreen;
+	uint64_t m_z1data;
+
+	void videoctrl1_w(offs_t offset, uint8_t data);
+	void videoctrl2_w(offs_t offset, uint8_t data);
+	uint8_t z1_r(offs_t offset);
+	uint8_t track_dir_r();
+	uint8_t track_val_r();
+	void out_w(uint8_t data);
 	template<uint8_t Which> DECLARE_WRITE_LINE_MEMBER(pit_out_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(laserbas_scanline);
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -137,73 +147,65 @@ TIMER_DEVICE_CALLBACK_MEMBER(  laserbas_state::laserbas_scanline )
 
 MC6845_UPDATE_ROW( laserbas_state::crtc_update_row )
 {
-	int x = 0;
-	int x_max = 0x100;
-	int dx = 1;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
-	if (m_flipscreen)
+	offs_t addr = ((ma & 0x3ff) << 5) | (ra << 7);
+	addr += (m_vset << 7);
+
+	for (int x = 0; x < x_count; x++)
 	{
-		y = 0xdf - y;
-		x = 0xff;
-		x_max = -1;
-		dx = -1;
-	}
+		// draw 8 pixels
+		for (int i = 0; i < 8; i++)
+		{
+			// layer 1 (scrolling)
+			offs_t offset_p1 = (addr + (x << 2) + (i >> 1)) & 0x7fff;
+			uint8_t p1 = (m_vram[0x0000 + offset_p1] >> ((i & 1) * 4)) & 0x0f;
 
-	int pixaddr = y << 8;
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint32_t *b = &bitmap.pix32(y);
+			// layer 2 (fixed)
+			offs_t offset_p2= ((y * 0x80) | (ra << 7)) + (x << 2) + (i >> 1);
+			uint8_t p2 = (m_vram[0x8000 + offset_p2] >> ((i & 1) * 4)) & 0x0f;
 
-	while (x != x_max)
-	{
-		int offset = (pixaddr >> 1) & 0x7fff;
-		int shift = (pixaddr & 1) * 4; // two 4 bit pixels in one byte
-		int p1 = (m_vram[offset] >> shift) & 0xf;
-		int p2 = (m_vram[offset + 0x8000] >> shift) & 0xf; // 0x10000 VRAM, two 4 bit layers 0x8000 bytes each
-		int p;
+			// priority: p2 > p1 > background
+			uint8_t p = p2 ? p2 : p1 ? (p1 + 16) : m_bset;
 
-		if (p2)
-			p = p2;
-		else if (p1)
-			p = p1 + 16;
-		else
-			p = m_bset;
-
-		b[x] = palette[p];
-
-		pixaddr++;
-		x += dx;
+			if (m_flipscreen)
+				bitmap.pix(0xdf - y, 0xff - (x * 8 + i)) = palette[p];
+			else
+				bitmap.pix(y, x * 8 + i) = palette[p];
+		}
 	}
 }
 
-READ8_MEMBER(laserbas_state::vram_r)
+void laserbas_state::videoctrl1_w(offs_t offset, uint8_t data)
 {
-	return m_vram[offset+(m_vrambank?0x8000:0)];
+	data ^= 0xff;
+
+	// 7-------  flip screen
+	// -6------  layer select
+	// --543---  vset (vertical scroll, inc'ed on interrupts - 8 ints/frame?)
+	// -----210  hset (presumably horizontal scroll)
+
+	m_flipscreen = BIT(data, 7);
+	m_vrambank->set_entry(BIT(~data, 6));
+	m_vset = (data >> 3) & 0x07;
+	m_hset = (data >> 0) & 0x07;
 }
 
-WRITE8_MEMBER(laserbas_state::vram_w)
+void laserbas_state::videoctrl2_w(offs_t offset, uint8_t data)
 {
-	m_vram[offset+(m_vrambank?0x8000:0)] = data;
+	data ^= 0xff;
+
+	// 7654----  background pen
+	// ----3---  scl (unknown)
+	// -----21-  not used?
+	// -------0  nmi enable (not on schematics, traced)
+
+	m_bset = (data >> 4) & 0x0f;
+	m_scl = BIT(data, 3);
+	m_nmi = BIT(data, 0);
 }
 
-WRITE8_MEMBER(laserbas_state::videoctrl_w)
-{
-	if (!(offset&1))
-	{
-		m_vrambank = data & 0x40; // layer select
-		m_flipscreen = !(data & 0x80);
-		m_vset = (data>>3)&7; // inc-ed on interrupts ( 8 ints / frame ?)
-		m_hset = data&7;
-	}
-	else
-	{
-		data^=0xff;
-		m_bset = data>>4; // bg pen
-		m_scl = (data&8)>>3; // unknown
-		m_nmi=data&1; // nmi enable (not on schematics, traced)
-	}
-}
-
-READ8_MEMBER(laserbas_state::z1_r)
+uint8_t laserbas_state::z1_r(offs_t offset)
 {
 	m_z1data = (m_z1data >> 10) | (uint64_t(offset & 0x03ff) << 30);
 
@@ -223,75 +225,96 @@ READ8_MEMBER(laserbas_state::z1_r)
 	return (bit7 << 7) | (bit6 << 6) | (bit5 << 5) | (bit4 << 4) | (bit3 << 3) | (bit2 << 2) | (bit1 << 1) | (bit0 << 0);
 }
 
-READ8_MEMBER(laserbas_state::track_lo_r)
+// trackball read twice per frame, direction first then value
+
+uint8_t laserbas_state::track_dir_r()
 {
-	uint8_t dx = ioport("TRACK_X")->read();
-	uint8_t dy = ioport("TRACK_Y")->read();
-	if (dx & 0x10)
-		dx ^= 0xf;
-	if (dy & 0x10)
-		dy ^= 0x0f;
-	int data = (dx & 0x0f) | ((dy & 0x0f) << 4);
-	return data;
+	for (unsigned i = 0; m_track.size() > i; ++i)
+	{
+		uint8_t const track = uint8_t(m_track[i]->read());
+		int diff = track - m_track_prv[i];
+		m_track_prv[i] = track;
+
+		if (diff > 0x20)
+			diff -= 0x40;
+		else if (diff < -0x20)
+			diff += 0x40;
+
+		m_track_cnt[i] += diff;
+	}
+	return ((m_track_cnt[0] < 0) ? 0x01 : 0x00) | ((m_track_cnt[1] > 0) ? 0x02 : 0x00);
 }
 
-READ8_MEMBER(laserbas_state::track_hi_r)
+uint8_t laserbas_state::track_val_r()
 {
-	int data =   ((ioport("TRACK_X")->read() & 0x10) >> 4) | ((ioport("TRACK_Y")->read() & 0x10) >> 3);
-	return data;
+	int8_t const x = std::clamp<int8_t>(m_track_cnt[0], -15, 15);
+	int8_t const y = std::clamp<int8_t>(m_track_cnt[1], -15, 15);
+	m_track_cnt[0] -= x;
+	m_track_cnt[1] -= y;
+
+	return std::abs(x) | (std::abs(y) << 4);
 }
 
-WRITE8_MEMBER(laserbas_state::out_w)
+void laserbas_state::out_w(uint8_t data)
 {
-	/* sound related , maybe also lamps */
+	// sound related , maybe also lamps
 }
 
 void laserbas_state::machine_start()
 {
+	m_vrambank->configure_entries(0, 2, m_vram, 0x8000);
+
+	std::fill(std::begin(m_counter), std::end(m_counter), 0);
+	std::fill(std::begin(m_cnt_out), std::end(m_cnt_out), 0);
+	m_nmi = 0;
+
+	std::fill(std::begin(m_track_prv), std::end(m_track_prv), 0);
+	std::fill(std::begin(m_track_cnt), std::end(m_track_cnt), 0);
+
+	save_item(NAME(m_counter));
+	save_item(NAME(m_cnt_out));
+	save_item(NAME(m_nmi));
+	save_item(NAME(m_track_prv));
+	save_item(NAME(m_track_cnt));
 	save_item(NAME(m_vram));
-	save_item(NAME(m_flipscreen));
-	save_item(NAME(m_vrambank));
 	save_item(NAME(m_hset));
 	save_item(NAME(m_vset));
 	save_item(NAME(m_bset));
 	save_item(NAME(m_scl));
-	save_item(NAME(m_nmi));
-	save_item(NAME(m_dac_data));
-	save_item(NAME(m_counter));
-	save_item(NAME(m_cnt_out));
+	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_z1data));
 }
 
 void laserbas_state::machine_reset()
 {
-	m_vrambank = 0;
-	m_flipscreen = false;
-	m_nmi=0;
-	m_bset = 0;
+	m_vrambank->set_entry(1);
+
 	m_hset = 0;
 	m_vset = 0;
+	m_bset = 0;
 	m_scl = 0;
+	m_flipscreen = 0;
 }
 
 template<uint8_t Which>
 WRITE_LINE_MEMBER(laserbas_state::pit_out_w)
 {
-	state^=1; // 7404  (6G)
-	if((!state)& m_cnt_out[Which]){ // 0->1 rising edge CLK
-		m_counter[Which] = (m_counter[Which]+1)&0x0f; // 4 bit counters 74393
-	}
-	int data =(state) | ((m_counter[Which]&7)<<1); // combine output from 8253 with counter bits 0-3
-	data<<=4;
-	if(m_counter[Which]&8) data^=0x0f; // counter bit 4 xors the data ( 7486 x 6)
-	m_dac[Which]->write(data); // 4 resistor packs :  47k, 100k, 220k, 470k
+	state ^= 1; // 7404  (6G)
+	if (!state && m_cnt_out[Which]) // 0->1 rising edge CLK
+		m_counter[Which] = (m_counter[Which] + 1) & 0x0f; // 4 bit counters 74393
 
-	m_cnt_out[Which]=state;
+	int data = state | ((m_counter[Which] & 7) << 1); // combine output from 8253 with counter bits 0-3
+	if (m_counter[Which] & 8) // counter bit 4 XORs the data (7486 x 6)
+		data ^= 0x0f;
+	m_dac[Which]->write(data); // 4 resistor packs:  47k, 100k, 220k, 470k
+
+	m_cnt_out[Which] = state;
 }
 
 void laserbas_state::laserbas_memory(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0xbfff).rw(FUNC(laserbas_state::vram_r), FUNC(laserbas_state::vram_w));
+	map(0x4000, 0xbfff).bankrw(m_vrambank);
 	map(0xc000, 0xf7ff).rom().nopw();
 	map(0xf800, 0xfbff).r(FUNC(laserbas_state::z1_r)).nopw(); /* protection device */
 	map(0xfc00, 0xffff).ram();
@@ -302,11 +325,12 @@ void laserbas_state::laserbas_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x01, 0x01).w("crtc", FUNC(mc6845_device::register_w));
-	map(0x10, 0x11).w(FUNC(laserbas_state::videoctrl_w));
+	map(0x10, 0x10).w(FUNC(laserbas_state::videoctrl1_w));
+	map(0x11, 0x11).w(FUNC(laserbas_state::videoctrl2_w));
 	map(0x20, 0x20).portr("DSW");
 	map(0x21, 0x21).portr("INPUTS");
-	map(0x22, 0x22).r(FUNC(laserbas_state::track_hi_r));
-	map(0x23, 0x23).r(FUNC(laserbas_state::track_lo_r));
+	map(0x22, 0x22).r(FUNC(laserbas_state::track_dir_r));
+	map(0x23, 0x23).r(FUNC(laserbas_state::track_val_r));
 	map(0x20, 0x23).w(FUNC(laserbas_state::out_w));
 	map(0x40, 0x43).rw("pit0", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x44, 0x47).rw("pit1", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
@@ -359,10 +383,10 @@ static INPUT_PORTS_START( laserbas )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )   // service coin
 
 	PORT_START("TRACK_X")
-	PORT_BIT( 0x01f, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_RESET
+	PORT_BIT( 0x03f, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(20)
 
 	PORT_START("TRACK_Y")
-	PORT_BIT( 0x01f, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_RESET PORT_REVERSE
+	PORT_BIT( 0x03f, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(20)
 INPUT_PORTS_END
 
 #define CLOCK 16680000
@@ -393,7 +417,7 @@ void laserbas_state::laserbas(machine_config &config)
 	pit1.out_handler<2>().set(FUNC(laserbas_state::pit_out_w<5>));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(4000000, 256, 0, 256, 256, 0, 256);   /* temporary, CRTC will configure screen */
+	screen.set_raw(6000000, 360, 0, 256, 274, 0, 224);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	mc6845_device &crtc(MC6845(config, "crtc", 3000000/4)); /* unknown clock, hand tuned to get ~60 fps */
@@ -406,19 +430,8 @@ void laserbas_state::laserbas(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_4BIT_R2R(config, m_dac[0], 0).add_route(ALL_OUTPUTS, "speaker", 0.16);
-	DAC_4BIT_R2R(config, m_dac[1], 0).add_route(ALL_OUTPUTS, "speaker", 0.16);
-	DAC_4BIT_R2R(config, m_dac[2], 0).add_route(ALL_OUTPUTS, "speaker", 0.16);
-	DAC_4BIT_R2R(config, m_dac[3], 0).add_route(ALL_OUTPUTS, "speaker", 0.16);
-	DAC_4BIT_R2R(config, m_dac[4], 0).add_route(ALL_OUTPUTS, "speaker", 0.16);
-	DAC_4BIT_R2R(config, m_dac[5], 0).add_route(ALL_OUTPUTS, "speaker", 0.16);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac3", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac3", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac4", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac4", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac5", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac5", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac6", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac6", -1.0, DAC_VREF_NEG_INPUT);
+	for (auto &dac : m_dac)
+		DAC_4BIT_R2R(config, dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.16);
 }
 
 /*
@@ -490,11 +503,9 @@ ROM_START( laserbasa )
 ROM_END
 
 /*
-It was unclear what type of device FF.9 was. The silkscreen on the PCB said
-2716,
+It was unclear what type of device FF.9 was. The silkscreen on the PCB said 2716,
 but the device is a masked ROM with its identifying marks rubbed off.
-I dumped it
-as a 2716 (FF.9), a 2532 like the others (FF.9A) and a 2732 (FF.9B).
+I dumped it as a 2716 (FF.9), a 2532 like the others (FF.9A) and a 2732 (FF.9B).
 */
 
 ROM_START( futflash )
@@ -508,6 +519,8 @@ ROM_START( futflash )
 	ROM_LOAD( "ff.7",         0xe000, 0x1000, CRC(9d2148d7) SHA1(24954d82a09d9fcfdc61e91b7c824daa5dd701c3) )
 	ROM_LOAD( "ff.8",         0xf000, 0x0800, CRC(623f558f) SHA1(be6c6565df658555f21c43a8c2459cf399794a84) )
 ROM_END
+
+} // anonymous namespace
 
 GAME( 1980, futflash,  0,        laserbas, laserbas, laserbas_state, empty_init, ROT270, "Hoei",                  "Future Flash",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, laserbas,  futflash, laserbas, laserbas, laserbas_state, empty_init, ROT270, "Hoei (Amstar license)", "Laser Base (set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

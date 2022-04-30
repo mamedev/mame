@@ -24,4 +24,4 @@ public:
 	void clear();
 };
 
-#endif
+#endif // MAME_DEBUGGER_WIN_LOGVIEWINFO_H

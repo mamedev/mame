@@ -77,42 +77,42 @@ public:
 	static const char *const SWITCHES_TAG;
 
 private:
-	void machine_reset() override;
-	void machine_start() override;
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER(sel34_w);
-	DECLARE_READ8_MEMBER(sel37_r);
+	void sel34_w(uint8_t data);
+	uint8_t sel37_r();
 
 	DECLARE_WRITE_LINE_MEMBER(cpu_int1_w);
 
-	DECLARE_WRITE8_MEMBER(data_mcu_port1_w);
-	DECLARE_READ8_MEMBER(data_mcu_port1_r);
-	DECLARE_WRITE8_MEMBER(data_mcu_port2_w);
-	DECLARE_READ8_MEMBER(data_mcu_port2_r);
+	void data_mcu_port1_w(uint8_t data);
+	uint8_t data_mcu_port1_r();
+	void data_mcu_port2_w(uint8_t data);
+	uint8_t data_mcu_port2_r();
 
-	DECLARE_WRITE8_MEMBER(ctrl_regs_w);
-	DECLARE_READ8_MEMBER(ctrl_regs_r);
-	DECLARE_WRITE8_MEMBER(ctrl_cpu_port1_w);
-	DECLARE_READ8_MEMBER(ctrl_cpu_port1_r);
-	DECLARE_WRITE8_MEMBER(ctrl_cpu_port3_w);
-	DECLARE_READ8_MEMBER(ctrl_cpu_port3_r);
+	void ctrl_regs_w(offs_t offset, uint8_t data);
+	uint8_t ctrl_regs_r(offs_t offset);
+	void ctrl_cpu_port1_w(uint8_t data);
+	uint8_t ctrl_cpu_port1_r();
+	void ctrl_cpu_port3_w(uint8_t data);
+	uint8_t ctrl_cpu_port3_r();
 
-	DECLARE_WRITE8_MEMBER(ctrl_mcu_port1_w);
-	DECLARE_READ8_MEMBER(ctrl_mcu_port1_r);
-	DECLARE_WRITE8_MEMBER(ctrl_mcu_port2_w);
-	DECLARE_READ8_MEMBER(ctrl_mcu_port2_r);
+	void ctrl_mcu_port1_w(uint8_t data);
+	uint8_t ctrl_mcu_port1_r();
+	void ctrl_mcu_port2_w(uint8_t data);
+	uint8_t ctrl_mcu_port2_r();
 
-	DECLARE_READ8_MEMBER(drive_i8155_pb_r);
-	DECLARE_READ8_MEMBER(drive_i8155_pc_r);
+	uint8_t drive_i8155_pb_r();
+	uint8_t drive_i8155_pc_r();
 
-	DECLARE_WRITE8_MEMBER(drive_i8255_pa_w);
-	DECLARE_WRITE8_MEMBER(drive_i8255_pb_w);
-	DECLARE_READ8_MEMBER(drive_i8255_pc_r);
-	DECLARE_WRITE8_MEMBER(drive_cpu_port1_w);
-	DECLARE_WRITE8_MEMBER(drive_cpu_port3_w);
+	void drive_i8255_pa_w(uint8_t data);
+	void drive_i8255_pb_w(uint8_t data);
+	uint8_t drive_i8255_pc_r();
+	void drive_cpu_port1_w(uint8_t data);
+	void drive_cpu_port3_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(refv_w);
 
@@ -243,25 +243,25 @@ private:
 	required_shared_ptr<uint8_t> m_ctrlram;
 	required_ioport m_switches;
 
-	uint8_t m_sel34;
-	uint8_t m_sel37;
+	uint8_t m_sel34 = 0;
+	uint8_t m_sel37 = 0;
 
-	uint8_t m_int_lines[2];
+	uint8_t m_int_lines[2]{};
 
-	uint8_t m_refv;
+	uint8_t m_refv = 0;
 
-	uint8_t m_ctrl_cpu_p1;
-	uint8_t m_ctrl_cpu_p3;
-	uint8_t m_ctrl_mcu_p1;
-	uint8_t m_ctrl_mcu_p2;
+	uint8_t m_ctrl_cpu_p1 = 0;
+	uint8_t m_ctrl_cpu_p3 = 0;
+	uint8_t m_ctrl_mcu_p1 = 0;
+	uint8_t m_ctrl_mcu_p2 = 0;
 
-	uint8_t m_drive_p1;
-	uint8_t m_drive_pc_bits;
+	uint8_t m_drive_p1 = 0;
+	uint8_t m_drive_pc_bits = 0;
 
-	uint8_t m_drive_rad_mir_dac;
-	uint8_t m_drive_i8255_pb;
-	emu_timer *m_drive_2ppr_timer;
-	uint8_t m_drive_2ppr;
+	uint8_t m_drive_rad_mir_dac = 0;
+	uint8_t m_drive_i8255_pb = 0;
+	emu_timer *m_drive_2ppr_timer = nullptr;
+	uint8_t m_drive_2ppr = 0;
 
 	static const char *const DATARAM_TAG;
 	static const char *const SCSI_TAG;

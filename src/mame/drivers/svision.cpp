@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "includes/svision.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "svision.lh"
@@ -30,7 +30,7 @@ TIMER_CALLBACK_MEMBER(svision_state::svision_pet_timer)
 			{
 				m_pet.input = m_joy2->read();
 			}
-			/* fall through */
+			[[fallthrough]];
 
 		case 0x02: case 0x04: case 0x06: case 0x08:
 		case 0x0a: case 0x0c: case 0x0e:
@@ -52,7 +52,7 @@ TIMER_CALLBACK_MEMBER(svision_state::svision_pet_timer)
 
 TIMER_DEVICE_CALLBACK_MEMBER(svision_state::svision_pet_timer_dev)
 {
-	svision_pet_timer(ptr,param);
+	svision_pet_timer(param);
 }
 
 WRITE_LINE_MEMBER(svision_state::sound_irq_w)
@@ -76,7 +76,7 @@ TIMER_CALLBACK_MEMBER(svision_state::svision_timer)
 	check_irq();
 }
 
-READ8_MEMBER(svision_state::svision_r)
+uint8_t svision_state::svision_r(offs_t offset)
 {
 	int data = m_reg[offset];
 	switch (offset)
@@ -130,7 +130,7 @@ READ8_MEMBER(svision_state::svision_r)
 	return data;
 }
 
-WRITE8_MEMBER(svision_state::svision_w)
+void svision_state::svision_w(offs_t offset, uint8_t data)
 {
 	m_reg[offset] = data;
 
@@ -167,11 +167,11 @@ WRITE8_MEMBER(svision_state::svision_w)
 			break;
 
 		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c:
-			m_sound->sounddma_w(space, offset - 0x18, data);
+			m_sound->sounddma_w(offset - 0x18, data);
 			break;
 
 		case 0x28: case 0x29: case 0x2a:
-			m_sound->noise_w(space, offset - 0x28, data);
+			m_sound->noise_w(offset - 0x28, data);
 			break;
 
 		default:
@@ -180,7 +180,7 @@ WRITE8_MEMBER(svision_state::svision_w)
 	}
 }
 
-READ8_MEMBER(svision_state::tvlink_r)
+uint8_t svision_state::tvlink_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -188,16 +188,16 @@ READ8_MEMBER(svision_state::tvlink_r)
 			if (offset >= 0x800 && offset < 0x840)
 			{
 				/* strange effects when modifying palette */
-				return svision_r(space, offset);
+				return svision_r(offset);
 			}
 			else
 			{
-				return svision_r(space, offset);
+				return svision_r(offset);
 			}
 	}
 }
 
-WRITE8_MEMBER(svision_state::tvlink_w)
+void svision_state::tvlink_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -222,7 +222,7 @@ WRITE8_MEMBER(svision_state::tvlink_w)
 			}
 			break;
 		default:
-			svision_w(space, offset,data);
+			svision_w(offset,data);
 			if (offset >= 0x800 && offset < 0x840)
 			{
 				if (offset == 0x803 && data == 0x07)
@@ -362,7 +362,7 @@ uint32_t svision_state::screen_update_svision(screen_device &screen, bitmap_ind1
 		{
 			const int start_x = 3 - (m_reg[XPOS] & 3);
 			const int end_x = std::min(163, m_reg[XSIZE] | 3);
-			uint16_t *line = &bitmap.pix16(y, start_x);
+			uint16_t *line = &bitmap.pix(y, start_x);
 			for (int x = start_x, i = 0; x < end_x; x+=4, i++)
 			{
 				uint8_t b = m_videoram[j+i];
@@ -394,7 +394,7 @@ uint32_t svision_state::screen_update_tvlink(screen_device &screen, bitmap_rgb32
 		{
 			const int start_x = 3 - (m_reg[XPOS] & 3);
 			const int end_x = std::min(163, m_reg[XSIZE] | 3);
-			uint32_t *line = &bitmap.pix32(y, start_x);
+			uint32_t *line = &bitmap.pix(y, start_x);
 			for (int x = start_x, i = 0; x < end_x; x += 4, i++)
 			{
 				uint8_t b = m_videoram[j + i];
@@ -449,7 +449,7 @@ DEVICE_IMAGE_LOAD_MEMBER( svision_state::cart_load )
 
 	if (size > 0x80000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 		return image_init_result::FAIL;
 	}
 
@@ -527,7 +527,7 @@ void svision_state::svision(machine_config &config)
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(svision_state::frame_int_w));
 
-	PALETTE(config, m_palette, FUNC(svision_state::svision_palette), ARRAY_LENGTH(svision_pens));
+	PALETTE(config, m_palette, FUNC(svision_state::svision_palette), std::size(svision_pens));
 }
 
 void svision_state::svisions(machine_config &config)
@@ -556,7 +556,7 @@ void svision_state::svisionn(machine_config &config)
 void svision_state::tvlinkp(machine_config &config)
 {
 	svisionp(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, address_map_constructor(&std::remove_pointer_t<decltype(this)>::tvlink_mem, tag(), this));
+	m_maincpu->set_addrmap(AS_PROGRAM, &svision_state::tvlink_mem);
 
 	m_screen->set_no_palette();
 	m_screen->set_screen_update(FUNC(svision_state::screen_update_tvlink));

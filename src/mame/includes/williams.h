@@ -11,6 +11,7 @@
 #pragma once
 
 #include "audio/williams.h"
+#include "audio/s11c_bg.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
@@ -50,8 +51,8 @@ public:
 	void init_robotron();
 
 	u8 port_0_49way_r();
-	u8 video_counter_r();
-	virtual DECLARE_WRITE8_MEMBER(watchdog_reset_w);
+	virtual u8 video_counter_r();
+	virtual void watchdog_reset_w(u8 data);
 
 	virtual TIMER_DEVICE_CALLBACK_MEMBER(va11_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(count240_callback);
@@ -92,7 +93,7 @@ protected:
 	virtual void vram_select_w(u8 data);
 	virtual void cmos_w(offs_t offset, u8 data);
 	void sinistar_vram_select_w(u8 data);
-	DECLARE_WRITE8_MEMBER(blitter_w);
+	void blitter_w(address_space &space, offs_t offset, u8 data);
 
 	TIMER_CALLBACK_MEMBER(deferred_snd_cmd_w);
 
@@ -170,7 +171,7 @@ private:
 
 	virtual void main_map(address_map &map) override;
 
-	uint8_t *m_protection;
+	uint8_t *m_protection = nullptr;
 	u8 protection_r(offs_t offset);
 };
 
@@ -265,8 +266,6 @@ public:
 	blaster_state(const machine_config &mconfig, device_type type, const char *tag) :
 		williams_state(mconfig, type, tag),
 		m_soundcpu_b(*this, "soundcpu_b"),
-		m_palette_0(*this, "blaster_pal0"),
-		m_scanline_control(*this, "blaster_scan"),
 		m_bankb(*this, "blaster_bankb"),
 		m_muxa(*this, "mux_a"),
 		m_muxb(*this, "mux_b")
@@ -281,8 +280,6 @@ private:
 	virtual void driver_init() override;
 
 	optional_device<cpu_device> m_soundcpu_b;
-	required_shared_ptr<uint8_t> m_palette_0;
-	required_shared_ptr<uint8_t> m_scanline_control;
 	optional_memory_bank m_bankb;
 	required_device<ls157_x2_device> m_muxa;
 	optional_device<ls157_device> m_muxb;
@@ -314,10 +311,21 @@ public:
 		williams_state(mconfig, type, tag),
 		m_bank8000(*this, "bank8000"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_tileram(*this, "williams2_tile")
+		m_tileram(*this, "williams2_tile"),
+		m_gain(  { 0.25f, 0.25f, 0.25f }),
+		m_offset({ 0.00f, 0.00f, 0.00f })
 	{ }
 
 	void williams2_base(machine_config &config);
+
+	INPUT_CHANGED_MEMBER(rgb_gain)
+	{
+		if (param < 3)
+			m_gain[param] = float(newval) / 100.0f;
+		else
+			m_offset[param - 3] = (float(newval) / 100.0f) - 1.0f;
+		rebuild_palette();
+	}
 
 protected:
 	virtual void machine_start() override;
@@ -328,15 +336,22 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint8_t> m_tileram;
 
-	tilemap_t *m_bg_tilemap;
-	uint16_t m_tilemap_xscroll;
-	uint8_t m_fg_color;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint16_t m_tilemap_xscroll = 0;
+	uint8_t m_fg_color = 0;
+	std::array<float, 3> m_gain;
+	std::array<float, 3> m_offset;
+
+	virtual u8 video_counter_r() override;
 
 	virtual TILE_GET_INFO_MEMBER(get_tile_info);
 	void bank_select_w(u8 data);
-	virtual DECLARE_WRITE8_MEMBER(watchdog_reset_w) override;
+	virtual void watchdog_reset_w(u8 data) override;
 	void segments_w(u8 data);
+
+	rgb_t calc_col(uint16_t lo, uint16_t hi);
 	void paletteram_w(offs_t offset, u8 data);
+	void rebuild_palette();
 	void fg_select_w(u8 data);
 	virtual void bg_select_w(u8 data);
 	void tileram_w(offs_t offset, u8 data);
@@ -400,15 +415,27 @@ class mysticm_state : public williams_d000_ram_state
 public:
 	mysticm_state(const machine_config &mconfig, device_type type, const char *tag) :
 		williams_d000_ram_state(mconfig, type, tag)
-	{ }
+	{
+		// overwrite defaults for mysticm
+		m_gain =   {   0.8f, 0.73f,  0.81f };
+		m_offset = { -0.27f, 0.00f, -0.22f };
+	}
 
 	void mysticm(machine_config &config);
+
+protected:
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
 private:
 	virtual void driver_init() override;
 
 	virtual TILE_GET_INFO_MEMBER(get_tile_info) override;
 	virtual void bg_select_w(u8 data) override;
+
+	int color_decode(uint8_t base_col, int sig_J1, int y);
+
+	uint8_t m_bg_color = 0;
+
 };
 
 class tshoot_state : public williams_d000_rom_state
@@ -449,7 +476,7 @@ public:
 	joust2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		williams_d000_rom_state(mconfig, type, tag),
 		m_mux(*this, "mux"),
-		m_cvsd_sound(*this, "cvsd")
+		m_bg(*this, "bg")
 	{ }
 
 	void joust2(machine_config &config);
@@ -459,15 +486,15 @@ private:
 	virtual void driver_init() override;
 
 	required_device<ls157_device> m_mux;
-	required_device<williams_cvsd_sound_device> m_cvsd_sound;
-	uint16_t m_current_sound_data;
+	required_device<s11_obg_device> m_bg;
+	uint16_t m_current_sound_data = 0;
 
 	virtual TILE_GET_INFO_MEMBER(get_tile_info) override;
 	virtual void bg_select_w(u8 data) override;
 
 	TIMER_CALLBACK_MEMBER(deferred_snd_cmd_w);
 	void snd_cmd_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(pia_3_cb1_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_s11_bg_strobe_w);
 };
 
 /*----------- defined in video/williams.cpp -----------*/

@@ -56,7 +56,7 @@ Notes:
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "video/ramdac.h"
 #include "emupal.h"
 #include "screen.h"
@@ -84,27 +84,27 @@ public:
 	void dunhuang(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(pos_x_w);
-	DECLARE_WRITE8_MEMBER(pos_y_w);
-	DECLARE_WRITE8_MEMBER(tile_w);
-	DECLARE_WRITE8_MEMBER(tile2_w);
-	DECLARE_WRITE8_MEMBER(clear_y_w);
-	DECLARE_WRITE8_MEMBER(horiz_clear_w);
-	DECLARE_WRITE8_MEMBER(vert_clear_w);
-	DECLARE_WRITE8_MEMBER(block_dest_w);
-	DECLARE_WRITE8_MEMBER(block_x_w);
-	DECLARE_WRITE8_MEMBER(block_y_w);
-	DECLARE_WRITE8_MEMBER(block_w_w);
-	DECLARE_WRITE8_MEMBER(block_c_w);
-	DECLARE_WRITE8_MEMBER(block_addr_lo_w);
-	DECLARE_WRITE8_MEMBER(block_addr_hi_w);
-	DECLARE_WRITE8_MEMBER(block_h_w);
-	DECLARE_WRITE8_MEMBER(layers_w);
-	DECLARE_WRITE8_MEMBER(input_w);
-	DECLARE_READ8_MEMBER(service_r);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(rombank_w);
-	DECLARE_READ8_MEMBER(dsw_r);
+	void pos_x_w(uint8_t data);
+	void pos_y_w(uint8_t data);
+	void tile_w(offs_t offset, uint8_t data);
+	void tile2_w(offs_t offset, uint8_t data);
+	void clear_y_w(uint8_t data);
+	void horiz_clear_w(uint8_t data);
+	void vert_clear_w(uint8_t data);
+	void block_dest_w(uint8_t data);
+	void block_x_w(uint8_t data);
+	void block_y_w(uint8_t data);
+	void block_w_w(uint8_t data);
+	void block_c_w(uint8_t data);
+	void block_addr_lo_w(uint8_t data);
+	void block_addr_hi_w(uint8_t data);
+	void block_h_w(uint8_t data);
+	void layers_w(uint8_t data);
+	void input_w(uint8_t data);
+	uint8_t service_r();
+	uint8_t input_r();
+	void rombank_w(uint8_t data);
+	uint8_t dsw_r();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void dunhuang_io_map(address_map &map);
@@ -166,13 +166,13 @@ TILE_GET_INFO_MEMBER(dunhuang_state::get_tile_info)
 {
 	uint16_t code = m_videoram[tile_index];
 	uint8_t color = m_colorram[tile_index] & 0x0f;
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 TILE_GET_INFO_MEMBER(dunhuang_state::get_tile_info2)
 {
 	uint16_t code = m_videoram2[tile_index];
 	uint8_t color = m_colorram2[tile_index] & 0x0f;
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	tileinfo.set(1, code, color, 0);
 }
 
 void dunhuang_state::video_start()
@@ -226,21 +226,21 @@ if (machine().input().code_pressed(KEYCODE_Z))
 
 // Tilemaps access
 
-WRITE8_MEMBER(dunhuang_state::pos_x_w)
+void dunhuang_state::pos_x_w(uint8_t data)
 {
 	m_pos_x = data & 0x3f;
 	m_written = 0;
 	m_written2 = 0;
 }
 
-WRITE8_MEMBER(dunhuang_state::pos_y_w)
+void dunhuang_state::pos_y_w(uint8_t data)
 {
 	m_pos_y = data;
 	m_written = 0;
 	m_written2 = 0;
 }
 
-WRITE8_MEMBER(dunhuang_state::tile_w)
+void dunhuang_state::tile_w(offs_t offset, uint8_t data)
 {
 	int addr;
 
@@ -266,7 +266,7 @@ WRITE8_MEMBER(dunhuang_state::tile_w)
 	m_tmap->mark_tile_dirty(addr);
 }
 
-WRITE8_MEMBER(dunhuang_state::tile2_w)
+void dunhuang_state::tile2_w(offs_t offset, uint8_t data)
 {
 	int addr;
 
@@ -294,11 +294,11 @@ WRITE8_MEMBER(dunhuang_state::tile2_w)
 
 // Clear a row of tiles (videoram)
 
-WRITE8_MEMBER(dunhuang_state::clear_y_w)
+void dunhuang_state::clear_y_w(uint8_t data)
 {
 	m_clear_y = data;
 }
-WRITE8_MEMBER(dunhuang_state::horiz_clear_w)
+void dunhuang_state::horiz_clear_w(uint8_t data)
 {
 	int i;
 //  logerror("%06x: horiz clear, y = %02x, data = %02d\n", m_maincpu->pc(), m_clear_y,data);
@@ -314,7 +314,7 @@ WRITE8_MEMBER(dunhuang_state::horiz_clear_w)
 
 // Clear a column of tiles (videoram2)
 
-WRITE8_MEMBER(dunhuang_state::vert_clear_w)
+void dunhuang_state::vert_clear_w(uint8_t data)
 {
 	int i;
 //  logerror("%06x: vert clear, x = %02x, y = %02x, data = %02x\n", m_maincpu->pc(), m_pos_x,m_pos_y,data);
@@ -334,43 +334,43 @@ WRITE8_MEMBER(dunhuang_state::vert_clear_w)
 // The tiles codes are read from the graphics roms too!
 //
 
-WRITE8_MEMBER(dunhuang_state::block_dest_w)
+void dunhuang_state::block_dest_w(uint8_t data)
 {
 	m_block_dest = data;
 }
 
-WRITE8_MEMBER(dunhuang_state::block_x_w)
+void dunhuang_state::block_x_w(uint8_t data)
 {
 	m_block_x = data;
 }
 
-WRITE8_MEMBER(dunhuang_state::block_y_w)
+void dunhuang_state::block_y_w(uint8_t data)
 {
 	m_block_y = data;
 }
 
-WRITE8_MEMBER(dunhuang_state::block_w_w)
+void dunhuang_state::block_w_w(uint8_t data)
 {
 	m_block_w = data;
 }
 
-WRITE8_MEMBER(dunhuang_state::block_c_w)
+void dunhuang_state::block_c_w(uint8_t data)
 {
 	m_block_c = data;
 }
 
-WRITE8_MEMBER(dunhuang_state::block_addr_lo_w)
+void dunhuang_state::block_addr_lo_w(uint8_t data)
 {
 	m_block_addr_lo = data;
 }
 
-WRITE8_MEMBER(dunhuang_state::block_addr_hi_w)
+void dunhuang_state::block_addr_hi_w(uint8_t data)
 {
 	m_block_addr_hi = data;
 }
 
 
-WRITE8_MEMBER(dunhuang_state::block_h_w)
+void dunhuang_state::block_h_w(uint8_t data)
 {
 	int i,j, addr;
 	uint8_t *tile_addr;
@@ -420,7 +420,7 @@ WRITE8_MEMBER(dunhuang_state::block_h_w)
 
 // Layers control (not understood)
 
-WRITE8_MEMBER(dunhuang_state::layers_w)
+void dunhuang_state::layers_w(uint8_t data)
 {
 //  popmessage("layers %02x",data);
 	m_layers = data;
@@ -439,12 +439,12 @@ void dunhuang_state::dunhuang_map(address_map &map)
 
 // Inputs
 
-WRITE8_MEMBER(dunhuang_state::input_w)
+void dunhuang_state::input_w(uint8_t data)
 {
 	m_input = data;
 }
 
-READ8_MEMBER(dunhuang_state::service_r)
+uint8_t dunhuang_state::service_r()
 {
 	return m_service->read()
 		| ((m_hopper && !(m_screen->frame_number() % 10)) ? 0x00 : 0x08)    // bit 3: hopper sensor
@@ -452,7 +452,7 @@ READ8_MEMBER(dunhuang_state::service_r)
 	;
 }
 
-READ8_MEMBER(dunhuang_state::dsw_r)
+uint8_t dunhuang_state::dsw_r()
 {
 	if (!(m_input & 0x01))  return m_dsw[0]->read();
 	if (!(m_input & 0x02))  return m_dsw[1]->read();
@@ -462,7 +462,7 @@ READ8_MEMBER(dunhuang_state::dsw_r)
 	logerror("%s: warning, unknown dsw bits read, input = %02x\n", machine().describe_context(), m_input);
 	return 0xff;
 }
-READ8_MEMBER(dunhuang_state::input_r)
+uint8_t dunhuang_state::input_r()
 {
 	if (!(m_input & 0x01))  return m_inputs[0]->read();
 	if (!(m_input & 0x02))  return m_inputs[1]->read();
@@ -473,7 +473,7 @@ READ8_MEMBER(dunhuang_state::input_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(dunhuang_state::rombank_w)
+void dunhuang_state::rombank_w(uint8_t data)
 {
 	// ?                data & 0x01
 	// ?                data & 0x02
@@ -511,8 +511,8 @@ void dunhuang_state::dunhuang_io_map(address_map &map)
 
 	map(0x001b, 0x001b).w(FUNC(dunhuang_state::block_dest_w));
 
-	map(0x0081, 0x0081).w("ymsnd", FUNC(ym2413_device::register_port_w));
-	map(0x0089, 0x0089).w("ymsnd", FUNC(ym2413_device::data_port_w));
+	map(0x0081, 0x0081).w("ymsnd", FUNC(ym2413_device::address_w));
+	map(0x0089, 0x0089).w("ymsnd", FUNC(ym2413_device::data_w));
 
 	map(0x0082, 0x0082).w("oki", FUNC(okim6295_device::write));
 
@@ -856,7 +856,7 @@ ROM_START( dunhuang )
 	ROM_LOAD( "rom3.u4", 0x00000, 0x80000, CRC(1ff5d35e) SHA1(b808eb4f81be8fc77a58dadd661a9cc2b376a509) )
 	ROM_LOAD( "rom2.u5", 0x80000, 0x40000, CRC(384fa1d3) SHA1(f329db17aacacf1768ebd6ca2cc612503db93fac) )
 
-	ROM_REGION( 0xc0000, "gfx2", 0 )    // do not dispose
+	ROM_REGION( 0xc0000, "gfx2", 0 )
 	ROM_LOAD( "rom4.u3", 0x00000, 0x40000, CRC(7db45227) SHA1(2a12a2b8a1e58946ce3e7c770b3ca4803c3c3ccd) )
 	ROM_LOAD( "rom5.u2", 0x40000, 0x80000, CRC(d609880e) SHA1(3d69800e959e8f24ef950fea4312610c4407f6ba) )
 

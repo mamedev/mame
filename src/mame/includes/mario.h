@@ -104,37 +104,37 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 
 	/* sound state */
-	uint8_t   m_last;
-	uint8_t   m_portT;
-	const char *m_eabank;
+	uint8_t   m_last = 0;
+	uint8_t   m_portT = 0;
+	const char *m_eabank = nullptr;
 
 	/* video state */
-	uint8_t   m_gfx_bank;
-	uint8_t   m_palette_bank;
-	uint16_t  m_gfx_scroll;
-	uint8_t   m_flip;
-	tilemap_t *m_bg_tilemap;
+	uint8_t   m_gfx_bank = 0;
+	uint8_t   m_palette_bank = 0;
+	uint16_t  m_gfx_scroll = 0;
+	uint8_t   m_flip = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
 	int m_monitor;
 
-	bool      m_nmi_mask;
+	bool      m_nmi_mask = false;
 	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
-	DECLARE_WRITE8_MEMBER(mario_videoram_w);
+	void mario_videoram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(gfx_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(palette_bank_w);
-	DECLARE_WRITE8_MEMBER(mario_scroll_w);
+	void mario_scroll_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flip_w);
-	DECLARE_READ8_MEMBER(mario_sh_p1_r);
-	DECLARE_READ8_MEMBER(mario_sh_p2_r);
+	uint8_t mario_sh_p1_r();
+	uint8_t mario_sh_p2_r();
 	DECLARE_READ_LINE_MEMBER(mario_sh_t0_r);
 	DECLARE_READ_LINE_MEMBER(mario_sh_t1_r);
-	DECLARE_READ8_MEMBER(mario_sh_tune_r);
-	DECLARE_WRITE8_MEMBER(mario_sh_p1_w);
-	DECLARE_WRITE8_MEMBER(mario_sh_p2_w);
-	DECLARE_WRITE8_MEMBER(masao_sh_irqtrigger_w);
-	DECLARE_WRITE8_MEMBER(mario_sh_tuneselect_w);
-	DECLARE_WRITE8_MEMBER(mario_sh3_w);
+	uint8_t mario_sh_tune_r(offs_t offset);
+	void mario_sh_p1_w(uint8_t data);
+	void mario_sh_p2_w(uint8_t data);
+	void masao_sh_irqtrigger_w(uint8_t data);
+	void mario_sh_tuneselect_w(uint8_t data);
+	void mario_sh3_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	virtual void sound_start() override;
@@ -142,11 +142,11 @@ private:
 	void mario_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	DECLARE_WRITE8_MEMBER(mario_sh_sound_w);
-	DECLARE_WRITE8_MEMBER(mario_sh1_w);
-	DECLARE_WRITE8_MEMBER(mario_sh2_w);
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
+	void mario_sh_sound_w(uint8_t data);
+	void mario_sh1_w(uint8_t data);
+	void mario_sh2_w(uint8_t data);
+	uint8_t memory_read_byte(offs_t offset);
+	void memory_write_byte(offs_t offset, uint8_t data);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void set_ea(int ea);
 	void mario_io_map(address_map &map);

@@ -68,9 +68,9 @@ public:
 	auto dma_out_cb() { return m_write_dma_out.bind(); }
 	auto efx_cb() { return m_write_efx.bind(); }
 
-	DECLARE_WRITE8_MEMBER( dma_w );
-	DECLARE_WRITE_LINE_MEMBER( disp_on_w );
-	DECLARE_WRITE_LINE_MEMBER( disp_off_w );
+	void dma_w(uint8_t data);
+	void disp_on_w(int state);
+	void disp_off_w(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -81,7 +81,7 @@ protected:
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	enum

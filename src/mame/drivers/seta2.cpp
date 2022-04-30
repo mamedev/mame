@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Luca Elia
+// copyright-holders:Luca Elia, David Haywood
 /***************************************************************************
 
                           -= Newer Seta Hardware =-
@@ -10,7 +10,7 @@
 CPU    :    TMP68301*
             or ColdFire + H8/3007 + PIC12C508 (for EVA2 & EVA3 PCBs)
 
-Video  :    DX-101
+Video  :    DX-101 or X1-020 (for P0-113A & P0-121A PCBs, compatible?)
             DX-102 x3
 
 Sound  :    X1-010
@@ -51,10 +51,14 @@ TODO:
 
 - Proper emulation of the TMP68301 CPU, in a core file.
 - Proper emulation of the ColdFire CPU, in a core file.
-- Flip screen / Zooming support.
+- improvements to Flip screen / Zooming support. (Flip Screen is often done with 'negative zoom value')
 - Fix some graphics imperfections (e.g. color depth selection, "tilemap" sprites) [all done? - NS]
 - I added a kludge involving a -0x10 yoffset, this fixes the lifeline in myangel.
   I didn't find a better way to do it without breaking pzlbowl's title screen.
+- Background color is not verified
+
+gundamex:
+- slowdowns, music tempo is incorrect
 
 mj4simai:
 - test mode doesn't work correctly, the grid is ok but when you press a key to go to the
@@ -74,20 +78,6 @@ myangel2:
 - before each level, the background image is shown with completely wrong colors. It
   corrects itself when the level starts.
 
-grdians:
-- the map screen after the character selection needs zooming. There is a global
-  zoom register that should affect the background map and the level picture but
-  not the frontmost frame. This latter should use color 7ff (the last one) and
-  ignore the individual color codes in the tiles data. Note: the frontmost frame
-  has the shadow bit set, and has become invisible after implementing it.
-
-penbros/ablast:
-- Zooming is used briefly (between scenes, stage exit, stage introduction)
-
-deerhunt,wschamp:
-- offset tilemap sprite during demo. In deerhunt intro, the hunter should zoom
-  in to the deer. In wschamp intro the GPS unit should zoom to the high scores.
-
 wschampb:
 - dumps of the program ROMs matched the hand written checksum for each chip, but
   the boot screen reports NG for both ROMs. - Is this correct and a bug from the
@@ -97,9 +87,6 @@ wschampb:
 funcube series:
 - Hacked to run, as they use a ColdFire CPU.
 - Pay-out key causes "unknown error" after coin count reaches 0.
-
-reelquak:
-- Needs an x offset for tilemap sprites.
 
 ***************************************************************************/
 
@@ -148,7 +135,7 @@ void seta2_state::machine_start()
 	m_lamps.resolve();
 }
 
-WRITE8_MEMBER(seta2_state::sound_bank_w)
+void seta2_state::sound_bank_w(offs_t offset, uint8_t data)
 {
 	m_x1_bank[offset & 7]->set_entry(data);
 }
@@ -170,7 +157,7 @@ void seta2_state::x1_map(address_map &map)
                                 Guardians
 ***************************************************************************/
 
-WRITE8_MEMBER(seta2_state::grdians_lockout_w)
+void seta2_state::grdians_lockout_w(uint8_t data)
 {
 	// initially 0, then either $25 (coin 1) or $2a (coin 2)
 	machine().bookkeeping().coin_counter_w(0,data & 0x01);   // or 0x04
@@ -202,12 +189,12 @@ void seta2_state::grdians_map(address_map &map)
                         Mobile Suit Gundam EX Revue
 ***************************************************************************/
 
-READ16_MEMBER(seta2_state::gundamex_eeprom_r)
+uint16_t seta2_state::gundamex_eeprom_r()
 {
 	return ((m_eeprom->do_read() & 1)) << 3;
 }
 
-WRITE16_MEMBER(seta2_state::gundamex_eeprom_w)
+void seta2_state::gundamex_eeprom_w(uint16_t data)
 {
 	m_eeprom->clk_write((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
 	m_eeprom->di_write(data & 0x1);
@@ -247,7 +234,7 @@ void mj4simai_state::machine_start()
 	save_item(NAME(m_keyboard_row));
 }
 
-READ16_MEMBER(seta2_state::mj4simai_p1_r)
+uint16_t seta2_state::mj4simai_p1_r()
 {
 	switch (m_keyboard_row)
 	{
@@ -260,7 +247,7 @@ READ16_MEMBER(seta2_state::mj4simai_p1_r)
 	}
 }
 
-READ16_MEMBER(seta2_state::mj4simai_p2_r)
+uint16_t seta2_state::mj4simai_p2_r()
 {
 	switch (m_keyboard_row)
 	{
@@ -345,18 +332,18 @@ void seta2_state::myangel2_map(address_map &map)
 
 /*  The game checks for a specific value read from the ROM region.
     The offset to use is stored in RAM at address 0x20BA16 */
-READ16_MEMBER(seta2_state::pzlbowl_protection_r)
+uint16_t seta2_state::pzlbowl_protection_r(address_space &space)
 {
 	uint32_t address = (space.read_word(0x20ba16) << 16) | space.read_word(0x20ba18);
 	return memregion("maincpu")->base()[address - 2];
 }
 
-READ8_MEMBER(seta2_state::pzlbowl_coins_r)
+uint8_t seta2_state::pzlbowl_coins_r()
 {
 	return ioport("SYSTEM")->read() | (machine().rand() & 0x80 );
 }
 
-WRITE8_MEMBER(seta2_state::pzlbowl_coin_counter_w)
+void seta2_state::pzlbowl_coin_counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0,data & 0x10);
 	machine().bookkeeping().coin_counter_w(1,data & 0x20);
@@ -425,7 +412,7 @@ void seta2_state::ablastb_map(address_map &map)
                               Reel'N Quake
 ***************************************************************************/
 
-WRITE16_MEMBER(seta2_state::reelquak_leds_w)
+void seta2_state::reelquak_leds_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -447,7 +434,7 @@ WRITE16_MEMBER(seta2_state::reelquak_leds_w)
 //  popmessage("LED %04X", data);
 }
 
-WRITE8_MEMBER(seta2_state::reelquak_coin_w)
+void seta2_state::reelquak_coin_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);  // coin in
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);  // coin in
@@ -496,7 +483,7 @@ void seta2_state::namcostr_map(address_map &map)
                             Sammy Outdoor Shooting
 ***************************************************************************/
 
-WRITE8_MEMBER(seta2_state::samshoot_coin_w)
+void seta2_state::samshoot_coin_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x10);
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);
@@ -545,7 +532,7 @@ void staraudi_state::staraudi_debug_outputs()
 //  popmessage("L1: %04X L2: %04X CAM: %04X", m_lamps1, m_lamps2, m_cam);
 }
 
-WRITE8_MEMBER(staraudi_state::lamps1_w)
+void staraudi_state::lamps1_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_lamps1);
 	m_leds[0] = BIT(data, 0);  // Lamp 1 |
@@ -555,7 +542,7 @@ WRITE8_MEMBER(staraudi_state::lamps1_w)
 	staraudi_debug_outputs();
 }
 
-WRITE8_MEMBER(staraudi_state::lamps2_w)
+void staraudi_state::lamps2_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_lamps2);
 	//                        data & 0x20 );  // ? Always On
@@ -564,7 +551,7 @@ WRITE8_MEMBER(staraudi_state::lamps2_w)
 	staraudi_debug_outputs();
 }
 
-WRITE8_MEMBER(staraudi_state::camera_w)
+void staraudi_state::camera_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_cam);
 	//                        data & 0x01 );  // ? Always On
@@ -579,12 +566,12 @@ WRITE8_MEMBER(staraudi_state::camera_w)
 #define TILE0 (0x7c000)
 #define TILERAM(offset) ((uint16_t*)(memregion("sprites")->base() + TILE0 * 8*8 + (offset * 2 / 0x20000) * 2 + ((offset * 2) % 0x20000) / 2 * 8))
 
-READ16_MEMBER(staraudi_state::tileram_r)
+uint16_t staraudi_state::tileram_r(offs_t offset)
 {
 	return *TILERAM(offset);
 }
 
-WRITE16_MEMBER(staraudi_state::tileram_w)
+void staraudi_state::tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(TILERAM(offset));
 	int tile = TILE0 + ((offset * 2) % 0x20000) / (8*2);
@@ -631,7 +618,7 @@ void staraudi_state::staraudi_map(address_map &map)
                             TelePachi Fever Lion
 ***************************************************************************/
 
-WRITE8_MEMBER(seta2_state::telpacfl_lamp1_w)
+void seta2_state::telpacfl_lamp1_w(uint8_t data)
 {
 	for (int i = 0; i <= 7; i++)
 		m_lamps[i] = BIT(data, i);
@@ -639,7 +626,7 @@ WRITE8_MEMBER(seta2_state::telpacfl_lamp1_w)
 //  popmessage("LAMP1 %04X", data);
 }
 
-WRITE8_MEMBER(seta2_state::telpacfl_lamp2_w)
+void seta2_state::telpacfl_lamp2_w(uint8_t data)
 {
 	m_lamps[8] = BIT(data, 0); // on/off lamp (throughout)
 	m_lamps[9] = BIT(data, 1); // bet lamp
@@ -651,7 +638,7 @@ WRITE8_MEMBER(seta2_state::telpacfl_lamp2_w)
 //  popmessage("LAMP2 %04X", data);
 }
 
-WRITE8_MEMBER(seta2_state::telpacfl_lockout_w)
+void seta2_state::telpacfl_lockout_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(1,  data & 0x02); // 100yen in
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x04); // coin blocker
@@ -703,7 +690,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void tra_complete() override;
 	virtual void tra_callback() override;
@@ -768,7 +755,7 @@ void funcube_touchscreen_device::device_reset()
 	m_tx_cb(1);
 }
 
-void funcube_touchscreen_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void funcube_touchscreen_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if(!id) {
 		uint8_t button_state = m_btn->read();
@@ -799,13 +786,13 @@ void funcube_touchscreen_device::tra_callback()
 // Bus conversion functions:
 
 // RAM shared with the sub CPU
-READ32_MEMBER(funcube_state::nvram_r)
+uint32_t funcube_state::nvram_r(offs_t offset)
 {
 	uint16_t val = m_nvram[offset];
 	return ((val & 0xff00) << 8) | (val & 0x00ff);
 }
 
-WRITE32_MEMBER(funcube_state::nvram_w)
+void funcube_state::nvram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -820,7 +807,7 @@ WRITE32_MEMBER(funcube_state::nvram_w)
 // Main CPU
 
 
-READ32_MEMBER(funcube_state::debug_r)
+uint32_t funcube_state::debug_r()
 {
 	uint32_t ret = ioport("DEBUG")->read();
 
@@ -842,9 +829,9 @@ void funcube_state::funcube_map(address_map &map)
 	map(0x00500001, 0x00500001).rw(m_oki, FUNC(okim9810_device::read_status), FUNC(okim9810_device::write_command));
 	map(0x00500003, 0x00500003).w(m_oki, FUNC(okim9810_device::write_tmp_register));
 
-	map(0x00800000, 0x0083ffff).rw(FUNC(funcube_state::spriteram_r), FUNC(funcube_state::spriteram_w)).share("spriteram");
+	map(0x00800000, 0x0083ffff).rw(FUNC(funcube_state::spriteram_r), FUNC(funcube_state::spriteram_w));
 	map(0x00840000, 0x0084ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");  // Palette
-	map(0x00860000, 0x0086003f).ram().w(FUNC(funcube_state::vregs_w)).share("vregs");
+	map(0x00860000, 0x0086003f).rw(FUNC(funcube_state::vregs_r), FUNC(funcube_state::vregs_w));
 
 	map(0x00c00000, 0x00c002ff).rw(FUNC(funcube_state::nvram_r), FUNC(funcube_state::nvram_w));
 
@@ -863,9 +850,9 @@ void funcube_state::funcube2_map(address_map &map)
 	map(0x00600001, 0x00600001).rw(m_oki, FUNC(okim9810_device::read_status), FUNC(okim9810_device::write_command));
 	map(0x00600003, 0x00600003).w(m_oki, FUNC(okim9810_device::write_tmp_register));
 
-	map(0x00800000, 0x0083ffff).rw(FUNC(funcube_state::spriteram_r), FUNC(funcube_state::spriteram_w)).share("spriteram");
+	map(0x00800000, 0x0083ffff).rw(FUNC(funcube_state::spriteram_r), FUNC(funcube_state::spriteram_w));
 	map(0x00840000, 0x0084ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
-	map(0x00860000, 0x0086003f).ram().w(FUNC(funcube_state::vregs_w)).share("vregs");
+	map(0x00860000, 0x0086003f).rw(FUNC(funcube_state::vregs_r), FUNC(funcube_state::vregs_w));
 
 	map(0x00c00000, 0x00c002ff).rw(FUNC(funcube_state::nvram_r), FUNC(funcube_state::nvram_w));
 
@@ -888,7 +875,7 @@ void funcube_state::funcube_sub_map(address_map &map)
 
 #define FUNCUBE_SUB_CPU_CLOCK (XTAL(14'745'600))
 
-READ16_MEMBER(funcube_state::coins_r)
+uint16_t funcube_state::coins_r()
 {
 	uint8_t ret = ioport("SWITCH")->read();
 	uint8_t coin_bit0 = 1;    // active low
@@ -925,7 +912,7 @@ void funcube_state::funcube_debug_outputs()
 #endif
 }
 
-WRITE16_MEMBER(funcube_state::leds_w)
+void funcube_state::leds_w(uint16_t data)
 {
 	*m_funcube_leds = data;
 
@@ -941,13 +928,13 @@ WRITE16_MEMBER(funcube_state::leds_w)
 	funcube_debug_outputs();
 }
 
-READ16_MEMBER(funcube_state::outputs_r)
+uint16_t funcube_state::outputs_r()
 {
 	// Bits 1,2,3 read
 	return *m_outputs;
 }
 
-WRITE16_MEMBER(funcube_state::outputs_w)
+void funcube_state::outputs_w(uint16_t data)
 {
 	*m_outputs = data;
 
@@ -964,7 +951,7 @@ WRITE16_MEMBER(funcube_state::outputs_w)
 	funcube_debug_outputs();
 }
 
-READ16_MEMBER(funcube_state::battery_r)
+uint16_t funcube_state::battery_r()
 {
 	return ioport("BATTERY")->read() ? 0x40 : 0x00;
 }
@@ -1118,9 +1105,9 @@ static INPUT_PORTS_START( grdians )
 	PORT_DIPSETTING(      0x0003, DEF_STR( Normal )  )  // 1
 	PORT_DIPSETTING(      0x0001, DEF_STR( Hard )    )  // 2
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )  // 3
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(      0x0004, "300000" )
+	PORT_DIPSETTING(      0x0000, "500000" )
 	PORT_DIPNAME( 0x0008, 0x0008, "Title" ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0008, "Guardians" )
 	PORT_DIPSETTING(      0x0000, "Denjin Makai II" )
@@ -1771,9 +1758,9 @@ static INPUT_PORTS_START( reelquak )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE   )                    // collect
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP   )                    // double up
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH   ) PORT_NAME("Big")   // big
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_BET     )                    // bet
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_GAMBLE_BET    )                    // bet
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_GAMBLE_LOW    ) PORT_NAME("Small") // small
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL   )                    // start
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START1        )                    // start
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 
 	PORT_START("TICKET")    // $400003.b
@@ -2298,7 +2285,7 @@ INTERRUPT_GEN_MEMBER(seta2_state::samshoot_interrupt)
 
 void seta2_state::seta2(machine_config &config)
 {
-	TMP68301(config, m_maincpu, XTAL(50'000'000)/3);   // !! TMP68301 !!
+	TMP68301(config, m_maincpu, XTAL(50'000'000)/3);   // Verified on some PCBs
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::mj4simai_map);
 	m_maincpu->set_vblank_int("screen", FUNC(seta2_state::seta2_interrupt));
 
@@ -2321,16 +2308,30 @@ void seta2_state::seta2(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	x1_010_device &x1snd(X1_010(config, "x1snd", XTAL(50'000'000)/3));   // clock?
+	x1_010_device &x1snd(X1_010(config, "x1snd", XTAL(50'000'000)/3));   // Verified on some PCBs
 	x1snd.add_route(ALL_OUTPUTS, "mono", 1.0);
 	x1snd.set_addrmap(0, &seta2_state::x1_map);
+}
+
+
+/*
+    P0-113A PCB has different sound/cpu input clock (32.53047MHz / 2, common input clock is 50MHz / 3)
+    and/or some PCB variant has uses this input clock?
+    reference:
+    https://youtu.be/6f-znVzcrmg, https://youtu.be/zJi_d463UQE (gundamex)
+    https://youtu.be/Ung9XeLisV0 (grdiansa)
+*/
+void seta2_state::seta2_32m(machine_config &config)
+{
+	m_maincpu->set_clock(XTAL(32'530'470)/2);
+	subdevice<x1_010_device>("x1snd")->set_clock(XTAL(32'530'470)/2);
 }
 
 
 void seta2_state::gundamex(machine_config &config)
 {
 	seta2(config);
-	m_maincpu->set_clock(XTAL(32'530'470)/2); // verified
+	seta2_32m(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::gundamex_map);
 
 	downcast<tmp68301_device &>(*m_maincpu).in_parallel_callback().set(FUNC(seta2_state::gundamex_eeprom_r));
@@ -2340,21 +2341,24 @@ void seta2_state::gundamex(machine_config &config)
 
 	// video hardware
 	m_screen->set_visarea(0x00, 0x180-1, 0x000, 0x0e0-1);
-
-	subdevice<x1_010_device>("x1snd")->set_clock(XTAL(32'530'470)/2); // verified; reference : https://youtu.be/6f-znVzcrmg
 }
 
-
+// run in P-FG01-1 PCB, uses common input clock for sound/cpu - 32.53047MHz XTAL not populated
+// reference: https://youtu.be/qj-TyKyAAVY
 void seta2_state::grdians(machine_config &config)
 {
 	seta2(config);
-	m_maincpu->set_clock(XTAL(32'530'470)/2); // verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::grdians_map);
 
 	// video hardware
 	m_screen->set_visarea(0x00, 0x130-1, 0x00, 0xe8 -1);
+}
 
-	subdevice<x1_010_device>("x1snd")->set_clock(XTAL(32'530'470)/2); // verified; reference : https://youtu.be/Ung9XeLisV0
+// run in P0-113A PCB, different sound/cpu input clock compared to P-FG01-1 PCB, same as gundamex?
+void seta2_state::grdiansa(machine_config &config)
+{
+	grdians(config);
+	seta2_32m(config);
 }
 
 
@@ -2439,7 +2443,7 @@ void staraudi_state::staraudi(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &staraudi_state::staraudi_map);
 
 	SHARP_LH28F016S_16BIT(config, "flash");
-	UPD4992(config, m_rtc);
+	UPD4992(config, m_rtc, 32'768);
 
 	// video hardware
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));  // not accurate
@@ -2504,7 +2508,7 @@ void funcube_state::funcube(machine_config &config)
 	m_sub->set_addrmap(AS_PROGRAM, &funcube_state::funcube_sub_map);
 	m_sub->set_addrmap(AS_IO, &funcube_state::funcube_sub_io);
 
-	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0);
+	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0, m_maincpu);
 
 	FUNCUBE_TOUCHSCREEN(config, "touchscreen", 200).tx_cb().set(":sub:sci1", FUNC(h8_sci_device::rx_w));
 
@@ -3408,8 +3412,8 @@ PCB Number: P0-142A
 Ram M1 are NEC D43001GU-70LL
 Ram M2 are LGS GM76C8128ALLFW70
 
-KUP-U06-I03 U06 Program rom ST27C4001 (even)
-KUP-U07-I03 U07 Program rom ST27C4001 (odd)
+KUP U06 I03 U06 Program rom ST27C4001 (even)
+KUP U07 I03 U07 Program rom ST27C4001 (odd)
 
 KUS-U18-I00 U18 Mask rom (Samples 23C32000 32Mbit)
 
@@ -3422,17 +3426,17 @@ KUC-U41-I00 U41 Mask rom (Graphics 23C32000 32Mbit)
 
 ROM_START( pzlbowl )
 	ROM_REGION( 0x100000, "maincpu", 0 )    // TMP68301 Code
-	ROM_LOAD16_BYTE( "kup-u06.i03", 0x000000, 0x080000, CRC(314e03ac) SHA1(999398e55161dd75570d418f4c9899e3bf311cc8) )
-	ROM_LOAD16_BYTE( "kup-u07.i03", 0x000001, 0x080000, CRC(a0423a04) SHA1(9539023c5c2f2bf72ee3fb6105443ffd3d61e2f8) )
+	ROM_LOAD16_BYTE( "kup_u06_i03.u6", 0x000000, 0x080000, CRC(314e03ac) SHA1(999398e55161dd75570d418f4c9899e3bf311cc8) )
+	ROM_LOAD16_BYTE( "kup_u07_i03.u7", 0x000001, 0x080000, CRC(a0423a04) SHA1(9539023c5c2f2bf72ee3fb6105443ffd3d61e2f8) )
 
 	ROM_REGION( 0x1000000, "sprites", 0 )   // Sprites
-	ROM_LOAD64_WORD( "kuc-u38.i00", 0x000000, 0x400000, CRC(3db24172) SHA1(89c39963e15c53b799994185d0c8b2e795478939) )
-	ROM_LOAD64_WORD( "kuc-u39.i00", 0x000002, 0x400000, CRC(9b26619b) SHA1(ea7a0bf46641d15353217b01e761d1a148bee4e7) )
-	ROM_LOAD64_WORD( "kuc-u40.i00", 0x000004, 0x400000, CRC(7e49a2cf) SHA1(d24683addbc54515c33fb620ac500e6702bd9e17) )
-	ROM_LOAD64_WORD( "kuc-u41.i00", 0x000006, 0x400000, CRC(2febf19b) SHA1(8081ac590c0463529777b5e4817305a1a6f6ea41) )
+	ROM_LOAD64_WORD( "kuc-u38-i00.u38", 0x000000, 0x400000, CRC(3db24172) SHA1(89c39963e15c53b799994185d0c8b2e795478939) )
+	ROM_LOAD64_WORD( "kuc-u39-i00.u39", 0x000002, 0x400000, CRC(9b26619b) SHA1(ea7a0bf46641d15353217b01e761d1a148bee4e7) )
+	ROM_LOAD64_WORD( "kuc-u40-i00.u40", 0x000004, 0x400000, CRC(7e49a2cf) SHA1(d24683addbc54515c33fb620ac500e6702bd9e17) )
+	ROM_LOAD64_WORD( "kuc-u41-i00.u41", 0x000006, 0x400000, CRC(2febf19b) SHA1(8081ac590c0463529777b5e4817305a1a6f6ea41) )
 
 	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
-	ROM_LOAD( "kus-u18.i00", 0x000000, 0x400000, CRC(e2b1dfcf) SHA1(fb0b8be119531a1a27efa46ed7b86b05a37ed585) )
+	ROM_LOAD( "kus-u18-i00.u18", 0x000000, 0x400000, CRC(e2b1dfcf) SHA1(fb0b8be119531a1a27efa46ed7b86b05a37ed585) )
 ROM_END
 
 /***************************************************************************
@@ -3737,7 +3741,25 @@ Note:
 
 ***************************************************************************/
 
-ROM_START( endrichs )
+ROM_START( endrichs ) // Memory Test doesn't show version like the set below
+	ROM_REGION( 0x100000, "maincpu", 0 )    // TMP68301 Code
+	ROM_LOAD16_BYTE( "endless_riches_u2_prg_even_v1.21_9-1-99.u2", 0x00000, 0x80000, CRC(bae6456c) SHA1(edbf4dc01095b9882243acf2bc8aecab8d9a1414) ) // handwritten label:  Endless Riches U2 PRG EVEN V1.21 9/1/99
+	ROM_LOAD16_BYTE( "endless_riches_u3_prg_odd_v1.21_9-1-99.u3",  0x00001, 0x80000, CRC(2b0529d6) SHA1(b85fc5d598081bc96ecdecb5663de698c4b95e27) ) // handwritten label:  Endless Riches U3 PRG ODD V1.21 9/1/99
+
+	ROM_REGION( 0x800000, "sprites", 0 )    // Sprites
+	ROM_LOAD64_WORD( "kfc-u16-c00.u16", 0x000000, 0x200000, CRC(cbfe5e0f) SHA1(6c7c8088c43231997ac47ce05cf43c78c1fdad47) )
+	ROM_LOAD64_WORD( "kfc-u15-c00.u15", 0x000002, 0x200000, CRC(98e4c36c) SHA1(651be122b78f225d38878ae90776f66989440590) )
+	ROM_LOAD64_WORD( "kfc-u18-c00.u18", 0x000004, 0x200000, CRC(561ac136) SHA1(96da493157405a5d3d72b8cc3004abd3fa3eadfa) )
+	ROM_LOAD64_WORD( "kfc-u17-c00.u17", 0x000006, 0x200000, CRC(34660029) SHA1(cf09b97422497d739f71e6ff8b9974fca0329928) )
+
+	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "kfs-u32-c00.u32", 0x000000, 0x200000, CRC(e9ffbecf) SHA1(3cc9ab3f4be1a305235603a68ca1e15797fb27cb) )
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "gal16v8_kf-001.u38", 0x000, 0x117, NO_DUMP )
+ROM_END
+
+ROM_START( endrichsa )
 	ROM_REGION( 0x100000, "maincpu", 0 )    // TMP68301 Code
 	ROM_LOAD16_BYTE( "kfp_u02_c12.u2", 0x00000, 0x80000, CRC(462341d2) SHA1(a88215d74469513f4239853f62d4dbbffe2aa83a) )
 	ROM_LOAD16_BYTE( "kfp_u03_c12.u3", 0x00001, 0x80000, CRC(2baee8d1) SHA1(f86920382c54a259adb1dee253859561746d215a) )
@@ -4400,20 +4422,33 @@ ROM_START( telpacfl )
 ROM_END
 
 GAME( 1994, gundamex,  0,        gundamex, gundamex, seta2_state,    empty_init,    ROT0,   "Banpresto",             "Mobile Suit Gundam EX Revue",                         0 )
+
 GAME( 1995, grdians,   0,        grdians,  grdians,  seta2_state,    empty_init,    ROT0,   "Winkysoft (Banpresto license)", "Guardians / Denjin Makai II (P-FG01-1 PCB)",  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, grdiansa,  grdians,  grdians,  grdians,  seta2_state,    empty_init,    ROT0,   "Winkysoft (Banpresto license)", "Guardians / Denjin Makai II (P0-113A PCB)",   MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, grdiansa,  grdians,  grdiansa, grdians,  seta2_state,    empty_init,    ROT0,   "Winkysoft (Banpresto license)", "Guardians / Denjin Makai II (P0-113A PCB)",   MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+
 GAME( 1996, mj4simai,  0,        seta2,    mj4simai, mj4simai_state, empty_init,    ROT0,   "Maboroshi Ware",        "Wakakusamonogatari Mahjong Yonshimai (Japan)",        MACHINE_NO_COCKTAIL )
+
 GAME( 1996, myangel,   0,        myangel,  myangel,  seta2_state,    empty_init,    ROT0,   "MOSS / Namco",          "Kosodate Quiz My Angel (Japan)",                      MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+
 GAME( 1997, myangel2,  0,        myangel2, myangel2, seta2_state,    empty_init,    ROT0,   "MOSS / Namco",          "Kosodate Quiz My Angel 2 (Japan)",                    MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+
 GAME( 1996, telpacfl,  0,        telpacfl, telpacfl, seta2_state,    empty_init,    ROT270, "Sunsoft",               "TelePachi Fever Lion (V1.0)",                         MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+
 GAME( 1997, reelquak,  0,        reelquak, reelquak, seta2_state,    empty_init,    ROT0,   "<unknown>",             "Reel'N Quake! (Version 1.05)",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 199?, endrichs,  0,        reelquak, endrichs, seta2_state,    empty_init,    ROT0,   "E.N.Tiger",             "Endless Riches (Ver 1.20)",                           MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, staraudi,  0,        staraudi, staraudi, staraudi_state, empty_init,    ROT0,   "Namco",                 "Star Audition",                                       MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+GAME( 1999, endrichs,  0,        reelquak, endrichs, seta2_state,    empty_init,    ROT0,   "E.N.Tiger",             "Endless Riches (Ver 1.21)",                           MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, endrichsa, endrichs, reelquak, endrichs, seta2_state,    empty_init,    ROT0,   "E.N.Tiger",             "Endless Riches (Ver 1.20)",                           MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+
+GAME( 1997, staraudi,  0,        staraudi, staraudi, staraudi_state, empty_init,    ROT0,   "Namco",                 "Star Audition",                                       MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // needs flipscreen hooking up properly with new code to function at all
+
 GAME( 1999, pzlbowl,   0,        pzlbowl,  pzlbowl,  seta2_state,    empty_init,    ROT0,   "MOSS / Nihon System",   "Puzzle De Bowling (Japan)",                           MACHINE_NO_COCKTAIL )
+
 GAME( 2000, penbros,   0,        penbros,  penbros,  seta2_state,    empty_init,    ROT0,   "Subsino",               "Penguin Brothers (Japan)",                            MACHINE_NO_COCKTAIL )
 GAME( 2000, ablast,    penbros,  penbros,  penbros,  seta2_state,    empty_init,    ROT0,   "Subsino",               "Hong Tian Lei (A-Blast) (Japan)",                     MACHINE_NO_COCKTAIL ) // 轟天雷/Hōng tiān léi
 GAME( 2000, ablastb,   penbros,  ablastb,  penbros,  seta2_state,    empty_init,    ROT0,   "bootleg",               "Hong Tian Lei (A-Blast) (bootleg)",                   MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND  ) // at least "tilemap sprite" scrolly flag differs, FPGA instead of x1-010
+
 GAME( 2000, namcostr,  0,        namcostr, funcube,  seta2_state,    init_namcostr, ROT0,   "Namco",                 "Namco Stars",                                         MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING )
+
 GAME( 2000, deerhunt,  0,        samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.3",                               MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2000, deerhunta, deerhunt, samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.2",                               MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2000, deerhuntb, deerhunt, samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.0",                               MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
@@ -4421,14 +4456,22 @@ GAME( 2000, deerhuntc, deerhunt, samshoot, deerhunt, seta2_state,    empty_init,
 GAME( 2000, deerhuntd, deerhunt, samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V2",                                 MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2000, deerhunte, deerhunt, samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V1",                                 MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2000, deerhuntj, deerhunt, samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.4.1 (Japan)",                     MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+
 GAME( 2001, turkhunt,  0,        samshoot, turkhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Turkey Hunting USA V1.00",                            MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+
 GAME( 2001, wschamp,   0,        samshoot, wschamp,  seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Wing Shooting Championship V2.00",                    MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2001, wschampa,  wschamp,  samshoot, wschamp,  seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Wing Shooting Championship V1.01",                    MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2001, wschampb,  wschamp,  samshoot, wschamp,  seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Wing Shooting Championship V1.00",                    MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+
 GAME( 2002, trophyh,   0,        samshoot, trophyh,  seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Trophy Hunting - Bear & Moose V1.00",                 MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2002, trophyht,  trophyh,  samshoot, trophyht, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Trophy Hunting - Bear & Moose V1.00 (location test)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+
 GAME( 2000, funcube,   0,        funcube,  funcube,  funcube_state,  init_funcube,  ROT0,   "Namco",                 "Funcube (v1.5)",                                      MACHINE_NO_COCKTAIL )
+
 GAME( 2001, funcube2,  0,        funcube2, funcube,  funcube_state,  init_funcube2, ROT0,   "Namco",                 "Funcube 2 (v1.1)",                                    MACHINE_NO_COCKTAIL )
+
 GAME( 2001, funcube3,  0,        funcube3, funcube,  funcube_state,  init_funcube3, ROT0,   "Namco",                 "Funcube 3 (v1.1)",                                    MACHINE_NO_COCKTAIL )
+
 GAME( 2001, funcube4,  0,        funcube2, funcube,  funcube_state,  init_funcube2, ROT0,   "Namco",                 "Funcube 4 (v1.0)",                                    MACHINE_NO_COCKTAIL )
+
 GAME( 2002, funcube5,  0,        funcube2, funcube,  funcube_state,  init_funcube2, ROT0,   "Namco",                 "Funcube 5 (v1.0)",                                    MACHINE_NO_COCKTAIL )

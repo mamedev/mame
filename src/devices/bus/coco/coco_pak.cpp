@@ -55,14 +55,14 @@ DEFINE_DEVICE_TYPE(COCO_PAK, coco_pak_device, "cocopak", "CoCo Program PAK")
 //-------------------------------------------------
 //  coco_pak_device - constructor
 //-------------------------------------------------
-coco_pak_device::coco_pak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+coco_pak_device::coco_pak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_cococart_interface(mconfig, *this)
 	, m_cart(nullptr), m_eprom(*this, CARTSLOT_TAG), m_autostart(*this, CART_AUTOSTART_TAG)
 {
 }
 
-coco_pak_device::coco_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+coco_pak_device::coco_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: coco_pak_device(mconfig, COCO_PAK, tag, owner, clock)
 {
 }
@@ -99,7 +99,7 @@ const tiny_rom_entry *coco_pak_device::device_rom_region() const
 //  get_cart_size
 //-------------------------------------------------
 
-uint32_t coco_pak_device::get_cart_size()
+u32 coco_pak_device::get_cart_size()
 {
 	return 0x8000;
 }
@@ -125,7 +125,7 @@ void coco_pak_device::device_reset()
     get_cart_base
 -------------------------------------------------*/
 
-uint8_t* coco_pak_device::get_cart_base()
+u8 *coco_pak_device::get_cart_base()
 {
 	return m_eprom->base();
 }
@@ -134,7 +134,7 @@ uint8_t* coco_pak_device::get_cart_base()
     get_cart_memregion
 -------------------------------------------------*/
 
-memory_region* coco_pak_device::get_cart_memregion()
+memory_region *coco_pak_device::get_cart_memregion()
 {
 	return m_eprom;
 }
@@ -143,7 +143,7 @@ memory_region* coco_pak_device::get_cart_memregion()
 //  cts_read
 //-------------------------------------------------
 
-READ8_MEMBER(coco_pak_device::cts_read)
+u8 coco_pak_device::cts_read(offs_t offset)
 {
 	if (offset < m_eprom->bytes())
 		return m_eprom->base()[offset];
@@ -171,12 +171,12 @@ DEFINE_DEVICE_TYPE(COCO_PAK_BANKED, coco_pak_banked_device, "cocopak_banked", "C
 //  coco_pak_device - constructor
 //-------------------------------------------------
 
-coco_pak_banked_device::coco_pak_banked_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+coco_pak_banked_device::coco_pak_banked_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: coco_pak_device(mconfig, type, tag, owner, clock)
 	, m_pos(0)
 {
 }
-coco_pak_banked_device::coco_pak_banked_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+coco_pak_banked_device::coco_pak_banked_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: coco_pak_banked_device(mconfig, COCO_PAK_BANKED, tag, owner, clock)
 {
 }
@@ -216,7 +216,7 @@ void coco_pak_banked_device::device_reset()
 //  get_cart_base
 //-------------------------------------------------
 
-uint8_t *coco_pak_banked_device::get_cart_base()
+u8 *coco_pak_banked_device::get_cart_base()
 {
 	return m_eprom->base() + (m_pos * 0x4000) % m_eprom->bytes();
 }
@@ -225,7 +225,7 @@ uint8_t *coco_pak_banked_device::get_cart_base()
 //  get_cart_size
 //-------------------------------------------------
 
-uint32_t coco_pak_banked_device::get_cart_size()
+u32 coco_pak_banked_device::get_cart_size()
 {
 	return 0x4000;
 }
@@ -234,7 +234,7 @@ uint32_t coco_pak_banked_device::get_cart_size()
 //  cts_read
 //-------------------------------------------------
 
-READ8_MEMBER(coco_pak_banked_device::cts_read)
+u8 coco_pak_banked_device::cts_read(offs_t offset)
 {
 	return m_eprom->base()[(m_pos * 0x4000) % m_eprom->bytes() | offset];
 }
@@ -243,7 +243,7 @@ READ8_MEMBER(coco_pak_banked_device::cts_read)
 //  scs_write
 //-------------------------------------------------
 
-WRITE8_MEMBER(coco_pak_banked_device::scs_write)
+void coco_pak_banked_device::scs_write(offs_t offset, u8 data)
 {
 	switch(offset)
 	{

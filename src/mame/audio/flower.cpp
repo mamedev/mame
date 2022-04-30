@@ -9,6 +9,8 @@
     TODO:
     - several unknown registers (effects and unknown register tied to repeat port);
     - repeat certainly needs a cutoff, which is unknown about how it works;
+    - keyon/off behavior is not verified
+    - PCM output is incorrect/unverified
 
 ***************************************************************************/
 
@@ -42,16 +44,15 @@ void flower_sound_device::regs_map(address_map &map)
 //  flower_sound_device - constructor
 //-------------------------------------------------
 
-flower_sound_device::flower_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+flower_sound_device::flower_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, FLOWER_CUSTOM, tag, owner, clock),
 	  device_sound_interface(mconfig, *this),
 	  device_memory_interface(mconfig, *this),
 	  m_io_space_config("io", ENDIANNESS_LITTLE, 8, 7, 0, address_map_constructor(FUNC(flower_sound_device::regs_map), this)),
 	  m_stream(nullptr),
-	  m_mixer_table(nullptr),
 	  m_mixer_lookup(nullptr),
-	  m_mixer_buffer(nullptr),
-	  m_last_channel(nullptr)
+	  m_sample_rom(*this, "samples"),
+	  m_volume_rom(*this, "soundvol")
 {
 }
 
@@ -63,30 +64,23 @@ flower_sound_device::flower_sound_device(const machine_config &mconfig, const ch
 void flower_sound_device::device_start()
 {
 	m_iospace = &space(AS_IO);
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock()/2);
+	m_stream = stream_alloc(0, 1, clock()/2);
 
-	m_mixer_buffer = make_unique_clear<short[]>(clock()/2);
+	m_mixer_buffer.resize(clock()/50);
 	make_mixer_table(MAX_VOICES, defgain);
 
-	m_last_channel = m_channel_list + MAX_VOICES;
+	save_item(STRUCT_MEMBER(m_channel_list, start_nibbles));
+	save_item(STRUCT_MEMBER(m_channel_list, raw_frequency));
+	save_item(STRUCT_MEMBER(m_channel_list, start_address));
+	save_item(STRUCT_MEMBER(m_channel_list, position));
+	save_item(STRUCT_MEMBER(m_channel_list, frequency));
+	save_item(STRUCT_MEMBER(m_channel_list, volume));
+	save_item(STRUCT_MEMBER(m_channel_list, volume_bank));
+	//save_item(STRUCT_MEMBER(m_channel_list, effect));
+	save_item(STRUCT_MEMBER(m_channel_list, enable));
+	save_item(STRUCT_MEMBER(m_channel_list, repeat));
 
-	m_sample_rom = machine().root_device().memregion("samples")->base();
-	m_volume_rom = machine().root_device().memregion("soundvol")->base();
-
-	for (int i = 0; i < MAX_VOICES; i++)
-	{
-		save_item(NAME(m_channel_list[i].start_address), i);
-		save_item(NAME(m_channel_list[i].position), i);
-		save_item(NAME(m_channel_list[i].frequency), i);
-		save_item(NAME(m_channel_list[i].volume), i);
-		save_item(NAME(m_channel_list[i].volume_bank), i);
-		save_item(NAME(m_channel_list[i].effect), i);
-		save_item(NAME(m_channel_list[i].enable), i);
-		save_item(NAME(m_channel_list[i].repeat), i);
-
-		// assign a channel number (debugger aid)
-		m_channel_list[i].channel_number = i;
-	}
+	save_item(NAME(m_io_regs));
 }
 
 
@@ -94,10 +88,10 @@ void flower_sound_device::device_start()
 void flower_sound_device::make_mixer_table(int voices, int gain)
 {
 	/* allocate memory */
-	m_mixer_table = make_unique_clear<int16_t[]>(256 * voices);
+	m_mixer_table.resize(256 * voices);
 
 	/* find the middle of the table */
-	m_mixer_lookup = m_mixer_table.get() + (128 * voices);
+	m_mixer_lookup = &m_mixer_table[128 * voices];
 
 	/* fill in the table - 16 bit case */
 	for (int i = 0; i < voices * 128; i++)
@@ -117,66 +111,70 @@ void flower_sound_device::make_mixer_table(int voices, int gain)
 
 void flower_sound_device::device_reset()
 {
-	for (fl_sound_channel *voice = m_channel_list; voice < m_last_channel; voice++)
+	for (auto &voice : m_channel_list)
 	{
-		voice->start_address = 0;
-		voice->position = 0;
-		voice->volume = 0;
-		voice->enable = false;
-		voice->repeat = false;
+		voice.start_address = 0;
+		voice.position = 0;
+		voice.volume = 0;
+		voice.enable = false;
+		voice.repeat = false;
 	}
 }
 
-void flower_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void flower_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *buffer = outputs[0];
+	auto &buffer = outputs[0];
 	short *mix;
-	uint8_t raw_sample;
+	u8 raw_sample;
 
-	memset(m_mixer_buffer.get(), 0, samples * sizeof(short));
+	std::fill_n(&m_mixer_buffer[0], buffer.samples(), 0);
 
-	for (fl_sound_channel *voice = m_channel_list; voice < m_last_channel; voice++)
+	for (auto &voice : m_channel_list)
 	{
-		int ch_volume = voice->volume;
-		int ch_frequency = voice->frequency;
+		int ch_volume = voice.volume;
+		int ch_frequency = voice.frequency;
 
-		if (voice->enable == false)
+		if (!voice.enable)
 			continue;
 
-		mix = m_mixer_buffer.get();
+		mix = &m_mixer_buffer[0];
 
-		for (int i = 0; i < samples; i++)
+		for (int i = 0; i < buffer.samples(); i++)
 		{
-			if (voice->repeat == true)
+			// Volume LUT ROM address bit:
+			// Bit 0-7: Sample ROM data
+			// Bit 8-11: Channel Volume
+			// Bit 12: Sample Position bit 6 (Sample nibble select bit for 4 bit data)
+			// Bit 13: Volume LUT bank select? (4 bit/8 bit data mode or wavetable/PCM?)
+			const u16 volume_index = (((ch_volume | voice.volume_bank) & 0x2f) << 8) | (BIT(voice.position, 6) << 12);
+			if (voice.repeat)
 			{
-				raw_sample = m_sample_rom[((voice->start_address >> 7) & 0x7e00) | ((voice->position >> 7) & 0x1ff)];
-				// guess: cut off after a number of repetitions
-				if ((voice->position >> 7) & 0x20000)
+				raw_sample = m_sample_rom[((voice.start_address >> 7) & 0x7e00) | ((voice.position >> 7) & 0x1ff)];
+				// guess: key on/off bit is lowest bit of volume bank register?
+				if ((voice.volume_bank & 0x10) != 0x10)
 				{
-					voice->enable = false;
+					voice.enable = false;
 					break;
 				}
 			}
 			else
 			{
-				raw_sample = m_sample_rom[((voice->start_address + voice->position) >> 7) & 0x7fff];
+				raw_sample = m_sample_rom[((voice.start_address + voice.position) >> 7) & 0x7fff];
 				if (raw_sample == 0xff)
 				{
-					voice->enable = false;
+					voice.enable = false;
 					break;
 				}
 			}
-			ch_volume |= voice->volume_bank;
-
-			*mix++ += m_volume_rom[(ch_volume << 8 | raw_sample) & 0x3fff] - 0x80;
-			voice->position += ch_frequency;
+			*mix++ += m_volume_rom[(volume_index | raw_sample) & 0x3fff] - 0x80;
+			voice.position += ch_frequency;
 		}
 	}
 
 	/* mix it down */
-	mix = m_mixer_buffer.get();
-	for (int i = 0; i < samples; i++)
-		*buffer++ = m_mixer_lookup[*mix++];
+	mix = &m_mixer_buffer[0];
+	for (int i = 0; i < buffer.samples(); i++)
+		buffer.put_int(i, m_mixer_lookup[*mix++], 32768);
 }
 
 //-------------------------------------------------
@@ -195,80 +193,83 @@ device_memory_interface::space_config_vector flower_sound_device::memory_space_c
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-WRITE8_MEMBER( flower_sound_device::lower_write )
+void flower_sound_device::lower_write(offs_t offset, u8 data)
 {
 	m_stream->update();
+	m_io_regs[offset] = data;
 	m_iospace->write_byte(offset,data);
 }
 
-WRITE8_MEMBER( flower_sound_device::upper_write )
+void flower_sound_device::upper_write(offs_t offset, u8 data)
 {
 	m_stream->update();
+	m_io_regs[offset|0x40] = data;
 	m_iospace->write_byte(offset|0x40,data);
 }
 
-WRITE8_MEMBER( flower_sound_device::frequency_w )
+void flower_sound_device::frequency_w(offs_t offset, u8 data)
 {
-	uint8_t ch = (offset >> 3) & 0x7;
-	fl_sound_channel *voice;
+	u8 ch = (offset >> 3) & 0x7;
+	fl_sound_channel &voice = m_channel_list[ch];
 
-	voice = &m_channel_list[ch];
+	// Low nibbles: part of frequency
+	// High nibbles: unknown
+	voice.raw_frequency[offset & 3] = data;
 
-	voice->raw_frequency[offset & 3] = data & 0xf;
-
-	voice->frequency = voice->raw_frequency[2] << 12;
-	voice->frequency|= voice->raw_frequency[3] << 8;
-	voice->frequency|= voice->raw_frequency[0] << 4;
-	voice->frequency|= voice->raw_frequency[1] << 0;
+	voice.frequency = (voice.raw_frequency[2] & 0xf) << 12;
+	voice.frequency|= (voice.raw_frequency[3] & 0xf) << 8;
+	voice.frequency|= (voice.raw_frequency[0] & 0xf) << 4;
+	voice.frequency|= (voice.raw_frequency[1] & 0xf) << 0;
 }
 
-WRITE8_MEMBER( flower_sound_device::repeat_w )
+void flower_sound_device::repeat_w(offs_t offset, u8 data)
 {
-	uint8_t ch = (offset >> 3) & 0x7;
-	fl_sound_channel *voice;
+	u8 ch = (offset >> 3) & 0x7;
+	fl_sound_channel &voice = m_channel_list[ch];
 
-	voice = &m_channel_list[ch];
-	voice->repeat = BIT(data,4);
+	voice.repeat = BIT(data, 4); // Bit 4: Repeat flag?
 }
 
-WRITE8_MEMBER( flower_sound_device::unk_w )
+void flower_sound_device::unk_w(offs_t offset, u8 data)
 {
 	// same as above?
 }
 
-WRITE8_MEMBER( flower_sound_device::volume_w )
+void flower_sound_device::volume_w(offs_t offset, u8 data)
 {
-	uint8_t ch = (offset >> 3) & 0x7;
-	fl_sound_channel *voice;
+	u8 ch = (offset >> 3) & 0x7;
+	fl_sound_channel &voice = m_channel_list[ch];
 
-	voice = &m_channel_list[ch];
-	voice->volume = data >> 4;
+	// Low nibbles: unknown
+	// High nibbles: volume
+	voice.volume = data >> 4;
 }
 
-WRITE8_MEMBER( flower_sound_device::start_address_w )
+void flower_sound_device::start_address_w(offs_t offset, u8 data)
 {
-	uint8_t ch = (offset >> 3) & 0x7;
-	fl_sound_channel *voice;
+	u8 ch = (offset >> 3) & 0x7;
+	fl_sound_channel &voice = m_channel_list[ch];
 
-	voice = &m_channel_list[ch];
-	voice->start_nibbles[offset & 7] = data & 0xf;
+	// Low nibbles: part of start address
+	// High nibbles: unknown
+	voice.start_nibbles[offset & 7] = data;
+	/*
 	if ((offset & 7) == 4)
-		voice->effect = data >> 4;
+	    voice.effect = data >> 4;
+	*/
 }
 
-WRITE8_MEMBER( flower_sound_device::sample_trigger_w )
+void flower_sound_device::sample_trigger_w(offs_t offset, u8 data)
 {
-	uint8_t ch = (offset >> 3) & 0x7;
-	fl_sound_channel *voice;
+	u8 ch = (offset >> 3) & 0x7;
+	fl_sound_channel &voice = m_channel_list[ch];
 
-	voice = &m_channel_list[ch];
-
-	voice->enable = true;
-	voice->volume_bank = (data & 3) << 4;
-	voice->start_address = 0;
-	voice->position = 0;
+	voice.enable = true; // BIT(data, 0);
+	voice.volume_bank = (data & 3) << 4; // Bit 0: Keyon/off?, Bit 1: PCM/Wavetable mode select?
+	voice.start_address = 0;
+	voice.position = 0;
 	for (int i = 5; i >= 0; i--)
 	{
-		voice->start_address = (voice->start_address << 4) | voice->start_nibbles[i];
+		voice.start_address = (voice.start_address << 4) | (voice.start_nibbles[i] & 0xf);
 	}
 }

@@ -1993,13 +1993,13 @@ const struct upd7810_device::opcode_s upd7810_device::s_opXX_7810[256] =
 	{&upd7810_device::ADINC_A_xx,    2, 7, 7,L0|L1}, /* 26: 0010 0110 xxxx xxxx                      */
 	{&upd7810_device::GTI_A_xx,      2, 7, 7,L0|L1}, /* 27: 0010 0111 xxxx xxxx                      */
 	{&upd7810_device::illegal,       1, 4, 4,L0|L1}, /* 28:                                          */
-	{&upd7810_device::LDAX_B,        2, 7, 7,L0|L1}, /* 29: 0010 1001 dddd dddd                      */
-	{&upd7810_device::LDAX_D,        2, 7, 7,L0|L1}, /* 2a: 0010 1010 dddd dddd                      */
-	{&upd7810_device::LDAX_H,        2, 7, 7,L0|L1}, /* 2b: 0010 1011 dddd dddd                      */
-	{&upd7810_device::LDAX_Dp,       2, 7, 7,L0|L1}, /* 2c: 0010 1100 dddd dddd                      */
-	{&upd7810_device::LDAX_Hp,       2, 7, 7,L0|L1}, /* 2d: 0010 1101 dddd dddd                      */
-	{&upd7810_device::LDAX_Dm,       2, 7, 7,L0|L1}, /* 2e: 0010 1110 dddd dddd                      */
-	{&upd7810_device::LDAX_Hm,       2, 7, 7,L0|L1}, /* 2f: 0010 1111 dddd dddd                      */
+	{&upd7810_device::LDAX_B,        1, 7, 7,L0|L1}, /* 29: 0010 1001                                */
+	{&upd7810_device::LDAX_D,        1, 7, 7,L0|L1}, /* 2a: 0010 1010                                */
+	{&upd7810_device::LDAX_H,        1, 7, 7,L0|L1}, /* 2b: 0010 1011                                */
+	{&upd7810_device::LDAX_Dp,       1, 7, 7,L0|L1}, /* 2c: 0010 1100                                */
+	{&upd7810_device::LDAX_Hp,       1, 7, 7,L0|L1}, /* 2d: 0010 1101                                */
+	{&upd7810_device::LDAX_Dm,       1, 7, 7,L0|L1}, /* 2e: 0010 1110                                */
+	{&upd7810_device::LDAX_Hm,       1, 7, 7,L0|L1}, /* 2f: 0010 1111                                */
 
 	{&upd7810_device::DCRW_wa,       2,16,16,L0|L1}, /* 30: 0011 0000 oooo oooo                      */
 	{&upd7810_device::BLOCK,         1,13,13,L0|L1}, /* 31: 0011 0001                                */  /* 7810 */
@@ -2010,13 +2010,13 @@ const struct upd7810_device::opcode_s upd7810_device::s_opXX_7810[256] =
 	{&upd7810_device::SUINB_A_xx,    2, 7, 7,L0|L1}, /* 36: 0011 0110 xxxx xxxx                      */
 	{&upd7810_device::LTI_A_xx,      2, 7, 7,L0|L1}, /* 37: 0011 0111 xxxx xxxx                      */
 	{&upd7810_device::illegal,       1, 4, 4,L0|L1}, /* 38:                                          */
-	{&upd7810_device::STAX_B,        2, 7, 7,L0|L1}, /* 39: 0011 1001 dddd dddd                      */
-	{&upd7810_device::STAX_D,        2, 7, 7,L0|L1}, /* 3a: 0011 1010 dddd dddd                      */
-	{&upd7810_device::STAX_H,        2, 7, 7,L0|L1}, /* 3b: 0011 1011 dddd dddd                      */
-	{&upd7810_device::STAX_Dp,       2, 7, 7,L0|L1}, /* 3c: 0011 1100 dddd dddd                      */
-	{&upd7810_device::STAX_Hp,       2, 7, 7,L0|L1}, /* 3d: 0011 1101 dddd dddd                      */
-	{&upd7810_device::STAX_Dm,       2, 7, 7,L0|L1}, /* 3e: 0011 1110 dddd dddd                      */
-	{&upd7810_device::STAX_Hm,       2, 7, 7,L0|L1}, /* 3f: 0011 1111 dddd dddd                      */
+	{&upd7810_device::STAX_B,        1, 7, 7,L0|L1}, /* 39: 0011 1001                                */
+	{&upd7810_device::STAX_D,        1, 7, 7,L0|L1}, /* 3a: 0011 1010                                */
+	{&upd7810_device::STAX_H,        1, 7, 7,L0|L1}, /* 3b: 0011 1011                                */
+	{&upd7810_device::STAX_Dp,       1, 7, 7,L0|L1}, /* 3c: 0011 1100                                */
+	{&upd7810_device::STAX_Hp,       1, 7, 7,L0|L1}, /* 3d: 0011 1101                                */
+	{&upd7810_device::STAX_Dm,       1, 7, 7,L0|L1}, /* 3e: 0011 1110                                */
+	{&upd7810_device::STAX_Hm,       1, 7, 7,L0|L1}, /* 3f: 0011 1111                                */
 
 	{&upd7810_device::CALL_w,        3,16,16,L0|L1}, /* 40: 0100 0000 llll llll hhhh hhhh            */
 	{&upd7810_device::INR_A,         1, 4, 4,L0|L1}, /* 41: 0100 0001                                */

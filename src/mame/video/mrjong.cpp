@@ -66,19 +66,19 @@ void mrjong_state::mrjong_palette(palette_device &palette) const
 
 ***************************************************************************/
 
-WRITE8_MEMBER(mrjong_state::mrjong_videoram_w)
+void mrjong_state::mrjong_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(mrjong_state::mrjong_colorram_w)
+void mrjong_state::mrjong_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(mrjong_state::mrjong_flipscreen_w)
+void mrjong_state::mrjong_flipscreen_w(uint8_t data)
 {
 	if (flip_screen() != BIT(data, 2))
 	{
@@ -93,7 +93,7 @@ TILE_GET_INFO_MEMBER(mrjong_state::get_bg_tile_info)
 	int color = m_colorram[tile_index] & 0x1f;
 	int flags = ((m_colorram[tile_index] & 0x40) ? TILE_FLIPX : 0) | ((m_colorram[tile_index] & 0x80) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 void mrjong_state::video_start()

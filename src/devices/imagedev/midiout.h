@@ -33,14 +33,14 @@ public:
 	virtual void call_unload() override;
 
 	// image device
-	virtual iodevice_t image_type() const noexcept override { return IO_MIDIOUT; }
 	virtual bool is_readable()  const noexcept override { return false; }
 	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "mid"; }
 	virtual bool core_opens_image_file() const noexcept override { return false; }
+	virtual const char *image_type_name() const noexcept override { return "midiout"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "mout"; }
 
 	virtual void tx(uint8_t state) { rx_w(state); }
 
@@ -53,13 +53,13 @@ protected:
 	virtual void rcv_complete() override;    // Rx completed receiving byte
 
 private:
-	osd_midi_device *m_midi;
+	std::unique_ptr<osd_midi_device> m_midi;
 };
 
 // device type definition
 DECLARE_DEVICE_TYPE(MIDIOUT, midiout_device)
 
 // device iterator
-typedef device_type_iterator<midiout_device> midiout_device_iterator;
+typedef device_type_enumerator<midiout_device> midiout_device_enumerator;
 
 #endif // MAME_IMAGEDEV_MIDIOUT_H

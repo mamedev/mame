@@ -117,6 +117,7 @@ Sound processor - 6502
 #include "emupal.h"
 #include "speaker.h"
 
+namespace {
 
 class deco_ld_state : public driver_device
 {
@@ -143,6 +144,9 @@ public:
 	DECLARE_READ_LINE_MEMBER(begas_vblank_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -158,12 +162,13 @@ private:
 	required_shared_ptr<uint8_t> m_vram1;
 	required_shared_ptr<uint8_t> m_attr1;
 
-	int m_nmimask;
-	DECLARE_READ8_MEMBER(acia_status_hack_r);
-	DECLARE_READ8_MEMBER(sound_status_r);
-	DECLARE_WRITE8_MEMBER(decold_sound_cmd_w);
-	virtual void machine_start() override;
+	int m_nmimask = 0;
+
+	uint8_t acia_status_hack_r();
+	uint8_t sound_status_r();
+	void decold_sound_cmd_w(uint8_t data);
 	uint32_t screen_update_rblaster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	[[maybe_unused]] void nmimask_w(uint8_t data);
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t *spriteram, uint16_t tile_bank );
 	void rblaster_map(address_map &map);
@@ -251,20 +256,20 @@ uint32_t deco_ld_state::screen_update_rblaster(screen_device &screen, bitmap_rgb
 }
 
 
-WRITE8_MEMBER(deco_ld_state::decold_sound_cmd_w)
+void deco_ld_state::decold_sound_cmd_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 /* unknown, but certainly related to audiocpu somehow */
-READ8_MEMBER(deco_ld_state::sound_status_r)
+uint8_t deco_ld_state::sound_status_r()
 {
 	return 0xff ^ 0x40;
 }
 
 // TODO: needs LD BIOS dumped
-READ8_MEMBER(deco_ld_state::acia_status_hack_r)
+uint8_t deco_ld_state::acia_status_hack_r()
 {
 	return 0xff;
 }
@@ -292,14 +297,12 @@ void deco_ld_state::rblaster_map(address_map &map)
 }
 
 
-/* sound arrangement is pratically identical to Zero Target. */
+/* sound arrangement is practically identical to Zero Target. */
 
-#ifdef UNUSED_FUNCTION
-WRITE8_MEMBER(deco_ld_state::nmimask_w)
+void deco_ld_state::nmimask_w(uint8_t data)
 {
 	m_nmimask = data & 0x80;
 }
-#endif
 
 INTERRUPT_GEN_MEMBER(deco_ld_state::sound_interrupt)
 {
@@ -654,6 +657,7 @@ ROM_START( cobraa )
 	ROM_LOAD( "vd0-t.f6",         0x0000, 0x00020, CRC(78449942) SHA1(584e25f7bffccd943c4db1edf05552f7989e08a4) )
 ROM_END
 
+} // anonymous namespace
 
 
 GAME( 1983, begas,    0,     rblaster, begas,    deco_ld_state, empty_init, ROT0, "Data East", "Bega's Battle (Revision 3)", MACHINE_NOT_WORKING )

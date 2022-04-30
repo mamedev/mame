@@ -43,16 +43,16 @@ private:
 	required_shared_ptr<uint16_t> m_workram;
 
 	/* video-related */
-	int         m_avac_bits[4];
-	int         m_avac_occupancy[4];
-	int         m_layer_colorbase[4];
-	int         m_layer_pri[4];
-	int         m_avac_vrc;
-	int         m_sprite_colorbase;
+	int         m_avac_bits[4]{};
+	int         m_avac_occupancy[4]{};
+	int         m_layer_colorbase[4]{};
+	int         m_layer_pri[4]{};
+	int         m_avac_vrc = 0;
+	int         m_sprite_colorbase = 0;
 
 	/* misc */
-	uint16_t      m_cur_control2;
-	emu_timer   *m_dmadelay_timer;
+	uint16_t      m_cur_control2 = 0U;
+	emu_timer   *m_dmadelay_timer = nullptr;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -64,9 +64,9 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<k054321_device> m_k054321;
 
-	DECLARE_READ16_MEMBER(control2_r);
-	DECLARE_WRITE16_MEMBER(control2_w);
-	DECLARE_WRITE16_MEMBER(sound_irq_w);
+	uint16_t control2_r();
+	void control2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_irq_w(uint16_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

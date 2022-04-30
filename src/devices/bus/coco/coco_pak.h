@@ -19,23 +19,23 @@ class coco_pak_device :
 {
 public:
 	// construction/destruction
-	coco_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	coco_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	virtual uint8_t* get_cart_base() override;
-	virtual uint32_t get_cart_size() override;
-	virtual memory_region* get_cart_memregion() override;
+	virtual u8 *get_cart_base() override;
+	virtual u32 get_cart_size() override;
+	virtual memory_region *get_cart_memregion() override;
 
 protected:
-	coco_pak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	coco_pak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual DECLARE_READ8_MEMBER(cts_read) override;
+	virtual u8 cts_read(offs_t offset) override;
 
 	// internal state
 	device_image_interface *m_cart;
@@ -50,22 +50,22 @@ class coco_pak_banked_device : public coco_pak_device
 {
 public:
 	// construction/destruction
-	coco_pak_banked_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	coco_pak_banked_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	coco_pak_banked_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	coco_pak_banked_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual uint8_t *get_cart_base() override;
-	virtual uint32_t get_cart_size() override;
-	virtual DECLARE_READ8_MEMBER(cts_read) override;
-	virtual DECLARE_WRITE8_MEMBER(scs_write) override;
+	virtual u8 *get_cart_base() override;
+	virtual u32 get_cart_size() override;
+	virtual u8 cts_read(offs_t offset) override;
+	virtual void scs_write(offs_t offset, u8 data) override;
 
 private:
-	uint8_t m_pos;
+	u8 m_pos;
 };
 
 

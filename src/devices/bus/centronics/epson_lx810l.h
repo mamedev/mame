@@ -4,7 +4,6 @@
  * Epson LX-810L dot matrix printer emulation
  *
  */
-
 #ifndef MAME_BUS_CENTRONICS_EPSON_LX810L_H
 #define MAME_BUS_CENTRONICS_EPSON_LX810L_H
 
@@ -14,20 +13,13 @@
 #include "cpu/upd7810/upd7810.h"
 #include "machine/e05a30.h"
 #include "machine/eepromser.h"
+#include "machine/bitmap_printer.h"
 #include "machine/steppers.h"
 #include "sound/dac.h"
 #include "screen.h"
 
+#include <cstdlib>
 
-/* The printer starts printing at x offset 44 and stops printing at x
- * offset 1009, giving a total of 965 printable pixels. Supposedly, the
- * border at the far right would be at x offset 1053. I've chosen the
- * width for the paper as 1024, since it's a nicer number than 1053, so
- * an offset must be used to centralize the pixels.
- */
-#define CR_OFFSET    (-14)
-#define PAPER_WIDTH  1024
-#define PAPER_HEIGHT 576
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -51,9 +43,13 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER( input_data5 ) override { m_e05a30->centronics_input_data5(state); }
 	virtual DECLARE_WRITE_LINE_MEMBER( input_data6 ) override { m_e05a30->centronics_input_data6(state); }
 	virtual DECLARE_WRITE_LINE_MEMBER( input_data7 ) override { m_e05a30->centronics_input_data7(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_init ) override { m_e05a30->centronics_input_init(state); }
 
 	/* Panel buttons */
 	DECLARE_INPUT_CHANGED_MEMBER(online_sw);
+
+	/* Reset Printer (equivalent to turning power off and back on) */
+	DECLARE_INPUT_CHANGED_MEMBER(reset_printer);
 
 protected:
 	epson_lx810l_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -61,43 +57,45 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
+	virtual bool supports_pin35_5v() override { return true; }
+
 private:
-	DECLARE_READ8_MEMBER(porta_r);
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_READ8_MEMBER(portb_r);
-	DECLARE_WRITE8_MEMBER(portb_w);
-	DECLARE_READ8_MEMBER(portc_r);
-	DECLARE_WRITE8_MEMBER(portc_w);
+	uint8_t porta_r(offs_t offset);
+	void porta_w(offs_t offset, uint8_t data);
+	uint8_t portb_r(offs_t offset);
+	void portb_w(offs_t offset, uint8_t data);
+	uint8_t portc_r(offs_t offset);
+	void portc_w(offs_t offset, uint8_t data);
 
 	/* fake memory I/O to get past memory reset check */
-	DECLARE_READ8_MEMBER(fakemem_r);
-	DECLARE_WRITE8_MEMBER(fakemem_w);
+	uint8_t fakemem_r();
+	void fakemem_w(uint8_t data);
 
 	/* Extended Timer Output */
 	DECLARE_WRITE_LINE_MEMBER(co0_w);
 
 	/* ADC */
-	DECLARE_READ8_MEMBER(an0_r);
-	DECLARE_READ8_MEMBER(an1_r);
-	DECLARE_READ8_MEMBER(an2_r);
-	DECLARE_READ8_MEMBER(an3_r);
-	DECLARE_READ8_MEMBER(an4_r);
-	DECLARE_READ8_MEMBER(an5_r);
-	DECLARE_READ8_MEMBER(an6_r);
-	DECLARE_READ8_MEMBER(an7_r);
+	uint8_t an0_r();
+	uint8_t an1_r();
+	uint8_t an2_r();
+	uint8_t an3_r();
+	uint8_t an4_r();
+	uint8_t an5_r();
+	uint8_t an6_r();
+	uint8_t an7_r();
 
 
 	/* GATE ARRAY */
-	DECLARE_WRITE16_MEMBER(printhead);
-	DECLARE_WRITE8_MEMBER(pf_stepper);
-	DECLARE_WRITE8_MEMBER(cr_stepper);
+	void printhead(uint16_t data);
+	void pf_stepper(uint8_t data);
+	void cr_stepper(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(e05a30_ready);
 
 	DECLARE_WRITE_LINE_MEMBER(e05a30_centronics_ack) { output_ack(state); }
@@ -106,33 +104,39 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(e05a30_centronics_fault) { output_fault(state); }
 	DECLARE_WRITE_LINE_MEMBER(e05a30_centronics_select) { output_select(state); }
 
+	DECLARE_WRITE_LINE_MEMBER(e05a30_cpu_reset) { if (!state) m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero); } // reset cpu
+
+	DECLARE_WRITE_LINE_MEMBER(e05a30_ready_led)
+	{
+		m_ready_led = state;
+		m_bitmap_printer->set_led_state(bitmap_printer_device::LED_READY, m_ready_led);
+	}
+
 	void lx810l_mem(address_map &map);
 
-	/* Video hardware (simulates paper) */
-	uint32_t screen_update_lx810l(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-#define uabs(x) ((x) > 0 ? (x) : -(x))
-	unsigned int bitmap_line(int i) { return ((uabs(m_pf_pos_abs) / 6) + i) % m_bitmap.height(); }
-
 	required_device<cpu_device> m_maincpu;
-	required_device<stepper_device> m_pf_stepper;
-	required_device<stepper_device> m_cr_stepper;
+	required_device<bitmap_printer_device> m_bitmap_printer;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<e05a30_device> m_e05a30;
-	required_device<screen_device> m_screen;
 
 	output_finder<> m_online_led;
+	output_finder<> m_ready_led;
+
+	required_ioport m_online_ioport;
+	required_ioport m_formfeed_ioport;
+	required_ioport m_linefeed_ioport;
+	required_ioport m_loadeject_ioport;
+	required_ioport m_paperend_ioport;
+	required_ioport m_dipsw1_ioport;
+	required_ioport m_dipsw2_ioport;
 
 	int m_93c06_clk;
 	int m_93c06_cs;
 	uint16_t m_printhead;
-	int m_pf_pos_abs;
-	int m_cr_pos_abs;
-	int m_real_cr_pos;
 	int m_real_cr_steps;
-	int m_real_cr_dir; /* 1 is going right, -1 is going left */
 	uint8_t m_fakemem;
-	bitmap_rgb32 m_bitmap;
+	int m_in_between_offset; // in between cr_stepper phases
+	int m_rightward_offset; // offset pixels when stepper moving rightward
 
 	enum {
 		TIMER_CR
@@ -147,9 +151,9 @@ class epson_ap2000_device : public epson_lx810l_device
 {
 public:
 	// construction/destruction
-	epson_ap2000_device(const machine_config &mconfig, const char *tag,
-					device_t *owner, uint32_t clock);
+	epson_ap2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };

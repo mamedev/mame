@@ -74,7 +74,7 @@ void iq151_staper_device::device_add_mconfig(machine_config &config)
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void iq151_staper_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void iq151_staper_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_PRINTER)
 		m_ppi->pc2_w(0);
@@ -106,13 +106,13 @@ void iq151_staper_device::io_write(offs_t offset, uint8_t data)
 //  I8255  interface
 //**************************************************************************
 
-READ8_MEMBER( iq151_staper_device::ppi_porta_r )
+uint8_t iq151_staper_device::ppi_porta_r()
 {
 	// TODO: paper tape reader input
 	return 0;
 }
 
-WRITE8_MEMBER( iq151_staper_device::ppi_portb_w )
+void iq151_staper_device::ppi_portb_w(uint8_t data)
 {
 	if (m_ppi_portc & 0x80)
 	{
@@ -128,7 +128,7 @@ WRITE8_MEMBER( iq151_staper_device::ppi_portb_w )
 	}
 }
 
-WRITE8_MEMBER( iq151_staper_device::ppi_portc_w )
+void iq151_staper_device::ppi_portc_w(uint8_t data)
 {
 	/*
 	    x--- ----   printer select

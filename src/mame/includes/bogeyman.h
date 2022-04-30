@@ -54,21 +54,21 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
-	tilemap_t    *m_bg_tilemap;
-	tilemap_t    *m_fg_tilemap;
+	tilemap_t    *m_bg_tilemap = nullptr;
+	tilemap_t    *m_fg_tilemap = nullptr;
 
 	/* misc */
-	int        m_psg_latch;
-	int        m_last_write;
-	int        m_colbank;
+	int        m_psg_latch = 0;
+	int        m_last_write = 0;
+	int        m_colbank = 0;
 
-	DECLARE_WRITE8_MEMBER(ay8910_latch_w);
-	DECLARE_WRITE8_MEMBER(ay8910_control_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(videoram2_w);
-	DECLARE_WRITE8_MEMBER(colorram2_w);
-	DECLARE_WRITE8_MEMBER(colbank_w);
+	void ay8910_latch_w(uint8_t data);
+	void ay8910_control_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	void videoram2_w(offs_t offset, uint8_t data);
+	void colorram2_w(offs_t offset, uint8_t data);
+	void colbank_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

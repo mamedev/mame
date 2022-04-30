@@ -303,6 +303,7 @@
 
 #pragma once
 
+#include "memarray.h"
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -409,7 +410,6 @@ class tilemap_t
 	friend class tilemap_device;
 	friend class tilemap_manager;
 	friend class simple_list<tilemap_t>;
-	friend resource_pool_object<tilemap_t>::~resource_pool_object();
 
 	// logical index
 	typedef u32 logical_index;
@@ -487,10 +487,10 @@ public:
 	void configure_groups(gfx_element &gfx, indirect_pen_t transcolor);
 
 	// drawing
-	void draw(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, u32 flags, u8 priority = 0, u8 priority_mask = 0xff);
-	void draw(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, u32 flags, u8 priority = 0, u8 priority_mask = 0xff);
-	void draw_roz(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, u32 startx, u32 starty, int incxx, int incxy, int incyx, int incyy, bool wraparound, u32 flags, u8 priority = 0, u8 priority_mask = 0xff);
-	void draw_roz(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, u32 startx, u32 starty, int incxx, int incxy, int incyx, int incyy, bool wraparound, u32 flags, u8 priority = 0, u8 priority_mask = 0xff);
+	void draw(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, u32 flags = TILEMAP_DRAW_ALL_CATEGORIES, u8 priority = 0, u8 priority_mask = 0xff);
+	void draw(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, u32 flags = TILEMAP_DRAW_ALL_CATEGORIES, u8 priority = 0, u8 priority_mask = 0xff);
+	void draw_roz(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, u32 startx, u32 starty, int incxx, int incxy, int incyx, int incyy, bool wraparound, u32 flags = TILEMAP_DRAW_ALL_CATEGORIES, u8 priority = 0, u8 priority_mask = 0xff);
+	void draw_roz(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, u32 startx, u32 starty, int incxx, int incxy, int incyx, int incyy, bool wraparound, u32 flags = TILEMAP_DRAW_ALL_CATEGORIES, u8 priority = 0, u8 priority_mask = 0xff);
 	void draw_debug(screen_device &screen, bitmap_rgb32 &dest, u32 scrollx, u32 scrolly, u32 flags = TILEMAP_DRAW_ALL_CATEGORIES);
 
 	// mappers
@@ -793,14 +793,11 @@ private:
 // function definition for a logical-to-memory mapper
 #define TILEMAP_MAPPER_MEMBER(_name)    tilemap_memory_index _name(u32 col, u32 row, u32 num_cols, u32 num_rows)
 
-// useful macro inside of a TILE_GET_INFO callback to set tile information
-#define SET_TILE_INFO_MEMBER(GFX,CODE,COLOR,FLAGS)  tileinfo.set(GFX, CODE, COLOR, FLAGS)
-
-// Macros for setting tile attributes in the TILE_GET_INFO callback:
+// Helpers for setting tile attributes in the TILE_GET_INFO callback:
 //   TILE_FLIP_YX assumes that flipy is in bit 1 and flipx is in bit 0
 //   TILE_FLIP_XY assumes that flipy is in bit 0 and flipx is in bit 1
-#define TILE_FLIPYX(YX)                 ((YX) & 3)
-#define TILE_FLIPXY(XY)                 ((((XY) & 2) >> 1) | (((XY) & 1) << 1))
+template <typename T> constexpr u8 TILE_FLIPYX(T yx) { return u8(yx & 3); }
+template <typename T> constexpr u8 TILE_FLIPXY(T xy) { return u8(((xy & 2) >> 1) | ((xy & 1) << 1)); }
 
 
 

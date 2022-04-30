@@ -11,6 +11,7 @@
 #include <atomic>
 #include <list>
 #include "crypto.hpp"
+#include "base64.hpp"
 
 #ifndef CASE_INSENSITIVE_EQUALS_AND_HASH
 #define CASE_INSENSITIVE_EQUALS_AND_HASH
@@ -65,7 +66,7 @@ namespace webpp {
 			unsigned short remote_endpoint_port;
 
 		private:
-			explicit Connection(socket_type* socket): remote_endpoint_port(0), socket(socket), strand(socket->get_io_context()), closed(false) { }
+			explicit Connection(asio::io_context &context, socket_type* socket): remote_endpoint_port(0), socket(socket), strand(context), closed(false) { }
 
 			class SendData {
 			public:
@@ -362,7 +363,7 @@ namespace webpp {
 					if(first_bytes[1]>=128) {
 						const std::string reason("message from server masked");
 						auto kept_connection=connection;
-						send_close(1002, reason, [this, kept_connection](const std::error_code& /*ec*/) {});
+						send_close(1002, reason, [](const std::error_code& /*ec*/) {});
 						if(on_close)
 							on_close(1002, reason);
 						return;
@@ -440,7 +441,7 @@ namespace webpp {
 
 						auto reason=message->string();
 						auto kept_connection=connection;
-						send_close(status, reason, [this, kept_connection](const std::error_code& /*ec*/) {});
+						send_close(status, reason, [](const std::error_code& /*ec*/) {});
 						if(on_close)
 							on_close(status, reason);
 						return;
@@ -488,7 +489,7 @@ namespace webpp {
 			resolver->async_resolve(query, [this]
 					(const std::error_code &ec, asio::ip::tcp::resolver::iterator it){
 				if(!ec) {
-					connection=std::shared_ptr<Connection>(new Connection(new WS(*io_context)));
+					connection=std::shared_ptr<Connection>(new Connection(*io_context, new WS(*io_context)));
 
 					asio::async_connect(*connection->socket, it, [this]
 							(const std::error_code &ec, asio::ip::tcp::resolver::iterator /*it*/){

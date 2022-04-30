@@ -31,11 +31,11 @@ public:
 
 	monsterb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(n7751_status_r);
-	DECLARE_WRITE8_MEMBER(n7751_command_w);
+	uint8_t n7751_status_r();
+	void n7751_command_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(sound_a_w);
-	DECLARE_WRITE8_MEMBER(sound_b_w);
+	void sound_a_w(uint8_t data);
+	void sound_b_w(uint8_t data);
 
 
 protected:
@@ -43,10 +43,10 @@ protected:
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	DECLARE_READ8_MEMBER(n7751_command_r);
-	DECLARE_WRITE8_MEMBER(n7751_p2_w);
+	uint8_t n7751_command_r();
+	void n7751_p2_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(n7751_rom_r);
+	uint8_t n7751_rom_r();
 	template<int Shift> void n7751_rom_addr_w(uint8_t data);
 	void n7751_rom_select_w(uint8_t data);
 

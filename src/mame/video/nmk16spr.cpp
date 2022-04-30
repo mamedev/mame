@@ -53,7 +53,7 @@ nmk_16bit_sprite_device::nmk_16bit_sprite_device(const machine_config &mconfig, 
 void nmk_16bit_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, u16* spriteram, int size)
 {
 	const bool priority = !m_colpri_cb.isnull();
-	struct sprite_t *sprite_ptr = m_spritelist.get();
+	sprite_t *sprite_ptr = m_spritelist.get();
 	const int xpos_max = m_xmask + 1;
 	const int ypos_max = m_ymask + 1;
 
@@ -260,7 +260,7 @@ void nmk_16bit_sprite_device::device_start()
 	m_colpri_cb.resolve();
 	m_ext_cb.resolve();
 	m_flip_screen = false;
-	m_spritelist = make_unique_clear<struct sprite_t[]>((0x1000/0x10) * 16 * 16);
+	m_spritelist = std::make_unique<sprite_t[]>((0x1000/0x10) * 16 * 16);
 
 	save_item(NAME(m_flip_screen));
 }

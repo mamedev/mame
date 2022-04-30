@@ -4,14 +4,12 @@
 
     Gomoku sound driver (quick hack of the Wiping sound driver)
 
-    used by wiping.c
+    used by gomoku.cpp
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "audio/gomoku.h"
-
-constexpr int DEFGAIN = 48;
 
 
 // device type definition
@@ -32,10 +30,6 @@ gomoku_sound_device::gomoku_sound_device(const machine_config &mconfig, const ch
 	, m_sound_rom(*this, DEVICE_SELF)
 	, m_sound_enable(0)
 	, m_stream(nullptr)
-	, m_mixer_table(nullptr)
-	, m_mixer_lookup(nullptr)
-	, m_mixer_buffer(nullptr)
-	, m_mixer_buffer_2(nullptr)
 {
 	std::fill(std::begin(m_soundregs1), std::end(m_soundregs1), 0);
 	std::fill(std::begin(m_soundregs2), std::end(m_soundregs2), 0);
@@ -48,23 +42,19 @@ gomoku_sound_device::gomoku_sound_device(const machine_config &mconfig, const ch
 
 void gomoku_sound_device::device_start()
 {
-	gomoku_sound_channel *voice;
+	sound_channel *voice;
 	int ch;
 
-	/* get stream channels */
+	// get stream channels
 	m_stream = stream_alloc(0, 1, clock());
 
-	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
-	m_mixer_buffer = std::make_unique<short[]>(2 * clock());
-	m_mixer_buffer_2 = m_mixer_buffer.get() + clock();
+	// allocate a buffer to mix into - 1 second's worth should be more than enough
+	m_mixer_buffer.resize(clock()/50);
 
-	/* build the mixer table */
-	make_mixer_table(8, DEFGAIN);
-
-	/* start with sound enabled, many games don't have a sound enable register */
+	// start with sound enabled, many games don't have a sound enable register
 	m_sound_enable = 1;
 
-	/* reset all the voices */
+	// reset all the voices
 	for (ch = 0, voice = std::begin(m_channel_list); voice < std::end(m_channel_list); ch++, voice++)
 	{
 		voice->channel = ch;
@@ -73,6 +63,15 @@ void gomoku_sound_device::device_start()
 		voice->volume = 0;
 		voice->oneshotplaying = 0;
 	}
+
+	save_item(NAME(m_soundregs1));
+	save_item(NAME(m_soundregs2));
+	// save_item(NAME(m_sound_enable)); // set to 1 at device start and never updated?
+	save_item(STRUCT_MEMBER(m_channel_list, channel));
+	save_item(STRUCT_MEMBER(m_channel_list, frequency));
+	save_item(STRUCT_MEMBER(m_channel_list, counter));
+	save_item(STRUCT_MEMBER(m_channel_list, volume));
+	save_item(STRUCT_MEMBER(m_channel_list, oneshotplaying));
 }
 
 
@@ -80,30 +79,30 @@ void gomoku_sound_device::device_start()
 //  sound_stream_update - handle a stream update in mono
 //-------------------------------------------------
 
-void gomoku_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void gomoku_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *buffer = outputs[0];
-	gomoku_sound_channel *voice;
+	auto &buffer = outputs[0];
+	sound_channel *voice;
 	short *mix;
-	int i, ch;
+	int ch;
 
-	/* if no sound, we're done */
+	// if no sound, we're done
 	if (m_sound_enable == 0)
 	{
-		memset(buffer, 0, samples * sizeof(*buffer));
+		buffer.fill(0);
 		return;
 	}
 
-	/* zap the contents of the mixer buffer */
-	memset(m_mixer_buffer.get(), 0, samples * sizeof(short));
+	// zap the contents of the mixer buffer
+	std::fill_n(&m_mixer_buffer[0], buffer.samples(), 0);
 
-	/* loop over each voice and add its contribution */
+	// loop over each voice and add its contribution
 	for (ch = 0, voice = std::begin(m_channel_list); voice < std::end(m_channel_list); ch++, voice++)
 	{
 		int f = 16 * voice->frequency;
 		int v = voice->volume;
 
-		/* only update if we have non-zero volume and frequency */
+		// only update if we have non-zero volume and frequency
 		if (v && f)
 		{
 			int w_base;
@@ -114,10 +113,10 @@ void gomoku_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 			else
 				w_base = 0x100 * (m_soundregs2[0x1d] & 0x0f);
 
-			mix = m_mixer_buffer.get();
+			mix = &m_mixer_buffer[0];
 
-			/* add our contribution */
-			for (i = 0; i < samples; i++)
+			// add our contribution
+			for (int i = 0; i < buffer.samples(); i++)
 			{
 				c += f;
 
@@ -125,7 +124,7 @@ void gomoku_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 				{
 					int offs = w_base | ((c >> 16) & 0x1f);
 
-					/* use full byte, first the high 4 bits, then the low 4 bits */
+					// use full byte, first the high 4 bits, then the low 4 bits
 					if (c & 0x8000)
 						*mix++ += ((m_sound_rom[offs] & 0x0f) - 8) * v;
 					else
@@ -142,7 +141,7 @@ void gomoku_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 
 					if (voice->oneshotplaying)
 					{
-						/* use full byte, first the high 4 bits, then the low 4 bits */
+						// use full byte, first the high 4 bits, then the low 4 bits
 						if (c & 0x8000)
 							*mix++ += ((m_sound_rom[offs] & 0x0f) - 8) * v;
 						else
@@ -150,57 +149,34 @@ void gomoku_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 					}
 				}
 
-				/* update the counter for this voice */
+				// update the counter for this voice
 				voice->counter = c;
 			}
 		}
 	}
 
-	/* mix it down */
-	mix = m_mixer_buffer.get();
-	for (i = 0; i < samples; i++)
-		*buffer++ = m_mixer_lookup[*mix++];
-}
-
-
-/* build a table to divide by the number of voices; gain is specified as gain*16 */
-void gomoku_sound_device::make_mixer_table(int voices, int gain)
-{
-	int count = voices * 128;
-	int i;
-
-	/* allocate memory */
-	m_mixer_table = std::make_unique<int16_t[]>(256 * voices);
-
-	/* find the middle of the table */
-	m_mixer_lookup = m_mixer_table.get() + (128 * voices);
-
-	/* fill in the table - 16 bit case */
-	for (i = 0; i < count; i++)
-	{
-		int val = i * gain * 16 / voices;
-		if (val > 32767) val = 32767;
-		m_mixer_lookup[ i] = val;
-		m_mixer_lookup[-i] = -val;
-	}
+	// mix it down
+	mix = &m_mixer_buffer[0];
+	for (int i = 0; i < buffer.samples(); i++)
+		buffer.put_int(i, *mix++, 128 * MAX_VOICES);
 }
 
 
 /********************************************************************************/
 
-WRITE8_MEMBER( gomoku_sound_device::sound1_w )
+void gomoku_sound_device::sound1_w(offs_t offset, uint8_t data)
 {
-	gomoku_sound_channel *voice;
+	sound_channel *voice;
 	int base;
 	int ch;
 
-	/* update the streams */
+	// update the streams
 	m_stream->update();
 
-	/* set the register */
+	// set the register
 	m_soundregs1[offset] = data;
 
-	/* recompute all the voice parameters */
+	// recompute all the voice parameters
 	for (ch = 0, base = 0, voice = m_channel_list; voice < m_channel_list + 3; ch++, voice++, base += 8)
 	{
 		voice->channel = ch;
@@ -210,19 +186,19 @@ WRITE8_MEMBER( gomoku_sound_device::sound1_w )
 	}
 }
 
-WRITE8_MEMBER( gomoku_sound_device::sound2_w )
+void gomoku_sound_device::sound2_w(offs_t offset, uint8_t data)
 {
-	gomoku_sound_channel *voice;
+	sound_channel *voice;
 	int base;
 	int ch;
 
-	/* update the streams */
+	// update the streams
 	m_stream->update();
 
-	/* set the register */
+	// set the register
 	m_soundregs2[offset] = data;
 
-	/* recompute all the voice parameters */
+	// recompute all the voice parameters
 	for (ch = 0, base = 0, voice = m_channel_list; voice < m_channel_list + 3; ch++, voice++, base += 8)
 	{
 		voice->channel = ch;

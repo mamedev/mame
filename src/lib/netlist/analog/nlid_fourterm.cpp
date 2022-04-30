@@ -1,8 +1,8 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Couriersud
 
-#include "netlist/solver/nld_solver.h"
-#include "netlist/nl_factory.h"
+#include "solver/nld_solver.h"
+#include "nl_factory.h"
 #include "nlid_fourterm.h"
 
 namespace netlist
@@ -30,17 +30,18 @@ NETLIB_RESET(VCCS)
 	m_ON1.set_go_gt(-m_mult, nlconst::zero());
 }
 
-NETLIB_UPDATE(VCCS)
+NETLIB_HANDLER(VCCS, termhandler)
 {
+	solver::matrix_solver_t *solv = nullptr;
 	// only called if connected to a rail net ==> notify the solver to recalculate
-	if (!m_IP.net().isRailNet())
-		m_IP.solve_now();
-	else if (!m_IN.net().isRailNet())
-		m_IN.solve_now();
-	else if (!m_OP.net().isRailNet())
-		m_OP.solve_now();
-	else if (!m_ON.net().isRailNet())
-		m_ON.solve_now();
+	if ((solv = m_IP.solver()) != nullptr)
+		solv->solve_now();
+	else if ((solv = m_IN.solver()) != nullptr)
+		solv->solve_now();
+	else if ((solv = m_OP.solver()) != nullptr)
+		solv->solve_now();
+	else if ((solv = m_ON.solver()) != nullptr)
+		solv->solve_now();
 }
 
 // ----------------------------------------------------------------------------------------
@@ -59,7 +60,7 @@ NETLIB_UPDATE_PARAM(LVCCS)
 
 NETLIB_UPDATE_TERMINALS(LVCCS)
 {
-	const nl_fptype m_mult = m_G() * m_gfac; // 1.0 ==> 1V ==> 1A
+	const nl_fptype m_mult = m_G() * get_gfac(); // 1.0 ==> 1V ==> 1A
 	const nl_fptype vi = m_IP.net().Q_Analog() - m_IN.net().Q_Analog();
 	const auto c1(nlconst::magic(0.2));
 
@@ -101,11 +102,13 @@ NETLIB_UPDATE_PARAM(CCCS)
 
 NETLIB_RESET(VCVS)
 {
-	m_gfac = plib::reciprocal(m_RO());
+	const auto gfac(plib::reciprocal(m_RO()));
+	set_gfac(gfac);
+
 	NETLIB_NAME(VCCS)::reset();
 
-	m_OP2.set_conductivity(m_gfac);
-	m_ON2.set_conductivity(m_gfac);
+	m_OP2.set_conductivity(gfac);
+	m_ON2.set_conductivity(gfac);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -114,20 +117,22 @@ NETLIB_RESET(VCVS)
 
 NETLIB_RESET(CCVS)
 {
-	m_gfac = plib::reciprocal(m_RO());
+	const auto gfac(plib::reciprocal(m_RO()));
+	set_gfac(gfac);
+
 	NETLIB_NAME(VCCS)::reset();
 
-	m_OP2.set_conductivity(m_gfac);
-	m_ON2.set_conductivity(m_gfac);
+	m_OP2.set_conductivity(gfac);
+	m_ON2.set_conductivity(gfac);
 }
 
 	} //namespace analog
 
 	namespace devices {
-		NETLIB_DEVICE_IMPL_NS(analog, VCVS,  "VCVS",  "")
-		NETLIB_DEVICE_IMPL_NS(analog, VCCS,  "VCCS",  "")
-		NETLIB_DEVICE_IMPL_NS(analog, CCCS,  "CCCS",  "")
-		NETLIB_DEVICE_IMPL_NS(analog, CCVS,  "CCVS",  "")
+		NETLIB_DEVICE_IMPL_NS(analog, VCVS,  "VCVS",  "G")
+		NETLIB_DEVICE_IMPL_NS(analog, VCCS,  "VCCS",  "G")
+		NETLIB_DEVICE_IMPL_NS(analog, CCCS,  "CCCS",  "G")
+		NETLIB_DEVICE_IMPL_NS(analog, CCVS,  "CCVS",  "G")
 		NETLIB_DEVICE_IMPL_NS(analog, LVCCS, "LVCCS", "")
 	} // namespace devices
 } // namespace netlist

@@ -34,7 +34,7 @@ void firetrk_state::firetrk_palette(palette_device &palette)
 
 	m_color1_mask = m_color2_mask = 0;
 
-	for (int i = 0; i < ARRAY_LENGTH(colortable_source); i++)
+	for (int i = 0; i < std::size(colortable_source); i++)
 	{
 		uint8_t color = colortable_source[i];
 
@@ -93,7 +93,7 @@ void firetrk_state::montecar_palette(palette_device &palette)
 
 	m_color1_mask = m_color2_mask = 0;
 
-	for (int i = 0; i < ARRAY_LENGTH(colortable_source); i++)
+	for (int i = 0; i < std::size(colortable_source); i++)
 	{
 		uint8_t color = colortable_source[i];
 
@@ -105,8 +105,8 @@ void firetrk_state::montecar_palette(palette_device &palette)
 		prom_to_palette(i, color_prom[0x100 + colortable_source[i]]);
 	}
 
-	palette.set_pen_color(ARRAY_LENGTH(colortable_source) + 0, rgb_t::black());
-	palette.set_pen_color(ARRAY_LENGTH(colortable_source) + 1, rgb_t::white());
+	palette.set_pen_color(std::size(colortable_source) + 0, rgb_t::black());
+	palette.set_pen_color(std::size(colortable_source) + 1, rgb_t::white());
 }
 
 
@@ -121,7 +121,7 @@ TILE_GET_INFO_MEMBER(firetrk_state::firetrk_get_tile_info1)
 	if (m_flash)
 		color = color | 0x04;
 
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	tileinfo.set(1, code, color, 0);
 }
 
 
@@ -136,7 +136,7 @@ TILE_GET_INFO_MEMBER(firetrk_state::superbug_get_tile_info1)
 	if (m_flash)
 		color = color | 0x04;
 
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	tileinfo.set(1, code, color, 0);
 }
 
 
@@ -148,7 +148,7 @@ TILE_GET_INFO_MEMBER(firetrk_state::montecar_get_tile_info1)
 	if (m_flash)
 		color = color | 0x04;
 
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	tileinfo.set(1, code, color, 0);
 }
 
 
@@ -164,7 +164,7 @@ TILE_GET_INFO_MEMBER(firetrk_state::firetrk_get_tile_info2)
 	if ((code & 0x3c) == 0x0c)
 		color = 2;   /* palette 0, 2 */
 
-	SET_TILE_INFO_MEMBER(2, code, color, 0);
+	tileinfo.set(2, code, color, 0);
 }
 
 
@@ -180,7 +180,7 @@ TILE_GET_INFO_MEMBER(firetrk_state::superbug_get_tile_info2)
 	if ((code & 0x38) == 0x00)
 		color = 2;   /* palette 0, 2 */
 
-	SET_TILE_INFO_MEMBER(2, code, color, 0);
+	tileinfo.set(2, code, color, 0);
 }
 
 
@@ -202,7 +202,7 @@ TILE_GET_INFO_MEMBER(firetrk_state::montecar_get_tile_info2)
 	if ((code & 0x30) == 0x30)
 		color = 0;   /* palette 0, 0 */
 
-	SET_TILE_INFO_MEMBER(2, code & 0x3f, color, 0);
+	tileinfo.set(2, code & 0x3f, color, 0);
 }
 
 
@@ -318,13 +318,11 @@ void firetrk_state::draw_text(bitmap_ind16 &bitmap, const rectangle &cliprect, u
 
 void firetrk_state::check_collision(int which)
 {
-	int y, x;
-
-	for (y = playfield_window.top(); y <= playfield_window.bottom(); y++)
-		for (x = playfield_window.left(); x <= playfield_window.right(); x++)
+	for (int y = playfield_window.top(); y <= playfield_window.bottom(); y++)
+		for (int x = playfield_window.left(); x <= playfield_window.right(); x++)
 		{
-			pen_t a = m_helper1.pix16(y, x);
-			pen_t b = m_helper2.pix16(y, x);
+			pen_t const a = m_helper1.pix(y, x);
+			pen_t const b = m_helper2.pix(y, x);
 
 			if (b != 0xff && (m_color1_mask >> a) & 1)
 				m_crash[which] = 1;

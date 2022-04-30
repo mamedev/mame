@@ -145,7 +145,7 @@ void fga002_device::device_reset()
 //-------------------------------------------------
 //  device_timer - handler timer events
 //-------------------------------------------------
-void fga002_device::device_timer (emu_timer &timer, device_timer_id id, int32_t param, void *ptr)
+void fga002_device::device_timer (emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{
@@ -608,7 +608,7 @@ WRITE_LINE_MEMBER (fga002_device::lirq5_w) { LOGINT("%s\n", FUNCNAME); lirq_w( F
 WRITE_LINE_MEMBER (fga002_device::lirq6_w) { LOGINT("%s\n", FUNCNAME); lirq_w( FGA_ISLOCAL6, INT_LOCAL6, FGA_ICRLOCAL6, state ); }
 WRITE_LINE_MEMBER (fga002_device::lirq7_w) { LOGINT("%s\n", FUNCNAME); lirq_w( FGA_ISLOCAL7, INT_LOCAL7, FGA_ICRLOCAL7, state ); }
 
-WRITE8_MEMBER (fga002_device::write){
+void fga002_device::write(offs_t offset, uint8_t data){
 	LOG("%s[%04x] <- %02x    - ", FUNCNAME, offset, data);
 	LOGSETUP(" * %s Reg %04x <- %02x\n", tag(), offset, data);
 	switch(offset)
@@ -682,7 +682,7 @@ WRITE8_MEMBER (fga002_device::write){
 	case FGA_DMA_GENERAL    : LOG("FGA_DMA_GENERAL - not implemented\n"); m_fga002[FGA_DMA_GENERAL] = data; break;
 	case FGA_CTL12          : LOG("FGA_CTL12 - not implemented\n"); m_fga002[FGA_CTL12] = data; break;
 	case FGA_LIOTIMING      : LOG("FGA_LIOTIMING - not implemented\n"); m_fga002[FGA_LIOTIMING] = data; break;
-	case FGA_LOCALIACK      : do_fga002reg_localiack_w(data);
+	case FGA_LOCALIACK      : do_fga002reg_localiack_w(data); break;
 	case FGA_FMBCTL         : LOG("FGA_FMBCTL - not implemented\n"); m_fga002[FGA_FMBCTL] = data; break;
 	case FGA_FMBAREA        : LOG("FGA_FMBAREA - not implemented\n"); m_fga002[FGA_FMBAREA] = data; break;
 	case FGA_AUXSRCSTART    : LOG("FGA_AUXSRCSTART - not implemented\n"); m_fga002[FGA_AUXSRCSTART] = data; break;
@@ -718,7 +718,7 @@ WRITE8_MEMBER (fga002_device::write){
 	}
 }
 
-READ8_MEMBER (fga002_device::read){
+uint8_t fga002_device::read(offs_t offset){
 	uint8_t ret = 0;
 
 	LOG("%s[%04x]      ", FUNCNAME, offset);

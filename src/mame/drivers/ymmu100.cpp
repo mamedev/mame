@@ -176,6 +176,7 @@ public:
 	void regs_int_read_tap(offs_t address, u16 data, u16 mem_mask);
 	void regs_int_write_tap(offs_t address, u16 data, u16 mem_mask);
 	void voice_write_tap(offs_t address, u16 data, u16 mem_mask);
+	void voice_read_tap(offs_t address, u16 data, u16 mem_mask);
 	void chan_write_tap(offs_t address, u16 data, u16 mem_mask);
 	void prg_write_tap(offs_t address, u16 data, u16 mem_mask);
 
@@ -191,6 +192,10 @@ public:
 		if(0)
 		m_maincpu->space(0).install_write_tap(0x20f03e, 0x20f03e + 0x92*0x40 - 1, "voice debug", [this](offs_t offset, u16 &data, u16 mem_mask) {
 												  voice_write_tap(offset, data, mem_mask);
+											   });
+		if(0)
+		m_maincpu->space(0).install_read_tap(0x20f03e, 0x20f03e + 0x92*0x40 - 1, "voice debug", [this](offs_t offset, u16 &data, u16 mem_mask) {
+												  voice_read_tap(offset, data, mem_mask);
 											   });
 		if(0)
 		m_maincpu->space(0).install_readwrite_tap(0x214ca2+0x20, 0x214ca2+0x320-1, "regs fp",
@@ -411,20 +416,71 @@ void mu100_state::regs_int_write_tap(offs_t address, u16 data, u16 mem_mask)
 	logerror("regs_int_w %03x, %04x @ %04x (%06x)\n", reg, data, mem_mask, pc);
 }
 
+struct xmap {
+	int slot;
+	const char *name;
+};
+
+static xmap vmap[] = {
+	{ 0x00, "instrumenthi" },
+	{ 0x02, "instrumentlo" },
+	{ 0x04, "midi_channelhi" },
+	{ 0x06, "midi_channello" },
+	{ 0x0c, "lpf_cutoff" },
+	{ 0x42, "delay_time" },
+	{ 0x48, "active" },
+	{ 0x4a, "velocity" },
+	{ 0x51, "inverse_velocity" },
+	{ -1, "" },
+};
+
 void mu100_state::voice_write_tap(offs_t address, u16 data, u16 mem_mask)
 {
 	offs_t pc = m_maincpu->pc();
 	offs_t off = address - 0x20f03e;
 	int voice = off / 0x92;
 	int slot = off % 0x92;
+
+	if(mem_mask == 0xff00)
+		data >>= 8;
+	else if(mem_mask == 0x00ff)
+		slot++;
+
+	std::string slotname = util::string_format("%02x", slot);
+	for(int i=0; vmap[i].slot != -1; i++)
+		if(vmap[i].slot == slot)
+			slotname = vmap[i].name;
+
 	if(mem_mask == 0xffff) {
-		logerror("voice_w %02x:%02x, %04x (%06x)\n", voice, slot, data, pc);
+		logerror("voice_w %02x:%s, %04x (%06x)\n", voice, slotname, data, pc);
 	} else {
-		if(mem_mask == 0xff00)
-			data >>= 8;
-		else
-			slot++;
-		logerror("voice_w %02x:%02x, %02x (%06x)\n", voice, slot, data, pc);
+		logerror("voice_w %02x:%s, %02x (%06x)\n", voice, slotname, data, pc);
+	}
+}
+
+void mu100_state::voice_read_tap(offs_t address, u16 data, u16 mem_mask)
+{
+	offs_t pc = m_maincpu->pc();
+	offs_t off = address - 0x20f03e;
+	int voice = off / 0x92;
+	int slot = off % 0x92;
+
+	logerror("off %x voice %x slot %x mask %04x\n", off, voice, slot, mem_mask);
+	data &= mem_mask;
+	if(mem_mask == 0xff00)
+		data >>= 8;
+	else if(mem_mask == 0x00ff)
+		slot++;
+
+	std::string slotname = util::string_format("%02x", slot);
+	for(int i=0; vmap[i].slot != -1; i++)
+		if(vmap[i].slot == slot)
+			slotname = vmap[i].name;
+
+	if(mem_mask == 0xffff) {
+		logerror("voice_r %02x:%s, %04x (%06x)\n", voice, slotname, data, pc);
+	} else {
+		logerror("voice_r %02x:%s, %02x (%06x)\n", voice, slotname, data, pc);
 	}
 }
 
@@ -558,7 +614,7 @@ void mu100_state::p2_w(u16 data)
 				m_lcd->control_write(cur_p1);
 		}
 	}
-	m_lcd->set_contrast((8 - ((cur_p2 >> 3) & 7))/8.0);
+	m_lcd->set_contrast((data >> 3) & 7);
 	cur_p2 = data;
 }
 
@@ -686,7 +742,7 @@ ROM_START( mu100 )
 	ROM_LOAD32_WORD( "sx743b0.ic35", 0x0000002, 0x400000, CRC(a9109a6c) SHA1(a67bb49378a38a2d809bd717d286e18bc6496db0) )
 	ROM_LOAD32_WORD( "xt445a0-828.ic36", 0x0800000, 0x200000, CRC(225c2280) SHA1(23b5e046fd2e2ac01af3e6dc6357c5c6547b286b) )
 	ROM_LOAD32_WORD( "xt461a0-829.ic37", 0x0800002, 0x200000, CRC(a1d138a3) SHA1(46a7a7225cd7e1818ba551325d2af5ac1bf5b2bf) )
-	ROM_LOAD32_WORD( "xt462a0.ic39", 0x1000000, 0x400000, CRC(cbf037da) SHA1(37449e741243305de38cb913b17041942ad334cd) )
+	ROM_LOAD32_WORD( "xt462a0.ic39", 0x1000000, 0x400000, CRC(2e82cbd4) SHA1(d1f0e2713bf2cca9156c562e23fcce4fa5d7cfb3) )
 	ROM_LOAD32_WORD( "xt463a0.ic38", 0x1000002, 0x400000, CRC(cce5f8d3) SHA1(bdca8c5158f452f2b5535c7d658c9b22c6d66048) )
 ROM_END
 
@@ -705,7 +761,7 @@ ROM_START( mu100r )
 	ROM_LOAD32_WORD( "sx743b0.ic35", 0x000002, 0x400000, CRC(a9109a6c) SHA1(a67bb49378a38a2d809bd717d286e18bc6496db0) )
 	ROM_LOAD32_WORD( "xt445a0-828.ic36", 0x800000, 0x200000, CRC(225c2280) SHA1(23b5e046fd2e2ac01af3e6dc6357c5c6547b286b) )
 	ROM_LOAD32_WORD( "xt461a0-829.ic37", 0x800002, 0x200000, CRC(a1d138a3) SHA1(46a7a7225cd7e1818ba551325d2af5ac1bf5b2bf) )
-	ROM_LOAD32_WORD( "xt462a0.ic39", 0x1000000, 0x400000, CRC(cbf037da) SHA1(37449e741243305de38cb913b17041942ad334cd) )
+	ROM_LOAD32_WORD( "xt462a0.ic39", 0x1000000, 0x400000, CRC(2e82cbd4) SHA1(d1f0e2713bf2cca9156c562e23fcce4fa5d7cfb3) )
 	ROM_LOAD32_WORD( "xt463a0.ic38", 0x1000002, 0x400000, CRC(cce5f8d3) SHA1(bdca8c5158f452f2b5535c7d658c9b22c6d66048) )
 ROM_END
 
@@ -719,10 +775,10 @@ ROM_START( mu100b )
 	ROM_LOAD32_WORD( "sx743b0.ic35", 0x0000002, 0x400000, CRC(a9109a6c) SHA1(a67bb49378a38a2d809bd717d286e18bc6496db0) )
 	ROM_LOAD32_WORD( "xt445a0-828.ic36", 0x0800000, 0x200000, CRC(225c2280) SHA1(23b5e046fd2e2ac01af3e6dc6357c5c6547b286b) )
 	ROM_LOAD32_WORD( "xt461a0-829.ic37", 0x0800002, 0x200000, CRC(a1d138a3) SHA1(46a7a7225cd7e1818ba551325d2af5ac1bf5b2bf) )
-	ROM_LOAD32_WORD( "xt462a0.ic39", 0x1000000, 0x400000, CRC(cbf037da) SHA1(37449e741243305de38cb913b17041942ad334cd) )
+	ROM_LOAD32_WORD( "xt462a0.ic39", 0x1000000, 0x400000, CRC(2e82cbd4) SHA1(d1f0e2713bf2cca9156c562e23fcce4fa5d7cfb3) )
 	ROM_LOAD32_WORD( "xt463a0.ic38", 0x1000002, 0x400000, CRC(cce5f8d3) SHA1(bdca8c5158f452f2b5535c7d658c9b22c6d66048) )
 ROM_END
 
-CONS( 1997, mu100,  0,     0, mu100, mu100, mu100_state,  empty_init, "Yamaha", "MU100",                  MACHINE_NOT_WORKING )
-CONS( 1997, mu100r, mu100, 0, mu100, mu100, mu100r_state, empty_init, "Yamaha", "MU100 Rackable version", MACHINE_NOT_WORKING )
-CONS( 1998, mu100b, mu100, 0, mu100, mu100, mu100_state,  empty_init, "Yamaha", "MU100B", MACHINE_NOT_WORKING )
+SYST( 1997, mu100,  0,     0, mu100, mu100, mu100_state,  empty_init, "Yamaha", "MU100",                  MACHINE_NOT_WORKING )
+SYST( 1997, mu100r, mu100, 0, mu100, mu100, mu100r_state, empty_init, "Yamaha", "MU100 Rackable version", MACHINE_NOT_WORKING )
+SYST( 1998, mu100b, mu100, 0, mu100, mu100, mu100_state,  empty_init, "Yamaha", "MU100B",                 MACHINE_NOT_WORKING )

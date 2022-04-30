@@ -32,15 +32,43 @@ public:
 
 	void map(address_map &map);
 
-	void set_tmap_xoffsets(int x1, int x2, int x3) { m_tilemap_scrolldx[0] = x1; m_tilemap_scrolldx[1] = x2; m_tilemap_scrolldx[2] = x3; }
-	void set_tmap_yoffsets(int y1, int y2, int y3) { m_tilemap_scrolldy[0] = y1; m_tilemap_scrolldy[1] = y2; m_tilemap_scrolldy[2] = y3; }
+	void set_tmap_flip_xoffsets(int x1, int x2, int x3) { m_tilemap_flip_scrolldx[0] = x1; m_tilemap_flip_scrolldx[1] = x2; m_tilemap_flip_scrolldx[2] = x3; }
+	void set_tmap_flip_yoffsets(int y1, int y2, int y3) { m_tilemap_flip_scrolldy[0] = y1; m_tilemap_flip_scrolldy[1] = y2; m_tilemap_flip_scrolldy[2] = y3; }
+	void set_tmap_xoffsets(int x1, int x2, int x3)
+	{
+		m_tilemap_scrolldx[0] = x1;
+		m_tilemap_scrolldx[1] = x2;
+		m_tilemap_scrolldx[2] = x3;
+		// default flip xoffset
+		set_tmap_flip_xoffsets(-x1, -x2, -x3);
+	}
+	void set_tmap_yoffsets(int y1, int y2, int y3)
+	{
+		m_tilemap_scrolldy[0] = y1;
+		m_tilemap_scrolldy[1] = y2;
+		m_tilemap_scrolldy[2] = y3;
+		// default flip yoffset
+		set_tmap_flip_yoffsets(-y1, -y2, -y3);
+	}
 
-	auto blit_irq_cb() { return m_blit_irq_cb.bind(); }
+	auto irq_cb() { return m_irq_cb.bind(); }
+	auto ext_ctrl_0_cb() { return m_ext_ctrl_0_cb.bind(); }
+	auto ext_ctrl_1_cb() { return m_ext_ctrl_1_cb.bind(); }
+	auto ext_ctrl_2_cb() { return m_ext_ctrl_2_cb.bind(); }
+	void set_vblank_irq_level(int level) { m_vblank_irq_level = level; }
+	void set_blit_irq_level(int level) { m_blit_irq_level = level; }
 	void set_spriteram_buffered(bool buffer) { m_spriteram_buffered = buffer; }
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_foreground(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_eof);
+
+	// TODO: privatize eventually
+	u8 irq_enable() const { return m_irq_enable; }
+	void irq_enable_w(u8 data);
+	void set_irq(int level);
+	void clear_irq(int level);
+	u8 irq_cause_r();
 
 protected:
 	imagetek_i4100_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool has_ext_tiles);
@@ -50,7 +78,9 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	virtual void update_irq_state();
 
 	required_shared_ptr_array<u16, 3> m_vram;
 	required_shared_ptr<u16> m_scratchram;
@@ -65,7 +95,12 @@ protected:
 
 	std::unique_ptr<u8[]>   m_expanded_gfx1;
 
-	devcb_write_line m_blit_irq_cb;
+	devcb_write8 m_irq_cb;
+
+	int m_vblank_irq_level;
+	int m_blit_irq_level;
+	u8 m_requested_int;
+	u8 m_irq_enable;
 
 	struct sprite_t
 	{
@@ -84,6 +119,8 @@ protected:
 	u16 m_rombank;
 	size_t m_gfxrom_size;
 	bool m_crtc_unlock;
+	u16 m_crtc_horz;
+	u16 m_crtc_vert;
 	u16 m_sprite_count;
 	u16 m_sprite_priority;
 	u16 m_sprite_xoffset,m_sprite_yoffset;
@@ -97,6 +134,8 @@ protected:
 	const bool m_support_8bpp, m_support_16x16;
 	int  m_tilemap_scrolldx[3];
 	int  m_tilemap_scrolldy[3];
+	int  m_tilemap_flip_scrolldx[3];
+	int  m_tilemap_flip_scrolldy[3];
 	bool m_spriteram_buffered;
 
 	void blt_write(const int tmap, const offs_t offs, const u16 data, const u16 mask);
@@ -109,59 +148,59 @@ protected:
 	emu_timer *m_blit_done_timer;
 
 	// I/O operations
+	void irq_cause_w(u8 data);
 	inline u16 vram_r(offs_t offset, int layer) { return m_vram[layer][offset]; }
 	inline void vram_w(offs_t offset, u16 data, u16 mem_mask, int layer) { COMBINE_DATA(&m_vram[layer][offset]); }
-	DECLARE_READ16_MEMBER(vram_0_r);
-	DECLARE_READ16_MEMBER(vram_1_r);
-	DECLARE_READ16_MEMBER(vram_2_r);
-	DECLARE_WRITE16_MEMBER(vram_0_w);
-	DECLARE_WRITE16_MEMBER(vram_1_w);
-	DECLARE_WRITE16_MEMBER(vram_2_w);
-	DECLARE_READ16_MEMBER(rmw_vram_0_r);
-	DECLARE_READ16_MEMBER(rmw_vram_1_r);
-	DECLARE_READ16_MEMBER(rmw_vram_2_r);
-	DECLARE_WRITE16_MEMBER(rmw_vram_0_w);
-	DECLARE_WRITE16_MEMBER(rmw_vram_1_w);
-	DECLARE_WRITE16_MEMBER(rmw_vram_2_w);
-	DECLARE_READ16_MEMBER(scratchram_r);
-	DECLARE_WRITE16_MEMBER(scratchram_w);
-	DECLARE_READ16_MEMBER(spriteram_r);
-	DECLARE_WRITE16_MEMBER(spriteram_w);
-	DECLARE_READ16_MEMBER(tiletable_r);
-	DECLARE_WRITE16_MEMBER(tiletable_w);
-	DECLARE_READ16_MEMBER(sprite_count_r);
-	DECLARE_WRITE16_MEMBER(sprite_count_w);
-	DECLARE_READ16_MEMBER(sprite_priority_r);
-	DECLARE_WRITE16_MEMBER(sprite_priority_w);
-	DECLARE_READ16_MEMBER(sprite_xoffset_r);
-	DECLARE_WRITE16_MEMBER(sprite_xoffset_w);
-	DECLARE_READ16_MEMBER(sprite_yoffset_r);
-	DECLARE_WRITE16_MEMBER(sprite_yoffset_w);
-	DECLARE_READ16_MEMBER(sprite_color_code_r);
-	DECLARE_WRITE16_MEMBER(sprite_color_code_w);
-	DECLARE_READ16_MEMBER(layer_priority_r);
-	DECLARE_WRITE16_MEMBER(layer_priority_w);
-	DECLARE_READ16_MEMBER(background_color_r);
-	DECLARE_WRITE16_MEMBER(background_color_w);
+	uint16_t vram_0_r(offs_t offset);
+	uint16_t vram_1_r(offs_t offset);
+	uint16_t vram_2_r(offs_t offset);
+	void vram_0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void vram_1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void vram_2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t rmw_vram_0_r(offs_t offset);
+	uint16_t rmw_vram_1_r(offs_t offset);
+	uint16_t rmw_vram_2_r(offs_t offset);
+	void rmw_vram_0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void rmw_vram_1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void rmw_vram_2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t scratchram_r(offs_t offset);
+	void scratchram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t spriteram_r(offs_t offset);
+	void spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t tiletable_r(offs_t offset);
+	void tiletable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t sprite_count_r();
+	void sprite_count_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t sprite_priority_r();
+	void sprite_priority_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t sprite_xoffset_r();
+	void sprite_xoffset_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t sprite_yoffset_r();
+	void sprite_yoffset_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t sprite_color_code_r();
+	void sprite_color_code_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t layer_priority_r();
+	void layer_priority_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t background_color_r();
+	void background_color_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER(screen_xoffset_r);
-	DECLARE_WRITE16_MEMBER(screen_xoffset_w);
-	DECLARE_READ16_MEMBER(screen_yoffset_r);
-	DECLARE_WRITE16_MEMBER(screen_yoffset_w);
+	uint16_t screen_xoffset_r();
+	void screen_xoffset_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t screen_yoffset_r();
+	void screen_yoffset_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER(window_r);
-	DECLARE_WRITE16_MEMBER(window_w);
-	DECLARE_READ16_MEMBER(scroll_r);
-	DECLARE_WRITE16_MEMBER(scroll_w);
+	uint16_t window_r(offs_t offset);
+	void window_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t scroll_r(offs_t offset);
+	void scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-
-	DECLARE_READ16_MEMBER(gfxrom_r);
-	DECLARE_WRITE16_MEMBER(crtc_vert_w);
-	DECLARE_WRITE16_MEMBER(crtc_horz_w);
-	DECLARE_WRITE16_MEMBER(crtc_unlock_w);
-	DECLARE_WRITE16_MEMBER(blitter_w);
-	DECLARE_WRITE16_MEMBER(screen_ctrl_w);
-	DECLARE_WRITE16_MEMBER(rombank_w);
+	uint16_t gfxrom_r(offs_t offset);
+	void crtc_vert_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void crtc_horz_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void crtc_unlock_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void screen_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void rombank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void draw_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri);
 	inline u8 get_tile_pix(u16 code, u8 x, u8 y, bool const big, u32 &pix);
@@ -185,6 +224,10 @@ protected:
 	bool m_inited_hack;
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 	DECLARE_GFXDECODE_MEMBER(gfxinfo_ext);
+
+	devcb_write_line m_ext_ctrl_0_cb;
+	devcb_write_line m_ext_ctrl_1_cb;
+	devcb_write_line m_ext_ctrl_2_cb;
 };
 
 class imagetek_i4220_device : public imagetek_i4100_device
@@ -195,7 +238,7 @@ public:
 
 	// needed by Blazing Tornado / Grand Striker 2 for mixing with PSAC
 	// (it's unknown how the chip enables external sync)
-	u32 get_background_pen() { return m_palette->pen(m_background_color); };
+	u32 get_background_pen() { return m_palette->pen(m_background_color); }
 
 	void v2_map(address_map &map);
 };
@@ -207,6 +250,19 @@ public:
 	imagetek_i4300_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void v3_map(address_map &map);
+	u8 irq_vector_r(offs_t offset);
+
+protected:
+	virtual void device_start() override;
+
+	virtual void update_irq_state() override;
+
+private:
+	void irq_level_w(offs_t offset, u8 data);
+	void irq_vector_w(offs_t offset, u8 data);
+
+	u8 m_irq_levels[8];
+	u8 m_irq_vectors[8];
 };
 
 // device type definition

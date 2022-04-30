@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(divebomb_state::get_fg_tile_info)
 
 	code |= (attr & 0x3) << 8;
 
-	SET_TILE_INFO_MEMBER(0, code, colour, 0);
+	tileinfo.set(0, code, colour, 0);
 }
 
 
@@ -58,14 +58,14 @@ K051316_CB_MEMBER(divebomb_state::zoom_callback_2)
  *
  *************************************/
 
-WRITE8_MEMBER(divebomb_state::fgram_w)
+void divebomb_state::fgram_w(offs_t offset, uint8_t data)
 {
 	m_fgram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
-WRITE8_MEMBER(divebomb_state::rozcpu_pal_w)
+void divebomb_state::rozcpu_pal_w(uint8_t data)
 {
 	//.... ..xx  K051316 1 palette select
 	//..xx ....  K051316 2 palette select
@@ -131,7 +131,7 @@ void divebomb_state::divebomb_palette(palette_device &palette) const
 }
 
 
-VIDEO_START_MEMBER(divebomb_state,divebomb)
+void divebomb_state::video_start()
 {
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(divebomb_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);

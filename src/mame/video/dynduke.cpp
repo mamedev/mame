@@ -7,19 +7,19 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(dynduke_state::background_w)
+void dynduke_state::background_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_back_data[offset]);
 	m_bg_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(dynduke_state::foreground_w)
+void dynduke_state::foreground_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fore_data[offset]);
 	m_fg_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(dynduke_state::text_w)
+void dynduke_state::text_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_tx_layer->mark_tile_dirty(offset);
@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(dynduke_state::get_bg_tile_info)
 
 	tile=tile&0xfff;
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			tile+m_back_bankbase,
 			color,
 			0);
@@ -45,7 +45,7 @@ TILE_GET_INFO_MEMBER(dynduke_state::get_fg_tile_info)
 
 	tile=tile&0xfff;
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile+m_fore_bankbase,
 			color,
 			0);
@@ -58,7 +58,7 @@ TILE_GET_INFO_MEMBER(dynduke_state::get_tx_tile_info)
 
 	tile = (tile & 0xff) | ((tile & 0xc000) >> 6);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile,
 			color,
 			0);
@@ -83,7 +83,7 @@ void dynduke_state::video_start()
 	save_item(NAME(m_old_fore));
 }
 
-WRITE16_MEMBER(dynduke_state::gfxbank_w)
+void dynduke_state::gfxbank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -101,7 +101,7 @@ WRITE16_MEMBER(dynduke_state::gfxbank_w)
 }
 
 
-WRITE16_MEMBER(dynduke_state::control_w)
+void dynduke_state::control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -164,9 +164,6 @@ void dynduke_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipr
 {
 	/* The transparency / palette handling on the background layer is very strange */
 	bitmap_ind16 &bm = m_bg_layer->pixmap();
-	int scrolly, scrollx;
-	int x,y;
-
 	/* if we're disabled, don't draw */
 	if (!m_back_enable)
 	{
@@ -174,8 +171,8 @@ void dynduke_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipr
 		return;
 	}
 
-	scrolly = ((m_scroll_ram[0x01]&0x30)<<4)+((m_scroll_ram[0x02]&0x7f)<<1)+((m_scroll_ram[0x02]&0x80)>>7);
-	scrollx = ((m_scroll_ram[0x09]&0x30)<<4)+((m_scroll_ram[0x0a]&0x7f)<<1)+((m_scroll_ram[0x0a]&0x80)>>7);
+	int scrolly = ((m_scroll_ram[0x01]&0x30)<<4)+((m_scroll_ram[0x02]&0x7f)<<1)+((m_scroll_ram[0x02]&0x80)>>7);
+	int scrollx = ((m_scroll_ram[0x09]&0x30)<<4)+((m_scroll_ram[0x0a]&0x7f)<<1)+((m_scroll_ram[0x0a]&0x80)>>7);
 
 	if (flip_screen())
 	{
@@ -183,14 +180,14 @@ void dynduke_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipr
 		scrollx = 256 - scrollx;
 	}
 
-	for (y=0;y<256;y++)
+	for (int y=0;y<256;y++)
 	{
 		int realy = (y + scrolly) & 0x1ff;
-		uint16_t *src = &bm.pix16(realy);
-		uint16_t *dst = &bitmap.pix16(y);
+		uint16_t const *const src = &bm.pix(realy);
+		uint16_t *const dst = &bitmap.pix(y);
 
 
-		for (x=0;x<256;x++)
+		for (int x=0;x<256;x++)
 		{
 			int realx = (x + scrollx) & 0x1ff;
 			uint16_t srcdat = src[realx];

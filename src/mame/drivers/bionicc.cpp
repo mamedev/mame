@@ -87,7 +87,7 @@
 #include "machine/timer.h"
 #include "video/bufsprite.h"
 #include "video/tigeroad_spr.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -150,23 +150,23 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
-	DECLARE_WRITE16_MEMBER(bgvideoram_w);
-	DECLARE_WRITE16_MEMBER(fgvideoram_w);
-	DECLARE_WRITE16_MEMBER(txvideoram_w);
-	DECLARE_WRITE16_MEMBER(scroll_w);
+	void bgvideoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void fgvideoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void txvideoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	tilemap_t   *m_tx_tilemap;
-	tilemap_t   *m_bg_tilemap;
-	tilemap_t   *m_fg_tilemap;
-	uint16_t    m_scroll[4];
+	tilemap_t   *m_tx_tilemap = nullptr;
+	tilemap_t   *m_bg_tilemap = nullptr;
+	tilemap_t   *m_fg_tilemap = nullptr;
+	uint16_t    m_scroll[4]{};
 
 	// audio
 	void audiocpu_nmi_w(u8 data);
 
 	// protection mcu
-	u8 m_audiocpu_to_mcu; // ls374 at 4a
-	u8 m_mcu_to_audiocpu; // ls374 at 5a
-	u8 m_mcu_p1;
+	u8 m_audiocpu_to_mcu = 0; // ls374 at 4a
+	u8 m_mcu_to_audiocpu = 0; // ls374 at 5a
+	u8 m_mcu_p1 = 0;
 	u8 m_mcu_p3;
 
 	void dmaon_w(u16 data);
@@ -336,25 +336,25 @@ rgb_t bionicc_state::RRRRGGGGBBBBIIII(uint32_t raw)
 
 */
 
-WRITE16_MEMBER(bionicc_state::bgvideoram_w)
+void bionicc_state::bgvideoram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_bgvideoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(bionicc_state::fgvideoram_w)
+void bionicc_state::fgvideoram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_fgvideoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(bionicc_state::txvideoram_w)
+void bionicc_state::txvideoram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_txvideoram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE16_MEMBER(bionicc_state::scroll_w)
+void bionicc_state::scroll_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	data = COMBINE_DATA(&m_scroll[offset]);
 
@@ -401,6 +401,13 @@ void bionicc_state::video_start()
 	m_fg_tilemap->set_transmask(0, 0xffff, 0x8000); /* split type 0 is completely transparent in front half */
 	m_fg_tilemap->set_transmask(1, 0xffc1, 0x803e); /* split type 1 has pens 1-5 opaque in front half */
 	m_bg_tilemap->set_transparent_pen(15);
+
+	m_tx_tilemap->set_scrolldx(128, 128);
+	m_tx_tilemap->set_scrolldy(  6,   6);
+	m_bg_tilemap->set_scrolldx(128, 128);
+	m_bg_tilemap->set_scrolldy(  6,   6);
+	m_fg_tilemap->set_scrolldx(128, 128);
+	m_fg_tilemap->set_scrolldy(  6,   6);
 }
 
 
@@ -455,7 +462,7 @@ TILE_GET_INFO_MEMBER(bionicc_state::get_tx_tile_info)
 	int attr = m_txvideoram[tile_index + 0x400];
 	int code = m_txvideoram[tile_index] & 0xff;
 
-	SET_TILE_INFO_MEMBER(0, ((attr & 0xc0) << 2) | code, attr & 0x3f, 0);
+	tileinfo.set(0, ((attr & 0xc0) << 2) | code, attr & 0x3f, 0);
 }
 
 TILE_GET_INFO_MEMBER(bionicc_state::get_fg_tile_info)
@@ -483,7 +490,7 @@ TILE_GET_INFO_MEMBER(bionicc_state::get_fg_tile_info)
 		flag = TILE_FLIPXY((attr & 0xc0) >> 6);
 	}
 
-	SET_TILE_INFO_MEMBER(2, ((attr & 0x07) << 8) | code, (attr & 0x18) >> 3, flag);
+	tileinfo.set(2, ((attr & 0x07) << 8) | code, (attr & 0x18) >> 3, flag);
 }
 
 TILE_GET_INFO_MEMBER(bionicc_state::get_bg_tile_info)
@@ -497,7 +504,7 @@ TILE_GET_INFO_MEMBER(bionicc_state::get_bg_tile_info)
 	int code = m_bgvideoram[2 * tile_index] & 0xff;
 	int flag = TILE_FLIPXY((attr & 0xc0) >> 6);
 
-	SET_TILE_INFO_MEMBER(1, ((attr & 0x07) << 8) | code, (attr & 0x38) >> 3, flag);
+	tileinfo.set(1, ((attr & 0x07) << 8) | code, (attr & 0x38) >> 3, flag);
 }
 
 
@@ -649,8 +656,7 @@ void bionicc_state::bionicc(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	/* FIXME: should be 257 visible horizontal pixels, first visible pixel should be repeated, back porch/front porch should be separated */
-	screen.set_raw(24_MHz_XTAL / 4, 386, 0, 256, 260, 16, 240);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
 	screen.set_screen_update(FUNC(bionicc_state::screen_update));
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);

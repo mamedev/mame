@@ -42,8 +42,8 @@ private:
 	// uint8_t m_ram[0x800];
 
 public:
-	DECLARE_READ8_MEMBER(p1_HDC_r);
-	DECLARE_WRITE8_MEMBER(p1_HDC_w);
+	uint8_t p1_HDC_r(offs_t offset);
+	void p1_HDC_w(offs_t offset, uint8_t data);
 };
 
 

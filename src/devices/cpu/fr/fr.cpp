@@ -12,14 +12,12 @@
 #include "fr.h"
 #include "frdasm.h"
 
-// device type definitions
-DEFINE_DEVICE_TYPE(MB91101A, mb91101a_device, "mb91101a", "Fujitsu MB91101A")
+// device type definition
+DEFINE_DEVICE_TYPE(MB91F155A, mb91f155a_device, "mb91f155a", "Fujitsu MB91F155A")
 
 fr_cpu_device::fr_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int addrbits, address_map_constructor map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_space_config("program", ENDIANNESS_BIG, 32, addrbits, 0, map)
-	, m_space(nullptr)
-	, m_cache(nullptr)
 	, m_regs{0}
 	, m_pc(0)
 	, m_ps(0)
@@ -30,9 +28,15 @@ fr_cpu_device::fr_cpu_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-mb91101a_device::mb91101a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: fr_cpu_device(mconfig, MB91101A, tag, owner, clock, 32, address_map_constructor())
+mb91f155a_device::mb91f155a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: fr_cpu_device(mconfig, MB91F155A, tag, owner, clock, 24, address_map_constructor(FUNC(mb91f155a_device::internal_map), this))
 {
+}
+
+void mb91f155a_device::internal_map(address_map &map)
+{
+	// TODO: I/O registers
+	map(0x001000, 0x008fff).ram();
 }
 
 std::unique_ptr<util::disasm_interface> fr_cpu_device::create_disassembler()
@@ -49,8 +53,8 @@ device_memory_interface::space_config_vector fr_cpu_device::memory_space_config(
 
 void fr_cpu_device::device_start()
 {
-	m_space = &space(AS_PROGRAM);
-	m_cache = m_space->cache<2, 0, ENDIANNESS_BIG>();
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_space);
 
 	set_icountptr(m_icount);
 
@@ -100,7 +104,7 @@ void fr_cpu_device::device_reset()
 
 void fr_cpu_device::execute_run()
 {
-	m_pc = m_space->read_dword(m_tbr + 0x3fc);
+	m_pc = m_space.read_dword(m_tbr + 0x3fc);
 
 	debugger_instruction_hook(m_pc);
 

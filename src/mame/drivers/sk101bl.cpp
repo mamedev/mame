@@ -58,11 +58,11 @@ private:
 	required_device<hd44780_device> m_lcdc;
 	optional_ioport_array<16> m_key_row;
 
-	u8 m_p1_data;
-	u8 m_lcd_control;
-	u16 m_key_scan;
-	u16 m_shift_output;
-	u8 m_row_counter;
+	u8 m_p1_data = 0;
+	u8 m_lcd_control = 0;
+	u16 m_key_scan = 0;
+	u16 m_shift_output = 0;
+	u8 m_row_counter = 0;
 };
 
 void sk101bl_state::machine_start()
@@ -87,7 +87,7 @@ void sk101bl_state::machine_reset()
 HD44780_PIXEL_UPDATE(sk101bl_state::pixel_update)
 {
 	if (pos < 16 && line == 0)
-		bitmap.pix16(line * 10 + y, pos * 6 + x) = state;
+		bitmap.pix(line * 10 + y, pos * 6 + x) = state;
 }
 
 u8 sk101bl_state::p1_r()

@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="ibm5170_cdrom" description="IBM PC/AT CD-ROM images">
 
 	<!--                                         -->
@@ -104,7 +107,7 @@
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="a-10 cuba! (1996)(activision)" sha1="a9bc7e3b7306c46acf33b93ae168862d18734245" />
+				<disk name="a-10 cuba (1996)(activision)" sha1="a9bc7e3b7306c46acf33b93ae168862d18734245" />
 			</diskarea>
 		</part>
 	</software>
@@ -116,7 +119,7 @@
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="a-10 cuba! (1997)(megamedia)[compilation megapak 7]" sha1="5fc89dde64013ab6d070572ac2b9a8829bbde084" />
+				<disk name="a-10 cuba (1997)(megamedia)[compilation megapak 7]" sha1="5fc89dde64013ab6d070572ac2b9a8829bbde084" />
 			</diskarea>
 		</part>
 	</software>
@@ -396,6 +399,22 @@
 		</part>
 	</software>
 
+	<software name="alienodu" cloneof="alienody" supported="no">
+		<!--
+		    L384 9614 05921024 B51103-30 M1S4
+		    IFPI6100
+		-->
+		<description>Alien Odyssey (US)</description>
+		<year>1995</year>
+		<publisher>Philips / Argonaut Software LTD</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="310691059-2" sha1="4db3c0e2559d0b56c620ad34895d504f2cde5128" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- TODO: can't setup sb16 sound card properly, hangs at "TimerRegister Event" -->
 	<!-- TODO: disc swap doesn't work properly -->
 	<software name="alienscb" supported="partial">
@@ -454,6 +473,20 @@
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="aces of the pacific (1994)(sierra)" sha1="42422f83009e0771968243cb0ea1172699bf8787" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- OS/2 -->
+	<software name="apak_os2">
+		<description>IBM AttachPak for OS/2 Warp Connect</description>
+		<year>1995</year>
+		<publisher>IBM</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: archive.org -->
+			<feature name="part_number" value="27H9296"/>
+			<diskarea name="cdrom">
+				<disk name="apak_usa" sha1="ad7b97376326cad3665a65a711ef872c44a93120"/>
 			</diskarea>
 		</part>
 	</software>
@@ -681,6 +714,23 @@
 		</part>
 	</software>
 
+	<!-- DOS -->
+	<!-- Created from original media. size="1386496" crc="8B00FD46" sha1="5E85EAECDDBBD0D91B01F315F2E040247E36FA5A" -->
+	<!-- Originally released on two PC Booter 5.25" floppies and one 3.5" PC Booter floppy. Reprinted on CD by -->
+	<!-- GT Interactive as a standalone release, and as part of "Arcade Favorites CD-Rom 5 Pak. -->
+	<!-- Game can be run straight from the CD." -->
+	<software name="bad_dudescd">
+		<description>Bad Dudes (1995 CD release)</description>
+		<year>1995</year>
+		<publisher>GT Interactive</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="bad_dudes_cd" sha1="97d6a57218a1ffaf50f7d89071e21d784855381c" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Windows 3.1 -->
 	<!-- Disc label Bad_mojo_uk -->
 	<!-- TODO: weird installer, missing graphics? -->
@@ -862,7 +912,7 @@
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="bioforge vf1.01 (1995)(origin)(m3)[!]" sha1="2bc3734682a461aae4e07d8a419fde407cefd4c1" />
+				<disk name="bioforge vf1.01 (1995)(origin)(m3)" sha1="2bc3734682a461aae4e07d8a419fde407cefd4c1" />
 			</diskarea>
 		</part>
 	</software>
@@ -877,22 +927,22 @@
 
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="blade runner (1997)(virgin)(disc 1 of 4)[!]" sha1="449b907d4b85e67d3b7fe5832ea7ad4f555b31db" />
+				<disk name="blade runner (1997)(virgin)(disc 1 of 4)" sha1="449b907d4b85e67d3b7fe5832ea7ad4f555b31db" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="blade runner (1997)(virgin)(disc 2 of 4)[!]" sha1="f1de28b44c7960d43451c1287e6fabfdb6018da5" />
+				<disk name="blade runner (1997)(virgin)(disc 2 of 4)" sha1="f1de28b44c7960d43451c1287e6fabfdb6018da5" />
 			</diskarea>
 		</part>
 		<part name="cdrom3" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="blade runner (1997)(virgin)(disc 3 of 4)[!]" sha1="aca716550f43468d4e786083d29c07610273d8e1" />
+				<disk name="blade runner (1997)(virgin)(disc 3 of 4)" sha1="aca716550f43468d4e786083d29c07610273d8e1" />
 			</diskarea>
 		</part>
 		<part name="cdrom4" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="blade runner (1997)(virgin)(disc 4 of 4)[!]" sha1="f4681e82c6cd1d17d449831102f5c9235b6d6659" />
+				<disk name="blade runner (1997)(virgin)(disc 4 of 4)" sha1="f4681e82c6cd1d17d449831102f5c9235b6d6659" />
 			</diskarea>
 		</part>
 	</software>
@@ -1185,7 +1235,7 @@
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="caesar ii (1997)(sierra)[!][budget][50011269]" sha1="1a3e489a3845963b4f833f613c89c8fffadeefbf" />
+				<disk name="caesar ii (1997)(sierra)[budget][50011269]" sha1="1a3e489a3845963b4f833f613c89c8fffadeefbf" />
 			</diskarea>
 		</part>
 	</software>
@@ -2088,6 +2138,39 @@
 		</part>
 	</software>
 
+	<!-- DOS -->
+	<!-- Created from original media. size="1239040" crc="A9510DC8" sha1="609D186B01197D971D0C1A20DC8954F79DAC80D9" -->
+	<!-- Originally released on two 5.25" floppies. Reprinted on CD by GT Interactive as a standalone release, -->
+	<!-- and as part of "Arcade Favorites CD-Rom 5 Pak. Game can be run straight from the CD." -->
+	<software name="heavybarrelcd">
+		<description>Heavy Barrel (1995 CD release)</description>
+		<year>1995</year>
+		<publisher>GT Interactive</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="heavybarrel_cd" sha1="0d6ea927d897d36f71d49950ccb805e807b92857" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ignition" supported="no">
+		<!--
+		    FUTURE MEDIA / CA
+		    FM 16942 (CD-C95-1063-0/IN0002)
+		    IFPI 3V17
+		-->
+		<description>Ignition (US)</description>
+		<year>1997</year>
+		<publisher>Interplay</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cd-c95-1063-0" sha1="48bad304857689acb3fc7fcc9e22c2c7e9d8b45f" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="ironbld">
 		<description>Iron Blood</description>
 		<year>1996</year>
@@ -2218,6 +2301,22 @@
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ku2impact" sha1="2e1f1c8ce81065fcdf2081daa97c72180243f1e0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS -->
+	<!-- Created from original media. size="931840" crc="25324098" sha1="15C4E7C307CCFC972A73C7C309E4104579D41287" -->
+	<!-- Originally released on PC Booter 5.25" floppies. Reprinted on CD by GT Interactive as a standalone release, -->
+	<!-- and as part of "Arcade Favorites CD-Rom 5 Pak. Game can be run straight from the CD." -->
+	<software name="karnovcd">
+		<description>Karnov (1995 CD release)</description>
+		<year>1995</year>
+		<publisher>GT Interactive</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="karnov_cd" sha1="6fb90bf33a608b855b917c8dfe94c900b10c47a9" />
 			</diskarea>
 		</part>
 	</software>
@@ -2380,6 +2479,23 @@
 		</part>
 	</software>
 
+	<!-- DOS -->
+	<!-- Created from an ISO. size="6352896" crc="DCEEEB82" sha1="EA7BE8CB7E91FB97C590D23AEDFA371DC98CF5C0" -->
+	<!-- Originally released on 3.5" and 5.25" floppies. Reprinted on CD by GT Interactive and included in -->
+	<!-- "Arcade Favorites CD-Rom 5 Pak." Game can be run straight from the CD or installed to a hard drive. -->
+	<software name="pipemaniacd">
+		<description>Pipe Mania (1995 CD release)</description>
+		<year>1995</year>
+		<publisher>GT Interactive</publisher>
+		<info name="alt_title" value="Pipe Dream" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="pipemaniacd" sha1="be7d5677f92a9820b5114980f70ab153f9e9b7b7" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Windows 3.x -->
 	<!-- TODO: 256 colors shifting issue, sound is too slow? -->
 	<software name="plumber" supported="partial">
@@ -2459,7 +2575,7 @@
 
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="Command &amp; Conquer - Red Alert (1996)(Virgin)(Disc 1 of 2)[!]" sha1="30e980766b5de27296c4f49cd41a7baec50736c4" />
+				<disk name="Command &amp; Conquer - Red Alert (1996)(Virgin)(Disc 1 of 2)" sha1="30e980766b5de27296c4f49cd41a7baec50736c4" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdrom">
@@ -2623,6 +2739,19 @@
 		</part>
 	</software>
 
+	<!-- DOS -->
+	<software name="skynet" supported="partial">
+		<description>SkyNET</description>
+		<year>1996</year>
+		<publisher>Bethesda Softworks</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="skynet" sha1="0b9059f48d86c651bcd0e8b8112983b84fc489a6" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Windows 3.1 -->
 	<!-- TODO: gfx shift issue on 256 color mode -->
 	<software name="spaceinv" supported="partial">
@@ -2649,6 +2778,78 @@
 		</part>
 	</software>
 
+	<!-- DOS -->
+	<!-- Created from original media. size="1230848" crc="71FF88DB" sha1="5AA5CB751B6236892CF74AB37A8A7E3953E866E0" -->
+	<!-- Originally released on one PC Booter 5.25" floppy disk. Reprinted on CD by GT Interactive as a -->
+	<!-- standalone release, and as part of "Arcade Favorites CD-Rom 5 Pak. Game can be run straight from the CD." -->
+	<software name="tagteamcd">
+		<description>Tag Team Wrestling (1995 CD release)</description>
+		<year>1995</year>
+		<publisher>GT Interactive</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="tagteam_cd" sha1="33eaebcca48c8a4382dc3ac87e346e393f47b2d8" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS -->
+	<!-- Low budget CD release of both games. Each can be installed separately. Also contains video demos for -->
+	<!-- Discoveries of the Deep, Eternam, Terminator 2: Chess Wars, Trolls and Wayne's World. -->
+	<software name="t2gmchess" supported="partial">
+		<description>Terminator 2: Judgment Day - Chess Wars / Grandmaster Chess</description>
+		<year>1993</year>
+		<publisher>Capstone Software</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="t2_cdrom" sha1="9bbb9362fe6a4895c7b1e3e34c179fdd7436c070" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS -->
+	<!-- Also contains demos for NCAA: Road to the Final Four 2 and Delta V. -->
+	<software name="term2029dx" supported="partial">
+		<description>The Terminator: 2029 - Deluxe CD Edition</description>
+		<year>1994</year>
+		<publisher>Bethesda Softworks</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="2029_cd" sha1="8bcadedb9f8f24b699a0847edcb1bc1fa1222b7a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS -->
+	<!-- Also contains demos for The Elder Scrolls: Daggerfall, Xcar, and PBA Bowling. -->
+	<software name="termfs" supported="partial">
+		<description>The Terminator: Future Shock</description>
+		<year>1995</year>
+		<publisher>Bethesda Softworks</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="future_shock" sha1="db390639f1c7ae57f1aa43083bdd37c08c3e3e10" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS -->
+	<!-- Also contains video demos for The Elder Scrolls: Arena and Delta V. -->
+	<software name="termramp" supported="partial">
+		<description>The Terminator: Rampage</description>
+		<year>1997</year>
+		<publisher>Bethesda Softworks</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="rampage" sha1="cb91ee2e34e3b7391169079d6787c75712b1d97f" />
+			</diskarea>
+		</part>
+	</software>
 
 	<software name="turricn2">
 		<description>Turrican II - The Final Fight</description>
@@ -2822,6 +3023,189 @@
 		</part>
 	</software>
 
+	<software name="freedos10">
+		<description>FreeDOS 1.0</description>
+		<year>2006</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.0" />
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="FreeDOS 1.0 base CD"/>
+			<diskarea name="cdrom">
+				<disk name="fd10basecd" sha1="4adf8033c7d02f30e9ef9caf68d90b8d131d1759"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="FreeDOS 1.0 base WS"/>
+			<diskarea name="cdrom">
+				<disk name="fd10basews" sha1="a34535fd4d2c719bf5c0de46b0174ff3e0726924"/>
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_id" value="FreeDOS 1.0 full CD"/>
+			<diskarea name="cdrom">
+				<disk name="fd10fullcd" sha1="c61303fb65f22c5d4731b921677e11b69c7cfbd5"/>
+			</diskarea>
+		</part>
+		<part name="cdrom4" interface="cdrom">
+			<feature name="part_id" value="FreeDOS 1.0 full WS"/>
+			<diskarea name="cdrom">
+				<disk name="fd10fullws" sha1="bfdfe1b9e3c4d697e69ea47dd436b6d291bee5bd"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="freedos10a" cloneof="freedos10">
+		<description>FreeDOS 1.0 (updated)</description>
+		<year>2007</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.0"/>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="FreeDOS 1.0 Base CD"/>
+			<diskarea name="cdrom">
+				<disk name="fd10abasecd" sha1="dd786f321046514e5f24abbf340b63dd4dadb30c"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="FreeDOS 1.0 Base CD with source"/>
+			<diskarea name="cdrom">
+				<disk name="fd10abasews" sha1="ac6941c1322c74df58093305f7bc9aed8180c4cd"/>
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_id" value="FreeDOS 1.0 Full CD"/>
+			<diskarea name="cdrom">
+				<disk name="fd10afullcd" sha1="7ee77df8277da136a7b19eb57afba106dd654233"/>
+			</diskarea>
+		</part>
+		<part name="cdrom4" interface="cdrom">
+			<feature name="part_id" value="FreeDOS 1.0 Full CD with source"/>
+			<diskarea name="cdrom">
+				<disk name="fd10afullws" sha1="0868559412de4d35b8d5081a6dec87d665ed9c1f"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="freedos11">
+		<description>FreeDOS 1.1</description>
+		<year>2012</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.1"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="fd11src" sha1="3e81da055507f4dd3f906d08f2b21fa47553cf92"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="freedos12">
+		<description>FreeDOS 1.2</description>
+		<year>2016</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.2"/>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="Standard installer"/>
+			<diskarea name="cdrom">
+				<disk name="fd12cd" sha1="6241ffcfcbd119c09a71622a31ef73d110542716"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Legacy installer"/>
+			<diskarea name="cdrom">
+				<disk name="fd12lgcy" sha1="86ff1e0c49029c68ad24a0110e32929ec26b2760"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="freedos13rc1">
+		<description>FreeDOS 1.3 Release Candidate 1</description>
+		<year>2019</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.3-RC1"/>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="LiveCD 1"/>
+			<diskarea name="cdrom">
+				<disk name="fd13live1" sha1="0eea3f4a33a47a3425f44377e521579d954781d7"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="LiveCD 2"/>
+			<diskarea name="cdrom">
+				<disk name="fd13live2" sha1="859562545a8ea1c11378e4422756a7dbb1b1171c"/>
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_id" value="Legacy CD"/>
+			<diskarea name="cdrom">
+				<disk name="fd13lgcy" sha1="6e7f457b161df9400c0f1dde0e0a209c6edb21d6"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="freedos13rc2">
+		<description>FreeDOS 1.3 Release Candidate 2</description>
+		<year>2019</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.3-RC2"/>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="LiveCD"/>
+			<diskarea name="cdrom">
+				<disk name="fd13live" sha1="183f63a9a35d95b10e1befa9b92060bf7a290726"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Legacy CD"/>
+			<diskarea name="cdrom">
+				<disk name="fd13lgcy" sha1="5a6bd7eed9700e18b3207c4af828b6da7138db60"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="freedos13rc3">
+		<description>FreeDOS 1.3 Release Candidate 3</description>
+		<year>2020</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.3-RC3"/>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="LiveCD"/>
+			<diskarea name="cdrom">
+				<disk name="fd13live" sha1="df8e74fbf7328f522bcbc677697bbbb9dd300c8b"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Legacy CD"/>
+			<diskarea name="cdrom">
+				<disk name="fd13lgcy" sha1="4f8c9809b335e5f8910edf4ce9c6fd1e5c53ebf5"/>
+			</diskarea>
+		</part>
+	</software>
+
+
+	<software name="freedos13rc4">
+		<description>FreeDOS 1.3 Release Candidate 4</description>
+		<year>2021</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.3-RC4"/>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="LiveCD"/>
+			<diskarea name="cdrom">
+				<disk name="fd13live" sha1="85bdfb46bc8cb955aa5bc6df1850b03aa0cef1e0"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Legacy CD"/>
+			<diskarea name="cdrom">
+				<disk name="fd13lgcy" sha1="34be19cb2465925f1a5576c1eb3144f315621882"/>
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_id" value="Bonus CD"/>
+			<diskarea name="cdrom">
+				<disk name="fd13bns" sha1="1fe2a984fffe11c4587e625f845200c219a0893d"/>
+			</diskarea>
+		</part>
+	</software>
+
+
 	<!-- DOS -->
 	<!-- Rereleased software, apparently identical to the floppy counterpart -->
 	<software name="keycad">
@@ -2874,10 +3258,188 @@
 		</part>
 	</software>
 
+	<!-- OS/2 -->
+	<software name="notes33exp_os2">
+		<description>Lotus Notes Express v3.30 for OS2, Special Promotion Copy NFR</description>
+		<year>1995</year>
+		<publisher>Lotus Development Corporation</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: archive.org -->
+			<feature name="part_number" value="27H9175"/>
+			<diskarea name="cdrom">
+				<disk name="lotus_notes_express_v3_30_for_os2_special_promotion_copy_nfr_27h9175_lotus_development_corporation_1995" sha1="00b6e6eb8132065c967ba4a967ea403fb3cec14d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="odosmrs701">
+		<description>Caldera OpenDOS Machine Readable Source Kit (M.R.S) 7.01</description>
+		<year>1997</year>
+		<publisher>Caldera</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: archive.org -->
+			<!-- Reconstructed from a ZIP archive, needs redump -->
+			<diskarea name="cdrom">
+				<disk name="opendosmrs" sha1="f2fb6ad42d42aed26f54e2494ca92ba779458ace" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- OS/2 -->
+	<software name="os2demopkg">
+		<description>IBM DEMOpkg for OS2 - First Edition 99Q3</description>
+		<year>1999</year>
+		<publisher>IBM</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cd1_setup_installation" sha1="1ac98794670346b1fb0fb866f8060f61500fabf6"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="cd2_data_management" sha1="caf7a162e7ebcb8ec822b6ec44caf400628ba2d7"/>
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="cd3_java" sha1="9b4d9fa06f682395ef6198a0a22b5269cf1e93ac"/>
+			</diskarea>
+		</part>
+		<part name="cdrom4" interface="cdrom">
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="cd4_lotus_products" sha1="997e98788ac69a5a3d6e0d972ca3eee225552a7e"/>
+			</diskarea>
+		</part>
+		<part name="cdrom5" interface="cdrom">
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="cd5_miscellaneous" sha1="92a4a37d96f064eeee3c4601cc64255d552fe3ac"/>
+			</diskarea>
+		</part>
+		<part name="cdrom6" interface="cdrom">
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="cd6_networking" sha1="f0bcc3c1b75d14effe4656a8bde7ce62e1b94052"/>
+			</diskarea>
+		</part>
+		<part name="cdrom7" interface="cdrom">
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="cd7_warp_server" sha1="4561f06b8c56a523e0e2b45cdc3c09aafd7f0b87"/>
+			</diskarea>
+		</part>
+		<part name="cdrom8" interface="cdrom">
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="cd8_warp_server_installation" sha1="4dba7d9093a76fedb7a37b94c397c591db189bf5"/>
+			</diskarea>
+		</part>
+		<part name="cdrom9" interface="cdrom">
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="cd9_workspace_on_demand" sha1="6a7906230637d67cff6560e61dbec6a336965a81"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- OS/2 -->
+	<software name="os2special">
+		<description>OS/2 Warp Special CD - november 1995</description>
+		<year>1995</year>
+		<publisher>IBM</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: archive.org -->
+			<!-- Reconstructed from a ZIP archive, needs redump -->
+			<diskarea name="cdrom">
+				<disk name="os2_warp_special_cd" sha1="0959b6949fc7baab26df6c162ddbd22856701db7" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="os2warp3">
+		<description>OS/2 Warp</description>
+		<year>1994</year>
+		<publisher>IBM</publisher>
+		<!-- Internal revision 8.162 (94/09/19), XR03000 -->
+		<info name="version" value="3.00"/>
+		<part name="cdrom1" interface="cdrom">
+			<!-- Origin: archive.org -->
+			<feature name="part_id" value="OS/2 Warp"/>
+			<feature name="part_number" value="83G8450"/>
+			<diskarea name="cdrom">
+				<disk name="os2cdrom" sha1="e316dd95d88d6e63da84b3751dbf9521f87a6bc8"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<!-- Origin: archive.org -->
+			<feature name="part_id" value="BonusPak for OS/2 version 3"/>
+			<feature name="part_number" value="19H6166"/>
+			<diskarea name="cdrom">
+				<disk name="bonuspak" sha1="8c874361fd00458a9bdf730fe6b57cc56b2d840e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="os2warp3b" cloneof="os2warp3">
+		<description>OS/2 Warp with Win-OS/2</description>
+		<year>1995</year>
+		<publisher>IBM</publisher>
+		<!-- Internal revision 8.200 (94/11/09), XR03001 -->
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="OS/2 Warp with Win-OS/2"/>
+			<diskarea name="cdrom">
+				<disk name="os2_cd_rom" sha1="8337e382b724ed398e98e881df91ef5d17fab237"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<!-- Missing -->
+			<feature name="part_id" value="BonusPak for OS/2 version 3"/>
+			<diskarea name="cdrom">
+				<disk name="bonus_pak" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="os2warp3cb">
+		<description>OS/2 Warp Connect with Win-OS/2</description>
+		<year>1995</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="3.00"/>
+		<info name="serial" value="07H9798"/>
+		<part name="cdrom1" interface="cdrom">
+			<!-- Origin: archive.org -->
+			<feature name="part_id" value="OS/2 Warp Connect with Win-OS/2"/>
+			<feature name="part_number" value="28H5357"/>
+			<diskarea name="cdrom">
+				<disk name="lanclnt" sha1="594cc9ce2788b51c43686eede95676100715773a"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<!-- Origin: archive.org -->
+			<feature name="part_id" value="BonusPak for OS/2 version 3"/>
+			<feature name="part_number" value="59H1710"/>
+			<diskarea name="cdrom">
+				<disk name="bpcdrom" sha1="d1bee4f3b18368fb9e811959e16f851460f143e2"/>
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<!-- Missing -->
+			<feature name="part_id" value="Lotus Notes Express release 3.30"/>
+			<feature name="part_number" value="28H5358"/>
+			<diskarea name="cdrom">
+				<disk name="lotusexpress" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="os2warp4" supported="partial">
 		<description>OS/2 Warp 4</description>
 		<year>1996</year>
 		<publisher>IBM</publisher>
+		<!-- Internal revision 9.023, XR04000 -->
 		<info name="version" value="4.00" />
 
 		<part name="cdrom" interface="cdrom">
@@ -2886,6 +3448,37 @@
 			</diskarea>
 		</part>
 	</software>
+
+	<software name="paranasalibm">
+		<!--
+		Origin: Gaming Alexandria
+		<rom name="Paranasal Sinuses & Anterior Skull Base.bin" size="725312112" crc="ddeb9c15" md5="883b0e0122e688d067ae6f96001bdc73"/>
+		<rom name="Paranasal Sinuses & Anterior Skull Base.cue" size="128" crc="6dbd3a2c" md5="8de5a6d9098ba9629e0f14a673f63aa2"/>
+
+		This disc was sold in a package with the CD-i version. This requires Windows 3.1 and Video for Windows to be installed.
+		-->
+		<description>Paranasal Sinuses &amp; Anterior Skull Base</description>
+		<year>1993</year>
+		<publisher>Elsevier Science B.V.</publisher>
+		<part name="cdrom" interface="cdi_cdrom">
+			<diskarea name="cdrom">
+				<disk name="paranasal sinuses &amp; anterior skull base (1993)(elsevier science b.v.)(windows 3.1 disc)" sha1="fddedb4f78bc5687d65f11fd4e18463e1fc4edda"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pcdos7">
+		<description>PC DOS 7</description>
+		<year>1995</year>
+		<publisher>IBM</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="25H7021"/>
+			<diskarea name="cdrom">
+				<disk name="pcdos70" sha1="38004dc0ee6142ec0498034b09b493d2ca8c1e19"/>
+			</diskarea>
+		</part>
+	</software>
+
 
 	<software name="pcdos2k">
 		<description>PC DOS 2000</description>
@@ -2908,6 +3501,20 @@
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sb16" sha1="c87097c58d1c3fcea03e5e4b50d2cafdcb870f16" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- OS/2 -->
+	<software name="ssuite_os2">
+		<description>Lotus SmartSuite for OS/2 Warp 4</description>
+		<year>1998</year>
+		<publisher>Lotus Development Corporation</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: archive.org -->
+			<feature name="part_number" value="T14970"/>
+			<diskarea name="cdrom">
+				<disk name="ssuiteos2" sha1="0cd1718ee6ce9876c57e5c700122f1209d5ea2ae"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3006,7 +3613,7 @@
 
 	<software name="win95a">
 		<description>Windows 95 OSR1 (en 4.00.950.osr1)</description> <!-- aka Windows 95A -->
-		<year>1995</year>
+		<year>1996</year>
 		<publisher>Microsoft</publisher>
 
 		<part name="cdrom" interface="cdrom">
@@ -3018,7 +3625,7 @@
 
 	<software name="win95b">
 		<description>Windows 95 OSR2 (en 4.00.1111.osr2)</description> <!-- aka Windows 95B -->
-		<year>1995</year>
+		<year>1996</year>
 		<publisher>Microsoft</publisher>
 
 		<part name="cdrom" interface="cdrom">
@@ -3030,7 +3637,7 @@
 
 	<software name="win95c">
 		<description>Windows 95 OSR2.5 (en 4.03.1216.osr2.5)</description> <!-- aka Windows 95C -->
-		<year>1995</year>
+		<year>1997</year>
 		<publisher>Microsoft</publisher>
 
 		<part name="cdrom" interface="cdrom">
@@ -3054,7 +3661,7 @@
 
 	<software name="win98se">
 		<description>Windows 98 Second Edition (en 4.10.2222) (Retail Full)</description>
-		<year>1998</year>
+		<year>1999</year>
 		<publisher>Microsoft</publisher>
 
 		<part name="cdrom" interface="cdrom">
@@ -3064,14 +3671,61 @@
 		</part>
 	</software>
 
+	<!-- Supports IBM PC-AT and PC-98 architectures -->
+	<software name="win98sejp">
+		<!--
+		Origin: Neo Kobe Collection
+		CCD converted to CUE with GNU ccd2cue
+		<rom name="Microsoft Windows 98SE.ccd" size="772" crc="65e992be" sha1="b869a3e83459f562966739caa22b46b5204e20cb"/>
+		<rom name="Microsoft Windows 98SE.cue" size="84" crc="a529c2b7" sha1="050dc1be1c9aeafd7e4d7ce7235285b8296f9eee"/>
+		<rom name="Microsoft Windows 98SE.img" size="546019152" crc="cbaea25b" sha1="6b1689232640632a7cc6e5de4967b922637c055d"/>
+		<rom name="Microsoft Windows 98SE.sub" size="22286496" crc="6dec77e2" sha1="41843630fb1a58131b5ecf6dd187884fb29e6685"/>
+		-->
+		<description>Windows 98 Second Edition (jp 4.10.2222) (Retail Full)</description>
+		<year>1999</year>
+		<publisher>Microsoft</publisher>
+		<info name="alt_title" value="マイクロソフト ウィンドウズ 98 オペレイティング システム SECOND EDITION" />
+		<info name="serial" value="X04-67430"/>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="microsoft windows 98se" sha1="eb0bdd209334b3709fa31043f390838351127bc0" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="winme">
 		<description>Windows ME (en 4.90.3000) (Retail Full)</description> <!-- aka Millennium Edition -->
-		<year>1999</year>
+		<year>2000</year>
 		<publisher>Microsoft</publisher>
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="windows me (en 4.90.3000 retail full)" sha1="3bb9b89f2b5918b7dbe393d250a8f1a530a175ef" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt31w">
+		<description>Windows NT 3.1 Workstation (3.10.511.1)</description>
+		<year>1993</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: WinWorld -->
+			<diskarea name="cdrom">
+				<disk name="en_winnt_3_1_wks" sha1="0a542add03b6c9ab130421d24f94731c4992e0a7"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt351w">
+		<description>Windows NT 3.51 Workstation (3.51.1057.1)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: WinWorld -->
+			<diskarea name="cdrom">
+				<disk name="en_winnt_3_51_wks" sha1="5a5d3cf9d244b6b24b007271be478b94a9c349f4"/>
 			</diskarea>
 		</part>
 	</software>

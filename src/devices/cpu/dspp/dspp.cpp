@@ -14,8 +14,6 @@
 #include "dsppfe.h"
 #include "dsppdasm.h"
 
-#include "debugger.h"
-
 
 //**************************************************************************
 //  CONSTANTS
@@ -100,8 +98,6 @@ dspp_device::dspp_device(const machine_config &mconfig, device_type type, const 
 		m_dma_write_handler(*this),
 		m_code_config("code", ENDIANNESS_BIG, 16, 10, -1, code_map_ctor),
 		m_data_config("data", ENDIANNESS_BIG, 16, 10, -1, data_map_ctor),
-		m_code(nullptr),
-		m_data(nullptr),
 		m_output_fifo_start(0),
 		m_output_fifo_count(0),
 		m_dspx_reset(0),
@@ -160,12 +156,9 @@ void dspp_device::device_start()
 	m_dma_write_handler.resolve_safe();
 
 	// Get our address spaces
-	m_code = &space(AS_PROGRAM);
-	m_data = &space(AS_DATA);
-	auto code_cache = m_code->cache<1, -1, ENDIANNESS_BIG>();
-	m_code_cache = code_cache;
-	m_code16 = [code_cache](offs_t address) -> uint16_t { return code_cache->read_word(address); };
-	m_codeptr = [code_cache](offs_t address) -> const void * { return code_cache->read_ptr(address); };
+	space(AS_PROGRAM).cache(m_code_cache);
+	space(AS_PROGRAM).specific(m_code);
+	space(AS_DATA).specific(m_data);
 
 	// Register our state for the debugger
 	state_add(DSPP_PC,         "PC",        m_core->m_pc);
@@ -174,7 +167,6 @@ void dspp_device::device_start()
 #if 0
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_core->m_flags).callimport().callexport().formatstr("%6s").noshow();
 	state_add(STATE_GENPCBASE, "GENPCBASE", m_ppc).noshow();
-	state_add(STATE_GENSP,     "GENSP",     m_src2val[REGBASE + 31]).noshow();
 
 	state_add(DSPP_PS,         "PS",        m_core->m_flagsio).callimport().callexport();
 	for (int regnum = 0; regnum < 32; regnum++)
@@ -369,7 +361,7 @@ inline void dspp_device::update_ticks()
 
 uint16_t dspp_device::read_op(offs_t pc)
 {
-	return m_code_cache->read_word(pc);
+	return m_code_cache.read_word(pc);
 }
 
 
@@ -379,7 +371,7 @@ uint16_t dspp_device::read_op(offs_t pc)
 
 inline uint16_t dspp_device::read_data(offs_t addr)
 {
-	return m_data->read_word(addr);
+	return m_data.read_word(addr);
 }
 
 
@@ -389,7 +381,7 @@ inline uint16_t dspp_device::read_data(offs_t addr)
 
 inline void dspp_device::write_data(offs_t addr, uint16_t data)
 {
-	m_data->write_word(addr, data);
+	m_data.write_word(addr, data);
 }
 
 
@@ -618,10 +610,11 @@ inline void dspp_device::set_rbase(uint32_t base, uint32_t addr)
 		case 0:
 			m_core->m_rbase[0] = addr;
 			m_core->m_rbase[1] = addr + 4 - base;
+			[[fallthrough]];
 		// Intentional fall-through
 		case 8:
 			m_core->m_rbase[2] = addr + 8 - base;
-
+			[[fallthrough]];
 		case 12:
 			m_core->m_rbase[3] = addr + 12 - base;
 			break;
@@ -1592,7 +1585,7 @@ void dspp_device::update_fifo_dma()
 
 	while (mask != 0)
 	{
-		uint32_t channel = 31 - count_leading_zeros(mask);
+		uint32_t channel = 31 - count_leading_zeros_32(mask);
 
 		const fifo_dma & dma = m_fifo_dma[channel];
 
@@ -1643,7 +1636,7 @@ void dspp_device::reset_channel(int32_t channel)
 //  input_r - Read digital input
 //-------------------------------------------------
 
-READ16_MEMBER( dspp_device::input_r )
+uint16_t dspp_device::input_r()
 {
 	// TODO
 	return 0;
@@ -1654,7 +1647,7 @@ READ16_MEMBER( dspp_device::input_r )
 //  output_w - Write to the 8 output registers
 //-------------------------------------------------
 
-WRITE16_MEMBER( dspp_device::output_w )
+void dspp_device::output_w(offs_t offset, uint16_t data)
 {
 	m_outputs[offset] = data;
 }
@@ -1664,7 +1657,7 @@ WRITE16_MEMBER( dspp_device::output_w )
 //  fifo_osc_r -
 //-------------------------------------------------
 
-READ16_MEMBER( dspp_device::fifo_osc_r )
+uint16_t dspp_device::fifo_osc_r(offs_t offset)
 {
 	uint32_t data = 0;
 	uint32_t channel = offset / 8;
@@ -1734,7 +1727,7 @@ READ16_MEMBER( dspp_device::fifo_osc_r )
 //  fifo_osc_w -
 //-------------------------------------------------
 
-WRITE16_MEMBER( dspp_device::fifo_osc_w )
+void dspp_device::fifo_osc_w(offs_t offset, uint16_t data)
 {
 	uint32_t channel = offset / 8;
 
@@ -1790,7 +1783,7 @@ WRITE16_MEMBER( dspp_device::fifo_osc_w )
 //  input_control_w -
 //-------------------------------------------------
 
-WRITE16_MEMBER( dspp_device::input_control_w )
+void dspp_device::input_control_w(uint16_t data)
 {
 	// TODO
 }
@@ -1800,7 +1793,7 @@ WRITE16_MEMBER( dspp_device::input_control_w )
 //  output_control_w -
 //-------------------------------------------------
 
-WRITE16_MEMBER( dspp_device::output_control_w )
+void dspp_device::output_control_w(uint16_t data)
 {
 	// TODO
 	if (data & 1)
@@ -1837,7 +1830,7 @@ WRITE16_MEMBER( dspp_device::output_control_w )
 //  input_status_r - Read input state
 //-------------------------------------------------
 
-READ16_MEMBER( dspp_device::input_status_r )
+uint16_t dspp_device::input_status_r()
 {
 	// TODO: How should this work?
 	return 1;
@@ -1849,7 +1842,7 @@ READ16_MEMBER( dspp_device::input_status_r )
 //  entries in the output FIFO
 //-------------------------------------------------
 
-READ16_MEMBER( dspp_device::output_status_r )
+uint16_t dspp_device::output_status_r()
 {
 	return m_output_fifo_count;
 }
@@ -1859,7 +1852,7 @@ READ16_MEMBER( dspp_device::output_status_r )
 //  cpu_int_w - Host CPU soft interrupt
 //-------------------------------------------------
 
-WRITE16_MEMBER( dspp_device::cpu_int_w )
+void dspp_device::cpu_int_w(uint16_t data)
 {
 	m_core->m_partial_int |= (data << DSPX_FLD_INT_SOFT_SHIFT) & DSPX_FLD_INT_SOFT_MASK;
 	update_host_interrupt();
@@ -1870,7 +1863,7 @@ WRITE16_MEMBER( dspp_device::cpu_int_w )
 //  pc_r - Read program counter
 //-------------------------------------------------
 
-READ16_MEMBER( dspp_device::pc_r )
+uint16_t dspp_device::pc_r()
 {
 	return m_core->m_pc;
 }
@@ -1880,7 +1873,7 @@ READ16_MEMBER( dspp_device::pc_r )
 //  pc_w - Write program counter
 //-------------------------------------------------
 
-WRITE16_MEMBER(dspp_device:: pc_w )
+void dspp_device::pc_w(uint16_t data)
 {
 	m_core->m_pc = data;
 }
@@ -1890,7 +1883,7 @@ WRITE16_MEMBER(dspp_device:: pc_w )
 //  audlock_r - Read Audio Lock status
 //-------------------------------------------------
 
-READ16_MEMBER( dspp_device::audlock_r )
+uint16_t dspp_device::audlock_r()
 {
 	return m_core->m_flag_audlock;
 }
@@ -1900,7 +1893,7 @@ READ16_MEMBER( dspp_device::audlock_r )
 //  audlock_w - Write Audio Lock status
 //-------------------------------------------------
 
-WRITE16_MEMBER( dspp_device::audlock_w )
+void dspp_device::audlock_w(uint16_t data)
 {
 	m_core->m_flag_audlock = data & 1;
 }
@@ -1910,7 +1903,7 @@ WRITE16_MEMBER( dspp_device::audlock_w )
 //  clock_r - Read CPU tick counter
 //-------------------------------------------------
 
-READ16_MEMBER( dspp_device::clock_r )
+uint16_t dspp_device::clock_r()
 {
 	return m_core->m_tclock;
 }
@@ -1920,7 +1913,7 @@ READ16_MEMBER( dspp_device::clock_r )
 //  clock_w - Write CPU tick counter
 //-------------------------------------------------
 
-WRITE16_MEMBER( dspp_device::clock_w )
+void dspp_device::clock_w(uint16_t data)
 {
 	m_core->m_tclock = data;
 }
@@ -1930,7 +1923,7 @@ WRITE16_MEMBER( dspp_device::clock_w )
 //  noise_r - PRNG noise
 //-------------------------------------------------
 
-READ16_MEMBER( dspp_device::noise_r )
+uint16_t dspp_device::noise_r()
 {
 	// TODO: Obviously this isn't accurate
 	return machine().rand();
@@ -2339,17 +2332,17 @@ void dspp_device::write_ext_control(offs_t offset, uint32_t data)
 //  read - host CPU read from DSPP internals
 //-------------------------------------------------
 
-READ32_MEMBER( dspp_device::read )
+uint32_t dspp_device::read(offs_t offset)
 {
 	if (offset < 0x1000/4)
 	{
 		// 16-bit code memory
-		return m_code->read_word(offset);
+		return m_code.read_word(offset);
 	}
 	else if (offset >= 0x1000/4 && offset < 0x2000/4)
 	{
 		// 16-bit data memory and registers
-		return m_data->read_word((offset - 0x1000/4));
+		return m_data.read_word((offset - 0x1000/4));
 	}
 	else if(offset >= 0x5000/4 && offset < 0x6000/4)
 	{
@@ -2500,17 +2493,17 @@ void dspp_device::write_dma_stack(offs_t offset, uint32_t data)
 //  write - host CPU write to DSPP internals
 //-------------------------------------------------
 
-WRITE32_MEMBER( dspp_device::write )
+void dspp_device::write(offs_t offset, uint32_t data)
 {
 	if (offset < 0x1000/4)
 	{
 		// 16-bit code memory
-		m_code->write_word(offset, data);
+		m_code.write_word(offset, data);
 	}
 	else if (offset >= 0x1000/4 && offset < 0x2000/4)
 	{
 		// 16-bit data memory and registers
-		m_data->write_word((offset - 0x1000/4), data);
+		m_data.write_word((offset - 0x1000/4), data);
 	}
 	else if(offset >= 0x5000/4 && offset < 0x6000/4)
 	{

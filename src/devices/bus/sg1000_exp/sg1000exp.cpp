@@ -86,18 +86,18 @@ void sg1000_expansion_slot_device::device_start()
 // has only 3 address lines (A0, A1, A2).
 
 
-READ8_MEMBER(sg1000_expansion_slot_device::read)
+uint8_t sg1000_expansion_slot_device::read(offs_t offset)
 {
 	uint8_t data = 0xff;
 	if (m_device)
-		data = m_device->peripheral_r(space, offset & 0x07);
+		data = m_device->peripheral_r(offset & 0x07);
 	return data;
 }
 
-WRITE8_MEMBER(sg1000_expansion_slot_device::write)
+void sg1000_expansion_slot_device::write(offs_t offset, uint8_t data)
 {
 	if (m_device)
-		m_device->peripheral_w(space, offset & 0x07, data);
+		m_device->peripheral_w(offset & 0x07, data);
 }
 
 

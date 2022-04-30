@@ -52,25 +52,25 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	tilemap_t *m_tilemap;
-	uint8_t m_master_nmi_mask;
-	uint8_t m_slave_irq_mask;
-	bool m_flipscreen;
+	tilemap_t *m_tilemap = nullptr;
+	uint8_t m_master_nmi_mask = 0U;
+	uint8_t m_slave_irq_mask = 0U;
+	bool m_flipscreen = false;
 
-	DECLARE_WRITE8_MEMBER(gyruss_irq_clear_w);
-	DECLARE_WRITE8_MEMBER(gyruss_sh_irqtrigger_w);
-	DECLARE_WRITE8_MEMBER(gyruss_i8039_irq_w);
+	void gyruss_irq_clear_w(uint8_t data);
+	void gyruss_sh_irqtrigger_w(uint8_t data);
+	void gyruss_i8039_irq_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(master_nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(slave_irq_mask_w);
+	void slave_irq_mask_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
-	DECLARE_WRITE8_MEMBER(gyruss_spriteram_w);
-	DECLARE_READ8_MEMBER(gyruss_scanline_r);
+	void gyruss_spriteram_w(offs_t offset, uint8_t data);
+	uint8_t gyruss_scanline_r();
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_READ8_MEMBER(gyruss_portA_r);
-	DECLARE_WRITE8_MEMBER(gyruss_dac_w);
-	DECLARE_WRITE8_MEMBER(gyruss_filter0_w);
-	DECLARE_WRITE8_MEMBER(gyruss_filter1_w);
+	uint8_t gyruss_portA_r();
+	void gyruss_dac_w(uint8_t data);
+	void gyruss_filter0_w(uint8_t data);
+	void gyruss_filter1_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(gyruss_get_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -78,7 +78,7 @@ private:
 	uint32_t screen_update_gyruss(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void filter_w(address_space &space, int chip, int data );
+	void filter_w(int chip, int data );
 	void audio_cpu1_io_map(address_map &map);
 	void audio_cpu1_map(address_map &map);
 	void audio_cpu2_io_map(address_map &map);

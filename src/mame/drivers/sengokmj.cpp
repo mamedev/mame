@@ -9,18 +9,18 @@ driver by Angelo Salese & Pierpaolo Prazzoli
 Uses the same Seibu custom chips of the D-Con HW.
 
 TODO:
-- Find what the remaining video C.R.T. registers does;
+- Find what the remaining video C.R.T. registers do;
 - Fix sprites bugs at a start of a play;
-- Check NVRAM boudaries;
-- How the "SW Service Mode" (press F2 during gameplay) really works (inputs etc)? Nothing mapped works with it...
+- Check NVRAM boundaries;
+- How does the "SW Service Mode" (press F2 during gameplay) really work (inputs etc)? Nothing mapped works with it...
 
 Notes:
-- Some strings written in the sound rom:
+- Some strings written in the sound ROM:
   "SENGOKU-MAHJONG Z80 PROGRAM ROM VERSION 1.00 WRITTEN BY K.SAEKI" at location 0x00c0-0x00ff.
   "Copyright 1990/1991 Sigma" at location 0x770-0x789.
 - To bypass the startup message, toggle "Reset" dip-switch or reset with F3.
-- If the Work RAM is not hooked-up (areas $67xx),a sound sample is played.I can't understand what it says though,
-  appears to japanese words for "RAM failed".
+- If the Work RAM is not hooked-up (areas $67xx), a sound sample is played. I can't understand what it says though,
+  appears to be the Japanese words for "RAM failed".
 - Snippets of a non-BET Version are scattered thru the code (for example a credit display).
   Might be either undumped revision or selectable somehow.
 
@@ -58,8 +58,8 @@ RSSENGO2.72   chr.
 
 #include "cpu/nec/nec.h"
 #include "machine/nvram.h"
-#include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "sound/ymopl.h"
 #include "video/seibu_crtc.h"
 #include "emupal.h"
 #include "screen.h"
@@ -99,26 +99,26 @@ private:
 	required_shared_ptr<uint16_t> m_sc3_vram;
 	required_shared_ptr<uint16_t> m_spriteram16;
 
-	tilemap_t *m_sc0_tilemap;
-	tilemap_t *m_sc1_tilemap;
-	tilemap_t *m_sc2_tilemap;
-	tilemap_t *m_sc3_tilemap;
+	tilemap_t *m_sc0_tilemap = nullptr;
+	tilemap_t *m_sc1_tilemap = nullptr;
+	tilemap_t *m_sc2_tilemap = nullptr;
+	tilemap_t *m_sc3_tilemap = nullptr;
 
-	uint16_t m_mux_data;
-	uint8_t m_hopper_io;
-	uint16_t m_layer_en;
-	uint16_t m_scrollram[6];
+	uint16_t m_mux_data = 0;
+	uint8_t m_hopper_io = 0;
+	uint16_t m_layer_en = 0;
+	uint16_t m_scrollram[6]{};
 
-	DECLARE_READ16_MEMBER(mahjong_panel_r);
-	DECLARE_WRITE16_MEMBER(mahjong_panel_w);
-	DECLARE_WRITE16_MEMBER(out_w);
-	DECLARE_READ16_MEMBER(system_r);
-	DECLARE_WRITE16_MEMBER(seibucrtc_sc0vram_w);
-	DECLARE_WRITE16_MEMBER(seibucrtc_sc1vram_w);
-	DECLARE_WRITE16_MEMBER(seibucrtc_sc2vram_w);
-	DECLARE_WRITE16_MEMBER(seibucrtc_sc3vram_w);
-	DECLARE_WRITE16_MEMBER(layer_en_w);
-	DECLARE_WRITE16_MEMBER(layer_scroll_w);
+	uint16_t mahjong_panel_r();
+	void mahjong_panel_w(uint16_t data);
+	void out_w(uint16_t data);
+	uint16_t system_r();
+	void seibucrtc_sc0vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void seibucrtc_sc1vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void seibucrtc_sc2vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void seibucrtc_sc3vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void layer_en_w(uint16_t data);
+	void layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	TILE_GET_INFO_MEMBER(seibucrtc_sc0_tile_info);
 	TILE_GET_INFO_MEMBER(seibucrtc_sc1_tile_info);
@@ -207,25 +207,25 @@ private:
 *
 *******************************/
 
-WRITE16_MEMBER( sengokmj_state::seibucrtc_sc0vram_w )
+void sengokmj_state::seibucrtc_sc0vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sc0_vram[offset]);
 	m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER( sengokmj_state::seibucrtc_sc2vram_w )
+void sengokmj_state::seibucrtc_sc2vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sc2_vram[offset]);
 	m_sc2_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER( sengokmj_state::seibucrtc_sc1vram_w )
+void sengokmj_state::seibucrtc_sc1vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sc1_vram[offset]);
 	m_sc1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER( sengokmj_state::seibucrtc_sc3vram_w )
+void sengokmj_state::seibucrtc_sc3vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sc3_vram[offset]);
 	m_sc3_tilemap->mark_tile_dirty(offset);
@@ -242,28 +242,28 @@ TILE_GET_INFO_MEMBER( sengokmj_state::seibucrtc_sc0_tile_info )
 	int tile = m_sc0_vram[tile_index] & 0xfff;
 	int color = (m_sc0_vram[tile_index] >> 12) & 0x0f;
 //  tile+=(m_seibucrtc_sc0bank<<12);
-	SET_TILE_INFO_MEMBER(1, tile, color, 0);
+	tileinfo.set(1, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER( sengokmj_state::seibucrtc_sc2_tile_info )
 {
 	int tile = m_sc2_vram[tile_index] & 0xfff;
 	int color = (m_sc2_vram[tile_index] >> 12) & 0x0f;
-	SET_TILE_INFO_MEMBER(2, tile, color, 0);
+	tileinfo.set(2, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER( sengokmj_state::seibucrtc_sc1_tile_info )
 {
 	int tile = m_sc1_vram[tile_index] & 0xfff;
 	int color = (m_sc1_vram[tile_index] >> 12) & 0x0f;
-	SET_TILE_INFO_MEMBER(3, tile, color, 0);
+	tileinfo.set(3, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER( sengokmj_state::seibucrtc_sc3_tile_info )
 {
 	int tile = m_sc3_vram[tile_index] & 0xfff;
 	int color = (m_sc3_vram[tile_index] >> 12) & 0x0f;
-	SET_TILE_INFO_MEMBER(4, tile, color, 0);
+	tileinfo.set(4, tile, color, 0);
 }
 
 void sengokmj_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
@@ -356,7 +356,7 @@ void sengokmj_state::machine_start()
 
 
 /* Multiplexer device for the mahjong panel */
-READ16_MEMBER(sengokmj_state::mahjong_panel_r)
+uint16_t sengokmj_state::mahjong_panel_r()
 {
 	const char *const mpnames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
 	int i;
@@ -371,7 +371,7 @@ READ16_MEMBER(sengokmj_state::mahjong_panel_r)
 	return res;
 }
 
-WRITE16_MEMBER(sengokmj_state::mahjong_panel_w)
+void sengokmj_state::mahjong_panel_w(uint16_t data)
 {
 	m_mux_data = (data & 0x3f00) >> 8;
 
@@ -379,7 +379,7 @@ WRITE16_MEMBER(sengokmj_state::mahjong_panel_w)
 		logerror("Write to mux %04x\n",data);
 }
 
-WRITE16_MEMBER(sengokmj_state::out_w)
+void sengokmj_state::out_w(uint16_t data)
 {
 	/* ---- ---- ---x ---- J.P. Signal (?)*/
 	/* ---- ---- ---- -x-- Coin counter (done AFTER you press start)*/
@@ -392,7 +392,7 @@ WRITE16_MEMBER(sengokmj_state::out_w)
 //  popmessage("%02x",m_hopper_io);
 }
 
-READ16_MEMBER(sengokmj_state::system_r)
+uint16_t sengokmj_state::system_r()
 {
 	return (ioport("SYSTEM")->read() & 0xffbf) | m_hopper_io;
 }
@@ -568,12 +568,12 @@ WRITE_LINE_MEMBER(sengokmj_state::vblank_irq)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4); // V30
 }
 
-WRITE16_MEMBER( sengokmj_state::layer_en_w )
+void sengokmj_state::layer_en_w(uint16_t data)
 {
 	m_layer_en = data;
 }
 
-WRITE16_MEMBER( sengokmj_state::layer_scroll_w )
+void sengokmj_state::layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scrollram[offset]);
 }

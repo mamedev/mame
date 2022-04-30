@@ -109,7 +109,7 @@ TILE_GET_INFO_MEMBER(crospang_state::get_bg_tile_info)
 	tile = tile + (m_tilebank[tilebank] << 10);
 	int color = (data >> 12) & 0x0f;
 
-	SET_TILE_INFO_MEMBER(1, tile, color + 0x20, 0);
+	tileinfo.set(1, tile, color + 0x20, 0);
 }
 
 TILE_GET_INFO_MEMBER(crospang_state::get_fg_tile_info)
@@ -120,7 +120,7 @@ TILE_GET_INFO_MEMBER(crospang_state::get_fg_tile_info)
 	tile = tile + (m_tilebank[tilebank] << 10);
 	int color = (data >> 12) & 0x0f;
 
-	SET_TILE_INFO_MEMBER(1, tile, color + 0x10, 0);
+	tileinfo.set(1, tile, color + 0x10, 0);
 }
 
 

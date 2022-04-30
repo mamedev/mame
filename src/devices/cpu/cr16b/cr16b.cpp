@@ -18,8 +18,6 @@ DEFINE_DEVICE_TYPE(CR16B, cr16b_device, "cr16b", "CompactRISC CR16B")
 cr16b_device::cr16b_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_space_config("program", ENDIANNESS_LITTLE, 16, 21, 0, map)
-	, m_space(nullptr)
-	, m_cache(nullptr)
 	, m_regs{0}
 	, m_pc(0)
 	, m_isp(0)
@@ -53,8 +51,8 @@ device_memory_interface::space_config_vector cr16b_device::memory_space_config()
 
 void cr16b_device::device_start()
 {
-	m_space = &space(AS_PROGRAM);
-	m_cache = m_space->cache<1, 0, ENDIANNESS_LITTLE>();
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_space);
 
 	set_icountptr(m_icount);
 

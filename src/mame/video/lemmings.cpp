@@ -25,7 +25,7 @@ TILE_GET_INFO_MEMBER(lemmings_state::get_tile_info)
 {
 	uint16_t tile = m_vram_data[tile_index];
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile&0x7ff,
 			(tile>>12)&0xf,
 			0);
@@ -66,28 +66,26 @@ WRITE_LINE_MEMBER(lemmings_state::screen_vblank_lemmings)
 /******************************************************************************/
 
 // RAM based
-WRITE16_MEMBER(lemmings_state::lemmings_pixel_0_w)
+void lemmings_state::lemmings_pixel_0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int sx, sy, src, old;
-
-	old = m_pixel_data[0][offset];
+	int const old = m_pixel_data[0][offset];
 	COMBINE_DATA(&m_pixel_data[0][offset]);
-	src = m_pixel_data[0][offset];
+	int const src = m_pixel_data[0][offset];
 	if (old == src)
 		return;
 
-	sy = (offset << 1) >> 11;
-	sx = (offset << 1) & 0x7ff;
+	int const sy = (offset << 1) >> 11;
+	int const sx = (offset << 1) & 0x7ff;
 
 	if (sx > 2047 || sy > 255)
 		return;
 
-	m_bitmap0.pix16(sy, sx + 0) = ((src >> 8) & 0xf) | 0x100;
-	m_bitmap0.pix16(sy, sx + 1) = ((src >> 0) & 0xf) | 0x100;
+	m_bitmap0.pix(sy, sx + 0) = ((src >> 8) & 0xf) | 0x100;
+	m_bitmap0.pix(sy, sx + 1) = ((src >> 0) & 0xf) | 0x100;
 }
 
 // RAM based tiles for the FG tilemap
-WRITE16_MEMBER(lemmings_state::lemmings_pixel_1_w)
+void lemmings_state::lemmings_pixel_1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int sx, sy, src, tile;
 
@@ -106,7 +104,7 @@ WRITE16_MEMBER(lemmings_state::lemmings_pixel_1_w)
 	m_vram_buffer[(tile * 64) + ((sx & 7)) + ((sy & 7) * 8)] = (src >> 0) & 0xf;
 }
 
-WRITE16_MEMBER(lemmings_state::lemmings_vram_w)
+void lemmings_state::lemmings_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_data[offset]);
 	m_vram_tilemap->mark_tile_dirty(offset);
@@ -115,16 +113,15 @@ WRITE16_MEMBER(lemmings_state::lemmings_vram_w)
 
 void lemmings_state::lemmings_copy_bitmap(bitmap_rgb32& bitmap, int* xscroll, int* yscroll, const rectangle& cliprect)
 {
-	int y,x;
-	const pen_t *paldata = m_palette->pens();
+	pen_t const *const paldata = m_palette->pens();
 
-	for (y=cliprect.top(); y<cliprect.bottom();y++)
+	for (int y=cliprect.top(); y<cliprect.bottom();y++)
 	{
-		uint32_t* dst = &bitmap.pix32(y,0);
+		uint32_t *const dst = &bitmap.pix(y,0);
 
-		for (x=cliprect.left(); x<cliprect.right();x++)
+		for (int x=cliprect.left(); x<cliprect.right();x++)
 		{
-			uint16_t src = m_bitmap0.pix16((y-*yscroll)&0xff,(x-*xscroll)&0x7ff);
+			uint16_t const src = m_bitmap0.pix((y-*yscroll)&0xff,(x-*xscroll)&0x7ff);
 
 			if (src!=0x100)
 				dst[x] = paldata[src];

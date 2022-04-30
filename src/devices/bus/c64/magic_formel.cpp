@@ -34,7 +34,7 @@
 DEFINE_DEVICE_TYPE(C64_MAGIC_FORMEL, c64_magic_formel_cartridge_device, "c64_magic_formel", "C64 Magic Formel cartridge")
 
 
-WRITE8_MEMBER( c64_magic_formel_cartridge_device::pia_pa_w )
+void c64_magic_formel_cartridge_device::pia_pa_w(uint8_t data)
 {
 	/*
 
@@ -56,7 +56,7 @@ WRITE8_MEMBER( c64_magic_formel_cartridge_device::pia_pa_w )
 	m_ram_oe = BIT(data, 4);
 }
 
-WRITE8_MEMBER( c64_magic_formel_cartridge_device::pia_pb_w )
+void c64_magic_formel_cartridge_device::pia_pb_w(uint8_t data)
 {
 	/*
 
@@ -157,7 +157,7 @@ c64_magic_formel_cartridge_device::c64_magic_formel_cartridge_device(const machi
 	device_t(mconfig, C64_MAGIC_FORMEL, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_pia(*this, MC6821_TAG),
-	m_ram(*this, "ram"),
+	m_ram(*this, "ram", 0x2000, ENDIANNESS_LITTLE),
 	m_rom_bank(0),
 	m_ram_bank(0),
 	m_ram_oe(0),
@@ -174,9 +174,6 @@ c64_magic_formel_cartridge_device::c64_magic_formel_cartridge_device(const machi
 
 void c64_magic_formel_cartridge_device::device_start()
 {
-	// allocate memory
-	m_ram.allocate(0x2000);
-
 	// state saving
 	save_item(NAME(m_rom_bank));
 	save_item(NAME(m_ram_bank));

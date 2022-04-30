@@ -12,10 +12,10 @@
 
 #include "machine/6532riot.h"
 #include "machine/gen_latch.h"
+#include "machine/slapstic.h"
 #include "machine/x2212.h"
 #include "sound/pokey.h"
 #include "sound/tms5220.h"
-#include "includes/slapstic.h"
 
 
 class starwars_state : public driver_device
@@ -32,7 +32,8 @@ public:
 		m_pokey(*this, "pokey%u", 1U),
 		m_tms(*this, "tms"),
 		m_novram(*this, "x2212"),
-		m_slapstic_device(*this, "slapstic")
+		m_slapstic(*this, "slapstic"),
+		m_slapstic_bank(*this, "slapstic_bank")
 	{ }
 
 	void starwars(machine_config &config);
@@ -53,52 +54,47 @@ private:
 	required_device_array<pokey_device, 4> m_pokey;
 	required_device<tms5220_device> m_tms;
 	required_device<x2212_device> m_novram;
-	optional_device<atari_slapstic_device> m_slapstic_device;
+	optional_device<atari_slapstic_device> m_slapstic;
+	optional_memory_bank m_slapstic_bank;
 
-	uint8_t *m_slapstic_source;
-	uint8_t *m_slapstic_base;
-	uint8_t m_slapstic_current_bank;
-	int m_MPA;
-	int m_BIC;
-	uint16_t m_dvd_shift;
-	uint16_t m_quotient_shift;
-	uint16_t m_divisor;
-	uint16_t m_dividend;
+	int m_MPA = 0;
+	int m_BIC = 0;
+	uint16_t m_dvd_shift = 0;
+	uint16_t m_quotient_shift = 0;
+	uint16_t m_divisor = 0;
+	uint16_t m_dividend = 0;
 	std::unique_ptr<uint8_t[]> m_PROM_STR;
 	std::unique_ptr<uint8_t[]> m_PROM_MAS;
 	std::unique_ptr<uint8_t[]> m_PROM_AM;
-	int m_math_run;
-	emu_timer *m_math_timer;
-	int16_t m_A;
-	int16_t m_B;
-	int16_t m_C;
-	int32_t m_ACC;
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_READ8_MEMBER(esb_slapstic_r);
-	DECLARE_WRITE8_MEMBER(esb_slapstic_w);
-	DECLARE_WRITE8_MEMBER(starwars_nstore_w);
+	int m_math_run = 0;
+	emu_timer *m_math_timer = nullptr;
+	int16_t m_A = 0;
+	int16_t m_B = 0;
+	int16_t m_C = 0;
+	int32_t m_ACC = 0;
+	void irq_ack_w(uint8_t data);
+	void starwars_nstore_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(recall_w);
 	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
-	DECLARE_READ8_MEMBER(starwars_prng_r);
+	uint8_t starwars_prng_r();
 	DECLARE_WRITE_LINE_MEMBER(prng_reset_w);
-	DECLARE_READ8_MEMBER(starwars_div_reh_r);
-	DECLARE_READ8_MEMBER(starwars_div_rel_r);
-	DECLARE_WRITE8_MEMBER(starwars_math_w);
+	uint8_t starwars_div_reh_r();
+	uint8_t starwars_div_rel_r();
+	void starwars_math_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(starwars_main_ready_flag_r);
+	uint8_t starwars_main_ready_flag_r();
 	DECLARE_WRITE_LINE_MEMBER(boost_interleave_hack);
-	DECLARE_WRITE8_MEMBER(starwars_soundrst_w);
-	DECLARE_WRITE8_MEMBER(quad_pokeyn_w);
+	void starwars_soundrst_w(uint8_t data);
+	void quad_pokeyn_w(offs_t offset, uint8_t data);
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(math_run_clear);
-	DECLARE_READ8_MEMBER(r6532_porta_r);
-	DECLARE_WRITE8_MEMBER(r6532_porta_w);
+	uint8_t r6532_porta_r();
+	void r6532_porta_w(uint8_t data);
 
 	void starwars_mproc_init();
 	void starwars_mproc_reset();
 	void run_mproc();
-	void esb_slapstic_tweak(address_space &space, offs_t offset);
 
 	void esb_main_map(address_map &map);
 	void main_map(address_map &map);

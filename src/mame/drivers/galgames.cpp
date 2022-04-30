@@ -38,6 +38,7 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/eepromser.h"
@@ -45,9 +46,12 @@ Notes:
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "video/cesblit.h"
+
+#include "dirom.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
 
 /***************************************************************************
 
@@ -67,7 +71,7 @@ DECLARE_DEVICE_TYPE(GALGAMES_SLOT,          galgames_slot_device)
 
 // CART declaration
 
-class galgames_cart_device : public device_t, public device_rom_interface
+class galgames_cart_device : public device_t, public device_rom_interface<21, 1, 0, ENDIANNESS_BIG>
 {
 public:
 	// construction/destruction
@@ -126,8 +130,8 @@ protected:
 	// PIC
 	optional_device<pic16c5x_device> m_pic;
 
-	u8 m_pic_iobits, m_pic_data, m_pic_data_rdy, m_pic_data_bit, m_pic_data_clk;
-	u8 m_pic_clk_mask, m_pic_in_mask, m_pic_out_mask, m_pic_dis_mask;
+	u8 m_pic_iobits = 0, m_pic_data = 0, m_pic_data_rdy = 0, m_pic_data_bit = 0, m_pic_data_clk = 0;
+	u8 m_pic_clk_mask = 0, m_pic_in_mask = 0, m_pic_out_mask = 0, m_pic_dis_mask = 0;
 
 	void log_cart_comm(const char *text, u8 data);
 	void pic_comm_reset();
@@ -274,7 +278,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	address_space_config m_space_config;
-	address_space *m_space;
+	address_space *m_space = nullptr;
 
 	required_shared_ptr<u16> m_ram;
 
@@ -288,10 +292,10 @@ protected:
 	void set_cart(int cart);
 	void reset_eeproms_except(int cart);
 
-	galgames_cart_device *m_carts[1+4];
+	galgames_cart_device *m_carts[1+4]{};
 
-	u8 m_cart;
-	bool m_is_ram_active;
+	u8 m_cart = 0;
+	bool m_is_ram_active = false;
 };
 
 device_memory_interface::space_config_vector galgames_slot_device::memory_space_config() const
@@ -313,7 +317,7 @@ galgames_cart_device::galgames_cart_device(
 		device_t *owner,
 		u32 clock):
 	device_t(mconfig, type, tag, owner, clock),
-	device_rom_interface(mconfig, *this, 21, ENDIANNESS_BIG, 16),
+	device_rom_interface(mconfig, *this),
 	m_cart(0),
 	m_slot(*this, "^slot"),
 	m_eeprom(*this, "eeprom"),
@@ -769,9 +773,9 @@ protected:
 	required_device<galgames_slot_device> m_slot;
 	required_shared_ptr<u8> m_okiram;
 
-	u8 m_palette_offset;
-	u8 m_palette_index;
-	u8 m_palette_data[3];
+	u8 m_palette_offset = 0;
+	u8 m_palette_index = 0;
+	u8 m_palette_data[3]{};
 };
 
 WRITE_LINE_MEMBER(galgames_state::blitter_irq_callback)

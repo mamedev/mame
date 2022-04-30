@@ -73,8 +73,8 @@ public:
 	TIMER_CALLBACK_MEMBER(irq4_on_timer_callback);
 	void vdp_handle_eof();
 	void device_reset_old();
-	void vdp_clear_irq6_pending() { m_irq6_pending = 0; };
-	void vdp_clear_irq4_pending() { m_irq4_pending = 0; };
+	void vdp_clear_irq6_pending() { m_irq6_pending = 0; }
+	void vdp_clear_irq4_pending() { m_irq4_pending = 0; }
 
 	// set some VDP variables at start (shall be moved to a device interface?)
 	void set_scanline_counter(int scanline) { m_scanline_counter = scanline; }

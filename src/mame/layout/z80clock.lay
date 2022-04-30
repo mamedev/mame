@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+	<element name="digit" defstate="0">
+		<led16seg><color red="0.90" green="0.58" blue="0.21" /></led16seg>
+	</element>
+
+	<element name="dot" defstate="0">
+		<disk state="1"><color red="0.90" green="0.58" blue="0.21" /></disk>
+		<disk state="0"><color red="0.112" green="0.072" blue="0.026" /></disk>
+	</element>
+
+	<element name="led" defstate="0">
+		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
+		<disk state="0"><color red="0.1" green="0.01" blue="0.015" /></disk>
+	</element>
+
+	<view name="Internal Layout">
+		<repeat count="8">
+			<param name="digitx" start="0" increment="15" />
+			<param name="dotx" start="10" increment="15" />
+			<param name="ledx" start="115.5" increment="-3" />
+			<param name="c" start="0" increment="1" />
+			<repeat count="3">
+				<param name="digity" start="0" increment="20" />
+				<param name="doty" start="13.55" increment="20" />
+				<param name="r" start="0" increment="1" />
+				<element name="row~r~.col~c~" ref="digit"><bounds x="~digitx~" y="~digity~" width="10" height="15" /></element>
+				<element name="row~r~.dp~c~" ref="dot"><bounds x="~dotx~" y="~doty~" width="1.5" height="1.5" /></element>
+			</repeat>
+			<element name="debug~c~" ref="led"><bounds x="~ledx~" y="55.1" width="1" height="1" /></element>
+		</repeat>
+	</view>
+</mamelayout>

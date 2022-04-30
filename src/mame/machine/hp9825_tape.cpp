@@ -20,7 +20,8 @@
 #define LOG_DBG(...) LOGMASKED(LOG_DBG_MASK, __VA_ARGS__)
 #undef VERBOSE
 //#define VERBOSE (LOG_GENERAL | LOG_REG_MASK | LOG_DBG_MASK)
-#define VERBOSE (LOG_GENERAL)
+//#define VERBOSE (LOG_GENERAL)
+#define VERBOSE (LOG_GENERAL | LOG_DBG_MASK)
 
 // Bit manipulation
 namespace {
@@ -80,6 +81,7 @@ hp9825_tape_device::hp9825_tape_device(const machine_config &mconfig, const char
 	, m_sts_handler(*this)
 	, m_dmar_handler(*this)
 	, m_led_handler(*this)
+	, m_cart_in_handler(*this)
 	, m_tape(*this , "drive")
 	, m_short_gap_timer(*this , "short_tmr")
 	, m_long_gap_timer(*this , "long_tmr")
@@ -92,7 +94,7 @@ void hp9825_tape_device::device_add_mconfig(machine_config &config)
 	m_tape->set_acceleration(ACCELERATION);
 	m_tape->set_set_points(SLOW_SPEED , FAST_SPEED);
 	m_tape->set_tick_size(TACH_TICK_LENGTH);
-	m_tape->set_bits_per_word(17);
+	m_tape->set_image_format(hti_format_t::HTI_DELTA_MOD_17_BITS);
 	m_tape->set_go_threshold(MOVING_THRESHOLD);
 	m_tape->cart_out().set(FUNC(hp9825_tape_device::cart_out_w));
 	m_tape->hole().set(FUNC(hp9825_tape_device::hole_w));
@@ -119,10 +121,12 @@ void hp9825_tape_device::device_add_mconfig(machine_config &config)
 
 void hp9825_tape_device::device_start()
 {
+	LOG_DBG("start\n");
 	m_flg_handler.resolve_safe();
 	m_sts_handler.resolve_safe();
 	m_dmar_handler.resolve_safe();
 	m_led_handler.resolve_safe();
+	m_cart_in_handler.resolve_safe();
 
 	save_item(NAME(m_cmd_reg));
 	save_item(NAME(m_stat_reg));
@@ -143,6 +147,7 @@ void hp9825_tape_device::device_start()
 
 void hp9825_tape_device::device_reset()
 {
+	LOG_DBG("reset\n");
 	clear_state();
 }
 
@@ -173,7 +178,7 @@ void hp9825_tape_device::clear_state()
 	m_led_handler(false);
 }
 
-READ16_MEMBER(hp9825_tape_device::tape_r)
+uint16_t hp9825_tape_device::tape_r(offs_t offset)
 {
 	uint16_t res = 0;
 
@@ -208,7 +213,7 @@ READ16_MEMBER(hp9825_tape_device::tape_r)
 	return res;
 }
 
-WRITE16_MEMBER(hp9825_tape_device::tape_w)
+void hp9825_tape_device::tape_w(offs_t offset, uint16_t data)
 {
 	LOG_REG("W R%u=%02x\n" , offset + 4 , data);
 
@@ -326,6 +331,8 @@ WRITE_LINE_MEMBER(hp9825_tape_device::cart_out_w)
 	} else {
 		BIT_CLR(m_stat_reg, STAT_REG_WPR_BIT);
 	}
+
+	m_cart_in_handler(!state);
 
 	update_sts();
 }

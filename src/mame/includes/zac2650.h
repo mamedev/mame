@@ -43,15 +43,15 @@ private:
 
 	bitmap_ind16 m_bitmap;
 	bitmap_ind16 m_spritebitmap;
-	int m_CollisionBackground;
-	int m_CollisionSprite;
-	tilemap_t *m_bg_tilemap;
+	int m_CollisionBackground = 0;
+	int m_CollisionSprite = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
 
-	DECLARE_WRITE8_MEMBER(tinvader_sound_w);
-	DECLARE_WRITE8_MEMBER(tinvader_videoram_w);
-	DECLARE_READ8_MEMBER(zac_s2636_r);
-	DECLARE_WRITE8_MEMBER(zac_s2636_w);
-	DECLARE_READ8_MEMBER(tinvader_port_0_r);
+	void tinvader_sound_w(uint8_t data);
+	void tinvader_videoram_w(offs_t offset, uint8_t data);
+	uint8_t zac_s2636_r(offs_t offset);
+	void zac_s2636_w(offs_t offset, uint8_t data);
+	uint8_t tinvader_port_0_r();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void zac2650_palette(palette_device &palette) const;
 	uint32_t screen_update_tinvader(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

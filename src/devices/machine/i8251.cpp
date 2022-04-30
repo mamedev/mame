@@ -85,10 +85,12 @@ v5x_scu_device::v5x_scu_device(const machine_config &mconfig, const char *tag, d
 
 
 //-------------------------------------------------
-//  device_start - device-specific startup
+//  device_resolve_objects - resolve objects that
+//  may be needed for other devices to set
+//  initial conditions at start time
 //-------------------------------------------------
 
-void i8251_device::device_start()
+void i8251_device::device_resolve_objects()
 {
 	// resolve callbacks
 	m_txd_handler.resolve_safe();
@@ -98,6 +100,14 @@ void i8251_device::device_start()
 	m_txrdy_handler.resolve_safe();
 	m_txempty_handler.resolve_safe();
 	m_syndet_handler.resolve_safe();
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void i8251_device::device_start()
+{
 	save_item(NAME(m_flags));
 	save_item(NAME(m_sync_byte_count));
 	save_item(NAME(m_status));
@@ -827,9 +837,12 @@ WRITE_LINE_MEMBER(i8251_device::write_cts)
 {
 	m_cts = state;
 
-	check_for_tx_start();
-	update_tx_ready();
-	update_tx_empty();
+	if (started())
+	{
+		check_for_tx_start();
+		update_tx_ready();
+		update_tx_empty();
+	}
 }
 
 WRITE_LINE_MEMBER(i8251_device::write_dsr)

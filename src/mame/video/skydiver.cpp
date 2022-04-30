@@ -25,7 +25,7 @@ void skydiver_state::machine_reset()
 TILE_GET_INFO_MEMBER(skydiver_state::get_tile_info)
 {
 	uint8_t code = m_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(0, code & 0x3f, code >> 6, 0);
+	tileinfo.set(0, code & 0x3f, code >> 6, 0);
 }
 
 
@@ -61,19 +61,19 @@ void skydiver_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(skydiver_state::videoram_w)
+void skydiver_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-READ8_MEMBER(skydiver_state::wram_r)
+uint8_t skydiver_state::wram_r(offs_t offset)
 {
 	return m_videoram[offset | 0x380];
 }
 
-WRITE8_MEMBER(skydiver_state::wram_w)
+void skydiver_state::wram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset | 0x0380] = data;
 }
@@ -142,7 +142,7 @@ WRITE_LINE_MEMBER(skydiver_state::lamp_r_w)
 	m_lamp_r = state;
 }
 
-WRITE8_MEMBER(skydiver_state::latch3_watchdog_w)
+void skydiver_state::latch3_watchdog_w(offs_t offset, uint8_t data)
 {
 	m_watchdog->watchdog_reset();
 	m_latch3->write_a0(offset);

@@ -34,7 +34,7 @@ private:
 	static const int rel[0x100];
 	static const char cc[4];
 
-	void add(std::string &buf, std::string str);
+	void add(std::string &buf, const std::string &str);
 	std::string SYM(int addr);
 	std::string IMM(offs_t pc, const data_buffer &params);
 	std::string IMM_PSL(offs_t pc, const data_buffer &params);

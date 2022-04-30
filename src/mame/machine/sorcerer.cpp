@@ -19,7 +19,7 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::serial_tc)
 	Transmit and receive clocks are connected to the same clock. */
 
 	/* if rs232 is disabled, receive clock is linked to cassette hardware */
-	if (BIT(m_fe, 7))
+	if (BIT(m_portfe, 7))
 	{
 		/* connect to rs232 */
 		m_rs232->write_txd(m_uart->so_r());
@@ -28,18 +28,15 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::serial_tc)
 }
 
 
-void sorcerer_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void sorcerer_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_SERIAL:
-		serial_tc(ptr, param);
+		serial_tc(param);
 		break;
 	case TIMER_CASSETTE:
-		cassette_tc(ptr, param);
-		break;
-	case TIMER_RESET:
-		sorcerer_reset(ptr, param);
+		cassette_tc(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in sorcerer_state::device_timer");
@@ -51,8 +48,8 @@ void sorcerer_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 TIMER_CALLBACK_MEMBER(sorcerer_state::cassette_tc)
 {
-	uint8_t cass_ws = 0;
-	switch (m_fe & 0xc0)        /*/ bit 7 low indicates cassette */
+	u8 cass_ws = 0;
+	switch (m_portfe & 0xc0)        /*/ bit 7 low indicates cassette */
 	{
 		case 0x00:              /* Cassette 300 baud */
 
@@ -61,7 +58,7 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::cassette_tc)
 
 			m_cass_data.input.length++;
 
-			cass_ws = ((((m_fe & 0x20) ? m_cassette2 : m_cassette1))->input() > +0.02) ? 1 : 0;
+			cass_ws = ((((m_portfe & 0x20) ? m_cassette2 : m_cassette1))->input() > +0.02) ? 1 : 0;
 
 			if (cass_ws != m_cass_data.input.level)
 			{
@@ -90,7 +87,7 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::cassette_tc)
 				if (!((m_cass_data.output.bit == 0) && (m_cass_data.output.length & 4)))
 				{
 					m_cass_data.output.level ^= 1;          // toggle output this, except on 2nd half of low bit
-					((m_fe & 0x20) ? m_cassette2 : m_cassette1)->output(m_cass_data.output.level ? -1.0 : +1.0);
+					((m_portfe & 0x20) ? m_cassette2 : m_cassette1)->output(m_cass_data.output.level ? -1.0 : +1.0);
 				}
 			}
 			return;
@@ -99,7 +96,7 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::cassette_tc)
 			/* loading a tape */
 			m_cass_data.input.length++;
 
-			cass_ws = ((((m_fe & 0x20) ? m_cassette2 : m_cassette1))->input() > +0.02) ? 1 : 0;
+			cass_ws = ((((m_portfe & 0x20) ? m_cassette2 : m_cassette1))->input() > +0.02) ? 1 : 0;
 
 			if (cass_ws != m_cass_data.input.level || m_cass_data.input.length == 10)
 			{
@@ -130,7 +127,7 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::cassette_tc)
 				if (!((m_cass_data.output.bit == 0) && (m_cass_data.output.length & 8)))
 				{
 					m_cass_data.output.level ^= 1;          // toggle output this, except on 2nd half of low bit
-					((m_fe & 0x20) ? m_cassette2 : m_cassette1)->output(m_cass_data.output.level ? -1.0 : +1.0);
+					((m_portfe & 0x20) ? m_cassette2 : m_cassette1)->output(m_cass_data.output.level ? -1.0 : +1.0);
 				}
 			}
 			return;
@@ -138,15 +135,9 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::cassette_tc)
 }
 
 
-/* after the first 4 bytes have been read from ROM, switch the ram back in */
-TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_reset)
-{
-	membank("boot")->set_entry(0);
-}
-
 // ************ EXIDY VIDEO UNIT FDC **************
 // The floppy sector has been read. Enable CPU.
-WRITE_LINE_MEMBER(sorcerer_state::intrq2_w)
+void sorcererd_state::intrq2_w(bool state)
 {
 	m_intrq_off = state ? false : true;
 	if (state)
@@ -155,7 +146,7 @@ WRITE_LINE_MEMBER(sorcerer_state::intrq2_w)
 		m_wait = false;
 	}
 	else
-	if (BIT(m_2c, 0) && m_drq_off && !m_wait)
+	if (BIT(m_port2c, 0) && m_drq_off && !m_wait)
 	{
 		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 		m_wait = true;
@@ -163,7 +154,7 @@ WRITE_LINE_MEMBER(sorcerer_state::intrq2_w)
 }
 
 // The next byte from floppy is available. Enable CPU so it can get the byte.
-WRITE_LINE_MEMBER(sorcerer_state::drq2_w)
+void sorcererd_state::drq2_w(bool state)
 {
 	m_drq_off = state ? false : true;
 	if (state)
@@ -172,7 +163,7 @@ WRITE_LINE_MEMBER(sorcerer_state::drq2_w)
 		m_wait = false;
 	}
 	else
-	if (BIT(m_2c, 0) && m_intrq_off && !m_wait)
+	if (BIT(m_port2c, 0) && m_intrq_off && !m_wait)
 	{
 		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 		m_wait = true;
@@ -183,9 +174,9 @@ WRITE_LINE_MEMBER(sorcerer_state::drq2_w)
 // Signals are unknown so guess
 // It outputs 24 or 25 when booting, so suppose that
 // bit 0 = enable wait generator, bit 2 = drive 0 select, bit 5 = ??
-WRITE8_MEMBER(sorcerer_state::port2c_w)
+void sorcererd_state::port2c_w(u8 data)
 {
-	m_2c = data;
+	m_port2c = data;
 
 	if (BIT(data, 0))
 	{
@@ -214,7 +205,7 @@ WRITE8_MEMBER(sorcerer_state::port2c_w)
 
 // ************ DREAMDISK FDC **************
 // Dreamdisk interrupts
-WRITE_LINE_MEMBER(sorcerer_state::intrq4_w)
+void sorcerer_state::intrq4_w(bool state)
 {
 	if (state && m_halt)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -222,12 +213,12 @@ WRITE_LINE_MEMBER(sorcerer_state::intrq4_w)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-READ8_MEMBER(sorcerer_state::port48_r)
+u8 sorcerer_state::port48_r()
 {
 	return m_port48;
 }
 
-WRITE8_MEMBER(sorcerer_state::port48_w)
+void sorcerer_state::port48_w(u8 data)
 {
 	m_port48 = data;
 	data ^= 0x1f;
@@ -235,6 +226,8 @@ WRITE8_MEMBER(sorcerer_state::port48_w)
 
 	if (BIT(data, 0)) floppy = m_floppy40->get_device();
 	if (BIT(data, 1)) floppy = m_floppy41->get_device();
+	if (BIT(data, 2)) floppy = m_floppy42->get_device();
+	if (BIT(data, 3)) floppy = m_floppy43->get_device();
 
 	m_fdc4->set_floppy(floppy);
 
@@ -249,7 +242,7 @@ WRITE8_MEMBER(sorcerer_state::port48_w)
 }
 
 // ************ DIGITRIO FDC **************
-READ8_MEMBER(sorcerer_state::port34_r)
+u8 sorcerer_state::port34_r()
 {
 	u8 data = m_port34;
 	data |= m_fdc3->intrq_r() ? 0x80 : 0;
@@ -257,13 +250,15 @@ READ8_MEMBER(sorcerer_state::port34_r)
 	return data;
 }
 
-WRITE8_MEMBER(sorcerer_state::port34_w)
+void sorcerer_state::port34_w(u8 data)
 {
 	m_port34 = data & 0x5f;
 	floppy_image_device *floppy = nullptr;
 
 	if (BIT(data, 0)) floppy = m_floppy30->get_device();
 	if (BIT(data, 1)) floppy = m_floppy31->get_device();
+	if (BIT(data, 2)) floppy = m_floppy32->get_device();
+	if (BIT(data, 3)) floppy = m_floppy33->get_device();
 
 	m_fdc3->set_floppy(floppy);
 
@@ -278,40 +273,40 @@ WRITE8_MEMBER(sorcerer_state::port34_w)
 }
 
 // ************ DIGITRIO DMA **************
-WRITE_LINE_MEMBER( sorcerer_state::busreq_w )
+void sorcerer_state::busreq_w(bool state)
 {
 // since our Z80 has no support for BUSACK, we assume it is granted immediately
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
-	m_maincpu->set_input_line(INPUT_LINE_HALT, state); // do we need this? - yes
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 	m_dma->bai_w(state); // tell dma that bus has been granted
 }
 
-READ8_MEMBER(sorcerer_state::memory_read_byte)
+u8 sorcerer_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(sorcerer_state::memory_write_byte)
+void sorcerer_state::memory_write_byte(offs_t offset, u8 data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset, data);
 }
 
-READ8_MEMBER(sorcerer_state::io_read_byte)
+u8 sorcerer_state::io_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(sorcerer_state::io_write_byte)
+void sorcerer_state::io_write_byte(offs_t offset, u8 data)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	prog_space.write_byte(offset, data);
 }
 
 // ************ INBUILT PORTS **************
-WRITE8_MEMBER(sorcerer_state::port_fd_w)
+void sorcerer_state::portfd_w(u8 data)
 {
 	/* Translate data to control signals */
 
@@ -324,10 +319,10 @@ WRITE8_MEMBER(sorcerer_state::port_fd_w)
 	m_uart->write_cs(1);
 }
 
-WRITE8_MEMBER(sorcerer_state::port_fe_w)
+void sorcerer_state::portfe_w(u8 data)
 {
-	uint8_t changed_bits = (m_fe ^ data) & 0xf0;
-	m_fe = data;
+	u8 changed_bits = (m_portfe ^ data) & 0xf0;
+	m_portfe = data;
 
 	/* bits 0..3 */
 	m_keyboard_line = data & 0x0f;
@@ -375,7 +370,7 @@ WRITE8_MEMBER(sorcerer_state::port_fe_w)
 	}
 }
 
-WRITE8_MEMBER(sorcerer_state::port_ff_w)
+void sorcerer_state::portff_w(u8 data)
 {
 	/// TODO: create a sorcerer parallel slot with a 7 bit and 8 bit centronics adapter as two of the options
 	/// TODO: figure out what role FE plays http://www.trailingedge.com/exidy/exidych7.html
@@ -405,10 +400,10 @@ WRITE8_MEMBER(sorcerer_state::port_ff_w)
 	}
 }
 
-READ8_MEMBER(sorcerer_state::port_fd_r)
+u8 sorcerer_state::portfd_r()
 {
 	/* set unused bits high */
-	uint8_t data = 0xe0;
+	u8 data = 0xe0;
 
 	m_uart->write_swe(0);
 	data |= m_uart->tbmt_r() ? 0x01 : 0;
@@ -421,14 +416,14 @@ READ8_MEMBER(sorcerer_state::port_fd_r)
 	return data;
 }
 
-READ8_MEMBER(sorcerer_state::port_fe_r)
+u8 sorcerer_state::portfe_r()
 {
 	/* bits 6..7
 	 - hardware handshakes from user port
 	 - not emulated
 	 - tied high, allowing PARIN and PAROUT bios routines to run */
 
-	uint8_t data = 0xc0;
+	u8 data = 0xc0;
 
 	/* bit 5 - vsync */
 	data |= m_iop_vs->read();
@@ -440,10 +435,16 @@ READ8_MEMBER(sorcerer_state::port_fe_r)
 }
 
 // ************ MACHINE **************
-void sorcerer_state::machine_start_common(u16 endmem)
+void sorcerer_state::machine_start_common(offs_t endmem)
 {
 	m_cassette_timer = timer_alloc(TIMER_CASSETTE);
 	m_serial_timer = timer_alloc(TIMER_SERIAL);
+
+	m_halt = false;
+
+	// register for savestates
+	save_item(NAME(m_portfe));
+	save_item(NAME(m_keyboard_line));
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	/* configure RAM */
@@ -469,14 +470,21 @@ void sorcerer_state::machine_start_common(u16 endmem)
 void sorcerer_state::machine_start()
 {
 	machine_start_common(0xbfff);
+	save_item(NAME(m_port48));
+	save_item(NAME(m_port34));
+	save_item(NAME(m_halt));
 }
 
-MACHINE_START_MEMBER(sorcerer_state,sorcererd)
+void sorcererd_state::machine_start()
 {
 	machine_start_common(0xbbff);
+	save_item(NAME(m_port2c));
+	save_item(NAME(m_wait));
+	save_item(NAME(m_drq_off));
+	save_item(NAME(m_intrq_off));
 }
 
-void sorcerer_state::machine_reset()
+void sorcerer_state::machine_reset_common()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -486,133 +494,177 @@ void sorcerer_state::machine_reset()
 	m_cass_data.input.length = 0;
 	m_cass_data.input.bit = 1;
 
+	m_portfe = 0xff;
+	portfe_w(0);
+
+	space.install_rom(0x0000, 0x0fff, m_rom);   // do it here for F3
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = space.install_read_tap(
+			0xe000, 0xefff,
+			"rom_shadow_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					// delete this tap
+					m_rom_shadow_tap.remove();
+
+					// reinstall RAM over the ROM shadow
+					m_maincpu->space(AS_PROGRAM).install_ram(0x0000, 0x0fff, m_ram->pointer());
+				}
+			},
+			&m_rom_shadow_tap);
+}
+
+void sorcerer_state::machine_reset()
+{
+	machine_reset_common();
+}
+
+void sorcererd_state::machine_reset()
+{
 	m_drq_off = true;
 	m_intrq_off = true;
 	m_wait = false;
-	m_fe = 0xff;
-	m_2c = 0;
-	port_fe_w(space, 0, 0, 0);
-
-	membank("boot")->set_entry(1);
-	timer_set(attotime::from_usec(10), TIMER_RESET);
-}
-
-/******************************************************************************
- Snapshot Handling
-******************************************************************************/
-
-SNAPSHOT_LOAD_MEMBER(sorcerer_state::snapshot_cb)
-{
-	uint8_t *RAM = memregion(m_maincpu->tag())->base();
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	uint8_t header[28];
-	unsigned char s_byte;
-
-	/* check size */
-	if (snapshot_size != 0x1001c)
-	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Snapshot must be 65564 bytes");
-		image.message("Snapshot must be 65564 bytes");
-		return image_init_result::FAIL;
-	}
-
-	/* get the header */
-	image.fread( &header, sizeof(header));
-
-	/* write it to ram */
-	for (int i = 0; i < 0xc000; i++)
-	{
-		image.fread( &s_byte, 1);
-		space.write_byte(i, s_byte);
-	}
-	image.fread( RAM+0xc000, 0x4000);
-
-	/* patch CPU registers */
-	m_maincpu->set_state_int(Z80_I, header[0]);
-	m_maincpu->set_state_int(Z80_HL2, header[1] | (header[2] << 8));
-	m_maincpu->set_state_int(Z80_DE2, header[3] | (header[4] << 8));
-	m_maincpu->set_state_int(Z80_BC2, header[5] | (header[6] << 8));
-	m_maincpu->set_state_int(Z80_AF2, header[7] | (header[8] << 8));
-	m_maincpu->set_state_int(Z80_HL, header[9] | (header[10] << 8));
-	m_maincpu->set_state_int(Z80_DE, header[11] | (header[12] << 8));
-	m_maincpu->set_state_int(Z80_BC, header[13] | (header[14] << 8));
-	m_maincpu->set_state_int(Z80_IY, header[15] | (header[16] << 8));
-	m_maincpu->set_state_int(Z80_IX, header[17] | (header[18] << 8));
-	m_maincpu->set_state_int(Z80_IFF1, header[19]&2 ? 1 : 0);
-	m_maincpu->set_state_int(Z80_IFF2, header[19]&4 ? 1 : 0);
-	m_maincpu->set_state_int(Z80_R, header[20]);
-	m_maincpu->set_state_int(Z80_AF, header[21] | (header[22] << 8));
-	m_maincpu->set_state_int(STATE_GENSP, header[23] | (header[24] << 8));
-	m_maincpu->set_state_int(Z80_IM, header[25]);
-	m_maincpu->set_pc(header[26] | (header[27] << 8));
-
-	return image_init_result::PASS;
+	m_port2c = 0;
+	machine_reset_common();
 }
 
 
 /*-------------------------------------------------
     QUICKLOAD_LOAD_MEMBER( sorcerer_state, sorcerer )
+    Handles BIN and SNP extensions.
 -------------------------------------------------*/
 
 QUICKLOAD_LOAD_MEMBER(sorcerer_state::quickload_cb)
 {
-	uint16_t execute_address, start_address, end_address;
-	int autorun;
+	// get autorun setting
+	bool autorun = BIT(m_iop_config->read(), 0);
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	/* load the binary into memory */
-	if (z80bin_load_file(&image, space, file_type, &execute_address, &start_address, &end_address) != image_init_result::PASS)
-		return image_init_result::FAIL;
-
-	/* is this file executable? */
-	if (execute_address != 0xffff)
+	if (image.is_filetype("bin"))
 	{
-		/* check to see if autorun is on */
-		autorun = m_iop_config->read() & 1;
+		u16 execute_address, start_address, end_address;
 
-		if ((execute_address >= 0xc000) && (execute_address <= 0xdfff) && (space.read_byte(0xdffa) != 0xc3))
-			return image_init_result::FAIL;     /* can't run a program if the cartridge isn't in */
+		// load the binary into memory
+		if (z80bin_load_file(image, space, execute_address, start_address, end_address) != image_init_result::PASS)
+			return image_init_result::FAIL;
 
-		/* Since Exidy Basic is by Microsoft, it needs some preprocessing before it can be run.
-		1. A start address of 01D5 indicates a basic program which needs its pointers fixed up.
-		2. If autorunning, jump to C689 (command processor), else jump to C3DD (READY prompt).
-		Important addresses:
-		    01D5 = start (load) address of a conventional basic program
-		    C858 = an autorun basic program will have this exec address on the tape
-		    C3DD = part of basic that displays READY and lets user enter input */
-
-		if (((start_address == 0x1d5) || (execute_address == 0xc858)) && (space.read_byte(0xdffa) == 0xc3))
+		// is this file executable?
+		if (execute_address != 0xffff)
 		{
-			uint8_t i;
-			static const uint8_t data[]={
-				0xcd, 0x26, 0xc4,   // CALL C426    ;set up other pointers
-				0x21, 0xd4, 1,      // LD HL,01D4   ;start of program address (used by C689)
-				0x36, 0,        // LD (HL),00   ;make sure dummy end-of-line is there
-				0xc3, 0x89, 0xc6    // JP C689  ;run program
-			};
 
-			for (i = 0; i < ARRAY_LENGTH(data); i++)
-				space.write_byte(0xf01f + i, data[i]);
+			if ((execute_address >= 0xc000) && (execute_address <= 0xdfff) && (space.read_byte(0xdffa) != 0xc3))
+				return image_init_result::FAIL;     // can't run a program if the cartridge isn't in
 
-			if (!autorun)
-				space.write_word(0xf028,0xc3dd);
+			/* Since Exidy Basic is by Microsoft, it needs some preprocessing before it can be run.
+			1. A start address of 01D5 indicates a basic program which needs its pointers fixed up.
+			2. If autorunning, jump to C689 (command processor), else jump to C3DD (READY prompt).
+			Important addresses:
+			    01D5 = start (load) address of a conventional basic program
+			    C858 = an autorun basic program will have this exec address on the tape
+			    C3DD = part of basic that displays READY and lets user enter input */
 
-			/* tell BASIC where program ends */
-			space.write_byte(0x1b7, end_address & 0xff);
-			space.write_byte(0x1b8, (end_address >> 8) & 0xff);
+			if (((start_address == 0x1d5) || (execute_address == 0xc858)) && (space.read_byte(0xdffa) == 0xc3))
+			{
+				static const u8 data[]={
+					0xcd, 0x26, 0xc4,   // CALL C426    ;set up other pointers
+					0x21, 0xd4, 1,      // LD HL,01D4   ;start of program address (used by C689)
+					0x36, 0,            // LD (HL),00   ;make sure dummy end-of-line is there
+					0xc3, 0x89, 0xc6    // JP C689  ;run program
+				};
 
-			if ((execute_address != 0xc858) && autorun)
-				space.write_word(0xf028, execute_address);
+				for (u8 i = 0; i < std::size(data); i++)
+					space.write_byte(0xf01f + i, data[i]);
 
-			m_maincpu->set_pc(0xf01f);
+				if (!autorun)
+					space.write_word(0xf028,0xc3dd);
+
+				/* tell BASIC where program ends */
+				space.write_byte(0x1b7, end_address & 0xff);
+				space.write_byte(0x1b8, (end_address >> 8) & 0xff);
+
+				if ((execute_address != 0xc858) && autorun)
+					space.write_word(0xf028, execute_address);
+
+				m_maincpu->set_pc(0xf01f);
+			}
+			else
+			{
+				if (autorun)
+					m_maincpu->set_pc(execute_address);
+			}
+		}
+	}
+	else
+	{
+		// SNP extension
+		// check size
+		if (image.length() != 0x1001c)
+		{
+			image.seterror(image_error::INVALIDIMAGE, "Snapshot must be 65564 bytes");
+			image.message("Snapshot must be 65564 bytes");
+			return image_init_result::FAIL;
+		}
+
+		/* get the header */
+		u8 header[28];
+		image.fread( &header, sizeof(header));
+
+		logerror("SNP PC register = 0x%04x\n", header[26] | (header[27] << 8));
+
+		// write it to ram, and skip roms
+		unsigned char s_byte;
+		for (int i = 0; i < 0xe000; i++)
+		{
+			image.fread( &s_byte, 1);
+			space.write_byte(i, s_byte);  // ram
+		}
+
+		for (int i = 0xe000; i < 0xf000; i++)
+			image.fread( &s_byte, 1);
+
+		for (int i = 0xf000; i < 0xf800; i++)
+		{
+			image.fread( &s_byte, 1);
+			space.write_byte(i, s_byte);  // screen
+		}
+
+		for (int i = 0xf800; i < 0xfc00; i++)
+			image.fread( &s_byte, 1);
+
+		for (int i = 0xfc00; i < 0x10000; i++)
+		{
+			image.fread( &s_byte, 1);
+			space.write_byte(i, s_byte);  //pcg
+		}
+
+		// it's assumed if autorun was off that you wished to examine the image rather than to play it
+		if (autorun)
+		{
+			// patch CPU registers
+			m_maincpu->set_state_int(Z80_I, header[0]);
+			m_maincpu->set_state_int(Z80_HL2, header[1] | (header[2] << 8));
+			m_maincpu->set_state_int(Z80_DE2, header[3] | (header[4] << 8));
+			m_maincpu->set_state_int(Z80_BC2, header[5] | (header[6] << 8));
+			m_maincpu->set_state_int(Z80_AF2, header[7] | (header[8] << 8));
+			m_maincpu->set_state_int(Z80_HL, header[9] | (header[10] << 8));
+			m_maincpu->set_state_int(Z80_DE, header[11] | (header[12] << 8));
+			m_maincpu->set_state_int(Z80_BC, header[13] | (header[14] << 8));
+			m_maincpu->set_state_int(Z80_IY, header[15] | (header[16] << 8));
+			m_maincpu->set_state_int(Z80_IX, header[17] | (header[18] << 8));
+			m_maincpu->set_state_int(Z80_IFF1, header[19]&2 ? 1 : 0);
+			m_maincpu->set_state_int(Z80_IFF2, header[19]&4 ? 1 : 0);
+			m_maincpu->set_state_int(Z80_R, header[20]);
+			m_maincpu->set_state_int(Z80_AF, header[21] | (header[22] << 8));
+			m_maincpu->set_state_int(Z80_SP, header[23] | (header[24] << 8));
+			m_maincpu->set_state_int(Z80_IM, header[25]);
+			m_maincpu->set_pc(header[26] | (header[27] << 8));
 		}
 		else
-		{
-			if (autorun)
-				m_maincpu->set_pc(execute_address);
-		}
-
+			m_maincpu->set_pc(0xe000);  // SNP destroys workspace, so do cold start.
 	}
 
 	return image_init_result::PASS;
 }
+

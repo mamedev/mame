@@ -99,7 +99,7 @@ void tp84_state::tp84_palette(palette_device &palette) const
 }
 
 
-WRITE8_MEMBER(tp84_state::tp84_spriteram_w)
+void tp84_state::tp84_spriteram_w(offs_t offset, uint8_t data)
 {
 	/* the game multiplexes the sprites, so update now */
 //  m_screen->update_now();
@@ -108,7 +108,7 @@ WRITE8_MEMBER(tp84_state::tp84_spriteram_w)
 }
 
 
-READ8_MEMBER(tp84_state::tp84_scanline_r)
+uint8_t tp84_state::tp84_scanline_r()
 {
 	/* reads 1V - 128V */
 	return m_screen->vpos();
@@ -123,7 +123,7 @@ TILE_GET_INFO_MEMBER(tp84_state::get_bg_tile_info)
 				(m_bg_colorram[tile_index] & 0x0f);
 	int flags = TILE_FLIPYX(m_bg_colorram[tile_index] >> 6);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(tp84_state::get_fg_tile_info)
@@ -134,7 +134,7 @@ TILE_GET_INFO_MEMBER(tp84_state::get_fg_tile_info)
 				(m_fg_colorram[tile_index] & 0x0f);
 	int flags = TILE_FLIPYX(m_fg_colorram[tile_index] >> 6);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 

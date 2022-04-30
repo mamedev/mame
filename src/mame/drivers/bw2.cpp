@@ -28,7 +28,7 @@
 #include "includes/bw2.h"
 #include "bus/rs232/rs232.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 
 //**************************************************************************
@@ -59,7 +59,7 @@ enum
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( bw2_state::read )
+uint8_t bw2_state::read(offs_t offset)
 {
 	int rom = 1, vram = 1, ram1 = 1, ram2 = 1, ram3 = 1, ram4 = 1, ram5 = 1, ram6 = 1;
 
@@ -116,7 +116,7 @@ READ8_MEMBER( bw2_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( bw2_state::write )
+void bw2_state::write(offs_t offset, uint8_t data)
 {
 	int vram = 1, ram1 = 1, ram2 = 1, ram3 = 1, ram4 = 1, ram5 = 1, ram6 = 1;
 
@@ -192,7 +192,7 @@ void bw2_state::bw2_io(address_map &map)
 	map(0x20, 0x21).m(m_lcdc, FUNC(msm6255_device::map));
 	map(0x30, 0x3f).rw(m_exp, FUNC(bw2_expansion_slot_device::slot_r), FUNC(bw2_expansion_slot_device::slot_w));
 	map(0x40, 0x41).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
-	map(0x50, 0x50).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x50, 0x50).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x60, 0x63).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write));
 	map(0x70, 0x7f).rw(m_exp, FUNC(bw2_expansion_slot_device::modsel_r), FUNC(bw2_expansion_slot_device::modsel_w));
 }
@@ -309,14 +309,14 @@ static INPUT_PORTS_START( bw2 )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('@') PORT_CHAR('`')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C') PORT_CHAR(3)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3))
 
 	PORT_START("Y7")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
@@ -370,7 +370,7 @@ WRITE_LINE_MEMBER( bw2_state::write_centronics_busy )
 //  I8255A interface
 //-------------------------------------------------
 
-WRITE8_MEMBER( bw2_state::ppi_pa_w )
+void bw2_state::ppi_pa_w(uint8_t data)
 {
 	/*
 
@@ -400,7 +400,7 @@ WRITE8_MEMBER( bw2_state::ppi_pa_w )
 	m_centronics->write_strobe(BIT(data, 7));
 }
 
-READ8_MEMBER( bw2_state::ppi_pb_r )
+uint8_t bw2_state::ppi_pb_r()
 {
 	/*
 
@@ -425,7 +425,7 @@ READ8_MEMBER( bw2_state::ppi_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( bw2_state::ppi_pc_w )
+void bw2_state::ppi_pc_w(uint8_t data)
 {
 	/*
 
@@ -439,7 +439,7 @@ WRITE8_MEMBER( bw2_state::ppi_pc_w )
 	m_bank = data & 0x07;
 }
 
-READ8_MEMBER( bw2_state::ppi_pc_r )
+uint8_t bw2_state::ppi_pc_r()
 {
 	/*
 
@@ -450,7 +450,7 @@ READ8_MEMBER( bw2_state::ppi_pc_r )
 
 	*/
 
-	uint8_t data = 0;
+	uint8_t data = m_bank;
 
 	// centronics busy
 	data |= m_centronics_busy << 4;
@@ -459,7 +459,7 @@ READ8_MEMBER( bw2_state::ppi_pc_r )
 	data |= m_mfdbk << 5;
 
 	// write protect
-	if (m_floppy) data |= m_floppy->wpt_r() << 7;
+	if (m_floppy) data |= !m_floppy->wpt_r() << 7;
 
 	return data;
 }
@@ -477,7 +477,7 @@ WRITE_LINE_MEMBER( bw2_state::mtron_w )
 }
 
 //-------------------------------------------------
-//  floppy_format_type floppy_formats
+//  floppy_formats
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( bw2_state::fdc_drq_w )
@@ -495,9 +495,11 @@ WRITE_LINE_MEMBER( bw2_state::fdc_drq_w )
 	}
 }
 
-FLOPPY_FORMATS_MEMBER( bw2_state::floppy_formats )
-	FLOPPY_BW2_FORMAT
-FLOPPY_FORMATS_END
+void bw2_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_BW2_FORMAT);
+}
 
 static void bw2_floppies(device_slot_interface &device)
 {

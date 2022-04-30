@@ -302,7 +302,7 @@ Mark Gordon
 #include "emu.h"
 #include "includes/adam.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -347,7 +347,7 @@ enum
 //  mreq_r - memory request read
 //-------------------------------------------------
 
-READ8_MEMBER( adam_state::mreq_r )
+uint8_t adam_state::mreq_r(offs_t offset)
 {
 	int bmreq = 0, biorq = 1, eos_enable = 1, boot_rom_cs = 1, aux_decode_1 = 1, aux_rom_cs = 1, cas1 = 1, cas2 = 1, cs1 = 1, cs2 = 1, cs3 = 1, cs4 = 1;
 
@@ -458,9 +458,9 @@ READ8_MEMBER( adam_state::mreq_r )
 	}
 
 	data = m_cart->bd_r(offset & 0x7fff, data, cs1, cs2, cs3, cs4);
-	data = m_slot1->bd_r(offset & 0xff, data, 1, biorq, 1, 1, 1);
-	data = m_slot2->bd_r(offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
-	data = m_slot3->bd_r(offset, data, 1, 1, 1, cas1, cas2);
+	data = m_slot[0]->bd_r(offset & 0xff, data, 1, biorq, 1, 1, 1);
+	data = m_slot[1]->bd_r(offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
+	data = m_slot[2]->bd_r(offset, data, 1, 1, 1, cas1, cas2);
 
 	return data;
 }
@@ -470,7 +470,7 @@ READ8_MEMBER( adam_state::mreq_r )
 // mreq_w - memory request write
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_state::mreq_w )
+void adam_state::mreq_w(offs_t offset, uint8_t data)
 {
 	int bmreq = 0, biorq = 1, aux_rom_cs = 1, cas1 = 1, cas2 = 1;
 
@@ -516,9 +516,9 @@ WRITE8_MEMBER( adam_state::mreq_w )
 		m_ram->pointer()[offset] = data;
 	}
 
-	m_slot1->bd_w(offset & 0xff, data, 1, biorq, 1, 1, 1);
-	m_slot2->bd_w(offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
-	m_slot3->bd_w(offset, data, 1, 1, 1, cas1, cas2);
+	m_slot[0]->bd_w(offset & 0xff, data, 1, biorq, 1, 1, 1);
+	m_slot[1]->bd_w(offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
+	m_slot[2]->bd_w(offset, data, 1, 1, 1, cas1, cas2);
 }
 
 
@@ -526,7 +526,7 @@ WRITE8_MEMBER( adam_state::mreq_w )
 //  iorq_r - I/O request read
 //-------------------------------------------------
 
-READ8_MEMBER( adam_state::iorq_r )
+uint8_t adam_state::iorq_r(offs_t offset)
 {
 	int bmreq = 1, biorq = 0, aux_rom_cs = 1, cas1 = 1, cas2 = 1;
 
@@ -535,11 +535,11 @@ READ8_MEMBER( adam_state::iorq_r )
 	switch ((offset >> 5) & 0x07)
 	{
 	case 1:
-		data = adamnet_r(space, 0);
+		data = adamnet_r();
 		break;
 
 	case 3:
-		data = mioc_r(space, 0);
+		data = mioc_r();
 		break;
 
 	case 5:
@@ -557,9 +557,9 @@ READ8_MEMBER( adam_state::iorq_r )
 		break;
 	}
 
-	data = m_slot1->bd_r(offset & 0xff, data, 1, biorq, 1, 1, 1);
-	data = m_slot2->bd_r(offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
-	data = m_slot3->bd_r(offset, data, 1, 1, 1, cas1, cas2);
+	data = m_slot[0]->bd_r(offset & 0xff, data, 1, biorq, 1, 1, 1);
+	data = m_slot[1]->bd_r(offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
+	data = m_slot[2]->bd_r(offset, data, 1, 1, 1, cas1, cas2);
 
 	return data;
 }
@@ -569,18 +569,18 @@ READ8_MEMBER( adam_state::iorq_r )
 //  iorq_w - I/O request write
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_state::iorq_w )
+void adam_state::iorq_w(offs_t offset, uint8_t data)
 {
 	int bmreq = 1, biorq = 0, aux_rom_cs = 1, cas1 = 1, cas2 = 1;
 
 	switch ((offset >> 5) & 0x07)
 	{
 	case 1:
-		adamnet_w(space, 0, data);
+		adamnet_w(data);
 		break;
 
 	case 3:
-		mioc_w(space, 0, data);
+		mioc_w(data);
 		break;
 
 	case 4:
@@ -609,9 +609,9 @@ WRITE8_MEMBER( adam_state::iorq_w )
 		break;
 	}
 
-	m_slot1->bd_w(offset & 0xff, data, 1, biorq, 1, 1, 1);
-	m_slot2->bd_w(offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
-	m_slot3->bd_w(offset, data, 1, 1, 1, cas1, cas2);
+	m_slot[0]->bd_w(offset & 0xff, data, 1, biorq, 1, 1, 1);
+	m_slot[1]->bd_w(offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
+	m_slot[2]->bd_w(offset, data, 1, 1, 1, cas1, cas2);
 }
 
 
@@ -619,7 +619,7 @@ WRITE8_MEMBER( adam_state::iorq_w )
 //  mioc_r -
 //-------------------------------------------------
 
-READ8_MEMBER( adam_state::mioc_r )
+uint8_t adam_state::mioc_r()
 {
 	return m_mioc & 0x0f;
 }
@@ -629,7 +629,7 @@ READ8_MEMBER( adam_state::mioc_r )
 //  mioc_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_state::mioc_w )
+void adam_state::mioc_w(uint8_t data)
 {
 	/*
 
@@ -659,7 +659,7 @@ WRITE8_MEMBER( adam_state::mioc_w )
 //  adamnet_r -
 //-------------------------------------------------
 
-READ8_MEMBER( adam_state::adamnet_r )
+uint8_t adam_state::adamnet_r()
 {
 	return m_an & 0x0f;
 }
@@ -669,7 +669,7 @@ READ8_MEMBER( adam_state::adamnet_r )
 //  adamnet_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_state::adamnet_w )
+void adam_state::adamnet_w(uint8_t data)
 {
 	/*
 
@@ -701,7 +701,7 @@ WRITE8_MEMBER( adam_state::adamnet_w )
 //  m6801_p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_state::m6801_p1_w )
+void adam_state::m6801_p1_w(uint8_t data)
 {
 	/*
 
@@ -726,7 +726,7 @@ WRITE8_MEMBER( adam_state::m6801_p1_w )
 //  m6801_p2_r -
 //-------------------------------------------------
 
-READ8_MEMBER( adam_state::m6801_p2_r )
+uint8_t adam_state::m6801_p2_r()
 {
 	/*
 
@@ -753,7 +753,7 @@ READ8_MEMBER( adam_state::m6801_p2_r )
 //  m6801_p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_state::m6801_p2_w )
+void adam_state::m6801_p2_w(uint8_t data)
 {
 	/*
 
@@ -782,7 +782,7 @@ WRITE8_MEMBER( adam_state::m6801_p2_w )
 //  m6801_p3_r -
 //-------------------------------------------------
 
-READ8_MEMBER( adam_state::m6801_p3_r )
+uint8_t adam_state::m6801_p3_r()
 {
 	/*
 
@@ -807,7 +807,7 @@ READ8_MEMBER( adam_state::m6801_p3_r )
 //  m6801_p3_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_state::m6801_p3_w )
+void adam_state::m6801_p3_w(uint8_t data)
 {
 	/*
 
@@ -832,7 +832,7 @@ WRITE8_MEMBER( adam_state::m6801_p3_w )
 //  m6801_p4_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_state::m6801_p4_w )
+void adam_state::m6801_p4_w(uint8_t data)
 {
 	/*
 
@@ -884,7 +884,7 @@ void adam_state::adam_io(address_map &map)
 
 void adam_state::m6801_mem(address_map &map)
 {
-	map(0x0000, 0x001f).rw(m_netcpu, FUNC(m6801_cpu_device::m6801_io_r), FUNC(m6801_cpu_device::m6801_io_w));
+	map(0x0000, 0x001f).m(m_netcpu, FUNC(m6801_cpu_device::m6801_io));
 	map(0x0080, 0x00ff).ram();
 	map(0xf800, 0xffff).rom().region(M6801_TAG, 0);
 }
@@ -1076,11 +1076,11 @@ void adam_state::adam(machine_config &config)
 	ADAMNET_SLOT(config, "net15", m_adamnet, adamnet_devices, nullptr);
 
 	COLECOVISION_CARTRIDGE_SLOT(config, m_cart, colecovision_cartridges, nullptr);
-	ADAM_EXPANSION_SLOT(config, m_slot1, XTAL(7'159'090)/2, adam_slot1_devices, "adamlink");
-	m_slot1->irq().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	ADAM_EXPANSION_SLOT(config, m_slot2, XTAL(7'159'090)/2, adam_slot2_devices, nullptr);
-	m_slot2->irq().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	ADAM_EXPANSION_SLOT(config, m_slot3, XTAL(7'159'090)/2, adam_slot3_devices, "ram");
+	ADAM_EXPANSION_SLOT(config, m_slot[0], XTAL(7'159'090)/2, adam_slot1_devices, "adamlink"); // left
+	m_slot[0]->irq().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ADAM_EXPANSION_SLOT(config, m_slot[1], XTAL(7'159'090)/2, adam_slot2_devices, nullptr); // center
+	m_slot[1]->irq().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ADAM_EXPANSION_SLOT(config, m_slot[2], XTAL(7'159'090)/2, adam_slot3_devices, "ram"); // right
 
 	COLECOVISION_CONTROL_PORT(config, m_joy1, colecovision_control_port_devices, "hand");
 	m_joy1->irq().set(FUNC(adam_state::joy1_irq_w));

@@ -5,7 +5,7 @@ $input v_texcoord0, v_texcoord1, v_texcoord2, v_color0
 
 /*
    Hyllian's xBR LV2 - noblend - pass1 Shader
-  
+
    Copyright (C) 2011-2015 Hyllian - sergiogdb@gmail.com
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -94,7 +94,7 @@ vec4 unpack_info(float i)
 	float frac_val = fract(i / 2.0f);
 	info.w = round(frac_val);
 	i = i / 2.0f - frac_val;
-	
+
 	frac_val = fract(i / 2.0f);
 	info.z = round(frac_val);
 	i = i / 2.0f - frac_val;

@@ -87,7 +87,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mrflea_state::mrflea_slave_interrupt)
 		m_pic->ir1_w(CLEAR_LINE);
 }
 
-WRITE8_MEMBER(mrflea_state::mrflea_data1_w)
+void mrflea_state::mrflea_data1_w(uint8_t data)
 {
 }
 

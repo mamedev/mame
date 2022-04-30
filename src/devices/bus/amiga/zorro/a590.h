@@ -18,7 +18,7 @@
 #include "machine/wd33c9x.h"
 
 
-namespace bus { namespace amiga { namespace zorro {
+namespace bus::amiga::zorro {
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -58,8 +58,8 @@ protected:
 	std::vector<uint8_t> m_ram;
 
 private:
-	DECLARE_READ8_MEMBER( dmac_scsi_r );
-	DECLARE_WRITE8_MEMBER( dmac_scsi_w );
+	uint8_t dmac_scsi_r(offs_t offset);
+	void dmac_scsi_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( dmac_int_w );
 	DECLARE_WRITE_LINE_MEMBER( dmac_cfgout_w ) { cfgout_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( scsi_irq_w );
@@ -132,7 +132,7 @@ private:
 	required_ioport m_jp201;
 };
 
-} } } // namespace bus::amiga::zorro
+} // namespace bus::amiga::zorro
 
 // device type definition
 DECLARE_DEVICE_TYPE_NS(ZORRO_A590,  bus::amiga::zorro, a590_device)

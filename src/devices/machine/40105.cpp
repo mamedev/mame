@@ -115,11 +115,6 @@ void cmos_40105_device::write(u8 data)
 	m_d = data & 0x0f;
 }
 
-WRITE8_MEMBER(cmos_40105_device::write)
-{
-	write(data);
-}
-
 
 //-------------------------------------------------
 //  load_input - load new data into FIFO

@@ -508,7 +508,7 @@ void k056832_device::get_tile_info(  tile_data &tileinfo, int tile_index, int pa
 
 	m_k056832_cb(layer, &code, &color, &flags, &priority);
 
-	SET_TILE_INFO_MEMBER(m_gfx_num,
+	tileinfo.set(m_gfx_num,
 			code,
 			color,
 			flags);
@@ -1069,7 +1069,7 @@ void k056832_device::word_w(offs_t offset, u16 data, u16 mem_mask)
 
 void k056832_device::b_word_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	assert(offset < ARRAY_LENGTH(m_regsb));
+	assert(offset < std::size(m_regsb));
 	COMBINE_DATA(&m_regsb[offset]);
 }
 
@@ -1100,8 +1100,8 @@ void k056832_device::b_w(offs_t offset, u8 data)
 	}
 }
 
-template<class _BitmapClass>
-int k056832_device::update_linemap( screen_device &screen, _BitmapClass &bitmap, int page, int flags )
+template<class BitmapClass>
+int k056832_device::update_linemap( screen_device &screen, BitmapClass &bitmap, int page, int flags )
 {
 	if (m_page_tile_mode[page])
 		return(0);
@@ -1177,8 +1177,8 @@ int k056832_device::update_linemap( screen_device &screen, _BitmapClass &bitmap,
 			{
 				tile_data tileinfo = {0};
 
-				dst_ptr = &pixmap->pix16(line);
-				xpr_ptr = &xprmap.pix8(line);
+				dst_ptr = &pixmap->pix(line);
+				xpr_ptr = &xprmap.pix(line);
 
 				if (!all_dirty)
 				{
@@ -1218,8 +1218,8 @@ int k056832_device::update_linemap( screen_device &screen, _BitmapClass &bitmap,
 	return(0);
 }
 
-template<class _BitmapClass>
-void k056832_device::tilemap_draw_common( screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int layer, uint32_t flags, uint32_t priority )
+template<class BitmapClass>
+void k056832_device::tilemap_draw_common( screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int layer, uint32_t flags, uint32_t priority )
 {
 	uint32_t last_dx, last_visible, new_colorbase, last_active;
 	int sx, sy, ay, tx, ty, width, height;
@@ -2106,8 +2106,8 @@ int k056832_device::altK056832_update_linemap(screen_device &screen, bitmap_rgb3
 			{
 				tile_data tileinfo = {0};
 
-				dst_ptr = &pixmap->pix16(line);
-				xpr_ptr = &xprmap.pix8(line);
+				dst_ptr = &pixmap->pix(line);
+				xpr_ptr = &xprmap.pix(line);
 
 				if (!all_dirty)
 				{

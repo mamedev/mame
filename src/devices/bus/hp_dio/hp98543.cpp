@@ -21,10 +21,9 @@ ROM_START(hp98543)
 	ROM_LOAD("1818-3907.bin", 0x000000, 0x002000, CRC(5e2bf02a) SHA1(9ba9391cf39624ef8027ce42c84e100344b2a2b8))
 ROM_END
 
-DEFINE_DEVICE_TYPE_NS(HPDIO_98543, bus::hp_dio, dio16_98543_device, "dio98543", "HP98543 medium-res color DIO video card")
+DEFINE_DEVICE_TYPE(HPDIO_98543, bus::hp_dio::dio16_98543_device, "dio98543", "HP98543 medium-res color DIO video card")
 
-namespace bus {
-	namespace hp_dio {
+namespace bus::hp_dio {
 
 void dio16_98543_device::device_add_mconfig(machine_config &config)
 {
@@ -90,8 +89,8 @@ dio16_98543_device::dio16_98543_device(const machine_config &mconfig, device_typ
 	m_nereid(*this, "nereid"),
 	m_space_config("vram", ENDIANNESS_BIG, 8, 19, 0, address_map_constructor(FUNC(dio16_98543_device::map), this)),
 	m_rom(*this, HP98543_ROM_REGION),
-	m_vram(*this, "vram")
-
+	m_vram(*this, "vram"),
+	m_intreg(0)
 {
 }
 
@@ -102,12 +101,12 @@ void dio16_98543_device::device_start()
 
 	dio().install_memory(
 			0x200000, 0x27ffff,
-			read16_delegate(*this, FUNC(dio16_98543_device::vram_r)),
-			write16_delegate(*this, FUNC(dio16_98543_device::vram_w)));
+			read16s_delegate(*this, FUNC(dio16_98543_device::vram_r)),
+			write16s_delegate(*this, FUNC(dio16_98543_device::vram_w)));
 	dio().install_memory(
 			0x560000, 0x563fff,
-			read16_delegate(*this, FUNC(dio16_98543_device::rom_r)),
-			write16_delegate(*this, FUNC(dio16_98543_device::rom_w)));
+			read16sm_delegate(*this, FUNC(dio16_98543_device::rom_r)),
+			write16sm_delegate(*this, FUNC(dio16_98543_device::rom_w)));
 	dio().install_memory(
 			0x564000, 0x565fff,
 			read16_delegate(*this, FUNC(dio16_98543_device::ctrl_r)),
@@ -115,28 +114,29 @@ void dio16_98543_device::device_start()
 
 	dio().install_memory(
 			0x566000, 0x567fff,
-			read16_delegate(*m_nereid, FUNC(nereid_device::ctrl_r)),
-			write16_delegate(*m_nereid, FUNC(nereid_device::ctrl_w)));
+			read16s_delegate(*m_nereid, FUNC(nereid_device::ctrl_r)),
+			write16s_delegate(*m_nereid, FUNC(nereid_device::ctrl_w)));
 }
 
 void dio16_98543_device::device_reset()
 {
+	m_intreg = 0;
 }
 
-READ16_MEMBER(dio16_98543_device::rom_r)
+uint16_t dio16_98543_device::rom_r(offs_t offset)
 {
 	if (offset == 1)
 		return m_intreg;
 	return 0xff00 | m_rom[offset];
 }
 
-WRITE16_MEMBER(dio16_98543_device::rom_w)
+void dio16_98543_device::rom_w(offs_t offset, uint16_t data)
 {
 	if (offset == 1)
 		m_intreg = data;
 }
 
-READ16_MEMBER(dio16_98543_device::ctrl_r)
+uint16_t dio16_98543_device::ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret = 0;
 
@@ -146,24 +146,24 @@ READ16_MEMBER(dio16_98543_device::ctrl_r)
 	return ret;
 }
 
-WRITE16_MEMBER(dio16_98543_device::ctrl_w)
+void dio16_98543_device::ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	for (auto &tc: m_topcat)
 		tc->ctrl_w(space, offset, data, mem_mask);
 }
 
-READ16_MEMBER(dio16_98543_device::vram_r)
+uint16_t dio16_98543_device::vram_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret = 0;
 	for (auto &tc: m_topcat)
-		ret |= tc->vram_r(space, offset, mem_mask);
+		ret |= tc->vram_r(offset, mem_mask);
 	return ret;
 }
 
-WRITE16_MEMBER(dio16_98543_device::vram_w)
+void dio16_98543_device::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	for (auto &tc: m_topcat)
-		tc->vram_w(space, offset, data, mem_mask);
+		tc->vram_w(offset, data, mem_mask);
 }
 
 WRITE_LINE_MEMBER(dio16_98543_device::vblank_w)
@@ -234,7 +234,7 @@ uint32_t dio16_98543_device::screen_update(screen_device &screen, bitmap_rgb32 &
 	}
 
 	for (int y = 0; y < m_v_pix; y++) {
-		uint32_t *scanline = &bitmap.pix32(y);
+		uint32_t *scanline = &bitmap.pix(y);
 
 		for (int x = 0; x < m_h_pix; x++) {
 			uint8_t tmp = m_vram[y * m_h_pix + x];
@@ -252,4 +252,3 @@ uint32_t dio16_98543_device::screen_update(screen_device &screen, bitmap_rgb32 &
 }
 
 } // namespace bus::hp_dio
-} // namespace bus

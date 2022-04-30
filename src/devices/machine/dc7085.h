@@ -8,176 +8,103 @@
 
 #include "diserial.h"
 
-#define DC7085_RX_FIFO_SIZE (64)
-
-// forward declaration
-class dc7085_device;
-
-class dc7085_channel : public device_t, public device_serial_interface
+class dc7085_channel
+	: public device_t
+	, public device_serial_interface
 {
-public:
-	dc7085_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	friend class dc7085_device;
 
-	// device-level overrides
+public:
+	auto tx_cb() { return m_tx_cb.bind(); }
+
+	dc7085_channel(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+protected:
+	// device_t overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	// device_serial overrides
-	virtual void rcv_complete() override;    // Rx completed receiving byte
-	virtual void tra_complete() override;    // Tx completed sending byte
-	virtual void tra_callback() override;    // Tx send bit
+	virtual void rcv_complete() override;
+	virtual void tra_complete() override;
+	virtual void tra_callback() override;
 
-	void set_baud_rate(int baud);
-	void set_format(int data_bits, int parity, int stop_bits);
-	void clear();
-	void set_tx_enable(bool bEnabled);
-	void set_rx_enable(bool bEnabled);
-	void write_TX(uint8_t data);
-	bool is_tx_ready()
-	{
-		if (!tx_enabled)
-		{
-			return false;
-		}
+	// parent interface
+	auto rx_done() { return m_rx_done.bind(); }
+	auto tx_done() { return m_tx_done.bind(); }
 
-		return tx_ready ? true : false;
-	}
+	void set_format(unsigned baud, unsigned data_bits, unsigned parity, unsigned stop_bits);
+	void set_enable(bool enable) { m_rx_enabled = enable; }
+	bool tx_ready() const { return is_transmit_register_empty(); }
+	void tx_w(u8 data);
 
 private:
-	/* Receiver */
-	u8 rx_enabled;
+	devcb_write_line m_tx_cb;
+	devcb_write_line m_tx_done;
+	devcb_write16 m_rx_done;
 
-	/* Shared */
-	int baud_rate;
-	int m_ch;
-
-	/* Transmitter */
-	u8 tx_enabled;
-	u8 tx_data;
-	u8 tx_ready;
-
-	dc7085_device *m_base;
+	bool m_rx_enabled;
 };
 
 class dc7085_device : public device_t
 {
-	friend class dc7085_channel;
-
 public:
-	required_device<dc7085_channel> m_chan0, m_chan1, m_chan2, m_chan3;
-
-	dc7085_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dc7085_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 	void map(address_map &map);
 
 	auto int_cb() { return m_int_cb.bind(); }
-	auto ch0_tx_cb() { return write_0_tx.bind(); }
-	auto ch1_tx_cb() { return write_1_tx.bind(); }
-	auto ch2_tx_cb() { return write_2_tx.bind(); }
-	auto ch3_tx_cb() { return write_3_tx.bind(); }
+
+	template <unsigned Ch> void rx_w(int state) { m_chan[Ch]->rx_w(state); }
+	template <unsigned Ch> auto tx_cb() { return m_tx_cb[Ch].bind(); }
+	template <unsigned Ch> auto dtr_cb() { return m_dtr_cb[Ch].bind(); }
 
 protected:
-	// standard device_interface overrides
+	// device_t overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	void rx_fifo_push(uint16_t data, uint16_t errors);
+	// register accessors
+	u16 csr_r() { return m_csr; }
+	u16 rbuf_r();
+	u16 tcr_r() { return m_tcr; }
+	u16 msr_r() { return m_msr; }
+	void csr_w(u16 data);
+	void lpr_w(u16 data);
+	void tcr_w(u16 data);
+	void tdr_w(u16 data);
+
+	// helpers
+	void rx_fifo_push(u16 data);
+	void rx_done(u16 data);
+	void tx_done(int state);
 	void recalc_irqs();
 
-	devcb_write_line m_int_cb;
-	devcb_write_line write_0_tx, write_1_tx, write_2_tx, write_3_tx;
-
-	u16 m_status;
-
-	u16 status_r();
-	u16 rxbuffer_r();
-	u16 txparams_r();
-	u16 modem_status_r();
-	void control_w(u16 data);
-	void lineparams_w(u16 data);
-	void txparams_w(u16 data);
-	void txdata_w(u16 data);
-
-	int get_ch(dc7085_channel *ch)
+	void set_int(bool state)
 	{
-		if (ch == m_chan0)
+		if (state != m_int_state)
 		{
-			return 0;
+			m_int_state = state;
+			m_int_cb(state);
 		}
-		else if (ch == m_chan1)
-		{
-			return 1;
-		}
-		else if (ch == m_chan2)
-		{
-			return 2;
-		}
-
-		return 3;
 	}
 
 private:
-	u16 rx_fifo[DC7085_RX_FIFO_SIZE];
-	int rx_fifo_read_ptr;
-	int rx_fifo_write_ptr;
-	int rx_fifo_num;
+	required_device_array<dc7085_channel, 4> m_chan;
 
-	enum control_status_mask : u16
-	{
-		CTRL_TRDY           = 0x8000,
-		CTRL_TX_IRQ_ENABLE  = 0x4000,
-		CTRL_LINE_MASK      = 0x0300,
-		CTRL_RX_DONE        = 0x0080,
-		CTRL_RX_IRQ_ENABLE  = 0x0040,
-		CTRL_MASTER_SCAN    = 0x0020,
-		CTRL_MASTER_CLEAR   = 0x0010,
-		CTRL_LOOPBACK       = 0x0008
-	};
+	devcb_write_line m_int_cb;
+	devcb_write_line::array<4> m_tx_cb;
+	devcb_write_line::array<4> m_dtr_cb;
 
-	enum rx_buffer_mask : u16
-	{
-		RXMASK_DATA_VALID   = 0x8000,
-		RXMASK_OVERRUN_ERR  = 0x4000,
-		RXMASK_FRAMING_ERR  = 0x2000,
-		RXMASK_PARITY_ERR   = 0x1000,
-		RXMASK_LINE_MASK    = 0x0300,
-		RXMASK_DATA_MASK    = 0x00ff
-	};
+	u16 m_csr;
+	u16 m_tcr;
+	u16 m_msr;
 
-	enum line_param_mask : u16
-	{
-		LPARAM_RX_ENABLE    = 0x1000,
-		LPARAM_BAUD_MASK    = 0x0f00,
-		LPARAM_ODD_PARITY   = 0x0080,
-		LPARAM_PARITY_ENB   = 0x0040,
-		LPARAM_STOP_BITS    = 0x0020,
-		LPARAM_CHARLEN_MASK = 0x0018,
-		LPARAM_LINE_MASK    = 0x0003
-	};
+	util::fifo<u16, 64> m_fifo;
+	u16 m_rx_buf;
 
-	enum tx_control_mask : u16
-	{
-		TXCTRL_DTR2         = 0x0400,
-		TXCTRL_LINE3_ENB    = 0x0008,
-		TXCTRL_LINE2_ENB    = 0x0004,
-		TXCTRL_LINE1_ENB    = 0x0002,
-		TXCTRL_LINE0_ENB    = 0x0001
-	};
-
-	enum modem_status_mask : u16
-	{
-		MSTAT_DSR2          = 0x0400
-	};
-
-	enum tx_data_mask : u16
-	{
-		TXDATA_LINE3_BREAK  = 0x0800,
-		TXDATA_LINE2_BREAK  = 0x0400,
-		TXDATA_LINE1_BREAK  = 0x0200,
-		TXDATA_LINE0_BREAK  = 0x0100,
-		TXDATA_DATA_MASK    = 0x00ff
-	};
+	bool m_int_state;
 };
 
 DECLARE_DEVICE_TYPE(DC7085, dc7085_device)

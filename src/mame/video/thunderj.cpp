@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(thunderj_state::get_alpha_tile_info)
 	int code = ((data & 0x200) ? (m_alpha_tile_bank * 0x200) : 0) + (data & 0x1ff);
 	int color = ((data >> 10) & 0x0f) | ((data >> 9) & 0x20);
 	int opaque = data & 0x8000;
-	SET_TILE_INFO_MEMBER(2, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
+	tileinfo.set(2, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
 }
 
 
@@ -33,7 +33,7 @@ TILE_GET_INFO_MEMBER(thunderj_state::get_playfield_tile_info)
 	uint16_t data2 = m_vad->playfield().extmem_read(tile_index) & 0xff;
 	int code = data1 & 0x7fff;
 	int color = 0x10 + (data2 & 0x0f);
-	SET_TILE_INFO_MEMBER(0, code, color, (data1 >> 15) & 1);
+	tileinfo.set(0, code, color, (data1 >> 15) & 1);
 	tileinfo.category = (data2 >> 4) & 3;
 }
 
@@ -44,7 +44,7 @@ TILE_GET_INFO_MEMBER(thunderj_state::get_playfield2_tile_info)
 	uint16_t data2 = m_vad->playfield2().extmem_read(tile_index) >> 8;
 	int code = data1 & 0x7fff;
 	int color = data2 & 0x0f;
-	SET_TILE_INFO_MEMBER(0, code, color, (data1 >> 15) & 1);
+	tileinfo.set(0, code, color, (data1 >> 15) & 1);
 	tileinfo.category = (data2 >> 4) & 3;
 }
 
@@ -120,9 +120,9 @@ uint32_t thunderj_state::screen_update_thunderj(screen_device &screen, bitmap_in
 	for (const sparse_dirty_rect *rect = m_vad->mob().first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->top(); y <= rect->bottom(); y++)
 		{
-			uint16_t *mo = &mobitmap.pix16(y);
-			uint16_t *pf = &bitmap.pix16(y);
-			uint8_t *pri = &priority_bitmap.pix8(y);
+			uint16_t const *const mo = &mobitmap.pix(y);
+			uint16_t *const pf = &bitmap.pix(y);
+			uint8_t const *const pri = &priority_bitmap.pix(y);
 			for (int x = rect->left(); x <= rect->right(); x++)
 				if (mo[x] != 0xffff)
 				{
@@ -184,19 +184,19 @@ uint32_t thunderj_state::screen_update_thunderj(screen_device &screen, bitmap_in
 					 *          +MPX0*!CS1*CS0
 					 *          +!CS1*!CS0*APIX0
 					 */
-					int mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
-					int pfm = 0;
+					int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
 
 					/* upper bit of MO priority signals special rendering and doesn't draw anything */
 					if (mopriority & 4)
 						continue;
 
 					/* determine pf/m signal */
+					int pfm = 0;
 					if ((mo[x] & 0xff) == 1)
 						pfm = 1;
 					else if (pf[x] & 8)
 					{
-						int pfpriority = (pri[x] & 0x80) ? ((pri[x] >> 2) & 3) : (pri[x] & 3);
+						int const pfpriority = (pri[x] & 0x80) ? ((pri[x] >> 2) & 3) : (pri[x] & 3);
 						if (((pfpriority == 3) && !(mopriority & 1)) ||
 							((pfpriority & 1) && (mopriority == 0)) ||
 							((pfpriority & 2) && !(mopriority & 2)))
@@ -218,12 +218,12 @@ uint32_t thunderj_state::screen_update_thunderj(screen_device &screen, bitmap_in
 	for (const sparse_dirty_rect *rect = m_vad->mob().first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->top(); y <= rect->bottom(); y++)
 		{
-			uint16_t *mo = &mobitmap.pix16(y);
-			uint16_t *pf = &bitmap.pix16(y);
+			uint16_t const *const mo = &mobitmap.pix(y);
+			uint16_t *const pf = &bitmap.pix(y);
 			for (int x = rect->left(); x <= rect->right(); x++)
 				if (mo[x] != 0xffff)
 				{
-					int mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
+					int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
 
 					/* upper bit of MO priority might mean palette kludges */
 					if (mopriority & 4)

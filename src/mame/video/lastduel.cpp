@@ -22,7 +22,7 @@ TILE_GET_INFO_MEMBER(lastduel_state::ld_get_bg_tile_info)
 {
 	int const tile = m_vram[1][2 * tile_index] & 0x1fff;
 	int const color = m_vram[1][2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile,color & 0xf,
 			TILE_FLIPYX((color & 0x60) >> 5));
 }
@@ -31,7 +31,7 @@ TILE_GET_INFO_MEMBER(lastduel_state::ld_get_fg_tile_info)
 {
 	int const tile = m_vram[0][2 * tile_index] & 0x1fff;
 	int const color = m_vram[0][2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(3,
+	tileinfo.set(3,
 			tile,
 			color & 0xf,
 			TILE_FLIPYX((color & 0x60) >> 5));
@@ -42,7 +42,7 @@ TILE_GET_INFO_MEMBER(lastduel_state::get_bg_tile_info)
 {
 	int const tile = m_vram[1][tile_index] & 0x1fff;
 	int const color = m_vram[1][tile_index + 0x0800];
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile,
 			color & 0xf,
 			TILE_FLIPYX((color & 0x60) >> 5));
@@ -52,7 +52,7 @@ TILE_GET_INFO_MEMBER(lastduel_state::get_fg_tile_info)
 {
 	int const tile = m_vram[0][tile_index] & 0x1fff;
 	int const color = m_vram[0][tile_index + 0x0800];
-	SET_TILE_INFO_MEMBER(3,
+	tileinfo.set(3,
 			tile,
 			color & 0xf,
 			TILE_FLIPYX((color & 0x60) >> 5));
@@ -62,7 +62,7 @@ TILE_GET_INFO_MEMBER(lastduel_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(lastduel_state::get_fix_info)
 {
 	int const tile = m_txram[tile_index];
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			tile & 0x7ff,
 			tile>>12,
 			(tile & 0x800) ? TILE_FLIPY : 0);
@@ -114,7 +114,7 @@ VIDEO_START_MEMBER(lastduel_state,madgear)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(lastduel_state::flip_w)
+void lastduel_state::flip_w(uint8_t data)
 {
 	flip_screen_set(data & 0x01);
 
@@ -124,7 +124,7 @@ WRITE8_MEMBER(lastduel_state::flip_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x80);
 }
 
-WRITE16_MEMBER(lastduel_state::vctrl_w)
+void lastduel_state::vctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_vctrl[offset]);
 	switch (offset)
@@ -140,7 +140,7 @@ WRITE16_MEMBER(lastduel_state::vctrl_w)
 	}
 }
 
-WRITE16_MEMBER(lastduel_state::txram_w)
+void lastduel_state::txram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_txram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);

@@ -37,7 +37,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/upd7810/upd7810.h"
+#include "cpu/upd7810/upd7811.h"
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
 #include "machine/i8279.h"
@@ -74,27 +74,26 @@ void ax80_state::machine_reset()
 
 void ax80_state::ax80_map(address_map &map)
 {
-	map(0x0000, 0x0fff).rom().region("maincpu", 0); // internal ROM
+	//map(0x0000, 0x0fff).rom().region("maincpu", 0); // internal ROM
 	map(0x1000, 0x1003).mirror(0x000c).rw(PIT0_TAG, FUNC(pit8253_device::read), FUNC(pit8253_device::write)); // IC20
 	map(0x1010, 0x1013).mirror(0x000c).rw(PIT1_TAG, FUNC(pit8253_device::read), FUNC(pit8253_device::write)); // IC21
 	map(0x1020, 0x1023).mirror(0x000c).rw(PIT2_TAG, FUNC(pit8253_device::read), FUNC(pit8253_device::write)); // IC22
 	map(0x1030, 0x1033).mirror(0x000c).rw(PIT3_TAG, FUNC(pit8253_device::read), FUNC(pit8253_device::write)); // IC23
 	map(0x1040, 0x1043).mirror(0x000c).rw(PIT4_TAG, FUNC(pit8253_device::read), FUNC(pit8253_device::write)); // IC24
 	map(0x1050, 0x1053).mirror(0x000c).rw(PIT5_TAG, FUNC(pit8253_device::read), FUNC(pit8253_device::write)); // IC25
-	map(0x1060, 0x1060).mirror(0x000e).rw("kdc", FUNC(i8279_device::data_r), FUNC(i8279_device::data_w));   // IC11
-	map(0x1061, 0x1061).mirror(0x000e).rw("kdc", FUNC(i8279_device::status_r), FUNC(i8279_device::cmd_w));  // IC11
+	map(0x1060, 0x1061).mirror(0x000e).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));   // IC11
 	map(0x1070, 0x1073).mirror(0x000c).rw(PPI1_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));   // IC10
 	//map(0x2000, 0x2001).mirror(0x0dfe).rw(PPI0_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));   // IC9 - A9 connects to A1-pin
 	//map(0x2200, 0x2201).mirror(0x0dfe).rw(PPI0_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));   // IC9 - A9 connects to A1-pin
 	//map(0x3000, 0x3fff) // steers audio to the various voice channels
-	map(0x4000, 0x5fff).mirror(0x2000).rom().region("maincpu", 0x1000);    // external program EPROM
+	map(0x4000, 0x5fff).mirror(0x2000).rom().region("program", 0);    // external program EPROM
 	map(0x8000, 0x87ff).mirror(0x3800).ram();
 	map(0xc000, 0xc7ff).mirror(0x3800).ram();
 }
 
 void ax80_state::ax80(machine_config &config)
 {
-	UPD7810(config, m_maincpu, XTAL(12'000'000));
+	UPD7811(config, m_maincpu, XTAL(12'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &ax80_state::ax80_map);
 	//m_maincpu->set_addrmap(AS_IO, &ax80_state::ax80_io);
 
@@ -121,16 +120,16 @@ static INPUT_PORTS_START( ax80 )
 INPUT_PORTS_END
 
 ROM_START( ax80 )
-	ROM_REGION(0x3000, "maincpu", 0)
-	// CPU internal mask
+	ROM_REGION(0x1000, "maincpu", 0) // CPU internal mask
 	ROM_LOAD( "akai ax80 main cpu mask rom.ic2", 0x000000, 0x001000, CRC(241c078f) SHA1(7f5d0d718f2d03ec446568ae440beaff0aac6bfd) )
-	// external program EPROM
+
+	ROM_REGION(0x2000, "program", 0) // external program EPROM
 	ROM_SYSTEM_BIOS( 0, "k", "REV.K" )
-	ROMX_LOAD( "ax-80k.ic4", 0x001000, 0x002000, CRC(a2f95ccf) SHA1(4e5f2c4c9a08ec1d38146cae786b400261a3dbb7), ROM_BIOS(0) )
+	ROMX_LOAD( "ax-80k.ic4", 0x000000, 0x002000, CRC(a2f95ccf) SHA1(4e5f2c4c9a08ec1d38146cae786b400261a3dbb7), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "l", "REV.L" )
-	ROMX_LOAD( "ax-80l.ic4", 0x001000, 0x002000, CRC(bc3d21bd) SHA1(d6730ec33b28e705a0ff88946b7860fadcc37793), ROM_BIOS(1) )
+	ROMX_LOAD( "ax-80l.ic4", 0x000000, 0x002000, CRC(bc3d21bd) SHA1(d6730ec33b28e705a0ff88946b7860fadcc37793), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "i", "REV.I" )
-	ROMX_LOAD( "ax-80i.ic4", 0x001000, 0x002000, CRC(d616e435) SHA1(84820522e6a96fc29966f82e76254e54df15d7e6), ROM_BIOS(2) )
+	ROMX_LOAD( "ax-80i.ic4", 0x000000, 0x002000, CRC(d616e435) SHA1(84820522e6a96fc29966f82e76254e54df15d7e6), ROM_BIOS(2) )
 ROM_END
 
 CONS( 1984, ax80, 0, 0, ax80, ax80, ax80_state, empty_init, "Akai", "AX80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

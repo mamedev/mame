@@ -23,7 +23,7 @@
 #include "includes/gatron.h"
 
 
-WRITE8_MEMBER(gatron_state::videoram_w)
+void gatron_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -40,7 +40,7 @@ TILE_GET_INFO_MEMBER(gatron_state::get_bg_tile_info)
 
 	int code = m_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	tileinfo.set(0, code, 0, 0);
 }
 
 void gatron_state::video_start()

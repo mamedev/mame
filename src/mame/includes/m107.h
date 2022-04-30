@@ -20,8 +20,8 @@
 
 struct pf_layer_info
 {
-	tilemap_t *     tmap;
-	uint16_t        vram_base;
+	tilemap_t *     tmap = nullptr;
+	uint16_t        vram_base = 0;
 };
 
 class m107_state : public driver_device
@@ -66,20 +66,20 @@ private:
 	optional_memory_bank m_mainbank;
 
 	// driver init
-	uint8_t m_spritesystem;
+	uint8_t m_spritesystem = 0;
 
-	uint8_t m_sprite_display;
-	uint16_t m_raster_irq_position;
+	uint8_t m_sprite_display = 0;
+	uint16_t m_raster_irq_position = 0;
 	pf_layer_info m_pf_layer[4];
-	uint16_t m_control[0x10];
+	uint16_t m_control[0x10]{};
 
-	DECLARE_WRITE8_MEMBER(coincounter_w);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_WRITE16_MEMBER(sound_reset_w);
-	DECLARE_WRITE16_MEMBER(wpksoc_output_w);
-	DECLARE_WRITE16_MEMBER(vram_w);
-	DECLARE_WRITE16_MEMBER(control_w);
-	DECLARE_WRITE16_MEMBER(spritebuffer_w);
+	void coincounter_w(uint8_t data);
+	void bankswitch_w(uint8_t data);
+	void sound_reset_w(uint16_t data);
+	void wpksoc_output_w(uint16_t data);
+	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void spritebuffer_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	TILE_GET_INFO_MEMBER(get_pf_tile_info);
 

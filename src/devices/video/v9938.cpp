@@ -33,7 +33,6 @@ todo:
 - vdp engine -- make run at correct speed
 - vr/hr/fh flags: double-check all of that
 - make vdp engine work in exp. ram
-- fix save state support
 */
 
 #include "emu.h"
@@ -173,7 +172,7 @@ void v99x8_device::device_config_complete()
 }
 
 
-void v99x8_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void v99x8_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	int scanline = (m_scanline - (m_scanline_start + m_offset_y));
 
@@ -643,9 +642,8 @@ void v99x8_device::device_start()
 	save_item(NAME(m_stat_reg));
 	save_item(NAME(m_cont_reg));
 	save_item(NAME(m_read_ahead));
-	//  save_item(NAME(m_vram));
-	//  if ( m_vram_exp != nullptr )
-	//      save_pointer(NAME(m_vram_exp), 0x10000);
+	save_item(NAME(m_v9958_sp_mode));
+	save_item(NAME(m_address_latch));
 	save_item(NAME(m_int_state));
 	save_item(NAME(m_scanline));
 	save_item(NAME(m_blink));
@@ -715,7 +713,6 @@ void v99x8_device::device_reset()
 	configure_pal_ntsc();
 	set_screen_parameters();
 }
-
 
 void v99x8_device::reset_palette()
 {
@@ -1866,12 +1863,12 @@ void v99x8_device::refresh_32(int line)
 
 	if (m_cont_reg[9] & 0x08)
 	{
-		ln = &m_bitmap.pix32(m_scanline*2+((m_stat_reg[2]>>1)&1));
+		ln = &m_bitmap.pix(m_scanline*2+((m_stat_reg[2]>>1)&1));
 	}
 	else
 	{
-		ln = &m_bitmap.pix32(m_scanline*2);
-		ln2 = &m_bitmap.pix32(m_scanline*2+1);
+		ln = &m_bitmap.pix(m_scanline*2);
+		ln2 = &m_bitmap.pix(m_scanline*2+1);
 		double_lines = true;
 	}
 
@@ -2918,13 +2915,11 @@ void v99x8_device::report_vdp_command(uint8_t Op)
 /*************************************************************/
 uint8_t v99x8_device::command_unit_w(uint8_t Op)
 {
-	int SM;
-
 	// V9938 ops only work in SCREENs 5-8
-	if (m_mode<5)
+	if (m_mode<5 || m_mode>8)
 		return(0);
 
-	SM = m_mode-5;         // Screen mode index 0..3
+	int SM = m_mode-5;         // Screen mode index 0..3
 
 	m_mmc.CM = Op>>4;
 	if ((m_mmc.CM & 0x0C) != 0x0C && m_mmc.CM != 0)
@@ -3057,5 +3052,47 @@ void v99x8_device::update_command()
 	{
 		m_vdp_ops_count=13662;
 		if(m_vdp_engine) (this->*m_vdp_engine)();
+	}
+}
+
+void v99x8_device::device_post_load() // TODO: is there a better way to restore this?
+{
+	switch(m_mmc.CM)
+	{
+	case CM_ABRT:
+	case CM_POINT:
+	case CM_PSET:
+		m_vdp_engine=nullptr;
+		break;
+	case CM_SRCH:
+		m_vdp_engine=&v99x8_device::srch_engine;
+		break;
+	case CM_LINE:
+		m_vdp_engine=&v99x8_device::line_engine;
+		break;
+	case CM_LMMV:
+		m_vdp_engine=&v99x8_device::lmmv_engine;
+		break;
+	case CM_LMMM:
+		m_vdp_engine=&v99x8_device::lmmm_engine;
+		break;
+	case CM_LMCM:
+		m_vdp_engine=&v99x8_device::lmcm_engine;
+		break;
+	case CM_LMMC:
+		m_vdp_engine=&v99x8_device::lmmc_engine;
+		break;
+	case CM_HMMV:
+		m_vdp_engine=&v99x8_device::hmmv_engine;
+		break;
+	case CM_HMMM:
+		m_vdp_engine=&v99x8_device::hmmm_engine;
+		break;
+	case CM_YMMM:
+		m_vdp_engine=&v99x8_device::ymmm_engine;
+		break;
+	case CM_HMMC:
+		m_vdp_engine=&v99x8_device::hmmc_engine;
+		break;
 	}
 }

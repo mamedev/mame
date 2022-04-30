@@ -12,6 +12,8 @@
 #include "emu.h"
 #include "bml3mp1802.h"
 
+#include "softlist_dev.h"
+
 
 /***************************************************************************
     PARAMETERS
@@ -61,10 +63,11 @@ void bml3bus_mp1802_device::device_add_mconfig(machine_config &config)
 	MB8866(config, m_fdc, CLK16M / 16); // 16MCLK divided by IC628 (HD74LS93P)
 	m_fdc->intrq_wr_callback().set(FUNC(bml3bus_mp1802_device::bml3_wd17xx_intrq_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy0, mp1802_floppies, "dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, mp1802_floppies, "dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy2, mp1802_floppies, nullptr, floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy3, mp1802_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy0, mp1802_floppies, "dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, mp1802_floppies, "dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy2, mp1802_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy3, mp1802_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
+	SOFTWARE_LIST(config, "flop_list").set_original("bml3_flop").set_filter("5");
 }
 
 //-------------------------------------------------
@@ -76,12 +79,12 @@ const tiny_rom_entry *bml3bus_mp1802_device::device_rom_region() const
 	return ROM_NAME( mp1802 );
 }
 
-READ8_MEMBER( bml3bus_mp1802_device::bml3_mp1802_r)
+uint8_t bml3bus_mp1802_device::bml3_mp1802_r()
 {
 	return m_fdc->drq_r() ? 0x00 : 0x80;
 }
 
-WRITE8_MEMBER( bml3bus_mp1802_device::bml3_mp1802_w)
+void bml3bus_mp1802_device::bml3_mp1802_w(uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -130,7 +133,7 @@ void bml3bus_mp1802_device::device_start()
 	// install into memory
 	address_space &space_prg = space();
 	space_prg.install_readwrite_handler(0xff00, 0xff03, read8sm_delegate(*m_fdc, FUNC(mb8866_device::read)), write8sm_delegate(*m_fdc, FUNC(mb8866_device::write)));
-	space_prg.install_readwrite_handler(0xff04, 0xff04, read8_delegate(*this, FUNC(bml3bus_mp1802_device::bml3_mp1802_r)), write8_delegate(*this, FUNC(bml3bus_mp1802_device::bml3_mp1802_w)));
+	space_prg.install_readwrite_handler(0xff04, 0xff04, read8smo_delegate(*this, FUNC(bml3bus_mp1802_device::bml3_mp1802_r)), write8smo_delegate(*this, FUNC(bml3bus_mp1802_device::bml3_mp1802_w)));
 	// overwriting the main ROM (rather than using e.g. install_rom) should mean that bank switches for RAM expansion still work...
 	uint8_t *mainrom = device().machine().root_device().memregion("maincpu")->base();
 	memcpy(mainrom + 0xf800, m_rom + 0xf800, 0x800);

@@ -27,8 +27,18 @@
 	TODO:
 	use getter callbacks in drivers for spriterams rather than allocating memory
 	here, then we won't have to allocate extra memory for seta.cpp games which
-	appear to have 0x800 bytes of RAM that isn't connceted to the sprite chip
+	appear to have 0x800 bytes of RAM that isn't connected to the sprite chip
 	between the banks.
+
+	This should implement device_video_interface, since it generates the vertical
+	and horizontal blanking and sync signals from a master clock.
+
+	understand sprite limits / how sprite 0 sometimes must be skipped, maybe
+	layers being enabled counts against limits? maybe some chip revisions skip
+	the first sprite? see note in device_start
+
+	understand why we need offset kludges for some games, they can even differ
+	from layer to layer
 
 	*/
 
@@ -41,8 +51,19 @@ DEFINE_DEVICE_TYPE(SETA001_SPRITE, seta001_device, "seta001", "Seta SETA001 Spri
 
 seta001_device::seta001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SETA001_SPRITE, tag, owner, clock)
-	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
+	, device_gfx_interface(mconfig, *this)
 	, m_gfxbank_cb(*this)
+	, m_fg_flipxoffs(0)
+	, m_fg_noflipxoffs(0)
+	, m_fg_flipyoffs(0)
+	, m_fg_noflipyoffs(0)
+	, m_bg_flipyoffs(0)
+	, m_bg_noflipyoffs(0)
+	, m_bg_flipxoffs(0)
+	, m_bg_noflipxoffs(0)
+	, m_colorbase(0)
+	, m_spritelimit(0x1ff)
+	, m_transpen(0)
 {
 }
 
@@ -79,22 +100,6 @@ void seta001_device::device_start()
 	memset(m_spritecodelow.get(),0xff,0x2000);
 	memset(m_spritecodehigh.get(),0xff,0x2000);
 
-	m_fg_flipxoffs = 0;
-	m_fg_noflipxoffs = 0;
-
-	m_fg_flipyoffs = 0;
-	m_fg_noflipyoffs = 0;
-
-	m_bg_flipyoffs = 0;
-	m_bg_noflipyoffs = 0;
-
-	m_bg_flipxoffs = 0;
-	m_bg_noflipxoffs = 0;
-
-	m_transpen = 0;
-	m_colorbase = 0;
-	m_spritelimit = 0x1ff;
-
 	m_bgflag = 0x00;
 
 	m_gfxbank_cb.resolve();
@@ -110,12 +115,12 @@ void seta001_device::device_reset()
 {
 }
 
-READ16_MEMBER( seta001_device::spritectrl_r16 )
+uint16_t seta001_device::spritectrl_r16(offs_t offset)
 {
 	return m_spritectrl[offset];
 }
 
-WRITE16_MEMBER( seta001_device::spritectrl_w16 )
+void seta001_device::spritectrl_w16(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -123,22 +128,22 @@ WRITE16_MEMBER( seta001_device::spritectrl_w16 )
 	}
 }
 
-READ8_MEMBER( seta001_device::spritectrl_r8 )
+uint8_t seta001_device::spritectrl_r8(offs_t offset)
 {
 	return m_spritectrl[offset];
 }
 
-WRITE8_MEMBER( seta001_device::spritectrl_w8 )
+void seta001_device::spritectrl_w8(offs_t offset, uint8_t data)
 {
 	m_spritectrl[offset] = data;
 }
 
-READ16_MEMBER( seta001_device::spriteylow_r16 )
+uint16_t seta001_device::spriteylow_r16(offs_t offset)
 {
 	return m_spriteylow[offset];
 }
 
-WRITE16_MEMBER( seta001_device::spriteylow_w16 )
+void seta001_device::spriteylow_w16(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -146,51 +151,51 @@ WRITE16_MEMBER( seta001_device::spriteylow_w16 )
 	}
 }
 
-READ8_MEMBER( seta001_device::spriteylow_r8 )
+uint8_t seta001_device::spriteylow_r8(offs_t offset)
 {
 	return m_spriteylow[offset];
 }
 
-WRITE8_MEMBER( seta001_device::spriteylow_w8 )
+void seta001_device::spriteylow_w8(offs_t offset, uint8_t data)
 {
 	m_spriteylow[offset] = data;
 }
 
 
-READ8_MEMBER( seta001_device::spritecodelow_r8 )
+uint8_t seta001_device::spritecodelow_r8(offs_t offset)
 {
 	return m_spritecodelow[offset];
 }
 
-WRITE8_MEMBER( seta001_device::spritecodelow_w8 )
+void seta001_device::spritecodelow_w8(offs_t offset, uint8_t data)
 {
 	m_spritecodelow[offset] = data;
 }
 
-READ8_MEMBER( seta001_device::spritecodehigh_r8 )
+uint8_t seta001_device::spritecodehigh_r8(offs_t offset)
 {
 	return m_spritecodehigh[offset];
 }
 
-WRITE8_MEMBER( seta001_device::spritecodehigh_w8 )
+void seta001_device::spritecodehigh_w8(offs_t offset, uint8_t data)
 {
 	m_spritecodehigh[offset] = data;
 }
 
-READ16_MEMBER( seta001_device::spritecode_r16 )
+uint16_t seta001_device::spritecode_r16(offs_t offset)
 {
 	uint16_t ret = m_spritecodelow[offset];
 	ret |= m_spritecodehigh[offset] << 8;
 	return ret;
 }
 
-WRITE16_MEMBER( seta001_device::spritecode_w16 )
+void seta001_device::spritecode_w16(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7) m_spritecodelow[offset] = data & 0x00ff;
 	if (ACCESSING_BITS_8_15)  m_spritecodehigh[offset] = (data & 0xff00)>>8;
 }
 
-WRITE8_MEMBER( seta001_device::spritebgflag_w8 )
+void seta001_device::spritebgflag_w8(uint8_t data)
 {
 	m_bgflag = data;
 }
@@ -251,12 +256,12 @@ void seta001_device::draw_background( bitmap_ind16 &bitmap, const rectangle &cli
 	int offs, col;
 	int xoffs, yoffs;
 
-	int const total_color_codes   =   m_gfxdecode->gfx(0)->colors();
+	int const total_color_codes   =   gfx(0)->colors();
 
 	int const ctrl    =   m_spritectrl[0];
 	int const ctrl2   =   m_spritectrl[1];
 
-	int const flip    =   ctrl & 0x40;
+	bool const flip   =   BIT(ctrl, 6);
 	int numcol  =   ctrl2 & 0x0f;
 
 	int scrollx, scrolly;
@@ -322,28 +327,28 @@ void seta001_device::draw_background( bitmap_ind16 &bitmap, const rectangle &cli
 			color   =   ( color >> (16-5) ) % total_color_codes;
 			code &= 0x3fff;
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			gfx(0)->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,
 					((sx) & 0x1ff),((sy) & 0x0ff),
 					transpen);
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			gfx(0)->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,
 					((sx) & 0x1ff)-512,((sy) & 0x0ff),
 					transpen);
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			gfx(0)->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,
 					((sx) & 0x1ff),((sy) & 0x0ff)-256,
 					transpen);
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			gfx(0)->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,
@@ -358,19 +363,18 @@ void seta001_device::draw_background( bitmap_ind16 &bitmap, const rectangle &cli
 void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size)
 {
 	int const screenflip = (m_spritectrl[0] & 0x40) >> 6;
-	int i;
 	int const ctrl2 = m_spritectrl[1];
-	int xoffs, yoffs;
 
-	int const total_color_codes   =   m_gfxdecode->gfx(0)->colors();
+	int const total_color_codes   =   gfx(0)->colors();
 
 	uint8_t *char_pointer = &m_spritecodelow[0x0000];
 	uint8_t *x_pointer = &m_spritecodelow[0x0200];
 	uint8_t *ctrl_pointer = &m_spritecodehigh[0x0000];
 	uint8_t *color_pointer = &m_spritecodehigh[0x0200];
 
-	xoffs   =   screenflip ? m_fg_flipxoffs : m_fg_noflipxoffs;
-	yoffs   =   screenflip ? m_fg_flipyoffs : m_fg_noflipyoffs;
+	// note that drgnunit, stg and qzkklogy run on the same board, yet they need different alignment
+	int xoffs = screenflip ? m_fg_flipxoffs : m_fg_noflipxoffs;
+	int yoffs = screenflip ? m_fg_flipyoffs : m_fg_noflipyoffs;
 
 	if ((ctrl2 ^ (~ctrl2 << 1)) & 0x40)
 	{
@@ -383,7 +387,7 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 	int const max_y = screen.height();
 
 	/* Draw up to 512 sprites, mjyuugi has glitches if you draw them all.. */
-	for (i = m_spritelimit; i >= 0; i--)
+	for (int i = m_spritelimit; i >= 0; i--)
 	{
 		int code, color, sx, sy, flipx, flipy;
 
@@ -409,7 +413,7 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		gfx(0)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -417,7 +421,7 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 				max_y - ((sy + yoffs) & 0x0ff),m_transpen);
 
 		/* wrap around x */
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		gfx(0)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -425,7 +429,7 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 				max_y - ((sy + yoffs) & 0x0ff),m_transpen);
 
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		gfx(0)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -433,7 +437,7 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 				max_y - ((sy + yoffs) & 0x0ff)-256,m_transpen);
 
 		/* wrap around x */
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		gfx(0)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

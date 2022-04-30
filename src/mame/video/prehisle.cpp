@@ -14,13 +14,13 @@
 #include "screen.h"
 
 
-WRITE16_MEMBER(prehisle_state::fg_vram_w)
+void prehisle_state::fg_vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_fg_vram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(prehisle_state::tx_vram_w)
+void prehisle_state::tx_vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_tx_vram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
@@ -65,7 +65,7 @@ TILE_GET_INFO_MEMBER(prehisle_state::get_bg_tile_info)
 	int const color = attr >> 12;
 	int const flags = (attr & 0x800) ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.set(1, code, color, flags);
 }
 
 /* tile layout
@@ -80,7 +80,7 @@ TILE_GET_INFO_MEMBER(prehisle_state::get_fg_tile_info)
 	int const color = attr >> 12;
 	int const flags = (attr & 0x800) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO_MEMBER(2, code, color, flags);
+	tileinfo.set(2, code, color, flags);
 }
 
 /* tile layout
@@ -93,7 +93,7 @@ TILE_GET_INFO_MEMBER(prehisle_state::get_tx_tile_info)
 	int const code = attr & 0xfff;
 	int const color = attr >> 12;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void prehisle_state::video_start()
@@ -150,7 +150,7 @@ void prehisle_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 		uint16_t const attr = spriteram16[offs + 2];
 		uint16_t const code = attr & 0x1fff;
 		uint16_t const color = spriteram16[offs + 3] >> 12;
-		uint32_t const priority = (color < 0x4) ? 0 : GFX_PMASK_1; // correct?
+		uint32_t const priority = GFX_PMASK_4 | ((color < 0x4) ? 0 : GFX_PMASK_2); // correct?
 		bool flipx = attr & 0x4000;
 		bool flipy = attr & 0x8000;
 		int16_t sx = spriteram16[offs + 1] & 0x1ff;
@@ -182,9 +182,9 @@ uint32_t prehisle_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 {
 	screen.priority().fill(0, cliprect);
 
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 4);
 	draw_sprites(screen, bitmap, cliprect);
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0);
 	return 0;
 }

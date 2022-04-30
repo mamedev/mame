@@ -38,7 +38,7 @@ public:
 				 {*this, "simm7.%u", 0U}}
 		, m_mainram(*this, "mainram")
 		, m_spriteram(*this, "spriteram")
-		, m_colourram(*this, "colourram", 0)
+		, m_colourram(*this, "colourram", 0x40000, ENDIANNESS_BIG)
 		, m_ppu_gscroll(*this, "ppu_gscroll_regs")
 		, m_tilemap_regs(*this, "ppu_tmap_regs")
 		, m_ppu_crtc_zoom(*this, "ppu_crtc_zoom")
@@ -92,7 +92,7 @@ protected:
 
 	required_shared_ptr<u32> m_mainram;
 	required_shared_ptr<u32> m_spriteram;
-	required_shared_ptr<u16> m_colourram;
+	memory_share_creator<u16> m_colourram;
 	required_shared_ptr<u32> m_ppu_gscroll;
 	required_shared_ptr<u32> m_tilemap_regs;
 	required_shared_ptr<u32> m_ppu_crtc_zoom;
@@ -104,65 +104,67 @@ protected:
 	optional_memory_region      m_user5_region;
 
 private:
-	u32 m_cram_gfxflash_bank;
+	u32 m_cram_gfxflash_bank = 0;
 	std::unique_ptr<u32[]> m_char_ram;
 	std::unique_ptr<u32[]> m_eeprom;
 	std::unique_ptr<u8[]>  m_ss_ram;
 	std::unique_ptr<u32[]> m_spritelist;
-	u32 m_ppu_gscroll_buff[0x20/4];
-	s16 m_ss_hscroll;
-	s16 m_ss_vscroll;
-	u8  m_ss_pal_base;
-	u32 m_screenwidth;
+	u32 m_ppu_gscroll_buff[0x20/4]{};
+	s16 m_ss_hscroll = 0;
+	s16 m_ss_vscroll = 0;
+	u8  m_ss_pal_base = 0;
+	u32 m_screenwidth = 0;
 	std::unique_ptr<u32[]> m_mame_colours;
 	bitmap_rgb32 m_renderbuffer_bitmap;
 	rectangle m_renderbuffer_clip;
-	u8* m_user4;
-	u32 m_key1;
-	u32 m_key2;
-	int m_altEncryption;
-	u16 m_dma_status;
-	u16 m_spritelist_dma;
-	u32 m_cram_bank;
-	u16 m_current_eeprom_read;
-	u32 m_paldma_source;
-	u32 m_paldma_realsource;
-	u32 m_paldma_dest;
-	u32 m_paldma_fade;
-	u32 m_paldma_other2;
-	u32 m_paldma_length;
-	u32 m_chardma_source;
-	u32 m_chardma_other;
-	int m_rle_length;
-	int m_last_normal_byte;
-	u16 m_lastb;
-	u16 m_lastb2;
-	u8* m_user5;
+	u8* m_user4 = nullptr;
+	std::unique_ptr<u8[]> m_user4_allocated;
+	u32 m_key1 = 0;
+	u32 m_key2 = 0;
+	int m_altEncryption = 0;
+	u16 m_dma_status = 0;
+	u16 m_spritelist_dma = 0;
+	u32 m_cram_bank = 0;
+	u16 m_current_eeprom_read = 0;
+	u32 m_paldma_source = 0;
+	u32 m_paldma_realsource = 0;
+	u32 m_paldma_dest = 0;
+	u32 m_paldma_fade = 0;
+	u32 m_paldma_other2 = 0;
+	u32 m_paldma_length = 0;
+	u32 m_chardma_source = 0;
+	u32 m_chardma_other = 0;
+	int m_rle_length = 0;
+	int m_last_normal_byte = 0;
+	u16 m_lastb = 0;
+	u16 m_lastb2 = 0;
+	u8* m_user5 = nullptr;
+	std::unique_ptr<u8[]> m_user5_allocated;
 
-	DECLARE_READ8_MEMBER(ssram_r);
-	DECLARE_WRITE8_MEMBER(ssram_w);
-	DECLARE_WRITE8_MEMBER(ssregs_w);
-	DECLARE_WRITE32_MEMBER(sh2cache_ram_w);
-	DECLARE_WRITE32_MEMBER(cram_bank_w);
-	DECLARE_READ32_MEMBER(cram_data_r);
-	DECLARE_WRITE32_MEMBER(cram_data_w);
-	DECLARE_READ32_MEMBER(gfxflash_r);
-	DECLARE_WRITE32_MEMBER(gfxflash_w);
-	DECLARE_READ32_MEMBER(flash1_r);
-	DECLARE_READ32_MEMBER(flash2_r);
-	DECLARE_WRITE32_MEMBER(flash1_w);
-	DECLARE_WRITE32_MEMBER(flash2_w);
-	DECLARE_WRITE32_MEMBER(cram_gfxflash_bank_w);
-	DECLARE_READ16_MEMBER(dma_status_r);
-	DECLARE_READ16_MEMBER(dev_dipsw_r);
-	DECLARE_READ32_MEMBER(eeprom_r);
-	DECLARE_WRITE32_MEMBER(eeprom_w);
-	DECLARE_WRITE32_MEMBER(palettedma_w);
-	DECLARE_WRITE32_MEMBER(characterdma_w);
-	DECLARE_READ16_MEMBER(colourram_r);
-	DECLARE_WRITE16_MEMBER(colourram_w);
-	DECLARE_WRITE16_MEMBER(outport_w);
-	DECLARE_WRITE16_MEMBER(spritedma_w);
+	u8 ssram_r(offs_t offset);
+	void ssram_w(offs_t offset, u8 data);
+	void ssregs_w(offs_t offset, u8 data);
+	void sh2cache_ram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void cram_bank_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 cram_data_r(offs_t offset);
+	void cram_data_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 gfxflash_r(offs_t offset, u32 mem_mask = ~0);
+	void gfxflash_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 flash1_r(offs_t offset, u32 mem_mask = ~0);
+	u32 flash2_r(offs_t offset, u32 mem_mask = ~0);
+	void flash1_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void flash2_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void cram_gfxflash_bank_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u16 dma_status_r();
+	u16 dev_dipsw_r();
+	u32 eeprom_r(offs_t offset, u32 mem_mask = ~0);
+	void eeprom_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void palettedma_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void characterdma_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u16 colourram_r(offs_t offset);
+	void colourram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void outport_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void spritedma_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	SH2_DMA_KLUDGE_CB(dma_callback);
 	void draw_fg_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

@@ -49,21 +49,21 @@ private:
 	required_memory_bank m_okibank;
 
 	/* video-related */
-	tilemap_t     *m_pant[2];
+	tilemap_t     *m_pant[2]{};
 	std::unique_ptr<bitmap_ind16> m_screen_bitmap;
 
 	/* misc */
-	int         m_current_bit;
-	int         m_cause_interrupt;
-	int         m_blitter_command;
+	int         m_current_bit = 0;
+	int         m_cause_interrupt = 0;
+	int         m_blitter_command = 0;
 
-	DECLARE_WRITE8_MEMBER(shareram_w);
-	DECLARE_READ8_MEMBER(shareram_r);
-	DECLARE_WRITE16_MEMBER(clr_int_w);
-	DECLARE_WRITE8_MEMBER(oki_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(coin_w);
-	DECLARE_WRITE16_MEMBER(blitter_w);
-	DECLARE_WRITE16_MEMBER(vram_w);
+	void shareram_w(offs_t offset, uint8_t data);
+	uint8_t shareram_r(offs_t offset);
+	void clr_int_w(uint16_t data);
+	void oki_bankswitch_w(uint8_t data);
+	void coin_w(offs_t offset, uint16_t data);
+	void blitter_w(uint16_t data);
+	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	DECLARE_WRITE_LINE_MEMBER(coin1_lockout_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_lockout_w);

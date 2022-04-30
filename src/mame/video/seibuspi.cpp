@@ -288,7 +288,7 @@ void seibuspi_state::tilemap_dma_start_w(u32 data)
 	/* fore layer row scroll */
 	if (m_rowscroll_enable)
 	{
-		std::copy_n(&m_mainram[index], 0x800/4, &m_tilemap_ram[0x1800/4]); // 0x2800/4?
+		std::copy_n(&m_mainram[index], 0x800/4, &m_tilemap_ram[0x2800/4]);
 		index += 0x800/4;
 	}
 
@@ -308,7 +308,7 @@ void seibuspi_state::tilemap_dma_start_w(u32 data)
 	/* middle layer row scroll */
 	if (m_rowscroll_enable)
 	{
-		std::copy_n(&m_mainram[index], 0x800/4, &m_tilemap_ram[0x2800/4]); // 0x1800/4?
+		std::copy_n(&m_mainram[index], 0x800/4, &m_tilemap_ram[0x1800/4]);
 		index += 0x800/4;
 	}
 
@@ -443,8 +443,8 @@ void seibuspi_state::drawgfx_blend(bitmap_rgb32 &bitmap, const rectangle &clipre
 	// draw
 	for (int y = y1; y <= y2; y++)
 	{
-		u32 *dest = &bitmap.pix32(y);
-		u8 *pri = &primap.pix8(y);
+		u32 *const dest = &bitmap.pix(y);
+		u8 *const pri = &primap.pix(y);
 		int src_i = (py * width) + px;
 		py += yd;
 
@@ -565,13 +565,11 @@ void seibuspi_state::combine_tilemap(bitmap_rgb32 &bitmap, const rectangle &clip
 	{
 		int rx = sx;
 		if (rowscroll)
-		{
-			rx += rowscroll[(y + sy) & yscroll_mask];
-		}
+			rx += rowscroll[(y + 19) & yscroll_mask]; // adder value probably not hardcoded but came from CRTC
 
-		u32 *dest = &bitmap.pix32(y);
-		const u16 *src = &pen_bitmap.pix16((y + sy) & yscroll_mask);
-		const u8 *flags = &flags_bitmap.pix8((y + sy) & yscroll_mask);
+		u32 *dest = &bitmap.pix(y);
+		const u16 *src = &pen_bitmap.pix((y + sy) & yscroll_mask);
+		const u8 *flags = &flags_bitmap.pix((y + sy) & yscroll_mask);
 		for (int x = cliprect.min_x + rx; x <= cliprect.max_x + rx; x++)
 		{
 			if (opaque || (flags[x & xscroll_mask] & (TILEMAP_PIXEL_LAYER0 | TILEMAP_PIXEL_LAYER1)))
@@ -665,7 +663,7 @@ TILE_GET_INFO_MEMBER(seibuspi_state::get_text_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(2, tile, color, 0);
+	tileinfo.set(2, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(seibuspi_state::get_back_tile_info)
@@ -677,7 +675,7 @@ TILE_GET_INFO_MEMBER(seibuspi_state::get_back_tile_info)
 	tile &= 0x1fff;
 	tile |= m_back_layer_d14;
 
-	SET_TILE_INFO_MEMBER(1, tile, color, 0);
+	tileinfo.set(1, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(seibuspi_state::get_midl_tile_info)
@@ -690,7 +688,7 @@ TILE_GET_INFO_MEMBER(seibuspi_state::get_midl_tile_info)
 	tile |= 0x2000;
 	tile |= m_midl_layer_d14;
 
-	SET_TILE_INFO_MEMBER(1, tile, color + 16, 0);
+	tileinfo.set(1, tile, color + 16, 0);
 }
 
 TILE_GET_INFO_MEMBER(seibuspi_state::get_fore_tile_info)
@@ -704,7 +702,7 @@ TILE_GET_INFO_MEMBER(seibuspi_state::get_fore_tile_info)
 	tile |= m_fore_layer_d13;
 	tile |= m_fore_layer_d14;
 
-	SET_TILE_INFO_MEMBER(1, tile, color + 8, 0);
+	tileinfo.set(1, tile, color + 8, 0);
 }
 
 

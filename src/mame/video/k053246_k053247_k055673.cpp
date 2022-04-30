@@ -204,7 +204,7 @@ u8 k053247_device::k053246_r(offs_t offset)
 		int addr;
 
 		addr = (m_kx46_regs[6] << 17) | (m_kx46_regs[7] << 9) | (m_kx46_regs[4] << 1) | ((offset & 1) ^ 1);
-		addr &= m_gfxrom.mask();
+		addr &= m_gfxrom.length() - 1;
 		return m_gfxrom[addr];
 	}
 	else
@@ -258,8 +258,8 @@ int k053247_device::k053246_is_irq_enabled(void)
  * The rest of the sprite remains normal.
  */
 
-template<class _BitmapClass>
-void k053247_device::k053247_sprites_draw_common(_BitmapClass &bitmap, const rectangle &cliprect)
+template<class BitmapClass>
+void k053247_device::k053247_sprites_draw_common(BitmapClass &bitmap, const rectangle &cliprect)
 {
 #define NUM_SPRITES 256
 
@@ -283,7 +283,7 @@ void k053247_device::k053247_sprites_draw_common(_BitmapClass &bitmap, const rec
 	*/
 	if (palette().shadows_enabled())
 	{
-		if (sizeof(typename _BitmapClass::pixel_t) == 4 && (palette().hilights_enabled()))
+		if (sizeof(typename BitmapClass::pixel_t) == 4 && (palette().hilights_enabled()))
 			shdmask = 3; // enable all shadows and highlights
 		else
 			shdmask = 0; // enable default shadows
@@ -496,7 +496,7 @@ void k053247_device::zdrawgfxzoom32GP(
 	pal_base  = palette().pens() + m_gfx->colorbase() + (color % m_gfx->colors()) * granularity;
 	shd_base  = palette().shadow_table();
 
-	dst_ptr   = &bitmap.pix32(0);
+	dst_ptr   = &bitmap.pix(0);
 	dst_pitch = bitmap.rowpixels();
 	dst_minx  = cliprect.min_x;
 	dst_maxx  = cliprect.max_x;
@@ -899,6 +899,9 @@ k055673_device::k055673_device(const machine_config &mconfig, const char *tag, d
 
 void k055673_device::device_start()
 {
+	// assumes it can make an address mask with m_gfxrom.length() - 1
+	assert(!(m_gfxrom.length() & (m_gfxrom.length() - 1)));
+
 	if (!palette().device().started())
 		throw device_missing_dependencies();
 
@@ -975,7 +978,8 @@ void k055673_device::device_start()
 			size4 = (m_gfxrom.length()/(1024*1024))/5;
 			size4 *= 4*1024*1024;
 			/* set the # of tiles based on the 4bpp section */
-			alt_k055673_rom = auto_alloc_array(machine(), u16, size4 * 5 / 2);
+			m_combined_gfx = std::make_unique<u16[]>(size4 * 5 / 2);
+			alt_k055673_rom = m_combined_gfx.get();
 			d = (u8 *)alt_k055673_rom;
 			// now combine the graphics together to form 5bpp
 			s1 = (u8 *)&m_gfxrom[0]; // 4bpp area
@@ -1023,13 +1027,13 @@ void k055673_device::device_start()
 	m_z_rejection = -1;
 	m_gfx = gfx(gfx_index);
 	m_objcha_line = CLEAR_LINE;
-	m_ram = std::make_unique<u16[]>(0x1000/2);
+	m_ram = std::make_unique<u16[]>(0x4000/2);
 
-	memset(m_ram.get(),  0, 0x1000);
+	memset(m_ram.get(),  0, 0x4000);
 	std::fill(std::begin(m_kx46_regs), std::end(m_kx46_regs), 0);
 	std::fill(std::begin(m_kx47_regs), std::end(m_kx47_regs), 0);
 
-	save_pointer(NAME(m_ram), 0x800);
+	save_pointer(NAME(m_ram), 0x2000);
 	save_item(NAME(m_kx46_regs));
 	save_item(NAME(m_kx47_regs));
 	save_item(NAME(m_objcha_line));
@@ -1041,7 +1045,6 @@ void k055673_device::device_start()
 
 
 DEFINE_DEVICE_TYPE(K053247, k053247_device, "k053247", "K053246/K053247 Sprite Generator")
-decltype(K053247) K053246 = K053247;
 
 k053247_device::k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: k053247_device(mconfig, K053247, tag, owner, clock)
@@ -1065,6 +1068,9 @@ k053247_device::k053247_device(const machine_config &mconfig, device_type type, 
 
 void k053247_device::device_start()
 {
+	// assumes it can make an address mask with m_gfxrom.length() - 1
+	assert(!(m_gfxrom.length() & (m_gfxrom.length() - 1)));
+
 	if (!palette().device().started())
 		throw device_missing_dependencies();
 

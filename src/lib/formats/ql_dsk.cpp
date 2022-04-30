@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/ql_dsk.h"
 
 ql_format::ql_format() : wd177x_format(formats)
@@ -52,4 +50,4 @@ const ql_format::format ql_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_QL_FORMAT = &floppy_image_format_creator<ql_format>;
+const ql_format FLOPPY_QL_FORMAT;

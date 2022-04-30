@@ -113,7 +113,7 @@ TILE_GET_INFO_MEMBER(m57_state::get_tile_info)
 	uint8_t attr = m_videoram[tile_index * 2 + 0];
 	uint16_t code = m_videoram[tile_index * 2 + 1] | ((attr & 0xc0) << 2);
 
-	SET_TILE_INFO_MEMBER(0, code, attr & 0x0f, TILE_FLIPXY(attr >> 4));
+	tileinfo.set(0, code, attr & 0x0f, TILE_FLIPXY(attr >> 4));
 }
 
 
@@ -123,7 +123,7 @@ TILE_GET_INFO_MEMBER(m57_state::get_tile_info)
  *
  *************************************/
 
-WRITE8_MEMBER(m57_state::m57_videoram_w)
+void m57_state::m57_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
@@ -151,7 +151,7 @@ void m57_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(m57_state::m57_flipscreen_w)
+void m57_state::m57_flipscreen_w(uint8_t data)
 {
 	/* screen flip is handled both by software and hardware */
 	m_flipscreen = (data & 0x01) ^ (~ioport("DSW2")->read() & 0x01);
@@ -170,36 +170,35 @@ WRITE8_MEMBER(m57_state::m57_flipscreen_w)
 
 void m57_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int y,x;
-	int16_t scrolly;
-
 	// from 64 to 127: not wrapped
-	for (y = 64; y < 128; y++)
+	for (int y = 64; y < 128; y++)
 		m_bg_tilemap->set_scrollx(y, m_scrollram[0x40]);
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	// from 128 to 255: wrapped
-	for (y = 128; y <= cliprect.max_y; y++)
+	for (int y = 128; y <= cliprect.max_y; y++)
 	{
-		scrolly = m_scrollram[y] + (m_scrollram[y + 0x100] << 8);
+		int16_t const scrolly = m_scrollram[y] + (m_scrollram[y + 0x100] << 8);
 
 		if (scrolly >= 0)
 		{
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				if ((x + scrolly) <= cliprect.max_x)
-					bitmap.pix16(y, x) = bitmap.pix16(y, x + scrolly);
+					bitmap.pix(y, x) = bitmap.pix(y, x + scrolly);
 				else
-					bitmap.pix16(y, x) = bitmap.pix16(y, cliprect.max_x);
+					bitmap.pix(y, x) = bitmap.pix(y, cliprect.max_x);
 			}
-		} else {
-			for (x = cliprect.max_x; x >= cliprect.min_x; x--)
+		}
+		else
+		{
+			for (int x = cliprect.max_x; x >= cliprect.min_x; x--)
 			{
 				if ((x + scrolly) >= cliprect.min_x)
-					bitmap.pix16(y, x) = bitmap.pix16(y, x + scrolly);
+					bitmap.pix(y, x) = bitmap.pix(y, x + scrolly);
 				else
-					bitmap.pix16(y, x) = bitmap.pix16(y, cliprect.min_x);
+					bitmap.pix(y, x) = bitmap.pix(y, cliprect.min_x);
 			}
 		}
 	}

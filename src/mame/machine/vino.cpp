@@ -146,13 +146,13 @@ void vino_device::device_add_mconfig(machine_config &config)
 	IMAGE_AVIVIDEO(config, m_avivideo);
 }
 
-void vino_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void vino_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	if (id == TIMER_FETCH_CHA || id == TIMER_FETCH_CHB)
 		fetch_pixel((int)id);
 }
 
-READ32_MEMBER(vino_device::read)
+uint32_t vino_device::read(offs_t offset, uint32_t mem_mask)
 {
 	switch (offset & ~1)
 	{
@@ -297,7 +297,7 @@ READ32_MEMBER(vino_device::read)
 	return 0;
 }
 
-WRITE32_MEMBER(vino_device::write)
+void vino_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset & ~1)
 	{

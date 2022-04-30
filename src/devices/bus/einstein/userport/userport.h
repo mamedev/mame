@@ -54,8 +54,8 @@ public:
 	// called from card device
 	DECLARE_WRITE_LINE_MEMBER( bstb_w ) { m_bstb_handler(state); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER (write );
+	uint8_t read();
+	void write(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( brdy_w );
 
 protected:

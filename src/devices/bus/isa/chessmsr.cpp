@@ -32,8 +32,7 @@ isa8_chessmsr_device::isa8_chessmsr_device(const machine_config &mconfig, const 
 	device_isa8_card_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
 	m_mainlatch(*this, "mainlatch"),
-	m_sublatch(*this, "sublatch"),
-	m_ram(*this, "ram")
+	m_sublatch(*this, "sublatch")
 { }
 
 
@@ -50,6 +49,11 @@ void isa8_chessmsr_device::device_start()
 	save_item(NAME(m_installed));
 	save_item(NAME(m_suspended));
 	save_item(NAME(m_ram_offset));
+
+	// allocate maximum RAM beforehand
+	const u32 maxram = 1 << 21;
+	m_ram = std::make_unique<u32[]>(maxram / 4);
+	save_pointer(NAME(m_ram), maxram / 4);
 }
 
 
@@ -64,14 +68,13 @@ void isa8_chessmsr_device::device_reset()
 	{
 		// MAME doesn't allow reading ioport at device_start
 		u16 port = ioport("DSW")->read() * 0x40 + 0x10;
-		m_isa->install_device(port, port+1, read8_delegate(*this, FUNC(isa8_chessmsr_device::chessmsr_r)), write8_delegate(*this, FUNC(isa8_chessmsr_device::chessmsr_w)));
+		m_isa->install_device(port, port+1, read8sm_delegate(*this, FUNC(isa8_chessmsr_device::chessmsr_r)), write8sm_delegate(*this, FUNC(isa8_chessmsr_device::chessmsr_w)));
 
 		m_maincpu->set_unscaled_clock(ioport("CPU")->read() ? (32_MHz_XTAL) : (30_MHz_XTAL/2));
 
 		// install RAM
 		u32 ramsize = 1 << ioport("RAM")->read();
-		m_ram.allocate(ramsize / 4);
-		m_maincpu->space(AS_PROGRAM).install_ram(0, ramsize - 1, m_ram);
+		m_maincpu->space(AS_PROGRAM).install_ram(0, ramsize - 1, m_ram.get());
 
 		m_installed = true;
 	}
@@ -80,7 +83,7 @@ void isa8_chessmsr_device::device_reset()
 void isa8_chessmsr_device::device_reset_after_children()
 {
 	// hold ARM CPU in reset state
-	chessmsr_w(machine().dummy_space(), 1, 0);
+	chessmsr_w(1, 0);
 }
 
 
@@ -152,7 +155,7 @@ void isa8_chessmsr_device::device_add_mconfig(machine_config &config)
 
 // External handlers
 
-READ8_MEMBER(isa8_chessmsr_device::chessmsr_r)
+uint8_t isa8_chessmsr_device::chessmsr_r(offs_t offset)
 {
 	if (offset == 0)
 		return m_mainlatch->read();
@@ -160,7 +163,7 @@ READ8_MEMBER(isa8_chessmsr_device::chessmsr_r)
 		return m_mainlatch->pending_r() ? 0 : 2;
 }
 
-WRITE8_MEMBER(isa8_chessmsr_device::chessmsr_w)
+void isa8_chessmsr_device::chessmsr_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{

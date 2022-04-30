@@ -14,7 +14,7 @@
 inline int saturn_device::READ_OP()
 {
 	m_icount-=3;
-	const uint8_t data=m_cache->read_byte(m_pc);
+	const uint8_t data=m_cache.read_byte(m_pc);
 	saturn_assert(data<0x10);
 	m_pc=(m_pc+1)&0xfffff;
 	return data;
@@ -23,7 +23,7 @@ inline int saturn_device::READ_OP()
 inline int saturn_device::READ_OP_ARG()
 {
 	m_icount-=3;
-	const uint8_t data=m_cache->read_byte(m_pc);
+	const uint8_t data=m_cache.read_byte(m_pc);
 	saturn_assert(data<0x10);
 	m_pc=(m_pc+1)&0xfffff;
 	return data;
@@ -83,7 +83,7 @@ inline int saturn_device::READ_OP_ARG20()
 inline int saturn_device::READ_NIBBLE(uint32_t adr)
 {
 	m_icount-=3;
-	const uint8_t data=m_program->read_byte(adr&0xfffff);
+	const uint8_t data=m_program.read_byte(adr&0xfffff);
 	saturn_assert(data<0x10);
 	m_crc_func(adr&0xfffff, data, 0xffffffff);
 	return data;
@@ -127,7 +127,7 @@ inline void saturn_device::WRITE_NIBBLE(uint32_t adr, uint8_t nib)
 {
 	m_icount-=3;
 	saturn_assert(nib<0x10);
-	m_program->write_byte(adr&0xfffff,nib);
+	m_program.write_byte(adr&0xfffff,nib);
 }
 
 inline int saturn_device::S64_READ_X(int r)

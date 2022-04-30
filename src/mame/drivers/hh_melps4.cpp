@@ -3,12 +3,17 @@
 // thanks-to:Kevin Horton
 /***************************************************************************
 
-  Mitsubishi MELPS 4 MCU tabletops/handhelds or other simple devices,
-  most of them are VFD electronic games/toys.
+Mitsubishi MELPS 4 MCU tabletops/handhelds or other simple devices,
+most of them are VFD electronic games/toys.
+
+TODO:
+- dump/add Gakken version of Frogger
+- get rid of hardcoded color overlay from SVGs, use MAME internal artwork
 
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/melps4/m58846.h"
 #include "video/pwm.h"
 #include "sound/spkrdev.h"
@@ -30,6 +35,12 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
+	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	// devices
 	required_device<m58846_device> m_maincpu;
 	optional_device<pwm_display_device> m_display;
@@ -37,17 +48,12 @@ public:
 	optional_ioport_array<4> m_inputs; // max 4
 
 	// misc common
-	u16 m_inp_mux;                  // multiplexed inputs mask
+	u16 m_inp_mux = 0;              // multiplexed inputs mask
 
-	u32 m_grid;                     // VFD current row data
-	u32 m_plate;                    // VFD current column data
+	u32 m_grid = 0;                 // VFD current row data
+	u32 m_plate = 0;                // VFD current column data
 
 	u8 read_inputs(int columns);
-	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 };
 
 
@@ -55,11 +61,6 @@ protected:
 
 void hh_melps4_state::machine_start()
 {
-	// zerofill
-	m_inp_mux = 0;
-	m_grid = 0;
-	m_plate = 0;
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_grid));
@@ -115,6 +116,11 @@ namespace {
   * Mitsubishi M58846-701P MCU
   * cyan/red/green VFD display Itron CP5090GLR R1B, with partial color overlay
 
+  Gakken / Konami Frogger
+  * PCB label Konami Gakken KH-8201D
+  * Mitsubishi M58846-700P MCU (Konami logo on it)
+  * cyan/red/green VFD display, with partial color overlay
+
 ***************************************************************************/
 
 class cfrogger_state : public hh_melps4_state
@@ -124,12 +130,14 @@ public:
 		hh_melps4_state(mconfig, type, tag)
 	{ }
 
-	void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
-	DECLARE_WRITE_LINE_MEMBER(speaker_w);
-	DECLARE_READ16_MEMBER(input_r);
 	void cfrogger(machine_config &config);
+
+private:
+	void update_display();
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+	DECLARE_WRITE_LINE_MEMBER(speaker_w);
+	u16 input_r();
 };
 
 // handlers
@@ -141,7 +149,7 @@ void cfrogger_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-WRITE8_MEMBER(cfrogger_state::plate_w)
+void cfrogger_state::plate_w(offs_t offset, u8 data)
 {
 	// F0,F1: input mux
 	if (offset == MELPS4_PORTF)
@@ -154,7 +162,7 @@ WRITE8_MEMBER(cfrogger_state::plate_w)
 	update_display();
 }
 
-WRITE16_MEMBER(cfrogger_state::grid_w)
+void cfrogger_state::grid_w(u16 data)
 {
 	// D0-D11: vfd grid
 	m_grid = data;
@@ -167,7 +175,7 @@ WRITE_LINE_MEMBER(cfrogger_state::speaker_w)
 	m_speaker->level_w(state);
 }
 
-READ16_MEMBER(cfrogger_state::input_r)
+u16 cfrogger_state::input_r()
 {
 	// K0,K1: multiplexed inputs
 	// K2: N/C
@@ -197,7 +205,7 @@ INPUT_PORTS_END
 
 void cfrogger_state::cfrogger(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M58846(config, m_maincpu, 600_kHz_XTAL);
 	m_maincpu->read_k().set(FUNC(cfrogger_state::input_r));
 	m_maincpu->write_s().set(FUNC(cfrogger_state::plate_w));
@@ -206,7 +214,7 @@ void cfrogger_state::cfrogger(machine_config &config)
 	m_maincpu->write_d().set(FUNC(cfrogger_state::grid_w));
 	m_maincpu->write_t().set(FUNC(cfrogger_state::speaker_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(500, 1080);
@@ -214,7 +222,7 @@ void cfrogger_state::cfrogger(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(12, 16);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -235,7 +243,7 @@ ROM_END
 
 /***************************************************************************
 
-  Gakken Jungler (manufactured in Japan, licensed from Konami)
+  Gakken / Konami Jungler (manufactured in Japan)
   * PCB label Konami Gakken GR503
   * Mitsubishi M58846-702P MCU
   * cyan/red/green VFD display Itron CP5143GLR SGA, with light-yellow color overlay
@@ -249,12 +257,14 @@ public:
 		hh_melps4_state(mconfig, type, tag)
 	{ }
 
-	void update_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
-	DECLARE_WRITE_LINE_MEMBER(speaker_w);
-	DECLARE_READ16_MEMBER(input_r);
 	void gjungler(machine_config &config);
+
+private:
+	void update_display();
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+	DECLARE_WRITE_LINE_MEMBER(speaker_w);
+	u16 input_r();
 };
 
 // handlers
@@ -266,7 +276,7 @@ void gjungler_state::update_display()
 	m_display->matrix(grid, plate);
 }
 
-WRITE8_MEMBER(gjungler_state::plate_w)
+void gjungler_state::plate_w(offs_t offset, u8 data)
 {
 	// G0,G1: input mux
 	if (offset == MELPS4_PORTG)
@@ -279,7 +289,7 @@ WRITE8_MEMBER(gjungler_state::plate_w)
 	update_display();
 }
 
-WRITE16_MEMBER(gjungler_state::grid_w)
+void gjungler_state::grid_w(u16 data)
 {
 	// D0-D11: vfd grid
 	m_grid = data;
@@ -292,7 +302,7 @@ WRITE_LINE_MEMBER(gjungler_state::speaker_w)
 	m_speaker->level_w(state);
 }
 
-READ16_MEMBER(gjungler_state::input_r)
+u16 gjungler_state::input_r()
 {
 	// K0,K1: multiplexed inputs
 	// K2,K3: fixed inputs
@@ -322,7 +332,7 @@ INPUT_PORTS_END
 
 void gjungler_state::gjungler(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M58846(config, m_maincpu, 600_kHz_XTAL);
 	m_maincpu->read_k().set(FUNC(gjungler_state::input_r));
 	m_maincpu->write_s().set(FUNC(gjungler_state::plate_w));
@@ -332,7 +342,7 @@ void gjungler_state::gjungler(machine_config &config)
 	m_maincpu->write_d().set(FUNC(gjungler_state::grid_w));
 	m_maincpu->write_t().set(FUNC(gjungler_state::speaker_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(481, 1080);
@@ -340,7 +350,7 @@ void gjungler_state::gjungler(machine_config &config)
 
 	PWM_DISPLAY(config, m_display).set_size(12, 18);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -366,6 +376,6 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME      PARENT CMP MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1981, cfrogger, 0,      0, cfrogger, cfrogger, cfrogger_state, empty_init, "Coleco", "Frogger (Coleco)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, cfrogger, 0,      0, cfrogger, cfrogger, cfrogger_state, empty_init, "Coleco / Konami", "Frogger (Coleco)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1982, gjungler, 0,      0, gjungler, gjungler, gjungler_state, empty_init, "Gakken / Konami", "Jungler (Gakken)", MACHINE_SUPPORTS_SAVE )

@@ -32,6 +32,7 @@ bool IsValidScope(uint32_t scope) {
     case SpvScopeSubgroup:
     case SpvScopeInvocation:
     case SpvScopeQueueFamilyKHR:
+    case SpvScopeShaderCallKHR:
       return true;
     case SpvScopeMax:
       break;
@@ -39,8 +40,8 @@ bool IsValidScope(uint32_t scope) {
   return false;
 }
 
-spv_result_t ValidateExecutionScope(ValidationState_t& _,
-                                    const Instruction* inst, uint32_t scope) {
+spv_result_t ValidateScope(ValidationState_t& _, const Instruction* inst,
+                           uint32_t scope) {
   SpvOp opcode = inst->opcode();
   bool is_int32 = false, is_const_int32 = false;
   uint32_t value = 0;
@@ -48,8 +49,7 @@ spv_result_t ValidateExecutionScope(ValidationState_t& _,
 
   if (!is_int32) {
     return _.diag(SPV_ERROR_INVALID_DATA, inst)
-           << spvOpcodeString(opcode)
-           << ": expected Execution Scope to be a 32-bit int";
+           << spvOpcodeString(opcode) << ": expected scope to be a 32-bit int";
   }
 
   if (!is_const_int32) {
@@ -66,12 +66,29 @@ spv_result_t ValidateExecutionScope(ValidationState_t& _,
              << "Scope ids must be constant or specialization constant when "
              << "CooperativeMatrixNV capability is present";
     }
-    return SPV_SUCCESS;
   }
 
   if (is_const_int32 && !IsValidScope(value)) {
     return _.diag(SPV_ERROR_INVALID_DATA, inst)
            << "Invalid scope value:\n " << _.Disassemble(*_.FindDef(scope));
+  }
+
+  return SPV_SUCCESS;
+}
+
+spv_result_t ValidateExecutionScope(ValidationState_t& _,
+                                    const Instruction* inst, uint32_t scope) {
+  SpvOp opcode = inst->opcode();
+  bool is_int32 = false, is_const_int32 = false;
+  uint32_t value = 0;
+  std::tie(is_int32, is_const_int32, value) = _.EvalInt32IfConst(scope);
+
+  if (auto error = ValidateScope(_, inst, scope)) {
+    return error;
+  }
+
+  if (!is_const_int32) {
+    return SPV_SUCCESS;
   }
 
   // Vulkan specific rules
@@ -82,27 +99,36 @@ spv_result_t ValidateExecutionScope(ValidationState_t& _,
       if (spvOpcodeIsNonUniformGroupOperation(opcode) &&
           value != SpvScopeSubgroup) {
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
-               << spvOpcodeString(opcode)
+               << _.VkErrorID(4642) << spvOpcodeString(opcode)
                << ": in Vulkan environment Execution scope is limited to "
                << "Subgroup";
       }
     }
 
-    // If OpControlBarrier is used in fragment, vertex, tessellation evaluation,
-    // or geometry stages, the execution Scope must be Subgroup.
+    // OpControlBarrier must only use Subgroup execution scope for a subset of
+    // execution models.
     if (opcode == SpvOpControlBarrier && value != SpvScopeSubgroup) {
+      std::string errorVUID = _.VkErrorID(4682);
       _.function(inst->function()->id())
-          ->RegisterExecutionModelLimitation([](SpvExecutionModel model,
-                                                std::string* message) {
+          ->RegisterExecutionModelLimitation([errorVUID](
+                                                 SpvExecutionModel model,
+                                                 std::string* message) {
             if (model == SpvExecutionModelFragment ||
                 model == SpvExecutionModelVertex ||
                 model == SpvExecutionModelGeometry ||
-                model == SpvExecutionModelTessellationEvaluation) {
+                model == SpvExecutionModelTessellationEvaluation ||
+                model == SpvExecutionModelRayGenerationKHR ||
+                model == SpvExecutionModelIntersectionKHR ||
+                model == SpvExecutionModelAnyHitKHR ||
+                model == SpvExecutionModelClosestHitKHR ||
+                model == SpvExecutionModelMissKHR) {
               if (message) {
                 *message =
-                    "in Vulkan evironment, OpControlBarrier execution scope "
-                    "must be Subgroup for Fragment, Vertex, Geometry and "
-                    "TessellationEvaluation execution models";
+                    errorVUID +
+                    "in Vulkan environment, OpControlBarrier execution scope "
+                    "must be Subgroup for Fragment, Vertex, Geometry, "
+                    "TessellationEvaluation, RayGeneration, Intersection, "
+                    "AnyHit, ClosestHit, and Miss execution models";
               }
               return false;
             }
@@ -110,23 +136,36 @@ spv_result_t ValidateExecutionScope(ValidationState_t& _,
           });
     }
 
+    // Only subset of execution models support Workgroup.
+    if (value == SpvScopeWorkgroup) {
+      std::string errorVUID = _.VkErrorID(4637);
+      _.function(inst->function()->id())
+          ->RegisterExecutionModelLimitation(
+              [errorVUID](SpvExecutionModel model, std::string* message) {
+                if (model != SpvExecutionModelTaskNV &&
+                    model != SpvExecutionModelMeshNV &&
+                    model != SpvExecutionModelTessellationControl &&
+                    model != SpvExecutionModelGLCompute) {
+                  if (message) {
+                    *message =
+                        errorVUID +
+                        "in Vulkan environment, Workgroup execution scope is "
+                        "only for TaskNV, MeshNV, TessellationControl, and "
+                        "GLCompute execution models";
+                  }
+                  return false;
+                }
+                return true;
+              });
+    }
+
     // Vulkan generic rules
     // Scope for execution must be limited to Workgroup or Subgroup
     if (value != SpvScopeWorkgroup && value != SpvScopeSubgroup) {
       return _.diag(SPV_ERROR_INVALID_DATA, inst)
-             << spvOpcodeString(opcode)
+             << _.VkErrorID(4636) << spvOpcodeString(opcode)
              << ": in Vulkan environment Execution Scope is limited to "
              << "Workgroup and Subgroup";
-    }
-  }
-
-  // WebGPU Specific rules
-  if (spvIsWebGPUEnv(_.context()->target_env)) {
-    if (value != SpvScopeWorkgroup) {
-      return _.diag(SPV_ERROR_INVALID_DATA, inst)
-             << spvOpcodeString(opcode)
-             << ": in WebGPU environment Execution Scope is limited to "
-             << "Workgroup";
     }
   }
 
@@ -152,32 +191,12 @@ spv_result_t ValidateMemoryScope(ValidationState_t& _, const Instruction* inst,
   uint32_t value = 0;
   std::tie(is_int32, is_const_int32, value) = _.EvalInt32IfConst(scope);
 
-  if (!is_int32) {
-    return _.diag(SPV_ERROR_INVALID_DATA, inst)
-           << spvOpcodeString(opcode)
-           << ": expected Memory Scope to be a 32-bit int";
+  if (auto error = ValidateScope(_, inst, scope)) {
+    return error;
   }
 
   if (!is_const_int32) {
-    if (_.HasCapability(SpvCapabilityShader) &&
-        !_.HasCapability(SpvCapabilityCooperativeMatrixNV)) {
-      return _.diag(SPV_ERROR_INVALID_DATA, inst)
-             << "Scope ids must be OpConstant when Shader capability is "
-             << "present";
-    }
-    if (_.HasCapability(SpvCapabilityShader) &&
-        _.HasCapability(SpvCapabilityCooperativeMatrixNV) &&
-        !spvOpcodeIsConstant(_.GetIdOpcode(scope))) {
-      return _.diag(SPV_ERROR_INVALID_DATA, inst)
-             << "Scope ids must be constant or specialization constant when "
-             << "CooperativeMatrixNV capability is present";
-    }
     return SPV_SUCCESS;
-  }
-
-  if (is_const_int32 && !IsValidScope(value)) {
-    return _.diag(SPV_ERROR_INVALID_DATA, inst)
-           << "Invalid scope value:\n " << _.Disassemble(*_.FindDef(scope));
   }
 
   if (value == SpvScopeQueueFamilyKHR) {
@@ -203,7 +222,7 @@ spv_result_t ValidateMemoryScope(ValidationState_t& _, const Instruction* inst,
   if (spvIsVulkanEnv(_.context()->target_env)) {
     if (value == SpvScopeCrossDevice) {
       return _.diag(SPV_ERROR_INVALID_DATA, inst)
-             << spvOpcodeString(opcode)
+             << _.VkErrorID(4638) << spvOpcodeString(opcode)
              << ": in Vulkan environment, Memory Scope cannot be CrossDevice";
     }
     // Vulkan 1.0 specifc rules
@@ -211,58 +230,62 @@ spv_result_t ValidateMemoryScope(ValidationState_t& _, const Instruction* inst,
         value != SpvScopeDevice && value != SpvScopeWorkgroup &&
         value != SpvScopeInvocation) {
       return _.diag(SPV_ERROR_INVALID_DATA, inst)
-             << spvOpcodeString(opcode)
+             << _.VkErrorID(4638) << spvOpcodeString(opcode)
              << ": in Vulkan 1.0 environment Memory Scope is limited to "
              << "Device, Workgroup and Invocation";
     }
     // Vulkan 1.1 specifc rules
-    if (_.context()->target_env == SPV_ENV_VULKAN_1_1 &&
+    if ((_.context()->target_env == SPV_ENV_VULKAN_1_1 ||
+         _.context()->target_env == SPV_ENV_VULKAN_1_2) &&
         value != SpvScopeDevice && value != SpvScopeWorkgroup &&
-        value != SpvScopeSubgroup && value != SpvScopeInvocation) {
+        value != SpvScopeSubgroup && value != SpvScopeInvocation &&
+        value != SpvScopeShaderCallKHR) {
       return _.diag(SPV_ERROR_INVALID_DATA, inst)
-             << spvOpcodeString(opcode)
-             << ": in Vulkan 1.1 environment Memory Scope is limited to "
-             << "Device, Workgroup and Invocation";
+             << _.VkErrorID(4638) << spvOpcodeString(opcode)
+             << ": in Vulkan 1.1 and 1.2 environment Memory Scope is limited "
+             << "to Device, Workgroup, Invocation, and ShaderCall";
     }
-  }
 
-  // WebGPU specific rules
-  if (spvIsWebGPUEnv(_.context()->target_env)) {
-    switch (inst->opcode()) {
-      case SpvOpControlBarrier:
-        if (value != SpvScopeWorkgroup) {
-          return _.diag(SPV_ERROR_INVALID_DATA, inst)
-                 << spvOpcodeString(opcode)
-                 << ": in WebGPU environment Memory Scope is limited to "
-                 << "Workgroup for OpControlBarrier";
-        }
-        break;
-      case SpvOpMemoryBarrier:
-        if (value != SpvScopeWorkgroup) {
-          return _.diag(SPV_ERROR_INVALID_DATA, inst)
-                 << spvOpcodeString(opcode)
-                 << ": in WebGPU environment Memory Scope is limited to "
-                 << "Workgroup for OpMemoryBarrier";
-        }
-        break;
-      default:
-        if (spvOpcodeIsAtomicOp(inst->opcode())) {
-          if (value != SpvScopeQueueFamilyKHR) {
-            return _.diag(SPV_ERROR_INVALID_DATA, inst)
-                   << spvOpcodeString(opcode)
-                   << ": in WebGPU environment Memory Scope is limited to "
-                   << "QueueFamilyKHR for OpAtomic* operations";
-          }
-        }
+    if (value == SpvScopeShaderCallKHR) {
+      std::string errorVUID = _.VkErrorID(4640);
+      _.function(inst->function()->id())
+          ->RegisterExecutionModelLimitation(
+              [errorVUID](SpvExecutionModel model, std::string* message) {
+                if (model != SpvExecutionModelRayGenerationKHR &&
+                    model != SpvExecutionModelIntersectionKHR &&
+                    model != SpvExecutionModelAnyHitKHR &&
+                    model != SpvExecutionModelClosestHitKHR &&
+                    model != SpvExecutionModelMissKHR &&
+                    model != SpvExecutionModelCallableKHR) {
+                  if (message) {
+                    *message =
+                        errorVUID +
+                        "ShaderCallKHR Memory Scope requires a ray tracing "
+                        "execution model";
+                  }
+                  return false;
+                }
+                return true;
+              });
+    }
 
-        if (value != SpvScopeWorkgroup && value != SpvScopeInvocation &&
-            value != SpvScopeQueueFamilyKHR) {
-          return _.diag(SPV_ERROR_INVALID_DATA, inst)
-                 << spvOpcodeString(opcode)
-                 << ": in WebGPU environment Memory Scope is limited to "
-                 << "Workgroup, Invocation, and QueueFamilyKHR";
-        }
-        break;
+    if (value == SpvScopeWorkgroup) {
+      std::string errorVUID = _.VkErrorID(4639);
+      _.function(inst->function()->id())
+          ->RegisterExecutionModelLimitation(
+              [errorVUID](SpvExecutionModel model, std::string* message) {
+                if (model != SpvExecutionModelGLCompute &&
+                    model != SpvExecutionModelTaskNV &&
+                    model != SpvExecutionModelMeshNV) {
+                  if (message) {
+                    *message = errorVUID +
+                               "Workgroup Memory Scope is limited to MeshNV, "
+                               "TaskNV, and GLCompute execution model";
+                  }
+                  return false;
+                }
+                return true;
+              });
     }
   }
 

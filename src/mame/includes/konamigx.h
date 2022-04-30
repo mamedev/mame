@@ -45,11 +45,10 @@ public:
 		, m_workram(*this, "workram")
 		, m_psacram(*this, "psacram")
 		, m_subpaletteram32(*this, "subpaletteram")
-		, m_k053936_0_ctrl(*this, "k053936_0_ctrl", 32)
-		, m_k053936_0_linectrl(*this, "k053936_0_line", 32)
-		, m_k053936_0_ctrl_16(*this, "k053936_0_ct16", 16)
-		, m_k053936_0_linectrl_16(*this, "k053936_0_li16", 16)
-		, m_konamigx_type3_psac2_bank(*this, "psac2_bank")
+		, m_k053936_0_ctrl(*this, "k053936_0_ctrl")
+		, m_k053936_0_linectrl(*this, "k053936_0_line")
+		, m_k053936_0_ctrl_16(*this, "k053936_0_ct16")
+		, m_k053936_0_linectrl_16(*this, "k053936_0_li16")
 		, m_generic_paletteram_32(*this, "paletteram")
 		, m_an0(*this, "AN0")
 		, m_an1(*this, "AN1")
@@ -62,26 +61,28 @@ public:
 		, m_lamp(*this, "lamp0")
 	{ }
 
-	DECLARE_WRITE32_MEMBER(esc_w);
-	DECLARE_WRITE32_MEMBER(eeprom_w);
-	DECLARE_WRITE32_MEMBER(control_w);
-	DECLARE_READ32_MEMBER(le2_gun_H_r);
-	DECLARE_READ32_MEMBER(le2_gun_V_r);
-	DECLARE_READ32_MEMBER(type1_roz_r1);
-	DECLARE_READ32_MEMBER(type1_roz_r2);
-	DECLARE_READ32_MEMBER(type3_sync_r);
-	DECLARE_WRITE32_MEMBER(type4_prot_w);
-	DECLARE_WRITE32_MEMBER(type1_cablamps_w);
-	DECLARE_READ16_MEMBER(tms57002_status_word_r);
-	DECLARE_WRITE16_MEMBER(tms57002_control_word_w);
-	DECLARE_READ16_MEMBER(K055550_word_r);
-	DECLARE_WRITE16_MEMBER(K055550_word_w);
-	DECLARE_WRITE16_MEMBER(K053990_martchmp_word_w);
-	DECLARE_WRITE32_MEMBER(fantjour_dma_w);
-	DECLARE_WRITE32_MEMBER(konamigx_type3_psac2_bank_w);
-	DECLARE_WRITE32_MEMBER(konamigx_tilebank_w);
-	DECLARE_WRITE32_MEMBER(konamigx_t1_psacmap_w);
-	DECLARE_WRITE32_MEMBER(konamigx_t4_psacmap_w);
+	void esc_w(address_space &space, uint32_t data);
+	void eeprom_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t le2_gun_H_r();
+	uint32_t le2_gun_V_r();
+	uint32_t type1_roz_r1(offs_t offset);
+	uint32_t type1_roz_r2(offs_t offset);
+	uint32_t type3_sync_r();
+	void type4_prot_w(address_space &space, offs_t offset, uint32_t data);
+	void type1_cablamps_w(uint32_t data);
+	uint16_t tms57002_status_word_r();
+	void tms57002_control_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t K055550_word_r(offs_t offset);
+	void K055550_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void K053990_martchmp_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void fantjour_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void type3_bank_w(offs_t offset, uint8_t data);
+	[[maybe_unused]] void konamigx_555_palette_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	[[maybe_unused]] void konamigx_555_palette2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void konamigx_tilebank_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void konamigx_t1_psacmap_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void konamigx_t4_psacmap_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(hblank_irq_ack_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(gx_rdport1_3_r);
@@ -120,14 +121,16 @@ public:
 	K055673_CB_MEMBER(salmndr2_sprite_callback);
 	K055673_CB_MEMBER(le2_sprite_callback);
 
+	struct GX_OBJ { int order = 0, offs = 0, code = 0, color = 0; };
+
 	void common_init();
-	DECLARE_READ32_MEMBER( k_6bpp_rom_long_r );
+	uint32_t k_6bpp_rom_long_r(offs_t offset, uint32_t mem_mask = ~0);
 	void konamigx_mixer     (screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect,tilemap_t *sub1, int sub1flags,tilemap_t *sub2, int sub2flags,int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack);
 	void konamigx_mixer_draw(screen_device &Screen, bitmap_rgb32 &bitmap, const rectangle &cliprect,
 						tilemap_t *sub1, int sub1flags,
 						tilemap_t *sub2, int sub2flags,
 						int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack,
-						struct GX_OBJ *objpool,
+						GX_OBJ *objpool,
 						int *objbuf,
 						int nobj
 						);
@@ -165,6 +168,7 @@ public:
 	inline int K055555GX_decode_objcolor(int c18);
 	inline int K055555GX_decode_inpri(int c18);
 	int K055555GX_decode_vmixcolor(int layer, int *color);
+	[[maybe_unused]] int K055555GX_decode_osmixcolor(int layer, int *color);
 
 	void init_posthack();
 	void konamigx_6bpp(machine_config &config);
@@ -184,6 +188,7 @@ public:
 	void gokuparo(machine_config &config);
 	void sexyparo(machine_config &config);
 	void gx_base_memmap(address_map &map);
+	void racinfrc_map(address_map &map);
 	void gx_type1_map(address_map &map);
 	void gx_type2_map(address_map &map);
 	void gx_type3_map(address_map &map);
@@ -212,62 +217,63 @@ protected:
 	optional_shared_ptr<uint32_t> m_workram;
 	optional_shared_ptr<uint32_t> m_psacram;
 	optional_shared_ptr<uint32_t> m_subpaletteram32;
-	optional_shared_ptr<uint16_t> m_k053936_0_ctrl;
-	optional_shared_ptr<uint16_t> m_k053936_0_linectrl;
+	optional_shared_ptr<uint32_t> m_k053936_0_ctrl;
+	optional_shared_ptr<uint32_t> m_k053936_0_linectrl;
 	optional_shared_ptr<uint16_t> m_k053936_0_ctrl_16;
 	optional_shared_ptr<uint16_t> m_k053936_0_linectrl_16;
-	optional_shared_ptr<uint32_t> m_konamigx_type3_psac2_bank;
 	optional_shared_ptr<uint32_t> m_generic_paletteram_32;
 
 	optional_ioport m_an0, m_an1, m_light0_x, m_light0_y, m_light1_x, m_light1_y, m_eepromout;
 
-	uint8_t m_sound_ctrl;
-	uint8_t m_sound_intck;
-	uint32_t m_fantjour_dma[8];
-	int m_konamigx_current_frame;
-	int m_gx_objdma, m_gx_primode;
-	emu_timer *m_dmadelay_timer;
-	emu_timer *m_boothack_timer;
-	int m_gx_rdport1_3, m_gx_syncen;
-	int m_gx_cfgport;
-	int m_suspension_active, m_resume_trigger;
-	int m_last_prot_op, m_last_prot_clk;
-	uint8_t m_prev_pixel_clock;
+	uint8_t m_sound_ctrl = 0;
+	uint8_t m_sound_intck = 0;
+	uint32_t m_fantjour_dma[8]{};
+	int m_konamigx_current_frame = 0;
+	int m_gx_objdma = 0, m_gx_primode = 0;
+	emu_timer *m_dmadelay_timer = nullptr;
+	emu_timer *m_boothack_timer = nullptr;
+	int m_gx_rdport1_3 = 0, m_gx_syncen = 0;
+	int m_gx_cfgport = 0;
+	int m_suspension_active = 0, m_resume_trigger = 0;
+	int m_last_prot_op = 0, m_last_prot_clk = 0;
+	u16 m_last_prot_param = 0;
+	uint8_t m_prev_pixel_clock = 0;
 
-	uint8_t m_esc_program[4096];
+	uint8_t m_esc_program[4096]{};
 	esc_cb m_esc_cb;
 
-	uint16_t m_prot_data[0x20];
+	uint16_t m_prot_data[0x20]{};
 
-	uint16_t *m_gx_spriteram;
+	uint16_t *m_gx_spriteram = nullptr;
+	std::unique_ptr<uint16_t[]> m_gx_spriteram_alloc;
 
 	// mirrored K054338 settings
-	int *m_K054338_shdRGB;
+	int *m_K054338_shdRGB = nullptr;
 
 	// 1st-Tier GX/MW Variables
 	// frequently used registers
-	int m_k053247_vrcbk[4];
-	int m_k053247_coreg, m_k053247_coregshift, m_k053247_opset;
-	int m_opri, m_oinprion;
-	int m_vcblk[6], m_ocblk;
-	int m_vinmix, m_vmixon, m_osinmix, m_osmixon;
-	uint8_t  m_gx_wrport1_0, m_gx_wrport1_1;
-	uint16_t m_gx_wrport2;
+	int m_k053247_vrcbk[4]{};
+	int m_k053247_coreg = 0, m_k053247_coregshift = 0, m_k053247_opset = 0;
+	int m_opri = 0, m_oinprion = 0;
+	int m_vcblk[6]{}, m_ocblk = 0;
+	int m_vinmix = 0, m_vmixon = 0, m_osinmix = 0, m_osmixon = 0;
+	uint8_t  m_gx_wrport1_0 = 0, m_gx_wrport1_1 = 0;
+	uint16_t m_gx_wrport2 = 0;
 
 	// 2nd-Tier GX/MW Graphics Variables
-	uint8_t *m_gx_objzbuf;
+	uint8_t *m_gx_objzbuf = nullptr;
 	std::unique_ptr<uint8_t[]> m_gx_shdzbuf;
-	int m_layer_colorbase[4];
-	int32_t m_gx_tilebanks[8], m_gx_oldbanks[8];
-	int m_gx_tilemode, m_gx_rozenable, m_psac_colorbase, m_last_psac_colorbase;
-	int m_gx_specialrozenable; // type 1 roz, with voxel height-map, rendered from 2 source tilemaps (which include height data) to temp bitmap for further processing
-	int m_gx_rushingheroes_hack;
+	int m_layer_colorbase[4]{};
+	int32_t m_gx_tilebanks[8]{}, m_gx_oldbanks[8]{};
+	int m_gx_tilemode = 0, m_gx_rozenable = 0, m_psac_colorbase = 0, m_last_psac_colorbase = 0;
+	int m_gx_specialrozenable = 0; // type 1 roz, with voxel height-map, rendered from 2 source tilemaps (which include height data) to temp bitmap for further processing
+	int m_gx_rushingheroes_hack = 0;
 
-	tilemap_t *m_gx_psac_tilemap, *m_gx_psac_tilemap2;
+	tilemap_t *m_gx_psac_tilemap = nullptr, *m_gx_psac_tilemap2 = nullptr;
 	std::unique_ptr<bitmap_ind16> m_type3_roz_temp_bitmap;
-	tilemap_t *m_gx_psac_tilemap_alt;
-	int m_konamigx_has_dual_screen;
-	int m_konamigx_palformat;
+	tilemap_t *m_gx_psac_tilemap_alt = nullptr;
+	int m_konamigx_has_dual_screen = 0;
+	int m_konamigx_palformat = 0;
 	std::unique_ptr<bitmap_rgb32> m_dualscreen_left_tempbitmap;
 	std::unique_ptr<bitmap_rgb32> m_dualscreen_right_tempbitmap;
 
@@ -291,9 +297,12 @@ protected:
 	std::unique_ptr<bitmap_ind16> m_gxtype1_roz_dstbitmap2;
 	rectangle m_gxtype1_roz_dstbitmapclip;
 
-	int m_konamigx_type3_psac2_actual_bank;
+	std::unique_ptr<GX_OBJ[]> m_gx_objpool;
+
+	u8 m_type3_psac2_bank = 0;
+	u8 m_type3_spriteram_bank = 0;
 	//int m_konamigx_type3_psac2_actual_last_bank = 0;
-	int m_use_68020_post_clock_hack;
+	int m_use_68020_post_clock_hack = 0;
 	output_finder<> m_lamp;
 };
 

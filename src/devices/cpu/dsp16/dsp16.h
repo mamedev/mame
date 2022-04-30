@@ -55,8 +55,8 @@ public:
 	DECLARE_READ_LINE_MEMBER(ose_r) { return m_ose_out; }
 
 	// high-level passive parallel I/O handlers
-	DECLARE_READ16_MEMBER(pio_r);
-	DECLARE_WRITE16_MEMBER(pio_w);
+	u16 pio_r();
+	void pio_w(u16 data);
 
 	// parallel I/O outputs
 	DECLARE_READ_LINE_MEMBER(psel_r) { return m_psel_out; }
@@ -105,7 +105,7 @@ protected:
 	// for specialisations to override
 	virtual void external_memory_enable(address_space &space, bool enable) = 0;
 
-	template <offs_t Base> DECLARE_READ16_MEMBER(external_memory_r);
+	template <offs_t Base> u16 external_memory_r(offs_t offset, u16 mem_mask = ~0);
 
 private:
 	// state registration indices
@@ -275,7 +275,7 @@ private:
 	// memory system access
 	required_shared_ptr<u16>    m_workram;
 	address_space               *m_spaces[3];
-	memory_access_cache<1, -1, ENDIANNESS_BIG> *m_pcache;
+	memory_access<16, 1, -1, ENDIANNESS_BIG>::cache m_pcache;
 	u16                         m_workram_mask;
 
 	// recompiler stuff

@@ -13,7 +13,7 @@
 #include "includes/tiamc1.h"
 
 
-WRITE8_MEMBER(tiamc1_state::tiamc1_videoram_w)
+void tiamc1_state::tiamc1_videoram_w(offs_t offset, uint8_t data)
 {
 	if(!(m_layers_ctrl & 2))
 		m_charram[offset + 0x0000] = data;
@@ -36,7 +36,7 @@ WRITE8_MEMBER(tiamc1_state::tiamc1_videoram_w)
 	}
 }
 
-WRITE8_MEMBER(tiamc1_state::kot_videoram_w)
+void tiamc1_state::kot_videoram_w(offs_t offset, uint8_t data)
 {
 	if ((m_layers_ctrl & 1) == 0)
 	{
@@ -45,7 +45,7 @@ WRITE8_MEMBER(tiamc1_state::kot_videoram_w)
 	}
 }
 
-WRITE8_MEMBER(tiamc1_state::tiamc1_bankswitch_w)
+void tiamc1_state::tiamc1_bankswitch_w(uint8_t data)
 {
 	if ((data & 128) != (m_layers_ctrl & 128))
 		machine().tilemap().mark_all_dirty();
@@ -53,49 +53,49 @@ WRITE8_MEMBER(tiamc1_state::tiamc1_bankswitch_w)
 	m_layers_ctrl = data;
 }
 
-WRITE8_MEMBER(tiamc1_state::kot_bankswitch_w)
+void tiamc1_state::kot_bankswitch_w(uint8_t data)
 {
 	m_gfxdecode->gfx(0)->set_source(m_charram + (data >> 1) * 0x100);
 	m_layers_ctrl = data;
 }
 
-WRITE8_MEMBER(tiamc1_state::tiamc1_sprite_x_w)
+void tiamc1_state::tiamc1_sprite_x_w(offs_t offset, uint8_t data)
 {
 	m_spriteram_x[offset] = data;
 }
 
-WRITE8_MEMBER(tiamc1_state::tiamc1_sprite_y_w)
+void tiamc1_state::tiamc1_sprite_y_w(offs_t offset, uint8_t data)
 {
 	m_spriteram_y[offset] = data;
 }
 
-WRITE8_MEMBER(tiamc1_state::tiamc1_sprite_a_w)
+void tiamc1_state::tiamc1_sprite_a_w(offs_t offset, uint8_t data)
 {
 	m_spriteram_a[offset] = data;
 }
 
-WRITE8_MEMBER(tiamc1_state::tiamc1_sprite_n_w)
+void tiamc1_state::tiamc1_sprite_n_w(offs_t offset, uint8_t data)
 {
 	m_spriteram_n[offset] = data;
 }
 
-WRITE8_MEMBER(tiamc1_state::tiamc1_bg_vshift_w)
+void tiamc1_state::tiamc1_bg_vshift_w(uint8_t data)
 {
 	m_bg_vshift = data;
 }
 
-WRITE8_MEMBER(tiamc1_state::tiamc1_bg_hshift_w)
+void tiamc1_state::tiamc1_bg_hshift_w(uint8_t data)
 {
 	m_bg_hshift = data;
 }
 
-WRITE8_MEMBER(tiamc1_state::tiamc1_bg_bplctrl_w)
+void tiamc1_state::tiamc1_bg_bplctrl_w(uint8_t data)
 {
 	m_bg_bplctrl = data;
 	update_bg_palette();
 }
 
-WRITE8_MEMBER(tiamc1_state::tiamc1_palette_w)
+void tiamc1_state::tiamc1_palette_w(offs_t offset, uint8_t data)
 {
 	m_paletteram[offset] = data;
 	m_palette->set_pen_color(offset, m_palette_ptr[data]);
@@ -143,12 +143,12 @@ void tiamc1_state::tiamc1_palette(palette_device &palette)
 
 TILE_GET_INFO_MEMBER(tiamc1_state::get_bg1_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0, m_tileram[tile_index], 0, 0);
+	tileinfo.set(0, m_tileram[tile_index], 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(tiamc1_state::get_bg2_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0, m_tileram[tile_index + 1024], 0, 0);
+	tileinfo.set(0, m_tileram[tile_index + 1024], 0, 0);
 }
 
 void tiamc1_state::video_start()

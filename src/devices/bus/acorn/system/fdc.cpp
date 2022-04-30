@@ -25,9 +25,11 @@ DEFINE_DEVICE_TYPE(ACORN_FDC, acorn_fdc_device, "acorn_fdc", "Acorn Floppy Disc 
 //  MACHINE_DRIVER( fdc )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER(acorn_fdc_device::floppy_formats )
-	FLOPPY_ACORN_SSD_FORMAT
-FLOPPY_FORMATS_END
+void acorn_fdc_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ACORN_SSD_FORMAT);
+}
 
 static void acorn_floppies(device_slot_interface &device)
 {

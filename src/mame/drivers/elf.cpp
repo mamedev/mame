@@ -34,7 +34,7 @@
 
 /* Read/Write Handlers */
 
-READ8_MEMBER( elf2_state::dispon_r )
+uint8_t elf2_state::dispon_r()
 {
 	m_vdc->disp_on_w(1);
 	m_vdc->disp_on_w(0);
@@ -42,18 +42,18 @@ READ8_MEMBER( elf2_state::dispon_r )
 	return 0xff;
 }
 
-READ8_MEMBER( elf2_state::data_r )
+uint8_t elf2_state::data_r()
 {
 	return m_data;
 }
 
-WRITE8_MEMBER( elf2_state::data_w )
+void elf2_state::data_w(uint8_t data)
 {
 	m_led_l->a_w(data & 0x0f);
 	m_led_h->a_w(data >> 4);
 }
 
-WRITE8_MEMBER( elf2_state::memory_w )
+void elf2_state::memory_w(offs_t offset, uint8_t data)
 {
 	if (LOAD)
 	{
@@ -80,7 +80,7 @@ void elf2_state::elf2_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x0000, 0x00ff).bankrw("bank1");
+	// Ram is added dynamically
 }
 
 void elf2_state::elf2_io(address_map &map)
@@ -159,12 +159,12 @@ WRITE_LINE_MEMBER( elf2_state::q_w )
 	m_led = state ? 1 : 0;
 }
 
-READ8_MEMBER( elf2_state::dma_r )
+uint8_t elf2_state::dma_r()
 {
 	return m_data;
 }
 
-WRITE8_MEMBER( elf2_state::sc_w )
+void elf2_state::sc_w(uint8_t data)
 {
 	switch (data)
 	{
@@ -212,10 +212,8 @@ void elf2_state::machine_start()
 	m_led_h->rbi_w(1);
 
 	/* setup memory banking */
-	program.install_read_bank(0x0000, 0x00ff, "bank1");
-	program.install_write_handler(0x0000, 0x00ff, write8_delegate(*this, FUNC(elf2_state::memory_w)));
-	membank("bank1")->configure_entry(0, m_ram->pointer());
-	membank("bank1")->set_entry(0);
+	program.install_rom(0x0000, 0x00ff, m_ram->pointer());
+	program.install_write_handler(0x0000, 0x00ff, write8sm_delegate(*this, FUNC(elf2_state::memory_w)));
 
 	/* register for state saving */
 	save_item(NAME(m_data));

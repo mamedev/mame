@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -66,6 +66,18 @@ TEST_CASE("vsnprintf f")
 	REQUIRE(test("     inf", "%8f",   std::numeric_limits<double>::infinity() ) );
 	REQUIRE(test("inf     ", "%-8f",  std::numeric_limits<double>::infinity() ) );
 	REQUIRE(test("    -INF", "%8F",  -std::numeric_limits<double>::infinity() ) );
+
+	REQUIRE(test(" 1.0",     "%4.1f",    1.0) );
+	REQUIRE(test(" 1.500",   "%6.3f",    1.5) );
+	REQUIRE(test("0001.500", "%08.3f",   1.5) );
+	REQUIRE(test("+001.500", "%+08.3f",  1.5) );
+	REQUIRE(test("-001.500", "%+08.3f", -1.5) );
+	REQUIRE(test("0.003906", "%f",       0.00390625) );
+	REQUIRE(test("0.0039",   "%.4f",     0.00390625) );
+
+	REQUIRE(test("0.00390625",          "%.8f",  0.00390625) );
+	REQUIRE(test("-0.00390625",         "%.8f", -0.00390625) );
+	REQUIRE(test("1.50000000000000000", "%.17f", 1.5) );
 }
 
 TEST_CASE("vsnprintf d/i/o/u/x")
@@ -82,6 +94,8 @@ TEST_CASE("vsnprintf d/i/o/u/x")
 	REQUIRE(test("2471", "%o", 1337) );
 	REQUIRE(test("1337                ", "%-20o",  01337) );
 	REQUIRE(test("37777776441         ", "%-20o", -01337) );
+	REQUIRE(test("                2471", "%20o",    1337) );
+	REQUIRE(test("00000000000000002471", "%020o",   1337) );
 
 	REQUIRE(test("1337", "%u", 1337) );
 	REQUIRE(test("1337                ", "%-20u",  1337) );
@@ -92,10 +106,39 @@ TEST_CASE("vsnprintf d/i/o/u/x")
 	REQUIRE(test("1234ABCD            ", "%-20X",  0x1234abcd) );
 	REQUIRE(test("edcb5433            ", "%-20x", -0x1234abcd) );
 	REQUIRE(test("EDCB5433            ", "%-20X", -0x1234abcd) );
+	REQUIRE(test("            1234abcd", "% 20x",  0x1234abcd) );
+	REQUIRE(test("            1234ABCD", "% 20X",  0x1234abcd) );
+	REQUIRE(test("            edcb5433", "% 20x", -0x1234abcd) );
+	REQUIRE(test("            EDCB5433", "% 20X", -0x1234abcd) );
 	REQUIRE(test("0000000000001234abcd", "%020x",  0x1234abcd) );
 	REQUIRE(test("0000000000001234ABCD", "%020X",  0x1234abcd) );
 	REQUIRE(test("000000000000edcb5433", "%020x", -0x1234abcd) );
 	REQUIRE(test("000000000000EDCB5433", "%020X", -0x1234abcd) );
+
+	REQUIRE(test("0xf",        "0x%01x", -1) );
+	REQUIRE(test("0xff",       "0x%02x", -1) );
+	REQUIRE(test("0xfff",      "0x%03x", -1) );
+	REQUIRE(test("0xffff",     "0x%04x", -1) );
+	REQUIRE(test("0xfffff",    "0x%05x", -1) );
+	REQUIRE(test("0xffffff",   "0x%06x", -1) );
+	REQUIRE(test("0xfffffff",  "0x%07x", -1) );
+	REQUIRE(test("0xffffffff", "0x%08x", -1) );
+
+	REQUIRE(test("  -1", "% 4i", -1) );
+	REQUIRE(test("  -1", "% 4i", -1) );
+	REQUIRE(test("   0", "% 4i",  0) );
+	REQUIRE(test("   1", "% 4i",  1) );
+	REQUIRE(test("   1", "% 4o",  1) );
+	REQUIRE(test("  +1", "%+4i",  1) );
+	REQUIRE(test("  +1", "%+4o",  1) );
+	REQUIRE(test("  +0", "%+4i",  0) );
+	REQUIRE(test("  -1", "%+4i", -1) );
+	REQUIRE(test("0001", "%04i",  1) );
+	REQUIRE(test("0001", "%04o",  1) );
+	REQUIRE(test("0000", "%04i",  0) );
+	REQUIRE(test("0000", "%04o",  0) );
+	REQUIRE(test("-001", "%04i", -1) );
+	REQUIRE(test("+001", "%+04i", 1) );
 
 	if (BX_ENABLED(BX_ARCH_32BIT) )
 	{
@@ -151,6 +194,12 @@ TEST_CASE("vsnprintf")
 
 	REQUIRE(test("hello               ", "%-20s", "hello") );
 	REQUIRE(test("hello, world!", "%s, %s!", "hello", "world") );
+
+	REQUIRE(test("h",     "%1s", "hello") );
+	REQUIRE(test("he",    "%2s", "hello") );
+	REQUIRE(test("hel",   "%3s", "hello") );
+	REQUIRE(test("hell",  "%4s", "hello") );
+	REQUIRE(test("hello", "%5s", "hello") );
 
 	bx::StringView str("0hello1world2");
 	bx::StringView hello(str, 1, 5);

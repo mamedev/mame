@@ -87,13 +87,13 @@ void trackfld_state::trackfld_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(trackfld_state::trackfld_videoram_w)
+void trackfld_state::trackfld_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(trackfld_state::trackfld_colorram_w)
+void trackfld_state::trackfld_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -105,7 +105,7 @@ WRITE_LINE_MEMBER(trackfld_state::flipscreen_w)
 	machine().tilemap().mark_all_dirty();
 }
 
-WRITE8_MEMBER(trackfld_state::atlantol_gfxbank_w)
+void trackfld_state::atlantol_gfxbank_w(uint8_t data)
 {
 	if (data & 1)
 	{
@@ -162,7 +162,7 @@ TILE_GET_INFO_MEMBER(trackfld_state::get_bg_tile_info)
 	if (m_bg_bank)
 		code |= 0x400;
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.set(1, code, color, flags);
 }
 
 VIDEO_START_MEMBER(trackfld_state,trackfld)

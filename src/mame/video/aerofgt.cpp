@@ -14,7 +14,7 @@ TILE_GET_INFO_MEMBER(aerofgt_state::get_pspikes_tile_info)
 {
 	uint16_t code = m_vram[0][tile_index];
 	int bank = (code & 0x1000) >> 12;
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			(code & 0x0fff) | (m_gfxbank[bank] << 12),
 			((code & 0xe000) >> 13) + 8 * m_charpalettebank,
 			0);
@@ -25,7 +25,7 @@ template<int Layer>
 TILE_GET_INFO_MEMBER(aerofgt_state::karatblz_tile_info)
 {
 	uint16_t code = m_vram[Layer][tile_index];
-	SET_TILE_INFO_MEMBER(Layer,
+	tileinfo.set(Layer,
 			(code & 0x1fff) | (m_gfxbank[Layer] << 13),
 			(code & 0xe000) >> 13,
 			0);
@@ -35,7 +35,7 @@ template<int Layer>
 TILE_GET_INFO_MEMBER(aerofgt_state::spinlbrk_tile_info)
 {
 	uint16_t code = m_vram[Layer][tile_index];
-	SET_TILE_INFO_MEMBER(Layer,
+	tileinfo.set(Layer,
 			(code & 0x0fff) | (m_gfxbank[Layer] << 12),
 			(code & 0xf000) >> 12,
 			0);
@@ -46,7 +46,7 @@ TILE_GET_INFO_MEMBER(aerofgt_state::get_tile_info)
 {
 	uint16_t code = m_vram[Layer][tile_index];
 	int bank = (Layer << 2) | (code & 0x1800) >> 11;
-	SET_TILE_INFO_MEMBER(Layer,
+	tileinfo.set(Layer,
 			(code & 0x07ff) | (m_gfxbank[bank] << 11),
 			(code & 0xe000) >> 13,
 			0);
@@ -77,6 +77,8 @@ VIDEO_START_MEMBER(aerofgt_state,pspikes)
 	/* no bg2 in this game */
 
 	m_sprite_gfx = 1;
+	m_spikes91_lookup = 0;
+	m_charpalettebank = 0;
 
 	aerofgt_register_state_globals();
 	save_item(NAME(m_spikes91_lookup));
@@ -163,25 +165,25 @@ void aerofgt_state::setbank( int layer, int num, int bank )
 	}
 }
 
-WRITE8_MEMBER(aerofgt_state::pspikes_gfxbank_w)
+void aerofgt_state::pspikes_gfxbank_w(uint8_t data)
 {
 	setbank(0, 0, (data & 0xf0) >> 4);
 	setbank(0, 1, data & 0x0f);
 }
 
-WRITE8_MEMBER(aerofgt_state::karatblz_gfxbank_w)
+void aerofgt_state::karatblz_gfxbank_w(uint8_t data)
 {
 	setbank(0, 0, (data & 0x01));
 	setbank(1, 1, (data & 0x08) >> 3);
 }
 
-WRITE8_MEMBER(aerofgt_state::spinlbrk_gfxbank_w)
+void aerofgt_state::spinlbrk_gfxbank_w(uint8_t data)
 {
 	setbank(0, 0, (data & 0x07));
 	setbank(1, 1, (data & 0x38) >> 3);
 }
 
-WRITE16_MEMBER(aerofgt_state::turbofrc_gfxbank_w)
+void aerofgt_state::turbofrc_gfxbank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_bank[offset]);
 
@@ -191,7 +193,7 @@ WRITE16_MEMBER(aerofgt_state::turbofrc_gfxbank_w)
 	setbank(offset, 4 * offset + 3, (data >> 12) & 0x0f);
 }
 
-WRITE16_MEMBER(aerofgt_state::aerofgt_gfxbank_w)
+void aerofgt_state::aerofgt_gfxbank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_bank[offset]);
 
@@ -199,14 +201,14 @@ WRITE16_MEMBER(aerofgt_state::aerofgt_gfxbank_w)
 	setbank(offset >> 1, 2 * offset + 1, (data >> 0) & 0xff);
 }
 
-WRITE8_MEMBER(aerofgt_state::kickball_gfxbank_w)
+void aerofgt_state::kickball_gfxbank_w(uint8_t data)
 {
 	// I strongly doubt this logic is correct
 	setbank(0, 0, (data & 0x0f)&~0x01);
 	setbank(0, 1, (data & 0x0f));
 }
 
-WRITE8_MEMBER(aerofgt_state::pspikes_palette_bank_w)
+void aerofgt_state::pspikes_palette_bank_w(uint8_t data)
 {
 	m_spritepalettebank = data & 0x03;
 	if (m_charpalettebank != (data & 0x1c) >> 2)
@@ -219,14 +221,14 @@ WRITE8_MEMBER(aerofgt_state::pspikes_palette_bank_w)
 	m_tilemap[0]->set_flip(m_flip_screen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 }
 
-WRITE8_MEMBER(aerofgt_state::spinlbrk_flip_screen_w)
+void aerofgt_state::spinlbrk_flip_screen_w(uint8_t data)
 {
 	m_flip_screen = BIT(data, 7);
 	m_tilemap[0]->set_flip(m_flip_screen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 	m_tilemap[1]->set_flip(m_flip_screen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 }
 
-WRITE8_MEMBER(aerofgt_state::turbofrc_flip_screen_w)
+void aerofgt_state::turbofrc_flip_screen_w(uint8_t data)
 {
 	m_flip_screen = BIT(data, 7);
 	m_tilemap[0]->set_flip(m_flip_screen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
@@ -380,7 +382,7 @@ VIDEO_START_MEMBER(aerofgt_state,wbbc97)
 }
 
 // BOOTLEG
-WRITE16_MEMBER(aerofgt_state::pspikesb_gfxbank_w)
+void aerofgt_state::pspikesb_gfxbank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_rasterram[0x200 / 2]);
 
@@ -389,13 +391,13 @@ WRITE16_MEMBER(aerofgt_state::pspikesb_gfxbank_w)
 }
 
 // BOOTLEG
-WRITE16_MEMBER(aerofgt_state::spikes91_lookup_w)
+void aerofgt_state::spikes91_lookup_w(uint16_t data)
 {
 	m_spikes91_lookup = data & 1;
 }
 
 // BOOTLEG
-WRITE16_MEMBER(aerofgt_state::wbbc97_bitmap_enable_w)
+void aerofgt_state::wbbc97_bitmap_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_wbbc97_bitmap_enable);
 }
@@ -640,17 +642,15 @@ void aerofgt_state::aerfboot_draw_sprites( screen_device &screen, bitmap_ind16 &
 // BOOTLEG
 void aerofgt_state::wbbc97_draw_bitmap( bitmap_rgb32 &bitmap )
 {
-	int x, y, count;
-
-	count = 16; // weird, the bitmap doesn't start at 0?
-	for (y = 0; y < 256; y++)
-		for (x = 0; x < 512; x++)
+	int count = 16; // weird, the bitmap doesn't start at 0?
+	for (int y = 0; y < 256; y++)
+		for (int x = 0; x < 512; x++)
 		{
 			int color = m_bitmapram[count] >> 1;
 
 			/* data is GRB; convert to RGB */
 			rgb_t pen = rgb_t(pal5bit((color & 0x3e0) >> 5), pal5bit((color & 0x7c00) >> 10), pal5bit(color & 0x1f));
-			bitmap.pix32(y, (10 + x - m_rasterram[(y & 0x7f)]) & 0x1ff) = pen;
+			bitmap.pix(y, (10 + x - m_rasterram[(y & 0x7f)]) & 0x1ff) = pen;
 
 			count++;
 			count &= 0x1ffff;
@@ -660,11 +660,9 @@ void aerofgt_state::wbbc97_draw_bitmap( bitmap_rgb32 &bitmap )
 // BOOTLEG
 uint32_t aerofgt_state::screen_update_pspikesb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i, scrolly;
-
 	m_tilemap[0]->set_scroll_rows(256);
-	scrolly = m_scrolly[0];
-	for (i = 0; i < 256; i++)
+	int scrolly = m_scrolly[0];
+	for (int i = 0; i < 256; i++)
 		m_tilemap[0]->set_scrollx((i + scrolly) & 0xff, m_rasterram[i] + 22);
 	m_tilemap[0]->set_scrolly(0, scrolly);
 

@@ -35,6 +35,9 @@ void sb2m600_state::video_start()
 	if (m_color_ram)
 		for (uint16_t addr = 0; addr < OSI630_COLORRAM_SIZE; addr++)
 			m_color_ram[addr] = machine().rand() & 0x0f;
+
+	m_32 = 0;
+	m_coloren = 0;
 }
 
 /* Video Update */
@@ -65,7 +68,7 @@ uint32_t sb2m600_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 						color = (color ^ BIT(colorram_data, 0)) ? (((colorram_data >> 1) & 0x07) + 2) : 0;
 					}
 
-					bitmap.pix16(y, x++) = color;
+					bitmap.pix(y, x++) = color;
 
 					charrom_data <<= 1;
 				}
@@ -98,8 +101,8 @@ uint32_t sb2m600_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 						color = (color ^ BIT(colorram_data, 0)) ? (((colorram_data >> 1) & 0x07) + 2) : 0;
 					}
 
-					bitmap.pix16(y, x++) = color;
-					bitmap.pix16(y, x++) = color;
+					bitmap.pix(y, x++) = color;
+					bitmap.pix(y, x++) = color;
 
 					charrom_data <<= 1;
 				}
@@ -128,7 +131,7 @@ uint32_t uk101_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 			for (int bit = 0; bit < 8; bit++)
 			{
-				bitmap.pix16(y, x) = BIT(charrom_data, 7);
+				bitmap.pix(y, x) = BIT(charrom_data, 7);
 				x++;
 				charrom_data <<= 1;
 			}

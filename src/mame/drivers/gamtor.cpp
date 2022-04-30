@@ -47,12 +47,12 @@ public:
 private:
 	void gaminator_map(address_map &map);
 
-	DECLARE_WRITE32_MEMBER(gamtor_unk_w);
+	void gamtor_unk_w(uint32_t data);
 
 	required_device<cpu_device> m_maincpu;
 };
 
-WRITE32_MEMBER(gaminator_state::gamtor_unk_w)
+void gaminator_state::gamtor_unk_w(uint32_t data)
 {
 }
 
@@ -90,13 +90,15 @@ void gaminator_state::gaminator(machine_config &config)
 	MCF5206E(config, m_maincpu, 40000000); /* definitely Coldfire, model / clock uncertain */
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaminator_state::gaminator_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gaminator_state::irq6_line_hold)); // irq6 seems to be needed to get past the ROM checking
-	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0);
+	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0, m_maincpu);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
 	screen.set_screen_update("vga", FUNC(gamtor_vga_device::screen_update));
 
-	GAMTOR_VGA(config, "vga", 0).set_screen("screen");
+	gamtor_vga_device &vga(GAMTOR_VGA(config, "vga", 0));
+	vga.set_screen("screen");
+	vga.set_vram_size(0x100000);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

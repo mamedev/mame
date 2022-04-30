@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include "r65c02.h"
+#include "w65c02s.h"
 
-class st2xxx_device : public r65c02_device {
+class st2xxx_device : public w65c02s_device {
 public:
 	enum {
 		ST_PAOUT = M6502_IR + 1,
@@ -57,6 +57,13 @@ public:
 		ST_LFRA,
 		ST_LAC,
 		ST_LPWM,
+		ST_SCTR,
+		ST_SCKR,
+		ST_SSR,
+		ST_SMOD,
+		ST_UCTR,
+		ST_USR,
+		ST_IRCTR,
 		ST_BCTR,
 		ST_BRS,
 		ST_BDIV
@@ -84,9 +91,6 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_reset() override;
 
-	virtual void do_exec_full() override;
-	virtual void do_exec_partial() override;
-
 	virtual u16 st2xxx_ireq_mask() const = 0;
 	virtual const char *st2xxx_irq_name(int i) const = 0;
 	virtual u8 st2xxx_pmcr_mask() const = 0;
@@ -103,32 +107,35 @@ protected:
 	virtual u8 st2xxx_lckr_mask() const = 0;
 	virtual u8 st2xxx_lpwm_mask() const = 0;
 	virtual unsigned st2xxx_lfr_clocks() const = 0;
+	virtual bool st2xxx_has_spi() const = 0;
+	virtual bool st2xxx_spi_iis() const { return false; }
+	virtual u8 st2xxx_uctr_mask() const = 0;
 	virtual u8 st2xxx_bctr_mask() const = 0;
 
 	class mi_st2xxx : public memory_interface {
 	public:
 		virtual u8 read_vector(u16 adr) = 0;
 
-		address_space *data;
-		memory_access_cache<0, 0, ENDIANNESS_LITTLE> *dcache;
+		memory_access<26, 0, 0, ENDIANNESS_LITTLE>::cache dcache;
+		memory_access<26, 0, 0, ENDIANNESS_LITTLE>::specific data;
 
 		bool irq_service;
 		bool irr_enable;
 		u16 irr;
 		u16 prr;
 		u16 drr;
-		u16 dmr;
 	};
 
 	void init_base_timer(u16 ireq);
 	void init_lcd_timer(u16 ireq);
 	void save_common_registers();
 
-	u8 read_vector(u16 adr) { return downcast<mi_st2xxx &>(*mintf).read_vector(adr); }
-	void set_irq_service(bool state) { downcast<mi_st2xxx &>(*mintf).irq_service = state; }
+	virtual u8 read_vector(u16 adr) override;
+	virtual void end_interrupt() override { set_irq_service(false); }
 
+	void set_irq_service(bool state) { downcast<mi_st2xxx &>(*mintf).irq_service = state; }
 	void update_irq_state() { irq_state = (m_ireq & m_iena) != 0; }
-	u8 acknowledge_irq();
+	u8 active_irq_level() const;
 
 	TIMER_CALLBACK_MEMBER(bt_interrupt);
 	TIMER_CALLBACK_MEMBER(lcd_interrupt);
@@ -169,10 +176,6 @@ protected:
 	void drrl_w(u8 data);
 	u8 drrh_r();
 	void drrh_w(u8 data);
-	u8 dmrl_r();
-	void dmrl_w(u8 data);
-	u8 dmrh_r();
-	void dmrh_w(u8 data);
 
 	u8 bten_r();
 	void bten_w(u8 data);
@@ -180,7 +183,6 @@ protected:
 	void btclr_w(u8 data);
 	void btclr_all_w(u8 data);
 
-	u32 tclk_pres_div(u8 mode) const;
 	u16 pres_count() const;
 	u8 prs_r();
 	void prs_w(u8 data);
@@ -212,6 +214,25 @@ protected:
 	void lac_w(u8 data);
 	u8 lpwm_r();
 	void lpwm_w(u8 data);
+
+	u8 sctr_r();
+	void sctr_w(u8 data);
+	u8 sckr_r();
+	void sckr_w(u8 data);
+	u8 ssr_r();
+	void ssr_w(u8 data);
+	u8 smod_r();
+	void smod_w(u8 data);
+
+	u8 uctr_r();
+	void uctr_w(u8 data);
+	u8 usr_r();
+	void ustr_trg_w(u8 data);
+	void usr_clr_w(u8 data);
+	u8 irctr_r();
+	void irctr_w(u8 data);
+	u8 udata_r();
+	void udata_w(u8 data);
 	u8 bctr_r();
 	void bctr_w(u8 data);
 	u8 brs_r();
@@ -219,18 +240,10 @@ protected:
 	u8 bdiv_r();
 	void bdiv_w(u8 data);
 
-#define O(o) void o ## _full(); void o ## _partial()
-
-	O(brk_st_imp);
-	O(rti_st_imp);
-	O(reset_st);
-
-#undef O
-
 	address_space_config m_data_config;
 
-	devcb_read8 m_in_port_cb[7];
-	devcb_write8 m_out_port_cb[7];
+	devcb_read8::array<7> m_in_port_cb;
+	devcb_write8::array<7> m_out_port_cb;
 
 	const u16 m_prr_mask;
 	const u16 m_drr_mask;
@@ -256,6 +269,7 @@ protected:
 
 	u16 m_ireq;
 	u16 m_iena;
+	u8 m_irq_level;
 
 	u16 m_lssa;
 	u8 m_lvpw;
@@ -270,6 +284,14 @@ protected:
 	u16 m_lcd_ireq;
 	emu_timer *m_lcd_timer;
 
+	u8 m_sctr;
+	u8 m_sckr;
+	u8 m_ssr;
+	u8 m_smod;
+
+	u8 m_uctr;
+	u8 m_usr;
+	u8 m_irctr;
 	u8 m_bctr;
 	u8 m_brs;
 	u8 m_bdiv;

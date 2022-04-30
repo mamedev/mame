@@ -187,20 +187,17 @@ void teleprinter_device::term_write(uint8_t data)
 ***************************************************************************/
 uint32_t teleprinter_device::tp_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t code;
-	int y, c, x, b;
-
-	for (y = 0; y < m_height; y++)
+	for (int y = 0; y < m_height; y++)
 	{
-		for (c = 0; c < 8; c++)
+		for (int c = 0; c < 8; c++)
 		{
 			int horpos = 0;
-			for (x = 0; x < m_width; x++)
+			for (int x = 0; x < m_width; x++)
 			{
-				code = teleprinter_font[(m_buffer[y*m_width + x]  & 0x7f) *8 + c];
-				for (b = 0; b < 8; b++)
+				uint8_t code = teleprinter_font[(m_buffer[y*m_width + x]  & 0x7f) *8 + c];
+				for (int b = 0; b < 8; b++)
 				{
-					bitmap.pix32(y*8 + c, horpos++) =  (code >> b) & 0x01 ? 0 : 0x00ffffff;
+					bitmap.pix(y*8 + c, horpos++) =  (code >> b) & 0x01 ? 0 : 0x00ffffff;
 				}
 			}
 		}

@@ -141,15 +141,15 @@ Notes:
 
     TODO:
 
-    - abc802 video is all black
-    - abc850 is broken
     - abc806 30K banking
     - cassette
+    - abc800 video card bus
 
 */
 
 #include "emu.h"
 #include "includes/abc80x.h"
+#include "softlist_dev.h"
 
 #define LOG 0
 
@@ -175,10 +175,13 @@ DISCRETE_SOUND_END
 //  pling_r - speaker read
 //-------------------------------------------------
 
-READ8_MEMBER( abc800_state::pling_r )
+uint8_t abc800_state::pling_r()
 {
-	m_discrete->write(NODE_01, 0);
-	m_discrete->write(NODE_01, 1);
+	if (!machine().side_effects_disabled())
+	{
+		m_discrete->write(NODE_01, 0);
+		m_discrete->write(NODE_01, 1);
+	}
 
 	return 0xff;
 }
@@ -189,40 +192,103 @@ READ8_MEMBER( abc800_state::pling_r )
 //  MEMORY BANKING
 //**************************************************************************
 
-//-------------------------------------------------
-//  bankswitch
-//-------------------------------------------------
-
-void abc800_state::bankswitch()
+uint8_t abc800_state::read(offs_t offset)
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
+	uint8_t data = 0xff;
 
-	if (m_fetch_charram)
+	if (offset < 0x4000 && (!m_keydtr || m_fetch_charram))
 	{
-		// HR video RAM selected
-		program.install_ram(0x0000, 0x3fff, m_video_ram);
+		data = m_video_ram[offset];
+	}
+	else if (offset < 0x7800)
+	{
+		data = m_rom->base()[offset];
+	}
+	else if (offset < 0x8000 && m_fetch_charram)
+	{
+		data = m_rom->base()[offset];
+	}
+	else if (offset < 0x8000)
+	{
+		data = m_char_ram[offset & (m_char_ram_size - 1)];
 	}
 	else
 	{
-		// BASIC ROM selected
-		program.install_rom(0x0000, 0x3fff, m_rom->base());
+		data = m_ram->pointer()[offset & m_ram->mask()];
+	}
+
+	return data;
+}
+
+void abc800_state::write(offs_t offset, uint8_t data)
+{
+	if (offset < 0x4000 && (!m_keydtr || m_fetch_charram))
+	{
+		m_video_ram[offset] = data;
+	}
+	else if (offset >= 0x7800 && offset < 0x8000)
+	{
+		m_char_ram[offset & (m_char_ram_size - 1)] = data;
+	}
+	else if (offset >= 0x8000)
+	{
+		m_ram->pointer()[offset & m_ram->mask()] = data;
 	}
 }
 
-void abc802_state::bankswitch()
+uint8_t abc802_state::read(offs_t offset)
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
+	uint8_t data = 0xff;
 
-	if (m_lrs)
+	if (offset < 0x8000)
 	{
-		// ROM and video RAM selected
-		program.install_rom(0x0000, 0x77ff, m_rom->base());
-		program.install_ram(0x7800, 0x7fff, m_char_ram);
+		if (!m_lrs)
+		{
+			data = m_ram->pointer()[offset];
+		}
+		else
+		{
+			if (offset < 0x7800)
+			{
+				data = m_rom->base()[offset];
+			}
+			else
+			{
+				if (m_fetch_charram)
+				{
+					data = m_rom->base()[offset];
+				}
+				else
+				{
+					data = m_char_ram[offset & (m_char_ram_size - 1)];
+				}
+			}
+		}
 	}
 	else
 	{
-		// low RAM selected
-		program.install_ram(0x0000, 0x7fff, m_ram->pointer());
+		data = m_ram->pointer()[offset];
+	}
+
+	return data;
+}
+
+void abc802_state::write(offs_t offset, uint8_t data)
+{
+	if (offset < 0x8000)
+	{
+		if (!m_lrs)
+		{
+			m_ram->pointer()[offset] = data;
+		}
+		else if (offset >= 0x7800)
+		{
+			m_char_ram[offset & (m_char_ram_size - 1)] = data;
+		}
+	}
+	else
+	{
+		m_ram->pointer()[offset] = data;
 	}
 }
 
@@ -282,7 +348,7 @@ void abc806_state::read_pal_p4(offs_t offset, bool m1l, bool xml, offs_t &m, boo
 	m = (mux ? ((map & 0x7f) << 12 | (offset & 0xfff)) : ((m_hrs & 0xf0) << 11 | (offset & 0x7fff))) & videoram_mask;
 }
 
-READ8_MEMBER( abc806_state::read )
+uint8_t abc806_state::read(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -307,13 +373,13 @@ READ8_MEMBER( abc806_state::read )
 
 	if (!vr)
 	{
-		data = charram_r(space, offset & 0x7ff);
+		data = charram_r(offset & 0x7ff);
 	}
 
 	return data;
 }
 
-READ8_MEMBER( abc806_state::m1_r )
+uint8_t abc806_state::m1_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -338,13 +404,13 @@ READ8_MEMBER( abc806_state::m1_r )
 
 	if (!vr)
 	{
-		data = charram_r(space, offset & 0x7ff);
+		data = charram_r(offset & 0x7ff);
 	}
 
 	return data;
 }
 
-WRITE8_MEMBER( abc806_state::write )
+void abc806_state::write(offs_t offset, uint8_t data)
 {
 	offs_t m = 0;
 	bool m1l = 1, xml = 1, romd = 0, ramd = 0, hre = 0, vr = 1;
@@ -362,7 +428,7 @@ WRITE8_MEMBER( abc806_state::write )
 
 	if (!vr)
 	{
-		charram_w(space, offset & 0x7ff, data);
+		charram_w(offset & 0x7ff, data);
 	}
 }
 
@@ -371,59 +437,16 @@ WRITE8_MEMBER( abc806_state::write )
 //  m1_r - opcode read
 //-------------------------------------------------
 
-READ8_MEMBER( abc800_state::m1_r )
+uint8_t abc800_state::m1_r(offs_t offset)
 {
 	if (offset >= 0x7800 && offset < 0x8000)
 	{
-		if (!m_fetch_charram)
-		{
-			m_fetch_charram = true;
-			bankswitch();
-		}
+		m_fetch_charram = true;
 
 		return m_rom->base()[offset];
 	}
 
-	if (m_fetch_charram)
-	{
-		m_fetch_charram = false;
-		bankswitch();
-	}
-
-	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
-}
-
-READ8_MEMBER( abc800c_state::m1_r )
-{
-	if (offset >= 0x7c00 && offset < 0x8000)
-	{
-		if (!m_fetch_charram)
-		{
-			m_fetch_charram = true;
-			bankswitch();
-		}
-
-		return m_rom->base()[offset];
-	}
-
-	if (m_fetch_charram)
-	{
-		m_fetch_charram = false;
-		bankswitch();
-	}
-
-	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
-}
-
-READ8_MEMBER( abc802_state::m1_r )
-{
-	if (m_lrs)
-	{
-		if (offset >= 0x7800 && offset < 0x8000)
-		{
-			return m_rom->base()[offset];
-		}
-	}
+	m_fetch_charram = false;
 
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
@@ -433,7 +456,7 @@ READ8_MEMBER( abc802_state::m1_r )
 //  mai_r - memory bank map read
 //-------------------------------------------------
 
-READ8_MEMBER( abc806_state::mai_r )
+uint8_t abc806_state::mai_r(offs_t offset)
 {
 	int bank = offset >> 12;
 
@@ -445,7 +468,7 @@ READ8_MEMBER( abc806_state::mai_r )
 //  mao_w - memory bank map write
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc806_state::mao_w )
+void abc806_state::mao_w(offs_t offset, uint8_t data)
 {
 	/*
 
@@ -486,16 +509,12 @@ void abc800_state::abc800_m1(address_map &map)
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( abc800c_mem )
+//  ADDRESS_MAP( abc800_mem )
 //-------------------------------------------------
 
-void abc800c_state::abc800c_mem(address_map &map)
+void abc800_state::abc800_mem(address_map &map)
 {
-	map.unmap_value_high();
-	map(0x0000, 0x3fff).ram().share("video_ram");
-	map(0x4000, 0x7bff).rom();
-	map(0x7c00, 0x7fff).ram().share("char_ram");
-	map(0x8000, 0xffff).ram();
+	map(0x0000, 0xffff).rw(FUNC(abc800_state::read), FUNC(abc800_state::write));
 }
 
 
@@ -534,20 +553,6 @@ void abc800_state::abc800c_io(address_map &map)
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( abc800m_mem )
-//-------------------------------------------------
-
-void abc800_state::abc800m_mem(address_map &map)
-{
-	map.unmap_value_high();
-	map(0x0000, 0x3fff).ram().share("video_ram");
-	map(0x4000, 0x77ff).rom();
-	map(0x7800, 0x7fff).ram().share("char_ram");
-	map(0x8000, 0xffff).ram();
-}
-
-
-//-------------------------------------------------
 //  ADDRESS_MAP( abc800m_io )
 //-------------------------------------------------
 
@@ -567,10 +572,7 @@ void abc800_state::abc800m_io(address_map &map)
 
 void abc802_state::abc802_mem(address_map &map)
 {
-	map.unmap_value_high();
-	map(0x0000, 0x77ff).rom();
-	map(0x7800, 0x7fff).ram().share("char_ram");
-	map(0x8000, 0xffff).ram();
+	map(0x0000, 0xffff).rw(FUNC(abc802_state::read), FUNC(abc802_state::write));
 }
 
 
@@ -800,31 +802,33 @@ WRITE_LINE_MEMBER( abc800_state::sio_rtsb_w )
 
 
 //-------------------------------------------------
+//  Z80DART abc800
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( abc800_state::keydtr_w )
+{
+	if (LOG) logerror("%s KEYDTR %u\n",machine().describe_context(),state);
+
+	m_keydtr = state;
+}
+
+
+//-------------------------------------------------
 //  Z80DART abc802
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( abc802_state::lrs_w )
 {
-	m_lrs = state;
+	if (LOG) logerror("%s LRS %u\n",machine().describe_context(),state);
 
-	bankswitch();
+	m_lrs = state;
 }
 
 WRITE_LINE_MEMBER( abc802_state::mux80_40_w )
 {
+	if (LOG) logerror("%s 80/40 MUX %u\n",machine().describe_context(),state);
+
 	m_80_40_mux = state;
-}
-
-
-//-------------------------------------------------
-//  Z80DART abc806
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( abc806_state::keydtr_w )
-{
-	if (LOG) logerror("%s KEYDTR %u\n",machine().describe_context(),state);
-
-	m_keydtr = state;
 }
 
 
@@ -862,16 +866,11 @@ void abc800_state::machine_start()
 	save_item(NAME(m_dfd_out));
 	save_item(NAME(m_dfd_in));
 	save_item(NAME(m_tape_ctr));
-	save_item(NAME(m_hrs));
-	save_item(NAME(m_fgctl));
 }
 
 void abc800_state::machine_reset()
 {
 	m_sb = m_io_sb->read();
-
-	m_fetch_charram = false;
-	bankswitch();
 
 	m_dart->ria_w(1);
 
@@ -898,9 +897,6 @@ void abc802_state::machine_start()
 	save_item(NAME(m_dfd_in));
 	save_item(NAME(m_tape_ctr));
 	save_item(NAME(m_lrs));
-	save_item(NAME(m_flshclk_ctr));
-	save_item(NAME(m_flshclk));
-	save_item(NAME(m_80_40_mux));
 }
 
 void abc802_state::machine_reset()
@@ -910,7 +906,6 @@ void abc802_state::machine_reset()
 
 	// memory banking
 	m_lrs = 1;
-	bankswitch();
 
 	// clear screen time out (S1)
 	m_sio->dcdb_w(BIT(config, 0));
@@ -934,10 +929,6 @@ void abc802_state::machine_reset()
 
 void abc806_state::machine_start()
 {
-	// allocate video RAM
-	uint32_t videoram_size = m_ram->size() - 0x8000;
-	m_video_ram.allocate(videoram_size);
-
 	// register for state saving
 	save_item(NAME(m_fetch_charram));
 	save_item(NAME(m_sb));
@@ -951,19 +942,6 @@ void abc806_state::machine_start()
 	save_item(NAME(m_keydtr));
 	save_item(NAME(m_eme));
 	save_item(NAME(m_map));
-	save_item(NAME(m_txoff));
-	save_item(NAME(m_40));
-	save_item(NAME(m_flshclk_ctr));
-	save_item(NAME(m_flshclk));
-	save_item(NAME(m_attr_data));
-	save_item(NAME(m_hrs));
-	save_item(NAME(m_hrc));
-	save_item(NAME(m_sync));
-	save_item(NAME(m_v50_addr));
-	save_item(NAME(m_hru2_a8));
-	save_item(NAME(m_vsync_shift));
-	save_item(NAME(m_vsync));
-	save_item(NAME(m_d_vsync));
 }
 
 void abc806_state::machine_reset()
@@ -981,7 +959,7 @@ void abc806_state::machine_reset()
 
 	// clear STO lines
 	for (int i = 0; i < 8; i++) {
-		sto_w(m_maincpu->space(AS_PROGRAM), 0, i);
+		sto_w(i);
 	}
 }
 
@@ -994,8 +972,8 @@ QUICKLOAD_LOAD_MEMBER(abc800_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	std::vector<uint8_t> data;
-	data.resize(quickload_size);
+	size_t quickload_size = image.length();
+	std::vector<uint8_t> data(quickload_size);
 	image.fread(&data[0], quickload_size);
 
 	uint8_t prstat = data[2];
@@ -1130,13 +1108,15 @@ void abc800c_state::abc800c(machine_config &config)
 	common(config);
 
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &abc800c_state::abc800c_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &abc800_state::abc800_mem);
 	m_maincpu->set_addrmap(AS_IO, &abc800c_state::abc800c_io);
 
 	// video hardware
 	abc800c_video(config);
 
 	// peripheral hardware
+	m_dart->out_dtrb_callback().set(FUNC(abc800_state::keydtr_w));
+
 	abc_keyboard_port_device &kb(*subdevice<abc_keyboard_port_device>(ABC_KEYBOARD_PORT_TAG));
 	kb.set_default_option("abc800");
 	kb.set_fixed(true);
@@ -1144,7 +1124,7 @@ void abc800c_state::abc800c(machine_config &config)
 	subdevice<abcbus_slot_device>(ABCBUS_TAG)->set_default_option("abc830");
 
 	// internal ram
-	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
+	RAM(config, RAM_TAG).set_default_size("32K");
 }
 
 
@@ -1157,13 +1137,15 @@ void abc800m_state::abc800m(machine_config &config)
 	common(config);
 
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &abc800m_state::abc800m_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &abc800_state::abc800_mem);
 	m_maincpu->set_addrmap(AS_IO, &abc800m_state::abc800m_io);
 
 	// video hardware
 	abc800m_video(config);
 
 	// peripheral hardware
+	m_dart->out_dtrb_callback().set(FUNC(abc800_state::keydtr_w));
+
 	abc_keyboard_port_device &kb(*subdevice<abc_keyboard_port_device>(ABC_KEYBOARD_PORT_TAG));
 	kb.set_default_option("abc800");
 	kb.set_fixed(true);
@@ -1171,7 +1153,7 @@ void abc800m_state::abc800m(machine_config &config)
 	subdevice<abcbus_slot_device>(ABCBUS_TAG)->set_default_option("abc830");
 
 	// internal ram
-	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
+	RAM(config, RAM_TAG).set_default_size("32K");
 }
 
 
@@ -1219,9 +1201,9 @@ void abc806_state::abc806(machine_config &config)
 	abc806_video(config);
 
 	// peripheral hardware
-	E0516(config, E0516_TAG, ABC806_X02);
+	m_dart->out_dtrb_callback().set(FUNC(abc800_state::keydtr_w));
 
-	m_dart->out_dtrb_callback().set(FUNC(abc806_state::keydtr_w));
+	E0516(config, E0516_TAG, ABC806_X02);
 
 	subdevice<abc_keyboard_port_device>(ABC_KEYBOARD_PORT_TAG)->set_default_option("abc77");
 
@@ -1274,13 +1256,25 @@ void abc806_state::abc806(machine_config &config)
 
 ROM_START( abc800c )
 	ROM_REGION( 0x8000, Z80_TAG, 0 )
+	ROM_DEFAULT_BIOS("6-52")
 	ROM_LOAD( "abc c-1.1m", 0x0000, 0x1000, CRC(37009d29) SHA1(a1acd817ff8c2ed93935a163c5cf3d83d8bd6fb5) )
 	ROM_LOAD( "abc 1-1.1l", 0x1000, 0x1000, CRC(ff15a28d) SHA1(bb4523ab1d190bc787f1923567b86795f66c26e2) )
 	ROM_LOAD( "abc 2-1.1k", 0x2000, 0x1000, CRC(6ff2f528) SHA1(32d1639769c4a20b7a45c44f4c6993f77397f7a1) )
 	ROM_LOAD( "abc 3-1.1j", 0x3000, 0x1000, CRC(9a43c47a) SHA1(964eb28e3d9779d1b13e0e938495133bbdb3aed3) )
 	ROM_LOAD( "abc 4-1.2m", 0x4000, 0x1000, CRC(ba18db9c) SHA1(0c4543766fe9b10bee333f3f832f6f2209e449f8) )
 	ROM_LOAD( "abc 5-1.2l", 0x5000, 0x1000, CRC(abbeb026) SHA1(44ebe417e3fa8d7878c23b56782aac8b443f1bfc) )
-	ROM_LOAD( "abc 6-1.2k", 0x6000, 0x1000, CRC(4bd5e808) SHA1(5ca0a60571de6cfa3d6d166e0cde3c78560569f3) ) // 1981-01-12
+	ROM_SYSTEM_BIOS( 0, "6-1", "ABC-DOS (1981-01-12)" )
+	ROMX_LOAD( "abc 6-1.2k", 0x6000, 0x1000, CRC(4bd5e808) SHA1(5ca0a60571de6cfa3d6d166e0cde3c78560569f3), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "6-23", "ABC-DOS (1982-03-24)" )
+	ROMX_LOAD( "abc 6-23.2k", 0x6000, 0x1000, CRC(63a5646c) SHA1(e97c94d97ea19821e4c576e9006ed1f1f5e3d7cb), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "6-13", "ABC-DOS (1982-07-19)" )
+	ROMX_LOAD( "abc 6-13.2k", 0x6000, 0x1000, CRC(6fa71fb6) SHA1(b037dfb3de7b65d244c6357cd146376d4237dab6), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 3, "6-11", "UFD-DOS v.19 (1983-05-31)" )
+	ROMX_LOAD( "abc 6-11.2k", 0x6000, 0x1000, CRC(2a45be80) SHA1(bf08a18a74e8bdaee2656a3c8246c0122398b58f), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 4, "6-52", "UFD-DOS v.20 (1984-03-02)" )
+	ROMX_LOAD( "abc 6-52.2k", 0x6000, 0x1000, CRC(c311b57a) SHA1(4bd2a541314e53955a0d53ef2f9822a202daa485), ROM_BIOS(4) )
+	ROM_LOAD_OPTIONAL( "abc 7-2.2j", 0x7000, 0x1000, CRC(fd137866) SHA1(3ac914d90db1503f61397c0ea26914eb38725044) )
+	ROM_LOAD_OPTIONAL( "abc 7-21.2j", 0x7000, 0x1000, CRC(4d2b589f) SHA1(8772119e002943d9891f77eb59d1d2491a834ccd) )
 	ROM_LOAD( "abc 7-22.2j", 0x7000, 0x1000, CRC(774511ab) SHA1(5171e43213a402c2d96dee33453c8306ac1aafc8) )
 
 	ROM_REGION( 0x20, "hru", 0 )
@@ -1297,20 +1291,51 @@ ROM_END
 
 ROM_START( abc800m )
 	ROM_REGION( 0x8000, Z80_TAG, 0 )
-	ROM_DEFAULT_BIOS("ufd20")
+	ROM_DEFAULT_BIOS("6-52")
 	ROM_LOAD( "abc m-12.1m", 0x0000, 0x1000, CRC(f85b274c) SHA1(7d0f5639a528d8d8130a22fe688d3218c77839dc) )
 	ROM_LOAD( "abc 1-12.1l", 0x1000, 0x1000, CRC(1e99fbdc) SHA1(ec6210686dd9d03a5ed8c4a4e30e25834aeef71d) )
 	ROM_LOAD( "abc 2-12.1k", 0x2000, 0x1000, CRC(ac196ba2) SHA1(64fcc0f03fbc78e4c8056e1fa22aee12b3084ef5) )
 	ROM_LOAD( "abc 3-12.1j", 0x3000, 0x1000, CRC(3ea2b5ee) SHA1(5a51ac4a34443e14112a6bae16c92b5eb636603f) )
 	ROM_LOAD( "abc 4-12.2m", 0x4000, 0x1000, CRC(695cb626) SHA1(9603ce2a7b2d7b1cbeb525f5493de7e5c1e5a803) )
 	ROM_LOAD( "abc 5-12.2l", 0x5000, 0x1000, CRC(b4b02358) SHA1(95338efa3b64b2a602a03bffc79f9df297e9534a) )
-	ROM_SYSTEM_BIOS( 0, "13", "ABC-DOS (1982-07-19)" )
-	ROMX_LOAD( "abc 6-13.2k", 0x6000, 0x1000, CRC(6fa71fb6) SHA1(b037dfb3de7b65d244c6357cd146376d4237dab6), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "ufd19", "UFD-DOS v.19 (1983-05-31)" )
-	ROMX_LOAD( "abc 6-11 ufd.2k", 0x6000, 0x1000, CRC(2a45be80) SHA1(bf08a18a74e8bdaee2656a3c8246c0122398b58f), ROM_BIOS(1) ) // is this "ABC 6-5" or "ABC 6-51" instead?
-	ROM_SYSTEM_BIOS( 2, "ufd20", "UFD-DOS v.20 (1984-03-02)" )
-	ROMX_LOAD( "abc 6-52.2k", 0x6000, 0x1000, CRC(c311b57a) SHA1(4bd2a541314e53955a0d53ef2f9822a202daa485), ROM_BIOS(2) )
-	ROM_LOAD_OPTIONAL( "abc 7-21.2j", 0x7000, 0x1000, CRC(fd137866) SHA1(3ac914d90db1503f61397c0ea26914eb38725044) )
+	ROM_SYSTEM_BIOS( 0, "6-1", "ABC-DOS (1981-01-12)" )
+	ROMX_LOAD( "abc 6-1.2k", 0x6000, 0x1000, CRC(4bd5e808) SHA1(5ca0a60571de6cfa3d6d166e0cde3c78560569f3), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "6-23", "ABC-DOS (1982-03-24)" )
+	ROMX_LOAD( "abc 6-23.2k", 0x6000, 0x1000, CRC(63a5646c) SHA1(e97c94d97ea19821e4c576e9006ed1f1f5e3d7cb), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "6-13", "ABC-DOS (1982-07-19)" )
+	ROMX_LOAD( "abc 6-13.2k", 0x6000, 0x1000, CRC(6fa71fb6) SHA1(b037dfb3de7b65d244c6357cd146376d4237dab6), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 3, "6-11", "UFD-DOS v.19 (1983-05-31)" )
+	ROMX_LOAD( "abc 6-11.2k", 0x6000, 0x1000, CRC(2a45be80) SHA1(bf08a18a74e8bdaee2656a3c8246c0122398b58f), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 4, "6-52", "UFD-DOS v.20 (1984-03-02)" )
+	ROMX_LOAD( "abc 6-52.2k", 0x6000, 0x1000, CRC(c311b57a) SHA1(4bd2a541314e53955a0d53ef2f9822a202daa485), ROM_BIOS(4) )
+	ROM_LOAD_OPTIONAL( "abc 7-2.2j", 0x7000, 0x1000, CRC(fd137866) SHA1(3ac914d90db1503f61397c0ea26914eb38725044) )
+	ROM_LOAD_OPTIONAL( "abc 7-21.2j", 0x7000, 0x1000, CRC(4d2b589f) SHA1(8772119e002943d9891f77eb59d1d2491a834ccd) )
+	ROM_LOAD( "abc 7-22.2j", 0x7000, 0x1000, CRC(774511ab) SHA1(5171e43213a402c2d96dee33453c8306ac1aafc8) )
+
+	ROM_REGION( 0x800, MC6845_TAG, 0 )
+	ROM_LOAD( "vum se.7c", 0x000, 0x800, CRC(f9152163) SHA1(997313781ddcbbb7121dbf9eb5f2c6b4551fc799) )
+
+	ROM_REGION( 0x20, "hru", 0 )
+	ROM_LOAD( "hru i.4g", 0x00, 0x20, CRC(d970a972) SHA1(c47fdd61fccc68368d42f03a01c7af90ab1fe1ab) )
+
+	ROM_REGION( 0x200, "hru2", 0 )
+	ROM_LOAD( "hru ii.3a", 0x000, 0x200, CRC(8e9d7cdc) SHA1(4ad16dc0992e31cdb2e644c7be81d334a56f7ad6) )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( dtc )
+//-------------------------------------------------
+
+ROM_START( dtc )
+	ROM_REGION( 0x8000, Z80_TAG, 0 )
+	ROM_LOAD( "abc m-12.1m", 0x0000, 0x1000, CRC(f85b274c) SHA1(7d0f5639a528d8d8130a22fe688d3218c77839dc) )
+	ROM_LOAD( "abc 1-12.1l", 0x1000, 0x1000, CRC(1e99fbdc) SHA1(ec6210686dd9d03a5ed8c4a4e30e25834aeef71d) )
+	ROM_LOAD( "abc 2-12.1k", 0x2000, 0x1000, CRC(ac196ba2) SHA1(64fcc0f03fbc78e4c8056e1fa22aee12b3084ef5) )
+	ROM_LOAD( "facit 3-13.1j", 0x3000, 0x1000, CRC(f5e4a43c) SHA1(f7c33906cd3a9b6ebfb4faa6c49e9813d610b0a1) )
+	ROM_LOAD( "abc 4-12.2m", 0x4000, 0x1000, CRC(695cb626) SHA1(9603ce2a7b2d7b1cbeb525f5493de7e5c1e5a803) )
+	ROM_LOAD( "abc 5-12.2l", 0x5000, 0x1000, CRC(b4b02358) SHA1(95338efa3b64b2a602a03bffc79f9df297e9534a) )
+	ROM_LOAD( "abc 6-52.2k", 0x6000, 0x1000, CRC(c311b57a) SHA1(4bd2a541314e53955a0d53ef2f9822a202daa485) )
 	ROM_LOAD( "abc 7-22.2j", 0x7000, 0x1000, CRC(774511ab) SHA1(5171e43213a402c2d96dee33453c8306ac1aafc8) )
 
 	ROM_REGION( 0x800, MC6845_TAG, 0 )
@@ -1342,9 +1367,9 @@ ROM_START( abc802 )
 	ROMX_LOAD( "abc 32-31.14f", 0x6000, 0x2000, CRC(fc8be7a8) SHA1(a1d4cb45cf5ae21e636dddfa70c99bfd2050ad60), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 3, "mica620", "MICA DOS v.20 (1984-03-02)" )
 	ROMX_LOAD( "mica820.14f",   0x6000, 0x2000, CRC(edf998af) SHA1(daae7e1ff6ef3e0ddb83e932f324c56f4a98f79b), ROM_BIOS(3) )
-	ROM_SYSTEM_BIOS( 4, "luxnet01", "LUXNET 01" )
+	ROM_SYSTEM_BIOS( 4, "luxnet01", "LUXNET node 1" )
 	ROMX_LOAD( "322n01.14f",   0x6000, 0x2000, CRC(0911bc92) SHA1(bf58b3be40ce07638eb265aa2dd97c5562a0c41b), ROM_BIOS(4) )
-	ROM_SYSTEM_BIOS( 5, "luxnet02", "LUXNET 02" )
+	ROM_SYSTEM_BIOS( 5, "luxnet02", "LUXNET node 2" )
 	ROMX_LOAD( "322n02.14f",   0x6000, 0x2000, CRC(2384baec) SHA1(8ae0371242c201913b2d33a75f670d2bccf29582), ROM_BIOS(5) )
 
 	ROM_REGION( 0x1000, MC6845_TAG, 0 )
@@ -1396,7 +1421,7 @@ ROM_START( abc806 )
 	ROMX_LOAD( "abc 66-31.2k", 0x6000, 0x1000, CRC(a2e38260) SHA1(0dad83088222cb076648e23f50fec2fddc968883), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "mica20", "MICA DOS v.20 (1984-04-03)" )
 	ROMX_LOAD( "mica2006.2k",  0x6000, 0x1000, CRC(58bc2aa8) SHA1(0604bd2396f7d15fcf3d65888b4b673f554037c0), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 3, "catnet", "CAT-NET" )
+	ROM_SYSTEM_BIOS( 3, "catnet", "CAT-NET CMD 8.5" )
 	ROMX_LOAD( "cmd8_5.2k",    0x6000, 0x1000, CRC(25430ef7) SHA1(03a36874c23c215a19b0be14ad2f6b3b5fb2c839), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 4, "luxnet", "LUXNET" )
 	ROMX_LOAD( "ln806.2k",    0x6000, 0x1000, CRC(034b5991) SHA1(ba7f8653f4e516687a4399abef450e361f2bfd20), ROM_BIOS(4) )
@@ -1510,5 +1535,6 @@ ROM_END
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT   CLASS          INIT        COMPANY             FULLNAME        FLAGS
 COMP( 1981, abc800c, 0,       0,      abc800c, abc800, abc800c_state, empty_init, "Luxor Datorer AB", "ABC 800 C/HR", MACHINE_SUPPORTS_SAVE )
 COMP( 1981, abc800m, abc800c, 0,      abc800m, abc800, abc800m_state, empty_init, "Luxor Datorer AB", "ABC 800 M/HR", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, abc802,  0,       0,      abc802,  abc802, abc802_state,  empty_init, "Luxor Datorer AB", "ABC 802",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, dtc,     abc800c, 0,      abc800m, abc800, abc800m_state, empty_init, "Facit",            "DTC",          MACHINE_SUPPORTS_SAVE )
+COMP( 1983, abc802,  0,       0,      abc802,  abc802, abc802_state,  empty_init, "Luxor Datorer AB", "ABC 802",      MACHINE_SUPPORTS_SAVE )
 COMP( 1983, abc806,  0,       0,      abc806,  abc806, abc806_state,  empty_init, "Luxor Datorer AB", "ABC 806",      MACHINE_SUPPORTS_SAVE )

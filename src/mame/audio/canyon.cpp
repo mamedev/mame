@@ -2,7 +2,7 @@
 // copyright-holders:Mike Balfour
 /*************************************************************************
 
-    audio\canyon.c
+    audio\canyon.cpp
 
 *************************************************************************/
 #include "emu.h"
@@ -16,13 +16,13 @@
  *
  *************************************/
 
-WRITE8_MEMBER(canyon_state::canyon_motor_w)
+void canyon_state::canyon_motor_w(offs_t offset, uint8_t data)
 {
 	m_discrete->write(NODE_RELATIVE(CANYON_MOTOR1_DATA, (offset & 0x01)), data & 0x0f);
 }
 
 
-WRITE8_MEMBER(canyon_state::canyon_explode_w)
+void canyon_state::canyon_explode_w(uint8_t data)
 {
 	m_discrete->write(CANYON_EXPLODE_DATA, data >> 4);
 }

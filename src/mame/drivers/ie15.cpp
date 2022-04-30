@@ -13,16 +13,17 @@
 
 
 #include "emu.h"
-#include "machine/ie15_kbd.h"
-#include "machine/ie15.h"
+
 #include "bus/rs232/rs232.h"
+#include "machine/ie15.h"
+#include "machine/ie15_kbd.h"
 
 
 class ie15_state : public driver_device
 {
 public:
-	ie15_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag)
+	ie15_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
 		, m_ie15(*this, "ie15")
 		, m_rs232(*this, "rs232")
 	{ }

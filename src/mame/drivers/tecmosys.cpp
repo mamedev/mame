@@ -191,18 +191,18 @@ ae500w07.ad1 - M6295 Samples (23c4001)
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "sound/262intf.h"
 #include "sound/okim6295.h"
+#include "sound/ymopl.h"
 #include "sound/ymz280b.h"
 #include "speaker.h"
 
 
-READ8_MEMBER(tecmosys_state::sound_command_pending_r)
+u8 tecmosys_state::sound_command_pending_r()
 {
 	return m_soundlatch->pending_r();
 }
 
-WRITE8_MEMBER(tecmosys_state::sound_nmi_disable_w)
+void tecmosys_state::sound_nmi_disable_w(u8 data)
 {
 	// 00 and FF are the only values written here; the latter value is set during initialization and NMI processing
 	m_soundnmi->in_w<1>(data == 0);
@@ -217,7 +217,7 @@ WRITE8_MEMBER(tecmosys_state::sound_nmi_disable_w)
     - 880000 & 03, crash
 */
 
-WRITE16_MEMBER(tecmosys_state::unk880000_w)
+void tecmosys_state::unk880000_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_880000regs[offset]);
 
@@ -244,7 +244,7 @@ WRITE16_MEMBER(tecmosys_state::unk880000_w)
 	}
 }
 
-READ16_MEMBER(tecmosys_state::unk880000_r)
+u16 tecmosys_state::unk880000_r(offs_t offset)
 {
 	//u16 ret = m_880000regs[offset];
 
@@ -262,12 +262,12 @@ READ16_MEMBER(tecmosys_state::unk880000_r)
 	}
 }
 
-READ16_MEMBER(tecmosys_state::eeprom_r)
+u16 tecmosys_state::eeprom_r()
 {
 	return ((m_eeprom->do_read() & 0x01) << 11);
 }
 
-WRITE16_MEMBER(tecmosys_state::eeprom_w)
+void tecmosys_state::eeprom_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if ( ACCESSING_BITS_8_15 )
 	{
@@ -278,14 +278,14 @@ WRITE16_MEMBER(tecmosys_state::eeprom_w)
 }
 
 template<int Layer>
-WRITE16_MEMBER(tecmosys_state::vram_w)
+void tecmosys_state::vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_vram[Layer][offset]);
 	m_tilemap[Layer]->mark_tile_dirty(offset/2);
 }
 
 template<int Layer>
-WRITE16_MEMBER(tecmosys_state::lineram_w)
+void tecmosys_state::lineram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_lineram[Layer][offset]);
 	if (data!=0x0000) popmessage("non 0 write to bg%01x lineram %04x %04x",Layer,offset,data);
@@ -332,12 +332,12 @@ void tecmosys_state::main_map(address_map &map)
 }
 
 
-WRITE8_MEMBER(tecmosys_state::z80_bank_w)
+void tecmosys_state::z80_bank_w(u8 data)
 {
 	m_audiobank->set_entry(data);
 }
 
-WRITE8_MEMBER(tecmosys_state::oki_bank_w)
+void tecmosys_state::oki_bank_w(u8 data)
 {
 	m_okibank[0]->set_entry((data & 0x03) >> 0);
 	m_okibank[1]->set_entry((data & 0x30) >> 4);
@@ -480,14 +480,14 @@ void tecmosys_state::tecmosys(machine_config &config)
 
 	ymf262_device &ymf(YMF262(config, "ymf", XTAL(14'318'181)));
 	ymf.irq_handler().set_inputline("audiocpu", 0);
-	ymf.add_route(0, "lspeaker", 1.00);
-	ymf.add_route(1, "rspeaker", 1.00);
-	ymf.add_route(2, "lspeaker", 1.00);
-	ymf.add_route(3, "rspeaker", 1.00);
+	ymf.add_route(0, "lspeaker", 0.50);
+	ymf.add_route(1, "rspeaker", 0.50);
+	ymf.add_route(2, "lspeaker", 0.50);
+	ymf.add_route(3, "rspeaker", 0.50);
 
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(16'000'000)/8, okim6295_device::PIN7_HIGH));
-	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 	oki.set_addrmap(0, &tecmosys_state::oki_map);
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(16'934'400)));
@@ -718,7 +718,7 @@ void tecmosys_state::init_tkdensha()
 	prot_init(2);
 }
 
-GAME( 1995, deroon,           0, tecmosys, tecmosys, tecmosys_state, init_deroon,     ROT0, "Tecmo", "Deroon DeroDero (earlier)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, deroon2,     deroon, tecmosys, tecmosys, tecmosys_state, init_deroon,     ROT0, "Tecmo", "Deroon DeroDero / Tecmo Stackers",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // some parts translated in English, attract without 'how to play'
-GAME( 1996, tkdensho,         0, tecmosys, tecmosys, tecmosys_state, init_tkdensho,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960614)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, deroon,    0,        tecmosys, tecmosys, tecmosys_state, init_deroon,     ROT0, "Tecmo", "Deroon DeroDero (earlier)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, deroon2,   deroon,   tecmosys, tecmosys, tecmosys_state, init_deroon,     ROT0, "Tecmo", "Deroon DeroDero / Tecmo Stackers",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // some parts translated in English, attract without 'how to play'
+GAME( 1996, tkdensho,  0,        tecmosys, tecmosys, tecmosys_state, init_tkdensho,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960614)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, tkdenshoa, tkdensho, tecmosys, tecmosys, tecmosys_state, init_tkdensha,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960427)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

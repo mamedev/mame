@@ -19,7 +19,7 @@ Notes:
   Invulnerability isn't possible in 'tnzsop' (level select is stucked to level 6-1).
 
 
-Hardware datails for the newer tnzs board (from pictures):
+Hardware details for the newer tnzs board (from pictures):
 
   Main board
   M6100409A N.ZEALAND STORY (written on label)
@@ -625,9 +625,8 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/06
 #include "includes/taitoipt.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/2203intf.h"
-#include "sound/volt_reg.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -664,7 +663,7 @@ SAMPLES_START_CB_MEMBER(kageki_state::init_samples)
 }
 
 
-READ8_MEMBER(kageki_state::csport_r)
+uint8_t kageki_state::csport_r()
 {
 	int dsw, dsw1, dsw2;
 
@@ -693,7 +692,7 @@ READ8_MEMBER(kageki_state::csport_r)
 	return (dsw & 0xff);
 }
 
-WRITE8_MEMBER(kageki_state::csport_w)
+void kageki_state::csport_w(uint8_t data)
 {
 	char mess[80];
 
@@ -704,17 +703,17 @@ WRITE8_MEMBER(kageki_state::csport_w)
 	}
 	else
 	{
-		if (data > MAX_SAMPLES)
-		{
-			// stop samples
-			m_samples->stop(0);
-			sprintf(mess, "VOICE:%02X STOP", data);
-		}
-		else
+		if (data < MAX_SAMPLES)
 		{
 			// play samples
 			m_samples->start_raw(0, m_sampledata[data].get(), m_samplesize[data], 7000);
 			sprintf(mess, "VOICE:%02X PLAY", data);
+		}
+		else
+		{
+			// stop samples
+			m_samples->stop(0);
+			sprintf(mess, "VOICE:%02X STOP", data);
 		}
 	//  popmessage(mess);
 	}
@@ -969,10 +968,10 @@ static INPUT_PORTS_START( plumppop )
 	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN2 )
 
 	PORT_START("AN1")       /* spinner 1 - read at f000/1 */
-	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_RESET
+	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
 	PORT_START("AN2")       /* spinner 2 - read at f002/3 */
-	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(2) PORT_RESET
+	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
@@ -1065,10 +1064,10 @@ static INPUT_PORTS_START( arknoid2 )
 	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701", upd4701_device, middle_w)
 
 	PORT_START("AN1")       /* spinner 1 - read at f000/1 */
-	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_RESET
+	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
 	PORT_START("AN2")       /* spinner 2 - read at f002/3 */
-	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(2) PORT_RESET
+	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( arknid2u )
@@ -1488,10 +1487,10 @@ static INPUT_PORTS_START( jpopnics )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("AN1")       /* spinner 1 - read at f000/1 */
-	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_RESET
+	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
 	PORT_START("AN2")       /* spinner 2 - read at f002/3 */
-	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(2) PORT_RESET
+	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
@@ -1545,8 +1544,9 @@ void tnzs_base_state::tnzs_base(machine_config &config)
 	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
-	SETA001_SPRITE(config, m_seta001, 0);
-	m_seta001->set_gfxdecode_tag("gfxdecode");
+	SETA001_SPRITE(config, m_seta001, 12'000'000, m_palette, gfx_tnzs);
+	m_seta001->set_fg_yoffsets( -0x12, 0x0e );
+	m_seta001->set_bg_yoffsets( 0x1, -0x1 );
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -1557,7 +1557,6 @@ void tnzs_base_state::tnzs_base(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(tnzs_base_state::screen_vblank_tnzs));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tnzs);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 512);
 
 	/* sound hardware */
@@ -1569,7 +1568,7 @@ void tnzs_mcu_state::tnzs(machine_config &config)
 	tnzs_base(config);
 	I8742(config, m_mcu, 12000000/2);  /* 400KHz ??? - Main board Crystal is 12MHz */
 	m_mcu->p1_in_cb().set(FUNC(tnzs_mcu_state::mcu_port1_r));
-	m_mcu->p2_in_cb().set(FUNC(tnzs_mcu_state::mcu_port2_r));
+	m_mcu->p2_in_cb().set_ioport("IN2");
 	m_mcu->p2_out_cb().set(FUNC(tnzs_mcu_state::mcu_port2_w));
 	m_mcu->t0_in_cb().set_ioport("COIN1");
 	m_mcu->t1_in_cb().set_ioport("COIN2");
@@ -1629,7 +1628,7 @@ void insectx_state::insectx(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &insectx_state::insectx_sub_map);
 
 	/* video hardware */
-	m_gfxdecode->set_info(gfx_insectx);
+	m_seta001->set_info(gfx_insectx);
 
 	/* sound hardware */
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/4)); /* verified on pcb */
@@ -1700,9 +1699,6 @@ void kabukiz_state::kabukiz(machine_config &config)
 	ymsnd.port_b_write_callback().set("dac", FUNC(dac_byte_interface::data_w));
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void jpopnics_state::jpopnics(machine_config &config)
@@ -2878,6 +2874,24 @@ ROM_START( insectxj )
 	ROM_LOAD( "b97__02.u2", 0x80000, 0x80000, CRC(db5a7434) SHA1(71fac872b19a13a7ad25c8ad895c322ec9573fdc) )
 ROM_END
 
+ROM_START( insectxbl )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "ic71", 0x00000, 0x20000, CRC(86ae1c66) SHA1(15a8d2fa296248346908643a5ff3a69dc2a0938a) ) // mainly copyright change
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "ic3", 0x00000, 0x10000, CRC(324b28c9) SHA1(db77a4ac60196d0f0f35dbc5c951ec29d6392463) ) // identical to the original
+
+	ROM_REGION( 0x100000, "gfx1", 0 ) // smaller ROMs, Taito and title have been blanked out
+	ROM_LOAD16_BYTE( "ic174", 0x00000, 0x20000, CRC(f5a5c8bf) SHA1(e5ecf0c43bf28fda73a85c9f0674872c1d41eac8) )
+	ROM_LOAD16_BYTE( "ic176", 0x00001, 0x20000, CRC(ef3436f4) SHA1(e143070d8ac4398af2f00e771e218b87a06b1afa) )
+	ROM_LOAD16_BYTE( "ic175", 0x40000, 0x20000, CRC(e926ec1b) SHA1(e013200ec58f8274a83c53c5d34c98c61a035803) )
+	ROM_LOAD16_BYTE( "ic177", 0x40001, 0x20000, CRC(88ead1fb) SHA1(952ef8301b13239e8f6877fa26b59caab5df81e2) )
+	ROM_LOAD16_BYTE( "ic212", 0x80000, 0x20000, CRC(54547590) SHA1(6e756bd88d89df092552b2e7f06f3dd3a077803f) )
+	ROM_LOAD16_BYTE( "ic214", 0x80001, 0x20000, CRC(da312ccd) SHA1(a8eea3730cbcd64d61ef5fcee69dd28126cf60e1) )
+	ROM_LOAD16_BYTE( "ic213", 0xc0000, 0x20000, CRC(5b6faea0) SHA1(18b3ca62153b689b5d42e91f4a56b72bb9f6f94f) )
+	ROM_LOAD16_BYTE( "ic215", 0xc0001, 0x20000, CRC(ff1dee9e) SHA1(3ef91f8188ae400880c03ba8d1fc039c8920d6c0) )
+ROM_END
+
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    CLASS,          INIT,       MONITOR,COMPANY,             FULLNAME,            FLAGS
 GAME( 1987, plumppop,  0,        plumppop, plumppop, extrmatn_state, empty_init, ROT0,   "Taito Corporation", "Plump Pop (Japan)", MACHINE_SUPPORTS_SAVE )
@@ -2918,5 +2932,6 @@ GAME( 1988, tnzsop,    tnzs,     tnzs,     tnzsop,   tnzs_state,     empty_init,
 GAME( 1988, kabukiz,   0,        kabukiz,  kabukiz,  kabukiz_state,  empty_init, ROT0,   "Kaneko / Taito Corporation Japan", "Kabuki-Z (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kabukizj,  kabukiz,  kabukiz,  kabukizj, kabukiz_state,  empty_init, ROT0,   "Kaneko / Taito Corporation",       "Kabuki-Z (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, insectx,   0,        insectx,  insectx,  insectx_state,  empty_init, ROT0,   "Taito Corporation Japan", "Insector X (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, insectxj,  insectx,  insectx,  insectxj, insectx_state,  empty_init, ROT0,   "Taito Corporation",       "Insector X (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, insectx,   0,        insectx,  insectx,  insectx_state,  empty_init, ROT0,   "Taito Corporation Japan",   "Insector X (World)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1989, insectxj,  insectx,  insectx,  insectxj, insectx_state,  empty_init, ROT0,   "Taito Corporation",         "Insector X (Japan)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1990, insectxbl, insectx,  insectx,  insectxj, insectx_state,  empty_init, ROT0,   "bootleg (Nagoya Kaihatsu)", "Insector X (bootleg)", MACHINE_SUPPORTS_SAVE )

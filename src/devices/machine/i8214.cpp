@@ -8,8 +8,10 @@
 
 #include "emu.h"
 #include "i8214.h"
+#include <iostream>
 
 //#define VERBOSE 1
+//#define LOG_OUTPUT_STREAM std::cout
 #include "logmacro.h"
 
 
@@ -40,7 +42,8 @@ void i8214_device::trigger_interrupt(int level)
 
 	// set interrupt line
 	m_write_int(ASSERT_LINE);
-	m_write_int(CLEAR_LINE);
+
+	//m_write_int(CLEAR_LINE);
 }
 
 
@@ -50,25 +53,53 @@ void i8214_device::trigger_interrupt(int level)
 
 void i8214_device::check_interrupt()
 {
-	if (m_int_dis || !m_etlg || !m_inte) return;
+	if (m_int_dis)
+	{
+		LOG("not checking interrupts because m_int_dis (%02x)\n", m_r);
+		if (m_r == 0xff)
+		{
+			m_int_dis = 0;
+			m_write_int(CLEAR_LINE);
+		}
+		return;
+	}
+	if (!m_etlg)
+	{
+		LOG("not checking interrupts because !m_etlg\n");
+		return;
+	}
+	if (!m_inte)
+	{
+		LOG("not checking interrupts because !m_inte\n");
+		return;
+	}
+
+	LOG("checking interrupts: R:%02x, sgs:%d, current:%d\n", m_r, m_sgs, m_current_status);
 
 	for (int level = 7; level >= 0; level--)
 	{
-		if (!BIT(m_r, 7 - level))
+		if (!BIT(m_r, level))
 		{
 			if (m_sgs)
 			{
 				if (level > m_current_status)
 				{
+					LOG("bit %d unset, level %d > current %d, triggering interrupt\n", 7 - level, level, m_current_status);
 					trigger_interrupt(level);
+					return;
 				}
 			}
 			else
 			{
+				LOG("bit %d unset, level %d, triggering interrupt\n", 7 - level, level);
 				trigger_interrupt(level);
+				return;
 			}
 		}
 	}
+
+	m_int_dis = 0;
+	m_write_int(CLEAR_LINE);
 }
 
 
@@ -128,7 +159,7 @@ uint8_t i8214_device::a_r()
 {
 	uint8_t a = m_a & 0x07;
 
-	LOG("I8214 A: %01x\n", a);
+	LOG("%s: a_r: %01x\n", machine().describe_context(), a);
 
 	return a;
 }
@@ -139,11 +170,31 @@ uint8_t i8214_device::a_r()
 //  8080-compatible interrupt vector
 //-------------------------------------------------
 
-READ8_MEMBER(i8214_device::vector_r)
+uint8_t i8214_device::vector_r()
 {
 	return 0xc7 | (m_a << 3);
 }
 
+
+//-------------------------------------------------
+//  b_sgs_w -
+//-------------------------------------------------
+
+void i8214_device::b_sgs_w(uint8_t data)
+{
+	m_current_status = data & 0x07;
+	m_sgs = BIT(data, 3);
+
+	LOG("%s: b_sgs_w: b:%d, sgs:%d\n", machine().describe_context(), m_current_status, m_sgs);
+
+	// enable interrupts
+	m_int_dis = 0;
+
+	// enable next level group
+	m_write_enlg(1);
+
+	check_interrupt();
+}
 
 //-------------------------------------------------
 //  b_w -
@@ -153,7 +204,7 @@ void i8214_device::b_w(uint8_t data)
 {
 	m_current_status = data & 0x07;
 
-	LOG("I8214 B: %01x\n", m_current_status);
+	LOG("%s: b_w: %d\n", machine().describe_context(), m_current_status);
 
 	// enable interrupts
 	m_int_dis = 0;
@@ -172,7 +223,7 @@ void i8214_device::b_w(uint8_t data)
 
 void i8214_device::r_w(int line, int state)
 {
-	LOG("I8214 R%d: %d\n", line, state);
+	LOG("%s: r_w: line %d, state %d\n", machine().describe_context(), line, state);
 
 	m_r &= ~(1 << line);
 	m_r |= (state << line);
@@ -181,13 +232,22 @@ void i8214_device::r_w(int line, int state)
 }
 
 
+void i8214_device::r_all_w(uint8_t state)
+{
+	LOG("%s: r_all_w: state %02x\n", machine().describe_context(), state);
+
+	m_r = state;
+
+	check_interrupt();
+}
+
 //-------------------------------------------------
 //  sgs_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( i8214_device::sgs_w )
+void i8214_device::sgs_w(int state)
 {
-	LOG("I8214 SGS: %u\n", state);
+	LOG("%s: sgs_w: %d\n", machine().describe_context(), state);
 
 	m_sgs = state;
 
@@ -199,9 +259,9 @@ WRITE_LINE_MEMBER( i8214_device::sgs_w )
 //  etlg_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( i8214_device::etlg_w )
+void i8214_device::etlg_w(int state)
 {
-	LOG("I8214 ETLG: %u\n", state);
+	LOG("%s: etlg_w: %d\n", machine().describe_context(), state);
 
 	m_etlg = state;
 
@@ -213,9 +273,9 @@ WRITE_LINE_MEMBER( i8214_device::etlg_w )
 //  inte_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( i8214_device::inte_w )
+void i8214_device::inte_w(int state)
 {
-	LOG("I8214 INTE: %u\n", state);
+	LOG("%s: inte_w: %d\n", machine().describe_context(), state);
 
 	m_inte = state;
 

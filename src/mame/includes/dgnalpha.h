@@ -44,27 +44,22 @@ public:
 		m_pia_2(*this, PIA2_TAG),
 		m_ay8912(*this, AY8912_TAG),
 		m_fdc(*this, WD2797_TAG),
-		m_floppy0(*this, WD2797_TAG ":0"),
-		m_floppy1(*this, WD2797_TAG ":1"),
-		m_floppy2(*this, WD2797_TAG ":2"),
-		m_floppy3(*this, WD2797_TAG ":3")
+		m_floppy(*this, WD2797_TAG ":%u", 0U),
+		m_nmis(*this, "nmis")
 	{
 	}
 
 	void dgnalpha(machine_config &config);
 
 private:
-	DECLARE_FLOPPY_FORMATS(dragon_formats);
-
+	static void dragon_formats(format_registration &fr);
 
 	/* pia2 */
-	DECLARE_WRITE8_MEMBER( pia2_pa_w );
-	DECLARE_WRITE_LINE_MEMBER( pia2_firq_a );
-	DECLARE_WRITE_LINE_MEMBER( pia2_firq_b );
+	void pia2_pa_w(uint8_t data);
 
 	/* psg */
-	DECLARE_READ8_MEMBER( psg_porta_read );
-	DECLARE_WRITE8_MEMBER( psg_porta_write );
+	uint8_t psg_porta_read();
+	void psg_porta_write(uint8_t data);
 
 	/* fdc */
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
@@ -74,22 +69,13 @@ private:
 	virtual void device_start(void) override;
 	virtual void device_reset(void) override;
 
-	/* interrupts */
-	virtual bool firq_get_line(void) override;
-
-	/* PIA1 */
-	virtual DECLARE_READ8_MEMBER( ff20_read ) override;
-	virtual DECLARE_WRITE8_MEMBER( ff20_write ) override;
+	void dgnalpha_io1(address_map &map);
 
 	required_device<pia6821_device> m_pia_2;
 	required_device<ay8912_device> m_ay8912;
 	required_device<wd2797_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
-
-	uint8_t m_just_reset;
+	required_device_array<floppy_connector, 4> m_floppy;
+	required_device<input_merger_device> m_nmis;
 
 	/* modem */
 	uint8_t modem_r(offs_t offset);

@@ -69,16 +69,16 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	tilemap_t *m_sc_layer[4];
+	tilemap_t *m_sc_layer[4]{};
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER(okim_rombank_w);
-	DECLARE_WRITE16_MEMBER(vram_sc0_w);
-	DECLARE_WRITE16_MEMBER(vram_sc1_w);
-	DECLARE_WRITE16_MEMBER(vram_sc2_w);
-	DECLARE_WRITE16_MEMBER(vram_sc3_w);
-	DECLARE_WRITE16_MEMBER(layer_disable_w);
+	void okim_rombank_w(uint8_t data);
+	void vram_sc0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void vram_sc1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void vram_sc2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void vram_sc3_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void layer_disable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_sc0_tileinfo);
 	TILE_GET_INFO_MEMBER(get_sc1_tileinfo);
 	TILE_GET_INFO_MEMBER(get_sc2_tileinfo);
@@ -94,7 +94,7 @@ private:
 	virtual void video_start() override;
 
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
-	uint16_t m_layer_disable;
+	uint16_t m_layer_disable = 0;
 };
 
 TILE_GET_INFO_MEMBER(seicupbl_state::get_sc0_tileinfo)
@@ -105,7 +105,7 @@ TILE_GET_INFO_MEMBER(seicupbl_state::get_sc0_tileinfo)
 	tile &= 0xfff;
 	//tile |= m_back_gfx_bank;        /* Heatbrl uses banking */
 
-	SET_TILE_INFO_MEMBER(1,tile,color,0);
+	tileinfo.set(1,tile,color,0);
 }
 
 TILE_GET_INFO_MEMBER(seicupbl_state::get_sc1_tileinfo)
@@ -118,7 +118,7 @@ TILE_GET_INFO_MEMBER(seicupbl_state::get_sc1_tileinfo)
 	tile |= 0x1000;
 	color += 0x10;
 
-	SET_TILE_INFO_MEMBER(1,tile,color,0);
+	tileinfo.set(1,tile,color,0);
 }
 
 TILE_GET_INFO_MEMBER(seicupbl_state::get_sc2_tileinfo)
@@ -128,7 +128,7 @@ TILE_GET_INFO_MEMBER(seicupbl_state::get_sc2_tileinfo)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(4,tile,color,0);
+	tileinfo.set(4,tile,color,0);
 }
 
 TILE_GET_INFO_MEMBER(seicupbl_state::get_sc3_tileinfo)
@@ -138,7 +138,7 @@ TILE_GET_INFO_MEMBER(seicupbl_state::get_sc3_tileinfo)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(0,tile,color,0);
+	tileinfo.set(0,tile,color,0);
 }
 
 void seicupbl_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
@@ -317,31 +317,31 @@ uint32_t seicupbl_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-WRITE16_MEMBER(seicupbl_state::vram_sc0_w)
+void seicupbl_state::vram_sc0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_back_data[offset]);
 	m_sc_layer[0]->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(seicupbl_state::vram_sc1_w)
+void seicupbl_state::vram_sc1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mid_data[offset]);
 	m_sc_layer[1]->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(seicupbl_state::vram_sc2_w)
+void seicupbl_state::vram_sc2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fore_data[offset]);
 	m_sc_layer[2]->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(seicupbl_state::vram_sc3_w)
+void seicupbl_state::vram_sc3_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_textram[offset]);
 	m_sc_layer[3]->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(seicupbl_state::layer_disable_w)
+void seicupbl_state::layer_disable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_layer_disable);
 }
@@ -370,7 +370,7 @@ void seicupbl_state::cupsocbl_mem(address_map &map)
 	map(0x108000, 0x11ffff).ram();
 }
 
-WRITE8_MEMBER(seicupbl_state::okim_rombank_w)
+void seicupbl_state::okim_rombank_w(uint8_t data)
 {
 //  popmessage("%08x",0x40000 * (data & 0x07));
 	m_oki->set_rom_bank(data & 0x7);
@@ -518,17 +518,6 @@ void seicupbl_state::machine_reset()
 {
 }
 
-static const gfx_layout cupsocsb_spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,1,2,3 },
-	{ 4,0,12,8,20,16,28,24, 512+4, 512+0, 512+12, 512+8, 512+20, 512+16, 512+28, 512+24 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32, 8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
-	32*32
-};
-
 static const gfx_layout cupsocsb_8x8_tilelayout =
 {
 	8,8,
@@ -557,7 +546,7 @@ static GFXDECODE_START( gfx_seicupbl_csb )
 	GFXDECODE_ENTRY( "char", 0, cupsocsb_8x8_tilelayout,    48*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, cupsocsb_tilelayout,        0*16, 32 )
 	GFXDECODE_ENTRY( "gfx4", 0, cupsocsb_tilelayout,        32*16, 16 ) /* unused */
-	GFXDECODE_ENTRY( "sprite", 0, cupsocsb_spritelayout,    0*16, 8*16 )
+	GFXDECODE_ENTRY( "sprite", 0, gfx_8x8x4_col_2x2_group_packed_lsb,    0*16, 8*16 )
 	GFXDECODE_ENTRY( "gfx5", 0, cupsocsb_tilelayout,        32*16, 16 )
 	GFXDECODE_ENTRY( "gfx6", 0, cupsocsb_tilelayout,        16*16, 16 )
 GFXDECODE_END

@@ -56,8 +56,9 @@ nscsi_toshiba_xm5701_sun_device::nscsi_toshiba_xm5701_sun_device(const machine_c
 {
 }
 
+// drive identifies as an original Apple CDSC (Sony CDU-8001 with custom firmware)
 nscsi_cdrom_apple_device::nscsi_cdrom_apple_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	nscsi_cdrom_device(mconfig, NSCSI_CDROM_APPLE, tag, owner, "Sony", "CDU-76S", "1.0", 0x00, 0x05)
+	nscsi_cdrom_device(mconfig, NSCSI_CDROM_APPLE, tag, owner, "Sony", "CD-ROM CDU-8001", "1.0", 0x00, 0x05)
 {
 }
 
@@ -105,7 +106,10 @@ int nscsi_cdrom_device::to_msf(int frame)
 void nscsi_cdrom_device::set_block_size(u32 block_size)
 {
 	if (bytes_per_sector % block_size)
-		throw emu_fatalerror("nscsi_cdrom_device(%s): block size must be a factor of sector size", tag());
+	{
+		logerror("nscsi_cdrom_device(%s): block size %d must be a factor of sector size %d", tag(), block_size, bytes_per_sector);
+		return;
+	}
 
 	bytes_per_block = block_size;
 };
@@ -119,7 +123,7 @@ uint8_t nscsi_cdrom_device::scsi_get_data(int id, int pos)
 	const int extra_pos = (lba * bytes_per_block) % bytes_per_sector;
 	if(sector != cur_sector) {
 		cur_sector = sector;
-		if(!cdrom_read_data(cdrom, sector, sector_buffer, CD_TRACK_MODE1)) {
+		if(!cdrom->read_data(sector, sector_buffer, cdrom_file::CD_TRACK_MODE1)) {
 			LOG("CD READ ERROR sector %d!\n", sector);
 			std::fill_n(sector_buffer, sizeof(sector_buffer), 0);
 		}
@@ -307,15 +311,15 @@ void nscsi_cdrom_device::scsi_command()
 	}
 
 	case SC_READ_CAPACITY: {
+		LOG("command READ CAPACITY\n");
+
 		if(!cdrom) {
 			return_no_cd();
 			break;
 		}
 
-		LOG("command READ CAPACITY\n");
-
 		// get the last used block on the disc
-		const u32 temp = cdrom_get_track_start(cdrom, 0xaa) * (bytes_per_sector / bytes_per_block) - 1;
+		const u32 temp = cdrom->get_track_start(0xaa) * (bytes_per_sector / bytes_per_block) - 1;
 
 		scsi_cmdbuf[0] = (temp>>24) & 0xff;
 		scsi_cmdbuf[1] = (temp>>16) & 0xff;
@@ -361,7 +365,7 @@ void nscsi_cdrom_device::scsi_command()
 		scsi_cmdbuf[pos++] = 0x80; // WP, cache
 
 		// get the last used block on the disc
-		const u32 temp = cdrom_get_track_start(cdrom, 0xaa) * (bytes_per_sector / bytes_per_block) - 1;
+		const u32 temp = cdrom ? cdrom->get_track_start(0xaa) * (bytes_per_sector / bytes_per_block) - 1 : 0;
 		scsi_cmdbuf[pos++] = 0x08; // Block descriptor length
 
 		scsi_cmdbuf[pos++] = 0x00; // density code
@@ -420,6 +424,21 @@ void nscsi_cdrom_device::scsi_command()
 				scsi_cmdbuf[pos++] = 0x00; // Reserved
 				break;
 
+			case 0x30: // magic Apple page
+				{
+					static const u8 apple_magic[0x17] =
+						{
+							0x00, 0x41, 0x50, 0x50, 0x4C, 0x45, 0x20, 0x43, 0x4F, 0x4D, 0x50, 0x55,
+							0x54, 0x45, 0x52, 0x2C, 0x20, 0x49, 0x4E, 0x43, 0x20, 0x20, 0x20
+						};
+
+					LOG("Apple special MODE SENSE page\n");
+					scsi_cmdbuf[pos++] = 0x30; // PS, page id
+					memcpy(&scsi_cmdbuf[pos], apple_magic, 0x17);
+					pos += 0x17;
+				}
+				break;
+
 			default:
 				if (page != 0x3f) {
 					LOG("mode sense page %02x unhandled\n", p);
@@ -442,6 +461,46 @@ void nscsi_cdrom_device::scsi_command()
 		break;
 	}
 
+	case SC_READ_DISC_INFORMATION:
+		LOG("command READ DISC INFORMATION\n");
+		if(!cdrom) {
+			return_no_cd();
+			break;
+		}
+
+		std::fill_n(scsi_cmdbuf, 34, 0);
+		scsi_cmdbuf[1] = 32;
+		scsi_cmdbuf[2] = 2; // disc is complete
+		scsi_cmdbuf[3] = 1; // first track
+		scsi_cmdbuf[4] = 1; // number of sessions (TODO: session support for CHDv6)
+		scsi_cmdbuf[5] = 1; // first track in last session
+		scsi_cmdbuf[6] = cdrom->get_last_track();   // last track in last session
+		scsi_cmdbuf[8] = 0; // CD-ROM, not XA
+
+		// lead in start time in MSF
+		{
+			u32 tstart = cdrom->get_track_start(0);
+			tstart = to_msf(tstart + 150);
+
+			scsi_cmdbuf[16] = (tstart >> 24) & 0xff;
+			scsi_cmdbuf[17] = (tstart >> 16) & 0xff;
+			scsi_cmdbuf[18] = (tstart >> 8) & 0xff;
+			scsi_cmdbuf[19] = (tstart & 0xff);
+
+			// lead-out start time in MSF
+			tstart = cdrom->get_track_start(0xaa);
+			tstart = to_msf(tstart + 150);
+
+			scsi_cmdbuf[20] = (tstart >> 24) & 0xff;
+			scsi_cmdbuf[21] = (tstart >> 16) & 0xff;
+			scsi_cmdbuf[22] = (tstart >> 8) & 0xff;
+			scsi_cmdbuf[23] = (tstart & 0xff);
+		}
+
+		scsi_data_in(0, 34);
+		scsi_status_complete(SS_GOOD);
+		break;
+
 	case SC_PREVENT_ALLOW_MEDIUM_REMOVAL:
 		// TODO: support eject prevention
 		LOG("command %s MEDIUM REMOVAL\n", (scsi_cmdbuf[4] & 0x1) ? "PREVENT" : "ALLOW");
@@ -460,7 +519,7 @@ void nscsi_cdrom_device::scsi_command()
 			"Session info",
 			"Full TOC",
 			"PMA",
-			"ATIP"
+			"ATIP",
 			"Reserved 5",
 			"Reserved 6",
 			"Reserved 7",
@@ -484,11 +543,16 @@ void nscsi_cdrom_device::scsi_command()
 
 		LOG("command READ TOC PMA ATIP, format %s msf=%d size=%d\n", format_names[format], msf, size);
 
+		if(!cdrom) {
+			return_no_cd();
+			break;
+		}
+
 		int pos = 0;
 		switch (format) {
 		case 0: {
 			int start_track = scsi_cmdbuf[6];
-			int end_track = cdrom_get_last_track(cdrom);
+			int end_track = cdrom->get_last_track();
 
 			int tracks;
 			if(start_track == 0)
@@ -507,7 +571,7 @@ void nscsi_cdrom_device::scsi_command()
 			scsi_cmdbuf[pos++] = (len>>8) & 0xff;
 			scsi_cmdbuf[pos++] = (len & 0xff);
 			scsi_cmdbuf[pos++] = 1;
-			scsi_cmdbuf[pos++] = cdrom_get_last_track(cdrom);
+			scsi_cmdbuf[pos++] = cdrom->get_last_track();
 
 			if (start_track == 0)
 				start_track = 1;
@@ -521,11 +585,11 @@ void nscsi_cdrom_device::scsi_command()
 				}
 
 				scsi_cmdbuf[pos++] = 0;
-				scsi_cmdbuf[pos++] = cdrom_get_adr_control(cdrom, cdrom_track);
+				scsi_cmdbuf[pos++] = cdrom->get_adr_control(cdrom_track);
 				scsi_cmdbuf[pos++] = track;
 				scsi_cmdbuf[pos++] = 0;
 
-				u32 tstart = cdrom_get_track_start(cdrom, cdrom_track);
+				u32 tstart = cdrom->get_track_start(cdrom_track);
 
 				if(msf)
 					tstart = to_msf(tstart+150);
@@ -547,11 +611,11 @@ void nscsi_cdrom_device::scsi_command()
 			scsi_cmdbuf[pos++] = 1;
 
 			scsi_cmdbuf[pos++] = 0;
-			scsi_cmdbuf[pos++] = cdrom_get_adr_control(cdrom, 0);
+			scsi_cmdbuf[pos++] = cdrom->get_adr_control(0);
 			scsi_cmdbuf[pos++] = 1;
 			scsi_cmdbuf[pos++] = 0;
 
-			u32 tstart = cdrom_get_track_start(cdrom, 0);
+			u32 tstart = cdrom->get_track_start(0);
 
 			if (msf)
 				tstart = to_msf(tstart+150);
@@ -604,13 +668,23 @@ enum sgi_scsi_command_e : uint8_t {
 	 * in the kernel runs, if there are SCSI problems.
 	 */
 	SGI_HD2CDROM = 0xc9,
+	/*
+	 * IRIX 5.3 sends this command when it wants to eject the drive
+	 */
+	SGI_EJECT = 0xc4,
 };
 
 void nscsi_cdrom_sgi_device::scsi_command()
 {
 	switch (scsi_cmdbuf[0]) {
 	case SGI_HD2CDROM:
-		LOG("command SGI_HD2CDROM");
+		LOG("command SGI_HD2CDROM\n");
+		// No need to do anything (yet). Just acknowledge the command.
+		scsi_status_complete(SS_GOOD);
+		break;
+
+	case SGI_EJECT:
+		LOG("command SGI_EJECT\n");
 		// No need to do anything (yet). Just acknowledge the command.
 		scsi_status_complete(SS_GOOD);
 		break;
@@ -625,6 +699,9 @@ bool nscsi_cdrom_sgi_device::scsi_command_done(uint8_t command, uint8_t length)
 {
 	switch (command) {
 	case SGI_HD2CDROM:
+		return length == 10;
+
+	case SGI_EJECT:
 		return length == 10;
 
 	default:

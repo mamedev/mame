@@ -1,9 +1,29 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="jakks_gamekey_nm" description="JAKKS Pacific 'NM' Game Keys">
 
 	<!-- This list is for the 'NM' coded Game Keys, for Namco base systems (MS Pacman) -->
 	<!-- for test mode, hold UP, press A, press DOWN -->
+
+	<!-- This was sold as a standalone key, without any bundled units to use it with -->
+
+	<software name="pacbos"> <!-- has SEEPROM -->
+		<description>Pac-Man &amp; Bosconian (01 APR 2005 A SKU G)</description>
+		<year>2005</year>
+		<publisher>JAKKS Pacific Inc / Namco / HotGen Ltd</publisher>
+		<part name="cart" interface="jakks_gamekey">
+			<feature name="slot" value="rom_24lc04"/>
+			<dataarea name="rom" size="0x800000">
+				<rom name="pacmanbosconiangk.bin" size="0x100000" crc="036a99ed" sha1="75dd2744636c1ab4825ba8c31d63658eefe62cc5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- These were both sold bundled with units -->
+
 	<software name="nrxdig"> <!-- has SEEPROM -->
 		<description>New Rally X &amp; Dig Dug (01 APR 2005 A SKU E)</description>
 		<year>2005</year>

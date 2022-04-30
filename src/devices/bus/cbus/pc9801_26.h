@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-Template for skeleton device
+    NEC PC-9801-26 sound card
 
 ***************************************************************************/
 
@@ -12,7 +12,7 @@ Template for skeleton device
 #pragma once
 
 #include "bus/cbus/pc9801_cbus.h"
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 #include "pc9801_snd.h"
 
 //**************************************************************************
@@ -27,8 +27,8 @@ public:
 	// construction/destruction
 	pc9801_26_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(opn_r);
-	DECLARE_WRITE8_MEMBER(opn_w);
+	uint8_t opn_r(offs_t offset);
+	void opn_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
@@ -39,12 +39,14 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual u16 read_io_base() override;
 
 private:
 	required_device<pc9801_slot_device> m_bus;
 	required_device<ym2203_device>  m_opn;
 
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
+	u32 m_rom_base;
 };
 
 

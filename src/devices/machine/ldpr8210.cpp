@@ -316,7 +316,7 @@ void pioneer_pr8210_device::device_reset()
 //  device
 //-------------------------------------------------
 
-void pioneer_pr8210_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pioneer_pr8210_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -374,7 +374,7 @@ void pioneer_pr8210_device::device_timer(emu_timer &timer, device_timer_id id, i
 
 		// pass everything else onto the parent
 		default:
-			laserdisc_device::device_timer(timer, id, param, ptr);
+			laserdisc_device::device_timer(timer, id, param);
 			break;
 	}
 }
@@ -484,7 +484,7 @@ void pioneer_pr8210_device::player_overlay(bitmap_yuy16 &bitmap)
 //  Pioneer PIA
 //-------------------------------------------------
 
-READ8_MEMBER( pioneer_pr8210_device::i8049_pia_r )
+uint8_t pioneer_pr8210_device::i8049_pia_r(offs_t offset)
 {
 	uint8_t result = 0xff;
 	switch (offset)
@@ -532,7 +532,7 @@ READ8_MEMBER( pioneer_pr8210_device::i8049_pia_r )
 //  Pioneer PIA
 //-------------------------------------------------
 
-WRITE8_MEMBER( pioneer_pr8210_device::i8049_pia_w )
+void pioneer_pr8210_device::i8049_pia_w(offs_t offset, uint8_t data)
 {
 	uint8_t value;
 	switch (offset)
@@ -603,7 +603,7 @@ WRITE8_MEMBER( pioneer_pr8210_device::i8049_pia_w )
 //  input, which is enabled via the PIA above
 //-------------------------------------------------
 
-READ8_MEMBER( pioneer_pr8210_device::i8049_bus_r )
+uint8_t pioneer_pr8210_device::i8049_bus_r()
 {
 	/*
 	   $80 = n/c
@@ -647,7 +647,7 @@ READ8_MEMBER( pioneer_pr8210_device::i8049_bus_r )
 //  port #1
 //-------------------------------------------------
 
-WRITE8_MEMBER( pioneer_pr8210_device::i8049_port1_w )
+void pioneer_pr8210_device::i8049_port1_w(uint8_t data)
 {
 	/*
 	   $80 = (out) SCAN C (F/R)
@@ -704,7 +704,7 @@ WRITE8_MEMBER( pioneer_pr8210_device::i8049_port1_w )
 //  port #2
 //-------------------------------------------------
 
-WRITE8_MEMBER( pioneer_pr8210_device::i8049_port2_w )
+void pioneer_pr8210_device::i8049_port2_w(uint8_t data)
 {
 	/*
 	   $80 = (out) /CS on PIA
@@ -738,7 +738,7 @@ WRITE8_MEMBER( pioneer_pr8210_device::i8049_port2_w )
 //  T0 input (connected to VSYNC)
 //-------------------------------------------------
 
-READ_LINE_MEMBER( pioneer_pr8210_device::i8049_t0_r )
+int pioneer_pr8210_device::i8049_t0_r()
 {
 	// returns VSYNC state
 	return !m_vsync;
@@ -750,7 +750,7 @@ READ_LINE_MEMBER( pioneer_pr8210_device::i8049_t0_r )
 //  T1 input (pulled high)
 //-------------------------------------------------
 
-READ_LINE_MEMBER( pioneer_pr8210_device::i8049_t1_r )
+int pioneer_pr8210_device::i8049_t1_r()
 {
 	return 1;
 }
@@ -784,12 +784,12 @@ void pioneer_pr8210_device::overlay_draw_group(bitmap_yuy16 &bitmap, const uint8
 
 void pioneer_pr8210_device::overlay_erase(bitmap_yuy16 &bitmap, float xstart, float xend)
 {
-	uint32_t xmin = (uint32_t)(xstart * 256.0f * float(bitmap.width()));
-	uint32_t xmax = (uint32_t)(xend * 256.0f * float(bitmap.width()));
+	uint32_t xmin = uint32_t(xstart * 256.0f * float(bitmap.width()));
+	uint32_t xmax = uint32_t(xend * 256.0f * float(bitmap.width()));
 
 	for (uint32_t y = OVERLAY_Y; y < (OVERLAY_Y + (OVERLAY_Y_PIXELS + 2) * OVERLAY_PIXEL_HEIGHT); y++)
 	{
-		uint16_t *dest = &bitmap.pix16(y, xmin >> 8);
+		uint16_t *dest = &bitmap.pix(y, xmin >> 8);
 		uint16_t ymax = *dest >> 8;
 		uint16_t ymin = ymax * 3 / 8;
 		uint16_t yres = ymin + ((ymax - ymin) * (xmin & 0xff)) / 256;
@@ -819,8 +819,8 @@ void pioneer_pr8210_device::overlay_erase(bitmap_yuy16 &bitmap, float xstart, fl
 
 void pioneer_pr8210_device::overlay_draw_char(bitmap_yuy16 &bitmap, uint8_t ch, float xstart)
 {
-	uint32_t xminbase = (uint32_t)(xstart * 256.0f * float(bitmap.width()));
-	uint32_t xsize = (uint32_t)(OVERLAY_PIXEL_WIDTH * 256.0f * float(bitmap.width()));
+	uint32_t xminbase = uint32_t(xstart * 256.0f * float(bitmap.width()));
+	uint32_t xsize = uint32_t(OVERLAY_PIXEL_WIDTH * 256.0f * float(bitmap.width()));
 
 	// iterate over pixels
 	const uint8_t *chdataptr = &text_bitmap[ch & 0x3f][0];
@@ -835,7 +835,7 @@ void pioneer_pr8210_device::overlay_draw_char(bitmap_yuy16 &bitmap, uint8_t ch, 
 				uint32_t xmax = xmin + xsize;
 				for (uint32_t yy = 0; yy < OVERLAY_PIXEL_HEIGHT; yy++)
 				{
-					uint16_t *dest = &bitmap.pix16(OVERLAY_Y + (y + 1) * OVERLAY_PIXEL_HEIGHT + yy, xmin >> 8);
+					uint16_t *dest = &bitmap.pix(OVERLAY_Y + (y + 1) * OVERLAY_PIXEL_HEIGHT + yy, xmin >> 8);
 					uint16_t ymax = 0xff;
 					uint16_t ymin = *dest >> 8;
 					uint16_t yres = ymin + ((ymax - ymin) * (~xmin & 0xff)) / 256;
@@ -986,7 +986,7 @@ void simutrek_special_device::device_reset()
 //  device
 //-------------------------------------------------
 
-void simutrek_special_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void simutrek_special_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -1003,7 +1003,7 @@ void simutrek_special_device::device_timer(emu_timer &timer, device_timer_id id,
 
 		// pass everything else onto the parent
 		default:
-			pioneer_pr8210_device::device_timer(timer, id, param, ptr);
+			pioneer_pr8210_device::device_timer(timer, id, param);
 			break;
 	}
 }
@@ -1041,7 +1041,7 @@ void simutrek_special_device::device_add_mconfig(machine_config &config)
 //  port #2
 //-------------------------------------------------
 
-READ8_MEMBER( simutrek_special_device::i8748_port2_r )
+uint8_t simutrek_special_device::i8748_port2_r()
 {
 	// bit $80 is the pr8210 video squelch
 	return (m_i8049_port1 & 0x20) ? 0x00 : 0x80;
@@ -1053,7 +1053,7 @@ READ8_MEMBER( simutrek_special_device::i8748_port2_r )
 //  port #2
 //-------------------------------------------------
 
-WRITE8_MEMBER( simutrek_special_device::i8748_port2_w )
+void simutrek_special_device::i8748_port2_w(uint8_t data)
 {
 	// update stat
 	uint8_t prev = m_i8748_port2;
@@ -1088,7 +1088,7 @@ WRITE8_MEMBER( simutrek_special_device::i8748_port2_w )
 //  i8748_data_r - handle external 8748 data reads
 //-------------------------------------------------
 
-READ8_MEMBER( simutrek_special_device::i8748_data_r )
+uint8_t simutrek_special_device::i8748_data_r()
 {
 	// acknowledge the read and clear the data ready flag
 	m_data_ready = false;
@@ -1101,7 +1101,7 @@ READ8_MEMBER( simutrek_special_device::i8748_data_r )
 //  T0 input
 //-------------------------------------------------
 
-READ_LINE_MEMBER( simutrek_special_device::i8748_t0_r )
+int simutrek_special_device::i8748_t0_r()
 {
 	// return 1 if data is waiting from main CPU
 	return m_data_ready;

@@ -1,0 +1,180 @@
+TITLE     PAL22V10 Combinatorial Test
+PATTERN   A
+REVISION  1.0
+AUTHOR    MAMEDev
+COMPANY   MAMEDev
+DATE      3/24/2020
+
+CHIP PAL22V10Test1 PAL22V10
+
+;---------------------------------- PIN Declarations ---------------
+PIN  1          I1                   COMBINATORIAL               ;
+PIN  2          I2                   COMBINATORIAL               ;
+PIN  3          I3                   COMBINATORIAL               ;
+PIN  4          I4                   COMBINATORIAL               ;
+PIN  5          I5                   COMBINATORIAL               ;
+PIN  6          I6                   COMBINATORIAL               ;
+PIN  7          I7                   COMBINATORIAL               ;
+PIN  8          I8                   COMBINATORIAL               ;
+PIN  9          I9                   COMBINATORIAL               ;
+PIN  10         I10                  COMBINATORIAL               ;
+PIN  11         I11                  COMBINATORIAL               ;
+PIN  12         GND                                              ;
+PIN  13         I13                  COMBINATORIAL               ;
+PIN  14         O14                  COMBINATORIAL               ;
+PIN  15         O15                  COMBINATORIAL               ;
+PIN  16         O16                  COMBINATORIAL               ;
+PIN  17         O17                  COMBINATORIAL               ;
+PIN  18         O18                  COMBINATORIAL               ;
+PIN  19         O19                  COMBINATORIAL               ;
+PIN  20         O20                  COMBINATORIAL               ;
+PIN  21         O21                  COMBINATORIAL               ;
+PIN  22         O22                  COMBINATORIAL               ;
+PIN  23         O23                  COMBINATORIAL               ;
+PIN  24         VCC                                              ;
+
+EQUATIONS
+
+O14 = /I9 +
+      /I8 +
+      /I7 +
+      /I6 +
+      /I5 +
+      /I4 +
+      /I3 +
+      /I2
+O14.TRST = VCC
+
+/O15 = I3 +
+       I7 * I8 +
+       I9 * I10 +
+       I11 * I13 +
+       I8 +
+       I4 * I6 +
+       I2 * I5 +
+       /I13 +
+       /I11 +
+       /I10
+O15.TRST = VCC
+
+/O16 = /I4 * /I5 * /I6 +
+       I2 * I3 * I11 * I13 +
+       I2 * I3 +
+       /I2 * I3 * /I4 +
+       /I3 * /I4 * /I13 +
+       /I5 * /I11 * /I13 +
+       I11 * I13 +
+       I9 * I10 +
+       I7 * I8 +
+       I5 * I6 +
+       I3 * I4 +
+       I1 * I2
+O16.TRST = O14
+
+O17 = /I6 * /I7 * /I8 * /I9 * /I10 +
+      /I1 * /I2 * /I3 * /I4 * /I5 +
+      I1 +
+      I2 +
+      I3 +
+      I4 +
+      I5 +
+      I6 +
+      I7 +
+      I8 +
+      I9 +
+      I10 +
+      I11 +
+      I13
+O17.TRST = /O15
+
+O18 = /I7 * /I8 +
+      I1 * I2 * /I5 * /I6 +
+      I13 * /O20 +
+      /I9 * /I10 * /I11 +
+      /I5 * /I6 * O20 +
+      O17 * /O20 +
+      I1 * I3 * /O17 +
+      I9 * I11 +
+      /I7 * /I9 * /I13 +
+      I5 * I6 * /I10 +
+      /I3 * I4 +
+      /I3 * /O17 +
+      I1 * I2 * I4 +
+      /I3 * /I4 * O17 +
+      /I1 * /I2 * O17 +
+      /O17
+O18.TRST = /I11 * /I13
+
+/O19 = I4 +
+       I3 +
+       I2 +
+       /I13 +
+       /I11 +
+       /I10 +
+       /I9 +
+       /I8 +
+       /I7 +
+       /I6 +
+       /I5 +
+       /I4 +
+       /I3 +
+       /I2 +
+       /O14 +
+       I1 * O14
+O19.TRST = VCC
+
+/O20 = /I8 +
+       /I9 +
+       /I10 +
+       /I11 +
+       /I13 +
+       I13 +
+       I11 +
+       I10 +
+       I9 +
+       I8 +
+       I7 +
+       I6 +
+       I5 +
+       I1 * /I2
+O20.TRST = I3 * /I9 * /I10 * I11
+
+/O21 = I5 * /I6 +
+       I4 * /I5 +
+       I3 * /I4 +
+       I2 * /I3 +
+       /I11 * /I13 +
+       /I9 * /I10 +
+       /I7 * /I8 +
+       /I5 * /I6 +
+       /I3 * /I4 +
+       /I2 * /I3 +
+       /O17 * /O23 +
+       I1 * I10
+O21.TRST = VCC
+
+/O22 = I9 * I10 * I11 * I13 +
+       I5 * I6 * I7 * I8 +
+       I1 * I2 * I3 * I4 +
+       I11 * /I13 +
+       I10 * /I11 +
+       I9 * /I10 +
+       I8 * /I9 +
+       I7 * /I8 +
+       I6 * /I7 +
+       O23
+O22.TRST = /I13
+
+O23 = /I1 * /I2 * /I3 * /I4 * /I5 * /I6 * /I7 * /I8 * /I9 * /I10 * /I11 * /I13 +
+      /I1 * I2 * /I3 * I4 * /I5 * I6 * /I7 * I8 * /I9 * I10 * /I11 * I13 +
+      I1 * /I2 * I3 * /I4 * I5 * /I6 * I7 * /I8 * I9 * /I10 * I11 * /I13 +
+      /I1 * /I13 +
+      /I1 * /I2 * /I3 * /I4 * /I5 * /I6 * /I7 * /I8 * /I9 * /I10 * /I11 * /I13 +
+      /I3 * I4 +
+      I1 * I2 * I3 * I4 * I5 * I6 * I7 * I8 * I9 * I10 * I11 * I13 +
+      I3 * /I4
+O23.TRST = /O15 * O21
+
+SIMULATION
+
+

@@ -136,6 +136,11 @@
 #define VBEND               (0)
 #define VBSTART             (224)
 
+// Unsure whether this should be 2 or 3. It depends on how many rising clock
+// edges MEMRQ is held for, plus 1 additional cycle. Going to 3 creates
+// noticeable slowdowns in Space Fury.
+static constexpr int WAIT_STATES = 2;
+
 
 
 /*************************************
@@ -169,7 +174,7 @@ void segag80r_state::machine_start()
  *
  *************************************/
 
-READ8_MEMBER(segag80r_state::g80r_opcode_r)
+uint8_t segag80r_state::g80r_opcode_r(offs_t offset)
 {
 	// opcodes themselves are not scrambled
 	uint8_t op = m_maincpu->space(AS_PROGRAM).read_byte(offset);
@@ -181,7 +186,7 @@ READ8_MEMBER(segag80r_state::g80r_opcode_r)
 	return op;
 }
 
-offs_t segag80r_state::decrypt_offset(address_space &space, offs_t offset)
+offs_t segag80r_state::decrypt_offset(offs_t offset)
 {
 	if (m_scrambled_write_pc == 0xffff)
 		return offset;
@@ -193,16 +198,16 @@ offs_t segag80r_state::decrypt_offset(address_space &space, offs_t offset)
 	return (offset & 0xff00) | (*m_decrypt)(pc, offset & 0xff);
 }
 
-WRITE8_MEMBER(segag80r_state::mainram_w)
+void segag80r_state::mainram_w(offs_t offset, uint8_t data)
 {
-	m_mainram[decrypt_offset(space, offset)] = data;
+	m_mainram[decrypt_offset(offset)] = data;
 }
 
-WRITE8_MEMBER(segag80r_state::vidram_w){ segag80r_videoram_w(space, decrypt_offset(space, offset), data); }
-WRITE8_MEMBER(segag80r_state::monsterb_vidram_w){ monsterb_videoram_w(space, decrypt_offset(space, offset), data); }
-WRITE8_MEMBER(segag80r_state::pignewt_vidram_w){ pignewt_videoram_w(space, decrypt_offset(space, offset), data); }
-WRITE8_MEMBER(segag80r_state::sindbadm_vidram_w){ sindbadm_videoram_w(space, decrypt_offset(space, offset), data); }
-WRITE8_MEMBER(segag80r_state::usb_ram_w){ m_usbsnd->ram_w(space, decrypt_offset(m_maincpu->space(AS_PROGRAM), offset), data); }
+void segag80r_state::vidram_w(offs_t offset, uint8_t data){ segag80r_videoram_w(decrypt_offset(offset), data); }
+void segag80r_state::monsterb_vidram_w(offs_t offset, uint8_t data){ monsterb_videoram_w(decrypt_offset(offset), data); }
+void segag80r_state::pignewt_vidram_w(offs_t offset, uint8_t data){ pignewt_videoram_w(decrypt_offset(offset), data); }
+void segag80r_state::sindbadm_vidram_w(offs_t offset, uint8_t data){ sindbadm_videoram_w(decrypt_offset(offset), data); }
+void segag80r_state::usb_ram_w(offs_t offset, uint8_t data){ m_usbsnd->ram_w(decrypt_offset(offset), data); }
 
 
 
@@ -221,7 +226,7 @@ inline uint8_t segag80r_state::demangle(uint8_t d7d6, uint8_t d5d4, uint8_t d3d2
 }
 
 
-READ8_MEMBER(segag80r_state::mangled_ports_r)
+uint8_t segag80r_state::mangled_ports_r(offs_t offset)
 {
 	/* The input ports are odd. Neighboring lines are read via a mux chip  */
 	/* one bit at a time. This means that one bank of DIP switches will be */
@@ -237,7 +242,7 @@ READ8_MEMBER(segag80r_state::mangled_ports_r)
 }
 
 
-READ8_MEMBER(segag80r_state::spaceod_mangled_ports_r)
+uint8_t segag80r_state::spaceod_mangled_ports_r(offs_t offset)
 {
 	/* Space Odyssey has different (and conflicting) wiring for upright */
 	/* versus cocktail cabinets; we fix this here. The input ports are */
@@ -265,7 +270,7 @@ READ8_MEMBER(segag80r_state::spaceod_mangled_ports_r)
 }
 
 
-READ8_MEMBER(segag80r_state::spaceod_port_fc_r)
+uint8_t segag80r_state::spaceod_port_fc_r()
 {
 	uint8_t upright = ioport("D3D2")->read() & 0x04;
 	uint8_t fc = ioport("FC")->read();
@@ -282,7 +287,7 @@ READ8_MEMBER(segag80r_state::spaceod_port_fc_r)
 }
 
 
-WRITE8_MEMBER(segag80r_state::coin_count_w)
+void segag80r_state::coin_count_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, (data >> 7) & 1);
 	machine().bookkeeping().coin_counter_w(1, (data >> 6) & 1);
@@ -297,7 +302,7 @@ WRITE8_MEMBER(segag80r_state::coin_count_w)
  *
  *************************************/
 
-WRITE8_MEMBER(segag80r_state::sindbadm_misc_w)
+void segag80r_state::sindbadm_misc_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x02);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
@@ -306,11 +311,11 @@ WRITE8_MEMBER(segag80r_state::sindbadm_misc_w)
 
 
 /* the data lines are flipped */
-WRITE8_MEMBER(segag80r_state::sindbadm_sn1_SN76496_w)
+void segag80r_state::sindbadm_sn1_SN76496_w(uint8_t data)
 {
 	m_sn1->write(bitswap<8>(data, 0,1,2,3,4,5,6,7));
 }
-WRITE8_MEMBER(segag80r_state::sindbadm_sn2_SN76496_w)
+void segag80r_state::sindbadm_sn2_SN76496_w(uint8_t data)
 {
 	m_sn2->write(bitswap<8>(data, 0,1,2,3,4,5,6,7));
 }
@@ -856,8 +861,8 @@ void segag80r_state::astrob(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	/* sound boards */
-	astrob_sound_board(config);
-	sega_speech_board(config);
+	ASTRO_BLASTER_AUDIO(config, m_g80_audio, 0).add_route(ALL_OUTPUTS, "speech", 1.0);
+	SEGA_SPEECH_BOARD(config, "speech", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 
@@ -1007,19 +1012,21 @@ ROM_START( astrob )
 	ROM_LOAD( "924a.prom-u18",  0x9000, 0x0800, CRC(120a39c7) SHA1(d8fdf97290725cf9ebddab9eeb34d7adba097394) )
 	ROM_LOAD( "925a.prom-u19",  0x9800, 0x0800, CRC(790a7f4e) SHA1(16b7b8e864a8f5f59da6bf2ad17f1e4791f34abe) )
 
-	ROM_REGION( 0x0800, "audiocpu", 0 )
+	ROM_REGION( 0x0800, "speech:cpu", 0 )
 	ROM_LOAD( "808b.speech-u7", 0x0000, 0x0800, CRC(5988c767) SHA1(3b91a8cd46aa7e714028cc40f700fea32287afb1) )
 
-	ROM_REGION( 0x4000, SEGASND_SEGASPEECH_REGION, 0 )
+	ROM_REGION( 0x0020, "speech:proms", 0 )
+	ROM_LOAD( "pr84.speech-u30",     0x0000, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* 7051, speech board addressing */
+
+	ROM_REGION( 0x4000, "speech:data", 0 )
 	ROM_LOAD( "809a.speech-u6", 0x0000, 0x0800, CRC(893f228d) SHA1(41c08210d322105f5446cfaa1258c194dd078a34) )
 	ROM_LOAD( "810.speech-u5",  0x0800, 0x0800, CRC(ff0163c5) SHA1(158a12f9bf01d25c7e98f34fce56df51d49e5a85) )
 	ROM_LOAD( "811.speech-u4",  0x1000, 0x0800, CRC(219f3978) SHA1(728edb9251f7cde237fa3b005971366a099c6342) )
 	ROM_LOAD( "812a.speech-u3", 0x1800, 0x0800, CRC(410ad0d2) SHA1(9b5f05bb64a6ecfe3543025a10c6ec67de797333) )
 
-	ROM_REGION( 0x0440, "proms", 0 ) // not dumped for this set, but believed identical
+	ROM_REGION( 0x0420, "proms", 0 ) // not dumped for this set, but believed identical
 	ROM_LOAD( "316-0806.video1-u52", 0x0000, 0x0020, CRC(358128b6) SHA1(b6b4b9ecfdcc69b45e69e7a8614153d83be4c62b) ) /* 6331 */
 	ROM_LOAD( "316-0764.cpu-u15",    0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) /* 6331, CPU board addressing */
-	ROM_LOAD( "pr84.speech-u30",     0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* 7051, speech board addressing */
 ROM_END
 
 ROM_START( astrob2 )
@@ -1045,19 +1052,21 @@ ROM_START( astrob2 )
 	ROM_LOAD( "905.prom-u18",   0x9000, 0x0800, CRC(4f08f9f4) SHA1(755a825b18ed50caa7bf274a0a5c3a1b00b1c070) )
 	ROM_LOAD( "906.prom-u19",   0x9800, 0x0800, CRC(58149df1) SHA1(2bba56576a225ca47ce31a5b6dcc491546dfffec) )
 
-	ROM_REGION( 0x0800, "audiocpu", 0 )
+	ROM_REGION( 0x0800, "speech:cpu", 0 )
 	ROM_LOAD( "808b.speech-u7", 0x0000, 0x0800, CRC(5988c767) SHA1(3b91a8cd46aa7e714028cc40f700fea32287afb1) )
 
-	ROM_REGION( 0x4000, SEGASND_SEGASPEECH_REGION, 0 )
+	ROM_REGION( 0x0020, "speech:proms", 0 )
+	ROM_LOAD( "pr84.speech-u30",     0x0000, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* 7051, speech board addressing */
+
+	ROM_REGION( 0x4000, "speech:data", 0 )
 	ROM_LOAD( "809a.speech-u6", 0x0000, 0x0800, CRC(893f228d) SHA1(41c08210d322105f5446cfaa1258c194dd078a34) )
 	ROM_LOAD( "810.speech-u5",  0x0800, 0x0800, CRC(ff0163c5) SHA1(158a12f9bf01d25c7e98f34fce56df51d49e5a85) )
 	ROM_LOAD( "811.speech-u4",  0x1000, 0x0800, CRC(219f3978) SHA1(728edb9251f7cde237fa3b005971366a099c6342) )
 	ROM_LOAD( "812a.speech-u3", 0x1800, 0x0800, CRC(410ad0d2) SHA1(9b5f05bb64a6ecfe3543025a10c6ec67de797333) )
 
-	ROM_REGION( 0x0440, "proms", 0 ) // not dumped for this set, but believed identical
+	ROM_REGION( 0x0420, "proms", 0 ) // not dumped for this set, but believed identical
 	ROM_LOAD( "316-0806.video1-u52", 0x0000, 0x0020, CRC(358128b6) SHA1(b6b4b9ecfdcc69b45e69e7a8614153d83be4c62b) ) /* 6331 */
 	ROM_LOAD( "316-0764.cpu-u15",    0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) /* 6331, CPU board addressing */
-	ROM_LOAD( "pr84.speech-u30",     0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* 7051, speech board addressing */
 ROM_END
 
 ROM_START( astrob2a )
@@ -1083,19 +1092,21 @@ ROM_START( astrob2a )
 	ROM_LOAD( "905.prom-u18",   0x9000, 0x0800, CRC(4f08f9f4) SHA1(755a825b18ed50caa7bf274a0a5c3a1b00b1c070) )
 	ROM_LOAD( "906.prom-u19",   0x9800, 0x0800, CRC(58149df1) SHA1(2bba56576a225ca47ce31a5b6dcc491546dfffec) )
 
-	ROM_REGION( 0x0800, "audiocpu", 0 )
+	ROM_REGION( 0x0800, "speech:cpu", 0 )
 	ROM_LOAD( "808b.speech-u7", 0x0000, 0x0800, CRC(5988c767) SHA1(3b91a8cd46aa7e714028cc40f700fea32287afb1) )
 
-	ROM_REGION( 0x4000, SEGASND_SEGASPEECH_REGION, 0 )
+	ROM_REGION( 0x0020, "speech:proms", 0 )
+	ROM_LOAD( "pr84.speech-u30",     0x0000, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* 7051, speech board addressing */
+
+	ROM_REGION( 0x4000, "speech:data", 0 )
 	ROM_LOAD( "809a.speech-u6", 0x0000, 0x0800, CRC(893f228d) SHA1(41c08210d322105f5446cfaa1258c194dd078a34) )
 	ROM_LOAD( "810.speech-u5",  0x0800, 0x0800, CRC(ff0163c5) SHA1(158a12f9bf01d25c7e98f34fce56df51d49e5a85) )
 	ROM_LOAD( "811.speech-u4",  0x1000, 0x0800, CRC(219f3978) SHA1(728edb9251f7cde237fa3b005971366a099c6342) )
 	ROM_LOAD( "812a.speech-u3", 0x1800, 0x0800, CRC(410ad0d2) SHA1(9b5f05bb64a6ecfe3543025a10c6ec67de797333) )
 
-	ROM_REGION( 0x0440, "proms", 0 )
+	ROM_REGION( 0x0420, "proms", 0 )
 	ROM_LOAD( "316-0806.video1-u52", 0x0000, 0x0020, CRC(358128b6) SHA1(b6b4b9ecfdcc69b45e69e7a8614153d83be4c62b) ) /* 6331 */
 	ROM_LOAD( "316-0764.cpu-u15",    0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) /* 6331, CPU board addressing */
-	ROM_LOAD( "pr84.speech-u30",     0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* 7051, speech board addressing */
 ROM_END
 
 ROM_START( astrob2b ) // This was dumped from 2 different PCB sets, with matching reads. Only different ROM from astrob2a is 829d.
@@ -1121,19 +1132,21 @@ ROM_START( astrob2b ) // This was dumped from 2 different PCB sets, with matchin
 	ROM_LOAD( "905.prom-u18",   0x9000, 0x0800, CRC(4f08f9f4) SHA1(755a825b18ed50caa7bf274a0a5c3a1b00b1c070) )
 	ROM_LOAD( "906.prom-u19",   0x9800, 0x0800, CRC(58149df1) SHA1(2bba56576a225ca47ce31a5b6dcc491546dfffec) )
 
-	ROM_REGION( 0x0800, "audiocpu", 0 )
+	ROM_REGION( 0x0800, "speech:cpu", 0 )
 	ROM_LOAD( "808b.speech-u7", 0x0000, 0x0800, CRC(5988c767) SHA1(3b91a8cd46aa7e714028cc40f700fea32287afb1) )
 
-	ROM_REGION( 0x4000, SEGASND_SEGASPEECH_REGION, 0 )
+	ROM_REGION( 0x0020, "speech:proms", 0 )
+	ROM_LOAD( "pr84.speech-u30",     0x0000, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* 7051, speech board addressing */
+
+	ROM_REGION( 0x4000, "speech:data", 0 )
 	ROM_LOAD( "809a.speech-u6", 0x0000, 0x0800, CRC(893f228d) SHA1(41c08210d322105f5446cfaa1258c194dd078a34) )
 	ROM_LOAD( "810.speech-u5",  0x0800, 0x0800, CRC(ff0163c5) SHA1(158a12f9bf01d25c7e98f34fce56df51d49e5a85) )
 	ROM_LOAD( "811.speech-u4",  0x1000, 0x0800, CRC(219f3978) SHA1(728edb9251f7cde237fa3b005971366a099c6342) )
 	ROM_LOAD( "812a.speech-u3", 0x1800, 0x0800, CRC(410ad0d2) SHA1(9b5f05bb64a6ecfe3543025a10c6ec67de797333) )
 
-	ROM_REGION( 0x0440, "proms", 0 )
+	ROM_REGION( 0x0420, "proms", 0 )
 	ROM_LOAD( "316-0806.video1-u52", 0x0000, 0x0020, CRC(358128b6) SHA1(b6b4b9ecfdcc69b45e69e7a8614153d83be4c62b) ) /* 6331 */
 	ROM_LOAD( "316-0764.cpu-u15",    0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) /* 6331, CPU board addressing */
-	ROM_LOAD( "pr84.speech-u30",     0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* 7051, speech board addressing */
 ROM_END
 
 ROM_START( astrob1 )
@@ -1156,19 +1169,21 @@ ROM_START( astrob1 )
 	ROM_LOAD( "851.prom-u15",   0x7800, 0x0800, CRC(3d4cf9f0) SHA1(11e996f33f3a104e50d0a54a0814ea3e07735683) )
 	ROM_LOAD( "852.prom-u16",   0x8000, 0x0800, CRC(af88a97e) SHA1(fe7993101c629b296b5da05519b0990cc2b78286) )
 
-	ROM_REGION( 0x0800, "audiocpu", 0 )
+	ROM_REGION( 0x0800, "speech:cpu", 0 )
 	ROM_LOAD( "808b.speech-u7", 0x0000, 0x0800, CRC(5988c767) SHA1(3b91a8cd46aa7e714028cc40f700fea32287afb1) )
 
-	ROM_REGION( 0x4000, SEGASND_SEGASPEECH_REGION, 0 )
+	ROM_REGION( 0x0020, "speech:proms", 0 )
+	ROM_LOAD( "pr84.speech-u30",     0x0000, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* 7051, speech board addressing */
+
+	ROM_REGION( 0x4000, "speech:data", 0 )
 	ROM_LOAD( "809a.speech-u6", 0x0000, 0x0800, CRC(893f228d) SHA1(41c08210d322105f5446cfaa1258c194dd078a34) )
 	ROM_LOAD( "810.speech-u5",  0x0800, 0x0800, CRC(ff0163c5) SHA1(158a12f9bf01d25c7e98f34fce56df51d49e5a85) )
 	ROM_LOAD( "811.speech-u4",  0x1000, 0x0800, CRC(219f3978) SHA1(728edb9251f7cde237fa3b005971366a099c6342) )
 	ROM_LOAD( "812a.speech-u3", 0x1800, 0x0800, CRC(410ad0d2) SHA1(9b5f05bb64a6ecfe3543025a10c6ec67de797333) )
 
-	ROM_REGION( 0x0440, "proms", 0 ) // not dumped for this set, but believed identical
+	ROM_REGION( 0x0420, "proms", 0 ) // not dumped for this set, but believed identical
 	ROM_LOAD( "316-0806.video1-u52", 0x0000, 0x0020, CRC(358128b6) SHA1(b6b4b9ecfdcc69b45e69e7a8614153d83be4c62b) ) /* 6331 */
 	ROM_LOAD( "316-0764.cpu-u15",    0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) /* 6331, CPU board addressing */
-	ROM_LOAD( "pr84.speech-u30",     0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* 7051, speech board addressing */
 ROM_END
 
 ROM_START( astrobg )
@@ -1191,19 +1206,21 @@ ROM_START( astrobg )
 	ROM_LOAD( "835.u15",    0x7800, 0x0800, CRC(6eeeb409) SHA1(1caf9b7ac08a4adcbf8c17f9e4b398373db706e1) )
 	ROM_LOAD( "836.u16",    0x8000, 0x0800, CRC(07ffe6dc) SHA1(70673e8266139034afa64bf980b1b9ddbf294e0f) )
 
-	ROM_REGION( 0x0800, "audiocpu", 0 )
+	ROM_REGION( 0x0800, "speech:cpu", 0 )
 	ROM_LOAD( "808b_speech_de.u07", 0x0000, 0x0800, CRC(5988c767) SHA1(3b91a8cd46aa7e714028cc40f700fea32287afb1) )
 
-	ROM_REGION( 0x4000, SEGASND_SEGASPEECH_REGION, 0 )
+	ROM_REGION( 0x0020, "speech:proms", 0 )
+	ROM_LOAD( "pr84.speech-u30",     0x0000, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* 7051, speech board addressing */
+
+	ROM_REGION( 0x4000, "speech:data", 0 )
 	ROM_LOAD( "830_speech_de.u06", 0x0000, 0x0800, CRC(2d840552) SHA1(7a2a7b54378b6cc85b8ab5c26e42266aa747c635) )
 	ROM_LOAD( "831_speech_de.u05", 0x0800, 0x0800, CRC(46b30ee4) SHA1(c9e19a9b9ebc9b3b853e79f93ad74e4ec5dfd1ae) )
 	ROM_LOAD( "832_speech_de.u04", 0x1000, 0x0800, CRC(d05280b8) SHA1(8d30b23b83b32465a8a2decd2ce9bfed24394e7e) )
 	ROM_LOAD( "833_speech_de.u03", 0x1800, 0x0800, CRC(08f11459) SHA1(da6dc2bf30b95882f95c21739ec02fc89d286a66) )
 
-	ROM_REGION( 0x0440, "proms", 0 ) // not dumped for this set, but believed identical
+	ROM_REGION( 0x0420, "proms", 0 ) // not dumped for this set, but believed identical
 	ROM_LOAD( "316-0806.video1-u52", 0x0000, 0x0020, CRC(358128b6) SHA1(b6b4b9ecfdcc69b45e69e7a8614153d83be4c62b) ) /* 6331 */
 	ROM_LOAD( "316-0764.cpu-u15",    0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) /* 6331, CPU board addressing */
-	ROM_LOAD( "pr84.speech-u30",     0x0420, 0x0020, CRC(adcb81d0) SHA1(74b0efc7e8362b0c98e54a6107981cff656d87e1) ) /* 7051, speech board addressing */
 ROM_END
 
 ROM_START( 005 )
@@ -1526,8 +1543,36 @@ void segag80r_state::monsterb_expand_gfx(const char *region)
  *
  *************************************/
 
+void segag80r_state::init_waitstates()
+{
+	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
+	address_space &opspace = m_maincpu->space(AS_OPCODES);
+
+	pgmspace.install_read_tap(0x0000, 0xffff, "program_waitstate_r",[this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+			m_maincpu->adjust_icount(-WAIT_STATES);
+		return data;
+	});
+	pgmspace.install_write_tap(0x0000, 0xffff, "program_waitstate_w",[this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+			m_maincpu->adjust_icount(-WAIT_STATES);
+		return data;
+	});
+
+	opspace.install_read_tap(0x0000, 0xffff, "opcodes_waitstate_r",[this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+			m_maincpu->adjust_icount(-WAIT_STATES);
+		return data;
+	});
+}
+
 void segag80r_state::init_astrob()
 {
+	init_waitstates();
+
 	address_space &iospace = m_maincpu->space(AS_IO);
 
 	/* configure the 315-0062 security chip */
@@ -1537,19 +1582,18 @@ void segag80r_state::init_astrob()
 	m_background_pcb = G80_BACKGROUND_NONE;
 
 	/* install speech board */
-	iospace.install_write_handler(0x38, 0x38, write8_delegate(*m_speech, FUNC(speech_sound_device::data_w)));
-	iospace.install_write_handler(0x3b, 0x3b, write8_delegate(*m_speech, FUNC(speech_sound_device::control_w)));
+	iospace.install_write_handler(0x38, 0x38, write8smo_delegate(*m_speech, FUNC(sega_speech_device::data_w)));
+	iospace.install_write_handler(0x3b, 0x3b, write8smo_delegate(*m_speech, FUNC(sega_speech_device::control_w)));
 
 	/* install Astro Blaster sound board */
-	iospace.install_write_handler(0x3e, 0x3f, write8_delegate(*this, FUNC(segag80r_state::astrob_sound_w)));
-
-	save_item(NAME(m_sound_state));
-	save_item(NAME(m_sound_rate));
+	iospace.install_write_handler(0x3e, 0x3f, write8sm_delegate(*m_g80_audio, FUNC(astrob_audio_device::write)));
 }
 
 
 void segag80r_state::init_005()
 {
+	init_waitstates();
+
 	/* configure the 315-0070 security chip */
 	m_decrypt = segag80_security(70);
 
@@ -1566,6 +1610,8 @@ void segag80r_state::init_005()
 
 void segag80r_state::init_spaceod()
 {
+	init_waitstates();
+
 	address_space &iospace = m_maincpu->space(AS_IO);
 
 	/* configure the 315-0063 security chip */
@@ -1575,14 +1621,14 @@ void segag80r_state::init_spaceod()
 	m_background_pcb = G80_BACKGROUND_SPACEOD;
 
 	/* configure ports for the background board */
-	iospace.install_readwrite_handler(0x08, 0x0f, read8_delegate(*this, FUNC(segag80r_state::spaceod_back_port_r)), write8_delegate(*this, FUNC(segag80r_state::spaceod_back_port_w)));
+	iospace.install_readwrite_handler(0x08, 0x0f, read8sm_delegate(*this, FUNC(segag80r_state::spaceod_back_port_r)), write8sm_delegate(*this, FUNC(segag80r_state::spaceod_back_port_w)));
 
 	/* install Space Odyssey sound board */
-	iospace.install_write_handler(0x0e, 0x0f, write8_delegate(*this, FUNC(segag80r_state::spaceod_sound_w)));
+	iospace.install_write_handler(0x0e, 0x0f, write8sm_delegate(*this, FUNC(segag80r_state::spaceod_sound_w)));
 
 	/* install our wacky mangled ports */
-	iospace.install_read_handler(0xf8, 0xfb, read8_delegate(*this, FUNC(segag80r_state::spaceod_mangled_ports_r)));
-	iospace.install_read_handler(0xfc, 0xfc, read8_delegate(*this, FUNC(segag80r_state::spaceod_port_fc_r)));
+	iospace.install_read_handler(0xf8, 0xfb, read8sm_delegate(*this, FUNC(segag80r_state::spaceod_mangled_ports_r)));
+	iospace.install_read_handler(0xfc, 0xfc, read8smo_delegate(*this, FUNC(segag80r_state::spaceod_port_fc_r)));
 
 	save_item(NAME(m_sound_state));
 }
@@ -1590,6 +1636,8 @@ void segag80r_state::init_spaceod()
 
 void segag80r_state::init_monsterb()
 {
+	init_waitstates();
+
 	address_space &iospace = m_maincpu->space(AS_IO);
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 
@@ -1601,8 +1649,8 @@ void segag80r_state::init_monsterb()
 	monsterb_expand_gfx("gfx1");
 
 	/* install background board handlers */
-	iospace.install_write_handler(0xb8, 0xbd, write8_delegate(*this, FUNC(segag80r_state::monsterb_back_port_w)));
-	pgmspace.install_write_handler(0xe000, 0xffff, write8_delegate(*this, FUNC(segag80r_state::monsterb_vidram_w)));
+	iospace.install_write_handler(0xb8, 0xbd, write8sm_delegate(*this, FUNC(segag80r_state::monsterb_back_port_w)));
+	pgmspace.install_write_handler(0xe000, 0xffff, write8sm_delegate(*this, FUNC(segag80r_state::monsterb_vidram_w)));
 
 	save_item(NAME(m_sound_state));
 	save_item(NAME(m_sound_addr));
@@ -1611,6 +1659,8 @@ void segag80r_state::init_monsterb()
 
 void segag80r_state::init_monster2()
 {
+	init_waitstates();
+
 	address_space &iospace = m_maincpu->space(AS_IO);
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 
@@ -1622,9 +1672,9 @@ void segag80r_state::init_monster2()
 	monsterb_expand_gfx("gfx1");
 
 	/* install background board handlers */
-	iospace.install_write_handler(0xb4, 0xb5, write8_delegate(*this, FUNC(segag80r_state::pignewt_back_color_w)));
-	iospace.install_write_handler(0xb8, 0xbd, write8_delegate(*this, FUNC(segag80r_state::pignewt_back_port_w)));
-	pgmspace.install_write_handler(0xe000, 0xffff, write8_delegate(*this, FUNC(segag80r_state::pignewt_vidram_w)));
+	iospace.install_write_handler(0xb4, 0xb5, write8sm_delegate(*this, FUNC(segag80r_state::pignewt_back_color_w)));
+	iospace.install_write_handler(0xb8, 0xbd, write8sm_delegate(*this, FUNC(segag80r_state::pignewt_back_port_w)));
+	pgmspace.install_write_handler(0xe000, 0xffff, write8sm_delegate(*this, FUNC(segag80r_state::pignewt_vidram_w)));
 
 	save_item(NAME(m_sound_state));
 	save_item(NAME(m_sound_addr));
@@ -1633,6 +1683,8 @@ void segag80r_state::init_monster2()
 
 void segag80r_state::init_pignewt()
 {
+	init_waitstates();
+
 	address_space &iospace = m_maincpu->space(AS_IO);
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 
@@ -1644,19 +1696,21 @@ void segag80r_state::init_pignewt()
 	monsterb_expand_gfx("gfx1");
 
 	/* install background board handlers */
-	iospace.install_write_handler(0xb4, 0xb5, write8_delegate(*this, FUNC(segag80r_state::pignewt_back_color_w)));
-	iospace.install_write_handler(0xb8, 0xbd, write8_delegate(*this, FUNC(segag80r_state::pignewt_back_port_w)));
-	pgmspace.install_write_handler(0xe000, 0xffff, write8_delegate(*this, FUNC(segag80r_state::pignewt_vidram_w)));
+	iospace.install_write_handler(0xb4, 0xb5, write8sm_delegate(*this, FUNC(segag80r_state::pignewt_back_color_w)));
+	iospace.install_write_handler(0xb8, 0xbd, write8sm_delegate(*this, FUNC(segag80r_state::pignewt_back_port_w)));
+	pgmspace.install_write_handler(0xe000, 0xffff, write8sm_delegate(*this, FUNC(segag80r_state::pignewt_vidram_w)));
 
 	/* install Universal sound board */
-	iospace.install_readwrite_handler(0x3f, 0x3f, read8_delegate(*m_usbsnd, FUNC(usb_sound_device::status_r)), write8_delegate(*m_usbsnd, FUNC(usb_sound_device::data_w)));
-	pgmspace.install_read_handler(0xd000, 0xdfff, read8_delegate(*m_usbsnd, FUNC(usb_sound_device::ram_r)));
-	pgmspace.install_write_handler(0xd000, 0xdfff, write8_delegate(*this, FUNC(segag80r_state::usb_ram_w)));
+	iospace.install_readwrite_handler(0x3f, 0x3f, read8smo_delegate(*m_usbsnd, FUNC(usb_sound_device::status_r)), write8smo_delegate(*m_usbsnd, FUNC(usb_sound_device::data_w)));
+	pgmspace.install_read_handler(0xd000, 0xdfff, read8sm_delegate(*m_usbsnd, FUNC(usb_sound_device::ram_r)));
+	pgmspace.install_write_handler(0xd000, 0xdfff, write8sm_delegate(*this, FUNC(segag80r_state::usb_ram_w)));
 }
 
 
 void segag80r_state::init_sindbadm()
 {
+	init_waitstates();
+
 	address_space &iospace = m_maincpu->space(AS_IO);
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 
@@ -1667,8 +1721,8 @@ void segag80r_state::init_sindbadm()
 	m_background_pcb = G80_BACKGROUND_SINDBADM;
 
 	/* install background board handlers */
-	iospace.install_write_handler(0x40, 0x41, write8_delegate(*this, FUNC(segag80r_state::sindbadm_back_port_w)));
-	pgmspace.install_write_handler(0xe000, 0xffff, write8_delegate(*this, FUNC(segag80r_state::sindbadm_vidram_w)));
+	iospace.install_write_handler(0x40, 0x41, write8sm_delegate(*this, FUNC(segag80r_state::sindbadm_back_port_w)));
+	pgmspace.install_write_handler(0xe000, 0xffff, write8sm_delegate(*this, FUNC(segag80r_state::sindbadm_vidram_w)));
 }
 
 
@@ -1681,12 +1735,12 @@ void segag80r_state::init_sindbadm()
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    CLASS,          INIT,          MONITOR,COMPANY,FULLNAME,FLAGS
 /* basic G-80 system with: CPU board, PROM board, Video I board, custom sound boards */
-GAME( 1981, astrob,    0,        astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 3)", MACHINE_IMPERFECT_SOUND )
-GAME( 1981, astrob2,   astrob,   astrob,   astrob2,  segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 2)", MACHINE_IMPERFECT_SOUND )
-GAME( 1981, astrob2a,  astrob,   astrob,   astrob2,  segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 2a)", MACHINE_IMPERFECT_SOUND )
-GAME( 1981, astrob2b,  astrob,   astrob,   astrob2,  segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 2b)", MACHINE_IMPERFECT_SOUND )
-GAME( 1981, astrob1,   astrob,   astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 1)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // instant death if you start game with 1 credit, protection?, bad dump?
-GAME( 1981, astrobg,   astrob,   astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (German)", MACHINE_IMPERFECT_SOUND )
+GAME( 1981, astrob,    0,        astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 3)", 0 )
+GAME( 1981, astrob2,   astrob,   astrob,   astrob2,  segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 2)", 0 )
+GAME( 1981, astrob2a,  astrob,   astrob,   astrob2,  segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 2a)", 0 )
+GAME( 1981, astrob2b,  astrob,   astrob,   astrob2,  segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 2b)", 0 )
+GAME( 1981, astrob1,   astrob,   astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (version 1)", 0 | MACHINE_NOT_WORKING ) // instant death if you start game with 1 credit, protection?, bad dump?
+GAME( 1981, astrobg,   astrob,   astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (German)", 0 )
 GAME( 1981, 005,       0,        sega005,  005,      segag80r_state, init_005,      ROT270, "Sega", "005", MACHINE_IMPERFECT_SOUND )
 
 

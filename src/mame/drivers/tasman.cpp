@@ -33,6 +33,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 #define CUSTOM_DRAW 1
 
 class kongambl_state : public driver_device
@@ -57,6 +59,10 @@ public:
 
 	void init_kingtut();
 
+protected:
+	virtual void machine_reset() override { m_irq_mask = 0; };
+	virtual void video_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<k053252_device> m_k053252;
@@ -70,16 +76,14 @@ private:
 	required_device<palette_device> m_palette;
 
 	optional_shared_ptr<uint32_t> m_vram;
-	DECLARE_READ32_MEMBER(eeprom_r);
-	DECLARE_WRITE8_MEMBER(eeprom_w);
-	DECLARE_WRITE8_MEMBER(kongambl_ff_w);
-	DECLARE_READ32_MEMBER(test_r);
-	// DECLARE_READ32_MEMBER(rng_r);
+	uint32_t eeprom_r(offs_t offset, uint32_t mem_mask = ~0);
+	void eeprom_w(offs_t offset, uint8_t data);
+	void kongambl_ff_w(uint8_t data);
+	uint32_t test_r();
+	// uint32_t rng_r();
 
-	DECLARE_VIDEO_START(kongambl);
-	uint8_t m_irq_mask;
+	uint8_t m_irq_mask = 0;
 
-	virtual void machine_reset() override { m_irq_mask = 0; };
 	uint32_t screen_update_kongambl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	WRITE_LINE_MEMBER(vblank_irq_ack_w);
 	WRITE_LINE_MEMBER(hblank_irq_ack_w);
@@ -92,7 +96,7 @@ private:
 };
 
 
-VIDEO_START_MEMBER(kongambl_state,kongambl)
+void kongambl_state::video_start()
 {
 	#if CUSTOM_DRAW
 
@@ -154,7 +158,7 @@ uint32_t kongambl_state::screen_update_kongambl(screen_device &screen, bitmap_in
 	return 0;
 }
 
-READ32_MEMBER(kongambl_state::eeprom_r)
+uint32_t kongambl_state::eeprom_r(offs_t offset, uint32_t mem_mask)
 {
 	//return machine().rand();
 	uint32_t retval = 0;
@@ -176,7 +180,7 @@ READ32_MEMBER(kongambl_state::eeprom_r)
 
 	return retval;
 }
-WRITE8_MEMBER(kongambl_state::eeprom_w)
+void kongambl_state::eeprom_w(offs_t offset, uint8_t data)
 {
 	// offset == 3 seems mux writes (active low)
 
@@ -193,19 +197,19 @@ WRITE8_MEMBER(kongambl_state::eeprom_w)
 		m_irq_mask = data;
 }
 
-READ32_MEMBER(kongambl_state::test_r)
+uint32_t kongambl_state::test_r()
 {
 	return -1;//machine().rand();
 }
 
 /*
- READ32_MEMBER(kongambl_state::rng_r)
+ uint32_t kongambl_state::rng_r()
 {
     return machine().rand();
 }
 */
 
-WRITE8_MEMBER(kongambl_state::kongambl_ff_w)
+void kongambl_state::kongambl_ff_w(uint8_t data)
 {
 	/* enables thru 0->1 */
 	/* ---- x--- (related to OBJ ROM) */
@@ -669,8 +673,6 @@ void kongambl_state::kongambl(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 32768);
 
-	MCFG_VIDEO_START_OVERRIDE(kongambl_state,kongambl)
-
 	K055555(config, m_k055555, 0);
 
 	K055673(config, m_k055673, 0);
@@ -818,6 +820,60 @@ ROM_START( vikingt )
 ROM_END
 
 
+
+ROM_START( thequest ) // all SUMs on labels match but for ROM position 17 which has SUM 3949 on label but dump has 5dcb. However it passes the boot checks.
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD32_WORD_SWAP( "qstn2a20.l.2", 0x00002, 0x080000, CRC(2ae75e07) SHA1(5137ecde0fba3011854a34642b6f7dc8a2464612) ) // 1st and 2nd half identical, but SUM matches and passes boot check
+	ROM_LOAD32_WORD_SWAP( "qstn2a20.h.1", 0x00000, 0x080000, CRC(03121033) SHA1(fe8ad20a35eb604c8a4c280e66d8d77b3539c7a7) ) // 1st and 2nd half identical, but SUM matches and passes boot check
+
+	ROM_REGION( 0x80000, "sndcpu", 0 ) // BADADDR       --xxxxxxxxxxxxxxx, but SUM matches and passes boot check
+	ROM_LOAD16_WORD_SWAP( "n12prog.ifu.41", 0x0000, 0x020000, CRC(adac17b1) SHA1(8e92dfd112f15ee0dbca215e265f479fb19d4be4) ) // same as dragsphr, horses4c, ivorytsk, vikingt
+
+	ROM_REGION( 0x100000, "k056832", 0 ) // 8x8x8 tiles
+	ROM_LOAD16_BYTE( "qst11_l1.vrm.21", 0x00000, 0x080000, CRC(bc336662) SHA1(145fc5725bbdce1f25f276221edf52324684876c) )
+	ROM_LOAD16_BYTE( "qst11_h1.vrm.23", 0x00001, 0x080000, CRC(cca0bb57) SHA1(291fd4bb87ca3417da2dd5eb987f836420d75683) )
+
+	ROM_REGION( 0x200000, "k055673", 0 ) // 16x16x8 sprites
+	ROM_LOAD64_WORD( "qst11ll1.obj.17", 0x000000, 0x080000, CRC(bc2b43be) SHA1(dfa48d42d3d80849d6c3dad8e153fee650a32b1a) )
+	ROM_LOAD64_WORD( "qst11lm1.obj.15", 0x000002, 0x080000, CRC(0e036d7b) SHA1(c39ae7180d7e5562cb0305ce551425dbabd42429) )
+	ROM_LOAD64_WORD( "qst11hm1.obj.13", 0x000004, 0x080000, CRC(3e3a490c) SHA1(1f3c25bbca0d0ae1f7ce8c47d3f75e311fc68e22) )
+	ROM_LOAD64_WORD( "qst11hh1.obj.11", 0x000006, 0x080000, CRC(d9fab8e3) SHA1(8912278c3fb38cdb7b9f3d1ee57cd890dca23d9a) )
+
+	ROM_REGION( 0x100000, "snd", 0 )
+	ROM_LOAD( "snd11sd1.snd.31", 0x000000, 0x80000, CRC(cce53e79) SHA1(970507fcef309c6c81f7e1a8e90afa64f3f6e2ae) ) // same as dragsphr, horses4c, ivorytsk, moneybnk
+	ROM_LOAD( "qst11sd2.snd.32", 0x080000, 0x80000, CRC(f4dd8f52) SHA1(1bf3358fcbe2b30064be0d232d57dde19792199f) )
+ROM_END
+
+
+
+ROM_START( horses4c ) // no labels available
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD32_WORD_SWAP( "l.2", 0x00002, 0x080000, CRC(b0db53e7) SHA1(54b262fc963140325283b22ba35b7966ea8c3677) ) // 1st and 2nd half identical, but passes boot check
+	ROM_LOAD32_WORD_SWAP( "h.1", 0x00000, 0x080000, CRC(deade3a1) SHA1(bdf4a1259528f0afa70b543fea432975985bae6e) ) // 1st and 2nd half identical, but passes boot check
+
+	ROM_REGION( 0x80000, "sndcpu", 0 ) // BADADDR       --xxxxxxxxxxxxxxx, but passes boot check
+	ROM_LOAD16_WORD_SWAP( "n12prog.ifu.41", 0x0000, 0x020000, CRC(adac17b1) SHA1(8e92dfd112f15ee0dbca215e265f479fb19d4be4) ) // same as dragsphr, horses4c, ivorytsk, vikingt
+
+	ROM_REGION( 0x100000, "k056832", 0 ) // 8x8x8 tiles
+	ROM_LOAD16_BYTE( "vrm.21", 0x00000, 0x080000, CRC(8e3acb65) SHA1(d7e90f1d4653a1590dc283f7012a7aa4d3e6e07f) )
+	ROM_LOAD16_BYTE( "vrm.23", 0x00001, 0x080000, CRC(05c1845c) SHA1(1a3036e9cb961fdd771782c83c1ed5fab5857b6c) )
+
+	ROM_REGION( 0x400000, "k055673", 0 ) // 16x16x8 sprites
+	ROM_LOAD64_WORD( "obj.17", 0x000000, 0x080000, CRC(2c8a45e8) SHA1(dc6bb416da67abdc0d0b24ea548207fc53fb4d54) )
+	ROM_LOAD64_WORD( "obj.15", 0x000002, 0x080000, CRC(a99c7a48) SHA1(298f67d5ceedf03152ebb92ae88d44792a9e7fcc) )
+	ROM_LOAD64_WORD( "obj.13", 0x000004, 0x080000, CRC(ca11684d) SHA1(7c93118fcc7e44a7d927f12c0b04f6d169fe8f86) )
+	ROM_LOAD64_WORD( "obj.11", 0x000006, 0x080000, CRC(97356ece) SHA1(ad45e6a8aae9683e06421e8a6bf076008abca86a) )
+	ROM_LOAD64_WORD( "obj.18", 0x200000, 0x080000, CRC(b0717c2e) SHA1(5e49969b86e2a0784ac3e71d8bc62e5d9536f79b) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF, but passes boot check
+	ROM_LOAD64_WORD( "obj.16", 0x200002, 0x080000, CRC(e3536f44) SHA1(da676c5d3753b49c5827dca05450b6e067081148) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF, but passes boot check
+	ROM_LOAD64_WORD( "obj.14", 0x200004, 0x080000, CRC(993e09ed) SHA1(40d38444e5896814df2096ead9507bdfe9961ca6) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF, but passes boot check
+	ROM_LOAD64_WORD( "obj.12", 0x200006, 0x080000, CRC(dbb7e613) SHA1(5ae0b0a756b997318c7fc60a161ce2c55ef04a4f) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF, but passes boot check
+
+	ROM_REGION( 0x100000, "snd", 0 )
+	ROM_LOAD( "snd11sd1.snd.31", 0x000000, 0x80000, CRC(cce53e79) SHA1(970507fcef309c6c81f7e1a8e90afa64f3f6e2ae) ) // same as dragsphr, horses4c, ivorytsk, moneybnk
+	ROM_LOAD( "sd2.snd.32",      0x080000, 0x80000, CRC(bacb43cb) SHA1(04519a811d3d997bd126be6a5eba375c7b285df0) )
+ROM_END
+
+
 void kongambl_state::init_kingtut()
 {
 	//uint32_t *rom = (uint32_t*)memregion("maincpu")->base();
@@ -828,8 +884,13 @@ void kongambl_state::init_kingtut()
 	//rom[0x55e40/4] = (rom[0x55e40/4] & 0xffff0000) | 0x4e71; // goes away from the POST
 }
 
+} // Anonymous namespace
+
+
 GAME( 199?, kingtut,    0,        kongambl,    kongambl, kongambl_state, init_kingtut, ROT0,  "Konami", "King Tut (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 199?, moneybnk,   0,        kongambl,    kongambl, kongambl_state, empty_init,   ROT0,  "Konami", "Money In The Bank (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 199?, dragsphr,   0,        kongambl,    kongambl, kongambl_state, empty_init,   ROT0,  "Konami", "Dragon Sphere", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 199?, ivorytsk,   0,        kongambl,    kongambl, kongambl_state, empty_init,   ROT0,  "Konami", "Ivory Tusk", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 199?, vikingt,    0,        kongambl,    kongambl, kongambl_state, empty_init,   ROT0,  "Konami", "Viking Treasure", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1997, thequest,   0,        kongambl,    kongambl, kongambl_state, empty_init,   ROT0,  "Konami", "The Quest (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2000, horses4c,   0,        kongambl,    kongambl, kongambl_state, empty_init,   ROT0,  "Konami", "Horses For Courses (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

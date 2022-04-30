@@ -187,17 +187,17 @@ Demo tape contents:
 
 /* Read/Write Handlers */
 
-WRITE8_MEMBER( tmc1800_state::keylatch_w )
+void tmc1800_state::keylatch_w(uint8_t data)
 {
 	m_keylatch = data;
 }
 
-WRITE8_MEMBER( osc1000b_state::keylatch_w )
+void osc1000b_state::keylatch_w(uint8_t data)
 {
 	m_keylatch = data;
 }
 
-WRITE8_MEMBER( tmc2000_state::keylatch_w )
+void tmc2000_state::keylatch_w(uint8_t data)
 {
 	/*
 
@@ -217,7 +217,7 @@ WRITE8_MEMBER( tmc2000_state::keylatch_w )
 	m_keylatch = data & 0x3f;
 }
 
-WRITE8_MEMBER( nano_state::keylatch_w )
+void nano_state::keylatch_w(uint8_t data)
 {
 	/*
 
@@ -280,16 +280,16 @@ void tmc2000_state::bankswitch()
 	}
 }
 
-WRITE8_MEMBER( tmc2000_state::bankswitch_w )
+void tmc2000_state::bankswitch_w(uint8_t data)
 {
 	m_roc = 0;
 	m_rac = BIT(data, 0);
 	bankswitch();
 
-	m_cti->tone_latch_w(space, 0, data);
+	m_cti->tone_latch_w(data);
 }
 
-WRITE8_MEMBER( nano_state::bankswitch_w )
+void nano_state::bankswitch_w(uint8_t data)
 {
 	/* enable RAM */
 	address_space &program = m_maincpu->space(AS_PROGRAM);
@@ -297,10 +297,10 @@ WRITE8_MEMBER( nano_state::bankswitch_w )
 	program.install_ram(0x0000, 0x0fff, 0x7000, ram);
 
 	/* write to CDP1864 tone latch */
-	m_cti->tone_latch_w(space, 0, data);
+	m_cti->tone_latch_w(data);
 }
 
-READ8_MEMBER( tmc1800_state::dispon_r )
+uint8_t tmc1800_state::dispon_r()
 {
 	m_vdc->disp_on_w(1);
 	m_vdc->disp_on_w(0);
@@ -308,7 +308,7 @@ READ8_MEMBER( tmc1800_state::dispon_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( tmc1800_state::dispoff_w )
+void tmc1800_state::dispoff_w(uint8_t data)
 {
 	m_vdc->disp_off_w(1);
 	m_vdc->disp_off_w(0);
@@ -624,12 +624,12 @@ WRITE_LINE_MEMBER( tmc2000_state::q_w )
 	m_cassette->output(state ? 1.0 : -1.0);
 }
 
-WRITE8_MEMBER( tmc2000_state::dma_w )
+void tmc2000_state::dma_w(offs_t offset, uint8_t data)
 {
 	m_color = ~(m_colorram[offset & 0x1ff]) & 0x07;
 
 	m_cti->con_w(0); // HACK
-	m_cti->dma_w(space, offset, data);
+	m_cti->dma_w(data);
 }
 
 // OSCOM Nano
@@ -703,8 +703,6 @@ void tmc2000_state::machine_start()
 {
 	m_led.resolve();
 
-	m_colorram.allocate(TMC2000_COLORRAM_SIZE);
-
 	// randomize color RAM contents
 	for (uint16_t addr = 0; addr < TMC2000_COLORRAM_SIZE; addr++)
 	{
@@ -730,7 +728,7 @@ void tmc2000_state::machine_reset()
 
 // OSCOM Nano
 
-void nano_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nano_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -801,6 +799,12 @@ void tmc1800_state::tmc1800(machine_config &config)
 
 	// devices
 	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(tmc1800_base_state::quickload_cb));
+	// The following can be enabled when the missing bios rom is found
+	//quickload_image_device &quickload(QUICKLOAD(config, "quickload", "bin,c8", attotime::from_seconds(2)));
+	//quickload.set_load_callback(FUNC(tmc1800_base_state_state::quickload_cb));
+	//quickload.set_interface("chip8quik");
+	//SOFTWARE_LIST(config, "quik_list").set_original("chip8_quik").set_filter("T"); // filter unknown until it can be tested
+
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
@@ -923,7 +927,7 @@ ROM_END
 
 /* Driver Initialization */
 
-void tmc1800_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tmc1800_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

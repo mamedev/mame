@@ -51,7 +51,7 @@ TILE_GET_INFO_MEMBER(marineb_state::get_tile_info)
 	uint8_t code = m_videoram[tile_index];
 	uint8_t col = m_colorram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 					code | ((col & 0xc0) << 2),
 					(col & 0x0f) | (m_palette_bank << 4),
 					TILE_FLIPXY((col >> 4) & 0x03));
@@ -84,27 +84,27 @@ void marineb_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(marineb_state::marineb_videoram_w)
+void marineb_state::marineb_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(marineb_state::marineb_colorram_w)
+void marineb_state::marineb_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(marineb_state::marineb_column_scroll_w)
+void marineb_state::marineb_column_scroll_w(uint8_t data)
 {
 	m_column_scroll = data;
 }
 
 
-WRITE8_MEMBER(marineb_state::marineb_palette_bank_0_w)
+void marineb_state::marineb_palette_bank_0_w(uint8_t data)
 {
 	uint8_t old = m_palette_bank;
 
@@ -117,7 +117,7 @@ WRITE8_MEMBER(marineb_state::marineb_palette_bank_0_w)
 }
 
 
-WRITE8_MEMBER(marineb_state::marineb_palette_bank_1_w)
+void marineb_state::marineb_palette_bank_1_w(uint8_t data)
 {
 	uint8_t old = m_palette_bank;
 

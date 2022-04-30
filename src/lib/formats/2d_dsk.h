@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Dirk Best
 /***************************************************************************
 
@@ -27,6 +27,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_2D_FORMAT;
+extern const _2d_format FLOPPY_2D_FORMAT;
 
 #endif // MAME_FORMATS_2D_DSK_H

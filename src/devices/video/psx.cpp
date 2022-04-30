@@ -265,8 +265,8 @@ void psxgpu_device::DebugMesh( int n_coordx, int n_coordy )
 				(int16_t)n_x.w.h <= width - 1 &&
 				(int16_t)n_y.w.h <= height - 1 )
 			{
-				if( m_debug.mesh->pix16( n_y.w.h, n_x.w.h ) != 0xffff )
-					m_debug.mesh->pix16( n_y.w.h, n_x.w.h ) = n_colour;
+				if( m_debug.mesh->pix( n_y.w.h, n_x.w.h ) != 0xffff )
+					m_debug.mesh->pix( n_y.w.h, n_x.w.h ) = n_colour;
 			}
 
 			n_x.d += n_dx;
@@ -364,7 +364,7 @@ int psxgpu_device::DebugMeshDisplay( bitmap_rgb32 &bitmap, const rectangle &clip
 	if( m_debug.b_mesh )
 	{
 		for( int y = cliprect.min_y; y <= cliprect.max_y; y++ )
-			draw_scanline16( bitmap, cliprect.min_x, y, cliprect.max_x + 1 - cliprect.min_x, &m_debug.mesh->pix16( y ), pens() );
+			draw_scanline16( bitmap, cliprect.min_x, y, cliprect.max_x + 1 - cliprect.min_x, &m_debug.mesh->pix( y ), pens() );
 	}
 
 	m_debug.b_clear = 1;
@@ -772,7 +772,7 @@ uint32_t psxgpu_device::update_screen(screen_device &screen, bitmap_rgb32 &bitma
 			while( n_line > 0 )
 			{
 				uint16_t *p_n_src = p_p_vram[ n_y + n_displaystarty ] + 3 * n_x + n_displaystartx;
-				uint32_t *p_n_dest = &bitmap.pix32(n_y + n_top, n_x + n_left);
+				uint32_t *p_n_dest = &bitmap.pix(n_y + n_top, n_x + n_left);
 
 				n_column = n_columns;
 				while( n_column > 0 )
@@ -3264,7 +3264,7 @@ void psxgpu_device::gpu_write( uint32_t *p_ram, int32_t n_size )
 	}
 }
 
-WRITE32_MEMBER( psxgpu_device::write )
+void psxgpu_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch( offset )
 	{
@@ -3459,7 +3459,7 @@ void psxgpu_device::gpu_read( uint32_t *p_ram, int32_t n_size )
 	}
 }
 
-READ32_MEMBER( psxgpu_device::read )
+uint32_t psxgpu_device::read(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data;
 
@@ -3516,6 +3516,8 @@ void psxgpu_device::gpu_reset()
 	n_twy = 0;
 	n_twh = 255;
 	n_tww = 255;
+	m_draw_stp = false;
+	m_check_stp = false;
 	updatevisiblearea();
 }
 

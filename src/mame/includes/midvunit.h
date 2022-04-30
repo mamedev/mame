@@ -20,15 +20,15 @@
 
 struct midvunit_object_data
 {
-	uint16_t *    destbase;
-	uint8_t *     texbase;
-	uint16_t      pixdata;
-	uint8_t       dither;
+	uint16_t *    destbase = nullptr;
+	uint8_t *     texbase = 0;
+	uint16_t      pixdata = 0;
+	uint8_t       dither = 0;
 };
 
 class midvunit_state;
 
-class midvunit_renderer : public poly_manager<float, midvunit_object_data, 2, 4000>
+class midvunit_renderer : public poly_manager<float, midvunit_object_data, 2>
 {
 public:
 	midvunit_renderer(midvunit_state &state);
@@ -49,7 +49,7 @@ class midvunit_state : public driver_device
 public:
 	midvunit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram", 32),
+		m_videoram(*this, "videoram", 0x200000, ENDIANNESS_LITTLE),
 		m_textureram(*this, "textureram"),
 		m_screen(*this, "screen"),
 		m_nvram(*this, "nvram"),
@@ -61,7 +61,6 @@ public:
 		m_watchdog(*this, "watchdog"),
 		m_palette(*this, "palette"),
 		m_adc(*this, "adc"),
-		m_midway_serial_pic(*this, "serial_pic"),
 		m_midway_serial_pic2(*this, "serial_pic2"),
 		m_midway_ioasic(*this, "ioasic"),
 		m_ata(*this, "ata"),
@@ -86,11 +85,11 @@ public:
 	void init_offroadc();
 	void init_crusnusa();
 
-	uint16_t m_page_control;
-	uint16_t m_dma_data[16];
-	uint8_t m_video_changed;
+	uint16_t m_page_control = 0;
+	uint16_t m_dma_data[16]{};
+	uint8_t m_video_changed = 0;
 
-	required_shared_ptr<uint16_t> m_videoram;
+	memory_share_creator<uint16_t> m_videoram;
 	required_shared_ptr<uint32_t> m_textureram;
 	required_device<screen_device> m_screen;
 
@@ -108,69 +107,66 @@ private:
 	required_shared_ptr<uint32_t> m_tms32031_control;
 	optional_shared_ptr<uint32_t> m_midvplus_misc;
 
-	uint8_t m_cmos_protected;
-	uint16_t m_control_data;
-	uint8_t m_adc_shift;
-	uint16_t m_last_port0;
-	uint8_t m_shifter_state;
-	double m_timer_rate;
-	uint16_t m_bit_index;
-	int m_lastval;
-	uint32_t *m_generic_speedup;
-	uint16_t m_video_regs[16];
-	uint8_t m_dma_data_index;
-	emu_timer *m_scanline_timer;
+	uint8_t m_cmos_protected = 0;
+	uint16_t m_control_data = 0;
+	uint8_t m_adc_shift = 0;
+	uint16_t m_last_port0 = 0;
+	uint8_t m_shifter_state = 0;
+	double m_timer_rate = 0;
+	uint16_t m_bit_index = 0;
+	int m_lastval = 0;
+	uint32_t *m_generic_speedup = nullptr;
+	uint16_t m_video_regs[16]{};
+	uint8_t m_dma_data_index = 0;
+	emu_timer *m_scanline_timer = nullptr;
 	std::unique_ptr<midvunit_renderer> m_poly;
-	uint8_t m_galil_input_index;
-	uint8_t m_galil_input_length;
-	const char *m_galil_input;
-	uint8_t m_galil_output_index;
-	char m_galil_output[450];
-	uint8_t m_wheel_board_output;
-	uint32_t m_wheel_board_last;
-	uint32_t m_wheel_board_u8_latch;
-	uint8_t m_comm_flags;
-	uint16_t m_comm_data;
-	DECLARE_WRITE32_MEMBER(midvunit_dma_queue_w);
-	DECLARE_READ32_MEMBER(midvunit_dma_queue_entries_r);
-	DECLARE_READ32_MEMBER(midvunit_dma_trigger_r);
-	DECLARE_WRITE32_MEMBER(midvunit_page_control_w);
-	DECLARE_READ32_MEMBER(midvunit_page_control_r);
-	DECLARE_WRITE32_MEMBER(midvunit_video_control_w);
-	DECLARE_READ32_MEMBER(midvunit_scanline_r);
-	DECLARE_WRITE32_MEMBER(midvunit_videoram_w);
-	DECLARE_READ32_MEMBER(midvunit_videoram_r);
-	DECLARE_WRITE32_MEMBER(midvunit_paletteram_w);
-	DECLARE_WRITE32_MEMBER(midvunit_textureram_w);
-	DECLARE_READ32_MEMBER(midvunit_textureram_r);
-	DECLARE_READ32_MEMBER(port0_r);
-	DECLARE_READ32_MEMBER(adc_r);
-	DECLARE_WRITE32_MEMBER(adc_w);
-	DECLARE_WRITE32_MEMBER(midvunit_cmos_protect_w);
-	DECLARE_WRITE32_MEMBER(midvunit_cmos_w);
-	DECLARE_READ32_MEMBER(midvunit_cmos_r);
-	DECLARE_WRITE32_MEMBER(midvunit_control_w);
-	DECLARE_WRITE32_MEMBER(crusnwld_control_w);
-	DECLARE_WRITE32_MEMBER(midvunit_sound_w);
-	DECLARE_READ32_MEMBER(tms32031_control_r);
-	DECLARE_WRITE32_MEMBER(tms32031_control_w);
-	DECLARE_READ32_MEMBER(crusnwld_serial_status_r);
-	DECLARE_READ32_MEMBER(crusnwld_serial_data_r);
-	DECLARE_WRITE32_MEMBER(crusnwld_serial_data_w);
-	DECLARE_READ32_MEMBER(bit_data_r);
-	DECLARE_WRITE32_MEMBER(bit_reset_w);
-	DECLARE_READ32_MEMBER(offroadc_serial_status_r);
-	DECLARE_READ32_MEMBER(offroadc_serial_data_r);
-	DECLARE_WRITE32_MEMBER(offroadc_serial_data_w);
-	DECLARE_READ32_MEMBER(midvplus_misc_r);
-	DECLARE_WRITE32_MEMBER(midvplus_misc_w);
-	DECLARE_WRITE8_MEMBER(midvplus_xf1_w);
-	DECLARE_READ32_MEMBER(generic_speedup_r);
-	DECLARE_READ32_MEMBER(midvunit_wheel_board_r);
-	DECLARE_WRITE32_MEMBER(midvunit_wheel_board_w);
-	DECLARE_READ32_MEMBER(midvunit_intcs_r);
-	DECLARE_READ32_MEMBER(midvunit_comcs_r);
-	DECLARE_WRITE32_MEMBER(midvunit_comcs_w);
+	uint8_t m_galil_input_index = 0;
+	uint8_t m_galil_input_length = 0;
+	const char *m_galil_input = nullptr;
+	uint8_t m_galil_output_index = 0;
+	char m_galil_output[450]{};
+	uint8_t m_wheel_board_output = 0;
+	uint32_t m_wheel_board_last = 0;
+	uint32_t m_wheel_board_u8_latch = 0;
+	uint8_t m_comm_flags = 0;
+	uint16_t m_comm_data = 0;
+	void midvunit_dma_queue_w(uint32_t data);
+	uint32_t midvunit_dma_queue_entries_r();
+	uint32_t midvunit_dma_trigger_r(offs_t offset);
+	void midvunit_page_control_w(uint32_t data);
+	uint32_t midvunit_page_control_r();
+	void midvunit_video_control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t midvunit_scanline_r();
+	void midvunit_videoram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t midvunit_videoram_r(offs_t offset);
+	void midvunit_paletteram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void midvunit_textureram_w(offs_t offset, uint32_t data);
+	uint32_t midvunit_textureram_r(offs_t offset);
+	uint32_t port0_r();
+	uint32_t adc_r();
+	void adc_w(uint32_t data);
+	void midvunit_cmos_protect_w(uint32_t data);
+	void midvunit_cmos_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t midvunit_cmos_r(offs_t offset);
+	void midvunit_control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void crusnwld_control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void midvunit_sound_w(uint32_t data);
+	uint32_t tms32031_control_r(offs_t offset);
+	void tms32031_control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t crusnwld_serial_status_r();
+	uint32_t crusnwld_serial_data_r();
+	void crusnwld_serial_data_w(uint32_t data);
+	uint32_t bit_data_r(offs_t offset);
+	void bit_reset_w(uint32_t data);
+	uint32_t midvplus_misc_r(offs_t offset);
+	void midvplus_misc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void midvplus_xf1_w(uint8_t data);
+	uint32_t generic_speedup_r(offs_t offset);
+	uint32_t midvunit_wheel_board_r();
+	void midvunit_wheel_board_w(uint32_t data);
+	uint32_t midvunit_intcs_r();
+	uint32_t midvunit_comcs_r(offs_t offset);
+	void midvunit_comcs_w(offs_t offset, uint32_t data);
 	void set_input(const char *s);
 	void init_crusnwld_common(offs_t speedup);
 	void init_crusnusa_common(offs_t speedup);
@@ -184,7 +180,6 @@ private:
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<palette_device> m_palette;
 	optional_device<adc0844_device> m_adc;
-	optional_device<midway_serial_pic_device> m_midway_serial_pic;
 	optional_device<midway_serial_pic2_device> m_midway_serial_pic2;
 	optional_device<midway_ioasic_device> m_midway_ioasic;
 	optional_device<ata_interface_device> m_ata;
@@ -203,5 +198,5 @@ private:
 	void midvplus_map(address_map &map);
 	void midvunit_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };

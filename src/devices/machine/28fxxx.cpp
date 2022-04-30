@@ -103,14 +103,16 @@ void base_28fxxx_device::nvram_default()
 		erase();
 }
 
-void base_28fxxx_device::nvram_read(emu_file &file)
+bool base_28fxxx_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_data.get(), m_size);
+	size_t actual;
+	return !file.read(m_data.get(), m_size, actual) && actual == m_size;
 }
 
-void base_28fxxx_device::nvram_write(emu_file &file)
+bool base_28fxxx_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_data.get(), m_size);
+	size_t actual;
+	return !file.write(m_data.get(), m_size, actual) && actual == m_size;
 }
 
 void base_28fxxx_device::erase()
@@ -118,7 +120,7 @@ void base_28fxxx_device::erase()
 	memset(m_data.get(), 0xff, m_size);
 }
 
-READ8_MEMBER(base_28fxxx_device::read)
+u8 base_28fxxx_device::read(address_space &space, offs_t offset, u8 mem_mask)
 {
 	switch (m_state)
 	{
@@ -146,7 +148,7 @@ READ8_MEMBER(base_28fxxx_device::read)
 	}
 }
 
-WRITE8_MEMBER(base_28fxxx_device::write)
+void base_28fxxx_device::write(offs_t offset, u8 data)
 {
 	// writes are ignored unless Vpp is asserted
 	if (!m_program_power)

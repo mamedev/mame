@@ -57,7 +57,7 @@ TILE_GET_INFO_MEMBER(alpha68k_II_state::get_tile_info)
 	const u8 color = attr & 0x0f;
 	const bool opaque = BIT(attr, 4);
 
-	SET_TILE_INFO_MEMBER(0, tile | (m_bank_base << 8), color, opaque ? TILE_FORCE_LAYER0 : 0);
+	tileinfo.set(0, tile | (m_bank_base << 8), color, opaque ? TILE_FORCE_LAYER0 : 0);
 }
 
 void alpha68k_II_state::videoram_w(offs_t offset, u16 data)

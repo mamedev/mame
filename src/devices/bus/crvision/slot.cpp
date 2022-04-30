@@ -7,7 +7,6 @@
 
  ***********************************************************************************************************/
 
-
 #include "emu.h"
 #include "slot.h"
 
@@ -64,7 +63,7 @@ void device_crvision_cart_interface::rom_alloc(uint32_t size, const char *tag)
 //-------------------------------------------------
 crvision_cart_slot_device::crvision_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CRVISION_CART_SLOT, tag, owner, clock),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_crvision_cart_interface>(mconfig, *this),
 	m_type(CRV_4K), m_cart(nullptr)
 {
@@ -115,7 +114,7 @@ static int crvision_get_pcb_id(const char *slot)
 {
 	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(elem.slot_option, slot))
+		if (!strcmp(elem.slot_option, slot))
 			return elem.pcb_id;
 	}
 
@@ -146,7 +145,7 @@ image_init_result crvision_cart_slot_device::call_load()
 
 		if (size > 0x4800)
 		{
-			seterror(IMAGE_ERROR_UNSPECIFIED, "Image extends beyond the expected size for an APF cart");
+			seterror(image_error::INVALIDIMAGE, "Image extends beyond the expected size for an APF cart");
 			return image_init_result::FAIL;
 		}
 
@@ -210,10 +209,10 @@ std::string crvision_cart_slot_device::get_default_card_software(get_default_car
 {
 	if (hook.image_file())
 	{
-		const char *slot_string;
-		uint32_t size = hook.image_file()->size();
-		int type = CRV_4K;
+		uint64_t size;
+		hook.image_file()->length(size); // FIXME: check error return
 
+		int type = CRV_4K;
 		switch (size)
 		{
 			case 0x4800:
@@ -239,7 +238,7 @@ std::string crvision_cart_slot_device::get_default_card_software(get_default_car
 				break;
 		}
 
-		slot_string = crvision_get_slot(type);
+		char const *const slot_string = crvision_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
 
@@ -253,18 +252,18 @@ std::string crvision_cart_slot_device::get_default_card_software(get_default_car
  read_rom
  -------------------------------------------------*/
 
-READ8_MEMBER(crvision_cart_slot_device::read_rom40)
+uint8_t crvision_cart_slot_device::read_rom40(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_rom40(space, offset);
+		return m_cart->read_rom40(offset);
 	else
 		return 0xff;
 }
 
-READ8_MEMBER(crvision_cart_slot_device::read_rom80)
+uint8_t crvision_cart_slot_device::read_rom80(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_rom80(space, offset);
+		return m_cart->read_rom80(offset);
 	else
 		return 0xff;
 }

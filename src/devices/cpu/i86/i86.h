@@ -20,6 +20,7 @@ enum
 {
 	I8086_PC = STATE_GENPC,
 	I8086_IP = 1, I8086_AX, I8086_CX, I8086_DX, I8086_BX, I8086_SP, I8086_BP, I8086_SI, I8086_DI,
+	I8086_AL, I8086_AH, I8086_CL, I8086_CH, I8086_DL, I8086_DH, I8086_BL, I8086_BH,
 	I8086_FLAGS, I8086_ES, I8086_CS, I8086_SS, I8086_DS,
 	I8086_VECTOR, I8086_HALT
 };
@@ -294,6 +295,9 @@ protected:
 	uint8_t   m_test_state;
 
 	address_space *m_program, *m_opcodes;
+	memory_access<20, 0, 0, ENDIANNESS_LITTLE>::cache m_cache8;
+	memory_access<20, 1, 0, ENDIANNESS_LITTLE>::cache m_cache16;
+
 	std::function<u8 (offs_t)> m_or8;
 	address_space *m_io;
 	int m_icount;

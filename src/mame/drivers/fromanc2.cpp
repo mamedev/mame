@@ -23,10 +23,11 @@
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "sound/2610intf.h"
-#include "rendlay.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "layout/generic.h"
 
 
 /*************************************
@@ -35,7 +36,7 @@
  *
  *************************************/
 
-WRITE16_MEMBER(fromanc2_state::sndcmd_w)
+void fromanc2_state::sndcmd_w(uint16_t data)
 {
 	m_soundlatch->write((data >> 8) & 0xff);   // 1P (LEFT)
 	m_soundlatch2->write(data & 0xff);         // 2P (RIGHT)
@@ -44,12 +45,12 @@ WRITE16_MEMBER(fromanc2_state::sndcmd_w)
 	m_sndcpu_nmi_flag = 0;
 }
 
-WRITE16_MEMBER(fromanc2_state::portselect_w)
+void fromanc2_state::portselect_w(uint16_t data)
 {
 	m_portselect = data;
 }
 
-READ16_MEMBER(fromanc2_state::keymatrix_r)
+uint16_t fromanc2_state::keymatrix_r()
 {
 	uint16_t ret;
 
@@ -82,7 +83,7 @@ READ_LINE_MEMBER(fromanc2_state::subcpu_nmi_r)
 	return m_subcpu_nmi_flag & 0x01;
 }
 
-WRITE16_MEMBER(fromanc2_state::fromancr_gfxbank_eeprom_w)
+void fromanc2_state::fromancr_gfxbank_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	fromancr_gfxbank_w(data & 0xfff8);
 	if (ACCESSING_BITS_0_7)
@@ -93,7 +94,7 @@ WRITE16_MEMBER(fromanc2_state::fromancr_gfxbank_eeprom_w)
 	}
 }
 
-WRITE16_MEMBER(fromanc2_state::subcpu_w)
+void fromanc2_state::subcpu_w(uint16_t data)
 {
 	m_datalatch1 = data;
 
@@ -101,7 +102,7 @@ WRITE16_MEMBER(fromanc2_state::subcpu_w)
 	m_subcpu_int_flag = 0;
 }
 
-READ16_MEMBER(fromanc2_state::subcpu_r)
+uint16_t fromanc2_state::subcpu_r()
 {
 	m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	m_subcpu_nmi_flag = 0;
@@ -109,41 +110,41 @@ READ16_MEMBER(fromanc2_state::subcpu_r)
 	return (m_datalatch_2h << 8) | m_datalatch_2l;
 }
 
-READ8_MEMBER(fromanc2_state::maincpu_r_l)
+uint8_t fromanc2_state::maincpu_r_l()
 {
 	return m_datalatch1 & 0x00ff;
 }
 
-READ8_MEMBER(fromanc2_state::maincpu_r_h)
+uint8_t fromanc2_state::maincpu_r_h()
 {
 	m_subcpu_int_flag = 1;
 
 	return (m_datalatch1 & 0xff00) >> 8;
 }
 
-WRITE8_MEMBER(fromanc2_state::maincpu_w_l)
+void fromanc2_state::maincpu_w_l(uint8_t data)
 {
 	m_datalatch_2l = data;
 }
 
-WRITE8_MEMBER(fromanc2_state::maincpu_w_h)
+void fromanc2_state::maincpu_w_h(uint8_t data)
 {
 	m_datalatch_2h = data;
 }
 
-WRITE8_MEMBER(fromanc2_state::subcpu_nmi_clr)
+void fromanc2_state::subcpu_nmi_clr(uint8_t data)
 {
 	m_subcpu_nmi_flag = 1;
 }
 
-READ8_MEMBER(fromanc2_state::sndcpu_nmi_clr)
+uint8_t fromanc2_state::sndcpu_nmi_clr()
 {
 	m_sndcpu_nmi_flag = 1;
 
 	return 0xff;
 }
 
-WRITE8_MEMBER(fromanc2_state::subcpu_rombank_w)
+void fromanc2_state::subcpu_rombank_w(uint8_t data)
 {
 	// Change ROM BANK
 	membank("bank1")->set_entry(data & 0x03);
@@ -709,7 +710,7 @@ ROM_START( fromanc2 )
 	ROM_REGION( 0x0100000, "gfx4", 0 )  // LAYER1 DATA
 	ROM_LOAD( "40-52.bin",   0x000000, 0x100000, CRC(dbb5062d) SHA1(d1be4d675b36ea6ebd602d5c990adcf3c029485e) )
 
-	ROM_REGION( 0x0400000, "ymsnd", 0 ) // SOUND DATA
+	ROM_REGION( 0x0400000, "ymsnd:adpcma", 0 ) // SOUND DATA
 	ROM_LOAD( "ic96.bin",    0x000000, 0x200000, CRC(2f1b394c) SHA1(d95dd8231d7873328f2253eaa27374c79d87e21b) )
 	ROM_LOAD( "ic97.bin",    0x200000, 0x200000, CRC(1d1377fc) SHA1(0dae5dfcbcf4ed6662522e9404fcac0236dce04d) )
 ROM_END
@@ -740,7 +741,7 @@ ROM_START( fromanc2o )
 	ROM_REGION( 0x0100000, "gfx4", 0 )  // LAYER1 DATA
 	ROM_LOAD( "40-52.bin",   0x000000, 0x100000, CRC(dbb5062d) SHA1(d1be4d675b36ea6ebd602d5c990adcf3c029485e) )
 
-	ROM_REGION( 0x0400000, "ymsnd", 0 ) // SOUND DATA
+	ROM_REGION( 0x0400000, "ymsnd:adpcma", 0 ) // SOUND DATA
 	ROM_LOAD( "ic96.bin",    0x000000, 0x200000, CRC(2f1b394c) SHA1(d95dd8231d7873328f2253eaa27374c79d87e21b) )
 	ROM_LOAD( "ic97.bin",    0x200000, 0x200000, CRC(1d1377fc) SHA1(0dae5dfcbcf4ed6662522e9404fcac0236dce04d) )
 ROM_END
@@ -773,7 +774,7 @@ ROM_START( fromancr )
 	ROM_REGION( 0x0200000, "gfx3", 0 )  // TEXT DATA
 	ROM_LOAD( "ic28-29.bin", 0x0000000, 0x200000, CRC(f5e262aa) SHA1(35464d059f4814832bf5cb3bede4b8a600bc8a84) )
 
-	ROM_REGION( 0x0400000, "ymsnd", 0 ) // SOUND DATA
+	ROM_REGION( 0x0400000, "ymsnd:adpcma", 0 ) // SOUND DATA
 	ROM_LOAD( "ic81.bin",    0x0000000, 0x200000, CRC(8ab6e343) SHA1(5ae28e6944edb0a4b8d0071ce48e348b6e927ca9) )
 	ROM_LOAD( "ic82.bin",    0x0200000, 0x200000, CRC(f57daaf8) SHA1(720eadf771c89d8749317b632bbc5e8ff1f6f520) )
 ROM_END
@@ -809,7 +810,7 @@ ROM_START( fromanc4 )
 	ROM_REGION( 0x0400000, "gfx3", 0 )  // TEXT DATA
 	ROM_LOAD16_WORD_SWAP( "em33-a00.37", 0x0000000, 0x400000, CRC(a3bd4a34) SHA1(78bd5298e83f89c738c18105c8bc809fa6a35206) )
 
-	ROM_REGION( 0x0800000, "ymsnd", 0 ) // SOUND DATA
+	ROM_REGION( 0x0800000, "ymsnd:adpcma", 0 ) // SOUND DATA
 	ROM_LOAD16_WORD_SWAP( "em33-p00.88", 0x0000000, 0x400000, CRC(1c6418d2) SHA1(c66d6b35f342fcbeca5414dbb2ac038d8a2ec2c4) )
 	ROM_LOAD16_WORD_SWAP( "em33-p01.89", 0x0400000, 0x400000, CRC(615b4e6e) SHA1(a031773ed27de2263e32422a3d11118bdcb2c197) )
 ROM_END

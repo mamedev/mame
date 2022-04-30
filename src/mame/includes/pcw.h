@@ -51,75 +51,84 @@ public:
 		, m_iptlines(*this, "LINE%u", 0U)
 	{ }
 
-	int m_boot;
-	int m_system_status;
-	int m_fdc_interrupt_code;
-	int m_interrupt_counter;
-	uint8_t m_banks[4];
-	unsigned char m_bank_force;
-	uint8_t m_timer_irq_flag;
-	uint8_t m_nmi_flag;
-	int16_t m_printer_headpos;
-	uint16_t m_kb_scan_row;
-	uint8_t m_mcu_keyboard_data[16];
-	uint8_t m_mcu_transmit_reset_seq;
-	uint8_t m_mcu_transmit_count;
-	uint8_t m_mcu_selected;
-	uint8_t m_mcu_buffer;
-	uint8_t m_mcu_prev;
-	unsigned int m_roller_ram_addr;
-	unsigned short m_roller_ram_offset;
-	unsigned char m_vdu_video_control_register;
-	uint8_t m_printer_serial;  // value if shift/store data pin
-	uint8_t m_printer_shift;  // state of shift register
-	uint8_t m_printer_shift_output;  // output presented to the paper feed motor and print head motor
-	uint8_t m_head_motor_state;
-	uint8_t m_linefeed_motor_state;
-	uint16_t m_printer_pins;
-	uint8_t m_printer_p2;  // MCU port P2 state
-	uint32_t m_paper_feed;  // amount of paper fed through printer, by n/360 inches.  One line feed is 61/360in (from the linefeed command in CP/M;s ptr menu)
-	std::unique_ptr<bitmap_ind16> m_prn_output;
-	uint8_t m_printer_p2_prev;
-	emu_timer *m_prn_stepper;
-	emu_timer *m_prn_pins;
-	emu_timer *m_pulse_timer;
-	emu_timer *m_beep_setup_timer;
-	DECLARE_READ8_MEMBER(pcw_keyboard_r);
-	DECLARE_READ8_MEMBER(pcw_keyboard_data_r);
-	DECLARE_READ8_MEMBER(pcw_interrupt_counter_r);
-	DECLARE_WRITE8_MEMBER(pcw_bank_select_w);
-	DECLARE_WRITE8_MEMBER(pcw_bank_force_selection_w);
-	DECLARE_WRITE8_MEMBER(pcw_roller_ram_addr_w);
-	DECLARE_WRITE8_MEMBER(pcw_pointer_table_top_scan_w);
-	DECLARE_WRITE8_MEMBER(pcw_vdu_video_control_register_w);
-	DECLARE_WRITE8_MEMBER(pcw_system_control_w);
-	DECLARE_READ8_MEMBER(pcw_system_status_r);
-	DECLARE_READ8_MEMBER(pcw_expansion_r);
-	DECLARE_WRITE8_MEMBER(pcw_expansion_w);
-	DECLARE_WRITE8_MEMBER(pcw_printer_data_w);
-	DECLARE_WRITE8_MEMBER(pcw_printer_command_w);
-	DECLARE_READ8_MEMBER(pcw_printer_data_r);
-	DECLARE_READ8_MEMBER(pcw_printer_status_r);
-	DECLARE_READ8_MEMBER(mcu_printer_p1_r);
-	DECLARE_WRITE8_MEMBER(mcu_printer_p1_w);
-	DECLARE_READ8_MEMBER(mcu_printer_p2_r);
-	DECLARE_WRITE8_MEMBER(mcu_printer_p2_w);
-	DECLARE_READ_LINE_MEMBER(mcu_printer_t1_r);
-	DECLARE_READ_LINE_MEMBER(mcu_printer_t0_r);
-	DECLARE_READ8_MEMBER(mcu_kb_scan_r);
-	DECLARE_WRITE8_MEMBER(mcu_kb_scan_w);
-	DECLARE_READ8_MEMBER(mcu_kb_scan_high_r);
-	DECLARE_WRITE8_MEMBER(mcu_kb_scan_high_w);
-	DECLARE_READ8_MEMBER(mcu_kb_data_r);
-	DECLARE_READ_LINE_MEMBER(mcu_kb_t1_r);
-	DECLARE_READ_LINE_MEMBER(mcu_kb_t0_r);
-	DECLARE_READ8_MEMBER(pcw9512_parallel_r);
-	DECLARE_WRITE8_MEMBER(pcw9512_parallel_w);
-	void mcu_transmit_serial(uint8_t bit);
+	void pcw(machine_config &config);
+	void pcw8256(machine_config &config);
+	void pcw8512(machine_config &config);
+	void pcw9512(machine_config &config);
+	void pcw9256(machine_config &config);
+	void pcw9512p(machine_config &config);
+	void pcw10(machine_config &config);
+
 	void init_pcw();
+
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+
+private:
+	int m_boot = 0;
+	int m_system_status = 0;
+	int m_fdc_interrupt_code = 0;
+	int m_interrupt_counter = 0;
+	uint8_t m_banks[4]{};
+	unsigned char m_bank_force = 0;
+	uint8_t m_timer_irq_flag = 0;
+	uint8_t m_nmi_flag = 0;
+	int16_t m_printer_headpos = 0;
+	uint16_t m_kb_scan_row = 0;
+	uint8_t m_mcu_keyboard_data[16];
+	uint8_t m_mcu_transmit_reset_seq = 0;
+	uint8_t m_mcu_transmit_count = 0;
+	uint8_t m_mcu_selected = 0;
+	uint8_t m_mcu_buffer = 0;
+	uint8_t m_mcu_prev = 0;
+	unsigned int m_roller_ram_addr = 0;
+	unsigned short m_roller_ram_offset = 0;
+	unsigned char m_vdu_video_control_register = 0;
+	uint8_t m_printer_serial = 0;  // value if shift/store data pin
+	uint8_t m_printer_shift = 0;  // state of shift register
+	uint8_t m_printer_shift_output = 0;  // output presented to the paper feed motor and print head motor
+	uint8_t m_head_motor_state = 0;
+	uint8_t m_linefeed_motor_state = 0;
+	uint16_t m_printer_pins = 0;
+	uint8_t m_printer_p2 = 0;  // MCU port P2 state
+	uint32_t m_paper_feed = 0;  // amount of paper fed through printer, by n/360 inches.  One line feed is 61/360in (from the linefeed command in CP/M;s ptr menu)
+	std::unique_ptr<bitmap_ind16> m_prn_output;
+	uint8_t m_printer_p2_prev = 0;
+	emu_timer *m_prn_stepper = nullptr;
+	emu_timer *m_prn_pins = nullptr;
+	emu_timer *m_pulse_timer = nullptr;
+	emu_timer *m_beep_setup_timer = nullptr;
+	uint8_t pcw_keyboard_r(offs_t offset);
+	uint8_t pcw_keyboard_data_r(offs_t offset);
+	uint8_t pcw_interrupt_counter_r();
+	void pcw_bank_select_w(offs_t offset, uint8_t data);
+	void pcw_bank_force_selection_w(uint8_t data);
+	void pcw_roller_ram_addr_w(uint8_t data);
+	void pcw_pointer_table_top_scan_w(uint8_t data);
+	void pcw_vdu_video_control_register_w(uint8_t data);
+	void pcw_system_control_w(uint8_t data);
+	uint8_t pcw_system_status_r();
+	uint8_t pcw_expansion_r(offs_t offset);
+	void pcw_expansion_w(offs_t offset, uint8_t data);
+	uint8_t mcu_printer_p1_r();
+	void mcu_printer_p1_w(uint8_t data);
+	uint8_t mcu_printer_p2_r();
+	void mcu_printer_p2_w(uint8_t data);
+	DECLARE_READ_LINE_MEMBER(mcu_printer_t1_r);
+	DECLARE_READ_LINE_MEMBER(mcu_printer_t0_r);
+	uint8_t mcu_kb_scan_r();
+	void mcu_kb_scan_w(uint8_t data);
+	uint8_t mcu_kb_scan_high_r();
+	void mcu_kb_scan_high_w(uint8_t data);
+	uint8_t mcu_kb_data_r();
+	DECLARE_READ_LINE_MEMBER(mcu_kb_t1_r);
+	DECLARE_READ_LINE_MEMBER(mcu_kb_t0_r);
+	uint8_t pcw9512_parallel_r(offs_t offset);
+	void pcw9512_parallel_w(offs_t offset, uint8_t data);
+	void mcu_transmit_serial(uint8_t bit);
+
 	void set_8xxx_palette(palette_device &palette) const;
 	void set_9xxx_palette(palette_device &palette) const;
 	void set_printer_palette(palette_device &palette) const;
@@ -131,7 +140,7 @@ public:
 	TIMER_CALLBACK_MEMBER(setup_beep);
 	TIMER_DEVICE_CALLBACK_MEMBER(pcw_timer_interrupt);
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	DECLARE_WRITE_LINE_MEMBER( pcw_fdc_interrupt );
 	required_device<cpu_device> m_maincpu;
@@ -155,13 +164,6 @@ public:
 	void pcw_update_mem(int block, int data);
 	int pcw_get_sys_status();
 	void pcw_printer_fire_pins(uint16_t pins);
-	void pcw(machine_config &config);
-	void pcw8256(machine_config &config);
-	void pcw8512(machine_config &config);
-	void pcw9512(machine_config &config);
-	void pcw9256(machine_config &config);
-	void pcw9512p(machine_config &config);
-	void pcw10(machine_config &config);
 	void pcw9512_io(address_map &map);
 	void pcw_io(address_map &map);
 	void pcw_map(address_map &map);

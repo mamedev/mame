@@ -45,9 +45,9 @@ public:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_fg_tilemap;
-	int        m_scroll;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	tilemap_t  *m_fg_tilemap = nullptr;
+	int        m_scroll = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -58,20 +58,20 @@ public:
 	required_device<z80ctc_device> m_ctc;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
-	emu_timer *m_soundcommand_timer;
-	uint8_t      m_nmi_mask;
-	DECLARE_WRITE8_MEMBER(pbaction_sh_command_w);
+	emu_timer *m_soundcommand_timer = nullptr;
+	uint8_t      m_nmi_mask = 0;
+	void pbaction_sh_command_w(uint8_t data);
 	TIMER_CALLBACK_MEMBER(sound_trigger);
-	DECLARE_WRITE8_MEMBER(nmi_mask_w);
-	DECLARE_READ8_MEMBER(sound_data_r);
-	DECLARE_WRITE8_MEMBER(sound_irq_ack_w);
-	DECLARE_READ8_MEMBER(pbaction2_prot_kludge_r);
-	DECLARE_WRITE8_MEMBER(pbaction_videoram_w);
-	DECLARE_WRITE8_MEMBER(pbaction_colorram_w);
-	DECLARE_WRITE8_MEMBER(pbaction_videoram2_w);
-	DECLARE_WRITE8_MEMBER(pbaction_colorram2_w);
-	DECLARE_WRITE8_MEMBER(pbaction_scroll_w);
-	DECLARE_WRITE8_MEMBER(pbaction_flipscreen_w);
+	void nmi_mask_w(uint8_t data);
+	uint8_t sound_data_r();
+	void sound_irq_ack_w(uint8_t data);
+	uint8_t pbaction2_prot_kludge_r();
+	void pbaction_videoram_w(offs_t offset, uint8_t data);
+	void pbaction_colorram_w(offs_t offset, uint8_t data);
+	void pbaction_videoram2_w(offs_t offset, uint8_t data);
+	void pbaction_colorram2_w(offs_t offset, uint8_t data);
+	void pbaction_scroll_w(uint8_t data);
+	void pbaction_flipscreen_w(uint8_t data);
 	void init_pbaction2();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -115,25 +115,25 @@ private:
 	void main_io_map(address_map &map);
 
 	TIMER_CALLBACK_MEMBER(sub_trigger);
-	emu_timer *m_subcommand_timer;
+	emu_timer *m_subcommand_timer = nullptr;
 
-	DECLARE_READ8_MEMBER(subcpu_r);
-	DECLARE_WRITE8_MEMBER(subcpu_w);
+	uint8_t subcpu_r();
+	void subcpu_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(sub8000_w);
 	DECLARE_WRITE_LINE_MEMBER(sub8001_w);
-	DECLARE_WRITE8_MEMBER(sub8008_w);
+	void sub8008_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(subtomain_w);
-	DECLARE_READ8_MEMBER(maintosub_r);
+	void subtomain_w(uint8_t data);
+	uint8_t maintosub_r();
 
 	required_device<z80_device> m_subcpu;
 	required_device<z80ctc_device> m_ctc2;
 	required_device<generic_latch_8_device> m_maintosublatch;
 	//required_device<generic_latch_8_device> m_subtomainlatch;
 	output_finder<24> m_digits;
-	uint8_t m_outlatch;
-	uint32_t m_outdata;
+	uint8_t m_outlatch = 0;
+	uint32_t m_outdata = 0;
 };
 
 #endif // MAME_INCLUDES_PBACTION_H

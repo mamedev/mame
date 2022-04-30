@@ -18,6 +18,9 @@
 #ifndef __EMU_H__
 #define __EMU_H__
 
+// get forward declarations before anything else
+#include "emufwd.h"
+
 #include <list>
 #include <forward_list>
 #include <vector>
@@ -28,29 +31,23 @@
 
 // core emulator headers -- must be first (profiler needs attotime, attotime needs xtal)
 #include "emucore.h"
+#include "osdcore.h"
 #include "eminline.h"
 #include "xtal.h"
 #include "attotime.h"
 #include "profiler.h"
 
-// http interface helpers
-#include "http.h"
-
 // commonly-referenced utilities imported from lib/util
+#include "corefile.h"
+#include "delegate.h"
+#include "hash.h"
 #include "palette.h"
-#include "unicode.h"
-#include "strformat.h"
-#include "vecstream.h"
 
 // emulator-specific utilities
-#include "hash.h"
-#include "fileio.h"
-#include "delegate.h"
 #include "devdelegate.h"
 
 // memory and address spaces
 #include "emumem.h"
-#include "memarray.h"
 
 // machine-wide utilities
 #include "romentry.h"
@@ -67,8 +64,6 @@
 #include "addrmap.h" // Needs optional_device<> and required_device<>
 #include "distate.h"
 #include "dimemory.h"
-#include "dirom.h"
-#include "opresolv.h"
 #include "dipalette.h"
 #include "digfx.h"
 #include "diimage.h"

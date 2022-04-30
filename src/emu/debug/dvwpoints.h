@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Andrew Gardner, Vas Crabb
 /*********************************************************************
 
     dvwpoints.h
@@ -7,14 +7,13 @@
     Watchpoint debugger view.
 
 ***************************************************************************/
-
 #ifndef MAME_EMU_DEBUG_DVWPOINTS_H
 #define MAME_EMU_DEBUG_DVWPOINTS_H
 
 #pragma once
 
-#include "debugvw.h"
 #include "debugcpu.h"
+#include "debugvw.h"
 
 
 //**************************************************************************
@@ -43,8 +42,8 @@ private:
 
 
 	// internal state
-	bool (*m_sortType)(const device_debug::watchpoint *, const device_debug::watchpoint *);
-	std::vector<device_debug::watchpoint *> m_buffer;
+	bool (*m_sortType)(const debug_watchpoint *, const debug_watchpoint *);
+	std::vector<debug_watchpoint *> m_buffer;
 };
 
 #endif // MAME_EMU_DEBUG_DVWPOINTS_H

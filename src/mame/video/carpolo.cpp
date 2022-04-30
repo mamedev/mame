@@ -321,8 +321,6 @@ int carpolo_state::check_sprite_sprite_collision(int x1, int y1, int code1, int 
 	/* check if the two sprites are even within collision range */
 	if ((abs(x1 - x2) < SPRITE_WIDTH) && (abs(y1 - y2) < SPRITE_HEIGHT))
 	{
-		int x,y;
-
 		normalize_coordinates(&x1, &y1, &x2, &y2);
 
 		m_sprite_sprite_collision_bitmap1->fill(0);
@@ -338,10 +336,10 @@ int carpolo_state::check_sprite_sprite_collision(int x1, int y1, int code1, int 
 				0,flipy2,
 				x2,y2);
 
-		for (x = x1; x < x1 + SPRITE_WIDTH; x++)
-			for (y = y1; y < y1 + SPRITE_HEIGHT; y++)
-				if ((m_sprite_sprite_collision_bitmap1->pix16(y, x) == 1) &&
-					(m_sprite_sprite_collision_bitmap2->pix16(y, x) == 1))
+		for (int x = x1; x < x1 + SPRITE_WIDTH; x++)
+			for (int y = y1; y < y1 + SPRITE_HEIGHT; y++)
+				if ((m_sprite_sprite_collision_bitmap1->pix(y, x) == 1) &&
+					(m_sprite_sprite_collision_bitmap2->pix(y, x) == 1))
 				{
 					*col_x = (x1 + x) & 0x0f;
 					*col_y = (y1 + y) & 0x0f;
@@ -369,12 +367,8 @@ int carpolo_state::check_sprite_left_goal_collision(int x1, int y1, int code1, i
 	if (((y1 + 16) > GOAL_Y) && (y1 < (GOAL_Y + GOAL_HEIGHT)) &&
 		((x1 + 16) > LEFT_GOAL_X) && (x1 < (LEFT_GOAL_X + GOAL_WIDTH)))
 	{
-		int x,y;
-		int x2,y2;
-
-
-		x2 = LEFT_GOAL_X;
-		y2 = GOAL_Y;
+		int x2 = LEFT_GOAL_X;
+		int y2 = GOAL_Y;
 
 		normalize_coordinates(&x1, &y1, &x2, &y2);
 
@@ -392,11 +386,11 @@ int carpolo_state::check_sprite_left_goal_collision(int x1, int y1, int code1, i
 					x2,y2,
 					0x20000,0x20000,0);
 
-		for (x = x1; x < x1 + SPRITE_WIDTH; x++)
-			for (y = y1; y < y1 + SPRITE_HEIGHT; y++)
-				if (m_sprite_goal_collision_bitmap1->pix16(y, x) == 1)
+		for (int x = x1; x < x1 + SPRITE_WIDTH; x++)
+			for (int y = y1; y < y1 + SPRITE_HEIGHT; y++)
+				if (m_sprite_goal_collision_bitmap1->pix(y, x) == 1)
 				{
-					pen_t pix = m_sprite_goal_collision_bitmap2->pix16(y, x);
+					pen_t pix = m_sprite_goal_collision_bitmap2->pix(y, x);
 
 					if (pix == LEFT_GOAL_PEN)
 					{
@@ -427,11 +421,8 @@ int carpolo_state::check_sprite_right_goal_collision(int x1, int y1, int code1, 
 	if (((y1 + 16) > GOAL_Y) && (y1 < (GOAL_Y + GOAL_HEIGHT)) &&
 		((x1 + 16) > RIGHT_GOAL_X) && (x1 < (RIGHT_GOAL_X + GOAL_WIDTH)))
 	{
-		int x,y;
-		int x2,y2;
-
-		x2 = RIGHT_GOAL_X;
-		y2 = GOAL_Y;
+		int x2 = RIGHT_GOAL_X;
+		int y2 = GOAL_Y;
 
 		normalize_coordinates(&x1, &y1, &x2, &y2);
 
@@ -449,11 +440,11 @@ int carpolo_state::check_sprite_right_goal_collision(int x1, int y1, int code1, 
 					x2,y2,
 					0x20000,0x20000,0);
 
-		for (x = x1; x < x1 + SPRITE_WIDTH; x++)
-			for (y = y1; y < y1 + SPRITE_HEIGHT; y++)
-				if (m_sprite_goal_collision_bitmap1->pix16(y, x) == 1)
+		for (int x = x1; x < x1 + SPRITE_WIDTH; x++)
+			for (int y = y1; y < y1 + SPRITE_HEIGHT; y++)
+				if (m_sprite_goal_collision_bitmap1->pix(y, x) == 1)
 				{
-					pen_t pix = m_sprite_goal_collision_bitmap2->pix16(y, x);
+					pen_t pix = m_sprite_goal_collision_bitmap2->pix(y, x);
 
 					if (pix == RIGHT_GOAL_PEN)
 					{
@@ -477,7 +468,6 @@ int carpolo_state::check_sprite_right_goal_collision(int x1, int y1, int code1, 
    2 for collision with horizontal border */
 int carpolo_state::check_sprite_border_collision(uint8_t x1, uint8_t y1, int code1, int flipy1)
 {
-	uint8_t x,y;
 	int collided = 0;
 
 	x1 = 240 - x1;
@@ -488,9 +478,9 @@ int carpolo_state::check_sprite_border_collision(uint8_t x1, uint8_t y1, int cod
 			0,flipy1,
 			0,0);
 
-	for (x = 0; x < SPRITE_WIDTH; x++)
-		for (y = 0; y < SPRITE_HEIGHT; y++)
-			if (m_sprite_border_collision_bitmap->pix16(y, x) == 1)
+	for (uint8_t x = 0; x < SPRITE_WIDTH; x++)
+		for (uint8_t y = 0; y < SPRITE_HEIGHT; y++)
+			if (m_sprite_border_collision_bitmap->pix(y, x) == 1)
 			{
 				if (((uint8_t)(x1 + x) == LEFT_BORDER) ||
 					((uint8_t)(x1 + x) == RIGHT_BORDER))

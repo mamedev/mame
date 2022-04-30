@@ -14,7 +14,7 @@ TILE_GET_INFO_MEMBER(glfgreat_state::glfgreat_get_roz_tile_info)
 
 	code = rom[tile_index + 0x80000] + 256 * rom[tile_index] + 256 * 256 * ((rom[tile_index / 4 + 0x100000] >> (2 * (tile_index & 3))) & 3);
 
-	SET_TILE_INFO_MEMBER(0, code & 0x3fff, code >> 14, 0);
+	tileinfo.set(0, code & 0x3fff, code >> 14, 0);
 }
 
 TILE_GET_INFO_MEMBER(prmrsocr_state::prmrsocr_get_roz_tile_info)
@@ -22,7 +22,7 @@ TILE_GET_INFO_MEMBER(prmrsocr_state::prmrsocr_get_roz_tile_info)
 	uint8_t *rom = memregion("user1")->base();
 	int code = rom[tile_index + 0x20000] + 256 * rom[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code & 0x1fff, code >> 13, 0);
+	tileinfo.set(0, code & 0x1fff, code >> 13, 0);
 }
 
 
@@ -246,6 +246,12 @@ VIDEO_START_MEMBER(tmnt_state,lgtnfght)/* also tmnt2, ssriders */
 
 	m_dim_c = m_dim_v = m_lastdim = m_lasten = 0;
 
+	for (int i = 0; i < 3; i++)
+	{
+		m_layer_colorbase[i] = 0;
+		m_sorted_layer[i] = 0;
+	}
+
 	save_item(NAME(m_dim_c));
 	save_item(NAME(m_dim_v));
 	save_item(NAME(m_lastdim));
@@ -291,7 +297,7 @@ VIDEO_START_MEMBER(tmnt_state,blswhstl)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(tmnt_state::tmnt_0a0000_w)
+void tmnt_state::tmnt_0a0000_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -315,7 +321,7 @@ WRITE16_MEMBER(tmnt_state::tmnt_0a0000_w)
 	}
 }
 
-WRITE16_MEMBER(tmnt_state::punkshot_0a0020_w)
+void tmnt_state::punkshot_0a0020_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -333,7 +339,7 @@ WRITE16_MEMBER(tmnt_state::punkshot_0a0020_w)
 	}
 }
 
-WRITE16_MEMBER(tmnt_state::lgtnfght_0a0018_w)
+void tmnt_state::lgtnfght_0a0018_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -352,7 +358,7 @@ WRITE16_MEMBER(tmnt_state::lgtnfght_0a0018_w)
 	}
 }
 
-WRITE16_MEMBER(tmnt_state::blswhstl_700300_w)
+void tmnt_state::blswhstl_700300_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -375,7 +381,7 @@ WRITE16_MEMBER(tmnt_state::blswhstl_700300_w)
 }
 
 
-READ16_MEMBER(glfgreat_state::glfgreat_rom_r)
+uint16_t glfgreat_state::glfgreat_rom_r(offs_t offset)
 {
 	if (m_roz_rom_mode)
 		return memregion("zoom")->base()[m_roz_char_bank * 0x80000 + offset];
@@ -388,7 +394,7 @@ READ16_MEMBER(glfgreat_state::glfgreat_rom_r)
 		return memregion("user1")->base()[((offset & 0x3ffff) >> 2) + 0x100000 + m_roz_rom_bank * 0x10000];
 }
 
-WRITE16_MEMBER(glfgreat_state::glfgreat_122000_w)
+void glfgreat_state::glfgreat_122000_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -419,7 +425,7 @@ WRITE16_MEMBER(glfgreat_state::glfgreat_122000_w)
 }
 
 
-WRITE16_MEMBER(tmnt_state::ssriders_eeprom_w)
+void tmnt_state::ssriders_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -438,7 +444,7 @@ WRITE16_MEMBER(tmnt_state::ssriders_eeprom_w)
 	}
 }
 
-WRITE16_MEMBER(tmnt_state::ssriders_1c0300_w)
+void tmnt_state::ssriders_1c0300_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -454,7 +460,7 @@ WRITE16_MEMBER(tmnt_state::ssriders_1c0300_w)
 	}
 }
 
-WRITE16_MEMBER(prmrsocr_state::prmrsocr_122000_w)
+void prmrsocr_state::prmrsocr_122000_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -476,7 +482,7 @@ WRITE16_MEMBER(prmrsocr_state::prmrsocr_122000_w)
 	}
 }
 
-READ16_MEMBER(prmrsocr_state::prmrsocr_rom_r)
+uint16_t prmrsocr_state::prmrsocr_rom_r(offs_t offset)
 {
 	if(m_roz_char_bank)
 		return memregion("zoom")->base()[offset];
@@ -487,7 +493,7 @@ READ16_MEMBER(prmrsocr_state::prmrsocr_rom_r)
 	}
 }
 
-WRITE16_MEMBER(tmnt_state::tmnt_priority_w)
+void tmnt_state::tmnt_priority_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -608,7 +614,7 @@ uint32_t tmnt_state::screen_update_lgtnfght(screen_device &screen, bitmap_ind16 
 }
 
 
-READ16_MEMBER(glfgreat_state::glfgreat_ball_r)
+uint16_t glfgreat_state::glfgreat_ball_r()
 {
 #ifdef MAME_DEBUG
 popmessage("%04x", m_glfgreat_pixel);
@@ -650,7 +656,7 @@ uint32_t tmnt_state::screen_update_glfgreat(screen_device &screen, bitmap_ind16 
 	if (m_layerpri[0] >= 0x30 && m_layerpri[1] < 0x30)
 	{
 		m_k053936->zoom_draw(screen, bitmap, cliprect, m_roz_tilemap, 0, 1, 1);
-		m_glfgreat_pixel = bitmap.pix16(0x80, 0x105);
+		m_glfgreat_pixel = bitmap.pix(0x80, 0x105);
 	}
 
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, m_sorted_layer[1], 0, 2);
@@ -658,7 +664,7 @@ uint32_t tmnt_state::screen_update_glfgreat(screen_device &screen, bitmap_ind16 
 	if (m_layerpri[1] >= 0x30 && m_layerpri[2] < 0x30)
 	{
 		m_k053936->zoom_draw(screen, bitmap, cliprect, m_roz_tilemap, 0, 1, 1);
-		m_glfgreat_pixel = bitmap.pix16(0x80, 0x105);
+		m_glfgreat_pixel = bitmap.pix(0x80, 0x105);
 	}
 
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, m_sorted_layer[2], 0, 4);
@@ -666,7 +672,7 @@ uint32_t tmnt_state::screen_update_glfgreat(screen_device &screen, bitmap_ind16 
 	if (m_layerpri[2] >= 0x30)
 	{
 		m_k053936->zoom_draw(screen, bitmap, cliprect, m_roz_tilemap, 0, 1, 1);
-		m_glfgreat_pixel = bitmap.pix16(0x80, 0x105);
+		m_glfgreat_pixel = bitmap.pix(0x80, 0x105);
 	}
 
 	m_k053245->sprites_draw(bitmap, cliprect, screen.priority());

@@ -12,7 +12,6 @@
  */
 
 #include "emu.h"
-#include "debugger.h"
 #include "dsp56000.h"
 #include "dsp56000d.h"
 

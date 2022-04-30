@@ -3,25 +3,20 @@
 /***********************************************************************************************************
 
 
- MegaDrive / Genesis J-Cart (+SEPROM) emulation
+ MegaDrive / Genesis J-Cart + I2C EEPROM emulation
 
 
- Emulation based on earlier researches by ElBarto
+ Emulation based on earlier research by ElBarto and Eke-Eke
 
 
- i2c games mapping table:
+ I2C games mapping table:
 
- game name                         |   SDA_IN   |  SDA_OUT   |     SCL    |  SIZE_MASK     | PAGE_MASK |
- ----------------------------------|------------|------------|------------|----------------|-----------|
- Micro Machines 2                  | 0x380001-7 | 0x300000-0*| 0x300000-1*| 0x03ff (24C08) |   0x0f    |
- Micro Machines Military           | 0x380001-7 | 0x300000-0*| 0x300000-1*| 0x03ff (24C08) |   0x0f    |
- Micro Machines 96                 | 0x380001-7 | 0x300000-0*| 0x300000-1*| 0x07ff (24C16) |   0x0f    |
- ----------------------------------|------------|------------|------------|----------------|-----------|
-
- * Notes: check these
-
-
- TODO: proper SEPROM emulation, still not worked on (just hooked up the I2C device)
+ Game Name                         |   SDA_IN   |  SDA_OUT   |     SCL    |  SIZE_MASK     | PAGE_MASK | WORKS |
+ ----------------------------------|------------|------------|------------|----------------|-----------|-------|
+ Micro Machines 2                  | 0x380001-7 | 0x300000-0*| 0x300000-1*| 0x03ff (24C08) |   0x0f    |  Yes  |
+ Micro Machines Military           | 0x380001-7 | 0x300000-0*| 0x300000-1*| 0x03ff (24C08) |   0x0f    |  Yes  |
+ Micro Machines 96                 | 0x380001-7 | 0x300000-0*| 0x300000-1*| 0x07ff (24C16) |   0x0f    |  Yes  |
+ ----------------------------------|------------|------------|------------|----------------|-----------|-------|
 
 ***********************************************************************************************************/
 
@@ -88,7 +83,7 @@ void md_seprom_codemast_device::device_add_mconfig(machine_config &config)
 
 void md_seprom_mm96_device::device_add_mconfig(machine_config &config)
 {
-	I2C_24C16A(config, m_i2cmem);
+	I2C_24C16(config, m_i2cmem); // 24C16A
 }
 
 
@@ -157,7 +152,7 @@ void md_seprom_codemast_device::device_reset()
  J-CART ONLY (Pete Sampras Tennis)
  -------------------------------------------------*/
 
-READ16_MEMBER(md_jcart_device::read)
+uint16_t md_jcart_device::read(offs_t offset)
 {
 	if (offset == 0x38fffe/2)
 	{
@@ -165,14 +160,14 @@ READ16_MEMBER(md_jcart_device::read)
 
 		if (m_jcart_io_data[0] & 0x40)
 		{
-			joy[0] = m_jcart3.read_safe(0);
-			joy[1] = m_jcart4.read_safe(0);
+			joy[0] = m_jcart3->read();
+			joy[1] = m_jcart4->read();
 			return (m_jcart_io_data[0] & 0x40) | joy[0] | (joy[1] << 8);
 		}
 		else
 		{
-			joy[0] = ((m_jcart3.read_safe(0) & 0xc0) >> 2) | (m_jcart3.read_safe(0) & 0x03);
-			joy[1] = ((m_jcart4.read_safe(0) & 0xc0) >> 2) | (m_jcart4.read_safe(0) & 0x03);
+			joy[0] = ((m_jcart3->read() & 0xc0) >> 2) | (m_jcart3->read() & 0x03);
+			joy[1] = ((m_jcart4->read() & 0xc0) >> 2) | (m_jcart4->read() & 0x03);
 			return (m_jcart_io_data[0] & 0x40) | joy[0] | (joy[1] << 8);
 		}
 	}
@@ -182,7 +177,7 @@ READ16_MEMBER(md_jcart_device::read)
 		return 0xffff;
 }
 
-WRITE16_MEMBER(md_jcart_device::write)
+void md_jcart_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0x38fffe/2)
 	{
@@ -195,7 +190,7 @@ WRITE16_MEMBER(md_jcart_device::write)
  J-CART + SEPROM
  -------------------------------------------------*/
 
-READ16_MEMBER(md_seprom_codemast_device::read)
+uint16_t md_seprom_codemast_device::read(offs_t offset)
 {
 	if (offset == 0x380000/2)
 	{
@@ -208,14 +203,14 @@ READ16_MEMBER(md_seprom_codemast_device::read)
 
 		if (m_jcart_io_data[0] & 0x40)
 		{
-			joy[0] = m_jcart3.read_safe(0);
-			joy[1] = m_jcart4.read_safe(0);
+			joy[0] = m_jcart3->read();
+			joy[1] = m_jcart4->read();
 			return (m_jcart_io_data[0] & 0x40) | joy[0] | (joy[1] << 8);
 		}
 		else
 		{
-			joy[0] = ((m_jcart3.read_safe(0) & 0xc0) >> 2) | (m_jcart3.read_safe(0) & 0x03);
-			joy[1] = ((m_jcart4.read_safe(0) & 0xc0) >> 2) | (m_jcart4.read_safe(0) & 0x03);
+			joy[0] = ((m_jcart3->read() & 0xc0) >> 2) | (m_jcart3->read() & 0x03);
+			joy[1] = ((m_jcart4->read() & 0xc0) >> 2) | (m_jcart4->read() & 0x03);
 			return (m_jcart_io_data[0] & 0x40) | joy[0] | (joy[1] << 8);
 		}
 	}
@@ -225,9 +220,9 @@ READ16_MEMBER(md_seprom_codemast_device::read)
 		return 0xffff;
 }
 
-WRITE16_MEMBER(md_seprom_codemast_device::write)
+void md_seprom_codemast_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if (offset == 0x380000/2)
+	if (offset == 0x300000/2)
 	{
 		m_i2c_clk = BIT(data, 9);
 		m_i2c_mem = BIT(data, 8);

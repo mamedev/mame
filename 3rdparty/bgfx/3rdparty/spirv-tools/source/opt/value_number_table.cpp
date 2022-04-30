@@ -49,7 +49,8 @@ uint32_t ValueNumberTable::AssignValueNumber(Instruction* inst) {
   // have its own value number.
   // OpSampledImage and OpImage must remain in the same basic block in which
   // they are used, because of this we will assign each one it own value number.
-  if (!context()->IsCombinatorInstruction(inst)) {
+  if (!context()->IsCombinatorInstruction(inst) &&
+      !inst->IsCommonDebugInstr()) {
     value = TakeNextValueNumber();
     id_to_value_[inst->result_id()] = value;
     return value;
@@ -93,7 +94,7 @@ uint32_t ValueNumberTable::AssignValueNumber(Instruction* inst) {
 
   // Phi nodes are a type of copy.  If all of the inputs have the same value
   // number, then we can assign the result of the phi the same value number.
-  if (inst->opcode() == SpvOpPhi &&
+  if (inst->opcode() == SpvOpPhi && inst->NumInOperands() > 0 &&
       dec_mgr->HaveTheSameDecorations(inst->result_id(),
                                       inst->GetSingleWordInOperand(0))) {
     value = GetValueNumber(inst->GetSingleWordInOperand(0));
@@ -168,6 +169,12 @@ void ValueNumberTable::BuildDominatorTreeValueNumberTable() {
   }
 
   for (auto& inst : context()->module()->ext_inst_imports()) {
+    if (inst.result_id() != 0) {
+      AssignValueNumber(&inst);
+    }
+  }
+
+  for (auto& inst : context()->module()->ext_inst_debuginfo()) {
     if (inst.result_id() != 0) {
       AssignValueNumber(&inst);
     }

@@ -68,10 +68,10 @@ igs017_igs031_device::igs017_igs031_device(const machine_config &mconfig, const 
 	, device_memory_interface(mconfig, *this)
 	, m_palette_scramble_cb(*this, FUNC(igs017_igs031_device::palette_callback_straight))
 	, m_space_config("igs017_igs031", ENDIANNESS_BIG, 8,15, 0, address_map_constructor(FUNC(igs017_igs031_device::map), this))
-	, m_spriteram(*this, "spriteram", 0)
-	, m_fg_videoram(*this, "fg_videoram", 0)
-	, m_bg_videoram(*this, "bg_videoram", 0)
-	, m_palram(*this, "palram", 0)
+	, m_spriteram(*this, "spriteram")
+	, m_fg_videoram(*this, "fg_videoram")
+	, m_bg_videoram(*this, "bg_videoram")
+	, m_palram(*this, "palram")
 	, m_i8255(*this, finder_base::DUMMY_TAG)
 	, m_palette(*this, "palette")
 	, m_revbits(false)
@@ -179,13 +179,13 @@ TILE_GET_INFO_MEMBER(igs017_igs031_device::get_fg_tile_info)
 {
 	const u16 code = m_fg_videoram[tile_index * 4 + 0] + (m_fg_videoram[tile_index * 4 + 1] << 8);
 	const u16 attr = m_fg_videoram[tile_index * 4 + 2] + (m_fg_videoram[tile_index * 4 + 3] << 8);
-	SET_TILE_INFO_MEMBER(0, code, COLOR(attr), TILE_FLIPXY(attr >> 5));
+	tileinfo.set(0, code, COLOR(attr), TILE_FLIPXY(attr >> 5));
 }
 TILE_GET_INFO_MEMBER(igs017_igs031_device::get_bg_tile_info)
 {
 	const u16 code = m_bg_videoram[tile_index * 4 + 0] + (m_bg_videoram[tile_index * 4 + 1] << 8);
 	const u16 attr = m_bg_videoram[tile_index * 4 + 2] + (m_bg_videoram[tile_index * 4 + 3] << 8);
-	SET_TILE_INFO_MEMBER(0, code, COLOR(attr)+8, TILE_FLIPXY(attr >> 5));
+	tileinfo.set(0, code, COLOR(attr)+8, TILE_FLIPXY(attr >> 5));
 }
 
 void igs017_igs031_device::fg_w(offs_t offset, u8 data)
@@ -305,8 +305,8 @@ void igs017_igs031_device::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cl
 	{ // skip if inner loop doesn't draw anything
 		for (int y = sy; y < ey; y++)
 		{
-			const u8 *source = source_base + y_index * dimx;
-			u16 *dest = &bitmap.pix16(y);
+			u8 const *const source = source_base + y_index * dimx;
+			u16 *const dest = &bitmap.pix(y);
 			int x_index = x_index_base;
 			for (int x = sx; x < ex; x++)
 			{

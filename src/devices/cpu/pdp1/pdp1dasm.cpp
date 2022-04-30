@@ -19,7 +19,7 @@ inline void pdp1_disassembler::ea()
 
 u32 pdp1_disassembler::opcode_alignment() const
 {
-	return 4;
+	return 1;
 }
 
 offs_t pdp1_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
@@ -290,5 +290,5 @@ offs_t pdp1_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 		//etime = 5;
 		break;
 	}
-	return 4;
+	return 1;
 }

@@ -5,13 +5,13 @@
 
 #pragma once
 
-typedef device_delegate<uint16_t (uint16_t pri)> decospr_pri_cb_delegate;
-typedef device_delegate<uint16_t (uint16_t col)> decospr_col_cb_delegate;
+typedef device_delegate<uint16_t (uint16_t pri, bool extpri)> decospr_pri_cb_delegate;
+typedef device_delegate<uint16_t (uint16_t col, bool extcol)> decospr_col_cb_delegate;
 
 
 // function definition for a callback
-#define DECOSPR_PRIORITY_CB_MEMBER(_name)   uint16_t _name(uint16_t pri)
-#define DECOSPR_COLOUR_CB_MEMBER(_name)     uint16_t _name(uint16_t col)
+#define DECOSPR_PRIORITY_CB_MEMBER(_name)   uint16_t _name(uint16_t pri, bool extpri)
+#define DECOSPR_COLOUR_CB_MEMBER(_name)     uint16_t _name(uint16_t col, bool extcol)
 
 
 class decospr_device : public device_t, public device_video_interface
@@ -43,7 +43,7 @@ public:
 
 	void alloc_sprite_bitmap();
 	void inefficient_copy_sprite_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t pri, uint16_t priority_mask, uint16_t colbase, uint16_t palmask, uint8_t alpha = 0xff);
-	bitmap_ind16& get_sprite_temp_bitmap() { assert(m_sprite_bitmap.valid()); return m_sprite_bitmap; };
+	bitmap_ind16& get_sprite_temp_bitmap() { assert(m_sprite_bitmap.valid()); return m_sprite_bitmap; }
 
 	DECOSPR_PRIORITY_CB_MEMBER(default_col_cb);
 
@@ -54,10 +54,10 @@ protected:
 	decospr_pri_cb_delegate m_pri_cb;
 	decospr_col_cb_delegate m_col_cb;
 	bitmap_ind16 m_sprite_bitmap;// optional sprite bitmap (should be INDEXED16)
-	bool m_alt_format;
-	uint16_t m_pixmask;
-	uint16_t m_raw_shift;
-	bool m_flip_screen;
+	bool m_alt_format = false;
+	uint16_t m_pixmask = 0;
+	uint16_t m_raw_shift = 0;
+	bool m_flip_screen = false;
 
 	// used by various bootleg / clone chips.
 	bool m_is_bootleg; // used by various bootlegs (disables masking of sprite tile number when multi-sprite is used)
@@ -67,8 +67,8 @@ protected:
 	int m_transpen; // used by fncywld (tumbleb.cpp)
 
 private:
-	template<class _BitmapClass>
-	void draw_sprites_common(_BitmapClass &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sizewords);
+	template<class BitmapClass>
+	void draw_sprites_common(BitmapClass &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sizewords);
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 

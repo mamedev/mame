@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -310,9 +310,9 @@ namespace bx
 
 	inline int32_t strCopy(char* _dst, int32_t _dstSize, const char* _src, int32_t _num)
 	{
-		BX_CHECK(NULL != _dst, "_dst can't be NULL!");
-		BX_CHECK(NULL != _src, "_src can't be NULL!");
-		BX_CHECK(0 < _dstSize, "_dstSize can't be 0!");
+		BX_ASSERT(NULL != _dst, "_dst can't be NULL!");
+		BX_ASSERT(NULL != _src, "_src can't be NULL!");
+		BX_ASSERT(0 < _dstSize, "_dstSize can't be 0!");
 
 		const int32_t len = strLen(_src, _num);
 		const int32_t max = _dstSize-1;
@@ -330,9 +330,9 @@ namespace bx
 
 	inline int32_t strCat(char* _dst, int32_t _dstSize, const char* _src, int32_t _num)
 	{
-		BX_CHECK(NULL != _dst, "_dst can't be NULL!");
-		BX_CHECK(NULL != _src, "_src can't be NULL!");
-		BX_CHECK(0 < _dstSize, "_dstSize can't be 0!");
+		BX_ASSERT(NULL != _dst, "_dst can't be NULL!");
+		BX_ASSERT(NULL != _src, "_src can't be NULL!");
+		BX_ASSERT(0 < _dstSize, "_dstSize can't be 0!");
 
 		const int32_t max = _dstSize;
 		const int32_t len = strLen(_dst, max);
@@ -420,18 +420,9 @@ namespace bx
 				}
 			}
 
-			// Set pointers.
-			const char* string = ptr;
-			const char* search = _find;
-
-			// Start comparing.
-			while (fn(*string++) == fn(*search++) )
+			if (0 == strCmp<fn>(ptr, _findMax, _find, _findMax) )
 			{
-				// If end of the 'search' string is reached, all characters match.
-				if ('\0' == *search)
-				{
-					return ptr;
-				}
+				return ptr;
 			}
 		}
 
@@ -539,9 +530,32 @@ namespace bx
 		return _str;
 	}
 
+	StringView strRTrimSpace(const StringView& _str)
+	{
+		if (!_str.isEmpty() )
+		{
+			const char* ptr = _str.getPtr();
+
+			for (int32_t len = _str.getLength(), ii = len - 1; 0 <= ii; --ii)
+			{
+				if (!isSpace(ptr[ii]) )
+				{
+					return StringView(ptr, ii + 1);
+				}
+			}
+		}
+
+		return _str;
+	}
+
 	StringView strTrim(const StringView& _str, const StringView& _chars)
 	{
 		return strLTrim(strRTrim(_str, _chars), _chars);
+	}
+
+	StringView strTrimSpace(const StringView& _str)
+	{
+		return strLTrimSpace(strRTrimSpace(_str) );
 	}
 
 	constexpr uint32_t kFindStep = 1024;
@@ -550,23 +564,13 @@ namespace bx
 	{
 		StringView str(_str);
 
-		for (; str.getPtr() != _str.getTerm()
-			; str = StringView(min(str.getPtr() + kFindStep, _str.getTerm() ), min(str.getPtr() + kFindStep*2, _str.getTerm() ) )
-			)
+		// This method returns the character past the \n, so
+		// there is no need to look for he \r which preceedes it.
+		StringView eol = strFind(str, "\n");
+		if (!eol.isEmpty() )
 		{
-			StringView eol = strFind(str, "\r\n");
-			if (!eol.isEmpty() )
-			{
-				return StringView(eol.getTerm(), _str.getTerm() );
-			}
-
-			eol = strFind(str, '\n');
-			if (!eol.isEmpty() )
-			{
-				return StringView(eol.getTerm(), _str.getTerm() );
-			}
+			return StringView(eol.getTerm(), str.getTerm() );
 		}
-
 		return StringView(_str.getTerm(), _str.getTerm() );
 	}
 
@@ -674,7 +678,7 @@ namespace bx
 		StringView ptr = strFind(_str, _word);
 		for (; !ptr.isEmpty(); ptr = strFind(StringView(ptr.getPtr() + len, _str.getTerm() ), _word) )
 		{
-			char ch = *(ptr.getPtr() - 1);
+			char ch = ptr.getPtr() != _str.getPtr() ? *(ptr.getPtr() - 1) : ' ';
 			if (isAlphaNum(ch) || '_' == ch)
 			{
 				continue;
@@ -739,13 +743,40 @@ namespace bx
 		{
 			int32_t size = 0;
 			int32_t len = (int32_t)strLen(_str, _len);
-			int32_t padding = _param.width > len ? _param.width - len : 0;
-			bool sign = _param.sign && len > 1 && _str[0] != '-';
-			padding = padding > 0 ? padding - sign : 0;
+
+			if (_param.width > 0)
+			{
+				len = min(_param.width, len);
+			}
+
+			const bool hasMinus = (NULL != _str && '-' == _str[0]);
+			const bool hasSign = _param.sign || hasMinus;
+			char sign = hasSign ? hasMinus ? '-' : '+' : '\0';
+
+			const char* str = _str;
+			if (hasMinus)
+			{
+				str++;
+				len--;
+			}
+
+			int32_t padding = _param.width > len ? _param.width - len - hasSign: 0;
 
 			if (!_param.left)
 			{
-				size += writeRep(_writer, _param.fill, padding, _err);
+				if (' '  != _param.fill
+				&&  '\0' != sign)
+				{
+					size += write(_writer, sign, _err);
+					sign = '\0';
+				}
+
+				size += writeRep(_writer, _param.fill, max(0, padding), _err);
+			}
+
+			if ('\0' != sign)
+			{
+				size += write(_writer, sign, _err);
 			}
 
 			if (NULL == _str)
@@ -756,17 +787,12 @@ namespace bx
 			{
 				for (int32_t ii = 0; ii < len; ++ii)
 				{
-					size += write(_writer, toUpper(_str[ii]), _err);
+					size += write(_writer, toUpper(str[ii]), _err);
 				}
-			}
-			else if (sign)
-			{
-				size += write(_writer, '+', _err);
-				size += write(_writer, _str, len, _err);
 			}
 			else
 			{
-				size += write(_writer, _str, len, _err);
+				size += write(_writer, str, len, _err);
 			}
 
 			if (_param.left)

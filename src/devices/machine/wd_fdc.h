@@ -57,6 +57,8 @@ public:
 	auto ready_wr_callback() { return ready_cb.bind(); }
 	auto enmf_rd_callback() { return enmf_cb.bind(); }
 
+	auto mon_wr_callback() { return mon_cb.bind(); }
+
 	void soft_reset();
 
 	DECLARE_WRITE_LINE_MEMBER(dden_w);
@@ -90,7 +92,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mr_w);
 
 	void index_callback(floppy_image_device *floppy, int state);
-
 protected:
 	wd_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -102,6 +103,7 @@ protected:
 	bool side_control;
 	bool side_compare;
 	bool head_control;
+	int hld_timeout;
 	bool motor_control;
 	bool ready_hooked;
 	int clock_ratio;
@@ -115,7 +117,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual int calc_sector_size(uint8_t size, uint8_t command) const;
 	virtual int settle_time() const;
@@ -216,6 +218,7 @@ private:
 		TRACK_DONE,
 
 		INITIAL_RESTORE,
+		DUMMY,
 
 		// Live states
 
@@ -237,6 +240,8 @@ private:
 		WRITE_SECTOR_PRE,
 		WRITE_SECTOR_PRE_BYTE
 	};
+
+
 
 	struct live_info {
 		enum { PT_NONE, PT_CRC_1, PT_CRC_2 };
@@ -294,13 +299,13 @@ private:
 
 	devcb_write_line intrq_cb, drq_cb, hld_cb, enp_cb, sso_cb, ready_cb;
 	devcb_read_line enmf_cb;
+	devcb_write_line mon_cb;
 
 	uint8_t format_last_byte;
 	int format_last_byte_count;
 	std::string format_description_string;
 
-	static std::string tts(const attotime &t);
-	std::string ttsn();
+	bool delay_int;
 
 	void delay_cycles(emu_timer *tm, int cycles);
 
@@ -354,8 +359,11 @@ private:
 	void live_write_mfm(uint8_t mfm);
 	void live_write_fm(uint8_t fm);
 
-	void drop_drq();
 	void set_drq();
+	void drop_drq();
+
+	void set_hld();
+	void drop_hld();
 
 	void update_sso();
 };

@@ -9,6 +9,7 @@
 
 #include "emu.h"
 #include "opus.h"
+#include "softlist_dev.h"
 
 
 //**************************************************************************
@@ -44,9 +45,11 @@ ioport_constructor spectrum_opus_device::device_input_ports() const
 //  MACHINE_DRIVER( opus )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( spectrum_opus_device::floppy_formats )
-	FLOPPY_OPD_FORMAT
-FLOPPY_FORMATS_END
+void spectrum_opus_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_OPD_FORMAT);
+}
 
 static void spectrum_floppies(device_slot_interface &device)
 {
@@ -99,6 +102,7 @@ void spectrum_opus_device::device_add_mconfig(machine_config &config)
 	/* passthru without NMI */
 	SPECTRUM_EXPANSION_SLOT(config, m_exp, spectrum_expansion_devices, nullptr);
 	m_exp->irq_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::irq_w));
+	m_exp->fb_r_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::fb_r));
 }
 
 const tiny_rom_entry *spectrum_opus_device::device_rom_region() const
@@ -139,7 +143,6 @@ void spectrum_opus_device::device_start()
 
 	save_item(NAME(m_romcs));
 	save_item(NAME(m_ram));
-	save_item(NAME(m_last_pc));
 }
 
 //-------------------------------------------------
@@ -149,7 +152,6 @@ void spectrum_opus_device::device_start()
 void spectrum_opus_device::device_reset()
 {
 	m_romcs = 0;
-	m_last_pc = 0x0000;
 }
 
 
@@ -162,13 +164,13 @@ READ_LINE_MEMBER(spectrum_opus_device::romcs)
 	return m_romcs | m_exp->romcs();
 }
 
-void spectrum_opus_device::pre_opcode_fetch(offs_t offset)
+void spectrum_opus_device::post_opcode_fetch(offs_t offset)
 {
-	m_exp->pre_opcode_fetch(offset);
+	m_exp->post_opcode_fetch(offset);
 
 	if (!machine().side_effects_disabled())
 	{
-		switch (m_last_pc)
+		switch (offset)
 		{
 		case 0x0008: case 0x0048: case 0x1708:
 			m_romcs = 1;
@@ -178,7 +180,6 @@ void spectrum_opus_device::pre_opcode_fetch(offs_t offset)
 			break;
 		}
 	}
-	m_last_pc = offset;
 }
 
 uint8_t spectrum_opus_device::iorq_r(offs_t offset)
@@ -188,14 +189,9 @@ uint8_t spectrum_opus_device::iorq_r(offs_t offset)
 	// PIA bit 7 is enable joystick and selected on A5 only
 	if (!BIT(m_pia->a_output(), 7) && (~offset & 0x20))
 	{
-		data &= m_joy->read() & 0x1f;
+		data = m_joy->read() & 0x1f;
 	}
 	return data;
-}
-
-void spectrum_opus_device::iorq_w(offs_t offset, uint8_t data)
-{
-	m_exp->iorq_w(offset, data);
 }
 
 uint8_t spectrum_opus_device::mreq_r(offs_t offset)
@@ -255,7 +251,7 @@ void spectrum_opus_device::mreq_w(offs_t offset, uint8_t data)
 		m_exp->mreq_w(offset, data);
 }
 
-WRITE8_MEMBER(spectrum_opus_device::pia_out_a)
+void spectrum_opus_device::pia_out_a(uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -272,8 +268,9 @@ WRITE8_MEMBER(spectrum_opus_device::pia_out_a)
 	m_fdc->dden_w(BIT(data, 5));
 }
 
-WRITE8_MEMBER(spectrum_opus_device::pia_out_b)
+void spectrum_opus_device::pia_out_b(uint8_t data)
 {
+	m_centronics->write_data0(BIT(data, 0));
 	m_centronics->write_data1(BIT(data, 1));
 	m_centronics->write_data2(BIT(data, 2));
 	m_centronics->write_data3(BIT(data, 3));

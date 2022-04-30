@@ -119,7 +119,7 @@
 
 #include "cpu/m68000/m68000.h"
 #include "machine/decocrpt.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "screen.h"
 #include "speaker.h"
 #include <algorithm>
@@ -202,7 +202,7 @@ void rohga_state::wizdfire_map(address_map &map)
 	map(0x208000, 0x208fff).rw("tilegen2", FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x20a000, 0x20afff).rw("tilegen2", FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 
-	map(0x20b000, 0x20b3ff).writeonly(); /* ? Always 0 written */
+	map(0x20b000, 0x20b3ff).nopw(); /* ? Always 0 written */
 	map(0x20c000, 0x20c7ff).ram().share("pf3_rowscroll");
 	map(0x20e000, 0x20e7ff).ram().share("pf4_rowscroll");
 
@@ -893,8 +893,6 @@ void rohga_state::rohga(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x64);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
 	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
@@ -908,8 +906,6 @@ void rohga_state::rohga(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[1], 0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x00);
 	m_deco_tilegen[1]->set_pf2_col_bank(0x10);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
@@ -939,16 +935,16 @@ void rohga_state::rohga(machine_config &config)
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 32220000/9));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 1);    /* IRQ2 */
 	ymsnd.port_write_handler().set(FUNC(rohga_state::sound_bankswitch_w));
-	ymsnd.add_route(0, "lspeaker", 0.78);
-	ymsnd.add_route(1, "rspeaker", 0.78);
+	ymsnd.add_route(0, "lspeaker", 0.36);
+	ymsnd.add_route(1, "rspeaker", 0.36);
 
 	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
-	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.46);
+	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.46);
 
 	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
-	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.40);
-	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.40);
+	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.18);
+	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.18);
 }
 
 void rohga_state::wizdfire(machine_config &config)
@@ -983,8 +979,6 @@ void rohga_state::wizdfire(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
 	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
@@ -998,8 +992,6 @@ void rohga_state::wizdfire(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[1], 0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x00);
 	m_deco_tilegen[1]->set_pf2_col_bank(0x10);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
@@ -1034,16 +1026,16 @@ void rohga_state::wizdfire(machine_config &config)
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 32220000/9));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 1);    /* IRQ2 */
 	ymsnd.port_write_handler().set(FUNC(rohga_state::sound_bankswitch_w));
-	ymsnd.add_route(0, "lspeaker", 0.80);
-	ymsnd.add_route(1, "rspeaker", 0.80);
+	ymsnd.add_route(0, "lspeaker", 0.36);
+	ymsnd.add_route(1, "rspeaker", 0.36);
 
 	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
-	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.46);
+	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.46);
 
 	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
-	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.40);
-	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.40);
+	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.18);
+	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.18);
 }
 
 void rohga_state::nitrobal(machine_config &config)
@@ -1078,8 +1070,6 @@ void rohga_state::nitrobal(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_32x32);
-	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
 	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
@@ -1093,8 +1083,6 @@ void rohga_state::nitrobal(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[1], 0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_32x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_32x32);
-	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[1]->set_pf1_col_bank(0);
 	m_deco_tilegen[1]->set_pf2_col_bank(0);
 	m_deco_tilegen[1]->set_pf1_col_mask(0);
@@ -1130,16 +1118,16 @@ void rohga_state::nitrobal(machine_config &config)
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 32220000/9));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 1);    /* IRQ2 */
 	ymsnd.port_write_handler().set(FUNC(rohga_state::sound_bankswitch_w));
-	ymsnd.add_route(0, "lspeaker", 0.80);
-	ymsnd.add_route(1, "rspeaker", 0.80);
+	ymsnd.add_route(0, "lspeaker", 0.36);
+	ymsnd.add_route(1, "rspeaker", 0.36);
 
 	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
-	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.46);
+	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.46);
 
 	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
-	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.40);
-	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.40);
+	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.18);
+	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.18);
 }
 
 void rohga_state::schmeisr(machine_config &config)
@@ -1174,8 +1162,6 @@ void rohga_state::schmeisr(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x64);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
 	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
@@ -1189,8 +1175,6 @@ void rohga_state::schmeisr(machine_config &config)
 	DECO16IC(config, m_deco_tilegen[1], 0);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x00);
 	m_deco_tilegen[1]->set_pf2_col_bank(0x10);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
@@ -1220,16 +1204,16 @@ void rohga_state::schmeisr(machine_config &config)
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 32220000/9));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 1);    /* IRQ2 */
 	ymsnd.port_write_handler().set(FUNC(rohga_state::sound_bankswitch_w));
-	ymsnd.add_route(0, "lspeaker", 0.80);
-	ymsnd.add_route(1, "rspeaker", 0.80);
+	ymsnd.add_route(0, "lspeaker", 0.36);
+	ymsnd.add_route(1, "rspeaker", 0.36);
 
 	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
-	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.46);
+	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.46);
 
 	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
-	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.40);
-	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.40);
+	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.18);
+	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.18);
 }
 
 
@@ -1737,6 +1721,51 @@ ROM_START( nitrobala )
 	ROM_LOAD( "jn-00.17l", 0x00000,  0x400,  CRC(6ac77b84) SHA1(9e1e2cabdb20b819e592a0f07d15658062227fa4) ) /* Priority (unused) */
 ROM_END
 
+ROM_START( nitrobalb )
+	ROM_REGION(0x200000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "mm-01.d3",   0x000000, 0x20000, CRC(81ca7ef0) SHA1(7090dc77eaee57805f723ef1c21e245d8c9e5c20) )
+	ROM_LOAD16_BYTE( "mm-00.b3",   0x000001, 0x20000, CRC(e3416c4f) SHA1(8cbe6e1d5248c85112d7059aeecc1e185fdd77d7) )
+	ROM_LOAD16_BYTE( "mm-03.d5",   0x040000, 0x20000, CRC(ed9792aa) SHA1(b540a828b5d7f4859e2b927b8ca843f0462d0b0b) )
+	ROM_LOAD16_BYTE( "mm-02.b5",   0x040001, 0x20000, CRC(9a568ed3) SHA1(acc254af3c9079eb91af52fcfda18c1cfadfd1ce) )
+	ROM_LOAD16_BYTE( "mm-05.d6",   0x080000, 0x40000, CRC(b820fa20) SHA1(8509567cf988fe27552d37241b25b66a6e1a9c39) )
+	ROM_LOAD16_BYTE( "mm-04.b6",   0x080001, 0x40000, CRC(1fd8995b) SHA1(75d77835500e4b7caca92ba634859d7a2ad9b84c) )
+	/* Two empty rom slots at d7, b7 */
+
+	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
+	ROM_LOAD( "mm-08.r20",  0x00000,  0x10000,  CRC(93d93fe1) SHA1(efc618724251d23a23b3019d475f7739a7e88751) )
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "mm-06.d10",  0x00000,  0x10000,  CRC(91cf668e) SHA1(fc153eaa09777f79369037a139470ad1118e8d7e) ) /* Chars */
+	ROM_LOAD16_BYTE( "mm-07.d12",  0x00001,  0x10000,  CRC(e61d0e42) SHA1(80d6ada356c721b0be826554ec6731dbbc19e0ab) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD( "mav00.b10", 0x00000, 0x80000,  CRC(34785d97) SHA1(094f881cd699d1b9fd079778f20f8c9d83283e6e) ) /* Tiles */
+	ROM_LOAD( "mav01.b12", 0x80000, 0x80000,  CRC(8b531b16) SHA1(f734286f4510b2c09dc2d6d2b8c8da9dc4424287) )
+
+	ROM_REGION( 0x200000, "gfx3", 0 )
+	ROM_LOAD( "mav02.b16", 0x000000, 0x100000,  CRC(20723bf7) SHA1(b3491d98ff415701fec2b58d85f99c743d71b013) ) /* Tiles */
+	ROM_LOAD( "mav03.e16", 0x100000, 0x100000,  CRC(ef6195f0) SHA1(491bc030519c78b84396f7f8a21df9daf8acc140) )
+
+	ROM_REGION( 0x300000, "gfx4", 0 )
+	ROM_LOAD( "mav04.b19", 0x000000, 0x100000,  CRC(8ba48385) SHA1(926ae1e0e99b8e022b6798ceb29dd080cfc1bada) ) /* Sprites #1 */
+	ROM_LOAD( "mav05.e19", 0x180000, 0x100000,  CRC(d92d769c) SHA1(8012e7f2b9a7cbccde8da90025647443beb6c47c) )
+	ROM_LOAD( "mav06.b20", 0x100000, 0x080000,  CRC(ae6201a5) SHA1(c0ae87fa96d12377c5522cb8adfed03373ab3757) )
+	ROM_LOAD( "mav07.e20", 0x280000, 0x080000,  CRC(5fc10ccd) SHA1(7debcf223802d5c2ea3d29d39850c8756c863b31) )
+
+	ROM_REGION( 0x80000, "gfx5", 0 )
+	ROM_LOAD( "mav08.b23", 0x000000, 0x040000,  CRC(64966576) SHA1(40c14c0f62eef0317abfb7192505e0337fb5cde5) ) /* Sprites #2 */
+	ROM_LOAD( "mav09.e23", 0x040000, 0x040000,  CRC(1ce7b51a) SHA1(17ed8f34bf6d057e0504e72e95f448d5923aa82e) )
+
+	ROM_REGION(0x80000, "oki1", 0 ) /* Oki samples */
+	ROM_LOAD( "mav10.r17",  0x00000,  0x80000,  CRC(8ad734b0) SHA1(768b9f54bbf4b54591cafecb7a27960da919ce84) )
+
+	ROM_REGION(0x80000, "oki2", 0 ) /* Oki samples */
+	ROM_LOAD( "mav11.r19",  0x00000,  0x80000,  CRC(ef513908) SHA1(72db6c704071d7a784b3768c256fc51087e9e93c) )
+
+	ROM_REGION( 1024, "proms", 0 )
+	ROM_LOAD( "jn-00.17l", 0x00000,  0x400,  CRC(6ac77b84) SHA1(9e1e2cabdb20b819e592a0f07d15658062227fa4) ) /* Priority (unused) */
+ROM_END
+
 ROM_START( gunball )
 	ROM_REGION(0x200000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "jc01.3d",     0x000000, 0x20000, CRC(61bfa998) SHA1(bee57cf5f1759d68948d27a2aaa817c4fc1e5e5a) )
@@ -1913,6 +1942,7 @@ GAME( 1992, darkseal2, wizdfire, wizdfire, wizdfire, rohga_state, init_wizdfire,
 
 GAME( 1992, nitrobal,  0,        nitrobal, nitrobal, rohga_state, init_nitrobal, ROT270, "Data East Corporation", "Nitro Ball (World, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, nitrobala, nitrobal, nitrobal, nitrobal, rohga_state, init_nitrobal, ROT270, "Data East Corporation", "Nitro Ball (World, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // was marked 'US' but doesn't seem to have a 'Winners Don't Use Drugs' screen, so unlikely
+GAME( 1992, nitrobalb, nitrobal, nitrobal, nitrobal, rohga_state, init_nitrobal, ROT270, "Data East Corporation", "Nitro Ball (World, set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, gunball,   nitrobal, nitrobal, nitrobal, rohga_state, init_nitrobal, ROT270, "Data East Corporation", "Gun Ball (Japan)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1993, schmeisr,  0,        schmeisr, schmeisr, rohga_state, init_schmeisr, ROT0,   "Hot-B",                 "Schmeiser Robo (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

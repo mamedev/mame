@@ -43,23 +43,23 @@ class emulator_info
 {
 public:
 	// construction/destruction
-	emulator_info() {};
+	emulator_info() = default;
 
-	static const char * get_appname();
-	static const char * get_appname_lower();
-	static const char * get_configname();
-	static const char * get_copyright();
-	static const char * get_copyright_info();
-	static const char * get_bare_build_version();
-	static const char * get_build_version();
-	static void display_ui_chooser(running_machine& machine);
+	static const char *get_appname();
+	static const char *get_appname_lower();
+	static const char *get_configname();
+	static const char *get_copyright();
+	static const char *get_copyright_info();
+	static const char *get_bare_build_version();
+	static const char *get_build_version();
+	static void display_ui_chooser(running_machine &machine);
 	static int start_frontend(emu_options &options, osd_interface &osd, std::vector<std::string> &args);
 	static int start_frontend(emu_options &options, osd_interface &osd, int argc, char *argv[]);
 	static void draw_user_interface(running_machine& machine);
 	static void periodic_check();
 	static bool frame_hook();
 	static void sound_hook();
-	static void layout_file_cb(util::xml::data_node const &layout);
+	static void layout_script_cb(layout_file &file, const char *script);
 	static bool standalone();
 };
 
@@ -71,7 +71,7 @@ protected:
 	// construction/destruction
 	machine_manager(emu_options& options, osd_interface& osd);
 public:
-	virtual ~machine_manager() { }
+	virtual ~machine_manager();
 
 	osd_interface &osd() const { return m_osd; }
 	emu_options &options() const { return m_options; }
@@ -88,7 +88,7 @@ public:
 
 	virtual void update_machine() { }
 
-	http_manager *http() { return m_http.get(); }
+	http_manager *http();
 	void start_http_server();
 
 protected:

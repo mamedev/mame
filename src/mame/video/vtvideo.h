@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic,Karl-Ludwig Deisenhofer
 /**********************************************************************
 
@@ -31,9 +31,9 @@ public:
 	template <typename T> void set_chargen(T &&tag) { m_char_rom.set_tag(std::forward<T>(tag)); }
 
 	DECLARE_READ_LINE_MEMBER(lba7_r);
-	DECLARE_WRITE8_MEMBER(dc012_w);
-	DECLARE_WRITE8_MEMBER(dc011_w);
-	DECLARE_WRITE8_MEMBER(brightness_w);
+	void dc012_w(offs_t offset, uint8_t data);
+	void dc011_w(uint8_t data);
+	void brightness_w(uint8_t data);
 
 	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -58,34 +58,34 @@ protected:
 	devcb_write8       m_write_lba3_lba4;
 	devcb_write_line   m_write_lba7;
 
-	int m_lba7;
+	int m_lba7 = 0;
 
-	bool MHFU_FLAG;
-	int MHFU_counter;
+	bool MHFU_FLAG = false;
+	int MHFU_counter = 0;
 
 	// dc012 attributes
-	uint8_t m_scroll_latch;
-	bool m_scroll_latch_valid;
-	uint8_t m_blink_flip_flop;
-	uint8_t m_reverse_field;
-	uint8_t m_basic_attribute;
+	uint8_t m_scroll_latch = 0;
+	bool m_scroll_latch_valid = false;
+	uint8_t m_blink_flip_flop = 0;
+	uint8_t m_reverse_field = 0;
+	uint8_t m_basic_attribute = 0;
 	// dc011 attributes
-	uint8_t m_columns;
-	uint8_t m_height;
-	uint8_t m_height_MAX;
-	uint8_t m_fill_lines;
-	bool m_is_50hz;
-	bool m_interlaced;
-	emu_timer *m_lba3_change_timer;
-	emu_timer *m_lba7_change_timer;
+	uint8_t m_columns = 0;
+	uint8_t m_height = 0;
+	uint8_t m_height_MAX = 0;
+	uint8_t m_fill_lines = 0;
+	bool m_is_50hz = false;
+	bool m_interlaced = false;
+	emu_timer *m_lba3_change_timer = nullptr;
+	emu_timer *m_lba7_change_timer = nullptr;
 
 	required_region_ptr<uint8_t> m_char_rom; /* character rom region */
 	required_device<palette_device> m_palette;
 
-	bool m_notify_vblank;
-	int m_last_scroll;
+	bool m_notify_vblank = false;
+	int m_last_scroll = 0;
 
-	bool m_linedoubler;
+	bool m_linedoubler = false;
 };
 
 

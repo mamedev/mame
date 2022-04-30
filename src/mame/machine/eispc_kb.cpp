@@ -406,7 +406,7 @@ ioport_constructor eispc_keyboard_device::device_input_ports() const
 
 void eispc_keyboard_device::eispc_kb_mem(address_map &map)
 {
-	map(0x0000, 0x001f).rw(M6801_TAG, FUNC(m6801_cpu_device::m6801_io_r), FUNC(m6801_cpu_device::m6801_io_w));
+	map(0x0000, 0x001f).m(M6801_TAG, FUNC(m6801_cpu_device::m6801_io));
 	map(0x0080, 0x00ff).ram();
 	map(0xf800, 0xffff).rom().region(M6801_TAG, 0);
 }

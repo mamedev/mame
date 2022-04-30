@@ -83,4 +83,13 @@ private:
 	static const char *const ir_names[];
 };
 
+class tmp90c051_disassembler : public tlcs90_disassembler
+{
+public:
+	tmp90c051_disassembler();
+
+private:
+	static const char *const ir_names[];
+};
+
 #endif

@@ -19,19 +19,19 @@ public:
 	auto portb_out() { return m_portb_out.bind(); }
 	auto portb_in() { return m_portb_in.bind(); }
 
-	DECLARE_READ8_MEMBER(inteact_2129_uio_a_data_r);
-	DECLARE_WRITE8_MEMBER(inteact_2129_uio_a_data_w);
-	DECLARE_READ8_MEMBER(inteact_212a_uio_a_direction_r);
-	DECLARE_WRITE8_MEMBER(inteact_212a_uio_a_direction_w);
-	DECLARE_READ8_MEMBER(inteact_212b_uio_a_attribute_r);
-	DECLARE_WRITE8_MEMBER(inteact_212b_uio_a_attribute_w);
+	uint8_t inteact_2129_uio_a_data_r();
+	void inteact_2129_uio_a_data_w(uint8_t data);
+	uint8_t inteact_212a_uio_a_direction_r();
+	void inteact_212a_uio_a_direction_w(uint8_t data);
+	uint8_t inteact_212b_uio_a_attribute_r();
+	void inteact_212b_uio_a_attribute_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(inteact_2149_uio_b_data_r);
-	DECLARE_WRITE8_MEMBER(inteact_2149_uio_b_data_w);
-	DECLARE_READ8_MEMBER(inteact_214a_uio_b_direction_r);
-	DECLARE_WRITE8_MEMBER(inteact_214a_uio_b_direction_w);
-	DECLARE_READ8_MEMBER(inteact_214b_uio_b_attribute_r);
-	DECLARE_WRITE8_MEMBER(inteact_214b_uio_b_attribute_w);
+	uint8_t inteact_2149_uio_b_data_r();
+	void inteact_2149_uio_b_data_w(uint8_t data);
+	uint8_t inteact_214a_uio_b_direction_r();
+	void inteact_214a_uio_b_direction_w(uint8_t data);
+	uint8_t inteact_214b_uio_b_attribute_r();
+	void inteact_214b_uio_b_attribute_w(uint8_t data);
 
 protected:
 	virtual void device_start() override;

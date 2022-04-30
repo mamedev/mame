@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Sean Young
-#include <cassert>
 
-#include "formats/fmsx_cas.h"
+#include "fmsx_cas.h"
+
+#include <cstring>
 
 
 #define CAS_PERIOD        (16)
@@ -104,7 +105,7 @@ static int fmsx_cas_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
 }
 
 
-static const struct CassetteLegacyWaveFiller fmsx_legacy_fill_wave =
+static const cassette_image::LegacyWaveFiller fmsx_legacy_fill_wave =
 {
 	fmsx_cas_fill_wave,                     /* fill_wave */
 	-1,                                     /* chunk_size */
@@ -117,21 +118,21 @@ static const struct CassetteLegacyWaveFiller fmsx_legacy_fill_wave =
 
 
 
-static cassette_image::error fmsx_cas_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error fmsx_cas_identify(cassette_image *cassette, cassette_image::Options *opts)
 {
-	return cassette_legacy_identify(cassette, opts, &fmsx_legacy_fill_wave);
+	return cassette->legacy_identify(opts, &fmsx_legacy_fill_wave);
 }
 
 
 
 static cassette_image::error fmsx_cas_load(cassette_image *cassette)
 {
-	return cassette_legacy_construct(cassette, &fmsx_legacy_fill_wave);
+	return cassette->legacy_construct(&fmsx_legacy_fill_wave);
 }
 
 
 
-static const struct CassetteFormat fmsx_cas_format =
+static const cassette_image::Format fmsx_cas_format =
 {
 	"tap,cas",
 	fmsx_cas_identify,

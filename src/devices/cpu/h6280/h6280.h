@@ -357,17 +357,17 @@ protected:
 
 	// internal registers
 	void internal_map(address_map &map);
-	DECLARE_READ8_MEMBER( irq_status_r );
-	DECLARE_WRITE8_MEMBER( irq_status_w );
+	uint8_t irq_status_r(offs_t offset);
+	void irq_status_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( timer_r );
-	DECLARE_WRITE8_MEMBER( timer_w );
+	uint8_t timer_r();
+	void timer_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( port_r );
-	DECLARE_WRITE8_MEMBER( port_w );
+	uint8_t port_r();
+	void port_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( io_buffer_r );
-	DECLARE_WRITE8_MEMBER( psg_w );
+	uint8_t io_buffer_r();
+	void psg_w(offs_t offset, uint8_t data);
 
 	devcb_read8 m_port_in_cb;
 	devcb_write8 m_port_out_cb;
@@ -380,9 +380,9 @@ protected:
 	uint8_t m_timer_scale;
 
 	// address spaces
-	address_space *m_program;
-	address_space *m_io;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<21, 0, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<21, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access< 2, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 
 	typedef void (h6280_device::*ophandler)();
 

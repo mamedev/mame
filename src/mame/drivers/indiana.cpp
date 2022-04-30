@@ -8,9 +8,8 @@
         01/20/2014 Added ISA bus and peripherals
 
         TODO: Text appears in VGA f/b (0x6B8000), but doesn't display?
-
-        System often reads/writes 6003D4/5, might be a cut-down 6845,
-        as it only uses registers C,D,E,F.
+        TODO: Keyboard doesn't work very well. Scancodes are often lost
+              because the 68030 doesn't poll the MFP frequently enough.
 
 ****************************************************************************/
 
@@ -34,8 +33,8 @@ class indiana_state : public driver_device
 {
 public:
 	indiana_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{
 	}
 
@@ -43,10 +42,13 @@ public:
 
 	void init_indiana();
 
-private:
+protected:
 	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
+
+private:
 	void indiana_mem(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -114,13 +116,11 @@ void indiana_state::indiana(machine_config &config)
 	ISA16_SLOT(config, "isa3", 0, ISABUS_TAG, indiana_isa_cards, "comat", false);
 	ISA16_SLOT(config, "isa4", 0, ISABUS_TAG, indiana_isa_cards, "ide", false);
 
-	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "pc_kbdc", 0));
-	pc_kbdc.out_data_cb().set("mfp", FUNC(mc68901_device::i0_w));
-	pc_kbdc.out_data_cb().append("mfp", FUNC(mc68901_device::si_w));
-	pc_kbdc.out_clock_cb().set("mfp", FUNC(mc68901_device::i1_w));
-	pc_kbdc.out_clock_cb().append("mfp", FUNC(mc68901_device::rc_w));
-
-	PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84).set_pc_kbdc_slot(subdevice("pc_kbdc"));
+	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84));
+	kbd.out_data_cb().set("mfp", FUNC(mc68901_device::i0_w));
+	kbd.out_data_cb().append("mfp", FUNC(mc68901_device::si_w));
+	kbd.out_clock_cb().set("mfp", FUNC(mc68901_device::i1_w));
+	kbd.out_clock_cb().append("mfp", FUNC(mc68901_device::rc_w));
 
 	mc68901_device &mfp(MC68901(config, "mfp", 16_MHz_XTAL / 4));
 	mfp.set_timer_clock(16_MHz_XTAL / 16);

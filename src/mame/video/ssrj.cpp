@@ -5,7 +5,7 @@
 
 /* tilemap 1 */
 
-WRITE8_MEMBER(ssrj_state::vram1_w)
+void ssrj_state::vram1_w(offs_t offset, uint8_t data)
 {
 	m_vram1[offset] = data;
 	m_tilemap1->mark_tile_dirty(offset>>1);
@@ -15,7 +15,7 @@ TILE_GET_INFO_MEMBER(ssrj_state::get_tile_info1)
 {
 	int code;
 	code = m_vram1[tile_index<<1] + (m_vram1[(tile_index<<1)+1]<<8);
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 		code&0x3ff,
 		(code>>12)&0x3,
 		((code & 0x8000) ? TILE_FLIPY:0) |( (code & 0x4000) ? TILE_FLIPX:0) );
@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(ssrj_state::get_tile_info1)
 
 /* tilemap 2 */
 
-WRITE8_MEMBER(ssrj_state::vram2_w)
+void ssrj_state::vram2_w(offs_t offset, uint8_t data)
 {
 	m_vram2[offset] = data;
 	m_tilemap2->mark_tile_dirty(offset>>1);
@@ -33,7 +33,7 @@ TILE_GET_INFO_MEMBER(ssrj_state::get_tile_info2)
 {
 	int code;
 	code = m_vram2[tile_index<<1] + (m_vram2[(tile_index<<1)+1]<<8);
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 		code&0x3ff,
 		((code>>12)&0x3)+4,
 		((code & 0x8000) ? TILE_FLIPY:0) |( (code & 0x4000) ? TILE_FLIPX:0) );
@@ -41,7 +41,7 @@ TILE_GET_INFO_MEMBER(ssrj_state::get_tile_info2)
 
 /* tilemap 4 */
 
-WRITE8_MEMBER(ssrj_state::vram4_w)
+void ssrj_state::vram4_w(offs_t offset, uint8_t data)
 {
 	m_vram4[offset] = data;
 	m_tilemap4->mark_tile_dirty(offset>>1);
@@ -51,7 +51,7 @@ TILE_GET_INFO_MEMBER(ssrj_state::get_tile_info4)
 {
 	int code;
 	code = m_vram4[tile_index<<1] + (m_vram4[(tile_index<<1)+1]<<8);
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 		code&0x3ff,
 		((code>>12)&0x3)+12,
 		((code & 0x8000) ? TILE_FLIPY:0) |( (code & 0x4000) ? TILE_FLIPX:0) );

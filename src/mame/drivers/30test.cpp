@@ -77,13 +77,13 @@ private:
 	void main_map(address_map &map);
 
 	void output_digit(int i, u8 data);
-	DECLARE_WRITE8_MEMBER(led_w);
-	DECLARE_WRITE8_MEMBER(led_rank_w);
-	DECLARE_WRITE8_MEMBER(lamps_w);
-	DECLARE_READ8_MEMBER(mux_r);
-	DECLARE_WRITE8_MEMBER(coin_w);
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(okibank_w);
+	void led_w(offs_t offset, u8 data);
+	void led_rank_w(offs_t offset, u8 data);
+	void lamps_w(u8 data);
+	u8 mux_r();
+	void coin_w(u8 data);
+	void mux_w(u8 data);
+	void okibank_w(u8 data);
 
 	u8 m_mux_data = 0;
 };
@@ -111,7 +111,7 @@ void namco_30test_state::output_digit(int i, u8 data)
 	m_digits[i] = led_map[data & 0xf];
 }
 
-WRITE8_MEMBER(namco_30test_state::led_w)
+void namco_30test_state::led_w(offs_t offset, u8 data)
 {
 	// 0-29: playfield
 	// 30,31: time
@@ -119,7 +119,7 @@ WRITE8_MEMBER(namco_30test_state::led_w)
 	output_digit(1 + offset * 2,  data & 0x0f);
 }
 
-WRITE8_MEMBER(namco_30test_state::led_rank_w)
+void namco_30test_state::led_rank_w(offs_t offset, u8 data)
 {
 	// 0: 1st place
 	// 1: 2nd place
@@ -129,14 +129,14 @@ WRITE8_MEMBER(namco_30test_state::led_rank_w)
 	output_digit(65 + offset * 2, data & 0x0f);
 }
 
-WRITE8_MEMBER(namco_30test_state::lamps_w)
+void namco_30test_state::lamps_w(u8 data)
 {
 	// d0-d5: ranking, d6: game over, d7: assume marquee lamp
 	for (int i = 0; i < 8; i++)
 		m_lamps[i] = BIT(data, i);
 }
 
-WRITE8_MEMBER(namco_30test_state::coin_w)
+void namco_30test_state::coin_w(u8 data)
 {
 	// d2: coincounter
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 2));
@@ -145,7 +145,7 @@ WRITE8_MEMBER(namco_30test_state::coin_w)
 	// other: ?
 }
 
-READ8_MEMBER(namco_30test_state::mux_r)
+u8 namco_30test_state::mux_r()
 {
 	u8 data = 0xff;
 
@@ -158,12 +158,12 @@ READ8_MEMBER(namco_30test_state::mux_r)
 	return data;
 }
 
-WRITE8_MEMBER(namco_30test_state::mux_w)
+void namco_30test_state::mux_w(u8 data)
 {
 	m_mux_data = data;
 }
 
-WRITE8_MEMBER(namco_30test_state::okibank_w)
+void namco_30test_state::okibank_w(u8 data)
 {
 	m_oki->set_rom_bank(data & 1);
 }

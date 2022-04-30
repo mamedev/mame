@@ -33,10 +33,10 @@ public:
 	// I/O operations
 	void regs_map(address_map &map);
 
-	DECLARE_READ16_MEMBER(status_r);
+	uint16_t status_r();
 
-	DECLARE_READ16_MEMBER(ram_r);
-	DECLARE_WRITE16_MEMBER(ram_w);
+	uint16_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void data_map(address_map &map);
 protected:
@@ -47,7 +47,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 private:
 	const address_space_config m_space_config;
-	uint16_t* m_ram;
+	uint16_t* m_ram = nullptr;
 };
 
 

@@ -1,13 +1,12 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0
 
 Most of these can be run in BASIC by using LOAD"*"
 If the program doesn't automatically start, start it with RUN
 
 -->
-
 
 <softwarelist name="tvc_flop" description="Videoton TVC floppies">
 	<software name="21">

@@ -107,7 +107,7 @@ Sound: VLM5030 at 7B
 
 
 
-READ8_MEMBER(yiear_state::yiear_speech_r)
+uint8_t yiear_state::speech_r()
 {
 	if (m_vlm->bsy())
 		return 1;
@@ -115,7 +115,7 @@ READ8_MEMBER(yiear_state::yiear_speech_r)
 		return 0;
 }
 
-WRITE8_MEMBER(yiear_state::yiear_VLM5030_control_w)
+void yiear_state::VLM5030_control_w(uint8_t data)
 {
 	/* bit 0 is latch direction */
 	m_vlm->st((data >> 1) & 1);
@@ -124,25 +124,25 @@ WRITE8_MEMBER(yiear_state::yiear_VLM5030_control_w)
 
 WRITE_LINE_MEMBER(yiear_state::vblank_irq)
 {
-	if (state && m_yiear_irq_enable)
+	if (state && m_irq_enable)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 
-INTERRUPT_GEN_MEMBER(yiear_state::yiear_nmi_interrupt)
+INTERRUPT_GEN_MEMBER(yiear_state::nmi_interrupt)
 {
-	if (m_yiear_nmi_enable)
+	if (m_nmi_enable)
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
 void yiear_state::main_map(address_map &map)
 {
-	map(0x0000, 0x0000).r(FUNC(yiear_state::yiear_speech_r));
-	map(0x4000, 0x4000).w(FUNC(yiear_state::yiear_control_w));
+	map(0x0000, 0x0000).r(FUNC(yiear_state::speech_r));
+	map(0x4000, 0x4000).w(FUNC(yiear_state::control_w));
 	map(0x4800, 0x4800).w(FUNC(yiear_state::konami_SN76496_latch_w));
 	map(0x4900, 0x4900).w(FUNC(yiear_state::konami_SN76496_w));
-	map(0x4a00, 0x4a00).w(FUNC(yiear_state::yiear_VLM5030_control_w));
+	map(0x4a00, 0x4a00).w(FUNC(yiear_state::VLM5030_control_w));
 	map(0x4b00, 0x4b00).w(m_vlm, FUNC(vlm5030_device::data_w));
 	map(0x4c00, 0x4c00).portr("DSW2");
 	map(0x4d00, 0x4d00).portr("DSW3");
@@ -155,7 +155,7 @@ void yiear_state::main_map(address_map &map)
 	map(0x5030, 0x53ff).ram();
 	map(0x5400, 0x542f).ram().share("spriteram2");
 	map(0x5430, 0x57ff).ram();
-	map(0x5800, 0x5fff).ram().w(FUNC(yiear_state::yiear_videoram_w)).share("videoram");
+	map(0x5800, 0x5fff).ram().w(FUNC(yiear_state::videoram_w)).share("videoram");
 	map(0x8000, 0xffff).rom();
 }
 
@@ -271,12 +271,12 @@ GFXDECODE_END
 
 void yiear_state::machine_start()
 {
-	save_item(NAME(m_yiear_nmi_enable));
+	save_item(NAME(m_nmi_enable));
 }
 
 void yiear_state::machine_reset()
 {
-	m_yiear_nmi_enable = 0;
+	m_nmi_enable = 0;
 }
 
 void yiear_state::yiear(machine_config &config)
@@ -284,7 +284,7 @@ void yiear_state::yiear(machine_config &config)
 	/* basic machine hardware */
 	MC6809E(config, m_maincpu, XTAL(18'432'000)/12);   /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &yiear_state::main_map);
-	m_maincpu->set_periodic_int(FUNC(yiear_state::yiear_nmi_interrupt), attotime::from_hz(480)); /* music tempo (correct frequency unknown) */
+	m_maincpu->set_periodic_int(FUNC(yiear_state::nmi_interrupt), attotime::from_hz(480)); /* music tempo (correct frequency unknown) */
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -294,12 +294,12 @@ void yiear_state::yiear(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(yiear_state::screen_update_yiear));
+	m_screen->set_screen_update(FUNC(yiear_state::screen_update));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(yiear_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_yiear);
-	PALETTE(config, m_palette, FUNC(yiear_state::yiear_palette), 32);
+	PALETTE(config, m_palette, FUNC(yiear_state::palette), 32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

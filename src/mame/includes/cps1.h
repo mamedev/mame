@@ -51,54 +51,54 @@ struct gfx_range
 	// start and end are as passed by the game (shift adjusted to be all
 	// in the same scale a 8x8 tiles): they don't necessarily match the
 	// position in ROM.
-	int type;
-	int start;
-	int end;
-	int bank;
+	int type = 0;
+	int start = 0;
+	int end = 0;
+	int bank = 0;
 };
 
 struct CPS1config
 {
-	const char *name;             /* game driver name */
+	const char *name = nullptr;             /* game driver name */
 
 	/* Some games interrogate a couple of registers on bootup. */
 	/* These are CPS1 board B self test checks. They wander from game to */
 	/* game. */
-	int cpsb_addr;        /* CPS board B test register address */
-	int cpsb_value;       /* CPS board B test register expected value */
+	int cpsb_addr = 0;        /* CPS board B test register address */
+	int cpsb_value = 0;       /* CPS board B test register expected value */
 
 	/* some games use as a protection check the ability to do 16-bit multiplies */
 	/* with a 32-bit result, by writing the factors to two ports and reading the */
 	/* result from two other ports. */
 	/* It looks like this feature was introduced with 3wonders (CPSB ID = 08xx) */
-	int mult_factor1;
-	int mult_factor2;
-	int mult_result_lo;
-	int mult_result_hi;
+	int mult_factor1 = 0;
+	int mult_factor2 = 0;
+	int mult_result_lo = 0;
+	int mult_result_hi = 0;
 
 	/* unknown registers which might be related to the multiply protection */
-	int unknown1;
-	int unknown2;
-	int unknown3;
+	int unknown1 = 0;
+	int unknown2 = 0;
+	int unknown3 = 0;
 
-	int layer_control;
-	int priority[4];
-	int palette_control;
+	int layer_control = 0;
+	int priority[4]{};
+	int palette_control = 0;
 
 	/* ideally, the layer enable masks should consist of only one bit, */
 	/* but in many cases it is unknown which bit is which. */
-	int layer_enable_mask[5];
+	int layer_enable_mask[5]{};
 
 	/* these depend on the B-board model and PAL */
-	int bank_sizes[4];
+	int bank_sizes[4]{};
 	const struct gfx_range *bank_mapper;
 
 	/* some C-boards have additional I/O for extra buttons/extra players */
-	int in2_addr;
-	int in3_addr;
-	int out2_addr;
+	int in2_addr = 0;
+	int in3_addr = 0;
+	int out2_addr = 0;
 
-	int bootleg_kludge;
+	int bootleg_kludge = 0;
 };
 
 
@@ -143,6 +143,7 @@ public:
 	void sf2m3(machine_config &config);
 	void sf2cems6(machine_config &config);
 	void sf2m10(machine_config &config);
+	void varthb2(machine_config &config);
 
 	void init_cps1();
 	void init_sf2ee();
@@ -153,6 +154,7 @@ public:
 	void init_pang3();
 	void init_ganbare();
 	void init_pang3b();
+	void init_pang3b4();
 	void init_sf2rb();
 	void init_sf2rb2();
 	void init_sf2thndr();
@@ -170,36 +172,39 @@ protected:
 	DECLARE_MACHINE_START(ganbare);
 	DECLARE_MACHINE_RESET(cps);
 
-	DECLARE_READ16_MEMBER(cps1_dsw_r);
-	DECLARE_READ16_MEMBER(cps1_in1_r);
-	DECLARE_READ16_MEMBER(cps1_in2_r);
-	DECLARE_READ16_MEMBER(cps1_in3_r);
-	DECLARE_WRITE16_MEMBER(cps1_coinctrl_w);
-	DECLARE_WRITE16_MEMBER(cpsq_coinctrl2_w);
-	DECLARE_WRITE16_MEMBER(cps1_cps_a_w);
-	DECLARE_READ16_MEMBER(cps1_cps_b_r);
-	DECLARE_WRITE16_MEMBER(cps1_cps_b_w);
-	DECLARE_WRITE16_MEMBER(cps1_gfxram_w);
-	DECLARE_WRITE16_MEMBER(cps1_soundlatch_w);
-	DECLARE_WRITE16_MEMBER(cps1_soundlatch2_w);
-	DECLARE_WRITE8_MEMBER(cps1_snd_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(cps1_oki_pin7_w);
-	DECLARE_READ16_MEMBER(qsound_rom_r);
-	DECLARE_READ16_MEMBER(qsound_sharedram1_r);
-	DECLARE_WRITE16_MEMBER(qsound_sharedram1_w);
-	DECLARE_READ16_MEMBER(qsound_sharedram2_r);
-	DECLARE_WRITE16_MEMBER(qsound_sharedram2_w);
-	DECLARE_WRITE8_MEMBER(qsound_banksw_w);
-	DECLARE_READ16_MEMBER(ganbare_ram_r);
-	DECLARE_WRITE16_MEMBER(ganbare_ram_w);
-	DECLARE_READ16_MEMBER(cps1_hack_dsw_r);
-	DECLARE_READ16_MEMBER(sf2rb_prot_r);
-	DECLARE_READ16_MEMBER(sf2rb2_prot_r);
-	DECLARE_READ16_MEMBER(sf2dongb_prot_r);
-	DECLARE_READ16_MEMBER(sf2ceblp_prot_r);
-	DECLARE_WRITE16_MEMBER(sf2ceblp_prot_w);
-	DECLARE_WRITE16_MEMBER(sf2m3_layer_w);
-	DECLARE_READ16_MEMBER(dinohunt_sound_r);
+	uint16_t cps1_dsw_r(offs_t offset);
+	uint16_t cps1_in1_r();
+	uint16_t cps1_in2_r();
+	uint16_t cps1_in3_r();
+	void cps1_coinctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cpsq_coinctrl2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cps1_cps_a_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t cps1_cps_b_r(offs_t offset);
+	void cps1_cps_b_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cps1_gfxram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cps1_soundlatch_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cps1_soundlatch2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cps1_snd_bankswitch_w(uint8_t data);
+	void cps1_oki_pin7_w(uint8_t data);
+	uint16_t qsound_rom_r(offs_t offset);
+	uint16_t qsound_sharedram1_r(offs_t offset);
+	void qsound_sharedram1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t qsound_sharedram2_r(offs_t offset);
+	void qsound_sharedram2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void qsound_banksw_w(uint8_t data);
+	uint16_t ganbare_ram_r(offs_t offset, uint16_t mem_mask = ~0);
+	void ganbare_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t cps1_hack_dsw_r(offs_t offset);
+	uint16_t sf2rb_prot_r(offs_t offset);
+	uint16_t sf2rb2_prot_r(offs_t offset);
+	uint16_t sf2dongb_prot_r(offs_t offset);
+	uint16_t sf2ceblp_prot_r();
+	void sf2ceblp_prot_w(uint16_t data);
+	void sf2m3_layer_w(offs_t offset, uint16_t data);
+	uint16_t dinohunt_sound_r();
+	void varthb2_cps_a_w(offs_t offset, uint16_t data);
+	uint16_t pang3b4_prot_r();
+	void pang3b4_prot_w(uint16_t data);
 
 	TILEMAP_MAPPER_MEMBER(tilemap0_scan);
 	TILEMAP_MAPPER_MEMBER(tilemap1_scan);
@@ -229,41 +234,43 @@ protected:
 	void sf2m3_map(address_map &map);
 	void sf2cems6_map(address_map &map);
 	void sf2m10_map(address_map &map);
+	void varthb2_map(address_map &map);
 
 	// game-specific
-	uint16_t sf2ceblp_prot;
+	uint16_t m_sf2ceblp_prot = 0;
+	uint16_t m_pang3b4_prot = 0;
 
 	/* video-related */
-	tilemap_t *m_bg_tilemap[3];
-	int m_scanline1;
-	int m_scanline2;
-	int m_scancalls;
+	tilemap_t *m_bg_tilemap[3]{};
+	int m_scanline1 = 0;
+	int m_scanline2 = 0;
+	int m_scancalls = 0;
 
-	int m_scroll1x;
-	int m_scroll1y;
-	int m_scroll2x;
-	int m_scroll2y;
-	int m_scroll3x;
-	int m_scroll3y;
+	int m_scroll1x = 0;
+	int m_scroll1y = 0;
+	int m_scroll2x = 0;
+	int m_scroll2y = 0;
+	int m_scroll3x = 0;
+	int m_scroll3y = 0;
 
-	int m_stars_enabled[2];        /* Layer enabled [Y/N] */
-	int m_stars1x;
-	int m_stars1y;
-	int m_stars2x;
-	int m_stars2y;
-	int m_last_sprite_offset;      /* Offset of the last sprite */
+	int m_stars_enabled[2]{};        /* Layer enabled [Y/N] */
+	int m_stars1x = 0;
+	int m_stars1y = 0;
+	int m_stars2x = 0;
+	int m_stars2y = 0;
+	int m_last_sprite_offset = 0;      /* Offset of the last sprite */
 
 	bitmap_ind16 m_dummy_bitmap;
 
 	/* video config (never changed after video_start) */
 	const struct CPS1config *m_game_config;
-	int m_scroll_size;
-	int m_obj_size;
-	int m_other_size;
-	int m_palette_align;
-	int m_palette_size;
-	int m_stars_rom_size;
-	uint8_t m_empty_tile[32*32];
+	int m_scroll_size = 0;
+	int m_obj_size = 0;
+	int m_other_size = 0;
+	int m_palette_align = 0;
+	int m_palette_size = 0;
+	int m_stars_rom_size = 0;
+	uint8_t m_empty_tile[32*32]{};
 
 	/* video/cps1.cpp */
 	inline uint16_t *cps1_base( int offset, int boundary );
@@ -282,16 +289,16 @@ protected:
 	required_shared_ptr<uint16_t> m_gfxram;
 	required_shared_ptr<uint16_t> m_cps_a_regs;
 	required_shared_ptr<uint16_t> m_cps_b_regs;
-	uint16_t * m_scroll1;
-	uint16_t * m_scroll2;
-	uint16_t * m_scroll3;
-	uint16_t * m_obj;
-	uint16_t * m_other;
+	uint16_t * m_scroll1 = nullptr;
+	uint16_t * m_scroll2 = nullptr;
+	uint16_t * m_scroll3 = nullptr;
+	uint16_t * m_obj = nullptr;
+	uint16_t * m_other = nullptr;
 	std::unique_ptr<uint16_t[]> m_buffered_obj;
 	optional_shared_ptr<uint8_t> m_qsound_sharedram1;
 	optional_shared_ptr<uint8_t> m_qsound_sharedram2;
 	std::unique_ptr<uint8_t[]> m_decrypt_kabuki;
-	int m_cps_version;
+	int m_cps_version = 0;
 
 	/* devices */
 	required_device<m68000_base_device> m_maincpu;
@@ -342,22 +349,22 @@ public:
 
 private:
 	void init_digital_volume();
-	DECLARE_READ16_MEMBER(gigaman2_dummyqsound_r);
-	DECLARE_WRITE16_MEMBER(gigaman2_dummyqsound_w);
+	uint16_t gigaman2_dummyqsound_r(offs_t offset);
+	void gigaman2_dummyqsound_w(offs_t offset, uint16_t data);
 	void gigaman2_gfx_reorder();
-	DECLARE_WRITE16_MEMBER(cps2_eeprom_port_w);
-	DECLARE_READ16_MEMBER(cps2_qsound_volume_r);
-	DECLARE_READ16_MEMBER(kludge_r);
-	DECLARE_READ16_MEMBER(joy_or_paddle_r);
-	DECLARE_READ16_MEMBER(joy_or_paddle_ecofghtr_r);
+	void cps2_eeprom_port_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t cps2_qsound_volume_r();
+	uint16_t kludge_r();
+	uint16_t joy_or_paddle_r();
+	uint16_t joy_or_paddle_ecofghtr_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(cps2_interrupt);
 	TIMER_CALLBACK_MEMBER(cps2_update_digital_volume);
 
-	DECLARE_WRITE16_MEMBER(cps2_objram_bank_w);
-	DECLARE_READ16_MEMBER(cps2_objram1_r);
-	DECLARE_READ16_MEMBER(cps2_objram2_r);
-	DECLARE_WRITE16_MEMBER(cps2_objram1_w);
-	DECLARE_WRITE16_MEMBER(cps2_objram2_w);
+	void cps2_objram_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t cps2_objram1_r(offs_t offset);
+	uint16_t cps2_objram2_r(offs_t offset);
+	void cps2_objram1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void cps2_objram2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void unshuffle(uint64_t *buf, int len);
 	void cps2_gfx_decode();
@@ -392,22 +399,22 @@ private:
 	std::unique_ptr<uint16_t[]> m_gigaman2_dummyqsound_ram;
 
 	/* video-related */
-	int          m_cps2_last_sprite_offset; /* Offset of the last sprite */
-	int          m_pri_ctrl;                /* Sprite layer priorities */
-	int          m_objram_bank;
-	int          m_cps2_obj_size;
+	int          m_cps2_last_sprite_offset = 0; /* Offset of the last sprite */
+	int          m_pri_ctrl = 0;                /* Sprite layer priorities */
+	int          m_objram_bank = 0;
+	int          m_cps2_obj_size = 0;
 
 	/* misc */
-	int          m_readpaddle;  // pzloop2
-	int          m_cps2networkpresent;
-	int          m_cps2digitalvolumelevel;
-	int          m_cps2disabledigitalvolume;
-	emu_timer    *m_digital_volume_timer;
-	int          m_cps2_dial_type;
-	int          m_ecofghtr_dial_direction0;
-	int          m_ecofghtr_dial_direction1;
-	int          m_ecofghtr_dial_last0;
-	int          m_ecofghtr_dial_last1;
+	int          m_readpaddle = 0;  // pzloop2
+	int          m_cps2networkpresent = 0;
+	int          m_cps2digitalvolumelevel = 0;
+	int          m_cps2disabledigitalvolume = 0;
+	emu_timer    *m_digital_volume_timer = nullptr;
+	int          m_cps2_dial_type = 0;
+	int          m_ecofghtr_dial_direction0 = 0;
+	int          m_ecofghtr_dial_direction1 = 0;
+	int          m_ecofghtr_dial_last0 = 0;
+	int          m_ecofghtr_dial_last1 = 0;
 };
 
 
@@ -423,5 +430,6 @@ INPUT_PORTS_EXTERN( sf2 );
 INPUT_PORTS_EXTERN( slammast );
 INPUT_PORTS_EXTERN( varth );
 INPUT_PORTS_EXTERN( captcomm );
+INPUT_PORTS_EXTERN( wof );
 
 #endif // MAME_INCLUDES_CPS1_H

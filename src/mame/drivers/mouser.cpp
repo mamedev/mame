@@ -42,7 +42,7 @@ WRITE_LINE_MEMBER(mouser_state::mouser_nmi_interrupt)
 
 /* Sound CPU interrupted on write */
 
-WRITE8_MEMBER(mouser_state::mouser_sound_nmi_clear_w)
+void mouser_state::mouser_sound_nmi_clear_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }

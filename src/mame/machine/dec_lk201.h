@@ -44,18 +44,18 @@ class lk201_device : public device_t, public device_serial_interface
 {
 public:
 	// construction/destruction
-	lk201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	lk201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	DECLARE_READ8_MEMBER(ddr_r);
-	DECLARE_WRITE8_MEMBER(ddr_w);
-	DECLARE_READ8_MEMBER(ports_r);
-	DECLARE_WRITE8_MEMBER(ports_w);
-	DECLARE_READ8_MEMBER(sci_r);
-	DECLARE_WRITE8_MEMBER(sci_w);
-	DECLARE_READ8_MEMBER(spi_r);
-	DECLARE_WRITE8_MEMBER(spi_w);
-	DECLARE_READ8_MEMBER(timer_r);
-	DECLARE_WRITE8_MEMBER(timer_w);
+	uint8_t ddr_r(offs_t offset);
+	void ddr_w(offs_t offset, uint8_t data);
+	uint8_t ports_r(offs_t offset);
+	void ports_w(offs_t offset, uint8_t data);
+	uint8_t sci_r(offs_t offset);
+	void sci_w(offs_t offset, uint8_t data);
+	uint8_t spi_r(offs_t offset);
+	void spi_w(offs_t offset, uint8_t data);
+	uint8_t timer_r(offs_t offset);
+	void timer_w(offs_t offset, uint8_t data);
 
 	auto tx_handler() { return m_tx_handler.bind(); }
 
@@ -67,7 +67,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_serial overrides
 	virtual void rcv_complete() override;    // Rx completed receiving byte
@@ -109,26 +109,14 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_speaker;
 
-	required_ioport m_kbd0;
-	required_ioport m_kbd1;
-	required_ioport m_kbd2;
-	required_ioport m_kbd3;
-	required_ioport m_kbd4;
-	required_ioport m_kbd5;
-	required_ioport m_kbd6;
-	required_ioport m_kbd7;
-	required_ioport m_kbd8;
-	required_ioport m_kbd9;
-	required_ioport m_kbd10;
-	required_ioport m_kbd11;
-	required_ioport m_kbd12;
-	required_ioport m_kbd13;
-	required_ioport m_kbd14;
-	required_ioport m_kbd15;
-	required_ioport m_kbd16;
-	required_ioport m_kbd17;
+	required_ioport_array<18> m_kbd;
 
-	void send_port(address_space &space, uint8_t offset, uint8_t data);
+	output_finder<> m_led_wait;
+	output_finder<> m_led_compose;
+	output_finder<> m_led_lock;
+	output_finder<> m_led_hold;
+
+	void send_port(uint8_t offset, uint8_t data);
 	void update_interrupts();
 
 	int m_kbd_state;

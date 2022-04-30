@@ -24,9 +24,9 @@ public:
 	void write_data(uint8_t data, int channel);
 	uint8_t read_data(int channel);
 	void write_rx_str(int channel, std::string resp);
-	std::string get_tx_str(int channel) { return m_serial_tx[channel]; };
-	void clear_tx_str(int channel) { m_serial_tx[channel].clear(); };
-	bool check_interrupt() { return (m_rr_regs[0][3] != 0); };
+	std::string get_tx_str(int channel) { return m_serial_tx[channel]; }
+	void clear_tx_str(int channel) { m_serial_tx[channel].clear(); }
+	bool check_interrupt() { return (m_rr_regs[0][3] != 0); }
 private:
 	uint8_t m_rr_regs[2][16];
 	uint8_t m_wr_regs[2][16];
@@ -48,11 +48,11 @@ public:
 
 	void set_init_info(int version, int seq_init) {m_version=version; m_seq_init=seq_init;}
 	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
-	template <typename T> void set_irq_info(T &&tag, const int irq_num, int serial_num) {
-		m_cpu.set_tag(std::forward<T>(tag)); m_irq_num = irq_num; m_serial_irq_num = serial_num; }
+	template <typename T> void set_irq_info(T &&tag, const int irq_num, int serial_num)
+	{ m_cpu.set_tag(std::forward<T>(tag)); m_irq_num = irq_num; m_serial_irq_num = serial_num; }
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_update);
-	DECLARE_WRITE8_MEMBER(serial_rx_w);
+	void serial_rx_w(uint8_t data);
 
 	enum { IO_SYSTEM, IO_IN1, IO_SW5, IO_NUM };
 	template <unsigned N> auto in_callback() { return m_in_cb[N].bind(); }
@@ -64,7 +64,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
@@ -73,7 +73,7 @@ private:
 	required_device<scc85c30_device> m_scc1;
 	required_device<screen_device> m_screen;
 	required_device<device_execute_interface> m_cpu;
-	devcb_read16 m_in_cb[3];
+	devcb_read16::array<3> m_in_cb;
 	devcb_read8 m_trackx_cb;
 	devcb_read8 m_tracky_cb;
 	devcb_read16 m_gunx_cb;
@@ -107,15 +107,15 @@ private:
 	void fpga_map(address_map &map);
 	void ram_map(address_map &map);
 
-	DECLARE_READ32_MEMBER( fpga_r );
-	DECLARE_WRITE32_MEMBER( fpga_w );
-	DECLARE_READ32_MEMBER( rtc_r );
-	DECLARE_WRITE32_MEMBER( rtc_w );
+	uint32_t fpga_r(offs_t offset, uint32_t mem_mask = ~0);
+	void fpga_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t rtc_r(offs_t offset, uint32_t mem_mask = ~0);
+	void rtc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	DECLARE_READ32_MEMBER(e1_nvram_r);
-	DECLARE_WRITE32_MEMBER(e1_nvram_w);
-	DECLARE_READ32_MEMBER( e1_ram_r );
-	DECLARE_WRITE32_MEMBER( e1_ram_w );
+	uint32_t e1_nvram_r(offs_t offset, uint32_t mem_mask = ~0);
+	void e1_nvram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t e1_ram_r(offs_t offset, uint32_t mem_mask = ~0);
+	void e1_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	DECLARE_WRITE_LINE_MEMBER(serial_interrupt);
 };
@@ -135,15 +135,15 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	address_space *m_memory_space;
+	address_space *m_memory_space = nullptr;
 	uint16_t m_sw_version;
 	uint8_t m_hw_version;
 
 	std::array<uint16_t, 0x40> m_iteagle_default_eeprom;
 
 	void eeprom_map(address_map &map);
-	DECLARE_READ32_MEMBER( eeprom_r );
-	DECLARE_WRITE32_MEMBER( eeprom_w );
+	uint32_t eeprom_r(offs_t offset, uint32_t mem_mask = ~0);
+	void eeprom_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
@@ -166,8 +166,8 @@ private:
 
 	void ctrl_map(address_map &map);
 
-	DECLARE_READ32_MEMBER( ctrl_r );
-	DECLARE_WRITE32_MEMBER( ctrl_w );
+	uint32_t ctrl_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 };
 

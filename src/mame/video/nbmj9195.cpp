@@ -17,7 +17,7 @@
 
 ******************************************************************************/
 
-WRITE8_MEMBER(nbmj9195_state::palette_w)
+void nbmj9195_state::palette_w(offs_t offset, uint8_t data)
 {
 	m_palette_ptr[offset] = data;
 
@@ -33,7 +33,7 @@ WRITE8_MEMBER(nbmj9195_state::palette_w)
 	}
 }
 
-WRITE8_MEMBER(nbmj9195_state::nb22090_palette_w)
+void nbmj9195_state::nb22090_palette_w(offs_t offset, uint8_t data)
 {
 	int r, g, b;
 	int offs_h, offs_l;
@@ -57,12 +57,11 @@ WRITE8_MEMBER(nbmj9195_state::nb22090_palette_w)
 int nbmj9195_state::blitter_r(int offset, int vram)
 {
 	int ret;
-	uint8_t *GFXROM = memregion("gfx1")->base();
 
 	switch (offset)
 	{
 		case 0x00:  ret = 0xfe | ((m_nb19010_busyflag & 0x01) ^ 0x01); break;    // NB19010 Busy Flag
-		case 0x01:  ret = GFXROM[m_blitter_src_addr[vram]]; break;           // NB19010 GFX-ROM Read
+		case 0x01:  ret = m_blit_region[m_blitter_src_addr[vram]]; break;           // NB19010 GFX-ROM Read
 		default:    ret = 0xff; break;
 	}
 
@@ -116,7 +115,7 @@ void nbmj9195_state::blitter_w(int offset, int data, int vram)
 	}
 }
 
-WRITE8_MEMBER(nbmj9195_state::clutsel_w)
+void nbmj9195_state::clutsel_w(uint8_t data)
 {
 	m_clutsel = data;
 }
@@ -126,7 +125,7 @@ void nbmj9195_state::clut_w(int offset, int data, int vram)
 	m_clut[vram][((m_clutsel & 0xff) * 0x10) + (offset & 0x0f)] = data;
 }
 
-WRITE8_MEMBER(nbmj9195_state::gfxflag2_w)
+void nbmj9195_state::gfxflag2_w(uint8_t data)
 {
 	m_gfxflag2 = data;
 }
@@ -176,10 +175,10 @@ void nbmj9195_state::vramflip(int vram)
 void nbmj9195_state::update_pixel(int vram, int x, int y)
 {
 	uint16_t color = m_videoram[vram][(y * m_screen->width()) + x];
-	m_tmpbitmap[vram].pix16(y, x) = color;
+	m_tmpbitmap[vram].pix(y, x) = color;
 }
 
-void nbmj9195_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nbmj9195_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -193,7 +192,6 @@ void nbmj9195_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 void nbmj9195_state::gfxdraw(int vram)
 {
-	uint8_t *GFX = memregion("gfx1")->base();
 	int width = m_screen->width();
 
 	int x, y;
@@ -210,8 +208,8 @@ void nbmj9195_state::gfxdraw(int vram)
 	if ((m_gfxdraw_mode == 2) && (m_clutmode[vram]))
 	{
 		// NB22090 clut256 mode
-		m_blitter_sizex[vram] = GFX[((m_blitter_src_addr[vram] + 0) & 0x00ffffff)];
-		m_blitter_sizey[vram] = GFX[((m_blitter_src_addr[vram] + 1) & 0x00ffffff)];
+		m_blitter_sizex[vram] = m_blit_region[((m_blitter_src_addr[vram] + 0) & 0x00ffffff)];
+		m_blitter_sizey[vram] = m_blit_region[((m_blitter_src_addr[vram] + 1) & 0x00ffffff)];
 	}
 
 	if (m_blitter_direction_x[vram])
@@ -240,7 +238,7 @@ void nbmj9195_state::gfxdraw(int vram)
 		skipy = -1;
 	}
 
-	gfxlen = memregion("gfx1")->bytes();
+	gfxlen = m_blit_region.bytes();
 	gfxaddr = ((m_blitter_src_addr[vram] + 2) & 0x00ffffff);
 
 	for (y = starty, ctry = sizey; ctry >= 0; y += skipy, ctry--)
@@ -256,7 +254,7 @@ void nbmj9195_state::gfxdraw(int vram)
 				gfxaddr &= (gfxlen - 1);
 			}
 
-			color = GFX[gfxaddr++];
+			color = m_blit_region[gfxaddr++];
 
 			dx1 = (2 * x + 0) & 0x3ff;
 			dx2 = (2 * x + 1) & 0x3ff;
@@ -355,14 +353,14 @@ void nbmj9195_state::gfxdraw(int vram)
 
 
 ******************************************************************************/
-WRITE8_MEMBER(nbmj9195_state::blitter_0_w){ blitter_w(offset, data, 0); }
-WRITE8_MEMBER(nbmj9195_state::blitter_1_w){ blitter_w(offset, data, 1); }
+void nbmj9195_state::blitter_0_w(offs_t offset, uint8_t data){ blitter_w(offset, data, 0); }
+void nbmj9195_state::blitter_1_w(offs_t offset, uint8_t data){ blitter_w(offset, data, 1); }
 
-READ8_MEMBER(nbmj9195_state::blitter_0_r){ return blitter_r(offset, 0); }
-READ8_MEMBER(nbmj9195_state::blitter_1_r){ return blitter_r(offset, 1); }
+uint8_t nbmj9195_state::blitter_0_r(offs_t offset){ return blitter_r(offset, 0); }
+uint8_t nbmj9195_state::blitter_1_r(offs_t offset){ return blitter_r(offset, 1); }
 
-WRITE8_MEMBER(nbmj9195_state::clut_0_w){ clut_w(offset, data, 0); }
-WRITE8_MEMBER(nbmj9195_state::clut_1_w){ clut_w(offset, data, 1); }
+void nbmj9195_state::clut_0_w(offs_t offset, uint8_t data){ clut_w(offset, data, 0); }
+void nbmj9195_state::clut_1_w(offs_t offset, uint8_t data){ clut_w(offset, data, 1); }
 
 /******************************************************************************
 
@@ -381,6 +379,7 @@ VIDEO_START_MEMBER(nbmj9195_state,_1layer)
 	m_scanline[0] = m_scanline[1] = SCANLINE_MIN;
 	m_nb19010_busyflag = 1;
 	m_gfxdraw_mode = 0;
+	m_dispflag[0] = m_dispflag[1] = 0;
 
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
@@ -424,6 +423,7 @@ void nbmj9195_state::video_start()
 	m_nb19010_busyflag = 1;
 	m_gfxdraw_mode = 1;
 	m_screen_refresh = 1;
+	m_dispflag[0] = m_dispflag[1] = 0;
 
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));

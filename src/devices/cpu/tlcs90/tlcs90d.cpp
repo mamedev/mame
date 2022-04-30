@@ -64,6 +64,25 @@ tmp90844_disassembler::tmp90844_disassembler()
 {
 }
 
+const char *const tmp90c051_disassembler::ir_names[0x4c] =   {
+											"P2",     "P2CR",   "P3",     "P3CR",
+	"P3FR",   "P4",     "P5",     "P45CR",  "P45FR",  "P6",     "P6CR",   "P6FR",
+	"TREG0",  "TREG1",  "TREG2",  "TREG3",  "T01MOD", "T23MOD", "TFFCR",  "TRDC",
+	"TRUN",   "IRF0",   "IRF1",   "IRF2",   "INTE0",  "INTE1",  "INTE2",  "DMAE",
+	"SCMOD0", "SCCR0",  "SCBUF0", "BRGCR0", "SCMOD1", "SCCR1",  "SCBUF1", "BRGCR1",
+	"REFCR",  "MSAR",   "MSAMR",  "MACR",   nullptr,  "WDMOD",  "WDCR",   "P2FR",
+	"SECR",   "MINR",   "HOUR",   "DAYR",   "DATER",  "MONTHR", "YEARR",  "PAGER",
+	"RESTR",  "TPHBUF", "TPHMOD", "TPHSCR", "BX",     "BY",     "CLLARL", "CLLARH",
+	"EXPA1L", "EXPA1H", "EXPA0L", "EXPA0H", nullptr,  nullptr,  "DMASB0", "DMADB0",
+	"DMAV0",  "DMASB1", "DMADB1", "DMAV1",  nullptr,  nullptr,  nullptr,  nullptr
+};
+
+tmp90c051_disassembler::tmp90c051_disassembler()
+	: tlcs90_disassembler(0xffb4, ir_names) // I/O base is actually FF80H
+{
+	// TODO: recognize TMP90C051-original LDC instruction needed to access certain DMA registers
+}
+
 const char *tlcs90_disassembler::internal_registers_names(uint16_t x) const
 {
 	if (x >= m_iobase)
@@ -858,6 +877,7 @@ void tlcs90_disassembler::decode()
 				if (b0 == 0xfe) {
 					OPCC( LDI+b1-0x58,14,18 )   NONE( 1 )       NONE( 2 )                   return;
 				}
+				break;
 
 				case 0x60:                                                                              // ADD A,g
 				case 0x61:                                                                              // ADC A,g
@@ -913,6 +933,7 @@ void tlcs90_disassembler::decode()
 				if (b0 == 0xfe) {
 					OPCC( RET,6,14 )    CC( 1, b1 - 0xd0 )      NONE( 2 )                   return;     // RET cc
 				}
+				break;
 			}   break;
 
 		case 0xff:

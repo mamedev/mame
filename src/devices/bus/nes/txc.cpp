@@ -91,31 +91,6 @@ void nes_txc_22211_device::pcb_reset()
 	m_reg[0] = m_reg[1] = m_reg[2] = m_reg[3] = 0;
 }
 
-void nes_txc_strikew_device::device_start()
-{
-	common_start();
-}
-
-void nes_txc_strikew_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_txc_commandos_device::device_start()
-{
-	common_start();
-}
-
-void nes_txc_commandos_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-
 
 
 
@@ -185,7 +160,7 @@ void nes_txc_dumarc_device::write_h(offs_t offset, uint8_t data)
 	LOG_MMC(("TXC Du Ma Racing write_h, offset: %04x, data: %02x\n", offset, data));
 
 	prg32(m_reg[2] >> 2);
-	chr8((((data ^ m_reg[2]) >> 3) & 0x02) | (((data ^ m_reg[2]) >> 5) & 0x01), CHRROM);
+	chr8(bitswap<2>(data ^ m_reg[2], 4, 5), CHRROM);
 }
 
 /*-------------------------------------------------

@@ -18,20 +18,15 @@
 
 #include "emu.h"
 #include "includes/apple3.h"
-#include "sound/volt_reg.h"
 #include "formats/ap2_dsk.h"
 
-#include "bus/a2bus/a2cffa.h"
-#include "bus/a2bus/a2applicard.h"
-#include "bus/a2bus/a2thunderclock.h"
-#include "bus/a2bus/mouse.h"
-#include "bus/a2bus/a2zipdrive.h"
+#include "bus/a2bus/cards.h"
 
 #include "bus/rs232/rs232.h"
 
 #include "machine/input_merger.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 void apple3_state::apple3_map(address_map &map)
@@ -39,23 +34,20 @@ void apple3_state::apple3_map(address_map &map)
 	map(0x0000, 0xffff).rw(FUNC(apple3_state::apple3_memory_r), FUNC(apple3_state::apple3_memory_w));
 }
 
-static void apple3_cards(device_slot_interface &device)
-{
-	device.option_add("cffa2", A2BUS_CFFA2_6502);       // CFFA2000 Compact Flash for Apple II (www.dreher.net), 6502 firmware
-	device.option_add("applicard", A2BUS_APPLICARD);    // PCPI Applicard
-	device.option_add("thclock", A2BUS_THUNDERCLOCK);   // ThunderWare ThunderClock Plus - driver assumes slot 2 by default
-	device.option_add("mouse", A2BUS_MOUSE);            // Apple II Mouse Card
-	device.option_add("focusdrive", A2BUS_FOCUSDRIVE);  // Focus Drive IDE card
-}
-
 static void a3_floppies(device_slot_interface &device)
 {
 	device.option_add("525", FLOPPY_525_SD);
 }
 
-FLOPPY_FORMATS_MEMBER( apple3_state::floppy_formats )
-	FLOPPY_A216S_FORMAT, FLOPPY_RWTS18_FORMAT, FLOPPY_EDD_FORMAT, FLOPPY_WOZ_FORMAT
-FLOPPY_FORMATS_END
+void apple3_state::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_A216S_DOS_FORMAT);
+	fr.add(FLOPPY_A216S_PRODOS_FORMAT);
+	fr.add(FLOPPY_RWTS18_FORMAT);
+	fr.add(FLOPPY_EDD_FORMAT);
+	fr.add(FLOPPY_WOZ_FORMAT);
+	fr.add(FLOPPY_NIB_FORMAT);
+}
 
 void apple3_state::apple3(machine_config &config)
 {
@@ -101,7 +93,7 @@ void apple3_state::apple3(machine_config &config)
 	m_a2bus->set_space(m_maincpu, AS_PROGRAM);
 	m_a2bus->irq_w().set(FUNC(apple3_state::a2bus_irq_w));
 	m_a2bus->nmi_w().set(FUNC(apple3_state::a2bus_nmi_w));
-	//m_a2bus->inh_w().set(FUNC(apple3_state::a2bus_inh_w));
+	m_a2bus->inh_w().set(FUNC(apple3_state::a2bus_inh_w));
 	m_a2bus->dma_w().set_inputline(m_maincpu, INPUT_LINE_HALT);
 	A2BUS_SLOT(config, "sl1", m_a2bus, apple3_cards, nullptr);
 	A2BUS_SLOT(config, "sl2", m_a2bus, apple3_cards, nullptr);
@@ -137,14 +129,15 @@ void apple3_state::apple3(machine_config &config)
 
 	/* rtc */
 	MM58167(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->irq().set(m_via[1], FUNC(via6522_device::write_ca1));
 
 	/* via */
-	VIA6522(config, m_via[0], 14.318181_MHz_XTAL / 14);
+	MOS6522(config, m_via[0], 14.318181_MHz_XTAL / 14);
 	m_via[0]->writepa_handler().set(FUNC(apple3_state::apple3_via_0_out_a));
 	m_via[0]->writepb_handler().set(FUNC(apple3_state::apple3_via_0_out_b));
 	m_via[0]->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
-	VIA6522(config, m_via[1], 14.318181_MHz_XTAL / 14);
+	MOS6522(config, m_via[1], 14.318181_MHz_XTAL / 14);
 	m_via[1]->writepa_handler().set(FUNC(apple3_state::apple3_via_1_out_a));
 	m_via[1]->writepb_handler().set(FUNC(apple3_state::apple3_via_1_out_b));
 	m_via[1]->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
@@ -153,10 +146,6 @@ void apple3_state::apple3(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_bell, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
 	DAC_6BIT_BINARY_WEIGHTED(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.125); // 6522.b5(pb0-pb5) + 320k,160k,80k,40k,20k,10k
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "bell", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	TIMER(config, "c040").configure_periodic(FUNC(apple3_state::apple3_c040_tick), attotime::from_hz(2000));
 
@@ -354,7 +343,11 @@ INPUT_PORTS_END
 
 ROM_START(apple3)
 	ROM_REGION(0x1000,"maincpu",0)
-	ROM_LOAD( "apple3.rom", 0x0000, 0x1000, CRC(55e8eec9) SHA1(579ee4cd2b208d62915a0aa482ddc2744ff5e967))
+	ROM_SYSTEM_BIOS(0, "original", "Apple /// boot ROM")
+	ROMX_LOAD( "apple3.rom", 0x0000, 0x1000, CRC(55e8eec9) SHA1(579ee4cd2b208d62915a0aa482ddc2744ff5e967), ROM_BIOS(0))
+
+	ROM_SYSTEM_BIOS(1, "soshd", "Rob Justice SOSHDBOOT")
+	ROMX_LOAD( "soshdboot.bin", 0x000000, 0x001000, CRC(fd5ac9e2) SHA1(ba466a54ddb7f618c4f18f344754343c5945b417), ROM_BIOS(1))
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY           FULLNAME */

@@ -20,12 +20,15 @@ public:
 	auto chip_select_callback() { return m_out_chip_select_func.bind(); }
 	auto tmrout0_handler() { return m_out_tmrout0_func.bind(); }
 	auto tmrout1_handler() { return m_out_tmrout1_func.bind(); }
+	auto irmx_irq_cb() { return m_irmx_irq_cb.bind(); }
+	template <typename... T> void set_irmx_irq_ack(T &&... args) { m_irmx_irq_ack.set(std::forward<T>(args)...); }
 
 	IRQ_CALLBACK_MEMBER(int_callback);
+	IRQ_CALLBACK_MEMBER(inta_callback);
 	DECLARE_WRITE_LINE_MEMBER(drq0_w) { m_dma[0].drq_state = state; }
 	DECLARE_WRITE_LINE_MEMBER(drq1_w) { m_dma[1].drq_state = state; }
-	DECLARE_WRITE_LINE_MEMBER(tmrin0_w) { if(state && (m_timer[0].control & 0x8004) == 0x8004) { inc_timer(0); } }
-	DECLARE_WRITE_LINE_MEMBER(tmrin1_w) { if(state && (m_timer[1].control & 0x8004) == 0x8004) { inc_timer(1); } }
+	DECLARE_WRITE_LINE_MEMBER(tmrin0_w) { external_tmrin(0, state); }
+	DECLARE_WRITE_LINE_MEMBER(tmrin1_w) { external_tmrin(1, state); }
 	DECLARE_WRITE_LINE_MEMBER(int0_w) { external_int(0, state); }
 	DECLARE_WRITE_LINE_MEMBER(int1_w) { external_int(1, state); }
 	DECLARE_WRITE_LINE_MEMBER(int2_w) { external_int(2, state); }
@@ -62,7 +65,7 @@ protected:
 	virtual void execute_run() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
 	virtual uint8_t fetch() override;
 	uint32_t update_pc() { return m_pc = (m_sregs[CS] << 4) + m_ip; }
@@ -83,13 +86,15 @@ private:
 	void update_interrupt_state();
 	void handle_eoi(int data);
 	void external_int(uint16_t intno, int state);
+	void restart_timer(int which);
 	void internal_timer_sync(int which);
 	void internal_timer_update(int which, int new_count, int new_maxA, int new_maxB, int new_control);
+	void external_tmrin(int which, int state);
 	void update_dma_control(int which, int new_control);
 	void drq_callback(int which);
 	void inc_timer(int which);
-	DECLARE_READ16_MEMBER(internal_port_r);
-	DECLARE_WRITE16_MEMBER(internal_port_w);
+	uint16_t internal_port_r(offs_t offset, uint16_t mem_mask = ~0);
+	void internal_port_w(offs_t offset, uint16_t data);
 
 	struct mem_state
 	{
@@ -105,7 +110,6 @@ private:
 		uint16_t      control;
 		uint16_t      maxA;
 		uint16_t      maxB;
-		bool        active_count;
 		uint16_t      count;
 		emu_timer   *int_timer;
 	};
@@ -121,6 +125,7 @@ private:
 
 	struct intr_state
 	{
+		uint8_t       vector;
 		uint8_t       pending;
 		uint16_t      ack_mask;
 		uint16_t      priority_mask;
@@ -128,7 +133,7 @@ private:
 		uint16_t      request;
 		uint16_t      status;
 		uint16_t      poll_status;
-		uint16_t      timer;
+		uint16_t      timer[3];
 		uint16_t      dma[2];
 		uint16_t      ext[4];
 		uint8_t       ext_state;
@@ -154,6 +159,8 @@ private:
 	devcb_write16 m_out_chip_select_func;
 	devcb_write_line m_out_tmrout0_func;
 	devcb_write_line m_out_tmrout1_func;
+	devcb_write_line m_irmx_irq_cb;
+	device_irq_acknowledge_delegate m_irmx_irq_ack;
 };
 
 class i80188_cpu_device : public i80186_cpu_device

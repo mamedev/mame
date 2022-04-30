@@ -2,14 +2,14 @@
 // server.cpp
 // ~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
 #include "server.hpp"
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 
 namespace http {
 namespace server2 {
@@ -33,7 +33,7 @@ server::server(const std::string& address, const std::string& port,
   signals_.async_wait(boost::bind(&server::handle_stop, this));
 
   // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
-  asio::ip::tcp::resolver resolver(acceptor_.get_executor().context());
+  asio::ip::tcp::resolver resolver(acceptor_.get_executor());
   asio::ip::tcp::endpoint endpoint =
     *resolver.resolve(address, port).begin();
   acceptor_.open(endpoint.protocol());

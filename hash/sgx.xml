@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="sgx" description="NEC Supergrafx cartridges">
 	<software name="1941">
 		<description>1941 - Counter Attack</description>

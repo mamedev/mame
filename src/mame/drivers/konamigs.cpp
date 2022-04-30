@@ -21,17 +21,20 @@
      Muscle Ranking Struck Out
      Neratte Don Don
      Pikkari Chance
-     Run Run Puppy
+    *Run Run Puppy / らんらんぱぴぃ
      Soreike! Hanapuu
 
     * denotes these games are archived
 
     TODO:
+     - proper ROZ, runpuppy uses rotation at juming dog animation
      - currently implemented very basic set of Q2SD GPU features, required/used by dumped games, should be improved if more games will be found.
-     - hook IRQs from GPU and SPU (not used by dumped games)
+     - hook IRQs from GPU and SPU (not used by dumped games), possible controlled by one MMIO registers in 140010xx area.
+     - fix/improve timings, currently DDR Kids have notable desync with music.
 
     Notes:
      - hold Test + Service while booting to initialise RTC NVRAM
+     - games do not enable SH-3 CPU cache, so it's actual rate is way lower than may/should be.
 
 **************************************************************************/
 
@@ -57,9 +60,9 @@ public:
 		, m_rtc_r(*this, "RTCR")
 		, m_rtc_w(*this, "RTCW")
 		, m_dipsw_r(*this, "DSW")
-		, m_vram(*this, "vram", 0)
-		, m_gpuregs(*this, "gpu_regs", 0)
-		, m_ymzram(*this, "ymz_ram", 0)
+		, m_vram(*this, "vram", 0x800000, ENDIANNESS_LITTLE)
+		, m_gpuregs(*this, "gpu_regs", 0x800, ENDIANNESS_LITTLE)
+		, m_ymzram(*this, "ymz_ram")
 		, m_screen(*this, "screen")
 		, m_hopper(*this, "hopper")
 	{ }
@@ -75,8 +78,8 @@ protected:
 	required_ioport m_rtc_r;
 	required_ioport m_rtc_w;
 	required_ioport m_dipsw_r;
-	required_shared_ptr<u16> m_vram;
-	required_shared_ptr<u16> m_gpuregs;
+	memory_share_creator<u16> m_vram;
+	memory_share_creator<u16> m_gpuregs;
 	required_shared_ptr<u8> m_ymzram;
 	required_device<screen_device> m_screen;
 	optional_device<hopper_device> m_hopper;
@@ -92,28 +95,29 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(ymzram_r);
-	DECLARE_WRITE8_MEMBER(ymzram_w);
-	DECLARE_READ16_MEMBER(cf_regs_r);
-	DECLARE_WRITE16_MEMBER(cf_regs_w);
-	DECLARE_READ16_MEMBER(cf_data_r);
-	DECLARE_WRITE16_MEMBER(cf_data_w);
-	DECLARE_READ8_MEMBER(rtc_r);
-	DECLARE_WRITE8_MEMBER(rtc_w);
-	DECLARE_READ64_MEMBER(portc_r);
-	DECLARE_WRITE64_MEMBER(portc_w);
-	DECLARE_WRITE64_MEMBER(portc_medal_w);
-	DECLARE_READ64_MEMBER(porte_r);
-	DECLARE_WRITE64_MEMBER(porte_w);
-	DECLARE_READ16_MEMBER(dipsw_r);
+	u8 ymzram_r(offs_t offset);
+	void ymzram_w(offs_t offset, u8 data);
+	u16 cf_regs_r(offs_t offset, u16 mem_mask = ~0);
+	void cf_regs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 cf_data_r();
+	void cf_data_w(u16 data);
+	u8 rtc_r();
+	void rtc_w(u8 data);
+	u64 portc_r();
+	void portc_w(u64 data);
+	void portc_medal_w(u64 data);
+	u64 porte_r();
+	void porte_w(u64 data);
+	void porte_medal_w(u64 data);
+	u16 dipsw_r();
 	u8 m_portc_data = 0xff;
 	u8 m_porte_data = 0xff;
 
 	// Q2SD GPU
-	DECLARE_READ16_MEMBER(gpu_r);
-	DECLARE_WRITE16_MEMBER(gpu_w);
-	DECLARE_READ16_MEMBER(vram_r);
-	DECLARE_WRITE16_MEMBER(vram_w);
+	u16 gpu_r(offs_t offset);
+	void gpu_w(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	u16 vram_r(offs_t offset);
+	void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(vblank);
 	void do_render(bool vbkem);
 	void draw_quad_tex(u16 cmd, u16 *data);
@@ -195,111 +199,141 @@ protected:
 
 
 // CF interface, looks like standard memory-mapped ATA layout, probably should be devicified
-READ16_MEMBER(gsan_state::cf_regs_r)
+u16 gsan_state::cf_regs_r(offs_t offset, u16 mem_mask)
 {
 	offset *= 2;
 	u16 data = 0;
 	if (ACCESSING_BITS_0_7)
-		data |= m_ata->read_cs0(offset, 0xff) & 0xff;
+		data |= m_ata->cs0_r(offset, 0xff) & 0xff;
 	if (ACCESSING_BITS_8_15)
-		data |= (m_ata->read_cs0(offset + 1, 0xff) << 8);
+		data |= (m_ata->cs0_r(offset + 1, 0xff) << 8);
 	return data;
 }
 
-WRITE16_MEMBER(gsan_state::cf_regs_w)
+void gsan_state::cf_regs_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	offset *= 2;
 	if (ACCESSING_BITS_0_7)
-		m_ata->write_cs0(offset, data & 0xff, 0xff);
+		m_ata->cs0_w(offset, data & 0xff, 0xff);
 	if (ACCESSING_BITS_8_15)
-		m_ata->write_cs0(offset + 1, data >> 8, 0xff);
+		m_ata->cs0_w(offset + 1, data >> 8, 0xff);
 }
 
-READ16_MEMBER(gsan_state::cf_data_r)
+u16 gsan_state::cf_data_r()
 {
-	u16 data = m_ata->read_cs0(0, 0xffff);
+	u16 data = m_ata->cs0_r(0, 0xffff);
 	return data;
 }
 
-WRITE16_MEMBER(gsan_state::cf_data_w)
+void gsan_state::cf_data_w(u16 data)
 {
-	m_ata->write_cs0(0, data, 0xffff);
+	m_ata->cs0_w(0, data, 0xffff);
 }
 
 // misc I/O
-READ16_MEMBER(gsan_state::dipsw_r)
+u16 gsan_state::dipsw_r()
 {
 	return m_dipsw_r->read();
 }
-READ8_MEMBER(gsan_state::rtc_r)
+u8 gsan_state::rtc_r()
 {
 	return m_rtc_r->read();
 }
-WRITE8_MEMBER(gsan_state::rtc_w)
+void gsan_state::rtc_w(u8 data)
 {
 	m_rtc_w->write(data);
 }
 
-READ8_MEMBER(gsan_state::ymzram_r)
+u8 gsan_state::ymzram_r(offs_t offset)
 {
 	return m_ymzram[offset];
 }
-WRITE8_MEMBER(gsan_state::ymzram_w)
+void gsan_state::ymzram_w(offs_t offset, u8 data)
 {
 	m_ymzram[offset] = data;
 }
 
 // SH-3 GPIO output ports
-READ64_MEMBER(gsan_state::portc_r)
+u64 gsan_state::portc_r()
 {
 	return m_portc_data;
 }
-WRITE64_MEMBER(gsan_state::portc_w)
+void gsan_state::portc_w(u64 data)
 {
+/* DDR
+    ---- x--- /Coin counter
+    --x- ---- Start button lamp
+    -x-- ---- Right button lamp
+    x--- ---- Left button lamp
+*/
 	m_portc_data = data;
-	// TODO
+
+	machine().bookkeeping().coin_counter_w(0, ~data & 8);
 }
-WRITE64_MEMBER(gsan_state::portc_medal_w)
+void gsan_state::portc_medal_w(u64 data)
 {
+/* Medal
+    ---- ---x Medal in counter
+    ---- --x- 100Y in counter
+    ---- -x-- 10Y in counter
+    x--- ---- Hopper
+*/
 	m_portc_data = data;
 
 	m_hopper->motor_w(data & 0x80);
 	machine().bookkeeping().coin_counter_w(0, data & 4);
-	machine().bookkeeping().coin_counter_w(1, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 2);
+	machine().bookkeeping().coin_counter_w(2, data & 1);
 }
-READ64_MEMBER(gsan_state::porte_r)
+u64 gsan_state::porte_r()
 {
 	return m_porte_data;
 }
-WRITE64_MEMBER(gsan_state::porte_w)
+void gsan_state::porte_w(u64 data)
 {
-	// lamps
-#if 0
-	u8 mask = m_porte_data ^ data;
-	if (mask)
-		logerror("PORT_E mask %02X val %02X\n", mask, data & mask);
-#endif
+/* DDR
+    ---- -x-- Lamp R3
+    ---- x--- Lamp R2
+    ---x ---- Lamp R1
+    --x- ---- Lamp L3
+    -x-- ---- Lamp L2
+    x--- ---- Lamp L1
+*/
 	m_porte_data = data;
+}
+void gsan_state::porte_medal_w(u64 data)
+{
+/* Medal
+    ---- ---x Medal in lock
+    ---- --x- 100Y in lock
+    ---- -x-- 10Y in lock
+    -x-- ---- Button lamp
+*/
+	m_porte_data = data;
+
+	machine().bookkeeping().coin_lockout_w(0, data & 4);
+	machine().bookkeeping().coin_lockout_w(1, data & 2);
+	machine().bookkeeping().coin_lockout_w(2, data & 1);
 }
 
 
 // Q2SD GPU
-READ16_MEMBER(gsan_state::vram_r)
+u16 gsan_state::vram_r(offs_t offset)
 {
 	return m_vram[offset];
 }
 
-WRITE16_MEMBER(gsan_state::vram_w)
+void gsan_state::vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset]);
 }
 
-READ16_MEMBER(gsan_state::gpu_r)
+u16 gsan_state::gpu_r(offs_t offset)
 {
 	return m_gpuregs[offset];
 }
 
-WRITE16_MEMBER(gsan_state::gpu_w)
+void gsan_state::gpu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	u16 prevval = m_gpuregs[offset];
 	COMBINE_DATA(&m_gpuregs[offset]);
@@ -319,7 +353,9 @@ WRITE16_MEMBER(gsan_state::gpu_w)
 		}
 		if (BIT(data, 14)) // display reset
 		{
-			m_gpuregs[0x002 / 2] &= ~(1 << 11);
+			m_gpuregs[0x002 / 2] &= ~(1 << 15); // TVR
+			m_gpuregs[0x002 / 2] &= ~(1 << 14); // FRM
+			m_gpuregs[0x002 / 2] &= ~(1 << 11); // VBK
 		}
 		if (BIT(data, 10)) // render break
 		{
@@ -653,7 +689,7 @@ void gsan_state::do_render(bool vbkem)
 			m_uymax = m_gpuregs[0x8e / 2] = m_vram[listoffs++];
 			break;
 		case 0x16: // WPR
-			gpu_w(machine().dummy_space(), m_vram[listoffs] & 0x3ff, m_vram[listoffs + 1]);
+			gpu_w(m_vram[listoffs] & 0x3ff, m_vram[listoffs + 1]);
 			listoffs += 2;
 			break;
 		case 0x17: // SCLIP
@@ -711,7 +747,7 @@ u32 gsan_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 					if (!m_bg16bit)
 						col = get_color(col);
 				}
-				bitmap.pix32(y, x) = pal565(col, 11, 5, 0);
+				bitmap.pix(y, x) = pal565(col, 11, 5, 0);
 			}
 	}
 	else
@@ -725,7 +761,7 @@ void gsan_state::main_map_common(address_map &map)
 {
 	map(0x00000000, 0x0000ffff).rom().region("maincpu", 0);
 	map(0x0c000000, 0x0c3fffff).ram().share("main_ram");
-	map(0x10000000, 0x100007ff).rw(FUNC(gsan_state::gpu_r), FUNC(gsan_state::gpu_w)).share("gpu_regs");
+	map(0x10000000, 0x100007ff).rw(FUNC(gsan_state::gpu_r), FUNC(gsan_state::gpu_w));
 	// misc I/O
 	map(0x14000800, 0x14000807).rw(FUNC(gsan_state::cf_regs_r), FUNC(gsan_state::cf_regs_w));
 	map(0x14000c00, 0x14000c03).rw(FUNC(gsan_state::cf_data_r), FUNC(gsan_state::cf_data_w));
@@ -741,8 +777,8 @@ void gsan_state::main_map_common(address_map &map)
 void gsan_state::main_map(address_map &map)
 {
 	main_map_common(map);
-	map(0x08000000, 0x087fffff).rw(FUNC(gsan_state::vram_r), FUNC(gsan_state::vram_w)).share("vram");
-	map(0x18800000, 0x18ffffff).rw(FUNC(gsan_state::ymzram_r), FUNC(gsan_state::ymzram_w)).share("ymz_ram");
+	map(0x08000000, 0x087fffff).rw(FUNC(gsan_state::vram_r), FUNC(gsan_state::vram_w));
+	map(0x18800000, 0x18ffffff).rw(FUNC(gsan_state::ymzram_r), FUNC(gsan_state::ymzram_w));
 }
 
 void gsan_state::main_port(address_map &map)
@@ -762,14 +798,15 @@ void gsan_state::ymz280b_map(address_map &map)
 void gsan_state::main_map_medal(address_map &map)
 {
 	main_map_common(map);
-	map(0x08000000, 0x083fffff).rw(FUNC(gsan_state::vram_r), FUNC(gsan_state::vram_w)).share("vram");
-	map(0x18800000, 0x18bfffff).rw(FUNC(gsan_state::ymzram_r), FUNC(gsan_state::ymzram_w)).share("ymz_ram");
+	map(0x08000000, 0x083fffff).rw(FUNC(gsan_state::vram_r), FUNC(gsan_state::vram_w));
+	map(0x18800000, 0x18bfffff).rw(FUNC(gsan_state::ymzram_r), FUNC(gsan_state::ymzram_w));
 }
 
 void gsan_state::main_port_medal(address_map &map)
 {
 	main_port(map);
 	map(SH3_PORT_C, SH3_PORT_C + 7).rw(FUNC(gsan_state::portc_r), FUNC(gsan_state::portc_medal_w));
+	map(SH3_PORT_E, SH3_PORT_E + 7).rw(FUNC(gsan_state::porte_r), FUNC(gsan_state::porte_medal_w));
 }
 
 void gsan_state::ymz280b_map_medal(address_map &map)
@@ -939,6 +976,17 @@ static INPUT_PORTS_START( muscl )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( runpuppy )
+	PORT_INCLUDE( muscl )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x3000, 0x0000, "Play Timer" ) PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(      0x3000, "8" )
+	PORT_DIPSETTING(      0x2000, "12" )
+	PORT_DIPSETTING(      0x1000, "16" )
+	PORT_DIPSETTING(      0x0000, "20" )
+INPUT_PORTS_END
+
 //**************************************************************************
 //  MACHINE DRIVERS
 //**************************************************************************
@@ -1034,7 +1082,7 @@ void gsan_state::gs_medal(machine_config &config)
 
 void gsan_state::init_gsan()
 {
-	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
+	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY | SH2DRC_STRICT_PCREL);
 	m_maincpu->sh2drc_add_fastram(0x00000000, 0x0000ffff, 0, memregion("maincpu")->base());
 	m_maincpu->sh2drc_add_fastram(0x0c000000, 0x0c3fffff, 1, memshare("main_ram")->ptr());
 }
@@ -1065,11 +1113,22 @@ ROM_START( musclhit )
 	DISK_IMAGE( "gsan6_a-213", 0, SHA1(d9e7a350428d1621fc70e81561390c01837a94c0) )
 ROM_END
 
+ROM_START( runpuppy )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "gsan1-a.u17", 0x00000, 0x08000, CRC(515da4bf) SHA1(72062296077db26d6bd1bc47556c2af00d5952e6) )
+
+	ROM_REGION( 0x0f, "rtc", 0 )
+	ROM_LOAD( "nvram.u9", 0x00, 0x0f, CRC(907eb7d3) SHA1(bdbe3618a2c6dd3fb66f8e4c0226c5d827e38d67) )
+
+	DISK_REGION( "ata:0:cfcard:image" )
+	DISK_IMAGE( "an10311003", 0, SHA1(5f972e29c201cdd6697f25140b37a11f02b605f5) )
+ROM_END
 
 
 //**************************************************************************
 //  GAME DRIVERS
 //**************************************************************************
 
-GAME( 2000, ddrkids,       0, gsan,     ddrkids, gsan_state, init_gsan, ROT0, "Konami",       "Dance Dance Revolution Kids (GQAN4 JAA)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_SUPPORTS_SAVE )
+GAME( 2000, ddrkids,       0, gsan,     ddrkids, gsan_state, init_gsan, ROT0, "Konami",       "Dance Dance Revolution Kids (GQAN4 JAA)", MACHINE_IMPERFECT_TIMING|MACHINE_IMPERFECT_GRAPHICS|MACHINE_SUPPORTS_SAVE )
 GAME( 2000, musclhit,      0, gs_medal, muscl,   gsan_state, init_gsan, ROT0, "Konami / TBS", "Muscle Ranking Kinniku Banzuke Spray Hitter", MACHINE_IMPERFECT_GRAPHICS|MACHINE_SUPPORTS_SAVE )
+GAME( 2000, runpuppy,      0, gs_medal, runpuppy,gsan_state, init_gsan, ROT0, "Konami",       "Run Run Puppy", MACHINE_IMPERFECT_GRAPHICS|MACHINE_SUPPORTS_SAVE )

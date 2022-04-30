@@ -25,6 +25,7 @@ bgfx_effect::bgfx_effect(uint64_t state, bgfx::ShaderHandle vertex_shader, bgfx:
 			delete uniforms[i];
 			continue;
 		}
+		uniforms[i]->create();
 		m_uniforms[uniforms[i]->name()] = uniforms[i];
 	}
 }
@@ -51,6 +52,6 @@ void bgfx_effect::submit(int view, uint64_t blend)
 
 bgfx_uniform* bgfx_effect::uniform(std::string name)
 {
-	std::map<std::string, bgfx_uniform*>::iterator iter = m_uniforms.find(name);
+	auto iter = m_uniforms.find(name);
 	return iter != m_uniforms.end() ? iter->second : nullptr;
 }

@@ -59,28 +59,6 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( video_off_r );
-	DECLARE_READ8_MEMBER( video_on_r );
-	DECLARE_WRITE8_MEMBER( audio_latch_w );
-	DECLARE_READ8_MEMBER( hex_keyboard_r );
-	DECLARE_WRITE8_MEMBER( hex_keylatch_w );
-	DECLARE_READ8_MEMBER( reset_counter_r );
-	DECLARE_WRITE8_MEMBER( segment_w );
-	DECLARE_READ8_MEMBER( data_r );
-	DECLARE_WRITE8_MEMBER( display_w );
-	DECLARE_WRITE_LINE_MEMBER( dmaout_w );
-	DECLARE_WRITE_LINE_MEMBER( efx_w );
-	DECLARE_READ_LINE_MEMBER( wait_r );
-	DECLARE_READ_LINE_MEMBER( clear_r );
-	DECLARE_READ_LINE_MEMBER( ef1_r );
-	DECLARE_READ_LINE_MEMBER( ef2_r );
-	DECLARE_READ_LINE_MEMBER( ef3_r );
-	DECLARE_READ_LINE_MEMBER( ef4_r );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
-	DECLARE_READ8_MEMBER( dma_r );
-	DECLARE_WRITE8_MEMBER( sc_w );
 	DECLARE_INPUT_CHANGED_MEMBER( data );
 	DECLARE_INPUT_CHANGED_MEMBER( enter );
 	DECLARE_INPUT_CHANGED_MEMBER( single_step );
@@ -92,40 +70,62 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( memory_protect );
 	DECLARE_INPUT_CHANGED_MEMBER( memory_disable );
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	void init_cosmicos();
+	void cosmicos(machine_config &config);
+
+private:
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	uint8_t video_off_r();
+	uint8_t video_on_r();
+	void audio_latch_w(uint8_t data);
+	uint8_t hex_keyboard_r();
+	void hex_keylatch_w(uint8_t data);
+	uint8_t reset_counter_r();
+	void segment_w(uint8_t data);
+	uint8_t data_r();
+	void display_w(uint8_t data);
+	uint8_t dma_r();
+	void sc_w(uint8_t data);
+	void set_cdp1802_mode(int mode);
+	void clear_input_data();
+	DECLARE_WRITE_LINE_MEMBER( dmaout_w );
+	DECLARE_WRITE_LINE_MEMBER( efx_w );
+	DECLARE_READ_LINE_MEMBER( wait_r );
+	DECLARE_READ_LINE_MEMBER( clear_r );
+	DECLARE_READ_LINE_MEMBER( ef1_r );
+	DECLARE_READ_LINE_MEMBER( ef2_r );
+	DECLARE_READ_LINE_MEMBER( ef3_r );
+	DECLARE_READ_LINE_MEMBER( ef4_r );
+	DECLARE_WRITE_LINE_MEMBER( q_w );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(digit_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(int_tick);
-	void cosmicos(machine_config &config);
 	void cosmicos_io(address_map &map);
 	void cosmicos_mem(address_map &map);
 
-private:
-	void set_cdp1802_mode(int mode);
-	void clear_input_data();
-
 	/* CPU state */
-	int m_wait;
-	int m_clear;
-	int m_sc1;
+	int m_wait = 0;
+	int m_clear = 0;
+	int m_sc1 = 0;
 
 	/* memory state */
-	uint8_t m_data;
-	int m_boot;
-	int m_ram_protect;
-	int m_ram_disable;
+	uint8_t m_data = 0U;
+	int m_boot = 0;
+	int m_ram_protect = 0;
+	int m_ram_disable = 0;
 
 	/* keyboard state */
-	uint8_t m_keylatch;
+	uint8_t m_keylatch = 0U;
 
 	/* display state */
-	uint8_t m_segment;
-	int m_digit;
-	int m_counter;
-	int m_q;
-	int m_dmaout;
-	int m_efx;
-	int m_video_on;
+	uint8_t m_segment = 0U;
+	int m_digit = 0;
+	int m_counter = 0;
+	int m_q = 0;
+	int m_dmaout = 0;
+	int m_efx = 0;
+	int m_video_on = 0;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

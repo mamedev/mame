@@ -135,7 +135,6 @@
 
 #include "emu.h"
 #include "includes/ssv.h"
-#include "render.h"
 
 
 void ssv_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int gfx, uint32_t code, uint32_t color, int flipx, int flipy, int base_sx, int base_sy, int shadow, int realline, int line)
@@ -171,7 +170,7 @@ void ssv_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, in
 		const uint8_t gfxbppmask = BPP_MASK_TABLE[gfx & 0x07].gfx_mask;
 		const uint8_t gfxshift = BPP_MASK_TABLE[gfx & 0x07].gfx_shift;
 
-		uint16_t *dest = &bitmap.pix16(realline);
+		uint16_t *const dest = &bitmap.pix(realline);
 
 		const int x0 = flipx ? (base_sx + gfxelement->width() - 1) : base_sx;
 		const int x1 = flipx ? (base_sx - 1) : (x0 + gfxelement->width());
@@ -212,37 +211,37 @@ void ssv_state::video_start()
 	save_item(NAME(m_shadow_pen_shift));
 }
 
-VIDEO_START_MEMBER(ssv_state,eaglshot)
+void eaglshot_state::video_start()
 {
 	ssv_state::video_start();
 
-	m_eaglshot_gfxram       =   std::make_unique<uint16_t[]>(16 * 0x40000 / 2);
+	m_gfxram       =   std::make_unique<uint16_t[]>(16 * 0x40000 / 2);
 
-	m_gfxdecode->gfx(0)->set_source((uint8_t *)m_eaglshot_gfxram.get());
+	m_gfxdecode->gfx(0)->set_source((uint8_t *)m_gfxram.get());
 
-	save_pointer(NAME(m_eaglshot_gfxram), 16 * 0x40000 / 2);
+	save_pointer(NAME(m_gfxram), 16 * 0x40000 / 2);
 }
 
-TILE_GET_INFO_MEMBER(ssv_state::get_tile_info_0)
+TILE_GET_INFO_MEMBER(gdfs_state::get_tile_info_0)
 {
-	uint16_t tile = m_gdfs_tmapram[tile_index];
+	uint16_t tile = m_tmapram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1, tile, 0, TILE_FLIPXY( tile >> 14 ));
+	tileinfo.set(1, tile, 0, TILE_FLIPXY( tile >> 14 ));
 }
 
-WRITE16_MEMBER(ssv_state::gdfs_tmapram_w)
+void gdfs_state::tmapram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(&m_gdfs_tmapram[offset]);
-	m_gdfs_tmap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_tmapram[offset]);
+	m_tmap->mark_tile_dirty(offset);
 }
 
-VIDEO_START_MEMBER(ssv_state,gdfs)
+void gdfs_state::video_start()
 {
 	ssv_state::video_start();
 
-	m_gdfs_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ssv_state::get_tile_info_0)), TILEMAP_SCAN_ROWS, 16,16, 0x100,0x100);
+	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gdfs_state::get_tile_info_0)), TILEMAP_SCAN_ROWS, 16,16, 0x100,0x100);
 
-	m_gdfs_tmap->set_transparent_pen(0);
+	m_tmap->set_transparent_pen(0);
 }
 
 /***************************************************************************
@@ -384,7 +383,7 @@ VIDEO_START_MEMBER(ssv_state,gdfs)
 
 ***************************************************************************/
 
-READ16_MEMBER(ssv_state::vblank_r)
+uint16_t ssv_state::vblank_r()
 {
 	// maybe reads scanline counter? pastelis reads this on the 'for use in Japan' screen + end credits
 	// and adjusts y position to do a polled raster effect by changing scroll values midscreen
@@ -399,7 +398,7 @@ READ16_MEMBER(ssv_state::vblank_r)
 	return ret;
 }
 
-WRITE16_MEMBER(ssv_state::scroll_w)
+void ssv_state::scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_screen->update_partial(m_screen->vpos() - 1); // pastelis FOR USE IN JAPAN screen polls the vblank / hblank to do a raster effect
 	COMBINE_DATA(m_scroll + offset);
@@ -939,21 +938,21 @@ void ssv_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 ***************************************************************************/
 
-uint32_t ssv_state::screen_update_eaglshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t eaglshot_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	return screen_update(screen, bitmap, cliprect);
+	return ssv_state::screen_update(screen, bitmap, cliprect);
 }
 
-uint32_t ssv_state::screen_update_gdfs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gdfs_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	screen_update(screen, bitmap, cliprect);
+	ssv_state::screen_update(screen, bitmap, cliprect);
 
 	// draw zooming sprites
-	m_gdfs_st0020->update_screen(screen, bitmap, cliprect, false);
+	m_st0020->update_screen(screen, bitmap, cliprect, false);
 
-	m_gdfs_tmap->set_scrollx(0, m_gdfs_tmapscroll[0x0c/2]);
-	m_gdfs_tmap->set_scrolly(0, m_gdfs_tmapscroll[0x10/2]);
-	m_gdfs_tmap->draw(screen, bitmap, cliprect, 0, 0);
+	m_tmap->set_scrollx(0, m_tmapscroll[0x0c/2]);
+	m_tmap->set_scrolly(0, m_tmapscroll[0x10/2]);
+	m_tmap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }

@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+
+<mamelayout version="2">
+
+	<element name="digit7" defstate="0">
+		<led7seg>
+			<color red="0.0" green="0.75" blue="1.0" />
+		</led7seg>
+	</element>
+
+	<view name="Default Layout">
+		<bounds left="0" top="25" right="325" bottom="205" />
+
+		<!-- Top Row -->
+		<element name="digit0" ref="digit7">
+			<bounds left="10" top="45" right="30" bottom="84" />
+		</element>
+		<element name="digit1" ref="digit7">
+			<bounds left="34" top="45" right="54" bottom="84" />
+		</element>
+		<element name="digit2" ref="digit7">
+			<bounds left="58" top="45" right="78" bottom="84" />
+		</element>
+		<element name="digit3" ref="digit7">
+			<bounds left="87" top="45" right="107" bottom="84" />
+		</element>
+		<element name="digit4" ref="digit7">
+			<bounds left="111" top="45" right="131" bottom="84" />
+		</element>
+		<element name="digit5" ref="digit7">
+			<bounds left="135" top="45" right="155" bottom="84" />
+		</element>
+
+		<element name="digit20" ref="digit7">
+			<bounds left="170" top="45" right="190" bottom="84" />
+		</element>
+		<element name="digit21" ref="digit7">
+			<bounds left="194" top="45" right="214" bottom="84" />
+		</element>
+		<element name="digit22" ref="digit7">
+			<bounds left="218" top="45" right="238" bottom="84" />
+		</element>
+		<element name="digit23" ref="digit7">
+			<bounds left="247" top="45" right="267" bottom="84" />
+		</element>
+		<element name="digit24" ref="digit7">
+			<bounds left="271" top="45" right="291" bottom="84" />
+		</element>
+		<element name="digit25" ref="digit7">
+			<bounds left="295" top="45" right="315" bottom="84" />
+		</element>
+
+		<!-- Middle Row -->
+		<element name="digit6" ref="digit7">
+			<bounds left="10" top="100" right="30" bottom="139" />
+		</element>
+		<element name="digit7" ref="digit7">
+			<bounds left="34" top="100" right="54" bottom="139" />
+		</element>
+		<element name="digit8" ref="digit7">
+			<bounds left="58" top="100" right="78" bottom="139" />
+		</element>
+		<element name="digit9" ref="digit7">
+			<bounds left="87" top="100" right="107" bottom="139" />
+		</element>
+		<element name="digit10" ref="digit7">
+			<bounds left="111" top="100" right="131" bottom="139" />
+		</element>
+		<element name="digit11" ref="digit7">
+			<bounds left="135" top="100" right="155" bottom="139" />
+		</element>
+
+		<element name="digit26" ref="digit7">
+			<bounds left="170" top="100" right="190" bottom="139" />
+		</element>
+		<element name="digit27" ref="digit7">
+			<bounds left="194" top="100" right="214" bottom="139" />
+		</element>
+		<element name="digit28" ref="digit7">
+			<bounds left="218" top="100" right="238" bottom="139" />
+		</element>
+		<element name="digit29" ref="digit7">
+			<bounds left="247" top="100" right="267" bottom="139" />
+		</element>
+		<element name="digit30" ref="digit7">
+			<bounds left="271" top="100" right="291" bottom="139" />
+		</element>
+		<element name="digit31" ref="digit7">
+			<bounds left="295" top="100" right="315" bottom="139" />
+		</element>
+
+		<!-- Bottom Row -->
+		<element name="digit15" ref="digit7">
+			<bounds left="10" top="155" right="30" bottom="194" />
+		</element>
+		<element name="unused1" ref="digit7">
+			<bounds left="34" top="155" right="54" bottom="194" />
+		</element>
+		<element name="digit14" ref="digit7">
+			<bounds left="58" top="155" right="78" bottom="194" />
+		</element>
+		<element name="unused2" ref="digit7">
+			<bounds left="87" top="155" right="107" bottom="194" />
+		</element>
+		<element name="digit13" ref="digit7">
+			<bounds left="111" top="155" right="131" bottom="194" />
+		</element>
+		<element name="digit12" ref="digit7">
+			<bounds left="135" top="155" right="155" bottom="194" />
+		</element>
+
+		<element name="digit32" ref="digit7">
+			<bounds left="170" top="155" right="190" bottom="194" />
+		</element>
+		<element name="digit33" ref="digit7">
+			<bounds left="194" top="155" right="214" bottom="194" />
+		</element>
+		<element name="digit34" ref="digit7">
+			<bounds left="218" top="155" right="238" bottom="194" />
+		</element>
+		<element name="digit35" ref="digit7">
+			<bounds left="247" top="155" right="267" bottom="194" />
+		</element>
+		<element name="digit35" ref="digit7">
+			<bounds left="271" top="155" right="291" bottom="194" />
+		</element>
+		<element name="digit35" ref="digit7">
+			<bounds left="295" top="155" right="315" bottom="194" />
+		</element>
+	</view>
+</mamelayout>

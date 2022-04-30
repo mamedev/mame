@@ -57,7 +57,7 @@ RO-3-9506 = 8KiB (4Kiw) self decoding address mask rom with external address dec
 #include "cpu/cp1610/cp1610.h"
 #include "sound/ay8910.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -226,7 +226,7 @@ static INPUT_PORTS_START( intvkbd )
 
 	PORT_START("ROW6")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP)  PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_CHAR('|')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)   PORT_CHAR('_') PORT_CHAR('-')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)   PORT_CHAR('-') PORT_CHAR('_')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)       PORT_CHAR('9') PORT_CHAR('(')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)       PORT_CHAR('7') PORT_CHAR('&')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)       PORT_CHAR('5') PORT_CHAR('%')
@@ -424,18 +424,18 @@ void intv_state::intvkbd2_mem(address_map &map)
 	map(0xe000, 0xffff).r(FUNC(intv_state::intvkb_iocart_r));
 }
 
-void intv_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void intv_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_INTV_INTERRUPT2_COMPLETE:
-		intv_interrupt2_complete(ptr, param);
+		intv_interrupt2_complete(param);
 		break;
 	case TIMER_INTV_INTERRUPT_COMPLETE:
-		intv_interrupt_complete(ptr, param);
+		intv_interrupt_complete(param);
 		break;
 	case TIMER_INTV_BTB_FILL:
-		intv_btb_fill(ptr, param);
+		intv_btb_fill(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in intv_state::device_timer");
@@ -460,9 +460,10 @@ INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt2)
 void intv_state::intv(machine_config &config)
 {
 	/* basic machine hardware */
-	CP1610(config, m_maincpu, XTAL(3'579'545)/4);        /* Colorburst/4 */
-	m_maincpu->set_addrmap(AS_PROGRAM, &intv_state::intv_mem);
-	m_maincpu->set_vblank_int("screen", FUNC(intv_state::intv_interrupt));
+	cp1610_cpu_device &maincpu(CP1610(config, m_maincpu, XTAL(3'579'545)/4));        /* Colorburst/4 */
+	maincpu.set_addrmap(AS_PROGRAM, &intv_state::intv_mem);
+	maincpu.set_vblank_int("screen", FUNC(intv_state::intv_interrupt));
+	maincpu.iab().set(FUNC(intv_state::iab_r));
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
@@ -657,12 +658,12 @@ void intv_state::init_intvkbd()
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS       INIT          COMPANY   FULLNAME */
-CONS( 1979, intv,     0,      0,      intv,     0,       intv_state, init_intv,    "Mattel", "Intellivision", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, intvsrs,  intv,   0,      intv,     0,       intv_state, init_intv,    "Sears",  "Super Video Arcade", MACHINE_SUPPORTS_SAVE )
-COMP( 1981, intvkbd,  intv,   0,      intvkbd,  intvkbd, intv_state, init_intvkbd, "Mattel", "Intellivision Keyboard Component (Unreleased)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-CONS( 1982, intv2,    intv,   0,      intv2,    0,       intv_state, init_intv,    "Mattel", "Intellivision II", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS       INIT          COMPANY               FULLNAME, FLAGS */
+CONS( 1979, intv,     0,      0,      intv,     0,       intv_state, init_intv,    "Mattel Electronics", "Intellivision", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, intvsrs,  intv,   0,      intv,     0,       intv_state, init_intv,    "Sears",              "Super Video Arcade", MACHINE_SUPPORTS_SAVE )
+COMP( 1981, intvkbd,  intv,   0,      intvkbd,  intvkbd, intv_state, init_intvkbd, "Mattel Electronics", "Intellivision Keyboard Component (Unreleased)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+CONS( 1982, intv2,    intv,   0,      intv2,    0,       intv_state, init_intv,    "Mattel Electronics", "Intellivision II", MACHINE_SUPPORTS_SAVE )
 
 // made up, user friendlier machines with pre-mounted passthu expansions
-COMP( 1982, intvoice, intv,   0,      intvoice, 0,       intv_state, init_intv,    "Mattel", "Intellivision w/IntelliVoice expansion", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, intvecs,  intv,   0,      intvecs,  0,       intv_state, init_intv,    "Mattel", "Intellivision w/Entertainment Computer System + Intellivoice expansions", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, intvoice, intv,   0,      intvoice, 0,       intv_state, init_intv,    "Mattel Electronics", "Intellivision w/IntelliVoice expansion", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, intvecs,  intv,   0,      intvecs,  0,       intv_state, init_intv,    "Mattel Electronics", "Intellivision w/Entertainment Computer System + Intellivoice expansions", MACHINE_SUPPORTS_SAVE )

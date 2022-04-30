@@ -35,8 +35,8 @@ DEFINE_DEVICE_TYPE(VRENDER0_SOC, vrender0soc_device, "vrender0", "MagicEyes VRen
 //  vrender0soc_device - constructor
 //-------------------------------------------------
 
-vrender0soc_device::vrender0soc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, VRENDER0_SOC, tag, owner, clock),
+vrender0soc_device::vrender0soc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, VRENDER0_SOC, tag, owner, clock),
 	m_host_cpu(*this, finder_base::DUMMY_TAG),
 	m_screen(*this, "screen"),
 	m_palette(*this, "palette"),
@@ -46,7 +46,7 @@ vrender0soc_device::vrender0soc_device(const machine_config &mconfig, const char
 	m_rspeaker(*this, "rspeaker"),
 	m_uart(*this, "uart%u", 0),
 	m_crtcregs(*this, "crtcregs"),
-	write_tx{ { *this }, { *this } }
+	write_tx(*this)
 {
 }
 
@@ -131,9 +131,9 @@ void vrender0soc_device::device_add_mconfig(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	VIDEO_VRENDER0(config, m_vr0vid, 14318180);
-	#ifdef IDLE_LOOP_SPEEDUP
+#ifdef IDLE_LOOP_SPEEDUP
 	m_vr0vid->idleskip_cb().set(FUNC(vrender0soc_device::idle_skip_speedup_w));
-	#endif
+#endif
 
 	PALETTE(config, m_palette, palette_device::RGB_565);
 
@@ -155,23 +155,23 @@ void vrender0soc_device::device_add_mconfig(machine_config &config)
 
 void vrender0soc_device::device_start()
 {
-	int i;
-	m_textureram = auto_alloc_array_clear(machine(), uint16_t, 0x00800000/2);
-	m_frameram = auto_alloc_array_clear(machine(), uint16_t, 0x00800000/2);
+	m_textureram = make_unique_clear<uint16_t []>(0x00800000/2);
+	m_frameram = make_unique_clear<uint16_t []>(0x00800000/2);
 
-	m_vr0vid->set_areas(m_textureram, m_frameram);
+	m_vr0vid->set_areas(m_textureram.get(), m_frameram.get());
 	m_host_space = &m_host_cpu->space(AS_PROGRAM);
 
 	if (this->clock() == 0)
 		fatalerror("%s: bus clock not setup properly",this->tag());
 
-	for (i = 0; i < 4; i++)
-		m_Timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vrender0soc_device::Timercb),this), (void*)(uintptr_t)i);
+	m_Timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vrender0soc_device::Timercb<0>),this));
+	m_Timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vrender0soc_device::Timercb<1>),this));
+	m_Timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vrender0soc_device::Timercb<2>),this));
+	m_Timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vrender0soc_device::Timercb<3>),this));
 
-	for (auto &cb : write_tx)
-		cb.resolve_safe();
+	write_tx.resolve_all_safe();
 
-	for (i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		m_uart[i]->set_channel_num(i);
 		m_uart[i]->set_parent(this);
@@ -243,22 +243,22 @@ void vrender0soc_device::device_reset()
  *
  */
 
-READ16_MEMBER(vrender0soc_device::textureram_r)
+uint16_t vrender0soc_device::textureram_r(offs_t offset)
 {
 	return m_textureram[offset];
 }
 
-WRITE16_MEMBER(vrender0soc_device::textureram_w)
+void vrender0soc_device::textureram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_textureram[offset]);
 }
 
-READ16_MEMBER(vrender0soc_device::frameram_r)
+uint16_t vrender0soc_device::frameram_r(offs_t offset)
 {
 	return m_frameram[offset];
 }
 
-WRITE16_MEMBER(vrender0soc_device::frameram_w)
+void vrender0soc_device::frameram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_frameram[offset]);
 }
@@ -269,12 +269,12 @@ WRITE16_MEMBER(vrender0soc_device::frameram_w)
  *
  */
 
-READ32_MEMBER(vrender0soc_device::intvec_r)
+uint32_t vrender0soc_device::intvec_r()
 {
 	return (m_IntHigh & 7) << 8;
 }
 
-WRITE32_MEMBER(vrender0soc_device::intvec_w)
+void vrender0soc_device::intvec_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -286,12 +286,12 @@ WRITE32_MEMBER(vrender0soc_device::intvec_w)
 		m_IntHigh = (data >> 8) & 7;
 }
 
-READ32_MEMBER( vrender0soc_device::inten_r )
+uint32_t vrender0soc_device::inten_r()
 {
 	return m_inten;
 }
 
-WRITE32_MEMBER( vrender0soc_device::inten_w )
+void vrender0soc_device::inten_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_inten);
 	// P'S Attack has a timer 0 irq service with no call to intvec_w but just this
@@ -300,12 +300,12 @@ WRITE32_MEMBER( vrender0soc_device::inten_w )
 		m_host_cpu->set_input_line(SE3208_INT, CLEAR_LINE);
 }
 
-READ32_MEMBER( vrender0soc_device::intst_r )
+uint32_t vrender0soc_device::intst_r()
 {
 	return m_intst;
 }
 
-WRITE32_MEMBER( vrender0soc_device::intst_w )
+void vrender0soc_device::intst_w(uint32_t data)
 {
 	// TODO: contradicts with documentation, games writes to this?
 	// ...
@@ -325,7 +325,7 @@ void vrender0soc_device::IntReq( int num )
 }
 
 
-int vrender0soc_device::irq_callback()
+uint8_t vrender0soc_device::irq_callback()
 {
 	for (int i = 0; i < 32; ++i)
 	{
@@ -364,27 +364,27 @@ void vrender0soc_device::TimerStart(int which)
 //  printf("timer %d start, PD = %x TCV = %x period = %s\n", which, PD, TCV, period.as_string());
 }
 
+template<int Which>
 TIMER_CALLBACK_MEMBER(vrender0soc_device::Timercb)
 {
-	int which = (int)(uintptr_t)ptr;
 	static const int num[] = { 0, 1, 9, 10 };
 
-	if (m_timer_control[which] & 2)
-		TimerStart(which);
+	if (m_timer_control[Which] & 2)
+		TimerStart(Which);
 	else
-		m_timer_control[which] &= ~1;
+		m_timer_control[Which] &= ~1;
 
-	IntReq(num[which]);
+	IntReq(num[Which]);
 }
 
 template<int Which>
-READ32_MEMBER(vrender0soc_device::tmcon_r)
+uint32_t vrender0soc_device::tmcon_r()
 {
 	return m_timer_control[Which];
 }
 
 template<int Which>
-WRITE32_MEMBER(vrender0soc_device::tmcon_w)
+void vrender0soc_device::tmcon_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old = m_timer_control[Which];
 	data = COMBINE_DATA(&m_timer_control[Which]);
@@ -405,13 +405,13 @@ WRITE32_MEMBER(vrender0soc_device::tmcon_w)
 }
 
 template<int Which>
-READ16_MEMBER(vrender0soc_device::tmcnt_r)
+uint16_t vrender0soc_device::tmcnt_r()
 {
 	return m_timer_count[Which] & 0xffff;
 }
 
 template<int Which>
-WRITE16_MEMBER(vrender0soc_device::tmcnt_w)
+void vrender0soc_device::tmcnt_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_timer_count[Which]);
 }
@@ -431,15 +431,15 @@ inline int vrender0soc_device::dma_setup_hold(uint8_t setting, uint8_t bitmask)
 	return setting & bitmask ? 0 : (setting & 2) ? 4 : (1 << (setting & 1));
 }
 
-template<int Which> READ32_MEMBER(vrender0soc_device::dmasa_r) { return m_dma[Which].src; }
-template<int Which> WRITE32_MEMBER(vrender0soc_device::dmasa_w) { COMBINE_DATA(&m_dma[Which].src); }
-template<int Which> READ32_MEMBER(vrender0soc_device::dmada_r) { return m_dma[Which].dst; }
-template<int Which> WRITE32_MEMBER(vrender0soc_device::dmada_w) { COMBINE_DATA(&m_dma[Which].dst); }
-template<int Which> READ32_MEMBER(vrender0soc_device::dmatc_r) { return m_dma[Which].size; }
-template<int Which> WRITE32_MEMBER(vrender0soc_device::dmatc_w) { COMBINE_DATA(&m_dma[Which].size); }
-template<int Which> READ32_MEMBER(vrender0soc_device::dmac_r) { return m_dma[Which].ctrl; }
+template<int Which> uint32_t vrender0soc_device::dmasa_r() { return m_dma[Which].src; }
+template<int Which> void vrender0soc_device::dmasa_w(offs_t offset, uint32_t data, uint32_t mem_mask) { COMBINE_DATA(&m_dma[Which].src); }
+template<int Which> uint32_t vrender0soc_device::dmada_r() { return m_dma[Which].dst; }
+template<int Which> void vrender0soc_device::dmada_w(offs_t offset, uint32_t data, uint32_t mem_mask) { COMBINE_DATA(&m_dma[Which].dst); }
+template<int Which> uint32_t vrender0soc_device::dmatc_r() { return m_dma[Which].size; }
+template<int Which> void vrender0soc_device::dmatc_w(offs_t offset, uint32_t data, uint32_t mem_mask) { COMBINE_DATA(&m_dma[Which].size); }
+template<int Which> uint32_t vrender0soc_device::dmac_r() { return m_dma[Which].ctrl; }
 template<int Which>
-WRITE32_MEMBER(vrender0soc_device::dmac_w)
+void vrender0soc_device::dmac_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (((data ^ m_dma[Which].ctrl) & (1 << 10)) && (data & (1 << 10)))   //DMAOn
 	{
@@ -491,7 +491,7 @@ WRITE32_MEMBER(vrender0soc_device::dmac_w)
  *
  */
 
-READ32_MEMBER(vrender0soc_device::crtc_r)
+uint32_t vrender0soc_device::crtc_r(offs_t offset)
 {
 	uint32_t res = m_crtcregs[offset];
 	uint32_t hdisp = (m_crtcregs[0x0c / 4] + 1);
@@ -517,7 +517,7 @@ READ32_MEMBER(vrender0soc_device::crtc_r)
 	return res;
 }
 
-WRITE32_MEMBER(vrender0soc_device::crtc_w)
+void vrender0soc_device::crtc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (((m_crtcregs[0] & 0x0100) == 0x0100) && (offset > 0) && (offset < 0x28/4)) // Write protect
 		return;
@@ -683,7 +683,7 @@ void vrender0soc_device::crtc_update()
 }
 
 // accessed by cross puzzle
-READ32_MEMBER(vrender0soc_device::sysid_r)
+uint32_t vrender0soc_device::sysid_r()
 {
 	// Device ID: VRender0+ -> 0x0a
 	// Revision Number -> 0x00
@@ -691,7 +691,7 @@ READ32_MEMBER(vrender0soc_device::sysid_r)
 	return 0x00000a00;
 }
 
-READ32_MEMBER(vrender0soc_device::cfgr_r)
+uint32_t vrender0soc_device::cfgr_r()
 {
 	// TODO: this truly needs real HW verification,
 	//       only Cross Puzzle reads this so far so leaving a logerror

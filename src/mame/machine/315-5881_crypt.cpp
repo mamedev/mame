@@ -106,19 +106,19 @@ void sega_315_5881_crypt_device::device_reset()
  *
  ************************************************/
 
-READ16_MEMBER(sega_315_5881_crypt_device::ready_r)
+uint16_t sega_315_5881_crypt_device::ready_r()
 {
 	// bit 0: busy flag
 	return 0;
 }
 
-WRITE16_MEMBER(sega_315_5881_crypt_device::addrlo_w)
+void sega_315_5881_crypt_device::addrlo_w(uint16_t data)
 {
 	set_addr_low(data&0xffff);
 	first_read = true;
 }
 
-WRITE16_MEMBER(sega_315_5881_crypt_device::addrhi_w)
+void sega_315_5881_crypt_device::addrhi_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	set_addr_high(0);
 	if (data != 0)
@@ -126,13 +126,13 @@ WRITE16_MEMBER(sega_315_5881_crypt_device::addrhi_w)
 	first_read = true;
 }
 
-WRITE16_MEMBER(sega_315_5881_crypt_device::subkey_le_w)
+void sega_315_5881_crypt_device::subkey_le_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	printf("subkey %08x (%08x)\n", data, mem_mask);
 	set_subkey(data & 0xffff);
 }
 
-WRITE16_MEMBER(sega_315_5881_crypt_device::subkey_be_w)
+void sega_315_5881_crypt_device::subkey_be_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t subkey;
 	printf("subkey %08x (%08x)\n", data, mem_mask);
@@ -141,16 +141,16 @@ WRITE16_MEMBER(sega_315_5881_crypt_device::subkey_be_w)
 	set_subkey(subkey);
 }
 
-READ16_MEMBER(sega_315_5881_crypt_device::decrypt_le_r)
+uint16_t sega_315_5881_crypt_device::decrypt_le_r()
 {
-	uint16_t retval = decrypt_be_r(space,offset,mem_mask);
+	uint16_t retval = decrypt_be_r();
 	// endian swap the sub-key for little endian CPUs
 	retval = ((retval & 0xff00) >> 8) | ((retval & 0x00ff) << 8);
 
 	return retval;
 }
 
-READ16_MEMBER(sega_315_5881_crypt_device::decrypt_be_r)
+uint16_t sega_315_5881_crypt_device::decrypt_be_r()
 {
 	if (first_read == true)
 	{

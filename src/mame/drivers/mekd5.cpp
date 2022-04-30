@@ -122,9 +122,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(trace_timer_clear_w);
 
 	DECLARE_READ_LINE_MEMBER(keypad_cb1_r);
-	DECLARE_READ8_MEMBER(keypad_key_r);
-	DECLARE_WRITE8_MEMBER(led_digit_w);
-	DECLARE_WRITE8_MEMBER(led_segment_w);
+	uint8_t keypad_key_r();
+	void led_digit_w(uint8_t data);
+	void led_segment_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(kansas_r);
 
 	// Clocks
@@ -139,7 +139,7 @@ private:
 
 	bool keypad_key_pressed();
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	uint8_t m_segment;
 	uint8_t m_digit;
 	virtual void machine_start() override;
@@ -240,7 +240,7 @@ INPUT_PORTS_END
 
 ************************************************************/
 
-void mekd5_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mekd5_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -310,7 +310,7 @@ READ_LINE_MEMBER(mekd5_state::keypad_cb1_r)
 	return mekd5_state::keypad_key_pressed();
 }
 
-READ8_MEMBER(mekd5_state::keypad_key_r)
+uint8_t mekd5_state::keypad_key_r()
 {
 	uint8_t view = machine().render().first_target()->view();
 	if (view > 1) return m_segment;
@@ -328,14 +328,14 @@ READ8_MEMBER(mekd5_state::keypad_key_r)
 ************************************************************/
 
 // PA
-WRITE8_MEMBER(mekd5_state::led_segment_w)
+void mekd5_state::led_segment_w(uint8_t data)
 {
 	m_segment = data & 0x7f;
 	m_display->matrix(m_digit & 0x3f, ~m_segment);
 }
 
 // PB
-WRITE8_MEMBER(mekd5_state::led_digit_w)
+void mekd5_state::led_digit_w(uint8_t data)
 {
 	m_digit = data;
 	m_display->matrix(m_digit & 0x3f, ~m_segment);
@@ -449,7 +449,6 @@ void mekd5_state::machine_reset()
 static DEVICE_INPUT_DEFAULTS_START(terminal)
 	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_9600)
 	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_9600)
-	DEVICE_INPUT_DEFAULTS("RS232_STARTBITS", 0xff, RS232_STARTBITS_1)
 	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_8)
 	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_NONE)
 	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)

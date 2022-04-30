@@ -237,8 +237,8 @@ protected:
 	uint32_t              m_nextpc;
 	uint8_t               m_irq_state;
 	int                 m_icount;
-	address_space *     m_program;
-	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::specific m_program;
 
 	// src2val table, registers are at the end
 	uint32_t              m_src2val[65536];

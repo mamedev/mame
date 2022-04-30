@@ -104,6 +104,11 @@ ROM_START(wy160)
 	ROM_LOAD("251167-06.bin", 0x00000, 0x10000, CRC(36e920df) SHA1(8fb7f51b4f47ef63b21d421227d6fef98001e4e9))
 ROM_END
 
+ROM_START(wy325) // SCN8032HCCA44, 211009-02, 3x CXK5864CM-70LL, SCN2661BC1A28, 3V battery, color display
+	ROM_REGION(0x10000, "program", 0)
+	ROM_LOAD("wyse_tech_rev.a_251125-05.bin", 0x00000, 0x10000, CRC(4a327c38) SHA1(061332197d824aa4171ec998e2f286081adcf198)) // M27C512-15XF1
+ROM_END
+
 void wy150_state::driver_start()
 {
 	uint8_t *rom = memregion("program")->base();
@@ -120,3 +125,4 @@ void wy150_state::driver_start()
 COMP(1991, wy150, 0, 0, wy150, wy150, wy150_state, empty_init, "Wyse Technology", "WY-150 (v1.0)", MACHINE_IS_SKELETON)
 COMP(1992, wy120, 0, 0, wy150, wy150, wy150_state, empty_init, "Wyse Technology", "WY-120 (v1.4)", MACHINE_IS_SKELETON)
 COMP(1994, wy160, 0, 0, wy150, wy150, wy150_state, empty_init, "Wyse Technology", "WY-160 (v1.7)", MACHINE_IS_SKELETON)
+COMP(1994, wy325, 0, 0, wy150, wy150, wy150_state, empty_init, "Wyse Technology", "WY-325 (v3.2)", MACHINE_IS_SKELETON)

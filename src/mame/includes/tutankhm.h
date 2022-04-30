@@ -31,6 +31,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_scroll(*this, "scroll"),
+		m_mainbank(*this, "mainbank"),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
@@ -43,10 +44,10 @@ public:
 
 protected:
 	DECLARE_WRITE_LINE_MEMBER(irq_enable_w);
-	DECLARE_WRITE8_MEMBER(tutankhm_bankselect_w);
+	void tutankhm_bankselect_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
-	DECLARE_WRITE8_MEMBER(sound_on_w);
+	void sound_on_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
 	virtual void machine_start() override;
@@ -63,15 +64,16 @@ protected:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	optional_shared_ptr<uint8_t> m_scroll;
+	required_memory_bank m_mainbank;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	uint8_t     m_flipscreen_x;
-	uint8_t     m_flipscreen_y;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	uint8_t     m_flipscreen_x = 0;
+	uint8_t     m_flipscreen_y = 0;
 
 	/* misc */
-	uint8_t    m_irq_toggle;
-	uint8_t    m_irq_enable;
+	uint8_t    m_irq_toggle = 0;
+	uint8_t    m_irq_enable = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -81,7 +83,7 @@ protected:
 	optional_ioport m_stars_config;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scramble_stars_blink_timer);
-	DECLARE_WRITE8_MEMBER(galaxian_stars_enable_w);
+	void galaxian_stars_enable_w(uint8_t data);
 	void stars_init();
 	void stars_init_scramble();
 	void stars_init_bootleg();
@@ -89,11 +91,11 @@ protected:
 	void scramble_draw_stars(bitmap_rgb32 &bitmap, const rectangle &cliprect, int maxx);
 	void scramble_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	uint8_t m_star_mode;
+	uint8_t m_star_mode = 0;
 	rgb_t m_star_color[64];
 	std::unique_ptr<uint8_t[]> m_stars;
-	uint8_t m_stars_enabled;
-	uint8_t m_stars_blink_state;
+	uint8_t m_stars_enabled = 0;
+	uint8_t m_stars_blink_state = 0;
 };
 
 #endif // MAME_INCLUDES_TUTANKHM_H

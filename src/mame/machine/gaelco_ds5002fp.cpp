@@ -28,12 +28,12 @@ gaelco_ds5002fp_device::gaelco_ds5002fp_device(machine_config const &mconfig, ch
 {
 }
 
-READ8_MEMBER(gaelco_ds5002fp_device::hostmem_r)
+uint8_t gaelco_ds5002fp_device::hostmem_r(offs_t offset)
 {
 	return m_hostmem->read_byte(offset);
 }
 
-WRITE8_MEMBER(gaelco_ds5002fp_device::hostmem_w)
+void gaelco_ds5002fp_device::hostmem_w(offs_t offset, uint8_t data)
 {
 	m_hostmem->write_byte(offset, data);
 }

@@ -39,6 +39,7 @@ public:
 	void warpwarp(machine_config &config);
 	void geebee(machine_config &config);
 	void navarone(machine_config &config);
+	void sos(machine_config &config);
 	void kaitei(machine_config &config);
 	void bombbee(machine_config &config);
 	void geebeeb(machine_config &config);
@@ -70,33 +71,32 @@ private:
 	optional_ioport m_in_config;
 	optional_ioport_array<4> m_ports;
 
-	int m_geebee_bgw;
-	int m_ball_on;
-	int m_ball_h;
-	int m_ball_v;
-	int m_ball_pen;
-	int m_ball_sizex;
-	int m_ball_sizey;
-	int m_handle_joystick;
-	tilemap_t *m_bg_tilemap;
+	int m_geebee_bgw = 0;
+	int m_ball_on = 0;
+	int m_ball_h = 0;
+	int m_ball_v = 0;
+	int m_ball_pen = 0;
+	int m_ball_sizex = 0;
+	int m_ball_sizey = 0;
+	int m_handle_joystick = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	// warpwarp and bombbee
-	DECLARE_READ8_MEMBER(warpwarp_sw_r);
-	DECLARE_WRITE8_MEMBER(warpwarp_out0_w);
-	DECLARE_WRITE8_MEMBER(warpwarp_out3_w);
-	DECLARE_WRITE8_MEMBER(warpwarp_videoram_w);
-	DECLARE_READ8_MEMBER(warpwarp_dsw1_r);
-	DECLARE_READ8_MEMBER(warpwarp_vol_r);
+	uint8_t warpwarp_sw_r(offs_t offset);
+	void warpwarp_out0_w(offs_t offset, uint8_t data);
+	void warpwarp_videoram_w(offs_t offset, uint8_t data);
+	uint8_t warpwarp_dsw1_r(offs_t offset);
+	uint8_t warpwarp_vol_r();
 
 	//geebee and navarone
-	DECLARE_READ8_MEMBER(geebee_in_r);
-	DECLARE_WRITE8_MEMBER(geebee_out6_w);
+	uint8_t geebee_in_r(offs_t offset);
+	void geebee_out6_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(counter_w);
 	DECLARE_WRITE_LINE_MEMBER(lock_out_w);
 	DECLARE_WRITE_LINE_MEMBER(geebee_bgw_w);
 	DECLARE_WRITE_LINE_MEMBER(ball_on_w);
 	DECLARE_WRITE_LINE_MEMBER(inv_w);
-	DECLARE_WRITE8_MEMBER(geebee_videoram_w);
+	void geebee_videoram_w(offs_t offset, uint8_t data);
 
 	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(kaitei);
@@ -107,6 +107,7 @@ private:
 	void warpwarp_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(navarone);
 	void navarone_palette(palette_device &palette) const;
+	void sos_palette(palette_device &palette) const;
 
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(geebee_get_tile_info);

@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Acorn BBC Master ROM Cartridges -->
+Acorn BBC Master ROM Cartridges
 
-<!-- Loading Instructions:
+    Loading Instructions:
 
       Hold down the SHIFT key and SPACEbar and press and release the BREAK key.
 -->
@@ -158,14 +160,27 @@
 		</part>
 	</software>
 
-	<software name="msc">
-		<description>Master Smart Cartridge</description>
+	<software name="msc200" cloneof="msc">
+		<description>Master Smart Cartridge v2</description>
 		<year>1987</year>
 		<publisher>Care Electronics</publisher>
 		<part name="cart" interface="bbcm_cart">
 			<feature name="slot" value="msc" />
 			<dataarea name="rom" size="16384">
 				<rom name="smart_v2.rom" size="16384" crc="e9a8139e" sha1="26d6bbfe4b43f76be1f0cb2d96143112d3503840" />
+			</dataarea>
+			<dataarea name="ram" size="2048" />
+		</part>
+	</software>
+
+	<software name="msc">
+		<description>Master Smart Cartridge v2.02</description>
+		<year>1987</year>
+		<publisher>Care Electronics</publisher>
+		<part name="cart" interface="bbcm_cart">
+			<feature name="slot" value="msc" />
+			<dataarea name="rom" size="16384">
+				<rom name="smart_v2.02.rom" size="16384" crc="f9cc2e5e" sha1="1419f09408b83a9294c7b4a175d17ccf5d7eb76d" />
 			</dataarea>
 			<dataarea name="ram" size="2048" />
 		</part>
@@ -182,6 +197,48 @@
 			</dataarea>
 			<dataarea name="lorom" size="16384">
 				<rom name="viewstore.rom" size="16384" crc="bc69c63e" sha1="5b9bf5bd57af043ddeaa182d188ceaea801bd11f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prisma2" supported="no">
+		<description>MasterPieCe 1.10</description>
+		<year>1987</year>
+		<publisher>G2 Systems</publisher>
+		<info name="usage" value="Requires Prisma-2"/>
+		<part name="cart" interface="bbcm_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="MasterPieCe-1.10.rom" size="16384" crc="14b85cdd" sha1="c975041933dd0e223470292d169dd70568c25c59" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prisma3" supported="no">
+		<description>Prisma-3 1.30</description>
+		<year>1988</year>
+		<publisher>Millipede</publisher>
+		<info name="usage" value="Requires Prisma-3"/>
+		<part name="cart" interface="bbcm_cart">
+			<dataarea name="lorom" size="16384">
+				<rom name="Prisma3-1.30-Main.rom" size="16384" crc="6ed1e8aa" sha1="ceda5ca869f960a4bb5368adbf4acd4861efd3a0" />
+			</dataarea>
+			<dataarea name="uprom" size="16384">
+				<rom name="Prisma3-1.30-Utils.rom" size="16384" crc="76c42acb" sha1="36aab45a3565325dd31ada64934597bafe765ed8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prisma3p" cloneof="prisma3" supported="no">
+		<description>Prisma-3 2.30</description>
+		<year>1990</year>
+		<publisher>Millipede</publisher>
+		<info name="usage" value="Requires Prisma-3/3+"/>
+		<part name="cart" interface="bbcm_cart">
+			<dataarea name="lorom" size="16384">
+				<rom name="Prisma3-2.30-Main.rom" size="16384" crc="b9489c7c" sha1="59a7606e3b92e1c7fbd0075d54e4fffd7c28417e" />
+			</dataarea>
+			<dataarea name="uprom" size="16384">
+				<rom name="Prisma3-2.30-Utils.rom" size="16384" crc="fa395bca" sha1="be7b1f590818e362a8acc5b203f0a08fce967f42" />
 			</dataarea>
 		</part>
 	</software>

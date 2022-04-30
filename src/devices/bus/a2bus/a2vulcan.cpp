@@ -55,15 +55,12 @@
 
 #include "emu.h"
 #include "a2vulcan.h"
+
+#include "bus/ata/ataintf.h"
 #include "imagedev/harddriv.h"
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
 
-DEFINE_DEVICE_TYPE(A2BUS_VULCAN,     a2bus_vulcan_device,     "a2vulcan", "Applied Engineering Vulcan IDE controller (IIgs version)")
-DEFINE_DEVICE_TYPE(A2BUS_VULCANIIE,  a2bus_vulcaniie_device,  "a2vuliie", "Applied Engineering Vulcan IDE controller (//e version)")
-DEFINE_DEVICE_TYPE(A2BUS_VULCANGOLD, a2bus_vulcangold_device, "a2vulgld", "Applied Engineering Vulcan Gold IDE controller (IIgs version)")
+namespace {
 
 #define VULCAN_ROM_REGION  "vulcan_rom"
 #define VULCAN_ATA_TAG     "vulcan_ata"
@@ -82,6 +79,69 @@ ROM_START( vulcangold )
 	ROM_REGION(0x4000, VULCAN_ROM_REGION, 0)
 	ROM_LOAD( "ae vulcan gold rom v2.0.bin", 0x000000, 0x004000, CRC(19bc3958) SHA1(96a22c2540fa603648a4e638e176eee76523b4e1) )
 ROM_END
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+class a2bus_vulcanbase_device:
+	public device_t,
+	public device_a2bus_card_interface
+{
+protected:
+	// construction/destruction
+	a2bus_vulcanbase_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	// overrides of standard a2bus slot functions
+	virtual uint8_t read_c0nx(uint8_t offset) override;
+	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+	virtual uint8_t read_cnxx(uint8_t offset) override;
+	virtual uint8_t read_c800(uint16_t offset) override;
+	virtual void write_c800(uint16_t offset, uint8_t data) override;
+
+	required_device<ata_interface_device> m_ata;
+	required_region_ptr<uint8_t> m_rom;
+
+	uint8_t m_ram[8*1024];
+
+private:
+	uint16_t m_lastdata;
+	int m_rombank, m_rambank;
+	bool m_last_read_was_0;
+};
+
+class a2bus_vulcan_device : public a2bus_vulcanbase_device
+{
+public:
+	a2bus_vulcan_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override;
+};
+
+class a2bus_vulcaniie_device : public a2bus_vulcanbase_device
+{
+public:
+	a2bus_vulcaniie_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override;
+};
+
+class a2bus_vulcangold_device : public a2bus_vulcanbase_device
+{
+public:
+	a2bus_vulcangold_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -122,7 +182,9 @@ const tiny_rom_entry *a2bus_vulcangold_device::device_rom_region() const
 a2bus_vulcanbase_device::a2bus_vulcanbase_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
-	m_ata(*this, VULCAN_ATA_TAG), m_rom(nullptr), m_lastdata(0), m_rombank(0), m_rambank(0), m_last_read_was_0(false)
+	m_ata(*this, VULCAN_ATA_TAG),
+	m_rom(*this, VULCAN_ROM_REGION),
+	m_lastdata(0), m_rombank(0), m_rambank(0), m_last_read_was_0(false)
 {
 }
 
@@ -147,8 +209,6 @@ a2bus_vulcangold_device::a2bus_vulcangold_device(const machine_config &mconfig, 
 
 void a2bus_vulcanbase_device::device_start()
 {
-	m_rom = device().machine().root_device().memregion(this->subtag(VULCAN_ROM_REGION).c_str())->base();
-
 	save_item(NAME(m_lastdata));
 	save_item(NAME(m_ram));
 	save_item(NAME(m_rombank));
@@ -191,7 +251,7 @@ uint8_t a2bus_vulcanbase_device::read_c0nx(uint8_t offset)
 	switch (offset)
 	{
 		case 0:
-			m_lastdata = m_ata->read_cs0(offset);
+			m_lastdata = m_ata->cs0_r(offset);
 //          printf("IDE: read %04x\n", m_lastdata);
 			m_last_read_was_0 = true;
 			return m_lastdata&0xff;
@@ -204,7 +264,7 @@ uint8_t a2bus_vulcanbase_device::read_c0nx(uint8_t offset)
 			}
 			else
 			{
-				return m_ata->read_cs0(offset, 0xff);
+				return m_ata->cs0_r(offset, 0xff);
 			}
 
 		case 2:
@@ -213,7 +273,7 @@ uint8_t a2bus_vulcanbase_device::read_c0nx(uint8_t offset)
 		case 5:
 		case 6:
 		case 7:
-			return m_ata->read_cs0(offset, 0xff);
+			return m_ata->cs0_r(offset, 0xff);
 
 		default:
 			logerror("a2vulcan: unknown read @ C0n%x\n", offset);
@@ -245,11 +305,11 @@ void a2bus_vulcanbase_device::write_c0nx(uint8_t offset, uint8_t data)
 				m_lastdata &= 0x00ff;
 				m_lastdata |= (data << 8);
 //              printf("IDE: write %04x\n", m_lastdata);
-				m_ata->write_cs0(0, m_lastdata);
+				m_ata->cs0_w(0, m_lastdata);
 			}
 			else
 			{
-				m_ata->write_cs0(offset, data, 0xff);
+				m_ata->cs0_w(offset, data, 0xff);
 			}
 			break;
 
@@ -260,7 +320,7 @@ void a2bus_vulcanbase_device::write_c0nx(uint8_t offset, uint8_t data)
 		case 6:
 		case 7:
 //          printf("%02x to IDE controller @ %x\n", data, offset);
-			m_ata->write_cs0(offset, data, 0xff);
+			m_ata->cs0_w(offset, data, 0xff);
 			break;
 
 		case 9: // ROM bank
@@ -317,3 +377,14 @@ void a2bus_vulcanbase_device::write_c800(uint16_t offset, uint8_t data)
 		m_ram[offset + m_rambank] = data;
 	}
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_VULCAN,     device_a2bus_card_interface, a2bus_vulcan_device,     "a2vulcan", "Applied Engineering Vulcan IDE controller (IIgs version)")
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_VULCANIIE,  device_a2bus_card_interface, a2bus_vulcaniie_device,  "a2vuliie", "Applied Engineering Vulcan IDE controller (//e version)")
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_VULCANGOLD, device_a2bus_card_interface, a2bus_vulcangold_device, "a2vulgld", "Applied Engineering Vulcan Gold IDE controller (IIgs version)")

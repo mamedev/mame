@@ -43,6 +43,15 @@ void nes_state::machine_start()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
+	// Fill main RAM with an arbitrary pattern (alternating 0x00/0xff) for software that depends on its contents at boot up (tsk tsk!)
+	// The fill value is a compromise since certain games malfunction with zero-filled memory, others with one-filled memory
+	// Examples: Minna no Taabou won't boot with all 0x00, Sachen's Dancing Block won't boot with all 0xff, Terminator 2 skips its copyright screen with all 0x00
+	for (int i = 0; i < 0x800; i += 2)
+	{
+		m_mainram[i] = 0x00;
+		m_mainram[i + 1] = 0xff;
+	}
+
 	// CIRAM (Character Internal RAM)
 	// NES has 2KB of internal RAM which can be used to fill the 4x1KB banks of PPU RAM at $2000-$2fff
 	// Line A10 is exposed to the carts, so that games can change CIRAM mapping in PPU (we emulate this with the set_nt_mirroring
@@ -59,10 +68,8 @@ void nes_state::machine_start()
 		space.install_write_handler(0x4100, 0x5fff, write8sm_delegate(*m_cartslot, FUNC(nes_cart_slot_device::write_l)));
 		space.install_read_handler(0x6000, 0x7fff, read8sm_delegate(*m_cartslot, FUNC(nes_cart_slot_device::read_m)));
 		space.install_write_handler(0x6000, 0x7fff, write8sm_delegate(*m_cartslot, FUNC(nes_cart_slot_device::write_m)));
-		space.install_read_bank(0x8000, 0x9fff, "prg0");
-		space.install_read_bank(0xa000, 0xbfff, "prg1");
-		space.install_read_bank(0xc000, 0xdfff, "prg2");
-		space.install_read_bank(0xe000, 0xffff, "prg3");
+		for(int i = 0; i < 4; i++)
+			space.install_read_bank(0x8000 + 0x2000*i, 0x9fff + 0x2000*i, m_prg_bank[i]);
 		space.install_write_handler(0x8000, 0xffff, write8sm_delegate(*m_cartslot, FUNC(nes_cart_slot_device::write_h)));
 
 		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8sm_delegate(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::chr_r)), write8sm_delegate(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::chr_w)));
@@ -72,28 +79,78 @@ void nes_state::machine_start()
 		m_ppu->set_latch(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::ppu_latch));
 
 		// install additional handlers (read_h, read_ex, write_ex)
-		if (m_cartslot->get_pcb_id() == STD_EXROM || m_cartslot->get_pcb_id() == STD_NROM368 || m_cartslot->get_pcb_id() == STD_DISKSYS
-			|| m_cartslot->get_pcb_id() == GG_NROM || m_cartslot->get_pcb_id() == CAMERICA_ALADDIN || m_cartslot->get_pcb_id() == SUNSOFT_DCS
-			|| m_cartslot->get_pcb_id() == BANDAI_DATACH || m_cartslot->get_pcb_id() == BANDAI_KARAOKE || m_cartslot->get_pcb_id() == BTL_2A03_PURITANS || m_cartslot->get_pcb_id() == AVE_MAXI15
-			|| m_cartslot->get_pcb_id() == KAISER_KS7022 || m_cartslot->get_pcb_id() == KAISER_KS7031 || m_cartslot->get_pcb_id() == KAISER_KS7037 || m_cartslot->get_pcb_id() == BMC_VT5201
-			|| m_cartslot->get_pcb_id() == UNL_LH32 || m_cartslot->get_pcb_id() == UNL_LH10 || m_cartslot->get_pcb_id() == UNL_2708 || m_cartslot->get_pcb_id() == UNL_RT01
-			|| m_cartslot->get_pcb_id() == UNL_43272 || m_cartslot->get_pcb_id() == BMC_G63IN1 || m_cartslot->get_pcb_id() == BMC_8157
-			|| m_cartslot->get_pcb_id() == BMC_GOLD150 || m_cartslot->get_pcb_id() == BMC_CH001
-			|| m_cartslot->get_pcb_id() == BMC_70IN1 || m_cartslot->get_pcb_id() == BMC_800IN1)
+		static const int r_h_pcbs[] =
+		{
+			AVE_MAXI15,
+			BANDAI_DATACH,
+			BANDAI_KARAOKE,
+			BATMAP_SRRX,
+			BMC_70IN1,
+			BMC_800IN1,
+			BMC_8157,
+			BMC_970630C,
+			BMC_DS927,
+			BMC_KC885,
+			BMC_TELETUBBIES,
+			BMC_VT5201,
+			BTL_PALTHENA,
+			CAMERICA_ALADDIN,
+			GG_NROM,
+			KAISER_KS7010,
+			KAISER_KS7022,
+			KAISER_KS7030,
+			KAISER_KS7031,
+			KAISER_KS7037,
+			KAISER_KS7057,
+			SACHEN_3013,
+			SACHEN_3014,
+			STD_DISKSYS,
+			STD_EXROM,
+			STD_NROM368,
+			SUNSOFT_DCS,
+			UNL_2708,
+			UNL_2A03PURITANS,
+			UNL_43272,
+			UNL_EH8813A,
+			UNL_LH10,
+			UNL_LH32,
+			UNL_RT01
+		};
+
+		static const int w_ex_pcbs[] =
+		{
+			BMC_N32_4IN1,
+			BTL_SMB2JB,
+			BTL_YUNG08,
+			UNL_AC08,
+			UNL_SMB2J
+		};
+
+		static const int rw_ex_pcbs[] =
+		{
+			BTL_09034A,
+			KAISER_KS7017,
+			STD_DISKSYS,
+			UNL_603_5052
+		};
+
+		int pcb_id = m_cartslot->get_pcb_id();
+
+		if (std::find(std::begin(r_h_pcbs), std::end(r_h_pcbs), pcb_id) != std::end(r_h_pcbs))
 		{
 			logerror("read_h installed!\n");
 			space.install_read_handler(0x8000, 0xffff, read8sm_delegate(*m_cartslot, FUNC(nes_cart_slot_device::read_h)));
 		}
 
-		if (m_cartslot->get_pcb_id() == BTL_SMB2JB || m_cartslot->get_pcb_id() == UNL_AC08 || m_cartslot->get_pcb_id() == UNL_SMB2J || m_cartslot->get_pcb_id() == BTL_09034A)
+		if (std::find(std::begin(w_ex_pcbs), std::end(w_ex_pcbs), pcb_id) != std::end(w_ex_pcbs))
 		{
 			logerror("write_ex installed!\n");
 			space.install_write_handler(0x4020, 0x40ff, write8sm_delegate(*m_cartslot, FUNC(nes_cart_slot_device::write_ex)));
 		}
 
-		if (m_cartslot->get_pcb_id() == KAISER_KS7017 || m_cartslot->get_pcb_id() == UNL_603_5052 || m_cartslot->get_pcb_id() == STD_DISKSYS)
+		if (std::find(std::begin(rw_ex_pcbs), std::end(rw_ex_pcbs), pcb_id) != std::end(rw_ex_pcbs))
 		{
-			logerror("write_ex & read_ex installed!\n");
+			logerror("read_ex & write_ex installed!\n");
 			space.install_read_handler(0x4020, 0x40ff, read8sm_delegate(*m_cartslot, FUNC(nes_cart_slot_device::read_ex)));
 			space.install_write_handler(0x4020, 0x40ff, write8sm_delegate(*m_cartslot, FUNC(nes_cart_slot_device::write_ex)));
 		}
@@ -112,7 +169,7 @@ void nes_state::machine_start()
 //  INPUTS
 //-------------------------------------------------
 
-READ8_MEMBER(nes_base_state::nes_in0_r)
+uint8_t nes_base_state::nes_in0_r()
 {
 	uint8_t ret = 0x40;
 	ret |= m_ctrl1->read_bit0();
@@ -120,7 +177,7 @@ READ8_MEMBER(nes_base_state::nes_in0_r)
 	return ret;
 }
 
-READ8_MEMBER(nes_base_state::nes_in1_r)
+uint8_t nes_base_state::nes_in1_r()
 {
 	uint8_t ret = 0x40;
 	ret |= m_ctrl2->read_bit0();
@@ -128,53 +185,39 @@ READ8_MEMBER(nes_base_state::nes_in1_r)
 	return ret;
 }
 
-WRITE8_MEMBER(nes_base_state::nes_in0_w)
+void nes_base_state::nes_in0_w(uint8_t data)
 {
 	m_ctrl1->write(data);
 	m_ctrl2->write(data);
 }
 
 
-READ8_MEMBER(nes_state::fc_in0_r)
+uint8_t nes_state::fc_in0_r()
 {
 	uint8_t ret = 0x40;
-	// bit 0 to controller port
+	// bit 0 from controller port
 	ret |= m_ctrl1->read_bit0();
 
-	// expansion port bits (in the original FC, P2 controller was hooked to these lines
-	// too, so in principle some homebrew hardware modification could use the same
-	// connection with P1 controller too)
-	ret |= m_ctrl1->read_exp(0);
-	ret |= m_ctrl2->read_exp(0);
+	// bit 2 from P2 controller microphone
+	ret |= m_ctrl2->read_bit2();
 
-	// at the same time, we might have a standard joypad connected to the expansion port which
-	// shall be read as P3 (this is needed here to avoid implementing the expansion port as a
-	// different device compared to the standard control port... it might be changed later)
-	ret |= (m_exp->read_bit0() << 1);
-	// finally, read the expansion port as expected
+	// and bit 1 comes from expansion port
 	ret |= m_exp->read_exp(0);
 	return ret;
 }
 
-READ8_MEMBER(nes_state::fc_in1_r)
+uint8_t nes_state::fc_in1_r()
 {
 	uint8_t ret = 0x40;
-	// bit 0 to controller port
+	// bit 0 from controller port
 	ret |= m_ctrl2->read_bit0();
 
-	// expansion port bits (in the original FC, P2 controller was hooked to these lines
-	// too, so in principle some homebrew hardware modification could use the same
-	// connection with P1 controller too)
-	ret |= m_ctrl1->read_exp(1);
-	ret |= m_ctrl2->read_exp(1);
-
-	// finally, read the expansion port as expected (standard pad cannot be hooked as P4, so
-	// no read_bit0 here)
+	// bits 1-4 from expansion port (in theory bit 0 also can be read on AV Famicom when controller is unplugged)
 	ret |= m_exp->read_exp(1);
 	return ret;
 }
 
-WRITE8_MEMBER(nes_state::fc_in0_w)
+void nes_state::fc_in0_w(uint8_t data)
 {
 	m_ctrl1->write(data);
 	m_ctrl2->write(data);
@@ -186,7 +229,7 @@ void nes_state::init_famicom()
 {
 	// setup alt input handlers for additional FC input devices
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_read_handler(0x4016, 0x4016, read8_delegate(*this, FUNC(nes_state::fc_in0_r)));
-	space.install_write_handler(0x4016, 0x4016, write8_delegate(*this, FUNC(nes_state::fc_in0_w)));
-	space.install_read_handler(0x4017, 0x4017, read8_delegate(*this, FUNC(nes_state::fc_in1_r)));
+	space.install_read_handler(0x4016, 0x4016, read8smo_delegate(*this, FUNC(nes_state::fc_in0_r)));
+	space.install_write_handler(0x4016, 0x4016, write8smo_delegate(*this, FUNC(nes_state::fc_in0_w)));
+	space.install_read_handler(0x4017, 0x4017, read8smo_delegate(*this, FUNC(nes_state::fc_in1_r)));
 }

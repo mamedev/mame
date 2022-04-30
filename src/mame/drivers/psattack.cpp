@@ -159,40 +159,33 @@ private:
 	required_device<vrender0soc_device> m_vr0soc;
 	required_device<ata_interface_device> m_ata;
 
-	IRQ_CALLBACK_MEMBER(icallback);
-
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void psattack_mem(address_map &map);
 
-	DECLARE_READ16_MEMBER(cfcard_data_r);
-	DECLARE_READ8_MEMBER(cfcard_regs_r);
-	DECLARE_WRITE8_MEMBER(cfcard_regs_w);
-	DECLARE_WRITE32_MEMBER(output_w);
+	uint16_t cfcard_data_r();
+	uint8_t cfcard_regs_r(offs_t offset);
+	void cfcard_regs_w(offs_t offset, uint8_t data);
+	void output_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 };
 
-IRQ_CALLBACK_MEMBER(psattack_state::icallback)
-{
-	return m_vr0soc->irq_callback();
-}
-
 // TODO: wrong, likely PIC protected too
-READ8_MEMBER( psattack_state::cfcard_regs_r )
+uint8_t psattack_state::cfcard_regs_r(offs_t offset)
 {
-	return m_ata->read_cs0(offset & 7, 0x000000ff);
+	return m_ata->cs0_r(offset & 7, 0x000000ff);
 }
 
-WRITE8_MEMBER( psattack_state::cfcard_regs_w )
+void psattack_state::cfcard_regs_w(offs_t offset, uint8_t data)
 {
-	m_ata->write_cs0(offset & 7, 0x000000ff);
+	m_ata->cs0_w(offset & 7, 0x000000ff);
 }
 
-READ16_MEMBER( psattack_state::cfcard_data_r )
+uint16_t psattack_state::cfcard_data_r()
 {
-	return m_ata->read_cs0(0, 0x0000ffff);
+	return m_ata->cs0_r(0, 0x0000ffff);
 }
 
-WRITE32_MEMBER( psattack_state::output_w )
+void psattack_state::output_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// suppress logging for now
 	if (data)
@@ -247,7 +240,7 @@ void psattack_state::psattack(machine_config &config)
 {
 	SE3208(config, m_maincpu, 14318180 * 3); // TODO : different between each PCBs
 	m_maincpu->set_addrmap(AS_PROGRAM, &psattack_state::psattack_mem);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(psattack_state::icallback));
+	m_maincpu->iackx_cb().set(m_vr0soc, FUNC(vrender0soc_device::irq_callback));
 
 	// PIC16C711
 

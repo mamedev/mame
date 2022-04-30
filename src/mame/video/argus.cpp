@@ -131,7 +131,7 @@ TILE_GET_INFO_MEMBER(argus_common_state::get_tx_tile_info)
 	u8 lo = m_txram[tile_index];
 	u8 hi = m_txram[tile_index + 1];
 
-	SET_TILE_INFO_MEMBER(Gfx,
+	tileinfo.set(Gfx,
 			((hi & 0xc0) << 2) | lo,
 			hi & 0x0f,
 			TILE_FLIPYX((hi & 0x30) >> 4));
@@ -148,7 +148,7 @@ TILE_GET_INFO_MEMBER(argus_state::get_bg0_tile_info)
 	u8 lo = m_vrom[1][tile_index];
 	u8 hi = m_vrom[1][tile_index | 1];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			((hi & 0xc0) << 2) | lo,
 			hi & 0x0f,
 			TILE_FLIPYX((hi & 0x30) >> 4));
@@ -161,7 +161,7 @@ TILE_GET_INFO_MEMBER(argus_state::get_bg1_tile_info)
 	u8 lo = m_bg1ram[tile_index];
 	u8 hi = m_bg1ram[tile_index + 1];
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			lo,
 			hi & 0x0f,
 			TILE_FLIPYX((hi & 0x30) >> 4));
@@ -174,7 +174,7 @@ TILE_GET_INFO_MEMBER(valtric_state::get_bg_tile_info)
 	u8 lo = m_bg1ram[tile_index];
 	u8 hi = m_bg1ram[tile_index + 1];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			((hi & 0xc0) << 2) | ((hi & 0x20) << 5) | lo,
 			hi & 0x0f,
 			0);
@@ -187,7 +187,7 @@ TILE_GET_INFO_MEMBER(butasan_state::get_tx_tile_info)
 	u8 lo = m_butasan_txram[tile_index];
 	u8 hi = m_butasan_txram[tile_index + 1];
 
-	SET_TILE_INFO_MEMBER(3,
+	tileinfo.set(3,
 			((hi & 0xc0) << 2) | lo,
 			hi & 0x0f,
 			TILE_FLIPYX((hi & 0x30) >> 4));
@@ -200,7 +200,7 @@ TILE_GET_INFO_MEMBER(butasan_state::get_bg0_tile_info)
 	u8 lo = m_butasan_bg0ram[tile_index];
 	u8 hi = m_butasan_bg0ram[tile_index + 1];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			((hi & 0xc0) << 2) | lo,
 			hi & 0x0f,
 			TILE_FLIPYX((hi & 0x30) >> 4));
@@ -210,7 +210,7 @@ TILE_GET_INFO_MEMBER(butasan_state::get_bg1_tile_info)
 {
 	int const tile = m_butasan_bg1ram[tile_index] | ((m_butasan_bg1_status & 2) << 7);
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			tile,
 			(tile & 0x80) >> 7,
 			0);
@@ -265,6 +265,7 @@ void argus_state::video_reset()
 void valtric_state::video_start()
 {
 	/*                           info                      offset             w   h  col  row */
+	m_bg_tilemap[0] = nullptr;
 	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(valtric_state::get_bg_tile_info)),    TILEMAP_SCAN_COLS, 16, 16, 32, 32);
 	m_tx_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(valtric_state::get_tx_tile_info<2>)), TILEMAP_SCAN_COLS,  8,  8, 32, 32);
 
@@ -719,36 +720,30 @@ void valtric_state::draw_mosaic(screen_device &screen, bitmap_rgb32 &bitmap, con
 	else
 	{
 		m_bg_tilemap[1]->draw(screen, m_mosaicbitmap, cliprect, 0, 0);
-		{
-			int step=m_mosaic;
-			u32 *dest;
-			int x,y,xx,yy,c=0;
-			int width = screen.width();
-			int height = screen.height();
+		int step=m_mosaic;
+		int c=0;
+		int width = screen.width();
+		int height = screen.height();
 
-			if (m_mosaic<0)step*=-1;
+		if (m_mosaic<0)step*=-1;
 
-			for (y=0;y<width+step;y+=step)
-				for (x=0;x<height+step;x+=step)
-				{
-					if (y < height && x < width)
-						c=m_mosaicbitmap.pix32(y, x);
+		for (int y=0;y<width+step;y+=step)
+			for (int x=0;x<height+step;x+=step)
+			{
+				if (y < height && x < width)
+					c=m_mosaicbitmap.pix(y, x);
 
-					if (m_mosaic<0)
-						if (y+step-1<height && x+step-1< width)
-							c = m_mosaicbitmap.pix32(y+step-1, x+step-1);
+				if (m_mosaic<0)
+					if (y+step-1<height && x+step-1< width)
+						c = m_mosaicbitmap.pix(y+step-1, x+step-1);
 
-					for (yy=0;yy<step;yy++)
-						for (xx=0;xx<step;xx++)
-						{
-							if (xx+x < width && yy+y<height)
-							{
-								dest=&bitmap.pix32(y+yy, x+xx);
-								*dest=c;
-							}
-						}
-				}
-		}
+				for (int yy=0;yy<step;yy++)
+					for (int xx=0;xx<step;xx++)
+					{
+						if (xx+x < width && yy+y<height)
+							bitmap.pix(y+yy, x+xx) = c;
+					}
+			}
 	}
 }
 #else
@@ -761,33 +756,27 @@ void valtric_state::draw_mosaic(screen_device &screen, bitmap_rgb32 &bitmap, con
 	else
 	{
 		m_bg_tilemap[1]->draw(screen, m_mosaicbitmap, cliprect, 0, 0);
-		{
-			u32 *dest;
-			int x,y,xx,yy,c=0;
-			int width = screen.width();
-			int height = screen.height();
+		int c=0;
+		int width = screen.width();
+		int height = screen.height();
 
-			for (y = 0; y < width+step; y += step)
-				for (x = 0; x < height+step; x += step)
-				{
-					if (y < height && x < width)
-						c = m_mosaicbitmap.pix32(y, x);
+		for (int y = 0; y < width+step; y += step)
+			for (int x = 0; x < height+step; x += step)
+			{
+				if (y < height && x < width)
+					c = m_mosaicbitmap.pix(y, x);
 
-					if (m_valtric_mosaic & 0x80)
-						if (y+step-1 < height && x+step-1 < width)
-							c = m_mosaicbitmap.pix32(y+step-1, x+step-1);
+				if (m_valtric_mosaic & 0x80)
+					if (y+step-1 < height && x+step-1 < width)
+						c = m_mosaicbitmap.pix(y+step-1, x+step-1);
 
-					for (yy = 0; yy < step; yy++)
-						for (xx = 0; xx < step; xx++)
-						{
-							if (xx+x < width && yy+y < height)
-							{
-								dest = &bitmap.pix32(y+yy, x+xx);
-								*dest = c;
-							}
-						}
-				}
-		}
+				for (int yy = 0; yy < step; yy++)
+					for (int xx = 0; xx < step; xx++)
+					{
+						if (xx+x < width && yy+y < height)
+							bitmap.pix(y+yy, x+xx) = c;
+					}
+			}
 	}
 }
 #endif

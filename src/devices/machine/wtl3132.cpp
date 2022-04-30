@@ -454,37 +454,38 @@ std::string wtl3132_device::disassemble(u64 const code)
 		case MF_FSTSR: alu = std::string("fstsr"); break;
 
 		case MF_FMODE: alu = util::string_format("fmode   0x%04x", (OPF(code, ABIN) << 10) | (OPF(code, CADD) << 5) | OPF(code, AADD)); break;
-		case MF_FABS:  alu = util::string_format("fabs    %4s, %-12s", reg(OPF(code, AADD)), adst(code)); break;
-		case MF_FLOAT: alu = util::string_format("float   %4s, %-12s", reg(OPF(code, AADD)), adst(code)); break;
-		case MF_FIX:   alu = util::string_format("fix     %4s, %-12s", reg(OPF(code, AADD)), adst(code)); break;
-		case MF_FLUT:  alu = util::string_format("flut    %4s, %-4s", reg(OPF(code, AADD)), reg(OPF(code, CADD))); break;
+		case MF_FABS:  alu = util::string_format("fabs    %4s, %s", reg(OPF(code, AADD)), adst(code)); break;
+		case MF_FLOAT: alu = util::string_format("float   %4s, %s", reg(OPF(code, AADD)), adst(code)); break;
+		case MF_FIX:   alu = util::string_format("fix     %4s, %s", reg(OPF(code, AADD)), adst(code)); break;
+		case MF_FLUT:  alu = util::string_format("flut    %4s, %s", reg(OPF(code, AADD)), reg(OPF(code, CADD))); break;
 
 		}
 		break;
-	case F_FSUBR: alu = util::string_format("fsubr   %4s, %4s, %-12s", reg(OPF(code, AADD)), abin(code), adst(code)); break;
+	case F_FSUBR: alu = util::string_format("fsubr   %4s, %4s, %s", reg(OPF(code, AADD)), abin(code), adst(code)); break;
 	case F_FSUB:
 		if (!OPF(code, CWEN) || OPF(code, ADST) != 3 || OPF(code, ENCN))
-			alu = util::string_format("fsub    %4s, %4s, %-12s", reg(OPF(code, AADD)), abin(code), adst(code));
+			alu = util::string_format("fsub    %4s, %4s, %s", reg(OPF(code, AADD)), abin(code), adst(code));
 		else
 			alu = std::string("fnop");
 		break;
 	case F_FADD:
-		if (!OPF(code, CWEN) || OPF(code, ADST) != 3 || OPF(code, ENCN) || OPF(code, ABIN) != 7)
-			alu = util::string_format("fadd    %4s, %4s, %-12s", reg(OPF(code, AADD)), abin(code), adst(code));
+		// FIXME: unsure if write enable is masked externally?
+		if (OPF(code, ADST) != 3 || OPF(code, ENCN) || OPF(code, ABIN) != 7) // !OPF(code, CWEN) ||
+			alu = util::string_format("fadd    %4s, %4s, %s", reg(OPF(code, AADD)), abin(code), adst(code));
 		else
 			alu = std::string("fnop");
 		break;
 
-	case F_FMNA: alu = util::string_format("fmna    %4s, %4s, %4s, %-12s", reg(OPF(code, AADD)), mbin(code), abin(code), adst(code)); break;
-	case F_FMNS: alu = util::string_format("fmns    %4s, %4s, %4s, %-12s", reg(OPF(code, AADD)), mbin(code), abin(code), adst(code)); break;
-	case F_FMAC: alu = util::string_format("fmac    %4s, %4s, %4s, %-12s", reg(OPF(code, AADD)), mbin(code), abin(code), adst(code)); break;
+	case F_FMNA: alu = util::string_format("fmna    %4s, %4s, %4s, %s", reg(OPF(code, AADD)), mbin(code), abin(code), adst(code)); break;
+	case F_FMNS: alu = util::string_format("fmns    %4s, %4s, %4s, %s", reg(OPF(code, AADD)), mbin(code), abin(code), adst(code)); break;
+	case F_FMAC: alu = util::string_format("fmac    %4s, %4s, %4s, %s", reg(OPF(code, AADD)), mbin(code), abin(code), adst(code)); break;
 	}
 
 	switch (OPF(code, IOCT))
 	{
-	case 1: return util::string_format("%-38s ; floadrc %4s", alu, reg(OPF(code, DADD))); break;
-	case 2: return util::string_format("%-38s ; fstore  %4s", alu, reg(OPF(code, DADD))); break;
-	case 3: return util::string_format("%-38s ; fload   %4s", alu, reg(OPF(code, DADD))); break;
+	case 1: return util::string_format("%s; floadrc %4s", alu, reg(OPF(code, DADD))); break;
+	case 2: return util::string_format("%s; fstore  %4s", alu, reg(OPF(code, DADD))); break;
+	case 3: return util::string_format("%s; fload   %4s", alu, reg(OPF(code, DADD))); break;
 	default:
 		return alu;
 	}

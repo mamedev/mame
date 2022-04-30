@@ -32,8 +32,8 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	DECLARE_READ64_MEMBER(base_r);
-	DECLARE_WRITE64_MEMBER(base_w);
+	uint64_t base_r(offs_t offset, uint64_t mem_mask);
+	void base_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 
 	required_device<mips3_device> m_maincpu;
 

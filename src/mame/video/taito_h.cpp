@@ -55,7 +55,7 @@ sprite RAM
   Screen refresh
 ***************************************************************************/
 
-void taitoh_state::syvalion_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void syvalion_state::syvalion_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int offs = 0x03f8 / 2; offs >= 0; offs -= 0x008 / 2)
 	{
@@ -120,7 +120,7 @@ void taitoh_state::taitoh_log_vram()
 
 /**************************************************************************/
 
-u32 taitoh_state::screen_update_syvalion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 syvalion_state::screen_update_syvalion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tc0080vco->tilemap_update();
 

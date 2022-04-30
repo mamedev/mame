@@ -64,7 +64,6 @@ public:
 
 	// computer interface
 	uint8_t read() { uint8_t data = 0xff; if (exists()) data = m_device->joy_r(); return data; }
-	DECLARE_READ8_MEMBER( read ) { return read(); }
 
 	DECLARE_WRITE_LINE_MEMBER( common0_w ) { if (exists()) m_device->common0_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( common1_w ) { if (exists()) m_device->common1_w(state); }

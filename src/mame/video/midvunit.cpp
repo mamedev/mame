@@ -26,7 +26,7 @@
 
 
 midvunit_renderer::midvunit_renderer(midvunit_state &state)
-	: poly_manager<float, midvunit_object_data, 2, 4000>(state.machine()),
+	: poly_manager<float, midvunit_object_data, 2>(state.machine()),
 		m_state(state) { }
 
 
@@ -36,12 +36,12 @@ midvunit_renderer::midvunit_renderer(midvunit_state &state)
  *
  *************************************/
 
-void midvunit_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void midvunit_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_SCANLINE:
-		scanline_timer_cb(ptr, param);
+		scanline_timer_cb(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in midvunit_state::device_timer");
@@ -358,14 +358,17 @@ void midvunit_renderer::process_dma_queue()
 	}
 
 	/* set up the object data for this triangle */
-	midvunit_object_data &objectdata = object_data_alloc();
+	midvunit_object_data &objectdata = object_data().next();
 	objectdata.destbase = &m_state.m_videoram[(m_state.m_page_control & 4) ? 0x40000 : 0x00000];
 	objectdata.texbase = (uint8_t *)m_state.m_textureram.target() + (m_state.m_dma_data[14] * 256);
 	objectdata.pixdata = pixdata;
 	objectdata.dither = ((m_state.m_dma_data[0] & 0x2000) != 0);
 
 	/* render as a quad */
-	render_polygon<4>(m_state.m_screen->visible_area(), callback, textured ? 2 : 0, vert);
+	if (textured)
+		render_polygon<4, 2>(m_state.m_screen->visible_area(), callback, vert);
+	else
+		render_polygon<4, 0>(m_state.m_screen->visible_area(), callback, vert);
 }
 
 
@@ -376,7 +379,7 @@ void midvunit_renderer::process_dma_queue()
  *
  *************************************/
 
-WRITE32_MEMBER(midvunit_state::midvunit_dma_queue_w)
+void midvunit_state::midvunit_dma_queue_w(uint32_t data)
 {
 	if (LOG_DMA && machine().input().code_pressed(KEYCODE_L))
 		logerror("%06X:queue(%X) = %08X\n", m_maincpu->pc(), m_dma_data_index, data);
@@ -385,14 +388,14 @@ WRITE32_MEMBER(midvunit_state::midvunit_dma_queue_w)
 }
 
 
-READ32_MEMBER(midvunit_state::midvunit_dma_queue_entries_r)
+uint32_t midvunit_state::midvunit_dma_queue_entries_r()
 {
 	/* always return 0 entries */
 	return 0;
 }
 
 
-READ32_MEMBER(midvunit_state::midvunit_dma_trigger_r)
+uint32_t midvunit_state::midvunit_dma_trigger_r(offs_t offset)
 {
 	if (offset)
 	{
@@ -412,7 +415,7 @@ READ32_MEMBER(midvunit_state::midvunit_dma_trigger_r)
  *
  *************************************/
 
-WRITE32_MEMBER(midvunit_state::midvunit_page_control_w)
+void midvunit_state::midvunit_page_control_w(uint32_t data)
 {
 	/* watch for the display page to change */
 	if ((m_page_control ^ data) & 1)
@@ -426,7 +429,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_page_control_w)
 }
 
 
-READ32_MEMBER(midvunit_state::midvunit_page_control_r)
+uint32_t midvunit_state::midvunit_page_control_r()
 {
 	return m_page_control;
 }
@@ -439,7 +442,7 @@ READ32_MEMBER(midvunit_state::midvunit_page_control_r)
  *
  *************************************/
 
-WRITE32_MEMBER(midvunit_state::midvunit_video_control_w)
+void midvunit_state::midvunit_video_control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint16_t old = m_video_regs[offset];
 
@@ -465,7 +468,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_video_control_w)
 }
 
 
-READ32_MEMBER(midvunit_state::midvunit_scanline_r)
+uint32_t midvunit_state::midvunit_scanline_r()
 {
 	return m_screen->vpos();
 }
@@ -478,7 +481,7 @@ READ32_MEMBER(midvunit_state::midvunit_scanline_r)
  *
  *************************************/
 
-WRITE32_MEMBER(midvunit_state::midvunit_videoram_w)
+void midvunit_state::midvunit_videoram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_poly->wait("Video RAM write");
 	if (!m_video_changed)
@@ -491,7 +494,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_videoram_w)
 }
 
 
-READ32_MEMBER(midvunit_state::midvunit_videoram_r)
+uint32_t midvunit_state::midvunit_videoram_r(offs_t offset)
 {
 	m_poly->wait("Video RAM read");
 	return m_videoram[offset];
@@ -505,7 +508,7 @@ READ32_MEMBER(midvunit_state::midvunit_videoram_r)
  *
  *************************************/
 
-WRITE32_MEMBER(midvunit_state::midvunit_paletteram_w)
+void midvunit_state::midvunit_paletteram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int newword;
 
@@ -522,7 +525,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_paletteram_w)
  *
  *************************************/
 
-WRITE32_MEMBER(midvunit_state::midvunit_textureram_w)
+void midvunit_state::midvunit_textureram_w(offs_t offset, uint32_t data)
 {
 	uint8_t *base = (uint8_t *)m_textureram.target();
 	m_poly->wait("Texture RAM write");
@@ -531,7 +534,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_textureram_w)
 }
 
 
-READ32_MEMBER(midvunit_state::midvunit_textureram_r)
+uint32_t midvunit_state::midvunit_textureram_r(offs_t offset)
 {
 	uint8_t *base = (uint8_t *)m_textureram.target();
 	return (base[offset * 2 + 1] << 8) | base[offset * 2];
@@ -548,7 +551,7 @@ READ32_MEMBER(midvunit_state::midvunit_textureram_r)
 
 uint32_t midvunit_state::screen_update_midvunit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y, width, xoffs;
+	int width, xoffs;
 	uint32_t offset;
 
 	m_poly->wait("Refresh Time");
@@ -574,10 +577,10 @@ uint32_t midvunit_state::screen_update_midvunit(screen_device &screen, bitmap_in
 	offset += 512 * (cliprect.min_y - screen.visible_area().min_y);
 
 	/* loop over rows */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint16_t *dest = &bitmap.pix16(y, cliprect.min_x);
-		for (x = 0; x < width; x++)
+		uint16_t *dest = &bitmap.pix(y, cliprect.min_x);
+		for (int x = 0; x < width; x++)
 			*dest++ = m_videoram[offset + x] & 0x7fff;
 		offset += 512;
 	}

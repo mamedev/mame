@@ -10,11 +10,15 @@
     C135 - Checks is object is displayed on Current output line.
     C146 - Steers the Decode Object Pixel data to the correct line buffer A or B
 
-    Metal Hawk requires a different draw function, so might use a different chip unless the hookup is just scrambled (needs checking)
+    Metal Hawk requires a different draw function, so might use a different chip unless the hookup
+    is just scrambled (needs checking).
 
-    used by the following drivers
-    namcos2.cpp (all games EXCEPT Steel Gunner, Steel Gunner 2, Lucky & Wild, Suzuka 8 Hours, Suzuka 8 Hours 2 which use the newer Namco NB1 style sprites, see namco_c355spr.cpp)
+    "Shadow" sprites are used in the baseball games to remap the background tile pen, and they're
+    also used a lot in valkyrie.
 
+    Device used by the following drivers:
+    namcos2.cpp (all games EXCEPT Steel Gunner, Steel Gunner 2, Lucky & Wild, Suzuka 8 Hours,
+    Suzuka 8 Hours 2 which use the newer Namco NB1 style sprites, see namco_c355spr.cpp).
 
 */
 
@@ -22,11 +26,29 @@
 #include "namcos2_sprite.h"
 
 DEFINE_DEVICE_TYPE(NAMCOS2_SPRITE, namcos2_sprite_device, "namcos2_sprite", "Namco System 2 Sprites (C106,C134,C135,C146)")
+DEFINE_DEVICE_TYPE(NAMCOS2_SPRITE_FINALLAP, namcos2_sprite_finallap_device, "namcos2_sprite_finallap", "Namco System 2 Sprites (C106,C134,C135,C146) (Final Lap)")
+DEFINE_DEVICE_TYPE(NAMCOS2_SPRITE_METALHAWK, namcos2_sprite_metalhawk_device, "namcos2_sprite_metalhawk", "Namco System 2 Sprites (C106,C134,C135,C146) (Metal Hawk)")
 
 namcos2_sprite_device::namcos2_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	device_t(mconfig, NAMCOS2_SPRITE, tag, owner, clock),
+	namcos2_sprite_device(mconfig, NAMCOS2_SPRITE, tag, owner, clock)
+{
+}
+
+namcos2_sprite_device::namcos2_sprite_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	m_gfxdecode(*this, finder_base::DUMMY_TAG),
 	m_spriteram(*this, finder_base::DUMMY_TAG)
+{
+}
+
+
+namcos2_sprite_metalhawk_device::namcos2_sprite_metalhawk_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	namcos2_sprite_device(mconfig, NAMCOS2_SPRITE_METALHAWK, tag, owner, clock)
+{
+}
+
+namcos2_sprite_finallap_device::namcos2_sprite_finallap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	namcos2_sprite_device(mconfig, NAMCOS2_SPRITE_FINALLAP, tag, owner, clock)
 {
 }
 
@@ -50,7 +72,6 @@ void namcos2_sprite_device::zdrawgfxzoom(
 		if (gfx)
 		{
 			device_palette_interface &palette = gfx->palette();
-			const int shadow_offset = (palette.shadows_enabled()) ? palette.entries() : 0;
 			const pen_t *pal = &palette.pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 			const u8 *source_base = gfx->get_data(code % gfx->elements());
 			const int sprite_screen_height = (scaley * gfx->height() + 0x8000) >> 16;
@@ -117,9 +138,9 @@ void namcos2_sprite_device::zdrawgfxzoom(
 					{
 						for (int y = sy; y < ey; y++)
 						{
-							const u8 *source = source_base + (y_index>>16) * gfx->rowbytes();
-							u16 *dest = &dest_bmp.pix16(y);
-							u8 *pri = &priority_bitmap.pix8(y);
+							u8 const *const source = source_base + (y_index>>16) * gfx->rowbytes();
+							u16 *const dest = &dest_bmp.pix(y);
+							u8 *const pri = &priority_bitmap.pix(y);
 							int x_index = x_index_base;
 							/* this code was previously shared with the c355 where this was needed
 							if (m_palxor)
@@ -160,9 +181,12 @@ void namcos2_sprite_device::zdrawgfxzoom(
 									{
 										if (pri[x] <= zpos)
 										{
-											if (color == 0xf && c==0xfe && shadow_offset)
+											if (color == 0xf && c == 0xfe)
 											{
-												dest[x] |= shadow_offset;
+												if (dest[x] & 0x1000)
+													dest[x] |= 0x800;
+												else
+													dest[x] = palette.black_pen();
 											}
 											else
 											{
@@ -190,6 +214,22 @@ void namcos2_sprite_device::zdrawgfxzoom(
 		int scalex, int scaley, int zpos)
 {
 	/* nop */
+}
+
+void namcos2_sprite_device::get_tilenum_and_size(const u16 word0, const u16 word1, u32 &sprn, bool &is_32)
+{
+	sprn = (word1 >> 2) & 0x0fff;
+	is_32 = bool(word0 & 0x200);
+}
+
+void namcos2_sprite_finallap_device::get_tilenum_and_size(const u16 word0, const u16 word1, u32 &sprn, bool &is_32)
+{
+	// Final Lap schematics show an older sprite board with lower capacity
+	// and the 32/16 pixel mode select on a different bit
+	// this is needed for the title screen to look correct, in addition to various in game sparks effects etc.
+
+	sprn = (word1 >> 2) & 0x07ff;
+	is_32 = bool((word1 >> 2) & 0x800);
 }
 
 void namcos2_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int control)
@@ -227,27 +267,30 @@ void namcos2_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 			const u16 word0   = m_spriteram[offset + (loop * 4) + 0];
 			const u16 word1   = m_spriteram[offset + (loop * 4) + 1];
 			const u16 offset4 = m_spriteram[offset + (loop * 4) + 2];
+			const int sizey   = ((word0 >> 10) & 0x003f) + 1;
 
-			const int sizey = ((word0 >> 10) & 0x003f) + 1;
-			int sizex       =  (word3 >> 10) & 0x003f;
+			u32 sprn;
+			bool is_32;
 
-			if ((word0 & 0x0200) == 0) sizex >>= 1;
+			get_tilenum_and_size(word0, word1, sprn, is_32);
+
+			int sizex = (word3 >> 10) & 0x003f;
+			if (!is_32) sizex >>= 1;
 
 			if ((sizey - 1) && sizex)
 			{
 				const u32 color  = (word3 >> 4) & 0x000f;
-				const u32 sprn   = (word1 >> 2) & 0x0fff;
 				const int ypos   = (0x1ff - (word0 & 0x01ff)) - 0x50 + 0x02;
-				const int xpos   = (offset4 & 0x03ff) - 0x50 + 0x07;
+				const int xpos   = (offset4 & 0x07ff) - 0x50 + 0x07;
 				const bool flipy = word1 & 0x8000;
 				const bool flipx = word1 & 0x4000;
-				const int scalex = (sizex << 16) / ((word0 & 0x0200) ? 0x20 : 0x10);
-				const int scaley = (sizey << 16) / ((word0 & 0x0200) ? 0x20 : 0x10);
+				const int scalex = (sizex << 16) / (is_32 ? 0x20 : 0x10);
+				const int scaley = (sizey << 16) / (is_32 ? 0x20 : 0x10);
 				if (scalex && scaley)
 				{
 					gfx_element *gfx = m_gfxdecode->gfx(0);
 
-					if ((word0 & 0x0200) == 0)
+					if (!is_32)
 						gfx->set_source_clip((word1 & 0x0001) ? 16 : 0, 16, (word1 & 0x0002) ? 16 : 0, 16);
 					else
 						gfx->set_source_clip(0, 32, 0, 32);
@@ -269,7 +312,7 @@ void namcos2_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 	}
 } /* draw_sprites */
 
-void namcos2_sprite_device::draw_sprites_metalhawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
+void namcos2_sprite_metalhawk_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int control)
 {
 	/**
 	 * word#0
@@ -340,7 +383,7 @@ void namcos2_sprite_device::draw_sprites_metalhawk(screen_device &screen, bitmap
 				}
 				if (sizey < 0x20)
 				{
-					sy += (0x20 - sizey) / 0xC;
+					sy += (0x20 - sizey) / 0xc;
 				}
 				gfx->set_source_clip(0, 32, 0, 32);
 			}

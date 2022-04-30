@@ -25,6 +25,9 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_vectorram(*this, "vectorram") { }
 
+	void aztarac(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<x2212_device> m_nvram;
@@ -34,18 +37,18 @@ public:
 
 	required_shared_ptr<uint16_t> m_vectorram;
 
-	int m_sound_status;
-	int m_xcenter;
-	int m_ycenter;
+	int m_sound_status = 0;
+	int m_xcenter = 0;
+	int m_ycenter = 0;
 
 	void nvram_store_w(uint16_t data);
-	DECLARE_READ16_MEMBER(joystick_r);
+	uint16_t joystick_r();
 	void ubr_w(uint8_t data);
-	DECLARE_READ16_MEMBER(sound_r);
-	DECLARE_WRITE16_MEMBER(sound_w);
-	DECLARE_READ8_MEMBER(snd_command_r);
-	DECLARE_READ8_MEMBER(snd_status_r);
-	DECLARE_WRITE8_MEMBER(snd_status_w);
+	uint16_t sound_r();
+	void sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t snd_command_r();
+	uint8_t snd_status_r();
+	void snd_status_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -55,7 +58,6 @@ public:
 	INTERRUPT_GEN_MEMBER(snd_timed_irq);
 
 	inline void read_vectorram(uint16_t *vectorram, int addr, int *x, int *y, int *c);
-	void aztarac(machine_config &config);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };

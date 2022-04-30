@@ -5,6 +5,7 @@
     emucore.h
 
     General core utilities and macros used throughout the emulator.
+
 ***************************************************************************/
 
 #ifndef MAME_EMU_EMUCORE_H
@@ -12,35 +13,38 @@
 
 #pragma once
 
-// standard C includes
-#include <cassert>
-#include <cmath>
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
-#include <cstdarg>
-
 // some cleanups for Solaris for things defined in stdlib.h
 #if defined(__sun__) && defined(__svr4__)
 #undef si_status
 #undef WWORD
 #endif
 
+// centralised forward declarations
+#include "emufwd.h"
+
+// common stuff from lib/util
+#include "corealloc.h"
+#include "coretmpl.h"
+#include "bitmap.h"
+#include "endianness.h"
+#include "strformat.h"
+#include "vecstream.h"
+
+// common stuff from osd
+#include "osdcomm.h"
+
 // standard C++ includes
-#include <cassert>
 #include <exception>
 #include <string>
 #include <type_traits>
 #include <typeinfo>
 
-// core system includes
-#include "osdcomm.h"
-#include "emualloc.h"
-#include "corestr.h"
-#include "bitmap.h"
-#include "strformat.h"
-
-#include "emufwd.h"
+// standard C includes
+#include <cassert>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 
 //**************************************************************************
@@ -72,19 +76,30 @@ using osd::s64;
 // useful utility functions
 using util::underlying_value;
 using util::enum_value;
+using util::make_bitmask;
 using util::BIT;
 using util::bitswap;
 using util::iabs;
+using util::string_format;
 
+using endianness_t = util::endianness;
 
-// genf is a generic function pointer; cast function pointers to this instead of void *
-typedef void genf(void);
+using util::BYTE_XOR_BE;
+using util::BYTE_XOR_LE;
+using util::BYTE4_XOR_BE;
+using util::BYTE4_XOR_LE;
+using util::WORD_XOR_BE;
+using util::WORD_XOR_LE;
+using util::BYTE8_XOR_BE;
+using util::BYTE8_XOR_LE;
+using util::WORD2_XOR_BE;
+using util::WORD2_XOR_LE;
+using util::DWORD_XOR_BE;
+using util::DWORD_XOR_LE;
+
 
 // pen_t is used to represent pixel values in bitmaps
 typedef u32 pen_t;
-
-// stream_sample_t is used to represent a single sample in a sound stream
-typedef s32 stream_sample_t;
 
 
 
@@ -154,21 +169,9 @@ union PAIR64
 //  COMMON CONSTANTS
 //**************************************************************************
 
-// constants for expression endianness
-enum endianness_t
-{
-	ENDIANNESS_LITTLE,
-	ENDIANNESS_BIG
-};
-
-extern const char *const endianness_names[2];
-
-// declare native endianness to be one or the other
-#ifdef LSB_FIRST
-const endianness_t ENDIANNESS_NATIVE = ENDIANNESS_LITTLE;
-#else
-const endianness_t ENDIANNESS_NATIVE = ENDIANNESS_BIG;
-#endif
+constexpr endianness_t ENDIANNESS_LITTLE = util::endianness::little;
+constexpr endianness_t ENDIANNESS_BIG    = util::endianness::big;
+constexpr endianness_t ENDIANNESS_NATIVE = util::endianness::native;
 
 
 // M_PI is not part of the C/C++ standards and is not present on
@@ -178,15 +181,60 @@ const endianness_t ENDIANNESS_NATIVE = ENDIANNESS_BIG;
 #endif
 
 
-// orientation of bitmaps
-constexpr int ORIENTATION_FLIP_X   = 0x0001;  // mirror everything in the X direction
-constexpr int ORIENTATION_FLIP_Y   = 0x0002;  // mirror everything in the Y direction
-constexpr int ORIENTATION_SWAP_XY  = 0x0004;  // mirror along the top-left/bottom-right diagonal
+/// \name Image orientation flags
+/// \{
+
+constexpr int ORIENTATION_FLIP_X   = 0x0001;  ///< Mirror horizontally (in the X direction)
+constexpr int ORIENTATION_FLIP_Y   = 0x0002;  ///< Mirror vertically (in the Y direction)
+constexpr int ORIENTATION_SWAP_XY  = 0x0004;  ///< Mirror along the top-left/bottom-right diagonal
 
 constexpr int ROT0                 = 0;
-constexpr int ROT90                = ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X;  // rotate clockwise 90 degrees
-constexpr int ROT180               = ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y;   // rotate 180 degrees
-constexpr int ROT270               = ORIENTATION_SWAP_XY | ORIENTATION_FLIP_Y;  // rotate counter-clockwise 90 degrees
+constexpr int ROT90                = ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X;  ///< Rotate 90 degrees clockwise
+constexpr int ROT180               = ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y;   ///< Rotate 180 degrees
+constexpr int ROT270               = ORIENTATION_SWAP_XY | ORIENTATION_FLIP_Y;  ///< Rotate 90 degrees anti-clockwise (270 degrees clockwise)
+
+/// \}
+
+
+// these are UTF-8 encoded strings for common characters
+#define UTF8_NBSP               "\xc2\xa0"          /* non-breaking space */
+
+#define UTF8_MULTIPLY           "\xc3\x97"          /* multiplication sign */
+#define UTF8_DIVIDE             "\xc3\xb7"          /* division sign */
+#define UTF8_SQUAREROOT         "\xe2\x88\x9a"      /* square root symbol */
+#define UTF8_PLUSMINUS          "\xc2\xb1"          /* plusminus symbol */
+
+#define UTF8_POW_2              "\xc2\xb2"          /* superscript 2 */
+#define UTF8_POW_X              "\xcb\xa3"          /* superscript x */
+#define UTF8_POW_Y              "\xca\xb8"          /* superscript y */
+#define UTF8_PRIME              "\xca\xb9"          /* prime symbol */
+#define UTF8_DEGREES            "\xc2\xb0"          /* degrees symbol */
+
+#define UTF8_SMALL_PI           "\xcf\x80"          /* Greek small letter pi */
+#define UTF8_CAPITAL_SIGMA      "\xce\xa3"          /* Greek capital letter sigma */
+#define UTF8_CAPITAL_DELTA      "\xce\x94"          /* Greek capital letter delta */
+
+#define UTF8_MACRON             "\xc2\xaf"          /* macron symbol */
+#define UTF8_NONSPACE_MACRON    "\xcc\x84"          /* nonspace macron, use after another char */
+
+#define a_RING                  "\xc3\xa5"          /* small a with a ring */
+#define a_UMLAUT                "\xc3\xa4"          /* small a with an umlaut */
+#define o_UMLAUT                "\xc3\xb6"          /* small o with an umlaut */
+#define u_UMLAUT                "\xc3\xbc"          /* small u with an umlaut */
+#define e_ACUTE                 "\xc3\xa9"          /* small e with an acute */
+#define n_TILDE                 "\xc3\xb1"          /* small n with a tilde */
+
+#define A_RING                  "\xc3\x85"          /* capital A with a ring */
+#define A_UMLAUT                "\xc3\x84"          /* capital A with an umlaut */
+#define O_UMLAUT                "\xc3\x96"          /* capital O with an umlaut */
+#define U_UMLAUT                "\xc3\x9c"          /* capital U with an umlaut */
+#define E_ACUTE                 "\xc3\x89"          /* capital E with an acute */
+#define N_TILDE                 "\xc3\x91"          /* capital N with a tilde */
+
+#define UTF8_LEFT               "\xe2\x86\x90"      /* cursor left */
+#define UTF8_RIGHT              "\xe2\x86\x92"      /* cursor right */
+#define UTF8_UP                 "\xe2\x86\x91"      /* cursor up */
+#define UTF8_DOWN               "\xe2\x86\x93"      /* cursor down */
 
 
 
@@ -225,16 +273,6 @@ inline TYPE &operator|=(TYPE &a, TYPE b) { return a = a | b; }
 // macros to convert radians to degrees and degrees to radians
 template <typename T> constexpr auto RADIAN_TO_DEGREE(T const &x) { return (180.0 / M_PI) * x; }
 template <typename T> constexpr auto DEGREE_TO_RADIAN(T const &x) { return (M_PI / 180.0) * x; }
-
-
-// endian-based value: first value is if 'endian' is little-endian, second is if 'endian' is big-endian
-#define ENDIAN_VALUE_LE_BE(endian,leval,beval)  (((endian) == ENDIANNESS_LITTLE) ? (leval) : (beval))
-
-// endian-based value: first value is if native endianness is little-endian, second is if native is big-endian
-#define NATIVE_ENDIAN_VALUE_LE_BE(leval,beval)  ENDIAN_VALUE_LE_BE(ENDIANNESS_NATIVE, leval, beval)
-
-// endian-based value: first value is if 'endian' matches native, second is if 'endian' doesn't match native
-#define ENDIAN_VALUE_NE_NNE(endian,neval,nneval) (((endian) == ENDIANNESS_NATIVE) ? (neval) : (nneval))
 
 
 //**************************************************************************
@@ -289,18 +327,19 @@ private:
 [[noreturn]] void report_bad_device_cast(const device_t *dev, const std::type_info &src_type, const std::type_info &dst_type);
 
 template <typename Dest, typename Source>
-inline std::enable_if_t<std::is_base_of<device_t, Source>::value> report_bad_cast(Source *const src)
+inline void report_bad_cast(Source *src)
 {
-	if (src) report_bad_device_cast(src, typeid(Source), typeid(Dest));
-	else report_bad_cast(typeid(Source), typeid(Dest));
-}
-
-template <typename Dest, typename Source>
-inline std::enable_if_t<!std::is_base_of<device_t, Source>::value> report_bad_cast(Source *const src)
-{
-	device_t const *dev(dynamic_cast<device_t const *>(src));
-	if (dev) report_bad_device_cast(dev, typeid(Source), typeid(Dest));
-	else report_bad_cast(typeid(Source), typeid(Dest));
+	if constexpr (std::is_base_of_v<device_t, Source>)
+	{
+		if (src) report_bad_device_cast(src, typeid(Source), typeid(Dest));
+		else report_bad_cast(typeid(Source), typeid(Dest));
+	}
+	else
+	{
+		device_t const *dev(dynamic_cast<device_t const *>(src));
+		if (dev) report_bad_device_cast(dev, typeid(Source), typeid(Dest));
+		else report_bad_cast(typeid(Source), typeid(Dest));
+	}
 }
 
 // template function for casting from a base class to a derived class that is checked
@@ -384,5 +423,12 @@ inline u64 d2u(double d)
 	u.dd = d;
 	return u.vv;
 }
+
+
+//**************************************************************************
+//  USEFUL UTILITIES
+//**************************************************************************
+
+using util::make_unique_clear;
 
 #endif // MAME_EMU_EMUCORE_H

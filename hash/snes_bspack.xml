@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
 <!--
+license:CC0
+
 
  WARNING: The entries in this software list will need a BIG cleanup once we
  fix our Satellaview emulation
@@ -20,7 +21,7 @@
  In the end, we shall only keep the proper dumps, possibly patching the header on load, if necessary with
  a ROM_LOAD overlay in the rom definitions...
 
- -->
+-->
 
 <softwarelist name="snes_bspack" description="Nintendo SNES Satellaview Memory Packs">
 
@@ -822,7 +823,7 @@
 
 			<feature name="slot" value="bsmempak" />
 			<dataarea name="rom" size="1048576">
-				<rom name="bs parlor! parlor! - dai-2-shuu (japan) (bs soundlink).bs" size="1048576" crc="c0f38b87" sha1="12acd209c5bd7875b2e01ad25253f96695c3f1b8" offset="0x000000" />
+				<rom name="bs parlor parlor - dai-2-shuu (japan) (bs soundlink).bs" size="1048576" crc="c0f38b87" sha1="12acd209c5bd7875b2e01ad25253f96695c3f1b8" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -836,7 +837,7 @@
 
 			<feature name="slot" value="bsmempak" />
 			<dataarea name="rom" size="1048576">
-				<rom name="bs parlor! parlor! - dai-2-shuu (japan).bs" size="1048576" crc="3ed9a005" sha1="235499d1922646dde43c6aa93f595fc2fa09ed64" offset="0x000000" />
+				<rom name="bs parlor parlor - dai-2-shuu (japan).bs" size="1048576" crc="3ed9a005" sha1="235499d1922646dde43c6aa93f595fc2fa09ed64" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1666,7 +1667,7 @@
 
 			<feature name="slot" value="bsmempak" />
 			<dataarea name="rom" size="1048576">
-				<rom name="do-re-mi de faa 2~! - 5-10 gou (japan) (bs).bs" size="1048576" crc="cf6be8f8" sha1="17297d5c3ea572438efef2861de6de458910949f" offset="0x000000" />
+				<rom name="do-re-mi de faa 2~ - 5-10 gou (japan) (bs).bs" size="1048576" crc="cf6be8f8" sha1="17297d5c3ea572438efef2861de6de458910949f" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1679,7 +1680,7 @@
 
 			<feature name="slot" value="bsmempak" />
 			<dataarea name="rom" size="1048576">
-				<rom name="do-re-mi de faa 2~! - 5-10 gou (japan).bs" size="1048576" crc="25401316" sha1="1c25723597a55ab94cf7289cf36b6b8941a3d5ab" offset="0x000000" />
+				<rom name="do-re-mi de faa 2~ - 5-10 gou (japan).bs" size="1048576" crc="25401316" sha1="1c25723597a55ab94cf7289cf36b6b8941a3d5ab" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1692,7 +1693,7 @@
 
 			<feature name="slot" value="bsmempak" />
 			<dataarea name="rom" size="1048576">
-				<rom name="do-re-mi de faa 2~! - 5-25 gou (japan) (bs).bs" size="1048576" crc="985aec8f" sha1="3541281ada66b8117e29442111edad325395b7f3" offset="0x000000" />
+				<rom name="do-re-mi de faa 2~ - 5-25 gou (japan) (bs).bs" size="1048576" crc="985aec8f" sha1="3541281ada66b8117e29442111edad325395b7f3" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1705,7 +1706,7 @@
 
 			<feature name="slot" value="bsmempak" />
 			<dataarea name="rom" size="1048576">
-				<rom name="do-re-mi de faa 2~! - 5-25 gou (japan).bs" size="1048576" crc="f8b048f5" sha1="d9af942b657a0ab2fd9979a708e10f4c3e75fcab" offset="0x000000" />
+				<rom name="do-re-mi de faa 2~ - 5-25 gou (japan).bs" size="1048576" crc="f8b048f5" sha1="d9af942b657a0ab2fd9979a708e10f4c3e75fcab" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2247,7 +2248,7 @@
 
 			<feature name="slot" value="bsmempak" />
 			<dataarea name="rom" size="1048576">
-				<rom name="golf daisuki! o.b. club (japan) (bs).bs" size="1048576" crc="fb1a2e4d" sha1="b7fba94a3bc5b7b46cf005e7f8116c4221005ee3" offset="0x000000" />
+				<rom name="golf daisuki o.b. club (japan) (bs).bs" size="1048576" crc="fb1a2e4d" sha1="b7fba94a3bc5b7b46cf005e7f8116c4221005ee3" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2260,7 +2261,7 @@
 
 			<feature name="slot" value="bsmempak" />
 			<dataarea name="rom" size="1048576">
-				<rom name="golf daisuki! o.b. club (japan).bs" size="1048576" crc="dc00efeb" sha1="e97c6c4a5e530815cb449b7aa5a8b1d156f850b7" offset="0x000000" />
+				<rom name="golf daisuki o.b. club (japan).bs" size="1048576" crc="dc00efeb" sha1="e97c6c4a5e530815cb449b7aa5a8b1d156f850b7" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2889,7 +2890,7 @@
 
 			<feature name="slot" value="bsmempak" />
 			<dataarea name="rom" size="1048576">
-				<rom name="satella walker - sate bou o sukuidase! (japan) (bs soundlink).bs" size="1048576" crc="e8dd9102" sha1="6f5caf8c4203c30661cd71112dd851c7e2cccb63" offset="0x000000" />
+				<rom name="satella walker - sate bou o sukuidase (japan) (bs soundlink).bs" size="1048576" crc="e8dd9102" sha1="6f5caf8c4203c30661cd71112dd851c7e2cccb63" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2904,7 +2905,7 @@
 
 			<feature name="slot" value="bsmempak" />
 			<dataarea name="rom" size="1048576">
-				<rom name="satella walker 2 - sate bou o sukuidase! (japan).bs" size="1048576" crc="7c8d211c" sha1="80bb866deb7141963e1ecf9b1f538ee0c28b11ed" offset="0x000000" />
+				<rom name="satella walker 2 - sate bou o sukuidase (japan).bs" size="1048576" crc="7c8d211c" sha1="80bb866deb7141963e1ecf9b1f538ee0c28b11ed" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3560,7 +3561,7 @@
 
 			<feature name="slot" value="bsmempak" />
 			<dataarea name="rom" size="1048576">
-				<rom name="zootto mahjong! - event version (japan) (bs).bs" size="1048576" crc="5d2c918d" sha1="ccdef08d2c8ecd500b86a26e75345ca9b3920bf1" offset="0x000000" />
+				<rom name="zootto mahjong - event version (japan) (bs).bs" size="1048576" crc="5d2c918d" sha1="ccdef08d2c8ecd500b86a26e75345ca9b3920bf1" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3573,7 +3574,7 @@
 
 			<feature name="slot" value="bsmempak" />
 			<dataarea name="rom" size="1048576">
-				<rom name="zootto mahjong! - event version (japan).bs" size="1048576" crc="7aca6cf0" sha1="2ee76761e023f0c51fbbf4797c175a7c752e788c" offset="0x000000" />
+				<rom name="zootto mahjong - event version (japan).bs" size="1048576" crc="7aca6cf0" sha1="2ee76761e023f0c51fbbf4797c175a7c752e788c" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3586,7 +3587,7 @@
 
 			<feature name="slot" value="bsmempak" />
 			<dataarea name="rom" size="1048576">
-				<rom name="zootto mahjong! - preview ban (japan) (bs).bs" size="1048576" crc="5439aa16" sha1="08b057baefeb73d60bed7cc2201dae1aad80d044" offset="0x000000" />
+				<rom name="zootto mahjong - preview ban (japan) (bs).bs" size="1048576" crc="5439aa16" sha1="08b057baefeb73d60bed7cc2201dae1aad80d044" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3599,7 +3600,7 @@
 
 			<feature name="slot" value="bsmempak" />
 			<dataarea name="rom" size="1048576">
-				<rom name="zootto mahjong! - preview ban (japan).bs" size="1048576" crc="e8a0758d" sha1="8ec66c5dcda3392c27bc532a06d726783c3a1565" offset="0x000000" />
+				<rom name="zootto mahjong - preview ban (japan).bs" size="1048576" crc="e8a0758d" sha1="8ec66c5dcda3392c27bc532a06d726783c3a1565" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3979,7 +3980,7 @@
 
 			<feature name="slot" value="bsmempak" />
 			<dataarea name="rom" size="524288">
-				<rom name="kirby no omochabako - hoshi kuzushi (bs) (2-26) (!).bs" size="524288" crc="3dbbd86a" sha1="b6cda98a2a6a7a6aa9a64aec7f346039a608b093" offset="0x000000" />
+				<rom name="kirby no omochabako - hoshi kuzushi (bs) (2-26).bs" size="524288" crc="3dbbd86a" sha1="b6cda98a2a6a7a6aa9a64aec7f346039a608b093" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4158,7 +4159,7 @@
 
 			<feature name="slot" value="bsmempak" />
 			<dataarea name="rom" size="524288">
-				<rom name="do-re-mi de faa! vol. 6 - 5-4 (japan).bs" size="524288" crc="0849123e" sha1="13beba44f974c4b4139a6303b14c0a5239156a02" offset="0x000000" />
+				<rom name="do-re-mi de faa vol. 6 - 5-4 (japan).bs" size="524288" crc="0849123e" sha1="13beba44f974c4b4139a6303b14c0a5239156a02" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4452,7 +4453,7 @@
 
 			<feature name="slot" value="bsmempak" />
 			<dataarea name="rom" size="1048576">
-				<rom name="table game daisyugo!! shougi mahjong hanafuda (japan) (bs).bs" size="1048576" crc="425f8747" sha1="295d68787a602fbb8200a2d0711918e333407ae3" offset="0x000000" />
+				<rom name="table game daisyugo shougi mahjong hanafuda (japan) (bs).bs" size="1048576" crc="425f8747" sha1="295d68787a602fbb8200a2d0711918e333407ae3" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4629,7 +4630,7 @@
 
 			<feature name="slot" value="bsmempak" />
 			<dataarea name="rom" size="1048576">
-				<rom name="kessen! dokapon oukoku iv - densetsu no yuusha-tachi (bs).bs" size="1048576" crc="e6a2e0d8" sha1="a40d9dedeff858fca2a549fadb2cbe7f0a84fc44" offset="0x000000" status="baddump" />
+				<rom name="kessen dokapon oukoku iv - densetsu no yuusha-tachi (bs).bs" size="1048576" crc="e6a2e0d8" sha1="a40d9dedeff858fca2a549fadb2cbe7f0a84fc44" offset="0x000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -4854,7 +4855,7 @@
 
 			<feature name="slot" value="bsmempak" />
 			<dataarea name="rom" size="1048576">
-				<rom name="bs fuurai no shiren - surura wo sukue! dai-4-wa.bs" size="1048576" crc="03f9394d" sha1="a08fb18c3ae0b624653cc8d373e86cfedc1a5bd8" offset="0x000000" status="baddump" />
+				<rom name="bs fuurai no shiren - surura wo sukue dai-4-wa.bs" size="1048576" crc="03f9394d" sha1="a08fb18c3ae0b624653cc8d373e86cfedc1a5bd8" offset="0x000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

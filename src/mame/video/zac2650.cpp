@@ -16,30 +16,30 @@
 /* once it's workings are fully understood.                   */
 /**************************************************************/
 
-WRITE8_MEMBER(zac2650_state::tinvader_videoram_w)
+void zac2650_state::tinvader_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER(zac2650_state::zac_s2636_r)
+uint8_t zac2650_state::zac_s2636_r(offs_t offset)
 {
 	if(offset!=0xCB) return m_s2636_0_ram[offset];
 	else return m_CollisionSprite;
 }
 
-WRITE8_MEMBER(zac2650_state::zac_s2636_w)
+void zac2650_state::zac_s2636_w(offs_t offset, uint8_t data)
 {
 	m_s2636_0_ram[offset] = data;
 	m_gfxdecode->gfx(1)->mark_dirty(offset/8);
 	m_gfxdecode->gfx(2)->mark_dirty(offset/8);
 	if (offset == 0xc7)
 	{
-		m_s2636->write_data(space, offset, data);
+		m_s2636->write_data(offset, data);
 	}
 }
 
-READ8_MEMBER(zac2650_state::tinvader_port_0_r)
+uint8_t zac2650_state::tinvader_port_0_r()
 {
 	return ioport("1E80")->read() - m_CollisionBackground;
 }
@@ -51,7 +51,6 @@ READ8_MEMBER(zac2650_state::tinvader_port_0_r)
 int zac2650_state::SpriteCollision(int first,int second)
 {
 	int Checksum=0;
-	int x,y;
 	const rectangle &visarea = m_screen->visible_area();
 
 	if((m_s2636_0_ram[first * 0x10 + 10] < 0xf0) && (m_s2636_0_ram[second * 0x10 + 10] < 0xf0))
@@ -70,12 +69,12 @@ int zac2650_state::SpriteCollision(int first,int second)
 
 		/* Get fingerprint */
 
-		for (x = fx; x < fx + m_gfxdecode->gfx(expand)->width(); x++)
+		for (int x = fx; x < fx + m_gfxdecode->gfx(expand)->width(); x++)
 		{
-			for (y = fy; y < fy + m_gfxdecode->gfx(expand)->height(); y++)
+			for (int y = fy; y < fy + m_gfxdecode->gfx(expand)->height(); y++)
 			{
 				if (visarea.contains(x, y))
-					Checksum += m_spritebitmap.pix16(y, x);
+					Checksum += m_spritebitmap.pix(y, x);
 			}
 		}
 
@@ -89,12 +88,12 @@ int zac2650_state::SpriteCollision(int first,int second)
 
 		/* Remove fingerprint */
 
-		for (x = fx; x < fx + m_gfxdecode->gfx(expand)->width(); x++)
+		for (int x = fx; x < fx + m_gfxdecode->gfx(expand)->width(); x++)
 		{
-			for (y = fy; y < fy +m_gfxdecode->gfx(expand)->height(); y++)
+			for (int y = fy; y < fy +m_gfxdecode->gfx(expand)->height(); y++)
 			{
 				if (visarea.contains(x, y))
-					Checksum -= m_spritebitmap.pix16(y, x);
+					Checksum -= m_spritebitmap.pix(y, x);
 			}
 		}
 
@@ -114,7 +113,7 @@ TILE_GET_INFO_MEMBER(zac2650_state::get_bg_tile_info)
 {
 	int code = m_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	tileinfo.set(0, code, 0, 0);
 }
 
 void zac2650_state::video_start()
@@ -137,7 +136,6 @@ void zac2650_state::video_start()
 
 void zac2650_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int offs;
 	const rectangle &visarea = m_screen->visible_area();
 
 	/* -------------------------------------------------------------- */
@@ -156,7 +154,7 @@ void zac2650_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	// for collision detection checking
 	copybitmap(m_bitmap,bitmap,0,0,0,0,visarea);
 
-	for(offs=0;offs<0x50;offs+=0x10)
+	for(int offs=0;offs<0x50;offs+=0x10)
 	{
 		if((m_s2636_0_ram[offs+10]<0xF0) && (offs!=0x30))
 		{
@@ -164,7 +162,6 @@ void zac2650_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			int expand   = ((m_s2636_0_ram[0xc0] & (spriteno*2))!=0) ? 2 : 1;
 			int bx       = (m_s2636_0_ram[offs+10] * 4) - 22;
 			int by       = (m_s2636_0_ram[offs+12] * 3) + 3;
-			int x,y;
 
 			/* Sprite->Background collision detection */
 			m_gfxdecode->gfx(expand)->transpen(bitmap,cliprect,
@@ -173,12 +170,12 @@ void zac2650_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 					0,0,
 					bx,by, 0);
 
-			for (x = bx; x < bx + m_gfxdecode->gfx(expand)->width(); x++)
+			for (int x = bx; x < bx + m_gfxdecode->gfx(expand)->width(); x++)
 			{
-				for (y = by; y < by +m_gfxdecode->gfx(expand)->height(); y++)
+				for (int y = by; y < by +m_gfxdecode->gfx(expand)->height(); y++)
 				{
 					if (visarea.contains(x, y))
-						if (bitmap.pix16(y, x) != m_bitmap.pix16(y, x))
+						if (bitmap.pix(y, x) != m_bitmap.pix(y, x))
 						{
 							m_CollisionBackground = 0x80;
 							break;

@@ -41,8 +41,8 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(port_40_w);
-	DECLARE_WRITE8_MEMBER(port_80_w);
+	void port_40_w(uint8_t data);
+	void port_80_w(uint8_t data);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
@@ -69,10 +69,10 @@ private:
 	required_shared_ptr<uint8_t>    m_port_80;
 
 	// video-related
-	tilemap_t        *m_cm_tilemap;
+	tilemap_t        *m_cm_tilemap = nullptr;
 	std::unique_ptr<bitmap_ind16>       m_bitmap_buffer;
 
-	uint8_t          m_irq_mask;
+	uint8_t          m_irq_mask = 0U;
 };
 
 #endif // MAME_INCLUDES_CHEEKYMS_H

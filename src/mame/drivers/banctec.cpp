@@ -39,7 +39,7 @@ public:
 protected:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
-	DECLARE_WRITE8_MEMBER(videoram_w);
+	void videoram_w(u8 data);
 
 	virtual void machine_reset() override;
 	void banctec_mcu_mem(address_map &map);
@@ -77,7 +77,7 @@ void banctec_state::machine_reset()
 * Video/Character functions *
 ****************************/
 
-WRITE8_MEMBER( banctec_state::videoram_w )
+void banctec_state::videoram_w(u8 data)
 {
 	m_videoram[m_video_address] = data;
 	m_video_address++;
@@ -87,16 +87,14 @@ WRITE8_MEMBER( banctec_state::videoram_w )
 
 MC6845_UPDATE_ROW( banctec_state::crtc_update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	u8 chr,gfx;
-	u16 mem,x;
-	u32 *p = &bitmap.pix32(y);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	u32 *p = &bitmap.pix(y);
 
-	for (x = 0; x < x_count; x++)
+	for (u16 x = 0; x < x_count; x++)
 	{
-		mem = (ma + x) & 0xff;
-		chr = m_videoram[mem];
-		gfx = m_p_chargen[chr | (ra << 8)] ^ ((x == cursor_x) ? 0xff : 0);
+		u16 const mem = (ma + x) & 0xff;
+		u8 const chr = m_videoram[mem];
+		u8 const gfx = m_p_chargen[chr | (ra << 8)] ^ ((x == cursor_x) ? 0xff : 0);
 
 		/* Display a scanline of a character (8 pixels) */
 		*p++ = palette[BIT(gfx, 7)];

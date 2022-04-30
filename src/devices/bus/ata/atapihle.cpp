@@ -51,7 +51,8 @@ void atapi_hle_device::process_buffer()
 
 		if (m_feature & ATAPI_FEATURES_FLAG_OVL)
 		{
-			printf( "ATAPI_FEATURES_FLAG_OVL not supported\n" );
+			// TODO: DC GD-ROM
+			logerror( "ATAPI_FEATURES_FLAG_OVL not supported\n" );
 		}
 
 		switch (m_phase)

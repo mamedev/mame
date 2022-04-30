@@ -129,7 +129,6 @@ void mos6551_device::device_start()
 
 	m_internal_clock->set_unscaled_clock(m_xtal);
 
-	output_irq(1);
 	output_txd(1);
 	output_rxc(1);
 	output_rts(1);
@@ -155,6 +154,9 @@ void mos6551_device::device_reset()
 
 	write_command(0);
 	write_control(0);
+
+	m_irq_state = 0;
+	update_irq();
 }
 
 void mos6551_device::output_irq(int irq)
@@ -280,18 +282,15 @@ uint8_t mos6551_device::read_status()
 {
 	uint8_t status = m_status;
 
-	if (!machine().side_effects_disabled())
+	if (m_cts)
 	{
-		if (m_cts)
-		{
-			status &= ~SR_TDRE;
-		}
+		status &= ~SR_TDRE;
+	}
 
-		if (m_irq_state != 0)
-		{
-			m_irq_state = 0;
-			update_irq();
-		}
+	if (!machine().side_effects_disabled() && m_irq_state != 0)
+	{
+		m_irq_state = 0;
+		update_irq();
 	}
 
 	return status;
@@ -317,6 +316,7 @@ void mos6551_device::write_reset(uint8_t data)
 {
 	m_status &= ~SR_OVERRUN;
 	m_irq_state &= ~(IRQ_DCD | IRQ_DSR);
+	update_irq();
 
 	write_command(m_command & ~0x1f);
 }

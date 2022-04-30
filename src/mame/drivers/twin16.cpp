@@ -54,7 +54,7 @@ Known Issues:
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 
 
@@ -69,7 +69,7 @@ int twin16_state::spriteram_process_enable()
 
 /* Read/Write Handlers */
 
-WRITE16_MEMBER(twin16_state::CPUA_register_w)
+void twin16_state::CPUA_register_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	7   6   5   4   3   2   1   0
@@ -102,7 +102,7 @@ WRITE16_MEMBER(twin16_state::CPUA_register_w)
 	}
 }
 
-WRITE16_MEMBER(twin16_state::CPUB_register_w)
+void twin16_state::CPUB_register_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	7   6   5   4   3   2   1   0
@@ -123,7 +123,7 @@ WRITE16_MEMBER(twin16_state::CPUB_register_w)
 	}
 }
 
-WRITE16_MEMBER(fround_state::fround_CPU_register_w)
+void fround_state::fround_CPU_register_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	7   6   5   4   3   2   1   0
@@ -143,17 +143,17 @@ WRITE16_MEMBER(fround_state::fround_CPU_register_w)
 	}
 }
 
-READ8_MEMBER(twin16_state::upd_busy_r)
+uint8_t twin16_state::upd_busy_r()
 {
 	return m_upd7759->busy_r();
 }
 
-WRITE8_MEMBER(twin16_state::upd_reset_w)
+void twin16_state::upd_reset_w(uint8_t data)
 {
 	m_upd7759->reset_w(data & 2);
 }
 
-WRITE8_MEMBER(twin16_state::upd_start_w)
+void twin16_state::upd_start_w(uint8_t data)
 {
 	m_upd7759->start_w(data & 1);
 }
@@ -196,6 +196,13 @@ void twin16_state::main_map(address_map &map)
 	map(0x120000, 0x121fff).ram().w(FUNC(twin16_state::videoram0_w)).share("videoram.0");
 	map(0x122000, 0x123fff).ram().w(FUNC(twin16_state::videoram1_w)).share("videoram.1");
 	map(0x140000, 0x143fff).ram().share("spriteram");
+}
+
+void cuebrickj_state::cuebrickj_main_map(address_map &map)
+{
+	main_map(map);
+	map(0x0b0000, 0x0b03ff).bankrw("nvrambank");
+	map(0x0b0400, 0x0b0400).w(FUNC(cuebrickj_state::nvram_bank_w));
 }
 
 void twin16_state::sub_map(address_map &map)
@@ -601,34 +608,21 @@ static INPUT_PORTS_START( cuebrickj )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-/* Graphics Layouts */
-
-static const gfx_layout tile_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,1,2,3 },
-	{ STEP8(0, 4) },
-	{ STEP8(0, 4*8) },
-	4*8*8
-};
-
 /* Graphics Decode Info */
 
 static GFXDECODE_START( gfx_twin16 )
-	GFXDECODE_ENTRY( "fixed", 0, tile_layout,   0, 16 )
-	GFXDECODE_RAM(  "zipram", 0, tile_layout, 512, 16 )
+	GFXDECODE_ENTRY( "fixed", 0, gfx_8x8x4_packed_msb,   0, 16 )
+	GFXDECODE_RAM(  "zipram", 0, gfx_8x8x4_packed_msb, 512, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_fround )
-	GFXDECODE_ENTRY( "fixed", 0, tile_layout,   0, 16 )
-	GFXDECODE_ENTRY( "tiles", 0, tile_layout, 512, 16 )
+	GFXDECODE_ENTRY( "fixed", 0, gfx_8x8x4_packed_msb,   0, 16 )
+	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x4_packed_msb, 512, 16 )
 GFXDECODE_END
 
 /* Sound Interfaces */
 
-WRITE8_MEMBER(twin16_state::volume_callback)
+void twin16_state::volume_callback(uint8_t data)
 {
 	m_k007232->set_volume(0,(data >> 4) * 0x11,0);
 	m_k007232->set_volume(1,0,(data & 0x0f) * 0x11);
@@ -763,6 +757,7 @@ void twin16_state::miaj(machine_config &config)
 void cuebrickj_state::cuebrickj(machine_config &config)
 {
 	twin16(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cuebrickj_state::cuebrickj_main_map);
 	m_screen->set_raw(XTAL(18'432'000)/2, 576, 1*8, 39*8, 264, 2*8, 30*8);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
@@ -1243,7 +1238,7 @@ void fround_state::init_fround()
 	m_is_fround = true;
 }
 
-WRITE8_MEMBER(cuebrickj_state::nvram_bank_w)
+void cuebrickj_state::nvram_bank_w(uint8_t data)
 {
 	membank("nvrambank")->set_entry(data);
 }
@@ -1251,11 +1246,6 @@ WRITE8_MEMBER(cuebrickj_state::nvram_bank_w)
 void cuebrickj_state::init_cuebrickj()
 {
 	init_twin16();
-
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	space.install_readwrite_bank(0x0b0000, 0x0b03ff, "nvrambank");
-	space.install_write_handler( 0x0b0400, 0x0b0401, write8_delegate(*this, FUNC(cuebrickj_state::nvram_bank_w)), 0xff00);
 
 	membank("nvrambank")->configure_entries(0, 0x20, m_nvram, 0x400);
 

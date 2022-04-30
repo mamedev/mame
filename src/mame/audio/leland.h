@@ -14,7 +14,7 @@
 #include "machine/gen_latch.h"
 #include "machine/pit8253.h"
 #include "sound/dac.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 
 
 class leland_80186_sound_device : public device_t
@@ -49,7 +49,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	int m_type;
+	int m_type = 0;
 
 	enum {
 		TYPE_LELAND,
@@ -61,7 +61,7 @@ protected:
 	required_device<generic_latch_16_device> m_soundlatch;
 	optional_device_array<dac_byte_interface, 8> m_dac;
 	optional_device<dac_word_interface> m_dac9;
-	optional_device_array<dac_binary_weighted_8bit_device, 8> m_dacvol;
+	optional_device_array<dac_8bit_binary_weighted_device, 8> m_dacvol;
 	optional_device_array<pit8254_device, 3> m_pit;
 	optional_device<i80186_cpu_device> m_audiocpu;
 	optional_device<ym2151_device> m_ymsnd;
@@ -71,19 +71,19 @@ protected:
 	void leland_80186_map_program(address_map &map);
 
 private:
-	void delayed_response_r(void *ptr, int param);
+	void delayed_response_r(int param);
 	void set_clock_line(int which, int state) { m_clock_active = state ? (m_clock_active | (1<<which)) : (m_clock_active & ~(1<<which)); }
 
 	// internal state
-	u16 m_peripheral;
-	u8 m_last_control;
-	u8 m_clock_active;
-	u8 m_clock_tick;
-	u16 m_sound_command;
-	u16 m_sound_response;
-	u32 m_ext_start;
-	u32 m_ext_stop;
-	u8 m_ext_active;
+	u16 m_peripheral = 0;
+	u8 m_last_control = 0;
+	u8 m_clock_active = 0;
+	u8 m_clock_tick = 0;
+	u16 m_sound_command = 0;
+	u16 m_sound_response = 0;
+	u32 m_ext_start = 0;
+	u32 m_ext_stop = 0;
+	u8 m_ext_active = 0;
 
 	required_device<cpu_device> m_master;
 

@@ -40,7 +40,7 @@ public:
 
 	void init_twin16();
 
-	DECLARE_WRITE8_MEMBER(volume_callback);
+	void volume_callback(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_twin16);
 	uint32_t screen_update_twin16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -61,32 +61,32 @@ protected:
 	optional_shared_ptr<uint16_t> m_sprite_gfx_ram;
 	required_region_ptr<uint16_t> m_gfxrom;
 
-	uint16_t m_CPUA_register;
-	uint16_t m_CPUB_register;
-	bool m_is_fround;
-	uint16_t m_sprite_buffer[0x800];
-	emu_timer *m_sprite_timer;
-	int m_sprite_busy;
-	int m_need_process_spriteram;
-	uint16_t m_scrollx[3];
-	uint16_t m_scrolly[3];
-	uint16_t m_video_register;
-	tilemap_t *m_fixed_tmap;
-	tilemap_t *m_scroll_tmap[2];
+	uint16_t m_CPUA_register = 0;
+	uint16_t m_CPUB_register = 0;
+	bool m_is_fround = false;
+	uint16_t m_sprite_buffer[0x800]{};
+	emu_timer *m_sprite_timer = nullptr;
+	int m_sprite_busy = 0;
+	int m_need_process_spriteram = 0;
+	uint16_t m_scrollx[3]{};
+	uint16_t m_scrolly[3]{};
+	uint16_t m_video_register = 0;
+	tilemap_t *m_fixed_tmap = nullptr;
+	tilemap_t *m_scroll_tmap[2]{};
 
-	DECLARE_WRITE16_MEMBER(CPUA_register_w);
-	DECLARE_WRITE16_MEMBER(CPUB_register_w);
+	void CPUA_register_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void CPUB_register_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER(sprite_status_r);
-	DECLARE_WRITE16_MEMBER(video_register_w);
-	DECLARE_WRITE16_MEMBER(fixram_w);
-	DECLARE_WRITE16_MEMBER(videoram0_w);
-	DECLARE_WRITE16_MEMBER(videoram1_w);
-	DECLARE_WRITE16_MEMBER(zipram_w);
+	uint16_t sprite_status_r();
+	void video_register_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void fixram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void videoram0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void videoram1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void zipram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ8_MEMBER(upd_busy_r);
-	DECLARE_WRITE8_MEMBER(upd_reset_w);
-	DECLARE_WRITE8_MEMBER(upd_start_w);
+	uint8_t upd_busy_r();
+	void upd_reset_w(uint8_t data);
+	void upd_start_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(fix_tile_info);
 	TILE_GET_INFO_MEMBER(layer0_tile_info);
@@ -106,7 +106,7 @@ protected:
 
 	int set_sprite_timer();
 	void spriteram_process();
-	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap );
+	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	int spriteram_process_enable();
 	void twin16_postload();
 };
@@ -123,15 +123,15 @@ public:
 	void init_fround();
 
 private:
-	DECLARE_WRITE16_MEMBER(fround_CPU_register_w);
-	DECLARE_WRITE16_MEMBER(gfx_bank_w);
+	void fround_CPU_register_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gfx_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void fround_map(address_map &map);
 
 	virtual void video_start() override;
 	virtual void tile_get_info(tile_data &tileinfo, uint16_t data, int color_base) override;
 
-	uint8_t m_gfx_bank[4];
+	uint8_t m_gfx_bank[4]{};
 };
 
 class cuebrickj_state : public twin16_state
@@ -146,9 +146,10 @@ public:
 	void init_cuebrickj();
 
 private:
-	DECLARE_WRITE8_MEMBER(nvram_bank_w);
+	void nvram_bank_w(uint8_t data);
 
-	uint16_t m_nvram[0x400 * 0x20 / 2];
+	void cuebrickj_main_map(address_map &map);
+	uint16_t m_nvram[0x400 * 0x20 / 2]{};
 };
 
 #endif // MAME_INCLUDES_TWIN16_H

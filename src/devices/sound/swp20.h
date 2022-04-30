@@ -8,7 +8,9 @@
 
 #pragma once
 
-class swp20_device : public device_t, public device_sound_interface, public device_rom_interface
+#include "dirom.h"
+
+class swp20_device : public device_t, public device_sound_interface, public device_rom_interface<23+2, 1, 0, ENDIANNESS_LITTLE>
 {
 public:
 	swp20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 11289600);
@@ -18,12 +20,15 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 	virtual void rom_bank_updated() override;
 
 private:
 	u8 m_p3c_port;
 	bool m_p3c_address;
+	u8 m_voice;
+	u32 m_keyon;
+	u32 m_keyoff;
 
 	// Generic upload port
 	void p3c_w(u8 data);

@@ -13,7 +13,7 @@
 template<int Layer>
 TILE_GET_INFO_MEMBER(tecmosys_state::get_tile_info)
 {
-	SET_TILE_INFO_MEMBER(Layer,
+	tileinfo.set(Layer,
 			m_vram[Layer][2*tile_index+1],
 			(m_vram[Layer][2*tile_index]&0x3f),
 			TILE_FLIPYX((m_vram[Layer][2*tile_index]&0xc0)>>6));
@@ -25,7 +25,7 @@ inline void tecmosys_state::set_color_555(pen_t color, int rshift, int gshift, i
 	m_palette->set_pen_color(color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
 }
 
-WRITE16_MEMBER(tecmosys_state::tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w)
+void tecmosys_state::tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_tilemap_paletteram16[offset]);
 	set_color_555(offset+0x4000, 5, 10, 0, m_tilemap_paletteram16[offset]);
@@ -130,7 +130,7 @@ void tecmosys_state::render_sprites_to_bitmap(const rectangle &cliprect, u16 ext
 				else ressy = ycnt;
 
 				const u32 srcoffs = address + (ressy * xsize);
-				u16* dstptr = &m_sprite_bitmap.pix16(drawy);
+				u16 *const dstptr = &m_sprite_bitmap.pix(drawy);
 
 				for (int drawx = drawx_base, xcnt = srcx; (drawx <= cliprect.max_x) && (xcnt < xsize); xcnt++, drawx++)
 				{
@@ -184,7 +184,7 @@ void tecmosys_state::render_sprites_to_bitmap(const rectangle &cliprect, u16 ext
 				else ressy = ycnt;
 
 				const u32 srcoffs = address + (ressy * xsize);
-				u16* dstptr = &m_sprite_bitmap.pix16(drawy >> 8);
+				u16 *const dstptr = &m_sprite_bitmap.pix(drawy >> 8);
 
 				for (int drawx = drawx_base, xcnt = srcx; (drawx < scaled_cliprect.max_x) && (xcnt < xsize); xcnt++, drawx += zoomx)
 				{
@@ -204,17 +204,14 @@ void tecmosys_state::render_sprites_to_bitmap(const rectangle &cliprect, u16 ext
 
 void tecmosys_state::tilemap_copy_to_compose(u16 pri, const rectangle &cliprect)
 {
-	int y,x;
-	u16 *srcptr;
-	u16 *dstptr;
-	for (y=cliprect.min_y;y<=cliprect.max_y;y++)
+	for (int y=cliprect.min_y;y<=cliprect.max_y;y++)
 	{
-		srcptr = &m_tmp_tilemap_renderbitmap.pix16(y);
-		dstptr = &m_tmp_tilemap_composebitmap.pix16(y);
-		for (x=cliprect.min_x;x<=cliprect.max_x;x++)
+		u16 const *const srcptr = &m_tmp_tilemap_renderbitmap.pix(y);
+		u16 *const dstptr = &m_tmp_tilemap_composebitmap.pix(y);
+		for (int x=cliprect.min_x;x<=cliprect.max_x;x++)
 		{
 			if ((srcptr[x]&0xf)!=0x0)
-				dstptr[x] =  (srcptr[x]&0x7ff) | pri;
+				dstptr[x] = (srcptr[x]&0x7ff) | pri;
 		}
 	}
 }
@@ -226,10 +223,10 @@ void tecmosys_state::do_final_mix(bitmap_rgb32 &bitmap, const rectangle &cliprec
 
 	for (int y=cliprect.min_y;y<=cliprect.max_y;y++)
 	{
-		u16 const *const srcptr = &m_tmp_tilemap_composebitmap.pix16(y);
-		u16 const *const srcptr2 = &m_sprite_bitmap.pix16(y);
+		u16 const *const srcptr = &m_tmp_tilemap_composebitmap.pix(y);
+		u16 const *const srcptr2 = &m_sprite_bitmap.pix(y);
 
-		u32 *const dstptr = &bitmap.pix32(y);
+		u32 *const dstptr = &bitmap.pix(y);
 		for (int x=cliprect.min_x;x<=cliprect.max_x;x++)
 		{
 			u16 const pri = srcptr[x] & 0xc000;
@@ -377,5 +374,6 @@ void tecmosys_state::video_start()
 	m_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tecmosys_state::get_tile_info<3>)), TILEMAP_SCAN_ROWS, 16,16, 32,32);
 	m_tilemap[3]->set_transparent_pen(0);
 
+	m_spritelist = 0;
 	save_item(NAME(m_spritelist));
 }

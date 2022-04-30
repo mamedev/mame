@@ -29,9 +29,11 @@ static void sdx_floppies(device_slot_interface &device)
 	device.option_add("525qd", FLOPPY_525_QD);
 }
 
-FLOPPY_FORMATS_MEMBER(mtx_sdx_device::floppy_formats)
-	FLOPPY_MTX_FORMAT
-FLOPPY_FORMATS_END
+void mtx_sdx_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_MTX_FORMAT);
+}
 
 //-------------------------------------------------
 //  ROM( sdx )
@@ -240,7 +242,7 @@ void mtx_sdxbas_device::device_reset()
 
 	/* SDX FDC */
 	io_space().install_readwrite_handler(0x10, 0x13, read8sm_delegate(*m_fdc, FUNC(mb8877_device::read)), write8sm_delegate(*m_fdc, FUNC(mb8877_device::write)));
-	io_space().install_readwrite_handler(0x14, 0x14, read8_delegate(*this, FUNC(mtx_sdx_device::sdx_status_r)), write8_delegate(*this, FUNC(mtx_sdx_device::sdx_control_w)));
+	io_space().install_readwrite_handler(0x14, 0x14, read8smo_delegate(*this, FUNC(mtx_sdx_device::sdx_status_r)), write8smo_delegate(*this, FUNC(mtx_sdx_device::sdx_control_w)));
 }
 
 void mtx_sdxcpm_device::device_reset()
@@ -249,10 +251,10 @@ void mtx_sdxcpm_device::device_reset()
 
 	/* SDX FDC */
 	io_space().install_readwrite_handler(0x10, 0x13, read8sm_delegate(*m_fdc, FUNC(mb8877_device::read)), write8sm_delegate(*m_fdc, FUNC(mb8877_device::write)));
-	io_space().install_readwrite_handler(0x14, 0x14, read8_delegate(*this, FUNC(mtx_sdx_device::sdx_status_r)), write8_delegate(*this, FUNC(mtx_sdx_device::sdx_control_w)));
+	io_space().install_readwrite_handler(0x14, 0x14, read8smo_delegate(*this, FUNC(mtx_sdx_device::sdx_status_r)), write8smo_delegate(*this, FUNC(mtx_sdx_device::sdx_control_w)));
 
 	/* 80 column */
-	io_space().install_readwrite_handler(0x30, 0x33, read8_delegate(*this, FUNC(mtx_sdxcpm_device::mtx_80col_r)), write8_delegate(*this, FUNC(mtx_sdxcpm_device::mtx_80col_w)));
+	io_space().install_readwrite_handler(0x30, 0x33, read8sm_delegate(*this, FUNC(mtx_sdxcpm_device::mtx_80col_r)), write8sm_delegate(*this, FUNC(mtx_sdxcpm_device::mtx_80col_w)));
 	io_space().install_readwrite_handler(0x38, 0x38, read8smo_delegate(*m_crtc, FUNC(mc6845_device::status_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::address_w)));
 	io_space().install_readwrite_handler(0x39, 0x39, read8smo_delegate(*m_crtc, FUNC(mc6845_device::register_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::register_w)));
 
@@ -265,7 +267,7 @@ void mtx_sdxcpm_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(mtx_sdx_device::sdx_status_r)
+uint8_t mtx_sdx_device::sdx_status_r()
 {
 	/*
 	bit     description
@@ -281,7 +283,7 @@ READ8_MEMBER(mtx_sdx_device::sdx_status_r)
 
 	uint8_t data = 0x00;
 
-	data |= m_dsw[BIT(m_control, 0)].read_safe(0x0f) & 0x0f;
+	data |= m_dsw[BIT(m_control, 0)]->read() & 0x0f;
 
 	data |= (m_floppy0->get_device() && m_floppy1->get_device()) ? 0x10 : 0x00;
 
@@ -294,7 +296,7 @@ READ8_MEMBER(mtx_sdx_device::sdx_status_r)
 	return data;
 }
 
-WRITE8_MEMBER(mtx_sdx_device::sdx_control_w)
+void mtx_sdx_device::sdx_control_w(uint8_t data)
 {
 	/*
 	bit     description
@@ -341,7 +343,7 @@ WRITE_LINE_MEMBER(mtx_sdx_device::motor_w)
 //  80 column video board
 //-------------------------------------------------
 
-READ8_MEMBER(mtx_sdxcpm_device::mtx_80col_r)
+uint8_t mtx_sdxcpm_device::mtx_80col_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -362,7 +364,7 @@ READ8_MEMBER(mtx_sdxcpm_device::mtx_80col_r)
 	return data;
 }
 
-WRITE8_MEMBER(mtx_sdxcpm_device::mtx_80col_w)
+void mtx_sdxcpm_device::mtx_80col_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -417,7 +419,7 @@ MC6845_UPDATE_ROW(mtx_sdxcpm_device::crtc_update_row)
 
 			int color = BIT(data, 7) ? fg : bg;
 
-			bitmap.pix32(y, x) = pen[de ? color : 0];
+			bitmap.pix(y, x) = pen[de ? color : 0];
 
 			data <<= 1;
 		}

@@ -1,11 +1,12 @@
 // license:BSD-3-Clause
-// copyright-holders:Sandro Ronco
+// copyright-holders:Sandro Ronco, hap
 // thanks-to:Berger
 /***************************************************************************
 
 Mephisto Mondial 68000XL
+The chess engine is actually the one from Mephisto Dallas.
 
-Hardware:
+Hardware notes:
 - TS68000CP12 @ 12MHz
 - 64KB ROM
 - 16KB RAM
@@ -14,17 +15,21 @@ Hardware:
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
+#include "machine/74259.h"
 #include "machine/sensorboard.h"
-#include "machine/timer.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
+#include "video/pcf2100.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork
 #include "mephisto_mondial68k.lh"
 
+
+namespace {
 
 class mondial68k_state : public driver_device
 {
@@ -32,141 +37,119 @@ public:
 	mondial68k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_dac(*this, "dac")
 		, m_board(*this, "board")
-		, m_display(*this, "display")
+		, m_lcd_latch(*this, "lcd_latch")
+		, m_led_pwm(*this, "led_pwm")
+		, m_lcd(*this, "lcd")
 		, m_inputs(*this, "IN.%u", 0)
 		, m_digits(*this, "digit%u", 0U)
-		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	void mondial68k(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	void mondial68k_mem(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(lcd_dlen_w);
-	DECLARE_WRITE8_MEMBER(lcd_clb_w);
-	DECLARE_WRITE8_MEMBER(lcd_data_w);
-	DECLARE_WRITE8_MEMBER(speaker_w);
-	DECLARE_WRITE8_MEMBER(input_mux_w);
-	DECLARE_WRITE8_MEMBER(board_mux_w);
-	DECLARE_READ8_MEMBER(inputs_r);
-	TIMER_DEVICE_CALLBACK_MEMBER(refresh_leds);
+	void update_leds();
+	void lcd_output_w(u32 data);
+	void input_mux_w(u8 data);
+	void board_mux_w(u8 data);
+	u8 inputs_r();
 
 	required_device<cpu_device> m_maincpu;
-	required_device<dac_bit_interface> m_dac;
 	required_device<sensorboard_device> m_board;
-	required_device<pwm_display_device> m_display;
+	required_device<hc259_device> m_lcd_latch;
+	required_device<pwm_display_device> m_led_pwm;
+	required_device<pcf2112_device> m_lcd;
 	required_ioport_array<4> m_inputs;
-	output_finder<8> m_digits;
-	output_finder<16> m_leds;
+	output_finder<4> m_digits;
 
-	uint8_t m_input_mux;
-	uint8_t m_board_mux;
-	uint8_t m_lcd_shift;
-	uint8_t m_dac_data;
+	u8 m_input_mux = 0xff;
+	u8 m_board_mux = 0xff;
 };
 
 
 void mondial68k_state::machine_start()
 {
 	m_digits.resolve();
-	m_leds.resolve();
 
 	save_item(NAME(m_input_mux));
 	save_item(NAME(m_board_mux));
-	save_item(NAME(m_lcd_shift));
-	save_item(NAME(m_dac_data));
 }
 
-void mondial68k_state::machine_reset()
+
+
+/******************************************************************************
+    I/O
+******************************************************************************/
+
+void mondial68k_state::update_leds()
 {
-	m_input_mux = 0;
-	m_board_mux = 0;
-	m_lcd_shift = 0;
-	m_dac_data = 0;
+	m_led_pwm->matrix(m_input_mux >> 6, ~m_board_mux);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(mondial68k_state::refresh_leds)
+void mondial68k_state::lcd_output_w(u32 data)
 {
-	for (int i=0; i<16; i++)
-		m_leds[0 + i] = 0;
+	// output LCD digits (note: last digit DP segment is unused)
+	for (int i = 0; i < 4; i++)
+		m_digits[i] = bitswap<8>((data & 0x7fffffff) >> (8 * i), 7,4,5,0,1,2,3,6);
 }
 
-WRITE8_MEMBER( mondial68k_state::lcd_clb_w )
+void mondial68k_state::board_mux_w(u8 data)
 {
-	if (BIT(data, 0))
-		m_lcd_shift++;
-}
-
-WRITE8_MEMBER( mondial68k_state::lcd_dlen_w )
-{
-	m_lcd_shift = 0;
-}
-
-WRITE8_MEMBER( mondial68k_state::lcd_data_w )
-{
-	if (m_lcd_shift > 0 && m_lcd_shift < 0x21)
-		m_display->write_element((m_lcd_shift - 1) / 8, (m_lcd_shift - 1) % 8, BIT(data, 0));
-}
-
-WRITE8_MEMBER( mondial68k_state::speaker_w )
-{
-	m_dac_data ^= 1;
-	m_dac->write(m_dac_data);
-}
-
-WRITE8_MEMBER(mondial68k_state::board_mux_w)
-{
+	// d0-d7: chessboard mux, led data
 	m_board_mux = data;
+	update_leds();
 }
 
-WRITE8_MEMBER(mondial68k_state::input_mux_w)
+void mondial68k_state::input_mux_w(u8 data)
 {
+	// d0-d3: button mux
+	// d6,d7: led select
 	m_input_mux = data;
-	for (int i=0; i<8; i++)
-	{
-		if (!BIT(m_board_mux, i))
-		{
-			if (BIT(m_input_mux, 7))   m_leds[0 + i] = 1;
-			if (BIT(m_input_mux, 6))   m_leds[8 + i] = 1;
-		}
-	}
+	update_leds();
 }
 
-READ8_MEMBER(mondial68k_state::inputs_r)
+u8 mondial68k_state::inputs_r()
 {
-	if      (!(m_input_mux & 0x01))    return m_inputs[0]->read();
-	else if (!(m_input_mux & 0x02))    return m_inputs[1]->read();
-	else if (!(m_input_mux & 0x04))    return m_inputs[2]->read();
-	else if (!(m_input_mux & 0x08))    return m_inputs[3]->read();
+	u8 data = 0;
 
-	uint8_t data = 0x00;
-	for (int i=0; i<8; i++)
+	// read buttons
+	for (int i = 0; i < 4; i++)
+		if (!BIT(m_input_mux, i))
+			data |= m_inputs[i]->read();
+
+	// read chessboard sensors
+	for (int i = 0; i < 8; i++)
 		if (!BIT(m_board_mux, i))
 			data |= m_board->read_rank(i);
 
 	return data;
 }
 
+
+
+/******************************************************************************
+    Address Maps
+******************************************************************************/
+
 void mondial68k_state::mondial68k_mem(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
-	map(0x800000, 0x800001).r(FUNC(mondial68k_state::inputs_r));
-	map(0x820000, 0x820001).w(FUNC(mondial68k_state::lcd_clb_w));
-	map(0x820002, 0x820003).w(FUNC(mondial68k_state::lcd_data_w));
-	map(0x820004, 0x820005).w(FUNC(mondial68k_state::lcd_dlen_w));
-	map(0x82000c, 0x82000d).nopw();
-	map(0x82000e, 0x82000f).w(FUNC(mondial68k_state::speaker_w));
-	map(0x840000, 0x840001).w(FUNC(mondial68k_state::input_mux_w));
-	map(0x860000, 0x860001).w(FUNC(mondial68k_state::board_mux_w));
+	map(0x800000, 0x800000).r(FUNC(mondial68k_state::inputs_r));
+	map(0x820000, 0x82000f).nopr().w(m_lcd_latch, FUNC(hc259_device::write_d0)).umask16(0xff00);
+	map(0x840000, 0x840000).w(FUNC(mondial68k_state::input_mux_w));
+	map(0x860000, 0x860000).w(FUNC(mondial68k_state::board_mux_w));
 	map(0xc00000, 0xc03fff).ram();
 }
 
+
+
+/******************************************************************************
+    Input Ports
+******************************************************************************/
 
 static INPUT_PORTS_START( mondial68k )
 	PORT_START("IN.0")
@@ -195,6 +178,11 @@ static INPUT_PORTS_START( mondial68k )
 INPUT_PORTS_END
 
 
+
+/******************************************************************************
+    Machine Configs
+******************************************************************************/
+
 void mondial68k_state::mondial68k(machine_config &config)
 {
 	/* basic machine hardware */
@@ -202,38 +190,48 @@ void mondial68k_state::mondial68k(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mondial68k_state::mondial68k_mem);
 	m_maincpu->set_periodic_int(FUNC(mondial68k_state::irq5_line_hold), attotime::from_hz(128));
 
+	HC259(config, m_lcd_latch);
+	m_lcd_latch->q_out_cb<0>().set(m_lcd, FUNC(pcf2112_device::clb_w));
+	m_lcd_latch->q_out_cb<1>().set(m_lcd, FUNC(pcf2112_device::data_w));
+	m_lcd_latch->q_out_cb<2>().set(m_lcd, FUNC(pcf2112_device::dlen_w));
+	m_lcd_latch->q_out_cb<6>().set_nop(); // another DAC input?
+	m_lcd_latch->q_out_cb<7>().set("dac", FUNC(dac_1bit_device::write));
+
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	m_board->set_delay(attotime::from_msec(100));
 
 	/* video hardware */
-	PWM_DISPLAY(config, m_display).set_size(4, 8);
-	m_display->set_segmask(0xf, 0x7f);
-	m_display->output_digit().set([this](offs_t offset, u8 data) { m_digits[offset] = bitswap<8>(data, 7,4,5,0,1,2,3,6); });
+	PCF2112(config, m_lcd, 50); // frequency guessed
+	m_lcd->write_segs().set(FUNC(mondial68k_state::lcd_output_w));
+
+	PWM_DISPLAY(config, m_led_pwm).set_size(2, 8);
 	config.set_default_layout(layout_mephisto_mondial68k);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-
-	TIMER(config, "refresh_leds").configure_periodic(FUNC(mondial68k_state::refresh_leds), attotime::from_hz(10));
+	DAC_1BIT(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 
-/***************************************************************************
-  ROM definitions
-***************************************************************************/
+
+/******************************************************************************
+    ROM Definitions
+******************************************************************************/
 
 ROM_START( mondl68k )
-	ROM_REGION16_BE( 0x1000000, "maincpu", 0 )
+	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("68000xl_u_06.11.87", 0x0000, 0x8000, CRC(aebe482a) SHA1(900c91ec836cd65e4cd38e50555976ab8064be41) )
 	ROM_LOAD16_BYTE("68000xl_l_06.11.87", 0x0001, 0x8000, CRC(564e32c5) SHA1(8c9df46bc5ced114e72fb663f1055d775b8e2e0b) )
 ROM_END
 
+} // anonymous namespace
+
+
 
 /***************************************************************************
-  Game drivers
+    Drivers
 ***************************************************************************/
 
-/*    YEAR, NAME,      PARENT    COMPAT  MACHINE      INPUT       CLASS             INIT        COMPANY             FULLNAME                     FLAGS */
-CONS( 1988, mondl68k,  0,        0,      mondial68k,  mondial68k, mondial68k_state, empty_init, "Hegener + Glaser", "Mephisto Mondial 68000XL",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME       PARENT    COMPAT  MACHINE      INPUT       CLASS             INIT        COMPANY             FULLNAME                    FLAGS */
+CONS( 1988, mondl68k,  0,        0,      mondial68k,  mondial68k, mondial68k_state, empty_init, "Hegener + Glaser", "Mephisto Mondial 68000XL", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "softlist_dev.h"
+#include "imagedev/cartrom.h"
 
 
 /* PCB */
@@ -68,6 +68,7 @@ enum
 	NEOGEO_SAMSHO5B,
 	NEOGEO_MSLUG3B6,
 	NEOGEO_MSLUG5P,
+	NEOGEO_MSLUG5B,
 	NEOGEO_KOG,
 	NEOGEO_SBP,
 	NEOGEO_KOF10TH,
@@ -92,13 +93,13 @@ public:
 	virtual ~device_neogeo_cart_interface();
 
 	// reading from ROM
-	virtual DECLARE_READ16_MEMBER(rom_r) { return 0xffff; }
-	virtual DECLARE_WRITE16_MEMBER(banksel_w) { }
-	virtual DECLARE_READ16_MEMBER(ram_r) { return 0xffff; }
-	virtual DECLARE_WRITE16_MEMBER(ram_w) { }
-	virtual DECLARE_READ16_MEMBER(protection_r) { return 0xffff; }
-	virtual DECLARE_WRITE16_MEMBER(protection_w) { }
-	virtual DECLARE_READ16_MEMBER(addon_r) { return 0xffff; }
+	virtual uint16_t rom_r(offs_t offset) { return 0xffff; }
+	virtual void banksel_w(uint16_t data) { }
+	virtual uint16_t ram_r(offs_t offset) { return 0xffff; }
+	virtual void ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { }
+	virtual uint16_t protection_r(address_space &space, offs_t offset) { return 0xffff; }
+	virtual void protection_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { }
+	virtual uint16_t addon_r(offs_t offset) { return 0xffff; }
 	virtual uint32_t get_bank_base(uint16_t sel) { return 0; }
 	virtual uint32_t get_special_bank() { return 0; }
 	virtual uint16_t get_helper() { return 0; }
@@ -185,7 +186,7 @@ protected:
 // ======================> neogeo_cart_slot_device
 
 class neogeo_cart_slot_device : public device_t,
-								public device_image_interface,
+								public device_cartrom_image_interface,
 								public device_single_card_slot_interface<device_neogeo_cart_interface>
 {
 public:
@@ -206,11 +207,6 @@ public:
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 
-	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return false; }
-	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "neo_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "bin"; }
@@ -219,13 +215,13 @@ public:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
-	DECLARE_READ16_MEMBER(rom_r);
-	DECLARE_WRITE16_MEMBER(banksel_w);
-	DECLARE_READ16_MEMBER(ram_r);
-	DECLARE_WRITE16_MEMBER(ram_w);
-	DECLARE_READ16_MEMBER(protection_r);
-	DECLARE_WRITE16_MEMBER(protection_w);
-	DECLARE_READ16_MEMBER(addon_r);
+	uint16_t rom_r(offs_t offset);
+	void banksel_w(uint16_t data);
+	uint16_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t protection_r(address_space &space, offs_t offset);
+	void protection_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t addon_r(offs_t offset);
 
 	void set_cart_type(const char *slot);
 	int get_type() { return m_type; }
@@ -336,9 +332,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-
-	// device_image_interface implementation
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 private:
 	int m_type;

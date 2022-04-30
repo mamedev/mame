@@ -57,7 +57,7 @@ bool windows_osd_interface::video_init()
 	window_init();
 
 	// create the windows
-	windows_options &options = downcast<windows_options &>(machine().options());
+	auto &options = downcast<windows_options &>(machine().options());
 	for (int index = 0; index < video_config.numscreens; index++)
 	{
 		win_window_info::create(machine(), index, m_monitor_module->pick_monitor(options, index), &windows[index]);
@@ -150,7 +150,6 @@ void windows_osd_interface::extract_video_config()
 	video_config.windowed      = options().window();
 	video_config.prescale      = options().prescale();
 	video_config.filter        = options().filter();
-	video_config.keepaspect    = options().keep_aspect();
 	video_config.numscreens    = options().numscreens();
 
 	// if we are in debug mode, never go full screen

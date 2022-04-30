@@ -73,12 +73,12 @@ TIMER_CALLBACK_MEMBER(vectrex_base_state::lightpen_trigger)
 
 *********************************************************************/
 
-READ8_MEMBER(vectrex_base_state::vectrex_via_r)
+uint8_t vectrex_base_state::vectrex_via_r(offs_t offset)
 {
 	return m_via6522_0->read(offset);
 }
 
-WRITE8_MEMBER(vectrex_base_state::vectrex_via_w)
+void vectrex_base_state::vectrex_via_w(offs_t offset, uint8_t data)
 {
 	attotime period;
 
@@ -123,8 +123,6 @@ TIMER_CALLBACK_MEMBER(vectrex_base_state::vectrex_refresh)
 
 uint32_t vectrex_base_state::screen_update_vectrex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int i;
-
 	vectrex_configuration();
 
 	/* start black */
@@ -133,7 +131,7 @@ uint32_t vectrex_base_state::screen_update_vectrex(screen_device &screen, bitmap
 						m_points[m_display_start].col,
 						0);
 
-	for (i = m_display_start; i != m_display_end; i = (i + 1) % NVECT)
+	for (int i = m_display_start; i != m_display_end; i = (i + 1) % NVECT)
 	{
 		m_vector->add_point(m_points[i].x,
 							m_points[i].y,
@@ -200,7 +198,7 @@ TIMER_CALLBACK_MEMBER(vectrex_base_state::vectrex_zero_integrators)
 
 *********************************************************************/
 
-TIMER_CALLBACK_MEMBER(vectrex_base_state::update_signal)
+void vectrex_base_state::update_vector()
 {
 	int length;
 
@@ -221,9 +219,6 @@ TIMER_CALLBACK_MEMBER(vectrex_base_state::update_signal)
 	}
 
 	m_vector_start_time = machine().time();
-
-	if (ptr)
-		* (uint8_t *) ptr = param;
 }
 
 
@@ -245,6 +240,15 @@ void vectrex_base_state::video_start()
 	vector_add_point_function = &vectrex_base_state::vectrex_add_point;
 
 	m_refresh = timer_alloc(TIMER_VECTREX_REFRESH);
+
+	m_display_start = 0;
+	m_display_end = 0;
+	m_reset_refresh = 0;
+	m_blank = 0;
+	m_ramp = 0;
+	std::fill(std::begin(m_analog), std::end(m_analog), 0);
+	m_point_index = 0;
+	m_lightpen_down = 0;
 }
 
 void vectrex_state::video_start()
@@ -268,14 +272,14 @@ void vectrex_state::video_start()
 
 void vectrex_base_state::vectrex_multiplexer(int mux)
 {
-	timer_set(attotime::from_nsec(ANALOG_DELAY), TIMER_UPDATE_SIGNAL, m_via_out[PORTA], &m_analog[mux]);
+	timer_set(attotime::from_nsec(ANALOG_DELAY), TIMER_UPDATE_ANALOG, mux);
 
 	if (mux == A_AUDIO)
 		m_dac->write(m_via_out[PORTA] ^ 0x80); // not gate shown on schematic
 }
 
 
-WRITE8_MEMBER(vectrex_base_state::v_via_pb_w)
+void vectrex_base_state::v_via_pb_w(uint8_t data)
 {
 	if (!(data & 0x80))
 	{
@@ -323,7 +327,7 @@ WRITE8_MEMBER(vectrex_base_state::v_via_pb_w)
 		if (!(data & 0x1) && (m_via_out[PORTB] & 0x1))
 		{
 			/* MUX has been enabled */
-			timer_set(attotime::from_nsec(ANALOG_DELAY), TIMER_UPDATE_SIGNAL);
+			timer_set(attotime::from_nsec(ANALOG_DELAY), TIMER_UPDATE_MUX_ENABLE);
 		}
 	}
 	else
@@ -339,7 +343,7 @@ WRITE8_MEMBER(vectrex_base_state::v_via_pb_w)
 
 	/* Cartridge bank-switching */
 	if (m_cart && ((data ^ m_via_out[PORTB]) & 0x40))
-		m_cart->write_bank(space, 0, data);
+		m_cart->write_bank(data);
 
 	/* Sound */
 	if (data & 0x10)
@@ -354,15 +358,15 @@ WRITE8_MEMBER(vectrex_base_state::v_via_pb_w)
 		vectrex_multiplexer((data >> 1) & 0x3);
 
 	m_via_out[PORTB] = data;
-	timer_set(attotime::from_nsec(ANALOG_DELAY), TIMER_UPDATE_SIGNAL, data & 0x80, &m_ramp);
+	timer_set(attotime::from_nsec(ANALOG_DELAY), TIMER_UPDATE_RAMP, data & 0x80);
 }
 
 
-WRITE8_MEMBER(vectrex_base_state::v_via_pa_w)
+void vectrex_base_state::v_via_pa_w(uint8_t data)
 {
 	/* DAC output always goes to Y integrator */
 	m_via_out[PORTA] = data;
-	timer_set(attotime::from_nsec(ANALOG_DELAY), TIMER_UPDATE_SIGNAL, data, &m_analog[A_Y]);
+	timer_set(attotime::from_nsec(ANALOG_DELAY), TIMER_UPDATE_ANALOG, A_Y);
 
 	if (!(m_via_out[PORTB] & 0x1))
 		vectrex_multiplexer((m_via_out[PORTB] >> 1) & 0x3);
@@ -399,7 +403,7 @@ WRITE_LINE_MEMBER(vectrex_base_state::v_via_cb2_w)
 			}
 		}
 
-		timer_set(attotime::zero, TIMER_UPDATE_SIGNAL, state, &m_blank);
+		timer_set(attotime::zero, TIMER_UPDATE_BLANK, state);
 		m_cb2 = state;
 	}
 }
@@ -411,7 +415,7 @@ WRITE_LINE_MEMBER(vectrex_base_state::v_via_cb2_w)
 
 *****************************************************************/
 
-WRITE8_MEMBER(raaspec_state::raaspec_led_w)
+void raaspec_state::raaspec_led_w(uint8_t data)
 {
 	logerror("Spectrum I+ LED: %i%i%i%i%i%i%i%i\n",
 				(data>>7)&0x1, (data>>6)&0x1, (data>>5)&0x1, (data>>4)&0x1,

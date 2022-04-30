@@ -30,7 +30,7 @@ public:
 		m_maincpu(*this, Z80_TAG),
 		m_cop(*this, COP420_TAG),
 		m_palette(*this, "palette"),
-		m_exp(*this, NEWBRAIN_EXPANSION_SLOT_TAG),
+		m_exp(*this, "exp"),
 		m_cassette1(*this, "cassette1"),
 		m_cassette2(*this, "cassette2"),
 		m_rs232_v24(*this, RS232_V24_TAG),
@@ -58,20 +58,20 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( mreq_r );
-	DECLARE_WRITE8_MEMBER( mreq_w );
-	DECLARE_READ8_MEMBER( iorq_r );
-	DECLARE_WRITE8_MEMBER( iorq_w );
+	uint8_t mreq_r(offs_t offset);
+	void mreq_w(offs_t offset, uint8_t data);
+	uint8_t iorq_r(offs_t offset);
+	void iorq_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER( enrg_w );
-	DECLARE_WRITE8_MEMBER( tvtl_w );
-	DECLARE_READ8_MEMBER( ust_a_r );
-	DECLARE_READ8_MEMBER( ust_b_r );
+	void enrg_w(uint8_t data);
+	void tvtl_w(uint8_t data);
+	uint8_t ust_a_r();
+	uint8_t ust_b_r();
 
-	DECLARE_WRITE8_MEMBER( cop_g_w );
-	DECLARE_READ8_MEMBER( cop_g_r );
-	DECLARE_WRITE8_MEMBER( cop_d_w );
-	DECLARE_READ8_MEMBER( cop_in_r );
+	void cop_g_w(uint8_t data);
+	uint8_t cop_g_r();
+	void cop_d_w(uint8_t data);
+	uint8_t cop_in_r();
 	DECLARE_WRITE_LINE_MEMBER( k2_w );
 	DECLARE_READ_LINE_MEMBER( tdi_r );
 	DECLARE_WRITE_LINE_MEMBER( k1_w );
@@ -79,7 +79,7 @@ private:
 	void newbrain_iorq(address_map &map);
 	void newbrain_mreq(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -117,32 +117,32 @@ private:
 	required_ioport_array<16> m_y;
 	output_finder<16> m_digits;
 
-	int m_clk;
-	int m_tvp;
-	int m_pwrup;
-	int m_userint;
-	int m_clkint;
-	int m_copint;
+	int m_clk = 0;
+	int m_tvp = 0;
+	int m_pwrup = 0;
+	int m_userint = 0;
+	int m_clkint = 0;
+	int m_copint = 0;
 
-	int m_cop_so;
-	int m_cop_tdo;
-	int m_cop_g1;
-	int m_cop_g3;
-	int m_cop_k6;
+	int m_cop_so = 0;
+	int m_cop_tdo = 0;
+	int m_cop_g1 = 0;
+	int m_cop_g3 = 0;
+	int m_cop_k6 = 0;
 
-	int m_405_q;
-	uint8_t m_403_q;
-	uint8_t m_403_d;
-	uint16_t m_402_q;
+	int m_405_q = 0;
+	uint8_t m_403_q = 0;
+	uint8_t m_403_d = 0;
+	uint16_t m_402_q = 0;
 
-	int m_rv;
-	int m_fs;
-	int m_32_40;
-	int m_ucr;
-	int m_80l;
-	uint16_t m_tvl;
+	int m_rv = 0;
+	int m_fs = 0;
+	int m_32_40 = 0;
+	int m_ucr = 0;
+	int m_80l = 0;
+	uint16_t m_tvl = 0;
 
-	emu_timer *m_clkint_timer;
+	emu_timer *m_clkint_timer = nullptr;
 };
 
 #endif

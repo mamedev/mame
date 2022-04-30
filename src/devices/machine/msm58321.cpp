@@ -189,7 +189,8 @@ msm58321_device::msm58321_device(const machine_config &mconfig, const char *tag,
 	m_test(0),
 	m_cs1(0),
 	m_address(0xf),
-	m_reg{}
+	m_reg{},
+	m_khz_ctr(0)
 {
 }
 
@@ -238,6 +239,7 @@ void msm58321_device::device_start()
 	save_item(NAME(m_cs1));
 	save_item(NAME(m_address));
 	save_item(NAME(m_reg));
+	save_item(NAME(m_khz_ctr));
 }
 
 
@@ -245,7 +247,7 @@ void msm58321_device::device_start()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void msm58321_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void msm58321_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -348,11 +350,14 @@ void msm58321_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void msm58321_device::nvram_read(emu_file &file)
+bool msm58321_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_reg.data(), m_reg.size());
+	size_t actual;
+	if (file.read(m_reg.data(), m_reg.size(), actual) || actual != m_reg.size())
+		return false;
 
 	clock_updated();
+	return true;
 }
 
 
@@ -361,9 +366,10 @@ void msm58321_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void msm58321_device::nvram_write(emu_file &file)
+bool msm58321_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_reg.data(), m_reg.size());
+	size_t actual;
+	return !file.write(m_reg.data(), m_reg.size(), actual) && actual == m_reg.size();
 }
 
 //-------------------------------------------------

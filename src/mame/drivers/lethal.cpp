@@ -268,7 +268,7 @@ static const char *const gunnames[] = { "LIGHT0_X", "LIGHT0_Y", "LIGHT1_X", "LIG
 #define GUNX( a ) (( ( ioport(gunnames[2 * (a - 1)])->read() * 287 ) / 0xff ) + 16)
 #define GUNY( a ) (( ( ioport(gunnames[2 * (a - 1) + 1])->read() * 223 ) / 0xff ) + 10)
 
-WRITE8_MEMBER(lethal_state::control2_w)
+void lethal_state::control2_w(uint8_t data)
 {
 	/* bit 0 is data */
 	/* bit 1 is cs (active low) */
@@ -291,23 +291,23 @@ INTERRUPT_GEN_MEMBER(lethal_state::lethalen_interrupt)
 		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
-READ8_MEMBER(lethal_state::sound_irq_r)
+uint8_t lethal_state::sound_irq_r()
 {
 	m_soundcpu->set_input_line(0, HOLD_LINE);
 	return 0x00;
 }
 
-WRITE8_MEMBER(lethal_state::sound_irq_w)
+void lethal_state::sound_irq_w(uint8_t data)
 {
 	m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER(lethal_state::le_bankswitch_w)
+void lethal_state::le_bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data);
 }
 
-READ8_MEMBER(lethal_state::guns_r)
+uint8_t lethal_state::guns_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -330,7 +330,7 @@ READ8_MEMBER(lethal_state::guns_r)
 	return 0;
 }
 
-READ8_MEMBER(lethal_state::gunsaux_r)
+uint8_t lethal_state::gunsaux_r()
 {
 	int res = 0;
 
@@ -365,7 +365,7 @@ void lethal_state::bank4000_map(address_map &map)
 {
 	// VRD = 0 or 1, CBNK = 0
 	map(0x0840, 0x084f).mirror(0x8000).rw(m_k053244, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w));
-	map(0x0880, 0x089f).mirror(0x8000).rw("k054000", FUNC(k054000_device::read), FUNC(k054000_device::write));
+	map(0x0880, 0x089f).mirror(0x8000).m("k054000", FUNC(k054000_device::map));
 	map(0x08c0, 0x08cf).m(m_k054321, FUNC(k054321_device::main_map));
 	map(0x1000, 0x17ff).mirror(0x8000).rw(m_k053244, FUNC(k05324x_device::k053245_r), FUNC(k05324x_device::k053245_w));
 

@@ -62,8 +62,8 @@ public:
 
 	template <typename... T> void set_pixel_update_cb(T &&... args) { m_pixel_update_cb.set(std::forward<T>(args)...); }
 
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
+	u8 io_r(offs_t offset);
+	void io_w(offs_t offset, u8 data);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -95,9 +95,9 @@ private:
 	pixel_update_delegate m_pixel_update_cb;
 
 	// i/o ports
-	devcb_write8 m_write_r[5];
-	devcb_read8 m_read_p[4];
-	devcb_write8 m_write_p[4];
+	devcb_write8::array<5> m_write_r;
+	devcb_read8::array<4> m_read_p;
+	devcb_write8::array<4> m_write_p;
 	void write_r(u8 port, u8 data);
 	void write_r4_out();
 	void write_p(u8 port, u8 data);

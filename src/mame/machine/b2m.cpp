@@ -11,14 +11,9 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "imagedev/cassette.h"
-#include "machine/wd_fdc.h"
-#include "machine/pic8259.h"
-#include "machine/i8251.h"
 #include "includes/b2m.h"
-#include "machine/ram.h"
 
-READ8_MEMBER(b2m_state::b2m_keyboard_r)
+uint8_t b2m_state::keyboard_r(offs_t offset)
 {
 	uint8_t key = 0x00;
 	if (offset < 0x100) {
@@ -39,136 +34,92 @@ READ8_MEMBER(b2m_state::b2m_keyboard_r)
 }
 
 
-void b2m_state::b2m_set_bank(int bank)
+void b2m_state::set_bank(int bank)
 {
 	uint8_t *rom;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint8_t *ram = m_ram->pointer();
 
-	space.install_write_bank(0x0000, 0x27ff, "bank1");
-	space.install_write_bank(0x2800, 0x2fff, "bank2");
-	space.install_write_bank(0x3000, 0x6fff, "bank3");
-	space.install_write_bank(0x7000, 0xdfff, "bank4");
-	space.install_write_bank(0xe000, 0xffff, "bank5");
+	space.install_ram(0x0000, 0xffff, ram);
 
 	rom = memregion("maincpu")->base();
 	switch(bank) {
-		case 0 :
-		case 1 :
-						space.unmap_write(0xe000, 0xffff);
+	case 0 :
+	case 1 :
+		space.unmap_write(0xe000, 0xffff);
+		space.install_rom(0xe000, 0xffff, rom);
+		break;
+	case 2 :
+		space.unmap_write(0x2800, 0x2fff);
+		space.install_read_handler(0x2800, 0x2fff, read8sm_delegate(*this, FUNC(b2m_state::keyboard_r)));
+		space.install_ram(0x3000, 0x6fff, ram + 0x10000);
+		space.unmap_write(0xe000, 0xffff);
+		space.install_rom(0xe000, 0xffff, rom);
+		break;
+	case 3 :
+		space.unmap_write(0x2800, 0x2fff);
+		space.install_read_handler(0x2800, 0x2fff, read8sm_delegate(*this, FUNC(b2m_state::keyboard_r)));
+		space.install_ram(0x3000, 0x6fff, ram + 0x14000);
+		space.unmap_write(0xe000, 0xffff);
+		space.install_rom(0xe000, 0xffff, rom);
+		break;
+	case 4 :
+		space.install_read_handler(0x2800, 0x2fff, read8sm_delegate(*this, FUNC(b2m_state::keyboard_r)));
+		space.install_ram(0x3000, 0x6fff, ram + 0x18000);
+		space.unmap_write(0xe000, 0xffff);
+		space.install_rom(0xe000, 0xffff, rom);
+		break;
+	case 5 :
+		space.unmap_write(0x2800, 0x2fff);
+		space.install_read_handler(0x2800, 0x2fff, read8sm_delegate(*this, FUNC(b2m_state::keyboard_r)));
+		space.install_ram(0x3000, 0x6fff, ram + 0x1c000);
+		space.unmap_write(0xe000, 0xffff);
+		space.install_rom(0xe000, 0xffff, rom);
+		break;
+	case 6 :
+		break;
+	case 7 :
+		space.unmap_write(0x0000, 0xffff);
+		space.unmap_read(0x0000, 0xffff);
 
-						membank("bank1")->set_base(ram);
-						membank("bank2")->set_base(ram + 0x2800);
-						membank("bank3")->set_base(ram + 0x3000);
-						membank("bank4")->set_base(ram + 0x7000);
-						membank("bank5")->set_base(rom + 0x10000);
-						break;
-#if 0
-		case 1 :
-						space.unmap_write(0x3000, 0x6fff);
-						space.unmap_write(0xe000, 0xffff);
-
-						membank("bank1")->set_base(ram);
-						membank("bank2")->set_base(ram + 0x2800);
-						membank("bank3")->set_base(rom + 0x12000);
-						membank("bank4")->set_base(rom + 0x16000);
-						membank("bank5")->set_base(rom + 0x10000);
-						break;
-#endif
-		case 2 :
-						space.unmap_write(0x2800, 0x2fff);
-						space.unmap_write(0xe000, 0xffff);
-
-						membank("bank1")->set_base(ram);
-						space.install_read_handler(0x2800, 0x2fff, read8_delegate(*this, FUNC(b2m_state::b2m_keyboard_r)));
-						membank("bank3")->set_base(ram + 0x10000);
-						membank("bank4")->set_base(ram + 0x7000);
-						membank("bank5")->set_base(rom + 0x10000);
-						break;
-		case 3 :
-						space.unmap_write(0x2800, 0x2fff);
-						space.unmap_write(0xe000, 0xffff);
-
-						membank("bank1")->set_base(ram);
-						space.install_read_handler(0x2800, 0x2fff, read8_delegate(*this, FUNC(b2m_state::b2m_keyboard_r)));
-						membank("bank3")->set_base(ram + 0x14000);
-						membank("bank4")->set_base(ram + 0x7000);
-						membank("bank5")->set_base(rom + 0x10000);
-						break;
-		case 4 :
-						space.unmap_write(0x2800, 0x2fff);
-						space.unmap_write(0xe000, 0xffff);
-
-						membank("bank1")->set_base(ram);
-						space.install_read_handler(0x2800, 0x2fff, read8_delegate(*this, FUNC(b2m_state::b2m_keyboard_r)));
-						membank("bank3")->set_base(ram + 0x18000);
-						membank("bank4")->set_base(ram + 0x7000);
-						membank("bank5")->set_base(rom + 0x10000);
-
-						break;
-		case 5 :
-						space.unmap_write(0x2800, 0x2fff);
-						space.unmap_write(0xe000, 0xffff);
-
-						membank("bank1")->set_base(ram);
-						space.install_read_handler(0x2800, 0x2fff, read8_delegate(*this, FUNC(b2m_state::b2m_keyboard_r)));
-						membank("bank3")->set_base(ram + 0x1c000);
-						membank("bank4")->set_base(ram + 0x7000);
-						membank("bank5")->set_base(rom + 0x10000);
-
-						break;
-		case 6 :
-						membank("bank1")->set_base(ram);
-						membank("bank2")->set_base(ram + 0x2800);
-						membank("bank3")->set_base(ram + 0x3000);
-						membank("bank4")->set_base(ram + 0x7000);
-						membank("bank5")->set_base(ram + 0xe000);
-						break;
-		case 7 :
-						space.unmap_write(0x0000, 0x27ff);
-						space.unmap_write(0x2800, 0x2fff);
-						space.unmap_write(0x3000, 0x6fff);
-						space.unmap_write(0x7000, 0xdfff);
-						space.unmap_write(0xe000, 0xffff);
-
-						membank("bank1")->set_base(rom + 0x10000);
-						membank("bank2")->set_base(rom + 0x10000);
-						membank("bank3")->set_base(rom + 0x10000);
-						membank("bank4")->set_base(rom + 0x10000);
-						membank("bank5")->set_base(rom + 0x10000);
-						break;
+		space.install_rom(0x0000, 0x1fff, rom);
+		space.install_rom(0x2800, 0x2fff, rom);
+		space.install_rom(0x3000, 0x4fff, rom);
+		space.install_rom(0x7000, 0x8fff, rom);
+		space.install_rom(0xe000, 0xffff, rom);
+		break;
 	}
 }
 
 
-WRITE_LINE_MEMBER(b2m_state::bm2_pit_out1)
+WRITE_LINE_MEMBER(b2m_state::pit_out1)
 {
 	m_speaker->level_w(state);
 }
 
-WRITE8_MEMBER(b2m_state::b2m_8255_porta_w)
+void b2m_state::ppi1_porta_w(uint8_t data)
 {
-	m_b2m_8255_porta = data;
+	m_porta = data;
 }
 
-WRITE8_MEMBER(b2m_state::b2m_8255_portb_w)
+void b2m_state::ppi1_portb_w(uint8_t data)
 {
-	m_b2m_video_scroll = data;
+	m_video_scroll = data;
 }
 
-WRITE8_MEMBER(b2m_state::b2m_8255_portc_w)
+void b2m_state::ppi1_portc_w(uint8_t data)
 {
-	m_b2m_8255_portc = data;
-	b2m_set_bank(m_b2m_8255_portc & 7);
-	m_b2m_video_page = (m_b2m_8255_portc >> 7) & 1;
+	m_portc = data;
+	set_bank(m_portc & 7);
+	m_video_page = BIT(m_portc, 7);
 }
 
-READ8_MEMBER(b2m_state::b2m_8255_portb_r)
+uint8_t b2m_state::ppi1_portb_r()
 {
-	return m_b2m_video_scroll;
+	return m_video_scroll;
 }
 
-WRITE_LINE_MEMBER( b2m_state::b2m_fdc_drq )
+WRITE_LINE_MEMBER( b2m_state::fdc_drq )
 {
 	/* Clears HALT state of CPU when data is ready to read */
 	if (state)
@@ -176,27 +127,22 @@ WRITE_LINE_MEMBER( b2m_state::b2m_fdc_drq )
 }
 
 
-WRITE8_MEMBER(b2m_state::b2m_ext_8255_portc_w)
+void b2m_state::ppi2_portc_w(uint8_t data)
 {
-	uint8_t drive = ((data >> 1) & 1) ^ 1;
-	uint8_t side  = (data  & 1) ^ 1;
+	uint8_t drive = BIT(~data, 1);
+	uint8_t side  = BIT(~data, 0);
 
 	floppy_image_device *floppy = nullptr;
 	if (m_fd[drive].found())
 		floppy = m_fd[drive]->get_device();
 
-	if (floppy != nullptr)
+	if (floppy)
 		floppy->mon_w(0);
 	m_fdc->set_floppy(floppy);
-	if (m_b2m_drive!=drive) {
-		m_b2m_drive = drive;
-	}
 
-	if (m_b2m_side!=side) {
-		m_b2m_side = side;
-		if (floppy != nullptr)
-			floppy->ss_w(side);
-	}
+	if (floppy)
+		floppy->ss_w(side);
+
 	/*
 	    When bit 5 is set CPU is in HALT state and stay there until
 	    DRQ is triggered from floppy side
@@ -207,84 +153,75 @@ WRITE8_MEMBER(b2m_state::b2m_ext_8255_portc_w)
 	}
 }
 
-READ8_MEMBER(b2m_state::b2m_romdisk_porta_r)
+uint8_t b2m_state::romdisk_porta_r()
 {
-	uint8_t *romdisk = memregion("maincpu")->base() + 0x12000;
-	return romdisk[m_b2m_romdisk_msb*256+m_b2m_romdisk_lsb];
+	uint8_t *romdisk = memregion("maincpu")->base() + 0x2000;
+	return romdisk[m_romdisk_msb*256+m_romdisk_lsb];
 }
 
-WRITE8_MEMBER(b2m_state::b2m_romdisk_portb_w)
+void b2m_state::romdisk_portb_w(uint8_t data)
 {
-	m_b2m_romdisk_lsb = data;
+	m_romdisk_lsb = data;
 }
 
-WRITE8_MEMBER(b2m_state::b2m_romdisk_portc_w)
+void b2m_state::romdisk_portc_w(uint8_t data)
 {
-	m_b2m_romdisk_msb = data & 0x7f;
+	m_romdisk_msb = data & 0x7f;
 }
 
-/* Driver initialization */
-void b2m_state::init_b2m()
+void b2m_state::palette_w(offs_t offset, uint8_t data)
 {
-	m_vblank_state = 0;
-}
+	uint8_t b = BIT(~data, 6, 2) * 0x55;
+	uint8_t g = BIT(~data, 4, 2) * 0x55;
+	uint8_t r = BIT(~data, 2, 2) * 0x55;
 
-WRITE8_MEMBER(b2m_state::b2m_palette_w)
-{
-	uint8_t b = (3 - ((data >> 6) & 3)) * 0x55;
-	uint8_t g = (3 - ((data >> 4) & 3)) * 0x55;
-	uint8_t r = (3 - ((data >> 2) & 3)) * 0x55;
+	uint8_t bw = BIT(~data, 0, 2) * 0x55;
 
-	uint8_t bw = (3 - (data & 3)) * 0x55;
+	m_color[offset & 3] = data;
 
-	m_b2m_color[offset & 3] = data;
-
-	if (ioport("MONITOR")->read()==1) {
+	if (ioport("MONITOR")->read()==1)
 		m_palette->set_pen_color(offset, r, g, b);
-	} else {
+	else
 		m_palette->set_pen_color(offset, bw, bw, bw);
-	}
 }
 
-READ8_MEMBER(b2m_state::b2m_palette_r)
+uint8_t b2m_state::palette_r(offs_t offset)
 {
-	return m_b2m_color[offset];
+	return m_color[offset];
 }
 
-WRITE8_MEMBER(b2m_state::b2m_localmachine_w)
+void b2m_state::localmachine_w(uint8_t data)
 {
-	m_b2m_localmachine = data;
+	m_localmachine = data;
 }
 
-READ8_MEMBER(b2m_state::b2m_localmachine_r)
+uint8_t b2m_state::localmachine_r()
 {
-	return m_b2m_localmachine;
+	return m_localmachine;
 }
 
-void b2m_state::b2m_postload()
+void b2m_state::postload()
 {
-	b2m_set_bank(m_b2m_8255_portc & 7);
+	set_bank(m_portc & 7);
 }
 
 void b2m_state::machine_start()
 {
 	/* register for state saving */
-	save_item(NAME(m_b2m_8255_porta));
-	save_item(NAME(m_b2m_video_scroll));
-	save_item(NAME(m_b2m_8255_portc));
-	save_item(NAME(m_b2m_video_page));
-	save_item(NAME(m_b2m_drive));
-	save_item(NAME(m_b2m_side));
-	save_item(NAME(m_b2m_romdisk_lsb));
-	save_item(NAME(m_b2m_romdisk_msb));
-	save_pointer(NAME(m_b2m_color), 4);
-	save_item(NAME(m_b2m_localmachine));
+	save_item(NAME(m_porta));
+	save_item(NAME(m_video_scroll));
+	save_item(NAME(m_portc));
+	save_item(NAME(m_video_page));
+	save_item(NAME(m_romdisk_lsb));
+	save_item(NAME(m_romdisk_msb));
+	save_pointer(NAME(m_color), 4);
+	save_item(NAME(m_localmachine));
 	save_item(NAME(m_vblank_state));
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(b2m_state::b2m_postload), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(b2m_state::postload), this));
 }
 
-INTERRUPT_GEN_MEMBER(b2m_state::b2m_vblank_interrupt)
+INTERRUPT_GEN_MEMBER(b2m_state::vblank_interrupt)
 {
 	m_vblank_state++;
 	if (m_vblank_state>1) m_vblank_state=0;
@@ -293,8 +230,49 @@ INTERRUPT_GEN_MEMBER(b2m_state::b2m_vblank_interrupt)
 
 void b2m_state::machine_reset()
 {
-	m_b2m_side = 0;
-	m_b2m_drive = 0;
+	m_vblank_state = 0;
+	set_bank(7);
+}
 
-	b2m_set_bank(7);
+uint32_t b2m_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	u8 const *const ram = m_ram->pointer();
+
+	for (int x = 0; x < 48; x++)
+	{
+		for (int y = 0; y < 256; y++)
+		{
+			u16 const t = x*256 + ((y + m_video_scroll) & 0xff);
+			u8 code1, code2;
+			if (m_video_page==0)
+			{
+				code1 = ram[0x11000 + t];
+				code2 = ram[0x15000 + t];
+			}
+			else
+			{
+				code1 = ram[0x19000 + t];
+				code2 = ram[0x1d000 + t];
+			}
+			for (int b = 7; b >= 0; b--)
+			{
+				u8 const col = (BIT(code2, b)<<1) + BIT(code1, b);
+				bitmap.pix(y, x*8+b) =  col;
+			}
+		}
+	}
+
+	return 0;
+}
+
+void b2m_state::b2m_palette(palette_device &palette) const
+{
+	static constexpr rgb_t b2m_pens[4] = {
+		{ 0x00, 0x00, 0x00 }, // 0
+		{ 0x00, 0x00, 0x00 }, // 1
+		{ 0x00, 0x00, 0x00 }, // 2
+		{ 0x00, 0x00, 0x00 }, // 3
+	};
+
+	palette.set_pen_colors(0, b2m_pens);
 }

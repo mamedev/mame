@@ -105,8 +105,8 @@ enum
 
 #define TMS340X0_SCANLINE_IND16_CB_MEMBER(_name) void _name(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms340x0_device::display_params *params)
 #define TMS340X0_SCANLINE_RGB32_CB_MEMBER(_name) void _name(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms340x0_device::display_params *params)
-#define TMS340X0_TO_SHIFTREG_CB_MEMBER(_name) void _name(address_space &space, offs_t address, uint16_t *shiftreg)
-#define TMS340X0_FROM_SHIFTREG_CB_MEMBER(_name) void _name(address_space &space, offs_t address, uint16_t *shiftreg)
+#define TMS340X0_TO_SHIFTREG_CB_MEMBER(_name) void _name(offs_t address, uint16_t *shiftreg)
+#define TMS340X0_FROM_SHIFTREG_CB_MEMBER(_name) void _name(offs_t address, uint16_t *shiftreg)
 
 
 class tms340x0_device : public cpu_device,
@@ -126,8 +126,8 @@ public:
 
 	typedef device_delegate<void (screen_device &screen, bitmap_ind16 &bitmap, int scanline, const display_params *params)> scanline_ind16_cb_delegate;
 	typedef device_delegate<void (screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const display_params *params)> scanline_rgb32_cb_delegate;
-	typedef device_delegate<void (address_space &space, offs_t address, uint16_t *shiftreg)> shiftreg_in_cb_delegate;
-	typedef device_delegate<void (address_space &space, offs_t address, uint16_t *shiftreg)> shiftreg_out_cb_delegate;
+	typedef device_delegate<void (offs_t address, uint16_t *shiftreg)> shiftreg_in_cb_delegate;
+	typedef device_delegate<void (offs_t address, uint16_t *shiftreg)> shiftreg_out_cb_delegate;
 
 	void set_halt_on_reset(bool halt_on_reset) { m_halt_on_reset = halt_on_reset; }
 	void set_pixel_clock(uint32_t pixclock) { m_pixclock = pixclock; }
@@ -252,7 +252,7 @@ protected:
 	};
 
 	// construction/destruction
-	tms340x0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_regs_map = address_map_constructor());
+	tms340x0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_regs_map, bool is_34020);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -277,16 +277,14 @@ protected:
 	typedef uint32_t (tms340x0_device::*raster_op_func)(uint32_t newpix, uint32_t oldpix);
 	typedef void (tms340x0_device::*wfield_func)(offs_t offset, uint32_t data);
 	typedef uint32_t (tms340x0_device::*rfield_func)(offs_t offset);
-	typedef void (tms340x0_device::*opcode_func)(uint16_t op);
 	typedef uint32_t (tms340x0_device::*pixel_op_func)(uint32_t, uint32_t, uint32_t);
 	typedef void (tms340x0_device::*pixblt_op_func)(int, int);
 	typedef void (tms340x0_device::*pixblt_b_op_func)(int);
-	typedef void (tms340x0_device::*word_write_func)(address_space &space, offs_t offset,uint16_t data);
-	typedef uint16_t (tms340x0_device::*word_read_func)(address_space &space, offs_t offset);
+	typedef void (tms340x0_device::*word_write_func)(offs_t offset, uint16_t data);
+	typedef uint16_t (tms340x0_device::*word_read_func)(offs_t offset);
 
 	static const wfield_func s_wfield_functions[32];
 	static const rfield_func s_rfield_functions[64];
-	static const opcode_func s_opcode_table[65536 >> 4];
 	static const pixel_op_func s_pixel_op_table[32];
 	static const uint8_t s_pixel_op_timing_table[33];
 	static const pixblt_op_func s_pixblt_op_table[];
@@ -312,14 +310,13 @@ protected:
 	uint32_t           m_convmp;
 	int32_t            m_gfxcycles;
 	uint8_t            m_pixelshift;
-	uint8_t            m_is_34020;
+	const bool         m_is_34020;
 	bool             m_reset_deferred;
 	bool             m_halt_on_reset; /* /HCS pin, which determines HALT state after reset */
 	uint8_t            m_hblank_stable;
 	uint8_t            m_external_host_access;
 	uint8_t            m_executing;
-	address_space *m_program;
-	memory_access_cache<1, 3, ENDIANNESS_LITTLE> *m_cache;
+
 	uint32_t  m_pixclock;                           /* the pixel clock (0 means don't adjust screen size) */
 	int     m_pixperclock;                        /* pixels per clock */
 	emu_timer *m_scantimer;
@@ -354,15 +351,19 @@ protected:
 	uint16_t m_IOregs[64];
 	uint16_t              m_shiftreg[(8 * 512 * sizeof(uint16_t))/2];
 
-	uint32_t TMS34010_RDMEM_DWORD(offs_t A);
-	void TMS34010_WRMEM_DWORD(offs_t A, uint32_t V);
+
+	virtual uint32_t TMS34010_RDMEM_WORD(offs_t A) = 0;
+	virtual uint32_t TMS34010_RDMEM_DWORD(offs_t A) = 0;
+	virtual void TMS34010_WRMEM_WORD(offs_t A, uint32_t V) = 0;
+	virtual void TMS34010_WRMEM_DWORD(offs_t A, uint32_t V) = 0;
 	void SET_ST(uint32_t st);
 	void RESET_ST();
-	uint32_t ROPCODE();
-	int16_t PARAM_WORD();
-	int32_t PARAM_LONG();
-	int16_t PARAM_WORD_NO_INC();
-	int32_t PARAM_LONG_NO_INC();
+	virtual uint16_t ROPCODE() = 0;
+	virtual void execute_op(uint16_t op) = 0;
+	virtual int16_t PARAM_WORD() = 0;
+	virtual int32_t PARAM_LONG() = 0;
+	virtual int16_t PARAM_WORD_NO_INC() = 0;
+	virtual int32_t PARAM_LONG_NO_INC() = 0;
 	uint32_t RBYTE(offs_t offset);
 	void WBYTE(offs_t offset, uint32_t data);
 	uint32_t RLONG(offs_t offset);
@@ -518,6 +519,7 @@ protected:
 	uint32_t rfield_s_30(offs_t offset);
 	uint32_t rfield_s_31(offs_t offset);
 	void unimpl(uint16_t op);
+	void illop(uint16_t op);
 	void pixblt_l_l(uint16_t op); /* 0f00 */
 	void pixblt_l_xy(uint16_t op); /* 0f20 */
 	void pixblt_xy_l(uint16_t op); /* 0f40 */
@@ -835,68 +837,15 @@ protected:
 	void rev_a(uint16_t op); /* 0020 */
 	void rev_b(uint16_t op); /* 0030 */
 	void trap(uint16_t op); /* 0900/10 */
-	void addxyi_a(uint16_t op);
-	void addxyi_b(uint16_t op);
-	void blmove(uint16_t op);
-	void cexec_l(uint16_t op);
-	void cexec_s(uint16_t op);
-	void clip(uint16_t op);
-	void cmovcg_a(uint16_t op);
-	void cmovcg_b(uint16_t op);
-	void cmovcm_f(uint16_t op);
-	void cmovcm_b(uint16_t op);
-	void cmovgc_a(uint16_t op);
-	void cmovgc_b(uint16_t op);
-	void cmovgc_a_s(uint16_t op);
-	void cmovgc_b_s(uint16_t op);
-	void cmovmc_f(uint16_t op);
-	void cmovmc_f_va(uint16_t op);
-	void cmovmc_f_vb(uint16_t op);
-	void cmovmc_b(uint16_t op);
-	void cmp_k_a(uint16_t op);
-	void cmp_k_b(uint16_t op);
-	void cvdxyl_a(uint16_t op);
-	void cvdxyl_b(uint16_t op);
-	void cvmxyl_a(uint16_t op);
-	void cvmxyl_b(uint16_t op);
-	void cvsxyl_a(uint16_t op);
-	void cvsxyl_b(uint16_t op);
-	void exgps_a(uint16_t op);
-	void exgps_b(uint16_t op);
-	void fline(uint16_t op);
-	void fpixeq(uint16_t op);
-	void fpixne(uint16_t op);
-	void getps_a(uint16_t op);
-	void getps_b(uint16_t op);
-	void idle(uint16_t op);
-	void linit(uint16_t op);
-	void mwait(uint16_t op);
-	void pfill_xy(uint16_t op);
-	void pixblt_l_m_l(uint16_t op);
-	void retm(uint16_t op);
-	void rmo_a(uint16_t op);
-	void rmo_b(uint16_t op);
-	void rpix_a(uint16_t op);
-	void rpix_b(uint16_t op);
-	void setcdp(uint16_t op);
-	void setcmp(uint16_t op);
-	void setcsp(uint16_t op);
-	void swapf_a(uint16_t op);
-	void swapf_b(uint16_t op);
-	void tfill_xy(uint16_t op);
-	void trapl(uint16_t op);
-	void vblt_b_l(uint16_t op);
-	void vfill_l(uint16_t op);
-	void vlcol(uint16_t op);
 	int apply_window(const char *inst_name,int srcbpp, uint32_t *srcaddr, XY *dst, int *dx, int *dy);
 	int compute_fill_cycles(int left_partials, int right_partials, int full_words, int op_timing);
 	int compute_pixblt_cycles(int left_partials, int right_partials, int full_words, int op_timing);
 	int compute_pixblt_b_cycles(int left_partials, int right_partials, int full_words, int rows, int op_timing, int bpp);
-	void memory_w(address_space &space, offs_t offset,uint16_t data);
-	uint16_t memory_r(address_space &space, offs_t offset);
-	void shiftreg_w(address_space &space, offs_t offset, uint16_t data);
-	uint16_t shiftreg_r(address_space &space, offs_t offset);
-	uint16_t dummy_shiftreg_r(address_space &space, offs_t offset);
+	void memory_w(offs_t offset, uint16_t data);
+	uint16_t memory_r(offs_t offset);
+	void shiftreg_w(offs_t offset, uint16_t data);
+	uint16_t shiftreg_r(offs_t offset);
+	uint16_t dummy_shiftreg_r(offs_t offset);
 	uint32_t pixel_op00(uint32_t dstpix, uint32_t mask, uint32_t srcpix);
 	uint32_t pixel_op01(uint32_t dstpix, uint32_t mask, uint32_t srcpix);
 	uint32_t pixel_op02(uint32_t dstpix, uint32_t mask, uint32_t srcpix);
@@ -1016,10 +965,32 @@ public:
 	virtual u16 io_register_r(offs_t offset) override;
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
+
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 8 - 1) / 8; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 8); }
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	void internal_regs_map(address_map &map);
+
+	virtual uint16_t ROPCODE() override;
+	virtual void execute_op(uint16_t op) override;
+	virtual int16_t PARAM_WORD() override;
+	virtual int32_t PARAM_LONG() override;
+	virtual int16_t PARAM_WORD_NO_INC() override;
+	virtual int32_t PARAM_LONG_NO_INC() override;
+	virtual uint32_t TMS34010_RDMEM_WORD(offs_t A) override;
+	virtual uint32_t TMS34010_RDMEM_DWORD(offs_t A) override;
+	virtual void TMS34010_WRMEM_WORD(offs_t A, uint32_t V) override;
+	virtual void TMS34010_WRMEM_DWORD(offs_t A, uint32_t V) override;
+
+	typedef void (tms34010_device::*opcode_func)(uint16_t op);
+
+private:
+	static const opcode_func s_opcode_table[65536 >> 4];
+
+	memory_access<32, 1, 3, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<32, 1, 3, ENDIANNESS_LITTLE>::specific m_program;
 };
 
 DECLARE_DEVICE_TYPE(TMS34010, tms34010_device)
@@ -1034,10 +1005,86 @@ public:
 	virtual u16 io_register_r(offs_t offset) override;
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
+
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 4); }
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	void internal_regs_map(address_map &map);
+
+	virtual uint16_t ROPCODE() override;
+	virtual void execute_op(uint16_t op) override;
+	virtual int16_t PARAM_WORD() override;
+	virtual int32_t PARAM_LONG() override;
+	virtual int16_t PARAM_WORD_NO_INC() override;
+	virtual int32_t PARAM_LONG_NO_INC() override;
+	virtual uint32_t TMS34010_RDMEM_WORD(offs_t A) override;
+	virtual uint32_t TMS34010_RDMEM_DWORD(offs_t A) override;
+	virtual void TMS34010_WRMEM_WORD(offs_t A, uint32_t V) override;
+	virtual void TMS34010_WRMEM_DWORD(offs_t A, uint32_t V) override;
+
+	typedef void (tms34020_device::*opcode_func)(uint16_t op);
+
+	void addxyi_a(uint16_t op);
+	void addxyi_b(uint16_t op);
+	void blmove(uint16_t op);
+	void cexec_l(uint16_t op);
+	void cexec_s(uint16_t op);
+	void clip(uint16_t op);
+	void cmovcg_a(uint16_t op);
+	void cmovcg_b(uint16_t op);
+	void cmovcm_f(uint16_t op);
+	void cmovcm_b(uint16_t op);
+	void cmovgc_a(uint16_t op);
+	void cmovgc_b(uint16_t op);
+	void cmovgc_a_s(uint16_t op);
+	void cmovgc_b_s(uint16_t op);
+	void cmovmc_f(uint16_t op);
+	void cmovmc_f_va(uint16_t op);
+	void cmovmc_f_vb(uint16_t op);
+	void cmovmc_b(uint16_t op);
+	void cmp_k_a(uint16_t op);
+	void cmp_k_b(uint16_t op);
+	void cvdxyl_a(uint16_t op);
+	void cvdxyl_b(uint16_t op);
+	void cvmxyl_a(uint16_t op);
+	void cvmxyl_b(uint16_t op);
+	void cvsxyl_a(uint16_t op);
+	void cvsxyl_b(uint16_t op);
+	void exgps_a(uint16_t op);
+	void exgps_b(uint16_t op);
+	void fline(uint16_t op);
+	void fpixeq(uint16_t op);
+	void fpixne(uint16_t op);
+	void getps_a(uint16_t op);
+	void getps_b(uint16_t op);
+	void idle(uint16_t op);
+	void linit(uint16_t op);
+	void mwait(uint16_t op);
+	void pfill_xy(uint16_t op);
+	void pixblt_l_m_l(uint16_t op);
+	void retm(uint16_t op);
+	void rmo_a(uint16_t op);
+	void rmo_b(uint16_t op);
+	void rpix_a(uint16_t op);
+	void rpix_b(uint16_t op);
+	void setcdp(uint16_t op);
+	void setcmp(uint16_t op);
+	void setcsp(uint16_t op);
+	void swapf_a(uint16_t op);
+	void swapf_b(uint16_t op);
+	void tfill_xy(uint16_t op);
+	void trapl(uint16_t op);
+	void vblt_b_l(uint16_t op);
+	void vfill_l(uint16_t op);
+	void vlcol(uint16_t op);
+
+private:
+	static const opcode_func s_opcode_table[65536 >> 4];
+
+	memory_access<32, 2, 3, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<32, 2, 3, ENDIANNESS_LITTLE>::specific m_program;
 };
 
 DECLARE_DEVICE_TYPE(TMS34020, tms34020_device)

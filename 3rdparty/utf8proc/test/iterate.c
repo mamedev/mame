@@ -35,6 +35,8 @@ int main(int argc, char **argv)
     uint32_t byt;
     unsigned char buf[16];
 
+    (void) argc; (void) argv; /* unused */
+
     tests = error = 0;
 
     // Check valid sequences that were considered valid erroneously before
@@ -54,7 +56,7 @@ int main(int argc, char **argv)
         CHECKVALID(3, 0xbe, 4);
         CHECKVALID(3, 0xbf, 4);
     }
-    
+
     // Continuation byte not after lead
     for (byt = 0x80; byt < 0xc0; byt++) {
         CHECKINVALID(0, byt, 1);

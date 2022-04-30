@@ -18,11 +18,11 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_NS(ZORRO_A590,  bus::amiga::zorro, a590_device,  "zorro_a590",  "CBM A590 HD Controller")
-DEFINE_DEVICE_TYPE_NS(ZORRO_A2091, bus::amiga::zorro, a2091_device, "zorro_a2091", "CBM A2091 HD Controller")
+DEFINE_DEVICE_TYPE(ZORRO_A590,  bus::amiga::zorro::a590_device,  "zorro_a590",  "CBM A590 HD Controller")
+DEFINE_DEVICE_TYPE(ZORRO_A2091, bus::amiga::zorro::a2091_device, "zorro_a2091", "CBM A2091 HD Controller")
 
 
-namespace bus { namespace amiga { namespace zorro {
+namespace bus::amiga::zorro {
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
@@ -159,10 +159,10 @@ ROM_START( dmac_hdc )
 	ROMX_LOAD("390388-02.u12", 0x4001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "v592", "Version 5.92") // a2091 only?
-	ROMX_LOAD("390508-02.u13", 0x0000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(1)) // checksum-16: ?
-	ROMX_LOAD("390509-02.u12", 0x0001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(1)) // checksum-16: 288c
-	ROMX_LOAD("390508-02.u13", 0x4000, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD("390509-02.u12", 0x4001, 0x2000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("390508-02_a2091_low_byte_u13_v5.92.u13",  0x0000, 0x2000, CRC(4bedbcb1) SHA1(0b97991d7058a8d0c8d000409b4b82bb96ca1dc9), ROM_SKIP(1) | ROM_BIOS(1)) // checksum-16: 23d8 (?)
+	ROMX_LOAD("390509-02_a2091_high_byte_u12_v5.92.u12", 0x0001, 0x2000, CRC(8f9dd6f8) SHA1(3a8a4639a498bf9a95cb11c45c13687efa714942), ROM_SKIP(1) | ROM_BIOS(1)) // checksum-16: 288c (ok)
+	ROMX_LOAD("390508-02_a2091_low_byte_u13_v5.92.u13",  0x4000, 0x2000, CRC(4bedbcb1) SHA1(0b97991d7058a8d0c8d000409b4b82bb96ca1dc9), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("390509-02_a2091_high_byte_u12_v5.92.u12", 0x4001, 0x2000, CRC(8f9dd6f8) SHA1(3a8a4639a498bf9a95cb11c45c13687efa714942), ROM_SKIP(1) | ROM_BIOS(1))
 
 	ROM_SYSTEM_BIOS(2, "v60", "Version 6.0") // a590 only?
 	ROMX_LOAD("390389-03.u13", 0x0000, 0x2000, CRC(2e77bbff) SHA1(8a098845068f32cfa4d34a278cd290f61d35a52c), ROM_SKIP(1) | ROM_BIOS(2)) // checksum-16: cbe8 (ok)
@@ -338,7 +338,7 @@ WRITE_LINE_MEMBER( a2091_device::cfgin_w )
 	m_dmac->configin_w(state);
 }
 
-READ8_MEMBER( dmac_hdc_device_base::dmac_scsi_r )
+uint8_t dmac_hdc_device_base::dmac_scsi_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -349,7 +349,7 @@ READ8_MEMBER( dmac_hdc_device_base::dmac_scsi_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( dmac_hdc_device_base::dmac_scsi_w )
+void dmac_hdc_device_base::dmac_scsi_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -377,4 +377,4 @@ WRITE_LINE_MEMBER( dmac_hdc_device_base::scsi_drq_w )
 	m_dmac->xdreq_w(state);
 }
 
-} } } // namespace bus::amiga::zorro
+} // namespace bus::amiga::zorro

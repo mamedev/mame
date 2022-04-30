@@ -116,7 +116,7 @@ WRITE_LINE_MEMBER( c1581_device::sp_w )
 	update_iec();
 }
 
-READ8_MEMBER( c1581_device::cia_pa_r )
+uint8_t c1581_device::cia_pa_r()
 {
 	/*
 
@@ -147,7 +147,7 @@ READ8_MEMBER( c1581_device::cia_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( c1581_device::cia_pa_w )
+void c1581_device::cia_pa_w(uint8_t data)
 {
 	/*
 
@@ -177,7 +177,7 @@ WRITE8_MEMBER( c1581_device::cia_pa_w )
 	m_leds[LED_ACT] = BIT(data, 6);
 }
 
-READ8_MEMBER( c1581_device::cia_pb_r )
+uint8_t c1581_device::cia_pb_r()
 {
 	/*
 
@@ -211,7 +211,7 @@ READ8_MEMBER( c1581_device::cia_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( c1581_device::cia_pb_w )
+void c1581_device::cia_pb_w(uint8_t data)
 {
 	/*
 
@@ -258,9 +258,10 @@ static void c1581_floppies(device_slot_interface &device)
 //  FLOPPY_FORMATS( c1581_device::floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( c1581_device::floppy_formats )
-	FLOPPY_D81_FORMAT
-FLOPPY_FORMATS_END
+void c1581_device::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_D81_FORMAT);
+}
 
 
 //-------------------------------------------------
@@ -282,7 +283,7 @@ void c1581_device::device_add_mconfig(machine_config &config)
 	m_cia->pb_wr_callback().set(FUNC(c1581_device::cia_pb_w));
 
 	WD1772(config, m_fdc, 16_MHz_XTAL / 2);
-	FLOPPY_CONNECTOR(config, WD1772_TAG":0", c1581_floppies, "35dd", c1581_device::floppy_formats, true);
+	FLOPPY_CONNECTOR(config, WD1772_TAG":0", c1581_floppies, "35dd", c1581_device::floppy_formats, true).enable_sound(true);
 }
 
 

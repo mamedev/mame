@@ -63,13 +63,13 @@ DISCRETE_STEP(dsd_555_astbl)
 
 	int     count_f = 0;
 	int     count_r = 0;
-	double  dt;                             /* change in time */
-	double  x_time  = 0;                    /* time since change happened */
+	double  dt;                         /* change in time */
+	double  x_time  = 0;                /* time since change happened */
 	double  v_cap   = m_cap_voltage;    /* Current voltage on capacitor, before dt */
-	double  v_cap_next = 0;                 /* Voltage on capacitor, after dt */
+	double  v_cap_next = 0;             /* Voltage on capacitor, after dt */
 	double  v_charge, exponent = 0;
-	uint8_t   flip_flop = m_flip_flop;
-	uint8_t   update_exponent = 0;
+	uint8_t flip_flop = m_flip_flop;
+	uint8_t update_exponent = 0;
 	double  v_out = 0.0;
 
 	/* put commonly used stuff in local variables for speed */
@@ -633,10 +633,12 @@ DISCRETE_STEP(dsd_555_cc)
 		{
 			case 1:
 				r_discharge = DSD_555_CC__RDIS;
+				[[fallthrough]];
 			case 0:
 				break;
 			case 3:
 				r_discharge = RES_2_PARALLEL(DSD_555_CC__RDIS, DSD_555_CC__RGND);
+				[[fallthrough]];
 			case 2:
 				r_charge = DSD_555_CC__RGND;
 				vi       = i * r_charge;
@@ -944,10 +946,12 @@ DISCRETE_RESET(dsd_555_cc)
 		{
 			case 1:
 				r_discharge = DSD_555_CC__RDIS;
+				[[fallthrough]];
 			case 0:
 				break;
 			case 3:
 				r_discharge = RES_2_PARALLEL(DSD_555_CC__RDIS, DSD_555_CC__RGND);
+				[[fallthrough]];
 			case 2:
 				r_charge = DSD_555_CC__RGND;
 				break;
@@ -1653,7 +1657,7 @@ DISCRETE_STEP(dsd_ls624)
 	double  freq, t1;
 	double  v_freq_2, v_freq_3, v_freq_4;
 	double  t_used = m_t_used;
-	double  dt = this->sample_time();;
+	double  dt = this->sample_time();
 	double  v_freq = DSD_LS624__VMOD;
 	double  v_rng = DSD_LS624__VRNG;
 	int     count_f = 0, count_r = 0;

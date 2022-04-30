@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="c64_flop_misc" description="Commodore 64 miscellaneous disks">
 
 	<!-- Games -->
@@ -49,7 +52,7 @@
 		</part>
 	</software>
 
-	<!-- Flippy disk. The other side is for Apple II. -->
+	<!-- "Flippy disk", the other side is for Apple II. -->
 	<software name="jingldsk">
 		<description>JingleDisk - Holiday Musical Story with Computer Animation</description>
 		<year>1985</year>

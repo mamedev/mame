@@ -39,6 +39,7 @@ shade pixels according to their depth.
 Winning Run
     polygon glitches/flicker
     posirq effects for bitmap layer not working
+    priority, mixing incorrection (specifically title screen and background color)
 
 
     NOTES:
@@ -48,6 +49,11 @@ Winning Run
         working
           - some minor polygon glitches
           - posirq handling broken
+          - priority, mixing incorrection
+
+    reference videos
+    - https://youtu.be/ZNNveBLWevg
+    - https://youtu.be/KazxHW9wQ60
 
 *****************************
 
@@ -289,11 +295,12 @@ Filter Board
 #include "machine/namco_c148.h"
 #include "video/namcos21_3d.h"
 #include "sound/c140.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
+
+
+namespace {
 
 #define ENABLE_LOGGING      0
-
-#define NAMCOS21_NUM_COLORS 0x8000
 
 class namcos21_state : public driver_device
 {
@@ -311,6 +318,7 @@ public:
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
 		m_audiobank(*this, "audiobank"),
+		m_c140_region(*this, "c140"),
 		m_dpram(*this, "dpram"),
 		m_gpu_intc(*this, "gpu_intc"),
 		m_namcos21_3d(*this, "namcos21_3d"),
@@ -320,7 +328,10 @@ public:
 	void configure_c148_standard(machine_config &config);
 	void winrun(machine_config &config);
 
-	void init_winrun();
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -334,6 +345,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_memory_bank m_audiobank;
+	required_region_ptr<u16> m_c140_region;
 	required_shared_ptr<uint8_t> m_dpram;
 	required_device<namco_c148_device> m_gpu_intc;
 	required_device<namcos21_3d_device> m_namcos21_3d;
@@ -346,36 +358,33 @@ private:
 
 	uint16_t m_winrun_color;
 	uint16_t m_winrun_gpu_register[0x10/2];
-	DECLARE_READ16_MEMBER(video_enable_r);
-	DECLARE_WRITE16_MEMBER(video_enable_w);
+	uint16_t video_enable_r();
+	void video_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER(dpram_word_r);
-	DECLARE_WRITE16_MEMBER(dpram_word_w);
-	DECLARE_READ8_MEMBER(dpram_byte_r);
-	DECLARE_WRITE8_MEMBER(dpram_byte_w);
+	uint16_t dpram_word_r(offs_t offset);
+	void dpram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t dpram_byte_r(offs_t offset);
+	void dpram_byte_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ16_MEMBER(winrun_gpu_color_r);
-	DECLARE_WRITE16_MEMBER(winrun_gpu_color_w);
-	DECLARE_READ16_MEMBER(winrun_gpu_register_r);
-	DECLARE_WRITE16_MEMBER(winrun_gpu_register_w);
-	DECLARE_WRITE16_MEMBER(winrun_gpu_videoram_w);
-	DECLARE_READ16_MEMBER(winrun_gpu_videoram_r);
+	uint16_t winrun_gpu_color_r();
+	void winrun_gpu_color_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t winrun_gpu_register_r(offs_t offset);
+	void winrun_gpu_register_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void winrun_gpu_videoram_w(offs_t offset, uint16_t data);
+	uint16_t winrun_gpu_videoram_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER(eeprom_w);
-	DECLARE_READ8_MEMBER(eeprom_r);
+	void eeprom_w(offs_t offset, uint8_t data);
+	uint8_t eeprom_r(offs_t offset);
 
-	DECLARE_WRITE8_MEMBER(sound_bankselect_w);
+	void sound_bankselect_w(uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(sound_reset_w);
-	DECLARE_WRITE8_MEMBER(system_reset_w);
+	void sound_reset_w(uint8_t data);
+	void system_reset_w(uint8_t data);
 	void reset_all_subcpus(int state);
 
 	std::unique_ptr<uint8_t[]> m_eeprom;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -388,35 +397,44 @@ private:
 	void winrun_gpu_map(address_map &map);
 
 	void sound_map(address_map &map);
+	void c140_map(address_map &map);
 };
 
-READ16_MEMBER(namcos21_state::winrun_gpu_color_r)
+void namcos21_state::video_start()
+{
+	m_gpu_videoram = std::make_unique<uint8_t[]>(0x80000);
+	m_gpu_maskram = std::make_unique<uint8_t[]>(0x80000);
+
+	save_pointer(NAME(m_gpu_videoram), 0x80000);
+	save_pointer(NAME(m_gpu_maskram), 0x80000);
+}
+
+uint16_t namcos21_state::winrun_gpu_color_r()
 {
 	return m_winrun_color;
 }
 
-WRITE16_MEMBER(namcos21_state::winrun_gpu_color_w)
+void namcos21_state::winrun_gpu_color_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_winrun_color );
 }
 
-READ16_MEMBER(namcos21_state::winrun_gpu_register_r)
+uint16_t namcos21_state::winrun_gpu_register_r(offs_t offset)
 {
 	return m_winrun_gpu_register[offset];
 }
 
-WRITE16_MEMBER(namcos21_state::winrun_gpu_register_w)
+void namcos21_state::winrun_gpu_register_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_winrun_gpu_register[offset] );
 	m_screen->update_partial(m_screen->vpos());
 }
 
-WRITE16_MEMBER(namcos21_state::winrun_gpu_videoram_w)
+void namcos21_state::winrun_gpu_videoram_w(offs_t offset, uint16_t data)
 {
 	int color = data>>8;
 	int mask  = data&0xff;
-	int i;
-	for( i=0; i<8; i++ )
+	for( int i=0; i<8; i++ )
 	{
 		if( mask&(0x01<<i) )
 		{
@@ -426,27 +444,26 @@ WRITE16_MEMBER(namcos21_state::winrun_gpu_videoram_w)
 	}
 }
 
-READ16_MEMBER(namcos21_state::winrun_gpu_videoram_r)
+uint16_t namcos21_state::winrun_gpu_videoram_r(offs_t offset)
 {
 	return (m_gpu_videoram[offset]<<8) | m_gpu_maskram[offset];
 }
 
 void namcos21_state::winrun_bitmap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *videoram = m_gpu_videoram.get();
+	uint8_t const *const videoram = m_gpu_videoram.get();
 	//printf("%d %d (%d %d) - %04x %04x %04x|%04x %04x\n",cliprect.top(),cliprect.bottom(),m_screen->vpos(),m_gpu_intc->get_posirq_line(),m_winrun_gpu_register[0],m_winrun_gpu_register[2/2],m_winrun_gpu_register[4/2],m_winrun_gpu_register[0xa/2],m_winrun_gpu_register[0xc/2]);
 
-	int yscroll = -cliprect.top()+(int16_t)m_winrun_gpu_register[0x2/2];
-	int xscroll = 0;//m_winrun_gpu_register[0xc/2] >> 7;
-	int base = 0x1000+0x100*(m_winrun_color&0xf);
-	int sx,sy;
-	for( sy=cliprect.top(); sy<=cliprect.bottom(); sy++ )
+	int const yscroll = -cliprect.top()+(int16_t)m_winrun_gpu_register[0x2/2];
+	int const xscroll = 0;//m_winrun_gpu_register[0xc/2] >> 7;
+	int const base = 0x1000+0x100*(m_winrun_color&0xf);
+	for( int sy=cliprect.top(); sy<=cliprect.bottom(); sy++ )
 	{
-		const uint8_t *pSource = &videoram[((yscroll+sy)&0x3ff)*0x200];
-		uint16_t *pDest = &bitmap.pix16(sy);
-		for( sx=cliprect.left(); sx<=cliprect.right(); sx++ )
+		uint8_t const *const pSource = &videoram[((yscroll+sy)&0x3ff)*0x200];
+		uint16_t *const pDest = &bitmap.pix(sy);
+		for( int sx=cliprect.left(); sx<=cliprect.right(); sx++ )
 		{
-			int pen = pSource[(sx+xscroll) & 0x1ff];
+			int const pen = pSource[(sx+xscroll) & 0x1ff];
 			switch( pen )
 			{
 			case 0xff:
@@ -482,12 +499,12 @@ uint32_t namcos21_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 
 
-READ16_MEMBER(namcos21_state::video_enable_r)
+[[maybe_unused]] uint16_t namcos21_state::video_enable_r()
 {
 	return m_video_enable;
 }
 
-WRITE16_MEMBER(namcos21_state::video_enable_w)
+[[maybe_unused]] void namcos21_state::video_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_video_enable ); /* 0x40 = enable */
 	if( m_video_enable!=0 && m_video_enable!=0x40 )
@@ -500,12 +517,12 @@ WRITE16_MEMBER(namcos21_state::video_enable_w)
 
 /* dual port ram memory handlers */
 
-READ16_MEMBER(namcos21_state::dpram_word_r)
+uint16_t namcos21_state::dpram_word_r(offs_t offset)
 {
 	return m_dpram[offset];
 }
 
-WRITE16_MEMBER(namcos21_state::dpram_word_w)
+void namcos21_state::dpram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if( ACCESSING_BITS_0_7 )
 	{
@@ -513,12 +530,12 @@ WRITE16_MEMBER(namcos21_state::dpram_word_w)
 	}
 }
 
-READ8_MEMBER(namcos21_state::dpram_byte_r)
+uint8_t namcos21_state::dpram_byte_r(offs_t offset)
 {
 	return m_dpram[offset];
 }
 
-WRITE8_MEMBER(namcos21_state::dpram_byte_w)
+void namcos21_state::dpram_byte_w(offs_t offset, uint8_t data)
 {
 	m_dpram[offset] = data;
 }
@@ -588,15 +605,22 @@ void namcos21_state::sound_map(address_map &map)
 	map(0x0000, 0x3fff).bankr("audiobank"); /* banked */
 	map(0x3000, 0x3003).nopw(); /* ? */
 	map(0x4000, 0x4001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x5000, 0x6fff).rw(m_c140, FUNC(c140_device::c140_r), FUNC(c140_device::c140_w));
-	map(0x7000, 0x77ff).rw(FUNC(namcos21_state::dpram_byte_r), FUNC(namcos21_state::dpram_byte_w)).share("dpram");
-	map(0x7800, 0x7fff).rw(FUNC(namcos21_state::dpram_byte_r), FUNC(namcos21_state::dpram_byte_w)); /* mirror */
+	map(0x5000, 0x51ff).mirror(0x0e00).rw(m_c140, FUNC(c140_device::c140_r), FUNC(c140_device::c140_w));
+	map(0x6000, 0x61ff).mirror(0x0e00).rw(m_c140, FUNC(c140_device::c140_r), FUNC(c140_device::c140_w)); // mirrored
+	map(0x7000, 0x77ff).mirror(0x0800).rw(FUNC(namcos21_state::dpram_byte_r), FUNC(namcos21_state::dpram_byte_w)).share("dpram");
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xbfff).nopw(); /* amplifier enable on 1st write */
 	map(0xc000, 0xffff).nopw(); /* avoid debug log noise; games write frequently to 0xe000 */
 	map(0xc000, 0xc001).w(FUNC(namcos21_state::sound_bankselect_w));
 	map(0xd001, 0xd001).nopw(); /* watchdog */
 	map(0xd000, 0xffff).rom().region("audiocpu", 0x01000);
+}
+
+void namcos21_state::c140_map(address_map &map)
+{
+	map.global_mask(0x7fffff);
+	// TODO: LSB not used? verify from schematics/real hardware
+	map(0x000000, 0x7fffff).lr16([this](offs_t offset) { return m_c140_region[((offset & 0x300000) >> 1) | (offset & 0x7ffff)]; }, "c140_rom_r");
 }
 
 
@@ -757,12 +781,12 @@ static INPUT_PORTS_START( winrungp )
 	PORT_DIPSETTING(    0x00, "4M" )
 INPUT_PORTS_END
 
-WRITE8_MEMBER( namcos21_state::sound_bankselect_w )
+void namcos21_state::sound_bankselect_w(uint8_t data)
 {
 	m_audiobank->set_entry(data>>4);
 }
 
-WRITE8_MEMBER(namcos21_state::sound_reset_w)
+void namcos21_state::sound_reset_w(uint8_t data)
 {
 	if (data & 0x01)
 	{
@@ -777,7 +801,7 @@ WRITE8_MEMBER(namcos21_state::sound_reset_w)
 	}
 }
 
-WRITE8_MEMBER(namcos21_state::system_reset_w)
+void namcos21_state::system_reset_w(uint8_t data)
 {
 	reset_all_subcpus(data & 1 ? CLEAR_LINE : ASSERT_LINE);
 
@@ -791,12 +815,12 @@ void namcos21_state::reset_all_subcpus(int state)
 	m_c65->ext_reset(state);
 }
 
-WRITE8_MEMBER(namcos21_state::eeprom_w)
+void namcos21_state::eeprom_w(offs_t offset, uint8_t data)
 {
 	m_eeprom[offset] = data;
 }
 
-READ8_MEMBER(namcos21_state::eeprom_r)
+uint8_t namcos21_state::eeprom_r(offs_t offset)
 {
 	return m_eeprom[offset];
 }
@@ -823,6 +847,9 @@ void namcos21_state::machine_start()
 	for (int i = 0; i < 0x10; i++)
 		m_audiobank->configure_entry(i, memregion("audiocpu")->base() + (i % max) * 0x4000);
 
+	save_item(NAME(m_video_enable));
+	save_item(NAME(m_winrun_color));
+	save_item(NAME(m_winrun_gpu_register));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos21_state::screen_scanline)
@@ -884,11 +911,11 @@ void namcos21_state::winrun(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// TODO: basic parameters to get 60.606060 Hz, x2 is for interlace
-	m_screen->set_raw(49.152_MHz_XTAL / 2, 768, 0, 496, 264*2, 0, 480);
+	m_screen->set_raw(49.152_MHz_XTAL / 4 * 2, 768, 0, 496, 264*2, 0, 480);
 	m_screen->set_screen_update(FUNC(namcos21_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette).set_format(palette_device::xBRG_888, NAMCOS21_NUM_COLORS);
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_888, 0x10000/2);
 
 	NAMCOS21_3D(config, m_namcos21_3d, 0);
 	m_namcos21_3d->set_fixed_palbase(0x4000);
@@ -899,8 +926,8 @@ void namcos21_state::winrun(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	C140(config, m_c140, 8000000/374);
-	m_c140->set_bank_type(c140_device::C140_TYPE::SYSTEM21);
+	C140(config, m_c140, 49.152_MHz_XTAL / 2304);
+	m_c140->set_addrmap(0, &namcos21_state::c140_map);
 	m_c140->int1_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 	m_c140->add_route(0, "lspeaker", 0.50);
 	m_c140->add_route(1, "rspeaker", 0.50);
@@ -944,11 +971,11 @@ ROM_START( winrun )
 	ROM_LOAD16_BYTE( "wr1-pt0u.8j", 0x00000, 0x20000, CRC(7ec4cf6b) SHA1(92ec92567b9f7321efb4a3724cbcdba216eb22f9) )
 	ROM_LOAD16_BYTE( "wr1-pt0l.8d", 0x00001, 0x20000, CRC(58c14b73) SHA1(e34a26866cd870743e166669f7fa5915a82104e9) )
 
-	ROM_REGION( 0x200000, "c140", 0 ) /* sound samples */
-	ROM_LOAD("wr-voi-0.11b", 0x040000, 0x40000, CRC(8040b645) SHA1(7ccafb3073fa79910e26cf9b8b6e8e9ae22e55fc) )
-	ROM_LOAD("wr-voi-1.11c", 0x0c0000, 0x40000, CRC(d347e904) SHA1(620cd07e6230322c306283e45a43fa1e217028d4) )
-	ROM_LOAD("wr-voi-2.11d", 0x140000, 0x40000, CRC(b34747af) SHA1(7e0b55631bffa0583bf4f7f5368db9f09e411ba1) )
-	ROM_LOAD("wr-voi-3.11e", 0x1c0000, 0x40000, CRC(43085303) SHA1(9f743055c20df3548879118194244e37a0b91f7e) )
+	ROM_REGION16_BE( 0x400000, "c140", ROMREGION_ERASE00 ) /* sound samples */
+	ROM_LOAD16_BYTE("wr-voi-0.11b", 0x080000, 0x40000, CRC(8040b645) SHA1(7ccafb3073fa79910e26cf9b8b6e8e9ae22e55fc) )
+	ROM_LOAD16_BYTE("wr-voi-1.11c", 0x180000, 0x40000, CRC(d347e904) SHA1(620cd07e6230322c306283e45a43fa1e217028d4) )
+	ROM_LOAD16_BYTE("wr-voi-2.11d", 0x280000, 0x40000, CRC(b34747af) SHA1(7e0b55631bffa0583bf4f7f5368db9f09e411ba1) )
+	ROM_LOAD16_BYTE("wr-voi-3.11e", 0x380000, 0x40000, CRC(43085303) SHA1(9f743055c20df3548879118194244e37a0b91f7e) )
 
 	ROM_REGION( 0x1000, "pals", 0 )
 	/* Main PCB (2252960101) */
@@ -985,6 +1012,9 @@ ROM_START( winrungp )
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Sound */
 	ROM_LOAD( "sg1-snd0.7c", 0x000000, 0x020000, CRC(de04b794) SHA1(191f4d79ac2375d7060f3d83ec753185e92f28ea) )
 
+	ROM_REGION16_BE( 0x2000, "tms", 0 )
+	ROM_LOAD( "tms320c25fnl_wybux8j1_japan", 0x0000, 0x2000, CRC(01f3fd3a) SHA1(1fa5185fa60c8c4097ed0e51a5e0fe1fa49b4b75) ) // decapped. TODO: verify, hook up and check if same for all games
+
 	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
 	ROM_LOAD( "sys2c65c.bin", 0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
@@ -1012,9 +1042,9 @@ ROM_START( winrungp )
 	ROM_LOAD16_BYTE( "sg1-pt1-u.8l", 0x40000, 0x20000, CRC(b63d3006) SHA1(78e78619766b0fd91b1e830cfb066495d6773981) )
 	ROM_LOAD16_BYTE( "sg1-pt1-l.8e", 0x40001, 0x20000, CRC(6385e325) SHA1(d50bceb2e9c0d0a38d7b0f918f99c482649e260d) )
 
-	ROM_REGION( 0x200000, "c140", 0 ) /* sound samples */
-	ROM_LOAD("sg-voi-1.11c", 0x080000, 0x80000,CRC(7dcccb31) SHA1(4441b37691434b13eae5dee2d04dc12a56b04d2a) )
-	ROM_LOAD("sg-voi-3.11e", 0x180000, 0x80000,CRC(a198141c) SHA1(b4ca352e6aedd9d7a7e5e39e840f1d3a7145900e) )
+	ROM_REGION16_BE( 0x400000, "c140", ROMREGION_ERASE00 ) /* sound samples */
+	ROM_LOAD16_BYTE("sg-voi-1.11c", 0x100000, 0x80000,CRC(7dcccb31) SHA1(4441b37691434b13eae5dee2d04dc12a56b04d2a) )
+	ROM_LOAD16_BYTE("sg-voi-3.11e", 0x300000, 0x80000,CRC(a198141c) SHA1(b4ca352e6aedd9d7a7e5e39e840f1d3a7145900e) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
 	ROM_LOAD( "nvram", 0x0000, 0x2000, CRC(93cca84c) SHA1(e39510d9f066266a77780662a6d991c3dd0348d1) )
@@ -1059,24 +1089,21 @@ ROM_START( winrun91 )
 	ROM_LOAD16_BYTE( "r911-pt1u.8l", 0x40000, 0x20000, CRC(7e5dab74) SHA1(5bde219d5b4305d38d17b494b2e759f05d05329f) )
 	ROM_LOAD16_BYTE( "r911-pt1l.8e", 0x40001, 0x20000, CRC(38a54ec5) SHA1(5c6017c98cae674868153ff2d64532027cf0ab83) )
 
-	ROM_REGION( 0x200000, "c140", 0 ) /* sound samples */
-	ROM_LOAD("r911-avo1.11c", 0x080000, 0x80000,CRC(9fb33af3) SHA1(666630a8e5766ca4c3275961963c3e713dfdda2d) )
-	ROM_LOAD("r911-avo3.11e", 0x180000, 0x80000,CRC(76e22f92) SHA1(0e1b8d35a5b9c20cc3192d935f0c9da1e69679d2) )
+	ROM_REGION16_BE( 0x400000, "c140", ROMREGION_ERASE00 ) /* sound samples */
+	ROM_LOAD16_BYTE("r911-avo1.11c", 0x100000, 0x80000,CRC(9fb33af3) SHA1(666630a8e5766ca4c3275961963c3e713dfdda2d) )
+	ROM_LOAD16_BYTE("r911-avo3.11e", 0x300000, 0x80000,CRC(76e22f92) SHA1(0e1b8d35a5b9c20cc3192d935f0c9da1e69679d2) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
 	ROM_LOAD( "nvram", 0x0000, 0x2000, CRC(75bcbc22) SHA1(1e7e785735d27aa8cd8393b16b589a46ecd7956a) )
 ROM_END
 
-void namcos21_state::init_winrun()
-{
-	m_gpu_videoram = std::make_unique<uint8_t[]>(0x80000);
-	m_gpu_maskram = std::make_unique<uint8_t[]>(0x80000);
-}
+} // Anonymous namespace
+
 
 /*    YEAR  NAME       PARENT    MACHINE   INPUT       CLASS           INIT           MONITOR  COMPANY  FULLNAME                                 FLAGS */
 
-// Original 'Namco System 21' with C65 I/O MCU, uses TMS320C25 DSP with no custom part number (no internal ROM?)
-GAME( 1988, winrun,    0,        winrun,   winrun,     namcos21_state, init_winrun,   ROT0,    "Namco", "Winning Run (World) (89/06/06, Ver.09)",                   MACHINE_IMPERFECT_GRAPHICS ) // Sub Ver.09, 1989, Graphic Ver .06, 89/01/14, Sound Ver.2.00
-GAME( 1989, winrungp,  0,        winrun,   winrungp,   namcos21_state, init_winrun,   ROT0,    "Namco", "Winning Run Suzuka Grand Prix (Japan) (89/12/03, Ver.02)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // Sub Ver.02, 1989, Graphic Ver.02 89/12/03, Sound Ver.0000
+// Original 'Namco System 21' with C65 I/O MCU, uses TMS320C25 DSP with no custom part number
+GAME( 1988, winrun,    0,        winrun,   winrun,     namcos21_state, empty_init,   ROT0,    "Namco", "Winning Run (World) (89/06/06, Ver.09)",                   MACHINE_IMPERFECT_GRAPHICS ) // Sub Ver.09, 1989, Graphic Ver .06, 89/01/14, Sound Ver.2.00
+GAME( 1989, winrungp,  0,        winrun,   winrungp,   namcos21_state, empty_init,   ROT0,    "Namco", "Winning Run Suzuka Grand Prix (Japan) (89/12/03, Ver.02)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // Sub Ver.02, 1989, Graphic Ver.02 89/12/03, Sound Ver.0000
 // Available on a size/cost reduced 2 PCB set with 'Namco System 21B' printed on each board, still C65 I/O MCU, appears to be functionally identical to original NS21
-GAME( 1991, winrun91,  0,        winrun,   winrungp,   namcos21_state, init_winrun,   ROT0,    "Namco", "Winning Run '91 (Japan) (1991/03/05, Main Ver 1.0, Sub Ver 1.0)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1991, winrun91,  0,        winrun,   winrungp,   namcos21_state, empty_init,   ROT0,    "Namco", "Winning Run '91 (Japan) (1991/03/05, Main Ver 1.0, Sub Ver 1.0)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )

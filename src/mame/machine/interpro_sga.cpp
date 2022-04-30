@@ -126,7 +126,7 @@ void interpro_sga_device::device_reset()
 {
 }
 
-WRITE32_MEMBER(interpro_sga_device::ddtc1_w)
+void interpro_sga_device::ddtc1_w(u32 data)
 {
 	m_ddtc1 = data;
 

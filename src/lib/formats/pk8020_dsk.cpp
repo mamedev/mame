@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Dirk Best
 /***************************************************************************
 
@@ -41,4 +41,4 @@ const pk8020_format::format pk8020_format::formats[] =
 	{}
 };
 
-const floppy_format_type FLOPPY_PK8020_FORMAT = &floppy_image_format_creator<pk8020_format>;
+const pk8020_format FLOPPY_PK8020_FORMAT;

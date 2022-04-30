@@ -5,7 +5,7 @@
 /*
 Notes:
 - fa/fghtatck: Global screen window effect cut one line from top/bottom of screen, especially noticeable with credit display.
-  It's a btanb according to a PCB video I've seen -AS.
+  It's a btanb according to a PCB video ref -AS.
 
 TODO:
 - background color currently follows what xday2 tries to set up, it's not sure if this is correct for everything else.
@@ -13,7 +13,7 @@ TODO:
 - non-shadow pixels for sprites flagged to enable shadows have bad colors
 - xday2: after choosing life (right) mode and set up date of birth, a joystick screen shows up.
   Bottom yellow frame doesn't show up correctly.
-- xday2: at the end of life event, there's an unemulated screen shutdown event (might be posirq?)
+- xday2: at the end of life event, there's an unemulated screen shutdown effect (might be posirq related?)
 
 */
 
@@ -34,11 +34,11 @@ void namcona1_state::tilemap_get_info(
 
 	if (data & 0x8000)
 	{
-		SET_TILE_INFO_MEMBER(gfx, tile, color, TILE_FORCE_LAYER0);
+		tileinfo.set(gfx, tile, color, TILE_FORCE_LAYER0);
 	}
 	else
 	{
-		SET_TILE_INFO_MEMBER(gfx, tile, color, 0);
+		tileinfo.set(gfx, tile, color, 0);
 		tileinfo.mask_data = &m_shaperam[tile << 3];
 	}
 } /* tilemap_get_info */
@@ -76,11 +76,11 @@ TILE_GET_INFO_MEMBER(namcona1_state::roz_get_info)
 
 	if (data & 0x8000)
 	{
-		SET_TILE_INFO_MEMBER(gfx, tile, color, TILE_FORCE_LAYER0);
+		tileinfo.set(gfx, tile, color, TILE_FORCE_LAYER0);
 	}
 	else
 	{
-		SET_TILE_INFO_MEMBER(gfx, tile, color, 0);
+		tileinfo.set(gfx, tile, color, 0);
 		tileinfo.mask_data = &m_shaperam[tile << 3];
 	}
 } /* roz_get_info */
@@ -295,10 +295,10 @@ void namcona1_state::pdraw_tile(
 	{ /* skip if inner loop doesn't draw anything */
 		for (int y = sy; y < ey; y++)
 		{
-			const u8 *source = source_base + y_index * gfx->rowbytes();
-			const u8 *mask_addr = mask_base + y_index * mask->rowbytes();
-			u16 *dest = &dest_bmp.pix16(y);
-			u8 *pri = &screen.priority().pix8(y);
+			u8 const *const source = source_base + y_index * gfx->rowbytes();
+			u8 const *const mask_addr = mask_base + y_index * mask->rowbytes();
+			u16 *const dest = &dest_bmp.pix(y);
+			u8 *const pri = &screen.priority().pix(y);
 
 			int x_index = x_index_base;
 			for (int x = sx; x < ex; x++)
@@ -506,8 +506,8 @@ void namcona1_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap
 					//const pen_t *paldata = &m_palette->pen(m_bg_tilemap[which]->palette_offset());
 					const pen_t *paldata = &m_palette->pen(0);
 
-					draw_pixel_line(cliprect, &bitmap.pix16(line),
-								&screen.priority().pix8(line),
+					draw_pixel_line(cliprect, &bitmap.pix(line),
+								&screen.priority().pix(line),
 								m_videoram + ydata + 25,
 								paldata);
 				}

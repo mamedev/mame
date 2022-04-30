@@ -45,19 +45,19 @@ void xavix2002_io_device::device_reset()
 	}
 }
 
-WRITE8_MEMBER(xavix2002_io_device::pio_dir_w)
+void xavix2002_io_device::pio_dir_w(offs_t offset, uint8_t data)
 {
 	LOG("%s: superxavix pio_dir_w (port %d) %02x\n", machine().describe_context(), offset, data);
 
 	if (offset < 3)
 	{
 		m_sx_pio_dir[offset] = data;
-		pio_out_w(space,offset, m_sx_pio_out[offset]);
+		pio_out_w(offset, m_sx_pio_out[offset]);
 		// update port?
 	}
 }
 
-READ8_MEMBER(xavix2002_io_device::pio_dir_r)
+uint8_t xavix2002_io_device::pio_dir_r(offs_t offset)
 {
 	LOG("%s: superxavix pio_dir_r (port %d)\n", machine().describe_context(), offset);
 	uint8_t ret = 0x00;
@@ -70,7 +70,7 @@ READ8_MEMBER(xavix2002_io_device::pio_dir_r)
 	return ret;
 }
 
-WRITE8_MEMBER(xavix2002_io_device::pio_out_w)
+void xavix2002_io_device::pio_out_w(offs_t offset, uint8_t data)
 {
 	LOG("%s: superxavix pio_out_w (port %d) %02x\n", machine().describe_context(), offset, data);
 
@@ -84,15 +84,15 @@ WRITE8_MEMBER(xavix2002_io_device::pio_out_w)
 
 		switch (offset)
 		{
-			case 0: m_out0_cb(space,0,outdata); break;
-			case 1: m_out1_cb(space,0,outdata); break;
-			case 2: m_out2_cb(space,0,outdata); break;
+			case 0: m_out0_cb(outdata); break;
+			case 1: m_out1_cb(outdata); break;
+			case 2: m_out2_cb(outdata); break;
 			default: break;
 		}
 	}
 }
 
-READ8_MEMBER(xavix2002_io_device::pio_out_r)
+uint8_t xavix2002_io_device::pio_out_r(offs_t offset)
 {
 	// what does this actually read?
 
@@ -107,7 +107,7 @@ READ8_MEMBER(xavix2002_io_device::pio_out_r)
 }
 
 
-READ8_MEMBER(xavix2002_io_device::pio_in_r)
+uint8_t xavix2002_io_device::pio_in_r(offs_t offset)
 {
 	LOG("%s: superxavix pio_in_r (port %d)\n", machine().describe_context(), offset);
 

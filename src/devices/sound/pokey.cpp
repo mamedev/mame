@@ -174,7 +174,7 @@ pokey_device::pokey_device(const machine_config &mconfig, const char *tag, devic
 		device_state_interface(mconfig, *this),
 		m_icount(0),
 		m_stream(nullptr),
-		m_pot_r_cb{ {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this} },
+		m_pot_r_cb(*this),
 		m_allpot_r_cb(*this),
 		m_serin_r_cb(*this),
 		m_serout_w_cb(*this),
@@ -251,8 +251,7 @@ void pokey_device::device_start()
 	std::fill(std::begin(m_clock_cnt), std::end(m_clock_cnt), 0);
 	std::fill(std::begin(m_POTx), std::end(m_POTx), 0);
 
-	for (devcb_read8 &cb : m_pot_r_cb)
-		cb.resolve();
+	m_pot_r_cb.resolve_all();
 	m_allpot_r_cb.resolve();
 	m_serin_r_cb.resolve();
 	m_serout_w_cb.resolve_safe();
@@ -264,15 +263,12 @@ void pokey_device::device_start()
 	timer_alloc(SYNC_POT);
 	timer_alloc(SYNC_SET_IRQST);
 
-	for (int i=0; i<POKEY_CHANNELS; i++)
-	{
-		save_item(NAME(m_channel[i].m_borrow_cnt), i);
-		save_item(NAME(m_channel[i].m_counter), i);
-		save_item(NAME(m_channel[i].m_filter_sample), i);
-		save_item(NAME(m_channel[i].m_output), i);
-		save_item(NAME(m_channel[i].m_AUDF), i);
-		save_item(NAME(m_channel[i].m_AUDC), i);
-	}
+	save_item(STRUCT_MEMBER(m_channel, m_borrow_cnt));
+	save_item(STRUCT_MEMBER(m_channel, m_counter));
+	save_item(STRUCT_MEMBER(m_channel, m_filter_sample));
+	save_item(STRUCT_MEMBER(m_channel, m_output));
+	save_item(STRUCT_MEMBER(m_channel, m_AUDF));
+	save_item(STRUCT_MEMBER(m_channel, m_AUDC));
 
 	save_item(NAME(m_clock_cnt));
 	save_item(NAME(m_p4));
@@ -362,7 +358,7 @@ void pokey_device::device_clock_changed()
 //  our sound stream
 //-------------------------------------------------
 
-void pokey_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pokey_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -681,14 +677,13 @@ void pokey_device::step_one_clock(void)
 }
 
 //-------------------------------------------------
-//  stream_generate - handle update requests for
+//  sound_stream_update - handle update requests for
 //  our sound stream
 //-------------------------------------------------
 
-
-void pokey_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void pokey_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *buffer = outputs[0];
+	auto &buffer = outputs[0];
 
 	if (m_output_type == LEGACY_LINEAR)
 	{
@@ -697,26 +692,21 @@ void pokey_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 			out += ((m_out_raw >> (4*i)) & 0x0f);
 		out *= POKEY_DEFAULT_GAIN;
 		out = (out > 0x7fff) ? 0x7fff : out;
-		while( samples > 0 )
-		{
-			*buffer++ = out;
-			samples--;
-		}
+		stream_buffer::sample_t outsamp = out * stream_buffer::sample_t(1.0 / 32768.0);
+		buffer.fill(outsamp);
 	}
 	else if (m_output_type == RC_LOWPASS)
 	{
 		double rTot = m_voltab[m_out_raw];
 
-		double V0 = rTot / (rTot+m_r_pullup) * m_v_ref / 5.0 * 32767.0;
+		double V0 = rTot / (rTot+m_r_pullup) * m_v_ref / 5.0;
 		double mult = (m_cap == 0.0) ? 1.0 : 1.0 - exp(-(rTot + m_r_pullup) / (m_cap * m_r_pullup * rTot) * m_clock_period.as_double());
 
-		while( samples > 0 )
+		for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 		{
 			/* store sum of output signals into the buffer */
 			m_out_filter += (V0 - m_out_filter) * mult;
-			*buffer++ = m_out_filter;
-			samples--;
-
+			buffer.put(sampindex, m_out_filter);
 		}
 	}
 	else if (m_output_type == OPAMP_C_TO_GROUND)
@@ -731,15 +721,8 @@ void pokey_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 		 * It is approximated by eliminating m_v_ref ( -1.0 term)
 		 */
 
-		double V0 = ((rTot+m_r_pullup) / rTot - 1.0) * m_v_ref  / 5.0 * 32767.0;
-
-		while( samples > 0 )
-		{
-			/* store sum of output signals into the buffer */
-			*buffer++ = V0;
-			samples--;
-
-		}
+		double V0 = ((rTot+m_r_pullup) / rTot - 1.0) * m_v_ref  / 5.0;
+		buffer.fill(V0);
 	}
 	else if (m_output_type == OPAMP_LOW_PASS)
 	{
@@ -748,25 +731,19 @@ void pokey_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 		 * It is approximated by not adding in VRef below.
 		 */
 
-		double V0 = (m_r_pullup / rTot) * m_v_ref  / 5.0 * 32767.0;
+		double V0 = (m_r_pullup / rTot) * m_v_ref  / 5.0;
 		double mult = (m_cap == 0.0) ? 1.0 : 1.0 - exp(-1.0 / (m_cap * m_r_pullup) * m_clock_period.as_double());
 
-		while( samples > 0 )
+		for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 		{
 			/* store sum of output signals into the buffer */
 			m_out_filter += (V0 - m_out_filter) * mult;
-			*buffer++ = m_out_filter /* + m_v_ref */;       // see above
-			samples--;
+			buffer.put(sampindex, m_out_filter);
 		}
 	}
 	else if (m_output_type == DISCRETE_VAR_R)
 	{
-		int32_t out = m_voltab[m_out_raw];
-		while( samples > 0 )
-		{
-			*buffer++ = out;
-			samples--;
-		}
+		buffer.fill(m_voltab[m_out_raw]);
 	}
 }
 

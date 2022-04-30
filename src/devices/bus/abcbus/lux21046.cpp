@@ -111,12 +111,14 @@ ROM_START( luxor_55_21046 )
 	ROM_DEFAULT_BIOS( "v207" )
 	ROM_SYSTEM_BIOS( 0, "v105", "Luxor v1.05 (1984-10-04)" )
 	ROMX_LOAD( "cntr 105.6cd", 0x2000, 0x2000, CRC(44043025) SHA1(17487ca35b399bb49d4015bbeede0809db8e772f), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "v107", "Luxor v1.07 (1985-07-03)" )
-	ROMX_LOAD( "cntr 1.07 6490318-07.6cd", 0x0000, 0x4000, CRC(db8c1c0e) SHA1(8bccd5bc72124984de529ee058df779f06d2c1d5), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 2, "v108", "Luxor v1.08 (1986-03-12)" )
-	ROMX_LOAD( "cntr 108.6cd", 0x2000, 0x2000, CRC(229764cb) SHA1(a2e2f6f49c31b827efc62f894de9a770b65d109d), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 3, "v207", "DiAB v2.07 (1987-06-24)" )
-	ROMX_LOAD( "diab 207.6cd", 0x2000, 0x2000, CRC(86622f52) SHA1(61ad271de53152c1640c0b364fce46d1b0b4c7e2), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 1, "v106", "Luxor v1.06 (1984-12-13)" )
+	ROMX_LOAD( "6490318-06.6cd", 0x2000, 0x2000, CRC(7f4726c9) SHA1(cf576456f135877537c5ee56b00a7259160d2c56), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "v107", "Luxor v1.07 (1985-07-03)" )
+	ROMX_LOAD( "cntr 1.07 6490318-07.6cd", 0x0000, 0x4000, CRC(db8c1c0e) SHA1(8bccd5bc72124984de529ee058df779f06d2c1d5), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 3, "v108", "Luxor v1.08 (1986-03-12)" )
+	ROMX_LOAD( "cntr 108.6cd", 0x2000, 0x2000, CRC(229764cb) SHA1(a2e2f6f49c31b827efc62f894de9a770b65d109d), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 4, "v207", "DiAB v2.07 (1987-06-24)" )
+	ROMX_LOAD( "diab 207.6cd", 0x2000, 0x2000, CRC(86622f52) SHA1(61ad271de53152c1640c0b364fce46d1b0b4c7e2), ROM_BIOS(4) )
 
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "pal16r4.2a", 0x000, 0x104, NO_DUMP)
@@ -161,7 +163,7 @@ void luxor_55_21046_device::luxor_55_21046_io(address_map &map)
 	map(0x58, 0x58).mirror(0x0007).select(0xff00).r(FUNC(luxor_55_21046_device::_9a_r));
 	map(0x68, 0x6b).mirror(0xff00).r(m_fdc, FUNC(fd1793_device::read));
 	map(0x78, 0x7b).mirror(0xff00).w(m_fdc, FUNC(fd1793_device::write));
-	map(0x80, 0x80).mirror(0xff77).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
+	map(0x80, 0x80).mirror(0xff77).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 }
 
 
@@ -232,29 +234,31 @@ WRITE_LINE_MEMBER( luxor_55_21046_device::dma_int_w )
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_fdc_irq || m_dma_irq);
 }
 
-READ8_MEMBER( luxor_55_21046_device::memory_read_byte )
+uint8_t luxor_55_21046_device::memory_read_byte(offs_t offset)
 {
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-WRITE8_MEMBER( luxor_55_21046_device::memory_write_byte )
+void luxor_55_21046_device::memory_write_byte(offs_t offset, uint8_t data)
 {
 	return m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
 }
 
-READ8_MEMBER( luxor_55_21046_device::io_read_byte )
+uint8_t luxor_55_21046_device::io_read_byte(offs_t offset)
 {
 	return m_maincpu->space(AS_IO).read_byte(offset);
 }
 
-WRITE8_MEMBER( luxor_55_21046_device::io_write_byte )
+void luxor_55_21046_device::io_write_byte(offs_t offset, uint8_t data)
 {
 	return m_maincpu->space(AS_IO).write_byte(offset, data);
 }
 
-FLOPPY_FORMATS_MEMBER( luxor_55_21046_device::floppy_formats )
-	FLOPPY_ABC800_FORMAT
-FLOPPY_FORMATS_END
+void luxor_55_21046_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ABC800_FORMAT);
+}
 
 static void abc_floppies(device_slot_interface &device)
 {
@@ -313,36 +317,36 @@ void luxor_55_21046_device::device_add_mconfig(machine_config & config)
 void abc830_device::device_add_mconfig(machine_config &config)
 {
 	luxor_55_21046_device::device_add_mconfig(config);
-	FLOPPY_CONNECTOR(config, m_floppy0, abc_floppies, "525ssdd", luxor_55_21046_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, abc_floppies, "525ssdd", luxor_55_21046_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy0, abc_floppies, "525ssdd", luxor_55_21046_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, abc_floppies, "525ssdd", luxor_55_21046_device::floppy_formats).enable_sound(true);
 }
 
 void abc832_device::device_add_mconfig(machine_config &config)
 {
 	luxor_55_21046_device::device_add_mconfig(config);
-	FLOPPY_CONNECTOR(config, m_floppy0, abc_floppies, "525qd", luxor_55_21046_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, abc_floppies, "525qd", luxor_55_21046_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy0, abc_floppies, "525qd", luxor_55_21046_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, abc_floppies, "525qd", luxor_55_21046_device::floppy_formats).enable_sound(true);
 }
 
 void abc834_device::device_add_mconfig(machine_config &config)
 {
 	luxor_55_21046_device::device_add_mconfig(config);
-	FLOPPY_CONNECTOR(config, m_floppy0, abc_floppies, "525qd", luxor_55_21046_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, abc_floppies, "525qd", luxor_55_21046_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy0, abc_floppies, "525qd", luxor_55_21046_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, abc_floppies, "525qd", luxor_55_21046_device::floppy_formats).enable_sound(true);
 }
 
 void abc838_device::device_add_mconfig(machine_config &config)
 {
 	luxor_55_21046_device::device_add_mconfig(config);
-	FLOPPY_CONNECTOR(config, m_floppy0, abc_floppies, "8dsdd", luxor_55_21046_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, abc_floppies, "8dsdd", luxor_55_21046_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy0, abc_floppies, "8dsdd", luxor_55_21046_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, abc_floppies, "8dsdd", luxor_55_21046_device::floppy_formats).enable_sound(true);
 }
 
 void abc850_floppy_device::device_add_mconfig(machine_config &config)
 {
 	luxor_55_21046_device::device_add_mconfig(config);
-	FLOPPY_CONNECTOR(config, m_floppy0, abc_floppies, "525qd", luxor_55_21046_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, abc_floppies, nullptr, luxor_55_21046_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy0, abc_floppies, "525qd", luxor_55_21046_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, abc_floppies, nullptr, luxor_55_21046_device::floppy_formats).enable_sound(true);
 }
 
 
@@ -789,10 +793,9 @@ void luxor_55_21046_device::device_reset()
 
 	m_maincpu->reset();
 
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	_4b_w(space, 0, 0);
-	_9b_w(space, 0, 0);
-	_8a_w(space, 0, 0);
+	_4b_w(0);
+	_9b_w(0);
+	_8a_w(0);
 }
 
 
@@ -932,9 +935,9 @@ void luxor_55_21046_device::abcbus_c4(uint8_t data)
 //  3d_r -
 //-------------------------------------------------
 
-READ8_MEMBER( luxor_55_21046_device::out_r )
+uint8_t luxor_55_21046_device::out_r()
 {
-	if (m_busy)
+	if (m_busy && !machine().side_effects_disabled())
 	{
 		m_busy = 0;
 	}
@@ -947,7 +950,7 @@ READ8_MEMBER( luxor_55_21046_device::out_r )
 //  4d_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( luxor_55_21046_device::inp_w )
+void luxor_55_21046_device::inp_w(uint8_t data)
 {
 	if (m_busy)
 	{
@@ -962,7 +965,7 @@ WRITE8_MEMBER( luxor_55_21046_device::inp_w )
 //  4b_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( luxor_55_21046_device::_4b_w )
+void luxor_55_21046_device::_4b_w(uint8_t data)
 {
 	/*
 
@@ -993,7 +996,7 @@ WRITE8_MEMBER( luxor_55_21046_device::_4b_w )
 //  9b_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( luxor_55_21046_device::_9b_w )
+void luxor_55_21046_device::_9b_w(uint8_t data)
 {
 	/*
 
@@ -1033,7 +1036,7 @@ WRITE8_MEMBER( luxor_55_21046_device::_9b_w )
 //  8a_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( luxor_55_21046_device::_8a_w )
+void luxor_55_21046_device::_8a_w(uint8_t data)
 {
 	/*
 
@@ -1053,7 +1056,7 @@ WRITE8_MEMBER( luxor_55_21046_device::_8a_w )
 	*/
 
 	// FDC master reset
-	if (!BIT(data, 0)) m_fdc->soft_reset();
+	m_fdc->mr_w(BIT(data, 0));
 
 	// density select
 	m_fdc->dden_w(BIT(data, 1));
@@ -1066,7 +1069,7 @@ WRITE8_MEMBER( luxor_55_21046_device::_8a_w )
 //  9a_r -
 //-------------------------------------------------
 
-READ8_MEMBER( luxor_55_21046_device::_9a_r )
+uint8_t luxor_55_21046_device::_9a_r(offs_t offset)
 {
 	/*
 

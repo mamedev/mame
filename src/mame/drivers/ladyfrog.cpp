@@ -57,24 +57,23 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-READ8_MEMBER(ladyfrog_state::from_snd_r)
+uint8_t ladyfrog_state::from_snd_r()
 {
 	m_snd_flag = 0;
 	return m_snd_data;
 }
 
-WRITE8_MEMBER(ladyfrog_state::to_main_w)
+void ladyfrog_state::to_main_w(uint8_t data)
 {
 	m_snd_data = data;
 	m_snd_flag = 2;
 }
 
-WRITE8_MEMBER(ladyfrog_state::sound_cpu_reset_w)
+void ladyfrog_state::sound_cpu_reset_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 1 ) ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -87,18 +86,18 @@ TIMER_CALLBACK_MEMBER(ladyfrog_state::nmi_callback)
 		m_pending_nmi = 1;
 }
 
-WRITE8_MEMBER(ladyfrog_state::sound_command_w)
+void ladyfrog_state::sound_command_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(ladyfrog_state::nmi_callback),this), data);
 }
 
-WRITE8_MEMBER(ladyfrog_state::nmi_disable_w)
+void ladyfrog_state::nmi_disable_w(uint8_t data)
 {
 	m_sound_nmi_enable = 0;
 }
 
-WRITE8_MEMBER(ladyfrog_state::nmi_enable_w)
+void ladyfrog_state::nmi_enable_w(uint8_t data)
 {
 	m_sound_nmi_enable = 1;
 	if (m_pending_nmi)
@@ -108,11 +107,11 @@ WRITE8_MEMBER(ladyfrog_state::nmi_enable_w)
 	}
 }
 
-WRITE8_MEMBER(ladyfrog_state::unk_w)
+void ladyfrog_state::unk_w(uint8_t data)
 {
 }
 
-READ8_MEMBER(ladyfrog_state::snd_flag_r)
+uint8_t ladyfrog_state::snd_flag_r()
 {
 	return m_snd_flag | 0xfd;
 }
@@ -339,9 +338,6 @@ void ladyfrog_state::ladyfrog(machine_config &config)
 	// pin 22 Noise Output  not mapped
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void ladyfrog_state::toucheme(machine_config &config)

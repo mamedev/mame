@@ -150,22 +150,22 @@ offs_t clipper_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	case 0x46: util::stream_format(stream, "loadd2  (r%d),f%d", R1, R2); bytes = 2; break;
 	case 0x47: util::stream_format(stream, "loadd2  %s,f%d", address(pc, opcodes), ADDR_R2); bytes = 2 + ADDR_SIZE; break;
 #endif
-	case 0x48: util::stream_format(stream, "b%-4s   (r%d)", cc[R2], R1); bytes = 2; break;
-	case 0x49: util::stream_format(stream, "b%-4s   %s", cc[ADDR_R2], address(pc, opcodes)); bytes = 2 + ADDR_SIZE; break;
+	case 0x48: util::stream_format(stream, "b%-4s   (r%d)", cc[R2], R1); bytes = 2; if (R2 != 0) flags |= STEP_COND; break;
+	case 0x49: util::stream_format(stream, "b%-4s   %s", cc[ADDR_R2], address(pc, opcodes)); bytes = 2 + ADDR_SIZE; if (ADDR_R2 != 0) flags |= STEP_COND; break;
 #if C400_INSTRUCTIONS
 	// delayed branches
-	case 0x4a: util::stream_format(stream, "cdb     r%d,(r%d)", R2, R1); bytes = 2; break;
-	case 0x4b: util::stream_format(stream, "cdb     r%d,%s", ADDR_R2, address(pc, opcodes)); bytes = 2 + ADDR_SIZE; break;
-	case 0x4c: util::stream_format(stream, "cdbeq   r%d,(r%d)", R2, R1); bytes = 2; break;
-	case 0x4d: util::stream_format(stream, "cdbeq   r%d,%s", ADDR_R2, address(pc, opcodes)); bytes = 2 + ADDR_SIZE; break;
-	case 0x4e: util::stream_format(stream, "cdbne   r%d,(r%d)", R2, R1); bytes = 2; break;
-	case 0x4f: util::stream_format(stream, "cdbne   r%d,%s", ADDR_R2, address(pc, opcodes)); bytes = 2 + ADDR_SIZE; break;
-	case 0x50: util::stream_format(stream, "db%-4s  (r%d)", cc[R2], R1); bytes = 2; break;
-	case 0x51: util::stream_format(stream, "db%-4s  %s", cc[ADDR_R2], address(pc, opcodes)); bytes = 2 + ADDR_SIZE; break;
+	case 0x4a: util::stream_format(stream, "cdb     r%d,(r%d)", R2, R1); bytes = 2; flags |= STEP_COND | step_over_extra(2); break;
+	case 0x4b: util::stream_format(stream, "cdb     r%d,%s", ADDR_R2, address(pc, opcodes)); bytes = 2 + ADDR_SIZE; flags |= STEP_COND | step_over_extra(2); break;
+	case 0x4c: util::stream_format(stream, "cdbeq   r%d,(r%d)", R2, R1); bytes = 2; flags |= STEP_COND | step_over_extra(2); break;
+	case 0x4d: util::stream_format(stream, "cdbeq   r%d,%s", ADDR_R2, address(pc, opcodes)); bytes = 2 + ADDR_SIZE; flags |= STEP_COND | step_over_extra(2); break;
+	case 0x4e: util::stream_format(stream, "cdbne   r%d,(r%d)", R2, R1); bytes = 2; flags |= STEP_COND | step_over_extra(2); break;
+	case 0x4f: util::stream_format(stream, "cdbne   r%d,%s", ADDR_R2, address(pc, opcodes)); bytes = 2 + ADDR_SIZE; flags |= STEP_COND | step_over_extra(2); break;
+	case 0x50: util::stream_format(stream, "db%-4s  (r%d)", cc[R2], R1); bytes = 2; if (R2 != 0) flags |= STEP_COND | step_over_extra(2); break;
+	case 0x51: util::stream_format(stream, "db%-4s  %s", cc[ADDR_R2], address(pc, opcodes)); bytes = 2 + ADDR_SIZE; if (ADDR_R2 != 0) flags |= STEP_COND | step_over_extra(2); break;
 #else
 	// these instructions are in the C300 documentation, but appear to be replaced in the C400
-	case 0x4c: util::stream_format(stream, "bf%s   (r%d)", R2 == 0 ? "any" : "bad", R1); bytes = 2; break;
-	case 0x4d: util::stream_format(stream, "bf%s   %s", ADDR_R2 == 0 ? "any" : "bad", address(pc, opcodes)); bytes = 2 + ADDR_SIZE; break;
+	case 0x4c: util::stream_format(stream, "bf%s   (r%d)", R2 == 0 ? "any" : "bad", R1); bytes = 2; flags |= STEP_COND; break;
+	case 0x4d: util::stream_format(stream, "bf%s   %s", ADDR_R2 == 0 ? "any" : "bad", address(pc, opcodes)); bytes = 2 + ADDR_SIZE; flags |= STEP_COND; break;
 #endif
 
 	case 0x60: util::stream_format(stream, "loadw   (r%d),r%d", R1, R2); bytes = 2; break;

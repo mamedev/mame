@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Couriersud
 
 #ifndef PTIME_H_
@@ -27,13 +27,6 @@ namespace plib
 		const static bool value = sizeof(T) <= sizeof(U);
 	};
 
-#if 0
-	template<typename T, typename U>
-	struct ptime_res {
-		using type = typename std::conditional<sizeof(T) >= sizeof(U), T, U>::type;
-	};
-#endif
-
 	template <typename TYPE, TYPE RES>
 	struct ptime final
 	{
@@ -53,28 +46,35 @@ namespace plib
 		constexpr ptime(ptime &&rhs) noexcept = default;
 		constexpr explicit ptime(const internal_type &time) noexcept : m_time(time) {}
 		constexpr explicit ptime(internal_type &&time) noexcept : m_time(time) {}
-		C14CONSTEXPR ptime &operator=(const ptime &rhs) noexcept = default;
-		C14CONSTEXPR ptime &operator=(ptime &&rhs) noexcept  = default;
+		constexpr ptime &operator=(const ptime &rhs) noexcept = default;
+		constexpr ptime &operator=(ptime &&rhs) noexcept  = default;
 
 		constexpr explicit ptime(const double t) = delete;
-		//: m_time((internal_type) ( t * (double) resolution)) { }
 		constexpr explicit ptime(const internal_type nom, const internal_type den) noexcept
 		: m_time(nom * (RES / den)) { }
 
-		// FIXME: check for overflow
-		template <typename O>
-		constexpr explicit ptime(const ptime<O, RES> &rhs) noexcept
-		: m_time(rhs.m_time) { }
+		template <typename O, typename = std::enable_if_t<ptime_le<ptime<O, RES>, ptime>::value>>
+		constexpr ptime(const ptime<O, RES> &rhs) noexcept
+		: m_time(static_cast<TYPE>(rhs.m_time))
+		{
+		}
+
+		template <typename O, typename T = std::enable_if_t<!ptime_le<ptime<O, RES>, ptime>::value, int>>
+		constexpr explicit ptime(const ptime<O, RES> &rhs, T dummy = 0) noexcept
+		: m_time(static_cast<TYPE>(rhs.m_time))
+		{
+			plib::unused_var(dummy);
+		}
 
 		template <typename O>
-		C14CONSTEXPR ptime &operator+=(const ptime<O, RES> &rhs) noexcept
+		constexpr ptime &operator+=(const ptime<O, RES> &rhs) noexcept
 		{
 			static_assert(ptime_le<ptime<O, RES>, ptime>::value, "Invalid ptime type");
 			m_time += rhs.m_time;
 			return *this;
 		}
 		template <typename O>
-		C14CONSTEXPR ptime &operator-=(const ptime<O, RES> &rhs) noexcept
+		constexpr ptime &operator-=(const ptime<O, RES> &rhs) noexcept
 		{
 			static_assert(ptime_le<ptime<O, RES>, ptime>::value, "Invalid ptime type");
 			m_time -= rhs.m_time;
@@ -82,7 +82,7 @@ namespace plib
 		}
 
 		template <typename M>
-		C14CONSTEXPR ptime &operator*=(const M factor) noexcept
+		constexpr ptime &operator*=(const M &factor) noexcept
 		{
 			static_assert(plib::is_integral<M>::value, "Factor must be an integral type");
 			m_time *= factor;
@@ -97,7 +97,7 @@ namespace plib
 		}
 
 		template <typename O>
-		constexpr ptime operator+(const ptime<O, RES> &rhs) const noexcept
+		constexpr ptime operator+(ptime<O, RES> rhs) const noexcept
 		{
 			static_assert(ptime_le<ptime<O, RES>, ptime>::value, "Invalid ptime type");
 			return ptime(m_time + rhs.m_time);
@@ -117,52 +117,60 @@ namespace plib
 			return static_cast<mult_type>(m_time / rhs.m_time);
 		}
 
-		friend constexpr bool operator<(const ptime lhs, const ptime rhs) noexcept
+		template <typename T>
+		constexpr std::enable_if_t<std::is_integral<T>::value, ptime>
+		operator/(const T &rhs) const noexcept
 		{
-			return (lhs.m_time < rhs.m_time);
+			return ptime(m_time / rhs);
 		}
 
-		friend constexpr bool operator>(const ptime lhs, const ptime rhs) noexcept
+		template <typename O>
+		friend constexpr bool operator<(const ptime &lhs, const ptime<O, RES> &rhs) noexcept
 		{
-			return (rhs < lhs);
+			static_assert(ptime_le<ptime<O, RES>, ptime>::value, "Invalid ptime type");
+			return (lhs.m_time < rhs.as_raw());
+			//return (lhs.m_time < rhs.m_time);
 		}
 
-		friend constexpr bool operator<=(const ptime lhs, const ptime rhs) noexcept
+		template <typename O>
+		friend constexpr bool operator>(const ptime &lhs, const ptime<O, RES> &rhs) noexcept
+		{
+			static_assert(ptime_le<ptime<O, RES>, ptime>::value, "Invalid ptime type");
+			return (lhs.m_time > rhs.as_raw());
+		}
+
+		template <typename O>
+		friend constexpr bool operator<=(const ptime &lhs, const ptime<O, RES> &rhs) noexcept
 		{
 			return !(lhs > rhs);
 		}
 
-		friend constexpr bool operator>=(const ptime lhs, const ptime rhs) noexcept
+		template <typename O>
+		friend constexpr bool operator>=(const ptime &lhs, const ptime<O, RES> &rhs) noexcept
 		{
 			return !(lhs < rhs);
 		}
 
-		friend constexpr bool operator==(const ptime lhs, const ptime rhs) noexcept
+		template <typename O>
+		friend constexpr bool operator==(const ptime &lhs, const ptime<O, RES> &rhs) noexcept
 		{
-			return lhs.m_time == rhs.m_time;
+			return lhs.m_time == rhs.as_raw();
 		}
 
-		friend constexpr bool operator!=(const ptime lhs, const ptime rhs) noexcept
+		template <typename O>
+		friend constexpr bool operator!=(const ptime &lhs, const ptime<O, RES> &rhs) noexcept
 		{
 			return !(lhs == rhs);
 		}
 
 		constexpr internal_type as_raw() const noexcept { return m_time; }
 
-		template <typename FT, typename = std::enable_if<std::is_floating_point<FT>::value, FT>>
+		template <typename FT, typename = std::enable_if<plib::is_floating_point<FT>::value, FT>>
 		constexpr FT
 		as_fp() const noexcept
 		{
 			return static_cast<FT>(m_time) * inv_res<FT>();
 		}
-
-#if PUSE_FLOAT128
-		constexpr __float128
-		as_fp() const noexcept
-		{
-			return static_cast<__float128>(m_time) * inv_res<__float128>();
-		}
-#endif
 
 		constexpr double as_double() const noexcept { return as_fp<double>(); }
 		constexpr double as_float() const noexcept { return as_fp<float>(); }
@@ -173,7 +181,12 @@ namespace plib
 		constexpr ptime shr(unsigned shift) const noexcept { return ptime(m_time >> shift); }
 
 		// for save states ....
-		C14CONSTEXPR internal_type *get_internaltype_ptr() noexcept { return &m_time; }
+
+		template <typename ST>
+		void save_state(ST &&st)
+		{
+			st.save_item(m_time, "m_time");
+		}
 
 		static constexpr ptime from_nsec(internal_type ns) noexcept { return ptime(ns, UINT64_C(1000000000)); }
 		static constexpr ptime from_usec(internal_type us) noexcept { return ptime(us, UINT64_C(   1000000)); }
@@ -183,11 +196,7 @@ namespace plib
 		static constexpr ptime from_raw(internal_type raw) noexcept { return ptime(raw); }
 
 		template <typename FT>
-		static constexpr typename std::enable_if<std::is_floating_point<FT>::value
-#if PUSE_FLOAT128
-			|| std::is_same<FT, __float128>::value
-#endif
-		, ptime>::type
+		static constexpr std::enable_if_t<plib::is_floating_point<FT>::value, ptime>
 		from_fp(FT t) noexcept { return ptime(static_cast<internal_type>(plib::floor(t * static_cast<FT>(RES) + static_cast<FT>(0.5))), RES); }
 
 		static constexpr ptime from_double(double t) noexcept
@@ -204,10 +213,10 @@ namespace plib
 		static constexpr ptime never() noexcept { return ptime(plib::numeric_limits<internal_type>::max(), RES); }
 		static constexpr internal_type resolution() noexcept { return RES; }
 
-		constexpr internal_type in_nsec() const noexcept { return m_time / (RES / UINT64_C(1000000000)); }
-		constexpr internal_type in_usec() const noexcept { return m_time / (RES / UINT64_C(   1000000)); }
-		constexpr internal_type in_msec() const noexcept { return m_time / (RES / UINT64_C(      1000)); }
-		constexpr internal_type in_sec()  const noexcept { return m_time / (RES / UINT64_C(         1)); }
+		constexpr internal_type in_nsec() const noexcept { return m_time / (RES / INT64_C(1000000000)); }
+		constexpr internal_type in_usec() const noexcept { return m_time / (RES / INT64_C(   1000000)); }
+		constexpr internal_type in_msec() const noexcept { return m_time / (RES / INT64_C(      1000)); }
+		constexpr internal_type in_sec()  const noexcept { return m_time / (RES / INT64_C(         1)); }
 
 	private:
 		template <typename FT>

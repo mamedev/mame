@@ -12,16 +12,11 @@
 #include "a2memexp.h"
 
 
+namespace {
+
 /***************************************************************************
     PARAMETERS
 ***************************************************************************/
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(A2BUS_MEMEXP,    a2bus_memexpapple_device, "a2memexp", "Apple II Memory Expansion Card")
-DEFINE_DEVICE_TYPE(A2BUS_RAMFACTOR, a2bus_ramfactor_device,   "a2ramfac", "Applied Engineering RamFactor")
 
 #define MEMEXP_ROM_REGION  "memexp_rom"
 
@@ -37,6 +32,56 @@ ROM_START( ramfactor )
 	ROM_LOAD( "ae ramfactor rom v1.1.bin", 0x4000, 0x2000, CRC(328907a3) SHA1(dc25b4133a52609799098d8918a289fd973d28d9) )
 	ROM_LOAD( "ae ramfactor rom v1.0.bin", 0x6000, 0x2000, CRC(39c2162a) SHA1(9286d35907939aadb1fffd3e1d75603fe3e846ad) )
 ROM_END
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+class a2bus_memexp_device:
+	public device_t,
+	public device_a2bus_card_interface
+{
+public:
+	bool m_isramfactor;
+	uint8_t m_bankhior;
+	int m_addrmask;
+
+protected:
+	// construction/destruction
+	a2bus_memexp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	// overrides of standard a2bus slot functions
+	virtual uint8_t read_c0nx(uint8_t offset) override;
+	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+	virtual uint8_t read_cnxx(uint8_t offset) override;
+	virtual uint8_t read_c800(uint16_t offset) override;
+
+private:
+	required_region_ptr<uint8_t> m_rom;
+	uint8_t m_regs[0x10];
+	uint8_t m_ram[8*1024*1024];
+	int m_wptr, m_liveptr;
+};
+
+class a2bus_memexpapple_device : public a2bus_memexp_device
+{
+public:
+	a2bus_memexpapple_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class a2bus_ramfactor_device : public a2bus_memexp_device
+{
+public:
+	a2bus_ramfactor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -70,7 +115,9 @@ const tiny_rom_entry *a2bus_ramfactor_device::device_rom_region() const
 
 a2bus_memexp_device::a2bus_memexp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	device_a2bus_card_interface(mconfig, *this), m_isramfactor(false), m_bankhior(0), m_addrmask(0), m_rom(nullptr), m_wptr(0), m_liveptr(0)
+	device_a2bus_card_interface(mconfig, *this), m_isramfactor(false), m_bankhior(0), m_addrmask(0),
+	m_rom(*this, MEMEXP_ROM_REGION),
+	m_wptr(0), m_liveptr(0)
 {
 }
 
@@ -96,8 +143,6 @@ a2bus_ramfactor_device::a2bus_ramfactor_device(const machine_config &mconfig, co
 
 void a2bus_memexp_device::device_start()
 {
-	m_rom = device().machine().root_device().memregion(this->subtag(MEMEXP_ROM_REGION).c_str())->base();
-
 	memset(m_ram, 0xff, 1024*1024*sizeof(uint8_t));
 
 	save_item(NAME(m_regs));
@@ -212,3 +257,13 @@ uint8_t a2bus_memexp_device::read_c800(uint16_t offset)
 	else
 		return m_rom[offset+0x800];
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_MEMEXP,    device_a2bus_card_interface, a2bus_memexpapple_device, "a2memexp", "Apple II Memory Expansion Card")
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_RAMFACTOR, device_a2bus_card_interface, a2bus_ramfactor_device,   "a2ramfac", "Applied Engineering RamFactor")

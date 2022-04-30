@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-  machine.c
+  taitosj.cpp
 
   Functions to emulate general aspects of the machine (RAM, ROM, interrupts,
   I/O ports)
@@ -20,8 +20,8 @@
 
 void taitosj_state::machine_start()
 {
-	membank("bank1")->configure_entry(0, memregion("maincpu")->base() + 0x6000);
-	membank("bank1")->configure_entry(1, memregion("maincpu")->base() + 0x10000);
+	m_mainbank->configure_entry(0, memregion("maincpu")->base() + 0x6000);
+	m_mainbank->configure_entry(1, memregion("maincpu")->base() + 0x10000);
 
 	save_item(NAME(m_spacecr_prot_value));
 	save_item(NAME(m_protection_value));
@@ -29,16 +29,15 @@ void taitosj_state::machine_start()
 
 void taitosj_state::machine_reset()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	/* set the default ROM bank (many games only have one bank and */
-	/* never write to the bank selector register) */
-	taitosj_bankswitch_w(space, 0, 0);
+	/* set the default ROM bank (many games only have one bank and
+	   never write to the bank selector register) */
+	bankswitch_w(0);
 
 	m_spacecr_prot_value = 0;
 }
 
 
-WRITE8_MEMBER(taitosj_state::taitosj_bankswitch_w)
+void taitosj_state::bankswitch_w(uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_global_w(~data & 1);
 
@@ -47,16 +46,15 @@ WRITE8_MEMBER(taitosj_state::taitosj_bankswitch_w)
 	    amplitude-overdrive-mute stuff done by
 	    bit 1 here should be done on a netlist.
 	*/
-	m_ay1->set_output_gain(0, (data & 0x2) ? 1.0 : 0.0); // 3 outputs for Ay1 since it doesn't use tied together outs
-	m_ay1->set_output_gain(1, (data & 0x2) ? 1.0 : 0.0);
-	m_ay1->set_output_gain(2, (data & 0x2) ? 1.0 : 0.0);
-	m_ay2->set_output_gain(0, (data & 0x2) ? 1.0 : 0.0);
-	m_ay3->set_output_gain(0, (data & 0x2) ? 1.0 : 0.0);
-	m_ay4->set_output_gain(0, (data & 0x2) ? 1.0 : 0.0);
+	m_ay[0]->set_output_gain(0, (data & 0x2) ? 1.0 : 0.0); // 3 outputs for Ay1 since it doesn't use tied together outs
+	m_ay[0]->set_output_gain(1, (data & 0x2) ? 1.0 : 0.0);
+	m_ay[0]->set_output_gain(2, (data & 0x2) ? 1.0 : 0.0);
+	m_ay[1]->set_output_gain(0, (data & 0x2) ? 1.0 : 0.0);
+	m_ay[2]->set_output_gain(0, (data & 0x2) ? 1.0 : 0.0);
+	m_ay[3]->set_output_gain(0, (data & 0x2) ? 1.0 : 0.0);
 	m_dac->set_output_gain(0, (data & 0x2) ? 1.0 : 0.0);
 
-	if(data & 0x80) membank("bank1")->set_entry(1);
-	else membank("bank1")->set_entry(0);
+	m_mainbank->set_entry(BIT(data, 7));
 }
 
 
@@ -74,30 +72,30 @@ WRITE8_MEMBER(taitosj_state::taitosj_bankswitch_w)
  direct access to the Z80 memory space. It can also trigger IRQs on the Z80.
 
 ***************************************************************************/
-READ8_MEMBER(taitosj_state::taitosj_fake_data_r)
+uint8_t taitosj_state::fake_data_r()
 {
-	LOG(("%04x: protection read\n",m_maincpu->pc()));
+	LOG(("%04x: protection read\n", m_maincpu->pc()));
 	return 0;
 }
 
-WRITE8_MEMBER(taitosj_state::taitosj_fake_data_w)
+void taitosj_state::fake_data_w(uint8_t data)
 {
-	LOG(("%04x: protection write %02x\n",m_maincpu->pc(),data));
+	LOG(("%04x: protection write %02x\n", m_maincpu->pc(), data));
 }
 
-READ8_MEMBER(taitosj_state::taitosj_fake_status_r)
+uint8_t taitosj_state::fake_status_r()
 {
-	LOG(("%04x: protection status read\n",m_maincpu->pc()));
+	LOG(("%04x: protection status read\n", m_maincpu->pc()));
 	return 0xff;
 }
 
 
-READ8_MEMBER(taitosj_state::mcu_mem_r)
+uint8_t taitosj_state::mcu_mem_r(offs_t offset)
 {
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-WRITE8_MEMBER(taitosj_state::mcu_mem_w)
+void taitosj_state::mcu_mem_w(offs_t offset, uint8_t data)
 {
 	m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
 }
@@ -117,9 +115,9 @@ WRITE_LINE_MEMBER(taitosj_state::mcu_busrq_w)
 }
 
 
-/* Space Cruiser protection (otherwise the game resets on the asteroids level) */
+// Space Cruiser protection (otherwise the game resets on the asteroids level)
 
-READ8_MEMBER(taitosj_state::spacecr_prot_r)
+uint8_t taitosj_state::spacecr_prot_r()
 {
 	int pc = m_maincpu->pc();
 
@@ -132,9 +130,9 @@ READ8_MEMBER(taitosj_state::spacecr_prot_r)
 }
 
 
-/* Alpine Ski protection crack routines */
+// Alpine Ski protection crack routines
 
-WRITE8_MEMBER(taitosj_state::alpine_protection_w)
+void taitosj_state::alpine_protection_w(uint8_t data)
 {
 	switch (data)
 	{
@@ -144,7 +142,7 @@ WRITE8_MEMBER(taitosj_state::alpine_protection_w)
 	case 0x07:
 	case 0x0c:
 	case 0x0f:
-		m_protection_value = 0x00;      /* not used as far as I can tell */
+		m_protection_value = 0x00;      // not used as far as I can tell
 		break;
 	case 0x16:
 		m_protection_value = 0x08;
@@ -153,18 +151,18 @@ WRITE8_MEMBER(taitosj_state::alpine_protection_w)
 		m_protection_value = 0x18;
 		break;
 	default:
-		m_protection_value = data;      /* not used as far as I can tell */
+		m_protection_value = data;      // not used as far as I can tell
 		break;
 	}
 }
 
-WRITE8_MEMBER(taitosj_state::alpinea_bankswitch_w)
+void taitosj_state::alpinea_bankswitch_w(uint8_t data)
 {
-	taitosj_bankswitch_w(space, offset, data);
+	bankswitch_w(data);
 	m_protection_value = data >> 2;
 }
 
-READ8_MEMBER(taitosj_state::alpine_port_2_r)
+uint8_t taitosj_state::alpine_port_2_r()
 {
-	return ioport("IN2")->read() | m_protection_value;
+	return m_in2->read() | m_protection_value;
 }

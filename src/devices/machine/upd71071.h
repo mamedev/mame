@@ -21,10 +21,10 @@ public:
 	template <unsigned N> auto dma_write_callback() { return m_dma_write_cb[N].bind(); }
 	template <unsigned N> auto out_dack_callback() { return m_out_dack_cb[N].bind(); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_WRITE_LINE_MEMBER(set_hreq);
-	DECLARE_WRITE_LINE_MEMBER(set_eop);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	void set_hreq(int state);
+	void set_eop(int state);
 
 	int dmarq(int state, int channel);
 
@@ -63,11 +63,11 @@ private:
 	//int m_transfer_size[4];
 	int m_base;
 	int m_upd_clock;
-	devcb_write_line    m_out_hreq_cb;
-	devcb_write_line    m_out_eop_cb;
-	devcb_read16        m_dma_read_cb[4];
-	devcb_write16       m_dma_write_cb[4];
-	devcb_write_line    m_out_dack_cb[4];
+	devcb_write_line m_out_hreq_cb;
+	devcb_write_line m_out_eop_cb;
+	devcb_read16::array<4> m_dma_read_cb;
+	devcb_write16::array<4> m_dma_write_cb;
+	devcb_write_line::array<4> m_out_dack_cb;
 	int m_hreq;
 	int m_eop;
 	optional_device<cpu_device> m_cpu;

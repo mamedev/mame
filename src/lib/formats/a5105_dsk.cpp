@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/a5105_dsk.h"
 
 a5105_format::a5105_format() : upd765_format(formats)
@@ -44,4 +42,4 @@ const a5105_format::format a5105_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_A5105_FORMAT = &floppy_image_format_creator<a5105_format>;
+const a5105_format FLOPPY_A5105_FORMAT;

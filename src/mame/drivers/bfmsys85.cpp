@@ -97,20 +97,20 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	int m_mmtr_latch;
-	int m_triac_latch;
-	int m_alpha_clock; // always 0
-	int m_irq_status;
-	int m_optic_pattern;
-	int m_locked; // always 0
-	int m_is_timer_enabled; // always 1
-	int m_coin_inhibits; // always 0
-	int m_mux_output_strobe;
-	int m_mux_input_strobe;
-	int m_mux_input;
-	uint8_t m_Inputs[64];
-	uint8_t m_codec_data[256];
-	uint8_t m_sys85_data_line_t; // never read
+	int m_mmtr_latch = 0;
+	int m_triac_latch = 0;
+	int m_alpha_clock = 0; // always 0
+	int m_irq_status = 0;
+	int m_optic_pattern = 0;
+	int m_locked = 0; // always 0
+	int m_is_timer_enabled = 1; // always 1
+	int m_coin_inhibits = 0; // always 0
+	int m_mux_output_strobe = 0;
+	int m_mux_input_strobe = 0;
+	int m_mux_input = 0;
+	uint8_t m_Inputs[64]{};
+	uint8_t m_codec_data[256]{};
+	uint8_t m_sys85_data_line_t = 0; // never read
 	optional_device<rocvfd_device> m_vfd;
 	required_device<cpu_device> m_maincpu;
 	required_device_array<stepper_device, 4> m_reel;
@@ -119,20 +119,20 @@ private:
 	output_finder<256> m_lamps;
 
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
-	DECLARE_WRITE8_MEMBER(watchdog_w);
-	DECLARE_READ8_MEMBER(irqlatch_r);
-	DECLARE_WRITE8_MEMBER(reel12_w);
-	DECLARE_WRITE8_MEMBER(reel34_w);
-	DECLARE_WRITE8_MEMBER(mmtr_w);
-	DECLARE_READ8_MEMBER(mmtr_r);
-	DECLARE_WRITE8_MEMBER(vfd_w);
-	DECLARE_WRITE8_MEMBER(mux_ctrl_w);
-	DECLARE_READ8_MEMBER(mux_ctrl_r);
-	DECLARE_WRITE8_MEMBER(mux_data_w);
-	DECLARE_READ8_MEMBER(mux_data_r);
-	DECLARE_WRITE8_MEMBER(mux_enable_w);
-	DECLARE_WRITE8_MEMBER(triac_w);
-	DECLARE_READ8_MEMBER(triac_r);
+	void watchdog_w(uint8_t data);
+	uint8_t irqlatch_r();
+	void reel12_w(uint8_t data);
+	void reel34_w(uint8_t data);
+	void mmtr_w(uint8_t data);
+	uint8_t mmtr_r();
+	void vfd_w(uint8_t data);
+	void mux_ctrl_w(uint8_t data);
+	uint8_t mux_ctrl_r();
+	void mux_data_w(uint8_t data);
+	uint8_t mux_data_r();
+	void mux_enable_w(uint8_t data);
+	void triac_w(uint8_t data);
+	uint8_t triac_r();
 	DECLARE_WRITE_LINE_MEMBER(sys85_data_w);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	int b85_find_project_string();
@@ -181,7 +181,7 @@ void bfmsys85_state::machine_reset()
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::watchdog_w)
+void bfmsys85_state::watchdog_w(uint8_t data)
 {
 }
 
@@ -198,7 +198,7 @@ INTERRUPT_GEN_MEMBER(bfmsys85_state::timer_irq)
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfmsys85_state::irqlatch_r)
+uint8_t bfmsys85_state::irqlatch_r()
 {
 	int result = m_irq_status | 0x02;
 
@@ -209,7 +209,7 @@ READ8_MEMBER(bfmsys85_state::irqlatch_r)
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::reel12_w)
+void bfmsys85_state::reel12_w(uint8_t data)
 {
 	m_reel[0]->update((data>>4)&0x0f);
 	m_reel[1]->update( data    &0x0f);
@@ -220,7 +220,7 @@ WRITE8_MEMBER(bfmsys85_state::reel12_w)
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::reel34_w)
+void bfmsys85_state::reel34_w(uint8_t data)
 {
 	m_reel[2]->update((data>>4)&0x0f);
 	m_reel[3]->update( data    &0x0f);
@@ -233,7 +233,7 @@ WRITE8_MEMBER(bfmsys85_state::reel34_w)
 // mechanical meters //////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::mmtr_w)
+void bfmsys85_state::mmtr_w(uint8_t data)
 {
 	int  changed = m_mmtr_latch ^ data;
 
@@ -247,26 +247,26 @@ WRITE8_MEMBER(bfmsys85_state::mmtr_w)
 }
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfmsys85_state::mmtr_r)
+uint8_t bfmsys85_state::mmtr_r()
 {
 	return m_mmtr_latch;
 }
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::vfd_w)
+void bfmsys85_state::vfd_w(uint8_t data)
 {
 //reset 0x20, clock 0x80, data 0x40
 
 	m_vfd->por(data & 0x20);//inverted?
 	m_vfd->sclk(data & 0x80);
-	m_vfd->data(data&0x40);
+	m_vfd->data(!(data & 0x40));
 }
 
 //////////////////////////////////////////////////////////////////////////////////
 // input / output multiplexers ///////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::mux_ctrl_w)
+void bfmsys85_state::mux_ctrl_w(uint8_t data)
 {
 	switch ( data & 0xF0 )
 	{
@@ -301,14 +301,14 @@ WRITE8_MEMBER(bfmsys85_state::mux_ctrl_w)
 	}
 }
 
-READ8_MEMBER(bfmsys85_state::mux_ctrl_r)
+uint8_t bfmsys85_state::mux_ctrl_r()
 {
 	// software waits for bit7 to become low
 
 	return 0;
 }
 
-WRITE8_MEMBER(bfmsys85_state::mux_data_w)
+void bfmsys85_state::mux_data_w(uint8_t data)
 {
 	int off = m_mux_output_strobe<<4;
 
@@ -319,14 +319,14 @@ WRITE8_MEMBER(bfmsys85_state::mux_data_w)
 	}
 }
 
-READ8_MEMBER(bfmsys85_state::mux_data_r)
+uint8_t bfmsys85_state::mux_data_r()
 {
 	return m_mux_input;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::mux_enable_w)
+void bfmsys85_state::mux_enable_w(uint8_t data)
 {
 }
 
@@ -334,14 +334,14 @@ WRITE8_MEMBER(bfmsys85_state::mux_enable_w)
 // payslide triacs ////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::triac_w)
+void bfmsys85_state::triac_w(uint8_t data)
 {
 	m_triac_latch = data;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfmsys85_state::triac_r)
+uint8_t bfmsys85_state::triac_r()
 {
 	return m_triac_latch;
 }
@@ -796,9 +796,9 @@ GAME( 1989, b85clbpm,   0,          bfmsys85, bfmsys85, bfmsys85_state, init_dec
 
 
 // PROJECT NUMBER 5116  HI LO SILVER DX  GAME No 39-350-049 -   27-FEB-1987 10:49:08
-GAME( 1987, b85hilo,    0,          bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "Hi Lo Silver (System 85, set 1)", MACHINE_FLAGS )
+GAME( 1987, b85hilo,    0,          bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "Hi-Lo Silver (System 85, set 1)", MACHINE_FLAGS )
 // PROJECT NUMBER 5407  HI LO SILVER 2P  GAME No 39-350-142 -   12-OCT-1988 09:39:26
-GAME( 1988, b85hiloa,   b85hilo,    bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "Hi Lo Silver (System 85, set 2)", MACHINE_FLAGS )
+GAME( 1988, b85hiloa,   b85hilo,    bfmsys85, bfmsys85, bfmsys85_state, init_decode,   0, "BFM",      "Hi-Lo Silver (System 85, set 2)", MACHINE_FLAGS )
 
 
 // PROJECT NUMBER 5104  THE RITZ 10P PLAY  GAME No 39-350-084 -   28-AUG-1987 08:44:30

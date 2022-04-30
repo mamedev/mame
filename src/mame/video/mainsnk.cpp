@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(mainsnk_state::get_tx_tile_info)
 {
 	int code = m_fgram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			0,
 			tile_index & 0x400 ? TILE_FORCE_LAYER0 : 0);
@@ -60,7 +60,7 @@ TILE_GET_INFO_MEMBER(mainsnk_state::get_bg_tile_info)
 {
 	int code = (m_bgram[tile_index]);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_bg_tile_offset + code,
 			0,
 			0);
@@ -82,7 +82,7 @@ void mainsnk_state::video_start()
 }
 
 
-WRITE8_MEMBER(mainsnk_state::c600_w)
+void mainsnk_state::c600_w(uint8_t data)
 {
 	int total_elements = m_gfxdecode->gfx(0)->elements();
 
@@ -104,13 +104,13 @@ WRITE8_MEMBER(mainsnk_state::c600_w)
 	}
 }
 
-WRITE8_MEMBER(mainsnk_state::fgram_w)
+void mainsnk_state::fgram_w(offs_t offset, uint8_t data)
 {
 	m_fgram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(mainsnk_state::bgram_w)
+void mainsnk_state::bgram_w(offs_t offset, uint8_t data)
 {
 	m_bgram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);

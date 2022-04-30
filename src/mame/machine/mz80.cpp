@@ -26,7 +26,7 @@ void mz80_state::machine_reset()
 }
 
 
-READ8_MEMBER( mz80_state::mz80k_8255_portb_r )
+uint8_t mz80_state::mz80k_8255_portb_r()
 {
 	char kbdrow[8];
 	sprintf(kbdrow,"LINE%d", m_mz80k_keyboard_line);
@@ -36,7 +36,7 @@ READ8_MEMBER( mz80_state::mz80k_8255_portb_r )
 		return ioport(kbdrow)->read();
 }
 
-READ8_MEMBER( mz80_state::mz80k_8255_portc_r )
+uint8_t mz80_state::mz80k_8255_portc_r()
 {
 	uint8_t val = 0;
 	val |= m_mz80k_vertical ? 0x80 : 0x00;
@@ -49,12 +49,12 @@ READ8_MEMBER( mz80_state::mz80k_8255_portc_r )
 	return val;
 }
 
-WRITE8_MEMBER( mz80_state::mz80k_8255_porta_w )
+void mz80_state::mz80k_8255_porta_w(uint8_t data)
 {
 	m_mz80k_keyboard_line = data & 0x0f;
 }
 
-WRITE8_MEMBER( mz80_state::mz80k_8255_portc_w )
+void mz80_state::mz80k_8255_portc_w(uint8_t data)
 {
 //  logerror("mz80k_8255_portc_w %02x\n",data);
 	m_cassette->output(BIT(data, 1) ? -1.0 : +1.0);
@@ -75,12 +75,12 @@ WRITE_LINE_MEMBER( mz80_state::pit_out2_changed )
 	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-READ8_MEMBER( mz80_state::mz80k_strobe_r )
+uint8_t mz80_state::mz80k_strobe_r()
 {
 	return 0x7e | (uint8_t)m_mz80k_tempo_strobe;
 }
 
-WRITE8_MEMBER( mz80_state::mz80k_strobe_w )
+void mz80_state::mz80k_strobe_w(uint8_t data)
 {
 	m_pit->write_gate0(BIT(data, 0));
 }

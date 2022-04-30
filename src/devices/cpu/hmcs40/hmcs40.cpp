@@ -2,18 +2,24 @@
 // copyright-holders:hap
 /*
 
-  Hitachi HMCS40 MCU family cores
+Hitachi HMCS40 MCU family cores
 
-  References:
-  - 1985 #AP1 Hitachi 4-bit Single-Chip Microcomputer Data Book
-  - 1988 HMCS400 Series Handbook (note: *400 is a newer MCU series, with similarities)
-  - opcode decoding by Tatsuyuki Satoh, Olivier Galibert, Kevin Horton, Lord Nightmare - and verified
+References:
+- 1985 #AP1 Hitachi 4-bit Single-Chip Microcomputer Data Book
+- 1988 HMCS400 Series Handbook (note: *400 is a newer MCU series, with similarities)
+- opcode decoding by Tatsuyuki Satoh, Olivier Galibert, Kevin Horton, Lord Nightmare
+  (verified a while later after new documentation was found)
+
+TODO:
+- How the stack works, is probably m_stack_levels+1 program counters, and
+  an index pointing to the current program counter. Then push/pop simply
+  decrements/increments the index. The way it is implemented right now
+  behaves the same.
 
 */
 
 #include "emu.h"
 #include "hmcs40.h"
-#include "debugger.h"
 #include "hmcs40d.h"
 
 #define IS_PMOS 0
@@ -56,16 +62,20 @@ DEFINE_DEVICE_TYPE(HD44828, hd44828_device, "hd44828", "Hitachi HD44828") // CMO
 
 
 // internal memory maps
+
+// On HMCS42/3/4/5, only half of the ROM address range contains user-executable code,
+// there is up to 128 bytes of pattern data in the 2nd half. The 2nd half also includes
+// a couple of pages with factory test code by Hitachi, only executable when MCU test
+// mode is enabled externally. This data can still be accessed with the P opcode.
+
 void hmcs40_cpu_device::program_1k(address_map &map)
 {
-	map(0x0000, 0x03ff).rom();
-	map(0x0780, 0x07bf).rom(); // patterns on page 30
+	map(0x0000, 0x07ff).rom();
 }
 
 void hmcs40_cpu_device::program_2k(address_map &map)
 {
-	map(0x0000, 0x07ff).rom();
-	map(0x0f40, 0x0fbf).rom(); // patterns on page 61,62
+	map(0x0000, 0x0fff).rom();
 }
 
 
@@ -94,8 +104,8 @@ hmcs40_cpu_device::hmcs40_cpu_device(const machine_config &mconfig, device_type 
 	, m_family(family)
 	, m_polarity(polarity)
 	, m_stack_levels(stack_levels)
-	, m_read_r{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_write_r{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_read_r(*this)
+	, m_write_r(*this)
 	, m_read_d(*this)
 	, m_write_d(*this)
 {
@@ -188,12 +198,6 @@ std::unique_ptr<util::disasm_interface> hmcs40_cpu_device::create_disassembler()
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-enum
-{
-	HMCS40_PC=1, HMCS40_A, HMCS40_B,
-	HMCS40_X, HMCS40_SPX, HMCS40_Y, HMCS40_SPY
-};
-
 void hmcs40_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
@@ -202,26 +206,21 @@ void hmcs40_cpu_device::device_start()
 	m_datamask = (1 << m_datawidth) - 1;
 	m_pcmask = (1 << m_pcwidth) - 1;
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hmcs40_cpu_device::simple_timer_cb), this));
-	reset_prescaler();
-
 	// resolve callbacks
-	for (int i = 0; i < 8; i++)
-	{
-		m_read_r[i].resolve_safe(m_polarity & 0xf);
-		m_write_r[i].resolve_safe();
-	}
-
+	m_read_r.resolve_all_safe(m_polarity & 0xf);
+	m_write_r.resolve_all_safe();
 	m_read_d.resolve_safe(m_polarity);
 	m_write_d.resolve_safe();
 
 	// zerofill
 	memset(m_stack, 0, sizeof(m_stack));
+	m_sp = 0;
 	m_op = 0;
 	m_prev_op = 0;
 	m_i = 0;
 	m_eint_line = 0;
 	m_halt = 0;
+	m_prescaler = 0;
 	m_pc = 0;
 	m_prev_pc = 0;
 	m_page = 0;
@@ -245,12 +244,12 @@ void hmcs40_cpu_device::device_start()
 
 	// register for savestates
 	save_item(NAME(m_stack));
+	save_item(NAME(m_sp));
 	save_item(NAME(m_op));
 	save_item(NAME(m_prev_op));
 	save_item(NAME(m_i));
 	save_item(NAME(m_eint_line));
 	save_item(NAME(m_halt));
-	save_item(NAME(m_timer_halted_remain));
 	save_item(NAME(m_pc));
 	save_item(NAME(m_prev_pc));
 	save_item(NAME(m_page));
@@ -263,6 +262,7 @@ void hmcs40_cpu_device::device_start()
 	save_item(NAME(m_s));
 	save_item(NAME(m_c));
 	save_item(NAME(m_tc));
+	save_item(NAME(m_prescaler));
 	save_item(NAME(m_cf));
 	save_item(NAME(m_ie));
 	save_item(NAME(m_iri));
@@ -275,17 +275,18 @@ void hmcs40_cpu_device::device_start()
 	save_item(NAME(m_d));
 
 	// register state for debugger
-	state_add(HMCS40_PC,  "PC",  m_pc).formatstr("%04X");
-	state_add(HMCS40_A,   "A",   m_a).formatstr("%01X");
-	state_add(HMCS40_B,   "B",   m_b).formatstr("%01X");
-	state_add(HMCS40_X,   "X",   m_x).formatstr("%01X");
-	state_add(HMCS40_SPX, "SPX", m_spx).formatstr("%01X");
-	state_add(HMCS40_Y,   "Y",   m_y).formatstr("%01X");
-	state_add(HMCS40_SPY, "SPY", m_spy).formatstr("%01X");
-
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_s).formatstr("%2s").noshow();
+
+	m_state_count = 0;
+	state_add(++m_state_count, "PC", m_pc).formatstr("%04X"); // 1
+	state_add(++m_state_count, "A", m_a).formatstr("%01X"); // 2
+	state_add(++m_state_count, "B", m_b).formatstr("%01X"); // 3
+	state_add(++m_state_count, "X", m_x).formatstr("%01X"); // 4
+	state_add(++m_state_count, "SPX", m_spx).formatstr("%01X"); // 5
+	state_add(++m_state_count, "Y", m_y).formatstr("%01X"); // 6
+	state_add(++m_state_count, "SPY", m_spy).formatstr("%01X"); // 7
 
 	set_icountptr(m_icount);
 }
@@ -369,7 +370,7 @@ u8 hmcs43_cpu_device::read_r(int index)
 	index &= 7;
 
 	if (index >= 2)
-		logerror("%s read from %s port R%d at $%04X\n", tag(), (index >= 4) ? "unknown" : "output", index, m_prev_pc);
+		logerror("read from %s port R%d at $%04X\n", (index >= 4) ? "unknown" : "output", index, m_prev_pc);
 
 	return hmcs40_cpu_device::read_r(index);
 }
@@ -381,7 +382,7 @@ void hmcs43_cpu_device::write_r(int index, u8 data)
 	if (index != 0 && index < 4)
 		hmcs40_cpu_device::write_r(index, data);
 	else
-		logerror("%s ineffective write to port R%d = $%X at $%04X\n", tag(), index, data & 0xf, m_prev_pc);
+		logerror("ineffective write to port R%d = $%X at $%04X\n", index, data & 0xf, m_prev_pc);
 }
 
 int hmcs43_cpu_device::read_d(int index)
@@ -389,7 +390,7 @@ int hmcs43_cpu_device::read_d(int index)
 	index &= 15;
 
 	if (index >= 4)
-		logerror("%s read from output pin D%d at $%04X\n", tag(), index, m_prev_pc);
+		logerror("read from output pin D%d at $%04X\n", index, m_prev_pc);
 
 	return hmcs40_cpu_device::read_d(index);
 }
@@ -403,7 +404,7 @@ u8 hmcs44_cpu_device::read_r(int index)
 	index &= 7;
 
 	if (index >= 6)
-		logerror("%s read from unknown port R%d at $%04X\n", tag(), index, m_prev_pc);
+		logerror("read from unknown port R%d at $%04X\n", index, m_prev_pc);
 
 	return hmcs40_cpu_device::read_r(index);
 }
@@ -415,7 +416,7 @@ void hmcs44_cpu_device::write_r(int index, u8 data)
 	if (index < 6)
 		hmcs40_cpu_device::write_r(index, data);
 	else
-		logerror("%s ineffective write to port R%d = $%X at $%04X\n", tag(), index, data & 0xf, m_prev_pc);
+		logerror("ineffective write to port R%d = $%X at $%04X\n", index, data & 0xf, m_prev_pc);
 }
 
 // HMCS45:
@@ -427,7 +428,7 @@ u8 hmcs45_cpu_device::read_r(int index)
 	index &= 7;
 
 	if (index >= 6)
-		logerror("%s read from %s port R%d at $%04X\n", tag(), (index == 7) ? "unknown" : "output", index, m_prev_pc);
+		logerror("read from %s port R%d at $%04X\n", (index == 7) ? "unknown" : "output", index, m_prev_pc);
 
 	return hmcs40_cpu_device::read_r(index);
 }
@@ -439,7 +440,7 @@ void hmcs45_cpu_device::write_r(int index, u8 data)
 	if (index != 7)
 		hmcs40_cpu_device::write_r(index, data);
 	else
-		logerror("%s ineffective write to port R%d = $%X at $%04X\n", tag(), index, data & 0xf, m_prev_pc);
+		logerror("ineffective write to port R%d = $%X at $%04X\n", index, data & 0xf, m_prev_pc);
 }
 
 
@@ -450,7 +451,6 @@ void hmcs45_cpu_device::write_r(int index, u8 data)
 
 void hmcs40_cpu_device::do_interrupt()
 {
-	m_icount--;
 	push_stack();
 	m_ie = 0;
 
@@ -467,6 +467,8 @@ void hmcs40_cpu_device::do_interrupt()
 
 	standard_irq_callback(line);
 	m_prev_pc = m_pc;
+
+	cycle();
 }
 
 void hmcs40_cpu_device::execute_set_input(int line, int state)
@@ -476,14 +478,6 @@ void hmcs40_cpu_device::execute_set_input(int line, int state)
 	// halt/unhalt mcu
 	if (line == HMCS40_INPUT_LINE_HLT && state != m_halt)
 	{
-		if (state)
-		{
-			m_timer_halted_remain = m_timer->remaining();
-			m_timer->reset();
-		}
-		else
-			m_timer->adjust(m_timer_halted_remain);
-
 		m_halt = state;
 		return;
 	}
@@ -509,20 +503,14 @@ void hmcs40_cpu_device::execute_set_input(int line, int state)
 	m_int[line] = state;
 }
 
-void hmcs40_cpu_device::reset_prescaler()
+void hmcs40_cpu_device::cycle()
 {
-	// reset 6-bit timer prescaler
-	attotime base = attotime::from_ticks(4 * 64, unscaled_clock());
-	m_timer->adjust(base);
-}
+	m_icount--;
+	m_prescaler = (m_prescaler + 1) & 0x3f;
 
-TIMER_CALLBACK_MEMBER( hmcs40_cpu_device::simple_timer_cb )
-{
 	// timer prescaler overflow
-	if (!m_cf)
+	if (m_prescaler == 0 && !m_cf)
 		increment_tc();
-
-	reset_prescaler();
 }
 
 void hmcs40_cpu_device::increment_tc()
@@ -580,17 +568,12 @@ void hmcs40_cpu_device::execute_run()
 
 		// check/handle interrupt, but not in the middle of a long jump
 		if (m_ie && (m_iri || m_irt) && (m_prev_op & 0x3e0) != 0x340)
-		{
 			do_interrupt();
-			if (m_icount <= 0)
-				break;
-		}
 
 		// fetch next opcode
 		debugger_instruction_hook(m_pc);
-		m_icount--;
 		m_op = m_program->read_word(m_pc) & 0x3ff;
-		m_i = bitswap<8>(m_op,7,6,5,4,0,1,2,3) & 0xf; // reversed bit-order for 4-bit immediate param (except for XAMR)
+		m_i = bitswap<4>(m_op,0,1,2,3); // reversed bit-order for 4-bit immediate param (except for XAMR)
 		increment_pc();
 
 		// handle opcode
@@ -822,5 +805,7 @@ void hmcs40_cpu_device::execute_run()
 			default:
 				op_illegal(); break;
 		} /* big switch */
+
+		cycle();
 	}
 }

@@ -41,10 +41,10 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
-	DECLARE_WRITE16_MEMBER(irq2_ack_w);
-	DECLARE_WRITE16_MEMBER(irq3_ack_w);
-	DECLARE_WRITE16_MEMBER(lamps_w);
-	DECLARE_WRITE16_MEMBER(outputs_w);
+	void irq2_ack_w(uint16_t data);
+	void irq3_ack_w(uint16_t data);
+	void lamps_w(uint16_t data);
+	void outputs_w(uint16_t data);
 
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -71,25 +71,21 @@ void cesclassic_state::video_start()
 
 uint32_t cesclassic_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y,xi;
-
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
+	for(int y=0;y<64;y++)
 	{
-		for(y=0;y<64;y++)
+		for(int x=0;x<16;x++)
 		{
-			for(x=0;x<16;x++)
+			for(int xi=0;xi<16;xi++)
 			{
-				for(xi=0;xi<16;xi++)
-				{
-					uint8_t color;
+				uint8_t color;
 
-					color = (((m_vram[x+y*16+0x400])>>(15-xi)) & 1);
-					color |= (((m_vram[x+y*16])>>(15-xi)) & 1)<<1;
+				color = (((m_vram[x+y*16+0x400])>>(15-xi)) & 1);
+				color |= (((m_vram[x+y*16])>>(15-xi)) & 1)<<1;
 
-					if((x*16+xi)<256 && ((y)+0)<256)
-						bitmap.pix32(y, x*16+xi) = m_palette->pen(color);
-				}
+				if((x*16+xi)<256 && ((y)+0)<256)
+					bitmap.pix(y, x*16+xi) = m_palette->pen(color);
 			}
 		}
 	}
@@ -97,22 +93,22 @@ uint32_t cesclassic_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 	return 0;
 }
 
-WRITE16_MEMBER( cesclassic_state::irq2_ack_w )
+void cesclassic_state::irq2_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(2, CLEAR_LINE);
 }
 
-WRITE16_MEMBER( cesclassic_state::irq3_ack_w )
+void cesclassic_state::irq3_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(3, CLEAR_LINE);
 }
 
-WRITE16_MEMBER( cesclassic_state::lamps_w )
+void cesclassic_state::lamps_w(uint16_t data)
 {
 	//popmessage("%04x",data);
 }
 
-WRITE16_MEMBER( cesclassic_state::outputs_w )
+void cesclassic_state::outputs_w(uint16_t data)
 {
 	/*
 	-x-- ---- OKI bankswitch

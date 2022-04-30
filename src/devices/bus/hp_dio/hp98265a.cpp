@@ -17,9 +17,9 @@
 #include "logmacro.h"
 
 
-DEFINE_DEVICE_TYPE_NS(HPDIO_98265A, bus::hp_dio, dio16_98265a_device, "hp98265a", "HP98265A SCSI S16 Interface")
+DEFINE_DEVICE_TYPE(HPDIO_98265A, bus::hp_dio::dio16_98265a_device, "hp98265a", "HP98265A SCSI S16 Interface")
 
-namespace bus { namespace hp_dio {
+namespace bus::hp_dio {
 
 void dio16_98265a_device::mb87030_scsi_adapter(device_t *device)
 {
@@ -66,7 +66,10 @@ dio16_98265a_device::dio16_98265a_device(const machine_config &mconfig, device_t
 	m_spc(*this, "scsibus:7:mb87030"),
 	m_sw1(*this, "SW1"),
 	m_sw2(*this, "SW2"),
-	m_irq_state(false)
+	m_installed_io(false),
+	m_control(0),
+	m_irq_state(false),
+	m_dmar0(false)
 {
 }
 
@@ -164,8 +167,8 @@ void dio16_98265a_device::device_reset()
 		program_space().install_readwrite_handler(
 				0x600000 + (code * 0x10000),
 				0x6007ff + (code * 0x10000),
-				read16_delegate(*this, FUNC(dio16_98265a_device::io_r)),
-				write16_delegate(*this, FUNC(dio16_98265a_device::io_w)));
+				read16sm_delegate(*this, FUNC(dio16_98265a_device::io_r)),
+				write16sm_delegate(*this, FUNC(dio16_98265a_device::io_w)));
 		program_space().install_device(0x600020 + (code * 0x10000), 0x60003f + (code * 0x10000), *m_spc, &mb87030_device::map, 0x00ff00ff);
 		m_installed_io = true;
 	}
@@ -181,7 +184,7 @@ int dio16_98265a_device::get_int_level()
 			REG_SW1_INT_LEVEL_MASK;
 
 }
-READ16_MEMBER(dio16_98265a_device::io_r)
+uint16_t dio16_98265a_device::io_r(offs_t offset)
 {
 
 	uint16_t ret = 0xffff;
@@ -204,7 +207,7 @@ READ16_MEMBER(dio16_98265a_device::io_r)
 	return ret;
 }
 
-WRITE16_MEMBER(dio16_98265a_device::io_w)
+void dio16_98265a_device::io_w(offs_t offset, uint16_t data)
 {
 	LOG("io_w: offset=%02X, data=%02X\n", offset, data);
 
@@ -265,7 +268,7 @@ void dio16_98265a_device::dmack_w_in(int channel, uint8_t data)
 	if(channel == 0 && !(m_control & REG_CONTROL_DE0))
 		return;
 	if(channel == 1 && !(m_control & REG_CONTROL_DE1))
-			return;
+		return;
 
 	m_spc->dma_w(data);
 }
@@ -292,4 +295,4 @@ WRITE_LINE_MEMBER(dio16_98265a_device::dmar0_w)
 
 }
 
-} } // namespace bus::hp_dio
+} // namespace bus::hp_dio

@@ -109,11 +109,11 @@ void tmpz84c011_device::device_reset()
 	z80_device::device_reset();
 
 	// initialize I/O
-	tmpz84c011_dir_pa_w(*m_io, 0, 0); tmpz84c011_pa_w(*m_io, 0, 0);
-	tmpz84c011_dir_pb_w(*m_io, 0, 0); tmpz84c011_pb_w(*m_io, 0, 0);
-	tmpz84c011_dir_pc_w(*m_io, 0, 0); tmpz84c011_pc_w(*m_io, 0, 0);
-	tmpz84c011_dir_pd_w(*m_io, 0, 0); tmpz84c011_pd_w(*m_io, 0, 0);
-	tmpz84c011_dir_pe_w(*m_io, 0, 0); tmpz84c011_pe_w(*m_io, 0, 0);
+	tmpz84c011_dir_pa_w(0); tmpz84c011_pa_w(0);
+	tmpz84c011_dir_pb_w(0); tmpz84c011_pb_w(0);
+	tmpz84c011_dir_pc_w(0); tmpz84c011_pc_w(0);
+	tmpz84c011_dir_pd_w(0); tmpz84c011_pd_w(0);
+	tmpz84c011_dir_pe_w(0); tmpz84c011_pe_w(0);
 }
 
 

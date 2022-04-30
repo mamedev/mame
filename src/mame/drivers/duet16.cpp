@@ -46,21 +46,21 @@ public:
 protected:
 	void machine_reset() override;
 private:
-	DECLARE_READ8_MEMBER(pic_r);
-	DECLARE_WRITE8_MEMBER(pic_w);
-	DECLARE_READ8_MEMBER(dma_mem_r);
-	DECLARE_WRITE8_MEMBER(dma_mem_w);
-	DECLARE_READ8_MEMBER(dmapg_r);
-	DECLARE_WRITE8_MEMBER(dmapg_w);
-	DECLARE_WRITE8_MEMBER(fdcctrl_w);
-	DECLARE_WRITE8_MEMBER(dispctrl_w);
-	DECLARE_WRITE8_MEMBER(pal_w);
+	u8 pic_r(offs_t offset);
+	void pic_w(offs_t offset, u8 data);
+	u8 dma_mem_r(offs_t offset);
+	void dma_mem_w(offs_t offset, u8 data);
+	u8 dmapg_r();
+	void dmapg_w(u8 data);
+	void fdcctrl_w(u8 data);
+	void dispctrl_w(u8 data);
+	void pal_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
-	DECLARE_READ8_MEMBER(rtc_r);
-	DECLARE_WRITE8_MEMBER(rtc_w);
-	DECLARE_READ8_MEMBER(rtc_stat_r);
-	DECLARE_WRITE8_MEMBER(rtc_addr_w);
-	DECLARE_READ16_MEMBER(sysstat_r);
+	u8 rtc_r();
+	void rtc_w(u8 data);
+	u8 rtc_stat_r();
+	void rtc_addr_w(u8 data);
+	u16 sysstat_r();
 	DECLARE_WRITE_LINE_MEMBER(rtc_d0_w);
 	DECLARE_WRITE_LINE_MEMBER(rtc_d1_w);
 	DECLARE_WRITE_LINE_MEMBER(rtc_d2_w);
@@ -94,45 +94,44 @@ void duet16_state::machine_reset()
 	rtc_irq_reset();
 }
 
-READ8_MEMBER(duet16_state::pic_r)
+u8 duet16_state::pic_r(offs_t offset)
 {
 	return m_pic->read(offset ^ 1);
 }
 
-WRITE8_MEMBER(duet16_state::pic_w)
+void duet16_state::pic_w(offs_t offset, u8 data)
 {
 	m_pic->write(offset ^ 1, data);
 }
 
-WRITE8_MEMBER(duet16_state::fdcctrl_w)
+void duet16_state::fdcctrl_w(u8 data)
 {
 	floppy_image_device *f = m_fd[BIT(data, 2) ? 1 : 0]->get_device();
 	m_fdc->set_floppy(f);
 
 	m_fd[0]->get_device()->mon_w(!BIT(data, 0));
 	m_fd[1]->get_device()->mon_w(!BIT(data, 0));
-	if(!BIT(data, 1))
-		m_fdc->soft_reset();
+	m_fdc->reset_w(!BIT(data, 1));
 
 	// TODO: bit 3 = LSPD
 }
 
-READ8_MEMBER(duet16_state::dma_mem_r)
+u8 duet16_state::dma_mem_r(offs_t offset)
 {
 	return m_maincpu->space(AS_PROGRAM).read_byte((m_dmapg << 16) | offset);
 }
 
-WRITE8_MEMBER(duet16_state::dma_mem_w)
+void duet16_state::dma_mem_w(offs_t offset, u8 data)
 {
 	m_maincpu->space(AS_PROGRAM).write_byte((m_dmapg << 16) | offset, data);
 }
 
-READ8_MEMBER(duet16_state::dmapg_r)
+u8 duet16_state::dmapg_r()
 {
 	return m_dmapg;
 }
 
-WRITE8_MEMBER(duet16_state::dmapg_w)
+void duet16_state::dmapg_w(u8 data)
 {
 	m_dmapg = data & 0xf;
 }
@@ -143,7 +142,7 @@ WRITE_LINE_MEMBER(duet16_state::hrq_w)
 	m_dmac->hack_w(state);
 }
 
-READ16_MEMBER(duet16_state::sysstat_r)
+u16 duet16_state::sysstat_r()
 {
 	return 0xb484;
 }
@@ -158,7 +157,7 @@ void duet16_state::duet16_mem(address_map &map)
 	map(0xf8020, 0xf8023).rw(FUNC(duet16_state::pic_r), FUNC(duet16_state::pic_w)).umask16(0x00ff);
 	map(0xf8040, 0xf804f).rw("itm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
 	map(0xf8060, 0xf8067).rw("bgpit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0xf8080, 0xf8087).rw("sio", FUNC(upd7201_new_device::ba_cd_r), FUNC(upd7201_new_device::ba_cd_w)).umask16(0x00ff);
+	map(0xf8080, 0xf8087).rw("sio", FUNC(upd7201_device::ba_cd_r), FUNC(upd7201_device::ba_cd_w)).umask16(0x00ff);
 	map(0xf80a0, 0xf80a3).rw("kbusart", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0xf80c0, 0xf80c0).rw("crtc", FUNC(hd6845s_device::status_r), FUNC(hd6845s_device::address_w));
 	map(0xf80c2, 0xf80c2).rw("crtc", FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
@@ -178,21 +177,23 @@ void duet16_state::duet16_io(address_map &map)
 {
 }
 
-WRITE8_MEMBER(duet16_state::pal_w)
+void duet16_state::pal_w(offs_t offset, u8 data)
 {
 	int entry = (BIT(offset, 0) ? 2 : 0) | (BIT(offset, 5) ? 0 : 4);
 	m_pal->set_pen_color(entry, pal1bit(BIT(data, 1)), pal1bit(BIT(data, 2)), pal1bit(BIT(data, 0)));
 	m_pal->set_pen_color(entry + 1, pal1bit(BIT(data, 5)), pal1bit(BIT(data, 6)), pal1bit(BIT(data, 4)));
 }
 
-WRITE8_MEMBER(duet16_state::dispctrl_w)
+void duet16_state::dispctrl_w(u8 data)
 {
 	m_dispctrl = data;
 }
 
 MC6845_UPDATE_ROW(duet16_state::crtc_update_row)
 {
-	u8 *gvram = (u8 *)&m_gvram[0];
+	if(!de)
+		return;
+	u8 const *const gvram = (u8 *)&m_gvram[0];
 	for(int i = 0; i < x_count; i++)
 	{
 		u16 coffset = (ma + i) & 0x07ff;
@@ -233,7 +234,7 @@ MC6845_UPDATE_ROW(duet16_state::crtc_update_row)
 				color = m_pal->pen_color((BIT(g2, 7 - xi) << 2) | (BIT(g1, 7 - xi) << 1) | BIT(g0, 7 - xi));
 			else
 				color = 0;
-			bitmap.pix32(y, (i * 8) + xi) = color;
+			bitmap.pix(y, (i * 8) + xi) = color;
 		}
 	}
 }
@@ -274,7 +275,7 @@ void duet16_state::rtc_irq_reset()
 	m_tmint->in_w<1>(0);
 }
 
-READ8_MEMBER(duet16_state::rtc_r)
+u8 duet16_state::rtc_r()
 {
 	u8 ret;
 	m_rtc->cs2_w(ASSERT_LINE);
@@ -285,7 +286,7 @@ READ8_MEMBER(duet16_state::rtc_r)
 	return ret;
 }
 
-WRITE8_MEMBER(duet16_state::rtc_w)
+void duet16_state::rtc_w(u8 data)
 {
 	m_rtc->d0_w(BIT(data, 0));
 	m_rtc->d1_w(BIT(data, 1));
@@ -297,7 +298,7 @@ WRITE8_MEMBER(duet16_state::rtc_w)
 	m_rtc->cs2_w(CLEAR_LINE);
 }
 
-READ8_MEMBER(duet16_state::rtc_stat_r)
+u8 duet16_state::rtc_stat_r()
 {
 	u8 status = m_rtc_irq ? 0x80 : 0;
 	if (!machine().side_effects_disabled())
@@ -305,7 +306,7 @@ READ8_MEMBER(duet16_state::rtc_stat_r)
 	return status;
 }
 
-WRITE8_MEMBER(duet16_state::rtc_addr_w)
+void duet16_state::rtc_addr_w(u8 data)
 {
 	m_rtc->d0_w(BIT(data, 0));
 	m_rtc->d1_w(BIT(data, 1));
@@ -347,7 +348,6 @@ void duet16_keyboard_devices(device_slot_interface &device)
 
 static DEVICE_INPUT_DEFAULTS_START(keyboard)
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_1200 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
@@ -384,10 +384,10 @@ void duet16_state::duet16(machine_config &config)
 	bgpit.set_clk<0>(8_MHz_XTAL / 13);
 	bgpit.set_clk<1>(8_MHz_XTAL / 13);
 	bgpit.set_clk<2>(8_MHz_XTAL / 13);
-	bgpit.out_handler<0>().set("sio", FUNC(upd7201_new_device::txca_w)); // TODO: selected through LS153
-	bgpit.out_handler<0>().append("sio", FUNC(upd7201_new_device::rxca_w));
-	bgpit.out_handler<1>().set("sio", FUNC(upd7201_new_device::txcb_w));
-	bgpit.out_handler<1>().append("sio", FUNC(upd7201_new_device::rxcb_w));
+	bgpit.out_handler<0>().set("sio", FUNC(upd7201_device::txca_w)); // TODO: selected through LS153
+	bgpit.out_handler<0>().append("sio", FUNC(upd7201_device::rxca_w));
+	bgpit.out_handler<1>().set("sio", FUNC(upd7201_device::txcb_w));
+	bgpit.out_handler<1>().append("sio", FUNC(upd7201_device::rxcb_w));
 	bgpit.out_handler<2>().set("kbusart", FUNC(i8251_device::write_txc));
 	bgpit.out_handler<2>().append("kbusart", FUNC(i8251_device::write_rxc));
 
@@ -397,7 +397,7 @@ void duet16_state::duet16(machine_config &config)
 	itm.o3_callback().append("itm", FUNC(ptm6840_device::set_c2));
 	itm.irq_callback().set(m_tmint, FUNC(input_merger_device::in_w<0>));
 
-	upd7201_new_device& sio(UPD7201_NEW(config, "sio", 8_MHz_XTAL / 2));
+	upd7201_device& sio(UPD7201(config, "sio", 8_MHz_XTAL / 2));
 	sio.out_int_callback().set("pic", FUNC(pic8259_device::ir1_w)); // INT5
 
 	i8251_device &kbusart(I8251(config, "kbusart", 8_MHz_XTAL / 4));
@@ -417,8 +417,8 @@ void duet16_state::duet16(machine_config &config)
 	UPD765A(config, m_fdc, 8_MHz_XTAL, true, false);
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq0_w));
 	m_fdc->intrq_wr_callback().set(m_pic, FUNC(pic8259_device::ir3_w)); // INT4
-	FLOPPY_CONNECTOR(config, "fdc:0", duet16_floppies, "525qd", floppy_image_device::default_floppy_formats, true);
-	FLOPPY_CONNECTOR(config, "fdc:1", duet16_floppies, "525qd", floppy_image_device::default_floppy_formats, true);
+	FLOPPY_CONNECTOR(config, "fdc:0", duet16_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats, true);
+	FLOPPY_CONNECTOR(config, "fdc:1", duet16_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats, true);
 
 	hd6845s_device &crtc(HD6845S(config, "crtc", 2000000)); // "46505S" on schematics
 	crtc.set_char_width(8);

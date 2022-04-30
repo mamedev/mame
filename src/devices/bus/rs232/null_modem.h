@@ -24,7 +24,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual void tra_callback() override;
@@ -40,7 +40,6 @@ private:
 
 	required_ioport m_rs232_txbaud;
 	required_ioport m_rs232_rxbaud;
-	required_ioport m_rs232_startbits;
 	required_ioport m_rs232_databits;
 	required_ioport m_rs232_parity;
 	required_ioport m_rs232_stopbits;
@@ -52,6 +51,7 @@ private:
 	emu_timer *m_timer_poll;
 	int m_rts;
 	int m_dtr;
+	int m_xoff;
 };
 
 DECLARE_DEVICE_TYPE(NULL_MODEM, null_modem_device)

@@ -2,7 +2,7 @@
 // detail/win_iocp_handle_read_op.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 // Copyright (c) 2008 Rep Invariant Systems, Inc. (info@repinvariant.com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,33 +20,34 @@
 
 #if defined(ASIO_HAS_IOCP)
 
-#include "asio/error.hpp"
 #include "asio/detail/bind_handler.hpp"
 #include "asio/detail/buffer_sequence_adapter.hpp"
 #include "asio/detail/fenced_block.hpp"
 #include "asio/detail/handler_alloc_helpers.hpp"
 #include "asio/detail/handler_invoke_helpers.hpp"
+#include "asio/detail/handler_work.hpp"
 #include "asio/detail/memory.hpp"
 #include "asio/detail/operation.hpp"
+#include "asio/error.hpp"
 
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
 namespace detail {
 
-template <typename MutableBufferSequence, typename Handler>
+template <typename MutableBufferSequence, typename Handler, typename IoExecutor>
 class win_iocp_handle_read_op : public operation
 {
 public:
   ASIO_DEFINE_HANDLER_PTR(win_iocp_handle_read_op);
 
-  win_iocp_handle_read_op(
-      const MutableBufferSequence& buffers, Handler& handler)
+  win_iocp_handle_read_op(const MutableBufferSequence& buffers,
+      Handler& handler, const IoExecutor& io_ex)
     : operation(&win_iocp_handle_read_op::do_complete),
       buffers_(buffers),
-      handler_(ASIO_MOVE_CAST(Handler)(handler))
+      handler_(ASIO_MOVE_CAST(Handler)(handler)),
+      work_(handler_, io_ex)
   {
-    handler_work<Handler>::start(handler_);
   }
 
   static void do_complete(void* owner, operation* base,
@@ -58,9 +59,13 @@ public:
     // Take ownership of the operation object.
     win_iocp_handle_read_op* o(static_cast<win_iocp_handle_read_op*>(base));
     ptr p = { asio::detail::addressof(o->handler_), o, o };
-    handler_work<Handler> w(o->handler_);
 
     ASIO_HANDLER_COMPLETION((*o));
+
+    // Take ownership of the operation's outstanding work.
+    handler_work<Handler, IoExecutor> w(
+        ASIO_MOVE_CAST2(handler_work<Handler, IoExecutor>)(
+          o->work_));
 
 #if defined(ASIO_ENABLE_BUFFER_DEBUGGING)
     if (owner)
@@ -99,6 +104,7 @@ public:
 private:
   MutableBufferSequence buffers_;
   Handler handler_;
+  handler_work<Handler, IoExecutor> work_;
 };
 
 } // namespace detail

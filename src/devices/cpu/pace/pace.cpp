@@ -65,11 +65,9 @@ ALLOW_SAVE_TYPE(pace_device::cycle);
 pace_device::pace_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_space_config("program", ENDIANNESS_LITTLE, 16, 16, -1)
-	, m_space(nullptr)
-	, m_cache(nullptr)
 	, m_bps_callback(*this)
-	, m_jc_callback{{*this}, {*this}, {*this}}
-	, m_flag_callback{{*this}, {*this}, {*this}, {*this}}
+	, m_jc_callback(*this)
+	, m_flag_callback(*this)
 	, m_fr(0xffff)
 	, m_pc(0)
 	, m_mdr(0)
@@ -120,10 +118,8 @@ void pace_device::device_resolve_objects()
 {
 	// resolve callbacks
 	m_bps_callback.resolve_safe(0);
-	for (auto &cb : m_jc_callback)
-		cb.resolve_safe(0);
-	for (auto &cb : m_flag_callback)
-		cb.resolve_safe();
+	m_jc_callback.resolve_all_safe(0);
+	m_flag_callback.resolve_all_safe();
 }
 
 
@@ -134,8 +130,8 @@ void pace_device::device_resolve_objects()
 void pace_device::device_start()
 {
 	// get memory spaces
-	m_space = &space(AS_PROGRAM);
-	m_cache = m_space->cache<1, -1, ENDIANNESS_LITTLE>();
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_space);
 
 	set_icountptr(m_icount);
 
@@ -544,7 +540,7 @@ void pace_device::read_instruction()
 	// TODO: interrupt check
 	m_ppc = m_pc;
 	debugger_instruction_hook(m_pc);
-	m_mdr = m_cache->read_word(m_pc++);
+	m_mdr = m_cache.read_word(m_pc++);
 	m_cir = m_mdr >> 6;
 	sign_extend(m_mdr);
 }
@@ -585,12 +581,7 @@ void pace_device::read_effective_address()
 {
 	// All opcodes with bit 15 set read from an EA except RTS and non-indirect ST
 	if (m_cir > 0x200 && (m_cir & 0x3c0) != 0x340)
-	{
-		if ((m_cir & 0x00c) == 0x004)
-			m_mdr = m_cache->read_word(m_mar);
-		else
-			m_mdr = m_space->read_word(m_mar);
-	}
+		m_mdr = m_space.read_word(m_mar);
 }
 
 
@@ -601,10 +592,7 @@ void pace_device::read_effective_address()
 
 void pace_device::write_effective_address(u16 r)
 {
-	if ((m_cir & 0x00c) == 0x004)
-		m_cache->write_word(m_mar, r);
-	else
-		m_space->write_word(m_mar, r);
+	m_space.write_word(m_mar, r);
 }
 
 
@@ -735,7 +723,7 @@ pace_device::cycle pace_device::execute_one()
 		return cycle::IFETCH_M1;
 
 	case cycle::LD_IND_M4:
-		m_mdr = m_space->read_word(m_mdr);
+		m_mdr = m_space.read_word(m_mdr);
 		return cycle::LD_IND_M5;
 
 	case cycle::LD_IND_M5:
@@ -747,11 +735,11 @@ pace_device::cycle pace_device::execute_one()
 		return cycle::IFETCH_M1;
 
 	case cycle::ST_IND_M4:
-		m_space->write_word(m_mdr, m_ac[0]);
+		m_space.write_word(m_mdr, m_ac[0]);
 		return cycle::IFETCH_M1;
 
 	case cycle::LSEX_M4:
-		m_mdr = m_space->read_word(m_mdr);
+		m_mdr = m_space.read_word(m_mdr);
 		sign_extend(m_mdr);
 		return cycle::IFETCH_M1;
 

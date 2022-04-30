@@ -121,7 +121,7 @@ anything in hardware. No cartridge has been found which uses them.
 
 #include "emu.h"
 #include "includes/arcadia.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 void arcadia_state::arcadia_mem(address_map &map)
@@ -208,7 +208,6 @@ static INPUT_PORTS_START( arcadia )
 	PORT_CODE_DEC(JOYCODE_1_LEFT)
 	PORT_CODE_INC(JOYCODE_1_RIGHT)
 	PORT_PLAYER(1)
-	PORT_RESET
 
 	PORT_START("controller1_joy_y")
 	PORT_BIT( 0x1fe,0x10,IPT_AD_STICK_Y)
@@ -220,7 +219,6 @@ static INPUT_PORTS_START( arcadia )
 	PORT_CODE_DEC(JOYCODE_1_UP)
 	PORT_CODE_INC(JOYCODE_1_DOWN)
 	PORT_PLAYER(1)
-	PORT_RESET
 
 	PORT_START("controller2_joy_x")
 	PORT_BIT( 0x1ff,0x10,IPT_AD_STICK_X)
@@ -232,7 +230,6 @@ static INPUT_PORTS_START( arcadia )
 	PORT_CODE_DEC(JOYCODE_2_LEFT)
 	PORT_CODE_INC(JOYCODE_2_RIGHT)
 	PORT_PLAYER(2)
-	PORT_RESET
 
 	PORT_START("controller2_joy_y")
 	PORT_BIT( 0x1ff,0x10,IPT_AD_STICK_Y)
@@ -244,7 +241,6 @@ static INPUT_PORTS_START( arcadia )
 	PORT_CODE_DEC(JOYCODE_2_UP)
 	PORT_CODE_INC(JOYCODE_2_DOWN)
 	PORT_PLAYER(2)
-	PORT_RESET
 #else
 	PORT_START("joysticks")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY
@@ -347,7 +343,6 @@ static INPUT_PORTS_START( plldium )
 	PORT_CODE_DEC(JOYCODE_1_LEFT)
 	PORT_CODE_INC(JOYCODE_1_RIGHT)
 	PORT_PLAYER(1)
-	PORT_RESET
 
 	PORT_START("controller1_joy_y")
 	PORT_BIT( 0x1fe,0x10,IPT_AD_STICK_Y)
@@ -359,7 +354,6 @@ static INPUT_PORTS_START( plldium )
 	PORT_CODE_DEC(JOYCODE_1_UP)
 	PORT_CODE_INC(JOYCODE_1_DOWN)
 	PORT_PLAYER(1)
-	PORT_RESET
 
 	PORT_START("controller2_joy_x")
 	PORT_BIT( 0x1ff,0x10,IPT_AD_STICK_X)
@@ -371,7 +365,6 @@ static INPUT_PORTS_START( plldium )
 	PORT_CODE_DEC(JOYCODE_2_LEFT)
 	PORT_CODE_INC(JOYCODE_2_RIGHT)
 	PORT_PLAYER(2)
-	PORT_RESET
 
 	PORT_START("controller2_joy_y")
 	PORT_BIT( 0x1ff,0x10,IPT_AD_STICK_Y)
@@ -383,7 +376,6 @@ static INPUT_PORTS_START( plldium )
 	PORT_CODE_DEC(JOYCODE_2_UP)
 	PORT_CODE_INC(JOYCODE_2_DOWN)
 	PORT_PLAYER(2)
-	PORT_RESET
 #else
 	PORT_START("joysticks")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )     PORT_PLAYER(1) PORT_8WAY
@@ -455,10 +447,10 @@ void arcadia_state::machine_start()
 		switch (m_cart->get_type())
 		{
 		case ARCADIA_STD:
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x7fff, read8_delegate(*m_cart, FUNC(arcadia_cart_slot_device::extra_rom)));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x7fff, read8sm_delegate(*m_cart, FUNC(arcadia_cart_slot_device::extra_rom)));
 			break;
 		case ARCADIA_GOLF:
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x4fff, read8_delegate(*m_cart, FUNC(arcadia_cart_slot_device::extra_rom)));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x4fff, read8sm_delegate(*m_cart, FUNC(arcadia_cart_slot_device::extra_rom)));
 			break;
 		}
 	}
@@ -491,14 +483,14 @@ void arcadia_state::arcadia(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_arcadia);
-	PALETTE(config, m_palette, FUNC(arcadia_state::palette_init), ARRAY_LENGTH(arcadia_palette), 8);
+	PALETTE(config, m_palette, FUNC(arcadia_state::palette_init), std::size(arcadia_palette), 8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	ARCADIA_SOUND(config, m_custom).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* cartridge */
-	EA2001_CART_SLOT(config, "cartslot", arcadia_cart, nullptr);
+	EA2001_CART_SLOT(config, "cartslot", arcadia_cart, nullptr).set_must_be_loaded(true);
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("arcadia");
@@ -535,6 +527,11 @@ ROM_START(ekusera)
 	ROM_REGION(0x100,"gfx1", ROMREGION_ERASEFF)
 ROM_END
 
+ROM_START(giglnrdo)
+	ROM_REGION(0x8000,"maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x100,"gfx1", ROMREGION_ERASEFF)
+ROM_END
+
 ROM_START(hanihac)
 	ROM_REGION(0x8000,"maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x100,"gfx1", ROMREGION_ERASEFF)
@@ -566,11 +563,6 @@ ROM_START(itmcmtp3)
 ROM_END
 
 ROM_START(lvision)
-	ROM_REGION(0x8000,"maincpu", ROMREGION_ERASEFF)
-	ROM_REGION(0x100,"gfx1", ROMREGION_ERASEFF)
-ROM_END
-
-ROM_START(leonardo)
 	ROM_REGION(0x8000,"maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x100,"gfx1", ROMREGION_ERASEFF)
 ROM_END
@@ -795,10 +787,10 @@ void arcadia_state::init_arcadia()
 		};
 #if 1
 		FILE *f = fopen("chartest.bin","wb");
-		fwrite(prog, ARRAY_LENGTH(prog), sizeof(prog[0]), f);
+		fwrite(prog, std::size(prog), sizeof(prog[0]), f);
 		fclose(f);
 #endif
-		for (int i = 0; i < ARRAY_LENGTH(prog); i++) rom[i] = prog[i];
+		for (int i = 0; i < std::size(prog); i++) rom[i] = prog[i];
 
 	}
 #endif
@@ -807,11 +799,12 @@ void arcadia_state::init_arcadia()
 
 /*   YEAR  NAME      PARENT    COMPAT    MACHINE  INPUT    CLASS          INIT          COMPANY               FULLNAME */
 CONS(1983, advsnha,  arcadia,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "Advision",           "Advision Home Arcade", MACHINE_IMPERFECT_SOUND )    /* France */
-CONS(1982, bndarc,   arcadia,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "Bandai",             "Arcadia", MACHINE_IMPERFECT_SOUND )                 /* Japan */
+CONS(1982, bndarc,   arcadia,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "Bandai",             "Arcadia (Bandai)", MACHINE_IMPERFECT_SOUND )        /* Japan */
 CONS(1982, arcadia,  0,        0,        arcadia, arcadia, arcadia_state, init_arcadia, "Emerson",            "Arcadia 2001", MACHINE_IMPERFECT_SOUND )            /* U.S.A. */
 CONS(198?, tccosmos, arcadia,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "Mobilar?",           "Tele-Computer Cosmos", MACHINE_IMPERFECT_SOUND )    /* Spain? I have only found pictures of a German Cosmos ( http://www.pong-picture-page.de/catalog/product_info.php?products_id=2170 ) */
 CONS(1982, dynavisn, intmpt03, 0,        arcadia, arcadia, arcadia_state, init_arcadia, "Yamagiwa",           "Dynavision", MACHINE_IMPERFECT_SOUND )              /* Japan */
 CONS(1982, ekusera,  intmpt03, 0,        arcadia, arcadia, arcadia_state, init_arcadia, "P.I.C",              "Ekusera", MACHINE_IMPERFECT_SOUND )                 /* Japan */
+CONS(1982, giglnrdo, arcadia,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "GiG Electronics",    "Leonardo (GiG Electronics)", MACHINE_IMPERFECT_SOUND ) /* Italy */
 CONS(1982, hanihac,  arcadia,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "Hanimex",            "Hanimex Home Arcade Centre", MACHINE_IMPERFECT_SOUND )  /* UK */
 CONS(1982, hmg2650,  arcadia,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "Hanimex",            "HMG-2650", MACHINE_IMPERFECT_SOUND )                 /* Germany */
 CONS(198?, intmpt03, 0,        arcadia,  arcadia, arcadia, arcadia_state, init_arcadia, "Intelligent Game",   "Intelligent Game MPT-03", MACHINE_IMPERFECT_SOUND )  /* U.S.A */
@@ -819,7 +812,6 @@ CONS(198?, ixl2000,  arcadia,  0,        arcadia, arcadia, arcadia_state, init_a
 CONS(198?, intervsn, ormatu,   0,        arcadia, arcadia, arcadia_state, init_arcadia, "Intervision",        "Intervision 2001", MACHINE_IMPERFECT_SOUND )         /* Switzerland */
 CONS(198?, itmcmtp3, intmpt03, 0,        arcadia, arcadia, arcadia_state, init_arcadia, "ITMC",               "ITMC MPT-03", MACHINE_IMPERFECT_SOUND )              /* France */
 CONS(1982, lvision,  arcadia,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "Leisure-Dynamics",   "Leisure-Vision", MACHINE_IMPERFECT_SOUND )           /* Canada */
-CONS(1982, leonardo, arcadia,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "GiG Electronics",    "Leonardo", MACHINE_IMPERFECT_SOUND )                 /* Italy */
 CONS(1983, mratlus,  plldium,  0,        arcadia, arcadia, arcadia_state, init_arcadia, "H.G.S.",             "Mr. Altus Tele Brain", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )    /* Germany */
 CONS(198?, ormatu,   0,        arcadia,  arcadia, arcadia, arcadia_state, init_arcadia, "Ormatu Electronics", "Ormatu 2001", MACHINE_IMPERFECT_SOUND )              /* Netherlands */
 CONS(198?, plldium,  0,        arcadia,  arcadia, plldium, arcadia_state, init_arcadia, "Neckermann",         "Palladium Video-Computer-Game", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )      /* Germany, 16 keys instead of 12 */

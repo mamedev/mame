@@ -19,6 +19,9 @@
 #include "riscii.h"
 #include "riidasm.h"
 
+#define LOG_TBRD (1U << 1)
+#include "logmacro.h"
+
 // device type definitions
 DEFINE_DEVICE_TYPE(EPG3231, epg3231_device, "epg3231", "Elan ePG3231")
 
@@ -57,19 +60,15 @@ std::unique_ptr<util::disasm_interface> epg3231_device::create_disassembler()
 	return std::make_unique<epg3231_disassembler>();
 }
 
-riscii_series_device::riscii_series_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, unsigned addrbits, unsigned pcbits, u32 datastart, unsigned bankbits, u8 maxbank, u8 post_id_mask, address_map_constructor regs)
+riscii_series_device::riscii_series_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, unsigned addrbits, unsigned pcbits, unsigned bankbits, u8 maxbank, u8 post_id_mask, address_map_constructor regs)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, addrbits, -1)
 	, m_regs_config("register", ENDIANNESS_LITTLE, 8, 8 + bankbits, 0, regs)
-	, m_program(nullptr)
-	, m_regs(nullptr)
-	, m_cache(nullptr)
 	, m_porta_in_cb(*this)
-	, m_port_in_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_port_out_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_port_in_cb(*this)
+	, m_port_out_cb(*this)
 	, m_pcmask((1 << pcbits) - 1)
-	, m_datastart(datastart)
-	, m_tbptmask(((1 << (addrbits + 1)) - 1) | (datastart != 0 ? 0x800000 : 0))
+	, m_tbptmask(((1 << (addrbits + 1)) - 1) | 0x800000)
 	, m_bankmask((1 << bankbits) - 1)
 	, m_maxbank(maxbank)
 	, m_post_id_mask(post_id_mask)
@@ -90,6 +89,7 @@ riscii_series_device::riscii_series_device(const machine_config &mconfig, device
 	, m_port_dcr{0, 0, 0, 0, 0, 0}
 	, m_port_control{0, 0}
 	, m_stbcon(0)
+	, m_pa(0xff)
 	, m_painten(0)
 	, m_paintsta(0)
 	, m_pawake(0)
@@ -139,7 +139,7 @@ void epg3231_device::regs_map(address_map &map)
 	map(0x0026, 0x0026).rw(FUNC(epg3231_device::trl1_r), FUNC(epg3231_device::trl1_w));
 	map(0x0027, 0x0027).rw(FUNC(epg3231_device::tr01con_r), FUNC(epg3231_device::tr01con_w));
 	map(0x0028, 0x0028).rw(FUNC(epg3231_device::tr2con_r), FUNC(epg3231_device::tr2con_w));
-	map(0x0028, 0x0028).rw(FUNC(epg3231_device::trlir_r), FUNC(epg3231_device::trlir_w));
+	map(0x0029, 0x0029).rw(FUNC(epg3231_device::trlir_r), FUNC(epg3231_device::trlir_w));
 	// R2Ah is reserved
 	map(0x002b, 0x002b).rw(FUNC(epg3231_device::post_id_r), FUNC(epg3231_device::post_id_w));
 	// TODO: ADCON (R2Ch)
@@ -175,7 +175,7 @@ void epg3231_device::regs_map(address_map &map)
 }
 
 epg3231_device::epg3231_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: riscii_series_device(mconfig, EPG3231, tag, owner, clock, 22, 18, 0x40000, 5, 0x1f, 0xbb,
+	: riscii_series_device(mconfig, EPG3231, tag, owner, clock, 22, 18, 5, 0x1f, 0xbb,
 		address_map_constructor(FUNC(epg3231_device::regs_map), this))
 {
 }
@@ -191,22 +191,23 @@ device_memory_interface::space_config_vector riscii_series_device::memory_space_
 void riscii_series_device::device_resolve_objects()
 {
 	m_porta_in_cb.resolve_safe(0xff);
-	for (auto &cb : m_port_in_cb)
-		cb.resolve_safe(0xff);
-	for (auto &cb : m_port_out_cb)
-		cb.resolve_safe();
+	m_port_in_cb.resolve_all_safe(0xff);
+	m_port_out_cb.resolve_all_safe();
 }
 
 void riscii_series_device::device_start()
 {
-	m_program = &space(AS_PROGRAM);
-	m_regs = &space(AS_DATA);
-	m_cache = m_program->cache<1, -1, ENDIANNESS_LITTLE>();
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
+	space(AS_DATA).specific(m_regs);
 
 	if (m_pcmask > 0xffff)
 		m_pchstack = make_unique_clear<u8[]>(128);
 
 	set_icountptr(m_icount);
+
+	m_timer0 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(riscii_series_device::timer0), this));
+	m_speech_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(riscii_series_device::speech_timer), this));
 
 	state_add<u32>(RII_PC, "PC", [this]() { return m_pc; }, [this](u32 pc) { debug_set_pc(pc); }).mask(m_pcmask);
 	state_add<u32>(STATE_GENPC, "GENPC", [this]() { return m_pc; }, [this](u32 pc) { debug_set_pc(pc); }).mask(m_pcmask).noshow();
@@ -287,6 +288,7 @@ void riscii_series_device::device_start()
 	save_item(NAME(m_port_dcr));
 	save_item(NAME(m_port_control));
 	save_item(NAME(m_stbcon));
+	save_item(NAME(m_pa));
 	save_item(NAME(m_painten));
 	save_item(NAME(m_paintsta));
 	save_item(NAME(m_pawake));
@@ -350,6 +352,7 @@ void riscii_series_device::device_reset()
 	m_tr01con = 0x00;
 	m_tr2con = 0x00;
 	m_sfcr = 0x00;
+	m_timer0->adjust(attotime::never);
 
 	// reset synthesizer
 	std::fill_n(&m_env[0], 4, 0x00);
@@ -359,6 +362,7 @@ void riscii_series_device::device_reset()
 	m_sphtcon = 0x00;
 	m_sphtrl = 0x00;
 	m_vocon = 0x07;
+	m_speech_timer->adjust(attotime::never);
 }
 
 void riscii_series_device::debug_set_pc(u32 pc)
@@ -580,7 +584,7 @@ void riscii_series_device::post_id_w(u8 data)
 u8 riscii_series_device::porta_r()
 {
 	// Port A is read-only
-	return m_porta_in_cb();
+	return m_pa & m_porta_in_cb();
 }
 
 u8 riscii_series_device::port_r(offs_t offset)
@@ -795,6 +799,31 @@ void riscii_series_device::sprh_w(u8 data)
 //  TIMER HANDLERS
 //**************************************************************************
 
+void riscii_series_device::timer0_reload()
+{
+	const unsigned prescale = 1 << ((m_tr01con & 0x03) << 1);
+	if (BIT(m_tr01con, 2))
+		m_timer0->adjust(cycles_to_attotime((m_trl0 + 1) * prescale * 2));
+	else
+		m_timer0->adjust(attotime::from_ticks((m_trl0 + 1) * prescale, 32768));
+}
+
+TIMER_CALLBACK_MEMBER(riscii_series_device::timer0)
+{
+	m_intsta |= 0x01;
+	timer0_reload();
+}
+
+u16 riscii_series_device::timer0_count() const
+{
+	if (!m_timer0->enabled())
+		return 0;
+	else if (BIT(m_tr01con, 2))
+		return m_trl0 - m_timer0->remaining().as_ticks(32768);
+	else
+		return m_trl0 - attotime_to_cycles(m_timer0->remaining()) / 2;
+}
+
 u8 riscii_series_device::trl0l_r()
 {
 	return m_trl0 & 0x00ff;
@@ -852,6 +881,11 @@ u8 riscii_series_device::tr2con_r()
 
 void riscii_series_device::tr2con_w(u8 data)
 {
+	// TODO: capture mode, event counter mode
+	if ((data & 0x30) == 0x10 && (m_tr2con & 0x30) == 0)
+		timer0_reload();
+	else if ((data & 0x30) == 0x10 && (m_tr2con & 0x30) == 0)
+		m_timer0->adjust(attotime::never);
 	m_tr2con = data;
 }
 
@@ -867,12 +901,12 @@ void riscii_series_device::trlir_w(u8 data)
 
 u8 riscii_series_device::t0cl_r()
 {
-	return 0x00;
+	return timer0_count() & 0x00ff;
 }
 
 u8 riscii_series_device::t0ch_r()
 {
-	return 0x00;
+	return timer0_count() >> 8;
 }
 
 u8 riscii_series_device::tr1c_r()
@@ -899,6 +933,21 @@ void riscii_series_device::sfcr_w(u8 data)
 //**************************************************************************
 //  MUSIC/SPEECH SYNTHESIZER
 //**************************************************************************
+
+void riscii_series_device::spht_reload()
+{
+	unsigned sphtpsr_shift = ((m_sphtcon & 0xc0) >> 5) + 1;
+	m_speech_timer->adjust(clocks_to_attotime(((u16(m_sphtcon & 0x07) << 8 | m_sphtrl) + 1) << sphtpsr_shift));
+}
+
+TIMER_CALLBACK_MEMBER(riscii_series_device::speech_timer)
+{
+	// Speech timer interrupt
+	if (BIT(m_sphtcon, 4))
+		m_sphtcon |= 0x20;
+
+	spht_reload();
+}
 
 u8 riscii_series_device::addl_r()
 {
@@ -960,7 +1009,13 @@ u8 riscii_series_device::mtcon_sphtcon_r()
 void riscii_series_device::mtcon_sphtcon_w(u8 data)
 {
 	if (BIT(m_sfcr, 2))
-		m_sphtcon = data;
+	{
+		bool old_data = std::exchange(m_sphtcon, data);
+		if (BIT(data, 3) && !BIT(old_data, 3))
+			spht_reload();
+		else if (!BIT(data, 3))
+			m_speech_timer->adjust(attotime::never);
+	}
 	else
 		m_mtcon[m_sfcr & 0x03] = data;
 }
@@ -998,7 +1053,7 @@ void riscii_series_device::vocon_w(u8 data)
 
 u16 riscii_series_device::fetch_program_word()
 {
-	return m_cache->read_word(std::exchange(m_pc, (m_pc + 1) & m_pcmask));
+	return m_cache.read_word(std::exchange(m_pc, (m_pc + 1) & m_pcmask));
 }
 
 u16 riscii_series_device::get_banked_address(u8 reg)
@@ -1111,22 +1166,22 @@ void riscii_series_device::multi_byte_borrow(u16 addr, bool cy)
 
 void riscii_series_device::execute_move(u8 dstreg, u8 srcreg)
 {
-	u8 tmp = m_regs->read_byte(get_banked_address(srcreg));
-	m_regs->write_byte(get_banked_address(dstreg), tmp);
+	u8 tmp = m_regs.read_byte(get_banked_address(srcreg));
+	m_regs.write_byte(get_banked_address(dstreg), tmp);
 }
 
 void riscii_series_device::execute_add(u8 reg, bool a, bool c)
 {
 	u16 addr = get_banked_address(reg);
-	s8 data = m_regs->read_byte(addr);
-	s16 tmp = s16(data) + s8(m_acc) + (c ? m_status & 0x01 : 0);
+	u8 data = m_regs.read_byte(addr);
+	s16 tmp = s16(s8(data)) + s8(m_acc) + (c ? m_status & 0x01 : 0);
 	bool cy = u16(data) + m_acc + (c ? m_status & 0x01 : 0) >= 0x100;
 	bool dc = (data & 0x0f) + (m_acc & 0x0f) + (c ? m_status & 0x01 : 0) >= 0x10;
 	if (a)
 		acc_w(tmp & 0xff);
 	else
 	{
-		m_regs->write_byte(addr, tmp & 0xff);
+		m_regs.write_byte(addr, tmp & 0xff);
 		multi_byte_carry(addr, cy);
 	}
 	m_status = (m_status & 0xc0)
@@ -1141,15 +1196,18 @@ void riscii_series_device::execute_add(u8 reg, bool a, bool c)
 void riscii_series_device::execute_sub(u8 reg, bool a, bool c)
 {
 	u16 addr = get_banked_address(reg);
-	s8 data = m_regs->read_byte(addr);
-	s16 tmp = s16(data) - s8(m_acc) - (c ? ~m_status & 0x01 : 0);
-	bool cy = u8(data) >= m_acc + (c ? m_status & 0x01 : 0); // borrow is inverted
+	u8 data = m_regs.read_byte(addr);
+	// HACK: BSR1 needs to be decremented when FSR1 rolls under 0x80
+	if (!a && addr == 0x0009)
+		data &= 0x7f;
+	s16 tmp = s16(s8(data)) - s8(m_acc) - (c ? ~m_status & 0x01 : 0);
+	bool cy = u16(data) >= m_acc + (c ? ~m_status & 0x01 : 0); // borrow is inverted
 	bool dc = (data & 0x0f) >= (m_acc & 0x0f) + (c ? ~m_status & 0x01 : 0);
 	if (a)
 		acc_w(tmp & 0xff);
 	else
 	{
-		m_regs->write_byte(addr, tmp & 0xff);
+		m_regs.write_byte(addr, tmp & 0xff);
 		multi_byte_borrow(addr, cy);
 	}
 	m_status = (m_status & 0xc0)
@@ -1179,7 +1237,7 @@ void riscii_series_device::execute_add_imm(u8 data, bool c)
 void riscii_series_device::execute_sub_imm(u8 data, bool c)
 {
 	s16 tmp = s16(s8(data)) - s8(m_acc) - (c ? ~m_status & 0x01 : 0);
-	bool cy = u8(data) >= m_acc + (c ? m_status & 0x01 : 0); // borrow is inverted
+	bool cy = u8(data) >= m_acc + (c ? ~m_status & 0x01 : 0); // borrow is inverted
 	bool dc = (data & 0x0f) + (m_acc & 0x0f) + (c ? ~m_status & 0x01 : 0) >= 0x10;
 	acc_w(tmp & 0xff);
 	m_status = (m_status & 0xc0)
@@ -1194,7 +1252,7 @@ void riscii_series_device::execute_sub_imm(u8 data, bool c)
 void riscii_series_device::execute_adddc(u8 reg, bool a)
 {
 	u16 addr = get_banked_address(reg);
-	u8 data = m_regs->read_byte(addr);
+	u8 data = m_regs.read_byte(addr);
 	u16 tmp = u16(data) + m_acc + (m_status & 0x01);
 	bool dc = (data & 0x0f) + (m_acc & 0x0f) + (m_status & 0x01) >= 0x0a;
 	if (dc)
@@ -1204,7 +1262,7 @@ void riscii_series_device::execute_adddc(u8 reg, bool a)
 	if (a)
 		acc_w(tmp & 0xff);
 	else
-		m_regs->write_byte(addr, tmp & 0xff);
+		m_regs.write_byte(addr, tmp & 0xff);
 	m_status = (m_status & 0xf8)
 		| (BIT(tmp, 8) ? 0x01 : 0x00)
 		| (dc ? 0x02 : 0x00)
@@ -1214,7 +1272,10 @@ void riscii_series_device::execute_adddc(u8 reg, bool a)
 void riscii_series_device::execute_subdb(u8 reg, bool a)
 {
 	u16 addr = get_banked_address(reg);
-	u8 data = m_regs->read_byte(addr);
+	u8 data = m_regs.read_byte(addr);
+	// HACK: BSR1 needs to be decremented when FSR1 rolls under 0x80
+	if (!a && addr == 0x0009)
+		data &= 0x7f;
 	u16 tmp = u16(data) - m_acc - (~m_status & 0x01);
 	bool dc = (data & 0x0f) + (~m_acc & 0x0f) + (m_status & 0x01) >= 0x0a;
 	if (dc)
@@ -1224,7 +1285,7 @@ void riscii_series_device::execute_subdb(u8 reg, bool a)
 	if (a)
 		acc_w(tmp & 0xff);
 	else
-		m_regs->write_byte(addr, tmp & 0xff);
+		m_regs.write_byte(addr, tmp & 0xff);
 	m_status = (m_status & 0xf8)
 		| (BIT(tmp, 8) ? 0x00 : 0x01) // borrow is inverted
 		| (dc ? 0x02 : 0x00)
@@ -1233,7 +1294,7 @@ void riscii_series_device::execute_subdb(u8 reg, bool a)
 
 void riscii_series_device::execute_mul(u8 reg)
 {
-	execute_mul_imm(m_regs->read_byte(get_banked_address(reg)));
+	execute_mul_imm(m_regs.read_byte(get_banked_address(reg)));
 }
 
 void riscii_series_device::execute_mul_imm(u8 data)
@@ -1241,16 +1302,17 @@ void riscii_series_device::execute_mul_imm(u8 data)
 	int mier = BIT(m_cpucon, 3) ? int(s8(m_acc)) : int(m_acc);
 	int mcand = BIT(m_cpucon, 4) ? int(s8(data)) : int(data);
 	m_prod = u16(mier * mcand);
+	logerror("%s: %d * %d = %04X\n", machine().describe_context(), mier, mcand, m_prod);
 }
 
 void riscii_series_device::execute_or(u8 reg, bool a)
 {
 	u16 addr = get_banked_address(reg);
-	u8 tmp = m_acc | m_regs->read_byte(addr);
+	u8 tmp = m_acc | m_regs.read_byte(addr);
 	if (a)
 		acc_w(tmp);
 	else
-		m_regs->write_byte(addr, tmp);
+		m_regs.write_byte(addr, tmp);
 	if (tmp == 0)
 		m_status |= 0x04;
 	else
@@ -1260,11 +1322,11 @@ void riscii_series_device::execute_or(u8 reg, bool a)
 void riscii_series_device::execute_and(u8 reg, bool a)
 {
 	u16 addr = get_banked_address(reg);
-	u8 tmp = m_acc & m_regs->read_byte(addr);
+	u8 tmp = m_acc & m_regs.read_byte(addr);
 	if (a)
 		acc_w(tmp);
 	else
-		m_regs->write_byte(addr, tmp);
+		m_regs.write_byte(addr, tmp);
 	if (tmp == 0)
 		m_status |= 0x04;
 	else
@@ -1274,11 +1336,11 @@ void riscii_series_device::execute_and(u8 reg, bool a)
 void riscii_series_device::execute_xor(u8 reg, bool a)
 {
 	u16 addr = get_banked_address(reg);
-	u8 tmp = m_acc ^ m_regs->read_byte(addr);
+	u8 tmp = m_acc ^ m_regs.read_byte(addr);
 	if (a)
 		acc_w(tmp);
 	else
-		m_regs->write_byte(addr, tmp);
+		m_regs.write_byte(addr, tmp);
 	if (tmp == 0)
 		m_status |= 0x04;
 	else
@@ -1288,11 +1350,11 @@ void riscii_series_device::execute_xor(u8 reg, bool a)
 void riscii_series_device::execute_com(u8 reg, bool a)
 {
 	u16 addr = get_banked_address(reg);
-	u8 tmp = ~m_regs->read_byte(addr);
+	u8 tmp = ~m_regs.read_byte(addr);
 	if (a)
 		acc_w(tmp);
 	else
-		m_regs->write_byte(addr, tmp);
+		m_regs.write_byte(addr, tmp);
 	if (tmp == 0)
 		m_status |= 0x04;
 	else
@@ -1301,41 +1363,41 @@ void riscii_series_device::execute_com(u8 reg, bool a)
 
 void riscii_series_device::execute_clr(u8 reg)
 {
-	m_regs->write_byte(get_banked_address(reg), 0);
+	m_regs.write_byte(get_banked_address(reg), 0);
 	m_status |= 0x04;
 }
 
 void riscii_series_device::execute_rrc(u8 reg, bool a)
 {
 	u16 addr = get_banked_address(reg);
-	u16 tmp = m_regs->read_byte(addr) | u16(m_status & 0x01) << 8;
+	u16 tmp = m_regs.read_byte(addr) | u16(m_status & 0x01) << 8;
 	if (a)
 		acc_w(tmp >> 1);
 	else
-		m_regs->write_byte(addr, tmp >> 1);
+		m_regs.write_byte(addr, tmp >> 1);
 	m_status = (m_status & 0xfe) | (tmp & 0x01);
 }
 
 void riscii_series_device::execute_rlc(u8 reg, bool a)
 {
 	u16 addr = get_banked_address(reg);
-	u16 tmp = u16(m_regs->read_byte(addr)) << 1 | (m_status & 0x01);
+	u16 tmp = u16(m_regs.read_byte(addr)) << 1 | (m_status & 0x01);
 	if (a)
 		acc_w(tmp & 0xff);
 	else
-		m_regs->write_byte(addr, tmp & 0xff);
+		m_regs.write_byte(addr, tmp & 0xff);
 	m_status = (m_status & 0xfe) | (tmp >> 8);
 }
 
 void riscii_series_device::execute_shra(u8 reg)
 {
-	u8 tmp = m_regs->read_byte(get_banked_address(reg));
+	u8 tmp = m_regs.read_byte(get_banked_address(reg));
 	acc_w((tmp >> 1) | (m_status & 0x01) << 7);
 }
 
 void riscii_series_device::execute_shla(u8 reg)
 {
-	u8 tmp = m_regs->read_byte(get_banked_address(reg));
+	u8 tmp = m_regs.read_byte(get_banked_address(reg));
 	acc_w((tmp << 1) | (m_status & 0x01));
 }
 
@@ -1349,7 +1411,7 @@ void riscii_series_device::execute_call(u32 addr)
 	// Push PC to the stack region at the end of banked RAM
 	m_stkptr -= 2;
 	u16 stkaddr = u16(m_maxbank - (BIT(m_stkptr, 7) ? 0 : 1)) << 8 | 0x80 | (m_stkptr & 0x7e);
-	m_regs->write_word(stkaddr, swapendian_int16(m_pc & 0xffff));
+	m_regs.write_word(stkaddr, swapendian_int16(m_pc & 0xffff));
 
 	// PCH (on relevant models) must be saved somewhere. This implementation assumes a private buffer is used.
 	if (m_pcmask > 0xffff)
@@ -1369,12 +1431,12 @@ void riscii_series_device::execute_jcc(bool condition)
 void riscii_series_device::execute_jdnz(u8 reg, bool a)
 {
 	u16 addr = get_banked_address(reg);
-	u8 tmp = m_regs->read_byte(addr) - 1;
+	u8 tmp = m_regs.read_byte(addr) - 1;
 	if (a)
 		acc_w(tmp);
 	else
 	{
-		m_regs->write_byte(addr, tmp);
+		m_regs.write_byte(addr, tmp);
 		multi_byte_borrow(addr, tmp != 0xff);
 	}
 	execute_jcc(tmp != 0);
@@ -1383,12 +1445,12 @@ void riscii_series_device::execute_jdnz(u8 reg, bool a)
 void riscii_series_device::execute_jinz(u8 reg, bool a)
 {
 	u16 addr = get_banked_address(reg);
-	u8 tmp = m_regs->read_byte(addr) + 1;
+	u8 tmp = m_regs.read_byte(addr) + 1;
 	if (a)
 		acc_w(tmp);
 	else
 	{
-		m_regs->write_byte(addr, tmp);
+		m_regs.write_byte(addr, tmp);
 		multi_byte_carry(addr, tmp == 0);
 	}
 	execute_jcc(tmp != 0);
@@ -1405,17 +1467,17 @@ void riscii_series_device::set_z_acc(u8 tmp)
 
 void riscii_series_device::execute_load(u8 reg)
 {
-	set_z_acc(m_regs->read_byte(get_banked_address(reg)));
+	set_z_acc(m_regs.read_byte(get_banked_address(reg)));
 }
 
 void riscii_series_device::execute_store(u8 reg)
 {
-	m_regs->write_byte(get_banked_address(reg), m_acc);
+	m_regs.write_byte(get_banked_address(reg), m_acc);
 }
 
 void riscii_series_device::execute_test(u8 reg)
 {
-	u8 tmp = m_regs->read_byte(get_banked_address(reg));
+	u8 tmp = m_regs.read_byte(get_banked_address(reg));
 	if (tmp == 0)
 		m_status |= 0x04;
 	else
@@ -1425,82 +1487,83 @@ void riscii_series_device::execute_test(u8 reg)
 void riscii_series_device::execute_swap(u8 reg, bool a)
 {
 	u16 addr = get_banked_address(reg);
-	u8 tmp = m_regs->read_byte(addr);
+	u8 tmp = m_regs.read_byte(addr);
 	if (a)
 		acc_w((tmp >> 4) | (tmp << 4));
 	else
-		m_regs->write_byte(addr, (tmp >> 4) | (tmp << 4));
+		m_regs.write_byte(addr, (tmp >> 4) | (tmp << 4));
 }
 
 void riscii_series_device::execute_jbc(u8 reg, int b)
 {
-	execute_jcc(!BIT(m_regs->read_byte(get_banked_address(reg)), b));
+	execute_jcc(!BIT(m_regs.read_byte(get_banked_address(reg)), b));
 }
 
 void riscii_series_device::execute_jbs(u8 reg, int b)
 {
-	execute_jcc(BIT(m_regs->read_byte(get_banked_address(reg)), b));
+	execute_jcc(BIT(m_regs.read_byte(get_banked_address(reg)), b));
 }
 
 void riscii_series_device::execute_bc(u8 reg, int b)
 {
 	u16 addr = get_banked_address(reg);
-	u8 tmp = m_regs->read_byte(addr) & ~(1 << b);
-	m_regs->write_byte(addr, tmp);
+	u8 tmp = m_regs.read_byte(addr) & ~(1 << b);
+	m_regs.write_byte(addr, tmp);
 }
 
 void riscii_series_device::execute_bs(u8 reg, int b)
 {
 	u16 addr = get_banked_address(reg);
-	u8 tmp = m_regs->read_byte(addr) | (1 << b);
-	m_regs->write_byte(addr, tmp);
+	u8 tmp = m_regs.read_byte(addr) | (1 << b);
+	m_regs.write_byte(addr, tmp);
 }
 
 void riscii_series_device::execute_btg(u8 reg, int b)
 {
 	u16 addr = get_banked_address(reg);
-	u8 tmp = m_regs->read_byte(addr) ^ (1 << b);
-	m_regs->write_byte(addr, tmp);
+	u8 tmp = m_regs.read_byte(addr) ^ (1 << b);
+	m_regs.write_byte(addr, tmp);
 }
 
 void riscii_series_device::execute_inc(u8 reg, bool a)
 {
 	u16 addr = get_banked_address(reg);
-	u16 tmp = u16(m_regs->read_byte(addr)) + 1;
+	u16 tmp = u16(m_regs.read_byte(addr)) + 1;
 	if (a)
 		acc_w(tmp & 0xff);
 	else
 	{
-		m_regs->write_byte(addr, tmp & 0xff);
+		m_regs.write_byte(addr, tmp & 0xff);
 		multi_byte_carry(addr, (tmp >> 8) != 0);
 	}
-	m_status = (m_status & 0xfa) | ((tmp & 0xff) == 0 ? 0x04 : 0x00) | (tmp >> 8);
+	m_status = (m_status & 0xfa) | (tmp == 0x100 ? 0x04 : 0x00) | (tmp >> 8);
 }
 
 void riscii_series_device::execute_dec(u8 reg, bool a)
 {
 	u16 addr = get_banked_address(reg);
-	u16 tmp = (u16(m_regs->read_byte(addr)) - 1) & 0x1ff;
+	u16 tmp = u16(m_regs.read_byte(addr)) + 0xff;
 	if (a)
 		acc_w(tmp & 0xff);
 	else
 	{
-		m_regs->write_byte(addr, tmp & 0xff);
-		multi_byte_borrow(addr, (tmp >> 8) != 0);
+		m_regs.write_byte(addr, tmp & 0xff);
+		// HACK: BSR1 needs to be decremented when FSR1 rolls under 0x80
+		multi_byte_borrow(addr, tmp == (addr == 0x0009 ? 0x7f : 0xff));
 	}
-	m_status = (m_status & 0xfa) | ((tmp & 0xff) == 0 ? 0x04 : 0x00) | (tmp >> 8);
+	m_status = (m_status & 0xfa) | (tmp == 0x100 ? 0x04 : 0x00) | (tmp >> 8);
 }
 
 void riscii_series_device::execute_rpt(u8 reg)
 {
-	m_repeat = m_regs->read_byte(get_banked_address(reg)) - 1;
+	m_repeat = m_regs.read_byte(get_banked_address(reg)) - 1;
 }
 
 void riscii_series_device::execute_ret(bool inte)
 {
 	// Pop PC from the stack region at the end of banked RAM
 	u16 stkaddr = u16(m_maxbank - (BIT(m_stkptr, 7) ? 0 : 1)) << 8 | 0x80 | (m_stkptr & 0x7e);
-	u32 dest = swapendian_int16(m_regs->read_word(stkaddr));
+	u32 dest = swapendian_int16(m_regs.read_word(stkaddr));
 	if (m_pcmask > 0xffff)
 		dest |= u32(m_pchstack[m_stkptr >> 1]) << 16;
 	execute_jump(dest);
@@ -1519,6 +1582,7 @@ void riscii_series_device::execute_wdtc()
 void riscii_series_device::execute_slep()
 {
 	logerror("%s mode entered (PC = %05X)\n", BIT(m_cpucon, 1) ? "Idle" : "Sleep", m_ppc);
+	m_exec_state = EXEC_IDLE;
 }
 
 void riscii_series_device::execute_undef(u16 opcode)
@@ -1765,15 +1829,15 @@ void riscii_series_device::execute_cycle1(u16 opcode)
 		break;
 
 	case 0x5500:
-		execute_jcc(m_acc >= m_regs->read_byte(get_banked_address(opcode & 0x00ff)));
+		execute_jcc(m_acc >= m_regs.read_byte(get_banked_address(opcode & 0x00ff)));
 		break;
 
 	case 0x5600:
-		execute_jcc(m_acc <= m_regs->read_byte(get_banked_address(opcode & 0x00ff)));
+		execute_jcc(m_acc <= m_regs.read_byte(get_banked_address(opcode & 0x00ff)));
 		break;
 
 	case 0x5700:
-		execute_jcc(m_acc == m_regs->read_byte(get_banked_address(opcode & 0x00ff)));
+		execute_jcc(m_acc == m_regs.read_byte(get_banked_address(opcode & 0x00ff)));
 		break;
 
 	case 0x5800: case 0x5900: case 0x5a00: case 0x5b00:
@@ -1811,15 +1875,16 @@ void riscii_series_device::execute_tbrd(u32 ptr)
 {
 	u16 addr = get_banked_address(m_curreg);
 	u32 memaddr = (ptr & 0x7ffffe) >> 1;
-	if (BIT(ptr, 23))
-		memaddr += m_datastart;
-	else
+	if (!BIT(ptr, 23))
 		memaddr &= m_pcmask;
-	u16 data = m_program->read_word(memaddr);
+	u16 data = m_program.read_word(memaddr);
 	if (BIT(ptr, 0))
-		m_regs->write_byte(addr, data >> 8);
+		data >>= 8;
 	else
-		m_regs->write_byte(addr, data);
+		data &= 0x00ff;
+	LOGMASKED(LOG_TBRD, "%05X: TBRD(%06Xh) = %02Xh -> %02X:%02Xh\n", m_ppc, ptr, data, addr >> 8, addr & 0x00ff);
+	m_regs.write_byte(addr, data);
+
 	if (m_repeat != 0)
 		--m_repeat;
 	else
@@ -1949,15 +2014,40 @@ void riscii_series_device::execute_run()
 			(void)fetch_program_word();
 			m_exec_state = EXEC_CYCLE1;
 			break;
+
+		case EXEC_IDLE:
+			m_icount = 0;
+			return;
 		}
 
 		m_icount--;
 	}
 }
 
+void riscii_series_device::idle_wakeup()
+{
+	if (m_exec_state == EXEC_IDLE)
+		m_exec_state = EXEC_CYCLE1;
+}
+
 void riscii_series_device::execute_set_input(int inputnum, int state)
 {
-	// TODO
+	if (inputnum >= PA0_LINE && inputnum <= PA7_LINE)
+	{
+		if (state != CLEAR_LINE)
+		{
+			// Interrupt/wake-up on pin falling edge
+			if (BIT(m_pa, inputnum - PA0_LINE))
+			{
+				m_pa &= ~(1 << (inputnum - PA0_LINE));
+				m_paintsta |= 1 << (inputnum - PA0_LINE);
+				if (BIT(m_pawake, inputnum - PA0_LINE))
+					idle_wakeup();
+			}
+		}
+		else
+			m_pa |= 1 << (inputnum - PA0_LINE);
+	}
 }
 
 void riscii_series_device::state_string_export(const device_state_entry &entry, std::string &str) const

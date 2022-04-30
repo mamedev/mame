@@ -45,7 +45,6 @@ mos6581_device::mos6581_device(const machine_config &mconfig, device_type type, 
 	, m_read_poty(*this)
 	, m_stream(nullptr)
 	, m_variant(variant)
-	, m_token(make_unique_clear<SID6581_t>())
 
 {
 }
@@ -199,9 +198,10 @@ void mos6581_device::device_start()
 	m_read_poty.resolve_safe(0xff);
 
 	// create sound stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
+	m_stream = stream_alloc(0, 1, machine().sample_rate());
 
 	// initialize SID engine
+	m_token = std::make_unique<SID6581_t>();
 	m_token->device = this;
 	m_token->mixer_channel = m_stream;
 	m_token->PCMfreq = machine().sample_rate();
@@ -239,9 +239,9 @@ void mos6581_device::device_post_load()
 //  our sound stream
 //-------------------------------------------------
 
-void mos6581_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void mos6581_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	m_token->fill_buffer(outputs[0], samples);
+	m_token->fill_buffer(outputs[0]);
 }
 
 

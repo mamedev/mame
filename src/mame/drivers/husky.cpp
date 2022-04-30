@@ -14,6 +14,7 @@
     TODO:
     - implement power button
     - test rs232 port
+    - Break key doesn't work?
 
 ****************************************************************************/
 
@@ -62,16 +63,16 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_READ8_MEMBER(porta_r);
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_READ8_MEMBER(portb_r);
-	DECLARE_READ8_MEMBER(portc_r);
-	DECLARE_WRITE8_MEMBER(portc_w);
-	DECLARE_WRITE8_MEMBER(serial_tx_w);
-	DECLARE_WRITE8_MEMBER(cursor_w);
-	DECLARE_WRITE8_MEMBER(curinh_w);
-	DECLARE_WRITE8_MEMBER(irqctrl_w);
-	DECLARE_WRITE8_MEMBER(page_w);
+	uint8_t porta_r();
+	void porta_w(uint8_t data);
+	uint8_t portb_r();
+	uint8_t portc_r();
+	void portc_w(uint8_t data);
+	void serial_tx_w(uint8_t data);
+	void cursor_w(uint8_t data);
+	void curinh_w(uint8_t data);
+	void irqctrl_w(uint8_t data);
+	void page_w(offs_t offset, uint8_t data);
 	void husky_palette(palette_device &palette) const;
 
 	DECLARE_WRITE_LINE_MEMBER(timer0_out);
@@ -163,7 +164,7 @@ static INPUT_PORTS_START(husky)
 	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('H') PORT_CHAR('#')
 	PORT_BIT(0x0400, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('J') PORT_CHAR('*')
 	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('K') PORT_CHAR('=')
-	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('L') PORT_NAME("L Esc")
+	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('L') PORT_CHAR(27) PORT_NAME("L Esc")
 	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Power on/off")
 
 	PORT_START("X2")
@@ -173,10 +174,10 @@ static INPUT_PORTS_START(husky)
 	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z') PORT_CHAR('<')
 	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_CHAR('$')
 	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('C') PORT_CHAR('%')
-	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('V') PORT_NAME("V Insert")
+	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('V') PORT_CHAR(UCHAR_MAMEKEY(INSERT)) PORT_NAME("V Insert")
 	PORT_BIT(0x0400, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_CHAR('B') PORT_CHAR('-')
-	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('N') PORT_NAME("N Left")
-	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('M') PORT_NAME("M Right")
+	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('N') PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_NAME("N Left")
+	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('M') PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_NAME("M Right")
 	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 
 	PORT_START("X3")
@@ -188,9 +189,9 @@ static INPUT_PORTS_START(husky)
 	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_NAME("5 Control")
 	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('.')
 	PORT_BIT(0x0400, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('+')
-	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_NAME("8 Down")
-	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_NAME("9 Up")
-	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_NAME("0 Del")
+	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_NAME("8 Down")
+	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_NAME("9 Up")
+	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(UCHAR_MAMEKEY(DEL)) PORT_NAME("0 Del")
 
 	PORT_START("BATTERY")
 	PORT_CONFNAME(0x04, 0x04, "Battery")
@@ -199,7 +200,7 @@ static INPUT_PORTS_START(husky)
 INPUT_PORTS_END
 
 
-READ8_MEMBER(husky_state::porta_r)
+uint8_t husky_state::porta_r()
 {
 	uint8_t data = 0xff;
 
@@ -211,12 +212,12 @@ READ8_MEMBER(husky_state::porta_r)
 	return data;
 }
 
-WRITE8_MEMBER(husky_state::porta_w)
+void husky_state::porta_w(uint8_t data)
 {
 	m_keydata = data;
 }
 
-READ8_MEMBER(husky_state::portb_r)
+uint8_t husky_state::portb_r()
 {
 	uint8_t data = 0xff;
 
@@ -232,7 +233,7 @@ READ8_MEMBER(husky_state::portb_r)
 Bit 2 = Power low warning (1 = Power OK, 0 = Power low)
 Input bits 7,6,4,3,2
 */
-READ8_MEMBER(husky_state::portc_r)
+uint8_t husky_state::portc_r()
 {
 	uint8_t data = 0x23;
 
@@ -245,7 +246,7 @@ READ8_MEMBER(husky_state::portc_r)
 /*
 Output bits 5,1,0
 */
-WRITE8_MEMBER(husky_state::portc_w)
+void husky_state::portc_w(uint8_t data)
 {
 	m_beeper->set_state(!BIT(data, 0));
 	m_rs232->write_rts(BIT(data, 1));
@@ -254,7 +255,7 @@ WRITE8_MEMBER(husky_state::portc_w)
 /*
 CURSOR - Output with a number 0-7F for the cursor position on the display
 */
-WRITE8_MEMBER(husky_state::cursor_w)
+void husky_state::cursor_w(uint8_t data)
 {
 	m_cursor = data & 0x7f;
 }
@@ -262,7 +263,7 @@ WRITE8_MEMBER(husky_state::cursor_w)
 /*
 CURINH - Inhibit cursor. BIT0 = 1 : Cursor off, BIT0 = 0 : Cursor on
 */
-WRITE8_MEMBER(husky_state::curinh_w)
+void husky_state::curinh_w(uint8_t data)
 {
 	m_curinh = BIT(data, 0);
 }
@@ -271,7 +272,7 @@ WRITE8_MEMBER(husky_state::curinh_w)
 V24OUT - Directly outputs to the V24 data line signal on bit 0.
 The output is voltage inverted ie. 0 = +ve, 1 = -ve
 */
-WRITE8_MEMBER(husky_state::serial_tx_w)
+void husky_state::serial_tx_w(uint8_t data)
 {
 	m_rs232->write_txd(data & 0x01);
 }
@@ -283,7 +284,7 @@ Bit 1 = Enable RSTC interrupts
 Bit 2 = Enable RSTB interrupts
 Bit 3 = Enable RSTA interrupts
 */
-WRITE8_MEMBER(husky_state::irqctrl_w)
+void husky_state::irqctrl_w(uint8_t data)
 {
 	m_irq_mask = data;
 	if(!(data & 0x08))
@@ -297,7 +298,7 @@ WRITE8_MEMBER(husky_state::irqctrl_w)
 /*
 PAGA 16, 17, 18 - Memory paging addresses
 */
-WRITE8_MEMBER(husky_state::page_w)
+void husky_state::page_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0x02)
 	{
@@ -383,13 +384,13 @@ uint32_t husky_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	I'm drawing each character as 6x12 to form an overall screen of 192x48.
 	*/
 
-	uint8_t data;
-	const pen_t *pen = m_palette->pens();
+	pen_t const *const pen = m_palette->pens();
 
 	for (int y = 0; y < 48; y++)
 	{
 		for (int x = 0; x < 32; x++)
 		{
+			uint8_t data;
 			switch (y % 12)
 			{
 			case 0: case 1: case 2: case 3: case 4: case 5: case 6:
@@ -398,24 +399,24 @@ uint32_t husky_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 				for (int b = 0; b < 5; b++)
 				{
-					bitmap.pix32(y, (x * 6) + b) = BIT(data, 0) ? pen[1] : pen[2];
+					bitmap.pix(y, (x * 6) + b) = BIT(data, 0) ? pen[1] : pen[2];
 					data >>= 1;
 				}
-				bitmap.pix32(y, (x * 6) + 5) = pen[0];
+				bitmap.pix(y, (x * 6) + 5) = pen[0];
 				break;
 			case 8:
 				/* cursor */
 				for (int b = 0; b < 5; b++)
 				{
-					bitmap.pix32(y, (x * 6) + b) = (!m_curinh && m_cursor == (y / 12) * 32 + x) ? pen[1] : pen[2];
+					bitmap.pix(y, (x * 6) + b) = (!m_curinh && m_cursor == (y / 12) * 32 + x) ? pen[1] : pen[2];
 				}
-				bitmap.pix32(y, (x * 6) + 5) = pen[0];
+				bitmap.pix(y, (x * 6) + 5) = pen[0];
 				break;
 			default:
 				/* blank */
 				for (int b = 0; b < 6; b++)
 				{
-					bitmap.pix32(y, (x * 6) + b) = pen[0];
+					bitmap.pix(y, (x * 6) + b) = pen[0];
 				}
 				break;
 			}

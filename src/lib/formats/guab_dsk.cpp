@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Dirk Best
 /***************************************************************************
 
@@ -39,4 +39,4 @@ const guab_format::format guab_format::formats[] =
 	{}
 };
 
-const floppy_format_type FLOPPY_GUAB_FORMAT = &floppy_image_format_creator<guab_format>;
+const guab_format FLOPPY_GUAB_FORMAT;

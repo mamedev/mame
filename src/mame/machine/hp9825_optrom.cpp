@@ -46,7 +46,7 @@ hp9825_optrom_device::hp9825_optrom_device(machine_config const &mconfig, char c
 
 hp9825_optrom_device::hp9825_optrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, HP9825_OPTROM, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	, device_rom_image_interface(mconfig, *this)
 	, m_rom_limit(0xffffU)
 	, m_loaded_regions(0)
 	, m_space_r(nullptr)

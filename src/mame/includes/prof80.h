@@ -68,7 +68,7 @@ private:
 	required_ioport m_j4;
 	required_ioport m_j5;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 
 	enum
@@ -76,9 +76,9 @@ private:
 		TIMER_ID_MOTOR
 	};
 
-	DECLARE_WRITE8_MEMBER(flr_w);
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_READ8_MEMBER(status2_r);
+	void flr_w(uint8_t data);
+	uint8_t status_r();
+	uint8_t status2_r();
 
 	void motor(int mon);
 
@@ -86,17 +86,16 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(inuse_w);
 	DECLARE_WRITE_LINE_MEMBER(motor_w);
 	DECLARE_WRITE_LINE_MEMBER(select_w);
-	DECLARE_WRITE_LINE_MEMBER(resf_w);
 	DECLARE_WRITE_LINE_MEMBER(mini_w);
 	DECLARE_WRITE_LINE_MEMBER(mstop_w);
 
 	// floppy state
-	int m_motor;
-	int m_ready;
-	int m_select;
+	int m_motor = 0;
+	int m_ready = 0;
+	int m_select = 0;
 
 	// timers
-	emu_timer   *m_floppy_motor_off_timer;
+	emu_timer   *m_floppy_motor_off_timer = nullptr;
 
 	void prof80_io(address_map &map);
 	void prof80_mem(address_map &map);

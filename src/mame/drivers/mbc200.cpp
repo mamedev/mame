@@ -44,6 +44,7 @@ TODO:
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
 #include "machine/i8251.h"
@@ -53,10 +54,14 @@ TODO:
 #include "sound/beep.h"
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
+
+
+namespace {
 
 class mbc200_state : public driver_device
 {
@@ -68,6 +73,8 @@ public:
 		, m_ppi_m(*this, "ppi_m")
 		, m_vram(*this, "vram")
 		, m_maincpu(*this, "maincpu")
+		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
 		, m_beep(*this, "beeper")
 		, m_speaker(*this, "speaker")
 		, m_fdc(*this, "fdc")
@@ -77,29 +84,33 @@ public:
 
 	void mbc200(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
-	DECLARE_READ8_MEMBER(p2_porta_r);
-	DECLARE_WRITE8_MEMBER(p1_portc_w);
-	DECLARE_WRITE8_MEMBER(pm_porta_w);
-	DECLARE_WRITE8_MEMBER(pm_portb_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
+	u8 p2_porta_r();
+	void p1_portc_w(u8 data);
+	void pm_porta_w(u8 data);
+	void pm_portb_w(u8 data);
+	u8 keyboard_r(offs_t offset);
 	void kbd_put(u8 data);
 	MC6845_UPDATE_ROW(update_row);
 	required_device<palette_device> m_palette;
 
-	void mbc200_io(address_map &map);
-	void mbc200_mem(address_map &map);
-	void mbc200_sub_io(address_map &map);
-	void mbc200_sub_mem(address_map &map);
+	void main_mem(address_map &map);
+	void main_io(address_map &map);
+	void sub_mem(address_map &map);
+	void sub_io(address_map &map);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	uint8_t m_comm_latch;
-	uint8_t m_term_data;
+	u8 m_comm_latch = 0U;
+	u8 m_term_data = 0U;
 	required_device<mc6845_device> m_crtc;
 	required_device<i8255_device> m_ppi_m;
-	required_shared_ptr<uint8_t> m_vram;
+	required_shared_ptr<u8> m_vram;
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_rom;
+	required_shared_ptr<u8> m_ram;
 	required_device<beep_device> m_beep;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<mb8876_device> m_fdc;
@@ -108,26 +119,24 @@ private:
 };
 
 
-void mbc200_state::mbc200_mem(address_map &map)
+void mbc200_state::main_mem(address_map &map)
 {
-	map.unmap_value_high();
-	map(0x0000, 0x0fff).ram().region("maincpu", 0);
-	map(0x1000, 0xffff).ram();
+	map(0x0000, 0xffff).ram().share("mainram");
 }
 
-WRITE8_MEMBER( mbc200_state::p1_portc_w )
+void mbc200_state::p1_portc_w(u8 data)
 {
 	m_speaker->level_w(BIT(data,4)); // used by beep command in basic
 }
 
-WRITE8_MEMBER( mbc200_state::pm_porta_w )
+void mbc200_state::pm_porta_w(u8 data)
 {
 	machine().scheduler().synchronize(); // force resync
 	//printf("A %02x %c\n",data,data);
 	m_comm_latch = data; // to slave CPU
 }
 
-WRITE8_MEMBER( mbc200_state::pm_portb_w )
+void mbc200_state::pm_portb_w(u8 data)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -148,7 +157,7 @@ WRITE8_MEMBER( mbc200_state::pm_portb_w )
 	m_beep->set_state(BIT(data, 1)); // key-click
 }
 
-void mbc200_state::mbc200_io(address_map &map)
+void mbc200_state::main_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -161,24 +170,24 @@ void mbc200_state::mbc200_io(address_map &map)
 
 
 
-void mbc200_state::mbc200_sub_mem(address_map &map)
+void mbc200_state::sub_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x2fff).rom();
-	map(0x3000, 0x7fff).ram();
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x7fff).ram();
 	map(0x8000, 0xffff).ram().share("vram");
 }
 
-READ8_MEMBER(mbc200_state::p2_porta_r)
+u8 mbc200_state::p2_porta_r()
 {
 	machine().scheduler().synchronize(); // force resync
-	uint8_t tmp = m_comm_latch;
+	u8 tmp = m_comm_latch;
 	m_comm_latch = 0;
 	m_ppi_m->pc6_w(0); // ppi_ack
 	return tmp;
 }
 
-void mbc200_state::mbc200_sub_io(address_map &map)
+void mbc200_state::sub_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -192,9 +201,9 @@ void mbc200_state::mbc200_sub_io(address_map &map)
 static INPUT_PORTS_START( mbc200 )
 INPUT_PORTS_END
 
-READ8_MEMBER( mbc200_state::keyboard_r )
+u8 mbc200_state::keyboard_r(offs_t offset)
 {
-	uint8_t data = 0;
+	u8 data = 0;
 	if (offset)
 	{
 		if (m_term_data)
@@ -250,13 +259,13 @@ void mbc200_state::kbd_put(u8 data)
 
 void mbc200_state::machine_start()
 {
+	save_item(NAME(m_comm_latch));
+	save_item(NAME(m_term_data));
 }
 
 void mbc200_state::machine_reset()
 {
-	uint8_t* roms = memregion("roms")->base();
-	uint8_t* main = memregion("maincpu")->base();
-	memcpy(main, roms, 0x1000);
+	memcpy(m_ram, m_rom, 0x1000);
 }
 
 static void mbc200_floppies(device_slot_interface &device)
@@ -266,15 +275,13 @@ static void mbc200_floppies(device_slot_interface &device)
 
 MC6845_UPDATE_ROW( mbc200_state::update_row )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t gfx;
-	uint16_t mem,x;
-	uint32_t *p = &bitmap.pix32(y);
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	u32 *p = &bitmap.pix(y);
 
-	for (x = 0; x < x_count; x++)
+	for (u16 x = 0; x < x_count; x++)
 	{
-		mem = (ma+x)*4+ra;
-		gfx = m_vram[mem & 0x7fff];
+		u16 mem = (ma+x)*4+ra;
+		u8 gfx = m_vram[mem & 0x7fff];
 		*p++ = palette[BIT(gfx, 7)];
 		*p++ = palette[BIT(gfx, 6)];
 		*p++ = palette[BIT(gfx, 5)];
@@ -286,7 +293,7 @@ MC6845_UPDATE_ROW( mbc200_state::update_row )
 	}
 }
 
-static const gfx_layout mbc200_chars_8x8 =
+static const gfx_layout charlayout =
 {
 	8,8,
 	256,
@@ -298,7 +305,7 @@ static const gfx_layout mbc200_chars_8x8 =
 };
 
 static GFXDECODE_START( gfx_mbc200 )
-	GFXDECODE_ENTRY( "subcpu", 0x1800, mbc200_chars_8x8, 0, 1 )
+	GFXDECODE_ENTRY( "subcpu", 0x1800, charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -306,12 +313,12 @@ void mbc200_state::mbc200(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 8_MHz_XTAL / 2); // NEC D780C-1
-	m_maincpu->set_addrmap(AS_PROGRAM, &mbc200_state::mbc200_mem);
-	m_maincpu->set_addrmap(AS_IO, &mbc200_state::mbc200_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mbc200_state::main_mem);
+	m_maincpu->set_addrmap(AS_IO, &mbc200_state::main_io);
 
 	z80_device &subcpu(Z80(config, "subcpu", 8_MHz_XTAL / 2)); // NEC D780C-1
-	subcpu.set_addrmap(AS_PROGRAM, &mbc200_state::mbc200_sub_mem);
-	subcpu.set_addrmap(AS_IO, &mbc200_state::mbc200_sub_io);
+	subcpu.set_addrmap(AS_PROGRAM, &mbc200_state::sub_mem);
+	subcpu.set_addrmap(AS_IO, &mbc200_state::sub_io);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -346,8 +353,8 @@ void mbc200_state::mbc200(machine_config &config)
 	I8251(config, "uart2", 0); // INS8251A
 
 	MB8876(config, m_fdc, 8_MHz_XTAL / 8); // guess
-	FLOPPY_CONNECTOR(config, "fdc:0", mbc200_floppies, "qd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", mbc200_floppies, "qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", mbc200_floppies, "qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", mbc200_floppies, "qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	/* Keyboard */
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
@@ -359,14 +366,17 @@ void mbc200_state::mbc200(machine_config &config)
 
 /* ROM definition */
 ROM_START( mbc200 )
-	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
-	ROM_REGION( 0x1000, "roms", 0 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "d2732a.bin",  0x0000, 0x1000, CRC(bf364ce8) SHA1(baa3a20a5b01745a390ef16628dc18f8d682d63b))
+
 	ROM_REGION( 0x3000, "subcpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "m5l2764.bin", 0x0000, 0x2000, CRC(377300a2) SHA1(8563172f9e7f84330378a8d179f4138be5fda099))
 ROM_END
 
+} // anonymous namespace
+
+
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS
-COMP( 1982, mbc200, 0,      0,      mbc200,  mbc200, mbc200_state, empty_init, "Sanyo", "MBC-200", 0 )
+COMP( 1982, mbc200, 0,      0,      mbc200,  mbc200, mbc200_state, empty_init, "Sanyo", "MBC-200", MACHINE_SUPPORTS_SAVE )

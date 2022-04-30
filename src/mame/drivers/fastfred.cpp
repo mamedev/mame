@@ -35,7 +35,7 @@ void fastfred_state::machine_start()
 // These values were derived based on disassembly of the code. Usually, it
 // was pretty obvious what the values should be. Of course, this will have
 // to change if a different ROM set ever surfaces.
-READ8_MEMBER(fastfred_state::fastfred_custom_io_r)
+uint8_t fastfred_state::fastfred_custom_io_r(offs_t offset)
 {
 	switch (m_maincpu->pc())
 	{
@@ -67,7 +67,7 @@ READ8_MEMBER(fastfred_state::fastfred_custom_io_r)
 	return 0x00;
 }
 
-READ8_MEMBER(fastfred_state::flyboy_custom1_io_r)
+uint8_t fastfred_state::flyboy_custom1_io_r(offs_t offset)
 {
 	switch (m_maincpu->pc())
 	{
@@ -94,7 +94,7 @@ READ8_MEMBER(fastfred_state::flyboy_custom1_io_r)
 	return 0x00;
 }
 
-READ8_MEMBER(fastfred_state::flyboy_custom2_io_r)
+uint8_t fastfred_state::flyboy_custom2_io_r(offs_t offset)
 {
 	switch (m_maincpu->pc())
 	{
@@ -119,14 +119,14 @@ READ8_MEMBER(fastfred_state::flyboy_custom2_io_r)
 }
 
 
-READ8_MEMBER(fastfred_state::jumpcoas_custom_io_r)
+uint8_t fastfred_state::jumpcoas_custom_io_r(offs_t offset)
 {
 	if (offset == 0x100)  return 0x63;
 
 	return 0x00;
 }
 
-READ8_MEMBER(fastfred_state::boggy84_custom_io_r)
+uint8_t fastfred_state::boggy84_custom_io_r(offs_t offset)
 {
 	if (offset == 0x100)  return 0x6a;
 
@@ -149,12 +149,12 @@ WRITE_LINE_MEMBER(fastfred_state::imago_dma_irq_w)
 	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(fastfred_state::imago_sprites_bank_w)
+void fastfred_state::imago_sprites_bank_w(uint8_t data)
 {
 	m_imago_sprites_bank = (data & 2) >> 1;
 }
 
-WRITE8_MEMBER(fastfred_state::imago_sprites_dma_w)
+void fastfred_state::imago_sprites_dma_w(offs_t offset, uint8_t data)
 {
 	uint8_t *rom = (uint8_t *)memregion("gfx2")->base();
 	uint8_t sprites_data;
@@ -171,7 +171,7 @@ WRITE8_MEMBER(fastfred_state::imago_sprites_dma_w)
 	m_gfxdecode->gfx(1)->mark_dirty(offset/32);
 }
 
-READ8_MEMBER(fastfred_state::imago_sprites_offset_r)
+uint8_t fastfred_state::imago_sprites_offset_r(offs_t offset)
 {
 	m_imago_sprites_address = offset;
 	return 0xff; //not really used
@@ -184,7 +184,7 @@ WRITE_LINE_MEMBER(fastfred_state::nmi_mask_w)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(fastfred_state::sound_nmi_mask_w)
+void fastfred_state::sound_nmi_mask_w(uint8_t data)
 {
 	m_sound_nmi_mask = data & 1;
 }
@@ -251,7 +251,7 @@ void fastfred_state::sound_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
 	map(0x3000, 0x3000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(FUNC(fastfred_state::sound_nmi_mask_w));
-	map(0x4000, 0x4000).writeonly();  // Reset PSG's
+	map(0x4000, 0x4000).nopw();  // Reset PSG's
 	map(0x5000, 0x5001).w("ay8910.1", FUNC(ay8910_device::address_data_w));
 	map(0x6000, 0x6001).w("ay8910.2", FUNC(ay8910_device::address_data_w));
 	map(0x7000, 0x7000).nopr(); // only for Imago, read but not used
@@ -555,17 +555,6 @@ static INPUT_PORTS_START( imagoa )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
 static const gfx_layout spritelayout =
 {
 	16,16,
@@ -592,32 +581,21 @@ static const gfx_layout imago_spritelayout =
 	32*8
 };
 
-static const gfx_layout imago_char_1bpp =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
 static GFXDECODE_START( gfx_fastfred )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 32 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar,   0, 32 )
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       0, 32 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_jumpcoas )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar,   0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,       0, 32 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_imago )
-	GFXDECODE_ENTRY( "gfx1", 0,      charlayout,          0, 32 )
-	GFXDECODE_ENTRY( nullptr,   0xb800, imago_spritelayout,  0, 32 )
-	GFXDECODE_ENTRY( "gfx3", 0,      charlayout,          0, 32 )
-	GFXDECODE_ENTRY( "gfx4", 0,      imago_char_1bpp, 0x140,  1 )
+	GFXDECODE_ENTRY( "gfx1",  0,      gfx_8x8x3_planar,    0, 32 )
+	GFXDECODE_ENTRY( nullptr, 0xb800, imago_spritelayout,  0, 32 )
+	GFXDECODE_ENTRY( "gfx3",  0,      gfx_8x8x3_planar,    0, 32 )
+	GFXDECODE_ENTRY( "gfx4",  0,      gfx_8x8x1,       0x140,  1 )
 GFXDECODE_END
 
 WRITE_LINE_MEMBER(fastfred_state::vblank_irq)
@@ -1050,8 +1028,8 @@ ROM_END
 
 void fastfred_state::init_flyboy()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc085, 0xc099, read8_delegate(*this, FUNC(fastfred_state::flyboy_custom1_io_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc8fb, 0xc900, read8_delegate(*this, FUNC(fastfred_state::flyboy_custom2_io_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc085, 0xc099, read8sm_delegate(*this, FUNC(fastfred_state::flyboy_custom1_io_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc8fb, 0xc900, read8sm_delegate(*this, FUNC(fastfred_state::flyboy_custom2_io_r)));
 	m_hardware_type = 1;
 }
 
@@ -1062,28 +1040,28 @@ void fastfred_state::init_flyboyb()
 
 void fastfred_state::init_fastfred()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(*this, FUNC(fastfred_state::fastfred_custom_io_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8sm_delegate(*this, FUNC(fastfred_state::fastfred_custom_io_r)));
 	m_maincpu->space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
 	m_hardware_type = 1;
 }
 
 void fastfred_state::init_jumpcoas()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(*this, FUNC(fastfred_state::jumpcoas_custom_io_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8sm_delegate(*this, FUNC(fastfred_state::jumpcoas_custom_io_r)));
 	m_maincpu->space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
 	m_hardware_type = 0;
 }
 
 void fastfred_state::init_boggy84b()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(*this, FUNC(fastfred_state::jumpcoas_custom_io_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8sm_delegate(*this, FUNC(fastfred_state::jumpcoas_custom_io_r)));
 	m_maincpu->space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
 	m_hardware_type = 2;
 }
 
 void fastfred_state::init_boggy84()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(*this, FUNC(fastfred_state::boggy84_custom_io_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8sm_delegate(*this, FUNC(fastfred_state::boggy84_custom_io_r)));
 	m_maincpu->space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
 	m_hardware_type = 2;
 }

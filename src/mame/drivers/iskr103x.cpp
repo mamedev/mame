@@ -17,14 +17,18 @@
 
 #include "emu.h"
 #include "machine/genpc.h"
-#include "cpu/i86/i86.h"
-#include "cpu/nec/nec.h"
+
 #include "bus/isa/xsu_cards.h"
 #include "bus/pc_kbd/keyboards.h"
+#include "bus/pc_kbd/pc_kbdc.h"
+#include "cpu/i86/i86.h"
 #include "machine/pc_lpt.h"
 #include "machine/ram.h"
+
 #include "softlist.h"
 
+
+namespace {
 
 class iskr103x_state : public driver_device
 {
@@ -66,7 +70,7 @@ static DEVICE_INPUT_DEFAULTS_START(iskr1031)
 	DEVICE_INPUT_DEFAULTS("DSW0", 0x30, 0x20)
 DEVICE_INPUT_DEFAULTS_END
 
-// XXX
+
 void iskr103x_state::iskr1030m(machine_config &config)
 {
 	/* basic machine hardware */
@@ -75,10 +79,12 @@ void iskr103x_state::iskr1030m(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &iskr103x_state::iskr1031_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb"));
 	mb.set_cputag(m_maincpu);
 	mb.int_callback().set_inputline(m_maincpu, 0);
 	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	mb.kbdclk_callback().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(iskr1030m));
 
 	ISA8_SLOT(config, "isa1", 0, "mb:isa", iskr103x_isa8_cards, "cga_iskr1030m", false); // FIXME: determine IS bus clock
@@ -88,8 +94,10 @@ void iskr103x_state::iskr1030m(machine_config &config)
 	ISA8_SLOT(config, "isa5", 0, "mb:isa", iskr103x_isa8_cards, nullptr, false);
 	ISA8_SLOT(config, "isa6", 0, "mb:isa", iskr103x_isa8_cards, nullptr, false);
 
-	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_EC_1841).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
-//  PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_ISKR_1030).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_EC_1841));
+//  pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_ISKR_1030));
+	kbd.out_clock_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_clock_w));
+	kbd.out_data_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_data_w));
 
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
 }
@@ -116,6 +124,9 @@ ROM_START( iskr1031 )
 	ROMX_LOAD( "150-06.bin", 0xc000, 0x2000, CRC(1adbf969) SHA1(08c0a0fc50a75e6207b1987bae389cca60893eac), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD( "150-07.bin", 0xc001, 0x2000, CRC(0dc4b65a) SHA1(c96f066251a7343eac8113ea9dcb2cb12d0334d5), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
+
+} // anonymous namespace
+
 
 /***************************************************************************
 

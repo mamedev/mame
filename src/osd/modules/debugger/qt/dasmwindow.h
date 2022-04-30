@@ -1,13 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
-#ifndef __DEBUG_QT_DASM_WINDOW_H__
-#define __DEBUG_QT_DASM_WINDOW_H__
-
-#include <QtWidgets/QLineEdit>
-#include <QtWidgets/QComboBox>
+#ifndef MAME_DEBUGGER_QT_DASMWINDOW_H
+#define MAME_DEBUGGER_QT_DASMWINDOW_H
 
 #include "debuggerview.h"
 #include "windowqt.h"
+
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QLineEdit>
 
 
 //============================================================
@@ -18,9 +18,8 @@ class DasmWindow : public WindowQt
 	Q_OBJECT
 
 public:
-	DasmWindow(running_machine* machine, QWidget* parent=nullptr);
+	DasmWindow(running_machine &machine, QWidget *parent = nullptr);
 	virtual ~DasmWindow();
-
 
 private slots:
 	void cpuChanged(int index);
@@ -29,25 +28,23 @@ private slots:
 	void toggleBreakpointAtCursor(bool changedTo);
 	void enableBreakpointAtCursor(bool changedTo);
 	void runToCursor(bool changedTo);
-	void rightBarChanged(QAction* changedTo);
+	void rightBarChanged(QAction *changedTo);
 
 	void dasmViewUpdated();
-
 
 private:
 	void populateComboBox();
 	void setToCurrentCpu();
 
-
 	// Widgets
-	QLineEdit* m_inputEdit;
-	QComboBox* m_cpuComboBox;
-	DebuggerView* m_dasmView;
+	QLineEdit *m_inputEdit;
+	QComboBox *m_cpuComboBox;
+	DebuggerView *m_dasmView;
 
 	// Menu items
-	QAction* m_breakpointToggleAct;
-	QAction* m_breakpointEnableAct;
-	QAction* m_runToCursorAct;
+	QAction *m_breakpointToggleAct;
+	QAction *m_breakpointEnableAct;
+	QAction *m_runToCursorAct;
 };
 
 
@@ -70,11 +67,11 @@ public:
 	int m_cpu;
 	int m_rightBar;
 
-	void buildFromQWidget(QWidget* widget);
-	void applyToQWidget(QWidget* widget);
+	void buildFromQWidget(QWidget *widget);
+	void applyToQWidget(QWidget *widget);
 	void addToXmlDataNode(util::xml::data_node &node) const;
 	void recoverFromXmlNode(util::xml::data_node const &node);
 };
 
 
-#endif
+#endif // MAME_DEBUGGER_QT_DASMWINDOW_H

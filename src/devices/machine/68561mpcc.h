@@ -62,11 +62,11 @@ public:
 	auto out_trxc_cb() { return m_out_trxc_cb.bind(); }
 	auto out_int_cb() { return m_out_int_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	// interrupt acknowledge
-	DECLARE_READ8_MEMBER( iack );
+	uint8_t iack(offs_t offset); // declared but not defined?
 
 	/* Callbacks to be called by others for signals driven by connected devices */
 	DECLARE_WRITE_LINE_MEMBER( write_rx );

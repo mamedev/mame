@@ -59,7 +59,7 @@ mc1502_rom_device::mc1502_rom_device(const machine_config &mconfig, const char *
 void mc1502_rom_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_rom(this, 0xe8000, 0xeffff, "XXX", "mc1502_rom");
+	m_isa->install_rom(this, 0xe8000, 0xeffff, "mc1502_rom");
 }
 
 

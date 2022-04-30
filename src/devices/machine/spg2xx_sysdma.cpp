@@ -39,7 +39,7 @@ void spg2xx_sysdma_device::device_reset()
 *    Machine Hardware    *
 *************************/
 
-READ16_MEMBER(spg2xx_sysdma_device::dma_r)
+uint16_t spg2xx_sysdma_device::dma_r(offs_t offset)
 {
 	offset &= 0x3;
 
@@ -68,7 +68,7 @@ READ16_MEMBER(spg2xx_sysdma_device::dma_r)
 	return val;
 }
 
-WRITE16_MEMBER(spg2xx_sysdma_device::dma_w)
+void spg2xx_sysdma_device::dma_w(offs_t offset, uint16_t data)
 {
 	offset &= 0x3;
 

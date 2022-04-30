@@ -33,7 +33,9 @@ void isa8_vga_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(vga_device::screen_update));
 
-	VGA(config, m_vga, 0).set_screen("screen");
+	VGA(config, m_vga, 0);
+	m_vga->set_screen("screen");
+	m_vga->set_vram_size(0x100000);
 }
 
 //-------------------------------------------------
@@ -63,19 +65,19 @@ isa8_vga_device::isa8_vga_device(const machine_config &mconfig, const char *tag,
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-READ8_MEMBER( isa8_vga_device::input_port_0_r ) { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
+uint8_t isa8_vga_device::input_port_0_r() { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
 
 void isa8_vga_device::device_start()
 {
 	set_isa_device();
 
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, "ibm_vga", "ibm_vga");
+	m_isa->install_rom(this, 0xc0000, 0xc7fff, "ibm_vga");
 
-	m_isa->install_device(0x3b0, 0x3bf, read8_delegate(*m_vga, FUNC(vga_device::port_03b0_r)), write8_delegate(*m_vga, FUNC(vga_device::port_03b0_w)));
-	m_isa->install_device(0x3c0, 0x3cf, read8_delegate(*m_vga, FUNC(vga_device::port_03c0_r)), write8_delegate(*m_vga, FUNC(vga_device::port_03c0_w)));
-	m_isa->install_device(0x3d0, 0x3df, read8_delegate(*m_vga, FUNC(vga_device::port_03d0_r)), write8_delegate(*m_vga, FUNC(vga_device::port_03d0_w)));
+	m_isa->install_device(0x3b0, 0x3bf, read8sm_delegate(*m_vga, FUNC(vga_device::port_03b0_r)), write8sm_delegate(*m_vga, FUNC(vga_device::port_03b0_w)));
+	m_isa->install_device(0x3c0, 0x3cf, read8sm_delegate(*m_vga, FUNC(vga_device::port_03c0_r)), write8sm_delegate(*m_vga, FUNC(vga_device::port_03c0_w)));
+	m_isa->install_device(0x3d0, 0x3df, read8sm_delegate(*m_vga, FUNC(vga_device::port_03d0_r)), write8sm_delegate(*m_vga, FUNC(vga_device::port_03d0_w)));
 
-	m_isa->install_memory(0xa0000, 0xbffff, read8_delegate(*m_vga, FUNC(vga_device::mem_r)), write8_delegate(*m_vga, FUNC(vga_device::mem_w)));
+	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(vga_device::mem_w)));
 }
 
 //-------------------------------------------------

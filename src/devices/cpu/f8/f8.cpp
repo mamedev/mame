@@ -46,7 +46,6 @@
 #include "emu.h"
 #include "f8.h"
 #include "f8dasm.h"
-#include "debugger.h"
 
 
 /* status flags */
@@ -68,7 +67,8 @@ f8_cpu_device::f8_cpu_device(const machine_config &mconfig, const char *tag, dev
 	cpu_device(mconfig, F8, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_BIG, 8, 16, 0),
 	m_regs_config("register", ENDIANNESS_BIG, 8, 6, 0, address_map_constructor(FUNC(f8_cpu_device::regs_map), this)),
-	m_io_config("io", ENDIANNESS_BIG, 8, 8, 0)
+	m_io_config("io", ENDIANNESS_BIG, 8, 8, 0),
+	m_romc08_callback(*this)
 { }
 
 void f8_cpu_device::regs_map(address_map &map)
@@ -106,12 +106,16 @@ void f8_cpu_device::state_string_export(const device_state_entry &entry, std::st
 	}
 }
 
+void f8_cpu_device::device_resolve_objects()
+{
+	m_romc08_callback.resolve_safe(0);
+}
+
 void f8_cpu_device::device_start()
 {
-	m_program = &space(AS_PROGRAM);
-	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
-	m_r = space(AS_DATA).cache<0, 0, ENDIANNESS_BIG>();
-	m_iospace = &space(AS_IO);
+	space(AS_PROGRAM).cache(m_program);
+	space(AS_DATA).cache(m_r);
+	space(AS_IO).specific(m_ios);
 
 	// zerofill
 	m_debug_pc = 0;
@@ -282,7 +286,7 @@ void f8_cpu_device::ROMC_00(int insttim)
 	 * of PC0.
 	 */
 
-	m_dbus = m_cache->read_byte(m_pc0);
+	m_dbus = m_program.read_byte(m_pc0);
 	m_pc0 += 1;
 	m_icount -= insttim; /* ROMC00 is usually short, not short+long, but DS is long */
 }
@@ -295,7 +299,7 @@ void f8_cpu_device::ROMC_01()
 	 * location addressed by PC0; then all devices add the 8-bit value
 	 * on the data bus as signed binary number to PC0.
 	 */
-	m_dbus = m_cache->read_byte(m_pc0);
+	m_dbus = m_program.read_byte(m_pc0);
 	m_pc0 += (s8)m_dbus;
 	m_icount -= cL;
 }
@@ -308,7 +312,7 @@ void f8_cpu_device::ROMC_02()
 	 * the memory location addressed by DC0; then all devices increment
 	 * DC0.
 	 */
-	m_dbus = m_program->read_byte(m_dc0);
+	m_dbus = m_program.read_byte(m_dc0);
 	m_dc0 += 1;
 	m_icount -= cL;
 }
@@ -319,7 +323,7 @@ void f8_cpu_device::ROMC_03(int insttim)
 	 * Similiar to 0x00, except that it is used for immediate operands
 	 * fetches (using PC0) instead of instruction fetches.
 	 */
-	m_dbus = m_io = m_cache->read_byte(m_pc0);
+	m_dbus = m_io = m_program.read_byte(m_pc0);
 	m_pc0 += 1;
 	m_icount -= insttim;
 }
@@ -339,7 +343,7 @@ void f8_cpu_device::ROMC_05()
 	 * Store the data bus contents into the memory location pointed
 	 * to by DC0; increment DC0.
 	 */
-	m_program->write_byte(m_dc0, m_dbus);
+	m_program.write_byte(m_dc0, m_dbus);
 	m_dc0 += 1;
 	m_icount -= cL;
 }
@@ -371,7 +375,7 @@ void f8_cpu_device::ROMC_08()
 	 */
 	m_pc1 = m_pc0;
 	m_dbus = 0;
-	m_pc0 = 0;
+	m_pc0 = m_romc08_callback() * 0x0101;
 	m_icount -= cL;
 }
 
@@ -413,7 +417,7 @@ void f8_cpu_device::ROMC_0C()
 	 * by PC0 into the data bus; then all devices move the value that
 	 * has just been placed on the data bus into the low order byte of PC0.
 	 */
-	m_dbus = m_cache->read_byte(m_pc0);
+	m_dbus = m_program.read_byte(m_pc0);
 	m_pc0 = (m_pc0 & 0xff00) | m_dbus;
 	m_icount -= cL;
 }
@@ -436,7 +440,7 @@ void f8_cpu_device::ROMC_0E()
 	 * The value on the data bus is then moved to the low order byte
 	 * of DC0 by all devices.
 	 */
-	m_dbus = m_cache->read_byte(m_pc0);
+	m_dbus = m_program.read_byte(m_pc0);
 	m_dc0 = (m_dc0 & 0xff00) | m_dbus;
 	m_icount -= cL;
 }
@@ -474,7 +478,7 @@ void f8_cpu_device::ROMC_11()
 	 * data bus. All devices must then move the contents of the
 	 * data bus to the upper byte of DC0.
 	 */
-	m_dbus = m_cache->read_byte(m_pc0);
+	m_dbus = m_program.read_byte(m_pc0);
 	m_dc0 = (m_dc0 & 0x00ff) | (m_dbus << 8);
 	m_icount -= cL;
 }
@@ -573,7 +577,7 @@ void f8_cpu_device::ROMC_1A()
 	 * register was addressed; the device containing the addressed port
 	 * must place the contents of the data bus into the address port.
 	 */
-	m_iospace->write_byte(m_io, m_dbus);
+	m_ios.write_byte(m_io, m_dbus);
 	m_icount -= cL;
 }
 
@@ -586,7 +590,7 @@ void f8_cpu_device::ROMC_1B()
 	 * contents of timer and interrupt control registers cannot be read
 	 * back onto the data bus).
 	 */
-	m_dbus = m_iospace->read_byte(m_io);
+	m_dbus = m_ios.read_byte(m_io);
 	m_icount -= cL;
 }
 
@@ -644,7 +648,7 @@ void f8_cpu_device::illegal()
  ***************************************************/
 void f8_cpu_device::f8_lr_a_ku()
 {
-	m_a = m_r->read_byte(12);
+	m_a = m_r.read_byte(12);
 }
 
 /***************************************************
@@ -653,7 +657,7 @@ void f8_cpu_device::f8_lr_a_ku()
  ***************************************************/
 void f8_cpu_device::f8_lr_a_kl()
 {
-	m_a = m_r->read_byte(13);
+	m_a = m_r.read_byte(13);
 }
 
 /***************************************************
@@ -662,7 +666,7 @@ void f8_cpu_device::f8_lr_a_kl()
  ***************************************************/
 void f8_cpu_device::f8_lr_a_qu()
 {
-	m_a = m_r->read_byte(14);
+	m_a = m_r.read_byte(14);
 }
 
 /***************************************************
@@ -671,7 +675,7 @@ void f8_cpu_device::f8_lr_a_qu()
  ***************************************************/
 void f8_cpu_device::f8_lr_a_ql()
 {
-	m_a = m_r->read_byte(15);
+	m_a = m_r.read_byte(15);
 }
 
 /***************************************************
@@ -680,7 +684,7 @@ void f8_cpu_device::f8_lr_a_ql()
  ***************************************************/
 void f8_cpu_device::f8_lr_ku_a()
 {
-	m_r->write_byte(12, m_a);
+	m_r.write_byte(12, m_a);
 }
 
 /***************************************************
@@ -689,7 +693,7 @@ void f8_cpu_device::f8_lr_ku_a()
  ***************************************************/
 void f8_cpu_device::f8_lr_kl_a()
 {
-	m_r->write_byte(13, m_a);
+	m_r.write_byte(13, m_a);
 }
 
 /***************************************************
@@ -698,7 +702,7 @@ void f8_cpu_device::f8_lr_kl_a()
  ***************************************************/
 void f8_cpu_device::f8_lr_qu_a()
 {
-	m_r->write_byte(14, m_a);
+	m_r.write_byte(14, m_a);
 }
 
 /***************************************************
@@ -707,7 +711,7 @@ void f8_cpu_device::f8_lr_qu_a()
  ***************************************************/
 void f8_cpu_device::f8_lr_ql_a()
 {
-	m_r->write_byte(15, m_a);
+	m_r.write_byte(15, m_a);
 }
 
 /***************************************************
@@ -717,9 +721,9 @@ void f8_cpu_device::f8_lr_ql_a()
 void f8_cpu_device::f8_lr_k_p()
 {
 	ROMC_07();
-	m_r->write_byte(12, m_dbus);
+	m_r.write_byte(12, m_dbus);
 	ROMC_0B();
-	m_r->write_byte(13, m_dbus);
+	m_r.write_byte(13, m_dbus);
 }
 
 /***************************************************
@@ -728,9 +732,9 @@ void f8_cpu_device::f8_lr_k_p()
  ***************************************************/
 void f8_cpu_device::f8_lr_p_k()
 {
-	m_dbus = m_r->read_byte(12);
+	m_dbus = m_r.read_byte(12);
 	ROMC_15();
-	m_dbus = m_r->read_byte(13);
+	m_dbus = m_r.read_byte(13);
 	ROMC_18();
 }
 
@@ -758,9 +762,9 @@ void f8_cpu_device::f8_lr_is_a()
  ***************************************************/
 void f8_cpu_device::f8_pk()
 {
-	m_dbus = m_r->read_byte(13);
+	m_dbus = m_r.read_byte(13);
 	ROMC_12();
-	m_dbus = m_r->read_byte(12);
+	m_dbus = m_r.read_byte(12);
 	ROMC_14();
 }
 
@@ -770,9 +774,9 @@ void f8_cpu_device::f8_pk()
  ***************************************************/
 void f8_cpu_device::f8_lr_p0_q()
 {
-	m_dbus = m_r->read_byte(15);
+	m_dbus = m_r.read_byte(15);
 	ROMC_17();
-	m_dbus = m_r->read_byte(14);
+	m_dbus = m_r.read_byte(14);
 	ROMC_14();
 }
 
@@ -783,9 +787,9 @@ void f8_cpu_device::f8_lr_p0_q()
 void f8_cpu_device::f8_lr_q_dc()
 {
 	ROMC_06();
-	m_r->write_byte(14, m_dbus);
+	m_r.write_byte(14, m_dbus);
 	ROMC_09();
-	m_r->write_byte(15, m_dbus);
+	m_r.write_byte(15, m_dbus);
 }
 
 /***************************************************
@@ -794,9 +798,9 @@ void f8_cpu_device::f8_lr_q_dc()
  ***************************************************/
 void f8_cpu_device::f8_lr_dc_q()
 {
-	m_dbus = m_r->read_byte(14);
+	m_dbus = m_r.read_byte(14);
 	ROMC_16();
-	m_dbus = m_r->read_byte(15);
+	m_dbus = m_r.read_byte(15);
 	ROMC_19();
 }
 
@@ -806,9 +810,9 @@ void f8_cpu_device::f8_lr_dc_q()
  ***************************************************/
 void f8_cpu_device::f8_lr_dc_h()
 {
-	m_dbus = m_r->read_byte(10);
+	m_dbus = m_r.read_byte(10);
 	ROMC_16();
-	m_dbus = m_r->read_byte(11);
+	m_dbus = m_r.read_byte(11);
 	ROMC_19();
 }
 
@@ -819,9 +823,9 @@ void f8_cpu_device::f8_lr_dc_h()
 void f8_cpu_device::f8_lr_h_dc()
 {
 	ROMC_06();
-	m_r->write_byte(10, m_dbus);
+	m_r.write_byte(10, m_dbus);
 	ROMC_09();
-	m_r->write_byte(11, m_dbus);
+	m_r.write_byte(11, m_dbus);
 }
 
 /***************************************************
@@ -948,7 +952,7 @@ void f8_cpu_device::f8_pop()
 void f8_cpu_device::f8_lr_w_j()
 {
 	ROMC_1C(cS);
-	m_w = m_r->read_byte(9) & 0x1f;
+	m_w = m_r.read_byte(9) & 0x1f;
 }
 
 /***************************************************
@@ -957,7 +961,7 @@ void f8_cpu_device::f8_lr_w_j()
  ***************************************************/
 void f8_cpu_device::f8_lr_j_w()
 {
-	m_r->write_byte(9, m_w);
+	m_r.write_byte(9, m_w);
 }
 
 /***************************************************
@@ -1127,8 +1131,8 @@ void f8_cpu_device::f8_xdc()
 void f8_cpu_device::f8_ds_r(int r)
 {
 	CLR_OZCS();
-	int d = do_add(m_r->read_byte(r), 0xff);
-	m_r->write_byte(r, d);
+	int d = do_add(m_r.read_byte(r), 0xff);
+	m_r.write_byte(r, d);
 	SET_SZ(d);
 }
 
@@ -1139,8 +1143,8 @@ void f8_cpu_device::f8_ds_r(int r)
 void f8_cpu_device::f8_ds_isar()
 {
 	CLR_OZCS();
-	int d = do_add(m_r->read_byte(m_is), 0xff);
-	m_r->write_byte(m_is, d);
+	int d = do_add(m_r.read_byte(m_is), 0xff);
+	m_r.write_byte(m_is, d);
 	SET_SZ(d);
 }
 
@@ -1151,8 +1155,8 @@ void f8_cpu_device::f8_ds_isar()
 void f8_cpu_device::f8_ds_isar_i()
 {
 	CLR_OZCS();
-	int d = do_add(m_r->read_byte(m_is), 0xff);
-	m_r->write_byte(m_is, d);
+	int d = do_add(m_r.read_byte(m_is), 0xff);
+	m_r.write_byte(m_is, d);
 	SET_SZ(d);
 	m_is = (m_is & 0x38) | ((m_is + 1) & 0x07);
 }
@@ -1164,8 +1168,8 @@ void f8_cpu_device::f8_ds_isar_i()
 void f8_cpu_device::f8_ds_isar_d()
 {
 	CLR_OZCS();
-	int d = do_add(m_r->read_byte(m_is), 0xff);
-	m_r->write_byte(m_is, d);
+	int d = do_add(m_r.read_byte(m_is), 0xff);
+	m_r.write_byte(m_is, d);
 	SET_SZ(d);
 	m_is = (m_is & 0x38) | ((m_is - 1) & 0x07);
 }
@@ -1176,7 +1180,7 @@ void f8_cpu_device::f8_ds_isar_d()
  ***************************************************/
 void f8_cpu_device::f8_lr_a_r(int r)
 {
-	m_a = m_r->read_byte(r);
+	m_a = m_r.read_byte(r);
 }
 
 /***************************************************
@@ -1185,7 +1189,7 @@ void f8_cpu_device::f8_lr_a_r(int r)
  ***************************************************/
 void f8_cpu_device::f8_lr_a_isar()
 {
-	m_a = m_r->read_byte(m_is);
+	m_a = m_r.read_byte(m_is);
 }
 
 /***************************************************
@@ -1194,7 +1198,7 @@ void f8_cpu_device::f8_lr_a_isar()
  ***************************************************/
 void f8_cpu_device::f8_lr_a_isar_i()
 {
-	m_a = m_r->read_byte(m_is);
+	m_a = m_r.read_byte(m_is);
 	m_is = (m_is & 0x38) | ((m_is + 1) & 0x07);
 }
 
@@ -1204,7 +1208,7 @@ void f8_cpu_device::f8_lr_a_isar_i()
  ***************************************************/
 void f8_cpu_device::f8_lr_a_isar_d()
 {
-	m_a = m_r->read_byte(m_is);
+	m_a = m_r.read_byte(m_is);
 	m_is = (m_is & 0x38) | ((m_is - 1) & 0x07);
 }
 
@@ -1214,7 +1218,7 @@ void f8_cpu_device::f8_lr_a_isar_d()
  ***************************************************/
 void f8_cpu_device::f8_lr_r_a(int r)
 {
-	m_r->write_byte(r, m_a);
+	m_r.write_byte(r, m_a);
 }
 
 /***************************************************
@@ -1223,7 +1227,7 @@ void f8_cpu_device::f8_lr_r_a(int r)
  ***************************************************/
 void f8_cpu_device::f8_lr_isar_a()
 {
-	m_r->write_byte(m_is, m_a);
+	m_r.write_byte(m_is, m_a);
 }
 
 /***************************************************
@@ -1232,7 +1236,7 @@ void f8_cpu_device::f8_lr_isar_a()
  ***************************************************/
 void f8_cpu_device::f8_lr_isar_i_a()
 {
-	m_r->write_byte(m_is, m_a);
+	m_r.write_byte(m_is, m_a);
 	m_is = (m_is & 0x38) | ((m_is + 1) & 0x07);
 }
 
@@ -1242,7 +1246,7 @@ void f8_cpu_device::f8_lr_isar_i_a()
  ***************************************************/
 void f8_cpu_device::f8_lr_isar_d_a()
 {
-	m_r->write_byte(m_is, m_a);
+	m_r.write_byte(m_is, m_a);
 	m_is = (m_is & 0x38) | ((m_is - 1) & 0x07);
 }
 
@@ -1398,7 +1402,7 @@ void f8_cpu_device::f8_ins_0(int n)
 {
 	ROMC_1C(cS);
 	CLR_OZCS();
-	m_a = m_iospace->read_byte(n);
+	m_a = m_ios.read_byte(n);
 	SET_SZ(m_a);
 }
 
@@ -1423,7 +1427,7 @@ void f8_cpu_device::f8_ins_1(int n)
 void f8_cpu_device::f8_outs_0(int n)
 {
 	ROMC_1C(cS);
-	m_iospace->write_byte(n, m_a);
+	m_ios.write_byte(n, m_a);
 }
 
 /***************************************************
@@ -1445,7 +1449,7 @@ void f8_cpu_device::f8_outs_1(int n)
 void f8_cpu_device::f8_as(int r)
 {
 	CLR_OZCS();
-	m_a = do_add(m_a, m_r->read_byte(r));
+	m_a = do_add(m_a, m_r.read_byte(r));
 	SET_SZ(m_a);
 }
 
@@ -1456,7 +1460,7 @@ void f8_cpu_device::f8_as(int r)
 void f8_cpu_device::f8_as_isar()
 {
 	CLR_OZCS();
-	m_a = do_add(m_a, m_r->read_byte(m_is));
+	m_a = do_add(m_a, m_r.read_byte(m_is));
 	SET_SZ(m_a);
 }
 
@@ -1467,7 +1471,7 @@ void f8_cpu_device::f8_as_isar()
 void f8_cpu_device::f8_as_isar_i()
 {
 	CLR_OZCS();
-	m_a = do_add(m_a, m_r->read_byte(m_is));
+	m_a = do_add(m_a, m_r.read_byte(m_is));
 	SET_SZ(m_a);
 	m_is = (m_is & 0x38) | ((m_is + 1) & 0x07);
 }
@@ -1479,7 +1483,7 @@ void f8_cpu_device::f8_as_isar_i()
 void f8_cpu_device::f8_as_isar_d()
 {
 	CLR_OZCS();
-	m_a = do_add(m_a, m_r->read_byte(m_is));
+	m_a = do_add(m_a, m_r.read_byte(m_is));
 	SET_SZ(m_a);
 	m_is = (m_is & 0x38) | ((m_is - 1) & 0x07);
 }
@@ -1491,7 +1495,7 @@ void f8_cpu_device::f8_as_isar_d()
 void f8_cpu_device::f8_asd(int r)
 {
 	ROMC_1C(cS);
-	m_a = do_add_decimal(m_a, m_r->read_byte(r));
+	m_a = do_add_decimal(m_a, m_r.read_byte(r));
 }
 
 /***************************************************
@@ -1501,7 +1505,7 @@ void f8_cpu_device::f8_asd(int r)
 void f8_cpu_device::f8_asd_isar()
 {
 	ROMC_1C(cS);
-	m_a = do_add_decimal(m_a, m_r->read_byte(m_is));
+	m_a = do_add_decimal(m_a, m_r.read_byte(m_is));
 }
 
 /***************************************************
@@ -1511,7 +1515,7 @@ void f8_cpu_device::f8_asd_isar()
 void f8_cpu_device::f8_asd_isar_i()
 {
 	ROMC_1C(cS);
-	m_a = do_add_decimal(m_a, m_r->read_byte(m_is));
+	m_a = do_add_decimal(m_a, m_r.read_byte(m_is));
 	m_is = (m_is & 0x38) | ((m_is + 1) & 0x07);
 }
 
@@ -1522,7 +1526,7 @@ void f8_cpu_device::f8_asd_isar_i()
 void f8_cpu_device::f8_asd_isar_d()
 {
 	ROMC_1C(cS);
-	m_a = do_add_decimal(m_a, m_r->read_byte(m_is));
+	m_a = do_add_decimal(m_a, m_r.read_byte(m_is));
 	m_is = (m_is & 0x38) | ((m_is - 1) & 0x07);
 }
 
@@ -1533,7 +1537,7 @@ void f8_cpu_device::f8_asd_isar_d()
 void f8_cpu_device::f8_xs(int r)
 {
 	CLR_OZCS();
-	m_a ^= m_r->read_byte(r);
+	m_a ^= m_r.read_byte(r);
 	SET_SZ(m_a);
 }
 
@@ -1544,7 +1548,7 @@ void f8_cpu_device::f8_xs(int r)
 void f8_cpu_device::f8_xs_isar()
 {
 	CLR_OZCS();
-	m_a ^= m_r->read_byte(m_is);
+	m_a ^= m_r.read_byte(m_is);
 	SET_SZ(m_a);
 }
 
@@ -1555,7 +1559,7 @@ void f8_cpu_device::f8_xs_isar()
 void f8_cpu_device::f8_xs_isar_i()
 {
 	CLR_OZCS();
-	m_a ^= m_r->read_byte(m_is);
+	m_a ^= m_r.read_byte(m_is);
 	SET_SZ(m_a);
 	m_is = (m_is & 0x38) | ((m_is + 1) & 0x07);
 }
@@ -1567,7 +1571,7 @@ void f8_cpu_device::f8_xs_isar_i()
 void f8_cpu_device::f8_xs_isar_d()
 {
 	CLR_OZCS();
-	m_a ^= m_r->read_byte(m_is);
+	m_a ^= m_r.read_byte(m_is);
 	SET_SZ(m_a);
 	m_is = (m_is & 0x38) | ((m_is - 1) & 0x07);
 }
@@ -1579,7 +1583,7 @@ void f8_cpu_device::f8_xs_isar_d()
 void f8_cpu_device::f8_ns(int r)
 {
 	CLR_OZCS();
-	m_a &= m_r->read_byte(r);
+	m_a &= m_r.read_byte(r);
 	SET_SZ(m_a);
 }
 
@@ -1590,7 +1594,7 @@ void f8_cpu_device::f8_ns(int r)
 void f8_cpu_device::f8_ns_isar()
 {
 	CLR_OZCS();
-	m_a &= m_r->read_byte(m_is);
+	m_a &= m_r.read_byte(m_is);
 	SET_SZ(m_a);
 }
 
@@ -1601,7 +1605,7 @@ void f8_cpu_device::f8_ns_isar()
 void f8_cpu_device::f8_ns_isar_i()
 {
 	CLR_OZCS();
-	m_a &= m_r->read_byte(m_is);
+	m_a &= m_r.read_byte(m_is);
 	SET_SZ(m_a);
 	m_is = (m_is & 0x38) | ((m_is + 1) & 0x07);
 }
@@ -1613,7 +1617,7 @@ void f8_cpu_device::f8_ns_isar_i()
 void f8_cpu_device::f8_ns_isar_d()
 {
 	CLR_OZCS();
-	m_a &= m_r->read_byte(m_is);
+	m_a &= m_r.read_byte(m_is);
 	SET_SZ(m_a);
 	m_is = (m_is & 0x38) | ((m_is - 1) & 0x07);
 }

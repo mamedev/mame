@@ -67,10 +67,10 @@ private:
 	required_region_ptr<u8> m_cycles;
 	required_ioport_array<7> m_kb;
 
-	bool m_upiobf;
-	u8 m_serial_control;
-	u32 m_kdtime;
-	bool m_display_clock;
+	bool m_upiobf = false;
+	u8 m_serial_control = 0;
+	u32 m_kdtime = 0;
+	bool m_display_clock = false;
 };
 
 u8 sdk51_state::psen_r(offs_t offset)

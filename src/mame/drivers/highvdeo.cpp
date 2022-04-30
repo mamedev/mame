@@ -111,6 +111,8 @@ Game is V30 based, with rom banking (2Mb)
 #include "fashion.lh"
 
 
+namespace {
+
 class highvdeo_state : public driver_device
 {
 public:
@@ -148,31 +150,31 @@ private:
 	uint16_t m_vblank_bit;
 	uint16_t m_brasil_prot_latch;
 	uint16_t m_grancapi_prot_latch;
-	DECLARE_READ16_MEMBER(read0_r);
-	DECLARE_READ16_MEMBER(read1_r);
-	DECLARE_READ16_MEMBER(read2_r);
-	DECLARE_READ8_MEMBER(read2_nmi_clear_r);
-	template<int Mask> DECLARE_WRITE8_MEMBER(bankselect_w);
-	DECLARE_WRITE16_MEMBER(write1_w);
-	DECLARE_READ16_MEMBER(tv_ncf_read1_r);
-	DECLARE_READ16_MEMBER(newmcard_status_r);
-	DECLARE_READ16_MEMBER(newmcard_vblank_r);
-	DECLARE_WRITE16_MEMBER(newmcard_vblank_w);
-	DECLARE_WRITE16_MEMBER(write2_w);
-	DECLARE_WRITE16_MEMBER(nyj_write2_w);
-	DECLARE_READ16_MEMBER(brasil_status_r);
-	DECLARE_WRITE16_MEMBER(brasil_status_w);
-	DECLARE_READ16_MEMBER(ciclone_status_r);
-	DECLARE_READ16_MEMBER(grancapi_status_r);
-	DECLARE_WRITE16_MEMBER(grancapi_status_w);
-	DECLARE_READ16_MEMBER(magicbom_status_r);
-	DECLARE_READ16_MEMBER(record_status_r);
-	DECLARE_WRITE16_MEMBER(fashion_output_w);
-	DECLARE_WRITE16_MEMBER(tv_oki6376_w);
-	DECLARE_READ8_MEMBER(tv_oki6376_r);
-	DECLARE_WRITE16_MEMBER(tv_ncf_oki6376_st_w);
-	DECLARE_READ8_MEMBER(nmi_clear_r);
-	DECLARE_WRITE8_MEMBER(nmi_clear_w);
+	uint16_t read0_r();
+	uint16_t read1_r();
+	uint16_t read2_r();
+	uint8_t read2_nmi_clear_r();
+	template<int Mask> void bankselect_w(uint8_t data);
+	void write1_w(uint16_t data);
+	uint16_t tv_ncf_read1_r();
+	uint16_t newmcard_status_r(offs_t offset);
+	uint16_t newmcard_vblank_r();
+	void newmcard_vblank_w(uint16_t data);
+	void write2_w(uint16_t data);
+	void nyj_write2_w(uint16_t data);
+	uint16_t brasil_status_r(offs_t offset);
+	void brasil_status_w(uint16_t data);
+	uint16_t ciclone_status_r(offs_t offset);
+	uint16_t grancapi_status_r(offs_t offset);
+	void grancapi_status_w(uint16_t data);
+	uint16_t magicbom_status_r(offs_t offset);
+	uint16_t record_status_r(offs_t offset);
+	void fashion_output_w(uint16_t data);
+	void tv_oki6376_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t tv_oki6376_r();
+	void tv_ncf_oki6376_st_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t nmi_clear_r();
+	void nmi_clear_w(uint8_t data);
 	uint32_t screen_update_tourvisn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_brasil(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -216,24 +218,22 @@ void highvdeo_state::machine_start()
 
 uint32_t highvdeo_state::screen_update_tourvisn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y,count;
-
-	for(y=cliprect.min_y;y<=cliprect.max_y;y++)
+	for(int y=cliprect.min_y;y<=cliprect.max_y;y++)
 	{
-		count = ((y * (screen.visible_area().max_x+1)) + cliprect.min_x) >> 1;
-		for(x=(cliprect.min_x>>1);x<=(cliprect.max_x>>1);x++)
+		int count = ((y * (screen.visible_area().max_x+1)) + cliprect.min_x) >> 1;
+		for(int x=(cliprect.min_x>>1);x<=(cliprect.max_x>>1);x++)
 		{
 			uint32_t color;
 
 			color = ((m_blit_ram[count]) & 0x00ff)>>0;
 
 			if(cliprect.contains((x*2)+0, y))
-				bitmap.pix32(y, (x*2)+0) = m_palette->pen(color);
+				bitmap.pix(y, (x*2)+0) = m_palette->pen(color);
 
 			color = ((m_blit_ram[count]) & 0xff00)>>8;
 
 			if(cliprect.contains((x*2)+1, y))
-				bitmap.pix32(y, (x*2)+1) = m_palette->pen(color);
+				bitmap.pix(y, (x*2)+1) = m_palette->pen(color);
 
 			count++;
 		}
@@ -245,16 +245,14 @@ uint32_t highvdeo_state::screen_update_tourvisn(screen_device &screen, bitmap_rg
 /*Later HW, RGB565 instead of RAM-based pens (+ ramdac).*/
 uint32_t highvdeo_state::screen_update_brasil(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y,count;
+	pen_t const *const rgb = m_palette->pens(); // 16 bit RGB
 
-	const pen_t *rgb = m_palette->pens(); // 16 bit RGB
-
-	for(y=cliprect.min_y;y<=cliprect.max_y;y++)
+	for(int y=cliprect.min_y;y<=cliprect.max_y;y++)
 	{
-		count = (y * 400) + cliprect.min_x;
-		for(x=cliprect.min_x;x<=cliprect.max_x;x++)
+		int count = (y * 400) + cliprect.min_x;
+		for(int x=cliprect.min_x;x<=cliprect.max_x;x++)
 		{
-			bitmap.pix32(y, x) = rgb[m_blit_ram[count++]];
+			bitmap.pix(y, x) = rgb[m_blit_ram[count++]];
 		}
 	}
 
@@ -263,22 +261,22 @@ uint32_t highvdeo_state::screen_update_brasil(screen_device &screen, bitmap_rgb3
 
 
 
-READ16_MEMBER(highvdeo_state::read0_r)
+uint16_t highvdeo_state::read0_r()
 {
 	return m_inputs[0]->read();
 }
 
-READ16_MEMBER(highvdeo_state::read1_r)
+uint16_t highvdeo_state::read1_r()
 {
 	return m_inputs[1]->read();
 }
 
-READ16_MEMBER(highvdeo_state::read2_r)
+uint16_t highvdeo_state::read2_r()
 {
 	return m_inputs[2]->read();
 }
 
-READ8_MEMBER(highvdeo_state::read2_nmi_clear_r)
+uint8_t highvdeo_state::read2_nmi_clear_r()
 {
 	if (!machine().side_effects_disabled())
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -286,13 +284,13 @@ READ8_MEMBER(highvdeo_state::read2_nmi_clear_r)
 }
 
 template<int Mask>
-WRITE8_MEMBER(highvdeo_state::bankselect_w)
+void highvdeo_state::bankselect_w(uint8_t data)
 {
 	m_mainbank->set_entry(data & Mask);
 }
 
 
-WRITE16_MEMBER(highvdeo_state::tv_oki6376_w)
+void highvdeo_state::tv_oki6376_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	static int okidata;
 	if (ACCESSING_BITS_0_7 && okidata != data)
@@ -303,7 +301,7 @@ WRITE16_MEMBER(highvdeo_state::tv_oki6376_w)
 	}
 }
 
-READ8_MEMBER(highvdeo_state::tv_oki6376_r)
+uint8_t highvdeo_state::tv_oki6376_r()
 {
 	if (!machine().side_effects_disabled())
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -311,7 +309,7 @@ READ8_MEMBER(highvdeo_state::tv_oki6376_r)
 	return m_okim6376->busy_r();
 }
 
-READ8_MEMBER(highvdeo_state::nmi_clear_r)
+uint8_t highvdeo_state::nmi_clear_r()
 {
 	if (!machine().side_effects_disabled())
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -319,12 +317,12 @@ READ8_MEMBER(highvdeo_state::nmi_clear_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(highvdeo_state::nmi_clear_w)
+void highvdeo_state::nmi_clear_w(uint8_t data)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE16_MEMBER(highvdeo_state::write1_w)
+void highvdeo_state::write1_w(uint16_t data)
 {
 /*
     - Lbits -
@@ -368,7 +366,7 @@ void highvdeo_state::tv_vcf_io(address_map &map)
 }
 
 
-READ16_MEMBER(highvdeo_state::tv_ncf_read1_r)
+uint16_t highvdeo_state::tv_ncf_read1_r()
 {
 	static int resetpulse = 0;
 
@@ -379,7 +377,7 @@ READ16_MEMBER(highvdeo_state::tv_ncf_read1_r)
 	return (m_inputs[1]->read() & 0xbf) | resetpulse;
 }
 
-WRITE16_MEMBER(highvdeo_state::tv_ncf_oki6376_st_w)
+void highvdeo_state::tv_ncf_oki6376_st_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -438,7 +436,7 @@ void highvdeo_state::nyjoker_io(address_map &map)
 }
 
 
-WRITE16_MEMBER(highvdeo_state::nyj_write2_w)
+void highvdeo_state::nyj_write2_w(uint16_t data)
 {
 /*
     7654 3210
@@ -479,7 +477,7 @@ void highvdeo_state::tv_tcf_io(address_map &map)
 *
 ****************************/
 
-READ16_MEMBER(highvdeo_state::ciclone_status_r)
+uint16_t highvdeo_state::ciclone_status_r(offs_t offset)
 {
 	static uint16_t resetpulse;
 	switch(offset*2)
@@ -505,7 +503,7 @@ void highvdeo_state::ciclone_io(address_map &map)
 *
 ****************************/
 
-READ16_MEMBER(highvdeo_state::newmcard_status_r)
+uint16_t highvdeo_state::newmcard_status_r(offs_t offset)
 {
 	switch(offset*2)
 	{
@@ -519,7 +517,7 @@ READ16_MEMBER(highvdeo_state::newmcard_status_r)
 	return 0;
 }
 
-READ16_MEMBER(highvdeo_state::record_status_r)
+uint16_t highvdeo_state::record_status_r(offs_t offset)
 {
 	static uint16_t resetpulse;
 	switch(offset*2)
@@ -537,17 +535,17 @@ READ16_MEMBER(highvdeo_state::record_status_r)
 }
 
 
-READ16_MEMBER(highvdeo_state::newmcard_vblank_r)
+uint16_t highvdeo_state::newmcard_vblank_r()
 {
 	return m_vblank_bit; //0x80
 }
 
-WRITE16_MEMBER(highvdeo_state::newmcard_vblank_w)
+void highvdeo_state::newmcard_vblank_w(uint16_t data)
 {
 	m_vblank_bit = data;
 }
 
-WRITE16_MEMBER(highvdeo_state::write2_w)
+void highvdeo_state::write2_w(uint16_t data)
 {
 	int i;
 
@@ -604,7 +602,7 @@ void highvdeo_state::record_io(address_map &map)
 ****************************/
 
 
-READ16_MEMBER(highvdeo_state::brasil_status_r)
+uint16_t highvdeo_state::brasil_status_r(offs_t offset)
 {
 	static uint16_t resetpulse;
 
@@ -621,7 +619,7 @@ READ16_MEMBER(highvdeo_state::brasil_status_r)
 }
 
 /*bankaddress might be incorrect.*/
-WRITE16_MEMBER(highvdeo_state::brasil_status_w)
+void highvdeo_state::brasil_status_w(uint16_t data)
 {
 	switch(data & 3) //data & 7?
 	{
@@ -635,7 +633,7 @@ WRITE16_MEMBER(highvdeo_state::brasil_status_w)
 //  popmessage("%04x",data);
 }
 
-READ16_MEMBER(highvdeo_state::grancapi_status_r)
+uint16_t highvdeo_state::grancapi_status_r(offs_t offset)
 {
 	static uint16_t resetpulse;
 
@@ -645,14 +643,14 @@ READ16_MEMBER(highvdeo_state::grancapi_status_r)
 		resetpulse^=0x20;
 
 		return 3 | resetpulse;
-		case 2: return (m_grancapi_prot_latch & 3)|0x17; //and 0x3f
+		case 2: return (m_grancapi_prot_latch & 3)|0x17; //and 0x3f  // This will always return 0x17: Coverity 316053
 	}
 
 	return 0;
 }
 
 /*bankaddress might be incorrect.*/
-WRITE16_MEMBER(highvdeo_state::grancapi_status_w)
+void highvdeo_state::grancapi_status_w(uint16_t data)
 {
 	switch(data & 3) //data & 7?
 	{
@@ -666,7 +664,7 @@ WRITE16_MEMBER(highvdeo_state::grancapi_status_w)
 //  popmessage("%04x",data);
 }
 
-READ16_MEMBER(highvdeo_state::magicbom_status_r)
+uint16_t highvdeo_state::magicbom_status_r(offs_t offset)
 {
 	static uint16_t resetpulse;
 
@@ -705,7 +703,7 @@ void highvdeo_state::brasil_io(address_map &map)
 //  map(0xffa2, 0xffa3).w(FUNC(highvdeo_state::));
 }
 
-WRITE16_MEMBER(highvdeo_state::fashion_output_w)
+void highvdeo_state::fashion_output_w(uint16_t data)
 {
 	int i;
 
@@ -1645,6 +1643,29 @@ ROM_START( cuncino )
 	ROM_LOAD( "sound-capitan uncino-hcu vers.1.u16", 0x00000, 0x80000, CRC(de87edb0) SHA1(a54c17dd21a756b1dbaec94b144db797d25ab7d6) ) // 1ST AND 2ND HALF IDENTICAL, matches grancapi's one when split in half
 ROM_END
 
+ROM_START( unksmk ) // VIDEO/SMK-1 C PCB. V30 + OKI M6376. Feigns to be a NeoGeo multigame to cover gambling game? Needs investigation.
+	ROM_REGION( 0x100000, "maincpu", 0 ) // no labels
+	ROM_LOAD16_BYTE( "ic7", 0x00000, 0x40000, CRC(ce1f303c) SHA1(8563ba217357857d0bc49cc64426406fa12a2f9b) )
+	ROM_RELOAD(             0x80000, 0x40000 )
+	ROM_LOAD16_BYTE( "ic8", 0x00001, 0x40000, CRC(b85575e5) SHA1(4fcda845c8e1b6c843cfe0a1f9b06df806325a7d) )
+	ROM_RELOAD(             0x80001, 0x40000 )
+
+	ROM_REGION( 0x080000, "oki", 0 )
+	ROM_LOAD( "ng 1.ic25", 0x00000, 0x80000, CRC(89291fe6) SHA1(f729e6b90a98151ff64baa1d852137a86bd0ef93) ) // handwritten label
+ROM_END
+
+ROM_START( newtiger ) // New High Video TYPE 001/V0 PCB. N80C186XL25 + OKIM6376 + Lattice ispLSI1032E + Lattice ispLSI2032. Also found on PCB with no markings, otherwise almost identical. These have a big black box covering part of the PCB which isn't present on other PCBs for these driver
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "new tiger pt hnt 7 v.-1.0 h.video 9.a 8m.u7", 0x000000, 0x100000, CRC(57c68716) SHA1(d6c6d285b63809864b7868b5fdfef31519eb94bf) )
+	ROM_LOAD16_BYTE( "new tiger pt hnt 8 v.-1.0 h.video 9.a 8m.u8", 0x000001, 0x100000, CRC(e83bd175) SHA1(d454783f58038ca8938077fa6575b22494056f6f) )
+
+	ROM_REGION( 0x040000, "oki", 0 )
+	ROM_LOAD( "new tiger sound v.-1 memory 2m.u16", 0x00000, 0x40000, CRC(aa8444ec) SHA1(3663c01a7cf2fe334eb6ea974d6a0c0b6bb88354) )
+ROM_END
+
+} // Anonymous namespace
+
+
 GAMEL( 2000, tour4000,  0,      tv_vcf,   tv_vcf,  highvdeo_state, empty_init, ROT0, "High Video",     "Tour 4000",                              0,                   layout_fashion )
 GAMEL( 2000, cfever40,  0,      tv_vcf,   tv_vcf,  highvdeo_state, empty_init, ROT0, "High Video",     "Casino Fever 4.0",                       0,                   layout_fashion )
 GAMEL( 2000, cfever50,  0,      tv_vcf,   tv_vcf,  highvdeo_state, empty_init, ROT0, "High Video",     "Casino Fever 5.0",                       0,                   layout_fashion )
@@ -1663,3 +1684,5 @@ GAMEL( 2000, grancapi,  0,      grancapi, brasil,  highvdeo_state, empty_init, R
 GAMEL( 2000, magicbom,  0,      magicbom, fashion, highvdeo_state, empty_init, ROT0, "High Video",     "Magic Bomb (Version 1)",                 MACHINE_NOT_WORKING, layout_fashion )
 GAMEL( 2000, record,    0,      record,   tv_tcf,  highvdeo_state, empty_init, ROT0, "High Video",     "Record (Version 1)",                     0,                   layout_fashion )
 GAMEL( 2000, cuncino,   0,      grancapi, brasil,  highvdeo_state, empty_init, ROT0, "High Video",     "Capitan Uncino (High Video, version 2)", MACHINE_NOT_WORKING, layout_fashion )
+GAMEL( 200?, unksmk,    0,      nyjoker,  nyjoker, highvdeo_state, empty_init, ROT0, "High Video",     "unknown SMK game",                       MACHINE_NOT_WORKING, layout_fashion ) // needs correct inputs
+GAMEL( 200?, newtiger,  0,      magicbom, fashion, highvdeo_state, empty_init, ROT0, "High Video",     "New Tiger",                              MACHINE_NOT_WORKING, layout_fashion ) // slightly differently protected

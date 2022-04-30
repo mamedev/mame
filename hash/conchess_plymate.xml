@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+
+<softwarelist name="conchess_plymate" description="Conchess Plymate Modules">
+
+	<software name="l16">
+		<description>Conchess L16</description>
+		<year>1985</year>
+		<publisher>Systemhuset / Loproc</publisher>
+		<part name="cart" interface="conchess_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="l16_e2_4_6.bin" size="0x2000" crc="adb018c5" sha1="a353c0870219aa250d16f6989eeb14b00c491410" offset="0x0000" />
+				<rom name="l16_e1_6_8.bin" size="0x2000" crc="b6768444" sha1="40a9bc67015235da1c9711937c2b03c6606b1a95" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

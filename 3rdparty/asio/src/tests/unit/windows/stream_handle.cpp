@@ -2,7 +2,7 @@
 // stream_handle.cpp
 // ~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -47,6 +47,7 @@ void test()
   try
   {
     io_context ioc;
+    const io_context::executor_type ioc_ex = ioc.get_executor();
     char mutable_char_buffer[128] = "";
     const char const_char_buffer[128] = "";
     archetypes::lazy_handler lazy;
@@ -56,42 +57,45 @@ void test()
 
     win::stream_handle handle1(ioc);
     HANDLE native_handle1 = INVALID_HANDLE_VALUE;
+#if defined(ASIO_MSVC) && (_MSC_VER < 1910)
+    // Skip this on older MSVC due to mysterious ambiguous overload errors.
+#else
     win::stream_handle handle2(ioc, native_handle1);
+#endif
+
+    win::stream_handle handle3(ioc_ex);
+    HANDLE native_handle2 = INVALID_HANDLE_VALUE;
+    win::stream_handle handle4(ioc_ex, native_handle2);
 
 #if defined(ASIO_HAS_MOVE)
-    win::stream_handle handle3(std::move(handle2));
+    win::stream_handle handle5(std::move(handle4));
 #endif // defined(ASIO_HAS_MOVE)
 
     // basic_stream_handle operators.
 
 #if defined(ASIO_HAS_MOVE)
     handle1 = win::stream_handle(ioc);
-    handle1 = std::move(handle2);
+    handle1 = std::move(handle4);
 #endif // defined(ASIO_HAS_MOVE)
 
     // basic_io_object functions.
 
-#if !defined(ASIO_NO_DEPRECATED)
-    io_context& ioc_ref = handle1.get_io_context();
-    (void)ioc_ref;
-#endif !defined(ASIO_NO_DEPRECATED)
-
-    io_context::executor_type ex = handle1.get_executor();
+    windows::stream_handle::executor_type ex = handle1.get_executor();
     (void)ex;
 
-    // basic_handle functions.
+    // basic_overlapped_handle functions.
 
     win::stream_handle::lowest_layer_type& lowest_layer
       = handle1.lowest_layer();
     (void)lowest_layer;
 
-    const win::stream_handle& handle4 = handle1;
+    const win::stream_handle& handle6 = handle1;
     const win::stream_handle::lowest_layer_type& lowest_layer2
-      = handle4.lowest_layer();
+      = handle6.lowest_layer();
     (void)lowest_layer2;
 
-    HANDLE native_handle2 = INVALID_HANDLE_VALUE;
-    handle1.assign(native_handle2);
+    HANDLE native_handle3 = INVALID_HANDLE_VALUE;
+    handle1.assign(native_handle3);
 
     bool is_open = handle1.is_open();
     (void)is_open;
@@ -99,9 +103,9 @@ void test()
     handle1.close();
     handle1.close(ec);
 
-    win::stream_handle::native_handle_type native_handle3
+    win::stream_handle::native_handle_type native_handle4
       = handle1.native_handle();
-    (void)native_handle3;
+    (void)native_handle4;
 
     handle1.cancel();
     handle1.cancel(ec);

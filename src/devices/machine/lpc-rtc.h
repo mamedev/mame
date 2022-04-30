@@ -28,14 +28,14 @@ private:
 	uint8_t cur_index, cur_extindex;
 	uint8_t ram[256];
 
-	DECLARE_READ8_MEMBER(  index_r);
-	DECLARE_WRITE8_MEMBER( index_w);
-	DECLARE_READ8_MEMBER(  target_r);
-	DECLARE_WRITE8_MEMBER( target_w);
-	DECLARE_READ8_MEMBER(  extindex_r);
-	DECLARE_WRITE8_MEMBER( extindex_w);
-	DECLARE_READ8_MEMBER(  exttarget_r);
-	DECLARE_WRITE8_MEMBER( exttarget_w);
+	uint8_t index_r();
+	void index_w(uint8_t data);
+	uint8_t target_r();
+	void target_w(uint8_t data);
+	uint8_t extindex_r();
+	void extindex_w(uint8_t data);
+	uint8_t exttarget_r();
+	void exttarget_w(uint8_t data);
 };
 
 DECLARE_DEVICE_TYPE(LPC_RTC, lpc_rtc_device)

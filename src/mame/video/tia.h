@@ -47,8 +47,8 @@ public:
 	auto databus_contents_callback() { return m_databus_contents_cb.bind(); }
 	auto vsync_callback() { return m_vsync_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	// construction/destruction
@@ -80,31 +80,31 @@ protected:
 	int current_y();
 	void setup_pXgfx(void);
 	void update_bitmap(int next_x, int next_y);
-	DECLARE_WRITE8_MEMBER( WSYNC_w );
-	DECLARE_WRITE8_MEMBER( VSYNC_w );
-	DECLARE_WRITE8_MEMBER( VBLANK_w );
-	DECLARE_WRITE8_MEMBER( CTRLPF_w );
-	DECLARE_WRITE8_MEMBER( HMP0_w );
-	DECLARE_WRITE8_MEMBER( HMP1_w );
-	DECLARE_WRITE8_MEMBER( HMM0_w );
-	DECLARE_WRITE8_MEMBER( HMM1_w );
-	DECLARE_WRITE8_MEMBER( HMBL_w );
-	DECLARE_WRITE8_MEMBER( HMOVE_w );
-	DECLARE_WRITE8_MEMBER( RSYNC_w );
-	DECLARE_WRITE8_MEMBER( NUSIZ0_w );
-	DECLARE_WRITE8_MEMBER( NUSIZ1_w );
-	DECLARE_WRITE8_MEMBER( HMCLR_w );
-	DECLARE_WRITE8_MEMBER( CXCLR_w );
-	DECLARE_WRITE8_MEMBER( RESP0_w );
-	DECLARE_WRITE8_MEMBER( RESP1_w );
-	DECLARE_WRITE8_MEMBER( RESM0_w );
-	DECLARE_WRITE8_MEMBER( RESM1_w );
-	DECLARE_WRITE8_MEMBER( RESBL_w );
-	DECLARE_WRITE8_MEMBER( RESMP0_w );
-	DECLARE_WRITE8_MEMBER( RESMP1_w );
-	DECLARE_WRITE8_MEMBER( GRP0_w );
-	DECLARE_WRITE8_MEMBER( GRP1_w );
-	DECLARE_READ8_MEMBER( INPT_r );
+	void WSYNC_w();
+	void VSYNC_w(uint8_t data);
+	void VBLANK_w(uint8_t data);
+	void CTRLPF_w(uint8_t data);
+	void HMP0_w(uint8_t data);
+	void HMP1_w(uint8_t data);
+	void HMM0_w(uint8_t data);
+	void HMM1_w(uint8_t data);
+	void HMBL_w(uint8_t data);
+	void HMOVE_w(uint8_t data);
+	void RSYNC_w();
+	void NUSIZ0_w(uint8_t data);
+	void NUSIZ1_w(uint8_t data);
+	void HMCLR_w(uint8_t data);
+	void CXCLR_w();
+	void RESP0_w();
+	void RESP1_w();
+	void RESM0_w();
+	void RESM1_w();
+	void RESBL_w();
+	void RESMP0_w(uint8_t data);
+	void RESMP1_w(uint8_t data);
+	void GRP0_w(uint8_t data);
+	void GRP1_w(uint8_t data);
+	uint8_t INPT_r(offs_t offset);
 
 
 private:

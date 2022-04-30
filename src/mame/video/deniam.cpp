@@ -62,7 +62,7 @@ TILE_GET_INFO_MEMBER(deniam_state::get_bg_tile_info)
 {
 	const int page = tile_index >> 11;
 	u16 attr = m_videoram[m_bg_page[page] * 0x0800 + (tile_index & 0x7ff)];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			attr,
 			(attr & 0x1fc0) >> 6,
 			0);
@@ -72,7 +72,7 @@ TILE_GET_INFO_MEMBER(deniam_state::get_fg_tile_info)
 {
 	const int page = tile_index >> 11;
 	u16 attr = m_videoram[m_fg_page[page] * 0x0800 + (tile_index & 0x7ff)];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			attr,
 			(attr & 0x1fc0) >> 6,
 			0);
@@ -81,7 +81,7 @@ TILE_GET_INFO_MEMBER(deniam_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(deniam_state::get_tx_tile_info)
 {
 	u16 attr = m_textram[tile_index];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			attr & 0xf1ff,
 			(attr & 0x0e00) >> 9,
 			0);
@@ -236,9 +236,9 @@ void deniam_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 						{
 							if (cliprect.contains(sx + x, y))
 							{
-								if ((screen.priority().pix8(y, sx + x) & primask) == 0)
-									bitmap.pix16(y, sx + x) = color * 16 + (rom[i] & 0x0f);
-								screen.priority().pix8(y, sx + x) = 8;
+								if ((screen.priority().pix(y, sx + x) & primask) == 0)
+									bitmap.pix(y, sx + x) = color * 16 + (rom[i] & 0x0f);
+								screen.priority().pix(y, sx + x) = 8;
 							}
 						}
 						x++;
@@ -255,9 +255,9 @@ void deniam_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 						{
 							if (cliprect.contains(sx + x, y))
 							{
-								if ((screen.priority().pix8(y, sx + x) & primask) == 0)
-									bitmap.pix16(y, sx + x) = color * 16+(rom[i] >> 4);
-								screen.priority().pix8(y, sx + x) = 8;
+								if ((screen.priority().pix(y, sx + x) & primask) == 0)
+									bitmap.pix(y, sx + x) = color * 16+(rom[i] >> 4);
+								screen.priority().pix(y, sx + x) = 8;
 							}
 						}
 						x++;
@@ -278,9 +278,9 @@ void deniam_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 						{
 							if (cliprect.contains(sx + x, y))
 							{
-								if ((screen.priority().pix8(y, sx + x) & primask) == 0)
-									bitmap.pix16(y, sx + x) = color * 16 + (rom[i] >> 4);
-								screen.priority().pix8(y, sx + x) = 8;
+								if ((screen.priority().pix(y, sx + x) & primask) == 0)
+									bitmap.pix(y, sx + x) = color * 16 + (rom[i] >> 4);
+								screen.priority().pix(y, sx + x) = 8;
 							}
 						}
 						x++;
@@ -297,9 +297,9 @@ void deniam_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 						{
 							if (cliprect.contains(sx + x, y))
 							{
-								if ((screen.priority().pix8(y, sx + x) & primask) == 0)
-									bitmap.pix16(y, sx + x) = color * 16 + (rom[i] & 0x0f);
-								screen.priority().pix8(y, sx + x) = 8;
+								if ((screen.priority().pix(y, sx + x) & primask) == 0)
+									bitmap.pix(y, sx + x) = color * 16 + (rom[i] & 0x0f);
+								screen.priority().pix(y, sx + x) = 8;
 							}
 						}
 						x++;

@@ -44,8 +44,8 @@ public:
 	auto porth_output_cb() { return m_output_cb[7].bind(); }
 
 	// memory handlers
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	u8 read(address_space &space, offs_t offset);
+	void write(offs_t offset, u8 data);
 
 protected:
 	// device-level overrides
@@ -54,12 +54,12 @@ protected:
 
 private:
 	// input/output callbacks
-	devcb_read8         m_input_cb[8];
-	devcb_write8        m_output_cb[8];
+	devcb_read8::array<8> m_input_cb;
+	devcb_write8::array<8> m_output_cb;
 
 	// internal state
-	u8                  m_data_latch[8];
-	u8                  m_data_dir[8];
+	u8 m_data_latch[8];
+	u8 m_data_dir[8];
 };
 
 // device type definition

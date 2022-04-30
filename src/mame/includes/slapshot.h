@@ -48,17 +48,17 @@ protected:
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	struct slapshot_tempsprite
 	{
-		u8 gfx;
-		u32 code,color;
-		bool flipx,flipy;
-		int x,y;
-		int zoomx,zoomy;
-		u32 primask;
+		u8 gfx = 0;
+		u32 code = 0, color = 0;
+		bool flipx = false, flipy = false;
+		int x = 0, y = 0;
+		int zoomx = 0, zoomy = 0;
+		u32 primask = 0;
 	};
 
 	/* devices */
@@ -82,15 +82,18 @@ private:
 
 	/* video-related */
 	std::unique_ptr<slapshot_tempsprite[]> m_spritelist;
-	bool      m_sprites_disabled;
-	s32       m_sprites_active_area;
-	s32       m_sprites_master_scrollx;
-	s32       m_sprites_master_scrolly;
-	bool      m_sprites_flipscreen;
-	bool      m_prepare_sprites;
-	int       m_dislayer[5];
+	bool      m_sprites_disabled = false;
+	s32       m_sprites_active_area = 0;
+	s32       m_sprites_master_scrollx = 0;
+	s32       m_sprites_master_scrolly = 0;
+	bool      m_sprites_flipscreen = false;
+	bool      m_prepare_sprites = false;
+#ifdef MAME_DEBUG
+	int       m_dislayer[5] = { 0, 0, 0, 0, 0 };
+#endif
 
-	emu_timer *m_int6_timer;
+	emu_timer *m_int6_timer = nullptr;
+	std::unique_ptr<u8[]> m_decoded_gfx;
 
 	// generic
 	u16 service_input_r(offs_t offset);

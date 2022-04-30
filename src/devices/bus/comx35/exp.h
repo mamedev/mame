@@ -73,7 +73,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(irq_w) { m_write_irq(state); }
 
-	DECLARE_WRITE8_MEMBER(sc_w);
+	void sc_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(tpb_w);
 
 protected:

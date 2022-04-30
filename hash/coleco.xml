@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 
 <softwarelist name="coleco" description="Coleco ColecoVision cartridges">
 
@@ -9,8 +12,6 @@
 
      - Moon Patrol (Atarisoft)
      - A.E. (Coleco)
-     - ADAM Demo Cartridge (Coleco)
-     - Coleco Graphics Processor (Coleco)
      - Super front Line Demo
      - Masters of the universe (Mattel)
      - Lord of the Dungeon (Probe 2000)
@@ -2607,7 +2608,7 @@
 		<!-- Burgertime (1983)(Mattel)(proto).bin -->
 		<description>Burgertime (Prototype)</description>
 		<year>1983</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<info name="developer" value="Data East USA" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="16384">

@@ -757,22 +757,11 @@ void m2_te_device::device_reset()
 }
 
 
-//-------------------------------------------------
-//  device_post_load - device-specific post-load
-//-------------------------------------------------
-
-void m2_te_device::device_post_load()
-{
-
-}
-
-
-
 /***************************************************************************
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
-READ32_MEMBER( m2_te_device::read )
+uint32_t m2_te_device::read(offs_t offset)
 {
 	uint32_t unit = (offset >> 11) & 7;
 	uint32_t reg = offset & 0x1ff;
@@ -828,7 +817,7 @@ READ32_MEMBER( m2_te_device::read )
 	return 0;
 }
 
-WRITE32_MEMBER( m2_te_device::write )
+void m2_te_device::write(offs_t offset, uint32_t data)
 {
 	uint32_t unit = (offset >> 11) & 7;
 	uint32_t reg = offset & 0x1ff;
@@ -1224,9 +1213,9 @@ void m2_te_device::setup_triangle(uint32_t flags)
 	if ((vb.y - vc.y) < 0.0f) a |= 2;
 	if ((vc.y - va.y) < 0.0f) a |= 1;
 
-	const se_vtx *v1 = NULL;
-	const se_vtx *v2 = NULL;
-	const se_vtx *v3 = NULL;
+	const se_vtx *v1 = nullptr;
+	const se_vtx *v2 = nullptr;
+	const se_vtx *v3 = nullptr;
 
 	switch (a)
 	{
@@ -1513,21 +1502,6 @@ uint32_t nr_invert(uint32_t num, uint32_t & shift_amount)
 
 
 //-------------------------------------------------
-//  clamp -
-//-------------------------------------------------
-
-uint32_t clamp(int32_t v, int32_t min, int32_t max)
-{
-	if (v < min)
-		return min;
-	else if (v > max)
-		return max;
-
-	return v;
-}
-
-
-//-------------------------------------------------
 //  walk_edges -
 //-------------------------------------------------
 
@@ -1675,10 +1649,10 @@ void m2_te_device::walk_edges(uint32_t wrange)
 			}
 
 			// Clamp to 8.11
-			r = clamp(r, 0, 0x0007ffff);
-			g = clamp(g, 0, 0x0007ffff);
-			b = clamp(b, 0, 0x0007ffff);
-			a = clamp(a, 0, 0x0007ffff);
+			r = std::clamp<int32_t>(r, 0, 0x0007ffff);
+			g = std::clamp<int32_t>(g, 0, 0x0007ffff);
+			b = std::clamp<int32_t>(b, 0, 0x0007ffff);
+			a = std::clamp<int32_t>(a, 0, 0x0007ffff);
 		}
 
 		if (!(m_es.es_cntl & TEMASTER_MODE_DTEXT))
@@ -1695,8 +1669,8 @@ void m2_te_device::walk_edges(uint32_t wrange)
 			}
 
 			// Clamp to 10.13
-			uw = clamp(uw, 0, 0x007fffff);
-			vw = clamp(vw, 0, 0x007fffff);
+			uw = std::clamp<int32_t>(uw, 0, 0x007fffff);
+			vw = std::clamp<int32_t>(vw, 0, 0x007fffff);
 		}
 
 		if (!(m_es.es_cntl & ESCNTL_PERSPECTIVEOFF))
@@ -1707,7 +1681,7 @@ void m2_te_device::walk_edges(uint32_t wrange)
 				w += step_back ? m_es.slope_w - m_es.ddx_w : m_es.slope_w;
 
 			// Clamp to 0.23
-			w = clamp(w, 0, 0x007fffff);
+			w = std::clamp<int32_t>(w, 0, 0x007fffff);
 		}
 
 		// Update Y
@@ -1935,8 +1909,8 @@ void m2_te_device::addr_calc(uint32_t u, uint32_t v, uint32_t lod,
 	u_max &= u_mask;
 	v_max &= v_mask;
 
-	u0 = clamp(u0, 0, u_max);
-	v0 = clamp(v0, 0, v_max);
+	u0 = std::min(u0, u_max);
+	v0 = std::min(v0, v_max);
 
 	// LOD
 	uint32_t lodmax = m_tm.tex_addr_cntl & TXTADDRCNTL_LODMAX_MASK;
@@ -2459,7 +2433,7 @@ void m2_te_device::destination_blend(uint32_t x, uint32_t y, uint32_t w, const r
 	bool winclipdis = false;
 
 	// Z Status
-	uint32_t zgel = 0;
+	[[maybe_unused]] uint32_t zgel = 0;
 
 	uint32_t zaddr;
 
@@ -3267,17 +3241,17 @@ void m2_te_device::walk_span(uint32_t wrange, bool omit_right,
 		}
 
 		// Clamp to 11.8
-		r = clamp(r, 0, 0x0007ffff);
-		g = clamp(g, 0, 0x0007ffff);
-		b = clamp(b, 0, 0x0007ffff);
-		a = clamp(a, 0, 0x0007ffff);
+		r = std::clamp<int32_t>(r, 0, 0x0007ffff);
+		g = std::clamp<int32_t>(g, 0, 0x0007ffff);
+		b = std::clamp<int32_t>(b, 0, 0x0007ffff);
+		a = std::clamp<int32_t>(a, 0, 0x0007ffff);
 
 		// Clamp to 10.13
-		uw = clamp(uw, 0, 0x007fffff);
-		vw = clamp(vw, 0, 0x007fffff);
+		uw = std::clamp<int32_t>(uw, 0, 0x007fffff);
+		vw = std::clamp<int32_t>(vw, 0, 0x007fffff);
 
 		// Clamp to 0.23
-		w = clamp(w, 0, 0x007fffff);
+		w = std::clamp<int32_t>(w, 0, 0x007fffff);
 
 #if TEST_TIMING
 		g_statistics[STAT_PIXELS_PROCESSED]++;
@@ -3334,8 +3308,6 @@ void m2_te_device::illegal_inst()
 
 void m2_te_device::execute()
 {
-	address_space &space = machine().driver_data()->generic_space();
-
 #if TEST_TIMING
 	memset(g_statistics, 0, sizeof(g_statistics));
 #endif
@@ -3353,7 +3325,7 @@ void m2_te_device::execute()
 
 				while (cnt-- >= 0)
 				{
-					write(space, offs >> 2, irp_fetch(), 0xffffffff);
+					write(offs >> 2, irp_fetch());
 					offs += 4;
 
 					if (m_state != TE_RUNNING)
@@ -3924,7 +3896,7 @@ void m2_te_device::load_texture()
     TIMERS
 ***************************************************************************/
 
-void m2_te_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void m2_te_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

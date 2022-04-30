@@ -13,7 +13,7 @@ public:
 	c6280_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// write only
-	DECLARE_WRITE8_MEMBER( c6280_w );
+	void c6280_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
@@ -22,7 +22,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	struct channel {

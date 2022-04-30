@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:CC0
 // copyright-holders:Couriersud
 /*
  * nmos_fet.cpp
@@ -7,7 +7,7 @@
 
 
 #include "netlist/devices/net_lib.h"
-#include "netlist/analog/nld_twoterm.h"
+#include "netlist/devices/net_lib.h"
 
 NETLIST_START(nmos)
 	/* Standard stuff */

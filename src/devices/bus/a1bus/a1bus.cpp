@@ -16,6 +16,10 @@
 
 DEFINE_DEVICE_TYPE(A1BUS_SLOT, a1bus_slot_device, "a1bus_slot", "Apple I Slot")
 
+template class device_finder<device_a1bus_card_interface, false>;
+template class device_finder<device_a1bus_card_interface, true>;
+
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -124,16 +128,15 @@ void a1bus_device::set_nmi_line(int state)
 	m_out_nmi_cb(state);
 }
 
-void a1bus_device::install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler)
+void a1bus_device::install_device(offs_t start, offs_t end, read8sm_delegate rhandler, write8sm_delegate whandler)
 {
 	m_space->install_readwrite_handler(start, end, rhandler, whandler);
 }
 
-void a1bus_device::install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data)
+void a1bus_device::install_bank(offs_t start, offs_t end, uint8_t *data)
 {
 //  printf("install_bank: %s @ %x->%x\n", tag, start, end);
-	m_space->install_readwrite_bank(start, end, tag);
-	machine().root_device().membank(siblingtag(tag).c_str())->set_base(data);
+	m_space->install_ram(start, end, data);
 }
 
 // interrupt request from a1bus card
@@ -190,12 +193,12 @@ void device_a1bus_card_interface::interface_pre_start()
 	m_a1bus->add_a1bus_card(this);
 }
 
-void device_a1bus_card_interface::install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler)
+void device_a1bus_card_interface::install_device(offs_t start, offs_t end, read8sm_delegate rhandler, write8sm_delegate whandler)
 {
 	m_a1bus->install_device(start, end, rhandler, whandler);
 }
 
-void device_a1bus_card_interface::install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data)
+void device_a1bus_card_interface::install_bank(offs_t start, offs_t end, uint8_t *data)
 {
-	m_a1bus->install_bank(start, end, tag, data);
+	m_a1bus->install_bank(start, end, data);
 }

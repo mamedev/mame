@@ -14,7 +14,7 @@ Atari Poolshark video emulation
 
 TILE_GET_INFO_MEMBER(poolshrk_state::get_tile_info)
 {
-	SET_TILE_INFO_MEMBER(1, m_playfield_ram[tile_index] & 0x3f, 0, 0);
+	tileinfo.set(1, m_playfield_ram[tile_index] & 0x3f, 0, 0);
 }
 
 

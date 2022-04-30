@@ -24,12 +24,10 @@
 #include "emu.h"
 
 #include "machine/netlist.h"
-
-#include "video/fixfreq.h"
-
 #include "netlist/devices/net_lib.h"
 
 #include "machine/nl_palestra.h"
+#include "video/fixfreq.h"
 
 #include "screen.h"
 
@@ -47,8 +45,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_video(*this, "fixfreq")
-	{
-	}
+	{ }
 
 	// devices
 	required_device<netlist_mame_device> m_maincpu;
@@ -61,8 +58,6 @@ protected:
 	virtual void machine_start() override { };
 	virtual void machine_reset() override { };
 
-	virtual void video_start() override { };
-
 private:
 };
 
@@ -73,7 +68,7 @@ INPUT_PORTS_END
 
 void palestra_state::palestra(machine_config &config)
 {
-	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK)
+	NETLIST_CPU(config, m_maincpu, netlist::config::DEFAULT_CLOCK())
 		.set_source(netlist_palestra);
 
 	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0").set_params("videomix", m_video, FUNC(fixedfreq_device::update_composite_monochrome));

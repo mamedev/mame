@@ -2,31 +2,16 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-    microbee.cpp
+Microbee machine driver
+Originally written by Juergen Buchmueller, Jan 2000
 
-    machine driver
-    Originally written by Juergen Buchmueller, Jan 2000
-
-    Rewritten by Robbbert (see notes in driver file).
+Rewritten by Robbbert (see notes in driver file).
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "includes/mbee.h"
 #include "machine/z80bin.h"
-
-
-void mbee_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_MBEE_NEWKB:
-		timer_newkb(ptr, param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in mbee_state::device_timer");
-	}
-}
 
 
 /***********************************************************
@@ -40,7 +25,7 @@ WRITE_LINE_MEMBER( mbee_state::pio_ardy )
 	m_centronics->write_strobe((state) ? 0 : 1);
 }
 
-WRITE8_MEMBER( mbee_state::pio_port_b_w )
+void mbee_state::pio_port_b_w(u8 data)
 {
 /*  PIO port B - d5..d2 not emulated
     d7 interrupt from network or rtc or vsync or not used (see config switch)
@@ -56,9 +41,9 @@ WRITE8_MEMBER( mbee_state::pio_port_b_w )
 	m_speaker->level_w(BIT(data, 6));
 }
 
-READ8_MEMBER( mbee_state::pio_port_b_r )
+u8 mbee_state::pio_port_b_r()
 {
-	uint8_t data = 0;
+	u8 data = 0;
 
 	if (m_cassette->input() > 0.03)
 		data |= 1;
@@ -68,16 +53,16 @@ READ8_MEMBER( mbee_state::pio_port_b_r )
 	switch (m_io_config->read() & 0xc0)
 	{
 		case 0x00:
-			data |= (uint8_t)m_b7_vs << 7;
+			data |= (u8)m_b7_vs << 7;
 			break;
 		case 0x40:
-			data |= (uint8_t)m_b7_rtc << 7;
+			data |= (u8)m_b7_rtc << 7;
 			break;
 		case 0x80:
 			data |= 0x80;
 			break;
 	}
-	data |= (uint8_t)m_b2 << 1; // key pressed on new keyboard
+	data |= (u8)m_b2 << 1; // key pressed on new keyboard
 
 	return data;
 }
@@ -101,7 +86,7 @@ WRITE_LINE_MEMBER( mbee_state::fdc_drq_w )
 	m_fdc_rq = (m_fdc_rq & 1) | (state << 1);
 }
 
-READ8_MEMBER( mbee_state::fdc_status_r )
+u8 mbee_state::fdc_status_r()
 {
 /*  d7 indicate if IRQ or DRQ is occurring (1=happening)
     d6..d0 not used */
@@ -109,7 +94,7 @@ READ8_MEMBER( mbee_state::fdc_status_r )
 	return m_fdc_rq ? 0xff : 0x7f;
 }
 
-WRITE8_MEMBER( mbee_state::fdc_motor_w )
+void mbee_state::fdc_motor_w(u8 data)
 {
 /*  d7..d4 not used
     d3 density (1=MFM)
@@ -144,7 +129,7 @@ WRITE8_MEMBER( mbee_state::fdc_motor_w )
 ************************************************************/
 
 
-TIMER_CALLBACK_MEMBER( mbee_state::timer_newkb )
+TIMER_DEVICE_CALLBACK_MEMBER( mbee_state::newkb_timer )
 {
 	/* Keyboard scanner is a Mostek M3870 chip. Its speed of operation is determined by a 15k resistor on
 	pin 2 (XTL2) and is therefore 2MHz. If a key change is detected (up or down), the /strobe
@@ -157,50 +142,54 @@ TIMER_CALLBACK_MEMBER( mbee_state::timer_newkb )
 	It includes up to 4 KB of mask-programmable ROM, 64 bytes of scratchpad RAM and up to 64 bytes
 	of executable RAM. The MCU also integrates 32-bit I/O and a programmable timer. */
 
-	uint8_t i, j, pressed;
+	if (!BIT(m_features, 2))
+		return;
+
+	u8 i, j, pressed;
 
 	// find what has changed
 	for (i = 0; i < 15; i++)
 	{
 		pressed = m_io_newkb[i]->read();
-		if (pressed != m_mbee256_was_pressed[i])
+		if (pressed != m_newkb_was_pressed[i])
 		{
 			// get scankey value
 			for (j = 0; j < 8; j++)
 			{
-				if (BIT(pressed^m_mbee256_was_pressed[i], j))
+				if (BIT(pressed^m_newkb_was_pressed[i], j))
 				{
 					// put it in the queue
-					uint8_t code = (i << 3) | j | (BIT(pressed, j) ? 0x80 : 0);
-					m_mbee256_q[m_mbee256_q_pos] = code;
-					if (m_mbee256_q_pos < 19) m_mbee256_q_pos++;
+					u8 code = (i << 3) | j | (BIT(pressed, j) ? 0x80 : 0);
+					m_newkb_q[m_newkb_q_pos] = code;
+					if (m_newkb_q_pos < (std::size(m_newkb_q)-1))
+						m_newkb_q_pos++;
 				}
 			}
-			m_mbee256_was_pressed[i] = pressed;
+			m_newkb_was_pressed[i] = pressed;
 		}
 	}
 
 	// if anything queued, cause an interrupt
-	if (m_mbee256_q_pos)
+	if (m_newkb_q_pos)
 		m_b2 = 1; // set irq
 
 	if (m_b2)
-		m_pio->port_b_write(pio_port_b_r(generic_space(),0,0xff));
-
-	timer_set(attotime::from_hz(50), TIMER_MBEE_NEWKB);
+		m_pio->port_b_write(pio_port_b_r());
 }
 
-READ8_MEMBER( mbee_state::port18_r )
+u8 mbee_state::port18_r()
 {
-	uint8_t i, data = m_mbee256_q[0]; // get oldest key
+	u8 i, data = m_newkb_q[0]; // get oldest key
 
-	if (m_mbee256_q_pos)
+	if (m_newkb_q_pos)
 	{
-		m_mbee256_q_pos--;
-		for (i = 0; i < m_mbee256_q_pos; i++) m_mbee256_q[i] = m_mbee256_q[i+1]; // ripple queue
+		for (i = 0; i < m_newkb_q_pos; i++) m_newkb_q[i] = m_newkb_q[i+1]; // ripple queue
+		m_newkb_q[m_newkb_q_pos] = 0;
+		m_newkb_q_pos--;
 	}
 
 	m_b2 = 0; // clear irq
+	m_pio->port_b_write(pio_port_b_r());
 	return data;
 }
 
@@ -211,18 +200,11 @@ READ8_MEMBER( mbee_state::port18_r )
 
 ************************************************************/
 
-READ8_MEMBER( mbee_state::speed_low_r )
+u8 mbee_state::speed_r(offs_t offset)
 {
-	m_maincpu->set_unscaled_clock(3375000);
+	m_maincpu->set_unscaled_clock(BIT(offset, 8, 2) ? 6750000 : 3375000);
 	return 0xff;
 }
-
-READ8_MEMBER( mbee_state::speed_high_r )
-{
-	m_maincpu->set_unscaled_clock(6750000);
-	return 0xff;
-}
-
 
 
 /***********************************************************
@@ -231,17 +213,17 @@ READ8_MEMBER( mbee_state::speed_high_r )
 
 ************************************************************/
 
-WRITE8_MEMBER( mbee_state::port04_w )  // address
+void mbee_state::port04_w(u8 data)  // address
 {
 	m_rtc->write(0, data);
 }
 
-WRITE8_MEMBER( mbee_state::port06_w )  // write
+void mbee_state::port06_w(u8 data)  // write
 {
 	m_rtc->write(1, data);
 }
 
-READ8_MEMBER( mbee_state::port07_r )   // read
+u8 mbee_state::port07_r()   // read
 {
 	return m_rtc->read(1);
 }
@@ -249,10 +231,10 @@ READ8_MEMBER( mbee_state::port07_r )   // read
 // See it work: Run mbeett, choose RTC in the config switches, run the F3 test, press Esc.
 WRITE_LINE_MEMBER( mbee_state::rtc_irq_w )
 {
-	m_b7_rtc = (state) ? 0 : 1; // inverted by IC15 (pins 8,9,10)
+	m_b7_rtc = state; // inverted by IC15 (pins 8,9,10) then again by mame
 
 	if ((m_io_config->read() & 0xc0) == 0x40) // RTC selected in config menu
-		m_pio->port_b_write(pio_port_b_r(generic_space(),0,0xff));
+		m_pio->port_b_write(pio_port_b_r());
 }
 
 
@@ -266,7 +248,7 @@ WRITE_LINE_MEMBER( mbee_state::rtc_irq_w )
     and (output = 22,21,20,19,18,17,16,15). The prom is also used to control
     the refresh required by the dynamic rams, however we ignore this function.
 
-    b_mask = total dynamic ram (1=64k; 3=128k; 7=256k)
+    b_mask = total dynamic ram (1=64k; 3=128k; 7=256k or more)
 
     Certain software (such as the PJB system) constantly switch banks around,
     causing slowness. Therefore this function only changes the banks that need
@@ -274,15 +256,17 @@ WRITE_LINE_MEMBER( mbee_state::rtc_irq_w )
 
 ************************************************************/
 
-void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
+void mbee_state::setup_banks(u8 data, bool first_time, u8 b_mask)
 {
+	b_mask &= 7;
+	u32 dbank = m_ramsize / 0x1000;
+	u8 extra_bits = (data & 0xc0) & (dbank - 1);
 	data &= 0x3f; // (bits 0-5 are referred to as S0-S5)
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
-	uint8_t *prom = memregion("pals")->base();
-	uint8_t b_data = bitswap<8>(data, 7,5,3,2,4,6,1,0) & 0x3b; // arrange data bits to S0,S1,-,S4,S2,S3
-	uint8_t b_bank, b_byte, b_byte_t, b_addr, p_bank = 1;
+	u8 *prom = memregion("pals")->base();
+	u8 b_data = bitswap<8>(data, 7,5,3,2,4,6,1,0) & 0x3b; // arrange data bits to S0,S1,-,S4,S2,S3
+	u8 b_bank, b_byte, b_byte_t, b_addr, p_bank = 1;
 	uint16_t b_vid;
-	char banktag[10];
 
 	if (first_time || (b_data != m_bank_array[0])) // if same data as last time, leave now
 	{
@@ -304,23 +288,20 @@ void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
 				if (!BIT(data, 5))
 					b_byte &= 0xfb;  // U42/1 - S17 only valid if S5 is on
 
-				mem.unmap_read (b_vid, b_vid + 0xfff);
-
 				if (!BIT(b_byte, 4))
 				{
 					// select video
-					mem.install_read_handler (b_vid, b_vid + 0x7ff, read8_delegate(*this, FUNC(mbee_state::video_low_r)));
-					mem.install_read_handler (b_vid + 0x800, b_vid + 0xfff, read8_delegate(*this, FUNC(mbee_state::video_high_r)));
+					mem.install_read_handler (b_vid, b_vid + 0x7ff, read8sm_delegate(*this, FUNC(mbee_state::video_low_r)));
+					mem.install_read_handler (b_vid + 0x800, b_vid + 0xfff, read8sm_delegate(*this, FUNC(mbee_state::video_high_r)));
 				}
 				else
 				{
-					sprintf(banktag, "bankr%d", b_bank);
-					mem.install_read_bank( b_vid, b_vid+0xfff, banktag );
+					mem.install_read_bank( b_vid, b_vid+0xfff, m_bankr[b_bank] );
 
 					if (!BIT(b_byte, 3))
-						membank(banktag)->set_entry(64 + (b_bank & 3)); // read from rom
+						m_bankr[b_bank]->set_entry(dbank + (b_bank & 3)); // read from rom
 					else
-						membank(banktag)->set_entry((b_bank & 7) | ((b_byte & b_mask) << 3)); // ram
+						m_bankr[b_bank]->set_entry(extra_bits + (b_bank & 7) + ((b_byte & b_mask) << 3)); // ram
 				}
 			}
 			p_bank++;
@@ -336,23 +317,20 @@ void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
 				if (!BIT(data, 5))
 					b_byte &= 0xfb;  // U42/1 - S17 only valid if S5 is on
 
-				mem.unmap_write (b_vid, b_vid + 0xfff);
-
 				if (!BIT(b_byte, 4))
 				{
 					// select video
-					mem.install_write_handler (b_vid, b_vid + 0x7ff, write8_delegate(*this, FUNC(mbee_state::video_low_w)));
-					mem.install_write_handler (b_vid + 0x800, b_vid + 0xfff, write8_delegate(*this, FUNC(mbee_state::video_high_w)));
+					mem.install_write_handler (b_vid, b_vid + 0x7ff, write8sm_delegate(*this, FUNC(mbee_state::video_low_w)));
+					mem.install_write_handler (b_vid + 0x800, b_vid + 0xfff, write8sm_delegate(*this, FUNC(mbee_state::video_high_w)));
 				}
 				else
 				{
-					sprintf(banktag, "bankw%d", b_bank);
-					mem.install_write_bank( b_vid, b_vid+0xfff, banktag );
+					mem.install_write_bank( b_vid, b_vid+0xfff, m_bankw[b_bank] );
 
-					if (!BIT(b_byte, 3))
-						membank(banktag)->set_entry(64); // write to rom dummy area
-					else
-						membank(banktag)->set_entry((b_bank & 7) | ((b_byte & b_mask) << 3)); // ram
+					//if (!BIT(b_byte, 3))
+						//m_bankw[b_bank]->set_entry(dbank); // write to rom dummy area
+					//else
+						m_bankw[b_bank]->set_entry(extra_bits + (b_bank & 7) + ((b_byte & b_mask) << 3)); // ram
 				}
 			}
 			p_bank++;
@@ -360,9 +338,10 @@ void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
 	}
 }
 
-WRITE8_MEMBER( mbee_state::mbee256_50_w )
+void mbee_state::port50_w(u8 data)
 {
-	setup_banks(data, 0, 7);
+	u8 mask = ((m_ramsize / 0x8000) - 1) & 7;
+	setup_banks(data, 0, mask);
 }
 
 /***********************************************************
@@ -378,10 +357,6 @@ WRITE8_MEMBER( mbee_state::mbee256_50_w )
 
 ************************************************************/
 
-WRITE8_MEMBER( mbee_state::mbee128_50_w )
-{
-	setup_banks(data, 0, 3);
-}
 
 /***********************************************************
 
@@ -393,38 +368,69 @@ WRITE8_MEMBER( mbee_state::mbee128_50_w )
     Output the PAK number to choose an optional PAK ROM.
 
     The bios will support 256 PAKs, although normally only
-    8 are available in hardware. Each PAK is normally a 4K
-    ROM. If 8K ROMs are used, the 2nd half becomes PAK+8,
+    6 are available in hardware. Each PAK is normally a 8K
+    ROM. If 16K ROMs are used, the 2nd half becomes PAK+8,
     thus 16 PAKs in total. This is used in the PC85 models.
 
 ************************************************************/
 
-WRITE8_MEMBER( mbee_state::port0a_w )
+void mbee_state::port0a_w(u8 data)
 {
-	m_0a = data;
-
-	if (m_pak)
-		m_pak->set_entry(data & 15);
+	m_0a = data & 15;
 }
 
-READ8_MEMBER( mbee_state::telcom_low_r )
+// Banking of Telcom rom
+// Some boards use bits 8 and 9, but there are no roms big enough in existence.
+u8 mbee_state::telcom_r(offs_t offset)
 {
-/* Read of port 0A - set Telcom rom to first half */
-	if (m_telcom)
-		m_telcom->set_entry(0);
-
-	return m_0a;
+	m_09 = BIT(offset, 8);
+	return m_09;
 }
 
-READ8_MEMBER( mbee_state::telcom_high_r )
+u8 mbee_state::pak_r(offs_t offset)
 {
-/* Read of port 10A - set Telcom rom to 2nd half */
-	if (m_telcom)
-		m_telcom->set_entry(1);
+	u8 data = (m_0a & 7)+2;
 
-	return m_0a;
+	if (m_pak[data] && m_pak[data]->exists())
+	{
+		if (BIT(m_0a, 3))
+		{
+			if (m_pak_extended[data])
+				return m_pak[data]->read_rom(0x2000 | offset);
+			else
+				return 0xff;
+		}
+		else
+			return m_pak[data]->read_rom(offset);
+	}
+	else
+	{
+		m_pak_extended[data] = false;
+		if (m_pakdef)
+			return m_p_pakdef[(m_0a<<13)|offset];
+		else
+			return 0xff;
+	}
 }
 
+u8 mbee_state::net_r(offs_t offset)
+{
+	if (m_pak[1] && m_pak[1]->exists())
+	{
+		if (m_09 && m_pak_extended[1])
+			return m_pak[1]->read_rom(0x1000 | offset);
+		else
+			return m_pak[1]->read_rom(offset);
+	}
+	else
+	{
+		m_pak_extended[1] = false;
+		if (m_netdef)
+			return m_p_netdef[(m_09<<12)|offset];
+		else
+			return 0xff;
+	}
+}
 
 /***********************************************************
 
@@ -437,197 +443,196 @@ READ8_MEMBER( mbee_state::telcom_high_r )
   It gets set back to normal on the first attempt to write to memory. (/WR line goes active).
 */
 
+void mbee_state::machine_start()
+{
+	save_item(NAME(m_ramsize));
+	save_item(NAME(m_features));
+	save_item(NAME(m_size));
+	save_item(NAME(m_b7_rtc));
+	save_item(NAME(m_b7_vs));
+	save_item(NAME(m_b2));
+	save_item(NAME(m_framecnt)); // not important
+	save_item(NAME(m_08));
+	save_item(NAME(m_09));
+	save_item(NAME(m_0a));
+	save_item(NAME(m_0b));
+	save_item(NAME(m_1c));
+	save_item(NAME(m_newkb_was_pressed));
+	save_item(NAME(m_newkb_q));
+	save_item(NAME(m_newkb_q_pos));
+	save_item(NAME(m_sy6545_reg));
+	save_item(NAME(m_sy6545_ind));
+	save_item(NAME(m_fdc_rq));
+	save_item(NAME(m_bank_array));
 
-void mbee_state::machine_reset_common()
+	m_b2 = 0;
+
+	// banking of the BASIC roms
+	if (m_basic)
+	{
+		u8 *b = memregion("basicrom")->base();
+		m_basic->configure_entries(0, 2, b, 0x2000);
+	}
+
+	// videoram
+	m_vram = make_unique_clear<u8[]>(0x0800);
+	save_pointer(NAME(m_vram), 0x0800);
+
+	// colour
+	if (BIT(m_features, 0))
+	{
+		m_cram = make_unique_clear<u8[]>(0x0800);
+		save_pointer(NAME(m_cram), 0x0800);
+	}
+
+	// minimal main ram
+	if (BIT(m_features, 1))
+		m_size = 0xE000;
+	else
+		m_size = 0x8000;
+
+	// premium
+	if (BIT(m_features, 3))
+	{
+		m_aram = make_unique_clear<u8[]>(0x0800);
+		save_pointer(NAME(m_aram), 0x0800);
+		m_pram = make_unique_clear<u8[]>(0x8800);
+		save_pointer(NAME(m_pram), 0x8800);
+	}
+	else
+	{
+		m_pram = make_unique_clear<u8[]>(0x1000);
+		save_pointer(NAME(m_pram), 0x1000);
+	}
+
+	// Banked systems
+	u8 b = BIT(m_features, 4, 2);
+	if (b)
+	{
+		m_ramsize = 0x20000;  // 128k
+		if (b == 2)
+			m_ramsize = 0x40000;  // 256k
+		else
+		if (b == 3)
+			m_ramsize = 0x100000;  // 1MB for PP
+
+		m_ram = make_unique_clear<u8[]>(m_ramsize);
+		save_pointer(NAME(m_ram), m_ramsize);
+		m_dummy = std::make_unique<u8[]>(0x1000);  // don't save this
+
+		u8 *r = m_ram.get();
+		u8 *d = m_dummy.get();
+		u8 *m = memregion("maincpu")->base();
+
+		u32 banks = m_ramsize / 0x1000;
+
+		for (u8 b_bank = 0; b_bank < 16; b_bank++)
+		{
+			m_bankr[b_bank]->configure_entries(0, banks, r, 0x1000); // RAM banks
+			m_bankr[b_bank]->configure_entries(banks, 4, m, 0x1000); // rom
+			m_bankw[b_bank]->configure_entries(0, banks, r, 0x1000); // RAM banks
+			m_bankw[b_bank]->configure_entry(banks, d); // dummy rom
+		}
+	}
+
+	// set pak index to true for 16k roms
+	if (m_pakdef)
+		for (u8 i = 8; i < 14; i++)
+			if (!(m_pak[i-8] && m_pak[i-8]->exists()))
+				if (m_p_pakdef[(i<<13)] != 0xff)
+					m_pak_extended[(i & 7)+2] = true;
+
+	// set net index to true for 8k roms
+	if (m_netdef && (m_netdef->bytes() > 0x1000))
+		if (!(m_pak[1] && m_pak[1]->exists()))
+			m_pak_extended[1] = true;
+}
+
+void mbee_state::machine_reset()
 {
 	m_fdc_rq = 0;
 	m_08 = 0;
+	m_09 = 0;
 	m_0a = 0;
 	m_0b = 0;
 	m_1c = 0;
 
+	// set default chars
+	memcpy(m_pram.get(), memregion("chargen")->base(), 0x800);
+
 	if (m_basic)
 		m_basic->set_entry(0);
 
-	if (m_telcom)
-		m_telcom->set_entry(0);
+	m_maincpu->set_pc(m_size);
+
+	// init new kbd
+	if (BIT(m_features, 2))
+		m_newkb_q_pos = 0;
+
+	// set banks to default
+	if (BIT(m_features, 4, 2) == 1)
+		setup_banks(0, 1, 3);
+	else
+	if (BIT(m_features, 4, 2) == 2)
+		setup_banks(0, 1, 7);
+	else
+	if (BIT(m_features, 4, 2) == 3)
+		setup_banks(0, 1, 31);
 }
 
-MACHINE_RESET_MEMBER( mbee_state, mbee )
-{
-	machine_reset_common();
-	m_maincpu->set_pc(0x8000);
-}
 
-MACHINE_RESET_MEMBER( mbee_state, mbee56 )
-{
-	machine_reset_common();
-	m_maincpu->set_pc(0xE000);
-}
-
-MACHINE_RESET_MEMBER( mbee_state, mbee128 )
-{
-	machine_reset_common();
-	setup_banks(0, 1, 3); // set banks to default
-	m_maincpu->set_pc(0x8000);
-}
-
-MACHINE_RESET_MEMBER( mbee_state, mbee256 )
-{
-	m_mbee256_q_pos = 0;
-	machine_reset_common();
-	setup_banks(0, 1, 7); // set banks to default
-	m_maincpu->set_pc(0x8000);
-}
-
-MACHINE_RESET_MEMBER( mbee_state, mbeett )
-{
-	m_mbee256_q_pos = 0;
-	machine_reset_common();
-	m_maincpu->set_pc(0x8000);
-}
-
-void mbee_state::init_mbee()
-{
-	m_size = 0x8000;
-	m_has_oldkb = 1;
-}
-
-void mbee_state::init_mbeeic()
-{
-	uint8_t *RAM = memregion("pakrom")->base();
-	m_pak->configure_entries(0, 16, &RAM[0x0000], 0x2000);
-	m_pak->set_entry(0);
-
-	m_size = 0x8000;
-	m_has_oldkb = 1;
-}
-
-void mbee_state::init_mbeepc()
-{
-	uint8_t *RAM = memregion("telcomrom")->base();
-	m_telcom->configure_entries(0, 2, &RAM[0x0000], 0x1000);
-
-	RAM = memregion("pakrom")->base();
-	m_pak->configure_entries(0, 16, &RAM[0x0000], 0x2000);
-	m_pak->set_entry(0);
-
-	m_size = 0x8000;
-	m_has_oldkb = 1;
-}
-
-void mbee_state::init_mbeepc85()
-{
-	uint8_t *RAM = memregion("telcomrom")->base();
-	m_telcom->configure_entries(0, 2, &RAM[0x0000], 0x1000);
-
-	RAM = memregion("pakrom")->base();
-	m_pak->configure_entries(0, 16, &RAM[0x0000], 0x2000);
-	m_pak->set_entry(5);
-
-	m_size = 0x8000;
-	m_has_oldkb = 1;
-}
-
-void mbee_state::init_mbeeppc()
-{
-	uint8_t *RAM = memregion("basicrom")->base();
-	m_basic->configure_entries(0, 2, &RAM[0x0000], 0x2000);
-
-	RAM = memregion("telcomrom")->base();
-	m_telcom->configure_entries(0, 2, &RAM[0x0000], 0x1000);
-
-	RAM = memregion("pakrom")->base();
-	m_pak->configure_entries(0, 16, &RAM[0x0000], 0x2000);
-	m_pak->set_entry(5);
-
-	m_size = 0x8000;
-	m_has_oldkb = 1;
-}
-
-void mbee_state::init_mbee56()
-{
-	m_size = 0xe000;
-	m_has_oldkb = 1;
-}
-
-// 128k uses 32 RAM banks.
-// PP has 1024k which is 256 banks, but having 64 banks stops it crashing during the self-test. Need a schematic before we can fix it.
-void mbee_state::init_mbee128()
-{
-	uint8_t *RAM = memregion("rams")->base();
-	uint8_t *ROM = memregion("roms")->base();
-	char banktag[10];
-
-	for (uint8_t b_bank = 0; b_bank < 16; b_bank++)
-	{
-		sprintf(banktag, "bankr%d", b_bank);
-		membank(banktag)->configure_entries(0, 64, &RAM[0x0000], 0x1000); // RAM banks
-		membank(banktag)->configure_entries(64, 4, &ROM[0x0000], 0x1000); // rom
-
-		sprintf(banktag, "bankw%d", b_bank);
-		membank(banktag)->configure_entries(0, 64, &RAM[0x0000], 0x1000); // RAM banks
-		membank(banktag)->configure_entries(64, 1, &ROM[0x4000], 0x1000); // dummy rom
-	}
-
-	m_size = 0x8000;
-	m_has_oldkb = 1;
-}
-
-void mbee_state::init_mbee256()
-{
-	uint8_t *RAM = memregion("rams")->base();
-	uint8_t *ROM = memregion("roms")->base();
-	char banktag[10];
-
-	for (uint8_t b_bank = 0; b_bank < 16; b_bank++)
-	{
-		sprintf(banktag, "bankr%d", b_bank);
-		membank(banktag)->configure_entries(0, 64, &RAM[0x0000], 0x1000); // RAM banks
-		membank(banktag)->configure_entries(64, 4, &ROM[0x0000], 0x1000); // rom
-
-		sprintf(banktag, "bankw%d", b_bank);
-		membank(banktag)->configure_entries(0, 64, &RAM[0x0000], 0x1000); // RAM banks
-		membank(banktag)->configure_entries(64, 1, &ROM[0x4000], 0x1000); // dummy rom
-	}
-
-	timer_set(attotime::from_hz(1), TIMER_MBEE_NEWKB);   /* kick-start timer for kbd */
-
-	m_size = 0x8000;
-	m_has_oldkb = 0;
-}
-
-void mbee_state::init_mbeett()
-{
-	uint8_t *RAM = memregion("telcomrom")->base();
-	m_telcom->configure_entries(0, 2, &RAM[0x0000], 0x1000);
-
-	RAM = memregion("pakrom")->base();
-	m_pak->configure_entries(0, 16, &RAM[0x0000], 0x2000);
-	m_pak->set_entry(5);
-
-	timer_set(attotime::from_hz(1), TIMER_MBEE_NEWKB);   /* kick-start timer for kbd */
-
-	m_size = 0x8000;
-	m_has_oldkb = 0;
-}
-
+/* m_features:
+bit 0 : (colour fitted) 1 = yes
+bit 1 : (initial pc value / size of main ram) 1=0xE000, 0=0x8000
+bit 2 : (keyboard type) 1 = new keyboard
+bit 3 : (core type) 1 = premium
+bit 4,5 : (banking main ram) 0x10 = 128k; 0x20 = 256k
+*/
 
 /***********************************************************
 
     Quickload
 
-    These load the standard BIN format, as well
+    This loads the standard BIN format, as well
     as BEE, COM and MWB files.
 
 ************************************************************/
 
-QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_bee)
+QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	uint16_t i, j;
-	uint8_t data, sw = m_io_config->read() & 1;   /* reading the config switch: 1 = autorun */
+	bool autorun = BIT(m_io_config->read(), 0);
+	if (image.is_filetype("bin"))
+	{
+		uint16_t execute_address, start_addr, end_addr;
 
+		/* load the binary into memory */
+		if (z80bin_load_file(image, space, execute_address, start_addr, end_addr) != image_init_result::PASS)
+			return image_init_result::FAIL;
+
+		/* is this file executable? */
+		if (execute_address != 0xffff)
+		{
+			space.write_word(0xa6, execute_address);            /* fix the EXEC command */
+
+			if (autorun)
+			{
+				space.write_word(0xa2, execute_address);        /* fix warm-start vector to get around some copy-protections */
+				m_maincpu->set_pc(execute_address);
+			}
+			else
+			{
+				space.write_word(0xa2, 0x8517);
+			}
+		}
+
+		return image_init_result::PASS;
+	}
+
+	uint16_t i, j;
+	u8 data;
+
+	size_t quickload_size = image.length();
 	if (image.is_filetype("mwb"))
 	{
 		/* mwb files - standard basic files */
@@ -650,7 +655,7 @@ QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_bee)
 			}
 		}
 
-		if (sw)
+		if (autorun)
 		{
 			space.write_word(0xa2,0x801e);  /* fix warm-start vector to get around some copy-protections */
 			m_maincpu->set_pc(0x801e);
@@ -658,7 +663,8 @@ QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_bee)
 		else
 			space.write_word(0xa2,0x8517);
 	}
-	else if (image.is_filetype("com"))
+	else
+	if (image.is_filetype("com"))
 	{
 		/* com files - most com files are just machine-language games with a wrapper and don't need cp/m to be present */
 		for (i = 0; i < quickload_size; i++)
@@ -680,9 +686,11 @@ QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_bee)
 			}
 		}
 
-		if (sw) m_maincpu->set_pc(0x100);
+		if (autorun)
+			m_maincpu->set_pc(0x100);
 	}
-	else if (image.is_filetype("bee"))
+	else
+	if (image.is_filetype("bee"))
 	{
 		/* bee files - machine-language games that start at 0900 */
 		for (i = 0; i < quickload_size; i++)
@@ -704,45 +712,80 @@ QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_bee)
 			}
 		}
 
-		if (sw) m_maincpu->set_pc(0x900);
-	}
-
-	return image_init_result::PASS;
-}
-
-
-/*-------------------------------------------------
-    QUICKLOAD_LOAD_MEMBER( mbee_state::quickload_bin )
--------------------------------------------------*/
-
-QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_bin)
-{
-	uint16_t execute_address, start_addr, end_addr;
-	int autorun;
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	/* load the binary into memory */
-	if (z80bin_load_file(&image, space, file_type, &execute_address, &start_addr, &end_addr) != image_init_result::PASS)
-		return image_init_result::FAIL;
-
-	/* is this file executable? */
-	if (execute_address != 0xffff)
-	{
-		/* check to see if autorun is on */
-		autorun = m_io_config->read() & 1;
-
-		space.write_word(0xa6, execute_address);            /* fix the EXEC command */
-
 		if (autorun)
+			m_maincpu->set_pc(0x900);
+	}
+
+	return image_init_result::PASS;
+}
+
+// Index usage: 0 = not used; 1 = net rom; 2-7 = pak roms
+image_init_result mbee_state::load_cart(device_image_interface &image, generic_slot_device *slot, u8 pak_index)
+{
+	u32 size = slot->common_get_size("rom");
+
+	if (pak_index > 1)
+	{
+		// "mbp" roms
+		if ((size == 0) || (size > 0x4000))
 		{
-			space.write_word(0xa2, execute_address);        /* fix warm-start vector to get around some copy-protections */
-			m_maincpu->set_pc(execute_address);
+			image.seterror(image_error::INVALIDIMAGE, "Unsupported ROM size");
+			return image_init_result::FAIL;
 		}
-		else
+
+		m_pak_extended[pak_index] = (size > 0x2000) ? true : false;
+
+		slot->rom_alloc(m_pak_extended[pak_index] ? 0x4000 : 0x2000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE); // we alloc the amount for a real rom
+		slot->common_load_rom(slot->get_rom_base(), size, "rom");
+
+		// Validate the rom
+		logerror ("Rom header = %02X %02X %02X\n", slot->read_rom(0), slot->read_rom(1), slot->read_rom(2));
+		if ((slot->read_rom(0) != 0xc3) || ((slot->read_rom(2) & 0xe0) != 0xc0))
 		{
-			space.write_word(0xa2, 0x8517);
+			image.seterror(image_error::INVALIDIMAGE, "Not a PAK rom");
+			slot->call_unload();
+			return image_init_result::FAIL;
+		}
+	}
+	else
+	{
+		// "mbn" roms
+		if ((size == 0) || (size > 0x2000))
+		{
+			image.seterror(image_error::INVALIDIMAGE, "Unsupported ROM size");
+			return image_init_result::FAIL;
+		}
+		m_pak_extended[pak_index] = (size > 0x1000) ? true : false;
+
+		slot->rom_alloc(m_pak_extended[pak_index] ? 0x2000 : 0x1000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+		slot->common_load_rom(slot->get_rom_base(), size, "rom");
+
+		// Validate the rom
+		logerror ("Rom header = %02X %02X %02X\n", slot->read_rom(0), slot->read_rom(1), slot->read_rom(2));
+		if (!image.loaded_through_softlist())  // need to let pascal through without testing
+		{
+			if ((slot->read_rom(0) != 0xc3) || ((slot->read_rom(2) & 0xf0) != 0xe0))
+			{
+				image.seterror(image_error::INVALIDIMAGE, "Not a NET rom");
+				slot->call_unload();
+				return image_init_result::FAIL;
+			}
 		}
 	}
 
 	return image_init_result::PASS;
 }
+
+void mbee_state::unload_cart(u8 pak_index)
+{
+	if (pak_index > 1)
+	{
+		if (m_pakdef)
+			m_pak_extended[pak_index] = (m_p_pakdef[((pak_index+8)<<13)] == 0xff) ? false : true;
+		else
+			m_pak_extended[pak_index] = false;
+	}
+	else
+		m_pak_extended[pak_index] = (m_netdef && (m_netdef->bytes() > 0x1000)) ? true : false;
+}
+

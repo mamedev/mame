@@ -8,7 +8,6 @@
 #include "machine/clock.h"
 #include "machine/rescap.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 
 
 //**************************************************************************
@@ -189,7 +188,7 @@ zac1b111xx_melody_base::zac1b111xx_melody_base(
 {
 }
 
-READ8_MEMBER(zac1b111xx_melody_base::melodypia_porta_r)
+u8 zac1b111xx_melody_base::melodypia_porta_r()
 {
 	u8 const control = m_melodypia->b_output();
 	u8 data = 0xff;
@@ -203,7 +202,7 @@ READ8_MEMBER(zac1b111xx_melody_base::melodypia_porta_r)
 	return data;
 }
 
-WRITE8_MEMBER(zac1b111xx_melody_base::melodypia_porta_w)
+void zac1b111xx_melody_base::melodypia_porta_w(u8 data)
 {
 	u8 const control = m_melodypia->b_output();
 
@@ -214,7 +213,7 @@ WRITE8_MEMBER(zac1b111xx_melody_base::melodypia_porta_w)
 		m_melodypsg2->data_address_w((control >> 2) & 0x01, data);
 }
 
-WRITE8_MEMBER(zac1b111xx_melody_base::melodypia_portb_w)
+void zac1b111xx_melody_base::melodypia_portb_w(u8 data)
 {
 	if (data & 0x02)
 		m_melodypsg1->data_address_w((data >> 0) & 0x01, m_melodypia->a_output());
@@ -223,7 +222,7 @@ WRITE8_MEMBER(zac1b111xx_melody_base::melodypia_portb_w)
 		m_melodypsg2->data_address_w((data >> 2) & 0x01, m_melodypia->a_output());
 }
 
-READ8_MEMBER(zac1b111xx_melody_base::melodypsg1_portb_r)
+u8 zac1b111xx_melody_base::melodypsg1_portb_r()
 {
 	return m_melody_command;
 }
@@ -270,7 +269,7 @@ zac1b11107_audio_device::zac1b11107_audio_device(machine_config const &mconfig, 
 {
 }
 
-WRITE8_MEMBER(zac1b11107_audio_device::sound_w)
+void zac1b11107_audio_device::sound_w(u8 data)
 {
 	// the sound program masks out the three most significant bits
 	// assume the top two bits are not connected and read high from the internal pull-ups
@@ -287,7 +286,7 @@ WRITE_LINE_MEMBER(zac1b11107_audio_device::reset_w)
 	// TODO: holds the reset line of m_melodypsg2 - can't implement this in MAME at this time
 }
 
-WRITE8_MEMBER(zac1b11107_audio_device::melodypsg1_porta_w)
+void zac1b11107_audio_device::melodypsg1_porta_w(u8 data)
 {
 	// similar to 1B11142
 	// TODO: move this to netlist audio where it belongs, along with the rest of the filtering
@@ -303,7 +302,7 @@ WRITE8_MEMBER(zac1b11107_audio_device::melodypsg1_porta_w)
 	m_melodypsg2->set_volume(1, 150 * RES_VOLTAGE_DIVIDER(RES_K(4.7), table[data & 0x07]));
 }
 
-WRITE8_MEMBER(zac1b11107_audio_device::melodypsg2_porta_w)
+void zac1b11107_audio_device::melodypsg2_porta_w(u8 data)
 {
 	// TODO: assume LEVELT is controlled here as is the case for 1B11142?
 }
@@ -342,7 +341,7 @@ zac1b11142_audio_device::zac1b11142_audio_device(machine_config const &mconfig, 
 {
 }
 
-WRITE8_MEMBER(zac1b11142_audio_device::hs_w)
+void zac1b11142_audio_device::hs_w(u8 data)
 {
 	m_host_command = data;
 	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
@@ -365,7 +364,7 @@ WRITE_LINE_MEMBER(zac1b11142_audio_device::ressound_w)
 	// TODO: does some funky stuff with the VDD and VSS lines on the speech chip
 }
 
-WRITE8_MEMBER(zac1b11142_audio_device::ay_4g_porta_w)
+void zac1b11142_audio_device::ay_4g_porta_w(u8 data)
 {
 	m_ioa[0]->write_line(BIT(data, 0)); // tromba mix volume
 	m_ioa[1]->write_line(BIT(data, 1)); //   "     "    "
@@ -374,23 +373,23 @@ WRITE8_MEMBER(zac1b11142_audio_device::ay_4g_porta_w)
 	m_ioa[4]->write_line(BIT(data, 4)); // rullante gate
 }
 
-WRITE8_MEMBER(zac1b11142_audio_device::ay_4h_porta_w)
+void zac1b11142_audio_device::ay_4h_porta_w(u8 data)
 {
 	m_level->write_line(BIT(data, 0)); // output level
 	m_levelt->write_line(BIT(data, 1)); // tromba level
 }
 
-WRITE8_MEMBER(zac1b11142_audio_device::ay_4h_portb_w)
+void zac1b11142_audio_device::ay_4h_portb_w(u8 data)
 {
 	m_sw1->write_line(BIT(data, 0)); // ANAL3 filter
 }
 
-READ8_MEMBER(zac1b11142_audio_device::host_command_r)
+u8 zac1b11142_audio_device::host_command_r()
 {
 	return m_host_command;
 }
 
-WRITE8_MEMBER(zac1b11142_audio_device::melody_command_w)
+void zac1b11142_audio_device::melody_command_w(u8 data)
 {
 	m_melodypia->ca1_w((data >> 7) & 0x01);
 	m_melody_command = data;
@@ -401,7 +400,7 @@ INPUT_CHANGED_MEMBER(zac1b11142_audio_device::p1_changed)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, (m_inputs->read() & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE8_MEMBER(zac1b11142_audio_device::pia_1i_portb_w)
+void zac1b11142_audio_device::pia_1i_portb_w(u8 data)
 {
 	m_speech->rsq_w(BIT(data, 0));
 	m_speech->wsq_w(BIT(data, 1));
@@ -438,9 +437,6 @@ void zac1b11142_audio_device::device_add_mconfig(machine_config &config)
 
 	//MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.30, AUTO_ALLOC_INPUT, 0); // mc1408.1f
 	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "sound_nl", 1.0, 7); // mc1408.1f
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	// There is no xtal, the clock is obtained from a RC oscillator as shown in the TMS5220 datasheet (R=100kOhm C=22pF)
 	// 162kHz measured on pin 3 20 minutes after power on, clock would then be 162.3*4=649.2kHz
@@ -472,14 +468,14 @@ void zac1b11142_audio_device::device_add_mconfig(machine_config &config)
 	 * The 5200 output is a current source providing between 0 and 1.5mA.
 	 * This is explained in detail in the datasheet.
 	 */
-	NETLIST_STREAM_INPUT(config, "sound_nl:cin6", 6, "I_SP.I").set_mult_offset(750e-6 / 16384.0, 750e-6);
+	NETLIST_STREAM_INPUT(config, "sound_nl:cin6", 6, "I_SP.I").set_mult_offset(2.0 * 750e-6, 750e-6);
 	/* DAC
 	 * The 1408 output is a current sink providing between 0 and 2.0mA.
 	 * This is explained in detail in the datasheet.
 	 */
-	NETLIST_STREAM_INPUT(config, "sound_nl:cin7", 7, "I_DAC.I").set_mult_offset(1e-3 / 32768.0, 1e-3);
+	NETLIST_STREAM_INPUT(config, "sound_nl:cin7", 7, "I_DAC.I").set_mult_offset(1e-3, 1e-3);
 
-	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "C7.2").set_mult_offset(3000.0 * 10.0, 0.0); // FIXME: no clue what numbers to use here
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "C7.2").set_mult_offset(3000.0 * 10.0 / 32768.0, 0.0); // FIXME: no clue what numbers to use here
 
 	// Potentiometers
 	NETLIST_ANALOG_INPUT(config, "sound_nl:pot1", "P1.DIAL");

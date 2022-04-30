@@ -3,13 +3,45 @@
 #include "emu.h"
 #include "terminal.h"
 
+#include "machine/terminal.h"
+
+
+namespace {
+
+class serial_terminal_device : public generic_terminal_device,
+	public device_buffered_serial_interface<16U>,
+	public device_rs232_port_interface
+{
+public:
+	serial_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override { device_buffered_serial_interface::rx_w(state); }
+
+	DECLARE_WRITE_LINE_MEMBER(update_serial);
+
+protected:
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_reset() override;
+
+	virtual void tra_callback() override;
+	virtual void send_key(uint8_t code) override;
+
+private:
+	virtual void received_byte(uint8_t byte) override;
+
+	required_ioport m_rs232_txbaud;
+	required_ioport m_rs232_rxbaud;
+	required_ioport m_rs232_databits;
+	required_ioport m_rs232_parity;
+	required_ioport m_rs232_stopbits;
+};
+
 serial_terminal_device::serial_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: generic_terminal_device(mconfig, SERIAL_TERMINAL, tag, owner, clock, TERMINAL_WIDTH, TERMINAL_HEIGHT)
 	, device_buffered_serial_interface(mconfig, *this)
 	, device_rs232_port_interface(mconfig, *this)
 	, m_rs232_txbaud(*this, "RS232_TXBAUD")
 	, m_rs232_rxbaud(*this, "RS232_RXBAUD")
-	, m_rs232_startbits(*this, "RS232_STARTBITS")
 	, m_rs232_databits(*this, "RS232_DATABITS")
 	, m_rs232_parity(*this, "RS232_PARITY")
 	, m_rs232_stopbits(*this, "RS232_STOPBITS")
@@ -21,7 +53,6 @@ static INPUT_PORTS_START(serial_terminal)
 
 	PORT_RS232_BAUD("RS232_TXBAUD", RS232_BAUD_9600, "TX Baud", serial_terminal_device, update_serial)
 	PORT_RS232_BAUD("RS232_RXBAUD", RS232_BAUD_9600, "RX Baud", serial_terminal_device, update_serial)
-	PORT_RS232_STARTBITS("RS232_STARTBITS", RS232_STARTBITS_1, "Start Bits", serial_terminal_device, update_serial)
 	PORT_RS232_DATABITS("RS232_DATABITS", RS232_DATABITS_8, "Data Bits", serial_terminal_device, update_serial)
 	PORT_RS232_PARITY("RS232_PARITY", RS232_PARITY_NONE, "Parity", serial_terminal_device, update_serial)
 	PORT_RS232_STOPBITS("RS232_STOPBITS", RS232_STOPBITS_1, "Stop Bits", serial_terminal_device, update_serial)
@@ -36,7 +67,7 @@ WRITE_LINE_MEMBER(serial_terminal_device::update_serial)
 {
 	clear_fifo();
 
-	int const startbits = convert_startbits(m_rs232_startbits->read());
+	int const startbits = 1;
 	int const databits = convert_databits(m_rs232_databits->read());
 	parity_t const parity = convert_parity(m_rs232_parity->read());
 	stop_bits_t const stopbits = convert_stopbits(m_rs232_stopbits->read());
@@ -81,4 +112,7 @@ void serial_terminal_device::received_byte(uint8_t byte)
 	term_write(byte);
 }
 
-DEFINE_DEVICE_TYPE(SERIAL_TERMINAL, serial_terminal_device, "serial_terminal", "Serial Terminal")
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(SERIAL_TERMINAL, device_rs232_port_interface, serial_terminal_device, "serial_terminal", "Serial Terminal")

@@ -51,7 +51,7 @@ TILEMAP_MAPPER_MEMBER(xain_state::back_scan)
 template <unsigned N> TILE_GET_INFO_MEMBER(xain_state::get_bg_tile_info)
 {
 	int const attr = m_bgram[N][tile_index | 0x400];
-	SET_TILE_INFO_MEMBER(2 - N,
+	tileinfo.set(2 - N,
 			m_bgram[N][tile_index] | ((attr & 7) << 8),
 			(attr & 0x70) >> 4,
 			(attr & 0x80) ? TILE_FLIPX : 0);
@@ -60,7 +60,7 @@ template <unsigned N> TILE_GET_INFO_MEMBER(xain_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(xain_state::get_char_tile_info)
 {
 	int attr = m_charram[tile_index | 0x400];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_charram[tile_index] | ((attr & 3) << 8),
 			(attr & 0xe0) >> 5,
 			0);
@@ -98,14 +98,14 @@ void xain_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(xain_state::charram_w)
+void xain_state::charram_w(offs_t offset, uint8_t data)
 {
 	m_charram[offset] = data;
 	m_char_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
-WRITE8_MEMBER(xain_state::flipscreen_w)
+void xain_state::flipscreen_w(uint8_t data)
 {
 	flip_screen_set(data & 1);
 }

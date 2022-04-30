@@ -33,7 +33,7 @@
 #define LOG_MODE (1U << 1)
 #define LOG_INPUT (1U << 2)
 #define LOG_TC (1U << 3)
-#define VERBOSE (LOG_GENERAL | LOG_MODE)
+//#define VERBOSE (LOG_GENERAL | LOG_MODE)
 
 #include "logmacro.h"
 
@@ -55,10 +55,10 @@ DEFINE_DEVICE_TYPE(AM9513A, am9513a_device, "am9513a", "Am9513A STC")
 //-------------------------------------------------
 
 am9513_device::am9513_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool is_am9513a)
-	: device_t(mconfig, type, tag, owner, clock),
-		m_out_cb{{*this}, {*this}, {*this}, {*this}, {*this}},
-		m_fout_cb(*this),
-		m_is_am9513a(is_am9513a)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_out_cb(*this)
+	, m_fout_cb(*this)
+	, m_is_am9513a(is_am9513a)
 {
 }
 
@@ -80,8 +80,7 @@ am9513a_device::am9513a_device(const machine_config &mconfig, const char *tag, d
 void am9513_device::device_start()
 {
 	// Resolve callbacks
-	for (auto &cb : m_out_cb)
-		cb.resolve_safe();
+	m_out_cb.resolve_all_safe();
 	m_fout_cb.resolve();
 
 	// Power-on reset
@@ -233,7 +232,7 @@ void am9513_device::device_clock_changed()
 //  fires
 //-------------------------------------------------
 
-void am9513_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void am9513_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	assert(id >= TIMER_F1 && id <= TIMER_F5);
 
@@ -1305,7 +1304,7 @@ void am9513_device::command_write(u8 data)
 				m_write_prefetch = !BIT(data, 0);
 				break;
 			}
-			// else fall through
+			[[fallthrough]];
 		default:
 			logerror("Invalid command: %02X\n", data);
 			break;

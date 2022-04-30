@@ -20,8 +20,8 @@ class etna_device : public device_t
 public:
 	etna_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
 
-	DECLARE_WRITE8_MEMBER(regs_w);
-	DECLARE_READ8_MEMBER(regs_r);
+	void regs_w(offs_t offset, uint8_t data);
+	uint8_t regs_r(offs_t offset);
 
 	DECLARE_WRITE_LINE_MEMBER(eeprom_cs_in);
 	DECLARE_WRITE_LINE_MEMBER(eeprom_clk_in);

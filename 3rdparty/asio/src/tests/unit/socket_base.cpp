@@ -2,7 +2,7 @@
 // socket_base.cpp
 // ~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -154,6 +154,17 @@ void test()
     (void)static_cast<bool>(linger1.enabled());
     linger1.timeout(1);
     (void)static_cast<int>(linger1.timeout());
+
+    // out_of_band_inline class.
+
+    socket_base::out_of_band_inline out_of_band_inline1(true);
+    sock.set_option(out_of_band_inline1);
+    socket_base::out_of_band_inline out_of_band_inline2;
+    sock.get_option(out_of_band_inline2);
+    out_of_band_inline1 = true;
+    (void)static_cast<bool>(out_of_band_inline1);
+    (void)static_cast<bool>(!out_of_band_inline1);
+    (void)static_cast<bool>(out_of_band_inline1.value());
 
     // enable_connection_aborted class.
 

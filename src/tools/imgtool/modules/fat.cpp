@@ -134,12 +134,16 @@
 
 ****************************************************************************/
 
-#include <ctime>
-#include <cctype>
-#include "imgtool.h"
-#include "formats/imageutl.h"
-#include "unicode.h"
 #include "fat.h"
+
+#include "formats/imageutl.h"
+
+#include "corestr.h"
+#include "unicode.h"
+
+#include <cctype>
+#include <cstdio>
+#include <ctime>
 
 #define FAT_DIRENT_SIZE         32
 #define FAT_SECLEN              512
@@ -364,14 +368,12 @@ static imgtoolerr_t fat_write_sector(imgtool::partition &partition, uint32_t sec
 }
 
 
-#ifdef UNUSED_FUNCTION
-static imgtoolerr_t fat_clear_sector(imgtool::partition &partition, uint32_t sector_index, uint8_t data)
+[[maybe_unused]] static imgtoolerr_t fat_clear_sector(imgtool::partition &partition, uint32_t sector_index, uint8_t data)
 {
 	char buf[FAT_SECLEN];
 	memset(buf, data, sizeof(buf));
 	return fat_write_sector(partition, sector_index, 0, buf, sizeof(buf));
 }
-#endif
 
 
 static imgtoolerr_t fat_partition_open(imgtool::partition &partition, uint64_t first_block, uint64_t block_count)
@@ -1326,11 +1328,11 @@ static imgtoolerr_t fat_read_dirent(imgtool::partition &partition, fat_file *fil
 				lfn_checksum = entry[13];
 			}
 			lfn_lastentry = entry[0] & 0x3F;
-			prepend_lfn_bytes(lfn_buf, ARRAY_LENGTH(lfn_buf),
+			prepend_lfn_bytes(lfn_buf, std::size(lfn_buf),
 				&lfn_len, entry, 28, 2);
-			prepend_lfn_bytes(lfn_buf, ARRAY_LENGTH(lfn_buf),
+			prepend_lfn_bytes(lfn_buf, std::size(lfn_buf),
 				&lfn_len, entry, 14, 6);
-			prepend_lfn_bytes(lfn_buf, ARRAY_LENGTH(lfn_buf),
+			prepend_lfn_bytes(lfn_buf, std::size(lfn_buf),
 				&lfn_len, entry,  1, 5);
 		}
 		else if (freeent && (freeent->position == ~0))
@@ -1372,8 +1374,8 @@ static imgtoolerr_t fat_read_dirent(imgtool::partition &partition, fat_file *fil
 			j = 0;
 			do
 			{
-				i += uchar_from_utf16(&ch, &lfn_buf[i], ARRAY_LENGTH(lfn_buf) - i);
-				j += utf8_from_uchar(&ent.long_filename[j], ARRAY_LENGTH(ent.long_filename) - j, ch);
+				i += uchar_from_utf16(&ch, &lfn_buf[i], std::size(lfn_buf) - i);
+				j += utf8_from_uchar(&ent.long_filename[j], std::size(ent.long_filename) - j, ch);
 			}
 			while(ch != 0);
 		}
@@ -1834,7 +1836,7 @@ static imgtoolerr_t fat_partition_nextenum(imgtool::directory &enumeration, imgt
 		return err;
 
 	/* copy stuff from the FAT dirent to the Imgtool dirent */
-	snprintf(ent.filename, ARRAY_LENGTH(ent.filename), "%s", fatent.long_filename[0]
+	snprintf(ent.filename, std::size(ent.filename), "%s", fatent.long_filename[0]
 		? fatent.long_filename : fatent.short_filename);
 	ent.filesize = fatent.filesize;
 	ent.directory = fatent.directory;

@@ -2,7 +2,7 @@
 // copyright-holders:Kevin Thacker,Sandro Ronco
 /******************************************************************************
 
-    kc.c
+    kc.cpp
     system driver
 
     A big thankyou to Torsten Paul for his great help with this
@@ -11,14 +11,14 @@
 
     Kevin Thacker [MESS driver]
 
- ******************************************************************************/
+******************************************************************************/
 
 /* Core includes */
 #include "emu.h"
 #include "includes/kc.h"
 
 #include "machine/input_merger.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -291,8 +291,8 @@ ROM_START(kc85_5)
 	ROMX_LOAD("caos43e.855", 0x2000, 0x2000, CRC(b66fc6c3) SHA1(521ac2fbded4148220f8af2d5a5ab99634364079), ROM_BIOS(1))
 ROM_END
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY                FULLNAME           wFLAGS
-COMP( 1987, kc85_2, 0,      0,      kc85_3,  kc85,  kc_state,     empty_init, "VEB Mikroelektronik", "HC900 / KC 85/2", MACHINE_NOT_WORKING)
-COMP( 1987, kc85_3, kc85_2, 0,      kc85_3,  kc85,  kc_state,     empty_init, "VEB Mikroelektronik", "KC 85/3",         MACHINE_NOT_WORKING)
-COMP( 1989, kc85_4, kc85_2, 0,      kc85_4,  kc85,  kc85_4_state, empty_init, "VEB Mikroelektronik", "KC 85/4",         MACHINE_NOT_WORKING)
-COMP( 1989, kc85_5, kc85_2, 0,      kc85_5,  kc85,  kc85_4_state, empty_init, "VEB Mikroelektronik", "KC 85/5",         MACHINE_NOT_WORKING)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY, FULLNAME, FLAGS
+COMP( 1987, kc85_2, 0,      0,      kc85_3,  kc85,  kc_state,     empty_init, u8"VEB Mikroelektronik \"Wilhelm Pieck\" Mühlhausen", "HC900 / KC 85/2", MACHINE_NOT_WORKING)
+COMP( 1987, kc85_3, kc85_2, 0,      kc85_3,  kc85,  kc_state,     empty_init, u8"VEB Mikroelektronik \"Wilhelm Pieck\" Mühlhausen", "KC 85/3",         MACHINE_NOT_WORKING)
+COMP( 1989, kc85_4, kc85_2, 0,      kc85_4,  kc85,  kc85_4_state, empty_init, u8"VEB Mikroelektronik \"Wilhelm Pieck\" Mühlhausen", "KC 85/4",         MACHINE_NOT_WORKING)
+COMP( 1989, kc85_5, kc85_2, 0,      kc85_5,  kc85,  kc85_4_state, empty_init, u8"VEB Mikroelektronik \"Wilhelm Pieck\" Mühlhausen", "KC 85/5",         MACHINE_NOT_WORKING)

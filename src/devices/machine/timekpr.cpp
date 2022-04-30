@@ -93,7 +93,7 @@ timekeeper_device::timekeeper_device(const machine_config &mconfig, device_type 
 	, device_nvram_interface(mconfig, *this)
 	, m_reset_cb(*this)
 	, m_irq_cb(*this)
-	, m_default_data(*this, DEVICE_SELF, size)
+	, m_default_data(*this, DEVICE_SELF)
 	, m_size(size)
 {
 }
@@ -268,7 +268,7 @@ void timekeeper_device::counters_from_ram()
 	m_century = counter_from_ram(&m_data[0], m_offset_century);
 }
 
-void timekeeper_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void timekeeper_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	LOGMASKED(LOG_TICKS, "Tick\n");
 	if ((m_seconds & SECONDS_ST) != 0 ||
@@ -457,11 +457,14 @@ void timekeeper_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void timekeeper_device::nvram_read(emu_file &file)
+bool timekeeper_device::nvram_read(util::read_stream &file)
 {
-	file.read(&m_data[0], m_size);
+	size_t actual;
+	if (file.read(&m_data[0], m_size, actual) || actual != m_size)
+		return false;
 
 	counters_to_ram();
+	return true;
 }
 
 
@@ -470,7 +473,8 @@ void timekeeper_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void timekeeper_device::nvram_write(emu_file &file)
+bool timekeeper_device::nvram_write(util::write_stream &file)
 {
-	file.write(&m_data[0], m_size);
+	size_t actual;
+	return !file.write(&m_data[0], m_size, actual) && actual == m_size;
 }

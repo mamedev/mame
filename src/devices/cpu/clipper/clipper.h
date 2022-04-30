@@ -18,8 +18,8 @@
 class clipper_device : public cpu_device
 {
 public:
-	DECLARE_WRITE8_MEMBER(set_ivec) { m_ivec = data; }
-	DECLARE_WRITE16_MEMBER(set_exception);
+	void set_ivec(u8 data) { m_ivec = data; }
+	void set_exception(u16 data);
 
 	// branch conditions (first description for comparison, second for move/logical)
 	enum branch_conditions : u8

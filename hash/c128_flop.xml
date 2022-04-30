@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="c128_flop" description="Commodore 128 diskettes">
 
 	<!-- Games -->
@@ -12,13 +15,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Story Disk Side 1"/>
 			<dataarea name="flop" size="333744">
-				<rom name="a_mind_forever_voyaging_s1[infocom_1985](c128)(!).g64" size="333744" crc="b5fbf19d" sha1="10643b56627ce79f88b2a679b4436f473fe6bc72"/>
+				<rom name="a_mind_forever_voyaging_s1[infocom_1985](c128).g64" size="333744" crc="b5fbf19d" sha1="10643b56627ce79f88b2a679b4436f473fe6bc72"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Story Disk Side 2"/>
 			<dataarea name="flop" size="333744">
-				<rom name="a_mind_forever_voyaging_s2[infocom_1985](c128)(!).g64" size="333744" crc="86df6654" sha1="8e9ad293aed7f077ba22d885f8abc61d98d08e4a"/>
+				<rom name="a_mind_forever_voyaging_s2[infocom_1985](c128).g64" size="333744" crc="86df6654" sha1="8e9ad293aed7f077ba22d885f8abc61d98d08e4a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -31,13 +34,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Story Disk Side 1"/>
 			<dataarea name="flop" size="333744">
-				<rom name="beyond_zork_s1[infocom_1987](c128)(!).g64" size="333744" crc="1ac04818" sha1="3b3e601951f1fd8a4ba2152ce3c8b14393547b21"/>
+				<rom name="beyond_zork_s1[infocom_1987](c128).g64" size="333744" crc="1ac04818" sha1="3b3e601951f1fd8a4ba2152ce3c8b14393547b21"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Story Disk Side 2"/>
 			<dataarea name="flop" size="333744">
-				<rom name="beyond_zork_s2[infocom_1987](c128)(!).g64" size="333744" crc="15b30575" sha1="f2852c8912c9e4742ee62b698fa140158276fa6d"/>
+				<rom name="beyond_zork_s2[infocom_1987](c128).g64" size="333744" crc="15b30575" sha1="f2852c8912c9e4742ee62b698fa140158276fa6d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -69,13 +72,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Story Disk Side 1"/>
 			<dataarea name="flop" size="333744">
-				<rom name="bureaucracy_s1[infocom_1987](r86)(c128)(!).g64" size="333744" crc="203155b4" sha1="896b5aeb2573ca6da3976fd17db4c1785ce460ed"/>
+				<rom name="bureaucracy_s1[infocom_1987](r86)(c128).g64" size="333744" crc="203155b4" sha1="896b5aeb2573ca6da3976fd17db4c1785ce460ed"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Story Disk Side 2"/>
 			<dataarea name="flop" size="333744">
-				<rom name="bureaucracy_s2[infocom_1987](r86)(c128)(!).g64" size="333744" crc="aeae424a" sha1="7e7934cc2d0c040bccf27f515ea55ac7e18d1e22"/>
+				<rom name="bureaucracy_s2[infocom_1987](r86)(c128).g64" size="333744" crc="aeae424a" sha1="7e7934cc2d0c040bccf27f515ea55ac7e18d1e22"/>
 			</dataarea>
 		</part>
 	</software>
@@ -235,7 +238,7 @@
 		<info name="protection" value="none" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
-				<rom name="enhanced_sid_player_128_version[compute!_198x].g64" size="333744" crc="284e224c" sha1="8057964665c16330a3283fdd44205a17075711a0"/>
+				<rom name="enhanced_sid_player_128_version[compute_198x].g64" size="333744" crc="284e224c" sha1="8057964665c16330a3283fdd44205a17075711a0"/>
 			</dataarea>
 		</part>
 	</software>

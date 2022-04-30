@@ -18,8 +18,8 @@ public:
 	static constexpr unsigned MAX_STARS = 250;
 
 	struct star {
-		float x,y;
-		int col,set;
+		float x = 0, y = 0;
+		int col = 0, set = 0;
 	};
 
 	enum
@@ -48,15 +48,15 @@ public:
 		, m_gfx2_region(*this, "gfx2")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(irq_1_ctrl_w);
-	DECLARE_WRITE8_MEMBER(irq_2_ctrl_w);
-	DECLARE_WRITE8_MEMBER(irq_3_ctrl_w);
-	DECLARE_WRITE8_MEMBER(sreset_w);
-	DECLARE_WRITE8_MEMBER(freset_w);
-	DECLARE_WRITE8_MEMBER(customio_3_w);
-	DECLARE_READ8_MEMBER(customio_3_r);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(starfield_control_w);
+	void irq_1_ctrl_w(offs_t offset, uint8_t data);
+	void irq_2_ctrl_w(offs_t offset, uint8_t data);
+	void irq_3_ctrl_w(offs_t offset, uint8_t data);
+	void sreset_w(offs_t offset, uint8_t data);
+	void freset_w(offs_t offset, uint8_t data);
+	void customio_3_w(offs_t offset, uint8_t data);
+	uint8_t customio_3_r(offs_t offset);
+	void videoram_w(offs_t offset, uint8_t data);
+	void starfield_control_w(offs_t offset, uint8_t data);
 
 	void gaplus_palette(palette_device &palette) const;
 
@@ -81,7 +81,7 @@ public:
 	virtual void driver_init() override;
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -104,17 +104,18 @@ protected:
 	required_memory_region m_gfx1_region;
 	required_memory_region m_gfx2_region;
 
-	int m_type;
+	int m_type = 0;
 
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_starfield_control[4];
-	int m_total_stars;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_starfield_control[4]{};
+	int m_total_stars = 0;
+	int m_starfield_framecount = 0;
 	struct star m_stars[MAX_STARS];
-	uint8_t m_main_irq_mask;
-	uint8_t m_sub_irq_mask;
-	uint8_t m_sub2_irq_mask;
-	emu_timer *m_namcoio0_run_timer;
-	emu_timer *m_namcoio1_run_timer;
+	uint8_t m_main_irq_mask = 0;
+	uint8_t m_sub_irq_mask = 0;
+	uint8_t m_sub2_irq_mask = 0;
+	emu_timer *m_namcoio0_run_timer = nullptr;
+	emu_timer *m_namcoio1_run_timer = nullptr;
 };
 
 class gaplusd_state : public gaplus_base_state
@@ -153,8 +154,8 @@ public:
 protected:
 	virtual void machine_start() override;
 
-	DECLARE_WRITE8_MEMBER(out_lamps0);
-	DECLARE_WRITE8_MEMBER(out_lamps1);
+	void out_lamps0(uint8_t data);
+	void out_lamps1(uint8_t data);
 
 	output_finder<2> m_lamps;
 };

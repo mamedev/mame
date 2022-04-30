@@ -28,7 +28,7 @@ Very likely to be 'whatever crystals we had on hand which were close enough for 
 #include "cpu/m68000/m68000.h"
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "video/decospr.h"
 #include "emupal.h"
 #include "screen.h"
@@ -67,10 +67,10 @@ private:
 	required_shared_ptr<u16> m_spriteram;
 
 	/* video-related */
-	tilemap_t   *m_bg_layer;
-	tilemap_t   *m_fg_layer;
-	int         m_tilebank[4];
-	int         m_whichbank;
+	tilemap_t   *m_bg_layer = nullptr;
+	tilemap_t   *m_fg_layer = nullptr;
+	int         m_tilebank[4]{};
+	int         m_whichbank = 0;
 
 	void tilebank_w(u16 data);
 	void tilebank1_w(u16 data);
@@ -148,7 +148,7 @@ TILE_GET_INFO_MEMBER(silvmil_state::get_bg_tile_info)
 	int color = (data >> 12) & 0x0f;
 	int bank = m_tilebank[(data & 0xc00) >> 10] * 0x400;
 
-	SET_TILE_INFO_MEMBER(1, tile + bank, color + 0x20, 0);
+	tileinfo.set(1, tile + bank, color + 0x20, 0);
 }
 
 TILE_GET_INFO_MEMBER(silvmil_state::get_fg_tile_info)
@@ -158,7 +158,7 @@ TILE_GET_INFO_MEMBER(silvmil_state::get_fg_tile_info)
 	int color = (data >> 12) & 0x0f;
 	int bank = m_tilebank[(data & 0xc00) >> 10] * 0x400;
 
-	SET_TILE_INFO_MEMBER(1, tile + bank, color + 0x10, 0);
+	tileinfo.set(1, tile + bank, color + 0x10, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(silvmil_state::scan_rows)

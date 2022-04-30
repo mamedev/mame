@@ -1,5 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Nathan Woods
+/**********************************************************************
+
+    Cassette wave samples sound driver
+
+**********************************************************************/
+
 #ifndef MAME_SOUND_WAVE_H
 #define MAME_SOUND_WAVE_H
 
@@ -30,10 +36,11 @@ protected:
 	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	required_device<cassette_image_device> m_cass;
+	std::vector<s16> m_sample_buf;
 };
 
 DECLARE_DEVICE_TYPE(WAVE, wave_device)

@@ -30,8 +30,8 @@ public:
 	// configuration
 	auto irq_cb() { return m_irq_cb.bind(); }
 
-	DECLARE_WRITE8_MEMBER( sounddma_w );
-	DECLARE_WRITE8_MEMBER( noise_w );
+	void sounddma_w(offs_t offset, uint8_t data);
+	void noise_w(offs_t offset, uint8_t data);
 
 	void sound_decrement();
 	void soundport_w(int which, int offset, int data);
@@ -41,7 +41,7 @@ protected:
 	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	struct NOISE

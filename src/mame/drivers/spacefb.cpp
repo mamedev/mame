@@ -128,12 +128,12 @@
  *************************************/
 
 
-void spacefb_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void spacefb_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch(id)
 	{
 	case TIMER_INTERRUPT:
-		interrupt_callback(ptr, param);
+		interrupt_callback(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in spacefb_state::device_timer");
@@ -188,11 +188,10 @@ void spacefb_state::machine_start()
 
 void spacefb_state::machine_reset()
 {
-	address_space &space = m_maincpu->space(AS_IO);
 	/* the 3 output ports are cleared on reset */
-	port_0_w(space, 0, 0);
-	port_1_w(space, 0, 0);
-	port_2_w(space, 0, 0);
+	port_0_w(0);
+	port_1_w(0);
+	port_2_w(0);
 
 	start_interrupt_timer();
 }

@@ -14,13 +14,13 @@ different compared to Stratos/Turbo King.
 #include "includes/saitek_stratos.h"
 
 #include "cpu/m6502/m65c02.h"
-#include "machine/bankdev.h"
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 // internal artwork
@@ -51,46 +51,37 @@ protected:
 
 private:
 	// devices/pointers
-	required_device<address_map_bank_device> m_rombank;
+	memory_view m_rombank;
 	required_device<sensorboard_device> m_board;
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<8+1> m_inputs;
 
 	void main_map(address_map &map);
-	void rombank_map(address_map &map);
 
 	// I/O handlers
 	void update_leds();
-	DECLARE_WRITE8_MEMBER(leds1_w);
-	DECLARE_WRITE8_MEMBER(leds2_w);
-	DECLARE_WRITE8_MEMBER(select1_w);
-	DECLARE_WRITE8_MEMBER(select2_w);
-	DECLARE_WRITE8_MEMBER(control1_w);
-	DECLARE_WRITE8_MEMBER(control2_w);
-	DECLARE_READ8_MEMBER(control1_r);
-	DECLARE_READ8_MEMBER(control2_r);
-	DECLARE_READ8_MEMBER(chessboard_r);
-	DECLARE_WRITE8_MEMBER(lcd_reset_w);
+	void leds1_w(u8 data);
+	void leds2_w(u8 data);
+	void select1_w(u8 data);
+	void select2_w(u8 data);
+	void control1_w(u8 data);
+	void control2_w(u8 data);
+	u8 control1_r();
+	u8 control2_r();
+	u8 chessboard_r();
+	void lcd_reset_w(u8 data);
 
-	u8 m_control1;
-	u8 m_control2;
-	u8 m_select1;
-	u8 m_select2;
-	u8 m_led_data1;
-	u8 m_led_data2;
+	u8 m_control1 = 0;
+	u8 m_control2 = 0;
+	u8 m_select1 = 0;
+	u8 m_select2 = 0;
+	u8 m_led_data1 = 0;
+	u8 m_led_data2 = 0;
 };
 
 void corona_state::machine_start()
 {
 	saitek_stratos_state::machine_start();
-
-	// zerofill
-	m_control1 = 0;
-	m_control2 = 0;
-	m_select1 = 0;
-	m_select2 = 0;
-	m_led_data1 = 0;
-	m_led_data2 = 0;
 
 	// register for savestates
 	save_item(NAME(m_control1));
@@ -105,7 +96,8 @@ void corona_state::machine_reset()
 {
 	saitek_stratos_state::machine_reset();
 
-	m_rombank->set_bank(0);
+	m_control2 = 0;
+	m_rombank.select(0);
 }
 
 
@@ -119,28 +111,28 @@ void corona_state::machine_reset()
 void corona_state::update_leds()
 {
 	// button leds
-	m_display->matrix_partial(0, 2, 1 << (m_control1 >> 5 & 1), (~m_led_data1 & 0xff), false);
+	m_display->matrix_partial(0, 2, 1 << (m_control1 >> 5 & 1), ~m_led_data1 & 0xff);
 	m_display->write_row(2, ~m_select1 >> 4 & 0xf);
 
 	// chessboard leds
 	m_display->matrix_partial(3, 8, 1 << (m_select1 & 0xf), m_led_data2);
 }
 
-WRITE8_MEMBER(corona_state::leds1_w)
+void corona_state::leds1_w(u8 data)
 {
 	// d0-d7: button led data
 	m_led_data1 = data;
 	update_leds();
 }
 
-WRITE8_MEMBER(corona_state::leds2_w)
+void corona_state::leds2_w(u8 data)
 {
 	// d0-d7: chessboard led data
 	m_led_data2 = data;
 	update_leds();
 }
 
-WRITE8_MEMBER(corona_state::select1_w)
+void corona_state::select1_w(u8 data)
 {
 	// d0-d3: chessboard led select
 	// d4-d7: black/white leds
@@ -148,14 +140,14 @@ WRITE8_MEMBER(corona_state::select1_w)
 	update_leds();
 }
 
-WRITE8_MEMBER(corona_state::select2_w)
+void corona_state::select2_w(u8 data)
 {
 	// d0-d3: input mux
 	// d4-d7: lcd data
 	m_select2 = data;
 }
 
-WRITE8_MEMBER(corona_state::control1_w)
+void corona_state::control1_w(u8 data)
 {
 	// d5: button led select
 	m_control1 = data;
@@ -165,10 +157,10 @@ WRITE8_MEMBER(corona_state::control1_w)
 	m_dac->write(data >> 6 & 1);
 }
 
-WRITE8_MEMBER(corona_state::control2_w)
+void corona_state::control2_w(u8 data)
 {
 	// d0,d1: rombank
-	m_rombank->set_bank(data & 3);
+	m_rombank.select(data & 3);
 
 	// d2 rising edge: write to lcd
 	if (~m_control2 & data & 4)
@@ -181,7 +173,7 @@ WRITE8_MEMBER(corona_state::control2_w)
 	m_control2 = data;
 }
 
-READ8_MEMBER(corona_state::control1_r)
+u8 corona_state::control1_r()
 {
 	u8 data = 0;
 
@@ -192,12 +184,12 @@ READ8_MEMBER(corona_state::control1_r)
 	// d6: FREQ. SEL related?
 
 	// d7: battery low
-	data |= m_inputs[8]->read();
+	data |= m_inputs[8]->read() << 7;
 
 	return data;
 }
 
-READ8_MEMBER(corona_state::control2_r)
+u8 corona_state::control2_r()
 {
 	u8 data = 0;
 	u8 sel = m_select2 & 0xf;
@@ -209,13 +201,13 @@ READ8_MEMBER(corona_state::control2_r)
 	return data;
 }
 
-READ8_MEMBER(corona_state::chessboard_r)
+u8 corona_state::chessboard_r()
 {
 	// d0-d7: chessboard sensors
 	return ~m_board->read_file(m_select2 & 0xf);
 }
 
-WRITE8_MEMBER(corona_state::lcd_reset_w)
+void corona_state::lcd_reset_w(u8 data)
 {
 	// reset lcd?
 	m_lcd_ready = true;
@@ -238,14 +230,12 @@ void corona_state::main_map(address_map &map)
 	map(0x6200, 0x6200).w(FUNC(corona_state::lcd_reset_w));
 	map(0x6400, 0x6400).w(FUNC(corona_state::leds2_w));
 	map(0x6600, 0x6600).rw(FUNC(corona_state::control2_r), FUNC(corona_state::control2_w));
-	map(0x8000, 0xffff).m(m_rombank, FUNC(address_map_bank_device::amap8));
-}
 
-void corona_state::rombank_map(address_map &map)
-{
-	map.unmap_value_high();
-	map(0x00000, 0x0ffff).rom().region("maincpu", 0);
-	map(0x10000, 0x17fff).r(m_extrom, FUNC(generic_slot_device::read_rom));
+	map(0x8000, 0xffff).view(m_rombank);
+	m_rombank[0](0x8000, 0xffff).rom().region("maincpu", 0x0000);
+	m_rombank[1](0x8000, 0xffff).rom().region("maincpu", 0x8000);
+	m_rombank[2](0x8000, 0xffff).r("extrom", FUNC(generic_slot_device::read_rom));
+	m_rombank[3](0x8000, 0xffff).lr8(NAME([]() { return 0xff; }));
 }
 
 
@@ -274,13 +264,12 @@ void corona_state::corona(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &corona_state::main_map);
 	m_maincpu->set_periodic_int(FUNC(corona_state::irq0_line_hold), attotime::from_hz(183));
 
-	ADDRESS_MAP_BANK(config, "rombank").set_map(&corona_state::rombank_map).set_options(ENDIANNESS_LITTLE, 8, 17, 0x8000);
-
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(200));
+	m_board->set_nvram_enable(true);
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(3+8, 8);
@@ -289,13 +278,10 @@ void corona_state::corona(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* extension rom */
-	GENERIC_CARTSLOT(config, m_extrom, generic_plain_slot, "saitek_egr", "bin");
-	m_extrom->set_device_load(FUNC(corona_state::extrom_load));
-
-	SOFTWARE_LIST(config, "cart_list").set_original("saitek_egr");
+	GENERIC_SOCKET(config, "extrom", generic_plain_slot, "saitek_egr");
+	SOFTWARE_LIST(config, "cart_list").set_original("saitek_egr").set_filter("egr2");
 }
 
 

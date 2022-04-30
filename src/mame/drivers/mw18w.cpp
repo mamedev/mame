@@ -38,11 +38,11 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(mw18w_sensors_r);
 
 private:
-	DECLARE_WRITE8_MEMBER(mw18w_sound0_w);
-	DECLARE_WRITE8_MEMBER(mw18w_sound1_w);
-	DECLARE_WRITE8_MEMBER(mw18w_lamps_w);
-	DECLARE_WRITE8_MEMBER(mw18w_led_display_w);
-	DECLARE_WRITE8_MEMBER(mw18w_irq0_clear_w);
+	void mw18w_sound0_w(uint8_t data);
+	void mw18w_sound1_w(uint8_t data);
+	void mw18w_lamps_w(uint8_t data);
+	void mw18w_led_display_w(uint8_t data);
+	void mw18w_irq0_clear_w(uint8_t data);
 	void mw18w_map(address_map &map);
 	void mw18w_portmap(address_map &map);
 
@@ -59,7 +59,7 @@ private:
 
 ***************************************************************************/
 
-WRITE8_MEMBER(mw18w_state::mw18w_sound0_w)
+void mw18w_state::mw18w_sound0_w(uint8_t data)
 {
 	// d0: coin counter
 	// d1: "summer"
@@ -71,7 +71,7 @@ WRITE8_MEMBER(mw18w_state::mw18w_sound0_w)
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
 
-WRITE8_MEMBER(mw18w_state::mw18w_sound1_w)
+void mw18w_state::mw18w_sound1_w(uint8_t data)
 {
 	// d0-d5: engine sound
 	// d6: bell sound
@@ -80,7 +80,7 @@ WRITE8_MEMBER(mw18w_state::mw18w_sound1_w)
 	m_lamps[80] = BIT(data, 7);
 }
 
-WRITE8_MEMBER(mw18w_state::mw18w_lamps_w)
+void mw18w_state::mw18w_lamps_w(uint8_t data)
 {
 	// d0-3, d7: selected rows
 	int rows = (data & 0xf) | (data >> 3 & 0x10);
@@ -147,7 +147,7 @@ WRITE8_MEMBER(mw18w_state::mw18w_lamps_w)
 	*/
 }
 
-WRITE8_MEMBER(mw18w_state::mw18w_led_display_w)
+void mw18w_state::mw18w_led_display_w(uint8_t data)
 {
 	// d0-3: 7448 (BCD to LED segment)
 	const uint8_t _7448_map[16] =
@@ -158,7 +158,7 @@ WRITE8_MEMBER(mw18w_state::mw18w_led_display_w)
 	m_digits[data >> 4] = _7448_map[data & 0xf];
 }
 
-WRITE8_MEMBER(mw18w_state::mw18w_irq0_clear_w)
+void mw18w_state::mw18w_irq0_clear_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }

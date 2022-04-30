@@ -12,6 +12,7 @@
 #include "hp9845_io.h"
 #include "98032.h"
 #include "98035.h"
+#include "98036.h"
 #include "98034.h"
 #include "98046.h"
 
@@ -36,6 +37,7 @@ hp9845_io_slot_device::hp9845_io_slot_device(const machine_config &mconfig, cons
 	option_add("98032_gpio" , HP98032_IO_CARD);
 	option_add("98034_hpib" , HP98034_IO_CARD);
 	option_add("98035_rtc" , HP98035_IO_CARD);
+	option_add("98036" , HP98036_IO_CARD);
 	option_add("98046" , HP98046_IO_CARD);
 	set_default_option(nullptr);
 	set_fixed(false);
@@ -97,13 +99,13 @@ WRITE_LINE_MEMBER(hp9845_io_slot_device::dmar_w)
 	m_dmar_cb_func(state);
 }
 
-int hp9845_io_slot_device::get_rw_handlers(read16_delegate& rhandler , write16_delegate& whandler)
+int hp9845_io_slot_device::get_rw_handlers(read16m_delegate& rhandler , write16m_delegate& whandler)
 {
 	device_hp9845_io_interface *card = get_card_device();
 
 	if (card) {
-		rhandler = read16_delegate(*card, FUNC(device_hp9845_io_interface::reg_r));
-		whandler = write16_delegate(*card, FUNC(device_hp9845_io_interface::reg_w));
+		rhandler = read16m_delegate(*card, FUNC(device_hp9845_io_interface::reg_r));
+		whandler = write16m_delegate(*card, FUNC(device_hp9845_io_interface::reg_w));
 		return card->get_sc();
 	} else {
 		return -1;

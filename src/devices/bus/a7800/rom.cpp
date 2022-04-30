@@ -208,7 +208,7 @@ void a78_rom_act_device::device_reset()
 
  -------------------------------------------------*/
 
-READ8_MEMBER(a78_rom_device::read_40xx)
+uint8_t a78_rom_device::read_40xx(offs_t offset)
 {
 	if (offset + 0x4000 < m_base_rom)
 		return 0xff;
@@ -226,7 +226,7 @@ READ8_MEMBER(a78_rom_device::read_40xx)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(a78_rom_pokey_device::read_40xx)
+uint8_t a78_rom_pokey_device::read_40xx(offs_t offset)
 {
 	if (offset < 0x4000)
 		return m_pokey->read(offset & 0x0f);
@@ -237,7 +237,7 @@ READ8_MEMBER(a78_rom_pokey_device::read_40xx)
 		return m_rom[offset + 0x4000 - m_base_rom];
 }
 
-WRITE8_MEMBER(a78_rom_pokey_device::write_40xx)
+void a78_rom_pokey_device::write_40xx(offs_t offset, uint8_t data)
 {
 	if (offset < 0x4000)
 		m_pokey->write(offset & 0x0f, data);
@@ -264,7 +264,7 @@ void a78_rom_pokey_device::device_add_mconfig(machine_config &config)
  -------------------------------------------------*/
 
 
-READ8_MEMBER(a78_rom_mram_device::read_40xx)
+uint8_t a78_rom_mram_device::read_40xx(offs_t offset)
 {
 	if (offset < 0x4000)
 		return m_ram[offset & 0xfeff];
@@ -274,7 +274,7 @@ READ8_MEMBER(a78_rom_mram_device::read_40xx)
 		return m_rom[offset + 0x4000 - m_base_rom];
 }
 
-WRITE8_MEMBER(a78_rom_mram_device::write_40xx)
+void a78_rom_mram_device::write_40xx(offs_t offset, uint8_t data)
 {
 	if (offset < 0x4000)
 		m_ram[offset&0xfeff] = data;
@@ -298,7 +298,7 @@ WRITE8_MEMBER(a78_rom_mram_device::write_40xx)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(a78_rom_sg_device::read_40xx)
+uint8_t a78_rom_sg_device::read_40xx(offs_t offset)
 {
 	if (offset < 0x4000)
 		return m_rom[(offset & 0x3fff) + ((m_bank_mask - 1) * 0x4000)]; // second to last bank (is this always ok?!?)
@@ -308,7 +308,7 @@ READ8_MEMBER(a78_rom_sg_device::read_40xx)
 		return m_rom[(offset & 0x3fff) + (m_bank_mask * 0x4000)];   // last bank
 }
 
-WRITE8_MEMBER(a78_rom_sg_device::write_40xx)
+void a78_rom_sg_device::write_40xx(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x4000 && offset < 0x8000)
 		m_bank = data & m_bank_mask;
@@ -324,7 +324,7 @@ WRITE8_MEMBER(a78_rom_sg_device::write_40xx)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(a78_rom_sg_pokey_device::read_40xx)
+uint8_t a78_rom_sg_pokey_device::read_40xx(offs_t offset)
 {
 	if (offset < 0x4000)
 		return m_pokey->read(offset & 0x0f);
@@ -334,7 +334,7 @@ READ8_MEMBER(a78_rom_sg_pokey_device::read_40xx)
 		return m_rom[(offset & 0x3fff) + (m_bank_mask * 0x4000)];   // last bank
 }
 
-WRITE8_MEMBER(a78_rom_sg_pokey_device::write_40xx)
+void a78_rom_sg_pokey_device::write_40xx(offs_t offset, uint8_t data)
 {
 	if (offset < 0x4000)
 		m_pokey->write(offset & 0x0f, data);
@@ -361,7 +361,7 @@ void a78_rom_sg_pokey_device::device_add_mconfig(machine_config &config)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(a78_rom_sg_ram_device::read_40xx)
+uint8_t a78_rom_sg_ram_device::read_40xx(offs_t offset)
 {
 	if (offset < 0x4000)
 		return m_ram[offset];
@@ -371,7 +371,7 @@ READ8_MEMBER(a78_rom_sg_ram_device::read_40xx)
 		return m_rom[(offset & 0x3fff) + (m_bank_mask * 0x4000)];   // last bank
 }
 
-WRITE8_MEMBER(a78_rom_sg_ram_device::write_40xx)
+void a78_rom_sg_ram_device::write_40xx(offs_t offset, uint8_t data)
 {
 	if (offset < 0x4000)
 		m_ram[offset] = data;
@@ -392,7 +392,7 @@ WRITE8_MEMBER(a78_rom_sg_ram_device::write_40xx)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(a78_rom_sg9_device::read_40xx)
+uint8_t a78_rom_sg9_device::read_40xx(offs_t offset)
 {
 	if (offset < 0x4000)
 		return m_rom[(offset & 0x3fff)];
@@ -402,7 +402,7 @@ READ8_MEMBER(a78_rom_sg9_device::read_40xx)
 		return m_rom[(offset & 0x3fff) + ((m_bank_mask + 1) * 0x4000)]; // last bank
 }
 
-WRITE8_MEMBER(a78_rom_sg9_device::write_40xx)
+void a78_rom_sg9_device::write_40xx(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x4000 && offset < 0x8000)
 		m_bank = (data & m_bank_mask) + 1;
@@ -419,7 +419,7 @@ WRITE8_MEMBER(a78_rom_sg9_device::write_40xx)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(a78_rom_abs_device::read_40xx)
+uint8_t a78_rom_abs_device::read_40xx(offs_t offset)
 {
 	if (offset < 0x4000)
 		return m_rom[(offset & 0x3fff) + (m_bank * 0x4000)];
@@ -430,7 +430,7 @@ READ8_MEMBER(a78_rom_abs_device::read_40xx)
 	}
 }
 
-WRITE8_MEMBER(a78_rom_abs_device::write_40xx)
+void a78_rom_abs_device::write_40xx(offs_t offset, uint8_t data)
 {
 	if (offset == 0x4000)
 	{
@@ -457,7 +457,7 @@ WRITE8_MEMBER(a78_rom_abs_device::write_40xx)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(a78_rom_act_device::read_40xx)
+uint8_t a78_rom_act_device::read_40xx(offs_t offset)
 {
 	uint8_t data = 0xff;
 	uint16_t addr = offset & 0x1fff;
@@ -488,7 +488,7 @@ READ8_MEMBER(a78_rom_act_device::read_40xx)
 	return data;
 }
 
-WRITE8_MEMBER(a78_rom_act_device::write_40xx)
+void a78_rom_act_device::write_40xx(offs_t offset, uint8_t data)
 {
 	if (offset >= 0xbf80 && offset <= 0xbf8f)
 		m_bank = offset & 7;

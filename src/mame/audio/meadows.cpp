@@ -37,9 +37,9 @@ SAMPLES_START_CB_MEMBER(meadows_state::meadows_sh_start)
 	m_latched_0c01 = m_latched_0c02 = m_latched_0c03 = 0;
 
 	m_samples->set_volume(0,0);
-	m_samples->start_raw(0,waveform,ARRAY_LENGTH(waveform),m_freq1,true);
+	m_samples->start_raw(0,waveform,std::size(waveform),m_freq1,true);
 	m_samples->set_volume(1,0);
-	m_samples->start_raw(1,waveform,ARRAY_LENGTH(waveform),m_freq2,true);
+	m_samples->start_raw(1,waveform,std::size(waveform),m_freq2,true);
 }
 
 /************************************/

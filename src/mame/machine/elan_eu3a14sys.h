@@ -11,11 +11,11 @@ class elan_eu3a14sys_device : public elan_eu3a05commonsys_device, public device_
 public:
 	elan_eu3a14sys_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(dma_trigger_r);
-	DECLARE_WRITE8_MEMBER(dma_trigger_w);
+	uint8_t dma_trigger_r();
+	void dma_trigger_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(dma_param_r);
-	DECLARE_WRITE8_MEMBER(dma_param_w);
+	uint8_t dma_param_r(offs_t offset);
+	void dma_param_w(offs_t offset, uint8_t data);
 
 	virtual void map(address_map& map) override;
 

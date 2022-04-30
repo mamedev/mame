@@ -16,18 +16,12 @@ public:
 	exidy440_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~exidy440_sound_device() {}
 
-	DECLARE_READ8_MEMBER(sound_command_r);
-	DECLARE_READ8_MEMBER(sound_volume_r);
-	DECLARE_WRITE8_MEMBER(sound_volume_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_interrupt_w);
-	DECLARE_WRITE8_MEMBER(sound_interrupt_clear_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_reset_w);
-	DECLARE_READ8_MEMBER(m6844_r);
-	DECLARE_WRITE8_MEMBER(m6844_w);
-	DECLARE_WRITE8_MEMBER(sound_banks_w);
-
 	void exidy440_sound_command(uint8_t param);
 	uint8_t exidy440_sound_command_ack();
+
+	DECLARE_WRITE_LINE_MEMBER(sound_interrupt_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_reset_w);
+
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -35,7 +29,7 @@ protected:
 	virtual void device_stop() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	void exidy440_audio_map(address_map &map);
@@ -64,12 +58,11 @@ private:
 	/* sound_cache_entry structure contains info on each decoded sample */
 	struct sound_cache_entry
 	{
-		struct sound_cache_entry *next;
 		int address;
 		int length;
 		int bits;
 		int frequency;
-		int16_t data[1];
+		std::vector<int16_t> data;
 	};
 
 	required_device<cpu_device> m_audiocpu;
@@ -82,11 +75,9 @@ private:
 	uint8_t m_sound_banks[4];
 	//uint8_t m_m6844_data[0x20];
 	uint8_t m_sound_volume[0x10];
-	std::unique_ptr<int32_t[]> m_mixer_buffer_left;
-	std::unique_ptr<int32_t[]> m_mixer_buffer_right;
-	sound_cache_entry *m_sound_cache;
-	sound_cache_entry *m_sound_cache_end;
-	sound_cache_entry *m_sound_cache_max;
+	std::vector<int32_t> m_mixer_buffer_left;
+	std::vector<int32_t> m_mixer_buffer_right;
+	std::list<sound_cache_entry> m_sound_cache;
 
 	/* 6844 description */
 	m6844_channel_data m_m6844_channel[4];
@@ -109,15 +100,22 @@ private:
 	void play_cvsd(int ch);
 	void stop_cvsd(int ch);
 
-	void reset_sound_cache();
 	int16_t *add_to_sound_cache(uint8_t *input, int address, int length, int bits, int frequency);
 	int16_t *find_or_add_to_sound_cache(int address, int length, int bits, int frequency);
 
-	void decode_and_filter_cvsd(uint8_t *data, int bytes, int maskbits, int frequency, int16_t *dest);
+	void decode_and_filter_cvsd(uint8_t *data, int bytes, int maskbits, int frequency, std::vector<int16_t> &output);
 	void fir_filter(int32_t *input, int16_t *output, int count);
 
 	void add_and_scale_samples(int ch, int32_t *dest, int samples, int volume);
-	void mix_to_16(int length, stream_sample_t *dest_left, stream_sample_t *dest_right);
+	void mix_to_16(write_stream_view &dest_left, write_stream_view &dest_right);
+
+	uint8_t sound_command_r();
+	uint8_t sound_volume_r(offs_t offset);
+	void sound_volume_w(offs_t offset, uint8_t data);
+	void sound_interrupt_clear_w(uint8_t data);
+	uint8_t m6844_r(offs_t offset);
+	void m6844_w(offs_t offset, uint8_t data);
+	void sound_banks_w(offs_t offset, uint8_t data);
 };
 
 DECLARE_DEVICE_TYPE(EXIDY440, exidy440_sound_device)

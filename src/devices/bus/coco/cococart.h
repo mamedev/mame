@@ -13,7 +13,7 @@
 
 #pragma once
 
-#include "softlist_dev.h"
+#include "imagedev/cartrom.h"
 
 
 /***************************************************************************
@@ -23,7 +23,7 @@
 // ======================> cococart_base_update_delegate
 
 // direct region update handler
-typedef delegate<void (uint8_t *)> cococart_base_update_delegate;
+typedef delegate<void (u8 *)> cococart_base_update_delegate;
 
 
 // ======================> cococart_slot_device
@@ -31,7 +31,7 @@ class device_cococart_interface;
 
 class cococart_slot_device final : public device_t,
 								public device_single_card_slot_interface<device_cococart_interface>,
-								public device_image_interface
+								public device_cartrom_image_interface
 {
 public:
 	// output lines on the CoCo cartridge slot
@@ -53,7 +53,7 @@ public:
 
 	// construction/destruction
 	template <typename T>
-	cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
+	cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&opts, const char *dflt)
 		: cococart_slot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
@@ -61,7 +61,7 @@ public:
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	auto cart_callback() { return m_cart_callback.bind(); }
 	auto nmi_callback() { return m_nmi_callback.bind(); }
@@ -69,18 +69,11 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
-
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return false; }
-	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "coco_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "ccc,rom"; }
@@ -89,12 +82,12 @@ public:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing to $C000-$FFEF
-	DECLARE_READ8_MEMBER(cts_read);
-	DECLARE_WRITE8_MEMBER(cts_write);
+	u8 cts_read(offs_t offset);
+	void cts_write(offs_t offset, u8 data);
 
 	// reading and writing to $FF40-$FF5F
-	DECLARE_READ8_MEMBER(scs_read);
-	DECLARE_WRITE8_MEMBER(scs_write);
+	u8 scs_read(offs_t offset);
+	void scs_write(offs_t offset, u8 data);
 
 	// manipulation of cartridge lines
 	void set_line_value(line line, line_value value);
@@ -105,8 +98,8 @@ public:
 	void twiddle_q_lines();
 
 	// cart base
-	uint8_t *get_cart_base();
-	virtual uint32_t get_cart_size();
+	u8 *get_cart_base();
+	u32 get_cart_size();
 	void set_cart_base_update(cococart_base_update_delegate update);
 
 private:
@@ -129,7 +122,7 @@ private:
 	coco_cartridge_line         m_nmi_line;
 	coco_cartridge_line         m_halt_line;
 public:
-	devcb_write_line        m_cart_callback;
+	devcb_write_line            m_cart_callback;
 	devcb_write_line            m_nmi_callback;
 	devcb_write_line            m_halt_callback;
 private:
@@ -137,9 +130,10 @@ private:
 	device_cococart_interface   *m_cart;
 
 	// methods
-	void set_line(const char *line_name, coco_cartridge_line &line, line_value value);
+	void set_line(line ln, coco_cartridge_line &line, line_value value);
 	void set_line_timer(coco_cartridge_line &line, line_value value);
 	void twiddle_line_if_q(coco_cartridge_line &line);
+public:
 	static const char *line_value_string(line_value value);
 };
 
@@ -165,16 +159,16 @@ public:
 	// construction/destruction
 	virtual ~device_cococart_interface();
 
-	virtual DECLARE_READ8_MEMBER(cts_read);
-	virtual DECLARE_WRITE8_MEMBER(cts_write);
-	virtual DECLARE_READ8_MEMBER(scs_read);
-	virtual DECLARE_WRITE8_MEMBER(scs_write);
+	virtual u8 cts_read(offs_t offset);
+	virtual void cts_write(offs_t offset, u8 data);
+	virtual u8 scs_read(offs_t offset);
+	virtual void scs_write(offs_t offset, u8 data);
 	virtual void set_sound_enable(bool sound_enable);
 
-	virtual uint8_t* get_cart_base();
-	virtual uint32_t get_cart_size();
+	virtual u8 *get_cart_base();
+	virtual u32 get_cart_size();
 	void set_cart_base_update(cococart_base_update_delegate update);
-	virtual memory_region* get_cart_memregion();
+	virtual memory_region *get_cart_memregion();
 
 protected:
 	virtual void interface_config_complete() override;
@@ -224,5 +218,14 @@ private:
 	cococart_slot_device *           m_owning_slot;
 	device_cococart_host_interface * m_host;
 };
+
+// methods for configuring CoCo slot devices (the expansion cart
+// itself, as well as slots on the Multi-Pak)
+void coco_cart_add_basic_devices(device_slot_interface &device);
+void coco_cart_add_fdcs(device_slot_interface &device);
+void coco_cart_add_multi_pak(device_slot_interface &device);
+void dragon_cart_add_basic_devices(device_slot_interface &device);
+void dragon_cart_add_fdcs(device_slot_interface &device);
+void dragon_cart_add_multi_pak(device_slot_interface &device);
 
 #endif // MAME_BUS_COCO_COCOCART_H

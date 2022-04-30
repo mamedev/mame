@@ -76,9 +76,14 @@
 typedef delegate<void ()> driver_callback_delegate;
 
 
-// ======================> driver_device
-
-// base class for machine driver-specific devices
+/// \brief Base class for system device classes
+///
+/// System devices can be used as the root device of a system.
+/// Indirection for metadata, input port definitons, initialisation
+/// functions, ROM definitions, internal artwork and emulation status
+/// flags is provided via the #game_driver structure.  This allows
+/// multiple systems to be be implemented using a single
+/// system device class.
 class driver_device : public device_t
 {
 public:
@@ -87,7 +92,7 @@ public:
 	virtual ~driver_device();
 
 	// getters
-	const game_driver &system() const { assert(m_system != nullptr); return *m_system; }
+	const game_driver &system() const { return m_system; }
 
 	// indexes into our generic callbacks
 	enum callback_type
@@ -100,14 +105,13 @@ public:
 	};
 
 	// inline configuration helpers
-	void set_game_driver(const game_driver &game);
 	static void static_set_callback(device_t &device, callback_type type, driver_callback_delegate callback);
 
-	// dummy driver_init callback
+	/// \brief Empty system initialisation function
+	///
+	/// Provided as a convenience for systems that have no additional
+	/// initialisation tasks.
 	void empty_init();
-
-	// memory helpers
-	address_space &generic_space() const { return machine().dummy_space(); }
 
 	// output heler
 	output_manager &output() const { return machine().output(); }
@@ -138,6 +142,8 @@ public:
 
 	void irq7_line_hold(device_t &device);
 	void irq7_line_assert(device_t &device);
+
+	virtual std::vector<std::string> searchpath() const override;
 
 	virtual void driver_init();
 
@@ -174,7 +180,8 @@ private:
 	void updateflip();
 
 	// internal state
-	const game_driver        *m_system;               // pointer to the game driver
+	const game_driver        &m_system;               // reference to the system description
+	std::vector<std::string>  m_searchpath;           // media search path following parent/clone links
 	driver_callback_delegate  m_callbacks[CB_COUNT];  // start/reset callbacks
 
 	// generic video

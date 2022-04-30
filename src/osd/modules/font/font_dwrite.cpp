@@ -9,7 +9,7 @@
 #include "modules/osdmodule.h"
 #include "modules/lib/osdlib.h"
 
-#if defined(OSD_WINDOWS) || defined(OSD_UWP)
+#if defined(OSD_WINDOWS)
 
 #include <windows.h>
 
@@ -146,7 +146,7 @@ HRESULT SaveBitmap2(bitmap_argb32 &bitmap, const WCHAR *filename)
 		uint32_t* pRow = pBitmap.get() + (y * bitmap.width());
 		for (int x = 0; x < bitmap.width(); x++)
 		{
-			uint32_t pixel = bitmap.pix32(y, x);
+			uint32_t pixel = bitmap.pix(y, x);
 			pRow[x] = (pixel == 0xFFFFFFFF) ? rgb_t(0xFF, 0x00, 0x00, 0x00) : rgb_t(0xFF, 0xFF, 0xFF, 0xFF);
 		}
 	}
@@ -353,11 +353,7 @@ public:
 		// accept qualifiers from the name
 		std::string name(_name);
 		if (name.compare("default") == 0)
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-			name = "Tahoma";
-#else
 			name = "Segoe UI";
-#endif
 		bool bold = (strreplace(name, "[B]", "") + strreplace(name, "[b]", "") > 0);
 		bool italic = (strreplace(name, "[I]", "") + strreplace(name, "[i]", "") > 0);
 
@@ -570,7 +566,7 @@ public:
 			// copy the bits into it
 			for (int y = 0; y < bitmap.height(); y++)
 			{
-				uint32_t *dstrow = &bitmap.pix32(y);
+				uint32_t *dstrow = &bitmap.pix(y);
 				uint8_t *srcrow = &pixels[(y + actbounds.min_y) * bmwidth];
 				for (int x = 0; x < bitmap.width(); x++)
 				{

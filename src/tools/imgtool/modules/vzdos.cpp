@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Dirk Best
 /****************************************************************************
 
@@ -8,14 +8,20 @@
 
 ****************************************************************************/
 
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
-#include <cmath>
 #include "imgtool.h"
-#include "formats/imageutl.h"
-#include "formats/vt_dsk.h"
+#include "filter.h"
 #include "iflopimg.h"
+
+#include "formats/vt_dsk_legacy.h"
+
+#include "formats/imageutl.h"
+#include "corestr.h"
+#include "opresolv.h"
+
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 /*
 
@@ -51,6 +57,14 @@ struct vzdos_dirent
 	uint8_t start_sector;
 	uint16_t start_address;
 	uint16_t end_address;
+
+	vzdos_dirent()
+	{
+	   ftype = delimitor = '\0';
+	   fname[0] = '\0';
+	   start_track = start_sector = 0;
+	   start_address = end_address = 0;
+	}
 };
 
 struct vz_iterator
@@ -445,7 +459,7 @@ static imgtoolerr_t vzdos_diskimage_nextenum(imgtool::directory &enumeration, im
 		default:   type = "Unknown";
 		}
 
-		snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "%s", type);
+		snprintf(ent.attr, std::size(ent.attr), "%s", type);
 
 		iter->index++;
 	}

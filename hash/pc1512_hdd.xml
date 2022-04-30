@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
 <softwarelist name="pc1512_hdd" description="Amstrad PC1512 hard disks">
 
 	<software name="hd20">

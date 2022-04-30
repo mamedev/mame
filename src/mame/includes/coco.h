@@ -8,11 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_INCLUDES_COCO_H
 #define MAME_INCLUDES_COCO_H
 
+#pragma once
 
 #include "imagedev/cassette.h"
 #include "bus/rs232/rs232.h"
@@ -24,7 +23,7 @@
 #include "machine/bankdev.h"
 #include "sound/dac.h"
 #include "screen.h"
-
+#include "machine/input_merger.h"
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -34,6 +33,7 @@ INPUT_PORTS_EXTERN( coco_analog_control );
 INPUT_PORTS_EXTERN( coco_joystick );
 INPUT_PORTS_EXTERN( coco_rtc );
 INPUT_PORTS_EXTERN( coco_beckerport );
+INPUT_PORTS_EXTERN( coco_beckerport_dw );
 
 void coco_cart(device_slot_interface &device);
 
@@ -90,35 +90,28 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(joystick_mode_changed);
 
 	// IO
-	virtual DECLARE_READ8_MEMBER( ff00_read );
-	virtual DECLARE_WRITE8_MEMBER( ff00_write );
-	virtual DECLARE_READ8_MEMBER( ff20_read );
-	virtual DECLARE_WRITE8_MEMBER( ff20_write );
-	virtual DECLARE_READ8_MEMBER( ff40_read );
-	virtual DECLARE_WRITE8_MEMBER( ff40_write );
-	DECLARE_READ8_MEMBER( ff60_read );
-	DECLARE_WRITE8_MEMBER( ff60_write );
+	virtual void ff20_write(offs_t offset, uint8_t data);
+	virtual uint8_t ff40_read(offs_t offset);
+	virtual void ff40_write(offs_t offset, uint8_t data);
+	uint8_t ff60_read(offs_t offset);
+	void ff60_write(offs_t offset, uint8_t data);
 
 	// PIA0
-	DECLARE_WRITE8_MEMBER( pia0_pa_w );
-	DECLARE_WRITE8_MEMBER( pia0_pb_w );
+	void pia0_pa_w(uint8_t data);
+	void pia0_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( pia0_ca2_w );
 	DECLARE_WRITE_LINE_MEMBER( pia0_cb2_w );
-	DECLARE_WRITE_LINE_MEMBER( pia0_irq_a );
-	DECLARE_WRITE_LINE_MEMBER( pia0_irq_b );
 
 	// PIA1
-	DECLARE_READ8_MEMBER( pia1_pa_r );
-	DECLARE_READ8_MEMBER( pia1_pb_r );
-	DECLARE_WRITE8_MEMBER( pia1_pa_w );
-	DECLARE_WRITE8_MEMBER( pia1_pb_w );
+	uint8_t pia1_pa_r();
+	uint8_t pia1_pb_r();
+	void pia1_pa_w(uint8_t data);
+	void pia1_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w );
 	DECLARE_WRITE_LINE_MEMBER( pia1_cb2_w );
-	DECLARE_WRITE_LINE_MEMBER( pia1_firq_a );
-	DECLARE_WRITE_LINE_MEMBER( pia1_firq_b );
 
 	// floating bus & "space"
-	DECLARE_READ8_MEMBER( floating_bus_r )   { return floating_bus_read(); }
+	uint8_t floating_bus_r()   { return floating_bus_read(); }
 	uint8_t floating_space_read(offs_t offset);
 	void floating_space_write(offs_t offset, uint8_t data);
 
@@ -134,18 +127,12 @@ public:
 	void coco_floating(machine_config &config);
 
 	void coco_floating_map(address_map &map);
-	void coco_mem(address_map &map);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	// interrupts
-	virtual bool firq_get_line(void);
-	virtual bool irq_get_line(void);
-	void recalculate_irq(void);
-	void recalculate_firq(void);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// changed handlers
 	virtual void pia1_pa_changed(uint8_t data);
@@ -160,7 +147,7 @@ protected:
 	// miscellaneous
 	virtual void update_keyboard_input(uint8_t value);
 	virtual void cart_w(bool state);
-	virtual void update_cart_base(uint8_t *cart_base) { };
+	virtual void update_cart_base(uint8_t *cart_base) { }
 
 protected:
 	// timer constants
@@ -194,10 +181,10 @@ protected:
 
 	struct analog_input_t
 	{
-		ioport_port *m_input[2][2];
-		ioport_port *m_buttons;
+		ioport_port *m_input[2][2]{};
+		ioport_port *m_buttons{};
 
-		uint8_t input(int joystick, int axis) const { return m_input[joystick][axis] ? m_input[joystick][axis]->read() : 0x00; }
+		uint32_t input(int joystick, int axis) const { return m_input[joystick][axis] ? m_input[joystick][axis]->read() : 0x00; }
 		uint8_t buttons(void) const { return m_buttons ? m_buttons->read() : 0x00; }
 	};
 
@@ -210,7 +197,8 @@ protected:
 
 	soundmux_status_t soundmux_status(void);
 	void update_sound(void);
-	void poll_joystick(bool *joyin, uint8_t *buttons);
+	bool poll_joystick(void);
+	uint8_t poll_joystick_buttons(void);
 	void poll_keyboard(void);
 	void poll_hires_joystick(void);
 	void update_cassout(int cassout);
@@ -244,43 +232,45 @@ protected:
 	optional_device<coco_vhd_image_device> m_vhd_0;
 	optional_device<coco_vhd_image_device> m_vhd_1;
 	optional_device<beckerport_device> m_beckerport;
-	optional_ioport                    m_beckerportconfig;
+	optional_ioport m_beckerportconfig;
+	required_device<input_merger_device> m_irqs;
+	required_device<input_merger_device> m_firqs;
 
 	// input ports
 	required_ioport_array<7> m_keyboard;
 	optional_ioport m_joystick_type_control;
 	optional_ioport m_joystick_hires_control;
-	analog_input_t m_joystick;
-	analog_input_t m_rat_mouse;
-	analog_input_t m_diecom_lightgun;
+	analog_input_t m_joystick{};
+	analog_input_t m_rat_mouse{};
+	analog_input_t m_diecom_lightgun{};
 
 	// DAC output
-	uint8_t m_dac_output;
+	uint8_t m_dac_output = 0U;
 
 	// remember the last audio sample level from the analog sources (DAC, cart, cassette) so that we don't
 	// introduce step changes when the audio output is enabled/disabled via PIA1 CB2
-	uint8_t m_analog_audio_level;
+	uint8_t m_analog_audio_level = 0U;
 
 	// hires interface
-	emu_timer *m_hiresjoy_transition_timer[2];
-	bool m_hiresjoy_ca;
+	emu_timer *m_hiresjoy_transition_timer[2]{};
+	bool m_hiresjoy_ca = false;
 
 	// diecom lightgun
-	emu_timer *m_diecom_lightgun_timer;
-	bool m_dclg_previous_bit;
-	uint8_t m_dclg_output_h;
-	uint8_t m_dclg_output_v;
-	uint8_t m_dclg_state;
-	uint16_t m_dclg_timer;
+	emu_timer *m_diecom_lightgun_timer = nullptr;
+	bool m_dclg_previous_bit = false;
+	uint8_t m_dclg_output_h = 0U;
+	uint8_t m_dclg_output_v = 0U;
+	uint32_t m_dclg_state = 0U;
+	uint32_t m_dclg_timer = 0U;
 
 	// VHD selection
-	uint8_t m_vhd_select;
+	uint8_t m_vhd_select = 0U;
 
 	// address space for "floating access"
 	//address_space m_floating_space;
 
 	// safety to prevent stack overflow when reading floating bus
-	bool m_in_floating_bus_read;
+	bool m_in_floating_bus_read = false;
 };
 
 #endif // MAME_INCLUDES_COCO_H

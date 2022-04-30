@@ -35,7 +35,7 @@ DEFINE_DEVICE_TYPE(RIPPLE_COUNTER, ripple_counter_device, "ripple_counter", "Gen
 
 ripple_counter_device::ripple_counter_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, RIPPLE_COUNTER, tag, owner, clock),
-		device_rom_interface(mconfig, *this, 0, ENDIANNESS_LITTLE, 8),
+		device_rom_interface(mconfig, *this),
 		m_count_out_cb(*this),
 		m_rom_out_cb(*this),
 		m_count_timer(nullptr),
@@ -178,7 +178,7 @@ WRITE_LINE_MEMBER(ripple_counter_device::reset_w)
 //  fires
 //-------------------------------------------------
 
-void ripple_counter_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ripple_counter_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{

@@ -7,7 +7,7 @@
 
 #include "cpu/m6502/m65c02.h"
 #include "sound/namco.h"
-#include "video/c45.h"
+#include "video/namco_c45road.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -37,9 +37,9 @@ public:
 	void tceptor(machine_config &config);
 
 private:
-	uint8_t m_m6809_irq_enable;
-	uint8_t m_m68k_irq_enable;
-	uint8_t m_mcu_irq_enable;
+	uint8_t m_m6809_irq_enable = 0;
+	uint8_t m_m68k_irq_enable = 0;
+	uint8_t m_mcu_irq_enable = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device_array<m65c02_device, 2> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
@@ -50,34 +50,34 @@ private:
 	required_shared_ptr<uint8_t> m_bg_ram;
 	required_shared_ptr<uint8_t> m_m68k_shared_ram;
 	required_shared_ptr<uint16_t> m_sprite_ram;
-	int m_sprite16;
-	int m_sprite32;
-	int m_bg;
-	tilemap_t *m_tx_tilemap;
-	tilemap_t *m_bg_tilemap[2];
-	int32_t m_bg_scroll_x[2];
-	int32_t m_bg_scroll_y[2];
+	int m_sprite16 = 0;
+	int m_sprite32 = 0;
+	int m_bg = 0;
+	tilemap_t *m_tx_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap[2]{};
+	int32_t m_bg_scroll_x[2]{};
+	int32_t m_bg_scroll_y[2]{};
 	bitmap_ind16 m_temp_bitmap;
 	std::unique_ptr<uint16_t[]> m_sprite_ram_buffered;
 	std::unique_ptr<uint8_t[]> m_decoded_16;
 	std::unique_ptr<uint8_t[]> m_decoded_32;
-	int m_is_mask_spr[1024/16];
-	DECLARE_READ8_MEMBER(m68k_shared_r);
-	DECLARE_WRITE8_MEMBER(m68k_shared_w);
-	DECLARE_WRITE8_MEMBER(m6809_irq_enable_w);
-	DECLARE_WRITE8_MEMBER(m6809_irq_disable_w);
-	DECLARE_WRITE16_MEMBER(m68k_irq_enable_w);
-	DECLARE_WRITE8_MEMBER(mcu_irq_enable_w);
-	DECLARE_WRITE8_MEMBER(mcu_irq_disable_w);
-	DECLARE_READ8_MEMBER(dsw0_r);
-	DECLARE_READ8_MEMBER(dsw1_r);
-	DECLARE_READ8_MEMBER(input0_r);
-	DECLARE_READ8_MEMBER(input1_r);
-	DECLARE_WRITE8_MEMBER(tceptor_tile_ram_w);
-	DECLARE_WRITE8_MEMBER(tceptor_tile_attr_w);
-	DECLARE_WRITE8_MEMBER(tceptor_bg_ram_w);
-	DECLARE_WRITE8_MEMBER(tceptor_bg_scroll_w);
-	DECLARE_WRITE8_MEMBER(tceptor2_shutter_w);
+	int m_is_mask_spr[1024/16]{};
+	uint8_t m68k_shared_r(offs_t offset);
+	void m68k_shared_w(offs_t offset, uint8_t data);
+	void m6809_irq_enable_w(uint8_t data);
+	void m6809_irq_disable_w(uint8_t data);
+	void m68k_irq_enable_w(uint16_t data);
+	void mcu_irq_enable_w(uint8_t data);
+	void mcu_irq_disable_w(uint8_t data);
+	uint8_t dsw0_r();
+	uint8_t dsw1_r();
+	uint8_t input0_r();
+	uint8_t input1_r();
+	void tceptor_tile_ram_w(offs_t offset, uint8_t data);
+	void tceptor_tile_attr_w(offs_t offset, uint8_t data);
+	void tceptor_bg_ram_w(offs_t offset, uint8_t data);
+	void tceptor_bg_scroll_w(offs_t offset, uint8_t data);
+	void tceptor2_shutter_w(uint8_t data);
 	void tile_mark_dirty(int offset);
 
 	required_device<namco_c45_road_device> m_c45_road;

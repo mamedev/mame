@@ -147,24 +147,24 @@
 static constexpr uint32_t adpcm_clock[2] = { 8000000, 4000000 };
 static constexpr uint32_t adpcm_div[4] = { 1024, 768, 512, /* Reserved */512 };
 
-void x68k_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void x68k_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_X68K_LED:
-		led_callback(ptr, param);
+		led_callback(param);
 		break;
 	case TIMER_X68K_SCC_ACK:
-		scc_ack(ptr, param);
+		scc_ack(param);
 		break;
 	case TIMER_MD_6BUTTON_PORT1_TIMEOUT:
-		md_6button_port1_timeout(ptr, param);
+		md_6button_port1_timeout(param);
 		break;
 	case TIMER_MD_6BUTTON_PORT2_TIMEOUT:
-		md_6button_port2_timeout(ptr, param);
+		md_6button_port2_timeout(param);
 		break;
 	case TIMER_X68K_BUS_ERROR:
-		bus_error(ptr, param);
+		bus_error(param);
 		break;
 	case TIMER_X68K_FDC_TC:
 		m_upd72065->tc_w(ASSERT_LINE);
@@ -243,32 +243,32 @@ int x68k_state::read_mouse()
     0xe98005 - Z8530 command port A
     0xe98007 - Z8530 data port A  (RS232)
 */
-READ16_MEMBER(x68k_state::scc_r )
+uint16_t x68k_state::scc_r(offs_t offset)
 {
 	offset %= 4;
 	switch(offset)
 	{
 	case 0:
-		return m_scc->reg_r(space, 0);
+		return m_scc->reg_r(0);
 	case 1:
 		return read_mouse();
 	case 2:
-		return m_scc->reg_r(space, 1);
+		return m_scc->reg_r(1);
 	case 3:
-		return m_scc->reg_r(space, 3);
+		return m_scc->reg_r(3);
 	default:
 		return 0xff;
 	}
 }
 
-WRITE16_MEMBER(x68k_state::scc_w )
+void x68k_state::scc_w(offs_t offset, uint16_t data)
 {
 	offset %= 4;
 
 	switch(offset)
 	{
 	case 0:
-		m_scc->reg_w(space, 0,(uint8_t)data);
+		m_scc->reg_w(0,(uint8_t)data);
 		if((m_scc->get_reg_b(5) & 0x02) != m_scc_prev)
 		{
 			if(m_scc->get_reg_b(5) & 0x02)  // Request to Send
@@ -281,13 +281,13 @@ WRITE16_MEMBER(x68k_state::scc_w )
 		}
 		break;
 	case 1:
-		m_scc->reg_w(space, 2,(uint8_t)data);
+		m_scc->reg_w(2,(uint8_t)data);
 		break;
 	case 2:
-		m_scc->reg_w(space, 1,(uint8_t)data);
+		m_scc->reg_w(1,(uint8_t)data);
 		break;
 	case 3:
-		m_scc->reg_w(space, 3,(uint8_t)data);
+		m_scc->reg_w(3,(uint8_t)data);
 		break;
 	}
 	m_scc_prev = m_scc->get_reg_b(5) & 0x02;
@@ -497,7 +497,7 @@ uint8_t x68k_state::xpd1lr_r(int port)
 }
 
 // Judging from the XM6 source code, PPI ports A and B are joystick inputs
-READ8_MEMBER(x68k_state::ppi_port_a_r)
+uint8_t x68k_state::ppi_port_a_r()
 {
 	int ctrl = m_ctrltype->read() & 0x0f;
 
@@ -519,7 +519,7 @@ READ8_MEMBER(x68k_state::ppi_port_a_r)
 	return 0xff;
 }
 
-READ8_MEMBER(x68k_state::ppi_port_b_r)
+uint8_t x68k_state::ppi_port_b_r()
 {
 	int ctrl = m_ctrltype->read() & 0xf0;
 
@@ -541,7 +541,7 @@ READ8_MEMBER(x68k_state::ppi_port_b_r)
 	return 0xff;
 }
 
-READ8_MEMBER(x68k_state::ppi_port_c_r)
+uint8_t x68k_state::ppi_port_c_r()
 {
 	return m_ppi_port[2];
 }
@@ -554,7 +554,7 @@ READ8_MEMBER(x68k_state::ppi_port_c_r)
    bits 3,2 - ADPCM Sample rate
    bits 1,0 - ADPCM Pan (00 = Both, 01 = Right only, 10 = Left only, 11 = Off)
 */
-WRITE8_MEMBER(x68k_state::ppi_port_c_w)
+void x68k_state::ppi_port_c_w(uint8_t data)
 {
 	// ADPCM / Joystick control
 	m_ppi_port[2] = data;
@@ -595,7 +595,7 @@ WRITE8_MEMBER(x68k_state::ppi_port_c_w)
 
 
 // NEC uPD72065 at 0xe94000
-WRITE16_MEMBER(x68k_state::fdc_w)
+void x68k_state::fdc_w(offs_t offset, uint16_t data)
 {
 	unsigned int drive, x;
 	switch(offset)
@@ -639,7 +639,7 @@ WRITE16_MEMBER(x68k_state::fdc_w)
 	}
 }
 
-READ16_MEMBER(x68k_state::fdc_r)
+uint16_t x68k_state::fdc_r(offs_t offset)
 {
 	unsigned int ret;
 	int x;
@@ -685,7 +685,7 @@ WRITE_LINE_MEMBER( x68k_state::fdc_irq )
 	}
 }
 
-WRITE8_MEMBER(x68k_state::ct_w)
+void x68k_state::ct_w(uint8_t data)
 {
 	// CT1 and CT2 bits from YM2151 port 0x1b
 	// CT1 - ADPCM clock - 0 = 8MHz, 1 = 4MHz
@@ -719,7 +719,7 @@ WRITE8_MEMBER(x68k_state::ct_w)
                 - bits 7-2 = vector
                 - bits 1,0 = device (00 = FDC, 01 = FDD, 10 = HDD, 11 = Printer)
 */
-WRITE16_MEMBER(x68k_state::ioc_w)
+void x68k_state::ioc_w(offs_t offset, uint16_t data)
 {
 	switch(offset)
 	{
@@ -751,7 +751,7 @@ WRITE16_MEMBER(x68k_state::ioc_w)
 	}
 }
 
-READ16_MEMBER(x68k_state::ioc_r)
+uint16_t x68k_state::ioc_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -783,7 +783,7 @@ READ16_MEMBER(x68k_state::ioc_r)
                                          Any other value, then SRAM is read only.
  Port 8 (0xe8e00f) - Power off control - write 0x00, 0x0f, 0x0f sequentially to switch power off.
 */
-WRITE16_MEMBER(x68k_state::sysport_w)
+void x68k_state::sysport_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -806,7 +806,7 @@ WRITE16_MEMBER(x68k_state::sysport_w)
 	}
 }
 
-READ16_MEMBER(x68k_state::sysport_r)
+uint16_t x68k_state::sysport_r(offs_t offset)
 {
 	int ret = 0;
 	switch(offset)
@@ -826,18 +826,18 @@ READ16_MEMBER(x68k_state::sysport_r)
 	}
 }
 
-WRITE16_MEMBER(x68k_state::ppi_w)
+void x68k_state::ppi_w(offs_t offset, uint16_t data)
 {
 	m_ppi->write(offset & 0x03,data);
 }
 
-READ16_MEMBER(x68k_state::ppi_r)
+uint16_t x68k_state::ppi_r(offs_t offset)
 {
 	return m_ppi->read(offset & 0x03);
 }
 
 
-WRITE16_MEMBER(x68k_state::sram_w)
+void x68k_state::sram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(m_sysport.sram_writeprotect == 0x31)
 	{
@@ -845,7 +845,7 @@ WRITE16_MEMBER(x68k_state::sram_w)
 	}
 }
 
-READ16_MEMBER(x68k_state::sram_r)
+uint16_t x68k_state::sram_r(offs_t offset)
 {
 	// HACKS!
 //  if(offset == 0x5a/2)  // 0x5a should be 0 if no SASI HDs are present.
@@ -855,7 +855,7 @@ READ16_MEMBER(x68k_state::sram_r)
 	return m_nvram[offset];
 }
 
-WRITE16_MEMBER(x68k_state::vid_w)
+void x68k_state::vid_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -892,7 +892,7 @@ WRITE16_MEMBER(x68k_state::vid_w)
 	}
 }
 
-READ16_MEMBER(x68k_state::vid_r)
+uint16_t x68k_state::vid_r(offs_t offset)
 {
 	switch(offset)
 	{
@@ -909,19 +909,19 @@ READ16_MEMBER(x68k_state::vid_r)
 	return 0xff;
 }
 
-READ16_MEMBER(x68k_state::areaset_r)
+uint16_t x68k_state::areaset_r()
 {
 	// register is write-only
 	return 0xffff;
 }
 
-WRITE16_MEMBER(x68k_state::areaset_w)
+void x68k_state::areaset_w(uint16_t data)
 {
 	// TODO
 	LOGMASKED(LOG_SYS, "SYS: Supervisor area set: 0x%02x\n",data & 0xff);
 }
 
-WRITE16_MEMBER(x68k_state::enh_areaset_w )
+void x68k_state::enh_areaset_w(offs_t offset, uint16_t data)
 {
 	// TODO
 	LOGMASKED(LOG_SYS, "SYS: Enhanced Supervisor area set (from %iMB): 0x%02x\n",(offset + 1) * 2,data & 0xff);
@@ -936,6 +936,11 @@ void x68k_state::set_bus_error(uint32_t address, bool rw, uint16_t mem_mask)
 {
 	if(m_bus_error)
 		return;
+	else if(!m_maincpu->executing())
+	{
+		m_hd63450->bec_w(0, hd63450_device::ERR_BUS);
+		return;
+	}
 	if(!ACCESSING_BITS_8_15)
 		address++;
 	m_bus_error = true;
@@ -946,7 +951,7 @@ void x68k_state::set_bus_error(uint32_t address, bool rw, uint16_t mem_mask)
 	LOGMASKED(LOG_SYS, "%s: Bus error: Unused RAM access [%08x]\n", machine().describe_context(), address);
 }
 
-READ16_MEMBER(x68k_state::rom0_r)
+uint16_t x68k_state::rom0_r(offs_t offset, uint16_t mem_mask)
 {
 	/* this location contains the address of some expansion device ROM, if no ROM exists,
 	   then access causes a bus error */
@@ -955,7 +960,7 @@ READ16_MEMBER(x68k_state::rom0_r)
 	return 0xff;
 }
 
-WRITE16_MEMBER(x68k_state::rom0_w)
+void x68k_state::rom0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* this location contains the address of some expansion device ROM, if no ROM exists,
 	   then access causes a bus error */
@@ -963,7 +968,7 @@ WRITE16_MEMBER(x68k_state::rom0_w)
 		set_bus_error((offset << 1) + 0xbffffc, false, mem_mask);
 }
 
-READ16_MEMBER(x68k_state::emptyram_r)
+uint16_t x68k_state::emptyram_r(offs_t offset, uint16_t mem_mask)
 {
 	/* this location is unused RAM, access here causes a bus error
 	   Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
@@ -972,7 +977,7 @@ READ16_MEMBER(x68k_state::emptyram_r)
 	return 0xff;
 }
 
-WRITE16_MEMBER(x68k_state::emptyram_w)
+void x68k_state::emptyram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* this location is unused RAM, access here causes a bus error
 	   Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
@@ -980,7 +985,7 @@ WRITE16_MEMBER(x68k_state::emptyram_w)
 		set_bus_error((offset << 1), 1, mem_mask);
 }
 
-READ16_MEMBER(x68k_state::exp_r)
+uint16_t x68k_state::exp_r(offs_t offset, uint16_t mem_mask)
 {
 	/* These are expansion devices, if not present, they cause a bus error */
 	if((m_options->read() & 0x02) && !machine().side_effects_disabled())
@@ -988,7 +993,7 @@ READ16_MEMBER(x68k_state::exp_r)
 	return 0xff;
 }
 
-WRITE16_MEMBER(x68k_state::exp_w)
+void x68k_state::exp_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* These are expansion devices, if not present, they cause a bus error */
 	if((m_options->read() & 0x02) && !machine().side_effects_disabled())
@@ -1001,7 +1006,7 @@ WRITE_LINE_MEMBER(x68k_state::dma_irq)
 	update_ipl();
 }
 
-WRITE8_MEMBER(x68k_state::dma_end)
+void x68k_state::dma_end(offs_t offset, uint8_t data)
 {
 	if(offset == 0)
 	{
@@ -1021,7 +1026,7 @@ WRITE_LINE_MEMBER(x68k_state::fm_irq)
 	}
 }
 
-WRITE8_MEMBER(x68k_state::adpcm_w)
+void x68k_state::adpcm_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -1501,13 +1506,6 @@ void x68k_state::machine_reset()
 	//m_mfpdev->i7_w(1); // h-sync
 
 	// reset output values
-	output().set_value("key_led_kana",1);
-	output().set_value("key_led_romaji",1);
-	output().set_value("key_led_code",1);
-	output().set_value("key_led_caps",1);
-	output().set_value("key_led_insert",1);
-	output().set_value("key_led_hiragana",1);
-	output().set_value("key_led_fullsize",1);
 	std::fill(std::begin(m_eject_drv_out), std::end(m_eject_drv_out), 1);
 	std::fill(std::begin(m_ctrl_drv_out), std::end(m_ctrl_drv_out), 1);
 	std::fill(std::begin(m_access_drv_out), std::end(m_access_drv_out), 1);
@@ -1527,8 +1525,7 @@ void x68k_state::machine_start()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	// install RAM handlers
 	m_spriteram = (uint16_t*)(memregion("user1")->base());
-	space.install_readwrite_bank(0x000000,m_ram->size()-1,"bank1");
-	membank("bank1")->set_base(m_ram->pointer());
+	space.install_ram(0x000000,m_ram->size()-1,m_ram->pointer());
 
 	// start mouse timer
 	m_mouse_timer->adjust(attotime::zero, 0, attotime::from_msec(1));  // a guess for now
@@ -1558,6 +1555,12 @@ void x68k_state::machine_start()
 	m_ioc.irqstatus = 0;
 	m_mouse.irqactive = false;
 	m_current_ipl = 0;
+	m_adpcm.rate = 0;
+	m_adpcm.clock = 0;
+	m_sysport.sram_writeprotect = 0;
+	m_sysport.monitor = 0;
+	m_bus_error = false;
+	m_led_state = 0;
 }
 
 void x68k_state::driver_init()
@@ -1608,10 +1611,12 @@ void x68030_state::driver_init()
 	m_is_32bit = true;
 }
 
-FLOPPY_FORMATS_MEMBER( x68k_state::floppy_formats )
-	FLOPPY_XDF_FORMAT,
-	FLOPPY_DIM_FORMAT
-FLOPPY_FORMATS_END
+void x68k_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_XDF_FORMAT);
+	fr.add(FLOPPY_DIM_FORMAT);
+}
 
 static void x68k_floppies(device_slot_interface &device)
 {
@@ -1646,7 +1651,7 @@ void x68k_state::x68000_base(machine_config &config)
 
 	HD63450(config, m_hd63450, 40_MHz_XTAL / 4, "maincpu");
 	m_hd63450->set_clocks(attotime::from_usec(2), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2));
-	m_hd63450->set_burst_clocks(attotime::from_usec(2), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50));
+	m_hd63450->set_burst_clocks(attotime::from_usec(2), attotime::from_nsec(450), attotime::from_nsec(450), attotime::from_nsec(50));
 	m_hd63450->irq_callback().set(FUNC(x68k_state::dma_irq));
 	m_hd63450->dma_end().set(FUNC(x68k_state::dma_end));
 	m_hd63450->dma_read<0>().set("upd72065", FUNC(upd72065_device::dma_r));

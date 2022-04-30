@@ -49,14 +49,14 @@ public:
 	auto co1_func() { return m_co1_func.bind(); }
 	auto txd_func() { return m_txd_func.bind(); }
 	auto rxd_func() { return m_rxd_func.bind(); }
-	auto an0_func() { return m_an0_func.bind(); }
-	auto an1_func() { return m_an1_func.bind(); }
-	auto an2_func() { return m_an2_func.bind(); }
-	auto an3_func() { return m_an3_func.bind(); }
-	auto an4_func() { return m_an4_func.bind(); }
-	auto an5_func() { return m_an5_func.bind(); }
-	auto an6_func() { return m_an6_func.bind(); }
-	auto an7_func() { return m_an7_func.bind(); }
+	auto an0_func() { return m_an_func[0].bind(); }
+	auto an1_func() { return m_an_func[1].bind(); }
+	auto an2_func() { return m_an_func[2].bind(); }
+	auto an3_func() { return m_an_func[3].bind(); }
+	auto an4_func() { return m_an_func[4].bind(); }
+	auto an5_func() { return m_an_func[5].bind(); }
+	auto an6_func() { return m_an_func[6].bind(); }
+	auto an7_func() { return m_an_func[7].bind(); }
 
 	auto pa_in_cb() { return m_pa_in_cb.bind(); }
 	auto pb_in_cb() { return m_pb_in_cb.bind(); }
@@ -69,13 +69,19 @@ public:
 	auto pd_out_cb() { return m_pd_out_cb.bind(); }
 	auto pf_out_cb() { return m_pf_out_cb.bind(); }
 
+	void set_pa_pullups(uint8_t p) { m_pa_pullups = p; }
+	void set_pb_pullups(uint8_t p) { m_pb_pullups = p; }
+	void set_pc_pullups(uint8_t p) { m_pc_pullups = p; }
+	void set_pd_pullups(uint8_t p) { m_pd_pullups = p; }
+	void set_pf_pullups(uint8_t p) { m_pf_pullups = p; }
+
 	auto pt_in_cb() { return m_pt_in_cb.bind(); }
 
-	DECLARE_WRITE8_MEMBER(pa_w);
-	DECLARE_WRITE8_MEMBER(pb_w);
-	DECLARE_WRITE8_MEMBER(pc_w);
-	DECLARE_WRITE8_MEMBER(pd_w);
-	DECLARE_WRITE8_MEMBER(pf_w);
+	void pa_w(uint8_t data, uint8_t mem_mask = ~0);
+	void pb_w(uint8_t data, uint8_t mem_mask = ~0);
+	void pc_w(uint8_t data, uint8_t mem_mask = ~0);
+	void pd_w(uint8_t data, uint8_t mem_mask = ~0);
+	void pf_w(uint8_t data, uint8_t mem_mask = ~0);
 
 protected:
 	void upd_internal_128_ram_map(address_map &map);
@@ -98,7 +104,7 @@ protected:
 	// IRR flags
 	enum
 	{
-		INTNMI  = 0x0001,
+		INTFNMI = 0x0001,
 		INTFT0  = 0x0002,
 		INTFT1  = 0x0004,
 		INTF1   = 0x0008,
@@ -131,6 +137,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 3 - 1) / 3; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 3); }
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 40; }
 	virtual uint32_t execute_input_lines() const noexcept override { return 2; }
@@ -161,14 +169,7 @@ protected:
 	devcb_write_line  m_co1_func;
 	devcb_write_line  m_txd_func;
 	devcb_read_line   m_rxd_func;
-	devcb_read8       m_an0_func;
-	devcb_read8       m_an1_func;
-	devcb_read8       m_an2_func;
-	devcb_read8       m_an3_func;
-	devcb_read8       m_an4_func;
-	devcb_read8       m_an5_func;
-	devcb_read8       m_an6_func;
-	devcb_read8       m_an7_func;
+	devcb_read8::array<8> m_an_func;
 
 	devcb_read8       m_pa_in_cb;
 	devcb_read8       m_pb_in_cb;
@@ -237,6 +238,7 @@ protected:
 	uint8_t   m_op;     /* opcode */
 	uint8_t   m_op2;    /* opcode part 2 */
 	uint8_t   m_iff;    /* interrupt enable flip flop */
+	uint8_t   m_iff_pending;
 	uint8_t   m_psw;    /* processor status word */
 	PAIR    m_ea;     /* extended accumulator */
 	PAIR    m_va;     /* accumulator + vector register */
@@ -279,10 +281,12 @@ protected:
 	uint8_t   m_pc_out;
 	uint8_t   m_pd_out;
 	uint8_t   m_pf_out;
-	uint8_t   m_cr0;    /* analog digital conversion register 0 */
-	uint8_t   m_cr1;    /* analog digital conversion register 1 */
-	uint8_t   m_cr2;    /* analog digital conversion register 2 */
-	uint8_t   m_cr3;    /* analog digital conversion register 3 */
+	uint8_t   m_pa_pullups;
+	uint8_t   m_pb_pullups;
+	uint8_t   m_pc_pullups;
+	uint8_t   m_pd_pullups;
+	uint8_t   m_pf_pullups;
+	uint8_t   m_cr[4];  /* analog digital conversion registers */
 	uint8_t   m_txb;    /* transmitter buffer */
 	uint8_t   m_rxb;    /* receiver buffer */
 	uint8_t   m_txd;    /* port C control line states */
@@ -329,8 +333,8 @@ protected:
 	const struct opcode_s *m_op64;
 	const struct opcode_s *m_op70;
 	const struct opcode_s *m_op74;
-	address_space *m_program;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_opcodes;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 	int m_icount;
 
 	uint8_t RP(offs_t port);
@@ -1354,6 +1358,17 @@ protected:
 };
 
 
+class upd78c10_device : public upd7810_device
+{
+public:
+	// construction/destruction
+	upd78c10_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	upd78c10_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map);
+};
+
+
 class upd7807_device : public upd7810_device
 {
 public:
@@ -1374,6 +1389,8 @@ public:
 
 protected:
 	virtual void device_reset() override;
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 2); }
 	virtual void execute_set_input(int inputnum, int state) override;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void handle_timers(int cycles) override;
@@ -1411,6 +1428,7 @@ public:
 
 
 DECLARE_DEVICE_TYPE(UPD7810,  upd7810_device)
+DECLARE_DEVICE_TYPE(UPD78C10, upd78c10_device)
 DECLARE_DEVICE_TYPE(UPD7807,  upd7807_device)
 DECLARE_DEVICE_TYPE(UPD7801,  upd7801_device)
 DECLARE_DEVICE_TYPE(UPD78C05, upd78c05_device)

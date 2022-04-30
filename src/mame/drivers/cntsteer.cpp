@@ -40,7 +40,6 @@
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -71,22 +70,22 @@ public:
 	required_shared_ptr<uint8_t> m_videoram2;
 
 	/* video-related */
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_fg_tilemap;
-	int      m_bg_bank;
-	int      m_bg_color_bank;
-	int      m_flipscreen;
-	int      m_scrolly;
-	int      m_scrolly_hi;
-	int      m_scrollx;
-	int      m_scrollx_hi;
-	int      m_rotation_x;
-	int      m_rotation_sign;
-	int      m_disable_roz;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	tilemap_t  *m_fg_tilemap = nullptr;
+	int      m_bg_bank = 0;
+	int      m_bg_color_bank = 0;
+	int      m_flipscreen = 0;
+	int      m_scrolly = 0;
+	int      m_scrolly_hi = 0;
+	int      m_scrollx = 0;
+	int      m_scrollx_hi = 0;
+	int      m_rotation_x = 0;
+	int      m_rotation_sign = 0;
+	int      m_disable_roz = 0;
 
 	/* misc */
-	int      m_nmimask; // zerotrgt only
-	bool     m_sub_nmimask; // counter steer only
+	int      m_nmimask = 0; // zerotrgt only
+	bool     m_sub_nmimask = false; // counter steer only
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -96,20 +95,20 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(zerotrgt_vregs_w);
-	DECLARE_WRITE8_MEMBER(cntsteer_vregs_w);
-	DECLARE_WRITE8_MEMBER(cntsteer_foreground_vram_w);
-	DECLARE_WRITE8_MEMBER(cntsteer_foreground_attr_w);
-	DECLARE_WRITE8_MEMBER(cntsteer_background_w);
-	DECLARE_READ8_MEMBER(cntsteer_background_mirror_r);
-	DECLARE_WRITE8_MEMBER(gekitsui_sub_irq_ack);
-	DECLARE_WRITE8_MEMBER(cntsteer_sound_w);
-	DECLARE_WRITE8_MEMBER(zerotrgt_ctrl_w);
-	DECLARE_WRITE8_MEMBER(cntsteer_sub_irq_w);
-	DECLARE_WRITE8_MEMBER(cntsteer_sub_nmi_w);
-	DECLARE_WRITE8_MEMBER(cntsteer_main_irq_w);
-	DECLARE_READ8_MEMBER(cntsteer_adx_r);
-	DECLARE_WRITE8_MEMBER(nmimask_w);
+	void zerotrgt_vregs_w(offs_t offset, uint8_t data);
+	void cntsteer_vregs_w(offs_t offset, uint8_t data);
+	void cntsteer_foreground_vram_w(offs_t offset, uint8_t data);
+	void cntsteer_foreground_attr_w(offs_t offset, uint8_t data);
+	void cntsteer_background_w(offs_t offset, uint8_t data);
+	uint8_t cntsteer_background_mirror_r(offs_t offset);
+	void gekitsui_sub_irq_ack(uint8_t data);
+	void cntsteer_sound_w(uint8_t data);
+	void zerotrgt_ctrl_w(offs_t offset, uint8_t data);
+	void cntsteer_sub_irq_w(uint8_t data);
+	void cntsteer_sub_nmi_w(uint8_t data);
+	void cntsteer_main_irq_w(uint8_t data);
+	uint8_t cntsteer_adx_r();
+	void nmimask_w(uint8_t data);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	void init_zerotrgt();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -184,7 +183,7 @@ TILE_GET_INFO_MEMBER(cntsteer_state::get_bg_tile_info)
 {
 	int code = m_videoram2[tile_index];
 
-	SET_TILE_INFO_MEMBER(2, code + m_bg_bank, m_bg_color_bank, 0);
+	tileinfo.set(2, code + m_bg_bank, m_bg_color_bank, 0);
 }
 
 TILE_GET_INFO_MEMBER(cntsteer_state::get_fg_tile_info)
@@ -194,7 +193,7 @@ TILE_GET_INFO_MEMBER(cntsteer_state::get_fg_tile_info)
 
 	code |= (attr & 0x01) << 8;
 
-	SET_TILE_INFO_MEMBER(0, code, 0x30 + ((attr & 0x78) >> 3), 0);
+	tileinfo.set(0, code, 0x30 + ((attr & 0x78) >> 3), 0);
 }
 
 VIDEO_START_MEMBER(cntsteer_state,cntsteer)
@@ -446,7 +445,7 @@ uint32_t cntsteer_state::screen_update_cntsteer(screen_device &screen, bitmap_in
       ---- ---x rotation sign (landscape should be turning right (0) == / , turning left (1) == \)
 [4] = xxxx xxxx rotation factor?
 */
-WRITE8_MEMBER(cntsteer_state::zerotrgt_vregs_w)
+void cntsteer_state::zerotrgt_vregs_w(offs_t offset, uint8_t data)
 {
 //  static uint8_t test[5];
 
@@ -471,7 +470,7 @@ WRITE8_MEMBER(cntsteer_state::zerotrgt_vregs_w)
 	}
 }
 
-WRITE8_MEMBER(cntsteer_state::cntsteer_vregs_w)
+void cntsteer_state::cntsteer_vregs_w(offs_t offset, uint8_t data)
 {
 //  static uint8_t test[5];
 
@@ -496,26 +495,26 @@ WRITE8_MEMBER(cntsteer_state::cntsteer_vregs_w)
 	}
 }
 
-WRITE8_MEMBER(cntsteer_state::cntsteer_foreground_vram_w)
+void cntsteer_state::cntsteer_foreground_vram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(cntsteer_state::cntsteer_foreground_attr_w)
+void cntsteer_state::cntsteer_foreground_attr_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(cntsteer_state::cntsteer_background_w)
+void cntsteer_state::cntsteer_background_w(offs_t offset, uint8_t data)
 {
 	m_videoram2[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 /* checks area 0x2000-0x2fff with this address config. */
-READ8_MEMBER(cntsteer_state::cntsteer_background_mirror_r)
+uint8_t cntsteer_state::cntsteer_background_mirror_r(offs_t offset)
 {
 	return m_videoram2[bitswap<16>(offset,15,14,13,12,5,4,3,2,1,0,11,10,9,8,7,6)];
 }
@@ -528,18 +527,18 @@ READ8_MEMBER(cntsteer_state::cntsteer_background_mirror_r)
  *
  *************************************/
 
-WRITE8_MEMBER(cntsteer_state::gekitsui_sub_irq_ack)
+void cntsteer_state::gekitsui_sub_irq_ack(uint8_t data)
 {
 	m_subcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(cntsteer_state::cntsteer_sound_w)
+void cntsteer_state::cntsteer_sound_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER(cntsteer_state::zerotrgt_ctrl_w)
+void cntsteer_state::zerotrgt_ctrl_w(offs_t offset, uint8_t data)
 {
 	/*TODO: check this.*/
 	logerror("CTRL: %04x: %04x: %04x\n", m_maincpu->pc(), offset, data);
@@ -550,25 +549,25 @@ WRITE8_MEMBER(cntsteer_state::zerotrgt_ctrl_w)
 //  if (offset == 2) m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(cntsteer_state::cntsteer_sub_irq_w)
+void cntsteer_state::cntsteer_sub_irq_w(uint8_t data)
 {
 	//m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 //  printf("%02x IRQ\n", data);
 }
 
-WRITE8_MEMBER(cntsteer_state::cntsteer_sub_nmi_w)
+void cntsteer_state::cntsteer_sub_nmi_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 //  popmessage("%02x", data);
 }
 
-WRITE8_MEMBER(cntsteer_state::cntsteer_main_irq_w)
+void cntsteer_state::cntsteer_main_irq_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 /* Convert weird input handling with MAME standards.*/
-READ8_MEMBER(cntsteer_state::cntsteer_adx_r)
+uint8_t cntsteer_state::cntsteer_adx_r()
 {
 	uint8_t res = 0, adx_val;
 	adx_val = ioport("AN_STEERING")->read();
@@ -658,7 +657,7 @@ void cntsteer_state::cntsteer_cpu2_map(address_map &map)
 
 /***************************************************************************/
 
-WRITE8_MEMBER(cntsteer_state::nmimask_w)
+void cntsteer_state::nmimask_w(uint8_t data)
 {
 	m_nmimask = data & 0x80;
 }
@@ -1023,9 +1022,6 @@ void cntsteer_state::cntsteer(machine_config &config)
 	YM2149(config, "ay2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // labeled DAC-08CQ
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void cntsteer_state::zerotrgt(machine_config &config)

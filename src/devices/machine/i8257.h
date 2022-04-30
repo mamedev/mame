@@ -34,23 +34,22 @@
 
 #pragma once
 
-class i8257_device :  public device_t,
-						public device_execute_interface
+class i8257_device : public device_t, public device_execute_interface
 {
 public:
 	// construction/destruction
 	i8257_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( hlda_w );
-	DECLARE_WRITE_LINE_MEMBER( ready_w );
+	void hlda_w(int state);
+	void ready_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( dreq0_w );
-	DECLARE_WRITE_LINE_MEMBER( dreq1_w );
-	DECLARE_WRITE_LINE_MEMBER( dreq2_w );
-	DECLARE_WRITE_LINE_MEMBER( dreq3_w );
+	void dreq0_w(int state);
+	void dreq1_w(int state);
+	void dreq2_w(int state);
+	void dreq3_w(int state);
 
 	auto out_hrq_cb() { return m_out_hrq_cb.bind(); }
 	auto out_tc_cb() { return m_out_tc_cb.bind(); }
@@ -99,14 +98,14 @@ private:
 	devcb_write_line   m_out_hrq_cb;
 	devcb_write_line   m_out_tc_cb;
 
-	/* accessors to main memory */
+	// accessors to main memory
 	devcb_read8        m_in_memr_cb;
 	devcb_write8       m_out_memw_cb;
 
-	/* channel accessors */
-	devcb_read8        m_in_ior_cb[4];
-	devcb_write8       m_out_iow_cb[4];
-	devcb_write_line   m_out_dack_cb[4];
+	// channel accessors
+	devcb_read8::array<4> m_in_ior_cb;
+	devcb_write8::array<4> m_out_iow_cb;
+	devcb_write_line::array<4> m_out_dack_cb;
 
 	struct
 	{

@@ -28,12 +28,7 @@ DEFINE_DEVICE_TYPE(VIC20_EXPANSION_SLOT, vic20_expansion_slot_device, "vic20_exp
 //-------------------------------------------------
 
 device_vic20_expansion_card_interface::device_vic20_expansion_card_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device, "vic20exp"),
-		m_blk1(*this, "blk1"),
-		m_blk2(*this, "blk2"),
-		m_blk3(*this, "blk3"),
-		m_blk5(*this, "blk5"),
-		m_nvram(*this, "nvram")
+	: device_interface(device, "vic20exp")
 {
 	m_slot = dynamic_cast<vic20_expansion_slot_device *>(device.owner());
 }
@@ -60,7 +55,7 @@ device_vic20_expansion_card_interface::~device_vic20_expansion_card_interface()
 vic20_expansion_slot_device::vic20_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VIC20_EXPANSION_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_vic20_expansion_card_interface>(mconfig, *this),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	m_write_irq(*this),
 	m_write_nmi(*this),
 	m_write_res(*this),

@@ -59,7 +59,7 @@
 #define HPHIL_DHR       0xFE    // Device Hard Reset
 
 /*
- * init sequnce (p. 4-13)
+ * init sequence (p. 4-13)
  *
  * DHR
  * IFC
@@ -125,8 +125,8 @@ public:
 	void add_hp_hil_device(device_hp_hil_interface *device);
 	bool get_int(void) { return m_r3 & 1; }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ap_w);
 
 	void hil_write(uint16_t data);
@@ -168,8 +168,8 @@ public:
 	// inline configuration
 	void set_hp_hil_mlc(hp_hil_mlc_device &mlc_device) { m_hp_hil_mlc = &mlc_device; }
 
-	virtual bool hil_write(uint16_t *data) { return true; };
-	int device_id() { return m_device_id; };
+	virtual bool hil_write(uint16_t *data) { return true; }
+	int device_id() { return m_device_id; }
 
 protected:
 	device_hp_hil_interface(const machine_config &mconfig, device_t &device);

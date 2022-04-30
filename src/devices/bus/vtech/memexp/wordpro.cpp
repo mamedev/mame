@@ -17,6 +17,17 @@
 DEFINE_DEVICE_TYPE(VTECH_WORDPRO, vtech_wordpro_device, "vtech_wordpro", "DSE VZ-300 WordPro")
 
 //-------------------------------------------------
+//  mem_map - memory space address map
+//-------------------------------------------------
+
+void vtech_wordpro_device::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x6000, 0x67ff).rom().region("software", 0);
+	map(0xd000, 0xffff).rom().region("software", 0);
+}
+
+//-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
@@ -42,8 +53,7 @@ const tiny_rom_entry *vtech_wordpro_device::device_rom_region() const
 //-------------------------------------------------
 
 vtech_wordpro_device::vtech_wordpro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VTECH_WORDPRO, tag, owner, clock),
-	device_vtech_memexp_interface(mconfig, *this)
+	vtech_memexp_device(mconfig, VTECH_WORDPRO, tag, owner, clock)
 {
 }
 
@@ -53,14 +63,5 @@ vtech_wordpro_device::vtech_wordpro_device(const machine_config &mconfig, const 
 
 void vtech_wordpro_device::device_start()
 {
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void vtech_wordpro_device::device_reset()
-{
-	program_space().install_rom(0x6000, 0x67ff, memregion("software")->base());
-	program_space().install_rom(0xd000, 0xffff, memregion("software")->base());
+	vtech_memexp_device::device_start();
 }

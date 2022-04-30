@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders: Couriersud
 
 /***************************************************************************
@@ -7,10 +7,10 @@
 
 ***************************************************************************/
 
-#ifndef __PLIB_PREPROCESSOR__
+//#ifndef __PLIB_PREPROCESSOR__
 	#define NL_PROHIBIT_BASEH_INCLUDE   1
 	#include "netlist/devices/net_lib.h"
-#endif
+//#endif
 
 #define FAST_CLOCK  (1)
 

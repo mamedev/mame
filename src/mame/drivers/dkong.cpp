@@ -433,13 +433,13 @@ Donkey Kong Notes
  *
  *************************************/
 
-READ8_MEMBER(dkong_state::memory_read_byte)
+uint8_t dkong_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(dkong_state::memory_write_byte)
+void dkong_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset, data);
@@ -454,7 +454,7 @@ WRITE8_MEMBER(dkong_state::memory_write_byte)
 WRITE_LINE_MEMBER(dkong_state::s2650_interrupt)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x03); // Z80
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 /*************************************
@@ -530,7 +530,7 @@ MACHINE_RESET_MEMBER(dkong_state,dkong)
 
 MACHINE_RESET_MEMBER(dkong_state,ddk)
 {
-	dk_braze_a15(!membank("bank1")->entry());
+	dk_braze_a15(!m_bank1->entry());
 }
 
 MACHINE_RESET_MEMBER(dkong_state,strtheat)
@@ -540,9 +540,9 @@ MACHINE_RESET_MEMBER(dkong_state,strtheat)
 	MACHINE_RESET_CALL_MEMBER(dkong);
 
 	/* The initial state of the counter is 0x08 */
-	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
+	m_bank1->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 	m_decrypt_counter = 0x08;
-	membank("bank1")->set_entry(0);
+	m_bank1->set_entry(0);
 }
 
 MACHINE_RESET_MEMBER(dkong_state,drakton)
@@ -552,9 +552,9 @@ MACHINE_RESET_MEMBER(dkong_state,drakton)
 	MACHINE_RESET_CALL_MEMBER(dkong);
 
 	/* The initial state of the counter is 0x09 */
-	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
+	m_bank1->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 	m_decrypt_counter = 0x09;
-	membank("bank1")->set_entry(1);
+	m_bank1->set_entry(1);
 }
 
 
@@ -564,7 +564,7 @@ MACHINE_RESET_MEMBER(dkong_state,drakton)
  *
  *************************************/
 
-READ8_MEMBER(dkong_state::hb_dma_read_byte)
+uint8_t dkong_state::hb_dma_read_byte(offs_t offset)
 {
 	int   bucket = m_rev_map[(offset>>10) & 0x1ff];
 	int   addr;
@@ -577,7 +577,7 @@ READ8_MEMBER(dkong_state::hb_dma_read_byte)
 	return prog_space.read_byte(addr);
 }
 
-WRITE8_MEMBER(dkong_state::hb_dma_write_byte)
+void dkong_state::hb_dma_write_byte(offs_t offset, uint8_t data)
 {
 	int   bucket = m_rev_map[(offset>>10) & 0x1ff];
 	int   addr;
@@ -590,12 +590,12 @@ WRITE8_MEMBER(dkong_state::hb_dma_write_byte)
 	prog_space.write_byte(addr, data);
 }
 
-READ8_MEMBER(dkong_state::p8257_ctl_r)
+uint8_t dkong_state::p8257_ctl_r()
 {
 	return m_dma_latch;
 }
 
-WRITE8_MEMBER(dkong_state::p8257_ctl_w)
+void dkong_state::p8257_ctl_w(uint8_t data)
 {
 	m_dma_latch = data;
 }
@@ -607,12 +607,12 @@ WRITE8_MEMBER(dkong_state::p8257_ctl_w)
  *
  *************************************/
 
-WRITE8_MEMBER(dkong_state::dkong3_coin_counter_w)
+void dkong_state::dkong3_coin_counter_w(offs_t offset, uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(offset, data & 0x01);
 }
 
-WRITE8_MEMBER(dkong_state::p8257_drq_w)
+void dkong_state::p8257_drq_w(uint8_t data)
 {
 	m_dma8257->dreq0_w(data & 0x01);
 	m_dma8257->dreq1_w(data & 0x01);
@@ -620,7 +620,7 @@ WRITE8_MEMBER(dkong_state::p8257_drq_w)
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100)); // smooth things out a bit
 }
 
-READ8_MEMBER(dkong_state::dkong_in2_r)
+uint8_t dkong_state::dkong_in2_r(offs_t offset)
 {
 	// 2 board DK and all DKjr has a watchdog
 	if (m_watchdog)
@@ -633,19 +633,8 @@ READ8_MEMBER(dkong_state::dkong_in2_r)
 	return r;
 }
 
-READ8_MEMBER(dkong_state::s2650_mirror_r)
-{
-	return space.read_byte(0x1000 + offset);
-}
 
-
-WRITE8_MEMBER(dkong_state::s2650_mirror_w)
-{
-	space.write_byte(0x1000 + offset, data);
-}
-
-
-READ8_MEMBER(dkong_state::epos_decrypt_rom)
+uint8_t dkong_state::epos_decrypt_rom(offs_t offset)
 {
 	if (offset & 0x01)
 	{
@@ -660,10 +649,10 @@ READ8_MEMBER(dkong_state::epos_decrypt_rom)
 
 	switch(m_decrypt_counter)
 	{
-		case 0x08:  membank("bank1")->set_entry(0);      break;
-		case 0x09:  membank("bank1")->set_entry(1);      break;
-		case 0x0A:  membank("bank1")->set_entry(2);      break;
-		case 0x0B:  membank("bank1")->set_entry(3);      break;
+		case 0x08:  m_bank1->set_entry(0);      break;
+		case 0x09:  m_bank1->set_entry(1);      break;
+		case 0x0A:  m_bank1->set_entry(2);      break;
+		case 0x0B:  m_bank1->set_entry(3);      break;
 		default:
 			logerror("Invalid counter = %02X\n",m_decrypt_counter);
 			break;
@@ -673,7 +662,7 @@ READ8_MEMBER(dkong_state::epos_decrypt_rom)
 }
 
 
-WRITE8_MEMBER(dkong_state::s2650_data_w)
+void dkong_state::s2650_data_w(uint8_t data)
 {
 #if DEBUG_PROTECTION
 	logerror("write : pc = %04x, loopback = %02x\n",m_maincpu->pc(), data);
@@ -694,7 +683,7 @@ WRITE_LINE_MEMBER(dkong_state::s2650_fo_w)
 		m_hunchloopback = 0xfb;
 }
 
-READ8_MEMBER(dkong_state::s2650_port0_r)
+uint8_t dkong_state::s2650_port0_r()
 {
 #if DEBUG_PROTECTION
 	logerror("port 0 : pc = %04x, loopback = %02x fo=%d\n",m_maincpu->pc(), m_hunchloopback, m_main_fo);
@@ -718,7 +707,7 @@ READ8_MEMBER(dkong_state::s2650_port0_r)
 }
 
 
-READ8_MEMBER(dkong_state::s2650_port1_r)
+uint8_t dkong_state::s2650_port1_r()
 {
 #if DEBUG_PROTECTION
 	logerror("port 1 : pc = %04x, loopback = %02x fo=%d\n",m_maincpu->pc(), m_hunchloopback, m_main_fo);
@@ -739,7 +728,7 @@ READ8_MEMBER(dkong_state::s2650_port1_r)
 }
 
 
-WRITE8_MEMBER(dkong_state::dkong3_2a03_reset_w)
+void dkong_state::dkong3_2a03_reset_w(uint8_t data)
 {
 	if (data & 1)
 	{
@@ -753,7 +742,7 @@ WRITE8_MEMBER(dkong_state::dkong3_2a03_reset_w)
 	}
 }
 
-READ8_MEMBER(dkong_state::strtheat_inputport_0_r)
+uint8_t dkong_state::strtheat_inputport_0_r()
 {
 	if(ioport("DSW0")->read() & 0x40)
 	{
@@ -768,7 +757,7 @@ READ8_MEMBER(dkong_state::strtheat_inputport_0_r)
 }
 
 
-READ8_MEMBER(dkong_state::strtheat_inputport_1_r)
+uint8_t dkong_state::strtheat_inputport_1_r()
 {
 	if(ioport("DSW0")->read() & 0x40)
 	{
@@ -782,12 +771,12 @@ READ8_MEMBER(dkong_state::strtheat_inputport_1_r)
 	}
 }
 
-WRITE8_MEMBER(dkong_state::dkong_z80dma_rdy_w)
+void dkong_state::dkong_z80dma_rdy_w(uint8_t data)
 {
 	m_z80dma->rdy_w(data & 0x01);
 }
 
-WRITE8_MEMBER(dkong_state::nmi_mask_w)
+void dkong_state::nmi_mask_w(uint8_t data)
 {
 	m_nmi_mask = data & 1;
 	if (!m_nmi_mask)
@@ -876,7 +865,7 @@ void dkong_state::dkong3_map(address_map &map)
 void dkong_state::dkong3_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(m_z80dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));  /* dma controller */
+	map(0x00, 0x00).rw(m_z80dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));  /* dma controller */
 }
 
 /* Epos conversions */
@@ -892,28 +881,25 @@ void dkong_state::epos_readport(address_map &map)
 void dkong_state::s2650_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
-	map(0x1000, 0x13ff).ram().share("sprite_ram");  /* 0x7000 */
-	map(0x1400, 0x1400).mirror(0x007f).portr("IN0").w("ls175.3d", FUNC(latch8_device::write));
-	map(0x1480, 0x1480).portr("IN1");
-	map(0x1500, 0x1500).mirror(0x007f).r(FUNC(dkong_state::dkong_in2_r));                                 /* IN2 */
-	map(0x1500, 0x1507).w(m_dev_6h, FUNC(latch8_device::bit0_w));       /* Sound signals */
-	map(0x1580, 0x1580).portr("DSW0").w(FUNC(dkong_state::dkong_audio_irq_w));     /* DSW0 */
-	map(0x1582, 0x1582).w(FUNC(dkong_state::dkong_flipscreen_w));
-	map(0x1583, 0x1583).w(FUNC(dkong_state::dkong_spritebank_w));                         /* 2 PSL Signal */
-	map(0x1584, 0x1584).noprw();                                               /* Possibly still interrupt enable */
-	map(0x1585, 0x1585).w(FUNC(dkong_state::p8257_drq_w));          /* P8257 ==> /DRQ0 /DRQ1 */
-	map(0x1586, 0x1587).w(FUNC(dkong_state::dkong_palettebank_w));
-	map(0x1600, 0x17ff).ram();                                               /* 0x6400  spriteram location */
-	map(0x1800, 0x1bff).ram().w(FUNC(dkong_state::dkong_videoram_w)).share("video_ram");        /* 0x7400 */
-	map(0x1C00, 0x1f7f).ram();                                               /* 0x6000 */
-	map(0x1f80, 0x1f8f).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write));   /* P8257 control registers */
+	map(0x1000, 0x13ff).mirror(0x6000).ram().share("sprite_ram");  /* 0x7000 */
+	map(0x1400, 0x1400).mirror(0x607f).portr("IN0").w("ls175.3d", FUNC(latch8_device::write));
+	map(0x1480, 0x1480).mirror(0x6000).portr("IN1");
+	map(0x1500, 0x1500).mirror(0x607f).r(FUNC(dkong_state::dkong_in2_r));                                 /* IN2 */
+	map(0x1500, 0x1507).mirror(0x6000).w(m_dev_6h, FUNC(latch8_device::bit0_w));       /* Sound signals */
+	map(0x1580, 0x1580).mirror(0x6000).portr("DSW0").w(FUNC(dkong_state::dkong_audio_irq_w));     /* DSW0 */
+	map(0x1582, 0x1582).mirror(0x6000).w(FUNC(dkong_state::dkong_flipscreen_w));
+	map(0x1583, 0x1583).mirror(0x6000).w(FUNC(dkong_state::dkong_spritebank_w));                         /* 2 PSL Signal */
+	map(0x1584, 0x1584).mirror(0x6000).noprw();                                               /* Possibly still interrupt enable */
+	map(0x1585, 0x1585).mirror(0x6000).w(FUNC(dkong_state::p8257_drq_w));          /* P8257 ==> /DRQ0 /DRQ1 */
+	map(0x1586, 0x1587).mirror(0x6000).w(FUNC(dkong_state::dkong_palettebank_w));
+	map(0x1600, 0x17ff).mirror(0x6000).ram();                                               /* 0x6400  spriteram location */
+	map(0x1800, 0x1bff).mirror(0x6000).ram().w(FUNC(dkong_state::dkong_videoram_w)).share("video_ram");        /* 0x7400 */
+	map(0x1C00, 0x1f7f).mirror(0x6000).ram();                                               /* 0x6000 */
+	map(0x1f80, 0x1f8f).mirror(0x6000).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write));   /* P8257 control registers */
 	/* 0x6800 not remapped */
 	map(0x2000, 0x2fff).rom();
-	map(0x3000, 0x3fff).rw(FUNC(dkong_state::s2650_mirror_r), FUNC(dkong_state::s2650_mirror_w));
 	map(0x4000, 0x4fff).rom();
-	map(0x5000, 0x5fff).rw(FUNC(dkong_state::s2650_mirror_r), FUNC(dkong_state::s2650_mirror_w));
 	map(0x6000, 0x6fff).rom();
-	map(0x7000, 0x7fff).rw(FUNC(dkong_state::s2650_mirror_r), FUNC(dkong_state::s2650_mirror_w));
 }
 
 void dkong_state::s2650_io_map(address_map &map)
@@ -1133,7 +1119,7 @@ static INPUT_PORTS_START( dkong3 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE )
 
 	PORT_START("IN1")      /* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
@@ -1180,10 +1166,10 @@ static INPUT_PORTS_START( dkong3 )
 	PORT_DIPSETTING(    0x20, "50000" )
 	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW1:!7,!8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( Hardest ) )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPSETTING(    0x80, "3" )
+	PORT_DIPSETTING(    0xc0, "4" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dkong3b )
@@ -1264,10 +1250,10 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( shootgal )
 	PORT_START("IN0")      /* IN0 */
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(4) PORT_REVERSE
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, -1.0, -8.0/256, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(4) PORT_REVERSE
 
 	PORT_START("IN1")      /* IN1 */
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(4) PORT_REVERSE
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, -256.0/224, -24.0/256, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(4) PORT_REVERSE
 
 	PORT_INCLUDE( dkong_in2 )
 	PORT_MODIFY("IN2")
@@ -1626,23 +1612,23 @@ GFXDECODE_END
  *
  *************************************/
 
-READ8_MEMBER(dkong_state::braze_eeprom_r)
+uint8_t dkong_state::braze_eeprom_r()
 {
 	return m_eeprom->do_read();
 }
 
 WRITE_LINE_MEMBER(dkong_state::dk_braze_a15)
 {
-	membank("bank1")->set_entry(state & 0x01);
-	membank("bank2")->set_entry(state & 0x01);
+	m_bank1->set_entry(state & 0x01);
+	m_bank2->set_entry(state & 0x01);
 }
 
-WRITE8_MEMBER(dkong_state::dk_braze_a15_w)
+void dkong_state::dk_braze_a15_w(uint8_t data)
 {
 	dk_braze_a15(data);
 }
 
-WRITE8_MEMBER(dkong_state::braze_eeprom_w)
+void dkong_state::braze_eeprom_w(uint8_t data)
 {
 	m_eeprom->di_write(data & 0x01);
 	m_eeprom->cs_write(data & 0x04 ? ASSERT_LINE : CLEAR_LINE);
@@ -1869,6 +1855,7 @@ void dkong_state::s2650(machine_config &config)
 	s2650.set_addrmap(AS_DATA, &dkong_state::s2650_data_map);
 	s2650.sense_handler().set("screen", FUNC(screen_device::vblank));
 	s2650.flag_handler().set(FUNC(dkong_state::s2650_fo_w));
+	s2650.intack_handler().set([this]() { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x03; });
 
 	m_screen->screen_vblank().set(FUNC(dkong_state::s2650_interrupt));
 
@@ -1933,7 +1920,43 @@ void dkong_state::drktnjr(machine_config &config)
  *
  *************************************/
 
-ROM_START( radarscp ) /* unclear which boardset this comes from; there existed a 5 pcb stack with trs-03 (no voice) sound board on top, and a 4 board as well as a 2 board pcb stack */
+// A newer revision based on ROM labels, legitimate looking code changes, although in MAME it has some misplaced sprites flicking in the top left part of the screen near the score as the enemies appear
+// Does this glitch happen on the PCB?
+ROM_START( radarscp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "trs2c5fd",     0x0000, 0x1000, CRC(80bbcbb3) SHA1(3af0ac3a267cdc819ccf5a279a78cdb16ee0360b) )
+	ROM_LOAD( "trs2c5gd",     0x1000, 0x1000, CRC(afa8c49f) SHA1(25880e9dcf2dc8862f7f3c38687f01dfe2424293) ) // == trs2c5gc
+	ROM_LOAD( "trs2c5hd",     0x2000, 0x1000, CRC(e3ad4239) SHA1(f28469bc3388b4fdc14e2a095d8e117af6643b46) )
+	ROM_LOAD( "trs2c5kd",     0x3000, 0x1000, CRC(260a3ec4) SHA1(d5e7941a56457cd222cb018ab17a8eee2a9134b9) )
+	//empty socket on position 5L on pcb labeled "Test", 0x4000, 0x1000
+
+	ROM_REGION( 0x1800, "soundcpu", 0 ) /* sound */
+	ROM_LOAD( "trs2s3i",      0x0000, 0x0800, CRC(78034f14) SHA1(548b44ac69f39df6687da1c0f60968009b1e0767) )
+	ROM_RELOAD(               0x0800, 0x0800 )
+	ROM_FILL(                 0x1000, 0x0800, 0x00 )
+	/* socket 3J is empty */
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "trs2v3gc",     0x0000, 0x0800, CRC(f095330e) SHA1(dd3de744f28ff108630d3336bd246d3323fa34af) )
+	ROM_LOAD( "trs2v3hc",     0x0800, 0x0800, CRC(15a316f0) SHA1(8785a996c6433882a0a7150693c329a4247bb77e) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "trs2v3dc",     0x0000, 0x0800, CRC(e0bb0db9) SHA1(b570439ea1b5d34d0ac938ac9157f22f319b786d) )
+	ROM_LOAD( "trs2v3cc",     0x0800, 0x0800, CRC(6c4e7dad) SHA1(54e6a5005c44261dc4ba845dcd5ff62ea1402d26) )
+	ROM_LOAD( "trs2v3bc",     0x1000, 0x0800, CRC(6fdd63f1) SHA1(2eb09ab0759e4c8df9188fb833440d8fc94f6172) )
+	ROM_LOAD( "trs2v3ac",     0x1800, 0x0800, CRC(bbf62755) SHA1(cb4ca8d4fe689ca0011a4b6c0a2dbd4c764ac70a) )
+
+	ROM_REGION( 0x0800, "gfx3", 0 ) /* radar/star timing table */
+	ROM_LOAD( "trs2v3ec",     0x0000, 0x0800, CRC(0eca8d6b) SHA1(8358b5131d082b2fb8dd793d2e5382daeef6f75c) )
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "rs2-x.xxx",    0x0000, 0x0100, CRC(54609d61) SHA1(586620ecc61f3e55258fe6360bcacad5f570f29c) ) /* palette low 4 bits (inverted) */
+	ROM_LOAD( "rs2-c.xxx",    0x0100, 0x0100, CRC(79a7d831) SHA1(475ec991929d43b2bcd4b5aee144249f487d0b5b) ) /* palette high 4 bits (inverted) */
+	ROM_LOAD( "rs2-v.1hc",    0x0200, 0x0100, CRC(1b828315) SHA1(00c9f8c5ae86b68d38c66f9071b5f1ef421c1005) ) /* character color codes on a per-column basis */
+ROM_END
+
+// unclear which boardset this comes from, probably a TRS-02 based on ROM labels; there existed a 5 pcb stack with TRS-03 (no voice) sound board on top, and a 4 board as well as a 2 board pcb stack
+ROM_START( radarscpc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "trs2c5fc",     0x0000, 0x1000, CRC(40949e0d) SHA1(94717b9d027600e25b863e89900df41325875961) )
 	ROM_LOAD( "trs2c5gc",     0x1000, 0x1000, CRC(afa8c49f) SHA1(25880e9dcf2dc8862f7f3c38687f01dfe2424293) )
@@ -1966,7 +1989,8 @@ ROM_START( radarscp ) /* unclear which boardset this comes from; there existed a
 	ROM_LOAD( "rs2-v.1hc",    0x0200, 0x0100, CRC(1b828315) SHA1(00c9f8c5ae86b68d38c66f9071b5f1ef421c1005) ) /* character color codes on a per-column basis */
 ROM_END
 
-ROM_START( radarscp1 ) /* TRS01 5-pcb stack with TRS01 "Voice" pcb on top containing the sound cpu and the m58817 speech chip and the m58819 speech serial rom emulator chip */
+// TRS01 5-pcb stack with TRS01 "Voice" pcb on top containing the sound cpu and the m58817 speech chip and the m58819 speech serial rom emulator chip
+ROM_START( radarscp1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "trs01_5f",     0x0000, 0x1000, CRC(40949e0d) SHA1(94717b9d027600e25b863e89900df41325875961) )
 	ROM_LOAD( "trs01_5g",     0x1000, 0x1000, CRC(afa8c49f) SHA1(25880e9dcf2dc8862f7f3c38687f01dfe2424293) )
@@ -3589,7 +3613,7 @@ void dkong_state::init_drakton()
 			{7,1,4,0,3,6,2,5},
 	};
 
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, "bank1" );
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, m_bank1 );
 
 	/* While the PAL supports up to 16 decryption methods, only four
 	    are actually used in the PAL.  Therefore, we'll take a little
@@ -3611,7 +3635,7 @@ void dkong_state::init_strtheat()
 			{6,3,4,1,0,7,2,5},
 	};
 
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, "bank1" );
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, m_bank1 );
 
 	/* While the PAL supports up to 16 decryption methods, only four
 	    are actually used in the PAL.  Therefore, we'll take a little
@@ -3622,23 +3646,23 @@ void dkong_state::init_strtheat()
 	drakton_decrypt_rom(0x88, 0x1c000, bs[3]);
 
 	/* custom handlers supporting Joystick or Steering Wheel */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7c00, 0x7c00, read8_delegate(*this, FUNC(dkong_state::strtheat_inputport_0_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7c80, 0x7c80, read8_delegate(*this, FUNC(dkong_state::strtheat_inputport_1_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7c00, 0x7c00, read8smo_delegate(*this, FUNC(dkong_state::strtheat_inputport_0_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7c80, 0x7c80, read8smo_delegate(*this, FUNC(dkong_state::strtheat_inputport_1_r)));
 }
 
 void dkong_state::dk_braze_decrypt()
 {
 	m_decrypted = std::make_unique<uint8_t[]>(0x10000);
 
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x5fff, "bank1");
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0xffff, "bank2");
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x5fff, m_bank1);
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0xffff, m_bank2);
 
 	braze_decrypt_rom(m_decrypted.get());
 
-	membank("bank1")->configure_entries(0, 2, m_decrypted.get(), 0x8000);
-	membank("bank1")->set_entry(0);
-	membank("bank2")->configure_entries(0, 2, m_decrypted.get(), 0x8000);
-	membank("bank2")->set_entry(0);
+	m_bank1->configure_entries(0, 2, m_decrypted.get(), 0x8000);
+	m_bank1->set_entry(0);
+	m_bank2->configure_entries(0, 2, m_decrypted.get(), 0x8000);
+	m_bank2->set_entry(0);
 }
 
 void dkong_state::init_dkonghs()
@@ -3646,8 +3670,8 @@ void dkong_state::init_dkonghs()
 	dk_braze_decrypt();
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_read_handler(0xc000, 0xc000, read8_delegate(*this, FUNC(dkong_state::braze_eeprom_r)));
-	space.install_write_handler(0xc000, 0xc000, write8_delegate(*this, FUNC(dkong_state::braze_eeprom_w)));
+	space.install_read_handler(0xc000, 0xc000, read8smo_delegate(*this, FUNC(dkong_state::braze_eeprom_r)));
+	space.install_write_handler(0xc000, 0xc000, write8smo_delegate(*this, FUNC(dkong_state::braze_eeprom_w)));
 }
 
 void dkong_state::init_dkongx()
@@ -3655,10 +3679,10 @@ void dkong_state::init_dkongx()
 	dk_braze_decrypt();
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_write_handler(0xe000, 0xe000, write8_delegate(*this, FUNC(dkong_state::dk_braze_a15_w)));
+	space.install_write_handler(0xe000, 0xe000, write8smo_delegate(*this, FUNC(dkong_state::dk_braze_a15_w)));
 
-	space.install_read_handler(0xc800, 0xc800, read8_delegate(*this, FUNC(dkong_state::braze_eeprom_r)));
-	space.install_write_handler(0xc800, 0xc800, write8_delegate(*this, FUNC(dkong_state::braze_eeprom_w)));
+	space.install_read_handler(0xc800, 0xc800, read8smo_delegate(*this, FUNC(dkong_state::braze_eeprom_r)));
+	space.install_write_handler(0xc800, 0xc800, write8smo_delegate(*this, FUNC(dkong_state::braze_eeprom_w)));
 }
 
 void dkong_state::init_dkong3hs()
@@ -3671,8 +3695,8 @@ void dkong_state::init_dkong3hs()
 	m_maincpu->space(AS_PROGRAM).install_rom(0x8000, 0xffff, m_decrypted.get() + 0x8000);
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_read_handler(0xc000, 0xc000, read8_delegate(*this, FUNC(dkong_state::braze_eeprom_r)));
-	space.install_write_handler(0xc000, 0xc000, write8_delegate(*this, FUNC(dkong_state::braze_eeprom_w)));
+	space.install_read_handler(0xc000, 0xc000, read8smo_delegate(*this, FUNC(dkong_state::braze_eeprom_r)));
+	space.install_write_handler(0xc000, 0xc000, write8smo_delegate(*this, FUNC(dkong_state::braze_eeprom_w)));
 }
 
 void dkong_state::init_dkingjr()
@@ -3693,7 +3717,8 @@ void dkong_state::init_dkingjr()
  *
  *************************************/
 
-GAME( 1980, radarscp,  0,        radarscp,  radarscp, dkong_state, empty_init,    ROT270, "Nintendo", "Radar Scope",         MACHINE_SUPPORTS_SAVE )
+GAME( 1980, radarscp,  0,        radarscp,  radarscp, dkong_state, empty_init,    ROT270, "Nintendo", "Radar Scope (TRS02, rev. D)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, radarscpc, radarscp, radarscp,  radarscp, dkong_state, empty_init,    ROT270, "Nintendo", "Radar Scope (TRS02?, rev. C)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, radarscp1, radarscp, radarscp1, radarscp, dkong_state, empty_init,    ROT270, "Nintendo", "Radar Scope (TRS01)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1981, dkong,     0,        dkong2b,   dkong,    dkong_state, empty_init,    ROT270, "Nintendo of America", "Donkey Kong (US set 1)",    MACHINE_SUPPORTS_SAVE )

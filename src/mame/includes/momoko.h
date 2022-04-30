@@ -50,16 +50,16 @@ private:
 	required_ioport m_io_fake;
 
 	/* video-related */
-	u8          m_fg_scrollx;
-	u8          m_fg_scrolly;
-	u8          m_fg_select;
-	u8          m_text_scrolly;
-	u8          m_text_mode;
-	u8          m_bg_select;
-	u8          m_bg_priority;
-	u8          m_bg_mask;
-	u8          m_fg_mask;
-	u8          m_flipscreen;
+	u8          m_fg_scrollx = 0;
+	u8          m_fg_scrolly = 0;
+	u8          m_fg_select = 0;
+	u8          m_text_scrolly = 0;
+	u8          m_text_mode = 0;
+	u8          m_bg_select = 0;
+	u8          m_bg_priority = 0;
+	u8          m_bg_mask = 0;
+	u8          m_fg_mask = 0;
+	u8          m_flipscreen = 0;
 	void bg_read_bank_w(u8 data);
 	void fg_scrollx_w(u8 data);
 	void fg_scrolly_w(u8 data);
@@ -75,6 +75,10 @@ private:
 	virtual void machine_reset() override;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bg_pri(bitmap_ind16 &bitmap, int chr, int col, int flipx, int flipy, int x, int y, int pri);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int end, int flip);
+	void draw_text_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip);
+	void draw_fg_romtilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip);
+	void draw_bg_romtilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip, bool high);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

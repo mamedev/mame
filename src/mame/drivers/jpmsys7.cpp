@@ -60,7 +60,7 @@ void jpmsys7_state::jpmsys7(machine_config &config)
 {
 	MCF5206E(config, m_maincpu, 40000000);  // seems to be a Coldfire of some kind
 	m_maincpu->set_addrmap(AS_PROGRAM, &jpmsys7_state::jpmsys7_map);
-	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0);
+	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0, m_maincpu);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

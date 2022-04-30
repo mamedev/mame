@@ -188,7 +188,7 @@ fefc34a - start of mem_size, which queries ECC registers for each memory board
 #include "machine/timer.h"
 #include "machine/z80scc.h"
 #include "machine/am79c90.h"
-#include "machine/ncr5380n.h"
+#include "machine/ncr5380.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
 
@@ -198,6 +198,8 @@ fefc34a - start of mem_size, which queries ECC registers for each memory board
 
 #include "screen.h"
 
+
+namespace {
 
 #define TIMEKEEPER_TAG  "timekpr"
 #define SCC1_TAG        "scc1"
@@ -253,15 +255,16 @@ public:
 
 	void ncr5380(device_t *device);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<m68020_device> m_maincpu;
 	required_device<z80scc_device> m_scc1;
 	required_device<z80scc_device> m_scc2;
 	required_device<nscsi_bus_device> m_scsibus;
-	required_device<ncr5380n_device> m_scsi;
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	required_device<ncr5380_device> m_scsi;
 
 	optional_shared_ptr<uint32_t> m_p_ram;
 	optional_shared_ptr<uint32_t> m_bw2_vram;
@@ -270,21 +273,21 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<am79c90_device> m_lance;
 
-	DECLARE_READ32_MEMBER( tl_mmu_r );
-	DECLARE_WRITE32_MEMBER( tl_mmu_w );
-	DECLARE_READ32_MEMBER( ram_r );
-	DECLARE_WRITE32_MEMBER( ram_w );
-	DECLARE_READ32_MEMBER( parity_r );
-	DECLARE_WRITE32_MEMBER( parity_w );
-	DECLARE_READ32_MEMBER( ecc_r );
-	DECLARE_WRITE32_MEMBER( ecc_w );
-	DECLARE_READ32_MEMBER( irqctrl_r );
-	DECLARE_WRITE32_MEMBER( irqctrl_w );
-	DECLARE_READ8_MEMBER( rtc7170_r );
-	DECLARE_WRITE8_MEMBER( rtc7170_w );
+	uint32_t tl_mmu_r(offs_t offset, uint32_t mem_mask = ~0);
+	void tl_mmu_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t parity_r(offs_t offset);
+	void parity_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t ecc_r(offs_t offset);
+	void ecc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t irqctrl_r();
+	void irqctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t rtc7170_r(offs_t offset);
+	void rtc7170_w(offs_t offset, uint8_t data);
 
+	template <unsigned W, unsigned H>
 	uint32_t bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t bw2_16x11_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t bw2_350_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(sun3_timer);
@@ -319,18 +322,18 @@ void sun3_state::ncr5380(device_t *device)
 {
 	devcb_base *devcb;
 	(void)devcb;
-//  downcast<ncr5380n_device &>(*device).drq_handler().set(FUNC(sun3_state::drq_w));
+//  downcast<ncr5380_device &>(*device).drq_handler().set(FUNC(sun3_state::drq_w));
 }
 
 static void scsi_devices(device_slot_interface &device)
 {
 	device.option_add("cdrom", NSCSI_CDROM);
 	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add_internal("ncr5380", NCR5380N);
+	device.option_add_internal("ncr5380", NCR5380);
 	device.set_option_machine_config("cdrom", sun_cdrom);
 }
 
-READ32_MEMBER( sun3_state::ram_r )
+uint32_t sun3_state::ram_r(offs_t offset)
 {
 	if (m_ecc[0] == 0x10c00000)
 	{
@@ -366,7 +369,7 @@ READ32_MEMBER( sun3_state::ram_r )
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER( sun3_state::ram_w )
+void sun3_state::ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// if writing bad parity is enabled
 	if (((m_parregs[0] & 0x20000000) == 0x20000000) &&
@@ -437,7 +440,7 @@ WRITE32_MEMBER( sun3_state::ram_w )
 	}
 }
 
-READ32_MEMBER( sun3_state::tl_mmu_r )
+uint32_t sun3_state::tl_mmu_r(offs_t offset, uint32_t mem_mask)
 {
 	uint8_t fc = m_maincpu->get_fc();
 
@@ -574,7 +577,7 @@ READ32_MEMBER( sun3_state::tl_mmu_r )
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER( sun3_state::tl_mmu_w )
+void sun3_state::tl_mmu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint8_t fc = m_maincpu->get_fc();
 
@@ -722,7 +725,7 @@ WRITE32_MEMBER( sun3_state::tl_mmu_w )
 	logerror("sun3: Unmapped write %04x (FC %d, mask %04x, PC=%x) to %08x\n", data, fc, mem_mask, m_maincpu->pc(), offset<<2);
 }
 
-READ32_MEMBER(sun3_state::parity_r)
+uint32_t sun3_state::parity_r(offs_t offset)
 {
 	uint32_t rv = m_parregs[offset];
 
@@ -735,7 +738,7 @@ READ32_MEMBER(sun3_state::parity_r)
 	return rv;
 }
 
-WRITE32_MEMBER(sun3_state::parity_w)
+void sun3_state::parity_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//printf("sun3: %08x to parity registers @ %x (mask %08x)\n", data, offset, mem_mask);
 
@@ -786,7 +789,7 @@ void sun3_state::vmetype1space_map(address_map &map)
 	map(0x000a0000, 0x000a0003).rw(FUNC(sun3_state::irqctrl_r), FUNC(sun3_state::irqctrl_w));
 	map(0x00100000, 0x0010ffff).rom().region("user1", 0);
 	map(0x00120000, 0x00120003).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w));
-	map(0x00140000, 0x00140007).rw(m_scsi, FUNC(ncr5380n_device::read), FUNC(ncr5380n_device::write)).umask32(0xffffffff);
+	map(0x00140000, 0x00140007).rw(m_scsi, FUNC(ncr5380_device::read), FUNC(ncr5380_device::write)).umask32(0xffffffff);
 	map(0x001e0000, 0x001e00ff).rw(FUNC(sun3_state::ecc_r), FUNC(sun3_state::ecc_w));
 }
 
@@ -800,12 +803,12 @@ void sun3_state::vmetype3space_map(address_map &map)
 {
 }
 
-READ32_MEMBER(sun3_state::irqctrl_r)
+uint32_t sun3_state::irqctrl_r()
 {
 	return m_irqctrl;
 }
 
-WRITE32_MEMBER(sun3_state::irqctrl_w)
+void sun3_state::irqctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//printf("sun3: %08x to interrupt control (mask %08x)\n", data, mem_mask);
 	COMBINE_DATA(&m_irqctrl);
@@ -837,14 +840,14 @@ WRITE32_MEMBER(sun3_state::irqctrl_w)
 	}
 }
 
-READ8_MEMBER(sun3_state::rtc7170_r)
+uint8_t sun3_state::rtc7170_r(offs_t offset)
 {
 	//printf("read 7170 @ %x, PC=%x\n", offset, m_maincpu->pc());
 
 	return 0xff;
 }
 
-WRITE8_MEMBER(sun3_state::rtc7170_w)
+void sun3_state::rtc7170_w(offs_t offset, uint8_t data)
 {
 	//printf("%02x to 7170 @ %x\n", data, offset);
 
@@ -857,7 +860,7 @@ WRITE8_MEMBER(sun3_state::rtc7170_w)
 	}
 }
 
-READ32_MEMBER(sun3_state::ecc_r)
+uint32_t sun3_state::ecc_r(offs_t offset)
 {
 	//printf("read ECC @ %x, PC=%x\n", offset, m_maincpu->pc());
 	// fefc34a
@@ -880,7 +883,7 @@ READ32_MEMBER(sun3_state::ecc_r)
 	return rv;
 }
 
-WRITE32_MEMBER(sun3_state::ecc_w)
+void sun3_state::ecc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//printf("%08x to ecc @ %x, mask %08x\n", data, offset, mem_mask);
 
@@ -898,57 +901,27 @@ TIMER_DEVICE_CALLBACK_MEMBER(sun3_state::sun3_timer)
 	}
 }
 
+template <unsigned W, unsigned H>
 uint32_t sun3_state::bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint32_t *scanline;
-	int x, y;
-	uint8_t pixels;
 	static const uint32_t palette[2] = { 0, 0xffffff };
-	uint8_t *m_vram = (uint8_t *)m_bw2_vram.target();
+	uint8_t const *const m_vram = (uint8_t *)m_bw2_vram.target();
 
-	for (y = 0; y < 900; y++)
+	for (int y = 0; y < H; y++)
 	{
-		scanline = &bitmap.pix32(y);
-		for (x = 0; x < 1152/8; x++)
+		uint32_t *scanline = &bitmap.pix(y);
+		for (int x = 0; x < W/8; x++)
 		{
-			pixels = m_vram[(y * (1152/8)) + (BYTE4_XOR_BE(x))];
+			uint8_t const pixels = m_vram[(y * (W/8)) + (BYTE4_XOR_BE(x))];
 
-			*scanline++ = palette[(pixels>>7)&1];
-			*scanline++ = palette[(pixels>>6)&1];
-			*scanline++ = palette[(pixels>>5)&1];
-			*scanline++ = palette[(pixels>>4)&1];
-			*scanline++ = palette[(pixels>>3)&1];
-			*scanline++ = palette[(pixels>>2)&1];
-			*scanline++ = palette[(pixels>>1)&1];
-			*scanline++ = palette[(pixels&1)];
-		}
-	}
-	return 0;
-}
-
-uint32_t sun3_state::bw2_16x11_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	uint32_t *scanline;
-	int x, y;
-	uint8_t pixels;
-	static const uint32_t palette[2] = { 0, 0xffffff };
-	uint8_t *m_vram = (uint8_t *)m_bw2_vram.target();
-
-	for (y = 0; y < 1100; y++)
-	{
-		scanline = &bitmap.pix32(y);
-		for (x = 0; x < 1600/8; x++)
-		{
-			pixels = m_vram[(y * (1600/8)) + (BYTE4_XOR_BE(x))];
-
-			*scanline++ = palette[(pixels>>7)&1];
-			*scanline++ = palette[(pixels>>6)&1];
-			*scanline++ = palette[(pixels>>5)&1];
-			*scanline++ = palette[(pixels>>4)&1];
-			*scanline++ = palette[(pixels>>3)&1];
-			*scanline++ = palette[(pixels>>2)&1];
-			*scanline++ = palette[(pixels>>1)&1];
-			*scanline++ = palette[(pixels&1)];
+			*scanline++ = palette[BIT(pixels, 7)];
+			*scanline++ = palette[BIT(pixels, 6)];
+			*scanline++ = palette[BIT(pixels, 5)];
+			*scanline++ = palette[BIT(pixels, 4)];
+			*scanline++ = palette[BIT(pixels, 3)];
+			*scanline++ = palette[BIT(pixels, 2)];
+			*scanline++ = palette[BIT(pixels, 1)];
+			*scanline++ = palette[BIT(pixels, 0)];
 		}
 	}
 	return 0;
@@ -956,27 +929,24 @@ uint32_t sun3_state::bw2_16x11_update(screen_device &screen, bitmap_rgb32 &bitma
 
 uint32_t sun3_state::bw2_350_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint32_t *scanline;
-	int x, y;
-	uint8_t pixels;
 	static const uint32_t palette[2] = { 0, 0xffffff };
-	uint8_t *m_vram = (uint8_t *)&m_ram_ptr[(0x100000>>2)];
+	uint8_t const *const m_vram = (uint8_t *)&m_ram_ptr[(0x100000>>2)];
 
-	for (y = 0; y < 900; y++)
+	for (int y = 0; y < 900; y++)
 	{
-		scanline = &bitmap.pix32(y);
-		for (x = 0; x < 1152/8; x++)
+		uint32_t *scanline = &bitmap.pix(y);
+		for (int x = 0; x < 1152/8; x++)
 		{
-			pixels = m_vram[(y * (1152/8)) + (BYTE4_XOR_BE(x))];
+			uint8_t const pixels = m_vram[(y * (1152/8)) + (BYTE4_XOR_BE(x))];
 
-			*scanline++ = palette[(pixels>>7)&1];
-			*scanline++ = palette[(pixels>>6)&1];
-			*scanline++ = palette[(pixels>>5)&1];
-			*scanline++ = palette[(pixels>>4)&1];
-			*scanline++ = palette[(pixels>>3)&1];
-			*scanline++ = palette[(pixels>>2)&1];
-			*scanline++ = palette[(pixels>>1)&1];
-			*scanline++ = palette[(pixels&1)];
+			*scanline++ = palette[BIT(pixels, 7)];
+			*scanline++ = palette[BIT(pixels, 6)];
+			*scanline++ = palette[BIT(pixels, 5)];
+			*scanline++ = palette[BIT(pixels, 4)];
+			*scanline++ = palette[BIT(pixels, 3)];
+			*scanline++ = palette[BIT(pixels, 2)];
+			*scanline++ = palette[BIT(pixels, 1)];
+			*scanline++ = palette[BIT(pixels, 0)];
 		}
 	}
 	return 0;
@@ -993,6 +963,7 @@ void sun3_state::machine_start()
 	m_idprom_ptr = (uint8_t *)m_idprom->base();
 	m_ram_size = m_ram->size();
 	m_ram_size_words = m_ram_size >> 2;
+	std::fill(std::begin(m_parregs), std::end(m_parregs), 0);
 }
 
 void sun3_state::machine_reset()
@@ -1013,7 +984,7 @@ void sun3_state::sun3(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sun3_state::sun3_mem);
 
 	screen_device &bwtwo(SCREEN(config, "bwtwo", SCREEN_TYPE_RASTER));
-	bwtwo.set_screen_update(FUNC(sun3_state::bw2_update));
+	bwtwo.set_screen_update(NAME((&sun3_state::bw2_update<1152, 900>)));
 	bwtwo.set_size(1600,1100);
 	bwtwo.set_visarea(0, 1152-1, 0, 900-1);
 	bwtwo.set_refresh_hz(72);
@@ -1079,7 +1050,7 @@ void sun3_state::sun3_60(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sun3_state::sun3_mem);
 
 	screen_device &bwtwo(*subdevice<screen_device>("bwtwo"));
-	bwtwo.set_screen_update(FUNC(sun3_state::bw2_16x11_update));
+	bwtwo.set_screen_update(NAME((&sun3_state::bw2_update<1600, 1100>)));
 	bwtwo.set_size(1600,1100);
 	bwtwo.set_visarea(0, 1600-1, 0, 1100-1);
 	bwtwo.set_refresh_hz(72);
@@ -1102,7 +1073,7 @@ void sun3_state::sun3200(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sun3_state::sun3_mem);
 
 	screen_device &bwtwo(*subdevice<screen_device>("bwtwo"));
-	bwtwo.set_screen_update(FUNC(sun3_state::bw2_16x11_update));
+	bwtwo.set_screen_update(NAME((&sun3_state::bw2_update<1600, 1100>)));
 	bwtwo.set_size(1600,1100);
 	bwtwo.set_visarea(0, 1600-1, 0, 1100-1);
 	bwtwo.set_refresh_hz(72);
@@ -1310,6 +1281,9 @@ ROM_START( sun3_e )
 	ROM_REGION( 0x20, "idprom", ROMREGION_ERASEFF)
 	ROM_LOAD( "sun3-e-idprom.bin", 0x000000, 0x000020, CRC(d1a92116) SHA1(4836f3188f2c3dd5ba49ab66e0b55caa6b1b1791) )
 ROM_END
+
+} // Anonymous namespace
+
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY             FULLNAME                    FLAGS
 COMP( 198?, sun3_50,  0,      0,      sun3_50, sun3,  sun3_state, empty_init, "Sun Microsystems", "Sun 3/50",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Model 25

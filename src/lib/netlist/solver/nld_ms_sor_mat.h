@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Couriersud
 
 #ifndef NLD_MS_SOR_MAT_H_
@@ -12,9 +12,8 @@
 /// For w==1 we will do the classic Gauss-Seidel approach
 ///
 
-#include "nld_matrix_solver.h"
+#include "nld_matrix_solver_ext.h"
 #include "nld_ms_direct.h"
-#include "nld_solver.h"
 
 #include <algorithm>
 
@@ -26,21 +25,19 @@ namespace solver
 	template <typename FT, int SIZE>
 	class matrix_solver_SOR_mat_t: public matrix_solver_direct_t<FT, SIZE>
 	{
-		friend class matrix_solver_t;
-
 	public:
 
 		using float_type = FT;
 
-		matrix_solver_SOR_mat_t(netlist_state_t &anetlist, const pstring &name,
-			const analog_net_t::list_t &nets,
+		matrix_solver_SOR_mat_t(devices::nld_solver &main_solver, const pstring &name,
+			const matrix_solver_t::net_list_t &nets,
 			const solver_parameters_t *params, std::size_t size)
-			: matrix_solver_direct_t<FT, SIZE>(anetlist, name, nets, params, size)
+			: matrix_solver_direct_t<FT, SIZE>(main_solver, name, nets, params, size)
 			, m_omega(*this, "m_omega", static_cast<float_type>(params->m_gs_sor))
 			{
 			}
 
-		unsigned vsolve_non_dynamic(bool newton_raphson) override;
+		void vsolve_non_dynamic() override;
 
 	private:
 		state_var<float_type> m_omega;
@@ -51,7 +48,7 @@ namespace solver
 	// ----------------------------------------------------------------------------------------
 
 	template <typename FT, int SIZE>
-	unsigned matrix_solver_SOR_mat_t<FT, SIZE>::vsolve_non_dynamic(bool newton_raphson)
+	void matrix_solver_SOR_mat_t<FT, SIZE>::vsolve_non_dynamic()
 	{
 		// The matrix based code looks a lot nicer but actually is 30% slower than
 		// the optimized code which works directly on the data structures.
@@ -101,7 +98,7 @@ namespace solver
 	#endif
 
 		for (std::size_t k = 0; k < iN; k++)
-			this->m_new_V[k] = this->m_terms[k].template getV<FT>();
+			this->m_new_V[k] = static_cast<float_type>(this->m_terms[k].getV());
 
 		do {
 			resched = false;
@@ -149,14 +146,8 @@ namespace solver
 		if (resched)
 		{
 			this->m_iterative_fail++;
-			return matrix_solver_direct_t<FT, SIZE>::solve_non_dynamic(newton_raphson);
+			matrix_solver_direct_t<FT, SIZE>::solve_non_dynamic();
 		}
-
-		bool err(false);
-		if (newton_raphson)
-			err = this->check_err();
-		this->store();
-		return (err) ? 2 : 1;
 	}
 
 } // namespace solver

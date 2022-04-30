@@ -21,15 +21,13 @@ public:
 
 	taito_zoom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	DECLARE_WRITE16_MEMBER(sound_irq_w);
-	DECLARE_READ16_MEMBER(sound_irq_r);
-	DECLARE_WRITE16_MEMBER(reg_data_w);
-	DECLARE_WRITE16_MEMBER(reg_address_w);
+	void sound_irq_w(uint16_t data);
+	uint16_t sound_irq_r();
+	void reg_data_w(uint16_t data);
+	void reg_address_w(uint16_t data);
 
-	DECLARE_READ8_MEMBER(shared_ram_r);
-	DECLARE_WRITE8_MEMBER(shared_ram_w);
-	DECLARE_READ8_MEMBER(tms_ctrl_r);
-	DECLARE_WRITE8_MEMBER(tms_ctrl_w);
+	uint8_t shared_ram_r(offs_t offset);
+	void shared_ram_w(offs_t offset, uint8_t data);
 
 	void set_use_flash() { m_use_flash = true; }
 
@@ -53,6 +51,9 @@ private:
 	uint8_t m_tms_ctrl;
 	bool m_use_flash;
 	std::unique_ptr<uint8_t[]> m_snd_shared_ram;
+
+	uint8_t tms_ctrl_r();
+	void tms_ctrl_w(uint8_t data);
 };
 
 DECLARE_DEVICE_TYPE(TAITO_ZOOM, taito_zoom_device)

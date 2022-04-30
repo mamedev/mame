@@ -50,18 +50,16 @@
 
  TM-0??                   Arcade Driver/Driver 1st Person (Not Produced/Released) (1974-75?)
  TM-018                   Dodgeball/Dodgem (Not Produced/Released) (1975)
- TM-024                   Qwakers (Not Produced/Released) (1974?) (Kee Games clone of Qwak!?)
+ TM-024                   Qwakers (Not Produced/Released) (1975) (Kee Games clone of Qwak!?) - A bare PCB has been found marked QWAKERS A000950 ATARI (c)75
 
  - Information (current as of 27 Mar. 2019) on what logic chips (and some analog parts) are still needed to be emulated in the
    netlist system per-game:
 
  TM-057 (Stunt Cycle)
-    566    Voltage-Controlled Oscillator
     1N751A Zener Diode
     1N752A Zener Diode
 
  TM-055 (Indy 4)
-    7406  Hex Inverter Buffers/Drivers with O.C. H.V. Outputs (note: Might not be needed, could just clone from 7404)
     7417  Hex Buffers/Drivers
     9301  1-of-10 Decoder
     LM339 Quad Comparator
@@ -72,12 +70,16 @@
 #include "emu.h"
 
 #include "machine/netlist.h"
+#include "netlist/nl_setup.h"
 #include "machine/nl_stuntcyc.h"
 #include "machine/nl_gtrak10.h"
+#include "machine/nl_tank.h"
 #include "netlist/devices/net_lib.h"
 #include "video/fixfreq.h"
 #include "screen.h"
 
+
+namespace {
 
 // copied by Pong, not accurate for this driver!
 // start
@@ -85,12 +87,12 @@
 #define V_TOTAL         (0x105+1)       // 262
 #define H_TOTAL         (0x1C6+1)       // 454
 
-#define HBSTART                 (H_TOTAL)
-#define HBEND                   (32)
-#define VBSTART                 (V_TOTAL)
-#define VBEND                   (16)
+#define HBSTART         (H_TOTAL)
+#define HBEND           (32)
+#define VBSTART         (V_TOTAL)
+#define VBEND           (16)
 
-#define HRES_MULT                   (1)
+#define HRES_MULT       (1)
 // end
 
 #define SC_VIDCLOCK     (14318000/2)
@@ -100,6 +102,10 @@
 #define SC_HBEND        (32)
 #define SC_VBSTART      (SC_VTOTAL)
 #define SC_VBEND        (8)
+
+#define TANK_VIDCLOCK   (14318181)
+#define TANK_HTOTAL     (952)
+#define TANK_VTOTAL     (262)
 
 #define GTRAK10_VIDCLOCK 14318181
 #define GTRAK10_HTOTAL 451
@@ -120,16 +126,6 @@ public:
 	required_device<fixedfreq_device> m_video;
 
 	void atarikee(machine_config &config);
-protected:
-
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	virtual void video_start() override;
-
-private:
-
 };
 
 class stuntcyc_state : public driver_device
@@ -143,11 +139,23 @@ public:
 	}
 
 	void stuntcyc(machine_config &config);
-protected:
 
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+private:
+	required_device<netlist_mame_device> m_maincpu;
+	required_device<fixedfreq_device> m_video;
+};
+
+class tank_state : public driver_device
+{
+public:
+	tank_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_video(*this, "fixfreq")
+	{
+	}
+
+	void tank(machine_config &config);
 
 private:
 	required_device<netlist_mame_device> m_maincpu;
@@ -182,30 +190,10 @@ static NETLIST_START(atarikee)
 NETLIST_END()
 
 
-void atarikee_state::machine_start()
-{
-}
-
-void atarikee_state::machine_reset()
-{
-}
-
-void atarikee_state::video_start()
-{
-}
-
-void stuntcyc_state::machine_start()
-{
-}
-
-void stuntcyc_state::machine_reset()
-{
-}
-
 void atarikee_state::atarikee(machine_config &config)
 {
 	/* basic machine hardware */
-	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_atarikee);
+	NETLIST_CPU(config, m_maincpu, netlist::config::DEFAULT_CLOCK()).set_source(netlist_atarikee);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
@@ -217,7 +205,6 @@ void atarikee_state::atarikee(machine_config &config)
 	m_video->set_threshold(0.30);
 }
 
-//#define STUNTCYC_NL_CLOCK (14318181*69)
 #define STUNTCYC_NL_CLOCK (SC_HTOTAL*SC_VTOTAL*60*140)
 
 void stuntcyc_state::stuntcyc(machine_config &config)
@@ -225,6 +212,9 @@ void stuntcyc_state::stuntcyc(machine_config &config)
 	/* basic machine hardware */
 	NETLIST_CPU(config, m_maincpu, STUNTCYC_NL_CLOCK).set_source(netlist_stuntcyc);
 	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("VIDEO_OUT", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
+	NETLIST_LOGIC_INPUT(config, "maincpu:coinsw", "coinsw.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:startsw1", "START1.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:startsw2", "START2.POS", 0);
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
@@ -238,10 +228,42 @@ void stuntcyc_state::stuntcyc(machine_config &config)
 	m_video->set_horz_scale(4);
 }
 
+void tank_state::tank(machine_config &config)
+{
+	/* basic machine hardware */
+	NETLIST_CPU(config, m_maincpu, netlist::config::DEFAULT_CLOCK()).set_source(NETLIST_NAME(tank));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("VIDEO_OUT", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
+	NETLIST_LOGIC_INPUT(config, "maincpu:p1lup",   "P1_LEFT_UP.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:p1ldown", "P1_LEFT_DOWN.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:p1rup",   "P1_RIGHT_UP.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:p1rdown", "P1_RIGHT_DOWN.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:p2lup",   "P2_LEFT_UP.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:p2ldown", "P2_LEFT_DOWN.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:p2rup",   "P2_RIGHT_UP.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:p2rdown", "P2_RIGHT_DOWN.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:p1fire",  "P1_FIRE.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:p2fire",  "P2_FIRE.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:coin1",   "COIN1.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:coin2",   "COIN2.POS", 0);
+
+	/* video hardware */
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	FIXFREQ(config, m_video).set_screen("screen");
+	m_video->set_monitor_clock(TANK_VIDCLOCK);
+	//                    Length of active video,   end of front-porch,   end of sync signal,  end of back porch
+	m_video->set_horz_params(776,                   776,                  808,                 904);
+	m_video->set_vert_params(512,                   512,                  520,                 520);
+	m_video->set_fieldcount(2);
+	m_video->set_threshold(1.0);
+	m_video->set_vsync_threshold(0.3);
+	m_video->set_gain(0.47);
+	m_video->set_horz_scale(3);
+}
+
 void gtrak10_state::gtrak10(machine_config &config)
 {
 	/* basic machine hardware */
-	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_source(netlist_gtrak10);
+	NETLIST_CPU(config, "maincpu", netlist::config::DEFAULT_CLOCK()).set_source(netlist_gtrak10);
 
 	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("VIDEO_OUT", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
 
@@ -280,6 +302,31 @@ void gtrak10_state::gtrak10(machine_config &config)
 
 static INPUT_PORTS_START( gtrak10 )
 	// TODO
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( stuntcyc )
+	PORT_START("IN0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1)     NETLIST_LOGIC_PORT_CHANGED("maincpu", "coinsw")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START1)    NETLIST_LOGIC_PORT_CHANGED("maincpu", "startsw1")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_START2)    NETLIST_LOGIC_PORT_CHANGED("maincpu", "startsw2")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tank )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP )    PORT_2WAY NETLIST_LOGIC_PORT_CHANGED("maincpu", "p1lup")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN )  PORT_2WAY NETLIST_LOGIC_PORT_CHANGED("maincpu", "p1ldown")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_2WAY NETLIST_LOGIC_PORT_CHANGED("maincpu", "p1rup")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP )   PORT_2WAY NETLIST_LOGIC_PORT_CHANGED("maincpu", "p1rdown")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP )    PORT_2WAY PORT_PLAYER(2) NETLIST_LOGIC_PORT_CHANGED("maincpu", "p1lup")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN )  PORT_2WAY PORT_PLAYER(2) NETLIST_LOGIC_PORT_CHANGED("maincpu", "p1ldown")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_2WAY PORT_PLAYER(2) NETLIST_LOGIC_PORT_CHANGED("maincpu", "p1rup")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP )   PORT_2WAY PORT_PLAYER(2) NETLIST_LOGIC_PORT_CHANGED("maincpu", "p1rdown")
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) NETLIST_LOGIC_PORT_CHANGED("maincpu", "p1fire")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) NETLIST_LOGIC_PORT_CHANGED("maincpu", "p2fire")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 ) NETLIST_LOGIC_PORT_CHANGED("maincpu", "coin1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 ) NETLIST_LOGIC_PORT_CHANGED("maincpu", "coin2")
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -476,7 +523,7 @@ ROM_START( tank )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
 	/* The "custom" 24-pin ROM used in Atari/Kee Games "Tank" is known as a MOSTEK MK28000P. */
-	ROM_REGION( 0x0801, "gfx", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0801, "maincpu:gfx", ROMREGION_ERASE00 )
 	ROM_LOAD( "90-2006.k10",  0x0000, 0x0800, CRC(87f5c365) SHA1(bc518a5795ef3ed8a7c0463653d70f60780ddda1) )
 ROM_END
 
@@ -537,10 +584,6 @@ ROM_START( pinpong )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START( pongdbl )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-ROM_END
-
 ROM_START( pursuit )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
@@ -571,23 +614,26 @@ ROM_END
 
 */
 
-GAME(1975,  antiairc,  0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari",        "Anti-Aircraft [TTL]",    MACHINE_IS_SKELETON)
-GAME(1975,  crashnsc,  0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari",        "Crash 'n Score/Stock Car [TTL]",   MACHINE_IS_SKELETON)
-GAME(1974,  gtrak10,   0,        gtrak10,  gtrak10,  gtrak10_state, empty_init, ROT0,  "Atari/Kee",    "Gran Trak 10/Trak 10/Formula K [TTL]",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1974,  gtrak10a,  gtrak10,  atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Gran Trak 10/Trak 10/Formula K (older) [TTL]",     MACHINE_IS_SKELETON)
-GAME(1974,  gtrak20,   0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Gran Trak 20/Trak 20/Twin Racer [TTL]",    MACHINE_IS_SKELETON)
-GAME(1976,  indy4,     0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Indy 4 [TTL]",           MACHINE_IS_SKELETON)
-GAME(1975,  indy800,   0,        atarikee,       0, atarikee_state, empty_init, ROT90, "Atari/Kee",    "Indy 800 [TTL]",         MACHINE_IS_SKELETON)
-GAME(1975,  jetfight,  0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari",        "Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (set 1) [TTL]",      MACHINE_IS_SKELETON)
-GAME(1975,  jetfighta, jetfight, atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari",        "Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (set 2) [TTL]",      MACHINE_IS_SKELETON)
-GAME(1976,  lemans,    0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari",        "Le Mans [TTL]",          MACHINE_IS_SKELETON)
-GAME(1976,  outlaw,    0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari",        "Outlaw [TTL]",           MACHINE_IS_SKELETON)
-GAME(1974,  qwakttl,   0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari",        "Qwak!/Quack [TTL]",      MACHINE_IS_SKELETON)
-GAME(1975,  sharkjaw,  0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari/Horror Games",    "Shark JAWS [TTL]",     MACHINE_IS_SKELETON)
-GAME(1975,  steeplec,  0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari",        "Steeplechase [TTL]",     MACHINE_IS_SKELETON)
-GAME(1976,  stuntcyc,  0,        stuntcyc,       0, stuntcyc_state, empty_init, ROT0,  "Atari",        "Stunt Cycle [TTL]",      MACHINE_IS_SKELETON)
-GAME(1974,  tank,      0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Tank/Tank Cocktail [TTL]",     MACHINE_IS_SKELETON)
-GAME(1975,  tankii,    0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Tank II [TTL]",          MACHINE_IS_SKELETON)
+} // Anonymous namespace
+
+
+GAME(1975,  antiairc,  0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Anti-Aircraft [TTL]",    MACHINE_IS_SKELETON)
+GAME(1975,  crashnsc,  0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Crash 'n Score/Stock Car [TTL]",   MACHINE_IS_SKELETON)
+GAME(1974,  gtrak10,   0,        gtrak10,   gtrak10,  gtrak10_state, empty_init, ROT0,  "Atari/Kee",    "Gran Trak 10/Trak 10/Formula K [TTL]",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1974,  gtrak10a,  gtrak10,  atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Gran Trak 10/Trak 10/Formula K (older) [TTL]",     MACHINE_IS_SKELETON)
+GAME(1974,  gtrak20,   0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Gran Trak 20/Trak 20/Twin Racer [TTL]",    MACHINE_IS_SKELETON)
+GAME(1976,  indy4,     0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Indy 4 [TTL]",           MACHINE_IS_SKELETON)
+GAME(1975,  indy800,   0,        atarikee,        0, atarikee_state, empty_init, ROT90, "Atari/Kee",    "Indy 800 [TTL]",         MACHINE_IS_SKELETON)
+GAME(1975,  jetfight,  0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (set 1) [TTL]",      MACHINE_IS_SKELETON)
+GAME(1975,  jetfighta, jetfight, atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (set 2) [TTL]",      MACHINE_IS_SKELETON)
+GAME(1976,  lemans,    0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Le Mans [TTL]",          MACHINE_IS_SKELETON)
+GAME(1976,  outlaw,    0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Outlaw [TTL]",           MACHINE_IS_SKELETON)
+GAME(1974,  qwakttl,   0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Qwak!/Quack [TTL]",      MACHINE_IS_SKELETON)
+GAME(1975,  sharkjaw,  0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari/Horror Games",    "Shark JAWS [TTL]",     MACHINE_IS_SKELETON)
+GAME(1975,  steeplec,  0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Steeplechase [TTL]",     MACHINE_IS_SKELETON)
+GAME(1976,  stuntcyc,  0,        stuntcyc, stuntcyc, stuntcyc_state, empty_init, ROT0,  "Atari",        "Stunt Cycle [TTL]",      MACHINE_IS_SKELETON)
+GAME(1974,  tank,      0,        tank,         tank, tank_state,     empty_init, ROT0,  "Atari/Kee",    "Tank/Tank Cocktail [TTL]",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(1975,  tankii,    0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Tank II [TTL]",          MACHINE_IS_SKELETON)
 
 // MISSING ROM DUMPS
 //GAME(1975,  astrotrf,  steeplec, atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Astroturf [TTL]",        MACHINE_IS_SKELETON)

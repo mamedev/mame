@@ -13,7 +13,6 @@
 
 #include "speaker.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -33,11 +32,8 @@ class acorn_vidc10_device : public device_t,
 							public device_video_interface
 {
 public:
-	// construction/destruction
-	acorn_vidc10_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
 	// I/O operations
-	DECLARE_WRITE32_MEMBER( write );
+	void write(offs_t offset, u32 data, u32 mem_mask = ~0);
 	DECLARE_READ_LINE_MEMBER( flyback_r );
 	auto vblank() { return m_vblank_cb.bind(); }
 	auto sound_drq() { return m_sound_drq_cb.bind(); }
@@ -50,8 +46,10 @@ public:
 	void set_cursor_enable(bool state) { m_cursor_enable = state; }
 	u32 get_cursor_size() { return (m_crtc_regs[CRTC_VCER] - m_crtc_regs[CRTC_VCSR]) * (32/4); }
 
+	virtual bool get_dac_mode() { return false; }
+
 protected:
-	acorn_vidc10_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	acorn_vidc10_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int dac_type);
 
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;
@@ -60,7 +58,7 @@ protected:
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual space_config_vector memory_space_config() const override;
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual u32 get_pixel_clock();
@@ -85,26 +83,29 @@ protected:
 	u16 m_pal_4bpp_base;
 	u16 m_pal_cursor_base;
 	u16 m_pal_border_base;
-	const double m_sound_internal_divider = 8.0;
 
 	u8 m_bpp_mode, m_crtc_interlace;
 	u8       m_sound_frequency_latch;
 	bool     m_sound_mode;
 
 	required_device_array<dac_16bit_r2r_twos_complement_device, 8> m_dac;
+	int m_dac_type;
 
-private:
 	required_device<speaker_device> m_lspeaker;
 	required_device<speaker_device> m_rspeaker;
+
+	virtual void refresh_stereo_image(u8 channel);
+	const int m_sound_max_channels = 8;
+private:
 	devcb_write_line m_vblank_cb;
 	devcb_write_line m_sound_drq_cb;
 
-	DECLARE_WRITE32_MEMBER( pal_data_display_w );
-	DECLARE_WRITE32_MEMBER( pal_data_cursor_w );
-	DECLARE_WRITE32_MEMBER( stereo_image_w );
-	DECLARE_WRITE32_MEMBER( crtc_w );
-	DECLARE_WRITE32_MEMBER( sound_frequency_w );
-	DECLARE_WRITE32_MEMBER( control_w );
+	void pal_data_display_w(offs_t offset, u32 data);
+	void pal_data_cursor_w(offs_t offset, u32 data);
+	void stereo_image_w(offs_t offset, u32 data);
+	void crtc_w(offs_t offset, u32 data);
+	void sound_frequency_w(u32 data);
+	void control_w(u32 data);
 
 	u8 m_pixel_clock;
 	bool m_cursor_enable;
@@ -127,23 +128,26 @@ private:
 	bool m_sound_frequency_test_bit;
 	u8       m_stereo_image[8];
 	const float m_sound_input_gain = 0.05f;
-	const int m_sound_max_channels = 8;
 	int16_t  m_ulaw_lookup[256];
-	inline void refresh_stereo_image(u8 channel);
 };
 
-class acorn_vidc10_lcd_device : public acorn_vidc10_device
+class acorn_vidc1_device : public acorn_vidc10_device
 {
 public:
 	// construction/destruction
-	acorn_vidc10_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	acorn_vidc1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+class acorn_vidc1a_device : public acorn_vidc10_device
+{
+public:
+	// construction/destruction
+	acorn_vidc1a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(ACORN_VIDC10, acorn_vidc10_device)
-DECLARE_DEVICE_TYPE(ACORN_VIDC10_LCD, acorn_vidc10_lcd_device)
+DECLARE_DEVICE_TYPE(ACORN_VIDC1, acorn_vidc1_device)
+DECLARE_DEVICE_TYPE(ACORN_VIDC1A, acorn_vidc1a_device)
 
 class arm_vidc20_device : public acorn_vidc10_device
 {
@@ -152,7 +156,7 @@ public:
 	arm_vidc20_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void write_dac32(u8 channel, u16 data);
-	bool get_dac_mode();
+	virtual bool get_dac_mode() override;
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -161,21 +165,19 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_config_complete() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual u32 get_pixel_clock() override;
 
-	const double m_sound_internal_divider = 1.0;
-
 private:
-	DECLARE_WRITE32_MEMBER( vidc20_pal_data_display_w );
-	DECLARE_WRITE32_MEMBER( vidc20_pal_data_index_w );
-	DECLARE_WRITE32_MEMBER( vidc20_pal_data_cursor_w );
-	DECLARE_WRITE32_MEMBER( vidc20_crtc_w );
-	DECLARE_WRITE32_MEMBER( vidc20_control_w );
-	DECLARE_WRITE32_MEMBER( vidc20_sound_frequency_w );
-	DECLARE_WRITE32_MEMBER( vidc20_sound_control_w );
-	DECLARE_WRITE32_MEMBER( fsynreg_w );
+	void vidc20_pal_data_display_w(offs_t offset, u32 data);
+	void vidc20_pal_data_index_w(u32 data);
+	void vidc20_pal_data_cursor_w(offs_t offset, u32 data);
+	void vidc20_crtc_w(offs_t offset, u32 data);
+	void vidc20_control_w(u32 data);
+	void vidc20_sound_frequency_w(u32 data);
+	void vidc20_sound_control_w(u32 data);
+	void fsynreg_w(u32 data);
 
 	u8 m_pal_data_index;
 	inline void update_8bpp_palette(u16 index, u32 paldata);
@@ -184,6 +186,10 @@ private:
 	u8 m_pixel_rate;
 	u8 m_vco_r_modulo;
 	u8 m_vco_v_modulo;
+
+	required_device_array<dac_16bit_r2r_twos_complement_device, 2> m_dac32;
+
+	virtual void refresh_stereo_image(u8 channel) override;
 };
 
 DECLARE_DEVICE_TYPE(ARM_VIDC20, arm_vidc20_device)
@@ -194,4 +200,4 @@ DECLARE_DEVICE_TYPE(ARM_VIDC20, arm_vidc20_device)
 //**************************************************************************
 
 
-#endif // MAME_MACHINE_ACORN_VIDC10_H
+#endif // MAME_MACHINE_ACORN_VIDC_H

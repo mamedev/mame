@@ -86,9 +86,9 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_P_CODE, bus::ti99::peb, ti_pcode_card_device, "ti99_pcode", "TI-99 P-Code Card")
+DEFINE_DEVICE_TYPE(TI99_P_CODE, bus::ti99::peb::ti_pcode_card_device, "ti99_pcode", "TI-99 P-Code Card")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 #define PCODE_GROM_TAG "pcode_grom"
 #define PCODE_ROM_TAG "pcode_rom"
@@ -115,7 +115,7 @@ ti_pcode_card_device::ti_pcode_card_device(const machine_config &mconfig, const 
 {
 }
 
-SETADDRESS_DBIN_MEMBER( ti_pcode_card_device::setaddress_dbin )
+void ti_pcode_card_device::setaddress_dbin(offs_t offset, int state)
 {
 	m_address = offset;
 	m_inDsrArea = in_dsr_space(offset, true);
@@ -142,25 +142,26 @@ SETADDRESS_DBIN_MEMBER( ti_pcode_card_device::setaddress_dbin )
 	}
 }
 
-void ti_pcode_card_device::debugger_read(uint16_t offset, uint8_t& value)
+void ti_pcode_card_device::debugger_read(offs_t offset, uint8_t& value)
 {
 	// The debuger does not call setaddress
 	if (m_active && in_dsr_space(offset, true))
 	{
 		bool isrom0 = ((offset & 0xf000)==0x4000);
 		bool isrom12 = ((offset & 0xf000)==0x5000);
-		if (isrom0) value = m_rom[m_address & 0x0fff];
+		if (isrom0) value = m_rom[offset & 0x0fff];
 		else
 			if (isrom12) value = m_rom[(m_bank_select<<12) | (offset & 0x0fff)];
 	}
 }
 
-READ8Z_MEMBER( ti_pcode_card_device::readz )
+void ti_pcode_card_device::readz(offs_t offset, uint8_t *value)
 {
 	// Care for debugger
 	if (machine().side_effects_disabled())
 	{
 		debugger_read(offset, *value);
+		return;
 	}
 
 	if (m_active && m_inDsrArea && m_selected)
@@ -240,7 +241,7 @@ WRITE_LINE_MEMBER( ti_pcode_card_device::clock_in)
     we just ignore any request. (Note that CRU lines are not like memory; you
     may be able to write to them, but not necessarily read them again.)
 */
-READ8Z_MEMBER(ti_pcode_card_device::crureadz)
+void ti_pcode_card_device::crureadz(offs_t offset, uint8_t *value)
 {
 }
 
@@ -356,4 +357,4 @@ ioport_constructor ti_pcode_card_device::device_input_ports() const
 	return INPUT_PORTS_NAME( ti99_pcode );
 }
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb

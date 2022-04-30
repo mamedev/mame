@@ -133,11 +133,11 @@ Q-0900^76203F0161063005080E492DCD4890597877103F020E75105A0A0C1E89F4101879
 
 #include "emu.h"
 #include "includes/vc4000.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
-READ8_MEMBER( vc4000_state::vc4000_key_r )
+uint8_t vc4000_state::vc4000_key_r(offs_t offset)
 {
 	uint8_t data=0;
 	switch(offset & 0x0f)
@@ -167,19 +167,19 @@ READ8_MEMBER( vc4000_state::vc4000_key_r )
 	return data;
 }
 
-WRITE8_MEMBER( vc4000_state::vc4000_sound_ctl )
+void vc4000_state::vc4000_sound_ctl(offs_t offset, uint8_t data)
 {
 	logerror("Write to sound control register offset= %d value= %d\n", offset, data);
 }
 
 // Write cassette - Address 0x1DFF
-WRITE8_MEMBER( vc4000_state::elektor_cass_w )
+void vc4000_state::elektor_cass_w(uint8_t data)
 {
 	m_cassette->output(BIT(data, 7) ? -1.0 : +1.0);
 }
 
 // Read cassette - Address 0x1DBF
-READ8_MEMBER( vc4000_state::elektor_cass_r )
+uint8_t vc4000_state::elektor_cass_r()
 {
 	return (m_cassette->input() > 0.03) ? 0xff : 0x7f;
 }
@@ -410,7 +410,7 @@ QUICKLOAD_LOAD_MEMBER(vc4000_state::quickload_cb)
 	read_ = image.fread( &quick_data[0], quick_length);
 	if (read_ != quick_length)
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+		image.seterror(image_error::INVALIDIMAGE, "Cannot read the file");
 		image.message(" Cannot read the file");
 	}
 	else
@@ -419,7 +419,7 @@ QUICKLOAD_LOAD_MEMBER(vc4000_state::quickload_cb)
 		{
 			if (quick_data[0] != 2)
 			{
-				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
+				image.seterror(image_error::INVALIDIMAGE, "Invalid header");
 				image.message(" Invalid header");
 			}
 			else
@@ -429,13 +429,13 @@ QUICKLOAD_LOAD_MEMBER(vc4000_state::quickload_cb)
 
 				if (quick_length < 0x5)
 				{
-					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
+					image.seterror(image_error::INVALIDIMAGE, "File too short");
 					image.message(" File too short");
 				}
 				else
 					if ((quick_length + quick_addr - 5) > 0x1600)
 					{
-						image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+						image.seterror(image_error::INVALIDIMAGE, "File too long");
 						image.message(" File too long");
 					}
 					else
@@ -460,7 +460,7 @@ QUICKLOAD_LOAD_MEMBER(vc4000_state::quickload_cb)
 			{
 				if (quick_data[0] != 0)
 				{
-					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
+					image.seterror(image_error::INVALIDIMAGE, "Invalid header");
 					image.message(" Invalid header");
 				}
 				else
@@ -469,19 +469,19 @@ QUICKLOAD_LOAD_MEMBER(vc4000_state::quickload_cb)
 
 					if (exec_addr >= quick_length)
 					{
-						image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Exec address beyond end of file");
+						image.seterror(image_error::INVALIDIMAGE, "Exec address beyond end of file");
 						image.message(" Exec address beyond end of file");
 					}
 					else
 						if (quick_length < 0x904)
 						{
-							image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
+							image.seterror(image_error::INVALIDIMAGE, "File too short");
 							image.message(" File too short");
 						}
 						else
 							if (quick_length > 0x2000)
 							{
-								image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+								image.seterror(image_error::INVALIDIMAGE, "File too long");
 								image.message(" File too long");
 							}
 							else
@@ -502,7 +502,7 @@ QUICKLOAD_LOAD_MEMBER(vc4000_state::quickload_cb)
 									read_ = quick_length;
 								if (quick_length > 0x1FC0)
 									for (i = 0x1F50; i < read_; i++)
-										vc4000_video_w(space, i-0x1f00, quick_data[i]);
+										vc4000_video_w(i-0x1f00, quick_data[i]);
 
 								/* display a message about the loaded quickload */
 								image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
@@ -534,6 +534,7 @@ void vc4000_state::vc4000(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vc4000_state::vc4000_mem);
 	m_maincpu->sense_handler().set(FUNC(vc4000_state::vc4000_vsync_r));
 	m_maincpu->set_periodic_int(FUNC(vc4000_state::vc4000_video_line), attotime::from_hz(312*53));  // GOLF needs this exact value
+	m_maincpu->intack_handler().set([]() { return 0x03; });
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

@@ -168,21 +168,21 @@ INPUT_PORTS_END
 //  I8255A 0 Interface
 //-------------------------------------------------
 
-READ8_MEMBER( softbox_state::ppi0_pa_r )
+uint8_t softbox_state::ppi0_pa_r()
 {
-	return m_ieee->read_dio() ^ 0xff;
+	return m_ieee->dio_r() ^ 0xff;
 }
 
-WRITE8_MEMBER( softbox_state::ppi0_pb_w )
+void softbox_state::ppi0_pb_w(uint8_t data)
 {
-	m_ieee->write_dio(data ^ 0xff);
+	m_ieee->host_dio_w(data ^ 0xff);
 }
 
 //-------------------------------------------------
 //  I8255A 1 Interface
 //-------------------------------------------------
 
-READ8_MEMBER( softbox_state::ppi1_pa_r )
+uint8_t softbox_state::ppi1_pa_r()
 {
 	/*
 
@@ -213,7 +213,7 @@ READ8_MEMBER( softbox_state::ppi1_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( softbox_state::ppi1_pb_w )
+void softbox_state::ppi1_pb_w(uint8_t data)
 {
 	/*
 
@@ -240,7 +240,7 @@ WRITE8_MEMBER( softbox_state::ppi1_pb_w )
 	m_ieee->host_ifc_w(!BIT(data, 7));
 }
 
-READ8_MEMBER( softbox_state::ppi1_pc_r )
+uint8_t softbox_state::ppi1_pc_r()
 {
 	/*
 
@@ -257,7 +257,7 @@ READ8_MEMBER( softbox_state::ppi1_pc_r )
 
 	*/
 
-	uint8_t status = m_hdc->status_r(space, 0);
+	uint8_t status = m_hdc->status_r();
 	uint8_t data = 0;
 
 	data |= (status & corvus_hdc_device::CONTROLLER_BUSY) ? 0 : 0x10;
@@ -266,7 +266,7 @@ READ8_MEMBER( softbox_state::ppi1_pc_r )
 	return data;
 }
 
-WRITE8_MEMBER( softbox_state::ppi1_pc_w )
+void softbox_state::ppi1_pc_w(uint8_t data)
 {
 	/*
 
@@ -291,7 +291,6 @@ WRITE8_MEMBER( softbox_state::ppi1_pc_w )
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )

@@ -6,7 +6,7 @@
 #pragma once
 
 #include "bus/msx_cart/cartridge.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 
 
 DECLARE_DEVICE_TYPE(MSX_CART_FMPAC, msx_cart_fmpac_device)

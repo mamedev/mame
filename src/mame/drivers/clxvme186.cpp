@@ -10,7 +10,7 @@
 #include "cpu/i86/i186.h"
 //#include "bus/vme/vme.h"
 #include "machine/74259.h"
-//#include "machine/m3000.h"
+#include "machine/m3002.h"
 #include "machine/z80scc.h"
 
 class clxvme186_state : public driver_device
@@ -65,7 +65,7 @@ void clxvme186_state::io_map(address_map &map)
 {
 	map(0xe000, 0xe001).unmaprw(); // SASI data port (PCS0)
 	map(0xe080, 0xe087).rw("scc", FUNC(scc8530_device::ab_dc_r), FUNC(scc8530_device::ab_dc_w)).umask16(0x00ff); // Serial I/O ports A & B (PCS1)
-	//map(0xe100, 0xe100).rw("rtc", FUNC(m3000_device::read), FUNC(m3000_device::write)); // Real time clock (PCS2)
+	map(0xe100, 0xe100).rw("rtc", FUNC(m3000_device::read), FUNC(m3000_device::write)); // Real time clock (PCS2)
 	map(0xe180, 0xe181).portr("TTL"); // TTL input port (PCS3)
 	map(0xe180, 0xe181).w(FUNC(clxvme186_state::unknown_w));
 	map(0xe190, 0xe190).r(FUNC(clxvme186_state::sasi_status_r)); // SASI status port (PCS3)
@@ -85,7 +85,7 @@ static INPUT_PORTS_START(clxvme186)
 	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN) // Printer busy
 	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN) // Printer paper empty
 	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN) // /SYSFAIL
-	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN) // Real time clock busy
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("rtc", m3000_device, busy_r)
 	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN) // Colex use only
 	PORT_BIT(0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN) // Colex use only
 	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN) // /ACFAIL
@@ -102,7 +102,7 @@ void clxvme186_state::clxvme186(machine_config &config)
 
 	SCC8530N(config, "scc", 3.6864_MHz_XTAL);
 
-	//M3000(config, "rtc", 32.768_kHz_XTAL);
+	M3000(config, "rtc", 32.768_kHz_XTAL);
 
 	LS259(config, "ctrllatch");
 }

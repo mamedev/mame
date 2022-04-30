@@ -7,7 +7,7 @@
 
 #define M1COMM_SIMULATION
 
-#include "osdcore.h"
+#include "osdfile.h"
 #include "cpu/z80/z80.h"
 #include "machine/am9517a.h"
 #include "machine/mb89374.h"
@@ -26,17 +26,17 @@ public:
 	// public API - stuff that gets called from the model1
 	// shared memory 4k
 	// reads/writes at I/O 0xB00xxx
-	DECLARE_READ8_MEMBER(share_r);
-	DECLARE_WRITE8_MEMBER(share_w);
+	uint8_t share_r(offs_t offset);
+	void share_w(offs_t offset, uint8_t data);
 
 	// single bit registers (74LS74)
 	// reads/writes at I/O 0xB01000
-	DECLARE_READ8_MEMBER(cn_r);
-	DECLARE_WRITE8_MEMBER(cn_w);
+	uint8_t cn_r();
+	void cn_w(uint8_t data);
 
 	// reads/writes at I/O 0xB01002
-	DECLARE_READ8_MEMBER(fg_r);
-	DECLARE_WRITE8_MEMBER(fg_w);
+	uint8_t fg_r();
+	void fg_w(uint8_t data);
 
 	// IRQ logic - 5 = VINT, 7 = DLC
 	void check_vint_irq();
@@ -64,40 +64,40 @@ private:
 
 	// MB89237A handler
 	DECLARE_WRITE_LINE_MEMBER(dma_hreq_w);
-	DECLARE_READ8_MEMBER(dma_mem_r);
-	DECLARE_WRITE8_MEMBER(dma_mem_w);
+	uint8_t dma_mem_r(offs_t offset);
+	void dma_mem_w(offs_t offset, uint8_t data);
 
 	// single bit registers (74LS74)
-	DECLARE_READ8_MEMBER(syn_r);
-	DECLARE_WRITE8_MEMBER(syn_w);
-	DECLARE_READ8_MEMBER(zfg_r);
-	DECLARE_WRITE8_MEMBER(zfg_w);
+	uint8_t syn_r();
+	void syn_w(uint8_t data);
+	uint8_t zfg_r();
+	void zfg_w(uint8_t data);
 
 	// shared memory 4k
 	// reads/writes at 0xC000-FFFF
 	// - share_r
 	// - share_w
 
-	uint8_t m_shared[0x1000]; // 2x 2k = 4k; model1 accesses this with 16bit data and 11bit address (A0 to A10)
-	uint8_t m_syn;            // bit0 is used to trigger DOP line on VINT, bit1 is used to enable/disable VINT/IRQ5
-	uint8_t m_zfg;            // z80 flip gate, bit0 is stored
-	uint8_t m_cn;             // bit0 is used to enable/disable the comm board
-	uint8_t m_fg;             // flip gate, bit0 is stored, bit7 is connected to ZFG bit 0
+	uint8_t m_shared[0x1000]{}; // 2x 2k = 4k; model1 accesses this with 16bit data and 11bit address (A0 to A10)
+	uint8_t m_syn = 0;            // bit0 is used to trigger DOP line on VINT, bit1 is used to enable/disable VINT/IRQ5
+	uint8_t m_zfg = 0;            // z80 flip gate, bit0 is stored
+	uint8_t m_cn = 0;             // bit0 is used to enable/disable the comm board
+	uint8_t m_fg = 0;             // flip gate, bit0 is stored, bit7 is connected to ZFG bit 0
 
 #ifdef M1COMM_SIMULATION
 	osd_file::ptr m_line_rx;  // rx line - can be either differential, simple serial or toslink
 	osd_file::ptr m_line_tx;  // tx line - is differential, simple serial and toslink
-	char m_localhost[256];
-	char m_remotehost[256];
-	uint8_t m_buffer0[0x200];
-	uint8_t m_buffer1[0x200];
+	char m_localhost[256]{};
+	char m_remotehost[256]{};
+	uint8_t m_buffer0[0x200]{};
+	uint8_t m_buffer1[0x200]{};
 	uint8_t m_framesync;
 
-	uint8_t m_linkenable;
-	uint16_t m_linktimer;
-	uint8_t m_linkalive;
-	uint8_t m_linkid;
-	uint8_t m_linkcount;
+	uint8_t m_linkenable = 0;
+	uint16_t m_linktimer = 0;
+	uint8_t m_linkalive = 0;
+	uint8_t m_linkid = 0;
+	uint8_t m_linkcount = 0;
 
 	void comm_tick();
 	int read_frame(int dataSize);

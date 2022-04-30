@@ -37,7 +37,7 @@ DEFINE_DEVICE_TYPE(ER2055, er2055_device, "er2055", "ER2055 EAROM (64x8)")
 er2055_device::er2055_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ER2055, tag, owner, clock),
 		device_nvram_interface(mconfig, *this),
-		m_default_data(*this, DEVICE_SELF, SIZE_DATA),
+		m_default_data(*this, DEVICE_SELF),
 		m_control_state(0),
 		m_address(0),
 		m_data(0)
@@ -83,9 +83,10 @@ void er2055_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void er2055_device::nvram_read(emu_file &file)
+bool er2055_device::nvram_read(util::read_stream &file)
 {
-	file.read(&m_rom_data[0], SIZE_DATA);
+	size_t actual;
+	return !file.read(&m_rom_data[0], SIZE_DATA, actual) && actual == SIZE_DATA;
 }
 
 
@@ -94,9 +95,10 @@ void er2055_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void er2055_device::nvram_write(emu_file &file)
+bool er2055_device::nvram_write(util::write_stream &file)
 {
-	file.write(&m_rom_data[0], SIZE_DATA);
+	size_t actual;
+	return !file.write(&m_rom_data[0], SIZE_DATA, actual) && actual == SIZE_DATA;
 }
 
 

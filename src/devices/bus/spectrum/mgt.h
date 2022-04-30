@@ -31,7 +31,7 @@ public:
 	// construction/destruction
 	spectrum_plusd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 	DECLARE_INPUT_CHANGED_MEMBER(snapshot_button);
 
 protected:
@@ -71,10 +71,18 @@ public:
 	// construction/destruction
 	spectrum_disciple_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	DECLARE_INPUT_CHANGED_MEMBER(inhibit_button) { if (!newval) m_romcs = 0; }
+
 protected:
+	enum
+	{
+		TIMER_RESET
+	};
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -92,8 +100,11 @@ private:
 	required_device<spectrum_expansion_slot_device> m_exp;
 	required_ioport m_joy1;
 	required_ioport m_joy2;
+	required_ioport m_inhibit;
 
 	bool m_map;
+	u8 m_control;
+	bool m_reset_delay;
 };
 
 

@@ -71,16 +71,16 @@ void aim65_state::u1_pb_w( u8 data )
 }
 
 
-template <unsigned D> WRITE16_MEMBER( aim65_state::update_ds )
+template <unsigned D> void aim65_state::update_ds(offs_t offset, u16 data)
 {
 	m_digits[((D - 1) << 2) | (offset ^ 3)] = data;
 }
 
-template WRITE16_MEMBER( aim65_state::update_ds<1> );
-template WRITE16_MEMBER( aim65_state::update_ds<2> );
-template WRITE16_MEMBER( aim65_state::update_ds<3> );
-template WRITE16_MEMBER( aim65_state::update_ds<4> );
-template WRITE16_MEMBER( aim65_state::update_ds<5> );
+template void aim65_state::update_ds<1>(offs_t offset, u16 data);
+template void aim65_state::update_ds<2>(offs_t offset, u16 data);
+template void aim65_state::update_ds<3>(offs_t offset, u16 data);
+template void aim65_state::update_ds<4>(offs_t offset, u16 data);
+template void aim65_state::update_ds<5>(offs_t offset, u16 data);
 
 
 /******************************************************************************
@@ -315,8 +315,6 @@ void aim65_state::z32_pa_w( u8 data )
 // Display printer output
 uint32_t aim65_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t data;
-
 	for (u8 y = 0; y<cliprect.max_y; y++)
 	{
 		u16 sy = m_printer_y*10 - cliprect.max_y + 10 + y;
@@ -324,13 +322,14 @@ uint32_t aim65_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			sy += 0x280;
 		for(u8 x = 0; x < 10; x++)
 		{
+			uint16_t data;
 			if (!BIT(sy, 0))
 				data = m_printerRAM[sy * 10 + x];
 			else
 				data = m_printerRAM[sy * 10 + (9 - x)];
 
 			for (u8 b = 0; b < 10; b++)
-				bitmap.pix16(y, 120 - (b * 12) - ((x > 4) ? x+1 : x)) = BIT(data, b);
+				bitmap.pix(y, 120 - (b * 12) - ((x > 4) ? x+1 : x)) = BIT(data, b);
 		}
 	}
 

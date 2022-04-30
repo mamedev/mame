@@ -2,13 +2,16 @@
 // copyright-holders:hap
 /*
 
-  Hughes HLCD 0538(A)/0539(A) LCD Driver
+Hughes HLCD 0538(A)/0539(A) LCD Driver
 
-  0538: 8 rows, 26 columns
-  0539: 0 rows, 34 columns
+0538: 8 rows, 26 columns
+0539: 0 rows, 34 columns
 
-  TODO:
-  - the only difference between 0538/0539 is row pins voltage levels?
+"LCD" pin can be used in 2 modes, either direct drive, or as an oscillator.
+In latter case, output frequency is approximately 1/RC.
+
+TODO:
+- the only difference between 0538/0539 is row pins voltage levels?
 
 */
 
@@ -47,11 +50,10 @@ void hlcd0538_device::device_start()
 	m_write_cols.resolve_safe();
 	m_write_interrupt.resolve_safe();
 
-	// zerofill
-	m_lcd = 0;
-	m_clk = 0;
-	m_data = 0;
-	m_shift = 0;
+	// timer (when LCD pin is oscillator)
+	m_lcd_timer = timer_alloc();
+	attotime period = (clock() != 0) ? attotime::from_hz(2 * clock()) : attotime::never;
+	m_lcd_timer->adjust(period, 0, period);
 
 	// register for savestates
 	save_item(NAME(m_lcd));

@@ -133,6 +133,10 @@ Switches   Aux-RS232   Aux Port   Alpha      Vend-Bus
                        13 - +12
                        14 - GAP
                        15 - 0V
+
+MPU5 Horizon and Genesis machines use also a mux PCB for LEDs, lamps and buttons called
+"Barcrest -MUX5E- XP19642 ISS4", wich uses a Zilog Z86E6116PSG MCU (undumped).
+
 */
 
 
@@ -144,7 +148,7 @@ Switches   Aux-RS232   Aux Port   Alpha      Vend-Bus
 #include "mpu5.lh"
 
 
-READ8_MEMBER(mpu5_state::asic_r8)
+uint8_t mpu5_state::asic_r8(offs_t offset)
 {
 	switch (offset)
 	{
@@ -173,17 +177,17 @@ READ8_MEMBER(mpu5_state::asic_r8)
 }
 
 
-READ32_MEMBER(mpu5_state::asic_r32)
+uint32_t mpu5_state::asic_r32(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t retdata = 0;
-	if (ACCESSING_BITS_24_31) retdata |= asic_r8(space,(offset*4)+0) <<24;
-	if (ACCESSING_BITS_16_23) retdata |= asic_r8(space,(offset*4)+1) <<16;
-	if (ACCESSING_BITS_8_15) retdata |= asic_r8(space,(offset*4)+2) <<8;
-	if (ACCESSING_BITS_0_7) retdata |= asic_r8(space,(offset*4)+3) <<0;
+	if (ACCESSING_BITS_24_31) retdata |= asic_r8((offset*4)+0) <<24;
+	if (ACCESSING_BITS_16_23) retdata |= asic_r8((offset*4)+1) <<16;
+	if (ACCESSING_BITS_8_15) retdata |= asic_r8((offset*4)+2) <<8;
+	if (ACCESSING_BITS_0_7) retdata |= asic_r8((offset*4)+3) <<0;
 	return retdata;
 }
 
-READ32_MEMBER(mpu5_state::mpu5_mem_r)
+uint32_t mpu5_state::mpu5_mem_r(offs_t offset, uint32_t mem_mask)
 {
 	int pc = m_maincpu->pc();
 	int addr = offset *4;
@@ -192,41 +196,33 @@ READ32_MEMBER(mpu5_state::mpu5_mem_r)
 	switch ( cs )
 	{
 		case 2:
-		{
 			switch (addr & 0xf0)
 			{
 				case 0xd0:
-				{
 					logerror("%08x PIC read\n", pc);
 					break;
-				}
+
 				case 0xe0:
-				{
 					logerror("%08x DUART read\n", pc);
 					break;
-				}
 
 				case 0xf0:
-				{
-					return asic_r32(space, offset&3,mem_mask);
-				}
+					return asic_r32(offset&3,mem_mask);
 
 				default:
-				logerror("%08x maincpu read access offset %08x mem_mask %08x cs %d\n", pc, offset*4, mem_mask, cs);
-				break;
+					logerror("%08x maincpu read access offset %08x mem_mask %08x cs %d\n", pc, offset*4, mem_mask, cs);
 			}
-		}
-		break;
+			break;
 
 		case 3:
 		case 4:
 			offset &=0x3fff;
-			return (m_mainram[offset]);
+			return m_mainram[offset];
 
-		case 1:if (offset < 0x100000) // make sure to log an error instead of crashing when reading beyond end of region
-			return m_cpuregion[offset];
-
-
+		case 1:
+			if (offset < 0x100000) // make sure to log an error instead of crashing when reading beyond end of region
+				return m_cpuregion[offset];
+			[[fallthrough]];
 		default:
 			logerror("%08x maincpu read access offset %08x mem_mask %08x cs %d\n", pc, offset*4, mem_mask, cs);
 
@@ -236,12 +232,11 @@ READ32_MEMBER(mpu5_state::mpu5_mem_r)
 }
 
 // Each board is fitted with an ASIC that does most of the heavy lifting, including sound playback.
-WRITE8_MEMBER(mpu5_state::asic_w8)
+void mpu5_state::asic_w8(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
 		case 0x03:
-		{
 			if (m_led_strobe_temp != data)
 			{
 				m_led_strobe_temp = data;
@@ -249,82 +244,75 @@ WRITE8_MEMBER(mpu5_state::asic_w8)
 				switch (m_led_strobe_temp)
 				{
 					case 0x00:
-					m_led_strobe = 0;
-					break;
+						m_led_strobe = 0;
+						break;
 					case 0x01:
-					m_led_strobe = 1;
-					break;
+						m_led_strobe = 1;
+						break;
 					case 0x02:
-					m_led_strobe = 2;
-					break;
+						m_led_strobe = 2;
+						break;
 					case 0x04:
-					m_led_strobe = 3;
-					break;
+						m_led_strobe = 3;
+						break;
 					case 0x08:
-					m_led_strobe = 4;
-					break;
+						m_led_strobe = 4;
+						break;
 					case 0x10:
-					m_led_strobe = 5;
-					break;
+						m_led_strobe = 5;
+						break;
 					case 0x20:
-					m_led_strobe = 6;
-					break;
+						m_led_strobe = 6;
+						break;
 					case 0x40:
-					m_led_strobe = 7;
-					break;
+						m_led_strobe = 7;
+						break;
 					case 0x80:
-					m_led_strobe = 8;
-					break;
+						m_led_strobe = 8;
+						break;
 				}
 			}
 			break;
-		}
 
 		case 0x09:
-		{
 			//Assume SEC fitted for now
 			m_sec->data_w(~data&0x01);
 			m_sec->clk_w(~data&0x02);
 			m_sec->cs_w(~data&0x04);
-		}
+			[[fallthrough]];
 		case 0x0b:
-		{
-			output().set_value("statuslamp1", ((data&0x10) != 0));
-
-			output().set_value("statuslamp2", ((data&0x20) != 0));
+			output().set_value("statuslamp1", BIT(data, 4));
+			output().set_value("statuslamp2", BIT(data, 5));
 
 			if (data & 0x40)
 			{
-//              m_dsp_pin =1;
+				//m_dsp_pin = 1;
 			}
-		}
-		break;
+			break;
+
 		default:
-		{
-			int pc = m_maincpu->pc();
-			logerror("%08x maincpu write to ASIC - offset %01x data %02x\n", pc, offset, data);
-		}
+			logerror("%s: maincpu write to ASIC - offset %01x data %02x\n", machine().describe_context(), offset, data);
 	}
 }
 
 
-WRITE32_MEMBER(mpu5_state::asic_w32)
+void mpu5_state::asic_w32(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	if (ACCESSING_BITS_24_31) asic_w8(space,(offset*4)+0, (data>>24)&0xff);
-	if (ACCESSING_BITS_16_23) asic_w8(space,(offset*4)+1, (data>>16)&0xff);
-	if (ACCESSING_BITS_8_15) asic_w8(space,(offset*4)+2, (data>>8) &0xff);
-	if (ACCESSING_BITS_0_7) asic_w8(space,(offset*4)+3, (data>>0) &0xff);
+	if (ACCESSING_BITS_24_31) asic_w8((offset*4)+0, (data>>24)&0xff);
+	if (ACCESSING_BITS_16_23) asic_w8((offset*4)+1, (data>>16)&0xff);
+	if (ACCESSING_BITS_8_15) asic_w8((offset*4)+2, (data>>8) &0xff);
+	if (ACCESSING_BITS_0_7) asic_w8((offset*4)+3, (data>>0) &0xff);
 }
 
 
-READ32_MEMBER(mpu5_state::pic_r)
+uint32_t mpu5_state::pic_r(offs_t offset)
 {
 	int pc = m_maincpu->pc();
 	logerror("%08x maincpu read from PIC - offset %01x\n", pc, offset);
 	return m_pic_output_bit;
 }
 
-WRITE32_MEMBER(mpu5_state::pic_w)
+void mpu5_state::pic_w(offs_t offset, uint32_t data)
 {
 	switch (offset)
 	{
@@ -379,7 +367,7 @@ WRITE32_MEMBER(mpu5_state::pic_w)
 
 }
 
-WRITE32_MEMBER(mpu5_state::mpu5_mem_w)
+void mpu5_state::mpu5_mem_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int pc = m_maincpu->pc();
 	int addr = offset *4;
@@ -393,7 +381,7 @@ WRITE32_MEMBER(mpu5_state::mpu5_mem_w)
 			{
 				case 0xd0:
 				{
-					pic_w(space, (addr& 0x0f),data,mem_mask);
+					pic_w((addr& 0x0f),data);
 					break;
 				}
 				case 0xe0:
@@ -404,7 +392,7 @@ WRITE32_MEMBER(mpu5_state::mpu5_mem_w)
 
 				case 0xf0:
 				{
-					asic_w32(space, offset&3,data,mem_mask);
+					asic_w32(offset&3,data,mem_mask);
 					break;
 				}
 

@@ -38,7 +38,7 @@ TILE_GET_INFO_MEMBER(toaplan2_state::get_text_tile_info)
 	const u16 attrib = m_tx_videoram[tile_index];
 	const u32 tile_number = attrib & 0x3ff;
 	const u32 color = attrib >> 10;
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			color,
 			0);
@@ -274,8 +274,8 @@ u32 toaplan2_state::screen_update_batsugun(screen_device &screen, bitmap_ind16 &
 	{
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			u16* src_vdp0 = &bitmap.pix16(y);
-			const u16* src_vdp1 = &m_secondary_render_bitmap.pix16(y);
+			u16 *const src_vdp0 = &bitmap.pix(y);
+			u16 const *const src_vdp1 = &m_secondary_render_bitmap.pix(y);
 
 			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{

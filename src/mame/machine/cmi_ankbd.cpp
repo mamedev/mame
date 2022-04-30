@@ -39,7 +39,7 @@ void cmi_alphanumeric_keyboard_device::device_start()
 {
 }
 
-READ8_MEMBER( cmi_alphanumeric_keyboard_device::col_r )
+u8 cmi_alphanumeric_keyboard_device::col_r()
 {
 	int row = m_pia->b_output() ^ 0xff;
 

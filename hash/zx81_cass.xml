@@ -1,9 +1,12 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
 
-<!-- Sinclair ZX81 Cassettes -->
+Sinclair ZX81 Cassettes
 
-<!-- This list was compiled from the archive at http://www.zx81stuff.org.uk/. Updated to 22/08/2016 -->
+This list was compiled from the archive at http://www.zx81stuff.org.uk/. Updated to 22/08/2016
+-->
 
 <softwarelist name="zx81_cass" description="Sinclair ZX81 cassettes">
 

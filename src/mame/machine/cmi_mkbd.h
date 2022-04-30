@@ -38,15 +38,15 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
-	DECLARE_WRITE8_MEMBER( cmi10_u20_a_w );
-	DECLARE_WRITE8_MEMBER( cmi10_u20_b_w );
+	void cmi10_u20_a_w(u8 data);
+	void cmi10_u20_b_w(u8 data);
 	DECLARE_READ_LINE_MEMBER( cmi10_u20_cb1_r );
 	DECLARE_WRITE_LINE_MEMBER( cmi10_u20_cb2_w );
 	DECLARE_WRITE_LINE_MEMBER( cmi10_u21_cb2_w );
-	DECLARE_READ8_MEMBER( cmi10_u21_a_r );
+	u8 cmi10_u21_a_r();
 
 	DECLARE_WRITE_LINE_MEMBER( kbd_acia_int );
 	DECLARE_WRITE_LINE_MEMBER( cmi_acia_int );
@@ -56,7 +56,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( kbd_txd_w );
 	DECLARE_WRITE_LINE_MEMBER( kbd_rts_w );
 
-	template <unsigned N> DECLARE_WRITE16_MEMBER( update_dp );
+	template <unsigned N> void update_dp(offs_t offset, u16 data);
 
 	void muskeys_map(address_map &map);
 
@@ -76,6 +76,7 @@ private:
 
 	required_ioport m_keypad_a_port;
 	required_ioport m_keypad_b_port;
+	required_ioport m_analog;
 
 	required_ioport_array<3> m_key_mux_ports[4];
 

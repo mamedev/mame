@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+copyright-holders:Patrick Mackinlay
+DECstation 2100/3100 LEDs
+-->
+<mamelayout version="2">
+	<element name="led" defstate="1">
+		<disk state="0">
+			<color red="0.0" green="0.75" blue="0.0" />
+		</disk>
+		<disk state="1">
+			<color red="0.0" green="0.25" blue="0.0" />
+		</disk>
+	</element>
+
+	<view name="KN01">
+		<screen index="0">
+			<bounds x="0" y="0" width="1024" height="864" />
+		</screen>
+
+		<repeat count="8">
+			<param name="n" start="0" increment="1" />
+			<param name="x" start="1015" increment="-10" />
+			<element name="led~n~" ref="led">
+				<bounds x="~x~" y="875" width="10" height="10" />
+			</element>
+		</repeat>
+	</view>
+</mamelayout>

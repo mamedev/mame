@@ -19,7 +19,8 @@ public:
 		REG_R, REG_C0, REG_C1,
 		REG_B0, REG_B1, REG_X0, REG_X1, REG_I0, REG_I1,
 		REG_SFT, REG_VSM, REG_MASK, REG_M,
-		REG_PCS0, REG_PCS1, REG_PCS2, REG_PCS3
+		REG_PCS0, REG_PCS1, REG_PCS2, REG_PCS3,
+		REG_SP
 	};
 
 	enum st_flags {
@@ -88,8 +89,12 @@ private:
 	address_space_config m_io_config;
 	address_space_config m_rf_config;
 
-	address_space        *m_program, *m_data, *m_io, *m_rf;
-	memory_access_cache<2, -2, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<16, 2, -2, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<16, 2, -2, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access<16, 2, -2, ENDIANNESS_LITTLE>::specific m_data;
+	memory_access<16, 2, -2, ENDIANNESS_LITTLE>::specific m_io;
+	memory_access< 4, 2, -2, ENDIANNESS_LITTLE>::specific m_rf;
+
 	int m_icount;
 
 	u32 m_st, m_a, m_b, m_d, m_p;
@@ -116,6 +121,8 @@ private:
 	void ea_post_1(u32 r);
 	void pcs_push();
 	void pcs_pop();
+	inline void stset_set_sz_int(u32 val);
+	inline void stset_set_sz_fp(u32 val);
 
 	u32 read_reg(u32 r);
 	void write_reg(u32 r, u32 v);

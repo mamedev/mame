@@ -53,7 +53,7 @@
 #include "bus/a2gameio/joyport.h"
 #include "bus/a2gameio/computereyes.h"
 #include "bus/a2gameio/paddles.h"
-
+#include "bus/a2gameio/gizmo.h"
 
 //**************************************************************************
 //  CONNECTOR DEVICE IMPLEMENTATION
@@ -66,6 +66,7 @@ apple2_gameio_device::apple2_gameio_device(const machine_config &mconfig, const 
 	: device_t(mconfig, APPLE2_GAMEIO, tag, owner, clock)
 	, device_single_card_slot_interface<device_a2gameio_interface>(mconfig, *this)
 	, m_intf(nullptr)
+	, m_sw_pullups(false)
 {
 }
 
@@ -74,6 +75,7 @@ void apple2_gameio_device::iiandplus_options(device_slot_interface &slot)
 	slot.option_add("joy", APPLE2_JOYSTICK);
 	slot.option_add("paddles", APPLE2_PADDLES);
 	slot.option_add("joyport", APPLE2_JOYPORT);
+	slot.option_add("gizmo", APPLE2_GIZMO);
 	slot.option_add("compeyes", APPLE2_COMPUTEREYES);
 }
 
@@ -81,6 +83,7 @@ void apple2_gameio_device::default_options(device_slot_interface &slot)
 {
 	slot.option_add("joy", APPLE2_JOYSTICK);
 	slot.option_add("paddles", APPLE2_PADDLES);
+	slot.option_add("gizmo", APPLE2_GIZMO);
 	slot.option_add("compeyes", APPLE2_COMPUTEREYES);
 }
 

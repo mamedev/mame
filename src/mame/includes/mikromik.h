@@ -7,7 +7,6 @@
 
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
-#include "formats/mm_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/am9517a.h"
 #include "machine/bankdev.h"
@@ -15,11 +14,14 @@
 #include "machine/mm1kb.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
-#include "machine/z80dart.h"
 #include "machine/upd765.h"
+#include "machine/z80sio.h"
 #include "video/i8275.h"
 #include "video/upd7220.h"
+
 #include "emupal.h"
+
+#include "formats/mm_dsk.h"
 
 #define SCREEN_TAG      "screen"
 #define I8085A_TAG      "ic40"
@@ -101,13 +103,13 @@ private:
 	int m_a8;
 
 	// video state
-	int m_llen;
+	int m_llen = 0;
 
 	// serial state
-	int m_intc;
-	int m_rx21;
-	int m_tx21;
-	int m_rcl;
+	int m_intc = 0;
+	int m_rx21 = 0;
+	int m_tx21 = 0;
+	int m_rcl = 0;
 
 	// floppy state
 	int m_recall;
@@ -117,8 +119,8 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( a8_w );
 	DECLARE_WRITE_LINE_MEMBER( recall_w );
 	DECLARE_WRITE_LINE_MEMBER( rx21_w );
@@ -128,8 +130,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( llen_w );
 	DECLARE_WRITE_LINE_MEMBER( motor_on_w );
 	DECLARE_WRITE_LINE_MEMBER( dma_hrq_w );
-	DECLARE_READ8_MEMBER( mpsc_dack_r );
-	DECLARE_WRITE8_MEMBER( mpsc_dack_w );
+	uint8_t mpsc_dack_r();
+	void mpsc_dack_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( dma_eop_w );
 	DECLARE_WRITE_LINE_MEMBER( dack3_w );
 	DECLARE_WRITE_LINE_MEMBER( itxc_w );
@@ -141,7 +143,7 @@ private:
 
 	void update_tc();
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	void mm1_palette(palette_device &palette) const;

@@ -52,13 +52,13 @@ void tia_device::device_stop()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void tia_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void tia_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	tia_process(m_chip, outputs[0], samples);
+	tia_process(m_chip, outputs[0]);
 }
 
 
-WRITE8_MEMBER( tia_device::tia_sound_w )
+void tia_device::tia_sound_w(offs_t offset, uint8_t data)
 {
 	m_channel->update();
 	tia_write(m_chip, offset, data);

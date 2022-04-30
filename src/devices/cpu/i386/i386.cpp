@@ -25,8 +25,8 @@
 #include "cycles.h"
 #include "i386ops.h"
 
-#include "debugger.h"
 #include "debug/debugcpu.h"
+#include "debug/express.h"
 
 /* seems to be defined on mingw-gcc */
 #undef i386
@@ -55,7 +55,6 @@ i386_device::i386_device(const machine_config &mconfig, device_type type, const 
 	, device_vtlb_interface(mconfig, *this, AS_PROGRAM)
 	, m_program_config("program", ENDIANNESS_LITTLE, program_data_width, program_addr_width, 0, 32, 12)
 	, m_io_config("io", ENDIANNESS_LITTLE, io_data_width, 16, 0)
-	, m_dr_breakpoints{nullptr, nullptr, nullptr, nullptr}
 	, m_smiact(*this)
 	, m_ferr_handler(*this)
 {
@@ -1556,10 +1555,13 @@ void i386_device::report_invalid_opcode()
 #ifndef DEBUG_MISSING_OPCODE
 	logerror("i386: Invalid opcode %02X at %08X %s\n", m_opcode, m_pc - 1, m_lock ? "with lock" : "");
 #else
-	logerror("i386: Invalid opcode");
+	logerror("Invalid opcode");
 	for (int a = 0; a < m_opcode_bytes_length; a++)
 		logerror(" %02X", m_opcode_bytes[a]);
-	logerror(" at %08X\n", m_opcode_pc);
+	logerror(" at %08X %s\n", m_opcode_pc, m_lock ? "with lock" : "");
+	logerror("Backtrace:\n");
+	for (uint32_t i = 1; i < 16; i++)
+		logerror("  %08X\n", m_opcode_addrs[(m_opcode_addrs_index - i) & 15]);
 #endif
 }
 
@@ -1568,10 +1570,13 @@ void i386_device::report_invalid_modrm(const char* opcode, uint8_t modrm)
 #ifndef DEBUG_MISSING_OPCODE
 	logerror("i386: Invalid %s modrm %01X at %08X\n", opcode, modrm, m_pc - 2);
 #else
-	logerror("i386: Invalid %s modrm %01X", opcode, modrm);
+	logerror("Invalid %s modrm %01X", opcode, modrm);
 	for (int a = 0; a < m_opcode_bytes_length; a++)
 		logerror(" %02X", m_opcode_bytes[a]);
-	logerror(" at %08X\n", m_opcode_pc);
+	logerror(" at %08X %s\n", m_opcode_pc, m_lock ? "with lock" : "");
+	logerror("Backtrace:\n");
+	for (uint32_t i = 1; i < 16; i++)
+		logerror("  %08X\n", m_opcode_addrs[(m_opcode_addrs_index - i) & 15]);
 #endif
 	i386_trap(6, 0, 0);
 }
@@ -1777,7 +1782,7 @@ uint32_t i386_device::i386_get_debug_desc(I386_SREG *seg)
 	return seg->valid;
 }
 
-uint64_t i386_device::debug_segbase(symbol_table &table, int params, const uint64_t *param)
+uint64_t i386_device::debug_segbase(int params, const uint64_t *param)
 {
 	uint32_t result;
 	I386_SREG seg;
@@ -1800,7 +1805,7 @@ uint64_t i386_device::debug_segbase(symbol_table &table, int params, const uint6
 	return result;
 }
 
-uint64_t i386_device::debug_seglimit(symbol_table &table, int params, const uint64_t *param)
+uint64_t i386_device::debug_seglimit(int params, const uint64_t *param)
 {
 	uint32_t result = 0;
 	I386_SREG seg;
@@ -1816,7 +1821,7 @@ uint64_t i386_device::debug_seglimit(symbol_table &table, int params, const uint
 	return result;
 }
 
-uint64_t i386_device::debug_segofftovirt(symbol_table &table, int params, const uint64_t *param)
+uint64_t i386_device::debug_segofftovirt(int params, const uint64_t *param)
 {
 	uint32_t result;
 	I386_SREG seg;
@@ -1854,7 +1859,7 @@ uint64_t i386_device::debug_segofftovirt(symbol_table &table, int params, const 
 	return result;
 }
 
-uint64_t i386_device::debug_virttophys(symbol_table &table, int params, const uint64_t *param)
+uint64_t i386_device::debug_virttophys(int params, const uint64_t *param)
 {
 	uint32_t result = param[0];
 
@@ -1863,7 +1868,7 @@ uint64_t i386_device::debug_virttophys(symbol_table &table, int params, const ui
 	return result;
 }
 
-uint64_t i386_device::debug_cacheflush(symbol_table &table, int params, const uint64_t *param)
+uint64_t i386_device::debug_cacheflush(int params, const uint64_t *param)
 {
 	uint32_t option;
 	bool invalidate;
@@ -1886,11 +1891,11 @@ uint64_t i386_device::debug_cacheflush(symbol_table &table, int params, const ui
 void i386_device::device_debug_setup()
 {
 	using namespace std::placeholders;
-	debug()->symtable().add("segbase", 1, 1, std::bind(&i386_device::debug_segbase, this, _1, _2, _3));
-	debug()->symtable().add("seglimit", 1, 1, std::bind(&i386_device::debug_seglimit, this, _1, _2, _3));
-	debug()->symtable().add("segofftovirt", 2, 2, std::bind(&i386_device::debug_segofftovirt, this, _1, _2, _3));
-	debug()->symtable().add("virttophys", 1, 1, std::bind(&i386_device::debug_virttophys, this, _1, _2, _3));
-	debug()->symtable().add("cacheflush", 0, 1, std::bind(&i386_device::debug_cacheflush, this, _1, _2, _3));
+	debug()->symtable().add("segbase", 1, 1, std::bind(&i386_device::debug_segbase, this, _1, _2));
+	debug()->symtable().add("seglimit", 1, 1, std::bind(&i386_device::debug_seglimit, this, _1, _2));
+	debug()->symtable().add("segofftovirt", 2, 2, std::bind(&i386_device::debug_segofftovirt, this, _1, _2));
+	debug()->symtable().add("virttophys", 1, 1, std::bind(&i386_device::debug_virttophys, this, _1, _2));
+	debug()->symtable().add("cacheflush", 0, 1, std::bind(&i386_device::debug_cacheflush, this, _1, _2));
 }
 
 /*************************************************************************/
@@ -1936,9 +1941,9 @@ void i386_device::i386_common_init()
 	m_program = &space(AS_PROGRAM);
 	if(m_program->data_width() == 16) {
 		// for the 386sx
-		macache16 = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
+		m_program->cache(macache16);
 	} else {
-		macache32 = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
+		m_program->cache(macache32);
 	}
 
 	m_io = &space(AS_IO);
@@ -2019,10 +2024,7 @@ void i386_device::i386_common_init()
 	m_ferr_handler(0);
 
 	set_icountptr(m_cycles);
-	m_notifier = m_program->add_change_notifier([this](read_or_write mode)
-	{
-		dri_changed();
-	});
+	m_notifier = m_program->add_change_notifier([this] (read_or_write mode) { dri_changed(); });
 }
 
 void i386_device::device_start()
@@ -2122,7 +2124,6 @@ void i386_device::register_state_i386()
 	state_add( STATE_GENPC, "GENPC", m_pc).noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_pc).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%32s").noshow();
-	state_add( STATE_GENSP, "GENSP", REG32(ESP)).noshow();
 }
 
 void i386_device::register_state_i386_x87()
@@ -2441,6 +2442,9 @@ void i386_device::zero_state()
 	memset( m_opcode_bytes, 0, sizeof(m_opcode_bytes) );
 	m_opcode_pc = 0;
 	m_opcode_bytes_length = 0;
+	memset(m_opcode_addrs, 0, sizeof(m_opcode_addrs));
+	m_opcode_addrs_index = 0;
+	m_dri_changed_active = false;
 }
 
 void i386_device::device_reset()
@@ -2790,6 +2794,8 @@ void i386_device::execute_run()
 #ifdef DEBUG_MISSING_OPCODE
 		m_opcode_bytes_length = 0;
 		m_opcode_pc = m_pc;
+		m_opcode_addrs[m_opcode_addrs_index] = m_opcode_pc;
+		m_opcode_addrs_index = (m_opcode_addrs_index + 1) & 15;
 #endif
 		try
 		{

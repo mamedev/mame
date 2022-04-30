@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include "bus/c64/exp.h"
 #include "bus/cbmiec/cbmiec.h"
@@ -44,6 +44,9 @@
 #define CONTROL1_TAG    "joy1"
 #define CONTROL2_TAG    "joy2"
 
+
+namespace {
+
 class c128_state : public driver_device
 {
 public:
@@ -69,7 +72,7 @@ public:
 		m_from(*this, "from"),
 		m_rom(*this, M8502_TAG),
 		m_charom(*this, "charom"),
-		m_color_ram(*this, "color_ram"),
+		m_color_ram(*this, "color_ram", 0x800, ENDIANNESS_LITTLE),
 		m_row(*this, "ROW%u", 0),
 		m_k(*this, "K%u", 0),
 		m_lock(*this, "LOCK"),
@@ -113,7 +116,7 @@ public:
 	required_device<generic_slot_device> m_from;
 	required_memory_region m_rom;
 	required_memory_region m_charom;
-	optional_shared_ptr<uint8_t> m_color_ram;
+	memory_share_creator<uint8_t> m_color_ram;
 	required_ioport_array<8> m_row;
 	required_ioport_array<3> m_k;
 	required_ioport m_lock;
@@ -129,14 +132,14 @@ public:
 	void write_memory(offs_t offset, offs_t vma, uint8_t data, int ba, int aec, int z80io);
 	inline void update_iec();
 
-	DECLARE_READ8_MEMBER( z80_r );
-	DECLARE_WRITE8_MEMBER( z80_w );
-	DECLARE_READ8_MEMBER( z80_io_r );
-	DECLARE_WRITE8_MEMBER( z80_io_w );
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( vic_videoram_r );
-	DECLARE_READ8_MEMBER( vic_colorram_r );
+	uint8_t z80_r(offs_t offset);
+	void z80_w(offs_t offset, uint8_t data);
+	uint8_t z80_io_r(offs_t offset);
+	void z80_io_w(offs_t offset, uint8_t data);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	uint8_t vic_videoram_r(offs_t offset);
+	uint8_t vic_colorram_r(offs_t offset);
 
 	DECLARE_WRITE_LINE_MEMBER( mmu_z80en_w );
 	DECLARE_WRITE_LINE_MEMBER( mmu_fsdir_w );
@@ -144,29 +147,29 @@ public:
 	DECLARE_READ_LINE_MEMBER( mmu_exrom_r );
 	DECLARE_READ_LINE_MEMBER( mmu_sense40_r );
 
-	DECLARE_WRITE8_MEMBER( vic_k_w );
+	void vic_k_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( sid_potx_r );
-	DECLARE_READ8_MEMBER( sid_poty_r );
+	uint8_t sid_potx_r();
+	uint8_t sid_poty_r();
 
 	DECLARE_WRITE_LINE_MEMBER( cia1_cnt_w );
 	DECLARE_WRITE_LINE_MEMBER( cia1_sp_w );
-	DECLARE_READ8_MEMBER( cia1_pa_r );
-	DECLARE_WRITE8_MEMBER( cia1_pa_w );
-	DECLARE_READ8_MEMBER( cia1_pb_r );
-	DECLARE_WRITE8_MEMBER( cia1_pb_w );
+	uint8_t cia1_pa_r();
+	void cia1_pa_w(uint8_t data);
+	uint8_t cia1_pb_r();
+	void cia1_pb_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( cia2_pa_r );
-	DECLARE_WRITE8_MEMBER( cia2_pa_w );
+	uint8_t cia2_pa_r();
+	void cia2_pa_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( cpu_r );
-	DECLARE_WRITE8_MEMBER( cpu_w );
+	uint8_t cpu_r();
+	void cpu_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( iec_srq_w );
 	DECLARE_WRITE_LINE_MEMBER( iec_data_w );
 
-	DECLARE_READ8_MEMBER( exp_dma_cd_r );
-	DECLARE_WRITE8_MEMBER( exp_dma_cd_w );
+	uint8_t exp_dma_cd_r(offs_t offset);
+	void exp_dma_cd_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( exp_dma_w );
 	DECLARE_WRITE_LINE_MEMBER( exp_reset_w );
 
@@ -175,8 +178,8 @@ public:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_c128);
 
-	DECLARE_READ8_MEMBER( cia2_pb_r );
-	DECLARE_WRITE8_MEMBER( cia2_pb_w );
+	uint8_t cia2_pb_r();
+	void cia2_pb_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( write_user_pa2 ) { m_user_pa2 = state; }
 	DECLARE_WRITE_LINE_MEMBER( write_user_pb0 ) { if (state) m_user_pb |= 1; else m_user_pb &= ~1; }
@@ -218,6 +221,7 @@ public:
 
 	int m_user_pa2;
 	int m_user_pb;
+	void softlists(machine_config &config, const char *filter);
 	void pal(machine_config &config);
 	void ntsc(machine_config &config);
 	void c128pal(machine_config &config);
@@ -275,7 +279,7 @@ enum
 
 QUICKLOAD_LOAD_MEMBER(c128_state::quickload_c128)
 {
-	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress);
+	return general_cbm_loadsnap(image, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress);
 }
 
 
@@ -540,7 +544,7 @@ void c128_state::write_memory(offs_t offset, offs_t vma, uint8_t data, int ba, i
 //  z80_r -
 //-------------------------------------------------
 
-READ8_MEMBER( c128_state::z80_r )
+uint8_t c128_state::z80_r(offs_t offset)
 {
 	int ba = 1, aec = 1, z80io = 1;
 	offs_t vma = 0;
@@ -553,7 +557,7 @@ READ8_MEMBER( c128_state::z80_r )
 //  z80_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( c128_state::z80_w )
+void c128_state::z80_w(offs_t offset, uint8_t data)
 {
 	int ba = 1, aec = 1, z80io = 1;
 	offs_t vma = 0;
@@ -566,7 +570,7 @@ WRITE8_MEMBER( c128_state::z80_w )
 //  z80_io_r -
 //-------------------------------------------------
 
-READ8_MEMBER( c128_state::z80_io_r )
+uint8_t c128_state::z80_io_r(offs_t offset)
 {
 	int ba = 1, aec = 1, z80io = 0;
 	offs_t vma = 0;
@@ -579,7 +583,7 @@ READ8_MEMBER( c128_state::z80_io_r )
 //  z80_io_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( c128_state::z80_io_w )
+void c128_state::z80_io_w(offs_t offset, uint8_t data)
 {
 	int ba = 1, aec = 1, z80io = 0;
 	offs_t vma = 0;
@@ -592,7 +596,7 @@ WRITE8_MEMBER( c128_state::z80_io_w )
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( c128_state::read )
+uint8_t c128_state::read(offs_t offset)
 {
 	int ba = 1, aec = 1, z80io = 1;
 	offs_t vma = 0;
@@ -605,7 +609,7 @@ READ8_MEMBER( c128_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( c128_state::write )
+void c128_state::write(offs_t offset, uint8_t data)
 {
 	int ba = 1, aec = 1, z80io = 1;
 	offs_t vma = 0;
@@ -618,7 +622,7 @@ WRITE8_MEMBER( c128_state::write )
 //  vic_videoram_r -
 //-------------------------------------------------
 
-READ8_MEMBER( c128_state::vic_videoram_r )
+uint8_t c128_state::vic_videoram_r(offs_t offset)
 {
 	int ba = 0, aec = 0, z80io = 1;
 
@@ -630,7 +634,7 @@ READ8_MEMBER( c128_state::vic_videoram_r )
 //  vic_colorram_r -
 //-------------------------------------------------
 
-READ8_MEMBER( c128_state::vic_colorram_r )
+uint8_t c128_state::vic_colorram_r(offs_t offset)
 {
 	return m_color_ram[(m_clrbank << 10) | offset];
 }
@@ -783,7 +787,7 @@ static INPUT_PORTS_START( c128 )
 
 	PORT_START( "ROW6" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH)                             PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x91  Pi") PORT_CODE(KEYCODE_DEL) PORT_CHAR(0x2191) PORT_CHAR(0x03C0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x91  Pi") PORT_CODE(KEYCODE_DEL) PORT_CHAR(0x2191,'^') PORT_CHAR(0x03C0)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH)                         PORT_CHAR('=')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Shift (Right)") PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CLR HOME") PORT_CODE(KEYCODE_INSERT)      PORT_CHAR(UCHAR_MAMEKEY(HOME))
@@ -1091,7 +1095,7 @@ GFXDECODE_END
 //  MOS8564_INTERFACE( vic_intf )
 //-------------------------------------------------
 
-WRITE8_MEMBER( c128_state::vic_k_w )
+void c128_state::vic_k_w(uint8_t data)
 {
 	m_vic_k = data;
 }
@@ -1101,7 +1105,7 @@ WRITE8_MEMBER( c128_state::vic_k_w )
 //  MOS6581_INTERFACE( sid_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( c128_state::sid_potx_r )
+uint8_t c128_state::sid_potx_r()
 {
 	uint8_t data = 0xff;
 
@@ -1128,7 +1132,7 @@ READ8_MEMBER( c128_state::sid_potx_r )
 	return data;
 }
 
-READ8_MEMBER( c128_state::sid_poty_r )
+uint8_t c128_state::sid_poty_r()
 {
 	uint8_t data = 0xff;
 
@@ -1160,7 +1164,7 @@ READ8_MEMBER( c128_state::sid_poty_r )
 //  MOS6526_INTERFACE( cia1_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( c128_state::cia1_pa_r )
+uint8_t c128_state::cia1_pa_r()
 {
 	/*
 
@@ -1208,7 +1212,7 @@ READ8_MEMBER( c128_state::cia1_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( c128_state::cia1_pa_w )
+void c128_state::cia1_pa_w(uint8_t data)
 {
 	/*
 
@@ -1228,7 +1232,7 @@ WRITE8_MEMBER( c128_state::cia1_pa_w )
 	m_joy2->joy_w(data & 0x1f);
 }
 
-READ8_MEMBER( c128_state::cia1_pb_r )
+uint8_t c128_state::cia1_pb_r()
 {
 	/*
 
@@ -1272,7 +1276,7 @@ READ8_MEMBER( c128_state::cia1_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( c128_state::cia1_pb_w )
+void c128_state::cia1_pb_w(uint8_t data)
 {
 	/*
 
@@ -1315,7 +1319,7 @@ WRITE_LINE_MEMBER( c128_state::cia1_sp_w )
 //  MOS6526_INTERFACE( cia2_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( c128_state::cia2_pa_r )
+uint8_t c128_state::cia2_pa_r()
 {
 	/*
 
@@ -1344,7 +1348,7 @@ READ8_MEMBER( c128_state::cia2_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( c128_state::cia2_pa_w )
+void c128_state::cia2_pa_w(uint8_t data)
 {
 	/*
 
@@ -1376,12 +1380,12 @@ WRITE8_MEMBER( c128_state::cia2_pa_w )
 	update_iec();
 }
 
-READ8_MEMBER( c128_state::cia2_pb_r )
+uint8_t c128_state::cia2_pb_r()
 {
 	return m_user_pb;
 }
 
-WRITE8_MEMBER( c128_state::cia2_pb_w )
+void c128_state::cia2_pb_w(uint8_t data)
 {
 	m_user->write_c((data>>0)&1);
 	m_user->write_d((data>>1)&1);
@@ -1397,7 +1401,7 @@ WRITE8_MEMBER( c128_state::cia2_pb_w )
 //  M6510_INTERFACE( cpu_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( c128_state::cpu_r)
+uint8_t c128_state::cpu_r()
 {
 	/*
 
@@ -1424,7 +1428,7 @@ READ8_MEMBER( c128_state::cpu_r)
 	return data;
 }
 
-WRITE8_MEMBER( c128_state::cpu_w )
+void c128_state::cpu_w(uint8_t data)
 {
 	/*
 
@@ -1501,7 +1505,7 @@ WRITE_LINE_MEMBER( c128_state::iec_data_w )
 //  C64_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( c128_state::exp_dma_cd_r )
+uint8_t c128_state::exp_dma_cd_r(offs_t offset)
 {
 	int ba = 0, aec = 1, z80io = 1;
 	offs_t vma = 0;
@@ -1509,7 +1513,7 @@ READ8_MEMBER( c128_state::exp_dma_cd_r )
 	return read_memory(offset, vma, ba, aec, z80io);
 }
 
-WRITE8_MEMBER( c128_state::exp_dma_cd_w )
+void c128_state::exp_dma_cd_w(offs_t offset, uint8_t data)
 {
 	int ba = 0, aec = 1, z80io = 1;
 	offs_t vma = 0;
@@ -1537,7 +1541,7 @@ WRITE_LINE_MEMBER( c128_state::exp_reset_w )
 //  SLOT_INTERFACE( c128dcr_iec_devices )
 //-------------------------------------------------
 
-void c128dcr_iec_devices(device_slot_interface &device)
+[[maybe_unused]] void c128dcr_iec_devices(device_slot_interface &device)
 {
 	device.option_add("c1571", C1571);
 	device.option_add("c1571cr", C1571CR);
@@ -1565,9 +1569,6 @@ void c128d81_iec_devices(device_slot_interface &device)
 
 void c128_state::machine_start()
 {
-	// allocate memory
-	m_color_ram.allocate(0x800);
-
 	// initialize memory
 	uint8_t data = 0xff;
 
@@ -1621,6 +1622,23 @@ void c128_state::machine_reset()
 //**************************************************************************
 //  MACHINE DRIVERS
 //**************************************************************************
+
+//-------------------------------------------------
+//  machine_config( softlists )
+//-------------------------------------------------
+
+void c128_state::softlists(machine_config &config, const char *filter)
+{
+	SOFTWARE_LIST(config, "cart_list").set_original("c128_cart").set_filter(filter);
+	SOFTWARE_LIST(config, "flop_list").set_original("c128_flop").set_filter(filter);
+	SOFTWARE_LIST(config, "from_list").set_original("c128_rom").set_filter(filter);
+	SOFTWARE_LIST(config, "cart_list_c64").set_original("c64_cart").set_filter(filter);
+	SOFTWARE_LIST(config, "cass_list_c64").set_original("c64_cass").set_filter(filter);
+	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10").set_filter(filter);
+	SOFTWARE_LIST(config, "flop_list_c64_orig").set_compatible("c64_flop_orig").set_filter(filter);
+	SOFTWARE_LIST(config, "flop_list_c64_misc").set_compatible("c64_flop_misc").set_filter(filter);
+}
+
 
 //-------------------------------------------------
 //  machine_config( ntsc )
@@ -1749,14 +1767,8 @@ void c128_state::ntsc(machine_config &config)
 
 	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c128_state::quickload_c128));
 
-	// software list
-	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10").set_filter("NTSC");
-	SOFTWARE_LIST(config, "cart_list_c64").set_original("c64_cart").set_filter("NTSC");
-	SOFTWARE_LIST(config, "cart_list").set_original("c128_cart").set_filter("NTSC");
-	SOFTWARE_LIST(config, "cass_list_c64").set_original("c64_cass").set_filter("NTSC");
-	SOFTWARE_LIST(config, "flop_list_c64").set_original("c64_flop").set_filter("NTSC");
-	SOFTWARE_LIST(config, "flop_list").set_original("c128_flop").set_filter("NTSC");
-	SOFTWARE_LIST(config, "from_list").set_original("c128_rom").set_filter("NTSC");
+	// software lists
+	softlists(config, "NTSC");
 
 	// function ROM
 	GENERIC_SOCKET(config, "from", generic_plain_slot, "c128_rom", "bin,rom");
@@ -1935,20 +1947,7 @@ void c128_state::pal(machine_config &config)
 	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c128_state::quickload_c128));
 
 	// software list
-	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10");
-	SOFTWARE_LIST(config, "cart_list_c64").set_original("c64_cart");
-	SOFTWARE_LIST(config, "cart_list").set_original("c128_cart");
-	SOFTWARE_LIST(config, "cass_list_c64").set_original("c64_cass");
-	SOFTWARE_LIST(config, "flop_list_c64").set_original("c64_flop");
-	SOFTWARE_LIST(config, "flop_list").set_original("c128_flop");
-	SOFTWARE_LIST(config, "from_list").set_original("c128_rom");
-	subdevice<software_list_device>("cart_list_vic10")->set_filter("PAL");
-	subdevice<software_list_device>("cart_list_c64")->set_filter("PAL");
-	subdevice<software_list_device>("cart_list")->set_filter("PAL");
-	subdevice<software_list_device>("cass_list_c64")->set_filter("PAL");
-	subdevice<software_list_device>("flop_list_c64")->set_filter("PAL");
-	subdevice<software_list_device>("flop_list")->set_filter("PAL");
-	subdevice<software_list_device>("from_list")->set_filter("PAL");
+	softlists(config, "PAL");
 
 	// function ROM
 	GENERIC_SOCKET(config, "from", generic_plain_slot, "c128_rom", "bin,rom");
@@ -2158,6 +2157,8 @@ ROM_START( c128dcr_se )
 	// converted from http://www.zimmers.net/anonftp/pub/cbm/firmware/computers/c128/8721-reduced.zip/8721-reduced.txt
 	ROM_LOAD( "8721r3.u11", 0x000, 0xc88, BAD_DUMP CRC(154db186) SHA1(ccadcdb1db3b62c51dc4ce60fe6f96831586d297) )
 ROM_END
+
+} // anonymous namespace
 
 
 

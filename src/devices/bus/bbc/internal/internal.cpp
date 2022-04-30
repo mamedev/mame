@@ -146,6 +146,11 @@ void bbc_internal_slot_device::latch_fe60_w(uint8_t data)
 		m_card->latch_fe60_w(data);
 }
 
+WRITE_LINE_MEMBER(bbc_internal_slot_device::irq6502_w)
+{
+	if (m_card)
+		m_card->irq6502_w(state);
+}
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( bbc_internal_devices )
@@ -179,7 +184,7 @@ void bbcb_internal_devices(device_slot_interface &device)
 	device.option_add("ariesb20", BBC_ARIESB20);        /* Aries-B20 RAM expansion */
 	device.option_add("ariesb32", BBC_ARIESB32);        /* Aries-B32 RAM expansion */
 	device.option_add("atplsw", BBC_ATPLSW);            /* ATPL Sidewise ROM/RAM expansion */
-	device.option_add("cumana68k", BBC_CUMANA68K);      /* Cumana 68008 2nd Processor */
+	device.option_add("cumana68k", BBC_CUMANA68K);      /* Cumana 68008 Upgrade Board */
 	device.option_add("integrab", BBC_INTEGRAB);        /* Computech Integra-B */
 	device.option_add("mr3000", BBC_MR3000);            /* Peartree MR3000 ROM board */
 	device.option_add("mr4200", BBC_MR4200);            /* Peartree MR4200 RAM board */
@@ -204,7 +209,7 @@ void bbcb_internal_devices(device_slot_interface &device)
 void bbcbp_internal_devices(device_slot_interface &device)
 {
 	device.option_add("atplswp", BBC_ATPLSWP);          /* ATPL Sidewise+ ROM expansion */
-	device.option_add("cumana68k", BBC_CUMANA68K);      /* Cumana 68008 2nd Processor */
+	device.option_add("cumana68k", BBC_CUMANA68K);      /* Cumana 68008 Upgrade Board */
 }
 
 void bbcm_internal_devices(device_slot_interface &device)

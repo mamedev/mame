@@ -80,6 +80,10 @@
 
 DEFINE_DEVICE_TYPE(A2BUS_SLOT, a2bus_slot_device, "a2bus_slot", "Apple II Slot")
 
+template class device_finder<device_a2bus_card_interface, false>;
+template class device_finder<device_a2bus_card_interface, true>;
+
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -205,8 +209,6 @@ uint8_t a2bus_device::get_a2bus_nmi_mask()
 
 void a2bus_device::set_irq_line(int state, int slot)
 {
-	m_out_irq_cb(state);
-
 	if (state == CLEAR_LINE)
 	{
 		m_slot_irq_mask &= ~(1<<slot);
@@ -215,6 +217,8 @@ void a2bus_device::set_irq_line(int state, int slot)
 	{
 		m_slot_irq_mask |= (1<<slot);
 	}
+
+	m_out_irq_cb(state);
 }
 
 void a2bus_device::set_nmi_line(int state, int slot)

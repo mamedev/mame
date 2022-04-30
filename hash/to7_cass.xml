@@ -1,6 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<!-- Thanks to DCMOTO (http://dcmoto.free.fr) for info! -->
+<!--
+license:CC0
+
+Thanks to DCMOTO (http://dcmoto.free.fr) for info!
+-->
 <softwarelist name="to7_cass" description="Thomson TO7 &amp; TO7/70 cassetes">
 
 	<software name="3duss">
@@ -3201,7 +3205,7 @@
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="33534">
-				<rom name="grammaire - comme vous avez de beaux complements ! (playjeux) (jean-paul et roselyne blanc) (1985) (to7).k7" size="33534" crc="d9244a0a" sha1="81b4c3ee61760c6c5ecf7b1c3e66f4e9507eb5e0"/>
+				<rom name="grammaire - comme vous avez de beaux complements (playjeux) (jean-paul et roselyne blanc) (1985) (to7).k7" size="33534" crc="d9244a0a" sha1="81b4c3ee61760c6c5ecf7b1c3e66f4e9507eb5e0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3310,25 +3314,25 @@
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Tape 1 Side A"/>
 			<dataarea name="cass" size="19327">
-				<rom name="guten tag ! (nathan) (dominique miermont, jacques vergne) (1983) (to7) (side 1).k7" size="19327" crc="40aa281a" sha1="47eb99b50db0c8aa72b6d5c7ee393e30743c4de2"/>
+				<rom name="guten tag (nathan) (dominique miermont, jacques vergne) (1983) (to7) (side 1).k7" size="19327" crc="40aa281a" sha1="47eb99b50db0c8aa72b6d5c7ee393e30743c4de2"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
 			<feature name="part_id" value="Tape 1 Side B"/>
 			<dataarea name="cass" size="19364">
-				<rom name="guten tag ! (nathan) (dominique miermont, jacques vergne) (1983) (to7) (side 2).k7" size="19364" crc="f7b76173" sha1="566f19aa1eae072a8163b3c02b40282100ecc5ce"/>
+				<rom name="guten tag (nathan) (dominique miermont, jacques vergne) (1983) (to7) (side 2).k7" size="19364" crc="f7b76173" sha1="566f19aa1eae072a8163b3c02b40282100ecc5ce"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="to_cass">
 			<feature name="part_id" value="Tape 2 Side A"/>
 			<dataarea name="cass" size="21895">
-				<rom name="guten tag ! (nathan) (dominique miermont, jacques vergne) (1983) (to7) (side 3).k7" size="21895" crc="577301c3" sha1="66311048f86a76859121b555ca7d56a9635c609a"/>
+				<rom name="guten tag (nathan) (dominique miermont, jacques vergne) (1983) (to7) (side 3).k7" size="21895" crc="577301c3" sha1="66311048f86a76859121b555ca7d56a9635c609a"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="to_cass">
 			<feature name="part_id" value="Tape 2 Side B"/>
 			<dataarea name="cass" size="22242">
-				<rom name="guten tag ! (nathan) (dominique miermont, jacques vergne) (1983) (to7) (side 4).k7" size="22242" crc="ba744ea9" sha1="7508316d2cb558e40d09636fcf3d8ba0223b6486"/>
+				<rom name="guten tag (nathan) (dominique miermont, jacques vergne) (1983) (to7) (side 4).k7" size="22242" crc="ba744ea9" sha1="7508316d2cb558e40d09636fcf3d8ba0223b6486"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5602,7 +5606,7 @@
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="26221">
-				<rom name="oh la belle bleue ! (puls) (samuel devulder) (2011) (to7).k7" size="26221" crc="bdec35fe" sha1="01c49e3e3636cc4b5145a292bda2891620044e4b"/>
+				<rom name="oh la belle bleue (puls) (samuel devulder) (2011) (to7).k7" size="26221" crc="bdec35fe" sha1="01c49e3e3636cc4b5145a292bda2891620044e4b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5840,25 +5844,25 @@
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Tape 1 Side A"/>
 			<dataarea name="cass" size="32193">
-				<rom name="participes passes - accordez-vous ! (edil) (catherine perrot) (1983) (to7) (side 1a).k7" size="32193" crc="cab1b195" sha1="20a8268b0276bbe0f661664e69ec912bd33ff818"/>
+				<rom name="participes passes - accordez-vous (edil) (catherine perrot) (1983) (to7) (side 1a).k7" size="32193" crc="cab1b195" sha1="20a8268b0276bbe0f661664e69ec912bd33ff818"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
 			<feature name="part_id" value="Tape 1 Side B"/>
 			<dataarea name="cass" size="18669">
-				<rom name="participes passes - accordez-vous ! (edil) (catherine perrot) (1983) (to7) (side 1b).k7" size="18669" crc="dda0de81" sha1="bab4cd29ee71ed47509012c197277d49dc484985"/>
+				<rom name="participes passes - accordez-vous (edil) (catherine perrot) (1983) (to7) (side 1b).k7" size="18669" crc="dda0de81" sha1="bab4cd29ee71ed47509012c197277d49dc484985"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="to_cass">
 			<feature name="part_id" value="Tape 2 Side A"/>
 			<dataarea name="cass" size="22929">
-				<rom name="participes passes - accordez-vous ! (edil) (catherine perrot) (1983) (to7) (side 2a).k7" size="22929" crc="492a9be7" sha1="41775e8f5216f522905d92ea164ac08448d3b7ce"/>
+				<rom name="participes passes - accordez-vous (edil) (catherine perrot) (1983) (to7) (side 2a).k7" size="22929" crc="492a9be7" sha1="41775e8f5216f522905d92ea164ac08448d3b7ce"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="to_cass">
 			<feature name="part_id" value="Tape 2 Side B"/>
 			<dataarea name="cass" size="31930">
-				<rom name="participes passes - accordez-vous ! (edil) (catherine perrot) (1983) (to7) (side 2b).k7" size="31930" crc="19ae6657" sha1="aaad2c9b5d21c335c832f1b532d991a75ecd900c"/>
+				<rom name="participes passes - accordez-vous (edil) (catherine perrot) (1983) (to7) (side 2b).k7" size="31930" crc="19ae6657" sha1="aaad2c9b5d21c335c832f1b532d991a75ecd900c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6556,7 +6560,7 @@
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="37566">
-				<rom name="quelle vie de chene ! (cndp) (e.n. foix) (1985) (to7).k7" size="37566" crc="dad5accc" sha1="a188fb089ed6e1fa0878f0568f045152cb546da4"/>
+				<rom name="quelle vie de chene (cndp) (e.n. foix) (1985) (to7).k7" size="37566" crc="dad5accc" sha1="a188fb089ed6e1fa0878f0568f045152cb546da4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7438,7 +7442,7 @@
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="6152">
-				<rom name="telerama no. 1 (nathan) (andre deledicq, jean delcourt, jean-pascal duclos, serge pouts lajus, jean-baptiste touchard) (1984) (to7).k7" size="6152" crc="3abe21c9" sha1="d1e86650f8d9ac2d928097c29e668729c73fa0bd"/>
+				<rom name="telerama no. 1 (nathan) (andre deledicq, jean delcourt, jean-pascal duclos, serge pouts lajus, jean-baptiste touchard).k7" size="6152" crc="3abe21c9" sha1="d1e86650f8d9ac2d928097c29e668729c73fa0bd"/>
 			</dataarea>
 		</part>
 	</software>

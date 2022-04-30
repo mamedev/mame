@@ -24,7 +24,7 @@ std::string mcs96_disassembler::regname8(uint8_t reg, bool is_dest) const
 {
 	switch(reg) {
 	case 0x00:
-		return "r0";
+		return "0";
 
 	case 0x08:
 		return "int_mask";
@@ -65,7 +65,7 @@ std::string mcs96_disassembler::regname16(uint8_t reg, bool is_dest) const
 {
 	switch(reg) {
 	case 0x00:
-		return "r0";
+		return "0";
 
 	case 0x18:
 		return "sp";

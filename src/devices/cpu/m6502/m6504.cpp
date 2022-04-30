@@ -11,38 +11,11 @@
 #include "emu.h"
 #include "m6504.h"
 
-DEFINE_DEVICE_TYPE(M6504, m6504_device, "m6504", "MOS Technology M6504")
+DEFINE_DEVICE_TYPE(M6504, m6504_device, "m6504", "MOS Technology 6504")
 
 m6504_device::m6504_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, M6504, tag, owner, clock)
 {
 	program_config.m_addr_width = 13;
 	sprogram_config.m_addr_width = 13;
-}
-
-void m6504_device::device_start()
-{
-	mintf = std::make_unique<mi_6504>();
-
-	init();
-}
-
-uint8_t m6504_device::mi_6504::read(uint16_t adr)
-{
-	return program->read_byte(adr & 0x1fff);
-}
-
-uint8_t m6504_device::mi_6504::read_sync(uint16_t adr)
-{
-	return scache->read_byte(adr & 0x1fff);
-}
-
-uint8_t m6504_device::mi_6504::read_arg(uint16_t adr)
-{
-	return cache->read_byte(adr & 0x1fff);
-}
-
-void m6504_device::mi_6504::write(uint16_t adr, uint8_t val)
-{
-	program->write_byte(adr & 0x1fff, val);
 }

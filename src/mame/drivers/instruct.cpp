@@ -2,14 +2,14 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-    Signetics Intructor 50
+Signetics Instructor 50
 
-    2010-04-08 Skeleton driver.
-    2012-05-20 Connected digits, system boots. [Robbbert]
-    2012-05-20 Connected keyboard, system mostly usable. [Robbbert]
-    2013-10-15 Fixed various regressions. [Robbbert]
+2010-04-08 Skeleton driver.
+2012-05-20 Connected digits, system boots. [Robbbert]
+2012-05-20 Connected keyboard, system mostly usable. [Robbbert]
+2013-10-15 Fixed various regressions. [Robbbert]
 
-    From looking at a blurry picture of it, this is what I can determine:
+From looking at a blurry picture of it, this is what I can determine:
     - Left side: 8 toggle switches, with a round red led above each one.
     - Below this is the Port Address Switch with choice of 'Non-Extended', 'Extended' or 'Memory'.
     - To the right of this is another toggle switch labelled 'Interrupt', the
@@ -25,14 +25,18 @@
       MIC and EAR cords to a cassette player.
     - At the back is a S100 interface.
 
-    Quick usage:
+Quick usage:
     - Look at memory: Press minus key. Enter an address. Press UP key to see the next.
     - Look at registers: Press R. Press 0. Press UP key to see the next.
     - Set PC register: Press R. Press C. Type in new address, Press UP.
     - Load a tape: Press L, enter file number (1 digit), press UP. On
       completion of a successful load, HELLO will be displayed.
 
-    ToDO:
+Pasting a test program: (page 2-4 of the user manual, modified)
+    - Paste this: QRF0^751120F005000620FA7EF97A84011F0003-0P
+    - You should see the LEDs flashing as they count upwards.
+
+ToDO:
     - Connect round led for Run.
     - Last Address Register
     - Initial Jump Logic
@@ -48,6 +52,7 @@
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "speaker.h"
+#include "video/pwm.h"
 
 #include "instruct.lh"
 
@@ -62,63 +67,64 @@ public:
 		, m_p_smiram(*this, "smiram")
 		, m_p_extram(*this, "extram")
 		, m_cass(*this, "cassette")
-		, m_digits(*this, "digit%u", 0U)
+		, m_display(*this, "display")
+		, m_io_keyboard(*this, "X%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	void instruct(machine_config &config);
 
-private:
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER(port_r);
-	DECLARE_READ8_MEMBER(portfc_r);
-	DECLARE_READ8_MEMBER(portfd_r);
-	DECLARE_READ8_MEMBER(portfe_r);
+private:
+	uint8_t port_r();
+	uint8_t portfc_r();
+	uint8_t portfd_r();
+	uint8_t portfe_r();
 	DECLARE_READ_LINE_MEMBER(sense_r);
 	DECLARE_WRITE_LINE_MEMBER(flag_w);
-	DECLARE_WRITE8_MEMBER(port_w);
-	DECLARE_WRITE8_MEMBER(portf8_w);
-	DECLARE_WRITE8_MEMBER(portf9_w);
-	DECLARE_WRITE8_MEMBER(portfa_w);
+	void port_w(uint8_t data);
+	void portf8_w(uint8_t data);
+	void portf9_w(uint8_t data);
+	void portfa_w(uint8_t data);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	INTERRUPT_GEN_MEMBER(t2l_int);
 	void data_map(address_map &map);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
-	uint16_t m_lar;
-	uint8_t m_digit;
-	bool m_valid_digit;
-	bool m_cassin;
-	bool m_irqstate;
+	uint16_t m_lar = 0U;
+	uint8_t m_digit = 0U;
+	u8 m_seg = 0U;
+	bool m_cassin = 0;
+	bool m_irqstate = 0;
 	required_device<s2650_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_ram;
 	required_shared_ptr<uint8_t> m_p_smiram;
 	required_shared_ptr<uint8_t> m_p_extram;
 	required_device<cassette_image_device> m_cass;
-	output_finder<129> m_digits;
+	required_device<pwm_display_device> m_display;
+	required_ioport_array<6> m_io_keyboard;
+	output_finder<9> m_leds;
 };
 
 // flag led
 WRITE_LINE_MEMBER( instruct_state::flag_w )
 {
-	output().set_value("led8", !state);
+	m_leds[8] = !state;
 }
 
 // user port
-WRITE8_MEMBER( instruct_state::port_w )
+void instruct_state::port_w(uint8_t data)
 {
-	char ledname[8];
 	for (int i = 0; i < 8; i++)
-	{
-		sprintf(ledname,"led%d",i);
-		output().set_value(ledname, !BIT(data, i));
-	}
+		m_leds[i] = !BIT(data, i);
 }
 
 // cassette port
-WRITE8_MEMBER( instruct_state::portf8_w )
+void instruct_state::portf8_w(uint8_t data)
 {
 	if (BIT(data, 4))
 		m_cass->output(BIT(data, 3) ? -1.0 : +1.0);
@@ -129,52 +135,47 @@ WRITE8_MEMBER( instruct_state::portf8_w )
 }
 
 // segment output
-WRITE8_MEMBER( instruct_state::portf9_w )
+void instruct_state::portf9_w(uint8_t data)
 {
-	if (m_valid_digit)
-		m_digits[m_digit] = data;
-	m_valid_digit = false;
+	m_seg = data;
+	m_display->matrix(m_digit, m_seg);
 }
 
 // digit & keyrow-scan select
-WRITE8_MEMBER( instruct_state::portfa_w )
+void instruct_state::portfa_w(uint8_t data)
 {
 	m_digit = data;
-	m_valid_digit = true;
+	m_display->matrix(m_digit, m_seg);
 }
 
 // user switches
-READ8_MEMBER( instruct_state::port_r )
+uint8_t instruct_state::port_r()
 {
 	return ioport("USW")->read();
 }
 
 // last address register A0-7 copied to 17E9 at boot
-READ8_MEMBER( instruct_state::portfc_r )
+uint8_t instruct_state::portfc_r()
 {
 	return m_lar;
 }
 
 // last address register A8-14 copied to 17E8 at boot
-READ8_MEMBER( instruct_state::portfd_r )
+uint8_t instruct_state::portfd_r()
 {
 	return (m_lar >> 8) & 0x7f;
 }
 
 // read keyboard
-READ8_MEMBER( instruct_state::portfe_r )
+uint8_t instruct_state::portfe_r()
 {
-	for (uint8_t i = 0; i < 6; i++)
-	{
-		if (BIT(m_digit, i))
-		{
-			char kbdrow[6];
-			sprintf(kbdrow,"X%X",i);
-			return ioport(kbdrow)->read();
-		}
-	}
+	u8 data = 15;
 
-	return 0xf;
+	for (uint8_t i = 0; i < 6; i++)
+		if (BIT(m_digit, i))
+			data &= m_io_keyboard[i]->read();
+
+	return data;
 }
 
 
@@ -208,17 +209,14 @@ INTERRUPT_GEN_MEMBER( instruct_state::t2l_int )
 	{
 		uint8_t switches = ioport("SW")->read();
 
-		// Set vector from INDIRECT sw
-		uint8_t vector = BIT(switches, 0) ? 0x87 : 0x07;
-
 		// Check INT sw & key
 		if (BIT(switches, 1))
-			device.execute().set_input_line_and_vector(0, BIT(hwkeys, 1) ? ASSERT_LINE : CLEAR_LINE, vector); // S2650
+			device.execute().set_input_line(0, BIT(hwkeys, 1) ? ASSERT_LINE : CLEAR_LINE);
 		else
 		// process ac input
 		{
 			m_irqstate ^= 1;
-			device.execute().set_input_line_and_vector(0, m_irqstate ? ASSERT_LINE : CLEAR_LINE, vector); // S2650
+			device.execute().set_input_line(0, m_irqstate ? ASSERT_LINE : CLEAR_LINE);
 		}
 	}
 }
@@ -333,10 +331,21 @@ INPUT_PORTS_END
 
 void instruct_state::machine_reset()
 {
+	m_irqstate = 0;
 	m_cassin = 0;
-	address_space &space = m_maincpu->space(AS_IO);
-	port_w(space, 0, 0); // turn round leds off
+	port_w(0); // turn round leds off
 	m_maincpu->set_state_int(S2650_PC, 0x1800);
+}
+
+void instruct_state::machine_start()
+{
+	m_leds.resolve();
+
+	save_item(NAME(m_lar));
+	save_item(NAME(m_digit));
+	save_item(NAME(m_seg));
+	save_item(NAME(m_cassin));
+	save_item(NAME(m_irqstate));
 }
 
 QUICKLOAD_LOAD_MEMBER(instruct_state::quickload_cb)
@@ -347,13 +356,13 @@ QUICKLOAD_LOAD_MEMBER(instruct_state::quickload_cb)
 	quick_length = image.length();
 	if (quick_length < 0x0100)
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
+		image.seterror(image_error::INVALIDIMAGE, "File too short");
 		image.message(" File too short");
 	}
 	else
 	if (quick_length > 0x8000)
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+		image.seterror(image_error::INVALIDIMAGE, "File too long");
 		image.message(" File too long");
 	}
 	else
@@ -362,12 +371,12 @@ QUICKLOAD_LOAD_MEMBER(instruct_state::quickload_cb)
 		read_ = image.fread( &quick_data[0], quick_length);
 		if (read_ != quick_length)
 		{
-			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+			image.seterror(image_error::INVALIDIMAGE, "Cannot read the file");
 			image.message(" Cannot read the file");
 		}
 		else if (quick_data[0] != 0xc5)
 		{
-			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
+			image.seterror(image_error::INVALIDIMAGE, "Invalid header");
 			image.message(" Invalid header");
 		}
 		else
@@ -376,7 +385,7 @@ QUICKLOAD_LOAD_MEMBER(instruct_state::quickload_cb)
 
 			if (exec_addr >= quick_length)
 			{
-				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Exec address beyond end of file");
+				image.seterror(image_error::INVALIDIMAGE, "Exec address beyond end of file");
 				image.message(" Exec address beyond end of file");
 			}
 			else
@@ -430,9 +439,13 @@ void instruct_state::instruct(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(instruct_state::t2l_int), attotime::from_hz(120));
 	m_maincpu->sense_handler().set(FUNC(instruct_state::sense_r));
 	m_maincpu->flag_handler().set(FUNC(instruct_state::flag_w));
+	// Set vector from INDIRECT sw
+	m_maincpu->intack_handler().set([this]() { return BIT(ioport("SW")->read(), 0) ? 0x87 : 0x07; });
 
 	/* video hardware */
 	config.set_default_layout(layout_instruct);
+	PWM_DISPLAY(config, m_display).set_size(8, 8);
+	m_display->set_segmask(0xff, 0xff);
 
 	/* quickload */
 	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(instruct_state::quickload_cb));
@@ -458,4 +471,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY      FULLNAME                   FLAGS
-COMP( 1978, instruct, 0,      0,      instruct, instruct, instruct_state, empty_init, "Signetics", "Signetics Instructor 50", 0 )
+COMP( 1978, instruct, 0,      0,      instruct, instruct, instruct_state, empty_init, "Signetics", "Signetics Instructor 50", MACHINE_SUPPORTS_SAVE )

@@ -27,12 +27,13 @@ the S14001A in the 70s), this time a 65C02 software solution.
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/r65c02.h"
+#include "machine/clock.h"
 #include "machine/sensorboard.h"
-#include "machine/timer.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -47,7 +48,6 @@ public:
 	chesster_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_irq_on(*this, "irq_on"),
 		m_rombank(*this, "rombank"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
@@ -66,7 +66,6 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<timer_device> m_irq_on;
 	required_memory_bank m_rombank;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
@@ -75,17 +74,13 @@ private:
 	// address maps
 	void main_map(address_map &map);
 
-	// periodic interrupts
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
-
 	// I/O handlers
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void control_w(offs_t offset, u8 data);
+	u8 input_r(offs_t offset);
 
-	int m_numbanks;
-	u8 m_speech_bank;
-	u8 m_select;
+	int m_numbanks = 0;
+	u8 m_speech_bank = 0;
+	u8 m_select = 0;
 };
 
 void chesster_state::init_chesster()
@@ -96,10 +91,6 @@ void chesster_state::init_chesster()
 
 void chesster_state::machine_start()
 {
-	// zerofill
-	m_speech_bank = 0;
-	m_select = 0;
-
 	// register for savestates
 	save_item(NAME(m_speech_bank));
 	save_item(NAME(m_select));
@@ -113,7 +104,7 @@ void chesster_state::machine_start()
 
 // TTL/generic
 
-WRITE8_MEMBER(chesster_state::control_w)
+void chesster_state::control_w(offs_t offset, u8 data)
 {
 	// a0-a2,d7: 74259(1)
 	u8 mask = 1 << offset;
@@ -133,7 +124,7 @@ WRITE8_MEMBER(chesster_state::control_w)
 	m_rombank->set_entry(bank & (m_numbanks - 1));
 }
 
-READ8_MEMBER(chesster_state::input_r)
+u8 chesster_state::input_r(offs_t offset)
 {
 	u8 sel = m_select >> 4 & 0xf;
 	u8 data = 0;
@@ -173,7 +164,7 @@ void chesster_state::main_map(address_map &map)
 
 static INPUT_PORTS_START( chesster )
 	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("Clear")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_NAME("Clear")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("Move / No")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Hint / Yes")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("Take Back / Repeat")
@@ -195,10 +186,9 @@ void chesster_state::chesster(machine_config &config)
 	R65C02(config, m_maincpu, 5_MHz_XTAL); // RP65C02G
 	m_maincpu->set_addrmap(AS_PROGRAM, &chesster_state::main_map);
 
-	const attotime irq_period = attotime::from_hz(9500); // from 555 timer, measured (9.6kHz on a Chesster, 9.3kHz on a Kishon)
-	TIMER(config, m_irq_on).configure_periodic(FUNC(chesster_state::irq_on<M6502_IRQ_LINE>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(2600)); // active for 2.6us
-	TIMER(config, "irq_off").configure_periodic(FUNC(chesster_state::irq_off<M6502_IRQ_LINE>), irq_period);
+	auto &irq_clock(CLOCK(config, "irq_clock", 9500)); // from 555 timer, measured (9.6kHz on a Chesster, 9.3kHz on a Kishon)
+	irq_clock.set_pulse_width(attotime::from_nsec(2600)); // active for 2.6us
+	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -211,9 +201,6 @@ void chesster_state::chesster(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.5); // m74hc374b1.ic1 + 8l513_02.z2
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void chesster_state::kishon(machine_config &config)

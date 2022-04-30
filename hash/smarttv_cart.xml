@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+
+<softwarelist name="smarttv_cart" description="WinFun KidConnection SmarTV Adventures / Funtastic TV Adventures cartridges">
+
+	<software name="amuseprk" supported="no">
+		<description>Amusement Park</description>
+		<year>200?</year>
+		<publisher>WinFun</publisher>
+		<part name="cart" interface="smarttv_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="kidconnectionamusementpark.bin" size="0x400000" crc="360f6306" sha1="72f9f9ba1498cdefd35956daf21b2668048e9af3"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

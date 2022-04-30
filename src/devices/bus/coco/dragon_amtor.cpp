@@ -53,7 +53,7 @@ INPUT_PORTS_END
 //  dragon_amtor_device - constructor
 //-------------------------------------------------
 
-dragon_amtor_device::dragon_amtor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dragon_amtor_device::dragon_amtor_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, DRAGON_AMTOR, tag, owner, clock)
 	, device_cococart_interface(mconfig, *this)
 	, m_eprom(*this, "eprom")
@@ -93,7 +93,7 @@ const tiny_rom_entry *dragon_amtor_device::device_rom_region() const
 //  dragon_amtor_device::get_cart_base
 //-------------------------------------------------
 
-uint8_t* dragon_amtor_device::get_cart_base()
+u8 *dragon_amtor_device::get_cart_base()
 {
 	return m_eprom->base();
 }
@@ -102,7 +102,7 @@ uint8_t* dragon_amtor_device::get_cart_base()
 //  dragon_amtor_device::get_cart_memregion
 //-------------------------------------------------
 
-memory_region* dragon_amtor_device::get_cart_memregion()
+memory_region *dragon_amtor_device::get_cart_memregion()
 {
 	return m_eprom;
 }
@@ -111,7 +111,7 @@ memory_region* dragon_amtor_device::get_cart_memregion()
 //  cts_read
 //-------------------------------------------------
 
-READ8_MEMBER(dragon_amtor_device::cts_read)
+u8 dragon_amtor_device::cts_read(offs_t offset)
 {
 	offset = bitswap<16>(offset, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 0, 1);
 

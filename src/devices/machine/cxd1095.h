@@ -65,8 +65,8 @@ public:
 	auto out_porte_cb() { return out_port_cb<4>(); }
 
 	// memory handlers
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 protected:
 	// device-level overrides
@@ -75,8 +75,8 @@ protected:
 
 private:
 	// input/output callbacks
-	devcb_read8         m_input_cb[5];
-	devcb_write8        m_output_cb[5];
+	devcb_read8::array<5> m_input_cb;
+	devcb_write8::array<5> m_output_cb;
 
 	// internal state
 	u8                  m_data_latch[5];

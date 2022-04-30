@@ -31,7 +31,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-namespace emu { namespace detail {
+namespace emu::detail {
 
 class machine_config_replace
 {
@@ -43,7 +43,7 @@ private:
 	friend class ::machine_config;
 };
 
-} } // namesapce emu::detail
+} // namespace emu::detail
 
 
 /// \brief Internal layout description
@@ -123,7 +123,7 @@ public:
 	//    to a #device_t and a const reference to an #internal_layout.
 	template <typename T> void apply_default_layouts(T &&op) const
 	{
-		for (std::pair<char const *, internal_layout const *> const &lay : m_default_layouts)
+		for (std::pair<char const *const, internal_layout const *> const &lay : m_default_layouts)
 			op(*device(lay.first), *lay.second);
 	}
 
@@ -133,7 +133,7 @@ public:
 	/// replace an existing device.
 	/// \return A device replacement helper to pass to a device type
 	///   when replacing an existing device.
-	emu::detail::machine_config_replace replace() { return emu::detail::machine_config_replace(*this); };
+	emu::detail::machine_config_replace replace() { return emu::detail::machine_config_replace(*this); }
 
 	/// \brief Set internal layout for current device
 	///

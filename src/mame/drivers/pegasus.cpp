@@ -38,17 +38,21 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "cpu/m6809/m6809.h"
 #include "imagedev/cassette.h"
 #include "machine/6821pia.h"
 #include "machine/timer.h"
+
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
 
 class pegasus_state : public driver_device
 {
@@ -64,10 +68,9 @@ public:
 		, m_exp_02(*this, "exp02")
 		, m_exp_0c(*this, "exp0c")
 		, m_exp_0d(*this, "exp0d")
-		, m_p_videoram(*this, "videoram")
+		, m_vram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
-		, m_p_pcgram(*this, "pcg")
-		, m_io_keyboard(*this, "KEY.%u", 0)
+		, m_io_keyboard(*this, "KEY.%u", 0U)
 	{ }
 
 	void pegasusm(machine_config &config);
@@ -75,18 +78,22 @@ public:
 
 	void init_pegasus();
 
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+
 private:
-	DECLARE_READ8_MEMBER(pegasus_keyboard_r);
-	DECLARE_READ8_MEMBER(pegasus_protection_r);
-	DECLARE_READ8_MEMBER(pegasus_pcg_r);
-	DECLARE_WRITE8_MEMBER(pegasus_controls_w);
-	DECLARE_WRITE8_MEMBER(pegasus_keyboard_w);
-	DECLARE_WRITE8_MEMBER(pegasus_pcg_w);
+	u8 pegasus_keyboard_r();
+	u8 pegasus_protection_r();
+	u8 pegasus_pcg_r(offs_t offset);
+	void pegasus_controls_w(u8 data);
+	void pegasus_keyboard_w(u8 data);
+	void pegasus_pcg_w(offs_t offset, u8 data);
 	DECLARE_READ_LINE_MEMBER(pegasus_keyboard_irq);
 	DECLARE_READ_LINE_MEMBER(pegasus_cassette_r);
 	DECLARE_WRITE_LINE_MEMBER(pegasus_cassette_w);
 	DECLARE_WRITE_LINE_MEMBER(pegasus_firq_clr);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(pegasus_firq);
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, const char *reg_tag);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp00_load) { return load_cart(image, m_exp_00, "0000"); }
@@ -98,12 +105,11 @@ private:
 	void pegasus_mem(address_map &map);
 	void pegasusm_mem(address_map &map);
 
-	uint8_t m_kbd_row;
-	bool m_kbd_irq;
-	uint8_t m_control_bits;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	void pegasus_decrypt_rom(uint8_t *ROM);
+	u8 m_kbd_row = 0U;
+	bool m_kbd_irq = false;
+	u8 m_control_bits = 0U;
+	std::unique_ptr<u8[]> m_pcg;
+	void pegasus_decrypt_rom(u8 *ROM);
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<pia6821_device> m_pia_s;
@@ -113,9 +119,8 @@ private:
 	required_device<generic_slot_device> m_exp_02;
 	required_device<generic_slot_device> m_exp_0c;
 	required_device<generic_slot_device> m_exp_0d;
-	required_shared_ptr<uint8_t> m_p_videoram;
+	required_shared_ptr<u8> m_vram;
 	required_region_ptr<u8> m_p_chargen;
-	required_region_ptr<u8> m_p_pcgram;
 	required_ioport_array<8> m_io_keyboard;
 };
 
@@ -129,24 +134,24 @@ WRITE_LINE_MEMBER( pegasus_state::pegasus_firq_clr )
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
-READ8_MEMBER( pegasus_state::pegasus_keyboard_r )
+u8 pegasus_state::pegasus_keyboard_r()
 {
-	uint8_t i,data = 0xff;
-	for (i = 0; i < 8; i++)
+	u8 data = 0xff;
+	for (unsigned i = 0; i < 8; i++)
 		if (!BIT(m_kbd_row, i)) data &= m_io_keyboard[i]->read();
 
 	m_kbd_irq = (data == 0xff) ? 1 : 0;
 	if (BIT(m_control_bits, 3))
-		data<<=4;
+		data <<= 4;
 	return data;
 }
 
-WRITE8_MEMBER( pegasus_state::pegasus_keyboard_w )
+void pegasus_state::pegasus_keyboard_w(u8 data)
 {
 	m_kbd_row = data;
 }
 
-WRITE8_MEMBER( pegasus_state::pegasus_controls_w )
+void pegasus_state::pegasus_controls_w(u8 data)
 {
 /*  d0,d2 - not emulated
     d0 - Blank - Video blanking
@@ -173,25 +178,25 @@ WRITE_LINE_MEMBER( pegasus_state::pegasus_cassette_w )
 	m_cass->output(state ? 1 : -1);
 }
 
-READ8_MEMBER( pegasus_state::pegasus_pcg_r )
+u8  pegasus_state::pegasus_pcg_r(offs_t offset)
 {
-	uint8_t code = m_p_videoram[offset] & 0x7f;
-	return m_p_pcgram[(code << 4) | (~m_kbd_row & 15)];
+	u8 code = m_vram[offset] & 0x7f;
+	return m_pcg[(code << 4) | (~m_kbd_row & 15)];
 }
 
-WRITE8_MEMBER( pegasus_state::pegasus_pcg_w )
+void pegasus_state::pegasus_pcg_w(offs_t offset, u8 data)
 {
 //  if (BIT(m_control_bits, 1))
 	{
-		uint8_t code = m_p_videoram[offset] & 0x7f;
-		m_p_pcgram[(code << 4) | (~m_kbd_row & 15)] = data;
+		u8 code = m_vram[offset] & 0x7f;
+		m_pcg[(code << 4) | (~m_kbd_row & 15)] = data;
 	}
 }
 
 /* Must return the A register except when it is doing a rom search */
-READ8_MEMBER( pegasus_state::pegasus_protection_r )
+u8 pegasus_state::pegasus_protection_r()
 {
-	uint8_t data = m_maincpu->state_int(M6809_A);
+	u8 data = m_maincpu->state_int(M6809_A);
 	if (data == 0x20) data = 0xff;
 	return data;
 }
@@ -207,7 +212,7 @@ void pegasus_state::pegasus_mem(address_map &map)
 	map(0xe200, 0xe3ff).rw(FUNC(pegasus_state::pegasus_pcg_r), FUNC(pegasus_state::pegasus_pcg_w));
 	map(0xe400, 0xe403).mirror(0x1fc).rw(m_pia_u, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xe600, 0xe603).mirror(0x1fc).rw(m_pia_s, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0xf000, 0xffff).rom();
+	map(0xf000, 0xffff).rom().region("maincpu", 0);
 }
 
 void pegasus_state::pegasusm_mem(address_map &map)
@@ -300,7 +305,7 @@ static INPUT_PORTS_START( pegasus )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("{ }") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('{') PORT_CHAR('}')
 INPUT_PORTS_END
 
-static const uint8_t mcm6571a_shift[] =
+static const u8 mcm6571a_shift[] =
 {
 	0,1,1,0,0,0,1,0,0,0,0,1,0,0,0,0,
 	1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,
@@ -313,22 +318,21 @@ static const uint8_t mcm6571a_shift[] =
 };
 
 
-uint32_t pegasus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 pegasus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,chr,gfx,inv;
-	uint16_t sy=0,ma=0,x;
-	bool pcg_mode = BIT(m_control_bits, 1);
+	u16 sy=0, ma=0;
+	const bool pcg_mode = BIT(m_control_bits, 1);
 
-	for(y = 0; y < 16; y++ )
+	for (u8 y = 0; y < 16; y++)
 	{
-		for(ra = 0; ra < 16; ra++ )
+		for (u8 ra = 0; ra < 16; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix(sy++);
 
-			for(x = ma; x < ma + 32; x++ )
+			for (u16 x = ma; x < ma + 32; x++)
 			{
-				inv = 0xff;
-				chr = m_p_videoram[x];
+				u8 inv = 0xff;
+				u8 chr = m_vram[x];
 
 				if (BIT(chr, 7))
 				{
@@ -336,12 +340,12 @@ uint32_t pegasus_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 					chr &= 0x7f;
 				}
 
+				u8 gfx;
 				if (pcg_mode)
 				{
-					gfx = m_p_pcgram[(chr << 4) | ra] ^ inv;
+					gfx = m_pcg[(chr << 4) | ra] ^ inv;
 				}
-				else
-				if (mcm6571a_shift[chr])
+				else if (mcm6571a_shift[chr])
 				{
 					if (ra < 3)
 						gfx = inv;
@@ -375,33 +379,29 @@ uint32_t pegasus_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 /* F4 Character Displayer */
 static const gfx_layout pegasus_charlayout =
 {
-	8, 16,                  /* text = 7 x 9, pcg = 8 x 16 */
-	128,                    /* 128 characters */
-	1,                  /* 1 bits per pixel */
-	{ 0 },                  /* no bitplanes */
-	/* x offsets */
+	8, 16,                  // text = 7 x 9, pcg = 8 x 16
+	128,                    // 128 characters
+	1,                      // 1 bits per pixel
+	{ 0 },                  // no bitplanes
+	// x offsets
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
+	// y offsets
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	8*16                    /* every char takes 16 bytes */
+	8*16                    // every char takes 16 bytes
 };
 
 static GFXDECODE_START( gfx_pegasus )
 	GFXDECODE_ENTRY( "chargen", 0x0000, pegasus_charlayout, 0, 1 )
-	GFXDECODE_ENTRY( "pcg", 0x0000, pegasus_charlayout, 0, 1 )
+	//GFXDECODE_ENTRY( "pcg", 0x0000, pegasus_charlayout, 0, 1 )
 GFXDECODE_END
 
 
 // An encrypted single rom starts with 02, decrypted with 20.
 // The 2nd and 3rd part of a multi-rom set will have no obvious byte,
 // so we check the first 4 bytes for a signature, and decrypt if found.
-void pegasus_state::pegasus_decrypt_rom(uint8_t *ROM)
+void pegasus_state::pegasus_decrypt_rom(u8 *ROM)
 {
 	bool doit = false;
-	uint8_t b;
-	uint16_t j;
-	std::vector<uint8_t> temp_copy;
-	temp_copy.resize(0x1000);
 
 	if (ROM[0] == 0x02) doit = true;
 	if (ROM[0] == 0x1e && ROM[1] == 0xfa && ROM[2] == 0x60 && ROM[3] == 0x71) doit = true; // xbasic 2nd rom
@@ -411,11 +411,12 @@ void pegasus_state::pegasus_decrypt_rom(uint8_t *ROM)
 
 	if (doit)
 	{
+		std::vector<u8> temp_copy;
+		temp_copy.resize(0x1000);
 		for (int i = 0; i < 0x1000; i++)
 		{
-			b = ROM[i];
-			j = bitswap<16>(i, 15, 14, 13, 12, 11, 10, 9, 8, 0, 1, 2, 3, 4, 5, 6, 7);
-			b = bitswap<8>(b, 3, 2, 1, 0, 7, 6, 5, 4);
+			const u16 j = bitswap<16>(i, 15, 14, 13, 12, 11, 10, 9, 8, 0, 1, 2, 3, 4, 5, 6, 7);
+			const u8 b = bitswap<8>(ROM[i], 3, 2, 1, 0, 7, 6, 5, 4);
 			temp_copy[j & 0xfff] = b;
 		}
 		memcpy(ROM, &temp_copy[0], 0x1000);
@@ -424,12 +425,12 @@ void pegasus_state::pegasus_decrypt_rom(uint8_t *ROM)
 
 image_init_result pegasus_state::load_cart(device_image_interface &image, generic_slot_device *slot, const char *reg_tag)
 {
-	uint32_t size = slot->common_get_size(reg_tag);
+	u32 size = slot->common_get_size(reg_tag);
 	bool any_socket = false;
 
 	if (size > 0x1000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 		return image_init_result::FAIL;
 	}
 
@@ -445,7 +446,7 @@ image_init_result pegasus_state::load_cart(device_image_interface &image, generi
 			std::string errmsg = string_format(
 					"Attempted to load a file that does not work in this socket.\n"
 					"Please check \"Usage\" field in the software list for the correct socket(s) to use.");
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, errmsg.c_str());
+			image.seterror(image_error::INVALIDIMAGE, errmsg.c_str());
 			return image_init_result::FAIL;
 		}
 	}
@@ -471,6 +472,11 @@ void pegasus_state::machine_start()
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xcfff, read8sm_delegate(*m_exp_0c, FUNC(generic_slot_device::read_rom)));
 	if (m_exp_0d->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0xd000, 0xdfff, read8sm_delegate(*m_exp_0d, FUNC(generic_slot_device::read_rom)));
+	m_pcg = make_unique_clear<u8[]>(0x0800);
+	save_pointer(NAME(m_pcg), 0x0800);
+	save_item(NAME(m_kbd_row));
+	save_item(NAME(m_kbd_irq));
+	save_item(NAME(m_control_bits));
 }
 
 void pegasus_state::machine_reset()
@@ -483,7 +489,7 @@ void pegasus_state::machine_reset()
 void pegasus_state::init_pegasus()
 {
 	// decrypt monitor
-	uint8_t *base = memregion("maincpu")->base() + 0xf000;
+	u8 *base = memregion("maincpu")->base();
 	pegasus_decrypt_rom(base);
 }
 
@@ -548,34 +554,35 @@ void pegasus_state::pegasusm(machine_config &config)
 
 /* ROM definition */
 ROM_START( pegasus )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "11r2674", "Monitor 1.1 r2674")
-	ROMX_LOAD( "mon11_2674.bin", 0xf000, 0x1000, CRC(1640ff7e) SHA1(8199643749fb40fb8be05e9f311c75620ca939b1), ROM_BIOS(0) )
+	ROMX_LOAD( "mon11_2674.bin",  0x0000, 0x1000, CRC(1640ff7e) SHA1(8199643749fb40fb8be05e9f311c75620ca939b1), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "10r2569", "Monitor 1.0 r2569")
-	ROMX_LOAD( "mon10_2569.bin", 0xf000, 0x1000, CRC(910fc930) SHA1(a4f6bbe5def0268cc49ee7045616a39017dd8052), ROM_BIOS(1) )
+	ROMX_LOAD( "mon10_2569.bin",  0x0000, 0x1000, CRC(910fc930) SHA1(a4f6bbe5def0268cc49ee7045616a39017dd8052), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(2, "11r2569", "Monitor 1.1 r2569")
-	ROMX_LOAD( "mon11_2569.bin", 0xf000, 0x1000, CRC(07b92002) SHA1(3c434601120870c888944ecd9ade5186432ddbc2), ROM_BIOS(2) )
+	ROMX_LOAD( "mon11_2569.bin",  0x0000, 0x1000, CRC(07b92002) SHA1(3c434601120870c888944ecd9ade5186432ddbc2), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS(3, "11r2669", "Monitor 1.1 r2669")
-	ROMX_LOAD( "mon11_2669.bin", 0xf000, 0x1000, CRC(f3ee23c8) SHA1(3ac96935668f5e53799c90db5140393c2ef9ce36), ROM_BIOS(3) )
+	ROMX_LOAD( "mon11_2669.bin",  0x0000, 0x1000, CRC(f3ee23c8) SHA1(3ac96935668f5e53799c90db5140393c2ef9ce36), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS(4, "22r2856", "Monitor 2.2 r2856")
-	ROMX_LOAD( "mon22_2856.bin", 0xf000, 0x1000, CRC(5f5f688a) SHA1(3719eecc347e158dd027ea7aa8a068cdafc00d9b), ROM_BIOS(4) )
+	ROMX_LOAD( "mon22_2856.bin",  0x0000, 0x1000, CRC(5f5f688a) SHA1(3719eecc347e158dd027ea7aa8a068cdafc00d9b), ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS(5, "22br2856", "Monitor 2.2B r2856")
-	ROMX_LOAD( "mon22b_2856.bin", 0xf000, 0x1000, CRC(a47b0308) SHA1(f215e51aa8df6aed99c10f3df6a3589cb9f63d46), ROM_BIOS(5) )
+	ROMX_LOAD( "mon22b_2856.bin", 0x0000, 0x1000, CRC(a47b0308) SHA1(f215e51aa8df6aed99c10f3df6a3589cb9f63d46), ROM_BIOS(5) )
 	ROM_SYSTEM_BIOS(6, "23r2601", "Monitor 2.3 r2601")
-	ROMX_LOAD( "mon23_2601.bin", 0xf000, 0x1000, CRC(0e024222) SHA1(9950cba08996931b9d5a3368b44c7309638b4e08), ROM_BIOS(6) )
+	ROMX_LOAD( "mon23_2601.bin",  0x0000, 0x1000, CRC(0e024222) SHA1(9950cba08996931b9d5a3368b44c7309638b4e08), ROM_BIOS(6) )
 	ROM_SYSTEM_BIOS(7, "23ar2569", "Monitor 2.3A r2569")
-	ROMX_LOAD( "mon23a_2569.bin", 0xf000, 0x1000, CRC(248e62c9) SHA1(adbde27e69b38b29ff89bacf28d0240a8e5d90f3), ROM_BIOS(7) )
+	ROMX_LOAD( "mon23a_2569.bin", 0x0000, 0x1000, CRC(248e62c9) SHA1(adbde27e69b38b29ff89bacf28d0240a8e5d90f3), ROM_BIOS(7) )
 
-	ROM_REGION( 0x800, "chargen", 0 )
+	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "6571.bin", 0x0000, 0x0800, CRC(5a25144b) SHA1(7b9fee0c8ef2605b85d12b6d9fe8feb82418c63a) )
-
-	ROM_REGION( 0x800, "pcg", ROMREGION_ERASEFF )
 ROM_END
 
 #define rom_pegasusm rom_pegasus
 
+} // anonymous namespace
+
+
 /* Driver */
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS          INIT          COMPANY      FULLNAME                                  FLAGS
-COMP( 1981, pegasus,  0,       0,      pegasus,  pegasus, pegasus_state, init_pegasus, "Technosys", "Aamber Pegasus",                         MACHINE_NO_SOUND_HW )
-COMP( 1981, pegasusm, pegasus, 0,      pegasusm, pegasus, pegasus_state, init_pegasus, "Technosys", "Aamber Pegasus with RAM expansion unit", MACHINE_NO_SOUND_HW )
+COMP( 1981, pegasus,  0,       0,      pegasus,  pegasus, pegasus_state, init_pegasus, "Technosys", "Aamber Pegasus",                         MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, pegasusm, pegasus, 0,      pegasusm, pegasus, pegasus_state, init_pegasus, "Technosys", "Aamber Pegasus with RAM expansion unit", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

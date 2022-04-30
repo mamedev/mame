@@ -8,7 +8,6 @@
 #include "emu.h"
 #include "musicmachine.h"
 
-#include "sound/volt_reg.h"
 #include "bus/midi/midi.h"
 #include "machine/clock.h"
 #include "speaker.h"
@@ -31,9 +30,6 @@ void cpc_musicmachine_device::device_add_mconfig(machine_config &config)
 
 	SPEAKER(config, "speaker").front_center();
 	ZN429E(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.2);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	// no pass-through
 }
@@ -61,9 +57,9 @@ void cpc_musicmachine_device::device_start()
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 	address_space &space = m_slot->cpu().space(AS_IO);
 
-	space.install_write_handler(0xf8e8,0xf8e8, write8_delegate(*this, FUNC(cpc_musicmachine_device::irqsel_w)));
-	space.install_readwrite_handler(0xf8ec,0xf8ef, read8_delegate(*this, FUNC(cpc_musicmachine_device::acia_r)), write8_delegate(*this, FUNC(cpc_musicmachine_device::acia_w)));
-	space.install_write_handler(0xf8f0,0xf8f0, write8_delegate(*this, FUNC(cpc_musicmachine_device::dac_w)));
+	space.install_write_handler(0xf8e8,0xf8e8, write8smo_delegate(*this, FUNC(cpc_musicmachine_device::irqsel_w)));
+	space.install_readwrite_handler(0xf8ec,0xf8ef, read8sm_delegate(*this, FUNC(cpc_musicmachine_device::acia_r)), write8sm_delegate(*this, FUNC(cpc_musicmachine_device::acia_w)));
+	space.install_write_handler(0xf8f0,0xf8f0, write8smo_delegate(*this, FUNC(cpc_musicmachine_device::dac_w)));
 	// 0xf8f4 - ADC read8_delegate
 	// 0xf8f8 - ADC start
 }
@@ -77,12 +73,12 @@ void cpc_musicmachine_device::device_reset()
 	// TODO
 }
 
-WRITE8_MEMBER(cpc_musicmachine_device::dac_w)
+void cpc_musicmachine_device::dac_w(uint8_t data)
 {
 	m_dac->write(data);
 }
 
-READ8_MEMBER(cpc_musicmachine_device::acia_r)
+uint8_t cpc_musicmachine_device::acia_r(offs_t offset)
 {
 	uint8_t ret = 0;
 
@@ -99,7 +95,7 @@ READ8_MEMBER(cpc_musicmachine_device::acia_r)
 	return ret;
 }
 
-WRITE8_MEMBER(cpc_musicmachine_device::acia_w)
+void cpc_musicmachine_device::acia_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -112,7 +108,7 @@ WRITE8_MEMBER(cpc_musicmachine_device::acia_w)
 	}
 }
 
-WRITE8_MEMBER(cpc_musicmachine_device::irqsel_w)
+void cpc_musicmachine_device::irqsel_w(uint8_t data)
 {
 	if(data == 0x01)
 		m_irq_select = true;

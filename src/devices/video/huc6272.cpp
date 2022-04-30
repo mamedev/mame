@@ -1,22 +1,33 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol, Angelo Salese
-/***************************************************************************
+/**************************************************************************************************
 
     Hudson/NEC HuC6272 "King" device
 
     TODO:
-    - Use NSCSI instead of legacy one!
-    - ADPCM Transfer is correct?
+    - Use NSCSI instead of legacy one;
+    - Convert base mapping to address_map;
+    - Convert I/O to space address, and make it honor mem_mask;
+    - subclass "SCSICD" into SCSI-2 "CD-ROM DRIVE:FX"
+      \- Crashes if CD-ROM is in, on unhandled command 0x28 "Read(10)";
+      \- During POST it tries an unhandled 0x44 "Read Header";
+      \- Derivative design of PCE drive, which in turn is a derivative of PC-8801-30 (cd drive)
+         and PC-8801-31 (interface);
+    - Implement video routines drawing and interface:
+      \- BIOS main menu draws BG0 only as backdrop of the PCE VDCs with 16M mode (5);
+    - Implement video mixing with other PCFX chips;
+    - Implement microprogram (layer timings, sort of Sega Saturn VRAM cycle patterns);
+    - Implement Rainbow transfers (NEC logo on POST);
+    - Verify ADPCM transfers;
 
     ADPCM related patents:
     - https://patents.google.com/patent/US5692099
     - https://patents.google.com/patent/US6453286
     - https://patents.google.com/patent/US5548655A
 
-***************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
-
 #include "video/huc6272.h"
 
 
@@ -190,7 +201,7 @@ void huc6272_device::write_microprg_data(offs_t address, uint16_t data)
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ32_MEMBER( huc6272_device::read )
+uint32_t huc6272_device::read(offs_t offset)
 {
 	uint32_t res = 0;
 
@@ -264,7 +275,7 @@ READ32_MEMBER( huc6272_device::read )
 	return res;
 }
 
-WRITE32_MEMBER( huc6272_device::write )
+void huc6272_device::write(offs_t offset, uint32_t data)
 {
 	if((offset & 1) == 0)
 		m_register = data & 0x7f;
@@ -383,7 +394,6 @@ WRITE32_MEMBER( huc6272_device::write )
 
 			case 0x15:
 				m_micro_prg.ctrl = data & 1;
-
 				break;
 
 			// case 0x16: wrap-around enable
@@ -443,8 +453,9 @@ WRITE32_MEMBER( huc6272_device::write )
 					m_adpcm.playing[i] = BIT(data, i);
 					if (!m_adpcm.playing[i])
 					{
-						m_adpcm.input[i] = -1;
+						m_adpcm.input[i] = 0;
 						m_adpcm.pos[i] = 0;
+						m_adpcm.nibble[i] = 32;
 					}
 					else
 					{
@@ -494,6 +505,8 @@ WRITE32_MEMBER( huc6272_device::write )
 	}
 }
 
+// TODO: clearly written in blind faith
+// (interrupt_update fns are untested by the BIOS main menu)
 uint8_t huc6272_device::adpcm_update(int chan)
 {
 	if (!m_adpcm.playing[chan])
@@ -503,7 +516,11 @@ uint8_t huc6272_device::adpcm_update(int chan)
 	m_adpcm.pos[chan]++;
 	if (m_adpcm.pos[chan] >= rate)
 	{
-		if (m_adpcm.input[chan] == -1)
+		m_adpcm.nibble[chan] += 4;
+		if (m_adpcm.nibble[chan] >= 32)
+			m_adpcm.nibble[chan] = 0;
+
+		if (m_adpcm.nibble[chan] == 0)
 		{
 			m_adpcm.input[chan] = read_dword(((m_page_setting & 0x1000) << 6) | m_adpcm.addr[chan]);
 			m_adpcm.addr[chan] = (m_adpcm.addr[chan] & 0x20000) | ((m_adpcm.addr[chan] + 1) & 0x1ffff);
@@ -525,7 +542,7 @@ uint8_t huc6272_device::adpcm_update(int chan)
 					interrupt_update();
 				}
 
-				if (BIT(m_adpcm.control[chan],0)) // Ring Buffer
+				if (BIT(m_adpcm.control[chan], 0)) // Ring Buffer
 				{
 					m_adpcm.addr[chan] = m_adpcm.start[chan];
 				}
@@ -535,31 +552,26 @@ uint8_t huc6272_device::adpcm_update(int chan)
 					return 0;
 				}
 			}
-			m_adpcm.nibble[chan] = 0;
+			//m_adpcm.nibble[chan] = 0;
 		}
-		else
-		{
-			m_adpcm.nibble[chan] += 4;
-			if (m_adpcm.nibble[chan] >= 28)
-				m_adpcm.input[chan] = -1;
-		}
+
 		m_adpcm.pos[chan] = 0;
 	}
 
 	return (m_adpcm.input[chan] >> m_adpcm.nibble[chan]) & 0xf;
 }
 
-READ8_MEMBER(huc6272_device::adpcm_update_0)
+uint8_t huc6272_device::adpcm_update_0()
 {
 	return adpcm_update(0);
 }
 
-READ8_MEMBER(huc6272_device::adpcm_update_1)
+uint8_t huc6272_device::adpcm_update_1()
 {
 	return adpcm_update(1);
 }
 
-WRITE8_MEMBER(huc6272_device::cdda_update)
+void huc6272_device::cdda_update(offs_t offset, uint8_t data)
 {
 	if (offset)
 		m_cdda_r->set_output_gain(ALL_OUTPUTS, float(data) / 63.0);
@@ -607,6 +619,6 @@ void huc6272_device::device_add_mconfig(machine_config &config)
 	INPUT_BUFFER(config, "scsi_ctrl_in");
 	INPUT_BUFFER(config, "scsi_data_in");
 
-	scsibus.set_slot_device(1, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
+	scsibus.set_slot_device(1, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
 	scsibus.slot(1).set_option_machine_config("cdrom", cdrom_config);
 }

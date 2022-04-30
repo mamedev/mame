@@ -56,6 +56,18 @@ public:
 		RII_VOCON
 	};
 
+	enum
+	{
+		PA0_LINE = 0,
+		PA1_LINE,
+		PA2_LINE,
+		PA3_LINE,
+		PA4_LINE,
+		PA5_LINE,
+		PA6_LINE,
+		PA7_LINE
+	};
+
 	// callback configuration
 	auto in_porta_cb() { return m_porta_in_cb.bind(); }
 	auto in_portb_cb() { return m_port_in_cb[0].bind(); }
@@ -80,7 +92,7 @@ public:
 	auto out_portk_cb() { return m_port_out_cb[9].bind(); }
 
 protected:
-	riscii_series_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, unsigned addrbits, unsigned pcbits, u32 datastart, unsigned bankbits, u8 maxbank, u8 post_id_mask, address_map_constructor regs);
+	riscii_series_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, unsigned addrbits, unsigned pcbits, unsigned bankbits, u8 maxbank, u8 post_id_mask, address_map_constructor regs);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;
@@ -173,6 +185,9 @@ protected:
 	void sprm_w(u8 data);
 	u8 sprh_r();
 	void sprh_w(u8 data);
+	void timer0_reload();
+	TIMER_CALLBACK_MEMBER(timer0);
+	u16 timer0_count() const;
 	u8 trl0l_r();
 	void trl0l_w(u8 data);
 	u8 trl0h_r();
@@ -193,6 +208,8 @@ protected:
 	u8 tr2c_r();
 	u8 sfcr_r();
 	void sfcr_w(u8 data);
+	void spht_reload();
+	TIMER_CALLBACK_MEMBER(speech_timer);
 	u8 addl_r();
 	void addl_w(u8 data);
 	u8 addm_r();
@@ -262,6 +279,7 @@ private:
 	void execute_undef(u16 opcode);
 	void execute_cycle1(u16 opcode);
 	void execute_tbrd(u32 ptr);
+	void idle_wakeup();
 
 	// interrupt helpers
 	bool interrupt_active() const;
@@ -279,24 +297,24 @@ private:
 		EXEC_L0CALL, EXEC_L1CALL, EXEC_L2CALL, EXEC_L3CALL,
 		EXEC_L4CALL, EXEC_L5CALL, EXEC_L6CALL, EXEC_L7CALL,
 		EXEC_L8CALL, EXEC_L9CALL, EXEC_LACALL, EXEC_LBCALL,
-		EXEC_LCCALL, EXEC_LDCALL, EXEC_LECALL, EXEC_LFCALL
+		EXEC_LCCALL, EXEC_LDCALL, EXEC_LECALL, EXEC_LFCALL,
+		EXEC_IDLE
 	};
 
 	// address spaces
 	address_space_config m_program_config;
 	address_space_config m_regs_config;
-	address_space *m_program;
-	address_space *m_regs;
-	memory_access_cache<1, -1, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<22, 1, -1, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<22, 1, -1, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access<13, 0,  0, ENDIANNESS_LITTLE>::specific m_regs;
 
 	// device callbacks
 	devcb_read8 m_porta_in_cb;
-	devcb_read8 m_port_in_cb[10];
-	devcb_write8 m_port_out_cb[10];
+	devcb_read8::array<10> m_port_in_cb;
+	devcb_write8::array<10> m_port_out_cb;
 
 	// model-specific parameters
 	const u32 m_pcmask;
-	const u32 m_datastart;
 	const u32 m_tbptmask;
 	const u8 m_bankmask;
 	const u8 m_maxbank;
@@ -324,6 +342,7 @@ private:
 	u8 m_port_dcr[6];
 	u8 m_port_control[2];
 	u8 m_stbcon;
+	u8 m_pa;
 	u8 m_painten;
 	u8 m_paintsta;
 	u8 m_pawake;
@@ -343,9 +362,10 @@ private:
 	u8 m_tr01con;
 	u8 m_tr2con;
 	u8 m_trlir;
-	u8 m_sfcr;
+	emu_timer *m_timer0;
 
 	// synthesizer state
+	u8 m_sfcr;
 	u32 m_add[4];
 	u8 m_env[4];
 	u8 m_mtcon[4];
@@ -354,6 +374,7 @@ private:
 	u8 m_sphtcon;
 	u8 m_sphtrl;
 	u8 m_vocon;
+	emu_timer *m_speech_timer;
 
 	// execution sequencing
 	s32 m_icount;

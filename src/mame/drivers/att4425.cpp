@@ -16,15 +16,14 @@
 
 #include "emu.h"
 
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
+#include "machine/keyboard.h"
 #include "machine/ram.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
-
-#include "bus/rs232/rs232.h"
-#include "machine/keyboard.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -37,6 +36,7 @@
 #define RS232_A_TAG         "sioa"
 #define RS232_B_TAG         "siob"
 #define I8251_TAG           "i8251"
+
 
 class att4425_state : public driver_device
 {
@@ -54,10 +54,10 @@ public:
 	void att4425(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(port10_w);
-	DECLARE_WRITE8_MEMBER(port14_w);
-	DECLARE_READ8_MEMBER(port14_r);
-	DECLARE_READ8_MEMBER(port15_r);
+	void port10_w(uint8_t data);
+	void port14_w(uint8_t data);
+	uint8_t port14_r();
+	uint8_t port15_r();
 
 	DECLARE_WRITE_LINE_MEMBER(write_line_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
@@ -65,7 +65,6 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_start() override;
-	virtual void video_start() override;
 	void att4425_io(address_map &map);
 	void att4425_mem(address_map &map);
 
@@ -79,23 +78,23 @@ private:
 
 /* Memory Maps */
 
-WRITE8_MEMBER(att4425_state::port10_w)
+void att4425_state::port10_w(uint8_t data)
 {
 	logerror("Writing %02X to port 10\n", data);
 }
 
-WRITE8_MEMBER(att4425_state::port14_w)
+void att4425_state::port14_w(uint8_t data)
 {
 	logerror("Writing %02X to port 14\n", data);
 }
 
-READ8_MEMBER(att4425_state::port14_r)
+uint8_t att4425_state::port14_r()
 {
 	// only complement of bit 0 used?
 	return 0;
 }
 
-READ8_MEMBER(att4425_state::port15_r)
+uint8_t att4425_state::port15_r()
 {
 	// status of something (at least bits 2 and 3 used)
 	return 0;
@@ -125,32 +124,28 @@ INPUT_PORTS_END
 
 /* Video */
 
-void att4425_state::video_start()
-{
-}
-
 uint32_t att4425_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y, ra, gfx, fg, bg, chr, attr;
-	uint16_t sy = 0, ma, x, ca;
+	uint16_t sy = 0;
 
-	fg = 2;
-	bg = 0;
+	uint8_t fg = 2;
+	uint8_t bg = 0;
 
-	for (y = 0; y < 27; y++)
+	for (uint8_t y = 0; y < 27; y++)
 	{
-		ma = 0x7e9c + 4 * (81 - 27 + y);
+		uint16_t ma = 0x7e9c + 4 * (81 - 27 + y);
 		ma = (m_p_videoram[ma] << 8) + m_p_videoram[ma + 1] - 0x8000;
 
-		for (ra = 0; ra < 13; ra++)
+		for (uint8_t ra = 0; ra < 13; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix(sy++);
 
-			for (x = ma; x < ma + 160; x += 2)
+			for (uint16_t x = ma; x < ma + 160; x += 2)
 			{
-				chr = m_p_videoram[x + 1];
-				attr = m_p_videoram[x];
-				ca = (chr << 4) & 0x7f0;
+				uint8_t const chr = m_p_videoram[x + 1];
+				uint8_t const attr = m_p_videoram[x];
+				uint16_t ca = (chr << 4) & 0x7f0;
+				uint8_t gfx;
 
 				// font 2
 				if (attr & 0x01)
@@ -178,9 +173,8 @@ uint32_t att4425_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 				/* Display a scanline of a character */
 				for (int i = 7; i >= 0; i--)
-				{
 					*p++ = BIT(gfx, i) ? fg : bg;
-				}
+
 				*p++ = bg;
 			}
 		}
@@ -226,7 +220,6 @@ WRITE_LINE_MEMBER(att4425_state::write_keyboard_clock)
 
 static const z80_daisy_config att4425_daisy_chain[] =
 {
-	// XXX order is unknown
 	{ Z80SIO_TAG },
 	{ Z80CTC_TAG },
 	{ nullptr }
@@ -235,7 +228,7 @@ static const z80_daisy_config att4425_daisy_chain[] =
 void att4425_state::att4425(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(32'000'000)/8); // XXX
+	Z80(config, m_maincpu, XTAL(32'000'000) / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &att4425_state::att4425_mem);
 	m_maincpu->set_addrmap(AS_IO, &att4425_state::att4425_io);
 	m_maincpu->set_daisy_config(att4425_daisy_chain);
@@ -247,12 +240,12 @@ void att4425_state::att4425(machine_config &config)
 	m_screen->set_screen_update(FUNC(att4425_state::screen_update));
 	m_screen->set_palette("palette");
 	m_screen->set_size(720, 351);
-	m_screen->set_visarea(0, 720-1, 0, 351-1);
+	m_screen->set_visarea(0, 720 - 1, 0, 351 - 1);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_att4425);
 	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
 
 	// ch.3 -- timer?
-	z80ctc_device& ctc(Z80CTC(config, Z80CTC_TAG, XTAL(32'000'000))); // XXX;
+	z80ctc_device &ctc(Z80CTC(config, Z80CTC_TAG, XTAL(32'000'000)));
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 #ifdef notdef
 	ctc.zc_callback<0>().set(m_sio, FUNC(z80sio_device::rxca_w));
@@ -260,7 +253,7 @@ void att4425_state::att4425(machine_config &config)
 	ctc.zc_callback<2>().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
 #endif
 
-	Z80SIO(config, m_sio, 4800); // XXX
+	Z80SIO(config, m_sio, 4800);
 	m_sio->out_int_callback().set_inputline(Z80_TAG, INPUT_LINE_IRQ0);
 	m_sio->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
 	m_sio->out_dtra_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
@@ -277,8 +270,7 @@ void att4425_state::att4425(machine_config &config)
 	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, "printer"));
 	rs232b.rxd_handler().set(m_sio, FUNC(z80sio_device::rxb_w));
 
-	// XXX
-	clock_device &line_clock(CLOCK(config, "line_clock", 9600*64));
+	clock_device &line_clock(CLOCK(config, "line_clock", 9600 * 64));
 	line_clock.signal_handler().set(FUNC(att4425_state::write_line_clock));
 
 	I8251(config, m_i8251, 0);
@@ -291,8 +283,7 @@ void att4425_state::att4425(machine_config &config)
 	rs232.cts_handler().set(m_i8251, FUNC(i8251_device::write_cts));
 	rs232.dsr_handler().set(m_i8251, FUNC(i8251_device::write_dsr));
 
-	// XXX
-	clock_device &keyboard_clock(CLOCK(config, "keyboard_clock", 4800*64));
+	clock_device &keyboard_clock(CLOCK(config, "keyboard_clock", 4800 * 64));
 	keyboard_clock.signal_handler().set(FUNC(att4425_state::write_keyboard_clock));
 
 	RAM(config, RAM_TAG).set_default_size("32K").set_default_value(0);

@@ -301,7 +301,6 @@ void atari_fdc_device::atari_load_proc(device_image_interface &image, bool is_cr
 			(m_drv[id].heads == 1) ? "SS" : "DS",
 			(m_drv[id].density == 0) ? "SD" : (m_drv[id].density == 1) ? "MD" : "DD",
 			m_drv[id].seclen);
-	return;
 }
 
 
@@ -662,7 +661,7 @@ void atari_fdc_device::a800_serial_write()
 	}
 }
 
-READ8_MEMBER( atari_fdc_device::serin_r )
+uint8_t atari_fdc_device::serin_r()
 {
 	int data = 0x00;
 	int ser_delay = 0;
@@ -690,7 +689,7 @@ READ8_MEMBER( atari_fdc_device::serin_r )
 	return data;
 }
 
-WRITE8_MEMBER( atari_fdc_device::serout_w )
+void atari_fdc_device::serout_w(uint8_t data)
 {
 	/* ignore serial commands if no floppy image is specified */
 	if( !m_drv[0].image )

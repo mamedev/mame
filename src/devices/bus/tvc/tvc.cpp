@@ -124,10 +124,10 @@ uint8_t tvcexp_slot_device::int_r()
     read
 -------------------------------------------------*/
 
-READ8_MEMBER(tvcexp_slot_device::read)
+uint8_t tvcexp_slot_device::read(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read(space, offset);
+		return m_cart->read(offset);
 	else
 		return 0x00;
 }
@@ -137,20 +137,20 @@ READ8_MEMBER(tvcexp_slot_device::read)
     write
 -------------------------------------------------*/
 
-WRITE8_MEMBER(tvcexp_slot_device::write)
+void tvcexp_slot_device::write(offs_t offset, uint8_t data)
 {
 	if (m_cart)
-		m_cart->write(space, offset, data);
+		m_cart->write(offset, data);
 }
 
 /*-------------------------------------------------
     IO read
 -------------------------------------------------*/
 
-READ8_MEMBER(tvcexp_slot_device::io_read)
+uint8_t tvcexp_slot_device::io_read(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->io_read(space, offset);
+		return m_cart->io_read(offset);
 	else
 		return 0x00;
 }
@@ -160,8 +160,8 @@ READ8_MEMBER(tvcexp_slot_device::io_read)
    IO write
 -------------------------------------------------*/
 
-WRITE8_MEMBER(tvcexp_slot_device::io_write)
+void tvcexp_slot_device::io_write(offs_t offset, uint8_t data)
 {
 	if (m_cart)
-		m_cart->io_write(space, offset, data);
+		m_cart->io_write(offset, data);
 }

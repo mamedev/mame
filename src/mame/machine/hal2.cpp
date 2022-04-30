@@ -387,10 +387,4 @@ void hal2_device::device_add_mconfig(machine_config &config)
 
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0);
 	m_rdac->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
-
-	voltage_regulator_device &vreg = VOLTAGE_REGULATOR(config, "vref");
-	vreg.add_route(0, "ldac",  1.0, DAC_VREF_POS_INPUT);
-	vreg.add_route(0, "rdac",  1.0, DAC_VREF_POS_INPUT);
-	vreg.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	vreg.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 }

@@ -2,33 +2,53 @@
 // copyright-holders:Zsolt Vasvari
 /***************************************************************************
 
- Route 16/Stratovox memory map (preliminary)
+Driver by Zsolt Vasvari
 
- driver by Zsolt Vasvari
+Notes
+-----
 
- Notes: Route 16 and Stratovox use identical hardware with the following
-        exceptions: Stratovox has a DAC for voice.
-        Route 16 has the added ability to turn off each bitplane individually.
-        This looks like an afterthought, as one of the same bits that control
-        the palette selection is doubly utilized as the bitmap enable bit.
+Route 16:
+        - Route 16 doesn't have the SN76477 chip. There is space on the PCB
+          but it is not populated.
 
- Space Echo:
-        when all astronauts are taken the game over tune ends with 5 bad notes,
-        this appears to be a bug in the ROM from a changed instruction at 2EB3.
+        - Has the added ability to turn off each bitplane individually.
+          This looks like an afterthought, as one of the same bits that control
+          the palette selection is doubly utilized as the bitmap enable bit.
 
-        service mode shows a garbled screen as most of the code for it has been
-        replaced by other routines, however the sound tests still work. it's
-        possible that the service switch isn't connected on the real hardware.
+        - New code to better emulate the protection in Route 16 was added in 0.194,
+          but it turned out to harbour a bug (see MT 07310). Therefore the previous
+          patches have been restored, and the protection routine has been nullified
+          but is still there in case someone wants to revisit it.
 
-        the game hangs if it doesn't pass the startup test, a best guess is implemented
-        rather than patching out the test. code for the same test is in stratvox but
-        isn't called, speakres has a very similar test but doesn't care about the result.
+Stratovox:
+        - Has almost *electrically* identical hardware to Route 16 with the exception
+          that it is physically different (2 PCB-set connected with flat cables) and
+          Stratovox has the SN76477 chip and uses a DAC for voice. There are 3 volume
+          pots on the PCB. One for music, one for speech and a master volume.
 
-        interrupts per frame for cpu1 is a best guess based on how stratvox uses the DAC,
-        writing up to 195 times per frame with each byte from the ROM written 4 times.
-        spacecho writes one byte per interrupt so 195/4 or 48 is used. a lower number
-        increases the chance of a sound interrupting itself, which for most sounds
-        is buggy and causes the game to freeze until the first sound completes.
+Space Echo:
+        - When all astronauts are taken the game over tune ends with 5 bad notes,
+          this appears to be a bug in the ROM from a changed instruction at 2EB3.
+
+        - Service mode shows a garbled screen as most of the code for it has been
+          replaced by other routines, however the sound tests still work. it's
+          possible that the service switch isn't connected on the real hardware.
+
+        - The game hangs if it doesn't pass the startup test, a best guess is implemented
+          rather than patching out the test. code for the same test is in stratvox but
+          isn't called, speakres has a very similar test but doesn't care about the result.
+
+        - Interrupts per frame for cpu1 is a best guess based on how stratvox uses the DAC,
+          writing up to 195 times per frame with each byte from the ROM written 4 times.
+          spacecho writes one byte per interrupt so 195/4 or 48 is used. a lower number
+          increases the chance of a sound interrupting itself, which for most sounds
+          is buggy and causes the game to freeze until the first sound completes.
+
+vscompmj:
+        - Stuck notes (constant tone) in-game after the mahjong tiles are laid down.
+
+
+Route 16/Stratovox memory map (preliminary)
 
  CPU1
 
@@ -67,10 +87,70 @@
 
  2800      DAC output (Stratovox only)
 
-New code to better emulate the protection was added in 0.194, but it turned
-out to harbour a bug (see MT 07310). Therefore the previous patches have been
-restored, and the protection routine has been nullified (but still there in
-case someone wants to revisit it).
+***************************************************************************
+
+Route 16 PCB Hardware Info by Guru
+
+TVX-2 (TVX-3 also seen)
+SUN ELECTRONICS CORPORATION
+|------------------------------------|-----------|
+| Z80             54  55  56  57  58 |59 SKT     |
+|                                    |         X |
+|                                    | MB8841  X | <--- Sub board on top containing 4 logic
+|                                    |         X |      chips and an MB8841 microcontroller
+| 10MHz                              |         X |      PCB Number: TVX-S1
+|                                    |         X |
+|  ^SN76477      MB7052.61           |---------X-|
+|#VRS  AY-3-8910                               X |
+|VOL                                           X |
+|  MB3713        MB7052.59                       |
+|1                                               |
+|8                                             X |
+|W                    MB8114                   X |
+|A    DSW                                      X |
+|Y                    MB8114                   X |
+|   %555 %555                                  X |
+|#VR2 %555 %555                                X |
+|#VR1                                          X |
+|#VR0   Z80        60  61  62  63              X |
+|------------------------------------------------|
+Notes:
+      X         - Texas Instruments TMS4116 16k x1-bit DRAM (total 16 chips)
+      MB8114    - Fujitsu MB8114 1k x4-bit SRAM, compatible with 2114
+      MB7052    - Fujitsu MB7052 256b x4-bit BiPolar PROM (compatible with 82S129)
+      AY-3-8910 - General Instrument AY-3-8910 Programmable Sound Generator (PSG). Clock 1.25MHz [10/8]
+      Z80       - Clock 2.5MHz [10/4] (both)
+      ^         - SN76477 not populated on Route 16 PCB
+      %         - These 4x 555 Timer ICs are not populated on Route 16 PCB
+      #         - These 4x Volume pots are not populated on Route 16 PCB
+      MB3713    - Fujitsu MB3713 5.7W Mono Power AMP
+      DSW       - 8-position DIP Switch
+      54...63   - 2716 EPROM
+      SKT       - 24-pin Socket for daughterboard connection
+      MB8841    - Fujitsu MB8841 4-bit microcontroller containing 2k x8-bit mask ROM and 128b x4-bit static RAM
+
+18-WAY PCB Edge Connector Pinout
+----------------+----------------
+    PARTS SIDE  |  SOLDER SIDE
+----------------+----------------
+       +5V | 1A | 1B | -5V
+       +5V | 2A | 2B | -5V
+ PL2 Right | 3A | 3B | PL1 Right
+  PL2 Left | 4A | 4B | PL1 Left
+    PL2 Up | 5A | 5B | PL1 Up
+  PL2 Down | 6A | 6B | PL1 Down
+PL2 Button | 7A | 7B | PL1 Button
+           | 8A | 8B |
+ PL2 Start | 9A | 9B | Test
+ PL1 Start |10A | 10B| Coin
+           |11A | 11B|
+     Green |12A | 12B| Coin Counter
+       Red |13A | 13B|
+      Blue |14A | 14B|
+      Sync |15A | 15B| Speaker +
+       GND |16A | 16B| Speaker -
+       GND |17A | 17B| +12V
+       GND |18A | 18B| +12V
 
 ***************************************************************************/
 
@@ -80,10 +160,39 @@ case someone wants to revisit it).
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
+#include "sound/sn76477.h"
 
-#include "screen.h"
 #include "speaker.h"
+
+class speakres_state : public route16_state
+{
+public:
+	speakres_state(const machine_config &mconfig, device_type type, const char *tag)
+		: route16_state(mconfig, type, tag)
+		, m_sn(*this, "snsnd")
+		, m_dac(*this, "dac")
+	{}
+
+	void speakres(machine_config &config);
+	void stratvox(machine_config &config);
+	void spacecho(machine_config &config);
+
+private:
+	uint8_t speakres_in3_r();
+	void speakres_out2_w(uint8_t data);
+	void stratvox_sn76477_w(uint8_t data);
+	void stratvox_dac_w(uint8_t data);
+	DECLARE_MACHINE_START(speakres);
+
+	void speakres_cpu1_map(address_map &map);
+	void stratvox_cpu1_map(address_map &map);
+	void stratvox_cpu2_map(address_map &map);
+
+	required_device<sn76477_device> m_sn;
+	required_device<dac_byte_interface> m_dac;
+
+	int m_speakres_vrx = 0;
+};
 
 
 /*************************************
@@ -92,7 +201,7 @@ case someone wants to revisit it).
  *
  *************************************/
 
-MACHINE_START_MEMBER(route16_state, speakres)
+MACHINE_START_MEMBER(speakres_state, speakres)
 {
 	save_item(NAME(m_speakres_vrx));
 }
@@ -102,7 +211,7 @@ MACHINE_START_MEMBER(route16_state, jongpute)
 	save_item(NAME(m_jongpute_port_select));
 }
 
-void route16_state::init_route16()
+void route16_state::init_route16a()
 {
 	// hack out the protection
 	u8 *rom = memregion("cpu1")->base();
@@ -116,7 +225,7 @@ void route16_state::init_route16()
 	init_route16c();
 }
 
-void route16_state::init_route16a()
+void route16_state::init_route16()
 {
 	save_item(NAME(m_protection_data));
 	// hack out the protection
@@ -146,6 +255,27 @@ void route16_state::init_route16c()
 	rom[0x754] = 0xc3; // skip protection checking
 	rom[0x755] = 0x63;
 	rom[0x756] = 0x07;
+}
+
+void route16_state::init_route16d()
+{
+	save_item(NAME(m_protection_data));
+	// hack out the protection
+	u8 *rom = memregion("cpu1")->base();
+
+	rom[0x0e9] = 0x3a; // remove call 2CCD
+
+	rom[0x105] = 0; // remove jp nz,4109
+	rom[0x106] = 0;
+	rom[0x107] = 0;
+
+	rom[0x735] = 0; // remove jp nz,4238
+	rom[0x736] = 0;
+	rom[0x737] = 0;
+
+	rom[0x74b] = 0xc3; // skip protection checking
+	rom[0x74c] = 0x5a;
+	rom[0x74d] = 0x07;
 }
 
 void route16_state::init_vscompmj() // only opcodes encrypted
@@ -203,7 +333,7 @@ void route16_state::init_vscompmj() // only opcodes encrypted
  *
  *************************************/
 
-template<bool cpu1> WRITE8_MEMBER(route16_state::route16_sharedram_w)
+template<bool cpu1> void route16_state::route16_sharedram_w(offs_t offset, uint8_t data)
 {
 	m_sharedram[offset] = data;
 
@@ -223,7 +353,7 @@ template<bool cpu1> WRITE8_MEMBER(route16_state::route16_sharedram_w)
  *
  *************************************/
 
-READ8_MEMBER(route16_state::routex_prot_read)
+uint8_t route16_state::routex_prot_read()
 {
 	if (m_cpu1->pc() == 0x2f) return 0xfb;
 
@@ -232,7 +362,7 @@ READ8_MEMBER(route16_state::routex_prot_read)
 }
 
 // never called, see notes.
-READ8_MEMBER(route16_state::route16_prot_read)
+uint8_t route16_state::route16_prot_read()
 {
 	m_protection_data++;
 	return (1 << ((m_protection_data >> 1) & 7));
@@ -246,7 +376,7 @@ READ8_MEMBER(route16_state::route16_prot_read)
  *
  *************************************/
 
-WRITE8_MEMBER(route16_state::stratvox_sn76477_w)
+void speakres_state::stratvox_sn76477_w(uint8_t data)
 {
 	/***************************************************************
 	 * AY8910 output bits are connected to...
@@ -268,6 +398,13 @@ WRITE8_MEMBER(route16_state::stratvox_sn76477_w)
 	m_sn->mixer_c_w((data >> 6) & 1);
 }
 
+void speakres_state::stratvox_dac_w(uint8_t data)
+{
+	// Data is written into a pair of MC14175B quad D flip-flops with complementary outputs.
+	// Schematics indicate an inverting output is tapped for the most significant bit (F7 pin 3).
+	m_dac->data_w(data ^ 0x80);
+}
+
 
 
 /***************************************************
@@ -276,38 +413,38 @@ WRITE8_MEMBER(route16_state::stratvox_sn76477_w)
  *
  ***************************************************/
 
-WRITE8_MEMBER(route16_state::jongpute_input_port_matrix_w)
+void route16_state::jongpute_input_port_matrix_w(uint8_t data)
 {
 	m_jongpute_port_select = data;
 }
 
 
-READ8_MEMBER(route16_state::jongpute_p1_matrix_r)
+uint8_t route16_state::jongpute_p1_matrix_r()
 {
 	uint8_t ret = 0;
 
 	switch (m_jongpute_port_select)
 	{
-	case 1:  ret = ioport("KEY0")->read(); break;
-	case 2:  ret = ioport("KEY1")->read(); break;
-	case 4:  ret = ioport("KEY2")->read(); break;
-	case 8:  ret = ioport("KEY3")->read(); break;
+	case 1:  ret = m_key[0]->read(); break;
+	case 2:  ret = m_key[1]->read(); break;
+	case 4:  ret = m_key[2]->read(); break;
+	case 8:  ret = m_key[3]->read(); break;
 	default: break;
 	}
 
 	return ret;
 }
 
-READ8_MEMBER(route16_state::jongpute_p2_matrix_r)
+uint8_t route16_state::jongpute_p2_matrix_r()
 {
 	uint8_t ret = 0;
 
 	switch (m_jongpute_port_select)
 	{
-	case 1:  ret = ioport("KEY4")->read(); break;
-	case 2:  ret = ioport("KEY5")->read(); break;
-	case 4:  ret = ioport("KEY6")->read(); break;
-	case 8:  ret = ioport("KEY7")->read(); break;
+	case 1:  ret = m_key[4]->read(); break;
+	case 2:  ret = m_key[5]->read(); break;
+	case 4:  ret = m_key[6]->read(); break;
+	case 8:  ret = m_key[7]->read(); break;
 	default: break;
 	}
 
@@ -324,7 +461,7 @@ READ8_MEMBER(route16_state::jongpute_p2_matrix_r)
   this would then be checking that the sounds are mixed correctly.
 ***************************************************************************/
 
-READ8_MEMBER(route16_state::speakres_in3_r)
+uint8_t speakres_state::speakres_in3_r()
 {
 	int bit2=4, bit1=2, bit0=1;
 
@@ -339,7 +476,7 @@ READ8_MEMBER(route16_state::speakres_in3_r)
 	return 0xf8|bit2|bit1|bit0;
 }
 
-WRITE8_MEMBER(route16_state::speakres_out2_w)
+void speakres_state::speakres_out2_w(uint8_t data)
 {
 	m_speakres_vrx=0;
 }
@@ -376,25 +513,25 @@ void route16_state::routex_cpu1_map(address_map &map)
 }
 
 
-void route16_state::stratvox_cpu1_map(address_map &map)
+void speakres_state::stratvox_cpu1_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).ram().share("sharedram");
-	map(0x4800, 0x4800).portr("DSW").w(FUNC(route16_state::out0_w));
-	map(0x5000, 0x5000).portr("P1").w(FUNC(route16_state::out1_w));
+	map(0x4800, 0x4800).portr("DSW").w(FUNC(speakres_state::out0_w));
+	map(0x5000, 0x5000).portr("P1").w(FUNC(speakres_state::out1_w));
 	map(0x5800, 0x5800).portr("P2");
 	map(0x8000, 0xbfff).ram().share("videoram1");
 }
 
 
-void route16_state::speakres_cpu1_map(address_map &map)
+void speakres_state::speakres_cpu1_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).ram().share("sharedram");
-	map(0x4800, 0x4800).portr("DSW").w(FUNC(route16_state::out0_w));
-	map(0x5000, 0x5000).portr("P1").w(FUNC(route16_state::out1_w));
-	map(0x5800, 0x5800).portr("P2").w(FUNC(route16_state::speakres_out2_w));
-	map(0x6000, 0x6000).r(FUNC(route16_state::speakres_in3_r));
+	map(0x4800, 0x4800).portr("DSW").w(FUNC(speakres_state::out0_w));
+	map(0x5000, 0x5000).portr("P1").w(FUNC(speakres_state::out1_w));
+	map(0x5800, 0x5800).portr("P2").w(FUNC(speakres_state::speakres_out2_w));
+	map(0x6000, 0x6000).r(FUNC(speakres_state::speakres_in3_r));
 	map(0x8000, 0xbfff).ram().share("videoram1");
 }
 
@@ -433,10 +570,10 @@ void route16_state::route16_cpu2_map(address_map &map)
 }
 
 
-void route16_state::stratvox_cpu2_map(address_map &map)
+void speakres_state::stratvox_cpu2_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2800, 0x2800).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0x2800, 0x2800).w(FUNC(speakres_state::stratvox_dac_w));
 	map(0x4000, 0x43ff).ram().share("sharedram");
 	map(0x8000, 0xbfff).ram().share("videoram2");
 }
@@ -459,27 +596,23 @@ void route16_state::cpu1_io_map(address_map &map)
 
 static INPUT_PORTS_START( route16 )
 	PORT_START("DSW")       /* DSW 1 */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )           PORT_DIPLOCATION("DSW:!1")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) ) // Doesn't seem to be referenced
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) // Doesn't seem to be referenced
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_HIGH, "DSW:!2" )  // Manual says unused
+	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_HIGH, "DSW:!3" )  // Manual says unused
+	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )         PORT_DIPLOCATION("DSW:!4,!5")
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
-//  PORT_DIPSETTING(    0x18, DEF_STR( 2C_1C ) ) // Same as 0x08
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 2C_1C ) )  // Same as 0x08
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )         PORT_DIPLOCATION("DSW:!6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Flip_Screen ) )     PORT_DIPLOCATION("DSW:!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )     PORT_DIPLOCATION("DSW:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -505,29 +638,41 @@ static INPUT_PORTS_START( route16 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( route16a )
+	PORT_INCLUDE( route16 )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )         PORT_DIPLOCATION("DSW:!4,!5")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )  // same as 0x00
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )  // same as 0x10
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( stratvox )
 	PORT_START("DSW")       /* IN0 */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )           PORT_DIPLOCATION("DSW:!1")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
-	PORT_DIPNAME( 0x02, 0x00, "Replenish Astronauts" )
+	PORT_DIPNAME( 0x02, 0x00, "Replenish Astronauts" )     PORT_DIPLOCATION("DSW:!2")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x0c, 0x00, "2 Attackers At Wave" )
+	PORT_DIPNAME( 0x0c, 0x00, "2 Attackers At Wave" )      PORT_DIPLOCATION("DSW:!3,!4")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x0c, "5" )
-	PORT_DIPNAME( 0x10, 0x00, "Astronauts Kidnapped" )
+	PORT_DIPNAME( 0x10, 0x00, "Astronauts Kidnapped" )     PORT_DIPLOCATION("DSW:!5")
 	PORT_DIPSETTING(    0x00, "Less Often" )
 	PORT_DIPSETTING(    0x10, "More Often" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )         PORT_DIPLOCATION("DSW:!6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Flip_Screen ) )     PORT_DIPLOCATION("DSW:!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Demo Voices" )
+	PORT_DIPNAME( 0x80, 0x00, "Demo Voices" )              PORT_DIPLOCATION("DSW:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -553,26 +698,26 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( speakres )
 	PORT_START("DSW")       /* IN0 */
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )           PORT_DIPLOCATION("DSW:!1,!2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x0c, 0x00, "2 Attackers At Wave" )
+	PORT_DIPNAME( 0x0c, 0x00, "2 Attackers At Wave" )      PORT_DIPLOCATION("DSW:!3,!4")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x0c, "5" )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Bonus_Life ) )      PORT_DIPLOCATION("DSW:!5")
 	PORT_DIPSETTING(    0x00, "5000" )
 	PORT_DIPSETTING(    0x10, "8000" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )         PORT_DIPLOCATION("DSW:!6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Flip_Screen ) )     PORT_DIPLOCATION("DSW:!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Demo Voices" )
+	PORT_DIPNAME( 0x80, 0x00, "Demo Voices" )              PORT_DIPLOCATION("DSW:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -598,27 +743,27 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( spacecho )
 	PORT_START("DSW")       /* IN0 */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )           PORT_DIPLOCATION("DSW:!1")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
-	PORT_DIPNAME( 0x02, 0x00, "Replenish Astronauts" )
+	PORT_DIPNAME( 0x02, 0x00, "Replenish Astronauts" )     PORT_DIPLOCATION("DSW:!2")
 	PORT_DIPSETTING(    0x02, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x0c, 0x00, "2 Attackers At Wave" )
+	PORT_DIPNAME( 0x0c, 0x00, "2 Attackers At Wave" )      PORT_DIPLOCATION("DSW:!3,!4")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x0c, "5" )
-	PORT_DIPNAME( 0x10, 0x00, "Astronauts Kidnapped" )
+	PORT_DIPNAME( 0x10, 0x00, "Astronauts Kidnapped" )     PORT_DIPLOCATION("DSW:!5")
 	PORT_DIPSETTING(    0x00, "Less Often" )
 	PORT_DIPSETTING(    0x10, "More Often" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )         PORT_DIPLOCATION("DSW:!6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Flip_Screen ) )     PORT_DIPLOCATION("DSW:!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Demo Voices" )
+	PORT_DIPNAME( 0x80, 0x00, "Demo Voices" )              PORT_DIPLOCATION("DSW:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -644,11 +789,29 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( jongpute )
 	PORT_START("DSW")       /* IN0 */
-	PORT_DIPNAME( 0x0c, 0x08, "Timer Decrement Speed" )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )        PORT_DIPLOCATION("DSW:!1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )        PORT_DIPLOCATION("DSW:!2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x08, "Timer Decrement Speed" )   PORT_DIPLOCATION("DSW:!3,!4")
 	PORT_DIPSETTING(    0x00, "Very Fast" )
 	PORT_DIPSETTING(    0x04, "Fast" )
 	PORT_DIPSETTING(    0x08, "Normal" )
 	PORT_DIPSETTING(    0x0c, "Slow" )
+	PORT_DIPNAME( 0x10, 0x0, DEF_STR( Unknown ) )        PORT_DIPLOCATION("DSW:!5")
+	PORT_DIPSETTING(    0x0, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )        PORT_DIPLOCATION("DSW:!6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )        PORT_DIPLOCATION("DSW:!7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )        PORT_DIPLOCATION("DSW:!8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_A )
@@ -742,12 +905,12 @@ INPUT_PORTS_END
 void route16_state::route16(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_cpu1, 2500000);  /* 10MHz / 4 = 2.5MHz */
+	Z80(config, m_cpu1, 10_MHz_XTAL / 4); // verified on PCB
 	m_cpu1->set_addrmap(AS_PROGRAM, &route16_state::route16_cpu1_map);
 	m_cpu1->set_addrmap(AS_IO, &route16_state::cpu1_io_map);
 	m_cpu1->set_vblank_int("screen", FUNC(route16_state::irq0_line_hold));
 
-	Z80(config, m_cpu2, 2500000);  /* 10MHz / 4 = 2.5MHz */
+	Z80(config, m_cpu2, 10_MHz_XTAL / 4); // verified on PCB
 	m_cpu2->set_addrmap(AS_PROGRAM, &route16_state::route16_cpu2_map);
 
 	/* video hardware */
@@ -762,7 +925,7 @@ void route16_state::route16(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	AY8910(config, "ay8910", 10000000/8).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	AY8910(config, "ay8910", 10_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "speaker", 0.5);  // verified on PCB
 }
 
 
@@ -775,19 +938,19 @@ void route16_state::routex(machine_config &config)
 }
 
 
-void route16_state::stratvox(machine_config &config)
+void speakres_state::stratvox(machine_config &config)
 {
 	route16(config);
 
 	/* basic machine hardware */
-	m_cpu1->set_addrmap(AS_PROGRAM, &route16_state::stratvox_cpu1_map);
-	m_cpu2->set_addrmap(AS_PROGRAM, &route16_state::stratvox_cpu2_map);
+	m_cpu1->set_addrmap(AS_PROGRAM, &speakres_state::stratvox_cpu1_map);
+	m_cpu2->set_addrmap(AS_PROGRAM, &speakres_state::stratvox_cpu2_map);
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(route16_state::screen_update_jongpute));
+	m_screen->set_screen_update(FUNC(speakres_state::screen_update_jongpute));
 
 	/* sound hardware */
-	subdevice<ay8910_device>("ay8910")->port_a_write_callback().set(FUNC(route16_state::stratvox_sn76477_w));  /* SN76477 commands (not used in Route 16?) */
+	subdevice<ay8910_device>("ay8910")->port_a_write_callback().set(FUNC(speakres_state::stratvox_sn76477_w));  // SN76477 commands (SN76477 not populated on Route 16 PCB)
 
 	SN76477(config, m_sn);
 	m_sn->set_noise_params(RES_K(47), RES_K(150), CAP_U(0.001));
@@ -805,23 +968,20 @@ void route16_state::stratvox(machine_config &config)
 	m_sn->set_enable(1);
 	m_sn->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+	DAC_8BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25); // R = 15K, 2R = 30K (TODO: output filtering)
 }
 
-void route16_state::speakres(machine_config &config)
+void speakres_state::speakres(machine_config &config)
 {
 	stratvox(config);
 
 	/* basic machine hardware */
-	m_cpu1->set_addrmap(AS_PROGRAM, &route16_state::speakres_cpu1_map);
+	m_cpu1->set_addrmap(AS_PROGRAM, &speakres_state::speakres_cpu1_map);
 
-	MCFG_MACHINE_START_OVERRIDE(route16_state, speakres)
+	MCFG_MACHINE_START_OVERRIDE(speakres_state, speakres)
 }
 
-void route16_state::spacecho(machine_config &config)
+void speakres_state::spacecho(machine_config &config)
 {
 	speakres(config);
 
@@ -859,6 +1019,58 @@ void route16_state::vscompmj(machine_config &config)
 
 ROM_START( route16 )
 	ROM_REGION( 0x10000, "cpu1", 0 )
+	ROM_LOAD( "stvg54.a0",       0x0000, 0x0800, CRC(b8471cdc) SHA1(2a890782e15fa74a6c706b06f91216f427435700) )
+	ROM_LOAD( "stvg55.a1",       0x0800, 0x0800, CRC(3ec52fe5) SHA1(451969b5caedd665231ef78cf262679d6d4c8507) )
+	ROM_LOAD( "stvg56.a2",       0x1000, 0x0800, CRC(a8e92871) SHA1(68a709c14309d2b617997b76ae9d7b80fd326f39) )
+	ROM_LOAD( "stvg57.a3",       0x1800, 0x0800, CRC(a0fc9fc5) SHA1(7013750c1b3d403b12eac10282a930538ed9c73e) )
+	ROM_LOAD( "stvg58.a4",       0x2000, 0x0800, CRC(cc95c02c) SHA1(c0b85070883463a98098d72282c52e14822c204e) )
+	ROM_LOAD( "stvg59.a5",       0x2800, 0x0800, CRC(a39ef648) SHA1(866095d9880b60b01f7ca66b332f5f6c4b41a5ac) )
+
+	ROM_REGION( 0x10000, "cpu2", 0 )
+	ROM_LOAD( "stvg60.b0",       0x0000, 0x0800, CRC(fef605f3) SHA1(bfbffa0ded3e285c034f0ad832864021ef3f2256) )
+	ROM_LOAD( "stvg61.b1",       0x0800, 0x0800, CRC(d0d6c189) SHA1(75cec891e20cf05aae354c8950857aea83c6dadc) )
+	ROM_LOAD( "stvg62.b2",       0x1000, 0x0800, CRC(defc5797) SHA1(aec8179e647de70016e0e63b720f932752adacc1) )
+	ROM_LOAD( "stvg63.b3",       0x1800, 0x0800, CRC(88d94a66) SHA1(163e952ada7c05110d1f1c681bd57d3b9ea8866e) )
+
+	ROM_REGION( 0x800, "mcu", 0 ) // on a small daughterboard inserted at a6
+	ROM_LOAD( "mb8841",       0x000, 0x800, NO_DUMP )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	// The upper 128 bytes are 0's, used by the hardware to blank the display
+	ROM_LOAD( "mb7052.59",    0x0000, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) // top bitmap
+	ROM_LOAD( "mb7052.61",    0x0100, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) // bottom bitmap
+ROM_END
+
+ // 2 sets found, one on TVX1 and one on TVX2 PCB. TVX1 has lots of wire hacks. Both PCBs have an identical TVX-S1 sub board with Fujitsu MB8841 + logic.
+ // There were two different bytes between the two versions, both in ROM a2:
+ // 0x1dd is 0x46 in the TVX1 dump and 0x47 in the TVX2 one. 0x764 is 0x04 in the TVX1 dump and 0x06 in the TVX2 one.
+ // Those cause the game to malfunction and it doesn't seem to be additional protection. The a2 ROM below is the one dumped from the TVX2 PCB.
+ROM_START( route16d )
+	ROM_REGION( 0x10000, "cpu1", 0 )
+	ROM_LOAD( "a0.7.bin", 0x0000, 0x0800, CRC(025a4f63) SHA1(f1ced12c7667467c25f7fc595ae2e1b3aef4a29f) )
+	ROM_LOAD( "a1.bin",   0x0800, 0x0800, CRC(ab6117fa) SHA1(99a96042ef9634fb32b7b5ca7e7e05f6637a7014) )
+	ROM_LOAD( "a2.8.bin", 0x1000, 0x0800, CRC(5174f9ac) SHA1(162303589c30cbd2c1b701c32a1aa6f9008d3b35) )
+	ROM_LOAD( "a3.bin",   0x1800, 0x0800, CRC(3ba19f10) SHA1(2e0f4a7b162f2ff2d17db0edc92f3c9804a8f8ee) )
+	ROM_LOAD( "a4.bin",   0x2000, 0x0800, CRC(1da34bde) SHA1(b67420c6d7857303c137199f718de77ba7e38336) )
+	ROM_LOAD( "a5.bin",   0x2800, 0x0800, CRC(74438cf5) SHA1(a7b7191f2a7b26577ee4459a6d3a83548f1c44ee) )
+
+	ROM_REGION( 0x10000, "cpu2", 0 )
+	ROM_LOAD( "b0.bin", 0x0000, 0x0800, CRC(fef605f3) SHA1(bfbffa0ded3e285c034f0ad832864021ef3f2256) )
+	ROM_LOAD( "b1.bin", 0x0800, 0x0800, CRC(49f265fc) SHA1(62e072828d1f64700dd2f3ed81417740e585bad4) )
+	ROM_LOAD( "b2.bin", 0x1000, 0x0800, CRC(defc5797) SHA1(aec8179e647de70016e0e63b720f932752adacc1) )
+	ROM_LOAD( "b3.bin", 0x1800, 0x0800, CRC(88d94a66) SHA1(163e952ada7c05110d1f1c681bd57d3b9ea8866e) )
+
+	ROM_REGION( 0x800, "mcu", 0 ) // on a small daughterboard inserted at a6
+	ROM_LOAD( "mb8841",       0x000, 0x800, NO_DUMP )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	// The upper 128 bytes are 0's, used by the hardware to blank the display
+	ROM_LOAD( "mb7052.59", 0x0000, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) // top bitmap
+	ROM_LOAD( "mb7052.61", 0x0100, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) // bottom bitmap
+ROM_END
+
+ROM_START( route16a )
+	ROM_REGION( 0x10000, "cpu1", 0 )
 	ROM_LOAD( "tvg54.a0",     0x0000, 0x0800, CRC(aef9ffc1) SHA1(178d23e4963336ded93c13cb17940a4ae98270c5) )
 	ROM_LOAD( "tvg55.a1",     0x0800, 0x0800, CRC(389bc077) SHA1(b0606f6e647e81ceae7148bda96bd4673a51e823) )
 	ROM_LOAD( "tvg56.a2",     0x1000, 0x0800, CRC(1065a468) SHA1(4a707a42fb5a718043c173cb98ff3523eb274ccc) )
@@ -871,6 +1083,9 @@ ROM_START( route16 )
 	ROM_LOAD( "tvg61.b1",     0x0800, 0x0800, CRC(2b326cf9) SHA1(c6602a9440a982c39f5836c6ab72283b6f9241be) )
 	ROM_LOAD( "tvg62.b2",     0x1000, 0x0800, CRC(529cad13) SHA1(b533d20df1f2580e237c3d60bfe3483486ad9a48) )
 	ROM_LOAD( "tvg63.b3",     0x1800, 0x0800, CRC(3bd8b899) SHA1(bc0c7909dbf5ea85eba5a1bb815fdd98c3aa794e) )
+
+	ROM_REGION( 0x800, "mcu", 0 ) // on a small daughterboard inserted at a6
+	ROM_LOAD( "mb8841",       0x000, 0x800, NO_DUMP )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	/* The upper 128 bytes are 0's, used by the hardware to blank the display */
@@ -893,13 +1108,16 @@ ROM_START( route16c )
 	ROM_LOAD( "route16.b2",   0x1000, 0x0800, CRC(529cad13) SHA1(b533d20df1f2580e237c3d60bfe3483486ad9a48) )
 	ROM_LOAD( "route16.b3",   0x1800, 0x0800, CRC(3bd8b899) SHA1(bc0c7909dbf5ea85eba5a1bb815fdd98c3aa794e) )
 
+	ROM_REGION( 0x800, "mcu", 0 ) // on a small daughterboard inserted at a6
+	ROM_LOAD( "mb8841",       0x000, 0x800, NO_DUMP )
+
 	ROM_REGION( 0x0200, "proms", 0 ) /* Intersil IM5623CPE proms compatible with 82s129 */
 	/* The upper 128 bytes are 0's, used by the hardware to blank the display */
 	ROM_LOAD( "im5623.f10",   0x0000, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) /* top bitmap */
 	ROM_LOAD( "im5623.f12",   0x0100, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) /* bottom bitmap */
 ROM_END
 
-ROM_START( route16a )
+ROM_START( route16b )
 	ROM_REGION( 0x10000, "cpu1", 0 )
 	ROM_LOAD( "vg-54",        0x0000, 0x0800, CRC(0c966319) SHA1(2f57e9a30dab864bbee2ccb0107c1b4212c5abaf) )
 	ROM_LOAD( "vg-55",        0x0800, 0x0800, CRC(a6a8c212) SHA1(a4a695d401b1e495c863c6938296a99592df0e7d) )
@@ -913,6 +1131,9 @@ ROM_START( route16a )
 	ROM_LOAD( "vg-61",        0x0800, 0x0800, CRC(b216c88c) SHA1(d011ef9f3727f87ae3482e271a0c2496f76036b4) )
 	ROM_LOAD( "route16.b2",   0x1000, 0x0800, CRC(529cad13) SHA1(b533d20df1f2580e237c3d60bfe3483486ad9a48) )
 	ROM_LOAD( "route16.b3",   0x1800, 0x0800, CRC(3bd8b899) SHA1(bc0c7909dbf5ea85eba5a1bb815fdd98c3aa794e) )
+
+	ROM_REGION( 0x800, "mcu", 0 ) // on a small daughterboard inserted at a6
+	ROM_LOAD( "mb8841",       0x000, 0x800, NO_DUMP )
 
 	ROM_REGION( 0x0200, "proms", 0 ) /* Intersil IM5623CPE proms compatible with 82s129 */
 	/* The upper 128 bytes are 0's, used by the hardware to blank the display */
@@ -941,8 +1162,6 @@ ROM_START( route16bl )
 	ROM_LOAD( "im5623.f12",   0x0100, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) /* bottom bitmap */
 ROM_END
 
-
-
 ROM_START( routex )
 	ROM_REGION( 0x10000, "cpu1", 0 )
 	ROM_LOAD( "routex01.a0",  0x0000, 0x0800, CRC(99b500e7) SHA1(2561c04a1425d7ac3309faf29fcfde63a0cda4da) )
@@ -963,6 +1182,28 @@ ROM_START( routex )
 	/* The upper 128 bytes are 0's, used by the hardware to blank the display */
 	ROM_LOAD( "im5623.f10",   0x0000, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) /* top bitmap */
 	ROM_LOAD( "im5623.f12",   0x0100, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) /* bottom bitmap */
+ROM_END
+
+ROM_START( routexa )
+	ROM_REGION( 0x10000, "cpu1", 0 )
+	ROM_LOAD( "r1.bin", 0x0000, 0x0800, CRC(78c819c8) SHA1(41951aef3ad8be53aadb17892b5b3e13be61b50f) ) // unique
+	ROM_LOAD( "r2.bin", 0x0800, 0x0800, CRC(3ec52fe5) SHA1(451969b5caedd665231ef78cf262679d6d4c8507) )
+	ROM_LOAD( "r3.bin", 0x1000, 0x0800, CRC(a8e92871) SHA1(68a709c14309d2b617997b76ae9d7b80fd326f39) )
+	ROM_LOAD( "r4.bin", 0x1800, 0x0800, CRC(a0fc9fc5) SHA1(7013750c1b3d403b12eac10282a930538ed9c73e) )
+	ROM_LOAD( "r5.bin", 0x2000, 0x0800, CRC(2fef7653) SHA1(ba3477da249ca402d096704e57ea638fde6abe9c) )
+	ROM_LOAD( "r6.bin", 0x2800, 0x0800, CRC(a39ef648) SHA1(866095d9880b60b01f7ca66b332f5f6c4b41a5ac) )
+	ROM_LOAD( "r7.bin", 0x3000, 0x0800, CRC(2aeb3102) SHA1(7398dd43b1717aef8dc18210758db9fa828bd92e) ) // unique, FIXED BITS (010x011011111111) and 1ST AND 2ND HALF IDENTICAL, but confirmed on two different PCBs
+
+	ROM_REGION( 0x10000, "cpu2", 0 )
+	ROM_LOAD( "r8.bin",  0x0000, 0x0800, CRC(fef605f3) SHA1(bfbffa0ded3e285c034f0ad832864021ef3f2256) ) // unique
+	ROM_LOAD( "r9.bin",  0x0800, 0x0800, CRC(d0d6c189) SHA1(75cec891e20cf05aae354c8950857aea83c6dadc) )
+	ROM_LOAD( "r10.bin", 0x1000, 0x0800, CRC(defc5797) SHA1(aec8179e647de70016e0e63b720f932752adacc1) )
+	ROM_LOAD( "r11.bin", 0x1800, 0x0800, CRC(88d94a66) SHA1(163e952ada7c05110d1f1c681bd57d3b9ea8866e) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // Intersil IM5623CPE proms compatible with 82s129
+	// The upper 128 bytes are 0's, used by the hardware to blank the display
+	ROM_LOAD( "im5623.f10",   0x0000, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) // top bitmap
+	ROM_LOAD( "im5623.f12",   0x0100, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) // bottom bitmap
 ROM_END
 
 ROM_START( speakres )
@@ -1223,20 +1464,23 @@ ROM_END
  *
  *************************************/
 
-GAME( 1981, route16,  0,        route16,  route16,  route16_state, init_route16,  ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, route16a, route16,  route16,  route16,  route16_state, init_route16a, ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, route16c, route16,  route16,  route16,  route16_state, init_route16c, ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 3, bootleg?)", MACHINE_SUPPORTS_SAVE ) // similar to set 1 but with some protection removed?
+GAME( 1981, route16,  0,        route16,  route16,  route16_state, init_route16,  ROT270, "Sun Electronics",                            "Route 16 (Sun Electronics, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, route16d, route16,  route16,  route16a, route16_state, init_route16d, ROT270, "Sun Electronics",                            "Route 16 (Sun Electronics, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, route16a, route16,  route16,  route16a, route16_state, init_route16a, ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (Centuri license, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, route16b, route16,  route16,  route16,  route16_state, init_route16,  ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (Centuri license, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, route16c, route16,  route16,  route16,  route16_state, init_route16c, ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (Centuri license, set 3, bootleg?)", MACHINE_SUPPORTS_SAVE ) // similar to set 1 but with some protection removed?
 GAME( 1981, route16bl,route16,  route16,  route16,  route16_state, empty_init,    ROT270, "bootleg (Leisure and Allied)",               "Route 16 (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, routex,   route16,  routex,   route16,  route16_state, empty_init,    ROT270, "bootleg",                                    "Route X (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, routex,   route16,  routex,   route16,  route16_state, empty_init,    ROT270, "bootleg",                                    "Route X (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, routexa,  route16,  routex,   route16,  route16_state, empty_init,    ROT270, "bootleg",                                    "Route X (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1980, speakres, 0,        speakres, speakres, route16_state, empty_init,    ROT270, "Sun Electronics",                 "Speak & Rescue", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, speakresb,speakres, speakres, speakres, route16_state, empty_init,    ROT270, "bootleg",                         "Speak & Rescue (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, stratvox, speakres, stratvox, stratvox, route16_state, empty_init,    ROT270, "Sun Electronics (Taito license)", "Stratovox (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, stratvoxa,speakres, stratvox, stratvox, route16_state, empty_init,    ROT270, "Sun Electronics (Taito license)", "Stratovox (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, stratvoxb,speakres, stratvox, stratvox, route16_state, empty_init,    ROT270, "bootleg",                         "Stratovox (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacecho, speakres, spacecho, spacecho, route16_state, empty_init,    ROT270, "bootleg (Gayton Games)",          "Space Echo (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacecho2,speakres, spacecho, spacecho, route16_state, empty_init,    ROT270, "bootleg (Gayton Games)",          "Space Echo (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, speakhlp, speakres, spacecho, spacecho, route16_state, empty_init,    ROT270, "bootleg",                         "Speak & Help", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1980, speakres, 0,        speakres, speakres, speakres_state, empty_init,   ROT270, "Sun Electronics",                 "Speak & Rescue", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, speakresb,speakres, speakres, speakres, speakres_state, empty_init,   ROT270, "bootleg",                         "Speak & Rescue (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, stratvox, speakres, stratvox, stratvox, speakres_state, empty_init,   ROT270, "Sun Electronics (Taito license)", "Stratovox (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, stratvoxa,speakres, stratvox, stratvox, speakres_state, empty_init,   ROT270, "Sun Electronics (Taito license)", "Stratovox (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, stratvoxb,speakres, stratvox, stratvox, speakres_state, empty_init,   ROT270, "bootleg",                         "Stratovox (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacecho, speakres, spacecho, spacecho, speakres_state, empty_init,   ROT270, "bootleg (Gayton Games)",          "Space Echo (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacecho2,speakres, spacecho, spacecho, speakres_state, empty_init,   ROT270, "bootleg (Gayton Games)",          "Space Echo (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, speakhlp, speakres, spacecho, spacecho, speakres_state, empty_init,   ROT270, "bootleg",                         "Speak & Help", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
 GAME( 1981, jongpute, 0,        jongpute, jongpute, route16_state, empty_init,    ROT0,   "Alpha Denshi Co.",                 "Jongputer",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING )  // sampling voice is not emulated, bug with colors makes tile recognition difficult
 GAME( 1981, ttmahjng, jongpute, jongpute, jongpute, route16_state, empty_init,    ROT0,   "Alpha Denshi Co. (Taito license)", "T.T Mahjong", MACHINE_SUPPORTS_SAVE )

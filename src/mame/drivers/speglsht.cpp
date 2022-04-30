@@ -109,7 +109,10 @@ Notes:
 #include "emupal.h"
 #include "machine/st0016.h"
 #include "cpu/mips/mips1.h"
+#include "speaker.h"
 #include <algorithm>
+
+namespace {
 
 class speglsht_state : public driver_device
 {
@@ -129,6 +132,11 @@ public:
 
 	void init_speglsht();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	required_device<palette_device> m_palette;
 	required_device<st0016_cpu_device> m_maincpu;
@@ -143,19 +151,16 @@ private:
 	std::unique_ptr<bitmap_ind16> m_bitmap;
 	uint32_t m_videoreg;
 
-	DECLARE_READ32_MEMBER(shared_r);
-	DECLARE_WRITE32_MEMBER(shared_w);
-	DECLARE_WRITE32_MEMBER(videoreg_w);
-	DECLARE_WRITE32_MEMBER(cop_w);
-	DECLARE_READ32_MEMBER(cop_r);
-	DECLARE_READ32_MEMBER(irq_ack_clear);
+	uint32_t shared_r(offs_t offset);
+	void shared_w(offs_t offset, uint32_t data);
+	void videoreg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void cop_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cop_r(offs_t offset);
+	uint32_t irq_ack_clear();
 
-	DECLARE_MACHINE_RESET(speglsht);
-	virtual void machine_start() override;
-	DECLARE_VIDEO_START(speglsht);
-	uint32_t screen_update_speglsht(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER(st0016_rom_bank_w);
+	void st0016_rom_bank_w(uint8_t data);
 	void speglsht_mem(address_map &map);
 	void st0016_io(address_map &map);
 	void st0016_mem(address_map &map);
@@ -182,7 +187,7 @@ void speglsht_state::machine_start()
 }
 
 // common rombank? should go in machine/st0016 with larger address space exposed?
-WRITE8_MEMBER(speglsht_state::st0016_rom_bank_w)
+void speglsht_state::st0016_rom_bank_w(uint8_t data)
 {
 	m_st0016_bank->set_entry(data);
 }
@@ -201,23 +206,23 @@ void speglsht_state::st0016_io(address_map &map)
 	//map(0xf0, 0xf0).r(FUNC(speglsht_state::st0016_dma_r));
 }
 
-READ32_MEMBER(speglsht_state::shared_r)
+uint32_t speglsht_state::shared_r(offs_t offset)
 {
 	return m_shared[offset];
 }
 
-WRITE32_MEMBER(speglsht_state::shared_w)
+void speglsht_state::shared_w(offs_t offset, uint32_t data)
 {
 	m_shared[offset]=data&0xff;
 }
 
-WRITE32_MEMBER(speglsht_state::videoreg_w)
+void speglsht_state::videoreg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_videoreg);
 }
 
 
-WRITE32_MEMBER(speglsht_state::cop_w)
+void speglsht_state::cop_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_cop_ram[offset]);
 
@@ -228,7 +233,7 @@ WRITE32_MEMBER(speglsht_state::cop_w)
 }
 
 //matrix * vector
-READ32_MEMBER(speglsht_state::cop_r)
+uint32_t speglsht_state::cop_r(offs_t offset)
 {
 	int32_t *cop=(int32_t*)&m_cop_ram[0];
 
@@ -262,7 +267,7 @@ READ32_MEMBER(speglsht_state::cop_r)
 	return 0;
 }
 
-READ32_MEMBER(speglsht_state::irq_ack_clear)
+uint32_t speglsht_state::irq_ack_clear()
 {
 	m_subcpu->set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE);
 	return 0;
@@ -361,31 +366,28 @@ static GFXDECODE_START( gfx_speglsht )
 GFXDECODE_END
 
 
-MACHINE_RESET_MEMBER(speglsht_state,speglsht)
+void speglsht_state::machine_reset()
 {
 	std::fill(&m_shared[0],&m_shared[m_shared.bytes()],0);
 }
 
-VIDEO_START_MEMBER(speglsht_state,speglsht)
+void speglsht_state::video_start()
 {
 	m_bitmap = std::make_unique<bitmap_ind16>(512, 512);
-//  VIDEO_START_CALL_MEMBER(st0016);
 }
 
 #define PLOT_PIXEL_RGB(x,y,r,g,b)   if(y>=0 && x>=0 && x<512 && y<512) \
 { \
-		bitmap.pix32(y, x) = (b) | ((g)<<8) | ((r)<<16); \
+		bitmap.pix(y, x) = (b) | ((g)<<8) | ((r)<<16); \
 }
 
-uint32_t speglsht_state::screen_update_speglsht(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t speglsht_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y,dy;
+	int dy=(m_videoreg&0x20)?(256*512):0; //visible frame
 
-	dy=(m_videoreg&0x20)?(256*512):0; //visible frame
-
-	for(y=0;y<256;y++)
+	for(int y=0;y<256;y++)
 	{
-		for(x=0;x<512;x++)
+		for(int x=0;x<512;x++)
 		{
 			int tmp=dy+y*512+x;
 			PLOT_PIXEL_RGB(x-67,y-5,(m_framebuffer[tmp]>>0)&0xff,(m_framebuffer[tmp]>>8)&0xff,(m_framebuffer[tmp]>>16)&0xff);
@@ -394,13 +396,13 @@ uint32_t speglsht_state::screen_update_speglsht(screen_device &screen, bitmap_rg
 
 	//draw st0016 gfx to temporary bitmap (indexed 16)
 	m_bitmap->fill(0);
-	m_maincpu->st0016_draw_screen(screen, *m_bitmap, cliprect);
+	m_maincpu->draw_screen(screen, *m_bitmap, cliprect);
 
 	//copy temporary bitmap to rgb 32 bit bitmap
-	for(y=cliprect.min_y; y<cliprect.max_y;y++)
+	for(int y=cliprect.min_y; y<=cliprect.max_y;y++)
 	{
-		uint16_t *srcline = &m_bitmap->pix16(y);
-		for(x=cliprect.min_x; x<cliprect.max_x;x++)
+		uint16_t const *const srcline = &m_bitmap->pix(y);
+		for(int x=cliprect.min_x; x<=cliprect.max_x;x++)
 		{
 			if(srcline[x])
 			{
@@ -416,18 +418,18 @@ uint32_t speglsht_state::screen_update_speglsht(screen_device &screen, bitmap_rg
 void speglsht_state::speglsht(machine_config &config)
 {
 	/* basic machine hardware */
-	ST0016_CPU(config, m_maincpu, 8000000); /* 8 MHz ? */
+	ST0016_CPU(config, m_maincpu, XTAL(42'954'545) / 6); // 7.159 MHz (42.9545 MHz / 6)
 	m_maincpu->set_addrmap(AS_PROGRAM, &speglsht_state::st0016_mem);
 	m_maincpu->set_addrmap(AS_IO, &speglsht_state::st0016_io);
 	m_maincpu->set_vblank_int("screen", FUNC(speglsht_state::irq0_line_hold));
+	m_maincpu->set_screen("screen");
 
-	R3051(config, m_subcpu, 25000000);
+	R3051(config, m_subcpu, XTAL(50'000'000) / 2); // 25 MHz (50 MHz / 2)
 	m_subcpu->set_endianness(ENDIANNESS_LITTLE);
 	m_subcpu->set_addrmap(AS_PROGRAM, &speglsht_state::speglsht_mem);
 	m_subcpu->set_vblank_int("screen", FUNC(speglsht_state::irq4_line_assert));
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
-	MCFG_MACHINE_RESET_OVERRIDE(speglsht_state,speglsht)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -435,12 +437,17 @@ void speglsht_state::speglsht(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 512);
 	screen.set_visarea(0, 319, 8, 239-8);
-	screen.set_screen_update(FUNC(speglsht_state::screen_update_speglsht));
+	screen.set_screen_update(FUNC(speglsht_state::screen_update));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_speglsht);
 	PALETTE(config, m_palette).set_entries(16*16*4+1);
 
-	MCFG_VIDEO_START_OVERRIDE(speglsht_state,speglsht)
+	// TODO: Mono?
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	m_maincpu->add_route(0, "lspeaker", 1.0);
+	m_maincpu->add_route(1, "rspeaker", 1.0);
 }
 
 ROM_START( speglsht )
@@ -462,8 +469,10 @@ ROM_END
 
 void speglsht_state::init_speglsht()
 {
-	m_maincpu->set_st0016_game_flag(3);
+	m_maincpu->set_game_flag(3);
 }
+
+} // Anonymous namespace
 
 
 GAME( 1994, speglsht, 0, speglsht, speglsht, speglsht_state, init_speglsht, ROT0, "Seta",  "Super Eagle Shot", MACHINE_IMPERFECT_GRAPHICS )

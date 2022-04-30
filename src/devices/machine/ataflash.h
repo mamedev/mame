@@ -15,10 +15,10 @@ class ata_flash_pccard_device : public ide_hdd_device, public device_pccard_inte
 public:
 	ata_flash_pccard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ16_MEMBER(read_memory) override;
-	virtual DECLARE_WRITE16_MEMBER(write_memory) override;
-	virtual DECLARE_READ16_MEMBER(read_reg) override;
-	virtual DECLARE_WRITE16_MEMBER(write_reg) override;
+	virtual uint16_t read_memory(offs_t offset, uint16_t mem_mask = ~0) override;
+	virtual void write_memory(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	virtual uint16_t read_reg(offs_t offset, uint16_t mem_mask = ~0) override;
+	virtual void write_reg(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 protected:
 	ata_flash_pccard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -27,10 +27,10 @@ protected:
 	virtual void device_reset() override;
 
 	virtual attotime seek_time() override;
-	uint8_t calculate_status() override { return ata_hle_device::calculate_status(); };
+	uint8_t calculate_status() override { return ata_hle_device::calculate_status(); }
 
 private:
-	uint8_t m_cis[512];
+	std::vector<uint8_t> m_cis;
 	uint8_t m_configuration_option;
 	uint8_t m_configuration_and_status;
 	uint8_t m_pin_replacement;
@@ -43,8 +43,8 @@ class taito_pccard1_device : public ata_flash_pccard_device
 public:
 	taito_pccard1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ16_MEMBER(read_reg) override;
-	virtual DECLARE_WRITE16_MEMBER(write_reg) override;
+	virtual uint16_t read_reg(offs_t offset, uint16_t mem_mask = ~0) override;
+	virtual void write_reg(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 protected:
 	virtual void device_start() override;
@@ -53,7 +53,7 @@ protected:
 	virtual bool is_ready() override;
 
 private:
-	uint8_t m_key[5];
+	std::vector<uint8_t> m_key;
 	uint16_t m_locked;
 };
 
@@ -75,7 +75,7 @@ protected:
 	static const int IDE_COMMAND_TAITO_GNET_UNLOCK_2 = 0xfc;
 
 private:
-	uint8_t m_key[5];
+	std::vector<uint8_t> m_key;
 	bool m_locked;
 };
 
@@ -95,7 +95,7 @@ protected:
 	static constexpr int IDE_COMMAND_TAITO_COMPACT_FLASH_UNLOCK = 0x0f;
 
 private:
-	uint8_t m_key[5];
+	std::vector<uint8_t> m_key;
 	bool m_locked;
 };
 

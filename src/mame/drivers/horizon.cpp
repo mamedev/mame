@@ -41,7 +41,7 @@ involves replacing the XTAL and reconnecting one jumper.
 #include "bus/s100/s100.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8251.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 #define Z80_TAG         "z80"
 #define I8251_L_TAG     "3a"
@@ -65,7 +65,7 @@ public:
 	void horizon2mhz(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(ff_r);
+	uint8_t ff_r();
 
 	void horizon_io(address_map &map);
 	void horizon_mem(address_map &map);
@@ -128,7 +128,7 @@ void horizon_state::machine_reset()
 	m_maincpu->set_pc(0xe800);
 }
 
-READ8_MEMBER( horizon_state::ff_r )
+uint8_t horizon_state::ff_r()
 {
 	return 0xff;
 }
@@ -140,7 +140,6 @@ READ8_MEMBER( horizon_state::ff_r )
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )

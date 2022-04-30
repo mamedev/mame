@@ -56,7 +56,7 @@ void generic_latch_base_device::device_start()
 //  init_callback - set initial state
 //-------------------------------------------------
 
-void generic_latch_base_device::init_callback(void *ptr, s32 param)
+void generic_latch_base_device::init_callback(s32 param)
 {
 	m_data_pending_cb(m_latch_written ? 1 : 0);
 }
@@ -153,7 +153,7 @@ WRITE_LINE_MEMBER( generic_latch_8_device::clear )
 //  callback to set a latch value
 //-------------------------------------------------
 
-void generic_latch_8_device::sync_callback(void *ptr, s32 param)
+void generic_latch_8_device::sync_callback(s32 param)
 {
 	u8 value = param;
 
@@ -224,7 +224,7 @@ WRITE_LINE_MEMBER( generic_latch_16_device::clear )
 //  callback to set a latch value
 //-------------------------------------------------
 
-void generic_latch_16_device::sync_callback(void *ptr, s32 param)
+void generic_latch_16_device::sync_callback(s32 param)
 {
 	u16 value = param;
 

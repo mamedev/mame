@@ -28,8 +28,8 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// I/O operations
-	DECLARE_WRITE8_MEMBER( tx_w );
-	DECLARE_READ8_MEMBER( rx_r );
+	void tx_w(uint8_t data);
+	uint8_t rx_r(offs_t offset);
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 
 protected:
@@ -37,7 +37,7 @@ protected:
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	devcb_write_line   m_write_irq;
 

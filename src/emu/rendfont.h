@@ -27,17 +27,18 @@ class render_font
 
 	// construction/destruction
 	render_font(render_manager &manager, const char *filename);
-	virtual ~render_font();
 
 public:
+	virtual ~render_font();
+
 	// getters
 	render_manager &manager() const { return m_manager; }
 
 	// size queries
 	s32 pixel_height() const { return m_height; }
 	float char_width(float height, float aspect, char32_t ch);
-	float string_width(float height, float aspect, const char *string);
-	float utf8string_width(float height, float aspect, const char *utf8string);
+	float string_width(float height, float aspect, std::string_view string);
+	float utf8string_width(float height, float aspect, std::string_view utf8string);
 
 	// texture/bitmap queries
 	render_texture *get_char_texture_and_bounds(float height, float aspect, char32_t ch, render_bounds &bounds);
@@ -81,10 +82,10 @@ private:
 	// helpers
 	glyph &get_char(char32_t chnum);
 	void char_expand(char32_t chnum, glyph &ch);
-	bool load_cached_bdf(const char *filename);
+	bool load_cached_bdf(std::string_view filename);
 	bool load_bdf();
-	bool load_cached(emu_file &file, u64 length, u32 hash);
-	bool save_cached(const char *filename, u64 length, u32 hash);
+	bool load_cached(util::random_read &file, u64 length, u32 hash);
+	bool save_cached(util::random_write &file, u64 length, u32 hash);
 
 	void render_font_command_glyph();
 
@@ -109,6 +110,6 @@ private:
 	static const u64 CACHED_BDF_HASH_SIZE   = 1024;
 };
 
-void convert_command_glyph(std::string &s);
+std::string convert_command_glyph(std::string_view str);
 
 #endif  /* MAME_EMU_RENDFONT_H */

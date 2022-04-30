@@ -43,6 +43,12 @@ u16 const TRANSLATION_TABLE[][4][16] = {
 		{ 0xffU, 0x01U, 0x13U, 0x04U, 0x06U, 0x07U, 0x08U, 0x0aU, 0x0bU, 0x0cU, ';',   '\'',  0x8dU, 0xffU, 0xffU, 0x0aU },
 		{ 0xffU, 0x1cU, 0x1aU, 0x18U, 0x03U, 0x16U, 0x02U, 0x0eU, 0x0dU, ',',   '.',   0xbfU, 0xffU, 0xffU, 0xffU, 0x00U }
 	},
+	{   // CODE-CTRL
+		{ 0x00U, 0x91U, 0x92U, 0x93U, 0x94U, 0x95U, 0x96U, 0x97U, 0x98U, 0x99U, 0x90U, 0xBDU, 0x9DU, 0x88U, 0x7fU, 0x9bU },
+		{ 0x89U, 0x91U, 0x97U, 0x85U, 0x92U, 0x94U, 0x99U, 0x95U, 0x89U, 0x8fU, 0x90U, 0xffU, 0xffU, 0xffU, 0xffU, 0xffU },
+		{ 0xffU, 0x81U, 0x93U, 0x84U, 0x86U, 0x87U, 0x88U, 0x8aU, 0x8bU, 0x8cU, 0x1EU, 0x00U, 0x8dU, 0xffU, 0xffU, 0x0aU },
+		{ 0xffU, 0x9cU, 0x9aU, 0x98U, 0x83U, 0x96U, 0x82U, 0x8eU, 0x8dU, 0x1bU, 0x1DU, 0xbfU, 0xffU, 0xffU, 0xffU, 0x00U }
+	},
 };
 
 
@@ -119,7 +125,7 @@ INPUT_PORTS_START( grid_keyboard )
 	PORT_BIT( 0x0080U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7)                                  PORT_CHAR('7')   PORT_CHAR('&')
 	PORT_BIT( 0x0100U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8)                                  PORT_CHAR('8')   PORT_CHAR('*')
 	PORT_BIT( 0x0200U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9)                                  PORT_CHAR('9')   PORT_CHAR('(')
-	PORT_BIT( 0x0400U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0)                                  PORT_CHAR('0')   PORT_CHAR('(')
+	PORT_BIT( 0x0400U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0)                                  PORT_CHAR('0')   PORT_CHAR(')')
 	PORT_BIT( 0x0800U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)                              PORT_CHAR('-')   PORT_CHAR('_')
 	PORT_BIT( 0x1000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS)                             PORT_CHAR('=')   PORT_CHAR('+')
 	PORT_BIT( 0x2000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE)  PORT_NAME("Backspace") PORT_CHAR(0x08U)
@@ -270,7 +276,7 @@ bool grid_keyboard_device::translate(u8 code, u16 &translated) const
 	bool const ctrl(modifiers & 0x01U);
 	bool const meta(modifiers & 0x08U);
 
-	unsigned const map(ctrl ? 3U : meta ? 2U : shift ? 1U : 0U);
+	unsigned const map(ctrl ? (meta ? 4U : 3U) : meta ? 2U : shift ? 1U : 0U);
 	u16 const result(TRANSLATION_TABLE[map][row][col]);
 	if (result == u8(~0U))
 	{

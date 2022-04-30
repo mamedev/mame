@@ -23,11 +23,11 @@ public:
 	auto master_intr_cb() { return m_master_intr_cb.bind(); }
 	auto parallel_int_cb() { return m_parallel_int_cb.bind(); }
 
-	DECLARE_READ8_MEMBER(dbb_master_r);
-	DECLARE_WRITE8_MEMBER(dbb_master_w);
+	uint8_t dbb_master_r(offs_t offset);
+	void dbb_master_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(pio_master_r);
-	DECLARE_WRITE8_MEMBER(pio_master_w);
+	uint8_t pio_master_r(offs_t offset);
+	void pio_master_w(offs_t offset, uint8_t data);
 
 protected:
 	virtual ioport_constructor device_input_ports() const override;
@@ -39,32 +39,32 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_WRITE8_MEMBER(miscout_w);
-	DECLARE_READ8_MEMBER(miscin_r);
+	void miscout_w(uint8_t data);
+	uint8_t miscin_r();
 	DECLARE_WRITE_LINE_MEMBER(beep_timer_w);
-	DECLARE_WRITE8_MEMBER(start_timer_w);
+	void start_timer_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER(kb_read);
-	DECLARE_READ8_MEMBER(kb_port_p2_r);
-	DECLARE_WRITE8_MEMBER(kb_port_p1_w);
+	uint8_t kb_read(offs_t offset);
+	uint8_t kb_port_p2_r();
+	void kb_port_p1_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(kb_port_t0_r);
 	DECLARE_READ_LINE_MEMBER(kb_port_t1_r);
 
-	DECLARE_WRITE8_MEMBER(ioc_dbbout_w);
-	DECLARE_WRITE8_MEMBER(ioc_f0_w);
-	DECLARE_WRITE8_MEMBER(ioc_set_f1_w);
-	DECLARE_WRITE8_MEMBER(ioc_reset_f1_w);
-	DECLARE_READ8_MEMBER(ioc_status_r);
-	DECLARE_READ8_MEMBER(ioc_dbbin_r);
+	void ioc_dbbout_w(offs_t offset, uint8_t data);
+	void ioc_f0_w(offs_t offset, uint8_t data);
+	void ioc_set_f1_w(uint8_t data);
+	void ioc_reset_f1_w(uint8_t data);
+	uint8_t ioc_status_r();
+	uint8_t ioc_dbbin_r();
 
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
-	DECLARE_READ8_MEMBER(ioc_mem_r);
-	DECLARE_WRITE8_MEMBER(ioc_mem_w);
+	uint8_t ioc_mem_r(offs_t offset);
+	void ioc_mem_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(pio_port_p1_r);
-	DECLARE_WRITE8_MEMBER(pio_port_p1_w);
-	DECLARE_READ8_MEMBER(pio_port_p2_r);
-	DECLARE_WRITE8_MEMBER(pio_port_p2_w);
+	uint8_t pio_port_p1_r();
+	void pio_port_p1_w(uint8_t data);
+	uint8_t pio_port_p2_r();
+	void pio_port_p2_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pio_lpt_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(pio_lpt_busy_w);
 	DECLARE_WRITE_LINE_MEMBER(pio_lpt_select_w);

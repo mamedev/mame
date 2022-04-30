@@ -32,26 +32,24 @@ todo:
 #include "speaker.h"
 
 
-/* input ports are rotated 90 degrees */
-READ8_MEMBER(gomoku_state::input_port_r)
+// input ports are rotated 90 degrees
+uint8_t gomoku_state::input_port_r(offs_t offset)
 {
-	int i, res;
-
-	res = 0;
-	for (i = 0; i < 8; i++)
+	int res = 0;
+	for (int i = 0; i < 8; i++)
 		res |= ((m_inputs[i].read_safe(0xff) >> offset) & 1) << i;
 
 	return res;
 }
 
 
-void gomoku_state::gomoku_map(address_map &map)
+void gomoku_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x47ff).rom();
 	map(0x4800, 0x4fff).ram();
-	map(0x5000, 0x53ff).ram().w(FUNC(gomoku_state::gomoku_videoram_w)).share("videoram");
-	map(0x5400, 0x57ff).ram().w(FUNC(gomoku_state::gomoku_colorram_w)).share("colorram");
-	map(0x5800, 0x58ff).ram().w(FUNC(gomoku_state::gomoku_bgram_w)).share("bgram");
+	map(0x5000, 0x53ff).ram().w(FUNC(gomoku_state::videoram_w)).share(m_videoram);
+	map(0x5400, 0x57ff).ram().w(FUNC(gomoku_state::colorram_w)).share(m_colorram);
+	map(0x5800, 0x58ff).ram().share(m_bgram);
 	map(0x6000, 0x601f).w("gomoku", FUNC(gomoku_sound_device::sound1_w));
 	map(0x6800, 0x681f).w("gomoku", FUNC(gomoku_sound_device::sound2_w));
 	map(0x7000, 0x7007).w("latch", FUNC(ls259_device::write_d1));
@@ -108,25 +106,25 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8, 8,       /* 8*8 characters */
-	256,        /* 256 characters */
-	2,          /* 2 bits per pixel */
-	{ 0, 4 },   /* the two bitplanes are packed in one byte */
+	8, 8,       // 8*8 characters
+	256,        // 256 characters
+	2,          // 2 bits per pixel
+	{ 0, 4 },   // the two bitplanes are packed in one byte
 	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	16*8        /* every char takes 16 consecutive bytes */
+	16*8        // every char takes 16 consecutive bytes
 };
 
 static GFXDECODE_START( gfx_gomoku )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 32 )
+	GFXDECODE_ENTRY( "chars", 0, charlayout, 0, 32 )
 GFXDECODE_END
 
 
 void gomoku_state::gomoku(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(18'432'000)/12);      /* 1.536 MHz ? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &gomoku_state::gomoku_map);
+	// basic machine hardware
+	Z80(config, m_maincpu, XTAL(18'432'000)/12);      // 1.536 MHz ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &gomoku_state::prg_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gomoku_state::irq0_line_hold));
 
 	ls259_device &latch(LS259(config, "latch")); // 7J
@@ -134,19 +132,19 @@ void gomoku_state::gomoku(machine_config &config)
 	latch.q_out_cb<2>().set(FUNC(gomoku_state::bg_dispsw_w));
 	latch.q_out_cb<7>().set_nop(); // start LED?
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(256, 256);
 	m_screen->set_visarea(0, 256-1, 16, 256-16-1);
-	m_screen->set_screen_update(FUNC(gomoku_state::screen_update_gomoku));
+	m_screen->set_screen_update(FUNC(gomoku_state::screen_update));
 	m_screen->set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_gomoku);
-	PALETTE(config, "palette", FUNC(gomoku_state::gomoku_palette), 64);
+	PALETTE(config, "palette", FUNC(gomoku_state::palette), 64);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GOMOKU_SOUND(config, "gomoku").add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -154,14 +152,14 @@ void gomoku_state::gomoku(machine_config &config)
 
 
 ROM_START( gomoku )
-	ROM_REGION( 0x10000, "maincpu", 0 ) // program
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rj_1.7a",    0x0000, 0x1000, CRC(ed20d539) SHA1(7cbbc678cbe5c85b914ca44f82bdbd452cf694a0) )
 	ROM_LOAD( "rj_2.7c",    0x1000, 0x1000, CRC(26a28516) SHA1(53d5d134cd91020fa06e380d355deb1df6b9cb6e) )
 	ROM_LOAD( "rj_3.7d",    0x2000, 0x1000, CRC(d05db072) SHA1(9697c932c6dcee6f8536c9f0b3c84a719a7d3dee) )
 	ROM_LOAD( "rj_4.7f",    0x3000, 0x1000, CRC(6e3d1c18) SHA1(e2f7e4c0de3c78d1b8e686152458972f996b023a) )
 	ROM_LOAD( "rj_5.4e",    0x4000, 0x0800, CRC(eaf541b4) SHA1(bc7e7ec1ba68f71ab9ac86f9ae77971ddb9ce3a4) )
 
-	ROM_REGION( 0x1000, "gfx1", 0 ) // text char
+	ROM_REGION( 0x1000, "chars", 0 )
 	ROM_LOAD( "rj_6.4r",    0x0000, 0x1000, CRC(ed26ae36) SHA1(61cb73d7f2568e88e1c2981e7af3e9a3b26797d3) )
 
 	ROM_REGION( 0x1000, "gomoku", 0 )   // sound
@@ -171,19 +169,19 @@ ROM_START( gomoku )
 	ROM_LOAD( "rj_prom.1m", 0x0000, 0x0020, CRC(5da2f2bd) SHA1(4355ccf06cb09ec3240dc92bda19b1f707a010ef) )  // TEXT color
 	ROM_LOAD( "rj_prom.1l", 0x0020, 0x0020, CRC(fe4ef393) SHA1(d4c63f8645afeadd13ff82087bcc497d8936d90b) )  // BG color
 
-	ROM_REGION( 0x0100, "user1", 0 )    // BG draw data X
+	ROM_REGION( 0x0100, "bg_x", 0 )    // BG draw data X
 	ROM_LOAD( "rj_prom.8n", 0x0000, 0x0100, CRC(9ba43222) SHA1(a443df49d7ee9dbfd258b09731d392bf1249cbfa) )
 
-	ROM_REGION( 0x0100, "user2", 0 )    // BG draw data Y
+	ROM_REGION( 0x0100, "bg_y", 0 )    // BG draw data Y
 	ROM_LOAD( "rj_prom.7p", 0x0000, 0x0100, CRC(5b5464f8) SHA1(b945efb8a7233f501d67f6b1be4e9d4967dc6719) )
 
-	ROM_REGION( 0x0100, "user3", 0 )    // BG character data
+	ROM_REGION( 0x0100, "bg_d", 0 )    // BG character data
 	ROM_LOAD( "rj_prom.7r", 0x0000, 0x0100, CRC(3004585a) SHA1(711b68140827f0f3dc71f2576fcf9b905c999e8d) )
 
-	ROM_REGION( 0x0020, "user4", 0 )    // unknown
+	ROM_REGION( 0x0020, "unkprom", 0 )    // unknown
 	ROM_LOAD( "rj_prom.9k", 0x0000, 0x0020, CRC(cff72923) SHA1(4f61375028ab62da46ed119bc81052f5f98c28d4) )
 ROM_END
 
 
 //    YEAR,   NAME,   PARENT,  MACHINE,  INPUT,  STATE         INIT,       MONITOR, COMPANY,      FULLNAME,              FLAGS
-GAME( 1981,   gomoku, 0,       gomoku,   gomoku, gomoku_state, empty_init, ROT90,   "Nichibutsu", "Gomoku Narabe Renju", 0 )
+GAME( 1981,   gomoku, 0,       gomoku,   gomoku, gomoku_state, empty_init, ROT90,   "Nichibutsu", "Gomoku Narabe Renju", MACHINE_SUPPORTS_SAVE )

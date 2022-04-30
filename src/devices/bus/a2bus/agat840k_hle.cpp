@@ -150,12 +150,9 @@ void a2bus_agat840k_hle_device::device_reset()
 
 	for (auto &img : m_floppy_image)
 	{
-		if (img.found())
-		{
-			img->floppy_drive_set_ready_state(FLOPPY_DRIVE_READY, 0);
-			img->floppy_drive_set_rpm(300.);
-			img->floppy_drive_seek(-img->floppy_drive_get_current_track());
-		}
+		img->floppy_drive_set_ready_state(FLOPPY_DRIVE_READY, 0);
+		img->floppy_drive_set_rpm(300.);
+		img->floppy_drive_seek(-img->floppy_drive_get_current_track());
 	}
 	m_floppy = m_floppy_image[0].target();
 
@@ -229,7 +226,7 @@ void a2bus_agat840k_hle_device::device_reset()
 	m_mxcs &= ~MXCSR_TR;
 }
 
-void a2bus_agat840k_hle_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void a2bus_agat840k_hle_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -336,7 +333,7 @@ uint8_t a2bus_agat840k_hle_device::read_cnxx(uint8_t offset)
  *
  * C0x1
  */
-READ8_MEMBER(a2bus_agat840k_hle_device::d14_i_b)
+uint8_t a2bus_agat840k_hle_device::d14_i_b()
 {
 	u8 data = 0x3;
 
@@ -366,7 +363,7 @@ READ8_MEMBER(a2bus_agat840k_hle_device::d14_i_b)
  *
  * C0x2
  */
-WRITE8_MEMBER(a2bus_agat840k_hle_device::d14_o_c)
+void a2bus_agat840k_hle_device::d14_o_c(uint8_t data)
 {
 	m_unit = BIT(data, 3);
 	m_floppy = m_floppy_image[m_unit].target();
@@ -399,7 +396,7 @@ WRITE8_MEMBER(a2bus_agat840k_hle_device::d14_o_c)
 // C0x4
 //
 // data are latched in by write to PC4
-READ8_MEMBER(a2bus_agat840k_hle_device::d15_i_a)
+uint8_t a2bus_agat840k_hle_device::d15_i_a()
 {
 	const u16 data = m_tracks[(2 * m_floppy->floppy_drive_get_current_track()) + m_side][m_count_read];
 	LOG("sector data: %02x @ %4d (head %d track %2d)%s\n", data & 0xff, m_count_read,
@@ -413,7 +410,7 @@ READ8_MEMBER(a2bus_agat840k_hle_device::d15_i_a)
 //
 // b6   AL  desync detected
 // b7   AH  read or write data ready
-READ8_MEMBER(a2bus_agat840k_hle_device::d15_i_c)
+uint8_t a2bus_agat840k_hle_device::d15_i_c()
 {
 	LOG("status B:       @ %4d %s %s (%s)\n", m_count_read,
 		BIT(m_mxcs, 7) ? "ready" : "READY", BIT(m_mxcs, 6) ? "SYNC" : "sync",
@@ -428,7 +425,7 @@ READ8_MEMBER(a2bus_agat840k_hle_device::d15_i_c)
 // b2   AH  b7 = ready for write data
 // b3   --  connected to b7, set if m_intr[PORT_A]
 // b4   AH  b7 = read data ready
-WRITE8_MEMBER(a2bus_agat840k_hle_device::d15_o_c)
+void a2bus_agat840k_hle_device::d15_o_c(uint8_t data)
 {
 	if (BIT(data, 0) || BIT(data, 3))
 	{

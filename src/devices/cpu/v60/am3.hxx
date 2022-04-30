@@ -720,13 +720,11 @@ uint32_t v60_device::am3DirectAddressDeferredIndexed()
 uint32_t v60_device::am3Immediate()
 {
 	fatalerror("CPU - AM3 - IMM (PC=%06x)\n", PC);
-	return 0; /* never reached, fatalerror won't return */
 }
 
 uint32_t v60_device::am3ImmediateQuick()
 {
 	fatalerror("CPU - AM3 - IMMQ (PC=%06x)\n", PC);
-	return 0; /* never reached, fatalerror won't return */
 }
 
 
@@ -737,33 +735,26 @@ uint32_t v60_device::am3ImmediateQuick()
 uint32_t v60_device::am3Error1()
 {
 	fatalerror("CPU - AM3 - 1 (PC=%06x)\n", PC);
-	return 0; /* never reached, fatalerror won't return */
 }
 
 uint32_t v60_device::am3Error2()
 {
 	fatalerror("CPU - AM3 - 2 (PC=%06x)\n", PC);
-	return 0; /* never reached, fatalerror won't return */
 }
 
-#ifdef UNUSED_FUNCTION
 uint32_t v60_device::am3Error3()
 {
 	fatalerror("CPU - AM3 - 3 (PC=%06x)\n", PC);
-	return 0; /* never reached, fatalerror won't return */
 }
-#endif
 
 uint32_t v60_device::am3Error4()
 {
 	fatalerror("CPU - AM3 - 4 (PC=%06x)\n", PC);
-	return 0; /* never reached, fatalerror won't return */
 }
 
 uint32_t v60_device::am3Error5()
 {
 	fatalerror("CPU - AM3 - 5 (PC=%06x)\n", PC);
-	return 0; /* never reached, fatalerror won't return */
 }
 
 const v60_device::am_func v60_device::s_AMTable3_G7a[16] =

@@ -33,6 +33,9 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void formatz(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_mainram;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -45,29 +48,29 @@ public:
 	required_shared_ptr<uint8_t> m_bgcolor;
 
 	/* stars layout */
-	uint8_t * m_stars_rom;
-	int     m_stars_length;
+	uint8_t * m_stars_rom = 0U;
+	int     m_stars_length = 0;
 
 	/* video-related */
-	tilemap_t *m_bg_tilemap;
-	int     m_charbank;
-	int     m_starsoff;
-	int     m_sx;
-	int     m_sy;
-	uint8_t   m_ox;
-	uint8_t   m_oy;
+	tilemap_t *m_bg_tilemap = nullptr;
+	int     m_charbank = 0;
+	int     m_starsoff = 0;
+	int     m_sx = 0;
+	int     m_sy = 0;
+	uint8_t   m_ox = 0U;
+	uint8_t   m_oy = 0U;
 
 	/* misc */
-	int m_count;
-	int m_disable_irq;
-	DECLARE_READ8_MEMBER(aeroboto_201_r);
-	DECLARE_READ8_MEMBER(aeroboto_irq_ack_r);
-	DECLARE_READ8_MEMBER(aeroboto_2973_r);
-	DECLARE_WRITE8_MEMBER(aeroboto_1a2_w);
-	DECLARE_READ8_MEMBER(aeroboto_in0_r);
-	DECLARE_WRITE8_MEMBER(aeroboto_3000_w);
-	DECLARE_WRITE8_MEMBER(aeroboto_videoram_w);
-	DECLARE_WRITE8_MEMBER(aeroboto_tilecolor_w);
+	int m_count = 0;
+	int m_disable_irq = 0;
+	uint8_t aeroboto_201_r();
+	uint8_t aeroboto_irq_ack_r();
+	uint8_t aeroboto_2973_r();
+	void aeroboto_1a2_w(uint8_t data);
+	uint8_t aeroboto_in0_r();
+	void aeroboto_3000_w(uint8_t data);
+	void aeroboto_videoram_w(offs_t offset, uint8_t data);
+	void aeroboto_tilecolor_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -79,7 +82,6 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void formatz(machine_config &config);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };

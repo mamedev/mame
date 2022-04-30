@@ -234,29 +234,27 @@ private:
 	int m_vint;
 	int m_interrupt_vdp0_state;
 	int m_interrupt_vdp1_state;
-	int m_layer0_enabled;
-	int m_layer1_enabled;
 	int m_bank;
 	int m_psd_a15;
 	uint16_t m_questions_loword_address;
 
-	DECLARE_WRITE8_MEMBER(crt250_bank_w);
-	DECLARE_WRITE8_MEMBER(psd_a15_w);
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_WRITE8_MEMBER(crt250_questions_lo_w);
-	DECLARE_WRITE8_MEMBER(crt250_questions_hi_w);
-	DECLARE_WRITE8_MEMBER(crt250_questions_bank_w);
-	DECLARE_WRITE8_MEMBER(ds1644_w);
-	DECLARE_READ8_MEMBER(ds1644_r);
-	DECLARE_READ8_MEMBER(_8255_port_c_r);
-	DECLARE_WRITE8_MEMBER(crt250_port_b_w);
-	DECLARE_WRITE8_MEMBER(ay8930_port_b_w);
-	DECLARE_READ8_MEMBER(audio_pio_port_a_r);
-	DECLARE_READ8_MEMBER(audio_pio_port_b_r);
-	DECLARE_WRITE8_MEMBER(audio_pio_port_a_w);
-	DECLARE_WRITE8_MEMBER(audio_pio_port_b_w);
-	DECLARE_WRITE8_MEMBER(io_pio_port_a_w);
-	DECLARE_WRITE8_MEMBER(io_pio_port_b_w);
+	void crt250_bank_w(uint8_t data);
+	void psd_a15_w(uint8_t data);
+	void bank_w(uint8_t data);
+	void crt250_questions_lo_w(uint8_t data);
+	void crt250_questions_hi_w(uint8_t data);
+	void crt250_questions_bank_w(uint8_t data);
+	void ds1644_w(offs_t offset, uint8_t data);
+	uint8_t ds1644_r(offs_t offset);
+	uint8_t _8255_port_c_r();
+	void crt250_port_b_w(uint8_t data);
+	void ay8930_port_b_w(uint8_t data);
+	uint8_t audio_pio_port_a_r();
+	uint8_t audio_pio_port_b_r();
+	void audio_pio_port_a_w(uint8_t data);
+	void audio_pio_port_b_w(uint8_t data);
+	void io_pio_port_a_w(uint8_t data);
+	void io_pio_port_b_w(uint8_t data);
 
 	DECLARE_MACHINE_START(crt250_questions);
 	DECLARE_MACHINE_START(crt250_crt252_crt258);
@@ -289,6 +287,7 @@ private:
  *  Microtouch touch coordinate transformation
  *
  *************************************/
+
 int meritm_state::touch_coord_transform(int *touch_x, int *touch_y)
 {
 	int xscr = (int)((double)(*touch_x)/0x4000*544);
@@ -320,25 +319,33 @@ int meritm_state::touch_coord_transform(int *touch_x, int *touch_y)
  *
  *************************************/
 
-
 WRITE_LINE_MEMBER(meritm_state::vdp0_interrupt)
 {
-	/* this is not used as the v9938 interrupt callbacks are broken
-	   interrupts seem to be fired quite randomly */
+	if (state != m_interrupt_vdp0_state)
+	{
+		m_vint = (m_vint & 8) | (state ? 0 : 0x10);
+		m_interrupt_vdp0_state = state;
+		m_z80pio[0]->port_a_write(m_vint);
+	}
 }
 
 WRITE_LINE_MEMBER(meritm_state::vdp1_interrupt)
 {
-	/* this is not used as the v9938 interrupt callbacks are broken
-	   interrupts seem to be fired quite randomly */
+	if (state != m_interrupt_vdp1_state)
+	{
+		m_vint = (m_vint & 0x10) | (state ? 0 : 8);
+		m_interrupt_vdp1_state = state;
+		m_z80pio[0]->port_a_write(m_vint);
+	}
 }
 
 
 void meritm_state::video_start()
 {
-	m_layer0_enabled = m_layer1_enabled = 1;
-
 	m_vint = 0x18;
+	m_interrupt_vdp0_state = 0;
+	m_interrupt_vdp1_state = 0;
+
 	save_item(NAME(m_vint));
 	save_item(NAME(m_interrupt_vdp0_state));
 	save_item(NAME(m_interrupt_vdp1_state));
@@ -346,28 +353,11 @@ void meritm_state::video_start()
 
 uint32_t meritm_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if(machine().input().code_pressed_once(KEYCODE_Q))
-	{
-		m_layer0_enabled^=1;
-		popmessage("Layer 0 %sabled",m_layer0_enabled ? "en" : "dis");
-	}
-	if(machine().input().code_pressed_once(KEYCODE_W))
-	{
-		m_layer1_enabled^=1;
-		popmessage("Layer 1 %sabled",m_layer1_enabled ? "en" : "dis");
-	}
-
 	bitmap.fill(rgb_t::black(), cliprect);
 
-	if ( m_layer0_enabled )
-	{
-		copybitmap(bitmap, m_v9938[0]->get_bitmap(), 0, 0, 0, 0, cliprect);
-	}
+	copybitmap(bitmap, m_v9938[0]->get_bitmap(), 0, 0, 0, 0, cliprect);
+	copybitmap_transalpha(bitmap, m_v9938[1]->get_bitmap(), 0, 0, -6, -12, cliprect);
 
-	if ( m_layer1_enabled )
-	{
-		copybitmap_transalpha(bitmap, m_v9938[1]->get_bitmap(), 0, 0, -6, -12, cliprect);
-	}
 	return 0;
 }
 
@@ -377,7 +367,6 @@ uint32_t meritm_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
  *
  *************************************/
 
-
 void meritm_state::crt250_switch_banks(  )
 {
 	int rombank = (m_bank & 0x07) ^ 0x07;
@@ -386,7 +375,7 @@ void meritm_state::crt250_switch_banks(  )
 	m_banks[0]->set_entry(rombank );
 }
 
-WRITE8_MEMBER(meritm_state::crt250_bank_w)
+void meritm_state::crt250_bank_w(uint8_t data)
 {
 	crt250_switch_banks();
 }
@@ -405,14 +394,14 @@ void meritm_state::switch_banks(  )
 	m_banks[2]->set_entry(rambank);
 }
 
-WRITE8_MEMBER(meritm_state::psd_a15_w)
+void meritm_state::psd_a15_w(uint8_t data)
 {
 	m_psd_a15 = data;
 	//logerror( "Writing PSD_A15 with %02x at PC=%04X\n", data, m_maincpu->pc() );
 	switch_banks();
 }
 
-WRITE8_MEMBER(meritm_state::bank_w)
+void meritm_state::bank_w(uint8_t data)
 {
 	switch_banks();
 }
@@ -423,20 +412,19 @@ WRITE8_MEMBER(meritm_state::bank_w)
  *
  *************************************/
 
-
-WRITE8_MEMBER(meritm_state::crt250_questions_lo_w)
+void meritm_state::crt250_questions_lo_w(uint8_t data)
 {
 	m_questions_loword_address &= 0xff00;
 	m_questions_loword_address |= data;
 }
 
-WRITE8_MEMBER(meritm_state::crt250_questions_hi_w)
+void meritm_state::crt250_questions_hi_w(uint8_t data)
 {
 	m_questions_loword_address &= 0x00ff;
 	m_questions_loword_address |= (data << 8);
 }
 
-WRITE8_MEMBER(meritm_state::crt250_questions_bank_w)
+void meritm_state::crt250_questions_bank_w(uint8_t data)
 {
 	uint32_t questions_address;
 
@@ -486,7 +474,7 @@ WRITE8_MEMBER(meritm_state::crt250_questions_bank_w)
  *
  *************************************/
 
-WRITE8_MEMBER(meritm_state::ds1644_w)
+void meritm_state::ds1644_w(offs_t offset, uint8_t data)
 {
 	int rambank = (m_psd_a15 >> 2) & 0x3;
 	if (rambank < 3)
@@ -510,7 +498,7 @@ uint8_t meritm_state::binary_to_BCD(uint8_t data)
 	return ((data / 10) << 4) | (data %10);
 }
 
-READ8_MEMBER(meritm_state::ds1644_r)
+uint8_t meritm_state::ds1644_r(offs_t offset)
 {
 	system_time systime;
 	int rambank = (m_psd_a15 >> 2) & 0x3;
@@ -876,13 +864,13 @@ INPUT_PORTS_END
  *
  *************************************/
 
-READ8_MEMBER(meritm_state::_8255_port_c_r)
+uint8_t meritm_state::_8255_port_c_r()
 {
 	//logerror( "8255 port C read\n" );
 	return 0xff;
 }
 
-WRITE8_MEMBER(meritm_state::crt250_port_b_w)
+void meritm_state::crt250_port_b_w(uint8_t data)
 {
 	//popmessage("Lamps: %d %d %d %d %d %d %d", BIT(data,0), BIT(data,1), BIT(data,2), BIT(data,3), BIT(data,4), BIT(data,5), BIT(data,6) );
 	output().set_value("P1 DISC 1 LAMP", !BIT(data,0));
@@ -905,7 +893,7 @@ WRITE8_MEMBER(meritm_state::crt250_port_b_w)
  Port B: Bits 0,1 used
 */
 
-WRITE8_MEMBER(meritm_state::ay8930_port_b_w)
+void meritm_state::ay8930_port_b_w(uint8_t data)
 {
 	// lamps
 }
@@ -916,7 +904,7 @@ WRITE8_MEMBER(meritm_state::ay8930_port_b_w)
  *
  *************************************/
 
-READ8_MEMBER(meritm_state::audio_pio_port_a_r)
+uint8_t meritm_state::audio_pio_port_a_r()
 {
 	/*
 
@@ -936,7 +924,7 @@ READ8_MEMBER(meritm_state::audio_pio_port_a_r)
 	return m_vint;
 }
 
-READ8_MEMBER(meritm_state::audio_pio_port_b_r)
+uint8_t meritm_state::audio_pio_port_b_r()
 {
 	/*
 
@@ -956,7 +944,7 @@ READ8_MEMBER(meritm_state::audio_pio_port_b_r)
 	return m_ds1204->read_dq();
 }
 
-WRITE8_MEMBER(meritm_state::audio_pio_port_a_w)
+void meritm_state::audio_pio_port_a_w(uint8_t data)
 {
 	/*
 
@@ -977,7 +965,7 @@ WRITE8_MEMBER(meritm_state::audio_pio_port_a_w)
 	//logerror("Writing BANK with %x (raw = %x)\n", m_bank, data);
 }
 
-WRITE8_MEMBER(meritm_state::audio_pio_port_b_w)
+void meritm_state::audio_pio_port_b_w(uint8_t data)
 {
 	/*
 
@@ -999,7 +987,7 @@ WRITE8_MEMBER(meritm_state::audio_pio_port_b_w)
 	m_ds1204->write_dq(data & 0x01);
 }
 
-WRITE8_MEMBER(meritm_state::io_pio_port_a_w)
+void meritm_state::io_pio_port_a_w(uint8_t data)
 {
 	/*
 
@@ -1017,7 +1005,7 @@ WRITE8_MEMBER(meritm_state::io_pio_port_a_w)
 	*/
 }
 
-WRITE8_MEMBER(meritm_state::io_pio_port_b_w)
+void meritm_state::io_pio_port_b_w(uint8_t data)
 {
 	/*
 
@@ -1127,9 +1115,6 @@ void meritm_state::crt250(machine_config &config)
 	m_z80pio[1]->in_pb_callback().set_ioport("PIO1_PORTB");
 	m_z80pio[1]->out_pb_callback().set(FUNC(meritm_state::io_pio_port_b_w));
 
-	TIMER(config, "vblank_start", 0).configure_scanline(FUNC(meritm_state::vblank_start_tick), "screen", 259, 262);
-	TIMER(config, "vblank_end", 0).configure_scanline(FUNC(meritm_state::vblank_end_tick), "screen", 262, 262);
-
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	DS1204(config, m_ds1204);
@@ -1137,12 +1122,15 @@ void meritm_state::crt250(machine_config &config)
 	V9938(config, m_v9938[0], SYSTEM_CLK);
 	m_v9938[0]->set_screen_ntsc("screen");
 	m_v9938[0]->set_vram_size(0x20000);
-	m_v9938[0]->int_cb().set(FUNC(meritm_state::vdp0_interrupt));
+	//m_v9938[0]->int_cb().set(FUNC(meritm_state::vdp0_interrupt));
 
 	V9938(config, m_v9938[1], SYSTEM_CLK);
 	m_v9938[1]->set_screen_ntsc("screen");
 	m_v9938[1]->set_vram_size(0x20000);
-	m_v9938[1]->int_cb().set(FUNC(meritm_state::vdp0_interrupt));
+	//m_v9938[1]->int_cb().set(FUNC(meritm_state::vdp1_interrupt));
+
+	TIMER(config, "vblank_start", 0).configure_scanline(FUNC(meritm_state::vblank_start_tick), "screen", 259, 262);
+	TIMER(config, "vblank_end", 0).configure_scanline(FUNC(meritm_state::vblank_end_tick), "screen", 262, 262);
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER).set_screen_update(FUNC(meritm_state::screen_update));
 
@@ -1151,7 +1139,7 @@ void meritm_state::crt250(machine_config &config)
 	ay8930_device &aysnd(AY8930(config, "aysnd", SYSTEM_CLK/12));
 	aysnd.port_a_read_callback().set_ioport("DSW");
 	aysnd.port_b_write_callback().set(FUNC(meritm_state::ay8930_port_b_w));
-	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.85);
 }
 
 void meritm_state::crt250_questions(machine_config &config)
@@ -1324,6 +1312,21 @@ ROM_START( pitbosssc ) /* ROMs at U9 and U11 are localized for California, denot
 	ROM_LOAD( "9221-12_u9-1.u9",   0x00000, 0x10000, CRC(6f55ba86) SHA1(6a9b09009f7640fe7862433a2d5ccee8ecd4f846) ) /* 9221-12-01  010892 */
 	ROM_LOAD( "9221-12_u10-0.u10", 0x10000, 0x10000, CRC(853a1a99) SHA1(45e33442aa7e51c05c9ac8b8458937ee3ff4c21d) )
 	ROM_LOAD( "9221-12_u11-1.u11", 0x20000, 0x10000, CRC(869398d0) SHA1(50283ea8cf708ef177976245ec75a1a4c4408dfb) )
+	ROM_LOAD( "9221-12_u12-0.u12", 0x30000, 0x10000, CRC(b9fb4203) SHA1(84b514d9739d9c2ab1081cfc7cdedb41155ee038) )
+	ROM_LOAD( "9221-12_u13-0.u13", 0x40000, 0x10000, CRC(93880b55) SHA1(1bf48bb25ef85a5474d63d1a4912f46772b6be62) )
+	ROM_LOAD( "9221-12_u14-0.u14", 0x50000, 0x10000, CRC(128b4dff) SHA1(945825d654b1dce2e71b4f8613029651c7641fac) )
+	ROM_LOAD( "9221-12_u15-0.u15", 0x60000, 0x10000, CRC(b5beeaa9) SHA1(99db48f83d09616617b585b60614f5819f5dc607) )
+	ROM_LOAD( "9221-12_u16-0.u16", 0x70000, 0x10000, CRC(574fb3c7) SHA1(213741df3055b97ddd9889c2aa3d3e863e2c86d3) ) // matches pitboss2
+
+	ROM_REGION( 0x000022, "ds1204", 0 )
+	ROM_LOAD( "pitbosssc-key", 0x000000, 0x000022, BAD_DUMP CRC(77249fe0) SHA1(719f66742147cb8e5720250ce744e5eb4983ab82) )
+ROM_END
+
+ROM_START( pitbosssm ) /* ROMs at U9 and U11 are localized for Minnesota, denoted by the "-2" in the label */
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "9221-12_u9-2.u9",   0x00000, 0x10000, CRC(d06163ae) SHA1(d6bb002dfee61153a8fd7190e34a538ad3d7c47f) ) /* 9221-12-02  010892 */
+	ROM_LOAD( "9221-12_u10-0.u10", 0x10000, 0x10000, CRC(853a1a99) SHA1(45e33442aa7e51c05c9ac8b8458937ee3ff4c21d) )
+	ROM_LOAD( "9221-12_u11-2.u11", 0x20000, 0x10000, CRC(bb5233bd) SHA1(49a277fd2115661b498040fb7e20be0db3691c8c) )
 	ROM_LOAD( "9221-12_u12-0.u12", 0x30000, 0x10000, CRC(b9fb4203) SHA1(84b514d9739d9c2ab1081cfc7cdedb41155ee038) )
 	ROM_LOAD( "9221-12_u13-0.u13", 0x40000, 0x10000, CRC(93880b55) SHA1(1bf48bb25ef85a5474d63d1a4912f46772b6be62) )
 	ROM_LOAD( "9221-12_u14-0.u14", 0x50000, 0x10000, CRC(128b4dff) SHA1(945825d654b1dce2e71b4f8613029651c7641fac) )
@@ -2408,7 +2411,7 @@ ROM_END
 
 void meritm_state::init_megat3te()
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfff8, 0xffff, read8_delegate(*this, FUNC(meritm_state::ds1644_r)), write8_delegate(*this, FUNC(meritm_state::ds1644_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfff8, 0xffff, read8sm_delegate(*this, FUNC(meritm_state::ds1644_r)), write8sm_delegate(*this, FUNC(meritm_state::ds1644_w)));
 }
 
 /* CRT-250 */
@@ -2420,7 +2423,8 @@ GAME( 1988, pitboss2,  0,        crt250, pitboss2,  meritm_state, empty_init, RO
 GAME( 1988, spitboss,  0,        crt250, spitboss,  meritm_state, empty_init, ROT0, "Merit", "Super Pit Boss (9221-02A)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1990, pitbosss,  0,        crt250, pitbosss,  meritm_state, empty_init, ROT0, "Merit", "Pit Boss Superstar (9221-10-00B)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1990, pitbosssa, pitbosss, crt250, pitbosss,  meritm_state, empty_init, ROT0, "Merit", "Pit Boss Superstar (9221-10-00A)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, pitbosssc, pitbosss, crt250, pitbosss,  meritm_state, empty_init, ROT0, "Merit", "Pit Boss Superstar (9221-12-01)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, pitbosssc, pitbosss, crt250, pitbosss,  meritm_state, empty_init, ROT0, "Merit", "Pit Boss Superstar (9221-12-01, California version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, pitbosssm, pitbosss, crt250, pitbosss,  meritm_state, empty_init, ROT0, "Merit", "Pit Boss Superstar (9221-12-02, Minnesota version)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* CRT-250 + CRT-252 + CRT-256 + CRT-258 */
 GAME( 1994, mtjpoker,  0,        crt250_crt252_crt258, mtjpoker,   meritm_state, empty_init, ROT0, "Merit", "Merit Touch Joker Poker (9132-00)", MACHINE_IMPERFECT_GRAPHICS )

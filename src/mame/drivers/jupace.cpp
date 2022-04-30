@@ -57,7 +57,7 @@ Ports:
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/ace_tap.h"
@@ -104,32 +104,32 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( io_r );
-	DECLARE_WRITE8_MEMBER( io_w );
-	DECLARE_READ8_MEMBER( ppi_pa_r );
-	DECLARE_WRITE8_MEMBER( ppi_pa_w );
-	DECLARE_READ8_MEMBER( ppi_pb_r );
-	DECLARE_WRITE8_MEMBER( ppi_pb_w );
-	DECLARE_READ8_MEMBER( ppi_pc_r );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
-	DECLARE_READ8_MEMBER( ppi_control_r );
-	DECLARE_WRITE8_MEMBER( ppi_control_w );
-	DECLARE_READ8_MEMBER( pio_pa_r );
-	DECLARE_WRITE8_MEMBER( pio_pa_w );
+	uint8_t io_r(offs_t offset);
+	void io_w(uint8_t data);
+	uint8_t ppi_pa_r();
+	void ppi_pa_w(uint8_t data);
+	uint8_t ppi_pb_r();
+	void ppi_pb_w(uint8_t data);
+	uint8_t ppi_pc_r();
+	void ppi_pc_w(uint8_t data);
+	uint8_t ppi_control_r();
+	void ppi_control_w(uint8_t data);
+	uint8_t pio_pa_r();
+	void pio_pa_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(set_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(clear_irq);
-	DECLARE_READ8_MEMBER(pio_ad_r);
-	DECLARE_READ8_MEMBER(pio_bd_r);
-	DECLARE_READ8_MEMBER(pio_ac_r);
-	DECLARE_READ8_MEMBER(pio_bc_r);
-	DECLARE_WRITE8_MEMBER(pio_ad_w);
-	DECLARE_WRITE8_MEMBER(pio_bd_w);
-	DECLARE_WRITE8_MEMBER(pio_ac_w);
-	DECLARE_WRITE8_MEMBER(pio_bc_w);
-	DECLARE_READ8_MEMBER(sby_r);
-	DECLARE_WRITE8_MEMBER(ald_w);
-	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
+	uint8_t pio_ad_r();
+	uint8_t pio_bd_r();
+	uint8_t pio_ac_r();
+	uint8_t pio_bc_r();
+	void pio_ad_w(uint8_t data);
+	void pio_bd_w(uint8_t data);
+	void pio_ac_w(uint8_t data);
+	void pio_bc_w(uint8_t data);
+	uint8_t sby_r();
+	void ald_w(uint8_t data);
+	SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 
 	void ace_io(address_map &map);
 	void ace_mem(address_map &map);
@@ -170,15 +170,16 @@ private:
 
 SNAPSHOT_LOAD_MEMBER(ace_state::snapshot_cb)
 {
+	std::vector<uint8_t> RAM(0x10000);
 	cpu_device *cpu = m_maincpu;
-	uint8_t *RAM = memregion(cpu->tag())->base();
 	address_space &space = cpu->space(AS_PROGRAM);
-	unsigned char ace_repeat, ace_byte, loop;
-	int done=0, ace_index=0x2000;
+	unsigned char ace_repeat, ace_byte;
+	u16 ace_index=0x2000;
+	bool done = false;
 
 	if (m_ram->size() < 16*1024)
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "At least 16KB RAM expansion required");
+		image.seterror(image_error::INVALIDIMAGE, "At least 16KB RAM expansion required");
 		image.message("At least 16KB RAM expansion required");
 		return image_init_result::FAIL;
 	}
@@ -194,7 +195,7 @@ SNAPSHOT_LOAD_MEMBER(ace_state::snapshot_cb)
 			{
 			case 0x00:
 					logerror("File loaded!\r\n");
-					done = 1;
+					done = true;
 					break;
 			case 0x01:
 					image.fread(&ace_byte, 1);
@@ -202,7 +203,7 @@ SNAPSHOT_LOAD_MEMBER(ace_state::snapshot_cb)
 					break;
 			default:
 					image.fread(&ace_repeat, 1);
-					for (loop = 0; loop < ace_byte; loop++)
+					for (u8 loop = 0; loop < ace_byte; loop++)
 						RAM[ace_index++] = ace_repeat;
 					break;
 			}
@@ -215,7 +216,7 @@ SNAPSHOT_LOAD_MEMBER(ace_state::snapshot_cb)
 
 	if (!done)
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "EOF marker not found");
+		image.seterror(image_error::INVALIDIMAGE, "EOF marker not found");
 		image.message("EOF marker not found");
 		return image_init_result::FAIL;
 	}
@@ -248,7 +249,7 @@ SNAPSHOT_LOAD_MEMBER(ace_state::snapshot_cb)
 		cpu->set_state_int(Z80_R, RAM[0x2140]);
 
 		if ((RAM[0x2119] < 0x80) || !ace_index)
-			cpu->set_state_int(STATE_GENSP, RAM[0x2118] | (RAM[0x2119] << 8));
+			cpu->set_state_int(Z80_SP, RAM[0x2118] | (RAM[0x2119] << 8));
 	}
 
 	/* Copy data to the address space */
@@ -266,7 +267,7 @@ SNAPSHOT_LOAD_MEMBER(ace_state::snapshot_cb)
 //   io_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ace_state::io_r )
+uint8_t ace_state::io_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -299,7 +300,7 @@ READ8_MEMBER( ace_state::io_r )
 //   io_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ace_state::io_w )
+void ace_state::io_w(uint8_t data)
 {
 	m_cassette->output(1);
 	m_speaker->level_w(1);
@@ -310,22 +311,22 @@ WRITE8_MEMBER( ace_state::io_w )
 //   ppi_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ace_state::ppi_pa_r )
+uint8_t ace_state::ppi_pa_r()
 {
 	return m_ppi->read(0);
 }
 
-READ8_MEMBER( ace_state::ppi_pb_r )
+uint8_t ace_state::ppi_pb_r()
 {
 	return m_ppi->read(1);
 }
 
-READ8_MEMBER( ace_state::ppi_pc_r )
+uint8_t ace_state::ppi_pc_r()
 {
 	return m_ppi->read(2);
 }
 
-READ8_MEMBER( ace_state::ppi_control_r )
+uint8_t ace_state::ppi_control_r()
 {
 	return m_ppi->read(3);
 }
@@ -335,22 +336,22 @@ READ8_MEMBER( ace_state::ppi_control_r )
 //   ppi_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ace_state::ppi_pa_w )
+void ace_state::ppi_pa_w(uint8_t data)
 {
 	m_ppi->write(0, data);
 }
 
-WRITE8_MEMBER( ace_state::ppi_pb_w )
+void ace_state::ppi_pb_w(uint8_t data)
 {
 	m_ppi->write(1, data);
 }
 
-WRITE8_MEMBER( ace_state::ppi_pc_w )
+void ace_state::ppi_pc_w(uint8_t data)
 {
 	m_ppi->write(2, data);
 }
 
-WRITE8_MEMBER( ace_state::ppi_control_w )
+void ace_state::ppi_control_w(uint8_t data)
 {
 	m_ppi->write(3, data);
 }
@@ -360,22 +361,22 @@ WRITE8_MEMBER( ace_state::ppi_control_w )
 //   pio_r -
 //-------------------------------------------------
 
-READ8_MEMBER(ace_state::pio_ad_r)
+uint8_t ace_state::pio_ad_r()
 {
 	return m_z80pio->data_read(0);
 }
 
-READ8_MEMBER(ace_state::pio_bd_r)
+uint8_t ace_state::pio_bd_r()
 {
 	return m_z80pio->data_read(1);
 }
 
-READ8_MEMBER(ace_state::pio_ac_r)
+uint8_t ace_state::pio_ac_r()
 {
 	return m_z80pio->control_read();
 }
 
-READ8_MEMBER(ace_state::pio_bc_r)
+uint8_t ace_state::pio_bc_r()
 {
 	return m_z80pio->control_read();
 }
@@ -385,22 +386,22 @@ READ8_MEMBER(ace_state::pio_bc_r)
 //   pio_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER(ace_state::pio_ad_w)
+void ace_state::pio_ad_w(uint8_t data)
 {
 	m_z80pio->data_write(0, data);
 }
 
-WRITE8_MEMBER(ace_state::pio_bd_w)
+void ace_state::pio_bd_w(uint8_t data)
 {
 	m_z80pio->data_write(1, data);
 }
 
-WRITE8_MEMBER(ace_state::pio_ac_w)
+void ace_state::pio_ac_w(uint8_t data)
 {
 	m_z80pio->control_write(0, data);
 }
 
-WRITE8_MEMBER(ace_state::pio_bc_w)
+void ace_state::pio_bc_w(uint8_t data)
 {
 	m_z80pio->control_write(1, data);
 }
@@ -419,7 +420,7 @@ void ace_state::ace_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).mirror(0x0400).ram().share("video_ram");
-	map(0x2800, 0x2bff).mirror(0x0400).ram().share("char_ram").region(Z80_TAG, 0xfc00);
+	map(0x2800, 0x2bff).mirror(0x0400).ram().share("char_ram");
 	map(0x3000, 0x33ff).mirror(0x0c00).ram();
 	map(0x4000, 0xffff).ram();
 }
@@ -457,8 +458,8 @@ void ace_state::ace_io(address_map &map)
 
 static INPUT_PORTS_START( ace )
 	PORT_START("A8")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Symbol Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_2)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Symbol Shift") PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z)          PORT_CHAR('z') PORT_CHAR('Z') PORT_CHAR(':')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X)          PORT_CHAR('x') PORT_CHAR('X') PORT_CHAR(0xA3)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C)          PORT_CHAR('c') PORT_CHAR('C') PORT_CHAR('?')
@@ -481,19 +482,19 @@ static INPUT_PORTS_START( ace )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("A11")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1)          PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2)          PORT_CHAR('2') PORT_CHAR('@')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1)          PORT_CHAR('1') PORT_CHAR('!') // DELETE LINE
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2)          PORT_CHAR('2') PORT_CHAR('@') // CAPS LOCK
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3)          PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4)          PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_LEFT) PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4)          PORT_CHAR('4') PORT_CHAR('$') // INVERSE VIDEO
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_LEFT) PORT_CHAR('5') PORT_CHAR('%') PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("A12")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0)          PORT_CHAR('0') PORT_CHAR('_')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9)          PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_DOWN) PORT_CHAR('7') PORT_CHAR('\'')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_UP)    PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0)          PORT_CHAR('0') PORT_CHAR('_') // DELETE
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9)          PORT_CHAR('9') PORT_CHAR(')') // GRAPHICS
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR('8') PORT_CHAR('(') PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_DOWN)  PORT_CHAR('7') PORT_CHAR('\'') PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_UP)    PORT_CHAR('6') PORT_CHAR('&') PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("A13")
@@ -509,11 +510,11 @@ static INPUT_PORTS_START( ace )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L)          PORT_CHAR('l') PORT_CHAR('L') PORT_CHAR('=')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K)          PORT_CHAR('k') PORT_CHAR('K') PORT_CHAR('+')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J)          PORT_CHAR('j') PORT_CHAR('J') PORT_CHAR('-')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("h  H  \xE2\x86\x91") PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("h  H  \xE2\x86\x91") PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H') PORT_CHAR('^')
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("A15")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(' ')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(' ') // BREAK
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M)          PORT_CHAR('m') PORT_CHAR('M') PORT_CHAR('.')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N)          PORT_CHAR('n') PORT_CHAR('N') PORT_CHAR(',')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B)          PORT_CHAR('b') PORT_CHAR('B') PORT_CHAR('*')
@@ -584,21 +585,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(ace_state::clear_irq)
 
 uint32_t ace_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=56,ma=0,x;
-
-	for (y = 0; y < 24; y++)
+	uint16_t sy=56, ma=0;
+	for (uint8_t y = 0; y < 24; y++)
 	{
-		for (ra = 0; ra < 8; ra++)
+		for (uint8_t ra = 0; ra < 8; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++, 40);
+			uint16_t *p = &bitmap.pix(sy++, 40);
 
-			for (x = ma; x < ma+32; x++)
+			for (uint16_t x = ma; x < ma+32; x++)
 			{
-				chr = m_video_ram[x];
+				uint8_t const chr = m_video_ram[x];
 
 				/* get pattern of pixels for that character scanline */
-				gfx = m_char_ram[((chr&0x7f)<<3) | ra] ^ (BIT(chr, 7) ? 0xff : 0);
+				uint8_t const gfx = m_char_ram[((chr&0x7f)<<3) | ra] ^ (BIT(chr, 7) ? 0xff : 0);
 
 				/* Display a scanline of a character (8 pixels) */
 				*p++ = BIT(gfx, 7);
@@ -626,7 +625,7 @@ uint32_t ace_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 //  I8255A interface
 //-------------------------------------------------
 
-READ8_MEMBER(ace_state::sby_r)
+uint8_t ace_state::sby_r()
 {
 	/*
 
@@ -646,7 +645,7 @@ READ8_MEMBER(ace_state::sby_r)
 	return m_sp0256->sby_r();
 }
 
-WRITE8_MEMBER(ace_state::ald_w)
+void ace_state::ald_w(uint8_t data)
 {
 	/*
 
@@ -673,7 +672,7 @@ WRITE8_MEMBER(ace_state::ald_w)
 //  Z80PIO
 //-------------------------------------------------
 
-READ8_MEMBER( ace_state::pio_pa_r )
+uint8_t ace_state::pio_pa_r()
 {
 	/*
 
@@ -693,7 +692,7 @@ READ8_MEMBER( ace_state::pio_pa_r )
 	return 0;
 }
 
-WRITE8_MEMBER( ace_state::pio_pa_w )
+void ace_state::pio_pa_w(uint8_t data)
 {
 	/*
 
@@ -804,7 +803,7 @@ void ace_state::ace(machine_config &config)
 	m_z80pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_z80pio->in_pa_callback().set(FUNC(ace_state::pio_pa_r));
 	m_z80pio->out_pa_callback().set(FUNC(ace_state::pio_pa_w));
-	m_z80pio->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_z80pio->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::write));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 
@@ -829,14 +828,14 @@ void ace_state::ace(machine_config &config)
 //-------------------------------------------------
 
 ROM_START( jupace )
-	ROM_REGION( 0x10000, Z80_TAG, 0 )
+	ROM_REGION( 0x2000, Z80_TAG, 0 )
 	ROM_LOAD( "rom-a.z1", 0x0000, 0x1000, CRC(dc8438a5) SHA1(8fa97eb71e5dd17c7d190c6587ee3840f839347c) )
 	ROM_LOAD( "rom-b.z2", 0x1000, 0x1000, CRC(4009f636) SHA1(98c5d4bcd74bcf014268cf4c00b2007ea5cc21f3) )
 
 	ROM_REGION( 0x1000, "fdc", 0 ) // Deep Thought disc interface
 	ROM_LOAD( "dos 4.bin", 0x0000, 0x1000, CRC(04c70448) SHA1(53ddcced6ae2feafd687a3b55864726656b71412) )
 
-	ROM_REGION( 0x10000, SP0256AL2_TAG, 0 )
+	ROM_REGION( 0x800, SP0256AL2_TAG, 0 )
 	ROM_LOAD( "sp0256-al2.ic1", 0x000, 0x800, CRC(b504ac15) SHA1(e60fcb5fa16ff3f3b69d36c7a6e955744d3feafc) )
 ROM_END
 
@@ -847,4 +846,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY           FULLNAME       FLAGS
-COMP( 1981, jupace, 0,      0,      ace,     ace,   ace_state, empty_init, "Jupiter Cantab", "Jupiter Ace", 0 )
+COMP( 1981, jupace, 0,      0,      ace,     ace,   ace_state, empty_init, "Jupiter Cantab", "Jupiter Ace", MACHINE_SUPPORTS_SAVE )

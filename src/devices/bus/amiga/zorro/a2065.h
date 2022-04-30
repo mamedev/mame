@@ -18,7 +18,7 @@
 #include "machine/autoconfig.h"
 
 
-namespace bus { namespace amiga { namespace zorro {
+namespace bus::amiga::zorro {
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -32,11 +32,11 @@ public:
 	// construction/destruction
 	a2065_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER( host_ram_r );
-	DECLARE_WRITE16_MEMBER( host_ram_w );
+	uint16_t host_ram_r(offs_t offset);
+	void host_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_READ16_MEMBER( lance_ram_r );
-	DECLARE_WRITE16_MEMBER( lance_ram_w );
+	uint16_t lance_ram_r(offs_t offset);
+	void lance_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER( lance_irq_w );
 
 protected:
@@ -56,7 +56,7 @@ private:
 	std::unique_ptr<uint16_t[]> m_ram;
 };
 
-} } } // namespace bus::amiga::zorro
+} // namespace bus::amiga::zorro
 
 // device type definition
 DECLARE_DEVICE_TYPE_NS(ZORRO_A2065, bus::amiga::zorro, a2065_device)

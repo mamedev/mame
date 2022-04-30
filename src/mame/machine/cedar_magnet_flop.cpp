@@ -201,7 +201,7 @@ void cedar_magnet_flop_device::port63_w(u8 data)
 
 }
 
-WRITE8_MEMBER(cedar_magnet_flop_device::write)
+void cedar_magnet_flop_device::write(offs_t offset, u8 data)
 {
 	switch (offset & 3)
 	{
@@ -213,7 +213,7 @@ WRITE8_MEMBER(cedar_magnet_flop_device::write)
 	}
 }
 
-READ8_MEMBER(cedar_magnet_flop_device::read)
+u8 cedar_magnet_flop_device::read(offs_t offset)
 {
 	switch (offset & 3)
 	{

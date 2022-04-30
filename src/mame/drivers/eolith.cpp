@@ -3,7 +3,7 @@
 /********************************************************************
  Eolith 32 bits hardware: Gradation 2D system
 
- driver by Tomasz Slanina    analog [at] op.pl
+ driver by Tomasz Slanina
  and       Pierpaolo Prazzoli
 
  Main CPU:
@@ -75,7 +75,8 @@
 
   - racooon (Raccoon World)
 
-      Game animation seems too fast?
+      Game animation & timers seem too fast? demoted to NOT WORKING as a
+      result
 
 -----------------------------------------------------------------------------
  Game Issues (unknown):
@@ -121,7 +122,7 @@ void eolith_state::machine_start()
 	m_led.resolve();
 }
 
-READ32_MEMBER(eolith_state::eolith_custom_r)
+uint32_t eolith_state::eolith_custom_r()
 {
 	/*
 	    bit 3 = eeprom bit
@@ -136,7 +137,7 @@ READ32_MEMBER(eolith_state::eolith_custom_r)
 	return (m_in0->read() & ~0x300) | (machine().rand() & 0x300);
 }
 
-WRITE32_MEMBER(eolith_state::systemcontrol_w)
+void eolith_state::systemcontrol_w(uint32_t data)
 {
 	m_buffer = (data & 0x80) >> 7;
 	machine().bookkeeping().coin_counter_w(0, data & m_coin_counter_bit);
@@ -148,7 +149,7 @@ WRITE32_MEMBER(eolith_state::systemcontrol_w)
 }
 
 template<int Player>
-READ32_MEMBER(eolith_state::hidctch3_pen_r)
+uint32_t eolith_state::hidctch3_pen_r()
 {
 	//320 x 240
 	int xpos = m_penxport[Player]->read();
@@ -164,7 +165,7 @@ READ32_MEMBER(eolith_state::hidctch3_pen_r)
  *
  *************************************/
 
-WRITE8_MEMBER( eolith_state::sound_p1_w )
+void eolith_state::sound_p1_w(uint8_t data)
 {
 	// .... xxxx - Data ROM bank (32kB)
 	// ...x .... - Unknown (Usually 1?)
@@ -191,13 +192,13 @@ WRITE8_MEMBER( eolith_state::sound_p1_w )
     P37 (O) RDB      (/RD)
 */
 
-READ8_MEMBER( eolith_state::qs1000_p1_r )
+uint8_t eolith_state::qs1000_p1_r()
 {
 	// Sound banking? (must be 1)
 	return 1;
 }
 
-WRITE8_MEMBER( eolith_state::qs1000_p1_w )
+void eolith_state::qs1000_p1_w(uint8_t data)
 {
 }
 
@@ -208,7 +209,7 @@ WRITE8_MEMBER( eolith_state::qs1000_p1_w )
  *
  *************************************/
 
-WRITE8_MEMBER(eolith_state::soundcpu_to_qs1000)
+void eolith_state::soundcpu_to_qs1000(uint8_t data)
 {
 	m_qs1000->serial_in(data);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(250));
@@ -570,8 +571,6 @@ void eolith_state::eolith45(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, palette_device::RGB_555);
-
-	MCFG_VIDEO_START_OVERRIDE(eolith_state,eolith)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1758,7 +1757,7 @@ GAME( 1998, ironfort,  0,        ironfort, ironfort,  eolith_state, init_eolith,
 GAME( 1998, ironfortc, ironfort, ironfort, ironfortc, eolith_state, init_eolith,   ROT0, "Eolith (Excellent Competence Ltd. license)", "Gongtit Jiucoi Iron Fortress (Hong Kong)", MACHINE_SUPPORTS_SAVE ) // Licensed/Distributed to Hong Kong company Excellent Competence Ltd.
 GAME( 1998, hidnctch,  0,        eolith45, hidnctch,  eolith_state, init_eolith,   ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.03)",  MACHINE_SUPPORTS_SAVE ) // or Teurrin Geurim Chajgi '98
 GAME( 1998, hidnctcha, hidnctch, eolith45, hidnctch,  eolith_state, init_eolith,   ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.02)",  MACHINE_SUPPORTS_SAVE ) // or Teurrin Geurim Chajgi '98
-GAME( 1998, raccoon,   0,        eolith45, raccoon,   eolith_state, init_eolith,   ROT0, "Eolith", "Raccoon World", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, raccoon,   0,        eolith45, raccoon,   eolith_state, init_eolith,   ROT0, "Eolith", "Raccoon World", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1998, puzzlekg,  0,        eolith45, puzzlekg,  eolith_state, init_eolith,   ROT0, "Eolith", "Puzzle King (Dance & Puzzle)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1999, candy,     0,        eolith50, candy,     eolith_state, init_eolith,   ROT0, "Eolith", "Candy Candy",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1999, hidctch2,  0,        eolith50, hidctch2,  eolith_state, init_hidctch2, ROT0, "Eolith", "Hidden Catch 2 (pcb ver 3.03) (Kor/Eng) (AT89c52 protected)", MACHINE_SUPPORTS_SAVE )

@@ -1,9 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz, David Haywood
 
+#include "emu.h"
 #include "includes/spg2xx.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "softlist_dev.h"
+
 
 class telestory_state : public spg2xx_game_state
 {
@@ -22,13 +26,13 @@ protected:
 
 	void mem_map_4m_tsram(address_map& map);
 
-	DECLARE_READ16_MEMBER(porta_r);
-	DECLARE_READ16_MEMBER(portb_r);
-	DECLARE_READ16_MEMBER(portc_r);
+	uint16_t porta_r();
+	uint16_t portb_r();
+	uint16_t portc_r();
 
-	virtual DECLARE_WRITE16_MEMBER(porta_w) override;
-	virtual DECLARE_WRITE16_MEMBER(portb_w) override;
-	virtual DECLARE_WRITE16_MEMBER(portc_w) override;
+	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	virtual void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load_telestory);
 
@@ -181,14 +185,14 @@ static INPUT_PORTS_START( telestory ) // there is a hidden test mode, if you ret
 INPUT_PORTS_END
 
 
-READ16_MEMBER(telestory_state::porta_r)
+uint16_t telestory_state::porta_r()
 {
 	uint16_t data = m_io_p1->read();
 	//logerror("%s: porta_r: %04x\n", machine().describe_context(), data);
 	return data;
 }
 
-WRITE16_MEMBER(telestory_state::porta_w)
+void telestory_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	not used as an output very often
@@ -201,7 +205,7 @@ WRITE16_MEMBER(telestory_state::porta_w)
 	logerror("%s: porta_w (%04x)\n", machine().describe_context(), data);
 }
 
-READ16_MEMBER(telestory_state::portb_r)
+uint16_t telestory_state::portb_r()
 {
 	// not used?
 	uint16_t data = m_io_p2->read();
@@ -209,20 +213,20 @@ READ16_MEMBER(telestory_state::portb_r)
 	return data;
 }
 
-WRITE16_MEMBER(telestory_state::portb_w)
+void telestory_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// not used?
 	logerror("%s: portb_w (%04x)\n", machine().describe_context(), data);
 }
 
 // What is here? accessed using serial protocol with clocked bits
-READ16_MEMBER(telestory_state::portc_r)
+uint16_t telestory_state::portc_r()
 {
 	//logerror("%s: portc_r\n", machine().describe_context());
 	return machine().rand() & 0x0c00; // bits need to change state or it doesn't boot
 }
 
-WRITE16_MEMBER(telestory_state::portc_w)
+void telestory_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//logerror("%s: portc_w (%04x)\n", machine().describe_context(), data);
 }
@@ -254,7 +258,7 @@ DEVICE_IMAGE_LOAD_MEMBER(telestory_state::cart_load_telestory)
 
 	if (size > 0x800000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 		return image_init_result::FAIL;
 	}
 

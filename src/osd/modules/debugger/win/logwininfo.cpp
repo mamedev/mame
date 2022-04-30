@@ -19,7 +19,7 @@ logwin_info::logwin_info(debugger_windows_interface &debugger) :
 	if (!window())
 		return;
 
-	m_views[0].reset(global_alloc(logview_info(debugger, *this, window())));
+	m_views[0].reset(new logview_info(debugger, *this, window()));
 	if ((m_views[0] == nullptr) || !m_views[0]->is_valid())
 	{
 		m_views[0].reset();

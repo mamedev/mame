@@ -354,7 +354,7 @@ protected:
 	// device callbacks
 	devcb_read_line        m_read_wait;
 	devcb_read_line        m_read_clear;
-	devcb_read_line        m_read_ef[4];
+	devcb_read_line::array<4> m_read_ef;
 	devcb_write_line       m_write_q;
 	devcb_read8            m_read_dma;
 	devcb_write8           m_write_dma;
@@ -415,9 +415,9 @@ protected:
 
 	// internal stuff
 	int                 m_icount;
-	address_space *     m_program;
-	address_space *     m_io;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access< 3, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 
 	// opcode/condition tables
 	typedef void (cosmac_device::*ophandler)();

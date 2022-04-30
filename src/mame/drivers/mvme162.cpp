@@ -206,8 +206,8 @@ mvme162_state(const machine_config &mconfig, device_type type, const char *tag)
 	void mvme162(machine_config &confg);
 
 private:
-	DECLARE_READ32_MEMBER (bootvect_r);
-	DECLARE_WRITE32_MEMBER (bootvect_w);
+	uint32_t bootvect_r(offs_t offset);
+	void bootvect_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	virtual void machine_start () override;
 	virtual void machine_reset () override;
 	void mvme162_mem(address_map &map);
@@ -217,14 +217,14 @@ private:
 	//required_device<scc85230_device> m_sccterm2;
 
 	// Pointer to System ROMs needed by bootvect_r and masking RAM buffer for post reset accesses
-	uint32_t *m_sysrom;
-	uint32_t m_sysram[2];
+	uint32_t *m_sysrom = nullptr;
+	uint32_t m_sysram[2]{};
 
 	// PCC registers
-	uint8_t m_genpurp_stat;
+	uint8_t m_genpurp_stat = 0;
 
 	// VME chip registers
-	uint8_t m_vc_cntl_conf;
+	uint8_t m_vc_cntl_conf = 0;
 };
 
 void mvme162_state::mvme162_mem(address_map &map)
@@ -277,16 +277,16 @@ void mvme162_state::machine_reset ()
   in the MCchip EPROM control register is high (ROM0=1). ROM0 is set to 1 after each reset. The ROM0 bit must be
   cleared before other resources (DRAM or SRAM) can be mapped in this range ($00000000 - $001FFFFF).
 */
-READ32_MEMBER (mvme162_state::bootvect_r)
+uint32_t mvme162_state::bootvect_r(offs_t offset)
 {
 	return m_sysrom[offset];
 }
 
-WRITE32_MEMBER (mvme162_state::bootvect_w)
+void mvme162_state::bootvect_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_sysram[offset % sizeof(m_sysram)] &= ~mem_mask;
 	m_sysram[offset % sizeof(m_sysram)] |= (data & mem_mask);
-	m_sysrom = &m_sysram[0]; // redirect all upcomming accesses to masking RAM until reset.
+	m_sysrom = &m_sysram[0]; // redirect all upcoming accesses to masking RAM until reset.
 }
 
 /*

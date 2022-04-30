@@ -6,9 +6,16 @@
 SciSys Chess Partner 2000, also sold by Novag with the same name.
 It's probably the last SciSys / Novag collaboration.
 
-- 3850PK CPU at ~2MHz, 3853PK memory interface
+Hardware notes:
+- 3850PK CPU at ~2.77MHz(averaged), 3853PK memory interface
 - 4KB ROM, 256 bytes RAM(2*2111N)
 - 4-digit 7seg panel, sensory chessboard
+
+3850 is officially rated 2MHz, and even the CP2000 manual says it runs at 2MHz,
+but tests show that the chesscomputer runs at a much higher speed. Three individual
+CP2000 were measured, by timing move calculation, and one recording to verify
+beeper pitch and display blinking rate. Real CP2000 CPU frequency is in the
+2.63MHz to 2.91MHz range.
 
 Entering moves is not as friendly as newer sensory games. The player is expected
 to press ENTER after their own move, but if they (accidentally) press it after
@@ -19,12 +26,13 @@ Capturing pieces is also unintuitive, having to press the destination square twi
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
-#include "video/pwm.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
-#include "sound/volt_reg.h"
+#include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -65,22 +73,17 @@ private:
 
 	// I/O handlers
 	void update_display();
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void control_w(u8 data);
+	void digit_w(u8 data);
+	u8 input_r();
 
-	u16 m_inp_mux;
-	u8 m_select;
-	u8 m_7seg_data;
+	u16 m_inp_mux = 0;
+	u8 m_select = 0;
+	u8 m_7seg_data = 0;
 };
 
 void cp2000_state::machine_start()
 {
-	// zerofill
-	m_inp_mux = 0;
-	m_select = 0;
-	m_7seg_data = 0;
-
 	// register for savestates
 	save_item(NAME(m_select));
 	save_item(NAME(m_inp_mux));
@@ -100,7 +103,7 @@ void cp2000_state::update_display()
 	m_display->matrix(m_select, m_7seg_data);
 }
 
-WRITE8_MEMBER(cp2000_state::control_w)
+void cp2000_state::control_w(u8 data)
 {
 	// d0-d3: digit select
 	m_select = ~data;
@@ -112,7 +115,7 @@ WRITE8_MEMBER(cp2000_state::control_w)
 	m_dac->write(BIT(~data, 5));
 }
 
-READ8_MEMBER(cp2000_state::input_r)
+u8 cp2000_state::input_r()
 {
 	u8 data = m_inp_mux;
 
@@ -142,7 +145,7 @@ READ8_MEMBER(cp2000_state::input_r)
 	return data;
 }
 
-WRITE8_MEMBER(cp2000_state::digit_w)
+void cp2000_state::digit_w(u8 data)
 {
 	// d0-d3: chessboard input mux (demux)
 	// d0-d7: keypad input mux (direct)
@@ -212,28 +215,27 @@ INPUT_PORTS_END
 
 void cp2000_state::cp2000(machine_config &config)
 {
-	/* basic machine hardware */
-	F8(config, m_maincpu, 2000000);
+	// basic machine hardware
+	F8(config, m_maincpu, 2750000); // see driver notes
 	m_maincpu->set_addrmap(AS_PROGRAM, &cp2000_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &cp2000_state::main_io);
 	m_maincpu->set_irq_acknowledge_callback("f3853", FUNC(f3853_device::int_acknowledge));
 
-	f3853_device &f3853(F3853(config, "f3853", 2000000));
+	f3853_device &f3853(F3853(config, "f3853", 2750000));
 	f3853.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(100));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 7);
 	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_saitek_cp2000);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
 

@@ -4,7 +4,7 @@
 
     cop400.h
 
-    National Semiconductor COPS Emulator.
+    National Semiconductor COPS(COP400 series) emulator.
 
 ***************************************************************************/
 
@@ -17,7 +17,7 @@
     CONSTANTS
 ***************************************************************************/
 
-/* register access indexes */
+// register access indexes
 enum
 {
 	COP400_PC,
@@ -37,23 +37,23 @@ enum
 	COP400_SKIP
 };
 
-/* input lines */
+// input lines
 enum
 {
-	/* COP420 */
+	// COP420
 	COP400_IN0 = 0,
 	COP400_IN1,
 	COP400_IN2,
 	COP400_IN3,
 
-	/* COP404L */
+	// COP404L
 	COP400_MB,
 	COP400_DUAL,
 	COP400_SEL10,
 	COP400_SEL20
 };
 
-/* CKI bonding options */
+// CKI bonding options
 enum cop400_cki_bond {
 	COP400_CKI_DIVISOR_4 = 4,
 	COP400_CKI_DIVISOR_8 = 8,
@@ -61,7 +61,7 @@ enum cop400_cki_bond {
 	COP400_CKI_DIVISOR_32 = 32
 };
 
-/* CKO bonding options */
+// CKO bonding options
 enum cop400_cko_bond {
 	COP400_CKO_OSCILLATOR_OUTPUT = 0,
 	COP400_CKO_RAM_POWER_SUPPLY,
@@ -73,7 +73,7 @@ enum cop400_cko_bond {
 class cop400_cpu_device : public cpu_device
 {
 public:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// L pins: 8-bit bi-directional
 	auto read_l() { return m_read_l.bind(); }
@@ -113,8 +113,14 @@ public:
 	void set_cko(cop400_cko_bond cko) { m_cko = cko; }
 	void set_microbus(bool has_microbus) { m_has_microbus = has_microbus; }
 
-	DECLARE_READ8_MEMBER( microbus_rd );
-	DECLARE_WRITE8_MEMBER( microbus_wr );
+	// output pin state accessors
+	int so_r() { return m_so_output; }
+	int sk_r() { return m_sk_output; }
+	uint8_t l_r() { return m_l_output; }
+
+	// microbus
+	uint8_t microbus_r();
+	void microbus_w(uint8_t data);
 
 	void data_128b(address_map &map);
 	void data_32b(address_map &map);
@@ -122,6 +128,7 @@ public:
 	void program_1kb(address_map &map);
 	void program_2kb(address_map &map);
 	void program_512b(address_map &map);
+
 protected:
 	// construction/destruction
 	cop400_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t program_addr_bits, uint8_t data_addr_bits, uint8_t featuremask, uint8_t g_mask, uint8_t d_mask, uint8_t in_mask, bool has_counter, bool has_inil, address_map_constructor internal_map_program, address_map_constructor internal_map_data);
@@ -184,51 +191,53 @@ protected:
 	bool m_has_counter;
 	bool m_has_inil;
 
-	address_space *m_program;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
-	address_space *m_data;
+	memory_access<11, 0, 0, ENDIANNESS_LITTLE>::cache m_program;
+	memory_access< 7, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
 
 	uint8_t m_featuremask;
 
-	/* registers */
-	uint16_t  m_pc;             /* 9/10/11-bit ROM address program counter */
-	uint16_t  m_prevpc;         /* previous value of program counter */
-	uint8_t   m_a;              /* 4-bit accumulator */
-	uint8_t   m_b;              /* 5/6/7-bit RAM address register */
-	int     m_c;              /* 1-bit carry register */
-	uint8_t   m_en;             /* 4-bit enable register */
-	uint8_t   m_g;              /* 4-bit general purpose I/O port */
-	uint8_t   m_q;              /* 8-bit latch for L port */
-	uint16_t  m_sa, m_sb, m_sc; /* subroutine save registers */
-	uint8_t   m_sio;            /* 4-bit shift register and counter */
-	int     m_skl;            /* 1-bit latch for SK output */
+	// registers
+	uint16_t m_pc;             // 9/10/11-bit ROM address program counter
+	uint16_t m_prevpc;         // previous value of program counter
+	uint8_t  m_a;              // 4-bit accumulator
+	uint8_t m_b;               // 5/6/7-bit RAM address register
+	int m_c;                   // 1-bit carry register
+	uint8_t m_en;              // 4-bit enable register
+	uint8_t m_g;               // 4-bit general purpose I/O port
+	uint8_t m_q;               // 8-bit latch for L port
+	uint16_t m_sa, m_sb, m_sc; // subroutine save registers
+	uint8_t m_sio;             // 4-bit shift register and counter
+	int m_skl;                 // 1-bit latch for SK output
 
-	/* counter */
-	uint8_t   m_t;              /* 8-bit timer */
-	int     m_skt_latch;      /* timer overflow latch */
+	// counter
+	uint8_t m_t;               // 8-bit timer
+	int m_skt_latch;           // timer overflow latch
 
-	/* input/output ports */
-	uint8_t   m_g_mask;         /* G port mask */
-	uint8_t   m_d_mask;         /* D port mask */
-	uint8_t   m_in_mask;        /* IN port mask */
-	uint8_t   m_il;             /* IN latch */
-	uint8_t   m_in[4];          /* IN port shift register */
-	uint8_t   m_si;             /* serial input */
+	// input/output ports
+	uint8_t m_g_mask;          // G port mask
+	uint8_t m_d_mask;          // D port mask
+	uint8_t m_in_mask;         // IN port mask
+	uint8_t m_il;              // IN latch
+	uint8_t m_in[4];           // IN port shift register
+	uint8_t m_si;              // serial input
+	int m_so_output;           // SO pin output state
+	int m_sk_output;           // SK pin output state
+	uint8_t m_l_output;        // L pins output state
 
-	/* skipping logic */
-	bool m_skip;               /* skip next instruction */
-	int m_skip_lbi;           /* skip until next non-LBI instruction */
-	bool m_last_skip;          /* last value of skip */
-	bool m_halt;               /* halt mode */
-	bool m_idle;               /* idle mode */
+	// skipping logic
+	bool m_skip;               // skip next instruction
+	int m_skip_lbi;            // skip until next non-LBI instruction
+	bool m_last_skip;          // last value of skip
+	bool m_halt;               // halt mode
+	bool m_idle;               // idle mode
 
-	/* execution logic */
-	int m_InstLen[256];       /* instruction length in bytes */
-	int m_icount;             /* instruction counter */
-	uint8_t m_opcode;         /* opcode being executed */
-	bool m_second_byte;       /* second byte of opcode */
+	// execution logic
+	int m_instlen[256];        // instruction length in bytes
+	int m_icount;              // instruction counter
+	uint8_t m_opcode;          // opcode being executed
+	bool m_second_byte;        // second byte of opcode
 
-	/* timers */
+	// timers
 	emu_timer *m_counter_timer;
 
 	typedef void (cop400_cpu_device::*cop400_opcode_func)(uint8_t operand);
@@ -265,7 +274,7 @@ protected:
 
 	uint8_t get_flags() const;
 	void set_flags(uint8_t flags);
-	uint8_t get_m() const;
+	uint8_t get_m();
 	void set_m(uint8_t m);
 
 	void illegal(uint8_t operand);

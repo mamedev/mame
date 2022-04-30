@@ -7,8 +7,6 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "machine/atarigen.h"
-#include "video/atarimo.h"
 #include "includes/xybots.h"
 
 
@@ -25,7 +23,7 @@ TILE_GET_INFO_MEMBER(xybots_state::get_alpha_tile_info)
 	int code = data & 0x3ff;
 	int color = (data >> 12) & 7;
 	int opaque = data & 0x8000;
-	SET_TILE_INFO_MEMBER(2, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
+	tileinfo.set(2, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
 }
 
 
@@ -34,7 +32,7 @@ TILE_GET_INFO_MEMBER(xybots_state::get_playfield_tile_info)
 	uint16_t data = m_playfield_tilemap->basemem_read(tile_index);
 	int code = data & 0x1fff;
 	int color = (data >> 11) & 0x0f;
-	SET_TILE_INFO_MEMBER(0, code, color, (data >> 15) & 1);
+	tileinfo.set(0, code, color, (data >> 15) & 1);
 }
 
 
@@ -100,8 +98,8 @@ uint32_t xybots_state::screen_update_xybots(screen_device &screen, bitmap_ind16 
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->top(); y <= rect->bottom(); y++)
 		{
-			uint16_t *mo = &mobitmap.pix16(y);
-			uint16_t *pf = &bitmap.pix16(y);
+			uint16_t const *const mo = &mobitmap.pix(y);
+			uint16_t *const pf = &bitmap.pix(y);
 			for (int x = rect->left(); x <= rect->right(); x++)
 				if (mo[x] != 0xffff)
 				{
@@ -119,9 +117,9 @@ uint32_t xybots_state::screen_update_xybots(screen_device &screen, bitmap_ind16 
 					    else
 					        GPC(P3-0) = ~MOCOL3-0
 					*/
-					int mopriority = (mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT) ^ 15;
-					int pfcolor = (pf[x] >> 4) & 0x0f;
-					int prien = ((mo[x] & 0x0f) > 1);
+					int const mopriority = (mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT) ^ 15;
+					int const pfcolor = (pf[x] >> 4) & 0x0f;
+					int const prien = ((mo[x] & 0x0f) > 1);
 
 					if (prien)
 					{

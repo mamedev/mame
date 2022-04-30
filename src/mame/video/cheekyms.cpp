@@ -40,7 +40,7 @@ void cheekyms_state::cheekyms_palette(palette_device &palette) const
 	}
 }
 
-WRITE8_MEMBER(cheekyms_state::port_40_w)
+void cheekyms_state::port_40_w(uint8_t data)
 {
 	m_sound_board->music_w(BIT(data, 7));
 	m_sound_board->cheese_w(BIT(data, 6));
@@ -52,7 +52,7 @@ WRITE8_MEMBER(cheekyms_state::port_40_w)
 }
 
 
-WRITE8_MEMBER(cheekyms_state::port_80_w)
+void cheekyms_state::port_80_w(uint8_t data)
 {
 	m_sound_board->coin_extra_w(BIT(data, 1));
 	m_sound_board->mute_w(BIT(data, 0));
@@ -94,7 +94,7 @@ TILE_GET_INFO_MEMBER(cheekyms_state::get_tile_info)
 			color = palette | (x >> 1);
 	}
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void cheekyms_state::video_start()
@@ -151,7 +151,6 @@ void cheekyms_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 uint32_t cheekyms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int y, x;
 	int scrolly = ((*m_port_80 >> 3) & 0x07);
 	int flip = *m_port_80 & 0x80;
 
@@ -168,9 +167,9 @@ uint32_t cheekyms_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_cm_tilemap->draw(screen, *m_bitmap_buffer, cliprect, 0, 0);
 
 	/* draw the tilemap to the final bitmap applying the scroll to the man character */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			int in_man_area;
 
@@ -185,13 +184,13 @@ uint32_t cheekyms_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 			if (in_man_area)
 			{
-				if ((y + scrolly) < 27 * 8 && m_bitmap_buffer->pix16(y + scrolly, x) != 0)
-					bitmap.pix16(y, x) = m_bitmap_buffer->pix16(y + scrolly, x);
+				if ((y + scrolly) < 27 * 8 && m_bitmap_buffer->pix(y + scrolly, x) != 0)
+					bitmap.pix(y, x) = m_bitmap_buffer->pix(y + scrolly, x);
 			}
 			else
 			{
-				if(m_bitmap_buffer->pix16(y, x) != 0)
-					bitmap.pix16(y, x) = m_bitmap_buffer->pix16(y, x);
+				if(m_bitmap_buffer->pix(y, x) != 0)
+					bitmap.pix(y, x) = m_bitmap_buffer->pix(y, x);
 			}
 		}
 	}

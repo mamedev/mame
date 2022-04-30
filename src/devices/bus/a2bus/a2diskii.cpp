@@ -24,7 +24,6 @@
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(A2BUS_DISKII,    a2bus_diskii_device,    "a2diskii",   "Apple Disk II controller")
-DEFINE_DEVICE_TYPE(A2BUS_IWM_FDC,   a2bus_iwmflop_device,   "a2iwm_flop", "Apple IWM floppy card")
 DEFINE_DEVICE_TYPE(A2BUS_AGAT7_FDC, a2bus_agat7flop_device, "agat7_flop", "Agat-7 140K floppy card")
 DEFINE_DEVICE_TYPE(A2BUS_AGAT9_FDC, a2bus_agat9flop_device, "agat9_flop", "Agat-9 140K floppy card")
 
@@ -69,14 +68,7 @@ ROM_END
 
 void a2bus_floppy_device::device_add_mconfig(machine_config &config)
 {
-	APPLEFDC(config, m_fdc, &fdc_interface);
-	FLOPPY_APPLE(config, FLOPPY_0, &floppy_interface, 15, 16);
-	FLOPPY_APPLE(config, FLOPPY_1, &floppy_interface, 15, 16);
-}
-
-void a2bus_iwmflop_device::device_add_mconfig(machine_config &config)
-{
-	IWM(config, m_fdc, &fdc_interface);
+	LEGACY_APPLEFDC(config, m_fdc, &fdc_interface);
 	FLOPPY_APPLE(config, FLOPPY_0, &floppy_interface, 15, 16);
 	FLOPPY_APPLE(config, FLOPPY_1, &floppy_interface, 15, 16);
 }
@@ -113,11 +105,6 @@ a2bus_floppy_device::a2bus_floppy_device(const machine_config &mconfig, device_t
 
 a2bus_diskii_device::a2bus_diskii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	a2bus_floppy_device(mconfig, A2BUS_DISKII, tag, owner, clock)
-{
-}
-
-a2bus_iwmflop_device::a2bus_iwmflop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_floppy_device(mconfig, A2BUS_IWM_FDC, tag, owner, clock)
 {
 }
 

@@ -45,7 +45,7 @@ void homedata_state::mrokumei_handleblit( int rom_base )
 	int dest_addr;
 	int base_addr;
 	int opcode, data, num_tiles;
-	uint8_t *pBlitData = &m_blit_rom[rom_base & m_blit_rom.mask()];
+	uint8_t *pBlitData = &m_blit_rom[rom_base & (m_blit_rom.length() - 1)];
 
 	dest_param = m_blitter_param[(m_blitter_param_count - 4) & 3] * 256 +
 		m_blitter_param[(m_blitter_param_count - 3) & 3];
@@ -130,7 +130,7 @@ void homedata_state::reikaids_handleblit( int rom_base )
 	int flipx;
 	int source_addr, base_addr;
 	int dest_addr;
-	uint8_t *pBlitData = &m_blit_rom[rom_base & m_blit_rom.mask()];
+	uint8_t *pBlitData = &m_blit_rom[rom_base & (m_blit_rom.length() - 1)];
 
 	int opcode, data, num_tiles;
 
@@ -227,7 +227,7 @@ void homedata_state::pteacher_handleblit( int rom_base )
 	int source_addr;
 	int dest_addr, base_addr;
 	int opcode, data, num_tiles;
-	uint8_t *pBlitData = &m_blit_rom[rom_base & m_blit_rom.mask()];
+	uint8_t *pBlitData = &m_blit_rom[rom_base & (m_blit_rom.length() - 1)];
 
 	dest_param = m_blitter_param[(m_blitter_param_count - 4) & 3] * 256 +
 		m_blitter_param[(m_blitter_param_count - 3) & 3];
@@ -405,7 +405,7 @@ inline void homedata_state::mrokumei_info0( tile_data &tileinfo, int tile_index,
 	int code  = m_videoram[addr + 1] + ((attr & 0x03) << 8) + (gfxbank << 10);
 	int color = (attr >> 2) + (gfxbank << 6);
 
-	SET_TILE_INFO_MEMBER(0, code, color, m_flipscreen );
+	tileinfo.set(0, code, color, m_flipscreen );
 }
 inline void homedata_state::mrokumei_info1( tile_data &tileinfo, int tile_index, int page, int gfxbank )
 {
@@ -414,7 +414,7 @@ inline void homedata_state::mrokumei_info1( tile_data &tileinfo, int tile_index,
 	int code  = m_videoram[addr + 1] + ((attr & 0x07) << 8) + (gfxbank << 11);
 	int color = (attr >> 3) + ((gfxbank & 3) << 6);
 
-	SET_TILE_INFO_MEMBER(1, code, color, m_flipscreen );
+	tileinfo.set(1, code, color, m_flipscreen );
 }
 
 TILE_GET_INFO_MEMBER(homedata_state::mrokumei_get_info0_0)
@@ -448,7 +448,7 @@ inline void homedata_state::reikaids_info( tile_data &tileinfo, int tile_index, 
 
 	if (attr & 0x80) flags ^= TILE_FLIPX;
 
-	SET_TILE_INFO_MEMBER(layer, code, color, flags );
+	tileinfo.set(layer, code, color, flags );
 }
 
 	/* reikaids_gfx_bank[0]:
@@ -507,7 +507,7 @@ inline void homedata_state::pteacher_info( tile_data &tileinfo, int tile_index, 
 	int code  = m_videoram[addr + 1] + ((attr & 0x07) << 8) + (gfxbank << 11);
 	int color = (attr >> 3) + ((gfxbank & 1) << 5);
 
-	SET_TILE_INFO_MEMBER(layer, code, color, m_flipscreen);
+	tileinfo.set(layer, code, color, m_flipscreen);
 }
 
 TILE_GET_INFO_MEMBER(homedata_state::pteacher_get_info0_0)
@@ -538,7 +538,7 @@ inline void homedata_state::lemnangl_info( tile_data &tileinfo, int tile_index, 
 	int code  = m_videoram[addr + 1] + ((attr & 0x07) << 8) + (gfxbank << 11);
 	int color = 16 * (attr >> 3) + gfxbank;
 
-	SET_TILE_INFO_MEMBER(2 * layer + gfxset, code, color, m_flipscreen);
+	tileinfo.set(2 * layer + gfxset, code, color, m_flipscreen);
 }
 
 TILE_GET_INFO_MEMBER(homedata_state::lemnangl_get_info0_0)
@@ -570,7 +570,7 @@ inline void homedata_state::mirderby_info0( tile_data &tileinfo, int tile_index,
 	int code  = m_videoram[addr + 1] + ((attr & 0x03) << 8) + 0x400;// + (gfxbank << 10);
 	int color = (attr >> 2) + (gfxbank << 6);
 
-	SET_TILE_INFO_MEMBER(0, code, color, m_flipscreen );
+	tileinfo.set(0, code, color, m_flipscreen );
 }
 inline void homedata_state::mirderby_info1( tile_data &tileinfo, int tile_index, int page, int gfxbank )
 {
@@ -579,7 +579,7 @@ inline void homedata_state::mirderby_info1( tile_data &tileinfo, int tile_index,
 	int code  = m_videoram[addr + 1] + ((attr & 0x07) << 8) + 0x400;//(gfxbank << 11);
 	int color = (attr >> 3) + ((gfxbank & 3) << 6);
 
-	SET_TILE_INFO_MEMBER(1, code, color, m_flipscreen );
+	tileinfo.set(1, code, color, m_flipscreen );
 }
 
 TILE_GET_INFO_MEMBER(homedata_state::mirderby_get_info0_0)
@@ -694,7 +694,7 @@ void homedata_state::reikaids_videoram_w(offs_t offset, u8 data)
 }
 
 
-WRITE8_MEMBER(homedata_state::reikaids_gfx_bank_w)
+void homedata_state::reikaids_gfx_bank_w(uint8_t data)
 {
 //logerror( "%04x: [setbank %02x]\n",m_maincpu->pc(),data);
 
@@ -707,7 +707,7 @@ WRITE8_MEMBER(homedata_state::reikaids_gfx_bank_w)
 	m_reikaids_which ^= 1;
 }
 
-WRITE8_MEMBER(homedata_state::pteacher_gfx_bank_w)
+void homedata_state::pteacher_gfx_bank_w(uint8_t data)
 {
 //  logerror("%s: gfxbank:=%02x\n", m_maincpu->pc(), data);
 	if (m_gfx_bank[0] != data)
@@ -717,7 +717,7 @@ WRITE8_MEMBER(homedata_state::pteacher_gfx_bank_w)
 	}
 }
 
-WRITE8_MEMBER(homedata_state::homedata_blitter_param_w)
+void homedata_state::homedata_blitter_param_w(uint8_t data)
 {
 //logerror("%s: blitter_param_w %02x\n", m_maincpu->pc(), data);
 	m_blitter_param[m_blitter_param_count] = data;
@@ -725,7 +725,7 @@ WRITE8_MEMBER(homedata_state::homedata_blitter_param_w)
 	m_blitter_param_count &= 3;
 }
 
-WRITE8_MEMBER(homedata_state::mrokumei_blitter_bank_w)
+void homedata_state::mrokumei_blitter_bank_w(uint8_t data)
 {
 	/* --xxx--- layer 1 gfx bank
 	   -----x-- blitter ROM bank
@@ -738,7 +738,7 @@ WRITE8_MEMBER(homedata_state::mrokumei_blitter_bank_w)
 	m_blitter_bank = data;
 }
 
-WRITE8_MEMBER(homedata_state::reikaids_blitter_bank_w)
+void homedata_state::reikaids_blitter_bank_w(uint8_t data)
 {
 	/* xxx----- priority control
 	   ----x--- target page? what's this for?
@@ -747,7 +747,7 @@ WRITE8_MEMBER(homedata_state::reikaids_blitter_bank_w)
 	m_blitter_bank = data;
 }
 
-WRITE8_MEMBER(homedata_state::pteacher_blitter_bank_w)
+void homedata_state::pteacher_blitter_bank_w(uint8_t data)
 {
 	/* xxx----- blitter ROM bank
 	   -----x-- pixel clock (normal/slow)
@@ -761,7 +761,7 @@ WRITE8_MEMBER(homedata_state::pteacher_blitter_bank_w)
 	m_blitter_bank = data;
 }
 
-WRITE8_MEMBER(homedata_state::mrokumei_blitter_start_w)
+void homedata_state::mrokumei_blitter_start_w(uint8_t data)
 {
 	if (data & 0x80)
 		mrokumei_handleblit(((m_blitter_bank & 0x04) >> 2) * 0x10000);
@@ -770,14 +770,14 @@ WRITE8_MEMBER(homedata_state::mrokumei_blitter_start_w)
 	   optional service mode ROM (not available in current dump) */
 }
 
-WRITE8_MEMBER(homedata_state::reikaids_blitter_start_w)
+void homedata_state::reikaids_blitter_start_w(uint8_t data)
 {
 	reikaids_handleblit((m_blitter_bank & 3) * 0x10000);
 }
 
-WRITE8_MEMBER(homedata_state::pteacher_blitter_start_w)
+void homedata_state::pteacher_blitter_start_w(uint8_t data)
 {
-	pteacher_handleblit((m_blitter_bank >> 5) * 0x10000 & m_blit_rom.mask());
+	pteacher_handleblit((m_blitter_bank >> 5) * 0x10000 & (m_blit_rom.length() - 1));
 }
 
 
@@ -790,8 +790,6 @@ WRITE8_MEMBER(homedata_state::pteacher_blitter_start_w)
 
 uint32_t homedata_state::screen_update_mrokumei(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int flags,width;
-
 	/* blank screen */
 	if (m_vreg[0x3] == 0xc1 && m_vreg[0x4] == 0xc0 && m_vreg[0x5] == 0xff)
 	{
@@ -799,13 +797,14 @@ uint32_t homedata_state::screen_update_mrokumei(screen_device &screen, bitmap_in
 		return 0;
 	}
 
-	flags = (m_vreg[1] & 0x80) ? (TILE_FLIPX | TILE_FLIPY) : 0;
+	int const flags = (m_vreg[1] & 0x80) ? (TILE_FLIPX | TILE_FLIPY) : 0;
 	if (flags != m_flipscreen)
 	{
 		m_flipscreen = flags;
 		machine().tilemap().mark_all_dirty();
 	}
 
+	int width;
 	switch (m_vreg[0x3])
 	{
 		case 0xb7: width = 54; break;   // mjclinic
@@ -828,14 +827,14 @@ uint32_t homedata_state::screen_update_mrokumei(screen_device &screen, bitmap_in
 
 	m_bg_tilemap[m_visible_page][0]->draw(screen, bitmap, cliprect, 0, 0);
 	m_bg_tilemap[m_visible_page][1]->draw(screen, bitmap, cliprect, 0, 0);
+
 	return 0;
 }
 
-#ifdef UNUSED_FUNCTION
 uint32_t homedata_state::screen_update_reikaids(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int flags;
-	static const int pritable[8][4] =
+#if 0
+	static constexpr int pritable[8][4] =
 	{
 		{ 3,1,0,2 },
 		{ 1,3,0,2 },
@@ -846,77 +845,56 @@ uint32_t homedata_state::screen_update_reikaids(screen_device &screen, bitmap_in
 		{ 2,3,1,0 },    // (bg color should be taken from 1)
 		{ 3,1,2,0 },    // (bg color should be taken from 1)
 	};
-	int pri, i;
-
-
-	flags = (m_vreg[1] & 0x80) ? (TILE_FLIPX | TILE_FLIPY) : 0;
-	if (flags != m_flipscreen)
+#else
+	static constexpr int pritable[2][8][4] =    /* table of priorities derived from the PROM */
 	{
-		m_flipscreen = flags;
-		machine().tilemap().mark_all_dirty();
-	}
-
-
-	bitmap.fill(m_palette->black_pen(), cliprect);
-
-	pri = (m_bank & 0x70) >> 4;
-	for (i = 0; i < 4; i++)
-		m_bg_tilemap[m_visible_page][pritable[pri][3 - i]]->draw(bitmap, cliprect, 0, 0);
-	return 0;
-}
+		{
+			{ 3,1,0,2 },
+			{ 1,3,0,2 },
+			{ 0,3,1,2 },
+			{ 0,1,3,2 },
+			{ 3,0,1,2 },
+			{ 1,0,3,2 },
+			{ 2,3,1,0 },    // (bg color should be taken from 1)
+			{ 3,1,2,0 }     // (bg color should be taken from 1)
+		},
+		{
+			{ 2,3,0,1 },
+			{ 2,0,3,1 },
+			{ 3,0,2,1 },
+			{ 0,3,2,1 },
+			{ 3,0,1,2 },
+			{ 2,1,3,0 },
+			{ 0,2,3,1 },
+			{ 3,2,0,1 }
+		}
+	};
 #endif
 
-uint32_t homedata_state::screen_update_reikaids(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	int flags;
-	static const int pritable[2][8][4] =    /* table of priorities derived from the PROM */
-	{
-	{
-		{ 3,1,0,2 },
-		{ 1,3,0,2 },
-		{ 0,3,1,2 },
-		{ 0,1,3,2 },
-		{ 3,0,1,2 },
-		{ 1,0,3,2 },
-		{ 2,3,1,0 },    // (bg color should be taken from 1)
-		{ 3,1,2,0 } // (bg color should be taken from 1)
-	},
-	{
-		{2,3,0,1},
-		{2,0,3,1},
-		{3,0,2,1},
-		{0,3,2,1},
-		{3,0,1,2},
-		{2,1,3,0},
-		{0,2,3,1},
-		{3,2,0,1}
-	},
-	};
-
-	int pri, i;
-
-	flags = (m_vreg[1] & 0x80) ? (TILE_FLIPX | TILE_FLIPY) : 0;
+	int const flags = (m_vreg[1] & 0x80) ? (TILE_FLIPX | TILE_FLIPY) : 0;
 	if (flags != m_flipscreen)
 	{
 		m_flipscreen = flags;
 		machine().tilemap().mark_all_dirty();
 	}
 
-
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	pri = (m_blitter_bank & 0x70) >> 4;
-	for (i = 0; i < 4; i++)
+	int const pri = (m_blitter_bank & 0x70) >> 4;
+#if 0
+	for (int i = 0; i < 4; i++)
+		m_bg_tilemap[m_visible_page][pritable[pri][3 - i]]->draw(bitmap, cliprect, 0, 0);
+#else
+	for (int i = 0; i < 4; i++)
 		m_bg_tilemap[m_visible_page][pritable[m_priority][pri][3 - i]]->draw(screen, bitmap, cliprect, 0, 0);
+#endif
+
 	return 0;
 }
 
 
 uint32_t homedata_state::screen_update_pteacher(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int flags, scroll_low, scroll_high;
-
-
 	/* blank screen */
 	if (m_vreg[0x3] == 0xc1 && m_vreg[0x4] == 0xc0 && m_vreg[0x5] == 0xff)
 	{
@@ -924,7 +902,7 @@ uint32_t homedata_state::screen_update_pteacher(screen_device &screen, bitmap_in
 		return 0;
 	}
 
-	flags = (m_vreg[1] & 0x80) ? (TILE_FLIPX | TILE_FLIPY) : 0;
+	int const flags = (m_vreg[1] & 0x80) ? (TILE_FLIPX | TILE_FLIPY) : 0;
 	if (flags != m_flipscreen)
 	{
 		m_flipscreen = flags;
@@ -957,6 +935,7 @@ uint32_t homedata_state::screen_update_pteacher(screen_device &screen, bitmap_in
 	   blanked = c1 c0 ff --
 	  */
 
+	int scroll_low;
 	if (m_blitter_bank & 0x04)
 	{
 		if (m_vreg[0x4] == 0xae || m_vreg[0x4] == 0xb8)
@@ -998,13 +977,14 @@ uint32_t homedata_state::screen_update_pteacher(screen_device &screen, bitmap_in
 			scroll_low = 7 - (m_vreg[0x4] & 0x0f);
 		}
 	}
-	scroll_high = m_vreg[0xb] >> 2;
+	int const scroll_high = m_vreg[0xb] >> 2;
 
 	m_bg_tilemap[m_visible_page][0]->set_scrollx(0, scroll_high * 8 + scroll_low);
 	m_bg_tilemap[m_visible_page][1]->set_scrollx(0, scroll_high * 8 + scroll_low);
 
 	m_bg_tilemap[m_visible_page][0]->draw(screen, bitmap, cliprect, 0, 0);
 	m_bg_tilemap[m_visible_page][1]->draw(screen, bitmap, cliprect, 0, 0);
+
 	return 0;
 }
 

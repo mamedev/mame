@@ -51,6 +51,7 @@ public:
 	void raphero(machine_config &config);
 	void tdragon(machine_config &config);
 	void tdragonb(machine_config &config);
+	void tdragonb2(machine_config &config);
 	void gunnail(machine_config &config);
 	void gunnailb(machine_config &config);
 	void hachamf(machine_config &config);
@@ -62,11 +63,13 @@ public:
 	void manybloc(machine_config &config);
 	void acrobatm(machine_config &config);
 	void strahl(machine_config &config);
+	void strahljbl(machine_config &config);
 	void tdragon3h(machine_config &config);
 	void hachamf_prot(machine_config &config);
 	void macross(machine_config &config);
-	void mustangb(machine_config &config);
 	void mustang(machine_config &config);
+	void mustangb(machine_config &config);
+	void mustangb3(machine_config &config);
 	void twinactn(machine_config &config);
 	void vandykeb(machine_config &config);
 
@@ -83,7 +86,6 @@ public:
 	void init_bjtwin();
 
 protected:
-	DECLARE_VIDEO_START(gunnail);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmk16_scanline);
 	u32 screen_update_macross(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -117,26 +119,24 @@ protected:
 	optional_ioport_array<2> m_dsw_io;
 	optional_ioport_array<3> m_in_io;
 
-	int m_sprclk;
-	int m_sprlimit;
-	int m_tilerambank;
-	int m_sprdma_base;
-	int mask[4*2];
+	emu_timer *m_dma_timer = nullptr;
+	int m_tilerambank = 0;
+	int m_sprdma_base = 0;
+	int mask[4*2]{};
 	std::unique_ptr<u16[]> m_spriteram_old;
 	std::unique_ptr<u16[]> m_spriteram_old2;
-	int m_bgbank;
-	int m_videoshift;
-	int m_bioship_background_bank;
-	tilemap_t *m_bg_tilemap[2];
-	tilemap_t *m_tx_tilemap;
-	int m_mustang_bg_xscroll;
-	u8 m_scroll[2][4];
-	u16 m_vscroll[4];
-	int m_prot_count;
-	u8 m_input_pressed;
-	u8 m_start_helper;
-	u8 m_coin_count[2];
-	u8 m_coin_count_frac[2];
+	int m_bgbank = 0;
+	int m_bioship_background_bank = 0;
+	tilemap_t *m_bg_tilemap[2]{};
+	tilemap_t *m_tx_tilemap = nullptr;
+	int m_mustang_bg_xscroll = 0;
+	u8 m_scroll[2][4]{};
+	u16 m_vscroll[4]{};
+	int m_prot_count = 0;
+	u8 m_input_pressed = 0;
+	u8 m_start_helper = 0;
+	u8 m_coin_count[2]{};
+	u8 m_coin_count_frac[2]{};
 	void mainram_strange_w(offs_t offset, u16 data/*, u16 mem_mask = ~0*/);
 	u16 mainram_swapped_r(offs_t offset);
 	void mainram_swapped_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -153,6 +153,7 @@ protected:
 	void mustang_scroll_w(u16 data);
 	void raphero_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	template<unsigned Layer> void scroll_w(offs_t offset, u8 data);
+	void bjtwin_scroll_w(offs_t offset, u8 data);
 	void vandyke_scroll_w(offs_t offset, u16 data);
 	void vandykeb_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void manybloc_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -174,6 +175,7 @@ protected:
 	DECLARE_VIDEO_START(bioship);
 	DECLARE_VIDEO_START(strahl);
 	DECLARE_VIDEO_START(macross2);
+	DECLARE_VIDEO_START(gunnail);
 	DECLARE_VIDEO_START(bjtwin);
 	void get_colour_4bit(u32 &colour, u32 &pri_mask);
 	void get_colour_5bit(u32 &colour, u32 &pri_mask);
@@ -181,11 +183,12 @@ protected:
 	u32 screen_update_tharrier(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_strahl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_bjtwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(dma_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(tdragon_mcu_sim);
 	TIMER_DEVICE_CALLBACK_MEMBER(hachamf_mcu_sim);
 	TIMER_DEVICE_CALLBACK_MEMBER(manybloc_scanline);
 	void video_init();
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u16 *src);
 	void bg_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer = 0);
 	void tx_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mcu_run(u8 dsw_setting);
@@ -212,6 +215,8 @@ protected:
 	void manybloc_map(address_map &map);
 	void mustang_map(address_map &map);
 	void mustangb_map(address_map &map);
+	void mustangb3_map(address_map &map);
+	void mustangb3_sound_map(address_map &map);
 	void oki1_map(address_map &map);
 	void oki2_map(address_map &map);
 	void raphero_map(address_map &map);
@@ -219,10 +224,13 @@ protected:
 	void ssmissin_map(address_map &map);
 	void ssmissin_sound_map(address_map &map);
 	void strahl_map(address_map &map);
+	void strahljbl_map(address_map &map);
 	void tdragon2_map(address_map &map);
 	void tdragon3h_map(address_map &map);
+	void tdragon3h_sound_io_map(address_map &map);
 	void tdragon_map(address_map &map);
 	void tdragonb_map(address_map &map);
+	void tdragonb2_map(address_map &map);
 	void tharrier_map(address_map &map);
 	void tharrier_sound_io_map(address_map &map);
 	void tharrier_sound_map(address_map &map);
@@ -256,6 +264,7 @@ public:
 	void init_redhawk();
 	void init_redhawkg();
 	void init_redhawki();
+	void init_redhawksa();
 	void init_spec2k();
 
 private:

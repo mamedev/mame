@@ -33,7 +33,7 @@ private:
 	std::string goffset(offs_t address) const;
 
 	static inline u32 b(u64 opc, u32 start, u32 count);
-	static inline void append(std::string &r, std::string e);
+	static inline void append(std::string &r, const std::string &e);
 };
 
 #endif

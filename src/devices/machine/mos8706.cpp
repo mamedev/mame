@@ -59,7 +59,7 @@ void mos8706_device::device_reset()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( mos8706_device::read )
+uint8_t mos8706_device::read(offs_t offset)
 {
 	return 0;
 }
@@ -69,6 +69,6 @@ READ8_MEMBER( mos8706_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mos8706_device::write )
+void mos8706_device::write(offs_t offset, uint8_t data)
 {
 }

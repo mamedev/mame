@@ -293,7 +293,7 @@ READ_LINE_MEMBER( tandy2k_keyboard_device::data_r )
 //  kb_p1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( tandy2k_keyboard_device::kb_p1_r )
+uint8_t tandy2k_keyboard_device::kb_p1_r()
 {
 	/*
 
@@ -325,7 +325,7 @@ READ8_MEMBER( tandy2k_keyboard_device::kb_p1_r )
 //  kb_p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( tandy2k_keyboard_device::kb_p1_w )
+void tandy2k_keyboard_device::kb_p1_w(uint8_t data)
 {
 	/*
 
@@ -351,7 +351,7 @@ WRITE8_MEMBER( tandy2k_keyboard_device::kb_p1_w )
 //  kb_p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( tandy2k_keyboard_device::kb_p2_w )
+void tandy2k_keyboard_device::kb_p2_w(uint8_t data)
 {
 	/*
 

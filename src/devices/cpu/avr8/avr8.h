@@ -3,38 +3,6 @@
 /*
     Atmel 8-bit AVR simulator
 
-    - Notes -
-      Cycle counts are generally considered to be 100% accurate per-instruction, does not support mid-instruction
-      interrupts although no software has been encountered yet that requires it. Evidence of cycle accuracy is given
-      in the form of the demoscene 'wild' demo, Craft, by [lft], which uses an ATmega88 to write video out a 6-bit
-      RGB DAC pixel-by-pixel, synchronously with the frame timing. Intentionally modifying the timing of any of
-      the existing opcodes has been shown to wildly corrupt the video output in Craft, so one can assume that the
-      existing timing is 100% correct.
-
-      Unimplemented opcodes: ELPM, SPM, SPM Z+, EIJMP, SLEEP, BREAK, WDR, EICALL, JMP, CALL
-
-    - Changelist -
-      23 Dec. 2012 [Sandro Ronco]
-      - Added CPSE, LD Z+, ST -Z/-Y/-X and ICALL opcodes
-      - Fixed Z flag in CPC, SBC and SBCI opcodes
-      - Fixed V and C flags in SBIW opcode
-
-      30 Oct. 2012
-      - Added FMUL, FMULS, FMULSU opcodes [Ryan Holtz]
-      - Fixed incorrect flag calculation in ROR opcode [Ryan Holtz]
-      - Fixed incorrect bit testing in SBIC/SBIS opcodes [Ryan Holtz]
-
-      25 Oct. 2012
-      - Added MULS, ANDI, STI Z+, LD -Z, LD -Y, LD -X, LD Y+q, LD Z+q, SWAP, ASR, ROR and SBIS opcodes [Ryan Holtz]
-      - Corrected cycle counts for LD and ST opcodes [Ryan Holtz]
-      - Moved opcycles init into inner while loop, fixes 2-cycle and 3-cycle opcodes effectively forcing
-        all subsequent 1-cycle opcodes to be 2 or 3 cycles [Ryan Holtz]
-      - Fixed register behavior in MULSU, LD -Z, and LD -Y opcodes [Ryan Holtz]
-
-      18 Oct. 2012
-      - Added OR, SBCI, ORI, ST Y+, ADIQ opcodes [Ryan Holtz]
-      - Fixed COM, NEG, LSR opcodes [Ryan Holtz]
-
 */
 
 #ifndef MAME_CPU_AVR8_AVR8_H
@@ -66,23 +34,30 @@ public:
 
 	// public interfaces
 	virtual void update_interrupt(int source);
-	uint64_t get_elapsed_cycles() const { return m_elapsed_cycles; }
 
 	// register handling
-	DECLARE_WRITE8_MEMBER(regs_w);
-	DECLARE_READ8_MEMBER(regs_r);
+	void regs_w(offs_t offset, uint8_t data);
+	uint8_t regs_r(offs_t offset);
 	uint32_t m_shifted_pc;
 
-protected:
-	enum
-	{
-		CPU_TYPE_ATMEGA88,
-		CPU_TYPE_ATMEGA644,
-		CPU_TYPE_ATMEGA1280,
-		CPU_TYPE_ATMEGA2560
-	};
+	// GPIO
+	template<uint8_t Port> auto gpio_out() { return m_gpio_out_cb[Port].bind(); }
+	template<uint8_t Port> auto gpio_in() { return m_gpio_in_cb[Port].bind(); }
 
-	avr8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, uint32_t address_mask, address_map_constructor internal_map, uint8_t cpu_type);
+protected:
+	avr8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, uint32_t address_mask, address_map_constructor internal_map, int32_t num_timers);
+
+	typedef void (avr8_device::*op_func) (uint16_t op);
+
+	op_func m_op_funcs[0x10000];
+	int m_op_cycles[0x10000];
+	int m_opcycles;
+	std::unique_ptr<uint8_t[]> m_add_flag_cache;
+	std::unique_ptr<uint8_t[]> m_adc_flag_cache;
+	std::unique_ptr<uint8_t[]> m_sub_flag_cache;
+	std::unique_ptr<uint8_t[]> m_sbc_flag_cache;
+	std::unique_ptr<uint8_t[]> m_bool_flag_cache;
+	std::unique_ptr<uint8_t[]> m_shift_flag_cache;
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -107,12 +82,10 @@ protected:
 	// address spaces
 	const address_space_config m_program_config;
 	const address_space_config m_data_config;
-	const address_space_config m_io_config;
 	required_region_ptr<uint8_t> m_eeprom;
 
 	// bootloader
 	uint16_t m_boot_size;
-	uint8_t m_cpu_type;
 
 	// Fuses
 	uint8_t m_lfuses;
@@ -125,18 +98,28 @@ protected:
 	uint8_t m_r[0x200];
 
 	// internal timers
+	int32_t m_num_timers;
 	int32_t m_timer_top[6];
 	uint8_t m_timer_increment[6];
 	uint16_t m_timer_prescale[6];
 	uint16_t m_timer_prescale_count[6];
+	int32_t m_wgm1;
+	int32_t m_timer1_compare_mode[2];
+	uint16_t m_ocr1[3];
+	uint16_t m_timer1_count;
 	bool m_ocr2_not_reached_yet;
+
+	// GPIO
+	void write_gpio(const uint8_t port, const uint8_t data);
+	uint8_t read_gpio(const uint8_t port);
+	devcb_write8::array<11> m_gpio_out_cb;
+	devcb_read8::array<11> m_gpio_in_cb;
 
 	// SPI
 	bool m_spi_active;
 	uint8_t m_spi_prescale;
 	uint8_t m_spi_prescale_count;
 	int8_t m_spi_prescale_countdown;
-	static const uint8_t spi_clock_divisor[8];
 	void enable_spi();
 	void disable_spi();
 	void spi_update_masterslave_select();
@@ -152,7 +135,6 @@ protected:
 
 	// other internal states
 	int m_icount;
-	uint64_t m_elapsed_cycles;
 
 	// memory access
 	inline void push(uint8_t val);
@@ -166,7 +148,7 @@ protected:
 	void set_irq_line(uint16_t vector, int state);
 
 	// timers
-	void timer_tick(int cycles);
+	void timer_tick();
 	void update_timer_clock_source(uint8_t timer, uint8_t selection);
 	void update_timer_waveform_gen_mode(uint8_t timer, uint8_t mode);
 
@@ -178,7 +160,7 @@ protected:
 	void timer0_force_output_compare(int reg);
 
 	// timer 1
-	void timer1_tick();
+	inline void timer1_tick();
 	void changed_tccr1a(uint8_t data);
 	void changed_tccr1b(uint8_t data);
 	void update_timer1_input_noise_canceler();
@@ -215,17 +197,121 @@ protected:
 //  void update_ocr5(uint8_t newval, uint8_t reg);
 //  void timer5_force_output_compare(int reg);
 
+	// ops
+	void populate_ops();
+	void populate_add_flag_cache();
+	void populate_adc_flag_cache();
+	void populate_sub_flag_cache();
+	void populate_sbc_flag_cache();
+	void populate_bool_flag_cache();
+	void populate_shift_flag_cache();
+	void op_nop(uint16_t op);
+	void op_movw(uint16_t op);
+	void op_muls(uint16_t op);
+	void op_mulsu(uint16_t op);
+	void op_fmul(uint16_t op);
+	void op_fmuls(uint16_t op);
+	void op_fmulsu(uint16_t op);
+	void op_cpc(uint16_t op);
+	void op_sbc(uint16_t op);
+	void op_add(uint16_t op);
+	void op_cpse(uint16_t op);
+	void op_cp(uint16_t op);
+	void op_sub(uint16_t op);
+	void op_adc(uint16_t op);
+	void op_and(uint16_t op);
+	void op_eor(uint16_t op);
+	void op_or(uint16_t op);
+	void op_mov(uint16_t op);
+	void op_cpi(uint16_t op);
+	void op_sbci(uint16_t op);
+	void op_subi(uint16_t op);
+	void op_ori(uint16_t op);
+	void op_andi(uint16_t op);
+	void op_lddz(uint16_t op);
+	void op_lddy(uint16_t op);
+	void op_stdz(uint16_t op);
+	void op_stdy(uint16_t op);
+	void op_lds(uint16_t op);
+	void op_ldzi(uint16_t op);
+	void op_ldzd(uint16_t op);
+	void op_lpmz(uint16_t op);
+	void op_lpmzi(uint16_t op);
+	void op_elpmz(uint16_t op);
+	void op_elpmzi(uint16_t op);
+	void op_ldyi(uint16_t op);
+	void op_ldyd(uint16_t op);
+	void op_ldx(uint16_t op);
+	void op_ldxi(uint16_t op);
+	void op_ldxd(uint16_t op);
+	void op_pop(uint16_t op);
+	void op_sts(uint16_t op);
+	void op_stzi(uint16_t op);
+	void op_stzd(uint16_t op);
+	void op_styi(uint16_t op);
+	void op_styd(uint16_t op);
+	void op_stx(uint16_t op);
+	void op_stxi(uint16_t op);
+	void op_stxd(uint16_t op);
+	void op_push(uint16_t op);
+	void op_com(uint16_t op);
+	void op_neg(uint16_t op);
+	void op_swap(uint16_t op);
+	void op_inc(uint16_t op);
+	void op_asr(uint16_t op);
+	void op_lsr(uint16_t op);
+	void op_ror(uint16_t op);
+	void op_setf(uint16_t op);
+	void op_clrf(uint16_t op);
+	void op_ijmp(uint16_t op);
+	void op_eijmp(uint16_t op);
+	void op_dec(uint16_t op);
+	void op_jmp(uint16_t op);
+	void op_call(uint16_t op);
+	void op_ret(uint16_t op);
+	void op_reti(uint16_t op);
+	void op_sleep(uint16_t op);
+	void op_break(uint16_t op);
+	void op_wdr(uint16_t op);
+	void op_lpm(uint16_t op);
+	void op_elpm(uint16_t op);
+	void op_spm(uint16_t op);
+	void op_spmzi(uint16_t op);
+	void op_icall(uint16_t op);
+	void op_eicall(uint16_t op);
+	void op_adiw(uint16_t op);
+	void op_sbiw(uint16_t op);
+	void op_cbi(uint16_t op);
+	void op_sbic(uint16_t op);
+	void op_sbi(uint16_t op);
+	void op_sbis(uint16_t op);
+	void op_mul(uint16_t op);
+	void op_out(uint16_t op);
+	void op_in(uint16_t op);
+	void op_rjmp(uint16_t op);
+	void op_rcall(uint16_t op);
+	void op_ldi(uint16_t op);
+	void op_brset(uint16_t op);
+	void op_brclr(uint16_t op);
+	void op_bst(uint16_t op);
+	void op_bld(uint16_t op);
+	void op_sbrs(uint16_t op);
+	void op_sbrc(uint16_t op);
+	void op_unimpl(uint16_t op);
+
 	// address spaces
 	address_space *m_program;
 	address_space *m_data;
-	address_space *m_io;
 };
 
 // device type definition
 DECLARE_DEVICE_TYPE(ATMEGA88,   atmega88_device)
+DECLARE_DEVICE_TYPE(ATMEGA168,  atmega168_device)
+DECLARE_DEVICE_TYPE(ATMEGA328,  atmega328_device)
 DECLARE_DEVICE_TYPE(ATMEGA644,  atmega644_device)
 DECLARE_DEVICE_TYPE(ATMEGA1280, atmega1280_device)
 DECLARE_DEVICE_TYPE(ATMEGA2560, atmega2560_device)
+DECLARE_DEVICE_TYPE(ATTINY15,   attiny15_device)
 
 // ======================> atmega88_device
 
@@ -235,6 +321,30 @@ public:
 	// construction/destruction
 	atmega88_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void atmega88_internal_map(address_map &map);
+};
+
+// ======================> atmega168_device
+
+class atmega168_device : public avr8_device
+{
+public:
+	// construction/destruction
+	atmega168_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void update_interrupt(int source) override;
+	void atmega168_internal_map(address_map &map);
+};
+
+// ======================> atmega328_device
+
+class atmega328_device : public avr8_device
+{
+public:
+	// construction/destruction
+	atmega328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void update_interrupt(int source) override;
+	void atmega328_internal_map(address_map &map);
 };
 
 // ======================> atmega644_device
@@ -273,11 +383,21 @@ public:
 	void atmega2560_internal_map(address_map &map);
 };
 
+// ======================> atmega88_device
+
+class attiny15_device : public avr8_device
+{
+public:
+	// construction/destruction
+	attiny15_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	void attiny15_internal_map(address_map &map);
+};
+
 /***************************************************************************
     REGISTER ENUMERATION
 ***************************************************************************/
 
-enum
+enum : uint8_t
 {
 	AVR8_SREG = 1,
 	AVR8_PC,
@@ -320,7 +440,7 @@ enum
 	AVR8_SPL
 };
 
-enum
+enum : uint8_t
 {
 	AVR8_INT_RESET = 0,
 	AVR8_INT_INT0,
@@ -381,7 +501,7 @@ enum
 };
 
 // Used by I/O register handling
-enum
+enum : uint16_t
 {
 	AVR8_REGIDX_R0 = 0x00,
 	AVR8_REGIDX_R1,
@@ -702,7 +822,7 @@ enum
 	//0x1FF: Reserved
 };
 
-enum {
+enum : uint8_t {
 	AVR8_IO_PORTA = 0,
 	AVR8_IO_PORTB,
 	AVR8_IO_PORTC,
@@ -716,8 +836,7 @@ enum {
 	AVR8_IO_PORTL
 };
 
-//TODO: AVR8_REG_* and AVR8_IO_PORT* seem to serve the same purpose and thus should be unified. Verify this!
-enum
+enum : uint8_t
 {
 	AVR8_REG_A = 0,
 	AVR8_REG_B,
@@ -732,7 +851,7 @@ enum
 	AVR8_REG_L
 };
 
-enum
+enum : uint8_t
 {
 	AVR8_INTIDX_SPI,
 
@@ -767,8 +886,8 @@ enum
 	AVR8_INTIDX_COUNT
 };
 
-//lock bit masks
-enum
+// lock bit masks
+enum : uint8_t
 {
 	LB1 = (1 << 0),
 	LB2 = (1 << 1),
@@ -778,16 +897,16 @@ enum
 	BLB12 = (1 << 5)
 };
 
-//extended fuses bit masks
-enum
+// extended fuses bit masks
+enum : uint8_t
 {
 	BODLEVEL0 = (1 << 0),
 	BODLEVEL1 = (1 << 1),
 	BODLEVEL2 = (1 << 2)
 };
 
-//high fuses bit masks
-enum
+// high fuses bit masks
+enum : uint8_t
 {
 	BOOTRST = (1 << 0),
 	BOOTSZ0 = (1 << 1),
@@ -799,8 +918,8 @@ enum
 	OCDEN = (1 << 7)
 };
 
-//low fuses bit masks
-enum
+// low fuses bit masks
+enum : uint8_t
 {
 	CKSEL0 = (1 << 0),
 	CKSEL1 = (1 << 1),

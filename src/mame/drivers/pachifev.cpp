@@ -100,20 +100,20 @@ public:
 
 private:
 	/* controls related */
-	int m_power;
-	int m_max_power;
-	int m_input_power;
-	int m_previous_power;
-	int m_cnt;
+	int m_power = 0;
+	int m_max_power = 0;
+	int m_input_power = 0;
+	int m_previous_power = 0;
+	int m_cnt = 0;
 
 #if USE_MSM
-	uint32_t m_adpcm_pos;
-	uint8_t m_adpcm_idle;
-	uint8_t m_trigger;
-	uint8_t m_adpcm_data;
+	uint32_t m_adpcm_pos = 0;
+	uint8_t m_adpcm_idle = 0;
+	uint8_t m_trigger = 0;
+	uint8_t m_adpcm_data = 0;
 #endif
-	DECLARE_WRITE8_MEMBER(controls_w);
-	DECLARE_READ8_MEMBER(controls_r);
+	void controls_w(uint8_t data);
+	uint8_t controls_r();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
@@ -122,7 +122,7 @@ private:
 	void pachifev_map(address_map &map);
 };
 
-WRITE8_MEMBER(pachifev_state::controls_w)
+void pachifev_state::controls_w(uint8_t data)
 {
 	if(!data)
 	{
@@ -137,7 +137,7 @@ WRITE8_MEMBER(pachifev_state::controls_w)
 	}
 }
 
-READ8_MEMBER(pachifev_state::controls_r)
+uint8_t pachifev_state::controls_r()
 {
 	int output_bit=(m_power < m_max_power)?0:1;
 	++m_power;

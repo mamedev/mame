@@ -23,6 +23,7 @@
 #include "svga_trident.h"
 #include "num9rev.h"
 #include "eis_hgb107x.h"
+#include "ex1280.h"
 
 // storage
 #include "fdc.h"
@@ -32,6 +33,7 @@
 #include "ide.h"
 #include "xtide.h"
 #include "side116.h"
+#include "acb2072.h"
 #include "aha1542b.h"
 #include "aha1542c.h"
 #include "aha174x.h"
@@ -47,6 +49,8 @@
 #include "ultra24f.h"
 #include "tekram_dc820.h"
 #include "asc88.h"
+#include "omti8621.h"
+#include "lrk330.h"
 
 // sound
 #include "adlib.h"
@@ -69,6 +73,7 @@
 #include "eis_sad8852.h"
 #include "eis_twib.h"
 #include "np600.h"
+#include "3xtwin.h"
 
 // communication ports
 #include "lpt.h"
@@ -79,6 +84,7 @@
 #include "chessmdr.h"
 #include "chessmsr.h"
 #include "finalchs.h"
+#include "bblue2.h"
 
 
 void pc_isa8_cards(device_slot_interface &device)
@@ -132,6 +138,9 @@ void pc_isa8_cards(device_slot_interface &device)
 	device.option_add("finalchs", ISA8_FINALCHS);
 	device.option_add("epc_mda", ISA8_EPC_MDA);
 	device.option_add("epc_twib", ISA8_EIS_TWIB);
+	device.option_add("babyblue2", ISA8_BABYBLUE2);
+	device.option_add("acb2072", ACB2072);
+	device.option_add("3xtwin", ISA8_3XTWIN);
 }
 
 void pc_isa16_cards(device_slot_interface &device)
@@ -175,6 +184,9 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("finalchs", ISA8_FINALCHS);
 	device.option_add("epc_mda", ISA8_EPC_MDA);
 	device.option_add("epc_twib", ISA8_EIS_TWIB);
+	device.option_add("babyblue2", ISA8_BABYBLUE2);
+	device.option_add("acb2072", ACB2072);
+	device.option_add("3xtwin", ISA8_3XTWIN);
 	// 16-bit
 	device.option_add("ide", ISA16_IDE);
 	device.option_add("ne2000", NE2000);
@@ -209,11 +221,15 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("bt542bh", BT542BH);
 	device.option_add("bt545s", BT545S);
 	device.option_add("dcb", NOVELL_DCB);
+	device.option_add("ex1280", ISA16_EX1280);
 	device.option_add("ultra12f", ULTRA12F);
+	device.option_add("ultra12f32", ULTRA12F32);
 	device.option_add("ultra14f", ULTRA14F);
 	device.option_add("ultra24f", ULTRA24F); // actually an EISA card
 	device.option_add("dc320b", TEKRAM_DC320B); // actually an EISA card
 	device.option_add("dc320e", TEKRAM_DC320E); // actually an EISA card
 	device.option_add("dc820", TEKRAM_DC820); // actually an EISA card
 	device.option_add("dc820b", TEKRAM_DC820B); // actually an EISA card
+	device.option_add("omti8621", ISA16_OMTI8621);
+	device.option_add("lrk331", LRK331);
 }

@@ -36,6 +36,7 @@ public:
 
 	void hyperspt(machine_config &config);
 	void roadf(machine_config &config);
+	void roadfu(machine_config &config);
 	void hypersptb(machine_config &config);
 
 private:
@@ -57,19 +58,19 @@ private:
 	required_device<palette_device> m_palette;
 
 	/* video-related */
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 
-	uint8_t m_irq_mask;
-	uint8_t m_SN76496_latch;
+	uint8_t m_irq_mask = 0U;
+	uint8_t m_SN76496_latch = 0U;
 
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(konami_SN76496_latch_w) { m_SN76496_latch = data; };
-	DECLARE_WRITE8_MEMBER(konami_SN76496_w) { m_sn->write(m_SN76496_latch); };
+	void konami_SN76496_latch_w(uint8_t data) { m_SN76496_latch = data; }
+	void konami_SN76496_w(uint8_t data) { m_sn->write(m_SN76496_latch); }
 
 	virtual void machine_start() override;
 	virtual void video_start() override;

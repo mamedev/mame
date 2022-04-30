@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(CPC_DKSPEECH, cpc_dkspeech_device, "cpc_dkspeech", "DK'Tronic
 //  device I/O handlers
 //-------------------------------------------------
 
-READ8_MEMBER(cpc_ssa1_device::ssa1_r)
+uint8_t cpc_ssa1_device::ssa1_r()
 {
 	uint8_t ret = 0xff;
 
@@ -39,12 +39,12 @@ READ8_MEMBER(cpc_ssa1_device::ssa1_r)
 	return ret;
 }
 
-WRITE8_MEMBER(cpc_ssa1_device::ssa1_w)
+void cpc_ssa1_device::ssa1_w(uint8_t data)
 {
 	m_sp0256_device->ald_w(data);
 }
 
-READ8_MEMBER(cpc_dkspeech_device::dkspeech_r)
+uint8_t cpc_dkspeech_device::dkspeech_r()
 {
 	uint8_t ret = 0xff;
 
@@ -56,7 +56,7 @@ READ8_MEMBER(cpc_dkspeech_device::dkspeech_r)
 	return ret;
 }
 
-WRITE8_MEMBER(cpc_dkspeech_device::dkspeech_w)
+void cpc_dkspeech_device::dkspeech_w(uint8_t data)
 {
 	m_sp0256_device->ald_w(data & 0x3f);
 }
@@ -177,8 +177,8 @@ void cpc_ssa1_device::device_start()
 
 	m_rom = memregion("sp0256")->base();
 
-	space.install_readwrite_handler(0xfaee,0xfaee, read8_delegate(*this, FUNC(cpc_ssa1_device::ssa1_r)), write8_delegate(*this, FUNC(cpc_ssa1_device::ssa1_w)));
-	space.install_readwrite_handler(0xfbee,0xfbee, read8_delegate(*this, FUNC(cpc_ssa1_device::ssa1_r)), write8_delegate(*this, FUNC(cpc_ssa1_device::ssa1_w)));
+	space.install_readwrite_handler(0xfaee,0xfaee, read8smo_delegate(*this, FUNC(cpc_ssa1_device::ssa1_r)), write8smo_delegate(*this, FUNC(cpc_ssa1_device::ssa1_w)));
+	space.install_readwrite_handler(0xfbee,0xfbee, read8smo_delegate(*this, FUNC(cpc_ssa1_device::ssa1_r)), write8smo_delegate(*this, FUNC(cpc_ssa1_device::ssa1_w)));
 }
 
 void cpc_dkspeech_device::device_start()
@@ -188,7 +188,7 @@ void cpc_dkspeech_device::device_start()
 
 	m_rom = memregion("sp0256")->base();
 
-	space.install_readwrite_handler(0xfbfe,0xfbfe, read8_delegate(*this, FUNC(cpc_dkspeech_device::dkspeech_r)), write8_delegate(*this, FUNC(cpc_dkspeech_device::dkspeech_w)));
+	space.install_readwrite_handler(0xfbfe,0xfbfe, read8smo_delegate(*this, FUNC(cpc_dkspeech_device::dkspeech_r)), write8smo_delegate(*this, FUNC(cpc_dkspeech_device::dkspeech_w)));
 }
 
 //-------------------------------------------------

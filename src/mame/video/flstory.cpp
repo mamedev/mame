@@ -19,7 +19,7 @@ TILE_GET_INFO_MEMBER(flstory_state::get_tile_info)
 	int flags = TILE_FLIPYX((attr & 0x18) >> 3);
 	tileinfo.category = (attr & 0x20) >> 5;
 	tileinfo.group = (attr & 0x20) >> 5;
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			attr & 0x0f,
 			flags);
@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(flstory_state::victnine_get_tile_info)
 	int tile_number = ((attr & 0x38) << 5) + code;
 	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			attr & 0x07,
 			flags);
@@ -47,7 +47,7 @@ TILE_GET_INFO_MEMBER(flstory_state::get_rumba_tile_info)
 
 	tileinfo.category = (attr & 0x20) >> 5;
 	tileinfo.group = (attr & 0x20) >> 5;
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			tile_number,
 			col,
 			0);
@@ -101,13 +101,13 @@ VIDEO_START_MEMBER(flstory_state,victnine)
 	save_item(NAME(m_paletteram_ext));
 }
 
-WRITE8_MEMBER(flstory_state::flstory_videoram_w)
+void flstory_state::flstory_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(flstory_state::flstory_palette_w)
+void flstory_state::flstory_palette_w(offs_t offset, uint8_t data)
 {
 	if (offset & 0x100)
 		m_palette->write8_ext((offset & 0xff) + (m_palette_bank << 8), data);
@@ -115,7 +115,7 @@ WRITE8_MEMBER(flstory_state::flstory_palette_w)
 		m_palette->write8((offset & 0xff) + (m_palette_bank << 8), data);
 }
 
-READ8_MEMBER(flstory_state::flstory_palette_r)
+uint8_t flstory_state::flstory_palette_r(offs_t offset)
 {
 	if (offset & 0x100)
 		return m_paletteram_ext[(offset & 0xff) + (m_palette_bank << 8)];
@@ -123,7 +123,7 @@ READ8_MEMBER(flstory_state::flstory_palette_r)
 		return m_paletteram[(offset & 0xff) + (m_palette_bank << 8)];
 }
 
-WRITE8_MEMBER(flstory_state::flstory_gfxctrl_w)
+void flstory_state::flstory_gfxctrl_w(uint8_t data)
 {
 	m_gfxctrl = data;
 
@@ -136,12 +136,12 @@ WRITE8_MEMBER(flstory_state::flstory_gfxctrl_w)
 	m_palette_bank = (data & 0x20) >> 5;
 }
 
-READ8_MEMBER(flstory_state::victnine_gfxctrl_r)
+uint8_t flstory_state::victnine_gfxctrl_r()
 {
 	return m_gfxctrl;
 }
 
-WRITE8_MEMBER(flstory_state::victnine_gfxctrl_w)
+void flstory_state::victnine_gfxctrl_w(uint8_t data)
 {
 	m_gfxctrl = data;
 
@@ -151,7 +151,7 @@ WRITE8_MEMBER(flstory_state::victnine_gfxctrl_w)
 		flip_screen_set(data & 0x01);
 }
 
-WRITE8_MEMBER(flstory_state::flstory_scrlram_w)
+void flstory_state::flstory_scrlram_w(offs_t offset, uint8_t data)
 {
 	m_scrlram[offset] = data;
 	m_bg_tilemap->set_scrolly(offset, data);

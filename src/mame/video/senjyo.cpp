@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(senjyo_state::get_fg_tile_info)
 	if (m_is_senjyo && (tile_index & 0x1f) >= 32-8)
 		flags |= TILE_FORCE_LAYER0;
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			m_fgvideoram[tile_index] + ((attr & 0x10) << 4),
 			attr & 0x07,
 			flags);
@@ -36,7 +36,7 @@ TILE_GET_INFO_MEMBER(senjyo_state::senjyo_bg1_tile_info)
 {
 	uint8_t code = m_bg1videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			(code & 0x70) >> 4,
 			0);
@@ -48,7 +48,7 @@ TILE_GET_INFO_MEMBER(senjyo_state::starforc_bg1_tile_info)
 	/* they wired bit 7 of the tile code in place of bit 4 to get the color code */
 	uint8_t code = m_bg1videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	tileinfo.set(1,
 			code,
 			bitswap<3>(((code & 0xe0) >> 5), 1, 0, 2),
 			0);
@@ -58,7 +58,7 @@ TILE_GET_INFO_MEMBER(senjyo_state::get_bg2_tile_info)
 {
 	uint8_t code = m_bg2videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(2,
+	tileinfo.set(2,
 			code,
 			(code & 0xe0) >> 5,
 			0);
@@ -68,7 +68,7 @@ TILE_GET_INFO_MEMBER(senjyo_state::get_bg3_tile_info)
 {
 	uint8_t code = m_bg3videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(3,
+	tileinfo.set(3,
 			code,
 			(code & 0xe0) >> 5,
 			0);
@@ -130,27 +130,27 @@ void senjyo_state::radar_palette(palette_device &palette) const
 
 ***************************************************************************/
 
-WRITE8_MEMBER(senjyo_state::fgvideoram_w)
+void senjyo_state::fgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
-WRITE8_MEMBER(senjyo_state::fgcolorram_w)
+void senjyo_state::fgcolorram_w(offs_t offset, uint8_t data)
 {
 	m_fgcolorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
-WRITE8_MEMBER(senjyo_state::bg1videoram_w)
+void senjyo_state::bg1videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg1videoram[offset] = data;
 	m_bg1_tilemap->mark_tile_dirty(offset);
 }
-WRITE8_MEMBER(senjyo_state::bg2videoram_w)
+void senjyo_state::bg2videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg2videoram[offset] = data;
 	m_bg2_tilemap->mark_tile_dirty(offset);
 }
-WRITE8_MEMBER(senjyo_state::bg3videoram_w)
+void senjyo_state::bg3videoram_w(offs_t offset, uint8_t data)
 {
 	m_bg3videoram[offset] = data;
 	m_bg3_tilemap->mark_tile_dirty(offset);
@@ -182,10 +182,10 @@ void senjyo_state::draw_bgbitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect
 		{
 			if (flip)
 				for (int y = 0;y < 256;y++)
-					bitmap.pix32(y, 255 - x) = m_palette->pen_color(384 + pen);
+					bitmap.pix(y, 255 - x) = m_palette->pen_color(384 + pen);
 			else
 				for (int y = 0;y < 256;y++)
-					bitmap.pix32(y, x) = m_palette->pen_color(384 + pen);
+					bitmap.pix(y, x) = m_palette->pen_color(384 + pen);
 
 			count += 0x10;
 			if (count >= strwid)
@@ -215,7 +215,7 @@ void senjyo_state::draw_radar(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				}
 
 				if (cliprect.contains(sx, sy))
-					bitmap.pix32(sy, sx) =  m_radar_palette->pen_color(offs < 0x200 ? 0 : 1);
+					bitmap.pix(sy, sx) =  m_radar_palette->pen_color(offs < 0x200 ? 0 : 1);
 			}
 }
 

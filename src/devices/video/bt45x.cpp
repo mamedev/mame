@@ -178,7 +178,7 @@ void bt45x_device_base::device_reset()
 	m_blink_start = -1;
 }
 
-READ8_MEMBER(bt45x_device_base::address_r)
+u8 bt45x_device_base::address_r()
 {
 	LOGMASKED(LOG_READS, "%s: address_r 0x%02x\n", machine().describe_context(), m_address & (m_palette_colors - 1));
 
@@ -188,7 +188,7 @@ READ8_MEMBER(bt45x_device_base::address_r)
 	return m_address & (m_palette_colors - 1);
 }
 
-WRITE8_MEMBER(bt45x_device_base::address_w)
+void bt45x_device_base::address_w(u8 data)
 {
 	LOGMASKED(LOG_WRITES, "%s: address_w 0x%02x\n", machine().describe_context(), data);
 
@@ -225,7 +225,7 @@ void bt457_device::increment_address(const bool side_effects)
 	}
 }
 
-READ8_MEMBER(bt45x_rgb_device_base::palette_r)
+u8 bt45x_rgb_device_base::palette_r(address_space &space)
 {
 	const u8 data = m_color_ram[m_address][m_address_rgb];
 
@@ -236,7 +236,7 @@ READ8_MEMBER(bt45x_rgb_device_base::palette_r)
 	return data & get_mask();
 }
 
-READ8_MEMBER(bt45x_mono_device_base::palette_r)
+u8 bt45x_mono_device_base::palette_r(address_space &space)
 {
 	u8 data = space.unmap();
 
@@ -250,7 +250,7 @@ READ8_MEMBER(bt45x_mono_device_base::palette_r)
 	return data & get_mask();
 }
 
-READ8_MEMBER(bt457_device::palette_r)
+u8 bt457_device::palette_r(address_space &space)
 {
 	u8 data = space.unmap();
 
@@ -265,7 +265,7 @@ READ8_MEMBER(bt457_device::palette_r)
 	return data;
 }
 
-WRITE8_MEMBER(bt45x_rgb_device_base::palette_w)
+void bt45x_rgb_device_base::palette_w(u8 data)
 {
 	LOGMASKED(LOG_WRITES, "%s: palette_w 0x%02x\n", machine().describe_context(), data);
 
@@ -278,7 +278,7 @@ WRITE8_MEMBER(bt45x_rgb_device_base::palette_w)
 	increment_address(true);
 }
 
-WRITE8_MEMBER(bt45x_mono_device_base::palette_w)
+void bt45x_mono_device_base::palette_w(u8 data)
 {
 	LOGMASKED(LOG_WRITES, "%s: palette_w 0x%02x\n", machine().describe_context(), data);
 
@@ -288,7 +288,7 @@ WRITE8_MEMBER(bt45x_mono_device_base::palette_w)
 	increment_address(true);
 }
 
-WRITE8_MEMBER(bt457_device::palette_w)
+void bt457_device::palette_w(u8 data)
 {
 	LOGMASKED(LOG_WRITES, "%s: palette_w 0x%02x\n", machine().describe_context(), data);
 
@@ -299,7 +299,7 @@ WRITE8_MEMBER(bt457_device::palette_w)
 	increment_address(true);
 }
 
-READ8_MEMBER(bt45x_device_base::register_r)
+u8 bt45x_device_base::register_r(address_space &space)
 {
 	LOGMASKED(LOG_READS, "%s: register_r 0x%02x\n", machine().describe_context(), m_address);
 
@@ -314,7 +314,7 @@ READ8_MEMBER(bt45x_device_base::register_r)
 	return space.unmap();
 }
 
-WRITE8_MEMBER(bt45x_device_base::register_w)
+void bt45x_device_base::register_w(u8 data)
 {
 	switch (m_address)
 	{
@@ -357,7 +357,7 @@ WRITE8_MEMBER(bt45x_device_base::register_w)
 	}
 }
 
-READ8_MEMBER(bt45x_rgb_device_base::overlay_r)
+u8 bt45x_rgb_device_base::overlay_r(address_space &space)
 {
 	// address is ignored for 1 bit overlay devices
 	const u8 address = (m_overlay_colors == 1) ? 0 : m_address;
@@ -374,7 +374,7 @@ READ8_MEMBER(bt45x_rgb_device_base::overlay_r)
 	return data & get_mask();
 }
 
-READ8_MEMBER(bt45x_mono_device_base::overlay_r)
+u8 bt45x_mono_device_base::overlay_r(address_space &space)
 {
 	// address is ignored for 1 bit overlay devices
 	const u8 address = (m_overlay_colors == 1) ? 0 : m_address;
@@ -391,7 +391,7 @@ READ8_MEMBER(bt45x_mono_device_base::overlay_r)
 	return data & get_mask();
 }
 
-READ8_MEMBER(bt457_device::overlay_r)
+u8 bt457_device::overlay_r(address_space &space)
 {
 	u8 data = space.unmap();
 
@@ -409,7 +409,7 @@ READ8_MEMBER(bt457_device::overlay_r)
 	return data;
 }
 
-WRITE8_MEMBER(bt45x_rgb_device_base::overlay_w)
+void bt45x_rgb_device_base::overlay_w(u8 data)
 {
 	LOGMASKED(LOG_WRITES, "%s: overlay_w 0x%02x\n", machine().describe_context(), data);
 
@@ -431,7 +431,7 @@ WRITE8_MEMBER(bt45x_rgb_device_base::overlay_w)
 	increment_address(true);
 }
 
-WRITE8_MEMBER(bt45x_mono_device_base::overlay_w)
+void bt45x_mono_device_base::overlay_w(u8 data)
 {
 	LOGMASKED(LOG_WRITES, "%s: overlay_w 0x%02x\n", machine().describe_context(), data);
 
@@ -444,7 +444,7 @@ WRITE8_MEMBER(bt45x_mono_device_base::overlay_w)
 	increment_address(true);
 }
 
-WRITE8_MEMBER(bt457_device::overlay_w)
+void bt457_device::overlay_w(u8 data)
 {
 	LOGMASKED(LOG_WRITES, "%s: overlay_w 0x%02x\n", machine().describe_context(), data);
 

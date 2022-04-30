@@ -61,6 +61,10 @@ public:
 	template <unsigned C> auto out_iow_callback() { return m_out_iow_cb[C].bind(); }
 	template <unsigned C> auto out_dack_callback() { return m_out_dack_cb[C].bind(); }
 
+	// define initial (inactive) state of DREQ inputs
+	void dreq_active_low() { assert(!configured()); m_status = 0xf0; }
+	void dreq_active_high() { assert(!configured()); m_status = 0; }
+
 	virtual uint8_t read(offs_t offset);
 	virtual void write(offs_t offset, uint8_t data);
 
@@ -116,7 +120,9 @@ protected:
 	uint8_t m_request;
 
 private:
-	void dma_request(int channel, int state);
+	void dma_request(int channel, bool state);
+	void mask_channel(int channel, bool state);
+	void set_mask_register(uint8_t mask);
 	inline bool is_request_active(int channel);
 	inline bool is_software_request_active(int channel);
 	inline void set_hreq(int state);
@@ -131,9 +137,9 @@ private:
 	devcb_read8        m_in_memr_cb;
 	devcb_write8       m_out_memw_cb;
 
-	devcb_read8        m_in_ior_cb[4];
-	devcb_write8       m_out_iow_cb[4];
-	devcb_write_line   m_out_dack_cb[4];
+	devcb_read8::array<4> m_in_ior_cb;
+	devcb_write8::array<4> m_out_iow_cb;
+	devcb_write_line::array<4> m_out_dack_cb;
 };
 
 
@@ -165,8 +171,8 @@ protected:
 	// 16 bit transfer callbacks
 	devcb_read16 m_in_mem16r_cb;
 	devcb_write16 m_out_mem16w_cb;
-	devcb_read16 m_in_io16r_cb[4];
-	devcb_write16 m_out_io16w_cb[4];
+	devcb_read16::array<4> m_in_io16r_cb;
+	devcb_write16::array<4> m_out_io16w_cb;
 
 	int m_selected_channel;
 	int m_base;

@@ -22,8 +22,7 @@
 
 TILE_GET_INFO_MEMBER(meadows_state::get_tile_info)
 {
-	uint8_t *videoram = m_videoram;
-	SET_TILE_INFO_MEMBER(0, videoram[tile_index] & 0x7f, 0, 0);
+	tileinfo.set(0, m_videoram[tile_index] & 0x7f, 0, 0);
 }
 
 
@@ -47,10 +46,9 @@ void meadows_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(meadows_state::meadows_videoram_w)
+void meadows_state::meadows_videoram_w(offs_t offset, uint8_t data)
 {
-	uint8_t *videoram = m_videoram;
-	videoram[offset] = data;
+	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -62,7 +60,7 @@ WRITE8_MEMBER(meadows_state::meadows_videoram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(meadows_state::meadows_spriteram_w)
+void meadows_state::meadows_spriteram_w(offs_t offset, uint8_t data)
 {
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
@@ -79,17 +77,14 @@ WRITE8_MEMBER(meadows_state::meadows_spriteram_w)
 
 void meadows_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip)
 {
-	uint8_t *spriteram = m_spriteram;
-	int i;
-
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
-		int x = spriteram[i+0] + SPR_ADJUST_X;
-		int y = spriteram[i+4] + SPR_ADJUST_Y;
-		int code = spriteram[i+8] & 0x0f;       /* bit #0 .. #3 select sprite */
-/*      int bank = (spriteram[i+8] >> 4) & 1;      bit #4 selects prom ???    */
-		int bank = i;                           /* that fixes it for now :-/ */
-		int flip = spriteram[i+8] >> 5;         /* bit #5 flip vertical flag */
+		int x = m_spriteram[i+0] + SPR_ADJUST_X;
+		int y = m_spriteram[i+4] + SPR_ADJUST_Y;
+		int code = m_spriteram[i+8] & 0x0f;       /* bit #0 .. #3 select sprite */
+/*      int bank = (m_spriteram[i+8] >> 4) & 1;      bit #4 selects prom ???    */
+		int bank = i;                             /* that fixes it for now :-/ */
+		int flip = m_spriteram[i+8] >> 5;         /* bit #5 flip vertical flag */
 
 		m_gfxdecode->gfx(bank + 1)->transpen(bitmap,clip, code, 0, flip, 0, x, y, 0);
 	}

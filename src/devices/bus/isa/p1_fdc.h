@@ -30,8 +30,8 @@ public:
 	template <typename T>
 	void set_cpu(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 
-	DECLARE_READ8_MEMBER(p1_fdc_r);
-	DECLARE_WRITE8_MEMBER(p1_fdc_w);
+	uint8_t p1_fdc_r(offs_t offset);
+	void p1_fdc_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
@@ -43,8 +43,6 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
-
 	DECLARE_WRITE_LINE_MEMBER(p1_fdc_irq_drq);
 
 	required_device<fd1793_device> m_fdc;

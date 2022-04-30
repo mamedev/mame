@@ -19,8 +19,8 @@ public:
 	void set_bank_limit(int limit) { m_banklimit = limit; }
 	template <typename... T> void set_sprite_callback(T &&... args) { m_callback.set(std::forward<T>(args)...); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 	void sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);
 
 protected:

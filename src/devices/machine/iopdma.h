@@ -36,10 +36,10 @@ public:
 	iop_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~iop_dma_device() override;
 
-	DECLARE_READ32_MEMBER(bank0_r);
-	DECLARE_WRITE32_MEMBER(bank0_w);
-	DECLARE_READ32_MEMBER(bank1_r);
-	DECLARE_WRITE32_MEMBER(bank1_w);
+	uint32_t bank0_r(offs_t offset, uint32_t mem_mask = ~0);
+	void bank0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t bank1_r(offs_t offset, uint32_t mem_mask = ~0);
+	void bank1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	enum channel_type : uint32_t
 	{

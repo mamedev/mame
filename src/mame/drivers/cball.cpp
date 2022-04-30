@@ -40,14 +40,14 @@ public:
 	required_shared_ptr<uint8_t> m_video_ram;
 
 	/* video-related */
-	tilemap_t* m_bg_tilemap;
+	tilemap_t* m_bg_tilemap = nullptr;
 
-	emu_timer *m_int_timer;
+	emu_timer *m_int_timer = nullptr;
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
 
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(wram_r);
-	DECLARE_WRITE8_MEMBER(wram_w);
+	void vram_w(offs_t offset, uint8_t data);
+	uint8_t wram_r(offs_t offset);
+	void wram_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
@@ -61,7 +61,7 @@ public:
 	void cball(machine_config &config);
 	void cpu_map(address_map &map);
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 
@@ -69,11 +69,11 @@ TILE_GET_INFO_MEMBER(cball_state::get_tile_info)
 {
 	uint8_t code = m_video_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code, code >> 7, 0);
+	tileinfo.set(0, code, code >> 7, 0);
 }
 
 
-WRITE8_MEMBER(cball_state::vram_w)
+void cball_state::vram_w(offs_t offset, uint8_t data)
 {
 	m_video_ram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -102,12 +102,12 @@ uint32_t cball_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 
-void cball_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void cball_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
 	case TIMER_INTERRUPT:
-		interrupt_callback(ptr, param);
+		interrupt_callback(param);
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in cball_state::device_timer");
@@ -152,13 +152,13 @@ void cball_state::cball_palette(palette_device &palette) const
 }
 
 
-READ8_MEMBER(cball_state::wram_r)
+uint8_t cball_state::wram_r(offs_t offset)
 {
 	return m_video_ram[0x380 + offset];
 }
 
 
-WRITE8_MEMBER(cball_state::wram_w)
+void cball_state::wram_w(offs_t offset, uint8_t data)
 {
 	m_video_ram[0x380 + offset] = data;
 }

@@ -20,8 +20,8 @@ public:
 	// external I/O
 	DECLARE_WRITE_LINE_MEMBER(bus_dir_w);
 	DECLARE_WRITE_LINE_MEMBER(mcu_start_w);
-	DECLARE_READ8_MEMBER(ext_ram_r);
-	DECLARE_WRITE8_MEMBER(ext_ram_w);
+	u8 ext_ram_r(offs_t offset);
+	void ext_ram_w(offs_t offset, u8 data);
 
 protected:
 	// device-level overrides
@@ -33,18 +33,18 @@ private:
 	required_device<hmcs40_cpu_device> m_mcu;
 
 	// internal state
-	int m_bus;                  // shared RAM bus direction
-	u16 m_mcu_address;          // MCU side RAM address
-	u16 m_mcu_d;                // MCU D output data
-	u8 m_mcu_r[4];              // MCU R0-R3 output data
+	int m_bus = 0;                  // shared RAM bus direction
+	u16 m_mcu_address = 0;          // MCU side RAM address
+	u16 m_mcu_d = 0;                // MCU D output data
+	u8 m_mcu_r[4]{};              // MCU R0-R3 output data
 	std::unique_ptr<u8[]> m_shared_ram; // 1KB RAM
 
 	void mcu_update_address();
 	void mcu_writeram();
 
-	DECLARE_READ8_MEMBER(mcu_data_r);
-	DECLARE_WRITE8_MEMBER(mcu_data_w);
-	DECLARE_WRITE16_MEMBER(mcu_d_w);
+	u8 mcu_data_r(offs_t offset);
+	void mcu_data_w(offs_t offset, u8 data);
+	void mcu_d_w(u16 data);
 };
 
 

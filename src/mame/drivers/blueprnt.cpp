@@ -65,17 +65,17 @@
  *
  *************************************/
 
-WRITE8_MEMBER(blueprnt_state::dipsw_w)
+void blueprnt_state::dipsw_w(uint8_t data)
 {
 	m_dipsw = data;
 }
 
-READ8_MEMBER(blueprnt_state::blueprnt_sh_dipsw_r)
+uint8_t blueprnt_state::blueprnt_sh_dipsw_r()
 {
 	return m_dipsw;
 }
 
-READ8_MEMBER(blueprnt_state::grasspin_sh_dipsw_r)
+uint8_t blueprnt_state::grasspin_sh_dipsw_r()
 {
 	// judging from the disasm, it looks like simple protection was added
 	// d6: small possibility it's for comms? but the fact that there's a Freeze switch on the pcb rules this out
@@ -83,13 +83,13 @@ READ8_MEMBER(blueprnt_state::grasspin_sh_dipsw_r)
 	return (m_dipsw & 0x7f) | 0x80;
 }
 
-WRITE8_MEMBER(blueprnt_state::blueprnt_sound_command_w)
+void blueprnt_state::blueprnt_sound_command_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-WRITE8_MEMBER(blueprnt_state::blueprnt_coin_counter_w)
+void blueprnt_state::blueprnt_coin_counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
@@ -371,8 +371,6 @@ void blueprnt_state::blueprnt(machine_config &config)
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(blueprnt_state::screen_update_blueprnt));
 	screen.set_palette(m_palette);
-
-	MCFG_VIDEO_START_OVERRIDE(blueprnt_state, blueprnt)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_blueprnt);
 	PALETTE(config, m_palette, FUNC(blueprnt_state::blueprnt_palette), 128*4+8);

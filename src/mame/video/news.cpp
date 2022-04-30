@@ -13,7 +13,7 @@
 TILE_GET_INFO_MEMBER(news_state::get_fg_tile_info)
 {
 	int code = (m_fgram[tile_index * 2] << 8) | m_fgram[tile_index * 2 + 1];
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code & 0x0fff,
 			(code & 0xf000) >> 12,
 			0);
@@ -28,7 +28,7 @@ TILE_GET_INFO_MEMBER(news_state::get_bg_tile_info)
 	if ((code & 0x0e00) == 0x0e00)
 		code = (code & 0x1ff) | (m_bgpic << 9);
 
-	SET_TILE_INFO_MEMBER(0,
+	tileinfo.set(0,
 			code,
 			color,
 			0);
@@ -58,19 +58,19 @@ void news_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(news_state::news_fgram_w)
+void news_state::news_fgram_w(offs_t offset, uint8_t data)
 {
 	m_fgram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(news_state::news_bgram_w)
+void news_state::news_bgram_w(offs_t offset, uint8_t data)
 {
 	m_bgram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(news_state::news_bgpic_w)
+void news_state::news_bgpic_w(uint8_t data)
 {
 	if (m_bgpic != data)
 	{

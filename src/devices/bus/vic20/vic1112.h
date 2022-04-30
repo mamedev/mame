@@ -47,8 +47,8 @@ protected:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER( via0_irq_w );
-	DECLARE_READ8_MEMBER( via0_pb_r );
-	DECLARE_WRITE8_MEMBER( via0_pb_w );
+	uint8_t via0_pb_r();
+	void via0_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( via1_irq_w );
 
 	required_device<via6522_device> m_via0;

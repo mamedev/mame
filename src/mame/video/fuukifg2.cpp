@@ -52,7 +52,7 @@ TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info)
 	const int buffer = (Layer < 2) ? 0 : (m_vregs[0x1e / 2] & 0x40) >> 6;
 	const u16 code = m_vram[Layer|buffer][2 * tile_index + 0];
 	const u16 attr = m_vram[Layer|buffer][2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(Layer, code, attr & 0x3f, TILE_FLIPYX((attr >> 6) & 3));
+	tileinfo.set(Layer, code, attr & 0x3f, TILE_FLIPYX((attr >> 6) & 3));
 }
 
 /***************************************************************************

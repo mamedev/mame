@@ -45,9 +45,9 @@
 
    for a total of (12*20*16) = 3840 RAM reads (3 clocks per read at 1.79MHz)
 
-   Then it relingishes control to the CPU by raising BUSREQ.
+   Then it relinquishes control to the CPU by raising BUSREQ.
 
-   Cloking in more detail: (in 1.79MHz clocks)
+   Clocking in more detail: (in 1.79MHz clocks)
    boot:
     busy:1  5360 clocks
     busy:0 22116 clocks
@@ -147,7 +147,7 @@ void gic_device::draw_char_left(int startx, int starty, uint8_t code, bitmap_ind
 		uint8_t curry= starty+y;
 		for(uint8_t x=0x20;x!=0;x=x/2){
 			if (current&x)
-				m_bitmap.pix16(curry,startx+nextx) = GIC_WHITE;
+				m_bitmap.pix(curry,startx+nextx) = GIC_WHITE;
 			nextx++;
 		}
 	}
@@ -161,15 +161,15 @@ void gic_device::draw_char_right(int startx, int starty, uint8_t code, bitmap_in
 		uint8_t nextx=0;
 		uint8_t curry= starty+y;
 
-		m_bitmap.pix16(curry,startx+nextx) = bg_col;
+		m_bitmap.pix(curry,startx+nextx) = bg_col;
 		nextx++;
 		for(uint8_t x=0x20;x!=0;x=x/2){
-			m_bitmap.pix16(curry,startx+nextx) = (current&x)?GIC_WHITE:bg_col;
+			m_bitmap.pix(curry,startx+nextx) = (current&x)?GIC_WHITE:bg_col;
 			nextx++;
 		}
-		m_bitmap.pix16(curry,startx+nextx) = bg_col;
+		m_bitmap.pix(curry,startx+nextx) = bg_col;
 		nextx++;
-		m_bitmap.pix16(curry,startx+nextx) = bg_col;
+		m_bitmap.pix(curry,startx+nextx) = bg_col;
 	}
 }
 
@@ -186,7 +186,7 @@ uint32_t gic_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 		for(uint8_t cx=0;cx<GIC_LEFT_W;cx++){
 			draw_char_left(XSTART+(cx*GIC_CHAR_W),
 							YSTART+(cy*GIC_CHAR_H),
-							m_ram(machine().dummy_space(), current, 0xff),
+							m_ram(current),
 							m_bitmap);
 			current++;
 		}
@@ -199,7 +199,7 @@ uint32_t gic_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	for(uint8_t cy=0;cy<GIC_RIGHT_H;cy++){
 		for(uint8_t cx=0;cx<GIC_RIGHT_W;cx++){
 			//complex case
-			uint8_t data = m_ram(machine().dummy_space(), current++, 0xff);
+			uint8_t data = m_ram(current++);
 
 			size_t currX   = (XSTART+           (cx*(3+GIC_CHAR_W)));
 			size_t currUP  = (YSTART+           (cy*(2*GIC_CHAR_H)));
@@ -239,7 +239,7 @@ uint32_t gic_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 
 /* AUDIO SECTION */
 
-void gic_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void gic_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch ( id )
 	{
@@ -252,14 +252,14 @@ void gic_device::device_timer(emu_timer &timer, device_timer_id id, int param, v
 
 #define GIC_AUDIO_BYTE 0x96
 
-void gic_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void gic_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	stream_sample_t *buffer = outputs[0];
+	auto &buffer = outputs[0];
 
 	//Audio is basic and badly implemented (doubt that was the intent)
-	//The datasheet list the 3 different frequencies the GIC can generate: 500,1000 and 2000Hz
+	//The datasheet lists the 3 different frequencies the GIC can generate: 500,1000 and 2000Hz
 	//but it is clear (for an audio guy at least) that the resulting spectrum
-	//is not a pure square wav. In fact, the counter is reset on vertical sync!
+	//is not a pure square wave. In fact, the counter is reset on vertical sync!
 	//http://twitter.com/plgDavid/status/527269086016077825
 	//...thus creating a buzzing sound.
 
@@ -295,11 +295,10 @@ void gic_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 	//lo for 1824(228*8)
 	//hi for 1824(228*8)
 
-	uint8_t audioByte = m_ram(machine().dummy_space(), GIC_AUDIO_BYTE, 0xff)*2;
+	uint8_t audioByte = m_ram(GIC_AUDIO_BYTE)*2;
 
 	if(!audioByte){
-		for(size_t i = 0; i < samples; i++)
-			*buffer++ = 0;
+		buffer.fill(0);
 
 		m_audioval   = 0;
 		m_audiocnt   = 0;
@@ -314,12 +313,12 @@ void gic_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 		m_audioreset = 0;
 	}
 
-	for(size_t i=0; i < samples; i++){
+	for(size_t i=0; i < buffer.samples(); i++){
 		m_audiocnt++;
 		if(m_audiocnt >= audioByte){
 			m_audioval = !m_audioval;
 			m_audiocnt=0;
 		}
-		*buffer++ = m_audioval<<13;
+		buffer.put(i, m_audioval ? 1.0 : 0.0);
 	}
 }

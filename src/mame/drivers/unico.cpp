@@ -29,9 +29,9 @@ Year + Game         PCB             Notes
 
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
-#include "sound/3812intf.h"
 #include "sound/okim6295.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
+#include "sound/ymopl.h"
 #include "speaker.h"
 
 
@@ -47,7 +47,7 @@ Year + Game         PCB             Notes
                                 Burglar X
 ***************************************************************************/
 
-WRITE8_MEMBER(unico_state::burglarx_okibank_w)
+void unico_state::burglarx_okibank_w(uint8_t data)
 {
 	m_oki->set_rom_bank(data & 1);
 }
@@ -61,15 +61,15 @@ void unico_state::burglarx_map(address_map &map)
 	map(0x80001a, 0x80001b).portr("DSW1");
 	map(0x80001c, 0x80001d).portr("DSW2");
 	map(0x800030, 0x800031).nopw();                                                // ? 0
-	map(0x80010c, 0x800121).rw(FUNC(unico_state::scroll_r), FUNC(unico_state::scroll_w)).share("scroll");               // Scroll
+	map(0x80010c, 0x800121).rw(FUNC(unico_state::scroll_r), FUNC(unico_state::scroll_w));               // Scroll
 	map(0x800189, 0x800189).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // Sound
-	map(0x80018a, 0x80018a).w("ymsnd", FUNC(ym3812_device::write_port_w));
-	map(0x80018c, 0x80018c).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
+	map(0x80018a, 0x80018a).w("ymsnd", FUNC(ym3812_device::data_w));
+	map(0x80018c, 0x80018c).rw("ymsnd", FUNC(ym3812_device::status_r), FUNC(ym3812_device::address_w));
 	map(0x80018e, 0x80018e).w(FUNC(unico_state::burglarx_okibank_w));                    //
 	map(0x8001e0, 0x8001e1).nopw();                                                // IRQ Ack
-	map(0x904000, 0x90ffff).rw(FUNC(unico_state::vram_r), FUNC(unico_state::vram_w)).share("vram");         // Layers 1, 2, 0
+	map(0x904000, 0x90ffff).rw(FUNC(unico_state::vram_r), FUNC(unico_state::vram_w));         // Layers 1, 2, 0
 	map(0x920000, 0x923fff).ram();                                                     // ? 0
-	map(0x930000, 0x9307ff).rw(FUNC(unico_state::spriteram_r), FUNC(unico_state::spriteram_w)).share("spriteram");   // Sprites
+	map(0x930000, 0x9307ff).rw(FUNC(unico_state::spriteram_r), FUNC(unico_state::spriteram_w));   // Sprites
 	map(0x940000, 0x947fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");   // Palette
 }
 
@@ -79,7 +79,7 @@ void unico_state::burglarx_map(address_map &map)
                                 Zero Point
 ***************************************************************************/
 
-WRITE8_MEMBER(zeropnt_state::zeropnt_okibank_leds_w)
+void zeropnt_state::zeropnt_okibank_leds_w(uint8_t data)
 {
 	/* Banked sound samples. The 3rd quarter of the ROM
 	   contains garbage. Indeed, only banks 0&1 are used */
@@ -92,7 +92,7 @@ WRITE8_MEMBER(zeropnt_state::zeropnt_okibank_leds_w)
 }
 
 /* Light Gun - need to wiggle the input slightly otherwise fire doesn't work */
-READ16_MEMBER(zeropnt_state::gunx_0_msb_r)
+uint16_t zeropnt_state::gunx_0_msb_r()
 {
 	int x=m_gun_axes[X0]->read();
 
@@ -103,7 +103,7 @@ READ16_MEMBER(zeropnt_state::gunx_0_msb_r)
 	return ((x&0xff) ^ (m_screen->frame_number()&1))<<8;
 }
 
-READ16_MEMBER(zeropnt_state::guny_0_msb_r)
+uint16_t zeropnt_state::guny_0_msb_r()
 {
 	int y=m_gun_axes[Y0]->read();
 
@@ -112,7 +112,7 @@ READ16_MEMBER(zeropnt_state::guny_0_msb_r)
 	return ((y&0xff) ^ (m_screen->frame_number()&1))<<8;
 }
 
-READ16_MEMBER(zeropnt_state::gunx_1_msb_r)
+uint16_t zeropnt_state::gunx_1_msb_r()
 {
 	int x=m_gun_axes[X1]->read();
 
@@ -123,7 +123,7 @@ READ16_MEMBER(zeropnt_state::gunx_1_msb_r)
 	return ((x&0xff) ^ (m_screen->frame_number()&1))<<8;
 }
 
-READ16_MEMBER(zeropnt_state::guny_1_msb_r)
+uint16_t zeropnt_state::guny_1_msb_r()
 {
 	int y=m_gun_axes[Y1]->read();
 
@@ -140,19 +140,19 @@ void zeropnt_state::zeropnt_map(address_map &map)
 	map(0x800018, 0x800019).portr("INPUTS");
 	map(0x80001a, 0x80001b).portr("DSW1");
 	map(0x80001c, 0x80001d).portr("DSW2");
-	map(0x80010c, 0x800121).rw(FUNC(zeropnt_state::scroll_r), FUNC(zeropnt_state::scroll_w)).share("scroll");   // Scroll
+	map(0x80010c, 0x800121).rw(FUNC(zeropnt_state::scroll_r), FUNC(zeropnt_state::scroll_w));   // Scroll
 	map(0x800170, 0x800171).r(FUNC(zeropnt_state::guny_0_msb_r));   // Light Guns
 	map(0x800174, 0x800175).r(FUNC(zeropnt_state::gunx_0_msb_r));   //
 	map(0x800178, 0x800179).r(FUNC(zeropnt_state::guny_1_msb_r));   //
 	map(0x80017c, 0x80017d).r(FUNC(zeropnt_state::gunx_1_msb_r));   //
 	map(0x800189, 0x800189).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // Sound
-	map(0x80018a, 0x80018a).w("ymsnd", FUNC(ym3812_device::write_port_w));
-	map(0x80018c, 0x80018c).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
+	map(0x80018a, 0x80018a).w("ymsnd", FUNC(ym3812_device::data_w));
+	map(0x80018c, 0x80018c).rw("ymsnd", FUNC(ym3812_device::status_r), FUNC(ym3812_device::address_w));
 	map(0x80018e, 0x80018e).w(FUNC(zeropnt_state::zeropnt_okibank_leds_w));   //
-	map(0x8001e0, 0x8001e1).writeonly();   // ? IRQ Ack
-	map(0x904000, 0x90ffff).rw(FUNC(zeropnt_state::vram_r), FUNC(zeropnt_state::vram_w)).share("vram");     // Layers 1, 2, 0
+	map(0x8001e0, 0x8001e1).nopw();   // ? IRQ Ack
+	map(0x904000, 0x90ffff).rw(FUNC(zeropnt_state::vram_r), FUNC(zeropnt_state::vram_w));     // Layers 1, 2, 0
 	map(0x920000, 0x923fff).ram(); // ? 0
-	map(0x930000, 0x9307ff).rw(FUNC(zeropnt_state::spriteram_r), FUNC(zeropnt_state::spriteram_w)).share("spriteram");   // Sprites
+	map(0x930000, 0x9307ff).rw(FUNC(zeropnt_state::spriteram_r), FUNC(zeropnt_state::spriteram_w));   // Sprites
 	map(0x940000, 0x947fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");   // Palette
 }
 
@@ -167,24 +167,24 @@ void zeropnt_state::zeropnt_oki_map(address_map &map)
                                 Zero Point 2
 ***************************************************************************/
 
-READ32_MEMBER(zeropnt2_state::zeropnt2_gunx_0_msb_r) { return (gunx_0_msb_r(space,0,0xffff)-0x0800) << 16; }
-READ32_MEMBER(zeropnt2_state::zeropnt2_guny_0_msb_r) { return (guny_0_msb_r(space,0,0xffff)+0x0800) << 16; }
-READ32_MEMBER(zeropnt2_state::zeropnt2_gunx_1_msb_r) { return (gunx_1_msb_r(space,0,0xffff)-0x0800) << 16; }
-READ32_MEMBER(zeropnt2_state::zeropnt2_guny_1_msb_r) { return (guny_1_msb_r(space,0,0xffff)+0x0800) << 16; }
+uint32_t zeropnt2_state::zeropnt2_gunx_0_msb_r() { return (gunx_0_msb_r()-0x0800) << 16; }
+uint32_t zeropnt2_state::zeropnt2_guny_0_msb_r() { return (guny_0_msb_r()+0x0800) << 16; }
+uint32_t zeropnt2_state::zeropnt2_gunx_1_msb_r() { return (gunx_1_msb_r()-0x0800) << 16; }
+uint32_t zeropnt2_state::zeropnt2_guny_1_msb_r() { return (guny_1_msb_r()+0x0800) << 16; }
 
-WRITE8_MEMBER(zeropnt2_state::zeropnt2_okibank)
+void zeropnt2_state::zeropnt2_okibank(uint8_t data)
 {
 	m_okibank->set_entry((data & 3) % 4);
 }
 
-WRITE8_MEMBER(zeropnt2_state::leds_w)
+void zeropnt2_state::leds_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0,data & 0x01);
 	m_leds[0] = BIT(data, 7); // Start 1
 	m_leds[1] = BIT(data, 6); // Start 2
 }
 
-WRITE32_MEMBER(zeropnt2_state::eeprom_w)
+void zeropnt2_state::eeprom_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (data & ~0xfe00000)
 		logerror("%s - Unknown EEPROM bit written %04X\n",machine().describe_context(),data);
@@ -211,7 +211,7 @@ void zeropnt2_state::zeropnt2_map(address_map &map)
 	map(0x800031, 0x800031).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));   //
 	map(0x800034, 0x800034).w(FUNC(zeropnt2_state::zeropnt2_okibank));   //
 	map(0x800039, 0x800039).w(FUNC(zeropnt2_state::leds_w));   // ?
-	map(0x80010c, 0x800123).rw(FUNC(zeropnt2_state::scroll_r), FUNC(zeropnt2_state::scroll_w)).share("scroll");   // Scroll
+	map(0x80010c, 0x800123).rw(FUNC(zeropnt2_state::scroll_r), FUNC(zeropnt2_state::scroll_w));   // Scroll
 	map(0x800140, 0x800143).r(FUNC(zeropnt2_state::zeropnt2_guny_0_msb_r));   // Light Guns
 	map(0x800144, 0x800147).r(FUNC(zeropnt2_state::zeropnt2_gunx_0_msb_r));   //
 	map(0x800148, 0x80014b).r(FUNC(zeropnt2_state::zeropnt2_guny_1_msb_r));   //
@@ -221,9 +221,9 @@ void zeropnt2_state::zeropnt2_map(address_map &map)
 	map(0x80015c, 0x80015f).portr("BUTTONS");
 	map(0x8001e0, 0x8001e3).nopw();                                    // ? IRQ Ack
 	map(0x8001f0, 0x8001f3).w(FUNC(zeropnt2_state::eeprom_w));                    // EEPROM
-	map(0x904000, 0x90ffff).rw(FUNC(zeropnt2_state::vram_r), FUNC(zeropnt2_state::vram_w)).share("vram");     // Layers 1, 2, 0
+	map(0x904000, 0x90ffff).rw(FUNC(zeropnt2_state::vram_r), FUNC(zeropnt2_state::vram_w));     // Layers 1, 2, 0
 	map(0x920000, 0x923fff).ram();                                         // ? 0
-	map(0x930000, 0x9307ff).rw(FUNC(zeropnt2_state::spriteram_r), FUNC(zeropnt2_state::spriteram_w)).share("spriteram");   // Sprites
+	map(0x930000, 0x9307ff).rw(FUNC(zeropnt2_state::spriteram_r), FUNC(zeropnt2_state::spriteram_w));   // Sprites
 	map(0x940000, 0x947fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");   // Palette
 	map(0xfe0000, 0xffffff).ram();                                         // RAM
 }

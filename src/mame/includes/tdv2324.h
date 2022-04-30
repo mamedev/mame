@@ -14,7 +14,7 @@
 #include "machine/pic8259.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "video/tms9927.h"
 
 
@@ -66,7 +66,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<m6802_cpu_device> m_fdccpu;
-	required_device<z80dart_device> m_sio;
+	required_device<z80sio_device> m_sio;
 	required_device<pic8259_device> m_pic;
 	required_device<pit8253_device> m_pit0;
 	required_device<pit8253_device> m_pit1;
@@ -75,9 +75,9 @@ private:
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( tdv2324_main_io_30 );
-	DECLARE_READ8_MEMBER( tdv2324_main_io_e6 );
-	DECLARE_WRITE8_MEMBER( tdv2324_main_io_e2 );
+	uint8_t tdv2324_main_io_30();
+	uint8_t tdv2324_main_io_e6();
+	void tdv2324_main_io_e2(uint8_t data);
 
 	// video state
 	required_shared_ptr<uint8_t> m_video_ram;

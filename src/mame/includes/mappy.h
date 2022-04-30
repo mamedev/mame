@@ -6,7 +6,6 @@
 #pragma once
 
 #include "machine/namcoio.h"
-#include "sound/dac.h"
 #include "sound/namco.h"
 #include "emupal.h"
 #include "screen.h"
@@ -24,7 +23,6 @@ public:
 		m_subcpu2(*this, "sub2"),
 		m_namcoio(*this, "namcoio_%u", 1),
 		m_namco_15xx(*this, "namco"),
-		m_dac(*this, "dac"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -42,7 +40,6 @@ public:
 	void superpac(machine_config &config);
 	void todruaga(machine_config &config);
 
-	void init_grobda();
 	void init_digdug2();
 
 protected:
@@ -57,33 +54,32 @@ private:
 	optional_device<cpu_device> m_subcpu2;
 	required_device_array<namcoio_device, 2> m_namcoio;
 	required_device<namco_15xx_device> m_namco_15xx;
-	optional_device<dac_byte_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	output_finder<2> m_leds;
 
-	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 	bitmap_ind16 m_sprite_bitmap;
 
-	uint8_t m_scroll;
+	uint8_t m_scroll = 0;
 
-	uint8_t m_main_irq_mask;
-	uint8_t m_sub_irq_mask;
-	uint8_t m_sub2_irq_mask;
+	uint8_t m_main_irq_mask = 0;
+	uint8_t m_sub_irq_mask = 0;
+	uint8_t m_sub2_irq_mask = 0;
 
-	emu_timer *m_namcoio_run_timer[2];
+	emu_timer *m_namcoio_run_timer[2]{};
 
 	DECLARE_WRITE_LINE_MEMBER(int_on_w);
 	DECLARE_WRITE_LINE_MEMBER(int_on_2_w);
 	DECLARE_WRITE_LINE_MEMBER(int_on_3_w);
 	DECLARE_WRITE_LINE_MEMBER(mappy_flip_w);
-	DECLARE_WRITE8_MEMBER(superpac_videoram_w);
-	DECLARE_WRITE8_MEMBER(mappy_videoram_w);
-	DECLARE_WRITE8_MEMBER(superpac_flipscreen_w);
-	DECLARE_READ8_MEMBER(superpac_flipscreen_r);
-	DECLARE_WRITE8_MEMBER(mappy_scroll_w);
-	DECLARE_WRITE8_MEMBER(out_lamps);
+	void superpac_videoram_w(offs_t offset, uint8_t data);
+	void mappy_videoram_w(offs_t offset, uint8_t data);
+	void superpac_flipscreen_w(uint8_t data);
+	uint8_t superpac_flipscreen_r();
+	void mappy_scroll_w(offs_t offset, uint8_t data);
+	void out_lamps(uint8_t data);
 	TILEMAP_MAPPER_MEMBER(superpac_tilemap_scan);
 	TILEMAP_MAPPER_MEMBER(mappy_tilemap_scan);
 	TILE_GET_INFO_MEMBER(superpac_get_tile_info);

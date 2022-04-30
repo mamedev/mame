@@ -1,5 +1,5 @@
 #
-# Copyright 2011-2019 Branimir Karadzic. All rights reserved.
+# Copyright 2011-2021 Branimir Karadzic. All rights reserved.
 # License: https://github.com/bkaradzic/bimg#license-bsd-2-clause
 #
 
@@ -42,15 +42,15 @@ projgen: ## Generate project files for all configurations.
 	$(GENIE) --with-tools                     vs2017
 	$(GENIE) --with-tools --gcc=mingw-gcc     gmake
 	$(GENIE) --with-tools --gcc=linux-gcc     gmake
-	$(GENIE) --with-tools --gcc=osx           gmake
+	$(GENIE) --with-tools --gcc=osx-x64       gmake
 	$(GENIE) --with-tools --xcode=osx         xcode8
 	$(GENIE) --with-tools --xcode=ios         xcode8
 	$(GENIE)              --gcc=freebsd       gmake
 	$(GENIE)                                --gcc=android-arm     gmake
 	$(GENIE)                                --gcc=android-arm64   gmake
-	$(GENIE)                                --gcc=android-mips    gmake
 	$(GENIE)                                --gcc=android-x86     gmake
-	$(GENIE)                                --gcc=asmjs           gmake
+	$(GENIE)                                --gcc=wasm2js         gmake
+	$(GENIE)                                --gcc=wasm            gmake
 	$(GENIE)                                --gcc=ios-arm         gmake
 	$(GENIE)                                --gcc=ios-arm64       gmake
 	$(GENIE)                                --gcc=ios-simulator   gmake
@@ -73,14 +73,6 @@ android-arm64-release: .build/projects/gmake-android-arm64 ## Build - Android AR
 	$(MAKE) -R -C .build/projects/gmake-android-arm64 config=release
 android-arm64: android-arm64-debug android-arm64-release ## Build - Android ARM64 Debug and Release
 
-.build/projects/gmake-android-mips:
-	$(GENIE) --gcc=android-mips gmake
-android-mips-debug: .build/projects/gmake-android-mips ## Build - Android MIPS Debug
-	$(MAKE) -R -C .build/projects/gmake-android-mips config=debug
-android-mips-release: .build/projects/gmake-android-mips ## Build - Android MIPS Release
-	$(MAKE) -R -C .build/projects/gmake-android-mips config=release
-android-mips: android-mips-debug android-mips-release ## Build - Android MIPS Debug and Release
-
 .build/projects/gmake-android-x86:
 	$(GENIE) --gcc=android-x86 gmake
 android-x86-debug: .build/projects/gmake-android-x86 ## Build - Android x86 Debug and Release
@@ -89,13 +81,21 @@ android-x86-release: .build/projects/gmake-android-x86 ## Build - Android x86 De
 	$(MAKE) -R -C .build/projects/gmake-android-x86 config=release
 android-x86: android-x86-debug android-x86-release ## Build - Android x86 Debug and Release
 
-.build/projects/gmake-asmjs:
-	$(GENIE) --gcc=asmjs gmake
-asmjs-debug: .build/projects/gmake-asmjs ## Build - Emscripten Debug
-	$(MAKE) -R -C .build/projects/gmake-asmjs config=debug
-asmjs-release: .build/projects/gmake-asmjs ## Build - Emscripten Release
-	$(MAKE) -R -C .build/projects/gmake-asmjs config=release
-asmjs: asmjs-debug asmjs-release ## Build - Emscripten Debug and Release
+.build/projects/gmake-wasm2js:
+	$(GENIE) --gcc=wasm2js gmake
+wasm2js-debug: .build/projects/gmake-wasm2js ## Build - Emscripten Debug
+	$(MAKE) -R -C .build/projects/gmake-wasm2js config=debug
+wasm2js-release: .build/projects/gmake-wasm2js ## Build - Emscripten Release
+	$(MAKE) -R -C .build/projects/gmake-wasm2js config=release
+wasm2js: wasm2js-debug wasm2js-release ## Build - Emscripten Debug and Release
+
+.build/projects/gmake-wasm:
+	$(GENIE) --gcc=wasm gmake
+wasm-debug: .build/projects/gmake-wasm ## Build - Emscripten Debug
+	$(MAKE) -R -C .build/projects/gmake-wasm config=debug
+wasm-release: .build/projects/gmake-wasm ## Build - Emscripten Release
+	$(MAKE) -R -C .build/projects/gmake-wasm config=release
+wasm: wasm-debug wasm-release ## Build - Emscripten Debug and Release
 
 .build/projects/gmake-linux:
 	$(GENIE) --with-tools --gcc=linux-gcc gmake
@@ -153,13 +153,13 @@ vs2017-release64: .build/projects/vs2017 ## Build - vs2017 x64 Release
 	devenv .build/projects/vs2017/bimg.sln /Build "Release|x64"
 vs2017: vs2017-debug32 vs2017-release32 vs2017-debug64 vs2017-release64 ## Build - vs2017 x86/x64 Debug and Release
 
-.build/projects/gmake-osx:
-	$(GENIE) --with-tools --gcc=osx gmake
-osx-debug64: .build/projects/gmake-osx ## Build - OSX x64 Debug
-	$(MAKE) -C .build/projects/gmake-osx config=debug64
-osx-release64: .build/projects/gmake-osx ## Build - OSX x64 Release
-	$(MAKE) -C .build/projects/gmake-osx config=release64
-osx: osx-debug64 osx-release64 ## Build - OSX x64 Debug and Release
+.build/projects/gmake-osx-x64:
+	$(GENIE) --gcc=osx-x64 gmake
+osx-x64-debug: .build/projects/gmake-osx-x64
+	make -C .build/projects/gmake-osx config=debug
+osx-x64-release: .build/projects/gmake-osx-x64
+	make -C .build/projects/gmake-osx config=release
+osx-x64: osx-x64-debug osx-x64-release
 
 .build/projects/gmake-ios-arm:
 	$(GENIE) --gcc=ios-arm gmake
@@ -201,7 +201,7 @@ rpi-release: .build/projects/gmake-rpi ## Build - RasberryPi Release
 	$(MAKE) -R -C .build/projects/gmake-rpi config=release
 rpi: rpi-debug rpi-release ## Build - RasberryPi Debug and Release
 
-build-darwin: osx
+build-darwin: osx-x64
 
 build-linux: linux-debug64 linux-release64
 
@@ -231,9 +231,9 @@ UNAME := $(shell uname)
 ifeq ($(UNAME),$(filter $(UNAME),Linux Darwin FreeBSD GNU/kFreeBSD))
 ifeq ($(UNAME),$(filter $(UNAME),Darwin))
 OS=darwin
-BUILD_PROJECT_DIR=gmake-osx
-BUILD_OUTPUT_DIR=osx64_clang
-BUILD_TOOLS_CONFIG=release64
+BUILD_PROJECT_DIR=gmake-osx-x64
+BUILD_OUTPUT_DIR=osx-x64
+BUILD_TOOLS_CONFIG=release
 BUILD_TOOLS_SUFFIX=Release
 EXE=
 else
@@ -284,33 +284,15 @@ clean-tools: ## Clean tools projects.
 	-$(SILENT) rm -r .build/projects/$(BUILD_PROJECT_DIR)
 
 dist-windows: .build/projects/gmake-mingw-gcc
-	$(SILENT) $(MAKE) -C .build/projects/gmake-mingw-gcc config=release64 -j 6 geometryc
-	$(SILENT) cp .build/win64_mingw-gcc/bin/geometrycRelease.exe tools/bin/windows/geometryc.exe
-	$(SILENT) $(MAKE) -C .build/projects/gmake-mingw-gcc config=release64 -j 6 shaderc
-	$(SILENT) cp .build/win64_mingw-gcc/bin/shadercRelease.exe   tools/bin/windows/shaderc.exe
-	$(SILENT) $(MAKE) -C .build/projects/gmake-mingw-gcc config=release64 -j 6 texturec
-	$(SILENT) cp .build/win64_mingw-gcc/bin/texturecRelease.exe  tools/bin/windows/texturec.exe
-	$(SILENT) $(MAKE) -C .build/projects/gmake-mingw-gcc config=release64 -j 6 texturev
-	$(SILENT) cp .build/win64_mingw-gcc/bin/texturevRelease.exe tools/bin/windows/texturev.exe
+	$(SILENT) $(MAKE) -C .build/projects/gmake-mingw-gcc        config=release64 -j 6 texturec
+	$(SILENT) cp .build/win64_mingw-gcc/bin/texturecRelease.exe tools/bin/windows/texturec.exe
 
 dist-linux: .build/projects/gmake-linux
-	$(SILENT) $(MAKE) -C .build/projects/gmake-linux     config=release64 -j 6 geometryc
-	$(SILENT) cp .build/linux64_gcc/bin/geometrycRelease tools/bin/linux/geometryc
-	$(SILENT) $(MAKE) -C .build/projects/gmake-linux     config=release64 -j 6 shaderc
-	$(SILENT) cp .build/linux64_gcc/bin/shadercRelease   tools/bin/linux/shaderc
-	$(SILENT) $(MAKE) -C .build/projects/gmake-linux     config=release64 -j 6 texturec
-	$(SILENT) cp .build/linux64_gcc/bin/texturecRelease  tools/bin/linux/texturec
-	$(SILENT) $(MAKE) -C .build/projects/gmake-linux     config=release64 -j 6 texturev
-	$(SILENT) cp .build/linux64_gcc/bin/texturevRelease  tools/bin/linux/texturev
+	$(SILENT) $(MAKE) -C .build/projects/gmake-linux    config=release64 -j 6 texturec
+	$(SILENT) cp .build/linux64_gcc/bin/texturecRelease tools/bin/linux/texturec
 
-dist-darwin: .build/projects/gmake-osx
-	$(SILENT) $(MAKE) -C .build/projects/gmake-osx       config=release64 -j 6 geometryc
-	$(SILENT) cp .build/osx64_clang/bin/geometrycRelease tools/bin/darwin/geometryc
-	$(SILENT) $(MAKE) -C .build/projects/gmake-osx       config=release64 -j 6 shaderc
-	$(SILENT) cp .build/osx64_clang/bin/shadercRelease   tools/bin/darwin/shaderc
-	$(SILENT) $(MAKE) -C .build/projects/gmake-osx       config=release64 -j 6 texturec
-	$(SILENT) cp .build/osx64_clang/bin/texturecRelease  tools/bin/darwin/texturec
-	$(SILENT) $(MAKE) -C .build/projects/gmake-osx       config=release64 -j 6 texturev
-	$(SILENT) cp .build/osx64_clang/bin/texturevRelease  tools/bin/darwin/texturev
+dist-darwin: .build/projects/gmake-osx-x64
+	$(SILENT) $(MAKE) -C .build/projects/gmake-osx-x64 config=release -j 6 texturec
+	$(SILENT) cp .build/osx-x64/bin/texturecRelease    tools/bin/darwin/texturec
 
 dist: clean dist-windows dist-linux dist-darwin

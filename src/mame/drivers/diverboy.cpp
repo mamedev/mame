@@ -89,8 +89,8 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE16_MEMBER(soundcmd_w);
-	DECLARE_WRITE8_MEMBER(okibank_w);
+	void soundcmd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void okibank_w(uint8_t data);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_diverboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -147,7 +147,7 @@ uint32_t diverboy_state::screen_update_diverboy(screen_device &screen, bitmap_in
 }
 
 
-WRITE16_MEMBER(diverboy_state::soundcmd_w)
+void diverboy_state::soundcmd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -156,7 +156,7 @@ WRITE16_MEMBER(diverboy_state::soundcmd_w)
 	}
 }
 
-WRITE8_MEMBER(diverboy_state::okibank_w)
+void diverboy_state::okibank_w(uint8_t data)
 {
 	/* bit 2 might be reset */
 //  popmessage("%02x",data);
@@ -177,8 +177,8 @@ void diverboy_state::diverboy_map(address_map &map)
 	map(0x180008, 0x180009).portr("COINS");
 //  map(0x18000a, 0x18000b).nopr();
 //  map(0x18000c, 0x18000d).nopw();
-	map(0x320000, 0x3207ff).writeonly(); /* ?? */
-	map(0x322000, 0x3227ff).writeonly(); /* ?? */
+	map(0x320000, 0x3207ff).nopw(); /* ?? */
+	map(0x322000, 0x3227ff).nopw(); /* ?? */
 //  map(0x340000, 0x340001).nopw();
 //  map(0x340002, 0x340003).nopw();
 }
@@ -251,22 +251,9 @@ INPUT_PORTS_END
 
 
 
-static const gfx_layout diverboy_spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,1,2,3 },
-	{  4, 0,  12, 8,  20, 16, 28, 24,
-		36, 32, 44, 40, 52, 48, 60, 56 },
-	{ 0*64, 1*64, 2*64,  3*64,  4*64,  5*64,  6*64,  7*64,
-		8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	16*64
-};
-
 static GFXDECODE_START( gfx_diverboy )
-	GFXDECODE_ENTRY( "gfx1", 0, diverboy_spritelayout, 0, 4*16 )
-	GFXDECODE_ENTRY( "gfx2", 0, diverboy_spritelayout, 0, 4*16 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_16x16x4_packed_lsb, 0, 4*16 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_16x16x4_packed_lsb, 0, 4*16 )
 GFXDECODE_END
 
 

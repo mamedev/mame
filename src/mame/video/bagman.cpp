@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-  bagman.c
+  bagman.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -13,13 +13,13 @@
 #include "includes/bagman.h"
 
 
-WRITE8_MEMBER(bagman_state::videoram_w)
+void bagman_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bagman_state::colorram_w)
+void bagman_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -102,7 +102,7 @@ TILE_GET_INFO_MEMBER(bagman_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] + 8 * (m_colorram[tile_index] & 0x20);
 	int color = m_colorram[tile_index] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(gfxbank, code, color, 0);
+	tileinfo.set(gfxbank, code, color, 0);
 }
 
 void bagman_state::video_start()

@@ -39,9 +39,9 @@ TILE_GET_INFO_MEMBER(ultratnk_state::tile_info)
 	uint8_t code = m_videoram[tile_index];
 
 	if (code & 0x20)
-		SET_TILE_INFO_MEMBER(0, code, code >> 6, 0);
+		tileinfo.set(0, code, code >> 6, 0);
 	else
-		SET_TILE_INFO_MEMBER(0, code, 4, 0);
+		tileinfo.set(0, code, 4, 0);
 }
 
 
@@ -50,6 +50,8 @@ void ultratnk_state::video_start()
 	m_screen->register_screen_bitmap(m_helper);
 
 	m_playfield = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ultratnk_state::tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	std::fill(std::begin(m_collision), std::end(m_collision), 0);
 }
 
 
@@ -122,7 +124,7 @@ WRITE_LINE_MEMBER(ultratnk_state::screen_vblank)
 
 			for (int y = rect.top(); y <= rect.bottom(); y++)
 				for (int x = rect.left(); x <= rect.right(); x++)
-					if (m_palette->pen_indirect(m_helper.pix16(y, x)) != BG)
+					if (m_palette->pen_indirect(m_helper.pix(y, x)) != BG)
 						m_collision[i] = 1;
 		}
 
@@ -133,7 +135,7 @@ WRITE_LINE_MEMBER(ultratnk_state::screen_vblank)
 }
 
 
-WRITE8_MEMBER(ultratnk_state::video_ram_w)
+void ultratnk_state::video_ram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_playfield->mark_tile_dirty(offset);

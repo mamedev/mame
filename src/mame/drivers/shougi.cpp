@@ -2,7 +2,7 @@
 // copyright-holders:Jarek Burczynski, Tomasz Slanina
 /***************************************************************************
 
-Driver by Jarek Burczynski, started by Tomasz Slanina  dox@space.pl
+Driver by Jarek Burczynski, started by Tomasz Slanina
 Lots of hardware info from Guru
 
 memory map :
@@ -104,7 +104,7 @@ public:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
-	DECLARE_READ8_MEMBER(semaphore_r);
+	uint8_t semaphore_r();
 
 	void shougi_palette(palette_device &palette) const;
 
@@ -123,8 +123,8 @@ private:
 
 	required_shared_ptr<uint8_t> m_videoram;
 
-	uint8_t m_nmi_enabled;
-	int m_r;
+	uint8_t m_nmi_enabled = 0;
+	int m_r = 0;
 };
 
 
@@ -217,7 +217,7 @@ uint32_t shougi_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 			color= ((data1>>x) & 1) | (((data1>>(4+x)) & 1)<<1);
 			data = ((data2>>x) & 1) | (((data2>>(4+x)) & 1)<<1);
 
-			bitmap.pix16(255-sy, 255-(sx*4 + x)) = color*4 + data;
+			bitmap.pix(255-sy, 255-(sx*4 + x)) = color*4 + data;
 		}
 	}
 
@@ -265,7 +265,7 @@ void shougi_state::main_map(address_map &map)
 
 // subcpu side
 
-READ8_MEMBER(shougi_state::semaphore_r)
+uint8_t shougi_state::semaphore_r()
 {
 	// d0: waits for it to be set before handling NMI routine
 	// hmm it must be a signal from maincpu, but what?

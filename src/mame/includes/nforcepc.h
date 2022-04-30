@@ -24,7 +24,7 @@ public:
 	crush11_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, const char *bios_device_tag)
 		: crush11_host_device(mconfig, tag, owner, clock)
 	{
-		set_ids_host(0x10de01a4, 0x01, 0x10430c11);
+		set_ids_host(0x10de01a4, 0xb2, 0);
 		set_cpu_tag(std::forward<T>(cpu_tag));
 		biosrom.set_tag(bios_device_tag);
 	}
@@ -36,6 +36,7 @@ public:
 	address_space *get_cpu_space(int spacenum) { return &cpu->space(spacenum); }
 
 	void bios_map(address_map &map);
+	void aperture_map(address_map &map) {}
 
 protected:
 	virtual void device_start() override;
@@ -51,13 +52,13 @@ protected:
 private:
 	required_device<device_memory_interface> cpu;
 	required_device<intelfsh8_device> biosrom;
-	uint32_t ram_size;
+	uint32_t ram_size = 0;
 
-	virtual DECLARE_READ8_MEMBER(header_type_r) override;
-	DECLARE_READ8_MEMBER(unknown_r);
-	DECLARE_WRITE8_MEMBER(unknown_w);
-	DECLARE_READ32_MEMBER(ram_size_r);
-	DECLARE_WRITE32_MEMBER(ram_size_w);
+	virtual uint8_t header_type_r() override;
+	uint8_t unknown_r();
+	void unknown_w(uint8_t data);
+	uint32_t ram_size_r();
+	void ram_size_w(uint32_t data);
 };
 
 DECLARE_DEVICE_TYPE(CRUSH11, crush11_host_device)
@@ -66,7 +67,7 @@ DECLARE_DEVICE_TYPE(CRUSH11, crush11_host_device)
 
 class crush11_memory_device : public pci_device {
 public:
-	crush11_memory_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, int ram_size);
+	crush11_memory_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id, int ram_size);
 	crush11_memory_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_ram_size(int ram_size);
@@ -81,10 +82,10 @@ protected:
 	virtual void config_map(address_map &map) override;
 
 private:
-	int ddr_ram_size;
-	std::vector<uint32_t> ram;
-	crush11_host_device *host;
-	address_space *ram_space;
+	int ddr_ram_size = 0;
+	std::vector<uint32_t> ram{};
+	crush11_host_device *host = nullptr;
+	address_space *ram_space = nullptr;
 };
 
 DECLARE_DEVICE_TYPE(CRUSH11_MEMORY, crush11_memory_device)
@@ -103,7 +104,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	uint8_t buffer[0xff];
+	uint8_t buffer[0xff]{};
 };
 
 DECLARE_DEVICE_TYPE(SMBUS_LOGGER, smbus_logger_device)
@@ -122,8 +123,8 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	const uint8_t *buffer;
-	int buffer_size;
+	const uint8_t *buffer  = nullptr;
+	int buffer_size = 0;
 };
 
 DECLARE_DEVICE_TYPE(SMBUS_ROM, smbus_rom_device)
@@ -142,7 +143,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint8_t buffer[0xff];
+	uint8_t buffer[0xff]{};
 };
 
 DECLARE_DEVICE_TYPE(AS99127F, as99127f_device)
@@ -158,7 +159,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint8_t buffer[0xff];
+	uint8_t buffer[0xff]{};
 };
 
 DECLARE_DEVICE_TYPE(AS99127F_SENSOR2, as99127f_sensor2_device)
@@ -174,7 +175,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint8_t buffer[0xff];
+	uint8_t buffer[0xff]{};
 };
 
 DECLARE_DEVICE_TYPE(AS99127F_SENSOR3, as99127f_sensor3_device)
@@ -234,21 +235,21 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(kbdp21_gp25_gatea20_w);
 	DECLARE_WRITE_LINE_MEMBER(kbdp20_gp20_reset_w);
 
-	DECLARE_READ8_MEMBER(read_it8703f);
-	DECLARE_WRITE8_MEMBER(write_it8703f);
+	uint8_t read_it8703f(offs_t offset);
+	void write_it8703f(offs_t offset, uint8_t data);
 	// parallel port
-	DECLARE_READ8_MEMBER(lpt_read);
-	DECLARE_WRITE8_MEMBER(lpt_write);
+	uint8_t lpt_read(offs_t offset);
+	void lpt_write(offs_t offset, uint8_t data);
 	// uarts
-	DECLARE_READ8_MEMBER(serial1_read);
-	DECLARE_WRITE8_MEMBER(serial1_write);
-	DECLARE_READ8_MEMBER(serial2_read);
-	DECLARE_WRITE8_MEMBER(serial2_write);
+	uint8_t serial1_read(offs_t offset);
+	void serial1_write(offs_t offset, uint8_t data);
+	uint8_t serial2_read(offs_t offset);
+	void serial2_write(offs_t offset, uint8_t data);
 	// keyboard
-	DECLARE_READ8_MEMBER(at_keybc_r);
-	DECLARE_WRITE8_MEMBER(at_keybc_w);
-	DECLARE_READ8_MEMBER(keybc_status_r);
-	DECLARE_WRITE8_MEMBER(keybc_command_w);
+	uint8_t at_keybc_r(offs_t offset);
+	void at_keybc_w(offs_t offset, uint8_t data);
+	uint8_t keybc_status_r();
+	void keybc_command_w(uint8_t data);
 
 protected:
 	virtual void device_start() override;
@@ -273,11 +274,11 @@ private:
 		ACPI,           // ACPI
 		Gpio567 = 12    // GPIO set 5, 6 and 7
 	};
-	int config_key_step;
-	int config_index;
-	int logical_device;
-	uint8_t global_configuration_registers[0x30];
-	uint8_t configuration_registers[13][0x100];
+	int config_key_step = 0;
+	int config_index = 0;
+	int logical_device = 0;
+	uint8_t global_configuration_registers[0x30]{};
+	uint8_t configuration_registers[13][0x100]{};
 	devcb_write_line pin_reset_callback;
 	devcb_write_line pin_gatea20_callback;
 	devcb_write_line m_txd1_callback;
@@ -286,19 +287,19 @@ private:
 	devcb_write_line m_txd2_callback;
 	devcb_write_line m_ndtr2_callback;
 	devcb_write_line m_nrts2_callback;
-	required_device<pc_fdc_interface> floppy_controller_fdcdev;
+	required_device<smc37c78_device> floppy_controller_fdcdev;
 	required_device<pc_lpt_device> pc_lpt_lptdev;
 	required_device<ns16450_device> pc_serial1_comdev;
 	required_device<ns16450_device> pc_serial2_comdev;
 	required_device<kbdc8042_device> m_kbdc;
-	bool enabled_logical[13];
-	bool enabled_game_port;
-	bool enabled_midi_port;
+	bool enabled_logical[13]{};
+	bool enabled_game_port = false;
+	bool enabled_midi_port = false;
 
-	lpcbus_host_interface *lpchost;
-	int lpcindex;
-	address_space *memspace;
-	address_space *iospace;
+	lpcbus_host_interface *lpchost = nullptr;
+	int lpcindex = 0;
+	address_space *memspace = nullptr;
+	address_space *iospace = nullptr;
 
 	void internal_memory_map(address_map &map);
 	void internal_io_map(address_map &map);

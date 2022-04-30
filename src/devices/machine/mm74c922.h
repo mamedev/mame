@@ -56,6 +56,7 @@ public:
 	auto x2_rd_callback() { return m_read_x[1].bind(); }
 	auto x3_rd_callback() { return m_read_x[2].bind(); }
 	auto x4_rd_callback() { return m_read_x[3].bind(); }
+	auto data_tri_callback() { return m_tristate_data.bind(); }
 
 	uint8_t read();
 
@@ -66,18 +67,19 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	void change_output_lines();
 	void clock_scan_counters();
 	void detect_keypress();
 
-	devcb_write_line   m_write_da;
-	devcb_read8        m_read_x[4];
+	devcb_write_line m_write_da;
+	devcb_read8::array<4> m_read_x;
+	devcb_read8 m_tristate_data;
 
-	double              m_cap_osc;
-	double              m_cap_debounce;
+	double m_cap_osc;
+	double m_cap_debounce;
 
 	const int m_max_y;
 
@@ -86,6 +88,7 @@ private:
 	int m_y;                    // latched row
 
 	uint8_t m_data;             // data latch
+	uint8_t m_next_data;        // next value of data latch
 
 	bool m_da;                  // data available flag
 	bool m_next_da;             // next value of data available flag

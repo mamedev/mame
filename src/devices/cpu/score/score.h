@@ -107,11 +107,11 @@ private:
 	void op_iform1b();
 
 	address_space_config m_program_config;
-	address_space *     m_program;
-	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::specific m_program;
 
 	// internal state
-	int                 m_icount;
+	int                   m_icount;
 	uint32_t              m_pc;
 	uint32_t              m_ppc;
 	uint32_t              m_op;
@@ -119,7 +119,7 @@ private:
 	uint32_t              m_cr[0x20];
 	uint32_t              m_sr[3];
 	uint32_t              m_ce[2];
-	bool                m_pending_interrupt[64];
+	uint64_t              m_pending_interrupt;
 
 	// opcodes tables
 	typedef void (score7_cpu_device::*op_handler)();

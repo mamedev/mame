@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/***************************************************************************
+/**************************************************************************************************
 
     System Sacom AMD-98 (AmuseMent boarD)
 
@@ -13,7 +13,7 @@
     - PIT control;
     - PCM section;
 
-=============================================================================
+===================================================================================================
 
 - Known games with AMD-98 support
     Brown's Run (System Sacom)
@@ -25,7 +25,7 @@
     Relics (Bothtec)
     Thexder (Game Arts)
 
-***************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "bus/cbus/pc9801_amd98.h"
@@ -37,7 +37,7 @@
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(PC9801_AMD98, pc9801_amd98_device, "pc9801_amd98", "pc9801_amd98")
+DEFINE_DEVICE_TYPE(PC9801_AMD98, pc9801_amd98_device, "pc9801_amd98", "System Sacom AMD-98")
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -101,11 +101,11 @@ ioport_constructor pc9801_amd98_device::device_input_ports() const
 //-------------------------------------------------
 
 pc9801_amd98_device::pc9801_amd98_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PC9801_AMD98, tag, owner, clock),
-		m_bus(*this, DEVICE_SELF_OWNER),
-		m_ay1(*this, "ay1"),
-		m_ay2(*this, "ay2"),
-		m_ay3(*this, "ay3")
+	: device_t(mconfig, PC9801_AMD98, tag, owner, clock)
+	, m_bus(*this, DEVICE_SELF_OWNER)
+	, m_ay1(*this, "ay1")
+	, m_ay2(*this, "ay2")
+	, m_ay3(*this, "ay3")
 {
 }
 
@@ -134,9 +134,9 @@ void pc9801_amd98_device::device_start()
 
 void pc9801_amd98_device::device_reset()
 {
-	m_bus->install_io(0x00d8, 0x00df, read8_delegate(*this, FUNC(pc9801_amd98_device::read)), write8_delegate(*this, FUNC(pc9801_amd98_device::write)));
+	m_bus->install_io(0x00d8, 0x00df, read8sm_delegate(*this, FUNC(pc9801_amd98_device::read)), write8sm_delegate(*this, FUNC(pc9801_amd98_device::write)));
 	// Thexder access with following
-	m_bus->install_io(0x38d8, 0x38df, read8_delegate(*this, FUNC(pc9801_amd98_device::read)), write8_delegate(*this, FUNC(pc9801_amd98_device::write)));
+	m_bus->install_io(0x38d8, 0x38df, read8sm_delegate(*this, FUNC(pc9801_amd98_device::read)), write8sm_delegate(*this, FUNC(pc9801_amd98_device::write)));
 }
 
 
@@ -144,7 +144,7 @@ void pc9801_amd98_device::device_reset()
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ8_MEMBER(pc9801_amd98_device::read)
+uint8_t pc9801_amd98_device::read(offs_t offset)
 {
 	switch(offset)
 	{
@@ -159,7 +159,7 @@ READ8_MEMBER(pc9801_amd98_device::read)
 	return 0xff;
 }
 
-WRITE8_MEMBER(pc9801_amd98_device::write)
+void pc9801_amd98_device::write(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
@@ -180,12 +180,12 @@ WRITE8_MEMBER(pc9801_amd98_device::write)
 	}
 }
 
-WRITE8_MEMBER(pc9801_amd98_device::ay3_address_w)
+void pc9801_amd98_device::ay3_address_w(uint8_t data)
 {
 	m_ay3_latch = data;
 }
 
-WRITE8_MEMBER(pc9801_amd98_device::ay3_data_latch_w)
+void pc9801_amd98_device::ay3_data_latch_w(uint8_t data)
 {
 	// TODO: this actually uses a flip flop mechanism, not quite sure about how it works yet
 	switch(data)

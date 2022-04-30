@@ -27,6 +27,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_COMX35_FORMAT;
+extern const comx35_format FLOPPY_COMX35_FORMAT;
 
 #endif // MAME_FORMATS_COMX35_DSK_H

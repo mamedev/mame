@@ -78,7 +78,7 @@ ioport_value msm6253_device::port_read()
 //  one of four internal latches
 //-------------------------------------------------
 
-WRITE8_MEMBER(msm6253_device::address_w)
+void msm6253_device::address_w(offs_t offset, u8 data)
 {
 	// fill the shift register from the internal A/D latch
 	m_shift_register = m_analog_input_cb[offset & 3]();
@@ -88,7 +88,7 @@ WRITE8_MEMBER(msm6253_device::address_w)
 //  select_w - write D0/D1 to address latch
 //-------------------------------------------------
 
-WRITE8_MEMBER(msm6253_device::select_w)
+void msm6253_device::select_w(offs_t offset, u8 data)
 {
 	// fill the shift register from the internal A/D latch
 	m_shift_register = m_analog_input_cb[data & 3]();
@@ -115,7 +115,7 @@ bool msm6253_device::shift_out()
 //  d0_r - shift data bit out to D0
 //-------------------------------------------------
 
-READ8_MEMBER(msm6253_device::d0_r)
+u8 msm6253_device::d0_r(address_space &space)
 {
 	// offset is ignored
 	return shift_out() | (space.unmap() & 0xfe);
@@ -125,7 +125,7 @@ READ8_MEMBER(msm6253_device::d0_r)
 //  d7_r - shift data bit out to D7
 //-------------------------------------------------
 
-READ8_MEMBER(msm6253_device::d7_r)
+u8 msm6253_device::d7_r(address_space &space)
 {
 	// offset is ignored
 	return (shift_out() << 7) | (space.unmap() & 0x7f);

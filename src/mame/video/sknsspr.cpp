@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(SKNS_SPRITE, sknsspr_device, "sknsspr", "SKNS Sprite")
 sknsspr_device::sknsspr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SKNS_SPRITE, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
-	, device_rom_interface(mconfig, *this, 27) // TODO : Unknown address bits; maybe 27?
+	, device_rom_interface(mconfig, *this)
 {
 }
 
@@ -55,23 +55,23 @@ int sknsspr_device::skns_rle_decode ( int romoffset, int size )
 	int decodeoffset = 0;
 
 	while(size>0) {
-		u8 code = read_byte((romoffset++) % (1<<27));
+		u8 code = read_byte((romoffset++) & ((1<<27) - 1));
 		size -= (code & 0x7f) + 1;
 		if(code & 0x80) { /* (code & 0x7f) normal values will follow */
 			code &= 0x7f;
 			do {
-				m_decodebuffer[(decodeoffset++)%SUPRNOVA_DECODE_BUFFER_SIZE] = read_byte((romoffset++) % (1<<27));
+				m_decodebuffer[(decodeoffset++) & (SUPRNOVA_DECODE_BUFFER_SIZE-1)] = read_byte((romoffset++) & ((1<<27) - 1));
 				code--;
 			} while(code != 0xff);
 		} else {  /* repeat next value (code & 0x7f) times */
-			u8 val = read_byte((romoffset++) % (1<<27));
+			u8 val = read_byte((romoffset++) & ((1<<27) - 1));
 			do {
-				m_decodebuffer[(decodeoffset++)%SUPRNOVA_DECODE_BUFFER_SIZE] = val;
+				m_decodebuffer[(decodeoffset++) & (SUPRNOVA_DECODE_BUFFER_SIZE-1)] = val;
 				code--;
 			} while(code != 0xff);
 		}
 	}
-	return romoffset % (1<<27);
+	return romoffset & ((1<<27) - 1);
 }
 
 void sknsspr_device::skns_sprite_kludge(int x, int y)
@@ -110,11 +110,11 @@ void sknsspr_device::skns_sprite_kludge(int x, int y)
 	}
 
 #define z_clamp_x_max()         \
-	if(x > clip.max_x) {                \
+	if(x >= clip.max_x) {                \
 		do {                    \
 			bxs += zxs;             \
 			x -= zxd;                   \
-		} while(x > clip.max_x);                \
+		} while(x >= clip.max_x);                \
 	}
 
 #define z_clamp_y_min()         \
@@ -127,11 +127,11 @@ void sknsspr_device::skns_sprite_kludge(int x, int y)
 	}
 
 #define z_clamp_y_max()         \
-	if(y > clip.max_y) {                \
+	if(y >= clip.max_y) {                \
 		do {                    \
 			bys += zys;             \
 			y -= zyd;                   \
-		} while(y > clip.max_y);                \
+		} while(y >= clip.max_y);                \
 		src += (bys>>16)*step_spr;           \
 	}
 
@@ -156,9 +156,9 @@ void sknsspr_device::skns_sprite_kludge(int x, int y)
 	while(ys < sy && yd >= clip.min_y)
 
 #define z_draw_pixel()              \
-	u8 val = src[xs >> 16];           \
+	u8 val = src[(xs >> 16) & 0x3f];    \
 	if(val)                 \
-		bitmap.pix16(yd>>16, xd>>16) = val + colour;
+		bitmap.pix(yd>>16, xd>>16) = val + colour;
 
 #define z_x_dst(op)         \
 	old = xd;                   \
@@ -474,81 +474,72 @@ void sknsspr_device::skns_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cl
 					sx >>= 6;
 					sy >>= 6;
 					if (!xflip && !yflip) {
-						int xx,yy;
-
-						for (xx = 0; xx<xsize; xx++)
+						for (int xx = 0; xx<xsize; xx++)
 						{
 							if ((sx+xx < (cliprect.max_x+1)) && (sx+xx >= cliprect.min_x))
 							{
-								for (yy = 0; yy<ysize; yy++)
+								for (int yy = 0; yy<ysize; yy++)
 								{
 									if ((sy+yy < (cliprect.max_y+1)) && (sy+yy >= cliprect.min_y))
 									{
-										int pix;
-										pix = m_decodebuffer[xsize*yy+xx];
+										int const pix = m_decodebuffer[xsize*yy+xx];
 										if (pix)
-											bitmap.pix16(sy+yy, sx+xx) = pix+ NewColour; // change later
+											bitmap.pix(sy+yy, sx+xx) = pix+ NewColour; // change later
 									}
 								}
 							}
 						}
 					} else if (!xflip && yflip) {
-						int xx,yy;
 						sy -= ysize;
 
-						for (xx = 0; xx<xsize; xx++)
+						for (int xx = 0; xx<xsize; xx++)
 						{
 							if ((sx+xx < (cliprect.max_x+1)) && (sx+xx >= cliprect.min_x))
 							{
-								for (yy = 0; yy<ysize; yy++)
+								for (int yy = 0; yy<ysize; yy++)
 								{
 									if ((sy+(ysize-1-yy) < (cliprect.max_y+1)) && (sy+(ysize-1-yy) >= cliprect.min_y))
 									{
-										int pix;
-										pix = m_decodebuffer[xsize*yy+xx];
+										int const pix = m_decodebuffer[xsize*yy+xx];
 										if (pix)
-											bitmap.pix16(sy+(ysize-1-yy), sx+xx) = pix+ NewColour; // change later
+											bitmap.pix(sy+(ysize-1-yy), sx+xx) = pix+ NewColour; // change later
 									}
 								}
 							}
 						}
 					} else if (xflip && !yflip) {
-						int xx,yy;
 						sx -= xsize;
 
-						for (xx = 0; xx<xsize; xx++)
+						for (int xx = 0; xx<xsize; xx++)
 						{
 							if ( (sx+(xsize-1-xx) < (cliprect.max_x+1)) && (sx+(xsize-1-xx) >= cliprect.min_x))
 							{
-								for (yy = 0; yy<ysize; yy++)
+								for (int yy = 0; yy<ysize; yy++)
 								{
 									if ((sy+yy < (cliprect.max_y+1)) && (sy+yy >= cliprect.min_y))
 									{
-										int pix;
-										pix = m_decodebuffer[xsize*yy+xx];
+										int const pix = m_decodebuffer[xsize*yy+xx];
 										if (pix)
-											bitmap.pix16(sy+yy, sx+(xsize-1-xx)) = pix+ NewColour; // change later
+											bitmap.pix(sy+yy, sx+(xsize-1-xx)) = pix+ NewColour; // change later
 									}
 								}
 							}
 						}
 					} else if (xflip && yflip) {
-						int xx,yy;
 						sx -= xsize;
 						sy -= ysize;
 
-						for (xx = 0; xx<xsize; xx++)
+						for (int xx = 0; xx<xsize; xx++)
 						{
 							if ((sx+(xsize-1-xx) < (cliprect.max_x+1)) && (sx+(xsize-1-xx) >= cliprect.min_x))
 							{
-								for (yy = 0; yy<ysize; yy++)
+								for (int yy = 0; yy<ysize; yy++)
 								{
 									if ((sy+(ysize-1-yy) < (cliprect.max_y+1)) && (sy+(ysize-1-yy) >= cliprect.min_y))
 									{
-										int pix;
-										pix = m_decodebuffer[xsize*yy+xx];
+										int const pix = m_decodebuffer[xsize*yy+xx];
 										if (pix)
-											bitmap.pix16(sy+(ysize-1-yy), sx+(xsize-1-xx)) = pix+ NewColour; // change later
+											bitmap.pix(sy+(ysize-1-yy), sx+(xsize-1-xx)) = pix+ NewColour; // change later
 									}
 								}
 							}

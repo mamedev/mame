@@ -17,13 +17,13 @@
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/watchdog.h"
-#include "sound/ym2151.h"
 #include "sound/okim6295.h"
+#include "sound/ymopm.h"
 #include "emupal.h"
 #include "speaker.h"
 
 
-WRITE8_MEMBER(ultraman_state::sound_nmi_enable_w)
+void ultraman_state::sound_nmi_enable_w(uint8_t data)
 {
 	m_soundnmi->in_w<1>(BIT(data, 0));
 }

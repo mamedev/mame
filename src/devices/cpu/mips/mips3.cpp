@@ -9,7 +9,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "mips3.h"
 #include "mips3com.h"
 #include "mips3dsm.h"
@@ -345,11 +344,9 @@ void mips3_device::generate_exception(int exception, int backup)
 void mips3_device::generate_tlb_exception(int exception, offs_t address)
 {
 	m_core->cpr[0][COP0_BadVAddr] = address;
-	if(exception == EXCEPTION_TLBLOAD || exception == EXCEPTION_TLBSTORE || exception == EXCEPTION_TLBLOAD_FILL || exception == EXCEPTION_TLBSTORE_FILL)
-	{
-		m_core->cpr[0][COP0_Context] = (m_core->cpr[0][COP0_Context] & 0xff800000) | ((address >> 9) & 0x007ffff0);
-		m_core->cpr[0][COP0_EntryHi] = (address & 0xffffe000) | (m_core->cpr[0][COP0_EntryHi] & 0xff);
-	}
+	m_core->cpr[0][COP0_Context] = (m_core->cpr[0][COP0_Context] & 0xff800000) | ((address >> 9) & 0x007ffff0);
+	m_core->cpr[0][COP0_EntryHi] = (address & 0xffffe000) | (m_core->cpr[0][COP0_EntryHi] & 0xff);
+
 	generate_exception(exception, 1);
 }
 
@@ -401,30 +398,30 @@ void mips3_device::device_start()
 	{
 		if (m_data_bits == 32)
 		{
-			auto cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
-			m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
-			m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+			m_program->cache(m_cache32le);
+			m_pr32 = delegate<u32 (offs_t)>(&memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache::read_dword, &m_cache32le);
+			m_prptr = [this] (offs_t address) -> const void * { return m_cache32le.read_ptr(address); };
 		}
 		else
 		{
-			auto cache = m_program->cache<3, 0, ENDIANNESS_LITTLE>();
-			m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
-			m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+			m_program->cache(m_cache64le);
+			m_pr32 = delegate<u32 (offs_t)>(&memory_access<32, 3, 0, ENDIANNESS_LITTLE>::cache::read_dword, &m_cache64le);
+			m_prptr = [this] (offs_t address) -> const void * { return m_cache64le.read_ptr(address); };
 		}
 	}
 	else
 	{
 		if (m_data_bits == 32)
 		{
-			auto cache = m_program->cache<2, 0, ENDIANNESS_BIG>();
-			m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
-			m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+			m_program->cache(m_cache32be);
+			m_pr32 = delegate<u32 (offs_t)>(&memory_access<32, 2, 0, ENDIANNESS_BIG>::cache::read_dword, &m_cache32be);
+			m_prptr = [this] (offs_t address) -> const void * { return m_cache32be.read_ptr(address); };
 		}
 		else
 		{
-			auto cache = m_program->cache<3, 0, ENDIANNESS_BIG>();
-			m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
-			m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+			m_program->cache(m_cache64be);
+			m_pr32 = delegate<u32 (offs_t)>(&memory_access<32, 3, 0, ENDIANNESS_BIG>::cache::read_dword, &m_cache64be);
+			m_prptr = [this] (offs_t address) -> const void * { return m_cache64be.read_ptr(address); };
 		}
 	}
 
@@ -728,7 +725,6 @@ void mips3_device::device_start()
 	state_add( MIPS3_LLADDR,       "LLAddr", m_core->cpr[0][COP0_LLAddr]).formatstr("%08X");
 
 	state_add( STATE_GENPCBASE, "CURPC", m_core->pc).noshow();
-	state_add( STATE_GENSP, "CURSP", m_core->r[31]).noshow();
 	state_add( STATE_GENFLAGS, "CURFLAGS", m_debugger_temp).formatstr("%1s").noshow();
 
 	set_icountptr(m_core->icount);
@@ -1721,7 +1717,7 @@ void mips3_device::set_cop0_reg(int idx, uint64_t val)
 	{
 		case COP0_Cause:
 			CAUSE = (CAUSE & 0xfc00) | (val & ~0xfc00);
-			if (CAUSE & 0x300)
+			if ((CAUSE & SR & 0x300) && (SR & SR_IE) && !(SR & (SR_EXL | SR_ERL)))
 			{
 				/* if we're in a delay slot, propogate the target PC before generating the exception */
 				if (m_nextpc != ~0)
@@ -3561,11 +3557,11 @@ void mips3_device::handle_special(uint32_t op)
 			m_core->icount -= 35;
 			break;
 		case 0x1c:  /* DMULT */
-			LOVAL64 = mul_64x64(RSVAL64, RTVAL64, reinterpret_cast<s64 *>(&HIVAL64));
+			LOVAL64 = mul_64x64(RSVAL64, RTVAL64, *reinterpret_cast<s64 *>(&HIVAL64));
 			m_core->icount -= 7;
 			break;
 		case 0x1d:  /* DMULTU */
-			LOVAL64 = mulu_64x64(RSVAL64, RTVAL64, &HIVAL64);
+			LOVAL64 = mulu_64x64(RSVAL64, RTVAL64, HIVAL64);
 			m_core->icount -= 7;
 			break;
 		case 0x1e:  /* DDIV */
@@ -5044,11 +5040,6 @@ void r5900le_device::handle_sdc2(uint32_t op)
 	}
 }
 
-void mips3_device::burn_cycles(int32_t cycles)
-{
-	execute_burn(cycles);
-}
-
 #if ENABLE_O2_DPRINTF
 #include "o2dprintf.hxx"
 #endif
@@ -5214,8 +5205,8 @@ void mips3_device::execute_run()
 					m_core->llbit = 1;
 					if LL_BREAK
 						machine().debug_break();
-					break;
 				}
+				break;
 			case 0x31:  /* LWC1 */
 				if (!(SR & SR_COP1))
 				{
@@ -5236,18 +5227,18 @@ void mips3_device::execute_run()
 					m_core->llbit = 1;
 					if LL_BREAK
 						machine().debug_break();
+				}
+				break;
+			case 0x35:  /* LDC1 */
+				if (!(SR & SR_COP1))
+				{
+					m_badcop_value = 1;
+					generate_exception(EXCEPTION_BADCOP, 1);
 					break;
 				}
-			case 0x35:  /* LDC1 */
-			if (!(SR & SR_COP1))
-			{
-				m_badcop_value = 1;
-				generate_exception(EXCEPTION_BADCOP, 1);
+				if (RDOUBLE(SIMMVAL+RSVAL32, &temp64))
+					set_cop1_reg64(RTREG, temp64);
 				break;
-			}
-			if (RDOUBLE(SIMMVAL+RSVAL32, &temp64))
-				set_cop1_reg64(RTREG, temp64);
-			break;
 			case 0x36:  handle_ldc2(op); break;
 			case 0x37:  /* LD */        if (RDOUBLE(SIMMVAL+RSVAL32, &temp64) && RTREG) RTVAL64 = temp64;       break;
 			case 0x38:  /* SC */

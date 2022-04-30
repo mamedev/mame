@@ -12,24 +12,25 @@
 #include "n2a03.h"
 #include "n2a03d.h"
 
+DEFINE_DEVICE_TYPE(N2A03_CORE, n2a03_core_device, "n2a03_core", "Ricoh N2A03 core") // needed for some VT systems with XOP instead of standard APU
 DEFINE_DEVICE_TYPE(N2A03, n2a03_device, "n2a03", "Ricoh N2A03")
 
-READ8_MEMBER(n2a03_device::psg1_4014_r)
+uint8_t n2a03_device::psg1_4014_r()
 {
 	return m_apu->read(0x14);
 }
 
-READ8_MEMBER(n2a03_device::psg1_4015_r)
+uint8_t n2a03_device::psg1_4015_r()
 {
 	return m_apu->read(0x15);
 }
 
-WRITE8_MEMBER(n2a03_device::psg1_4015_w)
+void n2a03_device::psg1_4015_w(uint8_t data)
 {
 	m_apu->write(0x15, data);
 }
 
-WRITE8_MEMBER(n2a03_device::psg1_4017_w)
+void n2a03_device::psg1_4017_w(uint8_t data)
 {
 	m_apu->write(0x17, data);
 }
@@ -51,15 +52,29 @@ void n2a03_device::n2a03_map(address_map &map)
 
 
 
+n2a03_core_device::n2a03_core_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: m6502_device(mconfig, type, tag, owner, clock)
+{
+}
+
+n2a03_core_device::n2a03_core_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: n2a03_core_device(mconfig, N2A03_CORE, tag, owner, clock)
+{
+}
+
+
+
 n2a03_device::n2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m6502_device(mconfig, N2A03, tag, owner, clock)
+	: n2a03_core_device(mconfig, N2A03, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this, 1)
 	, m_apu(*this, "nesapu")
 {
 	program_config.m_internal_map = address_map_constructor(FUNC(n2a03_device::n2a03_map), this);
 }
 
-std::unique_ptr<util::disasm_interface> n2a03_device::create_disassembler()
+
+
+std::unique_ptr<util::disasm_interface> n2a03_core_device::create_disassembler()
 {
 	return std::make_unique<n2a03_disassembler>();
 }
@@ -70,9 +85,9 @@ WRITE_LINE_MEMBER(n2a03_device::apu_irq)
 	set_input_line(N2A03_APU_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(n2a03_device::apu_read_mem)
+uint8_t n2a03_device::apu_read_mem(offs_t offset)
 {
-	return mintf->program->read_byte(offset);
+	return mintf->program.read_byte(offset);
 }
 
 void n2a03_device::device_add_mconfig(machine_config &config)

@@ -65,13 +65,13 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
 	// callbacks
 	devcb_write_line m_eoc_cb;
 	devcb_write_line m_eoc_ff_cb;
-	devcb_read8 m_in_cb[8];
+	devcb_read8::array<8> m_in_cb;
 
 	enum state : int
 	{

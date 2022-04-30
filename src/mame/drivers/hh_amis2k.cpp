@@ -3,12 +3,12 @@
 // thanks-to:Sean Riddle
 /***************************************************************************
 
-  AMI S2000 series handhelds or other simple devices.
+AMI S2000 series handhelds or other simple devices.
 
-  TODO:
-  - were any other handhelds with this MCU released?
-  - wildfire sound can be improved, volume decay should be more steep at the start,
-    and the pitch sounds wrong too (latter is an MCU emulation problem)
+TODO:
+- were any other handhelds with this MCU released?
+- wildfire sound can be improved, volume decay should be more steep at the start,
+  and the pitch sounds wrong too (latter is an MCU emulation problem)
 
 ***************************************************************************/
 
@@ -36,6 +36,10 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	// devices
 	required_device<amis2000_base_device> m_maincpu;
 	optional_device<pwm_display_device> m_display;
@@ -43,16 +47,12 @@ public:
 	optional_ioport_array<4> m_inputs; // max 4
 
 	// misc common
-	u16 m_a;                        // MCU address bus
-	u8 m_d;                         // MCU data bus
-	int m_f;                        // MCU F_out pin
-	u16 m_inp_mux;                  // multiplexed inputs mask
+	u16 m_a = 0;                    // MCU address bus
+	u8 m_d = 0;                     // MCU data bus
+	int m_f = 0;                    // MCU F_out pin
+	u16 m_inp_mux = 0;              // multiplexed inputs mask
 
 	u8 read_inputs(int columns);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 };
 
 
@@ -60,12 +60,6 @@ protected:
 
 void hh_amis2k_state::machine_start()
 {
-	// zerofill
-	m_a = 0;
-	m_d = 0;
-	m_f = 0;
-	m_inp_mux = 0;
-
 	// register for savestates
 	save_item(NAME(m_a));
 	save_item(NAME(m_d));
@@ -145,26 +139,27 @@ public:
 		hh_amis2k_state(mconfig, type, tag)
 	{ }
 
-	void update_display();
-	DECLARE_WRITE8_MEMBER(write_d);
-	DECLARE_WRITE16_MEMBER(write_a);
-	DECLARE_WRITE_LINE_MEMBER(write_f);
-
-	void speaker_update();
-	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
-	double m_speaker_volume;
 	void wildfire(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
+
+private:
+	void update_display();
+	void write_d(u8 data);
+	void write_a(u16 data);
+	DECLARE_WRITE_LINE_MEMBER(write_f);
+
+	void speaker_update();
+	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
+	double m_speaker_volume = 0.0;
+
+	std::vector<double> m_speaker_levels;
 };
 
 void wildfire_state::machine_start()
 {
 	hh_amis2k_state::machine_start();
-
-	// zerofill/init
-	m_speaker_volume = 0;
 	save_item(NAME(m_speaker_volume));
 }
 
@@ -190,14 +185,14 @@ void wildfire_state::update_display()
 	m_display->matrix(~m_a, m_d);
 }
 
-WRITE8_MEMBER(wildfire_state::write_d)
+void wildfire_state::write_d(u8 data)
 {
 	// D0-D7: led/7seg data
 	m_d = bitswap<8>(data,7,0,1,2,3,4,5,6);
 	update_display();
 }
 
-WRITE16_MEMBER(wildfire_state::write_a)
+void wildfire_state::write_a(u16 data)
 {
 	// A0-A2: digit select
 	// A3-A11: led select
@@ -234,7 +229,7 @@ static const u8 wildfire_7seg_table[0x10] =
 
 void wildfire_state::wildfire(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	AMI_S2152(config, m_maincpu, 850000); // approximation - RC osc. R=?, C=?
 	m_maincpu->set_7seg_table(wildfire_7seg_table);
 	m_maincpu->read_i().set_ioport("IN.0");
@@ -242,30 +237,30 @@ void wildfire_state::wildfire(machine_config &config)
 	m_maincpu->write_a().set(FUNC(wildfire_state::write_a));
 	m_maincpu->write_f().set(FUNC(wildfire_state::write_f));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(12, 8);
 	m_display->set_segmask(7, 0x7f);
 	m_display->set_bri_levels(0.01, 0.1); // bumpers are dimmed
 	config.set_default_layout(layout_wildfire);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	TIMER(config, "speaker_decay").configure_periodic(FUNC(wildfire_state::speaker_decay_sim), attotime::from_usec(100));
 
 	// set volume levels (set_output_gain is too slow for sub-frame intervals)
-	static s16 speaker_levels[0x8000];
+	m_speaker_levels.resize(0x8000);
 	for (int i = 0; i < 0x8000; i++)
-		speaker_levels[i] = i;
-	m_speaker->set_levels(0x8000, speaker_levels);
+		m_speaker_levels[i] = double(i) / 32768.0;
+	m_speaker->set_levels(0x8000, &m_speaker_levels[0]);
 }
 
 // roms
 
 ROM_START( wildfire )
 	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASE00 )
-	// Typed in from patent US4334679, data should be correct(it included checksums). 1st half was also dumped/verfied with release version.
+	// Typed in from patent US4334679, data should be correct(it included checksums). 1st half was also dumped/verified with release version.
 	ROM_LOAD( "us4341385", 0x0000, 0x0400, CRC(84ac0f1f) SHA1(1e00ddd402acfc2cc267c34eed4b89d863e2144f) )
 	ROM_CONTINUE(          0x0600, 0x0200 )
 ROM_END

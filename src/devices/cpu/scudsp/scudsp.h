@@ -49,15 +49,15 @@ public:
 	auto out_dma_callback() { return m_out_dma_cb.bind(); }
 
 	/* port 0 */
-	DECLARE_READ32_MEMBER( program_control_r );
-	DECLARE_WRITE32_MEMBER( program_control_w );
+	uint32_t program_control_r();
+	void program_control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	/* port 1 */
-	DECLARE_WRITE32_MEMBER( program_w );
+	void program_w(uint32_t data);
 	/* port 2 */
-	DECLARE_WRITE32_MEMBER( ram_address_control_w );
+	void ram_address_control_w(uint32_t data);
 	/* port 3 */
-	DECLARE_READ32_MEMBER( ram_address_r );
-	DECLARE_WRITE32_MEMBER( ram_address_w );
+	uint32_t ram_address_r();
+	void ram_address_w(uint32_t data);
 
 	void data_map(address_map &map);
 	void program_map(address_map &map);

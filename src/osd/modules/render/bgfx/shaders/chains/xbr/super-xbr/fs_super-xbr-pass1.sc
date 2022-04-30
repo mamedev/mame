@@ -4,9 +4,9 @@ $input v_texcoord0, v_color0
 // copyright-holders:Hyllian
 
 /*
-   
+
   *******  Super XBR Shader - pass1  *******
-   
+
   Copyright (c) 2015 Hyllian - sergiogdb@gmail.com
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -174,5 +174,5 @@ void main()
 	vec4 max_sample = max4(E, F, H, I) - anti_ring * mix((P2-H)*(F-P1), (P0-E)*(I-P3), d_mix);
 	color = clamp(color, min_sample.xyz, max_sample.xyz);
 
-	gl_FragColor = vec4(color, 1.0);	
+	gl_FragColor = vec4(color, 1.0);
 }

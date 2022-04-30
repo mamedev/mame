@@ -26,7 +26,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -37,9 +37,9 @@ protected:
 
 private:
 	// i8255 callbacks
-	DECLARE_READ8_MEMBER( ppi_porta_r );
-	DECLARE_WRITE8_MEMBER( ppi_portb_w );
-	DECLARE_WRITE8_MEMBER( ppi_portc_w );
+	uint8_t ppi_porta_r();
+	void ppi_portb_w(uint8_t data);
+	void ppi_portc_w(uint8_t data);
 
 	static const device_timer_id TIMER_PRINTER = 0;
 

@@ -52,7 +52,7 @@ void namcos2_roz_device::device_start()
 TILE_GET_INFO_MEMBER(namcos2_roz_device::roz_tile_info)
 {
 	int tile = m_rozram[tile_index];
-	SET_TILE_INFO_MEMBER(0, tile, 0/*color*/, 0);
+	tileinfo.set(0, tile, 0/*color*/, 0);
 }
 
 struct roz_param
@@ -75,7 +75,7 @@ draw_roz_helper_block(const struct roz_param *rozInfo, int destx, int desty,
 	int end_incrx = rozInfo->incyx - (width * rozInfo->incxx);
 	int end_incry = rozInfo->incyy - (width * rozInfo->incxy);
 
-	uint16_t *dest = &destbitmap.pix16(desty, destx);
+	uint16_t *dest = &destbitmap.pix(desty, destx);
 	int dest_rowinc = destbitmap.rowpixels() - width;
 
 	while (desty < desty_end)
@@ -96,9 +96,9 @@ draw_roz_helper_block(const struct roz_param *rozInfo, int destx, int desty,
 				goto L_SkipPixel;
 			}
 
-			if (flagsbitmap.pix8(ypos, xpos) & TILEMAP_PIXEL_LAYER0)
+			if (flagsbitmap.pix(ypos, xpos) & TILEMAP_PIXEL_LAYER0)
 			{
-				*dest = srcbitmap.pix16(ypos, xpos) + rozInfo->color;
+				*dest = srcbitmap.pix(ypos, xpos) + rozInfo->color;
 			}
 
 		L_SkipPixel:
@@ -288,7 +288,7 @@ void namcos2_roz_device::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, c
 	draw_roz_helper(screen, bitmap, m_tilemap_roz, cliprect, &rozParam);
 }
 
-WRITE16_MEMBER(namcos2_roz_device::rozram_word_w)
+void namcos2_roz_device::rozram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_rozram[offset]);
 	m_tilemap_roz->mark_tile_dirty(offset);

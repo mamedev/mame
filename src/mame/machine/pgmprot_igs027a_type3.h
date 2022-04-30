@@ -29,15 +29,15 @@ protected:
 
 private:
 	// svg
-	int m_svg_ram_sel;
+	int m_svg_ram_sel = 0;
 	std::unique_ptr<u32[]> m_svg_shareram[2];    //for 5585G MACHINE
 
-	u32 m_svg_latchdata_68k_w;
-	u32 m_svg_latchdata_arm_w;
+	u32 m_svg_latchdata_68k_w = 0;
+	u32 m_svg_latchdata_arm_w = 0;
 	required_shared_ptr<u32> m_arm_ram;
 	required_shared_ptr<u32> m_arm_ram2;
 
-	u32* m_armrom;
+	u32* m_armrom = nullptr;
 
 	optional_device<cpu_device> m_prot;
 
@@ -59,13 +59,13 @@ private:
 	void pgm_descramble_happy6(u8* src);
 	void pgm_descramble_happy6_2(u8* src);
 	void svg_latch_init();
-	DECLARE_READ32_MEMBER( dmnfrnt_speedup_r );
-	DECLARE_READ16_MEMBER( dmnfrnt_main_speedup_r );
-	DECLARE_READ32_MEMBER( killbldp_speedup_r );
-	DECLARE_READ32_MEMBER( theglad_speedup_r );
-	DECLARE_READ32_MEMBER( happy6_speedup_r );
-	DECLARE_READ32_MEMBER( svg_speedup_r );
-	DECLARE_READ32_MEMBER( svgpcb_speedup_r );
+	u32 dmnfrnt_speedup_r();
+	u16 dmnfrnt_main_speedup_r();
+	u32 killbldp_speedup_r();
+	u32 theglad_speedup_r();
+	u32 happy6_speedup_r();
+	u32 svg_speedup_r();
+	u32 svgpcb_speedup_r();
 	void _55857G_arm7_map(address_map &map);
 	void svg_68k_mem(address_map &map);
 };
@@ -74,5 +74,6 @@ INPUT_PORTS_EXTERN(theglad);
 INPUT_PORTS_EXTERN(happy6);
 INPUT_PORTS_EXTERN(happy6hk);
 INPUT_PORTS_EXTERN(svg);
+INPUT_PORTS_EXTERN(svghk);
 INPUT_PORTS_EXTERN(svgtw);
 INPUT_PORTS_EXTERN(svgpcb);

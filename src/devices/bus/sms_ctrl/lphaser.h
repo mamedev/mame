@@ -39,6 +39,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_sms_control_port_interface overrides
 	virtual uint8_t peripheral_r() override;
@@ -52,7 +53,6 @@ private:
 	emu_timer *m_lphaser_timer;
 	static const device_timer_id TIMER_LPHASER = 0;
 
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void sensor_check();
 	int bright_aim_area( emu_timer *timer, int lgun_x, int lgun_y );
 	uint16_t screen_hpos_nonscaled(int scaled_hpos);

@@ -83,7 +83,7 @@ private:
 		EFFECT_COUNT_MAX = 10
 	};
 
-	uint32_t clamped_latency() const { return unsigned(std::max(std::min(m_audio_latency, int(LATENCY_MAX)), int(LATENCY_MIN))); }
+	uint32_t clamped_latency() const { return unsigned(std::clamp<int>(m_audio_latency, LATENCY_MIN, LATENCY_MAX)); }
 	uint32_t buffer_avail() const { return ((m_writepos >= m_playpos) ? m_buffer_size : 0) + m_playpos - m_writepos; }
 	uint32_t buffer_used() const { return ((m_playpos > m_writepos) ? m_buffer_size : 0) + m_writepos - m_playpos; }
 
@@ -320,7 +320,7 @@ void sound_coreaudio::update_audio_stream(bool is_throttled, int16_t const *buff
 
 void sound_coreaudio::set_mastervolume(int attenuation)
 {
-	int const clamped_attenuation = std::max(std::min(attenuation, 0), -32);
+	int const clamped_attenuation = std::clamp(attenuation, -32, 0);
 	m_scale = (-32 == clamped_attenuation) ? 0 : (int32_t)(pow(10.0, clamped_attenuation / 20.0) * 128);
 }
 

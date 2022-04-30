@@ -61,11 +61,11 @@ private:
 	void update_graphics(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_text(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( ir_r );
-	DECLARE_WRITE8_MEMBER( ir_w );
+	uint8_t ir_r();
+	void ir_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( dr_r );
-	DECLARE_WRITE8_MEMBER( dr_w );
+	uint8_t dr_r();
+	void dr_w(uint8_t data);
 
 	void msm6255(address_map &map);
 

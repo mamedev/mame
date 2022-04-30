@@ -43,6 +43,7 @@ public:
 	auto autofd_handler() { return m_autofd_handler.bind(); }
 	auto fault_handler() { return m_fault_handler.bind(); }
 	auto init_handler() { return m_init_handler.bind(); }
+	auto sense_handler() { return m_sense_handler.bind(); }
 	auto select_in_handler() { return m_select_in_handler.bind(); }
 
 	template <typename T> void set_data_input_buffer(T &&tag)
@@ -80,6 +81,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_config_complete() override;
+	virtual void device_reset() override;
 	virtual void device_start() override;
 
 	devcb_write_line m_strobe_handler;
@@ -98,6 +100,7 @@ protected:
 	devcb_write_line m_autofd_handler;
 	devcb_write_line m_fault_handler;
 	devcb_write_line m_init_handler;
+	devcb_write_line m_sense_handler;
 	devcb_write_line m_select_in_handler;
 
 private:
@@ -150,6 +153,8 @@ protected:
 	virtual DECLARE_WRITE_LINE_MEMBER( input_fault ) { }
 	virtual DECLARE_WRITE_LINE_MEMBER( input_init ) { }
 	virtual DECLARE_WRITE_LINE_MEMBER( input_select_in ) { }
+
+	virtual bool supports_pin35_5v() { return false; }
 
 	centronics_device *m_slot;
 };

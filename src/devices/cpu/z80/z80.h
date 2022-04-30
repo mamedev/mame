@@ -38,6 +38,7 @@ public:
 	template <typename... T> void set_io_map(T &&... args) { set_addrmap(AS_IO, std::forward<T>(args)...); }
 	auto irqack_cb() { return m_irqack_cb.bind(); }
 	auto refresh_cb() { return m_refresh_cb.bind(); }
+	auto nomreq_cb() { return m_nomreq_cb.bind(); }
 	auto halt_cb() { return m_halt_cb.bind(); }
 
 protected:
@@ -148,13 +149,15 @@ protected:
 	void leave_halt();
 	uint8_t in(uint16_t port);
 	void out(uint16_t port, uint8_t value);
-	uint8_t rm(uint16_t addr);
+	virtual uint8_t rm(uint16_t addr);
+	uint8_t rm_reg(uint16_t addr);
 	void rm16(uint16_t addr, PAIR &r);
-	void wm(uint16_t addr, uint8_t value);
+	virtual void wm(uint16_t addr, uint8_t value);
 	void wm16(uint16_t addr, PAIR &r);
-	uint8_t rop();
-	uint8_t arg();
-	uint16_t arg16();
+	void wm16_sp(PAIR &r);
+	virtual uint8_t rop();
+	virtual uint8_t arg();
+	virtual uint16_t arg16();
 	void eax();
 	void eay();
 	void pop(PAIR &r);
@@ -229,36 +232,40 @@ protected:
 	void otdr();
 	void ei();
 
+	virtual void check_interrupts();
 	void take_interrupt();
 	void take_nmi();
+	void nomreq_ir(s8 cycles);
+	void nomreq_addr(u16 addr, s8 cycles);
 
 	// address spaces
 	const address_space_config m_program_config;
 	const address_space_config m_opcodes_config;
 	const address_space_config m_io_config;
-	address_space *m_program;
-	address_space *m_opcodes;
-	address_space *m_io;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
-	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_opcodes_cache;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_args;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_opcodes;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
+
 	devcb_write_line m_irqack_cb;
 	devcb_write8 m_refresh_cb;
+	devcb_write8 m_nomreq_cb;
 	devcb_write_line m_halt_cb;
 
-	PAIR            m_prvpc;
-	PAIR            m_pc;
-	PAIR            m_sp;
-	PAIR            m_af;
-	PAIR            m_bc;
-	PAIR            m_de;
-	PAIR            m_hl;
-	PAIR            m_ix;
-	PAIR            m_iy;
-	PAIR            m_wz;
-	PAIR            m_af2;
-	PAIR            m_bc2;
-	PAIR            m_de2;
-	PAIR            m_hl2;
+	PAIR              m_prvpc;
+	PAIR              m_pc;
+	PAIR              m_sp;
+	PAIR              m_af;
+	PAIR              m_bc;
+	PAIR              m_de;
+	PAIR              m_hl;
+	PAIR              m_ix;
+	PAIR              m_iy;
+	PAIR              m_wz;
+	PAIR              m_af2;
+	PAIR              m_bc2;
+	PAIR              m_de2;
+	PAIR              m_hl2;
 	uint8_t           m_r;
 	uint8_t           m_r2;
 	uint8_t           m_iff1;
@@ -269,13 +276,14 @@ protected:
 	uint8_t           m_nmi_state;          /* nmi line state */
 	uint8_t           m_nmi_pending;        /* nmi pending */
 	uint8_t           m_irq_state;          /* irq line state */
-	int             m_wait_state;         // wait line state
-	int             m_busrq_state;        // bus request line state
+	int               m_wait_state;         // wait line state
+	int               m_busrq_state;        // bus request line state
 	uint8_t           m_after_ei;           /* are we in the EI shadow? */
 	uint8_t           m_after_ldair;        /* same, but for LD A,I or LD A,R */
 	uint32_t          m_ea;
 
-	int             m_icount;
+	int               m_icount;
+	int               m_icount_executing;
 	uint8_t           m_rtemp;
 	const uint8_t *   m_cc_op;
 	const uint8_t *   m_cc_cb;
@@ -299,9 +307,9 @@ protected:
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_input_lines() const noexcept override { return 7; }
-	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
+	virtual void check_interrupts() override;
 	void take_interrupt_nsc800();
 	uint8_t m_nsc800_irq_state[4]; /* state of NSC800 restart interrupts A, B, C */
 };

@@ -32,9 +32,9 @@
 #define VERBOSE ( LOG_CONFIG | LOG_WARN )
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_FDC, bus::ti99::peb, ti_fdc_device, "ti99_fdc", "TI-99 Standard DSSD Floppy Controller")
+DEFINE_DEVICE_TYPE(TI99_FDC, bus::ti99::peb::ti_fdc_device, "ti99_fdc", "TI-99 Standard DSSD Floppy Controller")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 // ----------------------------------
 #define FDC_TAG "fd1771"
@@ -99,7 +99,7 @@ WRITE_LINE_MEMBER( ti_fdc_device::fdc_hld_w )
 	LOGMASKED(LOG_SIGNALS, "HLD callback = %d\n", m_HLD);
 }
 
-SETADDRESS_DBIN_MEMBER( ti_fdc_device::setaddress_dbin )
+void ti_fdc_device::setaddress_dbin(offs_t offset, int state)
 {
 	// Selection login in the PAL and some circuits on the board
 
@@ -131,7 +131,7 @@ void ti_fdc_device::debug_read(offs_t offset, uint8_t* value)
 	}
 }
 
-READ8Z_MEMBER(ti_fdc_device::readz)
+void ti_fdc_device::readz(offs_t offset, uint8_t *value)
 {
 	if (machine().side_effects_disabled())
 	{
@@ -201,7 +201,7 @@ void ti_fdc_device::write(offs_t offset, uint8_t data)
 
     See schematics for the meaning of the bits.
 */
-READ8Z_MEMBER(ti_fdc_device::crureadz)
+void ti_fdc_device::crureadz(offs_t offset, uint8_t *value)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{
@@ -379,10 +379,12 @@ void ti_fdc_device::device_config_complete()
 	if (subdevice("2")!=nullptr) m_floppy[2] = static_cast<floppy_image_device*>(subdevice("2")->subdevices().first());
 }
 
-FLOPPY_FORMATS_MEMBER(ti_fdc_device::floppy_formats)
-	FLOPPY_TI99_SDF_FORMAT,
-	FLOPPY_TI99_TDF_FORMAT
-FLOPPY_FORMATS_END
+void ti_fdc_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_TI99_SDF_FORMAT);
+	fr.add(FLOPPY_TI99_TDF_FORMAT);
+}
 
 static void tifdc_floppies(device_slot_interface &device)
 {
@@ -429,4 +431,4 @@ const tiny_rom_entry *ti_fdc_device::device_rom_region() const
 	return ROM_NAME( ti_fdc );
 }
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb

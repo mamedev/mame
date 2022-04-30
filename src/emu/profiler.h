@@ -117,7 +117,7 @@ private:
 	ATTR_FORCE_INLINE void real_start(profile_type type)
 	{
 		// fail if we overflow
-		if (m_filoptr >= &m_filo[ARRAY_LENGTH(m_filo) - 1])
+		if (m_filoptr >= &m_filo[std::size(m_filo) - 1])
 			throw emu_fatalerror("Profiler FILO overflow (type = %d)\n", type);
 
 		// get current tick count

@@ -100,7 +100,7 @@ void nt7534_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void nt7534_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nt7534_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
@@ -148,34 +148,34 @@ uint32_t nt7534_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		{
 			uint8_t py = (y + m_display_start_line - 32) % 65;
 			uint8_t page = py/8;
-			bitmap.pix16(y, x) = BIT(m_ddram[page*132 + px], py%8);
+			bitmap.pix(y, x) = BIT(m_ddram[page*132 + px], py%8);
 		}
 	}
 
 	return 0;
 }
 
-READ8_MEMBER(nt7534_device::read)
+uint8_t nt7534_device::read(offs_t offset)
 {
 	switch (offset & 0x01)
 	{
-		case 0: return control_read(space, 0);
-		case 1: return data_read(space, 0);
+		case 0: return control_read();
+		case 1: return data_read();
 	}
 
 	return 0;
 }
 
-WRITE8_MEMBER(nt7534_device::write)
+void nt7534_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x01)
 	{
-		case 0: control_write(space, 0, data);  break;
-		case 1: data_write(space, 0, data);     break;
+		case 0: control_write(data);  break;
+		case 1: data_write(data);     break;
 	}
 }
 
-WRITE8_MEMBER(nt7534_device::control_write)
+void nt7534_device::control_write(uint8_t data)
 {
 	if (m_data_len == 4)
 	{
@@ -284,7 +284,7 @@ WRITE8_MEMBER(nt7534_device::control_write)
 	}
 }
 
-READ8_MEMBER(nt7534_device::control_read)
+uint8_t nt7534_device::control_read()
 {
 	if (m_data_len == 4)
 	{
@@ -302,7 +302,7 @@ READ8_MEMBER(nt7534_device::control_read)
 	}
 }
 
-WRITE8_MEMBER(nt7534_device::data_write)
+void nt7534_device::data_write(uint8_t data)
 {
 //  if (m_busy_flag)
 //  {
@@ -331,7 +331,7 @@ WRITE8_MEMBER(nt7534_device::data_write)
 
 	LOG("RAM write %x %x '%c'\n", m_page*132 + m_column, m_dr, isprint(m_dr) ? m_dr : '.');
 
-	if (m_page*132 + m_column < ARRAY_LENGTH(m_ddram))
+	if (m_page*132 + m_column < std::size(m_ddram))
 		m_ddram[m_page*132 + m_column] = m_dr;
 
 	if (m_column < 131)
@@ -340,9 +340,9 @@ WRITE8_MEMBER(nt7534_device::data_write)
 	set_busy_flag(41);
 }
 
-READ8_MEMBER(nt7534_device::data_read)
+uint8_t nt7534_device::data_read()
 {
-	if (m_page*132 + m_column >= ARRAY_LENGTH(m_ddram))
+	if (m_page*132 + m_column >= std::size(m_ddram))
 		return 0;
 
 	uint8_t data = m_ddram[m_page*132 + m_column];

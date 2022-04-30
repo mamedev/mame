@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-Acrobatic Dog-Fight / Batten O'hara no Sucha-Raka Kuuchuu Sen
+Acrobatic Dog-Fight / 『バッテン・オハラのスチャラカ空中戦』
 (c) 1984 Technos Japan
 
 driver by Nicola Salmoria
@@ -16,24 +16,24 @@ driver by Nicola Salmoria
 #include "speaker.h"
 
 
-WRITE8_MEMBER(dogfgt_state::subirqtrigger_w)
+void dogfgt_state::subirqtrigger_w(uint8_t data)
 {
 	/* bit 0 used but unknown */
 	if (data & 0x04)
 		m_subcpu->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(dogfgt_state::sub_irqack_w)
+void dogfgt_state::sub_irqack_w(uint8_t data)
 {
 	m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(dogfgt_state::soundlatch_w)
+void dogfgt_state::soundlatch_w(uint8_t data)
 {
 	m_soundlatch = data;
 }
 
-WRITE8_MEMBER(dogfgt_state::soundcontrol_w)
+void dogfgt_state::soundcontrol_w(uint8_t data)
 {
 	/* bit 5 goes to YM2149 #0 BDIR pin  */
 	if ((m_last_snd_ctrl & 0x20) == 0x20 && (data & 0x20) == 0x00)
@@ -366,4 +366,4 @@ ROM_END
 
 GAME( 1984, dogfgt,  0,      dogfgt, dogfgt, dogfgt_state, empty_init, ROT0, "Technos Japan",                               "Acrobatic Dog-Fight",       MACHINE_SUPPORTS_SAVE )
 GAME( 1985, dogfgtu, dogfgt, dogfgt, dogfgt, dogfgt_state, empty_init, ROT0, "Technos Japan (Data East USA, Inc. license)", "Acrobatic Dog-Fight (USA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, dogfgtj, dogfgt, dogfgt, dogfgt, dogfgt_state, empty_init, ROT0, "Technos Japan",                               "Dog-Fight (Japan)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dogfgtj, dogfgt, dogfgt, dogfgt, dogfgt_state, empty_init, ROT0, "Technos Japan",                               "But-ten Ohara's Suit-Cha Luck-a Dog-Fight (Japan)", MACHINE_SUPPORTS_SAVE )

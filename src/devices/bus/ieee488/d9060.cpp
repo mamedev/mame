@@ -19,8 +19,8 @@
     Start the PET emulator with the D9060 attached on the IEEE-488 bus,
     with the new CHD mounted:
 
-    $ mess pet8032 -ieee8 d9060 -hard tm602s.chd
-    $ mess pet8032 -ieee8 d9090 -hard tm603s.chd
+    $ mame pet8032 -ieee8 d9060 -hard tm602s.chd
+    $ mame pet8032 -ieee8 d9090 -hard tm603s.chd
 
     Enter 'HEADER "LABEL",D0,I01' to format the hard drive.
     Wait up to 1 hour and 20 minutes.
@@ -136,7 +136,7 @@ void d9060_device_base::hdc_mem(address_map &map)
 //  riot6532 0
 //-------------------------------------------------
 
-READ8_MEMBER( d9060_device_base::dio_r )
+uint8_t d9060_device_base::dio_r()
 {
 	/*
 
@@ -153,11 +153,11 @@ READ8_MEMBER( d9060_device_base::dio_r )
 
 	*/
 
-	return m_bus->read_dio();
+	return m_bus->dio_r();
 }
 
 
-WRITE8_MEMBER( d9060_device_base::dio_w )
+void d9060_device_base::dio_w(uint8_t data)
 {
 	/*
 
@@ -182,7 +182,7 @@ WRITE8_MEMBER( d9060_device_base::dio_w )
 //  riot6532 1
 //-------------------------------------------------
 
-READ8_MEMBER( d9060_device_base::riot1_pa_r )
+uint8_t d9060_device_base::riot1_pa_r()
 {
 	/*
 
@@ -213,7 +213,7 @@ READ8_MEMBER( d9060_device_base::riot1_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( d9060_device_base::riot1_pa_w )
+void d9060_device_base::riot1_pa_w(uint8_t data)
 {
 	/*
 
@@ -248,7 +248,7 @@ WRITE8_MEMBER( d9060_device_base::riot1_pa_w )
 	update_ieee_signals();
 }
 
-READ8_MEMBER( d9060_device_base::riot1_pb_r )
+uint8_t d9060_device_base::riot1_pb_r()
 {
 	/*
 
@@ -279,7 +279,7 @@ READ8_MEMBER( d9060_device_base::riot1_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( d9060_device_base::riot1_pb_w )
+void d9060_device_base::riot1_pb_w(uint8_t data)
 {
 	/*
 
@@ -307,7 +307,7 @@ WRITE8_MEMBER( d9060_device_base::riot1_pb_w )
 }
 
 
-WRITE8_MEMBER( d9060_device_base::via_pb_w )
+void d9060_device_base::via_pb_w(uint8_t data)
 {
 	/*
 
@@ -347,7 +347,7 @@ WRITE_LINE_MEMBER( d9060_device_base::enable_w )
 	}
 }
 
-WRITE8_MEMBER( d9060_device_base::scsi_data_w )
+void d9060_device_base::scsi_data_w(uint8_t data)
 {
 	m_data = data;
 
@@ -383,7 +383,7 @@ void d9060_device_base::device_add_mconfig(machine_config &config)
 	M6502(config, m_hdccpu, XTAL(4'000'000)/4);
 	m_hdccpu->set_addrmap(AS_PROGRAM, &d9060_device::hdc_mem);
 
-	VIA6522(config, m_via, XTAL(4'000'000)/4);
+	MOS6522(config, m_via, XTAL(4'000'000)/4);
 	m_via->writepa_handler().set(FUNC(d9060_device_base::scsi_data_w));
 	m_via->writepb_handler().set(FUNC(d9060_device_base::via_pb_w));
 	m_via->ca2_handler().set(FUNC(d9060_device_base::ack_w));
