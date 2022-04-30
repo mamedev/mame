@@ -193,7 +193,7 @@ nes_pikay2k_device::nes_pikay2k_device(const machine_config &mconfig, const char
 {
 }
 
-nes_8237_device::nes_8237_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int board)
+nes_8237_device::nes_8237_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 board)
 	: nes_txrom_device(mconfig, type, tag, owner, clock), m_board(board)
 {
 }
@@ -223,7 +223,7 @@ nes_kasing_device::nes_kasing_device(const machine_config &mconfig, const char *
 {
 }
 
-nes_sglionk_device::nes_sglionk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int board)
+nes_sglionk_device::nes_sglionk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 board)
 	: nes_kasing_device(mconfig, type, tag, owner, clock), m_board(board)
 {
 }

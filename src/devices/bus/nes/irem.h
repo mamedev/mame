@@ -73,7 +73,8 @@ protected:
 	u8 m_latch;
 
 private:
-	u8 m_reg, m_prg_mask;
+	u8 m_reg;
+	const u8 m_prg_mask;
 };
 
 

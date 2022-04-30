@@ -76,7 +76,7 @@ protected:
 
 private:
 	u8 m_latch;
-	bool m_prg_flip;
+	const bool m_prg_flip;
 };
 
 
