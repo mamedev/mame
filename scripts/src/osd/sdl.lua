@@ -318,7 +318,7 @@ if BASE_TARGETOS=="unix" then
 			local str = backtick(sdlconfigcmd() .. " --libs")
 			addlibfromstring(str)
 			addoptionsfromstring(str)
-			if _OPTIONS["SDL_INSTALL_ROOT"] then
+			if _OPTIONS["SDL_INSTALL_ROOT"]~=nil then
 				includedirs {
 					path.join(_OPTIONS["SDL_INSTALL_ROOT"],"include"),
 				}
