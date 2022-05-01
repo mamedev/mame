@@ -38,7 +38,7 @@ void ram_32k_device::device_start()
 	std::fill_n(m_ram.get(), 0x8000, 0xff);
 	save_pointer(NAME(m_ram), 0x8000);
 
-	m_bus->space(AS_PROGRAM)->install_ram(0x8000, 0xffff, m_ram.get());
+	m_bus->installer(AS_PROGRAM)->install_ram(0x8000, 0xffff, m_ram.get());
 }
 
 void ram_32k_device::device_add_mconfig(machine_config &config)

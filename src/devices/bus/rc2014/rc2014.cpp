@@ -66,8 +66,7 @@ void rc2014_slot_device::device_resolve_objects()
 
 rc2014_bus_device::rc2014_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RC2014_BUS, tag, owner, clock)
-	, m_memory_space(nullptr)
-	, m_io_space(nullptr)
+	, m_installer{}
 	/*
 	,m_write_irq(*this)
 	,m_write_nmi(*this)*/
@@ -81,8 +80,8 @@ rc2014_bus_device::rc2014_bus_device(const machine_config &mconfig, const char *
 
 void rc2014_bus_device::device_start()
 {
-	if (m_memory_space == nullptr || m_io_space == nullptr)
-		throw emu_fatalerror("No address spaces set on RC2014 bus !!!");
+	if (m_installer[AS_PROGRAM] == nullptr)
+		throw emu_fatalerror("Main address installer missing on RC2014 bus !!!");
 	// resolve callbacks
 /*	m_write_irq.resolve_safe();
 	m_write_nmi.resolve_safe();
@@ -109,20 +108,17 @@ void rc2014_bus_device::set_bus_clock(u32 clock)
 	notify_clock_changed();
 }
 
-void rc2014_bus_device::assign_spaces(address_space *memory_space, address_space *io_space)
+void rc2014_bus_device::assign_installer(int index, address_space_installer *installer)
 {
-	if (m_memory_space != nullptr || m_io_space != nullptr)
-		throw emu_fatalerror("Address spaces already set on RC2014 bus !!!");
-	m_memory_space = memory_space;
-	m_io_space = io_space;
+	if (m_installer[index] != nullptr )
+		throw emu_fatalerror("Address installer already set on RC2014 bus !!!");
+	m_installer[index]  = installer;
 }
 
-address_space *rc2014_bus_device::space(int index) const
+address_space_installer *rc2014_bus_device::installer(int index) const
 {
-	if (index == AS_PROGRAM)
-		return m_memory_space;
-	else
-		return m_io_space;
+	assert(index >= 0 && index < 4 && m_installer[index]); 
+	return m_installer[index];
 }
 
 void device_rc2014_card_interface::set_bus_device(rc2014_bus_device &bus_device)

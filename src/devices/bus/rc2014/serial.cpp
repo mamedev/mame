@@ -36,7 +36,7 @@ serial_io_device::serial_io_device(const machine_config &mconfig, const char *ta
 
 void serial_io_device::device_start()
 {
-	m_bus->space(AS_IO)->install_readwrite_handler(0x80, 0x81, read8sm_delegate(*m_acia, FUNC(acia6850_device::read)), write8sm_delegate(*m_acia, FUNC(acia6850_device::write)));
+	m_bus->installer(AS_IO)->install_readwrite_handler(0x80, 0x81, read8sm_delegate(*m_acia, FUNC(acia6850_device::read)), write8sm_delegate(*m_acia, FUNC(acia6850_device::write)));
 }
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )

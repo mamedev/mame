@@ -67,5 +67,6 @@ void z80cpu_device::device_add_mconfig(machine_config &config)
 
 void z80cpu_device::device_resolve_objects()
 {
-	m_bus->assign_spaces(&m_maincpu->space(AS_PROGRAM), &m_maincpu->space(AS_IO));
+	m_bus->assign_installer(AS_PROGRAM, &m_maincpu->space(AS_PROGRAM));
+	m_bus->assign_installer(AS_IO, &m_maincpu->space(AS_IO));
 }

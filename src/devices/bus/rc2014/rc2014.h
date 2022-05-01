@@ -75,16 +75,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_write_nmi(state); }
 */  
-	void assign_spaces(address_space *memory_space, address_space *io_space);
-	address_space *space(int index) const;
+	void assign_installer(int index, address_space_installer *installer);
+	address_space_installer *installer(int index) const;
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
-	address_space *m_memory_space;
-	address_space *m_io_space;
+	address_space_installer *m_installer[4];
 /*	devcb_write_line   m_write_irq;
 	devcb_write_line   m_write_nmi;
 */
