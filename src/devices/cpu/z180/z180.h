@@ -105,10 +105,11 @@ enum {
 class z180_device : public cpu_device, public z80_daisy_chain_interface
 {
 public:
-	bool get_tend0();
-	bool get_tend1();
 	auto tend0_wr_callback() { return m_tend0_cb.bind(); }
 	auto tend1_wr_callback() { return m_tend1_cb.bind(); }
+
+	bool get_tend0();
+	bool get_tend1();
 
 protected:
 	// construction/destruction
