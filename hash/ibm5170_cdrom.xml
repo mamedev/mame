@@ -3748,12 +3748,59 @@ license:CC0
 		<!-- This is a Knoppix CD that was available for free from a German government IT security agency -->
 		<year>2002</year>
 		<publisher>Knopper.Net</publisher>
-
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="knoppix31bsi" sha1="423736fcd14c4771d4be817935a75d119a75428a" />
 			</diskarea>
 		</part>
+	</software>
+	
+	<software name="ubu504a64live">
+		<description>Ubuntu Version 5.04 for AMD64/EM64T live disk</description>
+		<!-- Free physical CD from Canonical -->
+		<year>2005</year>
+		<publisher>Canonical Ltd.</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ubuntu_5.04_amd64_live" sha1="ecad66f71c05b416c8f6084d239aa0fc1b32798c" />
+			</diskarea>
+		</part>
 	</software>	
 
+	<software name="ubu504a64install">
+		<description>Ubuntu Version 5.04 for AMD64/EM64T install disk</description>
+		<!-- Free physical CD from Canonical -->
+		<year>2005</year>
+		<publisher>Canonical Ltd.</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ubuntu_5.04_amd64_install" sha1="5b09fad16dc5ad782d5962a0806ea21f8f4b7de1" />
+			</diskarea>
+		</part>
+	</software>	
+	
+	<software name="ubu504x86live">
+		<description>Ubuntu Version 5.04 for Intel x86 live disk</description>
+		<!-- Free physical CD from Canonical -->
+		<year>2005</year>
+		<publisher>Canonical Ltd.</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ubuntu_5.04_i386_live" sha1="215c83d020c58669f7759619b741b6723d15b304" />
+			</diskarea>
+		</part>
+	</software>	
+
+	<software name="ubu504x86install">
+		<description>Ubuntu Version 5.04 for Intel x86 install disk</description>
+		<!-- Free physical CD from Canonical -->
+		<year>2005</year>
+		<publisher>Canonical Ltd.</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ubuntu_5.04_i386_install" sha1="5cac105e50d213e306c208500f4d1b3204486c86" />
+			</diskarea>
+		</part>
+	</software>		
+	
 </softwarelist>
