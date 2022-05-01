@@ -45,6 +45,14 @@ public:
 
 	void bus_error() { m_bus_error = true; }
 
+	/*
+	 * This method allows bit 19 of the Boot-Mode Settings to be configured. See Chapter 9, page 223 of the R4000 User Manual.
+	 * When this bit is 0 (interrupt_disabled = false, default), then the CP0 timer will set interrupt 5 whenever it expires.
+	 * When this bit is 1 (interrupt_disabled = true), the CP0 timer interrupt is disabled.
+	 * If the CP0 timer interrupt is disabled, interrupt 5 becomes a standard general-purpose interrupt.
+	 */
+	void set_timer_interrupt_disable(bool interrupt_disabled) { m_timer_interrupt_enabled = !interrupt_disabled; }
+
 protected:
 	enum cache_size
 	{
@@ -432,6 +440,7 @@ protected:
 	bool m_hard_reset;
 	bool m_ll_active;
 	bool m_bus_error;
+	bool m_timer_interrupt_enabled = true;
 	struct tlb_entry
 	{
 		u64 mask;

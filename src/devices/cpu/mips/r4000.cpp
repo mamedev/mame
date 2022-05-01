@@ -1437,7 +1437,8 @@ void r4000_base_device::cp0_set(unsigned const reg, u64 const data)
 		break;
 	case CP0_Compare:
 		m_cp0[CP0_Compare] = u32(data);
-		CAUSE &= ~CAUSE_IPEX5;
+		if (m_timer_interrupt_enabled)
+			CAUSE &= ~CAUSE_IPEX5;
 
 		cp0_update_timer(true);
 		break;
@@ -1588,7 +1589,8 @@ void r4000_base_device::cp0_update_timer(bool start)
 
 TIMER_CALLBACK_MEMBER(r4000_base_device::cp0_timer_callback)
 {
-	m_cp0[CP0_Cause] |= CAUSE_IPEX5;
+	if (m_timer_interrupt_enabled)
+		m_cp0[CP0_Cause] |= CAUSE_IPEX5;
 }
 
 bool r4000_base_device::cp0_64() const
