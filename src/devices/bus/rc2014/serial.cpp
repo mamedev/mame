@@ -24,7 +24,7 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_bus->irq_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_bus->int_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( tx_w ) { m_bus->tx_w(state); }
 private:
 	required_device<acia6850_device> m_acia;

@@ -61,6 +61,10 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+//**************************************************************************
+//  RC2014 Standard Bus
+//**************************************************************************
+
 // ======================> rc2014_bus_device
 
 class rc2014_bus_device : public device_t
@@ -70,7 +74,6 @@ public:
 	rc2014_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto int_callback() { return m_int.bind(); }
-	auto nmi_callback() { return m_nmi.bind(); }
 	auto tx_callback() { return m_tx.bind(); }
 	auto rx_callback() { return m_rx.bind(); }
 	auto user1_callback() { return m_user1.bind(); }
@@ -78,8 +81,7 @@ public:
 	auto user3_callback() { return m_user3.bind(); }
 	auto user4_callback() { return m_user4.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_int(state); }
-	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi(state); }
+	DECLARE_WRITE_LINE_MEMBER( int_w ) { m_int(state); }
 	DECLARE_WRITE_LINE_MEMBER( tx_w ) { m_tx(state); }
 	DECLARE_WRITE_LINE_MEMBER( rx_w ) { m_rx(state); }
 	DECLARE_WRITE_LINE_MEMBER( user1_w ) { m_user1(state); }
@@ -92,13 +94,13 @@ public:
 	void assign_installer(int index, address_space_installer *installer);
 	address_space_installer *installer(int index) const;
 protected:
+	rc2014_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	// device-level overrides
 	virtual void device_start() override;
 
 private:
 	address_space_installer *m_installer[4];
 	devcb_write_line m_int;
-	devcb_write_line m_nmi;
 	devcb_write_line m_tx;
 	devcb_write_line m_rx;
 	devcb_write_line m_user1;
@@ -108,6 +110,7 @@ private:
 };
 
 // ======================> device_rc2014_card_interface
+
 class rc2014_slot_device;
 
 class device_rc2014_card_interface : public device_interface
@@ -150,9 +153,52 @@ private:
 	required_device<rc2014_bus_device> m_bus;
 };
 
+//**************************************************************************
+//  RC2014 Extended Bus
+//**************************************************************************
+
+// ======================> rc2014_ext_bus_device
+
+class rc2014_ext_bus_device : public rc2014_bus_device
+{
+public:
+	// construction/destruction
+	rc2014_ext_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	auto nmi_callback() { return m_nmi.bind(); }
+	auto tx2_callback() { return m_tx2.bind(); }
+	auto rx2_callback() { return m_rx2.bind(); }
+	auto user5_callback() { return m_user5.bind(); }
+	auto user6_callback() { return m_user6.bind(); }
+	auto user7_callback() { return m_user7.bind(); }
+	auto user8_callback() { return m_user8.bind(); }
+
+	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi(state); }
+	DECLARE_WRITE_LINE_MEMBER( tx2_w ) { m_tx2(state); }
+	DECLARE_WRITE_LINE_MEMBER( rx2_w ) { m_rx2(state); }
+	DECLARE_WRITE_LINE_MEMBER( user5_w ) { m_user5(state); }
+	DECLARE_WRITE_LINE_MEMBER( user6_w ) { m_user6(state); }
+	DECLARE_WRITE_LINE_MEMBER( user7_w ) { m_user7(state); }
+	DECLARE_WRITE_LINE_MEMBER( user8_w ) { m_user8(state); }
+protected:
+	rc2014_ext_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	// device-level overrides
+	virtual void device_start() override;
+
+private:
+	devcb_write_line m_nmi;
+	devcb_write_line m_tx2;
+	devcb_write_line m_rx2;
+	devcb_write_line m_user5;
+	devcb_write_line m_user6;
+	devcb_write_line m_user7;
+	devcb_write_line m_user8;
+};
+
 // device type definition
 DECLARE_DEVICE_TYPE(RC2014_BUS,  rc2014_bus_device)
 DECLARE_DEVICE_TYPE(RC2014_SLOT, rc2014_slot_device)
 
+DECLARE_DEVICE_TYPE(RC2014_EXT_BUS,  rc2014_ext_bus_device)
 
 #endif // MAME_BUS_RC2014_RC2014_H

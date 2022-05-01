@@ -13,22 +13,27 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(RC2014_BUS,  rc2014_bus_device,  "rc2014_bus",  "rc2014 bus")
-DEFINE_DEVICE_TYPE(RC2014_SLOT, rc2014_slot_device, "rc2014_slot", "rc2014 slot")
+DEFINE_DEVICE_TYPE(RC2014_BUS,  rc2014_bus_device,  "rc2014_bus",  "RC2014 Standard Bus")
+DEFINE_DEVICE_TYPE(RC2014_SLOT, rc2014_slot_device, "rc2014_slot", "RC2014 Standard Bus Slot")
+
+DEFINE_DEVICE_TYPE(RC2014_EXT_BUS,  rc2014_ext_bus_device,  "rc2014_ext_bus",  "RC2014 Extended Bus")
 
 //**************************************************************************
 //  LIVE DEVICE
+//**************************************************************************
+
+//**************************************************************************
+//  RC2014 Standard Bus
 //**************************************************************************
 
 //-------------------------------------------------
 //  rc2014_bus_device 
 //-------------------------------------------------
 
-rc2014_bus_device::rc2014_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, RC2014_BUS, tag, owner, clock)
+rc2014_bus_device::rc2014_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, m_installer{}
 	, m_int(*this)
-	, m_nmi(*this)
 	, m_tx(*this)
 	, m_rx(*this)
 	, m_user1(*this)
@@ -38,13 +43,17 @@ rc2014_bus_device::rc2014_bus_device(const machine_config &mconfig, const char *
 {
 }
 
+rc2014_bus_device::rc2014_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: rc2014_bus_device(mconfig, RC2014_BUS, tag, owner, clock)
+{
+}
+
 void rc2014_bus_device::device_start()
 {
 	if (m_installer[AS_PROGRAM] == nullptr)
 		throw emu_fatalerror("Main address installer missing on RC2014 bus !!!");
 	// resolve callbacks
 	m_int.resolve_safe();
-	m_nmi.resolve_safe();
 	m_tx.resolve_safe();
 	m_rx.resolve_safe();
 	m_user1.resolve_safe();
@@ -108,4 +117,41 @@ void rc2014_slot_device::device_resolve_objects()
 
 	if (card)
 		card->set_bus_device(*m_bus);
+}
+
+//**************************************************************************
+//  RC2014 Extended Bus
+//**************************************************************************
+
+//-------------------------------------------------
+//  rc2014_ext_bus_device 
+//-------------------------------------------------
+
+rc2014_ext_bus_device::rc2014_ext_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: rc2014_ext_bus_device(mconfig, RC2014_EXT_BUS, tag, owner, clock)
+{
+}
+
+rc2014_ext_bus_device::rc2014_ext_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: rc2014_bus_device(mconfig, type, tag, owner, clock)
+	, m_nmi(*this)
+	, m_tx2(*this)
+	, m_rx2(*this)
+	, m_user5(*this)
+	, m_user6(*this)
+	, m_user7(*this)
+	, m_user8(*this)
+{
+}
+
+void rc2014_ext_bus_device::device_start()
+{
+	rc2014_bus_device::device_start();
+	m_nmi.resolve_safe();
+	m_tx2.resolve_safe();
+	m_rx2.resolve_safe();
+	m_user5.resolve_safe();
+	m_user6.resolve_safe();
+	m_user7.resolve_safe();
+	m_user8.resolve_safe();
 }
