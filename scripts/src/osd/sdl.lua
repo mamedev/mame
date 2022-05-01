@@ -57,6 +57,7 @@ function maintargetosdoptions(_target,_subtarget)
 		if _OPTIONS["with-bundled-sdl2"]~=nil then
 			configuration { "mingw*"}
 				links {
+					"SDL2main",
 					"SDL2",
 					"imm32",
 					"version",
@@ -74,6 +75,8 @@ function maintargetosdoptions(_target,_subtarget)
 			if _OPTIONS["USE_LIBSDL"]~="1" then
 				configuration { "mingw*"}
 					links {
+						"imm32",
+						"version",
 						"SDL2main",
 						"SDL2",
 					}
@@ -115,9 +118,19 @@ function maintargetosdoptions(_target,_subtarget)
 			"psapi",
 			"ole32",
 		}
+		
+	
 	configuration { }
 
 	if _OPTIONS["targetos"]=="macosx" then
+		if _OPTIONS["with-bundled-sdl2"]~=nil then
+			links {
+				"SDL2",
+			}
+		end
+	end
+
+	if _OPTIONS["targetos"]=="linux" then
 		if _OPTIONS["with-bundled-sdl2"]~=nil then
 			links {
 				"SDL2",
@@ -310,9 +323,18 @@ if BASE_TARGETOS=="unix" then
 		end
 		if _OPTIONS["with-bundled-sdl2"]~=nil then
 			if _OPTIONS["targetos"]~="android" then
-				links {
-					"SDL2",
-				}
+				if _OPTIONS["targetos"]=="linux" then
+					includedirs {
+						MAME_DIR .. "3rdparty/SDL2-override/linux/SDL2",
+					}
+					defines {
+						"USING_PREMAKE_CONFIG_H",
+					}
+				else
+					links {
+						"SDL2",
+					}
+				end
 			end
 		else
 			local str = backtick(sdlconfigcmd() .. " --libs")

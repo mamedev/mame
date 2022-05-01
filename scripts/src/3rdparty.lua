@@ -1852,6 +1852,89 @@ end
 		MAME_DIR .. "3rdparty/SDL2/src/video/SDL_video.c",
 
 	}
+	
+	if _OPTIONS["targetos"]=="linux" then
+		files {
+			MAME_DIR .. "3rdparty/SDL2/src/audio/alsa/SDL_alsa_audio.c",
+			MAME_DIR .. "3rdparty/SDL2/src/audio/esd/SDL_esdaudio.c",
+			MAME_DIR .. "3rdparty/SDL2/src/audio/dsp/SDL_dspaudio.c",
+			MAME_DIR .. "3rdparty/SDL2/src/audio/sndio/SDL_sndioaudio.c",
+			MAME_DIR .. "3rdparty/SDL2/src/audio/nas/SDL_nasaudio.c",
+			MAME_DIR .. "3rdparty/SDL2/src/audio/pulseaudio/SDL_pulseaudio.c",
+			MAME_DIR .. "3rdparty/SDL2/src/audio/SDL_audio.c",
+			MAME_DIR .. "3rdparty/SDL2/src/core/linux/SDL_evdev.c",
+			MAME_DIR .. "3rdparty/SDL2/src/core/linux/SDL_udev.c",
+			MAME_DIR .. "3rdparty/SDL2/src/core/linux/SDL_ime.c",
+			--MAME_DIR .. "3rdparty/SDL2/src/core/linux/SDL_udev.c",
+			MAME_DIR .. "3rdparty/SDL2/src/filesystem/unix/SDL_sysfilesystem.c",
+			MAME_DIR .. "3rdparty/SDL2/src/haptic/linux/SDL_syshaptic.c",
+			MAME_DIR .. "3rdparty/SDL2/src/haptic/linux/SDL_syshaptic_c.h",
+			MAME_DIR .. "3rdparty/SDL2/src/joystick/linux/SDL_sysjoystick.c",
+			MAME_DIR .. "3rdparty/SDL2/src/joystick/linux/SDL_sysjoystick_c.h",
+			MAME_DIR .. "3rdparty/SDL2/src/joystick/linux/SDL_sysjoystick.c",
+			MAME_DIR .. "3rdparty/SDL2/src/loadso/dlopen/SDL_sysloadso.c",
+			MAME_DIR .. "3rdparty/SDL2/src/power/linux/SDL_syspower.c",
+			MAME_DIR .. "3rdparty/SDL2/src/thread/pthread/SDL_syscond.c",
+			MAME_DIR .. "3rdparty/SDL2/src/thread/pthread/SDL_sysmutex.c",
+			MAME_DIR .. "3rdparty/SDL2/src/thread/pthread/SDL_sysmutex_c.h",
+			MAME_DIR .. "3rdparty/SDL2/src/thread/pthread/SDL_syssem.c",
+			MAME_DIR .. "3rdparty/SDL2/src/thread/pthread/SDL_systhread.c",
+			MAME_DIR .. "3rdparty/SDL2/src/thread/pthread/SDL_systhread_c.h",
+			MAME_DIR .. "3rdparty/SDL2/src/thread/pthread/SDL_systls.c",
+			MAME_DIR .. "3rdparty/SDL2/src/timer/unix/SDL_systimer.c",
+			MAME_DIR .. "3rdparty/SDL2/src/timer/unix/SDL_systimer_c.h",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/edid-parse.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/imKStoUCS.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/imKStoUCS.h",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11clipboard.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11clipboard.h",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11dyn.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11dyn.h",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11events.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11events.h",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11framebuffer.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11framebuffer.h",
+			--MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11gl.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11keyboard.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11keyboard.h",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11messagebox.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11messagebox.h",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11modes.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11modes.h",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11mouse.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11mouse.h",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11opengl.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11opengl.h",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11opengles.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11opengles.h",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11shape.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11shape.h",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11touch.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11touch.h",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11video.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11video.h",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11window.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11window.h",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11xinput2.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11xinput2.h",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11clipboard.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/x11/SDL_x11clipboard.h",
+
+			MAME_DIR .. "3rdparty/SDL2/src/video/wayland/SDL_waylanddyn.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/wayland/SDL_waylanddyn.h",
+			MAME_DIR .. "3rdparty/SDL2/src/video/wayland/SDL_waylandevents.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/wayland/SDL_waylandevents_c.h",
+			MAME_DIR .. "3rdparty/SDL2/src/video/wayland/SDL_waylandopengles.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/wayland/SDL_waylandopengles.h",
+			MAME_DIR .. "3rdparty/SDL2/src/video/wayland/SDL_waylandtouch.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/wayland/SDL_waylandtouch.h",
+			MAME_DIR .. "3rdparty/SDL2/src/video/wayland/SDL_waylandvideo.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/wayland/SDL_waylandvideo.h",
+			MAME_DIR .. "3rdparty/SDL2/src/video/wayland/SDL_waylandwindow.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/wayland/SDL_waylandwindow.h",
+		}
+	end
+	
 	if _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="windows" then
 		files {
 			MAME_DIR .. "3rdparty/SDL2/src/libm/e_atan2.c",
@@ -2094,6 +2177,14 @@ end
 			"-Wno-incompatible-pointer-types-discards-qualifiers",
 			"-Wno-unneeded-internal-declaration",
 			"-Wno-unused-const-variable",
+		}
+
+	configuration { "linux-*" }
+		includedirs {
+			MAME_DIR .. "3rdparty/SDL2-override/linux/SDL2",
+		}
+		defines {
+			"USING_PREMAKE_CONFIG_H",
 		}
 
 	configuration { }
