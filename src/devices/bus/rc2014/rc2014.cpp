@@ -17,6 +17,7 @@ DEFINE_DEVICE_TYPE(RC2014_BUS,  rc2014_bus_device,  "rc2014_bus",  "RC2014 Stand
 DEFINE_DEVICE_TYPE(RC2014_SLOT, rc2014_slot_device, "rc2014_slot", "RC2014 Standard Bus Slot")
 
 DEFINE_DEVICE_TYPE(RC2014_EXT_BUS,  rc2014_ext_bus_device,  "rc2014_ext_bus",  "RC2014 Extended Bus")
+DEFINE_DEVICE_TYPE(RC2014_EXT_SLOT, rc2014_ext_slot_device, "rc2014_ext_slot", "RC2014 Extended Bus Slot")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -100,10 +101,15 @@ void device_rc2014_card_interface::set_bus_device(rc2014_bus_device &bus_device)
 //  rc2014_slot_device
 //-------------------------------------------------
 
-rc2014_slot_device::rc2014_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, RC2014_SLOT, tag, owner, clock)
+rc2014_slot_device::rc2014_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_single_card_slot_interface<device_rc2014_card_interface>(mconfig, *this)
 	, m_bus(*this, finder_base::DUMMY_TAG)
+{
+}
+
+rc2014_slot_device::rc2014_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: rc2014_slot_device(mconfig, RC2014_SLOT, tag, owner, clock)
 {
 }
 
@@ -154,4 +160,41 @@ void rc2014_ext_bus_device::device_start()
 	m_user6.resolve_safe();
 	m_user7.resolve_safe();
 	m_user8.resolve_safe();
+}
+
+//-------------------------------------------------
+//  device_rc2014_ext_card_interface 
+//-------------------------------------------------
+
+device_rc2014_ext_card_interface::device_rc2014_ext_card_interface(const machine_config &mconfig, device_t &device)
+	: device_rc2014_card_interface(mconfig,device)
+	, m_bus(nullptr)
+{
+}
+
+void device_rc2014_ext_card_interface::set_bus_device(rc2014_ext_bus_device &bus_device)
+{
+	m_bus = &bus_device;
+}
+
+//-------------------------------------------------
+//  rc2014_ext_slot_device
+//-------------------------------------------------
+
+rc2014_ext_slot_device::rc2014_ext_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: rc2014_slot_device(mconfig, RC2014_EXT_SLOT, tag, owner, clock)
+	, m_bus(*this, finder_base::DUMMY_TAG)
+{
+}
+
+void rc2014_ext_slot_device::device_start()
+{
+}
+
+void rc2014_ext_slot_device::device_resolve_objects()
+{
+	device_rc2014_ext_card_interface *const card(dynamic_cast<device_rc2014_ext_card_interface *>(get_card_device()));
+
+	if (card)
+		card->set_bus_device(*m_bus);
 }

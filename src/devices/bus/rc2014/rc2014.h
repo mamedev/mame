@@ -117,10 +117,10 @@ class device_rc2014_card_interface : public device_interface
 {
 	friend class rc2014_slot_device;
 
-protected:
+public:
 	// construction/destruction
 	device_rc2014_card_interface(const machine_config &mconfig, device_t &device);
-
+protected:
 	void set_bus_device(rc2014_bus_device &bus_device);
 
 	rc2014_bus_device  *m_bus;
@@ -145,6 +145,7 @@ public:
 	}
 
 protected:
+	rc2014_slot_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_resolve_objects() override;
@@ -195,10 +196,55 @@ private:
 	devcb_write_line m_user8;
 };
 
+// ======================> device_rc2014_ext_card_interface
+
+class rc2014_ext_slot_device;
+
+class device_rc2014_ext_card_interface : public device_rc2014_card_interface
+{
+	friend class rc2014_ext_slot_device;
+
+protected:
+	// construction/destruction
+	device_rc2014_ext_card_interface(const machine_config &mconfig, device_t &device);
+
+	void set_bus_device(rc2014_ext_bus_device &bus_device);
+
+	rc2014_ext_bus_device  *m_bus;
+};
+
+// ======================> rc2014_ext_slot_device
+
+class rc2014_ext_slot_device : public rc2014_slot_device
+{
+public:
+	rc2014_ext_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+	template <typename T, typename U>
+	rc2014_ext_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&bus_tag, U &&slot_options, char const *default_option)
+		: rc2014_slot_device(mconfig, tag, owner, DERIVED_CLOCK(1,1))
+	{
+		m_bus.set_tag(std::forward<T>(bus_tag));
+		option_reset();
+		slot_options(*this);
+		set_default_option(default_option);
+		set_fixed(false);
+	}
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_resolve_objects() override;
+
+private:
+	required_device<rc2014_ext_bus_device> m_bus;
+};
+
 // device type definition
 DECLARE_DEVICE_TYPE(RC2014_BUS,  rc2014_bus_device)
 DECLARE_DEVICE_TYPE(RC2014_SLOT, rc2014_slot_device)
 
 DECLARE_DEVICE_TYPE(RC2014_EXT_BUS,  rc2014_ext_bus_device)
+DECLARE_DEVICE_TYPE(RC2014_EXT_SLOT, rc2014_ext_slot_device)
 
 #endif // MAME_BUS_RC2014_RC2014_H
