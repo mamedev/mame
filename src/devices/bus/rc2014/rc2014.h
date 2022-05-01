@@ -65,16 +65,27 @@ class rc2014_bus_device : public device_t
 public:
 	// construction/destruction
 	rc2014_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-/*
-	auto irq() { return m_write_irq.bind(); }
-	auto nmi() { return m_write_nmi.bind(); }
-*/
+
+	auto int_callback() { return m_int.bind(); }
+	auto nmi_callback() { return m_nmi.bind(); }
+	auto tx_callback() { return m_tx.bind(); }
+	auto rx_callback() { return m_rx.bind(); }
+	auto user1_callback() { return m_user1.bind(); }
+	auto user2_callback() { return m_user2.bind(); }
+	auto user3_callback() { return m_user3.bind(); }
+	auto user4_callback() { return m_user4.bind(); }
+
+	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_int(state); }
+	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi(state); }
+	DECLARE_WRITE_LINE_MEMBER( tx_w ) { m_tx(state); }
+	DECLARE_WRITE_LINE_MEMBER( rx_w ) { m_rx(state); }
+	DECLARE_WRITE_LINE_MEMBER( user1_w ) { m_user1(state); }
+	DECLARE_WRITE_LINE_MEMBER( user2_w ) { m_user2(state); }
+	DECLARE_WRITE_LINE_MEMBER( user3_w ) { m_user3(state); }
+	DECLARE_WRITE_LINE_MEMBER( user4_w ) { m_user4(state); }
+
 	void set_bus_clock(u32 clock);
 	void set_bus_clock(const XTAL &xtal) { set_bus_clock(xtal.value()); }
-/*
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
-	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_write_nmi(state); }
-*/  
 	void assign_installer(int index, address_space_installer *installer);
 	address_space_installer *installer(int index) const;
 protected:
@@ -84,9 +95,14 @@ protected:
 
 private:
 	address_space_installer *m_installer[4];
-/*	devcb_write_line   m_write_irq;
-	devcb_write_line   m_write_nmi;
-*/
+	devcb_write_line m_int;
+	devcb_write_line m_nmi;
+	devcb_write_line m_tx;
+	devcb_write_line m_rx;
+	devcb_write_line m_user1;
+	devcb_write_line m_user2;
+	devcb_write_line m_user3;
+	devcb_write_line m_user4;
 };
 
 // ======================> device_rc2014_card_interface

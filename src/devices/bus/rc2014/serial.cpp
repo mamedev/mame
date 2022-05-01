@@ -21,8 +21,11 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_resolve_objects() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
+	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_bus->irq_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( tx_w ) { m_bus->tx_w(state); }
 private:
 	required_device<acia6850_device> m_acia;
 };
@@ -39,6 +42,11 @@ void serial_io_device::device_start()
 	m_bus->installer(AS_IO)->install_readwrite_handler(0x80, 0x81, read8sm_delegate(*m_acia, FUNC(acia6850_device::read)), write8sm_delegate(*m_acia, FUNC(acia6850_device::write)));
 }
 
+void serial_io_device::device_resolve_objects()
+{
+	m_bus->rx_callback().set(m_acia, FUNC(acia6850_device::write_rxd));
+}
+
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_115200 )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_115200 )
@@ -50,9 +58,10 @@ DEVICE_INPUT_DEFAULTS_END
 void serial_io_device::device_add_mconfig(machine_config &config)
 {
 	ACIA6850(config, m_acia, 0);
-	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_acia->txd_handler().append("rs232", FUNC(rs232_port_device::write_txd));
+	m_acia->txd_handler().append(FUNC(serial_io_device::tx_w));
 	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
-	//m_acia->irq_handler().set_inputline("maincpu", INPUT_LINE_IRQ0); // Connect interrupt pin to our Z80 INT line
+	m_acia->irq_handler().set(FUNC(serial_io_device::irq_w));
 
 	clock_device &acia_clock(CLOCK(config, "acia_clock", DERIVED_CLOCK(1,1)));
 	acia_clock.signal_handler().set("acia", FUNC(acia6850_device::write_txc));
@@ -64,5 +73,6 @@ void serial_io_device::device_add_mconfig(machine_config &config)
 	rs232.cts_handler().set(m_acia, FUNC(acia6850_device::write_cts));
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 }
+
 
 DEFINE_DEVICE_TYPE_PRIVATE(RC2014_SERIAL_IO, device_rc2014_card_interface, serial_io_device, "rc2014_serial_io", "RC2014 Serial I/O Module")

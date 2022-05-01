@@ -67,9 +67,14 @@ void rc2014_slot_device::device_resolve_objects()
 rc2014_bus_device::rc2014_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RC2014_BUS, tag, owner, clock)
 	, m_installer{}
-	/*
-	,m_write_irq(*this)
-	,m_write_nmi(*this)*/
+	, m_int(*this)
+	, m_nmi(*this)
+	, m_tx(*this)
+	, m_rx(*this)
+	, m_user1(*this)
+	, m_user2(*this)
+	, m_user3(*this)
+	, m_user4(*this)
 {
 }
 
@@ -83,11 +88,15 @@ void rc2014_bus_device::device_start()
 	if (m_installer[AS_PROGRAM] == nullptr)
 		throw emu_fatalerror("Main address installer missing on RC2014 bus !!!");
 	// resolve callbacks
-/*	m_write_irq.resolve_safe();
-	m_write_nmi.resolve_safe();
-*/
+	m_int.resolve_safe();
+	m_nmi.resolve_safe();
+	m_tx.resolve_safe();
+	m_rx.resolve_safe();
+	m_user1.resolve_safe();
+	m_user2.resolve_safe();
+	m_user3.resolve_safe();
+	m_user4.resolve_safe();
 }
-
 
 //-------------------------------------------------
 //  device_reset - device-specific reset

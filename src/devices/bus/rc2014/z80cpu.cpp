@@ -23,11 +23,6 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_resolve_objects() override;
 private:
-/*	void bus_mem_w(offs_t offset, u8 data) { m_bus->space(AS_PROGRAM).write_byte(offset, data); }
-	u8 bus_mem_r(offs_t offset) { return m_bus->space(AS_PROGRAM).read_byte(offset); }
-	void bus_io_w(offs_t offset, u8 data) { m_bus->space(AS_IO).write_byte(offset, data); }
-	u8 bus_io_r(offs_t offset) { return m_bus->space(AS_IO).read_byte(offset); }
-*/
 	void addrmap_mem(address_map &map);
 	void addrmap_io(address_map &map);
 
@@ -69,4 +64,5 @@ void z80cpu_device::device_resolve_objects()
 {
 	m_bus->assign_installer(AS_PROGRAM, &m_maincpu->space(AS_PROGRAM));
 	m_bus->assign_installer(AS_IO, &m_maincpu->space(AS_IO));
+	m_bus->int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 }
