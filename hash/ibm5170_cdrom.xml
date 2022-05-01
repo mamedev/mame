@@ -3754,10 +3754,48 @@ license:CC0
 			</diskarea>
 		</part>
 	</software>
+
+	<software name="ubu410a64install">
+		<description>Ubuntu Version 4.10 for AMD64/EM64T install disk</description>
+		<!-- Official server https://old-releases.ubuntu.com/releases/4.10/ - for computers based on the AMD64 or EM64T architecture 
+			(e.g., Athlon64, Opteron, EM64T Xeon)-->
+		<year>2004</year>
+		<publisher>Canonical Ltd.</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="warty-release-install-amd64" sha1="4beb59e4121ccc79a7435e848d8d99495a1fa34e" />
+			</diskarea>
+		</part>
+	</software>	
+	
+	<software name="ubu410x86install">
+		<description>Ubuntu Version 4.10 for Intel x86 install disk</description>
+		<!-- Official server https://old-releases.ubuntu.com/releases/4.10/ -->
+		<year>2004</year>
+		<publisher>Canonical Ltd.</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="warty-release-install-i386" sha1="6f2d0a0833850469cd77ffc980ff753bbd314494" />
+			</diskarea>
+		</part>
+	</software>		
+	
+	<software name="ubu410x86live">
+		<description>Ubuntu Version 4.10 for Intel x86 live disk</description>
+		<!-- Official server https://old-releases.ubuntu.com/releases/4.10/ -->
+		<year>2004</year>
+		<publisher>Canonical Ltd.</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="warty-release-live-i386" sha1="a28cc349b514b9a50928ce437b6ebbb312c210a8" />
+			</diskarea>
+		</part>
+	</software>
 	
 	<software name="ubu504a64live">
 		<description>Ubuntu Version 5.04 for AMD64/EM64T live disk</description>
-		<!-- Free physical CD from Canonical -->
+		<!-- Free physical CD from Canonical  - for computers based on the AMD64 or EM64T architecture 
+			(e.g., Athlon64, Opteron, EM64T Xeon)-->
 		<year>2005</year>
 		<publisher>Canonical Ltd.</publisher>
 		<part name="cdrom" interface="cdrom">
