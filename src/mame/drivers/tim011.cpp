@@ -79,10 +79,10 @@ void tim011_state::machine_reset()
 {
 	m_scroll = 0;
 	// motor is actually connected on TXS pin of CPU
-	for (int i = 0; i < 4; i++)
+	for (auto &drive : m_floppy)
 	{
-		if (m_floppy[i]->get_device())
-			m_floppy[i]->get_device()->mon_w(0);
+		if (drive->get_device())
+			drive->get_device()->mon_w(0);
 	}
 }
 
