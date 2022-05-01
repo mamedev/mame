@@ -37580,6 +37580,9 @@ scorpio                         //
 @source:scotrsht.cpp
 scotrsht                        // GX545 (c) 1985
 
+@source:scrablex.cpp
+scrablex                        // Selchow & Righter
+
 @source:scramble.cpp
 800fath                         // (c) 1981 Amenip + U.S. Billiards license
 800fatha                        // (c) 1981 Amenip + U.S. Billiards license

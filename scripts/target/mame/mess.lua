@@ -1403,6 +1403,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"sanyo",
 		"saturn",
 		"segacons",
+		"selchow",
 		"sequential",
 		"sgi",
 		"sharp",
@@ -3687,6 +3688,11 @@ files {
 	MAME_DIR .. "src/mame/machine/megacd.h",
 	MAME_DIR .. "src/mame/machine/megacdcd.cpp",
 	MAME_DIR .. "src/mame/machine/megacdcd.h",
+}
+
+createMESSProjects(_target, _subtarget, "selchow")
+files {
+	MAME_DIR .. "src/mame/drivers/scrablex.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "sequential")
