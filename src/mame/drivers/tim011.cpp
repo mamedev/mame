@@ -88,18 +88,16 @@ void tim011_state::machine_reset()
 
 uint32_t tim011_state::screen_update_tim011(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u16 addr = 0;
-	for (u8 x = 0; x < 512/4; x++)
+	for (int x = 0; x < 512/4; x++)
 	{
 		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
-			int horpos = x*4;
-			u8 code = m_vram[addr++];
-			u8 real_y = (y - m_scroll) & 0xff;
-			bitmap.pix(real_y, horpos++) =  (code >> 0) & 0x03;
-			bitmap.pix(real_y, horpos++) =  (code >> 2) & 0x03;
-			bitmap.pix(real_y, horpos++) =  (code >> 4) & 0x03;
-			bitmap.pix(real_y, horpos++) =  (code >> 6) & 0x03;
+			int horpos = x << 2;
+			u8 code = m_vram[(x << 8) + ((y + m_scroll) & 0xff)];
+			bitmap.pix(y, horpos++) =  (code >> 0) & 0x03;
+			bitmap.pix(y, horpos++) =  (code >> 2) & 0x03;
+			bitmap.pix(y, horpos++) =  (code >> 4) & 0x03;
+			bitmap.pix(y, horpos++) =  (code >> 6) & 0x03;
 		}
 	}
 	return 0;
