@@ -58,9 +58,9 @@ private:
 	uint8_t m_address;
 	bool m_address_valid;
 
-	const char *m_cputag = nullptr;
-	const char *m_isatag = nullptr;
-	const char *m_biostag = nullptr;
+	const char *m_cputag;
+	const char *m_isatag;
+	const char *m_biostag;
 
 	uint8_t m_registers[0x10];
 

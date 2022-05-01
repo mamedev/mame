@@ -222,7 +222,7 @@ protected:
 private:
 	void set_bus(dio16_device & bus);
 	device_dio16_card_interface *m_next;
-	unsigned int m_index = 0;
+	unsigned int m_index;
 };
 
 class dio32_device;

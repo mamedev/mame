@@ -39,29 +39,29 @@ private:
 
 	attotime interrupt_period_table(int val);
 
-	int m_status = 0;     /* status register (*read* from address 0 = control register) */
-	int m_control = 0;    /* control register (*write* to address 0) */
+	int m_status;     /* status register (*read* from address 0 = control register) */
+	int m_control;    /* control register (*write* to address 0) */
 
-	int m_clk_set = 0;    /* clock setting register */
-	int m_int_ctl = 0;    /* interrupt control register */
+	int m_clk_set;    /* clock setting register */
+	int m_int_ctl;    /* interrupt control register */
 
-	int m_wday = 0;       /* day of the week (1-7 (1=day1 as set in init)) */
-	int m_years1 = 0;     /* years (BCD: 0-99) */
-	int m_years2 = 0;
-	int m_months1 = 0;    /* months (BCD: 1-12) */
-	int m_months2 = 0;
-	int m_days1 = 0;      /* days (BCD: 1-31) */
-	int m_days2 = 0;
-	int m_hours1 = 0;     /* hours (BCD : 0-23) */
-	int m_hours2 = 0;
-	int m_minutes1 = 0;   /* minutes (BCD : 0-59) */
-	int m_minutes2 = 0;
-	int m_seconds1 = 0;   /* seconds (BCD : 0-59) */
-	int m_seconds2 = 0;
-	int m_tenths = 0;     /* tenths of second (BCD : 0-9) */
+	int m_wday;       /* day of the week (1-7 (1=day1 as set in init)) */
+	int m_years1;     /* years (BCD: 0-99) */
+	int m_years2;
+	int m_months1;    /* months (BCD: 1-12) */
+	int m_months2;
+	int m_days1;      /* days (BCD: 1-31) */
+	int m_days2;
+	int m_hours1;     /* hours (BCD : 0-23) */
+	int m_hours2;
+	int m_minutes1;   /* minutes (BCD : 0-59) */
+	int m_minutes2;
+	int m_seconds1;   /* seconds (BCD : 0-59) */
+	int m_seconds2;
+	int m_tenths;     /* tenths of second (BCD : 0-9) */
 
-	emu_timer *m_increment_rtc = nullptr;
-	emu_timer *m_interrupt_timer = nullptr;
+	emu_timer *m_increment_rtc;
+	emu_timer *m_interrupt_timer;
 };
 
 DECLARE_DEVICE_TYPE(MM58274C, mm58274c_device)

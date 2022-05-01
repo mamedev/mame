@@ -19,11 +19,11 @@ protected:
 	void device_reset() override;
 
 private:
-	uint32_t pm1_cnt = 0, proc_cnt = 0, gpe0_sts = 0, gpe0_en = 0, smi_en = 0, smi_sts = 0;
-	uint16_t pm1_sts = 0, pm1_en = 0, alt_gp_smi_en = 0, alt_gp_smi_sts = 0, devact_sts = 0, devtrap_en = 0;
-	uint16_t tco1_sts = 0, tco2_sts = 0, tco1_cnt = 0, tco2_cnt = 0;
-	uint8_t  tco_rld = 0, tco_tmr = 0, tco_dat_in = 0, tco_dat_out = 0, tco_message1 = 0, tco_message2 = 0;
-	uint8_t  tco_wdstatus = 0, sw_irq_gen = 0;
+	uint32_t pm1_cnt, proc_cnt, gpe0_sts, gpe0_en, smi_en, smi_sts;
+	uint16_t pm1_sts, pm1_en, alt_gp_smi_en, alt_gp_smi_sts, devact_sts, devtrap_en;
+	uint16_t tco1_sts, tco2_sts, tco1_cnt, tco2_cnt;
+	uint8_t  tco_rld, tco_tmr, tco_dat_in, tco_dat_out, tco_message1, tco_message2;
+	uint8_t  tco_wdstatus, sw_irq_gen;
 
 	void map(address_map &map);
 

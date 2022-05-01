@@ -37,8 +37,8 @@ private:
 	std::unique_ptr<float[]> m_left_gains;
 	std::unique_ptr<float[]> m_right_gains;
 
-	u8 m_volume = 0;
-	u8 m_active = 0;
+	u8 m_volume;
+	u8 m_active;
 
 	void propagate_volume();
 

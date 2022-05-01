@@ -46,7 +46,7 @@ private:
 	required_device<ym2203_device>  m_opn;
 
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
-	u32 m_rom_base = 0;
+	u32 m_rom_base;
 };
 
 

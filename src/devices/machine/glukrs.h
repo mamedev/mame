@@ -28,7 +28,7 @@ protected:
 private:
 	u8 m_cmos[0x100];
 	required_device<nvram_device> m_nvram;
-	emu_timer *m_timer = nullptr;
+	emu_timer *m_timer;
 };
 
 DECLARE_DEVICE_TYPE(GLUKRS, glukrs_device)

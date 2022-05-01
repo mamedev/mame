@@ -5,9 +5,9 @@
     Nintendo Family Computer Hori Twin and 4 Players adapters
 
     In general these adapters work by reading pin 13 (the Famicom sees
-    this in memory location $4016, bit 1) of their subports. It is not
-    clear if other lines are pass-thru. For the moment we only emulate
-    joypads connected to these ports, which only use pin 13 when read.
+    this in memory location $4016, bit 1) of their subports. Other
+    input pins are not connected so various specialty controllers are
+    incompatible with these adapters.
 
     The Hori Twin passes subport 1's input directly through to $4016
     bit 1. It reroutes subport 2's to $4017 bit 1. Incidentally, HAL
@@ -137,6 +137,9 @@ u8 nes_hori4p_device::read_exp(offs_t offset)
 	u8 ret = 0;
 	int mode4p = m_cfg->read();
 
+	if (m_strobe)
+		reset_regs();
+
 	if (m_count[offset] < 16 || !mode4p)  // read from P1/P2 for first byte, P3/P4 for second byte if in 4P mode
 	{
 		int port = 2 * (BIT(m_count[offset], 3) & mode4p) + offset;
@@ -146,6 +149,7 @@ u8 nes_hori4p_device::read_exp(offs_t offset)
 	{
 		ret = (m_sig[offset] & 1) << 1;
 		m_sig[offset] >>= 1;
+		m_sig[offset] |= 0x80;  // reads beyond signature are always 1
 	}
 	m_count[offset]++;
 

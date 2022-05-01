@@ -43,10 +43,10 @@ protected:
 
 private:
 	required_device<picture_image_device> m_picture;
-	int m_x = 0, m_y = 0, m_cer0 = 0, m_cer1 = 0, m_cer2 = 0;
-	u8 m_a2_bitmap[280*193]{};
-	u8 m_threshold = 0;
-	bool m_bActive = false;
+	int m_x, m_y, m_cer0, m_cer1, m_cer2;
+	u8 m_a2_bitmap[280*193];
+	u8 m_threshold;
+	bool m_bActive;
 };
 
 /***************************************************************************

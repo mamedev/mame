@@ -2,10 +2,10 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-        UT88 driver by Miodrag Milanovic
+UT88 driver by Miodrag Milanovic
 
-        09/03/2008 Keyboard fixed, sound added.
-        06/03/2008 Preliminary driver.
+2008-03-09 Keyboard fixed, sound added.
+2008-03-06 Preliminary driver.
 
 UT88MINI
 ********

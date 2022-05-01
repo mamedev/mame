@@ -73,8 +73,8 @@ protected:
 
 	struct SDD1_PEM_ContextInfo
 	{
-		uint8_t status = 0;
-		uint8_t MPS = 0;
+		uint8_t status;
+		uint8_t MPS;
 	};
 
 	class SDD1_PEM //Probability Estimation Module
@@ -167,8 +167,8 @@ protected:
 
 	struct
 	{
-		uint32_t addr = 0;    // $43x2-$43x4 -- DMA transfer address
-		uint16_t size = 0;    // $43x5-$43x6 -- DMA transfer size
+		uint32_t addr;    // $43x2-$43x4 -- DMA transfer address
+		uint16_t size;    // $43x5-$43x6 -- DMA transfer size
 	} m_dma[8];
 
 	std::unique_ptr<SDD1_emu> m_sdd1emu;
@@ -176,9 +176,9 @@ protected:
 	struct
 	{
 		std::unique_ptr<uint8_t[]> data;    // pointer to decompressed S-DD1 data (65536 bytes)
-		uint16_t offset = 0;  // read index into S-DD1 decompression buffer
-		uint32_t size = 0;    // length of data buffer; reads decrement counter, set ready to false at 0
-		uint8_t ready = 0;    // 1 when data[] is valid; 0 to invoke sdd1emu.decompress()
+		uint16_t offset;  // read index into S-DD1 decompression buffer
+		uint32_t size;    // length of data buffer; reads decrement counter, set ready to false at 0
+		uint8_t ready;    // 1 when data[] is valid; 0 to invoke sdd1emu.decompress()
 	} m_buffer;
 };
 

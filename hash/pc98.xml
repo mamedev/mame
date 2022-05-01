@@ -8513,8 +8513,7 @@ TODO:
 		</part>
 	</software>
 
-	<!-- Doesn't pass the protection check -->
-	<software name="brandnew" supported="no">
+	<software name="brandnew">
 		<!-- Origin: private dump (r09) -->
 		<description>Brandish Renewal</description>
 		<year>1995</year>
@@ -8530,7 +8529,7 @@ TODO:
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="3594434">
-				<rom name="brandish_renewal_disk2.mfm" size="3594434" crc="ff09f243" sha1="9c8e3c99ac406b2501aa83867fa9e78424efb408" offset="0" />
+				<rom name="brandish_renewal_disk2.mfm" size="3594434" crc="411f9f13" sha1="97054b414c002e0b6884746015026e1acb03ddaf" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
@@ -13768,7 +13767,7 @@ TODO:
 	</software>
 
 	<software name="deja">
-		<description>De・Ja</description>
+		<description>De·Ja</description>
 		<year>1990</year>
 		<publisher>エルフ (Elf)</publisher>
 		<info name="alt_title" value="デ・ジャ" />
@@ -57823,7 +57822,7 @@ SPACE EMPIRE
 
 	<!-- Disk changes don't work -->
 	<software name="deja2" supported="no">
-		<description>De・Ja 2</description>
+		<description>De·Ja 2</description>
 		<year>1992</year>
 		<publisher>エルフ (Elf)</publisher>
 		<info name="alt_title" value="デ・ジャ２" />

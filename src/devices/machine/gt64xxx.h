@@ -95,7 +95,7 @@ private:
 	{
 		uint32_t low_addr;
 		uint32_t high_addr;
-		address_space* space = nullptr;
+		address_space* space;
 		galileo_addr_map() : low_addr(0xffffffff), high_addr(0x0) {}
 	};
 
@@ -104,6 +104,8 @@ private:
 	int m_irq_num;
 	int m_simm_size[4];
 
+	int m_irq_state;
+	uint32_t m_irq_pending;
 	int m_pci_stall_state;
 	int m_retry_count;
 	int m_pci_cpu_stalled;

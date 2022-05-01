@@ -359,7 +359,7 @@ bool menu_dats_view::custom_mouse_down()
 		if ((hover() - HOVER_INFO_TEXT - 1) != m_actual)
 		{
 			m_actual = hover() - HOVER_INFO_TEXT - 1;
-			reset(reset_options::SELECT_FIRST);
+			reset_layout();
 		}
 		return true;
 	}

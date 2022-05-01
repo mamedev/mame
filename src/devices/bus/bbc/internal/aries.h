@@ -48,7 +48,7 @@ protected:
 
 	optional_device_array<bbc_romslot_device, 16> m_rom;
 
-	uint8_t m_romsel = 0;
+	uint8_t m_romsel;
 };
 
 
@@ -73,7 +73,7 @@ protected:
 private:
 	void control_w(offs_t offset, uint8_t data);
 
-	bool m_shadow = false;
+	bool m_shadow;
 	std::unique_ptr<uint8_t[]> m_ram;
 };
 
@@ -102,9 +102,9 @@ protected:
 private:
 	required_memory_region m_aries_rom;
 
-	bool m_shadow = false;
+	bool m_shadow;
 	std::unique_ptr<uint8_t[]> m_ram;
-	uint8_t m_ramsel = 0;
+	uint8_t m_ramsel;
 };
 
 

@@ -18,7 +18,6 @@
 #include "emu.h"
 #include "mb88xx.h"
 #include "mb88dasm.h"
-#include "debugger.h"
 
 
 DEFINE_DEVICE_TYPE(MB88201, mb88201_cpu_device, "mb88201", "Fujitsu MB88201")

@@ -70,7 +70,6 @@
 #include "mdec.h"
 #include "rcnt.h"
 #include "sound/spu.h"
-#include "debugger.h"
 
 #include "psxdefs.h"
 
@@ -1982,6 +1981,10 @@ void psxcpu_device::device_start()
 	state_add( PSXCPU_CP2CR29, "zsf3", m_gte.m_cp2cr[ 29 ].d );
 	state_add( PSXCPU_CP2CR30, "zsf4", m_gte.m_cp2cr[ 30 ].d );
 	state_add( PSXCPU_CP2CR31, "flag", m_gte.m_cp2cr[ 31 ].d );
+
+	// initialize the registers once
+	for(int i=0; i != 32; i++)
+		m_r[i] = 0;
 
 	// set our instruction counter
 	set_icountptr(m_icount);

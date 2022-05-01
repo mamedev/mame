@@ -55,9 +55,9 @@ protected:
 private:
 	memory_share_creator<uint16_t> m_vram;
 	memory_share_creator<uint16_t> m_scroll;
-	tilemap_t *m_tilemap[3];
-	int m_sprites_scrolldx;
-	int m_sprites_scrolldy;
+	tilemap_t *m_tilemap[3]{};
+	int m_sprites_scrolldx = 0;
+	int m_sprites_scrolldy = 0;
 	memory_share_creator<uint16_t> m_spriteram;
 };
 

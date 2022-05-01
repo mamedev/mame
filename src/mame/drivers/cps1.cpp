@@ -14030,16 +14030,16 @@ void cps_state::init_sf2dongb()
 
 uint16_t cps_state::sf2ceblp_prot_r()
 {
-	if (sf2ceblp_prot == 0x0)
+	if (m_sf2ceblp_prot == 0x0)
 		return 0x1992;
-	if (sf2ceblp_prot == 0x04)
+	if (m_sf2ceblp_prot == 0x04)
 		return 0x0408;
 	return 0xffff;
 }
 
 void cps_state::sf2ceblp_prot_w(uint16_t data)
 {
-	sf2ceblp_prot = data;
+	m_sf2ceblp_prot = data;
 }
 
 
@@ -14180,16 +14180,16 @@ Pang 3b4 - code accesso to $5762b0 and $57a2b0 (PIC)
 */
 uint16_t cps_state::pang3b4_prot_r()
 {
-	if ((pang3b4_prot & 0xff) >=0 && (pang3b4_prot & 0xff) <=7)
-	      return (pang3b4_prot & 0xff) + 0x20;  // Game level + extend
-	if (pang3b4_prot == 0x17)
-	      return 0x7321;                      // Guessed from code @0x314
+	if ((m_pang3b4_prot & 0xff) <=7)
+		  return (m_pang3b4_prot & 0xff) + 0x20;  // Game level + extend
+	if (m_pang3b4_prot == 0x17)
+		  return 0x7321;                      // Guessed from code @0x314
 	return 0xffff;
 }
 
 void cps_state::pang3b4_prot_w(uint16_t data)
 {
-	pang3b4_prot = data;
+	m_pang3b4_prot = data;
 }
 
 

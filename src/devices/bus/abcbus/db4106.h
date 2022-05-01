@@ -50,7 +50,7 @@ protected:
 private:
 	required_device<z80_device> m_maincpu;
 
-	bool m_cs = false;
+	bool m_cs;
 
 	void databoard_4106_io(address_map &map);
 	void databoard_4106_mem(address_map &map);

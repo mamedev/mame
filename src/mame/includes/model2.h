@@ -77,7 +77,7 @@ public:
 	std::unique_ptr<u16[]> m_palram;
 	std::unique_ptr<u16[]> m_colorxlat;
 	std::unique_ptr<u16[]> m_lumaram;
-	u8 m_gamma_table[256];
+	u8 m_gamma_table[256]{};
 	std::unique_ptr<model2_renderer> m_poly;
 
 	/* Public for access by the ioports */
@@ -133,25 +133,25 @@ protected:
 	optional_ioport m_gears;
 	optional_ioport_array<4> m_lightgun_ports;
 
-	u32 m_timervals[4];
-	u32 m_timerorig[4];
-	int m_timerrun[4];
-	int m_ctrlmode;
-	u16 m_cmd_data;
-	u8 m_driveio_comm_data;
-	int m_iop_write_num;
-	u32 m_iop_data;
+	u32 m_timervals[4]{};
+	u32 m_timerorig[4]{};
+	int m_timerrun[4]{};
+	int m_ctrlmode = 0;
+	u16 m_cmd_data = 0;
+	u8 m_driveio_comm_data = 0;
+	int m_iop_write_num = 0;
+	u32 m_iop_data = 0;
 
-	u32 m_geo_read_start_address;
-	u32 m_geo_write_start_address;
+	u32 m_geo_read_start_address = 0;
+	u32 m_geo_write_start_address = 0;
 	std::unique_ptr<raster_state> m_raster;
 	std::unique_ptr<geo_state> m_geo;
 	bitmap_rgb32 m_sys24_bitmap;
 //  u32 m_soundack;
 	void model2_check_irq_state();
 	void model2_check_irqack_state(u32 data);
-	u8 m_gearsel;
-	u8 m_lightgun_mux;
+	u8 m_gearsel = 0;
+	u8 m_lightgun_mux = 0;
 
 	// Coprocessor communications
 	u32 copro_prg_r();
@@ -196,7 +196,7 @@ protected:
 	u32 doa_prot_r(offs_t offset, u32 mem_mask = ~0);
 	u32 doa_unk_r();
 	void sega_0229_map(address_map &map);
-	int m_prot_a;
+	int m_prot_a = 0;
 
 	void raster_init(memory_region *texture_rom);
 	void geo_init(memory_region *polygon_rom);
@@ -253,10 +253,10 @@ protected:
 
 	virtual void video_start() override;
 
-	u32 m_intreq;
-	u32 m_intena;
-	u32 m_coproctl;
-	u32 m_coprocnt;
+	u32 m_intreq = 0;
+	u32 m_intena = 0;
+	u32 m_coproctl = 0;
+	u32 m_coprocnt = 0;
 
 	virtual void copro_halt() = 0;
 	virtual void copro_boot() = 0;
@@ -264,14 +264,14 @@ protected:
 private:
 	void tri_list_dump(FILE *dst);
 
-	u32 m_geoctl;
-	u32 m_geocnt;
-	u32 m_videocontrol;
+	u32 m_geoctl = 0;
+	u32 m_geocnt = 0;
+	u32 m_videocontrol = 0;
 
-	bool m_render_unk;
-	bool m_render_mode;
-	bool m_render_test_mode;
-	int16 m_crtc_xoffset, m_crtc_yoffset;
+	bool m_render_unk = false;
+	bool m_render_mode = false;
+	bool m_render_test_mode = false;
+	int16 m_crtc_xoffset = 0, m_crtc_yoffset = 0;
 
 	u32 *geo_process_command( geo_state *geo, u32 opcode, u32 *input, bool *end_code );
 	// geo commands
@@ -345,7 +345,7 @@ protected:
 	u32 m_copro_sincos_base = 0;
 	u32 m_copro_inv_base = 0;
 	u32 m_copro_isqrt_base = 0;
-	u32 m_copro_atan_base[4];
+	u32 m_copro_atan_base[4]{};
 
 	void copro_function_port_w(offs_t offset, u32 data);
 	u32 copro_fifo_r();
@@ -721,7 +721,7 @@ public:
 private:
 	model2_state& m_state;
 	bitmap_rgb32 m_destmap;
-	int16_t m_xoffs,m_yoffs;
+	int16_t m_xoffs = 0, m_yoffs = 0;
 };
 
 typedef model2_renderer::vertex_t poly_vertex;

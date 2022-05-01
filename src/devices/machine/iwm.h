@@ -58,23 +58,22 @@ private:
 	};
 
 	floppy_image_device *m_floppy;
-	emu_timer *m_timer = nullptr;
+	emu_timer *m_timer;
 	double m_q3_fclk_ratio, m_fclk_q3_ratio;
-	u64 m_last_sync = 0, m_next_state_change = 0, m_sync_update = 0, m_async_update = 0;
-	u64 m_flux_write_start = 0;
-	std::array<u64, 16> m_flux_write;
-	u32 m_flux_write_count = 0;
-	u32 m_q3_clock = 0;
-	int m_active = 0, m_rw = 0, m_rw_state = 0;
-	u8 m_data = 0, m_whd = 0, m_mode = 0, m_status = 0, m_control = 0, m_rw_bit_count = 0;
-	u8 m_rsh = 0, m_wsh = 0;
-	u8 m_devsel = 0;
+	u64 m_last_sync, m_next_state_change, m_sync_update, m_async_update;
+	u64 m_flux_write_start;
+	std::array<u64, 65536> m_flux_write;
+	u32 m_flux_write_count;
+	u32 m_q3_clock;
+	int m_active, m_rw, m_rw_state;
+	u8 m_data, m_whd, m_mode, m_status, m_control, m_rw_bit_count;
+	u8 m_rsh, m_wsh;
+	u8 m_devsel;
+	bool m_q3_clock_active;
 
 	u8 control(int offset, u8 data);
 	u64 time_to_cycles(const attotime &tm) const;
 	attotime cycles_to_time(u64 cycles) const;
-	u64 fclk_to_q3(u64 cycles) const;
-	u64 q3_to_fclk(u64 cycles) const;
 
 	void mode_w(u8 data);
 	void data_w(u8 data);
@@ -82,9 +81,10 @@ private:
 	u64 window_size() const;
 	u64 half_window_size() const;
 	u64 read_register_update_delay() const;
-	u64 write_sync_half_window_size() const;
 	inline bool is_sync() const;
 	void flush_write(u64 when = 0);
+	void write_clock_start();
+	void write_clock_stop();
 };
 
 DECLARE_DEVICE_TYPE(IWM, iwm_device)

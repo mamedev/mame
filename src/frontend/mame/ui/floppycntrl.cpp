@@ -94,6 +94,11 @@ void menu_control_floppy_image::hook_load(const std::string &filename)
 	}
 }
 
+bool menu_control_floppy_image::can_format(const floppy_image_device::fs_info &fs)
+{
+	return !fs.m_manager || fs.m_manager->can_format();
+}
+
 void menu_control_floppy_image::menu_activated()
 {
 	switch (m_state) {
@@ -124,26 +129,46 @@ void menu_control_floppy_image::menu_activated()
 			m_state = START_FILE;
 			menu_activated();
 		} else {
-			const auto &fs = fd.get_create_fs();
+			// get all formatable file systems
+			std::vector<std::reference_wrapper<const floppy_image_device::fs_info>> fs;
+			for (const auto &this_fs : fd.get_fs()) {
+				if (can_format(this_fs))
+					fs.emplace_back(std::ref(this_fs));
+			}
+
 			output_filename = util::zippath_combine(m_current_directory, m_current_file);
 			if(fs.size() == 1) {
-				create_fs = &fs[0];
+				create_fs = &(fs[0].get());
 				do_load_create();
 				stack_pop();
 			} else {
 				m_submenu_result.i = -1;
-				menu::stack_push<menu_select_floppy_init>(ui(), container(), fs, &m_submenu_result.i);
+				menu::stack_push<menu_select_floppy_init>(ui(), container(), std::move(fs), &m_submenu_result.i);
 				m_state = SELECT_INIT;
 			}
 		}
 		break;
 
 	case SELECT_INIT:
-		if(m_submenu_result.i == -1) {
+		// figure out which (if any) create file system was selected
+		create_fs = nullptr;
+		if(m_submenu_result.i >= 0) {
+			int i = 0;
+			for (const auto &this_fs : fd.get_fs()) {
+				if (can_format(this_fs)) {
+					if (i == m_submenu_result.i) {
+						create_fs = &this_fs;
+						break;
+					}
+					i++;
+				}
+			}
+		}
+
+		if(!create_fs) {
 			m_state = START_FILE;
 			menu_activated();
 		} else {
-			create_fs = &fd.get_create_fs()[m_submenu_result.i];
 			do_load_create();
 			stack_pop();
 		}

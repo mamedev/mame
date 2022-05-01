@@ -14,7 +14,6 @@
 #include "emu.h"
 #include "asap.h"
 #include "asapdasm.h"
-#include "debugger.h"
 
 
 //**************************************************************************

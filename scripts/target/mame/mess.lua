@@ -961,6 +961,7 @@ BUSES["PSX_PARALLEL"] = true
 BUSES["QBUS"] = true
 BUSES["QL"] = true
 BUSES["RS232"] = true
+BUSES["PC8801"] = true
 BUSES["RTPC_KBD"] = true
 BUSES["S100"] = true
 BUSES["SAITEK_OSA"] = true
@@ -1210,7 +1211,6 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"akai",
 		"alesis",
 		"altos",
-		"ami",
 		"amirix",
 		"amiga",
 		"ampro",
@@ -1764,11 +1764,6 @@ files {
 	MAME_DIR .. "src/mame/machine/acs8600_ics.cpp",
 }
 
-createMESSProjects(_target, _subtarget, "ami")
-files {
-	MAME_DIR .. "src/mame/drivers/hh_amis2k.cpp",
-}
-
 createMESSProjects(_target, _subtarget, "amirix")
 files {
 	MAME_DIR .. "src/mame/drivers/wxstar4000.cpp",
@@ -2252,7 +2247,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/ac1.cpp",
 	MAME_DIR .. "src/mame/drivers/bcs3.cpp",
 	MAME_DIR .. "src/mame/drivers/c80.cpp",
-	MAME_DIR .. "src/mame/includes/c80.h",
 	MAME_DIR .. "src/mame/drivers/huebler.cpp",
 	MAME_DIR .. "src/mame/includes/huebler.h",
 	MAME_DIR .. "src/mame/drivers/jtc.cpp",
@@ -2410,9 +2404,6 @@ files {
 createMESSProjects(_target, _subtarget, "entex")
 files {
 	MAME_DIR .. "src/mame/drivers/advision.cpp",
-	MAME_DIR .. "src/mame/includes/advision.h",
-	MAME_DIR .. "src/mame/machine/advision.cpp",
-	MAME_DIR .. "src/mame/video/advision.cpp",
 	MAME_DIR .. "src/mame/drivers/sag.cpp",
 }
 
@@ -3375,6 +3366,7 @@ createMESSProjects(_target, _subtarget, "parker")
 files {
 	MAME_DIR .. "src/mame/drivers/talkingbb.cpp",
 	MAME_DIR .. "src/mame/drivers/talkingfb.cpp",
+	MAME_DIR .. "src/mame/drivers/wildfire.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "pitronic")

@@ -49,13 +49,13 @@ private:
 	required_memory_bank m_okibank;
 
 	/* video-related */
-	tilemap_t     *m_pant[2];
+	tilemap_t     *m_pant[2]{};
 	std::unique_ptr<bitmap_ind16> m_screen_bitmap;
 
 	/* misc */
-	int         m_current_bit;
-	int         m_cause_interrupt;
-	int         m_blitter_command;
+	int         m_current_bit = 0;
+	int         m_cause_interrupt = 0;
+	int         m_blitter_command = 0;
 
 	void shareram_w(offs_t offset, uint8_t data);
 	uint8_t shareram_r(offs_t offset);

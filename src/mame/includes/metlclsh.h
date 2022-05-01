@@ -38,10 +38,10 @@ private:
 	std::unique_ptr<uint8_t[]>        m_otherram;
 
 	/* video-related */
-	tilemap_t      *m_bg_tilemap;
-	tilemap_t      *m_fg_tilemap;
-	uint8_t          m_write_mask;
-	uint8_t          m_gfxbank;
+	tilemap_t      *m_bg_tilemap = nullptr;
+	tilemap_t      *m_fg_tilemap = nullptr;
+	uint8_t          m_write_mask = 0;
+	uint8_t          m_gfxbank = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

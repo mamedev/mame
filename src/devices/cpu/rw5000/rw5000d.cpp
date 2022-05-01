@@ -234,6 +234,38 @@ offs_t b5000_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 }
 
 
+// B5500 disasm (B5000 + LB x,11, SC/RSC moved to make room for more TL)
+
+const u8 b5500_disassembler::b5500_opmap[0x100] =
+{
+/*  0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F  */
+	em_NOP,  em_TC,   em_TKB,  em_TKBS, em_TDIN, em_TDIN, em_TDIN, em_TDIN, em_TM,   em_TM,   em_TM,   em_TM,   em_SC,   em_RSC,  0,       0,       // 0
+	em_SM,   em_SM,   em_SM,   em_SM,   em_RSM,  em_RSM,  em_RSM,  em_RSM,  em_RET,  em_RET,  em_RET,  em_RET,  em_LB11, em_LB11, em_LB11, em_LB11, // 1
+	em_LB7,  em_LB7,  em_LB7,  em_LB7,  em_LB10, em_LB10, em_LB10, em_LB10, em_LB9,  em_LB9,  em_LB9,  em_LB9,  em_LB8,  em_LB8,  em_LB8,  em_LB8,  // 2
+	em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_TL,   em_LB0,  em_LB0,  em_LB0,  em_LB0,  // 3
+
+	em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  em_LAX,  // 4
+	em_LDA,  em_LDA,  em_LDA,  em_LDA,  em_EXCP, em_EXCP, em_EXCP, em_EXCP, em_EXC0, em_EXC0, em_EXC0, em_EXC0, em_EXCM, em_EXCM, em_EXCM, em_EXCM, // 5
+	em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_ADX,  em_READ, // 6
+	em_ADD,  em_ADD,  em_ADD,  em_ADD,  em_KSEG, 0,       0,       em_ATB,  em_COMP, em_COMP, em_COMP, em_COMP, em_TAM,  em_TAM,  em_TAM,  em_TAM,  // 7
+
+	em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, // 8
+	em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, // 9
+	em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, // A
+	em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, em_TRA0, // B
+
+	em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, // C
+	em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, // D
+	em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, // E
+	em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, em_TRA1, // F
+};
+
+offs_t b5500_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+{
+	return common_disasm(b5500_opmap, stream, pc, opcodes, params);
+}
+
+
 // B6000 disasm (B5000 + ATBZ added)
 
 const u8 b6000_disassembler::b6000_opmap[0x100] =

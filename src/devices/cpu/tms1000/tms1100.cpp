@@ -12,7 +12,6 @@
 #include "emu.h"
 #include "tms1100.h"
 #include "tms1k_dasm.h"
-#include "debugger.h"
 
 // TMS1100 is nearly the same as TMS1000, some different opcodes, and with double the RAM and ROM
 DEFINE_DEVICE_TYPE(TMS1100, tms1100_cpu_device, "tms1100", "Texas Instruments TMS1100") // 28-pin DIP, 11 R pins

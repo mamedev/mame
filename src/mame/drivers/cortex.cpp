@@ -36,12 +36,6 @@ ToDo:
 - Memory mapping unit (74LS610)
 - Various CRU I/O
 
-Note that the MAME implementation of CRU addresses is not the same as real
-hardware. For writing, MAME uses the correct address (R12/2 + offset), with
-the bit (0 or 1), being in 'data'. However, for reading, 8 CRU bits are
-packed into a single address-byte (CRU 0 = bit 0, etc). So the address is
-(R12/2 + offset) >> 3.
-
 ****************************************************************************/
 
 #include "emu.h"

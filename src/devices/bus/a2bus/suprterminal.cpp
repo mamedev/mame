@@ -74,7 +74,7 @@ private:
 	std::unique_ptr<u8[]> m_vram;
 	std::unique_ptr<u8[]> m_fontram;
 //  u8 m_fontram[0x400];
-	bool m_bRasterRAM = false, m_bCharBank1 = false, m_bC800IsRAM = false;
+	bool m_bRasterRAM, m_bCharBank1, m_bC800IsRAM;
 };
 
 //-------------------------------------------------

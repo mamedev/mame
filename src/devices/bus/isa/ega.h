@@ -67,44 +67,44 @@ public:
 
 	/* Video memory and related variables */
 	std::unique_ptr<uint8_t[]> m_vram;
-	uint8_t   *m_plane[4]{};
-	uint8_t   m_read_latch[4]{};
-	uint8_t   *m_videoram = nullptr;
-	uint8_t   *m_charA = nullptr;
-	uint8_t   *m_charB = nullptr;
+	uint8_t   *m_plane[4];
+	uint8_t   m_read_latch[4];
+	uint8_t   *m_videoram;
+	uint8_t   *m_charA;
+	uint8_t   *m_charB;
 
 	/* Registers */
-	uint8_t   m_misc_output = 0;
-	uint8_t   m_feature_control = 0;
+	uint8_t   m_misc_output;
+	uint8_t   m_feature_control;
 
 	/* Attribute registers AR00 - AR14
 	*/
 	struct {
-		uint8_t   index = 0;
-		uint8_t   data[32]{};
-		uint8_t   index_write = 0;
+		uint8_t   index;
+		uint8_t   data[32];
+		uint8_t   index_write;
 	} m_attribute;
 
 	/* Sequencer registers SR00 - SR04
 	*/
 	struct {
-		uint8_t   index = 0;
-		uint8_t   data[8]{};
+		uint8_t   index;
+		uint8_t   data[8];
 	} m_sequencer;
 
 	/* Graphics controller registers GR00 - GR08
 	*/
 	struct {
-		uint8_t   index = 0;
-		uint8_t   data[16]{};
+		uint8_t   index;
+		uint8_t   data[16];
 	} m_graphics_controller;
 
-	uint8_t   m_frame_cnt = 0;
-	uint8_t   m_hsync = 0;
-	uint8_t   m_vsync = 0;
-	uint8_t   m_vblank = 0;
-	uint8_t   m_display_enable = 0;
-	int     m_video_mode = 0;
+	uint8_t   m_frame_cnt;
+	uint8_t   m_hsync;
+	uint8_t   m_vsync;
+	uint8_t   m_vblank;
+	uint8_t   m_display_enable;
+	int     m_video_mode;
 	required_device<palette_device> m_palette;
 };
 

@@ -55,7 +55,7 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 
 private:
-	bool m_centronics_busy = false;
+	bool m_centronics_busy;
 };
 
 // device type definition

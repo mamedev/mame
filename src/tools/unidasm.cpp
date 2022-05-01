@@ -394,6 +394,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "axc51core",       le,  0, []() -> util::disasm_interface * { return new axc51core_disassembler; } },
 	{ "axc208",          le,  0, []() -> util::disasm_interface * { return new ax208_disassembler; } },
 	{ "b5000",           le,  0, []() -> util::disasm_interface * { return new b5000_disassembler; } },
+	{ "b5500",           le,  0, []() -> util::disasm_interface * { return new b5500_disassembler; } },
 	{ "b6000",           le,  0, []() -> util::disasm_interface * { return new b6000_disassembler; } },
 	{ "b6100",           le,  0, []() -> util::disasm_interface * { return new b6100_disassembler; } },
 	{ "capricorn",       le,  0, []() -> util::disasm_interface * { return new capricorn_disassembler; } },
@@ -679,7 +680,7 @@ class unidasm_data_buffer : public util::disasm_interface::data_buffer
 {
 public:
 	std::vector<u8> data;
-	offs_t base_pc;
+	offs_t base_pc = 0;
 	u32 size;
 
 	unidasm_data_buffer(util::disasm_interface *disasm, const dasm_table_entry *entry);

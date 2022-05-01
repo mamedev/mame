@@ -16,8 +16,12 @@ DEFINE_DEVICE_TYPE(A5500, a5500_cpu_device, "a5500", "Rockwell A5500")
 
 
 // constructor
+a5500_cpu_device::a5500_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
+	a5000_cpu_device(mconfig, type, tag, owner, clock, prgwidth, program, datawidth, data)
+{ }
+
 a5500_cpu_device::a5500_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	a5000_cpu_device(mconfig, A5500, tag, owner, clock, 10, address_map_constructor(FUNC(a5500_cpu_device::program_768x8), this), 6, address_map_constructor(FUNC(a5500_cpu_device::data_48x4), this))
+	a5500_cpu_device(mconfig, A5500, tag, owner, clock, 10, address_map_constructor(FUNC(a5500_cpu_device::program_768x8), this), 6, address_map_constructor(FUNC(a5500_cpu_device::data_48x4), this))
 { }
 
 

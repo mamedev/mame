@@ -50,7 +50,7 @@ private:
 	required_device<pc9801_slot_device> m_bus;
 	required_device<ym2608_device>  m_opn3;
 
-	uint8_t m_ext_reg = 0;
+	uint8_t m_ext_reg;
 
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 };

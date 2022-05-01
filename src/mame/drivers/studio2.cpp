@@ -277,7 +277,7 @@ protected:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 
 	/* keyboard state */
-	uint8_t m_keylatch;
+	uint8_t m_keylatch = 0;
 
 	void studio2_io_map(address_map &map);
 	void studio2_map(address_map &map);

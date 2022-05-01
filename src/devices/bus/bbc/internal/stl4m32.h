@@ -54,9 +54,9 @@ protected:
 
 	std::unique_ptr<uint8_t[]> m_ram;
 
-	uint8_t m_romsel = 0;
-	uint8_t m_ramsel = 0;
-	uint8_t m_shadow = 0;
+	uint8_t m_romsel;
+	uint8_t m_ramsel;
+	uint8_t m_shadow;
 };
 
 

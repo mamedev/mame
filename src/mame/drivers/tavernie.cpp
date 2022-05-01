@@ -2,25 +2,25 @@
 // copyright-holders: Robbbert
 /*********************************************************************************
 
-    Tavernier CPU09 and IVG09 (Realisez votre ordinateur individuel)
+Tavernier CPU09 and IVG09 (Realisez votre ordinateur individuel)
 
-    2013-12-08 Skeleton driver.
+2013-12-08 Skeleton driver.
 
-    This system was described in a French computer magazine "Micro-Informatique".
+This system was described in a French computer magazine "Micro-Informatique".
 
-    CPU09 includes 6809, 6821, 6840, 6850, cassette, rs232
-    IVG09 includes 6845, another 6821, beeper
-    IFD09 includes WD1795
+CPU09 includes 6809, 6821, 6840, 6850, cassette, rs232
+IVG09 includes 6845, another 6821, beeper
+IFD09 includes WD1795
 
 ToDo:
-    - Graphics
-    - Character rom is not dumped
-    - Graphics rom is not dumped
+- Graphics
+- Character rom is not dumped
+- Graphics rom is not dumped
         (note 2020-05-29: added what are thought to be the correct roms, but the proper
                           operation is uncertain).
-    - 3x 7611 proms not dumped
-    - Test FDC
-    - Need software (there are floppy images, but they are not yet in a supported format)
+- 3x 7611 proms not dumped
+- Test FDC
+- Need software (there are floppy images, but they are not yet in a supported format)
 
 
 List of commands (must be in UPPERCASE):
@@ -94,7 +94,7 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	void cpu09_mem(address_map &map);
 	u8 m_pa = 0U;
-	bool m_cassold = 0;
+	bool m_cassold = false;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<pia6821_device> m_pia0;

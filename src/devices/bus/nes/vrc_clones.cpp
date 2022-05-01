@@ -33,6 +33,8 @@ DEFINE_DEVICE_TYPE(NES_900218,      nes_900218_device,      "nes_900218",      "
 DEFINE_DEVICE_TYPE(NES_AX40G,       nes_ax40g_device,       "nes_ax40g",       "NES Cart UNL-AX-40G PCB")
 DEFINE_DEVICE_TYPE(NES_AX5705,      nes_ax5705_device,      "nes_ax5705",      "NES Cart AX5705 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_830506C, nes_bmc_830506c_device, "nes_bmc_830506c", "NES Cart BMC 830506C PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_831128C, nes_bmc_831128c_device, "nes_bmc_831128c", "NES Cart BMC 831128C PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_KL06,    nes_bmc_kl06_device,    "nes_bmc_kl06",    "NES Cart BMC KL-06 PCB")
 DEFINE_DEVICE_TYPE(NES_CITYFIGHT,   nes_cityfight_device,   "nes_cityfight",   "NES Cart City Fighter PCB")
 DEFINE_DEVICE_TYPE(NES_SHUIGUAN,    nes_shuiguan_device,    "nes_shuiguan",    "NES Cart Shui Guan Pipe Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_T230,        nes_t230_device,        "nes_t230",        "NES Cart T-230 PCB")
@@ -64,6 +66,16 @@ nes_ax5705_device::nes_ax5705_device(const machine_config &mconfig, const char *
 
 nes_bmc_830506c_device::nes_bmc_830506c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_konami_vrc4_device(mconfig, NES_BMC_830506C, tag, owner, clock), m_outer(0)
+{
+}
+
+nes_bmc_831128c_device::nes_bmc_831128c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_konami_vrc4_device(mconfig, NES_BMC_831128C, tag, owner, clock), m_reg(0)
+{
+}
+
+nes_bmc_kl06_device::nes_bmc_kl06_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_konami_vrc4_device(mconfig, NES_BMC_KL06, tag, owner, clock), m_reg(0)
 {
 }
 
@@ -177,6 +189,36 @@ void nes_bmc_830506c_device::device_start()
 void nes_bmc_830506c_device::pcb_reset()
 {
 	m_outer = 0;
+	nes_konami_vrc4_device::pcb_reset();
+}
+
+void nes_bmc_831128c_device::device_start()
+{
+	nes_konami_vrc4_device::device_start();
+	save_item(NAME(m_reg));
+}
+
+void nes_bmc_831128c_device::pcb_reset()
+{
+	nes_konami_vrc4_device::pcb_reset();
+
+	m_reg = 0;
+	prg32((m_prg_chunks >> 1) - 1);
+}
+
+void nes_bmc_kl06_device::device_start()
+{
+	nes_konami_vrc4_device::device_start();
+	save_item(NAME(m_reg));
+
+	// VRC4 pins 3 and 4
+	m_vrc_ls_prg_a = 3;  // A1
+	m_vrc_ls_prg_b = 2;  // A0
+}
+
+void nes_bmc_kl06_device::pcb_reset()
+{
+	m_reg = 0;
 	nes_konami_vrc4_device::pcb_reset();
 }
 
@@ -695,5 +737,130 @@ void nes_bmc_830506c_device::write_h(offs_t offset, u8 data)
 		u8 bank = ((offset >> 12) - 3) * 2 + BIT(offset, m_vrc_ls_prg_a);
 		m_outer = (m_mmc_vrom_bank[bank] & 0x180) >> 3;
 		set_prg();
+	}
+}
+
+/*-------------------------------------------------
+
+ Board BMC-831128C
+
+ Games: 1995 New Series Super 2 in 1
+
+ Weird clone that seems to be part Konami VRC4 (IRQ),
+ and part Sunsoft FME-7 (banking/mirroring).
+
+ NES 2.0: mapper 528
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+
+u8 nes_bmc_831128c_device::read_m(offs_t offset)
+{
+// LOG_MMC(("bmc_831128c read_m, offset: %04x, data: %02x\n", offset, data));
+
+	if (m_reg == 1)
+		return device_nes_cart_interface::read_m(offset);
+	else
+		return m_prg[(m_reg * 0x2000 + offset) & (m_prg_size - 1)];
+}
+
+void nes_bmc_831128c_device::write_m(offs_t offset, u8 data)
+{
+// LOG_MMC(("bmc_831128c write_m, offset: %04x, data: %02x\n", offset, data));
+
+	if (m_reg == 1)
+		device_nes_cart_interface::write_m(offset, data);
+}
+
+void nes_bmc_831128c_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_831128c write_h, offset: %04x, data: %02x\n", offset, data));
+
+	u8 page = offset >> 12;
+	if (page != 2 && page != 4)  // ignore writes except $Axxx and $Cxxx
+		return;
+
+	int outer = BIT(offset, 14) << 4;
+	prg16_cdef(outer ? m_prg_chunks - 1 : 7);
+
+	u8 reg = offset & 0x0f;
+	switch (reg)
+	{
+		case 0x0: case 0x1: case 0x2: case 0x3:
+		case 0x4: case 0x5: case 0x6: case 0x7:
+			chr1_x(reg, (outer << 4) | data, m_chr_source);
+			break;
+		case 0x8:
+			m_reg = data;
+			break;
+		case 0x9:
+		case 0xa:
+			prg8_x(reg - 9, outer + (data & (outer | 0x0f)));
+			break;
+		// case 0xb: do nothing
+		case 0xc:
+			set_mirror(data);
+			break;
+		case 0xd:
+			irq_ctrl_w(data);
+			break;
+		case 0xe:
+			irq_ack_w();
+			break;
+		case 0xf:
+			m_irq_count_latch = data;
+			break;
+	}
+}
+
+/*-------------------------------------------------
+
+ Board BMC-KL-06
+
+ Games: 1993 New 860 in 1 Over-Valued Golden Version Games
+
+ VRC4 clone with banking for multicart menu.
+
+ NES 2.0: mapper 447
+
+ In MAME: Supported.
+
+ TODO: There must be jumper settings since this is
+ showing up as a 1650 in 1.
+
+ -------------------------------------------------*/
+
+void nes_bmc_kl06_device::set_prg()
+{
+	u8 outer = (m_reg & 0x03) << 4;
+
+	if (BIT(m_reg, 2))
+	{
+		u8 bank_lo = outer | m_mmc_prg_bank[0];
+		u8 bank_hi = outer | m_mmc_prg_bank[1];
+		u8 mode = ~m_reg & 0x02;
+		prg8_89(bank_lo & ~mode);
+		prg8_ab(bank_hi & ~mode);
+		prg8_cd(bank_lo | mode);
+		prg8_ef(bank_hi | mode);
+	}
+	else
+		nes_konami_vrc4_device::set_prg(outer, 0x0f);
+}
+
+void nes_bmc_kl06_device::write_m(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_kl06 write_m, offset: %04x, data: %02x\n", offset, data));
+
+	// 2K RAM for Crisis Force overlays control register
+	nes_konami_vrc4_device::write_m(offset, data);
+
+	if (!(m_reg & 1))  // lock bit
+	{
+		m_reg = offset;
+		set_prg();
+		set_chr();
 	}
 }

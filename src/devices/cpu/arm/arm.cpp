@@ -18,7 +18,6 @@
 
 #include "emu.h"
 #include "arm.h"
-#include "debugger.h"
 #include "armdasm.h"
 
 #define ARM_DEBUG_CORE 0

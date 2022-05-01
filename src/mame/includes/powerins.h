@@ -21,8 +21,6 @@ public:
 	void powerinsb(machine_config &config);
 	void powerinsc(machine_config &config);
 
-	void init_powerinsc();
-
 private:
 	void powerinsa_okibank_w(u8 data);
 	u8 powerinsb_fake_ym2203_r();

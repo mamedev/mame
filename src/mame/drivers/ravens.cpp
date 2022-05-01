@@ -9,8 +9,8 @@ the entire thing (including the circuit boards) yourself.
 
 
 https://web.archive.org/web/20160321001634/http://petersieg.bplaced.com/?2650_Computer:2650_Selbstbaucomputer
-        2013-04-23 Skeleton driver.
 
+2013-04-23 Skeleton driver.
 
 No instructions, no schematics - it's all guesswork.
 

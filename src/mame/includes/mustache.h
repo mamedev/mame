@@ -40,8 +40,8 @@ private:
 
 	required_ioport m_dswb;
 
-	tilemap_t *m_bg_tilemap;
-	int m_control_byte;
+	tilemap_t *m_bg_tilemap = nullptr;
+	int m_control_byte = 0;
 
 	void videoram_w(offs_t offset, uint8_t data);
 	void video_control_w(uint8_t data);

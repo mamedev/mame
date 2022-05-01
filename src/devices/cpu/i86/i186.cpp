@@ -9,7 +9,6 @@
 
 #include "emu.h"
 #include "i186.h"
-#include "debugger.h"
 #include "i86inline.h"
 
 #define LOG_PORTS           0

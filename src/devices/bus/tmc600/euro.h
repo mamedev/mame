@@ -91,7 +91,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
-	device_tmc600_eurobus_card_interface *m_card = nullptr;
+	device_tmc600_eurobus_card_interface *m_card;
 };
 
 

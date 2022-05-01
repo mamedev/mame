@@ -421,7 +421,7 @@ offs_t cr16c_disassembler::disassemble(std::ostream &stream, offs_t pc, const cr
 					stream << "br      ";
 					format_pc_disp24(stream, pc, u32(op2 & 0x000f) << 20 | u32(op2 & 0x0f00) << 8 | op3);
 					return 6 | SUPPORTED;
-				}					
+				}
 				else
 				{
 					util::stream_format(stream, "b%s     ", s_cc[(opcode & 0x00f0) >> 4]);

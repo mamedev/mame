@@ -41,9 +41,9 @@ private:
 	optional_ioport_array<3> m_port_in;
 
 	/* video-related */
-	tilemap_t    *m_bg_tilemap;
-	tilemap_t    *m_fg_tilemap;
-	uint8_t      m_scroll[4];
+	tilemap_t    *m_bg_tilemap = nullptr;
+	tilemap_t    *m_fg_tilemap = nullptr;
+	uint8_t      m_scroll[4]{};
 
 	/* misc */
 	int        m_input_ports_hack;

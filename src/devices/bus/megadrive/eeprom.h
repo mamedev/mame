@@ -204,20 +204,20 @@ private:
 	std::vector<uint8_t> m_sram;
 
 	// EEPROM runtime vars
-	uint8_t m_eeprom_sda = 0;     // current SDA
-	uint8_t m_eeprom_prev_sda = 0;    // previous SDA
-	uint8_t m_eeprom_scl = 0;     // current SCL
-	uint8_t m_eeprom_prev_scl = 0;   // previous SCL
-	uint8_t m_eeprom_cnt = 0;     // operation count in 0-9
-	uint8_t m_eeprom_readwrite = 0;     // read/write bit
-	uint16_t m_eeprom_slave_mask = 0; // dev addr
-	uint16_t m_eeprom_word_address = 0;  // memory addr
-	uint16_t m_eeprom_devsel = 0;  // selected device
-	uint16_t m_eeprom_byte = 0;  // byte to be written
-	int m_eeprom_cur_state = 0;  // current state
+	uint8_t m_eeprom_sda;     // current SDA
+	uint8_t m_eeprom_prev_sda;    // previous SDA
+	uint8_t m_eeprom_scl;     // current SCL
+	uint8_t m_eeprom_prev_scl;   // previous SCL
+	uint8_t m_eeprom_cnt;     // operation count in 0-9
+	uint8_t m_eeprom_readwrite;     // read/write bit
+	uint16_t m_eeprom_slave_mask; // dev addr
+	uint16_t m_eeprom_word_address;  // memory addr
+	uint16_t m_eeprom_devsel;  // selected device
+	uint16_t m_eeprom_byte;  // byte to be written
+	int m_eeprom_cur_state;  // current state
 	// EEPROM physical characteristics (configured at init)
-	uint16_t m_eeprom_mask = 0;       // size of the memory - 1
-	uint16_t m_eeprom_pagewrite_mask = 0;  // max number of bytes that can be written in a single write cycle
+	uint16_t m_eeprom_mask;       // size of the memory - 1
+	uint16_t m_eeprom_pagewrite_mask;  // max number of bytes that can be written in a single write cycle
 
 };
 

@@ -37,7 +37,7 @@ protected:
 	virtual bool overrides_rom() override { return true; }
 	virtual void romsel_w(offs_t offset, uint8_t data) override { m_romsel = data & 0x0f; }
 
-	uint8_t m_romsel = 0;
+	uint8_t m_romsel;
 };
 
 

@@ -77,8 +77,8 @@ private:
 	int     m_cru_base_phoenix;
 
 	// Debugging
-	int     m_current_bank = 0;
-	int     m_current_page = 0;
+	int     m_current_bank;
+	int     m_current_page;
 };
 
 } // end namespace bus::ti99::peb

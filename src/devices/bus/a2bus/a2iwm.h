@@ -64,7 +64,7 @@ public:
 	virtual uint8_t read_cnxx(uint8_t offset) override;
 
 private:
-	uint8_t *m_rom = nullptr;
+	uint8_t *m_rom;
 };
 
 // device type definition

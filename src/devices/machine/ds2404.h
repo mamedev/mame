@@ -84,7 +84,7 @@ private:
 	uint8_t m_sram[512];  /* 4096 bits */
 	uint8_t m_ram[32];    /* scratchpad ram, 256 bits */
 	uint8_t m_rtc[5];     /* 40-bit RTC counter */
-	STATE m_state[8]{};
+	STATE m_state[8];
 	int m_state_ptr;
 };
 

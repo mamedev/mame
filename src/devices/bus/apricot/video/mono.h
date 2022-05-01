@@ -54,9 +54,9 @@ private:
 
 	std::unique_ptr<uint16_t[]> m_vram;
 
-	uint8_t m_portb = 0;
-	uint8_t m_portc = 0;
-	uint8_t m_portx = 0;
+	uint8_t m_portb;
+	uint8_t m_portc;
+	uint8_t m_portx;
 };
 
 // device type definition

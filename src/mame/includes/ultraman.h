@@ -33,7 +33,7 @@ public:
 	void ultraman(machine_config &config);
 
 private:
-	int        m_bank[3];
+	int        m_bank[3] = {};
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

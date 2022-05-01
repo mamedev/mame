@@ -101,6 +101,7 @@ datamux_device::datamux_device(const machine_config &mconfig, const char *tag, d
 	m_grom0(*owner, TI99_GROM0_TAG),
 	m_grom1(*owner, TI99_GROM1_TAG),
 	m_grom2(*owner, TI99_GROM2_TAG),
+	m_tms9901(*owner, TI99_TMS9901_TAG),
 	m_ready(*this),
 	m_addr_buf(0),
 	m_dbin(CLEAR_LINE),
@@ -435,6 +436,10 @@ void datamux_device::setaddress(offs_t offset, uint16_t busctrl)
 	m_dbin = ((busctrl & TMS99xx_BUS_DBIN)!=0);
 
 	LOGMASKED(LOG_ADDRESS, "Set address %04x\n", m_addr_buf);
+
+	// Trigger the TMS9901 clock when A10 is 1
+	if ((m_addr_buf & 0x0020) != 0)
+		m_tms9901->update_clock();
 
 	if ((m_addr_buf & 0xe000) == 0x0000)
 	{

@@ -43,19 +43,19 @@ private:
 		CMD_READMASK = 0x18,
 		CMD_READCRC = 0x03
 	};
-	bool m_reset = false;
-	bool m_clk = false;
-	bool m_data = false;
-	bool m_read = false;
-	bool m_start = false;
-	u8 m_count = 0;
-	u8 m_shiftreg = 0;
-	u8 m_command = 0;
-	u8 m_crc = 0;
-	u8 m_selbits = 0;
-	u32 m_addr = 0;
-	u16 m_select = 0;
-	u16 m_selectval = 0;
+	bool m_reset;
+	bool m_clk;
+	bool m_data;
+	bool m_read;
+	bool m_start;
+	u8 m_count;
+	u8 m_shiftreg;
+	u8 m_command;
+	u8 m_crc;
+	u8 m_selbits;
+	u32 m_addr;
+	u16 m_select;
+	u16 m_selectval;
 };
 
 DECLARE_DEVICE_TYPE(DS6417, ds6417_device)

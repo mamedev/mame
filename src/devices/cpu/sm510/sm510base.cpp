@@ -17,7 +17,6 @@
 
 #include "emu.h"
 #include "sm510base.h"
-#include "debugger.h"
 
 
 //-------------------------------------------------

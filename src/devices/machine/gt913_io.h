@@ -56,15 +56,15 @@ private:
 	const char *m_intc_tag;
 
 	/* timers */
-	uint8_t m_timer_control[2]{};
-	uint16_t m_timer_rate[2]{};
-	int m_timer_irq[2]{};
-	bool m_timer_irq_pending[2]{};
-	emu_timer *m_timer[2]{};
+	uint8_t m_timer_control[2];
+	uint16_t m_timer_rate[2];
+	int m_timer_irq[2];
+	bool m_timer_irq_pending[2];
+	emu_timer *m_timer[2];
 
 	/* 2x ADC */
-	bool m_adc_enable = false, m_adc_channel = false;
-	uint8_t m_adc_data[2]{};
+	bool m_adc_enable, m_adc_channel;
+	uint8_t m_adc_data[2];
 
 };
 

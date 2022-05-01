@@ -94,30 +94,30 @@ protected:
 	virtual int transfer_size(int const channel) const { return 1; }
 
 	int m_icount;
-	uint32_t m_address_mask = 0;
+	uint32_t m_address_mask;
 
 	struct
 	{
-		uint32_t m_address = 0;
-		uint32_t m_count  = 0;
-		uint32_t m_base_address = 0;
-		uint32_t m_base_count = 0;
-		uint8_t m_mode = 0;
+		uint32_t m_address;
+		uint32_t m_count;
+		uint32_t m_base_address;
+		uint32_t m_base_count;
+		uint8_t m_mode;
 	} m_channel[4];
 
-	int m_msb = 0;
-	int m_hreq = 0;
-	int m_hack = 0;
-	int m_ready = 0;
-	int m_eop = 0;
-	int m_state = 0;
-	int m_current_channel = 0;
-	int m_last_channel = 0;
-	uint8_t m_command = 0;
-	uint8_t m_mask = 0;
-	uint8_t m_status = 0;
-	uint16_t m_temp = 0;
-	uint8_t m_request = 0;
+	int m_msb;
+	int m_hreq;
+	int m_hack;
+	int m_ready;
+	int m_eop;
+	int m_state;
+	int m_current_channel;
+	int m_last_channel;
+	uint8_t m_command;
+	uint8_t m_mask;
+	uint8_t m_status;
+	uint16_t m_temp;
+	uint8_t m_request;
 
 private:
 	void dma_request(int channel, bool state);

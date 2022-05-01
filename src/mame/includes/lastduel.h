@@ -51,12 +51,12 @@ private:
 	optional_memory_bank m_audiobank;
 
 	/* video-related */
-	tilemap_t     *m_tilemap[2];
-	tilemap_t     *m_tx_tilemap;
-	uint16_t      m_vctrl[8];
-	int         m_sprite_flipy_mask;
-	int         m_sprite_pri_mask;
-	int         m_tilemap_priority;
+	tilemap_t     *m_tilemap[2]{};
+	tilemap_t     *m_tx_tilemap = nullptr;
+	uint16_t      m_vctrl[8]{};
+	int         m_sprite_flipy_mask = 0;
+	int         m_sprite_pri_mask = 0;
+	int         m_tilemap_priority = 0;
 
 	void mg_bankswitch_w(uint8_t data);
 	void flip_w(uint8_t data);

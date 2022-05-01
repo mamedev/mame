@@ -222,9 +222,6 @@ protected:
 	DECLARE_VIDEO_START(ddenlovr);
 private:
 	DECLARE_MACHINE_START(rongrong);
-protected:
-	DECLARE_MACHINE_START(hanakanz);
-private:
 	DECLARE_MACHINE_START(sryudens);
 	DECLARE_VIDEO_START(mjflove);
 	DECLARE_MACHINE_START(seljan2);
@@ -392,9 +389,6 @@ private:
 	void mjmyster_map(address_map &map);
 	void mjmyster_portmap(address_map &map);
 	void mjmywrld_portmap(address_map &map);
-protected:
-	void hanakanz_map(address_map &map);
-private:
 	void mjschuka_portmap(address_map &map);
 	void nettoqc_map(address_map &map);
 	void quiz365_map(address_map &map);
@@ -556,6 +550,9 @@ class hanakanz_state : public ddenlovr_state
 public:
 	hanakanz_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ddenlovr_state(mconfig, type, tag)
+		, m_banked_nvram(*this, "nvram", 0x8000, ENDIANNESS_LITTLE)
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
 		, m_led(*this, "led")
 	{ }
 
@@ -572,6 +569,7 @@ public:
 	void init_momotaro();
 
 private:
+	DECLARE_MACHINE_START(hanakanz);
 	DECLARE_VIDEO_START(hanakanz);
 	DECLARE_MACHINE_RESET(hanakanz);
 
@@ -616,6 +614,7 @@ private:
 
 	void mjchuuka_get_romdata();
 
+	void hanakanz_map(address_map &map);
 	void daimyojn_portmap(address_map &map);
 	void hanakanz_portmap(address_map &map);
 	void hkagerou_portmap(address_map &map);
@@ -626,6 +625,9 @@ private:
 	void mjgnight_portmap(address_map &map);
 	void mjreach1_portmap(address_map &map);
 
+	memory_share_creator<uint8_t> m_banked_nvram;
+	required_memory_bank m_bank1;
+	required_memory_bank m_bank2;
 	output_finder<> m_led;
 
 	uint8_t m_romdata[2]{};
@@ -2738,16 +2740,16 @@ void mmpanic_state::funkyfig_sound_portmap(address_map &map)
 
 void hanakanz_state::hanakanz_rombank_w(uint8_t data)
 {
-	membank("bank1")->set_entry(data & 0x0f);
-	membank("bank2")->set_entry(((data & 0xf0) >> 4));
+	m_bank1->set_entry(data & 0x0f);
+	m_bank2->set_entry((data & 0xf0) >> 4);
 }
 
-void ddenlovr_state::hanakanz_map(address_map &map)
+void hanakanz_state::hanakanz_map(address_map &map)
 {
-	map(0x0000, 0x5fff).rom();                 // ROM
-	map(0x6000, 0x6fff).ram();                 // RAM
+	map(0x0000, 0x5fff).rom();              // ROM
+	map(0x6000, 0x6fff).bankrw("bank0");    // RAM
 	map(0x7000, 0x7fff).bankrw("bank2");    // RAM (Banked)
-	map(0x8000, 0xffff).bankr("bank1");    // ROM (Banked)
+	map(0x8000, 0xffff).bankr("bank1");     // ROM (Banked)
 }
 
 
@@ -9709,11 +9711,13 @@ MACHINE_RESET_MEMBER(mmpanic_state,mmpanic)
 	MACHINE_RESET_CALL_MEMBER(ddenlovr);
 }
 
-MACHINE_START_MEMBER(ddenlovr_state,hanakanz)
+MACHINE_START_MEMBER(hanakanz_state,hanakanz)
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	membank("bank1")->configure_entries(0, 0x10, &rom[0x10000], 0x8000);
-	membank("bank2")->configure_entries(0, 0x10, &rom[0x90000], 0x1000);
+	membank("bank0")->set_base(&m_banked_nvram[0]);
+	m_bank1->configure_entries(0, 0x10, &rom[0], 0x8000);
+	m_bank2->configure_entries(0, 0x08, &m_banked_nvram[0], 0x1000);
+	m_bank2->configure_entries(0x08, 0x08, &m_banked_nvram[0], 0x1000); // mirror to be safe
 
 	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
@@ -10065,6 +10069,8 @@ void hanakanz_state::hanakanz(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(hanakanz_state,hanakanz)
 	MCFG_MACHINE_RESET_OVERRIDE(hanakanz_state,hanakanz)
 
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -10115,6 +10121,8 @@ void hanakanz_state::kotbinyo(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE(hanakanz_state,hanakanz)
 	MCFG_MACHINE_RESET_OVERRIDE(hanakanz_state,hanakanz)
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -10230,7 +10238,7 @@ void ddenlovr_state::mjschuka(machine_config &config)
 	tmpz.out_pa_callback().set(FUNC(ddenlovr_state::sryudens_rambank_w));
 	tmpz.out_pb_callback().set(FUNC(ddenlovr_state::mjflove_rombank_w));
 
-	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,hanakanz)
+	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,sryudens)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
@@ -10525,6 +10533,8 @@ void hanakanz_state::jongtei(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(hanakanz_state,hanakanz)
 	MCFG_MACHINE_RESET_OVERRIDE(hanakanz_state,hanakanz)
 
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -10620,7 +10630,7 @@ void ddenlovr_state::janshinp(machine_config &config)
 	maincpu.out_pa_callback().set(FUNC(ddenlovr_state::sryudens_rambank_w));
 	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::mjflove_rombank_w));
 
-	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,hanakanz)
+	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,sryudens)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
@@ -10742,8 +10752,10 @@ void hanakanz_state::daimyojn(machine_config &config)
 	maincpu.out_p3_callback().set(FUNC(hanakanz_state::jongtei_dsw_keyb_w));
 	maincpu.in_p4_callback().set(FUNC(hanakanz_state::hanakanz_dsw_r));
 
-	MCFG_MACHINE_START_OVERRIDE(hanakanz_state,mjflove)
+	MCFG_MACHINE_START_OVERRIDE(hanakanz_state,hanakanz)
 	MCFG_MACHINE_RESET_OVERRIDE(hanakanz_state,hanakanz)
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -11525,9 +11537,8 @@ REAL TIME CLOCK : MSM6242
 ***************************************************************************/
 
 ROM_START( hanakanz )
-	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )   /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )   /* Z80 Code */
 	ROM_LOAD( "50720.5b",     0x00000, 0x80000, CRC(dc40fcfc) SHA1(32c8b3d23039ac47504c881552572f2c22afa585) )
-	ROM_RELOAD(               0x10000, 0x80000 )
 
 	ROM_REGION( 0x300000, "blitter", 0 )    /* blitter data */
 	ROM_LOAD16_BYTE( "50740.8b",     0x000000, 0x80000, CRC(999e70ce) SHA1(421c137b43522fbf9f3f5aa86692dc563af86880) )
@@ -11572,9 +11583,8 @@ NM5108.12B
 ***************************************************************************/
 
 ROM_START( hkagerou )
-	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )   /* ! KL5C80 Code ! */
+	ROM_REGION( 0x80000, "maincpu", 0 )   /* ! KL5C80 Code ! */
 	ROM_LOAD( "nm5102.5b",    0x00000, 0x80000, CRC(c56c0856) SHA1(9b3c17c80498c9fa0ea91aa876aa4853c95ebb8c) )
-	ROM_RELOAD(               0x10000, 0x80000 )
 
 	ROM_REGION( 0xe80000, "blitter", 0 )    /* blitter data */
 
@@ -11617,9 +11627,8 @@ no RTC nor battery (unpopulated)
 ***************************************************************************/
 
 ROM_START( kotbinyo )
-	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )   /* ! KL5C80 Code ! */
+	ROM_REGION( 0x80000, "maincpu", 0 )   /* ! KL5C80 Code ! */
 	ROM_LOAD( "prg.5b", 0x00000, 0x80000, CRC(673c90d5) SHA1(0588c624a177423a483ce466c0ae66dfa511773e) )
-	ROM_RELOAD(         0x10000, 0x80000 )
 
 	ROM_REGION( 0x280000, "blitter", 0 )    /* blitter data */
 	ROM_LOAD16_BYTE( "gfx.8b",  0x000000, 0x80000, CRC(126f3591) SHA1(f21236587f555035ec25f1a9f5eb651a533446b2) )
@@ -11650,9 +11659,8 @@ Same hardware as kotbinyo, but:
 ***************************************************************************/
 
 ROM_START( kotbinsp )
-	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )   /* ! KL5C80 Code ! */
+	ROM_REGION( 0x80000, "maincpu", 0 )   /* ! KL5C80 Code ! */
 	ROM_LOAD( "prg.5c", 0x00000, 0x80000, CRC(c917f791) SHA1(78611118f7f33096364ea3e34e4cd5356c1d1cce) )
-	ROM_RELOAD(         0x10000, 0x80000 )
 
 	ROM_REGION( 0x2000000, "blitter", 0 )   /* blitter data */
 	ROM_LOAD16_BYTE( "909036.8b", 0x000000, 0x100000, CRC(c468bdda) SHA1(4942d48815af55b5a6b1bd9debc7ce0051a33a49) )
@@ -11706,9 +11714,8 @@ Others: M6242B (RTC)
 ***************************************************************************/
 
 ROM_START( mjreach1 )
-	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )   /* ! KL5C80 Code ! */
+	ROM_REGION( 0x80000, "maincpu", 0 )   /* ! KL5C80 Code ! */
 	ROM_LOAD( "52602-n.5b",   0x00000, 0x80000, CRC(6bef7978) SHA1(56e38448fb03e868094d75e5b7de4e4f4a4e850a) )
-	ROM_RELOAD(               0x10000, 0x80000 )
 
 	ROM_REGION( 0x500000, "blitter", 0 )    /* blitter data */
 	ROM_LOAD16_BYTE( "52604.8b",     0x000000, 0x100000, CRC(6ce01bb4) SHA1(800043d8203ab5560ed0b24e0a4e01c14b6a3ac0) )
@@ -11763,9 +11770,8 @@ Notes:
 ***************************************************************************/
 
 ROM_START( mjchuuka )
-	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )   /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )   /* Z80 Code */
 	ROM_LOAD( "d12102.5b", 0x00000, 0x80000, CRC(585a0a8e) SHA1(94b3eede36117fe0a34b61454484c72cd7f0ce6a) )
-	ROM_RELOAD(            0x10000, 0x80000 )
 
 	ROM_REGION( 0x300000, "blitter", ROMREGION_ERASEFF )    /* blitter data */
 	ROM_LOAD16_BYTE( "d12103.11c", 0x000000, 0x080000, CRC(83bfc841) SHA1(36547e737244f95004c598adeb46cebce9ab3231) )
@@ -11844,9 +11850,8 @@ Notes:
 ***************************************************************************/
 
 ROM_START( mjdchuka )
-	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )   /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )   /* Z80 Code */
 	ROM_LOAD( "2.5b", 0x00000, 0x80000, CRC(7957b4e7) SHA1(8b76c15694e42ff0b2ec5aeae059bf342f6bf476) )
-	ROM_RELOAD(       0x10000, 0x80000 )
 
 	ROM_REGION( 0x100000, "blitter", ROMREGION_ERASEFF )    /* blitter data */
 	ROM_LOAD16_BYTE( "3.11c", 0x000000, 0x080000, CRC(c66553c3) SHA1(6e5380fdb97cc8b52986f3a3a8cac43c0f38cf54) )
@@ -12740,9 +12745,8 @@ Notes:
 ***************************************************************************/
 
 ROM_START( jongtei )
-	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )   /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )   /* Z80 Code */
 	ROM_LOAD( "53202.5b", 0x00000, 0x80000, CRC(fa95a7f2) SHA1(bb67d74acb8908c222acdc92ee13d4a644358aef) )
-	ROM_RELOAD(           0x10000, 0x80000 )
 
 	ROM_REGION( 0x800000, "blitter", 0 )    /* blitter data */
 	ROM_LOAD( "53203.7b",  0x000000, 0x200000, CRC(55d6522a) SHA1(47996be70481a98ead10211645566613d20b5880) )
@@ -12764,9 +12768,8 @@ TSM003-0002 Techno-Top, Limited
 ***************************************************************************/
 
 ROM_START( mjgnight )
-	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )   /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )   /* Z80 Code */
 	ROM_LOAD( "00302.5b",  0x00000, 0x80000, CRC(7169611a) SHA1(90744799b57001a4f6d0767db639362f24d3797c) )
-	ROM_RELOAD(            0x10000, 0x80000 )
 
 	ROM_REGION( 0x800000, "blitter", 0 )    /* blitter data */
 	ROM_LOAD( "00303.7b",  0x000000, 0x200000, CRC(5b2f28a5) SHA1(12fff6d5736e58e32b0efd6d136952bc4c03e661) )
@@ -12882,9 +12885,8 @@ Notes:
 ***************************************************************************/
 
 ROM_START( daimyojn )
-	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )   /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )   /* Z80 Code */
 	ROM_LOAD( "p0172.6b", 0x00000, 0x80000, CRC(478442bd) SHA1(50efe7e014a55a5e5ac359628438ad2963df181c) )
-	ROM_RELOAD(           0x10000, 0x80000 )
 
 	ROM_REGION( 0x400000, "blitter", 0 )    /* blitter data */
 	ROM_LOAD( "t0173.7b", 0x000000, 0x200000, CRC(b54c7b02) SHA1(54a750708c91041caa89adb033d8133b409b0706) )
@@ -12895,9 +12897,8 @@ ROM_START( daimyojn )
 ROM_END
 
 ROM_START( momotaro )
-	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )   /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )   /* Z80 Code */
 	ROM_LOAD( "r0272m1.6e", 0x00000, 0x80000, CRC(71c83332) SHA1(c949cb9e23e5cc77dbd64fc28e62a88f1dc811a3) )
-	ROM_RELOAD(             0x10000, 0x80000 )
 
 	ROM_REGION( 0x400000, "blitter", 0 )    /* blitter data */
 	// no table at top, half size or encrypted?

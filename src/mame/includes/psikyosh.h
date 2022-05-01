@@ -61,15 +61,15 @@ private:
 	/* video-related */
 	struct sprite_t
 	{
-		s32 ypos, xpos;
-		u8 high, wide;
-		u8 flpy, flpx;
-		u8 spr_pri, bg_pri;
-		u8 zoomy, zoomx;
-		u32 tnum;
-		u16 colr;
-		u8 dpth;
-		s16 alpha;
+		s32 ypos = 0, xpos = 0;
+		u8 high = 0, wide = 0;
+		u8 flpy = 0, flpx = 0;
+		u8 spr_pri = 0, bg_pri = 0;
+		u8 zoomy = 0, zoomx = 0;
+		u32 tnum = 0;
+		u16 colr = 0;
+		u8 dpth = 0;
+		s16 alpha = 0;
 	};
 
 	bitmap_ind8                 m_zoom_bitmap;

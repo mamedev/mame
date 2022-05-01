@@ -40,22 +40,22 @@ private:
 
 	int m_int_ctl;    /* interrupt control register */
 
-	int m_years = 0;
-	int m_wday = 0;       /* day of the week (1-7 (1=day1 as set in init)) */
-	int m_months1 = 0;    /* months (BCD: 1-12) */
-	int m_months2 = 0;
-	int m_days1 = 0;      /* days (BCD: 1-31) */
-	int m_days2 = 0;
-	int m_hours1 = 0;     /* hours (BCD : 0-23) */
-	int m_hours2 = 0;
-	int m_minutes1 = 0;   /* minutes (BCD : 0-59) */
-	int m_minutes2 = 0;
-	int m_seconds1 = 0;   /* seconds (BCD : 0-59) */
-	int m_seconds2 = 0;
+	int m_years;
+	int m_wday;       /* day of the week (1-7 (1=day1 as set in init)) */
+	int m_months1;    /* months (BCD: 1-12) */
+	int m_months2;
+	int m_days1;      /* days (BCD: 1-31) */
+	int m_days2;
+	int m_hours1;     /* hours (BCD : 0-23) */
+	int m_hours2;
+	int m_minutes1;   /* minutes (BCD : 0-59) */
+	int m_minutes2;
+	int m_seconds1;   /* seconds (BCD : 0-59) */
+	int m_seconds2;
 	int m_tenths;     /* tenths of second (BCD : 0-9) */
 
-	emu_timer *m_increment_rtc = nullptr;
-	emu_timer *m_interrupt_timer = nullptr;
+	emu_timer *m_increment_rtc;
+	emu_timer *m_interrupt_timer;
 };
 
 DECLARE_DEVICE_TYPE(MM58174, mm58174_device)

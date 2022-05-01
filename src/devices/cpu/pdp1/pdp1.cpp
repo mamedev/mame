@@ -340,7 +340,6 @@
 
 
 #include "emu.h"
-#include "debugger.h"
 #include "pdp1.h"
 #include "pdp1dasm.h"
 

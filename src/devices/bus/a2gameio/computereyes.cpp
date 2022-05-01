@@ -40,8 +40,8 @@ protected:
 
 private:
 	required_device<picture_image_device> m_picture;
-	int m_x = 0, m_y = 0, m_an1 = 0, m_an2 = 0, m_an3 = 0, m_level = 0;
-	u8 m_a2_bitmap[280*192]{};
+	int m_x, m_y, m_an1, m_an2, m_an3, m_level;
+	u8 m_a2_bitmap[280*192];
 };
 
 //**************************************************************************

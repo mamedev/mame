@@ -78,7 +78,7 @@ protected:
 	uint8_t m_channel_check;
 	uint8_t m_nmi_enabled;
 	bool m_ide_io_ports_enabled;
-	address_space *spaceio = nullptr;
+	address_space *spaceio;
 
 	void pc_select_dma_channel(int channel, bool state);
 

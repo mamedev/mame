@@ -699,11 +699,11 @@ void gaelco_state::machine_start()
 void gaelco_state::bigkarnk(machine_config &config)
 {
 	// Basic machine hardware
-	M68000(config, m_maincpu, XTAL(24'000'000)/2);   // MC68000P10, 12 MHz?
+	M68000(config, m_maincpu, XTAL(24'000'000)/2);   // MC68000P10, 12 MHz (verified)
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaelco_state::bigkarnk_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gaelco_state::irq6_line_assert));
 
-	MC6809E(config, m_audiocpu, XTAL(8'000'000)/4);  // 68B09EP, 2 MHz?
+	MC6809E(config, m_audiocpu, XTAL(8'000'000)/4);  // 68B09EP, 2 MHz (verified)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &gaelco_state::bigkarnk_snd_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));

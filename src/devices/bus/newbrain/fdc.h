@@ -62,12 +62,12 @@ private:
 
 	void moton(int state);
 
-	int m_paging = 0;
-	int m_ma16 = 0;
-	int m_mpm = 0;
-	int m_fdc_att = 0;
-	int m_fdc_int = 0;
-	int m_pa15 = 0;
+	int m_paging;
+	int m_ma16;
+	int m_mpm;
+	int m_fdc_att;
+	int m_fdc_int;
+	int m_pa15;
 };
 
 

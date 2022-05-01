@@ -161,7 +161,8 @@ void akiko_device::device_reset()
 	else
 	{
 		// Arcade case
-		m_cdrom = new cdrom_file(machine().rom_load().get_disk_handle(":cdrom"));
+		chd_file *chd = machine().rom_load().get_disk_handle(":cdrom");
+		m_cdrom = chd != nullptr ? new cdrom_file(chd) : nullptr;
 	}
 
 	/* create the TOC table */
@@ -459,6 +460,9 @@ TIMER_CALLBACK_MEMBER(akiko_device::dma_proc)
 	uint8_t   buf[2352];
 	int     index;
 
+	if ( m_cdrom == nullptr )
+		return;
+
 	if ( (m_cdrom_dmacontrol & 0x04000000) == 0 )
 		return;
 
@@ -726,7 +730,7 @@ void akiko_device::update_cdrom()
 
 			(void)cdda_getstatus(&lba);
 
-			if ( lba > 0 )
+			if ( lba > 0 && m_cdrom != nullptr )
 			{
 				uint32_t  disk_pos;
 				uint32_t  track_pos;

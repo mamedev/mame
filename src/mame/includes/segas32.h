@@ -76,13 +76,13 @@ protected:
 	{
 		bitmap_ind16 bitmap;
 		std::unique_ptr<uint8_t[]> transparent;
-		int num;
+		int num = 0;
 	};
 
 	struct extents_list
 	{
-		uint8_t                   scan_extent[256];
-		uint16_t                  extent[32][16];
+		uint8_t                   scan_extent[256]{};
+		uint16_t                  extent[32][16]{};
 	};
 
 
@@ -231,44 +231,44 @@ protected:
 	optional_memory_bank m_multipcm_bank_hi;
 	optional_memory_bank m_multipcm_bank_lo;
 
-	const bool m_is_multi32;
+	const bool m_is_multi32 = false;
 
 	// internal states
-	uint8_t m_v60_irq_control[0x10];
-	timer_device *m_v60_irq_timer[2];
-	uint8_t m_sound_irq_control[4];
-	uint8_t m_sound_irq_input;
-	uint8_t m_sound_dummy_value;
-	uint16_t m_sound_bank;
+	uint8_t m_v60_irq_control[0x10]{};
+	timer_device *m_v60_irq_timer[2]{};
+	uint8_t m_sound_irq_control[4]{};
+	uint8_t m_sound_irq_input = 0;
+	uint8_t m_sound_dummy_value = 0;
+	uint16_t m_sound_bank = 0;
 	sys32_output_callback m_sw1_output;
 	sys32_output_callback m_sw2_output;
 	sys32_output_callback m_sw3_output;
 
 	// hardware specific
 	std::unique_ptr<uint16_t[]> m_system32_protram;
-	uint16_t m_arescue_dsp_io[6];
+	uint16_t m_arescue_dsp_io[6]{};
 
 	// video-related
-	uint16_t m_system32_displayenable[2];
-	uint16_t m_system32_tilebank_external;
+	uint16_t m_system32_displayenable[2]{};
+	uint16_t m_system32_tilebank_external = 0;
 	std::unique_ptr<cache_entry[]> m_tmap_cache;
-	cache_entry *m_cache_head;
+	cache_entry *m_cache_head = nullptr;
 	layer_info m_layer_data[11];
-	uint16_t m_mixer_control[2][0x40];
+	uint16_t m_mixer_control[2][0x40]{};
 	std::unique_ptr<uint16_t[]> m_solid_0000;
 	std::unique_ptr<uint16_t[]> m_solid_ffff;
-	uint8_t m_sprite_render_count;
-	uint8_t m_sprite_control_latched[8];
-	uint8_t m_sprite_control[8];
+	uint8_t m_sprite_render_count = 0;
+	uint8_t m_sprite_control_latched[8]{};
+	uint8_t m_sprite_control[8]{};
 	std::unique_ptr<uint32_t[]> m_spriteram_32bit;
 	std::unique_ptr<int32_t[]> m_prev_bgstartx;
 	std::unique_ptr<int32_t[]> m_prev_bgendx;
 	std::unique_ptr<int32_t[]> m_bgcolor_line;
 	typedef void (segas32_state::*prot_vblank_func)();
 	prot_vblank_func m_system32_prot_vblank;
-	int m_print_count;
-	emu_timer *m_vblank_end_int_timer;
-	emu_timer *m_update_sprites_timer;
+	int m_print_count = 0;
+	emu_timer *m_vblank_end_int_timer = nullptr;
+	emu_timer *m_update_sprites_timer = nullptr;
 };
 
 class segas32_regular_state : public segas32_state
@@ -380,7 +380,7 @@ protected:
 
 private:
 	optional_ioport_array<8> m_analog_ports;
-	uint8_t m_analog_bank;
+	uint8_t m_analog_bank = 0;
 };
 
 class sega_multi32_6player_state : public sega_multi32_state

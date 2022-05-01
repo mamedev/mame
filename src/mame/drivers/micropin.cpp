@@ -550,5 +550,5 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(1978,  pentacup,  0,         pent6800,  pent6800, pent6800_state, empty_init, ROT0, "Micropin", "Pentacup (rev. 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1980,  pentacup2, pentacup,  pent8085,  pent8085, pent8085_state, empty_init, ROT0, "Micropin", "Pentacup (rev. 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1978,  pentacup,  0,         pent6800,  pent6800, pent6800_state, empty_init, ROT0, "Micropin", "Pentacup (rev. 1)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  pentacup2, pentacup,  pent8085,  pent8085, pent8085_state, empty_init, ROT0, "Micropin", "Pentacup (rev. 2)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

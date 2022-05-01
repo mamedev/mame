@@ -34,10 +34,10 @@
     Dodonpachi Daioujou Tamashii
     Knights of Valour 3
 
-    These were only released as single board PGM2 based hardware, seen for sale in Japan for around $250-$300
+    These were only released in Japan, seen for sale for around $250-$300
 
     Jigsaw World Arena
-    Puzzle of Ocha / Ochainu No Pazuru
+    Ochaken no Puzzle
 
 
     ToDo (emulation issues):
@@ -1518,6 +1518,6 @@ GAME( 2011, kov3_100,     kov3,   pgm2_hires,  pgm2, pgm2_state, init_kov3_100, 
 // King of Fighters '98: Ultimate Match Hero
 GAME( 2009, kof98umh,     0,      pgm2_lores,  pgm2, pgm2_state, init_kof98umh, ROT0, "IGS / SNK Playmore / New Channel", "The King of Fighters '98: Ultimate Match HERO (China, V100, 09-08-23)", MACHINE_SUPPORTS_SAVE )
 
-// Jigsaw World Arena
+// ジグソーワールドアリーナ/Jigsaw World Arena
 
 // お茶犬のパズル/Ochaken no Puzzle (V101JP exists but undumped, Puzzle game of Japanese お茶犬/Ochaken franchises)

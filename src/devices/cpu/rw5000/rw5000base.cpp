@@ -23,8 +23,6 @@ It is similar, but too many differences to emulate in this device, probably.
 #include "emu.h"
 #include "rw5000base.h"
 
-#include "debugger.h"
-
 
 rw5000_base_device::rw5000_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
 	cpu_device(mconfig, type, tag, owner, clock),

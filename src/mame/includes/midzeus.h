@@ -24,18 +24,18 @@ struct mz_poly_extra_data
 {
 	const void *    palbase;
 	const void *    texbase;
-	uint16_t          solidcolor;
-	uint16_t          voffset;
-	int16_t           zoffset;
-	uint16_t          transcolor;
-	uint16_t          texwidth;
-	uint16_t          color;
-	uint32_t          alpha;
-	uint32_t          ctrl_word;
-	bool            blend_enable;
-	bool            depth_test_enable;
-	bool            depth_write_enable;
-	uint32_t          blend;
+	uint16_t          solidcolor = 0;
+	uint16_t          voffset = 0;
+	int16_t           zoffset = 0;
+	uint16_t          transcolor = 0;
+	uint16_t          texwidth = 0;
+	uint16_t          color = 0;
+	uint32_t          alpha = 0;
+	uint32_t          ctrl_word = 0;
+	bool            blend_enable = false;
+	bool            depth_test_enable = false;
+	bool            depth_write_enable = false;
+	uint32_t          blend = 0;
 	uint8_t           (*get_texel)(const void *, int, int, int);
 };
 
@@ -152,20 +152,20 @@ protected:
 	optional_ioport m_io_keypad;
 	output_finder<7> m_digits;
 
-	emu_timer *     m_display_irq_off_timer;
-	uint8_t         m_crusnexo_leds_select;
-	uint32_t        m_disk_asic_jr[0x10];
+	emu_timer *     m_display_irq_off_timer = nullptr;
+	uint8_t         m_crusnexo_leds_select = 0;
+	uint32_t        m_disk_asic_jr[0x10]{};
 
-	uint8_t         m_cmos_protected;
+	uint8_t         m_cmos_protected = 0;
 
-	emu_timer *     m_timer[2];
+	emu_timer *     m_timer[2]{};
 
 private:
-	uint32_t        m_gun_control;
-	uint8_t         m_gun_irq_state;
-	emu_timer *     m_gun_timer[2];
-	int32_t         m_gun_x[2], m_gun_y[2];
-	uint8_t         m_keypad_select;
+	uint32_t        m_gun_control = 0;
+	uint8_t         m_gun_irq_state = 0;
+	emu_timer *     m_gun_timer[2]{};
+	int32_t         m_gun_x[2]{}, m_gun_y[2]{};
+	uint8_t         m_keypad_select = 0;
 
 	void exit_handler();
 	void zeus_pointer_w(uint32_t which, uint32_t data, bool logit);
@@ -189,22 +189,22 @@ private:
 	void waveram_plot_check_depth_nowrite(int y, int x, uint16_t color, uint16_t depth);
 
 	std::unique_ptr<midzeus_renderer> m_poly;
-	uint8_t     m_log_fifo;
+	uint8_t     m_log_fifo = 0;
 
-	uint32_t    m_zeus_fifo[20];
-	uint8_t     m_zeus_fifo_words;
-	int16_t     m_zeus_matrix[3][3];
-	int32_t     m_zeus_point[3];
-	int16_t     m_zeus_light[3];
-	void *      m_zeus_renderbase;
-	uint32_t    m_zeus_palbase;
-	uint32_t    m_zeus_unkbase;
-	int         m_zeus_enable_logging;
-	uint32_t    m_zeus_objdata;
+	uint32_t    m_zeus_fifo[20]{};
+	uint8_t     m_zeus_fifo_words = 0;
+	int16_t     m_zeus_matrix[3][3]{};
+	int32_t     m_zeus_point[3]{};
+	int16_t     m_zeus_light[3]{};
+	void *      m_zeus_renderbase = 0;
+	uint32_t    m_zeus_palbase = 0;
+	uint32_t    m_zeus_unkbase = 0;
+	int         m_zeus_enable_logging = 0;
+	uint32_t    m_zeus_objdata = 0;
 	rectangle   m_zeus_cliprect;
 
 	std::unique_ptr<uint32_t[]> m_waveram[2];
-	int         m_yoffs;
-	int         m_texel_width;
-	int         m_is_mk4b;
+	int         m_yoffs = 0;
+	int         m_texel_width = 0;
+	int         m_is_mk4b = 0;
 };

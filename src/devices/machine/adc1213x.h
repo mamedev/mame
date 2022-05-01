@@ -48,17 +48,17 @@ protected:
 
 private:
 	// internal state
-	int m_cycle = 0;
-	int m_data_out = 0;
-	int m_data_in = 0;
-	int m_conv_mode = 0;
-	int m_auto_cal = 0;
-	int m_auto_zero = 0;
-	int m_acq_time = 0;
-	int m_data_out_sign = 0;
-	int m_input_shift_reg = 0;
-	int m_output_shift_reg = 0;
-	int m_end_conv = 0;
+	int m_cycle;
+	int m_data_out;
+	int m_data_in;
+	int m_conv_mode;
+	int m_auto_cal;
+	int m_auto_zero;
+	int m_acq_time;
+	int m_data_out_sign;
+	int m_input_shift_reg;
+	int m_output_shift_reg;
+	int m_end_conv;
 };
 
 

@@ -61,38 +61,38 @@ protected:
 
 	// internal state
 	std::vector<uint8_t> m_data;
-	uint32_t      m_size = 0;
-	uint8_t       m_mode = 0;
-	uint8_t       m_status = 0;
+	uint32_t      m_size;
+	uint8_t       m_mode;
+	uint8_t       m_status;
 	std::vector<uint8_t> m_buffer1;
 	//std::vector<uint8_t> m_buffer2;
-	uint8_t       m_si_byte = 0;
-	uint8_t       m_si_bits = 0;
-	uint8_t       m_so_byte = 0;
-	uint8_t       m_so_bits = 0;
+	uint8_t       m_si_byte;
+	uint8_t       m_si_bits;
+	uint8_t       m_so_byte;
+	uint8_t       m_so_bits;
 
 	struct AT45DBXX_PINS
 	{
-		int cs = 0;    // chip select
-		int sck = 0;   // serial clock
-		int si = 0;    // serial input
-		int so = 0;    // serial output
-		int wp = 0;    // write protect
-		int reset = 0; // reset
-		int busy = 0;  // busy
+		int cs;    // chip select
+		int sck;   // serial clock
+		int si;    // serial input
+		int so;    // serial output
+		int wp;    // write protect
+		int reset; // reset
+		int busy;  // busy
 	} m_pin;
 
 	struct AT45DBXX_IO
 	{
-		uint8_t *data = nullptr;
-		uint32_t size = 0;
-		uint32_t pos = 0;
+		uint8_t *data;
+		uint32_t size;
+		uint32_t pos;
 	} m_io;
 
 	struct AT45DBXX_CMD
 	{
-		uint8_t data[8]{};
-		uint8_t size = 0;
+		uint8_t data[8];
+		uint8_t size;
 	} m_cmd;
 };
 

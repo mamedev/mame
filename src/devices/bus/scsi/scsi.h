@@ -195,7 +195,7 @@ protected:
 	int m_msg;
 	int m_req;
 	int m_ack;
-	int m_atn = 0;
+	int m_atn;
 	int m_rst;
 	int m_data0;
 	int m_data1;

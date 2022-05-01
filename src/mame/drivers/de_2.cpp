@@ -129,8 +129,8 @@ private:
 	output_finder<> m_diag_digit;
 
 	uint8_t m_sample_data = 0U;
-	bool m_more_data = 0;
-	bool m_nmi_enable = 0;
+	bool m_more_data = false;
+	bool m_nmi_enable = false;
 
 	uint32_t m_segment1 = 0U;
 	uint32_t m_segment2 = 0U;
@@ -979,31 +979,31 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME( 1990, bttf_a28, 0,        de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "Back to the Future - The Pinball (2.8)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1990, bttf_a27, bttf_a28, de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "Back to the Future - The Pinball (2.7)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1990, bttf_a20, bttf_a28, de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "Back to the Future - The Pinball (2.0)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1990, bttf_a21, bttf_a28, de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "Back to the Future - The Pinball (2.1)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 199?, bttf_g27, bttf_a28, de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "Back to the Future - The Pinball (2.7, Germany)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1990, kiko_a10, 0,        de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "King Kong (1.0)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, lwar_a83, 0,        de_type1,        de2, de_2_state, empty_init, ROT0, "Data East", "Laser War (8.3)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, lwar_a81, lwar_a83, de_type1,        de2, de_2_state, empty_init, ROT0, "Data East", "Laser War (8.1)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, lwar_e90, lwar_a83, de_type1,        de2, de_2_state, empty_init, ROT0, "Data East", "Laser War (9.0 Europe)",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1989, mnfb_c29, 0,        de_type2_alpha3, de2, de_2_state, empty_init, ROT0, "Data East", "Monday Night Football (2.9, 50cts)",   MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1989, mnfb_c27, mnfb_c29, de_type2_alpha3, de2, de_2_state, empty_init, ROT0, "Data East", "Monday Night Football (2.7, 50cts)",   MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1990, poto_a32, 0,        de_type2_alpha3, de2, de_2_state, empty_init, ROT0, "Data East", "The Phantom of the Opera (3.2)",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1990, poto_a31, poto_a32, de_type2_alpha3, de2, de_2_state, empty_init, ROT0, "Data East", "The Phantom of the Opera (3.1)",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1990, poto_a29, poto_a32, de_type2_alpha3, de2, de_2_state, empty_init, ROT0, "Data East", "The Phantom of the Opera (2.9)",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1989, play_a24, 0,        de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Playboy 35th Anniversary (2.4)",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1989, robo_a34, 0,        de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "Robocop (3.4)",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1989, robo_a30, robo_a34, de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "Robocop (3.0)",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1989, robo_a29, robo_a34, de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "Robocop (2.9)",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, ssvc_a26, 0,        de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Secret Service (2.6)",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, ssvc_b26, ssvc_a26, de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Secret Service (2.6 alternate sound)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, ssvc_a42, ssvc_a26, de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Secret Service (4.2 alternate sound)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1990, simp_a27, 0,        de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "The Simpsons (2.7)",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1990, simp_a20, simp_a27, de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "The Simpsons (2.0)",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, tmac_a24, 0,        de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Time Machine (2.4)",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, tmac_a18, tmac_a24, de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Time Machine (1.8)",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, tmac_g18, tmac_a24, de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Time Machine (1.8, Germany)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, torp_e21, 0,        de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Torpedo Alley (2.1, Europe)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, torp_a16, torp_e21, de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Torpedo Alley (1.6)",                  MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1990, bttf_a28, 0,        de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "Back to the Future - The Pinball (2.8)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, bttf_a27, bttf_a28, de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "Back to the Future - The Pinball (2.7)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, bttf_a20, bttf_a28, de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "Back to the Future - The Pinball (2.0)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, bttf_a21, bttf_a28, de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "Back to the Future - The Pinball (2.1)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, bttf_g27, bttf_a28, de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "Back to the Future - The Pinball (2.7, Germany)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, kiko_a10, 0,        de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "King Kong (1.0)",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, lwar_a83, 0,        de_type1,        de2, de_2_state, empty_init, ROT0, "Data East", "Laser War (8.3)",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, lwar_a81, lwar_a83, de_type1,        de2, de_2_state, empty_init, ROT0, "Data East", "Laser War (8.1)",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, lwar_e90, lwar_a83, de_type1,        de2, de_2_state, empty_init, ROT0, "Data East", "Laser War (9.0 Europe)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mnfb_c29, 0,        de_type2_alpha3, de2, de_2_state, empty_init, ROT0, "Data East", "Monday Night Football (2.9, 50cts)",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mnfb_c27, mnfb_c29, de_type2_alpha3, de2, de_2_state, empty_init, ROT0, "Data East", "Monday Night Football (2.7, 50cts)",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, poto_a32, 0,        de_type2_alpha3, de2, de_2_state, empty_init, ROT0, "Data East", "The Phantom of the Opera (3.2)",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, poto_a31, poto_a32, de_type2_alpha3, de2, de_2_state, empty_init, ROT0, "Data East", "The Phantom of the Opera (3.1)",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, poto_a29, poto_a32, de_type2_alpha3, de2, de_2_state, empty_init, ROT0, "Data East", "The Phantom of the Opera (2.9)",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, play_a24, 0,        de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Playboy 35th Anniversary (2.4)",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, robo_a34, 0,        de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "Robocop (3.4)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, robo_a30, robo_a34, de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "Robocop (3.0)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, robo_a29, robo_a34, de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "Robocop (2.9)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ssvc_a26, 0,        de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Secret Service (2.6)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ssvc_b26, ssvc_a26, de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Secret Service (2.6 alternate sound)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ssvc_a42, ssvc_a26, de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Secret Service (4.2 alternate sound)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, simp_a27, 0,        de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "The Simpsons (2.7)",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, simp_a20, simp_a27, de_type3,        de2, de_2_state, empty_init, ROT0, "Data East", "The Simpsons (2.0)",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tmac_a24, 0,        de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Time Machine (2.4)",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tmac_a18, tmac_a24, de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Time Machine (1.8)",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tmac_g18, tmac_a24, de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Time Machine (1.8, Germany)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, torp_e21, 0,        de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Torpedo Alley (2.1, Europe)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, torp_a16, torp_e21, de_type2,        de2, de_2_state, empty_init, ROT0, "Data East", "Torpedo Alley (1.6)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

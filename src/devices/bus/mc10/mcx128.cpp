@@ -101,8 +101,8 @@ private:
 	memory_share_creator<u8> m_share;
 	memory_view m_view;
 	memory_bank_array_creator<8> m_bank;
-	uint8_t ram_bank_cr = 0;
-	uint8_t rom_map_cr = 0;
+	uint8_t ram_bank_cr;
+	uint8_t rom_map_cr;
 
 	void update_banks();
 

@@ -115,8 +115,8 @@ private:
 	uint16_t reellamps_4567_r(offs_t offset, uint16_t mem_mask = ~0);
 	void reellamps_4567_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	uint16_t m_reellamps_0123;
-	uint16_t m_reellamps_5678;
+	uint16_t m_reellamps_0123 = 0;
+	uint16_t m_reellamps_5678 = 0;
 
 	void mux_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t mux_r(offs_t offset, uint16_t mem_mask = ~0);
@@ -134,14 +134,14 @@ private:
 	output_finder<32> m_reellamp_out;
 	optional_device_array<stepper_device, 8> m_reel;
 
-	int m_lamp_strobe;
-	int m_mpxclk;
-	uint16_t m_muxram[0x100];
-	uint16_t m_optic_pattern;
-	int m_chop;
-	uint8_t m_a0_data_out;
-	uint8_t m_a1_data_out;
-	uint8_t m_a2_data_out;
+	int m_lamp_strobe = 0;
+	int m_mpxclk = 0;
+	uint16_t m_muxram[0x100]{};
+	uint16_t m_optic_pattern = 0;
+	int m_chop = 0;
+	uint8_t m_a0_data_out = 0;
+	uint8_t m_a1_data_out = 0;
+	uint8_t m_a2_data_out = 0;
 };
 
 
@@ -182,14 +182,14 @@ private:
 	required_memory_bank m_rombank;
 	required_ioport_array<2> m_touch_axes;
 
-	uint8_t m_palette_val[16][3];
-	int m_pal_addr;
-	int m_pal_idx;
-	int m_touch_state;
-	emu_timer *m_touch_timer;
-	int m_touch_data_count;
-	int m_touch_data[3];
-	int m_touch_shift_cnt;
+	uint8_t m_palette_val[16][3]{};
+	int m_pal_addr = 0;
+	int m_pal_idx = 0;
+	int m_touch_state = 0;
+	emu_timer *m_touch_timer = nullptr;
+	int m_touch_data_count = 0;
+	int m_touch_data[3]{};
+	int m_touch_shift_cnt = 0;
 };
 
 #endif // MAME_INCLUDES_JPMSYS5_H

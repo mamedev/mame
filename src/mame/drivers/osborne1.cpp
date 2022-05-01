@@ -258,7 +258,7 @@ INPUT_PORTS_END
 static void osborne1_floppies(device_slot_interface &device)
 {
 	device.option_add("525sssd", FLOPPY_525_SSSD); // Siemens FDD 100-5, custom Osborne electronics
-	device.option_add("525ssdd", FLOPPY_525_QD); // SSDD) // MPI 52(?), custom Osborne electronics
+	device.option_add("525ssdd", FLOPPY_525_SSDD); // MPI 52(?), custom Osborne electronics
 }
 
 

@@ -55,7 +55,7 @@ private:
 	required_device<tilemap_device> m_alpha_tilemap;
 	required_device<atari_motion_objects_device> m_mob;
 
-	uint16_t          m_h256;
+	uint16_t          m_h256 = 0;
 
 	static const atari_motion_objects_config s_mob_config;
 };

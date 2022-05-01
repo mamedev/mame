@@ -20,7 +20,6 @@
 
  * 004 Mendel Palace has never worked properly
  * 004 Ninja Gaiden 2 has flashing bg graphics in the second level
- * 119 Pin Bot has glitches when the ball is in the upper half of the screen
 
  ***********************************************************************************************************/
 
@@ -29,7 +28,6 @@
 #include "mmc3.h"
 
 #include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE
-#include "screen.h"
 
 
 #ifdef NES_PCB_DEBUG
@@ -89,12 +87,12 @@ nes_tqrom_device::nes_tqrom_device(const machine_config &mconfig, const char *ta
 {
 }
 
-nes_qj_device::nes_qj_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_qj_device::nes_qj_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_txrom_device(mconfig, NES_QJ_PCB, tag, owner, clock)
 {
 }
 
-nes_zz_device::nes_zz_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_zz_device::nes_zz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_txrom_device(mconfig, NES_ZZ_PCB, tag, owner, clock)
 {
 }
@@ -185,14 +183,12 @@ void nes_hkrom_device::pcb_reset()
 
 void nes_qj_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	mmc3_common_initialize(0x0f, 0x7f, 0);
 }
 
 
 void nes_zz_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	mmc3_common_initialize(0x07, 0x7f, 0);
 }
 
@@ -345,7 +341,7 @@ void nes_txrom_device::write_m(offs_t offset, uint8_t data)
 	{
 		if (!m_battery.empty())
 			m_battery[offset & (m_battery.size() - 1)] = data;
-		if (!m_prgram.empty())
+		else if (!m_prgram.empty())
 			m_prgram[offset & (m_prgram.size() - 1)] = data;
 	}
 }
@@ -461,35 +457,23 @@ void nes_hkrom_device::write_h(offs_t offset, uint8_t data)
 
  iNES: mapper 118
 
- In MESS: Supported. It also uses mmc3_irq.
+ In MAME: Supported. It also uses mmc3_irq.
 
  -------------------------------------------------*/
 
-void nes_txsrom_device::set_mirror()
+void nes_txsrom_device::set_chr(u8 chr, int chr_base, int chr_mask)
 {
-	if (m_latch & 0x80)
-	{
-		set_nt_page(0, CIRAM, BIT(m_mmc_vrom_bank[2],7), 1);
-		set_nt_page(1, CIRAM, BIT(m_mmc_vrom_bank[3],7), 1);
-		set_nt_page(2, CIRAM, BIT(m_mmc_vrom_bank[4],7), 1);
-		set_nt_page(3, CIRAM, BIT(m_mmc_vrom_bank[5],7), 1);
-	}
-	else
-	{
-		set_nt_page(0, CIRAM, BIT(m_mmc_vrom_bank[0],7), 1);
-		set_nt_page(1, CIRAM, BIT(m_mmc_vrom_bank[0],7), 1);
-		set_nt_page(2, CIRAM, BIT(m_mmc_vrom_bank[1],7), 1);
-		set_nt_page(3, CIRAM, BIT(m_mmc_vrom_bank[1],7), 1);
-	}
+	nes_txrom_device::set_chr(chr, chr_base, chr_mask);
+
+	// do nametables
+	static constexpr u8 bank[8] = { 0, 0, 1, 1, 2, 3, 4, 5 };
+	int start = (m_latch & 0x80) >> 5;
+
+	for (int i = 0; i < 4; i++)
+		set_nt_page(i, CIRAM, BIT(m_mmc_vrom_bank[bank[start + i]], 7), 1);
 }
 
-void nes_txsrom_device::chr_cb( int start, int bank, int source )
-{
-	set_mirror();   // we could probably update only for one (e.g. the first) call, to slightly optimize the code
-	chr1_x(start, bank, source);
-}
-
-void nes_txsrom_device::write_h(offs_t offset, uint8_t data)
+void nes_txsrom_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("txsrom write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -497,7 +481,6 @@ void nes_txsrom_device::write_h(offs_t offset, uint8_t data)
 	{
 		case 0x2000:
 			break;
-
 		default:
 			txrom_write(offset, data);
 			break;
@@ -512,32 +495,17 @@ void nes_txsrom_device::write_h(offs_t offset, uint8_t data)
 
  iNES: mapper 119
 
- In MESS: Supported. It also uses mmc3_irq.
+ In MAME: Supported. It also uses mmc3_irq.
 
  -------------------------------------------------*/
 
-void nes_tqrom_device::set_chr( uint8_t chr, int chr_base, int chr_mask )
+void nes_tqrom_device::chr_cb(int start, int bank, int source)
 {
-	uint8_t chr_page = (m_latch & 0x80) >> 5;
-	uint8_t src[6], mask[6];
-
-	// TQROM ignores the source, base and mask set by the MMC3 and determines them based on vrom bank bits
-	for (int i = 0; i < 6; i++)
-	{
-		src[i] = (m_mmc_vrom_bank[i] & 0x40) ? CHRRAM : CHRROM;
-		mask[i] =  (m_mmc_vrom_bank[i] & 0x40) ? 0x07 : 0x3f;
-	}
-
-	chr1_x(chr_page ^ 0, ((m_mmc_vrom_bank[0] & ~0x01) & mask[0]), src[0]);
-	chr1_x(chr_page ^ 1, ((m_mmc_vrom_bank[0] |  0x01) & mask[0]), src[0]);
-	chr1_x(chr_page ^ 2, ((m_mmc_vrom_bank[1] & ~0x01) & mask[1]), src[1]);
-	chr1_x(chr_page ^ 3, ((m_mmc_vrom_bank[1] |  0x01) & mask[1]), src[1]);
-	chr1_x(chr_page ^ 4, (m_mmc_vrom_bank[2] & mask[2]), src[2]);
-	chr1_x(chr_page ^ 5, (m_mmc_vrom_bank[3] & mask[3]), src[3]);
-	chr1_x(chr_page ^ 6, (m_mmc_vrom_bank[4] & mask[4]), src[4]);
-	chr1_x(chr_page ^ 7, (m_mmc_vrom_bank[5] & mask[5]), src[5]);
+	if (BIT(bank, 6))
+		chr1_x(start, bank & 0x07, CHRRAM);
+	else
+		chr1_x(start, bank & 0x3f, CHRROM);
 }
-
 
 /*-------------------------------------------------
 
@@ -548,18 +516,18 @@ void nes_tqrom_device::set_chr( uint8_t chr, int chr_base, int chr_mask )
 
  -------------------------------------------------*/
 
-void nes_qj_device::write_m(offs_t offset, uint8_t data)
+void nes_qj_device::write_m(offs_t offset, u8 data)
 {
 	LOG_MMC(("qj write_m, offset: %04x, data: %02x\n", offset, data));
 
-	m_prg_base = BIT(data, 0) << 4;
-	m_prg_mask = 0x0f;
-	m_chr_base = BIT(data, 0) << 7;
-	m_chr_mask = 0x7f;
-	set_prg(m_prg_base, m_prg_mask);
-	set_chr(m_chr_source, m_chr_base, m_chr_mask);
+	if (BIT(m_wram_protect, 7) && !BIT(m_wram_protect, 6))
+	{
+		m_prg_base = BIT(data, 0) << 4;
+		m_chr_base = BIT(data, 0) << 7;
+		set_prg(m_prg_base, m_prg_mask);
+		set_chr(m_chr_source, m_chr_base, m_chr_mask);
+	}
 }
-
 
 /*-------------------------------------------------
 
@@ -568,17 +536,22 @@ void nes_qj_device::write_m(offs_t offset, uint8_t data)
 
  iNES: mapper 37
 
+ TODO: this board apparently only resets to the menu
+ screen on systems with a CIC (the outer PRG lines
+ are somehow tied to the CIC's reset line).
+
  -------------------------------------------------*/
 
-void nes_zz_device::write_m(offs_t offset, uint8_t data)
+void nes_zz_device::write_m(offs_t offset, u8 data)
 {
-	uint8_t mmc_helper = data & 0x07;
 	LOG_MMC(("zz write_m, offset: %04x, data: %02x\n", offset, data));
 
-	m_prg_base = (BIT(mmc_helper, 2) << 4) | (((mmc_helper & 0x03) == 0x03) ? 0x08 : 0);
-	m_prg_mask = (mmc_helper << 1) | 0x07;
-	m_chr_base = BIT(mmc_helper, 2) << 7;
-	m_chr_mask = 0x7f;
-	set_prg(m_prg_base, m_prg_mask);
-	set_chr(m_chr_source, m_chr_base, m_chr_mask);
+	if (BIT(m_wram_protect, 7) && !BIT(m_wram_protect, 6))
+	{
+		m_prg_base = ((data & 0x04) | (data & (data << 1) & 0x02)) << 2;
+		m_prg_mask = (m_prg_mask == 0x10) ? 0x0f : 0x07;
+		m_chr_base = BIT(data, 2) << 7;
+		set_prg(m_prg_base, m_prg_mask);
+		set_chr(m_chr_source, m_chr_base, m_chr_mask);
+	}
 }

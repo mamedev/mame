@@ -46,11 +46,11 @@ private:
 	required_memory_bank m_audiobank;
 
 	/* video-related */
-	tilemap_t *m_tilemap[7];
+	tilemap_t *m_tilemap[7]{};
 
 	/* sound-related */
-	u8        m_adpcm_byte;
-	int       m_msm5205_vclk_toggle;
+	u8        m_adpcm_byte = 0;
+	int       m_msm5205_vclk_toggle = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

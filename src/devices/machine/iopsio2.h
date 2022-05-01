@@ -63,24 +63,24 @@ protected:
 	required_device<ps2_mc_device> m_mc0;
 
 	// HACK: Buffer size is a guess.
-	uint8_t m_buffer[512]{};
-	uint32_t m_curr_byte = 0;
-	uint32_t m_end_byte = 0;
-	uint32_t m_ctrl = 0;
+	uint8_t m_buffer[512];
+	uint32_t m_curr_byte;
+	uint32_t m_end_byte;
+	uint32_t m_ctrl;
 
-	uint32_t m_unknown_0x6c = 0; // Device status?
-	uint32_t m_unknown_0x70 = 0;
-	uint32_t m_unknown_0x74 = 0;
+	uint32_t m_unknown_0x6c; // Device status?
+	uint32_t m_unknown_0x70;
+	uint32_t m_unknown_0x74;
 
-	uint32_t m_cmdbuf[16]{};
-	uint32_t m_curr_port = 0;
-	uint32_t m_cmd_size = 0;
-	uint32_t m_cmd_length = 0;
-	uint32_t m_databuf[4][2]{};
+	uint32_t m_cmdbuf[16];
+	uint32_t m_curr_port;
+	uint32_t m_cmd_size;
+	uint32_t m_cmd_length;
+	uint32_t m_databuf[4][2];
 
-	uint32_t m_target_device = 0;
+	uint32_t m_target_device;
 
-	emu_timer *m_response_timer = nullptr;
+	emu_timer *m_response_timer;
 
 	static const size_t BUFFER_SIZE;
 };

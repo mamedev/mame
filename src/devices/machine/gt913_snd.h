@@ -44,7 +44,7 @@ protected:
 	virtual void rom_bank_updated() override;
 
 private:
-	sound_stream *m_stream = nullptr;
+	sound_stream *m_stream;
 
 	u8 m_gain;
 	u16 m_data[3];

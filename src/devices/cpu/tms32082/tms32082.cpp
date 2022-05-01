@@ -11,7 +11,6 @@
 #include "tms32082.h"
 #include "dis_pp.h"
 #include "dis_mp.h"
-#include "debugger.h"
 
 DEFINE_DEVICE_TYPE(TMS32082_MP, tms32082_mp_device, "tms32082_mp", "Texas Instruments TMS32082 MP")
 DEFINE_DEVICE_TYPE(TMS32082_PP, tms32082_pp_device, "tms32082_pp", "Texas Instruments TMS32082 PP")

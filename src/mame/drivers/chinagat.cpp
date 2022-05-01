@@ -477,7 +477,7 @@ void chinagat_state::saiyugoub1_adpcm_control_w(uint8_t data)
 			}
 		}
 
-		m_adpcm_addr = ((m_adpcm_addr & 0x07fff) | (data & 0x70 << 11));
+		m_adpcm_addr = ((m_adpcm_addr & 0x07fff) | ((data & 0x70) << 11));
 
 		m_pcm_nibble = saiyugoub1_adpcm_rom[m_adpcm_addr & 0x3ffff];
 

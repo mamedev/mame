@@ -69,8 +69,8 @@ protected:
 	required_device<i8251_device> m_usart;
 	bool m_installed;
 	int m_irq;
-	int m_irq_tx = 0;
-	int m_irq_rx = 0;
+	int m_irq_tx;
+	int m_irq_rx;
 	int m_control;
 	int m_status;
 };

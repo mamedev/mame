@@ -78,7 +78,6 @@
 #include "emu.h"
 #include "pps4.h"
 #include "pps4dasm.h"
-#include "debugger.h"
 
 
 #define VERBOSE 0       //!< set to 1 to log certain instruction conditions

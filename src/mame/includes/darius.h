@@ -58,16 +58,16 @@ private:
 	required_memory_bank m_audiobank;
 
 	/* video-related */
-	tilemap_t  *m_fg_tilemap;
+	tilemap_t  *m_fg_tilemap = nullptr;
 
 	/* misc */
-	u16     m_cpua_ctrl;
-	u16     m_coin_word;
-	u8      m_adpcm_command;
-	u8      m_nmi_enable;
-	u32     m_def_vol[0x10];
-	u8      m_vol[VOL_MAX];
-	u8      m_pan[PAN_MAX];
+	u16     m_cpua_ctrl = 0;
+	u16     m_coin_word = 0;
+	u8      m_adpcm_command = 0;
+	u8      m_nmi_enable = 0;
+	u32     m_def_vol[0x10]{};
+	u8      m_vol[VOL_MAX]{};
+	u8      m_pan[PAN_MAX]{};
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

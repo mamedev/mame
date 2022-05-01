@@ -296,5 +296,5 @@ ROM_START(junior80)
 	ROM_LOAD( "junior80_seria_321-ok.ic46", 0x0000, 0x0800, CRC(07f09842) SHA1(c7591a1006ae59d6353859ca401c57ff6eb1d4ff) )
 ROM_END
 
-//    YEAR  NAME        PARENT    COMPAT    MACHINE     INPUT        CLASS           INIT             COMPANY          FULLNAME               FLAGS
-COMP( 1988, junior80,   0,        0,        junior80,   junior80,    junior80_state, empty_init,     "unknown",      "Junior 80",        MACHINE_IS_SKELETON )
+//    YEAR  NAME        PARENT    COMPAT    MACHINE     INPUT        CLASS           INIT            COMPANY          FULLNAME            FLAGS
+COMP( 1988, junior80,   0,        0,        junior80,   junior80,    junior80_state, empty_init,     "<unknown>",     "Junior 80",        MACHINE_IS_SKELETON )

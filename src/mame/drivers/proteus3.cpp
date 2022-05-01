@@ -116,7 +116,7 @@ private:
 	u8 m_flashcnt = 0U;
 	u16 m_curs_pos = 0U;
 	u8 m_cass_data[4]{};
-	bool m_cassbit = 0, m_cassold = 0, m_cassinbit = 0;
+	bool m_cassbit = false, m_cassold = false, m_cassinbit = false;
 	std::unique_ptr<u8[]> m_vram;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;

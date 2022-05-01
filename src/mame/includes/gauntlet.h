@@ -96,10 +96,10 @@ private:
 	required_shared_ptr<uint16_t> m_yscroll;
 	required_device<atari_motion_objects_device> m_mob;
 
-	uint16_t          m_sound_reset_val;
-	bool              m_vindctr2_screen_refresh;
-	uint8_t           m_playfield_tile_bank;
-	uint8_t           m_playfield_color_bank;
+	uint16_t          m_sound_reset_val = 0;
+	bool              m_vindctr2_screen_refresh = false;
+	uint8_t           m_playfield_tile_bank = 0;
+	uint8_t           m_playfield_color_bank = 0;
 
 	static const atari_motion_objects_config s_mob_config;
 

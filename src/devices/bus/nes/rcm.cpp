@@ -75,32 +75,6 @@ nes_3dblock_device::nes_3dblock_device(const machine_config &mconfig, const char
 
 
 
-void nes_gs2015_device::device_start()
-{
-	common_start();
-}
-
-void nes_gs2015_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-}
-
-void nes_3dblock_device::device_start()
-{
-	common_start();
-}
-
-void nes_3dblock_device::pcb_reset()
-{
-	prg32(0);
-	chr8(0, CHRRAM);
-}
-
-
-
-
 /*-------------------------------------------------
  mapper specific handlers
  -------------------------------------------------*/

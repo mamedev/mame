@@ -71,28 +71,28 @@ private:
 	optional_device<acorn_vidc10_device> m_vidc;
 	const address_space_config m_space_config;
 
-	address_space *     m_space = nullptr;
+	address_space *     m_space;
 	devcb_write_line    m_abort_w;
 	devcb_write_line    m_sirq_w;
-	bool                m_output_dram_rowcol = false;
-	int                 m_spvmd = 0;
-	uint8_t             m_pagesize = 0;
-	bool                m_latchrom = false;
-	bool                m_video_dma_on = false;
-	bool                m_sound_dma_on = false;
-	bool                m_cursor_enabled = false;
-	bool                m_os_mode = false;
-	uint32_t            m_vidinit = 0;
-	uint32_t            m_vidstart = 0;
-	uint32_t            m_vidend = 0;
-	uint32_t            m_vidcur = 0;
-	uint32_t            m_cinit = 0;
-	uint32_t            m_sndstart = 0;
-	uint32_t            m_sndend = 0;
-	uint32_t            m_sndcur = 0;
-	uint32_t            m_sndendcur = 0;
-	int16_t             m_pages[0x2000]{};        // the logical RAM area is 32 megs, and the smallest page size is 4k
-	uint8_t             m_pages_ppl[0x2000]{};
+	bool                m_output_dram_rowcol;
+	int                 m_spvmd;
+	uint8_t             m_pagesize;
+	bool                m_latchrom;
+	bool                m_video_dma_on;
+	bool                m_sound_dma_on;
+	bool                m_cursor_enabled;
+	bool                m_os_mode;
+	uint32_t            m_vidinit;
+	uint32_t            m_vidstart;
+	uint32_t            m_vidend;
+	uint32_t            m_vidcur;
+	uint32_t            m_cinit;
+	uint32_t            m_sndstart;
+	uint32_t            m_sndend;
+	uint32_t            m_sndcur;
+	uint32_t            m_sndendcur;
+	int16_t             m_pages[0x2000];        // the logical RAM area is 32 megs, and the smallest page size is 4k
+	uint8_t             m_pages_ppl[0x2000];
 };
 
 

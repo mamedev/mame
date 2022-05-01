@@ -114,7 +114,7 @@ static const nes_mmc mmc_list[] =
 	{ 79, AVE_NINA06 },
 	{ 80, TAITO_X1_005 },
 	{ 81, NTDEC_N715021 }, // 81 Super Gun
-	{ 82, TAITO_X1_017 },
+	// 82 Taito X1-017 mapper for old mis-ordered PRG dumps
 	{ 83, CONY_BOARD },
 	// 84 Pasofami hacked images?
 	{ 85, KONAMI_VRC7 },
@@ -232,7 +232,7 @@ static const nes_mmc mmc_list[] =
 	{ 196, BTL_SBROS11 },
 	{ 197, UNL_SF3 },
 	{ 198, WAIXING_TYPE_F },
-	{ 199, WAIXING_TYPE_G },
+	{ 199, WAIXING_TYPE_F1 },
 	{ 200, BMC_36IN1 },
 	{ 201, BMC_21IN1 },
 	{ 202, BMC_150IN1 },
@@ -268,7 +268,7 @@ static const nes_mmc mmc_list[] =
 	{ 232, CAMERICA_BF9096 },
 	{ 233, BMC_42IN1RESET },
 	{ 234, AVE_MAXI15 },
-	{ 235, BMC_GOLD150 },   // 235 Golden Game x-in-1 - Unsupported
+	{ 235, BMC_GOLD260 },   // 235 Golden Game x-in-1 games
 	{ 236, BMC_70IN1 },
 	{ 237, BMC_TELETUBBIES },
 	{ 238, UNL_603_5052 },
@@ -477,14 +477,20 @@ static const nes_mmc mmc_list[] =
 	// 439 YS2309 multicart
 	// 440 Dongda Sonic REC-9388 educational computer
 	// 441 841026C and 850335C multicarts
-	// 442 "Golden Key" educational computer 
+	// 442 "Golden Key" educational computer
 	// 443 NC3000M multicart
 	// 444 NC7000M multicart
 	// 445 DG574B MMC3-compatible multicart
 	// 446 Mindkids SMD172B_FPGA board
-	// 447 VRC4-based KL-06 multicart
-	// 448...511 Unused
-	// 512 probably the correct MMC3 clone for chuugokt in nes.xml
+	{ 447, BMC_KL06 },
+	// 448 VRC4-based 830768C multicart
+	// 449 Super Games King multicart
+	// 450 VRC2-based YY841157C multicart
+	// 451 homebrew Haratyler HP/MP
+	{ 452, BMC_DS927 },
+	// 453 Realtec 8042
+	// 454...511 Unused
+	{ 512, SACHEN_ZGDH },
 	{ 513, SACHEN_SA9602B },
 	// 514 seems to be for skaraok, currently set to UNKNOWN in nes.xml
 	// 515 Korean Family Noraebang karaoke cart with expansion cart, mic, and YM2413!
@@ -500,7 +506,7 @@ static const nes_mmc mmc_list[] =
 	{ 525, KAISER_KS7021A },       // GetsuFumaDen pirate (and maybe a Contra?)
 	// 526 sangochu clone not yet in nes.xml?
 	{ 527, UNL_AX40G },            // Fudou Myouou Den pirate
-	// 528 1995 New Series Super 2-in-1 multicart not in nes.xml
+	{ 528, BMC_831128C },          // 1995 New Series Super 2-in-1
 	{ 529, UNL_T230 },             // Datach Dragon Ball Z IV bootleg
 	{ 530, UNL_AX5705 },           // Super Mario Bros Pocker Mali
 	// 531 Used by Asder PC-95 Famicom clone built into a keyboard
@@ -523,7 +529,7 @@ static const nes_mmc mmc_list[] =
 	{ 549, KAISER_KS7016B },       // Meikyuu Jiin Dababa alt FDS conversion
 	{ 550, BMC_JY820845C },
 	{ 551, JNCOTA_KT1001 },
-	// 552 TAITO_X1_017, this is a correction of mapper 82. We should drop 82 and only support the accurate dumps of 552?
+	{ 552, TAITO_X1_017 },
 	{ 553, SACHEN_3013 },          // Dong Dong Nao 1
 	{ 554, KAISER_KS7010 },        // Akumajo Dracula FDS conversion
 	{ 555, STD_EVENT2 },
@@ -757,10 +763,9 @@ void nes_cart_slot_device::call_load_ines()
 			m_cart->set_ce(0x03, ce_state);
 		}
 		// iNES Mapper 232
-		else if (mapper == 210 && submapper == 1)
+		else if (mapper == 232 && submapper == 1)
 		{
-			submapper = 0;
-			logerror("Unimplemented NES 2.0 submapper: CAMERICA-BF9096.\n");
+			pcb_id = CAMERICA_BF9096_ALT;
 		}
 		// 268: SMD133 boards
 		else if (mapper == 268)
@@ -1276,6 +1281,11 @@ const char * nes_cart_slot_device::get_default_card_ines(get_default_card_softwa
 		else if (mapper == 116 && submapper == 2)
 		{
 			pcb_id = SOMARI_HUANG2; // Mapper 116 is used for 2 diff boards
+		}
+		// iNES Mapper 232
+		else if (mapper == 232 && submapper == 1)
+		{
+			pcb_id = CAMERICA_BF9096_ALT;
 		}
 	}
 

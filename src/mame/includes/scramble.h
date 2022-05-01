@@ -139,13 +139,13 @@ private:
 	inline int bit(int i,int n);
 	void sh_init();
 
-	uint8_t m_cavelon_bank;
+	uint8_t m_cavelon_bank = 0;
 
 	// harem
-	uint8_t m_harem_decrypt_mode;
-	uint8_t m_harem_decrypt_bit;
-	uint8_t m_harem_decrypt_clk;
-	uint8_t m_harem_decrypt_count;
+	uint8_t m_harem_decrypt_mode = 0;
+	uint8_t m_harem_decrypt_bit = 0;
+	uint8_t m_harem_decrypt_clk = 0;
+	uint8_t m_harem_decrypt_count = 0;
 	std::unique_ptr<uint8_t[]> m_harem_decrypted_data;
 	std::unique_ptr<uint8_t[]> m_harem_decrypted_opcodes;
 };

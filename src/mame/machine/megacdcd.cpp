@@ -381,12 +381,13 @@ void lc89510_temp_device::CDD_GetTrackAdr(void)
 {
 	CLEAR_CDD_RESULT
 
-	int track = (CDD_TX[5] & 0xF) + (CDD_TX[4] & 0xF) * 10;
-	int last_track = segacd.cd->get_last_track();
-
 	CDD_STATUS &= 0xFF;
 	if(segacd.cd == nullptr) // no CD is there, bail out
 		return;
+
+	int track = (CDD_TX[5] & 0xF) + (CDD_TX[4] & 0xF) * 10;
+	int last_track = segacd.cd->get_last_track();
+
 	CDD_STATUS |= SCD_STATUS;
 
 	if (track > last_track)
@@ -413,12 +414,13 @@ void lc89510_temp_device::CDD_GetTrackType(void)
 {
 	CLEAR_CDD_RESULT
 
-	int track = (CDD_TX[5] & 0xF) + (CDD_TX[4] & 0xF) * 10;
-	int last_track = segacd.cd->get_last_track();
-
 	CDD_STATUS &= 0xFF;
 	if(segacd.cd == nullptr) // no CD is there, bail out
 		return;
+
+	int track = (CDD_TX[5] & 0xF) + (CDD_TX[4] & 0xF) * 10;
+	int last_track = segacd.cd->get_last_track();
+
 	CDD_STATUS |= SCD_STATUS;
 
 	if (track > last_track)

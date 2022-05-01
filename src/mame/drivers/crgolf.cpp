@@ -75,7 +75,7 @@
         |                 YUVO CO., LTD                |
         |-----------------------------------------------
 
-         next to rom M-GF_A10.12K
+         next to ROM M-GF_A10.12K
          the box must contain at least a Z80
 
 DASM Notes:
@@ -84,22 +84,254 @@ tries to see if $612c onward has a "MASTERJ" string on it, resets itself
 otherwise.
 During irq routines it also checks if bit 7 is active for $640a-$6415,
 modifies this area if condition is true.
-Neither of above matches what we have in the rom data banks, so it's either
+Neither of above matches what we have in the ROM data banks, so it's either
 protected or a snippet should do the aforementioned string copy.
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/crgolf.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
+class crgolf_state : public driver_device
+{
+public:
+	crgolf_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_palette(*this, "palette"),
+		m_videoram(*this, "vram%u", 0U, 0x6000U, ENDIANNESS_LITTLE),
+		m_mainbank(*this, "mainbank"),
+		m_stick(*this, "STICK%u", 0U),
+		m_ioport(*this, { "IN0", "IN1", "P1", "P2", "DSW", "UNUSED0", "UNUSED1" })
+	{ }
+
+	void crgolf(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<palette_device> m_palette;
+
+	void sound_map(address_map &map);
+
+private:
+	// memory pointers
+	memory_share_array_creator<uint8_t, 2> m_videoram;
+	required_memory_bank m_mainbank;
+
+	required_ioport_array<2> m_stick;
+	required_ioport_array<7> m_ioport;
+
+	bool m_color_select = false;
+	bool m_screen_flip = false;
+	bool m_screen_enable[2] = { false, false };
+
+	// misc
+	uint8_t m_port_select = 0U;
+
+	void rom_bank_select_w(uint8_t data);
+	uint8_t switch_input_r();
+	uint8_t analog_input_r();
+	void switch_input_select_w(uint8_t data);
+	void unknown_w(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(color_select_w);
+	DECLARE_WRITE_LINE_MEMBER(screen_flip_w);
+	DECLARE_WRITE_LINE_MEMBER(screen_select_w);
+	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(screen_enable_w);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void main_map(address_map &map);
+};
+
+class crgolfhi_state : public crgolf_state
+{
+public:
+	crgolfhi_state(const machine_config &mconfig, device_type type, const char *tag) :
+		crgolf_state(mconfig, type, tag),
+		m_adpcm_rom(*this, "adpcm"),
+		m_msm(*this, "msm")
+	{ }
+
+	void crgolfhi(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	// memory pointers
+	required_region_ptr<uint8_t> m_adpcm_rom;
+
+	// devices
+	required_device<msm5205_device> m_msm;
+
+	// misc
+	uint16_t m_sample_offset = 0U;
+	uint8_t m_sample_count = 0U;
+
+	void sample_w(offs_t offset, uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(vck_callback);
+
+	void sound_map(address_map &map);
+};
+
+class mastrglf_state : public crgolfhi_state
+{
+public:
+	mastrglf_state(const machine_config &mconfig, device_type type, const char *tag) :
+		crgolfhi_state(mconfig, type, tag)
+	{ }
+
+	void mastrglf(machine_config &config);
+
+private:
+	uint8_t unk_sound_02_r();
+	uint8_t unk_sound_05_r();
+	uint8_t unk_sound_07_r();
+	void unk_sound_0c_w(uint8_t data);
+	void palette(palette_device &palette) const;
+	void main_io_map(address_map &map);
+	void main_prg_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_prg_map(address_map &map);
+};
+
+// video
+
+
+/*************************************
+ *
+ *  Video startup
+ *
+ *************************************/
+
+void crgolf_state::palette(palette_device &palette) const
+{
+	uint8_t const *const prom = memregion("proms")->base();
+	static constexpr uint8_t NUM_PENS = 0x20;
+
+	for (offs_t offs = 0; offs < NUM_PENS; offs++)
+	{
+		uint8_t const data = prom[offs];
+
+		// red component
+		int bit0 = BIT(data, 0);
+		int bit1 = BIT(data, 1);
+		int bit2 = BIT(data, 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// green component
+		bit0 = BIT(data, 3);
+		bit1 = BIT(data, 4);
+		bit2 = BIT(data, 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// blue component
+		bit0 = BIT(data, 6);
+		bit1 = BIT(data, 7);
+		int const b = 0x4f * bit0 + 0xa8 * bit1;
+
+		m_palette->set_pen_color(offs, r, g, b);
+	}
+}
+
+void mastrglf_state::palette(palette_device &palette) const
+{
+	// TODO: once PROMs are dumped
+}
+
+/*************************************
+ *
+ *  Video update
+ *
+ *************************************/
+
+uint32_t crgolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int flip = m_screen_flip;
+	static constexpr uint16_t VIDEORAM_SIZE = 0x2000 * 3;
+
+	// for each byte in the video RAM
+	for (offs_t offs = 0; offs < VIDEORAM_SIZE / 3; offs++)
+	{
+		uint8_t y = (offs & 0x1fe0) >> 5;
+		uint8_t x = (offs & 0x001f) << 3;
+
+		uint8_t data_a0 = m_videoram[0][0x2000 | offs];
+		uint8_t data_a1 = m_videoram[0][0x0000 | offs];
+		uint8_t data_a2 = m_videoram[0][0x4000 | offs];
+		uint8_t data_b0 = m_videoram[1][0x2000 | offs];
+		uint8_t data_b1 = m_videoram[1][0x0000 | offs];
+		uint8_t data_b2 = m_videoram[1][0x4000 | offs];
+
+		if (flip)
+		{
+			y = ~y;
+			x = ~x;
+		}
+
+		// for each pixel in the byte
+		for (int i = 0; i < 8; i++)
+		{
+			offs_t color;
+			uint8_t data_b = 0;
+			uint8_t data_a = 0;
+
+			if (!m_screen_enable[0])
+				data_a = ((data_a0 & 0x80) >> 7) | ((data_a1 & 0x80) >> 6) | ((data_a2 & 0x80) >> 5);
+
+			if (!m_screen_enable[1])
+				data_b = ((data_b0 & 0x80) >> 7) | ((data_b1 & 0x80) >> 6) | ((data_b2 & 0x80) >> 5);
+
+			// screen A has priority over B
+			if (data_a)
+				color = data_a;
+			else
+				color = data_b | 0x08;
+
+			// add HI bit if enabled
+			if (m_color_select)
+				color = color | 0x10;
+
+			bitmap.pix(y, x) = color;
+
+			// next pixel
+			data_a0 = data_a0 << 1;
+			data_a1 = data_a1 << 1;
+			data_a2 = data_a2 << 1;
+			data_b0 = data_b0 << 1;
+			data_b1 = data_b1 << 1;
+			data_b2 = data_b2 << 1;
+
+			if (flip)
+				x = x - 1;
+			else
+				x = x + 1;
+		}
+	}
+
+	return 0;
+}
+
+
+// machine
 
 /*************************************
  *
@@ -109,35 +341,44 @@ protected or a snippet should do the aforementioned string copy.
 
 void crgolf_state::rom_bank_select_w(uint8_t data)
 {
-	membank("bank1")->set_entry(data & 15);
+	m_mainbank->set_entry(data & 15); // TODO: mastrglf has more banks
 }
 
 
 void crgolf_state::machine_start()
 {
-	if (membank("bank1"))
-	{
-		uint32_t size = memregion("maindata")->bytes();
+	uint32_t size = memregion("maindata")->bytes();
 
-		/* configure the banking */
-		membank("bank1")->configure_entries(0, size/0x2000, memregion("maindata")->base(), 0x2000);
-		membank("bank1")->set_entry(0);
-	}
+	// configure the banking
+	m_mainbank->configure_entries(0, size / 0x2000, memregion("maindata")->base(), 0x2000);
+	m_mainbank->set_entry(0);
+	membank("vrambank")->configure_entry(0, m_videoram[0]);
+	membank("vrambank")->configure_entry(1, m_videoram[1]);
 
-	/* register for save states */
+	// register for save states
 	save_item(NAME(m_port_select));
-	save_item(NAME(m_sample_offset));
-	save_item(NAME(m_sample_count));
 	save_item(NAME(m_color_select));
 	save_item(NAME(m_screen_flip));
-	save_item(NAME(m_screena_enable));
-	save_item(NAME(m_screenb_enable));
+	save_item(NAME(m_screen_enable));
 }
 
+void crgolfhi_state::machine_start()
+{
+	crgolf_state::machine_start();
+
+	save_item(NAME(m_sample_offset));
+	save_item(NAME(m_sample_count));
+}
 
 void crgolf_state::machine_reset()
 {
 	m_port_select = 0;
+}
+
+void crgolfhi_state::machine_reset()
+{
+	crgolf_state::machine_reset();
+
 	m_sample_offset = 0;
 	m_sample_count = 0;
 }
@@ -151,27 +392,21 @@ void crgolf_state::machine_reset()
 
 uint8_t crgolf_state::switch_input_r()
 {
-	static const char *const portnames[] = { "IN0", "IN1", "P1", "P2", "DSW", "UNUSED0", "UNUSED1" };
-
-	return ioport(portnames[m_port_select])->read();
+	return m_ioport[m_port_select]->read();
 }
 
 
 uint8_t crgolf_state::analog_input_r()
 {
-	return ((ioport("STICK0")->read() >> 4) | (ioport("STICK1")->read() & 0xf0)) ^ 0x88;
+	return ((m_stick[0]->read() >> 4) | (m_stick[1]->read() & 0xf0)) ^ 0x88;
 }
 
 
 void crgolf_state::switch_input_select_w(uint8_t data)
 {
-	if (!(data & 0x40)) m_port_select = 6;
-	if (!(data & 0x20)) m_port_select = 5;
-	if (!(data & 0x10)) m_port_select = 4;
-	if (!(data & 0x08)) m_port_select = 3;
-	if (!(data & 0x04)) m_port_select = 2;
-	if (!(data & 0x02)) m_port_select = 1;
-	if (!(data & 0x01)) m_port_select = 0;
+	for (int i = 6; i >= 0; i--)
+		if (!(BIT(data, i)))
+			m_port_select = i;
 }
 
 
@@ -188,23 +423,23 @@ void crgolf_state::unknown_w(uint8_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(crgolf_state::vck_callback)
+WRITE_LINE_MEMBER(crgolfhi_state::vck_callback)
 {
-	/* only play back if we have data remaining */
+	// only play back if we have data remaining
 	if (m_sample_count != 0xff)
 	{
-		uint8_t data = memregion("adpcm")->base()[m_sample_offset >> 1];
+		uint8_t data = m_adpcm_rom[m_sample_offset >> 1];
 
-		/* write the next nibble and advance */
+		// write the next nibble and advance
 		m_msm->data_w((data >> (4 * (~m_sample_offset & 1))) & 0x0f);
 		m_sample_offset++;
 
-		/* every 256 clocks, we decrement the length */
+		// every 256 clocks, we decrement the length
 		if (!(m_sample_offset & 0xff))
 		{
 			m_sample_count--;
 
-			/* if we hit 0xff, automatically turn off playback */
+			// if we hit 0xff, automatically turn off playback
 			if (m_sample_count == 0xff)
 				m_msm->reset_w(1);
 		}
@@ -212,26 +447,26 @@ WRITE_LINE_MEMBER(crgolf_state::vck_callback)
 }
 
 
-void crgolf_state::crgolfhi_sample_w(offs_t offset, uint8_t data)
+void crgolfhi_state::sample_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
-		/* offset 0 holds the MSM5205 in reset */
+		// offset 0 holds the MSM5205 in reset
 		case 0:
 			m_msm->reset_w(1);
 			break;
 
-		/* offset 1 is the length/256 nibbles */
+		// offset 1 is the length/256 nibbles
 		case 1:
 			m_sample_count = data;
 			break;
 
-		/* offset 2 is the offset/256 nibbles */
+		// offset 2 is the offset/256 nibbles
 		case 2:
 			m_sample_offset = data << 8;
 			break;
 
-		/* offset 3 turns on playback */
+		// offset 3 turns on playback
 		case 3:
 			m_msm->reset_w(0);
 			break;
@@ -251,21 +486,10 @@ WRITE_LINE_MEMBER(crgolf_state::screen_flip_w)
 }
 
 
-WRITE_LINE_MEMBER(crgolf_state::screen_select_w)
+template <uint8_t Which>
+WRITE_LINE_MEMBER(crgolf_state::screen_enable_w)
 {
-	m_vrambank->set_bank(state);
-}
-
-
-WRITE_LINE_MEMBER(crgolf_state::screena_enable_w)
-{
-	m_screena_enable = state;
-}
-
-
-WRITE_LINE_MEMBER(crgolf_state::screenb_enable_w)
-{
-	m_screenb_enable = state;
+	m_screen_enable[Which] = state;
 }
 
 
@@ -280,18 +504,12 @@ void crgolf_state::main_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x5fff).ram();
-	map(0x6000, 0x7fff).bankr("bank1");
+	map(0x6000, 0x7fff).bankr(m_mainbank);
 	map(0x8000, 0x8007).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0x8800, 0x8800).r("soundlatch2", FUNC(generic_latch_8_device::read));
 	map(0x8800, 0x8800).w("soundlatch1", FUNC(generic_latch_8_device::write));
 	map(0x9000, 0x9000).w(FUNC(crgolf_state::rom_bank_select_w));
-	map(0xa000, 0xffff).m(m_vrambank, FUNC(address_map_bank_device::amap8));
-}
-
-void crgolf_state::vrambank_map(address_map &map)
-{
-	map(0x0000, 0x5fff).ram().share("vrama");
-	map(0x8000, 0xdfff).ram().share("vramb");
+	map(0xa000, 0xffff).bankrw("vrambank");
 }
 
 
@@ -313,24 +531,28 @@ void crgolf_state::sound_map(address_map &map)
 	map(0xe003, 0xe003).w("soundlatch2", FUNC(generic_latch_8_device::write));
 }
 
+void crgolfhi_state::sound_map(address_map &map)
+{
+	crgolf_state::sound_map(map);
+
+	map(0xa000, 0xa003).w(FUNC(crgolfhi_state::sample_w));
+}
 
 
 
 
-
-
-void crgolf_state::mastrglf_map(address_map &map)
+void mastrglf_state::main_prg_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x5fff).bankr("bank1");
+	map(0x4000, 0x5fff).bankr("mainbank");
 	map(0x6000, 0x8fff).ram(); // maybe RAM and ROM here?
 	map(0x9000, 0x9fff).ram();
-	map(0xa000, 0xffff).m(m_vrambank, FUNC(address_map_bank_device::amap8));
+	map(0xa000, 0xffff).bankrw("vrambank");
 
 }
 
 
-void crgolf_state::mastrglf_io(address_map &map)
+void mastrglf_state::main_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x07).w("mainlatch", FUNC(ls259_device::write_d0));
@@ -341,43 +563,43 @@ void crgolf_state::mastrglf_io(address_map &map)
 
 
 
-void crgolf_state::mastrglf_submap(address_map &map)
+void mastrglf_state::sound_prg_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
 }
 
 
-uint8_t crgolf_state::unk_sub_02_r()
+uint8_t mastrglf_state::unk_sound_02_r()
 {
 	return 0x00;
 }
 
-uint8_t crgolf_state::unk_sub_05_r()
+uint8_t mastrglf_state::unk_sound_05_r()
 {
 	return 0x00;
 }
 
-uint8_t crgolf_state::unk_sub_07_r()
+uint8_t mastrglf_state::unk_sound_07_r()
 {
 	return 0x00;
 }
 
-void crgolf_state::unk_sub_0c_w(uint8_t data)
+void mastrglf_state::unk_sound_0c_w(uint8_t data)
 {
 }
 
 
-void crgolf_state::mastrglf_subio(address_map &map)
+void mastrglf_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).r("soundlatch1", FUNC(generic_latch_8_device::read)).nopw();
-	map(0x02, 0x02).r(FUNC(crgolf_state::unk_sub_02_r));
-	map(0x05, 0x05).r(FUNC(crgolf_state::unk_sub_05_r));
+	map(0x02, 0x02).r(FUNC(mastrglf_state::unk_sound_02_r));
+	map(0x05, 0x05).r(FUNC(mastrglf_state::unk_sound_05_r));
 	map(0x06, 0x06).nopr();
-	map(0x07, 0x07).r(FUNC(crgolf_state::unk_sub_07_r));
+	map(0x07, 0x07).r(FUNC(mastrglf_state::unk_sound_07_r));
 	map(0x08, 0x08).w("soundlatch2", FUNC(generic_latch_8_device::write));
-	map(0x0c, 0x0c).w(FUNC(crgolf_state::unk_sub_0c_w));
+	map(0x0c, 0x0c).w(FUNC(mastrglf_state::unk_sound_0c_w));
 	map(0x10, 0x11).w("aysnd", FUNC(ay8910_device::address_data_w));
 }
 
@@ -390,12 +612,12 @@ void crgolf_state::mastrglf_subio(address_map &map)
  *************************************/
 
 static INPUT_PORTS_START( crgolf )
-	PORT_START("IN0")   /* CREDIT */
+	PORT_START("IN0")   // CREDIT
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("IN1")   /* SELECT */
+	PORT_START("IN1")   // SELECT
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 )
@@ -404,24 +626,24 @@ static INPUT_PORTS_START( crgolf )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1)            /* club select */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)            /* backward address */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)            /* forward address */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)            /* open stance */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1)            /* closed stance */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)  /* direction left */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) /* direction right */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)            /* shot switch */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1)            // club select
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)            // backward address
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)            // forward address
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)            // open stance
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1)            // closed stance
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)  // direction left
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) // direction right
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)            // shot switch
 
 	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_COCKTAIL     /* club select */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL     /* backward address */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_COCKTAIL     /* forward address */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_COCKTAIL     /* open stance */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_COCKTAIL     /* closed stance */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL   /* direction left */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL  /* direction right */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL     /* shot switch */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_COCKTAIL     // club select
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL     // backward address
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_COCKTAIL     // forward address
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_COCKTAIL     // open stance
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_COCKTAIL     // closed stance
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL   // direction left
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL  // direction right
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL     // shot switch
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW:2")
@@ -488,12 +710,14 @@ INPUT_PORTS_END
 
 void crgolf_state::crgolf(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, MASTER_CLOCK/3/2);
+	static constexpr XTAL MASTER_CLOCK = XTAL(18'432'000);
+
+	// basic machine hardware
+	Z80(config, m_maincpu, MASTER_CLOCK / 3 / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &crgolf_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(crgolf_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, MASTER_CLOCK/3/2);
+	Z80(config, m_audiocpu, MASTER_CLOCK / 3 / 2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &crgolf_state::sound_map);
 	m_audiocpu->set_vblank_int("screen", FUNC(crgolf_state::irq0_line_hold));
 
@@ -502,56 +726,55 @@ void crgolf_state::crgolf(machine_config &config)
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 1H
 	mainlatch.q_out_cb<3>().set(FUNC(crgolf_state::color_select_w));
 	mainlatch.q_out_cb<4>().set(FUNC(crgolf_state::screen_flip_w));
-	mainlatch.q_out_cb<5>().set(FUNC(crgolf_state::screen_select_w));
-	mainlatch.q_out_cb<6>().set(FUNC(crgolf_state::screenb_enable_w));
-	mainlatch.q_out_cb<7>().set(FUNC(crgolf_state::screena_enable_w));
+	mainlatch.q_out_cb<5>().set_membank("vrambank");
+	mainlatch.q_out_cb<6>().set(FUNC(crgolf_state::screen_enable_w<1>));
+	mainlatch.q_out_cb<7>().set(FUNC(crgolf_state::screen_enable_w<0>));
 
 	GENERIC_LATCH_8(config, "soundlatch1").data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	GENERIC_LATCH_8(config, "soundlatch2").data_pending_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	/* stride is technically 0x6000, but powers of 2 makes the memory map / address masking cleaner. */
-	ADDRESS_MAP_BANK(config, "vrambank").set_map(&crgolf_state::vrambank_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x8000);
+	PALETTE(config, m_palette, FUNC(crgolf_state::palette), 0x20);
 
-	PALETTE(config, m_palette, FUNC(crgolf_state::crgolf_palette), 0x20);
-
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 255, 8, 247);
-	screen.set_screen_update(FUNC(crgolf_state::screen_update_crgolf));
+	screen.set_screen_update(FUNC(crgolf_state::screen_update));
 	screen.set_palette(m_palette);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	AY8910(config, "aysnd", MASTER_CLOCK/3/2/2).add_route(ALL_OUTPUTS, "mono", 1.0);
+	AY8910(config, "aysnd", MASTER_CLOCK / 3 / 2 / 2).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void crgolf_state::crgolfhi(machine_config &config)
+void crgolfhi_state::crgolfhi(machine_config &config)
 {
 	crgolf(config);
 
+	m_audiocpu->set_addrmap(AS_PROGRAM, &crgolfhi_state::sound_map);
+
 	MSM5205(config, m_msm, 384000);
-	m_msm->vck_legacy_callback().set(FUNC(crgolf_state::vck_callback));
+	m_msm->vck_legacy_callback().set(FUNC(crgolfhi_state::vck_callback));
 	m_msm->set_prescaler_selector(msm5205_device::S64_4B);
 	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void crgolf_state::mastrglf(machine_config &config)
+void mastrglf_state::mastrglf(machine_config &config)
 {
 	crgolfhi(config);
 
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &crgolf_state::mastrglf_map);
-	m_maincpu->set_addrmap(AS_IO, &crgolf_state::mastrglf_io);
-	m_maincpu->set_vblank_int("screen", FUNC(crgolf_state::irq0_line_hold));
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &mastrglf_state::main_prg_map);
+	m_maincpu->set_addrmap(AS_IO, &mastrglf_state::main_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(mastrglf_state::irq0_line_hold));
 
-	m_audiocpu->set_addrmap(AS_PROGRAM, &crgolf_state::mastrglf_submap);
-	m_audiocpu->set_addrmap(AS_IO, &crgolf_state::mastrglf_subio);
-	m_audiocpu->set_vblank_int("screen", FUNC(crgolf_state::irq0_line_hold));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &mastrglf_state::sound_prg_map);
+	m_audiocpu->set_addrmap(AS_IO, &mastrglf_state::sound_io_map);
+	m_audiocpu->set_vblank_int("screen", FUNC(mastrglf_state::irq0_line_hold));
 
-	PALETTE(config.replace(), m_palette, FUNC(crgolf_state::mastrglf_palette), 0x100);
+	PALETTE(config.replace(), m_palette, FUNC(mastrglf_state::palette), 0x100);
 }
 
 
@@ -588,7 +811,7 @@ ROM_START( crgolf ) // 834-5419-04
 	ROM_LOAD( "pr5877.1s", 0x0000, 0x0020, CRC(f880b95d) SHA1(5ad0ee39e2b9befaf3895ec635d5865b7b1e562b) )
 
 	ROM_REGION( 0x0200, "plds", 0 ) // pal16l8
-	ROM_LOAD( "cg.3e.bin",  0x0000, 0x0104, CRC(beef5560) SHA1(cd7462dea015151cf29029e2275e10b949537cd2) ) /* PAL is read protected */
+	ROM_LOAD( "cg.3e.bin",  0x0000, 0x0104, CRC(beef5560) SHA1(cd7462dea015151cf29029e2275e10b949537cd2) ) // PAL is read protected
 ROM_END
 
 ROM_START( crgolfa ) // 834-5419-03
@@ -618,7 +841,7 @@ ROM_START( crgolfa ) // 834-5419-03
 	ROM_LOAD( "pr5877.1s", 0x0000, 0x0020, CRC(f880b95d) SHA1(5ad0ee39e2b9befaf3895ec635d5865b7b1e562b) )
 
 	ROM_REGION( 0x0200, "plds", 0 ) // pal16l8
-	ROM_LOAD( "cg.3e.bin",  0x0000, 0x0104, CRC(beef5560) SHA1(cd7462dea015151cf29029e2275e10b949537cd2) ) /* PAL is read protected */
+	ROM_LOAD( "cg.3e.bin",  0x0000, 0x0104, CRC(beef5560) SHA1(cd7462dea015151cf29029e2275e10b949537cd2) ) // PAL is read protected
 ROM_END
 
 
@@ -766,21 +989,7 @@ ROM_START( mastrglf )
 	ROM_LOAD( "tbp24s10n.2", 0x0200, 0x0100, NO_DUMP )
 ROM_END
 
-
-
-
-
-/*************************************
- *
- *  Game-specific init
- *
- *************************************/
-
-void crgolf_state::init_crgolfhi()
-{
-	m_audiocpu->space(AS_PROGRAM).install_write_handler(0xa000, 0xa003, write8sm_delegate(*this, FUNC(crgolf_state::crgolfhi_sample_w)));
-}
-
+} // anonymous namespace
 
 
 /*************************************
@@ -789,11 +998,11 @@ void crgolf_state::init_crgolfhi()
  *
  *************************************/
 
-GAME( 1984, crgolf,   0,      crgolf,   crgolf,  crgolf_state, empty_init,    ROT0, "Nasco Japan", "Crowns Golf (834-5419-04)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, crgolfa,  crgolf, crgolf,   crgolfa, crgolf_state, empty_init,    ROT0, "Nasco Japan", "Crowns Golf (834-5419-03)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, crgolfb,  crgolf, crgolf,   crgolfb, crgolf_state, empty_init,    ROT0, "Nasco Japan", "Crowns Golf (set 3)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1984, crgolfc,  crgolf, crgolf,   crgolfb, crgolf_state, empty_init,    ROT0, "Nasco Japan", "Champion Golf",             MACHINE_SUPPORTS_SAVE )
-GAME( 1984, crgolfbt, crgolf, crgolf,   crgolfb, crgolf_state, empty_init,    ROT0, "bootleg",     "Champion Golf (bootleg)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1985, crgolfhi, 0,      crgolfhi, crgolfa, crgolf_state, init_crgolfhi, ROT0, "Nasco Japan", "Crowns Golf in Hawaii",     MACHINE_SUPPORTS_SAVE )
+GAME( 1984, crgolf,   0,      crgolf,   crgolf,  crgolf_state,   empty_init, ROT0, "Nasco Japan", "Crowns Golf (834-5419-04)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, crgolfa,  crgolf, crgolf,   crgolfa, crgolf_state,   empty_init, ROT0, "Nasco Japan", "Crowns Golf (834-5419-03)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, crgolfb,  crgolf, crgolf,   crgolfb, crgolf_state,   empty_init, ROT0, "Nasco Japan", "Crowns Golf (set 3)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1984, crgolfc,  crgolf, crgolf,   crgolfb, crgolf_state,   empty_init, ROT0, "Nasco Japan", "Champion Golf",             MACHINE_SUPPORTS_SAVE )
+GAME( 1984, crgolfbt, crgolf, crgolf,   crgolfb, crgolf_state,   empty_init, ROT0, "bootleg",     "Champion Golf (bootleg)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1985, crgolfhi, 0,      crgolfhi, crgolfa, crgolfhi_state, empty_init, ROT0, "Nasco Japan", "Crowns Golf in Hawaii",     MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, mastrglf, 0,      mastrglf, crgolf,  crgolf_state, empty_init,    ROT0, "Nasco",       "Master's Golf",             MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1985, mastrglf, 0,      mastrglf, crgolf,  mastrglf_state, empty_init, ROT0, "Nasco",       "Master's Golf",             MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

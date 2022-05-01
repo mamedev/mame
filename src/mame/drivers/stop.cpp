@@ -105,5 +105,5 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR  NAME  PARENT MACHINE INPUT CLASS       INIT        ROT   COMPANY    FULLNAME FLAGS
-GAME( 19??, stop, 0,     stop,   stop, stop_state, empty_init, ROT0, "unknown", "Stop",  MACHINE_IS_SKELETON )
+//    YEAR  NAME  PARENT MACHINE INPUT CLASS       INIT        ROT   COMPANY      FULLNAME FLAGS
+GAME( 19??, stop, 0,     stop,   stop, stop_state, empty_init, ROT0, "<unknown>", "Stop",  MACHINE_IS_SKELETON )

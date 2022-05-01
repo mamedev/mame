@@ -92,8 +92,8 @@ protected:
 private:
 	DECLARE_WRITE_LINE_MEMBER(write_via1_cb2);
 
-	u8 m_portb1 = 0;
-	int m_last_cb2_state = 0;
+	u8 m_portb1;
+	int m_last_cb2_state;
 };
 
 class a2bus_phasor_device : public a2bus_ayboard_device

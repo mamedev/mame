@@ -81,7 +81,7 @@ private:
 	// timing
 	attotime m_write_time;
 	attotime m_erase_time;
-	emu_timer *m_data_propagation_timer = nullptr;
+	emu_timer *m_data_propagation_timer;
 
 	// internal registers
 	u16 m_data_register;

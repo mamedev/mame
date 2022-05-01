@@ -24,6 +24,7 @@
 #include "bus/ti99/internal/ioport.h"
 #include "machine/ram.h"
 #include "machine/tmc0430.h"
+#include "machine/tms9901.h"
 #include "sound/sn76496.h"
 #include "sound/tms5220.h"
 #include "video/tms9928a.h"
@@ -236,7 +237,7 @@ private:
 	video_waitstate_generator m_vidws;
 
 	// Pointer to mainboard
-	mainboard8_device* m_mainboard = nullptr;
+	mainboard8_device* m_mainboard;
 };
 
 /*
@@ -323,7 +324,7 @@ private:
 	int m_msast = 0;
 
 	// Pointer to mainboard
-	mainboard8_device* m_mainboard = nullptr;
+	mainboard8_device* m_mainboard;
 };
 
 /*
@@ -381,7 +382,7 @@ private:
 	uint8_t* m_sram = nullptr;
 
 	// Pointer to mainboard
-	mainboard8_device* m_mainboard = nullptr;
+	mainboard8_device* m_mainboard;
 
 	// Keep the system ready state
 	int m_srdy = 0;
@@ -684,6 +685,9 @@ private:
 	required_device<tmc0430_device> m_p3grom0;
 	required_device<tmc0430_device> m_p3grom1;
 	required_device<tmc0430_device> m_p3grom2;
+
+	// Link to the 9901
+	required_device<tms9901_device> m_tms9901;
 
 	// Idle flags for GROMs
 	bool m_sgrom_idle = true;

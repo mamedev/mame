@@ -259,8 +259,6 @@ void arm_iomd_device::device_start()
 	save_item(NAME(m_sndend));
 	save_item(NAME(m_sound_dma_on));
 	save_item(NAME(m_sndcur_buffer));
-	save_item(NAME(m_snd_overrun));
-	save_item(NAME(m_snd_int));
 
 	save_pointer(NAME(m_sndcur_reg), sounddma_ch_size);
 	save_pointer(NAME(m_sndend_reg), sounddma_ch_size);
@@ -303,11 +301,11 @@ void arm_iomd_device::device_reset()
 		m_irq_mask[i] = 0;
 	}
 
-	for (i=0; i<timer_ch_size; i++)
+	for (i = 0; i < timer_ch_size; i++)
 		m_timer[i]->adjust(attotime::never);
 
 	m_sound_dma_on = false;
-	for (i=0; i<sounddma_ch_size; i++)
+	for (i = 0; i < sounddma_ch_size; i++)
 	{
 		m_sndbuffer_ok[i] = false;
 		m_sndcur_reg[i] = 0;
@@ -555,8 +553,6 @@ u32 arm_iomd_device::version_r()
 	return m_version;
 }
 
-u32 version_r();
-
 // sound DMA
 
 template <unsigned Which> u32 arm_iomd_device::sdcur_r() { return m_sndcur_reg[Which]; }
@@ -572,6 +568,7 @@ template <unsigned Which> void arm_iomd_device::sdend_w(offs_t offset, u32 data,
 	m_sndend_reg[Which] &= 0x00fffff0;
 	m_sndstop_reg[Which] = BIT(data, 31);
 	m_sndlast_reg[Which] = BIT(data, 30);
+	m_sndbuffer_ok[Which] = true;
 }
 
 u32 arm_iomd_device::sdcr_r()
@@ -594,12 +591,19 @@ void arm_iomd_device::sdcr_w(u32 data)
 		// ...
 	}
 
-	// TODO: bit 7 resets sound DMA
+	// TODO: sound DMA reset
+	// eats samples in ppcar
+//  if (BIT(data, 7))
+//      m_sndbuffer_ok[0] = m_sndbuffer_ok[1] = false;
 }
 
 u32 arm_iomd_device::sdst_r()
 {
-	return (m_snd_overrun << 2) | (m_snd_int << 1) | m_sndcur_buffer;
+	// TODO: confirm implementation
+	bool sound_overrun = m_sndbuffer_ok[0] == false && m_sndbuffer_ok[1] == false;
+	bool sound_int = m_sndbuffer_ok[0] == false || m_sndbuffer_ok[1] == false;
+
+	return (sound_overrun << 2) | (sound_int << 1) | m_sndcur_buffer;
 }
 
 // video DMA
@@ -706,11 +710,7 @@ inline void arm_iomd_device::sounddma_swap_buffer()
 {
 	m_sndcur = m_sndcur_reg[m_sndcur_buffer];
 	m_sndend = m_sndcur + (m_sndend_reg[m_sndcur_buffer] + 0x10);
-	m_sndbuffer_ok[m_sndcur_buffer] = true;
-
-	// TODO: actual condition for int
-	m_snd_overrun = false;
-	m_snd_int = false;
+//  m_sndbuffer_ok[m_sndcur_buffer] = true;
 }
 
 WRITE_LINE_MEMBER( arm_iomd_device::sound_drq )
@@ -720,21 +720,21 @@ WRITE_LINE_MEMBER( arm_iomd_device::sound_drq )
 
 	if (m_vidc->get_dac_mode() == true)
 	{
-		for (int ch=0;ch<2;ch++)
+		if (!m_sndbuffer_ok[m_sndcur_buffer])
+			return;
+
+		for (int ch = 0; ch < 2; ch++)
 			m_vidc->write_dac32(ch, (m_host_space->read_word(m_sndcur + ch*2)));
 
 		m_sndcur += 4;
 
 		if (m_sndcur >= m_sndend)
 		{
-			// TODO: interrupt bit
-
 			m_vidc->update_sound_mode(m_sound_dma_on);
 			if (m_sound_dma_on)
 			{
 				m_sndbuffer_ok[m_sndcur_buffer] = false;
 				m_sndcur_buffer ^= 1;
-				m_snd_overrun = (m_sndbuffer_ok[m_sndcur_buffer] == false);
 				sounddma_swap_buffer();
 			}
 			else

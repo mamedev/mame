@@ -106,7 +106,7 @@ private:
 	void pegasusm_mem(address_map &map);
 
 	u8 m_kbd_row = 0U;
-	bool m_kbd_irq = 0;
+	bool m_kbd_irq = false;
 	u8 m_control_bits = 0U;
 	std::unique_ptr<u8[]> m_pcg;
 	void pegasus_decrypt_rom(u8 *ROM);

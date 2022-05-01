@@ -62,13 +62,13 @@ private:
 
 	// Pointer to System ROMs needed by bootvect_r and masking RAM buffer for post reset accesses
 	memory_passthrough_handler m_rom_shadow_tap;
-	uint16_t    m_irq_state = 0;
-	uint16_t    m_irq_mask = 0;
-	uint8_t     m_rtc_reg[16]{};
-	bool        m_rtc_hack = false;
-	int         m_fdcdrq_hack = 0;
-	bool        m_bus_error = false;
-	emu_timer  *m_bus_error_timer = nullptr;
+	uint16_t    m_irq_state;
+	uint16_t    m_irq_mask;
+	uint8_t     m_rtc_reg[16];
+	bool        m_rtc_hack;
+	int         m_fdcdrq_hack;
+	bool        m_bus_error;
+	emu_timer  *m_bus_error_timer;
 
 	uint32_t irq_state_r(offs_t offset);
 	void irq_mask_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

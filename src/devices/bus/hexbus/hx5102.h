@@ -89,7 +89,7 @@ private:
 	bool m_mspeed_on;
 
 	bool m_pending_int;
-	bool m_pending_drq = false;
+	bool m_pending_drq;
 
 	bool m_dcs;
 
@@ -101,7 +101,7 @@ private:
 	void update_readyff_input();
 
 	// Link to the attached floppy drives
-	floppy_image_device*    m_floppy[2]{};
+	floppy_image_device*    m_floppy[2];
 	floppy_image_device*    m_current_floppy;
 	int m_floppy_select, m_floppy_select_last;
 
@@ -117,8 +117,8 @@ private:
 	required_device<ram_device> m_ram2;
 
 	// System ROM
-	uint8_t* m_rom1 = nullptr;
-	uint8_t* m_rom2 = nullptr;
+	uint8_t* m_rom1;
+	uint8_t* m_rom2;
 };
 
 } // end namespace bus::hexbus

@@ -351,43 +351,25 @@ bool device_image_interface::load_software_region(std::string_view tag, std::uni
 // to be loaded
 // ****************************************************************************
 
-bool device_image_interface::run_hash(util::core_file &file, u32 skip_bytes, util::hash_collection &hashes, const char *types)
+std::error_condition device_image_interface::run_hash(util::random_read &file, u32 skip_bytes, util::hash_collection &hashes, const char *types)
 {
 	// reset the hash; we want to override existing data
 	hashes.reset();
 
 	// figure out the size, and "cap" the skip bytes
 	u64 size;
-	if (file.length(size))
-		return false;
+	std::error_condition filerr = file.length(size);
+	if (filerr)
+		return filerr;
 	skip_bytes = u32(std::min<u64>(skip_bytes, size));
 
-	// seek to the beginning
-	file.seek(skip_bytes, SEEK_SET); // TODO: check error return
-	u64 position = skip_bytes;
+	// and compute the hashes
+	size_t actual_count;
+	filerr = hashes.compute(file, skip_bytes, size - skip_bytes, actual_count, types);
+	if (filerr)
+		return filerr;
 
-	// keep on reading hashes
-	hashes.begin(types);
-	while (position < size)
-	{
-		uint8_t buffer[8192];
-
-		// read bytes
-		const size_t count = size_t(std::min<u64>(size - position, sizeof(buffer)));
-		size_t actual_count;
-		const std::error_condition filerr = file.read(buffer, count, actual_count);
-		if (filerr || !actual_count)
-			return false;
-		position += actual_count;
-
-		// and compute the hashes
-		hashes.buffer(buffer, actual_count);
-	}
-	hashes.end();
-
-	// cleanup
-	file.seek(0, SEEK_SET); // TODO: check error return
-	return true;
+	return std::error_condition();
 }
 
 
@@ -408,18 +390,18 @@ bool device_image_interface::image_checkhash()
 			return true;
 
 		// run the hash
-		if (!run_hash(*m_file, unhashed_header_length(), m_hash, util::hash_collection::HASH_TYPES_ALL))
+		if (run_hash(*m_file, unhashed_header_length(), m_hash, util::hash_collection::HASH_TYPES_ALL))
 			return false;
 	}
 	return true;
 }
 
 
-util::hash_collection device_image_interface::calculate_hash_on_file(util::core_file &file) const
+util::hash_collection device_image_interface::calculate_hash_on_file(util::random_read &file) const
 {
 	// calculate the hash
 	util::hash_collection hash;
-	if (!run_hash(file, unhashed_header_length(), hash, util::hash_collection::HASH_TYPES_ALL))
+	if (run_hash(file, unhashed_header_length(), hash, util::hash_collection::HASH_TYPES_ALL))
 		hash.reset();
 	return hash;
 }

@@ -132,7 +132,7 @@ private:
 	devcb_write_line m_drq_handler;
 
 	// state machine
-	emu_timer *m_state_timer = nullptr;
+	emu_timer *m_state_timer;
 	enum state : uint32_t
 	{
 		IDLE,
@@ -152,17 +152,17 @@ private:
 	m_state;
 
 	// registers
-	u8 m_odata = 0;
-	u8 m_icmd = 0;
-	u8 m_mode = 0;
-	u8 m_tcmd = 0;
-	u8 m_bas = 0;
-	u8 m_idata = 0;
+	u8 m_odata;
+	u8 m_icmd;
+	u8 m_mode;
+	u8 m_tcmd;
+	u8 m_bas;
+	u8 m_idata;
 
 	// line state
-	u32 m_scsi_ctrl = 0;
-	bool m_irq_state = false;
-	bool m_drq_state = false;
+	u32 m_scsi_ctrl;
+	bool m_irq_state;
+	bool m_drq_state;
 
 	bool const m_has_lbs;
 };

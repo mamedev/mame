@@ -56,9 +56,9 @@ protected:
 
 private:
 	// registers
-	u8 m_dskreg = 0;
-	bool m_intrq = false;
-	bool m_drq = false;
+	u8 m_dskreg;
+	bool m_intrq;
+	bool m_drq;
 };
 
 // device type definitions - CoCo FDC

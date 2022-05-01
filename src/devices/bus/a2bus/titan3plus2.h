@@ -55,7 +55,7 @@ private:
 	u8 m_ram[128*1024];
 	bool m_enabled;
 
-	double m_joystick_x1_time = 0, m_joystick_y1_time = 0, m_joystick_x2_time = 0, m_joystick_y2_time = 0, m_x_calibration = 0, m_y_calibration = 0;
+	double m_joystick_x1_time, m_joystick_y1_time, m_joystick_x2_time, m_joystick_y2_time, m_x_calibration, m_y_calibration;
 };
 
 // device type definition

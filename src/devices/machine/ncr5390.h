@@ -203,7 +203,7 @@ protected:
 	int dma_dir;
 
 	bool irq, drq;
-	bool dma_command = false;
+	bool dma_command;
 	bool test_mode;
 
 	void dma_set(int dir);
@@ -322,7 +322,7 @@ protected:
 
 private:
 	u8 config3;
-	u8 fifo_align = 0;
+	u8 fifo_align;
 	busmd_t m_busmd;
 };
 

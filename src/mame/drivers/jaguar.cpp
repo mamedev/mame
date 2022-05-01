@@ -1231,8 +1231,15 @@ void jaguarcd_state::butch_regs_w(offs_t offset, uint32_t data, uint32_t mem_mas
 			switch((m_butch_regs[offset] & 0xff00) >> 8)
 			{
 				case 0x03: // Read TOC
-					uint32_t msf;
-
+				{
+					if(!m_cd_file) // No disc
+					{
+						m_butch_cmd_response[0] = 0x400;
+						m_butch_regs[0] |= 0x2000;
+						m_butch_cmd_index = 0;
+						m_butch_cmd_size = 1;
+						return;
+					}
 					if(m_butch_regs[offset] & 0xff) // Multi Session CD, TODO
 					{
 						m_butch_cmd_response[0] = 0x0029; // illegal value
@@ -1242,7 +1249,7 @@ void jaguarcd_state::butch_regs_w(offs_t offset, uint32_t data, uint32_t mem_mas
 						return;
 					}
 
-					msf = m_cd_file->get_track_start(0) + 150;
+					uint32_t msf = m_cd_file->get_track_start(0) + 150;
 
 					/* first track number */
 					m_butch_cmd_response[0] = 0x2000 | 1;
@@ -1259,45 +1266,57 @@ void jaguarcd_state::butch_regs_w(offs_t offset, uint32_t data, uint32_t mem_mas
 					m_butch_cmd_index = 0;
 					m_butch_cmd_size = 5;
 					break;
+				}
+
 				case 0x14: // Read Long TOC
+				{
+					if(!m_cd_file) // No disc
 					{
-						uint32_t msf;
-						int ntrks = m_cd_file->get_last_track();
-
-						for(int i=0;i<ntrks;i++)
-						{
-							msf = m_cd_file->get_track_start(i) + 150;
-
-							/* track number */
-							m_butch_cmd_response[i*5+0] = 0x6000 | (i+1);
-							/* attributes (?) */
-							m_butch_cmd_response[i*5+1] = 0x6100 | 0x00;
-
-							/* start of track minutes */
-							m_butch_cmd_response[i*5+2] = 0x6200 | ((msf / 60) / 60);
-							/* start of track seconds */
-							m_butch_cmd_response[i*5+3] = 0x6300 | (msf / 60) % 60;
-							/* start of track frame */
-							m_butch_cmd_response[i*5+4] = 0x6400 | (msf % 75);
-						}
+						m_butch_cmd_response[0] = 0x400;
 						m_butch_regs[0] |= 0x2000;
 						m_butch_cmd_index = 0;
-						m_butch_cmd_size = 5*ntrks;
+						m_butch_cmd_size = 1;
+						return;
 					}
 
+					int ntrks = m_cd_file->get_last_track();
+
+					for(int i=0;i<ntrks;i++)
+					{
+						uint32_t msf = m_cd_file->get_track_start(i) + 150;
+
+						/* track number */
+						m_butch_cmd_response[i*5+0] = 0x6000 | (i+1);
+						/* attributes (?) */
+						m_butch_cmd_response[i*5+1] = 0x6100 | 0x00;
+
+						/* start of track minutes */
+						m_butch_cmd_response[i*5+2] = 0x6200 | ((msf / 60) / 60);
+						/* start of track seconds */
+						m_butch_cmd_response[i*5+3] = 0x6300 | (msf / 60) % 60;
+						/* start of track frame */
+						m_butch_cmd_response[i*5+4] = 0x6400 | (msf % 75);
+					}
+					m_butch_regs[0] |= 0x2000;
+					m_butch_cmd_index = 0;
+					m_butch_cmd_size = 5*ntrks;
 					break;
+				}
+
 				case 0x15: // Set Mode
 					m_butch_regs[0] |= 0x2000;
 					m_butch_cmd_response[0] = 0x1700 | (m_butch_regs[offset] & 0xff);
 					m_butch_cmd_index = 0;
 					m_butch_cmd_size = 1;
 					break;
+
 				case 0x70: // Set DAC Mode
 					m_butch_regs[0] |= 0x2000;
 					m_butch_cmd_response[0] = 0x7000 | (m_butch_regs[offset] & 0xff);
 					m_butch_cmd_index = 0;
 					m_butch_cmd_size = 1;
 					break;
+
 				default:
 					printf("%04x CMD\n",m_butch_regs[offset]);
 					break;

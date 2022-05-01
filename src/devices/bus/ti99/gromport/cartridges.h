@@ -112,7 +112,7 @@ private:
 		const std::string m_pathname;
 	};
 
-	bool    m_readrom = false;
+	bool    m_readrom;
 	int     m_pcbtype;
 	int     m_slot;
 	int     get_index_from_tagname();
@@ -155,12 +155,12 @@ protected:
 	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const { m_cart->logerror(fmt, args...); }
 
 	ti99_cartridge_device*  m_cart;
-	tmc0430_device*     m_grom[5]{};
+	tmc0430_device*     m_grom[5];
 	bool                m_grom_idle;
 	int                 m_grom_size;
 	int                 m_rom_size;
 	int                 m_ram_size;
-	int                 m_bank_mask = 0;
+	int                 m_bank_mask;
 
 	uint8_t*              m_rom_ptr;
 	uint8_t*              m_ram_ptr;

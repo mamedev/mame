@@ -44,10 +44,10 @@ protected:
 	required_device<wd_fdc_device_base> m_fdc;
 	optional_device_array<floppy_connector, 4> m_floppy_connectors;
 
-	offs_t io_base = 0;
-	int dma_channel = 0;
+	offs_t io_base;
+	int dma_channel;
 
-	bool has_motor_control = false;
+	bool has_motor_control;
 
 	enum FDC_COMMAND {
 		FDC_DRIVE_SEL = 0x03,

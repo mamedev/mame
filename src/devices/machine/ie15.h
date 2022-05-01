@@ -106,32 +106,32 @@ private:
 
 	std::unique_ptr<uint32_t[]> m_tmpbmp;
 
-	emu_timer *m_hblank_timer = nullptr;
+	emu_timer *m_hblank_timer;
 
-	uint8_t m_long_beep = 0;
-	uint8_t m_kb_control = 0;
-	uint8_t m_kb_data = 0;
-	uint8_t m_kb_flag0 = 0;
-	uint8_t m_kb_flag = 0;
-	uint8_t m_kb_ruslat = 0;
-	uint8_t m_latch = 0;
+	uint8_t m_long_beep;
+	uint8_t m_kb_control;
+	uint8_t m_kb_data;
+	uint8_t m_kb_flag0;
+	uint8_t m_kb_flag;
+	uint8_t m_kb_ruslat;
+	uint8_t m_latch;
 
 	struct
 	{
-		uint8_t cursor = 0;
-		uint8_t enable = 0;
-		uint8_t line25 = 0;
-		uint32_t ptr1 = 0;
-		uint32_t ptr2 = 0;
+		uint8_t cursor;
+		uint8_t enable;
+		uint8_t line25;
+		uint32_t ptr1;
+		uint32_t ptr2;
 	} m_video;
 
-	uint8_t m_serial_rx_ready = 0;
-	uint8_t m_serial_rx_char = 0;
-	uint8_t m_serial_tx_ready = 0;
-	int m_hblank = 0;
-	int m_vpos = 0;
-	int m_marker_scanline = 0;
-	bool m_kbd_sdv = false;
+	uint8_t m_serial_rx_ready;
+	uint8_t m_serial_rx_char;
+	uint8_t m_serial_tx_ready;
+	int m_hblank;
+	int m_vpos;
+	int m_marker_scanline;
+	bool m_kbd_sdv;
 
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_videoram;

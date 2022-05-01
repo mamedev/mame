@@ -44,8 +44,8 @@ private:
 
 	void ramsel_w(offs_t offset, uint8_t data);
 
-	uint8_t m_romsel = 0;
-	uint8_t m_ramsel = 0;
+	uint8_t m_romsel;
+	uint8_t m_ramsel;
 };
 
 

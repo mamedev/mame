@@ -397,8 +397,8 @@ protected:
 	virtual attotime scsi_fast_negation_period();
 
 	uint8_t scsi_cmdbuf[4096], scsi_sense_buffer[18];
-	int scsi_cmdsize = 0;
-	uint8_t scsi_identify = 0;
+	int scsi_cmdsize;
+	uint8_t scsi_identify;
 
 private:
 	enum {
@@ -440,19 +440,19 @@ private:
 	};
 
 	struct control {
-		int action = 0;
-		int param1 = 0, param2 = 0;
+		int action;
+		int param1, param2;
 	};
 
-	emu_timer *scsi_timer = nullptr;
+	emu_timer *scsi_timer;
 
-	int scsi_state = 0, scsi_substate = 0;
-	int scsi_initiator_id = 0;
-	int data_buffer_id = 0, data_buffer_size = 0, data_buffer_pos = 0;
+	int scsi_state, scsi_substate;
+	int scsi_initiator_id;
+	int data_buffer_id, data_buffer_size, data_buffer_pos;
 
 	control buf_control[32];
-	int buf_control_rpos = 0;
-	int buf_control_wpos = 0;
+	int buf_control_rpos;
+	int buf_control_wpos;
 
 	control *buf_control_push();
 	control *buf_control_pop();

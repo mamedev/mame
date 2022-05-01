@@ -110,28 +110,28 @@ private:
 	devcb_write_line   m_write_tre;
 
 	// status
-	int m_dr = 0;
-	int m_tbre = 0;
-	int m_tre = 0;
-	int m_pe = 0;
-	int m_fe = 0;
-	int m_oe = 0;
+	int m_dr;
+	int m_tbre;
+	int m_tre;
+	int m_pe;
+	int m_fe;
+	int m_oe;
 
 	// control
-	int m_cls1 = 0;
-	int m_cls2 = 0;
-	int m_sbs = 0;
-	int m_sfd = 0;
-	int m_epe = 0;
-	int m_pi = 0;
+	int m_cls1;
+	int m_cls2;
+	int m_sbs;
+	int m_sfd;
+	int m_epe;
+	int m_pi;
 
 	// receiver
-	uint8_t m_rbr = 0;
+	uint8_t m_rbr;
 	int m_rrc;
 	int m_rrc_count;
 
 	// transmitter
-	uint8_t m_tbr = 0;
+	uint8_t m_tbr;
 	int m_trc;
 	int m_trc_count;
 };

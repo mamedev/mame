@@ -13,7 +13,6 @@
 #include "emu.h"
 #include "tx0.h"
 #include "tx0dasm.h"
-#include "debugger.h"
 
 #define LOG_RIM (1 << 1U)
 //#define VERBOSE (LOG_RIM)

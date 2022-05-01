@@ -30,13 +30,13 @@ public:
 	void module_reset();
 
 protected:
-	m68340_cpu_device *m_cpu = nullptr;
+	m68340_cpu_device *m_cpu;
 
 	// Module registers not in the DUART part
-	uint8_t m_mcrh = 0;
-	uint8_t m_mcrl = 0;
-	uint8_t m_ilr = 0;
-	uint8_t m_ivr = 0;
+	uint8_t m_mcrh;
+	uint8_t m_mcrl;
+	uint8_t m_ilr;
+	uint8_t m_ivr;
 
 	enum {
 		REG_MCRH    = 0,

@@ -64,21 +64,21 @@ private:
 
 	const uint8_t m_ram_size;
 
-	int m_ce = 0;
-	int m_clk = 0;
-	int m_io = 0;
-	int m_state = 0;
-	int m_bits = 0;
-	uint8_t m_cmd = 0;
-	uint8_t m_data = 0;
-	int m_addr = 0;
+	int m_ce;
+	int m_clk;
+	int m_io;
+	int m_state;
+	int m_bits;
+	uint8_t m_cmd;
+	uint8_t m_data;
+	int m_addr;
 
-	uint8_t m_reg[9]{};
-	uint8_t m_user[9]{};
-	uint8_t m_ram[31]{};
+	uint8_t m_reg[9];
+	uint8_t m_user[9];
+	uint8_t m_ram[31];
 
 	// timers
-	emu_timer *m_clock_timer = nullptr;
+	emu_timer *m_clock_timer;
 };
 
 // ======================> ds1202_device

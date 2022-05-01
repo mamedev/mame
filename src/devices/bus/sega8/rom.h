@@ -359,6 +359,28 @@ public:
 };
 
 
+// ======================> sega8_korean_188_device
+
+class sega8_korean_188_device : public sega8_rom_device
+{
+public:
+	// construction/destruction
+	sega8_korean_188_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	// reading and writing
+	virtual u8 read_cart(offs_t offset) override;
+	virtual void write_cart(offs_t offset, u8 data) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	u8 m_rom_bank_base;
+};
+
+
 // ======================> sega8_korean_nb_device
 
 class sega8_korean_nb_device : public sega8_rom_device
@@ -392,8 +414,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	uint8_t m_gamesel = 0;
-	uint8_t m_readxor = 0;
+	uint8_t m_gamesel;
+	uint8_t m_readxor;
 };
 
 
@@ -420,7 +442,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	uint8_t m_block = 0;
+	uint8_t m_block;
 };
 
 
@@ -447,7 +469,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	uint8_t m_block = 0;
+	uint8_t m_block;
 };
 
 class sega8_x_terminator_device : public sega8_rom_device
@@ -495,6 +517,7 @@ DECLARE_DEVICE_TYPE(SEGA8_ROM_NEMESIS,      sega8_nemesis_device)
 DECLARE_DEVICE_TYPE(SEGA8_ROM_JANGGUN,      sega8_janggun_device)
 DECLARE_DEVICE_TYPE(SEGA8_ROM_HICOM,        sega8_hicom_device)
 DECLARE_DEVICE_TYPE(SEGA8_ROM_KOREAN,       sega8_korean_device)
+DECLARE_DEVICE_TYPE(SEGA8_ROM_KOREAN_188,   sega8_korean_188_device)
 DECLARE_DEVICE_TYPE(SEGA8_ROM_KOREAN_NB,    sega8_korean_nb_device)
 DECLARE_DEVICE_TYPE(SEGA8_ROM_SEOJIN,       sega8_seojin_device)
 DECLARE_DEVICE_TYPE(SEGA8_ROM_MULTICART,    sega8_multicart_device)

@@ -210,7 +210,7 @@ private:
 		assert(!owner);
 		assert(!clock);
 
-		return make_unique_clear<DriverClass>(mconfig, type, tag);
+		return std::make_unique<DriverClass>(mconfig, type, tag);
 	}
 
 	create_func const m_creator;

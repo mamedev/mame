@@ -46,8 +46,8 @@ protected:
 	required_memory_region m_rom;
 	required_device<centronics_device> m_centronics;
 
-	int m_romcs = 0;
-	int m_busy = 0;
+	int m_romcs;
+	int m_busy;
 };
 
 class spectrum_lprint3_device :
@@ -87,8 +87,8 @@ protected:
 	required_device<rs232_port_device> m_rs232;
 	required_device<spectrum_expansion_slot_device> m_exp;
 
-	int m_romcs = 0;
-	int m_busy = 0;
+	int m_romcs;
+	int m_busy;
 };
 
 class spectrum_kempcentrs_device :
@@ -115,7 +115,7 @@ protected:
 
 	required_device<centronics_device> m_centronics;
 
-	int m_busy = 0;
+	int m_busy;
 };
 
 class spectrum_kempcentre_device :
@@ -150,9 +150,9 @@ protected:
 	required_memory_region m_rom;
 	required_device<centronics_device> m_centronics;
 
-	int m_active = 0;
-	int m_romcs = 0;
-	int m_busy = 0;
+	int m_active;
+	int m_romcs;
+	int m_busy;
 };
 
 class spectrum_kempcentreu_device :

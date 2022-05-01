@@ -334,7 +334,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	int m_type = 0;
+	int m_type;
 	device_neogeo_cart_interface*       m_cart;
 };
 
