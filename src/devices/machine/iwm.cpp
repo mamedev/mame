@@ -30,16 +30,6 @@ iwm_device::iwm_device(const machine_config &mconfig, const char *tag, device_t 
 	m_fclk_q3_ratio = q3_clock ? double(q3_clock)/double(clock) : 0; // ~4
 }
 
-u64 iwm_device::q3_to_fclk(u64 cycles) const
-{
-	return u64(m_q3_fclk_ratio * double(cycles) + 0.5);
-}
-
-u64 iwm_device::fclk_to_q3(u64 cycles) const
-{
-	return u64(m_fclk_q3_ratio * double(cycles) + 0.5);
-}
-
 void iwm_device::device_start()
 {
 	applefdintf_device::device_start();
@@ -53,6 +43,7 @@ void iwm_device::device_start()
 	save_item(NAME(m_flux_write));
 	save_item(NAME(m_flux_write_count));
 	save_item(NAME(m_q3_clock));
+	save_item(NAME(m_q3_clock_active));
 	save_item(NAME(m_active));
 	save_item(NAME(m_rw));
 	save_item(NAME(m_rw_state));
@@ -88,6 +79,7 @@ void iwm_device::device_reset()
 	m_rw_bit_count = 0;
 	m_devsel = 0;
 	m_devsel_cb(0);
+	m_q3_clock_active = false;
 }
 
 void iwm_device::device_timer(emu_timer &, device_timer_id, int)
@@ -199,7 +191,7 @@ u8 iwm_device::control(int offset, u8 data)
 			if(m_rw != MODE_READ) {
 				if(m_rw == MODE_WRITE) {
 					flush_write();
-					m_flux_write_start = 0;
+					write_clock_stop();
 				}
 				m_rw = MODE_READ;
 				m_rw_state = S_IDLE;
@@ -215,8 +207,7 @@ u8 iwm_device::control(int offset, u8 data)
 				m_rw_state = S_IDLE;
 				m_whd |= 0x40;
 				m_next_state_change = 0;
-				m_flux_write_start = m_last_sync;
-				m_flux_write_count = 0;
+				write_clock_start();
 				if(m_floppy)
 					m_floppy->set_write_splice(cycles_to_time(m_flux_write_start));
 			}
@@ -225,7 +216,7 @@ u8 iwm_device::control(int offset, u8 data)
 		if(m_active == MODE_ACTIVE) {
 			flush_write();
 			if(m_mode & 0x04) {
-				m_flux_write_start = 0;
+				write_clock_stop();
 				m_active = MODE_IDLE;
 				m_rw = MODE_IDLE;
 				m_rw_state = S_IDLE;
@@ -318,12 +309,12 @@ void iwm_device::data_w(u8 data)
 
 u64 iwm_device::time_to_cycles(const attotime &tm) const
 {
-	return tm.as_ticks(clock());
+	return tm.as_ticks(m_q3_clock_active ? m_q3_clock : clock());
 }
 
 attotime iwm_device::cycles_to_time(u64 cycles) const
 {
-	return attotime::from_ticks(cycles, clock());
+	return attotime::from_ticks(cycles, m_q3_clock_active ? m_q3_clock : clock());
 }
 
 bool iwm_device::is_sync() const
@@ -333,6 +324,9 @@ bool iwm_device::is_sync() const
 
 u64 iwm_device::half_window_size() const
 {
+	if(m_q3_clock_active)
+		return m_mode & 0x08 ? 2 : 4;
+
 	switch(m_mode & 0x18) {
 	case 0x00: return 14;
 	case 0x08: return  7;
@@ -344,6 +338,9 @@ u64 iwm_device::half_window_size() const
 
 u64 iwm_device::window_size() const
 {
+	if(m_q3_clock_active)
+		return m_mode & 0x08 ? 4 : 8;
+
 	switch(m_mode & 0x18) {
 	case 0x00: return 28;
 	case 0x08: return 14;
@@ -358,9 +355,23 @@ u64 iwm_device::read_register_update_delay() const
 	return m_mode & 0x08 ? 4 : 8;
 }
 
-u64 iwm_device::write_sync_half_window_size() const
+void iwm_device::write_clock_start()
 {
-	return m_mode & 0x08 ? 2 : 4;
+	if(is_sync() && m_q3_clock) {
+		m_q3_clock_active = true;
+		m_last_sync = machine().time().as_ticks(m_q3_clock);
+	}
+	m_flux_write_start = m_last_sync;
+	m_flux_write_count = 0;
+}
+
+void iwm_device::write_clock_stop()
+{
+	if(m_q3_clock_active) {
+		m_q3_clock_active = false;
+		m_last_sync = machine().time().as_ticks(clock());
+	}
+	m_flux_write_start = 0;
 }
 
 void iwm_device::sync()
@@ -368,7 +379,7 @@ void iwm_device::sync()
 	if(!m_active)
 		return;
 
-	u64 next_sync = machine().time().as_ticks(clock());
+	u64 next_sync = machine().time().as_ticks(m_q3_clock_active ? m_q3_clock : clock());
 	switch(m_rw) {
 	case MODE_IDLE:
 		m_last_sync = next_sync;
@@ -463,10 +474,7 @@ void iwm_device::sync()
 				} else {
 					m_wsh = m_data;
 					m_rw_state = SW_WINDOW_MIDDLE;
-					if(m_q3_clock)
-						m_next_state_change = q3_to_fclk(fclk_to_q3(m_last_sync) + write_sync_half_window_size());
-					else
-						m_next_state_change = m_last_sync + half_window_size();
+					m_next_state_change = m_last_sync + half_window_size();
 				}
 				break;
 
@@ -474,7 +482,7 @@ void iwm_device::sync()
 				if(m_whd & 0x80) {
 					logerror("underrun\n");
 					flush_write(next_sync);
-					m_flux_write_start = 0;
+					write_clock_stop();
 					m_whd &= ~0x40;
 					m_last_sync = next_sync;
 					m_rw_state = SW_UNDERRUN;
@@ -492,10 +500,7 @@ void iwm_device::sync()
 					m_flux_write[m_flux_write_count++] = m_last_sync;
 				m_wsh <<= 1;
 				m_rw_state = SW_WINDOW_END;
-				if((m_mode & 0x02) || !m_q3_clock)
-					m_next_state_change = m_last_sync + half_window_size();
-				else
-					m_next_state_change = q3_to_fclk(fclk_to_q3(m_last_sync) + write_sync_half_window_size());
+				m_next_state_change = m_last_sync + half_window_size();
 				break;
 
 			case SW_WINDOW_END:
@@ -512,10 +517,7 @@ void iwm_device::sync()
 						m_next_state_change = m_last_sync + half_window_size();
 					}
 				} else {
-					if(m_q3_clock)
-						m_next_state_change = q3_to_fclk(fclk_to_q3(m_last_sync) + write_sync_half_window_size());
-					else
-						m_next_state_change = m_last_sync + half_window_size();
+					m_next_state_change = m_last_sync + half_window_size();
 					m_rw_state = SW_WINDOW_MIDDLE;
 				}
 				break;

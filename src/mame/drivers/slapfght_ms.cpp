@@ -447,8 +447,8 @@ ROM_END
 
 void slapfght_ms_state::init_decryption() // same as the one for blktiger_ms
 {
-	uint8_t *src = memregion("maincpu")->base();
-	int len = memregion("maincpu")->bytes();
+	uint8_t *const src = memregion("maincpu")->base();
+	auto const len = memregion("maincpu")->bytes();
 
 	// bitswap data
 	for (int i = 0; i < len; i++)

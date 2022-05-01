@@ -1556,8 +1556,6 @@ files {
 	MAME_DIR .. "src/mame/includes/fcrash.h",
 	MAME_DIR .. "src/mame/drivers/gng.cpp",
 	MAME_DIR .. "src/mame/drivers/gunsmoke.cpp",
-	MAME_DIR .. "src/mame/includes/gunsmoke.h",
-	MAME_DIR .. "src/mame/video/gunsmoke.cpp",
 	MAME_DIR .. "src/mame/drivers/higemaru.cpp",
 	MAME_DIR .. "src/mame/includes/higemaru.h",
 	MAME_DIR .. "src/mame/video/higemaru.cpp",
@@ -1692,8 +1690,6 @@ files {
 	MAME_DIR .. "src/mame/includes/boogwing.h",
 	MAME_DIR .. "src/mame/video/boogwing.cpp",
 	MAME_DIR .. "src/mame/drivers/brkthru.cpp",
-	MAME_DIR .. "src/mame/includes/brkthru.h",
-	MAME_DIR .. "src/mame/video/brkthru.cpp",
 	MAME_DIR .. "src/mame/drivers/btime.cpp",
 	MAME_DIR .. "src/mame/includes/btime.h",
 	MAME_DIR .. "src/mame/machine/btime.cpp",
@@ -3397,8 +3393,6 @@ files {
 createMAMEProjects(_target, _subtarget, "sanritsu")
 files {
 	MAME_DIR .. "src/mame/drivers/appoooh.cpp",
-	MAME_DIR .. "src/mame/includes/appoooh.h",
-	MAME_DIR .. "src/mame/video/appoooh.cpp",
 	MAME_DIR .. "src/mame/drivers/bankp.cpp",
 	MAME_DIR .. "src/mame/includes/bankp.h",
 	MAME_DIR .. "src/mame/video/bankp.cpp",

@@ -123,7 +123,6 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-
 	void megatech(machine_config &config);
 
 	void cart_select_w(uint8_t data);
@@ -145,7 +144,6 @@ private:
 	uint8_t sms_ioport_dd_r();
 	void mt_sms_standard_rom_bank_w(address_space &space, offs_t offset, uint8_t data);
 
-
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, int gameno);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart1 ) { return load_cart(image, m_cart1, 0); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart2 ) { return load_cart(image, m_cart2, 1); }
@@ -163,11 +161,11 @@ private:
 	void megatech_bios_map(address_map &map);
 	void megatech_bios_portmap(address_map &map);
 
-	uint8_t m_mt_cart_select_reg;
-	uint32_t m_bios_port_ctrl;
-	int m_current_machine_is_sms; // is the current game SMS based (running on genesis z80, in VDP compatibility mode)
-	uint32_t m_bios_ctrl_inputs;
-	int m_mt_bank_addr;
+	uint8_t m_mt_cart_select_reg = 0;
+	uint32_t m_bios_port_ctrl = 0;
+	int m_current_machine_is_sms = 0; // is the current game SMS based (running on genesis z80, in VDP compatibility mode)
+	uint32_t m_bios_ctrl_inputs = 0;
+	int m_mt_bank_addr = 0;
 
 	int m_cart_is_genesis[8];
 
@@ -297,7 +295,6 @@ static INPUT_PORTS_START( megatech ) /* Genesis Input Ports */
 	PORT_DIPSETTING(    0xd0, "1:30" )
 	PORT_DIPSETTING(    0xe0, "1:00" )
 	PORT_DIPSETTING(    0xf0, "0:30" )
-
 
 	PORT_START("BIOS_J1")
 	PORT_DIPNAME( 0x0001, 0x0001, "5" )
@@ -475,7 +472,7 @@ void mtech_state::cart_select_w(uint8_t data)
 	  but it stores something in (banked?) ram
 	  because it always seems to show the
 	  same instructions ... */
-	m_mt_cart_select_reg = data;
+	m_mt_cart_select_reg = data & 0x07;
 	switch_cart(m_mt_cart_select_reg);
 }
 
@@ -524,12 +521,12 @@ void mtech_state::mt_z80_bank_w(uint8_t data)
 
 uint8_t mtech_state::banked_ram_r(offs_t offset)
 {
-	return m_banked_ram[offset + 0x1000 * (m_mt_cart_select_reg & 0x07)];
+	return m_banked_ram[offset + 0x1000 * m_mt_cart_select_reg];
 }
 
 void mtech_state::banked_ram_w(offs_t offset, uint8_t data)
 {
-	m_banked_ram[offset + 0x1000 * (m_mt_cart_select_reg & 0x07)] = data;
+	m_banked_ram[offset + 0x1000 * m_mt_cart_select_reg] = data;
 }
 
 

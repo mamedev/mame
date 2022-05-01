@@ -225,6 +225,17 @@ void mn10200_device::device_start()
 		save_item(NAME(m_port[i].dir), i);
 	}
 
+	// registering reads the value, so clear it before
+	m_pc = 0;
+	m_mdr = 0;
+	m_nmicr = 0;
+	m_iagr = 0;
+	for (int i=0; i != 4; i++)
+	{
+		m_d[i] = 0;
+		m_a[i] = 0;
+	}
+
 	// register for debugger
 	state_add( MN10200_PC,    "PC",    m_pc ).mask(0xffffff).formatstr("%06X");
 	state_add( MN10200_MDR,   "MDR",   m_mdr).formatstr("%04X");

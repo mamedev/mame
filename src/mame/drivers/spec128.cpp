@@ -165,8 +165,17 @@ resulting mess can be seen in the F4 viewer display.
 /****************************************************************************************************/
 /* Spectrum 128 specific functions */
 
+void spectrum_128_state::video_start()
+{
+	m_frame_invert_count = 16;
+	m_screen_location = m_ram->pointer() + (5 << 14);
+	m_contention_pattern = {6, 5, 4, 3, 2, 1, 0, 0};
+}
+
 uint8_t spectrum_128_state::spectrum_128_pre_opcode_fetch_r(offs_t offset)
 {
+	if (is_contended(offset)) content_early();
+
 	/* this allows expansion devices to act upon opcode fetches from MEM addresses
 	   for example, interface1 detection fetches requires fetches at 0008 / 0708 to
 	   enable paged ROM and then fetches at 0700 to disable it
@@ -203,6 +212,9 @@ uint8_t spectrum_128_state::spectrum_128_bank1_r(offs_t offset)
 
 void spectrum_128_state::spectrum_128_port_7ffd_w(offs_t offset, uint8_t data)
 {
+	if (is_contended(offset)) content_early();
+	content_early(1);
+
 	/* D0-D2: RAM page located at 0x0c000-0x0ffff */
 	/* D3 - Screen select (screen 0 in ram page 5, screen 1 in ram page 7 */
 	/* D4 - ROM select - which rom paged into 0x0000-0x03fff */
@@ -233,6 +245,7 @@ void spectrum_128_state::spectrum_128_update_memory()
 	unsigned char *ram_data = messram + (ram_page<<14);
 	membank("bank4")->set_base(ram_data);
 
+	m_screen->update_now();
 	if (BIT(m_port_7ffd_data, 3))
 		m_screen_location = messram + (7<<14);
 	else
@@ -241,6 +254,12 @@ void spectrum_128_state::spectrum_128_update_memory()
 
 uint8_t spectrum_128_state::spectrum_port_r(offs_t offset)
 {
+	if (is_contended(offset))
+	{
+		content_early();
+		content_late();
+	}
+
 	// Pass through to expansion device if present
 	if (m_exp->get_card_device())
 		return m_exp->iorq_r(offset | 1);
@@ -289,6 +308,20 @@ void spectrum_128_state::machine_reset()
 	m_port_7ffd_data = 0;
 	m_port_1ffd_data = -1;
 	spectrum_128_update_memory();
+}
+
+bool spectrum_128_state::is_vram_write(offs_t offset) {
+	// TODO respect banks 2,5 mapped to 0xc000
+	return (BIT(m_port_7ffd_data, 3))
+		? offset >= 0x8000 && offset < 0x9b00
+		: spectrum_state::is_vram_write(offset);
+}
+
+bool spectrum_128_state::is_contended(offs_t offset) {
+	// Unlike the base 128K machine, RAM banks 4, 5, 6 and 7 are contended.
+	u8 mapped = m_port_7ffd_data & 0x07;
+	return spectrum_state::is_contended(offset) || (
+		(offset >= 0xc000 && offset <= 0xffff) && (mapped >= 4 && mapped <= 7));
 }
 
 static const gfx_layout spectrum_charlayout =

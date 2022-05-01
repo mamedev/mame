@@ -8259,7 +8259,7 @@ license:CC0
 		<description>Garou - Mark of the Wolves (NGH-2530)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
-		<info name="serial" value="NGM-2530"/>
+		<info name="serial" value="NGH-2530"/>
 		<info name="release" value="19991126"/>
 		<info name="alt_title" value="餓狼"/>
 		<sharedfeat name="release" value="AES" />
@@ -9133,7 +9133,7 @@ license:CC0
 		<description>The King of Fighters 2002 (NGM-2650 ~ NGH-2650)</description>
 		<year>2002</year>
 		<publisher>Eolith / Playmore</publisher>
-		<info name="serial" value="NGM-2650 (MVS), NGM-2650 (AES)"/>
+		<info name="serial" value="NGM-2650 (MVS), NGH-2650 (AES)"/>
 		<info name="release" value="20021010 (MVS), 20021219 (AES)"/>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ 2002"/>
 		<sharedfeat name="release" value="MVS,AES" />

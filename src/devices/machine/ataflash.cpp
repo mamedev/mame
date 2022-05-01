@@ -160,7 +160,7 @@ void taito_pccard1_device::write_reg(offs_t offset, uint16_t data, uint16_t mem_
 	{
 		uint8_t v = data;
 		int pos = offset - 0x280;
-		uint8_t k = pos < sizeof(m_key) ? m_key[pos] : 0;
+		uint8_t k = pos < m_key.size() ? m_key[pos] : 0;
 
 		// TODO: find out if unlocking the key then using an incorrect key will re-lock the card.
 		if (v == k)

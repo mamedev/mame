@@ -102,6 +102,7 @@ static const nes_pcb pcb_list[] =
 	{ "maxi15",           AVE_MAXI15 },
 	{ "bf9093",           CAMERICA_BF9093 },
 	{ "bf9096",           CAMERICA_BF9096 },
+	{ "bf9096a",          CAMERICA_BF9096_ALT },
 	{ "goldenfive",       CAMERICA_GOLDENFIVE },
 	{ "ade"   ,           CAMERICA_ALADDIN },
 	{ "cne_decathl",      CNE_DECATHLON },

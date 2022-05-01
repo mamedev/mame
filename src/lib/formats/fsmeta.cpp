@@ -44,19 +44,19 @@ std::optional<meta_name> meta_data::from_entry_name(const char *name)
 	return {};
 }
 
-template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
-template<class... Ts> overloaded(Ts...)->overloaded<Ts...>;
+template <class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
+template <class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
 meta_type meta_value::type() const
 {
 	std::optional<meta_type> result;
-	std::visit(overloaded
-	{
-		[&result](const std::string &)              { result = meta_type::string; },
-		[&result](std::uint64_t)                    { result = meta_type::number; },
-		[&result](bool)                             { result = meta_type::flag; },
-		[&result](const util::arbitrary_datetime &) { result = meta_type::date; }
-	}, value);
+	std::visit(
+			overloaded{
+				[&result] (const std::string &)              { result = meta_type::string; },
+				[&result] (std::uint64_t)                    { result = meta_type::number; },
+				[&result] (bool)                             { result = meta_type::flag; },
+				[&result] (const util::arbitrary_datetime &) { result = meta_type::date; } },
+			value);
 	return *result;
 }
 
@@ -64,18 +64,18 @@ std::string meta_value::as_string() const
 {
 	std::string result;
 
-	std::visit(overloaded
-	{
-		[&result](const std::string &s)				{ result = s; },
-		[&result](std::uint64_t i)					{ result = util::string_format("0x%x", i); },
-		[&result](bool b)							{ result = b ? "t" : "f"; },
-		[&result](const util::arbitrary_datetime &dt)
-		{
-			result = util::string_format("%04d-%02d-%02d %02d:%02d:%02d",
-				dt.year, dt.month, dt.day_of_month,
-				dt.hour, dt.minute, dt.second);
-		}
-	}, value);
+	std::visit(
+		overloaded{
+			[&result](const std::string &val) { result = val; },
+			[&result](std::uint64_t val) { result = util::string_format("0x%x", val); },
+			[&result](bool val) { result = val ? "t" : "f"; },
+			[&result](const util::arbitrary_datetime &val)
+			{
+				result = util::string_format("%04d-%02d-%02d %02d:%02d:%02d",
+					val.year, val.month, val.day_of_month,
+					val.hour, val.minute, val.second);
+			} },
+		value);
 	return result;
 }
 

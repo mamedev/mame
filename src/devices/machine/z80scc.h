@@ -39,12 +39,6 @@
 #include "diserial.h"
 
 //**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define Z80SCC_USE_LOCAL_BRG 0
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -64,7 +58,6 @@ public:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_serial_interface overrides
 	virtual void tra_callback() override;
@@ -128,6 +121,8 @@ public:
 	void rxc_w(int state);
 	void txc_w(int state);
 	void sync_w(int state);
+
+	TIMER_CALLBACK_MEMBER(brg_tick);
 
 	int m_rxc;
 	int m_txc;
@@ -235,14 +230,6 @@ protected:
 		REG_WR13_HI_BAUD_GEN    = 13,
 		REG_WR14_MISC_CTRL      = 14,
 		REG_WR15_EXT_ST_INT_CTRL= 15
-	};
-
-	enum
-	{
-		TIMER_ID_BAUD,
-		TIMER_ID_XTAL,
-		TIMER_ID_RTXC,
-		TIMER_ID_TRXC
 	};
 
 	emu_timer *m_baudtimer;

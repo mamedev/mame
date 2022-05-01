@@ -6581,6 +6581,38 @@ ROM_START( tdragonb2 )
 	ROM_LOAD( "shinea2a2-01", 0x00000, 0x80000, CRC(4556e717) SHA1(efdec7c989436f97e8f18b157bfd5f9da55b29ba) )
 ROM_END
 
+ROM_START( tdragonb3 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "tms27c010a.19e", 0x00000, 0x20000, CRC(659167c4) SHA1(bd9dbdf751869730513db186324c60abed4bc05e) )
+	ROM_LOAD16_BYTE( "tms27c010a.19c", 0x00001, 0x20000, CRC(02f5befc) SHA1(5c0b9e7c5a811adf5c50b6ea6703df670e5a703f) )
+
+	ROM_REGION(0x20000, "audiocpu", 0 )
+	ROM_LOAD( "d27512.4b",          0x00000, 0x8000, CRC(99ee7505) SHA1(b97c8ee5e26e8554b5de506fba3b32cc2fde53c9) )
+	ROM_CONTINUE(                   0x10000, 0x8000 )
+	ROM_COPY( "audiocpu",  0x00000, 0x18000, 0x8000 )
+
+	ROM_REGION( 0x20000, "fgtile", 0 ) // 8x8
+	ROM_LOAD( "tms27c010a.2k", 0x00000, 0x20000, CRC(5144dc69) SHA1(e64d88dc0e7672f811868621f74ec209aeafbc6f) )
+
+	ROM_REGION( 0x100000, "bgtile", 0 ) // 16x16
+	ROM_LOAD( "unreadable.18h", 0x000000, 0x100000, BAD_DUMP CRC(d0bde826) SHA1(3b74d5fc88a4a9329e101ee72f393608d327d816) ) // undumpable on this PCB, probably the same as the original as the other 2 GFX ROMs are
+
+	ROM_REGION( 0x100000, "sprites", 0 )
+	ROM_LOAD16_WORD_SWAP( "upd27c8000.18f", 0x000000, 0x100000, CRC(3eedc2fe) SHA1(9f48986c231a8fbc07f2b39b2017d1e967b2ed3c) )
+
+	ROM_REGION( 0x40000, "unknown_rom", 0 ) // between the main CPU and the bgtile ROMs
+	ROM_LOAD( "tms27c020.20g", 0x00000, 0x40000, CRC(1ed8a2da) SHA1(8eabc35f1eb88f49b83baf8bd72229d40efed248) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "m27c512.1c", 0x00000, 0x10000, CRC(f6f6c4bf) SHA1(ea4cf74d968e254ae47c16c2f4c2f4bc1a528808) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "n82s147n.7f", 0x000, 0x200, CRC(ed0bd072) SHA1(66a6d435d8587c82ae96dd09c39ed5749fe00e24) )
+
+	ROM_REGION( 0x200, "plds", 0 )
+	ROM_LOAD( "pal16l8acn.8b", 0x000, 0x104, CRC(92fa095c) SHA1(4c7ece64c402ab4716fcf58d11c5b0b131a7c3e8) )
+ROM_END
+
 ROM_START( ssmissin )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ssm14.165",    0x00001, 0x20000, CRC(eda61b74) SHA1(6247682c27d2be7dff1fad407ccf86fe2a25f11c) )
@@ -8990,7 +9022,8 @@ GAME( 1997, tomagic,   0,         tomagic,      tomagic,      nmk16_tomagic_stat
 // these use the Seibu sound system (sound / music stolen from Raiden) rather than the bootleggers copying the nmk004
 GAME( 1990, mustangb,   mustang,  mustangb,     mustang,      nmk16_state, empty_init,           ROT0,   "bootleg",                       "US AAF Mustang (bootleg, set 1)", 0 )
 GAME( 1990, mustangb2,  mustang,  mustangb,     mustang,      nmk16_state, empty_init,           ROT0,   "bootleg (TAB Austria)",         "US AAF Mustang (TAB Austria bootleg)", 0 ) // PCB and ROMs have TAB Austria stickers
-GAME( 1991, tdragonb,   tdragon,  tdragonb,     tdragonb,     nmk16_state, init_tdragonb,        ROT270, "bootleg",                       "Thunder Dragon (bootleg, set 1)", 0 )
+GAME( 1991, tdragonb,   tdragon,  tdragonb,     tdragonb,     nmk16_state, init_tdragonb,        ROT270, "bootleg",                       "Thunder Dragon (bootleg with Raiden sounds, encrypted)", 0 )
+GAME( 1991, tdragonb3,  tdragon,  tdragonb,     tdragonb,     nmk16_state, empty_init,           ROT270, "bootleg",                       "Thunder Dragon (bootleg with Raiden sounds, unencrypted)", 0 )
 GAME( 1992, strahljbl,  strahl,   strahljbl,    strahljbl,    nmk16_state, empty_init,           ROT0,   "bootleg",                       "Koutetsu Yousai Strahl (Japan, bootleg)", 0 )
 
 // these are bootlegs with tharrier like sound hw
@@ -8998,7 +9031,7 @@ GAME( 1990, mustangb3,  mustang,  mustangb3,    mustang,      nmk16_state, empty
 GAME( 1989, tharrierb,  tharrier, tharrier,     tharrier,     nmk16_state, init_tharrier,        ROT270, "bootleg (Lettering)",           "Task Force Harrier (Lettering bootleg)", 0 )
 
 // bootleg with no audio CPU and only 1 Oki
-GAME( 1991, tdragonb2,  tdragon,  tdragonb2,    tdragon,      nmk16_state, empty_init,           ROT270, "bootleg",                       "Thunder Dragon (bootleg, set 2)", MACHINE_NOT_WORKING ) // GFX and input problems. IRQs related?
+GAME( 1991, tdragonb2,  tdragon,  tdragonb2,    tdragon,      nmk16_state, empty_init,           ROT270, "bootleg",                       "Thunder Dragon (bootleg with reduced sound system)", MACHINE_NOT_WORKING ) // GFX and input problems. IRQs related?
 
 // bootleg with cloned airbustr sound hardware
 GAME( 1992, gunnailb,   gunnail,  gunnailb,     gunnail,      nmk16_state, init_gunnailb,        ROT270, "bootleg",                      "GunNail (bootleg)", MACHINE_IMPERFECT_SOUND ) // crappy sound, unknown how much of it is incomplete emulation and how much bootleg quality
