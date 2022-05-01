@@ -91,7 +91,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 private:
 	address_space_installer *m_installer[4];

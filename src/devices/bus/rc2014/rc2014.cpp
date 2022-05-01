@@ -16,52 +16,12 @@
 DEFINE_DEVICE_TYPE(RC2014_BUS,  rc2014_bus_device,  "rc2014_bus",  "rc2014 bus")
 DEFINE_DEVICE_TYPE(RC2014_SLOT, rc2014_slot_device, "rc2014_slot", "rc2014 slot")
 
-
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
 //-------------------------------------------------
-//  device_rc2014_card_interface - constructor
-//-------------------------------------------------
-
-device_rc2014_card_interface::device_rc2014_card_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device, "rc2014bus")
-	, m_bus(nullptr)
-{
-}
-
-//-------------------------------------------------
-//  rc2014_slot_device - constructor
-//-------------------------------------------------
-rc2014_slot_device::rc2014_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, RC2014_SLOT, tag, owner, clock)
-	, device_single_card_slot_interface<device_rc2014_card_interface>(mconfig, *this)
-	, m_bus(*this, finder_base::DUMMY_TAG)
-{
-}
-
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void rc2014_slot_device::device_start()
-{
-}
-
-void rc2014_slot_device::device_resolve_objects()
-{
-	device_rc2014_card_interface *const card(dynamic_cast<device_rc2014_card_interface *>(get_card_device()));
-
-	if (card)
-		card->set_bus_device(*m_bus);
-}
-
-
-//-------------------------------------------------
-//  rc2014_bus_device - constructor
+//  rc2014_bus_device 
 //-------------------------------------------------
 
 rc2014_bus_device::rc2014_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -78,11 +38,6 @@ rc2014_bus_device::rc2014_bus_device(const machine_config &mconfig, const char *
 {
 }
 
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
 void rc2014_bus_device::device_start()
 {
 	if (m_installer[AS_PROGRAM] == nullptr)
@@ -97,19 +52,6 @@ void rc2014_bus_device::device_start()
 	m_user3.resolve_safe();
 	m_user4.resolve_safe();
 }
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void rc2014_bus_device::device_reset()
-{
-}
-
-
-///-------------------------------------------------
-//  set_bus_clock - set main bus clock
-//-------------------------------------------------
 
 void rc2014_bus_device::set_bus_clock(u32 clock)
 {
@@ -130,7 +72,40 @@ address_space_installer *rc2014_bus_device::installer(int index) const
 	return m_installer[index];
 }
 
+//-------------------------------------------------
+//  device_rc2014_card_interface 
+//-------------------------------------------------
+
+device_rc2014_card_interface::device_rc2014_card_interface(const machine_config &mconfig, device_t &device)
+	: device_interface(device, "rc2014bus")
+	, m_bus(nullptr)
+{
+}
+
 void device_rc2014_card_interface::set_bus_device(rc2014_bus_device &bus_device)
 {
 	m_bus = &bus_device;
+}
+
+//-------------------------------------------------
+//  rc2014_slot_device
+//-------------------------------------------------
+
+rc2014_slot_device::rc2014_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, RC2014_SLOT, tag, owner, clock)
+	, device_single_card_slot_interface<device_rc2014_card_interface>(mconfig, *this)
+	, m_bus(*this, finder_base::DUMMY_TAG)
+{
+}
+
+void rc2014_slot_device::device_start()
+{
+}
+
+void rc2014_slot_device::device_resolve_objects()
+{
+	device_rc2014_card_interface *const card(dynamic_cast<device_rc2014_card_interface *>(get_card_device()));
+
+	if (card)
+		card->set_bus_device(*m_bus);
 }
