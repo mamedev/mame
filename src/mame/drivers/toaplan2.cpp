@@ -1066,6 +1066,26 @@ void toaplan2_state::batsugun_68k_mem(address_map &map)
 	map(0x700000, 0x700001).r(FUNC(toaplan2_state::video_count_r));
 }
 
+void toaplan2_state::batsugunbl_68k_mem(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x10ffff).ram();
+	// map(0x200004, 0x200005).r() // only cleared at boot?
+	map(0x200005, 0x200005).w(FUNC(toaplan2_state::fixeightbl_oki_bankswitch_w)); // TODO: doesn't sound correct
+	map(0x200009, 0x200009).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x200010, 0x200011).portr("IN1");
+	map(0x200014, 0x200015).portr("IN2");
+	map(0x200018, 0x200019).portr("SYS");
+	map(0x21f004, 0x21f005).portr("DSWA");
+	map(0x21f006, 0x21f007).portr("DSWB");
+	map(0x21f008, 0x21f009).portr("JMPR");
+	map(0x20001c, 0x20001d).nopw(); // leftover code from the original?
+	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
+	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x500000, 0x50000d).rw(m_vdp[1], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
+	map(0x700000, 0x700001).r(FUNC(toaplan2_state::video_count_r));
+}
+
 void toaplan2_state::pwrkick_68k_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
@@ -2346,6 +2366,31 @@ static INPUT_PORTS_START( batsugun )
 	PORT_CONFSETTING(       0x0020, "Hong Kong (Taito Corp.)" )
 	PORT_CONFSETTING(       0x0010, DEF_STR( Korea ) )
 	PORT_CONFSETTING(       0x0000, "Korea (Unite Trading)" )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( batsugunbl )
+	PORT_INCLUDE( batsugun )
+
+	PORT_MODIFY("JMPR")
+	PORT_CONFNAME( 0x000f,  0x0009, DEF_STR( Region ) ) //PORT_CONFLOCATION("JP:!4,!3,!2,!1")
+	PORT_CONFSETTING(       0x0009, DEF_STR( Europe ) )
+	PORT_CONFSETTING(       0x0008, "Europe (Taito Corp.)" )
+	PORT_CONFSETTING(       0x000b, DEF_STR( USA ) )
+	PORT_CONFSETTING(       0x000a, "USA (Taito Corp.)" )
+	PORT_CONFSETTING(       0x000f, DEF_STR( Japan ) )
+//  PORT_CONFSETTING(       0x000e, DEF_STR( Japan ) )
+	PORT_CONFSETTING(       0x000d, "Japan (Taito Corp.)" )
+//  PORT_CONFSETTING(       0x000c, "Japan (Taito Corp.)" )
+	PORT_CONFSETTING(       0x0007, DEF_STR( Southeast_Asia ) )
+	PORT_CONFSETTING(       0x0006, "Southeast Asia (Taito Corp.)" )
+	PORT_CONFSETTING(       0x0005, DEF_STR( Taiwan ) )
+	PORT_CONFSETTING(       0x0004, "Taiwan (Taito Corp.)" )
+	PORT_CONFSETTING(       0x0003, DEF_STR( Hong_Kong ) )
+	PORT_CONFSETTING(       0x0002, "Hong Kong (Taito Corp.)" )
+	PORT_CONFSETTING(       0x0001, DEF_STR( Korea ) )
+	PORT_CONFSETTING(       0x0000, "Korea (Unite Trading)" )
+	PORT_CONFNAME( 0x00f0,  0x00f0, "(null)" )
 INPUT_PORTS_END
 
 
@@ -3858,6 +3903,23 @@ void toaplan2_state::batsugun(machine_config &config)
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.4);
 }
 
+void toaplan2_state::batsugunbl(machine_config &config)
+{
+	batsugun(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::batsugunbl_68k_mem);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &toaplan2_state::cpu_space_fixeightbl_map);
+
+	m_vdp[0]->vint_out_cb().set_inputline(m_maincpu, M68K_IRQ_2, ASSERT_LINE);
+
+	MCFG_VIDEO_START_OVERRIDE(toaplan2_state, batsugunbl)
+
+	config.device_remove("audiocpu");
+	config.device_remove("ymsnd");
+
+	m_oki[0]->set_addrmap(0, &toaplan2_state::fixeightbl_oki);
+}
+
 void toaplan2_state::pwrkick(machine_config &config)
 {
 	/* basic machine hardware */
@@ -4900,8 +4962,6 @@ ROM_START( batsugunb )
 //  ROM_LOAD( "tp030_u19_gal16v8b-15.jed", 0x0000, 0x991, CRC(31be54a2) SHA1(06278942a9a2ea858c0352b2ef5a65bf329b7b82) )
 ROM_END
 
-
-
 ROM_START( batsugunsp )
 	ROM_REGION( 0x080000, "maincpu", 0 )            /* Main 68K code */
 	ROM_LOAD16_WORD_SWAP( "tp030-sp.u69", 0x000000, 0x080000, CRC(8072a0cd) SHA1(3a0a9cdf894926a16800c4882a2b00383d981367) )
@@ -4926,6 +4986,25 @@ ROM_START( batsugunsp )
 	ROM_LOAD( "tp030_u19_gal16v8b-15.bin", 0x0000, 0x117, CRC(f71669e8) SHA1(ec1fbe04605fee864af4b01f001af227938c9f21) )
 ROM_END
 
+// a cost-cutting bootleg PCB with only M68000 + OKIM6295. A pair of TPC1020 seem to do the job of the GP9001s.
+// according to the dumper 'audio is pretty garbage, and some sprites overlay the UI incorrectly'
+ROM_START( batsugunbl )
+	ROM_REGION( 0x080000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "27c240.bin", 0x000000, 0x080000, CRC(a34df8bb) SHA1(10d456f5437b21a95fd8018bdb19a08a110241c4) )
+
+	ROM_REGION( 0x400000, "gp9001_0", 0 ) // same as original
+	ROM_LOAD( "27c8100-j.bin", 0x000000, 0x100000, CRC(3024b793) SHA1(e161db940f069279356fca2c5bf2753f07773705) )
+	ROM_LOAD( "27c8100-k.bin", 0x100000, 0x100000, CRC(ed75730b) SHA1(341f0f728144a049486d996c9bb14078578c6879) )
+	ROM_LOAD( "27c8100-l.bin", 0x200000, 0x100000, CRC(fedb9861) SHA1(4b0917056bd359b21935358c6bcc729262be6417) )
+	ROM_LOAD( "27c8100-m.bin", 0x300000, 0x100000, CRC(d482948b) SHA1(31be7dc5cff072403b783bf203b9805ffcad7284) )
+
+	ROM_REGION( 0x200000, "gp9001_1", 0 ) // same as original
+	ROM_LOAD( "27c8100-n.bin",  0x000000, 0x100000, CRC(bcf5ba05) SHA1(40f98888a29cdd30cda5dfb60fdc667c69b0fdb0) )
+	ROM_LOAD( "27c8100-o.bin",  0x100000, 0x100000, CRC(0666fecd) SHA1(aa8f921fc51590b5b05bbe0b0ad0cce5ff359c64) )
+
+	ROM_REGION( 0x80000, "oki1", 0 ) // more samples to compensate for missing YM2151
+	ROM_LOAD( "27c040.bin", 0x00000, 0x80000, CRC(1f8ec1b6) SHA1(28107a90d29613ceddc001df2556543b33c1294c) )
+ROM_END
 
 ROM_START( pwrkick )
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
@@ -5881,6 +5960,7 @@ GAME( 1993, batsugun,    0,        batsugun,   batsugun,   toaplan2_state, init_
 GAME( 1993, batsuguna,   batsugun, batsugun,   batsugun,   toaplan2_state, init_dogyuun,    ROT270, "Toaplan", "Batsugun (older set)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, batsugunb,   batsugun, batsugun,   batsugun,   toaplan2_state, init_dogyuun,    ROT270, "Toaplan", "Batsugun (Korean PCB)", MACHINE_SUPPORTS_SAVE ) // cheap looking PCB (same 'TP-030' numbering as original) but without Mask ROMs.  Still has original customs etc.  Jumpers were set to the Korea Unite Trading license, so likely made in Korea, not a bootleg tho.
 GAME( 1993, batsugunsp,  batsugun, batsugun,   batsugun,   toaplan2_state, init_dogyuun,    ROT270, "Toaplan", "Batsugun - Special Version", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, batsugunbl,  batsugun, batsugunbl, batsugunbl, toaplan2_state, init_fixeightbl, ROT270, "Toaplan", "Batsugun (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // needs correct GFX offsets and oki banking fix
 
 GAME( 1994, pwrkick,     0,        pwrkick,    pwrkick,    toaplan2_state, empty_init,      ROT0,   "Sunwise",  "Power Kick (Japan)",    0 )
 GAME( 1995, othldrby,    0,        othldrby,   othldrby,   toaplan2_state, empty_init,      ROT0,   "Sunwise",  "Othello Derby (Japan)", 0 )
