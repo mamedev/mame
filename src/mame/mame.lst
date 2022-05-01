@@ -36746,6 +36746,7 @@ mt32                            //
 
 @source:roland_pr100.cpp
 pr100                           //
+pr100_201                       //
 
 @source:roland_r8.cpp
 r8                              //
