@@ -1,142 +1,61 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Sean Riddle
-/***************************************************************************
+/*******************************************************************************
 
-AMI S2000 series handhelds or other simple devices.
+Parker Brothers Wildfire, by Bob and Holly Doyle (prototype), and Garry Kitchen
+
+This is an electronic handheld pinball game. It has dozens of small leds to
+create the illusion of a moving ball, and even the flippers are leds. A drawing
+of a pinball table is added as overlay.
+
+Hardware notes:
+- AMI S2150, labeled C10641
+- RC circuit for speaker volume decay (see patent US4334679 FIG.5,
+  the 2 resistors at A12 are 10K and the cap is 4.7uF)
+
+led translation table: led Lzz from patent US4334679 FIG.4* = MAME y.x:
+*note: 2 mistakes in it: L19 between L12 and L14 should be L13, and L84 should of course be L48
+
+  0 = -      10 = 6.6    20 = 4.5    30 = 5.3    40 = 5.7    50 = 11.6
+  1 = 10.7   11 = 5.6    21 = 4.4    31 = 4.3    41 = 6.0    51 = 11.5
+  2 = 10.0   12 = 6.5    22 = 5.4    32 = 5.2    42 = 7.0    52 = 11.4
+  3 = 10.1   13 = 7.5    23 = 6.3    33 = 5.1    43 = 8.0    53 = 11.3
+  4 = 10.2   14 = 8.5    24 = 7.3    34 = 11.7   44 = 9.0    60 = 3.6
+  5 = 10.3   15 = 9.4    25 = 11.1   35 = 7.1    45 = 6.7    61 = 3.6(!)
+  6 = 10.4   16 = 8.4    26 = 9.3    36 = 9.1    46 = 7.7    62 = 3.5
+  7 = 10.5   17 = 7.4    27 = 9.2    37 = 5.0    47 = 8.7    63 = 3.5(!)
+  8 = 8.6    18 = 11.2   28 = 8.2    38 = 6.1    48 = 9.7    70 = 3.3
+  9 = 7.6    19 = 5.5    29 = 11.0   39 = 8.1    49 = -
+
+NOTE!: MAME external artwork is required
 
 TODO:
-- were any other handhelds with this MCU released?
-- wildfire sound can be improved, volume decay should be more steep at the start,
-  and the pitch sounds wrong too (latter is an MCU emulation problem)
+- sound can be improved, volume decay should be more steep at the start, and the
+  pitch sounds wrong too (latter is an MCU emulation problem)
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 #include "cpu/amis2000/amis2000.h"
-#include "video/pwm.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
+#include "video/pwm.h"
 #include "speaker.h"
 
-// internal artwork
 #include "wildfire.lh"
 
-//#include "hh_amis2k_test.lh" // common test-layout - use external artwork
-
-
-class hh_amis2k_state : public driver_device
-{
-public:
-	hh_amis2k_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_display(*this, "display"),
-		m_speaker(*this, "speaker"),
-		m_inputs(*this, "IN.%u", 0)
-	{ }
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	// devices
-	required_device<amis2000_base_device> m_maincpu;
-	optional_device<pwm_display_device> m_display;
-	optional_device<speaker_sound_device> m_speaker;
-	optional_ioport_array<4> m_inputs; // max 4
-
-	// misc common
-	u16 m_a = 0;                    // MCU address bus
-	u8 m_d = 0;                     // MCU data bus
-	int m_f = 0;                    // MCU F_out pin
-	u16 m_inp_mux = 0;              // multiplexed inputs mask
-
-	u8 read_inputs(int columns);
-};
-
-
-// machine start/reset
-
-void hh_amis2k_state::machine_start()
-{
-	// register for savestates
-	save_item(NAME(m_a));
-	save_item(NAME(m_d));
-	save_item(NAME(m_f));
-	save_item(NAME(m_inp_mux));
-}
-
-void hh_amis2k_state::machine_reset()
-{
-}
-
-
-
-/***************************************************************************
-
-  Helper Functions
-
-***************************************************************************/
-
-// generic input handlers
-
-u8 hh_amis2k_state::read_inputs(int columns)
-{
-	u8 ret = 0;
-
-	// read selected input rows
-	for (int i = 0; i < columns; i++)
-		if (m_inp_mux >> i & 1)
-			ret |= m_inputs[i]->read();
-
-	return ret;
-}
-
-
-
-/***************************************************************************
-
-  Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
-
-***************************************************************************/
 
 namespace {
 
-/***************************************************************************
-
-  Parker Brothers Wildfire, by Bob and Holly Doyle (prototype), and Garry Kitchen
-  * AMI S2150, labeled C10641
-  * RC circuit for speaker volume decay (see patent US4334679 FIG.5,
-    the 2 resistors at A12 are 10K and the cap is 4.7uF)
-
-  This is an electronic handheld pinball game. It has dozens of small leds
-  to create the illusion of a moving ball, and even the flippers are leds.
-  A drawing of a pinball table is added as overlay.
-
-  led translation table: led Lzz from patent US4334679 FIG.4* = MAME y.x:
-  *note: 2 mistakes in it: L19 between L12 and L14 should be L13, and L84 should of course be L48
-
-    0 = -      10 = 6.6    20 = 4.5    30 = 5.3    40 = 5.7    50 = 11.6
-    1 = 10.7   11 = 5.6    21 = 4.4    31 = 4.3    41 = 6.0    51 = 11.5
-    2 = 10.0   12 = 6.5    22 = 5.4    32 = 5.2    42 = 7.0    52 = 11.4
-    3 = 10.1   13 = 7.5    23 = 6.3    33 = 5.1    43 = 8.0    53 = 11.3
-    4 = 10.2   14 = 8.5    24 = 7.3    34 = 11.7   44 = 9.0    60 = 3.6
-    5 = 10.3   15 = 9.4    25 = 11.1   35 = 7.1    45 = 6.7    61 = 3.6(!)
-    6 = 10.4   16 = 8.4    26 = 9.3    36 = 9.1    46 = 7.7    62 = 3.5
-    7 = 10.5   17 = 7.4    27 = 9.2    37 = 5.0    47 = 8.7    63 = 3.5(!)
-    8 = 8.6    18 = 11.2   28 = 8.2    38 = 6.1    48 = 9.7    70 = 3.3
-    9 = 7.6    19 = 5.5    29 = 11.0   39 = 8.1    49 = -
-
-  NOTE!: MAME external artwork is required
-
-***************************************************************************/
-
-class wildfire_state : public hh_amis2k_state
+class wildfire_state : public driver_device
 {
 public:
 	wildfire_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_amis2k_state(mconfig, type, tag)
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_display(*this, "display"),
+		m_speaker(*this, "speaker")
 	{ }
 
 	void wildfire(machine_config &config);
@@ -145,6 +64,10 @@ protected:
 	virtual void machine_start() override;
 
 private:
+	required_device<amis2000_base_device> m_maincpu;
+	required_device<pwm_display_device> m_display;
+	required_device<speaker_sound_device> m_speaker;
+
 	void update_display();
 	void write_d(u8 data);
 	void write_a(u16 data);
@@ -153,17 +76,27 @@ private:
 	void speaker_update();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
 	double m_speaker_volume = 0.0;
-
 	std::vector<double> m_speaker_levels;
+
+	u16 m_a = 0;
+	u8 m_d = 0;
+	int m_f = 0;
 };
 
 void wildfire_state::machine_start()
 {
-	hh_amis2k_state::machine_start();
+	// register for savestates
+	save_item(NAME(m_a));
+	save_item(NAME(m_d));
+	save_item(NAME(m_f));
 	save_item(NAME(m_speaker_volume));
 }
 
-// handlers
+
+
+/*******************************************************************************
+    I/O
+*******************************************************************************/
 
 void wildfire_state::speaker_update()
 {
@@ -210,7 +143,11 @@ WRITE_LINE_MEMBER(wildfire_state::write_f)
 	speaker_update();
 }
 
-// config
+
+
+/*******************************************************************************
+    Input Ports
+*******************************************************************************/
 
 static INPUT_PORTS_START( wildfire )
 	PORT_START("IN.0") // I
@@ -219,6 +156,12 @@ static INPUT_PORTS_START( wildfire )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Right Flipper")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
+
+
+
+/*******************************************************************************
+    Machine Configs
+*******************************************************************************/
 
 // 7seg decoder table differs from default, this one is made by hand
 static const u8 wildfire_7seg_table[0x10] =
@@ -256,7 +199,11 @@ void wildfire_state::wildfire(machine_config &config)
 	m_speaker->set_levels(0x8000, &m_speaker_levels[0]);
 }
 
-// roms
+
+
+/*******************************************************************************
+    ROM Definitions
+*******************************************************************************/
 
 ROM_START( wildfire )
 	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASE00 )
@@ -265,15 +212,13 @@ ROM_START( wildfire )
 	ROM_CONTINUE(          0x0600, 0x0200 )
 ROM_END
 
-
-
 } // anonymous namespace
 
-/***************************************************************************
 
-  Game driver(s)
 
-***************************************************************************/
+/*******************************************************************************
+    Drivers
+*******************************************************************************/
 
 //    YEAR  NAME      PARENT CMP MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1979, wildfire, 0,      0, wildfire, wildfire, wildfire_state, empty_init, "Parker Brothers", "Wildfire (patent)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK ) // note: pretty sure that it matches the commercial release
