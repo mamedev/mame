@@ -222,7 +222,7 @@ public:
 
 	template <typename T, typename U>
 	rc2014_ext_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&bus_tag, U &&slot_options, char const *default_option)
-		: rc2014_slot_device(mconfig, tag, owner, DERIVED_CLOCK(1,1))
+		: rc2014_ext_slot_device(mconfig, tag, owner, DERIVED_CLOCK(1,1))
 	{
 		m_bus.set_tag(std::forward<T>(bus_tag));
 		option_reset();
