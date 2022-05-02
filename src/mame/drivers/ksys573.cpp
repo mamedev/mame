@@ -62,7 +62,6 @@ D Dance Dance Revolution Solo 2000              1999.12    GC905 AA/JA       905
 D Dance Dance Revolution 3rdMIX PLUS            2000.06    GCA22 JA          A22 JA A02
 D Dance Dance Revolution 4thMIX                 2000.08    GCA33 JA          A33 JA A02
 D Dance Dance Revolution 4thMIX PLUS            2000.12    GCA34 JA          A34 JA A02
-? *Dance Dance Revolution Kids                  2000.12
 D Dance Dance Revolution 5thMIX                 2001.03    GCA27 JA          A27 JA A02
 D DDRMAX Dance Dance Revolution 6thMIX          2001.10    GCB19 JA          B19 JA A02
 D DDRMAX2 Dance Dance Revolution 7thMIX         2002.03    GCB20 JA          B20 JA A02
