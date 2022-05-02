@@ -93,16 +93,13 @@ z180_device::z180_device(const machine_config &mconfig, device_type type, const 
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0, 16, 12, internal_map)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_decrypted_opcodes_config("opcodes", ENDIANNESS_LITTLE, 8, 20, 0, 16, 12, internal_map)
+	, m_asci_0(*this, "asci_0")
+	, m_asci_1(*this, "asci_1")
 	, m_extended_io(extended_io)
 	, m_tend0_cb(*this)
 	, m_tend1_cb(*this)
 {
 	// some arbitrary initial values
-	m_asci_cntla[0] = m_asci_cntla[1] = 0;
-	m_asci_cntlb[0] = m_asci_cntlb[1] = 0;
-	m_asci_stat[0] = 0;
-	m_asci_tdr[0] = m_asci_tdr[1] = 0;
-	m_asci_rdr[0] = m_asci_rdr[1] = 0;
 	m_csio_trdr = 0;
 	m_tmdr[0].w = m_tmdr[1].w = 0;
 	m_rldr[0].w = m_rldr[1].w = 0xffff;
@@ -241,60 +238,6 @@ bool z180_device::get_tend1()
 #define _HY     m_IY.b.h
 #define _LY     m_IY.b.l
 
-
-/* 00 ASCI control register A ch 0 */
-#define Z180_CNTLA0_MPE         0x80
-#define Z180_CNTLA0_RE          0x40
-#define Z180_CNTLA0_TE          0x20
-#define Z180_CNTLA0_RTS0        0x10
-#define Z180_CNTLA0_MPBR_EFR    0x08
-#define Z180_CNTLA0_MODE_DATA   0x04
-#define Z180_CNTLA0_MODE_PARITY 0x02
-#define Z180_CNTLA0_MODE_STOPB  0x01
-
-/* 01 ASCI control register A ch 1 */
-#define Z180_CNTLA1_MPE         0x80
-#define Z180_CNTLA1_RE          0x40
-#define Z180_CNTLA1_TE          0x20
-#define Z180_CNTLA1_CKA1D       0x10
-#define Z180_CNTLA1_MPBR_EFR    0x08
-#define Z180_CNTLA1_MODE        0x07
-
-/* 02 ASCI control register B ch 0 */
-#define Z180_CNTLB0_MPBT        0x80
-#define Z180_CNTLB0_MP          0x40
-#define Z180_CNTLB0_CTS_PS      0x20
-#define Z180_CNTLB0_PEO         0x10
-#define Z180_CNTLB0_DR          0x08
-#define Z180_CNTLB0_SS          0x07
-
-/* 03 ASCI control register B ch 1 */
-#define Z180_CNTLB1_MPBT        0x80
-#define Z180_CNTLB1_MP          0x40
-#define Z180_CNTLB1_CTS_PS      0x20
-#define Z180_CNTLB1_PEO         0x10
-#define Z180_CNTLB1_DR          0x08
-#define Z180_CNTLB1_SS          0x07
-
-/* 04 ASCI status register 0 (all bits read-only except RIE and TIE) */
-#define Z180_STAT0_RDRF         0x80
-#define Z180_STAT0_OVRN         0x40
-#define Z180_STAT0_PE           0x20
-#define Z180_STAT0_FE           0x10
-#define Z180_STAT0_RIE          0x08
-#define Z180_STAT0_DCD0         0x04
-#define Z180_STAT0_TDRE         0x02
-#define Z180_STAT0_TIE          0x01
-
-/* 05 ASCI status register 1 (all bits read-only except RIE, CTS1E and TIE) */
-#define Z180_STAT1_RDRF         0x80
-#define Z180_STAT1_OVRN         0x40
-#define Z180_STAT1_PE           0x20
-#define Z180_STAT1_FE           0x10
-#define Z180_STAT1_RIE          0x08
-#define Z180_STAT1_CTS1E        0x04
-#define Z180_STAT1_TDRE         0x02
-#define Z180_STAT1_TIE          0x01
 
 /* 0a CSI/O control/status register (EF is read-only) */
 #define Z180_CNTR_EF            0x80
@@ -505,54 +448,43 @@ uint8_t z180_device::z180_internal_port_read(uint8_t port)
 	switch (port)
 	{
 	case 0x00:
-		data = m_asci_cntla[0];
-		LOG("Z180 CNTLA0 rd $%02x\n", data);
+		data = m_asci_0->cntla_r();
 		break;
 
 	case 0x01:
-		data = m_asci_cntla[1];
-		LOG("Z180 CNTLA1 rd $%02x\n", data);
+		data = m_asci_1->cntla_r();
 		break;
 
 	case 0x02:
-		data = m_asci_cntlb[0];
-		LOG("Z180 CNTLB0 rd $%02x\n", data);
+		data = m_asci_0->cntlb_r();
 		break;
 
 	case 0x03:
-		data = m_asci_cntlb[1];
-		LOG("Z180 CNTLB1 rd $%02x\n", data);
+		data = m_asci_1->cntlb_r();
 		break;
 
 	case 0x04:
-		data = m_asci_stat[0];
-		data |= 0x02; // kludge for 20pacgal
-		LOG("Z180 STAT0  rd $%02x\n", data);
+		data = m_asci_0->stat_r();
 		break;
 
 	case 0x05:
-		data = m_asci_stat[1];
-		LOG("Z180 STAT1  rd $%02x\n", data);
+		data = m_asci_1->stat_r();
 		break;
 
 	case 0x06:
-		data = m_asci_tdr[0];
-		LOG("Z180 TDR0   rd $%02x\n", data);
+		data = m_asci_0->tdr_r();
 		break;
 
 	case 0x07:
-		data = m_asci_tdr[1];
-		LOG("Z180 TDR1   rd $%02x\n", data);
+		data = m_asci_1->tdr_r();
 		break;
 
 	case 0x08:
-		data = m_asci_rdr[0];
-		LOG("Z180 RDR0   rd $%02x\n", data);
+		data = m_asci_0->rdr_r();
 		break;
 
 	case 0x09:
-		data = m_asci_rdr[1];
-		LOG("Z180 RDR1   rd $%02x\n", data);
+		data = m_asci_1->rdr_r();
 		break;
 
 	case 0x0a:
@@ -869,53 +801,43 @@ void z180_device::z180_internal_port_write(uint8_t port, uint8_t data)
 	switch (port)
 	{
 	case 0x00:
-		LOG("Z180 CNTLA0 wr $%02x\n", data);
-		m_asci_cntla[0] = data;
+		m_asci_0->cntla_w(data);
 		break;
 
 	case 0x01:
-		LOG("Z180 CNTLA1 wr $%02x\n", data);
-		m_asci_cntla[1] = data;
+		m_asci_1->cntla_w(data);
 		break;
 
 	case 0x02:
-		LOG("Z180 CNTLB0 wr $%02x\n", data);
-		m_asci_cntlb[0] = data;
+		m_asci_0->cntlb_w(data);
 		break;
 
 	case 0x03:
-		LOG("Z180 CNTLB1 wr $%02x\n", data);
-		m_asci_cntlb[1] = data;
+		m_asci_1->cntlb_w(data);
 		break;
 
 	case 0x04:
-		LOG("Z180 STAT0  wr $%02x ($%02x)\n", data,  data & (Z180_STAT0_RIE | Z180_STAT0_TIE));
-		m_asci_stat[0] = (m_asci_stat[0] & ~(Z180_STAT0_RIE | Z180_STAT0_TIE)) | (data & (Z180_STAT0_RIE | Z180_STAT0_TIE));
+		m_asci_0->stat_w(data);
 		break;
 
 	case 0x05:
-		LOG("Z180 STAT1  wr $%02x ($%02x)\n", data,  data & (Z180_STAT1_RIE | Z180_STAT1_CTS1E | Z180_STAT1_TIE));
-		m_asci_stat[1] = (m_asci_stat[1] & ~(Z180_STAT1_RIE | Z180_STAT1_CTS1E | Z180_STAT1_TIE)) | (data & (Z180_STAT1_RIE | Z180_STAT1_CTS1E | Z180_STAT1_TIE));
+		m_asci_1->stat_w(data);
 		break;
 
 	case 0x06:
-		LOG("Z180 TDR0   wr $%02x\n", data);
-		m_asci_tdr[0] = data;
+		m_asci_0->tdr_w(data);
 		break;
 
 	case 0x07:
-		LOG("Z180 TDR1   wr $%02x\n", data);
-		m_asci_tdr[1] = data;
+		m_asci_1->tdr_w(data);
 		break;
 
 	case 0x08:
-		LOG("Z180 RDR0   wr $%02x\n", data);
-		m_asci_rdr[0] = data;
+		m_asci_0->rdr_w(data);
 		break;
 
 	case 0x09:
-		LOG("Z180 RDR1   wr $%02x\n", data);
-		m_asci_rdr[1] = data;
+		m_asci_1->rdr_w(data);
 		break;
 
 	case 0x0a:
@@ -1236,12 +1158,16 @@ void z8s180_device::z180_internal_port_write(uint8_t port, uint8_t data)
 	case 0x1e:
 		LOG("Z180 CMR    wr $%02x ($%02x)\n", data,  data & Z180_CMR_MASK);
 		m_cmr = data & Z180_CMR_MASK;
+		m_asci_0->set_clock((m_cmr & 0x80) ? (clock() * 2) : (m_ccr & 0x80) ? clock() : (clock() / 2));
+		m_asci_1->set_clock((m_cmr & 0x80) ? (clock() * 2) : (m_ccr & 0x80) ? clock() : (clock() / 2));
 		notify_clock_changed();
 		break;
 
 	case 0x1f:
 		LOG("Z180 CCR    wr $%02x\n", data);
 		m_ccr = data;
+		m_asci_0->set_clock((m_cmr & 0x80) ? (clock() * 2) : (m_ccr & 0x80) ? clock() : (clock() / 2));
+		m_asci_1->set_clock((m_cmr & 0x80) ? (clock() * 2) : (m_ccr & 0x80) ? clock() : (clock() / 2));
 		notify_clock_changed();
 		break;
 
@@ -1725,18 +1651,6 @@ void z180_device::device_start()
 
 		state_add(Z180_IOLINES,    "IOLINES",   m_ioltemp).mask(0xffffff).callimport();
 
-		state_add(Z180_CNTLA0,     "CNTLA0",    m_asci_cntla[0]);
-		state_add(Z180_CNTLB0,     "CNTLB0",    m_asci_cntlb[0]);
-		state_add(Z180_STAT0,      "STAT0",     m_asci_stat[0]);
-		state_add(Z180_TDR0,       "TDR0",      m_asci_tdr[0]);
-		state_add(Z180_RDR0,       "RDR0",      m_asci_rdr[0]);
-
-		state_add(Z180_CNTLA1,     "CNTLA1",    m_asci_cntla[1]);
-		state_add(Z180_CNTLB1,     "CNTLB1",    m_asci_cntlb[1]);
-		state_add(Z180_STAT1,      "STAT1",     m_asci_stat[1]);
-		state_add(Z180_TDR1,       "TDR1",      m_asci_tdr[1]);
-		state_add(Z180_RDR1,       "RDR1",      m_asci_rdr[1]);
-
 		state_add(Z180_CNTR,       "CNTR",      m_csio_cntr).mask(Z180_CNTR_MASK);
 		state_add(Z180_TRDR,       "TRDR",      m_csio_trdr);
 
@@ -1798,11 +1712,6 @@ void z180_device::device_start()
 	save_item(NAME(m_tmdrh));
 	save_item(NAME(m_tmdr_latch));
 
-	save_item(NAME(m_asci_cntla));
-	save_item(NAME(m_asci_cntlb));
-	save_item(NAME(m_asci_stat));
-	save_item(NAME(m_asci_tdr));
-	save_item(NAME(m_asci_rdr));
 	save_item(NAME(m_csio_cntr));
 	save_item(NAME(m_csio_trdr));
 	save_item(NAME(m_tmdr[0].w));
@@ -1912,12 +1821,6 @@ void z180_device::device_reset()
 	m_frc_prescale = 0;
 
 	/* reset io registers */
-	m_asci_cntla[0] = (m_asci_cntla[0] & Z180_CNTLA0_MPBR_EFR) | Z180_CNTLA0_RTS0;
-	m_asci_cntla[1] = (m_asci_cntla[1] & Z180_CNTLA1_MPBR_EFR) | Z180_CNTLA1_CKA1D;
-	m_asci_cntlb[0] = (m_asci_cntlb[0] & (Z180_CNTLB0_MPBT | Z180_CNTLB0_CTS_PS)) | 0x07;
-	m_asci_cntlb[1] = (m_asci_cntlb[1] & Z180_CNTLB1_MPBT) | 0x07;
-	m_asci_stat[0] = m_asci_stat[0] & (Z180_STAT0_DCD0 | Z180_STAT0_TDRE);
-	m_asci_stat[1] = Z180_STAT1_TDRE;
 	m_csio_cntr = 0x07;
 	m_tcr = 0x00;
 	m_dma_iar1.b.h2 = 0x00;
@@ -1936,6 +1839,14 @@ void z180_device::device_reset()
 	z180_mmu();
 }
 
+void z180_device::device_add_mconfig(machine_config &config)
+{
+	Z180ASCI_CHANNEL(config, m_asci_0, DERIVED_CLOCK(1,2));
+	m_asci_0->set_id(0);
+	Z180ASCI_CHANNEL(config, m_asci_1, DERIVED_CLOCK(1,2));
+	m_asci_1->set_id(1);
+}
+
 void z8s180_device::device_reset()
 {
 	z180_device::device_reset();
@@ -1945,6 +1856,8 @@ void z8s180_device::device_reset()
 	m_cmr = 0x00;
 	m_ccr = 0x00;
 	notify_clock_changed();
+	m_asci_0->set_clock((m_cmr & 0x80) ? (clock() * 2) : (m_ccr & 0x80) ? clock() : (clock() / 2));
+	m_asci_1->set_clock((m_cmr & 0x80) ? (clock() * 2) : (m_ccr & 0x80) ? clock() : (clock() / 2));
 }
 
 /* Handle PRT timers, decreasing them after 20 clocks and returning the new icount base that needs to be used for the next check */
@@ -2005,6 +1918,9 @@ int z180_device::check_interrupts()
 
 		if (m_irq_state[2] != CLEAR_LINE && (m_itc & Z180_ITC_ITE2) == Z180_ITC_ITE2)
 			m_int_pending[Z180_INT_IRQ2] = 1;
+
+		m_int_pending[Z180_INT_ASCI0] = m_asci_0->check_interrupt();
+		m_int_pending[Z180_INT_ASCI1] = m_asci_1->check_interrupt();
 	}
 
 	for (i = 0; i <= Z180_INT_MAX; i++)
@@ -2012,6 +1928,8 @@ int z180_device::check_interrupts()
 		{
 			cycles += take_interrupt(i);
 			m_int_pending[i] = 0;
+			if (i==Z180_INT_ASCI0) m_asci_0->clear_interrupt();
+			if (i==Z180_INT_ASCI1) m_asci_1->clear_interrupt();
 			break;
 		}
 
