@@ -32,6 +32,7 @@ CPUS["M680X0"] = true
 --CPUS["COP400"] = true
 CPUS["F8"] = true
 CPUS["CCPU"] = true
+CPUS["MCS40"] = true
 
 --------------------------------------------------
 -- Specify all the sound cores necessary for the
@@ -60,6 +61,7 @@ SOUNDS["SN76477"] = true
 SOUNDS["SN76496"] = true
 SOUNDS["SP0250"] = true
 SOUNDS["TMS36XX"] = true
+SOUNDS["TMS5110"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -396,6 +398,12 @@ files{
 	MAME_DIR .. "src/mame/drivers/starcrus.cpp",
 	MAME_DIR .. "src/mame/includes/starcrus.h",
 	MAME_DIR .. "src/mame/video/starcrus.cpp",
+	
+	MAME_DIR .. "src/mame/drivers/dragrace.cpp",
+	MAME_DIR .. "src/mame/includes/dragrace.h",
+	MAME_DIR .. "src/mame/audio/dragrace.cpp",
+	MAME_DIR .. "src/mame/video/dragrace.cpp",
+	
 
 	-- Skeletons ...
 	MAME_DIR .. "src/mame/drivers/a1supply.cpp",

@@ -14707,6 +14707,7 @@ moonaln                         // [Nichibutsu] (Karateco license) or hack
 mooncmw                         // bootleg
 mooncptc                        // bootleg (Petaco S.A.)
 mooncreg                        // bootleg
+mooncreg2                       // bootleg
 mooncrgx                        // bootleg
 mooncrs2                        // bootleg
 mooncrs3                        // bootleg
@@ -16457,9 +16458,6 @@ heromem                         // E34 (c) 1997 Taito
 @source:hexion.cpp
 hexion                          // GX122 (c) 1992
 hexionb                         // bootleg
-
-@source:hh_amis2k.cpp
-wildfire                        // Parker Bros
 
 @source:hh_cop400.cpp
 bship82                         // Milton Bradley
@@ -36749,6 +36747,7 @@ mt32                            //
 
 @source:roland_pr100.cpp
 pr100                           //
+pr100_201                       //
 
 @source:roland_r8.cpp
 r8                              //
@@ -37580,6 +37579,9 @@ scorpio                         //
 
 @source:scotrsht.cpp
 scotrsht                        // GX545 (c) 1985
+
+@source:scrablex.cpp
+scrablex                        // Selchow & Righter
 
 @source:scramble.cpp
 800fath                         // (c) 1981 Amenip + U.S. Billiards license
@@ -41822,6 +41824,7 @@ batrideru                       // (c) 1998 Raizing/8ing
 batsugun                        // TP-030 (c) 1993 Toaplan
 batsuguna                       // TP-030 (c) 1993 Toaplan
 batsugunb                       //
+batsugunbl                      // bootleg
 batsugunsp                      // TP-030 (c) 1993 Toaplan
 bbakraid                        // (c) 1999 8ing
 bbakraidc                       // (c) 1999 8ing
@@ -43423,6 +43426,9 @@ wicat                           //
 
 @source:wico.cpp
 aftor                           //
+
+@source:wildfire.cpp
+wildfire                        // Parker Bros
 
 @source:wildpkr.cpp
 tabpkr                          // 199?, TAB Austira

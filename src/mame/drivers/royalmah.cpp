@@ -768,7 +768,7 @@ void royalmah_state::pongboo2_map(address_map &map)
 {
 	map(0x0000, 0x6fff).rom().region("maincpu", 0);
 	map(0x7000, 0x7fff).ram().share("nvram");
-	map(0x8000, 0xffff).rom().region("maincpu", 0x8000); // TODO: should be banked, as changing the offset to the other ROMs shows other graphics
+	map(0x8000, 0xffff).rom().region("maincpu", 0x8000); // TODO: should be banked, as changing the offset shows other graphics
 	map(0x8000, 0xffff).writeonly().share(m_videoram);
 }
 

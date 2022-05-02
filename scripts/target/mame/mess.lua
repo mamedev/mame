@@ -1170,6 +1170,7 @@ FORMATS["THOM_CAS"] = true
 FORMATS["THOM_DSK"] = true
 FORMATS["TI99_DSK"] = true
 FORMATS["TIKI100_DSK"] = true
+FORMATS["TIM011_DSK"] = true
 FORMATS["TRD_DSK"] = true
 FORMATS["TRS80_DSK"] = true
 FORMATS["TRS_CAS"] = true
@@ -1211,7 +1212,6 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"akai",
 		"alesis",
 		"altos",
-		"ami",
 		"amirix",
 		"amiga",
 		"ampro",
@@ -1403,6 +1403,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"sanyo",
 		"saturn",
 		"segacons",
+		"selchow",
 		"sequential",
 		"sgi",
 		"sharp",
@@ -1763,11 +1764,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/altos486.cpp",
 	MAME_DIR .. "src/mame/drivers/altos8600.cpp",
 	MAME_DIR .. "src/mame/machine/acs8600_ics.cpp",
-}
-
-createMESSProjects(_target, _subtarget, "ami")
-files {
-	MAME_DIR .. "src/mame/drivers/hh_amis2k.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "amirix")
@@ -3372,6 +3368,7 @@ createMESSProjects(_target, _subtarget, "parker")
 files {
 	MAME_DIR .. "src/mame/drivers/talkingbb.cpp",
 	MAME_DIR .. "src/mame/drivers/talkingfb.cpp",
+	MAME_DIR .. "src/mame/drivers/wildfire.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "pitronic")
@@ -3691,6 +3688,11 @@ files {
 	MAME_DIR .. "src/mame/machine/megacd.h",
 	MAME_DIR .. "src/mame/machine/megacdcd.cpp",
 	MAME_DIR .. "src/mame/machine/megacdcd.h",
+}
+
+createMESSProjects(_target, _subtarget, "selchow")
+files {
+	MAME_DIR .. "src/mame/drivers/scrablex.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "sequential")

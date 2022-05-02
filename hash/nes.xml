@@ -30106,6 +30106,7 @@ license:CC0
 		</part>
 	</software>
 
+<!-- Only Go Dizzy Go works -->
 	<software name="quatrarc" supported="partial">
 		<description>Quattro Arcade (USA)</description>
 		<year>1992</year>
@@ -30124,7 +30125,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="quatrspt" cloneof="supsport">
+<!-- BMX Simulator doesn't respond to start on its title screen -->
+	<software name="quatrspt" cloneof="supsport" supported="partial">
 		<description>Quattro Sports (USA)</description>
 		<year>1991</year>
 		<publisher>Camerica</publisher>
@@ -36501,8 +36503,8 @@ license:CC0
 		<year>19??</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bf9096" />
-			<feature name="pcb" value="CAMERICA-BF9096" />
+			<feature name="slot" value="bf9096a" />
+			<feature name="pcb" value="CAMERICA-BF9096-ALT" />
 			<feature name="pcb_model" value="NR8OV2-1" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 CHR" />
@@ -51230,8 +51232,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="supsporta" cloneof="supsport">
-		<description>Super Sports Challenge (Euro, Plug-Thru Cart)</description>
+<!-- BMX Simulator doesn't respond to start on its title screen -->
+	<software name="supsporta" cloneof="supsport" supported="partial">
+		<description>Super Sports Challenge (Euro, plug-thru cart)</description>
 		<year>19??</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="nes_cart">
@@ -51247,13 +51250,14 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="supsport">
+<!-- BMX Simulator doesn't respond to start on its title screen -->
+	<software name="supsport" supported="partial">
 		<description>Super Sports Challenge (Euro)</description>
 		<year>19??</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bf9096" />
-			<feature name="pcb" value="CAMERICA-BF9096" />
+			<feature name="slot" value="bf9096a" />
+			<feature name="pcb" value="CAMERICA-BF9096-ALT" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="262144">
 				<rom name="super sports challenge (europe) (unl).prg" size="262144" crc="a045fe1d" sha1="6ec9f19845848130513f5ce359952afe56dcae8e" offset="00000" status="baddump" />
@@ -85605,13 +85609,13 @@ be better to redump them properly. -->
 	</software>
 
 <!-- Pegasus was a Polish NES clone -->
-	<software name="mc_pega4" supported="partial">
-		<description>Pegasus 4 in 1 ~ Golden Four (Pol)</description>
-		<year>19??</year>
+	<software name="mc_pega4">
+		<description>Pegasus 4 in 1 ~ Golden Four (Poland)</description>
+		<year>199?</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bf9096" />
-			<feature name="pcb" value="CAMERICA-BF9096" />
+			<feature name="slot" value="bf9096a" />
+			<feature name="pcb" value="CAMERICA-BF9096-ALT" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="262144">
 				<rom name="pegasus 4 in 1 (unl).prg" size="262144" crc="4b40cbd9" sha1="40409fec8249efdb772e6ffb2dcd41860c6cca23" offset="00000" status="baddump" />
@@ -85623,9 +85627,9 @@ be better to redump them properly. -->
 	</software>
 
 <!-- Pegasus was a Polish NES clone -->
-	<software name="mc_pega5">
-		<description>Pegasus 5 in 1 ~ Golden Five (Pol)</description>
-		<year>19??</year>
+	<software name="mc_pega5" supported="partial"> <!-- Big Nose Freaks out has the same issues as the singleton cart -->
+		<description>Pegasus 5 in 1 ~ Golden Five (Poland)</description>
+		<year>199?</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="goldenfive" />
