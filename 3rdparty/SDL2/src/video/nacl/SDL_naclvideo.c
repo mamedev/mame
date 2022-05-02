@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -81,7 +81,7 @@ static int NACL_Available(void) {
 static void NACL_DeleteDevice(SDL_VideoDevice *device) {
     SDL_VideoData *driverdata = (SDL_VideoData*) device->driverdata;
     driverdata->ppb_core->ReleaseResource((PP_Resource) driverdata->ppb_message_loop);
-    SDL_free(device->driverdata);
+    /* device->driverdata is not freed because it points to static memory */
     SDL_free(device);
 }
 
@@ -93,6 +93,10 @@ NACL_SetDisplayMode(_THIS, SDL_VideoDisplay * display, SDL_DisplayMode * mode)
 
 static SDL_VideoDevice *NACL_CreateDevice(int devindex) {
     SDL_VideoDevice *device;
+    
+    if (!NACL_Available()) {
+        return NULL;
+    }
     
     /* Initialize all variables that we clean on shutdown */
     device = (SDL_VideoDevice *) SDL_calloc(1, sizeof(SDL_VideoDevice));
@@ -107,7 +111,7 @@ static SDL_VideoDevice *NACL_CreateDevice(int devindex) {
     device->VideoQuit = NACL_VideoQuit;
     device->PumpEvents = NACL_PumpEvents;
     
-    device->CreateWindow = NACL_CreateWindow;
+    device->CreateSDLWindow = NACL_CreateWindow;
     device->SetWindowTitle = NACL_SetWindowTitle;
     device->DestroyWindow = NACL_DestroyWindow;
     
@@ -132,7 +136,7 @@ static SDL_VideoDevice *NACL_CreateDevice(int devindex) {
 
 VideoBootStrap NACL_bootstrap = {
     NACLVID_DRIVER_NAME, "SDL Native Client Video Driver",
-    NACL_Available, NACL_CreateDevice
+    NACL_CreateDevice
 };
 
 int NACL_VideoInit(_THIS) {

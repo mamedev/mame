@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,8 +19,8 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _SDL_BWin_h
-#define _SDL_BWin_h
+#ifndef SDL_BWin_h_
+#define SDL_BWin_h_
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,9 +38,9 @@ extern "C" {
 #include <stdio.h>
 #include <AppKit.h>
 #include <InterfaceKit.h>
-#include <be/game/DirectWindow.h>
+#include <game/DirectWindow.h>
 #if SDL_VIDEO_OPENGL
-#include <be/opengl/GLView.h>
+#include <opengl/GLView.h>
 #endif
 #include "SDL_events.h"
 #include "../../main/haiku/SDL_BApp.h"
@@ -72,6 +72,7 @@ class SDL_BWin:public BDirectWindow
 
 #if SDL_VIDEO_OPENGL
         _SDL_GLView = NULL;
+        _gl_type = 0;
 #endif
         _shown = false;
         _inhibit_resize = false;
@@ -85,9 +86,10 @@ class SDL_BWin:public BDirectWindow
         _buffer_locker = new BLocker();
         _bitmap = NULL;
         _clips = NULL;
+        _num_clips = 0;
 
 #ifdef DRAWTHREAD
-        _draw_thread_id = spawn_thread(BE_DrawThread, "drawing_thread",
+        _draw_thread_id = spawn_thread(HAIKU_DrawThread, "drawing_thread",
                             B_NORMAL_PRIORITY, (void*) this);
         resume_thread(_draw_thread_id);
 #endif
@@ -114,6 +116,8 @@ class SDL_BWin:public BDirectWindow
         }
 #endif
 
+        delete _prev_frame;
+
         /* Clean up framebuffer stuff */
         _buffer_locker->Lock();
 #ifdef DRAWTHREAD
@@ -133,8 +137,10 @@ class SDL_BWin:public BDirectWindow
                                      B_FOLLOW_ALL_SIDES,
                                      (B_WILL_DRAW | B_FRAME_EVENTS),
                                      gl_flags);
+            _gl_type = gl_flags;
         }
         AddChild(_SDL_GLView);
+        _SDL_GLView->SetEventMask(B_POINTER_EVENTS | B_KEYBOARD_EVENTS, B_NO_POINTER_HISTORY);
         _SDL_GLView->EnableDirectMode(true);
         _SDL_GLView->LockGL();  /* "New" GLViews are created */
         Unlock();
@@ -175,13 +181,17 @@ class SDL_BWin:public BDirectWindow
             _connected = true;
 
         case B_DIRECT_MODIFY:
-            if(_clips) {
-                free(_clips);
-                _clips = NULL;
+            if (info->clip_list_count > _num_clips)
+            {
+                if(_clips) {
+                    free(_clips);
+                    _clips = NULL;
+                }
             }
 
             _num_clips = info->clip_list_count;
-            _clips = (clipping_rect *)malloc(_num_clips*sizeof(clipping_rect));
+            if (_clips == NULL)
+                _clips = (clipping_rect *)malloc(_num_clips*sizeof(clipping_rect));
             if(_clips) {
                 memcpy(_clips, info->clip_list,
                     _num_clips*sizeof(clipping_rect));
@@ -250,6 +260,7 @@ class SDL_BWin:public BDirectWindow
 
     virtual void WindowActivated(bool active) {
         BMessage msg(BAPP_KEYBOARD_FOCUS);  /* Mouse focus sold separately */
+        msg.AddBool("focusGained", active);
         _PostWindowEvent(msg);
     }
 
@@ -309,22 +320,17 @@ class SDL_BWin:public BDirectWindow
                 && msg->FindInt32("be:transit", &transit) == B_OK) {
                 _MouseMotionEvent(where, transit);
             }
-
-            /* FIXME: Apparently a button press/release event might be dropped
-               if made before before a different button is released.  Does
-               B_MOUSE_MOVED have the data needed to check if a mouse button
-               state has changed? */
-            if (msg->FindInt32("buttons", &buttons) == B_OK) {
-                _MouseButtonEvent(buttons);
-            }
             break;
 
         case B_MOUSE_DOWN:
-        case B_MOUSE_UP:
-            /* _MouseButtonEvent() detects any and all buttons that may have
-               changed state, as well as that button's new state */
             if (msg->FindInt32("buttons", &buttons) == B_OK) {
-                _MouseButtonEvent(buttons);
+                _MouseButtonEvent(buttons, SDL_PRESSED);
+            }
+            break;
+
+        case B_MOUSE_UP:
+            if (msg->FindInt32("buttons", &buttons) == B_OK) {
+                _MouseButtonEvent(buttons, SDL_RELEASED);
             }
             break;
 
@@ -442,6 +448,7 @@ class SDL_BWin:public BDirectWindow
     BBitmap *GetBitmap() { return _bitmap; }
 #if SDL_VIDEO_OPENGL
     BGLView *GetGLView() { return _SDL_GLView; }
+    Uint32 GetGLType() { return _gl_type; }
 #endif
 
     /* Setter methods */
@@ -486,26 +493,17 @@ private:
  if true:  SDL_SetCursor(NULL); */
     }
 
-    void _MouseButtonEvent(int32 buttons) {
+    void _MouseButtonEvent(int32 buttons, Uint8 state) {
         int32 buttonStateChange = buttons ^ _last_buttons;
 
-        /* Make sure at least one button has changed state */
-        if( !(buttonStateChange) ) {
-            return;
-        }
-
-        /* Add any mouse button events */
         if(buttonStateChange & B_PRIMARY_MOUSE_BUTTON) {
-            _SendMouseButton(SDL_BUTTON_LEFT, buttons &
-                B_PRIMARY_MOUSE_BUTTON);
+            _SendMouseButton(SDL_BUTTON_LEFT, state);
         }
         if(buttonStateChange & B_SECONDARY_MOUSE_BUTTON) {
-            _SendMouseButton(SDL_BUTTON_RIGHT, buttons &
-                B_PRIMARY_MOUSE_BUTTON);
+            _SendMouseButton(SDL_BUTTON_RIGHT, state);
         }
         if(buttonStateChange & B_TERTIARY_MOUSE_BUTTON) {
-            _SendMouseButton(SDL_BUTTON_MIDDLE, buttons &
-                B_PRIMARY_MOUSE_BUTTON);
+            _SendMouseButton(SDL_BUTTON_MIDDLE, state);
         }
 
         _last_buttons = buttons;
@@ -532,7 +530,7 @@ private:
         msg.AddInt32("key-state", keyState);
         msg.AddInt32("key-scancode", keyCode);
         if (keyUtf8 != NULL) {
-        	msg.AddData("key-utf8", B_INT8_TYPE, (const void*)keyUtf8, len);
+            msg.AddData("key-utf8", B_INT8_TYPE, (const void*)keyUtf8, len);
         }
         be_app->PostMessage(&msg);
     }
@@ -585,7 +583,7 @@ private:
         if(msg->FindBool("window-border", &bEnabled) != B_OK) {
             return;
         }
-        SetLook(bEnabled ? B_BORDERED_WINDOW_LOOK : B_NO_BORDER_WINDOW_LOOK);
+        SetLook(bEnabled ? B_TITLED_WINDOW_LOOK : B_NO_BORDER_WINDOW_LOOK);
     }
 
     void _SetResizable(BMessage *msg) {
@@ -624,6 +622,7 @@ private:
     /* Members */
 #if SDL_VIDEO_OPENGL
     BGLView * _SDL_GLView;
+    Uint32 _gl_type;
 #endif
 
     int32 _last_buttons;
@@ -645,7 +644,7 @@ private:
     clipping_rect   _bounds;
     BLocker        *_buffer_locker;
     clipping_rect  *_clips;
-    int32           _num_clips;
+    uint32          _num_clips;
     int32           _bytes_per_px;
     thread_id       _draw_thread_id;
 
@@ -667,4 +666,6 @@ private:
  *                         through a draw cycle.  Occurs when the previous
  *                         buffer provided by DirectConnected() is invalidated.
  */
-#endif
+#endif /* SDL_BWin_h_ */
+
+/* vi: set ts=4 sw=4 expandtab: */

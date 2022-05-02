@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,13 +20,13 @@
 */
 #include "../../SDL_internal.h"
 
-#ifndef _SDL_mutex_c_h
-#define _SDL_mutex_c_h
+#ifndef SDL_mutex_c_h_
+#define SDL_mutex_c_h_
 
 struct SDL_mutex
 {
     pthread_mutex_t id;
 };
 
-#endif /* _SDL_mutex_c_h */
+#endif /* SDL_mutex_c_h_ */
 /* vi: set ts=4 sw=4 expandtab: */

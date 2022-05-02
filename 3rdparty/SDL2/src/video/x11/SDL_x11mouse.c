@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -23,7 +23,6 @@
 #if SDL_VIDEO_DRIVER_X11
 
 #include <X11/cursorfont.h>
-#include "SDL_assert.h"
 #include "SDL_x11video.h"
 #include "SDL_x11mouse.h"
 #include "SDL_x11xinput2.h"
@@ -48,7 +47,7 @@ X11_CreateEmptyCursor()
         XColor color;
         Pixmap pixmap;
 
-        SDL_zero(data);
+        SDL_zeroa(data);
         color.red = color.green = color.blue = 0;
         pixmap = X11_XCreateBitmapFromData(display, DefaultRootWindow(display),
                                        data, 1, 1);
@@ -309,22 +308,26 @@ X11_ShowCursor(SDL_Cursor * cursor)
 }
 
 static void
+WarpMouseInternal(Window xwindow, const int x, const int y)
+{
+    SDL_VideoData *videodata = (SDL_VideoData *) SDL_GetVideoDevice()->driverdata;
+    Display *display = videodata->display;
+    X11_XWarpPointer(display, None, xwindow, 0, 0, 0, 0, x, y);
+    X11_XSync(display, False);
+    videodata->global_mouse_changed = SDL_TRUE;
+}
+
+static void
 X11_WarpMouse(SDL_Window * window, int x, int y)
 {
     SDL_WindowData *data = (SDL_WindowData *) window->driverdata;
-    Display *display = data->videodata->display;
-
-    X11_XWarpPointer(display, None, data->xwindow, 0, 0, 0, 0, x, y);
-    X11_XSync(display, False);
+    WarpMouseInternal(data->xwindow, x, y);
 }
 
 static int
 X11_WarpMouseGlobal(int x, int y)
 {
-    Display *display = GetDisplay();
-
-    X11_XWarpPointer(display, None, DefaultRootWindow(display), 0, 0, 0, 0, x, y);
-    X11_XSync(display, False);
+    WarpMouseInternal(DefaultRootWindow(GetDisplay()), x, y);
     return 0;
 }
 

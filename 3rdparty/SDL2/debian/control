@@ -11,6 +11,7 @@ Standards-Version: 3.9.3
 Build-Depends: debhelper (>= 9),
                dh-autoreconf,
                dpkg-dev (>= 1.16.1~),
+               fcitx-libs-dev [linux-any],
                libasound2-dev [linux-any],
                libgl1-mesa-dev,
                libpulse-dev,
@@ -26,7 +27,6 @@ Build-Depends: debhelper (>= 9),
                libxinerama-dev,
                libxrandr-dev,
                libxss-dev,
-               libxt-dev,
                libxxf86vm-dev
 Homepage: http://www.libsdl.org/
 

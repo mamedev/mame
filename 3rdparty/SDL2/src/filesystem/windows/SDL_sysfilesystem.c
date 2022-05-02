@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -28,7 +28,6 @@
 #include "../../core/windows/SDL_windows.h"
 #include <shlobj.h>
 
-#include "SDL_assert.h"
 #include "SDL_error.h"
 #include "SDL_stdinc.h"
 #include "SDL_filesystem.h"
@@ -118,6 +117,14 @@ SDL_GetPrefPath(const char *org, const char *app)
     size_t new_wpath_len = 0;
     BOOL api_result = FALSE;
 
+    if (!app) {
+        SDL_InvalidParamError("app");
+        return NULL;
+    }
+    if (!org) {
+        org = "";
+    }
+
     if (!SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_APPDATA | CSIDL_FLAG_CREATE, NULL, 0, path))) {
         WIN_SetError("Couldn't locate our prefpath");
         return NULL;
@@ -145,8 +152,10 @@ SDL_GetPrefPath(const char *org, const char *app)
         return NULL;
     }
 
-    lstrcatW(path, L"\\");
-    lstrcatW(path, worg);
+    if (*worg) {
+        lstrcatW(path, L"\\");
+        lstrcatW(path, worg);
+    }
     SDL_free(worg);
 
     api_result = CreateDirectoryW(path, NULL);

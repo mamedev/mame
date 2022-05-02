@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -53,7 +53,7 @@ typedef struct
             float _21, _22, _23, _24;
             float _31, _32, _33, _34;
             float _41, _42, _43, _44;
-        };
+        } v;
         float m[4][4];
     };
 } Float4X4;

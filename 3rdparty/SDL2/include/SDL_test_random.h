@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -37,8 +37,8 @@
 
 */
 
-#ifndef _SDL_test_random_h
-#define _SDL_test_random_h
+#ifndef SDL_test_random_h_
+#define SDL_test_random_h_
 
 #include "begin_code.h"
 /* Set up for C function definitions, even when using C++ */
@@ -110,6 +110,6 @@ extern "C" {
 #endif
 #include "close_code.h"
 
-#endif /* _SDL_test_random_h */
+#endif /* SDL_test_random_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

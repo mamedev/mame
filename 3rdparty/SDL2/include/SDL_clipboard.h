@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -25,8 +25,8 @@
  * Include file for SDL clipboard handling
  */
 
-#ifndef _SDL_clipboard_h
-#define _SDL_clipboard_h
+#ifndef SDL_clipboard_h_
+#define SDL_clipboard_h_
 
 #include "SDL_stdinc.h"
 
@@ -66,6 +66,6 @@ extern DECLSPEC SDL_bool SDLCALL SDL_HasClipboardText(void);
 #endif
 #include "close_code.h"
 
-#endif /* _SDL_clipboard_h */
+#endif /* SDL_clipboard_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

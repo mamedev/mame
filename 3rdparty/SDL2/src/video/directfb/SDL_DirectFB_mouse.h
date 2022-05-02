@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,8 +19,8 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _SDL_DirectFB_mouse_h
-#define _SDL_DirectFB_mouse_h
+#ifndef SDL_DirectFB_mouse_h_
+#define SDL_DirectFB_mouse_h_
 
 #include <directfb.h>
 
@@ -39,6 +39,6 @@ struct _DFB_CursorData
 extern void DirectFB_InitMouse(_THIS);
 extern void DirectFB_QuitMouse(_THIS);
 
-#endif /* _SDL_DirectFB_mouse_h */
+#endif /* SDL_DirectFB_mouse_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

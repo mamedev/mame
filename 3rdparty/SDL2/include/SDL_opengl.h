@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -32,8 +32,8 @@
  *  version included in SDL_opengl.h.
  */
 
-#ifndef _SDL_opengl_h
-#define _SDL_opengl_h
+#ifndef SDL_opengl_h_
+#define SDL_opengl_h_
 
 #include "SDL_config.h"
 
@@ -97,6 +97,13 @@
 #elif defined(__CYGWIN__) && defined(USE_OPENGL32) /* use native windows opengl32 */
 #  define GLAPI extern
 #  define GLAPIENTRY __stdcall
+#elif defined(__OS2__) || defined(__EMX__) /* native os/2 opengl */
+#  define GLAPI extern
+#  define GLAPIENTRY _System
+#  define APIENTRY _System
+#  if defined(__GNUC__) && !defined(_System)
+#    define _System
+#  endif
 #elif (defined(__GNUC__) && __GNUC__ >= 4) || (defined(__SUNPRO_C) && (__SUNPRO_C >= 0x590))
 #  define GLAPI __attribute__((visibility("default")))
 #  define GLAPIENTRY
@@ -2171,6 +2178,6 @@ typedef void (APIENTRYP PFNGLEGLIMAGETARGETRENDERBUFFERSTORAGEOESPROC) (GLenum t
 
 #endif /* !__IPHONEOS__ */
 
-#endif /* _SDL_opengl_h */
+#endif /* SDL_opengl_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -129,8 +129,8 @@ static SDL_Scancode Android_Keycodes[] = {
     SDL_SCANCODE_AUDIOSTOP, /* AKEYCODE_MEDIA_STOP */
     SDL_SCANCODE_AUDIONEXT, /* AKEYCODE_MEDIA_NEXT */
     SDL_SCANCODE_AUDIOPREV, /* AKEYCODE_MEDIA_PREVIOUS */
-    SDL_SCANCODE_UNKNOWN, /* AKEYCODE_MEDIA_REWIND */
-    SDL_SCANCODE_UNKNOWN, /* AKEYCODE_MEDIA_FAST_FORWARD */
+    SDL_SCANCODE_AUDIOREWIND, /* AKEYCODE_MEDIA_REWIND */
+    SDL_SCANCODE_AUDIOFASTFORWARD, /* AKEYCODE_MEDIA_FAST_FORWARD */
     SDL_SCANCODE_MUTE, /* AKEYCODE_MUTE */
     SDL_SCANCODE_PAGEUP, /* AKEYCODE_PAGE_UP */
     SDL_SCANCODE_PAGEDOWN, /* AKEYCODE_PAGE_DOWN */
@@ -357,7 +357,7 @@ Android_HasScreenKeyboardSupport(_THIS)
 SDL_bool
 Android_IsScreenKeyboardShown(_THIS, SDL_Window * window)
 {
-    return SDL_IsTextInputActive();
+    return Android_JNI_IsScreenKeyboardShown();
 }
 
 void

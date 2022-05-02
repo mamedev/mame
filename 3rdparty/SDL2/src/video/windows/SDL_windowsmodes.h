@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,22 +20,19 @@
 */
 #include "../../SDL_internal.h"
 
-#ifndef _SDL_windowsmodes_h
-#define _SDL_windowsmodes_h
+#ifndef SDL_windowsmodes_h_
+#define SDL_windowsmodes_h_
 
 typedef struct
 {
-    TCHAR DeviceName[32];
+    WCHAR DeviceName[32];
+    HMONITOR MonitorHandle;
+    SDL_bool IsValid;
 } SDL_DisplayData;
 
 typedef struct
 {
     DEVMODE DeviceMode;
-    float ScaleX;
-    float ScaleY;
-    float DiagDPI;
-    float HorzDPI;
-    float VertDPI;
 } SDL_DisplayModeData;
 
 extern int WIN_InitModes(_THIS);
@@ -44,8 +41,9 @@ extern int WIN_GetDisplayUsableBounds(_THIS, SDL_VideoDisplay * display, SDL_Rec
 extern int WIN_GetDisplayDPI(_THIS, SDL_VideoDisplay * display, float * ddpi, float * hdpi, float * vdpi);
 extern void WIN_GetDisplayModes(_THIS, SDL_VideoDisplay * display);
 extern int WIN_SetDisplayMode(_THIS, SDL_VideoDisplay * display, SDL_DisplayMode * mode);
+extern void WIN_RefreshDisplays(_THIS);
 extern void WIN_QuitModes(_THIS);
 
-#endif /* _SDL_windowsmodes_h */
+#endif /* SDL_windowsmodes_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

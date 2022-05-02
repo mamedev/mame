@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,9 +20,6 @@
 */
 #include "../../SDL_internal.h"
 
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
 #include <errno.h>
 #include <pthread.h>
 #include <semaphore.h>
@@ -94,7 +91,10 @@ SDL_SemWait(SDL_sem * sem)
         return SDL_SetError("Passed a NULL semaphore");
     }
 
-    retval = sem_wait(&sem->sem);
+    do {
+        retval = sem_wait(&sem->sem);
+    } while (retval < 0 && errno == EINTR);
+
     if (retval < 0) {
         retval = SDL_SetError("sem_wait() failed");
     }

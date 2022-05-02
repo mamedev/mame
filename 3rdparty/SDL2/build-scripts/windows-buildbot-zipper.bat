@@ -1,9 +1,9 @@
 @echo off
 rem just a helper batch file for collecting up files and zipping them.
-rem usage: windows-buildbot-zipper.bat <zipfilename>
+rem usage: windows-buildbot-zipper.bat <target> <slndir> <zipfilename>
 rem must be run from root of SDL source tree.
 
-IF EXIST VisualC\Win32\Release GOTO okaydir
+IF EXIST %2\%1\Release GOTO okaydir
 echo Please run from root of source tree after doing a Release build.
 GOTO done
 
@@ -12,18 +12,15 @@ erase /q /f /s zipper
 IF EXIST zipper GOTO zippermade
 mkdir zipper
 :zippermade
+mkdir zipper\SDL
+mkdir zipper\SDL\include
+mkdir zipper\SDL\lib
+copy include\*.h include\
+copy %2\%1\Release\SDL2.dll zipper\SDL\lib\
+copy %2\%1\Release\SDL2.lib zipper\SDL\lib\
+copy %2\%1\Release\SDL2main.lib zipper\SDL\lib\
 cd zipper
-mkdir SDL
-cd SDL
-mkdir include
-mkdir lib
-mkdir lib\win32
-copy ..\..\include\*.h include\
-copy ..\..\VisualC\Win32\Release\SDL2.dll lib\win32\
-copy ..\..\VisualC\Win32\Release\SDL2.lib lib\win32\
-copy ..\..\VisualC\Win32\Release\SDL2main.lib lib\win32\
-cd ..
-zip -9r ..\%1 SDL
+zip -9r ..\%3 SDL
 cd ..
 erase /q /f /s zipper
 

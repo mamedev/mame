@@ -8,6 +8,9 @@ From the developer's point of view, OS X is a sort of hybrid Mac and
 Unix system, and you have the option of using either traditional
 command line tools or Apple's IDE Xcode.
 
+Command Line Build
+==================
+
 To build SDL using the command line, use the standard configure and make
 process:
 
@@ -97,7 +100,7 @@ You should replace EXE_NAME with the name of the executable. APP_NAME is what
 will be visible to the user in the Finder. Usually it will be the same
 as EXE_NAME but capitalized. E.g. if EXE_NAME is "testgame" then APP_NAME 
 usually is "TestGame". You might also want to use `@PACKAGE@` to use the package
-name as specified in your configure.in file.
+name as specified in your configure.ac file.
 
 If your project builds more than one application, you will have to do a bit
 more. For each of your target applications, you need a separate rule.

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -22,8 +22,8 @@
 
 /* These are functions that need to be implemented by a port of SDL */
 
-#ifndef _SDL_systhread_h
-#define _SDL_systhread_h
+#ifndef SDL_systhread_h_
+#define SDL_systhread_h_
 
 #include "SDL_thread.h"
 #include "SDL_thread_c.h"
@@ -33,11 +33,11 @@
    on success.
 */
 #ifdef SDL_PASSED_BEGINTHREAD_ENDTHREAD
-extern int SDL_SYS_CreateThread(SDL_Thread * thread, void *args,
+extern int SDL_SYS_CreateThread(SDL_Thread * thread,
                                 pfnSDL_CurrentBeginThread pfnBeginThread,
                                 pfnSDL_CurrentEndThread pfnEndThread);
 #else
-extern int SDL_SYS_CreateThread(SDL_Thread * thread, void *args);
+extern int SDL_SYS_CreateThread(SDL_Thread * thread);
 #endif
 
 /* This function does any necessary setup in the child thread */
@@ -55,7 +55,7 @@ extern void SDL_SYS_WaitThread(SDL_Thread * thread);
 extern void SDL_SYS_DetachThread(SDL_Thread * thread);
 
 /* Get the thread local storage for this thread */
-extern SDL_TLSData *SDL_SYS_GetTLSData();
+extern SDL_TLSData *SDL_SYS_GetTLSData(void);
 
 /* Set the thread local storage for this thread */
 extern int SDL_SYS_SetTLSData(SDL_TLSData *data);
@@ -65,6 +65,6 @@ extern SDL_Thread *
 SDL_CreateThreadInternal(int (SDLCALL * fn) (void *), const char *name,
                          const size_t stacksize, void *data);
 
-#endif /* _SDL_systhread_h */
+#endif /* SDL_systhread_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

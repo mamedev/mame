@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,8 +20,8 @@
 */
 #include "../../SDL_internal.h"
 
-#ifndef _SDL_x11opengles_h
-#define _SDL_x11opengles_h
+#ifndef SDL_x11opengles_h_
+#define SDL_x11opengles_h_
 
 #if SDL_VIDEO_OPENGL_EGL
 
@@ -30,6 +30,9 @@
 
 typedef struct SDL_PrivateGLESData
 {
+  /* 1401 If the struct-declaration-list contains no named members, the behavior is undefined. */
+  /* warning: empty struct has size 0 in C, size 1 in C++ [-Wc++-compat] */
+  int dummy; 
 } SDL_PrivateGLESData;
 
 /* OpenGLES functions */
@@ -43,11 +46,11 @@ typedef struct SDL_PrivateGLESData
 extern int X11_GLES_LoadLibrary(_THIS, const char *path);
 extern XVisualInfo *X11_GLES_GetVisual(_THIS, Display * display, int screen);
 extern SDL_GLContext X11_GLES_CreateContext(_THIS, SDL_Window * window);
-extern void X11_GLES_SwapWindow(_THIS, SDL_Window * window);
+extern int X11_GLES_SwapWindow(_THIS, SDL_Window * window);
 extern int X11_GLES_MakeCurrent(_THIS, SDL_Window * window, SDL_GLContext context);
 
 #endif /* SDL_VIDEO_OPENGL_EGL */
 
-#endif /* _SDL_x11opengles_h */
+#endif /* SDL_x11opengles_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

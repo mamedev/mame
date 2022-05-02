@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -97,7 +97,7 @@ SDL_AddTimerInternal(SDL_TimerData *data, SDL_Timer *timer)
     timer->next = curr;
 }
 
-static int
+static int SDLCALL
 SDL_TimerThread(void *_data)
 {
     SDL_TimerData *data = (SDL_TimerData *)_data;
@@ -168,6 +168,7 @@ SDL_TimerThread(void *_data)
 
             if (interval > 0) {
                 /* Reschedule this timer */
+                current->interval = interval;
                 current->scheduled = tick + interval;
                 SDL_AddTimerInternal(data, current);
             } else {

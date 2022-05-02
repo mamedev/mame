@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,11 +20,11 @@
 */
 #include "../SDL_internal.h"
 
-#ifndef _SDL_clipboardevents_c_h
-#define _SDL_clipboardevents_c_h
+#ifndef SDL_clipboardevents_c_h_
+#define SDL_clipboardevents_c_h_
 
 extern int SDL_SendClipboardUpdate(void);
 
-#endif /* _SDL_clipboardevents_c_h */
+#endif /* SDL_clipboardevents_c_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

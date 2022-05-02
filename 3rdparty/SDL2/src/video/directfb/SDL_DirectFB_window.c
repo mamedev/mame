@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -458,8 +458,28 @@ SDL_bool
 DirectFB_GetWindowWMInfo(_THIS, SDL_Window * window,
                          struct SDL_SysWMinfo * info)
 {
+    const Uint32 version = ((((Uint32) info->version.major) * 1000000) +
+                            (((Uint32) info->version.minor) * 10000) +
+                            (((Uint32) info->version.patch)));
+
     SDL_DFB_DEVICEDATA(_this);
     SDL_DFB_WINDOWDATA(window);
+
+    /* Before 2.0.6, it was possible to build an SDL with DirectFB support
+       (SDL_SysWMinfo will be large enough to hold DirectFB info), but build
+       your app against SDL headers that didn't have DirectFB support
+       (SDL_SysWMinfo could be smaller than DirectFB needs. This would lead
+       to an app properly using SDL_GetWindowWMInfo() but we'd accidentally
+       overflow memory on the stack or heap. To protect against this, we've
+       padded out the struct unconditionally in the headers and DirectFB will
+       just return an error for older apps using this function. Those apps
+       will need to be recompiled against newer headers or not use DirectFB,
+       maybe by forcing SDL_VIDEODRIVER=x11. */
+    if (version < 2000006) {
+        info->subsystem = SDL_SYSWM_UNKNOWN;
+        SDL_SetError("Version must be 2.0.6 or newer");
+        return SDL_FALSE;
+    }
 
     if (info->version.major == SDL_MAJOR_VERSION &&
         info->version.minor == SDL_MINOR_VERSION) {
@@ -469,7 +489,7 @@ DirectFB_GetWindowWMInfo(_THIS, SDL_Window * window,
         info->info.dfb.surface = windata->surface;
         return SDL_TRUE;
     } else {
-        SDL_SetError("Application not compiled with SDL %d.%d\n",
+        SDL_SetError("Application not compiled with SDL %d.%d",
                      SDL_MAJOR_VERSION, SDL_MINOR_VERSION);
         return SDL_FALSE;
     }

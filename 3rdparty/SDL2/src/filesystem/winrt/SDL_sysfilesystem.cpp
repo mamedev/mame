@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -48,7 +48,16 @@ SDL_WinRTGetFSPathUNICODE(SDL_WinRT_Path pathType)
         {
             static wstring path;
             if (path.empty()) {
+#if defined(NTDDI_WIN10_19H1) && (NTDDI_VERSION >= NTDDI_WIN10_19H1) && (WINAPI_FAMILY == WINAPI_FAMILY_PC_APP) /* Only PC supports mods */
+                /* Windows 1903 supports mods, via the EffectiveLocation API */
+                if (Windows::Foundation::Metadata::ApiInformation::IsApiContractPresent("Windows.Foundation.UniversalApiContract", 8, 0)) {
+                    path = Windows::ApplicationModel::Package::Current->EffectiveLocation->Path->Data();
+                } else {
+                    path = Windows::ApplicationModel::Package::Current->InstalledLocation->Path->Data();
+                }
+#else
                 path = Windows::ApplicationModel::Package::Current->InstalledLocation->Path->Data();
+#endif
             }
             return path.c_str();
         }
@@ -152,6 +161,14 @@ SDL_GetPrefPath(const char *org, const char *app)
     size_t new_wpath_len = 0;
     BOOL api_result = FALSE;
 
+    if (!app) {
+        SDL_InvalidParamError("app");
+        return NULL;
+    }
+    if (!org) {
+        org = "";
+    }
+
     srcPath = SDL_WinRTGetFSPathUNICODE(SDL_WINRT_PATH_LOCAL_FOLDER);
     if ( ! srcPath) {
         SDL_SetError("Unable to find a source path");
@@ -186,9 +203,11 @@ SDL_GetPrefPath(const char *org, const char *app)
         return NULL;
     }
 
-    SDL_wcslcat(path, L"\\", new_wpath_len + 1);
-    SDL_wcslcat(path, worg, new_wpath_len + 1);
-    SDL_free(worg);
+    if (*worg) {
+        SDL_wcslcat(path, L"\\", new_wpath_len + 1);
+        SDL_wcslcat(path, worg, new_wpath_len + 1);
+        SDL_free(worg);
+    }
 
     api_result = CreateDirectoryW(path, NULL);
     if (api_result == FALSE) {
@@ -219,3 +238,5 @@ SDL_GetPrefPath(const char *org, const char *app)
 }
 
 #endif /* __WINRT__ */
+
+/* vi: set ts=4 sw=4 expandtab: */

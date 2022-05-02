@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -32,6 +32,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <limits.h>
+#include <fcntl.h>
 
 #if defined(__FREEBSD__) || defined(__OPENBSD__)
 #include <sys/sysctl.h>
@@ -40,7 +41,10 @@
 #include "SDL_error.h"
 #include "SDL_stdinc.h"
 #include "SDL_filesystem.h"
+#include "SDL_rwops.h"
 
+/* QNX's /proc/self/exefile is a text file and not a symlink. */
+#if !defined(__QNXNTO__)
 static char *
 readSymLink(const char *path)
 {
@@ -72,7 +76,7 @@ readSymLink(const char *path)
     SDL_free(retval);
     return NULL;
 }
-
+#endif
 
 char *
 SDL_GetBasePath(void)
@@ -122,23 +126,28 @@ SDL_GetBasePath(void)
 
     /* is a Linux-style /proc filesystem available? */
     if (!retval && (access("/proc", F_OK) == 0)) {
+        /* !!! FIXME: after 2.0.6 ships, let's delete this code and just
+                      use the /proc/%llu version. There's no reason to have
+                      two copies of this plus all the #ifdefs. --ryan. */
 #if defined(__FREEBSD__)
         retval = readSymLink("/proc/curproc/file");
 #elif defined(__NETBSD__)
         retval = readSymLink("/proc/curproc/exe");
+#elif defined(__QNXNTO__)
+        retval = SDL_LoadFile("/proc/self/exefile", NULL);
 #else
         retval = readSymLink("/proc/self/exe");  /* linux. */
-#endif
         if (retval == NULL) {
             /* older kernels don't have /proc/self ... try PID version... */
             char path[64];
-            const int rc = (int) SDL_snprintf(path, sizeof(path),
+            const int rc = SDL_snprintf(path, sizeof(path),
                                               "/proc/%llu/exe",
                                               (unsigned long long) getpid());
             if ( (rc > 0) && (rc < sizeof(path)) ) {
                 retval = readSymLink(path);
             }
         }
+#endif
     }
 
     /* If we had access to argv[0] here, we could check it for a path,
@@ -180,6 +189,14 @@ SDL_GetPrefPath(const char *org, const char *app)
     char *ptr = NULL;
     size_t len = 0;
 
+    if (!app) {
+        SDL_InvalidParamError("app");
+        return NULL;
+    }
+    if (!org) {
+        org = "";
+    }
+
     if (!envr) {
         /* You end up with "$HOME/.local/share/Game Name 2" */
         envr = SDL_getenv("HOME");
@@ -204,7 +221,11 @@ SDL_GetPrefPath(const char *org, const char *app)
         return NULL;
     }
 
-    SDL_snprintf(retval, len, "%s%s%s/%s/", envr, append, org, app);
+    if (*org) {
+        SDL_snprintf(retval, len, "%s%s%s/%s/", envr, append, org, app);
+    } else {
+        SDL_snprintf(retval, len, "%s%s%s/", envr, append, app);
+    }
 
     for (ptr = retval+1; *ptr; ptr++) {
         if (*ptr == '/') {

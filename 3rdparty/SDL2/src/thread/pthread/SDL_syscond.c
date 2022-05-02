@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -42,7 +42,7 @@ SDL_CreateCond(void)
 
     cond = (SDL_cond *) SDL_malloc(sizeof(SDL_cond));
     if (cond) {
-        if (pthread_cond_init(&cond->cond, NULL) < 0) {
+        if (pthread_cond_init(&cond->cond, NULL) != 0) {
             SDL_SetError("pthread_cond_init() failed");
             SDL_free(cond);
             cond = NULL;
@@ -129,7 +129,7 @@ SDL_CondWaitTimeout(SDL_cond * cond, SDL_mutex * mutex, Uint32 ms)
     switch (retval) {
     case EINTR:
         goto tryagain;
-        break;
+        /* break; -Wunreachable-code-break */
     case ETIMEDOUT:
         retval = SDL_MUTEX_TIMEDOUT;
         break;

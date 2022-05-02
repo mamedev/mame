@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -141,7 +141,7 @@ int
 NACL_GLES_SetSwapInterval(_THIS, int interval)
 {
     /* STUB */
-    return 0;
+    return SDL_Unsupported();
 }
 
 int
@@ -151,12 +151,15 @@ NACL_GLES_GetSwapInterval(_THIS)
     return 0;
 }
 
-void
+int
 NACL_GLES_SwapWindow(_THIS, SDL_Window * window)
 {
     SDL_VideoData *driverdata = (SDL_VideoData *) _this->driverdata;
     struct PP_CompletionCallback callback = { NULL, 0, PP_COMPLETIONCALLBACK_FLAG_NONE };
-    driverdata->ppb_graphics->SwapBuffers((PP_Resource) SDL_GL_GetCurrentContext(), callback );
+    if (driverdata->ppb_graphics->SwapBuffers((PP_Resource) SDL_GL_GetCurrentContext(), callback ) != 0) {
+        return SDL_SetError("SwapBuffers failed");
+    }
+    return 0;
 }
 
 void

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -25,8 +25,8 @@
  *  Defines keyboard scancodes.
  */
 
-#ifndef _SDL_scancode_h
-#define _SDL_scancode_h
+#ifndef SDL_scancode_h_
+#define SDL_scancode_h_
 
 #include "SDL_stdinc.h"
 
@@ -38,7 +38,7 @@
  *  SDL_Event structure.
  *
  *  The values in this enumeration are based on the USB usage page standard:
- *  http://www.usb.org/developers/devclass_docs/Hut1_12v2.pdf
+ *  https://www.usb.org/sites/default/files/documents/hut1_12v2.pdf
  */
 typedef enum
 {
@@ -390,12 +390,24 @@ typedef enum
 
     /* @} *//* Walther keys */
 
+    /**
+     *  \name Usage page 0x0C (additional media keys)
+     *
+     *  These values are mapped from usage page 0x0C (USB consumer page).
+     */
+    /* @{ */
+
+    SDL_SCANCODE_AUDIOREWIND = 285,
+    SDL_SCANCODE_AUDIOFASTFORWARD = 286,
+
+    /* @} *//* Usage page 0x0C (additional media keys) */
+
     /* Add any other keys here. */
 
     SDL_NUM_SCANCODES = 512 /**< not a key, just marks the number of scancodes
                                  for array bounds */
 } SDL_Scancode;
 
-#endif /* _SDL_scancode_h */
+#endif /* SDL_scancode_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

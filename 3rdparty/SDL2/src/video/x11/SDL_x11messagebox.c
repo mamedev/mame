@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -26,7 +26,7 @@
 #include "SDL.h"
 #include "SDL_x11video.h"
 #include "SDL_x11dyn.h"
-#include "SDL_assert.h"
+#include "SDL_x11messagebox.h"
 
 #include <X11/keysym.h>
 #include <locale.h>
@@ -43,13 +43,12 @@
 #endif
 
 #define MAX_BUTTONS             8       /* Maximum number of buttons supported */
-#define MAX_TEXT_LINES          32      /* Maximum number of text lines supported */
 #define MIN_BUTTON_WIDTH        64      /* Minimum button width */
 #define MIN_DIALOG_WIDTH        200     /* Minimum dialog width */
 #define MIN_DIALOG_HEIGHT       100     /* Minimum dialog height */
 
 static const char g_MessageBoxFontLatin1[] = "-*-*-medium-r-normal--0-120-*-*-p-0-iso8859-1";
-static const char g_MessageBoxFont[] = "-*-*-*-*-*-*-*-120-*-*-*-*-*-*";
+static const char g_MessageBoxFont[] = "-*-*-medium-r-normal--*-120-*-*-*-*-*-*";
 
 static const SDL_MessageBoxColor g_default_colors[ SDL_MESSAGEBOX_COLOR_MAX ] = {
     { 56,  54,  53  }, /* SDL_MESSAGEBOX_COLOR_BACKGROUND, */
@@ -100,7 +99,7 @@ typedef struct SDL_MessageBoxDataX11
     int xtext, ytext;                   /* Text position to start drawing at. */
     int numlines;                       /* Count of Text lines. */
     int text_height;                    /* Height for text lines. */
-    TextLineData linedata[ MAX_TEXT_LINES ];
+    TextLineData *linedata;
 
     int *pbuttonid;                     /* Pointer to user return buttonid value. */
 
@@ -222,6 +221,18 @@ X11_MessageBoxInit( SDL_MessageBoxDataX11 *data, const SDL_MessageBoxData * mess
     return 0;
 }
 
+static int
+CountLinesOfText(const char *text)
+{
+    int retval = 0;
+    while (text && *text) {
+        const char *lf = SDL_strchr(text, '\n');
+        retval++;  /* even without an endline, this counts as a line. */
+        text = lf ? lf + 1 : NULL;
+    }
+    return retval;
+}
+
 /* Calculate and initialize text and button locations. */
 static int
 X11_MessageBoxInitPositions( SDL_MessageBoxDataX11 *data )
@@ -234,31 +245,37 @@ X11_MessageBoxInitPositions( SDL_MessageBoxDataX11 *data )
     const SDL_MessageBoxData *messageboxdata = data->messageboxdata;
 
     /* Go over text and break linefeeds into separate lines. */
-    if ( messageboxdata->message && messageboxdata->message[ 0 ] ) {
+    if ( messageboxdata->message[0] ) {
         const char *text = messageboxdata->message;
-        TextLineData *plinedata = data->linedata;
+        const int linecount = CountLinesOfText(text);
+        TextLineData *plinedata = (TextLineData *) SDL_malloc(sizeof (TextLineData) * linecount);
 
-        for ( i = 0; i < MAX_TEXT_LINES; i++, plinedata++ ) {
+        if (!plinedata) {
+            return SDL_OutOfMemory();
+        }
+
+        data->linedata = plinedata;
+        data->numlines = linecount;
+
+        for ( i = 0; i < linecount; i++, plinedata++ ) {
+            const char *lf = SDL_strchr( text, '\n' );
+            const int length = lf ? ( lf - text ) : SDL_strlen( text );
             int height;
-            char *lf = SDL_strchr( ( char * )text, '\n' );
 
-            data->numlines++;
-
-            /* Only grab length up to lf if it exists and isn't the last line. */
-            plinedata->length = ( lf && ( i < MAX_TEXT_LINES - 1 ) ) ? ( lf - text ) : SDL_strlen( text );
             plinedata->text = text;
 
-            GetTextWidthHeight( data, text, plinedata->length, &plinedata->width, &height );
+            GetTextWidthHeight( data, text, length, &plinedata->width, &height );
 
             /* Text and widths are the largest we've ever seen. */
             data->text_height = IntMax( data->text_height, height );
             text_width_max = IntMax( text_width_max, plinedata->width );
 
+            plinedata->length = length;
             if (lf && (lf > text) && (lf[-1] == '\r')) {
                 plinedata->length--;
             }
 
-            text += plinedata->length + 1;
+            text += length + 1;
 
             /* Break if there are no more linefeeds. */
             if ( !lf )
@@ -316,7 +333,11 @@ X11_MessageBoxInitPositions( SDL_MessageBoxDataX11 *data )
         data->dialog_height = IntMax( data->dialog_height, ybuttons + 2 * button_height );
 
         /* Location for first button. */
-        x = ( data->dialog_width - width_of_buttons ) / 2;
+        if ( messageboxdata->flags & SDL_MESSAGEBOX_BUTTONS_RIGHT_TO_LEFT ) {
+			x = data->dialog_width - ( data->dialog_width - width_of_buttons ) / 2 - ( button_width + button_spacing );
+		} else {
+			x = ( data->dialog_width - width_of_buttons ) / 2;
+		}
         y = ybuttons + ( data->dialog_height - ybuttons - button_height ) / 2;
 
         for ( i = 0; i < data->numbuttons; i++ ) {
@@ -331,7 +352,11 @@ X11_MessageBoxInitPositions( SDL_MessageBoxDataX11 *data )
             data->buttonpos[ i ].y = y + ( button_height - button_text_height - 1 ) / 2 + button_text_height;
 
             /* Scoot over for next button. */
-            x += button_width + button_spacing;
+			if ( messageboxdata->flags & SDL_MESSAGEBOX_BUTTONS_RIGHT_TO_LEFT ) {
+				x -= button_width + button_spacing;
+			} else {
+				x += button_width + button_spacing;
+			}
         }
     }
 
@@ -368,6 +393,8 @@ X11_MessageBoxShutdown( SDL_MessageBoxDataX11 *data )
         X11_XCloseDisplay( data->display );
         data->display = NULL;
     }
+
+    SDL_free(data->linedata);
 }
 
 /* Create and set up our X11 dialog box indow. */
@@ -377,10 +404,11 @@ X11_MessageBoxCreateWindow( SDL_MessageBoxDataX11 *data )
     int x, y;
     XSizeHints *sizehints;
     XSetWindowAttributes wnd_attr;
-    Atom _NET_WM_WINDOW_TYPE, _NET_WM_WINDOW_TYPE_DIALOG, _NET_WM_NAME, UTF8_STRING;
+    Atom _NET_WM_WINDOW_TYPE, _NET_WM_WINDOW_TYPE_DIALOG, _NET_WM_NAME;
     Display *display = data->display;
     SDL_WindowData *windowdata = NULL;
     const SDL_MessageBoxData *messageboxdata = data->messageboxdata;
+    char *title_locale = NULL;
 
     if ( messageboxdata->window ) {
         SDL_DisplayData *displaydata =
@@ -407,16 +435,49 @@ X11_MessageBoxCreateWindow( SDL_MessageBoxDataX11 *data )
     }
 
     if ( windowdata ) {
+        Atom _NET_WM_STATE = X11_XInternAtom(display, "_NET_WM_STATE", False);
+        Atom stateatoms[16];
+        size_t statecount = 0;
+        /* Set some message-boxy window states when attached to a parent window... */
+        /* we skip the taskbar since this will pop to the front when the parent window is clicked in the taskbar, etc */
+        stateatoms[statecount++] = X11_XInternAtom(display, "_NET_WM_STATE_SKIP_TASKBAR", False);
+        stateatoms[statecount++] = X11_XInternAtom(display, "_NET_WM_STATE_SKIP_PAGER", False);
+        stateatoms[statecount++] = X11_XInternAtom(display, "_NET_WM_STATE_FOCUSED", False);
+        stateatoms[statecount++] = X11_XInternAtom(display, "_NET_WM_STATE_MODAL", False);
+        SDL_assert(statecount <= SDL_arraysize(stateatoms));
+        X11_XChangeProperty(display, data->window, _NET_WM_STATE, XA_ATOM, 32,
+                            PropModeReplace, (unsigned char *)stateatoms, statecount);
+
         /* http://tronche.com/gui/x/icccm/sec-4.html#WM_TRANSIENT_FOR */
         X11_XSetTransientForHint( display, data->window, windowdata->xwindow );
     }
 
     X11_XStoreName( display, data->window, messageboxdata->title );
     _NET_WM_NAME = X11_XInternAtom(display, "_NET_WM_NAME", False);
-    UTF8_STRING = X11_XInternAtom(display, "UTF8_STRING", False);
-    X11_XChangeProperty(display, data->window, _NET_WM_NAME, UTF8_STRING, 8,
-                    PropModeReplace, (unsigned char *) messageboxdata->title,
-                    strlen(messageboxdata->title) + 1 );
+
+    title_locale = SDL_iconv_utf8_locale(messageboxdata->title);
+    if (title_locale) {
+        XTextProperty titleprop;
+        Status status = X11_XStringListToTextProperty(&title_locale, 1, &titleprop);
+        SDL_free(title_locale);
+        if (status) {
+            X11_XSetTextProperty(display, data->window, &titleprop, XA_WM_NAME);
+            X11_XFree(titleprop.value);
+        }
+    }
+
+#ifdef X_HAVE_UTF8_STRING
+    if (SDL_X11_HAVE_UTF8) {
+        XTextProperty titleprop;
+        Status status = X11_Xutf8TextListToTextProperty(display, (char **) &messageboxdata->title, 1,
+                                            XUTF8StringStyle, &titleprop);
+        if (status == Success) {
+            X11_XSetTextProperty(display, data->window, &titleprop,
+                                 _NET_WM_NAME);
+            X11_XFree(titleprop.value);
+        }
+    }
+#endif
 
     /* Let the window manager know this is a dialog box */
     _NET_WM_WINDOW_TYPE = X11_XInternAtom(display, "_NET_WM_WINDOW_TYPE", False);

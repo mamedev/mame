@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -45,7 +45,7 @@ SDL_X11_SYM(Pixmap,XCreateBitmapFromData,(Display *dpy,Drawable d,_Xconst char *
 SDL_X11_SYM(Colormap,XCreateColormap,(Display* a,Window b,Visual* c,int d),(a,b,c,d),return)
 SDL_X11_SYM(Cursor,XCreatePixmapCursor,(Display* a,Pixmap b,Pixmap c,XColor* d,XColor* e,unsigned int f,unsigned int g),(a,b,c,d,e,f,g),return)
 SDL_X11_SYM(Cursor,XCreateFontCursor,(Display* a,unsigned int b),(a,b),return)
-SDL_X11_SYM(XFontSet,XCreateFontSet,(Display* a, _Xconst char* b, char*** c, int* d, char**	e),(a,b,c,d,e),return)
+SDL_X11_SYM(XFontSet,XCreateFontSet,(Display* a, _Xconst char* b, char*** c, int* d, char** e),(a,b,c,d,e),return)
 SDL_X11_SYM(GC,XCreateGC,(Display* a,Drawable b,unsigned long c,XGCValues* d),(a,b,c,d),return)
 SDL_X11_SYM(XImage*,XCreateImage,(Display* a,Visual* b,unsigned int c,int d,int e,char* f,unsigned int g,unsigned int h,int i,int j),(a,b,c,d,e,f,g,h,i,j),return)
 SDL_X11_SYM(Window,XCreateWindow,(Display* a,Window b,int c,int d,unsigned int e,unsigned int f,unsigned int g,int h,unsigned int i,Visual* j,unsigned long k,XSetWindowAttributes* l),(a,b,c,d,e,f,g,h,i,j,k,l),return)
@@ -72,6 +72,7 @@ SDL_X11_SYM(char*,XGetAtomName,(Display *a,Atom b),(a,b),return)
 SDL_X11_SYM(int,XGetInputFocus,(Display *a,Window *b,int *c),(a,b,c),return)
 SDL_X11_SYM(int,XGetErrorDatabaseText,(Display* a,_Xconst char* b,_Xconst char* c,_Xconst char* d,char* e,int f),(a,b,c,d,e,f),return)
 SDL_X11_SYM(XModifierKeymap*,XGetModifierMapping,(Display* a),(a),return)
+SDL_X11_SYM(int,XGetKeyboardControl,(Display* a, XKeyboardState* b),(a,b),return)
 SDL_X11_SYM(int,XGetPointerControl,(Display* a,int* b,int* c,int* d),(a,b,c,d),return)
 SDL_X11_SYM(Window,XGetSelectionOwner,(Display* a,Atom b),(a,b),return)
 SDL_X11_SYM(XVisualInfo*,XGetVisualInfo,(Display* a,long b,XVisualInfo* c,int* d),(a,b,c,d),return)
@@ -179,6 +180,8 @@ SDL_X11_SYM(Status,XkbGetState,(Display* a,unsigned int b,XkbStatePtr c),(a,b,c)
 SDL_X11_SYM(Status,XkbGetUpdatedMap,(Display* a,unsigned int b,XkbDescPtr c),(a,b,c),return)
 SDL_X11_SYM(XkbDescPtr,XkbGetMap,(Display* a,unsigned int b,unsigned int c),(a,b,c),return)
 SDL_X11_SYM(void,XkbFreeClientMap,(XkbDescPtr a,unsigned int b, Bool c),(a,b,c),)
+SDL_X11_SYM(void,XkbFreeKeyboard,(XkbDescPtr a,unsigned int b, Bool c),(a,b,c),)
+SDL_X11_SYM(Bool,XkbSetDetectableAutoRepeat,(Display* a, Bool b, Bool* c),(a,b,c),return)
 #endif
 
 #if NeedWidePrototypes
@@ -199,7 +202,7 @@ SDL_X11_SYM(void,XUnsetICFocus,(XIC a),(a),)
 SDL_X11_SYM(XIM,XOpenIM,(Display* a,struct _XrmHashBucketRec* b,char* c,char* d),(a,b,c,d),return)
 SDL_X11_SYM(Status,XCloseIM,(XIM a),(a),return)
 SDL_X11_SYM(void,Xutf8DrawString,(Display *a, Drawable b, XFontSet c, GC d, int e, int f, _Xconst char *g, int h),(a,b,c,d,e,f,g,h),)
-SDL_X11_SYM(int,Xutf8TextExtents,(XFontSet a, _Xconst char*	b, int c, XRectangle* d, XRectangle* e),(a,b,c,d,e),return)
+SDL_X11_SYM(int,Xutf8TextExtents,(XFontSet a, _Xconst char* b, int c, XRectangle* d, XRectangle* e),(a,b,c,d,e),return)
 SDL_X11_SYM(char*,XSetLocaleModifiers,(const char *a),(a),return)
 SDL_X11_SYM(char*,Xutf8ResetIC,(XIC a),(a),return)
 #endif
@@ -290,6 +293,7 @@ SDL_X11_SYM(void,XRRFreeScreenConfigInfo,(XRRScreenConfiguration *config),(confi
 SDL_X11_SYM(void,XRRSetScreenSize,(Display *dpy, Window window,int width, int height,int mmWidth, int mmHeight),(dpy,window,width,height,mmWidth,mmHeight),)
 SDL_X11_SYM(Status,XRRGetScreenSizeRange,(Display *dpy, Window window,int *minWidth, int *minHeight, int *maxWidth, int *maxHeight),(dpy,window,minWidth,minHeight,maxWidth,maxHeight),return)
 SDL_X11_SYM(XRRScreenResources *,XRRGetScreenResources,(Display *dpy, Window window),(dpy, window),return)
+SDL_X11_SYM(XRRScreenResources *,XRRGetScreenResourcesCurrent,(Display *dpy, Window window),(dpy, window),return)
 SDL_X11_SYM(void,XRRFreeScreenResources,(XRRScreenResources *resources),(resources),)
 SDL_X11_SYM(XRROutputInfo *,XRRGetOutputInfo,(Display *dpy, XRRScreenResources *resources, RROutput output),(dpy,resources,output),return)
 SDL_X11_SYM(void,XRRFreeOutputInfo,(XRROutputInfo *outputInfo),(outputInfo),)

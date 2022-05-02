@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -129,22 +129,14 @@ main(int argc, char *argv[])
     if (!state) {
         return 1;
     }
-    for (i = 1; i < argc;) {
-        int consumed;
 
-        consumed = SDLTest_CommonArg(state, i);
-        if (consumed == 0) {
-            consumed = -1;
-        }
-        if (consumed < 0) {
-            SDL_Log("Usage: %s %s\n", argv[0], SDLTest_CommonUsage(state));
-            quit(1);
-        }
-        i += consumed;
+    if (!SDLTest_CommonDefaultArgs(state, argc, argv) || !SDLTest_CommonInit(state)) {
+        SDLTest_CommonQuit(state);
+        return 1;
     }
-    if (!SDLTest_CommonInit(state)) {
-        quit(2);
-    }
+
+    SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
+    SDL_EventState(SDL_DROPTEXT, SDL_ENABLE);
 
     for (i = 0; i < state->num_windows; ++i) {
         SDL_Renderer *renderer = state->renderers[i];

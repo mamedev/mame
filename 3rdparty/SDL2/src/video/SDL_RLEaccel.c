@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,12 +20,14 @@
 */
 #include "../SDL_internal.h"
 
+#if SDL_HAVE_RLE
+
 /*
  * RLE encoding for software colorkey and alpha-channel acceleration
  *
  * Original version by Sam Lantinga
  *
- * Mattias Engdegård (Yorick): Rewrite. New encoding format, encoder and
+ * Mattias EngdegÃ¥rd (Yorick): Rewrite. New encoding format, encoder and
  * decoder. Added per-surface alpha blitter. Added per-pixel alpha
  * format, encoder and blitter.
  *
@@ -90,9 +92,6 @@
 #include "SDL_blit.h"
 #include "SDL_RLEaccel_c.h"
 
-#ifndef MAX
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-#endif
 #ifndef MIN
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #endif
@@ -298,10 +297,10 @@
     } while(0)
 
 #define ALPHA_BLIT16_565_50(to, from, length, bpp, alpha)       \
-    ALPHA_BLIT16_50(to, from, length, bpp, alpha, 0xf7de)
+    ALPHA_BLIT16_50(to, from, length, bpp, alpha, 0xf7deU)
 
 #define ALPHA_BLIT16_555_50(to, from, length, bpp, alpha)       \
-    ALPHA_BLIT16_50(to, from, length, bpp, alpha, 0xfbde)
+    ALPHA_BLIT16_50(to, from, length, bpp, alpha, 0xfbdeU)
 
 #define CHOOSE_BLIT(blitter, alpha, fmt)                        \
     do {                                                        \
@@ -448,7 +447,7 @@ RLEClipBlit(int w, Uint8 * srcbuf, SDL_Surface * surf_dst,
 
 
 /* blit a colorkeyed RLE surface */
-int
+static int SDLCALL
 SDL_RLEBlit(SDL_Surface * surf_src, SDL_Rect * srcrect,
             SDL_Surface * surf_dst, SDL_Rect * dstrect)
 {
@@ -726,7 +725,7 @@ RLEAlphaClipBlit(int w, Uint8 * srcbuf, SDL_Surface * surf_dst,
 }
 
 /* blit a pixel-alpha RLE surface */
-int
+static int SDLCALL
 SDL_RLEAlphaBlit(SDL_Surface * surf_src, SDL_Rect * srcrect,
                  SDL_Surface * surf_dst, SDL_Rect * dstrect)
 {
@@ -1223,8 +1222,9 @@ RLEAlphaSurface(SDL_Surface * surface)
 
     /* Now that we have it encoded, release the original pixels */
     if (!(surface->flags & SDL_PREALLOC)) {
-        SDL_free(surface->pixels);
+        SDL_SIMDFree(surface->pixels);
         surface->pixels = NULL;
+        surface->flags &= ~SDL_SIMD_ALIGNED;
     }
 
     /* realloc the buffer to release unused memory */
@@ -1239,19 +1239,19 @@ RLEAlphaSurface(SDL_Surface * surface)
 }
 
 static Uint32
-getpix_8(Uint8 * srcbuf)
+getpix_8(const Uint8 * srcbuf)
 {
     return *srcbuf;
 }
 
 static Uint32
-getpix_16(Uint8 * srcbuf)
+getpix_16(const Uint8 * srcbuf)
 {
-    return *(Uint16 *) srcbuf;
+    return *(const Uint16 *) srcbuf;
 }
 
 static Uint32
-getpix_24(Uint8 * srcbuf)
+getpix_24(const Uint8 * srcbuf)
 {
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
     return srcbuf[0] + (srcbuf[1] << 8) + (srcbuf[2] << 16);
@@ -1261,12 +1261,12 @@ getpix_24(Uint8 * srcbuf)
 }
 
 static Uint32
-getpix_32(Uint8 * srcbuf)
+getpix_32(const Uint8 * srcbuf)
 {
-    return *(Uint32 *) srcbuf;
+    return *(const Uint32 *) srcbuf;
 }
 
-typedef Uint32(*getpix_func) (Uint8 *);
+typedef Uint32(*getpix_func) (const Uint8 *);
 
 static const getpix_func getpixes[4] = {
     getpix_8, getpix_16, getpix_24, getpix_32
@@ -1280,7 +1280,7 @@ RLEColorkeySurface(SDL_Surface * surface)
     int y;
     Uint8 *srcbuf, *lastline;
     int maxsize = 0;
-    int bpp = surface->format->BytesPerPixel;
+    const int bpp = surface->format->BytesPerPixel;
     getpix_func getpix;
     Uint32 ckey, rgbmask;
     int w, h;
@@ -1303,6 +1303,9 @@ RLEColorkeySurface(SDL_Surface * surface)
         maxsize = surface->h * (4 * (surface->w / 65535 + 1)
                                 + surface->w * 4) + 4;
         break;
+
+    default:
+        return -1;
     }
 
     rlebuf = (Uint8 *) SDL_malloc(maxsize);
@@ -1383,8 +1386,9 @@ RLEColorkeySurface(SDL_Surface * surface)
 
     /* Now that we have it encoded, release the original pixels */
     if (!(surface->flags & SDL_PREALLOC)) {
-        SDL_free(surface->pixels);
+        SDL_SIMDFree(surface->pixels);
         surface->pixels = NULL;
+        surface->flags &= ~SDL_SIMD_ALIGNED;
     }
 
     /* realloc the buffer to release unused memory */
@@ -1396,7 +1400,7 @@ RLEColorkeySurface(SDL_Surface * surface)
         surface->map->data = p;
     }
 
-    return (0);
+    return 0;
 }
 
 int
@@ -1428,7 +1432,7 @@ SDL_RLESurface(SDL_Surface * surface)
     /* Pass on combinations not supported */
     if ((flags & SDL_COPY_MODULATE_COLOR) ||
         ((flags & SDL_COPY_MODULATE_ALPHA) && surface->format->Amask) ||
-        (flags & (SDL_COPY_ADD | SDL_COPY_MOD)) ||
+        (flags & (SDL_COPY_ADD | SDL_COPY_MOD | SDL_COPY_MUL)) ||
         (flags & SDL_COPY_NEAREST)) {
         return -1;
     }
@@ -1484,10 +1488,11 @@ UnRLEAlpha(SDL_Surface * surface)
         uncopy_opaque = uncopy_transl = uncopy_32;
     }
 
-    surface->pixels = SDL_malloc(surface->h * surface->pitch);
+    surface->pixels = SDL_SIMDAlloc(surface->h * surface->pitch);
     if (!surface->pixels) {
         return (SDL_FALSE);
     }
+    surface->flags |= SDL_SIMD_ALIGNED;
     /* fill background with transparent pixels */
     SDL_memset(surface->pixels, 0, surface->h * surface->pitch);
 
@@ -1510,8 +1515,9 @@ UnRLEAlpha(SDL_Surface * surface)
             if (run) {
                 srcbuf += uncopy_opaque(dst + ofs, srcbuf, run, df, sf);
                 ofs += run;
-            } else if (!ofs)
-                return (SDL_TRUE);
+            } else if (!ofs) {
+                goto end_function;
+            }
         } while (ofs < w);
 
         /* skip padding if needed */
@@ -1532,7 +1538,8 @@ UnRLEAlpha(SDL_Surface * surface)
         } while (ofs < w);
         dst += surface->pitch >> 2;
     }
-    /* Make the compiler happy */
+
+end_function:
     return (SDL_TRUE);
 }
 
@@ -1547,12 +1554,13 @@ SDL_UnRLESurface(SDL_Surface * surface, int recode)
                 SDL_Rect full;
 
                 /* re-create the original surface */
-                surface->pixels = SDL_malloc(surface->h * surface->pitch);
+                surface->pixels = SDL_SIMDAlloc(surface->h * surface->pitch);
                 if (!surface->pixels) {
                     /* Oh crap... */
                     surface->flags |= SDL_RLEACCEL;
                     return;
                 }
+                surface->flags |= SDL_SIMD_ALIGNED;
 
                 /* fill it with the background color */
                 SDL_FillRect(surface, NULL, surface->map->info.colorkey);
@@ -1577,5 +1585,7 @@ SDL_UnRLESurface(SDL_Surface * surface, int recode)
         surface->map->data = NULL;
     }
 }
+
+#endif /* SDL_HAVE_RLE */
 
 /* vi: set ts=4 sw=4 expandtab: */

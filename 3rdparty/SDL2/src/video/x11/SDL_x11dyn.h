@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,8 +20,8 @@
 */
 #include "../../SDL_internal.h"
 
-#ifndef _SDL_x11dyn_h
-#define _SDL_x11dyn_h
+#ifndef SDL_x11dyn_h_
+#define SDL_x11dyn_h_
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -107,5 +107,5 @@ extern SDL_DYNX11FN_XGetICValues X11_XGetICValues;
 }
 #endif
 
-#endif                          /* !defined _SDL_x11dyn_h */
+#endif                          /* !defined SDL_x11dyn_h_ */
 /* vi: set ts=4 sw=4 expandtab: */

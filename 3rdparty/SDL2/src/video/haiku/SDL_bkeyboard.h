@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -30,13 +30,15 @@ extern "C" {
 
 #include "../../../include/SDL_keyboard.h"
 
-extern void BE_InitOSKeymap();
-extern SDL_Scancode BE_GetScancodeFromBeKey(int32 bkey);
-extern int8 BE_GetKeyState(int32 bkey);
-extern void BE_SetKeyState(int32 bkey, int8 state);
+extern void HAIKU_InitOSKeymap(void);
+extern SDL_Scancode HAIKU_GetScancodeFromBeKey(int32 bkey);
+extern int8 HAIKU_GetKeyState(int32 bkey);
+extern void HAIKU_SetKeyState(int32 bkey, int8 state);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
+
+/* vi: set ts=4 sw=4 expandtab: */

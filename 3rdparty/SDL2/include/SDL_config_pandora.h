@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,8 +19,9 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _SDL_config_h
-#define _SDL_config_h
+#ifndef SDL_config_pandora_h_
+#define SDL_config_pandora_h_
+#define SDL_config_h_
 
 /* This is a set of defines to configure the SDL features */
 
@@ -35,22 +36,24 @@
 
 #define SDL_BYTEORDER 1234
 
-#define HAVE_ALLOCA_H 1
-#define HAVE_SYS_TYPES_H 1
-#define HAVE_STDIO_H 1
 #define STDC_HEADERS 1
-#define HAVE_STDLIB_H 1
-#define HAVE_STDARG_H 1
-#define HAVE_MALLOC_H 1
-#define HAVE_MEMORY_H 1
-#define HAVE_STRING_H 1
-#define HAVE_STRINGS_H 1
-#define HAVE_INTTYPES_H 1
-#define HAVE_STDINT_H 1
+#define HAVE_ALLOCA_H 1
 #define HAVE_CTYPE_H 1
-#define HAVE_MATH_H 1
 #define HAVE_ICONV_H 1
+#define HAVE_INTTYPES_H 1
+#define HAVE_LIMITS_H 1
+#define HAVE_MALLOC_H 1
+#define HAVE_MATH_H 1
+#define HAVE_MEMORY_H 1
 #define HAVE_SIGNAL_H 1
+#define HAVE_STDARG_H 1
+#define HAVE_STDINT_H 1
+#define HAVE_STDIO_H 1
+#define HAVE_STDLIB_H 1
+#define HAVE_STRINGS_H 1
+#define HAVE_STRING_H 1
+#define HAVE_SYS_TYPES_H 1
+
 #define HAVE_MALLOC 1
 #define HAVE_CALLOC 1
 #define HAVE_REALLOC 1
@@ -67,7 +70,6 @@
 #define HAVE_MEMCPY 1
 #define HAVE_MEMMOVE 1
 #define HAVE_STRLEN 1
-#define HAVE_STRDUP 1
 #define HAVE_STRCHR 1
 #define HAVE_STRRCHR 1
 #define HAVE_STRSTR 1
@@ -88,9 +90,11 @@
 #define HAVE_COPYSIGN 1
 #define HAVE_COS 1
 #define HAVE_COSF 1
+#define HAVE_EXP 1
 #define HAVE_FABS 1
 #define HAVE_FLOOR 1
 #define HAVE_LOG 1
+#define HAVE_LOG10 1
 #define HAVE_SCALBN 1
 #define HAVE_SIN 1
 #define HAVE_SINF 1
@@ -98,6 +102,8 @@
 #define HAVE_SQRTF 1
 #define HAVE_TAN 1
 #define HAVE_TANF 1
+#define HAVE_TRUNC 1
+#define HAVE_TRUNCF 1
 #define HAVE_SIGACTION 1
 #define HAVE_SETJMP 1
 #define HAVE_NANOSLEEP 1
@@ -106,9 +112,11 @@
 #define SDL_AUDIO_DRIVER_OSS 1
 
 #define SDL_INPUT_LINUXEV 1
-#define SDL_INPUT_TSLIB 1
 #define SDL_JOYSTICK_LINUX 1
+#define SDL_JOYSTICK_VIRTUAL 1
 #define SDL_HAPTIC_LINUX 1
+
+#define SDL_SENSOR_DUMMY 1
 
 #define SDL_LOADSO_DLOPEN 1
 
@@ -124,4 +132,4 @@
 #define SDL_VIDEO_RENDER_OGL_ES 1
 #define SDL_VIDEO_OPENGL_ES 1
 
-#endif /* _SDL_config_h */
+#endif /* SDL_config_pandora_h_ */

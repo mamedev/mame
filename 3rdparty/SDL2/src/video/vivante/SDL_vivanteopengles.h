@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,8 +20,8 @@
 */
 #include "../../SDL_internal.h"
 
-#ifndef _SDL_vivanteopengles_h
-#define _SDL_vivanteopengles_h
+#ifndef SDL_vivanteopengles_h_
+#define SDL_vivanteopengles_h_
 
 #if SDL_VIDEO_DRIVER_VIVANTE && SDL_VIDEO_OPENGL_EGL
 
@@ -38,11 +38,11 @@
 
 extern int VIVANTE_GLES_LoadLibrary(_THIS, const char *path);
 extern SDL_GLContext VIVANTE_GLES_CreateContext(_THIS, SDL_Window * window);
-extern void VIVANTE_GLES_SwapWindow(_THIS, SDL_Window * window);
+extern int VIVANTE_GLES_SwapWindow(_THIS, SDL_Window * window);
 extern int VIVANTE_GLES_MakeCurrent(_THIS, SDL_Window * window, SDL_GLContext context);
 
 #endif /* SDL_VIDEO_DRIVER_VIVANTE && SDL_VIDEO_OPENGL_EGL */
 
-#endif /* _SDL_vivanteopengles_h */
+#endif /* SDL_vivanteopengles_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

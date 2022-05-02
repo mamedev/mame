@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,8 +19,8 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _SDL_DirectFB_events_h
-#define _SDL_DirectFB_events_h
+#ifndef SDL_DirectFB_events_h_
+#define SDL_DirectFB_events_h_
 
 #include "../SDL_sysvideo.h"
 
@@ -29,4 +29,6 @@ extern void DirectFB_InitKeyboard(_THIS);
 extern void DirectFB_QuitKeyboard(_THIS);
 extern void DirectFB_PumpEventsWindow(_THIS);
 
-#endif
+#endif /* SDL_DirectFB_events_h_ */
+
+/* vi: set ts=4 sw=4 expandtab: */

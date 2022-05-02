@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -45,8 +45,8 @@
  *  See this bug for details: http://bugzilla.libsdl.org/show_bug.cgi?id=1995
  */
 
-#ifndef _SDL_render_h
-#define _SDL_render_h
+#ifndef SDL_render_h_
+#define SDL_render_h_
 
 #include "SDL_stdinc.h"
 #include "SDL_rect.h"
@@ -84,6 +84,16 @@ typedef struct SDL_RendererInfo
     int max_texture_width;      /**< The maximum texture width */
     int max_texture_height;     /**< The maximum texture height */
 } SDL_RendererInfo;
+
+/**
+ *  \brief The scaling mode for a texture.
+ */
+typedef enum
+{
+    SDL_ScaleModeNearest, /**< nearest pixel sampling */
+    SDL_ScaleModeLinear,  /**< linear filtering */
+    SDL_ScaleModeBest     /**< anisotropic filtering */
+} SDL_ScaleMode;
 
 /**
  *  \brief The access pattern allowed for a texture.
@@ -233,6 +243,8 @@ extern DECLSPEC int SDLCALL SDL_GetRendererOutputSize(SDL_Renderer * renderer,
  *          active,  the format was unsupported, or the width or height were out
  *          of range.
  *
+ *  \note The contents of the texture are not defined at creation.
+ *
  *  \sa SDL_QueryTexture()
  *  \sa SDL_UpdateTexture()
  *  \sa SDL_DestroyTexture()
@@ -365,13 +377,45 @@ extern DECLSPEC int SDLCALL SDL_GetTextureBlendMode(SDL_Texture * texture,
                                                     SDL_BlendMode *blendMode);
 
 /**
+ *  \brief Set the scale mode used for texture scale operations.
+ *
+ *  \param texture The texture to update.
+ *  \param scaleMode ::SDL_ScaleMode to use for texture scaling.
+ *
+ *  \return 0 on success, or -1 if the texture is not valid.
+ *
+ *  \note If the scale mode is not supported, the closest supported mode is
+ *        chosen.
+ *
+ *  \sa SDL_GetTextureScaleMode()
+ */
+extern DECLSPEC int SDLCALL SDL_SetTextureScaleMode(SDL_Texture * texture,
+                                                    SDL_ScaleMode scaleMode);
+
+/**
+ *  \brief Get the scale mode used for texture scale operations.
+ *
+ *  \param texture   The texture to query.
+ *  \param scaleMode A pointer filled in with the current scale mode.
+ *
+ *  \return 0 on success, or -1 if the texture is not valid.
+ *
+ *  \sa SDL_SetTextureScaleMode()
+ */
+extern DECLSPEC int SDLCALL SDL_GetTextureScaleMode(SDL_Texture * texture,
+                                                    SDL_ScaleMode *scaleMode);
+
+/**
  *  \brief Update the given texture rectangle with new pixel data.
  *
  *  \param texture   The texture to update
  *  \param rect      A pointer to the rectangle of pixels to update, or NULL to
  *                   update the entire texture.
- *  \param pixels    The raw pixel data.
+ *  \param pixels    The raw pixel data in the format of the texture.
  *  \param pitch     The number of bytes in a row of pixel data, including padding between lines.
+ *
+ *  The pixel data must be in the format of the texture. The pixel format can be
+ *  queried with SDL_QueryTexture.
  *
  *  \return 0 on success, or -1 if the texture is not valid.
  *
@@ -426,9 +470,30 @@ extern DECLSPEC int SDLCALL SDL_LockTexture(SDL_Texture * texture,
                                             void **pixels, int *pitch);
 
 /**
+ *  \brief Lock a portion of the texture for write-only pixel access.
+ *         Expose it as a SDL surface.
+ *
+ *  \param texture   The texture to lock for access, which was created with
+ *                   ::SDL_TEXTUREACCESS_STREAMING.
+ *  \param rect      A pointer to the rectangle to lock for access. If the rect
+ *                   is NULL, the entire texture will be locked.
+ *  \param surface   This is filled in with a SDL surface representing the locked area
+ *                   Surface is freed internally after calling SDL_UnlockTexture or SDL_DestroyTexture.
+ *
+ *  \return 0 on success, or -1 if the texture is not valid or was not created with ::SDL_TEXTUREACCESS_STREAMING.
+ *
+ *  \sa SDL_UnlockTexture()
+ */
+extern DECLSPEC int SDLCALL SDL_LockTextureToSurface(SDL_Texture *texture,
+                                            const SDL_Rect *rect,
+                                            SDL_Surface **surface);
+
+/**
  *  \brief Unlock a texture, uploading the changes to video memory, if needed.
+ *         If SDL_LockTextureToSurface() was called for locking, the SDL surface is freed.
  *
  *  \sa SDL_LockTexture()
+ *  \sa SDL_LockTextureToSurface()
  */
 extern DECLSPEC void SDLCALL SDL_UnlockTexture(SDL_Texture * texture);
 
@@ -553,8 +618,8 @@ extern DECLSPEC void SDLCALL SDL_RenderGetViewport(SDL_Renderer * renderer,
  *  \brief Set the clip rectangle for the current target.
  *
  *  \param renderer The renderer for which clip rectangle should be set.
- *  \param rect   A pointer to the rectangle to set as the clip rectangle, or
- *                NULL to disable clipping.
+ *  \param rect   A pointer to the rectangle to set as the clip rectangle,
+ *                relative to the viewport, or NULL to disable clipping.
  *
  *  \return 0 on success, or -1 on error
  *
@@ -816,7 +881,7 @@ extern DECLSPEC int SDLCALL SDL_RenderCopy(SDL_Renderer * renderer,
  *                   texture.
  *  \param dstrect   A pointer to the destination rectangle, or NULL for the
  *                   entire rendering target.
- *  \param angle    An angle in degrees that indicates the rotation that will be applied to dstrect
+ *  \param angle    An angle in degrees that indicates the rotation that will be applied to dstrect, rotating it in a clockwise direction
  *  \param center   A pointer to a point indicating the point around which dstrect will be rotated (if NULL, rotation will be done around dstrect.w/2, dstrect.h/2).
  *  \param flip     An SDL_RendererFlip value stating which flipping actions should be performed on the texture
  *
@@ -829,6 +894,148 @@ extern DECLSPEC int SDLCALL SDL_RenderCopyEx(SDL_Renderer * renderer,
                                            const double angle,
                                            const SDL_Point *center,
                                            const SDL_RendererFlip flip);
+
+
+/**
+ *  \brief Draw a point on the current rendering target.
+ *
+ *  \param renderer The renderer which should draw a point.
+ *  \param x The x coordinate of the point.
+ *  \param y The y coordinate of the point.
+ *
+ *  \return 0 on success, or -1 on error
+ */
+extern DECLSPEC int SDLCALL SDL_RenderDrawPointF(SDL_Renderer * renderer,
+                                                 float x, float y);
+
+/**
+ *  \brief Draw multiple points on the current rendering target.
+ *
+ *  \param renderer The renderer which should draw multiple points.
+ *  \param points The points to draw
+ *  \param count The number of points to draw
+ *
+ *  \return 0 on success, or -1 on error
+ */
+extern DECLSPEC int SDLCALL SDL_RenderDrawPointsF(SDL_Renderer * renderer,
+                                                  const SDL_FPoint * points,
+                                                  int count);
+
+/**
+ *  \brief Draw a line on the current rendering target.
+ *
+ *  \param renderer The renderer which should draw a line.
+ *  \param x1 The x coordinate of the start point.
+ *  \param y1 The y coordinate of the start point.
+ *  \param x2 The x coordinate of the end point.
+ *  \param y2 The y coordinate of the end point.
+ *
+ *  \return 0 on success, or -1 on error
+ */
+extern DECLSPEC int SDLCALL SDL_RenderDrawLineF(SDL_Renderer * renderer,
+                                                float x1, float y1, float x2, float y2);
+
+/**
+ *  \brief Draw a series of connected lines on the current rendering target.
+ *
+ *  \param renderer The renderer which should draw multiple lines.
+ *  \param points The points along the lines
+ *  \param count The number of points, drawing count-1 lines
+ *
+ *  \return 0 on success, or -1 on error
+ */
+extern DECLSPEC int SDLCALL SDL_RenderDrawLinesF(SDL_Renderer * renderer,
+                                                const SDL_FPoint * points,
+                                                int count);
+
+/**
+ *  \brief Draw a rectangle on the current rendering target.
+ *
+ *  \param renderer The renderer which should draw a rectangle.
+ *  \param rect A pointer to the destination rectangle, or NULL to outline the entire rendering target.
+ *
+ *  \return 0 on success, or -1 on error
+ */
+extern DECLSPEC int SDLCALL SDL_RenderDrawRectF(SDL_Renderer * renderer,
+                                               const SDL_FRect * rect);
+
+/**
+ *  \brief Draw some number of rectangles on the current rendering target.
+ *
+ *  \param renderer The renderer which should draw multiple rectangles.
+ *  \param rects A pointer to an array of destination rectangles.
+ *  \param count The number of rectangles.
+ *
+ *  \return 0 on success, or -1 on error
+ */
+extern DECLSPEC int SDLCALL SDL_RenderDrawRectsF(SDL_Renderer * renderer,
+                                                 const SDL_FRect * rects,
+                                                 int count);
+
+/**
+ *  \brief Fill a rectangle on the current rendering target with the drawing color.
+ *
+ *  \param renderer The renderer which should fill a rectangle.
+ *  \param rect A pointer to the destination rectangle, or NULL for the entire
+ *              rendering target.
+ *
+ *  \return 0 on success, or -1 on error
+ */
+extern DECLSPEC int SDLCALL SDL_RenderFillRectF(SDL_Renderer * renderer,
+                                                const SDL_FRect * rect);
+
+/**
+ *  \brief Fill some number of rectangles on the current rendering target with the drawing color.
+ *
+ *  \param renderer The renderer which should fill multiple rectangles.
+ *  \param rects A pointer to an array of destination rectangles.
+ *  \param count The number of rectangles.
+ *
+ *  \return 0 on success, or -1 on error
+ */
+extern DECLSPEC int SDLCALL SDL_RenderFillRectsF(SDL_Renderer * renderer,
+                                                 const SDL_FRect * rects,
+                                                 int count);
+
+/**
+ *  \brief Copy a portion of the texture to the current rendering target.
+ *
+ *  \param renderer The renderer which should copy parts of a texture.
+ *  \param texture The source texture.
+ *  \param srcrect   A pointer to the source rectangle, or NULL for the entire
+ *                   texture.
+ *  \param dstrect   A pointer to the destination rectangle, or NULL for the
+ *                   entire rendering target.
+ *
+ *  \return 0 on success, or -1 on error
+ */
+extern DECLSPEC int SDLCALL SDL_RenderCopyF(SDL_Renderer * renderer,
+                                            SDL_Texture * texture,
+                                            const SDL_Rect * srcrect,
+                                            const SDL_FRect * dstrect);
+
+/**
+ *  \brief Copy a portion of the source texture to the current rendering target, rotating it by angle around the given center
+ *
+ *  \param renderer The renderer which should copy parts of a texture.
+ *  \param texture The source texture.
+ *  \param srcrect   A pointer to the source rectangle, or NULL for the entire
+ *                   texture.
+ *  \param dstrect   A pointer to the destination rectangle, or NULL for the
+ *                   entire rendering target.
+ *  \param angle    An angle in degrees that indicates the rotation that will be applied to dstrect, rotating it in a clockwise direction
+ *  \param center   A pointer to a point indicating the point around which dstrect will be rotated (if NULL, rotation will be done around dstrect.w/2, dstrect.h/2).
+ *  \param flip     An SDL_RendererFlip value stating which flipping actions should be performed on the texture
+ *
+ *  \return 0 on success, or -1 on error
+ */
+extern DECLSPEC int SDLCALL SDL_RenderCopyExF(SDL_Renderer * renderer,
+                                            SDL_Texture * texture,
+                                            const SDL_Rect * srcrect,
+                                            const SDL_FRect * dstrect,
+                                            const double angle,
+                                            const SDL_FPoint *center,
+                                            const SDL_RendererFlip flip);
 
 /**
  *  \brief Read pixels from the current rendering target.
@@ -871,6 +1078,31 @@ extern DECLSPEC void SDLCALL SDL_DestroyTexture(SDL_Texture * texture);
  */
 extern DECLSPEC void SDLCALL SDL_DestroyRenderer(SDL_Renderer * renderer);
 
+/**
+ *  \brief Force the rendering context to flush any pending commands to the
+ *         underlying rendering API.
+ *
+ *  You do not need to (and in fact, shouldn't) call this function unless
+ *  you are planning to call into OpenGL/Direct3D/Metal/whatever directly
+ *  in addition to using an SDL_Renderer.
+ *
+ *  This is for a very-specific case: if you are using SDL's render API,
+ *  you asked for a specific renderer backend (OpenGL, Direct3D, etc),
+ *  you set SDL_HINT_RENDER_BATCHING to "1", and you plan to make
+ *  OpenGL/D3D/whatever calls in addition to SDL render API calls. If all of
+ *  this applies, you should call SDL_RenderFlush() between calls to SDL's
+ *  render API and the low-level API you're using in cooperation.
+ *
+ *  In all other cases, you can ignore this function. This is only here to
+ *  get maximum performance out of a specific situation. In all other cases,
+ *  SDL will do the right thing, perhaps at a performance loss.
+ *
+ *  This function is first available in SDL 2.0.10, and is not needed in
+ *  2.0.9 and earlier, as earlier versions did not queue rendering commands
+ *  at all, instead flushing them to the OS immediately.
+ */
+extern DECLSPEC int SDLCALL SDL_RenderFlush(SDL_Renderer * renderer);
+
 
 /**
  *  \brief Bind the texture to the current OpenGL/ES/ES2 context for use with
@@ -893,6 +1125,27 @@ extern DECLSPEC int SDLCALL SDL_GL_BindTexture(SDL_Texture *texture, float *texw
  */
 extern DECLSPEC int SDLCALL SDL_GL_UnbindTexture(SDL_Texture *texture);
 
+/**
+ *  \brief Get the CAMetalLayer associated with the given Metal renderer
+ *
+ *  \param renderer The renderer to query
+ *
+ *  \return CAMetalLayer* on success, or NULL if the renderer isn't a Metal renderer
+ *
+ *  \sa SDL_RenderGetMetalCommandEncoder()
+ */
+extern DECLSPEC void *SDLCALL SDL_RenderGetMetalLayer(SDL_Renderer * renderer);
+
+/**
+ *  \brief Get the Metal command encoder for the current frame
+ *
+ *  \param renderer The renderer to query
+ *
+ *  \return id<MTLRenderCommandEncoder> on success, or NULL if the renderer isn't a Metal renderer
+ *
+ *  \sa SDL_RenderGetMetalLayer()
+ */
+extern DECLSPEC void *SDLCALL SDL_RenderGetMetalCommandEncoder(SDL_Renderer * renderer);
 
 /* Ends C function definitions when using C++ */
 #ifdef __cplusplus
@@ -900,6 +1153,6 @@ extern DECLSPEC int SDLCALL SDL_GL_UnbindTexture(SDL_Texture *texture);
 #endif
 #include "close_code.h"
 
-#endif /* _SDL_render_h */
+#endif /* SDL_render_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

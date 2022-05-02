@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -24,11 +24,18 @@
 
 #if SDL_DYNAMIC_API
 
+#if defined(__OS2__)
+#define INCL_DOS
+#define INCL_DOSERRORS
+#include <os2.h>
+#include <dos.h>
+#endif
+
 #include "SDL.h"
 
-/* !!! FIXME: Shouldn't these be included in SDL.h? */
-#include "SDL_shape.h"
+/* These headers have system specific definitions, so aren't included above */
 #include "SDL_syswm.h"
+#include "SDL_vulkan.h"
 
 /* This is the version of the dynamic API. This doesn't match the SDL version
    and should not change until there's been a major revamp in API/ABI.
@@ -56,38 +63,38 @@ static void SDL_InitDynamicAPI(void);
 #if DISABLE_JUMP_MAGIC
 /* Can't use the macro for varargs nonsense. This is atrocious. */
 #define SDL_DYNAPI_VARARGS_LOGFN(_static, name, initcall, logname, prio) \
-    _static void SDL_Log##logname##name(int category, SDL_PRINTF_FORMAT_STRING const char *fmt, ...) { \
+    _static void SDLCALL SDL_Log##logname##name(int category, SDL_PRINTF_FORMAT_STRING const char *fmt, ...) { \
         va_list ap; initcall; va_start(ap, fmt); \
         jump_table.SDL_LogMessageV(category, SDL_LOG_PRIORITY_##prio, fmt, ap); \
         va_end(ap); \
     }
 
 #define SDL_DYNAPI_VARARGS(_static, name, initcall) \
-    _static int SDL_SetError##name(SDL_PRINTF_FORMAT_STRING const char *fmt, ...) { \
+    _static int SDLCALL SDL_SetError##name(SDL_PRINTF_FORMAT_STRING const char *fmt, ...) { \
         char buf[512]; /* !!! FIXME: dynamic allocation */ \
         va_list ap; initcall; va_start(ap, fmt); \
         jump_table.SDL_vsnprintf(buf, sizeof (buf), fmt, ap); \
         va_end(ap); \
         return jump_table.SDL_SetError("%s", buf); \
     } \
-    _static int SDL_sscanf##name(const char *buf, SDL_SCANF_FORMAT_STRING const char *fmt, ...) { \
+    _static int SDLCALL SDL_sscanf##name(const char *buf, SDL_SCANF_FORMAT_STRING const char *fmt, ...) { \
         int retval; va_list ap; initcall; va_start(ap, fmt); \
         retval = jump_table.SDL_vsscanf(buf, fmt, ap); \
         va_end(ap); \
         return retval; \
     } \
-    _static int SDL_snprintf##name(SDL_OUT_Z_CAP(maxlen) char *buf, size_t maxlen, SDL_PRINTF_FORMAT_STRING const char *fmt, ...) { \
+    _static int SDLCALL SDL_snprintf##name(SDL_OUT_Z_CAP(maxlen) char *buf, size_t maxlen, SDL_PRINTF_FORMAT_STRING const char *fmt, ...) { \
         int retval; va_list ap; initcall; va_start(ap, fmt); \
         retval = jump_table.SDL_vsnprintf(buf, maxlen, fmt, ap); \
         va_end(ap); \
         return retval; \
     } \
-    _static void SDL_Log##name(SDL_PRINTF_FORMAT_STRING const char *fmt, ...) { \
+    _static void SDLCALL SDL_Log##name(SDL_PRINTF_FORMAT_STRING const char *fmt, ...) { \
         va_list ap; initcall; va_start(ap, fmt); \
         jump_table.SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, fmt, ap); \
         va_end(ap); \
     } \
-    _static void SDL_LogMessage##name(int category, SDL_LogPriority priority, SDL_PRINTF_FORMAT_STRING const char *fmt, ...) { \
+    _static void SDLCALL SDL_LogMessage##name(int category, SDL_LogPriority priority, SDL_PRINTF_FORMAT_STRING const char *fmt, ...) { \
         va_list ap; initcall; va_start(ap, fmt); \
         jump_table.SDL_LogMessageV(category, priority, fmt, ap); \
         va_end(ap); \
@@ -105,9 +112,9 @@ static void SDL_InitDynamicAPI(void);
 /* The DEFAULT funcs will init jump table and then call real function. */
 /* The REAL funcs are the actual functions, name-mangled to not clash. */
 #define SDL_DYNAPI_PROC(rc,fn,params,args,ret) \
-    typedef rc (*SDL_DYNAPIFN_##fn) params; \
-    static rc fn##_DEFAULT params; \
-    extern rc fn##_REAL params;
+    typedef rc (SDLCALL *SDL_DYNAPIFN_##fn) params; \
+    static rc SDLCALL fn##_DEFAULT params; \
+    extern rc SDLCALL fn##_REAL params;
 #include "SDL_dynapi_procs.h"
 #undef SDL_DYNAPI_PROC
 
@@ -119,7 +126,7 @@ typedef struct {
 } SDL_DYNAPI_jump_table;
 
 /* Predeclare the default functions for initializing the jump table. */
-#define SDL_DYNAPI_PROC(rc,fn,params,args,ret) static rc fn##_DEFAULT params;
+#define SDL_DYNAPI_PROC(rc,fn,params,args,ret) static rc SDLCALL fn##_DEFAULT params;
 #include "SDL_dynapi_procs.h"
 #undef SDL_DYNAPI_PROC
 
@@ -133,7 +140,7 @@ static SDL_DYNAPI_jump_table jump_table = {
 /* Default functions init the function table then call right thing. */
 #if DISABLE_JUMP_MAGIC
 #define SDL_DYNAPI_PROC(rc,fn,params,args,ret) \
-    static rc fn##_DEFAULT params { \
+    static rc SDLCALL fn##_DEFAULT params { \
         SDL_InitDynamicAPI(); \
         ret jump_table.fn args; \
     }
@@ -150,7 +157,7 @@ SDL_DYNAPI_VARARGS(static, _DEFAULT, SDL_InitDynamicAPI())
 /* Public API functions to jump into the jump table. */
 #if DISABLE_JUMP_MAGIC
 #define SDL_DYNAPI_PROC(rc,fn,params,args,ret) \
-    rc fn params { ret jump_table.fn args; }
+    rc SDLCALL fn params { ret jump_table.fn args; }
 #define SDL_DYNAPI_PROC_NO_VARARGS 1
 #include "SDL_dynapi_procs.h"
 #undef SDL_DYNAPI_PROC
@@ -161,15 +168,10 @@ SDL_DYNAPI_VARARGS(,,)
 #error Write me.
 #endif
 
-
-
-/* Here's the exported entry point that fills in the jump table. */
-/*  Use specific types when an "int" might suffice to keep this sane. */
-typedef Sint32 (SDLCALL *SDL_DYNAPI_ENTRYFN)(Uint32 apiver, void *table, Uint32 tablesize);
-extern DECLSPEC Sint32 SDLCALL SDL_DYNAPI_entry(Uint32, void *, Uint32);
-
-Sint32
-SDL_DYNAPI_entry(Uint32 apiver, void *table, Uint32 tablesize)
+/* we make this a static function so we can call the correct one without the
+   system's dynamic linker resolving to the wrong version of this. */
+static Sint32
+initialize_jumptable(Uint32 apiver, void *table, Uint32 tablesize)
 {
     SDL_DYNAPI_jump_table *output_jump_table = (SDL_DYNAPI_jump_table *) table;
 
@@ -196,6 +198,18 @@ SDL_DYNAPI_entry(Uint32 apiver, void *table, Uint32 tablesize)
 }
 
 
+/* Here's the exported entry point that fills in the jump table. */
+/*  Use specific types when an "int" might suffice to keep this sane. */
+typedef Sint32 (SDLCALL *SDL_DYNAPI_ENTRYFN)(Uint32 apiver, void *table, Uint32 tablesize);
+extern DECLSPEC Sint32 SDLCALL SDL_DYNAPI_entry(Uint32, void *, Uint32);
+
+Sint32
+SDL_DYNAPI_entry(Uint32 apiver, void *table, Uint32 tablesize)
+{
+    return initialize_jumptable(apiver, table, tablesize);
+}
+
+
 /* Obviously we can't use SDL_LoadObject() to load SDL.  :)  */
 /* Also obviously, we never close the loaded library. */
 #if defined(WIN32) || defined(_WIN32) || defined(__CYGWIN__)
@@ -216,21 +230,7 @@ static SDL_INLINE void *get_sdlapi_entry(const char *fname, const char *sym)
     return retval;
 }
 
-#elif defined(__HAIKU__)
-#include <os/kernel/image.h>
-static SDL_INLINE void *get_sdlapi_entry(const char *fname, const char *sym)
-{
-    image_id lib = load_add_on(fname);
-    void *retval = NULL;
-    if (lib >= 0) {
-        if (get_image_symbol(lib, sym, B_SYMBOL_TYPE_TEXT, &retval) != B_NO_ERROR) {
-            unload_add_on(lib);
-            retval = NULL;
-        }
-    }
-    return retval;
-}
-#elif defined(unix) || defined(__unix__) || defined(__APPLE__)
+#elif defined(unix) || defined(__unix__) || defined(__APPLE__) || defined(__HAIKU__) || defined(__QNX__)
 #include <dlfcn.h>
 static SDL_INLINE void *get_sdlapi_entry(const char *fname, const char *sym)
 {
@@ -244,35 +244,78 @@ static SDL_INLINE void *get_sdlapi_entry(const char *fname, const char *sym)
     }
     return retval;
 }
+
+#elif defined(__OS2__)
+static SDL_INLINE void *get_sdlapi_entry(const char *fname, const char *sym)
+{
+    HMODULE hmodule;
+    PFN retval = NULL;
+    char error[256];
+    if (DosLoadModule(error, sizeof(error), fname, &hmodule) == NO_ERROR) {
+        if (DosQueryProcAddr(hmodule, 0, sym, &retval) != NO_ERROR) {
+            DosFreeModule(hmodule);
+        }
+    }
+    return (void *)retval;
+}
+
 #else
 #error Please define your platform.
 #endif
+
+
+static void dynapi_warn(const char *msg)
+{
+    const char *caption = "SDL Dynamic API Failure!";
+    /* SDL_ShowSimpleMessageBox() is a too heavy for here. */
+    #if defined(WIN32) || defined(_WIN32) || defined(__CYGWIN__)
+    MessageBoxA(NULL, msg, caption, MB_OK | MB_ICONERROR);
+    #else
+    fprintf(stderr, "\n\n%s\n%s\n\n", caption, msg);
+    fflush(stderr);
+    #endif
+}
+
+/* This is not declared in any header, although it is shared between some
+    parts of SDL, because we don't want anything calling it without an
+    extremely good reason. */
+#if defined(__WATCOMC__)
+void SDL_ExitProcess(int exitcode);
+#pragma aux SDL_ExitProcess aborts;
+#endif
+SDL_NORETURN void SDL_ExitProcess(int exitcode);
 
 
 static void
 SDL_InitDynamicAPILocked(void)
 {
     const char *libname = SDL_getenv_REAL("SDL_DYNAMIC_API");
-    SDL_DYNAPI_ENTRYFN entry = SDL_DYNAPI_entry;  /* funcs from here by default. */
+    SDL_DYNAPI_ENTRYFN entry = NULL;  /* funcs from here by default. */
+    SDL_bool use_internal = SDL_TRUE;
 
     if (libname) {
         entry = (SDL_DYNAPI_ENTRYFN) get_sdlapi_entry(libname, "SDL_DYNAPI_entry");
         if (!entry) {
-            /* !!! FIXME: fail to startup here instead? */
-            /* !!! FIXME: definitely warn user. */
-            /* Just fill in the function pointers from this library. */
-            entry = SDL_DYNAPI_entry;
+            dynapi_warn("Couldn't load overriding SDL library. Please fix or remove the SDL_DYNAMIC_API environment variable. Using the default SDL.");
+            /* Just fill in the function pointers from this library, later. */
         }
     }
 
-    if (entry(SDL_DYNAPI_VERSION, &jump_table, sizeof (jump_table)) < 0) {
-        /* !!! FIXME: fail to startup here instead? */
-        /* !!! FIXME: definitely warn user. */
-        /* Just fill in the function pointers from this library. */
-        if (entry != SDL_DYNAPI_entry) {
-            if (!SDL_DYNAPI_entry(SDL_DYNAPI_VERSION, &jump_table, sizeof (jump_table))) {
-                /* !!! FIXME: now we're screwed. Should definitely abort now. */
-            }
+    if (entry) {
+        if (entry(SDL_DYNAPI_VERSION, &jump_table, sizeof (jump_table)) < 0) {
+            dynapi_warn("Couldn't override SDL library. Using a newer SDL build might help. Please fix or remove the SDL_DYNAMIC_API environment variable. Using the default SDL.");
+            /* Just fill in the function pointers from this library, later. */
+        } else {
+            use_internal = SDL_FALSE;   /* We overrode SDL! Don't use the internal version! */
+        }
+    }
+
+    /* Just fill in the function pointers from this library. */
+    if (use_internal) {
+        if (initialize_jumptable(SDL_DYNAPI_VERSION, &jump_table, sizeof (jump_table)) < 0) {
+            /* Now we're screwed. Should definitely abort now. */
+            dynapi_warn("Failed to initialize internal SDL dynapi. As this would otherwise crash, we have to abort now.");
+            SDL_ExitProcess(86);
         }
     }
 
@@ -316,4 +359,3 @@ SDL_InitDynamicAPI(void)
 #endif  /* SDL_DYNAMIC_API */
 
 /* vi: set ts=4 sw=4 expandtab: */
-

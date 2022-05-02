@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,14 +19,15 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _SDL_androidmouse_h
-#define _SDL_androidmouse_h
+#ifndef SDL_androidmouse_h_
+#define SDL_androidmouse_h_
 
 #include "SDL_androidvideo.h"
 
 extern void Android_InitMouse(void);
-extern void Android_OnMouse( int button, int action, float x, float y);
+extern void Android_OnMouse(SDL_Window *window, int button, int action, float x, float y, SDL_bool relative);
+extern void Android_QuitMouse(void);
 
-#endif /* _SDL_androidmouse_h */
+#endif /* SDL_androidmouse_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

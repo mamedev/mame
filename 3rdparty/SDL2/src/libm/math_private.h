@@ -21,9 +21,11 @@
 #include "SDL_endian.h"
 /* #include <sys/types.h> */
 
+#define _IEEE_LIBM
 #define attribute_hidden
 #define libm_hidden_proto(x)
 #define libm_hidden_def(x)
+#define strong_alias(x, y)
 
 #ifndef __HAIKU__ /* already defined in a system header. */
 typedef unsigned int u_int32_t;
@@ -33,10 +35,14 @@ typedef unsigned int u_int32_t;
 #define __ieee754_atan2 SDL_uclibc_atan2
 #define copysign        SDL_uclibc_copysign
 #define cos             SDL_uclibc_cos
+#define __ieee754_exp   SDL_uclibc_exp
 #define fabs            SDL_uclibc_fabs
 #define floor           SDL_uclibc_floor
+#define __ieee754_fmod  SDL_uclibc_fmod
 #define __ieee754_log   SDL_uclibc_log
+#define __ieee754_log10 SDL_uclibc_log10
 #define __ieee754_pow   SDL_uclibc_pow
+#define scalbln         SDL_uclibc_scalbln
 #define scalbn          SDL_uclibc_scalbn
 #define sin             SDL_uclibc_sin
 #define __ieee754_sqrt  SDL_uclibc_sqrt
@@ -201,7 +207,7 @@ __ieee754_sqrt(double)
      extern double __ieee754_jn(int, double) attribute_hidden;
      extern double __ieee754_yn(int, double) attribute_hidden;
      extern double __ieee754_remainder(double, double) attribute_hidden;
-     extern int __ieee754_rem_pio2(double, double *) attribute_hidden;
+     extern int32_t __ieee754_rem_pio2(double, double *) attribute_hidden;
 #if defined(_SCALB_INT)
      extern double __ieee754_scalb(double, int) attribute_hidden;
 #else
@@ -215,7 +221,7 @@ __ieee754_sqrt(double)
      extern double __kernel_sin(double, double, int) attribute_hidden;
      extern double __kernel_cos(double, double) attribute_hidden;
      extern double __kernel_tan(double, double, int) attribute_hidden;
-     extern int __kernel_rem_pio2(double *, double *, int, int, int,
-                                  const int *) attribute_hidden;
+     extern int32_t __kernel_rem_pio2(const double *, double *, int, int, const unsigned int,
+                                  const int32_t *) attribute_hidden;
 
 #endif /* _MATH_PRIVATE_H_ */

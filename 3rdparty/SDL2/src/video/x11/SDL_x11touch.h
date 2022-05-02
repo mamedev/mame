@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,12 +20,13 @@
 */
 #include "../../SDL_internal.h"
 
-#ifndef _SDL_x11touch_h
-#define _SDL_x11touch_h
+#ifndef SDL_x11touch_h_
+#define SDL_x11touch_h_
 
 extern void X11_InitTouch(_THIS);
 extern void X11_QuitTouch(_THIS);
+extern void X11_ResetTouch(_THIS);
 
-#endif /* _SDL_x11touch_h */
+#endif /* SDL_x11touch_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

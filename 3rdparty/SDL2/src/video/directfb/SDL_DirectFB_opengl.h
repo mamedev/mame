@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,8 +20,8 @@
 */
 
 
-#ifndef _SDL_directfb_opengl_h
-#define _SDL_directfb_opengl_h
+#ifndef SDL_directfb_opengl_h_
+#define SDL_directfb_opengl_h_
 
 #include "SDL_DirectFB_video.h"
 
@@ -50,7 +50,7 @@ extern int DirectFB_GL_MakeCurrent(_THIS, SDL_Window * window,
                                    SDL_GLContext context);
 extern int DirectFB_GL_SetSwapInterval(_THIS, int interval);
 extern int DirectFB_GL_GetSwapInterval(_THIS);
-extern void DirectFB_GL_SwapWindow(_THIS, SDL_Window * window);
+extern int DirectFB_GL_SwapWindow(_THIS, SDL_Window * window);
 extern void DirectFB_GL_DeleteContext(_THIS, SDL_GLContext context);
 
 extern void DirectFB_GL_FreeWindowContexts(_THIS, SDL_Window * window);
@@ -59,6 +59,6 @@ extern void DirectFB_GL_DestroyWindowContexts(_THIS, SDL_Window * window);
 
 #endif /* SDL_DIRECTFB_OPENGL */
 
-#endif /* _SDL_directfb_opengl_h */
+#endif /* SDL_directfb_opengl_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

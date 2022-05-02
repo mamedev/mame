@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -116,7 +116,7 @@ LoadNASLibrary(void)
             char *err = (char *) alloca(len);
             SDL_strlcpy(err, origerr, len);
             retval = -1;
-            SDL_SetError("NAS: SDL_LoadObject('%s') failed: %s\n",
+            SDL_SetError("NAS: SDL_LoadObject('%s') failed: %s",
                          nas_library, err);
         } else {
             retval = load_nas_syms();

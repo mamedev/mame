@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -30,6 +30,16 @@ int
 VIVANTE_SetupPlatform(_THIS)
 {
     return 0;
+}
+
+char *VIVANTE_GetDisplayName(_THIS)
+{
+    return NULL;
+}
+
+void
+VIVANTE_UpdateDisplayScale(_THIS)
+{
 }
 
 void

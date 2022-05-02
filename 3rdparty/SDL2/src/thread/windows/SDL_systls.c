@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -28,11 +28,23 @@
 #include "SDL_thread.h"
 #include "../SDL_thread_c.h"
 
+#if WINAPI_FAMILY_WINRT
+#include <fibersapi.h>
+
+#ifndef TLS_OUT_OF_INDEXES
+#define TLS_OUT_OF_INDEXES  FLS_OUT_OF_INDEXES
+#endif
+
+#define TlsAlloc()  FlsAlloc(NULL)
+#define TlsSetValue FlsSetValue
+#define TlsGetValue FlsGetValue
+#endif
+
 static DWORD thread_local_storage = TLS_OUT_OF_INDEXES;
 static SDL_bool generic_local_storage = SDL_FALSE;
 
 SDL_TLSData *
-SDL_SYS_GetTLSData()
+SDL_SYS_GetTLSData(void)
 {
     if (thread_local_storage == TLS_OUT_OF_INDEXES && !generic_local_storage) {
         static SDL_SpinLock lock;

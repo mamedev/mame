@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,8 +20,8 @@
 */
 #include "../../SDL_internal.h"
 
-#ifndef _SDL_androidaudio_h
-#define _SDL_androidaudio_h
+#ifndef SDL_androidaudio_h_
+#define SDL_androidaudio_h_
 
 #include "../SDL_sysaudio.h"
 
@@ -34,6 +34,9 @@ struct SDL_PrivateAudioData
     int resume;
 };
 
-#endif /* _SDL_androidaudio_h */
+void ANDROIDAUDIO_ResumeDevices(void);
+void ANDROIDAUDIO_PauseDevices(void);
+
+#endif /* SDL_androidaudio_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

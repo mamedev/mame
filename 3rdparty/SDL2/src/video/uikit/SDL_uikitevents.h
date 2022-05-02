@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,13 +18,21 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#ifndef _SDL_uikitevents_h
-#define _SDL_uikitevents_h
+#ifndef SDL_uikitevents_h_
+#define SDL_uikitevents_h_
 
 #include "../SDL_sysvideo.h"
 
 extern void UIKit_PumpEvents(_THIS);
 
-#endif /* _SDL_uikitevents_h */
+extern void SDL_InitGCKeyboard(void);
+extern SDL_bool SDL_HasGCKeyboard(void);
+extern void SDL_QuitGCKeyboard(void);
+
+extern void SDL_InitGCMouse(void);
+extern SDL_bool SDL_HasGCMouse(void);
+extern void SDL_QuitGCMouse(void);
+
+#endif /* SDL_uikitevents_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -48,7 +48,6 @@ int main(int argc,char** argv)
     SDL_Renderer *renderer;
     SDL_Color black = {0,0,0,0xff};
     SDL_Event event;
-    int event_pending = 0;
     int should_exit = 0;
     unsigned int current_picture;
     int button_down;
@@ -81,7 +80,6 @@ int main(int argc,char** argv)
         pictures[i].surface = SDL_LoadBMP(argv[i+1]);
         pictures[i].name = argv[i+1];
         if(pictures[i].surface == NULL) {
-            j = 0;
             for(j=0;j<num_pictures;j++)
                 SDL_FreeSurface(pictures[j].surface);
             SDL_free(pictures);
@@ -130,8 +128,7 @@ int main(int argc,char** argv)
     for(i=0;i<num_pictures;i++) {
         pictures[i].texture = SDL_CreateTextureFromSurface(renderer,pictures[i].surface);
         if(pictures[i].texture == NULL) {
-            j = 0;
-            for(j=0;j<num_pictures;i++)
+            for(i=0;i<num_pictures;i++)
                 if(pictures[i].texture != NULL)
                     SDL_DestroyTexture(pictures[i].texture);
             for(i=0;i<num_pictures;i++)
@@ -145,9 +142,7 @@ int main(int argc,char** argv)
         }
     }
 
-    event_pending = 0;
     should_exit = 0;
-    event_pending = SDL_PollEvent(&event);
     current_picture = 0;
     button_down = 0;
     texture_dimensions.h = 0;
@@ -159,8 +154,7 @@ int main(int argc,char** argv)
     SDL_SetWindowSize(window,texture_dimensions.w,texture_dimensions.h);
     SDL_SetWindowShape(window,pictures[current_picture].surface,&pictures[current_picture].mode);
     while(should_exit == 0) {
-        event_pending = SDL_PollEvent(&event);
-        if(event_pending == 1) {
+        while (SDL_PollEvent(&event)) {
             if(event.type == SDL_KEYDOWN) {
                 button_down = 1;
                 if(event.key.keysym.sym == SDLK_ESCAPE) {
@@ -178,9 +172,10 @@ int main(int argc,char** argv)
                 SDL_SetWindowSize(window,texture_dimensions.w,texture_dimensions.h);
                 SDL_SetWindowShape(window,pictures[current_picture].surface,&pictures[current_picture].mode);
             }
-            if(event.type == SDL_QUIT)
+            if (event.type == SDL_QUIT) {
                 should_exit = 1;
-            event_pending = 0;
+                break;
+            }
         }
         render(renderer,pictures[current_picture].texture,texture_dimensions);
         SDL_Delay(10);

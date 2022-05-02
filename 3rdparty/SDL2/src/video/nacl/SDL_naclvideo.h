@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,8 +20,8 @@
 */
 #include "../../SDL_internal.h"
 
-#ifndef _SDL_naclvideo_h
-#define _SDL_naclvideo_h
+#ifndef SDL_naclvideo_h_
+#define SDL_naclvideo_h_
 
 #include "../SDL_sysvideo.h"
 #include "ppapi_simple/ps_interface.h"
@@ -64,4 +64,4 @@ typedef struct SDL_VideoData {
 extern void NACL_SetScreenResolution(int width, int height, Uint32 format);
 
 
-#endif /* _SDL_naclvideo_h */
+#endif /* SDL_naclvideo_h_ */

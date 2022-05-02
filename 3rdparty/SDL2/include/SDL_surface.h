@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -25,8 +25,8 @@
  *  Header file for ::SDL_Surface definition and management functions.
  */
 
-#ifndef _SDL_surface_h
-#define _SDL_surface_h
+#ifndef SDL_surface_h_
+#define SDL_surface_h_
 
 #include "SDL_stdinc.h"
 #include "SDL_pixels.h"
@@ -53,6 +53,7 @@ extern "C" {
 #define SDL_PREALLOC        0x00000001  /**< Surface uses preallocated memory */
 #define SDL_RLEACCEL        0x00000002  /**< Surface is RLE encoded */
 #define SDL_DONTFREE        0x00000004  /**< Surface is referenced internally */
+#define SDL_SIMD_ALIGNED    0x00000008  /**< Surface uses aligned memory */
 /* @} *//* Surface flags */
 
 /**
@@ -79,7 +80,9 @@ typedef struct SDL_Surface
 
     /** information needed for surfaces requiring locks */
     int locked;                 /**< Read-only */
-    void *lock_data;            /**< Read-only */
+
+    /** list of BlitMap that hold a reference to this surface */
+    void *list_blitmap;         /**< Private */
 
     /** clipping information */
     SDL_Rect clip_rect;         /**< Read-only */
@@ -94,8 +97,19 @@ typedef struct SDL_Surface
 /**
  * \brief The type of function used for surface blitting functions.
  */
-typedef int (*SDL_blit) (struct SDL_Surface * src, SDL_Rect * srcrect,
-                         struct SDL_Surface * dst, SDL_Rect * dstrect);
+typedef int (SDLCALL *SDL_blit) (struct SDL_Surface * src, SDL_Rect * srcrect,
+                                 struct SDL_Surface * dst, SDL_Rect * dstrect);
+
+/**
+ * \brief The formula used for converting between YUV and RGB
+ */
+typedef enum
+{
+    SDL_YUV_CONVERSION_JPEG,        /**< Full range JPEG */
+    SDL_YUV_CONVERSION_BT601,       /**< BT.601 (the default) */
+    SDL_YUV_CONVERSION_BT709,       /**< BT.709 */
+    SDL_YUV_CONVERSION_AUTOMATIC    /**< BT.601 for SD content, BT.709 for HD content */
+} SDL_YUV_CONVERSION_MODE;
 
 /**
  *  Allocate and free an RGB surface.
@@ -118,8 +132,11 @@ typedef int (*SDL_blit) (struct SDL_Surface * src, SDL_Rect * srcrect,
 extern DECLSPEC SDL_Surface *SDLCALL SDL_CreateRGBSurface
     (Uint32 flags, int width, int height, int depth,
      Uint32 Rmask, Uint32 Gmask, Uint32 Bmask, Uint32 Amask);
+
+/* !!! FIXME for 2.1: why does this ask for depth? Format provides that. */
 extern DECLSPEC SDL_Surface *SDLCALL SDL_CreateRGBSurfaceWithFormat
     (Uint32 flags, int width, int height, int depth, Uint32 format);
+
 extern DECLSPEC SDL_Surface *SDLCALL SDL_CreateRGBSurfaceFrom(void *pixels,
                                                               int width,
                                                               int height,
@@ -221,6 +238,13 @@ extern DECLSPEC int SDLCALL SDL_SetSurfaceRLE(SDL_Surface * surface,
                                               int flag);
 
 /**
+ *  \brief Returns whether the surface is RLE enabled
+ *
+ *  \return SDL_TRUE if the surface is RLE enabled, or SDL_FALSE if the surface is NULL or not RLE enabled
+ */
+extern DECLSPEC SDL_bool SDLCALL SDL_HasSurfaceRLE(SDL_Surface * surface);
+
+/**
  *  \brief Sets the color key (transparent pixel) in a blittable surface.
  *
  *  \param surface The surface to update
@@ -233,6 +257,13 @@ extern DECLSPEC int SDLCALL SDL_SetSurfaceRLE(SDL_Surface * surface,
  */
 extern DECLSPEC int SDLCALL SDL_SetColorKey(SDL_Surface * surface,
                                             int flag, Uint32 key);
+
+/**
+ *  \brief Returns whether the surface has a color key
+ *
+ *  \return SDL_TRUE if the surface has a color key, or SDL_FALSE if the surface is NULL or has no color key
+ */
+extern DECLSPEC SDL_bool SDLCALL SDL_HasColorKey(SDL_Surface * surface);
 
 /**
  *  \brief Gets the color key (transparent pixel) in a blittable surface.
@@ -355,6 +386,11 @@ extern DECLSPEC SDL_bool SDLCALL SDL_SetClipRect(SDL_Surface * surface,
  */
 extern DECLSPEC void SDLCALL SDL_GetClipRect(SDL_Surface * surface,
                                              SDL_Rect * rect);
+
+/*
+ * Creates a new surface identical to the existing surface
+ */
+extern DECLSPEC SDL_Surface *SDLCALL SDL_DuplicateSurface(SDL_Surface * surface);
 
 /**
  *  Creates a new surface of the specified format, and then copies and maps
@@ -501,6 +537,20 @@ extern DECLSPEC int SDLCALL SDL_LowerBlitScaled
     (SDL_Surface * src, SDL_Rect * srcrect,
     SDL_Surface * dst, SDL_Rect * dstrect);
 
+/**
+ *  \brief Set the YUV conversion mode
+ */
+extern DECLSPEC void SDLCALL SDL_SetYUVConversionMode(SDL_YUV_CONVERSION_MODE mode);
+
+/**
+ *  \brief Get the YUV conversion mode
+ */
+extern DECLSPEC SDL_YUV_CONVERSION_MODE SDLCALL SDL_GetYUVConversionMode(void);
+
+/**
+ *  \brief Get the YUV conversion mode, returning the correct mode for the resolution when the current conversion mode is SDL_YUV_CONVERSION_AUTOMATIC
+ */
+extern DECLSPEC SDL_YUV_CONVERSION_MODE SDLCALL SDL_GetYUVConversionModeForResolution(int width, int height);
 
 /* Ends C function definitions when using C++ */
 #ifdef __cplusplus
@@ -508,6 +558,6 @@ extern DECLSPEC int SDLCALL SDL_LowerBlitScaled
 #endif
 #include "close_code.h"
 
-#endif /* _SDL_surface_h */
+#endif /* SDL_surface_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

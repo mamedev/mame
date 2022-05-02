@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,13 +20,13 @@
 */
 #include "../../SDL_internal.h"
 
-#ifndef _SDL_naclwindow_h
-#define _SDL_naclwindow_h
+#ifndef SDL_naclwindow_h_
+#define SDL_naclwindow_h_
 
 extern int NACL_CreateWindow(_THIS, SDL_Window * window);
 extern void NACL_SetWindowTitle(_THIS, SDL_Window * window);
 extern void NACL_DestroyWindow(_THIS, SDL_Window * window);
 
-#endif /* _SDL_naclwindow_h */
+#endif /* SDL_naclwindow_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -67,7 +67,6 @@ extern "C" {
 #include "SDL_winrtmouse_c.h"
 #include "SDL_main.h"
 #include "SDL_system.h"
-//#include "SDL_log.h"
 
 
 /* Initialization/Query functions */
@@ -95,12 +94,6 @@ SDL_Window * WINRT_GlobalSDLWindow = NULL;
 
 
 /* WinRT driver bootstrap functions */
-
-static int
-WINRT_Available(void)
-{
-    return (1);
-}
 
 static void
 WINRT_DeleteDevice(SDL_VideoDevice * device)
@@ -140,7 +133,7 @@ WINRT_CreateDevice(int devindex)
     /* Set the function pointers */
     device->VideoInit = WINRT_VideoInit;
     device->VideoQuit = WINRT_VideoQuit;
-    device->CreateWindow = WINRT_CreateWindow;
+    device->CreateSDLWindow = WINRT_CreateWindow;
     device->SetWindowSize = WINRT_SetWindowSize;
     device->SetWindowFullscreen = WINRT_SetWindowFullscreen;
     device->DestroyWindow = WINRT_DestroyWindow;
@@ -175,7 +168,7 @@ WINRT_CreateDevice(int devindex)
 #define WINRTVID_DRIVER_NAME "winrt"
 VideoBootStrap WINRT_bootstrap = {
     WINRTVID_DRIVER_NAME, "SDL WinRT video driver",
-    WINRT_Available, WINRT_CreateDevice
+    WINRT_CreateDevice
 };
 
 int
@@ -300,7 +293,7 @@ WINRT_AddDisplaysForOutput (_THIS, IDXGIAdapter1 * dxgiAdapter1, int outputIndex
         }
     }
 
-    if (SDL_AddVideoDisplay(&display) < 0) {
+    if (SDL_AddVideoDisplay(&display, SDL_FALSE) < 0) {
         goto done;
     }
 
@@ -383,7 +376,7 @@ WINRT_AddDisplaysForAdapter (_THIS, IDXGIFactory2 * dxgiFactory2, int adapterInd
                 display.desktop_mode = mode;
                 display.current_mode = mode;
                 if ((SDL_AddDisplayMode(&display, &mode) < 0) ||
-                    (SDL_AddVideoDisplay(&display) < 0))
+                    (SDL_AddVideoDisplay(&display, SDL_FALSE) < 0))
                 {
                     return SDL_SetError("Failed to apply DXGI Display-detection workaround");
                 }
@@ -621,7 +614,7 @@ WINRT_CreateWindow(_THIS, SDL_Window * window)
                 _this->egl_data->egl_config,
                 cpp_winrtEglWindow, NULL);
             if (data->egl_surface == NULL) {
-                return SDL_SetError("eglCreateWindowSurface failed");
+                return SDL_EGL_SetError("unable to create EGL native-window surface", "eglCreateWindowSurface");
             }
         } else if (data->coreWindow.Get() != nullptr) {
             /* Attempt to create a window surface using newer versions of
@@ -634,7 +627,7 @@ WINRT_CreateWindow(_THIS, SDL_Window * window)
                 coreWindowAsIInspectable,
                 NULL);
             if (data->egl_surface == NULL) {
-                return SDL_SetError("eglCreateWindowSurface failed");
+                return SDL_EGL_SetError("unable to create EGL native-window surface", "eglCreateWindowSurface");
             }
         } else {
             return SDL_SetError("No supported means to create an EGL window surface are available");
@@ -771,7 +764,7 @@ WINRT_GetWindowWMInfo(_THIS, SDL_Window * window, SDL_SysWMinfo * info)
         info->info.winrt.window = reinterpret_cast<IInspectable *>(data->coreWindow.Get());
         return SDL_TRUE;
     } else {
-        SDL_SetError("Application not compiled with SDL %d.%d\n",
+        SDL_SetError("Application not compiled with SDL %d.%d",
                      SDL_MAJOR_VERSION, SDL_MINOR_VERSION);
         return SDL_FALSE;
     }

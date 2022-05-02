@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -17,14 +17,14 @@
  ********************************************************************************/
 
 #include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten/emscripten.h>
 #endif
 
 #include "SDL.h"
+
+#include "testyuv_cvt.h"
 
 #define MOOSEPIC_W 64
 #define MOOSEPIC_H 88
@@ -33,110 +33,110 @@
 #define MOOSEFRAMES_COUNT 10
 
 SDL_Color MooseColors[84] = {
-    {49, 49, 49}
-    , {66, 24, 0}
-    , {66, 33, 0}
-    , {66, 66, 66}
+    {49, 49, 49, SDL_ALPHA_OPAQUE}
+    , {66, 24, 0, SDL_ALPHA_OPAQUE}
+    , {66, 33, 0, SDL_ALPHA_OPAQUE}
+    , {66, 66, 66, SDL_ALPHA_OPAQUE}
     ,
-    {66, 115, 49}
-    , {74, 33, 0}
-    , {74, 41, 16}
-    , {82, 33, 8}
+    {66, 115, 49, SDL_ALPHA_OPAQUE}
+    , {74, 33, 0, SDL_ALPHA_OPAQUE}
+    , {74, 41, 16, SDL_ALPHA_OPAQUE}
+    , {82, 33, 8, SDL_ALPHA_OPAQUE}
     ,
-    {82, 41, 8}
-    , {82, 49, 16}
-    , {82, 82, 82}
-    , {90, 41, 8}
+    {82, 41, 8, SDL_ALPHA_OPAQUE}
+    , {82, 49, 16, SDL_ALPHA_OPAQUE}
+    , {82, 82, 82, SDL_ALPHA_OPAQUE}
+    , {90, 41, 8, SDL_ALPHA_OPAQUE}
     ,
-    {90, 41, 16}
-    , {90, 57, 24}
-    , {99, 49, 16}
-    , {99, 66, 24}
+    {90, 41, 16, SDL_ALPHA_OPAQUE}
+    , {90, 57, 24, SDL_ALPHA_OPAQUE}
+    , {99, 49, 16, SDL_ALPHA_OPAQUE}
+    , {99, 66, 24, SDL_ALPHA_OPAQUE}
     ,
-    {99, 66, 33}
-    , {99, 74, 33}
-    , {107, 57, 24}
-    , {107, 82, 41}
+    {99, 66, 33, SDL_ALPHA_OPAQUE}
+    , {99, 74, 33, SDL_ALPHA_OPAQUE}
+    , {107, 57, 24, SDL_ALPHA_OPAQUE}
+    , {107, 82, 41, SDL_ALPHA_OPAQUE}
     ,
-    {115, 57, 33}
-    , {115, 66, 33}
-    , {115, 66, 41}
-    , {115, 74, 0}
+    {115, 57, 33, SDL_ALPHA_OPAQUE}
+    , {115, 66, 33, SDL_ALPHA_OPAQUE}
+    , {115, 66, 41, SDL_ALPHA_OPAQUE}
+    , {115, 74, 0, SDL_ALPHA_OPAQUE}
     ,
-    {115, 90, 49}
-    , {115, 115, 115}
-    , {123, 82, 0}
-    , {123, 99, 57}
+    {115, 90, 49, SDL_ALPHA_OPAQUE}
+    , {115, 115, 115, SDL_ALPHA_OPAQUE}
+    , {123, 82, 0, SDL_ALPHA_OPAQUE}
+    , {123, 99, 57, SDL_ALPHA_OPAQUE}
     ,
-    {132, 66, 41}
-    , {132, 74, 41}
-    , {132, 90, 8}
-    , {132, 99, 33}
+    {132, 66, 41, SDL_ALPHA_OPAQUE}
+    , {132, 74, 41, SDL_ALPHA_OPAQUE}
+    , {132, 90, 8, SDL_ALPHA_OPAQUE}
+    , {132, 99, 33, SDL_ALPHA_OPAQUE}
     ,
-    {132, 99, 66}
-    , {132, 107, 66}
-    , {140, 74, 49}
-    , {140, 99, 16}
+    {132, 99, 66, SDL_ALPHA_OPAQUE}
+    , {132, 107, 66, SDL_ALPHA_OPAQUE}
+    , {140, 74, 49, SDL_ALPHA_OPAQUE}
+    , {140, 99, 16, SDL_ALPHA_OPAQUE}
     ,
-    {140, 107, 74}
-    , {140, 115, 74}
-    , {148, 107, 24}
-    , {148, 115, 82}
+    {140, 107, 74, SDL_ALPHA_OPAQUE}
+    , {140, 115, 74, SDL_ALPHA_OPAQUE}
+    , {148, 107, 24, SDL_ALPHA_OPAQUE}
+    , {148, 115, 82, SDL_ALPHA_OPAQUE}
     ,
-    {148, 123, 74}
-    , {148, 123, 90}
-    , {156, 115, 33}
-    , {156, 115, 90}
+    {148, 123, 74, SDL_ALPHA_OPAQUE}
+    , {148, 123, 90, SDL_ALPHA_OPAQUE}
+    , {156, 115, 33, SDL_ALPHA_OPAQUE}
+    , {156, 115, 90, SDL_ALPHA_OPAQUE}
     ,
-    {156, 123, 82}
-    , {156, 132, 82}
-    , {156, 132, 99}
-    , {156, 156, 156}
+    {156, 123, 82, SDL_ALPHA_OPAQUE}
+    , {156, 132, 82, SDL_ALPHA_OPAQUE}
+    , {156, 132, 99, SDL_ALPHA_OPAQUE}
+    , {156, 156, 156, SDL_ALPHA_OPAQUE}
     ,
-    {165, 123, 49}
-    , {165, 123, 90}
-    , {165, 132, 82}
-    , {165, 132, 90}
+    {165, 123, 49, SDL_ALPHA_OPAQUE}
+    , {165, 123, 90, SDL_ALPHA_OPAQUE}
+    , {165, 132, 82, SDL_ALPHA_OPAQUE}
+    , {165, 132, 90, SDL_ALPHA_OPAQUE}
     ,
-    {165, 132, 99}
-    , {165, 140, 90}
-    , {173, 132, 57}
-    , {173, 132, 99}
+    {165, 132, 99, SDL_ALPHA_OPAQUE}
+    , {165, 140, 90, SDL_ALPHA_OPAQUE}
+    , {173, 132, 57, SDL_ALPHA_OPAQUE}
+    , {173, 132, 99, SDL_ALPHA_OPAQUE}
     ,
-    {173, 140, 107}
-    , {173, 140, 115}
-    , {173, 148, 99}
-    , {173, 173, 173}
+    {173, 140, 107, SDL_ALPHA_OPAQUE}
+    , {173, 140, 115, SDL_ALPHA_OPAQUE}
+    , {173, 148, 99, SDL_ALPHA_OPAQUE}
+    , {173, 173, 173, SDL_ALPHA_OPAQUE}
     ,
-    {181, 140, 74}
-    , {181, 148, 115}
-    , {181, 148, 123}
-    , {181, 156, 107}
+    {181, 140, 74, SDL_ALPHA_OPAQUE}
+    , {181, 148, 115, SDL_ALPHA_OPAQUE}
+    , {181, 148, 123, SDL_ALPHA_OPAQUE}
+    , {181, 156, 107, SDL_ALPHA_OPAQUE}
     ,
-    {189, 148, 123}
-    , {189, 156, 82}
-    , {189, 156, 123}
-    , {189, 156, 132}
+    {189, 148, 123, SDL_ALPHA_OPAQUE}
+    , {189, 156, 82, SDL_ALPHA_OPAQUE}
+    , {189, 156, 123, SDL_ALPHA_OPAQUE}
+    , {189, 156, 132, SDL_ALPHA_OPAQUE}
     ,
-    {189, 189, 189}
-    , {198, 156, 123}
-    , {198, 165, 132}
-    , {206, 165, 99}
+    {189, 189, 189, SDL_ALPHA_OPAQUE}
+    , {198, 156, 123, SDL_ALPHA_OPAQUE}
+    , {198, 165, 132, SDL_ALPHA_OPAQUE}
+    , {206, 165, 99, SDL_ALPHA_OPAQUE}
     ,
-    {206, 165, 132}
-    , {206, 173, 140}
-    , {206, 206, 206}
-    , {214, 173, 115}
+    {206, 165, 132, SDL_ALPHA_OPAQUE}
+    , {206, 173, 140, SDL_ALPHA_OPAQUE}
+    , {206, 206, 206, SDL_ALPHA_OPAQUE}
+    , {214, 173, 115, SDL_ALPHA_OPAQUE}
     ,
-    {214, 173, 140}
-    , {222, 181, 148}
-    , {222, 189, 132}
-    , {222, 189, 156}
+    {214, 173, 140, SDL_ALPHA_OPAQUE}
+    , {222, 181, 148, SDL_ALPHA_OPAQUE}
+    , {222, 189, 132, SDL_ALPHA_OPAQUE}
+    , {222, 189, 156, SDL_ALPHA_OPAQUE}
     ,
-    {222, 222, 222}
-    , {231, 198, 165}
-    , {231, 231, 231}
-    , {239, 206, 173}
+    {222, 222, 222, SDL_ALPHA_OPAQUE}
+    , {231, 198, 165, SDL_ALPHA_OPAQUE}
+    , {231, 231, 231, SDL_ALPHA_OPAQUE}
+    , {239, 206, 173, SDL_ALPHA_OPAQUE}
 };
 
 Uint8 MooseFrame[MOOSEFRAMES_COUNT][MOOSEFRAME_SIZE*2];
@@ -149,8 +149,7 @@ SDL_Renderer *renderer;
 int paused = 0;
 int i;
 SDL_bool done = SDL_FALSE;
-Uint32 pixel_format = SDL_PIXELFORMAT_YV12;
-int fpsdelay;
+static int fpsdelay;
 
 /* Call this instead of exit(), so we can clean up SDL: atexit() is evil. */
 static void
@@ -158,91 +157,6 @@ quit(int rc)
 {
     SDL_Quit();
     exit(rc);
-}
-
-/* All RGB2YUV conversion code and some other parts of code has been taken from testoverlay.c */
-
-/* NOTE: These RGB conversion functions are not intended for speed,
-         only as examples.
-*/
-
-void
-RGBtoYUV(Uint8 * rgb, int *yuv, int monochrome, int luminance)
-{
-    if (monochrome) {
-#if 1                           /* these are the two formulas that I found on the FourCC site... */
-        yuv[0] = (int)(0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]);
-        yuv[1] = 128;
-        yuv[2] = 128;
-#else
-        yuv[0] = (int)(0.257 * rgb[0]) + (0.504 * rgb[1]) + (0.098 * rgb[2]) + 16;
-        yuv[1] = 128;
-        yuv[2] = 128;
-#endif
-    } else {
-#if 1                           /* these are the two formulas that I found on the FourCC site... */
-        yuv[0] = (int)(0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]);
-        yuv[1] = (int)((rgb[2] - yuv[0]) * 0.565 + 128);
-        yuv[2] = (int)((rgb[0] - yuv[0]) * 0.713 + 128);
-#else
-        yuv[0] = (0.257 * rgb[0]) + (0.504 * rgb[1]) + (0.098 * rgb[2]) + 16;
-        yuv[1] = 128 - (0.148 * rgb[0]) - (0.291 * rgb[1]) + (0.439 * rgb[2]);
-        yuv[2] = 128 + (0.439 * rgb[0]) - (0.368 * rgb[1]) - (0.071 * rgb[2]);
-#endif
-    }
-
-    if (luminance != 100) {
-        yuv[0] = yuv[0] * luminance / 100;
-        if (yuv[0] > 255)
-            yuv[0] = 255;
-    }
-}
-
-void
-ConvertRGBtoYV12(Uint8 *rgb, Uint8 *out, int w, int h,
-                 int monochrome, int luminance)
-{
-    int x, y;
-    int yuv[3];
-    Uint8 *op[3];
-
-    op[0] = out;
-    op[1] = op[0] + w*h;
-    op[2] = op[1] + w*h/4;
-    for (y = 0; y < h; ++y) {
-        for (x = 0; x < w; ++x) {
-            RGBtoYUV(rgb, yuv, monochrome, luminance);
-            *(op[0]++) = yuv[0];
-            if (x % 2 == 0 && y % 2 == 0) {
-                *(op[1]++) = yuv[2];
-                *(op[2]++) = yuv[1];
-            }
-            rgb += 3;
-        }
-    }
-}
-
-void
-ConvertRGBtoNV12(Uint8 *rgb, Uint8 *out, int w, int h,
-                 int monochrome, int luminance)
-{
-    int x, y;
-    int yuv[3];
-    Uint8 *op[2];
-
-    op[0] = out;
-    op[1] = op[0] + w*h;
-    for (y = 0; y < h; ++y) {
-        for (x = 0; x < w; ++x) {
-            RGBtoYUV(rgb, yuv, monochrome, luminance);
-            *(op[0]++) = yuv[0];
-            if (x % 2 == 0 && y % 2 == 0) {
-                *(op[1]++) = yuv[1];
-                *(op[1]++) = yuv[2];
-            }
-            rgb += 3;
-        }
-    }
 }
 
 static void
@@ -307,7 +221,7 @@ loop()
     if (!paused) {
         i = (i + 1) % MOOSEFRAMES_COUNT;
 
-        SDL_UpdateTexture(MooseTexture, NULL, MooseFrame[i], MOOSEPIC_W*SDL_BYTESPERPIXEL(pixel_format));
+        SDL_UpdateTexture(MooseTexture, NULL, MooseFrame[i], MOOSEPIC_W);
     }
     SDL_RenderClear(renderer);
     SDL_RenderCopy(renderer, MooseTexture, NULL, &displayrect);
@@ -328,13 +242,7 @@ main(int argc, char **argv)
     SDL_Window *window;
     int j;
     int fps = 12;
-    int fpsdelay;
     int nodelay = 0;
-#ifdef TEST_NV12
-    Uint32 pixel_format = SDL_PIXELFORMAT_NV12;
-#else
-    Uint32 pixel_format = SDL_PIXELFORMAT_YV12;
-#endif
     int scale = 5;
 
     /* Enable standard application logging */
@@ -346,9 +254,9 @@ main(int argc, char **argv)
     }
 
     while (argc > 1) {
-        if (strcmp(argv[1], "-fps") == 0) {
+        if (SDL_strcmp(argv[1], "-fps") == 0) {
             if (argv[2]) {
-                fps = atoi(argv[2]);
+                fps = SDL_atoi(argv[2]);
                 if (fps == 0) {
                     SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                             "The -fps option requires an argument [from 1 to 1000], default is 12.\n");
@@ -366,13 +274,13 @@ main(int argc, char **argv)
                         "The -fps option requires an argument [from 1 to 1000], default is 12.\n");
                 quit(10);
             }
-        } else if (strcmp(argv[1], "-nodelay") == 0) {
+        } else if (SDL_strcmp(argv[1], "-nodelay") == 0) {
             nodelay = 1;
             argv += 1;
             argc -= 1;
-        } else if (strcmp(argv[1], "-scale") == 0) {
+        } else if (SDL_strcmp(argv[1], "-scale") == 0) {
             if (argv[2]) {
-                scale = atoi(argv[2]);
+                scale = SDL_atoi(argv[2]);
                 if (scale == 0) {
                     SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                             "The -scale option requires an argument [from 1 to 50], default is 5.\n");
@@ -390,8 +298,8 @@ main(int argc, char **argv)
                         "The -fps option requires an argument [from 1 to 1000], default is 12.\n");
                 quit(10);
             }
-        } else if ((strcmp(argv[1], "-help") == 0)
-                   || (strcmp(argv[1], "-h") == 0)) {
+        } else if ((SDL_strcmp(argv[1], "-help") == 0)
+                   || (SDL_strcmp(argv[1], "-h") == 0)) {
             PrintUsage(argv[0]);
             quit(0);
         } else {
@@ -401,10 +309,9 @@ main(int argc, char **argv)
         break;
     }
 
-    RawMooseData = (Uint8 *) malloc(MOOSEFRAME_SIZE * MOOSEFRAMES_COUNT);
+    RawMooseData = (Uint8 *) SDL_malloc(MOOSEFRAME_SIZE * MOOSEFRAMES_COUNT);
     if (RawMooseData == NULL) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Can't allocate memory for movie !\n");
-        free(RawMooseData);
         quit(1);
     }
 
@@ -412,7 +319,7 @@ main(int argc, char **argv)
     handle = SDL_RWFromFile("moose.dat", "rb");
     if (handle == NULL) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Can't find the file moose.dat !\n");
-        free(RawMooseData);
+        SDL_free(RawMooseData);
         quit(2);
     }
 
@@ -430,21 +337,21 @@ main(int argc, char **argv)
                               SDL_WINDOW_RESIZABLE);
     if (!window) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't set create window: %s\n", SDL_GetError());
-        free(RawMooseData);
+        SDL_free(RawMooseData);
         quit(4);
     }
 
     renderer = SDL_CreateRenderer(window, -1, 0);
     if (!renderer) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't set create renderer: %s\n", SDL_GetError());
-        free(RawMooseData);
+        SDL_free(RawMooseData);
         quit(4);
     }
 
-    MooseTexture = SDL_CreateTexture(renderer, pixel_format, SDL_TEXTUREACCESS_STREAMING, MOOSEPIC_W, MOOSEPIC_H);
+    MooseTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_YV12, SDL_TEXTUREACCESS_STREAMING, MOOSEPIC_W, MOOSEPIC_H);
     if (!MooseTexture) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't set create texture: %s\n", SDL_GetError());
-        free(RawMooseData);
+        SDL_free(RawMooseData);
         quit(5);
     }
     /* Uncomment this to check vertex color with a YUV texture */
@@ -463,20 +370,12 @@ main(int argc, char **argv)
             rgb[2] = MooseColors[frame[j]].b;
             rgb += 3;
         }
-        switch (pixel_format) {
-        case SDL_PIXELFORMAT_YV12:
-            ConvertRGBtoYV12(MooseFrameRGB, MooseFrame[i], MOOSEPIC_W, MOOSEPIC_H, 0, 100);
-            break;
-        case SDL_PIXELFORMAT_NV12:
-            ConvertRGBtoNV12(MooseFrameRGB, MooseFrame[i], MOOSEPIC_W, MOOSEPIC_H, 0, 100);
-            break;
-        default:
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Unsupported pixel format\n");
-            break;
-        }
+        ConvertRGBtoYUV(SDL_PIXELFORMAT_YV12, MooseFrameRGB, MOOSEPIC_W*3, MooseFrame[i], MOOSEPIC_W, MOOSEPIC_H,
+            SDL_GetYUVConversionModeForResolution(MOOSEPIC_W, MOOSEPIC_H),
+            0, 100);
     }
 
-    free(RawMooseData);
+    SDL_free(RawMooseData);
 
     /* set the start frame */
     i = 0;

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -22,10 +22,10 @@
 
 #if SDL_VIDEO_DRIVER_WINDOWS
 
-#include "SDL_assert.h"
 #include "SDL_loadso.h"
 #include "SDL_windowsvideo.h"
 #include "SDL_windowsopengles.h"
+#include "SDL_hints.h"
 
 /* WGL implementation of SDL OpenGL support */
 
@@ -81,6 +81,11 @@
 #define WGL_CONTEXT_RELEASE_BEHAVIOR_FLUSH_ARB          0x2098
 #endif
 
+#ifndef WGL_ARB_create_context_no_error
+#define WGL_ARB_create_context_no_error
+#define WGL_CONTEXT_OPENGL_NO_ERROR_ARB                 0x31B3
+#endif
+
 typedef HGLRC(APIENTRYP PFNWGLCREATECONTEXTATTRIBSARBPROC) (HDC hDC,
                                                             HGLRC
                                                             hShareContext,
@@ -130,6 +135,44 @@ WIN_GL_LoadLibrary(_THIS, const char *path)
         !_this->gl_data->wglMakeCurrent) {
         return SDL_SetError("Could not retrieve OpenGL functions");
     }
+
+    /* XXX Too sleazy? WIN_GL_InitExtensions looks for certain OpenGL
+       extensions via SDL_GL_DeduceMaxSupportedESProfile. This uses
+       SDL_GL_ExtensionSupported which in turn calls SDL_GL_GetProcAddress.
+       However SDL_GL_GetProcAddress will fail if the library is not
+       loaded; it checks for gl_config.driver_loaded > 0. To avoid this
+       test failing, increment driver_loaded around the call to
+       WIN_GLInitExtensions.
+
+       Successful loading of the library is normally indicated by
+       SDL_GL_LoadLibrary incrementing driver_loaded immediately after
+       this function returns 0 to it.
+
+       Alternatives to this are:
+       - moving SDL_GL_DeduceMaxSupportedESProfile to both the WIN and
+         X11 platforms while adding a function equivalent to
+         SDL_GL_ExtensionSupported but which directly calls
+         glGetProcAddress(). Having 3 copies of the
+         SDL_GL_ExtensionSupported makes this alternative unattractive.
+       - moving SDL_GL_DeduceMaxSupportedESProfile to a new file shared
+         by the WIN and X11 platforms while adding a function equivalent
+         to SDL_GL_ExtensionSupported. This is unattractive due to the
+         number of project files that will need updating, plus there
+         will be 2 copies of the SDL_GL_ExtensionSupported code.
+       - Add a private equivalent of SDL_GL_ExtensionSupported to
+         SDL_video.c.
+       - Move the call to WIN_GL_InitExtensions back to WIN_CreateWindow
+         and add a flag to gl_data to avoid multiple calls to this
+         expensive function. This is probably the least objectionable
+         alternative if this increment/decrement trick is unacceptable.
+
+       Note that the driver_loaded > 0 check needs to remain in
+       SDL_GL_ExtensionSupported and SDL_GL_GetProcAddress as they are
+       public API functions.
+    */
+    ++_this->gl_config.driver_loaded;
+    WIN_GL_InitExtensions(_this);
+    --_this->gl_config.driver_loaded;
 
     return 0;
 }
@@ -407,14 +450,26 @@ WIN_GL_InitExtensions(_THIS)
     }
 
     /* Check for WGL_EXT_create_context_es2_profile */
-    _this->gl_data->HAS_WGL_EXT_create_context_es2_profile = SDL_FALSE;
     if (HasExtension("WGL_EXT_create_context_es2_profile", extensions)) {
-        _this->gl_data->HAS_WGL_EXT_create_context_es2_profile = SDL_TRUE;
+        SDL_GL_DeduceMaxSupportedESProfile(
+            &_this->gl_data->es_profile_max_supported_version.major,
+            &_this->gl_data->es_profile_max_supported_version.minor
+        );
     }
 
-    /* Check for GLX_ARB_context_flush_control */
+    /* Check for WGL_ARB_context_flush_control */
     if (HasExtension("WGL_ARB_context_flush_control", extensions)) {
         _this->gl_data->HAS_WGL_ARB_context_flush_control = SDL_TRUE;
+    }
+
+    /* Check for WGL_ARB_create_context_robustness */
+    if (HasExtension("WGL_ARB_create_context_robustness", extensions)) {
+        _this->gl_data->HAS_WGL_ARB_create_context_robustness = SDL_TRUE;
+    }
+
+    /* Check for WGL_ARB_create_context_no_error */
+    if (HasExtension("WGL_ARB_create_context_no_error", extensions)) {
+        _this->gl_data->HAS_WGL_ARB_create_context_no_error = SDL_TRUE;
     }
 
     _this->gl_data->wglMakeCurrent(hdc, NULL);
@@ -593,14 +648,26 @@ WIN_GL_SetupWindow(_THIS, SDL_Window * window)
     return retval;
 }
 
+SDL_bool
+WIN_GL_UseEGL(_THIS)
+{
+    SDL_assert(_this->gl_data != NULL);
+    SDL_assert(_this->gl_config.profile_mask == SDL_GL_CONTEXT_PROFILE_ES);
+
+    return (SDL_GetHintBoolean(SDL_HINT_OPENGL_ES_DRIVER, SDL_FALSE)
+            || _this->gl_config.major_version == 1 /* No WGL extension for OpenGL ES 1.x profiles. */
+            || _this->gl_config.major_version > _this->gl_data->es_profile_max_supported_version.major
+            || (_this->gl_config.major_version == _this->gl_data->es_profile_max_supported_version.major
+                && _this->gl_config.minor_version > _this->gl_data->es_profile_max_supported_version.minor));
+}
+
 SDL_GLContext
 WIN_GL_CreateContext(_THIS, SDL_Window * window)
 {
     HDC hdc = ((SDL_WindowData *) window->driverdata)->hdc;
     HGLRC context, share_context;
 
-    if (_this->gl_config.profile_mask == SDL_GL_CONTEXT_PROFILE_ES &&
-        !_this->gl_data->HAS_WGL_EXT_create_context_es2_profile) {
+    if (_this->gl_config.profile_mask == SDL_GL_CONTEXT_PROFILE_ES && WIN_GL_UseEGL(_this)) {
 #if SDL_VIDEO_OPENGL_EGL        
         /* Switch to EGL based functions */
         WIN_GL_UnloadLibrary(_this);
@@ -660,13 +727,13 @@ WIN_GL_CreateContext(_THIS, SDL_Window * window)
             SDL_SetError("GL 3.x is not supported");
             context = temp_context;
         } else {
-        /* max 10 attributes plus terminator */
-            int attribs[11] = {
-                WGL_CONTEXT_MAJOR_VERSION_ARB, _this->gl_config.major_version,
-                WGL_CONTEXT_MINOR_VERSION_ARB, _this->gl_config.minor_version,
-                0
-            };
-            int iattr = 4;
+            int attribs[15];  /* max 14 attributes plus terminator */
+            int iattr = 0;
+
+            attribs[iattr++] = WGL_CONTEXT_MAJOR_VERSION_ARB;
+            attribs[iattr++] = _this->gl_config.major_version;
+            attribs[iattr++] = WGL_CONTEXT_MINOR_VERSION_ARB;
+            attribs[iattr++] = _this->gl_config.minor_version;
 
             /* SDL profile bits match WGL profile bits */
             if (_this->gl_config.profile_mask != 0) {
@@ -686,6 +753,20 @@ WIN_GL_CreateContext(_THIS, SDL_Window * window)
                 attribs[iattr++] = _this->gl_config.release_behavior ?
                                     WGL_CONTEXT_RELEASE_BEHAVIOR_FLUSH_ARB :
                                     WGL_CONTEXT_RELEASE_BEHAVIOR_NONE_ARB;
+            }
+
+            /* only set if wgl extension is available */
+            if (_this->gl_data->HAS_WGL_ARB_create_context_robustness) {
+                attribs[iattr++] = WGL_CONTEXT_RESET_NOTIFICATION_STRATEGY_ARB;
+                attribs[iattr++] = _this->gl_config.reset_notification ?
+                                    WGL_LOSE_CONTEXT_ON_RESET_ARB :
+                                    WGL_NO_RESET_NOTIFICATION_ARB;
+            }
+
+            /* only set if wgl extension is available */
+            if (_this->gl_data->HAS_WGL_ARB_create_context_no_error) {
+                attribs[iattr++] = WGL_CONTEXT_OPENGL_NO_ERROR_ARB;
+                attribs[iattr++] = _this->gl_config.no_error;
             }
 
             attribs[iattr++] = 0;
@@ -766,12 +847,15 @@ WIN_GL_GetSwapInterval(_THIS)
     return retval;
 }
 
-void
+int
 WIN_GL_SwapWindow(_THIS, SDL_Window * window)
 {
     HDC hdc = ((SDL_WindowData *) window->driverdata)->hdc;
 
-    SwapBuffers(hdc);
+    if (!SwapBuffers(hdc)) {
+        return WIN_SetError("SwapBuffers()");
+    }
+    return 0;
 }
 
 void

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,8 +19,8 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _SDL_DirectFB_shape_h
-#define _SDL_DirectFB_shape_h
+#ifndef SDL_DirectFB_shape_h_
+#define SDL_DirectFB_shape_h_
 
 #include <directfb.h>
 
@@ -31,9 +31,8 @@ typedef struct {
     IDirectFBSurface *surface;
 } SDL_ShapeData;
 
-extern SDL_Window* DirectFB_CreateShapedWindow(const char *title,unsigned int x,unsigned int y,unsigned int w,unsigned int h,Uint32 flags);
 extern SDL_WindowShaper* DirectFB_CreateShaper(SDL_Window* window);
 extern int DirectFB_ResizeWindowShape(SDL_Window* window);
 extern int DirectFB_SetWindowShape(SDL_WindowShaper *shaper,SDL_Surface *shape,SDL_WindowShapeMode *shapeMode);
 
-#endif /* _SDL_DirectFB_shape_h */
+#endif /* SDL_DirectFB_shape_h_ */

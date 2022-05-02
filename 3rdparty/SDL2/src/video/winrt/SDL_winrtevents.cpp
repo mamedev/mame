@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -36,7 +36,6 @@ using Windows::UI::Core::CoreCursor;
 #include "../../core/winrt/SDL_winrtapp_common.h"
 #include "../../core/winrt/SDL_winrtapp_direct3d.h"
 #include "../../core/winrt/SDL_winrtapp_xaml.h"
-#include "SDL_assert.h"
 #include "SDL_system.h"
 
 extern "C" {
@@ -105,7 +104,7 @@ WINRT_XAMLThreadMain(void * userdata)
 }
 
 void
-WINRT_CycleXAMLThread()
+WINRT_CycleXAMLThread(void)
 {
     switch (_threadState) {
         case ThreadState_NotLaunched:

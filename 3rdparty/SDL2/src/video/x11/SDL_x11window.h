@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,8 +20,8 @@
 */
 #include "../../SDL_internal.h"
 
-#ifndef _SDL_x11window_h
-#define _SDL_x11window_h
+#ifndef SDL_x11window_h_
+#define SDL_x11window_h_
 
 /* We need to queue the focus in/out changes because they may occur during
    video mode changes and we can respond to them by triggering more mode
@@ -104,7 +104,8 @@ extern void X11_DestroyWindow(_THIS, SDL_Window * window);
 extern SDL_bool X11_GetWindowWMInfo(_THIS, SDL_Window * window,
                                     struct SDL_SysWMinfo *info);
 extern int X11_SetWindowHitTest(SDL_Window *window, SDL_bool enabled);
+extern void X11_AcceptDragAndDrop(SDL_Window * window, SDL_bool accept);
 
-#endif /* _SDL_x11window_h */
+#endif /* SDL_x11window_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

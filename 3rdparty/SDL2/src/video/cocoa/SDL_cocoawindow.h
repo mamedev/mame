@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,10 +20,14 @@
 */
 #include "../../SDL_internal.h"
 
-#ifndef _SDL_cocoawindow_h
-#define _SDL_cocoawindow_h
+#ifndef SDL_cocoawindow_h_
+#define SDL_cocoawindow_h_
 
 #import <Cocoa/Cocoa.h>
+
+#if SDL_VIDEO_OPENGL_EGL
+#include "../SDL_egl_c.h"
+#endif
 
 typedef struct SDL_WindowData SDL_WindowData;
 
@@ -109,11 +113,15 @@ struct SDL_WindowData
 {
     SDL_Window *window;
     NSWindow *nswindow;
+    NSView *sdlContentView;
     NSMutableArray *nscontexts;
     SDL_bool created;
-    SDL_bool inWindowMove;
+    SDL_bool inWindowFullscreenTransition;
     Cocoa_WindowListener *listener;
     struct SDL_VideoData *videodata;
+#if SDL_VIDEO_OPENGL_EGL
+    EGLSurface egl_surface;
+#endif
 };
 
 extern int Cocoa_CreateWindow(_THIS, SDL_Window * window);
@@ -141,7 +149,8 @@ extern void Cocoa_SetWindowGrab(_THIS, SDL_Window * window, SDL_bool grabbed);
 extern void Cocoa_DestroyWindow(_THIS, SDL_Window * window);
 extern SDL_bool Cocoa_GetWindowWMInfo(_THIS, SDL_Window * window, struct SDL_SysWMinfo *info);
 extern int Cocoa_SetWindowHitTest(SDL_Window *window, SDL_bool enabled);
+extern void Cocoa_AcceptDragAndDrop(SDL_Window * window, SDL_bool accept);
 
-#endif /* _SDL_cocoawindow_h */
+#endif /* SDL_cocoawindow_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

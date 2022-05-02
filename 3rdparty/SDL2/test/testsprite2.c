@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -37,6 +37,8 @@ static SDL_Rect *positions;
 static SDL_Rect *velocities;
 static int sprite_w, sprite_h;
 static SDL_BlendMode blendMode = SDL_BLENDMODE_BLEND;
+static Uint32 next_fps_check, frames;
+static const Uint32 fps_check_delay = 5000;
 
 /* Number of iterations to move sprites - used for visual tests. */
 /* -1: infinite random moves (default); >=0: enables N deterministic moves */
@@ -99,7 +101,12 @@ LoadSprite(const char *file)
             SDL_FreeSurface(temp);
             return (-1);
         }
-        SDL_SetTextureBlendMode(sprites[i], blendMode);
+        if (SDL_SetTextureBlendMode(sprites[i], blendMode) < 0) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't set blend mode: %s\n", SDL_GetError());
+            SDL_FreeSurface(temp);
+            SDL_DestroyTexture(sprites[i]);
+            return (-1);
+        }
     }
     SDL_FreeSurface(temp);
 
@@ -239,6 +246,7 @@ MoveSprites(SDL_Renderer * renderer, SDL_Texture * sprite)
 void
 loop()
 {
+    Uint32 now;
     int i;
     SDL_Event event;
 
@@ -256,13 +264,24 @@ loop()
         emscripten_cancel_main_loop();
     }
 #endif
+
+    frames++;
+    now = SDL_GetTicks();
+    if (SDL_TICKS_PASSED(now, next_fps_check)) {
+        /* Print out some timing information */
+        const Uint32 then = next_fps_check - fps_check_delay;
+        const double fps = ((double) frames * 1000) / (now - then);
+        SDL_Log("%2.2f frames per second\n", fps);
+        next_fps_check = now + fps_check_delay;
+        frames = 0;
+    }
+
 }
 
 int
 main(int argc, char *argv[])
 {
     int i;
-    Uint32 then, now, frames;
     Uint64 seed;
     const char *icon = "icon.bmp";
 
@@ -295,6 +314,9 @@ main(int argc, char *argv[])
                     } else if (SDL_strcasecmp(argv[i + 1], "mod") == 0) {
                         blendMode = SDL_BLENDMODE_MOD;
                         consumed = 2;
+                    } else if (SDL_strcasecmp(argv[i + 1], "sub") == 0) {
+                        blendMode = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_SUBTRACT, SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_SUBTRACT);
+                        consumed = 2;
                     }
                 }
             } else if (SDL_strcasecmp(argv[i], "--iterations") == 0) {
@@ -318,8 +340,8 @@ main(int argc, char *argv[])
             }
         }
         if (consumed < 0) {
-            SDL_Log("Usage: %s %s [--blend none|blend|add|mod] [--cyclecolor] [--cyclealpha] [--iterations N] [num_sprites] [icon.bmp]\n",
-                    argv[0], SDLTest_CommonUsage(state));
+            static const char *options[] = { "[--blend none|blend|add|mod]", "[--cyclecolor]", "[--cyclealpha]", "[--iterations N]", "[num_sprites]", "[icon.bmp]", NULL };
+            SDLTest_CommonLogUsage(state, argv[0], options);
             quit(1);
         }
         i += consumed;
@@ -376,24 +398,17 @@ main(int argc, char *argv[])
 
     /* Main render loop */
     frames = 0;
-    then = SDL_GetTicks();
+    next_fps_check = SDL_GetTicks() + fps_check_delay;
     done = 0;
 
 #ifdef __EMSCRIPTEN__
     emscripten_set_main_loop(loop, 0, 1);
 #else
     while (!done) {
-        ++frames;
         loop();
     }
 #endif
 
-    /* Print out some timing information */
-    now = SDL_GetTicks();
-    if (now > then) {
-        double fps = ((double) frames * 1000) / (now - then);
-        SDL_Log("%2.2f frames per second\n", fps);
-    }
     quit(0);
     return 0;
 }

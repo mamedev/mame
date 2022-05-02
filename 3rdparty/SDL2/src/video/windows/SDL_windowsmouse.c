@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -22,7 +22,6 @@
 
 #if SDL_VIDEO_DRIVER_WINDOWS
 
-#include "SDL_assert.h"
 #include "SDL_windowsvideo.h"
 
 #include "../../events/SDL_mouse_c.h"
@@ -97,6 +96,7 @@ WIN_CreateCursor(SDL_Surface * surface, int hot_x, int hot_y)
     LPVOID pixels;
     LPVOID maskbits;
     size_t maskbitslen;
+    SDL_bool isstack;
     ICONINFO ii;
 
     SDL_zero(bmh);
@@ -112,7 +112,7 @@ WIN_CreateCursor(SDL_Surface * surface, int hot_x, int hot_y)
     bmh.bV4BlueMask  = 0x000000FF;
 
     maskbitslen = ((surface->w + (pad - (surface->w % pad))) / 8) * surface->h;
-    maskbits = SDL_stack_alloc(Uint8,maskbitslen);
+    maskbits = SDL_small_alloc(Uint8, maskbitslen, &isstack);
     if (maskbits == NULL) {
         SDL_OutOfMemory();
         return NULL;
@@ -129,7 +129,7 @@ WIN_CreateCursor(SDL_Surface * surface, int hot_x, int hot_y)
     ii.hbmColor = CreateDIBSection(hdc, (BITMAPINFO*)&bmh, DIB_RGB_COLORS, &pixels, NULL, 0);
     ii.hbmMask = CreateBitmap(surface->w, surface->h, 1, 1, maskbits);
     ReleaseDC(NULL, hdc);
-    SDL_stack_free(maskbits);
+    SDL_small_free(maskbits, isstack);
 
     SDL_assert(surface->format->format == SDL_PIXELFORMAT_ARGB8888);
     SDL_assert(surface->pitch == surface->w * 4);
@@ -275,12 +275,14 @@ WIN_GetGlobalMouseState(int *x, int *y)
 {
     Uint32 retval = 0;
     POINT pt = { 0, 0 };
+    SDL_bool swapButtons = GetSystemMetrics(SM_SWAPBUTTON) != 0;
+
     GetCursorPos(&pt);
     *x = (int) pt.x;
     *y = (int) pt.y;
 
-    retval |= GetAsyncKeyState(VK_LBUTTON) & 0x8000 ? SDL_BUTTON_LMASK : 0;
-    retval |= GetAsyncKeyState(VK_RBUTTON) & 0x8000 ? SDL_BUTTON_RMASK : 0;
+    retval |= GetAsyncKeyState(!swapButtons ? VK_LBUTTON : VK_RBUTTON) & 0x8000 ? SDL_BUTTON_LMASK : 0;
+    retval |= GetAsyncKeyState(!swapButtons ? VK_RBUTTON : VK_LBUTTON) & 0x8000 ? SDL_BUTTON_RMASK : 0;
     retval |= GetAsyncKeyState(VK_MBUTTON) & 0x8000 ? SDL_BUTTON_MMASK : 0;
     retval |= GetAsyncKeyState(VK_XBUTTON1) & 0x8000 ? SDL_BUTTON_X1MASK : 0;
     retval |= GetAsyncKeyState(VK_XBUTTON2) & 0x8000 ? SDL_BUTTON_X2MASK : 0;
@@ -304,20 +306,11 @@ WIN_InitMouse(_THIS)
     mouse->GetGlobalMouseState = WIN_GetGlobalMouseState;
 
     SDL_SetDefaultCursor(WIN_CreateDefaultCursor());
-
-    SDL_SetDoubleClickTime(GetDoubleClickTime());
 }
 
 void
 WIN_QuitMouse(_THIS)
 {
-    SDL_Mouse *mouse = SDL_GetMouse();
-    if ( mouse->def_cursor ) {
-        SDL_free(mouse->def_cursor);
-        mouse->def_cursor = NULL;
-        mouse->cur_cursor = NULL;
-    }
-
     if (rawInputEnableCount) {  /* force RAWINPUT off here. */
         rawInputEnableCount = 1;
         ToggleRawInput(SDL_FALSE);

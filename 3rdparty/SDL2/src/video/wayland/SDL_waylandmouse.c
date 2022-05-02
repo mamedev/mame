@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -23,10 +23,6 @@
 
 #if SDL_VIDEO_DRIVER_WAYLAND
 
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
-
 #include <sys/types.h>
 #include <sys/mman.h>
 #include <fcntl.h>
@@ -44,7 +40,6 @@
 #include "SDL_waylanddyn.h"
 #include "wayland-cursor.h"
 
-#include "SDL_assert.h"
 
 
 typedef struct {
@@ -128,6 +123,8 @@ create_buffer_from_shm(Wayland_CursorData *d,
         close (shm_fd);
         return SDL_SetError("mmap() failed.");
     }
+
+    SDL_assert(d->shm_data != NULL);
 
     shm_pool = wl_shm_create_pool(data->shm, shm_fd, size);
     d->buffer = wl_shm_pool_create_buffer(shm_pool,
@@ -396,23 +393,5 @@ Wayland_FiniMouse(void)
     /* This effectively assumes that nobody else
      * touches SDL_Mouse which is effectively
      * a singleton */
-
-    SDL_Mouse *mouse = SDL_GetMouse();
-
-    /* Free the current cursor if not the same pointer as
-     * the default cursor */
-    if (mouse->def_cursor != mouse->cur_cursor)
-        Wayland_FreeCursor (mouse->cur_cursor);
-
-    Wayland_FreeCursor (mouse->def_cursor);
-    mouse->def_cursor = NULL;
-    mouse->cur_cursor = NULL;
-
-    mouse->CreateCursor =  NULL;
-    mouse->CreateSystemCursor = NULL;
-    mouse->ShowCursor = NULL;
-    mouse->FreeCursor = NULL;
-    mouse->WarpMouse = NULL;
-    mouse->SetRelativeMouseMode = NULL;
 }
 #endif  /* SDL_VIDEO_DRIVER_WAYLAND */

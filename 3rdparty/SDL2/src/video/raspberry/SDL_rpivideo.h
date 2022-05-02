@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -25,7 +25,7 @@
 #include "../../SDL_internal.h"
 #include "../SDL_sysvideo.h"
 
-#include "bcm_host.h"
+#include <bcm_host.h>
 #include "GLES/gl.h"
 #include "EGL/egl.h"
 #include "EGL/eglext.h"
@@ -48,6 +48,12 @@ typedef struct SDL_WindowData
 #if SDL_VIDEO_OPENGL_EGL  
     EGLSurface egl_surface;
 #endif    
+
+    /* Vsync callback cond and mutex */
+    SDL_cond  *vsync_cond;
+    SDL_mutex *vsync_cond_mutex;
+    SDL_bool double_buffer;
+
 } SDL_WindowData;
 
 #define SDL_RPI_VIDEOLAYER 10000 /* High enough so to occlude everything */
@@ -90,7 +96,7 @@ SDL_GLContext RPI_GLES_CreateContext(_THIS, SDL_Window * window);
 int RPI_GLES_MakeCurrent(_THIS, SDL_Window * window, SDL_GLContext context);
 int RPI_GLES_SetSwapInterval(_THIS, int interval);
 int RPI_GLES_GetSwapInterval(_THIS);
-void RPI_GLES_SwapWindow(_THIS, SDL_Window * window);
+int RPI_GLES_SwapWindow(_THIS, SDL_Window * window);
 void RPI_GLES_DeleteContext(_THIS, SDL_GLContext context);
 
 #endif /* __SDL_RPIVIDEO_H__ */

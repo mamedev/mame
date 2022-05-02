@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -25,13 +25,15 @@
 #include "SDL_timer.h"
 #include "SDL_events.h"
 #include "SDL_events_c.h"
-#include "SDL_assert.h"
 #include "../video/SDL_sysvideo.h"
 
 
 /* #define DEBUG_KEYBOARD */
 
 /* Global keyboard information */
+
+#define KEYBOARD_HARDWARE       0x01
+#define KEYBOARD_AUTORELEASE    0x02
 
 typedef struct SDL_Keyboard SDL_Keyboard;
 
@@ -40,8 +42,10 @@ struct SDL_Keyboard
     /* Data common to all keyboards */
     SDL_Window *focus;
     Uint16 modstate;
+    Uint8 keysource[SDL_NUM_SCANCODES];
     Uint8 keystate[SDL_NUM_SCANCODES];
     SDL_Keycode keymap[SDL_NUM_SCANCODES];
+    SDL_bool autorelease_pending;
 };
 
 static SDL_Keyboard SDL_keyboard;
@@ -273,6 +277,10 @@ static const SDL_Keycode SDL_default_keymap[SDL_NUM_SCANCODES] = {
     SDLK_KBDILLUMUP,
     SDLK_EJECT,
     SDLK_SLEEP,
+    SDLK_APP1,
+    SDLK_APP2,
+    SDLK_AUDIOREWIND,
+    SDLK_AUDIOFASTFORWARD,
 };
 
 static const char *SDL_scancode_names[SDL_NUM_SCANCODES] = {
@@ -505,6 +513,10 @@ static const char *SDL_scancode_names[SDL_NUM_SCANCODES] = {
     "KBDIllumUp",
     "Eject",
     "Sleep",
+    "App1",
+    "App2",
+    "AudioRewind",
+    "AudioFastForward",
 };
 
 /* Taken from SDL_iconv() */
@@ -569,7 +581,7 @@ SDL_ResetKeyboard(void)
 #ifdef DEBUG_KEYBOARD
     printf("Resetting keyboard\n");
 #endif
-    for (scancode = 0; scancode < SDL_NUM_SCANCODES; ++scancode) {
+    for (scancode = (SDL_Scancode) 0; scancode < SDL_NUM_SCANCODES; ++scancode) {
         if (keyboard->keystate[scancode] == SDL_PRESSED) {
             SDL_SendKeyboardKey(SDL_RELEASED, scancode);
         }
@@ -586,12 +598,22 @@ void
 SDL_SetKeymap(int start, SDL_Keycode * keys, int length)
 {
     SDL_Keyboard *keyboard = &SDL_keyboard;
+    SDL_Scancode scancode;
 
     if (start < 0 || start + length > SDL_NUM_SCANCODES) {
         return;
     }
 
     SDL_memcpy(&keyboard->keymap[start], keys, sizeof(*keys) * length);
+
+    /* The number key scancodes always map to the number key keycodes.
+     * On AZERTY layouts these technically are symbols, but users (and games)
+     * always think of them and view them in UI as number keys.
+     */
+    keyboard->keymap[SDL_SCANCODE_0] = SDLK_0;
+    for (scancode = SDL_SCANCODE_1; scancode <= SDL_SCANCODE_9; ++scancode) {
+        keyboard->keymap[scancode] = SDLK_1 + (scancode - SDL_SCANCODE_1);
+    }
 }
 
 void
@@ -657,20 +679,20 @@ SDL_SetKeyboardFocus(SDL_Window * window)
     }
 }
 
-int
-SDL_SendKeyboardKey(Uint8 state, SDL_Scancode scancode)
+static int
+SDL_SendKeyboardKeyInternal(Uint8 source, Uint8 state, SDL_Scancode scancode)
 {
     SDL_Keyboard *keyboard = &SDL_keyboard;
     int posted;
     SDL_Keymod modifier;
     SDL_Keycode keycode;
-    Uint16 modstate;
     Uint32 type;
-    Uint8 repeat;
+    Uint8 repeat = SDL_FALSE;
 
-    if (!scancode) {
+    if (scancode == SDL_SCANCODE_UNKNOWN) {
         return 0;
     }
+
 #ifdef DEBUG_KEYBOARD
     printf("The '%s' key has been %s\n", SDL_GetScancodeName(scancode),
            state == SDL_PRESSED ? "pressed" : "released");
@@ -690,18 +712,30 @@ SDL_SendKeyboardKey(Uint8 state, SDL_Scancode scancode)
     }
 
     /* Drop events that don't change state */
-    repeat = (state && keyboard->keystate[scancode]);
-    if (keyboard->keystate[scancode] == state && !repeat) {
-#if 0
-        printf("Keyboard event didn't change state - dropped!\n");
-#endif
-        return 0;
+    if (state) {
+        if (keyboard->keystate[scancode]) {
+            if (!(keyboard->keysource[scancode] & source)) {
+                keyboard->keysource[scancode] |= source;
+                return 0;
+            }
+            repeat = SDL_TRUE;
+        }
+        keyboard->keysource[scancode] |= source;
+    } else {
+        if (!keyboard->keystate[scancode]) {
+            return 0;
+        }
+        keyboard->keysource[scancode] = 0;
     }
 
     /* Update internal keyboard state */
     keyboard->keystate[scancode] = state;
 
     keycode = keyboard->keymap[scancode];
+
+    if (source == KEYBOARD_AUTORELEASE) {
+        keyboard->autorelease_pending = SDL_TRUE;
+    }
 
     /* Update modifiers state if applicable */
     switch (keycode) {
@@ -737,7 +771,6 @@ SDL_SendKeyboardKey(Uint8 state, SDL_Scancode scancode)
         break;
     }
     if (SDL_KEYDOWN == type) {
-        modstate = keyboard->modstate;
         switch (keycode) {
         case SDLK_NUMLOCKCLEAR:
             keyboard->modstate ^= KMOD_NUM;
@@ -751,7 +784,6 @@ SDL_SendKeyboardKey(Uint8 state, SDL_Scancode scancode)
         }
     } else {
         keyboard->modstate &= ~modifier;
-        modstate = keyboard->modstate;
     }
 
     /* Post the event, if desired */
@@ -763,11 +795,53 @@ SDL_SendKeyboardKey(Uint8 state, SDL_Scancode scancode)
         event.key.repeat = repeat;
         event.key.keysym.scancode = scancode;
         event.key.keysym.sym = keycode;
-        event.key.keysym.mod = modstate;
+        event.key.keysym.mod = keyboard->modstate;
         event.key.windowID = keyboard->focus ? keyboard->focus->id : 0;
         posted = (SDL_PushEvent(&event) > 0);
     }
     return (posted);
+}
+
+int
+SDL_SendKeyboardKey(Uint8 state, SDL_Scancode scancode)
+{
+    return SDL_SendKeyboardKeyInternal(KEYBOARD_HARDWARE, state, scancode);
+}
+
+int
+SDL_SendKeyboardKeyAutoRelease(SDL_Scancode scancode)
+{
+    return SDL_SendKeyboardKeyInternal(KEYBOARD_AUTORELEASE, SDL_PRESSED, scancode);
+}
+
+void
+SDL_ReleaseAutoReleaseKeys(void)
+{
+    SDL_Keyboard *keyboard = &SDL_keyboard;
+    SDL_Scancode scancode;
+
+    if (keyboard->autorelease_pending) {
+        for (scancode = SDL_SCANCODE_UNKNOWN; scancode < SDL_NUM_SCANCODES; ++scancode) {
+            if (keyboard->keysource[scancode] == KEYBOARD_AUTORELEASE) {
+                SDL_SendKeyboardKeyInternal(KEYBOARD_AUTORELEASE, SDL_RELEASED, scancode);
+            }
+        }
+        keyboard->autorelease_pending = SDL_FALSE;
+    }
+}
+
+SDL_bool
+SDL_HardwareKeyboardKeyPressed(void)
+{
+    SDL_Keyboard *keyboard = &SDL_keyboard;
+    SDL_Scancode scancode;
+
+    for (scancode = SDL_SCANCODE_UNKNOWN; scancode < SDL_NUM_SCANCODES; ++scancode) {
+        if ((keyboard->keysource[scancode] & KEYBOARD_HARDWARE) != 0) {
+            return SDL_TRUE;
+        }
+    }
+    return SDL_FALSE;
 }
 
 int
@@ -834,7 +908,7 @@ SDL_GetModState(void)
 {
     SDL_Keyboard *keyboard = &SDL_keyboard;
 
-    return keyboard->modstate;
+    return (SDL_Keymod) keyboard->modstate;
 }
 
 void
@@ -863,7 +937,7 @@ SDL_GetKeyFromScancode(SDL_Scancode scancode)
 {
     SDL_Keyboard *keyboard = &SDL_keyboard;
 
-    if (scancode < SDL_SCANCODE_UNKNOWN || scancode >= SDL_NUM_SCANCODES) {
+    if (((int)scancode) < SDL_SCANCODE_UNKNOWN || scancode >= SDL_NUM_SCANCODES) {
           SDL_InvalidParamError("scancode");
           return 0;
     }
@@ -890,7 +964,7 @@ const char *
 SDL_GetScancodeName(SDL_Scancode scancode)
 {
     const char *name;
-    if (scancode < SDL_SCANCODE_UNKNOWN || scancode >= SDL_NUM_SCANCODES) {
+    if (((int)scancode) < SDL_SCANCODE_UNKNOWN || scancode >= SDL_NUM_SCANCODES) {
           SDL_InvalidParamError("scancode");
           return "";
     }
@@ -968,8 +1042,10 @@ SDL_GetKeyFromName(const char *name)
 {
     SDL_Keycode key;
 
-        /* Check input */
-        if (name == NULL) return SDLK_UNKNOWN;
+    /* Check input */
+    if (name == NULL) {
+        return SDLK_UNKNOWN;
+    }
 
     /* If it's a single UTF-8 character, then that's the keycode itself */
     key = *(const unsigned char *)name;

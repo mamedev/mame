@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,8 +20,8 @@
 */
 #include "../../SDL_internal.h"
 
-#ifndef _SDL_cocoaclipboard_h
-#define _SDL_cocoaclipboard_h
+#ifndef SDL_cocoaclipboard_h_
+#define SDL_cocoaclipboard_h_
 
 /* Forward declaration */
 struct SDL_VideoData;
@@ -31,6 +31,6 @@ extern char *Cocoa_GetClipboardText(_THIS);
 extern SDL_bool Cocoa_HasClipboardText(_THIS);
 extern void Cocoa_CheckClipboardUpdate(struct SDL_VideoData * data);
 
-#endif /* _SDL_cocoaclipboard_h */
+#endif /* SDL_cocoaclipboard_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

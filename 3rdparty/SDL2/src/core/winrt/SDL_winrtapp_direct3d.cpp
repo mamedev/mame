@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -47,11 +47,8 @@ using namespace Windows::Phone::UI::Input;
 
 /* SDL includes */
 extern "C" {
-#include "../../SDL_internal.h"
-#include "SDL_assert.h"
 #include "SDL_events.h"
 #include "SDL_hints.h"
-#include "SDL_log.h"
 #include "SDL_main.h"
 #include "SDL_stdinc.h"
 #include "SDL_render.h"
@@ -122,7 +119,8 @@ int SDL_WinRTInitNonXAMLApp(int (*mainFunction)(int, char **))
     return 0;
 }
 
-static void WINRT_SetDisplayOrientationsPreference(void *userdata, const char *name, const char *oldValue, const char *newValue)
+static void SDLCALL
+WINRT_SetDisplayOrientationsPreference(void *userdata, const char *name, const char *oldValue, const char *newValue)
 {
     SDL_assert(SDL_strcmp(name, SDL_HINT_ORIENTATIONS) == 0);
 
@@ -827,7 +825,7 @@ static void WINRT_OnBackButtonPressed(BackButtonEventArgs ^ args)
     }
 }
 
-#if NTDDI_VERSION == NTDDI_WIN10
+#if NTDDI_VERSION >= NTDDI_WIN10
 void SDL_WinRTApp::OnBackButtonPressed(Platform::Object^ sender, Windows::UI::Core::BackRequestedEventArgs^ args)
 
 {

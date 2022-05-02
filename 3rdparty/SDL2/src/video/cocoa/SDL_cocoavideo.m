@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -26,19 +26,14 @@
 #include "SDL_endian.h"
 #include "SDL_cocoavideo.h"
 #include "SDL_cocoashape.h"
-#include "SDL_assert.h"
+#include "SDL_cocoavulkan.h"
+#include "SDL_cocoametalview.h"
 
 /* Initialization/Query functions */
 static int Cocoa_VideoInit(_THIS);
 static void Cocoa_VideoQuit(_THIS);
 
 /* Cocoa driver bootstrap functions */
-
-static int
-Cocoa_Available(void)
-{
-    return (1);
-}
 
 static void
 Cocoa_DeleteDevice(SDL_VideoDevice * device)
@@ -80,8 +75,8 @@ Cocoa_CreateDevice(int devindex)
     device->PumpEvents = Cocoa_PumpEvents;
     device->SuspendScreenSaver = Cocoa_SuspendScreenSaver;
 
-    device->CreateWindow = Cocoa_CreateWindow;
-    device->CreateWindowFrom = Cocoa_CreateWindowFrom;
+    device->CreateSDLWindow = Cocoa_CreateWindow;
+    device->CreateSDLWindowFrom = Cocoa_CreateWindowFrom;
     device->SetWindowTitle = Cocoa_SetWindowTitle;
     device->SetWindowIcon = Cocoa_SetWindowIcon;
     device->SetWindowPosition = Cocoa_SetWindowPosition;
@@ -104,6 +99,7 @@ Cocoa_CreateDevice(int devindex)
     device->DestroyWindow = Cocoa_DestroyWindow;
     device->GetWindowWMInfo = Cocoa_GetWindowWMInfo;
     device->SetWindowHitTest = Cocoa_SetWindowHitTest;
+    device->AcceptDragAndDrop = Cocoa_AcceptDragAndDrop;
 
     device->shape_driver.CreateShaper = Cocoa_CreateShaper;
     device->shape_driver.SetWindowShape = Cocoa_SetWindowShape;
@@ -120,6 +116,31 @@ Cocoa_CreateDevice(int devindex)
     device->GL_GetSwapInterval = Cocoa_GL_GetSwapInterval;
     device->GL_SwapWindow = Cocoa_GL_SwapWindow;
     device->GL_DeleteContext = Cocoa_GL_DeleteContext;
+#elif SDL_VIDEO_OPENGL_EGL
+    device->GL_LoadLibrary = Cocoa_GLES_LoadLibrary;
+    device->GL_GetProcAddress = Cocoa_GLES_GetProcAddress;
+    device->GL_UnloadLibrary = Cocoa_GLES_UnloadLibrary;
+    device->GL_CreateContext = Cocoa_GLES_CreateContext;
+    device->GL_MakeCurrent = Cocoa_GLES_MakeCurrent;
+    device->GL_SetSwapInterval = Cocoa_GLES_SetSwapInterval;
+    device->GL_GetSwapInterval = Cocoa_GLES_GetSwapInterval;
+    device->GL_SwapWindow = Cocoa_GLES_SwapWindow;
+    device->GL_DeleteContext = Cocoa_GLES_DeleteContext;
+#endif
+
+#if SDL_VIDEO_VULKAN
+    device->Vulkan_LoadLibrary = Cocoa_Vulkan_LoadLibrary;
+    device->Vulkan_UnloadLibrary = Cocoa_Vulkan_UnloadLibrary;
+    device->Vulkan_GetInstanceExtensions = Cocoa_Vulkan_GetInstanceExtensions;
+    device->Vulkan_CreateSurface = Cocoa_Vulkan_CreateSurface;
+    device->Vulkan_GetDrawableSize = Cocoa_Vulkan_GetDrawableSize;
+#endif
+
+#if SDL_VIDEO_METAL
+    device->Metal_CreateView = Cocoa_Metal_CreateView;
+    device->Metal_DestroyView = Cocoa_Metal_DestroyView;
+    device->Metal_GetLayer = Cocoa_Metal_GetLayer;
+    device->Metal_GetDrawableSize = Cocoa_Metal_GetDrawableSize;
 #endif
 
     device->StartTextInput = Cocoa_StartTextInput;
@@ -137,7 +158,7 @@ Cocoa_CreateDevice(int devindex)
 
 VideoBootStrap COCOA_bootstrap = {
     "cocoa", "SDL Cocoa video driver",
-    Cocoa_Available, Cocoa_CreateDevice
+    Cocoa_CreateDevice
 };
 
 
@@ -148,12 +169,19 @@ Cocoa_VideoInit(_THIS)
 
     Cocoa_InitModes(_this);
     Cocoa_InitKeyboard(_this);
-    Cocoa_InitMouse(_this);
+    if (Cocoa_InitMouse(_this) < 0) {
+        return -1;
+    }
 
     data->allow_spaces = ((floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_6) && SDL_GetHintBoolean(SDL_HINT_VIDEO_MAC_FULLSCREEN_SPACES, SDL_TRUE));
 
     /* The IOPM assertion API can disable the screensaver as of 10.7. */
     data->screensaver_use_iopm = floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_6;
+
+    data->swaplock = SDL_CreateMutex();
+    if (!data->swaplock) {
+        return -1;
+    }
 
     return 0;
 }
@@ -161,9 +189,12 @@ Cocoa_VideoInit(_THIS)
 void
 Cocoa_VideoQuit(_THIS)
 {
+    SDL_VideoData *data = (SDL_VideoData *) _this->driverdata;
     Cocoa_QuitModes(_this);
     Cocoa_QuitKeyboard(_this);
     Cocoa_QuitMouse(_this);
+    SDL_DestroyMutex(data->swaplock);
+    data->swaplock = NULL;
 }
 
 /* This function assumes that it's called from within an autorelease pool */
@@ -222,6 +253,9 @@ Cocoa_CreateImage(SDL_Surface * surface)
  *
  * This doesn't really have aything to do with the interfaces of the SDL video
  *  subsystem, but we need to stuff this into an Objective-C source code file.
+ *
+ * NOTE: This is copypasted in src/video/uikit/SDL_uikitvideo.m! Be sure both
+ *  versions remain identical!
  */
 
 void SDL_NSLog(const char *text)

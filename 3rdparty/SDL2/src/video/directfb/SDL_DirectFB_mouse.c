@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -22,7 +22,6 @@
 
 #if SDL_VIDEO_DRIVER_DIRECTFB
 
-#include "SDL_assert.h"
 
 #include "SDL_DirectFB_video.h"
 #include "SDL_DirectFB_mouse.h"
@@ -36,10 +35,8 @@ static SDL_Cursor *DirectFB_CreateDefaultCursor(void);
 static SDL_Cursor *DirectFB_CreateCursor(SDL_Surface * surface,
                                          int hot_x, int hot_y);
 static int DirectFB_ShowCursor(SDL_Cursor * cursor);
-static void DirectFB_MoveCursor(SDL_Cursor * cursor);
 static void DirectFB_FreeCursor(SDL_Cursor * cursor);
 static void DirectFB_WarpMouse(SDL_Window * window, int x, int y);
-static void DirectFB_FreeMouse(SDL_Mouse * mouse);
 
 static const char *arrow[] = {
     /* pixels */
@@ -84,11 +81,9 @@ DirectFB_CreateDefaultCursor(void)
 
     SDL_DFB_DEVICEDATA(dev);
     DFB_CursorData *curdata;
-    DFBResult ret;
     DFBSurfaceDescription dsc;
     SDL_Cursor *cursor;
     Uint32 *dest;
-    Uint32 *p;
     int pitch, i, j;
 
     SDL_DFB_ALLOC_CLEAR( cursor, sizeof(*cursor));
@@ -139,7 +134,6 @@ DirectFB_CreateCursor(SDL_Surface * surface, int hot_x, int hot_y)
 
     SDL_DFB_DEVICEDATA(dev);
     DFB_CursorData *curdata;
-    DFBResult ret;
     DFBSurfaceDescription dsc;
     SDL_Cursor *cursor;
     Uint32 *dest;
@@ -184,7 +178,6 @@ static int
 DirectFB_ShowCursor(SDL_Cursor * cursor)
 {
     SDL_DFB_CURSORDATA(cursor);
-    DFBResult ret;
     SDL_Window *window;
 
     window = SDL_GetFocusWindow();
@@ -239,7 +232,6 @@ DirectFB_WarpMouse(SDL_Window * window, int x, int y)
     SDL_VideoDisplay *display = SDL_GetDisplayForWindow(window);
     DFB_DisplayData *dispdata = (DFB_DisplayData *) display->driverdata;
     DFB_WindowData *windata = (DFB_WindowData *) window->driverdata;
-    DFBResult ret;
     int cx, cy;
 
     SDL_DFB_CHECKERR(windata->dfbwin->GetPosition(windata->dfbwin, &cx, &cy));
@@ -253,8 +245,10 @@ DirectFB_WarpMouse(SDL_Window * window, int x, int y)
 
 #if USE_MULTI_API
 
+static void DirectFB_MoveCursor(SDL_Cursor * cursor);
 static void DirectFB_WarpMouse(SDL_Mouse * mouse, SDL_Window * window,
                                int x, int y);
+static void DirectFB_FreeMouse(SDL_Mouse * mouse);
 
 static int id_mask;
 

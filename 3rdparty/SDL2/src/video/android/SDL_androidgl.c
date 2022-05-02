@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -29,31 +29,61 @@
 #include "SDL_androidwindow.h"
 
 #include "SDL_androidvideo.h"
+#include "SDL_androidgl.h"
 #include "../../core/android/SDL_android.h"
 
 #include <android/log.h>
 
 #include <dlfcn.h>
 
-SDL_EGL_CreateContext_impl(Android)
-SDL_EGL_MakeCurrent_impl(Android)
+int
+Android_GLES_MakeCurrent(_THIS, SDL_Window * window, SDL_GLContext context)
+{
+    if (window && context) {
+        return SDL_EGL_MakeCurrent(_this, ((SDL_WindowData *) window->driverdata)->egl_surface, context);
+    } else {
+        return SDL_EGL_MakeCurrent(_this, NULL, NULL);
+    }
+}
 
-void
+SDL_GLContext
+Android_GLES_CreateContext(_THIS, SDL_Window * window)
+{
+    SDL_GLContext ret;
+
+    Android_ActivityMutex_Lock_Running();
+
+    ret = SDL_EGL_CreateContext(_this, ((SDL_WindowData *) window->driverdata)->egl_surface);
+
+    SDL_UnlockMutex(Android_ActivityMutex);
+
+    return ret;
+}
+
+int
 Android_GLES_SwapWindow(_THIS, SDL_Window * window)
 {
+    int retval;
+
+    SDL_LockMutex(Android_ActivityMutex);
+
     /* The following two calls existed in the original Java code
      * If you happen to have a device that's affected by their removal,
      * please report to Bugzilla. -- Gabriel
      */
-    
+
     /*_this->egl_data->eglWaitNative(EGL_CORE_NATIVE_ENGINE);
     _this->egl_data->eglWaitGL();*/
-    SDL_EGL_SwapBuffers(_this, ((SDL_WindowData *) window->driverdata)->egl_surface);
+    retval = SDL_EGL_SwapBuffers(_this, ((SDL_WindowData *) window->driverdata)->egl_surface);
+
+    SDL_UnlockMutex(Android_ActivityMutex);
+
+    return retval;
 }
 
 int
 Android_GLES_LoadLibrary(_THIS, const char *path) {
-    return SDL_EGL_LoadLibrary(_this, path, (NativeDisplayType) 0);
+    return SDL_EGL_LoadLibrary(_this, path, (NativeDisplayType) 0, 0);
 }
 
 #endif /* SDL_VIDEO_DRIVER_ANDROID */

@@ -5,46 +5,9 @@
 #  back to the buildmaster. You might find it useful too.
 
 # Install Clang (you already have it on Mac OS X, apt-get install clang
-#  on Ubuntu, etc),
-# or download checker at http://clang-analyzer.llvm.org/ and unpack it in
-#  /usr/local ... update CHECKERDIR as appropriate.
+#  on Ubuntu, etc), and make sure scan-build is in your $PATH.
 
 FINALDIR="$1"
-
-CHECKERDIR="/usr/local/checker-276"
-if [ ! -d "$CHECKERDIR" ]; then
-    echo "$CHECKERDIR not found. Trying /usr/share/clang ..." 1>&2
-    CHECKERDIR="/usr/share/clang/scan-build"
-fi
-
-if [ ! -d "$CHECKERDIR" ]; then
-    echo "$CHECKERDIR not found. Giving up." 1>&2
-    exit 1
-fi
-
-if [ -z "$MAKE" ]; then
-    OSTYPE=`uname -s`
-    if [ "$OSTYPE" == "Linux" ]; then
-        NCPU=`cat /proc/cpuinfo |grep vendor_id |wc -l`
-        let NCPU=$NCPU+1
-    elif [ "$OSTYPE" = "Darwin" ]; then
-        NCPU=`sysctl -n hw.ncpu`
-    elif [ "$OSTYPE" = "SunOS" ]; then
-        NCPU=`/usr/sbin/psrinfo |wc -l |sed -e 's/^ *//g;s/ *$//g'`
-    else
-        NCPU=1
-    fi
-
-    if [ -z "$NCPU" ]; then
-        NCPU=1
-    elif [ "$NCPU" = "0" ]; then
-        NCPU=1
-    fi
-
-    MAKE="make -j$NCPU"
-fi
-
-echo "\$MAKE is '$MAKE'"
 
 set -x
 set -e
@@ -60,17 +23,23 @@ fi
 mkdir checker-buildbot
 cd checker-buildbot
 
+# We turn off deprecated declarations, because we don't care about these warnings during static analysis.
+# The -Wno-liblto is new since our checker-279 upgrade, I think; checker otherwise warns "libLTO.dylib relative to clang installed dir not found"
+
 # You might want to do this for CMake-backed builds instead...
-PATH="$CHECKERDIR:$PATH" scan-build -o analysis cmake -DCMAKE_BUILD_TYPE=Debug -DASSERTIONS=enabled ..
+scan-build -o analysis cmake -G Ninja -Wno-dev -DSDL_STATIC=OFF -DCMAKE_BUILD_TYPE=Debug -DASSERTIONS=enabled -DCMAKE_C_FLAGS="-Wno-deprecated-declarations" -DCMAKE_SHARED_LINKER_FLAGS="-Wno-liblto" ..
 
 # ...or run configure without the scan-build wrapper...
-#CC="$CHECKERDIR/libexec/ccc-analyzer" CFLAGS="-O0" ../configure --enable-assertions=enabled
-
-# ...but this works for our buildbots just fine (EXCEPT ON LATEST MAC OS X).
-#CFLAGS="-O0" PATH="$CHECKERDIR:$PATH" scan-build -o analysis ../configure --enable-assertions=enabled
+#CC="$CHECKERDIR/libexec/ccc-analyzer" CFLAGS="-O0 -Wno-deprecated-declarations" LDFLAGS="-Wno-liblto" ../configure --enable-assertions=enabled
 
 rm -rf analysis
-PATH="$CHECKERDIR:$PATH" scan-build -o analysis $MAKE
+scan-build -o analysis ninja
+
+if [ `ls -A analysis |wc -l` == 0 ] ; then
+    mkdir analysis/zarro
+    echo '<html><head><title>Zarro boogs</title></head><body>Static analysis: no issues to report.</body></html>' >analysis/zarro/index.html
+fi
+
 mv analysis/* ../analysis
 rmdir analysis   # Make sure this is empty.
 cd ..

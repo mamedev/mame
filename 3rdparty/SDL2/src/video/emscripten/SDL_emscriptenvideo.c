@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -42,6 +42,7 @@
 static int Emscripten_VideoInit(_THIS);
 static int Emscripten_SetDisplayMode(_THIS, SDL_VideoDisplay * display, SDL_DisplayMode * mode);
 static void Emscripten_VideoQuit(_THIS);
+static int Emscripten_GetDisplayUsableBounds(_THIS, SDL_VideoDisplay * display, SDL_Rect * rect);
 
 static int Emscripten_CreateWindow(_THIS, SDL_Window * window);
 static void Emscripten_SetWindowSize(_THIS, SDL_Window * window);
@@ -52,12 +53,6 @@ static void Emscripten_SetWindowTitle(_THIS, SDL_Window * window);
 
 
 /* Emscripten driver bootstrap functions */
-
-static int
-Emscripten_Available(void)
-{
-    return (1);
-}
 
 static void
 Emscripten_DeleteDevice(SDL_VideoDevice * device)
@@ -86,13 +81,13 @@ Emscripten_CreateDevice(int devindex)
     /* Set the function pointers */
     device->VideoInit = Emscripten_VideoInit;
     device->VideoQuit = Emscripten_VideoQuit;
+    device->GetDisplayUsableBounds = Emscripten_GetDisplayUsableBounds;
     device->SetDisplayMode = Emscripten_SetDisplayMode;
 
 
     device->PumpEvents = Emscripten_PumpEvents;
 
-    device->CreateWindow = Emscripten_CreateWindow;
-    /*device->CreateWindowFrom = Emscripten_CreateWindowFrom;*/
+    device->CreateSDLWindow = Emscripten_CreateWindow;
     device->SetWindowTitle = Emscripten_SetWindowTitle;
     /*device->SetWindowIcon = Emscripten_SetWindowIcon;
     device->SetWindowPosition = Emscripten_SetWindowPosition;*/
@@ -111,6 +106,7 @@ Emscripten_CreateDevice(int devindex)
     device->UpdateWindowFramebuffer = Emscripten_UpdateWindowFramebuffer;
     device->DestroyWindowFramebuffer = Emscripten_DestroyWindowFramebuffer;
 
+#if SDL_VIDEO_OPENGL_EGL
     device->GL_LoadLibrary = Emscripten_GLES_LoadLibrary;
     device->GL_GetProcAddress = Emscripten_GLES_GetProcAddress;
     device->GL_UnloadLibrary = Emscripten_GLES_UnloadLibrary;
@@ -121,6 +117,7 @@ Emscripten_CreateDevice(int devindex)
     device->GL_SwapWindow = Emscripten_GLES_SwapWindow;
     device->GL_DeleteContext = Emscripten_GLES_DeleteContext;
     device->GL_GetDrawableSize = Emscripten_GLES_GetDrawableSize;
+#endif
 
     device->free = Emscripten_DeleteDevice;
 
@@ -129,7 +126,7 @@ Emscripten_CreateDevice(int devindex)
 
 VideoBootStrap Emscripten_bootstrap = {
     EMSCRIPTENVID_DRIVER_NAME, "SDL emscripten video driver",
-    Emscripten_Available, Emscripten_CreateDevice
+    Emscripten_CreateDevice
 };
 
 
@@ -155,7 +152,6 @@ Emscripten_VideoInit(_THIS)
         return -1;
     }
 
-    SDL_zero(mode);
     SDL_AddDisplayMode(&_this->displays[0], &mode);
 
     Emscripten_InitMouse();
@@ -177,6 +173,22 @@ Emscripten_VideoQuit(_THIS)
     Emscripten_FiniMouse();
 }
 
+static int
+Emscripten_GetDisplayUsableBounds(_THIS, SDL_VideoDisplay * display, SDL_Rect * rect)
+{
+    if (rect) {
+        rect->x = 0;
+        rect->y = 0;
+        rect->w = EM_ASM_INT_V({
+            return window.innerWidth;
+        });
+        rect->h = EM_ASM_INT_V({
+            return window.innerHeight;
+        });
+    }
+    return 0;
+}
+
 static void
 Emscripten_PumpEvents(_THIS)
 {
@@ -196,6 +208,8 @@ Emscripten_CreateWindow(_THIS, SDL_Window * window)
         return SDL_OutOfMemory();
     }
 
+    wdata->canvas_id = SDL_strdup("#canvas");
+
     if (window->flags & SDL_WINDOW_ALLOW_HIGHDPI) {
         wdata->pixel_ratio = emscripten_get_device_pixel_ratio();
     } else {
@@ -205,29 +219,30 @@ Emscripten_CreateWindow(_THIS, SDL_Window * window)
     scaled_w = SDL_floor(window->w * wdata->pixel_ratio);
     scaled_h = SDL_floor(window->h * wdata->pixel_ratio);
 
-    emscripten_set_canvas_size(scaled_w, scaled_h);
+    /* set a fake size to check if there is any CSS sizing the canvas */
+    emscripten_set_canvas_element_size(wdata->canvas_id, 1, 1);
+    emscripten_get_element_css_size(wdata->canvas_id, &css_w, &css_h);
 
-    emscripten_get_element_css_size(NULL, &css_w, &css_h);
-
-    wdata->external_size = SDL_floor(css_w) != scaled_w || SDL_floor(css_h) != scaled_h;
+    wdata->external_size = SDL_floor(css_w) != 1 || SDL_floor(css_h) != 1;
 
     if ((window->flags & SDL_WINDOW_RESIZABLE) && wdata->external_size) {
         /* external css has resized us */
         scaled_w = css_w * wdata->pixel_ratio;
         scaled_h = css_h * wdata->pixel_ratio;
 
-        emscripten_set_canvas_size(scaled_w, scaled_h);
         SDL_SendWindowEvent(window, SDL_WINDOWEVENT_RESIZED, css_w, css_h);
     }
+    emscripten_set_canvas_element_size(wdata->canvas_id, scaled_w, scaled_h);
 
     /* if the size is not being controlled by css, we need to scale down for hidpi */
     if (!wdata->external_size) {
         if (wdata->pixel_ratio != 1.0f) {
             /*scale canvas down*/
-            emscripten_set_element_css_size(NULL, window->w, window->h);
+            emscripten_set_element_css_size(wdata->canvas_id, window->w, window->h);
         }
     }
 
+#if SDL_VIDEO_OPENGL_EGL
     if (window->flags & SDL_WINDOW_OPENGL) {
         if (!_this->egl_data) {
             if (SDL_GL_LoadLibrary(NULL) < 0) {
@@ -240,6 +255,7 @@ Emscripten_CreateWindow(_THIS, SDL_Window * window)
             return SDL_SetError("Could not create GLES window surface");
         }
     }
+#endif
 
     wdata->window = window;
 
@@ -263,12 +279,14 @@ static void Emscripten_SetWindowSize(_THIS, SDL_Window * window)
     if (window->driverdata) {
         data = (SDL_WindowData *) window->driverdata;
         /* update pixel ratio */
-        data->pixel_ratio = emscripten_get_device_pixel_ratio();
-        emscripten_set_canvas_size(window->w * data->pixel_ratio, window->h * data->pixel_ratio);
+        if (window->flags & SDL_WINDOW_ALLOW_HIGHDPI) {
+            data->pixel_ratio = emscripten_get_device_pixel_ratio();
+        }
+        emscripten_set_canvas_element_size(data->canvas_id, window->w * data->pixel_ratio, window->h * data->pixel_ratio);
 
         /*scale canvas down*/
         if (!data->external_size && data->pixel_ratio != 1.0f) {
-            emscripten_set_element_css_size(NULL, window->w, window->h);
+            emscripten_set_element_css_size(data->canvas_id, window->w, window->h);
         }
     }
 }
@@ -282,10 +300,17 @@ Emscripten_DestroyWindow(_THIS, SDL_Window * window)
         data = (SDL_WindowData *) window->driverdata;
 
         Emscripten_UnregisterEventHandlers(data);
+#if SDL_VIDEO_OPENGL_EGL
         if (data->egl_surface != EGL_NO_SURFACE) {
             SDL_EGL_DestroySurface(_this, data->egl_surface);
             data->egl_surface = EGL_NO_SURFACE;
         }
+#endif
+
+        /* We can't destroy the canvas, so resize it to zero instead */
+        emscripten_set_canvas_element_size(data->canvas_id, 0, 0);
+        SDL_free(data->canvas_id);
+
         SDL_free(window->driverdata);
         window->driverdata = NULL;
     }
@@ -321,7 +346,7 @@ Emscripten_SetWindowFullscreen(_THIS, SDL_Window * window, SDL_VideoDisplay * di
             data->requested_fullscreen_mode = window->flags & (SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_FULLSCREEN);
             data->fullscreen_resize = is_desktop_fullscreen;
 
-            res = emscripten_request_fullscreen_strategy(NULL, 1, &strategy);
+            res = emscripten_request_fullscreen_strategy(data->canvas_id, 1, &strategy);
             if(res != EMSCRIPTEN_RESULT_SUCCESS && res != EMSCRIPTEN_RESULT_DEFERRED) {
                 /* unset flags, fullscreen failed */
                 window->flags &= ~(SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_FULLSCREEN);
@@ -335,8 +360,8 @@ Emscripten_SetWindowFullscreen(_THIS, SDL_Window * window, SDL_VideoDisplay * di
 static void
 Emscripten_SetWindowTitle(_THIS, SDL_Window * window) {
     EM_ASM_INT({
-      if (typeof Module['setWindowTitle'] !== 'undefined') {
-        Module['setWindowTitle'](Module['Pointer_stringify']($0));
+      if (typeof setWindowTitle !== 'undefined') {
+        setWindowTitle(UTF8ToString($0));
       }
       return 0;
     }, window->title);

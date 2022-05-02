@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,8 +19,8 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _SDL_assert_h
-#define _SDL_assert_h
+#ifndef SDL_assert_h_
+#define SDL_assert_h_
 
 #include "SDL_config.h"
 
@@ -51,9 +51,13 @@ assert can have unique static variables associated with it.
 /* Don't include intrin.h here because it contains C++ code */
     extern void __cdecl __debugbreak(void);
     #define SDL_TriggerBreakpoint() __debugbreak()
-#elif (!defined(__NACL__) && defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
+#elif ( (!defined(__NACL__)) && ((defined(__GNUC__) || defined(__clang__)) && (defined(__i386__) || defined(__x86_64__))) )
     #define SDL_TriggerBreakpoint() __asm__ __volatile__ ( "int $3\n\t" )
-#elif defined(HAVE_SIGNAL_H)
+#elif ( defined(__APPLE__) && defined(__arm64__) )  /* this might work on other ARM targets, but this is a known quantity... */
+    #define SDL_TriggerBreakpoint() __asm__ __volatile__ ( "brk #22\n\t" )
+#elif defined(__386__) && defined(__WATCOMC__)
+    #define SDL_TriggerBreakpoint() { _asm { int 0x03 } }
+#elif defined(HAVE_SIGNAL_H) && !defined(__WATCOMC__)
     #include <signal.h>
     #define SDL_TriggerBreakpoint() raise(SIGTRAP)
 #else
@@ -63,7 +67,7 @@ assert can have unique static variables associated with it.
 
 #if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L) /* C99 supports __func__ as a standard. */
 #   define SDL_FUNCTION __func__
-#elif ((__GNUC__ >= 2) || defined(_MSC_VER))
+#elif ((__GNUC__ >= 2) || defined(_MSC_VER) || defined (__WATCOMC__))
 #   define SDL_FUNCTION __FUNCTION__
 #else
 #   define SDL_FUNCTION "???"
@@ -201,7 +205,7 @@ typedef SDL_AssertState (SDLCALL *SDL_AssertionHandler)(
  *
  *  This callback is NOT reset to SDL's internal handler upon SDL_Quit()!
  *
- *  \return SDL_AssertState value of how to handle the assertion failure.
+ *  Return SDL_AssertState value of how to handle the assertion failure.
  *
  *  \param handler Callback function, called when an assertion fails.
  *  \param userdata A pointer passed to the callback as-is.
@@ -250,7 +254,7 @@ extern DECLSPEC SDL_AssertionHandler SDLCALL SDL_GetAssertionHandler(void **puse
  *  <code>
  *  const SDL_AssertData *item = SDL_GetAssertionReport();
  *  while (item) {
- *      printf("'%s', %s (%s:%d), triggered %u times, always ignore: %s.\n",
+ *      printf("'%s', %s (%s:%d), triggered %u times, always ignore: %s.\\n",
  *             item->condition, item->function, item->filename,
  *             item->linenum, item->trigger_count,
  *             item->always_ignore ? "yes" : "no");
@@ -284,6 +288,6 @@ extern DECLSPEC void SDLCALL SDL_ResetAssertionReport(void);
 #endif
 #include "close_code.h"
 
-#endif /* _SDL_assert_h */
+#endif /* SDL_assert_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

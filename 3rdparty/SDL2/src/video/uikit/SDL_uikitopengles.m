@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,7 +20,7 @@
 */
 #include "../../SDL_internal.h"
 
-#if SDL_VIDEO_DRIVER_UIKIT
+#if SDL_VIDEO_DRIVER_UIKIT && (SDL_VIDEO_OPENGL_ES || SDL_VIDEO_OPENGL_ES2)
 
 #include "SDL_uikitopengles.h"
 #import "SDL_uikitopenglview.h"
@@ -96,6 +96,8 @@ UIKit_GL_GetDrawableSize(_THIS, SDL_Window * window, int * w, int * h)
             if (h) {
                 *h = glview.backingHeight;
             }
+        } else {
+            SDL_GetWindowSize(window, w, h);
         }
     }
 }
@@ -111,7 +113,7 @@ UIKit_GL_LoadLibrary(_THIS, const char *path)
     return 0;
 }
 
-void UIKit_GL_SwapWindow(_THIS, SDL_Window * window)
+int UIKit_GL_SwapWindow(_THIS, SDL_Window * window)
 {
     @autoreleasepool {
         SDLEAGLContext *context = (__bridge SDLEAGLContext *) SDL_GL_GetCurrentContext();
@@ -127,6 +129,7 @@ void UIKit_GL_SwapWindow(_THIS, SDL_Window * window)
          * We don't pump events here because we don't want iOS application events
          * (low memory, terminate, etc.) to happen inside low level rendering. */
     }
+    return 0;
 }
 
 SDL_GLContext
@@ -167,12 +170,9 @@ UIKit_GL_CreateContext(_THIS, SDL_Window * window)
             /* Set the scale to the natural scale factor of the screen - the
              * backing dimensions of the OpenGL view will match the pixel
              * dimensions of the screen rather than the dimensions in points. */
-#ifdef __IPHONE_8_0
             if ([data.uiwindow.screen respondsToSelector:@selector(nativeScale)]) {
                 scale = data.uiwindow.screen.nativeScale;
-            } else
-#endif
-            {
+            } else {
                 scale = data.uiwindow.screen.scale;
             }
         }
@@ -227,7 +227,7 @@ UIKit_GL_DeleteContext(_THIS, SDL_GLContext context)
 }
 
 void
-UIKit_GL_RestoreCurrentContext()
+UIKit_GL_RestoreCurrentContext(void)
 {
     @autoreleasepool {
         /* Some iOS system functionality (such as Dictation on the on-screen

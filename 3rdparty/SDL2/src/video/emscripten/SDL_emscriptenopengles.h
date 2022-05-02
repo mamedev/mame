@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,8 +20,8 @@
 */
 #include "../../SDL_internal.h"
 
-#ifndef _SDL_emscriptenopengles_h
-#define _SDL_emscriptenopengles_h
+#ifndef SDL_emscriptenopengles_h_
+#define SDL_emscriptenopengles_h_
 
 #if SDL_VIDEO_DRIVER_EMSCRIPTEN && SDL_VIDEO_OPENGL_EGL
 
@@ -34,16 +34,16 @@
 #define Emscripten_GLES_UnloadLibrary SDL_EGL_UnloadLibrary
 #define Emscripten_GLES_SetSwapInterval SDL_EGL_SetSwapInterval
 #define Emscripten_GLES_GetSwapInterval SDL_EGL_GetSwapInterval
+#define Emscripten_GLES_DeleteContext SDL_EGL_DeleteContext
 
 extern int Emscripten_GLES_LoadLibrary(_THIS, const char *path);
-extern void Emscripten_GLES_DeleteContext(_THIS, SDL_GLContext context);
 extern SDL_GLContext Emscripten_GLES_CreateContext(_THIS, SDL_Window * window);
-extern void Emscripten_GLES_SwapWindow(_THIS, SDL_Window * window);
+extern int Emscripten_GLES_SwapWindow(_THIS, SDL_Window * window);
 extern int Emscripten_GLES_MakeCurrent(_THIS, SDL_Window * window, SDL_GLContext context);
 extern void Emscripten_GLES_GetDrawableSize(_THIS, SDL_Window * window, int * w, int * h);
 
 #endif /* SDL_VIDEO_DRIVER_EMSCRIPTEN && SDL_VIDEO_OPENGL_EGL */
 
-#endif /* _SDL_emscriptenopengles_h */
+#endif /* SDL_emscriptenopengles_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

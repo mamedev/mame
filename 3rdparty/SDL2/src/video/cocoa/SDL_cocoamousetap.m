@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -69,9 +69,12 @@ Cocoa_MouseTapCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event
 
     switch (type) {
         case kCGEventTapDisabledByTimeout:
-        case kCGEventTapDisabledByUserInput:
             {
                 CGEventTapEnable(tapdata->tap, true);
+                return NULL;
+            }
+        case kCGEventTapDisabledByUserInput:
+            {
                 return NULL;
             }
         default:
@@ -142,15 +145,12 @@ Cocoa_MouseTapThread(void *data)
 {
     SDL_MouseEventTapData *tapdata = (SDL_MouseEventTapData*)data;
 
-    /* Create a tap. */
-    CFMachPortRef eventTap = CGEventTapCreate(kCGSessionEventTap, kCGHeadInsertEventTap,
-                                              kCGEventTapOptionDefault, allGrabbedEventsMask,
-                                              &Cocoa_MouseTapCallback, tapdata);
+    /* Tap was created on main thread but we own it now. */
+    CFMachPortRef eventTap = tapdata->tap;
     if (eventTap) {
         /* Try to create a runloop source we can schedule. */
         CFRunLoopSourceRef runloopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0);
         if  (runloopSource) {
-            tapdata->tap = eventTap;
             tapdata->runloopSource = runloopSource;
         } else {
             CFRelease(eventTap);
@@ -202,15 +202,32 @@ Cocoa_InitMouseEventTap(SDL_MouseData* driverdata)
 
     tapdata->runloopStartedSemaphore = SDL_CreateSemaphore(0);
     if (tapdata->runloopStartedSemaphore) {
-        tapdata->thread = SDL_CreateThreadInternal(&Cocoa_MouseTapThread, "Event Tap Loop", 512 * 1024, tapdata);
-        if (!tapdata->thread) {
-            SDL_DestroySemaphore(tapdata->runloopStartedSemaphore);
+        tapdata->tap = CGEventTapCreate(kCGSessionEventTap, kCGHeadInsertEventTap,
+                                        kCGEventTapOptionDefault, allGrabbedEventsMask,
+                                        &Cocoa_MouseTapCallback, tapdata);
+        if (tapdata->tap) {
+            /* Tap starts disabled, until app requests mouse grab */
+            CGEventTapEnable(tapdata->tap, false);
+            tapdata->thread = SDL_CreateThreadInternal(&Cocoa_MouseTapThread, "Event Tap Loop", 512 * 1024, tapdata);
+            if (tapdata->thread) {
+                /* Success - early out. Ownership transferred to thread. */
+                return;
+            }
+            CFRelease(tapdata->tap);
         }
+        SDL_DestroySemaphore(tapdata->runloopStartedSemaphore);
     }
+    SDL_free(driverdata->tapdata);
+    driverdata->tapdata = NULL;
+}
 
-    if (!tapdata->thread) {
-        SDL_free(driverdata->tapdata);
-        driverdata->tapdata = NULL;
+void
+Cocoa_EnableMouseEventTap(SDL_MouseData *driverdata, SDL_bool enabled)
+{
+    SDL_MouseEventTapData *tapdata = (SDL_MouseEventTapData*)driverdata->tapdata;
+    if (tapdata && tapdata->tap)
+    {
+        CGEventTapEnable(tapdata->tap, !!enabled);
     }
 }
 
@@ -219,6 +236,13 @@ Cocoa_QuitMouseEventTap(SDL_MouseData *driverdata)
 {
     SDL_MouseEventTapData *tapdata = (SDL_MouseEventTapData*)driverdata->tapdata;
     int status;
+
+    if (tapdata == NULL) {
+        /* event tap was already cleaned up (possibly due to CGEventTapCreate
+         * returning null.)
+         */
+        return;
+    }
 
     /* Ensure that the runloop has been started first.
      * TODO: Move this to InitMouseEventTap, check for error conditions that can
@@ -242,6 +266,11 @@ Cocoa_QuitMouseEventTap(SDL_MouseData *driverdata)
 
 void
 Cocoa_InitMouseEventTap(SDL_MouseData *unused)
+{
+}
+
+void
+Cocoa_EnableMouseEventTap(SDL_MouseData *driverdata, SDL_bool enabled)
 {
 }
 

@@ -5,7 +5,7 @@ Build:
 
     $ mkdir build
     $ cd build
-    $ emconfigure ../configure --host=asmjs-unknown-emscripten --disable-assembly --disable-threads --enable-cpuinfo=false CFLAGS="-O2"
+    $ emconfigure ../configure --host=asmjs-unknown-emscripten --disable-assembly --disable-threads --disable-cpuinfo CFLAGS="-O2"
     $ emmake make
 
 Or with cmake:
@@ -21,8 +21,6 @@ To build one of the tests:
     $ emcc -O2 --js-opts 0 -g4 testdraw2.c -I../include ../build/.libs/libSDL2.a ../build/libSDL2_test.a -o a.html
 
 Uses GLES2 renderer or software
-
-tests: https://dl.dropboxusercontent.com/u/17360362/SDL2-em/index.html
 
 Some other SDL2 libraries can be easily built (assuming SDL2 is installed somewhere):
 

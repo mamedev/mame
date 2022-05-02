@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -24,7 +24,7 @@
 
 /* GIMP RGB C-Source image dump (primitives.c) */
 
-const SDLTest_SurfaceImage_t SDLTest_imagePrimitives = {
+static const SDLTest_SurfaceImage_t SDLTest_imagePrimitives = {
   80, 60, 3,
   "\5ii\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
   "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
@@ -510,3 +510,5 @@ SDL_Surface *SDLTest_ImagePrimitives()
          );
    return surface;
 }
+
+/* vi: set ts=4 sw=4 expandtab: */

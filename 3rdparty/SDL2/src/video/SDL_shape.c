@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -21,7 +21,6 @@
 #include "../SDL_internal.h"
 
 #include "SDL.h"
-#include "SDL_assert.h"
 #include "SDL_video.h"
 #include "SDL_sysvideo.h"
 #include "SDL_pixels.h"
@@ -35,6 +34,10 @@ SDL_CreateShapedWindow(const char *title,unsigned int x,unsigned int y,unsigned 
     SDL_Window *result = NULL;
     result = SDL_CreateWindow(title,-1000,-1000,w,h,(flags | SDL_WINDOW_BORDERLESS) & (~SDL_WINDOW_FULLSCREEN) & (~SDL_WINDOW_RESIZABLE) /* & (~SDL_WINDOW_SHOWN) */);
     if(result != NULL) {
+        if (SDL_GetVideoDevice()->shape_driver.CreateShaper == NULL) {
+            SDL_DestroyWindow(result);
+            return NULL;
+        }
         result->shaper = SDL_GetVideoDevice()->shape_driver.CreateShaper(result);
         if(result->shaper != NULL) {
             result->shaper->userx = x;
@@ -70,18 +73,21 @@ SDL_CalculateShapeBitmap(SDL_WindowShapeMode mode,SDL_Surface *shape,Uint8* bitm
     int y = 0;
     Uint8 r = 0,g = 0,b = 0,alpha = 0;
     Uint8* pixel = NULL;
-    Uint32 bitmap_pixel,pixel_value = 0,mask_value = 0;
+    Uint32 pixel_value = 0,mask_value = 0;
+    int bytes_per_scanline = (shape->w + (ppb - 1)) / ppb;
+    Uint8 *bitmap_scanline;
     SDL_Color key;
     if(SDL_MUSTLOCK(shape))
         SDL_LockSurface(shape);
     for(y = 0;y<shape->h;y++) {
+        bitmap_scanline = bitmap + y * bytes_per_scanline;
         for(x=0;x<shape->w;x++) {
             alpha = 0;
             pixel_value = 0;
             pixel = (Uint8 *)(shape->pixels) + (y*shape->pitch) + (x*shape->format->BytesPerPixel);
             switch(shape->format->BytesPerPixel) {
                 case(1):
-                    pixel_value = *(Uint8*)pixel;
+                    pixel_value = *pixel;
                     break;
                 case(2):
                     pixel_value = *(Uint16*)pixel;
@@ -94,7 +100,6 @@ SDL_CalculateShapeBitmap(SDL_WindowShapeMode mode,SDL_Surface *shape,Uint8* bitm
                     break;
             }
             SDL_GetRGBA(pixel_value,shape->format,&r,&g,&b,&alpha);
-            bitmap_pixel = y*shape->w + x;
             switch(mode.mode) {
                 case(ShapeModeDefault):
                     mask_value = (alpha >= 1 ? 1 : 0);
@@ -110,7 +115,7 @@ SDL_CalculateShapeBitmap(SDL_WindowShapeMode mode,SDL_Surface *shape,Uint8* bitm
                     mask_value = ((key.r != r || key.g != g || key.b != b) ? 1 : 0);
                     break;
             }
-            bitmap[bitmap_pixel / ppb] |= mask_value << (7 - ((ppb - 1) - (bitmap_pixel % ppb)));
+            bitmap_scanline[x / ppb] |= mask_value << (x % ppb);
         }
     }
     if(SDL_MUSTLOCK(shape))
@@ -135,7 +140,7 @@ RecursivelyCalculateShapeTree(SDL_WindowShapeMode mode,SDL_Surface* mask,SDL_Rec
             pixel = (Uint8 *)(mask->pixels) + (y*mask->pitch) + (x*mask->format->BytesPerPixel);
             switch(mask->format->BytesPerPixel) {
                 case(1):
-                    pixel_value = *(Uint8*)pixel;
+                    pixel_value = *pixel;
                     break;
                 case(2):
                     pixel_value = *(Uint16*)pixel;
@@ -206,8 +211,14 @@ RecursivelyCalculateShapeTree(SDL_WindowShapeMode mode,SDL_Surface* mask,SDL_Rec
 SDL_ShapeTree*
 SDL_CalculateShapeTree(SDL_WindowShapeMode mode,SDL_Surface* shape)
 {
-    SDL_Rect dimensions = {0,0,shape->w,shape->h};
+    SDL_Rect dimensions;
     SDL_ShapeTree* result = NULL;
+
+    dimensions.x = 0;
+    dimensions.y = 0;
+    dimensions.w = shape->w;
+    dimensions.h = shape->h;
+
     if(SDL_MUSTLOCK(shape))
         SDL_LockSurface(shape);
     result = RecursivelyCalculateShapeTree(mode,shape,dimensions);
@@ -234,10 +245,10 @@ void
 SDL_FreeShapeTree(SDL_ShapeTree** shape_tree)
 {
     if((*shape_tree)->kind == QuadShape) {
-        SDL_FreeShapeTree((SDL_ShapeTree **)&(*shape_tree)->data.children.upleft);
-        SDL_FreeShapeTree((SDL_ShapeTree **)&(*shape_tree)->data.children.upright);
-        SDL_FreeShapeTree((SDL_ShapeTree **)&(*shape_tree)->data.children.downleft);
-        SDL_FreeShapeTree((SDL_ShapeTree **)&(*shape_tree)->data.children.downright);
+        SDL_FreeShapeTree((SDL_ShapeTree **)(char*)&(*shape_tree)->data.children.upleft);
+        SDL_FreeShapeTree((SDL_ShapeTree **)(char*)&(*shape_tree)->data.children.upright);
+        SDL_FreeShapeTree((SDL_ShapeTree **)(char*)&(*shape_tree)->data.children.downleft);
+        SDL_FreeShapeTree((SDL_ShapeTree **)(char*)&(*shape_tree)->data.children.downright);
     }
     SDL_free(*shape_tree);
     *shape_tree = NULL;

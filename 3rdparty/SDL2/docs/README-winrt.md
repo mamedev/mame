@@ -16,15 +16,24 @@ Some of the operating systems that include WinRT, are:
 Requirements
 ------------
 
-* Microsoft Visual C++ (aka Visual Studio), either 2015, 2013, or 2012
+* Microsoft Visual C++ (aka Visual Studio), either 2017, 2015, 2013, or 2012
   - Free, "Community" or "Express" editions may be used, so long as they
     include  support for either "Windows Store" or "Windows Phone" apps.
     "Express" versions marked as supporting "Windows Desktop" development
     typically do not include support for creating WinRT apps, to note.
     (The "Community" editions of Visual C++ do, however, support both
     desktop/Win32 and WinRT development).
+  - Visual Studio 2017 can be used, however it is recommended that you install
+    the Visual C++ 2015 build tools.  These build tools can be installed
+    using VS 2017's installer.  Be sure to also install the workload for
+    "Universal Windows Platform development", its optional component, the
+    "C++ Universal Windows Platform tools", and for UWP / Windows 10
+    development, the "Windows 10 SDK (10.0.10240.0)".  Please note that
+    targeting UWP / Windows 10 apps from development machine(s) running
+    earlier versions of Windows, such as Windows 7, is not always supported
+    by Visual Studio, and you may get error(s) when attempting to do so.
   - Visual C++ 2012 can only build apps that target versions 8.0 of Windows,
-    or  Windows Phone.  8.0-targetted apps will run on devices running 8.1
+    or  Windows Phone.  8.0-targeted apps will run on devices running 8.1
     editions of Windows, however they will not be able to take advantage of
     8.1-specific features.
   - Visual C++ 2013 cannot create app projects that target Windows 8.0.
@@ -45,7 +54,7 @@ Requirements
 Status
 ------
 
-Here is a rough list of what works, and what doens't:
+Here is a rough list of what works, and what doesn't:
 
 * What works:
   * compilation via Visual C++ 2012 through 2015
@@ -61,12 +70,18 @@ Here is a rough list of what works, and what doens't:
     SDL_GetPerformanceFrequency(), etc.)
   * file I/O via SDL_RWops
   * mouse input  (unsupported on Windows Phone)
-  * audio, via a modified version of SDL's XAudio2 backend
+  * audio, via SDL's WASAPI backend (if you want to record, your app must 
+    have "Microphone" capabilities enabled in its manifest, and the user must 
+    not have blocked access. Otherwise, capture devices will fail to work,
+    presenting as a device disconnect shortly after opening it.)
   * .DLL file loading.  Libraries *MUST* be packaged inside applications.  Loading
     anything outside of the app is not supported.
   * system path retrieval via SDL's filesystem APIs
   * game controllers.  Support is provided via the SDL_Joystick and
-    SDL_GameController APIs, and is backed by Microsoft's XInput API.
+    SDL_GameController APIs, and is backed by Microsoft's XInput API.  Please
+    note, however, that Windows limits game-controller support in UWP apps to,
+    "Xbox compatible controllers" (many controllers that work in Win32 apps,
+    do not work in UWP, due to restrictions in UWP itself.) 
   * multi-touch input
   * app events.  SDL_APP_WILLENTER* and SDL_APP_DIDENTER* events get sent out as
     appropriate.
@@ -81,7 +96,7 @@ Here is a rough list of what works, and what doens't:
   * keyboard input.  Most of WinRT's documented virtual keys are supported, as
     well as many keys with documented hardware scancodes.  Converting
     SDL_Scancodes to or from SDL_Keycodes may not work, due to missing APIs
-    (MapVirualKey()) in Microsoft's Windows Store / UWP APIs.
+    (MapVirtualKey()) in Microsoft's Windows Store / UWP APIs.
   * SDLmain.  WinRT uses a different signature for each app's main() function.
     SDL-based apps that use this port must compile in SDL_winrt_main_NonXAML.cpp
     (in `SDL\src\main\winrt\`) directly in order for their C-style main()
@@ -94,8 +109,10 @@ Here is a rough list of what works, and what doens't:
     SDL_CreateSystemCursor() (unsupported on Windows Phone)
   * SDL_WarpMouseInWindow() or SDL_WarpMouseGlobal().  This are not currently
     supported by WinRT itself.
-  * joysticks and game controllers that aren't supported by Microsoft's XInput
-    API.
+  * joysticks and game controllers that either are not supported by
+    Microsoft's XInput API, or are not supported within UWP apps (many
+    controllers that work in Win32, do not work in UWP, due to restrictions in
+    UWP itself).
   * turning off VSync when rendering on Windows Phone.  Attempts to turn VSync
     off on Windows Phone result either in Direct3D not drawing anything, or it
     forcing VSync back on.  As such, SDL_RENDERER_PRESENTVSYNC will always get
@@ -279,7 +296,7 @@ A few files should be included directly in your app's MSVC project, specifically
    included, mouse-position reporting may fail if and when the cursor is
    hidden, due to possible bugs/design-oddities in Windows itself.*
 
-To include these files:
+To include these files for C/C++ projects:
 
 1. right-click on your project (again, in Visual C++'s Solution Explorer), 
    navigate to "Add", then choose "Existing Item...".
@@ -296,11 +313,14 @@ To include these files:
 7. change the setting for "Consume Windows Runtime Extension" to "Yes (/ZW)".
 8. click the OK button.  This will close the dialog.
 
-
 **NOTE: C++/CX compilation is currently required in at least one file of your 
 app's project.  This is to make sure that Visual C++'s linker builds a 'Windows 
 Metadata' file (.winmd) for your app.  Not doing so can lead to build errors.**
 
+For non-C++ projects, you will need to call SDL_WinRTRunApp from your language's
+main function, and generate SDL2-WinRTResources.res manually by using `rc` via
+the Developer Command Prompt and including it as a <Win32Resource> within the
+first <PropertyGroup> block in your Visual Studio project file.
 
 ### 6. Add app code and assets ###
 
@@ -476,3 +496,52 @@ SDL provides a workaround for this, but it requires that an app links to a
 set of Win32-style cursor image-resource files.  A copy of suitable resource
 files can be found in `src/main/winrt/`.  Adding them to an app's Visual C++
 project file should be sufficient to get the app to use them.
+
+
+#### SDL's Visual Studio project file fails to open, with message, "The system can't find the file specified."
+
+This can be caused for any one of a few reasons, which Visual Studio can
+report, but won't always do so in an up-front manner.
+
+To help determine why this error comes up:
+
+1. open a copy of Visual Studio without opening a project file.  This can be
+   accomplished via Windows' Start Menu, among other means.
+2. show Visual Studio's Output window.  This can be done by going to VS'
+   menu bar, then to View, and then to Output.
+3. try opening the SDL project file directly by going to VS' menu bar, then
+   to File, then to Open, then to Project/Solution.  When a File-Open dialog
+   appears, open the SDL project (such as the one in SDL's source code, in its
+   directory, VisualC-WinRT/UWP_VS2015/).
+4. after attempting to open SDL's Visual Studio project file, additional error
+   information will be output to the Output window.
+
+If Visual Studio reports (via its Output window) that the project:
+
+"could not be loaded because it's missing install components. To fix this launch Visual Studio setup with the following selections:
+Microsoft.VisualStudio.ComponentGroup.UWP.VC"
+
+... then you will need to re-launch Visual Studio's installer, and make sure that
+the workflow for "Universal Windows Platform development" is checked, and that its
+optional component, "C++ Universal Windows Platform tools" is also checked.  While
+you are there, if you are planning on targeting UWP / Windows 10, also make sure
+that you check the optional component, "Windows 10 SDK (10.0.10240.0)".  After
+making sure these items are checked as-appropriate, install them.
+
+Once you install these components, try re-launching Visual Studio, and re-opening
+the SDL project file.  If you still get the error dialog, try using the Output
+window, again, seeing what Visual Studio says about it.
+
+
+#### Game controllers / joysticks aren't working!
+
+Windows only permits certain game controllers and joysticks to work within
+WinRT / UWP apps.  Even if a game controller or joystick works in a Win32
+app, that device is not guaranteed to work inside a WinRT / UWP app.
+
+According to Microsoft, "Xbox compatible controllers" should work inside
+UWP apps, potentially with more working in the future.  This includes, but
+may not be limited to, Microsoft-made Xbox controllers and USB adapters.
+(Source: https://social.msdn.microsoft.com/Forums/en-US/9064838b-e8c3-4c18-8a83-19bf0dfe150d/xinput-fails-to-detect-game-controllers?forum=wpdevelop)
+
+

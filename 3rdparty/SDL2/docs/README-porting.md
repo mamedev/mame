@@ -13,7 +13,7 @@ There are two basic ways of building SDL at the moment:
 
 1. The "UNIX" way:  ./configure; make; make install
 
-   If you have a GNUish system, then you might try this.  Edit configure.in,
+   If you have a GNUish system, then you might try this.  Edit configure.ac,
    take a look at the large section labelled:
 
 	"Set up the configuration based on the host platform!"
@@ -25,7 +25,7 @@ There are two basic ways of building SDL at the moment:
    If you're using an IDE or other non-configure build system, you'll probably
    want to create a custom SDL_config.h for your platform.  Edit SDL_config.h,
    add a section for your platform, and create a custom SDL_config_{platform}.h,
-   based on SDL_config.h.minimal and SDL_config.h.in
+   based on SDL_config_minimal.h and SDL_config.h.in
 
    Add the top level include directory to the header search path, and then add
    the following sources to the project:
@@ -40,6 +40,7 @@ There are two basic ways of building SDL at the moment:
 	src/joystick/*.c
 	src/power/*.c
 	src/render/*.c
+	src/render/software/*.c
 	src/stdlib/*.c
 	src/thread/*.c
 	src/timer/*.c

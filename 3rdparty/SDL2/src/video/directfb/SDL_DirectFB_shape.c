@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -22,32 +22,28 @@
 
 #if SDL_VIDEO_DRIVER_DIRECTFB
 
-#include "SDL_assert.h"
 #include "SDL_DirectFB_video.h"
 #include "SDL_DirectFB_shape.h"
 #include "SDL_DirectFB_window.h"
 
 #include "../SDL_shape_internals.h"
 
-SDL_Window*
-DirectFB_CreateShapedWindow(const char *title,unsigned int x,unsigned int y,unsigned int w,unsigned int h,Uint32 flags) {
-    return SDL_CreateWindow(title,x,y,w,h,flags /* | SDL_DFB_WINDOW_SHAPED */);
-}
-
 SDL_WindowShaper*
 DirectFB_CreateShaper(SDL_Window* window) {
     SDL_WindowShaper* result = NULL;
+    SDL_ShapeData* data;
+    int resized_properly;
 
     result = malloc(sizeof(SDL_WindowShaper));
     result->window = window;
     result->mode.mode = ShapeModeDefault;
     result->mode.parameters.binarizationCutoff = 1;
     result->userx = result->usery = 0;
-    SDL_ShapeData* data = SDL_malloc(sizeof(SDL_ShapeData));
+    data = SDL_malloc(sizeof(SDL_ShapeData));
     result->driverdata = data;
     data->surface = NULL;
     window->shaper = result;
-    int resized_properly = DirectFB_ResizeWindowShape(window);
+    resized_properly = DirectFB_ResizeWindowShape(window);
     SDL_assert(resized_properly == 0);
 
     return result;

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -34,7 +34,7 @@ VIVANTE_GLES_LoadLibrary(_THIS, const char *path)
 
     displaydata = SDL_GetDisplayDriverData(0);
 
-    return SDL_EGL_LoadLibrary(_this, path, displaydata->native_display);
+    return SDL_EGL_LoadLibrary(_this, path, displaydata->native_display, 0);
 }
 
 SDL_EGL_CreateContext_impl(VIVANTE)

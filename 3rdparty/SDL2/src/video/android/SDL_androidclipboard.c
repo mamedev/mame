@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -23,7 +23,7 @@
 #if SDL_VIDEO_DRIVER_ANDROID
 
 #include "SDL_androidvideo.h"
-
+#include "SDL_androidclipboard.h"
 #include "../../core/android/SDL_android.h"
 
 int

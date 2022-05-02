@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -236,7 +236,7 @@ ProcessWindowEvent(_THIS, SDL_Window *sdlwin, DFBWindowEvent * evt)
                 /* printf("Scancode %d  %d %d\n", keysym.scancode, evt->key_code, evt->key_id); */
                 SDL_SendKeyboardKey_ex(0, SDL_PRESSED, keysym.scancode);
                 if (SDL_EventState(SDL_TEXTINPUT, SDL_QUERY)) {
-                    SDL_zero(text);
+                    SDL_zeroa(text);
                     UnicodeToUtf8(unicode, text);
                     if (*text) {
                         SDL_SendKeyboardText_ex(0, text);
@@ -372,7 +372,7 @@ ProcessInputEvent(_THIS, DFBInputEvent * ievt)
             /* printf("Scancode %d  %d %d\n", keysym.scancode, evt->key_code, evt->key_id); */
             SDL_SendKeyboardKey_ex(kbd_idx, SDL_PRESSED, keysym.scancode);
             if (SDL_EventState(SDL_TEXTINPUT, SDL_QUERY)) {
-                SDL_zero(text);
+                SDL_zeroa(text);
                 UnicodeToUtf8(unicode, text);
                 if (*text) {
                     SDL_SendKeyboardText_ex(kbd_idx, text);
@@ -743,9 +743,6 @@ void
 DirectFB_QuitKeyboard(_THIS)
 {
     /* SDL_DFB_DEVICEDATA(_this); */
-
-    SDL_KeyboardQuit();
-
 }
 
 #endif /* SDL_VIDEO_DRIVER_DIRECTFB */

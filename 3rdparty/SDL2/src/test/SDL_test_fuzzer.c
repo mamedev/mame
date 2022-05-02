@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -27,19 +27,20 @@
 
 #include "SDL_config.h"
 
+#include <limits.h>
 /* Visual Studio 2008 doesn't have stdint.h */
 #if defined(_MSC_VER) && _MSC_VER <= 1500
-#define UINT8_MAX   ~(Uint8)0
-#define UINT16_MAX  ~(Uint16)0
-#define UINT32_MAX  ~(Uint32)0
-#define UINT64_MAX  ~(Uint64)0
+#define UINT8_MAX   _UI8_MAX
+#define UINT16_MAX  _UI16_MAX
+#define UINT32_MAX  _UI32_MAX
+#define INT64_MIN    _I64_MIN
+#define INT64_MAX    _I64_MAX
+#define UINT64_MAX  _UI64_MAX
 #else
-#define _GNU_SOURCE
 #include <stdint.h>
 #endif
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
 #include <float.h>
 
 #include "SDL_test.h"
@@ -125,29 +126,35 @@ SDLTest_RandomUint32()
 Uint64
 SDLTest_RandomUint64()
 {
-    Uint64 value = 0;
-    Uint32 *vp = (void *)&value;
+    union {
+        Uint64 v64;
+        Uint32 v32[2];
+    } value;
+    value.v64 = 0;
 
     fuzzerInvocationCounter++;
 
-    vp[0] = SDLTest_RandomSint32();
-    vp[1] = SDLTest_RandomSint32();
+    value.v32[0] = SDLTest_RandomSint32();
+    value.v32[1] = SDLTest_RandomSint32();
 
-    return value;
+    return value.v64;
 }
 
 Sint64
 SDLTest_RandomSint64()
 {
-    Uint64 value = 0;
-    Uint32 *vp = (void *)&value;
+    union {
+        Uint64 v64;
+        Uint32 v32[2];
+    } value;
+    value.v64 = 0;
 
     fuzzerInvocationCounter++;
 
-    vp[0] = SDLTest_RandomSint32();
-    vp[1] = SDLTest_RandomSint32();
+    value.v32[0] = SDLTest_RandomSint32();
+    value.v32[1] = SDLTest_RandomSint32();
 
-    return value;
+    return (Sint64)value.v64;
 }
 
 
@@ -197,7 +204,7 @@ SDLTest_RandomIntegerInRange(Sint32 pMin, Sint32 pMax)
  *
  * \returns Returns a random boundary value for the domain or 0 in case of error
  */
-Uint64
+static Uint64
 SDLTest_GenerateUnsignedBoundaryValues(const Uint64 maxValue, Uint64 boundary1, Uint64 boundary2, SDL_bool validDomain)
 {
         Uint64 b1, b2;
@@ -298,9 +305,9 @@ Uint64
 SDLTest_RandomUint64BoundaryValue(Uint64 boundary1, Uint64 boundary2, SDL_bool validDomain)
 {
     /* max value for Uint64 */
-    const Uint64 maxValue = ULLONG_MAX;
+    const Uint64 maxValue = UINT64_MAX;
     return SDLTest_GenerateUnsignedBoundaryValues(maxValue,
-                (Uint64) boundary1, (Uint64) boundary2,
+                boundary1, boundary2,
                 validDomain);
 }
 
@@ -329,7 +336,7 @@ SDLTest_RandomUint64BoundaryValue(Uint64 boundary1, Uint64 boundary2, SDL_bool v
  *
  * \returns Returns a random boundary value for the domain or 0 in case of error
  */
-Sint64
+static Sint64
 SDLTest_GenerateSignedBoundaryValues(const Sint64 minValue, const Sint64 maxValue, Sint64 boundary1, Sint64 boundary2, SDL_bool validDomain)
 {
         Sint64 b1, b2;
@@ -434,8 +441,8 @@ Sint64
 SDLTest_RandomSint64BoundaryValue(Sint64 boundary1, Sint64 boundary2, SDL_bool validDomain)
 {
     /* min & max values for Sint64 */
-    const Sint64 maxValue = LLONG_MAX;
-    const Sint64 minValue = LLONG_MIN;
+    const Sint64 maxValue = INT64_MAX;
+    const Sint64 minValue = INT64_MIN;
     return SDLTest_GenerateSignedBoundaryValues(minValue, maxValue,
                 boundary1, boundary2,
                 validDomain);
@@ -444,13 +451,13 @@ SDLTest_RandomSint64BoundaryValue(Sint64 boundary1, Sint64 boundary2, SDL_bool v
 float
 SDLTest_RandomUnitFloat()
 {
-    return (float) SDLTest_RandomUint32() / UINT_MAX;
+    return SDLTest_RandomUint32() / (float) UINT_MAX;
 }
 
 float
 SDLTest_RandomFloat()
 {
-        return (float) (SDLTest_RandomUnitDouble() * (double)2.0 * (double)FLT_MAX - (double)(FLT_MAX));
+        return (float) (SDLTest_RandomUnitDouble() * 2.0 * (double)FLT_MAX - (double)(FLT_MAX));
 }
 
 double
@@ -523,3 +530,5 @@ SDLTest_RandomAsciiStringOfSize(int size)
 
     return string;
 }
+
+/* vi: set ts=4 sw=4 expandtab: */

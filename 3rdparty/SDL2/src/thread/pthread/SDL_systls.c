@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,6 +20,7 @@
 */
 #include "../../SDL_internal.h"
 #include "SDL_thread.h"
+#include "../SDL_systhread.h"
 #include "../SDL_thread_c.h"
 
 #include <pthread.h>
@@ -31,7 +32,7 @@ static pthread_key_t thread_local_storage = INVALID_PTHREAD_KEY;
 static SDL_bool generic_local_storage = SDL_FALSE;
 
 SDL_TLSData *
-SDL_SYS_GetTLSData()
+SDL_SYS_GetTLSData(void)
 {
     if (thread_local_storage == INVALID_PTHREAD_KEY && !generic_local_storage) {
         static SDL_SpinLock lock;

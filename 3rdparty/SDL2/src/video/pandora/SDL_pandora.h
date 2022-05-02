@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -92,7 +92,7 @@ SDL_GLContext PND_gl_createcontext(_THIS, SDL_Window * window);
 int PND_gl_makecurrent(_THIS, SDL_Window * window, SDL_GLContext context);
 int PND_gl_setswapinterval(_THIS, int interval);
 int PND_gl_getswapinterval(_THIS);
-void PND_gl_swapwindow(_THIS, SDL_Window * window);
+int PND_gl_swapwindow(_THIS, SDL_Window * window);
 void PND_gl_deletecontext(_THIS, SDL_GLContext context);
 
 

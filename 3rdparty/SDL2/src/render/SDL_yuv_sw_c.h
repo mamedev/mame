@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,6 +18,10 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+#ifndef SDL_yuv_sw_c_h_
+#define SDL_yuv_sw_c_h_
+
 #include "../SDL_internal.h"
 
 #include "SDL_video.h"
@@ -30,16 +34,6 @@ struct SDL_SW_YUVTexture
     Uint32 target_format;
     int w, h;
     Uint8 *pixels;
-    int *colortab;
-    Uint32 *rgb_2_pix;
-    void (*Display1X) (int *colortab, Uint32 * rgb_2_pix,
-                       unsigned char *lum, unsigned char *cr,
-                       unsigned char *cb, unsigned char *out,
-                       int rows, int cols, int mod);
-    void (*Display2X) (int *colortab, Uint32 * rgb_2_pix,
-                       unsigned char *lum, unsigned char *cr,
-                       unsigned char *cb, unsigned char *out,
-                       int rows, int cols, int mod);
 
     /* These are just so we don't have to allocate them separately */
     Uint16 pitches[3];
@@ -68,5 +62,12 @@ int SDL_SW_CopyYUVToRGB(SDL_SW_YUVTexture * swdata, const SDL_Rect * srcrect,
                         Uint32 target_format, int w, int h, void *pixels,
                         int pitch);
 void SDL_SW_DestroyYUVTexture(SDL_SW_YUVTexture * swdata);
+
+/* FIXME: This breaks on various versions of GCC and should be rewritten using intrinsics */
+#if 0 /* (__GNUC__ > 2) && defined(__i386__) && __OPTIMIZE__ && SDL_ASSEMBLY_ROUTINES && !defined(__clang__) */
+#define USE_MMX_ASSEMBLY 1
+#endif
+
+#endif /* SDL_yuv_sw_c_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

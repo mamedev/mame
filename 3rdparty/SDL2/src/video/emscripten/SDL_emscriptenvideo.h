@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,15 +20,17 @@
 */
 #include "../../SDL_internal.h"
 
-#ifndef _SDL_emscriptenvideo_h
-#define _SDL_emscriptenvideo_h
+#ifndef SDL_emscriptenvideo_h_
+#define SDL_emscriptenvideo_h_
 
 #include "../SDL_sysvideo.h"
 #include "../../events/SDL_touch_c.h"
 #include <emscripten/emscripten.h>
 #include <emscripten/html5.h>
 
+#if SDL_VIDEO_OPENGL_EGL
 #include <EGL/egl.h>
+#endif
 
 typedef struct SDL_WindowData
 {
@@ -38,6 +40,8 @@ typedef struct SDL_WindowData
     SDL_Window *window;
     SDL_Surface *surface;
 
+    char *canvas_id;
+
     float pixel_ratio;
 
     SDL_bool external_size;
@@ -45,10 +49,9 @@ typedef struct SDL_WindowData
     int requested_fullscreen_mode;
     SDL_bool fullscreen_resize;
 
-    SDL_bool finger_touching;  /* for mapping touch events to mice */
-    SDL_FingerID first_finger;
+    SDL_bool has_pointer_lock;
 } SDL_WindowData;
 
-#endif /* _SDL_emscriptenvideo_h */
+#endif /* SDL_emscriptenvideo_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

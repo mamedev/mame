@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,8 +20,8 @@
 */
 #include "../../SDL_internal.h"
 
-#ifndef _SDL_xinput_h
-#define _SDL_xinput_h
+#ifndef SDL_xinput_h_
+#define SDL_xinput_h_
 
 #ifdef HAVE_XINPUT_H
 
@@ -100,6 +100,8 @@
 #endif
 
 /* typedef's for XInput structs we use */
+
+#ifndef HAVE_XINPUT_GAMEPAD_EX
 typedef struct
 {
     WORD wButtons;
@@ -111,12 +113,15 @@ typedef struct
     SHORT sThumbRY;
     DWORD dwPaddingReserved;
 } XINPUT_GAMEPAD_EX;
+#endif
 
+#ifndef HAVE_XINPUT_STATE_EX
 typedef struct
 {
     DWORD dwPacketNumber;
     XINPUT_GAMEPAD_EX Gamepad;
 } XINPUT_STATE_EX;
+#endif
 
 typedef struct
 {
@@ -167,6 +172,6 @@ extern DWORD SDL_XInputVersion;  /* ((major << 16) & 0xFF00) | (minor & 0xFF) */
 
 #endif /* HAVE_XINPUT_H */
 
-#endif /* _SDL_xinput_h */
+#endif /* SDL_xinput_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

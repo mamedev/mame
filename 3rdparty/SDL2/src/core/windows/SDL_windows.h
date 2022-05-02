@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -35,6 +35,7 @@
 #endif
 
 #include <windows.h>
+#include <basetyps.h>   /* for REFIID with broken mingw.org headers */
 
 /* Routines to convert from UTF8 to native Windows text */
 #if UNICODE
@@ -57,10 +58,17 @@ extern HRESULT WIN_CoInitialize(void);
 extern void WIN_CoUninitialize(void);
 
 /* Returns SDL_TRUE if we're running on Windows Vista and newer */
-extern BOOL WIN_IsWindowsVistaOrGreater();
+extern BOOL WIN_IsWindowsVistaOrGreater(void);
+
+/* Returns SDL_TRUE if we're running on Windows 7 and newer */
+extern BOOL WIN_IsWindows7OrGreater(void);
 
 /* You need to SDL_free() the result of this call. */
 extern char *WIN_LookupAudioDeviceName(const WCHAR *name, const GUID *guid);
+
+/* Checks to see if two GUID are the same. */
+extern BOOL WIN_IsEqualGUID(const GUID * a, const GUID * b);
+extern BOOL WIN_IsEqualIID(REFIID a, REFIID b);
 
 #endif /* _INCLUDED_WINDOWS_H */
 

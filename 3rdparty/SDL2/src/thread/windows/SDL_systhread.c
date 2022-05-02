@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -74,23 +74,16 @@ typedef void (__cdecl * pfnSDL_CurrentEndThread) (unsigned code);
 #endif /* !SDL_PASSED_BEGINTHREAD_ENDTHREAD */
 
 
-typedef struct ThreadStartParms
-{
-    void *args;
-    pfnSDL_CurrentEndThread pfnCurrentEndThread;
-} tThreadStartParms, *pThreadStartParms;
-
 static DWORD
 RunThread(void *data)
 {
-    pThreadStartParms pThreadParms = (pThreadStartParms) data;
-    pfnSDL_CurrentEndThread pfnEndThread = pThreadParms->pfnCurrentEndThread;
-    void *args = pThreadParms->args;
-    SDL_free(pThreadParms);
-    SDL_RunThread(args);
-    if (pfnEndThread != NULL)
+    SDL_Thread *thread = (SDL_Thread *) data;
+    pfnSDL_CurrentEndThread pfnEndThread = (pfnSDL_CurrentEndThread) thread->endfunc;
+    SDL_RunThread(thread);
+    if (pfnEndThread != NULL) {
         pfnEndThread(0);
-    return (0);
+    }
+    return 0;
 }
 
 static DWORD WINAPI
@@ -107,33 +100,27 @@ RunThreadViaBeginThreadEx(void *data)
 
 #ifdef SDL_PASSED_BEGINTHREAD_ENDTHREAD
 int
-SDL_SYS_CreateThread(SDL_Thread * thread, void *args,
+SDL_SYS_CreateThread(SDL_Thread * thread,
                      pfnSDL_CurrentBeginThread pfnBeginThread,
                      pfnSDL_CurrentEndThread pfnEndThread)
 {
 #elif defined(__CYGWIN__) || defined(__WINRT__)
 int
-SDL_SYS_CreateThread(SDL_Thread * thread, void *args)
+SDL_SYS_CreateThread(SDL_Thread * thread)
 {
     pfnSDL_CurrentBeginThread pfnBeginThread = NULL;
     pfnSDL_CurrentEndThread pfnEndThread = NULL;
 #else
 int
-SDL_SYS_CreateThread(SDL_Thread * thread, void *args)
+SDL_SYS_CreateThread(SDL_Thread * thread)
 {
     pfnSDL_CurrentBeginThread pfnBeginThread = (pfnSDL_CurrentBeginThread)_beginthreadex;
     pfnSDL_CurrentEndThread pfnEndThread = (pfnSDL_CurrentEndThread)_endthreadex;
 #endif /* SDL_PASSED_BEGINTHREAD_ENDTHREAD */
-    pThreadStartParms pThreadParms =
-        (pThreadStartParms) SDL_malloc(sizeof(tThreadStartParms));
     const DWORD flags = thread->stacksize ? STACK_SIZE_PARAM_IS_A_RESERVATION : 0;
-    if (!pThreadParms) {
-        return SDL_OutOfMemory();
-    }
+
     /* Save the function which we will have to call to clear the RTL of calling app! */
-    pThreadParms->pfnCurrentEndThread = pfnEndThread;
-    /* Also save the real parameters we have to pass to thread function */
-    pThreadParms->args = args;
+    thread->endfunc = pfnEndThread;
 
     /* thread->stacksize == 0 means "system default", same as win32 expects */
     if (pfnBeginThread) {
@@ -141,12 +128,12 @@ SDL_SYS_CreateThread(SDL_Thread * thread, void *args)
         thread->handle = (SYS_ThreadHandle)
             ((size_t) pfnBeginThread(NULL, (unsigned int) thread->stacksize,
                                      RunThreadViaBeginThreadEx,
-                                     pThreadParms, flags, &threadid));
+                                     thread, flags, &threadid));
     } else {
         DWORD threadid = 0;
         thread->handle = CreateThread(NULL, thread->stacksize,
                                       RunThreadViaCreateThread,
-                                      pThreadParms, flags, &threadid);
+                                      thread, flags, &threadid);
     }
     if (thread->handle == NULL) {
         return SDL_SetError("Not enough resources to create thread");
@@ -164,26 +151,55 @@ typedef struct tagTHREADNAME_INFO
 } THREADNAME_INFO;
 #pragma pack(pop)
 
+
+typedef HRESULT (WINAPI *pfnSetThreadDescription)(HANDLE, PCWSTR);
+
 void
 SDL_SYS_SetupThread(const char *name)
 {
-    if ((name != NULL) && IsDebuggerPresent()) {
-        THREADNAME_INFO inf;
+    if (name != NULL) {
+        #ifndef __WINRT__   /* !!! FIXME: There's no LoadLibrary() in WinRT; don't know if SetThreadDescription is available there at all at the moment. */
+        static pfnSetThreadDescription pSetThreadDescription = NULL;
+        static HMODULE kernel32 = 0;
 
-        /* C# and friends will try to catch this Exception, let's avoid it. */
-        if (SDL_GetHintBoolean(SDL_HINT_WINDOWS_DISABLE_THREAD_NAMING, SDL_FALSE)) {
-            return;
+        if (!kernel32) {
+            kernel32 = LoadLibraryW(L"kernel32.dll");
+            if (kernel32) {
+                pSetThreadDescription = (pfnSetThreadDescription) GetProcAddress(kernel32, "SetThreadDescription");
+            }
         }
 
-        /* This magic tells the debugger to name a thread if it's listening. */
-        SDL_zero(inf);
-        inf.dwType = 0x1000;
-        inf.szName = name;
-        inf.dwThreadID = (DWORD) -1;
-        inf.dwFlags = 0;
+        if (pSetThreadDescription != NULL) {
+            WCHAR *strw = WIN_UTF8ToString(name);
+            if (strw) {
+                pSetThreadDescription(GetCurrentThread(), strw);
+                SDL_free(strw);
+            }
+        }
+        #endif
 
-        /* The debugger catches this, renames the thread, continues on. */
-        RaiseException(0x406D1388, 0, sizeof(inf) / sizeof(ULONG), (const ULONG_PTR*) &inf);
+        /* Presumably some version of Visual Studio will understand SetThreadDescription(),
+           but we still need to deal with older OSes and debuggers. Set it with the arcane
+           exception magic, too. */
+
+        if (IsDebuggerPresent()) {
+            THREADNAME_INFO inf;
+
+            /* C# and friends will try to catch this Exception, let's avoid it. */
+            if (SDL_GetHintBoolean(SDL_HINT_WINDOWS_DISABLE_THREAD_NAMING, SDL_TRUE)) {
+                return;
+            }
+
+            /* This magic tells the debugger to name a thread if it's listening. */
+            SDL_zero(inf);
+            inf.dwType = 0x1000;
+            inf.szName = name;
+            inf.dwThreadID = (DWORD) -1;
+            inf.dwFlags = 0;
+
+            /* The debugger catches this, renames the thread, continues on. */
+            RaiseException(0x406D1388, 0, sizeof(inf) / sizeof(ULONG), (const ULONG_PTR*) &inf);
+        }
     }
 }
 
@@ -202,6 +218,8 @@ SDL_SYS_SetThreadPriority(SDL_ThreadPriority priority)
         value = THREAD_PRIORITY_LOWEST;
     } else if (priority == SDL_THREAD_PRIORITY_HIGH) {
         value = THREAD_PRIORITY_HIGHEST;
+    } else if (priority == SDL_THREAD_PRIORITY_TIME_CRITICAL) {
+        value = THREAD_PRIORITY_TIME_CRITICAL;
     } else {
         value = THREAD_PRIORITY_NORMAL;
     }

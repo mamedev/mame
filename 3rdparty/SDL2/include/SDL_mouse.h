@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -25,8 +25,8 @@
  *  Include file for SDL mouse event handling.
  */
 
-#ifndef _SDL_mouse_h
-#define _SDL_mouse_h
+#ifndef SDL_mouse_h_
+#define SDL_mouse_h_
 
 #include "SDL_stdinc.h"
 #include "SDL_error.h"
@@ -38,7 +38,7 @@
 extern "C" {
 #endif
 
-typedef struct SDL_Cursor SDL_Cursor;   /* Implementation dependent */
+typedef struct SDL_Cursor SDL_Cursor;   /**< Implementation dependent */
 
 /**
  * \brief Cursor types for SDL_CreateSystemCursor().
@@ -297,6 +297,6 @@ extern DECLSPEC int SDLCALL SDL_ShowCursor(int toggle);
 #endif
 #include "close_code.h"
 
-#endif /* _SDL_mouse_h */
+#endif /* SDL_mouse_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,8 +19,8 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _SDL_main_h
-#define _SDL_main_h
+#ifndef SDL_main_h_
+#define SDL_main_h_
 
 #include "SDL_stdinc.h"
 
@@ -55,6 +55,10 @@
 /* On iOS SDL provides a main function that creates an application delegate
    and starts the iOS application run loop.
 
+   If you link with SDL dynamically on iOS, the main function can't be in a
+   shared library, so you need to link with libSDLmain.a, which includes a
+   stub main function that calls into the shared library to start execution.
+
    See src/video/uikit/SDL_uikitappdelegate.m for more details.
  */
 #define SDL_MAIN_NEEDED
@@ -63,9 +67,12 @@
 /* On Android SDL provides a Java class in SDLActivity.java that is the
    main activity entry point.
 
-   See README-android.md for more details on extending that class.
+   See docs/README-android.md for more details on extending that class.
  */
 #define SDL_MAIN_NEEDED
+
+/* We need to export SDL_main so it can be launched from Java */
+#define SDLMAIN_DECLSPEC    DECLSPEC
 
 #elif defined(__NACL__)
 /* On NACL we use ppapi_simple to set up the application helper code,
@@ -79,11 +86,9 @@
 #endif
 #endif /* SDL_MAIN_HANDLED */
 
-#ifdef __cplusplus
-#define C_LINKAGE   "C"
-#else
-#define C_LINKAGE
-#endif /* __cplusplus */
+#ifndef SDLMAIN_DECLSPEC
+#define SDLMAIN_DECLSPEC
+#endif
 
 /**
  *  \file SDL_main.h
@@ -104,16 +109,17 @@
 #define main    SDL_main
 #endif
 
-/**
- *  The prototype for the application's main() function
- */
-extern C_LINKAGE int SDL_main(int argc, char *argv[]);
-
-
 #include "begin_code.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ *  The prototype for the application's main() function
+ */
+typedef int (*SDL_main_func)(int argc, char *argv[]);
+extern SDLMAIN_DECLSPEC int SDL_main(int argc, char *argv[]);
+
 
 /**
  *  This is called by the real SDL main function to let the rest of the
@@ -129,8 +135,7 @@ extern DECLSPEC void SDLCALL SDL_SetMainReady(void);
 /**
  *  This can be called to set the application class at startup
  */
-extern DECLSPEC int SDLCALL SDL_RegisterApp(char *name, Uint32 style,
-                                            void *hInst);
+extern DECLSPEC int SDLCALL SDL_RegisterApp(char *name, Uint32 style, void *hInst);
 extern DECLSPEC void SDLCALL SDL_UnregisterApp(void);
 
 #endif /* __WIN32__ */
@@ -146,9 +151,23 @@ extern DECLSPEC void SDLCALL SDL_UnregisterApp(void);
  *  \return 0 on success, -1 on failure.  On failure, use SDL_GetError to retrieve more
  *      information on the failure.
  */
-extern DECLSPEC int SDLCALL SDL_WinRTRunApp(int (*mainFunction)(int, char **), void * reserved);
+extern DECLSPEC int SDLCALL SDL_WinRTRunApp(SDL_main_func mainFunction, void * reserved);
 
 #endif /* __WINRT__ */
+
+#if defined(__IPHONEOS__)
+
+/**
+ *  \brief Initializes and launches an SDL application.
+ *
+ *  \param argc The argc parameter from the application's main() function
+ *  \param argv The argv parameter from the application's main() function
+ *  \param mainFunction The SDL app's C-style main().
+ *  \return the return value from mainFunction
+ */
+extern DECLSPEC int SDLCALL SDL_UIKitRunApp(int argc, char *argv[], SDL_main_func mainFunction);
+
+#endif /* __IPHONEOS__ */
 
 
 #ifdef __cplusplus
@@ -156,6 +175,6 @@ extern DECLSPEC int SDLCALL SDL_WinRTRunApp(int (*mainFunction)(int, char **), v
 #endif
 #include "close_code.h"
 
-#endif /* _SDL_main_h */
+#endif /* SDL_main_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

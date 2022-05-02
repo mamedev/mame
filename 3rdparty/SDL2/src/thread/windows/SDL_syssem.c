@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -90,11 +90,7 @@ SDL_SemWaitTimeout(SDL_sem * sem, Uint32 timeout)
     } else {
         dwMilliseconds = (DWORD) timeout;
     }
-#if __WINRT__
     switch (WaitForSingleObjectEx(sem->id, dwMilliseconds, FALSE)) {
-#else
-    switch (WaitForSingleObject(sem->id, dwMilliseconds)) {
-#endif
     case WAIT_OBJECT_0:
         InterlockedDecrement(&sem->count);
         retval = 0;

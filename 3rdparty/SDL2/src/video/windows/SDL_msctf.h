@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,8 +19,8 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _SDL_msctf_h
-#define _SDL_msctf_h
+#ifndef SDL_msctf_h_
+#define SDL_msctf_h_
 
 #include <unknwn.h>
 
@@ -239,4 +239,4 @@ struct ITfSource
     const struct ITfSourceVtbl *lpVtbl;
 };
 
-#endif /* _SDL_msctf_h */
+#endif /* SDL_msctf_h_ */

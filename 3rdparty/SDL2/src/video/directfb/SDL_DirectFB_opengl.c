@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -117,9 +117,9 @@ DirectFB_GL_LoadLibrary(_THIS, const char *path)
 
 
     if (path == NULL) {
-        path = SDL_getenv("SDL_VIDEO_GL_DRIVER");
+        path = SDL_getenv("SDL_OPENGL_LIBRARY");
         if (path == NULL) {
-            path = "libGL.so";
+            path = "libGL.so.1";
         }
     }
 
@@ -133,7 +133,6 @@ DirectFB_GL_LoadLibrary(_THIS, const char *path)
     SDL_DFB_DEBUG("Loaded library: %s\n", path);
 
     _this->gl_config.dll_handle = handle;
-    _this->gl_config.driver_loaded = 1;
     if (path) {
         SDL_strlcpy(_this->gl_config.driver_path, path,
                     SDL_arraysize(_this->gl_config.driver_path));
@@ -151,16 +150,10 @@ static void
 DirectFB_GL_UnloadLibrary(_THIS)
 {
  #if 0
-    int ret;
-
-    if (_this->gl_config.driver_loaded) {
-
-        ret = GL_UnloadObject(_this->gl_config.dll_handle);
-        if (ret)
-            SDL_DFB_ERR("Error #%d trying to unload library.\n", ret);
-        _this->gl_config.dll_handle = NULL;
-        _this->gl_config.driver_loaded = 0;
-    }
+    int ret = GL_UnloadObject(_this->gl_config.dll_handle);
+    if (ret)
+        SDL_DFB_ERR("Error #%d trying to unload library.\n", ret);
+    _this->gl_config.dll_handle = NULL;
 #endif
     /* Free OpenGL memory */
     SDL_free(_this->gl_data);
@@ -246,17 +239,11 @@ DirectFB_GL_GetSwapInterval(_THIS)
     return 0;
 }
 
-void
+int
 DirectFB_GL_SwapWindow(_THIS, SDL_Window * window)
 {
     SDL_DFB_WINDOWDATA(window);
-    DFBRegion region;
     DirectFB_GLContext *p;
-
-    region.x1 = 0;
-    region.y1 = 0;
-    region.x2 = window->w;
-    region.y2 = window->h;
 
 #if 0
     if (devdata->glFinish)
@@ -273,9 +260,9 @@ DirectFB_GL_SwapWindow(_THIS, SDL_Window * window)
         }
 
     SDL_DFB_CHECKERR(windata->window_surface->Flip(windata->window_surface,NULL,  DSFLIP_PIPELINE |DSFLIP_BLIT | DSFLIP_ONSYNC ));
-    return;
+    return 0;
   error:
-    return;
+    return -1;
 }
 
 void
