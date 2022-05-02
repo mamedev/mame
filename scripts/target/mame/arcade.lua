@@ -1445,6 +1445,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/bowltry.cpp",
 	MAME_DIR .. "src/mame/drivers/ohmygod.cpp",
 	MAME_DIR .. "src/mame/drivers/patapata.cpp",
+	MAME_DIR .. "src/mame/drivers/rallypnt.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "barcrest")

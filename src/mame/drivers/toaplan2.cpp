@@ -5176,6 +5176,11 @@ ROM_START( sstrikerk )
 	ROM_REGION( 0x200000, "gp9001_0", 0 )
 	ROM_LOAD( "ra-ma01-rom2.u2",  0x000000, 0x100000, CRC(54e2bd95) SHA1(341359dd46152615675bb90e8a184216c8feebff) )
 	ROM_LOAD( "ra-ma01-rom3.u1",  0x100000, 0x100000, CRC(21cd378f) SHA1(e1695bccec949d18b1c03e9c42dca384554b0d7c) )
+	// also seen with 4 smaller ROMs instead of 2
+	// 01.bin                  ra-ma01-rom2.u2 [even]     IDENTICAL
+	// 02.bin                  ra-ma01-rom2.u2 [odd]      IDENTICAL
+	// 03.bin                  ra-ma01-rom3.u1 [even]     IDENTICAL
+	// 04.bin                  ra-ma01-rom3.u1 [odd]      IDENTICAL
 
 	ROM_REGION( 0x008000, "text", 0 )
 	ROM_LOAD( "ra-ma-01_05.u81",  0x000000, 0x008000, CRC(88b58841) SHA1(1d16b538c11a291bd1f46a510bfbd6259b45a0b5) )

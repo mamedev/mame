@@ -1054,6 +1054,7 @@ radikaldarts.cpp
 raiden.cpp
 raiden2.cpp
 raiden_ms.cpp
+rallypnt.cpp
 rallyx.cpp
 rampart.cpp
 ramtek.cpp

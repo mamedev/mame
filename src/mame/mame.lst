@@ -33173,9 +33173,11 @@ svcpcba                         // 0269 (c) 2003 Playmore / Capcom - JAMMA PCB
 neoprint                        //
 npcartv1                        //
 npcramen                        //
+npeurver                        //
 npfpit                          //
 npmillen                        //
 npotogib                        //
+nppopeye                        //
 nprsp                           //
 npscv1                          //
 npskv                           //
@@ -36464,6 +36466,9 @@ zeroteamsr                      // (c) 1993 Seibu Kaihatsu
 rainbow                         // 1983 DEC Rainbow 100-B
 rainbow100a                     // 1982 DEC Rainbow 100-A
 rainbow190                      // 1985 DEC Rainbow 190
+
+@source:rallypnt.cpp
+rallypnt2
 
 @source:rallyx.cpp
 commsega                        // (c) 1983 Sega
