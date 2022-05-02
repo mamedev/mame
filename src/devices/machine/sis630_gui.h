@@ -110,15 +110,15 @@ DECLARE_DEVICE_TYPE(SIS630_GUI, sis630_gui_device)
 class sis630_bridge_device : public pci_bridge_device
 {
 public:
-	sis630_bridge_device(
+	template <typename T> sis630_bridge_device(
 		const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
-		const char *gui_tag
+		T &&gui_tag
 	) : sis630_bridge_device(mconfig, tag, owner, clock)
 	{
 		// either 0001 or 6001 as device ID
 		set_ids_bridge(0x10396001, 0x00);
 		//set_multifunction_device(true);
-		m_vga.set_tag(gui_tag);
+		m_vga.set_tag(std::forward<T>(gui_tag));
 	}
 
 	sis630_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

@@ -54,7 +54,7 @@ DEFINE_DEVICE_TYPE(SIS950_LPC, sis950_lpc_device, "sis950_lpc", "SiS 950 LPC Sup
 sis950_lpc_device::sis950_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, SIS950_LPC, tag, owner, clock)
 	, m_host_cpu(*this, finder_base::DUMMY_TAG)
-	, m_flash_rom(*this, "flash")
+	, m_flash_rom(*this, finder_base::DUMMY_TAG)
 	, m_pic_master(*this, "pic_master")
 	, m_pic_slave(*this, "pic_slave")
 	, m_dmac_master(*this, "dmac_master")

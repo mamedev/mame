@@ -35,16 +35,16 @@
 class sis950_lpc_device : public pci_device
 {
 public:
-	sis950_lpc_device(
+	template <typename T, typename U> sis950_lpc_device(
 		const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
-		const char *cpu_tag, const char *flash_tag
+		T &&cpu_tag, U &&flash_tag
 	) : sis950_lpc_device(mconfig, tag, owner, clock)
 	{
 		// Revision 0 -> A0
 		set_ids(0x10390008, 0x00, 0x060100, 0x00);
 		//set_multifunction_device(true);
-		m_host_cpu.set_tag(cpu_tag);
-		m_flash_rom.set_tag(flash_tag);
+		m_host_cpu.set_tag(std::forward<T>(cpu_tag));
+		m_flash_rom.set_tag(std::forward<U>(flash_tag));
 	}
 
 	sis950_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

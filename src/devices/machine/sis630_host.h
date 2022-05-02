@@ -12,15 +12,15 @@
 class sis630_host_device : public pci_host_device
 {
 public:
-	sis630_host_device(
+	template <typename T> sis630_host_device(
 		const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
-		const char *cpu_tag, int ram_size
+		T &&cpu_tag, int ram_size
 	) : sis630_host_device(mconfig, tag, owner, clock)
 	{
 		// Revision 1 -> A1
 		set_ids(0x10390630, 0x01, 0x060000, 0x00);
 		set_multifunction_device(true);
-		m_host_cpu.set_tag(cpu_tag);
+		m_host_cpu.set_tag(std::forward<T>(cpu_tag));
 		set_ram_size(ram_size);
 	}
 

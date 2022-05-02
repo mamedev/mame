@@ -197,7 +197,7 @@ void sis630_state::sis630(machine_config &config)
 
 	// TODO: unknown flash ROM types
 	// Needs a $80000 sized ROM
-	AMD_29F400T(config,  "flash");
+	AMD_29F400T(config, "flash");
 
 	PCI_ROOT(config, "pci", 0);
 	// up to 512MB, 2 x DIMM sockets
