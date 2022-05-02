@@ -452,15 +452,16 @@ void sdl_osd_interface::init(running_machine &machine)
 			//osd_setenv(SDLENV_RENDERDRIVER, stemp, 1);
 			SDL_SetHint(SDL_HINT_RENDER_DRIVER, stemp);
 		}
+// Disabled for now. Don't try to be smarter than SDL. opengl renderdriver looks broken on windows
+#if 0 && defined(SDLMAME_WIN32)
 		else
 		{
-#if defined(SDLMAME_WIN32)
 			// OpenGL renderer has less issues with mode switching on windows
 			osd_printf_verbose("Setting SDL renderdriver '%s' ...\n", "opengl");
 			//osd_setenv(SDLENV_RENDERDRIVER, stemp, 1);
 			SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
-#endif
 		}
+#endif
 	}
 
 	/* Set the SDL environment variable for drivers wanting to load the
