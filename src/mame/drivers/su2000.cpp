@@ -2,20 +2,26 @@
 // copyright-holders:Philip Bennett
 /***************************************************************************
 
-    Virtuality SU2000 hardware
+    Virtuality SU2000 (Stand Up) and SD2000 (Sit Down) hardware
 
     preliminary driver by Phil Bennett
 
-    Known games:
-        * Dactyl Nightmare SP
-        * Virtual Boxing
-        * Buggy Ball
-        * Missile Command
+   Known games (needs to be determined as to what games are SU2000 or SD2000 specific):
+        * Boxing
+		* Buggy Ball
+		* Dactyl Nightmare SP
+        * Dactyl Nightmare 2 - Race For The Eggs!
+		* Ghost Train
+		* Missile Command VR
+		* PacManVR
+		* Shoot For Loot
+		* Sphere
+		* X-Treme Strike
         * Zone Hunter
 
-
-    Hardware Info:
-        See: http://arianchen.de/su2000/status.html
+   SU2000 Hardware Info:
+        An owner's breakdown of system: http://arianchen.de/su2000/status.html
+		Technical Manual: http://arianchen.de/su2000/files/su2000tech.pdf
 
 
     TODO:
