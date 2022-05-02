@@ -676,14 +676,21 @@ void sis630_bridge_device::map_extra(
 	uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space
 )
 {
+	// command extensions
+	// VGA control - forward legacy VGA addresses to AGP
+	// TODO: doc implies that is unaffected by base and limit?
 	if (BIT(bridge_control, 3))
 	{
-		// VGA control
 		memory_space->install_device(0, 0xfffff, *m_vga, &sis630_gui_device::legacy_memory_map);
 		io_space->install_device(0, 0x0fff, *m_vga, &sis630_gui_device::legacy_io_map);
 	}
 
 	// TODO: ISA control
+	// forward to "primary PCI" (host & LPC?) for A8 or A9 blocks for each 1KB blocks in I/O spaces,
+	// (i.e. $100-$3ff, $500-$7ff, $900-$bff etc.)
+	// even if I/O range is inside base and limits
+//	if (BIT(bridge_control, 2))
+	// ...
 }
 
 void sis630_bridge_device::bridge_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)

@@ -5,7 +5,7 @@
 	SiS 5513 IDE controller
 
     TODO:
-    - Derive from a common pci-ide.cpp interface
+    - Derive from common pci-ide.cpp interface
 	  (what flavour that emulates tho? PCI regs 0x40-0x52 don't match)
 
 **************************************************************************************************/
