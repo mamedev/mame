@@ -678,15 +678,18 @@ void sis630_bridge_device::map_extra(
 {
 	if (BIT(bridge_control, 3))
 	{
-		LOGMAP("- Enable VGA control\n");
+		// VGA control
 		memory_space->install_device(0, 0xfffff, *m_vga, &sis630_gui_device::legacy_memory_map);
 		io_space->install_device(0, 0x0fff, *m_vga, &sis630_gui_device::legacy_io_map);
 	}
+
+	// TODO: ISA control
 }
 
 void sis630_bridge_device::bridge_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	pci_bridge_device::bridge_control_w(offset, data, mem_mask);
+	LOGMAP("- %s VGA control\n", bridge_control & 8 ? "Enable" : "Disable");
 	remap_cb();
 }
 

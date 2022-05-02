@@ -6,7 +6,7 @@
 
     TODO:
     - Stub interface, to be improved;
-    - NM93Cxx EEPROM (93C66 based);
+    - Sensible defaults for EEPROM;
 
 **************************************************************************************************/
 
@@ -32,6 +32,7 @@ DEFINE_DEVICE_TYPE(SIS900_ETH, sis900_eth_device, "sis900_eth", "SiS 900 Fast Et
 
 sis900_eth_device::sis900_eth_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, SIS900_ETH, tag, owner, clock)
+	, m_eeprom(*this, "eeprom")
 	, m_eth_rom(*this, "eth_rom")
 {
 	// 0x020000 - Network Ethernet controller
@@ -41,7 +42,7 @@ sis900_eth_device::sis900_eth_device(const machine_config &mconfig, const char *
 
 void sis900_eth_device::device_add_mconfig(machine_config &config)
 {
-
+	EEPROM_93C66_16BIT(config, m_eeprom); // NM93Cxx
 }
 
 void sis900_eth_device::config_map(address_map &map)
@@ -58,7 +59,7 @@ void sis900_eth_device::memory_map(address_map &map)
 
 void sis900_eth_device::io_map(address_map &map)
 {
-
+	map(0x08, 0x08).rw(FUNC(sis900_eth_device::eromar_r), FUNC(sis900_eth_device::eromar_w));
 }
 
 void sis900_eth_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
@@ -69,16 +70,13 @@ void sis900_eth_device::map_extra(uint64_t memory_window_start, uint64_t memory_
 
 ROM_START( sis900eth )
 	ROM_REGION32_LE( 0x10000, "eth_rom", ROMREGION_ERASEFF )
-	// TODO: documentation hints that this has an internal BIOS
 	ROM_LOAD( "pxe_m.19", 0x0000, 0xa000, BAD_DUMP CRC(c8da34a6) SHA1(f11b4f5398176b7d924c63c77a1951cb83020e48) )
 	// structure:
-	// [0x00] signature -> likely 0x55aa
-	// [0x02] vendor ID -> likely 0x1039
-	// [0x04] device ID -> likely 0x0900 (*)
+	// [0x00] signature -> 0x55aa
 	// [0x08] MAC address
 	// [0x0b] checksum
-
-	// (*) Linux driver sis900.h sets a pointer to [0x03], looks unlikely?
+	// PCIR signature+[0x00] vendor ID -> 0x1039
+	// PCIR signature+[0x02] device ID -> 0x0900
 ROM_END
 
 const tiny_rom_entry *sis900_eth_device::device_rom_region() const
@@ -106,6 +104,8 @@ void sis900_eth_device::device_reset()
 
 	command = 0x0000;
 	status = 0x0290;
+
+	m_eromar_mode = false;
 }
 
 uint8_t sis900_eth_device::capptr_r()
@@ -122,4 +122,40 @@ u32 sis900_eth_device::pmc_id_r()
 	// bits 7-0 PM_CAP_ID (0x01 for PMC)
 	// TODO: versioning may depend on ROM installed
 	return 0xfe010001;
+}
+
+/*
+ * I/O space
+ */
+
+u8 sis900_eth_device::eromar_r()
+{
+	// TODO: doc claims all bits are readable, looks unlikely?
+	u8 res = m_eromar_mode << 7;
+	if (m_eromar_mode)
+	{
+		// ...
+	}
+	else
+		res |= m_eeprom->do_read() << 1;
+
+	return res;
+}
+
+void sis900_eth_device::eromar_w(u8 data)
+{
+	m_eromar_mode = bool(BIT(data, 7));
+
+	LOGIO("eromar_w %s selected %02x\n", m_eromar_mode ? "HomePHY" : "eeprom", data);
+
+	if (m_eromar_mode)
+	{
+		// ...
+	}
+	else
+	{
+		m_eeprom->cs_write(BIT(data, 3));
+		m_eeprom->clk_write(BIT(data, 2));
+		m_eeprom->di_write(BIT(data, 0));
+	}
 }
