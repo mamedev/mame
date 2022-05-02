@@ -449,8 +449,7 @@ void sdl_osd_interface::init(running_machine &machine)
 #if defined(SDLMAME_UNIX)
 			// bgfx does not work with wayland
 			osd_printf_verbose("Setting SDL videodriver '%s' ...\n", "x11");
-			//osd_setenv(SDLENV_VIDEODRIVER, stemp, 1);
-			SDL_SetHint(SDL_HINT_VIDEODRIVER, "x11");
+			osd_setenv(SDLENV_VIDEODRIVER, "x11", 1);
 #endif
 		}
 	}
