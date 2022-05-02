@@ -2208,6 +2208,9 @@ end
 			MAME_DIR .. "3rdparty/SDL2-override/mingw",
 			MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
 		}
+		buildoptions {
+			"-Wno-undef",
+		}
 		buildoptions_c {
 			"-Wno-bad-function-cast",
 			"-Wno-discarded-qualifiers",
@@ -2215,11 +2218,7 @@ end
 			"-Wno-format-security",
 			"-Wno-pointer-to-int-cast",
 			"-Wno-strict-prototypes",
-			"-Wno-undef",
 			"-Wno-unused-but-set-variable",
-		}
-		buildoptions {
-			"-Wno-undef",
 		}
 
 	configuration { "mingw-clang"}

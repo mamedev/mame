@@ -121,7 +121,15 @@ if BASE_TARGETOS=="unix" then
 	end
 end
 
+
 if _OPTIONS["targetos"]=="windows" then
+	if _OPTIONS["osd"]=="sdl" then
+		configuration { "mingw*" }
+			buildoptions {
+				"-Wno-undef",
+			}
+	end
+
 	configuration { "mingw* or vs*" }
 		defines {
 			"UNICODE",
@@ -129,10 +137,6 @@ if _OPTIONS["targetos"]=="windows" then
 			"_WIN32_WINNT=0x0501",
 			"WIN32_LEAN_AND_MEAN",
 			"NOMINMAX",
-		}
-		buildoptions
-		{
-			"-Wno-undef",
 		}
 
 	configuration { }
