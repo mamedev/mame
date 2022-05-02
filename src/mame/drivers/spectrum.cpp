@@ -737,7 +737,6 @@ void spectrum_state::init_spectrum()
 void spectrum_state::machine_start()
 {
 	save_item(NAME(m_port_fe_data));
-	//TODO more
 }
 
 void spectrum_state::machine_reset()

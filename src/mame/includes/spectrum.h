@@ -216,13 +216,19 @@ class spectrum_128_state : public spectrum_state
 {
 public:
 	spectrum_128_state(const machine_config &mconfig, device_type type, const char *tag) :
-		spectrum_state(mconfig, type, tag)
+		spectrum_state(mconfig, type, tag),
+		m_bank_rom(*this, "bank_rom%u", 0U),
+		m_bank_ram(*this, "bank_ram%u", 0U)
 		{ }
 
 	void spectrum_128(machine_config &config);
 
 protected:
+	memory_bank_array_creator<1> m_bank_rom;
+	memory_bank_array_creator<3> m_bank_ram;
+
 	virtual void video_start() override;
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void spectrum_128_update_memory() override;
@@ -232,10 +238,14 @@ protected:
 	virtual bool is_vram_write(offs_t offset) override;
 
 private:
-	uint8_t spectrum_128_pre_opcode_fetch_r(offs_t offset);
-	void spectrum_128_bank1_w(offs_t offset, uint8_t data);
-	uint8_t spectrum_128_bank1_r(offs_t offset);
-	void spectrum_128_port_7ffd_w(offs_t offset, uint8_t data);
+	u8 spectrum_128_pre_opcode_fetch_r(offs_t offset);
+	void spectrum_128_rom_w(offs_t offset, u8 data);
+	u8 spectrum_128_rom_r(offs_t offset);
+	template <u8 Bank>
+	void spectrum_128_ram_w(offs_t offset, u8 data);
+	template <u8 Bank>
+	u8 spectrum_128_ram_r(offs_t offset);
+	void spectrum_128_port_7ffd_w(offs_t offset, u8 data);
 	virtual uint8_t spectrum_port_r(offs_t offset) override;
 	//uint8_t spectrum_128_ula_r();
 
