@@ -2243,6 +2243,11 @@ project "asmjit"
 			}
 		end
 	end
+	
+	buildoptions
+	{
+		"-Wno-maybe-uninitialized",
+	}
 
 	files {
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/a64.h",
