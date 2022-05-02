@@ -43,7 +43,6 @@ protected:
 	virtual void config_map(address_map &map) override;
 
 	void memory_map(address_map &map);
-	void io_map(address_map &map);
 
 private:
 	required_device<cpu_device> m_host_cpu;

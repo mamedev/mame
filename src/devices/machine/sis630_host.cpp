@@ -84,6 +84,10 @@ void sis630_host_device::config_map(address_map &map)
 	pci_host_device::config_map(map);
 	// override header type, needed for actual IDE detection
 	map(0x0e, 0x0e).lr8(NAME([] () { return 0x80; }));
+
+	// override first BAR slot for gfx window base address
+	map(0x10, 0x13).rw(FUNC(pci_device::address_base_r), FUNC(pci_device::address_base_w));
+
 	map(0x34, 0x34).r(FUNC(sis630_host_device::capptr_r));
 
 	// host & DRAM regs
@@ -156,12 +160,6 @@ void sis630_host_device::memory_map(address_map &map)
 {
 }
 
-void sis630_host_device::io_map(address_map &map)
-{
-	pci_host_device::io_configuration_access_map(map);
-	// ...
-}
-
 void sis630_host_device::map_shadowram(address_space *memory_space, uint32_t start_offs, uint32_t end_offs, bool read_enable, bool write_enable)
 {
 	LOGMAP("- 0x%08x-0x%08x ", start_offs, end_offs);
@@ -193,7 +191,7 @@ void sis630_host_device::map_extra(
 	uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 	uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space
 ) {
-	io_space->install_device(0, 0xffff, *this, &sis630_host_device::io_map);
+	io_space->install_device(0, 0xffff,  *static_cast<pci_host_device *>(this), &pci_host_device::io_configuration_access_map);
 
 	regenerate_config_mapping();
 
@@ -261,8 +259,6 @@ void sis630_host_device::map_extra(
 	// TODO: undocumented shadow RAM configs bits 7 and 23 after POST IDE check on shutms11 (programmer errors?)
 
 	memory_space->install_ram(0x00100000, m_ram_size - 1, &m_ram[0x00100000/4]);
-
-//  memory_space->install_device(0, 0xffffffff, *this, &sis630_host_device::memory_map);
 }
 
 
