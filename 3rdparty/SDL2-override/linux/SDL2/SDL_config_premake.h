@@ -20,9 +20,8 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef SDL_config_h_
-#define SDL_config_h_
-
+#ifndef SDL_config_premake_h_
+#define SDL_config_premake_h_
 /**
  *  \file SDL_config.h.in
  *
@@ -215,7 +214,8 @@
 //FIXME: needs pkgconfig
 //#define HAVE_DBUS_DBUS_H 1
 
-#define HAVE_FCITX 1
+//FIXME: depends dbus
+//#define HAVE_FCITX 1
 #define HAVE_SYS_INOTIFY_H 1
 #define HAVE_INOTIFY_INIT 1
 #define HAVE_INOTIFY_INIT1 1
@@ -307,7 +307,8 @@
 /* #undef SDL_JOYSTICK_WINMM */
 /* #undef SDL_JOYSTICK_USBHID */
 /* #undef SDL_JOYSTICK_USBHID_MACHINE_JOYSTICK_H */
-#define SDL_JOYSTICK_HIDAPI 1
+//FIXME: doesn't compile
+//#define SDL_JOYSTICK_HIDAPI 1
 /* #undef SDL_JOYSTICK_RAWINPUT */
 /* #undef SDL_JOYSTICK_EMSCRIPTEN */
 #define SDL_JOYSTICK_VIRTUAL 1
@@ -451,4 +452,4 @@
 /* Enable dynamic libsamplerate support */
 #define SDL_LIBSAMPLERATE_DYNAMIC "libsamplerate.so.0"
 
-#endif /* SDL_config_h_ */
+#endif /* SDL_config_premake_h_ */

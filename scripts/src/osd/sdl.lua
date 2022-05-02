@@ -281,7 +281,6 @@ if BASE_TARGETOS=="unix" then
 			"-framework OpenGL",
 		}
 
-
 		if os_version>=101100 then
 			linkoptions {
 				"-weak_framework Metal",
@@ -296,7 +295,12 @@ if BASE_TARGETOS=="unix" then
 				"-framework ForceFeedback",
 				"-framework IOKit",
 				"-framework CoreVideo",
+				"-framework GameController",
 			}
+			includedirs {
+				MAME_DIR .. "3rdparty/SDL2/src/hidapi/hidapi",
+			}
+
 		else
 			if _OPTIONS["USE_LIBSDL"]~="1" then
 				linkoptions {

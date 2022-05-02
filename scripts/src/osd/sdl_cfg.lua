@@ -130,6 +130,10 @@ if _OPTIONS["targetos"]=="windows" then
 			"WIN32_LEAN_AND_MEAN",
 			"NOMINMAX",
 		}
+		buildoptions
+		{
+			"-Wno-undef",
+		}
 
 	configuration { }
 
