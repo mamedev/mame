@@ -31,7 +31,7 @@ Barb Wire                                748  Hit 1, press GO                   
 Brooks & Dunn                            749  (unfinished prototype)
 Super Mario Brothers Mushroom World     N105  (not working)
 Strikes n Spares                        N111  (not working, press F3 to see the screen)
-Machina Zois                                  Hit 1, press LM                      M
+machinaZOIS Virtual Training Center           Hit 1, press LM                      M
 
 Status:
 - Some machines are playable
@@ -787,7 +787,7 @@ ROM_START(shaqattq2) // Rev. 2
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Machina Zois (hack of Shaq Attack)
+/ machinaZOIS Virtual Training Center (hack of Shaq Attack)
 /-------------------------------------------------------------------*/
 ROM_START(mac_zois)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
@@ -1368,7 +1368,7 @@ GAME(1995,  stargatp1,  stargatp, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Got
 GAME(1995,  stargatp0,  stargatp, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Stargate (pinball)",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1995,  shaqattq,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Shaq Attaq (rev.5)",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1995,  shaqattq2,  shaqattq, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Shaq Attaq (rev.2)",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(2003,  mac_zois,   shaqattq, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Aksioma",  "Machina Zois Virtual Training Centre",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(2003,  mac_zois,   shaqattq, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Aksioma",  "machinaZOIS Virtual Training Center",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1994,  freddy,     0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Freddy: A Nightmare on Elm Street (rev.4)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1994,  freddy3,    freddy,   p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Freddy: A Nightmare on Elm Street (rev.3)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1995,  bighurt,    0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Frank Thomas' Big Hurt (rev.3)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
