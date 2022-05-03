@@ -54,7 +54,7 @@ private:
 	template<int N> void write_r(u8 data);
 
 	u8 m_inp_mux = 0;
-	u8 m_r[4] = { };
+	u16 m_r = 0;
 };
 
 void scrablex_state::machine_start()
@@ -99,22 +99,14 @@ template<int N>
 void scrablex_state::write_r(u8 data)
 {
 	// R0-R13: digit segments
-	m_r[N] = ~data & 0xf;
-
-	u16 digit_data = 0;
-	for (int i = 0; i < 4; i++)
-		digit_data = (digit_data << 4) | (m_r[i ^ 3]);
-
-	digit_data = bitswap<14>(digit_data,10,8,6,12,11,7,9,13,5,4,3,2,1,0);
-	m_display->write_mx(digit_data);
+	m_r = (m_r & ~(0xf << (N * 4))) | ((~data & 0xf) << (N * 4));
+	m_display->write_mx(bitswap<14>(m_r,10,8,6,12,11,7,9,13,5,4,3,2,1,0));
 
 	// R14,R15: speaker out
+	m_speaker->level_w(m_r >> 14 & 3);
+
 	// R15: input mux part
-	if (N == 3)
-	{
-		m_speaker->level_w(data >> 2 & 3);
-		m_inp_mux = (m_inp_mux & 0xf) | (~data << 1 & 0x10);
-	}
+	m_inp_mux = (m_inp_mux & 0xf) | (m_r >> 11 & 0x10);
 }
 
 
