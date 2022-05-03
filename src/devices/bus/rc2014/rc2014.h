@@ -121,14 +121,14 @@ public:
 	// construction/destruction
 	device_rc2014_card_interface(const machine_config &mconfig, device_t &device);
 protected:
-	void set_bus_device(rc2014_bus_device &bus_device);
+	void set_bus_device(rc2014_bus_device *bus_device);
 
 	rc2014_bus_device  *m_bus;
 };
 
 // ======================> rc2014_slot_device
 
-class rc2014_slot_device : public device_t, public device_single_card_slot_interface<device_rc2014_card_interface>
+class rc2014_slot_device : public device_t, public device_slot_interface
 {
 public:
 	rc2014_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
@@ -150,7 +150,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_resolve_objects() override;
 
-private:
 	required_device<rc2014_bus_device> m_bus;
 };
 
@@ -208,7 +207,7 @@ protected:
 	// construction/destruction
 	device_rc2014_ext_card_interface(const machine_config &mconfig, device_t &device);
 
-	void set_bus_device(rc2014_ext_bus_device &bus_device);
+	void set_bus_device(rc2014_ext_bus_device *bus_device);
 
 	rc2014_ext_bus_device  *m_bus;
 };
@@ -235,9 +234,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_resolve_objects() override;
-
-private:
-	required_device<rc2014_ext_bus_device> m_bus;
 };
 
 // device type definition
