@@ -165,6 +165,7 @@ public:
 	// construction/destruction
 	rc2014_ext_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto page_callback() { return m_page.bind(); }
 	auto nmi_callback() { return m_nmi.bind(); }
 	auto tx2_callback() { return m_tx2.bind(); }
 	auto rx2_callback() { return m_rx2.bind(); }
@@ -173,6 +174,7 @@ public:
 	auto user7_callback() { return m_user7.bind(); }
 	auto user8_callback() { return m_user8.bind(); }
 
+	DECLARE_WRITE_LINE_MEMBER( page_w ) { m_page(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi(state); }
 	DECLARE_WRITE_LINE_MEMBER( tx2_w ) { m_tx2(state); }
 	DECLARE_WRITE_LINE_MEMBER( rx2_w ) { m_rx2(state); }
@@ -186,6 +188,7 @@ protected:
 	virtual void device_start() override;
 
 private:
+	devcb_write_line m_page;
 	devcb_write_line m_nmi;
 	devcb_write_line m_tx2;
 	devcb_write_line m_rx2;
@@ -231,6 +234,66 @@ public:
 	}
 
 protected:
+	rc2014_ext_slot_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_resolve_objects() override;
+};
+
+//**************************************************************************
+//  RC2014 RC80 Bus
+//**************************************************************************
+
+// ======================> rc2014_rc80_bus_device
+
+class rc2014_rc80_bus_device : public rc2014_ext_bus_device
+{
+public:
+	// construction/destruction
+	rc2014_rc80_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	rc2014_rc80_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	// device-level overrides
+	virtual void device_start() override;
+};
+
+// ======================> device_rc2014_rc80_card_interface
+
+class rc2014_rc80_slot_device;
+
+class device_rc2014_rc80_card_interface : public device_rc2014_ext_card_interface
+{
+	friend class rc2014_rc80_slot_device;
+
+protected:
+	// construction/destruction
+	device_rc2014_rc80_card_interface(const machine_config &mconfig, device_t &device);
+
+	void set_bus_device(rc2014_rc80_bus_device *bus_device);
+
+	rc2014_rc80_bus_device  *m_bus;
+};
+
+// ======================> rc2014_rc80_slot_device
+
+class rc2014_rc80_slot_device : public rc2014_ext_slot_device
+{
+public:
+	rc2014_rc80_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+	template <typename T, typename U>
+	rc2014_rc80_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&bus_tag, U &&slot_options, char const *default_option)
+		: rc2014_rc80_slot_device(mconfig, tag, owner, DERIVED_CLOCK(1,1))
+	{
+		m_bus.set_tag(std::forward<T>(bus_tag));
+		option_reset();
+		slot_options(*this);
+		set_default_option(default_option);
+		set_fixed(false);
+	}
+
+protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_resolve_objects() override;
@@ -242,5 +305,8 @@ DECLARE_DEVICE_TYPE(RC2014_SLOT, rc2014_slot_device)
 
 DECLARE_DEVICE_TYPE(RC2014_EXT_BUS,  rc2014_ext_bus_device)
 DECLARE_DEVICE_TYPE(RC2014_EXT_SLOT, rc2014_ext_slot_device)
+
+DECLARE_DEVICE_TYPE(RC2014_RC80_BUS,  rc2014_rc80_bus_device)
+DECLARE_DEVICE_TYPE(RC2014_RC80_SLOT, rc2014_rc80_slot_device)
 
 #endif // MAME_BUS_RC2014_RC2014_H

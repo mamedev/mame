@@ -19,6 +19,9 @@ DEFINE_DEVICE_TYPE(RC2014_SLOT, rc2014_slot_device, "rc2014_slot", "RC2014 Stand
 DEFINE_DEVICE_TYPE(RC2014_EXT_BUS,  rc2014_ext_bus_device,  "rc2014_ext_bus",  "RC2014 Extended Bus")
 DEFINE_DEVICE_TYPE(RC2014_EXT_SLOT, rc2014_ext_slot_device, "rc2014_ext_slot", "RC2014 Extended Bus Slot")
 
+DEFINE_DEVICE_TYPE(RC2014_RC80_BUS,  rc2014_rc80_bus_device,  "rc2014_rc80_bus",  "RC2014 RC80 Bus")
+DEFINE_DEVICE_TYPE(RC2014_RC80_SLOT, rc2014_rc80_slot_device, "rc2014_rc80_slot", "RC2014 RC80 Bus Slot")
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -140,6 +143,7 @@ rc2014_ext_bus_device::rc2014_ext_bus_device(const machine_config &mconfig, cons
 
 rc2014_ext_bus_device::rc2014_ext_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: rc2014_bus_device(mconfig, type, tag, owner, clock)
+	, m_page(*this)
 	, m_nmi(*this)
 	, m_tx2(*this)
 	, m_rx2(*this)
@@ -153,6 +157,7 @@ rc2014_ext_bus_device::rc2014_ext_bus_device(const machine_config &mconfig, devi
 void rc2014_ext_bus_device::device_start()
 {
 	rc2014_bus_device::device_start();
+	m_page.resolve_safe();
 	m_nmi.resolve_safe();
 	m_tx2.resolve_safe();
 	m_rx2.resolve_safe();
@@ -182,7 +187,12 @@ void device_rc2014_ext_card_interface::set_bus_device(rc2014_ext_bus_device *bus
 //-------------------------------------------------
 
 rc2014_ext_slot_device::rc2014_ext_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: rc2014_slot_device(mconfig, RC2014_EXT_SLOT, tag, owner, clock)
+	: rc2014_ext_slot_device(mconfig, RC2014_EXT_SLOT, tag, owner, clock)
+{
+}
+
+rc2014_ext_slot_device::rc2014_ext_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: rc2014_slot_device(mconfig, type, tag, owner, clock)
 {
 }
 
@@ -197,4 +207,65 @@ void rc2014_ext_slot_device::device_resolve_objects()
 
 	if (card)
 		card->set_bus_device(dynamic_cast<rc2014_ext_bus_device *>(m_bus.target()));
+}
+
+//**************************************************************************
+//  RC2014 RC80 Bus
+//**************************************************************************
+
+//-------------------------------------------------
+//  rc2014_rc80_bus_device 
+//-------------------------------------------------
+
+rc2014_rc80_bus_device::rc2014_rc80_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: rc2014_rc80_bus_device(mconfig, RC2014_RC80_BUS, tag, owner, clock)
+{
+}
+
+rc2014_rc80_bus_device::rc2014_rc80_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: rc2014_ext_bus_device(mconfig, type, tag, owner, clock)
+
+{
+}
+
+void rc2014_rc80_bus_device::device_start()
+{
+	rc2014_ext_bus_device::device_start();
+}
+
+//-------------------------------------------------
+//  device_rc2014_rc80_card_interface 
+//-------------------------------------------------
+
+device_rc2014_rc80_card_interface::device_rc2014_rc80_card_interface(const machine_config &mconfig, device_t &device)
+	: device_rc2014_ext_card_interface(mconfig,device)
+	, m_bus(nullptr)
+{
+}
+
+void device_rc2014_rc80_card_interface::set_bus_device(rc2014_rc80_bus_device *bus_device)
+{
+	m_bus = bus_device;
+}
+
+//-------------------------------------------------
+//  rc2014_rc80_slot_device
+//-------------------------------------------------
+
+rc2014_rc80_slot_device::rc2014_rc80_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: rc2014_ext_slot_device(mconfig, RC2014_RC80_SLOT, tag, owner, clock)
+{
+}
+
+void rc2014_rc80_slot_device::device_start()
+{
+}
+
+void rc2014_rc80_slot_device::device_resolve_objects()
+{
+	rc2014_ext_slot_device::device_resolve_objects();
+	device_rc2014_rc80_card_interface *const card(dynamic_cast<device_rc2014_rc80_card_interface *>(get_card_device()));
+
+	if (card)
+		card->set_bus_device(dynamic_cast<rc2014_rc80_bus_device *>(m_bus.target()));
 }
