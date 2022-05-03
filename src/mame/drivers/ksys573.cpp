@@ -113,7 +113,7 @@ P Hyper Bishi Bashi Champ                            1998.07    GC876 EA        
 P Hyper Bishi Bashi Champ - 2 Player                 1999.08    GC908 JA          908    A02
 P Jikkyou Powerful Pro Yakyuu EX                     1998.04    GX802 JA          802 JA B02
 P Jikkyou Powerful Pro Yakyuu EX 98                  1998.08
-K Kick & Kick                                        2001       GNA36 EA          (no CD)
+AA Kick & Kick                                     n 2001       GNA36 EA          (no CD)
 P Konami 80's Arcade Gallery                         1998.11    GC826 JA          826 JA A01
 P Konami 80's AC Special                             1998       GC826 UA          826 UA A01
 D Mambo a GoGo                                       2001.06
@@ -125,14 +125,15 @@ P Step Champ                                         1999.12
 
 P: plain System573
 A: uses ext. analog I/O board GX700-PWB(F)
+AA: uses alt. ext. analog I/O board GX700-PWB(K)
 D: uses ext. digital sound and I/O board GX894-PWB(B)
-N: uses network PCB unit GUC07 + ext. digital sound and I/O board GX894-PWB(B)
+N : uses network PCB unit GUC07 + ext. digital sound and I/O board GX894-PWB(B)
 G: gun mania only, drives air soft gun (this game uses real BB bullet)
-K: uses alt. ext. analog I/O board GX700-PWB(K)
+K: a modified System 573, equipped with four video input/output and a DAM karaoke device
 
   Note:
        Not all games listed above are confirmed to run on System 573.
-       * - denotes not dumped yet.
+       * - denotes undumped.
 
   Main PCB Layout
   ---------------
