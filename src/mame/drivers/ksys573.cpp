@@ -113,7 +113,7 @@ P Hyper Bishi Bashi Champ                            1998.07    GC876 EA        
 P Hyper Bishi Bashi Champ - 2 Player                 1999.08    GC908 JA          908    A02
 P Jikkyou Powerful Pro Yakyuu EX                     1998.04    GX802 JA          802 JA B02
 P Jikkyou Powerful Pro Yakyuu EX 98                  1998.08
-AA Kick & Kick                                     n 2001       GNA36 EA          (no CD)
+AA Kick & Kick                                       2001       GNA36 EA          (no CD)
 P Konami 80's Arcade Gallery                         1998.11    GC826 JA          826 JA A01
 P Konami 80's AC Special                             1998       GC826 UA          826 UA A01
 D Mambo a GoGo                                       2001.06
