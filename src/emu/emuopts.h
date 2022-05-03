@@ -15,6 +15,8 @@
 
 #include "options.h"
 
+#include <optional>
+
 #define OPTION_PRIORITY_CMDLINE     OPTION_PRIORITY_HIGH + 1
 // core options
 #define OPTION_SYSTEMNAME           core_options::unadorned(0)
@@ -204,6 +206,7 @@
 class game_driver;
 class device_slot_interface;
 class emu_options;
+template <class DeviceType, class DeviceClass> class device_type_enumerator;
 
 class slot_option
 {
@@ -499,14 +502,12 @@ protected:
 	virtual void command_argument_processed() override;
 
 private:
-	struct software_options
-	{
-		std::unordered_map<std::string, std::string>    slot;
-		std::unordered_map<std::string, std::string>    image;
-	};
+	struct software_options;
 
 	// slot/image/softlist calculus
-	software_options evaluate_initial_softlist_options(const std::string &software_identifier);
+	software_options evaluate_initial_softlist_options(std::string_view software_identifier);
+	std::optional<software_options> evaluate_single_software(const machine_config &config, device_type_enumerator<software_list_device, software_list_device> &swdevice_iter, software_list_device &swlistdev, std::string_view software_name) const;
+	static std::tuple<std::string_view, std::string_view> parse_software_identifier(std::string_view software_identifier);
 	void update_slot_and_image_options();
 	bool add_and_remove_slot_options();
 	bool add_and_remove_image_options();
