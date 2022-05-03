@@ -32,7 +32,8 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(irq_timer_tick);
 
 	void irq_clock(int blanked, int mode);
 	void update_banks(int reg);
@@ -61,7 +62,6 @@ protected:
 	int m_irq_enable;
 	int m_irq_up, m_irq_down;
 
-	static const device_timer_id TIMER_IRQ = 0;
 	emu_timer *irq_timer;
 	attotime timer_freq;
 };

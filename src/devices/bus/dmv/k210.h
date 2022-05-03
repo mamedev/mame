@@ -28,7 +28,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id tid, int param) override;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -52,6 +51,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(cent_fault_w);
 	DECLARE_WRITE_LINE_MEMBER(cent_autofd_w);
 	DECLARE_WRITE_LINE_MEMBER(cent_init_w);
+
+	TIMER_CALLBACK_MEMBER(strobe_tick);
 
 	required_device<i8255_device> m_ppi;
 	required_device<centronics_device> m_centronics;

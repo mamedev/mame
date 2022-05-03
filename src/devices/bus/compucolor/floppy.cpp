@@ -127,7 +127,7 @@ void compucolor_floppy_port_device::device_start()
 void compucolor_floppy_device::device_start()
 {
 	// allocate timer
-	m_timer = timer_alloc();
+	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(compucolor_floppy_device::rxd_tick), this));
 	m_timer->adjust(attotime::from_hz(9600*8), 0, attotime::from_hz(9600*8));
 
 	// state saving
@@ -141,7 +141,7 @@ void compucolor_floppy_device::device_start()
 //  device_timer - handle timer events
 //-------------------------------------------------
 
-void compucolor_floppy_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(compucolor_floppy_device::rxd_tick)
 {
 	if (!m_sel && !m_rw)
 	{

@@ -33,7 +33,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -43,6 +42,8 @@ protected:
 private:
 	static void load_proc(device_image_interface &image, bool is_created);
 	static void unload_proc(device_image_interface &image);
+
+	TIMER_CALLBACK_MEMBER(irq_timer_tick);
 
 	std::unique_ptr<uint8_t[]> m_fds_data;    // here, we store a copy of the disk
 	required_device<legacy_floppy_image_device> m_disk;

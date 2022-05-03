@@ -19,13 +19,10 @@ public:
 	sns_pfest94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	static constexpr device_timer_id TIMER_EVENT = 0;
-
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -39,6 +36,8 @@ protected:
 
 	virtual uint32_t necdsp_prg_r(offs_t offset);
 	virtual uint16_t necdsp_data_r(offs_t offset);
+
+	TIMER_CALLBACK_MEMBER(event_tick);
 
 private:
 	required_device<upd7725_device> m_upd7725;

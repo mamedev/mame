@@ -166,7 +166,7 @@ void nes_jf17_device::pcb_reset()
 void nes_ss88006_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_ss88006_device::irq_timer_tick), this));
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_mmc_prg_bank));
@@ -382,52 +382,49 @@ void nes_jf19_adpcm_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_ss88006_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_ss88006_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (m_irq_enable)
 	{
-		if (m_irq_enable)
+		if (m_irq_mode & 0x08)  // 4bits counter
 		{
-			if (m_irq_mode & 0x08)  // 4bits counter
+			if (!(m_irq_count & 0x000f))
 			{
-				if (!(m_irq_count & 0x000f))
-				{
-					set_irq_line(ASSERT_LINE);
-					m_irq_count = (m_irq_count & 0xfff0) | 0x000f;
-				}
-				else
-					m_irq_count = (m_irq_count & 0xfff0) | ((m_irq_count & 0x000f) - 1);
+				set_irq_line(ASSERT_LINE);
+				m_irq_count = (m_irq_count & 0xfff0) | 0x000f;
 			}
-			else if (m_irq_mode & 0x04) // 8bits counter
+			else
+				m_irq_count = (m_irq_count & 0xfff0) | ((m_irq_count & 0x000f) - 1);
+		}
+		else if (m_irq_mode & 0x04) // 8bits counter
+		{
+			if (!(m_irq_count & 0x00ff))
 			{
-				if (!(m_irq_count & 0x00ff))
-				{
-					set_irq_line(ASSERT_LINE);
-					m_irq_count = (m_irq_count & 0xff00) | 0x00ff;
-				}
-				else
-					m_irq_count = (m_irq_count & 0xff00) | ((m_irq_count & 0x00ff) - 1);
+				set_irq_line(ASSERT_LINE);
+				m_irq_count = (m_irq_count & 0xff00) | 0x00ff;
 			}
-			else if (m_irq_mode & 0x02) // 12bits counter
+			else
+				m_irq_count = (m_irq_count & 0xff00) | ((m_irq_count & 0x00ff) - 1);
+		}
+		else if (m_irq_mode & 0x02) // 12bits counter
+		{
+			if (!(m_irq_count & 0x0fff))
 			{
-				if (!(m_irq_count & 0x0fff))
-				{
-					set_irq_line(ASSERT_LINE);
-					m_irq_count = (m_irq_count & 0xf000) | 0x0fff;
-				}
-				else
-					m_irq_count = (m_irq_count & 0xf000) | ((m_irq_count & 0x0fff) - 1);
+				set_irq_line(ASSERT_LINE);
+				m_irq_count = (m_irq_count & 0xf000) | 0x0fff;
 			}
-			else    // 16bits counter
+			else
+				m_irq_count = (m_irq_count & 0xf000) | ((m_irq_count & 0x0fff) - 1);
+		}
+		else    // 16bits counter
+		{
+			if (!m_irq_count)
 			{
-				if (!m_irq_count)
-				{
-					set_irq_line(ASSERT_LINE);
-					m_irq_count = 0xffff;
-				}
-				else
-					m_irq_count = m_irq_count - 1;
+				set_irq_line(ASSERT_LINE);
+				m_irq_count = 0xffff;
 			}
+			else
+				m_irq_count = m_irq_count - 1;
 		}
 	}
 }

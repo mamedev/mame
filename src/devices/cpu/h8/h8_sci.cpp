@@ -249,7 +249,7 @@ void h8_sci_device::device_start()
 	tx_cb.resolve_safe();
 	clk_cb.resolve_safe();
 
-	sync_timer = timer_alloc(0);
+	sync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(h8_sci_device::sync_tick), this));
 
 	if(external_clock_period.is_never()) {
 		internal_to_external_ratio = 0;
@@ -309,7 +309,7 @@ void h8_sci_device::device_reset()
 	cur_sync_time = attotime::never;
 }
 
-void h8_sci_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(h8_sci_device::sync_tick)
 {
 	// Used only to force system-wide syncs
 }

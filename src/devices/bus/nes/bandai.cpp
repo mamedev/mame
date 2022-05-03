@@ -123,7 +123,7 @@ void nes_oekakids_device::pcb_reset()
 void nes_fcg_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_fcg_device::irq_timer_tick), this));
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -144,7 +144,7 @@ void nes_fcg_device::pcb_reset()
 void nes_lz93d50_24c01_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_lz93d50_24c01_device::irq_timer_tick), this));
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -167,7 +167,7 @@ void nes_lz93d50_24c01_device::pcb_reset()
 void nes_fjump2_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_fjump2_device::irq_timer_tick), this));
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_reg));
@@ -281,25 +281,22 @@ void nes_oekakids_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_fcg_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(nes_fcg_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (m_irq_enable)
 	{
-		if (m_irq_enable)
-		{
-			// 16bit counter, IRQ fired when the counter goes from 1 to 0
-			// after firing, the counter is *not* reloaded, but next clock
-			// counter wraps around from 0 to 0xffff
-			if (!m_irq_count)
-				m_irq_count = 0xffff;
-			else
-				m_irq_count--;
+		// 16bit counter, IRQ fired when the counter goes from 1 to 0
+		// after firing, the counter is *not* reloaded, but next clock
+		// counter wraps around from 0 to 0xffff
+		if (!m_irq_count)
+			m_irq_count = 0xffff;
+		else
+			m_irq_count--;
 
-			if (!m_irq_count)
-			{
-				set_irq_line(ASSERT_LINE);
-				m_irq_enable = 0;
-			}
+		if (!m_irq_count)
+		{
+			set_irq_line(ASSERT_LINE);
+			m_irq_enable = 0;
 		}
 	}
 }

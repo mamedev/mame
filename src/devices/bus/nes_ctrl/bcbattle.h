@@ -31,16 +31,15 @@ public:
 	virtual uint8_t read_exp(offs_t offset) override;
 
 protected:
-	static constexpr device_timer_id TIMER_BATTLER = 1;
-
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	int read_current_bit();
+
+	TIMER_CALLBACK_MEMBER(scan_tick);
 
 	required_device<barcode_reader_device> m_reader;
 	uint8_t m_current_barcode[20];
