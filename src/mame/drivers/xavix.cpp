@@ -1977,7 +1977,7 @@ CONS( 2003, jarajal,   0,          0,  xavix_nv,         jarajal,  xavix_state, 
 
 CONS( 2003, tcarnavi,  0,          0,  xavix_nv,         jarajal,  xavix_state,          init_xavix,    "Tomy / SSD Company LTD",                       "Tomica Carnavi Drive (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2003, tomcpin,   0,          0,  xavix_i2c_24c02,  tomcpin,  xavix_i2c_state,          init_xavix,    "Tomy / SSD Company LTD",                       "Champiyon Pinball (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, tomcpin,   0,          0,  xavix_i2c_24c08,  tomcpin,  xavix_i2c_state,          init_xavix,    "Tomy / SSD Company LTD",                       "Champiyon Pinball (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2004, tomplc,   0,          0,  xavix_i2c_24c02,  tomcpin,  xavix_i2c_state,          init_xavix,    "Tomy / SSD Company LTD",                       "Nihon Isshuu - Boku wa Plarail Untenshi (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 

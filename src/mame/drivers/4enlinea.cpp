@@ -192,6 +192,7 @@
   - Proper UM487F device emulation.
   - Interlaced video mode.
   - Sound.
+  - k7_olym accesses i2c device with an id of 0xeb. Device is unknown.
   - More work...
 
 *************************************************************************/
