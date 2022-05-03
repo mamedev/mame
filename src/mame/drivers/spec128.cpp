@@ -330,7 +330,7 @@ bool spectrum_128_state::is_contended(offs_t offset) {
 	// Memory banks 1,3,5 and 7 are contended
 	u8 bank = m_bank_ram[3]->entry();
 	return spectrum_state::is_contended(offset)
-	|| ((offset >= 0xc000 && offset <= 0xffff) && (bank && 1));
+		|| ((offset >= 0xc000 && offset <= 0xffff) && (bank && 1));
 }
 
 static const gfx_layout spectrum_charlayout =

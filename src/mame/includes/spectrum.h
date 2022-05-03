@@ -221,7 +221,7 @@ public:
 		spectrum_state(mconfig, type, tag),
 		m_bank_rom(*this, "bank_rom%u", 0U),
 		m_bank_ram(*this, "bank_ram%u", 0U)
-		{ }
+	{ }
 
 	void spectrum_128(machine_config &config);
 
