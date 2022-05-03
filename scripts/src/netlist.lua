@@ -26,6 +26,13 @@ project "netlist"
 
 	addprojectflags()
 
+	configuration "Debug"
+		defines {
+			"NL_DEBUG=true",
+		}
+
+	configuration { }
+
 	defines {
 		"__STDC_CONSTANT_MACROS",
 		"NL_USE_ACADEMIC_SOLVERS=0",

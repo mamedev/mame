@@ -56,8 +56,8 @@ namespace devices
 		const netlist_time_ext now(exec().time());
 		const std::size_t nthreads = m_params.m_parallel() < 2 ? 1 : std::min(static_cast<std::size_t>(m_params.m_parallel()), plib::omp::get_max_threads());
 		const netlist_time_ext sched(now + (nthreads <= 1 ? netlist_time_ext::zero() : netlist_time_ext::from_nsec(100)));
-		plib::uninitialised_array<solver::matrix_solver_t *, config::MAX_SOLVER_QUEUE_SIZE::value> tmp; //NOLINT
-		plib::uninitialised_array<netlist_time, config::MAX_SOLVER_QUEUE_SIZE::value> nt; //NOLINT
+		plib::uninitialised_array<solver::matrix_solver_t *, config::max_solver_queue_size::value> tmp; //NOLINT
+		plib::uninitialised_array<netlist_time, config::max_solver_queue_size::value> nt; //NOLINT
 		std::size_t p=0;
 
 		while (!m_queue.empty())
