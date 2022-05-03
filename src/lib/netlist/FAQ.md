@@ -2,7 +2,7 @@
 
 ## Glosary
 
-BATANB: Bug that is not a bug.
+BTANB: Bugs That Aren't Bugs.
 
 ## General
 
