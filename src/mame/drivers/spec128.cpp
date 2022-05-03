@@ -201,7 +201,7 @@ u8 spectrum_128_state::spectrum_128_rom_r(offs_t offset)
 template <u8 Bank>
 void spectrum_128_state::spectrum_128_ram_w(offs_t offset, u8 data)
 {
-	u16 addr = 0x4000 * (Bank + 1) + offset;
+	u16 addr = 0x4000 * Bank + offset;
 	if (is_contended(addr)) content_early();
 	if (is_vram_write(addr)) m_screen->update_now();
 
@@ -211,7 +211,7 @@ void spectrum_128_state::spectrum_128_ram_w(offs_t offset, u8 data)
 template <u8 Bank>
 u8 spectrum_128_state::spectrum_128_ram_r(offs_t offset)
 {
-	u16 addr = 0x4000 * (Bank + 1) + offset;
+	u16 addr = 0x4000 * Bank + offset;
 	if (is_contended(addr)) content_early();
 
 	return ((u8*)m_bank_ram[Bank]->base())[offset];
@@ -247,7 +247,7 @@ void spectrum_128_state::spectrum_128_update_memory()
 {
 	m_bank_rom[0]->set_entry(BIT(m_port_7ffd_data, 4));
 	/* select ram at 0x0c000-0x0ffff */
-	m_bank_ram[2]->set_entry(m_port_7ffd_data & 0x07);
+	m_bank_ram[3]->set_entry(m_port_7ffd_data & 0x07);
 
 	m_screen->update_now();
 	if (BIT(m_port_7ffd_data, 3))
@@ -283,9 +283,9 @@ void spectrum_128_state::spectrum_128_io(address_map &map)
 void spectrum_128_state::spectrum_128_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rw(FUNC(spectrum_128_state::spectrum_128_rom_r), FUNC(spectrum_128_state::spectrum_128_rom_w));
-	map(0x4000, 0x7fff).rw(FUNC(spectrum_128_state::spectrum_128_ram_r<0>), FUNC(spectrum_128_state::spectrum_128_ram_w<0>));
-	map(0x8000, 0xbfff).rw(FUNC(spectrum_128_state::spectrum_128_ram_r<1>), FUNC(spectrum_128_state::spectrum_128_ram_w<1>));
-	map(0xc000, 0xffff).rw(FUNC(spectrum_128_state::spectrum_128_ram_r<2>), FUNC(spectrum_128_state::spectrum_128_ram_w<2>));
+	map(0x4000, 0x7fff).rw(FUNC(spectrum_128_state::spectrum_128_ram_r<1>), FUNC(spectrum_128_state::spectrum_128_ram_w<1>));
+	map(0x8000, 0xbfff).rw(FUNC(spectrum_128_state::spectrum_128_ram_r<2>), FUNC(spectrum_128_state::spectrum_128_ram_w<2>));
+	map(0xc000, 0xffff).rw(FUNC(spectrum_128_state::spectrum_128_ram_r<3>), FUNC(spectrum_128_state::spectrum_128_ram_w<3>));
 }
 
 void spectrum_128_state::spectrum_128_fetch(address_map &map)
@@ -299,17 +299,17 @@ void spectrum_128_state::machine_start()
 	memory_region *rom = memregion("maincpu");
 	m_bank_rom[0]->configure_entries(0, 2, rom->base() + 0x10000, 0x4000);
 
-	for (auto i = 0; i < 3; i++)
+	for (auto i = 1; i < 4; i++)
 		m_bank_ram[i]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
 }
 
 void spectrum_128_state::machine_reset()
 {
 	/* Bank 5 is always in 0x4000 - 0x7fff */
-	m_bank_ram[0]->set_entry(5);
+	m_bank_ram[1]->set_entry(5);
 
 	/* Bank 2 is always in 0x8000 - 0xbfff */
-	m_bank_ram[1]->set_entry(2);
+	m_bank_ram[2]->set_entry(2);
 
 	spectrum_state::machine_reset();
 
@@ -328,7 +328,7 @@ bool spectrum_128_state::is_vram_write(offs_t offset) {
 
 bool spectrum_128_state::is_contended(offs_t offset) {
 	// Memory banks 1,3,5 and 7 are contended
-	u8 bank = m_bank_ram[2]->entry();
+	u8 bank = m_bank_ram[3]->entry();
 	return spectrum_state::is_contended(offset)
 	|| ((offset >= 0xc000 && offset <= 0xffff) && (bank && 1));
 }
