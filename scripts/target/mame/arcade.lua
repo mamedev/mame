@@ -1756,8 +1756,6 @@ files {
 	MAME_DIR .. "src/mame/video/exprraid.cpp",
 	MAME_DIR .. "src/mame/drivers/ffantasy_ms.cpp",
 	MAME_DIR .. "src/mame/drivers/firetrap.cpp",
-	MAME_DIR .. "src/mame/includes/firetrap.h",
-	MAME_DIR .. "src/mame/video/firetrap.cpp",
 	MAME_DIR .. "src/mame/drivers/funkyjet.cpp",
 	MAME_DIR .. "src/mame/drivers/karnov.cpp",
 	MAME_DIR .. "src/mame/drivers/kchamp.cpp",
