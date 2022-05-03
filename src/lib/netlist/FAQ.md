@@ -10,7 +10,7 @@ BTANB: Bugs That Aren't Bugs.
 
 Yes I did. And decided against it. Which features? Forced randomness - will this
 be different at every restart? And it would require another parameter per device
-(specification, e.g. for resistors 5%, 10%, 20%). This would cause more cache 
+(specification, e.g. for resistors 5%, 10%, 20%). This would cause more cache
 usage.
 
 And I am convinced we would see more BTANBs.
@@ -18,9 +18,9 @@ And I am convinced we would see more BTANBs.
 ### How do frontiers work?
 
 Frontiers divides a netlist into sub netlists, i.e. a number of smaller netlists.
-Frontiers work best if you have a low impedance to high impedance transition. 
+Frontiers work best if you have a low impedance to high impedance transition.
 This is best illustrated by an example. Consider the following mixing stage
-	
+
 	                 R1
 	      S1 >-----1RRRR2---------+
 	                              |
@@ -32,9 +32,9 @@ This is best illustrated by an example. Consider the following mixing stage
 	                              R
 	                              |
 	                             GND
-	
+
 With `OPTIMIZE_FRONTIER(R2.2, R3, R2)` this becomes:
-	
+
 	                 R1
 	      S1 >-----1RRRR2--------------------------------+
 	                                                     |
@@ -49,7 +49,7 @@ With `OPTIMIZE_FRONTIER(R2.2, R3, R2)` this becomes:
 	                       # GND          Frontier  #   GND
 	                       #                        #
 	                       ##########################
-	
+
 As a result, provided there are no other connections between the parts
 generating S1 and S2 the "S2 part" will now have a separate solver.
 
@@ -57,64 +57,63 @@ The size (aka number of nets) of the solver for S1 will be smaller.
 The size of the solver for S2 and the rest of the circuit will be smaller
 as well.
 
-Frontiers assume that there is feedback from the "out" terminal to the "in" 
-terminal. This is a safe assumption is the "in" terminal e.g. is connected to an 
-op-amp output (typically < 500 Ohm) and R2 in the example above is in the 10 KHz range.
+Frontiers assume that there is little to no feedback from the "out" terminal to the "in"
+terminal. This is a safe assumption is the "in" terminal e.g. is connected to an
+op-amp output (typically < 500 Ohm) and R2 in the example above is in the 10 KOhm range.
 
 ## MAME specific
 
 ### Is there an example of a netlist that takes input from an AY-8910/2 and handles it?
 
-There are quite a couple:
+There are quite a few:
 
 - nl_kidniki.cpp
 - nl_konami.cpp
 - 1942.cpp
 
-Basically the AY8910 driver has to be configuredr to push resistor values to the
-input stream. The konami drivers (scramble, frogger and friends) do that and 
+Basically the AY8910 driver has to be configured to push resistor values to the
+input stream. The konami drivers (scramble, frogger and friends) do that and
 should be used as a reference. 1942 connects outputs and may be an even better example.
 
 ## Models
 
 ### Is there are JFET model?
 
-No, there is currently no JFET model in netlist. They are close to mosfets so 
+No, there is currently no JFET model in netlist. They are close to mosfets so
 you may try a generic n-mosfet with a negative trigger voltage. Example:
 
 	MOSFET(Q21, "NMOS(VTO=-1.0)")
 
-Writing an analog model is a very time-consuming task. JFETs are typically used 
-in switching applications and consequently the simplified model above should 
+Writing an analog model is a very time-consuming task. The simplified model above should
 deliver reasonable results.
 
 ## Operational Amplifiers
 
 ### What's UGF? Would like to understand this black magic a little better. :)
 
-UGF = Unity Gain Frequency, usually identical to gain-bandwidth product for 
-op-amps. The idea is that the an op-amp's open-loop gain (its amplification 
-factor when used without any negative feedback) is proportional to the 
+UGF = Unity Gain Frequency, usually identical to gain-bandwidth product for
+op-amps. The idea is that the an op-amp's open-loop gain (its amplification
+factor when used without any negative feedback) is proportional to the
 frequency of its input signal. For slowly-varying, near-DC signals, this gain
 will be extremely high (in this case, a gain of 10000 at 1 Hz), which is part
 of what makes an op-amp effective. In practice the op-amp's actual gain will
-be limited by whatever negative feedback is applied, but its open-loop gain 
+be limited by whatever negative feedback is applied, but its open-loop gain
 is a key quantity in computing its actual response. Because the op-amp is
-limited in how fast it can respond to its input, its open-loop gain will 
-drop as the frequency of the input signal rises, eventually falling to a 
-gain of 1 (output = input) at the unity gain frequency. In this case 
-couriersud set the unity gain frequency is 10 kHz, which is much lower than 
-reality, in order to make the op-amp response in the oscillators slower and 
-easier for the netlist solver to handle without using very small timesteps. 
-According to Texas Instruments, the TL084's actual gain-bandwidth product 
+limited in how fast it can respond to its input, its open-loop gain will
+drop as the frequency of the input signal rises, eventually falling to a
+gain of 1 (output = input) at the unity gain frequency. In this case
+couriersud set the unity gain frequency is 10 kHz, which is much lower than
+reality, in order to make the op-amp response in the oscillators slower and
+easier for the netlist solver to handle without using very small time steps.
+According to Texas Instruments, the TL084's actual gain-bandwidth product
 (remember, this is the same as the UGF) is typically 3 MHz.
 
 ## Documentation
 
 ### What is the preferred documentation format?
 
-The preferred documentation for devices is to use the netlist documentaion format.
-This will ensure that the devices are properly documented in the oxygen 
+The preferred documentation for devices is to use the netlist documentation format.
+This will ensure that the devices are properly documented in the Doxygen
 documentation created by `make doc`
 
 An example entry is given here:
@@ -144,7 +143,7 @@ An example entry is given here:
 	//-    http://pdf.datasheetcatalog.com/datasheets/400/335051_DS.pdf
 	//-
 	static NETLIST_START(SN74LS629_DIP)
-	
+
 If you add an example in the examples folder this will be included in the 
 documentation as well.
 
