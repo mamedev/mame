@@ -3217,7 +3217,7 @@ license:CC0
 		<description>World Heroes 2 (ALH-006)</description>
 		<year>1993</year>
 		<publisher>ADK</publisher>
-		<info name="serial" value="ALH-006, ALH-006"/>
+		<info name="serial" value="ALH-006"/>
 		<info name="release" value="19930604"/>
 		<info name="alt_title" value="ワールドヒーローズ2"/>
 		<sharedfeat name="release" value="AES" />
