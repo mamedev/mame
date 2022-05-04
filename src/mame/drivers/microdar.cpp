@@ -62,6 +62,7 @@ Known machines using this hardware:
 _____________________________________________________________________________________________________________________________________________________
 |Dumped | Name                | Manufacturer      | Notes                                                               | Machine type               |
 |-------|---------------------|-------------------|---------------------------------------------------------------------|----------------------------|
+|  NO   | King Dart 2         | CIC Play          | Slightly different PCB layout. Regular MCU instead of REF34VA       | Darts                      |
 |  NO   | Sagitario           | CIC Play          | CPU silkscreened "REF 0034 9115S", without manufacturer logos       | Darts                      |
 |  YES  | Far West            | Compumatic        | Standard Microdar SPD with Philips REF34VA                          | Electromechanical shooting |
 |  NO   | Party Darts         | Compumatic        | More info: http://www.recreativas.org/party-darts-4906-compumatic   | Darts                      |
