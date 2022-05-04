@@ -24,6 +24,12 @@
    SU2000 Hardware Info sources:
         An owner's breakdown of system: http://arianchen.de/su2000/status.html
 		Technical Manual: http://arianchen.de/su2000/files/su2000tech.pdf
+    
+   SU2000 and SD2000 share the same base hardware:
+        -Intel 486 DX-33 processor
+		-8MB RAM
+		-customised `Expality PIX 1000` card with 16MB Video RAM 
+		 (has Dual Motorola MC88110 CPU, and each game comes with independent firmware for both CPUs)
 
 
     TODO:
