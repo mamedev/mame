@@ -233,7 +233,7 @@ private:
 
 	uint8_t m_meters = 0;
 	uint8_t m_frame = 0;
-	bool m_auxbtt = false;
+//	bool m_auxbtt = false;
 };
 
 
