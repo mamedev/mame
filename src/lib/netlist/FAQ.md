@@ -80,8 +80,9 @@ should be used as a reference. 1942 connects outputs and may be an even better e
 
 ### Is there are JFET model?
 
-No, there is currently no JFET model in netlist. They are close to mosfets so
-you may try a generic n-mosfet with a negative trigger voltage. Example:
+No, there is currently no JFET model in netlist. They are close to depletion 
+mode MOSFETs with very low gate capacitance so you may try a generic n-mosfet 
+with a negative trigger voltage. Example:
 
 	MOSFET(Q21, "NMOS(VTO=-1.0)")
 
