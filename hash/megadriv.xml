@@ -10974,7 +10974,7 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="awepossm">
-		<description>Awesome Possum (USA)</description>
+		<description>Awesome Possum Kicks Dr. Machino's Butt! (USA)</description>
 		<year>1993</year>
 		<publisher>Tengen</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -10985,7 +10985,18 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="awepossmp" cloneof="awepossm">
-		<description>Awesome Possum (USA, Prototype)</description>
+		<description>Awesome Possum Kicks Dr. Machino's Butt! (USA, prototype, 19930712)</description>
+		<year>1993</year>
+		<publisher>Tengen</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="awesome possum (beta, 7-12-93-2).bin" size="2097152" crc="a541ac1c" sha1="8c1dab306b3b41cedd6a744d25b2111f879eb186"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="awepossmp1" cloneof="awepossm">
+		<description>Awesome Possum Kicks Dr. Machino's Butt! (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Tengen</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -10996,7 +11007,7 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="awepossmj" cloneof="awepossm">
-		<description>Awesome Possum (Jpn)</description>
+		<description>Awesome Possum Kicks Dr. Machino's Butt! (Japan)</description>
 		<year>1993</year>
 		<publisher>Tengen</publisher>
 		<info name="serial" value="T-48153"/>
