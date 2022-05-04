@@ -59,7 +59,7 @@ The size of the solver for S2 and the rest of the circuit will be smaller
 as well.
 
 Frontiers assume that there is little to no feedback from the "out" terminal to the "in"
-terminal. This is a safe assumption is the "in" terminal e.g. is connected to an
+terminal. This is a safe assumption if the "in" terminal e.g. is connected to an
 op-amp output (typically < 500 Ohm) and R2 in the example above is in the 10 KOhm range.
 
 ## MAME specific
