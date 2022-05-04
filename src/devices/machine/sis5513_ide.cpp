@@ -87,9 +87,7 @@ void sis5513_ide_device::config_map(address_map &map)
 //	map(0x52, 0x52) IDE misc control regs
 }
 
-// compatible mapping:
-// overrides BARs with legacy addresses but can values written can still be readout.
-// In practice we need to override writes and make sure we flush remapping accordingly
+#if 0
 void sis5513_ide_device::compatible_io_map(address_map &map)
 {
 	map(0x0170, 0x0177).rw(FUNC(sis5513_ide_device::ide2_read32_cs0_r), FUNC(sis5513_ide_device::ide2_write32_cs0_w));
@@ -97,6 +95,7 @@ void sis5513_ide_device::compatible_io_map(address_map &map)
 	map(0x0376, 0x0376).rw(FUNC(sis5513_ide_device::ide2_read_cs1_r), FUNC(sis5513_ide_device::ide2_write_cs1_w));
 	map(0x03f6, 0x03f6).rw(FUNC(sis5513_ide_device::ide1_read_cs1_r), FUNC(sis5513_ide_device::ide1_write_cs1_w));
 }
+#endif
 
 // $1f0
 void sis5513_ide_device::ide1_command_map(address_map &map)
@@ -128,6 +127,9 @@ void sis5513_ide_device::bus_master_ide_control_map(address_map &map)
 	map(0x8, 0xf).rw(m_ide2, FUNC(bus_master_ide_controller_device::bmdma_r), FUNC(bus_master_ide_controller_device::bmdma_w));
 }
 
+// TODO: should really use a set_remap_cb override
+// In compatible mode BARs with legacy addresses but can values written can still be readout.
+// In practice we need to override writes and make sure we flush remapping accordingly
 void sis5513_ide_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
@@ -137,13 +139,14 @@ void sis5513_ide_device::map_extra(uint64_t memory_window_start, uint64_t memory
 
 	if (compatible_mode)
 	{
-		io_space->install_device(0, 0x03ff, *this, &sis5513_ide_device::compatible_io_map);
-		LOGMAP("- Compatible Mode\n");
+		//io_space->install_device(0, 0x03ff, *this, &sis5513_ide_device::compatible_io_map);
+		//LOGMAP("- Compatible Mode\n");
 		intr_pin = 0;
-		// TODO: disable map banks
+		throw emu_fatalerror("sis5513 unimplemented Compatible mode");
 	}
 	else
 	{
+		// Native Mode
 		pclass |= 0xa;
 		intr_pin = 1;
 	}
