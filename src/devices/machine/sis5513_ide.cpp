@@ -176,20 +176,9 @@ void sis5513_ide_device::device_reset()
 void sis5513_ide_device::prog_if_w(u8 data)
 {
 	pclass = (pclass & ~0x5) | (data & 5);
-}
 
-#if 0
-void sis5513_ide_device::address_base_w(offs_t offset, uint32_t data)
-{
-	if (offset < 4)
-	{
-		m_bar[offset] = data;
-		pci_device::address_base_w(offset, data);
-	}
-	else
-		pci_device::address_base_w(offset, data);
+	// TODO: individual compatible mode levels
 }
-#endif
 
 u8 sis5513_ide_device::ide_ctrl_0_r()
 {
