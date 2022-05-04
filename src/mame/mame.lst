@@ -17016,6 +17016,9 @@ hotblock                        // (c) 1993 Nics? / NIX?
 hotblocka                       // (c) 1993 Nics? / NIX?
 hotblockb                       // (c) 1993 Nics? / NIX?
 
+@source:hotchili.cpp
+hotchili                        // (c) 1995 Pacific Gaming Pty Ltd.
+
 @source:hotstuff.cpp
 hotstuff                        //
 
