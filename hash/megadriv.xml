@@ -4679,7 +4679,6 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 		</part>
 	</software>
 
-	<!-- Called Thunder Force IV in other regions -->
 	<software name="lightfor" cloneof="tf4">
 		<description>Lightening Force (USA)</description>
 		<year>1992</year>
@@ -4989,7 +4988,6 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 		</part>
 	</software>
 
-	<!-- Called Tyrants Fight Through Time in USA region -->
 	<software name="megalo1" cloneof="megalo">
 		<description>Mega Lo Mania (Euro)</description>
 		<year>1992</year>
@@ -5017,7 +5015,6 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 		</part>
 	</software>
 
-	<!-- Called Rockman in Japan region -->
 	<software name="megaman">
 		<description>Mega Man - The Wily Wars (Euro)</description>
 		<year>1994</year>
@@ -6034,7 +6031,6 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 		</part>
 	</software>
 
-	<!-- Called Pac-Attack in USA region -->
 	<software name="pacpanic">
 		<description>Pac-Panic (Euro)</description>
 		<year>1993</year>
@@ -7917,7 +7913,6 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 		</part>
 	</software>
 
-	<!-- Called Bare Knuckle III in Japan region -->
 	<software name="sor3">
 		<description>Streets of Rage 3 (Euro)</description>
 		<year>1994</year>
@@ -8477,7 +8472,6 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 		</part>
 	</software>
 
-	<!-- Called TM Ninja Turtles in other regions -->
 	<software name="tmhthh">
 		<description>Teenage Mutant Hero Turtles - The Hyperstone Heist (Euro)</description>
 		<year>1992</year>
@@ -8594,7 +8588,6 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 		</part>
 	</software>
 
-	<!-- Called Lightening Force in USA region -->
 	<software name="tf4">
 		<description>Thunder Force IV (Euro)</description>
 		<year>1993</year>
@@ -8908,7 +8901,6 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 		</part>
 	</software>
 
-	<!-- Called Mega lo Mania in other regions -->
 	<software name="tyrant" cloneof="megalo">
 		<description>Tyrants - Fight Through Time (USA)</description>
 		<year>1992</year>
@@ -10867,7 +10859,6 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<!-- Called Art of Fighting in other regions -->
 	<software name="ryukoken" cloneof="aof">
 		<description>Ryuuko no Ken (Jpn)</description>
 		<year>1994</year>
@@ -12039,7 +12030,6 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<!-- Called Bio-Hazard Battle in other regions -->
 	<software name="crying" cloneof="biohazrb">
 		<description>Crying - Aseimei Sensou (Jpn)</description>
 		<year>1992</year>
@@ -12643,7 +12633,6 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<!-- Called Castlevania in other regions -->
 	<software name="akumajo" cloneof="cvania">
 		<description>Akumajou Dracula - Vampire Killer (Jpn)</description>
 		<year>1994</year>
@@ -12766,7 +12755,6 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<!-- Called The Chaos Engine in other regions -->
 	<software name="soldfort" cloneof="chaoseng">
 		<description>Soldiers of Fortune (USA)</description>
 		<year>1993</year>
@@ -17380,7 +17368,6 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<!-- Called Hyper Dunk in other regions -->
 	<software name="ddribble" cloneof="hyperdnk">
 		<description>Double Dribble - The Playoff Edition (USA)</description>
 		<year>1994</year>
@@ -19500,7 +19487,6 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<!-- Called Mega Man in other regions -->
 	<software name="rockman" cloneof="megaman">
 		<description>Rockman Mega World (Jpn)</description>
 		<year>1994</year>
@@ -19561,8 +19547,6 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-    <!-- This version is not Region Locked, unlike megalo1 -->
-	<!-- Called Tyrants Fight Through Time in USA -->
 	<software name="megalo">
 		<description>Mega Lo Mania (Euro, v1.1)</description>
 		<year>1992</year>
@@ -19574,7 +19558,6 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<!-- Called Tyrants Fight Through Time in USA region -->
 	<software name="megaloj" cloneof="megalo">
 		<description>Mega Lo Mania (Jpn)</description>
 		<year>1993</year>
@@ -22205,7 +22188,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<!-- Called Pac-Panic in Europe region -->
 	<software name="pacattak" cloneof="pacpanic">
 		<description>Pac-Attack (USA)</description>
 		<year>1993</year>
@@ -23779,7 +23761,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<!-- Called Ranger-X in other regions -->
 	<software name="exranza" cloneof="rangerx">
 		<description>Ex-Ranza (Jpn)</description>
 		<year>1993</year>
@@ -24627,7 +24608,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<!-- Called Samurai Showdown in other regions -->
 	<software name="samspir" cloneof="samsho">
 		<description>Samurai Spirits (Jpn)</description>
 		<year>1994</year>
@@ -25484,7 +25464,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<!-- Called Crusader of Centy in USA and Ragnacenty in Japan and Korea regions -->
 	<software name="soleil">
 		<description>Soleil (Euro)</description>
 		<year>1994</year>
@@ -25500,7 +25479,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<!-- Called Soleil in Europe and Ragnacenty in Japan and Korea regions -->
 	<software name="crusader" cloneof="soleil">
 		<description>Crusader of Centy (USA)</description>
 		<year>1994</year>
@@ -25516,7 +25494,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<!-- Called Soleil in Europe region and Crusader of Centy in USA region -->
 	<software name="ragnacen" cloneof="soleil">
 		<description>Shin Souseiki Ragnacenty (Jpn)</description>
 		<year>1994</year>
@@ -25547,7 +25524,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<!-- Called Crusader of Centy in USA region and Soleil in Europe region -->
 	<software name="ragnacenk" cloneof="soleil">
 		<description>Ragnacenty (Kor)</description>
 		<year>1994</year>
@@ -26967,7 +26943,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-    <!-- Known as The Story of Thor in other regions -->
 	<software name="beyoasis" cloneof="thor">
 		<description>Beyond Oasis (USA)</description>
 		<year>1995</year>
@@ -27089,7 +27064,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<!-- Called Bare Knuckle II in Japan region -->
 	<software name="sor2u" cloneof="sor2">
 		<description>Streets of Rage 2 (USA)</description>
 		<year>1992</year>
@@ -27102,7 +27076,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<!-- Called Streets of Rage 2 in other regions -->
 	<software name="bk2p" cloneof="sor2">
 		<description>Bare Knuckle II (Jpn, Prototype)</description>
 		<year>1992</year>
@@ -27303,7 +27276,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<!-- Called Streets of Rage 3 in other regions -->
 	<software name="bk3" cloneof="sor3">
 		<description>Bare Knuckle III (Jpn)</description>
 		<year>1994</year>
@@ -28328,7 +28300,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<!-- Called TMNT The Hyperstone Heist in other regions -->
 	<software name="tmntshj" cloneof="tmhthh">
 		<description>Teenage Mutant Ninja Turtles - Return of the Shredder (Jpn)</description>
 		<year>1992</year>
@@ -28531,7 +28502,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<!-- Called Lightening Force in USA region -->
 	<software name="tf4j" cloneof="tf4">
 		<description>Thunder Force IV (Jpn)</description>
 		<year>1992</year>
