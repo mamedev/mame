@@ -73,7 +73,7 @@ private:
 	uint8_t ide2_read_cs1_r();
 	void ide2_write_cs1_w(uint8_t data);
 
-//	void compatible_io_map(address_map &map);
+	void compatible_io_map(address_map &map);
 
 	u8 unmap_log_r(offs_t offset);
 	void unmap_log_w(offs_t offset, u8 data);

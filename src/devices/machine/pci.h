@@ -60,7 +60,7 @@ public:
 	virtual uint8_t header_type_r();
 	virtual uint8_t bist_r();
 	uint32_t address_base_r(offs_t offset);
-	virtual void address_base_w(offs_t offset, uint32_t data);
+	void address_base_w(offs_t offset, uint32_t data);
 	uint16_t subvendor_r();
 	uint16_t subsystem_r();
 	uint32_t expansion_base_r();
