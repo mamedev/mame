@@ -6,20 +6,22 @@
 
     preliminary driver by Phil Bennett
 
-   Known games (needs to be determined as to what games are SU2000 or SD2000 specific):
+   Known SU2000 games:
         * Boxing
-		* Buggy Ball
 		* Dactyl Nightmare SP
         * Dactyl Nightmare 2 - Race For The Eggs!
-		* Ghost Train
-		* Missile Command VR
 		* PacManVR
 		* Shoot For Loot
 		* Sphere
-		* X-Treme Strike
         * Zone Hunter
-
-   SU2000 Hardware Info:
+		
+    Known SD2000 games:
+		* Buggy Ball
+		* Ghost Train
+		* Missile Command VR
+		* X-Treme Strike
+		
+   SU2000 Hardware Info sources:
         An owner's breakdown of system: http://arianchen.de/su2000/status.html
 		Technical Manual: http://arianchen.de/su2000/files/su2000tech.pdf
 
