@@ -28,6 +28,11 @@ Known Non-Issues (confirmed on Real Genesis)
 #include "speaker.h"
 
 
+#define VERBOSE (LOG_GENERAL)
+
+#include "logmacro.h"
+
+
 void md_base_state::megadriv_z80_bank_w(uint16_t data)
 {
 	m_genz80.z80_bank_addr = ((m_genz80.z80_bank_addr >> 1) | (data << 23)) & 0xff8000;
@@ -35,13 +40,22 @@ void md_base_state::megadriv_z80_bank_w(uint16_t data)
 
 void md_base_state::megadriv_68k_z80_bank_write(uint16_t data)
 {
-	//logerror("%06x: 68k writing bit to bank register %01x\n", m_maincpu->pc(),data&0x01);
+	//LOG("%06x: 68k writing bit to bank register %01x\n", m_maincpu->pc(),data&0x01);
 	megadriv_z80_bank_w(data & 0x01);
 }
 
 void md_base_state::megadriv_z80_z80_bank_w(uint8_t data)
 {
-	//logerror("%04x: z80 writing bit to bank register %01x\n", m_maincpu->pc(),data&0x01);
+	//LOG("%04x: z80 writing bit to bank register %01x\n", m_maincpu->pc(),data&0x01);
+	// menghu tries to write 8 times 0xff from z80 side after you talk with the cashier twice.
+	// Without this guard game will trash 68k memory causing a crash, apparently works on real HW with everdrive
+	// so not coming from a cart copy protection.
+	// TODO: understand exact condition
+	if (data == 0xff)
+	{
+		LOG("%s: attempt to write an illegal 0x%02x to port $6000\n", machine().describe_context(), data);
+		return;
+	}
 	megadriv_z80_bank_w(data & 0x01);
 }
 
@@ -54,7 +68,7 @@ uint8_t md_base_state::megadriv_68k_YM2612_read(offs_t offset, uint8_t mem_mask)
 	}
 	else
 	{
-		logerror("%s: 68000 attempting to access YM2612 (read) without bus\n", machine().describe_context());
+		LOG("%s: 68000 attempting to access YM2612 (read) without bus\n", machine().describe_context());
 		return 0;
 	}
 
@@ -72,7 +86,7 @@ void md_base_state::megadriv_68k_YM2612_write(offs_t offset, uint8_t data, uint8
 	}
 	else
 	{
-		logerror("%s: 68000 attempting to access YM2612 (write) without bus\n", machine().describe_context());
+		LOG("%s: 68000 attempting to access YM2612 (write) without bus\n", machine().describe_context());
 	}
 }
 
@@ -309,7 +323,7 @@ uint16_t md_base_state::megadriv_68k_io_read(offs_t offset)
 	switch (offset)
 	{
 		case 0:
-			logerror("%06x read version register\n", m_maincpu->pc());
+			LOG("%06x read version register\n", m_maincpu->pc());
 			retdata = m_version_hi_nibble | 0x01; // Version number contained in bits 3-0
 			break;
 
@@ -486,14 +500,14 @@ uint16_t md_base_state::megadriv_68k_read_z80_ram(offs_t offset, uint16_t mem_ma
 	}
 	else
 	{
-		logerror("%06x: 68000 attempting to access Z80 (read) address space without bus\n", m_maincpu->pc());
+		LOG("%06x: 68000 attempting to access Z80 (read) address space without bus\n", m_maincpu->pc());
 		return machine().rand();
 	}
 }
 
 void md_base_state::megadriv_68k_write_z80_ram(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	//logerror("write z80 ram\n");
+	//LOG("write z80 ram\n");
 
 	if ((m_genz80.z80_has_bus == 0) && (m_genz80.z80_is_reset == 0))
 	{
@@ -512,7 +526,7 @@ void md_base_state::megadriv_68k_write_z80_ram(offs_t offset, uint16_t data, uin
 	}
 	else
 	{
-		logerror("%06x: 68000 attempting to access Z80 (write) address space without bus\n", m_maincpu->pc());
+		LOG("%06x: 68000 attempting to access Z80 (write) address space without bus\n", m_maincpu->pc());
 	}
 }
 
@@ -537,13 +551,13 @@ uint16_t md_base_state::megadriv_68k_check_z80_bus(offs_t offset, uint16_t mem_m
 		if (m_genz80.z80_has_bus || m_genz80.z80_is_reset) retvalue = nextvalue | 0x0100;
 		else retvalue = (nextvalue & 0xfeff);
 
-		//logerror("%06x: 68000 check z80 Bus (byte MSB access) returning %04x mask %04x\n", m_maincpu->pc(),retvalue, mem_mask);
+		//LOG("%06x: 68000 check z80 Bus (byte MSB access) returning %04x mask %04x\n", m_maincpu->pc(),retvalue, mem_mask);
 		return retvalue;
 
 	}
 	else if (!ACCESSING_BITS_8_15) // is this valid?
 	{
-		//logerror("%06x: 68000 check z80 Bus (byte LSB access) %04x\n", m_maincpu->pc(),mem_mask);
+		//LOG("%06x: 68000 check z80 Bus (byte LSB access) %04x\n", m_maincpu->pc(),mem_mask);
 		if (m_genz80.z80_has_bus || m_genz80.z80_is_reset) retvalue = 0x0001;
 		else retvalue = 0x0000;
 
@@ -551,7 +565,7 @@ uint16_t md_base_state::megadriv_68k_check_z80_bus(offs_t offset, uint16_t mem_m
 	}
 	else
 	{
-		//logerror("%06x: 68000 check z80 Bus (word access) %04x\n", m_maincpu->pc(),mem_mask);
+		//LOG("%06x: 68000 check z80 Bus (word access) %04x\n", m_maincpu->pc(),mem_mask);
 		if (m_genz80.z80_has_bus || m_genz80.z80_is_reset) retvalue = nextvalue | 0x0100;
 		else retvalue = (nextvalue & 0xfeff);
 
@@ -588,12 +602,12 @@ void md_base_state::megadriv_68k_req_z80_bus(offs_t offset, uint16_t data, uint1
 	{
 		if (data & 0x0100)
 		{
-			//logerror("%06x: 68000 request z80 Bus (byte MSB access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
+			//LOG("%06x: 68000 request z80 Bus (byte MSB access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
 			m_genz80.z80_has_bus = 0;
 		}
 		else
 		{
-			//logerror("%06x: 68000 return z80 Bus (byte MSB access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
+			//LOG("%06x: 68000 return z80 Bus (byte MSB access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
 			m_genz80.z80_has_bus = 1;
 		}
 	}
@@ -601,12 +615,12 @@ void md_base_state::megadriv_68k_req_z80_bus(offs_t offset, uint16_t data, uint1
 	{
 		if (data & 0x0001)
 		{
-			//logerror("%06x: 68000 request z80 Bus (byte LSB access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
+			//LOG("%06x: 68000 request z80 Bus (byte LSB access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
 			m_genz80.z80_has_bus = 0;
 		}
 		else
 		{
-			//logerror("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
+			//LOG("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
 			m_genz80.z80_has_bus = 1;
 		}
 	}
@@ -614,12 +628,12 @@ void md_base_state::megadriv_68k_req_z80_bus(offs_t offset, uint16_t data, uint1
 	{
 		if (data & 0x0100)
 		{
-			//logerror("%06x: 68000 request z80 Bus (word access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
+			//LOG("%06x: 68000 request z80 Bus (word access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
 			m_genz80.z80_has_bus = 0;
 		}
 		else
 		{
-			//logerror("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
+			//LOG("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
 			m_genz80.z80_has_bus = 1;
 		}
 	}
@@ -635,12 +649,12 @@ void md_base_state::megadriv_68k_req_z80_reset(offs_t offset, uint16_t data, uin
 	{
 		if (data & 0x0100)
 		{
-			//logerror("%06x: 68000 clear z80 reset (byte MSB access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
+			//LOG("%06x: 68000 clear z80 reset (byte MSB access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
 			m_genz80.z80_is_reset = 0;
 		}
 		else
 		{
-			//logerror("%06x: 68000 start z80 reset (byte MSB access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
+			//LOG("%06x: 68000 start z80 reset (byte MSB access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
 			m_genz80.z80_is_reset = 1;
 		}
 	}
@@ -648,12 +662,12 @@ void md_base_state::megadriv_68k_req_z80_reset(offs_t offset, uint16_t data, uin
 	{
 		if (data & 0x0001)
 		{
-			//logerror("%06x: 68000 clear z80 reset (byte LSB access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
+			//LOG("%06x: 68000 clear z80 reset (byte LSB access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
 			m_genz80.z80_is_reset = 0;
 		}
 		else
 		{
-			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
+			//LOG("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
 			m_genz80.z80_is_reset = 1;
 		}
 	}
@@ -661,12 +675,12 @@ void md_base_state::megadriv_68k_req_z80_reset(offs_t offset, uint16_t data, uin
 	{
 		if (data & 0x0100)
 		{
-			//logerror("%06x: 68000 clear z80 reset (word access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
+			//LOG("%06x: 68000 clear z80 reset (word access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
 			m_genz80.z80_is_reset = 0;
 		}
 		else
 		{
-			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
+			//LOG("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
 			m_genz80.z80_is_reset = 1;
 		}
 	}
