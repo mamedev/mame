@@ -417,21 +417,21 @@ void sis630_host_device::agp_command_w(offs_t offset, uint32_t data, uint32_t me
 
 	if (ACCESSING_BITS_0_7)
 	{
+		// quick checker, to be translated into an AGP interface
 		std::map<u8, std::string> agp_transfer_rates = {
+			{ 0, "(illegal 0)" },
 			{ 1, "1X" },
 			{ 2, "2X" },
+			{ 3, "(illegal 3)" },
 			{ 4, "4X" }
+			{ 5, "(illegal 5)" },
+			{ 6, "(illegal 6)" },
+			{ 7, "(illegal 7)" }
 		};
 
 		// make sure the AGP DATA_RATE specs are honored
-		try {
-			const u8 data_rate = data & 7;
-			LOGAGP("- DATA_RATE = %s\n", agp_transfer_rates.at(data_rate));
-			m_agp.data_rate = data_rate;
-		}
-		catch (std::out_of_range& err) {
-			LOG("Warning: AGP illegal DATA_RATE set = %d enabled=%d\n", data & 7, m_agp.enable);
-		}
+		LOGAGP("- DATA_RATE = %s enabled=%d\n", agp_transfer_rates.at(data & 7), m_agp.enable);
+		m_agp.data_rate = data_rate;
 
 		// should probably never be enabled since it reads out from the ID
 		if (data & 0x30)

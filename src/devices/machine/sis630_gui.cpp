@@ -459,20 +459,17 @@ void sis630_gui_device::agp_command_w(offs_t offset, uint32_t data, uint32_t mem
 
 	if (ACCESSING_BITS_0_7)
 	{
+		// quick checker, to be translated into an AGP interface
 		std::map<u8, std::string> agp_transfer_rates = {
+			{ 0, "(illegal 0)" },
 			{ 1, "1X" },
 			{ 2, "2X" },
+			{ 3, "(illegal 3)" }
 		};
 
 		// make sure the AGP DATA_RATE specs are honored
-		try {
-			const u8 data_rate = data & 3;
-			LOGAGP("- DATA_RATE = %s\n", agp_transfer_rates.at(data_rate));
-			m_agp.data_rate = data_rate;
-		}
-		catch (std::out_of_range& err) {
-			LOG("Warning: AGP illegal DATA_RATE set = %d enabled=%d\n", data & 3, m_agp.enable);
-		}
+		LOGAGP("- DATA_RATE = %s enabled=%d\n", agp_transfer_rates.at(data & 3), m_agp.enable);
+		m_agp.data_rate = data_rate;
 	}
 }
 
