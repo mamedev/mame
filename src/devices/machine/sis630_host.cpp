@@ -423,14 +423,15 @@ void sis630_host_device::agp_command_w(offs_t offset, uint32_t data, uint32_t me
 			{ 1, "1X" },
 			{ 2, "2X" },
 			{ 3, "(illegal 3)" },
-			{ 4, "4X" }
+			{ 4, "4X" },
 			{ 5, "(illegal 5)" },
 			{ 6, "(illegal 6)" },
 			{ 7, "(illegal 7)" }
 		};
 
 		// make sure the AGP DATA_RATE specs are honored
-		LOGAGP("- DATA_RATE = %s enabled=%d\n", agp_transfer_rates.at(data & 7), m_agp.enable);
+		const u8 data_rate = data & 7;
+		LOGAGP("- DATA_RATE = %s enabled=%d\n", agp_transfer_rates.at(data_rate), m_agp.enable);
 		m_agp.data_rate = data_rate;
 
 		// should probably never be enabled since it reads out from the ID

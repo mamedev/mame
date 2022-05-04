@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+/*
+ * References:
+ * - PCI local bus (rev 2.x)
+ * - https://wiki.osdev.org/PCI
+ */
 #include "emu.h"
 #include "pci.h"
 
@@ -263,6 +268,17 @@ void pci_device::expansion_base_w(offs_t offset, uint32_t data, uint32_t mem_mas
 	remap_cb();
 }
 
+// if non-zero a CAPability PoinTeR marks an offset in PCI config space where a standard extension is located
+// For example if capptr_r is 0xc0 then [offset+0xc0] has a capability identifier that is set with:
+// bits 31-16 <capability dependant, usually revision and supported sub-features>
+// bits 15-8 next capptr offset, 0x00 to determine the given item as last
+// bits 7-0 capability ID:
+// - 0x01 PMI Power Management Interface
+// - 0x02 AGP Accelerated Graphics Port
+// - 0x03 VPD Vital Product Data
+// - 0x04 Slot Identification
+// - 0x05 MSI Message Signaled Interrupts
+// - 0x06 CompactPCI Hot Swap
 uint8_t pci_device::capptr_r()
 {
 	return 0x00;

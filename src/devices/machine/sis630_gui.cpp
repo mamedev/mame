@@ -468,7 +468,8 @@ void sis630_gui_device::agp_command_w(offs_t offset, uint32_t data, uint32_t mem
 		};
 
 		// make sure the AGP DATA_RATE specs are honored
-		LOGAGP("- DATA_RATE = %s enabled=%d\n", agp_transfer_rates.at(data & 3), m_agp.enable);
+		const u8 data_rate = data & 3;
+		LOGAGP("- DATA_RATE = %s enabled=%d\n", agp_transfer_rates.at(data_rate), m_agp.enable);
 		m_agp.data_rate = data_rate;
 	}
 }
