@@ -935,7 +935,7 @@ void nes_bmc_gold7in1_device::device_start()
 
 void nes_bmc_gold7in1_device::pcb_reset()
 {
-	m_lock = 0;
+	m_lock = false;
 	mmc3_common_initialize(0x1f, 0xff, 0);
 }
 
