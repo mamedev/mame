@@ -22,7 +22,10 @@
     \- To bypass hold F7 while the "to install SCSI drivers [...] press F6" appears.
        And by F7 I really mean it :shrug:
 
-    - windows xp sp3: BSoDs during install with a STOP #0a IRQL_NOT_LESS_OR_EQUAL;
+    - windows xp sp3: BSoD during install with a STOP #0a IRQL_NOT_LESS_OR_EQUAL;
+
+    - windows neptune: BSoD during ethernet check (after time clock setup)
+	  with a STOP #a0 INTERNAL_POWER_ERROR with param1 0x5 ("reserved"!?)
 
     - gamecstl Kontron BIOS:
     \- hangs at PC=0xf3cf2, again wanting a SMI# from devtrap_en_w;

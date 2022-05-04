@@ -87,6 +87,9 @@ void sis5513_ide_device::config_map(address_map &map)
 //	map(0x52, 0x52) IDE misc control regs
 }
 
+// compatible mapping:
+// overrides BARs with legacy addresses but can values written can still be readout.
+// In practice we need to override writes and make sure we flush remapping accordingly
 void sis5513_ide_device::compatible_io_map(address_map &map)
 {
 	map(0x0170, 0x0177).rw(FUNC(sis5513_ide_device::ide2_read32_cs0_r), FUNC(sis5513_ide_device::ide2_write32_cs0_w));

@@ -42,6 +42,7 @@ protected:
 	
 private:
 	u8 m_downstream_ports;
+	u32 m_HcFmInterval = 0;
 
 	u8 unmap_log_r(offs_t offset);
 	void unmap_log_w(offs_t offset, u8 data);

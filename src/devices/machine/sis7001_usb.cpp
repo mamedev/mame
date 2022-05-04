@@ -48,6 +48,12 @@ void sis7001_usb_device::io_map(address_map &map)
 	// operational mode
 	map(0x000, 0x000).lr8(NAME([]() { return 0x00000110; }));
 	// ...
+	// HcFmInterval (Windows OSes fails if this isn't r/w)
+	map(0x034, 0x037).lrw32(
+		NAME([this]() { return m_HcFmInterval; } ),
+		NAME([this](offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_HcFmInterval); LOG("Write HcFmInterval %08x & %08x\n", data, mem_mask); })
+	);
+	// ...
 	 // HcRhDescriptorA, writeable except for 0x4ff
 	map(0x048, 0x04c).lr8(NAME([this]() { return 0x01000000 | m_downstream_ports; }));
 	// ...
@@ -83,4 +89,5 @@ void sis7001_usb_device::device_reset()
 	
 	command = 0x0000;
 	status = 0x0000;
+	m_HcFmInterval = 0;
 }
