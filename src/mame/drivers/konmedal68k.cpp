@@ -118,7 +118,10 @@ private:
 		}
 
 		if (offset & 1)
+		{
 			offset |= 0x100000;
+			offset &= ~1;
+		}
 
 		return m_k056832->piratesh_rom_r(offset);
 	}

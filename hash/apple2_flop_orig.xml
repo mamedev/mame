@@ -3628,10 +3628,13 @@ license:CC0
 		<!-- It requires a 48K Apple II or II+.
 		Due to compatibility issues created by the copy protection,
 		it will not run on later models. -->
+		<!-- This disk was redumped on March 30th, 2022 to fix
+		corruption related to a bug in early Applesauce FDC
+		firmware. -->
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="345853">
-				<rom name="choplifter.woz" size="345853" crc="00e91e75" sha1="7aa350181b6ebc2040b85fceebf767ad604eca51" />
+			<dataarea name="flop" size="360719">
+				<rom name="choplifter.woz" size="360719" crc="9d4dc01c" sha1="1c4983656937762ae71646480396cf50541efc94" />
 			</dataarea>
 		</part>
 	</software>
@@ -21616,6 +21619,951 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296683">
 				<rom name="the bank street writer iii 800k.woz" size="1296683" crc="c49de32c" sha1="e6617380de897d8f74e0724e004cf5850e697860"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv9">
+		<description>Copy II Plus (Version 9.0)</description>
+		<year>1989</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-29"/>
+		<sharedfeat name="compatibility" value="A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K enhanced Apple //e or later. -->
+		<!--"Copy II Plus" is a 1989 disk utility developed and distributed by Central Point Software. This is version 9.0. It requires a 128K enhanced Apple //e or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234768">
+				<rom name="copy ii plus v9.0 side a.woz" size="234768" crc="41bccf73" sha1="04e166d931c218bf9ac01dcd0500eca2a6b5c3ae"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234768">
+				<rom name="copy ii plus v9.0 side b.woz" size="234768" crc="33fd0e1d" sha1="7726f07aa41516f6f1c638555493555acdaa8415"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv84">
+		<description>Copy II Plus (Version 8.4)</description>
+		<year>1989</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-29"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Copy II Plus" is a 1989 disk utility developed and distributed by Central Point Software. This is version 8.4. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234779">
+				<rom name="copy ii plus v8.4.woz" size="234779" crc="369b4b0c" sha1="8b86c15238757bf66c64e52c41fad89fa41106ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv91">
+		<description>Copy II Plus (Version 9.1)</description>
+		<year>1990</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-29"/>
+		<sharedfeat name="compatibility" value="A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K enhanced Apple //e or later. -->
+		<!--"Copy II Plus" is a 1990 disk utility developed and distributed by Central Point Software. This is version 9.1. It requires a 128K enhanced Apple //e or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234772">
+				<rom name="copy ii plus v9.1 side a.woz" size="234772" crc="7e098a6e" sha1="71b78d9a478992b433685cef65e67bb657e08a84"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234772">
+				<rom name="copy ii plus v9.1 side b.woz" size="234772" crc="e14f2006" sha1="1b8f9d8eb2d8fd9385a063d69f690d66f65c24bb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv8135">
+		<description>Copy II Plus (Version 8.1) (800K 3.5")</description>
+		<year>1987</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-29"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or 64K //e or ][+ with a compatible drive controller card. -->
+		<!--"Copy II Plus" is a 1987 disk utility developed and distributed by Central Point Software. This is version 8.1, originally distributed on a single 3.5-inch disk. It requires an Apple IIgs, //c+, or 64K //e or ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="656151">
+				<rom name="copy ii plus v8.1 800k.woz" size="656151" crc="a859df1a" sha1="09d5b5a68a0ce96619d0b1f2663b6a58e8351d41"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv8235">
+		<description>Copy II Plus (Version 8.2) (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-29"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or 64K //e or ][+ with a compatible drive controller card. -->
+		<!--"Copy II Plus" is a 1988 disk utility developed and distributed by Central Point Software. This is version 8.2, originally distributed on a single 3.5-inch disk. It requires an Apple IIgs, //c+, or 64K //e or ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="673573">
+				<rom name="copy ii plus v8.2 800k.woz" size="673573" crc="86df9fff" sha1="b5385097198544d93a58d27c7b13d1ef0667a6c5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv8335">
+		<description>Copy II Plus (Version 8.3) (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-29"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or 64K //e or ][+ with a compatible drive controller card. -->
+		<!--"Copy II Plus" is a 1988 disk utility developed and distributed by Central Point Software. This is version 8.3, originally distributed on a single 3.5-inch disk. It requires an Apple IIgs, //c+, or 64K //e or ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="648964">
+				<rom name="copy ii plus v8.3 800k.woz" size="648964" crc="e0d31412" sha1="c3e8ed7e0f7f9d53e883fa743e550f7559b945a9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lsmith50c">
+		<description>Locksmith (Version 5.0 Revision C)</description>
+		<year>1983</year>
+		<publisher>Omega Microware</publisher>
+		<info name="release" value="2022-03-26"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Locksmith" is a 1983 disk utility developed and distributed by Omega Microware. This is version 5.0 revision C. It runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234792">
+				<rom name="locksmith v5.0c.woz" size="234792" crc="a50a0a75" sha1="6505f88cdd389f21e3638d8bcfc1df3bf88b7812"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lsmith50f">
+		<description>Locksmith (Version 5.0 Revision F)</description>
+		<year>1983</year>
+		<publisher>Omega Microware</publisher>
+		<info name="release" value="2022-03-26"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Locksmith" is a 1983 disk utility developed and distributed by Omega Microware. This is version 5.0 revision F. It runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234792">
+				<rom name="locksmith v5.0f.woz" size="234792" crc="961919c1" sha1="1e4769a0c14079ed163b27b8857b5674afb520e3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lsmith50g">
+		<description>Locksmith (Version 5.0 Revision G)</description>
+		<year>1983</year>
+		<publisher>Omega Microware</publisher>
+		<info name="release" value="2022-03-26"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Locksmith" is a 1983 disk utility developed and distributed by Omega Microware. This is version 5.0 revision G. It runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234803">
+				<rom name="locksmith v5.0g.woz" size="234803" crc="453629cd" sha1="9f8b59c4e5a21fdb5c41263f813a0e441c586217"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lsmith60a">
+		<description>Locksmith (Version 6.0 Revision A)</description>
+		<year>1986</year>
+		<publisher>Alpha Logic Business Systems</publisher>
+		<info name="release" value="2022-03-26"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Locksmith" is a 1986 disk utility developed and distributed by Alpha Logic Business Systems. This is version 6.0 revision A. It runs on any Apple ][ with 48K. This archive also includes Locksmith 6.0 Parameter Disk 1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="234798">
+				<rom name="locksmith v6.0a parameter disk 1.woz" size="234798" crc="88e3563c" sha1="ad16d3e5d07feef9871f01c678d59a6bc658faac"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="234790">
+				<rom name="locksmith v6.0a.woz" size="234790" crc="84b8d5ef" sha1="d782dab1994115295d00c6697f996269cf71e5fa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv8435">
+		<description>Copy II Plus (Version 8.4) (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-29"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or 64K //e or ][+ with a compatible drive controller card. -->
+		<!--"Copy II Plus" is a 1989 disk utility developed and distributed by Central Point Software. This is version 8.4, originally distributed on a single 3.5-inch disk. It requires an Apple IIgs, //c+, or 64K //e or ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296132">
+				<rom name="copy ii plus v8.4 800k.woz" size="1296132" crc="ce99eb30" sha1="9b0490ce057c59f4eec77fee1a94bb4a955567ed"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lsmith60b">
+		<description>Locksmith (Version 6.0 Revision B)</description>
+		<year>1986</year>
+		<publisher>Alpha Logic Business Systems</publisher>
+		<info name="release" value="2022-03-27"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Locksmith" is a 1986 disk utility developed and distributed by Alpha Logic Business Systems. This is version 6.0 revision B, created by booting version 6.0 revision A and executing the "patch to rev. B" file from Locksmith Parameter Disk 1D. It runs on any Apple ][ with 48K. This archive also includes Locksmith 6.0 Parameter Disk 1D.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Locksmith v6.0b"/>
+			<dataarea name="flop" size="234790">
+				<rom name="locksmith v6.0b.woz" size="234790" crc="9106c526" sha1="efdaec6e6c9592ea98e65b098dd19099f5f61149"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Locksmith 6.0B parameter disk 1D"/>
+			<!-- This disk upgrades 6.0A to 6.0B -->
+			<dataarea name="flop" size="234799">
+				<rom name="locksmith v6.0b parameter disk 1d.woz" size="234799" crc="e31292d4" sha1="bab8cc7a5f34a2a44954648b17f85997cacd443a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="edd30840206">
+		<description>Essential Data Duplicator (Version 3.0-1984-02-06)</description>
+		<year>1984</year>
+		<publisher>Utilico Microware</publisher>
+		<info name="release" value="2022-03-27"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Essential Data Duplicator" is a 1984 disk utility developed by Donald Anthony Schnapp and distributed by Utilico Microware. This is version 3.0-1984-02-06. It runs on any Apple ][ with 48K. Due to aggressive copy protection (!) this disk image does not boot in all emulators. It was verified working in &lt;a href="https://archive.org/details/OpenEmulatorSnapshots" rel="nofollow"&gt;OpenEmulator v1.1&lt;/a&gt;.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="248150">
+				<rom name="essential data duplicator iii v3.0-1984-02-06.woz" size="248150" crc="0a30990a" sha1="16dd4115b4dbba341504ee066500b5e6901b7cf5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="edd30840525">
+		<description>Essential Data Duplicator (Version 3.0-1984-05-25)</description>
+		<year>1984</year>
+		<publisher>Utilico Microware</publisher>
+		<info name="release" value="2022-03-27"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Essential Data Duplicator" is a 1984 disk utility developed by Donald Anthony Schnapp and distributed by Utilico Microware. This is version 3.0-1984-05-25. It runs on any Apple ][ with 48K. Due to aggressive copy protection (!) this disk image does not boot in all emulators. It was verified working in OpenEmulator v1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="247145">
+				<rom name="essential data duplicator iii v3.0-1984-05-25.woz" size="247145" crc="7b1493eb" sha1="1de36a7c74a19786cf4516b4d1f16e4c7164837e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="backitup36">
+		<description>Back It Up (Version 3.6)</description>
+		<year>1983</year>
+		<publisher>Sensible Software</publisher>
+		<info name="release" value="2022-03-27"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Back It Up" is a 1983 disk utility developed by Henry A. Roberts and distributed by Sensible Software. This is version 3.6. It runs on any Apple ][ with 48K. Due to aggressive copy protection (!) this disk image does not boot in all emulators. It was verified working in OpenEmulator v1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="121660">
+				<rom name="back it up iii v3.6.woz" size="121660" crc="9161150d" sha1="07398e4da71fcba119534eb56ec3feba26958170"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdiskc36">
+		<description>Super Disk Copy (Version 3.6)</description>
+		<year>1981</year>
+		<publisher>Sensible Software</publisher>
+		<info name="release" value="2022-03-27"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Super Disk Copy" is a 1981 disk utility developed and distributed by Sensible Software. This is version 3.6. It runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55078">
+				<rom name="super disk copy iii v3.6.woz" size="55078" crc="0f8a1ccb" sha1="c9d7aaf56ba52ecdd585d047538456b7ac08b876"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv31">
+		<description>Copy II Plus (Version 3.1)</description>
+		<year>1981</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-27"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple ][ with 16K. -->
+		<!--"Copy II Plus" is a 1981 disk utility developed by Michael D. Brown and distributed by Central Point Software. This is version 3.1. It runs on any Apple ][ with 16K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="15186">
+				<rom name="copy ii plus v3.1.woz" size="15186" crc="45de29aa" sha1="0eef8313f859807c27983503fb2d119135aed54e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv41">
+		<description>Copy II Plus (Version 4.1)</description>
+		<year>1982</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-27"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Copy II Plus" is a 1982 disk utility developed and distributed by Central Point Software. This is version 4.1. It runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="108311">
+				<rom name="copy ii plus v4.1.woz" size="108311" crc="894ffe65" sha1="d01d410cc8342bcefade73645dce0b888921ba4f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv43">
+		<description>Copy II Plus (Version 4.3)</description>
+		<year>1982</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-28"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Copy II Plus" is a 1982 disk utility developed and distributed by Central Point Software. This is version 4.3. It runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="114951">
+				<rom name="copy ii plus v4.3.woz" size="114951" crc="fc5b42b6" sha1="88e06eb03015e34e93552567182dd9f784bfd632"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv44b">
+		<description>Copy II Plus (Version 4.4B)</description>
+		<year>1982</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-28"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Copy II Plus" is a 1982 disk utility developed and distributed by Central Point Software. This is version 4.4B. It runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="121608">
+				<rom name="copy ii plus v4.4b.woz" size="121608" crc="ba994c7f" sha1="b83b96b2893382aef7c5639e863ead1bba8091f4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv44c">
+		<description>Copy II Plus (Version 4.4C)</description>
+		<year>1982</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-28"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Copy II Plus" is a 1982 disk utility developed and distributed by Central Point Software. This is version 4.4C. It runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="121624">
+				<rom name="copy ii plus v4.4c.woz" size="121624" crc="8a63d5d1" sha1="9dd8e366bd5bee3799b095b79c8af9d7b6d9d57a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv90">
+		<description>Copy II Plus (Version 9.0) (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-29"/>
+		<sharedfeat name="compatibility" value="A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or 128K enhanced //e with a compatible drive controller card. -->
+		<!--"Copy II Plus" is a 1989 disk utility developed and distributed by Central Point Software. This is version 9.0, originally distributed on a single 3.5-inch disk. It requires an Apple IIgs, //c+, or 128K enhanced //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296127">
+				<rom name="copy ii plus v9.0 800k.woz" size="1296127" crc="c79fd34f" sha1="0a80305970ca0bf9343d802f57b57b8d13b279b0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv44d">
+		<description>Copy II Plus (Version 4.4D)</description>
+		<year>1982</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-28"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Copy II Plus" is a 1982 disk utility developed and distributed by Central Point Software. This is version 4.4D. It runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="114968">
+				<rom name="copy ii plus v4.4d.woz" size="114968" crc="53924539" sha1="bed659673605bd09ad66467effb542bc98d9c807"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv50">
+		<description>Copy II Plus (Version 5.0)</description>
+		<year>1985</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-28"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Copy II Plus" is a 1985 disk utility developed and distributed by Central Point Software. This is version 5.0. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234763">
+				<rom name="copy ii plus v5.0.woz" size="234763" crc="702fb21c" sha1="9c72acaf2de148865bc33ab6fac58381464a4ea2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv51">
+		<description>Copy II Plus (Version 5.1)</description>
+		<year>1985</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-28"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Copy II Plus" is a 1985 disk utility developed and distributed by Central Point Software. This is version 5.1. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234790">
+				<rom name="copy ii plus v5.1.woz" size="234790" crc="e248dfab" sha1="b04452eca59beaa55969cc0313a038f2064a6b8e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv52">
+		<description>Copy II Plus (Version 5.2)</description>
+		<year>1985</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-28"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Copy II Plus" is a 1985 disk utility developed and distributed by Central Point Software. This is version 5.2. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234779">
+				<rom name="copy ][ plus v5.2.woz" size="234779" crc="a04ba6aa" sha1="c845787e1c00bb18f5c4f9beba9aa9f2f6794efd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv54">
+		<description>Copy II Plus (Version 5.4)</description>
+		<year>1985</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-28"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Copy II Plus" is a 1985 disk utility developed and distributed by Central Point Software. This is version 5.4. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234763">
+				<rom name="copy ii plus v5.4.woz" size="234763" crc="283968f7" sha1="78caf5814418a737dfb46e83f1afe89bf39740f9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv60">
+		<description>Copy II Plus (Version 6.0)</description>
+		<year>1985</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-28"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Copy II Plus" is a 1985 disk utility developed and distributed by Central Point Software. This is version 6.0. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234779">
+				<rom name="copy ii plus v6.0.woz" size="234779" crc="76f417b4" sha1="8bd75c716dc26f77674d841c39cfe6cced36b022"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv55">
+		<description>Copy II Plus (Version 5.5)</description>
+		<year>1985</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-28"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Copy II Plus" is a 1985 disk utility developed and distributed by Central Point Software. This is version 5.5. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234779">
+				<rom name="copy ii plus v5.5.woz" size="234779" crc="770ff4ff" sha1="be2f6599408505f6f7e815322798c066ed8d2122"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv61">
+		<description>Copy II Plus (Version 6.1)</description>
+		<year>1986</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-28"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Copy II Plus" is a 1986 disk utility developed and distributed by Central Point Software. This is version 6.1. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234790">
+				<rom name="copy ii plus v6.1.woz" size="234790" crc="26f79c70" sha1="dec82ff19d6b7615eb3e1f523226cb450f6449b1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv62">
+		<description>Copy II Plus (Version 6.2)</description>
+		<year>1986</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-28"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Copy II Plus" is a 1986 disk utility developed and distributed by Central Point Software. This is version 6.2. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234796">
+				<rom name="copy ii plus v6.2.woz" size="234796" crc="ffba2be5" sha1="2814e502f16bc987f67781f2202e20bd34e2f039"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv63">
+		<description>Copy II Plus (Version 6.3)</description>
+		<year>1986</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-28"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Copy II Plus" is a 1986 disk utility developed and distributed by Central Point Software. This is version 6.3. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234763">
+				<rom name="copy ii plus v6.3.woz" size="234763" crc="0d380137" sha1="c9be624f21224a2a20809a390f9537f6d90b3fc4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv9135">
+		<description>Copy II Plus (Version 9.1) (800K 3.5")</description>
+		<year>1990</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-29"/>
+		<sharedfeat name="compatibility" value="A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or 128K enhanced //e with a compatible drive controller card. -->
+		<!--"Copy II Plus" is a 1990 disk utility developed and distributed by Central Point Software. This is version 9.1, originally distributed on a single 3.5-inch disk. It requires an Apple IIgs, //c+, or 128K enhanced //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296127">
+				<rom name="copy ii plus v9.1 800k.woz" size="1296127" crc="c1be6735" sha1="82d0693f3674b75d7475e56a61bcce80a8546cc4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv64">
+		<description>Copy II Plus (Version 6.4)</description>
+		<year>1986</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-29"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Copy II Plus" is a 1986 disk utility developed and distributed by Central Point Software. This is version 6.4. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234763">
+				<rom name="copy ii plus v6.4.woz" size="234763" crc="ba0e1b61" sha1="3e74f6ecc3afb86f549895144032b208bf315e72"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv65">
+		<description>Copy II Plus (Version 6.5)</description>
+		<year>1986</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-29"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Copy II Plus" is a 1986 disk utility developed and distributed by Central Point Software. This is version 6.5. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234763">
+				<rom name="copy ii plus v6.5.woz" size="234763" crc="9e189810" sha1="6f844a71c8f6782129147b99d71f639298c5af59"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv66">
+		<description>Copy II Plus (Version 6.6)</description>
+		<year>1986</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-29"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Copy II Plus" is a 1986 disk utility developed and distributed by Central Point Software. This is version 6.6. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234763">
+				<rom name="copy ii plus v6.6.woz" size="234763" crc="e808a0c6" sha1="02610a44218fbf3c780e5f4c3ff4fe4ac89f6a1d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv71">
+		<description>Copy II Plus (Version 7.1)</description>
+		<year>1986</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-29"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Copy II Plus" is a 1986 disk utility developed and distributed by Central Point Software. This is version 7.1. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234763">
+				<rom name="copy ii plus v7.1.woz" size="234763" crc="ab6a5a0c" sha1="51ffed1a93c541ce0a5b9faaf76ea6514f0df8b0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv72">
+		<description>Copy II Plus (Version 7.2)</description>
+		<year>1986</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-29"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Copy II Plus" is a 1986 disk utility developed and distributed by Central Point Software. This is version 7.2. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234779">
+				<rom name="copy ii plus v7.2.woz" size="234779" crc="e2a09606" sha1="3b277b4bac185f046641c02f6a1b87a764634a58"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv73">
+		<description>Copy II Plus (Version 7.3)</description>
+		<year>1987</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-29"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Copy II Plus" is a 1987 disk utility developed and distributed by Central Point Software. This is version 7.3. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234779">
+				<rom name="copy ii plus v7.3.woz" size="234779" crc="3a96dd1b" sha1="c3cc0b335a1f07987361d482fef3a4d2f139c306"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv74">
+		<description>Copy II Plus (Version 7.4)</description>
+		<year>1987</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-29"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Copy II Plus" is a 1987 disk utility developed and distributed by Central Point Software. This is version 7.4. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234779">
+				<rom name="copy ii plus v7.4.woz" size="234779" crc="8d4d3560" sha1="461955279142f89320e3f7187bbda2b681a4d2ee"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv81">
+		<description>Copy II Plus (Version 8.1)</description>
+		<year>1987</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-29"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Copy II Plus" is a 1987 disk utility developed and distributed by Central Point Software. This is version 8.1. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234763">
+				<rom name="copy ii plus v8.1.woz" size="234763" crc="3808ee2d" sha1="eb22948c09f4f1add65bef80da7eb7e9de734bb7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv82">
+		<description>Copy II Plus (Version 8.2)</description>
+		<year>1988</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-29"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Copy II Plus" is a 1988 disk utility developed and distributed by Central Point Software. This is version 8.2. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234763">
+				<rom name="copy ii plus v8.2.woz" size="234763" crc="737590b8" sha1="d583faa91e718554306cfc24c4327b17283f3c59"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copy2pv83">
+		<description>Copy II Plus (Version 8.3)</description>
+		<year>1988</year>
+		<publisher>Central Point Software</publisher>
+		<info name="release" value="2022-03-29"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Copy II Plus" is a 1988 disk utility developed and distributed by Central Point Software. This is version 8.3. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234779">
+				<rom name="copy ii plus v8.3.woz" size="234779" crc="b548da95" sha1="fe50cee6796abdf0f336904c9c4c0b4d72c39d65"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kraking">
+		<description>Kraking by The Disk Jockey</description>
+		<year>1984</year>
+		<publisher>Pirate's Harbor</publisher>
+		<info name="release" value="2022-03-31"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Kraking by The Disk Jockey" is a 1984 educational program developed by The Disk Jockey and distributed by Pirate's Harbor. It runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234784">
+				<rom name="kraking by the disk jockey side a.woz" size="234784" crc="b4fac6c2" sha1="6323cfc61ae5f0cab30f7e82a75637c02acbb5e2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234784">
+				<rom name="kraking by the disk jockey side b.woz" size="234784" crc="a1fb6333" sha1="c3fa8345fa2f7b073899b1fb1c3911511fd80768"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="handmath135">
+		<description>Hands-On Math! Volume I (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Ventura Educational Systems</publisher>
+		<info name="release" value="2022-03-31"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card. -->
+		<!--"Hands-On Math! Volume I" is a 1988 educational program developed and distributed by Ventura Educational Systems. It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296178">
+				<rom name="hands-on math volume 1 800k.woz" size="1296178" crc="100c9d29" sha1="7d73389edc6dc343c6ade6b6f9774780e8b4cc31"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scpearth">
+		<description>Science Corner: Planet Earth (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Society for Visual Education</publisher>
+		<info name="release" value="2022-03-31"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card. -->
+		<!--"Science Corner: Planet Earth" is a 1989 educational program developed by Learningways, Inc. and distributed by Society for Visual Education. It requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296201">
+				<rom name="science corner- planet earth 800k.woz" size="1296201" crc="39eed016" sha1="9385d2f29b831d4c1b04442d3a3d7a63b671e723"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bnckmg">
+		<description>Bouncing Kamungas!</description>
+		<year>1983</year>
+		<publisher>Penguin Software</publisher>
+		<info name="release" value="2022-04-01"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Bouncing Kamungas!" is a 1983 action game developed by Tom Becklund and distributed by Penguin Software. It runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="81700">
+				<rom name="bouncing kamungas.woz" size="81700" crc="c4de657e" sha1="f2f6299d5efa68eeb087990daf3df560911e3950"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pigpen">
+		<description>Pig Pen</description>
+		<year>1982</year>
+		<publisher>Datamost</publisher>
+		<info name="release" value="2022-04-01"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Pig Pen" is a 1982 action game developed by TMQ Software and distributed by Datamost. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234773">
+				<rom name="pig pen.woz" size="234773" crc="5b6f8c25" sha1="b5e998751eaa35f884fe89b5dde3e7bf74c5de3e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ricochet">
+		<description>Ricochet</description>
+		<year>1982</year>
+		<publisher>Automated Simulations</publisher>
+		<info name="release" value="2022-04-01"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Ricochet" is a 1982 action game developed and distributed by Automated Simulations. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234805">
+				<rom name="ricochet.woz" size="234805" crc="ce1c4d9d" sha1="775f043ba627970753250732c9da7964f5ab9e54"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gseaskies">
+		<description>Grey Seas, Grey Skies</description>
+		<year>1983</year>
+		<publisher>Simulations Canada</publisher>
+		<info name="release" value="2022-04-01"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Grey Seas, Grey Skies" is a 1983 simulation game developed by W. J. Nichols and distributed by Simulations Canada. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234783">
+				<rom name="grey seas, grey skies.woz" size="234783" crc="13f63025" sha1="e4710714eea886f901787570d2b8d73724c7b74f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wcleaderb">
+		<description>World Class Leader Board</description>
+		<year>1987</year>
+		<publisher>Access Software</publisher>
+		<info name="release" value="2022-04-01"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"World Class Leader Board" is a 1987 sports game developed by Bruce and Roger Carver, ported to the Apple II by Vance Cook, and distributed by Access Software. It requires a 64K Apple ][+ or later. This archive also includes "World Class Famous Course Disk Volume 1", originally sold separately.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234815">
+				<rom name="world class leader board side a.woz" size="234815" crc="ac7104f3" sha1="b913bbcab30a3dad52cb28556bdeb4d34e67a4b4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="241471">
+				<rom name="world class leader board side b.woz" size="241471" crc="14e4bd7c" sha1="ee2fa7be8a79549f07f62925c1635b2ed6768ffd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="column2e">
+		<description>Columns //e (Version 2.01)</description>
+		<year>1991</year>
+		<publisher>Creative Computing Services</publisher>
+		<info name="release" value="2022-04-02"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!--"Columns //e" is a 1991 action game developed by Michael Foegelle and distributed by Creative Computing Services. This is version 2.01. It requires a 128K Apple //e or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234786">
+				<rom name="columns iie side a.woz" size="234786" crc="e3a97f52" sha1="3168f61af1f53375301ae030c6ae2882083ca79f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234786">
+				<rom name="columns iie side b.woz" size="234786" crc="5960a425" sha1="1578ecd41c8e3fb8d7a453b18e65fdc0e71101cf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wzdry0981">
+		<description>Wizardry: Proving Grounds of the Mad Overload (Version 05-SEP-81)</description>
+		<year>1981</year>
+		<publisher>Sir-Tech</publisher>
+		<info name="release" value="2022-04-02"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Wizardry: Proving Grounds of the Mad Overload" is a 1981 roleplaying game developed by Andrew Greenberg and Robert Woodhead, and distributed by Sir-Tech. This version is dated 05-SEP-81, the earliest known version. It runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Scenario disk"/>
+			<dataarea name="flop" size="234881">
+				<rom name="wizardry- proving grounds of the mad overlord v05-sep-81 side a - scenario.woz" size="234881" crc="01d521fe" sha1="2cd4d7f52a98e1a51787c89b82fa9f64dfa0fc3e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot disk"/>
+			<dataarea name="flop" size="234846">
+				<rom name="wizardry- proving grounds of the mad overlord v05-sep-81 side b - boot.woz" size="234846" crc="a7d80c8c" sha1="1f1ad5cb198a29e1934a744901ae71cccc82e300"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wzdry1281">
+		<description>Wizardry: Proving Grounds of the Mad Overload (Version 01-DEC-81)</description>
+		<year>1981</year>
+		<publisher>Sir-Tech</publisher>
+		<info name="release" value="2022-04-02"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Wizardry: Proving Grounds of the Mad Overload" is a 1981 roleplaying game developed by Andrew Greenberg and Robert Woodhead, and distributed by Sir-Tech. This version is dated 01-DEC-81. It runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Master scenario disk"/>
+			<dataarea name="flop" size="234884">
+				<rom name="wizardry- proving grounds of the mad overlord v01-dec-81 side a - master scenario.woz" size="234884" crc="caae12b7" sha1="78b15dbc13bcf61cf9f44a31d3478a565b010b0f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot disk"/>
+			<dataarea name="flop" size="234873">
+				<rom name="wizardry- proving grounds of the mad overlord v01-dec-81 side b - boot.woz" size="234873" crc="0a1eb2ab" sha1="36d42cdb06b5b7452c05ddccf5d6aa8182bdd790"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drugefct">
+		<description>Drugs: Their Effects on You</description>
+		<year>1987</year>
+		<publisher>Marshware</publisher>
+		<info name="release" value="2022-04-23"/>
+		<!--"Drugs: Their Effects on You" is a 1987 educational program developed by EduSystems, illustrated by Morse Software Illustrations, with consultants Donna L. Osness and James M. Schaefer, and distributed by Marshware. It is preserved here for the first time.-->
+        <!-- Be sure to read the story of actually obtaining and dumping this disk at
+        https://archive.org/details/PreservingDrugsTheirEffectsOnYou
+        It might leave you taped to your seat. -->
+        <!-- Side B is not Apple-format. -->
+        
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241629">
+				<rom name="drugs- their effects on you - disk 1, side a.woz" size="241629" crc="fd63a817" sha1="4f30cd771a60b6fed20973a86df5355d491ead8f" />
 			</dataarea>
 		</part>
 	</software>

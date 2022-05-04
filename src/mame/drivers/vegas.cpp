@@ -274,6 +274,7 @@
 #include "emu.h"
 
 #include "audio/dcs.h"
+#include "machine/midwayic.h"
 
 #include "bus/ata/idehd.h"
 #include "bus/rs232/rs232.h"
@@ -282,7 +283,6 @@
 #include "machine/idectrl.h"
 #include "machine/input_merger.h"
 #include "machine/ins8250.h"
-#include "machine/midwayic.h"
 #include "machine/pci-ide.h"
 #include "machine/pci.h"
 #include "machine/smc91c9x.h"
@@ -473,7 +473,7 @@ private:
 	void vegas_cs7_map(address_map &map);
 	void vegas_cs8_map(address_map &map);
 
-	static void hdd_config(device_t* device);
+	static void hdd_config(device_t *device);
 };
 
 /*************************************
@@ -1950,12 +1950,12 @@ void vegas_state::vegascore(machine_config &config)
 	screen.set_screen_update(PCI_ID_VIDEO, FUNC(voodoo_pci_device::screen_update));
 }
 
-void vegas_state::hdd_config(device_t* device)
+void vegas_state::hdd_config(device_t *device)
 {
 	// Set the disk dma transfer speed
-	static_cast<ide_hdd_device*>(device)->set_dma_transfer_time(attotime::from_usec(15));
+	dynamic_cast<ide_hdd_device *>(device)->set_dma_transfer_time(attotime::from_usec(15));
 	// Allow ultra dma
-	//uint16_t *identify_device = static_cast<ide_hdd_device*>(device)->identify_device_buffer();
+	//uint16_t *identify_device = dynamic_cast<ide_hdd_device *>(device)->identify_device_buffer();
 	//identify_device[88] = 0x7f;
 
 }
@@ -2057,7 +2057,9 @@ void vegas_state::denver(machine_config &config)
 
 void vegas_state::gauntleg(machine_config &config)
 {
-	vegas(config);
+	// Needs 250MHz MIPS or screen tearing occurs (See MT8064)
+	// Firmware frequency detection seems to have a bug, console reports 220MHz for a 200MHz cpu and 260MHz for a 250MHz cpu
+	vegas250(config);
 	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0b5d);
@@ -2072,7 +2074,8 @@ void vegas_state::gauntleg(machine_config &config)
 
 void vegas_state::gauntdl(machine_config &config)
 {
-	vegas(config);
+	// Needs 250MHz MIPS or screen tearing occurs (See MT8064)
+	vegas250(config);
 	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
 	dcs.set_dram_in_mb(4);
 	dcs.set_polling_offset(0x0b5d);
@@ -2687,10 +2690,10 @@ GAME( 1998, tenthdeg,   0,         tenthdeg, tenthdeg, vegas_state, init_tenthde
 // Vegas/Durango + Vegas SIO + Voodoo 2
 GAME( 1999, gauntdl,    0,         gauntdl,  gauntleg, vegas_state, init_gauntdl,  ROT0, "Midway Games", "Gauntlet Dark Legacy (version DL 2.52)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, gauntdl24,  gauntdl,   gauntdl,  gauntleg, vegas_state, init_gauntdl,  ROT0, "Midway Games", "Gauntlet Dark Legacy (version DL 2.4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, warfa,      0,         warfa,    warfa,    vegas_state, init_warfa,    ROT0, "Atari Games",  "War: The Final Assault (EPROM 1.9 Mar 25 1999, GUTS 1.3 Apr 20 1999, GAME Apr 20 1999)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, warfaa,     warfa,     warfa,    warfa,    vegas_state, init_warfa,    ROT0, "Atari Games",  "War: The Final Assault (EPROM 1.6 Jan 14 1999, GUTS 1.1 Mar 16 1999, GAME Mar 16 1999)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, warfab,     warfa,     warfa,    warfa,    vegas_state, init_warfa,    ROT0, "Atari Games",  "War: The Final Assault (EPROM 1.3 Apr 7 1999, GUTS 1.3 Apr 7 1999, GAME Apr 7 1999)", MACHINE_SUPPORTS_SAVE ) // version numbers comes from test mode, can be unreliable
-GAME( 1999, warfac,     warfa,     warfa,    warfa,    vegas_state, init_warfa,    ROT0, "Atari Games",  "War: The Final Assault (EPROM 1.91 Apr 13 1999, GUTS 1.3 Apr 7 1999, GAME Apr 7 1999)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, warfa,      0,         warfa,    warfa,    vegas_state, init_warfa,    ROT0, "Atari Games",  "War: Final Assault (EPROM 1.9 Mar 25 1999, GUTS 1.3 Apr 20 1999, GAME Apr 20 1999)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, warfaa,     warfa,     warfa,    warfa,    vegas_state, init_warfa,    ROT0, "Atari Games",  "War: Final Assault (EPROM 1.6 Jan 14 1999, GUTS 1.1 Mar 16 1999, GAME Mar 16 1999)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, warfab,     warfa,     warfa,    warfa,    vegas_state, init_warfa,    ROT0, "Atari Games",  "War: Final Assault (EPROM 1.3 Apr 7 1999, GUTS 1.3 Apr 7 1999, GAME Apr 7 1999)", MACHINE_SUPPORTS_SAVE ) // version numbers comes from test mode, can be unreliable
+GAME( 1999, warfac,     warfa,     warfa,    warfa,    vegas_state, init_warfa,    ROT0, "Atari Games",  "War: Final Assault (EPROM 1.91 Apr 13 1999, GUTS 1.3 Apr 7 1999, GAME Apr 7 1999)", MACHINE_SUPPORTS_SAVE )
 
 // Durango + DSIO + Voodoo 2
 GAME( 1999, roadburn,   0,         roadburn, roadburn, vegas_state, init_roadburn, ROT0, "Atari Games",  "Road Burners (ver 1.04)", MACHINE_SUPPORTS_SAVE )

@@ -614,8 +614,8 @@ void lependu_state::init_lependu()
 
 /*  break the loop at $cc53 that prevents to start a game
 
-	$cc53 lda $01c4
-	$cc56 bne $cc53
+    $cc53 lda $01c4
+    $cc56 bne $cc53
 */
 	ROM[0xcc56] = 0xea;
 	ROM[0xcc57] = 0xea;

@@ -191,6 +191,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("nina006",          NES_NINA006);
 	device.option_add_internal("bf9093",           NES_BF9093);
 	device.option_add_internal("bf9096",           NES_BF9096);
+	device.option_add_internal("bf9096a",          NES_BF9096A);
 	device.option_add_internal("goldenfive",       NES_GOLDEN5);
 	device.option_add_internal("ade",              NES_ALADDIN);
 	device.option_add_internal("cne_decathl",      NES_CNE_DECATHL);
@@ -221,7 +222,6 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("s74x374a",         NES_SACHEN_74X374_ALT);  // FIXME: Made up boards some different handling
 	device.option_add_internal("tcu01",            NES_SACHEN_TCU01);
 	device.option_add_internal("tcu02",            NES_SACHEN_TCU02);
-	device.option_add_internal("tengen_800008",    NES_TENGEN_800008);   // FIXME: Is this the same as CNROM?
 	device.option_add_internal("tengen_800032",    NES_TENGEN_800032);
 	device.option_add_internal("tengen_800037",    NES_TENGEN_800037);
 	device.option_add_internal("txc_22110",        NES_TXC_22110);
@@ -505,7 +505,6 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("onebus",           NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("pec586",           NES_NROM);    // UNSUPPORTED
 // are there dumps of games with these boards?
-	device.option_add_internal("bmc_hik_kof",      NES_NROM); // mapper 251 - UNSUPPORTED
 	device.option_add_internal("bmc_13in1jy110",   NES_NROM); //  [mentioned in FCEUMM source - we need more info] - UNSUPPORTED
 	device.option_add_internal("bmc_gk_192",       NES_NROM); //  [mentioned in FCEUMM source - we need more info] - UNSUPPORTED
 	device.option_add_internal("konami_qtai",      NES_NROM); //  [mentioned in FCEUMM source - we need more info] - UNSUPPORTED

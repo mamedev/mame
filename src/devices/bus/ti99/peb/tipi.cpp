@@ -58,14 +58,18 @@
     the mouse operations can be polled from the Raspberry in the
     intended way.
 
+    Logging
+    -------
+    Since we use a background thread for the websocket client, and logging
+    is not thread-safe, log output may look broken at some times.
+
+
     Michael Zapf
     March 20222
 
     References
 
     [1] TIPI description on Github: https://github.com/jedimatt42/tipi
-
-    TODO: Add ASYNC mode
 
 *****************************************************************************/
 
@@ -78,6 +82,8 @@
 #define LOG_PORTS      (1U<<4)
 #define LOG_CONFIG     (1U<<5)
 #define LOG_RPI        (1U<<6)
+#define LOG_QUEUE      (1U<<7)
+#define LOG_PROT       (1U<<8)
 
 #define VERBOSE ( LOG_GENERAL | LOG_WARN | LOG_CONFIG )
 #define RASPI "rpi"
@@ -95,7 +101,11 @@ tipi_card_device::tipi_card_device(const machine_config &mconfig, const char *ta
 	m_rpi(*this, RASPI),
 	m_address(0),
 	m_dsr(false),
-	m_portaccess(false)
+	m_portaccess(false),
+	m_waitinit(false),
+	m_rpiconn(false),
+	m_tc(0),
+	m_lasttc(0)
 {
 }
 
@@ -124,7 +134,7 @@ void tipi_card_device::readz(offs_t offset, uint8_t *value)
 	if (m_dsr)
 	{
 		// Lines A0-A12 directly connected to the EPROM (chip pin order)
-		// Lines A13-A15 connected to PLD
+		// Lines A13-A15 connected to PLD (currently not used)
 		int base = 0;
 		uint8_t* rom = &m_eprom[base | (m_address & 0x1fff)];
 		*value = *rom;
@@ -145,7 +155,8 @@ void tipi_card_device::readz(offs_t offset, uint8_t *value)
 			int val = 0;
 			if (m_address & 2)
 			{
-				val = m_rd;
+				val = m_indqueue.front();
+				m_indqueue.pop();
 				LOGMASKED(LOG_PORTS, "RDIN -> %02x\n", val);
 			}
 			else
@@ -199,6 +210,7 @@ void tipi_card_device::set_tc(u8 data)
 	if (m_tc != data)
 	{
 		m_tc = data;
+		m_lasttc = 0;
 		process_message();
 	}
 }
@@ -208,6 +220,15 @@ void tipi_card_device::set_tc(u8 data)
 */
 void tipi_card_device::debug_read(offs_t offset, uint8_t* value)
 {
+	int base = 0;
+	if (in_dsr_space(offset, true) && m_selected)
+	{
+		if ((offset & 0x1ff8)!=0x1ff8)  // not in mapping area
+		{
+			uint8_t* rom = &m_eprom[base | (offset & 0x1fff)];
+			*value = *rom;
+		}
+	}
 }
 
 /*
@@ -215,6 +236,7 @@ void tipi_card_device::debug_read(offs_t offset, uint8_t* value)
 */
 void tipi_card_device::debug_write(offs_t offset, uint8_t data)
 {
+	// No write allowed
 }
 
 /*
@@ -222,6 +244,7 @@ void tipi_card_device::debug_write(offs_t offset, uint8_t data)
 */
 void tipi_card_device::crureadz(offs_t offset, uint8_t *value)
 {
+	// No CRU read
 }
 
 /*
@@ -251,18 +274,24 @@ void tipi_card_device::cruwrite(offs_t offset, uint8_t data)
 
 void tipi_card_device::send(const char* message)
 {
-	*m_send_stream << message;
-	m_wsclient->send(m_send_stream);
+	if (m_rpiconn)
+	{
+		*m_send_stream << message;
+		m_wsclient->send(m_send_stream);
+	}
 }
 
 void tipi_card_device::send(u8* message, int len)
 {
-	for (int i=0; i < len; i++)
+	if (m_rpiconn)
 	{
-		LOGMASKED(LOG_RPI, "Sending byte %02x\n", message[i]);
-		*m_send_stream << message[i];
+		for (int i=0; i < len; i++)
+		{
+			LOGMASKED(LOG_RPI, "Sending byte %02x\n", message[i]);
+			*m_send_stream << message[i];
+		}
+		m_wsclient->send(m_send_stream, nullptr, 130);  // binary (10000010)
 	}
-	m_wsclient->send(m_send_stream, nullptr, 130);  // binary (10000010)
 }
 
 enum
@@ -310,60 +339,61 @@ void tipi_card_device::process_message()
 {
 	if (m_tc == TSRSET)   // Reset command
 	{
+		LOGMASKED(LOG_PROT, "Reset\n");
 		m_rpimessage = nullptr;
 		m_msgindex = -2;
 		m_rc = m_tc;
-		send("SYNC");
+		m_lasttc = 0;
+
+		if (m_syncmode)
+		{
+			LOGMASKED(LOG_PROT, "Sending SYNC\n");
+			send("SYNC");   // only for SYNC mode
+		}
 	}
 	else
 	{
-		if ((m_tc & 0xfe) == TSWB)    // 02 and 03: write byte (LSB as strobe)
+		if (m_lasttc != m_tc)
 		{
-			if (m_msgindex == -2)
-				m_msglength = m_td << 8;
-			else
+			if ((m_tc & 0xfe) == TSWB)    // 02 and 03: write byte (LSB as strobe)
 			{
-				if (m_msgindex == -1)
+				switch (m_msgindex)
 				{
+				case -2:
+					m_msglength = m_td << 8;
+					break;
+				case -1:
 					m_msglength |= m_td;
 					m_rpimessage = std::make_unique<u8[]>(m_msglength);
-				}
-				else
-				{
+					break;
+				default:
 					if (m_rpimessage != nullptr)
 						m_rpimessage[m_msgindex] = m_td;
 				}
-			}
 
-			m_msgindex++;
-			if (m_msgindex == m_msglength)
-			{
-				// Message is complete - transmit it
-				LOGMASKED(LOG_RPI, "Sending message, length %d\n", m_msglength);
-				send(m_rpimessage.get(), m_msglength);
-				m_rpimessage = nullptr;
-			}
-			m_rc = m_tc;   // Auto-acknowledge
-		}
-		else
-		{
-			if ((m_tc & 0xfe) == TSRB)    // 06 and 07: read byte (LSB as strobe)
-			{
-				if (m_rpimessage != nullptr)
+				m_msgindex++;
+
+				if (m_msgindex == m_msglength)
 				{
-					if (m_msgindex == -2)
-						m_rd = (m_msglength >> 8)& 0xff;
-					else
+					// Message is complete - transmit it
+					LOGMASKED(LOG_RPI, "Sending message, length %d\n", m_msglength);
+					send(m_rpimessage.get(), m_msglength);
+					m_rpimessage = nullptr;
+				}
+				else
+					m_lasttc = m_tc;
+
+				m_rc = m_tc;   // Auto-acknowledge
+			}
+			else
+			{
+				if ((m_tc & 0xfe) == TSRB)   // 06 and 07: read byte (LSB as strobe)
+				{
+					if (!m_indqueue.empty())
 					{
-						if (m_msgindex == -1)
-							m_rd = m_msglength & 0xff;
-						else
-						{
-							m_rd = m_rpimessage[m_msgindex];
-						}
+						m_rc = m_tc;   // Auto-acknowledge
+						m_lasttc = m_tc;
 					}
-					m_msgindex++;
-					m_rc = m_tc;   // Auto-acknowledge
 				}
 			}
 		}
@@ -378,7 +408,7 @@ void tipi_card_device::process_message()
 */
 void tipi_card_device::open_websocket()
 {
-	if (m_rpi->exists())
+	if (m_rpiconn)
 	{
 		// We are just interested in the file name
 		// Cannot call it "socket.xxx" because this will make sdlsocket open
@@ -394,7 +424,7 @@ void tipi_card_device::open_websocket()
 
 			shost += "/tipi";
 
-			LOGMASKED(LOG_CONFIG, "Connection to Raspberry Pi at %s\n", shost.c_str());
+			LOG("Trying to connect to Raspberry Pi at %s\n", shost.c_str());
 
 			m_wsclient = std::make_unique<webpp::ws_client>(shost);
 			webpp::ws_client* wsc = m_wsclient.get();
@@ -422,14 +452,15 @@ void tipi_card_device::open_websocket()
 		else
 			fatalerror("Invalid TIPI connection address. Syntax: -conn rpi.<host>[:<port>]\n");
 	}
-	else
-		LOGMASKED(LOG_CONFIG, "No Raspberry Pi connected\n");
 }
 
 void tipi_card_device::websocket_opened()
 {
-	LOGMASKED(LOG_RPI, "Opening connection\n");
+	LOG("Connection established\n");
 	m_connected = true;
+	m_rc = 0;
+
+	if (m_waitinit) m_slot->set_ready(ASSERT_LINE);
 }
 
 void tipi_card_device::websocket_incoming(std::shared_ptr<webpp::ws_client::Message> message)
@@ -441,7 +472,7 @@ void tipi_card_device::websocket_incoming(std::shared_ptr<webpp::ws_client::Mess
 		LOGMASKED(LOG_RPI, "Got text message: %s\n", message->string());
 		if (message->string().find("RD=")==0)
 		{
-			m_rd = std::stoi(message->string().substr(3));
+			m_indqueue.push(std::stoi(message->string().substr(3)));
 		}
 		if (message->string().find("RC=")==0)
 		{
@@ -451,12 +482,25 @@ void tipi_card_device::websocket_incoming(std::shared_ptr<webpp::ws_client::Mess
 
 	case 2:
 		LOGMASKED(LOG_RPI, "Got binary message, length %d\n", message->size());
-		m_rpimessage = std::make_unique<u8[]>(message->size());
-		for (int i=0; i < message->size(); i++)
-			m_rpimessage[i] = (u8)message->get();
+		// Enqueue the incoming message
+		// as n1 n2 msg, where n1 and n2 are the length of the message,
+		// and msg is the byte sequence of the message.
+		{
+			u8 len1 = (message->size()>>8) & 0xff;
+			u8 len2 = message->size() & 0xff;
+			m_indqueue.push(len1);
+			LOGMASKED(LOG_QUEUE, "<- %02x (len1) [%d]\n", len1, m_indqueue.size());
+			m_indqueue.push(len2);
+			LOGMASKED(LOG_QUEUE, "<- %02x (len2) [%d]\n", len2, m_indqueue.size());
+		}
 
-		m_msglength = message->size();
-		m_msgindex = -2;
+		for (int i=0; i < message->size(); i++)
+		{
+			u8 msgbyte = (u8)message->get();
+			m_indqueue.push(msgbyte);
+			LOGMASKED(LOG_QUEUE, "<- %02x [%d]\n", msgbyte, m_indqueue.size());
+		}
+
 		process_message();
 		break;
 
@@ -474,18 +518,24 @@ void tipi_card_device::websocket_error(const std::error_code& code)
 		if (m_attempts > 0)
 		{
 			m_attempts--;
-			LOGMASKED(LOG_CONFIG, "Error, connection reset. Retrying.\n");
-			m_restart_timer->adjust(attotime::from_msec(1000));
+			LOGMASKED(LOG_WARN, "Error, connection reset. Retrying.\n");
+			m_restart_timer->adjust(attotime::from_msec(2500));
 		}
 		else
 		{
-			LOGMASKED(LOG_CONFIG, "Connection is reset on setup several times; giving up\n");
+			LOGMASKED(LOG_WARN, "Connection has been reset several times; giving up\n");
 			m_connected = false;
 		}
 	}
 	else
 	{
-		LOGMASKED(LOG_RPI, "Got error: %s (%d)\n", code.message().c_str(), code.value());
+		// End-of-file (2) occurs when the Pi is rebooted
+		LOGMASKED(LOG_WARN, "Got error: %s (%d)\n", code.message().c_str(), code.value());
+		// Reconnection is not implemented on the Pi side for emulations,
+		// so this may cause the config program to wait forever
+		// Needs to be documented
+		m_restart_timer->adjust(attotime::from_msec(20000));
+		m_attempts = 20;
 	}
 }
 
@@ -500,10 +550,12 @@ void tipi_card_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 
 void tipi_card_device::websocket_closed(int i, const std::string& msg)
 {
-	LOGMASKED(LOG_RPI, "Closing connection\n");
-	// Open it again after 2 secs
+	LOG("Closing connection\n");
+	if (m_waitinit) m_slot->set_ready(CLEAR_LINE);
+	// Open it again after 3 secs
 	m_wsclient->stop();
 	m_restart_timer->adjust(attotime::from_msec(3000));
+	m_attempts = 5;
 }
 
 void tipi_card_device::device_start()
@@ -519,20 +571,33 @@ void tipi_card_device::device_start()
 	save_item(NAME(m_tc));
 	save_item(NAME(m_td));
 	save_item(NAME(m_rc));
-	save_item(NAME(m_rd));
+	save_item(NAME(m_lasttc));
 
 	m_restart_timer = timer_alloc(0);
-	m_attempts = 5;
+	m_rpiconn = (m_rpi->exists());
 }
 
 void tipi_card_device::device_reset()
 {
 	m_cru_base = (ioport("SW1")->read()) << 8;
+	m_waitinit = (ioport("WAIT")->read()!=0);
+	m_syncmode = (ioport("MODE")->read()!=0);
 	m_address = 0;
 	m_dsr = false;
 	m_portaccess = false;
+	if (!m_rpiconn) LOGMASKED(LOG_CONFIG, "No Raspberry Pi connected\n");
 	open_websocket();
 	m_connected = false;
+	m_lasttc = 0;
+	m_attempts = 5;
+}
+
+void tipi_card_device::device_stop()
+{
+	// MZ: Without this I'm getting segfaults/list corruption
+	// when leaving the emulation
+	m_wsclient = NULL;
+	LOG("Stopping TIPI\n");
 }
 
 /*
@@ -540,7 +605,7 @@ void tipi_card_device::device_reset()
 */
 INPUT_PORTS_START( tipi )
 	PORT_START("SW1")
-	PORT_DIPNAME(0x1f, 0x10, "TIPI card CRU base")
+	PORT_DIPNAME(0x1f, 0x10, "CRU base")
 		PORT_DIPSETTING(0x10, "1000") // Default setting
 		PORT_DIPSETTING(0x11, "1100")
 		PORT_DIPSETTING(0x12, "1200")
@@ -557,6 +622,15 @@ INPUT_PORTS_START( tipi )
 		PORT_DIPSETTING(0x1d, "1d00")
 		PORT_DIPSETTING(0x1e, "1e00")
 		PORT_DIPSETTING(0x1f, "1f00")
+	PORT_START("WAIT")
+	PORT_CONFNAME(0x01, 0x00, "Wait for initialization")
+		PORT_CONFSETTING( 0x00, DEF_STR( Off ) )
+		PORT_CONFSETTING( 0x01, DEF_STR( On ) )
+	PORT_START("MODE")
+	PORT_CONFNAME(0x01, 0x00, "Transfer mode")
+		PORT_CONFSETTING( 0x00, "async" )
+		PORT_CONFSETTING( 0x01, "sync" )
+
 INPUT_PORTS_END
 
 void tipi_card_device::device_add_mconfig(machine_config &config)

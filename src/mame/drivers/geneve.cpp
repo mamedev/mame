@@ -496,6 +496,10 @@ void geneve_state::setaddress_debug(bool debug, offs_t address, uint8_t busctrl)
 		// See V9938 specs
 		m_pal->csw_in(m_gatearray->csw_out());
 		m_pal->csr_in(m_gatearray->csr_out());
+
+		// Trigger the 9901 clock when A10=1
+		if ((address & 0x0020) != 0)
+			m_tms9901->update_clock();
 	}
 
 	// Going to the box

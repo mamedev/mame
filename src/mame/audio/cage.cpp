@@ -4,12 +4,84 @@
 
     Atari CAGE Audio Board
 
+    Atari CH31.2 sound board layout:
+    --------------------------------
+
+    ATARI GAMES (C) 93 MADE IN U.S.A.
+    |-----------------------------------------------------------|
+    |         JXBUS|---------------------------------|          |
+    |              |---------------------------------|  JPWR    |
+    |       |---------|                                         |
+    |JROMBUS|   11A   |                                         |
+    | |--|  |---------|                                         |
+    | |  ||-----------|                                         |
+    | |  ||    11B    |                                         |
+    | |  ||-----------|                                         |
+    | |  ||-----------|                     3B                  |
+    | |  ||    11C    | RAM  RAM  RAM  RAM                      |
+    | |  ||-----------|                                         |
+    | |  ||-----------|                                         |
+    | |  ||    11D    |                                         |
+    | |  ||-----------|                     3D                  |
+    | |  ||-----------|      |-----------|                      |
+    | |  ||    11E    |      |           |                      |
+    | |  ||-----------|      |    DSP    |                      |
+    | |  |                   |           |                 AMP  |
+    | |--|OSC                |-----------|  JSPKR               |
+    |                                                           |
+    |-----------------------------------------------------------|
+
+    DSP: TMS320C31 33.8688MHz
+    OSC: 33.8688MHz
+    11A: DIP32 EPROM for Boot
+    11B, 11C, 11D, 11E: DIP42 Mask ROM for Data
+    RAM: 32Kx8 bit SRAM
+    3B: AK4316-VS DAC, Not populated in primal rage (no quad channel sound support)
+    3D: AK4316-VS DAC
+    AMP: TDA1554Q Audio amplifier for connect speaker directly
+    JROMBUS: ROM expansion connector
+    JXBUS: X-Bus host interface
+    JSPKR: Audio output connector, Connect to external speaker or motherboard/AMP board
+    JPWR: Power supply connector, Connect to external power distribution board or motherboard
+
+    Pinouts:
+
+    JSPKR:
+    ---------------
+    01  Channel 1 +
+    02  Channel 1 -
+    03  Channel 2 +
+    04  Channel 2 -
+    05  Key
+    06  Channel 3 +
+    07  Channel 3 -
+    08  Channel 4 +
+    09  Channel 4 -
+    10  Subwoofer +
+    11  Subwoofer -
+
+    JPWR:
+    ----------------
+    01  +5V
+    02  +5V
+    03  Key
+    04  GND
+    05  GND
+    06  +12V
+    07  +12V
+    08  -5V
+    09  GND
+
+    TODO:
+    - Move DSP internal functions into tms32031.cpp
+    - Further support for variable sound output channel
+    - Support subwoofer output
+
 ****************************************************************************/
 
 
 #include "emu.h"
 #include "cage.h"
-#include "speaker.h"
 
 
 #define LOG_COMM            (0)
@@ -23,7 +95,7 @@
  *
  *************************************/
 
-#define DAC_BUFFER_CHANNELS     4
+#define DAC_BUFFER_CHANNELS     4 // 5; 4 channel + subwoofer?
 #define STACK_SOUND_BUFSIZE     (1024)
 
 /*************************************
@@ -105,6 +177,7 @@ static const char *const register_names[] =
  *
  *************************************/
 
+// uses Atari CH31(.2) external sound board
 DEFINE_DEVICE_TYPE(ATARI_CAGE, atari_cage_device, "atari_cage", "Atari CAGE")
 
 
@@ -119,6 +192,7 @@ atari_cage_device::atari_cage_device(const machine_config &mconfig, const char *
 
 atari_cage_device::atari_cage_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
+	device_mixer_interface(mconfig, *this, 5), // 5 output routines in JSPKR
 	m_cpu(*this, "cpu"),
 	m_cageram(*this, "cageram"),
 	m_soundlatch(*this, "soundlatch"),
@@ -337,7 +411,7 @@ void atari_cage_device::update_serial()
 	freq = m_serial_period_per_word.as_hz() / DAC_BUFFER_CHANNELS;
 	if (freq > 0 && freq < 100000)
 	{
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < DAC_BUFFER_CHANNELS; i++)
 		{
 			m_dmadac[i]->set_frequency(freq);
 			m_dmadac[i]->enable(1);
@@ -617,7 +691,7 @@ void atari_cage_seattle_device::cage_map_seattle(address_map &map)
 void atari_cage_device::device_add_mconfig(machine_config &config)
 {
 	/* basic machine hardware */
-	TMS32031(config, m_cpu, 33868800);
+	TMS32031(config, m_cpu, XTAL(33'868'800));
 	m_cpu->set_addrmap(AS_PROGRAM, &atari_cage_device::cage_map);
 	m_cpu->set_mcbl_mode(true);
 
@@ -626,27 +700,25 @@ void atari_cage_device::device_add_mconfig(machine_config &config)
 	TIMER(config, m_timer[1]).configure_generic(DEVICE_SELF, FUNC(atari_cage_device::cage_timer_callback));
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
 	GENERIC_LATCH_16(config, m_soundlatch);
 
 #if (DAC_BUFFER_CHANNELS == 4)
-	DMADAC(config, m_dmadac[0]).add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	DMADAC(config, m_dmadac[0]).add_route(ALL_OUTPUTS, *this, 0.50, AUTO_ALLOC_INPUT, 0);
 
-	DMADAC(config, m_dmadac[1]).add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	DMADAC(config, m_dmadac[1]).add_route(ALL_OUTPUTS, *this, 0.50, AUTO_ALLOC_INPUT, 1);
 
-	DMADAC(config, m_dmadac[2]).add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	DMADAC(config, m_dmadac[2]).add_route(ALL_OUTPUTS, *this, 0.50, AUTO_ALLOC_INPUT, 2);
 
-	DMADAC(config, m_dmadac[3]).add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	DMADAC(config, m_dmadac[3]).add_route(ALL_OUTPUTS, *this, 0.50, AUTO_ALLOC_INPUT, 3);
 #else
-	DMADAC(config, m_dmadac[0]).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	DMADAC(config, m_dmadac[0]).add_route(ALL_OUTPUTS, *this, 1.0, AUTO_ALLOC_INPUT, 0);
 
-	DMADAC(config, m_dmadac[1]).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	DMADAC(config, m_dmadac[1]).add_route(ALL_OUTPUTS, *this, 1.0, AUTO_ALLOC_INPUT, 1);
 #endif
+	//add_route(ALL_OUTPUTS, *this, 0.50, AUTO_ALLOC_INPUT, 4); Subwoofer output
 }
 
-
+// Embedded in San francisco Rush Motherboard, 4 channel output connected to Quad Amp PCB and expanded to 5 channel (4 channel + subwoofer)
 DEFINE_DEVICE_TYPE(ATARI_CAGE_SEATTLE, atari_cage_seattle_device, "atari_cage_seattle", "Atari CAGE Seattle")
 
 

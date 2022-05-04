@@ -5638,7 +5638,7 @@ msgstr "Πατήστε %s για διαγραφή"
 #, lua-format
 msgctxt "plugin-autofire"
 msgid "%s [%g Hz]"
-msgstr "%s [%d Hz]"
+msgstr "%s [%g Hz]"
 
 #: plugins/autofire/autofire_menu.lua:95
 #, lua-format

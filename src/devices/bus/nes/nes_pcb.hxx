@@ -102,6 +102,7 @@ static const nes_pcb pcb_list[] =
 	{ "maxi15",           AVE_MAXI15 },
 	{ "bf9093",           CAMERICA_BF9093 },
 	{ "bf9096",           CAMERICA_BF9096 },
+	{ "bf9096a",          CAMERICA_BF9096_ALT },
 	{ "goldenfive",       CAMERICA_GOLDENFIVE },
 	{ "ade"   ,           CAMERICA_ALADDIN },
 	{ "cne_decathl",      CNE_DECATHLON },
@@ -129,7 +130,6 @@ static const nes_pcb pcb_list[] =
 	{ "tcu01",            SACHEN_TCU01 },
 	{ "tcu02",            SACHEN_TCU02 },
 	{ "sa9602b",          SACHEN_SA9602B },
-	{ "tengen_800008",    TENGEN_800008 },  /* FIXME: Is this the same as mapper 3? */
 	{ "tengen_800032",    TENGEN_800032 },
 	{ "tengen_800037",    TENGEN_800037 },
 	{ "txc_22110",        TXC_22110 },
@@ -413,7 +413,6 @@ static const nes_pcb pcb_list[] =
 	{ "ffe4",             FFE4_BOARD },
 	{ "ffe8",             FFE8_BOARD },
 	{ "unl_dance",        UNSUPPORTED_BOARD },
-	{ "bmc_hik_kof",      UNSUPPORTED_BOARD },
 	{ "onebus",           UNSUPPORTED_BOARD },
 	{ "pec586",           UNSUPPORTED_BOARD },
 	{ "test",             TEST_BOARD },

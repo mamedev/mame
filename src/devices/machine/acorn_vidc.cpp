@@ -13,8 +13,8 @@
       * lotustc2: abuses color flipping;
       * quazer: needs in-flight DMA;
     - move DAC handling into a separate sub-device(s),
-	  particularly needed for proper VIDC20 mixing and likely for fixing aliasing
-	  issues in VIDC10;
+      particularly needed for proper VIDC20 mixing and likely for fixing aliasing
+      issues in VIDC10;
     - complete VIDC20 emulation (RiscPC/ssfindo.cpp);
     - Are CRTC values correct? VGA modes have a +1 in display line;
 

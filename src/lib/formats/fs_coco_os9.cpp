@@ -17,9 +17,146 @@
 #include "coco_rawdsk.h"
 #include "strformat.h"
 
+
+//**************************************************************************
+//  TYPE DECLARATIONS
+//**************************************************************************
+
+namespace {
+
+using namespace fs;
+
+// methods
+std::string pick_os9_string(std::string_view raw_string);
+std::string to_os9_string(std::string_view s, size_t length);
+util::arbitrary_datetime from_os9_date(u32 os9_date, u16 os9_time = 0);
+std::tuple<u32, u16> to_os9_date(const util::arbitrary_datetime &datetime);
+u32 pick_integer_be(const u8 *data, int length);
+bool validate_filename(std::string_view name);
+bool is_ignored_filename(std::string_view name);
+std::vector<meta_description> entity_meta_description();
+
+
+// ======================> volume_header
+
+class volume_header
+{
+public:
+	volume_header(fsblk_t::block_t &&block);
+
+	u32 total_sectors() const { return m_block.r24b(0); }
+	u8  track_size_in_sectors() const { return m_block.r8(3); }
+	u16 allocation_bitmap_bytes() const { return m_block.r16b(4); }
+	u16 cluster_size() const { return m_block.r16b(6); }
+	u32 root_dir_lsn() const { return m_block.r24b(8); }
+	u16 owner_id() const { return m_block.r16b(11); }
+	u16 disk_id() const { return m_block.r16b(14); }
+	u8  format_flags() const { return m_block.r8(16); }
+	u16 sectors_per_track() const { return m_block.r16b(17); }
+	u32 bootstrap_lsn() const { return m_block.r24b(21); }
+	u16 bootstrap_size() const { return m_block.r16b(24); }
+	util::arbitrary_datetime creation_date() const { return from_os9_date(m_block.r24b(26), m_block.r16b(29)); }
+	u16 sector_size() const { u16 result = m_block.r16b(104); return result != 0 ? result : 256; }
+	u8 sides() const { return (format_flags() & 0x01) ? 2 : 1; }
+	bool double_density() const { return (format_flags() & 0x02) != 0; }
+	bool double_track() const { return (format_flags() & 0x04) != 0; }
+	bool quad_track_density() const { return (format_flags() & 0x08) != 0; }
+	bool octal_track_density() const { return (format_flags() & 0x10) != 0; }
+
+	std::string name() const;
+
+private:
+	fsblk_t::block_t    m_block;
+};
+
+
+// ======================> file_header
+
+class file_header
+{
+public:
+	file_header(fsblk_t::block_t &&block);
+
+	u8  attributes() const { return m_block.r8(0); }
+	u16 owner_id() const { return m_block.r16b(1); }
+	u8  link_count() const { return m_block.r8(8); }
+	u32 file_size() const { return m_block.r32b(9); }
+	util::arbitrary_datetime creation_date() const;
+	bool is_directory() const { return (attributes() & 0x80) != 0; }
+	bool is_non_sharable() const { return (attributes() & 0x40) != 0; }
+	bool is_public_execute() const { return (attributes() & 0x20) != 0; }
+	bool is_public_write() const { return (attributes() & 0x10) != 0; }
+	bool is_public_read() const { return (attributes() & 0x08) != 0; }
+	bool is_user_execute() const { return (attributes() & 0x04) != 0; }
+	bool is_user_write() const { return (attributes() & 0x02) != 0; }
+	bool is_user_read() const { return (attributes() & 0x01) != 0; }
+
+	meta_data metadata() const;
+	int get_sector_map_entry_count() const;
+	void get_sector_map_entry(int entry_number, u32 &start_lsn, u16 &count) const;
+
+private:
+	fsblk_t::block_t    m_block;
+};
+
+
+// ======================> impl
+
+class impl : public filesystem_t {
+public:
+	class file : public ifile_t {
+	public:
+		file(impl &fs, file_header &&file_header);
+		virtual ~file() = default;
+
+		virtual void drop_weak_references() override;
+
+		virtual meta_data metadata() override;
+		virtual std::vector<u8> read_all() override;
+
+	private:
+		impl &m_fs;
+		file_header m_file_header;
+	};
+
+	class directory : public idir_t {
+	public:
+		directory(impl &i, file_header &&file_header);
+		virtual ~directory() = default;
+
+		virtual void drop_weak_references() override;
+		virtual meta_data metadata() override;
+		virtual std::vector<dir_entry> contents() override;
+		virtual file_t file_get(u64 key) override;
+		virtual dir_t dir_get(u64 key) override;
+
+	private:
+		impl &m_fs;
+		file_header m_file_header;
+	};
+
+	impl(fsblk_t &blockdev, volume_header &&header);
+	virtual ~impl() = default;
+
+	virtual meta_data metadata() override;
+	virtual dir_t root() override;
+	virtual void format(const meta_data &meta) override;
+
+private:
+	volume_header   m_volume_header;
+	dir_t           m_root;
+
+	directory *open_directory(u32 lsn);
+	std::vector<u8> read_file_data(const file_header &header) const;
+};
+
+}
+
 namespace fs {
 
 const coco_os9_image COCO_OS9;
+
+};
 
 
 //**************************************************************************
@@ -30,7 +167,7 @@ const coco_os9_image COCO_OS9;
 //  name
 //-------------------------------------------------
 
-const char *coco_os9_image::name() const
+const char *fs::coco_os9_image::name() const
 {
 	return "coco_os9";
 }
@@ -40,7 +177,7 @@ const char *coco_os9_image::name() const
 //  description
 //-------------------------------------------------
 
-const char *coco_os9_image::description() const
+const char *fs::coco_os9_image::description() const
 {
 	return "CoCo OS-9";
 }
@@ -50,7 +187,7 @@ const char *coco_os9_image::description() const
 //  enumerate_f
 //-------------------------------------------------
 
-void coco_os9_image::enumerate_f(floppy_enumerator &fe, u32 form_factor, const std::vector<u32> &variants) const
+void fs::coco_os9_image::enumerate_f(floppy_enumerator &fe, u32 form_factor, const std::vector<u32> &variants) const
 {
 	if (has(form_factor, variants, floppy_image::FF_525, floppy_image::SSDD))
 	{
@@ -64,7 +201,7 @@ void coco_os9_image::enumerate_f(floppy_enumerator &fe, u32 form_factor, const s
 //  can_format
 //-------------------------------------------------
 
-bool coco_os9_image::can_format() const
+bool fs::coco_os9_image::can_format() const
 {
 	return true;
 }
@@ -74,7 +211,7 @@ bool coco_os9_image::can_format() const
 //  can_read
 //-------------------------------------------------
 
-bool coco_os9_image::can_read() const
+bool fs::coco_os9_image::can_read() const
 {
 	return true;
 }
@@ -84,7 +221,7 @@ bool coco_os9_image::can_read() const
 //  can_write
 //-------------------------------------------------
 
-bool coco_os9_image::can_write() const
+bool fs::coco_os9_image::can_write() const
 {
 	return false;
 }
@@ -94,7 +231,7 @@ bool coco_os9_image::can_write() const
 //  has_rsrc
 //-------------------------------------------------
 
-bool coco_os9_image::has_rsrc() const
+bool fs::coco_os9_image::has_rsrc() const
 {
 	return false;
 }
@@ -104,7 +241,7 @@ bool coco_os9_image::has_rsrc() const
 //  directory_separator
 //-------------------------------------------------
 
-char coco_os9_image::directory_separator() const
+char fs::coco_os9_image::directory_separator() const
 {
 	return '/';
 }
@@ -114,7 +251,7 @@ char coco_os9_image::directory_separator() const
 //  volume_meta_description
 //-------------------------------------------------
 
-std::vector<meta_description> coco_os9_image::volume_meta_description() const
+std::vector<meta_description> fs::coco_os9_image::volume_meta_description() const
 {
 	std::vector<meta_description> results;
 	results.emplace_back(meta_description(meta_name::name, "UNTITLED", false, [](const meta_value &m) { return m.as_string().size() <= 32; }, "Volume name, up to 32 characters"));
@@ -127,7 +264,7 @@ std::vector<meta_description> coco_os9_image::volume_meta_description() const
 //  file_meta_description
 //-------------------------------------------------
 
-std::vector<meta_description> coco_os9_image::file_meta_description() const
+std::vector<meta_description> fs::coco_os9_image::file_meta_description() const
 {
 	return entity_meta_description();
 }
@@ -137,25 +274,9 @@ std::vector<meta_description> coco_os9_image::file_meta_description() const
 //  directory_meta_description
 //-------------------------------------------------
 
-std::vector<meta_description> coco_os9_image::directory_meta_description() const
+std::vector<meta_description> fs::coco_os9_image::directory_meta_description() const
 {
 	return entity_meta_description();
-}
-
-
-//-------------------------------------------------
-//  entity_meta_description
-//-------------------------------------------------
-
-std::vector<meta_description> coco_os9_image::entity_meta_description() const
-{
-	std::vector<meta_description> results;
-	results.emplace_back(meta_description(meta_name::name, "", false, [](const meta_value &m) { return validate_filename(m.as_string()); }, "File name"));
-	results.emplace_back(meta_description(meta_name::creation_date, util::arbitrary_datetime::now(), false, nullptr, "Creation time"));
-	results.emplace_back(meta_description(meta_name::owner_id, 0, true, nullptr, "Owner ID"));
-	results.emplace_back(meta_description(meta_name::attributes, "", true, nullptr, "File attributes"));
-	results.emplace_back(meta_description(meta_name::length, 0, true, nullptr, "Size of the file in bytes"));
-	return results;
 }
 
 
@@ -163,7 +284,7 @@ std::vector<meta_description> coco_os9_image::entity_meta_description() const
 //  mount
 //-------------------------------------------------
 
-std::unique_ptr<filesystem_t> coco_os9_image::mount(fsblk_t &blockdev) const
+std::unique_ptr<filesystem_t> fs::coco_os9_image::mount(fsblk_t &blockdev) const
 {
 	// read the header block
 	blockdev.set_block_size(256);
@@ -179,10 +300,28 @@ std::unique_ptr<filesystem_t> coco_os9_image::mount(fsblk_t &blockdev) const
 
 
 //-------------------------------------------------
+//  entity_meta_description
+//-------------------------------------------------
+
+namespace {
+
+std::vector<meta_description> entity_meta_description()
+{
+	std::vector<meta_description> results;
+	results.emplace_back(meta_description(meta_name::name, "", false, [](const meta_value &m) { return validate_filename(m.as_string()); }, "File name"));
+	results.emplace_back(meta_description(meta_name::creation_date, util::arbitrary_datetime::now(), false, nullptr, "Creation time"));
+	results.emplace_back(meta_description(meta_name::owner_id, 0, true, nullptr, "Owner ID"));
+	results.emplace_back(meta_description(meta_name::attributes, "", true, nullptr, "File attributes"));
+	results.emplace_back(meta_description(meta_name::length, 0, true, nullptr, "Size of the file in bytes"));
+	return results;
+}
+
+
+//-------------------------------------------------
 //  pick_os9_string
 //-------------------------------------------------
 
-std::string coco_os9_image::pick_os9_string(std::string_view raw_string)
+std::string pick_os9_string(std::string_view raw_string)
 {
 	// find the last NUL or high bit character
 	auto iter = std::find_if(raw_string.begin(), raw_string.end(), [](char ch)
@@ -205,7 +344,7 @@ std::string coco_os9_image::pick_os9_string(std::string_view raw_string)
 //  to_os9_string
 //-------------------------------------------------
 
-std::string coco_os9_image::to_os9_string(std::string_view s, size_t length)
+std::string to_os9_string(std::string_view s, size_t length)
 {
 	std::string result(length, '\0');
 	for (auto i = 0; i < std::min(length, s.size()); i++)
@@ -221,7 +360,7 @@ std::string coco_os9_image::to_os9_string(std::string_view s, size_t length)
 //  pick_integer_be
 //-------------------------------------------------
 
-u32 coco_os9_image::pick_integer_be(const u8 *data, int length)
+u32 pick_integer_be(const u8 *data, int length)
 {
 	u32 result = 0;
 	for (int i = 0; i < length; i++)
@@ -234,15 +373,15 @@ u32 coco_os9_image::pick_integer_be(const u8 *data, int length)
 //  from_os9_date
 //-------------------------------------------------
 
-util::arbitrary_datetime coco_os9_image::from_os9_date(u32 os9_date, u16 os9_time)
+util::arbitrary_datetime from_os9_date(u32 os9_date, u16 os9_time)
 {
 	util::arbitrary_datetime dt;
 	memset(&dt, 0, sizeof(dt));
-	dt.year			= ((os9_date >> 16) & 0xFF) + 1900;
-	dt.month		= (os9_date >> 8) & 0xFF;
-	dt.day_of_month	= (os9_date >> 0) & 0xFF;
-	dt.hour			= (os9_time >> 8) & 0xFF;
-	dt.minute		= (os9_time >> 0) & 0xFF;
+	dt.year         = ((os9_date >> 16) & 0xFF) + 1900;
+	dt.month        = (os9_date >> 8) & 0xFF;
+	dt.day_of_month = (os9_date >> 0) & 0xFF;
+	dt.hour         = (os9_time >> 8) & 0xFF;
+	dt.minute       = (os9_time >> 0) & 0xFF;
 	return dt;
 }
 
@@ -251,7 +390,7 @@ util::arbitrary_datetime coco_os9_image::from_os9_date(u32 os9_date, u16 os9_tim
 //  to_os9_date
 //-------------------------------------------------
 
-std::tuple<u32, u16> coco_os9_image::to_os9_date(const util::arbitrary_datetime &datetime)
+std::tuple<u32, u16> to_os9_date(const util::arbitrary_datetime &datetime)
 {
 	u32 os9_date = ((datetime.year - 1900) & 0xFF) << 16
 		| (datetime.month & 0xFF) << 8
@@ -266,7 +405,7 @@ std::tuple<u32, u16> coco_os9_image::to_os9_date(const util::arbitrary_datetime 
 //  validate_filename
 //-------------------------------------------------
 
-bool coco_os9_image::validate_filename(std::string_view name)
+bool validate_filename(std::string_view name)
 {
 	return !is_ignored_filename(name)
 		&& name.size() <= 29
@@ -279,7 +418,7 @@ bool coco_os9_image::validate_filename(std::string_view name)
 //  ignored if it is in the file system?
 //-------------------------------------------------
 
-bool coco_os9_image::is_ignored_filename(std::string_view name)
+bool is_ignored_filename(std::string_view name)
 {
 	return name.empty()
 		|| name[0] == '\0'
@@ -292,7 +431,7 @@ bool coco_os9_image::is_ignored_filename(std::string_view name)
 //  volume_header ctor
 //-------------------------------------------------
 
-coco_os9_image::volume_header::volume_header(fsblk_t::block_t &&block)
+volume_header::volume_header(fsblk_t::block_t &&block)
 	: m_block(std::move(block))
 {
 }
@@ -302,7 +441,7 @@ coco_os9_image::volume_header::volume_header(fsblk_t::block_t &&block)
 //  volume_header::name
 //-------------------------------------------------
 
-std::string coco_os9_image::volume_header::name() const
+std::string volume_header::name() const
 {
 	std::string_view raw_name((const char *)&m_block.rodata()[31], 32);
 	return pick_os9_string(raw_name);
@@ -313,7 +452,7 @@ std::string coco_os9_image::volume_header::name() const
 //  file_header ctor
 //-------------------------------------------------
 
-coco_os9_image::file_header::file_header(fsblk_t::block_t &&block)
+file_header::file_header(fsblk_t::block_t &&block)
 	: m_block(std::move(block))
 {
 }
@@ -323,7 +462,7 @@ coco_os9_image::file_header::file_header(fsblk_t::block_t &&block)
 //  file_header::creation_date
 //-------------------------------------------------
 
-util::arbitrary_datetime coco_os9_image::file_header::creation_date() const
+util::arbitrary_datetime file_header::creation_date() const
 {
 	return from_os9_date(m_block.r24b(13));
 }
@@ -333,7 +472,7 @@ util::arbitrary_datetime coco_os9_image::file_header::creation_date() const
 //  file_header::metadata
 //-------------------------------------------------
 
-meta_data coco_os9_image::file_header::metadata() const
+meta_data file_header::metadata() const
 {
 	// format the attributes
 	std::string attributes = util::string_format("%c%c%c%c%c%c%c%c",
@@ -359,7 +498,7 @@ meta_data coco_os9_image::file_header::metadata() const
 //  file_header::get_sector_map_entry_count
 //-------------------------------------------------
 
-int coco_os9_image::file_header::get_sector_map_entry_count() const
+int file_header::get_sector_map_entry_count() const
 {
 	return (m_block.size() - 16) / 5;
 }
@@ -369,7 +508,7 @@ int coco_os9_image::file_header::get_sector_map_entry_count() const
 //  file_header::get_sector_map_entry
 //-------------------------------------------------
 
-void coco_os9_image::file_header::get_sector_map_entry(int entry_number, u32 &start_lsn, u16 &count) const
+void file_header::get_sector_map_entry(int entry_number, u32 &start_lsn, u16 &count) const
 {
 	start_lsn   = m_block.r24b(16 + (entry_number * 5) + 0);
 	count       = m_block.r16b(16 + (entry_number * 5) + 3);
@@ -380,7 +519,7 @@ void coco_os9_image::file_header::get_sector_map_entry(int entry_number, u32 &st
 //  impl ctor
 //-------------------------------------------------
 
-coco_os9_image::impl::impl(fsblk_t &blockdev, volume_header &&header)
+impl::impl(fsblk_t &blockdev, volume_header &&header)
 	: filesystem_t(blockdev, 256)
 	, m_volume_header(std::move(header))
 {
@@ -391,7 +530,7 @@ coco_os9_image::impl::impl(fsblk_t &blockdev, volume_header &&header)
 //  impl::metadata
 //-------------------------------------------------
 
-meta_data coco_os9_image::impl::metadata()
+meta_data impl::metadata()
 {
 	meta_data results;
 	results.set(meta_name::name, m_volume_header.name());
@@ -404,7 +543,7 @@ meta_data coco_os9_image::impl::metadata()
 //  impl::root
 //-------------------------------------------------
 
-filesystem_t::dir_t coco_os9_image::impl::root()
+filesystem_t::dir_t impl::root()
 {
 	if (!m_root)
 		m_root = open_directory(m_volume_header.root_dir_lsn());
@@ -413,34 +552,24 @@ filesystem_t::dir_t coco_os9_image::impl::root()
 
 
 //-------------------------------------------------
-//  impl::drop_root_ref
-//-------------------------------------------------
-
-void coco_os9_image::impl::drop_root_ref()
-{
-	m_root = nullptr;
-}
-
-
-//-------------------------------------------------
 //  impl::format
 //-------------------------------------------------
 
-void coco_os9_image::impl::format(const meta_data &meta)
+void impl::format(const meta_data &meta)
 {
 	// for some reason, the OS-9 world favored filling with 0xE5
 	m_blockdev.fill(0xE5);
 
 	// identify geometry info
-	u8 sectors = 18;				// TODO - we need a definitive technique to get the floppy geometry
-	u8 heads = 1;					// TODO - we need a definitive technique to get the floppy geometry
-	u16 sector_bytes = 256;			// TODO - we need a definitive technique to get the floppy geometry
-	bool is_double_density = true;	// TODO - we need a definitive technique to get the floppy geometry
+	u8 sectors = 18;                // TODO - we need a definitive technique to get the floppy geometry
+	u8 heads = 1;                   // TODO - we need a definitive technique to get the floppy geometry
+	u16 sector_bytes = 256;         // TODO - we need a definitive technique to get the floppy geometry
+	bool is_double_density = true;  // TODO - we need a definitive technique to get the floppy geometry
 	u32 tracks = m_blockdev.block_count() / sectors / heads;
 
 	// get attributes from metadata
-	std::string volume_title					= meta.get_string(meta_name::name, "UNTITLED");
-	util::arbitrary_datetime creation_datetime	= meta.get_date(meta_name::creation_date);
+	std::string volume_title                    = meta.get_string(meta_name::name, "UNTITLED");
+	util::arbitrary_datetime creation_datetime  = meta.get_date(meta_name::creation_date);
 	auto [creation_os9date, creation_os9time] = to_os9_date(creation_datetime);
 
 	u32 lsn_count = m_blockdev.block_count();
@@ -456,32 +585,32 @@ void coco_os9_image::impl::format(const meta_data &meta)
 	// volume header
 	auto volume_header = m_blockdev.get(0);
 	volume_header.fill(0x00);
-	volume_header.w24b(0, lsn_count);								// DD.TOT - total secctors
-	volume_header.w8(3, sectors);									// DD.TKS - track size in sectors
-	volume_header.w16b(4, (allocation_bitmap_bits + 7) / 8);		// DD.MAP - allocation bitmap in bytes
-	volume_header.w16b(6, cluster_size);							// DD.BIT - cluster size
-	volume_header.w24b(8, 1 + allocation_bitmap_lsns);				// DD.DIR - root directory LSN
-	volume_header.w16b(11, owner_id);								// DD.OWN - owner ID
-	volume_header.w8(13, attributes);								// DD.ATT - Dattributes
-	volume_header.w16b(14, disk_id);								// DD.DSK - disk ID
-	volume_header.w8(16, format_flags);								// DD.FMT - format flags
-	volume_header.w16b(17, sectors);								// DD.SPT - sectors per track
-	volume_header.w24b(26, creation_os9date);						// DD.DAT - date of creation
-	volume_header.w16b(29, creation_os9time);						// DD.DAT - time of creation
-	volume_header.wstr(31, to_os9_string(volume_title, 32));		// DD.NAM - title
-	volume_header.w16b(103, sector_bytes / 256);					// sector bytes
+	volume_header.w24b(0, lsn_count);                               // DD.TOT - total secctors
+	volume_header.w8(3, sectors);                                   // DD.TKS - track size in sectors
+	volume_header.w16b(4, (allocation_bitmap_bits + 7) / 8);        // DD.MAP - allocation bitmap in bytes
+	volume_header.w16b(6, cluster_size);                            // DD.BIT - cluster size
+	volume_header.w24b(8, 1 + allocation_bitmap_lsns);              // DD.DIR - root directory LSN
+	volume_header.w16b(11, owner_id);                               // DD.OWN - owner ID
+	volume_header.w8(13, attributes);                               // DD.ATT - Dattributes
+	volume_header.w16b(14, disk_id);                                // DD.DSK - disk ID
+	volume_header.w8(16, format_flags);                             // DD.FMT - format flags
+	volume_header.w16b(17, sectors);                                // DD.SPT - sectors per track
+	volume_header.w24b(26, creation_os9date);                       // DD.DAT - date of creation
+	volume_header.w16b(29, creation_os9time);                       // DD.DAT - time of creation
+	volume_header.wstr(31, to_os9_string(volume_title, 32));        // DD.NAM - title
+	volume_header.w16b(103, sector_bytes / 256);                    // sector bytes
 
 	// path descriptor options
-	volume_header.w8(0x3f + 0x00, 1);								// device class
-	volume_header.w8(0x3f + 0x01, 1);								// drive number
-	volume_header.w8(0x3f + 0x03, 0x20);							// device type
-	volume_header.w8(0x3f + 0x04, 1);								// density capability
-	volume_header.w16b(0x3f + 0x05, tracks);						// number of tracks
-	volume_header.w8(0x3f + 0x07, heads);							// number of sides
-	volume_header.w16b(0x3f + 0x09, sectors);						// sectors per track
-	volume_header.w16b(0x3f + 0x0b, sectors);						// sectors on track zero
-	volume_header.w8(0x3f + 0x0d, 3);								// sector interleave factor
-	volume_header.w8(0x3f + 0x0e, 8);								// default sectors per allocation
+	volume_header.w8(0x3f + 0x00, 1);                               // device class
+	volume_header.w8(0x3f + 0x01, 1);                               // drive number
+	volume_header.w8(0x3f + 0x03, 0x20);                            // device type
+	volume_header.w8(0x3f + 0x04, 1);                               // density capability
+	volume_header.w16b(0x3f + 0x05, tracks);                        // number of tracks
+	volume_header.w8(0x3f + 0x07, heads);                           // number of sides
+	volume_header.w16b(0x3f + 0x09, sectors);                       // sectors per track
+	volume_header.w16b(0x3f + 0x0b, sectors);                       // sectors on track zero
+	volume_header.w8(0x3f + 0x0d, 3);                               // sector interleave factor
+	volume_header.w8(0x3f + 0x0e, 8);                               // default sectors per allocation
 
 	// allocation bitmap
 	u32 total_allocated_sectors = 1 + allocation_bitmap_lsns + 1 + 8;
@@ -536,7 +665,7 @@ void coco_os9_image::impl::format(const meta_data &meta)
 //  impl::open_directory
 //-------------------------------------------------
 
-coco_os9_image::impl::directory *coco_os9_image::impl::open_directory(u32 lsn)
+impl::directory *impl::open_directory(u32 lsn)
 {
 	file_header header(m_blockdev.get(lsn));
 	return new directory(*this, std::move(header));
@@ -547,7 +676,7 @@ coco_os9_image::impl::directory *coco_os9_image::impl::open_directory(u32 lsn)
 //  impl::read_file_data
 //-------------------------------------------------
 
-std::vector<u8> coco_os9_image::impl::read_file_data(const file_header &header) const
+std::vector<u8> impl::read_file_data(const file_header &header) const
 {
 	std::vector<u8> data;
 	data.reserve(header.file_size());
@@ -574,7 +703,7 @@ std::vector<u8> coco_os9_image::impl::read_file_data(const file_header &header) 
 //  file ctor
 //-------------------------------------------------
 
-coco_os9_image::impl::file::file(impl &i, file_header &&file_header)
+impl::file::file(impl &i, file_header &&file_header)
 	: m_fs(i)
 	, m_file_header(std::move(file_header))
 {
@@ -585,7 +714,7 @@ coco_os9_image::impl::file::file(impl &i, file_header &&file_header)
 //  file::drop_weak_references
 //-------------------------------------------------
 
-void coco_os9_image::impl::file::drop_weak_references()
+void impl::file::drop_weak_references()
 {
 }
 
@@ -594,7 +723,7 @@ void coco_os9_image::impl::file::drop_weak_references()
 //  file::metadata
 //-------------------------------------------------
 
-meta_data coco_os9_image::impl::file::metadata()
+meta_data impl::file::metadata()
 {
 	return m_file_header.metadata();
 }
@@ -604,7 +733,7 @@ meta_data coco_os9_image::impl::file::metadata()
 //  file::read_all
 //-------------------------------------------------
 
-std::vector<u8> coco_os9_image::impl::file::read_all()
+std::vector<u8> impl::file::read_all()
 {
 	return m_fs.read_file_data(m_file_header);
 }
@@ -614,7 +743,7 @@ std::vector<u8> coco_os9_image::impl::file::read_all()
 //  directory ctor
 //-------------------------------------------------
 
-coco_os9_image::impl::directory::directory(impl &i, file_header &&file_header)
+impl::directory::directory(impl &i, file_header &&file_header)
 	: m_fs(i)
 	, m_file_header(std::move(file_header))
 {
@@ -625,7 +754,7 @@ coco_os9_image::impl::directory::directory(impl &i, file_header &&file_header)
 //  directory::drop_weak_references
 //-------------------------------------------------
 
-void coco_os9_image::impl::directory::drop_weak_references()
+void impl::directory::drop_weak_references()
 {
 }
 
@@ -634,7 +763,7 @@ void coco_os9_image::impl::directory::drop_weak_references()
 //  directory::metadata
 //-------------------------------------------------
 
-meta_data coco_os9_image::impl::directory::metadata()
+meta_data impl::directory::metadata()
 {
 	return m_file_header.metadata();
 }
@@ -644,7 +773,7 @@ meta_data coco_os9_image::impl::directory::metadata()
 //  directory::contents
 //-------------------------------------------------
 
-std::vector<dir_entry> coco_os9_image::impl::directory::contents()
+std::vector<dir_entry> impl::directory::contents()
 {
 	// read the directory data
 	std::vector<u8> directory_data = m_fs.read_file_data(m_file_header);
@@ -678,7 +807,7 @@ std::vector<dir_entry> coco_os9_image::impl::directory::contents()
 //  directory::file_get
 //-------------------------------------------------
 
-filesystem_t::file_t coco_os9_image::impl::directory::file_get(u64 key)
+filesystem_t::file_t impl::directory::file_get(u64 key)
 {
 	file_header header(m_fs.m_blockdev.get(u32(key)));
 	return file_t(new file(m_fs, std::move(header)));
@@ -689,9 +818,9 @@ filesystem_t::file_t coco_os9_image::impl::directory::file_get(u64 key)
 //  directory::dir_get
 //-------------------------------------------------
 
-filesystem_t::dir_t coco_os9_image::impl::directory::dir_get(u64 key)
+filesystem_t::dir_t impl::directory::dir_get(u64 key)
 {
 	return dir_t(m_fs.open_directory(u32(key)));
 }
 
-} // namespace fs
+};

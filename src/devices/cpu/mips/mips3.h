@@ -624,7 +624,7 @@ private:
 
 	void generate_update_mode(drcuml_block &block);
 	void generate_update_cycles(drcuml_block &block, compiler_state &compiler, uml::parameter param, bool allow_exception);
-	void generate_checksum_block(drcuml_block &block, compiler_state &compiler, const opcode_desc *seqhead, const opcode_desc *seqlast, const opcode_desc* codelast);
+	void generate_checksum_block(drcuml_block &block, compiler_state &compiler, const opcode_desc *seqhead, const opcode_desc *seqlast, const opcode_desc *codelast);
 	void generate_sequence_instruction(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 	void generate_delay_slot_and_branch(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint8_t linkreg);
 
@@ -969,6 +969,7 @@ private:
 /***************************************************************************
 COMPILER-SPECIFIC OPTIONS
 ***************************************************************************/
+
 #define MIPS3DRC_STRICT_VERIFY      0x0001          /* verify all instructions */
 #define MIPS3DRC_STRICT_COP0        0x0002          /* validate all COP0 instructions */
 #define MIPS3DRC_STRICT_COP1        0x0004          /* validate all COP1 instructions */
@@ -980,9 +981,5 @@ COMPILER-SPECIFIC OPTIONS
 
 #define MIPS3DRC_COMPATIBLE_OPTIONS (MIPS3DRC_STRICT_VERIFY | MIPS3DRC_STRICT_COP1 | MIPS3DRC_STRICT_COP0 | MIPS3DRC_STRICT_COP2)
 #define MIPS3DRC_FASTEST_OPTIONS    (0)
-
-/* Use with STRICT_VERIFY to print debug info to console for extra validation checks */
-/* Set to 1 to activate and use MIPS3DRC_STRICT_VERIFY in the drc options */
-#define DEBUG_STRICT_VERIFY	0
 
 #endif // MAME_CPU_MIPS_MIPS3_H

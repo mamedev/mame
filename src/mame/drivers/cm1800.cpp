@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic, Robbbert
+// copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
 CM-1800

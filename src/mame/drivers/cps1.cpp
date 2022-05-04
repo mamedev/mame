@@ -14181,9 +14181,9 @@ Pang 3b4 - code accesso to $5762b0 and $57a2b0 (PIC)
 uint16_t cps_state::pang3b4_prot_r()
 {
 	if ((m_pang3b4_prot & 0xff) <=7)
-	      return (m_pang3b4_prot & 0xff) + 0x20;  // Game level + extend
+		  return (m_pang3b4_prot & 0xff) + 0x20;  // Game level + extend
 	if (m_pang3b4_prot == 0x17)
-	      return 0x7321;                      // Guessed from code @0x314
+		  return 0x7321;                      // Guessed from code @0x314
 	return 0xffff;
 }
 

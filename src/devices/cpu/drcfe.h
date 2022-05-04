@@ -134,7 +134,7 @@ public:
 	// describe a block
 	opcode_desc const *describe_code(offs_t startpc);
 	// get last opcode of block
-	opcode_desc const* get_last() { return m_desc_live_list.last(); };
+	opcode_desc const *get_last() { return m_desc_live_list.last(); }
 
 protected:
 	// required overrides

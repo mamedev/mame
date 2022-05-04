@@ -2619,7 +2619,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 					(m_rombank ? 0x02 : 0x00) |
 					(m_intcxrom ? 0x01 : 0x00);
 
-		case 0x70:	// PTRIG - triggers paddles on read or write
+		case 0x70:  // PTRIG - triggers paddles on read or write
 			if (!machine().side_effects_disabled())
 			{
 				// Zip paddle slowdown (does ZipGS also use the old Zip flag?)
@@ -4808,7 +4808,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 	A2BUS_SLOT(config, "sl6", m_a2bus, apple2gs_cards, nullptr);
 	A2BUS_SLOT(config, "sl7", m_a2bus, apple2gs_cards, nullptr);
 
-	IWM(config, m_iwm, A2GS_7M, 1021800*2);
+	IWM(config, m_iwm, A2GS_7M, A2GS_MASTER_CLOCK/14);
 	m_iwm->phases_cb().set(FUNC(apple2gs_state::phases_w));
 	m_iwm->sel35_cb().set(FUNC(apple2gs_state::sel35_w));
 	m_iwm->devsel_cb().set(FUNC(apple2gs_state::devsel_w));

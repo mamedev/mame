@@ -20,6 +20,7 @@
 #include "sound/spkrdev.h"
 #include "emupal.h"
 #include "screen.h"
+#include "cpu/z80/z80.h"
 
 /* Spectrum crystals */
 
@@ -98,8 +99,7 @@ protected:
 	enum
 	{
 		TIMER_IRQ_ON,
-		TIMER_IRQ_OFF,
-		TIMER_SCANLINE // tsconf assumes it last know. if need more add above or fix references in clones
+		TIMER_IRQ_OFF // tsconf assumes it last know. if need more add above or fix references in clones
 	};
 
 	int m_port_fe_data;
@@ -113,12 +113,8 @@ protected:
 	optional_shared_ptr<uint8_t> m_video_ram;
 	uint8_t *m_screen_location;
 
-	int m_ROMSelection;
-
-	// Build up the screen bitmap line-by-line as the z80 uses CPU cycles.
-	// Eliminates sprite flicker on various games (E.g. Marauder and
-	// Stormlord) and makes Firefly playable.
-	emu_timer *m_scanline_timer;
+	int m_ROMSelection = 0; // FIXME: this is used for various things in derived classes, but not by this base class, and should be removed
+	std::vector<u8> m_contention_pattern;
 
 	uint8_t m_ram_disabled_by_beta;
 	uint8_t pre_opcode_fetch_r(offs_t offset);
@@ -126,7 +122,12 @@ protected:
 	uint8_t spectrum_rom_r(offs_t offset);
 	uint8_t spectrum_data_r(offs_t offset);
 	void spectrum_data_w(offs_t offset, uint8_t data);
+	virtual bool is_contended(offs_t offset);
+	virtual bool is_vram_write(offs_t offset);
+	void content_early(s8 shift = 0);
+	void content_late();
 
+	void spectrum_nomreq(offs_t offset, uint8_t data);
 	void spectrum_ula_w(offs_t offset, uint8_t data);
 	uint8_t spectrum_ula_r(offs_t offset);
 	void spectrum_port_w(offs_t offset, uint8_t data);
@@ -137,11 +138,12 @@ protected:
 	void spectrum_palette(palette_device &palette) const;
 	virtual u32 screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(spec_interrupt);
+	virtual attotime time_until_int();
 
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
 	void spectrum_io(address_map &map);
@@ -225,6 +227,9 @@ protected:
 
 	virtual void spectrum_128_update_memory() override;
 	virtual rectangle get_screen_area() override;
+
+	virtual bool is_contended(offs_t offset) override;
+	virtual bool is_vram_write(offs_t offset) override;
 
 private:
 	uint8_t spectrum_128_pre_opcode_fetch_r(offs_t offset);

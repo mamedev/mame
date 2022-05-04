@@ -74,7 +74,7 @@ public:
 	virtual void input_init(running_machine &machine) override
 	{
 		// Add a single win32 keyboard device that we'll monitor using Win32
-		auto &devinfo = devicelist()->create_device<win32_keyboard_device>(machine, "Win32 Keyboard 1", "Win32 Keyboard 1", *this);
+		auto &devinfo = devicelist().create_device<win32_keyboard_device>(machine, "Win32 Keyboard 1", "Win32 Keyboard 1", *this);
 
 		keyboard_trans_table &table = keyboard_trans_table::instance();
 
@@ -106,7 +106,7 @@ public:
 			case INPUT_EVENT_KEYDOWN:
 			case INPUT_EVENT_KEYUP:
 				args = static_cast<KeyPressEventArgs*>(eventdata);
-				devicelist()->for_each_device([args](auto device)
+				devicelist().for_each_device([args](auto device)
 				{
 					auto keyboard = dynamic_cast<win32_keyboard_device*>(device);
 					if (keyboard != nullptr)
@@ -206,7 +206,7 @@ public:
 			return;
 
 		// allocate a device
-		auto &devinfo = devicelist()->create_device<win32_mouse_device>(machine, "Win32 Mouse 1", "Win32 Mouse 1", *this);
+		auto &devinfo = devicelist().create_device<win32_mouse_device>(machine, "Win32 Mouse 1", "Win32 Mouse 1", *this);
 
 		// populate the axes
 		for (int axisnum = 0; axisnum < 2; axisnum++)
@@ -235,7 +235,7 @@ public:
 			return false;
 
 		auto args = static_cast<MouseButtonEventArgs*>(eventdata);
-		devicelist()->for_each_device([args](auto device)
+		devicelist().for_each_device([args](auto device)
 		{
 			auto mouse = dynamic_cast<win32_mouse_device*>(device);
 			if (mouse != nullptr)
@@ -268,7 +268,7 @@ public:
 		m_lightgun_shared_axis_mode = downcast<windows_options &>(machine.options()).dual_lightgun();
 
 		// Since we are about to be added to the list, the current size is the zero-based index of where we will be
-		m_gun_index = downcast<wininput_module&>(module).devicelist()->size();
+		m_gun_index = downcast<wininput_module&>(module).devicelist().size();
 	}
 
 	void poll() override
@@ -391,7 +391,7 @@ public:
 			static const char *const gun_names[] = { "Win32 Gun 1", "Win32 Gun 2" };
 
 			// allocate a device
-			auto &devinfo = devicelist()->create_device<win32_lightgun_device>(machine, gun_names[gunnum], gun_names[gunnum], *this);
+			auto &devinfo = devicelist().create_device<win32_lightgun_device>(machine, gun_names[gunnum], gun_names[gunnum], *this);
 
 			// populate the axes
 			for (int axisnum = 0; axisnum < 2; axisnum++)
@@ -421,7 +421,7 @@ public:
 			return false;
 
 		auto args = static_cast<MouseButtonEventArgs*>(eventdata);
-		devicelist()->for_each_device([args](auto device)
+		devicelist().for_each_device([args](auto device)
 		{
 			auto lightgun = dynamic_cast<win32_lightgun_device*>(device);
 			if (lightgun != nullptr)

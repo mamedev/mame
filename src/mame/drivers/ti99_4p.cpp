@@ -443,6 +443,10 @@ void ti99_4p_state::setaddress(offs_t address, uint16_t busctrl)
 	m_decode = SGCPU_NONE;
 	m_muxready = true;
 
+	// Trigger the TMS9901 clock when A10 is 1
+	if ((m_addr_buf & 0x0020) != 0)
+		m_tms9901->update_clock();
+
 	m_decode = decode_address(m_addr_buf);
 
 	if (m_decode == SGCPU_NONE)

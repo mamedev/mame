@@ -701,52 +701,52 @@ void twinkle_state::twinkle_videomixer_w(offs_t offset, uint16_t data)
 	{
 	case 0x00:
 		/*
-			Address Register offset
-			0x00 Command Register 0, Input Select Register
-			0x01 Reserved
-			0x02 Command Register 2, Status Register
-			0x03 Command Register 3, Output Format Register
-			0x04 Command Register 4, Operation Mode Select Register
-			0x05 Command Register 5, Input Format Register
-			0x06 Command Register 6, Clock Definition Register
-			0x07 Command Register 7, Video Timing Definition Register
-			0x08 Brightness Adjust Register (range: -64 to +63)
-			0x09 Contrast Adjust Register (range: 0 to 198.44%)
-			0x0a Saturation Adjust Register (range: 0 to 198.44%)
-			0x0b Hue Adjust Register (range: -45 to +44.3)
-			0x0c HCLOCK Low Register
-			0x0d HCLOCK High Register
-			0x0e HDELAY Low Register
-			0x0f HDELAY High Register
-			0x10 ACTIVE_PIXELS Low Register
-			0x11 ACTIVE_PIXELS High Register
-			0x12 VDELAY Low Register
-			0x13 VDELAY High Register
-			0x14 ACTIVE_LINES Low Register
-			0x15 ACTIVE_LINES High Register
-			0x16 P (subcarrier freq) Register 0
-			0x17 P (subcarrier freq) Register 1
-			0x18 P (subcarrier freq) Register 2
-			0x19 AGC Delay Register
-			0x1a Burst Delay Register
-			0x1b Sample Rate Conversion Low Register
-			0x1c Sample Rate Conversion High Register
-			0x1d Command Register 1D, Video Timing Polarity Register
-			0x1e-0xfe Reserved
-			0xff Software Reset
+		    Address Register offset
+		    0x00 Command Register 0, Input Select Register
+		    0x01 Reserved
+		    0x02 Command Register 2, Status Register
+		    0x03 Command Register 3, Output Format Register
+		    0x04 Command Register 4, Operation Mode Select Register
+		    0x05 Command Register 5, Input Format Register
+		    0x06 Command Register 6, Clock Definition Register
+		    0x07 Command Register 7, Video Timing Definition Register
+		    0x08 Brightness Adjust Register (range: -64 to +63)
+		    0x09 Contrast Adjust Register (range: 0 to 198.44%)
+		    0x0a Saturation Adjust Register (range: 0 to 198.44%)
+		    0x0b Hue Adjust Register (range: -45 to +44.3)
+		    0x0c HCLOCK Low Register
+		    0x0d HCLOCK High Register
+		    0x0e HDELAY Low Register
+		    0x0f HDELAY High Register
+		    0x10 ACTIVE_PIXELS Low Register
+		    0x11 ACTIVE_PIXELS High Register
+		    0x12 VDELAY Low Register
+		    0x13 VDELAY High Register
+		    0x14 ACTIVE_LINES Low Register
+		    0x15 ACTIVE_LINES High Register
+		    0x16 P (subcarrier freq) Register 0
+		    0x17 P (subcarrier freq) Register 1
+		    0x18 P (subcarrier freq) Register 2
+		    0x19 AGC Delay Register
+		    0x1a Burst Delay Register
+		    0x1b Sample Rate Conversion Low Register
+		    0x1c Sample Rate Conversion High Register
+		    0x1d Command Register 1D, Video Timing Polarity Register
+		    0x1e-0xfe Reserved
+		    0xff Software Reset
 		*/
 		break;
 	case 0x04:
 		/*
-			Register data
-			Uses offset given in the address register offset command.
+		    Register data
+		    Uses offset given in the address register offset command.
 
-			Game initialized values:
-			HCLOCK 853
-			HDELAY 126
-			ACTIVE_PIXELS 706
-			VDELAY 22
-			ACTIVE_LINES 16
+		    Game initialized values:
+		    HCLOCK 853
+		    HDELAY 126
+		    ACTIVE_PIXELS 706
+		    VDELAY 22
+		    ACTIVE_LINES 16
 		*/
 		break;
 	case 0x08:

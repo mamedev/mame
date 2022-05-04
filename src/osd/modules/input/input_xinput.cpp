@@ -186,7 +186,7 @@ xinput_joystick_device * xinput_api_helper::create_xinput_device(running_machine
 	snprintf(device_name, sizeof(device_name), "XInput Player %u", index + 1);
 
 	// allocate the device object
-	auto &devinfo = module.devicelist()->create_device<xinput_joystick_device>(machine, device_name, device_name, module, shared_from_this());
+	auto &devinfo = module.devicelist().create_device<xinput_joystick_device>(machine, device_name, device_name, module, shared_from_this());
 
 	// Set the player ID
 	devinfo.xinput_state.player_index = index;

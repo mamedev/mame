@@ -528,7 +528,7 @@ void emu_options::update_slot_and_image_options()
 		if (add_and_remove_slot_options())
 			changed = true;
 
-		// second, we perform an analgous operation with m_image_options
+		// second, we perform an analogous operation with m_image_options
 		if (add_and_remove_image_options())
 			changed = true;
 

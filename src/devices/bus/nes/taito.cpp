@@ -46,22 +46,22 @@ DEFINE_DEVICE_TYPE(NES_X1_005,            nes_x1_005_device,            "nes_x1_
 DEFINE_DEVICE_TYPE(NES_X1_017,            nes_x1_017_device,            "nes_x1_017",    "NES Cart Taito X1-017 PCB")
 
 
-nes_tc0190fmc_device::nes_tc0190fmc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+nes_tc0190fmc_device::nes_tc0190fmc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, type, tag, owner, clock)
 {
 }
 
-nes_tc0190fmc_device::nes_tc0190fmc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_tc0190fmc_device::nes_tc0190fmc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_tc0190fmc_device(mconfig, NES_TC0190FMC, tag, owner, clock)
 {
 }
 
-nes_tc0190fmc_pal16r4_device::nes_tc0190fmc_pal16r4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_tc0190fmc_pal16r4_device::nes_tc0190fmc_pal16r4_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_tc0190fmc_device(mconfig, NES_TC0190FMC_PAL16R4, tag, owner, clock), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0)
 {
 }
 
-nes_x1_005_device::nes_x1_005_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_x1_005_device::nes_x1_005_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_X1_005, tag, owner, clock), m_latch(0)
 {
 }
@@ -75,7 +75,6 @@ nes_x1_017_device::nes_x1_017_device(const machine_config &mconfig, const char *
 
 void nes_tc0190fmc_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -83,7 +82,7 @@ void nes_tc0190fmc_device::pcb_reset()
 
 void nes_tc0190fmc_pal16r4_device::device_start()
 {
-	common_start();
+	nes_tc0190fmc_device::device_start();
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
 	save_item(NAME(m_irq_count_latch));
@@ -91,10 +90,7 @@ void nes_tc0190fmc_pal16r4_device::device_start()
 
 void nes_tc0190fmc_pal16r4_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg16_89ab(0);
-	prg16_cdef(m_prg_chunks - 1);
-	chr8(0, m_chr_source);
+	nes_tc0190fmc_device::pcb_reset();
 
 	m_irq_enable = 0;
 	m_irq_count = 0;
@@ -114,7 +110,6 @@ void nes_x1_005_device::device_start()
 
 void nes_x1_005_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -173,15 +168,15 @@ void nes_x1_017_device::pcb_reset()
 
  iNES: mapper 33
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_tc0190fmc_device::tc0190fmc_write(offs_t offset, uint8_t data)
+void nes_tc0190fmc_device::write_h(offs_t offset, u8 data)
 {
-	LOG_MMC(("tc0190fmc_write, offset: %04x, data: %02x\n", offset, data));
+	LOG_MMC(("tc0190fmc write_h, offset: %04x, data: %02x\n", offset, data));
 
-	switch (offset & 0x7003)
+	switch (offset & 0x6003)
 	{
 		case 0x0000:
 			set_nt_mirroring(BIT(data, 6) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
@@ -191,22 +186,14 @@ void nes_tc0190fmc_device::tc0190fmc_write(offs_t offset, uint8_t data)
 			prg8_ab(data);
 			break;
 		case 0x0002:
-			chr2_0(data, CHRROM);
-			break;
 		case 0x0003:
-			chr2_2(data, CHRROM);
+			chr2_x((offset & 1) << 1, data, CHRROM);
 			break;
 		case 0x2000:
-			chr1_4(data, CHRROM);
-			break;
 		case 0x2001:
-			chr1_5(data, CHRROM);
-			break;
 		case 0x2002:
-			chr1_6(data, CHRROM);
-			break;
 		case 0x2003:
-			chr1_7(data, CHRROM);
+			chr1_x((offset & 0x03) | 4, data, CHRROM);
 			break;
 	}
 }
@@ -226,30 +213,30 @@ void nes_tc0190fmc_device::tc0190fmc_write(offs_t offset, uint8_t data)
 
  iNES: mapper 48
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_tc0190fmc_pal16r4_device::hblank_irq( int scanline, int vblank, int blanked )
+void nes_tc0190fmc_pal16r4_device::hblank_irq(int scanline, int vblank, int blanked)
 {
 	if (scanline < ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
 	{
-		int prior_count = m_irq_count;
-		if (m_irq_count == 0)
-			m_irq_count = m_irq_count_latch;
-		else
+		if (m_irq_count)
+		{
 			m_irq_count--;
-
-		if (m_irq_enable && !blanked && (m_irq_count == 0) && prior_count)
-			set_irq_line(ASSERT_LINE);
+			if (m_irq_enable && !blanked && !m_irq_count)
+				set_irq_line(ASSERT_LINE);
+		}
+		else
+			m_irq_count = m_irq_count_latch;
 	}
 }
 
-void nes_tc0190fmc_pal16r4_device::write_h(offs_t offset, uint8_t data)
+void nes_tc0190fmc_pal16r4_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("tc0190fmc pal16r4 write_h, offset: %04x, data: %02x\n", offset, data));
 
-	switch (offset & 0x7003)
+	switch (offset & 0x6003)
 	{
 		case 0x0000:
 			prg8_89(data);
@@ -261,10 +248,10 @@ void nes_tc0190fmc_pal16r4_device::write_h(offs_t offset, uint8_t data)
 		case 0x2001:
 		case 0x2002:
 		case 0x2003:
-			tc0190fmc_write(offset, data);
+			nes_tc0190fmc_device::write_h(offset, data);
 			break;
 		case 0x4000:
-			m_irq_count_latch = (0x100 - data) & 0xff;
+			m_irq_count_latch = ~data;
 			break;
 		case 0x4001:
 			m_irq_count = m_irq_count_latch;
@@ -293,71 +280,58 @@ void nes_tc0190fmc_pal16r4_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_x1_005_device::write_m(offs_t offset, uint8_t data)
+void nes_x1_005_device::write_m(offs_t offset, u8 data)
 {
 	LOG_MMC(("x1_005 write_m, offset: %04x, data: %02x\n", offset, data));
 
-	switch (offset)
+	if ((offset & 0x1f70) == 0x1e70) // A7 is not connected
 	{
-		case 0x1ef0:
-			chr2_0(BIT(data, 1, 6), CHRROM);
-			if (m_x1_005_alt_mirroring)
-			{
-				set_nt_page(0, CIRAM, BIT(data, 7), 1);
-				set_nt_page(1, CIRAM, BIT(data, 7), 1);
-			}
-			break;
-		case 0x1ef1:
-			chr2_2(BIT(data, 1, 6), CHRROM);
-			if (m_x1_005_alt_mirroring)
-			{
-				set_nt_page(2, CIRAM, BIT(data, 7), 1);
-				set_nt_page(3, CIRAM, BIT(data, 7), 1);
-			}
-			break;
-		case 0x1ef2:
-			chr1_4(data, CHRROM);
-			break;
-		case 0x1ef3:
-			chr1_5(data, CHRROM);
-			break;
-		case 0x1ef4:
-			chr1_6(data, CHRROM);
-			break;
-		case 0x1ef5:
-			chr1_7(data, CHRROM);
-			break;
-		case 0x1ef6:
-		case 0x1ef7:
-			if (!m_x1_005_alt_mirroring)
-				set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
-			break;
-		case 0x1ef8:
-		case 0x1ef9:
-			m_latch = data;
-			break;
-		case 0x1efa:
-		case 0x1efb:
-			prg8_89(data);
-			break;
-		case 0x1efc:
-		case 0x1efd:
-			prg8_ab(data);
-			break;
-		case 0x1efe:
-		case 0x1eff:
-			prg8_cd(data);
-			break;
-		default:
-			logerror("mapper80_m_w uncaught addr: %04x, value: %02x\n", offset + 0x6000, data);
-			break;
-	}
+		u8 reg = offset & 0x0f;
 
-	if (offset >= 0x1f00 && m_latch == 0xa3)
+		switch (reg)
+		{
+			case 0x0:
+			case 0x1:
+				reg <<= 1;
+				chr2_x(reg, BIT(data, 1, 6), CHRROM);
+				if (m_x1_005_alt_mirroring)
+				{
+					set_nt_page(reg + 0, CIRAM, BIT(data, 7), 1);
+					set_nt_page(reg + 1, CIRAM, BIT(data, 7), 1);
+				}
+				break;
+			case 0x2:
+			case 0x3:
+			case 0x4:
+			case 0x5:
+				chr1_x(reg + 2, data, CHRROM);
+				break;
+			case 0x6:
+			case 0x7:
+				if (!m_x1_005_alt_mirroring)
+					set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+				break;
+			case 0x8:
+			case 0x9:
+				m_latch = data;
+				break;
+			case 0xa:
+			case 0xb:
+			case 0xc:
+			case 0xd:
+			case 0xe:
+			case 0xf:
+				prg8_x((reg - 0x0a) >> 1, data);
+				break;
+		}
+	}
+	else if (offset >= 0x1f00 && m_latch == 0xa3)
 		m_x1_005_ram[offset & 0x7f] = data;
+	else
+		logerror("Taito X1-005 uncaught addr: %04x, value: %02x\n", offset + 0x6000, data);
 }
 
-uint8_t nes_x1_005_device::read_m(offs_t offset)
+u8 nes_x1_005_device::read_m(offs_t offset)
 {
 	LOG_MMC(("x1_005 read_m, offset: %04x\n", offset));
 
@@ -434,7 +408,7 @@ void nes_x1_017_device::write_m(offs_t offset, u8 data)
 		case 0x1efa:
 		case 0x1efb:
 		case 0x1efc:
-			prg8_x((offset & 0x0f) - 0xa, bitswap<6>(data, 0, 1, 2, 3, 4, 5));
+			prg8_x((offset & 0x0f) - 0x0a, bitswap<6>(data, 0, 1, 2, 3, 4, 5));
 			break;
 		case 0x1efd:
 			m_irq_count_latch = data;
@@ -454,8 +428,8 @@ void nes_x1_017_device::write_m(offs_t offset, u8 data)
 
 	// 2+2+1 KB of Internal RAM can be independently enabled/disabled!
 	if ((offset < 0x0800 && m_reg[0] == 0xca) ||
-	    (offset < 0x1000 && m_reg[1] == 0x69) ||
-	    (offset < 0x1400 && m_reg[2] == 0x84))
+		(offset < 0x1000 && m_reg[1] == 0x69) ||
+		(offset < 0x1400 && m_reg[2] == 0x84))
 	{
 		m_x1_017_ram[offset] = data;
 
@@ -470,8 +444,8 @@ u8 nes_x1_017_device::read_m(offs_t offset)
 
 	// 2+2+1 KB of Internal RAM can be independently enabled/disabled!
 	if ((offset < 0x0800 && m_reg[0] == 0xca) ||
-	    (offset < 0x1000 && m_reg[1] == 0x69) ||
-	    (offset < 0x1400 && m_reg[2] == 0x84))
+		(offset < 0x1000 && m_reg[1] == 0x69) ||
+		(offset < 0x1400 && m_reg[2] == 0x84))
 	{
 		u8 ret = m_x1_017_ram[offset];
 

@@ -2,23 +2,23 @@
 // copyright-holders:
 /**************************************************************************************************
 
-	Go Go Strike (c) 2007? Paokai
+    Go Go Strike (c) 2007? Paokai
 
-	Originally in fruitpc.cpp, split because definitely doesn't belong
+    Originally in fruitpc.cpp, split because definitely doesn't belong
 
-	Some kind of x86 pc-like hardware, exact CPU type etc. unknown hardware is by Paokai,
-	motherboard has logos, large chip with logo too, http://www.paokai.com.tw/
+    Some kind of x86 pc-like hardware, exact CPU type etc. unknown hardware is by Paokai,
+    motherboard has logos, large chip with logo too, http://www.paokai.com.tw/
 
     CF card has a Linux partition, partially bootable with m55hipl driver.
-	- starts with a "LILO boot", fails with a recoverable "undefined video mode" 
-	  (press RETURN or SPACE);
-	- Shows being a "gcc 3.2.2 (Red Hat Linux 3.2.2-5)" distro.
-	  Notice that latter seems mislabeled, and RedHat is actually version 9
-	  http://rpm.pbone.net/info_idpl_19558085_distro_redhat9_com_gcc-3.2.2-5.i386.rpm.html
-	- Has pretty verbose terminal log, checks PnP, USB, Pentium f0 0f bug, 
-	  assumes "33 MHz system bus" for IDE PIO mode, returns PIIX only during PCI scan 
-	  (that's what m55hipl has as default);
-	- Eventually hangs at a "Setting the clock:" prompt;
+    - starts with a "LILO boot", fails with a recoverable "undefined video mode"
+      (press RETURN or SPACE);
+    - Shows being a "gcc 3.2.2 (Red Hat Linux 3.2.2-5)" distro.
+      Notice that latter seems mislabeled, and RedHat is actually version 9
+      http://rpm.pbone.net/info_idpl_19558085_distro_redhat9_com_gcc-3.2.2-5.i386.rpm.html
+    - Has pretty verbose terminal log, checks PnP, USB, Pentium f0 0f bug,
+      assumes "33 MHz system bus" for IDE PIO mode, returns PIIX only during PCI scan
+      (that's what m55hipl has as default);
+    - Eventually hangs at a "Setting the clock:" prompt;
 
 **************************************************************************************************/
 
@@ -69,8 +69,8 @@ void paokaipc_state::main_io(address_map &map)
 	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
 	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
 	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::cs1_r), FUNC(ide_controller_device::cs1_w));
-//	map(0x0880, 0x0880) extensively accessed at POST, hangs if returns wrong values
-//	map(0x0cf8, 0x0cff).rw(m_pcibus, FUNC(pci_bus_device::read), FUNC(pci_bus_device::write));
+//  map(0x0880, 0x0880) extensively accessed at POST, hangs if returns wrong values
+//  map(0x0cf8, 0x0cff).rw(m_pcibus, FUNC(pci_bus_device::read), FUNC(pci_bus_device::write));
 }
 
 static INPUT_PORTS_START( gogostrk )
@@ -108,9 +108,9 @@ void paokaipc_state::paokaipc(machine_config &config)
 	m_isabus->drq3_callback().set("dma8237_1", FUNC(am9517a_device::dreq3_w));
 
 	// FIXME: determine ISA bus clock
-//	isa8_slot_device &isa1(ISA8_SLOT(config, "isa1", 0, "isa", fruitpc_isa8_cards, "sb15", true));
-//	isa1.set_option_device_input_defaults("sb15", DEVICE_INPUT_DEFAULTS_NAME(fruitpc_sb_def));
-//	isa1.set_option_machine_config("sb15", fruitpc_sb_conf);
+//  isa8_slot_device &isa1(ISA8_SLOT(config, "isa1", 0, "isa", fruitpc_isa8_cards, "sb15", true));
+//  isa1.set_option_device_input_defaults("sb15", DEVICE_INPUT_DEFAULTS_NAME(fruitpc_sb_def));
+//  isa1.set_option_machine_config("sb15", fruitpc_sb_conf);
 }
 
 ROM_START( gogostrk )

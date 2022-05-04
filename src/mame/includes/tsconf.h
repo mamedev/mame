@@ -51,7 +51,7 @@ protected:
 private:
 	enum timer_id : u8
 	{
-		TIMER_IRQ_FRAME = TIMER_SCANLINE + 1,
+		TIMER_IRQ_FRAME = TIMER_IRQ_OFF + 1,
 		TIMER_IRQ_SCANLINE
 	};
 

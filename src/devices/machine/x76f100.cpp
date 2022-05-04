@@ -220,6 +220,9 @@ WRITE_LINE_MEMBER( x76f100_device::write_scl )
 		case STATE_LOAD_PASSWORD:
 		case STATE_VERIFY_PASSWORD:
 		case STATE_WRITE_DATA:
+			// FIXME: Processing on the rising edge of the clock causes sda to change state while clock is high
+			// which is not allowed. Also need to ensure that only valid device-id's and commands
+			// are acknowledged.
 			if( m_scl == 0 && state != 0 )
 			{
 				if( m_bit < 8 )
@@ -341,6 +344,8 @@ WRITE_LINE_MEMBER( x76f100_device::write_scl )
 			break;
 
 		case STATE_READ_DATA:
+			// FIXME: Processing on the rising edge of the clock causes sda to change state while clock is high
+			// which is not allowed.
 			if( m_scl == 0 && state != 0 )
 			{
 				if( m_bit < 8 )

@@ -22566,8 +22566,24 @@ license:CC0
 		</part>
 	</software>
 
+<!-- Title screen and cutscene graphics are corrupt, but main game is playable -->
+	<software name="ttex" supported="partial">
+		<!-- Notes: GBC only -->
+		<description>Tyrannosaurus Tex (USA)</description>
+		<year>2018</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="2097152">
+				<rom name="tyrannosaurus tex.bin" size="2097152" crc="e90504c1" sha1="7e41e92f92ff06101e48dee758420f1bd3959013"/>
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- developed by Slitherine Software -->
-	<software name="ttex" supported="no">
+	<software name="ttexp" cloneof="ttex" supported="no">
 		<description>Tyrannosaurus Tex (prototype)</description>
 		<year>2000</year><!-- 2000-03-21 on label -->
 		<publisher>Eidos Interactive</publisher>

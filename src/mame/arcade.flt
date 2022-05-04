@@ -96,6 +96,7 @@ avt.cpp
 aztarac.cpp
 backfire.cpp
 badlands.cpp
+badlands_ms.cpp
 badlandsbl.cpp
 bagman.cpp
 bailey.cpp
@@ -1052,6 +1053,7 @@ radikaldarts.cpp
 raiden.cpp
 raiden2.cpp
 raiden_ms.cpp
+rallypnt.cpp
 rallyx.cpp
 rampart.cpp
 ramtek.cpp
@@ -1201,6 +1203,7 @@ skykid.cpp
 skylncr.cpp
 skyraid.cpp
 slapfght.cpp
+slapfght_ms.cpp
 slapshot.cpp
 sleic.cpp
 sliver.cpp

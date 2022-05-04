@@ -78,7 +78,7 @@ void fruitpc_state::fruitpc_io(address_map &map)
 	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
 	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
 	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::cs1_r), FUNC(ide_controller_device::cs1_w));
-//	map(0x0cf8, 0x0cff).rw(m_pcibus, FUNC(pci_bus_device::read), FUNC(pci_bus_device::write));
+//  map(0x0cf8, 0x0cff).rw(m_pcibus, FUNC(pci_bus_device::read), FUNC(pci_bus_device::write));
 }
 
 static INPUT_PORTS_START( fruitpc )

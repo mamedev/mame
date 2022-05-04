@@ -56,7 +56,6 @@
 #include "speaker.h"
 
 #define TI99_CONSOLEGROM     "cons_grom"
-#define TI99_TMS9901_TAG     "tms9901"
 #define TI99_SCREEN_TAG      "screen"
 
 // Debugging

@@ -86,6 +86,8 @@ public:
 
 	void set_poll_int_lines(bool poll) { m_poll_lines = poll; }
 
+	void update_clock();
+
 private:
 	static constexpr device_timer_id DECREMENTER = 0;
 

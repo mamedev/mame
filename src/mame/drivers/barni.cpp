@@ -249,7 +249,7 @@ void barni_state::barni(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &barni_state::audiocpu_map);
 
 	PIA6821(config, m_pias1, 0); // U12
-	m_pias1->writepa_handler().set(m_speech, FUNC(tms5200_device::data_w));
+	m_pias1->writepa_handler().set(m_speech, FUNC(tms5220_device::data_w));
 	m_pias1->writepb_handler().set(FUNC(barni_state::pias1_pb_w));
 	m_pias1->irqa_handler().set_inputline(m_maincpu, M6802_IRQ_LINE);
 	m_pias1->irqb_handler().set_inputline(m_maincpu, M6802_IRQ_LINE);

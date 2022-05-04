@@ -10,9 +10,8 @@
     suffix indicated a typewriter-style keyboard. The TVI-920 added a row of
     function keys but was otherwise mostly identical to the TVI-912. The
     TVI-912C keyboard matrix and ribbon connector pinout are almost the same
-    as in the TVI-910. The system self-test can be triggered by shorting two
-    wires on the keyboard unit near the connector (TODO: figure out how to do
-    this on the emulated system).
+    as in the TVI-910. A self-test display pattern can be triggered by shorting
+    two wires on the keyboard unit near the connector.
 
     Settings for these terminals are controlled by DIP switches, which are not
     read by the CPU except for those of S4 (which is usually left as a block of
@@ -57,16 +56,18 @@
 #include "bus/rs232/rs232.h"
 #include "machine/ay31015.h"
 #include "machine/bankdev.h"
+#include "machine/input_merger.h"
 #include "sound/beep.h"
 #include "video/tms9927.h"
 #include "screen.h"
 #include "speaker.h"
 
-#define TV912_CH_WIDTH 14
-#define CHARSET_TEST 0
+namespace {
 
 class tv912_state : public driver_device
 {
+	static constexpr int TV912_CH_WIDTH = 14;
+
 public:
 	tv912_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
@@ -75,6 +76,7 @@ public:
 		, m_uart(*this, "uart")
 		, m_rs232(*this, "rs232")
 		, m_bankdev(*this, "bankdev")
+		, m_txd_merger(*this, "txd")
 		, m_beep(*this, "beep")
 		, m_dispram_bank(*this, "dispram")
 		, m_p_chargen(*this, "chargen")
@@ -130,6 +132,7 @@ private:
 	required_device<ay51013_device> m_uart;
 	required_device<rs232_port_device> m_rs232;
 	required_device<address_map_bank_device> m_bankdev;
+	required_device<input_merger_device> m_txd_merger;
 	required_device<beep_device> m_beep;
 	required_memory_bank m_dispram_bank;
 	required_region_ptr<u8> m_p_chargen;
@@ -224,7 +227,7 @@ u8 tv912_state::uart_status_r(offs_t offset)
 
 void tv912_state::output_40c(u8 data)
 {
-	// DB6: -PRTOL
+	// DB6: -PRTOL (TODO)
 
 	// DB5: +FORCE BLANK
 	m_force_blank = BIT(data, 5);
@@ -233,6 +236,7 @@ void tv912_state::output_40c(u8 data)
 	m_lpt_select = BIT(data, 4);
 
 	// DB3: -BREAK
+	m_txd_merger->in_w<1>(BIT(data, 3));
 
 	// DB2: -RQS
 	ioport_value dtr = m_dtr->read();
@@ -308,9 +312,6 @@ u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 					? dispram[(row << 6) | pos]
 					: dispram[0x600 | ((row & 0x07) << 6) | ((row & 0x18) << 1) | (pos & 0x0f)];
 
-			if (CHARSET_TEST && pos >= 32 && pos < 64)
-				ch = (pos & 0x1f) | (row & 7) << 5;
-
 			bool inhibit = ra == 0 || ra == 9;
 			bool underline = ra == 9 && BIT(charctrl, 0);
 			bool invert = BIT(charctrl, 1);
@@ -325,6 +326,12 @@ u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 					underline = false;
 				if (!BIT(ch, 1))
 					invert = false;
+			}
+			else if ((charctrl & 0xc) == 0)
+			{
+				inhibit = true;
+				underline = false;
+				invert = false;
 			}
 			else if ((charctrl & 0xc) == 0xc && m_2hz_flasher)
 				inhibit = true;
@@ -544,7 +551,7 @@ static INPUT_PORTS_START( tv912b )
 	PORT_START("KEY3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('.') PORT_CHAR('>') PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('b') PORT_CHAR('B') PORT_CHAR(0x02) PORT_CODE(KEYCODE_B)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Self Test Mode")
 	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("KEY4")
@@ -638,7 +645,7 @@ static INPUT_PORTS_START( tv912b )
 	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("KEY19")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN) // control character 0x9a (BREAK)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_DEL)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Line Feed") PORT_CHAR(0x0a) PORT_CODE(KEYCODE_INSERT)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -740,7 +747,7 @@ static INPUT_PORTS_START( tv912c )
 	PORT_START("KEY3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('.') PORT_CHAR('>') PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('b') PORT_CHAR('B') PORT_CHAR(0x02) PORT_CODE(KEYCODE_B)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Self Test Mode")
 	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("KEY4")
@@ -834,7 +841,7 @@ static INPUT_PORTS_START( tv912c )
 	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("KEY19")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN) // control character 0x9a (BREAK)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_DEL)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('[') PORT_CHAR(']') PORT_CHAR(0x1d) PORT_CODE(KEYCODE_CLOSEBRACE)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -941,8 +948,10 @@ void tv912_state::tv912(machine_config &config)
 
 	AY51013(config, m_uart);
 	m_uart->read_si_callback().set(m_rs232, FUNC(rs232_port_device::rxd_r));
-	m_uart->write_so_callback().set(m_rs232, FUNC(rs232_port_device::write_txd));
+	m_uart->write_so_callback().set(m_txd_merger, FUNC(input_merger_device::in_w<0>));
 	m_uart->set_auto_rdav(true);
+
+	INPUT_MERGER_ALL_HIGH(config, m_txd_merger).output_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, "loopback");
 
@@ -976,5 +985,7 @@ ROM_START( tv912b )
 	ROM_LOAD( "televideo912b_rom_a3.bin", 0x0000, 0x0800, CRC(bb9a7fbd) SHA1(5f1c4d41b25bd3ca4dbc336873362935daf283da) ) // AMI 8110QV (A3-2)
 ROM_END
 
-COMP( 1978, tv912c, 0,      0, tv912, tv912c, tv912_state, empty_init, "TeleVideo Systems", "TVI-912C", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // attributes not emulated
-COMP( 1978, tv912b, tv912c, 0, tv912, tv912b, tv912_state, empty_init, "TeleVideo Systems", "TVI-912B", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // attributes not emulated
+} // anonymous namespace
+
+COMP( 1978, tv912c, 0,      0, tv912, tv912c, tv912_state, empty_init, "TeleVideo Systems", "TVI-912C", MACHINE_NOT_WORKING )
+COMP( 1978, tv912b, tv912c, 0, tv912, tv912b, tv912_state, empty_init, "TeleVideo Systems", "TVI-912B", MACHINE_NOT_WORKING )

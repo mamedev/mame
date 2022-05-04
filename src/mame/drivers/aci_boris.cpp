@@ -66,7 +66,7 @@ private:
 	void digit_w(u8 data);
 	u8 input_r();
 
-	u8 m_io[2] = { 0, 0 };
+	u8 m_io[2] = { };
 	u8 m_4042 = 0;
 };
 

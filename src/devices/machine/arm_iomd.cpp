@@ -593,8 +593,8 @@ void arm_iomd_device::sdcr_w(u32 data)
 
 	// TODO: sound DMA reset
 	// eats samples in ppcar
-//	if (BIT(data, 7))
-//		m_sndbuffer_ok[0] = m_sndbuffer_ok[1] = false;
+//  if (BIT(data, 7))
+//      m_sndbuffer_ok[0] = m_sndbuffer_ok[1] = false;
 }
 
 u32 arm_iomd_device::sdst_r()

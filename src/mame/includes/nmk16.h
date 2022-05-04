@@ -216,6 +216,7 @@ protected:
 	void mustang_map(address_map &map);
 	void mustangb_map(address_map &map);
 	void mustangb3_map(address_map &map);
+	void mustangb3_sound_map(address_map &map);
 	void oki1_map(address_map &map);
 	void oki2_map(address_map &map);
 	void raphero_map(address_map &map);

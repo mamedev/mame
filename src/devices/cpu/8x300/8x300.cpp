@@ -189,7 +189,7 @@ void n8x300_cpu_device::device_resolve_objects()
 	m_sc_callback.resolve_safe();
 	m_wc_callback.resolve_safe();
 	m_lb_callback.resolve_safe();
-	m_rb_callback.resolve_safe();	
+	m_rb_callback.resolve_safe();
 	m_mclk_callback.resolve_safe();
 	m_iv_callback.resolve_safe();
 }
@@ -631,7 +631,7 @@ void n8x300_cpu_device::execute_run()
 				{
 					xmit_lb(dst, mask, with_sc, with_wc);
 				}
-					
+
 			}
 			break;
 		case 0x07:  // JMP

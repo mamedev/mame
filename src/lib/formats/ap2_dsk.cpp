@@ -607,7 +607,7 @@ int a2_16sect_format::identify(util::random_read &io, uint32_t form_factor, cons
 	static const unsigned char a3a2emul_block1[6] = { 0x8d, 0xd0, 0x03, 0x4c, 0xc7, 0xa4 };
 	static const unsigned char cpm22_block1[8] = { 0xa2, 0x55, 0xa9, 0x00, 0x9d, 0x00, 0x0d, 0xca };
 	static const unsigned char subnod_block1[8] = { 0x63, 0xaa, 0xf0, 0x76, 0x8d, 0x63, 0xaa, 0x8e };
- 
+
 	size_t actual;
 	io.read_at(0, sector_data, 256*2, actual);
 
