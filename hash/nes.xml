@@ -66990,7 +66990,7 @@ We don't include these hacks because they were not burned into real carts nor so
 				<rom name="wukong douju.prg" size="262144" crc="8638454c" sha1="3c7c91c552104c9c24153c00fd603c740715ff51" status="baddump" />
 			</dataarea>
 			<dataarea name="chr" size="524288">
-				<rom name="wukong douju.prg" size="524288" crc="72137bc5" sha1="1533ecf77b9bbc6864a2c62b463dfab34e017797" status="baddump" />
+				<rom name="wukong douju.chr" size="524288" crc="72137bc5" sha1="1533ecf77b9bbc6864a2c62b463dfab34e017797" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
@@ -85638,16 +85638,16 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-<!-- This dump is supposed to be bad: all other carts with the same PCB have switched CHR bank order, redump needed to check why this is different -->
+<!-- A dump with swapped 256K CHR pages exists (CRC f1310012). It's not clear if this has been properly redumped to determine which is the correct order. -->
 	<software name="mc_mario">
-		<description>Mario 7 in 1 (Bad Dump)</description>
+		<description>Mario 7 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_mario7in1" />
-			<feature name="pcb" value="BMC-MARIOPARTY-7IN1" />
+			<feature name="slot" value="bmc_gold7in1" />
+			<feature name="pcb" value="BMC-GOLD-7IN1" />
 			<dataarea name="chr" size="1048576">
-				<rom name="mario 7-in-1 [p1].chr" size="1048576" crc="f1310012" sha1="42378af64fc6356ec7d85b6e49b934287d2b6f15" offset="00000" status="baddump" />
+				<rom name="mario 7-in-1 [p1].chr" size="1048576" crc="29fa219f" sha1="28a77600426a6be233717ec60b84e9eb8a4ba637" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="1048576">
 				<rom name="mario 7-in-1 [p1].prg" size="1048576" crc="c021a8b9" sha1="4fe43bef9d9217881b7c8ece0007dc4cd830fbec" offset="00000" status="baddump" />
