@@ -34,22 +34,19 @@ sis5513_ide_device::sis5513_ide_device(const machine_config &mconfig, const char
 	, m_ide2(*this, "ide2")
 	, m_irq_pri_callback(*this)
 	, m_irq_sec_callback(*this)
+	, m_bus_master_space(*this, finder_base::DUMMY_TAG, AS_PROGRAM)
 {
-	// IDE controller with 0xd0 as programming i/f "ATA Host Adapters standard"
-	// pclass bits 1-3 are actually 1 when controller is in native mode
-	// pclass bits 0-2 can be r/w from $09
-	set_ids(0x10395513, 0xd0, 0x010180, 0x00);
 }
 
 void sis5513_ide_device::device_add_mconfig(machine_config &config)
 {
 	BUS_MASTER_IDE_CONTROLLER(config, m_ide1).options(ata_devices, "hdd", nullptr, false);
 	m_ide1->irq_handler().set([this](int state) { m_irq_pri_callback(state); });
-	m_ide1->set_bus_master_space(":maincpu", AS_PROGRAM);
+	m_ide1->set_bus_master_space(m_bus_master_space);
 
 	BUS_MASTER_IDE_CONTROLLER(config, m_ide2).options(ata_devices, "cdrom", nullptr, false);
 	m_ide2->irq_handler().set([this](int state) { m_irq_sec_callback(state); });
-	m_ide2->set_bus_master_space(":maincpu", AS_PROGRAM);
+	m_ide2->set_bus_master_space(m_bus_master_space);
 }
 
 void sis5513_ide_device::config_map(address_map &map)
@@ -183,6 +180,19 @@ void sis5513_ide_device::prog_if_w(u8 data)
 {
 	pclass = (pclass & ~0x5) | (data & 5);
 }
+
+#if 0
+void sis5513_ide_device::address_base_w(offs_t offset, uint32_t data)
+{
+	if (offset < 4)
+	{
+		m_bar[offset] = data;
+		pci_device::address_base_w(offset, data);
+	}
+	else
+		pci_device::address_base_w(offset, data);
+}
+#endif
 
 u8 sis5513_ide_device::ide_ctrl_0_r()
 {

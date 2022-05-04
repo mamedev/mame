@@ -205,7 +205,7 @@ void sis630_state::sis630(machine_config &config)
 	PCI_ROOT(config, "pci", 0);
 	// up to 512MB, 2 x DIMM sockets
 	SIS630_HOST(config, "pci:00.0", 0, "maincpu", 256*1024*1024);
-	SIS5513_IDE(config, m_ide_00_1, 0);
+	SIS5513_IDE(config, m_ide_00_1, 0, "maincpu");
 	// TODO: both on same line as default, should also trigger towards LPC
 	m_ide_00_1->irq_pri().set("pci:01.0:pic_slave", FUNC(pic8259_device::ir6_w));
 		//FUNC(sis950_lpc_device::pc_irq14_w));

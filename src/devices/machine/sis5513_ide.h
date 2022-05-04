@@ -12,12 +12,21 @@
 class sis5513_ide_device : public pci_device 
 {
 public:
+	template <typename T> sis5513_ide_device(
+		const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
+	    T &&host_tag, uint32_t bmspace = AS_PROGRAM
+	) : sis5513_ide_device(mconfig, tag, owner, clock)
+	{
+		// IDE controller with 0xd0 as programming i/f "ATA Host Adapters standard"
+		// pclass bits 1-3 are actually 1 when controller is in native mode
+		// pclass bits 0-2 can be r/w from $09
+		set_ids(0x10395513, 0xd0, 0x010180, 0x00);
+		m_bus_master_space.set_tag(host_tag, bmspace);
+	}
 	sis5513_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto irq_pri() { return m_irq_pri_callback.bind(); }
 	auto irq_sec() { return m_irq_sec_callback.bind(); }
-
-	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
 protected:
 	virtual void device_start() override;
@@ -41,6 +50,10 @@ private:
 	required_device<bus_master_ide_controller_device> m_ide2;
 	devcb_write_line m_irq_pri_callback;
 	devcb_write_line m_irq_sec_callback;
+	required_address_space m_bus_master_space;
+//	virtual void address_base_w(offs_t offset, uint32_t data) override;
+
+//	u32 m_bar[4]{};
 
 	void prog_if_w(u8 data);
 	u8 ide_ctrl_0_r();
