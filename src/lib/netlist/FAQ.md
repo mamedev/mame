@@ -1,8 +1,9 @@
 # The netlist FAQ
 
-## Glosary
+## Glossary
 
-BTANB: Bugs That Aren't Bugs.
+BTANB: Bugs That Aren't Bugs. Bugs in the hardware (or software) that are 
+faithfully emulated, therefore not a bug in the emulator.
 
 ## General
 
