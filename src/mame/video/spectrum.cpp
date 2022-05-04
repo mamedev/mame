@@ -85,7 +85,6 @@ rectangle spectrum_state::get_screen_area()
 
 u8 spectrum_state::get_border_color(u16 hpos, u16 vpos)
 {
-	//TODO snow effect
 	return m_port_fe_data & 0x07;
 }
 

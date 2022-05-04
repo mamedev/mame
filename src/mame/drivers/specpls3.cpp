@@ -261,15 +261,12 @@ void specpls3_state::port_7ffd_w(offs_t offset, uint8_t data)
 	/* D5    - Disable paging (permanent until reset) */
 
 	/* mface3 needs to see this port */
-	if (m_exp)
-		m_exp->iorq_w(offset | 0x4000, data);
+	if (m_exp) m_exp->iorq_w(offset | 0x4000, data);
 
 	/* paging disabled? */
-	if (m_port_7ffd_data & 0x20)
-		return;
+	if (m_port_7ffd_data & 0x20) return;
 
-	if ((m_port_7ffd_data ^ data) & 0x08)
-		m_screen->update_now();
+	if ((m_port_7ffd_data ^ data) & 0x08) m_screen->update_now();
 
 	/* store new state */
 	m_port_7ffd_data = data;
@@ -396,6 +393,7 @@ void specpls3_state::spectrum_plus2(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &specpls3_state::plus3_mem);
 	m_maincpu->set_addrmap(AS_IO, &specpls3_state::plus3_io);
+	m_maincpu->nomreq_cb().set_nop();
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(specpls3);
 

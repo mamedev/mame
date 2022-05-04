@@ -228,11 +228,9 @@ void spectrum_128_state::spectrum_128_port_7ffd_w(offs_t offset, uint8_t data)
 	/* D5 - Disable paging */
 
 	/* disable paging? */
-	if (m_port_7ffd_data & 0x20)
-			return;
+	if (m_port_7ffd_data & 0x20) return;
 
-	if ((m_port_7ffd_data ^ data) & 0x08)
-		m_screen->update_now();
+	if ((m_port_7ffd_data ^ data) & 0x08) m_screen->update_now();
 
 	/* store new state */
 	m_port_7ffd_data = data;
