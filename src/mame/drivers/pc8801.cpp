@@ -1710,7 +1710,6 @@ void pc8801_state::pc8801(machine_config &config)
 	Z80(config, m_maincpu, MASTER_CLOCK); // ~4 MHz, selectable to ~8 MHz on late models
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc8801_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &pc8801_state::main_io);
-//  m_maincpu->set_vblank_int("screen", FUNC(pc8801_state::vrtc_irq_w));
 	m_maincpu->set_irq_acknowledge_callback(FUNC(pc8801_state::int_ack_cb));
 
 	PC80S31(config, m_pc80s31, MASTER_CLOCK);
@@ -1721,6 +1720,7 @@ void pc8801_state::pc8801(machine_config &config)
 
 	I8214(config, m_pic, MASTER_CLOCK);
 	m_pic->int_wr_callback().set(FUNC(pc8801_state::irq_w));
+	m_pic->set_int_dis_hack(true);
 
 	UPD1990A(config, m_rtc);
 	//CENTRONICS(config, "centronics", centronics_devices, "printer");
