@@ -127,9 +127,9 @@ P: plain System573
 A: uses ext. analog I/O board GX700-PWB(F)
 AA: uses alt. ext. analog I/O board GX700-PWB(K)
 D: uses ext. digital sound and I/O board GX894-PWB(B)
-N : uses network PCB unit GUC07 + ext. digital sound and I/O board GX894-PWB(B)
+N: uses network PCB unit GUC07 + ext. digital sound and I/O board GX894-PWB(B)
 G: gun mania only, drives air soft gun (this game uses real BB bullet)
-K: a modified System 573, equipped with four video input/output and a DAM karaoke device
+K: uses karaoke I/O board GX921-PWB(B)
 
   Note:
        Not all games listed above are confirmed to run on System 573.
