@@ -423,6 +423,27 @@ namespace
 		if (peg_priority && !entry.expired())
 			entry.lock()->set_priority(OPTION_PRIORITY_MAXIMUM);
 	}
+
+
+	//-------------------------------------------------
+	//  parse_software_identifier
+	//-------------------------------------------------
+
+	std::tuple<std::string_view, std::string_view> parse_software_identifier(std::string_view software_identifier)
+	{
+		std::string_view list_name, software_name;
+		auto colon_pos = software_identifier.find_first_of(':');
+		if (colon_pos != std::string::npos)
+		{
+			list_name = software_identifier.substr(0, colon_pos);
+			software_name = software_identifier.substr(colon_pos + 1);
+		}
+		else
+		{
+			software_name = software_identifier;
+		}
+		return std::make_tuple(list_name, software_name);
+	}
 }
 
 
@@ -1038,27 +1059,6 @@ std::optional<emu_options::software_options> emu_options::evaluate_single_softwa
 	return is_compatible
 		? result
 		: std::optional<emu_options::software_options>();
-}
-
-
-//-------------------------------------------------
-//  parse_software_identifier
-//-------------------------------------------------
-
-std::tuple<std::string_view, std::string_view> emu_options::parse_software_identifier(std::string_view software_identifier)
-{
-	std::string_view list_name, software_name;
-	auto colon_pos = software_identifier.find_first_of(':');
-	if (colon_pos != std::string::npos)
-	{
-		list_name = software_identifier.substr(0, colon_pos);
-		software_name = software_identifier.substr(colon_pos + 1);
-	}
-	else
-	{
-		software_name = software_identifier;
-	}
-	return std::make_tuple(list_name, software_name);
 }
 
 
