@@ -9,7 +9,12 @@
 #include "emu.h"
 #include "serial.h"
 #include "machine/6850acia.h"
+#include "machine/z80sio.h"
 #include "bus/rs232/rs232.h"
+
+//**************************************************************************
+// Serial I/O
+//**************************************************************************
 
 class serial_io_device : public device_t, public device_rc2014_card_interface
 {
@@ -72,5 +77,67 @@ void serial_io_device::device_add_mconfig(machine_config &config)
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 }
 
-
 DEFINE_DEVICE_TYPE_PRIVATE(RC2014_SERIAL_IO, device_rc2014_card_interface, serial_io_device, "rc2014_serial_io", "RC2014 Serial I/O Module")
+
+//**************************************************************************
+//  Dual Serial Module SIO/2
+//**************************************************************************
+
+class dual_serial_device : public device_t, public device_rc2014_ext_card_interface
+{
+public:
+	// construction/destruction
+	dual_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_resolve_objects() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_bus->int_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( tx_w ) { m_bus->tx_w(state); }
+private:
+	required_device<z80sio_device> m_sio;
+};
+
+dual_serial_device::dual_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, RC2014_SERIAL_IO, tag, owner, clock)
+	, device_rc2014_ext_card_interface(mconfig, *this)
+	, m_sio(*this, "sio")
+{
+}
+
+void dual_serial_device::device_start()
+{
+	m_bus->installer(AS_IO)->install_readwrite_handler(0x80, 0x80, read8smo_delegate(*m_sio, FUNC(z80sio_device::ca_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::ca_w)));
+	m_bus->installer(AS_IO)->install_readwrite_handler(0x81, 0x81, read8smo_delegate(*m_sio, FUNC(z80sio_device::da_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::da_w)));
+	m_bus->installer(AS_IO)->install_readwrite_handler(0x82, 0x82, read8smo_delegate(*m_sio, FUNC(z80sio_device::cb_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::cb_w)));
+	m_bus->installer(AS_IO)->install_readwrite_handler(0x83, 0x83, read8smo_delegate(*m_sio, FUNC(z80sio_device::db_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::db_w)));
+}
+
+void dual_serial_device::device_resolve_objects()
+{
+	m_bus->clk_callback().append(m_sio, FUNC(z80sio_device::txca_w));
+	m_bus->clk_callback().append(m_sio, FUNC(z80sio_device::rxca_w));
+
+	m_bus->clk2_callback().append(m_sio, FUNC(z80sio_device::txcb_w));
+	m_bus->clk2_callback().append(m_sio, FUNC(z80sio_device::rxcb_w));
+
+	m_bus->rx_callback().append(m_sio, FUNC(z80sio_device::rxa_w));
+}
+
+void dual_serial_device::device_add_mconfig(machine_config &config)
+{
+	Z80SIO(config, m_sio, 0);
+	m_sio->out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_sio->out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
+	m_sio->out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_sio->out_int_callback().set(FUNC(dual_serial_device::irq_w));
+
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("sio", FUNC(z80sio_device::rxa_w));
+	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
+}
+
+DEFINE_DEVICE_TYPE_PRIVATE(RC2014_DUAL_SERIAL, device_rc2014_ext_card_interface, dual_serial_device, "rc2014_dual_serial", "RC2014 Serial I/O Module")
