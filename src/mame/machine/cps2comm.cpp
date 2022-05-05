@@ -347,7 +347,8 @@ private:
 					if (err)
 					{
 						LOG("Error accepting OUT port connection: %s\n", err.message());
-						start_accept();
+						if (!m_stopping)
+							start_accept();
 					}
 					else
 					{
