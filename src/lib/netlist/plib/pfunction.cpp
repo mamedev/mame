@@ -17,6 +17,13 @@
 
 namespace plib {
 
+	PERRMSGV(MF_FUNCTION_UNKNOWN_TOKEN,          2, "pfunction: unknown/misformatted token <{1}> in <{2}>")
+	PERRMSGV(MF_FUNCTION_STACK_UNDERFLOW,        2, "pfunction: stack underflow on token <{1}> in <{2}>")
+	PERRMSGV(MF_FUNCTION_STACK_OVERFLOW,         2, "pfunction: stack overflow on token <{1}> in <{2}>")
+	PERRMSGV(MF_FUNCTION_PARENTHESIS_INEQUALITY, 2, "pfunction: parenthesis inequality on token <{1}> in <{2}>")
+	PERRMSGV(MF_FUNCTION_STACK_UNEQUAL_ONE,      2, "pfunction: stack count {1} different to one on <{2}>")
+	PERRMSGV(MF_FUNCTION_STACK_UNDERFLOW_INFIX,  1, "pfunction: stack underflow during infix parsing of: <{1}>")
+
 	static constexpr const std::size_t MAX_STACK = 32;
 
 	struct pcmd_t
@@ -141,20 +148,20 @@ namespace plib {
 					else
 						rc = rpn_inst(plib::pstonum_ne<NT>(plib::left(cmd, cmd.length()-1), err) * r->second);
 					if (err)
-						throw pexception(plib::pfmt("pfunction: unknown/misformatted token <{1}> in <{2}>")(cmd)(expr));
+						throw pexception(MF_FUNCTION_UNKNOWN_TOKEN(cmd, expr));
 					stk += 1;
 				}
 			}
 			if (stk < 1)
-				throw pexception(plib::pfmt("pfunction: stack underflow on token <{1}> in <{2}>")(cmd)(expr));
+				throw pexception(MF_FUNCTION_STACK_UNDERFLOW(cmd, expr));
 			if (stk >= narrow_cast<int>(MAX_STACK))
-				throw pexception(plib::pfmt("pfunction: stack overflow on token <{1}> in <{2}>")(cmd)(expr));
+				throw pexception(MF_FUNCTION_STACK_OVERFLOW(cmd, expr));
 			if (rc.cmd() == LP || rc.cmd() == RP)
-				throw pexception(plib::pfmt("pfunction: parenthesis inequality on token <{1}> in <{2}>")(cmd)(expr));
+				throw pexception(MF_FUNCTION_PARENTHESIS_INEQUALITY(cmd, expr));
 			m_precompiled.push_back(rc);
 		}
 		if (stk != 1)
-			throw pexception(plib::pfmt("pfunction: stack count {1} different to one on <{2}>")(stk, expr));
+			throw pexception(MF_FUNCTION_STACK_UNEQUAL_ONE(stk, expr));
 		compress();
 	}
 
@@ -187,7 +194,7 @@ namespace plib {
 	static pstring pop_check(std::stack<pstring> &stk, const pstring &expr) noexcept(false)
 	{
 		if (stk.empty())
-			throw pexception(plib::pfmt("pfunction: stack underflow during infix parsing of: <{1}>")(expr));
+			throw pexception(MF_FUNCTION_STACK_UNDERFLOW_INFIX(expr));
 		pstring res = stk.top();
 		stk.pop();
 		return res;

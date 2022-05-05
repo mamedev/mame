@@ -362,6 +362,7 @@ namespace devices
 						auto &pt = dynamic_cast<terminal_t &>(*term);
 						// check the connected terminal
 						const auto *const connected_terminals = nlstate.setup().get_connected_terminals(pt);
+						// NOLINTNEXTLINE proposal does not work for VS
 						for (auto ct = connected_terminals->begin(); *ct != nullptr; ct++)
 						{
 							analog_net_t &connected_net = (*ct)->net();
