@@ -59,10 +59,10 @@ Known undumped pirates
   * Shizen Mahjong / Competition Mahjong (by Sachen, apparently dumped but hoarded)
   * Magic 7 Block - 百変七巧板
 
-NOTE
-
-  * Phantasy Star (serial G-4534, released by Sega on 1994-04-02) is actually a SMS cart which works in the MD
-    thanks to VDP compatibility mode. Since this is currently not emulated in MAME, the dump is in sms.xml
+TODO:
+- Phantasy Star (serial G-4534, pstarjmd) is actually a SMS cart in MD shell,
+  which works in the MD thanks to VDP compatibility mode.
+  The dump needs to be ported from sms.xml and a specific cart slot override needs to be added here.
 
 
 Info on Sega chip labels (from Sunbeam / Digital Corruption)
@@ -1623,10 +1623,13 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 	</software>
 
 
-	<software name="collslam">
+	<software name="collslam" supported="no">
 		<description>College Slam (USA)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+[EEPROM] Blue stripes at boot
+]]></notes>
 		<info name="serial" value="T-81576"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
@@ -5098,10 +5101,13 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 
 
 <!-- Only Euro is confirmed -->
-	<software name="menacer">
+	<software name="menacer" supported="no">
 		<description>Menacer 6-Game Cartridge (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Unsupported [Menacer] peripheral
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B"/>
 			<feature name="u1" value="MPR-15075-F"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -5475,10 +5481,13 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 
 
 <!-- Only USA is confirmed -->
-	<software name="nbajamte">
+	<software name="nbajamte" supported="no">
 		<description>NBA Jam Tournament Edition (World)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+[EEPROM] Blue stripes at boot
+]]></notes>
 		<info name="serial" value="T-81143"/>
 		<info name="release" value="19950224"/>
 		<info name="alt_title" value="NBA ジャム トーナメントエディション"/>
@@ -5717,10 +5726,13 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 
 
 <!-- Only Euro is confirmed -->
-	<software name="nflqb">
+	<software name="nflqb" supported="no">
 		<description>NFL Quarterback Club (World)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+[EEPROM] Blue stripes at boot
+]]></notes>
 		<info name="serial" value="T-81155"/>
 		<info name="release" value="19950224"/>
 		<info name="alt_title" value="NFLクォーターバッククラブ'95"/>
@@ -9973,7 +9985,7 @@ Some carts have been partially documented, based on available pics (from Neperen
 but dumps still have to be confirmed.
 -->
 
-	<software name="13mahjan">
+	<software name="13mahjan" supported="yes">
 		<description>13 Ma Jiang - 98 Mei Shao Nu (Chi)</description>
 		<year>1998</year>
 		<publisher>BBD</publisher>
@@ -9985,7 +9997,7 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="16ton">
+	<software name="16ton" supported="yes">
 		<description>16 Ton (Jpn, SegaNet)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
@@ -10020,7 +10032,7 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="16mj2">
-		<description>Shi Liu Zhang Ma Jiang II</description>
+		<description>Shi Liu Zhang Ma Jiang II (Chi)</description>
 		<year>199?</year>
 		<publisher>City Man</publisher>
 		<info name="serial" value="GM-95003"/>
@@ -10045,24 +10057,30 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="3in1fwt">
+	<software name="3in1fwt" supported="no">
 		<description>3 in 1 Flashback - World Championship Soccer - Tecmo World Cup 92 (Pirate)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Only Flashback portion is present in the dump, the other two entries and menu are missing.
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="3-in-1 flashback - world champ. soccer - tecmo world cup 92 (pirate).bin" size="2097152" crc="a8fd28d7" sha1="a0dd99783667af20589d473a2054d4bbd62d943e"/>
+				<rom name="3-in-1 flashback - world champ. soccer - tecmo world cup 92 (pirate).bin" size="2097152" crc="a8fd28d7" sha1="a0dd99783667af20589d473a2054d4bbd62d943e" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="3in1rmb">
+	<software name="3in1rmb" supported="no">
 		<description>3 in 1 Road Rash - Ms. Pac-Man - Block Out (Pirate)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Only Road Rash portion is present in the dump, the other two entries and menu are missing.
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="3-in-1 road rash - ms. pac-man - block out (pirate).bin" size="1048576" crc="13c96154" sha1="fd7255c2abdf90698f779a039ea1e560ca19639a"/>
+				<rom name="3-in-1 road rash - ms. pac-man - block out (pirate).bin" size="1048576" crc="13c96154" sha1="fd7255c2abdf90698f779a039ea1e560ca19639a" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12089,10 +12107,13 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="blockb">
+	<software name="blockb" supported="no">
 		<description>Blockbuster World Video Game Championship II (USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+[EEPROM] Blue stripes at boot
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_nbajamte"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
@@ -12118,10 +12139,13 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="bodyco">
+	<software name="bodyco" supported="partial">
 		<description>Body Count (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Unsupported [Menacer] peripheral (joypad works)
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -12130,10 +12154,13 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="bodycop" cloneof="bodyco">
+	<software name="bodycop" cloneof="bodyco" supported="partial">
 		<description>Body Count (Euro, Prototype)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Unsupported [Menacer] peripheral (joypad works)
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="body count (euro) (beta).bin" size="1048576" crc="b4ffb6ce" sha1="a01971cdce4d98e770d9c083a5accb8cb5260112"/>
@@ -12141,10 +12168,14 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="bodycop4" cloneof="bodyco">
+	<software name="bodycop4" cloneof="bodyco" supported="partial">
 		<description>Body Count (USA, Prototype, 19940208)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Unsupported [Menacer] peripheral (joypad works)
+]]></notes>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1046784">
 				<rom name="body count (prototype - feb 08, 1994).bin" size="1046784" crc="c5fed897" sha1="1c13134c32dc620dd663f33150c82d12cc69d442"/>
@@ -12164,10 +12195,15 @@ but dumps still have to be confirmed.
 	    </part>
 	</software-->
 
-	<software name="bodycop5" cloneof="bodyco">
+	<software name="bodycop5" cloneof="bodyco" supported="partial">
 		<description>Body Count (USA, Prototype, 19940127)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Unsupported [Menacer] peripheral (joypad works)
+]]></notes>
+		<!-- megadrij works with this specific version only -->
+		<sharedfeat name="compatibility" value="NTSC-U,NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="body count (prototype - jan 27, 1994).bin" size="1048576" crc="66ca4e71" sha1="8cbea2b2c0435fadc6031a2704d7a60c1a386615"/>
@@ -12175,10 +12211,14 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="bodycop3" cloneof="bodyco">
+	<software name="bodycop3" cloneof="bodyco" supported="partial">
 		<description>Body Count (USA, Prototype, 19940303)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Unsupported [Menacer] peripheral (joypad works)
+]]></notes>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="body count (prototype - mar 03, 1994).bin" size="1048576" crc="6abc6e77" sha1="0c50d81ff0630fb79a600f65dfacb894dfe62f4d"/>
@@ -12202,6 +12242,7 @@ but dumps still have to be confirmed.
 		<description>Body Count (USA, Prototype, 19940308)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="body count (prototype - mar 08, 1994).bin" size="1048576" crc="8965213f" sha1="dbd4fec001f61c6a8414b2035e884ebfbf48b899"/>
@@ -16399,10 +16440,13 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="bighurt">
+	<software name="bighurt" supported="no">
 		<description>Frank Thomas Big Hurt Baseball (Euro, USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+[EEPROM] Blue stripes at boot
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_cslam"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
@@ -18654,10 +18698,13 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="lethalen">
+	<software name="lethalen" supported="partial">
 		<description>Lethal Enforcers (Euro)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+Unsupported [Justifier] peripheral (joypad works)
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -18666,10 +18713,13 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="lethalenj" cloneof="lethalen">
+	<software name="lethalenj" cloneof="lethalen" supported="partial">
 		<description>Lethal Enforcers (Jpn)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+Unsupported [Justifier] peripheral (joypad works)
+]]></notes>
 		<info name="serial" value="T-95073"/>
 		<info name="release" value="19931210"/>
 		<info name="alt_title" value="リーサルエンフォーサーズ"/>
@@ -18681,10 +18731,13 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="lethalenup" cloneof="lethalen">
+	<software name="lethalenup" cloneof="lethalen" supported="partial">
 		<description>Lethal Enforcers (USA, Prototype)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+Unsupported [Justifier] peripheral (joypad works)
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="lethalenforcers00.eadd.bin" size="2097152" crc="f4010503" sha1="01a445cf8ed57db1be4bd2aef1107d9e2fbcdb77"/>
@@ -18692,10 +18745,13 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="le2">
+	<software name="le2" supported="partial">
 		<description>Lethal Enforcers II - Gun Fighters (Euro)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+Unsupported [Justifier] peripheral (joypad works)
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -18704,10 +18760,13 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="le2u" cloneof="le2">
+	<software name="le2u" cloneof="le2" supported="partial">
 		<description>Lethal Enforcers II - Gun Fighters (USA)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+Unsupported [Justifier] peripheral (joypad works)
+]]></notes>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -20883,6 +20942,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>NBA Jam (Euro, USA, v1.1)</description>
 		<year>1993</year>
 		<publisher>Arena</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U,PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_nbajam_alt"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -20898,6 +20958,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="serial" value="T-81033"/>
 		<info name="release" value="19940429"/>
 		<info name="alt_title" value="NBA ジャム"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_nbajam_alt"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -20920,10 +20981,13 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="nbajamtef" cloneof="nbajamte">
+	<software name="nbajamtef" cloneof="nbajamte" supported="no">
 		<description>NBA Jam Tournament Edition (World, 2002 Fix Release)</description>
 		<year>2002?</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+[EEPROM] Blue stripes at boot
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_nbajamte"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -33043,8 +33107,13 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="deathcal">
 		<description>Death Caliber (Rus)</description>
-		<year>199?</year>
-		<publisher>Tomsoft</publisher>
+		<year>2002</year>
+		<publisher>Glorysun</publisher>
+		<notes><![CDATA[
+https://bootleggames.fandom.com/wiki/Death_Caliber
+Unsupported lightgun?
+]]></notes>
+		<info name="developer" value="Hummer Software, Tomsoft"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="death caliber.bin" size="4194304" crc="3cd2c797" sha1="414bce2fa385642fccaa4653339dae44f1913505"/>
@@ -34053,10 +34122,14 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	<!-- The next development tools have been dumped by Tiido: all of them would require PC connection with Sega Loader Board and LPT cable.
 	We still need to find the PC-side software for these dumps... -->
 
-	<software name="gems">
+	<software name="gems" supported="no">
 		<description>GEMS v2.8</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Unsupported Sega Loader Board
+]]></notes>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="262144">
 				<rom name="gems.bin" size="262144" crc="98ebb058" sha1="83412622877d9df8ac7c1486b06c490dfa52ebf6"/>
@@ -34064,10 +34137,13 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="sndtool">
+	<software name="sndtool" supported="no">
 		<description>Sound Tool v2.2?</description>
 		<year>1991</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Unsupported Sega Loader Board
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="262144">
 				<rom name="sndtool.bin" size="262144" crc="ee41b452" sha1="a99238e3fdedbeca602f05a4c83f70db1bf1ba84"/>
@@ -34079,6 +34155,9 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Art Tool</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Unsupported Sega Loader Board
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="262144">
 				<rom name="arttool.bin" size="262144" crc="5353f532" sha1="7f3233f4938fcd26af0733e7645d1a401999de86"/>
@@ -34091,26 +34170,30 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 <!-- Dumps of dubious nature -->
 
 
-<!-- this dump is 'double interleaved' in .smd AND .md format.. it's trash -->
 	<software name="tetris1" supported="no">
 		<description>Tetris (Bad?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Dump is 'double interleaved' in .smd AND .md format
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
-				<rom name="tetris.bin" size="524288" crc="eb024ab2" sha1="44340cd021ab9cfb0536f78d6f0d59ea0f409a40"/>
+				<rom name="tetris.bin" size="524288" crc="eb024ab2" sha1="44340cd021ab9cfb0536f78d6f0d59ea0f409a40" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
 
-<!-- this dump seem to be Pele World Tournament Soccer with some weird interleave... it's probably trash -->
 	<software name="virak" supported="no">
 		<description>Voina Irak (Bad?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Bad dump of a supposedly russian version of pele2 (cfr. missing MD header at top)
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="voina_irak.bin" size="2097152" crc="c7177e93" sha1="017af15b93a7f2e3c9f6310fe01c234f49c47b13"/>
+				<rom name="voina_irak.bin" size="2097152" crc="c7177e93" sha1="017af15b93a7f2e3c9f6310fe01c234f49c47b13" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -34122,7 +34205,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="super_mario_2.bin" size="2097152" crc="0da6dc4b" sha1="f6808fff565f96c0d2f619be890052c7dba3019e"/>
+				<rom name="super_mario_2.bin" size="2097152" crc="0da6dc4b" sha1="f6808fff565f96c0d2f619be890052c7dba3019e" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -34132,13 +34215,16 @@ Aborted attempt to hack out the Rockman X3 protection?
 rockman x3 (unl).bin [1/2]      xxx3.bin     [1/2]      88.159271%
 rockman x3 (unl).bin [2/2]      xxx3.bin     [2/2]      IDENTICAL
 -->
-	<software name="rockmnx3b" cloneof="rockmnx3">
+	<software name="rockmnx3b" cloneof="rockmnx3" supported="no">
 		<description>Rockman X3 (Bad? Hacked?)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<notes><![CDATA[
+Punts to a stack trace screen
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="xxx3.bin" size="2097152" crc="188da9f0" sha1="808d29751b572ada0780dc35d587d99c08ba95b0"/>
+				<rom name="xxx3.bin" size="2097152" crc="188da9f0" sha1="808d29751b572ada0780dc35d587d99c08ba95b0" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -34211,13 +34297,15 @@ This dump is either a bad dump or a wrongly patched one.
 	   If no additional materials are listed then the results of a successful run should be mentioned here for future reference.
 	-->
 
-	<!-- most effects currently fail -->
 	<!-- titan-overdrivemegademo.zip -->
 	<!-- http://www.pouet.net/prod.php?which=61724 -->
-	<software name="d_titovr">
+	<software name="d_titovr" supported="no">
 		<description>Overdrive (Demo) (Euro)</description>
 		<year>2013</year>
 		<publisher>Titan</publisher>
+		<notes><![CDATA[
+Most effects fails
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="0x400000">
 				<rom name="titan-overdrivemegademo.bin" size="0x3f01be" crc="3deb19a9" sha1="6085182099d6a9ad2c8242eae263507e42269b66"/>
@@ -34225,13 +34313,17 @@ This dump is either a bad dump or a wrongly patched one.
 		</part>
 	</software>
 
-	<!-- Doesn't boot correctly.  Needs emulation improvements -->
 	<!-- titan-overdrive2.zip -->
 	<!-- http://www.pouet.net/prod.php?which=69648 -->
 	<software name="d_titov2" supported="no">
 		<description>Overdrive 2 (Demo) (Euro)</description>
 		<year>2017</year>
 		<publisher>Titan</publisher>
+		<notes><![CDATA[
+Punts to a 0d2 B50D stack trace screen
+Tries to jump to jsr $a385b86.l (?) at PC=0x38b0, must be using its own mapper rather than ssf2
+]]></notes>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_ssf2"/>
 			<dataarea name="rom" width="16" endianness="big" size="16777216">
