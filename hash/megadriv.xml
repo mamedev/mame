@@ -20937,8 +20937,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1997</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="nba live 98 (usa).bin" size="2097152" crc="23473a8a" sha1="89b98867c7393371a364de58ba6955e0798fa10f"/>
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
