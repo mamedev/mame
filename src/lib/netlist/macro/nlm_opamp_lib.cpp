@@ -307,6 +307,25 @@ static NETLIST_START(MC3340_DIP)
 	ALIAS(8, VCC)
 NETLIST_END()
 
+static NETLIST_START(MB4391_DIP)
+	MC3340_DIP(A)
+	MC3340_DIP(B)
+	
+	DIPPINS(        /*   +--------------+   */
+		A.INPUT,    /*   |1     ++    16|   */ A.VCC,
+		A.CONTROL,  /*   |2           15|   */ A.OUTPUT,
+		A.GND,      /*   |3           14|   */ A.ROLLOFF,
+		NC.1,       /*   |4           13|   */ NC.4,
+		B.INPUT,    /*   |5           12|   */ B.VCC,
+		B.CONTROL,  /*   |6           11|   */ B.OUTPUT,
+		B.GND,      /*   |7           10|   */ B.ROLLOFF,
+		NC.2,       /*   |8            9|   */ NC.3
+					/*   +--------------+   */
+	)
+	NET_C(A.GND, B.GND)
+	NET_C(A.VCC, B.VCC)
+NETLIST_END()
+
 static NETLIST_START(TL081_DIP)
 	OPAMP(A, "TL084")
 
@@ -637,6 +656,7 @@ NETLIST_START(opamp_lib)
 	NET_MODEL("LM3900_PNP1 PNP(IS=1E-14 BF=40 TF=1E-7 CJC=1E-12 CJE=1E-12 VAF=150 RB=100 RE=5)")
 #endif
 	LOCAL_LIB_ENTRY(MB3614_DIP)
+	LOCAL_LIB_ENTRY(MB4391_DIP)
 	LOCAL_LIB_ENTRY(MC3340_DIP)
 	LOCAL_LIB_ENTRY(TL081_DIP)
 	LOCAL_LIB_ENTRY(TL082_DIP)

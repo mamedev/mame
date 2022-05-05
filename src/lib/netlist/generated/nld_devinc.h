@@ -949,6 +949,10 @@
 #define MB3614_DIP(...)                                                   \
 	NET_REGISTER_DEVEXT(MB3614_DIP, __VA_ARGS__)
 
+// usage       : MB4391_DIP(name, )
+#define MB4391_DIP(...)                                                   \
+	NET_REGISTER_DEVEXT(MB4391_DIP, __VA_ARGS__)
+
 // usage       : MC3340_DIP(name, )
 #define MC3340_DIP(...)                                                   \
 	NET_REGISTER_DEVEXT(MC3340_DIP, __VA_ARGS__)

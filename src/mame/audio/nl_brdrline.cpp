@@ -14,8 +14,6 @@
 //      in a wrong orientation.
 //      base and collectors were swaped
 //
-//  * MB4391 is missing. a fake substitution is used
-//
 //  * it takes up to 30seconds to charge C24 to its working point
 //      in ANIMAL_SOUND
 //
@@ -65,123 +63,6 @@
 
 #define ENABLE_FRONTIERS (1)
 
-
-/* ----------------------------------------------------------------------------
- *  Library section content START
- * ---------------------------------------------------------------------------*/
-#if 0
-//
-// WARNING: fake implementation for MB4391 based on guesses only
-// MB4391_DIP
-// MB4391(A)
-//            +--------------+
-//  .1/*IN1*/ |1     ++    16| .16/*VCC1*/
-// .2/*CON1*/ |2           15| .15/*OUT1*/
-// .3/*GND1*/ |3           14| .14/*RO1*/
-//            |4   MB4391  13|
-//  .5/*IN2*/ |5           12| .12/*VCC2*/
-// .6/*CON2*/ |6           11| .11/*OUT2*/
-// .7/*GND2*/ |7           10| .10/*RO2*/
-//            |8            9|
-//            +--------------+
-/*
- * VCC -----+-----------+-------------- VCC
- *          |           |
- *         +-+          |
- *         |R|          |
- *         |1|         2|
- *         +-+  +-------+-+
- *          |  0|  AFUNC  |Q  +----+
- *  IN -----+---+         +---|Rout|--- OUT
- *          |   |   fx    |   +----+
- *         +-+  +-+--+--+-+
- *         |R|   1| 4| 3|
- *         |2|    |  |  |
- *         +-+    |  |  |
- *          |     |  |  |
- * GND -----+-----|--|--+-------------- GND
- *                |  |
- * CON -----------+  |
- *                   |
- *  RO --------------+
- *
- */
-#endif
-static NETLIST_START(_MB4391)
-	// MB4391 (fake implementation)
-	// 2020 by beta-tester (https://github.com/beta-tester)
-	//
-	// values by guesses
-	// for brdrline schematics only
-	//
-	// Vmix  = -(Vcon - 4.759384) / (4.759384 - 2.839579)
-	// Vmix2 = pow(Vmix, 2)
-	// Vout  = Vin * Vmix2
-	//
-	// Vcon(max) = 4.759384
-	// Vcon(min) = 2.839584...2.839579 (@3.002360417e+01)(@3.152360417e+01)
-	//AFUNC(fx, 5, "(A1)")
-	//
-	//AFUNC(fx, 5, "min(1, max(0, -(A1 - 4.759384) / (4.759384 - 2.839579)))")
-	//AFUNC(fx, 5, "min(1, max(0, -(A1 - (A2-0.24)) / ((A2-0.24) - (A2/2+0.34))))")
-	//
-	// Vin(offset)=2.5 (VCC/2)
-	//AFUNC(fx, 5, "(A0)")
-	//AFUNC(fx, 5, "(A0-2.5)")
-	//AFUNC(fx, 5, "(A0-(A2/2))")
-	//
-	// vin * mix
-	//AFUNC(fx, 5, "(A0-(A2/2)) * (min(1, max(0, -(A1 - 4.759384) / (4.759384 - 2.839579))))")
-	//
-	// vin * pow(mix, 2)
-	AFUNC(fx, 5, "(A0-(A2/2)) * pow((min(1, max(0, -(A1 - 4.759384) / (4.759384 - 2.839579))), 2))")
-
-	RES(R1, RES_K(10))
-	RES(R2, RES_K(10))
-	NET_C(VCC, R1.1)
-	NET_C(IN,  R1.2, R2.1)
-	NET_C(R2.2, GND)
-
-	RES(Rout, RES_K(1))
-	NET_C(fx.Q, Rout.1) // fx(IN, CON, VCC, GND, RO) = OUT
-
-	// INPUT
-	ALIAS(IN,  fx.A0) // IN
-	ALIAS(CON, fx.A1) // CON
-	ALIAS(VCC, fx.A2) // VCC
-	ALIAS(GND, fx.A3) // GND
-	ALIAS(RO,  fx.A4) // RO
-
-	// OUTPUT
-	ALIAS(OUT, Rout.2)  // OUT
-NETLIST_END()
-
-
-static NETLIST_START(_MB4391_DIP)
-	SUBMODEL(_MB4391, A)
-	SUBMODEL(_MB4391, B)
-
-	NC_PIN(NC)
-
-	DIPPINS(    /*      +--------------+       */
-		  A.IN, /*  IN1 |1     ++    16| VCC1  */ A.VCC,
-		 A.CON, /* CON1 |2           15| OUT1  */ A.OUT,
-		 A.GND, /* GND1 |3           14| RO1   */ A.RO,
-		  NC.I, /*      |4   MB4391  13|       */ NC.I,
-		  B.IN, /*  IN2 |5           12| VCC2  */ B.VCC,
-		 B.CON, /* CON2 |6           11| OUT2  */ B.OUT,
-		 B.GND, /* GND2 |7           10| RO2   */ B.RO,
-		  NC.I, /*      |8            9|       */ NC.I
-				/*      +--------------+       */
-	)
-NETLIST_END()
-/* ----------------------------------------------------------------------------
- *  Library section content END
- * ---------------------------------------------------------------------------*/
-
-
-
-
 /*
  * hack
  *
@@ -215,19 +96,6 @@ NETLIST_END()
 // npn transistor 2SC458
 #define C458(_name) \
 			QBJT_EB(_name, "NPN")
-
-// MB4391 one half of
-//#define MB4391(_name)  NET_REGISTER_DEV_X(MB4391, _name)
-#define MB4391(_name) \
-			SUBMODEL(_MB4391, _name)
-
-// MB4391 full dip
-//#define MB4391_DIP(_name)  NET_REGISTER_DEV_X(MB4391_DIP, _name)
-#define MB4391_DIP(_name) \
-			SUBMODEL(_MB4391_DIP, _name)
-
-
-
 
 // ---------------------------------------------------------------------------
 // Borderline
@@ -1497,9 +1365,6 @@ NETLIST_START(brdrline)
 	SOLVER(solver, 48000)
 #endif
 
-	LOCAL_SOURCE(_MB4391)
-	LOCAL_SOURCE(_MB4391_DIP)
-
 	LOCAL_SOURCE(brdrline_schematics)
 	LOCAL_SOURCE(brdrline_sound_out)
 
@@ -1647,22 +1512,6 @@ OPAMP(A, "LM324")
  * .6/*MINUS2*/ |6            9| .9/*MINUS3*/
  *   .7/*OUT2*/ |7   LM324    8| .8/*OUT3*/
  *              +--------------+
-#endif
-
-#if 0
-WARNING: fake implementation for MB4391 based on guesses only
-MB4391_DIP
-MB4391(A)
- *            +--------------+
- *  .1/*IN1*/ |1     ++    16| .16/*VCC1*/
- * .2/*CON1*/ |2           15| .15/*OUT1*/
- * .3/*GND1*/ |3           14| .14/*RO1*/
- *            |4   MB4391  13|
- *  .5/*IN2*/ |5           12| .12/*VCC2*/
- * .6/*CON2*/ |6           11| .11/*OUT2*/
- * .7/*GND2*/ |7           10| .10/*RO2*/
- *            |8            9|
- *            +--------------+
 #endif
 
 #if 0
