@@ -8,6 +8,7 @@
 #include "bus/rc2014/ram.h"
 #include "bus/rc2014/rom.h"
 #include "bus/rc2014/serial.h"
+#include "bus/rc2014/cf.h"
 
 namespace {
 
@@ -18,6 +19,7 @@ static void rc2014_bus_devices(device_slot_interface &device)
 	device.option_add("ram32k", RC2014_RAM_32K);
 	device.option_add("sw_rom", RC2014_SWITCH_ROM);
 	device.option_add("serial", RC2014_SERIAL_IO);
+	device.option_add("cf", RC2014_COMPACT_FLASH);
 
 	device.option_add("z80_21", RC2014_Z80CPU_21);
 	device.option_add("dual_clk", RC2014_DUAL_CLOCK);
@@ -79,7 +81,7 @@ public:
 		RC2014_EXT_SLOT(config, "bus:3", m_rc2014_bus, rc2014_bus_devices, "ram32k");
 		RC2014_EXT_SLOT(config, "bus:4", m_rc2014_bus, rc2014_bus_devices, "sw_rom");
 		RC2014_EXT_SLOT(config, "bus:5", m_rc2014_bus, rc2014_bus_devices, "serial");
-		RC2014_EXT_SLOT(config, "bus:6", m_rc2014_bus, rc2014_bus_devices, nullptr);
+		RC2014_EXT_SLOT(config, "bus:6", m_rc2014_bus, rc2014_bus_devices, "cf");
 		RC2014_EXT_SLOT(config, "bus:7", m_rc2014_bus, rc2014_bus_devices, nullptr);
 		RC2014_EXT_SLOT(config, "bus:8", m_rc2014_bus, rc2014_bus_devices, nullptr);
 		RC2014_EXT_SLOT(config, "bus:9", m_rc2014_bus, rc2014_bus_devices, nullptr);
