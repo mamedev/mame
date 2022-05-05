@@ -186,28 +186,35 @@ uint8_t spectrum_128_state::spectrum_128_pre_opcode_fetch_r(offs_t offset)
 	return retval;
 }
 
-void spectrum_128_state::spectrum_128_bank1_w(offs_t offset, uint8_t data)
+void spectrum_128_state::spectrum_128_rom_w(offs_t offset, uint8_t data)
 {
 	m_exp->mreq_w(offset, data);
 }
 
-uint8_t spectrum_128_state::spectrum_128_bank1_r(offs_t offset)
+u8 spectrum_128_state::spectrum_128_rom_r(offs_t offset)
 {
-	uint8_t data;
+	return m_exp->romcs()
+		? m_exp->mreq_r(offset)
+		: ((u8*)m_bank_rom[0]->base())[offset];
+}
 
-	if (m_exp->romcs())
-	{
-		data = m_exp->mreq_r(offset);
-	}
-	else
-	{
-		/* ROM switching */
-		int ROMSelection = BIT(m_port_7ffd_data, 4);
+template <u8 Bank>
+void spectrum_128_state::spectrum_128_ram_w(offs_t offset, u8 data)
+{
+	u16 addr = 0x4000 * Bank + offset;
+	if (is_contended(addr)) content_early();
+	if (is_vram_write(addr)) m_screen->update_now();
 
-		/* rom 0 is 128K rom, rom 1 is 48 BASIC */
-		data = memregion("maincpu")->base()[0x010000 + (ROMSelection << 14) + offset];
-	}
-	return data;
+	((u8*)m_bank_ram[Bank]->base())[offset] = data;
+}
+
+template <u8 Bank>
+u8 spectrum_128_state::spectrum_128_ram_r(offs_t offset)
+{
+	u16 addr = 0x4000 * Bank + offset;
+	if (is_contended(addr)) content_early();
+
+	return ((u8*)m_bank_ram[Bank]->base())[offset];
 }
 
 void spectrum_128_state::spectrum_128_port_7ffd_w(offs_t offset, uint8_t data)
@@ -221,11 +228,9 @@ void spectrum_128_state::spectrum_128_port_7ffd_w(offs_t offset, uint8_t data)
 	/* D5 - Disable paging */
 
 	/* disable paging? */
-	if (m_port_7ffd_data & 0x20)
-			return;
+	if (m_port_7ffd_data & 0x20) return;
 
-	if ((m_port_7ffd_data ^ data) & 0x08)
-		m_screen->update_now();
+	if ((m_port_7ffd_data ^ data) & 0x08) m_screen->update_now();
 
 	/* store new state */
 	m_port_7ffd_data = data;
@@ -238,18 +243,15 @@ void spectrum_128_state::spectrum_128_port_7ffd_w(offs_t offset, uint8_t data)
 
 void spectrum_128_state::spectrum_128_update_memory()
 {
-	uint8_t *messram = m_ram->pointer();
-
+	m_bank_rom[0]->set_entry(BIT(m_port_7ffd_data, 4));
 	/* select ram at 0x0c000-0x0ffff */
-	int ram_page = m_port_7ffd_data & 0x07;
-	unsigned char *ram_data = messram + (ram_page<<14);
-	membank("bank4")->set_base(ram_data);
+	m_bank_ram[3]->set_entry(m_port_7ffd_data & 0x07);
 
 	m_screen->update_now();
 	if (BIT(m_port_7ffd_data, 3))
-		m_screen_location = messram + (7<<14);
+		m_screen_location = m_ram->pointer() + (7<<14);
 	else
-		m_screen_location = messram + (5<<14);
+		m_screen_location = m_ram->pointer() + (5<<14);
 }
 
 uint8_t spectrum_128_state::spectrum_port_r(offs_t offset)
@@ -278,10 +280,10 @@ void spectrum_128_state::spectrum_128_io(address_map &map)
 
 void spectrum_128_state::spectrum_128_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).rw(FUNC(spectrum_128_state::spectrum_128_bank1_r), FUNC(spectrum_128_state::spectrum_128_bank1_w));
-	map(0x4000, 0x7fff).bankrw("bank2");
-	map(0x8000, 0xbfff).bankrw("bank3");
-	map(0xc000, 0xffff).bankrw("bank4");
+	map(0x0000, 0x3fff).rw(FUNC(spectrum_128_state::spectrum_128_rom_r), FUNC(spectrum_128_state::spectrum_128_rom_w));
+	map(0x4000, 0x7fff).rw(FUNC(spectrum_128_state::spectrum_128_ram_r<1>), FUNC(spectrum_128_state::spectrum_128_ram_w<1>));
+	map(0x8000, 0xbfff).rw(FUNC(spectrum_128_state::spectrum_128_ram_r<2>), FUNC(spectrum_128_state::spectrum_128_ram_w<2>));
+	map(0xc000, 0xffff).rw(FUNC(spectrum_128_state::spectrum_128_ram_r<3>), FUNC(spectrum_128_state::spectrum_128_ram_w<3>));
 }
 
 void spectrum_128_state::spectrum_128_fetch(address_map &map)
@@ -289,18 +291,23 @@ void spectrum_128_state::spectrum_128_fetch(address_map &map)
 	map(0x0000, 0xffff).r(FUNC(spectrum_128_state::spectrum_128_pre_opcode_fetch_r));
 }
 
+void spectrum_128_state::machine_start()
+{
+	/* rom 0 is 128K rom, rom 1 is 48 BASIC */
+	memory_region *rom = memregion("maincpu");
+	m_bank_rom[0]->configure_entries(0, 2, rom->base() + 0x10000, 0x4000);
+
+	for (auto i = 1; i < 4; i++)
+		m_bank_ram[i]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
+}
+
 void spectrum_128_state::machine_reset()
 {
-	uint8_t *messram = m_ram->pointer();
-
-	memset(messram,0,128*1024);
-	/* 0x0000-0x3fff always holds ROM */
-
 	/* Bank 5 is always in 0x4000 - 0x7fff */
-	membank("bank2")->set_base(messram + (5<<14));
+	m_bank_ram[1]->set_entry(5);
 
 	/* Bank 2 is always in 0x8000 - 0xbfff */
-	membank("bank3")->set_base(messram + (2<<14));
+	m_bank_ram[2]->set_entry(2);
 
 	spectrum_state::machine_reset();
 
@@ -318,10 +325,10 @@ bool spectrum_128_state::is_vram_write(offs_t offset) {
 }
 
 bool spectrum_128_state::is_contended(offs_t offset) {
-	// Unlike the base 128K machine, RAM banks 4, 5, 6 and 7 are contended.
-	u8 mapped = m_port_7ffd_data & 0x07;
-	return spectrum_state::is_contended(offset) || (
-		(offset >= 0xc000 && offset <= 0xffff) && (mapped >= 4 && mapped <= 7));
+	// Memory banks 1,3,5 and 7 are contended
+	u8 bank = m_bank_ram[3]->entry();
+	return spectrum_state::is_contended(offset)
+		|| ((offset >= 0xc000 && offset <= 0xffff) && (bank && 1));
 }
 
 static const gfx_layout spectrum_charlayout =
@@ -353,6 +360,8 @@ void spectrum_128_state::spectrum_128(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &spectrum_128_state::spectrum_128_io);
 	m_maincpu->set_addrmap(AS_OPCODES, &spectrum_128_state::spectrum_128_fetch);
 	m_maincpu->set_vblank_int("screen", FUNC(spectrum_128_state::spec_interrupt));
+	m_maincpu->nomreq_cb().set(FUNC(spectrum_128_state::spectrum_nomreq));
+
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */

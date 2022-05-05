@@ -31,12 +31,13 @@ public:
 
 protected:
 	virtual void video_start() override;
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void plus3_update_memory() override;
 
 private:
-	void bank1_w(offs_t offset, uint8_t data);
-	uint8_t bank1_r(offs_t offset);
+	void rom_w(offs_t offset, uint8_t data);
+	uint8_t rom_r(offs_t offset);
 	void port_3ffd_w(offs_t offset, uint8_t data);
 	uint8_t port_3ffd_r();
 	uint8_t port_2ffd_r();

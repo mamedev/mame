@@ -85,7 +85,6 @@ rectangle spectrum_state::get_screen_area()
 
 u8 spectrum_state::get_border_color(u16 hpos, u16 vpos)
 {
-	//TODO snow effect
 	return m_port_fe_data & 0x07;
 }
 
@@ -184,7 +183,7 @@ void spectrum_state::content_early(s8 shift)
 		return;
 
 	u64 now = m_maincpu->attotime_to_clocks(m_screen->frame_period() - time_until_int()) + shift;
-	u64 cf = vpos * m_screen->width() * m_maincpu->clock() / m_screen->clock() - 1;
+	u64 cf = vpos * m_screen->width() * m_maincpu->clock() / m_screen->clock() + m_contention_offset;
 	u64 ct = cf + get_screen_area().width() * m_maincpu->clock() / m_screen->clock();
 
 	if(cf <= now && now < ct)
@@ -202,7 +201,7 @@ void spectrum_state::content_late()
 		return;
 
 	u64 now = m_maincpu->attotime_to_clocks(m_screen->frame_period() - time_until_int()) + 1;
-	u64 cf = vpos * m_screen->width() * m_maincpu->clock() / m_screen->clock() - 1;
+	u64 cf = vpos * m_screen->width() * m_maincpu->clock() / m_screen->clock() + m_contention_offset;
 	u64 ct = cf + get_screen_area().width() * m_maincpu->clock() / m_screen->clock();
 	for(auto i = 0x04; i; i >>= 1)
 	{
