@@ -324,7 +324,9 @@ uint16_t md_base_state::megadriv_68k_io_read(offs_t offset)
 	{
 		case 0:
 			LOG("%06x read version register\n", m_maincpu->pc());
-			retdata = m_version_hi_nibble | 0x01; // Version number contained in bits 3-0
+			// Version number contained in bits 3-0
+			// TODO: non-TMSS BIOSes must return 0 here
+			retdata = m_version_hi_nibble | 0x01;
 			break;
 
 		/* Joystick Port Registers */
