@@ -506,8 +506,7 @@ private:
 
 	// slot/image/softlist calculus
 	software_options evaluate_initial_softlist_options(std::string_view software_identifier);
-	std::optional<software_options> evaluate_single_software(const machine_config &config, device_type_enumerator<software_list_device, software_list_device> &swdevice_iter, software_list_device &swlistdev, std::string_view software_name) const;
-	static std::tuple<std::string_view, std::string_view> parse_software_identifier(std::string_view software_identifier);
+	std::optional<software_options> evaluate_single_software(const machine_config &config, software_list_device &swlistdev, std::string_view software_name) const;
 	void update_slot_and_image_options();
 	bool add_and_remove_slot_options();
 	bool add_and_remove_image_options();
