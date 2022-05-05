@@ -64,7 +64,8 @@ void z80cpu_device::device_resolve_objects()
 {
 	m_bus->assign_installer(AS_PROGRAM, &m_maincpu->space(AS_PROGRAM));
 	m_bus->assign_installer(AS_IO, &m_maincpu->space(AS_IO));
-	m_bus->int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
+	m_bus->int_callback().append_inputline(m_maincpu, INPUT_LINE_IRQ0);
 }
 
 class z80cpu21_device : public device_t, public device_rc2014_ext_card_interface
@@ -120,6 +121,7 @@ void z80cpu21_device::device_resolve_objects()
 {
 	m_bus->assign_installer(AS_PROGRAM, &m_maincpu->space(AS_PROGRAM));
 	m_bus->assign_installer(AS_IO, &m_maincpu->space(AS_IO));
-	m_bus->int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_bus->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+
+	m_bus->int_callback().append_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_bus->nmi_callback().append_inputline(m_maincpu, INPUT_LINE_NMI);
 }

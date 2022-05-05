@@ -73,6 +73,7 @@ public:
 	// construction/destruction
 	rc2014_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto clk_callback() { return m_clk.bind(); }
 	auto int_callback() { return m_int.bind(); }
 	auto tx_callback() { return m_tx.bind(); }
 	auto rx_callback() { return m_rx.bind(); }
@@ -81,6 +82,7 @@ public:
 	auto user3_callback() { return m_user3.bind(); }
 	auto user4_callback() { return m_user4.bind(); }
 
+	DECLARE_WRITE_LINE_MEMBER( clk_w ) { m_clk(state); }
 	DECLARE_WRITE_LINE_MEMBER( int_w ) { m_int(state); }
 	DECLARE_WRITE_LINE_MEMBER( tx_w ) { m_tx(state); }
 	DECLARE_WRITE_LINE_MEMBER( rx_w ) { m_rx(state); }
@@ -100,6 +102,7 @@ protected:
 
 private:
 	address_space_installer *m_installer[4];
+	devcb_write_line m_clk;
 	devcb_write_line m_int;
 	devcb_write_line m_tx;
 	devcb_write_line m_rx;

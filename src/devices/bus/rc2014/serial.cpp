@@ -9,7 +9,6 @@
 #include "emu.h"
 #include "serial.h"
 #include "machine/6850acia.h"
-#include "machine/clock.h"
 #include "bus/rs232/rs232.h"
 
 class serial_io_device : public device_t, public device_rc2014_card_interface
@@ -44,7 +43,10 @@ void serial_io_device::device_start()
 
 void serial_io_device::device_resolve_objects()
 {
-	m_bus->rx_callback().set(m_acia, FUNC(acia6850_device::write_rxd));
+	m_bus->clk_callback().append(m_acia, FUNC(acia6850_device::write_txc));
+	m_bus->clk_callback().append(m_acia, FUNC(acia6850_device::write_rxc));
+
+	m_bus->rx_callback().append(m_acia, FUNC(acia6850_device::write_rxd));
 }
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
@@ -62,10 +64,6 @@ void serial_io_device::device_add_mconfig(machine_config &config)
 	m_acia->txd_handler().append(FUNC(serial_io_device::tx_w));
 	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	m_acia->irq_handler().set(FUNC(serial_io_device::irq_w));
-
-	clock_device &acia_clock(CLOCK(config, "acia_clock", DERIVED_CLOCK(1,1)));
-	acia_clock.signal_handler().set("acia", FUNC(acia6850_device::write_txc));
-	acia_clock.signal_handler().append("acia", FUNC(acia6850_device::write_rxc));
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
 	rs232.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
