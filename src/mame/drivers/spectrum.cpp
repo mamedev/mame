@@ -731,6 +731,7 @@ void spectrum_state::machine_start()
 
 void spectrum_state::machine_reset()
 {
+	m_port_fe_data = -1;
 	m_port_7ffd_data = -1;
 	m_port_1ffd_data = -1;
 }
