@@ -29069,10 +29069,12 @@ Needs slot emulation for the other two games (accessible on cart dip or menu at 
 		<description>Triple Play '96 (USA)</description>
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
+		<!-- TODO: starts off with music off (still coming from the dump?) -->
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
+			<!-- baddump: Sports non-default save, "Ghetto USA" instead of NY Yankees -->
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="triple play '96 (usa).bin" size="4194304" crc="f1748e91" sha1="c0981b524d5e1c5368f9e74a4ce9c57d87fe323a"/>
+				<rom name="triple play '96 (usa).bin" size="4194304" crc="f1748e91" sha1="c0981b524d5e1c5368f9e74a4ce9c57d87fe323a" status="baddump"/>
 			</dataarea>
 			<dataarea name="sram" size="65536">
 			</dataarea>
@@ -29086,8 +29088,9 @@ Needs slot emulation for the other two games (accessible on cart dip or menu at 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
+			<!-- baddump: Sports non-default save, "TODDs Team" instead of San Francisco -->
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="triple play gold (usa).bin" size="4194304" crc="bbe69017" sha1="007bee242384db1887c5831657470584ff77a163"/>
+				<rom name="triple play gold (usa).bin" size="4194304" crc="bbe69017" sha1="007bee242384db1887c5831657470584ff77a163" status="baddump"/>
 			</dataarea>
 			<dataarea name="sram" size="65536">
 			</dataarea>
@@ -29100,6 +29103,7 @@ Needs slot emulation for the other two games (accessible on cart dip or menu at 
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
+			<!-- Dump seems clean unlike the other versions -->
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="triple play gold (usa) (alt).bin" size="4194304" crc="a89638a0" sha1="cb7f4b9b89fbf6162d7d4182229c8ac473f91cf4"/>
 			</dataarea>
@@ -30297,6 +30301,10 @@ Needs slot emulation for the other two games (accessible on cart dip or menu at 
 		<description>Wonder Library (Jpn)</description>
 		<year>199?</year>
 		<publisher>Victor</publisher>
+		<notes><![CDATA[
+Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
+]]></notes>
+		<info name="alt_title" value="ワンダーライブラリ"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="wonder library (jpn).bin" size="524288" crc="9350e754" sha1="57b97d9ddecfa2e9a75c4a05cd2b7e821210155a"/>
@@ -32042,7 +32050,7 @@ Needs slot emulation for the other two games (accessible on cart dip or menu at 
 	</software>
 
 	<!-- To be used in conjuction with a MegaCD -->
-	<software name="flux">
+	<software name="flux" supported="no">
 		<description>Flux (Euro)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -32054,7 +32062,7 @@ Needs slot emulation for the other two games (accessible on cart dip or menu at 
 	</software>
 
 	<!-- To be used in conjuction with a MegaCD -->
-	<software name="fluxp" cloneof="flux">
+	<software name="fluxp" cloneof="flux" supported="no">
 		<description>Flux (Euro, prototype 19950425)</description>
 		<year>1995</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -32070,10 +32078,13 @@ Needs slot emulation for the other two games (accessible on cart dip or menu at 
 		</part>
 	</software>
 
-	<software name="meganser">
+	<software name="meganser" supported="no">
 		<description>Mega Anser (Jpn)</description>
 		<year>1989</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Unemulated Sega Modem and printer features
+]]></notes>
 		<info name="serial" value="G-4502"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
