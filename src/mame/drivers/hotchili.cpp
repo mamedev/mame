@@ -205,8 +205,8 @@ private:
 	//external ram
 	void extram_w(offs_t offset, uint8_t data);
 	uint8_t extram_r(offs_t offset);
-	uint8_t lo, hi;
-	uint16_t mask, addr_latch;
+	uint8_t m_addr_high, m_addr_low;
+	uint16_t m_addr_mask, m_addr_latch;
 
 	void hc_map(address_map &map);
 	void mainbank_map(address_map &map);
@@ -233,7 +233,6 @@ private:
 
 	uint8_t m_meters = 0;
 	uint8_t m_frame = 0;
-//	bool m_auxbtt = false;
 };
 
 
@@ -483,7 +482,7 @@ void hotchili_state::outp2_w(offs_t offset, uint8_t data)
 {
 	m_lamp[32] = BIT(data,0); // 1st Line
 	m_lamp[33] = BIT(data,1); // 2nd Line
-	m_lamp[34] = BIT(data,2); //·3rd Line
+	m_lamp[34] = BIT(data,2); // 3rd Line
 	m_lamp[35] = BIT(data,3); // 4th Line
 	m_lamp[36] = BIT(data,4); // 5th Line
 	m_lamp[37] = BIT(data,5);
@@ -531,16 +530,16 @@ void hotchili_state::extram_w(offs_t offset, uint8_t data)
 	offset = (offset >> 2) & 0x03;
 	switch( offset )
 	{
-		case 0: lo = data;
+		case 0: m_addr_low = data;
 		break;
 
-		case 1: hi = data & 0x07;
+		case 1: m_addr_high = data & 0x07;
 		break;
 
-		case 2: mask = data; addr_latch = (hi * 0x100) + lo;
+		case 2: m_addr_mask = data; m_addr_latch = (m_addr_high * 0x100) + m_addr_low;
 		break;
 
-		case 3:  m_ram->pointer()[addr_latch & 0x0fff] = data;
+		case 3: m_ram->pointer()[m_addr_latch & 0x0fff] = data;
 		break;
 	}
 }
@@ -551,17 +550,13 @@ uint8_t hotchili_state::extram_r(offs_t offset)
 	offset = (offset >> 2) & 0x07;
 	switch( offset )
 	{
-		case 0: return lo;
-		break;
+		case 0: return m_addr_low;
 
-		case 1: return hi;
-		break;
+		case 1: return m_addr_high;
 
 		case 2: return 0x3f; // mask
-		break;
 
-		case 3: return m_ram->pointer()[addr_latch & 0x0fff];
-		break;
+		case 3: return m_ram->pointer()[m_addr_latch & 0x0fff];
 
 		default: return 0;
 	}
@@ -575,7 +570,7 @@ uint8_t hotchili_state::extram_r(offs_t offset)
 
 void hotchili_state::machine_start()
 {
-    m_lamp.resolve();
+	m_lamp.resolve();
 	m_nvram->set_base(m_ram->pointer(), m_ram->size());
 }
 
@@ -646,16 +641,16 @@ ROM_START( hotchili )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "h.chilli_95103_v0191__27c512.ic32", 0x0000, 0x10000, CRC(54b7c675) SHA1(7ce0348ae9561784519cdb99e33a57922520941c) )
 
-ROM_REGION( 0x40000, "gfx1", 0 )
+	ROM_REGION( 0x40000, "gfx1", 0 )
 	ROM_LOAD( "9510301_chr0_h.c.nsw.ic2",   0x00000, 0x10000, CRC(52faf9ae) SHA1(72050a3168f7326f39743e8424a0795b14b00d69) )
 	ROM_LOAD( "9510301_chr1_h.c.nsw.ic1",   0x10000, 0x10000, CRC(f0ac0f98) SHA1(45a2f304758f2b1d701feb8db58b6137e58fed4c) )
 	ROM_LOAD( "9510301_chr2_h.c.nsw.ic25",  0x20000, 0x10000, CRC(a946c2e4) SHA1(7530aebd5c5204bb7aa091acd108b0cd00ac272b) )
 	ROM_LOAD( "9510301_chr3_h.c.nsw.ic26",  0x30000, 0x10000, CRC(69dc0f95) SHA1(7b613a5d1f2d431b178fc105c2023ec8bbf3a873) )
 
-ROM_REGION( 0x0800, "nvram", 0 )
+	ROM_REGION( 0x0800, "nvram", 0 )
 	ROM_LOAD( "hotchili_nvram.bin",  0x0000, 0x0800, CRC(e2b463e5) SHA1(a94ae3888858173aed53e54cceb951a9fe8b7a20) )
 
-ROM_REGION( 0x0400, "proms", 0 )
+	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "vn55-1.ic8",  0x0000, 0x0200, CRC(3acb6539) SHA1(f202b2403acf1c6e7abc61e860a75aef318ab03c) )
 	ROM_LOAD( "vn55-2.ic9",  0x0200, 0x0200, CRC(e1d2897e) SHA1(2e8ff5041dfd4b69488f0d580645564bd523fc10) )
 ROM_END
@@ -669,7 +664,6 @@ void hotchili_state::init_hc()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
-	ROM[0x03e0] = 0x05; // Shortens long delay at startup
 	ROM[0x05bc] = 0x00; // Avoids ram error flag setup
 	ROM[0x06c1] = 0x20; // Skip Rom Error
 	ROM[0x06c4] = 0xc6; // Skip Ram Error
