@@ -247,7 +247,7 @@ private:
 	required_ioport_array<4> m_inputs;
 
 	uint8_t m_palette_bank = 0;
-	tilemap_t *m_tilemap[1]{}; // FG = 0, BG =1
+	tilemap_t *m_tilemap[2]{}; // FG = 0, BG =1
 	bitmap_ind16 m_fg_bitmap;
 	bitmap_ind16 m_sprite_bitmap;
 	std::unique_ptr<uint32_t[]> m_transmask[3];
