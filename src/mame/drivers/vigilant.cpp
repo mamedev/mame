@@ -31,8 +31,6 @@ abruptly, without time for final polish.  Seems to finish in level 10
 
 ***************************************************************************/
 
-//Insert Corrected Timings
-
 #include "emu.h"
 #include "includes/vigilant.h"
 #include "includes/iremipt.h"
@@ -625,8 +623,8 @@ void vigilant_state::vigilant(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(55);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_refresh_hz(56.34);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(1750)); /* not accurate */
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea((16*8)-1, (64-16)*8-4, 0*8, 32*8-1);
 	screen.set_screen_update(FUNC(vigilant_state::screen_update_vigilant));
