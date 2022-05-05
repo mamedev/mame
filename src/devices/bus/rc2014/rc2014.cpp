@@ -145,6 +145,7 @@ rc2014_ext_bus_device::rc2014_ext_bus_device(const machine_config &mconfig, cons
 
 rc2014_ext_bus_device::rc2014_ext_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: rc2014_bus_device(mconfig, type, tag, owner, clock)
+	, m_clk2(*this)
 	, m_page(*this)
 	, m_nmi(*this)
 	, m_tx2(*this)
@@ -159,6 +160,7 @@ rc2014_ext_bus_device::rc2014_ext_bus_device(const machine_config &mconfig, devi
 void rc2014_ext_bus_device::device_start()
 {
 	rc2014_bus_device::device_start();
+	m_clk2.resolve_safe();
 	m_page.resolve_safe();
 	m_nmi.resolve_safe();
 	m_tx2.resolve_safe();

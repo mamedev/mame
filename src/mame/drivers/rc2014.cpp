@@ -20,6 +20,7 @@ static void rc2014_bus_devices(device_slot_interface &device)
 	device.option_add("serial", RC2014_SERIAL_IO);
 
 	device.option_add("z80_21", RC2014_Z80CPU_21);
+	device.option_add("dual_clk", RC2014_DUAL_CLOCK);
 }
 
 class rc2014_state : public driver_device
@@ -74,7 +75,7 @@ public:
 	{
 		RC2014_EXT_BUS(config, m_rc2014_bus, 0);
 		RC2014_EXT_SLOT(config, "bus:1", m_rc2014_bus, rc2014_bus_devices, "z80_21");
-		RC2014_EXT_SLOT(config, "bus:2", m_rc2014_bus, rc2014_bus_devices, "clock");
+		RC2014_EXT_SLOT(config, "bus:2", m_rc2014_bus, rc2014_bus_devices, "dual_clk");
 		RC2014_EXT_SLOT(config, "bus:3", m_rc2014_bus, rc2014_bus_devices, "ram32k");
 		RC2014_EXT_SLOT(config, "bus:4", m_rc2014_bus, rc2014_bus_devices, "sw_rom");
 		RC2014_EXT_SLOT(config, "bus:5", m_rc2014_bus, rc2014_bus_devices, "serial");

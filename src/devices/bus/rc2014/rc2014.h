@@ -168,6 +168,7 @@ public:
 	// construction/destruction
 	rc2014_ext_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto clk2_callback() { return m_clk2.bind(); }
 	auto page_callback() { return m_page.bind(); }
 	auto nmi_callback() { return m_nmi.bind(); }
 	auto tx2_callback() { return m_tx2.bind(); }
@@ -177,6 +178,7 @@ public:
 	auto user7_callback() { return m_user7.bind(); }
 	auto user8_callback() { return m_user8.bind(); }
 
+	DECLARE_WRITE_LINE_MEMBER( clk2_w ) { m_clk2(state); }
 	DECLARE_WRITE_LINE_MEMBER( page_w ) { m_page(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi(state); }
 	DECLARE_WRITE_LINE_MEMBER( tx2_w ) { m_tx2(state); }
@@ -191,6 +193,7 @@ protected:
 	virtual void device_start() override;
 
 private:
+	devcb_write_line m_clk2;
 	devcb_write_line m_page;
 	devcb_write_line m_nmi;
 	devcb_write_line m_tx2;
