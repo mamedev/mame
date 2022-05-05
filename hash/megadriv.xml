@@ -14233,6 +14233,7 @@ but dumps still have to be confirmed.
 		<description>Daze Before Christmas (Oceania)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="daze before christmas (aus).bin" size="2097152" crc="b95e25c9" sha1="240c0d9487d7659a4b2999e0394d552ab17bee8a"/>
@@ -14244,7 +14245,6 @@ but dumps still have to be confirmed.
 		<description>Daze Before Christmas (Oceania, Prototype)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
-		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="daze before christmas (aus) (beta).bin" size="2097152" crc="317c9491" sha1="a63cdb54c31b1c1219467987a81e761ee92feee3"/>
