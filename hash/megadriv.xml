@@ -1144,8 +1144,8 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 			<feature name="ic2" value="MPR-17345-SM"/>
 			<feature name="ic3" value="SN74HC00N"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
-				<rom name="mpr-17344-sm.ic1" size="2097152" crc="77fb2b16" sha1="dc8ea3d6b5f2ef513eed9af978d323b25bc8bcd2" loadflag="load16_word_swap"/>
-				<rom name="mpr-17345-sm.ic2" size="1048576" crc="e1f60a14" sha1="5fa9a2adcffef8aa72c3a0626cc42d06a9ca296e" offset="0x200000" loadflag="load16_word_swap"/>
+				<rom name="mpr-17344-sm.ic1" size="2097152" crc="77fb2b16" sha1="dc8ea3d6b5f2ef513eed9af978d323b25bc8bcd2" loadflag="load16_word"/>
+				<rom name="mpr-17345-sm.ic2" size="1048576" crc="e1f60a14" sha1="5fa9a2adcffef8aa72c3a0626cc42d06a9ca296e" offset="0x200000" loadflag="load16_word"/>
 			</dataarea>
 		</part>
 	</software>
