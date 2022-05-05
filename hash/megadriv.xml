@@ -10370,7 +10370,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>The Adventures of Mighty Max (USA)</description>
 		<year>1994</year>
 		<publisher>Ocean</publisher>
-        <sharedfeat name="compatibility" value="NTSC-U,NTSC-J"/>
+		<sharedfeat name="compatibility" value="NTSC-U,NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="adventures of mighty max, the (usa).bin" size="1048576" crc="55f13a00" sha1="147364ce2de49a85bb64dd7f1075d9687d4fe89e"/>
@@ -12522,14 +12522,14 @@ Unsupported [Menacer] peripheral (joypad works)
 
 	<software name="bugsbunu" cloneof="bugsbun">
 		<description>Bugs Bunny in Double Trouble (USA)</description>
-			<year>1996</year>
-			<publisher>Sega</publisher>
-			<sharedfeat name="compatibility" value="NTSC-U,NTSC-J"/>
-			<part name="cart" interface="megadriv_cart">
-				<dataarea name="rom" width="16" endianness="big" size="2097152">
-					<rom name="bugs bunny in double trouble (usa).bin" size="2097152" crc="365305a2" sha1="50b18d9f9935a46854641c9cfc5b3d3b230edd5e"/>
-				</dataarea>
-			</part>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U,NTSC-J"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="bugs bunny in double trouble (usa).bin" size="2097152" crc="365305a2" sha1="50b18d9f9935a46854641c9cfc5b3d3b230edd5e"/>
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="bullvsbl">
@@ -13388,7 +13388,6 @@ Unsupported [Menacer] peripheral (joypad works)
 		<description>College Football's National Championship II (USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
-		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<!-- Dump To Be Confirmed -->
@@ -14274,6 +14273,7 @@ Unsupported [Menacer] peripheral (joypad works)
 		<description>Daze Before Christmas (Oceania)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="daze before christmas (aus).bin" size="2097152" crc="b95e25c9" sha1="240c0d9487d7659a4b2999e0394d552ab17bee8a"/>
@@ -14285,7 +14285,6 @@ Unsupported [Menacer] peripheral (joypad works)
 		<description>Daze Before Christmas (Oceania, Prototype)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
-		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="daze before christmas (aus) (beta).bin" size="2097152" crc="317c9491" sha1="a63cdb54c31b1c1219467987a81e761ee92feee3"/>
@@ -22843,8 +22842,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-5524"/>
 		<info name="release" value="19931217"/>
-		<info name="alt_title" value="ァンタシースター ～千年紀の終りに～"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<info name="alt_title" value="ファンタシースター ～千年紀の終りに～"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -28976,7 +28974,7 @@ Needs slot emulation for the other two games (accessible on cart dip or menu at 
 		<year>1996</year>
 		<publisher>Disney Interactive</publisher>
 		<info name="alt_title" value="Disney's Toy Story (Box)"/>
-		<sharedfeat name="compatibility" value="NTSC-U,NTSC-J"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<!-- Dump To Be Confirmed -->
 			<feature name="pcb" value="171-7147A"/>
