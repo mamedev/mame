@@ -31,6 +31,8 @@ abruptly, without time for final polish.  Seems to finish in level 10
 
 ***************************************************************************/
 
+//Insert Corrected Timings
+
 #include "emu.h"
 #include "includes/vigilant.h"
 #include "includes/iremipt.h"
