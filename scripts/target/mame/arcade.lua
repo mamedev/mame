@@ -2981,8 +2981,6 @@ files {
 	MAME_DIR .. "src/mame/includes/namcos86.h",
 	MAME_DIR .. "src/mame/video/namcos86.cpp",
 	MAME_DIR .. "src/mame/drivers/pacland.cpp",
-	MAME_DIR .. "src/mame/includes/pacland.h",
-	MAME_DIR .. "src/mame/video/pacland.cpp",
 	MAME_DIR .. "src/mame/drivers/polepos.cpp",
 	MAME_DIR .. "src/mame/includes/polepos.h",
 	MAME_DIR .. "src/mame/audio/polepos.cpp",
