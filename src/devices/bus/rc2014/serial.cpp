@@ -58,7 +58,7 @@ DEVICE_INPUT_DEFAULTS_END
 void serial_io_device::device_add_mconfig(machine_config &config)
 {
 	ACIA6850(config, m_acia, 0);
-	m_acia->txd_handler().append("rs232", FUNC(rs232_port_device::write_txd));
+	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia->txd_handler().append(FUNC(serial_io_device::tx_w));
 	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	m_acia->irq_handler().set(FUNC(serial_io_device::irq_w));
