@@ -921,7 +921,7 @@ emu_options::software_options emu_options::evaluate_initial_softlist_options(std
 			if (list_name.empty() || (list_name == swlistdev.list_name()))
 			{
 				// we can use this software list, try to evaluate it
-				std::optional<software_options> this_results = evaluate_single_software(config, iter, swlistdev, software_name);
+				std::optional<software_options> this_results = evaluate_single_software(config, swlistdev, software_name);
 				if (this_results)
 				{
 					results = std::move(this_results);
@@ -957,7 +957,7 @@ emu_options::software_options emu_options::evaluate_initial_softlist_options(std
 //  evaluate_single_software
 //-------------------------------------------------
 
-std::optional<emu_options::software_options> emu_options::evaluate_single_software(const machine_config &config, software_list_device_enumerator &swdevice_iter, software_list_device &swlistdev, std::string_view software_name) const
+std::optional<emu_options::software_options> emu_options::evaluate_single_software(const machine_config &config, software_list_device &swlistdev, std::string_view software_name) const
 {
 	bool is_compatible = false;
 	software_options result;
@@ -1012,6 +1012,7 @@ std::optional<emu_options::software_options> emu_options::evaluate_single_softwa
 						int requirement_swdevs_found = 0;
 
 						// see if we can find this requirement
+						software_list_device_enumerator swdevice_iter(config.root_device());
 						for (software_list_device &swdev : swdevice_iter)
 						{
 							if (requirement_list_name.empty() || swdev.list_name() == requirement_list_name)
