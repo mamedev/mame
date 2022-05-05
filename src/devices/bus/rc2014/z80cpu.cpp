@@ -66,3 +66,60 @@ void z80cpu_device::device_resolve_objects()
 	m_bus->assign_installer(AS_IO, &m_maincpu->space(AS_IO));
 	m_bus->int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 }
+
+class z80cpu21_device : public device_t, public device_rc2014_ext_card_interface
+{
+public:
+	// construction/destruction
+	z80cpu21_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_resolve_objects() override;
+private:
+	void addrmap_mem(address_map &map);
+	void addrmap_io(address_map &map);
+
+	// object finders
+	required_device<z80_device> m_maincpu;
+};
+
+DEFINE_DEVICE_TYPE_PRIVATE(RC2014_Z80CPU_21, device_rc2014_ext_card_interface, z80cpu21_device, "rc2014_z8021", "RC2014 Z80 2.1 CPU Module")
+
+z80cpu21_device::z80cpu21_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, RC2014_Z80CPU_21, tag, owner, clock)
+	, device_rc2014_ext_card_interface(mconfig, *this)
+	, m_maincpu(*this, "maincpu")
+{
+}
+
+void z80cpu21_device::device_start()
+{
+}
+
+void z80cpu21_device::addrmap_mem(address_map &map)
+{
+	map.unmap_value_high(); // unmapped addresses return 0xff
+}
+
+void z80cpu21_device::addrmap_io(address_map &map)
+{
+	map.global_mask(0xff);  // use 8-bit ports
+}
+
+void z80cpu21_device::device_add_mconfig(machine_config &config)
+{
+	Z80(config, m_maincpu, DERIVED_CLOCK(1,1));
+	m_maincpu->set_addrmap(AS_PROGRAM, &z80cpu21_device::addrmap_mem);
+	m_maincpu->set_addrmap(AS_IO, &z80cpu21_device::addrmap_io);
+}
+
+void z80cpu21_device::device_resolve_objects()
+{
+	m_bus->assign_installer(AS_PROGRAM, &m_maincpu->space(AS_PROGRAM));
+	m_bus->assign_installer(AS_IO, &m_maincpu->space(AS_IO));
+	m_bus->int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_bus->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+}

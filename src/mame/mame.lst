@@ -44540,4 +44540,6 @@ gs6809                          // Grant Searle's Simple 6809 Machine
 ultim809
 
 @source:rc2014.cpp
-rc2014                          // RC2014 Mini
+rc2014                          // RC2014 Classic
+rc2014pro                       // RC2014 Pro
+rc2014cl2                       // RC2014 Classic 2

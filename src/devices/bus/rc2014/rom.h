@@ -13,6 +13,6 @@
 
 #include "bus/rc2014/rc2014.h"
 
-DECLARE_DEVICE_TYPE(RC2014_ROM, device_rc2014_card_interface)
+DECLARE_DEVICE_TYPE(RC2014_SWITCH_ROM, device_rc2014_card_interface)
 
 #endif // MAME_BUS_RC2014_ROM_H
