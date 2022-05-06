@@ -63,6 +63,7 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_start() override;
 	virtual void device_resolve_objects() override;
 };
 
@@ -72,6 +73,11 @@ z80cpu_device::z80cpu_device(const machine_config &mconfig, const char *tag, dev
 	: z80cpu_base(mconfig, RC2014_Z80CPU, tag, owner, clock)
 	, device_rc2014_card_interface(mconfig, *this)
 {
+}
+
+void z80cpu_device::device_start()
+{
+	m_maincpu->set_daisy_config(m_bus->get_daisy_chain());
 }
 
 void z80cpu_device::device_resolve_objects()
@@ -89,6 +95,7 @@ public:
 	z80cpu21_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 protected:
 	// device-level overrides
+	virtual void device_start() override;
 	virtual void device_resolve_objects() override;
 };
 
@@ -98,6 +105,11 @@ z80cpu21_device::z80cpu21_device(const machine_config &mconfig, const char *tag,
 	: z80cpu_base(mconfig, RC2014_Z80CPU_21, tag, owner, clock)
 	, device_rc2014_ext_card_interface(mconfig, *this)
 {
+}
+
+void z80cpu21_device::device_start()
+{
+	m_maincpu->set_daisy_config(m_bus->get_daisy_chain());
 }
 
 void z80cpu21_device::device_resolve_objects()

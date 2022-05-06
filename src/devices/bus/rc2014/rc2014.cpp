@@ -45,12 +45,20 @@ rc2014_bus_device::rc2014_bus_device(const machine_config &mconfig, device_type 
 	, m_user2(*this)
 	, m_user3(*this)
 	, m_user4(*this)
+	, m_daisy_chain{}
 {
 }
 
 rc2014_bus_device::rc2014_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: rc2014_bus_device(mconfig, RC2014_BUS, tag, owner, clock)
 {
+}
+
+rc2014_bus_device::~rc2014_bus_device()
+{
+	for(size_t i = 0; i < m_daisy.size(); i++)
+    	delete [] m_daisy_chain[i];
+	delete [] m_daisy_chain;
 }
 
 void rc2014_bus_device::device_start()
@@ -85,6 +93,18 @@ address_space_installer *rc2014_bus_device::installer(int index) const
 {
 	assert(index >= 0 && index < 4 && m_installer[index]); 
 	return m_installer[index];
+}
+
+const z80_daisy_config* rc2014_bus_device::get_daisy_chain()
+{
+	m_daisy_chain = new char*[m_daisy.size() + 1];
+	for(size_t i = 0; i < m_daisy.size(); i++)
+	{
+		m_daisy_chain[i] = new char[m_daisy[i].size() + 1];
+		strcpy(m_daisy_chain[i], m_daisy[i].c_str());
+	}
+	m_daisy_chain[m_daisy.size()] = nullptr;
+	return (const z80_daisy_config*)m_daisy_chain;
 }
 
 //-------------------------------------------------

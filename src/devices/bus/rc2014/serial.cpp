@@ -125,6 +125,8 @@ void dual_serial_device::device_resolve_objects()
 	m_bus->clk2_callback().append(m_sio, FUNC(z80sio_device::rxcb_w));
 
 	m_bus->rx_callback().append(m_sio, FUNC(z80sio_device::rxa_w));
+
+	m_bus->add_to_daisy_chain(m_sio->tag());
 }
 
 void dual_serial_device::device_add_mconfig(machine_config &config)

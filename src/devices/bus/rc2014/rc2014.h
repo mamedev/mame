@@ -56,6 +56,7 @@
 
 #pragma once
 
+#include "machine/z80daisy.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -72,6 +73,7 @@ class rc2014_bus_device : public device_t
 public:
 	// construction/destruction
 	rc2014_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~rc2014_bus_device();
 
 	auto clk_callback() { return m_clk.bind(); }
 	auto int_callback() { return m_int.bind(); }
@@ -95,6 +97,9 @@ public:
 	void set_bus_clock(const XTAL &xtal) { set_bus_clock(xtal.value()); }
 	void assign_installer(int index, address_space_installer *installer);
 	address_space_installer *installer(int index) const;
+	void add_to_daisy_chain(std::string tag) { m_daisy.push_back(tag); }
+	const z80_daisy_config* get_daisy_chain();
+
 protected:
 	rc2014_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	// device-level overrides
@@ -110,6 +115,8 @@ private:
 	devcb_write_line m_user2;
 	devcb_write_line m_user3;
 	devcb_write_line m_user4;
+	std::vector<std::string> m_daisy;
+	char **m_daisy_chain;
 };
 
 // ======================> device_rc2014_card_interface
@@ -187,6 +194,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( user6_w ) { m_user6(state); }
 	DECLARE_WRITE_LINE_MEMBER( user7_w ) { m_user7(state); }
 	DECLARE_WRITE_LINE_MEMBER( user8_w ) { m_user8(state); }
+
 protected:
 	rc2014_ext_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	// device-level overrides
