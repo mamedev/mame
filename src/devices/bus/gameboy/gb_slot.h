@@ -45,6 +45,7 @@ enum
 	GB_MBC_DKONG5,
 	GB_MBC_UNK01,
 	GB_MBC_MEGADUCK,     /* MEGADUCK style banking                        */
+	GB_MBC_VFAME,        /* Vast Fame carts */
 	GB_MBC_UNKNOWN       /* Unknown mapper                                */
 };
 

@@ -27208,6 +27208,18 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="nuwang2k" supported="no">
+		<description>Nü Wang Ge Dou 2000</description>
+		<year>200?</year>
+		<publisher>Vast Fame</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_vfame" />
+			<dataarea name="rom" size="2097152">
+				<rom name="Nv Wang Ge Dou 2000 (Unl) [C] [Raw].gbc" size="2097152" crc="e1668b49" sha1="37516139aa317a16440379c1dc00bdfc4c1e607a"/>
+			</dataarea>
+		</part>
+	</software>
 
 <!-- TO BE VERIFIED: all of these files have the same first half and *very* similar second half (~99%). Hard to say which is good though -->
 <!-- Once sorted out what is good and what not, the entry should be moved among the Sintax games above! -->

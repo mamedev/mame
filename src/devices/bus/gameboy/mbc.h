@@ -427,7 +427,37 @@ private:
 	uint8_t m_camera_regs[54];
 };
 
+// ======================> gb_rom_vfame_device
 
+class gb_rom_vfame_device : public gb_rom_mbc5_device
+{
+public:
+	// construction/destruction
+	gb_rom_vfame_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
+
+protected:
+	gb_rom_vfame_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	
+	bool m_in_config_mode = false;
+	u8 m_running_val = 0;
+	
+	u8 m_6000 = 0;
+	u8 m_700x[15] = {};
+	std::array<u8, 4> m_seq = {};
+	u8 m_seq_start_bank = 0;
+	u16 m_seq_start_addr = 0;
+	int m_seq_length = 0;
+	int m_seq_bytes_left = 0;
+	
+	bool m_shouldreplace = false;
+	u16 m_replace_start_addr = 0;
+	u8 m_replace_src_bank = 0;
+};
 
 // device type definition
 DECLARE_DEVICE_TYPE(GB_ROM_MBC1,     gb_rom_mbc1_device)
@@ -448,5 +478,6 @@ DECLARE_DEVICE_TYPE(GB_ROM_DIGIMON,  gb_rom_digimon_device)
 DECLARE_DEVICE_TYPE(GB_ROM_ROCKMAN8, gb_rom_rockman8_device)
 DECLARE_DEVICE_TYPE(GB_ROM_SM3SP,    gb_rom_sm3sp_device)
 DECLARE_DEVICE_TYPE(GB_ROM_CAMERA,   gb_rom_camera_device)
+DECLARE_DEVICE_TYPE(GB_ROM_VFAME,    gb_rom_vfame_device)
 
 #endif // MAME_BUS_GAMEBOY_MBC_H

@@ -455,6 +455,7 @@ static void gb_cart(device_slot_interface &device)
 	device.option_add_internal("rom_digimon", GB_ROM_DIGIMON);
 	device.option_add_internal("rom_rock8",   GB_ROM_ROCKMAN8);
 	device.option_add_internal("rom_sm3sp",   GB_ROM_SM3SP);
+	device.option_add_internal("rom_vfame",   GB_ROM_VFAME);
 //  device.option_add_internal("rom_dkong5",  GB_ROM_DKONG5);
 //  device.option_add_internal("rom_unk01",   GB_ROM_UNK01);
 }

@@ -36,6 +36,7 @@ DEFINE_DEVICE_TYPE(GB_ROM_DIGIMON,  gb_rom_digimon_device,     "gb_rom_digimon",
 DEFINE_DEVICE_TYPE(GB_ROM_ROCKMAN8, gb_rom_rockman8_device,    "gb_rom_rockman8", "GB MBC1 Rockman 8")
 DEFINE_DEVICE_TYPE(GB_ROM_SM3SP,    gb_rom_sm3sp_device,       "gb_sm3sp",        "GB MBC1 Super Mario 3 Special")
 DEFINE_DEVICE_TYPE(GB_ROM_CAMERA,   gb_rom_camera_device,      "gb_rom_camera",   "GB Camera")
+DEFINE_DEVICE_TYPE(GB_ROM_VFAME,    gb_rom_vfame_device,       "gb_rom_vfame",    "GB Vast Fame Carts")
 
 
 gb_rom_mbc_device::gb_rom_mbc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -155,6 +156,15 @@ gb_rom_camera_device::gb_rom_camera_device(const machine_config &mconfig, const 
 {
 }
 
+gb_rom_vfame_device::gb_rom_vfame_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: gb_rom_mbc5_device(mconfig, type, tag, owner, clock)
+{
+}
+
+gb_rom_vfame_device::gb_rom_vfame_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: gb_rom_vfame_device(mconfig, GB_ROM_VFAME, tag, owner, clock)
+{
+}
 
 //-------------------------------------------------
 //  shared_start
@@ -1438,4 +1448,118 @@ void gb_rom_camera_device::write_ram(offs_t offset, uint8_t data)
 		if (!m_ram.empty())
 			m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)] = data;
 	}
+}
+
+// Vast Fame
+
+uint8_t gb_rom_vfame_device::read_rom(offs_t offset)
+{
+	bool inchargestartbank = (m_seq_start_bank == 0 && offset < 0x4000) || (m_seq_start_bank == m_latch_bank2 && offset >= 0x4000);
+	
+	if (inchargestartbank && offset == m_seq_start_addr && m_seq_bytes_left == 0)
+	{
+		m_seq_bytes_left = m_seq_length;
+	}
+	
+	if(m_seq_bytes_left > 0 && offset < 0x8000)
+	{
+		m_seq_bytes_left--;
+		return m_seq[m_seq_length - m_seq_bytes_left - 1];
+	}
+	
+	if(m_shouldreplace && offset >= m_replace_start_addr && offset < 0x4000)
+	{
+		return m_rom[m_replace_src_bank * 0x4000 + (offset & 0x3fff)];
+	}
+
+	if (offset < 0x4000)
+		return m_rom[rom_bank_map[m_latch_bank] * 0x4000 + (offset & 0x3fff)];
+	else
+		return m_rom[rom_bank_map[m_latch_bank2] * 0x4000 + (offset & 0x3fff)];
+}
+
+void gb_rom_vfame_device::write_bank(offs_t offset, uint8_t data)
+{
+	if (offset < 0x2000)
+		m_ram_enable = ((data & 0x0f) == 0x0a) ? 1 : 0;
+	else if (offset < 0x3000)
+	{
+		// MBC5 has a 9 bit bank select
+		// Writing into 2000-2fff sets the lower 8 bits
+		m_latch_bank2 = (m_latch_bank2 & 0x100) | data;
+	}
+	else if (offset < 0x4000)
+	{
+		// MBC5 has a 9 bit bank select
+		// Writing into 3000-3fff sets the 9th bit
+		m_latch_bank2 = (m_latch_bank2 & 0xff) | ((data & 0x01) << 8);
+	}
+	else if (offset < 0x6000)
+	{
+		data &= 0x0f;
+		if (has_rumble)
+		{
+			m_rumble = BIT(data, 3);
+			data &= 0x7;
+		}
+		m_ram_bank = data;
+	}
+	else if (offset < 0x8000)
+	{
+		u16 ea = offset & 0xf00f;
+		if (ea == 0x7000 && data == 0x96)
+		{
+			m_in_config_mode = true;
+		}
+		else if (ea == 0x700f && data == 0x96)
+		{
+			m_in_config_mode = false;
+		}
+		
+		if (!m_in_config_mode) return;
+		
+		if (ea >= 0x700b || (ea < 0x7000 && ea > 0x6000)) return;
+		
+		m_running_val = (BIT(m_running_val,0) ? 0x80 : 0) + (m_running_val >> 1);
+		m_running_val ^= data;
+		
+		if (ea >= 0x7000) m_700x[ea & 0xf] = m_running_val;
+		else if (ea == 0x6000) m_6000 = m_running_val;
+		
+		if (ea == 0x7000)
+		{
+			m_seq_start_bank = m_700x[3];
+			m_seq_start_addr = (m_700x[2] << 8) | m_700x[1];
+			m_seq = {m_700x[4], m_700x[5], m_700x[6], m_700x[7]};
+			m_seq_length = 0;
+			switch (m_700x[0] & 7)
+			{
+				case 4: m_seq_length = 1; break;
+				case 5: m_seq_length = 2; break;
+				case 6: m_seq_length = 3; break;
+				case 7: m_seq_length = 4; break;
+			}
+		}
+		
+		if (ea == 0x7008)
+		{
+			m_replace_start_addr = (m_700x[10] << 8) | m_700x[9];
+			m_replace_src_bank = m_6000;
+			m_shouldreplace = (m_700x[8] & 0xf) == 0xf;
+		}
+	}
+}
+
+uint8_t gb_rom_vfame_device::read_ram(offs_t offset)
+{
+	if (!m_ram.empty() && m_ram_enable)
+		return m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)];
+	else
+		return 0xff;
+}
+
+void gb_rom_vfame_device::write_ram(offs_t offset, uint8_t data)
+{
+	if (!m_ram.empty() && m_ram_enable)
+		m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)] = data;
 }
