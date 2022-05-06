@@ -77,7 +77,8 @@ void dual_clock_device::device_start()
 {
 }
 
-static u32 clock_mapping[] = { 
+static constexpr u32 clock_mapping[] =
+{ 
 	7'372'800/1,
 	7'372'800/2,
 	7'372'800/3,
@@ -87,7 +88,8 @@ static u32 clock_mapping[] = {
 	7'372'800/24,
 	10'000,
 	0,
-	0 };
+	0
+};
 
 void dual_clock_device::device_reset()
 {
