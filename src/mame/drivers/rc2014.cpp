@@ -25,6 +25,7 @@ static void rc2014_bus_devices(device_slot_interface &device)
 	device.option_add("dual_clk", RC2014_DUAL_CLOCK);
 	device.option_add("sio", RC2014_DUAL_SERIAL);
 	device.option_add("page_rom", RC2014_PAGABLE_ROM);
+	device.option_add("ram64k", RC2014_RAM_64K);
 }
 
 class rc2014_state : public driver_device
@@ -80,7 +81,7 @@ public:
 		RC2014_EXT_BUS(config, m_rc2014_bus, 0);
 		RC2014_EXT_SLOT(config, "bus:1", m_rc2014_bus, rc2014_bus_devices, "z80_21");
 		RC2014_EXT_SLOT(config, "bus:2", m_rc2014_bus, rc2014_bus_devices, "dual_clk");
-		RC2014_EXT_SLOT(config, "bus:3", m_rc2014_bus, rc2014_bus_devices, "ram32k");
+		RC2014_EXT_SLOT(config, "bus:3", m_rc2014_bus, rc2014_bus_devices, "ram64k");
 		RC2014_EXT_SLOT(config, "bus:4", m_rc2014_bus, rc2014_bus_devices, "page_rom");
 		RC2014_EXT_SLOT(config, "bus:5", m_rc2014_bus, rc2014_bus_devices, "sio");
 		RC2014_EXT_SLOT(config, "bus:6", m_rc2014_bus, rc2014_bus_devices, "cf");
