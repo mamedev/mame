@@ -23,6 +23,7 @@ license:CC0
     OSAKA BANK MY LINE DEMO             JAPAN
     OUTBACK JOEY - PERSONAL TRAINER     ???         http://www.guardiana.net/MDG-Database/Mega%20Drive/Outback%20Joey/#v3553
     PGA TOUR GOLF                       USA/PAL     we have v1.1 and v1.2, v1.0 needed (does it exist?)
+    PRO VERSION ACTION REPLAY           PAL         Datel's 2nd Action Replay release
     ROAD RASH                           USA         needs proper dump
     SIDE POCKET                         JAPAN/USA   conflict in current info
     SMURFS                              PAL         we have Rev A, Rev 0 needed (does it exist?)
@@ -7875,10 +7876,13 @@ Unsupported [Menacer] peripheral
 
 
 <!-- Only Europe and Japan are confirmed -->
-	<software name="sor">
+	<software name="sor" supported="partial">
 		<description>Streets of Rage (Euro, USA, Rev. A) ~ Bare Knuckle - Ikari no Tekken (Jpn, Rev. A)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+[VDP] Stage starts have player sprites in front of status bar
+]]></notes>
 		<info name="serial" value="G-4050 (JPN)"/>
 		<info name="release" value="19910802 (JPN)"/>
 		<info name="alt_title" value="ベア・ナックル 怒りの鉄拳"/>
@@ -7893,10 +7897,13 @@ Unsupported [Menacer] peripheral
 
 
 <!-- Only Europe and Japan are confirmed -->
-	<software name="sora" cloneof="sor">
+	<software name="sora" cloneof="sor" supported="partial">
 		<description>Streets of Rage (Euro, USA) ~ Bare Knuckle - Ikari no Tekken (Jpn)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+[VDP] Stage starts have player sprites in front of status bar
+]]></notes>
 		<info name="serial" value="G-4050 (JPN)"/>
 		<info name="release" value="19910802 (JPN)"/>
 		<info name="alt_title" value="ベア・ナックル 怒りの鉄拳"/>
@@ -9763,7 +9770,7 @@ Unsupported [Menacer] peripheral
 
 <!-- Partially documented: confirmed dumps, missing additional info (a PCB pic would be of help to fill missing details) -->
 
-	<software name="microm96">
+	<software name="microm96" supported="yes">
 		<description>Micro Machines Turbo Tournament 96 (Euro, v1.1, J-Cart)</description>
 		<year>1995</year>
 		<publisher>Codemasters</publisher>
@@ -14788,10 +14795,14 @@ Unsupported [Menacer] peripheral (joypad works)
 		</part>
 	</software>
 
-	<software name="dbz">
+	<software name="dbz" supported="partial">
 		<description>Dragon Ball Z - Buyuu Retsuden (Jpn)</description>
 		<year>1994</year>
 		<publisher>Bandai</publisher>
+		<notes><![CDATA[
+Sports glitchy tile during attract (Android 18 vs. Freeza), doesn't seem to happen in-game
+Choppy timings during gameplay (btanb?)
+]]></notes>
 		<info name="serial" value="T-133013"/>
 		<info name="release" value="19940401"/>
 		<info name="alt_title" value="ドラゴンボールZ武勇烈伝"/>
@@ -19659,12 +19670,18 @@ Unsupported [Justifier] peripheral (joypad works)
 		</part>
 	</software>
 
-	<software name="menghu">
+	<software name="menghu" supported="yes">
 		<description>Meng Huan Shui Guo Pan - 777 Casino (Chi)</description>
-		<year>199?</year>
+		<!-- Definitely not earlier than '94 -->
+		<year>1996?</year>
 		<publisher>City Man</publisher>
+		<notes><![CDATA[
+https://bootleggames.fandom.com/wiki/777_Casino
+Needs [megadriv_z80_z80_bank_w] workaround to work (emulator copy protection?)
+]]></notes>
 		<info name="serial" value="GM-95002"/>
 		<info name="alt_title" value="夢幻水果盤"/>
+		<info name="developer" value="Gamtec"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="meng huan shui guo pan - 777 casino (chi) (unl).bin" size="1048576" crc="42dc03e4" sha1="df20a28d03a2cd481af134ef7602062636c3cc79"/>
@@ -26540,9 +26557,12 @@ Unsupported [Sega Mega Modem] features
 		<description>Sport Games (Bra)</description>
 		<year>199?</year>
 		<publisher>Tec Toy</publisher>
-		<!-- The cart contains no menu, the second game is probably accessed through reset... -->
 		<notes><![CDATA[
-Needs slot emulation for the other two games (accessible on cart dip or menu at $300000?)
+Needs slot emulation for the other two games, has no menu but pressing reset button cycles thru them
+$000000 Super Volley Ball (USA)
+$100000 World Championship Soccer II (USA)
+$200000 Super Real Basketball (Euro)
+$040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
 ]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
@@ -33139,7 +33159,7 @@ Unemulated [Sega Mega Modem] and printer features
 		<publisher>Glorysun</publisher>
 		<notes><![CDATA[
 https://bootleggames.fandom.com/wiki/Death_Caliber
-Unsupported lightgun?
+Unsupported lightgun or mouse?
 ]]></notes>
 		<info name="developer" value="Hummer Software, Tomsoft"/>
 		<part name="cart" interface="megadriv_cart">
@@ -33153,6 +33173,9 @@ Unsupported lightgun?
 		<description>Deer Hunter (Rus)</description>
 		<year>199?</year>
 		<publisher>Tomsoft</publisher>
+		<notes><![CDATA[
+Unsupported lightgun or mouse?
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="deer hunter.bin" size="1048576" crc="da11978b" sha1="866fb68f8398da233835d198dbfea52bae387818"/>
@@ -33163,7 +33186,8 @@ Unsupported lightgun?
 <!-- Does this come from a real cart? or is it a fan hack? -->
 	<software name="diablo" cloneof="fatallab">
 		<description>Diablo (Rus)</description>
-		<year>199?</year>
+		<!-- "Kudos 2010" -->
+		<year>2010?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -33526,11 +33550,17 @@ Unsupported lightgun?
 		</part>
 	</software>
 
-	<software name="mario3">
+	<software name="mario3" supported="partial">
 		<description>Mario 3 - Vokrug Sveta (Rus)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<!-- Kudos -->
+		<publisher>KDS</publisher>
+		<notes><![CDATA[
+https://bootleggames.fandom.com/wiki/Mario_3:_Around_the_World
+BGM sometimes goes silent (does several [YM2612] 68k writes without bus)
+]]></notes>
 		<info name="alt_title" value="Mario 3 Вокруг света"/>
+		<info name="developer" value="BMB"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="mario 3 (unl)[a1].bin" size="2097152" crc="6f630ebd" sha1="167f17f3a9d24f5d3ed1fbf7d7310fae53015258"/>
@@ -33538,11 +33568,16 @@ Unsupported lightgun?
 		</part>
 	</software>
 
-	<software name="mario3d" cloneof="mario3">
+	<software name="mario3d" cloneof="mario3" supported="partial">
 		<description>Mario 3 - Vokrug Sveta (Rus, Demo?)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<!-- Kudos -->
+		<publisher>KDS</publisher>
+		<notes><![CDATA[
+https://bootleggames.fandom.com/wiki/Mario_3:_Around_the_World
+]]></notes>
 		<info name="alt_title" value="Mario 3 Вокруг света"/>
+		<info name="developer" value="BMB"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="mario 3 (unl).bin" size="2097152" crc="69f5b02f" sha1="7c2ebe7c88503bc719d5bcecae183619a7be503c"/>
@@ -33550,11 +33585,19 @@ Unsupported lightgun?
 		</part>
 	</software>
 
-	<software name="mario4">
+	<software name="mario4" supported="no">
+		<!-- Mario 4: A Space Odyssey -->
 		<description>Mario 4 - Kosmicheskaya Odissyeya (Rus)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<!-- Kudos -->
+		<publisher>KDS</publisher>
+		<notes><![CDATA[
+https://bootleggames.fandom.com/wiki/Mario_3:_Around_the_World
+Crashes if you buy anything from the shop (press start)
+BGM sometimes goes silent (does several [YM2612] 68k writes without bus)
+]]></notes>
 		<info name="alt_title" value="Mario 4 Космическая одиссея"/>
+		<info name="developer" value="BMB"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="mario 4 (unl).bin" size="2097152" crc="96b0ecd9" sha1="6c9444268413b76d698ea432cbceb4cdc9a6cfaf"/>
@@ -34011,8 +34054,12 @@ Unsupported lightgun?
 
 	<software name="ar" supported="no">
 		<description>Action Replay (Euro)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1991</year>
+		<publisher>Datel</publisher>
+		<notes><![CDATA[
+https://segaretro.org/Action_Replay_(Mega_Drive)
+Needs own slot type with mountable carts
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="32768">
 				<rom name="action replay (euro).bin" size="32768" crc="95ff7c3e" sha1="1e0f246826be4ebc7b99bb3f9de7f1de347122e5"/>
@@ -34022,8 +34069,11 @@ Unsupported lightgun?
 
 	<software name="ggenie">
 		<description>Game Genie (Euro, USA, Rev. A)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1992</year>
+		<publisher>Codemasters</publisher>
+		<notes><![CDATA[
+https://segaretro.org/Game_Genie_(Mega_Drive)
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_ggenie"/>
 			<dataarea name="rom" width="16" endianness="big" size="32768">
@@ -34035,7 +34085,10 @@ Unsupported lightgun?
 	<software name="ggenie1" cloneof="ggenie">
 		<description>Game Genie (Euro, USA)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Codemasters</publisher>
+		<notes><![CDATA[
+https://segaretro.org/Game_Genie_(Mega_Drive)
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_ggenie"/>
 			<dataarea name="rom" width="16" endianness="big" size="32768">
@@ -34046,8 +34099,12 @@ Unsupported lightgun?
 
 	<software name="par" supported="no">
 		<description>Pro Action Replay (Euro)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1992</year>
+		<publisher>Datel</publisher>
+		<notes><![CDATA[
+https://segaretro.org/Action_Replay_(Mega_Drive)
+Jumps to invalid address, needs own slot type with mountable carts
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="131072">
 				<rom name="pro action replay (euro).bin" size="131072" crc="17255224" sha1="b0bbfe0c201b2ab2fc17b37e5709785fedc07170"/>
@@ -34057,8 +34114,12 @@ Unsupported lightgun?
 
 	<software name="par2" supported="no">
 		<description>Pro Action Replay 2 (Euro)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Datel</publisher>
+		<notes><![CDATA[
+https://segaretro.org/Action_Replay_(Mega_Drive)
+Jumps to invalid address, needs own slot type with mountable carts
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="65536">
 				<rom name="pro action replay 2 (euro).bin" size="65536" crc="a73abd27" sha1="c488883a0270766d8fff503fd2e4b5e25a15d523"/>
@@ -34068,8 +34129,11 @@ Unsupported lightgun?
 
 	<software name="par2a" cloneof="par2" supported="no">
 		<description>Pro Action Replay 2 (Euro, Alt)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Datel</publisher>
+		<notes><![CDATA[
+Jumps to invalid address, needs own slot type with mountable carts
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="65536">
 				<rom name="pro action replay 2 (euro) (alt).bin" size="65536" crc="e6669a61" sha1="00e4266f3cd7ab2178ca37d564bc5315efdbe967"/>
@@ -34078,7 +34142,6 @@ Unsupported lightgun?
 	</software>
 
 	<software name="vr">
-		<!-- With SVP -->
 		<description>Virtua Racing (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -34099,11 +34162,13 @@ Unsupported lightgun?
 		</part>
 	</software>
 
-	<software name="vrj" cloneof="vr">
-		<!-- With SVP -->
+	<software name="vrj" cloneof="vr" supported="partial">
 		<description>Virtua Racing (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Has missing sound samples (i.e. tire screech, "time bonus" on checkpoints)
+]]></notes>
 		<info name="serial" value="G-7001"/>
 		<info name="release" value="19940318"/>
 		<info name="alt_title" value="バーチャ レーシング"/>
@@ -34124,11 +34189,13 @@ Unsupported lightgun?
 		</part>
 	</software>
 
-	<software name="vru" cloneof="vr">
-		<!-- With SVP -->
+	<software name="vru" cloneof="vr" supported="partial">
 		<description>Virtua Racing (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Has missing sound samples (i.e. tire screech, "time bonus" on checkpoints)
+]]></notes>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<sharedfeat name="addon" value="SVP"/>
 		<part name="cart" interface="megadriv_cart">
@@ -34217,7 +34284,7 @@ Dump is 'double interleaved' in .smd AND .md format
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
-Bad dump of a supposedly russian version of pele2 (cfr. missing MD header at top)
+Bad dump of a supposedly Russian version of pele2 (cfr. corrupted MD header at top)
 ]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
