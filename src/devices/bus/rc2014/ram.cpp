@@ -70,6 +70,7 @@ private:
 	int m_bank;
 	std::unique_ptr<u8[]> m_ram;
 	required_ioport m_start_addr;
+	required_ioport m_paged;
 };
 
 ram_64k_device::ram_64k_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -77,6 +78,7 @@ ram_64k_device::ram_64k_device(const machine_config &mconfig, const char *tag, d
 	, device_rc2014_ext_card_interface(mconfig, *this)
 	, m_ram(nullptr)
 	, m_start_addr(*this, "START_ADDR")
+	, m_paged(*this, "PAGED")
 {
 }
 
@@ -91,7 +93,10 @@ void ram_64k_device::device_reset()
 {
 	m_bank = 0;
 	update_banks();
-	m_bus->installer(AS_PROGRAM)->install_ram(0x4000, 0xffff, m_ram.get() + 0x4000);
+	if (m_paged->read())
+		m_bus->installer(AS_PROGRAM)->install_ram(0x8000, 0xffff, m_ram.get() + 0x8000);
+	else
+		m_bus->installer(AS_PROGRAM)->install_ram(m_start_addr->read() * 0x1000, 0xffff, m_ram.get() + m_start_addr->read() * 0x1000);
 }
 
 void ram_64k_device::device_resolve_objects()
@@ -101,12 +106,12 @@ void ram_64k_device::device_resolve_objects()
 
 void ram_64k_device::update_banks()
 {
-	if (m_start_addr->read() == 4) return;
+	if (m_paged->read() == 0) return; // If not paged skip
 
 	if (m_bank == 0) {
-		m_bus->installer(AS_PROGRAM)->install_write_handler(m_start_addr->read() * 0x1000, 0x3fff, write8sm_delegate(*this, FUNC(ram_64k_device::ram_w)));
+		m_bus->installer(AS_PROGRAM)->install_write_handler(0x0000, 0x7fff, write8sm_delegate(*this, FUNC(ram_64k_device::ram_w)));
 	} else {
-		m_bus->installer(AS_PROGRAM)->install_ram(m_start_addr->read() * 0x1000, 0x3fff, m_ram.get() + m_start_addr->read() * 0x1000);
+		m_bus->installer(AS_PROGRAM)->install_ram(0x0000, 0x7fff, m_ram.get());
 	}
 }
 
@@ -117,6 +122,10 @@ static INPUT_PORTS_START( start_addr )
 	PORT_CONFSETTING( 0x1, "0x1000" )
 	PORT_CONFSETTING( 0x2, "0x2000" )
 	PORT_CONFSETTING( 0x4, "0x4000" )
+	PORT_START("PAGED")
+	PORT_CONFNAME( 0x1, 0x1, "Paged" )
+	PORT_CONFSETTING( 0x0, DEF_STR( No ) )
+	PORT_CONFSETTING( 0x1, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 ioport_constructor ram_64k_device::device_input_ports() const

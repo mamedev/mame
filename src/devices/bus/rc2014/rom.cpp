@@ -96,23 +96,34 @@ protected:
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	void reset_bank_w(offs_t, uint8_t) { m_bank = 0; update_banks(); m_bus->page_w(CLEAR_LINE);}
+	void toggle_bank_w(offs_t, uint8_t) { m_bank = m_bank ? 0 : 1; update_banks(); m_bus->page_w(m_bank ? ASSERT_LINE : CLEAR_LINE); }
+
+	void update_banks();
 private:
+	int m_bank;
+	u16 m_start_offset;
+	u16 m_end_addr;
 	required_memory_region m_rom;
-	required_ioport m_page_size;
-	required_ioport_array<6> m_page_addr;
+	required_ioport m_page_size_conf;
+	required_ioport_array<6> m_page_addr_conf;
 };
 
 pagable_rom_device::pagable_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, RC2014_PAGABLE_ROM, tag, owner, clock)
 	, device_rc2014_ext_card_interface(mconfig, *this)
+	, m_bank(0)
 	, m_rom(*this, "rom")
-	, m_page_size(*this, "PAGE_SIZE")
-	, m_page_addr(*this, "A1%u", 0U)
+	, m_page_size_conf(*this, "PAGE_SIZE")
+	, m_page_addr_conf(*this, "A1%u", 0U)
 {
 }
 
 void pagable_rom_device::device_start()
 {
+	m_bus->installer(AS_IO)->install_write_handler(0x30, 0x30, write8sm_delegate(*this, FUNC(pagable_rom_device::reset_bank_w)));
+	m_bus->installer(AS_IO)->install_write_handler(0x38, 0x38, write8sm_delegate(*this, FUNC(pagable_rom_device::toggle_bank_w)));
 }
 
 void pagable_rom_device::device_reset()
@@ -121,17 +132,22 @@ void pagable_rom_device::device_reset()
 	static u16 page_mask[] = { 0xfc00, 0xf800, 0xf000, 0xe000, 0xc000, 0x8000 };
 
 	int index = 0;
-	u16 start_addr = 0x0000;
-	for (auto& addr : m_page_addr)
+	m_start_offset = 0x0000;
+	for (auto& addr : m_page_addr_conf)
 	{
 		if (addr->read() != 0)
-		{
-			start_addr += (addr->read()-1) * page_size[index];
-		}		
+			m_start_offset += (addr->read() - 1) * page_size[index];
 		index++;
 	}
-	start_addr &= page_mask[m_page_size->read()];
-	m_bus->installer(AS_PROGRAM)->install_rom(0x0000, page_size[m_page_size->read()], 0x0000, m_rom->base() + start_addr);
+	m_start_offset &= page_mask[m_page_size_conf->read()];
+	m_end_addr = page_size[m_page_size_conf->read()] - 1;
+	reset_bank_w(0,0);
+}
+
+void pagable_rom_device::update_banks()
+{
+	if (m_bank == 0)
+		m_bus->installer(AS_PROGRAM)->install_rom(0x0000, m_end_addr, 0x0000, m_rom->base() + m_start_offset);
 }
 
 static INPUT_PORTS_START( page_selector )
