@@ -7,9 +7,9 @@
     Used for PC-8001mkII/PC-8801 NRTDRV sound program
     http://upd780c1.g1.xrea.com/pc-8001/j80-25.html
 
-	TODO:
-	- Source claims it runs on INT3, but the vector that uses NRTDRV is clearly INT4.
-	  Is it configurable?
+    TODO:
+    - Source claims it runs on INT3, but the vector that uses NRTDRV is clearly INT4.
+      Is it configurable?
 
 **************************************************************************************************/
 
@@ -19,8 +19,8 @@
 
 DEFINE_DEVICE_TYPE(JMBX1, jmbx1_device, "jmbx1", "JMB-X1 \"Sound Board X\"")
 
-jmbx1_device::jmbx1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) 
-    : pc8801_exp_device(mconfig, JMBX1, tag, owner, clock)
+jmbx1_device::jmbx1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pc8801_exp_device(mconfig, JMBX1, tag, owner, clock)
 	, m_opm1(*this, "opm1")
 	, m_opm2(*this, "opm2")
 	, m_ssg(*this, "ssg")

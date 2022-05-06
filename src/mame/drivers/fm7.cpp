@@ -1908,7 +1908,8 @@ void fm7_state::fm7(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("fm7_cass");
 
-	SOFTWARE_LIST(config, "cass_list").set_original("fm7_cass");
+	SOFTWARE_LIST(config, "fm7_cass_list").set_original("fm7_cass");
+	SOFTWARE_LIST(config, "fm8_cass_list").set_compatible("fm8_cass");
 
 	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
 	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fdc_intrq_w));
@@ -1959,6 +1960,8 @@ void fm7_state::fm8(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("fm7_cass");
+
+	SOFTWARE_LIST(config, "fm8_cass_list").set_original("fm8_cass");
 
 	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
 	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fdc_intrq_w));
@@ -2018,7 +2021,8 @@ void fm77_state::fm77av(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("fm7_cass");
 
-	SOFTWARE_LIST(config, "cass_list").set_compatible("fm7_cass");
+	SOFTWARE_LIST(config, "fm7_cass_list").set_compatible("fm7_cass");
+	SOFTWARE_LIST(config, "fm8_cass_list").set_compatible("fm8_cass");
 
 	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
 	m_fdc->intrq_wr_callback().set(FUNC(fm77_state::fdc_intrq_w));

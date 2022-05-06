@@ -16,7 +16,7 @@ known chips:
  *A56     HD38750  1981, Actronics(Hanzawa) Twinvader (small brown version)
  *A58     HD38750  1981, Actronics(Hanzawa) Challenge Racer/Ludotronic(Hanzawa) Grand Prix Turbo
  *A62     HD38750  1982, Actronics(Hanzawa) Pack'n Maze
- *A67     HD38750  1982, Romtec Pucki & Monsters (ET-803)
+ @A67     HD38750  1982, Romtec Pucki & Monsters (ET-803)
 
  @A04     HD38800  1980, Gakken Heiankyo Alien
   A16     HD38800  1981, Entex Select-A-Game cartridge: Basketball 3 -> sag.cpp
@@ -37,13 +37,13 @@ known chips:
  @B01     HD38800  1982, Gakken Crazy Kong
  @B19     HD38800  1982, Bandai Zaxxon
  @B23     HD38800  1982, Tomy Kingman (THF-01II)
- *B24     HD38800  1982, Actronics(Hanzawa) Wanted G-Man
- *B29     HD38800  1984, Tomy Portable 6000 Bombman
+ @B24     HD38800  1982, Actronics(Hanzawa) Wanted G-Man
+ @B29     HD38800  1984, Tomy Bombman
  *B31     HD38800  1983, Romtec Frog Prince (ET-806)
  *B35     HD38800  1983, Bandai Gundam vs Gelgoog Zaku
- *B42     HD38800  1983, Bandai Kiteyo Parman
+ @B42     HD38800  1983, Bandai Kiteyo Parman
  @B43     HD38800  1983, Bandai Dokodemo Dorayaki Doraemon (PT-412)
- *B48     HD38800  1983, Bandai Go Go Dynaman
+ @B48     HD38800  1983, Bandai Toukon Juohmaru
  @B52     HD38800  1983, Bandai Ultraman Monster Battle (PT-424)
 
  @A09     HD38820  1980, Mattel World Championship Baseball
@@ -57,13 +57,14 @@ known chips:
  @A43     HD38820  1982, Entex Turtles
  @A45     HD38820  1982, Coleco Donkey Kong
  @A49     HD38820  1983, Bandai Zackman
+ @L53     HD38820  1983, Gakken Defender
  @A61     HD38820  1983, Coleco Ms. Pac-Man
  *A62     HD38820  1983, Coleco Zaxxon
  @A63     HD38820  1983, Bandai Pengo
  @A65     HD38820  1983, Bandai Burger Time (PT-389)
  @A69     HD38820  1983, Gakken Dig Dug
  @A70     HD38820  1983, Parker Brothers Q*Bert
- *A75     HD38820  1983, Bandai Toukon Juohmaru
+ @A75     HD38820  1983, Bandai Go Go Dynaman
  @A85     HD38820  1984, Bandai Machine Man (PT-438)
  @A88     HD38820  1984, Bandai Pair Match (PT-460) (1/2)
  @A89     HD38820  1984, Bandai Pair Match (PT-460) (2/2)
@@ -96,10 +97,12 @@ known chips:
 
 ============================================================================
 
-ROM source notes when dumped from another publisher, but confident it's the same:
+ROM source notes when dumped from another model, but confident it's the same:
 - gckong: CGL Super Kong
+- ggdman: Bandai Kampf der Monster
 - ghalien: CGL Earth Invaders
 - kingman: Tandy Kingman
+- wantgman: Ludotronic Operation 'Z'
 - zackman: Tandy Zackman
 
 TODO:
@@ -116,7 +119,8 @@ TODO:
   games may manipulate VFD plate brightness by strobing it longer/shorter,
   eg. cgalaxn when a ship explodes.
 - bzaxxon 3D effect is difficult to simulate
-- improve/redo SVGs of: bzaxxon, bbtime
+- improve/redo SVG for: bzaxxon, bbtime
+- add SVG for: ggdman, ktparman, tkjmaru, gdefender, bombman, wantgman, puckimon
 - get rid of hardcoded color overlay from SVGs, use MAME internal artwork
 
 ***************************************************************************/
@@ -143,7 +147,7 @@ TODO:
 #include "msthawk.lh"
 #include "packmon.lh"
 
-//#include "hh_hmcs40_test.lh" // common test-layout - no svg artwork(yet), use external artwork
+#include "hh_hmcs40_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
 
 class hh_hmcs40_state : public driver_device
@@ -260,6 +264,125 @@ INPUT_CHANGED_MEMBER(hh_hmcs40_state::single_interrupt_line)
 ***************************************************************************/
 
 namespace {
+
+/***************************************************************************
+
+  Actronics / Hanzawa Wanted G-Man
+  * Hitachi HD38800B24 MCU
+  * cyan/red VFD display
+
+  known releases:
+  - World: Wanted G-Man, published by Actronics
+  - France: Operation 'Z', published by Ludotronic
+
+***************************************************************************/
+
+class wantgman_state : public hh_hmcs40_state
+{
+public:
+	wantgman_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_hmcs40_state(mconfig, type, tag)
+	{ }
+
+	void wantgman(machine_config &config);
+
+private:
+	void update_display();
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+	u16 input_r();
+};
+
+// handlers
+
+void wantgman_state::update_display()
+{
+	m_display->matrix(m_grid, m_plate);
+}
+
+void wantgman_state::plate_w(offs_t offset, u8 data)
+{
+	// R0x-R3x: vfd plate
+	int shift = offset * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+	update_display();
+}
+
+void wantgman_state::grid_w(u16 data)
+{
+	// D0: speaker out
+	m_speaker->level_w(data & 1);
+
+	// D1-D6: input mux
+	m_inp_mux = data >> 1 & 0x3f;
+
+	// D1-D9,D13,D14: vfd grid
+	m_grid = (data >> 1 & 0x1ff) | (data >> 4 & 0x600);
+	update_display();
+}
+
+u16 wantgman_state::input_r()
+{
+	// D15: multiplexed inputs
+	return read_inputs(6) & 0x8000;
+}
+
+// config
+
+static INPUT_PORTS_START( wantgman )
+	PORT_START("IN.0") // D1 line D15
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+
+	PORT_START("IN.1") // D2 line D15
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+
+	PORT_START("IN.2") // D3 line D15
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+
+	PORT_START("IN.3") // D4 line D15
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+
+	PORT_START("IN.4") // D5 line D15
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Skill / Start / Jump")
+
+	PORT_START("IN.5") // D6 line D15
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Demo")
+INPUT_PORTS_END
+
+void wantgman_state::wantgman(machine_config &config)
+{
+	// basic machine hardware
+	HD38800(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(wantgman_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(wantgman_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(wantgman_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(wantgman_state::plate_w));
+	m_maincpu->write_d().set(FUNC(wantgman_state::grid_w));
+	m_maincpu->read_d().set(FUNC(wantgman_state::input_r));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(11, 16);
+	config.set_default_layout(layout_hh_hmcs40_test);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( wantgman )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38800b24", 0x0000, 0x1000, CRC(ad1dfb26) SHA1(f2ef0ec98116a8a38e97299e3e3b2b0129d78c04) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+
+	ROM_REGION( 100000, "screen", 0)
+	ROM_LOAD( "wantgman.svg", 0, 100000, NO_DUMP )
+ROM_END
+
+
+
+
 
 /***************************************************************************
 
@@ -1317,6 +1440,100 @@ ROM_END
 
 /***************************************************************************
 
+  Bandai Kiteyo Parman
+  * Hitachi HD38800B42 MCU
+  * cyan/red/blue VFD display
+
+***************************************************************************/
+
+class ktparman_state : public hh_hmcs40_state
+{
+public:
+	ktparman_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_hmcs40_state(mconfig, type, tag)
+	{ }
+
+	void ktparman(machine_config &config);
+
+private:
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+};
+
+// handlers
+
+void ktparman_state::plate_w(offs_t offset, u8 data)
+{
+	// R0x-R3x(,D0-D2): vfd plate
+	int shift = offset * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+
+	// update display
+	m_display->matrix(m_grid, m_plate);
+}
+
+void ktparman_state::grid_w(u16 data)
+{
+	// D3: speaker out
+	m_speaker->level_w(data >> 3 & 1);
+
+	// D8-D15: vfd grid
+	m_grid = data >> 8 & 0xff;
+
+	// D0-D2: vfd plate (update display there)
+	plate_w(4, data & 7);
+}
+
+// config
+
+static INPUT_PORTS_START( ktparman )
+	PORT_START("IN.0") // port D
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+
+	PORT_START("IN.1") // INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, 0)
+INPUT_PORTS_END
+
+void ktparman_state::ktparman(machine_config &config)
+{
+	// basic machine hardware
+	HD38800(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(ktparman_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(ktparman_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(ktparman_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(ktparman_state::plate_w));
+	m_maincpu->write_d().set(FUNC(ktparman_state::grid_w));
+	m_maincpu->read_d().set_ioport("IN.0");
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(8, 19);
+	config.set_default_layout(layout_hh_hmcs40_test);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( ktparman )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38800b42", 0x0000, 0x1000, CRC(ba1f7939) SHA1(1038d33923fcc87b5dd95954d5f964064a10ff9d) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+
+	ROM_REGION( 100000, "screen", 0)
+	ROM_LOAD( "ktparman.svg", 0, 100000, NO_DUMP )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Bandai Dokodemo Dorayaki Doraemon (FL LSI Game Push Up) (manufactured in Japan)
   * PCB label Kaken Corp PT-412 FL-Doreamon(in katakana)
   * Hitachi HD38800B43 MCU
@@ -1428,6 +1645,119 @@ ROM_END
 
 /***************************************************************************
 
+  Bandai Toukon Juohmaru
+  * Hitachi HD38800B48 MCU
+  * cyan/red/blue VFD display
+
+***************************************************************************/
+
+class tkjmaru_state : public hh_hmcs40_state
+{
+public:
+	tkjmaru_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_hmcs40_state(mconfig, type, tag)
+	{ }
+
+	void tkjmaru(machine_config &config);
+
+private:
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+	u16 input_r();
+};
+
+// handlers
+
+void tkjmaru_state::plate_w(offs_t offset, u8 data)
+{
+	// R0x-R3x(,D0): vfd plate
+	int shift = offset * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+
+	// update display
+	m_display->matrix(m_grid, m_plate);
+}
+
+void tkjmaru_state::grid_w(u16 data)
+{
+	// D4-D7: input mux
+	m_inp_mux = data >> 4 & 0xf;
+
+	// D10: speaker out
+	m_speaker->level_w(data >> 10 & 1);
+
+	// D11-D15: vfd grid
+	m_grid = data >> 11 & 0x1f;
+
+	// D0: vfd plate (update display there)
+	plate_w(4, data & 1);
+}
+
+u16 tkjmaru_state::input_r()
+{
+	// D3: multiplexed inputs, D8,D9: fixed inputs
+	return read_inputs(4) | m_inputs[4]->read();
+}
+
+// config
+
+static INPUT_PORTS_START( tkjmaru )
+	PORT_START("IN.0") // D4 line D3
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+
+	PORT_START("IN.1") // D5 line D3
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+
+	PORT_START("IN.2") // D6 line D3
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+
+	PORT_START("IN.3") // D7 line D3
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+
+	PORT_START("IN.4") // D8,D9
+	PORT_BIT( 0x100, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_CONFNAME( 0x200, 0x000, "Factory Test" )
+	PORT_CONFSETTING(     0x000, DEF_STR( Off ) )
+	PORT_CONFSETTING(     0x200, DEF_STR( On ) )
+INPUT_PORTS_END
+
+void tkjmaru_state::tkjmaru(machine_config &config)
+{
+	// basic machine hardware
+	HD38800(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(tkjmaru_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(tkjmaru_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(tkjmaru_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(tkjmaru_state::plate_w));
+	m_maincpu->write_d().set(FUNC(tkjmaru_state::grid_w));
+	m_maincpu->read_d().set(FUNC(tkjmaru_state::input_r));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(5, 17);
+	config.set_default_layout(layout_hh_hmcs40_test);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( tkjmaru )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38800b48", 0x0000, 0x1000, CRC(249f357d) SHA1(0b5dad187a035db622790eb092b7be1ca7c57d97) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+
+	ROM_REGION( 100000, "screen", 0)
+	ROM_LOAD( "tkjmaru.svg", 0, 100000, NO_DUMP )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Bandai Ultraman Monster Battle (FL LSI Game Push Up) (manufactured in Japan)
   * PCB label Kaken Corp. PT-424 FL Ultra Man
   * Hitachi HD38800B52 MCU
@@ -1523,6 +1853,130 @@ ROM_START( bultrman )
 
 	ROM_REGION( 405717, "screen", 0)
 	ROM_LOAD( "bultrman.svg", 0, 405717, CRC(13367971) SHA1(f294898712d1e146ff267bb1e3cfd059f972b248) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Bandai Go Go Dynaman
+  * Hitachi HD38820A75 MCU
+  * cyan/red/blue VFD display
+
+  known releases:
+  - Japan: Go Go Dynaman, published by Bandai
+  - Germany: Kampf der Monster, published by Bandai
+
+***************************************************************************/
+
+class ggdman_state : public hh_hmcs40_state
+{
+public:
+	ggdman_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_hmcs40_state(mconfig, type, tag)
+	{ }
+
+	void ggdman(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
+
+private:
+	void update_int0();
+	void update_display();
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+};
+
+// handlers
+
+void ggdman_state::update_display()
+{
+	m_display->matrix(m_grid, m_plate);
+}
+
+void ggdman_state::plate_w(offs_t offset, u8 data)
+{
+	// R0x-R5x: vfd plate
+	int shift = offset * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+	update_display();
+}
+
+void ggdman_state::grid_w(u16 data)
+{
+	// D0: speaker out
+	m_speaker->level_w(data & 1);
+
+	// D6-D9: input mux
+	u8 inp_mux = data >> 6 & 0xf;
+	if (inp_mux != m_inp_mux)
+	{
+		m_inp_mux = inp_mux;
+		update_int0();
+	}
+
+	// D11-D15: vfd grid
+	m_grid = data >> 11 & 0x1f;
+	update_display();
+}
+
+void ggdman_state::update_int0()
+{
+	// INT0 on multiplexed inputs
+	set_interrupt(0, read_inputs(4));
+}
+
+// config
+
+static INPUT_PORTS_START( ggdman )
+	PORT_START("IN.0") // D6 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, ggdman_state, input_changed, 0)
+
+	PORT_START("IN.1") // D7 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, ggdman_state, input_changed, 0)
+
+	PORT_START("IN.2") // D8 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, ggdman_state, input_changed, 0)
+
+	PORT_START("IN.3") // D9 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, ggdman_state, input_changed, 0)
+
+	PORT_START("IN.4") // INT1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, 1)
+INPUT_PORTS_END
+
+void ggdman_state::ggdman(machine_config &config)
+{
+	// basic machine hardware
+	HD38820(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(ggdman_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(ggdman_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(ggdman_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(ggdman_state::plate_w));
+	m_maincpu->write_r<4>().set(FUNC(ggdman_state::plate_w));
+	m_maincpu->write_r<5>().set(FUNC(ggdman_state::plate_w));
+	m_maincpu->write_d().set(FUNC(ggdman_state::grid_w));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(5, 24);
+	config.set_default_layout(layout_hh_hmcs40_test);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( ggdman )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38820a75", 0x0000, 0x1000, CRC(14a9c064) SHA1(253a5decbf4219c1b457280e301b82388694e49f) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+
+	ROM_REGION( 100000, "screen", 0)
+	ROM_LOAD( "ggdman.svg", 0, 100000, NO_DUMP )
 ROM_END
 
 
@@ -3579,6 +4033,136 @@ ROM_END
 
 /***************************************************************************
 
+  Gakken Defender
+  * Hitachi HD38820L53 MCU (SDIP)
+  * cyan/red/green VFD display
+
+***************************************************************************/
+
+class gdefender_state : public hh_hmcs40_state
+{
+public:
+	gdefender_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_hmcs40_state(mconfig, type, tag)
+	{ }
+
+	void gdefender(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int1(); }
+
+private:
+	void update_display();
+	void update_int1();
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+	u16 input_r();
+};
+
+// handlers
+
+void gdefender_state::update_display()
+{
+	m_display->matrix(m_grid, m_plate);
+}
+
+void gdefender_state::plate_w(offs_t offset, u8 data)
+{
+	// R0x-R6x: vfd plate
+	int shift = offset * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+	update_display();
+}
+
+void gdefender_state::grid_w(u16 data)
+{
+	// D0: speaker out
+	m_speaker->level_w(data & 1);
+
+	// D12-D15: input mux
+	u8 inp_mux = data >> 12 & 0xf;
+	if (inp_mux != m_inp_mux)
+	{
+		m_inp_mux = inp_mux;
+		update_int1();
+	}
+
+	// D3-D15: vfd grid
+	m_grid = data >> 3 & 0x1fff;
+	update_display();
+}
+
+u16 gdefender_state::input_r()
+{
+	// D1: multiplexed inputs
+	return read_inputs(4) & 2;
+}
+
+void gdefender_state::update_int1()
+{
+	// INT1 on multiplexed inputs
+	set_interrupt(1, read_inputs(4) & 1);
+}
+
+// config
+
+static INPUT_PORTS_START( gdefender )
+	PORT_START("IN.0") // D11 INT1/D1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, gdefender_state, input_changed, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+
+	PORT_START("IN.1") // D12 INT1/D1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, gdefender_state, input_changed, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Warp")
+
+	PORT_START("IN.2") // D13 INT1/D1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, gdefender_state, input_changed, 0) PORT_NAME("Missile / Game")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Bomb")
+
+	PORT_START("IN.3") // D14 INT1/D1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, gdefender_state, input_changed, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+void gdefender_state::gdefender(machine_config &config)
+{
+	// basic machine hardware
+	HD38820(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(gdefender_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(gdefender_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(gdefender_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(gdefender_state::plate_w));
+	m_maincpu->write_r<4>().set(FUNC(gdefender_state::plate_w));
+	m_maincpu->write_r<5>().set(FUNC(gdefender_state::plate_w));
+	m_maincpu->write_r<6>().set(FUNC(gdefender_state::plate_w));
+	m_maincpu->write_d().set(FUNC(gdefender_state::grid_w));
+	m_maincpu->read_d().set(FUNC(gdefender_state::input_r));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(13, 28);
+	config.set_default_layout(layout_hh_hmcs40_test);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( gdefender )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38820l53", 0x0000, 0x1000, CRC(fe52bbb4) SHA1(e0250954c3801af9841306c2e1fdf57f3b9edffa) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+
+	ROM_REGION( 100000, "screen", 0)
+	ROM_LOAD( "gdefender.svg", 0, 100000, NO_DUMP )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Gakken Dig Dug (manufactured in Japan)
   * PCB label Gakken DIG-DAG KS-004283(A/B)
   * Hitachi QFP HD38820A69 MCU
@@ -4123,6 +4707,103 @@ ROM_END
 
 /***************************************************************************
 
+  Romtec Pucki & Monsters
+  * Hitachi HD38750A67 MCU
+  * cyan/red/green VFD display
+
+***************************************************************************/
+
+class puckimon_state : public hh_hmcs40_state
+{
+public:
+	puckimon_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_hmcs40_state(mconfig, type, tag)
+	{ }
+
+	void puckimon(machine_config &config);
+
+private:
+	void update_display();
+	void grid_w(offs_t offset, u8 data);
+	void plate_w(u16 data);
+};
+
+// handlers
+
+void puckimon_state::update_display()
+{
+	m_display->matrix(m_grid, m_plate);
+}
+
+void puckimon_state::grid_w(offs_t offset, u8 data)
+{
+	// R1x-R3x: vfd grid
+	int shift = (offset - 1) * 4;
+	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
+
+	// R13: vfd plate
+	if (offset == 1)
+		m_plate = (m_plate & 0x7fff) | (data << 12 & 0x8000);
+	update_display();
+}
+
+void puckimon_state::plate_w(u16 data)
+{
+	// D0: speaker out
+	m_speaker->level_w(data & 1);
+
+	// D1-D15: vfd plate
+	m_plate = (m_plate & 0x8000) | (data >> 1 & 0x7fff);
+	update_display();
+
+}
+
+// config
+
+static INPUT_PORTS_START( puckimon )
+	PORT_START("IN.0") // port R0x
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+INPUT_PORTS_END
+
+void puckimon_state::puckimon(machine_config &config)
+{
+	// basic machine hardware
+	HD38750(config, m_maincpu, 400000); // approximation
+	m_maincpu->read_r<0>().set_ioport("IN.0").invert();
+	m_maincpu->write_r<1>().set(FUNC(puckimon_state::grid_w));
+	m_maincpu->write_r<2>().set(FUNC(puckimon_state::grid_w));
+	m_maincpu->write_r<3>().set(FUNC(puckimon_state::grid_w));
+	m_maincpu->write_d().set(FUNC(puckimon_state::plate_w));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(12, 16);
+	config.set_default_layout(layout_hh_hmcs40_test);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( puckimon )
+	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38750a67", 0x0000, 0x0800, CRC(8b493783) SHA1(6c37e67de5d59889abf8a155654f130218cfc12e) )
+	ROM_CONTINUE(           0x0f00, 0x0080 )
+
+	ROM_REGION( 100000, "screen", 0)
+	ROM_LOAD( "puckimon.svg", 0, 100000, NO_DUMP )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Tomy(tronic) Tron (manufactured in Japan)
   * PCB label THN-02 2E114E07
   * Hitachi HD38800A88 MCU
@@ -4383,6 +5064,127 @@ ROM_END
 
 /***************************************************************************
 
+  Tomy Bombman (Portable 6000 series)
+  * Hitachi HD38800B29 MCU
+  * cyan/red/blue VFD display
+
+***************************************************************************/
+
+class bombman_state : public hh_hmcs40_state
+{
+public:
+	bombman_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_hmcs40_state(mconfig, type, tag)
+	{ }
+
+	void bombman(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
+
+private:
+	void update_int0();
+	void update_display();
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+};
+
+// handlers
+
+void bombman_state::update_display()
+{
+	m_display->matrix(m_grid, m_plate);
+}
+
+void bombman_state::plate_w(offs_t offset, u8 data)
+{
+	// R0x-R3x: vfd plate
+	int shift = offset * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+	update_display();
+}
+
+void bombman_state::grid_w(u16 data)
+{
+	// D7: speaker out
+	m_speaker->level_w(data >> 7 & 1);
+
+	// D11-D15: input mux
+	u8 inp_mux = data >> 11 & 0x1f;
+	if (inp_mux != m_inp_mux)
+	{
+		m_inp_mux = inp_mux;
+		update_int0();
+	}
+
+	// D8-D15: vfd grid
+	m_grid = data >> 8 & 0xff;
+
+	// D0-D4: more plates
+	m_plate = (m_plate & 0x00ffff) | (data << 16 & 0x1f0000);
+	update_display();
+}
+
+void bombman_state::update_int0()
+{
+	// INT0 on multiplexed inputs
+	set_interrupt(0, read_inputs(5));
+}
+
+// config
+
+static INPUT_PORTS_START( bombman )
+	PORT_START("IN.0") // D11 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, bombman_state, input_changed, 0)
+
+	PORT_START("IN.1") // D12 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY PORT_CHANGED_MEMBER(DEVICE_SELF, bombman_state, input_changed, 0)
+
+	PORT_START("IN.2") // D13 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY PORT_CHANGED_MEMBER(DEVICE_SELF, bombman_state, input_changed, 0)
+
+	PORT_START("IN.3") // D14 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_CHANGED_MEMBER(DEVICE_SELF, bombman_state, input_changed, 0)
+
+	PORT_START("IN.4") // D15 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_CHANGED_MEMBER(DEVICE_SELF, bombman_state, input_changed, 0)
+INPUT_PORTS_END
+
+void bombman_state::bombman(machine_config &config)
+{
+	// basic machine hardware
+	HD38800(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(bombman_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(bombman_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(bombman_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(bombman_state::plate_w));
+	m_maincpu->write_d().set(FUNC(bombman_state::grid_w));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(8, 21);
+	config.set_default_layout(layout_hh_hmcs40_test);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( bombman )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38800b29", 0x0000, 0x1000, CRC(f99ebd3f) SHA1(5016d4e35efa1353d26e60f98d8a027773d571a0) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+
+	ROM_REGION( 100000, "screen", 0)
+	ROM_LOAD( "bombman.svg", 0, 100000, NO_DUMP )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   VTech Invaders (manufactured in Taiwan)
   * Hitachi HD38750A45 MCU
   * cyan/red VFD display Futaba DM-26Z 1G, with bezel
@@ -4494,46 +5296,55 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR  NAME       PARENT   CMP MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1979, bambball,  0,        0, bambball, bambball, bambball_state, empty_init, "Bambino", "Dribble Away Basketball", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, bmboxing,  0,        0, bmboxing, bmboxing, bmboxing_state, empty_init, "Bambino", "Knock-Em Out Boxing", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT   CMP MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1982, wantgman,  0,        0, wantgman,  wantgman,  wantgman_state,  empty_init, "Actronics / Hanzawa", "Wanted G-Man", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-CONS( 1982, bfriskyt,  0,        0, bfriskyt, bfriskyt, bfriskyt_state, empty_init, "Bandai", "Frisky Tom (Bandai)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, packmon,   0,        0, packmon,  packmon,  packmon_state,  empty_init, "Bandai", "Packri Monster", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, bzaxxon,   0,        0, bzaxxon,  bzaxxon,  bzaxxon_state,  empty_init, "Bandai", "Zaxxon (Bandai)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, zackman,   0,        0, zackman,  zackman,  zackman_state,  empty_init, "Bandai", "Zackman", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, bpengo,    0,        0, bpengo,   bpengo,   bpengo_state,   empty_init, "Bandai", "Pengo (Bandai)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, bbtime,    0,        0, bbtime,   bbtime,   bbtime_state,   empty_init, "Bandai", "Burger Time (Bandai)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, bdoramon,  0,        0, bdoramon, bdoramon, bdoramon_state, empty_init, "Bandai", "Dokodemo Dorayaki Doraemon", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, bultrman,  0,        0, bultrman, bultrman, bultrman_state, empty_init, "Bandai", "Ultraman Monster Battle", MACHINE_SUPPORTS_SAVE )
-CONS( 1984, machiman,  0,        0, machiman, machiman, machiman_state, empty_init, "Bandai", "Machine Man", MACHINE_SUPPORTS_SAVE )
-CONS( 1984, pairmtch,  0,        0, pairmtch, pairmtch, pairmtch_state, empty_init, "Bandai", "Pair Match", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, bambball,  0,        0, bambball,  bambball,  bambball_state,  empty_init, "Bambino", "Dribble Away Basketball", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, bmboxing,  0,        0, bmboxing,  bmboxing,  bmboxing_state,  empty_init, "Bambino", "Knock-Em Out Boxing", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, alnattck,  0,        0, alnattck, alnattck, alnattck_state, empty_init, "Coleco", "Alien Attack", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   cdkong_state,   empty_init, "Coleco", "Donkey Kong (Coleco)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, cgalaxn,   0,        0, cgalaxn,  cgalaxn,  cgalaxn_state,  empty_init, "Coleco", "Galaxian (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-CONS( 1981, cpacman,   0,        0, cpacman,  cpacman,  cpacman_state,  empty_init, "Coleco", "Pac-Man (Coleco, Rev. 29)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, cpacmanr1, cpacman,  0, cpacman,  cpacman,  cpacman_state,  empty_init, "Coleco", "Pac-Man (Coleco, Rev. 28)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, cmspacmn,  0,        0, cmspacmn, cmspacmn, cmspacmn_state, empty_init, "Coleco", "Ms. Pac-Man (Coleco)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, bfriskyt,  0,        0, bfriskyt,  bfriskyt,  bfriskyt_state,  empty_init, "Bandai", "Frisky Tom (Bandai)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, packmon,   0,        0, packmon,   packmon,   packmon_state,   empty_init, "Bandai", "Packri Monster", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, bzaxxon,   0,        0, bzaxxon,   bzaxxon,   bzaxxon_state,   empty_init, "Bandai", "Zaxxon (Bandai)", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, zackman,   0,        0, zackman,   zackman,   zackman_state,   empty_init, "Bandai", "Zackman", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, bpengo,    0,        0, bpengo,    bpengo,    bpengo_state,    empty_init, "Bandai", "Pengo (Bandai)", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, bbtime,    0,        0, bbtime,    bbtime,    bbtime_state,    empty_init, "Bandai", "Burger Time (Bandai)", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, ktparman,  0,        0, ktparman,  ktparman,  ktparman_state,  empty_init, "Bandai", "Kiteyo Parman", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1983, bdoramon,  0,        0, bdoramon,  bdoramon,  bdoramon_state,  empty_init, "Bandai", "Dokodemo Dorayaki Doraemon", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, tkjmaru,   0,        0, tkjmaru,   tkjmaru,   tkjmaru_state,   empty_init, "Bandai", "Toukon Juohmaru", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1983, bultrman,  0,        0, bultrman,  bultrman,  bultrman_state,  empty_init, "Bandai", "Ultraman Monster Battle", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, ggdman,    0,        0, ggdman,    ggdman,    ggdman_state,    empty_init, "Bandai", "Go Go Dynaman", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1984, machiman,  0,        0, machiman,  machiman,  machiman_state,  empty_init, "Bandai", "Machine Man", MACHINE_SUPPORTS_SAVE )
+CONS( 1984, pairmtch,  0,        0, pairmtch,  pairmtch,  pairmtch_state,  empty_init, "Bandai", "Pair Match", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, egalaxn2,  0,        0, egalaxn2, egalaxn2, egalaxn2_state, empty_init, "Entex", "Galaxian 2 (Entex)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, epacman2,  0,        0, epacman2, epacman2, epacman2_state, empty_init, "Entex", "Pac Man 2 (Entex, cyan Pacman)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, epacman2r, epacman2, 0, epacman2, epacman2, epacman2_state, empty_init, "Entex", "Pac Man 2 (Entex, red Pacman)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, einvader2, 0,        0, einvader2,einvader2,einvader2_state,empty_init, "Entex", "Super Space Invader 2 (Entex, black version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, eturtles,  0,        0, eturtles, eturtles, eturtles_state, empty_init, "Entex", "Turtles (Entex)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, estargte,  0,        0, estargte, estargte, estargte_state, empty_init, "Entex", "Stargate (Entex)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, alnattck,  0,        0, alnattck,  alnattck,  alnattck_state,  empty_init, "Coleco", "Alien Attack", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, cdkong,    0,        0, cdkong,    cdkong,    cdkong_state,    empty_init, "Coleco", "Donkey Kong (Coleco)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, cgalaxn,   0,        0, cgalaxn,   cgalaxn,   cgalaxn_state,   empty_init, "Coleco", "Galaxian (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+CONS( 1981, cpacman,   0,        0, cpacman,   cpacman,   cpacman_state,   empty_init, "Coleco", "Pac-Man (Coleco, Rev. 29)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, cpacmanr1, cpacman,  0, cpacman,   cpacman,   cpacman_state,   empty_init, "Coleco", "Pac-Man (Coleco, Rev. 28)", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, cmspacmn,  0,        0, cmspacmn,  cmspacmn,  cmspacmn_state,  empty_init, "Coleco", "Ms. Pac-Man (Coleco)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, ghalien,   0,        0, ghalien,  ghalien,  ghalien_state,  empty_init, "Gakken", "Heiankyo Alien (Gakken)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, gckong,    0,        0, gckong,   gckong,   gckong_state,   empty_init, "Gakken", "Crazy Kong (Gakken)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, gscobra,   0,        0, gscobra,  gscobra,  gscobra_state,  empty_init, "Gakken", "Super Cobra (Gakken, green version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, gdigdug,   0,        0, gdigdug,  gdigdug,  gdigdug_state,  empty_init, "Gakken", "Dig Dug (Gakken)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, egalaxn2,  0,        0, egalaxn2,  egalaxn2,  egalaxn2_state,  empty_init, "Entex", "Galaxian 2 (Entex)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, epacman2,  0,        0, epacman2,  epacman2,  epacman2_state,  empty_init, "Entex", "Pac Man 2 (Entex, cyan Pacman)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, epacman2r, epacman2, 0, epacman2,  epacman2,  epacman2_state,  empty_init, "Entex", "Pac Man 2 (Entex, red Pacman)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, einvader2, 0,        0, einvader2, einvader2, einvader2_state, empty_init, "Entex", "Super Space Invader 2 (Entex, black version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, eturtles,  0,        0, eturtles,  eturtles,  eturtles_state,  empty_init, "Entex", "Turtles (Entex)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, estargte,  0,        0, estargte,  estargte,  estargte_state,  empty_init, "Entex", "Stargate (Entex)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, mwcbaseb,  0,        0, mwcbaseb, mwcbaseb, mwcbaseb_state, empty_init, "Mattel Electronics", "World Championship Baseball", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, msthawk,   0,        0, msthawk,  msthawk,  msthawk_state,  empty_init, "Mattel Electronics", "Star Hawk (Mattel)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, ghalien,   0,        0, ghalien,   ghalien,   ghalien_state,   empty_init, "Gakken", "Heiankyo Alien (Gakken)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, gckong,    0,        0, gckong,    gckong,    gckong_state,    empty_init, "Gakken", "Crazy Kong (Gakken)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, gscobra,   0,        0, gscobra,   gscobra,   gscobra_state,   empty_init, "Gakken", "Super Cobra (Gakken, green version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, gdefender, 0,        0, gdefender, gdefender, gdefender_state, empty_init, "Gakken", "Defender (Gakken)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1983, gdigdug,   0,        0, gdigdug,   gdigdug,   gdigdug_state,   empty_init, "Gakken", "Dig Dug (Gakken)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1983, pbqbert,   0,        0, pbqbert,  pbqbert,  pbqbert_state,  empty_init, "Parker Brothers", "Q*Bert (Parker Brothers)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, mwcbaseb,  0,        0, mwcbaseb,  mwcbaseb,  mwcbaseb_state,  empty_init, "Mattel Electronics", "World Championship Baseball", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, msthawk,   0,        0, msthawk,   msthawk,   msthawk_state,   empty_init, "Mattel Electronics", "Star Hawk (Mattel)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1982, tmtron,    0,        0, tmtron,   tmtron,   tmtron_state,   empty_init, "Tomy", "Tron (Tomy)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, kingman,   0,        0, kingman,  kingman,  kingman_state,  empty_init, "Tomy", "Kingman", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, pbqbert,   0,        0, pbqbert,   pbqbert,   pbqbert_state,   empty_init, "Parker Brothers", "Q*Bert (Parker Brothers)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, vinvader,  0,        0, vinvader, vinvader, vinvader_state, empty_init, "VTech", "Invaders (VTech)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, puckimon,  0,        0, puckimon,  puckimon,  puckimon_state,  empty_init, "Romtec", "Pucki & Monsters", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+
+CONS( 1982, tmtron,    0,        0, tmtron,    tmtron,    tmtron_state,    empty_init, "Tomy", "Tron (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, kingman,   0,        0, kingman,   kingman,   kingman_state,   empty_init, "Tomy", "Kingman", MACHINE_SUPPORTS_SAVE )
+CONS( 1984, bombman,   0,        0, bombman,   bombman,   bombman_state,   empty_init, "Tomy", "Bombman", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+
+CONS( 1981, vinvader,  0,        0, vinvader,  vinvader,  vinvader_state,  empty_init, "VTech", "Invaders (VTech)", MACHINE_SUPPORTS_SAVE )

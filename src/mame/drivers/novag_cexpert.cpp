@@ -16,6 +16,9 @@ Hardware notes:
 
 I/O is again similar to supercon
 
+The first version was on a modified Super Constellation PCB. 4MHz CPU speed,
+and 4 TMM27128 with identical ROM contents as the newer version.
+
 ******************************************************************************/
 
 #include "emu.h"
@@ -50,8 +53,11 @@ public:
 	// machine configs
 	void cexpert(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(switch_cpu_freq) { set_cpu_freq(); }
+
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override { set_cpu_freq(); }
 
 private:
 	// devices/pointers
@@ -60,6 +66,8 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device<beep_device> m_beeper;
 	required_ioport_array<8> m_inputs;
+
+	void set_cpu_freq();
 
 	// address maps
 	void main_map(address_map &map);
@@ -80,6 +88,12 @@ void cexpert_state::machine_start()
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_select));
+}
+
+void cexpert_state::set_cpu_freq()
+{
+	// old version had a 4MHz CPU
+	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? (10_MHz_XTAL/2) : (8_MHz_XTAL/2));
 }
 
 
@@ -192,6 +206,11 @@ static INPUT_PORTS_START( cexpert )
 	PORT_START("IN.7")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("Go")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("Take Back / Restore")
+
+	PORT_START("FAKE")
+	PORT_CONFNAME( 0x01, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, cexpert_state, switch_cpu_freq, 0) // factory set
+	PORT_CONFSETTING(    0x00, "4MHz" )
+	PORT_CONFSETTING(    0x01, "5MHz" )
 INPUT_PORTS_END
 
 

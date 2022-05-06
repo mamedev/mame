@@ -34,19 +34,6 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="alde">
-		<description>Aldebaran</description>
-		<year>1981</year>
-		<publisher>ハドソン (Hudson Soft)</publisher>
-		<info name="serial" value="LA-1004"/>
-		<info name="alt_title" value="アルデバラン"/>
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="471592">
-				<rom name="alde.t77" size="471592" crc="16da890c" sha1="bf3979254575eebbf8e0dd4054b7ce6087402d57"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="alien">
 		<description>The Alien</description>
 		<year>1983</year>
@@ -295,32 +282,6 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="bushman">
-		<description>Happy Bushman</description>
-		<year>1983</year>
-		<publisher>ポニカ (PonyCa)</publisher>
-		<info name="serial" value="K33M5027"/>
-		<info name="release" value="198303xx"/>
-		<info name="alt_title" value="ハッピーブッシュマン"/>
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="1642830">
-				<rom name="bushman.t77" size="1642830" crc="728062ab" sha1="8b0cd10f01585f12ce33179ac6f7d8fc999f2d91"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="capricrn">
-		<description>Minami no Shima no Capricorn</description>
-		<year>1983</year>
-		<publisher>九十九電機 (Tsukumo Denki)</publisher>
-		<info name="alt_title" value="南の島のカプリコーン"/>
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="2693020">
-				<rom name="cap.t77" size="2693020" crc="634256e6" sha1="8ab55c19b72be26f9a0ae5ab9a4d90a9991ea618"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="castle">
 		<description>The Castle</description>
 		<year>1985</year>
@@ -434,20 +395,6 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3748336">
 				<rom name="dattu.t77" size="3748336" crc="00b8d39e" sha1="8b809e249ba495afc6f24ec68c387d0ed9f5da5c"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="delphis">
-		<description>Delphis</description>
-		<year>1984</year>
-		<publisher>コムパック (Compaq)</publisher>
-		<info name="serial" value="CD-1135"/>
-		<info name="release" value="198404xx"/>
-		<info name="alt_title" value="デルフィス"/>
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="2113922">
-				<rom name="del.t77" size="2113922" crc="da2c5b1e" sha1="e48082992a51530beb5cd9e90556e6de409a9454"/>
 			</dataarea>
 		</part>
 	</software>
@@ -601,18 +548,6 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="904832">
 				<rom name="egg.t77" size="904832" crc="aa938b89" sha1="50cb41c0b2def21bed19032b9c3f3f81d6f4a521"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="elevgame">
-		<description>Elevator Game</description>
-		<year>19??</year>
-		<publisher>スターパック (Star Pack)</publisher>
-		<info name="alt_title" value="エレベーターゲーム"/>
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="332360">
-				<rom name="elevator game.t77" size="332360" crc="365fe706" sha1="d965486a3c2f25e14ce0b9bed0f003330c849de0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -915,20 +850,6 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="hhouse">
-		<description>Haunted House</description>
-		<year>1983</year>
-		<publisher>コムパック (Compaq)</publisher>
-		<info name="serial" value="CD-1071"/>
-		<info name="release" value="198310xx"/>
-		<info name="alt_title" value="ハウンテッドハウス"/>
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="1657464">
-				<rom name="house.t77" size="1657464" crc="e6b10029" sha1="1b7112208394e58d699bd77a2dee3d326c10fda6"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="hisha">
 		<description>Hisha</description>
 		<year>1985</year>
@@ -1078,20 +999,6 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="kaguya">
-		<description>Ohi! Kaguya Hime - Kinuginu no Wakare</description>
-		<year>1983</year>
-		<publisher>ポニカ (PonyCa)</publisher>
-		<info name="serial" value="K40M5047"/>
-		<info name="release" value="198311xx"/>
-		<info name="alt_title" value="おーい!かぐや姫 - 衣衣 のわかれ"/>
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="2274254">
-				<rom name="ooikagu.t77" size="2274254" crc="9f0057ff" sha1="da5947960734ef53cd3b5332e971ad14be680f62"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="kaito">
 		<description>Karei Naru Kaitou</description>
 		<year>1983</year>
@@ -1163,19 +1070,6 @@ Titles, serial #s, publishers and release dates taken from:
 			<feature name="part_id" value="Chapters 5-6" />
 			<dataarea name="cass" size="6190056">
 				<rom name="karu56.t77" size="6190056" crc="869d5660" sha1="2e141488afb14d03ec72ad7c594140963a3e2b24"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="kiki">
-		<description>Mari-chan Kiki Ippatsu</description>
-		<year>1983</year>
-		<publisher>エニックス (Enix)</publisher>
-		<info name="release" value="198302xx"/>
-		<info name="alt_title" value="マリちゃん危機一髪"/>
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="4555760">
-				<rom name="kiki.t77" size="4555760" crc="cf535f2f" sha1="f14df460bd63bba2bc0db4869ea865a2bd8b900c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1384,20 +1278,6 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="midway">
-		<description>Midway</description>
-		<year>1983</year>
-		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
-		<info name="serial" value="DP-3036"/>
-		<info name="release" value="198309xx"/>
-		<info name="alt_title" value="ミッドウェイ"/>
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="1361648">
-				<rom name="mid.t77" size="1361648" crc="c63c2f29" sha1="0889adcc6d0ae183757381acb94d3dae03e0be53"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="molemole">
 		<description>Mole Mole</description>
 		<year>1985</year>
@@ -1422,19 +1302,6 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1102476">
 				<rom name="mr_bat.t77" size="1102476" crc="abb98b5c" sha1="57e56b8c62a78a3942298aa824427dfe680c36fc"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mu">
-		<description>Mu Tairiku no Nazo</description>
-		<year>1983</year>
-		<publisher>マジカルズゥ (MagicalZoo)</publisher>
-		<info name="release" value="198308xx"/>
-		<info name="alt_title" value="ムー大陸の謎"/>
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="2637670">
-				<rom name="mu.t77" size="2637670" crc="fb9fea6f" sha1="e0e0cd9061b970d46f275973dfef38ecf9db1f14"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1594,20 +1461,6 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="panic">
-		<description>Joshi Ryou Panic</description>
-		<year>1983</year>
-		<publisher>エニックス (Enix)</publisher>
-		<info name="serial" value="E-G027"/>
-		<info name="release" value="198306xx"/>
-		<info name="alt_title" value="女子寮パニック"/>
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="11369494">
-				<rom name="panic.t77" size="11369494" crc="e42b289e" sha1="bf44e13d984ff5bec00c3a5660b3b897ed0ace7a"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="penguin">
 		<description>Penguin-kun</description>
 		<year>1983</year>
@@ -1641,12 +1494,14 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="portopia" supported="no">
+	<!-- This dump is missing side B, which contains the FM-8 version of the game -->
+	<software name="portopia">
 		<description>Portopia Renzoku Satsujin Jiken</description>
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
 		<info name="serial" value="E-G034"/>
 		<info name="alt_title" value="ポートピア連続殺人事件"/>
+		<info name="usage" value="Type LOADM&quot;&quot;,R to load, then switch to portopia2.t77 and type RUN&quot;&quot;,R to load the next part. After the initial screens, switch to portopia3.t77 and press ENTER to load the game proper."/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="55320">
 				<rom name="portopia1.t77" size="55320" crc="c828949f" sha1="5a45ca2c832eb41122816bed92f76af0bac605b7"/>
@@ -1821,19 +1676,6 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="renju">
-		<description>Renju</description>
-		<year>1981</year>
-		<publisher>九十九電機 (Tsukumo Denki)</publisher>
-		<info name="alt_title" value="連珠"/>
-		<info name="usage" value="Type LOADM&quot;&quot;,R to load"/>
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="352882">
-				<rom name="ren.t77" size="352882" crc="9cea162b" sha1="737da555921890e13fd3b80b6c44fe811b31584f"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="riglas">
 		<description>Riglas</description>
 		<year>1986</year>
@@ -1891,32 +1733,6 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="sanjutsu">
-		<description>I wa Sanjutsu Nari</description>
-		<year>1982</year>
-		<publisher>ハドソン (Hudson Soft)</publisher>
-		<info name="serial" value="LA-1009"/>
-		<info name="alt_title" value="医は算術なり"/>
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="1232372">
-				<rom name="san.t77" size="1232372" crc="6fc56674" sha1="22f36cb798cf3059c2a890532fcedffc5461ffef"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sanjutsua" cloneof="sanjutsu">
-		<description>I wa Sanjutsu Nari (alt)</description>
-		<year>1982</year>
-		<publisher>ハドソン (Hudson Soft)</publisher>
-		<info name="serial" value="LA-1009"/>
-		<info name="alt_title" value="医は算術なり"/>
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="1232818">
-				<rom name="i wa sanjutsu nari (alt).t77" size="1232818" crc="c53c34cb" sha1="892a7442e66e22eb15d3ca64a33461e5c5b2ea37"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="sbasebal">
 		<description>Super Baseball</description>
 		<year>1983</year>
@@ -1938,19 +1754,6 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1521974">
 				<rom name="ser.t77" size="1521974" crc="3c023dfa" sha1="6356caad4c17ca4ef27f447b8145d53ab88e94d1"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="skougeki">
-		<description>Shinjuwan Kougeki</description>
-		<year>1983</year>
-		<publisher>ポニカ (Pony Canyon)</publisher>
-		<info name="serial" value="K35M5501"/>
-		<info name="alt_title" value="真珠湾攻撃"/>
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="1846044">
-				<rom name="shinjuwan kougeki.t77" size="1846044" crc="53126cfa" sha1="32c408f3985d13bb3a908165aad83727ecdeff53"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1979,25 +1782,6 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1293548">
 				<rom name="sokoban (alt).t77" size="1293548" crc="e7fa1407" sha1="dc8de2da31d30d90a429294c5abfd7556d7d325a"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sokoban2">
-		<description>Sokoban 2</description>
-		<year>1984</year>
-		<publisher>シンキングラビット (Thinking Rabbit)</publisher>
-		<info name="release" value="198402xx"/>
-		<info name="alt_title" value="倉庫番2"/>
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="1161332">
-				<rom name="sokoban.t77" size="1161332" crc="40d4f9ea" sha1="d962a6b54099160c059b4ee11efeb9e3002ea89d"/>
-			</dataarea>
-		</part>
-		<part name="cass2" interface="fm7_cass">
-			<feature name="part_id" value="Editor" />
-			<dataarea name="cass" size="853574">
-				<rom name="soko_edit.t77" size="853574" crc="32d61e93" sha1="68eab3da4f0758c7b9f5f4485dadd0ad43556218"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2182,18 +1966,6 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="startrek">
-		<description>Star Trek</description>
-		<year>1981</year>
-		<publisher>九十九電機 (Tsukumo Denki)</publisher>
-		<info name="alt_title" value="スーパースタートレック"/>
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="470560">
-				<rom name="sup_star.t77" size="470560" crc="a6a45074" sha1="3086ef8e7ea9a07be4440fb220df6b5f697438eb"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="thestars">
 		<description>The Stars</description>
 		<year>1983</year>
@@ -2220,19 +1992,6 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1212934">
 				<rom name="str.t77" size="1212934" crc="88069cef" sha1="2f98669dc652b9d139d6902133ecae7175604d35"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="tankgame">
-		<description>Tank Game</description>
-		<year>1983?</year>
-		<publisher>九十九電機 (Tsukumo Denki)</publisher>
-		<info name="alt_title" value="タンクゲーム"/>
-		<info name="usage" value="Type LOADM&quot;&quot;,R to load"/>
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="408904">
-				<rom name="tank.t77" size="408904" crc="4e9c78bf" sha1="9d1d3ec37962618b0ddac528e51ac1a49c527a7c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2307,18 +2066,6 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="447614">
 				<rom name="ult.t77" size="447614" crc="c7f51123" sha1="5c3286552b0b2b572b531834a4ea8ea7c4bc9c8a"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ultramah">
-		<description>Ultra Yonin Mahjong</description>
-		<year>1983</year>
-		<publisher>九十九電機 (Tsukumo Denki)</publisher>
-		<info name="alt_title" value="ウルトラ四人麻雀"/>
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="1123700">
-				<rom name="mah.t77" size="1123700" crc="699d71e1" sha1="56546522b779f9e9216bd6d7307e847969c0bb92"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2443,31 +2190,6 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="yakyuken">
-		<description>Yakyuuken</description>
-		<year>1982</year>
-		<publisher>九十九電機 (Tsukumo Denki)</publisher>
-		<info name="alt_title" value="野球拳"/>
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="598028">
-				<rom name="yakyu.t77" size="598028" crc="d70a43cf" sha1="ba87e6104b4a150c0f2cc345d989b2ea212d1b93"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="yama">
-		<description>Yamanotesen Adventure</description>
-		<year>1983</year>
-		<publisher>光栄 (Koei)</publisher>
-		<info name="release" value="198308xx"/>
-		<info name="alt_title" value="山手線アドベンチャー"/>
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="1221136">
-				<rom name="yama.t77" size="1221136" crc="08eacb43" sha1="51ebb742424385a8dd736266e1435dd7d57a7637"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="yumepyak">
 		<description>Yume no Pro Yakyuu</description>
 		<year>1983</year>
@@ -2477,19 +2199,6 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1117458">
 				<rom name="yume no pro yakyuu.t77" size="1117458" crc="958d52ec" sha1="49b4851d5267dcd3a83c002acfa63c8e9b1fe54a"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zaiko">
-		<description>Zaiko Kanri</description>
-		<year>1981</year>
-		<publisher>Kinki Computer Service</publisher>
-		<info name="serial" value="KCS-C-1013"/>
-		<info name="alt_title" value="在庫管理"/>
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="886402">
-				<rom name="zaiko.t77" size="886402" crc="bb7f5770" sha1="d158f99543b30731279e95c90d6c73882323d002"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2515,130 +2224,6 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="5088378">
 				<rom name="zgun.t77" size="5088378" crc="4990921e" sha1="b6be73ac2463902f2af3071af06c63a710c969e8"/>
-			</dataarea>
-		</part>
-	</software>
-
-
-<!-- To sort, probably all FM7/FM8 tapes by ASCII! -->
-
-	<software name="demofm8">
-		<description>FM8 Demonstration</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="デモンストレーション"/> <!-- Marked デモンストレーション 1 in the pack I found -->
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="328964">
-				<rom name="demonstration.t77" size="328964" crc="c80a32c1" sha1="64db2b9ecf50a239ad103be7aa52f6ca84d4c20f" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-<!-- These were in a pack FM-8 Program Library No. 2 -->
-	<software name="graph">
-		<description>Graph</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="グラフ"/> <!-- Marked グラフ 2 in the pack I found -->
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="924508">
-				<rom name="graph.t77" size="924508" crc="f7c65807" sha1="8b079cfaaab3670cc2cd250d7ad3b9d273c8a5cd" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sumwint">
-		<description>Summer Winter</description>
-		<year>1981?</year>
-		<publisher>アスキー (ASCII)</publisher>
-		<info name="alt_title" value="サマーウインター"/> <!-- Marked サマーウインター 3 in the pack I found -->
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="416272">
-				<rom name="sumwint.t77" size="416272" crc="d219f306" sha1="6f2b6abdd71101047e482cd80930b8ddab15280a" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wordpro">
-		<description>Word Processor</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="ワードプロセッサ"/> <!-- Marked ワードプロセッサ 4 in the pack I found -->
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="394700">
-				<rom name="wordpro.t77" size="394700" crc="3c5c622c" sha1="d1322d3c4ef0f19037e39e1c9308db5ad791ce58" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="llander">
-		<description>Lunar Lander</description>
-		<year>1981?</year>
-		<publisher>アスキー (ASCII)</publisher>
-		<info name="alt_title" value="ルナーランダー"/> <!-- Marked ルナーランダー 5 in the pack I found -->
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="419418">
-				<rom name="lunar lander.t77" size="419418" crc="ca58b4d0" sha1="b34f6f71c04f4b9f135334463f88032067215785" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bjbonus">
-		<description>Black Jack &amp; Bonus</description>
-		<year>1981?</year>
-		<publisher>アスキー (ASCII)</publisher>
-		<info name="alt_title" value="ブラックジャック&amp;ボーナス"/> <!-- Marked ブラックジャック＆ボーナス 6 in the pack I found -->
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="448498">
-				<rom name="bjbonus.t77" size="448498" crc="90bd16b0" sha1="95b5a8c8a9259063017d409e1d3c5bb2826ac898" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sort">
-		<description>Sort Kenkyuu</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="ソート研究"/> <!-- Marked ソート研究 7 in the pack I found -->
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="201096">
-				<rom name="sort.t77" size="201096" crc="4f1a8a23" sha1="b0610ee3414d49149a81bf8b9986b229338407b5" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="meibo">
-		<description>Meibo</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="名簿"/> <!-- Marked 名簿 8 in the pack I found -->
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="426582">
-				<rom name="meibo.t77" size="426582" crc="6048ed8a" sha1="be297c0119fe9f5d634f9ccb1538e5547229a980" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="fm8pl3">
-		<description>FM-8 Program Library No. 3</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="FM−8プログラムライブラリNO.3"/>
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="3453092">
-				<rom name="fm-8 program library 3.t77" size="3453092" crc="bb5bc9eb" sha1="85c75f9c8d243a9b94fcabcb50fbd581bb5d4ae9" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="fm8pl4">
-		<description>FM-8 Program Library No. 4</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="FM−8プログラムライブラリNO.4"/>
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="3230932">
-				<rom name="fm-8 program library 4.t77" size="3230932" crc="2b2c73c1" sha1="02e6fadf819d7b5337b590c670106b379ff95030" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

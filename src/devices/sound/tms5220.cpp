@@ -312,7 +312,7 @@ Exidy's 'Victory' and 'Victor Banana' (need verify for both)
     Pinball: Several (don't know names offhand, have not checked schematics; likely Zaccaria's 'Farfalla')
     Home computer: Street Electronics Corp.'s Apple II 'Echo 2' Speech
 synthesizer (later cards only); Texas Instruments' 'Speak and Learn'
-scanner wand unit.
+scanner wand unit; HP 27201A Speech Output Module (serial port connection).
 
 TMS5220C AKA TSP5220C: (on stuff made from 1984 to 1992 or so)
     Arcade: Atari's 'Indiana Jones and the Temple of Doom', '720',
@@ -1564,9 +1564,11 @@ void tms5220_device::set_interrupt_state(int state)
 
 	LOGMASKED(LOG_PIN_READS, "irq pin set to state %d\n", state);
 
-	if (!m_irq_handler.isnull() && state != m_irq_pin)
+	if (state != m_irq_pin)
+	{
+		m_irq_pin = state;
 		m_irq_handler(!state);
-	m_irq_pin = state;
+	}
 }
 
 /**********************************************************************************************
@@ -1640,7 +1642,7 @@ void tms5220_device::device_start()
 	}
 
 	/* resolve callbacks */
-	m_irq_handler.resolve();
+	m_irq_handler.resolve_safe();
 	m_readyq_handler.resolve();
 	m_m0_cb.resolve();
 	m_m1_cb.resolve();

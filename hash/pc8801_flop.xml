@@ -48121,7 +48121,7 @@ ExtractDisk  [09]"第4集 B     " -> "jam vol.1 (alt)_09.d88"
 		<!--combined image-->
 		<!--rom name="autumn park.d88" size="697696" crc="9ee6184f" sha1="9ea1f7e9b791025324003d9cbb903576d2c247a2"/-->
 		<info name="usage" value="Works in vanilla PC8801 only"/>
-		<!-- otherwise punts with an invisible "RETURN without GOSUB in 56230" --> 
+		<!-- otherwise punts with an invisible "RETURN without GOSUB in 56230" -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
@@ -54787,13 +54787,13 @@ ExtractDisk  [02]"DISK_B          " -> "game music library_02.d88"
 	</software>
 
 <!--
-	01 Pascom Tower
-	02 Jagey
-	03 Trump Kyou
-	04 Yakyuu Kyou
-	05 PUNCH BALL [Mario Bros]
-	06 DRAGON SLAYER
-	07 ??? (doesn't boot)
+    01 Pascom Tower
+    02 Jagey
+    03 Trump Kyou
+    04 Yakyuu Kyou
+    05 PUNCH BALL [Mario Bros]
+    06 DRAGON SLAYER
+    07 ??? (doesn't boot)
 -->
 	<software name="88gamez1">
 		<description>88Gamez1</description>
@@ -54809,12 +54809,12 @@ ExtractDisk  [02]"DISK_B          " -> "game music library_02.d88"
 	</software>
 
 <!--
-	"PC-8801 GAME PACK"
-	1: [Nintendo no] GOLF
-	2: [Nintendo no] TENNIS
-	3: EGGY
-	4: BILLIARDS [Lunar Ball]
-	5: [David's] MIDNIGHT MAGIC
+    "PC-8801 GAME PACK"
+    1: [Nintendo no] GOLF
+    2: [Nintendo no] TENNIS
+    3: EGGY
+    4: BILLIARDS [Lunar Ball]
+    5: [David's] MIDNIGHT MAGIC
 -->
 	<software name="88gamez2">
 		<description>88Gamez2</description>

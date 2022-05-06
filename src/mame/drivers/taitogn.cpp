@@ -398,12 +398,12 @@ private:
 	required_ioport m_jp1;
 
 	bool m_has_zoom;
-	uint8_t m_control;
-	uint16_t m_control2;
-	uint8_t m_control3;
-	int m_v;
+	uint8_t m_control = 0;
+	uint16_t m_control2 = 0;
+	uint8_t m_control3 = 0;
+	int m_v = 0;
 
-	uint8_t m_coin_info;
+	uint8_t m_coin_info = 0;
 };
 
 // Misc. controls

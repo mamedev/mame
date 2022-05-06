@@ -222,7 +222,7 @@ void ts2068_state::ts2068_update_memory()
 
 
 	uint8_t *ExROM = memregion("maincpu")->base() + 0x014000;
-	uint8_t *ChosenROM;
+	uint8_t *ChosenROM = nullptr;
 
 	if (m_port_f4_data & 0x01)
 	{
@@ -601,7 +601,6 @@ DEVICE_IMAGE_LOAD_MEMBER( ts2068_state::cart_load )
 
 	if (!image.loaded_through_softlist())
 	{
-		uint8_t *DOCK;
 		int chunks_in_file = 0;
 		std::vector<uint8_t> header;
 		header.resize(9);
@@ -618,7 +617,7 @@ DEVICE_IMAGE_LOAD_MEMBER( ts2068_state::cart_load )
 		}
 
 		m_dock->rom_alloc(0x10000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-		DOCK = m_dock->get_rom_base();
+		u8* DOCK = m_dock->get_rom_base();
 
 		// check header
 		image.fread(&header[0], 9);

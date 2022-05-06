@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles, Couriersud,Stephane Humbert, Robbbert
+// copyright-holders:Aaron Giles, Couriersud, Stephane Humbert, Robbbert
 /***************************************************************************
 
     Galaxian-derived hardware
@@ -4378,7 +4378,7 @@ static INPUT_PORTS_START( mooncrsl )
 	PORT_INCLUDE(mooncrst)
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) /* the game will crash at round 3 otherwise, could be protection (or a bad rom / bad hack) the same code is mostly patched out in mooncreg */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) // mooncrsl and mooncreg2 will crash at round 3 otherwise, could be protection (or a bad hack). The same code is mostly patched out in mooncreg
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
@@ -12637,6 +12637,34 @@ ROM_START( mooncreg ) // similar to the 'floritas' set but with original Moon Cr
 ROM_END
 
 
+ROM_START( mooncreg2 ) // more similar to 'floritasm'
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.bin",    0x0000, 0x0800, CRC(f82b5b29) SHA1(cd3336b690bb2af6c741a46e6cf96371b21c7373) )
+	ROM_LOAD( "2_bb.bin", 0x0800, 0x0800, CRC(b5e90c11) SHA1(fb43bc3ce1b25d13385ec59be2e8cf514270911a) ) // unique
+	ROM_LOAD( "3.bin",    0x1000, 0x0800, CRC(a1939def) SHA1(c9be93d325dde496d89e0735ec4e7abca932c0f6) )
+	ROM_LOAD( "4_b.bin",  0x1800, 0x0800, CRC(27f7cda1) SHA1(4d2eef64eddc021179b7e6fe7b8b40bc969491cb) )
+	ROM_LOAD( "5.bin",    0x2000, 0x0800, CRC(32cd9adc) SHA1(3143690712465d092d6c63f4826f220839d78958) )
+	ROM_LOAD( "6.bin",    0x2800, 0x0800, CRC(f0230048) SHA1(8a4363323530b21ee14dbe608aa0de5241d8bb39) )
+	ROM_LOAD( "7_r.bin",  0x3000, 0x0800, CRC(3e798858) SHA1(65b63a5aaf51f22f77537dfd01f49180227a1fb5) ) // unique
+	ROM_LOAD( "8.bin",    0x3800, 0x0800, CRC(bead5e83) SHA1(86d40eb5c16d1b9c9e7114af3eefedb50bd16cde) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "cm_2b.bin", 0x0000, 0x0800, CRC(528da705) SHA1(d726ee18b79774c982f88afb2a508eb5d5783193) )
+	ROM_LOAD( "cm_4.bin",  0x0800, 0x0200, CRC(5a4b17ea) SHA1(8a879dc34fdecc8a121c4a87abb981212fb05945) )
+	ROM_CONTINUE(          0x0c00, 0x0200 )
+	ROM_CONTINUE(          0x0a00, 0x0200 )
+	ROM_CONTINUE(          0x0e00, 0x0200 )
+	ROM_LOAD( "cm_1b.bin", 0x1000, 0x0800, CRC(4e79ff6b) SHA1(f72386a3766a7fcc7b4b8cedfa58b8d57f911f6f) )
+	ROM_LOAD( "cm_3.bin",  0x1800, 0x0200, CRC(e0edccbd) SHA1(0839a4c9b6e863d12253ae8e1732e80e08702228) )
+	ROM_CONTINUE(          0x1c00, 0x0200 )
+	ROM_CONTINUE(          0x1a00, 0x0200 )
+	ROM_CONTINUE(          0x1e00, 0x0200 )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "mb7051.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+ROM_END
+
+
 ROM_START( mooncrsl ) // similar to above
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "01.bin",     0x0000, 0x0800, CRC(a67ca4af) SHA1(0422be6b3549418c19ece3de6dd165e690d40fdd) )
@@ -15866,7 +15894,8 @@ GAME( 198?, starfgmc,    mooncrst, mooncrst,   mooncrsa,   galaxian_state, init_
 GAME( 1980, spcdrag,     mooncrst, mooncrst,   smooncrs,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg",                      "Space Dragon (Moon Cresta bootleg)",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1980, floritas,    mooncrst, mooncrst,   smooncrs,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg",                      "Floritas (Moon Cresta bootleg)",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1980, floritasm,   mooncrst, mooncrst,   smooncrs,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Multivideo)",         "Floritas (Multivideo Spanish Moon Cresta bootleg)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1980, mooncreg,    mooncrst, mooncrst,   mooncreg,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Electrogame S.A.)",   "Moon Cresta (Electrogame S.A. Spanish bootleg)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1980, mooncreg,    mooncrst, mooncrst,   mooncreg,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Electrogame S.A.)",   "Moon Cresta (Electrogame S.A. Spanish bootleg, set 1)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1980, mooncreg2,   mooncrst, mooncrst,   mooncrsl,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Electrogame S.A.)",   "Moon Cresta (Electrogame S.A. Spanish bootleg, set 2)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1980, mooncrsl,    mooncrst, mooncrst,   mooncrsl,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Laguna S.A.)",        "Cresta Mundo (Laguna S.A. Spanish Moon Cresta bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, stera,       mooncrst, mooncrst,   smooncrs,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg",                      "Steraranger (Moon Cresta bootleg)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1980, mooncrgx,    mooncrst, galaxian,   mooncrgx,   galaxian_state, init_mooncrgx,   ROT270, "bootleg",                      "Moon Cresta (bootleg on Galaxian hardware)",             MACHINE_SUPPORTS_SAVE )

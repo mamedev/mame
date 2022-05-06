@@ -328,7 +328,7 @@ namespace solver
 		}
 		m_cnt++;
 
-		if (false)
+		if (false) // NOLINT
 			for (unsigned i=0; i<iN; i++)
 			{
 				float_type tmp = plib::constants<FT>::zero();

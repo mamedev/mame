@@ -191,6 +191,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("nina006",          NES_NINA006);
 	device.option_add_internal("bf9093",           NES_BF9093);
 	device.option_add_internal("bf9096",           NES_BF9096);
+	device.option_add_internal("bf9096a",          NES_BF9096A);
 	device.option_add_internal("goldenfive",       NES_GOLDEN5);
 	device.option_add_internal("ade",              NES_ALADDIN);
 	device.option_add_internal("cne_decathl",      NES_CNE_DECATHL);
@@ -221,7 +222,6 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("s74x374a",         NES_SACHEN_74X374_ALT);  // FIXME: Made up boards some different handling
 	device.option_add_internal("tcu01",            NES_SACHEN_TCU01);
 	device.option_add_internal("tcu02",            NES_SACHEN_TCU02);
-	device.option_add_internal("tengen_800008",    NES_TENGEN_800008);   // FIXME: Is this the same as CNROM?
 	device.option_add_internal("tengen_800032",    NES_TENGEN_800032);
 	device.option_add_internal("tengen_800037",    NES_TENGEN_800037);
 	device.option_add_internal("txc_22110",        NES_TXC_22110);
@@ -474,7 +474,6 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("bmc_kc885",        NES_BMC_KC885);
 	device.option_add_internal("bmc_sfc12",        NES_BMC_SFC12);
 	device.option_add_internal("bmc_hik4in1",      NES_BMC_HIK4);
-	device.option_add_internal("bmc_mario7in1",    NES_BMC_MARIO7IN1);
 	device.option_add_internal("bmc_f15",          NES_BMC_F15);
 	device.option_add_internal("bmc_f600",         NES_BMC_F600);
 	device.option_add_internal("bmc_gn45",         NES_BMC_GN45);

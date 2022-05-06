@@ -131,10 +131,10 @@ Sega Bass Fishing / Get Bass
 Virtua Fighter 3
 Virtua Fighter 3 Team Battle
 Le Mans 24
-Scud Race / Super GT
+Scud Race / Sega Super GT
 Scud Race Plus
-The Lost World
-The Lost World Special
+The Lost World: Jurassic Park
+The Lost World: Jurassic Park Special
 Virtua Striker 2
 Virtua Striker 2 Version '98
 
@@ -6789,8 +6789,8 @@ GAME( 1996, scuddx,         scud,      scud,      scud,     model3_state,     in
 GAME( 1996, scudau,         scud,      scud,      scud,     model3_state,     init_scud, ROT0, "Sega", "Scud Race Twin/DX (Australia)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, scudplus,       scud,      scud,      scud,     model3_state, init_scudplus, ROT0, "Sega", "Scud Race Plus Twin/DX (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, USA, Export
 GAME( 1997, scudplusa,      scud,      scud,      scud,     model3_state,init_scudplusa, ROT0, "Sega", "Scud Race Plus Twin/DX", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, USA, Export
-GAME( 1997, lostwsga,          0,  lostwsga,      lostwsga, model3_state, init_lostwsga, ROT0, "Sega", "The Lost World (Japan, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, lostwsgp,   lostwsga,  lostwsga,      lostwsga, model3_state, init_lostwsga, ROT0, "Sega", "The Lost World (location test)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, USA, Export, Koala
+GAME( 1997, lostwsga,          0,  lostwsga,      lostwsga, model3_state, init_lostwsga, ROT0, "Sega", "The Lost World: Jurassic Park (Japan, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, lostwsgp,   lostwsga,  lostwsga,      lostwsga, model3_state, init_lostwsga, ROT0, "Sega", "The Lost World: Jurassic Park (location test)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, USA, Export, Koala
 GAME( 1997, vs215,           vs2, model3_15,      model3,   model3_state,    init_vs215, ROT0, "Sega", "Virtua Striker 2 (Step 1.5, Export, USA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, vs215o,          vs2, model3_15,      model3,   model3_state,    init_vs215, ROT0, "Sega", "Virtua Striker 2 (Step 1.5, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, lemans24,          0, model3_15,      scud,     model3_state, init_lemans24, ROT0, "Sega", "Le Mans 24 (Japan, Revision B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

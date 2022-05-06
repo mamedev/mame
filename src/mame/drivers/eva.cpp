@@ -81,7 +81,6 @@ protected:
 	virtual void machine_start() override;
 
 private:
-
 	// devices
 	required_device<cop420_cpu_device> m_maincpu;
 

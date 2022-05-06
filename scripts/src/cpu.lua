@@ -3126,6 +3126,16 @@ if opt_tool(CPUS, "ALPHA") then
 end
 
 --------------------------------------------------
+-- Hewlett-Packard HP2100 (disassembler only)
+--@src/devices/cpu/hp2100/hp2100.h,CPUS["HP2100"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "HP2100") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/hp2100/hp2100d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/hp2100/hp2100d.h")
+end
+
+--------------------------------------------------
 -- National Semiconductor HPC
 --@src/devices/cpu/hpc/hpc.h,CPUS["HPC"] = true
 --------------------------------------------------
@@ -3579,4 +3589,13 @@ end
 if opt_tool(CPUS, "M68HC16") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/m68hc16/cpu16dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/m68hc16/cpu16dasm.h")
+end
+
+--------------------------------------------------
+-- Varian 620, disassembler only
+--------------------------------------------------
+
+if opt_tool(CPUS, "V620") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/v620/v620dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/v620/v620dasm.h")
 end

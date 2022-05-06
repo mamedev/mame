@@ -755,7 +755,7 @@ void tsconf_state::update_frame_timer()
 INTERRUPT_GEN_MEMBER(tsconf_state::tsconf_vblank_interrupt)
 {
 	update_frame_timer();
-	m_line_irq_timer->adjust(attotime::zero);
+	m_line_irq_timer->adjust(m_screen->time_until_pos(0));
 }
 
 void tsconf_state::dma_ready(int line)

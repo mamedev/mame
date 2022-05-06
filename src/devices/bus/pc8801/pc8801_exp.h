@@ -32,7 +32,7 @@ public:
 	{
 		m_iospace->install_device(0x00, 0xff, device, map);
 	}
-	
+
 	auto int3_callback() { return m_int3_cb.bind(); }
 	auto int4_callback() { return m_int4_cb.bind(); }
 	auto int5_callback() { return m_int5_cb.bind(); }
@@ -45,8 +45,8 @@ protected:
 private:
 	required_address_space m_iospace;
 
-//	device_pc8801_exp_interface *m_exp;
-	
+//  device_pc8801_exp_interface *m_exp;
+
 	devcb_write_line m_int3_cb;
 	devcb_write_line m_int4_cb;
 	devcb_write_line m_int5_cb;
@@ -67,7 +67,7 @@ protected:
 	virtual void interface_post_start() override;
 
 	pc8801_exp_slot_device *m_slot;
-	
+
 	DECLARE_WRITE_LINE_MEMBER( int3_w );
 	virtual DECLARE_WRITE_LINE_MEMBER( int4_w );
 	DECLARE_WRITE_LINE_MEMBER( int5_w );
@@ -81,7 +81,7 @@ public:
 
 
 protected:
-//	virtual void device_add_mconfig(machine_config &config) override;
+//  virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
 

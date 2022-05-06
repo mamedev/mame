@@ -1498,10 +1498,10 @@ void goldnpkr_state::lespendu_mux_w(uint8_t data)
 {
 	m_mux_data = data ^ 0xff;   // inverted
 
-    if(data == 0x00)
+	if(data == 0x00)
 		data = 0xff;
 
-    membank("bank0")->set_entry(data & 0x07); // for both sets
+	membank("bank0")->set_entry(data & 0x07); // for both sets
 }
 
 
@@ -1862,8 +1862,8 @@ void goldnpkr_state::lespendu_map(address_map &map)
 	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
 	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
- 
-   	map(0x5000, 0x5fff).bankr("bank0");
+
+	map(0x5000, 0x5fff).bankr("bank0");
 	map(0x6000, 0x7fff).rom();
 }
 
@@ -5054,7 +5054,7 @@ ROM_END
 
   1- When the player wins a hand, game will automatically switch to HI-LO
      for double-up (no need to press the "double" button)
-	 
+
   2- A card is shown to the player, then the game is to guess the drawn card
     (BIG to guess bigger than actual card, LO to guess a lower card)
 
@@ -5104,7 +5104,7 @@ ROM_END
 
   1- When the player wins a hand, game will automatically switch to HI-LO
      for double-up (no need to press the "double" button)
-	 
+
   2- A card is shown to the player, then the game is to guess the drawn card
     (BIG to guess bigger than actual card, LO to guess a lower card)
 
@@ -11744,7 +11744,7 @@ ROM_END
 
   Le Super Pendu.
   Voyageur de L'Espace Inc.
-  
+
   French language hangman style game manufactured in Canada.
   Conversion kit for modified Bonanza Enterprises hardware.
 
@@ -12285,10 +12285,10 @@ void goldnpkr_state::init_lespendu()
 
 	ROM0[0x643d] = 0xff;  // skip checksum
 	ROM0[0x643f] = 0xff;  // skip checksum
-	ROM0[0x6461] = 0xff;  // changing value to store at $01c1 (RAM security patch) 
+	ROM0[0x6461] = 0xff;  // changing value to store at $01c1 (RAM security patch)
 
 	ROM1[0x7aa3] = 0x20;  // restore to original call, before RAM security patch
-	ROM1[0x7aa4] = 0xc3; 
+	ROM1[0x7aa4] = 0xc3;
 	ROM1[0x7aa5] = 0x78;
 
 	ROM0[0x75de] = 0x1f;  // fix lamps bug
@@ -12298,13 +12298,13 @@ void goldnpkr_state::init_lespenduj()
 {
 	uint8_t *ROM0 = memregion("maincpu")->base();
 	uint8_t *ROM1 = memregion("data")->base();
-   
+
 	ROM0[0x643d] = 0xff;  // skip checksum
 	ROM0[0x643f] = 0xff;  // skip checksum
-	ROM0[0x6461] = 0xff;  // changing value to store at $01c1 (RAM security patch) 
+	ROM0[0x6461] = 0xff;  // changing value to store at $01c1 (RAM security patch)
 
 	ROM1[0x7aa3] = 0x20;  // restore to original call, before RAM security patch
-	ROM1[0x7aa4] = 0xc8; 
+	ROM1[0x7aa4] = 0xc8;
 	ROM1[0x7aa5] = 0x78;
 
 	ROM0[0x766c] = 0x17;  // fix lamps bug

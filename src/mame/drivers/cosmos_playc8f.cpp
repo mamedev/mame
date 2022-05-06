@@ -18,8 +18,8 @@
   No      Universal Space Amusement Equipment Ltd.                         Bed Monsters        PLAYC8F + SY-MUSIC01 (music)
   No      Universal Space Amusement Equipment Ltd.                         Colorama 4 Player   PLAYC8F + SY-MUSIC01 (music)
   No      Universal Space Amusement Equipment Ltd. / Bromley Incorporated  Ghost Hunter        PLAYC8E + SY-MUSIC01 (music)
-  
-  
+
+
   Sound PCB "SY-MUSIC01":
  ___________________________________________________________________
 | ___   __  __    __________________                               |

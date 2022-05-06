@@ -27,7 +27,7 @@ Star Trax                        ---  X                      unknown
 
 Status:
 - All pinball machines are playable
-- Star Trax has no pinball, but instead has many ball bearings (800 was mentioned). Although it 
+- Star Trax has no pinball, but instead has many ball bearings (800 was mentioned). Although it
     can be started, and a score attained, it will eventually say PUMP ERROR and stop responding.
 
 

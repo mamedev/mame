@@ -530,7 +530,7 @@ void floppy_image_device::device_timer(emu_timer &timer, device_timer_id id, int
 	index_resync();
 }
 
-const floppy_image_format_t *floppy_image_device::identify(std::string filename)
+const floppy_image_format_t *floppy_image_device::identify(std::string_view filename)
 {
 	util::core_file::ptr fd;
 	std::string revised_path;
@@ -1384,7 +1384,7 @@ void floppy_image_device::wspan_write(const std::vector<wspan> &wspans, std::vec
 				track[si] = floppy_image::MG_E | (ws.start-1);
 				si ++;
 			}
-		} 
+		}
 
 		// Check for a neutral zone at the end and reduce it if needed
 		if(ei != track.size() && (track[ei] & floppy_image::MG_MASK) == floppy_image::MG_E) {

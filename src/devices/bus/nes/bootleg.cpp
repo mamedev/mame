@@ -197,7 +197,7 @@ nes_lg25_device::nes_lg25_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-nes_lh10_device::nes_lh10_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_lh10_device::nes_lh10_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_LH10, tag, owner, clock), m_latch(0)
 {
 }
@@ -558,7 +558,6 @@ void nes_lh42_device::pcb_reset()
 {
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);    // Last 16K is fixed
-	chr8(0, CHRRAM);
 
 	m_latch = 0;
 }
@@ -573,7 +572,6 @@ void nes_lg25_device::pcb_reset()
 {
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);    // Last 16K is fixed
-	chr8(0, CHRRAM);
 
 	m_latch = 0;
 }
@@ -582,7 +580,6 @@ void nes_lh10_device::device_start()
 {
 	common_start();
 	save_item(NAME(m_latch));
-	save_item(NAME(m_reg));
 }
 
 void nes_lh10_device::pcb_reset()
@@ -591,17 +588,13 @@ void nes_lh10_device::pcb_reset()
 	prg8_ab(0);
 	// 0xc000-0xdfff reads/writes WRAM
 	prg8_ef((m_prg_chunks << 1) - 1);
-	chr8(0, CHRRAM);
-	set_nt_mirroring(PPU_MIRROR_VERT);
 
 	m_latch = 0;
-	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
 }
 
 void nes_lh51_device::pcb_reset()
 {
 	prg32((m_prg_chunks >> 1) - 1);    // first 8K is switchable, the rest fixed
-	chr8(0, CHRRAM);
 }
 
 void nes_lh53_device::device_start()
@@ -1707,10 +1700,7 @@ void nes_lh32_device::write_h(offs_t offset, uint8_t data)
 
  NES 2.0: mapper 418
 
- In MAME: Preliminary supported.
-
- TODO: Investigate garbage tiles on bottom half of
- course map screens. This should be car dashboard?
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -1718,21 +1708,24 @@ void nes_lh42_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("lh42 write_h, offset: %04x, data: %02x\n", offset, data));
 
-	if (BIT(offset, 0))
+	switch (offset & 0x6001)
 	{
-		switch (m_latch)
-		{
-			case 1:
-				set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-				break;
-			case 2:
-			case 3:
-				prg8_x(m_latch & 1, data & 0x0f);
-				break;
-		}
+		case 0x0000:
+			m_latch = data & 0x07;
+			break;
+		case 0x0001:
+			switch (m_latch)
+			{
+				case 5:
+					set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+					break;
+				case 6:
+				case 7:
+					prg8_x(m_latch & 1, data & 0x0f);
+					break;
+			}
+			break;
 	}
-	else
-		m_latch = data & 0x03;
 }
 
 /*-------------------------------------------------
@@ -1754,21 +1747,24 @@ void nes_lg25_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("lg25 write_h, offset: %04x, data: %02x\n", offset, data));
 
-	if (BIT(offset, 0))
+	switch (offset & 0x6001)
 	{
-		switch (m_latch)
-		{
-			case 1:
-				set_nt_mirroring(BIT(data, 2) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
-				break;
-			case 2:
-			case 3:
-				prg8_x(m_latch & 1, data & 0x0f);
-				break;
-		}
+		case 0x0000:
+			m_latch = data & 0x07;
+			break;
+		case 0x0001:
+			switch (m_latch)
+			{
+				case 5:
+					set_nt_mirroring(BIT(data, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+					break;
+				case 6:
+				case 7:
+					prg8_x(m_latch & 1, data & 0x0f);
+					break;
+			}
+			break;
 	}
-	else
-		m_latch = data & 0x03;
 }
 
 /*-------------------------------------------------
@@ -1786,19 +1782,13 @@ void nes_lg25_device::write_h(offs_t offset, u8 data)
 
  -------------------------------------------------*/
 
-void nes_lh10_device::update_prg()
-{
-	prg8_89(m_reg[6]);
-	prg8_ab(m_reg[7]);
-}
-
-uint8_t nes_lh10_device::read_m(offs_t offset)
+u8 nes_lh10_device::read_m(offs_t offset)
 {
 	LOG_MMC(("lh10 read_m, offset: %04x\n", offset));
-	return m_prg[(0x0e * 0x2000) + (offset & 0x1fff)];
+	return m_prg[(0x0e * 0x2000 + offset) & (m_prg_size - 1)];
 }
 
-uint8_t nes_lh10_device::read_h(offs_t offset)
+u8 nes_lh10_device::read_h(offs_t offset)
 {
 //  LOG_MMC(("lh10 read_h, offset: %04x\n", offset));
 
@@ -1808,24 +1798,28 @@ uint8_t nes_lh10_device::read_h(offs_t offset)
 	return hi_access_rom(offset);
 }
 
-void nes_lh10_device::write_h(offs_t offset, uint8_t data)
+void nes_lh10_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("lh10 write_h, offset: %04x, data: %02x\n", offset, data));
 
-	if (offset >= 0x4000 && offset < 0x6000)
-		m_prgram[offset & 0x1fff] = data;
-	else
+	switch (offset & 0x6001)
 	{
-		switch (offset & 0x6001)
-		{
-			case 0x0000:
-				m_latch = data & 7;
-				break;
-			case 0x0001:
-				m_reg[m_latch] = data;
-				update_prg();
-				break;
-		}
+		case 0x0000:
+			m_latch = data & 7;
+			break;
+		case 0x0001:
+			switch (m_latch)
+			{
+				case 6:
+				case 7:
+					prg8_x(m_latch & 1, data & 0x0f);
+					break;
+			}
+			break;
+		case 0x4000:
+		case 0x4001:
+			m_prgram[offset & 0x1fff] = data;
+			break;
 	}
 }
 
@@ -1853,11 +1847,9 @@ void nes_lh51_device::write_h(offs_t offset, u8 data)
 	switch (offset & 0x6000)
 	{
 		case 0x0000:
-		case 0x1000:
 			prg8_89(data & 0x0f);
 			break;
 		case 0x6000:
-		case 0x7000:
 			set_nt_mirroring(BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 	}
