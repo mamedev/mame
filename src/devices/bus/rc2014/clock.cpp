@@ -10,6 +10,8 @@
 #include "clock.h"
 #include "machine/clock.h"
 
+namespace {
+
 class single_clock_device : public device_t, public device_rc2014_card_interface
 {
 public:
@@ -39,8 +41,6 @@ void single_clock_device::device_add_mconfig(machine_config &config)
 	clock_device &clock(CLOCK(config, "clock", XTAL(7'372'800)));
 	clock.signal_handler().set(FUNC(single_clock_device::clk_w));
 }
-
-DEFINE_DEVICE_TYPE_PRIVATE(RC2014_SINGLE_CLOCK, device_rc2014_card_interface, single_clock_device, "rc2014_clock", "RC2014 Single clock generator")
 
 class dual_clock_device : public device_t, public device_rc2014_ext_card_interface
 {
@@ -142,4 +142,10 @@ void dual_clock_device::device_add_mconfig(machine_config &config)
 	m_clock_2->signal_handler().set(FUNC(dual_clock_device::clk2_w));
 }
 
+}
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(RC2014_SINGLE_CLOCK, device_rc2014_card_interface, single_clock_device, "rc2014_clock", "RC2014 Single clock generator")
 DEFINE_DEVICE_TYPE_PRIVATE(RC2014_DUAL_CLOCK, device_rc2014_ext_card_interface, dual_clock_device, "rc2014_dual_clock", "RC2014 Dual Clock Module")

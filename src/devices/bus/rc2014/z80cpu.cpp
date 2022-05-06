@@ -11,6 +11,12 @@
 
 #include "cpu/z80/z80.h"
 
+namespace {
+
+//**************************************************************************
+// Z80 CPU base class
+//**************************************************************************
+
 class z80cpu_base : public device_t
 {
 protected:
@@ -55,6 +61,10 @@ void z80cpu_base::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &z80cpu_base::addrmap_io);
 }
 
+//**************************************************************************
+// Z80 CPU Module
+//**************************************************************************
+
 class z80cpu_device : public z80cpu_base, public device_rc2014_card_interface
 {
 public:
@@ -66,8 +76,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_resolve_objects() override;
 };
-
-DEFINE_DEVICE_TYPE_PRIVATE(RC2014_Z80CPU, device_rc2014_card_interface, z80cpu_device, "rc2014_z80", "RC2014 Z80 CPU Module")
 
 z80cpu_device::z80cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: z80cpu_base(mconfig, RC2014_Z80CPU, tag, owner, clock)
@@ -88,6 +96,10 @@ void z80cpu_device::device_resolve_objects()
 	m_bus->int_callback().append_inputline(m_maincpu, INPUT_LINE_IRQ0);
 }
 
+//**************************************************************************
+// Z80 CPU 2.1 Module
+//**************************************************************************
+
 class z80cpu21_device : public z80cpu_base, public device_rc2014_ext_card_interface
 {
 public:
@@ -98,8 +110,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_resolve_objects() override;
 };
-
-DEFINE_DEVICE_TYPE_PRIVATE(RC2014_Z80CPU_21, device_rc2014_ext_card_interface, z80cpu21_device, "rc2014_z8021", "RC2014 Z80 2.1 CPU Module")
 
 z80cpu21_device::z80cpu21_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: z80cpu_base(mconfig, RC2014_Z80CPU_21, tag, owner, clock)
@@ -120,3 +130,11 @@ void z80cpu21_device::device_resolve_objects()
 	m_bus->int_callback().append_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_bus->nmi_callback().append_inputline(m_maincpu, INPUT_LINE_NMI);
 }
+
+}
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(RC2014_Z80CPU, device_rc2014_card_interface, z80cpu_device, "rc2014_z80", "RC2014 Z80 CPU Module")
+DEFINE_DEVICE_TYPE_PRIVATE(RC2014_Z80CPU_21, device_rc2014_ext_card_interface, z80cpu21_device, "rc2014_z8021", "RC2014 Z80 2.1 CPU Module")

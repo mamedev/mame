@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "ram.h"
 
+namespace {
 //**************************************************************************
 //  RC2014 32K RAM Module
 //**************************************************************************
@@ -42,8 +43,6 @@ void ram_32k_device::device_start()
 
 	m_bus->installer(AS_PROGRAM)->install_ram(0x8000, 0xffff, m_ram.get());
 }
-
-DEFINE_DEVICE_TYPE_PRIVATE(RC2014_RAM_32K, device_rc2014_card_interface, ram_32k_device, "rc2014_ram_32k", "RC2014 32K RAM Module")
 
 //**************************************************************************
 //  RC2014 64K RAM Module
@@ -133,4 +132,10 @@ ioport_constructor ram_64k_device::device_input_ports() const
 	return INPUT_PORTS_NAME( start_addr );
 }
 
+}
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(RC2014_RAM_32K, device_rc2014_card_interface, ram_32k_device, "rc2014_ram_32k", "RC2014 32K RAM Module")
 DEFINE_DEVICE_TYPE_PRIVATE(RC2014_RAM_64K, device_rc2014_ext_card_interface, ram_64k_device, "rc2014_ram_64k", "RC2014 64K RAM Module")

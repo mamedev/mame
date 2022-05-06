@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "rom.h"
 
+namespace {
 
 //**************************************************************************
 //  Switchable ROM
@@ -76,8 +77,6 @@ const tiny_rom_entry *switchable_rom_device::device_rom_region() const
 {
 	return ROM_NAME( rc2014_rom );
 }
-
-DEFINE_DEVICE_TYPE_PRIVATE(RC2014_SWITCH_ROM, device_rc2014_card_interface, switchable_rom_device, "rc2014_switchable_rom", "RC2014 Switchable ROM Module")
 
 //**************************************************************************
 //  Pageable ROM
@@ -206,4 +205,10 @@ const tiny_rom_entry *pagable_rom_device::device_rom_region() const
 	return ROM_NAME( rc2014_pagable_rom );
 }
 
+}
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(RC2014_SWITCH_ROM, device_rc2014_card_interface, switchable_rom_device, "rc2014_switchable_rom", "RC2014 Switchable ROM Module")
 DEFINE_DEVICE_TYPE_PRIVATE(RC2014_PAGABLE_ROM, device_rc2014_ext_card_interface, pagable_rom_device, "rc2014_pagable_rom", "RC2014 Pagable ROM Module")

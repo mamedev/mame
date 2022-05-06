@@ -12,6 +12,8 @@
 #include "machine/z80sio.h"
 #include "bus/rs232/rs232.h"
 
+namespace {
+
 //**************************************************************************
 // Serial I/O
 //**************************************************************************
@@ -77,8 +79,6 @@ void serial_io_device::device_add_mconfig(machine_config &config)
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 }
 
-DEFINE_DEVICE_TYPE_PRIVATE(RC2014_SERIAL_IO, device_rc2014_card_interface, serial_io_device, "rc2014_serial_io", "RC2014 Serial I/O Module")
-
 //**************************************************************************
 //  Dual Serial Module SIO/2
 //**************************************************************************
@@ -142,4 +142,10 @@ void dual_serial_device::device_add_mconfig(machine_config &config)
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 }
 
+}
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(RC2014_SERIAL_IO, device_rc2014_card_interface, serial_io_device, "rc2014_serial_io", "RC2014 Serial I/O Module")
 DEFINE_DEVICE_TYPE_PRIVATE(RC2014_DUAL_SERIAL, device_rc2014_ext_card_interface, dual_serial_device, "rc2014_dual_serial", "RC2014 Serial I/O Module")
