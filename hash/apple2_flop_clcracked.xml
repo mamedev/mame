@@ -48117,4 +48117,45 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="botgardn">
+		<description>Botanical Gardens (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-05"/>
+		<!--"Botanical Gardens" is a 1986 educational program developed by Robert Kimball, David J. Donoghue, and Patrick Kehoe, and distributed by Sunburst Communications. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="botanical gardens (4am crack).dsk" size="143360" crc="45282d06" sha1="bebb4d99261cf2caa58144cc0561cca21e8c5455"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="usconnaf">
+		<description>The U.S. Constitution: Nationalism and Federalism (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Focus Media</publisher>
+		<info name="release" value="2022-05-06"/>
+		<!--"The U.S. Constitution: Nationalism and Federalism" is a 1987 educational program developed and distributed by Focus Media. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Development of the Constitution"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the u.s. constitution - nationalism and federalism (4am crack) disk 1 - development of the constitution.dsk" size="143360" crc="e50f8f9c" sha1="657339a9f4d9614d1b535b6c098a49608e29420c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - The creation of the Constution"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the u.s. constitution - nationalism and federalism (4am crack) disk 2 - the creation of the constitution.dsk" size="143360" crc="2e178e4c" sha1="bfc9fb735410da42870b7e4f2b256d8eee8aea67"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Testing your knowledge of the Constitution"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the u.s. constitution - nationalism and federalism (4am crack) disk 3 - testing your knowledge of the constitution.dsk" size="143360" crc="911e86c8" sha1="6247e47f014a6b43d78e9cce2cb4416c531e012a"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
