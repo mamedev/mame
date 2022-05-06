@@ -1007,6 +1007,7 @@ function createMAMEProjects(_target, _subtarget, _name)
 		GEN_DIR  .. "mame/layout",
 	}
 	includedirs {
+		ext_includedir("asio"),
 		ext_includedir("flac"),
 		ext_includedir("glm"),
 		ext_includedir("jpeg"),
@@ -1543,6 +1544,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/cps1bl_pic.cpp",
 	MAME_DIR .. "src/mame/drivers/kenseim.cpp",
 	MAME_DIR .. "src/mame/drivers/cps2.cpp",
+	MAME_DIR .. "src/mame/machine/cps2comm.cpp",
+	MAME_DIR .. "src/mame/machine/cps2comm.h",
 	MAME_DIR .. "src/mame/machine/cps2crypt.cpp",
 	MAME_DIR .. "src/mame/machine/cps2crypt.h",
 	MAME_DIR .. "src/mame/drivers/cps3.cpp",
