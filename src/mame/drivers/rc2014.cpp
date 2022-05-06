@@ -3,30 +3,9 @@
 
 #include "emu.h"
 #include "bus/rc2014/rc2014.h"
-#include "bus/rc2014/z80cpu.h"
-#include "bus/rc2014/clock.h"
-#include "bus/rc2014/ram.h"
-#include "bus/rc2014/rom.h"
-#include "bus/rc2014/serial.h"
-#include "bus/rc2014/cf.h"
+#include "bus/rc2014/modules.h"
 
 namespace {
-
-static void rc2014_bus_devices(device_slot_interface &device)
-{
-	device.option_add("z80", RC2014_Z80CPU);
-	device.option_add("clock", RC2014_SINGLE_CLOCK);
-	device.option_add("ram32k", RC2014_RAM_32K);
-	device.option_add("sw_rom", RC2014_SWITCH_ROM);
-	device.option_add("serial", RC2014_SERIAL_IO);
-	device.option_add("cf", RC2014_COMPACT_FLASH);
-
-	device.option_add("z80_21", RC2014_Z80CPU_21);
-	device.option_add("dual_clk", RC2014_DUAL_CLOCK);
-	device.option_add("sio", RC2014_DUAL_SERIAL);
-	device.option_add("page_rom", RC2014_PAGABLE_ROM);
-	device.option_add("ram64k", RC2014_RAM_64K);
-}
 
 class rc2014_state : public driver_device
 {
@@ -39,24 +18,24 @@ public:
 	void rc2014(machine_config &config)
 	{
 		RC2014_BUS(config, m_rc2014_bus, 0);
-		RC2014_SLOT(config, "bus:1", m_rc2014_bus, rc2014_bus_devices, "z80");
-		RC2014_SLOT(config, "bus:2", m_rc2014_bus, rc2014_bus_devices, "clock");
-		RC2014_SLOT(config, "bus:3", m_rc2014_bus, rc2014_bus_devices, "ram32k");
-		RC2014_SLOT(config, "bus:4", m_rc2014_bus, rc2014_bus_devices, "sw_rom");
-		RC2014_SLOT(config, "bus:5", m_rc2014_bus, rc2014_bus_devices, "serial");
+		RC2014_SLOT(config, "bus:1", m_rc2014_bus, rc2014_bus_modules, "z80");
+		RC2014_SLOT(config, "bus:2", m_rc2014_bus, rc2014_bus_modules, "clock");
+		RC2014_SLOT(config, "bus:3", m_rc2014_bus, rc2014_bus_modules, "ram32k");
+		RC2014_SLOT(config, "bus:4", m_rc2014_bus, rc2014_bus_modules, "sw_rom");
+		RC2014_SLOT(config, "bus:5", m_rc2014_bus, rc2014_bus_modules, "serial");
 	}
 
 	void rc2014cl2(machine_config &config)
 	{
 		RC2014_BUS(config, m_rc2014_bus, 0);
-		RC2014_SLOT(config, "bus:1", m_rc2014_bus, rc2014_bus_devices, "z80");
-		RC2014_SLOT(config, "bus:2", m_rc2014_bus, rc2014_bus_devices, "clock");
-		RC2014_SLOT(config, "bus:3", m_rc2014_bus, rc2014_bus_devices, "ram32k");
-		RC2014_SLOT(config, "bus:4", m_rc2014_bus, rc2014_bus_devices, "sw_rom");
-		RC2014_SLOT(config, "bus:5", m_rc2014_bus, rc2014_bus_devices, "serial");
-		RC2014_SLOT(config, "bus:6", m_rc2014_bus, rc2014_bus_devices, nullptr);
-		RC2014_SLOT(config, "bus:7", m_rc2014_bus, rc2014_bus_devices, nullptr);
-		RC2014_SLOT(config, "bus:8", m_rc2014_bus, rc2014_bus_devices, nullptr);
+		RC2014_SLOT(config, "bus:1", m_rc2014_bus, rc2014_bus_modules, "z80");
+		RC2014_SLOT(config, "bus:2", m_rc2014_bus, rc2014_bus_modules, "clock");
+		RC2014_SLOT(config, "bus:3", m_rc2014_bus, rc2014_bus_modules, "ram32k");
+		RC2014_SLOT(config, "bus:4", m_rc2014_bus, rc2014_bus_modules, "sw_rom");
+		RC2014_SLOT(config, "bus:5", m_rc2014_bus, rc2014_bus_modules, "serial");
+		RC2014_SLOT(config, "bus:6", m_rc2014_bus, rc2014_bus_modules, nullptr);
+		RC2014_SLOT(config, "bus:7", m_rc2014_bus, rc2014_bus_modules, nullptr);
+		RC2014_SLOT(config, "bus:8", m_rc2014_bus, rc2014_bus_modules, nullptr);
 	}
 
 private:
@@ -79,18 +58,18 @@ public:
 	void rc2014pro(machine_config &config)
 	{
 		RC2014_EXT_BUS(config, m_rc2014_bus, 0);
-		RC2014_EXT_SLOT(config, "bus:1", m_rc2014_bus, rc2014_bus_devices, "z80_21");
-		RC2014_EXT_SLOT(config, "bus:2", m_rc2014_bus, rc2014_bus_devices, "dual_clk");
-		RC2014_EXT_SLOT(config, "bus:3", m_rc2014_bus, rc2014_bus_devices, "ram64k");
-		RC2014_EXT_SLOT(config, "bus:4", m_rc2014_bus, rc2014_bus_devices, "page_rom");
-		RC2014_EXT_SLOT(config, "bus:5", m_rc2014_bus, rc2014_bus_devices, "sio");
-		RC2014_EXT_SLOT(config, "bus:6", m_rc2014_bus, rc2014_bus_devices, "cf");
-		RC2014_EXT_SLOT(config, "bus:7", m_rc2014_bus, rc2014_bus_devices, nullptr);
-		RC2014_EXT_SLOT(config, "bus:8", m_rc2014_bus, rc2014_bus_devices, nullptr);
-		RC2014_EXT_SLOT(config, "bus:9", m_rc2014_bus, rc2014_bus_devices, nullptr);
-		RC2014_EXT_SLOT(config, "bus:10", m_rc2014_bus, rc2014_bus_devices, nullptr);
-		RC2014_EXT_SLOT(config, "bus:11", m_rc2014_bus, rc2014_bus_devices, nullptr);
-		RC2014_EXT_SLOT(config, "bus:12", m_rc2014_bus, rc2014_bus_devices, nullptr);
+		RC2014_EXT_SLOT(config, "bus:1", m_rc2014_bus, rc2014_ext_bus_modules, "z80_21");
+		RC2014_EXT_SLOT(config, "bus:2", m_rc2014_bus, rc2014_ext_bus_modules, "dual_clk");
+		RC2014_EXT_SLOT(config, "bus:3", m_rc2014_bus, rc2014_ext_bus_modules, "ram64k");
+		RC2014_EXT_SLOT(config, "bus:4", m_rc2014_bus, rc2014_ext_bus_modules, "page_rom");
+		RC2014_EXT_SLOT(config, "bus:5", m_rc2014_bus, rc2014_ext_bus_modules, "sio");
+		RC2014_EXT_SLOT(config, "bus:6", m_rc2014_bus, rc2014_ext_bus_modules, "cf");
+		RC2014_EXT_SLOT(config, "bus:7", m_rc2014_bus, rc2014_ext_bus_modules, nullptr);
+		RC2014_EXT_SLOT(config, "bus:8", m_rc2014_bus, rc2014_ext_bus_modules, nullptr);
+		RC2014_EXT_SLOT(config, "bus:9", m_rc2014_bus, rc2014_ext_bus_modules, nullptr);
+		RC2014_EXT_SLOT(config, "bus:10", m_rc2014_bus, rc2014_ext_bus_modules, nullptr);
+		RC2014_EXT_SLOT(config, "bus:11", m_rc2014_bus, rc2014_ext_bus_modules, nullptr);
+		RC2014_EXT_SLOT(config, "bus:12", m_rc2014_bus, rc2014_ext_bus_modules, nullptr);
 	}
 private:
 	required_device<rc2014_ext_bus_device> m_rc2014_bus;

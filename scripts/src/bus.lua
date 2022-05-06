@@ -2088,6 +2088,8 @@ if (BUSES["RC2014"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/rc2014/rc2014.cpp",
 		MAME_DIR .. "src/devices/bus/rc2014/rc2014.h",
+		MAME_DIR .. "src/devices/bus/rc2014/modules.cpp",
+		MAME_DIR .. "src/devices/bus/rc2014/modules.h",
 		MAME_DIR .. "src/devices/bus/rc2014/z80cpu.cpp",
 		MAME_DIR .. "src/devices/bus/rc2014/z80cpu.h",
 		MAME_DIR .. "src/devices/bus/rc2014/clock.cpp",

@@ -34,7 +34,7 @@ private:
 };
 
 switchable_rom_device::switchable_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, RC2014_SWITCH_ROM, tag, owner, clock)
+	: device_t(mconfig, RC2014_SWITCHABLE_ROM, tag, owner, clock)
 	, device_rc2014_card_interface(mconfig, *this)
 	, m_rom(*this, "rom")
 	, m_rom_selector(*this, "A13-A15")
@@ -210,5 +210,5 @@ const tiny_rom_entry *pagable_rom_device::device_rom_region() const
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_PRIVATE(RC2014_SWITCH_ROM, device_rc2014_card_interface, switchable_rom_device, "rc2014_switchable_rom", "RC2014 Switchable ROM Module")
+DEFINE_DEVICE_TYPE_PRIVATE(RC2014_SWITCHABLE_ROM, device_rc2014_card_interface, switchable_rom_device, "rc2014_switchable_rom", "RC2014 Switchable ROM Module")
 DEFINE_DEVICE_TYPE_PRIVATE(RC2014_PAGABLE_ROM, device_rc2014_ext_card_interface, pagable_rom_device, "rc2014_pagable_rom", "RC2014 Pagable ROM Module")
