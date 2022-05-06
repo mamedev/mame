@@ -102,6 +102,7 @@ ti99_cartridge_device::ti99_cartridge_device(const machine_config &mconfig, cons
 
 void ti99_cartridge_device::prepare_cartridge()
 {
+	int rom1_length = 0;
 	int rom2_length = 0;
 
 	uint8_t* grom_ptr;
@@ -139,22 +140,25 @@ void ti99_cartridge_device::prepare_cartridge()
 		if (m_pcb->m_grom_size > 0x8000) m_pcb->set_grom_pointer(4, subdevice(GROM7_TAG));
 	}
 
-	m_pcb->m_rom_size = loaded_through_softlist() ? get_software_region_length("rom") : m_rpk->get_resource_length("rom_socket");
+	rom1_length = loaded_through_softlist() ? get_software_region_length("rom") : m_rpk->get_resource_length("rom_socket");
 	m_pcb->m_bank_mask = 0;
 
-	if (m_pcb->m_rom_size > 0)
+	if (rom1_length > 0)
 	{
-		LOGMASKED(LOG_CONFIG, "ROM dump size=0x%04x\n", m_pcb->m_rom_size);
+		LOGMASKED(LOG_CONFIG, "ROM dump size=0x%04x\n", rom1_length);
+
+		// Round up to 8K multiple; dumps may be shorter, but we have
+		// a cartridge ROM window of 8K
+		// TODO: Allow for mirroring?
+		m_pcb->m_rom_size = rom1_length;
+
+		if ((rom1_length % 0x2000)!=0)
+			m_pcb->m_rom_size = (rom1_length + 0x2000) & ~0x1fff;
 
 		// Softlist uses only one ROM area, no second socket
 		if (!loaded_through_softlist())
 		{
 			rom2_length = m_rpk->get_resource_length("rom2_socket");
-			if (rom2_length > 0x2000)
-			{
-				LOGMASKED(LOG_WARN, "Can only use 8K for second socket; dump truncated\n");
-				rom2_length = 0x2000;
-			}
 		}
 
 		// Using ROM2 socket automatically implies paged12, paged16,
@@ -162,24 +166,33 @@ void ti99_cartridge_device::prepare_cartridge()
 		if (rom2_length > 0)
 		{
 			LOGMASKED(LOG_CONFIG, "Second ROM dump size = 0x%04x\n", rom2_length);
+			if (rom2_length > 0x2000)
+			{
+				LOGMASKED(LOG_WARN, "Can only use 8K for second socket; dump truncated\n");
+				rom2_length = 0x2000;
+			}
 
 			if (m_pcb->m_rom_size > 0x2000)
 			{
 				m_pcb->m_rom_size = 0x2000;
-				LOGMASKED(LOG_WARN, "Can only use 8K for first socket when there is a second one; dump truncated.\n");
+				LOGMASKED(LOG_WARN, "Can only use 8K for first socket when there is a second socket; dump truncated.\n");
 			}
-			m_romspace = std::make_unique<u8[]>(0x4000);
+
+			// We assign 16K for both rom1 and rom2, so this is properly
+			// aligned with the 8K spaces even when the dumps are shorter
+			m_romspace = make_unique_clear<u8[]>(0x4000);
 
 			// Load the contents of the second socket in the upper half
+			// The contents of the first socket are copied later
 			rom_ptr = m_rpk->get_contents_of_socket("rom2_socket");
 			memcpy(m_romspace.get() + 0x2000, rom_ptr, rom2_length);
 
 			m_pcb->m_bank_mask = 1;
-			LOGMASKED(LOG_CONFIG, "ROM bank mask=0x0001 (using rom/rom2)\n");
+			LOGMASKED(LOG_CONFIG, "ROM bank mask=0x0001 (using ROM1/ROM2)\n");
 		}
 		else
 		{
-			m_romspace = std::make_unique<u8[]>(m_pcb->m_rom_size);
+			m_romspace = make_unique_clear<u8[]>(m_pcb->m_rom_size);
 
 			// Determine the bank mask for flexible ROM sizes in gromemu
 			int rsizet = m_pcb->m_rom_size;
@@ -197,7 +210,7 @@ void ti99_cartridge_device::prepare_cartridge()
 		}
 
 		rom_ptr = loaded_through_softlist() ? get_software_region("rom") : m_rpk->get_contents_of_socket("rom_socket");
-		memcpy(m_romspace.get(), rom_ptr, m_pcb->m_rom_size);
+		memcpy(m_romspace.get(), rom_ptr, rom1_length);
 
 		m_pcb->m_rom_ptr = m_romspace.get();
 	}
