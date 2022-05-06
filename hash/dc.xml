@@ -632,7 +632,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<publisher>Sega</publisher>
 		<info name="serial" value="HDR-0080"/>
 		<info name="release" value="20001012"/>
-		<info name="alt_title" value="エイティーン･ホイーラー"/>
+		<info name="alt_title" value="エイティーン・ホイーラー"/>
 		<info name="ring_code" value="&lt;HDR-0080-0529&gt;HK919C"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
@@ -791,7 +791,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<!-- Front Inlay ID: 673-01375 -->
 		<!-- Back Inlay ID: 673-01376 -->
 		<info name="release" value="20000622"/>
-		<info name="alt_title" value="アドバンスド大戦略～ヨーロッパの嵐･ドイツ電撃作戦～"/>
+		<info name="alt_title" value="アドバンスド大戦略～ヨーロッパの嵐・ドイツ電撃作戦～"/>
 		<info name="ring_code" value="HDR-0066-0405A   10M2   C   05"/>
 		<info name="barcode" value="4 974365 500665"/>
 		<part interface="cdrom" name="cdrom">
@@ -4019,7 +4019,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	    <publisher>Abel</publisher>
 	    <info name="serial" value="T-44406M"/>
 	    <info name="release" value="20020328"/>
-	    <info name="alt_title" value="カード･オブ･デスティニー 〜光と闇の統合者〜"/>
+	    <info name="alt_title" value="カード・オブ・デスティニー 〜光と闇の統合者〜"/>
 	    <part interface="cdrom" name="cdrom">
 	        <diskarea name="cdrom">
 	            <disk name="card of destiny hikari to yami no tougousha (jpn)" status="nodump"/>
@@ -4062,7 +4062,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<publisher>Abel</publisher>
 		<info name="serial" value="T-44405M"/>
 		<info name="release" value="20020328"/>
-		<info name="alt_title" value="カード･オブ･デスティニー 〜光と闇の統合者〜 限定版"/>
+		<info name="alt_title" value="カード・オブ・デスティニー 〜光と闇の統合者〜 限定版"/>
 		<info name="ring_code" value="&lt;T-44406M-0815&gt;HM220A (Game), T-44405M   OP222A (Talk CD)"/>
 		<part interface="cdrom" name="cdrom1">
 			<feature name="part_id" value="Card of Destiny: Hikari to Yami no Tougousha"/>
@@ -7393,7 +7393,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<publisher>Broccoli</publisher>
 		<info name="serial" value="T-46302M"/>
 		<info name="release" value="20010906"/>
-		<info name="alt_title" value="デ･ジ･キャラット ファンタジー"/>
+		<info name="alt_title" value="デ・ジ・キャラット ファンタジー"/>
 		<info name="ring_code" value="T-46302M-0753 MT   B04"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
@@ -7427,7 +7427,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<publisher>Broccoli</publisher>
 		<info name="serial" value="T-46301M"/>
 		<info name="release" value="20010906"/>
-		<info name="alt_title" value="デ･ジ･キャラット ファンタジー 初回限定版"/>
+		<info name="alt_title" value="デ・ジ・キャラット ファンタジー 初回限定版"/>
 		<info name="ring_code" value="T-46302M-0753 MT   B04 (Game), GCFC-21   2MM1   C   18 (Audio CD)"/>
 		<part interface="cdrom" name="cdrom1">
 			<feature name="part_id" value="Di Gi Charat Fantasy"/>
@@ -13316,7 +13316,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<publisher>Sega</publisher>
 		<info name="serial" value="HDR-0013"/>
 		<info name="release" value="19990325"/>
-		<info name="alt_title" value="スーパースピード･レーシング"/>
+		<info name="alt_title" value="スーパースピード・レーシング"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
 				<disk name="super speed racing (jpn)" sha1="8465a0af4d7726be89be45e3e0e838ec64b3d8b0"/>
@@ -18771,7 +18771,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<publisher>Sega</publisher>
 		<info name="serial" value="HDR-0149"/>
 		<info name="release" value="20010315"/>
-		<info name="alt_title" value="ル･マン24アワーズ"/>
+		<info name="alt_title" value="ル・マン24アワーズ"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
 				<disk name="le mans 24 hours (jpn)" sha1="483dc1ba8da6e1af5b8017c84579837403804486"/>
@@ -19146,7 +19146,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<publisher>Sega</publisher>
 		<info name="serial" value="HDR-0102, HDR-0112 (Limited Box)"/>
 		<info name="release" value="20000928"/>
-		<info name="alt_title" value="ラブひな 突然のエンゲージ･ハプニング, ラブひな 突然のエンゲージ･ハプニング LIMITED BOX"/>
+		<info name="alt_title" value="ラブひな 突然のエンゲージ・ハプニング, ラブひな 突然のエンゲージ・ハプニング LIMITED BOX"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
 				<disk name="love hina totsuzen no engage happening (jpn)" sha1="157ba9560a8fa359e8a9d27caa33a4e0538fb672"/>
@@ -19506,7 +19506,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	    <publisher>Kool Kizz</publisher>
 	    <info name="serial" value="T-44701M"/>
 	    <info name="release" value="20011115"/>
-	    <info name="alt_title" value="マリー&amp;エリーのアトリエ 〜ザールブルグの錬金術士1･2〜"/>
+	    <info name="alt_title" value="マリー&amp;エリーのアトリエ 〜ザールブルグの錬金術士1・2〜"/>
 	    <part interface="cdrom" name="cdrom1">
 	        <feature name="part_id" value="Game Disc"/>
 	        <diskarea name="cdrom">
@@ -20309,7 +20309,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	    <publisher>KID</publisher>
 	    <info name="serial" value="T-19713M"/>
 	    <info name="release" value="20020228"/>
-	    <info name="alt_title" value="ミルキィ･シーズン"/>
+	    <info name="alt_title" value="ミルキィ・シーズン"/>
 	    <part interface="cdrom" name="cdrom">
 	        <diskarea name="cdrom">
 	            <disk name="milky season (jpn)" status="nodump"/>
@@ -20360,7 +20360,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<publisher>Naxat Soft</publisher>
 		<info name="serial" value="T-18702M"/>
 		<info name="release" value="20010621"/>
-		<info name="alt_title" value="ミス･ムーンライト"/>
+		<info name="alt_title" value="ミス・ムーンライト"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
 				<disk name="miss moonlight (jpn)" sha1="05967f4e85e2b9415165de304bbb52070fccc065"/>

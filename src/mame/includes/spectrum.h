@@ -115,6 +115,8 @@ protected:
 
 	int m_ROMSelection = 0; // FIXME: this is used for various things in derived classes, but not by this base class, and should be removed
 	std::vector<u8> m_contention_pattern;
+	/* Defines offset in CPU cycles from screen left side. Early model (48/128/+2) typically use -1, later (+2A/+3) +1 */
+	s8 m_contention_offset = -1;
 
 	uint8_t m_ram_disabled_by_beta;
 	uint8_t pre_opcode_fetch_r(offs_t offset);
@@ -216,13 +218,19 @@ class spectrum_128_state : public spectrum_state
 {
 public:
 	spectrum_128_state(const machine_config &mconfig, device_type type, const char *tag) :
-		spectrum_state(mconfig, type, tag)
-		{ }
+		spectrum_state(mconfig, type, tag),
+		m_bank_rom(*this, "bank_rom%u", 0U),
+		m_bank_ram(*this, "bank_ram%u", 0U)
+	{ }
 
 	void spectrum_128(machine_config &config);
 
 protected:
+	memory_bank_array_creator<1> m_bank_rom;
+	memory_bank_array_creator<4> m_bank_ram;
+
 	virtual void video_start() override;
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void spectrum_128_update_memory() override;
@@ -231,11 +239,16 @@ protected:
 	virtual bool is_contended(offs_t offset) override;
 	virtual bool is_vram_write(offs_t offset) override;
 
+	template <u8 Bank>
+	void spectrum_128_ram_w(offs_t offset, u8 data);
+	template <u8 Bank>
+	u8 spectrum_128_ram_r(offs_t offset);
+
 private:
-	uint8_t spectrum_128_pre_opcode_fetch_r(offs_t offset);
-	void spectrum_128_bank1_w(offs_t offset, uint8_t data);
-	uint8_t spectrum_128_bank1_r(offs_t offset);
-	void spectrum_128_port_7ffd_w(offs_t offset, uint8_t data);
+	u8 spectrum_128_pre_opcode_fetch_r(offs_t offset);
+	void spectrum_128_rom_w(offs_t offset, u8 data);
+	u8 spectrum_128_rom_r(offs_t offset);
+	void spectrum_128_port_7ffd_w(offs_t offset, u8 data);
 	virtual uint8_t spectrum_port_r(offs_t offset) override;
 	//uint8_t spectrum_128_ula_r();
 

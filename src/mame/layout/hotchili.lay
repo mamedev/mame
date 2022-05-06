@@ -1,0 +1,153 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+
+	<element name="bet_1" defstate="0">
+		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.3" green="0.0" blue="0.0" /></rect>
+		<text string="BET 1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
+		</text>	
+	</element>
+
+	<element name="bet_2" defstate="0">
+		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.3" green="0.0" blue="0.0" /></rect>
+		<text string="BET 2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
+		</text>	
+	</element>	
+
+	<element name="bet_3" defstate="0">
+		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.3" green="0.0" blue="0.0" /></rect>
+		<text string="BET 3">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
+		</text>	
+	</element>	
+
+	<element name="bet_5" defstate="0">
+		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.3" green="0.0" blue="0.0" /></rect>
+		<text string="BET 5">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
+		</text>	
+	</element>	
+
+	<element name="bet_10" defstate="0">
+		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.3" green="0.0" blue="0.0" /></rect>
+		<text string="BET 10">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
+		</text>	
+	</element>		
+
+	<element name="play_1l" defstate="0">
+		<rect state="1"><color red="0.0" green="1.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.0" green="0.3" blue="0.0" /></rect>
+		<text string="PLAY 1 L">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
+		</text>	
+	</element>		
+
+	<element name="play_3l" defstate="0">
+		<rect state="1"><color red="0.0" green="1.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.0" green="0.3" blue="0.0" /></rect>
+		<text string="PLAY 3 L">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
+		</text>	
+	</element>		
+
+	<element name="play_5l" defstate="0">
+		<rect state="1"><color red="0.0" green="1.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.0" green="0.3" blue="0.0" /></rect>
+		<text string="PLAY 5 L">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
+		</text>	
+	</element>			
+
+	<element name="play_7l" defstate="0">
+		<rect state="1"><color red="0.0" green="1.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.0" green="0.3" blue="0.0" /></rect>
+		<text string="PLAY 7 L">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
+		</text>	
+	</element>			
+
+	<element name="play_9l" defstate="0">
+		<rect state="1"><color red="0.0" green="1.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.0" green="0.3" blue="0.0" /></rect>
+		<text string="PLAY 9 L">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
+		</text>	
+	</element>				
+
+	<element name="collect" defstate="0">
+		<rect state="1"><color red="1.0" green="1.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.3" green="0.3" blue="0.0" /></rect>
+		<text string="COLLECT">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
+		</text>	
+	</element>			
+	
+	<element name="cpanel">
+		<rect>
+			<color red="0.00" green="0.00" blue="0.00" />
+		</rect>
+	</element>
+
+
+	
+	<view name="Button Lamps">
+		<screen index="0">
+			<bounds left="0" top="0" right="640" bottom="480" />
+		</screen>
+		<element ref="cpanel"><bounds left="0" right="640" top="480" bottom="530" /></element>	
+		<element name="lamp8" ref="bet_1" inputtag="IN2" inputmask="0x01">
+			<bounds x="4" y="490" width="54" height="28" />
+		</element>
+		<element name="lamp9" ref="bet_2" inputtag="IN2" inputmask="0x02">
+			<bounds x="62" y="490" width="54" height="28" />
+		</element>
+		<element name="lamp10" ref="bet_3" inputtag="IN2" inputmask="0x04">
+			<bounds x="120" y="490" width="54" height="28" />
+		</element>
+		<element name="lamp11" ref="bet_5" inputtag="IN2" inputmask="0x08">
+			<bounds x="178" y="490" width="54" height="28" />
+		</element>
+		<element name="lamp12" ref="bet_10" inputtag="IN2" inputmask="0x10">
+			<bounds x="236" y="490" width="54" height="28" />
+		</element>
+		<element name="lamp32" ref="play_1l" inputtag="IN4" inputmask="0x01">
+			<bounds x="294" y="490" width="54" height="28" />
+		</element>
+		<element name="lamp33" ref="play_3l" inputtag="IN4" inputmask="0x02">
+			<bounds x="352" y="490" width="54" height="28" />
+		</element>
+		<element name="lamp34" ref="play_5l" inputtag="IN4" inputmask="0x04">
+			<bounds x="410" y="490" width="54" height="28" />
+		</element>
+		<element name="lamp35" ref="play_7l" inputtag="IN4" inputmask="0x08">
+			<bounds x="468" y="490" width="54" height="28" />
+		</element>
+		<element name="lamp36" ref="play_9l" inputtag="IN4" inputmask="0x10">
+			<bounds x="526" y="490" width="54" height="28" />
+		</element>				
+		<element name="lamp10" ref="collect" inputtag="IN0" inputmask="0x40">
+			<bounds x="584" y="490" width="54" height="28" />
+		</element>
+	</view>
+</mamelayout>

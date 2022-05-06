@@ -6834,7 +6834,7 @@ license:CC0
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1318"/>
 		<info name="release" value="19870419"/>
-		<info name="alt_title" value="デカ - スケバン刑事II 少女鉄仮面伝説" />
+		<info name="alt_title" value="スケバン刑事II 少女鉄仮面伝説" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="sukeban deka ii - shoujo tekkamen densetsu (japan).bin" size="131072" crc="b13df647" sha1="5cd041990c7418ba63cde54f83d3e0e323b42c3b" offset="000000" />

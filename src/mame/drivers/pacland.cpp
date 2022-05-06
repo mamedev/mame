@@ -110,7 +110,7 @@ PL1-1   -> 1R
 
 
 
-Pacland
+Pac-Land
 Namco, 1984
 
 PCB Layout
@@ -191,16 +191,493 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/pacland.h"
 
+#include "cpu/m6800/m6801.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/watchdog.h"
+#include "sound/namco.h"
+
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
+namespace {
+
+class pacland_state : public driver_device
+{
+public:
+	pacland_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_mcu(*this, "mcu"),
+		m_cus30(*this, "namco"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_videoram(*this, "videoram%u", 1U),
+		m_spriteram(*this, "spriteram"),
+		m_color_prom(*this, "proms"),
+		m_mainbank(*this, "mainbank"),
+		m_leds(*this, "led%u", 0U),
+		m_inputs(*this, { "DSWA", "DSWB", "IN0", "IN1" })
+	{ }
+
+	void pacland(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<hd63701v0_cpu_device> m_mcu;
+	required_device<namco_cus30_device> m_cus30;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
+	required_shared_ptr_array<uint8_t, 2> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_region_ptr<uint8_t> m_color_prom;
+	required_memory_bank m_mainbank;
+
+	output_finder<2> m_leds;
+	required_ioport_array<4> m_inputs;
+
+	uint8_t m_palette_bank = 0;
+	tilemap_t *m_tilemap[2]{}; // FG = 0, BG =1
+	bitmap_ind16 m_fg_bitmap;
+	bitmap_ind16 m_sprite_bitmap;
+	std::unique_ptr<uint32_t[]> m_transmask[3];
+	uint16_t m_scroll[2]{};
+	uint8_t m_main_irq_mask = 0;
+	uint8_t m_mcu_irq_mask = 0;
+
+	void subreset_w(offs_t offset, uint8_t data);
+	void flipscreen_w(offs_t offset, uint8_t data);
+	uint8_t input_r(offs_t offset);
+	void coin_w(uint8_t data);
+	void led_w(uint8_t data);
+	void maincpu_irq_ctrl_w(offs_t offset, uint8_t data);
+	void mcu_irq_ctrl_w(offs_t offset, uint8_t data);
+	template <uint8_t Which> void videoram_w(offs_t offset, uint8_t data);
+	template <uint8_t Which> void scroll_w(offs_t offset, uint8_t data);
+	void scroll1_w(offs_t offset, uint8_t data);
+	void bankswitch_w(uint8_t data);
+
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+
+	void palette(palette_device &palette);
+
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void switch_palette();
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip, int whichmask);
+	void draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
+
+	void main_map(address_map &map);
+	void mcu_map(address_map &map);
+};
+
+
+// video
+
+/***************************************************************************
+
+Sprite/tile priority is quite complex in this game: it is handled both
+internally to the CUS29 chip, and externally to it.
+
+The bg tilemap is always behind everything.
+
+The CUS29 mixes two 8-bit inputs, one from sprites and one from the fg
+tilemap. 0xff is the transparent color. CUS29 also takes a PRI input, telling
+which of the two color inputs has priority. Additionally, sprite pixels of
+color >= 0xf0 always have priority.
+The priority bit comes from the tilemap RAM, but through an additional filter:
+sprite pixels of color < 0x80 act as a "cookie cut" mask, handled externally,
+which overload the PRI bit, making the sprite always have priority. The external
+RAM that holds this mask contains the OR of all sprite pixels drawn at a certain
+position, therefore when sprites overlap, it is sufficient for one of them to
+have color < 0x80 to promote priority of the frontmost sprite. This is used
+to draw the light in round 19.
+
+The CUS29 outputs an 8-bit pixel color, but only the bottom 7 bits are externally
+checked to determine whether it is transparent or not; therefore, both 0xff and
+0x7f are transparent. This is again used to draw the light in round 19, because
+sprite color 0x7f will erase the tilemap and force it to be transparent.
+
+***************************************************************************/
+
+
+/***************************************************************************
+
+  Convert the color PROMs.
+
+  Pac-Land has one 1024x8 and one 1024x4 palette PROM; and three 1024x8 lookup
+  table PROMs (sprites, bg tiles, fg tiles).
+  The palette has 1024 colors, but it is bank switched (4 banks) and only 256
+  colors are visible at a time. So, instead of creating a static palette, we
+  modify it when the bank switching takes place.
+  The color PROMs are connected to the RGB output this way:
+
+  bit 7 -- 220 ohm resistor  -- GREEN
+        -- 470 ohm resistor  -- GREEN
+        -- 1  kohm resistor  -- GREEN
+        -- 2.2kohm resistor  -- GREEN
+        -- 220 ohm resistor  -- RED
+        -- 470 ohm resistor  -- RED
+        -- 1  kohm resistor  -- RED
+  bit 0 -- 2.2kohm resistor  -- RED
+
+  bit 3 -- 220 ohm resistor  -- BLUE
+        -- 470 ohm resistor  -- BLUE
+        -- 1  kohm resistor  -- BLUE
+  bit 0 -- 2.2kohm resistor  -- BLUE
+
+***************************************************************************/
+
+void pacland_state::switch_palette()
+{
+	const uint8_t *color_prom = m_color_prom + 256 * m_palette_bank;
+
+	for (int i = 0; i < 256; i++)
+	{
+		int bit0 = BIT(color_prom[0], 0);
+		int bit1 = BIT(color_prom[0], 1);
+		int bit2 = BIT(color_prom[0], 2);
+		int bit3 = BIT(color_prom[0], 3);
+		int const r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		bit0 = BIT(color_prom[0], 4);
+		bit1 = BIT(color_prom[0], 5);
+		bit2 = BIT(color_prom[0], 6);
+		bit3 = BIT(color_prom[0], 7);
+		int const g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		bit0 = BIT(color_prom[1024], 0);
+		bit1 = BIT(color_prom[1024], 1);
+		bit2 = BIT(color_prom[1024], 2);
+		bit3 = BIT(color_prom[1024], 3);
+		int const b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		color_prom++;
+
+		m_palette->set_indirect_color(i, rgb_t(r, g, b));
+	}
+}
+
+void pacland_state::palette(palette_device &palette)
+{
+	uint8_t const *color_prom = &m_color_prom[0];
+
+	// skip the palette data, it will be initialized later
+	color_prom += 2 * 0x400;
+	// color_prom now points to the beginning of the lookup table
+
+	for (int i = 0; i < 0x400; i++)
+		palette.set_pen_indirect(m_gfxdecode->gfx(0)->colorbase() + i, *color_prom++);
+
+	// Background
+	for (int i = 0; i < 0x400; i++)
+		palette.set_pen_indirect(m_gfxdecode->gfx(1)->colorbase() + i, *color_prom++);
+
+	// Sprites
+	for (int i = 0; i < 0x400; i++)
+		palette.set_pen_indirect(m_gfxdecode->gfx(2)->colorbase() + i, *color_prom++);
+
+	m_palette_bank = 0;
+	switch_palette();
+
+	// precalculate transparency masks for sprites
+	m_transmask[0] = std::make_unique<uint32_t[]>(64);
+	m_transmask[1] = std::make_unique<uint32_t[]>(64);
+	m_transmask[2] = std::make_unique<uint32_t[]>(64);
+	for (int i = 0; i < 64; i++)
+	{
+		// start with no transparency
+		m_transmask[0][i] = m_transmask[1][i] = m_transmask[2][i] = 0;
+
+		// iterate over all palette entries except the last one
+		for (int palentry = 0; palentry < 0x100; palentry++)
+		{
+			uint32_t const mask = palette.transpen_mask(*m_gfxdecode->gfx(2), i, palentry);
+
+			/* transmask[0] is a mask that is used to draw only high priority sprite pixels; thus, pens
+			   $00-$7F are opaque, and others are transparent */
+			if (palentry >= 0x80)
+				m_transmask[0][i] |= mask;
+
+			// transmask[1] is a normal drawing masking with palette entries $7F and $FF transparent
+			if ((palentry & 0x7f) == 0x7f)
+				m_transmask[1][i] |= mask;
+
+			/* transmask[2] is a mask of the topmost priority sprite pixels; thus pens $F0-$FE are
+			   opaque, and others are transparent */
+			if (palentry < 0xf0 || palentry == 0xff)
+				m_transmask[2][i] |= mask;
+		}
+	}
+}
+
+
+
+/***************************************************************************
+
+  Callbacks for the TileMap code
+
+***************************************************************************/
+
+TILE_GET_INFO_MEMBER(pacland_state::get_bg_tile_info)
+{
+	int offs = tile_index * 2;
+	int attr = m_videoram[1][offs + 1];
+	int code = m_videoram[1][offs] + ((attr & 0x01) << 8);
+	int color = ((attr & 0x3e) >> 1) + ((code & 0x1c0) >> 1);
+	int flags = TILE_FLIPYX(attr >> 6);
+
+	tileinfo.set(1, code, color, flags);
+}
+
+TILE_GET_INFO_MEMBER(pacland_state::get_fg_tile_info)
+{
+	int offs = tile_index * 2;
+	int attr = m_videoram[0][offs + 1];
+	int code = m_videoram[0][offs] + ((attr & 0x01) << 8);
+	int color = ((attr & 0x1e) >> 1) + ((code & 0x1e0) >> 1);
+	int flags = TILE_FLIPYX(attr >> 6);
+
+	tileinfo.category = (attr & 0x20) ? 1 : 0;
+	tileinfo.group = color;
+
+	tileinfo.set(0, code, color, flags);
+}
+
+
+
+/***************************************************************************
+
+  Start the video hardware emulation.
+
+***************************************************************************/
+
+void pacland_state::video_start()
+{
+	m_screen->register_screen_bitmap(m_sprite_bitmap);
+
+	m_screen->register_screen_bitmap(m_fg_bitmap);
+	m_fg_bitmap.fill(0xffff);
+
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pacland_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pacland_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+
+	m_tilemap[1]->set_scrolldx(3, 340);
+	m_tilemap[0]->set_scrolldx(0, 336); // scrolling portion needs an additional offset when flipped
+	m_tilemap[0]->set_scroll_rows(32);
+
+	/* create one group per color code; for each group, set the transparency mask
+	   to correspond to the pens that are 0x7f or 0xff */
+	assert(m_gfxdecode->gfx(0)->colors() <= TILEMAP_NUM_GROUPS);
+	for (int color = 0; color < m_gfxdecode->gfx(0)->colors(); color++)
+	{
+		uint32_t mask = m_palette->transpen_mask(*m_gfxdecode->gfx(0), color, 0x7f);
+		mask |= m_palette->transpen_mask(*m_gfxdecode->gfx(0), color, 0xff);
+		m_tilemap[0]->set_transmask(color, mask, 0);
+	}
+
+	save_item(NAME(m_palette_bank));
+	save_item(NAME(m_scroll));
+}
+
+
+
+/***************************************************************************
+
+  Memory handlers
+
+***************************************************************************/
+
+template <uint8_t Which>
+void pacland_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[Which][offset] = data;
+	m_tilemap[Which]->mark_tile_dirty(offset / 2);
+}
+
+template <uint8_t Which>
+void pacland_state::scroll_w(offs_t offset, uint8_t data)
+{
+	m_scroll[Which] = data + 256 * offset;
+}
+
+void pacland_state::bankswitch_w(uint8_t data)
+{
+	m_mainbank->set_entry(data & 0x07);
+
+//  pbc = data & 0x20;
+
+	if (m_palette_bank != ((data & 0x18) >> 3))
+	{
+		m_palette_bank = (data & 0x18) >> 3;
+		switch_palette();
+	}
+}
+
+
+
+/***************************************************************************
+
+  Display refresh
+
+***************************************************************************/
+
+// the sprite generator IC is the same as Mappy
+void pacland_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip, int whichmask)
+{
+	uint8_t *spriteram = &m_spriteram[0x780];
+	uint8_t *spriteram_2 = &m_spriteram[0xf80];
+	uint8_t *spriteram_3 = &m_spriteram[0x1780];
+
+	for (int offs = 0; offs < 0x80; offs += 2)
+	{
+		static const int gfx_offs[2][2] =
+		{
+			{ 0, 1 },
+			{ 2, 3 }
+		};
+		int sprite = spriteram[offs] + ((spriteram_3[offs] & 0x80) << 1);
+		int color = spriteram[offs + 1] & 0x3f;
+		int sx = (spriteram_2[offs + 1]) + 0x100 * (spriteram_3[offs + 1] & 1) - 47;
+		int sy = 256 - spriteram_2[offs] + 9;
+		int flipx = (spriteram_3[offs] & 0x01);
+		int flipy = (spriteram_3[offs] & 0x02) >> 1;
+		int sizex = (spriteram_3[offs] & 0x04) >> 2;
+		int sizey = (spriteram_3[offs] & 0x08) >> 3;
+
+		sprite &= ~sizex;
+		sprite &= ~(sizey << 1);
+
+		if (flip)
+		{
+			flipx ^= 1;
+			flipy ^= 1;
+		}
+
+		sy -= 16 * (sizey + 1); // sprites could not be displayed at the bottom of the screen
+		sy = (sy & 0xff) - 16; // fix wraparound
+
+		for (int y = 0; y <= sizey; y++)
+		{
+			for (int x = 0; x <= sizex; x++)
+			{
+				if (whichmask != 0)
+					m_gfxdecode->gfx(2)->transmask(bitmap, cliprect,
+						sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
+						color,
+						flipx, flipy,
+						sx + 16 * x, sy + 16 * y, m_transmask[whichmask][color]);
+				else
+					m_gfxdecode->gfx(2)->prio_transmask(bitmap, cliprect,
+						sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
+						color,
+						flipx, flipy,
+						sx + 16 * x, sy + 16 * y,
+						screen.priority(), 0, m_transmask[whichmask][color]);
+			}
+		}
+	}
+}
+
+
+void pacland_state::draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
+{
+	/* draw tilemap transparently over it; this will leave invalid pens (0xffff)
+	   anywhere where the fg_tilemap should be transparent; note that we assume
+	   the fg_bitmap has been pre-erased to 0xffff */
+	m_tilemap[0]->draw(screen, m_fg_bitmap, cliprect, priority, 0);
+
+	// now copy the fg_bitmap to the destination wherever the sprite pixel allows
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		uint8_t const *const pri = &screen.priority().pix(y);
+		uint16_t *const src = &m_fg_bitmap.pix(y);
+		uint16_t *const dst = &bitmap.pix(y);
+
+		/* only copy if the priority bitmap is 0 (no high priority sprite) and the
+		   source pixel is not the invalid pen; also clear to 0xffff when finished */
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			uint16_t pix = src[x];
+			if (pix != 0xffff)
+			{
+				src[x] = 0xffff;
+				if (pri[x] == 0)
+					dst[x] = pix;
+			}
+		}
+	}
+}
+
+
+uint32_t pacland_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int flip = flip_screen();
+
+	for (int row = 5; row < 29; row++)
+		m_tilemap[0]->set_scrollx(row, m_scroll[0] - (flip ? 7 : 0));
+	m_tilemap[1]->set_scrollx(0, m_scroll[1]);
+
+	/* draw high priority sprite pixels, setting priority bitmap to non-zero
+	   wherever there is a high-priority pixel; note that we draw to the bitmap
+	   which is safe because the bg_tilemap draw will overwrite everything */
+	screen.priority().fill(0x00, cliprect);
+	draw_sprites(screen, bitmap, cliprect, flip, 0);
+
+	// draw background
+	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
+
+	// draw low priority fg tiles
+	draw_fg(screen, bitmap, cliprect, 0);
+
+	// draw sprites with regular transparency
+	draw_sprites(screen, bitmap, cliprect, flip, 1);
+
+	// draw sprite pixels in a temporary bitmap with colortable values >= 0xf0
+	m_sprite_bitmap.fill(0, cliprect);
+	draw_sprites(screen, m_sprite_bitmap, cliprect, flip, 2);
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		uint16_t *const spr = &m_sprite_bitmap.pix(y);
+		uint16_t const *const bmp = &bitmap.pix(y);
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			/* clear to 0 if "m_sprite_bitmap" and "bitmap" are different,
+			   because not redraw pixels that are not visible in "bitmap"
+			   in this way, keep sprite-sprite priorities intact */
+			if (spr[x] != 0 && spr[x] != bmp[x])
+				spr[x] = 0;
+		}
+	}
+
+	// draw high priority fg tiles
+	draw_fg(screen, bitmap, cliprect, 1);
+
+	// draw sprite pixels with colortable values >= 0xf0, which have priority over everything
+	copybitmap_trans(bitmap, m_sprite_bitmap, 0, 0, 0, 0, cliprect, 0);
+
+	return 0;
+}
+
+
+// machine
 void pacland_state::machine_start()
 {
 	m_leds.resolve();
+
+	m_mainbank->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x2000);
 
 	save_item(NAME(m_main_irq_mask));
 	save_item(NAME(m_mcu_irq_mask));
@@ -208,13 +685,13 @@ void pacland_state::machine_start()
 
 void pacland_state::subreset_w(offs_t offset, uint8_t data)
 {
-	int bit = !BIT(offset,11);
+	int bit = !BIT(offset, 11);
 	m_mcu->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 }
 
 void pacland_state::flipscreen_w(offs_t offset, uint8_t data)
 {
-	int bit = !BIT(offset,11);
+	int bit = !BIT(offset, 11);
 	flip_screen_set(bit);
 }
 
@@ -223,9 +700,8 @@ uint8_t pacland_state::input_r(offs_t offset)
 {
 	int shift = 4 * (offset & 1);
 	int port = offset & 2;
-	static const char *const portnames[] = { "DSWA", "DSWB", "IN0", "IN1" };
-	int r = (ioport(portnames[port])->read() << shift) & 0xf0;
-	r |= (ioport(portnames[port+1])->read() >> (4 - shift)) & 0x0f;
+	int r = (m_inputs[port]->read() << shift) & 0xf0;
+	r |= (m_inputs[port + 1]->read() >> (4 - shift)) & 0x0f;
 
 	return r;
 }
@@ -243,7 +719,7 @@ void pacland_state::led_w(uint8_t data)
 	m_leds[1] = BIT(data, 4);
 }
 
-void pacland_state::irq_1_ctrl_w(offs_t offset, uint8_t data)
+void pacland_state::maincpu_irq_ctrl_w(offs_t offset, uint8_t data)
 {
 	int bit = !BIT(offset, 11);
 	m_main_irq_mask = bit;
@@ -251,7 +727,7 @@ void pacland_state::irq_1_ctrl_w(offs_t offset, uint8_t data)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-void pacland_state::irq_2_ctrl_w(offs_t offset, uint8_t data)
+void pacland_state::mcu_irq_ctrl_w(offs_t offset, uint8_t data)
 {
 	int bit = !BIT(offset, 13);
 	m_mcu_irq_mask = bit;
@@ -263,15 +739,15 @@ void pacland_state::irq_2_ctrl_w(offs_t offset, uint8_t data)
 
 void pacland_state::main_map(address_map &map)
 {
-	map(0x0000, 0x0fff).ram().w(FUNC(pacland_state::videoram_w)).share("videoram");
-	map(0x1000, 0x1fff).ram().w(FUNC(pacland_state::videoram2_w)).share("videoram2");
-	map(0x2000, 0x37ff).ram().share("spriteram");
-	map(0x3800, 0x3801).w(FUNC(pacland_state::scroll0_w));
-	map(0x3a00, 0x3a01).w(FUNC(pacland_state::scroll1_w));
+	map(0x0000, 0x0fff).ram().w(FUNC(pacland_state::videoram_w<0>)).share(m_videoram[0]);
+	map(0x1000, 0x1fff).ram().w(FUNC(pacland_state::videoram_w<1>)).share(m_videoram[1]);
+	map(0x2000, 0x37ff).ram().share(m_spriteram);
+	map(0x3800, 0x3801).w(FUNC(pacland_state::scroll_w<0>));
+	map(0x3a00, 0x3a01).w(FUNC(pacland_state::scroll_w<1>));
 	map(0x3c00, 0x3c00).w(FUNC(pacland_state::bankswitch_w));
-	map(0x4000, 0x5fff).bankr("bank1");
-	map(0x6800, 0x6bff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w));      /* PSG device, shared RAM */
-	map(0x7000, 0x7fff).w(FUNC(pacland_state::irq_1_ctrl_w));
+	map(0x4000, 0x5fff).bankr(m_mainbank);
+	map(0x6800, 0x6bff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w));      // PSG device, shared RAM
+	map(0x7000, 0x7fff).w(FUNC(pacland_state::maincpu_irq_ctrl_w));
 	map(0x7800, 0x7fff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0x8000, 0xffff).rom();
 	map(0x8000, 0x8fff).w(FUNC(pacland_state::subreset_w));
@@ -282,9 +758,9 @@ void pacland_state::mcu_map(address_map &map)
 {
 	map(0x0000, 0x001f).m(m_mcu, FUNC(hd63701v0_cpu_device::m6801_io));
 	map(0x0080, 0x00ff).ram();
-	map(0x1000, 0x13ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w));      /* PSG device, shared RAM */
-	map(0x2000, 0x3fff).w("watchdog", FUNC(watchdog_timer_device::reset_w));     /* watchdog? */
-	map(0x4000, 0x7fff).w(FUNC(pacland_state::irq_2_ctrl_w));
+	map(0x1000, 0x13ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w));      // PSG device, shared RAM
+	map(0x2000, 0x3fff).w("watchdog", FUNC(watchdog_timer_device::reset_w));     // watchdog?
+	map(0x4000, 0x7fff).w(FUNC(pacland_state::mcu_irq_ctrl_w));
 	map(0x8000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram();
 	map(0xd000, 0xd003).r(FUNC(pacland_state::input_r));
@@ -340,7 +816,7 @@ static INPUT_PORTS_START( pacland )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 
-	PORT_START("IN0")   /* Memory Mapped Port */
+	PORT_START("IN0")   // Memory Mapped Port
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL  PORT_NAME("P2 Right")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -352,7 +828,7 @@ static INPUT_PORTS_START( pacland )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 
-	PORT_START("IN1")   /* Memory Mapped Port */
+	PORT_START("IN1")   // Memory Mapped Port
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -362,10 +838,10 @@ static INPUT_PORTS_START( pacland )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) // IPT_JOYSTICK_DOWN according to schematics
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_COCKTAIL   // IPT_JOYSTICK_UP according to schematics
 
-	PORT_START("IN2")   /* MCU Input Port */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_COCKTAIL  /* OUT:coin lockout */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )    /* OUT:coin counter 1 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )    /* OUT:coin counter 2 */
+	PORT_START("IN2")   // MCU Input Port
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_COCKTAIL  // OUT: coin lockout
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )    // OUT: coin counter 1
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )    // OUT: coin counter 2
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Jump")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Left")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Right")
@@ -398,9 +874,9 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( gfx_pacland )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,              0, 256 )
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout,          256*4, 256 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,  256*4+256*4, 64 )
+	GFXDECODE_ENTRY( "fg_chars", 0, charlayout,              0, 256 )
+	GFXDECODE_ENTRY( "bg_chars", 0, charlayout,          256*4, 256 )
+	GFXDECODE_ENTRY( "sprites",  0, spritelayout,  256*4+256*4, 64 )
 GFXDECODE_END
 
 
@@ -415,35 +891,35 @@ WRITE_LINE_MEMBER(pacland_state::vblank_irq)
 
 void pacland_state::pacland(machine_config &config)
 {
-	/* basic machine hardware */
-	MC6809E(config, m_maincpu, XTAL(49'152'000)/32); /* 1.536 MHz */
+	// basic machine hardware
+	MC6809E(config, m_maincpu, XTAL(49'152'000) / 32); // 1.536 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &pacland_state::main_map);
 
-	HD63701V0(config, m_mcu, XTAL(49'152'000)/8); /* 6.144 MHz? */
+	HD63701V0(config, m_mcu, XTAL(49'152'000) / 8); // 6.144 MHz?
 	m_mcu->set_addrmap(AS_PROGRAM, &pacland_state::mcu_map);
 	m_mcu->in_p1_cb().set_ioport("IN2");
 	m_mcu->out_p1_cb().set(FUNC(pacland_state::coin_w));
-	m_mcu->in_p2_cb().set_constant(0xff);  /* leds won't work otherwise */
+	m_mcu->in_p2_cb().set_constant(0xff);  // leds won't work otherwise
 	m_mcu->out_p2_cb().set(FUNC(pacland_state::led_w));
 
-	config.set_maximum_quantum(attotime::from_hz(6000));  /* we need heavy synching between the MCU and the CPU */
+	config.set_maximum_quantum(attotime::from_hz(6000));  // we need heavy synching between the MCU and the CPU
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(49'152'000)/8, 384, 3*8, 39*8, 264, 2*8, 30*8);
+	m_screen->set_raw(XTAL(49'152'000) / 8, 384, 3*8, 39*8, 264, 2*8, 30*8);
 	m_screen->set_screen_update(FUNC(pacland_state::screen_update));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(pacland_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pacland);
-	PALETTE(config, m_palette, FUNC(pacland_state::pacland_palette), 256*4 + 256*4 + 64*16, 256);
+	PALETTE(config, m_palette, FUNC(pacland_state::palette), 256*4 + 256*4 + 64*16, 256);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	NAMCO_CUS30(config, m_cus30, XTAL(49'152'000)/2/1024);
+	NAMCO_CUS30(config, m_cus30, XTAL(49'152'000) / 2 / 1024);
 	m_cus30->set_voices(8);
 	m_cus30->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -458,177 +934,177 @@ void pacland_state::pacland(machine_config &config)
 ROM_START( pacland )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "pl5_01b.8b",     0x08000, 0x4000, CRC(b0ea7631) SHA1(424afa6f397310c7af39c9e8b580aa9ccd42c39c) )
-	ROM_LOAD( "pl5_02.8d",      0x0C000, 0x4000, CRC(d903e84e) SHA1(25338726227bfbec65847879aac5228a6a307db4) )
-	/* all the following are banked at 0x4000-0x5fff */
+	ROM_LOAD( "pl5_02.8d",      0x0c000, 0x4000, CRC(d903e84e) SHA1(25338726227bfbec65847879aac5228a6a307db4) )
+	// all the following are banked at 0x4000-0x5fff
 	ROM_LOAD( "pl1_3.8e",       0x10000, 0x4000, CRC(aa9fa739) SHA1(7b1f7857eb5f68e166b1f8988c82051aaf05df48) )
 	ROM_LOAD( "pl1_4.8f",       0x14000, 0x4000, CRC(2b895a90) SHA1(820f8873c6a5a736089406d0f03d491dfb82d00d) )
 	ROM_LOAD( "pl1_5.8h",       0x18000, 0x4000, CRC(7af66200) SHA1(f44161ded1633e9801b7a9cd84d481e53823f5d9) )
 	ROM_LOAD( "pl3_6.8j",       0x1c000, 0x4000, CRC(2ffe3319) SHA1(c2540321cd5a1fe29ecb077abdf8f997893192e9) )
 
 	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "pl1_7.3e",       0x8000, 0x2000, CRC(8c5becae) SHA1(14d67136395c4c64472980a69648ce2d479ae67f) ) /* sub program for the mcu */
-	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) ) /* Internal code from the MCU */
+	ROM_LOAD( "pl1_7.3e",       0x8000, 0x2000, CRC(8c5becae) SHA1(14d67136395c4c64472980a69648ce2d479ae67f) ) // sub program for the MCU
+	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) ) // internal code from the MCU
 
-	ROM_REGION( 0x02000, "gfx1", 0 )
-	ROM_LOAD( "pl2_12.6n",      0x00000, 0x2000, CRC(a63c8726) SHA1(b15903fa2267375280af03af0a7157e1b0bcb86d) ) /* chars */
+	ROM_REGION( 0x02000, "fg_chars", 0 )
+	ROM_LOAD( "pl2_12.6n",      0x00000, 0x2000, CRC(a63c8726) SHA1(b15903fa2267375280af03af0a7157e1b0bcb86d) )
 
-	ROM_REGION( 0x02000, "gfx2", 0 )
+	ROM_REGION( 0x02000, "bg_chars", 0 )
 	ROM_LOAD( "pl4_13.6t",      0x00000, 0x2000, CRC(3ae582fd) SHA1(696b2cfadb6b071de8e43d20cd65b37713ca3b30) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 )
-	ROM_LOAD( "pl1-9.6f",       0x00000, 0x4000, CRC(f5d5962b) SHA1(8d008a9bc06dc562c241955d9c551647b5c1f4e9) ) /* sprites */
+	ROM_REGION( 0x10000, "sprites", 0 )
+	ROM_LOAD( "pl1-9.6f",       0x00000, 0x4000, CRC(f5d5962b) SHA1(8d008a9bc06dc562c241955d9c551647b5c1f4e9) )
 	ROM_LOAD( "pl1-8.6e",       0x04000, 0x4000, CRC(a2ebfa4a) SHA1(4a2a2b43a23a7a46266751415d1bde118143429c) )
 	ROM_LOAD( "pl1-10.7e",      0x08000, 0x4000, CRC(c7cf1904) SHA1(7ca8ed20ee32eb8609ac96b4e4fcb3b6027b598a) )
 	ROM_LOAD( "pl1-11.7f",      0x0c000, 0x4000, CRC(6621361a) SHA1(4efa40adba803006e86d5e12514983d4132b5efb) )
 
 	ROM_REGION( 0x1400, "proms", 0 )
-	ROM_LOAD( "pl1-2.1t",       0x0000, 0x0400, CRC(472885de) SHA1(8d552c90b8d5bc6ad6c60934c00f4303cd180ce7) )  /* red and green component */
-	ROM_LOAD( "pl1-1.1r",       0x0400, 0x0400, CRC(a78ebdaf) SHA1(8ea215701eb5e1a2a329ef92c19fc69b18fc28c7) )  /* blue component */
-	ROM_LOAD( "pl1-5.5t",       0x0800, 0x0400, CRC(4b7ee712) SHA1(dd0ec4c632d8b160f7b54d8f18fcf4ef1508d832) )  /* foreground lookup table */
-	ROM_LOAD( "pl1-4.4n",       0x0c00, 0x0400, CRC(3a7be418) SHA1(475cdc68205e3acce83fe79b00b74c6a7e28dde4) )  /* background lookup table */
-	ROM_LOAD( "pl1-3.6l",       0x1000, 0x0400, CRC(80558da8) SHA1(7e1483467817295f36d1e2bdb32934c4f2617d52) )  /* sprites lookup table */
+	ROM_LOAD( "pl1-2.1t",       0x0000, 0x0400, CRC(472885de) SHA1(8d552c90b8d5bc6ad6c60934c00f4303cd180ce7) )  // red and green component
+	ROM_LOAD( "pl1-1.1r",       0x0400, 0x0400, CRC(a78ebdaf) SHA1(8ea215701eb5e1a2a329ef92c19fc69b18fc28c7) )  // blue component
+	ROM_LOAD( "pl1-5.5t",       0x0800, 0x0400, CRC(4b7ee712) SHA1(dd0ec4c632d8b160f7b54d8f18fcf4ef1508d832) )  // foreground lookup table
+	ROM_LOAD( "pl1-4.4n",       0x0c00, 0x0400, CRC(3a7be418) SHA1(475cdc68205e3acce83fe79b00b74c6a7e28dde4) )  // background lookup table
+	ROM_LOAD( "pl1-3.6l",       0x1000, 0x0400, CRC(80558da8) SHA1(7e1483467817295f36d1e2bdb32934c4f2617d52) )  // sprites lookup table
 ROM_END
 
 ROM_START( paclandj )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "pl6_01.8b",      0x08000, 0x4000, CRC(4c96e11c) SHA1(c136dc3877155b7a600173c876f6a53394d9260d) )
-	ROM_LOAD( "pl6_02.8d",      0x0C000, 0x4000, CRC(8cf5bd8d) SHA1(0771ca1ab5db58f5632583a5e6e84660e8ab727d) )
-	/* all the following are banked at 0x4000-0x5fff */
+	ROM_LOAD( "pl6_02.8d",      0x0c000, 0x4000, CRC(8cf5bd8d) SHA1(0771ca1ab5db58f5632583a5e6e84660e8ab727d) )
+	// all the following are banked at 0x4000-0x5fff
 	ROM_LOAD( "pl1_3.8e",       0x10000, 0x4000, CRC(aa9fa739) SHA1(7b1f7857eb5f68e166b1f8988c82051aaf05df48) )
 	ROM_LOAD( "pl1_4.8f",       0x14000, 0x4000, CRC(2b895a90) SHA1(820f8873c6a5a736089406d0f03d491dfb82d00d) )
 	ROM_LOAD( "pl1_5.8h",       0x18000, 0x4000, CRC(7af66200) SHA1(f44161ded1633e9801b7a9cd84d481e53823f5d9) )
 	ROM_LOAD( "pl1_6.8j",       0x1c000, 0x4000, CRC(b01e59a9) SHA1(e5b093852d33a4d09969d111fa6e42e964aa4dac) )
 
 	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "pl1_7.3e",       0x8000, 0x2000, CRC(8c5becae) SHA1(14d67136395c4c64472980a69648ce2d479ae67f) ) /* sub program for the mcu */
-	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) ) /* Internal code from the MCU */
+	ROM_LOAD( "pl1_7.3e",       0x8000, 0x2000, CRC(8c5becae) SHA1(14d67136395c4c64472980a69648ce2d479ae67f) ) // sub program for the MCU
+	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) ) // internal code from the MCU
 
-	ROM_REGION( 0x02000, "gfx1", 0 )
-	ROM_LOAD( "pl6_12.6n",      0x00000, 0x2000, CRC(c8cb61ab) SHA1(ec33d64949a8c011430e889f55f54816b33c4218) ) /* chars */
+	ROM_REGION( 0x02000, "fg_chars", 0 )
+	ROM_LOAD( "pl6_12.6n",      0x00000, 0x2000, CRC(c8cb61ab) SHA1(ec33d64949a8c011430e889f55f54816b33c4218) )
 
-	ROM_REGION( 0x02000, "gfx2", 0 )
+	ROM_REGION( 0x02000, "bg_chars", 0 )
 	ROM_LOAD( "pl1_13.6t",      0x00000, 0x2000, CRC(6c5ed9ae) SHA1(db919c9254289179e98ba5d2ed8c66d67ae95f35) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 )
-	ROM_LOAD( "pl1_9b.6f",      0x00000, 0x4000, CRC(80768a87) SHA1(1572f309e810d9eb007a1c8b2aa8463027c146ca) ) /* sprites */
+	ROM_REGION( 0x10000, "sprites", 0 )
+	ROM_LOAD( "pl1_9b.6f",      0x00000, 0x4000, CRC(80768a87) SHA1(1572f309e810d9eb007a1c8b2aa8463027c146ca) )
 	ROM_LOAD( "pl1_8.6e",       0x04000, 0x4000, CRC(2b20e46d) SHA1(9f78952ae94fef6a83a15de35d5fefdf71e78488) )
 	ROM_LOAD( "pl1_10b.7e",     0x08000, 0x4000, CRC(ffd9d66e) SHA1(9a6e9ad500fcb7a67cb3c45d029c2aa7636a64f9) )
 	ROM_LOAD( "pl1_11.7f",      0x0c000, 0x4000, CRC(c59775d8) SHA1(034281c8101719d79043df31ef845fd28c0c69c0) )
 
 	ROM_REGION( 0x1400, "proms", 0 )
-	ROM_LOAD( "pl1-2.1t",       0x0000, 0x0400, CRC(472885de) SHA1(8d552c90b8d5bc6ad6c60934c00f4303cd180ce7) )  /* red and green component */
-	ROM_LOAD( "pl1-1.1r",       0x0400, 0x0400, CRC(a78ebdaf) SHA1(8ea215701eb5e1a2a329ef92c19fc69b18fc28c7) )  /* blue component */
-	ROM_LOAD( "pl1-5.5t",       0x0800, 0x0400, CRC(4b7ee712) SHA1(dd0ec4c632d8b160f7b54d8f18fcf4ef1508d832) )  /* foreground lookup table */
-	ROM_LOAD( "pl1-4.4n",       0x0c00, 0x0400, CRC(3a7be418) SHA1(475cdc68205e3acce83fe79b00b74c6a7e28dde4) )  /* background lookup table */
-	ROM_LOAD( "pl1-3.6l",       0x1000, 0x0400, CRC(80558da8) SHA1(7e1483467817295f36d1e2bdb32934c4f2617d52) )  /* sprites lookup table */
+	ROM_LOAD( "pl1-2.1t",       0x0000, 0x0400, CRC(472885de) SHA1(8d552c90b8d5bc6ad6c60934c00f4303cd180ce7) )  // red and green component
+	ROM_LOAD( "pl1-1.1r",       0x0400, 0x0400, CRC(a78ebdaf) SHA1(8ea215701eb5e1a2a329ef92c19fc69b18fc28c7) )  // blue component
+	ROM_LOAD( "pl1-5.5t",       0x0800, 0x0400, CRC(4b7ee712) SHA1(dd0ec4c632d8b160f7b54d8f18fcf4ef1508d832) )  // foreground lookup table
+	ROM_LOAD( "pl1-4.4n",       0x0c00, 0x0400, CRC(3a7be418) SHA1(475cdc68205e3acce83fe79b00b74c6a7e28dde4) )  // background lookup table
+	ROM_LOAD( "pl1-3.6l",       0x1000, 0x0400, CRC(80558da8) SHA1(7e1483467817295f36d1e2bdb32934c4f2617d52) )  // sprites lookup table
 ROM_END
 
 ROM_START( paclandjo )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "pl1_1.8b",       0x08000, 0x4000, CRC(f729fb94) SHA1(332ff2e4aae67eb8ed0f52048097f74323a176f8) )
-	ROM_LOAD( "pl1_2.8d",       0x0C000, 0x4000, CRC(5c66eb6f) SHA1(376233f51e655df8922886c1e808a2f37ccae5d4) )
-	/* all the following are banked at 0x4000-0x5fff */
+	ROM_LOAD( "pl1_2.8d",       0x0c000, 0x4000, CRC(5c66eb6f) SHA1(376233f51e655df8922886c1e808a2f37ccae5d4) )
+	// all the following are banked at 0x4000-0x5fff
 	ROM_LOAD( "pl1_3.8e",       0x10000, 0x4000, CRC(aa9fa739) SHA1(7b1f7857eb5f68e166b1f8988c82051aaf05df48) )
 	ROM_LOAD( "pl1_4.8f",       0x14000, 0x4000, CRC(2b895a90) SHA1(820f8873c6a5a736089406d0f03d491dfb82d00d) )
 	ROM_LOAD( "pl1_5.8h",       0x18000, 0x4000, CRC(7af66200) SHA1(f44161ded1633e9801b7a9cd84d481e53823f5d9) )
 	ROM_LOAD( "pl1_6.8j",       0x1c000, 0x4000, CRC(b01e59a9) SHA1(e5b093852d33a4d09969d111fa6e42e964aa4dac) )
 
 	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "pl1_7.3e",       0x8000, 0x2000, CRC(8c5becae) SHA1(14d67136395c4c64472980a69648ce2d479ae67f) ) /* sub program for the mcu */
-	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) ) /* Internal code from the MCU */
+	ROM_LOAD( "pl1_7.3e",       0x8000, 0x2000, CRC(8c5becae) SHA1(14d67136395c4c64472980a69648ce2d479ae67f) ) // sub program for the MCU
+	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) ) // internal code from the MCU
 
-	ROM_REGION( 0x02000, "gfx1", 0 )
-	ROM_LOAD( "pl1_12.6n",      0x00000, 0x2000, CRC(c159fbce) SHA1(b0326c85b7df407f3e94c38a5971f911968d7b27) ) /* chars */
+	ROM_REGION( 0x02000, "fg_chars", 0 )
+	ROM_LOAD( "pl1_12.6n",      0x00000, 0x2000, CRC(c159fbce) SHA1(b0326c85b7df407f3e94c38a5971f911968d7b27) )
 
-	ROM_REGION( 0x02000, "gfx2", 0 )
+	ROM_REGION( 0x02000, "bg_chars", 0 )
 	ROM_LOAD( "pl1_13.6t",      0x00000, 0x2000, CRC(6c5ed9ae) SHA1(db919c9254289179e98ba5d2ed8c66d67ae95f35) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 )
-	ROM_LOAD( "pl1_9b.6f",      0x00000, 0x4000, CRC(80768a87) SHA1(1572f309e810d9eb007a1c8b2aa8463027c146ca) ) /* sprites */
+	ROM_REGION( 0x10000, "sprites", 0 )
+	ROM_LOAD( "pl1_9b.6f",      0x00000, 0x4000, CRC(80768a87) SHA1(1572f309e810d9eb007a1c8b2aa8463027c146ca) )
 	ROM_LOAD( "pl1_8.6e",       0x04000, 0x4000, CRC(2b20e46d) SHA1(9f78952ae94fef6a83a15de35d5fefdf71e78488) )
 	ROM_LOAD( "pl1_10b.7e",     0x08000, 0x4000, CRC(ffd9d66e) SHA1(9a6e9ad500fcb7a67cb3c45d029c2aa7636a64f9) )
 	ROM_LOAD( "pl1_11.7f",      0x0c000, 0x4000, CRC(c59775d8) SHA1(034281c8101719d79043df31ef845fd28c0c69c0) )
 
 	ROM_REGION( 0x1400, "proms", 0 )
-	ROM_LOAD( "pl1-2.1t",       0x0000, 0x0400, CRC(472885de) SHA1(8d552c90b8d5bc6ad6c60934c00f4303cd180ce7) )  /* red and green component */
-	ROM_LOAD( "pl1-1.1r",       0x0400, 0x0400, CRC(a78ebdaf) SHA1(8ea215701eb5e1a2a329ef92c19fc69b18fc28c7) )  /* blue component */
-	ROM_LOAD( "pl1-5.5t",       0x0800, 0x0400, CRC(4b7ee712) SHA1(dd0ec4c632d8b160f7b54d8f18fcf4ef1508d832) )  /* foreground lookup table */
-	ROM_LOAD( "pl1-4.4n",       0x0c00, 0x0400, CRC(3a7be418) SHA1(475cdc68205e3acce83fe79b00b74c6a7e28dde4) )  /* background lookup table */
-	ROM_LOAD( "pl1-3.6l",       0x1000, 0x0400, CRC(80558da8) SHA1(7e1483467817295f36d1e2bdb32934c4f2617d52) )  /* sprites lookup table */
+	ROM_LOAD( "pl1-2.1t",       0x0000, 0x0400, CRC(472885de) SHA1(8d552c90b8d5bc6ad6c60934c00f4303cd180ce7) )  // red and green component
+	ROM_LOAD( "pl1-1.1r",       0x0400, 0x0400, CRC(a78ebdaf) SHA1(8ea215701eb5e1a2a329ef92c19fc69b18fc28c7) )  // blue component
+	ROM_LOAD( "pl1-5.5t",       0x0800, 0x0400, CRC(4b7ee712) SHA1(dd0ec4c632d8b160f7b54d8f18fcf4ef1508d832) )  // foreground lookup table
+	ROM_LOAD( "pl1-4.4n",       0x0c00, 0x0400, CRC(3a7be418) SHA1(475cdc68205e3acce83fe79b00b74c6a7e28dde4) )  // background lookup table
+	ROM_LOAD( "pl1-3.6l",       0x1000, 0x0400, CRC(80558da8) SHA1(7e1483467817295f36d1e2bdb32934c4f2617d52) )  // sprites lookup table
 ROM_END
 
 ROM_START( paclandjo2 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "pl1_1.8b",       0x08000, 0x4000, CRC(f729fb94) SHA1(332ff2e4aae67eb8ed0f52048097f74323a176f8) )
-	ROM_LOAD( "pl1_2.8d",       0x0C000, 0x4000, CRC(5c66eb6f) SHA1(376233f51e655df8922886c1e808a2f37ccae5d4) )
-	/* all the following are banked at 0x4000-0x5fff */
+	ROM_LOAD( "pl1_2.8d",       0x0c000, 0x4000, CRC(5c66eb6f) SHA1(376233f51e655df8922886c1e808a2f37ccae5d4) )
+	// all the following are banked at 0x4000-0x5fff
 	ROM_LOAD( "pl1_3.8e",       0x10000, 0x4000, CRC(aa9fa739) SHA1(7b1f7857eb5f68e166b1f8988c82051aaf05df48) )
 	ROM_LOAD( "pl1_4.8f",       0x14000, 0x4000, CRC(2b895a90) SHA1(820f8873c6a5a736089406d0f03d491dfb82d00d) )
 	ROM_LOAD( "pl1_5.8h",       0x18000, 0x4000, CRC(7af66200) SHA1(f44161ded1633e9801b7a9cd84d481e53823f5d9) )
 	ROM_LOAD( "pl1_6.8j",       0x1c000, 0x4000, CRC(b01e59a9) SHA1(e5b093852d33a4d09969d111fa6e42e964aa4dac) )
 
 	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "pl1_7.3e",       0x8000, 0x2000, CRC(8c5becae) SHA1(14d67136395c4c64472980a69648ce2d479ae67f) ) /* sub program for the mcu */
-	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) ) /* Internal code from the MCU */
+	ROM_LOAD( "pl1_7.3e",       0x8000, 0x2000, CRC(8c5becae) SHA1(14d67136395c4c64472980a69648ce2d479ae67f) ) // sub program for the MCU
+	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) ) // internal code from the MCU
 
-	ROM_REGION( 0x02000, "gfx1", 0 )
-	ROM_LOAD( "pl1_12.6n",      0x00000, 0x2000, CRC(c159fbce) SHA1(b0326c85b7df407f3e94c38a5971f911968d7b27) ) /* chars */
+	ROM_REGION( 0x02000, "fg_chars", 0 )
+	ROM_LOAD( "pl1_12.6n",      0x00000, 0x2000, CRC(c159fbce) SHA1(b0326c85b7df407f3e94c38a5971f911968d7b27) )
 
-	ROM_REGION( 0x02000, "gfx2", 0 )
+	ROM_REGION( 0x02000, "bg_chars", 0 )
 	ROM_LOAD( "pl1_13.6t",      0x00000, 0x2000, CRC(6c5ed9ae) SHA1(db919c9254289179e98ba5d2ed8c66d67ae95f35) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 )
-	ROM_LOAD( "pl1_9.6f",       0x00000, 0x4000, CRC(80768a87) SHA1(1572f309e810d9eb007a1c8b2aa8463027c146ca) ) /* sprites */
+	ROM_REGION( 0x10000, "sprites", 0 )
+	ROM_LOAD( "pl1_9.6f",       0x00000, 0x4000, CRC(80768a87) SHA1(1572f309e810d9eb007a1c8b2aa8463027c146ca) )
 	ROM_LOAD( "pl1_8.6e",       0x04000, 0x4000, CRC(2b20e46d) SHA1(9f78952ae94fef6a83a15de35d5fefdf71e78488) )
 	ROM_LOAD( "pl1_10.7e",      0x08000, 0x4000, CRC(c62660e8) SHA1(ff922c26f32264b35fa2b07c64097a331437dd64) )
 	ROM_LOAD( "pl1_11.7f",      0x0c000, 0x4000, CRC(c59775d8) SHA1(034281c8101719d79043df31ef845fd28c0c69c0) )
 
 	ROM_REGION( 0x1400, "proms", 0 )
-	ROM_LOAD( "pl1-2.1t",       0x0000, 0x0400, CRC(472885de) SHA1(8d552c90b8d5bc6ad6c60934c00f4303cd180ce7) )  /* red and green component */
-	ROM_LOAD( "pl1-1.1r",       0x0400, 0x0400, CRC(a78ebdaf) SHA1(8ea215701eb5e1a2a329ef92c19fc69b18fc28c7) )  /* blue component */
-	ROM_LOAD( "pl1-5.5t",       0x0800, 0x0400, CRC(4b7ee712) SHA1(dd0ec4c632d8b160f7b54d8f18fcf4ef1508d832) )  /* foreground lookup table */
-	ROM_LOAD( "pl1-4.4n",       0x0c00, 0x0400, CRC(3a7be418) SHA1(475cdc68205e3acce83fe79b00b74c6a7e28dde4) )  /* background lookup table */
-	ROM_LOAD( "pl1-3.6l",       0x1000, 0x0400, CRC(80558da8) SHA1(7e1483467817295f36d1e2bdb32934c4f2617d52) )  /* sprites lookup table */
+	ROM_LOAD( "pl1-2.1t",       0x0000, 0x0400, CRC(472885de) SHA1(8d552c90b8d5bc6ad6c60934c00f4303cd180ce7) )  // red and green component
+	ROM_LOAD( "pl1-1.1r",       0x0400, 0x0400, CRC(a78ebdaf) SHA1(8ea215701eb5e1a2a329ef92c19fc69b18fc28c7) )  // blue component
+	ROM_LOAD( "pl1-5.5t",       0x0800, 0x0400, CRC(4b7ee712) SHA1(dd0ec4c632d8b160f7b54d8f18fcf4ef1508d832) )  // foreground lookup table
+	ROM_LOAD( "pl1-4.4n",       0x0c00, 0x0400, CRC(3a7be418) SHA1(475cdc68205e3acce83fe79b00b74c6a7e28dde4) )  // background lookup table
+	ROM_LOAD( "pl1-3.6l",       0x1000, 0x0400, CRC(80558da8) SHA1(7e1483467817295f36d1e2bdb32934c4f2617d52) )  // sprites lookup table
 ROM_END
 
 ROM_START( paclandm )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "pl1-1",          0x08000, 0x4000, CRC(a938ae99) SHA1(bf12097d8c69685cb7af763f9b9617c767aaed2f) )
-	ROM_LOAD( "pl1-2",          0x0C000, 0x4000, CRC(3fe43bb5) SHA1(14e6144d06ff2fd786f383f36f1b8238ac364849) )
-	/* all the following are banked at 0x4000-0x5fff */
+	ROM_LOAD( "pl1-2",          0x0c000, 0x4000, CRC(3fe43bb5) SHA1(14e6144d06ff2fd786f383f36f1b8238ac364849) )
+	// all the following are banked at 0x4000-0x5fff
 	ROM_LOAD( "pl1_3.8e",       0x10000, 0x4000, CRC(aa9fa739) SHA1(7b1f7857eb5f68e166b1f8988c82051aaf05df48) )
 	ROM_LOAD( "pl1_4.8f",       0x14000, 0x4000, CRC(2b895a90) SHA1(820f8873c6a5a736089406d0f03d491dfb82d00d) )
 	ROM_LOAD( "pl1_5.8h",       0x18000, 0x4000, CRC(7af66200) SHA1(f44161ded1633e9801b7a9cd84d481e53823f5d9) )
 	ROM_LOAD( "pl1_6.8j",       0x1c000, 0x4000, CRC(b01e59a9) SHA1(e5b093852d33a4d09969d111fa6e42e964aa4dac) )
 
 	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "pl1_7.3e",       0x8000, 0x2000, CRC(8c5becae) SHA1(14d67136395c4c64472980a69648ce2d479ae67f) ) /* sub program for the mcu */
-	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) ) /* Internal code from the MCU */
+	ROM_LOAD( "pl1_7.3e",       0x8000, 0x2000, CRC(8c5becae) SHA1(14d67136395c4c64472980a69648ce2d479ae67f) ) // sub program for the MCU
+	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) ) // internal code from the MCU
 
-	ROM_REGION( 0x02000, "gfx1", 0 )
-	ROM_LOAD( "pl1_12.6n",      0x00000, 0x2000, CRC(c159fbce) SHA1(b0326c85b7df407f3e94c38a5971f911968d7b27) ) /* chars */
+	ROM_REGION( 0x02000, "fg_chars", 0 )
+	ROM_LOAD( "pl1_12.6n",      0x00000, 0x2000, CRC(c159fbce) SHA1(b0326c85b7df407f3e94c38a5971f911968d7b27) )
 
-	ROM_REGION( 0x02000, "gfx2", 0 )
+	ROM_REGION( 0x02000, "bg_chars", 0 )
 	ROM_LOAD( "pl1_13.6t",      0x00000, 0x2000, CRC(6c5ed9ae) SHA1(db919c9254289179e98ba5d2ed8c66d67ae95f35) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 )
-	ROM_LOAD( "pl1-9.6f",       0x00000, 0x4000, CRC(f5d5962b) SHA1(8d008a9bc06dc562c241955d9c551647b5c1f4e9) ) /* sprites */
+	ROM_REGION( 0x10000, "sprites", 0 )
+	ROM_LOAD( "pl1-9.6f",       0x00000, 0x4000, CRC(f5d5962b) SHA1(8d008a9bc06dc562c241955d9c551647b5c1f4e9) )
 	ROM_LOAD( "pl1-8.6e",       0x04000, 0x4000, CRC(a2ebfa4a) SHA1(4a2a2b43a23a7a46266751415d1bde118143429c) )
 	ROM_LOAD( "pl1-10.7e",      0x08000, 0x4000, CRC(c7cf1904) SHA1(7ca8ed20ee32eb8609ac96b4e4fcb3b6027b598a) )
 	ROM_LOAD( "pl1-11.7f",      0x0c000, 0x4000, CRC(6621361a) SHA1(4efa40adba803006e86d5e12514983d4132b5efb) )
 
 	ROM_REGION( 0x1400, "proms", 0 )
-	ROM_LOAD( "pl1-2.1t",       0x0000, 0x0400, CRC(472885de) SHA1(8d552c90b8d5bc6ad6c60934c00f4303cd180ce7) )  /* red and green component */
-	ROM_LOAD( "pl1-1.1r",       0x0400, 0x0400, CRC(a78ebdaf) SHA1(8ea215701eb5e1a2a329ef92c19fc69b18fc28c7) )  /* blue component */
-	ROM_LOAD( "pl1-5.5t",       0x0800, 0x0400, CRC(4b7ee712) SHA1(dd0ec4c632d8b160f7b54d8f18fcf4ef1508d832) )  /* foreground lookup table */
-	ROM_LOAD( "pl1-4.4n",       0x0c00, 0x0400, CRC(3a7be418) SHA1(475cdc68205e3acce83fe79b00b74c6a7e28dde4) )  /* background lookup table */
-	ROM_LOAD( "pl1-3.6l",       0x1000, 0x0400, CRC(80558da8) SHA1(7e1483467817295f36d1e2bdb32934c4f2617d52) )  /* sprites lookup table */
+	ROM_LOAD( "pl1-2.1t",       0x0000, 0x0400, CRC(472885de) SHA1(8d552c90b8d5bc6ad6c60934c00f4303cd180ce7) )  // red and green component
+	ROM_LOAD( "pl1-1.1r",       0x0400, 0x0400, CRC(a78ebdaf) SHA1(8ea215701eb5e1a2a329ef92c19fc69b18fc28c7) )  // blue component
+	ROM_LOAD( "pl1-5.5t",       0x0800, 0x0400, CRC(4b7ee712) SHA1(dd0ec4c632d8b160f7b54d8f18fcf4ef1508d832) )  // foreground lookup table
+	ROM_LOAD( "pl1-4.4n",       0x0c00, 0x0400, CRC(3a7be418) SHA1(475cdc68205e3acce83fe79b00b74c6a7e28dde4) )  // background lookup table
+	ROM_LOAD( "pl1-3.6l",       0x1000, 0x0400, CRC(80558da8) SHA1(7e1483467817295f36d1e2bdb32934c4f2617d52) )  // sprites lookup table
 ROM_END
 
 ROM_START( paclandm2 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "pl-8b.bin",      0x08000, 0x4000, CRC(93d13fc0) SHA1(dfd2e6460afce30654fe092e7ed2bb330354c5ec) )
-	ROM_LOAD( "pl-8d.bin",      0x0C000, 0x4000, CRC(a761c6aa) SHA1(3526e9302ffdf0ee61e2cd3f0b35f63cf2f5ced2) )
+	ROM_LOAD( "pl-8d.bin",      0x0c000, 0x4000, CRC(a761c6aa) SHA1(3526e9302ffdf0ee61e2cd3f0b35f63cf2f5ced2) )
 	ROM_LOAD( "pl1_3.8e",       0x10000, 0x4000, CRC(aa9fa739) SHA1(7b1f7857eb5f68e166b1f8988c82051aaf05df48) )
 	ROM_LOAD( "pl1_4.8f",       0x14000, 0x4000, CRC(2b895a90) SHA1(820f8873c6a5a736089406d0f03d491dfb82d00d) )
 	ROM_LOAD( "pl1_5.8h",       0x18000, 0x4000, CRC(7af66200) SHA1(f44161ded1633e9801b7a9cd84d481e53823f5d9) )
@@ -638,13 +1114,13 @@ ROM_START( paclandm2 )
 	ROM_LOAD( "pl1_7.3e",       0x8000, 0x2000, CRC(8c5becae) SHA1(14d67136395c4c64472980a69648ce2d479ae67f) )
 	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )
 
-	ROM_REGION( 0x02000, "gfx1", 0 )
+	ROM_REGION( 0x02000, "fg_chars", 0 )
 	ROM_LOAD( "pl2_12.6n",      0x00000, 0x2000, CRC(a63c8726) SHA1(b15903fa2267375280af03af0a7157e1b0bcb86d) )
 
-	ROM_REGION( 0x02000, "gfx2", 0 )
+	ROM_REGION( 0x02000, "bg_chars", 0 )
 	ROM_LOAD( "pl4_13.6t",      0x00000, 0x2000, CRC(3ae582fd) SHA1(696b2cfadb6b071de8e43d20cd65b37713ca3b30) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 )
+	ROM_REGION( 0x10000, "sprites", 0 )
 	ROM_LOAD( "pl1-9.6f",       0x00000, 0x4000, CRC(f5d5962b) SHA1(8d008a9bc06dc562c241955d9c551647b5c1f4e9) )
 	ROM_LOAD( "pl1-8.6e",       0x04000, 0x4000, CRC(a2ebfa4a) SHA1(4a2a2b43a23a7a46266751415d1bde118143429c) )
 	ROM_LOAD( "pl1-10.7e",      0x08000, 0x4000, CRC(c7cf1904) SHA1(7ca8ed20ee32eb8609ac96b4e4fcb3b6027b598a) )
@@ -658,11 +1134,12 @@ ROM_START( paclandm2 )
 	ROM_LOAD( "pl1-3.6l",       0x1000, 0x0400, CRC(80558da8) SHA1(7e1483467817295f36d1e2bdb32934c4f2617d52) )
 ROM_END
 
+} // anonymous namespace
 
 
-GAME( 1984, pacland,   0,       pacland, pacland, pacland_state, empty_init, ROT0, "Namco", "Pac-Land (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, paclandj,  pacland, pacland, pacland, pacland_state, empty_init, ROT0, "Namco", "Pac-Land (Japan new)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, paclandjo, pacland, pacland, pacland, pacland_state, empty_init, ROT0, "Namco", "Pac-Land (Japan old)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, paclandjo2,pacland, pacland, pacland, pacland_state, empty_init, ROT0, "Namco", "Pac-Land (Japan older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, paclandm,  pacland, pacland, pacland, pacland_state, empty_init, ROT0, "Namco (Bally Midway license)", "Pac-Land (Midway)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, paclandm2, pacland, pacland, pacland, pacland_state, empty_init, ROT0, "Namco (Bally Midway license)", "Pac-Land (Bally-Midway)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, pacland,    0,       pacland, pacland, pacland_state, empty_init, ROT0, "Namco",                        "Pac-Land (World)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1984, paclandj,   pacland, pacland, pacland, pacland_state, empty_init, ROT0, "Namco",                        "Pac-Land (Japan new)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1984, paclandjo,  pacland, pacland, pacland, pacland_state, empty_init, ROT0, "Namco",                        "Pac-Land (Japan old)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1984, paclandjo2, pacland, pacland, pacland, pacland_state, empty_init, ROT0, "Namco",                        "Pac-Land (Japan older)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1984, paclandm,   pacland, pacland, pacland, pacland_state, empty_init, ROT0, "Namco (Bally Midway license)", "Pac-Land (Midway)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1984, paclandm2,  pacland, pacland, pacland, pacland_state, empty_init, ROT0, "Namco (Bally Midway license)", "Pac-Land (Bally-Midway)", MACHINE_SUPPORTS_SAVE )

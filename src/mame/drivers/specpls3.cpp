@@ -175,29 +175,21 @@ static const int spectrum_plus3_memory_selections[]=
 
 void specpls3_state::port_3ffd_w(offs_t offset, uint8_t data)
 {
-	if (m_upd765.found())
-		m_upd765->fifo_w(data);
+	if (m_upd765.found()) m_upd765->fifo_w(data);
 
 	/* mface3 needs to see this port */
-	if (m_exp)
-		m_exp->iorq_w(offset | 0x3000, data);
+	if (m_exp) m_exp->iorq_w(offset | 0x3000, data);
 }
 
 uint8_t specpls3_state::port_3ffd_r()
 {
-	if (m_upd765.found())
-		return m_upd765->fifo_r();
-	else
-		return 0xff;
+	return m_upd765.found() ? m_upd765->fifo_r() : 0xff;
 }
 
 
 uint8_t specpls3_state::port_2ffd_r()
 {
-	if (m_upd765.found())
-		return m_upd765->msr_r();
-	else
-		return 0xff;
+	return m_upd765.found() ? m_upd765->msr_r() : 0xff;
 }
 
 
@@ -215,104 +207,66 @@ void specpls3_state::plus3_update_memory()
 		m_screen_location = m_ram->pointer() + (5 << 14);
 	}
 
-	if ((m_port_1ffd_data & 0x01) == 0)
+	if (m_port_1ffd_data & 0x01)
 	{
-		/* select ram at 0x0c000-0x0ffff */
-		int ram_page = m_port_7ffd_data & 0x07;
-		unsigned char *ram_data = m_ram->pointer() + (ram_page<<14);
-		membank("bank4")->set_base(ram_data);
-
-		LOG("RAM at 0xc000: %02x\n", ram_page);
+		/* Extended memory paging */
+		int MemorySelection = (m_port_1ffd_data >> 1) & 0x03;
+		const int *memory_selection = &spectrum_plus3_memory_selections[(MemorySelection << 2)];
+		m_bank_ram[0]->set_entry(memory_selection[0]);
+		m_bank_ram[1]->set_entry(memory_selection[1]);
+		m_bank_ram[2]->set_entry(memory_selection[2]);
+		m_bank_ram[3]->set_entry(memory_selection[3]);
+		LOG("extended memory paging: %02x\n", MemorySelection);
+	}
+	else
+	{
+		m_bank_rom[0]->set_entry(BIT(m_port_7ffd_data, 4) | ((m_port_1ffd_data >> 1) & 0x02));
 
 		/* Reset memory between 0x4000 - 0xbfff in case extended paging was being used */
 		/* Bank 5 in 0x4000 - 0x7fff */
-		membank("bank2")->set_base(m_ram->pointer() + (5 << 14));
-
+		m_bank_ram[1]->set_entry(5);
 		/* Bank 2 in 0x8000 - 0xbfff */
-		membank("bank3")->set_base(m_ram->pointer() + (2 << 14));
-	}
-	else
-	{
-		/* Extended memory paging */
-		int MemorySelection = (m_port_1ffd_data >> 1) & 0x03;
-		const int *memory_selection = &spectrum_plus3_memory_selections[(MemorySelection << 2)];
-		unsigned char *ram_data = m_ram->pointer() + (memory_selection[0] << 14);
-
-		ram_data = m_ram->pointer() + (memory_selection[1] << 14);
-		membank("bank2")->set_base(ram_data);
-
-		ram_data = m_ram->pointer() + (memory_selection[2] << 14);
-		membank("bank3")->set_base(ram_data);
-
-		ram_data = m_ram->pointer() + (memory_selection[3] << 14);
-		membank("bank4")->set_base(ram_data);
-
-		LOG("extended memory paging: %02x\n", MemorySelection);
+		m_bank_ram[2]->set_entry(2);
+		/* select ram at 0x0c000-0x0ffff */
+		int ram_page = m_port_7ffd_data & 0x07;
+		m_bank_ram[3]->set_entry(ram_page);
+		LOG("RAM at 0xc000: %02x\n", ram_page);
 	}
 }
 
 
-void specpls3_state::bank1_w(offs_t offset, uint8_t data)
+void specpls3_state::rom_w(offs_t offset, uint8_t data)
 {
 	if (m_exp->romcs())
-	{
 		m_exp->mreq_w(offset, data);
-	}
-	else if ((m_port_1ffd_data & 0x01) != 0)
-	{
-		/* Extended memory paging */
-		int MemorySelection = (m_port_1ffd_data >> 1) & 0x03;
-		const int *memory_selection = &spectrum_plus3_memory_selections[(MemorySelection << 2)];
-		m_ram->pointer()[(memory_selection[0] << 14) + offset] = data;
-	}
+	else if (m_port_1ffd_data & 0x01)
+		((u8*)m_bank_ram[0]->base())[offset] = data;
 }
 
-uint8_t specpls3_state::bank1_r(offs_t offset)
+uint8_t specpls3_state::rom_r(offs_t offset)
 {
-	uint8_t data;
+	return m_exp->romcs()
+		? m_exp->mreq_r(offset)
+		: (m_port_1ffd_data & 0x01)
+		  ? ((u8*)m_bank_ram[0]->base())[offset]
+		  : ((u8*)m_bank_rom[0]->base())[offset];
 
-	if (m_exp->romcs())
-	{
-		data = m_exp->mreq_r(offset);
-	}
-	else
-	{
-		if ((m_port_1ffd_data & 0x01) == 0)
-		{
-			/* ROM switching */
-			int ROMSelection = BIT(m_port_7ffd_data, 4) | ((m_port_1ffd_data >> 1) & 0x02);
-
-			/* rom 0 is editor, rom 1 is syntax, rom 2 is DOS, rom 3 is 48 BASIC */
-			data = memregion("maincpu")->base()[0x010000 + (ROMSelection << 14) + offset];
-		}
-		else
-		{
-			/* Extended memory paging */
-			int MemorySelection = (m_port_1ffd_data >> 1) & 0x03;
-			const int *memory_selection = &spectrum_plus3_memory_selections[(MemorySelection << 2)];
-			data = m_ram->pointer()[(memory_selection[0] << 14) + offset];
-		}
-	}
-	return data;
 }
 
 void specpls3_state::port_7ffd_w(offs_t offset, uint8_t data)
 {
-	if (is_contended(offset)) content_early();
-	content_early(1);
-
 	/* D0-D2 - RAM page located at 0x0c000-0x0ffff */
 	/* D3    - Screen select (screen 0 in ram page 5, screen 1 in ram page 7 */
 	/* D4    - ROM select low bit - which rom paged into 0x0000-0x03fff */
 	/* D5    - Disable paging (permanent until reset) */
 
 	/* mface3 needs to see this port */
-	if (m_exp)
-		m_exp->iorq_w(offset | 0x4000, data);
+	if (m_exp) m_exp->iorq_w(offset | 0x4000, data);
 
 	/* paging disabled? */
-	if (m_port_7ffd_data & 0x20)
-		return;
+	if (m_port_7ffd_data & 0x20) return;
+
+	if ((m_port_7ffd_data ^ data) & 0x08) m_screen->update_now();
 
 	/* store new state */
 	m_port_7ffd_data = data;
@@ -334,13 +288,11 @@ void specpls3_state::port_1ffd_w(offs_t offset, uint8_t data)
 	if (m_upd765.found())
 	{
 		for (auto &flop : m_flop)
-			if (flop->get_device())
-				flop->get_device()->mon_w(!BIT(data, 3));
+			if (flop->get_device()) flop->get_device()->mon_w(!BIT(data, 3));
 	}
 
 	/* mface3 needs to see this port */
-	if (m_exp)
-		m_exp->iorq_w(offset | 0x1000, data);
+	if (m_exp) m_exp->iorq_w(offset | 0x1000, data);
 
 	/* paging disabled? */
 	if ((m_port_7ffd_data & 0x20)==0)
@@ -360,9 +312,8 @@ void specpls3_state::port_1ffd_w(offs_t offset, uint8_t data)
 void specpls3_state::video_start()
 {
 	spectrum_128_state::video_start();
-	// This is reported contention pattern for +2A/+3. Keep +2 for now.
-	//m_contention_pattern = {1, 0, 7, 6, 5, 4, 3, 2};
-	//m_screen->configure(m_screen->width(), m_screen->height(), m_screen->visible_area(), HZ_TO_ATTOSECONDS(50.01));
+	m_contention_pattern = {1, 0, 7, 6, 5, 4, 3, 2};
+	m_contention_offset = 1;
 }
 
 /* ports are not decoded full.
@@ -381,19 +332,25 @@ void specpls3_state::plus3_io(address_map &map)
 
 void specpls3_state::plus3_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).rw(FUNC(specpls3_state::bank1_r), FUNC(specpls3_state::bank1_w)); //.bankr("bank1");
-	map(0x4000, 0x7fff).bankrw("bank2");
-	map(0x8000, 0xbfff).bankrw("bank3");
-	map(0xc000, 0xffff).bankrw("bank4");
+	map(0x0000, 0x3fff).rw(FUNC(specpls3_state::rom_r), FUNC(specpls3_state::rom_w));
+	map(0x4000, 0x7fff).rw(FUNC(specpls3_state::spectrum_128_ram_r<1>), FUNC(specpls3_state::spectrum_128_ram_w<1>));
+	map(0x8000, 0xbfff).rw(FUNC(specpls3_state::spectrum_128_ram_r<2>), FUNC(specpls3_state::spectrum_128_ram_w<2>));
+	map(0xc000, 0xffff).rw(FUNC(specpls3_state::spectrum_128_ram_r<3>), FUNC(specpls3_state::spectrum_128_ram_w<3>));
+}
+
+void specpls3_state::machine_start()
+{
+	spectrum_128_state::machine_start();
+
+	// reconfigure ROMs
+	memory_region *rom = memregion("maincpu");
+	m_bank_rom[0]->configure_entries(0, 4, rom->base() + 0x10000, 0x4000);
+
+	m_bank_ram[0]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
 }
 
 void specpls3_state::machine_reset()
 {
-	uint8_t *messram = m_ram->pointer();
-	memset(messram,0,128*1024);
-
-	spectrum_state::machine_reset();
-
 	/* Initial configuration */
 	m_port_7ffd_data = 0;
 	m_port_1ffd_data = 0;
@@ -405,8 +362,7 @@ void specpls3_state::plus3_us_w(uint8_t data)
 	// US1 is not connected, so US0 alone selects either drive
 	floppy_image_device *flop = m_flop[data & 1]->get_device();
 	m_upd765->set_floppy(flop);
-	if (flop)
-		flop->ds_w(data & 1);
+	if (flop) flop->ds_w(data & 1);
 }
 
 static void specpls3_floppies(device_slot_interface &device)
@@ -417,17 +373,17 @@ static void specpls3_floppies(device_slot_interface &device)
 /* F4 Character Displayer */
 static const gfx_layout spectrum_charlayout =
 {
-	8, 8,                                       /* 8 x 8 characters */
-	96,                                         /* 96 characters */
-	1,                                          /* 1 bits per pixel */
-	{ 0 },                                      /* no bitplanes */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },                 /* x offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 }, /* y offsets */
-	8*8                                         /* every char takes 8 bytes */
+	8, 8,          /* 8 x 8 characters */
+	96,            /* 96 characters */
+	1,             /* 1 bits per pixel */
+	{ 0 },         /* no bitplanes */
+	{STEP8(0, 1)}, /* x offsets */
+	{STEP8(0, 8)}, /* y offsets */
+	8*8            /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( specpls3 )
-	GFXDECODE_ENTRY( "maincpu", 0x1fd00, spectrum_charlayout, 0, 8 )
+	GFXDECODE_ENTRY( "maincpu", 0x1fd00, spectrum_charlayout, 7, 8 )
 GFXDECODE_END
 
 
@@ -437,6 +393,7 @@ void specpls3_state::spectrum_plus2(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &specpls3_state::plus3_mem);
 	m_maincpu->set_addrmap(AS_IO, &specpls3_state::plus3_io);
+	m_maincpu->nomreq_cb().set_nop();
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(specpls3);
 

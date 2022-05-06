@@ -721,6 +721,7 @@ def write_project(options, projectfile, mappings, sources):
             '        MAME_DIR .. "src/lib/netlist",\n' \
             '        MAME_DIR .. "3rdparty",\n' \
             '        GEN_DIR  .. "mame/layout",\n' \
+            '        ext_includedir("asio"),\n' \
             '        ext_includedir("flac"),\n' \
             '        ext_includedir("glm"),\n' \
             '        ext_includedir("jpeg"),\n' \

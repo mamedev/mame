@@ -4442,6 +4442,27 @@ ROM_START( dogyuuna )
 ROM_END
 
 
+// found on a standard TP-022-1 PCB, main CPU ROM had a MR sticker. It's a little closer to the location test than to the released versions (i.e region configuration).
+ROM_START( dogyuunb )
+	ROM_REGION( 0x080000, "maincpu", 0 )            // Main 68K code
+	ROM_LOAD16_WORD_SWAP( "mr.u64", 0x000000, 0x080000, CRC(4dc258dc) SHA1(ac2783030a8367a20bfad282942c2aa383156291) ) // M27C4002
+
+	// Secondary CPU is a Toaplan marked chip, (TS-002-MACH  TOA PLAN)
+	// It's a NEC V25 (PLCC94) (encrypted program uploaded by main CPU)
+
+	ROM_REGION( 0x200000, "gp9001_0", 0 )
+	ROM_LOAD16_WORD_SWAP( "tp022_3.w92", 0x000000, 0x100000, CRC(191b595f) SHA1(89344946daa18087cc83f92027cf5da659b1c7a5) )
+	ROM_LOAD16_WORD_SWAP( "tp022_4.w93", 0x100000, 0x100000, CRC(d58d29ca) SHA1(90d142fef37764ef817347a2bed77892a288a077) )
+
+	ROM_REGION( 0x400000, "gp9001_1", 0 )
+	ROM_LOAD16_WORD_SWAP( "tp022_5.w16", 0x000000, 0x200000, CRC(d4c1db45) SHA1(f5655467149ba737128c2f54c9c6cdaca6e4c35c) )
+	ROM_LOAD16_WORD_SWAP( "tp022_6.w17", 0x200000, 0x200000, CRC(d48dc74f) SHA1(081b5a00a2ff2bd82b98b30aab3cb5b6ae1014d5) )
+
+	ROM_REGION( 0x40000, "oki1", 0 )
+	ROM_LOAD( "tp022_2.w30", 0x00000, 0x40000, CRC(043271b3) SHA1(c7eaa929e55dd956579b824ea9d20a1d0129a925) )
+ROM_END
+
+
 ROM_START( dogyuunt )
 	ROM_REGION( 0x080000, "maincpu", 0 )            /* Main 68K code */
 	ROM_LOAD16_WORD_SWAP( "sample10.9.u64.bin", 0x000000, 0x080000, CRC(585f5016) SHA1(18d57843f33a560a3bb4b6aef176f7ef795b742d) )
@@ -4958,6 +4979,32 @@ ROM_START( batsugunb )
 	ROM_LOAD( "rom13.bin", 0x00000, 0x40000, CRC(276146f5) SHA1(bf11d1f6782cefcad77d52af4f7e6054a8f93440) )
 
 	ROM_REGION( 0x1000, "plds", 0 )         /* Logic for mixing output of both GP9001 GFX controllers */
+	ROM_LOAD( "tp030_u19_gal16v8b-15.bin", 0x0000, 0x117, CRC(f71669e8) SHA1(ec1fbe04605fee864af4b01f001af227938c9f21) )
+//  ROM_LOAD( "tp030_u19_gal16v8b-15.jed", 0x0000, 0x991, CRC(31be54a2) SHA1(06278942a9a2ea858c0352b2ef5a65bf329b7b82) )
+ROM_END
+
+// very similar to batsuguna, same main CPU label, seems to have just a tiny bit more code
+ROM_START( batsugunc )
+	ROM_REGION( 0x080000, "maincpu", 0 )            // Main 68K code
+	ROM_LOAD16_WORD_SWAP( "tp-030_01.u69", 0x000000, 0x080000, CRC(545305c4) SHA1(9411ad7fe0be89a9f04b9116c9c709dc5e98c345) )
+
+	/* Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN) */
+	/* It's a NEC V25 (PLCC94) (program uploaded by main CPU) */
+
+	ROM_REGION( 0x400000, "gp9001_0", 0 )
+	ROM_LOAD( "tp030_rom3-l.u55", 0x000000, 0x100000, CRC(3024b793) SHA1(e161db940f069279356fca2c5bf2753f07773705) )
+	ROM_LOAD( "tp030_rom3-h.u56", 0x100000, 0x100000, CRC(ed75730b) SHA1(341f0f728144a049486d996c9bb14078578c6879) )
+	ROM_LOAD( "tp030_rom4-l.u54", 0x200000, 0x100000, CRC(fedb9861) SHA1(4b0917056bd359b21935358c6bcc729262be6417) )
+	ROM_LOAD( "tp030_rom4-h.u57", 0x300000, 0x100000, CRC(d482948b) SHA1(31be7dc5cff072403b783bf203b9805ffcad7284) )
+
+	ROM_REGION( 0x200000, "gp9001_1", 0 )
+	ROM_LOAD( "tp030_rom5.u32",  0x000000, 0x100000, CRC(bcf5ba05) SHA1(40f98888a29cdd30cda5dfb60fdc667c69b0fdb0) )
+	ROM_LOAD( "tp030_rom6.u31",  0x100000, 0x100000, CRC(0666fecd) SHA1(aa8f921fc51590b5b05bbe0b0ad0cce5ff359c64) )
+
+	ROM_REGION( 0x40000, "oki1", 0 )
+	ROM_LOAD( "tp030_rom2.u65", 0x00000, 0x40000, CRC(276146f5) SHA1(bf11d1f6782cefcad77d52af4f7e6054a8f93440) )
+
+	ROM_REGION( 0x1000, "plds", 0 )         // Logic for mixing output of both GP9001 GFX controllers
 	ROM_LOAD( "tp030_u19_gal16v8b-15.bin", 0x0000, 0x117, CRC(f71669e8) SHA1(ec1fbe04605fee864af4b01f001af227938c9f21) )
 //  ROM_LOAD( "tp030_u19_gal16v8b-15.jed", 0x0000, 0x991, CRC(31be54a2) SHA1(06278942a9a2ea858c0352b2ef5a65bf329b7b82) )
 ROM_END
@@ -5919,6 +5966,7 @@ GAME( 1991, ghoxjo,      ghox,     ghox,         ghoxjo,     toaplan2_state, emp
 
 GAME( 1992, dogyuun,     0,        dogyuun,      dogyuun,    toaplan2_state, init_dogyuun,  ROT270, "Toaplan",         "Dogyuun",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1992, dogyuuna,    dogyuun,  dogyuun,      dogyuuna,   toaplan2_state, init_dogyuun,  ROT270, "Toaplan",         "Dogyuun (older set)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dogyuunb,    dogyuun,  dogyuun,      dogyuunt,   toaplan2_state, init_dogyuun,  ROT270, "Toaplan",         "Dogyuun (oldest set)",      MACHINE_SUPPORTS_SAVE ) // maybe a newer location test version, instead
 GAME( 1992, dogyuunt,    dogyuun,  dogyuun,      dogyuunt,   toaplan2_state, init_dogyuun,  ROT270, "Toaplan",         "Dogyuun (location test)",   MACHINE_SUPPORTS_SAVE )
 
 GAME( 1993, kbash,       0,        kbash,        kbash,      toaplan2_state, empty_init,    ROT0,   "Toaplan / Atari", "Knuckle Bash",              MACHINE_SUPPORTS_SAVE ) // Atari license shown for some regions.
@@ -5962,7 +6010,8 @@ GAME( 1992, grindstma,   grindstm, vfive,      grindstma,  toaplan2_state, init_
 GAME( 1993, vfive,       grindstm, vfive,      vfive,      toaplan2_state, init_vfive,      ROT270, "Toaplan", "V-Five (Japan)",            MACHINE_SUPPORTS_SAVE )
 
 GAME( 1993, batsugun,    0,        batsugun,   batsugun,   toaplan2_state, init_dogyuun,    ROT270, "Toaplan", "Batsugun", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, batsuguna,   batsugun, batsugun,   batsugun,   toaplan2_state, init_dogyuun,    ROT270, "Toaplan", "Batsugun (older set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, batsuguna,   batsugun, batsugun,   batsugun,   toaplan2_state, init_dogyuun,    ROT270, "Toaplan", "Batsugun (older, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, batsugunc,   batsugun, batsugun,   batsugun,   toaplan2_state, init_dogyuun,    ROT270, "Toaplan", "Batsugun (older, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, batsugunb,   batsugun, batsugun,   batsugun,   toaplan2_state, init_dogyuun,    ROT270, "Toaplan", "Batsugun (Korean PCB)", MACHINE_SUPPORTS_SAVE ) // cheap looking PCB (same 'TP-030' numbering as original) but without Mask ROMs.  Still has original customs etc.  Jumpers were set to the Korea Unite Trading license, so likely made in Korea, not a bootleg tho.
 GAME( 1993, batsugunsp,  batsugun, batsugun,   batsugun,   toaplan2_state, init_dogyuun,    ROT270, "Toaplan", "Batsugun - Special Version", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, batsugunbl,  batsugun, batsugunbl, batsugunbl, toaplan2_state, init_fixeightbl, ROT270, "Toaplan", "Batsugun (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // needs correct GFX offsets and oki banking fix

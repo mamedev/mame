@@ -11432,8 +11432,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="explfist">
-		<description>Exploding Fist (USA, Prototype 19900522)</description>
+	<software name="explfistp" cloneof="explfist">
+		<description>Exploding Fist (USA, prototype 19900522)</description>
 		<year>1990</year>
 		<publisher>Tradewest</publisher>
 		<part name="cart" interface="nes_cart">
@@ -44964,6 +44964,24 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+	<software name="babyboomk" cloneof="babyboom">
+		<description>Baby Boomer (Korea)</description>
+		<year>199?</year>
+		<publisher>Daou Infosys</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="discrete_74x377" />
+			<feature name="pcb" value="COLORDREAMS-74*377" />
+			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="zapper" />
+			<dataarea name="prg" size="65536">
+				<rom name="baby boomer (k).prg" size="65536" crc="0bd9fbcf" sha1="20948c1618d0e1173409371140651f21b2602204" />
+			</dataarea>
+			<dataarea name="chr" size="16384">
+				<rom name="baby boomer (k).chr" size="16384" crc="45fe3114" sha1="baa3d240f1acd3a364530ae6f6dc6f8506d8b9c6" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ballstry">
 		<!-- Alt. Title: ZhuangQiu ChuanShuo - HuaZhuang II - Ball Story -->
 		<description>Ball Story - Jong Yuk Chuen Suet Fa Jong II (Chi)</description>
@@ -46648,8 +46666,26 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="explfist1" cloneof="explfist">
-		<description>Exploding Fist (USA, Prototype Older)</description>
+	<software name="explfist">
+		<description>Exploding Fist (USA)</description>
+		<year>2019</year>
+		<publisher>Piko Interactive</publisher>
+		<info name="release" value="20190415"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="cnrom" />
+			<feature name="pcb" value="NES-CNROM" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="32768">
+				<rom name="exploding fist.prg" size="32768" crc="9082fc29" sha1="c3cb25e12bc8a60770dd6ef7c48c16b31685393b" />
+			</dataarea>
+			<dataarea name="chr" size="32768">
+				<rom name="exploding fist.chr" size="32768" crc="fe6f36b5" sha1="595d04d967bbe8f920383c5cee0726bc7f6eeed7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="explfistp1" cloneof="explfist">
+		<description>Exploding Fist (USA, prototype older)</description>
 		<year>1990</year>
 		<publisher>Tradewest</publisher>
 		<part name="cart" interface="nes_cart">
@@ -52008,6 +52044,27 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="uninvitep" cloneof="uninvite">
+		<description>Uninvited (USA, prototype)</description>
+		<year>1991</year>
+		<publisher>Kemco</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb_model" value="HVC-TK22EROM-01" />
+			<feature name="mmc3_type" value="MMC3B" />
+			<dataarea name="prg" size="131072">
+				<rom name="8.30 uninvited prg" size="131072" crc="d5081984" sha1="41c3067a09a21226742de5a3eaa57a64092458b1" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="8.23 uninvited prg" size="131072" crc="f7019d0f" sha1="1cd6e1e868519aeefd1fd0d6f5bf32df1c48925a" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="uruseiyap" cloneof="uruseiya">
 		<description>Urusei Yatsura - Lum no Wedding Bell (Jpn, Prototype)</description>
 		<year>1986</year>
@@ -53737,6 +53794,24 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="chr" size="65536">
 				<rom name="0.chr" size="65536" crc="f2b0b9bc" sha1="66d58b8f78068924a9f3dd752c287b47b792ac65" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tuji" cloneof="silentas">
+		<description>Tújí (Taiwan)</description>
+		<year>1989</year>
+		<publisher>Sachen</publisher>
+		<info name="serial" value="TC-005"/>
+		<info name="alt_title" value="突擊"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nina006" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="65536">
+				<rom name="tu ji (tw) (joy van).prg" size="65536" crc="943b393a" sha1="624ffe7840037bfe3d8c3378da9873965fd21f0a" />
+			</dataarea>
+			<dataarea name="chr" size="65536">
+				<rom name="tu ji (tw) (joy van).chr" size="65536" crc="4e62fba8" sha1="bd491e460566b33fad9b3762044a414fa18436cb" />
 			</dataarea>
 		</part>
 	</software>
@@ -66895,6 +66970,29 @@ We don't include these hacks because they were not burned into real carts nor so
 				<rom name="[hengge] wu jian dao feng yun (c).prg" size="1048576" crc="750dbc48" sha1="38614b87865967ab00fcc1886a5e87904a0dd216" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wukongdj" cloneof="dbz" supported="partial">
+		<description>Wùkōng Dòujù (China)</description>
+		<year>199?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<info name="alt_title" value="悟空斗剧"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="hengg_shjy3" />
+			<dataarea name="prg" size="262144">
+				<rom name="wukong douju.prg" size="262144" crc="8638454c" sha1="3c7c91c552104c9c24153c00fd603c740715ff51" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="wukong douju.chr" size="524288" crc="72137bc5" sha1="1533ecf77b9bbc6864a2c62b463dfab34e017797" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
@@ -80104,7 +80202,7 @@ be better to redump them properly. -->
 			<feature name="slot" value="2a03pur" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="1048576">
-				<rom name="2a03puritans.prg" size="1048576" crc="5baee143" sha1="5024cf5f53995119892067603bed3e23c3655e9e" status="baddump" />
+				<rom name="2a03puritans.prg" size="1048576" crc="5baee143" sha1="5024cf5f53995119892067603bed3e23c3655e9e" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -80117,11 +80215,12 @@ be better to redump them properly. -->
 		<description>8-bit Xmas 2008</description>
 		<year>2008</year>
 		<publisher>RetroZone</publisher>
+		<info name="serial" value="RET-X8-GBL"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
-				<rom name="xmas08demo.prg" size="32768" crc="3ae2a150" sha1="5ce021bebb9049604434af45d6c397e6dd7b84c4" status="baddump" />
+				<rom name="xmas08demo.prg" size="32768" crc="3ae2a150" sha1="5ce021bebb9049604434af45d6c397e6dd7b84c4" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
@@ -80133,11 +80232,12 @@ be better to redump them properly. -->
 		<description>8-bit Xmas 2009</description>
 		<year>2009</year>
 		<publisher>RetroZone</publisher>
+		<info name="serial" value="RET-X9-GBL"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
-				<rom name="xmas09demo.prg" size="32768" crc="851cea10" sha1="88ed2741e88144eda26366985d216f27629cf3f8" status="baddump" />
+				<rom name="xmas09demo.prg" size="32768" crc="851cea10" sha1="88ed2741e88144eda26366985d216f27629cf3f8" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
@@ -80149,11 +80249,12 @@ be better to redump them properly. -->
 		<description>8-bit Xmas 2010</description>
 		<year>2010</year>
 		<publisher>RetroZone</publisher>
+		<info name="serial" value="RET-X0-GBL"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
-				<rom name="xmas10demo.prg" size="32768" crc="a6e02975" sha1="a3a81cc6fdb7a68efbb061ba44dd52407a978e26" status="baddump" />
+				<rom name="xmas10demo.prg" size="32768" crc="a6e02975" sha1="a3a81cc6fdb7a68efbb061ba44dd52407a978e26" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
@@ -80165,11 +80266,12 @@ be better to redump them properly. -->
 		<description>8-bit Xmas 2011</description>
 		<year>2011</year>
 		<publisher>RetroZone</publisher>
+		<info name="serial" value="RET-X1-GBL"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
-				<rom name="xmas11demo.prg" size="32768" crc="d0d0c932" sha1="067bbd99c5f9ccaf66ef484e024b9c98e4893d6d" status="baddump" />
+				<rom name="xmas11demo.prg" size="32768" crc="d0d0c932" sha1="067bbd99c5f9ccaf66ef484e024b9c98e4893d6d" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
@@ -80182,10 +80284,11 @@ be better to redump them properly. -->
 		<description>8-bit Xmas 2012</description>
 		<year>2012</year>
 		<publisher>RetroZone</publisher>
+		<info name="serial" value="RET-X2-GBL"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="8bitxmas" />
 			<dataarea name="prg" size="131072">
-				<rom name="xmas12demo.prg" size="131072" crc="feab08f1" sha1="4834a8bea6df40c9566b97412de775de2ffde492" status="baddump" />
+				<rom name="xmas12demo.prg" size="131072" crc="feab08f1" sha1="4834a8bea6df40c9566b97412de775de2ffde492" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
@@ -80197,10 +80300,11 @@ be better to redump them properly. -->
 		<description>8-bit Xmas 2013</description>
 		<year>2013</year>
 		<publisher>RetroZone</publisher>
+		<info name="serial" value="RET-X3-GBL"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="8bitxmas" />
 			<dataarea name="prg" size="131072">
-				<rom name="xmas13demo.prg" size="131072" crc="f8d04aa0" sha1="98e57ebca93689042d254fe205c357cdc4d84b0a" status="baddump" />
+				<rom name="xmas13demo.prg" size="131072" crc="f8d04aa0" sha1="98e57ebca93689042d254fe205c357cdc4d84b0a" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
@@ -80212,10 +80316,11 @@ be better to redump them properly. -->
 		<description>8-bit Xmas 2014</description>
 		<year>2014</year>
 		<publisher>retroUSB</publisher>
+		<info name="serial" value="RET-X4-GBL"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="8bitxmas" />
 			<dataarea name="prg" size="131072">
-				<rom name="xmas14demo.prg" size="131072" crc="900ca825" sha1="9e7a881a5c1e643b1327a7c4434e2623eefb95e5" status="baddump" />
+				<rom name="xmas14demo.prg" size="131072" crc="900ca825" sha1="9e7a881a5c1e643b1327a7c4434e2623eefb95e5" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
@@ -80227,10 +80332,11 @@ be better to redump them properly. -->
 		<description>8-bit Xmas 2015</description>
 		<year>2015</year>
 		<publisher>retroUSB</publisher>
+		<info name="serial" value="RET-X5-GBL"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="8bitxmas" />
 			<dataarea name="prg" size="131072">
-				<rom name="xmas15demo.prg" size="131072" crc="376c9fcc" sha1="658929d3377e30469c82b3bf8a66c7d2fbcd0b57" status="baddump" />
+				<rom name="xmas15demo.prg" size="131072" crc="376c9fcc" sha1="658929d3377e30469c82b3bf8a66c7d2fbcd0b57" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
@@ -80242,10 +80348,11 @@ be better to redump them properly. -->
 		<description>8-bit Xmas 2016</description>
 		<year>2016</year>
 		<publisher>retroUSB</publisher>
+		<info name="serial" value="RET-X6-GBL"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="8bitxmas" />
 			<dataarea name="prg" size="131072">
-				<rom name="xmas16demo.prg" size="131072" crc="19eb1773" sha1="9a22cb50f0b7d26f81dd0b9f8e3f05e07c3b4834" status="baddump" />
+				<rom name="xmas16demo.prg" size="131072" crc="19eb1773" sha1="9a22cb50f0b7d26f81dd0b9f8e3f05e07c3b4834" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
@@ -80257,11 +80364,12 @@ be better to redump them properly. -->
 		<description>8-bit Xmas 2018</description>
 		<year>2018</year>
 		<publisher>retroUSB</publisher>
+		<info name="serial" value="RET-Y8-GBL"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="8bitxmas" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
-				<rom name="xmas18demo.prg" size="131072" crc="38431bf6" sha1="cb5a7ee17b4a4a7a30d4c98073d107561d903641" status="baddump" />
+				<rom name="xmas18demo.prg" size="131072" crc="38431bf6" sha1="cb5a7ee17b4a4a7a30d4c98073d107561d903641" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
@@ -80273,10 +80381,11 @@ be better to redump them properly. -->
 		<description>8-bit Xmas 2019</description>
 		<year>2019</year>
 		<publisher>retroUSB</publisher>
+		<info name="serial" value="RET-Y9-GBL"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="8bitxmas" />
 			<dataarea name="prg" size="131072">
-				<rom name="xmas19demo.prg" size="131072" crc="3e03466b" sha1="a8cceadd892a8fb4c43ccc660a2073c2d8b2d69e" status="baddump" />
+				<rom name="xmas19demo.prg" size="131072" crc="3e03466b" sha1="a8cceadd892a8fb4c43ccc660a2073c2d8b2d69e" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
@@ -80288,10 +80397,11 @@ be better to redump them properly. -->
 		<description>8-bit Xmas 2020</description>
 		<year>2020</year>
 		<publisher>retroUSB</publisher>
+		<info name="serial" value="RET-Y0-GBL"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="8bitxmas" />
 			<dataarea name="prg" size="131072">
-				<rom name="xmas20demo.prg" size="131072" crc="bad62c7b" sha1="b0d4a83d71e571ab7ba5ba95784498f17b527606" status="baddump" />
+				<rom name="xmas20demo.prg" size="131072" crc="bad62c7b" sha1="b0d4a83d71e571ab7ba5ba95784498f17b527606" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
@@ -80303,11 +80413,12 @@ be better to redump them properly. -->
 		<description>8-bit Xmas 2021</description>
 		<year>2021</year>
 		<publisher>retroUSB</publisher>
+		<info name="serial" value="RET-Y1-GBL"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="8bitxmas" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
-				<rom name="xmas21demo.prg" size="131072" crc="d8ab6288" sha1="8b15b9eff1bcb128ff4969de7a5d4d47b3b2b62f" status="baddump" />
+				<rom name="xmas21demo.prg" size="131072" crc="d8ab6288" sha1="8b15b9eff1bcb128ff4969de7a5d4d47b3b2b62f" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
@@ -80326,10 +80437,10 @@ be better to redump them properly. -->
 			<feature name="slot" value="txrom" />
 			<feature name="pcb_model" value="KB87D" />
 			<dataarea name="prg" size="524288">
-				<rom name="8bit music power.prg" size="524288" crc="104e9410" sha1="2861b2fa673b785b66bf46814735104da9cc61be" status="baddump" />
+				<rom name="8bit music power.prg" size="524288" crc="104e9410" sha1="2861b2fa673b785b66bf46814735104da9cc61be" />
 			</dataarea>
 			<dataarea name="chr" size="262144">
-				<rom name="8bit music power.chr" size="262144" crc="16f15eb6" sha1="09a4204edb35dd742fb3110e68b533661e8ba35e" status="baddump" />
+				<rom name="8bit music power.chr" size="262144" crc="16f15eb6" sha1="09a4204edb35dd742fb3110e68b533661e8ba35e" />
 			</dataarea>
 		</part>
 	</software>
@@ -80345,10 +80456,10 @@ be better to redump them properly. -->
 			<feature name="slot" value="txrom" />
 			<feature name="pcb_model" value="KB87G" />
 			<dataarea name="prg" size="524288">
-				<rom name="8bit music power final.prg" size="524288" crc="c2856b5d" sha1="c97581829fa9738a8ce6eae9b6140b4b81510f66" status="baddump" />
+				<rom name="8bit music power final.prg" size="524288" crc="c2856b5d" sha1="c97581829fa9738a8ce6eae9b6140b4b81510f66" />
 			</dataarea>
 			<dataarea name="chr" size="262144">
-				<rom name="8bit music power final.chr" size="262144" crc="a8c9290a" sha1="11101ef07c2e7d66421e9ca7e7df34a8c300107f" status="baddump" />
+				<rom name="8bit music power final.chr" size="262144" crc="a8c9290a" sha1="11101ef07c2e7d66421e9ca7e7df34a8c300107f" />
 			</dataarea>
 		</part>
 	</software>
@@ -80362,10 +80473,10 @@ be better to redump them properly. -->
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<dataarea name="prg" size="524288">
-				<rom name="8bit rhythm land.prg" size="524288" crc="81dd11d5" sha1="7e257de8dd5103067c66fb13806084d48b028ed5" status="baddump" />
+				<rom name="8bit rhythm land.prg" size="524288" crc="81dd11d5" sha1="7e257de8dd5103067c66fb13806084d48b028ed5" />
 			</dataarea>
 			<dataarea name="chr" size="262144">
-				<rom name="8bit rhythm land.chr" size="262144" crc="884b021f" sha1="2dfffa356308eddbb002cce1a7fdec72dc5c2cae" status="baddump" />
+				<rom name="8bit rhythm land.chr" size="262144" crc="884b021f" sha1="2dfffa356308eddbb002cce1a7fdec72dc5c2cae" />
 			</dataarea>
 		</part>
 	</software>
@@ -80396,7 +80507,7 @@ be better to redump them properly. -->
 			<feature name="slot" value="uxrom" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
-				<rom name="airball (retrousb) (2007).prg" size="131072" crc="3e9d567b" sha1="76c9d4a9b9c1a4b587dd15661e39c68f125628c4" status="baddump" />
+				<rom name="airball (retrousb) (2007).prg" size="131072" crc="3e9d567b" sha1="76c9d4a9b9c1a4b587dd15661e39c68f125628c4" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
@@ -80406,7 +80517,7 @@ be better to redump them properly. -->
 
 	<software name="ao">
 		<description>AO</description>
-		<year>2016</year>
+		<year>2015</year>
 		<publisher>Second Dimension</publisher>
 		<info name="alt_title" value="青"/>
 		<part name="cart" interface="nes_cart">
@@ -80449,7 +80560,7 @@ be better to redump them properly. -->
 			<feature name="slot" value="uxrom" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="262144">
-				<rom name="battle kid - fortress of peril (v1.100).prg" size="262144" crc="aef464ce" sha1="1f5832a163313f930893151a30efb1ebb853b0db" status="baddump" />
+				<rom name="battle kid - fortress of peril (v1.100).prg" size="262144" crc="aef464ce" sha1="1f5832a163313f930893151a30efb1ebb853b0db" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -80467,7 +80578,7 @@ be better to redump them properly. -->
 			<feature name="slot" value="uxrom" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="262144">
-				<rom name="battle kid - fortress of peril (v1.000).prg" size="262144" crc="48bb5a71" sha1="ed2d9137711c022613e4d9d9e4855c31652d7b8c" status="baddump" />
+				<rom name="battle kid - fortress of peril (v1.000).prg" size="262144" crc="48bb5a71" sha1="ed2d9137711c022613e4d9d9e4855c31652d7b8c" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -80485,7 +80596,7 @@ be better to redump them properly. -->
 			<feature name="slot" value="unrom512" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="524288">
-				<rom name="battle kid - fortress of peril (japan) (v2.000).prg" size="524288" crc="fa5d5a4d" sha1="7f142f448bee7972b5cf4feeb427a7f19d78f2e3" status="baddump" />
+				<rom name="battle kid - fortress of peril (japan) (v2.000).prg" size="524288" crc="fa5d5a4d" sha1="7f142f448bee7972b5cf4feeb427a7f19d78f2e3" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -80503,7 +80614,7 @@ be better to redump them properly. -->
 			<feature name="slot" value="unrom512" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="524288">
-				<rom name="battle kid 2 - mountain of torment (v1.000).prg" size="524288" crc="74b823a1" sha1="dcd6870e0d5a79899dce11b975c8a16652fc7143" status="baddump" />
+				<rom name="battle kid 2 - mountain of torment (v1.000).prg" size="524288" crc="74b823a1" sha1="dcd6870e0d5a79899dce11b975c8a16652fc7143" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -80536,7 +80647,7 @@ be better to redump them properly. -->
 			<feature name="slot" value="unrom512" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="524288">
-				<rom name="candelabra - estoscerro.prg" size="524288" crc="acc3e3df" sha1="6b929e2aaaf31b6bcddf530f608612aa5826632f" status="baddump" /> <!-- this is from the .nes file distributed by the author, Sly Dog Studios -->
+				<rom name="candelabra - estoscerro.prg" size="524288" crc="acc3e3df" sha1="6b929e2aaaf31b6bcddf530f608612aa5826632f" /> <!-- this is from the .nes file distributed by the author, Sly Dog Studios -->
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
@@ -80570,7 +80681,7 @@ be better to redump them properly. -->
 			<feature name="slot" value="unrom512" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
-				<rom name="et.prg" size="131072" crc="9e8eca2c" sha1="fa88ca7cadca763eb68e606c97ebf9a4302eedfd" status="baddump" />
+				<rom name="et.prg" size="131072" crc="9e8eca2c" sha1="fa88ca7cadca763eb68e606c97ebf9a4302eedfd" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
@@ -80586,10 +80697,26 @@ be better to redump them properly. -->
 			<feature name="slot" value="2a03pur" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="524288">
-				<rom name="pico.prg" size="524288" crc="0eb47d80" sha1="5a71e9936045df6408926fe9d5d97cd60af359b7" status="baddump" />
+				<rom name="pico.prg" size="524288" crc="0eb47d80" sha1="5a71e9936045df6408926fe9d5d97cd60af359b7" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="getgary">
+		<description>Get'em Gary</description>
+		<year>2016</year>
+		<publisher>Second Dimension</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="32768">
+				<rom name="get'em gary.prg" size="32768" crc="8bfaa4d9" sha1="426420ef1c64173f5c419bebbdef0bcb451ee22e" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="get'em gary.chr" size="8192" crc="276327f8" sha1="37cba87765faf6eda80539c19e7e4df3fb510459" />
 			</dataarea>
 		</part>
 	</software>
@@ -80603,7 +80730,7 @@ be better to redump them properly. -->
 			<feature name="slot" value="cufrom" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
-				<rom name="glider.prg" size="131072" crc="1b00c2b3" sha1="670fbb3c9a3f51a878d68a45930ee3fab4beb8dd" status="baddump" />
+				<rom name="glider.prg" size="131072" crc="1b00c2b3" sha1="670fbb3c9a3f51a878d68a45930ee3fab4beb8dd" />
 			</dataarea>
 			<!-- 32k VRAM on cartridge -->
 			<dataarea name="vram" size="32768">
@@ -80642,10 +80769,10 @@ be better to redump them properly. -->
 			<feature name="slot" value="txrom" />
 			<feature name="pcb_model" value="KB87G" />
 			<dataarea name="prg" size="262144">
-				<rom name="kira kira star night dx.prg" size="262144" crc="35f72799" sha1="a865787e66b5e3c604b895ba92ef16f509bd79d3" status="baddump" />
+				<rom name="kira kira star night dx.prg" size="262144" crc="35f72799" sha1="a865787e66b5e3c604b895ba92ef16f509bd79d3" />
 			</dataarea>
 			<dataarea name="chr" size="262144">
-				<rom name="kira kira star night dx.chr" size="262144" crc="baeb2c47" sha1="3a9f35bfaa920633ca96eb7df5a26b25688f6984" status="baddump" />
+				<rom name="kira kira star night dx.chr" size="262144" crc="baeb2c47" sha1="3a9f35bfaa920633ca96eb7df5a26b25688f6984" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -80663,7 +80790,7 @@ be better to redump them properly. -->
 			<feature name="slot" value="unrom512" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="524288">
-				<rom name="larry and the long look for a luscious lover (khan games) (2014).prg" size="524288" crc="8bc0340c" sha1="c21f74fcac66f74a248c831eda1b84c0bdf5a3e0" status="baddump" />
+				<rom name="larry and the long look for a luscious lover (khan games) (2014).prg" size="524288" crc="8bc0340c" sha1="c21f74fcac66f74a248c831eda1b84c0bdf5a3e0" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
@@ -80679,7 +80806,7 @@ be better to redump them properly. -->
 			<feature name="slot" value="unrom512" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="524288">
-				<rom name="legends of owlia (gradual games) (2016).prg" size="524288" crc="95dfc71c" sha1="1680c45e7bb1a67d754b4fef5046c6ecf16d3da4" status="baddump" />
+				<rom name="legends of owlia (gradual games) (2016).prg" size="524288" crc="95dfc71c" sha1="1680c45e7bb1a67d754b4fef5046c6ecf16d3da4" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
@@ -80696,10 +80823,43 @@ be better to redump them properly. -->
 			<feature name="slot" value="uxrom" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
-				<rom name="the mad wizard - a candelabra chronicle.prg" size="131072" crc="b4a7b014" sha1="c3b49ba3dd16ac203af6a43b29a8b61add21c118" status="baddump" /> <!-- this is from the .nes file distributed by the author, Sly Dog Studios -->
+				<rom name="the mad wizard - a candelabra chronicle.prg" size="131072" crc="b4a7b014" sha1="c3b49ba3dd16ac203af6a43b29a8b61add21c118" /> <!-- this is from the .nes file distributed by the author, Sly Dog Studios -->
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mglider" supported="partial"> <!-- Save not implemented -->
+		<description>More Glider</description>
+		<year>2016</year>
+		<publisher>retroUSB</publisher>
+		<info name="serial" value="RET-MG-GBL"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unrom512" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="524288">
+				<rom name="more glider.prg" size="524288" crc="02196a3e" sha1="e7a0289c5957e7c6bcf053df45a0563c7f20620e" />
+			</dataarea>
+			<!-- 32k VRAM on cartridge? -->
+			<dataarea name="vram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="multidude">
+		<description>Multidude</description>
+		<year>2019</year> <!-- original digital release 20150214 -->
+		<publisher>Mega Cat Studios</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="32768">
+				<rom name="multidude.prg" size="32768" crc="d98ebe33" sha1="14b278b01ea207cf765def8b96a65f661cec6ac3" /> <!-- these are from the .nes file distributed by the author, RetroSouls -->
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="multidude.chr" size="8192" crc="08d6ea77" sha1="f1f55e1cc7bfdd1d4f571daf9eab29e889a4ecd4" />
 			</dataarea>
 		</part>
 	</software>
@@ -80713,7 +80873,7 @@ be better to redump them properly. -->
 			<feature name="slot" value="unrom512" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="65536">
-				<rom name="mystic pillars (sivak games) (2008).prg" size="65536" crc="318c0a59" sha1="21a75108278a6d311f652c34430e30f3522cf742" status="baddump" />
+				<rom name="mystic pillars (sivak games) (2008).prg" size="65536" crc="318c0a59" sha1="21a75108278a6d311f652c34430e30f3522cf742" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
@@ -80730,10 +80890,10 @@ be better to redump them properly. -->
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<dataarea name="prg" size="524288">
-				<rom name="neo heiankyo alien.prg" size="524288" crc="b0fc6145" sha1="a8178c5293aafc2c6dc6d78c5fe4239edfff8395" status="baddump" />
+				<rom name="neo heiankyo alien.prg" size="524288" crc="b0fc6145" sha1="a8178c5293aafc2c6dc6d78c5fe4239edfff8395" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="neo heiankyo alien.chr" size="131072" crc="3f726765" sha1="879cb8c5a38295008aa08a79c69388d55292a249" status="baddump" />
+				<rom name="neo heiankyo alien.chr" size="131072" crc="3f726765" sha1="879cb8c5a38295008aa08a79c69388d55292a249" />
 			</dataarea>
 		</part>
 	</software>
@@ -80755,7 +80915,7 @@ be better to redump them properly. -->
 	</software>
 
 	<software name="nomolos">
-		<description>Nomolos - Storming the Catsle</description>
+		<description>Nomolos - Storming the Catsle (v1.01)</description>
 		<year>2014</year>
 		<publisher>RetroZone</publisher> <!-- also re-released by Infinite NES Lives -->
 		<info name="serial" value="GRD-NM-GBL"/>
@@ -80763,10 +80923,44 @@ be better to redump them properly. -->
 			<feature name="slot" value="unrom512" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="524288">
-				<rom name="nomolos - storming the catsle (gradual games) (2012).prg" size="524288" crc="222b13a0" sha1="e0c33747107ba715bf3689429fbdb3b0caedac64" status="baddump" />
+				<rom name="nomolos - storming the catsle (gradual games) (2012).prg" size="524288" crc="222b13a0" sha1="e0c33747107ba715bf3689429fbdb3b0caedac64" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nomolos1" cloneof="nomolos">
+		<description>Nomolos - Storming the Catsle (v1.00)</description>
+		<year>2012</year>
+		<publisher>RetroZone</publisher>
+		<info name="serial" value="GRD-NM-GBL"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="262144">
+				<rom name="nomolos - storming the catsle v1.00.prg" size="262144" crc="675bd9cb" sha1="5e90a49b4df1230bd1957d5ca43b097afb4310f8" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="questfor">
+		<description>Quest Forge - By Order of Kings</description>
+		<year>2015</year>
+		<publisher>Piko Interactive</publisher>
+		<info name="release" value="20150904"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="questforge.prg" size="32768" crc="982c8405" sha1="df35a8c0639a08e4c7d406d8fa046480a00aa0e5" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="questforge.chr" size="8192" crc="e1aae1ed" sha1="a8c46107a4a1de85f8380840132b68b0f4554930" />
 			</dataarea>
 		</part>
 	</software>
@@ -80779,7 +80973,7 @@ be better to redump them properly. -->
 			<feature name="slot" value="smd133" />
 			<feature name="smd133-addr" value="6K" />
 			<dataarea name="prg" size="524288">
-				<rom name="rainbow brite - journey to rainbow land.prg" size="524288" crc="660750fe" sha1="acad918691f4346c15d0d991a14059dc2ea5a6f6" status="baddump" />
+				<rom name="rainbow brite - journey to rainbow land.prg" size="524288" crc="660750fe" sha1="acad918691f4346c15d0d991a14059dc2ea5a6f6" />
 			</dataarea>
 			<!-- 128k VRAM on cartridge -->
 			<dataarea name="vram" size="131072">
@@ -80799,7 +80993,7 @@ be better to redump them properly. -->
 			<feature name="slot" value="uxrom" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
-				<rom name="the rise of amondus.prg" size="131072" crc="825313ca" sha1="f796b7d700bd2aca18b17036e7146ef955395e4f" status="baddump" /> <!-- this is from the .nes file distributed by the author, Sly Dog Studios -->
+				<rom name="the rise of amondus.prg" size="131072" crc="825313ca" sha1="f796b7d700bd2aca18b17036e7146ef955395e4f" /> <!-- this is from the .nes file distributed by the author, Sly Dog Studios -->
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
@@ -80811,6 +81005,7 @@ be better to redump them properly. -->
 		<description>Solaris</description>
 		<year>2016</year>
 		<publisher>retroUSB</publisher>
+		<info name="serial" value="RET-SL-GBL"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="unrom512" />
 			<feature name="mirroring" value="vertical" />
@@ -80838,6 +81033,22 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="spainter">
+		<description>Super Painter</description>
+		<year>2019</year> <!-- original digital release 20150127 -->
+		<publisher>Mega Cat Studios</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="superpainter.prg" size="32768" crc="6fafa01f" sha1="0965bd6ce34abcca6b1b92199bac6999590df12d" /> <!-- these are from the .nes file distributed by the author, RetroSouls -->
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="superpainter.chr" size="8192" crc="05877e58" sha1="872c9acf705226a1a31e1f5dcd4fca6818aebddd" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="superrr">
 		<description>Super Russian Roulette</description>
 		<year>2017</year>
@@ -80847,13 +81058,13 @@ be better to redump them properly. -->
 			<feature name="mirroring" value="vertical" />
 			<feature name="peripheral" value="zapper" />
 			<dataarea name="prg" size="262144">
-				<rom name="super russian roulette.prg" size="262144" crc="d29e7bd7" sha1="bea73714080dfa2747a526724255fe34a381b0a0" status="baddump" />
+				<rom name="super russian roulette.prg" size="262144" crc="d29e7bd7" sha1="bea73714080dfa2747a526724255fe34a381b0a0" />
 			</dataarea>
 			<dataarea name="chr" size="262144">
-				<rom name="super russian roulette.chr" size="262144" crc="6ba75953" sha1="93153b472c9a36e26e0d9243b9dee1bfacdaa3f8" status="baddump" />
+				<rom name="super russian roulette.chr" size="262144" crc="6ba75953" sha1="93153b472c9a36e26e0d9243b9dee1bfacdaa3f8" />
 			</dataarea>
 			<dataarea name="dpcm" size="8388608">
-				<rom name="super russian roulette.dpcm" size="8388608" crc="e880dbe6" sha1="b05f2bd2845c3ec3aa63d7aec855c23058fc8412" status="baddump" />
+				<rom name="super russian roulette.dpcm" size="8388608" crc="e880dbe6" sha1="b05f2bd2845c3ec3aa63d7aec855c23058fc8412" />
 			</dataarea>
 		</part>
 	</software>
@@ -80885,10 +81096,10 @@ be better to redump them properly. -->
 			<feature name="slot" value="cnrom" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
-				<rom name="ultimate frogger champion.prg" size="32768" crc="c9c408cf" sha1="89cbc3856737967849278c0f60aa7b25d01cef4f" status="baddump" /> <!-- this is from the .nes file distributed by the author, KHAN Games -->
+				<rom name="ultimate frogger champion.prg" size="32768" crc="c9c408cf" sha1="89cbc3856737967849278c0f60aa7b25d01cef4f" /> <!-- this is from the .nes file distributed by the author, KHAN Games -->
 			</dataarea>
 			<dataarea name="chr" size="16384">
-				<rom name="ultimate frogger champion.chr" size="16384" crc="96a3389f" sha1="5662ac095f8d6fad77c79fd356ccea41baef9944" status="baddump" />
+				<rom name="ultimate frogger champion.chr" size="16384" crc="96a3389f" sha1="5662ac095f8d6fad77c79fd356ccea41baef9944" />
 			</dataarea>
 		</part>
 	</software>
@@ -80920,7 +81131,7 @@ be better to redump them properly. -->
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="action53" />
 			<dataarea name="prg" size="524288">
-				<rom name="action 53 volume 1.prg" size="524288" crc="6441e8f6" sha1="da92a26ecc64767fdbb63ab8b2d9e7dcd7884fcc" status="baddump" />
+				<rom name="action 53 volume 1.prg" size="524288" crc="6441e8f6" sha1="da92a26ecc64767fdbb63ab8b2d9e7dcd7884fcc" />
 			</dataarea>
 			<!-- 32k VRAM on cartridge? -->
 			<dataarea name="vram" size="32768">
@@ -80935,7 +81146,7 @@ be better to redump them properly. -->
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="action53" />
 			<dataarea name="prg" size="524288">
-				<rom name="action 53 volume 2.prg" size="524288" crc="6e61971f" sha1="cb2c6dc8c8be3ee738ad8a793a75475553506e14" status="baddump" />
+				<rom name="action 53 volume 2.prg" size="524288" crc="6e61971f" sha1="cb2c6dc8c8be3ee738ad8a793a75475553506e14" />
 			</dataarea>
 			<!-- 32k VRAM on cartridge? -->
 			<dataarea name="vram" size="32768">
@@ -80950,7 +81161,7 @@ be better to redump them properly. -->
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="action53" />
 			<dataarea name="prg" size="1048576">
-				<rom name="action 53 volume 3.prg" size="1048576" crc="660f8e82" sha1="85c67c171f77a47566f4b9ead1a352c02e2e07a6" status="baddump" />
+				<rom name="action 53 volume 3.prg" size="1048576" crc="660f8e82" sha1="85c67c171f77a47566f4b9ead1a352c02e2e07a6" />
 			</dataarea>
 			<!-- 32k VRAM on cartridge? Sinking Feeling needs this much. -->
 			<dataarea name="vram" size="32768">
@@ -85427,16 +85638,16 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-<!-- This dump is supposed to be bad: all other carts with the same PCB have switched CHR bank order, redump needed to check why this is different -->
+<!-- A dump with swapped 256K CHR pages exists (CRC f1310012). It's not clear if this has been properly redumped to determine which is the correct order. -->
 	<software name="mc_mario">
-		<description>Mario 7 in 1 (Bad Dump)</description>
+		<description>Mario 7 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_mario7in1" />
-			<feature name="pcb" value="BMC-MARIOPARTY-7IN1" />
+			<feature name="slot" value="bmc_gold7in1" />
+			<feature name="pcb" value="BMC-GOLD-7IN1" />
 			<dataarea name="chr" size="1048576">
-				<rom name="mario 7-in-1 [p1].chr" size="1048576" crc="f1310012" sha1="42378af64fc6356ec7d85b6e49b934287d2b6f15" offset="00000" status="baddump" />
+				<rom name="mario 7-in-1 [p1].chr" size="1048576" crc="29fa219f" sha1="28a77600426a6be233717ec60b84e9eb8a4ba637" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="1048576">
 				<rom name="mario 7-in-1 [p1].prg" size="1048576" crc="c021a8b9" sha1="4fe43bef9d9217881b7c8ece0007dc4cd830fbec" offset="00000" status="baddump" />

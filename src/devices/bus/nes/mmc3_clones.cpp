@@ -73,7 +73,6 @@ DEFINE_DEVICE_TYPE(NES_BMC_JY302,     nes_bmc_jy302_device,     "nes_bmc_jy302",
 DEFINE_DEVICE_TYPE(NES_BMC_KC885,     nes_bmc_kc885_device,     "nes_bmc_kc885",     "NES Cart BMC KC885 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_SFC12,     nes_bmc_sfc12_device,     "nes_bmc_sfc12",     "NES Cart BMC SFC-12 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_HIK4,      nes_bmc_hik4_device,      "nes_bmc_hik4",      "NES Cart BMC HIK 4 in 1 PCB")
-DEFINE_DEVICE_TYPE(NES_BMC_MARIO7IN1, nes_bmc_mario7in1_device, "nes_bmc_mario7in1", "NES Cart BMC Mario 7 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_F15,       nes_bmc_f15_device,       "nes_bmc_f15",       "NES Cart BMC F-15 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_F600,      nes_bmc_f600_device,      "nes_bmc_f600",      "NES Cart BMC F600 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GN45,      nes_bmc_gn45_device,      "nes_bmc_gn45",      "NES Cart BMC GN-45 PCB")
@@ -407,11 +406,6 @@ nes_bmc_hik4_device::nes_bmc_hik4_device(const machine_config &mconfig, const ch
 {
 }
 
-nes_bmc_mario7in1_device::nes_bmc_mario7in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_txrom_device(mconfig, NES_BMC_MARIO7IN1, tag, owner, clock), m_reg_written(0)
-{
-}
-
 nes_bmc_f15_device::nes_bmc_f15_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_txrom_device(mconfig, NES_BMC_F15, tag, owner, clock)
 {
@@ -429,8 +423,8 @@ nes_bmc_gn45_device::nes_bmc_gn45_device(const machine_config &mconfig, const ch
 {
 }
 
-nes_bmc_gold7in1_device::nes_bmc_gold7in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_txrom_device(mconfig, NES_BMC_GOLD7IN1, tag, owner, clock), m_reg_written(0)
+nes_bmc_gold7in1_device::nes_bmc_gold7in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_BMC_GOLD7IN1, tag, owner, clock), m_lock(false)
 {
 }
 
@@ -899,20 +893,6 @@ void nes_bmc_hik4_device::pcb_reset()
 	mmc3_common_initialize(0x0f, 0x7f, 0);
 }
 
-void nes_bmc_mario7in1_device::device_start()
-{
-	mmc3_start();
-	save_item(NAME(m_reg_written));
-}
-
-void nes_bmc_mario7in1_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-
-	m_reg_written = 0;
-	mmc3_common_initialize(0x1f, 0xff, 0);
-}
-
 void nes_bmc_f15_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
@@ -950,14 +930,12 @@ void nes_bmc_gn45_device::pcb_reset()
 void nes_bmc_gold7in1_device::device_start()
 {
 	mmc3_start();
-	save_item(NAME(m_reg_written));
+	save_item(NAME(m_lock));
 }
 
 void nes_bmc_gold7in1_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-
-	m_reg_written = 0;
+	m_lock = false;
 	mmc3_common_initialize(0x1f, 0xff, 0);
 }
 
@@ -2888,47 +2866,6 @@ void nes_bmc_hik4_device::write_m(offs_t offset, u8 data)
 
 /*-------------------------------------------------
 
- BMC-MARIOPARTY-7IN1
-
- Known Boards: Unknown Multigame Bootleg Board
- Games: Mario 7 in 1
-
- MMC3 clone
-
- iNES: mapper 52
-
- In MESS: Supported.
-
- -------------------------------------------------*/
-
-void nes_bmc_mario7in1_device::write_m(offs_t offset, uint8_t data)
-{
-	uint8_t helper1, helper2;
-	LOG_MMC(("bmc_mario7in1 write_m, offset: %04x, data: %02x\n", offset, data));
-
-	/* mid writes only work when WRAM is enabled. not sure if I should
-	 change the condition to m_map52_reg_written == 0x80 (i.e. what is the effect of
-	 the read-only bit?) and it only can happen once! */
-	if ((m_wram_protect & 0x80) && !m_reg_written)
-	{
-		helper1 = (data & 0x08);
-		helper2 = (data & 0x40);
-
-		m_prg_base = helper1 ? ((data & 0x07) << 4) : ((data & 0x06) << 4);
-		m_prg_mask = helper1 ? 0x0f : 0x1f;
-		m_chr_base = ((data & 0x20) << 4) | ((data & 0x04) << 6) | (helper2 ? ((data & 0x10) << 3) : 0);
-		m_chr_mask = helper2 ? 0x7f : 0xff;
-		set_prg(m_prg_base, m_prg_mask);
-		set_chr(m_chr_source, m_chr_base, m_chr_mask);
-
-		m_reg_written = 1;
-	}
-	else
-		m_prgram[offset] = data;
-}
-
-/*-------------------------------------------------
-
  BMC-A88S-1
 
  Games: 1997 Super 7 in 1, 6 in 1 (JY-201 to JY-206)
@@ -3152,36 +3089,34 @@ void nes_bmc_gn45_device::write_m(offs_t offset, u8 data)
  Known Boards: Unknown Multigame Bootleg Board
  Games: Super HIK Gold 7 in 1, Golden 7 in 1 and many more
 
- MMC3 clone, same as BMC-MARIOPARTY-7IN1 but with switched CHR
- bank lines
+ MMC3 clone with banking for multigame menu.
 
  iNES: mapper 52
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_bmc_gold7in1_device::write_m(offs_t offset, uint8_t data)
+void nes_bmc_gold7in1_device::write_m(offs_t offset, u8 data)
 {
-	uint8_t helper1, helper2;
 	LOG_MMC(("bmc_gold7in1 write_m, offset: %04x, data: %02x\n", offset, data));
 
-	if ((m_wram_protect & 0x80) && !m_reg_written)
+	if ((m_wram_protect & 0xc0) == 0x80 && !m_lock)
 	{
-		helper1 = (data & 0x08);
-		helper2 = (data & 0x40);
+		u8 prg128k = BIT(data, 3);
+		u8 chr128k = BIT(data, 6);
 
-		m_prg_base = helper1 ? ((data & 0x07) << 4) : ((data & 0x06) << 4);
-		m_prg_mask = helper1 ? 0x0f : 0x1f;
-		m_chr_base = ((data & 0x20) << 3) | ((data & 0x04) << 7) | (helper2 ? ((data & 0x10) << 3) : 0);
-		m_chr_mask = helper2 ? 0x7f : 0xff;
+		m_prg_base = (data & (0x06 | prg128k)) << 4;
+		m_prg_mask = 0x1f >> prg128k;
+		m_chr_base = (bitswap<3>(data, 2, 5, 4) & (0x06 | chr128k)) << 7;
+		m_chr_mask = 0xff >> chr128k;
 		set_prg(m_prg_base, m_prg_mask);
 		set_chr(m_chr_source, m_chr_base, m_chr_mask);
 
-		m_reg_written = BIT(data, 7); // mc_2hikg & mc_s3nt3 write here multiple time
+		m_lock = BIT(data, 7); // mc_2hikg & mc_s3nt3 write here multiple time
 	}
 	else
-		m_prgram[offset] = data;
+		nes_txrom_device::write_m(offset, data);  // write WRAM
 }
 
 /*-------------------------------------------------

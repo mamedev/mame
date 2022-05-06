@@ -64,7 +64,6 @@ private:
 	u8 m_led_data = 0;
 };
 
-
 void mondial2_state::machine_start()
 {
 	save_item(NAME(m_keypad_mux));
