@@ -35,6 +35,12 @@ Known Non-Issues (confirmed on Real Genesis)
 
 void md_base_state::megadriv_z80_bank_w(uint16_t data)
 {
+	// TODO: menghu crashes here
+	// Tries to setup a bank of 0xff0000 from z80 side (PC=1131) after you talk with the cashier twice.
+	// Without a guard over it game will trash 68k memory causing a crash, works on real HW with everdrive
+	// so not coming from a cart copy protection.
+	// Update: it breaks cfodder BGM on character select at least, therefore we current don't guard against it
+	// Apparently reading 68k RAM from z80 is not recommended by Sega, so *writing* isn't possible lacking bus grant?
 	m_genz80.z80_bank_addr = ((m_genz80.z80_bank_addr >> 1) | (data << 23)) & 0xff8000;
 }
 
@@ -47,16 +53,10 @@ void md_base_state::megadriv_68k_z80_bank_write(uint16_t data)
 void md_base_state::megadriv_z80_z80_bank_w(uint8_t data)
 {
 	//LOG("%04x: z80 writing bit to bank register %01x\n", m_maincpu->pc(),data&0x01);
-	// TODO: menghu tries to write 8 times 0xff from z80 side after you talk with the cashier twice.
-	// Without a guard over it game will trash 68k memory causing a crash, apparently works on real HW with everdrive
-	// so not coming from a cart copy protection.
-	// Update: it breaks cfodder BGM on character select at least, therefore we current don't guard against it
-//	if (data == 0xff)
-//	{
-	LOG("%s: port $6000 write 0x%02x\n", machine().describe_context(), data);
-//		return;
-//	}
+
+	LOG("%s: port $6000 write 0x%02x ", machine().describe_context(), data);
 	megadriv_z80_bank_w(data & 0x01);
+	LOG("Current bank %08x\n", m_genz80.z80_bank_addr);
 }
 
 uint8_t md_base_state::megadriv_68k_YM2612_read(offs_t offset, uint8_t mem_mask)
@@ -532,18 +532,20 @@ void md_base_state::megadriv_68k_write_z80_ram(offs_t offset, uint16_t data, uin
 	}
 }
 
-
+/*
+ * ddragon, beast, superoff, and timekill have buggy sound programs.
+ * They request the bus, then have a loop which waits for the bus
+ * to be unavailable, checking for a 0 value due to bad coding.  The real hardware
+ * appears to return bits of the next instruction in the unused bits, thus meaning
+ * the value is never zero.  Time Killers is the most fussy, and doesn't like the
+ * read_next_instruction function from system16, so I just return a random value
+ * in the unused bits
+ */
 uint16_t md_base_state::megadriv_68k_check_z80_bus(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t retvalue;
 
-	/* Double Dragon, Shadow of the Beast, Super Off Road, and Time Killers have buggy
-	   sound programs.  They request the bus, then have a loop which waits for the bus
-	   to be unavailable, checking for a 0 value due to bad coding.  The real hardware
-	   appears to return bits of the next instruction in the unused bits, thus meaning
-	   the value is never zero.  Time Killers is the most fussy, and doesn't like the
-	   read_next_instruction function from system16, so I just return a random value
-	   in the unused bits */
+
 	uint16_t nextvalue = machine().rand();//read_next_instruction(space)&0xff00;
 
 
@@ -580,6 +582,7 @@ uint16_t md_base_state::megadriv_68k_check_z80_bus(offs_t offset, uint16_t mem_m
 TIMER_CALLBACK_MEMBER(md_base_state::megadriv_z80_run_state)
 {
 	/* Is the z80 RESET line pulled? */
+	// TODO: Z80 /RESET
 	if (m_genz80.z80_is_reset)
 	{
 		m_z80snd->reset();
@@ -589,6 +592,7 @@ TIMER_CALLBACK_MEMBER(md_base_state::megadriv_z80_run_state)
 	else
 	{
 		/* Check if z80 has the bus */
+		// TODO: Z80 /BUSREQ
 		if (m_genz80.z80_has_bus)
 			m_z80snd->resume(SUSPEND_REASON_HALT);
 		else

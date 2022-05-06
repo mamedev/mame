@@ -64,7 +64,7 @@ TODO:
 - Phantasy Star (serial G-4534, pstarjmd) is actually a SMS cart in MD shell,
   which works in the MD thanks to VDP compatibility mode.
   The dump needs to be ported from sms.xml and a specific cart slot override needs to be added here.
-
+- Identify the <unlicensed> games, in particular the "(Chi)" releases which most likely are actually Taiwanese.
 
 Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
@@ -104,11 +104,11 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 <!-- Fully documented: confirmed dumps + PCB pics -->
 
 
-	<!-- Game is switched on reset -->
 	<software name="2fdizcsp">
 		<description>2 in 1 - Fantastic Dizzy &amp; Cosmic Spacehead (Euro)</description>
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
+		<info name="usage" value="Games are switchable with reset button"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_cm2in1"/>
 			<feature name="pcb" value="SR16V7-2"/>
@@ -1358,10 +1358,13 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 		</part>
 	</software>
 
-	<software name="cfodder">
+	<software name="cfodder" supported="partial">
 		<description>Cannon Fodder (Euro)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
+		<notes><![CDATA[
+Unsupported [Sega Mouse] peripheral
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-17322-H"/>
@@ -2206,6 +2209,9 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 		<description>Bram Stoker's Dracula (Euro)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
+		<notes><![CDATA[
+No [VDP] sprites
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B"/>
 			<feature name="u1" value="MPR-15828-F"/>  <!-- location not really marked on PCB, using u1 for consistency -->
@@ -3161,10 +3167,13 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 	</software>
 
 
-	<software name="funngame">
+	<software name="funngame" supported="partial">
 		<description>Fun 'N Games (Euro)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
+		<notes><![CDATA[
+Unsupported [Sega Mouse] peripheral
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
@@ -4141,10 +4150,13 @@ Moans about [Sega Mega Modem] not hooked up, punts to a red screen
 	</software>
 
 
-	<software name="jimmywws">
+	<software name="jimmywws" supported="partial">
 		<description>Jimmy White's Whirlwind Snooker (Euro)</description>
 		<year>1991</year>
 		<publisher>Virgin Games</publisher>
+		<notes><![CDATA[
+Unsupported [Sega Mouse] peripheral
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703"/>
 			<feature name="ic1" value="MPR-17299-F"/>
@@ -4620,10 +4632,13 @@ Moans about [Sega Mega Modem] not hooked up, punts to a red screen
 	</software>
 
 
-	<software name="lemming2">
+	<software name="lemming2" supported="partial">
 		<description>Lemmings 2 - The Tribes (Euro)</description>
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
+		<notes><![CDATA[
+Unsupported [Sega Mouse] peripheral
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
@@ -7210,10 +7225,13 @@ Unsupported [Menacer] peripheral
 	</software>
 
 
-	<software name="shangh2">
+	<software name="shangh2" supported="partial">
 		<description>Shanghai II - Dragon's Eye (USA)</description>
 		<year>1994</year>
 		<publisher>Activision</publisher>
+		<notes><![CDATA[
+Unsupported [Sega Mouse] peripheral
+]]></notes>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="800057-02"/>
@@ -9999,7 +10017,7 @@ but dumps still have to be confirmed.
 -->
 
 	<software name="13mahjan" supported="yes">
-		<description>13 Ma Jiang - 98 Mei Shao Nu (Chi)</description>
+		<description>13 Ma Jiang - 98 Mei Shao Nu (Tw)</description>
 		<year>1998</year>
 		<publisher>BBD</publisher>
 		<info name="alt_title" value="十三張麻將 98'美少女"/>
@@ -11456,10 +11474,14 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 	</software>
 
 	<software name="barver">
-		<description>Barver Battle Saga - Tai Kong Zhan Shi - Mo Fa Zhan Shi (Chi)</description>
+		<description>Barver Battle Saga - Tai Kong Zhan Shi - Mo Fa Zhan Shi (Tw)</description>
 		<year>1996</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<notes><![CDATA[
+https://bootleggames.fandom.com/wiki/Barver_Battle_Saga:_Tai_Kong_Zhan_Shi
+]]></notes>
 		<info name="alt_title" value="太空戰士 魔法戰士"/>
+		<info name="developer" value="Chuanpu"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -11594,7 +11616,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 	<software name="btlchess">
 		<description>Zhan Qi - Chinese Battle Chess (Tw)</description>
 		<year>199?</year>
-		<publisher>Creaton</publisher>
+		<publisher>Creaton Softech</publisher>
 		<info name="alt_title" value="戦棊 - Chinese Battle Chess"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -12157,6 +12179,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
 Unsupported [Menacer] peripheral (joypad works)
+Unsupported [Sega Mouse] peripheral
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
@@ -12381,6 +12404,9 @@ Unsupported [Menacer] peripheral (joypad works)
 		<description>Bram Stoker's Dracula (USA)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
+		<notes><![CDATA[
+No [VDP] sprites
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="bram stoker's dracula (usa).bin" size="1048576" crc="077084a6" sha1="4ede0e75054655acab63f2a41b8c57e1cf137e58"/>
@@ -12793,9 +12819,13 @@ Unsupported [Menacer] peripheral (joypad works)
 	</software>
 
 	<software name="cjfuweng">
-		<description>Chao Ji Da Fu Weng (Chi)</description>
-		<year>199?</year>
-		<publisher>Gametec?</publisher>
+		<description>Chao Ji Da Fu Weng (Tw)</description>
+		<!-- 1994 or 1995 -->
+		<year>1994?</year>
+		<publisher>Gametec</publisher>
+		<notes><![CDATA[
+https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
+]]></notes>
 		<info name="alt_title" value="超級大富翁"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -16060,9 +16090,12 @@ Choppy timings during gameplay (btanb?)
 	</software>
 
 	<software name="fengkuan">
-		<description>Feng Kuang Tao Hua Yuan (Chi)</description>
+		<description>Feng Kuang Tao Hua Yuan (Tw)</description>
 		<year>199?</year>
-		<publisher>Creaton</publisher>
+		<publisher>Creaton Softech</publisher>
+		<notes><![CDATA[
+https://segaretro.org/Feng_Kuang_Tao_Hua_Yuan
+]]></notes>
 		<info name="alt_title" value="瘋狂桃花源"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_mjlov"/>
@@ -16073,9 +16106,9 @@ Choppy timings during gameplay (btanb?)
 	</software>
 
 	<software name="fengkuan1" cloneof="fengkuan">
-		<description>Feng Kuang Tao Hua Yuan (Chi, Unprotected)</description>
+		<description>Feng Kuang Tao Hua Yuan (Tw, Unprotected)</description>
 		<year>199?</year>
-		<publisher>Creaton</publisher>
+		<publisher>Creaton Softech</publisher>
 		<info name="alt_title" value="瘋狂桃花源"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -16085,9 +16118,12 @@ Choppy timings during gameplay (btanb?)
 	</software>
 
 	<software name="fengshen">
-		<description>Feng Shen Ying Jie Chuan (Chi)</description>
+		<description>Feng Shen Ying Jie Chuan (Tw)</description>
 		<year>1996</year>
 		<publisher>Chuanpu Technologies</publisher>
+		<notes><![CDATA[
+https://segaretro.org/Feng_Shen_Ying_Jie_Chuan
+]]></notes>
 		<info name="alt_title" value="封神英傑傳"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -16097,7 +16133,7 @@ Choppy timings during gameplay (btanb?)
 	</software>
 
 	<software name="fengshena" cloneof="fengshen">
-		<description>Feng Shen Ying Jie Zhuan (Chi, Alt?)</description>
+		<description>Feng Shen Ying Jie Chuan (Tw, Alt?)</description>
 		<year>1996</year>
 		<publisher>Chuanpu Technologies</publisher>
 		<info name="alt_title" value="封神英傑傳"/>
@@ -17829,10 +17865,13 @@ Choppy timings during gameplay (btanb?)
 		</part>
 	</software>
 
-	<software name="janout">
+	<software name="janout" supported="partial">
 		<description>Janou Touryuumon (Jpn)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Unsupported [Sega Mouse] peripheral
+]]></notes>
 		<info name="serial" value="G-4096"/>
 		<info name="release" value="19931105"/>
 		<info name="alt_title" value="日本プロ麻雀連盟公認 雀皇登龍門"/>
@@ -18702,10 +18741,13 @@ Choppy timings during gameplay (btanb?)
 		</part>
 	</software>
 
-	<software name="lemming2u" cloneof="lemming2">
+	<software name="lemming2u" cloneof="lemming2" supported="partial">
 		<description>Lemmings 2 - The Tribes (USA)</description>
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
+		<notes><![CDATA[
+Unsupported [Sega Mouse] peripheral
+]]></notes>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -18916,13 +18958,17 @@ Unsupported [Justifier] peripheral (joypad works)
 		</part>
 	</software>
 
-	<software name="lordmon">
+	<software name="lordmon" supported="partial">
 		<description>Lord Monarch - Tokoton Sentou Densetsu (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Unsupported [Sega Mouse] peripheral
+]]></notes>
 		<info name="serial" value="G-5534"/>
 		<info name="release" value="19940624"/>
 		<info name="alt_title" value="ロードモナーク とことん戦闘伝説"/>
+		<info name="compatibility" value="NTSC-J,PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -18998,9 +19044,12 @@ Unsupported [Justifier] peripheral (joypad works)
 	</software>
 
 	<software name="maqiao">
-		<description>Ma Qiao E Mo Ta - Devilish Mahjong Tower (Chi)</description>
+		<description>Ma Qiao E Mo Ta - Devilish Mahjong Tower (Tw)</description>
 		<year>1994</year>
 		<publisher>C&amp;E</publisher>
+		<notes><![CDATA[
+https://segaretro.org/Ma_Qiao_E_Mo_Ta:_Devilish_Mahjong_Tower
+]]></notes>
 		<info name="alt_title" value="麻雀惡魔塔"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -19294,10 +19343,13 @@ Unsupported [Justifier] peripheral (joypad works)
 		</part>
 	</software>
 
-	<software name="marblej">
+	<software name="marblej" supported="partial">
 		<description>Marble Madness (Japan)</description>
 		<year>1993</year>
 		<publisher>Tengen</publisher>
+		<notes><![CDATA[
+Unsupported [Sega Mouse] peripheral (trackball)
+]]></notes>
 		<info name="serial" value="T-48113"/>
 		<info name="release" value="19930813"/>
 		<info name="alt_title" value="マーブル マッドネス"/>
@@ -19670,13 +19722,14 @@ Unsupported [Justifier] peripheral (joypad works)
 		</part>
 	</software>
 
-	<software name="menghu" supported="yes">
-		<description>Meng Huan Shui Guo Pan - 777 Casino (Chi)</description>
+	<software name="menghu" supported="no">
+		<description>Meng Huan Shui Guo Pan - 777 Casino (Tw)</description>
 		<!-- Definitely not earlier than '94 -->
 		<year>1996?</year>
 		<publisher>City Man</publisher>
 		<notes><![CDATA[
 https://bootleggames.fandom.com/wiki/777_Casino
+Crashes when you talk with the cashier twice
 Needs [megadriv_z80_z80_bank_w] workaround to work (emulator copy protection?)
 ]]></notes>
 		<info name="serial" value="GM-95002"/>
@@ -21900,10 +21953,13 @@ Unemulated [Sega Mega Modem] features
 		</part>
 	</software>
 
-	<software name="nobuhao">
+	<software name="nobuhao" supported="partial">
 		<description>Nobunaga no Yabou - Haouden (Jpn)</description>
 		<year>1994</year>
 		<publisher>Koei</publisher>
+		<notes><![CDATA[
+Unsupported [Sega Mouse] peripheral
+]]></notes>
 		<info name="serial" value="T-76153"/>
 		<info name="release" value="19940225"/>
 		<info name="alt_title" value="信長の野望 覇王伝"/>
@@ -21917,10 +21973,13 @@ Unemulated [Sega Mega Modem] features
 		</part>
 	</software>
 
-	<software name="nobuamb">
+	<software name="nobuamb" supported="partial">
 		<description>Nobunaga's Ambition (USA)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
+		<notes><![CDATA[
+Unsupported [Sega Mouse] peripheral
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="524288">
@@ -21931,10 +21990,13 @@ Unemulated [Sega Mega Modem] features
 		</part>
 	</software>
 
-	<software name="nobuzenk" cloneof="nobuamb">
+	<software name="nobuzenk" cloneof="nobuamb" supported="partial">
 		<description>Nobunaga no Yabou - Zenkokuban (Jpn)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
+		<notes><![CDATA[
+Unsupported [Sega Mouse] peripheral
+]]></notes>
 		<info name="serial" value="T-76133"/>
 		<info name="release" value="19930915"/>
 		<info name="alt_title" value="信長の野望 全・国・版"/>
@@ -24053,10 +24115,13 @@ Unemulated [Sega Mega Modem] features
 		</part>
 	</software>
 
-	<software name="rsbt">
+	<software name="rsbt" supported="partial">
 		<description>Richard Scarry's BusyTown (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Unsupported [Sega Mouse] peripheral
+]]></notes>
 		<sharedfeat name="compatibility" value="NTSC-U,NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -24737,9 +24802,13 @@ Unemulated [Sega Mega Modem] features
 	</software>
 
 	<software name="sanguo5">
-		<description>San Guo Zhi V (Chi)</description>
+		<description>San Guo Zhi V (Tw)</description>
+		<!-- "after '96" -->
 		<year>199?</year>
 		<publisher>SKOB</publisher>
+		<notes><![CDATA[
+https://bootleggames.fandom.com/wiki/San_Guo_Zhi_V
+]]></notes>
 		<info name="alt_title" value="三國志V"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -25331,10 +25400,14 @@ Unsupported [Sega Mega Modem] features
 		</part>
 	</software>
 
+<!-- undumped original '96 release by Kin Tec known to exist  -->
 	<software name="shuihu">
-		<description>Shui Hu - Feng Yun Zhuan (Chi)</description>
+		<description>Shui Hu - Feng Yun Zhuan (Tw)</description>
 		<year>1999</year>
 		<publisher>Never Ending Soft Team</publisher>
+		<notes><![CDATA[
+https://bootleggames.fandom.com/wiki/Shui_Hu_Feng_Yun_Zhuan
+]]></notes>
 		<info name="alt_title" value="水滸 風雲傳"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -29818,10 +29891,13 @@ $040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
 		</part>
 	</software>
 
-	<software name="wworlds">
+	<software name="wworlds" supported="partial">
 		<description>Wacky Worlds (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Unsupported [Sega Mouse] peripheral
+]]></notes>
 		<info name="alt_title" value="Wacky Worlds Creativity Studio (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -32239,10 +32315,13 @@ Unemulated [Sega Mega Modem] and printer features
 		</part>
 	</software>
 
-	<software name="chinf3">
+	<software name="chinf3" supported="no">
 		<description>Tenchi wo Kurau III - Sanguo Wai Chuan - Chinese Fighter (Chi)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<notes><![CDATA[
+Crashes during attract or in character select, copy protection
+]]></notes>
 		<info name="alt_title" value="天地を喰らうⅢ三国外伝"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_chinf3"/>
@@ -32466,9 +32545,12 @@ Unemulated [Sega Mega Modem] and printer features
 	</software>
 
 	<software name="squirrel">
-		<description>Squirrel King (Chi)</description>
+		<description>Squirrel King (Tw)</description>
 		<year>1995</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<publisher>Gamtec</publisher>
+		<notes><![CDATA[
+https://bootleggames.fandom.com/wiki/Squirrel_King
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_squir"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -32504,9 +32586,13 @@ Unemulated [Sega Mega Modem] and printer features
 	</software>
 
 	<software name="suprbubl">
-		<description>Super Bubble Bobble MD (Chi)</description>
+		<description>Super Bubble Bobble MD (Tw?)</description>
 		<year>1995</year>
+		<!-- Gamtec? -->
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<notes><![CDATA[
+https://bootleggames.fandom.com/wiki/Super_Bubble_Bobble_MD
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sbubl"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -32542,9 +32628,9 @@ Unemulated [Sega Mega Modem] and printer features
 	</software>
 
 	<software name="mhpoker">
-		<description>Du Shen Zhi Meng Huan Puke</description>
+		<description>Du Shen Zhi Meng Huan Puke (Tw)</description>
 		<year>1995</year>
-		<publisher>Creaton</publisher>
+		<publisher>Creaton Softech</publisher>
 		<info name="alt_title" value="赌神之梦幻扑克"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_mjlov"/>
@@ -32631,11 +32717,12 @@ Unemulated [Sega Mega Modem] and printer features
 
 <!-- Dump with CRC a2ef16de is hacked to bypass protection. If you found it on a real cart, please let us know. -->
 	<software name="tbolt2">
-		<description>Lei Dian II - Thunderbolt II (Unl)</description>
-		<year>199?</year>
+		<description>Lei Dian II - Thunderbolt II (Tw)</description>
+		<year>1995</year>
 		<publisher>Sun Green</publisher>
 		<info name="serial" value="GM-95201"/>
 		<info name="alt_title" value="雷電伝説II ~ Lei Dian Chuan Shuo II (Box) / 雷電II"/>
+		<info name="developer" value="Gamtec"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_smouse"/>
 			<dataarea name="rom" width="16" endianness="big" size="524288">
@@ -32707,7 +32794,7 @@ Unemulated [Sega Mega Modem] and printer features
 	<software name="cjmjclub">
 		<description>Chaoji Majiang Club (Tw)</description>
 		<year>1995</year>
-		<publisher>Creaton</publisher>
+		<publisher>Creaton Softech</publisher>
 		<info name="alt_title" value="超級麻將 ~ Super Majong Club"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_cjmjclub"/>
@@ -32963,7 +33050,7 @@ Unemulated [Sega Mega Modem] and printer features
 	</software>
 
 	<software name="tankwar">
-		<description>Super Tank War</description>
+		<description>Super Tank War (Tw)</description>
 		<year>199?</year>
 		<publisher>Gamtec</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -33505,11 +33592,14 @@ Unsupported lightgun or mouse?
 		</part>
 	</software>
 
-<!-- What is the relation with Chinese Fighter? -->
+<!-- Unprotected GFX modified version of chinf3, with different character roster -->
 	<software name="lotrgs">
 		<description>Lord of the Rings - The Return of the King (Rus)</description>
 		<year>199?</year>
 		<publisher>Glorysun</publisher>
+		<notes><![CDATA[
+https://bootleggames.fandom.com/wiki/The_Lord_of_the_Rings_3:_Return_of_the_King
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="lord of the rings (unl).bin" size="2097152" crc="513ea675" sha1="314fde51223fd2d315cf9c74318a1fc8470d5382"/>
