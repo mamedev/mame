@@ -70,9 +70,7 @@
 		catch (...) { std::cout << ptest_f << ":" << __LINE__ << ":1: error: unexpected exception thrown\n"; } \
 	} else do {} while (0)
 
-namespace plib
-{
-namespace testing
+namespace plib::testing
 {
 
 	class Test
@@ -176,8 +174,7 @@ namespace testing
 
 #undef DEF_COMP
 
-} // namespace testing
-} // namespace plib
+} // namespace plib::testing
 
 
 #endif // PTESTS_H_

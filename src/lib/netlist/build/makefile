@@ -29,7 +29,7 @@ PSRC = $(SRC)/plib
 VSBUILD = $(SRC)/buildVS
 DOC = $(SRC)/documentation
 
-TIDY_FLAGSX = -checks=*,-google*,-hicpp*,readability*,-fuchsia*,cert-*,-android-*,
+TIDY_FLAGSX = -checks=*,-google*,-hicpp*,readability*,-fuchsia*,cert-*,-android-*,-altera*,
 TIDY_FLAGSX += -llvm-header-guard,
 # TIDY_FLAGSX += -cppcoreguidelines-pro-type-reinterpret-cast,
 TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-pointer-arithmetic,
@@ -44,11 +44,15 @@ TIDY_FLAGSX += -bugprone-macro-parentheses,
 #TIDY_FLAGSX += -misc-macro-parentheses,
 TIDY_FLAGSX += -bugprone-too-small-loop-variable,
 TIDY_FLAGSX += -modernize-use-trailing-return-type,
-#TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
 TIDY_FLAGSX += -readability-magic-numbers,-readability-braces-around-statements,
 TIDY_FLAGSX += -readability-implicit-bool-conversion,
 TIDY_FLAGSX += -readability-named-parameter,-readability-function-size,
 TIDY_FLAGSX += -llvmlibc-restrict-system-libc-headers,-llvmlibc-implementation-in-namespace,-llvmlibc-callee-namespace,
+TIDY_FLAGSX += -modernize-use-nodiscard,
+#TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+#TIDY_FLAGSX += -cppcoreguidelines-prefer-member-initializer,
+#TIDY_FLAGSX += -modernize-use-transparent-functors,
+TIDY_FLAGSX += -readability-function-cognitive-complexity,
 #TIDY_FLAGSX += -cppcoreguidelines-avoid-non-const-global-variables
 
 space :=
@@ -104,14 +108,14 @@ TIDY_DB = $(OBJ)/compile_commands.json
 #LTO decreases performance :-(
 #LTO = -flto=4  -fuse-linker-plugin -Wodr
 
-CCOREFLAGS = -g -O3 -std=c++14 -I$(SRC) 
+CCOREFLAGS = -g -O3 -std=c++17 -I$(SRC) 
 
 CFLAGS =  $(LTO) $(CCOREFLAGS) $(CEXTRAFLAGS)
-LDFLAGS = $(LTO) -g -O3 -std=c++14 $(LDEXTRAFLAGS)
+LDFLAGS = $(LTO) -g -O3 -std=c++17 $(LDEXTRAFLAGS)
 
 CC = g++
 LD = g++
-CLANG_TIDY = clang-tidy-11
+CLANG_TIDY = clang-tidy-13
 DEPENDCC=$(CC)
 
 
@@ -150,6 +154,7 @@ DEVSOURCES += $(wildcard $(SRC)/devices/*.cpp)
 DEVSOURCES += $(wildcard $(SRC)/analog/*.cpp)
 DEVSOURCES += $(wildcard $(SRC)/macro/*.cpp)
 DEVSOURCES += $(MODULESOURCES)
+DEVSOURCES += $(SRC)/generated/nlm_modules_lib.cpp
 
 TESTSOURCES = $(wildcard $(SRC)/tests/*.cpp)
 
@@ -161,7 +166,6 @@ CORESOURCES := \
 	$(SRC)/nl_factory.cpp \
 	$(SRC)/tools/nl_convert.cpp \
 	$(SRC)/generated/static_solvers.cpp \
-	$(SRC)/generated/nlm_modules_lib.cpp \
 
 MAINSOURCES = $(SRC)/prg/nltool.cpp $(SRC)/prg/nlwav.cpp
 
@@ -269,7 +273,7 @@ gcc9:
 
 clang:
 	#$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native -msse4.2 -Weverything -Wall -pedantic -Wpedantic -Wunused-private-field -Wno-padded -Wno-unused-template -Wno-missing-variable-declarations -Wno-float-equal -Wconversion -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral  -Wno-exit-time-destructors"
-	$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native \
+	$(MAKE) CC=clang++-13 LD=clang++-13 OBJ=obj/clang CEXTRAFLAGS="-march=native \
 		-mllvm -inline-threshold=2000 \
 		-Wunknown-warning-option \
 		-Weverything -Wall -pedantic -Wpedantic -Wunused-private-field  \
@@ -277,13 +281,13 @@ clang:
 		-Wmissing-variable-declarations -Wno-float-equal -Wconversion \
 		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wformat-nonliteral \
 		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override \
-		-Wno-return-std-move-in-c++11 -Wno-unreachable-code \
-		-Wno-missing-prototypes"
+		-Wunreachable-code \
+		-Wmissing-prototypes"
 
 clang-libc:
 	#clang-11 currently broken
 	#$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native
-	$(MAKE) CC=clang++-10 LD=clang++-10 OBJ=obj/clang-libc CEXTRAFLAGS="-march=native \
+	$(MAKE) CC=clang++-13 LD=clang++-13 OBJ=obj/clang-libc CEXTRAFLAGS="-march=native \
 		-stdlib=libc++ -mllvm -inline-threshold=2000 \
 		-Wunknown-warning-option \
 		-Weverything -Wall -pedantic -Wpedantic -Wunused-private-field  \
@@ -291,12 +295,9 @@ clang-libc:
 		-Wmissing-variable-declarations -Wno-float-equal -Wconversion \
 		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wformat-nonliteral \
 		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override \
-		-Wno-return-std-move-in-c++11 -Wno-unreachable-code \
-		-Wno-missing-prototypes" \
+		-Wunreachable-code \
+		-Wmissing-prototypes" \
 		LDEXTRAFLAGS=-stdlib=libc++
-
-clang-5:
-	$(MAKE) CC=clang++-5.0 LD=clang++-5.0 CEXTRAFLAGS="-march=native -Weverything -Werror -Wno-inconsistent-missing-destructor-override -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wno-weak-template-vtables -Wno-exit-time-destructors"
 
 nvcc:
 	$(MAKE) CC=/usr/local/cuda-10.2/bin/nvcc LD=/usr/local/cuda-10.2/bin/nvcc \

@@ -17,9 +17,7 @@
 
 #include <algorithm>
 
-namespace netlist
-{
-namespace solver
+namespace netlist::solver
 {
 
 	template <typename FT, int SIZE>
@@ -199,7 +197,6 @@ namespace solver
 		this->build_mat_ptr(m_A);
 	}
 
-} // namespace solver
-} // namespace netlist
+} // namespace netlist::solver
 
 #endif // NLD_MS_DIRECT_H_

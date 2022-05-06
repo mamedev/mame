@@ -21,10 +21,8 @@
 // Namespace starts
 //============================================================
 
-namespace netlist
+namespace netlist::devices
 {
-	namespace devices
-	{
 		// -----------------------------------------------------------------------------
 		// mainclock
 		// -----------------------------------------------------------------------------
@@ -177,7 +175,6 @@ namespace netlist
 			analog_output_t m_Q;
 		};
 
-	} // namespace devices
-} // namespace netlist
+} // namespace netlist::devices
 
 #endif // NL_CORE_DEVICES_H_

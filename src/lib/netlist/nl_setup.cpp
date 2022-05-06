@@ -1336,7 +1336,7 @@ models_t::model_t models_t::get_model(const pstring &model)
 	if (map.empty())
 		model_parse(model , map);
 
-	return model_t(model, map);
+	return { model, map };
 }
 
 pstring models_t::model_t::value_str(const pstring &entity) const
@@ -1726,7 +1726,7 @@ plib::istream_uptr source_file_t::stream(const pstring &name)
 	auto f = std::make_unique<plib::ifstream>(plib::filesystem::u8path(m_filename));
 	if (f->is_open())
 	{
-		return plib::istream_uptr(std::move(f), m_filename);
+		return { std::move(f), m_filename };
 	}
 
 	return plib::istream_uptr();
@@ -1738,7 +1738,7 @@ plib::istream_uptr source_pattern_t::stream(const pstring &name)
 	auto f = std::make_unique<plib::ifstream>(plib::filesystem::u8path(filename));
 	if (f->is_open())
 	{
-		return plib::istream_uptr(std::move(f), filename);
+		return { std::move(f), filename };
 	}
 
 	return plib::istream_uptr();

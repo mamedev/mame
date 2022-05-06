@@ -45,9 +45,7 @@
 
 #include <algorithm>
 
-namespace netlist
-{
-namespace solver
+namespace netlist::solver
 {
 
 	template <typename FT, int SIZE>
@@ -350,7 +348,6 @@ namespace solver
 		this->solve_non_dynamic();
 	}
 
-} // namespace solver
-} // namespace netlist
+} // namespace netlist::solver
 
 #endif // NLD_MS_DIRECT_H_

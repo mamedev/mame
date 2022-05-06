@@ -23,9 +23,7 @@
 #include <algorithm>
 #include <type_traits>
 
-namespace netlist
-{
-namespace devices
+namespace netlist::devices
 {
 
 	// ----------------------------------------------------------------------------------------
@@ -444,7 +442,7 @@ namespace devices
 			switch (params->m_fp_type())
 			{
 				case solver::matrix_fp_type_e::FLOAT:
-					if (!config::use_float_matrix())
+					if (!config::use_float_matrix::value)
 						log().info("FPTYPE {1} not supported. Using DOUBLE", params->m_fp_type().name());
 					ms = create_solvers<std::conditional_t<config::use_float_matrix::value, float, double>>(sname, params.get(), grp);
 					break;
@@ -452,7 +450,7 @@ namespace devices
 					ms = create_solvers<double>(sname, params.get(), grp);
 					break;
 				case solver::matrix_fp_type_e::LONGDOUBLE:
-					if (!config::use_long_double_matrix())
+					if (!config::use_long_double_matrix::value)
 						log().info("FPTYPE {1} not supported. Using DOUBLE", params->m_fp_type().name());
 					ms = create_solvers<std::conditional_t<config::use_long_double_matrix::value, long double, double>>(sname, params.get(), grp);
 					break;
@@ -513,5 +511,4 @@ namespace devices
 
 	NETLIB_DEVICE_IMPL(solver, "SOLVER", "FREQ")
 
-} // namespace devices
-} // namespace netlist
+} // namespace netlist::devices

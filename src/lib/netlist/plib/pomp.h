@@ -19,8 +19,7 @@
 #include "omp.h"
 #endif
 
-namespace plib {
-namespace omp {
+namespace plib::omp {
 
 template <typename I, class T>
 void for_static(std::size_t numops, const I start, const I end, const T &what)  noexcept(noexcept(what))
@@ -79,7 +78,6 @@ inline std::size_t get_max_threads() noexcept
 // pdynlib: dynamic loading of libraries  ...
 // ----------------------------------------------------------------------------------------
 
-} // namespace omp
-} // namespace plib
+} // namespace plib::omp
 
 #endif // PSTRING_H_

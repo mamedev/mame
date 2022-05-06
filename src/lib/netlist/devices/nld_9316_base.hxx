@@ -8,10 +8,8 @@
 #include "nl_base.h"
 #include "nl_factory.h"
 
-namespace netlist
+namespace netlist::devices
 {
-	namespace devices
-	{
 
 		template <unsigned N>
 		static constexpr unsigned rollover(unsigned v) noexcept { return v <= N ? v : 0; }
@@ -154,5 +152,4 @@ namespace netlist
 		using NETLIB_NAME(74161_fixme) = NETLIB_NAME(9316_base)<desc_74161>;
 		using NETLIB_NAME(74163) = NETLIB_NAME(9316_base)<desc_74163>;
 
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

@@ -23,9 +23,8 @@
 #include <vector>
 #include <queue>
 
-namespace netlist
+namespace netlist::detail
 {
-	namespace detail {
 		// Use timed_queue_heap to use stdc++ heap functions instead of linear processing.
 		// This slows down processing by about 35% on a Kaby Lake.
 		// template <class T, bool TS>
@@ -108,8 +107,7 @@ namespace netlist
 
 		using queue_t = queue_base<net_t, false>;
 
-	} // namespace detail
-} // namespace netlist
+} // namespace netlist::detail
 
 
 #endif // NL_CORE_QUEUE_H_

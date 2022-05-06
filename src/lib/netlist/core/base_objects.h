@@ -21,10 +21,7 @@
 
 #include <unordered_map>
 
-namespace netlist
-{
-
-	namespace detail {
+namespace netlist::detail {
 
 		template <typename C, typename T>
 		struct property_store_t
@@ -278,9 +275,7 @@ namespace netlist
 		};
 
 
-	} // namespace detail
-
-} // namespace netlist
+} // namespace netlist::detail
 
 
 #endif // NL_CORE_BASE_OBJECTS_H_
