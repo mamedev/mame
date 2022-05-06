@@ -47,15 +47,15 @@ void md_base_state::megadriv_68k_z80_bank_write(uint16_t data)
 void md_base_state::megadriv_z80_z80_bank_w(uint8_t data)
 {
 	//LOG("%04x: z80 writing bit to bank register %01x\n", m_maincpu->pc(),data&0x01);
-	// menghu tries to write 8 times 0xff from z80 side after you talk with the cashier twice.
-	// Without this guard game will trash 68k memory causing a crash, apparently works on real HW with everdrive
+	// TODO: menghu tries to write 8 times 0xff from z80 side after you talk with the cashier twice.
+	// Without a guard over it game will trash 68k memory causing a crash, apparently works on real HW with everdrive
 	// so not coming from a cart copy protection.
-	// TODO: understand exact condition
-	if (data == 0xff)
-	{
-		LOG("%s: attempt to write an illegal 0x%02x to port $6000\n", machine().describe_context(), data);
-		return;
-	}
+	// Update: it breaks cfodder BGM on character select at least, therefore we current don't guard against it
+//	if (data == 0xff)
+//	{
+	LOG("%s: port $6000 write 0x%02x\n", machine().describe_context(), data);
+//		return;
+//	}
 	megadriv_z80_bank_w(data & 0x01);
 }
 
