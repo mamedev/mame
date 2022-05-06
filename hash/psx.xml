@@ -37289,7 +37289,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Hamster</publisher>
 		<info name="serial" value="SLPM-86656" />
 		<info name="release" value="20001026" />
-		<info name="alt_title" value="雷電ディー･エックス"/>
+		<info name="alt_title" value="雷電ディー・エックス"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -49818,7 +49818,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Global A</publisher>
 		<info name="serial" value="SLPM-86684" />
 		<info name="release" value="20001207" />
-		<info name="alt_title" value="ザ マエストロムジーク･メリークリスマス･アペンド"/>
+		<info name="alt_title" value="ザ マエストロムジーク・メリークリスマス・アペンド"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -51903,7 +51903,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Media Entertainment</publisher>
 		<info name="serial" value="SLPS-03245" />
 		<info name="release" value="20010830" />
-		<info name="alt_title" value="パチスロ帝王 メーカー推奨マニュアル5 〜レースクイーン2･トムキャット〜"/>
+		<info name="alt_title" value="パチスロ帝王 メーカー推奨マニュアル5 〜レースクイーン2・トムキャット〜"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -58797,7 +58797,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<publisher>Hudson</publisher>
 		<info name="serial" value="SLPS-01451" />
 		<info name="release" value="19980625" />
-		<info name="alt_title" value="銀河お嬢様伝説ユナ ファイナル･エディション"/>
+		<info name="alt_title" value="銀河お嬢様伝説ユナ ファイナル・エディション"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
