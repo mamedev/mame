@@ -124,7 +124,7 @@ license:CC0
 		<publisher>NCS</publisher>
 		<info name="serial" value="NSCD5018"/>
 		<info name="release" value="19950224"/>
-		<info name="alt_title" value="愛･超兄貴"/>
+		<info name="alt_title" value="愛・超兄貴"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -3689,7 +3689,7 @@ license:CC0
 		<publisher>Hudson</publisher>
 		<info name="serial" value="HCD4062"/>
 		<info name="release" value="19940729"/>
-		<info name="alt_title" value="ネオ･ネクタリス"/>
+		<info name="alt_title" value="ネオ・ネクタリス"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -4070,7 +4070,7 @@ license:CC0
 		<publisher>Hudson</publisher>
 		<info name="serial" value="HCD1021"/>
 		<info name="release" value="19911025"/>
-		<info name="alt_title" value="ポピュラス ザ･プロミストランド"/>
+		<info name="alt_title" value="ポピュラス ザ・プロミストランド"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -5435,7 +5435,7 @@ license:CC0
 		<publisher>NEC Avenue</publisher>
 		<info name="serial" value="NAPR-1050"/>
 		<info name="release" value="19950728"/>
-		<info name="alt_title" value="スペースインベーダー･ジ･オリジナルゲーム"/>
+		<info name="alt_title" value="スペースインベーダー・ジ・オリジナルゲーム"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -5595,7 +5595,7 @@ license:CC0
 		<publisher>Nihon Telenet</publisher>
 		<info name="serial" value="TJCD1021"/>
 		<info name="release" value="19911220"/>
-		<info name="alt_title" value="なりトレ ザ･スゴロク'92"/>
+		<info name="alt_title" value="なりトレ ザ・スゴロク'92"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -5755,7 +5755,7 @@ license:CC0
 		<publisher>Naxat Soft</publisher>
 		<info name="serial" value="NXCD4030"/>
 		<info name="release" value="19940805"/>
-		<info name="alt_title" value="スーパーリアル麻雀PII･PIIIカスタム"/>
+		<info name="alt_title" value="スーパーリアル麻雀PII・PIIIカスタム"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -6152,7 +6152,7 @@ license:CC0
 		<publisher>Micro World</publisher>
 		<info name="serial" value="MWCD2002"/>
 		<info name="release" value="19920401"/>
-		<info name="alt_title" value="ザ･デビスカップテニス"/>
+		<info name="alt_title" value="ザ・デビスカップテニス"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -6168,7 +6168,7 @@ license:CC0
 		<publisher>Micro World</publisher>
 		<info name="serial" value="MWCD2001"/>
 		<info name="release" value="19920731"/>
-		<info name="alt_title" value="ザ･キックボクシング"/>
+		<info name="alt_title" value="ザ・キックボクシング"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -6868,7 +6868,7 @@ license:CC0
 		<publisher>Hudson</publisher>
 		<info name="serial" value="HCD9009"/>
 		<info name="release" value="19891221"/>
-		<info name="alt_title" value="イースI･II"/>
+		<info name="alt_title" value="イースI・II"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
