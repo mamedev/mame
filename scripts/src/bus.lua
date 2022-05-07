@@ -2098,6 +2098,8 @@ if (BUSES["RC2014"]~=null) then
 		MAME_DIR .. "src/devices/bus/rc2014/ram.h",
 		MAME_DIR .. "src/devices/bus/rc2014/rom.cpp",
 		MAME_DIR .. "src/devices/bus/rc2014/rom.h",
+		MAME_DIR .. "src/devices/bus/rc2014/romram.cpp",
+		MAME_DIR .. "src/devices/bus/rc2014/romram.h",
 		MAME_DIR .. "src/devices/bus/rc2014/serial.cpp",
 		MAME_DIR .. "src/devices/bus/rc2014/serial.h",
 		MAME_DIR .. "src/devices/bus/rc2014/cf.cpp",

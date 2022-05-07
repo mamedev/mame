@@ -51,6 +51,7 @@ void z80cpu_base::addrmap_mem(address_map &map)
 
 void z80cpu_base::addrmap_io(address_map &map)
 {
+	map.unmap_value_high(); 
 	map.global_mask(0xff);  // use 8-bit ports
 }
 

@@ -13,6 +13,7 @@
 #include "bus/rc2014/clock.h"
 #include "bus/rc2014/ram.h"
 #include "bus/rc2014/rom.h"
+#include "bus/rc2014/romram.h"
 #include "bus/rc2014/serial.h"
 #include "bus/rc2014/cf.h"
 
@@ -24,6 +25,7 @@ void rc2014_bus_modules(device_slot_interface &device)
 	device.option_add("sw_rom", RC2014_SWITCHABLE_ROM);
 	device.option_add("serial", RC2014_SERIAL_IO);
 	device.option_add("cf", RC2014_COMPACT_FLASH);
+	device.option_add("rom_ram", RC2014_ROM_RAM_512);
 }
 
 void rc2014_ext_bus_modules(device_slot_interface &device)

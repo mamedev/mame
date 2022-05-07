@@ -15,4 +15,5 @@
 
 DECLARE_DEVICE_TYPE(RC2014_SERIAL_IO, device_rc2014_card_interface)
 DECLARE_DEVICE_TYPE(RC2014_DUAL_SERIAL, device_rc2014_ext_card_interface)
+
 #endif // MAME_BUS_RC2014_SERIAL_H

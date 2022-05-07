@@ -41,7 +41,8 @@ compact_flash_device::compact_flash_device(const machine_config &mconfig, const 
 
 void compact_flash_device::device_start()
 {
-	m_bus->installer(AS_IO)->install_readwrite_handler(0x10, 0x17, read8sm_delegate(*this, FUNC(compact_flash_device::ide_cs0_r)), write8sm_delegate(*this, FUNC(compact_flash_device::ide_cs0_w)));
+	// A7 not connected
+	m_bus->installer(AS_IO)->install_readwrite_handler(0x10, 0x17, 0, 0x80, 0, read8sm_delegate(*this, FUNC(compact_flash_device::ide_cs0_r)), write8sm_delegate(*this, FUNC(compact_flash_device::ide_cs0_w)));
 }
 
 void compact_flash_device::device_add_mconfig(machine_config &config)
