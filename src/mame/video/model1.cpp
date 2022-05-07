@@ -19,6 +19,8 @@ enum { MOIRE = 0x01000000 };
 
 uint32_t model1_state::readi(int adr) const
 {
+	// Grab the 32 bit unsigned value
+
 	return m_display_list_current[(adr + 0)&0x7fff] | (m_display_list_current[(adr + 1)&0x7fff] << 16);
 }
 
@@ -279,6 +281,10 @@ void model1_state::fill_quad(bitmap_rgb32 &bitmap, view_t *view, const quad_t& q
 		return;
 	}
 
+	// SOYS - This may have changed from original because it can restrict the 
+	// drawing to scaled bitmap.
+
+	// Limit to the view y2
 	if(limy > view->y2)
 	{
 		limy = view->y2;
@@ -335,6 +341,8 @@ void model1_state::fill_quad(bitmap_rgb32 &bitmap, view_t *view, const quad_t& q
 		}
 		else
 		{
+			sl1 = sl1;
+			sl2 = sl2; 
 			fill_slope(bitmap, view, color, x1, x2, sl1, sl2, cury, p[ps2 + 1].y, &x1, &x2);
 			cury = p[ps2 + 1].y;
 			if(cury >= limy)
@@ -356,9 +364,12 @@ void model1_state::fill_quad(bitmap_rgb32 &bitmap, view_t *view, const quad_t& q
 	}
 }
 
-#if 0
-void model1_state::draw_line(bitmap_rgb32 &bitmap, model1_state::view_t *view, int color, int x1, int y1, int x2, int y2) const
+// SOYS: Reintroduce the draw line (original code)
+#if 0 
+void model1_state::draw_line(bitmap_rgb32 &bitmap, 
+	model1_state::view_t *view, int color, int x1, int y1, int x2, int y2) const
 {
+	// SOYS
 	if ((x1 < view->x1 && x2 < view->x1) ||
 		(x1 > view->x2 && x2 > view->x2) ||
 		(y1 < view->y1 && y2 < view->y1) ||
@@ -397,11 +408,13 @@ void model1_state::draw_line(bitmap_rgb32 &bitmap, model1_state::view_t *view, i
 		d2 = t;
 	}
 
-	if(d1 > 600)
-	{
-		return;
-	}
+	// SOYS - Need to remove this to keep drawing larger than original pixel width
+	//if(d1 > 600)
+	//{
+	//	return;
+	//}
 
+	// SOYS to do change this to anti-alias version
 	int cur = 0;
 	while (x != x2 || y != y2)
 	{
@@ -425,6 +438,242 @@ void model1_state::draw_line(bitmap_rgb32 &bitmap, model1_state::view_t *view, i
 	}
 }
 #endif
+
+//-------------------------------------------------------------------------------------------------
+// SOYS - Anti-aliased version of the draw_line ---------------------------------------------------
+
+int model1_state::roundNumber(float x) const
+{
+    return model1_state::iPartOfNumber(x + 0.5) ;
+}
+
+void model1_state::swap(int* a , int*b) const
+{
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+  
+// returns absolute value of number
+float model1_state::absolute(float x ) const
+{
+    if (x < 0) return -x;
+    else return x;
+}
+
+void model1_state::drawPixel(bitmap_rgb32 &bitmap, int x , int y , float brightness, int color) const
+{
+	// Whichever component is strongest, use that component
+	// if other components are close then also use those components
+
+	int cR = (color & 0xff0000) >> 16;
+	int cG = (color & 0xff00) >> 8;
+	int cB = color & 0xff;
+
+	int useR = 0;
+	int useG = 0;
+	int useB = 0;
+
+	int threshold = 20;
+
+	if(cG > cR) 
+	{
+		if(cB > cG)
+		{
+			// Blue is strongest
+			useB = 1;
+
+			// Use R and G as well?
+			useR = (cB - cR) < threshold;
+			useG = (cB - cG) < threshold;
+		} 
+		else
+		{
+			// Green is strongest
+			useG = 1;
+
+			// use B and R as well?
+			useB = (cG - cB) < threshold;
+			useR = (cG - cR) < threshold;
+		}
+	}
+	else if(cB > cR)
+	{
+		// Blue is strongest
+		useB = 1;
+
+		// use red and green as well?
+		useR = (cB - cR) < threshold;
+		useG = (cB - cG) < threshold;
+		
+	}
+	else
+	{
+		// Red is strongest
+		useR = 1;
+
+		// Use G and B as well?
+		useB = (cR - cB) < threshold;
+		useG = (cR - cG) < threshold;
+	}
+
+	int c = (255 * brightness);
+
+	int fc = 0;
+	if(useB) fc = c;
+	if(useG) fc = fc | (c << 8);
+	if(useR) fc = fc | (c << 16);
+
+	//popmessage("c: %g, useR: %g, G: %g, B: %g", c, useR, useG, useB);
+
+	bitmap.pix(y, x) = fc;
+}
+
+//returns integer part of a floating point number
+int model1_state::iPartOfNumber(float x) const
+{
+    return (int)x;
+}
+
+//returns fractional part of a number
+float model1_state::fPartOfNumber(float x) const
+{
+    if (x>0) return x - model1_state::iPartOfNumber(x);
+    else return x - (model1_state::iPartOfNumber(x)+1);
+  
+}
+  
+//returns 1 - fractional part of number
+float model1_state::rfPartOfNumber(float x) const
+{
+    return 1 - model1_state::fPartOfNumber(x);
+}
+
+// Anti-aliased line version
+
+void model1_state::draw_line(bitmap_rgb32 &bitmap, model1_state::view_t *view, int color, int x1, int y1, int x2, int y2) const
+{
+	if ((x1 < view->x1 && x2 < view->x1) ||
+		(x1 > view->x2 && x2 > view->x2) ||
+		(y1 < view->y1 && y2 < view->y1) ||
+		(y1 > view->y2 && y2 > view->y2))
+		return;
+
+    int steep = model1_state::absolute(y2 - y1) > model1_state::absolute(x2 - x1) ;
+  
+    // swap the co-ordinates if slope > 1 or we
+    // draw backwards
+    if (steep)
+    {
+        model1_state::swap(&x1 , &y1);
+        model1_state::swap(&x2 , &y2);
+    }
+    if (x1 > x2)
+    {
+        model1_state::swap(&x1 ,&x2);
+        model1_state::swap(&y1 ,&y2);
+    }
+  
+    //compute the slope
+    float dx = x2-x1;
+    float dy = y2-y1;
+    float gradient = dy/dx;
+    if (dx == 0.0)
+        gradient = 1;
+  
+    int xpxl1 = x1;
+    int xpxl2 = x2;
+
+    float intersectY = y1;
+
+	// Handle first end point
+
+	float xend = model1_state::roundNumber(x1);
+    float yend = y1+ gradient * (xend - x1);
+    xpxl1 = xend; 
+
+	/*
+	// Optional to anti-alias the first point
+
+    float xgap = model1_state::rfPartOfNumber(x1 + 0.5);
+    int ypxl1 = model1_state::iPartOfNumber(yend);
+
+    if(steep)
+	{
+        model1_state::drawPixel(bitmap, ypxl1, xpxl1, 
+			model1_state::rfPartOfNumber(yend) * xgap, color);
+        model1_state::drawPixel(bitmap, ypxl1 + 1, xpxl1, 
+			model1_state::rfPartOfNumber(yend) * xgap, color);
+	}
+    else
+	{
+        model1_state::drawPixel(bitmap, xpxl1, ypxl1  , model1_state::rfPartOfNumber(yend) * xgap, color);
+        model1_state::drawPixel(bitmap, xpxl1, ypxl1 + 1,  model1_state::fPartOfNumber(yend) * xgap, color);	
+	}
+	*/
+
+	// first y-intersection for the main loop
+
+    intersectY = yend + gradient; 
+
+	// Handle 2nd end point
+
+	xend = model1_state::roundNumber(x2);
+    yend = y2 + gradient * (xend - x2);
+    xpxl2 = xend; 
+
+	/*
+	// Optional to anti-alias the 2nd point
+
+    xgap = model1_state::rfPartOfNumber(x2 + 0.5);
+    int ypxl2 = model1_state::iPartOfNumber(yend);
+
+    if(steep)
+	{
+        model1_state::drawPixel(bitmap, ypxl2, xpxl2, 
+			model1_state::rfPartOfNumber(yend) * xgap, color);
+        model1_state::drawPixel(bitmap, ypxl2 + 1, xpxl2, 
+			model1_state::rfPartOfNumber(yend) * xgap, color);
+	}
+    else
+	{
+        model1_state::drawPixel(bitmap, xpxl2, ypxl2, 
+			model1_state::rfPartOfNumber(yend) * xgap, color);
+        model1_state::drawPixel(bitmap, xpxl2, ypxl2 + 1,  
+			model1_state::fPartOfNumber(yend) * xgap, color);	
+	}
+	*/
+
+	// Main loop
+
+	if(steep)
+	{
+		for(int x = xpxl1 + 1; x < xpxl2; x++)
+		{
+			model1_state::drawPixel(bitmap, model1_state::iPartOfNumber(intersectY), 
+				x, model1_state::rfPartOfNumber(intersectY), color);
+			model1_state::drawPixel(bitmap, model1_state::iPartOfNumber(intersectY) + 1, 
+				x, model1_state::fPartOfNumber(intersectY), color);
+			intersectY += gradient;
+		}
+	}
+	else
+	{
+		for(int x = xpxl1 + 1; x < xpxl2; x++)
+		{
+			model1_state::drawPixel(bitmap, x, model1_state::iPartOfNumber(intersectY), 
+				model1_state::rfPartOfNumber(intersectY), color);
+			model1_state::drawPixel(bitmap, x, model1_state::iPartOfNumber(intersectY) + 1, 
+				model1_state::fPartOfNumber(intersectY), color);
+			intersectY += gradient;
+		}
+	}  
+}
+
+// SOYS - End of anti-alised draw_line -----------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
+
+//#endif
 
 static int comp_quads(const void *q1, const void *q2)
 {
@@ -468,6 +717,7 @@ void model1_state::unsort_quads() const
 	}
 }
 
+// SOYS - Here we can send this to a 3D rednering engine.
 
 void model1_state::draw_quads(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -479,6 +729,7 @@ void model1_state::draw_quads(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	int save_x2 = view->x2;
 	int save_y1 = view->y1;
 	int save_y2 = view->y2;
+	
 	view->x1 = std::max(view->x1, cliprect.min_x);
 	view->x2 = std::min(view->x2, cliprect.max_x);
 	view->y1 = std::max(view->y1, cliprect.min_y);
@@ -486,14 +737,192 @@ void model1_state::draw_quads(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 	for (int i = 0; i < count; i++)
 	{
-		fill_quad(bitmap, view, *m_quadind[i]);
-#if 0
-		quad_t *q = m_quadind[i];
-		draw_line(bitmap, m_palette->black_pen(), q.p[0]->s.x, q.p[0]->s.y, q.p[1]->s.x, q.p[1]->s.y);
-		draw_line(bitmap, m_palette->black_pen(), q.p[1]->s.x, q.p[1]->s.y, q.p[2]->s.x, q.p[2]->s.y);
-		draw_line(bitmap, m_palette->black_pen(), q.p[2]->s.x, q.p[2]->s.y, q.p[3]->s.x, q.p[3]->s.y);
-		draw_line(bitmap, m_palette->black_pen(), q.p[3]->s.x, q.p[3]->s.y, q.p[0]->s.x, q.p[0]->s.y);
+
+#if 1
+		if(!renderWireframe)
+		{
+			// SOYS - This draws the 3d filled polies 
+			fill_quad(bitmap, view, *m_quadind[i]);
+
+		}
 #endif
+
+#if 0
+		// SOYS - DEPRECATED - DO NOT USE - We now use the tgp_render with 
+		// renderScale instead to scale properly.
+		
+		// SOYS scale up each point - This produces a pixelated scaled view
+		// not that good. So use the view port method.
+
+		view->x2 = cliprect.max_x * 1.32;
+		view->y2 = cliprect.max_y * 1.10;
+
+		// Get original screen width and height
+
+	 	float sWidth =  656;
+		float sHeight = 424;
+
+		//--------- Scaled look ----------------------------------------------
+
+		quad_t *qold = m_quadind[i];
+
+		// Scale each screen point. Only the s (screen point) is used.
+		// We may want to relook at this and scale the view port instead of
+		// the screen points. View port is larger.
+
+		point_t p1, p2, p3, p4;
+		
+		// Integer scale
+		p1.s.x = (qold->p[0]->s.x / sWidth) * view->x2;
+		p1.s.y = (qold->p[0]->s.y / sHeight) * view->y2;
+		p2.s.x = (qold->p[1]->s.x / sWidth) * view->x2;
+		p2.s.y = (qold->p[1]->s.y / sHeight) * view->y2;
+		p3.s.x = (qold->p[2]->s.x / sWidth) * view->x2;
+		p3.s.y = (qold->p[2]->s.y / sHeight) * view->y2;
+		p4.s.x = (qold->p[3]->s.x / sWidth) * view->x2;
+		p4.s.y = (qold->p[3]->s.y / sHeight) * view->y2;
+
+	#if 0
+		// float scale - Seems no advantage
+		p1.s.x = round(((float)qold->p[0]->s.x / sWidth) * (float)view->x2);
+		p1.s.y = round(((float)qold->p[0]->s.y / sHeight) * (float)view->y2);
+		p2.s.x = round(((float)qold->p[1]->s.x / sWidth) * (float)view->x2);
+		p2.s.y = round(((float)qold->p[1]->s.y / sHeight) * (float)view->y2);
+		p3.s.x = round(((float)qold->p[2]->s.x / sWidth) * (float)view->x2);
+		p3.s.y = round(((float)qold->p[2]->s.y / sHeight) * (float)view->y2);
+		p4.s.x = round(((float)qold->p[3]->s.x / sWidth) * (float)view->x2);
+		p4.s.y = round(((float)qold->p[3]->s.y / sHeight) * (float)view->y2);
+	#endif
+		quad_t qs(qold->col, qold->z, &p1, &p2, &p3, &p4);
+		fill_quad(bitmap, view, qs);
+#endif
+
+#if 0
+		// SOYS - DEPRECATED - DO NOT USE - scale up a little
+		view->x2 = cliprect.max_x * 1.32;
+		view->y2 = cliprect.max_y * 1.10;
+
+		// Get original screen width and height
+
+	 	float sWidth =  656;
+		float sHeight = 424;
+
+		//--------------- Scaled wireframe antialiased look -----------------------
+		// Looks best with native resolution of your screen
+		// SOYS - Just does the wireframe. The bitmap would be the bitmap screen we 
+		// are drawing to Write frame look fill - these 2 lines are optional
+		quad_t *qold = m_quadind[i];
+
+		// Scale each screen point. Only the s (screen point) is used.
+		// We may want to relook at this and scale the view port instead of
+		// the screen points. View port is larger.
+
+		point_t p1, p2, p3, p4;
+		
+		// Integer scale
+		p1.s.x = (qold->p[0]->s.x / sWidth) * view->x2;
+		p1.s.y = (qold->p[0]->s.y / sHeight) * view->y2;
+		p2.s.x = (qold->p[1]->s.x / sWidth) * view->x2;
+		p2.s.y = (qold->p[1]->s.y / sHeight) * view->y2;
+		p3.s.x = (qold->p[2]->s.x / sWidth) * view->x2;
+		p3.s.y = (qold->p[2]->s.y / sHeight) * view->y2;
+		p4.s.x = (qold->p[3]->s.x / sWidth) * view->x2;
+		p4.s.y = (qold->p[3]->s.y / sHeight) * view->y2;
+
+		// This draws with original colors
+		//quad_t qs(qold->col, qold->z, &p1, &p2, &p3, &p4);
+		
+		// This fills drawings with white pen
+		quad_t qs(m_palette->white_pen(), qold->z, &p1, &p2, &p3, &p4);
+		fill_quad(bitmap, view, qs);
+
+		#if 0
+		// Test lines
+		draw_line(bitmap, view, m_palette->white_pen(), 0, 0, 1920, 20);
+		draw_line(bitmap, view, m_palette->white_pen(), 1920, 30, 0, 0);
+		draw_line(bitmap, view, m_palette->white_pen(), 0, 0, 1920, 50);
+		draw_line(bitmap, view, m_palette->white_pen(), 1920, 750, 0, 0);
+		draw_line(bitmap, view, m_palette->white_pen(), 0, 0, 1920, 100);
+		draw_line(bitmap, view, m_palette->white_pen(), 0, 0, 1920, 200);
+		draw_line(bitmap, view, m_palette->white_pen(), 0, 0, 1920, 300);
+		draw_line(bitmap, view, m_palette->white_pen(), 0, 0, 1920, 600);
+		draw_line(bitmap, view, m_palette->white_pen(), 0, 0, 1920, 1080);
+		#endif
+
+		// Draw all white pen wireframe
+		#if 0
+		quad_t *q = m_quadind[i];
+		draw_line(bitmap, view, m_palette->white_pen(), 
+			(q->p[0]->s.x / sWidth) *  view->x2, 
+			(q->p[0]->s.y / sHeight) * view->y2, 
+			(q->p[1]->s.x / sWidth) * view->x2, 
+			(q->p[1]->s.y / sHeight) * view->y2);
+		draw_line(bitmap, view, m_palette->white_pen(), 
+			(q->p[1]->s.x / sWidth) *  view->x2, 
+			(q->p[1]->s.y / sHeight) * view->y2, 
+			(q->p[2]->s.x / sWidth) * view->x2, 
+			(q->p[2]->s.y / sHeight) * view->y2);
+		draw_line(bitmap, view, m_palette->white_pen(), 
+			(q->p[2]->s.x / sWidth) *  view->x2, 
+			(q->p[2]->s.y / sHeight) * view->y2, 
+			(q->p[3]->s.x / sWidth) * view->x2, 
+			(q->p[3]->s.y / sHeight) * view->y2);
+		draw_line(bitmap, view, m_palette->white_pen(), 
+			(q->p[3]->s.x / sWidth) *  view->x2, 
+			(q->p[3]->s.y / sHeight) * view->y2, 
+			(q->p[0]->s.x / sWidth) * view->x2, 
+			(q->p[0]->s.y / sHeight) * view->y2);
+		#endif
+
+		#if 1
+		quad_t *q = m_quadind[i];
+		draw_line(bitmap, view, q->col, 
+			(q->p[0]->s.x / sWidth) *  view->x2, 
+			(q->p[0]->s.y / sHeight) * view->y2, 
+			(q->p[1]->s.x / sWidth) * view->x2, 
+			(q->p[1]->s.y / sHeight) * view->y2);
+		draw_line(bitmap, view, q->col, 
+			(q->p[1]->s.x / sWidth) *  view->x2, 
+			(q->p[1]->s.y / sHeight) * view->y2, 
+			(q->p[2]->s.x / sWidth) * view->x2, 
+			(q->p[2]->s.y / sHeight) * view->y2);
+		draw_line(bitmap, view, q->col, 
+			(q->p[2]->s.x / sWidth) *  view->x2, 
+			(q->p[2]->s.y / sHeight) * view->y2, 
+			(q->p[3]->s.x / sWidth) * view->x2, 
+			(q->p[3]->s.y / sHeight) * view->y2);
+		draw_line(bitmap, view, q->col, 
+			(q->p[3]->s.x / sWidth) *  view->x2, 
+			(q->p[3]->s.y / sHeight) * view->y2, 
+			(q->p[0]->s.x / sWidth) * view->x2, 
+			(q->p[0]->s.y / sHeight) * view->y2);
+		#endif
+#endif		
+		
+#if 0
+		// Wire framed white lines - Anti aliased no fill
+		quad_t *q = m_quadind[i];
+
+		//--------------- Original resolution wireframe ----------------------------
+		draw_line(bitmap, view, m_palette->white_pen(), q->p[0]->s.x, q->p[0]->s.y, q->p[1]->s.x, q->p[1]->s.y);
+		draw_line(bitmap, view, m_palette->white_pen(), q->p[1]->s.x, q->p[1]->s.y, q->p[2]->s.x, q->p[2]->s.y);
+		draw_line(bitmap, view, m_palette->white_pen(), q->p[2]->s.x, q->p[2]->s.y, q->p[3]->s.x, q->p[3]->s.y);
+		draw_line(bitmap, view, m_palette->white_pen(), q->p[3]->s.x, q->p[3]->s.y, q->p[0]->s.x, q->p[0]->s.y);
+#endif
+		// SOYS -- Added an anti-aliased wire frame mode - Looks awesome in my opinion
+
+		if(renderWireframe)
+		{
+			// Wire framed version with polygon filled with black
+			quad_t *q = m_quadind[i];
+			quad_t qs(m_palette->white_pen(), q->z, q->p[0], q->p[1], q->p[2], q->p[3]);
+			fill_quad(bitmap, view, qs);
+
+			draw_line(bitmap, view, q->col, q->p[0]->s.x, q->p[0]->s.y, q->p[1]->s.x, q->p[1]->s.y);
+			draw_line(bitmap, view, q->col, q->p[1]->s.x, q->p[1]->s.y, q->p[2]->s.x, q->p[2]->s.y);
+			draw_line(bitmap, view, q->col, q->p[2]->s.x, q->p[2]->s.y, q->p[3]->s.x, q->p[3]->s.y);
+			draw_line(bitmap, view, q->col, q->p[3]->s.x, q->p[3]->s.y, q->p[0]->s.x, q->p[0]->s.y);
+		}
 	}
 
 	view->x1 = save_x1;
@@ -501,6 +930,8 @@ void model1_state::draw_quads(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	view->y1 = save_y1;
 	view->y2 = save_y2;
 }
+
+
 #if 0
 uint16_t model1_state::scale_color(uint16_t color, float level) const
 {
@@ -621,6 +1052,12 @@ void model1_state::fclip_push_quad(int level, quad_t& q)
 	for (int i = 0; i < 4; i++)
 		LOG_TGP((" (%f, %f, %f, %d)", q.p[i]->x, q.p[i]->y, q.p[i]->z, is_out[i]));
 	LOG_TGP(("\n"));
+#if 0
+	fclip_push_quad(level + 1, q);
+	return;
+#endif
+
+#if 1
 
 	// No clipping
 	if(!is_out[0] && !is_out[1] && !is_out[2] && !is_out[3])
@@ -696,6 +1133,8 @@ void model1_state::fclip_push_quad(int level, quad_t& q)
 			fclip_push_quad_next(level, q, pt[3], pi2, pi1, pi1);
 		}
 	}
+#endif 
+
 }
 
 float model1_state::min4f(float a, float b, float c, float d)
@@ -755,8 +1194,15 @@ float model1_state::compute_specular(glm::vec3& normal, glm::vec3& light, float 
 	return 0;
 }
 
+// SOYS - This will load all polies for an object. Which can come from RAM or ROM.
+// So idea is to initially cache these to file. The current one will be used, but
+// the rest will come from file and loaded to memory. This will allow us to control
+// the z-cull ourselves.
+
 void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t size)
 {
+	uint32_t actualSize = 0;
+
 	// Protect against bad data when attacking a super destroyer
 	if(tex_adr == 0xffffffff || size >= 0x1000000)
 		return;
@@ -765,11 +1211,22 @@ void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t siz
 	int dump;
 #endif
 
+	// SOYS - TODO. Cache these to file then reload? So we can
+	// render ALL polies.
+
 	float *poly_data;
 	if (poly_adr & 0x800000)
+	{
+		// SOYS - This polygon changes (hence from RAM)(?)
 		poly_data = (float *)m_poly_ram.get();
+	}
 	else
+	{
+		//popmessage("Poly from rom: %ld", romObjectCount++);
+
+		// SOYS - These polygons DO NOT change (hence from ROM)(?)
 		poly_data = (float *)m_poly_rom.target();
+	}
 
 	poly_adr &= 0x7fffff;
 #if 0
@@ -795,6 +1252,8 @@ void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t siz
 		LOG_TGP(("XVIDEO:   draw object (%x, %x, %x)\n", tex_adr, poly_adr, size));
 	}
 
+	// Get all polies by default
+
 	if (!size)
 		size = 0xffffffff;
 
@@ -807,6 +1266,9 @@ void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t siz
 	old_p1->x = poly_data[poly_adr + 3];
 	old_p1->y = poly_data[poly_adr + 4];
 	old_p1->z = poly_data[poly_adr + 5];
+
+	// Here we transform the poly point to the view and see if clipping
+
 	m_view->transform_point(old_p0);
 	m_view->transform_point(old_p1);
 
@@ -832,8 +1294,17 @@ void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t siz
 
 	poly_adr += 6;
 
+	
+	// This gets all the polygon for the object
+
 	for (int i = 0; i < size; i++)
 	{
+		// Keep count of how many polygons in the object
+
+		actualSize++;
+
+		//popmessage("SOYS Poly count: %ld, actual: %ld", size, actualSize);		
+
 #if 0
 		LOG_TGP(("VIDEO:     %08x (%f, %f, %f) (%f, %f, %f) (%f, %f, %f)\n",
 			*(uint32_t *)(poly_data + poly_adr) & ~(0x01800303),
@@ -844,11 +1315,15 @@ void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t siz
 		uint32_t flags = *reinterpret_cast<uint32_t*>(poly_data + poly_adr);
 
 		int type = flags & 3;
+
 		if (!type)
+		{
 			break;
+		}
 
 		if (flags & 0x00001000)
 			tex_adr++;
+
 		int lightmode = (flags >> 17) & 15;
 
 		point_t *p0 = m_pointpt++;
@@ -868,6 +1343,7 @@ void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t siz
 
 		m_view->transform_point(p0);
 		m_view->transform_point(p1);
+
 		if (p0->z > 0)
 		{
 			m_view->project_point(p0);
@@ -912,7 +1388,9 @@ void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t siz
 			goto next;
 
 		if (!(flags & 0x00004000) && view_determinant(old_p1, old_p0, p0) > 0)
+		{
 			goto next;
+		}
 
 		vn = glm::normalize(vn);
 
@@ -1302,16 +1780,18 @@ void model1_state::view_t::set_view_translation(float x, float y)
 	recompute_frustum();
 }
 
-
-
 void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_render_done = 1;
+
 	if ((m_listctl[1] & 0x1f) == 0x1f)
 	{
 		set_current_render_list();
 		int zz = 0;
 		LOG_TGP(("VIDEO: render list %d\n", get_list_number()));
+
+		// SOYS - Seems to be which screen(?) Flips between 1 and 0
+		// popmessage("list number: %d", get_list_number());
 
 		m_view->init_translation_matrix();
 
@@ -1326,6 +1806,7 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				break;
 			case 1:
 			case 0x41:
+				// SOYS - This is how the rendering pipeline is arranged i think..?
 				// 1 = plane 1
 				// 2 = ??  draw object (413d3, 17c4c, e)
 				// 3 = plane 2
@@ -1334,7 +1815,12 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				// 6 = ??  draw object (57bd4, 387460, 2ad)
 
 				if (true || zz >= 666)
+				{
 					push_object(readi(list_offset + 2), readi(list_offset + 4), readi(list_offset + 6));
+					
+					// SOYS - This does cull out some polygons but not z-cull
+					//push_object(readi(list_offset + 2), readi(list_offset + 4), 16000);
+				}
 				list_offset += 8;
 				break;
 			case 2:
@@ -1344,7 +1830,7 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			}
 			case 3:
 			{
-				LOG_TGP(("VIDEO:   viewport (%d, %d, %d, %d, %d, %d, %d)\n",
+				LOG_TGP(("VIDEO:   viewport (?: %d, xc: %d, yc: %d, x1: %d, y1: %d, x2: %d, y2: %d)\n",
 					readi(list_offset + 2),
 					readi16(list_offset + 4), readi16(list_offset + 6), readi16(list_offset + 8),
 					readi16(list_offset + 10), readi16(list_offset + 12), readi16(list_offset + 14)));
@@ -1355,10 +1841,36 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				float yc = 383 - (readi16(list_offset + 6) - 39);
 				float x1 = readi16(list_offset + 8);
 				float y2 = 383 - (readi16(list_offset + 10) - 39);
-				float x2 = readi16(list_offset + 12);
+				float x2 = readi16(list_offset + 12);				
 				float y1 = 383 - (readi16(list_offset + 14) - 39);
 
+				#if 1
+				// SOYS - scale up all aspects of the viewport ------------------------------------
+
+				//popmessage("VIDEO:   viewport (?: %d, xc: %d, yc: %d, x1: %d, y2: %d, x2: %d, y1: %d)\n",
+				//	readi(list_offset + 2),
+				//	readi16(list_offset + 4), readi16(list_offset + 6), readi16(list_offset + 8),
+				//	readi16(list_offset + 10), readi16(list_offset + 12), readi16(list_offset + 14));
+
+				//popmessage("xc: %g, yc: %g", xc, yc);
+
+				//x2 = x2 * renderScale;
+				//y2 = y2 * renderScale;
+
+				// SOYS just render to edge.
+				x2 = cliprect.max_x;
+				y2 = cliprect.max_y;
+
+				m_view->set_viewport(xc * renderScale, yc * renderScale, x1 * renderScale, 
+										x2, y1 * renderScale, y2);
+
+				//---------------------------------------------------------------------------------
+				#endif
+
+				#if 0
+				// Original code
 				m_view->set_viewport(xc, yc, x1, x2, y1, y2);
+				#endif 
 
 				list_offset += 16;
 				break;
@@ -1414,7 +1926,23 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				break;
 			case 9:
 				LOG_TGP(("VIDEO:   zoom (%f, %f)\n", readf(list_offset + 2), readf(list_offset + 4)));
-				m_view->set_zoom(readf(list_offset + 2) * 4, readf(list_offset + 4) * 4);
+				
+				#if 1
+				// SOYS - Scale up to cliprect size -----------------------------------------------
+
+				m_view->set_zoom(readf(list_offset + 2) * 4 * renderScale, 
+					readf(list_offset + 4) * 4 * renderScale);
+
+				//---------------------------------------------------------------------------------
+				#endif
+
+				#if 0
+				// Original code
+
+				m_view->set_zoom(readf(list_offset + 2) * 4 * renderScale, 
+					readf(list_offset + 4) * 4 * renderScale);
+				#endif
+
 				list_offset += 6;
 				break;
 			case 0xa:
@@ -1439,8 +1967,23 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				break;
 			}
 			case 0xc:
+				#if 1
+				// SOYS the translation for the view - Scale up so everything is move to correct
+				// place on screen ----------------------------------------------------------------
+
+				m_view->set_view_translation(readf(list_offset + 2) * renderScale, 
+								readf(list_offset + 4) * renderScale);
+
+				//---------------------------------------------------------------------------------
+				#endif
+
+				#if 0
 				LOG_TGP(("VIDEO:   trans (%f, %f)\n", readf(list_offset + 2), readf(list_offset + 4)));
-				m_view->set_view_translation(readf(list_offset + 2), readf(list_offset + 4));
+
+				// original code
+				m_view->set_view_translation(readf(list_offset + 2), readf(list_offset + 4));				
+				#endif
+
 				list_offset += 6;
 				break;
 			case 0xf:
@@ -1472,6 +2015,7 @@ void model1_state::tgp_scan()
 #endif
 	if (!m_render_done && (m_listctl[1] & 0x1f) == 0x1f)
 	{
+		// SOYS another zcull?
 		set_current_render_list();
 		// Skip everything but the data uploads
 		LOG_TGP(("VIDEO: scan list %d\n", get_list_number()));
@@ -1509,8 +2053,12 @@ void model1_state::tgp_scan()
 				}
 				case 5:
 				{
+					// SOYS - zcull Here we are loading in all the polygons
+					// What if we boost the numbers
+					
 					int adr = readi(list_offset + 2);
 					int len = readi(list_offset + 4);
+					//len = 8000;
 					for (int i = 0; i < len; i++)
 					{
 						m_poly_ram[adr - 0x800000 + i] = readi(list_offset + 2 * i + 6);
@@ -1520,6 +2068,8 @@ void model1_state::tgp_scan()
 				}
 				case 6:
 				{
+					// The lights
+
 					int adr = readi(list_offset + 2);
 					int len = readi(list_offset + 4);
 					//LOG_TGP(("VIDEO:   upload data, adr=%x, len=%x\n", adr, len));
@@ -1581,6 +2131,7 @@ void model1_state::video_start()
 	m_quadpt = &m_quaddb[0];
 	m_listctl[0] = m_listctl[1] = 0;
 
+	// SOYS - Disabled clipping
 	m_clipfn[0].m_isclipped = &model1_state::fclip_isc_bottom;
 	m_clipfn[0].m_clip = &model1_state::fclip_clip_bottom;
 	m_clipfn[1].m_isclipped = &model1_state::fclip_isc_top;
@@ -1595,9 +2146,70 @@ void model1_state::video_start()
 	save_item(NAME(m_listctl));
 }
 
+// SOYS -- The bitmap scaler.. Very simplified for speed. Only does multiples
+// of the originalBitmapWidth and originalBitmapHeight.. Hence we are using
+// the pixel with to be renderScale.
+
+// You should have the tBitmap size, the renderScale * source bitmap sBitmap size
+// You you get a whole number pixel width and height
+//
+// You should fill the sBitmap prior to drawing on it with a unique color 
+// using the MSB of the 32 bits like 0x7fffffff to make transparency work.
+
+void model1_state::CopyTmpBitmapToBitmap(
+	bitmap_rgb32& sBitmap, bitmap_rgb32 &tBitmap, uint32_t transparentColor)
+{
+	//popmessage("sb.wh: %d,%d, tb.wh: %d,%d", sBitmap.width(), sBitmap.height(), 
+	//			tBitmap.width(), tBitmap.height());
+
+	const int sWidth = sBitmap.width();
+	const int tWidth = tBitmap.width();
+
+	const int sHeight = sBitmap.width();
+	const int tHeight = tBitmap.height();
+	const int renderScaleMinus1 = renderScale - 1;
+
+	uint32_t* sBP = (uint32_t*) sBitmap.raw_pixptr(0);
+	uint32_t* tBP = (uint32_t*) tBitmap.raw_pixptr(0);
+
+	int cX = 0; int cY = 0;
+	for(int r = 0; r < sHeight; r++)
+	{
+		// Repeat each row for renderScale times
+		for(int r2 = 0; r2 < renderScale && cY++ < tHeight; r2++)
+		{
+			// Repeat each pixel for renderScale times
+			cX = 0;
+			for(int c = 0; c < sWidth; c++)
+			{
+				for(int c2 = 0; c2 < renderScale && cX++ < tWidth; c2++)
+				{
+					if(*sBP != transparentColor)
+						*tBP++ = *sBP;
+					else
+						tBP++;
+				}
+				sBP++;
+			}
+
+			if(r2 == renderScaleMinus1) break;
+
+			// Reset original row pix pointer
+			sBP -= sWidth;
+		}
+	}
+}
+
 uint32_t model1_state::screen_update_model1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	model1_state::view_t *view = m_view.get();
+
+	//popmessage("tb.wh: %d,%d, sb.xysl: %d,%d, tb.xysl: %d,%d"
+	//			", cr: %d,%d,%d,%d", 
+	//			bitmap.width(), bitmap.height(), 0, 0, 0, 0, cliprect.min_x,
+	//			cliprect.min_y, cliprect.max_x, cliprect.max_y);
+
+	// SOYS - U can use the following to change the camera view for the 3D
 #if 0
 	{
 		bool mod = false;
@@ -1654,19 +2266,110 @@ uint32_t model1_state::screen_update_model1(screen_device &screen, bitmap_rgb32 
 	view->ayys = sin(view->ayy);
 
 	screen.priority().fill(0);
+
+	// SOYS Render Scaling -------------------------------------------------------
+
+	// Create our temp bitmaps for the various layers
+
+	if(tmpBitmap.width() == 0)
+	{
+		// Original cliprest
+
+		originalCliprect.min_x = 0;
+		originalCliprect.min_y = 0;
+		originalCliprect.max_x = originalCliprectX2;
+		originalCliprect.max_y = originalCliprectY2;
+
+		// Resize out tmp bitmap to the original size.
+
+		tmpBitmap.resize(originalBitmapWidth, originalBitmapHeight);
+		tmpBitmap2.resize(originalBitmapWidth, originalBitmapHeight);
+	}
+
+	// Black background
+	bitmap.fill(m_palette->black_pen(), cliprect);
+
+	//----------------------------------------------------------------------------
+
+#if 0
+	// Original background
 	bitmap.fill(m_palette->pen(0x400), cliprect);
+#endif
+
+	// SOYS - These are the sprites and other aspects. This is
+	// behind the 3D
+
+#if 0
+	// Original code for background tiles
 
 	m_tiles->draw(screen, bitmap, cliprect, 6, 0, 0);
+	
+	// This is the world cube background
 	m_tiles->draw(screen, bitmap, cliprect, 4, 0, 0);
+
+	// Other sprites
 	m_tiles->draw(screen, bitmap, cliprect, 2, 0, 0);
 	m_tiles->draw(screen, bitmap, cliprect, 0, 0, 0);
+#endif
 
+
+#if 1
+	// Soys - Draw the original background to tmpBitmap then
+	// scale up to new bitmap
+
+	// So if we are drawing to another 3D renderer, we can use tmpBitmap
+	// as a texture and scale that to the screen
+
+	tmpBitmap.fill(m_palette->black_pen(), originalCliprect);
+
+	// This will draw to our tmp bitmap and it gets scalled up	
+	m_tiles->draw(screen, tmpBitmap, originalCliprect, 6, 0, 0);
+	
+	// This is the world cube background
+	if(renderBackground)
+	{
+		m_tiles->draw(screen, tmpBitmap, originalCliprect, 4, 0, 0);
+	}
+
+	// Other sprites
+	m_tiles->draw(screen, tmpBitmap, originalCliprect, 2, 0, 0);
+	m_tiles->draw(screen, tmpBitmap, originalCliprect, 0, 0, 0);
+
+	CopyTmpBitmapToBitmap(tmpBitmap, bitmap, 0x7fffffff);
+#endif
+
+	// SOYS - These are the 3D objects.. see tgp_render for
+	// changes there.
+
+	// This is the 3D aspects, which we can render using 3d engin
+	
 	tgp_render(bitmap, cliprect);
+
+#if 0
+	// Original bitmaps on top of 3D, these must be rendered
+	// with transparency
 
 	m_tiles->draw(screen, bitmap, cliprect, 7, 0, 0);
 	m_tiles->draw(screen, bitmap, cliprect, 5, 0, 0);
 	m_tiles->draw(screen, bitmap, cliprect, 3, 0, 0);
 	m_tiles->draw(screen, bitmap, cliprect, 1, 0, 0);
+#endif
+
+#if 1
+	// SOYS - New scaled version
+	// Draw to another buffer that matches original screen
+	// then scale up
+
+	tmpBitmap2.fill(0x7fffffff, originalCliprect);
+	m_tiles->draw(screen, tmpBitmap2, originalCliprect, 7, 0, 0);
+	m_tiles->draw(screen, tmpBitmap2, originalCliprect, 5, 0, 0);
+	m_tiles->draw(screen, tmpBitmap2, originalCliprect, 3, 0, 0);
+	m_tiles->draw(screen, tmpBitmap2, originalCliprect, 1, 0, 0);
+	CopyTmpBitmapToBitmap(tmpBitmap2, bitmap, 0x7fffffff);
+#endif
+
+	// We can also inject out own watermarks on top.. E.g. the FPS
+	// the key to press ect.
 
 	return 0;
 }
