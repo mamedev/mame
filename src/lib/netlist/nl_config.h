@@ -32,40 +32,6 @@
 //  GENERAL
 //============================================================
 
-/// \brief  Make use of a memory pool for performance related objects.
-///
-/// Set to 1 to compile netlist with memory allocations from a
-/// linear memory pool. This is based of the assumption that
-/// due to enhanced locality there will be less cache misses.
-/// Your mileage may vary.
-///
-
-#ifndef NL_USE_MEMPOOL
-#define NL_USE_MEMPOOL               (1)
-#endif
-
-/// brief default minimum alignment of mempool_arena
-///
-/// 256 is the best compromise between logic applications like MAME
-/// TTL games (e.g. pong) and analog applications like e.g. kidnikik sound.
-///
-/// Best performance for pong is achieved with a value of 16, but this degrades
-/// kidniki performance by ~10%.
-///
-/// More work is needed here.
-#define NL_MEMPOOL_ALIGN            (16)
-
-/// \brief  Enable queue statistics.
-///
-/// Queue statistics come at a performance cost. Although
-/// the cost is low, we disable them here since they are
-/// only needed during development.
-///
-
-#ifndef NL_USE_QUEUE_STATS
-#define NL_USE_QUEUE_STATS             (0)
-#endif
-
 /// \brief  Compile in academic solvers
 ///
 /// Set to 0 to disable compiling the following solvers:
@@ -94,7 +60,7 @@
 ///
 
 #ifndef NL_USE_COPY_INSTEAD_OF_REFERENCE
-#define NL_USE_COPY_INSTEAD_OF_REFERENCE (0)
+#define NL_USE_COPY_INSTEAD_OF_REFERENCE (0)//FIXME: Move to config struct later
 #endif
 
 /// \brief Use backward Euler integration
@@ -119,33 +85,6 @@
 #define NL_USE_FLOAT128 PUSE_FLOAT128
 #endif
 
-/// \brief Prefer 128bit int type for ptime if supported
-///
-/// Set this to one if you want to use 128 bit int for ptime.
-/// This is about 10% slower on a skylake processor for pongf.
-///
-#ifndef NL_PREFER_INT128
-#define NL_PREFER_INT128 (0)
-#endif
-
-/// \brief Support float type for matrix calculations.
-///
-/// Defaults to NL_USE_ACADEMIC_SOLVERS to provide faster build times
-
-#ifndef NL_USE_FLOAT_MATRIX
-#define NL_USE_FLOAT_MATRIX (NL_USE_ACADEMIC_SOLVERS)
-//#define NL_USE_FLOAT_MATRIX 1
-#endif
-
-/// \brief Support long double type for matrix calculations.
-///
-/// Defaults to NL_USE_ACADEMIC_SOLVERS to provide faster build times
-
-#ifndef NL_USE_LONG_DOUBLE_MATRIX
-#define NL_USE_LONG_DOUBLE_MATRIX (NL_USE_ACADEMIC_SOLVERS)
-//#define NL_USE_LONG_DOUBLE_MATRIX 1
-#endif
-
 //============================================================
 //  DEBUGGING
 //============================================================
@@ -155,7 +94,6 @@
 
 #ifndef NL_DEBUG
 #define NL_DEBUG                    (false)
-//#define NL_DEBUG                    (true)
 #endif
 
 ///
@@ -164,9 +102,47 @@
 
 namespace netlist
 {
-	// FIXME: need a better solution for global constants.
-	struct config
+	//============================================================
+	//  GENERAL
+	//============================================================
+
+	struct config_default
 	{
+		/// \brief  Make use of a memory pool for performance related objects.
+		///
+		/// Set to 1 to compile netlist with memory allocations from a
+		/// linear memory pool. This is based of the assumption that
+		/// due to enhanced locality there will be less cache misses.
+		/// Your mileage may vary.
+		///
+		using use_mempool = std::integral_constant<bool, true>;
+
+		/// brief default minimum alignment of mempool_arena
+		///
+		/// 256 is the best compromise between logic applications like MAME
+		/// TTL games (e.g. pong) and analog applications like e.g. kidnikik sound.
+		///
+		/// Best performance for pong is achieved with a value of 16, but this degrades
+		/// kidniki performance by ~10%.
+		///
+		/// More work is needed here.
+		using mempool_align = std::integral_constant<std::size_t, 16>;
+
+		/// \brief Prefer 128bit int type for ptime if supported
+		///
+		/// Set this to one if you want to use 128 bit int for ptime.
+		/// This is about 10% slower on a skylake processor for pongf.
+		///
+		using prefer_int128 = std::integral_constant<bool, false>;
+
+		/// \brief  Enable queue statistics.
+		///
+		/// Queue statistics come at a performance cost. Although
+		/// the cost is low, we disable them here since they are
+		/// only needed during development.
+		///
+		using use_queue_stats = std::integral_constant<bool, false>;
+
 		//============================================================
 		// Time resolution
 		//============================================================
@@ -202,17 +178,23 @@ namespace netlist
 
 		/// \brief Maximum queue size
 		///
-		using MAX_QUEUE_SIZE = std::integral_constant<std::size_t, 1024>; // NOLINT
+		using max_queue_size = std::integral_constant<std::size_t, 1024>; // NOLINT
 
 		/// \brief Maximum queue size for solvers
 		///
-		using MAX_SOLVER_QUEUE_SIZE = std::integral_constant<std::size_t, 512>; // NOLINT
+		using max_solver_queue_size = std::integral_constant<std::size_t, 512>; // NOLINT
 
-		using use_float_matrix = std::integral_constant<bool, NL_USE_FLOAT_MATRIX>;
-		using use_long_double_matrix = std::integral_constant<bool, NL_USE_LONG_DOUBLE_MATRIX>;
+		/// \brief Support float type for matrix calculations.
+		///
+		/// Defaults to NL_USE_ACADEMIC_SOLVERS to provide faster build times
+		using use_float_matrix = std::integral_constant<bool, NL_USE_ACADEMIC_SOLVERS>;
+
+		/// \brief Support long double type for matrix calculations.
+		///
+		/// Defaults to NL_USE_ACADEMIC_SOLVERS to provide faster build times
+		using use_long_double_matrix = std::integral_constant<bool, NL_USE_ACADEMIC_SOLVERS>;
+
 		using use_float128_matrix = std::integral_constant<bool, NL_USE_FLOAT128>;
-
-		using use_mempool = std::integral_constant<bool, NL_USE_MEMPOOL>;
 
 		/// \brief  Floating point types used
 		///
@@ -225,6 +207,15 @@ namespace netlist
 		///  FIXME: More work needed. Review magic numbers.
 		///
 		using fptype = double;
+	};
+
+	/// \brief  Netlist configuration.
+	///
+	/// You can override all netlist build defaults here which are defined
+	/// in \ref config_default.
+	///
+	struct config : public config_default
+	{
 	};
 
 	using nl_fptype = config::fptype;
@@ -317,11 +308,7 @@ namespace netlist
 //  Asserts
 //============================================================
 
-#if defined(MAME_DEBUG) || (NL_DEBUG == true)
-#define nl_assert(x)    passert_always(x)
-#else
-#define nl_assert(x)    do { } while (0)
-#endif
+#define nl_assert(x)    do { if (NL_DEBUG) passert_always(x); } while (0)
 #define nl_assert_always(x, msg) passert_always_msg(x, msg)
 
 #endif // NLCONFIG_H_
