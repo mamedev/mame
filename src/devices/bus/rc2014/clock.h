@@ -15,5 +15,6 @@
 
 DECLARE_DEVICE_TYPE(RC2014_SINGLE_CLOCK, device_rc2014_card_interface)
 DECLARE_DEVICE_TYPE(RC2014_DUAL_CLOCK, device_rc2014_ext_card_interface)
+DECLARE_DEVICE_TYPE(RC2014_DUAL_CLOCK_40P, device_rc2014_card_interface)
 
 #endif // MAME_BUS_RC2014_CLOCK_H

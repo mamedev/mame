@@ -20,10 +20,15 @@
 void rc2014_bus_modules(device_slot_interface &device)
 {
 	device.option_add("z80", RC2014_Z80CPU);
+	// Z80 2.1 on standard bus is same as Z80 module
+	device.option_add("z80_21_40p", RC2014_Z80CPU);
 	device.option_add("clock", RC2014_SINGLE_CLOCK);
+	device.option_add("dual_clk_40p", RC2014_DUAL_CLOCK_40P);
 	device.option_add("ram32k", RC2014_RAM_32K);
+	device.option_add("ram64k_40p", RC2014_RAM_64K_40P);
 	device.option_add("sw_rom", RC2014_SWITCHABLE_ROM);
 	device.option_add("serial", RC2014_SERIAL_IO);
+	device.option_add("sio_40p", RC2014_DUAL_SERIAL_40P);
 	device.option_add("cf", RC2014_COMPACT_FLASH);
 	device.option_add("rom_ram", RC2014_ROM_RAM_512);
 }

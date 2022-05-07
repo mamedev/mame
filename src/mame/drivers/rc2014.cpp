@@ -38,6 +38,19 @@ public:
 		RC2014_SLOT(config, "bus:8", m_rc2014_bus, rc2014_bus_modules, nullptr);
 	}
 
+	void rc2014zed(machine_config &config)
+	{
+		RC2014_BUS(config, m_rc2014_bus, 0);
+		RC2014_SLOT(config, "bus:1", m_rc2014_bus, rc2014_bus_modules, "z80_21_40p");
+		RC2014_SLOT(config, "bus:2", m_rc2014_bus, rc2014_bus_modules, "dual_clk_40p");
+		RC2014_SLOT(config, "bus:3", m_rc2014_bus, rc2014_bus_modules, "rom_ram");
+		RC2014_SLOT(config, "bus:4", m_rc2014_bus, rc2014_bus_modules, "sio_40p");
+		RC2014_SLOT(config, "bus:5", m_rc2014_bus, rc2014_bus_modules, nullptr);
+		RC2014_SLOT(config, "bus:6", m_rc2014_bus, rc2014_bus_modules, nullptr);
+		RC2014_SLOT(config, "bus:7", m_rc2014_bus, rc2014_bus_modules, nullptr);
+		RC2014_SLOT(config, "bus:8", m_rc2014_bus, rc2014_bus_modules, nullptr);
+	}
+
 private:
 	required_device<rc2014_bus_device> m_rc2014_bus;
 };
@@ -45,6 +58,8 @@ private:
 ROM_START(rc2014)
 ROM_END
 ROM_START(rc2014cl2)
+ROM_END
+ROM_START(rc2014zed)
 ROM_END
 
 class rc2014pro_state : public driver_device
@@ -71,11 +86,8 @@ public:
 		RC2014_EXT_SLOT(config, "bus:11", m_rc2014_bus, rc2014_ext_bus_modules, nullptr);
 		RC2014_EXT_SLOT(config, "bus:12", m_rc2014_bus, rc2014_ext_bus_modules, nullptr);
 	}
-
-	// RC2014 Zed model is on 8 slot standard 40 pin slot board, but clk2 is connected to
-	// SIO module using jumper wire
-	// Zed Pro model is using extended slot board with same modules installed
-	void rc2014zed(machine_config &config)
+	
+	void rc2014zedp(machine_config &config)
 	{
 		RC2014_EXT_BUS(config, m_rc2014_bus, 0);
 		RC2014_EXT_SLOT(config, "bus:1", m_rc2014_bus, rc2014_ext_bus_modules, "z80_21");
@@ -98,7 +110,7 @@ private:
 ROM_START(rc2014pro)
 ROM_END
 
-ROM_START(rc2014zed)
+ROM_START(rc2014zedp)
 ROM_END
 
 } // anonymous namespace
@@ -108,4 +120,5 @@ ROM_END
 COMP( 2016, rc2014,     0,        0,        rc2014,    0,       rc2014_state,    empty_init,    "RFC2795 Ltd",    "RC2014 Classic",    MACHINE_SUPPORTS_SAVE )
 COMP( 2017, rc2014pro,  rc2014,   0,        rc2014pro, 0,       rc2014pro_state, empty_init,    "RFC2795 Ltd",    "RC2014 Pro",        MACHINE_SUPPORTS_SAVE )
 COMP( 2020, rc2014cl2,  rc2014,   0,        rc2014cl2, 0,       rc2014_state,    empty_init,    "RFC2795 Ltd",    "RC2014 Classic 2",  MACHINE_SUPPORTS_SAVE )
-COMP( 2018, rc2014zed , rc2014,   0,        rc2014zed ,0,       rc2014pro_state, empty_init,    "RFC2795 Ltd",    "RC2014 Zed/Zed Pro",MACHINE_SUPPORTS_SAVE )
+COMP( 2018, rc2014zed , rc2014,   0,        rc2014zed ,0,       rc2014_state,    empty_init,    "RFC2795 Ltd",    "RC2014 Zed",        MACHINE_SUPPORTS_SAVE )
+COMP( 2018, rc2014zedp, rc2014,   0,        rc2014zedp,0,       rc2014pro_state, empty_init,    "RFC2795 Ltd",    "RC2014 Zed Pro",    MACHINE_SUPPORTS_SAVE )

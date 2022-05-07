@@ -15,5 +15,6 @@
 
 DECLARE_DEVICE_TYPE(RC2014_RAM_32K, device_rc2014_card_interface)
 DECLARE_DEVICE_TYPE(RC2014_RAM_64K, device_rc2014_ext_card_interface)
+DECLARE_DEVICE_TYPE(RC2014_RAM_64K_40P, device_rc2014_card_interface)
 
 #endif // MAME_BUS_RC2014_RAM_H

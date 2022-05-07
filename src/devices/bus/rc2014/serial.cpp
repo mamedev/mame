@@ -84,77 +84,61 @@ void serial_io_device::device_add_mconfig(machine_config &config)
 //  Module author: Spencer Owen
 //**************************************************************************
 
-class dual_serial_device : public device_t, public device_rc2014_ext_card_interface
-{
-public:
-	// construction/destruction
-	dual_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+//**************************************************************************
+//  dual_serial_base
+//**************************************************************************
 
+class dual_serial_base : public device_t
+{
 protected:
+	// construction/destruction
+	dual_serial_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_resolve_objects() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_bus->int_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( tx_w ) { m_bus->tx_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( tx2_w ) { m_bus->tx2_w(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( irq_w ) = 0;
+	virtual DECLARE_WRITE_LINE_MEMBER( tx_w ) = 0;
+	virtual DECLARE_WRITE_LINE_MEMBER( tx2_w ) = 0;
 	DECLARE_WRITE_LINE_MEMBER( clk1_w ) { if (m_clk_portb == 1) { m_sio->txcb_w(state); m_sio->rxcb_w(state); } }
 	DECLARE_WRITE_LINE_MEMBER( clk2_w ) { if (m_clk_portb == 0) { m_sio->txcb_w(state); m_sio->rxcb_w(state); } }
-private:
+
+	// base-class members
 	u8 m_clk_portb;
 	required_ioport m_portb;
 	required_device<z80sio_device> m_sio;
 };
 
-dual_serial_device::dual_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, RC2014_SERIAL_IO, tag, owner, clock)
-	, device_rc2014_ext_card_interface(mconfig, *this)
+dual_serial_base::dual_serial_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, m_clk_portb(0)
 	, m_portb(*this, "PORTB")
 	, m_sio(*this, "sio")
 {
 }
 
-void dual_serial_device::device_start()
+void dual_serial_base::device_start()
 {
-	// A2 not connected
-	m_bus->installer(AS_IO)->install_readwrite_handler(0x80, 0x80, 0, 0x04, 0, read8smo_delegate(*m_sio, FUNC(z80sio_device::ca_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::ca_w)));
-	m_bus->installer(AS_IO)->install_readwrite_handler(0x81, 0x81, 0, 0x04, 0, read8smo_delegate(*m_sio, FUNC(z80sio_device::da_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::da_w)));
-	m_bus->installer(AS_IO)->install_readwrite_handler(0x82, 0x82, 0, 0x04, 0, read8smo_delegate(*m_sio, FUNC(z80sio_device::cb_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::cb_w)));
-	m_bus->installer(AS_IO)->install_readwrite_handler(0x83, 0x83, 0, 0x04, 0, read8smo_delegate(*m_sio, FUNC(z80sio_device::db_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::db_w)));
 }
 
-void dual_serial_device::device_reset()
+void dual_serial_base::device_reset()
 {
 	m_clk_portb = m_portb->read();
 }
 
-void dual_serial_device::device_resolve_objects()
-{
-	m_bus->clk_callback().append(m_sio, FUNC(z80sio_device::txca_w));
-	m_bus->clk_callback().append(m_sio, FUNC(z80sio_device::rxca_w));
-	m_bus->clk_callback().append(*this, FUNC(dual_serial_device::clk1_w));
-	m_bus->clk2_callback().append(*this, FUNC(dual_serial_device::clk2_w));
-
-	m_bus->rx_callback().append(m_sio, FUNC(z80sio_device::rxa_w));
-	m_bus->rx2_callback().append(m_sio, FUNC(z80sio_device::rxb_w));
-
-	m_bus->add_to_daisy_chain(m_sio->tag());
-}
-
-void dual_serial_device::device_add_mconfig(machine_config &config)
+void dual_serial_base::device_add_mconfig(machine_config &config)
 {
 	Z80SIO(config, m_sio, 0);
 	m_sio->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
-	m_sio->out_txda_callback().append(FUNC(dual_serial_device::tx_w));
+	m_sio->out_txda_callback().append(FUNC(dual_serial_base::tx_w));
 	m_sio->out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
 	m_sio->out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
-	m_sio->out_txdb_callback().append(FUNC(dual_serial_device::tx2_w));
+	m_sio->out_txdb_callback().append(FUNC(dual_serial_base::tx2_w));
 	m_sio->out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
-	m_sio->out_int_callback().set(FUNC(dual_serial_device::irq_w));
+	m_sio->out_int_callback().set(FUNC(dual_serial_base::irq_w));
 
 	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, "terminal"));
 	rs232a.rxd_handler().set(m_sio, FUNC(z80sio_device::rxa_w));
@@ -171,9 +155,105 @@ static INPUT_PORTS_START( dual_serial_jumpers )
 	PORT_CONFSETTING( 0x1, "CLK1 (Closed)" )
 INPUT_PORTS_END
 
-ioport_constructor dual_serial_device::device_input_ports() const
+ioport_constructor dual_serial_base::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( dual_serial_jumpers );
+}
+
+//**************************************************************************
+//  RC2014 Dual Serial module SIO/2 in extended bus
+//**************************************************************************
+
+class dual_serial_device : public dual_serial_base, public device_rc2014_ext_card_interface
+{
+public:
+	// construction/destruction
+	dual_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_resolve_objects() override;
+
+	// base-class overrides
+	DECLARE_WRITE_LINE_MEMBER( irq_w ) override { m_bus->int_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( tx_w ) override { m_bus->tx_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( tx2_w ) override { m_bus->tx2_w(state); }
+};
+
+dual_serial_device::dual_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: dual_serial_base(mconfig, RC2014_SERIAL_IO, tag, owner, clock)
+	, device_rc2014_ext_card_interface(mconfig, *this)
+{
+}
+
+void dual_serial_device::device_start()
+{
+	// A2 not connected
+	m_bus->installer(AS_IO)->install_readwrite_handler(0x80, 0x80, 0, 0x04, 0, read8smo_delegate(*m_sio, FUNC(z80sio_device::ca_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::ca_w)));
+	m_bus->installer(AS_IO)->install_readwrite_handler(0x81, 0x81, 0, 0x04, 0, read8smo_delegate(*m_sio, FUNC(z80sio_device::da_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::da_w)));
+	m_bus->installer(AS_IO)->install_readwrite_handler(0x82, 0x82, 0, 0x04, 0, read8smo_delegate(*m_sio, FUNC(z80sio_device::cb_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::cb_w)));
+	m_bus->installer(AS_IO)->install_readwrite_handler(0x83, 0x83, 0, 0x04, 0, read8smo_delegate(*m_sio, FUNC(z80sio_device::db_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::db_w)));
+}
+
+void dual_serial_device::device_resolve_objects()
+{
+	m_bus->clk_callback().append(m_sio, FUNC(z80sio_device::txca_w));
+	m_bus->clk_callback().append(m_sio, FUNC(z80sio_device::rxca_w));
+	m_bus->clk_callback().append(*this, FUNC(dual_serial_device::clk1_w));
+	m_bus->clk2_callback().append(*this, FUNC(dual_serial_device::clk2_w));
+
+	m_bus->rx_callback().append(m_sio, FUNC(z80sio_device::rxa_w));
+	m_bus->rx2_callback().append(m_sio, FUNC(z80sio_device::rxb_w));
+
+	m_bus->add_to_daisy_chain(m_sio->tag());
+}
+
+//**************************************************************************
+//  RC2014 Dual Serial module SIO/2 in standard bus
+//**************************************************************************
+
+class dual_serial_device_40pin : public dual_serial_base, public device_rc2014_card_interface
+{
+public:
+	// construction/destruction
+	dual_serial_device_40pin(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_resolve_objects() override;
+
+	// base-class overrides
+	DECLARE_WRITE_LINE_MEMBER( irq_w ) override { m_bus->int_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( tx_w ) override { m_bus->tx_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( tx2_w ) override { }
+};
+
+dual_serial_device_40pin::dual_serial_device_40pin(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: dual_serial_base(mconfig, RC2014_SERIAL_IO, tag, owner, clock)
+	, device_rc2014_card_interface(mconfig, *this)
+{
+}
+
+void dual_serial_device_40pin::device_start()
+{
+	// A2 not connected
+	m_bus->installer(AS_IO)->install_readwrite_handler(0x80, 0x80, 0, 0x04, 0, read8smo_delegate(*m_sio, FUNC(z80sio_device::ca_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::ca_w)));
+	m_bus->installer(AS_IO)->install_readwrite_handler(0x81, 0x81, 0, 0x04, 0, read8smo_delegate(*m_sio, FUNC(z80sio_device::da_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::da_w)));
+	m_bus->installer(AS_IO)->install_readwrite_handler(0x82, 0x82, 0, 0x04, 0, read8smo_delegate(*m_sio, FUNC(z80sio_device::cb_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::cb_w)));
+	m_bus->installer(AS_IO)->install_readwrite_handler(0x83, 0x83, 0, 0x04, 0, read8smo_delegate(*m_sio, FUNC(z80sio_device::db_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::db_w)));
+}
+
+void dual_serial_device_40pin::device_resolve_objects()
+{
+	m_bus->clk_callback().append(m_sio, FUNC(z80sio_device::txca_w));
+	m_bus->clk_callback().append(m_sio, FUNC(z80sio_device::rxca_w));
+	m_bus->clk_callback().append(*this, FUNC(dual_serial_device_40pin::clk1_w));
+
+	m_bus->rx_callback().append(m_sio, FUNC(z80sio_device::rxa_w));
+
+	m_bus->add_to_daisy_chain(m_sio->tag());
 }
 
 }
@@ -183,3 +263,4 @@ ioport_constructor dual_serial_device::device_input_ports() const
 
 DEFINE_DEVICE_TYPE_PRIVATE(RC2014_SERIAL_IO, device_rc2014_card_interface, serial_io_device, "rc2014_serial_io", "RC2014 Serial I/O module")
 DEFINE_DEVICE_TYPE_PRIVATE(RC2014_DUAL_SERIAL, device_rc2014_ext_card_interface, dual_serial_device, "rc2014_dual_serial", "RC2014 Dual Serial module SIO/2")
+DEFINE_DEVICE_TYPE_PRIVATE(RC2014_DUAL_SERIAL_40P, device_rc2014_card_interface, dual_serial_device_40pin, "rc2014_dual_serial_40p", "RC2014 Dual Serial module SIO/2 (40 pin)")

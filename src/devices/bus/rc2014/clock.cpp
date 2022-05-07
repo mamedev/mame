@@ -23,11 +23,12 @@ public:
 	// construction/destruction
 	single_clock_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	DECLARE_WRITE_LINE_MEMBER( clk_w ) { m_bus->clk_w(state); }
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
+
+	DECLARE_WRITE_LINE_MEMBER( clk_w ) { m_bus->clk_w(state); }
 };
 
 single_clock_device::single_clock_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -52,30 +53,34 @@ void single_clock_device::device_add_mconfig(machine_config &config)
 //  Module author: Spencer Owen
 //**************************************************************************
 
-class dual_clock_device : public device_t, public device_rc2014_ext_card_interface
-{
-public:
-	// construction/destruction
-	dual_clock_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+//**************************************************************************
+//  dual_clock_base
+//**************************************************************************
 
-	DECLARE_WRITE_LINE_MEMBER( clk_w ) { m_bus->clk_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( clk2_w ) { m_bus->clk2_w(state); }
+class dual_clock_base : public device_t
+{
 protected:
+	// construction/destruction
+	dual_clock_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
-private:
+
+	virtual DECLARE_WRITE_LINE_MEMBER( clk_w ) = 0;
+	virtual DECLARE_WRITE_LINE_MEMBER( clk2_w ) = 0;
+
+	// base-class members
 	required_device<clock_device> m_clock_1;
 	required_device<clock_device> m_clock_2;
 	required_ioport m_clk_sel_1;
 	required_ioport m_clk_sel_2;
 };
 
-dual_clock_device::dual_clock_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, RC2014_DUAL_CLOCK, tag, owner, clock)
-	, device_rc2014_ext_card_interface(mconfig, *this)
+dual_clock_base::dual_clock_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, m_clock_1(*this, "clock1")
 	, m_clock_2(*this, "clock2")
 	, m_clk_sel_1(*this, "CLOCK1")
@@ -83,7 +88,7 @@ dual_clock_device::dual_clock_device(const machine_config &mconfig, const char *
 {
 }
 
-void dual_clock_device::device_start()
+void dual_clock_base::device_start()
 {
 }
 
@@ -101,11 +106,10 @@ static constexpr u32 clock_mapping[] =
 	0
 };
 
-void dual_clock_device::device_reset()
+void dual_clock_base::device_reset()
 {
 	u32 clk1 = clock_mapping[m_clk_sel_1->read()];
 	m_clock_1->set_clock(clk1);
-	m_bus->set_bus_clock(clk1);
 
 	u32 clk2 = clock_mapping[m_clk_sel_2->read()];
 	m_clock_2->set_clock(clk2);
@@ -140,18 +144,80 @@ static INPUT_PORTS_START( dual_clock_jumpers )
 	PORT_CONFSETTING( 0x9, "External" )
 INPUT_PORTS_END
 
-ioport_constructor dual_clock_device::device_input_ports() const
+ioport_constructor dual_clock_base::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( dual_clock_jumpers );
 }
 
-void dual_clock_device::device_add_mconfig(machine_config &config)
+void dual_clock_base::device_add_mconfig(machine_config &config)
 {
 	CLOCK(config, m_clock_1, 0);
-	m_clock_1->signal_handler().set(FUNC(dual_clock_device::clk_w));
+	m_clock_1->signal_handler().set(FUNC(dual_clock_base::clk_w));
 
 	CLOCK(config, m_clock_2, 0);
-	m_clock_2->signal_handler().set(FUNC(dual_clock_device::clk2_w));
+	m_clock_2->signal_handler().set(FUNC(dual_clock_base::clk2_w));
+}
+
+//**************************************************************************
+//  RC2014 Dual Clock module in extended bus
+//**************************************************************************
+
+class dual_clock_device : public dual_clock_base, public device_rc2014_ext_card_interface
+{
+public:
+	// construction/destruction
+	dual_clock_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// device-level overrides
+	virtual void device_reset() override;
+
+	// base-class overrides
+	DECLARE_WRITE_LINE_MEMBER( clk_w ) override { m_bus->clk_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( clk2_w ) override { m_bus->clk2_w(state); }
+};
+
+dual_clock_device::dual_clock_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: dual_clock_base(mconfig, RC2014_DUAL_CLOCK, tag, owner, clock)
+	, device_rc2014_ext_card_interface(mconfig, *this)
+{
+}
+
+void dual_clock_device::device_reset()
+{
+	m_bus->set_bus_clock(clock_mapping[m_clk_sel_1->read()]);
+	dual_clock_base::device_reset();
+}
+
+//**************************************************************************
+//  RC2014 Dual Clock module in standard bus
+//**************************************************************************
+
+class dual_clock_device_40pin : public dual_clock_base, public device_rc2014_card_interface
+{
+public:
+	// construction/destruction
+	dual_clock_device_40pin(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// device-level overrides
+	virtual void device_reset() override;
+
+	// base-class overrides
+	DECLARE_WRITE_LINE_MEMBER( clk_w ) override { m_bus->clk_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( clk2_w ) override { }
+};
+
+dual_clock_device_40pin::dual_clock_device_40pin(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: dual_clock_base(mconfig, RC2014_DUAL_CLOCK, tag, owner, clock)
+	, device_rc2014_card_interface(mconfig, *this)
+{
+}
+
+void dual_clock_device_40pin::device_reset()
+{
+	m_bus->set_bus_clock(clock_mapping[m_clk_sel_1->read()]);
+	dual_clock_base::device_reset();
 }
 
 }
@@ -161,3 +227,4 @@ void dual_clock_device::device_add_mconfig(machine_config &config)
 
 DEFINE_DEVICE_TYPE_PRIVATE(RC2014_SINGLE_CLOCK, device_rc2014_card_interface, single_clock_device, "rc2014_clock", "RC2014 Clock module")
 DEFINE_DEVICE_TYPE_PRIVATE(RC2014_DUAL_CLOCK, device_rc2014_ext_card_interface, dual_clock_device, "rc2014_dual_clock", "RC2014 Dual Clock module")
+DEFINE_DEVICE_TYPE_PRIVATE(RC2014_DUAL_CLOCK_40P, device_rc2014_card_interface, dual_clock_device_40pin, "rc2014_dual_clock_40p", "RC2014 Dual Clock module (40 pin)")
