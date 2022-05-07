@@ -2157,10 +2157,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="sumgame2">
-		<description>Summer Games II</description>
+		<description>Summer Games II [cr]</description>
 		<year>1986</year>
 		<publisher>Epyx</publisher>
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="Niclas (The Carebears)" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="summer games 2.img" size="368640" crc="a9ebb8f5" sha1="78f5300488c37f858681b856ff53e6eeadf01d53"/>
@@ -2470,10 +2471,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="wizardr4">
-		<description>Wizardry IV: The Return of Werdna</description>
+		<description>Wizardry IV: The Return of Werdna [cr]</description>
 		<year>1987</year>
 		<publisher>Sir-Tech Software</publisher>
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="737280">
 				<rom name="wizardry 4 - the return of werdna.img" size="737280" crc="e33b0ade" sha1="fa524474b8c05047baf8474ea2efdf6cb9052a06"/>
@@ -2482,10 +2484,11 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="wizardr5">
-		<description>Wizardry V: Heart of the Maelstrom</description>
+		<description>Wizardry V: Heart of the Maelstrom [cr]</description>
 		<year>1987</year>
 		<publisher>Sir-Tech Software</publisher>
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="737280">
 				<rom name="wizardry 5 - heart of the maelstrom.img" size="737280" crc="a85a5459" sha1="c5a8dd0db15b0bf940b266775d3df19b385f146c"/>
