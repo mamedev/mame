@@ -34,6 +34,7 @@ protected:
 private:
 	uint8_t m_page_reg[4];
 	uint8_t m_page_en;
+	std::unique_ptr<u8[]> m_ram;
 	required_memory_region m_romram;
 	memory_bank_array_creator<4> m_bank;
 };
@@ -43,6 +44,7 @@ rom_ram_512k_device::rom_ram_512k_device(const machine_config &mconfig, const ch
 	, device_rc2014_card_interface(mconfig, *this)
 	, m_page_reg{0,0,0,0}
 	, m_page_en(0)
+	, m_ram(nullptr)
 	, m_romram(*this, "romram")
 	, m_bank(*this, "bank%u", 0U)
 {
@@ -50,6 +52,10 @@ rom_ram_512k_device::rom_ram_512k_device(const machine_config &mconfig, const ch
 
 void rom_ram_512k_device::device_start()
 {
+	m_ram = std::make_unique<u8[]>(0x80000);
+	std::fill_n(m_ram.get(), 0x80000, 0xff);
+	save_pointer(NAME(m_ram), 0x80000);
+
 	// A3 not connected
 	m_bus->installer(AS_IO)->install_write_handler(0x70, 0x73, 0, 0x08, 0, write8sm_delegate(*this, FUNC(rom_ram_512k_device::page_w)));
 	// A3, A1 and A0 not connected
@@ -67,29 +73,32 @@ void rom_ram_512k_device::update_banks()
 {
 	if (m_page_en)
 	{
-		m_bank[0]->set_base(m_romram->base() + (m_page_reg[0] << 14));
-		m_bank[1]->set_base(m_romram->base() + (m_page_reg[1] << 14));
-		m_bank[2]->set_base(m_romram->base() + (m_page_reg[2] << 14));
-		m_bank[3]->set_base(m_romram->base() + (m_page_reg[3] << 14));
-
 		if (m_page_reg[0] & 0x20) {
+			m_bank[0]->set_base(m_ram.get() + ((m_page_reg[0] & 0x1f) << 14));
 			m_bus->installer(AS_PROGRAM)->install_write_bank(0x0000, 0x3fff, m_bank[0]);
 		} else {
+			m_bank[0]->set_base(m_romram->base() + (m_page_reg[0] << 14));
 			m_bus->installer(AS_PROGRAM)->unmap_write(0x0000, 0x3fff);
 		}
 		if (m_page_reg[1] & 0x20) {
+			m_bank[1]->set_base(m_ram.get() + ((m_page_reg[1] & 0x1f) << 14));
 			m_bus->installer(AS_PROGRAM)->install_write_bank(0x4000, 0x7fff, m_bank[1]);
 		} else {
+			m_bank[1]->set_base(m_romram->base() + (m_page_reg[1] << 14));
 			m_bus->installer(AS_PROGRAM)->unmap_write(0x4000, 0x7fff);
 		}
 		if (m_page_reg[2] & 0x20) {
+			m_bank[2]->set_base(m_ram.get() + ((m_page_reg[2] & 0x1f) << 14));
 			m_bus->installer(AS_PROGRAM)->install_write_bank(0x8000, 0xbfff, m_bank[2]);
 		} else {
+			m_bank[2]->set_base(m_romram->base() + (m_page_reg[2] << 14));
 			m_bus->installer(AS_PROGRAM)->unmap_write(0x8000, 0xbfff);
 		}
 		if (m_page_reg[3] & 0x20) {
+			m_bank[3]->set_base(m_ram.get() + ((m_page_reg[3] & 0x1f) << 14));
 			m_bus->installer(AS_PROGRAM)->install_write_bank(0xc000, 0xffff, m_bank[3]);
 		} else {
+			m_bank[3]->set_base(m_romram->base() + (m_page_reg[3] << 14));
 			m_bus->installer(AS_PROGRAM)->unmap_write(0xc000, 0xffff);
 		}
 	}
@@ -103,7 +112,7 @@ void rom_ram_512k_device::update_banks()
 }
 
 ROM_START(rc2014_rom_ram_512k)
-	ROM_REGION( 0x100000, "romram", ROMREGION_ERASEFF)
+	ROM_REGION( 0x80000, "romram", 0)
 	ROM_LOAD( "rc_2.512k.rom", 0x00000, 0x80000, CRC(c3aefb4e) SHA1(34541851dc781033b00cdfbe445e1d91811da5c2) )
 ROM_END
 
