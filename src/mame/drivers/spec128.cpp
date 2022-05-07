@@ -167,6 +167,8 @@ resulting mess can be seen in the F4 viewer display.
 
 void spectrum_128_state::video_start()
 {
+	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
+
 	m_frame_invert_count = 16;
 	m_screen_location = m_ram->pointer() + (5 << 14);
 	m_contention_pattern = {6, 5, 4, 3, 2, 1, 0, 0};
@@ -230,8 +232,6 @@ void spectrum_128_state::spectrum_128_port_7ffd_w(offs_t offset, uint8_t data)
 	/* disable paging? */
 	if (m_port_7ffd_data & 0x20) return;
 
-	if ((m_port_7ffd_data ^ data) & 0x08) m_screen->update_now();
-
 	/* store new state */
 	m_port_7ffd_data = data;
 
@@ -293,6 +293,10 @@ void spectrum_128_state::spectrum_128_fetch(address_map &map)
 
 void spectrum_128_state::machine_start()
 {
+	spectrum_state::machine_start();
+
+	save_item(NAME(m_port_7ffd_data));
+
 	/* rom 0 is 128K rom, rom 1 is 48 BASIC */
 	memory_region *rom = memregion("maincpu");
 	m_bank_rom[0]->configure_entries(0, 2, rom->base() + 0x10000, 0x4000);
@@ -313,7 +317,6 @@ void spectrum_128_state::machine_reset()
 
 	/* set initial ram config */
 	m_port_7ffd_data = 0;
-	m_port_1ffd_data = -1;
 	spectrum_128_update_memory();
 }
 

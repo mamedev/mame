@@ -24,6 +24,8 @@
 ***************************************************************************/
 void spectrum_state::video_start()
 {
+	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
+
 	m_frame_invert_count = 16;
 	m_screen_location = m_video_ram;
 	m_contention_pattern = {6, 5, 4, 3, 2, 1, 0, 0};
@@ -182,7 +184,7 @@ void spectrum_state::content_early(s8 shift)
 	if (m_contention_pattern.empty() || vpos < get_screen_area().top() || vpos > get_screen_area().bottom())
 		return;
 
-	u64 now = m_maincpu->attotime_to_clocks(m_screen->frame_period() - time_until_int()) + shift;
+	u64 now = m_maincpu->total_cycles() - m_int_at + shift;
 	u64 cf = vpos * m_screen->width() * m_maincpu->clock() / m_screen->clock() + m_contention_offset;
 	u64 ct = cf + get_screen_area().width() * m_maincpu->clock() / m_screen->clock();
 
@@ -200,7 +202,7 @@ void spectrum_state::content_late()
 	if (m_contention_pattern.empty() || vpos < get_screen_area().top() || vpos > get_screen_area().bottom())
 		return;
 
-	u64 now = m_maincpu->attotime_to_clocks(m_screen->frame_period() - time_until_int()) + 1;
+	u64 now = m_maincpu->total_cycles() - m_int_at + 1;
 	u64 cf = vpos * m_screen->width() * m_maincpu->clock() / m_screen->clock() + m_contention_offset;
 	u64 ct = cf + get_screen_area().width() * m_maincpu->clock() / m_screen->clock();
 	for(auto i = 0x04; i; i >>= 1)

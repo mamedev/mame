@@ -217,6 +217,8 @@ void pentagon_state::machine_reset()
 
 void pentagon_state::video_start()
 {
+	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
+
 	m_frame_invert_count = 16;
 	m_screen_location = m_ram->pointer() + (5 << 14);
 }
