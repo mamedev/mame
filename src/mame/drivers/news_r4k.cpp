@@ -47,9 +47,6 @@
  *  General Emulation Status (major chips only, there are additional smaller chips including CPLDs on the boards)
  *  CPU card:
  *   - MIPS R4400: emulated, with the caveats above
- *     - The DRC breaks the NEWS-OS APbus bootloader, so for now, DRC is forced disable.
- *       The monitor ROM works just fine with DRC. NetBSD doesn't boot without DRC,
- *       so you must recompile without the DRC disable or with R4000.cpp to use the NetBSD floppy.
  *   - 10x Motorola MCM67A618FN12 SRAMs (secondary cache): partially emulated
  *     - Tag manipulation is implemented. This seems to be enough for NEWS-OS 4 to work.
  *  Motherboard:
@@ -75,12 +72,11 @@
  *  ~2GB HD image that plays well with the NEWS-OS installer: `chdman createhd -o test.chd -s 2088960000`
  *
  *  Known issues:
- *  - NEWS-OS APbus bootloader doesn't work with DRC enabled (see CPU section above)
- *  - Monitor ROM command `ss -r` doesn't show most register values
- *    (TLB dump is broken, but that is broken on the real NWS-5000X too. Use the `mp` command for a working version that shows the TLB correctly,
- *     both on real hardware and in emulation)
- *  - NetBSD kernel doesn't work with DRC disabled on the MIPS3 driver.
- *  - SCSI performance seems variable from run to run. Will probably need to do some runtime profiling on that.
+ *  - Monitor ROM command `ss -r` doesn't show most register values. Not sure what mechanism the APmonitor uses to get the register dump.
+ *    (TLB dump is also broken, but unlike the register dump, the TLB dump is broken on the real NWS-5000X too.
+ *     Use the `mp` monitor command instead for a working version that shows the TLB correctly, both on real hardware and in emulation)
+ *  - NetBSD kernel doesn't work with DRC disabled on the MIPS3 driver. The Sony APbus bootloader doesn't work on MIPS3 with DRC enabled.
+ *  - SCSI performance seems variable from run to run, especially when networking is enabled. Will probably need to do some runtime profiling on that.
  *  - Reboot/halt+boot fails because the ESCC FIFO isn't reset properly. For now, the emulator must be hard reset.
  *    It prints out a message (`esccf0: ai->ai_addr points AProm`) and then tries to allocate and use a different FIFO (which fails)
  *
@@ -558,11 +554,11 @@ void news_r4k_state::nws5000x(machine_config &config) { machine_common(config); 
  * Assign the address map for the CPU
  * References:
  *  - https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/include/adrsmap.h
- *  - MROM device table (Run MROM command `ss -d` for details)
+ *  - APmonitor device table (Run APmonitor command `ss -d` for details)
  */
 void news_r4k_state::cpu_map(address_map &map)
 {
-	// Unmapping to high causes the MROM to wait a huge amount of time in between
+	// Unmapping to high causes the APmonitor to wait a huge amount of time in between
 	// printing serial characters - what is weird is that manually setting the unmapped
 	// reads to return zero while unmapping everything high doesn't fix this issue, so
 	// there must be a side effect caused by unmapping high somewhere.
@@ -1151,11 +1147,11 @@ void news_r4k_state::int_check()
 	// This has been tested with a few different devices and seems OK so far, but there might be some things missing.
 	for (int i = 0; i < 6; i++)
 	{
-		bool state = (m_intst[i] & m_inten[i]) > 0;
+		bool state = m_intst[i] & m_inten[i];
 
 		if (m_int_state[i] != state)
 		{
-			LOGMASKED(LOG_ALL_INTERRUPT, "Setting CPU input line %d to %d\n", interrupt_map[i], state > 0 ? 1 : 0);
+			LOGMASKED(LOG_ALL_INTERRUPT, "Setting CPU input line %d to %d\n", interrupt_map[i], state ? 1 : 0);
 			m_int_state[i] = state;
 			m_cpu->set_input_line(interrupt_map[i], state ? 1 : 0);
 		}
@@ -1311,4 +1307,4 @@ ROM_END
 
 // Machine definitions
 //   YEAR  NAME      P  CM MACHINE   INPUT    CLASS           INIT           COMPANY FULLNAME                      FLAGS
-COMP(1994, nws5000x, 0, 0, nws5000x, nws5000, news_r4k_state, init_nws5000x, "Sony", "NET WORK STATION NWS-5000X", MACHINE_TYPE_COMPUTER | MACHINE_IS_INCOMPLETE | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+COMP(1994, nws5000x, 0, 0, nws5000x, nws5000, news_r4k_state, init_nws5000x, "Sony", "NET WORK STATION NWS-5000X", MACHINE_TYPE_COMPUTER | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
