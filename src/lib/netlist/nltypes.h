@@ -144,7 +144,7 @@ namespace netlist
 	///
 
 	using device_arena = std::conditional_t<config::use_mempool::value,
-		plib::mempool_arena<plib::aligned_arena, NL_MEMPOOL_ALIGN>,
+		plib::mempool_arena<plib::aligned_arena, config::mempool_align::value>,
 		plib::aligned_arena>;
 	using host_arena   = plib::aligned_arena;
 
@@ -183,7 +183,7 @@ namespace netlist
 	} // namespace detail
 
 	using netlist_time = plib::ptime<std::int64_t, config::INTERNAL_RES::value>;
-	using netlist_time_ext = plib::ptime<std::conditional<NL_PREFER_INT128 && plib::compile_info::has_int128::value, INT128, std::int64_t>::type, config::INTERNAL_RES::value>;
+	using netlist_time_ext = plib::ptime<std::conditional<config::prefer_int128::value && plib::compile_info::has_int128::value, INT128, std::int64_t>::type, config::INTERNAL_RES::value>;
 
 	static_assert(noexcept(netlist_time::from_nsec(1)), "Not evaluated as constexpr");
 
