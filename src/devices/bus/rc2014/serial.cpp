@@ -182,7 +182,7 @@ protected:
 };
 
 dual_serial_device::dual_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: dual_serial_base(mconfig, RC2014_SERIAL_IO, tag, owner, clock)
+	: dual_serial_base(mconfig, RC2014_DUAL_SERIAL, tag, owner, clock)
 	, device_rc2014_ext_card_interface(mconfig, *this)
 {
 }
@@ -231,7 +231,7 @@ protected:
 };
 
 dual_serial_device_40pin::dual_serial_device_40pin(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: dual_serial_base(mconfig, RC2014_SERIAL_IO, tag, owner, clock)
+	: dual_serial_base(mconfig, RC2014_DUAL_SERIAL_40P, tag, owner, clock)
 	, device_rc2014_card_interface(mconfig, *this)
 {
 }

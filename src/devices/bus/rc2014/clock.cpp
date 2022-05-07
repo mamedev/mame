@@ -209,7 +209,7 @@ protected:
 };
 
 dual_clock_device_40pin::dual_clock_device_40pin(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: dual_clock_base(mconfig, RC2014_DUAL_CLOCK, tag, owner, clock)
+	: dual_clock_base(mconfig, RC2014_DUAL_CLOCK_40P, tag, owner, clock)
 	, device_rc2014_card_interface(mconfig, *this)
 {
 }

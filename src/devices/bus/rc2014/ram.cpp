@@ -213,4 +213,4 @@ void ram_64k_device_40pin::device_reset()
 
 DEFINE_DEVICE_TYPE_PRIVATE(RC2014_RAM_32K, device_rc2014_card_interface, ram_32k_device, "rc2014_ram_32k", "RC2014 32K RAM module")
 DEFINE_DEVICE_TYPE_PRIVATE(RC2014_RAM_64K, device_rc2014_ext_card_interface, ram_64k_device, "rc2014_ram_64k", "RC2014 64K RAM module")
-DEFINE_DEVICE_TYPE_PRIVATE(RC2014_RAM_64K_40P, device_rc2014_card_interface, ram_64k_device_40pin, "rc2014_ram_64k", "RC2014 64K RAM module (40 pin)")
+DEFINE_DEVICE_TYPE_PRIVATE(RC2014_RAM_64K_40P, device_rc2014_card_interface, ram_64k_device_40pin, "rc2014_ram_64k_40p", "RC2014 64K RAM module (40 pin)")
