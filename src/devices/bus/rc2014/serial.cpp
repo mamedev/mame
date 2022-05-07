@@ -95,18 +95,26 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
 	virtual void device_resolve_objects() override;
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_bus->int_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( tx_w ) { m_bus->tx_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( clk1_w ) { if (m_clk_portb == 1) { m_sio->txcb_w(state); m_sio->rxcb_w(state); } }
+	DECLARE_WRITE_LINE_MEMBER( clk2_w ) { if (m_clk_portb == 0) { m_sio->txcb_w(state); m_sio->rxcb_w(state); } }
 private:
+	u8 m_clk_portb;
+	required_ioport m_portb;
 	required_device<z80sio_device> m_sio;
 };
 
 dual_serial_device::dual_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, RC2014_SERIAL_IO, tag, owner, clock)
 	, device_rc2014_ext_card_interface(mconfig, *this)
+	, m_clk_portb(0)
+	, m_portb(*this, "PORTB")
 	, m_sio(*this, "sio")
 {
 }
@@ -120,13 +128,17 @@ void dual_serial_device::device_start()
 	m_bus->installer(AS_IO)->install_readwrite_handler(0x83, 0x83, 0, 0x04, 0, read8smo_delegate(*m_sio, FUNC(z80sio_device::db_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::db_w)));
 }
 
+void dual_serial_device::device_reset()
+{
+	m_clk_portb = m_portb->read();
+}
+
 void dual_serial_device::device_resolve_objects()
 {
 	m_bus->clk_callback().append(m_sio, FUNC(z80sio_device::txca_w));
 	m_bus->clk_callback().append(m_sio, FUNC(z80sio_device::rxca_w));
-
-	m_bus->clk2_callback().append(m_sio, FUNC(z80sio_device::txcb_w));
-	m_bus->clk2_callback().append(m_sio, FUNC(z80sio_device::rxcb_w));
+	m_bus->clk_callback().append(*this, FUNC(dual_serial_device::clk1_w));
+	m_bus->clk2_callback().append(*this, FUNC(dual_serial_device::clk2_w));
 
 	m_bus->rx_callback().append(m_sio, FUNC(z80sio_device::rxa_w));
 
@@ -144,6 +156,18 @@ void dual_serial_device::device_add_mconfig(machine_config &config)
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
 	rs232.rxd_handler().set("sio", FUNC(z80sio_device::rxa_w));
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
+}
+
+static INPUT_PORTS_START( dual_serial_jumpers )
+	PORT_START("PORTB")
+	PORT_CONFNAME( 0x1, 0x0, "Port B" )
+	PORT_CONFSETTING( 0x0, "CLK2 (Open)" )
+	PORT_CONFSETTING( 0x1, "CLK1 (Closed)" )
+INPUT_PORTS_END
+
+ioport_constructor dual_serial_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( dual_serial_jumpers );
 }
 
 }
