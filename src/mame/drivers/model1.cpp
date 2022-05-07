@@ -602,6 +602,7 @@ Notes:
 
 #include "vr.lh"
 #include "model1io2.lh"
+#include "emuopts.h"
 
 // On the real system, another 315-5338A is acting as slave
 // and writes the data to the dual port RAM. This isn't
@@ -1731,7 +1732,58 @@ void model1_state::model1(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	m_screen->set_raw(XTAL(16'000'000), 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/);
+	
+	// SOYS -----------------------------------------------------------------------------------------
+	//screen_device &set_raw(const XTAL &xtal, u16 htotal, u16 hbend, u16 hbstart, u16 vtotal, 
+	// u16 vbend, u16 vbstart) hbend is the clip x, hstart is the clip y, vbend is clip x2, vstart 
+	// is xlip y2. i.e. It zooms on this section.. vbend is the clip
+
+	// (vlbank time hz, original width, screen clip x, screen clip x2, original height, screen clip 
+	// y1, screen clip y2). The clip is the actual screen resolution and the bitmap created will be 
+	// the size of the screen clip x and screen clip y
+
+	// SOYS -- Uses the renderScale. Can read from mame config ---------------------------------------
+	// You can try with XTAL(32'000'000) but everything speeds up double.
+
+	renderScale = 4;
+	renderBackground = 1;
+	renderWireframe = 0;
+
+	// Set the render state to the options. You need to include "emuopts.h" to use
+	// the following else you get a forward declaration issues when compiling.
+	// Use the intscalex in mame.ini if non 0.
+	//
+	// over 100, scale in antialiased wireframe mode no bitmap background
+	// over 200, scale in antialiased wireframe mode with bitmap background
+
+	if(config.options().int_scale_x())
+	{
+		renderScale = config.options().int_scale_x();
+		if(renderScale > 100)
+		{
+			// Wireframe scaling mode without background
+			renderScale = renderScale - 100;
+			renderWireframe = 1;
+			renderBackground = 0;
+		}
+		else if(renderScale > 200)
+		{
+			// Wireframe mode scaling with background
+			renderScale = renderScale - 200;
+			renderWireframe = 1;
+			renderBackground = 1;
+		}
+	}
+
+	m_screen->set_raw(XTAL(16'000'000), originalBitmapWidth, 0/*+69*/, 
+		originalCliprectX2 * renderScale/*+69*/, originalBitmapHeight, 0/*+25*/, 
+		originalCliprectY2 * renderScale/*+25*/);
+	
+	//------------------------------------------------------------------------------------------------
+
+	// This renders at original resolution of the machine.
+	//m_screen->set_raw(XTAL(16'000'000), 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/);
+
 	m_screen->set_screen_update(FUNC(model1_state::screen_update_model1));
 	m_screen->screen_vblank().set(FUNC(model1_state::screen_vblank_model1));
 
