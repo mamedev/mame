@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, SomeRandomGuyIdk
 /**********************************************************************
-
-    JPM Stepper Reel Unit
-
-    JPM's first CPU-based fruit machine platform, from late 1978/1979.
+	
+	JPM Stepper Reel Unit
+	
+	JPM's first CPU-based fruit machine platform, from late 1978/1979.
 	Notably the first system to use stepper reels instead of EM reels.
 	Uses a 1.5MHz TMS9980A CPU together with some TTL for I/O providing
 	56 outputs (16 used by reels) & 24 inputs (8 used by optos), 
@@ -44,10 +44,15 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "includes/jpmsru.h"
 
 #include "cpu/tms9900/tms9980a.h"
+#include "machine/timer.h"
+#include "machine/steppers.h"
+#include "machine/genfruit.h"
+#include "machine/nvram.h"
 #include "video/awpvid.h"
+#include "machine/netlist.h"
+#include "netlist/nl_setup.h"
 #include "speaker.h"
 #include "audio/nl_jpmsru.h"
 
@@ -58,6 +63,97 @@
 #include "j_lan.lh"
 
 #define MAIN_CLOCK 6_MHz_XTAL
+
+class jpmsru_state : public genfruit_class
+{
+public:
+	jpmsru_state(const machine_config &mconfig, device_type type, const char *tag) : 
+			genfruit_class(mconfig, type, tag),
+			m_maincpu(*this, "maincpu"),
+			m_inputs(*this, "IN%u", 0U),
+			m_reel(*this, "reel%u", 0U),
+			m_lamp(*this, "lamp%u", 0U),
+			m_digits(*this, "digit%u", 0U),
+			m_audio_in(*this, "nl_audio:in%u", 0U),
+			m_nvram(*this, "nvram", 0x80, ENDIANNESS_BIG),
+			m_dips(*this, "DIP%u", 0U)
+	{ }
+
+	void jpmsru_3k(machine_config &config);
+	void jpmsru_3k_busext(machine_config &config);
+	void jpmsru_4k(machine_config &config);
+	void ewn(machine_config &config);
+	void ewn2(machine_config &config);
+	void ndu(machine_config &config);
+	void dud(machine_config &config);
+	void lan(machine_config &config);
+
+	void init_jpmsru();
+	
+	template <unsigned N> DECLARE_READ_LINE_MEMBER(opto_r) { return m_opto[N]; }
+protected:
+	virtual void machine_start() override;
+
+private:
+	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(opto_cb) { m_opto[N] = state; }
+
+	uint8_t inputs_r(offs_t offset);
+	void reel_w(offs_t offset, uint8_t data);
+	void update_int();
+	void audio_w(offs_t offset, uint8_t data);
+	void int1_en_w(offs_t offset, uint8_t data);
+	void int2_en_w(offs_t offset, uint8_t data);
+	uint8_t busext_data_r(offs_t offset);
+	void busext_data_w(offs_t offset, uint8_t data);
+	void busext_bdir_w(offs_t offset, uint8_t data);
+	void busext_mode_w(offs_t offset, uint8_t data);
+	void busext_addr_w(offs_t offset, uint8_t data);
+	uint8_t busext_dips_r(offs_t offset);
+	void out_lamp_w(offs_t offset, uint8_t data);
+	void out_lamp_ext_w(offs_t offset, uint8_t data);
+	void out_disp_w(offs_t offset, uint8_t data);
+	void out_payout_cash_w(offs_t offset, uint8_t data);
+	void out_payout_token_w(offs_t offset, uint8_t data);
+	template<unsigned meter> void out_meter_w(offs_t offset, uint8_t data);
+	void out_coin_lockout_w(offs_t offset, uint8_t data);
+
+	void jpmsru_3k_map(address_map &map);
+	void jpmsru_4k_map(address_map &map);
+	void jpmsru_io(address_map &map);
+	void jpmsru_busext_io(address_map &map);
+	void outputs_ewn(address_map &map);
+	void outputs_ewn2(address_map &map);
+	void outputs_ndu(address_map &map);
+	void outputs_dud(address_map &map);
+	void outputs_lan(address_map &map);
+	
+	bool m_int1;
+	bool m_int2;
+	bool m_int1_en;
+	bool m_int2_en;
+	int m_reelbits[4];
+	bool m_opto[4];
+	int m_disp_digit;
+	bool m_disp_d1;
+	bool m_disp_d2;
+	bool m_busext_bdir;
+	uint8_t m_busext_mode;
+	uint8_t m_busext_addr;
+	
+	TIMER_DEVICE_CALLBACK_MEMBER(int1);
+	TIMER_DEVICE_CALLBACK_MEMBER(int2);
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_ioport_array<3> m_inputs;
+	required_device_array<stepper_device, 4> m_reel;
+	output_finder<56> m_lamp;
+	output_finder<2> m_digits;
+	required_device_array<netlist_mame_logic_input_device, 6> m_audio_in;
+	
+	memory_share_creator<uint8_t> m_nvram;
+	optional_ioport_array<3> m_dips;
+};
 
 void jpmsru_state::jpmsru_3k_map(address_map &map)
 {
@@ -191,7 +287,7 @@ uint8_t jpmsru_state::inputs_r(offs_t offset)
 
 void jpmsru_state::reel_w(offs_t offset, uint8_t data)
 {
-	int reel = (offset & 0xC) >> 2;
+	int reel = (offset & 0xc) >> 2;
 	int bit = offset & 0x3;
 	m_reelbits[reel] = (m_reelbits[reel] & ~(1 << bit)) | (data ? (1 << bit) : 0);
 	
@@ -258,15 +354,7 @@ void jpmsru_state::out_coin_lockout_w(offs_t offset, uint8_t data)
 
 void jpmsru_state::audio_w(offs_t offset, uint8_t data)
 {
-	switch(offset)
-	{
-		case 0: m_audio_in1->write(data); break;
-		case 1: m_audio_in2->write(data); break;
-		case 2: m_audio_in3->write(data); break;
-		case 3: m_audio_in4->write(data); break;
-		case 4: m_audio_in5->write(data); break;
-		case 5: m_audio_in6->write(data); break;
-	}
+	m_audio_in[offset]->write(data);
 }
 
 void jpmsru_state::update_int()
@@ -395,15 +483,15 @@ static INPUT_PORTS_START( j_ewn )
 	PORT_INCLUDE( jpmsru_inputs )
 	
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Hold 1")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Hold 2")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Hold 3")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Cancel/Gamble")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_POKER_CANCEL ) PORT_NAME("Cancel/Gamble")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Nudge Down")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Nudge Down")
 
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Nudge Up")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Nudge Up")
 	
 	PORT_START("DIP0")
 	PORT_DIPNAME( 0x0f, 0x00, "Nudge chance" )
@@ -485,30 +573,30 @@ static INPUT_PORTS_START( j_ewn2 )
 	PORT_CONFSETTING(	 0x80, "10p" )
 	
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Hold 1")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Hold 2")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Hold 3")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Cancel/Gamble")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_POKER_CANCEL ) PORT_NAME("Cancel/Gamble")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Nudge Down")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Nudge Down")
 
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Nudge Up")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Nudge Up")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( j_ndu )
 	PORT_INCLUDE( jpmsru_inputs )
 	
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Hold 1")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Hold 2")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Hold 3")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Cancel/Gamble")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_POKER_CANCEL ) PORT_NAME("Cancel/Gamble")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Nudge Down")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Nudge Down")
 
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Nudge Up")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Nudge Up")
 	
 	PORT_START("DIP0")
 	PORT_DIPNAME( 0x0f, 0x00, "Nudge chance" )
@@ -583,15 +671,15 @@ static INPUT_PORTS_START( j_dud )
 	PORT_INCLUDE( jpmsru_inputs )
 	
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Hold 1")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Hold 2")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Hold 3")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Cancel/Gamble")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_POKER_CANCEL ) PORT_NAME("Cancel/Gamble")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Nudge Down")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Nudge Down")
 
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Nudge Up")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Nudge Up")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( j_dud2 )
@@ -607,15 +695,15 @@ static INPUT_PORTS_START( j_lan )
 	PORT_INCLUDE( jpmsru_inputs )
 	
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Hold 1")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Hold 2")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Hold 3")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Nudge Reverse")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Nudge Reverse")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Cancel/Gamble")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_POKER_CANCEL ) PORT_NAME("Cancel/Gamble")
 
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Feature Stop")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Feature Stop")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( j_lan2 )
@@ -689,12 +777,12 @@ void jpmsru_state::jpmsru_3k(machine_config &config)
 		.set_source(NETLIST_NAME(jpmsru))
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	NETLIST_LOGIC_INPUT(config, "nl_audio:in1", "IN1.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "nl_audio:in2", "IN2.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "nl_audio:in3", "IN3.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "nl_audio:in4", "IN4.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "nl_audio:in5", "IN5.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "nl_audio:in6", "IN6.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_audio_in[0], "IN1.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_audio_in[1], "IN2.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_audio_in[2], "IN3.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_audio_in[3], "IN4.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_audio_in[4], "IN5.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_audio_in[5], "IN6.IN", 0);
 	NETLIST_ANALOG_INPUT(config, "nl_audio:pot", "R8.DIAL");
 
 	NETLIST_STREAM_OUTPUT(config, "nl_audio:cout0", 0, "OUT").set_mult_offset(1.0, 0.0);
@@ -869,7 +957,7 @@ ROM_START( j_unk )
 	ROM_LOAD( "sruunk1.p3", 0x0800, 0x000400, CRC(25138e03) SHA1(644fc6144ea74f08dc892f106ad494ba364afe86) )
 ROM_END
 
-#define GAME_FLAGS MACHINE_NOT_WORKING|MACHINE_MECHANICAL|MACHINE_REQUIRES_ARTWORK|MACHINE_IMPERFECT_SOUND
+#define GAME_FLAGS MACHINE_NOT_WORKING|MACHINE_MECHANICAL|MACHINE_REQUIRES_ARTWORK|MACHINE_IMPERFECT_SOUND|MACHINE_SUPPORTS_SAVE
 
 GAMEL( 1979?, j_ewn,     0,        ewn,  j_ewn,  jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Nudger (JPM) (SRU) (revision 20, 5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_ewn )
 GAMEL( 1981?, j_ewna,    j_ewn,    ewn2, j_ewn2, jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Nudger (JPM) (SRU) (revision 26A, £2 Jackpot)", GAME_FLAGS, layout_j_ewn )

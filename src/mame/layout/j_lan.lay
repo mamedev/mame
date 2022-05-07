@@ -33,20 +33,74 @@ license:CC0
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
-	<element name="Reel 1" defstate="0">
-		<reel reelreversed="1" stateoffset="6540" numsymbolsvisible="5" symbollist="Watermelon,Pear,Bell(1),Cherry,Bell,Pear(2),Cherry,Bell(2),Pear,Orange(1),Bell,Grapes,Cherry,Pear(2),Cherry,Orange(2),Pear(1),Bell,Plum,JPM">
-			<color red="0.0" green="0.0" blue="0.0" />
-		</reel>
+	<element name="Reel 1">
+		<rect> <bounds x="0" y="0" width="100" height="400"/> <color alpha="0.0"/> </rect>
+		<text string="Melon">		<bounds x="0" y="40" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Pear">		<bounds x="0" y="60" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Bell(1)">		<bounds x="0" y="80" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Cherry">		<bounds x="0" y="100" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Bell">		<bounds x="0" y="120" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Pear(2)">		<bounds x="0" y="140" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Cherry">		<bounds x="0" y="160" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Bell(2)">		<bounds x="0" y="180" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Pear">		<bounds x="0" y="200" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Orange(1)">	<bounds x="0" y="220" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Bell">		<bounds x="0" y="240" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Grapes">		<bounds x="0" y="260" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Cherry">		<bounds x="0" y="280" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Pear(2)">		<bounds x="0" y="300" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Cherry">		<bounds x="0" y="320" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Orange(2)">	<bounds x="0" y="340" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Pear(1)">		<bounds x="0" y="360" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Bell">		<bounds x="0" y="380" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Plum">		<bounds x="0" y="0" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="JPM">			<bounds x="0" y="20" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 	</element>
-	<element name="Reel 2" defstate="0">
-		<reel reelreversed="1" stateoffset="6540" numsymbolsvisible="5" symbollist="Orange,Plum(2),Watermelon,Plum(1),Grapes,Watermelon,Orange,Plum(1),Cherry,Grapes,Plum(2),Pear,Grapes,Watermelon,Bell,Plum(2),Watermelon,Plum(1),Grapes,JPM">
-			<color red="0.0" green="0.0" blue="0.0" />
-		</reel>
+	<element name="Reel 2">
+		<rect> <bounds x="0" y="0" width="100" height="400"/> <color alpha="0.0"/> </rect>
+		<text string="Orange">		<bounds x="0" y="40" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Plum(2)">		<bounds x="0" y="60" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Melon">		<bounds x="0" y="80" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Plum(1)">		<bounds x="0" y="100" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Grapes">		<bounds x="0" y="120" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Melon">		<bounds x="0" y="140" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Orange">		<bounds x="0" y="160" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Plum(1)">		<bounds x="0" y="180" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Cherry">		<bounds x="0" y="200" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Grapes">		<bounds x="0" y="220" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Plum(2)">		<bounds x="0" y="240" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Pear">		<bounds x="0" y="260" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Grapes">		<bounds x="0" y="280" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Melon">		<bounds x="0" y="300" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Bell">		<bounds x="0" y="320" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Plum(2)">		<bounds x="0" y="340" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Melon">		<bounds x="0" y="360" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Plum(1)">		<bounds x="0" y="380" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Grapes">		<bounds x="0" y="0" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="JPM">			<bounds x="0" y="20" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 	</element>
-	<element name="Reel 3" defstate="0">
-		<reel reelreversed="1" stateoffset="6540" numsymbolsvisible="5" symbollist="Orange(2),Plum,Cherry,Orange,Cherry,Bell(2),Watermelon,Cherry,Orange(1),Cherry,Orange,Pear(1),Cherry,Pear(2),Plum,Orange(2),Grapes,Cherry,Bell(1),JPM">
-			<color red="0.0" green="0.0" blue="0.0" />
-		</reel>
+	<element name="Reel 3">
+		<rect> <bounds x="0" y="0" width="100" height="400"/> <color alpha="0.0"/> </rect>
+		<text string="Orange(2)">	<bounds x="0" y="40" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Plum">		<bounds x="0" y="60" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Cherry">		<bounds x="0" y="80" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Orange">		<bounds x="0" y="100" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Cherry">		<bounds x="0" y="120" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Bell(2)">		<bounds x="0" y="140" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Melon">		<bounds x="0" y="160" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Cherry">		<bounds x="0" y="180" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Orange(1)">	<bounds x="0" y="200" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Cherry">		<bounds x="0" y="220" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Orange">		<bounds x="0" y="240" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Pear(1)">		<bounds x="0" y="260" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Cherry">		<bounds x="0" y="280" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Pear(2)">		<bounds x="0" y="300" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Plum">		<bounds x="0" y="320" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Orange(2)">	<bounds x="0" y="340" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Grapes">		<bounds x="0" y="360" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Cherry">		<bounds x="0" y="380" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="Bell(1)">		<bounds x="0" y="0" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string="JPM">			<bounds x="0" y="20" width="100" height="20"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
 	</element>
 	<element name="LCD" defstate="0">
 		<led7seg>
@@ -55,24 +109,17 @@ license:CC0
 	</element>
 
 	<view name="AWP Simulated Video (No Artwork)">
-		<element ref="rect_white">
-			<bounds x="20" y="300" width="30" height="100"/>
-		</element>
-		<element name="sreel1" ref="Reel 1" state="0">
-			<bounds x="20" y="300" width="30" height="100"/>
-		</element>
-		<element ref="rect_white">
-			<bounds x="70" y="300" width="30" height="100"/>
-		</element>
-		<element name="sreel2" ref="Reel 2" state="0">
-			<bounds x="70" y="300" width="30" height="100"/>
-		</element>
-		<element ref="rect_white">
-			<bounds x="120" y="300" width="30" height="100"/>
-		</element>
-		<element name="sreel3" ref="Reel 3" state="0">
-			<bounds x="120" y="300" width="30" height="100"/>
-		</element>
+		<repeat count="3">
+			<param name="i" start="1" increment="1" />
+			<param name="x" start="20" increment="50" />
+			<element ref="rect_white">
+				<bounds x="~x~" y="300" width="30" height="100"/>
+			</element>
+			<element ref="Reel ~i~" state="0">
+				<bounds x="~x~" y="300" width="30" height="100"/>
+				<yscroll name="sreel~i~" size="0.25" wrap="yes" min="65536" max="0"/>
+			</element>
+		</repeat>
 		<element ref="rect_black">
 			<bounds x="20" y="350" width="150" height="1"/>
 		</element>
@@ -81,102 +128,17 @@ license:CC0
 		<element ref="text_credits">
 			<bounds x="170" y="420" width="36" height="15"/>
 		</element>
-		<element name="lamp0" ref="matrixlamp" state="0">
-			<bounds x="0" y="0" width="7" height="7"/>
-		</element>
-		<element name="lamp1" ref="matrixlamp" state="0">
-			<bounds x="8" y="0" width="7" height="7"/>
-		</element>
-		<element name="lamp2" ref="matrixlamp" state="0">
-			<bounds x="16" y="0" width="7" height="7"/>
-		</element>
-		<element name="lamp3" ref="matrixlamp" state="0">
-			<bounds x="24" y="0" width="7" height="7"/>
-		</element>
-		<element name="lamp6" ref="matrixlamp" state="0">
-			<bounds x="48" y="0" width="7" height="7"/>
-		</element>
-		<element name="lamp7" ref="matrixlamp" state="0">
-			<bounds x="56" y="0" width="7" height="7"/>
-		</element>
-		<element name="lamp8" ref="matrixlamp" state="0">
-			<bounds x="0" y="8" width="7" height="7"/>
-		</element>
-		<element name="lamp9" ref="matrixlamp" state="0">
-			<bounds x="8" y="8" width="7" height="7"/>
-		</element>
-		<element name="lamp25" ref="matrixlamp" state="0">
-			<bounds x="8" y="24" width="7" height="7"/>
-		</element>
-		<element name="lamp30" ref="matrixlamp" state="0">
-			<bounds x="48" y="24" width="7" height="7"/>
-		</element>
-		<element name="lamp31" ref="matrixlamp" state="0">
-			<bounds x="56" y="24" width="7" height="7"/>
-		</element>
-		<element name="lamp32" ref="matrixlamp" state="0">
-			<bounds x="0" y="32" width="7" height="7"/>
-		</element>
-		<element name="lamp33" ref="matrixlamp" state="0">
-			<bounds x="8" y="32" width="7" height="7"/>
-		</element>
-		<element name="lamp34" ref="matrixlamp" state="0">
-			<bounds x="16" y="32" width="7" height="7"/>
-		</element>
-		<element name="lamp35" ref="matrixlamp" state="0">
-			<bounds x="24" y="32" width="7" height="7"/>
-		</element>
-		<element name="lamp36" ref="matrixlamp" state="0">
-			<bounds x="32" y="32" width="7" height="7"/>
-		</element>
-		<element name="lamp40" ref="matrixlamp" state="0">
-			<bounds x="0" y="40" width="7" height="7"/>
-		</element>
-		<element name="lamp41" ref="matrixlamp" state="0">
-			<bounds x="8" y="40" width="7" height="7"/>
-		</element>
-		<element name="lamp42" ref="matrixlamp" state="0">
-			<bounds x="16" y="40" width="7" height="7"/>
-		</element>
-		<element name="lamp43" ref="matrixlamp" state="0">
-			<bounds x="24" y="40" width="7" height="7"/>
-		</element>
-		<element name="lamp44" ref="matrixlamp" state="0">
-			<bounds x="32" y="40" width="7" height="7"/>
-		</element>
-		<element name="lamp45" ref="matrixlamp" state="0">
-			<bounds x="40" y="40" width="7" height="7"/>
-		</element>
-		<element name="lamp46" ref="matrixlamp" state="0">
-			<bounds x="48" y="40" width="7" height="7"/>
-		</element>
-		<element name="lamp47" ref="matrixlamp" state="0">
-			<bounds x="56" y="40" width="7" height="7"/>
-		</element>
-		<element name="lamp48" ref="matrixlamp" state="0">
-			<bounds x="0" y="48" width="7" height="7"/>
-		</element>
-		<element name="lamp49" ref="matrixlamp" state="0">
-			<bounds x="8" y="48" width="7" height="7"/>
-		</element>
-		<element name="lamp50" ref="matrixlamp" state="0">
-			<bounds x="16" y="48" width="7" height="7"/>
-		</element>
-		<element name="lamp51" ref="matrixlamp" state="0">
-			<bounds x="24" y="48" width="7" height="7"/>
-		</element>
-		<element name="lamp52" ref="matrixlamp" state="0">
-			<bounds x="32" y="48" width="7" height="7"/>
-		</element>
-		<element name="lamp53" ref="matrixlamp" state="0">
-			<bounds x="40" y="48" width="7" height="7"/>
-		</element>
-		<element name="lamp54" ref="matrixlamp" state="0">
-			<bounds x="48" y="48" width="7" height="7"/>
-		</element>
-		<element name="lamp55" ref="matrixlamp" state="0">
-			<bounds x="56" y="48" width="7" height="7"/>
-		</element>
+		<repeat count="7">
+			<param name="i" start="0" increment="8" />
+			<param name="y" start="0" increment="8" />
+			<repeat count="8">
+				<param name="j" start="~i~" increment="1" />
+				<param name="x" start="0" increment="8" />
+				<element name="lamp~j~" ref="matrixlamp" state="0">
+					<bounds x="~x~" y="~y~" width="7" height="7"/>
+				</element>
+			</repeat>
+		</repeat>
 	</view>
 </mamelayout>
 
