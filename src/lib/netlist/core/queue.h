@@ -18,10 +18,10 @@
 #include "../plib/ptimed_queue.h"
 
 #include <array>
+#include <queue>
 #include <unordered_map>
 #include <utility>
 #include <vector>
-#include <queue>
 
 namespace netlist::detail
 {
@@ -42,18 +42,18 @@ namespace netlist::detail
 
 	template <typename A, typename O, bool TS>
 	class queue_base :
-			public timed_queue<A, plib::pqentry_t<netlist_time_ext, O *>, false>,
+			public timed_queue<A, plib::queue_entry_t<netlist_time_ext, O *>, false>,
 			public plib::state_manager_t::callback_t
 	{
 	public:
-		using entry_t = plib::pqentry_t<netlist_time_ext, O *>;
+		using entry_t = plib::queue_entry_t<netlist_time_ext, O *>;
 		using base_queue = timed_queue<A, entry_t, false>;
 		using id_delegate = plib::pmfp<std::size_t (const O *)>;
 		using obj_delegate = plib::pmfp<O * (std::size_t)>;
 
 		explicit queue_base(A &arena, std::size_t size, id_delegate get_id, obj_delegate get_obj)
-		: timed_queue<A, plib::pqentry_t<netlist_time_ext, O *>, false>(arena, size)
-		, m_qsize(0)
+		: timed_queue<A, plib::queue_entry_t<netlist_time_ext, O *>, false>(arena, size)
+		, m_size(0)
 		, m_times(size)
 		, m_net_ids(size)
 		, m_get_id(get_id)
@@ -72,23 +72,23 @@ namespace netlist::detail
 
 		void register_state(plib::state_manager_t &manager, const pstring &module) override
 		{
-			manager.save_item(this, m_qsize, module + "." + "qsize");
+			manager.save_item(this, m_size, module + "." + "qsize");
 			manager.save_item(this, &m_times[0], module + "." + "times", m_times.size());
 			manager.save_item(this, &m_net_ids[0], module + "." + "names", m_net_ids.size());
 		}
 		void on_pre_save([[maybe_unused]] plib::state_manager_t &manager) override
 		{
-			m_qsize = this->size();
-			for (std::size_t i = 0; i < m_qsize; i++ )
+			m_size = this->size();
+			for (std::size_t i = 0; i < m_size; i++ )
 			{
-				m_times[i] =  this->listptr()[i].exec_time().as_raw();
-				m_net_ids[i] = m_get_id(this->listptr()[i].object());
+				m_times[i] =  this->list_pointer()[i].exec_time().as_raw();
+				m_net_ids[i] = m_get_id(this->list_pointer()[i].object());
 			}
 		}
 		void on_post_load([[maybe_unused]] plib::state_manager_t &manager) override
 		{
 			this->clear();
-			for (std::size_t i = 0; i < m_qsize; i++ )
+			for (std::size_t i = 0; i < m_size; i++ )
 			{
 				O *n = m_obj_by_id(m_net_ids[i]);
 				this->template push<false>(entry_t(netlist_time_ext::from_raw(m_times[i]),n));
@@ -96,7 +96,7 @@ namespace netlist::detail
 		}
 
 	private:
-		std::size_t m_qsize;
+		std::size_t m_size;
 		std::vector<netlist_time_ext::internal_type> m_times;
 		std::vector<std::size_t> m_net_ids;
 		id_delegate m_get_id;

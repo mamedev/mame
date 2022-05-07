@@ -21,7 +21,7 @@ namespace plib {
 	// A simple tokenizer
 	// ----------------------------------------------------------------------------------------
 
-	void ptokenizer::skipeol()
+	void ptokenizer::skip_eol()
 	{
 		pstring::value_type c = getc();
 		while (c != 0)
@@ -49,7 +49,7 @@ namespace plib {
 		{
 			//++m_source_location.back();
 			putf8string line;
-			if (m_strm->readline_lf(line))
+			if (m_strm->read_line_lf(line))
 			{
 				m_cur_line = pstring(line);
 				m_px = m_cur_line.begin();
@@ -68,11 +68,11 @@ namespace plib {
 		m_unget = c;
 	}
 
-	void ptoken_reader::require_token(const token_id_t &token_num)
+	void token_reader_t::require_token(const token_id_t &token_num)
 	{
 		require_token(get_token(), token_num);
 	}
-	void ptoken_reader::require_token(const token_t &tok, const token_id_t &token_num)
+	void token_reader_t::require_token(const token_t &tok, const token_id_t &token_num)
 	{
 		if (!tok.is(token_num))
 		{
@@ -80,7 +80,7 @@ namespace plib {
 		}
 	}
 
-	pstring ptoken_reader::get_string()
+	pstring token_reader_t::get_string()
 	{
 		token_t tok = get_token();
 		if (!tok.is_type(token_type::STRING))
@@ -91,7 +91,7 @@ namespace plib {
 	}
 
 
-	pstring ptoken_reader::get_identifier()
+	pstring token_reader_t::get_identifier()
 	{
 		token_t tok = get_token();
 		if (!tok.is_type(token_type::IDENTIFIER))
@@ -101,7 +101,7 @@ namespace plib {
 		return tok.str();
 	}
 
-	pstring ptoken_reader::get_identifier_or_number()
+	pstring token_reader_t::get_identifier_or_number()
 	{
 		token_t tok = get_token();
 		if (!(tok.is_type(token_type::IDENTIFIER) || tok.is_type(token_type::NUMBER)))
@@ -112,7 +112,7 @@ namespace plib {
 	}
 
 	// FIXME: combine into template
-	double ptoken_reader::get_number_double()
+	double token_reader_t::get_number_double()
 	{
 		token_t tok = get_token();
 		if (!tok.is_type(token_type::NUMBER))
@@ -126,7 +126,7 @@ namespace plib {
 		return ret;
 	}
 
-	long ptoken_reader::get_number_long()
+	long token_reader_t::get_number_long()
 	{
 		token_t tok = get_token();
 		if (!tok.is_type(token_type::NUMBER))
@@ -140,7 +140,7 @@ namespace plib {
 		return ret;
 	}
 
-	bool ptoken_reader::process_line_token(const token_t &tok)
+	bool token_reader_t::process_line_token(const token_t &tok)
 	{
 		if (tok.is_type(token_type::LINEMARKER))
 		{
@@ -186,7 +186,7 @@ namespace plib {
 		return false;
 	}
 
-	ptoken_reader::token_t ptoken_reader::get_token()
+	token_reader_t::token_t token_reader_t::get_token()
 	{
 		token_t ret = get_token_queue();
 		while (true)
@@ -206,14 +206,14 @@ namespace plib {
 		}
 	}
 
-	ptoken_reader::token_t ptoken_reader::get_token_raw()
+	token_reader_t::token_t token_reader_t::get_token_raw()
 	{
 		token_t ret = get_token_queue();
 		process_line_token(ret);
 		return ret;
 	}
 
-	ptoken_reader::token_t ptokenizer::get_token_internal()
+	token_reader_t::token_t ptokenizer::get_token_internal()
 	{
 		// skip ws
 		pstring::value_type c = getc();
@@ -308,7 +308,7 @@ namespace plib {
 		}
 	}
 
-	ptoken_reader::token_t ptokenizer::get_token_comment()
+	token_reader_t::token_t ptokenizer::get_token_comment()
 	{
 		token_t ret = get_token_internal();
 		while (true)
@@ -325,7 +325,7 @@ namespace plib {
 			}
 			else if (ret.is(m_tok_line_comment))
 			{
-				skipeol();
+				skip_eol();
 				ret = get_token_internal();
 			}
 			else
@@ -336,7 +336,7 @@ namespace plib {
 	}
 
 
-	void ptoken_reader::error(const perrmsg &errs)
+	void token_reader_t::error(const perrmsg &errs)
 	{
 		pstring s("");
 		pstring trail      ("                 from ");

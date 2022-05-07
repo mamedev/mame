@@ -39,7 +39,7 @@ namespace netlist
 			POINTER // Special-case which is always initialized at MAME startup time
 		};
 
-		//deviceless, it's the responsibility of the owner to register!
+		//device-less, it's the responsibility of the owner to register!
 		param_t(const pstring &name);
 
 		param_t(core_device_t &device, const pstring &name);
@@ -49,7 +49,7 @@ namespace netlist
 
 		param_type_t param_type() const noexcept(false);
 
-		virtual pstring valstr() const = 0;
+		virtual pstring value_string() const = 0;
 
 	protected:
 
@@ -84,7 +84,7 @@ namespace netlist
 
 		void set(const T &param) noexcept { set_and_update_param(m_param, param); }
 
-		pstring valstr() const override
+		pstring value_string() const override
 		{
 			return plib::pfmt("{}").e(gsl::narrow<nl_fptype>(m_param));
 		}
@@ -105,7 +105,7 @@ namespace netlist
 		operator T() const noexcept { return m_param; }
 		void set(const T &param) noexcept { set_and_update_param(m_param, param); }
 
-		pstring valstr() const override
+		pstring value_string() const override
 		{
 			// returns the numerical value
 			return plib::pfmt("{}")(static_cast<int>(m_param));
@@ -131,7 +131,7 @@ namespace netlist
 		std::uint8_t * operator()() const noexcept { return m_param; }
 		void set(std::uint8_t *param) noexcept { set_and_update_param(m_param, param); }
 
-		pstring valstr() const override
+		pstring value_string() const override
 		{
 			// returns something which errors
 			return { "PTRERROR" };
@@ -161,7 +161,7 @@ namespace netlist
 				device().update_param();
 			}
 		}
-		pstring valstr() const override
+		pstring value_string() const override
 		{
 			return *m_param;
 		}
@@ -315,6 +315,26 @@ namespace netlist
 			device.state().log().warning(MW_ROM_NOT_FOUND(str()));
 	}
 
+	// -----------------------------------------------------------------------------
+	// Externals
+	// -----------------------------------------------------------------------------
+
+	extern template class param_num_t<std::uint8_t>;
+	extern template class param_num_t<std::uint16_t>;
+	extern template class param_num_t<std::uint32_t>;
+	extern template class param_num_t<std::uint64_t>;
+	extern template class param_num_t<std::int8_t>;
+	extern template class param_num_t<std::int16_t>;
+	extern template class param_num_t<std::int32_t>;
+	extern template class param_num_t<std::int64_t>;
+	extern template class param_num_t<float>;
+	extern template class param_num_t<double>;
+	extern template class param_num_t<long double>;
+	extern template class param_num_t<bool>;
+
+	extern template class param_model_t::value_base_t<float>;
+	extern template class param_model_t::value_base_t<double>;
+	extern template class param_model_t::value_base_t<long double>;
 
 } // namespace netlist
 

@@ -31,7 +31,7 @@ namespace netlist::solver
 		// ----------------------------------------------------------------------------------------
 		// matrix_solver - Direct1
 		// ----------------------------------------------------------------------------------------
-		void vsolve_non_dynamic() override
+		void upstream_solve_non_dynamic() override
 		{
 			this->clear_square_mat(this->m_A);
 			this->fill_matrix_and_rhs();

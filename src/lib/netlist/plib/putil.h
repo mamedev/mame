@@ -107,7 +107,7 @@ namespace plib
 		pstring basename(const pstring &filename, const pstring &suffix = "");
 		pstring path(const pstring &filename);
 		bool    exists(const pstring &filename);
-		pstring buildpath(std::initializer_list<pstring> list );
+		pstring build_path(std::initializer_list<pstring> list );
 		pstring environment(const pstring &var, const pstring &default_val);
 	} // namespace util
 
@@ -147,7 +147,7 @@ namespace plib
 	// ----------------------------------------------------------------------------------------
 
 	template <typename V, typename T>
-	V hash(const T *buf, std::size_t size)
+	constexpr V hash(const T *buf, std::size_t size) noexcept
 	{
 		V result = 5381; // NOLINT
 		for (const T* p = buf; p != buf + size; p++)

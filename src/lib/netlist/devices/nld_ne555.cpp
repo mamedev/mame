@@ -31,11 +31,11 @@ namespace netlist::devices {
 		, m_undershoot(*this, "m_undershoot", 0.0)
 		, m_ovlimit(0.0)
 		{
-			register_subalias("GND",  "R3.2");    // Pin 1
-			register_subalias("CONT", "R1.2");    // Pin 5
-			register_subalias("DISCH", "RDIS.1"); // Pin 7
-			register_subalias("VCC",  "R1.1");    // Pin 8
-			register_subalias("OUT",  "ROUT.1");  // Pin 3
+			register_sub_alias("GND",  "R3.2");    // Pin 1
+			register_sub_alias("CONT", "R1.2");    // Pin 5
+			register_sub_alias("DISCH", "RDIS.1"); // Pin 7
+			register_sub_alias("VCC",  "R1.1");    // Pin 8
+			register_sub_alias("OUT",  "ROUT.1");  // Pin 3
 
 			connect("R1.2", "R2.1");
 			connect("R2.2", "R3.1");

@@ -119,8 +119,10 @@ namespace plib {
 	/// \brief cast to void *
 	///
 	/// The purpose here is to help identify casts to void in the code.
-	/// These case usually indicate some wizard assumptions which should be easily
+
+	/// These case usually indicate some wizard assumptions which should
 	/// be easy to identify.
+	///
 	template <typename T>
 	constexpr void * void_ptr_cast(T *ptr) noexcept { return static_cast<void *>(ptr); }
 

@@ -16,7 +16,7 @@
 
 namespace netlist
 {
-	class parser_t : public plib::ptoken_reader
+	class parser_t : public plib::token_reader_t
 	{
 	public:
 		using token_t = plib::ptokenizer::token_t;
@@ -33,22 +33,22 @@ namespace netlist
 	protected:
 		void parse_netlist();
 		void net_alias();
-		void dippins();
+		void dip_pins();
 		void netdev_param();
-		void netdev_defparam();
+		void netdev_default_param();
 		void netdev_hint();
 		void net_c();
 		void frontier();
 		void device(const pstring &dev_type);
 		void netdev_netlist_end();
 		void net_model();
-		void net_submodel();
+		void net_sub_model();
 		void net_include();
 		void net_local_source();
 		void net_external_source();
 		void net_lib_entry(bool is_local);
 		void net_register_dev();
-		void net_truthtable_start(const pstring &nlname);
+		void net_truth_table_start(const pstring &nlname);
 
 		void verror(const pstring &msg) override;
 	private:

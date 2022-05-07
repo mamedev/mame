@@ -179,7 +179,7 @@ private:
 	std::unordered_map<pstring, arena::unique_ptr<pin_alias_t>> m_pins;
 
 	std::vector<unit_t> m_units;
-	pstring m_numberchars;
+	pstring m_number_chars;
 
 	std::unordered_map<pstring, str_list> dev_map;
 
@@ -210,7 +210,7 @@ public:
 
 	nl_convert_eagle_t() = default;
 
-	class tokenizer : public plib::ptokenizer, public plib::ptoken_reader
+	class tokenizer : public plib::ptokenizer, public plib::token_reader_t
 	{
 	public:
 		using token_t = ptokenizer::token_t;
@@ -247,7 +247,7 @@ public:
 
 	nl_convert_rinf_t() = default;
 
-	class tokenizer : public plib::ptokenizer, public plib::ptoken_reader
+	class tokenizer : public plib::ptokenizer, public plib::token_reader_t
 	{
 	public:
 		using token_t = ptokenizer::token_t;

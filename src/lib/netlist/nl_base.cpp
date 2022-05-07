@@ -10,9 +10,10 @@
 #include "plib/pmempool.h"
 #include "plib/putil.h"
 
+#include "core/devices.h"
+#include "core/logic.h"
 #include "core/setup.h"
 #include "devices/nlid_proxy.h"
-#include "nl_base.h"
 
 #include "nl_errstr.h"
 
@@ -160,7 +161,7 @@ namespace netlist
 #endif
 	}
 
-	void netlist_state_t::set_static_solver_lib(std::unique_ptr<plib::dynlib_base> &&lib)
+	void netlist_state_t::set_static_solver_lib(std::unique_ptr<plib::dynamic_library_base> &&lib)
 	{
 		m_lib = std::move(lib);
 	}
@@ -255,7 +256,7 @@ namespace netlist
 		ENTRY_EX(sizeof(std::vector<detail::core_terminal_t *>))
 		ENTRY_EX(sizeof(plib::plog_level))
 
-		ENTRY_EX(sizeof(nldelegate))
+		ENTRY_EX(sizeof(nl_delegate))
 		ENTRY(PPMF_FORCE_TYPE)
 		ENTRY(PHAS_PMF_INTERNAL)
 
@@ -333,7 +334,7 @@ namespace netlist
 		{
 			case 0:
 			{
-				std::vector<const nldelegate *> t;
+				std::vector<const nl_delegate *> t;
 				log().verbose("Using default startup strategy");
 				for (auto &n : m_nets)
 				{
@@ -519,7 +520,7 @@ namespace netlist
 	{
 	}
 
-	void base_device_t::register_subalias(const pstring &name, const detail::core_terminal_t &term)
+	void base_device_t::register_sub_alias(const pstring &name, const detail::core_terminal_t &term)
 	{
 		pstring alias = this->name() + "." + name;
 
@@ -527,7 +528,7 @@ namespace netlist
 		state().parser().register_alias_nofqn(alias, term.name());
 	}
 
-	void base_device_t::register_subalias(const pstring &name, const pstring &aliased)
+	void base_device_t::register_sub_alias(const pstring &name, const pstring &aliased)
 	{
 		pstring alias = this->name() + "." + name;
 		pstring aliased_fqn = this->name() + "." + aliased;
@@ -682,7 +683,7 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 	detail::core_terminal_t::core_terminal_t(core_device_t &dev, const pstring &aname,
-			const state_e state, nldelegate delegate)
+			const state_e state, nl_delegate delegate)
 	: device_object_t(&dev, dev.name() + "." + aname)
 	#if NL_USE_COPY_INSTEAD_OF_REFERENCE
 	, m_Q(*this, "m_Q", 0)
@@ -694,7 +695,7 @@ namespace netlist
 	}
 
 	analog_t::analog_t(core_device_t &dev, const pstring &aname, const state_e state,
-		nldelegate delegate)
+		nl_delegate delegate)
 	: core_terminal_t(dev, aname, state, delegate)
 	{
 	}
@@ -704,20 +705,20 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 	terminal_t::terminal_t(core_device_t &dev, const pstring &aname,
-		terminal_t *other_terminal, nldelegate delegate)
+		terminal_t *other_terminal, nl_delegate delegate)
 	: terminal_t(dev, aname, other_terminal, { nullptr, nullptr }, delegate)
 	{
 	}
 
 	terminal_t::terminal_t(core_device_t &dev, const pstring &aname,
-		terminal_t *other_terminal, const std::array<terminal_t *, 2> &splitterterms,
-		nldelegate delegate)
+		terminal_t *other_terminal, const std::array<terminal_t *, 2> &splitter_terms,
+		nl_delegate delegate)
 	: analog_t(dev, aname, STATE_BIDIR, delegate)
 	, m_Idr(nullptr)
 	, m_go(nullptr)
 	, m_gt(nullptr)
 	{
-		state().setup().register_term(*this, other_terminal, splitterterms);
+		state().setup().register_term(*this, other_terminal, splitter_terms);
 	}
 
 	void terminal_t::set_ptrs(nl_fptype *gt, nl_fptype *go, nl_fptype *Idr) noexcept(false)
@@ -746,7 +747,7 @@ namespace netlist
 	// -----------------------------------------------------------------------------
 
 	logic_t::logic_t(device_t &dev, const pstring &aname, const state_e terminal_state,
-			nldelegate delegate)
+			nl_delegate delegate)
 		: core_terminal_t(dev, aname, terminal_state, delegate)
 		, logic_family_t(dev.logic_family())
 	{
@@ -757,7 +758,7 @@ namespace netlist
 	// -----------------------------------------------------------------------------
 
 	logic_input_t::logic_input_t(device_t &dev, const pstring &aname,
-			nldelegate delegate)
+			nl_delegate delegate)
 			: logic_t(dev, aname, STATE_INP_ACTIVE, delegate)
 	{
 		state().setup().register_term(*this);
@@ -769,7 +770,7 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 	logic_output_t::logic_output_t(device_t &dev, const pstring &aname, [[maybe_unused]] bool dummy)
-		: logic_t(dev, aname, STATE_OUT, nldelegate())
+		: logic_t(dev, aname, STATE_OUT, nl_delegate())
 		, m_my_net(dev.state(), name() + ".net", this)
 	{
 		this->set_net(&m_my_net);
@@ -798,7 +799,7 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 	analog_input_t::analog_input_t(core_device_t &dev, const pstring &aname,
-		nldelegate delegate)
+		nl_delegate delegate)
 	: analog_t(dev, aname, STATE_INP_ACTIVE, delegate)
 	{
 		state().setup().register_term(*this);
@@ -809,7 +810,7 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 	analog_output_t::analog_output_t(core_device_t &dev, const pstring &aname)
-		: analog_t(dev, aname, STATE_OUT, nldelegate())
+		: analog_t(dev, aname, STATE_OUT, nl_delegate())
 		, m_my_net(dev.state(), name() + ".net", this)
 	{
 		state().register_net(device_arena::owned_ptr<analog_net_t>(&m_my_net, false));
@@ -890,8 +891,8 @@ namespace netlist
 
 	param_ptr_t::param_ptr_t(core_device_t &device, const pstring &name, uint8_t * val)
 	: param_t(device, name)
+	, m_param(val)
 	{
-		m_param = val;
 	}
 
 	void param_model_t::changed() noexcept
@@ -1061,7 +1062,6 @@ namespace netlist
 			process_queue_stats<true>(delta);
 		}
 	}
-
 
 	template struct state_var<std::uint8_t>;
 	template struct state_var<std::uint16_t>;

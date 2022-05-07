@@ -83,7 +83,7 @@ namespace netlist::devices {
 	nld_a_to_d_proxy::nld_a_to_d_proxy(netlist_state_t &anetlist, const pstring &name, const logic_input_t *in_proxied)
 	: nld_base_a_to_d_proxy(anetlist, name, in_proxied)
 	, m_Q(*this, "Q")
-	, m_I(*this, "I", nldelegate(&nld_a_to_d_proxy::input, this))
+	, m_I(*this, "I", nl_delegate(&nld_a_to_d_proxy::input, this))
 	{
 	}
 
@@ -115,12 +115,12 @@ namespace netlist::devices {
 
 	nld_d_to_a_proxy::nld_d_to_a_proxy(netlist_state_t &anetlist, const pstring &name, const logic_output_t *out_proxied)
 	: nld_base_d_to_a_proxy(anetlist, name, out_proxied)
-	, m_I(*this, "I", nldelegate(&nld_d_to_a_proxy :: input, this))
+	, m_I(*this, "I", nl_delegate(&nld_d_to_a_proxy :: input, this))
 	, m_RP(*this, "RP")
 	, m_RN(*this, "RN")
 	, m_last_state(*this, "m_last_var", terminal_t::OUT_TRISTATE())
 	{
-		register_subalias("Q", "RN.1");
+		register_sub_alias("Q", "RN.1");
 
 		connect(m_RN.N(), *m_tn);
 		connect(m_RP.P(), *m_tp);

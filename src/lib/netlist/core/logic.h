@@ -30,7 +30,7 @@ namespace netlist
 	{
 	public:
 		logic_t(device_t &dev, const pstring &aname,
-				state_e terminal_state, nldelegate delegate);
+				state_e terminal_state, nl_delegate delegate);
 
 		logic_net_t & net() noexcept
 		{
@@ -50,7 +50,7 @@ namespace netlist
 	{
 	public:
 		logic_input_t(device_t &dev, const pstring &aname,
-				nldelegate delegate);
+				nl_delegate delegate);
 
 		const netlist_sig_t &operator()() const noexcept
 		{

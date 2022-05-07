@@ -100,7 +100,7 @@ namespace netlist::devices {
 
 				for (auto &e : b)
 					/* use pstring::sprintf, it is a LOT faster */
-					m_writer.writeline(plib::pfmt("{1:.9} {2}").e(e.t.as_fp<nl_fptype>()).e(e.v));
+					m_writer.write_line(plib::pfmt("{1:.9} {2}").e(e.t.as_fp<nl_fptype>()).e(e.v));
 				b.clear();
 				m_sem_r.release();
 				m_r++;
@@ -132,9 +132,9 @@ namespace netlist::devices {
 	NETLIB_OBJECT_DERIVED(logD, log)
 	{
 		NETLIB_CONSTRUCTOR(logD)
-		, m_I2(*this, "I2", nldelegate(&NETLIB_NAME(logD)::input, this))
+		, m_I2(*this, "I2", nl_delegate(&NETLIB_NAME(logD)::input, this))
 		{
-			m_I.set_delegate(nldelegate(&NETLIB_NAME(logD)::input, this));
+			m_I.set_delegate(nl_delegate(&NETLIB_NAME(logD)::input, this));
 		}
 
 		NETLIB_HANDLERI(input)

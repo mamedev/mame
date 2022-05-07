@@ -84,7 +84,7 @@
 		::plib::testing::test_location source = PINT_LOCATION(); PINT_SET_LAST(source); \
 		m_parameters->m_num_tests++; \
 		try { exp; this->test_ok() << "got no exception for " # exp << std::endl;} \
-		catch (std::exception &ptest_e) { this->test_error(source) << "unexpected exception thrown: " << ptest_e.what() << std::endl; } \
+		catch (std::exception &test_exception) { this->test_error(source) << "unexpected exception thrown: " << test_exception.what() << std::endl; } \
 		catch (...) { this->test_error(source) << "unexpected exception thrown" << std::endl; } \
 	} else do {} while (0)
 

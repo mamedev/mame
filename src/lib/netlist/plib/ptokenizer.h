@@ -172,7 +172,7 @@ namespace plib {
 		// get internal token with comment processing
 		token_t get_token_comment();
 
-		void skipeol();
+		void skip_eol();
 
 		pstring::value_type getc();
 		void ungetc(pstring::value_type c);
@@ -203,7 +203,7 @@ namespace plib {
 		token_store *m_token_queue;
 	};
 
-	class ptoken_reader
+	class token_reader_t
 	{
 	public:
 
@@ -212,7 +212,7 @@ namespace plib {
 		using token_id_t = ptokenizer::token_id_t;
 		using token_store = ptokenizer::token_store;
 
-		explicit ptoken_reader()
+		explicit token_reader_t()
 		: m_idx(0)
 		, m_token_store(nullptr)
 		{
@@ -220,16 +220,16 @@ namespace plib {
 			m_source_location.emplace_back(plib::source_location("Unknown", 0));
 		}
 
-		PCOPYASSIGNMOVE(ptoken_reader, delete)
+		PCOPYASSIGNMOVE(token_reader_t, delete)
 
-		virtual ~ptoken_reader() = default;
+		virtual ~token_reader_t() = default;
 
 		void set_token_source(const token_store *tokstor)
 		{
 			m_token_store = tokstor;
 		}
 
-		pstring currentline_str() const;
+		pstring current_line_str() const;
 
 		// tokenizer stuff follows ...
 
