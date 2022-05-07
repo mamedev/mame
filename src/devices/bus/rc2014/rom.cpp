@@ -50,7 +50,7 @@ void switchable_rom_device::device_reset()
 	m_bus->installer(AS_PROGRAM)->install_rom(0x0000, 0x1fff, 0x0000, m_rom->base() + (m_rom_selector->read() & 7) * 0x2000);
 }
 
-static INPUT_PORTS_START( rom_selector )
+static INPUT_PORTS_START( switchable_rom_jumpers )
 	PORT_START("A13-A15")   /* jumpers to select ROM region */
 	PORT_CONFNAME( 0x7, 0x7, "ROM Bank" )
 	PORT_CONFSETTING( 0x0, "BASIC" )
@@ -65,7 +65,7 @@ INPUT_PORTS_END
 
 ioport_constructor switchable_rom_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( rom_selector );
+	return INPUT_PORTS_NAME( switchable_rom_jumpers );
 }
 
 ROM_START(rc2014_rom)
@@ -149,7 +149,7 @@ void pagable_rom_device::update_banks()
 		m_bus->installer(AS_PROGRAM)->install_rom(0x0000, m_end_addr, 0x0000, m_rom->base() + m_start_offset);
 }
 
-static INPUT_PORTS_START( page_selector )
+static INPUT_PORTS_START( pagable_rom_jumpers )
 	PORT_START("PAGE_SIZE")
 	PORT_CONFNAME( 0x7, 0x4, "Page Size" )
 	PORT_CONFSETTING( 0x0, "1K" )
@@ -192,7 +192,7 @@ INPUT_PORTS_END
 
 ioport_constructor pagable_rom_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( page_selector );
+	return INPUT_PORTS_NAME( pagable_rom_jumpers );
 }
 
 ROM_START(rc2014_pagable_rom)

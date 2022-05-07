@@ -117,7 +117,7 @@ void ram_64k_device::update_banks()
 	}
 }
 
-static INPUT_PORTS_START( start_addr )
+static INPUT_PORTS_START( ram_64k_jumpers )
 	PORT_START("START_ADDR")
 	PORT_CONFNAME( 0x4, 0x0, "Start address" )
 	PORT_CONFSETTING( 0x0, "0x0000" )
@@ -132,7 +132,7 @@ INPUT_PORTS_END
 
 ioport_constructor ram_64k_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( start_addr );
+	return INPUT_PORTS_NAME( ram_64k_jumpers );
 }
 
 }

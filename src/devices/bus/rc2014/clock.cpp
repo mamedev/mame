@@ -113,7 +113,7 @@ void dual_clock_device::device_reset()
 	notify_clock_changed();
 }
 
-static INPUT_PORTS_START( clock_selector )
+static INPUT_PORTS_START( dual_clock_jumpers )
 	PORT_START("CLOCK1")
 	PORT_CONFNAME( 0xf, 0x0, "Clock 1" )
 	PORT_CONFSETTING( 0x0, "7.3728 MHz" )
@@ -142,7 +142,7 @@ INPUT_PORTS_END
 
 ioport_constructor dual_clock_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( clock_selector );
+	return INPUT_PORTS_NAME( dual_clock_jumpers );
 }
 
 void dual_clock_device::device_add_mconfig(machine_config &config)
