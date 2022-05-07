@@ -14,7 +14,7 @@
 namespace {
 
 //**************************************************************************
-// Z80 CPU base class
+//  Z80 CPU base class
 //**************************************************************************
 
 class z80cpu_base : public device_t
@@ -46,13 +46,13 @@ void z80cpu_base::device_start()
 
 void z80cpu_base::addrmap_mem(address_map &map)
 {
-	map.unmap_value_high(); // unmapped addresses return 0xff
+	map.unmap_value_high();
 }
 
 void z80cpu_base::addrmap_io(address_map &map)
 {
 	map.unmap_value_high(); 
-	map.global_mask(0xff);  // use 8-bit ports
+	map.global_mask(0xff);
 }
 
 void z80cpu_base::device_add_mconfig(machine_config &config)
@@ -63,7 +63,8 @@ void z80cpu_base::device_add_mconfig(machine_config &config)
 }
 
 //**************************************************************************
-// Z80 CPU Module
+//  RC2014 Z80 CPU module
+//  Module author: Spencer Owen
 //**************************************************************************
 
 class z80cpu_device : public z80cpu_base, public device_rc2014_card_interface
@@ -98,7 +99,8 @@ void z80cpu_device::device_resolve_objects()
 }
 
 //**************************************************************************
-// Z80 CPU 2.1 Module
+//  RC2014 Z80 CPU 2.1 module
+//  Module author: Spencer Owen
 //**************************************************************************
 
 class z80cpu21_device : public z80cpu_base, public device_rc2014_ext_card_interface
@@ -137,5 +139,5 @@ void z80cpu21_device::device_resolve_objects()
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_PRIVATE(RC2014_Z80CPU, device_rc2014_card_interface, z80cpu_device, "rc2014_z80", "RC2014 Z80 CPU Module")
-DEFINE_DEVICE_TYPE_PRIVATE(RC2014_Z80CPU_21, device_rc2014_ext_card_interface, z80cpu21_device, "rc2014_z8021", "RC2014 Z80 2.1 CPU Module")
+DEFINE_DEVICE_TYPE_PRIVATE(RC2014_Z80CPU, device_rc2014_card_interface, z80cpu_device, "rc2014_z80", "RC2014 Z80 CPU module")
+DEFINE_DEVICE_TYPE_PRIVATE(RC2014_Z80CPU_21, device_rc2014_ext_card_interface, z80cpu21_device, "rc2014_z8021", "RC2014 Z80 CPU 2.1 module")

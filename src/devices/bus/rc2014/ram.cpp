@@ -10,8 +10,10 @@
 #include "ram.h"
 
 namespace {
+
 //**************************************************************************
-//  RC2014 32K RAM Module
+//  RC2014 32K RAM module
+//  Module author: Spencer Owen
 //**************************************************************************
 
 class ram_32k_device : public device_t, public device_rc2014_card_interface
@@ -45,7 +47,8 @@ void ram_32k_device::device_start()
 }
 
 //**************************************************************************
-//  RC2014 64K RAM Module
+//  RC2014 64K RAM module
+//  Module author: Spencer Owen
 //**************************************************************************
 
 class ram_64k_device : public device_t, public device_rc2014_ext_card_interface
@@ -137,5 +140,5 @@ ioport_constructor ram_64k_device::device_input_ports() const
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_PRIVATE(RC2014_RAM_32K, device_rc2014_card_interface, ram_32k_device, "rc2014_ram_32k", "RC2014 32K RAM Module")
-DEFINE_DEVICE_TYPE_PRIVATE(RC2014_RAM_64K, device_rc2014_ext_card_interface, ram_64k_device, "rc2014_ram_64k", "RC2014 64K RAM Module")
+DEFINE_DEVICE_TYPE_PRIVATE(RC2014_RAM_32K, device_rc2014_card_interface, ram_32k_device, "rc2014_ram_32k", "RC2014 32K RAM module")
+DEFINE_DEVICE_TYPE_PRIVATE(RC2014_RAM_64K, device_rc2014_ext_card_interface, ram_64k_device, "rc2014_ram_64k", "RC2014 64K RAM module")

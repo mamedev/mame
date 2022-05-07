@@ -2,7 +2,7 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-    RC2014 Serial I/O Module
+    RC2014 Serial Module
 
 ****************************************************************************/
 
@@ -15,7 +15,8 @@
 namespace {
 
 //**************************************************************************
-// Serial I/O
+//  RC2014 Serial I/O module
+//  Module author: Spencer Owen
 //**************************************************************************
 
 class serial_io_device : public device_t, public device_rc2014_card_interface
@@ -42,7 +43,6 @@ serial_io_device::serial_io_device(const machine_config &mconfig, const char *ta
 	, m_acia(*this, "acia")
 {
 }
-
 
 void serial_io_device::device_start()
 {
@@ -82,7 +82,8 @@ void serial_io_device::device_add_mconfig(machine_config &config)
 }
 
 //**************************************************************************
-//  Dual Serial Module SIO/2
+//  RC2014 Dual Serial module SIO/2
+//  Module author: Spencer Owen
 //**************************************************************************
 
 class dual_serial_device : public device_t, public device_rc2014_ext_card_interface
@@ -150,5 +151,5 @@ void dual_serial_device::device_add_mconfig(machine_config &config)
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_PRIVATE(RC2014_SERIAL_IO, device_rc2014_card_interface, serial_io_device, "rc2014_serial_io", "RC2014 Serial I/O Module")
-DEFINE_DEVICE_TYPE_PRIVATE(RC2014_DUAL_SERIAL, device_rc2014_ext_card_interface, dual_serial_device, "rc2014_dual_serial", "RC2014 Serial I/O Module")
+DEFINE_DEVICE_TYPE_PRIVATE(RC2014_SERIAL_IO, device_rc2014_card_interface, serial_io_device, "rc2014_serial_io", "RC2014 Serial I/O module")
+DEFINE_DEVICE_TYPE_PRIVATE(RC2014_DUAL_SERIAL, device_rc2014_ext_card_interface, dual_serial_device, "rc2014_dual_serial", "RC2014 Dual Serial module SIO/2")

@@ -2,7 +2,7 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-    RC2014 512k ROM 512k RAM RomWBW Module
+    RC2014 ROM/RAM Module
 
 ****************************************************************************/
 
@@ -12,7 +12,8 @@
 namespace {
 
 //**************************************************************************
-//  RC2014 512k ROM 512k RAM
+//  RC2014 512K RAM / 512K Flash
+//  Module author: Spencer Owen
 //**************************************************************************
 
 class rom_ram_512k_device : public device_t, public device_rc2014_card_interface
@@ -24,7 +25,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	void page_w(offs_t offset, uint8_t data) { m_page_reg[offset & 3] = data & 0x3f; update_banks(); }
@@ -61,10 +61,6 @@ void rom_ram_512k_device::device_start()
 	m_bus->installer(AS_PROGRAM)->install_read_bank(0xc000, 0xffff, m_bank[3]);
 
 	update_banks();
-}
-
-void rom_ram_512k_device::device_reset()
-{
 }
 
 void rom_ram_512k_device::update_banks()
@@ -121,4 +117,4 @@ const tiny_rom_entry *rom_ram_512k_device::device_rom_region() const
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_PRIVATE(RC2014_ROM_RAM_512, device_rc2014_card_interface, rom_ram_512k_device, "rc2014_rom_ram_512k", "RC2014 Switchable ROM Module")
+DEFINE_DEVICE_TYPE_PRIVATE(RC2014_ROM_RAM_512, device_rc2014_card_interface, rom_ram_512k_device, "rc2014_rom_ram_512k", "RC2014 512K RAM / 512K Flash")

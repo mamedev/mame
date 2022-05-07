@@ -12,6 +12,11 @@
 
 namespace {
 
+//**************************************************************************
+//  RC2014 Compact Flash module
+//  Module author: Spencer Owen
+//**************************************************************************
+
 class compact_flash_device : public device_t, public device_rc2014_card_interface
 {
 public:
@@ -55,4 +60,4 @@ void compact_flash_device::device_add_mconfig(machine_config &config)
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_PRIVATE(RC2014_COMPACT_FLASH, device_rc2014_card_interface, compact_flash_device, "rc2014_cf", "RC2014 Compact Flash Module")
+DEFINE_DEVICE_TYPE_PRIVATE(RC2014_COMPACT_FLASH, device_rc2014_card_interface, compact_flash_device, "rc2014_cf", "RC2014 Compact Flash module")

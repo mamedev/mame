@@ -2,29 +2,12 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-        RC2014 bus device
+    RC2014 Bus Device
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "rc2014.h"
-
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(RC2014_BUS,  rc2014_bus_device,  "rc2014_bus",  "RC2014 Standard Bus")
-DEFINE_DEVICE_TYPE(RC2014_SLOT, rc2014_slot_device, "rc2014_slot", "RC2014 Standard Bus Slot")
-
-DEFINE_DEVICE_TYPE(RC2014_EXT_BUS,  rc2014_ext_bus_device,  "rc2014_ext_bus",  "RC2014 Extended Bus")
-DEFINE_DEVICE_TYPE(RC2014_EXT_SLOT, rc2014_ext_slot_device, "rc2014_ext_slot", "RC2014 Extended Bus Slot")
-
-DEFINE_DEVICE_TYPE(RC2014_RC80_BUS,  rc2014_rc80_bus_device,  "rc2014_rc80_bus",  "RC2014 RC80 Bus")
-DEFINE_DEVICE_TYPE(RC2014_RC80_SLOT, rc2014_rc80_slot_device, "rc2014_rc80_slot", "RC2014 RC80 Bus Slot")
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
 
 //**************************************************************************
 //  RC2014 Standard Bus
@@ -293,3 +276,16 @@ void rc2014_rc80_slot_device::device_resolve_objects()
 	if (card)
 		card->set_bus_device(dynamic_cast<rc2014_rc80_bus_device *>(m_bus.target()));
 }
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE(RC2014_BUS,  rc2014_bus_device,  "rc2014_bus",  "RC2014 Standard Bus")
+DEFINE_DEVICE_TYPE(RC2014_SLOT, rc2014_slot_device, "rc2014_slot", "RC2014 Standard Bus Slot")
+
+DEFINE_DEVICE_TYPE(RC2014_EXT_BUS,  rc2014_ext_bus_device,  "rc2014_ext_bus",  "RC2014 Extended Bus")
+DEFINE_DEVICE_TYPE(RC2014_EXT_SLOT, rc2014_ext_slot_device, "rc2014_ext_slot", "RC2014 Extended Bus Slot")
+
+DEFINE_DEVICE_TYPE(RC2014_RC80_BUS,  rc2014_rc80_bus_device,  "rc2014_rc80_bus",  "RC2014 RC80 Bus")
+DEFINE_DEVICE_TYPE(RC2014_RC80_SLOT, rc2014_rc80_slot_device, "rc2014_rc80_slot", "RC2014 RC80 Bus Slot")

@@ -12,7 +12,8 @@
 namespace {
 
 //**************************************************************************
-//  Switchable ROM
+//  RC2014 Switchable ROM module
+//  Module author: Spencer Owen
 //**************************************************************************
 
 class switchable_rom_device : public device_t, public device_rc2014_card_interface
@@ -25,7 +26,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 private:
@@ -79,7 +79,8 @@ const tiny_rom_entry *switchable_rom_device::device_rom_region() const
 }
 
 //**************************************************************************
-//  Pageable ROM
+//  RC2014 Pageable ROM module
+//  Module author: Spencer Owen
 //**************************************************************************
 
 class pagable_rom_device : public device_t, public device_rc2014_ext_card_interface
@@ -92,7 +93,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
@@ -210,5 +210,5 @@ const tiny_rom_entry *pagable_rom_device::device_rom_region() const
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_PRIVATE(RC2014_SWITCHABLE_ROM, device_rc2014_card_interface, switchable_rom_device, "rc2014_switchable_rom", "RC2014 Switchable ROM Module")
-DEFINE_DEVICE_TYPE_PRIVATE(RC2014_PAGABLE_ROM, device_rc2014_ext_card_interface, pagable_rom_device, "rc2014_pagable_rom", "RC2014 Pagable ROM Module")
+DEFINE_DEVICE_TYPE_PRIVATE(RC2014_SWITCHABLE_ROM, device_rc2014_card_interface, switchable_rom_device, "rc2014_switchable_rom", "RC2014 Switchable ROM module")
+DEFINE_DEVICE_TYPE_PRIVATE(RC2014_PAGABLE_ROM, device_rc2014_ext_card_interface, pagable_rom_device, "rc2014_pagable_rom", "RC2014 Pageable ROM module")
