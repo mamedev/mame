@@ -54,6 +54,52 @@ public:
 	{
 	}
 
+	// SOYS - For antialiased wireframe mode ------------------------------------
+	
+	float rfPartOfNumber(float x) const;
+	float fPartOfNumber(float x) const;
+	int iPartOfNumber(float x) const;
+	void drawPixel(bitmap_rgb32 &bitmap, int x , int y , 
+			float brightness, int color) const;
+	void swap(int* a , int*b) const;
+	float absolute(float x ) const;
+	int roundNumber(float x) const;
+
+	//---------------------------------------------------------------------------
+
+	// SOYS for scaling up the rendering ----------------------------------------
+	// Scale up rendering resolution by this much. This will scale all aspects up.
+	// 5 will give you almost 1440p, which is OK for intel 11th Gen i7 mobile
+	// with pyhsical screen of 1080p, software rendering
+	
+	int renderScale = 4;
+
+	// Wire frame mode for 3D. 1 yes, 0 no.
+	int renderWireframe = 0;
+	int renderBackground = 1;
+
+	const int originalCliprectX1 = 0;
+	const int originalCliprectX2 = 496;
+	const int originalCliprectY1 = 0;
+	const int originalCliprectY2 = 384;
+	rectangle originalCliprect;
+
+	const int originalBitmapWidth = 656;
+	const int originalBitmapHeight = 424;
+	int scaledBitmapWidth, scaledBitmapHeight;
+
+	int delayCount = 0;
+	const int delayCountDefault = 15;
+	
+	// My temporarily bitmap and copy tmpBitmap to full bitmap
+
+	bitmap_rgb32 tmpBitmap;
+	bitmap_rgb32 tmpBitmap2;
+	void CopyTmpBitmapToBitmap(bitmap_rgb32& sBitmap, 
+		bitmap_rgb32 &bitmap, uint32_t transparentColor);
+
+	//----------------------------------------------------------------------------
+
 	void model1(machine_config &config);
 	void vf(machine_config &config);
 	void vr(machine_config &config);
@@ -95,6 +141,7 @@ public:
 
 private:
 	// Machine
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -306,6 +353,10 @@ private:
 	void        draw_quads(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	static void recompute_frustum(view_t *view);
 	static void draw_hline(bitmap_rgb32 &bitmap, int x1, int x2, int y, int color);
+
+	// SOYS: Reintroduce the draw_line
+	void 		draw_line(bitmap_rgb32 &bitmap, model1_state::view_t *view, int color, int x1, int y1, int x2, int y2) const;
+
 	static void draw_hline_moired(bitmap_rgb32 &bitmap, int x1, int x2, int y, int color);
 	static void fill_slope(bitmap_rgb32 &bitmap, view_t *view, int color, int32_t x1, int32_t x2, int32_t sl1, int32_t sl2, int32_t y1, int32_t y2, int32_t *nx1, int32_t *nx2);
 	static void fill_line(bitmap_rgb32 &bitmap, view_t *view, int color, int32_t y, int32_t x1, int32_t x2);
