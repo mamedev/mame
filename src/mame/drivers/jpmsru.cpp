@@ -287,8 +287,8 @@ uint8_t jpmsru_state::inputs_r(offs_t offset)
 
 void jpmsru_state::reel_w(offs_t offset, uint8_t data)
 {
-	int reel = (offset & 0xc) >> 2;
-	int bit = offset & 0x3;
+	const int reel = (offset & 0xc) >> 2;
+	const int bit = offset & 0x3;
 	m_reelbits[reel] = (m_reelbits[reel] & ~(1 << bit)) | (data ? (1 << bit) : 0);
 	
 	if(bit == 3) 
