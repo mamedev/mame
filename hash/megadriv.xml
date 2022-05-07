@@ -4162,6 +4162,7 @@ Moans about [Sega Mega Modem] not hooked up, punts to a red screen
 		<notes><![CDATA[
 Unsupported [Sega Mouse] peripheral
 ]]></notes>
+		<info name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703"/>
 			<feature name="ic1" value="MPR-17299-F"/>
@@ -5019,6 +5020,7 @@ Unsupported [Sega Mouse] peripheral
 		<description>Mega Lo Mania (Euro)</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
+		<!-- Header reports 1992 Sep -->
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
@@ -16880,6 +16882,10 @@ https://segaretro.org/Feng_Shen_Ying_Jie_Chuan
 		<description>Go Net (Jpn)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+https://segaretro.org/Go_Net
+Unemulated [Sega Mega Modem] features
+]]></notes>
 		<info name="serial" value="G-4533"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -19694,6 +19700,7 @@ Unsupported [Sega Mouse] peripheral (trackball)
 		<description>Mega Lo Mania (Euro, v1.1)</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
+		<!-- Header reports Dec. 1992 -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="mega-lo-mania (euro) (v1.1).bin" size="1048576" crc="ab9fed30" sha1="3794cb708b1f54675eb6fb272cfee01e6dbcecc1"/>
@@ -19705,6 +19712,7 @@ Unsupported [Sega Mouse] peripheral (trackball)
 		<description>Mega Lo Mania (Jpn)</description>
 		<year>1993</year>
 		<publisher>CRI</publisher>
+		<!-- Header reports Feb. 1993 -->
 		<info name="serial" value="T-68053"/>
 		<info name="release" value="19930423"/>
 		<info name="alt_title" value="メガロマニア"/>
@@ -28474,10 +28482,14 @@ $040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
 		</part>
 	</software>
 
-	<software name="teddyboy">
+	<software name="teddyboy" supported="partial">
 		<description>Teddy Boy Blues (Jpn, SegaNet)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=7645
+No BGMs
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="262144">
 				<rom name="teddy boy blues (jpn) (sn).bin" size="262144" crc="733d2eb3" sha1="dc858342be31ab9491acfaebf1524ece2c6ef9a3"/>
@@ -32041,11 +32053,16 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		</part>
 	</software>
 
-	<software name="zhuogu">
-		<description>Zhuo Gui Da Shi - Ghost Hunter (Chi)</description>
+	<software name="zhuogu" supported="no">
+		<description>Zhuo Gui Da Shi - Ghost Hunter (Tw)</description>
 		<year>1994</year>
 		<publisher>Senchi Technology</publisher>
+		<notes><![CDATA[
+https://segaretro.org/Zhuo_Gui_Da_Shi:_Ghost_Hunter
+Crashes often if you use level select in options menu, particularly later on.
+]]></notes>
 		<info name="alt_title" value="抓鬼大師"/>
+		<info name="developer" value="Jumbo"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="zhuo gui da shi - ghost hunter (chi) (unl).bin" size="524288" crc="76c62a8b" sha1="3424892e913c20754d2e340c6e79476a9eb6761b"/>
@@ -32158,11 +32175,15 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		</part>
 	</software>
 
-	<!-- To be used in conjuction with a MegaCD -->
 	<software name="flux" supported="no">
 		<description>Flux (Euro)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Virgin Interactive</publisher>
+		<notes><![CDATA[
+https://segaretro.org/Flux
+Needs Mega CD addon
+]]></notes>
+		<!-- TODO: check compatibility -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="262144">
 				<rom name="flux (euro).bin" size="262144" crc="2a1da08c" sha1="6357f38db012278bc889c77c5780a82d535760fd"/>
@@ -32170,11 +32191,14 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		</part>
 	</software>
 
-	<!-- To be used in conjuction with a MegaCD -->
 	<software name="fluxp" cloneof="flux" supported="no">
 		<description>Flux (Euro, prototype 19950425)</description>
 		<year>1995</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Virgin Interactive</publisher>
+		<notes><![CDATA[
+https://segaretro.org/Flux
+Needs Mega CD addon
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5694-01"/>
 			<feature name="ic1" value="M27C1000-12XF1"/>
@@ -32386,11 +32410,12 @@ Crashes during attract or in character select, copy protection
 	</software>
 
 	<software name="huanle">
-		<description>Huan Le Tao Qi Shu - Smart Mouse (Chi)</description>
+		<description>Huan Le Tao Qi Shu - Smart Mouse (Tw)</description>
 		<year>199?</year>
 		<publisher>Ming</publisher>
 		<info name="serial" value="GM-95401"/>
 		<info name="alt_title" value="歡樂淘氣鼠"/>
+		<info name="developer" value="Chuanpu"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_smouse"/>
 			<dataarea name="rom" width="16" endianness="big" size="524288">
@@ -33755,24 +33780,34 @@ BGM sometimes goes silent (does several [YM2612] 68k writes without bus)
 		</part>
 	</software>
 
-	<software name="nba2k" cloneof="nbaact">
+	<software name="nba2k" cloneof="nbaact95" supported="partial">
 		<description>NBA 2000 (Rus)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>200?</year>
+		<publisher>Glorysun</publisher>
+		<notes><![CDATA[
+Does extensive checksum at PC=1dcf32 including supposedly mirrored area at $200000
+Selecting "revised roster" will default with Andrew Lang in all positions and teams
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="nba 2000 (unl).bin" size="2097152" crc="2cef6950" sha1="c9727ca783d730d4ee35ef18023c55a0b8d101e2"/>
+			<dataarea name="rom" width="16" endianness="big" size="0x400000">
+				<rom name="nba 2000 (unl).bin" size="0x200000" crc="2cef6950" sha1="c9727ca783d730d4ee35ef18023c55a0b8d101e2" status="baddump"/>
+				<rom value="0x00" size="0x200000" offset="0x200000" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="nba2k5" cloneof="nbaact95">
+	<software name="nba2k5" cloneof="nbaact95" supported="partial">
 		<description>NBA 2005 (Rus)</description>
-		<year>199?</year>
+		<year>200?</year>
 		<publisher>Glorysun</publisher>
+		<notes><![CDATA[
+Does extensive checksum at PC=1dcf32 including supposedly mirrored area at $200000
+Selecting "revised roster" will default with Anderson Kenny in all positions and teams
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="nba 2005 (unl).bin" size="2097152" crc="e8610238" sha1="5820c8db66cdf74fd926d529e469133666babb46"/>
+			<dataarea name="rom" width="16" endianness="big" size="0x400000">
+				<rom name="nba 2005 (unl).bin" size="0x200000" crc="e8610238" sha1="5820c8db66cdf74fd926d529e469133666babb46" status="baddump"/>
+				<rom value="0x00" size="0x200000" offset="0x200000" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
