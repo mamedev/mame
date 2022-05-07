@@ -2869,8 +2869,9 @@ No [VDP] sprites
 
 
 <!-- This was marked as rev. A on the EA sticker, but its header (and ROM markings) uses the Jpn title... weird situation :-)  -->
-	<software name="fatalrewa" cloneof="fatalrew" supported="no">
-		<description>Fatal Rewind (Euro)</description>
+	<software name="fatalrewa" cloneof="fatalrew" supported="yes">
+		<!-- Originally marked as Fatal Rewind, boots as The Killing Game Show -->
+		<description>The Killing Game Show (Euro)</description>
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -2888,6 +2889,10 @@ No [VDP] sprites
 		<description>Fatal Rewind (Euro, USA, Rev. A)</description>
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+Boots in PAL mode only, in NTSC it crashes with diverging behaviour if debugger is on.
+Randomly doesn't show EA logo animation at boot
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="PWB SC40X1 REV B"/>
 			<feature name="u1" value="FATAL REWIND FAT04"/>  <!-- location not really marked on PCB, using u1 for consistency -->
@@ -16075,7 +16080,7 @@ Choppy timings during gameplay (btanb?)
 		</part>
 	</software>
 
-	<software name="killshow" cloneof="fatalrew" supported="no">
+	<software name="killshow" cloneof="fatalrew" supported="yes">
 		<description>The Killing Game Show (Jpn)</description>
 		<year>1993</year>
 		<publisher>Electronic Arts Victor</publisher>
@@ -24908,7 +24913,7 @@ Unsupported [Sega Mega Modem] features
 		</part>
 	</software>
 
-	<software name="sesame" supported="no">
+	<software name="sesame" supported="yes">
 		<description>Sesame Street Counting Cafe (USA)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>

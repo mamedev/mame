@@ -776,7 +776,7 @@ void md_base_state::megadriv_z80_map(address_map &map)
 void md_base_state::megadriv_z80_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x0000, 0xff).noprw();
+	map(0x00, 0xff).noprw();
 }
 
 uint32_t md_base_state::screen_update_megadriv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
