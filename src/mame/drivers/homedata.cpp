@@ -2220,7 +2220,7 @@ GAME( 1988, mjclinica, mjclinic, mrokumei, mjhokite, homedata_state, empty_init,
 GAME( 1988, mrokumei,  0,        mrokumei, mjhokite, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Rokumeikan (Japan)",                          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1988, lastapos,  0,        reikaids, reikaids, homedata_state, init_reikaids, ROT0, "Home Data",  "The Last Apostle Puppetshow",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1988, reikaids,  lastapos, reikaids, reikaids, homedata_state, init_reikaids, ROT0, "Home Data",  "Reikai Doushi (Japan)",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1988, reikaids,  lastapos, reikaids, reikaids, homedata_state, init_reikaids, ROT0, "Home Data",  "Reikai Doushi - Chinese Exorcist (Japan)",            MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, battlcry,  0,        reikaids, battlcry, homedata_state, init_battlcry, ROT0, "Home Data",  "Battlecry (Version E)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, battlcryc, battlcry, reikaids, battlcry, homedata_state, init_battlcry, ROT0, "Home Data",  "Battlecry (Version C)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
