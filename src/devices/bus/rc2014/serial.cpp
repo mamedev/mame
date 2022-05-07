@@ -76,8 +76,6 @@ void serial_io_device::device_add_mconfig(machine_config &config)
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
 	rs232.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
-	rs232.dcd_handler().set(m_acia, FUNC(acia6850_device::write_dcd));
-	rs232.cts_handler().set(m_acia, FUNC(acia6850_device::write_cts));
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 }
 
@@ -152,24 +150,18 @@ void dual_serial_device::device_add_mconfig(machine_config &config)
 	Z80SIO(config, m_sio, 0);
 	m_sio->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
 	m_sio->out_txda_callback().append(FUNC(dual_serial_device::tx_w));
-	m_sio->out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	m_sio->out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
 	m_sio->out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
 	m_sio->out_txdb_callback().append(FUNC(dual_serial_device::tx2_w));
-	m_sio->out_dtrb_callback().set("rs232b", FUNC(rs232_port_device::write_dtr));
 	m_sio->out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
 	m_sio->out_int_callback().set(FUNC(dual_serial_device::irq_w));
 
 	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, "terminal"));
 	rs232a.rxd_handler().set(m_sio, FUNC(z80sio_device::rxa_w));
-	//rs232a.dcd_handler().set(m_sio, FUNC(z80sio_device::dcda_w));
-	//rs232a.cts_handler().set(m_sio, FUNC(z80sio_device::ctsa_w));
 	rs232a.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, nullptr));
 	rs232b.rxd_handler().set(m_sio, FUNC(z80sio_device::rxb_w));
-	//rs232b.dcd_handler().set(m_sio, FUNC(z80sio_device::dcdb_w));
-	//rs232b.cts_handler().set(m_sio, FUNC(z80sio_device::ctsb_w));
 }
 
 static INPUT_PORTS_START( dual_serial_jumpers )
