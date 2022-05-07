@@ -67,7 +67,7 @@ $00     Status register - cycle 0xc7, 0x55, 0x00  (Thanks to Dave Spicer for the
 Known Info
 ----------
 
-2K Character RAM at write only address $f000-$f7fff looks to be organised
+2K Character RAM at write only address $f000-$f7ff looks to be organised
 64x32 chars with the screen rotated through 90 degrees clockwise. There
 appears to be some kind of attribute(?) RAM above at $f800-$ffff organised
 in the same manner.
@@ -78,6 +78,12 @@ would make the overall frame buffer 296x256.
 Print function maybe around $09a2 based on info from log file.
 
 $e000 looks like sprite ram, setup routines at $0008.
+
+Partial hand-made schematics don't show a buffer, but the games most
+definitely need it.  Could be the second half of the ram, which seems
+otherwise unused, but it would be weird bandwidth-wise.  It's not
+double-buffering through page swapping, sprite updates are
+incremental.
 
 
 Sound System CPU Details
@@ -910,8 +916,11 @@ void slapfght_state::perfrman(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(36_MHz_XTAL/6, 388, 0, 296, 270, 0, 240);
 	m_screen->set_screen_update(FUNC(slapfght_state::screen_update_perfrman));
+	m_screen->screen_vblank().set(m_spriteram_buffer, FUNC(buffered_spriteram8_device::vblank_copy_falling));
 	m_screen->screen_vblank().append(FUNC(slapfght_state::vblank_irq));
 	m_screen->set_palette(m_palette);
+
+	BUFFERED_SPRITERAM8(config, m_spriteram_buffer);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_perfrman);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
@@ -956,8 +965,11 @@ void slapfght_state::tigerh(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(36_MHz_XTAL/6, 388, 0, 296, 270, 0, 240);
 	m_screen->set_screen_update(FUNC(slapfght_state::screen_update_slapfight));
+	m_screen->screen_vblank().set(m_spriteram_buffer, FUNC(buffered_spriteram8_device::vblank_copy_falling));
 	m_screen->screen_vblank().append(FUNC(slapfght_state::vblank_irq));
 	m_screen->set_palette(m_palette);
+
+	BUFFERED_SPRITERAM8(config, m_spriteram_buffer);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_slapfght);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
@@ -1036,8 +1048,11 @@ void slapfght_state::slapfigh(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(36_MHz_XTAL/6, 388, 0, 296, 270, 0, 240);
 	m_screen->set_screen_update(FUNC(slapfght_state::screen_update_slapfight));
+	m_screen->screen_vblank().set(m_spriteram_buffer, FUNC(buffered_spriteram8_device::vblank_copy_falling));
 	m_screen->screen_vblank().append(FUNC(slapfght_state::vblank_irq));
 	m_screen->set_palette(m_palette);
+
+	BUFFERED_SPRITERAM8(config, m_spriteram_buffer);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_slapfght);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
@@ -2101,3 +2116,4 @@ GAME( 1986, grdian,     0,        slapfigh,   getstar,   slapfght_state, init_sl
 GAME( 1986, getstarj,   grdian,   slapfigh,   getstarj,  slapfght_state, init_slapfigh,  ROT0,   "Toaplan / Taito",                                       "Get Star (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, getstarb1,  grdian,   getstarb1,  getstarj,  slapfght_state, init_getstarb1, ROT0,   "bootleg",                                               "Get Star (bootleg set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1986, getstarb2,  grdian,   getstarb2,  getstarb2, slapfght_state, init_getstarb2, ROT0,   "bootleg",                                               "Get Star (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+z
