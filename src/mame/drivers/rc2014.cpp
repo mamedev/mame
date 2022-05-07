@@ -105,7 +105,7 @@ ROM_END
 
 // This ties everything together
 //    YEAR  NAME        PARENT    COMPAT    MACHINE    INPUT    CLASS            INIT           COMPANY           FULLNAME             FLAGS
-COMP( 2016, rc2014,     0,        0,        rc2014,    0,       rc2014_state,    empty_init,    "RFC2795 Ltd",    "RC2014 Classic",    MACHINE_IS_SKELETON )
-COMP( 2016, rc2014pro,  rc2014,   0,        rc2014pro, 0,       rc2014pro_state, empty_init,    "RFC2795 Ltd",    "RC2014 Pro",        MACHINE_IS_SKELETON )
-COMP( 2016, rc2014cl2,  rc2014,   0,        rc2014cl2, 0,       rc2014_state,    empty_init,    "RFC2795 Ltd",    "RC2014 Classic 2",  MACHINE_IS_SKELETON )
-COMP( 2016, rc2014zed , rc2014,   0,        rc2014zed ,0,       rc2014pro_state, empty_init,    "RFC2795 Ltd",    "RC2014 Zed/Zed Pro",MACHINE_IS_SKELETON )
+COMP( 2016, rc2014,     0,        0,        rc2014,    0,       rc2014_state,    empty_init,    "RFC2795 Ltd",    "RC2014 Classic",    MACHINE_SUPPORTS_SAVE )
+COMP( 2017, rc2014pro,  rc2014,   0,        rc2014pro, 0,       rc2014pro_state, empty_init,    "RFC2795 Ltd",    "RC2014 Pro",        MACHINE_SUPPORTS_SAVE )
+COMP( 2020, rc2014cl2,  rc2014,   0,        rc2014cl2, 0,       rc2014_state,    empty_init,    "RFC2795 Ltd",    "RC2014 Classic 2",  MACHINE_SUPPORTS_SAVE )
+COMP( 2018, rc2014zed , rc2014,   0,        rc2014zed ,0,       rc2014pro_state, empty_init,    "RFC2795 Ltd",    "RC2014 Zed/Zed Pro",MACHINE_SUPPORTS_SAVE )
