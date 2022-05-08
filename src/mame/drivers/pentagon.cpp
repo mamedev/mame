@@ -219,7 +219,7 @@ void pentagon_state::video_start()
 {
 	spectrum_128_state::video_start();
 	m_contention_pattern = {};
-	/* XXX Must be 4 but that requires draw of previous border chunk and significantly complicates the code.
+	/* TODO (minor) Must be 4 but that requires draw of previous border chunk and significantly complicates the code.
 	Will see if we really have case for this change. */
 	m_border4t_render_at = /*4*/ 3;
 }
