@@ -162,8 +162,8 @@ namespace plib
 
 		pmatrix2d_vrl(const pmatrix2d_vrl &) = default;
 		pmatrix2d_vrl &operator=(const pmatrix2d_vrl &) = default;
-		pmatrix2d_vrl(pmatrix2d_vrl &&) = default;
-		pmatrix2d_vrl &operator=(pmatrix2d_vrl &&) = default;
+		pmatrix2d_vrl(pmatrix2d_vrl &&) noexcept = default;
+		pmatrix2d_vrl &operator=(pmatrix2d_vrl &&) noexcept = default;
 
 		~pmatrix2d_vrl() = default;
 

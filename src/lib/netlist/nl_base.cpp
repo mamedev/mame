@@ -140,9 +140,10 @@ namespace netlist
 		//m_setup->parser().register_source<source_pattern_t>("../macro/nlm_{1}.cpp");
 #else
 #if 1
-		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/macro/nlm_{1}.cpp", true);
-		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/generated/nlm_{1}.cpp", true);
-		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/macro/modules/nlmod_{1}.cpp", true);
+		pstring dir = "src/lib/netlist/";
+		m_setup->parser().register_source<source_pattern_t>(dir + "/macro/nlm_{1}.cpp", true);
+		m_setup->parser().register_source<source_pattern_t>(dir + "/generated/nlm_{1}.cpp", true);
+		m_setup->parser().register_source<source_pattern_t>(dir + "/macro/modules/nlmod_{1}.cpp", true);
 		m_setup->parser().include("base_lib");
 #else
 		// FIXME: This is very slow - need optimized parsing scanning

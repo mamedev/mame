@@ -104,7 +104,7 @@ namespace plib
 		istream_uptr stream(const pstring &name) override
 		{
 			if (name == m_name)
-				return istream_uptr(std::make_unique<std::stringstream>(putf8string(m_str)), name);
+				return {std::make_unique<std::stringstream>(putf8string(m_str)), name };
 
 			return istream_uptr();
 		}

@@ -460,11 +460,11 @@ namespace plib {
 
 		template<typename O>
 		late_pmfp(specific_member_function<O> mftp)
+		: m_creator(creator<O>)
 		{
 			static_assert(sizeof(m_raw) >= sizeof(specific_member_function<O>), "size issue");
 			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 			*reinterpret_cast<specific_member_function<O> *>(&m_raw) = mftp;
-			m_creator = creator<O>;
 		}
 
 		template<typename O>

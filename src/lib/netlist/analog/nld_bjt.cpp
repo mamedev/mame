@@ -21,10 +21,10 @@ namespace analog
 		{}
 
 		diode(nl_fptype Is, nl_fptype n)
+		: m_Is(Is)
+		, m_VT(nlconst::np_VT(n))
+		, m_VT_inv(plib::reciprocal(m_VT))
 		{
-			m_Is = Is;
-			m_VT = nlconst::np_VT(n);
-			m_VT_inv = plib::reciprocal(m_VT);
 		}
 		void set(nl_fptype Is, nl_fptype n) noexcept
 		{

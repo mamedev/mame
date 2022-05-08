@@ -24,9 +24,7 @@
 
 #define PFDEBUG(x)
 
-namespace netlist
-{
-namespace solver
+namespace netlist::solver
 {
 
 	enum static_compile_target
@@ -134,9 +132,8 @@ namespace solver
 
 		// special
 		, m_use_gabs(parent, prefix + "USE_GABS", defaults.m_use_gabs())
-
+		, m_min_timestep(m_dynamic_min_ts())
 		{
-			m_min_timestep = m_dynamic_min_ts();
 			m_max_timestep = netlist_time::from_fp(plib::reciprocal(m_freq())).as_fp<decltype(m_max_timestep)>();
 
 			if (m_dynamic_ts)
@@ -304,7 +301,7 @@ namespace solver
 		virtual std::pair<pstring, pstring> create_solver_code(solver::static_compile_target target)
 		{
 			plib::unused_var(target);
-			return std::pair<pstring, pstring>("", plib::pfmt("/* solver doesn't support static compile */\n\n"));
+			return { "", plib::pfmt("/* solver doesn't support static compile */\n\n") };
 		}
 
 		// return number of floating point operations for solve
@@ -385,7 +382,6 @@ namespace solver
 		plib::aligned_vector<terms_for_net_t> m_rails_temp; // setup only
 	};
 
-} // namespace solver
-} // namespace netlist
+} // namespace netlist::solver
 
 #endif // NLD_MS_DIRECT_H_
