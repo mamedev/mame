@@ -3743,6 +3743,8 @@ license:CC0
 	</software>
 
 	<!-- Linux flavours -->
+
+	<!-- Knoppix -->
 	<software name="knoppix31bsi">
 		<description>Knoppix 3.1 "Bundesamt für Sicherheit in der Informationstechnik" edition</description>
 		<!-- This is a Knoppix CD that was available for free from a German government IT security agency -->
@@ -3755,10 +3757,11 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Ubuntu -->
 	<software name="ubu410a64install">
 		<description>Ubuntu Version 4.10 for AMD64/EM64T install disk</description>
-		<!-- Official server https://old-releases.ubuntu.com/releases/4.10/ - for computers based on the AMD64 or EM64T architecture 
-			(e.g., Athlon64, Opteron, EM64T Xeon)-->
+		<!-- Official server https://old-releases.ubuntu.com/releases/4.10/ - for computers based on the AMD64 or EM64T architecture
+		    (e.g., Athlon64, Opteron, EM64T Xeon)-->
 		<year>2004</year>
 		<publisher>Canonical Ltd.</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -3766,8 +3769,8 @@ license:CC0
 				<disk name="warty-release-install-amd64" sha1="4beb59e4121ccc79a7435e848d8d99495a1fa34e" />
 			</diskarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="ubu410x86install">
 		<description>Ubuntu Version 4.10 for Intel x86 install disk</description>
 		<!-- Official server https://old-releases.ubuntu.com/releases/4.10/ -->
@@ -3778,8 +3781,8 @@ license:CC0
 				<disk name="warty-release-install-i386" sha1="6f2d0a0833850469cd77ffc980ff753bbd314494" />
 			</diskarea>
 		</part>
-	</software>		
-	
+	</software>
+
 	<software name="ubu410x86live">
 		<description>Ubuntu Version 4.10 for Intel x86 live disk</description>
 		<!-- Official server https://old-releases.ubuntu.com/releases/4.10/ -->
@@ -3791,11 +3794,11 @@ license:CC0
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="ubu504a64live">
 		<description>Ubuntu Version 5.04 for AMD64/EM64T live disk</description>
-		<!-- Free physical CD from Canonical  - for computers based on the AMD64 or EM64T architecture 
-			(e.g., Athlon64, Opteron, EM64T Xeon)-->
+		<!-- Free physical CD from Canonical  - for computers based on the AMD64 or EM64T architecture
+		    (e.g., Athlon64, Opteron, EM64T Xeon)-->
 		<year>2005</year>
 		<publisher>Canonical Ltd.</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -3803,7 +3806,7 @@ license:CC0
 				<disk name="ubuntu_5.04_amd64_live" sha1="ecad66f71c05b416c8f6084d239aa0fc1b32798c" />
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="ubu504a64install">
 		<description>Ubuntu Version 5.04 for AMD64/EM64T install disk</description>
@@ -3815,8 +3818,8 @@ license:CC0
 				<disk name="ubuntu_5.04_amd64_install" sha1="5b09fad16dc5ad782d5962a0806ea21f8f4b7de1" />
 			</diskarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="ubu504x86live">
 		<description>Ubuntu Version 5.04 for Intel x86 live disk</description>
 		<!-- Free physical CD from Canonical -->
@@ -3827,7 +3830,7 @@ license:CC0
 				<disk name="ubuntu_5.04_i386_live" sha1="215c83d020c58669f7759619b741b6723d15b304" />
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="ubu606ltsa64">
 		<description>Ubuntu Version 6.06 LTS for AMD64/EM64T</description>
@@ -3852,7 +3855,7 @@ license:CC0
 			</diskarea>
 		</part>
 	</software>
-		
+
 	<software name="ubu710a64">
 		<description>Ubuntu Version 7.10 for AMD64/EM64T</description>
 		<!-- Free physical CD from Canonical -->
@@ -3911,6 +3914,8 @@ license:CC0
 				<disk name="ubuntu_9.04_desktop_edition" sha1="289cde4dc215bb34c535fb228d90cc947edd5d33" />
 			</diskarea>
 		</part>
-	</software>		
-	
+	</software>
+
+	<!-- Kubuntu -->
+
 </softwarelist>
