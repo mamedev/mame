@@ -217,10 +217,11 @@ void pentagon_state::machine_reset()
 
 void pentagon_state::video_start()
 {
-	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
-
-	m_frame_invert_count = 16;
-	m_screen_location = m_ram->pointer() + (5 << 14);
+	spectrum_128_state::video_start();
+	m_contention_pattern = {};
+	/* XXX Must be 4 but that requires draw of previous border chunk and significantly complicates the code.
+	Will see if we really have case for this change. */
+	m_border4t_render_at = /*4*/ 3;
 }
 
 static const gfx_layout spectrum_charlayout =

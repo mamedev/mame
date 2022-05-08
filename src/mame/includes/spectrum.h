@@ -115,6 +115,7 @@ protected:
 
 	int m_ROMSelection = 0; // FIXME: this is used for various things in derived classes, but not by this base class, and should be removed
 	std::vector<u8> m_contention_pattern;
+	u8 m_border4t_render_at = 0;
 	/* Defines offset in CPU cycles from screen left side. Early model (48/128/+2) typically use -1, later (+2A/+3) +1 */
 	s8 m_contention_offset = -1;
 	u64 m_int_at;

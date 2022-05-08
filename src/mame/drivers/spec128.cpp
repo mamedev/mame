@@ -167,11 +167,9 @@ resulting mess can be seen in the F4 viewer display.
 
 void spectrum_128_state::video_start()
 {
-	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
-
-	m_frame_invert_count = 16;
+	spectrum_state::video_start();
 	m_screen_location = m_ram->pointer() + (5 << 14);
-	m_contention_pattern = {6, 5, 4, 3, 2, 1, 0, 0};
+	m_border4t_render_at = 6;
 }
 
 uint8_t spectrum_128_state::spectrum_128_pre_opcode_fetch_r(offs_t offset)

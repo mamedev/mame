@@ -29,6 +29,8 @@ void spectrum_state::video_start()
 	m_frame_invert_count = 16;
 	m_screen_location = m_video_ram;
 	m_contention_pattern = {6, 5, 4, 3, 2, 1, 0, 0};
+	m_contention_offset = -1;
+	m_border4t_render_at = 2;
 }
 
 /***************************************************************************
@@ -118,14 +120,17 @@ u32 spectrum_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &
 
 void spectrum_state::spectrum_update_border(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &border)
 {
-	u8 mod = m_contention_pattern.empty() ? 1 : m_contention_pattern.size();
+	u8 mod = m_contention_pattern.empty() ? 4 : 8;
+	u8 at = m_border4t_render_at;
 	for (auto y = border.top(); y <= border.bottom(); y++)
 	{
 		u16 *pix = &(bitmap.pix(y, border.left()));
 		for (auto x = border.left(); x <= border.right(); )
 		{
-			if (x % mod == 0)
+			if (x % mod == at)
 			{
+				pix -= at;
+				x -= at;
 				for (auto m = 0; m < mod; m++, x++)
 					*pix++ = get_border_color(y, x);
 			}
