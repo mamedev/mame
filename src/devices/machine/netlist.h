@@ -67,10 +67,10 @@ struct netlist_log_csv
 private:
 	static constexpr int MAX_BUFFER_ENTRIES = 1000;
 public:
-	void open(running_machine &machine, const std::string &name) const { }
-	void close() const { }
-	void log_add(char const* param, double value, bool isfloat) const { }
-	void log_flush(int count = MAX_BUFFER_ENTRIES) const { }
+	void open(running_machine &machine, const std::string &name) { }
+	void close() { }
+	void log_add(char const* param, double value, bool isfloat) { }
+	void log_flush(int count = MAX_BUFFER_ENTRIES) { }
 
 private:
 };
