@@ -93,6 +93,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override { update_banks(); }
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
@@ -121,6 +122,8 @@ pagable_rom_device::pagable_rom_device(const machine_config &mconfig, const char
 
 void pagable_rom_device::device_start()
 {
+	save_item(NAME(m_bank));
+
 	m_bus->installer(AS_IO)->install_write_handler(0x30, 0x30, write8sm_delegate(*this, FUNC(pagable_rom_device::reset_bank_w)));
 	m_bus->installer(AS_IO)->install_write_handler(0x38, 0x38, write8sm_delegate(*this, FUNC(pagable_rom_device::toggle_bank_w)));
 }

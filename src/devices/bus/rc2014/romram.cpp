@@ -25,6 +25,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_post_load() override { update_banks(); }
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	void page_w(offs_t offset, uint8_t data) { m_page_reg[offset & 3] = data & 0x3f; update_banks(); }
@@ -55,6 +56,8 @@ void rom_ram_512k_device::device_start()
 	m_ram = std::make_unique<u8[]>(0x80000);
 	std::fill_n(m_ram.get(), 0x80000, 0xff);
 	save_pointer(NAME(m_ram), 0x80000);
+	save_item(NAME(m_page_en));
+	save_item(NAME(m_page_reg));
 
 	// A3 not connected
 	m_bus->installer(AS_IO)->install_write_handler(0x70, 0x73, 0, 0x08, 0, write8sm_delegate(*this, FUNC(rom_ram_512k_device::page_w)));

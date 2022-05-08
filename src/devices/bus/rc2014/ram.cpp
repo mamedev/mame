@@ -64,6 +64,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override { update_banks(); }
+
 	virtual ioport_constructor device_input_ports() const override;
 
 	DECLARE_WRITE_LINE_MEMBER( page_w ) { m_bank = state; update_banks(); }
@@ -80,6 +82,7 @@ protected:
 
 ram_64k_base::ram_64k_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
+	, m_bank(0)
 	, m_ram(nullptr)
 	, m_start_addr(*this, "START_ADDR")
 	, m_paged(*this, "PAGED")
@@ -91,6 +94,7 @@ void ram_64k_base::device_start()
 	m_ram = std::make_unique<u8[]>(0x10000);
 	std::fill_n(m_ram.get(), 0x10000, 0xff);
 	save_pointer(NAME(m_ram), 0x10000);
+	save_item(NAME(m_bank));
 }
 
 void ram_64k_base::device_reset()
