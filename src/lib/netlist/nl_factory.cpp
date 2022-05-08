@@ -11,8 +11,7 @@
 #include "nl_setup.h"
 #include "plib/putil.h"
 
-namespace netlist {
-namespace factory {
+namespace netlist::factory {
 
 	// FIXME: this doesn't do anything, check how to remove
 	class NETLIB_NAME(wrapper) : public base_device_t
@@ -88,5 +87,4 @@ namespace factory {
 	}
 
 
-} // namespace factory
- } // namespace netlist
+} // namespace netlist::factory

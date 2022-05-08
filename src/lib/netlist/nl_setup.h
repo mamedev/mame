@@ -79,7 +79,6 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 		setup.register_source_proc(# name, &NETLIST_NAME(name));
 
 #define EXTERNAL_SOURCE(name)                                                  \
-		NETLIST_EXTERNAL(name)                                                 \
 		setup.register_source_proc(# name, &NETLIST_NAME(name));
 
 #define LOCAL_LIB_ENTRY_2(type, name)                                          \

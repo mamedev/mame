@@ -30,5 +30,6 @@
 
 #include "../generated/nld_devinc.h"
 
+NETLIST_EXTERNAL(base_lib)
 
 #endif // NET_LIB_H

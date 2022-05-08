@@ -162,6 +162,24 @@ void z88cart_slot_device::call_unload()
 
 std::string z88cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
+	// select the correct slot device for the ROM size
+	if (hook.image_file())
+	{
+		uint64_t size;
+		std::error_condition err = hook.image_file()->length(size);
+
+		if (!err)
+		{
+			if (size <= 0x8000)     return std::string("32krom");
+			if (size <= 0x20000)    return std::string("128krom");
+			if (size <= 0x40000)    return std::string("256krom");
+			if (size <= 0x100000)   return std::string("1024kflash");
+			fatalerror("%s: unsupported ROM size 0x%06x", tag(), size);
+		}
+		else
+			fatalerror("%s: %s:%d %s\n", tag(), err.category().name(), err.value(), err.message());
+	}
+
 	return software_get_default_slot("128krom");
 }
 
@@ -187,6 +205,16 @@ void z88cart_slot_device::write(offs_t offset, uint8_t data)
 {
 	if (m_cart)
 		m_cart->write(offset, data);
+}
+
+/*-------------------------------------------------
+    set EPROM programming voltage to slot 3
+-------------------------------------------------*/
+
+void z88cart_slot_device::vpp_w(int state)
+{
+	if (m_cart)
+		m_cart->vpp_w(state);
 }
 
 
