@@ -116,6 +116,7 @@ protected:
 	DECLARE_MACHINE_RESET(dynax);
 
 	void htengoku_banked_map(address_map &map);
+	void tenkai_palette_w(offs_t offset, uint8_t data);
 
 private:
 	void jantouki_vblank_ack_w(uint8_t data);
@@ -162,7 +163,6 @@ private:
 	void tenkai_ip_w(uint8_t data);
 	uint8_t tenkai_ip_r(offs_t offset);
 	uint8_t tenkai_palette_r(offs_t offset);
-	void tenkai_palette_w(offs_t offset, uint8_t data);
 	uint8_t tenkai_p3_r();
 	void tenkai_p3_w(uint8_t data);
 	void tenkai_p4_w(uint8_t data);

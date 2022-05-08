@@ -134,7 +134,7 @@ Notes:
 #include "speaker.h"
 
 
-namespace {
+//namespace {
 
 /***************************************************************************
 
@@ -4920,6 +4920,8 @@ static INPUT_PORTS_START( ultrchmp )
 	PORT_DIPUNKNOWN( 0x40, 0x40 )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 INPUT_PORTS_END
+
+INPUT_PORTS_EXTERN( HANAFUDA_KEYS_BET );
 
 static INPUT_PORTS_START( htengoku )
 	PORT_START("COINS")
@@ -13129,7 +13131,7 @@ ROM_START( htengoku )
 	ROM_LOAD( "6510.11b", 0x280000, 0x20000, CRC(0fdd6edf) SHA1(c6870ab538987110337e6e154cba98391c68fb98) )
 ROM_END
 
-} // anonymous namespace
+//} // anonymous namespace
 
 
 GAME( 1992, htengoku,  0,        htengoku,  htengoku, htengoku_state, empty_init,    ROT180, "Dynax",                                     "Hanafuda Hana Tengoku [BET] (Japan)",                                   0)
