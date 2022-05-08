@@ -3758,19 +3758,6 @@ license:CC0
 	</software>
 
 	<!-- Ubuntu -->
-	<software name="ubu410a64install">
-		<description>Ubuntu Version 4.10 for AMD64/EM64T install disk</description>
-		<!-- Official server https://old-releases.ubuntu.com/releases/4.10/ - for computers based on the AMD64 or EM64T architecture
-		    (e.g., Athlon64, Opteron, EM64T Xeon)-->
-		<year>2004</year>
-		<publisher>Canonical Ltd.</publisher>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="warty-release-install-amd64" sha1="4beb59e4121ccc79a7435e848d8d99495a1fa34e" />
-			</diskarea>
-		</part>
-	</software>
-
 	<software name="ubu410x86install">
 		<description>Ubuntu Version 4.10 for Intel x86 install disk</description>
 		<!-- Official server https://old-releases.ubuntu.com/releases/4.10/ -->
@@ -3795,31 +3782,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ubu504a64live">
-		<description>Ubuntu Version 5.04 for AMD64/EM64T live disk</description>
-		<!-- Free physical CD from Canonical  - for computers based on the AMD64 or EM64T architecture
-		    (e.g., Athlon64, Opteron, EM64T Xeon)-->
-		<year>2005</year>
-		<publisher>Canonical Ltd.</publisher>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="ubuntu_5.04_amd64_live" sha1="ecad66f71c05b416c8f6084d239aa0fc1b32798c" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="ubu504a64install">
-		<description>Ubuntu Version 5.04 for AMD64/EM64T install disk</description>
-		<!-- Free physical CD from Canonical -->
-		<year>2005</year>
-		<publisher>Canonical Ltd.</publisher>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="ubuntu_5.04_amd64_install" sha1="5b09fad16dc5ad782d5962a0806ea21f8f4b7de1" />
-			</diskarea>
-		</part>
-	</software>
-
 	<software name="ubu504x86live">
 		<description>Ubuntu Version 5.04 for Intel x86 live disk</description>
 		<!-- Free physical CD from Canonical -->
@@ -3832,18 +3794,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ubu606ltsa64">
-		<description>Ubuntu Version 6.06 LTS for AMD64/EM64T</description>
-		<!-- Free physical CD from Canonical -->
-		<year>2006</year>
-		<publisher>Canonical Ltd.</publisher>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="ubuntu_6.06_lts_64bit_pc" sha1="71776c6899e52199986671922b54e09928ffad61" />
-			</diskarea>
-		</part>
-	</software>
-
 	<software name="ubu6061ltsx86">
 		<description>Ubuntu Version 6.06.1 LTS for Intel x86</description>
 		<!-- Free physical CD from Canonical -->
@@ -3852,18 +3802,6 @@ license:CC0
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ubuntu_6.06.1_lts_pc" sha1="14b6cdf1126b5641b482549b04d8b6bbcb98d04c" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="ubu710a64">
-		<description>Ubuntu Version 7.10 for AMD64/EM64T</description>
-		<!-- Free physical CD from Canonical -->
-		<year>2007</year>
-		<publisher>Canonical Ltd.</publisher>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="ubuntu_7.10_64bit_pc" sha1="5cf6c51038e9e1159374032be1e706805d54a831" />
 			</diskarea>
 		</part>
 	</software>
