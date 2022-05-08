@@ -1705,6 +1705,8 @@ files {
 	MAME_DIR .. "src/mame/includes/z88.h",
 	MAME_DIR .. "src/mame/machine/upd65031.cpp",
 	MAME_DIR .. "src/mame/machine/upd65031.h",
+	MAME_DIR .. "src/mame/machine/z88_impexp.cpp",
+	MAME_DIR .. "src/mame/machine/z88_impexp.h",
 	MAME_DIR .. "src/mame/video/z88.cpp",
 }
 
