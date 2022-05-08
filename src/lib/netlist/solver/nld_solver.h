@@ -20,9 +20,7 @@
 // solver
 // ----------------------------------------------------------------------------------------
 
-namespace netlist
-{
-namespace devices
+namespace netlist::devices
 {
 	NETLIB_OBJECT(solver)
 	{
@@ -89,7 +87,6 @@ namespace devices
 
 	};
 
-} // namespace devices
-} // namespace netlist
+} // namespace netlist::devices
 
 #endif // NLD_SOLVER_H_
