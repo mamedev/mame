@@ -132,7 +132,7 @@ void device_v5x_interface::TCKS_w(u8 data)
 	tcu_clock_update();
 }
 
-void device_v5x_interface::interface_clock_changed()
+void device_v5x_interface::interface_clock_changed(bool sync_on_new_clock_domain)
 {
 	tcu_clock_update();
 }
