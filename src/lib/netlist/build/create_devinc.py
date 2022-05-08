@@ -61,28 +61,28 @@ def process_file(srcfile):
         ls = re.sub("\"","",ls)
         m = re.match(r"NETLIB_DEVICE_IMPL\((\w+),(\w+),([a-zA-Z0-9_+@,]*)", ls)
         #print("Line{}: {}".format(count, line.strip()))
-        if m != None:
+        if m is not None:
             process_entry(srcfile, m.group(2), m.group(3))
         else:
             m = re.match(r"NETLIB_DEVICE_IMPL_ALIAS\((\w+),(\w+),(\w+),([a-zA-Z0-9_+@,]*)", ls)
-            if m != None:
+            if m is not None:
                 process_entry(srcfile, m.group(3), m.group(4))
             else:
                 m = re.match(r"NETLIB_DEVICE_IMPL_NS\((\w+),(\w+),(\w+),([a-zA-Z0-9_+@,]*)", ls)
-                if m != None:
+                if m is not None:
                     process_entry(srcfile, m.group(3), m.group(4))
                 else:
                     m = re.match(r"LOCAL_LIB_ENTRY\((\w+)\)", ls)
-                    if m != None:
+                    if m is not None:
                         process_entry(srcfile, m.group(1), "")
                     else:
                         m = re.match(r"(static)*TRUTHTABLE_START\((\w+),(\w+),(\w+),([a-zA-Z0-9_+@,]*)", ls)
-                        if m != None:
+                        if m is not None:
                             process_entry(srcfile, m.group(2), m.group(5))
                         else:
                             #m = re.match(r"EXTERNAL_SOURCE\((\w+)\)", ls)
                             m = re.match(r"NETLIST_START\((\w+)\)", ls)
-                            if m != None:
+                            if m is not None:
                                 process_entry_external(srcfile, m.group(1))
 
     src.close()
