@@ -81,6 +81,7 @@ const help_item f_static_help_list[] =
 		"  stateload[sl] <filename> -- load a state file for the current driver\n"
 		"  snap [<filename>] -- save a screen snapshot.\n"
 		"  source <filename> -- reads commands from <filename> and executes them one by one\n"
+		"  time -- prints current machine time to the console\n"
 		"  cls -- clears the console text buffer\n"
 		"  quit -- exits MAME and the debugger\n"
 	},
@@ -579,6 +580,13 @@ const help_item f_static_help_list[] =
 		"\n"
 		"source break_and_trace.cmd\n"
 		"  Reads in debugger commands from break_and_trace.cmd and executes them.\n"
+	},
+	{
+		"time",
+		"\n"
+		"  time\n"
+		"\n"
+		"The time command prints the current machine time to the console.\n"
 	},
 	{
 		"quit",
