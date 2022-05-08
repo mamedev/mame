@@ -3829,14 +3829,86 @@ license:CC0
 		</part>
 	</software>	
 
-	<software name="ubu504x86install">
-		<description>Ubuntu Version 5.04 for Intel x86 install disk</description>
+	<software name="ubu606ltsa64">
+		<description>Ubuntu Version 6.06 LTS for AMD64/EM64T</description>
 		<!-- Free physical CD from Canonical -->
-		<year>2005</year>
+		<year>2006</year>
 		<publisher>Canonical Ltd.</publisher>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="ubuntu_5.04_i386_install" sha1="5cac105e50d213e306c208500f4d1b3204486c86" />
+				<disk name="ubuntu_6.06_lts_64bit_pc" sha1="71776c6899e52199986671922b54e09928ffad61" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ubu6061ltsx86">
+		<description>Ubuntu Version 6.06.1 LTS for Intel x86</description>
+		<!-- Free physical CD from Canonical -->
+		<year>2006</year>
+		<publisher>Canonical Ltd.</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ubuntu_6.06.1_lts_pc" sha1="14b6cdf1126b5641b482549b04d8b6bbcb98d04c" />
+			</diskarea>
+		</part>
+	</software>
+		
+	<software name="ubu710a64">
+		<description>Ubuntu Version 7.10 for AMD64/EM64T</description>
+		<!-- Free physical CD from Canonical -->
+		<year>2007</year>
+		<publisher>Canonical Ltd.</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ubuntu_7.10_64bit_pc" sha1="5cf6c51038e9e1159374032be1e706805d54a831" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ubu710x86">
+		<description>Ubuntu Version 7.10 for Intel x86</description>
+		<!-- Free physical CD from Canonical -->
+		<year>2007</year>
+		<publisher>Canonical Ltd.</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ubuntu_7.10_pc" sha1="4c825b07bfc7486ec6b1c00a4a9c3343aae649fa" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ubu804ltsx86desk">
+		<description>Ubuntu Version 8.04 LTS Desktop Edition for Intel x86</description>
+		<!-- Free physical CD from Canonical -->
+		<year>2008</year>
+		<publisher>Canonical Ltd.</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ubuntu_8.04_lts_desktop_edition" sha1="6558b06be0ae4e7539388b47c663b46a4c7199df" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ubu810x86desk">
+		<description>Ubuntu Version 8.10 Desktop Edition for Intel x86</description>
+		<!-- Free physical CD from Canonical -->
+		<year>2008</year>
+		<publisher>Canonical Ltd.</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ubuntu_8.10_desktop_edition" sha1="55d66617b962c8410c74117032c34cc999025ad8" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ubu904x86desk">
+		<description>Ubuntu Version 9.04 Desktop Edition for Intel x86</description>
+		<!-- Free physical CD from Canonical -->
+		<year>2009</year>
+		<publisher>Canonical Ltd.</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ubuntu_9.04_desktop_edition" sha1="289cde4dc215bb34c535fb228d90cc947edd5d33" />
 			</diskarea>
 		</part>
 	</software>		
