@@ -789,7 +789,7 @@ uint8_t vegas_state::sio_r(offs_t offset)
 			result = (((m_io_8way[2]->read() & 0x40) >> 3) | ((m_io_8way[3]->read() & 0x7000) >> 8));
 			break;
 		}
-		logerror("%s: sio_r: offset: %08x index: %d result: %02X\n", machine().describe_context(), offset, index, result);
+		if (LOG_SIO) logerror("%s: sio_r: offset: %08x index: %d result: %02X\n", machine().describe_context(), offset, index, result);
 		break;
 	}
 	}
