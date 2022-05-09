@@ -1784,7 +1784,7 @@ void sega_segacd_device::device_reset()
 
 	m_total_scanlines = 262;
 
-	// HACK!!!! timegal, anettfut, roadaven end up with the SubCPU waiting in a loop for *something*
+	// HACK!!!! timegal, anettfut, roadaven/rbfx end up with the SubCPU waiting in a loop for *something*
 	// overclocking the CPU, even at the point where the game is hung, allows them to continue and boot
 	// I'm not sure what the source of this timing problem is, it's not using IRQ3 or StopWatch at the
 	// time.  Changing the CDHock timer to 50hz from 75hz also stops the hang, but then the video is
