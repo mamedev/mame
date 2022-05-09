@@ -252,6 +252,7 @@ enum
 	void GollyGhostUpdateLED_c8(int data);
 	void GollyGhostUpdateLED_ca(int data);
 	void GollyGhostUpdateDiorama_c0(int data);
+	void BubbleTroubleUpdateDiorama_c0(int data);
 	void TilemapCB(uint16_t code, int *tile, int *mask);
 	void TilemapCB_finalap2(uint16_t code, int *tile, int *mask);
 	void RozCB_luckywld(uint16_t code, int *tile, int *mask, int which);
