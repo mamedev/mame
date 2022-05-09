@@ -8,7 +8,7 @@
   Driver by Roberto Fresca & Grull Osgo.
 
 
-  One of the most beautiful designs for 8bit slots machines.
+  One of the most beautiful designs for 8bit slots machines. Very rare.
 
   The reverse-engineering was made seeing a few PCB pictures, and following the code.
   After all these exhaustive analysis we finally got the inputs working, but they are
@@ -157,7 +157,6 @@
 #include "video/seta001.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
-#include "machine/bankdev.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -177,22 +176,22 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_seta001(*this, "spritegen")
 		, m_palette(*this, "palette")
-		, m_mainbank(*this, "mainbank")
+		, m_screen(*this, "screen")
+		, m_bank(*this, "bank")
 		, m_ram(*this, RAM_TAG)
 		, m_nvram(*this, "nvram")
+		, m_inp0(*this, "IN0")
 		, m_lamp(*this, "lamp%u", 0U)
 	{
 	}
 
 	void hotchili(machine_config &config);
-	void hotchili_mainbank(machine_config &config);
-    void init_hc();
+	void init_hc();
 	
 
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
-
 	
 private:
 	// screen updates
@@ -209,7 +208,6 @@ private:
 	uint16_t m_addr_mask, m_addr_latch;
 
 	void hc_map(address_map &map);
-	void mainbank_map(address_map &map);
 	void bankswitch_w(uint8_t data);
 
 	//inports
@@ -224,15 +222,14 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<seta001_device> m_seta001;
 	required_device<palette_device> m_palette;
-	required_device<address_map_bank_device> m_mainbank;
+	required_device<screen_device> m_screen;
+	required_memory_bank m_bank;
 	required_device<ram_device> m_ram;
 	required_device<nvram_device> m_nvram;
+	required_ioport m_inp0;
 	output_finder<40> m_lamp;
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-
 	uint8_t m_meters = 0;
-	uint8_t m_frame = 0;
 };
 
 
@@ -280,22 +277,7 @@ uint32_t hotchili_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 
 void hotchili_state::bankswitch_w(uint8_t data)
 {
-	uint8_t bank, hibit, high;
-	high = data & 0x03;
-	hibit = data >> 7;
-	bank = hibit ? 4 + high : 4;
-	m_mainbank->set_bank(bank);
-}
-
-void hotchili_state::mainbank_map(address_map &map)
-{
-	map(0x000000, 0x07fff).rom().region(":maincpu", 0x0000);
-	map(0x008000, 0x0ffff).rom().region(":maincpu", 0x8000);
-}
-
-void hotchili_state::hotchili_mainbank(machine_config &config)
-{
-	ADDRESS_MAP_BANK(config, "mainbank").set_map(&hotchili_state::mainbank_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x2000);
+	m_bank->set_entry((data & 0x80) ? (data & 0x03) : 0);
 }
 
 
@@ -306,7 +288,7 @@ void hotchili_state::hotchili_mainbank(machine_config &config)
 void hotchili_state::hc_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).m(m_mainbank, FUNC(address_map_bank_device::amap8));
+	map(0x8000, 0x9fff).bankr("bank");
 	map(0xa000, 0xafff).ram().rw(m_seta001, FUNC(seta001_device::spritecodelow_r8), FUNC(seta001_device::spritecodelow_w8));
 	map(0xb000, 0xbfff).ram().rw(m_seta001, FUNC(seta001_device::spritecodehigh_r8), FUNC(seta001_device::spritecodehigh_w8));
 	map(0xc000, 0xdfff).ram();
@@ -405,13 +387,14 @@ INPUT_PORTS_END
 
 uint8_t hotchili_state::inport0_r()
 {
-	if(m_frame == 8)
+	if( (m_screen->frame_number() & 7) == 0)
 	{
-		m_frame = 0;
-		return ioport("IN0")->read() & 0xf9;  // enables alternate inputs read 
+		return m_inp0->read() & 0xf9;  // enables alternate inputs read
 	}
-
-	return ioport("IN0")->read();
+	else
+	{
+		return m_inp0->read();
+	}
 }
 
 
@@ -425,82 +408,81 @@ uint8_t hotchili_state::inport3_r()
 *            Lamps and Outputs             *
 *******************************************/
 
-
 void hotchili_state::outp1_w(offs_t offset, uint8_t data)
 {
 	offset = (offset >> 2) & 0x03;
 	switch( offset )
 	{
 		case 0:
-			m_lamp[0] = BIT(data,0); // 1st Start
-			m_lamp[1] = BIT(data,1); // 2nd Start
-			m_lamp[2] = BIT(data,2); // 3rd Start
-			m_lamp[3] = BIT(data,3); // 4th Start
-			m_lamp[4] = BIT(data,4); // 5th Start 
+			m_lamp[0] = BIT(data,0);  // 1st Start
+			m_lamp[1] = BIT(data,1);  // 2nd Start
+			m_lamp[2] = BIT(data,2);  // 3rd Start
+			m_lamp[3] = BIT(data,3);  // 4th Start
+			m_lamp[4] = BIT(data,4);  // 5th Start 
 			m_lamp[5] = BIT(data,5); 
 			m_lamp[6] = BIT(data,6);
-			m_lamp[7] = BIT(data,7); // motor hopper
+			m_lamp[7] = BIT(data,7);  // Motor Hopper
 			break;
 
 		case 1:
-			m_lamp[8]  = BIT(data,0); // 1st Start - Test Mode
-			m_lamp[9]  = BIT(data,1); // 2nd Start 
-			m_lamp[10] = BIT(data,2); // 3rd Start
-			m_lamp[11] = BIT(data,3); // 4th Start
-			m_lamp[12] = BIT(data,4); // 5th Start 
-			m_lamp[13] = BIT(data,5); // Coin Lock Out Coil
-			m_lamp[14] = BIT(data,6); // Divert Solenoid
-			m_lamp[15] = BIT(data,7); // Divert Solenoid
+			m_lamp[8]  = BIT(data,0);  // 1st Start - Test Mode
+			m_lamp[9]  = BIT(data,1);  // 2nd Start 
+			m_lamp[10] = BIT(data,2);  // 3rd Start
+			m_lamp[11] = BIT(data,3);  // 4th Start
+			m_lamp[12] = BIT(data,4);  // 5th Start 
+			m_lamp[13] = BIT(data,5);  // Coin Lock Out Coil
+			m_lamp[14] = BIT(data,6);  // Divert Solenoid
+			m_lamp[15] = BIT(data,7);  // Divert Solenoid
 		break;
 
 		case 2:
-			m_lamp[16] = BIT(data,0); // alt door lamp?
-			m_lamp[17] = BIT(data,1); // Animation Lamp D
-			m_lamp[18] = BIT(data,2); // Animation Lamp C
-			m_lamp[19] = BIT(data,3); // Animation Lamp B
-			m_lamp[20] = BIT(data,4); // Animation Lamp A
-			m_lamp[21] = BIT(data,5); // Door Oper Tower
-			m_lamp[22] = BIT(data,6); // Call Attendat Tower
-			m_lamp[23] = BIT(data,7); // Jackpot Tower
+			m_lamp[16] = BIT(data,0);  // alt door lamp?
+			m_lamp[17] = BIT(data,1);  // Animation Lamp D
+			m_lamp[18] = BIT(data,2);  // Animation Lamp C
+			m_lamp[19] = BIT(data,3);  // Animation Lamp B
+			m_lamp[20] = BIT(data,4);  // Animation Lamp A
+			m_lamp[21] = BIT(data,5);  // Door Oper Tower
+			m_lamp[22] = BIT(data,6);  // Call Attendat Tower
+			m_lamp[23] = BIT(data,7);  // Jackpot Tower
 		break;
 
 		case 3:
 			m_meters = data;
-			m_lamp[24] = BIT(data,0); machine().bookkeeping().coin_counter_w(0, BIT(data, 0)); // Coin 1
-			m_lamp[25] = BIT(data,1); machine().bookkeeping().coin_counter_w(1, BIT(data, 1)); // Coin 2
-			m_lamp[26] = BIT(data,2); machine().bookkeeping().coin_counter_w(2, BIT(data, 2)); // Coin 3 Credits Played
-			m_lamp[27] = BIT(data,3); machine().bookkeeping().coin_counter_w(3, BIT(data, 3)); // Coin 4 Credits Won
-			m_lamp[28] = BIT(data,4); machine().bookkeeping().coin_counter_w(4, BIT(data, 4)); // Coin 5 Credits to Cash Box
-			m_lamp[29] = BIT(data,5); machine().bookkeeping().coin_counter_w(5, BIT(data, 5)); // Coin 6 Creditos Cancelados (Hand Pay)
-			m_lamp[30] = BIT(data,6); machine().bookkeeping().coin_counter_w(6, BIT(data, 6)); // Coin 7 Games
-			m_lamp[31] = BIT(data,7); machine().bookkeeping().coin_counter_w(7, BIT(data, 7)); // Coin 8
+			m_lamp[24] = BIT(data,0); machine().bookkeeping().coin_counter_w(0, BIT(data, 0));  // Meter 1
+			m_lamp[25] = BIT(data,1); machine().bookkeeping().coin_counter_w(1, BIT(data, 1));  // Meter 2
+			m_lamp[26] = BIT(data,2); machine().bookkeeping().coin_counter_w(2, BIT(data, 2));  // Meter 3 - Credits Played
+			m_lamp[27] = BIT(data,3); machine().bookkeeping().coin_counter_w(3, BIT(data, 3));  // Meter 4 - Credits Won
+			m_lamp[28] = BIT(data,4); machine().bookkeeping().coin_counter_w(4, BIT(data, 4));  // Meter 5 - Credits to Cash Box
+			m_lamp[29] = BIT(data,5); machine().bookkeeping().coin_counter_w(5, BIT(data, 5));  // Meter 6 - Cancelled Credits (Hand Pay)
+			m_lamp[30] = BIT(data,6); machine().bookkeeping().coin_counter_w(6, BIT(data, 6));  // Meter 7 - Games
+			m_lamp[31] = BIT(data,7); machine().bookkeeping().coin_counter_w(7, BIT(data, 7));  // Meter 8
 		break;
 	}
 }
 
 void hotchili_state::outp2_w(offs_t offset, uint8_t data)
 {
-	m_lamp[32] = BIT(data,0); // 1st Line
-	m_lamp[33] = BIT(data,1); // 2nd Line
-	m_lamp[34] = BIT(data,2); // 3rd Line
-	m_lamp[35] = BIT(data,3); // 4th Line
-	m_lamp[36] = BIT(data,4); // 5th Line
+	m_lamp[32] = BIT(data,0);  // 1st Line
+	m_lamp[33] = BIT(data,1);  // 2nd Line
+	m_lamp[34] = BIT(data,2);  // 3rd Line
+	m_lamp[35] = BIT(data,3);  // 4th Line
+	m_lamp[36] = BIT(data,4);  // 5th Line
 	m_lamp[37] = BIT(data,5);
 	m_lamp[38] = BIT(data,6);
 	m_lamp[39] = BIT(data,7);
 }
 
+
 /*********************************************
 *              Graphics Layouts              *
 *********************************************/
-
 
 static const gfx_layout charlayout =
 {
 	16,16,
 	RGN_FRAC(1,4),
 	4,
-    { RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
+	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
 			8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
@@ -513,16 +495,14 @@ static const gfx_layout charlayout =
 *           Graphics Decode Information           *
 **************************************************/
 
-
 static GFXDECODE_START( gfx_hotchili )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x0, 32  )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 32 )
 GFXDECODE_END
 
 
 /**************************************************
 *          Universal External RAM Module          *
 **************************************************/
-
 
 void hotchili_state::extram_w(offs_t offset, uint8_t data)
 {
@@ -567,7 +547,6 @@ uint8_t hotchili_state::extram_r(offs_t offset)
 *              Machine Start              *
 ******************************************/
 
-
 void hotchili_state::machine_start()
 {
 	m_lamp.resolve();
@@ -575,26 +554,9 @@ void hotchili_state::machine_start()
 }
 
 
-/******************************************
-*           Interrupts Handling           *
-******************************************/
-
-
-WRITE_LINE_MEMBER(hotchili_state::vblank_irq)
-{
-	m_maincpu->set_input_line(0, HOLD_LINE);
-
-	if(state)
-	{
-		m_frame++;
-	}
-}
-
-
 /*********************************************
 *              Machine Drivers               *
 *********************************************/
-
 
 void hotchili_state::hotchili(machine_config &config)
 {
@@ -602,20 +564,15 @@ void hotchili_state::hotchili(machine_config &config)
 	Z80(config, m_maincpu, MAIN_CLOCK / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hotchili_state::hc_map);
 
-	hotchili_mainbank(config);
-
 	RAM(config, m_ram).set_default_size("2K").set_default_value(0);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	
-	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(hotchili_state::screen_update));
-	screen.screen_vblank().set(FUNC(hotchili_state::vblank_irq));
-	screen.set_palette(m_palette);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw( MAIN_CLOCK / 2, 260, 0, 256, 256, 16, 239);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_screen_update(FUNC(hotchili_state::screen_update));
+	m_screen->screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
+	m_screen->set_palette(m_palette);   
 
 	SETA001_SPRITE(config, m_seta001, 16'000'000, m_palette, gfx_hotchili);
 	m_seta001->set_fg_yoffsets( -0x12, 0x0e );
@@ -635,7 +592,6 @@ void hotchili_state::hotchili(machine_config &config)
 /*********************************************
 *                  Rom Load                  *
 *********************************************/
-
 
 ROM_START( hotchili )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -663,14 +619,15 @@ ROM_END
 void hotchili_state::init_hc()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
+	m_bank->configure_entries(0, 4, &ROM[0x8000], 0x2000);
 
-	ROM[0x05bc] = 0x00; // Avoids ram error flag setup
-	ROM[0x06c1] = 0x20; // Skip Rom Error
-	ROM[0x06c4] = 0xc6; // Skip Ram Error
-	ROM[0x06d1] = 0xd3; // Skip Ram Error
-	ROM[0x06d2] = 0x06; // Skip Ram Error
-	ROM[0x1c54] = 0x84; // Avoids meter error
-	ROM[0x1c5b] = 0x84; // Avoids meter error
+	ROM[0x05bc] = 0x00;  // Avoids ram error flag setup
+	ROM[0x06c1] = 0x20;  // Skip Rom Error
+	ROM[0x06c4] = 0xc6;  // Skip Ram Error
+	ROM[0x06d1] = 0xd3;  // Skip Ram Error
+	ROM[0x06d2] = 0x06;  // Skip Ram Error
+	ROM[0x1c54] = 0x84;  // Avoids meter error
+	ROM[0x1c5b] = 0x84;  // Avoids meter error
 }
 
 
@@ -678,5 +635,5 @@ void hotchili_state::init_hc()
 *                Game Drivers                *
 *********************************************/
 
-//     YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT        ROT    COMPANY                    FULLNAME                    FLAGS
+//     YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT        ROT    COMPANY                    FULLNAME                    FLAGS   LAYOUT
 GAMEL( 1995, hotchili, 0,      hotchili, hotchili, hotchili_state, init_hc,    ROT0, "Pacific Gaming Pty Ltd.", "Hot Chilli (95103, v0104)", 0     , layout_hotchili )
