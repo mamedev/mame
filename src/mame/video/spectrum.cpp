@@ -120,8 +120,8 @@ u32 spectrum_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &
 
 void spectrum_state::spectrum_update_border(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &border)
 {
-	u8 mod = m_contention_pattern.empty() ? 4 : 8;
-	u8 at = m_border4t_render_at;
+	u8 mod = m_contention_pattern.empty() ? 1 : 8;
+	u8 at = m_contention_pattern.empty() ? 0 : m_border4t_render_at;
 	for (auto y = border.top(); y <= border.bottom(); y++)
 	{
 		u16 *pix = &(bitmap.pix(y, border.left()));
