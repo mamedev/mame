@@ -28,6 +28,8 @@ namespace netlist::detail {
 	{
 		using value_type = T;
 		using key_type = const C *;
+		using store_type = std::unordered_map<key_type, value_type>;
+
 		static void add(key_type obj, const value_type &aname) noexcept
 		{
 			store().insert({obj, aname});
@@ -37,7 +39,7 @@ namespace netlist::detail {
 		{
 			try
 			{
-				auto ret(store().find(obj));
+				typename store_type::iterator ret(store().find(obj));
 				if (ret == store().end())
 					return nullptr;
 				return &ret->second;
@@ -54,9 +56,9 @@ namespace netlist::detail {
 			store().erase(store().find(obj));
 		}
 
-		static std::unordered_map<key_type, value_type> &store() noexcept
+		static store_type &store() noexcept
 		{
-			static std::unordered_map<key_type, value_type> lstore;
+			static store_type lstore;
 			return lstore;
 		}
 

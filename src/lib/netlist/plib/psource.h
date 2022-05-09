@@ -131,7 +131,7 @@ namespace plib
 		{
 			static_assert(std::is_base_of<psource_t, S>::value, "S must inherit from plib::psource_t");
 
-			auto src(std::make_unique<S>(std::forward<Args>(args)...));
+			auto src = std::make_unique<S>(std::forward<Args>(args)...);
 			m_collection.push_back(std::move(src));
 		}
 
