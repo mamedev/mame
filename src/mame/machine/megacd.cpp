@@ -16,26 +16,6 @@
 #define DMA_PRG  (0x0500)
 #define DMA_WRAM (0x0700)
 
-// irq3 timer
-#define CHECK_SCD_LV3_INTERRUPT \
-	if (m_lc89510_temp->get_segacd_irq_mask() & 0x08) \
-	{ \
-		m_scdcpu->set_input_line(3, HOLD_LINE); \
-	}
-// from master
-#define CHECK_SCD_LV2_INTERRUPT \
-	if (m_lc89510_temp->get_segacd_irq_mask() & 0x04) \
-	{ \
-		m_scdcpu->set_input_line(2, HOLD_LINE); \
-	}
-
-// gfx convert
-#define CHECK_SCD_LV1_INTERRUPT \
-	if (m_lc89510_temp->get_segacd_irq_mask() & 0x02) \
-	{ \
-		m_scdcpu->set_input_line(1, HOLD_LINE); \
-	}
-
 #define SEGACD_IRQ3_TIMER_SPEED (attotime::from_nsec(m_irq3_timer_reg*30720))
 
 
@@ -60,16 +40,19 @@ IRQ_CALLBACK_MEMBER(sega_segacd_device::segacd_sub_int_callback)
 
 TIMER_DEVICE_CALLBACK_MEMBER( sega_segacd_device::irq3_timer_callback )
 {
-	CHECK_SCD_LV3_INTERRUPT
+	if (m_lc89510_temp->get_segacd_irq_mask() & 0x08)
+		m_scdcpu->set_input_line(3, HOLD_LINE);
+
 	m_irq3_timer->adjust(SEGACD_IRQ3_TIMER_SPEED);
 }
 
-
+// GFX conversion
 TIMER_DEVICE_CALLBACK_MEMBER( sega_segacd_device::stamp_timer_callback )
 {
 	//printf("stamp_timer_callback\n");
 
-	CHECK_SCD_LV1_INTERRUPT
+	if (m_lc89510_temp->get_segacd_irq_mask() & 0x02)
+		m_scdcpu->set_input_line(1, HOLD_LINE);
 
 	segacd_conversion_active = 0;
 
@@ -513,10 +496,9 @@ void sega_segacd_device::scd_a12000_halt_reset_w(offs_t offset, uint16_t data, u
 
 	if (ACCESSING_BITS_8_15)
 	{
-		if (m_a12000_halt_reset_reg & 0x0100)
-		{
-			CHECK_SCD_LV2_INTERRUPT
-		}
+		// from master CPU
+		if (m_a12000_halt_reset_reg & 0x0100 && m_lc89510_temp->get_segacd_irq_mask() & 0x04)
+			m_scdcpu->set_input_line(2, HOLD_LINE);
 
 		if (m_a12000_halt_reset_reg & 0x8000)
 		{
