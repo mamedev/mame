@@ -45,16 +45,20 @@
 
 #include "emu.h"
 
-#include "cpu/tms9900/tms9980a.h"
-#include "machine/timer.h"
-#include "machine/steppers.h"
-#include "machine/genfruit.h"
-#include "machine/nvram.h"
-#include "video/awpvid.h"
-#include "machine/netlist.h"
-#include "netlist/nl_setup.h"
-#include "speaker.h"
 #include "audio/nl_jpmsru.h"
+#include "machine/genfruit.h"
+#include "video/awpvid.h"
+
+#include "cpu/tms9900/tms9980a.h"
+
+#include "machine/netlist.h"
+#include "machine/nvram.h"
+#include "machine/steppers.h"
+#include "machine/timer.h"
+
+#include "speaker.h"
+
+#include "netlist/nl_setup.h"
 
 #include "jpmsru.lh"
 #include "j_ewn.lh"
@@ -114,7 +118,7 @@ private:
 	void out_disp_w(offs_t offset, uint8_t data);
 	void out_payout_cash_w(offs_t offset, uint8_t data);
 	void out_payout_token_w(offs_t offset, uint8_t data);
-	template<unsigned meter> void out_meter_w(offs_t offset, uint8_t data);
+	template<unsigned Meter> void out_meter_w(offs_t offset, uint8_t data);
 	void out_coin_lockout_w(offs_t offset, uint8_t data);
 
 	void jpmsru_3k_map(address_map &map);
@@ -327,10 +331,10 @@ void jpmsru_state::out_disp_w(offs_t offset, uint8_t data)
 	if(m_disp_d2) m_digits[0] = patterns[m_disp_digit];
 }
 
-template<unsigned meter>
+template<unsigned Meter>
 void jpmsru_state::out_meter_w(offs_t offset, uint8_t data)
 {
-	machine().bookkeeping().coin_counter_w(meter, data);
+	machine().bookkeeping().coin_counter_w(Meter, data);
 	if(data) m_samples->start(0, SAMPLE_METER);
 }
 

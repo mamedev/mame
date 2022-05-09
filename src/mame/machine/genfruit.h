@@ -1,20 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:SomeRandomGuyIdk
-#ifndef GENFRUIT_H_
-#define GENFRUIT_H_
+#ifndef MAME_MACHINE_GENFRUIT_H
+#define MAME_MACHINE_GENFRUIT_H
+
+#pragma once
 
 #include "sound/samples.h"
-
-#define SAMPLE_METER 0
-#define SAMPLE_PAYOUT 1
-
-const char *const genfruit_sample_names[] =
-{
-	"*genfruit",
-	"meter",
-	"payout",
-	nullptr   /* end of array */
-};
 
 class genfruit_class : public driver_device
 {
@@ -27,7 +18,22 @@ public:
 	required_device<samples_device> m_samples;
 
 	void genfruit_audio(machine_config &config);
+	
+	enum
+	{
+		SAMPLE_METER = 0,
+		SAMPLE_PAYOUT,
+		SAMPLE_END
+	};
+private:
+	const char *const genfruit_sample_names[SAMPLE_END + 2] =
+	{
+		"*genfruit",
+		"meter",
+		"payout",
+		nullptr   /* end of array */
+	};
 };
 
 
-#endif /* GENFRUIT_H_ */
+#endif /* MAME_MACHINE_GENFRUIT_H */
