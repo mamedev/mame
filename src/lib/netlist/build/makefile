@@ -53,6 +53,9 @@ TIDY_FLAGSX += -modernize-use-nodiscard,
 #TIDY_FLAGSX += -cppcoreguidelines-prefer-member-initializer,
 #TIDY_FLAGSX += -modernize-use-transparent-functors,
 TIDY_FLAGSX += -readability-function-cognitive-complexity,
+TIDY_FLAGSX += -readability-uppercase-literal-suffix
+
+
 #TIDY_FLAGSX += -cppcoreguidelines-avoid-non-const-global-variables
 
 space :=
@@ -281,6 +284,8 @@ clang:
 		-Wmissing-variable-declarations -Wno-float-equal -Wconversion \
 		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wformat-nonliteral \
 		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override \
+		-Wno-embedded-directive \
+		-Wno-undefined-reinterpret-cast \
 		-Wunreachable-code \
 		-Wmissing-prototypes"
 
@@ -295,6 +300,7 @@ clang-libc:
 		-Wmissing-variable-declarations -Wno-float-equal -Wconversion \
 		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wformat-nonliteral \
 		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override \
+		-Wno-undefined-reinterpret-cast \
 		-Wunreachable-code \
 		-Wmissing-prototypes" \
 		LDEXTRAFLAGS=-stdlib=libc++

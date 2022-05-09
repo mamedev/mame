@@ -1685,7 +1685,7 @@ void setup_t::prepare_to_run()
 	for (auto &n : m_nlstate.nets())
 	{
 		for (auto & term : m_nlstate.core_terms(*n))
-			if (!term->delegate())
+			if (term->delegate().isnull())
 			{
 				log().fatal(MF_DELEGATE_NOT_SET_1(term->name()));
 				throw nl_exception(MF_DELEGATE_NOT_SET_1(term->name()));
