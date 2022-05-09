@@ -773,7 +773,7 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 	</software>
 
 
-	<software name="atptour">
+	<software name="atptour" supported="yes">
 		<description>ATP Tour Championship Tennis (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -804,6 +804,7 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 		<info name="serial" value="G-5514 (Jpn), MK-1135-50 (Euro)"/>
 		<info name="release" value="19920717"/>
 		<info name="alt_title" value="アイルトン・セナ スーパーモナコGP II"/>
+		<sharedfeat name="compatibility" value="PAL,NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<feature name="pcb" value="171-5955A"/>
@@ -826,6 +827,7 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK-1135"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<feature name="pcb" value="171-5955A"/>
@@ -1093,6 +1095,7 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 		<description>Body Count (Bra)</description>
 		<year>1994</year>
 		<publisher>Tec Toy</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B"/>
 			<feature name="ic1" value="MPR-16252 W51"/>
@@ -1123,6 +1126,7 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 		<description>Bonkers (Euro, USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<info name="alt_title" value="Disney's Bonkers (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
@@ -1739,6 +1743,7 @@ Unsupported [Sega Mouse] peripheral
 		<description>Cool Spot (Euro, Prototype)</description>
 		<year>1993</year>
 		<publisher>Virgin Games</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5694-01"/>
 			<feature name="ic1" value="IC1"/> <!-- EPROM1 -->
@@ -2054,6 +2059,7 @@ Unsupported [Sega Mouse] peripheral
 		<description>Dino Dini's Soccer (Euro)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
+		<!-- Enforces compatibility by selecting anything in main menu -->
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -2256,6 +2262,7 @@ No [VDP] sprites
 		<description>Dragon's Fury (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Tengen</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U,PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703"/>
 			<feature name="ic1" value="MPR-14931-SM"/>
@@ -2300,6 +2307,7 @@ No [VDP] sprites
 		<description>Dune II - Kampf um den Wüstenplaneten (Ger)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-16838-F"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -2479,6 +2487,7 @@ No [VDP] sprites
 		<description>Escape from Mars Starring Taz (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<info name="alt_title" value="Taz in Escape from Mars (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
@@ -2495,6 +2504,7 @@ No [VDP] sprites
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="alt_title" value="Taz in Escape from Mars (Box)"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B-8/16"/>
 			<feature name="ic1" value="MPR-16913-F"/>
@@ -2510,6 +2520,7 @@ No [VDP] sprites
 		<description>ESPN Speedworld (USA, Prototype)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="u1" value="TC57400AD-120"/>
 			<feature name="u2" value="TC57400AD-120"/>
@@ -2531,6 +2542,7 @@ No [VDP] sprites
 		<description>ESPN Sunday Night NFL (USA, Prototype)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="u1" value="TC57400AD-120"/>
 			<feature name="u2" value="TC57400AD-120"/>
@@ -3019,6 +3031,7 @@ Randomly doesn't show EA logo animation at boot
 		<description>FIFA 97 Gold Edition (Euro, USA)</description>
 		<year>1996</year>
 		<publisher>Electronic Arts</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U,PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<feature name="pcb" value="PWA P10002 REV M"/>
@@ -3295,6 +3308,7 @@ Moans about [Sega Mega Modem] not hooked up, punts to a red screen
 		<description>Garfield - Caught in the Act (Euro, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U,PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-18452-U"/>
@@ -3442,7 +3456,7 @@ Moans about [Sega Mega Modem] not hooked up, punts to a red screen
 		<description>Gods (Euro)</description>
 		<year>1993</year>
 		<publisher>Accolade</publisher>
-		<sharedfeat name="compatibility" value="PAL,NTSC-U"/>
+		<sharedfeat name="compatibility" value="NTSC-U,PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="ACSGPC291 REV.B"/>
 			<feature name="ic1" value="ACGOSG"/>
@@ -4277,6 +4291,7 @@ Unsupported [Sega Mouse] peripheral
 		<description>Disney's The Jungle Book (Euro)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-16843-U"/>
@@ -4291,6 +4306,7 @@ Unsupported [Sega Mouse] peripheral
 		<description>Disney's The Jungle Book (USA)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="670115 REV 4"/>
 			<feature name="ic1" value="MPR-16923-MX"/>
@@ -7038,6 +7054,7 @@ Unsupported [Menacer] peripheral
 		<description>Rolling Thunder 2 (Euro)</description>
 		<year>1991</year>
 		<publisher>Namco</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="837-9127"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -7087,6 +7104,7 @@ Unsupported [Menacer] peripheral
 		<description>Saturday Night Slammasters (Euro)</description>
 		<year>1994</year>
 		<publisher>Capcom</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6570A"/>
 			<feature name="ic1" value="MPR-17902-F"/>
@@ -7104,6 +7122,7 @@ Unsupported [Menacer] peripheral
 		<description>Saturday Night Slammasters (USA)</description>
 		<year>1994</year>
 		<publisher>Capcom</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="93653-2"/>
 			<feature name="ic1" value="SLM-GS-1"/>
@@ -7303,6 +7322,7 @@ Unsupported [Sega Mouse] peripheral
 		<description>Shining Force - The Legacy of Great Intention (Euro)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<feature name="pcb" value="171-6278A"/>
@@ -7449,6 +7469,7 @@ Unsupported [Sega Mouse] peripheral
 		<description>Skeleton Krew (Euro)</description>
 		<year>1995</year>
 		<publisher>Core Design</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-17922-MX"/>
@@ -7546,6 +7567,7 @@ Unsupported [Sega Mouse] peripheral
 		<description>Sonic Compilation (Euro, Earlier)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6570A"/>
 			<feature name="ic1" value="MPR-18203-MX, MPR-18203-U"/>
@@ -7896,10 +7918,14 @@ Unsupported [Sega Mouse] peripheral
 	</software>
 
 
-	<software name="sracer">
+	<software name="sracer" supported="partial">
 		<description>Street Racer (Euro)</description>
 		<year>1995</year>
 		<publisher>Ubi Soft</publisher>
+		<notes><![CDATA[
+Corrupted Ubi Soft and Vivid Image logos
+]]></notes>
+		<info name="developer" value="Vivid Image"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-17987-F"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -8745,6 +8771,7 @@ Unsupported [Sega Mouse] peripheral
 		<description>Toe Jam &amp; Earl in Panic auf Funkotron (Ger)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-16363-S"/>
@@ -8759,6 +8786,7 @@ Unsupported [Sega Mouse] peripheral
 		<description>Toe Jam &amp; Earl in Panic on Funkotron (USA)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-16112-H"/>
@@ -9247,6 +9275,7 @@ Unsupported [Sega Mouse] peripheral
 		<description>Wimbledon Championship Tennis (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5979-A"/>
 			<feature name="ic1" value="MPR-15966-F"/>
@@ -9919,6 +9948,7 @@ Doesn't accept any input
 		<info name="serial" value="G-5531"/>
 		<info name="release" value="19940527"/>
 		<info name="alt_title" value="ソニック・ザ・ヘッジホッグ3"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_fram"/>
 			<feature name="pcb" value="171-6658A"/>
@@ -10273,6 +10303,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>The Adventures of Batman &amp; Robin (Prototype, 19950406)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="adventures of batman &amp; robin, the (prototype - apr 06, 1995).bin" size="2097152" crc="f05cf389" sha1="bb7ed12f68a7df4956891338d6db0f29acb0f5df"/>
@@ -10284,6 +10315,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>The Adventures of Batman &amp; Robin (Prototype, 19950410)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="adventures of batman &amp; robin, the (prototype - apr 10, 1995).bin" size="2097152" crc="d4f3a070" sha1="27b06143ca3d31504e75429610acc34be4bbe514"/>
@@ -10295,6 +10327,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>The Adventures of Batman &amp; Robin (Prototype, 19950411)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="adventures of batman &amp; robin, the (prototype - apr 11, 1995).bin" size="2097152" crc="b5b5a290" sha1="901fe36018b031ce6a226795ceb7fd868b28ead6"/>
@@ -10306,6 +10339,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>The Adventures of Batman &amp; Robin (Prototype, 19950418)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="adventures of batman &amp; robin, the (prototype - apr 18, 1995).bin" size="2097152" crc="6874142b" sha1="5cb7d30f81de290da7cd5298a38acccb7ab1f9c7"/>
@@ -10317,6 +10351,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>The Adventures of Batman &amp; Robin (Prototype, 19950419)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="adventures of batman &amp; robin, the (prototype - apr 19, 1995).bin" size="2097152" crc="7002da56" sha1="f76e8669934668abfe739c043a40cbf8ed24e78a"/>
@@ -10328,6 +10363,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>The Adventures of Batman &amp; Robin (Prototype, 19950421)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="adventures of batman &amp; robin, the (prototype - apr 21, 1995).bin" size="2097152" crc="61f02f13" sha1="531973851bb71a589be3544952cf0f7694f8d072"/>
@@ -10339,6 +10375,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>The Adventures of Batman &amp; Robin (Prototype, 19950422)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="adventures of batman &amp; robin, the (prototype - apr 22, 1995).bin" size="2097152" crc="eb8236b2" sha1="97c91de74e744ab0eb52bdcceffb79467a9c5474"/>
@@ -10350,6 +10387,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>The Adventures of Batman &amp; Robin (Prototype, 19950424)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="adventures of batman &amp; robin, the (prototype - apr 24, 1995).bin" size="2097152" crc="253947f8" sha1="1dfd9a4fd06cbe6e28b2519e84b303dbe03a9674"/>
@@ -10361,6 +10399,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>The Adventures of Batman &amp; Robin (Prototype, 19950426)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="adventures of batman &amp; robin, the (prototype - apr 26, 1995).bin" size="2097152" crc="bc79f7ee" sha1="6160fd2b45be920c68b31e2a88c27a967dde6d84"/>
@@ -10372,6 +10411,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>The Adventures of Batman &amp; Robin (Prototype, 19950427)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+				<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="adventures of batman &amp; robin, the (prototype - apr 27, 1995).bin" size="2097152" crc="fdac8190" sha1="1a2bece0e3f66dcdd44b555ce45deda510b8ca3a"/>
@@ -10383,6 +10423,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>The Adventures of Batman &amp; Robin (Prototype, 19950428)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="adventures of batman &amp; robin, the (prototype - apr 28, 1995).bin" size="2097152" crc="27a1524b" sha1="2e41a3b9c64d93de1d05c830f6d8471edfc2090c"/>
@@ -10394,6 +10435,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>The Adventures of Batman &amp; Robin (Prototype, 19950501)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="adventures of batman &amp; robin, the (prototype - may 01, 1995).bin" size="2097152" crc="589aa203" sha1="10467cc121afd7d74699b3ab6b7243b370c09e47"/>
@@ -10452,6 +10494,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>Aero the Acro-Bat (Prototype)</description>
 		<year>1993</year>
 		<publisher>Sunsoft</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="aero the acro-bat (beta).bin" size="1048576" crc="dcd14b10" sha1="105316ad1eb7e3386cbd3ffa2d9d841796193e65"/>
@@ -10606,6 +10649,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>Disney's Aladdin (USA, Prototype)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="aladdin (usa) (beta).bin" size="2097152" crc="8c60ef73" sha1="1f8d4f888b761a878dcc5ffe2dc7c6fef46db1ca"/>
@@ -10700,6 +10744,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<info name="serial" value="G-4130"/>
 		<info name="release" value="19950224"/>
 		<info name="alt_title" value="エイリアンソルジャー"/>
+		<sharedfeat name="compatibility" value="NTSC-J,PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="alien soldier (jpn).bin" size="2097152" crc="90fa1539" sha1="8f6eb584ed9487b8504fbc21d86783f58e6c9cd6"/>
@@ -10880,6 +10925,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>Art of Fighting (Prototype, 19940711)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="art of fighting (prototype - jul 11, 1994).bin" size="2097152" crc="19ce567d" sha1="221c6ee35e9dfc446f076f84762af153cc3f4208"/>
@@ -11027,6 +11073,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>ATP Tour Championship Tennis (Prototype, 19940802)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -11041,6 +11088,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>ATP Tour Championship Tennis (Prototype, 19940805)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -11055,6 +11103,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>ATP Tour Championship Tennis (Prototype, 19940808)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -11070,6 +11119,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>ATP Tour Championship Tennis (Prototype, 19940719)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -11084,6 +11134,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>ATP Tour Championship Tennis (Prototype, 19940723)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -11111,6 +11162,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>ATP Tour Championship Tennis (Prototype, 19940509)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -11125,6 +11177,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>ATP Tour Championship Tennis (Prototype, 19940908)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -11135,7 +11188,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		</part>
 	</software>
 
-	<software name="atptouru" cloneof="atptour">
+	<software name="atptouru" cloneof="atptour" supported="yes">
 		<description>ATP Tour Championship Tennis (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -11154,6 +11207,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>Australian Rugby League (Euro)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="australian rugby league (euro).bin" size="2097152" crc="ac5bc26a" sha1="b54754180f22d52fc56bab3aeb7a1edd64c13fef"/>
@@ -11165,6 +11219,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>Australian Rugby League (prototype)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
+		<!-- compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="australian rugby league (prototype).bin" size="2097152" crc="51117c67" sha1="bb84be50eb4d31dbe601058bf9ea1adaaec1a1b1"/>
@@ -11281,6 +11336,10 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>Baby Boom (Prototype, 19940811)</description>
 		<year>1994</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+https://segaretro.org/Baby_Boom
+]]></notes>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="baby boom (prototype - aug 11, 1994).bin" size="2097152" crc="bd697054" sha1="7baa515001aff4fa93c871189c891e5bd2eaab11"/>
@@ -11292,6 +11351,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>Baby Boom (Prototype, 19940603)</description>
 		<year>1994</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="baby boom (prototype - jun 03, 1994).bin" size="2097152" crc="c0d97f6f" sha1="24b5a84fb68b89a5ac4e7a9e85af95880067fc5f"/>
@@ -11303,6 +11363,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>Baby Boom (Prototype, 19940606)</description>
 		<year>1994</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="baby boom (prototype - jun 06, 1994).bin" size="2097152" crc="6e0cf48d" sha1="22c8e6ac65de990a3f30aedf777f7336f7791e66"/>
@@ -11312,8 +11373,12 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 
 	<software name="babyd">
 		<description>Baby's Day Out (USA, Prototype)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994?</year>
+		<publisher>Hi-Tech Expression</publisher>
+		<notes><![CDATA[
+https://segaretro.org/Baby%27s_Day_Out
+]]></notes>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="baby's day out (usa) (prototype).bin" size="1048576" crc="b2e7cc49" sha1="5cc32a2826b3cc5c581043fe6c481ffb753321dd"/>
@@ -11321,10 +11386,14 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		</part>
 	</software>
 
-	<software name="babydo" cloneof="babyd">
+	<software name="babydo" cloneof="babyd" supported="partial">
 		<description>Baby's Day Out (USA, Prototype, Earlier)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994?</year>
+		<publisher>Hi-Tech Expression</publisher>
+		<notes><![CDATA[
+No sound (btanb?)
+]]></notes>
+		<!-- compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="baby's day out (usa) (prototype) (earlier).bin" size="1048576" crc="459b891c" sha1="99983282e75e1cf01a47d00f0be15e20eaae0907"/>
@@ -11377,6 +11446,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>Ballz 3D (USA, prototype 199406xx)</description>
 		<year>1994</year>
 		<publisher>Accolade</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="ballz 3d - fighting at its ballziest (june prototype).bin" size="2097152" crc="c89ad87e" sha1="6cd87eb8b1b585778158c6ecf5faf16365924d33"/>
@@ -11434,6 +11504,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>Barbie Vacation Adventure (USA, Prototype)</description>
 		<year>1994</year>
 		<publisher>Hi Tech Expressions</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="barbie vacation adventure (usa) (prototype).bin" size="1048576" crc="10e0ba69" sha1="51fe102543e0419a9ccd0f3e016150fdb3666c24"/>
@@ -11483,6 +11554,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>Barney's Hide &amp; Seek Game (USA, Prototype 19930918)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="957482">
 				<rom name="barney's hide &amp; seek game (sep 18, 1993 build).bin" size="957482" crc="19d9dc81" sha1="405d1abe448e8d24786a5383f62e4e2833af392f" />
@@ -11796,6 +11868,7 @@ https://bootleggames.fandom.com/wiki/Barver_Battle_Saga:_Tai_Kong_Zhan_Shi
 		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940801)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="berenstain bears' camping adventure, the (prototype - aug 01, 1994).bin" size="1048576" crc="b7cd465c" sha1="d60e4e0542d1c0a4bdbb7a433373051718549055"/>
@@ -11807,6 +11880,7 @@ https://bootleggames.fandom.com/wiki/Barver_Battle_Saga:_Tai_Kong_Zhan_Shi
 		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940802)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="berenstain bears' camping adventure, the (prototype - aug 02, 1994).bin" size="1048576" crc="383ad564" sha1="faf4801049124ab2f63d514f04adc757a66382b5"/>
@@ -11818,6 +11892,7 @@ https://bootleggames.fandom.com/wiki/Barver_Battle_Saga:_Tai_Kong_Zhan_Shi
 		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940803)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="berenstain bears' camping adventure, the (prototype - aug 03, 1994).bin" size="1048576" crc="18f268a6" sha1="5f496994fa770db96afac4579d7314d56a8f15d5"/>
@@ -11829,6 +11904,7 @@ https://bootleggames.fandom.com/wiki/Barver_Battle_Saga:_Tai_Kong_Zhan_Shi
 		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940805)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="berenstain bears' camping adventure, the (prototype - aug 05, 1994).bin" size="1048576" crc="24159b6f" sha1="1b4e21aeffba372820c25517d98c181731bbd007"/>
@@ -11840,6 +11916,7 @@ https://bootleggames.fandom.com/wiki/Barver_Battle_Saga:_Tai_Kong_Zhan_Shi
 		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940808)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="berenstain bears' camping adventure, the (prototype - aug 08, 1994).bin" size="1048576" crc="58b6b0fc" sha1="ba0e3fc9d04e37a81b37d4e9ff21097bfc4fc0f1"/>
@@ -11851,6 +11928,7 @@ https://bootleggames.fandom.com/wiki/Barver_Battle_Saga:_Tai_Kong_Zhan_Shi
 		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940709)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="berenstain bears' camping adventure, the (prototype - jul 09, 1994).bin" size="1048576" crc="bf6aa405" sha1="8172369e0a73d1be60e1124a2ea8df41cfddfb55"/>
@@ -11862,6 +11940,7 @@ https://bootleggames.fandom.com/wiki/Barver_Battle_Saga:_Tai_Kong_Zhan_Shi
 		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940716)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="berenstain bears' camping adventure, the (prototype - jul 16, 1994).bin" size="1048576" crc="c84aad8e" sha1="758f5e7072d8bc4bd6325fb7629ebb9f11d1ce10"/>
@@ -11873,6 +11952,7 @@ https://bootleggames.fandom.com/wiki/Barver_Battle_Saga:_Tai_Kong_Zhan_Shi
 		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940720)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="berenstain bears' camping adventure, the (prototype - jul 20, 1994).bin" size="1048576" crc="abee4c5e" sha1="ebc3d134494ce02932b44bbda3720176089d7604"/>
@@ -11884,6 +11964,7 @@ https://bootleggames.fandom.com/wiki/Barver_Battle_Saga:_Tai_Kong_Zhan_Shi
 		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940602)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="berenstain bears' camping adventure, the (prototype - jun 02, 1994).bin" size="1048576" crc="83cf19e4" sha1="fe2fa9060a2cf13720c79a5fc8568a33c2adad0a"/>
@@ -11895,6 +11976,7 @@ https://bootleggames.fandom.com/wiki/Barver_Battle_Saga:_Tai_Kong_Zhan_Shi
 		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940610)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="berenstain bears' camping adventure, the (prototype - jun 10, 1994).bin" size="1048576" crc="a748e2cf" sha1="32ee3d750ea8ff06adb28c7b5812670f4e92d952"/>
@@ -11939,6 +12021,7 @@ https://bootleggames.fandom.com/wiki/Barver_Battle_Saga:_Tai_Kong_Zhan_Shi
 		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940517)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="berenstain bears' camping adventure, the (prototype - may 17, 1994).bin" size="1048576" crc="e1855ade" sha1="391c1bdeb7546bc19c3f866cb17079f529044b3c"/>
@@ -11950,6 +12033,7 @@ https://bootleggames.fandom.com/wiki/Barver_Battle_Saga:_Tai_Kong_Zhan_Shi
 		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940519)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="berenstain bears' camping adventure, the (prototype - may 19, 1994).bin" size="1048576" crc="07c9f71f" sha1="617284c4964117e2c7ac9fab8ef4ea19a89fa0ea"/>
@@ -11961,6 +12045,7 @@ https://bootleggames.fandom.com/wiki/Barver_Battle_Saga:_Tai_Kong_Zhan_Shi
 		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940523)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="berenstain bears' camping adventure, the (prototype - may 23, 1994).bin" size="1048576" crc="913887b7" sha1="4b866f0b0f491a3d73d1ce1895df9720c93a79f2"/>
@@ -11972,6 +12057,7 @@ https://bootleggames.fandom.com/wiki/Barver_Battle_Saga:_Tai_Kong_Zhan_Shi
 		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940526)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="berenstain bears' camping adventure, the (prototype - may 26, 1994).bin" size="1048576" crc="d33c0fa4" sha1="4315949e9c7f3c938d0ef15f0ce361e7f47042a1"/>
@@ -11983,6 +12069,7 @@ https://bootleggames.fandom.com/wiki/Barver_Battle_Saga:_Tai_Kong_Zhan_Shi
 		<description>The Berenstain Bears' Camping Adventure (Prototype, 19940530)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="berenstain bears' camping adventure, the (prototype - may 30, 1994).bin" size="1048576" crc="9c3bf429" sha1="33c292b28518f25e1d87c41fff3cf5f2da635993"/>
@@ -12213,6 +12300,7 @@ Unsupported [Sega Mouse] peripheral
 		<notes><![CDATA[
 Unsupported [Menacer] peripheral (joypad works)
 ]]></notes>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="body count (euro) (beta).bin" size="1048576" crc="b4ffb6ce" sha1="a01971cdce4d98e770d9c083a5accb8cb5260112"/>
@@ -12331,6 +12419,7 @@ Unsupported [Menacer] peripheral (joypad works)
 		<description>Bonkers (USA, Prototype, 19940328)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="bonkers (prototype - mar 28, 1994).bin" size="1048576" crc="cd67c588" sha1="3f08ea3bc211f4a02d216d87c9abcdab11612ccb"/>
@@ -12342,6 +12431,7 @@ Unsupported [Menacer] peripheral (joypad works)
 		<description>Bonkers (USA, Prototype, 19940503)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="bonkers (prototype - may 03, 1994).bin" size="1048576" crc="e4cd0d61" sha1="7c4798c73548f6992b18bf2bbd2f8c3144fcff58"/>
@@ -12353,6 +12443,7 @@ Unsupported [Menacer] peripheral (joypad works)
 		<description>Bonkers (USA, Prototype, 19941004)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="bonkers (prototype - oct 04, 1994).bin" size="1048576" crc="913cc834" sha1="435c0dc4c72184e0b7dd535fe5e7d5323d787571"/>
@@ -12364,6 +12455,7 @@ Unsupported [Menacer] peripheral (joypad works)
 		<description>Bonkers (USA, Prototype, 19941025)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="bonkers (prototype - oct 25, 1994).bin" size="1048576" crc="3e5edc4f" sha1="a1bfc26fe6ab4fe1e5b8ddbc84b840209d9cb798"/>
@@ -12375,6 +12467,7 @@ Unsupported [Menacer] peripheral (joypad works)
 		<description>Bonkers (USA, Prototype, 19941029)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="bonkers (prototype - oct 29, 1994).bin" size="1048576" crc="7b84793e" sha1="994a0d7f7c21edbe35e31ca2a28b3e2017683355"/>
@@ -13140,6 +13233,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>College Football USA 96 (prototype 19950621)</description>
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="college football usa 96 (prototype 19950621).bin" size="2097152" crc="e70bd01d" sha1="5438ba1baa3400c73905e25fdfe9d504c3604d5a"/>
@@ -13181,6 +13275,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>College Football's National Championship (Prototype, 19940413)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -13195,6 +13290,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>College Football's National Championship (Prototype, 19940418)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -13209,6 +13305,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>College Football's National Championship (Prototype, 19940419)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -13223,6 +13320,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>College Football's National Championship (Prototype, 19940429)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -13237,6 +13335,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>College Football's National Championship (Prototype, 19940601)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -13251,6 +13350,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>College Football's National Championship (Prototype, 19940603)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -13265,6 +13365,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>College Football's National Championship (Prototype, 19940607)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -13279,6 +13380,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>College Football's National Championship (Prototype, 19940608)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -13293,6 +13395,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>College Football's National Championship (Prototype, 19940614)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -13307,6 +13410,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>College Football's National Championship (Prototype, 19940615)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -13321,6 +13425,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>College Football's National Championship (Prototype, 19940618)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -13335,6 +13440,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>College Football's National Championship (Prototype, 19940620)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -13349,6 +13455,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>College Football's National Championship (Prototype, 19940503)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -13363,6 +13470,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>College Football's National Championship (Prototype, 19940506)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -13377,6 +13485,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>College Football's National Championship (Prototype, 19940511-A)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -13391,6 +13500,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>College Football's National Championship (Prototype, 19940517-A)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -13405,6 +13515,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>College Football's National Championship (Prototype, 19940520)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -13419,6 +13530,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>College Football's National Championship (Prototype, 19940525)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -13433,6 +13545,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>College Football's National Championship (Prototype, 19940531)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -13610,6 +13723,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>Comix Zone (USA, Prototype, 19950602-B)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="comix zone (prototype - jun 02, 1995 - b).bin" size="2097152" crc="b5f0dae5" sha1="1d8e133a0ce52e4586593beca095ed269f01473e"/>
@@ -13621,6 +13735,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>Comix Zone (USA, Prototype, 19950602)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="comix zone (prototype - jun 02, 1995).bin" size="2097152" crc="1a4abcf3" sha1="fa1e69531857d4146497de4ae95957d096bceb20"/>
@@ -13632,6 +13747,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>Comix Zone (USA, Prototype, 19950603)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="comix zone (prototype - jun 03, 1995).bin" size="2097152" crc="aff32614" sha1="9cfead71b55cfa48fa6fb66d2d7c6294776fe4ed"/>
@@ -13643,6 +13759,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>Comix Zone (Prototype, 19950526)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="comix zone (prototype - may 26, 1995).bin" size="2097152" crc="36029a1f" sha1="dbce6c71b1b1c193a57416dd4ccacc876a9e64af"/>
@@ -13654,6 +13771,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>Comix Zone (Prototype, 19950530)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="comix zone (prototype - may 30, 1995).bin" size="2097152" crc="a72eca2c" sha1="c751ec1ba09abda3ea3252a3e211383f054a507c"/>
@@ -13665,6 +13783,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>Comix Zone (Kor, Prototype, 19950609)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U,NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="comix zone (kor) (prototype - jun 09, 1995).bin" size="2097152" crc="e45a15f4" sha1="2427e7e3932da731eb172ae22ad779c0abfced13"/>
@@ -13676,6 +13795,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>Comix Zone (Sega Channel, Prototype, 19950612)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="comix zone (sega channel) (prototype - jun 12, 1995).bin" size="2097152" crc="c77db9e1" sha1="5da563561e3d74f5db672c8694891083db869999"/>
@@ -13727,6 +13847,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<info name="serial" value="T-70013"/>
 		<info name="release" value="19940218"/>
 		<info name="alt_title" value="クールスポット"/>
+		<!-- compatibility not enforced, works on PAL too -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="cool spot (jpn, kor).bin" size="1048576" crc="e869efb1" sha1="e32826ca9ae5173d5ef9722b52bfcb4ad390a7bb"/>
@@ -13738,6 +13859,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>Cool Spot (USA, Prototype)</description>
 		<year>1994</year>
 		<publisher>Virgin Games</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U,NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="cool spot (usa) (beta).bin" size="1048576" crc="0ebaa4a8" sha1="9b42bb33186ddc759a469ed3e0ee12e5dee0b809"/>
@@ -13869,6 +13991,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>Crystal's Pony Tale (USA, Prototype, 19940701)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="crystal's pony tale (prototype - jul 01, 1994).bin" size="1048576" crc="16ac2e4f" sha1="37e6369f0c5f8969003fd4ec1c291e06900c617a"/>
@@ -13880,6 +14003,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>Crystal's Pony Tale (USA, Prototype, 19940702)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="crystal's pony tale (prototype - jul 02, 1994).bin" size="1048576" crc="24bc4354" sha1="fa14565f90a254bbe8cff18e62f65e9ff1da1736"/>
@@ -13891,6 +14015,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>Crystal's Pony Tale (USA, Prototype, 19940703)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="crystal's pony tale (prototype - jul 03, 1994).bin" size="1048576" crc="6d67a87c" sha1="decec86674df91d1b9d29881745e279759470125"/>
@@ -13902,6 +14027,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>Crystal's Pony Tale (USA, Prototype, 19940712-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="crystal's pony tale (prototype - jul 12, 1994 - b).bin" size="1048576" crc="3577dc72" sha1="db225126e319380d89c0a5ab58d9f75d97419e6a"/>
@@ -13913,6 +14039,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>Crystal's Pony Tale (USA, Prototype, 19940712)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1045844">
 				<rom name="crystal's pony tale (prototype - jul 12, 1994).bin" size="1045844" crc="2bfc0a53" sha1="9ac7eba7cb238602925ed2a23f870b81b413991e"/>
@@ -13924,6 +14051,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>Crystal's Pony Tale (USA, Prototype, 19940713)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="crystal's pony tale (prototype - jul 13, 1994).bin" size="1048576" crc="c67b6dba" sha1="58e56c2cbb94f81205c6f38656a0c75dcf27e267"/>
@@ -13935,6 +14063,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>Crystal's Pony Tale (USA, Prototype, 19940601)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="crystal's pony tale (prototype - jun 01, 1994).bin" size="1048576" crc="14c6347c" sha1="170db22a5bfc30afe19ece372ad0cceea1961cd7"/>
@@ -13946,6 +14075,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>Crystal's Pony Tale (USA, Prototype, 19940606)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="crystal's pony tale (prototype - jun 06, 1994).bin" size="1048576" crc="83e8cac9" sha1="2941ae87e22de10eadd0b7f75bf2e003396d4c99"/>
@@ -13957,6 +14087,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>Crystal's Pony Tale (USA, Prototype, 19940610)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="crystal's pony tale (prototype - jun 10, 1994).bin" size="1048576" crc="9e1dd267" sha1="cd0ebcdca3b8fdd763c8748bc2ebc91690bebd7f"/>
@@ -13968,6 +14099,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>Crystal's Pony Tale (USA, Prototype, 19940623)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="crystal's pony tale (prototype - jun 23, 1994).bin" size="1048576" crc="4ccc19af" sha1="2220bcb6baa349f5086c3a42ead63c7efeb49631"/>
@@ -13979,6 +14111,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>Crystal's Pony Tale (USA, Prototype, 19940628)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="crystal's pony tale (prototype - jun 28, 1994).bin" size="1048576" crc="03be7f66" sha1="ca3abcc3403c34fa7b2ea6ff56b1967267d96fce"/>
@@ -13990,6 +14123,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>Crystal's Pony Tale (USA, Prototype, 19940630)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="crystal's pony tale (prototype - jun 30, 1994).bin" size="1048576" crc="dd8c73fb" sha1="4db4a0b358a88f9c04f2f3c73d7b9ce1ac87a8da"/>
@@ -14001,6 +14135,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>Crystal's Pony Tale (USA, Prototype, 19940511)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="crystal's pony tale (prototype - may 11, 1994).bin" size="1048576" crc="eac9d74b" sha1="53cd0e287b54a49ddf1d6075fab4b3a7f1ddc396"/>
@@ -14012,6 +14147,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>Crystal's Pony Tale (USA, Prototype, 19940519)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="crystal's pony tale (prototype - may 19, 1994).bin" size="1048576" crc="dc50b741" sha1="b9c271296977e2b304a8a808cb2d5e9fb44467b1"/>
@@ -14023,6 +14159,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>Crystal's Pony Tale (USA, Prototype, 19940526)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="crystal's pony tale (prototype - may 26, 1994).bin" size="1048576" crc="a2eaba55" sha1="16278beee4d39ea9f70ce6225373b193881cb2b0"/>
@@ -14380,6 +14517,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>The Death and Return of Superman (USA)</description>
 		<year>1995</year>
 		<publisher>Sunsoft</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="death and return of superman, the (usa).bin" size="2097152" crc="982242d3" sha1="3534d17801bd5756b10a7f8d7d95f3a8d9b74844"/>
@@ -14789,6 +14927,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>Dr. Robotnik's Mean Bean Machine (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="dr. robotnik's mean bean machine (usa) (beta).bin" size="1048576" crc="4d0e5273" sha1="312f9a283bebc5d612a63afd2cf67eb923f4f074"/>
@@ -14966,6 +15105,7 @@ Choppy timings during gameplay (btanb?)
 		<description>Dune - The Battle for Arrakis (Euro, prototype 19940111)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="dune ii - the battle for arrakis (prototype 19940111).bin" size="1048576" crc="781cb285" sha1="d02cf6e07071cf3d47e867182bf42d67b9e30a3e"/>
@@ -15242,6 +15382,7 @@ Choppy timings during gameplay (btanb?)
 		<description>Ecco - The Tides of Time (USA, Prototype)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="ecco - the tides of time (beta).bin" size="2097152" crc="8db60749" sha1="3120625e8ff6b289ae6c398b8afe1ab5ff6396e3"/>
@@ -15253,6 +15394,7 @@ Choppy timings during gameplay (btanb?)
 		<description>Ecco - The Tides of Time (USA, Prototype, Alt)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="ecco - the tides of time (beta, alt).bin" size="2097152" crc="1d1470ea" sha1="364523cd30615ce4a94793ebbc189c0db6adc38f"/>
@@ -15264,6 +15406,7 @@ Choppy timings during gameplay (btanb?)
 		<description>Ecco - The Tides of Time (USA, Prototype, 19940429)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="ecco ii - the tides of time (prototype - apr 29, 1994).bin" size="2097152" crc="5af83ecb" sha1="3c653329c897e369198425e99e76ff53688d245b"/>
@@ -15278,6 +15421,7 @@ Choppy timings during gameplay (btanb?)
 		<info name="serial" value="G-4123"/>
 		<info name="release" value="19940826"/>
 		<info name="alt_title" value="エコー・ザ・ドルフィン2"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="mpr-16996.bin" size="2097152" crc="062d439c" sha1="0ca535d0e0d430c67e413ab904ef867516ce9fad"/>
@@ -15289,6 +15433,7 @@ Choppy timings during gameplay (btanb?)
 		<description>Ecco - The Tides of Time (USA, Prototype X11, 19940413)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="ecco - the tides of time (prototype x11 - apr 13, 1994).bin" size="2097152" crc="b5d64817" sha1="6cc1ea0b6c4be29ed7a02cd5e01f9504d272323e"/>
@@ -15394,10 +15539,15 @@ Choppy timings during gameplay (btanb?)
 		</part>
 	</software>
 
-	<software name="elit95">
+	<software name="elit95" cloneof="nhl95">
 		<description>Elitserien 95 (Swe)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+https://segaretro.org/Elitserien_95
+]]></notes>
+		<info name="developer" value="Neurostone"/>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<!-- Dump To Be Confirmed, info based on pics found in the web -->
 			<feature name="slot" value="rom_sram"/>
@@ -15415,10 +15565,14 @@ Choppy timings during gameplay (btanb?)
 		</part>
 	</software>
 
-	<software name="elit96">
+	<software name="elit96" cloneof="nhl96">
 		<description>Elitserien 96 (Swe)</description>
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+https://segaretro.org/Elitserien_96
+]]></notes>
+		<info name="developer" value="Neurostone"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -15470,6 +15624,7 @@ Choppy timings during gameplay (btanb?)
 		<description>Escape from Mars Starring Taz (Prototype, 19940418)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="taz in escape from mars (prototype - apr 18, 1994).bin" size="2097152" crc="bfa776ec" sha1="e35e8019b3a89319fd22dfee444741b955820afd"/>
@@ -15481,6 +15636,7 @@ Choppy timings during gameplay (btanb?)
 		<description>Escape from Mars Starring Taz (Prototype, 19940602)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="taz in escape from mars (prototype - jun 02, 1994).bin" size="2097152" crc="39f345c2" sha1="1ccdb04cea4a0dfc816e8fd9552f77d201504002"/>
@@ -15492,6 +15648,7 @@ Choppy timings during gameplay (btanb?)
 		<description>Escape from Mars Starring Taz (Prototype, 19940607)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="taz in escape from mars (prototype - jun 07, 1994).bin" size="2097152" crc="3481e709" sha1="5ecc3a4754507410830039e6b27d81b675727d43"/>
@@ -15503,6 +15660,7 @@ Choppy timings during gameplay (btanb?)
 		<description>Escape from Mars Starring Taz (Prototype, 19940610)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="taz in escape from mars (prototype - jun 10, 1994).bin" size="2097152" crc="832f4cb4" sha1="48199482c13bcf49461fd5459617e75497fadcf9"/>
@@ -15514,6 +15672,7 @@ Choppy timings during gameplay (btanb?)
 		<description>Escape from Mars Starring Taz (Prototype, 19940614)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="taz in escape from mars (prototype - jun 14, 1994).bin" size="2097152" crc="2badb65b" sha1="74b701be56a7a7ba286dcf354fbe646d0b9ce73a"/>
@@ -15525,6 +15684,7 @@ Choppy timings during gameplay (btanb?)
 		<description>Escape from Mars Starring Taz (Prototype, 19940618-A)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="taz in escape from mars (prototype - jun 18, 1994 - a).bin" size="2097152" crc="3c4b1e9c" sha1="b81fe7b3656f859f51f60bd7d368ffc62c8bb615"/>
@@ -15536,6 +15696,7 @@ Choppy timings during gameplay (btanb?)
 		<description>Escape from Mars Starring Taz (Prototype, 19940620)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="taz in escape from mars (prototype - jun 20, 1994).bin" size="2097152" crc="f00f4203" sha1="de7927962c29477b3bf0392f27e07b44daf185c9"/>
@@ -15547,6 +15708,7 @@ Choppy timings during gameplay (btanb?)
 		<description>Escape from Mars Starring Taz (Prototype, 19940309)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1939766">
 				<rom name="taz in escape from mars (prototype - mar 09, 1994).bin" size="1939766" crc="e3c2271e" sha1="587e57673dfec493231f410677e7b380484bf7d2"/>
@@ -15558,6 +15720,7 @@ Choppy timings during gameplay (btanb?)
 		<description>Escape from Mars Starring Taz (Prototype, 19940509)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="taz in escape from mars (prototype - may 09, 1994).bin" size="2097152" crc="11727086" sha1="a2d00ac89176dc61d4f736a8c65bd7153c184293"/>
@@ -15569,6 +15732,7 @@ Choppy timings during gameplay (btanb?)
 		<description>Escape from Mars Starring Taz (Prototype, 19940518)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="759172">
 				<rom name="taz in escape from mars (prototype - may 18, 1994).bin" size="759172" crc="6e2666de" sha1="c046885fbf4d654b636c0c1ea9fd65acc3b18da3"/>
@@ -15580,6 +15744,7 @@ Choppy timings during gameplay (btanb?)
 		<description>Escape from Mars Starring Taz (Prototype, 19940523)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="taz in escape from mars (prototype - may 23, 1994).bin" size="2097152" crc="ea344fd2" sha1="92a7563beb8e4957251d7fff29354f0dc6aa0394"/>
@@ -15617,6 +15782,7 @@ Choppy timings during gameplay (btanb?)
 		<description>ESPN National Hockey Night (USA, Prototype)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -15675,6 +15841,7 @@ Choppy timings during gameplay (btanb?)
 		<description>Eternal Champions (Euro, Prototype)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="eternal champions (euro) (beta).bin" size="3145728" crc="e0665f06" sha1="c06f2d9ff29b6e6ec2dbec06eab2eac21e80e423"/>
@@ -15805,6 +15972,7 @@ Choppy timings during gameplay (btanb?)
 		<description>Exo Squad (USA, Prototype)</description>
 		<year>1995</year>
 		<publisher>Playmates Interactive</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="exo squad (usa) (beta).bin" size="1048576" crc="70edf964" sha1="d165e0057a5d290ae02ff6cae9f99c2ebc8a3f7c"/>
@@ -15863,6 +16031,7 @@ Choppy timings during gameplay (btanb?)
 		<description>F-15 Strike Eagle II (USA, Prototype, Alt)</description>
 		<year>1993</year>
 		<publisher>Microprose</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="f-15strikeeagleii.0f82.bin" size="2097152" crc="dc5f07ba" sha1="6900219ec9057ce2ef5bd1304c2c26aa678a1daa"/>
@@ -16402,6 +16571,7 @@ https://segaretro.org/Feng_Shen_Ying_Jie_Chuan
 		<description>Flashback - The Quest for Identity (USA, Alt)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1572864">
 				<rom name="flashback - the quest for identity (usa) (alt).bin" size="1572864" crc="33cd2b65" sha1="225b405274d39541e07488fdd33de8f854624bf1"/>
@@ -16684,6 +16854,7 @@ https://segaretro.org/Feng_Shen_Ying_Jie_Chuan
 		<description>Gauntlet IV (Euro, USA, 199309)</description>
 		<year>1993</year>
 		<publisher>Tengen</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U,PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="gauntlet iv (euro, usa) (september 1993).bin" size="1048576" crc="f9d60510" sha1="d28e22207121f0e2980dd409b4fb24f9fb8967ae"/>
@@ -16695,6 +16866,7 @@ https://segaretro.org/Feng_Shen_Ying_Jie_Chuan
 		<description>Gauntlet IV (Euro, USA, 199308)</description>
 		<year>1993</year>
 		<publisher>Tengen</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U,PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="gauntlet iv (euro, usa) (august 1993).bin" size="1048576" crc="3bf46dce" sha1="26c26ee2bb9571d51537d9328a5fd2a91b4e9dc1"/>
@@ -16706,6 +16878,7 @@ https://segaretro.org/Feng_Shen_Ying_Jie_Chuan
 		<description>Gauntlet (Jpn)</description>
 		<year>1993</year>
 		<publisher>Tengen</publisher>
+		<!-- Compatibility not enforced -->
 		<info name="serial" value="T-48123"/>
 		<info name="release" value="19930917"/>
 		<info name="alt_title" value="ガントレット"/>
@@ -16935,6 +17108,7 @@ Unemulated [Sega Mega Modem] features
 		<description>Gods (USA, Prototype)</description>
 		<year>1992</year>
 		<publisher>Mindscape</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U,PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="gods (usa) (beta).bin" size="1048576" crc="2c06bb64" sha1="dd9c03eaf3160303775ca1bca048101614507203"/>
@@ -17381,6 +17555,7 @@ Unemulated [Sega Mega Modem] features
 		<description>Home Alone 2 - Lost in New York (USA, Prototype 19930929)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="home alone 2 - lost in new york (sep 29, 1993 build).bin" size="522726" crc="c2f37ae2" sha1="6a9f892b2425f4dd53bac7d43a05e2d91ebdf396"/>
@@ -17474,6 +17649,7 @@ Unemulated [Sega Mega Modem] features
 		<description>Hyper Dunk - The Playoff Edition (Jpn)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<!-- Compatibility not enforced -->
 		<info name="serial" value="T-95083"/>
 		<info name="release" value="19940304"/>
 		<info name="alt_title" value="ハイパーダンク ザ プレイオフ エディション"/>
@@ -17488,6 +17664,7 @@ Unemulated [Sega Mega Modem] features
 		<description>Hyper Dunk - The Playoff Edition (Jpn, Prototype)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="hyper dunk - the playoff edition (jpn) (beta).bin" size="2097152" crc="db124bbb" sha1="87a2d58614fab2799e2a4456a08436fc7acc745b"/>
@@ -17595,6 +17772,7 @@ Unemulated [Sega Mega Modem] features
 		<description>Instruments of Chaos Starring Young Indiana Jones (Prototype)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1572864">
 				<rom name="instruments of chaos starring young indiana jones (usa) (beta).bin" size="1572864" crc="ad6c2050" sha1="63f5ac7dddb166fba76d74c58daf320568d6b016"/>
@@ -17606,6 +17784,7 @@ Unemulated [Sega Mega Modem] features
 		<description>Instruments of Chaos Starring Young Indiana Jones (Prototype, 19941229)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="instruments of chaos starring young indiana jones (prototype - dec 29, 1994).bin" size="1048576" crc="94b02351" sha1="10ce37b58d423fdab76e0c53a3b2d379ae9f1221"/>
@@ -17617,6 +17796,7 @@ Unemulated [Sega Mega Modem] features
 		<description>Instruments of Chaos Starring Young Indiana Jones (Prototype, 19941228-A)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1046332">
 				<rom name="instruments of chaos starring young indiana jones (prototype - dec 28, 1994 - a).bin" size="1046332" crc="f285ad46" sha1="4f0ef01ada3090d6a4004ec6d46dea5c20e34e1a"/>
@@ -17628,6 +17808,7 @@ Unemulated [Sega Mega Modem] features
 		<description>Instruments of Chaos Starring Young Indiana Jones (Prototype, 19940101)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="instruments of chaos starring young indiana jones (prototype - jan 01, 1994).bin" size="1048576" crc="263f1a4c" sha1="99cb157adb1b6295ab04955efdc8868ba5ac4d9f"/>
@@ -17639,6 +17820,7 @@ Unemulated [Sega Mega Modem] features
 		<description>Instruments of Chaos Starring Young Indiana Jones (Prototype, 19940103)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="instruments of chaos starring young indiana jones (prototype - jan 03, 1994).bin" size="1048576" crc="3c46d83d" sha1="e4afc2d09815495e7d15111a1698e8f324e5873d"/>
@@ -17650,6 +17832,7 @@ Unemulated [Sega Mega Modem] features
 		<description>Instruments of Chaos Starring Young Indiana Jones (Prototype, 19940126)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="instruments of chaos starring young indiana jones (prototype - jan 26, 1994).bin" size="1048576" crc="f3498542" sha1="e3dc69f339f6ec6e766578edee4cc05f429a689a"/>
@@ -17661,6 +17844,7 @@ Unemulated [Sega Mega Modem] features
 		<description>Instruments of Chaos Starring Young Indiana Jones (Prototype, 19940127)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="instruments of chaos starring young indiana jones (prototype - jan 27, 1994).bin" size="1048576" crc="f43112c3" sha1="2174482b62d11a73fd5edff55d111f9bcac53d97"/>
@@ -17672,6 +17856,7 @@ Unemulated [Sega Mega Modem] features
 		<description>Instruments of Chaos Starring Young Indiana Jones (Prototype, 19940923-A)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1041348">
 				<rom name="instruments of chaos starring young indiana jones (prototype - sep 23, 1994 - a).bin" size="1041348" crc="14443a29" sha1="ed02300b73f66b6ca41c282a5b9ab55c30b4c7c8"/>
@@ -17683,6 +17868,7 @@ Unemulated [Sega Mega Modem] features
 		<description>Instruments of Chaos Starring Young Indiana Jones (Prototype, 19931228)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="instruments of chaos starring young indiana jones (prototype - dec 28, 1993).bin" size="1048576" crc="51ca641c" sha1="e6b8d13344f37aff131edea4f3f3b20100f63e72"/>
@@ -18150,6 +18336,7 @@ Unsupported [Sega Mouse] peripheral
 		<description>Disney's The Jungle Book (prototype)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="the jungle book (wces 1994 prototype).bin" size="1048576" crc="20b97d87" sha1="df79f4d61d1de7f9a3ed056f98a94dcad2ae8e18"/>
@@ -18186,6 +18373,7 @@ Unsupported [Sega Mouse] peripheral
 		<description>Jurassic Park (Euro, Prototype 19930614)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="jurassic park (jun 14, 1993 prototype).bin" size="2097152" crc="64b8beb5" sha1="98bf950f2542c7aa22687ecef1d4ea25498c7a4b" />
@@ -18197,6 +18385,7 @@ Unsupported [Sega Mouse] peripheral
 		<description>Jurassic Park (USA, Prototype)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="jurassic park (usa) (beta).bin" size="2097152" crc="cf890eed" sha1="ac2097b5f2a30787d7ca1ed8ab4eac7f4be77f0f"/>
@@ -18208,6 +18397,7 @@ Unsupported [Sega Mouse] peripheral
 		<description>Jurassic Park (USA, Prototype 19930526)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1978944">
 				<rom name="jurassic park (may 26, 1993 build).bin" size="1978944" crc="b44968e7" sha1="f71745f8a98d96b0fd504728973774406aeebe4e" />
@@ -18219,6 +18409,7 @@ Unsupported [Sega Mouse] peripheral
 		<description>Jurassic Park - Rampage Edition (Prototype, 19940708)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="jurassic park - rampage edition (prototype - jul 08, 1994).bin" size="2097152" crc="f4c78bd0" sha1="7dca5ec1440222ce38f085663d0ab6539693feaa"/>
@@ -18230,6 +18421,7 @@ Unsupported [Sega Mouse] peripheral
 		<description>Jurassic Park - Rampage Edition (Prototype, 19940713)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="jurassic park - rampage edition (prototype - jul 13, 1994).bin" size="2097152" crc="8475a105" sha1="b840cc1b00bf2f7e75320c1395da3dceaa637071"/>
@@ -18241,6 +18433,7 @@ Unsupported [Sega Mouse] peripheral
 		<description>Jurassic Park - Rampage Edition (Prototype, 19940714)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="jurassic park - rampage edition (prototype - jul 14, 1994).bin" size="2097152" crc="9bf0e28d" sha1="534eea52e7c6d8d0fc0a93480c89f89568196d36"/>
@@ -18252,6 +18445,7 @@ Unsupported [Sega Mouse] peripheral
 		<description>Jurassic Park - Rampage Edition (Prototype, 19940715)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="jurassic park - rampage edition (prototype - jul 15, 1994).bin" size="2097152" crc="d2202be5" sha1="b10fae841b410525ac83e729983f3e0cda2e7365"/>
@@ -18263,6 +18457,7 @@ Unsupported [Sega Mouse] peripheral
 		<description>Jurassic Park - Rampage Edition (Prototype, 19940717)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="jurassic park - rampage edition (prototype - jul 17, 1994).bin" size="2097152" crc="2eae6140" sha1="2d817ad10e9b6b93b6eee23a76f788a73827bbc5"/>
@@ -18274,6 +18469,7 @@ Unsupported [Sega Mouse] peripheral
 		<description>Jurassic Park - Rampage Edition (Prototype, 19940718)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="jurassic park - rampage edition (prototype - jul 18, 1994).bin" size="2097152" crc="1a62b826" sha1="cbb44d5d5da1263a4524c747be9afd0aa8547a63"/>
@@ -18285,6 +18481,10 @@ Unsupported [Sega Mouse] peripheral
 		<description>Jurassic Park - Rampage Edition (Prototype, 19940620)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Black screen
+]]></notes>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2059872">
 				<rom name="jurassic park - rampage edition (prototype - jun 20, 1994).bin" size="2059872" crc="1280fa5c" sha1="f8f52d23dcd36e8167ec273cf9978ae44f21658b"/>
@@ -18296,6 +18496,10 @@ Unsupported [Sega Mouse] peripheral
 		<description>Jurassic Park - Rampage Edition (Prototype, 19940622)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Black screen
+]]></notes>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="jurassic park - rampage edition (prototype - jun 22, 1994).bin" size="2097152" crc="53582f2b" sha1="6607cdeb4a5ddb229201f1417d3e693063094a7d"/>
@@ -18307,6 +18511,7 @@ Unsupported [Sega Mouse] peripheral
 		<description>Jurassic Park - Rampage Edition (Prototype, 19940630)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="jurassic park - rampage edition (prototype - jun 30, 1994).bin" size="2097152" crc="bff4b396" sha1="f1f763e087065483ed7ff53f95b99bac16bb8484"/>
@@ -18636,6 +18841,7 @@ Unsupported [Sega Mouse] peripheral
 		<description>Landstalker - The Treasures of King Nole (USA, Prototype 19930713)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -19212,6 +19418,7 @@ https://segaretro.org/Ma_Qiao_E_Mo_Ta:_Devilish_Mahjong_Tower
 		<description>The Magic School Bus (Prototype, 19950202)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="magic school bus, the (prototype - feb 02, 1995).bin" size="1048576" crc="7805b5c9" sha1="06bd39d487f63fe4bebdd651247223767540e00a"/>
@@ -19234,6 +19441,7 @@ https://segaretro.org/Ma_Qiao_E_Mo_Ta:_Devilish_Mahjong_Tower
 		<description>The Magic School Bus (Prototype, 19950112)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="963300">
 				<rom name="magic school bus, the (prototype - jan 12, 1995).bin" size="963300" crc="946346f9" sha1="1351b74d8bdbdeb7e1d042c35e2d770bd925beb3"/>
@@ -20030,6 +20238,7 @@ Needs [megadriv_z80_z80_bank_w] workaround to work (emulator copy protection?)
 		<description>Mighty Morphin Power Rangers (USA, Prototype, 19940804)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="mighty morphin power rangers (prototype - aug 04, 1994).bin" size="2097152" crc="f3ae5aaf" sha1="c15f23e20aee4d0664897e6cd29b77bd39228fc7"/>
@@ -20041,6 +20250,7 @@ Needs [megadriv_z80_z80_bank_w] workaround to work (emulator copy protection?)
 		<description>Mighty Morphin Power Rangers (USA, Prototype, 19940808)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="mighty morphin power rangers (prototype - aug 08, 1994).bin" size="2097152" crc="57644549" sha1="e1651f13dd1bcedad0acc7d2c21298f9662ccf55"/>
@@ -20052,6 +20262,7 @@ Needs [megadriv_z80_z80_bank_w] workaround to work (emulator copy protection?)
 		<description>Mighty Morphin Power Rangers (Prototype, 19940809)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="mighty morphin power rangers (prototype - aug 09, 1994).bin" size="2097152" crc="4356fe0a" sha1="a91cf34ae5178696e66a71770872b3720265d61c"/>
@@ -20063,6 +20274,7 @@ Needs [megadriv_z80_z80_bank_w] workaround to work (emulator copy protection?)
 		<description>Mighty Morphin Power Rangers (Prototype, 19940810)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="mighty morphin power rangers (prototype - aug 10, 1994).bin" size="2097152" crc="e79cd214" sha1="c5e82c5786b52675d376872b3b985927d08feed2"/>
@@ -20119,6 +20331,7 @@ Needs [megadriv_z80_z80_bank_w] workaround to work (emulator copy protection?)
 		<description>Mighty Morphin Power Rangers - The Movie (USA, Prototype, 19950717)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="mighty morphin power rangers - the movie (prototype - jul 17, 1995).bin" size="2097152" crc="579de657" sha1="480cdadf79d884319daf0d23a062555e816187ff"/>
@@ -20130,6 +20343,7 @@ Needs [megadriv_z80_z80_bank_w] workaround to work (emulator copy protection?)
 		<description>Mighty Morphin Power Rangers - The Movie (USA, Prototype, 19950722)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="mighty morphin power rangers - the movie (prototype - jul 22, 1995).bin" size="2097152" crc="c2ca3a8b" sha1="a10a3ca13c57030b411752231da7be2c1a6e81e6"/>
@@ -20141,6 +20355,7 @@ Needs [megadriv_z80_z80_bank_w] workaround to work (emulator copy protection?)
 		<description>Mighty Morphin Power Rangers - The Movie (USA, Prototype, 19950724)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="mighty morphin power rangers - the movie (prototype - jul 24, 1995).bin" size="2097152" crc="3429fa3a" sha1="7a567082b0314d3e8d677d07b8bccaf307c8c9c2"/>
@@ -20617,6 +20832,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="alt_title" value="NBA Action '94 (Box)"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -20645,6 +20861,7 @@ Crashes after team selection
 		<description>NBA Action (Prototype, 19940116)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -24730,6 +24947,7 @@ Red screen
 		<description>Rolling Thunder 2 (USA)</description>
 		<year>1991</year>
 		<publisher>Namco</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<!-- Dump To Be Confirmed -->
 			<feature name="pcb" value="?? (Namcot)"/>
@@ -25041,6 +25259,10 @@ Unsupported [Sega Mega Modem] features
 		<description>Sensible Soccer (Prototype)</description>
 		<year>1993</year>
 		<publisher>Renegade</publisher>
+		<notes><![CDATA[
+Throws "this game is [...] european megadrive system" even with megadriv system (btanb? cfr. checks at PC=18b2e and PC=18b4c, $ff0006 RAM buffer is never set other than POST init)
+]]></notes>
+		<!-- <sharedfeat name="compatibility" value="PAL"/> -->
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="524288">
@@ -25333,6 +25555,7 @@ https://segaretro.org/Shi_Jie_Zhi_Bang_Zheng_Ba_Zhan:_World_Pro_Baseball_94
 		<description>Shining Force II (USA, Prototype, 19940404)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -25347,6 +25570,7 @@ https://segaretro.org/Shi_Jie_Zhi_Bang_Zheng_Ba_Zhan:_World_Pro_Baseball_94
 		<description>Shining Force II (USA, Prototype, 19940607)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -25407,6 +25631,7 @@ https://segaretro.org/Shi_Jie_Zhi_Bang_Zheng_Ba_Zhan:_World_Pro_Baseball_94
 		<description>Shinobi III - Return of the Ninja Master (USA, Prototype 19930629)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="shinobi iii - return of the ninja master (jun 29, 1993 prototype).bin" size="1048576" crc="ed32899a" sha1="bb504d035612daa91c88d4a876a665ffca56efe3" />
@@ -25614,6 +25839,7 @@ https://bootleggames.fandom.com/wiki/Shui_Hu_Feng_Yun_Zhuan
 		<description>Skeleton Krew (USA)</description>
 		<year>1995</year>
 		<publisher>Core Design</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="skeleton krew (usa).bin" size="2097152" crc="c2e05acb" sha1="2a6f6ea7d2fc1f3a396269f9455011ef95266ffc"/>
@@ -26127,6 +26353,9 @@ https://bootleggames.fandom.com/wiki/Shui_Hu_Feng_Yun_Zhuan
 		<description>Sonic Jam 6 (Alt)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<notes><![CDATA[
+Black screen, writes in ROM area then jumps to PC=1a2000 (encryption?)
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="sonic jam 6 (unl) (pirate).bin" size="2097152" crc="04f0c93e" sha1="a9e316ccde5b71f6aa85485b6897c1cfc780742d"/>
@@ -26149,6 +26378,7 @@ https://bootleggames.fandom.com/wiki/Shui_Hu_Feng_Yun_Zhuan
 		<description>Sonic Spinball (Euro, prototype 19930917)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="sonic spinball 0 md 17-9 4m.eprom" size="524288" crc="2e0e6929" sha1="d54f89dea19a1489f0297405f5a0d245f55e9e86" offset="0x000001" loadflag="load16_byte"/> <!-- Sonic Spinball 0 MD 17/9 4M -->
@@ -26161,6 +26391,7 @@ https://bootleggames.fandom.com/wiki/Shui_Hu_Feng_Yun_Zhuan
 		<description>Sonic Spinball (prototype 19930922)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="sonic the hedgehog spinball (sep 22, 1993 build).bin" size="1048576" crc="82c55a36" sha1="dffa4d4a996c9bf757c48584b933e16944eff86c"/>
@@ -26434,6 +26665,7 @@ https://bootleggames.fandom.com/wiki/Shui_Hu_Feng_Yun_Zhuan
 		<description>Sonic the Hedgehog 3 (USA, Prototype 19931120)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_fram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -26725,6 +26957,7 @@ https://bootleggames.fandom.com/wiki/Shui_Hu_Feng_Yun_Zhuan
 		<description>Spirou (Euro, prototype)</description>
 		<year>1996</year>
 		<publisher>Infogrames</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="spirou (prototype).bin" size="1048576" crc="51bc6c35" sha1="1b03b04a1d3ae75b51e487dced305c6a729b4fa6"/>
@@ -26804,6 +27037,7 @@ $040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
 		<description>Spot Goes to Hollywood (Euro)</description>
 		<year>1996</year>
 		<publisher>Virgin Interactive</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U,PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="mpr-18680+mpr-18681.bin" size="3145728" crc="fbe254ea" sha1="be1144c3d9d49dce2d5e1ab598ef0e2b730950b7"/>
@@ -26815,6 +27049,7 @@ $040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
 		<description>Spot Goes to Hollywood (USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="spot goes to hollywood (usa).bin" size="3145728" crc="bdad1cbc" sha1="064a384f745eeffee3621d55a0278c133abdbc11"/>
@@ -27007,6 +27242,7 @@ $040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
 		<description>Star Trek - The Next Generation - Echoes from the Past (Prototype, 19940125)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -27114,6 +27350,7 @@ $040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
 		<description>Stone Protectors (USA, Prototype)</description>
 		<year>1994</year>
 		<publisher>Vic Tokai</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="stone protectors.bin" size="2097152" crc="fbf0d54f" sha1="6629a0299689898b1a9b54e4fd05dad1e2fd62d3"/>
@@ -27226,6 +27463,7 @@ $040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
 		<description>The Story of Thor (USA, Prototype, 19941004)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -27240,6 +27478,7 @@ $040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
 		<description>The Story of Thor (USA, Prototype, 19941017)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -27254,6 +27493,7 @@ $040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
 		<description>Beyond Oasis (USA, Prototype, 19941101)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -27367,10 +27607,14 @@ $040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
 	</software>
 
 <!-- This mostly differs from final build only in the internal header... -->
-	<software name="sracerp" cloneof="sracer">
+	<software name="sracerp" cloneof="sracer" supported="partial">
 		<description>Street Racer (Euro, prototype 19950321)</description>
 		<year>1995</year>
 		<publisher>Ubi Soft</publisher>
+		<notes><![CDATA[
+Corrupted Ubi Soft and Vivid Image logos
+]]></notes>
+		<info name="developer" value="Vivid Image"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="street racer (prototype 19950321).bin" size="1048576" crc="a439a96e" sha1="674e3c5185923a98bd8e9ae9bc0409d0c6503432"/>
@@ -27431,6 +27675,7 @@ $040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
 		<description>Streets of Rage 3 (Kor)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="streets of rage 3 (kor).bin" size="3145728" crc="90ef991e" sha1="8c0bc5b66703efbdeef2d6ede5745aad89bd8a44"/>
@@ -27442,6 +27687,7 @@ $040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
 		<description>Streets of Rage 3 (Euro, Prototype, 19940412)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="streets of rage 3 (euro) (prototype - apr 12, 1994).bin" size="3145728" crc="a17ce5ab" sha1="0b0fa81973bf2f0313e0f2041c8cdd1c220e9839"/>
@@ -27453,6 +27699,7 @@ $040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
 		<description>Streets of Rage 3 (Euro, Prototype, 19940413)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="streets of rage 3 (euro) (prototype - apr 13, 1994).bin" size="3145728" crc="164e42ae" sha1="32df74ccf217e8258dee9acc50db540bbc68ca02"/>
@@ -27464,6 +27711,7 @@ $040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
 		<description>Streets of Rage 3 (Euro, Prototype, 19940415)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="streets of rage 3 (euro) (prototype - apr 15, 1994).bin" size="3145728" crc="c64f1e6b" sha1="118e4a8a3891956e0b60bcf5a6dd631ba93794a3"/>
@@ -27475,6 +27723,7 @@ $040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
 		<description>Streets of Rage 3 (Euro, Prototype, 19940420)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="streets of rage 3 (euro) (prototype - apr 20, 1994).bin" size="3145728" crc="6ae4bd8e" sha1="58feae0110f239ba7a58e447b86158705249b35b"/>
@@ -27486,6 +27735,7 @@ $040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
 		<description>Streets of Rage 3 (Euro, Prototype, 19940425)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="streets of rage 3 (euro) (prototype - apr 25, 1994).bin" size="3145728" crc="7033878a" sha1="8a8cfc1e75f89cf72d7d783b29238f4a8b3ff568"/>
@@ -27497,6 +27747,7 @@ $040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
 		<description>Streets of Rage 3 (Prototype, 19940401)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="streets of rage 3 (prototype - apr 01, 1994).bin" size="3145728" crc="797e75b7" sha1="9f2f64507fd11114c2bacdd54aa25aecfa4f25bb"/>
@@ -27508,6 +27759,7 @@ $040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
 		<description>Streets of Rage 3 (Prototype, 19940404)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="streets of rage 3 (prototype - apr 04, 1994).bin" size="3145728" crc="6b968f13" sha1="e2645121252f51d1eb5ea4ffc9af0092941ad7c9"/>
@@ -27519,6 +27771,7 @@ $040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
 		<description>Streets of Rage 3 (Prototype, 19940408)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="streets of rage 3 (prototype - apr 08, 1994).bin" size="3145728" crc="d4ba76c2" sha1="94cc6697534cf90a369b5c7dfb4e53f1de96df1c"/>
@@ -27530,6 +27783,7 @@ $040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
 		<description>Streets of Rage 3 (Prototype, 19940411)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="streets of rage 3 (prototype - apr 11, 1994).bin" size="3145728" crc="fa5e5a82" sha1="5592e80501219dc2b5fe5f07819948520b8fa051"/>
@@ -27541,6 +27795,7 @@ $040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
 		<description>Streets of Rage 3 (Prototype, 19940412)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="streets of rage 3 (prototype - apr 12, 1994).bin" size="3145728" crc="3f52cb72" sha1="60e47f8393a79dd30c8ad273bc448610bef602f8"/>
@@ -27552,6 +27807,7 @@ $040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
 		<description>Streets of Rage 3 (Prototype, 19940413)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="streets of rage 3 (prototype - apr 13, 1994).bin" size="3145728" crc="6b675807" sha1="ffe3b23352b15f62f00653631bc3a606b7cda4b0"/>
@@ -27596,6 +27852,7 @@ $040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
 		<description>Streets of Rage 3 (Prototype, 19940328)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="streets of rage 3 (prototype - mar 28, 1994).bin" size="3145728" crc="8757f797" sha1="0b5160bdb791033c51aaf924eb280f977fc387d4"/>
@@ -27608,6 +27865,7 @@ $040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
 		<description>Streets of Rage 3 (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="streets of rage 3 (usa).bin" size="3145728" crc="d5bb15d9" sha1="40a33dd6f9dab0aff26c7525c9b8f342482c7af6"/>
@@ -27635,6 +27893,7 @@ $040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="alt_title" value="ベア・ナックルIII"/>
+		<sharedfeat name="compatibility" value="NTSC-J,PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="bare knuckle iii (jpn) (beta).bin" size="3145728" crc="e7ff99db" sha1="1d75372571ce970545f6ce63977cea9fa811e23f"/>
@@ -27671,6 +27930,7 @@ $040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
 		<description>Striker (Euro, Prototype)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -27685,6 +27945,7 @@ $040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
 		<description>SubTerrania (Prototype)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="subterrania (beta).bin" size="2097152" crc="3a1022d1" sha1="57279fa2bc9baf07d701be44e51e42d7f1e0e2a2"/>
@@ -27959,6 +28220,7 @@ $040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
 		<description>Super Monaco GP (USA)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="super monaco gp (usa).bin" size="524288" crc="725018ee" sha1="1947d41598daa3880ecb826303abae2accd1857f"/>
@@ -28983,6 +29245,7 @@ No BGMs
 		<description>Tintin au Tibet (Euro, prototype)</description>
 		<year>1995</year>
 		<publisher>Infogrames</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="tintin in tibet (prototype).bin" size="2097152" crc="5d4e0ea1" sha1="28a63f4e7c063c127b00dc7c8c3f1439eed437ba"/>
@@ -29018,6 +29281,7 @@ No BGMs
 		<description>TNN Bass Tournament of Champions (USA)</description>
 		<year>1993</year>
 		<publisher>American Softworks</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -29032,6 +29296,7 @@ No BGMs
 		<description>TNN Outdoors Bass Tournament '96 (USA)</description>
 		<year>1996</year>
 		<publisher>American Softworks</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -29098,6 +29363,7 @@ No BGMs
 		<description>Toe Jam &amp; Earl in Panic on Funkotron (Prototype)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="toejam&amp;earl.58bd.bin" size="2097152" crc="c6a1a8dc" sha1="a9f7a493e3470a2843c632c221e238080eed2de2"/>
@@ -29110,6 +29376,7 @@ No BGMs
 		<description>Toe Jam &amp; Earl in Panic on Funkotron (Prototype 19930911)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="toejam &amp; earl in panic on funkotron (sep 11, 1993 build).bin" size="2097152" crc="d9dfbb5c" sha1="9959ab08c2f74cbd9009bf784fc0205ce1f7bce1"/>
@@ -29365,6 +29632,7 @@ No BGMs
 		<description>Triple Play Gold (USA, Alt)</description>
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<!-- Dump seems clean unlike the other versions -->
@@ -30254,6 +30522,7 @@ Unsupported [Sega Mouse] peripheral
 		<description>WaterWorld (Euro, Prototype)</description>
 		<year>1995?</year>
 		<publisher>Ocean</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="waterworld (euro) (prototype).bin" size="2097152" crc="51c80498" sha1="35e4186654a677a43d16861f9832199c5cb5e0ef"/>
@@ -30418,6 +30687,7 @@ Unsupported [Sega Mouse] peripheral
 		<description>Wild Snake (USA, Prototype)</description>
 		<year>1994</year>
 		<publisher>Bullet-Proof Software</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="wild snake (usa) (prototype).bin" size="524288" crc="0c1a49e5" sha1="68241498209c5e1f09ca335aee1b0f55ce19ff6e"/>
@@ -30432,6 +30702,7 @@ Unsupported [Sega Mouse] peripheral
 		<info name="serial" value="G-4110"/>
 		<info name="release" value="19940520"/>
 		<info name="alt_title" value="ウィンブルドンCHAMPIONSHIP TENNIS"/>
+		<sharedfeat name="compatibility" value="NTSC-J,PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="wimbledon championship tennis (jpn).bin" size="1048576" crc="3e0c9daf" sha1="73a6dad0bedc5552459e8a74a9b8ae242ad5a78e"/>
@@ -30455,6 +30726,7 @@ Unsupported [Sega Mouse] peripheral
 		<description>Wimbledon Championship Tennis (USA, Prototype)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="wimbledon championship tennis (usa) (beta).bin" size="1048576" crc="9febc760" sha1="402bdc507647d861ee7bb80599f528d3d5aeaf0f"/>
@@ -30841,6 +31113,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Heroes (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="world heroes (usa).bin" size="2097152" crc="0f4d22ec" sha1="5a563f441c3013ac4b3f9e08d5e5a6e05efc5de0"/>
@@ -30850,8 +31123,9 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 
 	<software name="whj" cloneof="wh">
 		<description>World Heroes (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="world heroes (jpn).bin" size="2097152" crc="56e3ceff" sha1="0c806b701069ae72b6cfd19b7b65a123192cff23"/>
@@ -30863,6 +31137,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Heroes (USA, Prototype, 19940331-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="world heroes (euro) (prototype - mar 31, 1994 - b).bin" size="2097152" crc="d210aa6e" sha1="de2166ed7b4f51aca63abb63db5aee9cff381a1c"/>
@@ -30874,6 +31149,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Heroes (USA, Prototype, 19940331)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="world heroes (euro) (prototype - mar 31, 1994).bin" size="2097152" crc="92e1bf14" sha1="aea91bc2c65c33a54b0ec1873be5433beb8685b8"/>
@@ -30885,6 +31161,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Heroes (Jpn, Prototype, 19940408)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="world heroes (jpn) (prototype - apr 08, 1994).bin" size="2097152" crc="2bea7215" sha1="eb981388d7d2183a64673810a4a047780743c637"/>
@@ -30896,6 +31173,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Heroes (Jpn, Prototype, 19940415)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="world heroes (jpn) (prototype - apr 15, 1994).bin" size="2097152" crc="6dec07b3" sha1="a47ac5e017315422194a233d4f0aec9f5cc0e71a"/>
@@ -30907,6 +31185,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Heroes (Jpn, Prototype, 19940420-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="world heroes (jpn) (prototype - apr 20, 1994 - b).bin" size="2097152" crc="f5ffb191" sha1="f1e661306009254797fee5224d4feed4ccaa8610"/>
@@ -30914,10 +31193,14 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		</part>
 	</software>
 
-	<software name="whjp1" cloneof="wh">
+	<software name="whjp1" cloneof="wh" supported="no">
 		<description>World Heroes (Jpn, Prototype, 19940420, broken - C05 missing)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Black screen
+]]></notes>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="world heroes (jpn) (prototype - apr 20, 1994) (broken - c05 missing).bin" size="2097152" crc="b43b518c" sha1="b4af1c44e32e65f2c167d8fc94e884ed8ff703d1"/>
@@ -30929,6 +31212,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Heroes (Jpn, Prototype, 19940330)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="world heroes (jpn) (prototype - mar 30, 1994).bin" size="2097152" crc="3f93181a" sha1="cafdd71037782d60b41508e7db7fb5fec654ff71"/>
@@ -30940,6 +31224,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Heroes (USA, Prototype, 19940223)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="world heroes (usa) (prototype - feb 23, 1994).bin" size="2097152" crc="f5db477e" sha1="154d8b2415bcbce62656eef63e4fad026ee2d8d0"/>
@@ -30963,6 +31248,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Heroes (USA, Prototype, 19940303)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="world heroes (usa) (prototype - mar 03, 1994).bin" size="2097152" crc="24a63aef" sha1="0caea512a3e3a56da25ee729213427ecb3ec6380"/>
@@ -30974,6 +31260,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Heroes (USA, Prototype, 19940307)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="world heroes (usa) (prototype - mar 07, 1994).bin" size="2097152" crc="45c29350" sha1="f479d845e22dd22f9adf94bf961585bec937898f"/>
@@ -30985,6 +31272,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Heroes (USA, Prototype, 19940309)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="world heroes (usa) (prototype - mar 09, 1994).bin" size="2097152" crc="2c7f9e64" sha1="cf7ab91e4cca7f3ab7203d2468e8375adb8fd7c0"/>
@@ -30996,6 +31284,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Heroes (USA, Prototype, 19940315)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="world heroes (usa) (prototype - mar 15, 1994).bin" size="2097152" crc="2c0b2f4f" sha1="d02031fe3130d3d313ab2262e82abb0d921a971c"/>
@@ -31007,6 +31296,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Heroes (USA, Prototype, 19940316)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="world heroes (usa) (prototype - mar 16, 1994).bin" size="2097152" crc="19c74e2a" sha1="592e3500a2700059efc878c4360070c5b9f4b056"/>
@@ -31018,6 +31308,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Heroes (USA, Prototype, 19940318)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="world heroes (usa) (prototype - mar 18, 1994).bin" size="2097152" crc="2bc2a6bb" sha1="fa925428f0f9b651a2037aa3bd3e05e6f22183d8"/>
@@ -31029,6 +31320,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Heroes (USA, Prototype, 19940322, broken - C07 missing)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="world heroes (usa) (prototype - mar 22, 1994) (broken - c07 missing).bin" size="2097152" crc="5c3c0931" sha1="0bd56a492bc9adf862d4b745e6e66909b8acc0d2"/>
@@ -31040,6 +31332,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Heroes (USA, Prototype, 19940323)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="world heroes (usa) (prototype - mar 23, 1994).bin" size="2097152" crc="587e6739" sha1="2d0fa212a52a1b418fb061926d515200b3a511fa"/>
@@ -31051,6 +31344,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Heroes (USA, Prototype, 19940324)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="world heroes (usa) (prototype - mar 24, 1994).bin" size="2097152" crc="8a656942" sha1="4a03d5d1b5e629ae69f9f8c5f0cbc96bf46a3843"/>
@@ -31062,6 +31356,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Heroes (USA, Prototype, 19940330)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="world heroes (usa) (prototype - mar 30, 1994).bin" size="2097152" crc="50c797cb" sha1="8c4dc2b06e0734fc8e39997f8da6295d187e316e"/>
@@ -31085,6 +31380,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World of Illusion Starring Mickey Mouse and Donald Duck (USA, Kor)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="world of illusion starring mickey mouse and donald duck (usa, kor).bin" size="1048576" crc="921ebd1c" sha1="adb0a2edebb6f978c3217075a2f29003a8b025c6"/>
@@ -31110,6 +31406,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball '95 (USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -31124,6 +31421,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball '95 (USA, Prototype, 19941208)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="world series baseball '95 (prototype - dec 08, 1994).bin" size="3145728" crc="8846b050" sha1="aad244dcad0e5d4ca72e480cd5f18c7977d2a02f"/>
@@ -31135,6 +31433,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball '95 (USA, Prototype, 19941214)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="world series baseball '95 (prototype - dec 14, 1994).bin" size="3145728" crc="385be354" sha1="406b2d3540c4664356044c38cf4613bd8f76aefa"/>
@@ -31146,6 +31445,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball '95 (USA, Prototype, 19941228-SB)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -31160,6 +31460,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball '95 (USA, Prototype, 19950202)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -31174,6 +31475,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball '95 (USA, Prototype, 19950203)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -31188,6 +31490,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball '95 (USA, Prototype, 19950207)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -31202,6 +31505,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball '95 (USA, Prototype, 19950209-B)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -31216,6 +31520,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball '95 (USA, Prototype, 19950209)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -31230,6 +31535,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball '95 (USA, Prototype, 19950211)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -31244,6 +31550,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball '95 (USA, Prototype, 19950212)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -31258,6 +31565,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball '95 (USA, Prototype, 19950213)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -31272,6 +31580,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball '95 (USA, Prototype, 19950214)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -31286,6 +31595,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball '95 (USA, Prototype, 19950101-TST)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -31300,6 +31610,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball '95 (USA, Prototype, 19950103-TST)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -31314,6 +31625,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball '95 (USA, Prototype, 19950105)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -31328,6 +31640,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball '95 (USA, Prototype, 19950109-TST)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -31342,6 +31655,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball '95 (USA, Prototype, 19950110)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -31356,6 +31670,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball '95 (USA, Prototype, 19950114-RM)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3151446">
 				<rom name="world series baseball '95 (prototype - jan 14, 1995 - rm).bin" size="3151445" crc="f70b07cf" sha1="b301931fdee91cf8b67f9de4e6935310e643078b"/>
@@ -31367,6 +31682,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball '95 (USA, Prototype, 19950116)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -31381,6 +31697,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball '95 (USA, Prototype, 19950118-RM)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3154900">
 				<rom name="world series baseball '95 (prototype - jan 18, 1995 - rm).bin" size="3154899" crc="5ce70f8f" sha1="f9e1e8424e12ca7c95e926e3bb4d24233eb09c5d"/>
@@ -31392,6 +31709,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball '95 (USA, Prototype, 19950120)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<!-- Compatibility not enforced -->
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -31406,6 +31724,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball '95 (USA, Prototype, 19950125)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -31420,6 +31739,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball '95 (USA, Prototype, 19950130)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -31448,6 +31768,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -31473,6 +31794,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball (USA, Prototype, 19931226)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -31487,6 +31809,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball (USA, Prototype, 19931229)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -31501,6 +31824,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball (USA, Prototype, 19940218)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -31515,6 +31839,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball (USA, Prototype, 19940103)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -31529,6 +31854,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball (USA, Prototype, 19940106)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -31543,6 +31869,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball (USA, Prototype, 19940116)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -31568,6 +31895,7 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 		<description>World Series Baseball (USA, Prototype, 19940527)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -31602,9 +31930,11 @@ Unsupported Mega-CD/Wondermega cart allowing EBXA format to be played back
 	</software>
 
 	<software name="wormsp" cloneof="worms">
+		<!-- TODO: Claims USA really, dumper mistake? -->
 		<description>Worms (Euro, Prototype)</description>
 		<year>1995</year>
 		<publisher>Ocean</publisher>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="worms (euro) (beta).bin" size="2097152" crc="1d191694" sha1="23127e9b3a98eea13fb97bed2d8e206adb495d97"/>
@@ -33259,8 +33589,13 @@ https://bootleggames.fandom.com/wiki/Super_Bubble_Bobble_MD
 
 	<software name="dynoblaz">
 		<description>Dyno Blaze (Early Prototype)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995?</year>
+		<publisher>Virgin Interactive</publisher>
+		<notes><![CDATA[
+https://segaretro.org/DynoBlaze
+Boots to a pink screen (btanb)
+]]></notes>
+		<info name="developer" value="Bonsai Entertainment"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1511878">
 				<rom name="dyno blaze (proto).bin" size="1511878" crc="d625e584" sha1="c5f01dcfbf01d9a3b08e4d6ebe0c460cc3508413"/>
@@ -34150,10 +34485,16 @@ https://segaretro.org/Shin_Samurai_Spirits_Haohmaru_Jigokuhen
 	</software>
 
 	<software name="spongbob" cloneof="coolspot">
-		<description>Sponge Bob (Rus)</description>
-		<year>199?</year>
+		<description>SpongeBob SquarePants (Rus)</description>
+		<year>2012?</year>
+		<!-- Kudos -->
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<notes><![CDATA[
+https://bootleggames.fandom.com/wiki/SpongeBob_SquarePants
+]]></notes>
 		<info name="alt_title" value="Губка Боб"/>
+		<!-- compatibility enforced even if it's a bootleg -->
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="sponge bob.bin" size="1048576" crc="c5437496" sha1="1f6fc731c958957d0e28115bac0376b9fd35af81" offset="00000"/>
@@ -34634,6 +34975,9 @@ This dump is either a bad dump or a wrongly patched one.
 		<description>Sonic Jam 6 (Bad?)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<notes><![CDATA[
+Black screen
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="sonic jam 6 (unl).bin" size="2097152" crc="bf39d897" sha1="3a6fe5a92dc2ada7e9ab17ac120c7e50d1f9a1ed"/>
