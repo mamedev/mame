@@ -1341,7 +1341,7 @@ license:CC0
 			May 1988
 	-->
 	<software name="bpfeb88">
-		<description>Byte Power (Febuary 1988)</description>
+		<description>Byte Power (February 1988)</description>
 		<year>1988</year>
 		<publisher>Byte Power</publisher>
 		<part name="cass" interface="spectrum_cass">
