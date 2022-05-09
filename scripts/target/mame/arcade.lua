@@ -4527,8 +4527,6 @@ createMAMEProjects(_target, _subtarget, "yunsung")
 files {
 	MAME_DIR .. "src/mame/drivers/nmg5.cpp",
 	MAME_DIR .. "src/mame/drivers/paradise.cpp",
-	MAME_DIR .. "src/mame/includes/paradise.h",
-	MAME_DIR .. "src/mame/video/paradise.cpp",
 	MAME_DIR .. "src/mame/drivers/yunsung8.cpp",
 	MAME_DIR .. "src/mame/drivers/yunsun16.cpp",
 	MAME_DIR .. "src/mame/includes/yunsun16.h",
