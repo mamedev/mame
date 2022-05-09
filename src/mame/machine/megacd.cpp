@@ -1789,8 +1789,8 @@ void sega_segacd_device::device_reset()
 	// I'm not sure what the source of this timing problem is, it's not using IRQ3 or StopWatch at the
 	// time.  Changing the CDHock timer to 50hz from 75hz also stops the hang, but then the video is
 	// too slow and has bad sound.  -- Investigate!
-
-	m_scdcpu->set_clock_scale(1.5000f);
+	// Update: removed, otherwise megacdj and megacd2j will black screen with no cdrom inserted.
+	//m_scdcpu->set_clock_scale(1.5000f);
 
 
 	// initialize some stuff on reset
