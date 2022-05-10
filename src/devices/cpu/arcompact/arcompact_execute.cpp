@@ -1652,7 +1652,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle02(OPS_32)
 	{
 		readdata = READ8(address >> 0);
 
-		if (X && (readdata & 0x80)
+		if (X && (readdata & 0x80))
 		    readdata |= 0xffffff00;
 
 	}
@@ -1660,7 +1660,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle02(OPS_32)
 	{
 		readdata = READ16(address >> 1);		
 		
-		if (X && (readdata & 0x8000)
+		if (X && (readdata & 0x8000))
 		    readdata |= 0xffff0000;
 	}
 	else if (Z == 3)
