@@ -150,15 +150,139 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/4enraya.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
+#include "sound/ay8910.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
-#define MAIN_CLOCK XTAL(8'000'000)
 
+namespace {
+
+class _4enraya_state : public driver_device
+{
+public:
+	_4enraya_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ay(*this, "aysnd")
+		, m_palette(*this, "palette")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_videoram(*this, "videoram", 0x1000, ENDIANNESS_LITTLE)
+		, m_workram(*this, "workram", 0x1000, ENDIANNESS_LITTLE)
+		, m_prom(*this, "pal_prom")
+		, m_rom(*this, "maincpu")
+	{
+	}
+
+	void _4enraya(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+	void videoram_w(offs_t offset, uint8_t data);
+
+	void video(machine_config &config);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<ay8910_device> m_ay;
+	required_device<palette_device> m_palette;
+
+private:
+	required_device<gfxdecode_device> m_gfxdecode;
+
+	// memory pointers
+	memory_share_creator<uint8_t> m_videoram;
+	memory_share_creator<uint8_t> m_workram;
+
+	optional_region_ptr<uint8_t> m_prom;
+	optional_region_ptr<uint8_t> m_rom;
+
+	// video-related
+	tilemap_t *m_bg_tilemap = nullptr;
+
+	// sound-related
+	uint8_t m_soundlatch = 0U;
+
+	void sound_data_w(uint8_t data);
+	uint8_t fenraya_custom_map_r(offs_t offset);
+	void fenraya_custom_map_w(offs_t offset, uint8_t data);
+	void sound_control_w(uint8_t data);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void main_map(address_map &map);
+	void main_portmap(address_map &map);
+};
+
+class unk_gambl_state : public _4enraya_state
+{
+public:
+	unk_gambl_state(const machine_config &mconfig, device_type type, const char *tag)
+		: _4enraya_state(mconfig, type, tag)
+	{
+	}
+
+	void unkpacg(machine_config &config);
+	void unkpacga(machine_config &config);
+	void tourpgum(machine_config &config);
+	void chicgum(machine_config &config);
+
+private:
+	void unkpacg_main_map(address_map &map);
+	void unkpacga_main_map(address_map &map);
+	void tourpgum_main_map(address_map &map);
+
+	void unkpacg_main_portmap(address_map &map);
+};
+
+class unk_gambl_enc_state : public unk_gambl_state
+{
+public:
+	unk_gambl_enc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: unk_gambl_state(mconfig, type, tag)
+	{
+	}
+
+private:
+	void driver_init() override;
+};
+
+
+// video
+
+void _4enraya_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[(offset & 0x3ff) * 2] = data;
+	m_videoram[(offset & 0x3ff) * 2 + 1] = (offset & 0xc00) >> 10;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
+}
+
+TILE_GET_INFO_MEMBER(_4enraya_state::get_tile_info)
+{
+	int code = m_videoram[tile_index * 2] + (m_videoram[tile_index * 2 + 1] << 8);
+	tileinfo.set(0, code, 0, 0);
+}
+
+void _4enraya_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(_4enraya_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+}
+
+uint32_t _4enraya_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}
+
+
+// machine
 
 /***********************************
 *         Custom Handlers          *
@@ -242,7 +366,7 @@ void _4enraya_state::fenraya_custom_map_w(offs_t offset, uint8_t data)
 
 	if (prom_routing & 8) // gfx control / RAM wait
 	{
-		fenraya_videoram_w(offset & 0xfff, data);
+		videoram_w(offset & 0xfff, data);
 	}
 }
 
@@ -271,7 +395,7 @@ void unk_gambl_state::unkpacg_main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x6000, 0x67ff).ram().share("nvram");
-	map(0x7000, 0x7fff).w(FUNC(_4enraya_state::fenraya_videoram_w));
+	map(0x7000, 0x7fff).w(FUNC(unk_gambl_state::videoram_w));
 	map(0x8000, 0x9fff).rom();
 }
 
@@ -279,7 +403,7 @@ void unk_gambl_state::unkpacga_main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom().region("maincpu", 0x6000);
 	map(0x6000, 0x67ff).ram().share("nvram");
-	map(0x7000, 0x7fff).w(FUNC(_4enraya_state::fenraya_videoram_w));
+	map(0x7000, 0x7fff).w(FUNC(unk_gambl_state::videoram_w));
 	map(0x8000, 0xffff).rom().region("maincpu", 0x8000);
 }
 
@@ -287,7 +411,7 @@ void unk_gambl_state::tourpgum_main_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x6000, 0x67ff).ram().share("nvram");
-	map(0x7000, 0x7fff).w(FUNC(_4enraya_state::fenraya_videoram_w));
+	map(0x7000, 0x7fff).w(FUNC(unk_gambl_state::videoram_w));
 }
 
 void unk_gambl_state::unkpacg_main_portmap(address_map &map)
@@ -512,7 +636,7 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( gfx_4enraya )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chars", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -522,8 +646,6 @@ GFXDECODE_END
 
 void _4enraya_state::machine_start()
 {
-	save_item(NAME(m_videoram));
-	save_item(NAME(m_workram));
 	save_item(NAME(m_soundlatch));
 }
 
@@ -537,15 +659,15 @@ void _4enraya_state::machine_reset()
 *         Machine Drivers          *
 ***********************************/
 
-void _4enraya_state::_4enraya_video(machine_config &config)
+void _4enraya_state::video(machine_config &config)
 {
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(_4enraya_state::screen_update_4enraya));
+	screen.set_screen_update(FUNC(_4enraya_state::screen_update));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_4enraya);
@@ -554,19 +676,21 @@ void _4enraya_state::_4enraya_video(machine_config &config)
 }
 
 
+static constexpr XTAL MAIN_CLOCK = XTAL(8'000'000);
+
 void _4enraya_state::_4enraya(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, MAIN_CLOCK/2);
+	// basic machine hardware
+	Z80(config, m_maincpu, MAIN_CLOCK / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &_4enraya_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &_4enraya_state::main_portmap);
 	m_maincpu->set_periodic_int(FUNC(_4enraya_state::irq0_line_hold), attotime::from_hz(4*60)); // unknown timing
 
-	_4enraya_video(config);
+	video(config);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	AY8910(config, m_ay, MAIN_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.3); /* guess */
+	AY8910(config, m_ay, MAIN_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 0.3); // guess
 }
 
 
@@ -574,13 +698,13 @@ void unk_gambl_state::unkpacg(machine_config &config)
 {
 	_4enraya(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &unk_gambl_state::unkpacg_main_map);
 	m_maincpu->set_addrmap(AS_IO, &unk_gambl_state::unkpacg_main_portmap);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* sound hardware */
-	AY8910(config.replace(), m_ay, MAIN_CLOCK/4); /* guess */
+	// sound hardware
+	AY8910(config.replace(), m_ay, MAIN_CLOCK / 4); // guess
 	m_ay->port_a_read_callback().set_ioport("DSW2");
 	m_ay->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -589,25 +713,25 @@ void unk_gambl_state::unkpacga(machine_config &config)
 {
 	unkpacg(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &unk_gambl_state::unkpacga_main_map);
 }
 
 void unk_gambl_state::tourpgum(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(18'000'000)/4); // can only see an 18Mhz XTAL on this PCB?
+	// basic machine hardware
+	Z80(config, m_maincpu, XTAL(18'000'000) / 4); // can only see an 18Mhz XTAL on this PCB?
 	m_maincpu->set_addrmap(AS_PROGRAM, &unk_gambl_state::tourpgum_main_map);
 	m_maincpu->set_addrmap(AS_IO, &unk_gambl_state::unkpacg_main_portmap);
 	m_maincpu->set_periodic_int(FUNC(_4enraya_state::irq0_line_hold), attotime::from_hz(4*60)); // unknown timing
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	_4enraya_video(config);
+	video(config);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	AY8910(config, m_ay, XTAL(18'000'000)/4/4).add_route(ALL_OUTPUTS, "mono", 1.0); /* guess */
+	AY8910(config, m_ay, XTAL(18'000'000) / 4 / 4).add_route(ALL_OUTPUTS, "mono", 1.0); // guess
 	m_ay->port_a_read_callback().set_ioport("DSW2");
 	m_ay->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -628,13 +752,13 @@ ROM_START( 4enraya )
 	ROM_LOAD( "5.bin",   0x0000, 0x8000, CRC(cf1cd151) SHA1(3920b0a6ed5798859158871b578b01ec742b0d13) )
 	ROM_LOAD( "4.bin",   0x8000, 0x4000, CRC(f9ec1be7) SHA1(189159129ecbc4f6909c086867b0e02821f5b976) )
 
-	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_REGION( 0x6000, "chars", 0 )
 	ROM_LOAD( "1.bin",   0x0000, 0x2000, CRC(0e5072fd) SHA1(0960e81f7fd52b38111eab2c124cfded5b35aa0b) )
 	ROM_LOAD( "2.bin",   0x2000, 0x2000, CRC(2b0a3793) SHA1(2c3d224251557824bb9641dc2f98a000ab72c4a2) )
 	ROM_LOAD( "3.bin",   0x4000, 0x2000, CRC(f6940836) SHA1(afde21ffa0c141cf73243e50da62ecfd474aaac2) )
 
 	ROM_REGION( 0x0020,  "pal_prom", 0 )
-	ROM_LOAD( "1.bpr",   0x0000, 0x0020, CRC(dcbd2352) SHA1(ce72e84129ed1b455aaf648e1dfaa4333e7e7628) ) /* system control: used for memory mapping */
+	ROM_LOAD( "1.bpr",   0x0000, 0x0020, CRC(dcbd2352) SHA1(ce72e84129ed1b455aaf648e1dfaa4333e7e7628) ) // system control: used for memory mapping
 ROM_END
 
 ROM_START( 4enrayaa )
@@ -642,13 +766,13 @@ ROM_START( 4enrayaa )
 	ROM_LOAD( "5.bin",   0x0000, 0x8000, CRC(76e8656c) SHA1(8c92bf083abe5f669b1bff47444294820b711f1a) ) // sldh
 	ROM_LOAD( "4.bin",   0x8000, 0x4000, CRC(f9ec1be7) SHA1(189159129ecbc4f6909c086867b0e02821f5b976) )
 
-	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_REGION( 0x6000, "chars", 0 )
 	ROM_LOAD( "1.bin",   0x0000, 0x2000, CRC(0e5072fd) SHA1(0960e81f7fd52b38111eab2c124cfded5b35aa0b) )
 	ROM_LOAD( "2.bin",   0x2000, 0x2000, CRC(2b0a3793) SHA1(2c3d224251557824bb9641dc2f98a000ab72c4a2) )
 	ROM_LOAD( "3.bin",   0x4000, 0x2000, CRC(f6940836) SHA1(afde21ffa0c141cf73243e50da62ecfd474aaac2) )
 
 	ROM_REGION( 0x0020,  "pal_prom", 0 )
-	ROM_LOAD( "1.bpr",   0x0000, 0x0020, CRC(dcbd2352) SHA1(ce72e84129ed1b455aaf648e1dfaa4333e7e7628) ) /* system control: used for memory mapping */
+	ROM_LOAD( "1.bpr",   0x0000, 0x0020, CRC(dcbd2352) SHA1(ce72e84129ed1b455aaf648e1dfaa4333e7e7628) ) // system control: used for memory mapping
 ROM_END
 
 /*  ________________________________________________________________________________________________________
@@ -695,7 +819,7 @@ ROM_START( tourpgum )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "4.ic52",   0x0000, 0x8000, CRC(58d68a5a) SHA1(e1eb9113d6ebb1cedf5c6724c15b96934e357504) )
 
-	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_REGION( 0x18000, "chars", 0 )
 	ROM_LOAD( "1_tourvision.ic19",   0x00000, 0x8000, CRC(dbfb5b72) SHA1(efdc66f2288cd66f0b91211d3d1e7e6b20079ab1) )
 	ROM_LOAD( "2_tourvision.ic18",   0x08000, 0x8000, CRC(af25ed99) SHA1(9605b36151791b84c2d0648070b0f97e31300dbb) )
 	ROM_LOAD( "3_tourvision.ic17",   0x10000, 0x8000, CRC(0b081663) SHA1(86dbf69e819ced12ac7cb7a4839fe0ba677580ae) )
@@ -705,7 +829,7 @@ ROM_START( chicgum )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "k13.ic52", 0x0000, 0x8000, CRC(3e01a610) SHA1(86be3d1c3a9810f29701c22d79f262c7e89a2b9b) ) // 1xxxxxxxxxxxxxx = 0x00
 
-	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_REGION( 0x18000, "chars", 0 )
 	ROM_LOAD( "kb.ic19", 0x02000, 0x6000, CRC(90eaa64b) SHA1(867d94a65d7350fa3c0cf84f081056b035385a4a) ) // 00xxxxxxxxxxxxx = 0x00
 	ROM_CONTINUE(        0x00000, 0x2000 )
 	ROM_LOAD( "kg.ic18", 0x0a000, 0x6000, CRC(0f1394b9) SHA1(9c21b03b080d007ff3c9ec93881efd11a5740bd4) ) // 00xxxxxxxxxxxxx = 0x00
@@ -718,7 +842,7 @@ ROM_START( strker )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic52",   0x0000, 0x8000, CRC(745beb7f) SHA1(1ead50897d27e338b768b0335d4dbd9581c93372) ) // 1ST AND 2ND HALF IDENTICAL
 
-	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_REGION( 0x18000, "chars", 0 )
 	ROM_LOAD( "1.ic19",   0x2000, 0x2000, CRC(30b66fcd) SHA1(42b2fb20036e0126abf44b39855eaab449206c71) ) // 1ST AND 2ND HALF IDENTICAL
 	ROM_CONTINUE(         0x2000, 0x4000 )
 	ROM_CONTINUE(         0x6000, 0x2000 )
@@ -744,7 +868,7 @@ ROM_START(unkpacg)
 	ROM_LOAD( "1.u14",   0x0000, 0x2000, CRC(848c4143) SHA1(3cff26181c58e5f52f1ac81df7d5d43e644585a2) )
 	ROM_LOAD( "2.u46",   0x8000, 0x2000, CRC(9e6e0bd3) SHA1(f502132a0460108dad243632cc13d9116c534291) )
 
-	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_REGION( 0x6000, "chars", 0 )
 	ROM_LOAD( "3.u20",   0x2000, 0x2000, CRC(d00b04ea) SHA1(e65901d8586507257d74ab103001207e28fa28af) )
 	ROM_LOAD( "4.u19",   0x4000, 0x2000, CRC(4a123a3d) SHA1(26300b8af0d0df0023a153a212699727311d1b74) )
 	ROM_LOAD( "5.u18",   0x0000, 0x2000, CRC(44f272d2) SHA1(b39cbc1f290d9fb2453396906e4da4a682c41ef4) )
@@ -755,7 +879,7 @@ ROM_START(unkpacga)
 	ROM_LOAD( "p1.bin",  0x0000, 0x8000, CRC(386bd2da) SHA1(fa786c25dd5ec1a26ebe021ca701dccebfcbb64f) )  // first 0x5fff are 0xff filled
 	ROM_LOAD( "p2.bin",  0x8000, 0x8000, CRC(7878d7f3) SHA1(cacdd4b8e33a93e2913d0f5d740195ef0f439031) )
 
-	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_REGION( 0x6000, "chars", 0 )
 	ROM_LOAD( "r.bin",   0x0000, 0x2000, CRC(b0d7b67a) SHA1(87bd150ed46d1346a363dc45c226e72967426f2a) ) // 1ST AND 2ND HALF IDENTICAL
 	ROM_CONTINUE(        0x0000, 0x2000)
 	ROM_IGNORE(0x4000)
@@ -772,7 +896,7 @@ ROM_START(unkpacgb)
 	ROM_LOAD( "p1.bin",  0x0000, 0x8000, CRC(5cc6b5e1) SHA1(80325eef389f7d6a8c78531fdc6e5b73721eb0b1) )
 	ROM_LOAD( "p2.bin",  0x8000, 0x8000, CRC(06b42740) SHA1(0639ec2e31bd81e85a45689929bb67a61599497c) )
 
-	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_REGION( 0x6000, "chars", 0 )
 	ROM_LOAD( "r.bin",   0x0000, 0x2000, CRC(b0d7b67a) SHA1(87bd150ed46d1346a363dc45c226e72967426f2a) ) // 1ST AND 2ND HALF IDENTICAL
 	ROM_CONTINUE(        0x0000, 0x2000)
 	ROM_IGNORE(0x4000)
@@ -789,7 +913,7 @@ ROM_START(unkpacgc)
 	ROM_LOAD( "4",   0x0000, 0x2000, CRC(9f620694) SHA1(957d5c6636d40a74579d3f20be8f0b7e58516935) )
 	ROM_LOAD( "5",   0x8000, 0x2000, CRC(b107ad7e) SHA1(33ab0a63f8a57dd7efd5c5efae7c6e8bda1a65cc) )
 
-	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_REGION( 0x6000, "chars", 0 )
 	ROM_LOAD( "1",   0x2000, 0x2000, CRC(d00b04ea) SHA1(e65901d8586507257d74ab103001207e28fa28af) )
 	ROM_LOAD( "2",   0x4000, 0x2000, CRC(4a123a3d) SHA1(26300b8af0d0df0023a153a212699727311d1b74) )
 	ROM_LOAD( "3",   0x0000, 0x2000, CRC(f7cd9de0) SHA1(e0a6b316811ef7c3d3aeb853a9c50f9fdf1f2ff2) )
@@ -797,7 +921,7 @@ ROM_END
 
 /*
   Unknown 'Space Invaders' gambling game.
-  All roms are 0x8000 but only the last 0x2000 of each is used.
+  All ROMs are 0x8000 but only the last 0x2000 of each is used.
 */
 ROM_START( unksig )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -810,7 +934,7 @@ ROM_START( unksig )
 	ROM_CONTINUE(       0x8000, 0x2000)
 	ROM_CONTINUE(       0x8000, 0x2000) // only data here matters
 
-	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_REGION( 0x6000, "chars", 0 )
 	ROM_LOAD( "r.bin", 0x0000, 0x2000, CRC(f8a358fe) SHA1(5c4051de156014a5c2400f4934e2136b38bfed8c) )
 	ROM_CONTINUE(      0x0000, 0x2000)
 	ROM_CONTINUE(      0x0000, 0x2000)
@@ -827,7 +951,7 @@ ROM_END
 
 /*
   Unknown 'Space Invaders' gambling game
-  All roms are 0x10000 but with a lot of addressing issues
+  All ROMs are 0x10000 but with a lot of addressing issues
 
   1.bin    BADADDR    ---xxxxxxxxxxxxx
   2.bin    BADADDR    ---xxxxxxxxxxxxx
@@ -835,7 +959,7 @@ ROM_END
   r.bin    BADADDR    x-xxxxxxxxxxxxxx
   v.bin    BADADDR    x-xxxxxxxxxxxxxx
 
-  The game has both (space invaders & pac-man) graphics sets.
+  The game has both (Space Invaders & Pac-Man) graphics sets.
   Maybe a leftover?...
 
 */
@@ -846,7 +970,7 @@ ROM_START( unksiga )
 	ROM_LOAD( "2.bin",  0x8000, 0x2000, CRC(970632fd) SHA1(2aa69fda1dce201856b237ecbedfdcde470a4bb3) )  // 0x2000 of data repeated along the dump
 	ROM_IGNORE(                 0xe000)   /* Identical 0x2000 segments */
 
-	ROM_REGION( 0xc000, "gfx1", 0 )
+	ROM_REGION( 0xc000, "chars", 0 )
 /*  tileset 0000-03ff = Space Invaders GFX.
     tileset 0400-07ff = Pac-Man GFX.
 */
@@ -864,6 +988,23 @@ ROM_START( unksiga )
 	ROM_IGNORE(                0x4000) // dupe
 ROM_END
 
+ROM_START( unksigb ) // this set has been found with GFX ROMs of different sizes, but same relevant data. Program ROM isn't encrypted and has further differences to the two other sets.
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u144",  0x8000, 0x2000, CRC(8f19f1d3) SHA1(6c7364cdb68974ac600c75d4b8c7646a7f218e27) )
+	ROM_CONTINUE(      0x0000, 0x2000 )
+	ROM_IGNORE(                0x4000 ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x6000, "chars", 0 )
+	ROM_LOAD( "u172", 0x0000, 0x2000, CRC(f8a358fe) SHA1(5c4051de156014a5c2400f4934e2136b38bfed8c) )
+	ROM_CONTINUE(     0x0000, 0x2000)
+	ROM_CONTINUE(     0x0000, 0x2000)
+	ROM_CONTINUE(     0x0000, 0x2000) // only data here matters
+	ROM_LOAD( "u171", 0x2000, 0x2000, CRC(56ac5874) SHA1(7ae63f930b07cb1b4989c8328fcc3627d8ff68f8) )
+	ROM_CONTINUE(     0x2000, 0x2000)
+	ROM_CONTINUE(     0x2000, 0x2000)
+	ROM_CONTINUE(     0x2000, 0x2000) // only data here matters
+	ROM_LOAD( "u170", 0x4000, 0x2000, CRC(f9c686fc) SHA1(b34412be047e04fc6aca218adf61bbe233908bd7) )
+ROM_END
 
 /***********************************
 *          Driver Init             *
@@ -871,20 +1012,20 @@ ROM_END
 
 void unk_gambl_enc_state::driver_init()
 {
-	_4enraya_state::driver_init();
-
-	// descramble rom
+	// descramble ROM
 	uint8_t *rom = memregion("maincpu")->base();
 	for (int i = 0x8000; i < 0x10000; i++)
-		rom[i] = bitswap<8>(rom[i], 7,6,5,4,3,2,0,1);
+		rom[i] = bitswap<8>(rom[i], 7, 6, 5, 4, 3, 2, 0, 1);
 }
+
+} // anonymous namespace
 
 
 /***********************************
 *           Game Drivers           *
 ***********************************/
 
-/*    YEAR  NAME       PARENT   MACHINE   INPUT     CLASS            INIT        ROT   COMPANY      FULLNAME                                          FLAGS  */
+//    YEAR  NAME       PARENT   MACHINE   INPUT     CLASS            INIT        ROT   COMPANY      FULLNAME                                          FLAGS
 GAME( 1990, 4enraya,   0,       _4enraya, 4enraya,  _4enraya_state,  empty_init, ROT0, "IDSA",      "4 En Raya (set 1)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1990, 4enrayaa,  4enraya, _4enraya, 4enraya,  _4enraya_state,  empty_init, ROT0, "IDSA",      "4 En Raya (set 2)",                              MACHINE_SUPPORTS_SAVE )
 
@@ -897,5 +1038,6 @@ GAME( 199?, unkpacgb,  unkpacg, unkpacg,  unkpacg,  unk_gambl_enc_state, empty_i
 GAME( 1988, unkpacgc,  unkpacg, unkpacg,  unkpacg,  unk_gambl_state,     empty_init, ROT0, "<unknown>", "Coco Louco",                              MACHINE_SUPPORTS_SAVE )
 GAME( 199?, unkpacga,  unkpacg, unkpacga, unkpacg,  unk_gambl_enc_state, empty_init, ROT0, "IDI SRL",   "Pucman",                                  MACHINE_SUPPORTS_SAVE )
 
-GAME( 199?, unksig,    0,       unkpacg,  unkfr,    unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unksiga,   unksig,  unkpacg,  unkfr,    unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unksig,    0,       unkpacg,  unkfr,    unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (encrypted, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unksiga,   unksig,  unkpacg,  unkfr,    unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (encrypted, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unksigb,   unksig,  unkpacg,  unkfr,    unk_gambl_state,     empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (unencrypted)",      MACHINE_SUPPORTS_SAVE )
