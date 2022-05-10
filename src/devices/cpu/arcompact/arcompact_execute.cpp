@@ -1826,6 +1826,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_helper(OPS_32, const char
 	}
 	else if (p == 1)
 	{
+	    
 	}
 	else if (p == 2)
 	{
@@ -2567,7 +2568,10 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_05_p00(OPS_32)
 
 	if (F)
 	{
-		arcompact_fatal("arcompact_handle04_05 (OR) (F set)\n"); // not yet supported
+	        if (result & 0x80000000) { STATUS32_SET_N; }
+		else { STATUS32_CLEAR_N; }
+		if (result == 0x00000000) { STATUS32_SET_Z; }
+		else { STATUS32_CLEAR_Z; }
 	}
 	return m_pc + (size >> 0);
 }
@@ -2608,7 +2612,10 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_05_p01(OPS_32)
 
 	if (F)
 	{
-		arcompact_fatal("arcompact_handle04_05 (OR) (F set)\n"); // not yet supported
+		if (result & 0x80000000) { STATUS32_SET_N; }
+		else { STATUS32_CLEAR_N; }
+		if (result == 0x00000000) { STATUS32_SET_Z; }
+		else { STATUS32_CLEAR_Z; }
 	}
 	return m_pc + (size >> 0);
 }
@@ -2648,7 +2655,10 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_05_p10(OPS_32)
 
 	if (F)
 	{
-		arcompact_fatal("arcompact_handle04_05 (OR) (F set)\n"); // not yet supported
+		if (result & 0x80000000) { STATUS32_SET_N; }
+		else { STATUS32_CLEAR_N; }
+		if (result == 0x00000000) { STATUS32_SET_Z; }
+		else { STATUS32_CLEAR_Z; }
 	}
 	return m_pc + (size >> 0);
 }
@@ -2701,7 +2711,10 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_05_p11_m1(OPS_32)
 
 	if (F)
 	{
-		arcompact_fatal("arcompact_handle04_05 (OR) (F set)\n"); // not yet supported
+		if (result & 0x80000000) { STATUS32_SET_N; }
+		else { STATUS32_CLEAR_N; }
+		if (result == 0x00000000) { STATUS32_SET_Z; }
+		else { STATUS32_CLEAR_Z; }
 	}
 	return m_pc + (size >> 0);
 }
@@ -2753,7 +2766,10 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_06_p00(OPS_32)
 
 	if (F)
 	{
-		arcompact_fatal("arcompact_handle04_06 (BIC) (F set)\n"); // not yet supported
+		if (result & 0x80000000) { STATUS32_SET_N; }
+		else { STATUS32_CLEAR_N; }
+		if (result == 0x00000000) { STATUS32_SET_Z; }
+		else { STATUS32_CLEAR_Z; }
 	}
 	return m_pc + (size >> 0);
 }
@@ -2794,7 +2810,10 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_06_p01(OPS_32)
 
 	if (F)
 	{
-		arcompact_fatal("arcompact_handle04_06 (BIC) (F set)\n"); // not yet supported
+		if (result & 0x80000000) { STATUS32_SET_N; }
+		else { STATUS32_CLEAR_N; }
+		if (result == 0x00000000) { STATUS32_SET_Z; }
+		else { STATUS32_CLEAR_Z; }
 	}
 	return m_pc + (size >> 0);
 }
@@ -2834,7 +2853,10 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_06_p10(OPS_32)
 
 	if (F)
 	{
-		arcompact_fatal("arcompact_handle04_06 (BIC) (F set)\n"); // not yet supported
+		if (result & 0x80000000) { STATUS32_SET_N; }
+		else { STATUS32_CLEAR_N; }
+		if (result == 0x00000000) { STATUS32_SET_Z; }
+		else { STATUS32_CLEAR_Z; }
 	}
 	return m_pc + (size >> 0);
 }
@@ -2887,7 +2909,10 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_06_p11_m1(OPS_32)
 
 	if (F)
 	{
-		arcompact_fatal("arcompact_handle04_06 (BIC) (F set)\n"); // not yet supported
+		if (result & 0x80000000) { STATUS32_SET_N; }
+		else { STATUS32_CLEAR_N; }
+		if (result == 0x00000000) { STATUS32_SET_Z; }
+		else { STATUS32_CLEAR_Z; }
 	}
 	return m_pc + (size >> 0);
 }
@@ -2939,7 +2964,10 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_07_p00(OPS_32)
 
 	if (F)
 	{
-		arcompact_fatal("arcompact_handle04_07 (XOR) (F set)\n"); // not yet supported
+		if (result & 0x80000000) { STATUS32_SET_N; }
+		else { STATUS32_CLEAR_N; }
+		if (result == 0x00000000) { STATUS32_SET_Z; }
+		else { STATUS32_CLEAR_Z; }
 	}
 	return m_pc + (size >> 0);
 }
@@ -2980,7 +3008,10 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_07_p01(OPS_32)
 
 	if (F)
 	{
-		arcompact_fatal("arcompact_handle04_07 (XOR) (F set)\n"); // not yet supported
+		if (result & 0x80000000) { STATUS32_SET_N; }
+		else { STATUS32_CLEAR_N; }
+		if (result == 0x00000000) { STATUS32_SET_Z; }
+		else { STATUS32_CLEAR_Z; }
 	}
 	return m_pc + (size >> 0);
 }
@@ -3020,7 +3051,10 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_07_p10(OPS_32)
 
 	if (F)
 	{
-		arcompact_fatal("arcompact_handle04_07 (XOR) (F set)\n"); // not yet supported
+		if (result & 0x80000000) { STATUS32_SET_N; }
+		else { STATUS32_CLEAR_N; }
+		if (result == 0x00000000) { STATUS32_SET_Z; }
+		else { STATUS32_CLEAR_Z; }
 	}
 	return m_pc + (size >> 0);
 }
@@ -3073,7 +3107,10 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_07_p11_m1(OPS_32)
 
 	if (F)
 	{
-		arcompact_fatal("arcompact_handle04_07 (XOR) (F set)\n"); // not yet supported
+		if (result & 0x80000000) { STATUS32_SET_N; }
+		else { STATUS32_CLEAR_N; }
+		if (result == 0x00000000) { STATUS32_SET_Z; }
+		else { STATUS32_CLEAR_Z; }
 	}
 	return m_pc + (size >> 0);
 }
@@ -3451,7 +3488,10 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_0f_p00(OPS_32)
 
 	if (F)
 	{
-		arcompact_fatal("arcompact_handle04_0f (BSET) (F set)\n"); // not yet supported
+		if (result & 0x80000000) { STATUS32_SET_N; }
+		else { STATUS32_CLEAR_N; }
+		if (result == 0x00000000) { STATUS32_SET_Z; }
+		else { STATUS32_CLEAR_Z; }
 	}
 	return m_pc + (size >> 0);
 }
@@ -3492,7 +3532,10 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_0f_p01(OPS_32)
 
 	if (F)
 	{
-		arcompact_fatal("arcompact_handle04_0f (BSET) (F set)\n"); // not yet supported
+		if (result & 0x80000000) { STATUS32_SET_N; }
+		else { STATUS32_CLEAR_N; }
+		if (result == 0x00000000) { STATUS32_SET_Z; }
+		else { STATUS32_CLEAR_Z; }
 	}
 	return m_pc + (size >> 0);
 }
@@ -3532,7 +3575,10 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_0f_p10(OPS_32)
 
 	if (F)
 	{
-		arcompact_fatal("arcompact_handle04_0f (BSET) (F set)\n"); // not yet supported
+		if (result & 0x80000000) { STATUS32_SET_N; }
+		else { STATUS32_CLEAR_N; }
+		if (result == 0x00000000) { STATUS32_SET_Z; }
+		else { STATUS32_CLEAR_Z; }
 	}
 	return m_pc + (size >> 0);
 }
@@ -3585,7 +3631,10 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_0f_p11_m1(OPS_32)
 
 	if (F)
 	{
-		arcompact_fatal("arcompact_handle04_0f (BSET) (F set)\n"); // not yet supported
+		if (result & 0x80000000) { STATUS32_SET_N; }
+		else { STATUS32_CLEAR_N; }
+		if (result == 0x00000000) { STATUS32_SET_Z; }
+		else { STATUS32_CLEAR_Z; }
 	}
 	return m_pc + (size >> 0);
 }
@@ -3637,7 +3686,10 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_13_p00(OPS_32)
 
 	if (F)
 	{
-		arcompact_fatal("arcompact_handle04_13 (BMSK) (F set)\n"); // not yet supported
+		if (result & 0x80000000) { STATUS32_SET_N; }
+		else { STATUS32_CLEAR_N; }
+		if (result == 0x00000000) { STATUS32_SET_Z; }
+		else { STATUS32_CLEAR_Z; }
 	}
 	return m_pc + (size >> 0);
 }
@@ -3678,7 +3730,10 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_13_p01(OPS_32)
 
 	if (F)
 	{
-		arcompact_fatal("arcompact_handle04_13 (BMSK) (F set)\n"); // not yet supported
+		if (result & 0x80000000) { STATUS32_SET_N; }
+		else { STATUS32_CLEAR_N; }
+		if (result == 0x00000000) { STATUS32_SET_Z; }
+		else { STATUS32_CLEAR_Z; }
 	}
 	return m_pc + (size >> 0);
 }
@@ -3718,7 +3773,10 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_13_p10(OPS_32)
 
 	if (F)
 	{
-		arcompact_fatal("arcompact_handle04_13 (BMSK) (F set)\n"); // not yet supported
+		if (result & 0x80000000) { STATUS32_SET_N; }
+		else { STATUS32_CLEAR_N; }
+		if (result == 0x00000000) { STATUS32_SET_Z; }
+		else { STATUS32_CLEAR_Z; }
 	}
 	return m_pc + (size >> 0);
 }
@@ -3771,7 +3829,10 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_13_p11_m1(OPS_32)
 
 	if (F)
 	{
-		arcompact_fatal("arcompact_handle04_13 (BMSK) (F set)\n"); // not yet supported
+		if (result & 0x80000000) { STATUS32_SET_N; }
+		else { STATUS32_CLEAR_N; }
+		if (result == 0x00000000) { STATUS32_SET_Z; }
+		else { STATUS32_CLEAR_Z; }
 	}
 	return m_pc + (size >> 0);
 }
