@@ -853,7 +853,7 @@ void midway_ioasic_device::cage_irq_handler(uint8_t data)
 
 WRITE_LINE_MEMBER(midway_ioasic_device::ioasic_input_empty)
 {
-    LOGFIFO("ioasic_input_empty(%d)\n", state);
+	LOGFIFO("ioasic_input_empty(%d)\n", state);
 	if (state)
 		m_sound_irq_state |= 0x0080;
 	else
@@ -864,7 +864,7 @@ WRITE_LINE_MEMBER(midway_ioasic_device::ioasic_input_empty)
 
 WRITE_LINE_MEMBER(midway_ioasic_device::ioasic_output_full)
 {
-    LOGFIFO("ioasic_output_full(%d)\n", state);
+	LOGFIFO("ioasic_output_full(%d)\n", state);
 	if (state)
 		m_sound_irq_state |= 0x0040;
 	else
