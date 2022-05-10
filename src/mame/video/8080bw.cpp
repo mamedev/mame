@@ -420,17 +420,14 @@ uint32_t _8080bw_state::screen_update_vortex(screen_device &screen, bitmap_rgb32
 			// the video RAM is read at every 8 pixels starting with pixel 4
 			if ((x & 0x07) == 0x04)
 			{
-				offs_t offs = ((offs_t)y << 5) | (x >> 3);
+				offs_t const offs = (offs_t(y) << 5) | (x >> 3);
 				video_data = m_main_ram[offs];
-				uint8_t pix = m_main_ram[offs + 1] & 0x01;
-				if (pix == 0x01)
-					col = rgb_t(0, 255, (((x >> 5) & 0x01) * 255));
-				else
-					col = rgb_t(255, 0, (((x >> 5) & 0x01) * 255));
+				uint8_t const pix = BIT(m_main_ram[offs + 1], 0);
+				col = rgb_t(pix ? 0 : 255, pix ? 255 : 0, BIT(x, 5) ? 255 : 0);
 			}
 
 			// plot the current pixel
-			pen_t pen = (video_data & 0x01) ? col : rgb_t::black();
+			pen_t const pen = BIT(video_data, 0) ? col : rgb_t::black();
 
 			if (m_flip_screen)
 				bitmap.pix(MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - x) = pen;
@@ -438,20 +435,20 @@ uint32_t _8080bw_state::screen_update_vortex(screen_device &screen, bitmap_rgb32
 				bitmap.pix(y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = pen;
 
 			// next pixel
-			video_data = video_data >> 1;
+			video_data >>= 1;
 		}
 
 		// end of line, flush out the shift register
 		for (int i = 0; i < 4; i++)
 		{
-			pen_t pen = (video_data & 0x01) ? col : rgb_t::black();
+			pen_t const pen = BIT(video_data, 0) ? col : rgb_t::black();
 
 			if (m_flip_screen)
 				bitmap.pix(MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - (256 + i)) = pen;
 			else
 				bitmap.pix(y - MW8080BW_VCOUNTER_START_NO_VBLANK, 256 + i) = pen;
 
-			video_data = video_data >> 1;
+			video_data >>= 1;
 		}
 
 		// at next row, video_data is now 0, so the next line will start with 4 blank pixels
