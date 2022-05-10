@@ -1239,17 +1239,6 @@ X-1414 : Streetracer
 		</part>
 	</software>
 
-	<software name="avcspop">
-		<description>Atari VCS Point-of-Purchase ROM</description>
-		<year>1982</year>
-		<publisher>Atari</publisher>
-		<part name="cart" interface="a2600_cart">
-			<dataarea name="rom" size="2048">
-				<rom name="atari vcs point-of-purchase rom.bin" size="2048" crc="9d3cfba6" sha1="b84c34aaedd84fca30b6e8223ee062439acf4fe0"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="avc">
 		<description>Atari Video Cube</description>
 		<year>1982</year>
