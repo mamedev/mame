@@ -131,21 +131,21 @@ int arcompact_device::check_condition(uint8_t condition)
 	switch (condition & 0x1f)
 	{
 		case 0x00: return 1; // AL
-		case 0x01: return CONDITION_EQ;
+		case 0x01: return CONDITION_EQ; // EQ
 		case 0x02: return !CONDITION_EQ; // NE
-		case 0x03: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
+		case 0x03: return !CONDITION_MI; // PL
 		case 0x04: return CONDITION_MI; // MI (N)
 		case 0x05: return CONDITION_CS; // CS (Carry Set / Lower than)
-		case 0x06: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
-		case 0x07: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
-		case 0x08: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
-		case 0x09: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
-		case 0x0a: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
-		case 0x0b: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
-		case 0x0c: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
-		case 0x0d: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
-		case 0x0e: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
-		case 0x0f: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
+		case 0x06: return !CONDITION_CS; // CC
+		case 0x07: return CONDITION_VS; // VS
+		case 0x08: return !CONDITION_VS; // VC
+		case 0x09: return !CONDITION_LE; // GT
+		case 0x0a: return !CONDITION_LT; // GE
+		case 0x0b: return CONDITION_LT; // LT
+		case 0x0c: return CONDITION_LE; // LE
+		case 0x0d: return CONDITION_HI; // HI
+		case 0x0e: return !CONDITION_HI; // LS
+		case 0x0f: return CONDITION_PNZ; // PNZ
 		case 0x10: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
 		case 0x11: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
 		case 0x12: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
