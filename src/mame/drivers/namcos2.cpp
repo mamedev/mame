@@ -43,9 +43,6 @@ TODO:
        Does a checksum on area 0x181000 - 0x183fff, in 0x20 bytes block chunks. Game doesn't init it properly so you either have to go into service menu and do
        an "all data clear" or play once to get rid of the message.
 
-    Bubble Trouble (Golly Ghost II)
-    - no artwork
-
     Metal Hawk
     - ROZ wraparound isn't implemented (see large battleship in 2nd stage)
 
@@ -573,60 +570,6 @@ C102 - Controls CPU access to ROZ Memory Area.
 /* 68000/6809/63705 Shared memory area - DUAL PORT Memory    */
 /*************************************************************/
 
-void namcos2_state::GollyGhostUpdateLED_c4(int data)
-{
-	output().set_value("zip100", data >> 4);
-	output().set_value("zip10", data & 0x0f);
-}
-
-void namcos2_state::GollyGhostUpdateLED_c6(int data)
-{
-	output().set_value("zip1", data >> 4);
-	output().set_value("time10", data & 0x0f);
-}
-
-void namcos2_state::GollyGhostUpdateLED_c8(int data)
-{
-	output().set_value("time1", data >> 4);
-	output().set_value("zap100", data & 0x0f);
-}
-
-void namcos2_state::GollyGhostUpdateLED_ca(int data)
-{
-	output().set_value("zap10", data >> 4);
-	output().set_value("zap1", data & 0x0f);
-}
-
-void namcos2_state::GollyGhostUpdateDiorama_c0(int data)
-{
-	if (data & 0x80)
-	{
-		output().set_value("dollhouse", 1); /* diorama is lit up */
-
-		/* dollhouse controller; solenoids control physical components */
-		output().set_value("toybox",      (data >> 0) & 1);
-		output().set_value("bathroom",    (data >> 1) & 1);
-		output().set_value("bureau",      (data >> 2) & 1);
-		output().set_value("refrigerator",(data >> 3) & 1);
-		output().set_value("porch",       (data >> 4) & 1);
-		/* gun recoils */
-		output().set_value("Player1_Gun_Recoil",(data & 0x20)>>5);
-		output().set_value("Player2_Gun_Recoil",(data & 0x40)>>6);
-
-	}
-	else
-	{
-		output().set_value("dollhouse",0);
-		output().set_value("toybox", 0);
-		output().set_value("bathroom", 0);
-		output().set_value("bureau", 0);
-		output().set_value("refrigerator", 0);
-		output().set_value("porch", 0);
-		output().set_value("Player1_Gun_Recoil",0);
-		output().set_value("Player2_Gun_Recoil",0);
-	}
-}
-
 uint16_t namcos2_state::dpram_word_r(offs_t offset)
 {
 	return m_dpram[offset];
@@ -636,28 +579,75 @@ void namcos2_state::dpram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask
 {
 	if( ACCESSING_BITS_0_7 )
 	{
-		m_dpram[offset] = data&0xff;
+		m_dpram[offset] = data & 0xff;
 
-		// TODO : This is a hack! should be output ports MCU side, not probing into DPRAM content
-		if( m_gametype==NAMCOS2_GOLLY_GHOST )
-		{
-			switch( offset )
-			{
-			case 0xc0/2: GollyGhostUpdateDiorama_c0(data); break;
-			case 0xc2/2:
-				/* unknown; 0x00 or 0x01 - probably lights up guns */
-			break;
-			case 0xc4/2: GollyGhostUpdateLED_c4(data); break;
-			case 0xc6/2: GollyGhostUpdateLED_c6(data); break;
-			case 0xc8/2: GollyGhostUpdateLED_c8(data); break;
-			case 0xca/2: GollyGhostUpdateLED_ca(data); break;
-			default:
-				break;
-			}
-		}
 		/* Note:  Outputs for the other gun games pass through here as well, but I couldn't find the offsets. */
 		/* Steel Gunner 1 & 2 have 6 "damage lamps" (three on each side) as well as gun recoils. */
+	}
+}
 
+void gollygho_state::dpram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if( ACCESSING_BITS_0_7 )
+	{
+		m_dpram[offset] = data & 0xff;
+
+		// TODO : This is a hack! should be output ports MCU side, not probing into DPRAM content
+		switch( offset )
+		{
+			case 0xc0/2:
+			{
+				int on = BIT(data, 7);
+				// output diorama0-5
+				/*
+				Golly Ghost:
+				0 = toybox
+				1 = bathroom
+				2 = bureau
+				3 = refrigerator
+				4 = porch
+				5 = backlight
+
+				Bubble Trouble
+				0 = shell
+				1 = ship
+				2 = trapdoor
+				3 = chest
+				4 = unused?
+				5 = backlight
+				*/
+
+				for (int i = 0; i < 5; i++)
+					m_out_diorama[i] = on & BIT(data, i);
+				m_out_diorama[5] = on;
+
+				// output gun recoil
+				m_out_gun_recoil[0] = on & BIT(data, 5);
+				m_out_gun_recoil[1] = on & BIT(data, 6);
+
+				break;
+			}
+
+			case 0xc2/2:
+				// unknown; 0x00 or 0x01 - probably lights up guns
+				break;
+
+			case 0xc4/2: case 0xc6/2: case 0xc8/2: case 0xca/2:
+			{
+				// output 7segs
+				// 6/9 have no roof/tail, so presume 7448
+				static const uint8_t ls48_map[0x10] =
+					{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
+
+				int group = (offset * 2) - 0xc4;
+				m_out_digit[group | 0] = ls48_map[data >> 4 & 0xf];
+				m_out_digit[group | 1] = ls48_map[data & 0xf];
+				break;
+			}
+
+			default:
+				break;
+		}
 	}
 }
 
@@ -1881,36 +1871,6 @@ void namcos2_state::base3(machine_config &config)
 	m_c140->add_route(1, "rspeaker", 0.45);
 
 	YM2151(config.replace(), "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0); /* 3.579545MHz */
-}
-
-void namcos2_state::gollygho(machine_config &config)
-{
-	configure_common_standard(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &namcos2_state::master_default_am);
-
-	m_slave->set_addrmap(AS_PROGRAM, &namcos2_state::slave_default_am);
-
-	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
-
-	configure_c65_standard(config);
-
-	config.set_maximum_quantum(attotime::from_hz(6000)); /* CPU slices per frame */
-
-	configure_c148_standard(config);
-	configure_c116_standard(config);
-
-	m_screen->set_screen_update(FUNC(namcos2_state::screen_update));
-
-	GFXDECODE(config, m_gfxdecode, m_c116, gfx_namcos2);
-
-	configure_namcos2_sprite_standard(config);
-	configure_c123tmap_standard(config);
-	configure_namcos2_roz_standard(config);
-
-	m_c140->add_route(0, "lspeaker", 0.75);
-	m_c140->add_route(1, "rspeaker", 0.75);
-
-	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 0.80).add_route(1, "rspeaker", 0.80); /* 3.579545MHz */
 }
 
 
@@ -5813,7 +5773,7 @@ GAME(  1990, dsaberj,    dsaber,   base3,    base,     namcos2_state, init_dsabe
 GAMEL( 1990, finalap2,   0,        finalap2, finallap, namcos2_state, init_finalap2, ROT0,   "Namco", "Final Lap 2", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
 GAMEL( 1990, finalap2j,  finalap2, finalap2, finallap, namcos2_state, init_finalap2, ROT0,   "Namco", "Final Lap 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
 
-GAME(  1990, gollygho,   0,        gollygho, gollygho, namcos2_state, init_gollygho, ROT180, "Namco", "Golly! Ghost!", MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(  1990, gollygho,   0,        base,     gollygho, gollygho_state,init_gollygho, ROT180, "Namco", "Golly! Ghost!", MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 
 GAME(  1990, rthun2,     0,        base3,    base,     namcos2_state, init_rthun2,   ROT0,   "Namco", "Rolling Thunder 2", MACHINE_SUPPORTS_SAVE )
 GAME(  1990, rthun2j,    rthun2,   base3,    base,     namcos2_state, init_rthun2j,  ROT0,   "Namco", "Rolling Thunder 2 (Japan)", MACHINE_SUPPORTS_SAVE )
@@ -5829,8 +5789,8 @@ GAME(  1991, sgunner2j,  sgunner2, sgunner2, sgunner,  namcos2_state, init_sgunn
 GAME(  1991, cosmogng,   0,        base,     base,     namcos2_state, init_cosmogng, ROT90,  "Namco", "Cosmo Gang the Video (US)", MACHINE_SUPPORTS_SAVE )
 GAME(  1991, cosmogngj,  cosmogng, base,     base,     namcos2_state, init_cosmogng, ROT90,  "Namco", "Cosmo Gang the Video (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME(  1992, bubbletr,   0,        gollygho, bubbletr, namcos2_state, init_bubbletr, ROT180, "Namco", "Bubble Trouble - Golly! Ghost! 2 (World, Rev B)", MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(  1992, bubbletrj,  bubbletr, gollygho, bubbletr, namcos2_state, init_bubbletr, ROT180, "Namco", "Bubble Trouble - Golly! Ghost! 2 (Japan, Rev C)", MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(  1992, bubbletr,   0,        base,     bubbletr, gollygho_state,init_bubbletr, ROT180, "Namco", "Bubble Trouble - Golly! Ghost! 2 (World, Rev B)", MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(  1992, bubbletrj,  bubbletr, base,     bubbletr, gollygho_state,init_bubbletr, ROT180, "Namco", "Bubble Trouble - Golly! Ghost! 2 (Japan, Rev C)", MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 
 GAMEL( 1992, finalap3,   0,        finalap3, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (World, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
 GAMEL( 1992, finalap3a,  finalap3, finalap3, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (World, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
