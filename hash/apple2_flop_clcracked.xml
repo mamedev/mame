@@ -48158,4 +48158,66 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="verbusg40189">
+		<description>Verb Usage 4 (Version 01.31.89) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2022-05-09"/>
+		<!--"Verb Usage 4" is a 1989 educational program developed and distributed by Hartley Courseware. This version is dated 01.31.89. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="verb usage 4 v01.31.89 (4am crack).dsk" size="143360" crc="47ebdd05" sha1="4bfc911e1be292aa18ce61c2fe4be5659e2af9bc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ezgraph2">
+		<description>Easy Graph II (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Grolier Publishing</publisher>
+		<info name="release" value="2022-05-09"/>
+		<!--"Easy Graph II" is a 1987 educational program developed by James Austin, Yen-ching Chu, Michael Lease, Kate McCormick, Joan Nordberg, Matt Osber, Jay Roberts, Elaine Lewis, Susan Christie Thomas, Bob Stickgold, and George Sullivan, and distributed by Grolier publishing. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Tutorial disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="easy graph ii (4am crack) disk 1 - tutorial.dsk" size="143360" crc="35556a34" sha1="77e726881244e5d343634aff9f75632ee76b410c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Tool disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="easy graph ii (4am crack) disk 2 - tool.dsk" size="143360" crc="dd4a193b" sha1="5552fcf0fcfccc5aade53f28a1af4465766524e7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grphcalc16">
+		<description>Graphics Calculator (Version 1.6) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Conduit Educational Software</publisher>
+		<info name="release" value="2022-05-09"/>
+		<!--"Graphics Calculator" is a 1988 educational program developed by Michael Konemann, Dennis Mick, Gerald Isaacs, and Richard O'Farrell, and distributed by Conduit Educational Software. This is version 1.6. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="graphics calculator (4am crack) disk 1 - program disk.dsk" size="143360" crc="7f9e2522" sha1="f09e468d67aab85e066779bf77635810a29d07d2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Demonstration disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="graphics calculator (4am crack) disk 2 - demonstration disk.dsk" size="143360" crc="b5fb6ffc" sha1="2cf05d3ae3c88282c2e459cbb47c197afe6923d4"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Auxiliary disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="graphics calculator (4am crack) disk 3 - auxiliary disk.dsk" size="143360" crc="f0c1b21e" sha1="5ba76831964d0d749b5d9ba150db9e1920098d23"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
