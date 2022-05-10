@@ -256,8 +256,8 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle01_00(OPS_32)
 
 	switch (subinstr2)
 	{
-		case 0x00: return arcompact_handle01_00_00dasm(PARAMS);  // Branch and Link Conditionally
-		case 0x01: return arcompact_handle01_00_01dasm(PARAMS);  // Branch and Link Unconditional Far
+		case 0x00: return arcompact_handle01_00_00(PARAMS);  // Branch and Link Conditionally
+		case 0x01: return arcompact_handle01_00_01(PARAMS);  // Branch and Link Unconditional Far
 	}
 
 	return 0;
@@ -1253,18 +1253,37 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle00_01(OPS_32)
 
 }
 
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle01_00_00dasm(OPS_32)
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle01_00_00(OPS_32)
 {
 	int size = 4;
 
 	// Branch and Link Conditionally
-	arcompact_log("unimplemented BLcc %08x", op);
+	// 0000 1sss ssss sss0 SSSS SSSS SSNQ QQQQ
+	int32_t address = (op & 0x07fe0000) >> 17;
+	address |= ((op & 0x0000ffc0) >> 6) << 10;
+	if (address & 0x80000) address = -0x80000 + (address & 0x7ffff);
+	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
+
+	uint32_t realaddress = PC_ALIGNED32 + (address * 2);
+
+	if (n)
+	{
+		m_delayactive = 1;
+		m_delayjump = realaddress;
+		m_delaylinks = 1;
+	}
+	else
+	{
+	        m_regs[REG_BLINK] = m_pc + (size >> 0);
+		return realaddress;
+	}
+		
 	return m_pc + (size>>0);
 }
 
 
 
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle01_00_01dasm(OPS_32)
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle01_00_01(OPS_32)
 {
 	int size = 4;
 	// Branch and Link Unconditionally Far
@@ -1633,17 +1652,16 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle02(OPS_32)
 	{
 		readdata = READ8(address >> 0);
 
-		if (X) // todo
-			arcompact_fatal("illegal LD %08x (data size %d mode %d with X)", op, Z, a);
+		if (X && (readdata & 0x80)
+		    readdata |= 0xffffff00;
 
 	}
 	else if (Z == 2)
 	{
-		readdata = READ16(address >> 1);
-
-		if (X) // todo
-			arcompact_fatal("illegal LD %08x (data size %d mode %d with X)", op, Z, a);
-
+		readdata = READ16(address >> 1);		
+		
+		if (X && (readdata & 0x8000)
+		    readdata |= 0xffff0000;
 	}
 	else if (Z == 3)
 	{ // Z == 3 is always illegal

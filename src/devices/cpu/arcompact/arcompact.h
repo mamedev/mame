@@ -143,8 +143,8 @@ protected:
 
 	ARCOMPACT_RETTYPE arcompact_handle00_00(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle00_01(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_00_00dasm(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_00_01dasm(OPS_32);
+	ARCOMPACT_RETTYPE arcompact_handle01_00_00(OPS_32);
+	ARCOMPACT_RETTYPE arcompact_handle01_00_01(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle01_01_00_00(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle01_01_00_01(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle01_01_00_02(OPS_32);
