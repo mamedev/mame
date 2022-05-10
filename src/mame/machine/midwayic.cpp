@@ -9,12 +9,12 @@
 #include "emu.h"
 #include "midwayic.h"
 
-#define LOG_IRQ             (1U << 0)
-#define LOG_NVRAM           (1U << 1)
-#define LOG_FIFO            (1U << 2)
-#define LOG_IOASIC          (1U << 3)
-#define LOG_PIC             (1U << 4)
-#define LOG_UART            (1U << 5)
+#define LOG_IRQ             (1U << 1)
+#define LOG_NVRAM           (1U << 2)
+#define LOG_FIFO            (1U << 3)
+#define LOG_IOASIC          (1U << 4)
+#define LOG_PIC             (1U << 5)
+#define LOG_UART            (1U << 6)
 
 //#define VERBOSE (LOG_IRQ | LOG_FIFO | LOG_IOASIC | LOG_PIC | LOG_UART)
 #include "logmacro.h"
