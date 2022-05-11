@@ -258,7 +258,7 @@ namespace plib
 			//------------------------------------------------------------------------
 
 			std::size_t itr_used = 0;
-			auto rho_delta(plib::constants<float_type>::zero());
+			float_type rho_delta(plib::constants<float_type>::zero());
 
 			const    std::size_t n = size();
 
@@ -390,7 +390,7 @@ namespace plib
 				// x += m_v[j] * m_y[j]
 				for (std::size_t i = k + 1; i-- > 0;)
 				{
-					auto tmp(m_g[i]);
+					auto tmp = m_g[i];
 					const auto htii=plib::reciprocal(m_ht[i][i]);
 					for (std::size_t j = i + 1; j <= k; j++)
 						tmp -= m_ht[i][j] * m_y[j];

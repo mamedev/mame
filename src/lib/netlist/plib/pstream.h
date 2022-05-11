@@ -299,7 +299,7 @@ public:
 	template <typename T>
 	void write(const std::vector<T> &val)
 	{
-		const auto sz(val.size());
+		const typename std::vector<T>::size_type sz(val.size());
 		write(sz);
 		ostream_write(m_strm, val.data(), sz);
 	}

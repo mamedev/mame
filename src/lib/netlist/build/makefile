@@ -300,11 +300,11 @@ clang-libc:
 		LDEXTRAFLAGS=-stdlib=libc++
 
 nvcc:
-	$(MAKE) CC=/usr/local/cuda-10.2/bin/nvcc LD=/usr/local/cuda-10.2/bin/nvcc \
-		OBJ=obj/nvcc CEXTRAFLAGS="--std c++14 -x cu  -DNVCCBUILD=102 --expt-extended-lambda \
+	$(MAKE) CC=/usr/local/cuda-11.3/bin/nvcc LD=/usr/local/cuda-11.3/bin/nvcc \
+		OBJ=obj/nvcc CEXTRAFLAGS="--std c++17 -x cu  -DNVCCBUILD=113 --expt-extended-lambda \
 		--expt-relaxed-constexpr --default-stream per-thread --restrict \
 		--ftemplate-depth 1024  \
-		-Xcompiler -O6 -Xcompiler -march=native -ccbin g++-8 " \
+		-Xcompiler -O6 -Xcompiler -march=native -ccbin g++-9 " \
 		DEPENDCC=g++
 
 mingw:
