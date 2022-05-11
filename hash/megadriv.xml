@@ -22337,8 +22337,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="release" value="19940812"/>
 		<info name="alt_title" value="パノラマコットン"/>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="flying.bin" size="4194304" crc="54d82f86" sha1="aa7d052268ef439a3e289379003d7e7d6fc356f2"/>
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="flying.bin" size="2097152" crc="52f95eed" sha1="bbb1154cd0f4229d8e503cc20ec0e02ee808597d"/>
 			</dataarea>
 		</part>
 	</software>
