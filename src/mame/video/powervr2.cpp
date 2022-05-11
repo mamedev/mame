@@ -2076,6 +2076,41 @@ void powervr2_device::process_ta_fifo()
 						rd->verts_size += 4;
 					}
 				}
+				else
+				{
+					if (rd->verts_size <= (MAX_VERTS - 6) && grp->strips_size < MAX_STRIPS)
+					{
+						strip *ts;
+						vert *tv = &rd->verts[rd->verts_size];
+						tv[0].x = u2f(tafifo_buff[0x1]);
+						tv[0].y = u2f(tafifo_buff[0x2]);
+						tv[0].w = u2f(tafifo_buff[0x3]);
+						tv[1].x = u2f(tafifo_buff[0x4]);
+						tv[1].y = u2f(tafifo_buff[0x5]);
+						tv[1].w = u2f(tafifo_buff[0x6]);
+						tv[3].x = u2f(tafifo_buff[0x7]);
+						tv[3].y = u2f(tafifo_buff[0x8]);
+						tv[3].w = u2f(tafifo_buff[0x9]);
+						tv[2].x = u2f(tafifo_buff[0xa]);
+						tv[2].y = u2f(tafifo_buff[0xb]);
+						tv[2].w = tv[0].w+tv[3].w-tv[1].w;
+
+						int idx;
+						for (idx = 0; idx < 4; idx++) {
+							memcpy(tv[idx].b, poly_base_color,
+								   sizeof(tv[idx].b));
+							memcpy(tv[idx].o, poly_offs_color,
+								   sizeof(tv[idx].o));
+						}
+
+						ts = &grp->strips[grp->strips_size++];
+						tex_get_info(&ts->ti);
+						ts->svert = rd->verts_size;
+						ts->evert = rd->verts_size + 3;
+
+						rd->verts_size += 4;
+					}
+				}
 			}
 			else if (global_paratype == 4)
 			{
