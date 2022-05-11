@@ -17,6 +17,7 @@
 #include "bus/rc2014/serial.h"
 #include "bus/rc2014/cf.h"
 #include "bus/rc2014/rtc.h"
+#include "bus/rc2014/sound.h"
 
 void rc2014_bus_modules(device_slot_interface &device)
 {
@@ -33,6 +34,7 @@ void rc2014_bus_modules(device_slot_interface &device)
 	device.option_add("cf", RC2014_COMPACT_FLASH);
 	device.option_add("rom_ram", RC2014_ROM_RAM_512);
 	device.option_add("ds1302_rtc", RC2014_DS1302_RTC);
+	device.option_add("ym_ay_sound", RC2014_YM_AY_SOUND);
 }
 
 void rc2014_ext_bus_modules(device_slot_interface &device)
