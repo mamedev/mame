@@ -226,7 +226,9 @@ std::error_condition osd_file::open(std::string const &path, std::uint32_t openf
 {
 	std::string dst;
 	if (posix_check_socket_path(path))
-		return posix_open_socket(path, openflags, file, filesize);
+		return posix_open_tcp_socket(path, openflags, file, filesize);
+	else if (posix_check_udp_path(path))
+		return posix_open_udp_socket(path, openflags, file, filesize);
 	else if (posix_check_ptty_path(path))
 		return posix_open_ptty(openflags, file, filesize, dst);
 	else if (posix_check_domain_path(path))
@@ -339,6 +341,16 @@ std::error_condition osd_file::openpty(ptr &file, std::string &name) noexcept
 {
 	std::uint64_t filesize;
 	return posix_open_ptty(OPEN_FLAG_READ | OPEN_FLAG_WRITE, file, filesize, name);
+}
+
+
+//============================================================
+//  osd_open_udp_socket
+//============================================================
+
+std::error_condition osd_file::open_udp_socket(std::string const &path, uint32_t openflags, ptr &file, std::uint64_t &filesize) noexcept
+{
+	return posix_open_udp_socket(path, openflags, file, filesize);
 }
 
 
