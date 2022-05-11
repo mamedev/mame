@@ -319,17 +319,15 @@ void spectrum_128_state::machine_reset()
 }
 
 bool spectrum_128_state::is_vram_write(offs_t offset) {
-	// TODO respect banks 2,5 mapped to 0xc000
-	return (BIT(m_port_7ffd_data, 3))
-		? offset >= 0x8000 && offset < 0x9b00
+	return (BIT(m_port_7ffd_data, 3) && m_bank_ram[3]->entry() == 7)
+		? offset >= 0xc000 && offset < 0xdb00
 		: spectrum_state::is_vram_write(offset);
 }
 
 bool spectrum_128_state::is_contended(offs_t offset) {
-	// Memory banks 1,3,5 and 7 are contended
 	u8 bank = m_bank_ram[3]->entry();
 	return spectrum_state::is_contended(offset)
-		|| ((offset >= 0xc000 && offset <= 0xffff) && (bank && 1));
+		|| ((offset >= 0xc000 && offset <= 0xffff) && (bank && 1)); // Memory banks 1,3,5 and 7 are contended
 }
 
 static const gfx_layout spectrum_charlayout =
