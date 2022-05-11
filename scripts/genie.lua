@@ -1096,6 +1096,13 @@ end
 					"-Wno-stringop-overread",       -- machine/bbc.cpp in GCC 11.1
 				}
 			end
+			if version >= 120000 then
+				buildoptions {
+					"-Wno-maybe-uninitialized",
+					"-Wno-uninitialized",   -- netlist
+					"-Wno-address",     -- mips3.cpp
+				}
+			end
 		end
 	end
 
