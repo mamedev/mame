@@ -40,6 +40,7 @@ The game uses derivative hardware.
 #include "screen.h"
 #include "speaker.h"
 
+#define VIDEO_CLOCK        (XTAL(18'432'000))
 
 void vigilant_state::machine_start()
 {
@@ -620,10 +621,8 @@ void vigilant_state::vigilant(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(55);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea((16*8)-1, (64-16)*8-4, 0*8, 32*8-1);
+	// Screen timings measured by atrac17 and reviewed by Jose Tejada (JOTEGO)
+	screen.set_raw( VIDEO_CLOCK/3 /* pixel clock*/, 384 /* total H */, 128, 384, 256+28 /* total V */, 0, 256 );
 	screen.set_screen_update(FUNC(vigilant_state::screen_update_vigilant));
 	screen.set_palette(m_palette);
 
