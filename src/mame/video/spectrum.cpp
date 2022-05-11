@@ -143,6 +143,14 @@ void spectrum_state::spectrum_update_border(screen_device &screen, bitmap_ind16 
 	}
 }
 
+/* ULA reads screen data in 16px (8T) chunks as following:
+ T: |   0   |   1   |   2   |   3   |   4   |   5   |   6   |   7   |
+px: | 0 | 1 | 2 | 3 |*4*| 5 | 6 | 7 |*0*| 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+    | << !right <<  | char1 | attr1 | char2 | attr2 |   >> right >> |
+
+TODO Curren implementation only tracks char switch position. In order to track both (char and attr) we need to share
+     some state between screen->update() events.
+*/
 void spectrum_state::spectrum_update_screen(screen_device &screen_d, bitmap_ind16 &bitmap, const rectangle &screen)
 {
 	u8 *attrs_location = m_screen_location + 0x1800;
@@ -151,17 +159,26 @@ void spectrum_state::spectrum_update_screen(screen_device &screen_d, bitmap_ind1
 	{
 		u16 hpos = screen.left();
 		u16 x = hpos - get_screen_area().left();
-		if (x % 8)
+		bool chunk_right = x & 8;
+		if (x % 8 <= (chunk_right ? 0 : 4))
+		{
+			u8 shift = x % 8;
+			x -= shift;
+			hpos -= shift;
+		}
+		else
 		{
 			u8 shift = 8 - (x % 8);
 			x += shift;
 			hpos += shift;
+			chunk_right = !chunk_right;
 		}
 		u16 y = vpos - get_screen_area().top();
 		u8 *scr = &m_screen_location[((y & 7) << 8) | ((y & 0x38) << 2) | ((y & 0xc0) << 5) | (x >> 3)];
 		u8 *attr = &attrs_location[((y & 0xf8) << 2) | (x >> 3)];
 		u16 *pix = &(bitmap.pix(vpos, hpos));
-		while (hpos <= screen.right())
+
+		while ((hpos + (chunk_right ? 0 : 4)) <= screen.right())
 		{
 			u16 ink = ((*attr >> 3) & 0x08) | (*attr & 0x07);
 			u16 pap = (*attr >> 3) & 0x0f;
@@ -171,6 +188,7 @@ void spectrum_state::spectrum_update_screen(screen_device &screen_d, bitmap_ind1
 				*pix++ = (pix8 & b) ? ink : pap;
 			scr++;
 			attr++;
+			chunk_right = !chunk_right;
 		}
 	}
 }
