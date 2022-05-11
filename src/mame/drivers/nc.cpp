@@ -556,28 +556,16 @@ uint8_t nc_state::nc_key_data_in_r(offs_t offset)
 
 void nc_state::nc_sound_update(int channel)
 {
-	int on;
-	int frequency;
-	int period;
-	beep_device *beeper_device = nullptr;
+	channel &= 1;
+	beep_device *beeper_device = channel ? m_beeper2 : m_beeper1;
 
-	switch(channel)
-	{
-		case 0:
-			beeper_device = m_beeper1;
-			break;
-		case 1:
-			beeper_device = m_beeper2;
-			break;
-	}
-
-	period = m_sound_channel_periods[channel];
+	int period = m_sound_channel_periods[channel];
 
 	/* if top bit is 0, sound is on */
-	on = ((period & (1<<15))==0);
+	int on = ((period & (1<<15))==0);
 
 	/* calculate frequency from period */
-	frequency = (int)(1000000.0f/((float)((period & 0x07fff)<<1) * 1.6276f));
+	int frequency = (int)(1000000.0f/((float)((period & 0x07fff)<<1) * 1.6276f));
 
 	/* set state */
 	beeper_device->set_state(on);
@@ -1513,4 +1501,4 @@ ROM_END
 COMP( 1992, nc100, 0,      0,      nc100,   nc100, nc100_state, init_nc, "Amstrad plc",          "NC100",           0 )
 COMP( 1992, dw225, nc100,  0,      nc100,   nc100, nc100_state, init_nc, "NTS Computer Systems", "DreamWriter 225", 0 )
 COMP( 1992, nc150, nc100,  0,      nc100,   nc100, nc100_state, init_nc, "Amstrad plc",          "NC150",           0 )
-COMP( 1993, nc200, 0,      0,      nc200,   nc200, nc200_state, init_nc, "Amstrad plc",          "NC200",           MACHINE_NOT_WORKING ) // boot hangs while checking the MC146818 UIP (update in progress) bit
+COMP( 1993, nc200, 0,      0,      nc200,   nc200, nc200_state, init_nc, "Amstrad plc",          "NC200",           0 )

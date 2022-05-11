@@ -438,6 +438,11 @@ vme_fccpu21yb_card_device::vme_fccpu21yb_card_device(const machine_config &mconf
 	LOG("%s %s\n", tag, FUNCNAME);
 }
 
+enum
+{
+	TIMER_ID_BUS_GRANT
+};
+
 /* Start it up */
 void vme_fccpu20_device::device_start()
 {
@@ -460,19 +465,14 @@ void vme_fccpu20_device::device_start()
 	m_vme->install_device(base + 2, base + 3, // Channel B - Control
 			read8_delegate(*subdevice<z80sio_device>("pit"), FUNC(z80sio_device::cb_r)), write8_delegate(*subdevice<z80sio_device>("pit"), FUNC(z80sio_device::cb_w)), 0x00ff);
 #endif
+	m_arbiter_start = timer_alloc(TIMER_ID_BUS_GRANT);
 }
-
-enum
-{
-	TIMER_ID_BUS_GRANT
-};
 
 void vme_fccpu20_device::device_reset()
 {
 	LOG("%s\n", FUNCNAME);
 
 	/* We need to delay the static bus grant signal until we have it from the VME interface or MAME supports bus arbitration */
-	m_arbiter_start = timer_alloc(TIMER_ID_BUS_GRANT);
 	m_arbiter_start->adjust(attotime::from_msec(10), TIMER_ID_BUS_GRANT, attotime::never);
 }
 

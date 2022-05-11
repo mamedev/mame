@@ -7,9 +7,7 @@
 #include "nld_matrix_solver.h"
 #include "plib/putil.h"
 
-namespace netlist
-{
-namespace solver
+namespace netlist::solver
 {
 
 	terms_for_net_t::terms_for_net_t(analog_net_t * net)
@@ -507,7 +505,7 @@ namespace solver
 
 	netlist_time matrix_solver_t::solve(netlist_time_ext now, const char *source)
 	{
-		netlist_time delta = static_cast<netlist_time>(now - m_last_step());
+		auto delta = static_cast<netlist_time>(now - m_last_step());
 		PFDEBUG(printf("solve %.10f\n", delta.as_double());)
 		plib::unused_var(source);
 
@@ -666,6 +664,5 @@ namespace solver
 		}
 	}
 
-} // namespace solver
-} // namespace netlist
+} // namespace netlist::solver
 

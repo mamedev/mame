@@ -274,7 +274,8 @@ void segas32_state::device_start()
 
 	/* allocate pre-rendered solid lines of 0's and ffff's */
 	m_solid_0000 = make_unique_clear<uint16_t[]>(512);
-	m_solid_ffff = make_unique_clear<uint16_t[],0xff>(512);
+	m_solid_ffff = std::make_unique<uint16_t[]>(512);
+	std::fill_n(m_solid_ffff.get(), 512, ~uint16_t(0));
 
 	/* allocate background color per line*/
 	m_prev_bgstartx = std::make_unique<int32_t[]>(512);

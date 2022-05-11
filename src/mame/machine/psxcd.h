@@ -141,7 +141,7 @@ private:
 #endif
 
 	bool open = false, m_mute = false, m_dmaload = false;
-	device_timer_id next_read_event;
+	device_timer_id next_read_event{};
 	int64_t next_sector_t = 0;
 	unsigned int autopause_sector = 0, start_read_delay = 0, read_sector_cycles = 0, preread_delay = 0;
 

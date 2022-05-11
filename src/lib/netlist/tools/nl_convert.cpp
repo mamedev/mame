@@ -12,10 +12,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace netlist
-{
-
-namespace convert
+namespace netlist::convert
 {
 
 // FIXME: temporarily defined here - should be in a file
@@ -1112,5 +1109,4 @@ void nl_convert_rinf_t::convert(const pstring &contents)
 
 }
 
-} // namespace convert
-} // namespace netlist
+} // namespace netlist::convert

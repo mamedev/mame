@@ -564,8 +564,8 @@ namespace plib
 				//  printf("occ %d\n", (int)i);
 				for (auto i_k = base_type::row_idx[i]; i_k < base_type::diag[i]; i_k++)
 				{
-					const auto k(base_type::col_idx[i_k]);
-					const auto p_k_end(base_type::row_idx[k + 1]);
+					const index_type k(base_type::col_idx[i_k]);
+					const index_type p_k_end(base_type::row_idx[k + 1]);
 					const typename base_type::value_type LUp_i_k = base_type::A[i_k] = base_type::A[i_k] / base_type::A[base_type::diag[k]];
 
 					std::size_t k_j(base_type::diag[k] + 1);
@@ -574,8 +574,8 @@ namespace plib
 					while (i_j < p_i_end && k_j < p_k_end )  // pj = (i, j)
 					{
 						// we can assume that within a row ja increases continuously
-						const std::size_t c_i_j(base_type::col_idx[i_j]); // row i, column j
-						const auto c_k_j(base_type::col_idx[k_j]); // row k, column j
+						const index_type c_i_j(base_type::col_idx[i_j]); // row i, column j
+						const index_type c_k_j(base_type::col_idx[k_j]); // row k, column j
 
 						if (c_k_j == c_i_j)
 							base_type::A[i_j] -= LUp_i_k * base_type::A[k_j];
@@ -616,8 +616,8 @@ namespace plib
 			for (std::size_t i = 1; i < base_type::size(); ++i )
 			{
 				typename base_type::value_type tmp(0);
-				const auto j1(base_type::row_idx[i]);
-				const auto j2(base_type::diag[i]);
+				const index_type j1(base_type::row_idx[i]);
+				const index_type j2(base_type::diag[i]);
 
 				for (auto j = j1; j < j2; ++j )
 					tmp +=  base_type::A[j] * r[base_type::col_idx[j]];
@@ -627,8 +627,8 @@ namespace plib
 			for (std::size_t i = base_type::size(); i-- > 0; )
 			{
 				typename base_type::value_type tmp(0);
-				const auto di(base_type::diag[i]);
-				const auto j2(base_type::row_idx[i+1]);
+				const index_type di(base_type::diag[i]);
+				const index_type j2(base_type::row_idx[i+1]);
 				for (std::size_t j = di + 1; j < j2; j++ )
 					tmp += base_type::A[j] * r[base_type::col_idx[j]];
 				r[i] = (r[i] - tmp) / base_type::A[di];

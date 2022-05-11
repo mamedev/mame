@@ -77,48 +77,48 @@ protected:
 	std::unique_ptr<uint32_t[]>    m_vdp1_vram;
 	std::unique_ptr<uint16_t[]>    m_vdp1_regs;
 
-	uint8_t     m_en_68k;
+	uint8_t     m_en_68k = 0;
 
-	int       m_minit_boost;
-	int       m_sinit_boost;
+	int       m_minit_boost = 0;
+	int       m_sinit_boost = 0;
 	attotime  m_minit_boost_timeslice;
 	attotime  m_sinit_boost_timeslice;
 
 	struct {
 		std::unique_ptr<uint16_t * []> framebuffer_display_lines;
-		int       framebuffer_mode;
-		int       framebuffer_double_interlace;
-		int       fbcr_accessed;
-		int       framebuffer_width;
-		int       framebuffer_height;
-		int       framebuffer_current_display;
-		int       framebuffer_current_draw;
-		int       framebuffer_clear_on_next_frame;
+		int       framebuffer_mode = 0;
+		int       framebuffer_double_interlace = 0;
+		int       fbcr_accessed = 0;
+		int       framebuffer_width = 0;
+		int       framebuffer_height = 0;
+		int       framebuffer_current_display = 0;
+		int       framebuffer_current_draw = 0;
+		int       framebuffer_clear_on_next_frame = 0;
 		rectangle system_cliprect;
 		rectangle user_cliprect;
 		std::unique_ptr<uint16_t []> framebuffer[2];
 		std::unique_ptr<uint16_t * []> framebuffer_draw_lines;
 		std::unique_ptr<uint8_t []> gfx_decode;
-		uint16_t    lopr;
-		uint16_t    copr;
-		uint16_t    ewdr;
+		uint16_t    lopr = 0;
+		uint16_t    copr = 0;
+		uint16_t    ewdr = 0;
 
-		int       local_x;
-		int       local_y;
+		int       local_x = 0;
+		int       local_y = 0;
 	}m_vdp1;
 
 	struct {
 		std::unique_ptr<uint8_t[]>      gfx_decode;
 		bitmap_rgb32 roz_bitmap[2];
-		uint8_t     dotsel;
-		uint8_t     pal;
-		uint8_t     odd;
-		uint16_t    h_count;
-		uint16_t    v_count;
-		uint8_t     exltfg;
-		uint8_t     exsyfg;
-		int       old_crmd;
-		int       old_tvmd;
+		uint8_t     dotsel = 0;
+		uint8_t     pal = 0;
+		uint8_t     odd = 0;
+		uint16_t    h_count = 0;
+		uint16_t    v_count = 0;
+		uint8_t     exltfg = 0;
+		uint8_t     exsyfg = 0;
+		int       old_crmd = 0;
+		int       old_tvmd = 0;
 	}m_vdp2;
 
 	required_device<sh2_device> m_maincpu;
@@ -148,7 +148,7 @@ protected:
 	uint8_t saturn_backupram_r(offs_t offset);
 	void saturn_backupram_w(offs_t offset, uint8_t data);
 
-	int m_scsp_last_line;
+	int m_scsp_last_line = 0;
 
 	uint16_t saturn_vdp1_regs_r(offs_t offset);
 	uint32_t saturn_vdp1_vram_r(offs_t offset);
@@ -215,18 +215,18 @@ protected:
 
 	struct stv_vdp1_poly_scanline
 	{
-		int32_t   x[2];
-		int32_t   b[2];
-		int32_t   g[2];
-		int32_t   r[2];
-		int32_t   db;
-		int32_t   dg;
-		int32_t   dr;
+		int32_t   x[2]{};
+		int32_t   b[2]{};
+		int32_t   g[2]{};
+		int32_t   r[2]{};
+		int32_t   db = 0;
+		int32_t   dg = 0;
+		int32_t   dr = 0;
 	};
 
 	struct stv_vdp1_poly_scanline_data
 	{
-		int32_t   sy, ey;
+		int32_t   sy = 0, ey = 0;
 		struct  stv_vdp1_poly_scanline scanline[512];
 	};
 
@@ -234,13 +234,13 @@ protected:
 
 	struct stv_vdp2_sprite_list
 	{
-		int CMDCTRL, CMDLINK, CMDPMOD, CMDCOLR, CMDSRCA, CMDSIZE, CMDGRDA;
-		int CMDXA, CMDYA;
-		int CMDXB, CMDYB;
-		int CMDXC, CMDYC;
-		int CMDXD, CMDYD;
+		int CMDCTRL = 0, CMDLINK = 0, CMDPMOD = 0, CMDCOLR = 0, CMDSRCA = 0, CMDSIZE = 0, CMDGRDA = 0;
+		int CMDXA = 0, CMDYA = 0;
+		int CMDXB = 0, CMDYB = 0;
+		int CMDXC = 0, CMDYC = 0;
+		int CMDXD = 0, CMDYD = 0;
 
-		int ispoly;
+		int ispoly = 0;
 
 	} stv2_current_sprite;
 
@@ -249,18 +249,18 @@ protected:
 	struct _stv_gouraud_shading
 	{
 		/* Gouraud shading table */
-		uint16_t  GA;
-		uint16_t  GB;
-		uint16_t  GC;
-		uint16_t  GD;
+		uint16_t  GA = 0;
+		uint16_t  GB = 0;
+		uint16_t  GC = 0;
+		uint16_t  GD = 0;
 	} stv_gouraud_shading;
 
-	uint16_t m_sprite_colorbank;
+	uint16_t m_sprite_colorbank = 0;
 
 	/* VDP1 Framebuffer handling */
-	int      stv_sprite_priorities_used[8];
-	int      stv_sprite_priorities_usage_valid;
-	uint8_t    stv_sprite_priorities_in_fb_line[512][8];
+	int      stv_sprite_priorities_used[8]{};
+	int      stv_sprite_priorities_usage_valid = 0;
+	uint8_t    stv_sprite_priorities_in_fb_line[512][8]{};
 
 
 	/* VDP2 */
@@ -334,105 +334,105 @@ protected:
 	void stv_vdp2_exit ( void );
 	int stv_vdp2_start ( void );
 
-	uint8_t m_vdpdebug_roz;
+	uint8_t m_vdpdebug_roz = 0;
 
 	struct stv_vdp2_tilemap_capabilities
 	{
-		uint8_t  enabled;
-		uint8_t  transparency;
-		uint8_t  colour_calculation_enabled;
-		uint8_t  colour_depth;
-		uint8_t  alpha;
-		uint8_t  tile_size;
-		uint8_t  bitmap_enable;
-		uint8_t  bitmap_size;
-		uint8_t  bitmap_palette_number;
-		uint8_t  bitmap_map;
-		uint16_t map_offset[16];
-		uint8_t  map_count;
+		uint8_t  enabled = 0;
+		uint8_t  transparency = 0;
+		uint8_t  colour_calculation_enabled = 0;
+		uint8_t  colour_depth = 0;
+		uint8_t  alpha = 0;
+		uint8_t  tile_size = 0;
+		uint8_t  bitmap_enable = 0;
+		uint8_t  bitmap_size = 0;
+		uint8_t  bitmap_palette_number = 0;
+		uint8_t  bitmap_map = 0;
+		uint16_t map_offset[16]{};
+		uint8_t  map_count = 0;
 
-		uint8_t  pattern_data_size;
-		uint8_t  character_number_supplement;
-		uint8_t  special_priority_register;
-		uint8_t  special_colour_control_register;
-		uint8_t  supplementary_palette_bits;
-		uint8_t  supplementary_character_bits;
+		uint8_t  pattern_data_size = 0;
+		uint8_t  character_number_supplement = 0;
+		uint8_t  special_priority_register = 0;
+		uint8_t  special_colour_control_register = 0;
+		uint8_t  supplementary_palette_bits = 0;
+		uint8_t  supplementary_character_bits = 0;
 
-		int16_t scrollx;
-		int16_t scrolly;
-		uint32_t incx, incy;
+		int16_t scrollx = 0;
+		int16_t scrolly = 0;
+		uint32_t incx = 0, incy = 0;
 
-		uint8_t   linescroll_enable;
-		uint8_t   linescroll_interval;
-		uint32_t  linescroll_table_address;
-		uint8_t   vertical_linescroll_enable;
-		uint8_t   vertical_cell_scroll_enable;
-		uint8_t   linezoom_enable;
+		uint8_t   linescroll_enable = 0;
+		uint8_t   linescroll_interval = 0;
+		uint32_t  linescroll_table_address = 0;
+		uint8_t   vertical_linescroll_enable = 0;
+		uint8_t   vertical_cell_scroll_enable = 0;
+		uint8_t   linezoom_enable = 0;
 
-		uint8_t  plane_size;
-		uint8_t  colour_ram_address_offset;
-		uint8_t  fade_control;
+		uint8_t  plane_size = 0;
+		uint8_t  colour_ram_address_offset = 0;
+		uint8_t  fade_control = 0;
 		struct{
-			uint8_t logic;
-			uint8_t enabled[2];
-			uint8_t area[2];
+			uint8_t logic = 0;
+			uint8_t enabled[2]{};
+			uint8_t area[2]{};
 		}window_control;
 
-		uint8_t  line_screen_enabled;
-		uint8_t  mosaic_screen_enabled;
-		bool roz_mode3;
+		uint8_t  line_screen_enabled = 0;
+		uint8_t  mosaic_screen_enabled = 0;
+		bool roz_mode3 = false;
 
-		int layer_name; /* just to keep track */
+		int layer_name = 0; /* just to keep track */
 	} stv2_current_tilemap;
 
 	struct rotation_table
 	{
-		int32_t   xst;
-		int32_t   yst;
-		int32_t   zst;
-		int32_t   dxst;
-		int32_t   dyst;
-		int32_t   dx;
-		int32_t   dy;
-		int32_t   A;
-		int32_t   B;
-		int32_t   C;
-		int32_t   D;
-		int32_t   E;
-		int32_t   F;
-		int32_t   px;
-		int32_t   py;
-		int32_t   pz;
-		int32_t   cx;
-		int32_t   cy;
-		int32_t   cz;
-		int32_t   mx;
-		int32_t   my;
-		int32_t   kx;
-		int32_t   ky;
-		uint32_t  kast;
-		int32_t   dkast;
-		int32_t   dkax;
+		int32_t   xst = 0;
+		int32_t   yst = 0;
+		int32_t   zst = 0;
+		int32_t   dxst = 0;
+		int32_t   dyst = 0;
+		int32_t   dx = 0;
+		int32_t   dy = 0;
+		int32_t   A = 0;
+		int32_t   B = 0;
+		int32_t   C = 0;
+		int32_t   D = 0;
+		int32_t   E = 0;
+		int32_t   F = 0;
+		int32_t   px = 0;
+		int32_t   py = 0;
+		int32_t   pz = 0;
+		int32_t   cx = 0;
+		int32_t   cy = 0;
+		int32_t   cz = 0;
+		int32_t   mx = 0;
+		int32_t   my = 0;
+		int32_t   kx = 0;
+		int32_t   ky = 0;
+		uint32_t  kast = 0;
+		int32_t   dkast = 0;
+		int32_t   dkax = 0;
 
 	} stv_current_rotation_parameter_table;
 
 	struct _stv_vdp2_layer_data_placement
 	{
-		uint32_t  map_offset_min;
-		uint32_t  map_offset_max;
-		uint32_t  tile_offset_min;
-		uint32_t  tile_offset_max;
+		uint32_t  map_offset_min = 0;
+		uint32_t  map_offset_max = 0;
+		uint32_t  tile_offset_min = 0;
+		uint32_t  tile_offset_max = 0;
 	} stv_vdp2_layer_data_placement;
 
 	struct _stv_rbg_cache_data
 	{
-		uint8_t   watch_vdp2_vram_writes;
-		uint8_t   is_cache_dirty;
+		uint8_t   watch_vdp2_vram_writes = 0;
+		uint8_t   is_cache_dirty = 0;
 
-		uint32_t  map_offset_min[2];
-		uint32_t  map_offset_max[2];
-		uint32_t  tile_offset_min[2];
-		uint32_t  tile_offset_max[2];
+		uint32_t  map_offset_min[2]{};
+		uint32_t  map_offset_max[2]{};
+		uint32_t  tile_offset_min[2]{};
+		uint32_t  tile_offset_max[2]{};
 
 		struct stv_vdp2_tilemap_capabilities    layer_data[2];
 

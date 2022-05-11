@@ -121,7 +121,7 @@ public:
 	K055673_CB_MEMBER(salmndr2_sprite_callback);
 	K055673_CB_MEMBER(le2_sprite_callback);
 
-	struct GX_OBJ { int order, offs, code, color; };
+	struct GX_OBJ { int order = 0, offs = 0, code = 0, color = 0; };
 
 	void common_init();
 	uint32_t k_6bpp_rom_long_r(offs_t offset, uint32_t mem_mask = ~0);
@@ -225,55 +225,55 @@ protected:
 
 	optional_ioport m_an0, m_an1, m_light0_x, m_light0_y, m_light1_x, m_light1_y, m_eepromout;
 
-	uint8_t m_sound_ctrl;
-	uint8_t m_sound_intck;
-	uint32_t m_fantjour_dma[8];
-	int m_konamigx_current_frame;
-	int m_gx_objdma, m_gx_primode;
-	emu_timer *m_dmadelay_timer;
-	emu_timer *m_boothack_timer;
-	int m_gx_rdport1_3, m_gx_syncen;
-	int m_gx_cfgport;
-	int m_suspension_active, m_resume_trigger;
-	int m_last_prot_op, m_last_prot_clk;
-	u16 m_last_prot_param;
-	uint8_t m_prev_pixel_clock;
+	uint8_t m_sound_ctrl = 0;
+	uint8_t m_sound_intck = 0;
+	uint32_t m_fantjour_dma[8]{};
+	int m_konamigx_current_frame = 0;
+	int m_gx_objdma = 0, m_gx_primode = 0;
+	emu_timer *m_dmadelay_timer = nullptr;
+	emu_timer *m_boothack_timer = nullptr;
+	int m_gx_rdport1_3 = 0, m_gx_syncen = 0;
+	int m_gx_cfgport = 0;
+	int m_suspension_active = 0, m_resume_trigger = 0;
+	int m_last_prot_op = 0, m_last_prot_clk = 0;
+	u16 m_last_prot_param = 0;
+	uint8_t m_prev_pixel_clock = 0;
 
-	uint8_t m_esc_program[4096];
+	uint8_t m_esc_program[4096]{};
 	esc_cb m_esc_cb;
 
-	uint16_t m_prot_data[0x20];
+	uint16_t m_prot_data[0x20]{};
 
-	uint16_t *m_gx_spriteram;
+	uint16_t *m_gx_spriteram = nullptr;
 	std::unique_ptr<uint16_t[]> m_gx_spriteram_alloc;
 
 	// mirrored K054338 settings
-	int *m_K054338_shdRGB;
+	int *m_K054338_shdRGB = nullptr;
 
 	// 1st-Tier GX/MW Variables
 	// frequently used registers
-	int m_k053247_vrcbk[4];
-	int m_k053247_coreg, m_k053247_coregshift, m_k053247_opset;
-	int m_opri, m_oinprion;
-	int m_vcblk[6], m_ocblk;
-	int m_vinmix, m_vmixon, m_osinmix, m_osmixon;
-	uint8_t  m_gx_wrport1_0, m_gx_wrport1_1;
-	uint16_t m_gx_wrport2;
+	int m_k053247_vrcbk[4]{};
+	int m_k053247_coreg = 0, m_k053247_coregshift = 0, m_k053247_opset = 0;
+	int m_opri = 0, m_oinprion = 0;
+	int m_vcblk[6]{}, m_ocblk = 0;
+	int m_vinmix = 0, m_vmixon = 0, m_osinmix = 0, m_osmixon = 0;
+	uint8_t  m_gx_wrport1_0 = 0, m_gx_wrport1_1 = 0;
+	uint16_t m_gx_wrport2 = 0;
 
 	// 2nd-Tier GX/MW Graphics Variables
-	uint8_t *m_gx_objzbuf;
+	uint8_t *m_gx_objzbuf = nullptr;
 	std::unique_ptr<uint8_t[]> m_gx_shdzbuf;
-	int m_layer_colorbase[4];
-	int32_t m_gx_tilebanks[8], m_gx_oldbanks[8];
-	int m_gx_tilemode, m_gx_rozenable, m_psac_colorbase, m_last_psac_colorbase;
-	int m_gx_specialrozenable; // type 1 roz, with voxel height-map, rendered from 2 source tilemaps (which include height data) to temp bitmap for further processing
-	int m_gx_rushingheroes_hack;
+	int m_layer_colorbase[4]{};
+	int32_t m_gx_tilebanks[8]{}, m_gx_oldbanks[8]{};
+	int m_gx_tilemode = 0, m_gx_rozenable = 0, m_psac_colorbase = 0, m_last_psac_colorbase = 0;
+	int m_gx_specialrozenable = 0; // type 1 roz, with voxel height-map, rendered from 2 source tilemaps (which include height data) to temp bitmap for further processing
+	int m_gx_rushingheroes_hack = 0;
 
-	tilemap_t *m_gx_psac_tilemap, *m_gx_psac_tilemap2;
+	tilemap_t *m_gx_psac_tilemap = nullptr, *m_gx_psac_tilemap2 = nullptr;
 	std::unique_ptr<bitmap_ind16> m_type3_roz_temp_bitmap;
-	tilemap_t *m_gx_psac_tilemap_alt;
-	int m_konamigx_has_dual_screen;
-	int m_konamigx_palformat;
+	tilemap_t *m_gx_psac_tilemap_alt = nullptr;
+	int m_konamigx_has_dual_screen = 0;
+	int m_konamigx_palformat = 0;
 	std::unique_ptr<bitmap_rgb32> m_dualscreen_left_tempbitmap;
 	std::unique_ptr<bitmap_rgb32> m_dualscreen_right_tempbitmap;
 
@@ -299,10 +299,10 @@ protected:
 
 	std::unique_ptr<GX_OBJ[]> m_gx_objpool;
 
-	u8 m_type3_psac2_bank;
-	u8 m_type3_spriteram_bank;
+	u8 m_type3_psac2_bank = 0;
+	u8 m_type3_spriteram_bank = 0;
 	//int m_konamigx_type3_psac2_actual_last_bank = 0;
-	int m_use_68020_post_clock_hack;
+	int m_use_68020_post_clock_hack = 0;
 	output_finder<> m_lamp;
 };
 

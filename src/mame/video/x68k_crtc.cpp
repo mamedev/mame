@@ -367,7 +367,7 @@ void x68k_crtc_device::crtc_w(offs_t offset, u16 data, u16 mem_mask)
 			attotime irq_time = attotime::zero;
 			if ((data / m_vmultiple) != screen().vpos())
 			{
-				irq_time = screen().time_until_pos((data - 1) / m_vmultiple,2);
+				irq_time = screen().time_until_pos(((data != 0 ? data : screen().height()) - 1) / m_vmultiple,2);
 				m_rint_callback(1);
 			}
 			m_raster_irq_timer->adjust(irq_time, (data) / m_vmultiple);

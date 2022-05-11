@@ -96,6 +96,7 @@ avt.cpp
 aztarac.cpp
 backfire.cpp
 badlands.cpp
+badlands_ms.cpp
 badlandsbl.cpp
 bagman.cpp
 bailey.cpp
@@ -563,6 +564,7 @@ homedata.cpp
 homerun.cpp
 hornet.cpp
 hotblock.cpp
+hotchili.cpp
 hotstuff.cpp
 houseball.cpp
 hshavoc.cpp
@@ -693,6 +695,7 @@ lckydraw.cpp
 legionna.cpp
 leland.cpp
 lemmings.cpp
+lependu.cpp
 lethal.cpp
 lethalj.cpp
 lgp.cpp
@@ -953,6 +956,7 @@ pacman.cpp
 pandoras.cpp
 pangofun.cpp
 panicr.cpp
+paokaipc.cpp
 paradise.cpp
 paranoia.cpp
 parodius.cpp
@@ -1051,6 +1055,7 @@ radikaldarts.cpp
 raiden.cpp
 raiden2.cpp
 raiden_ms.cpp
+rallypnt.cpp
 rallyx.cpp
 rampart.cpp
 ramtek.cpp
@@ -1101,7 +1106,6 @@ s4.cpp
 s6.cpp
 s7.cpp
 s8.cpp
-s8a.cpp
 s9.cpp
 safarir.cpp
 sam.cpp
@@ -1200,6 +1204,7 @@ skykid.cpp
 skylncr.cpp
 skyraid.cpp
 slapfght.cpp
+slapfght_ms.cpp
 slapshot.cpp
 sleic.cpp
 sliver.cpp
@@ -1222,6 +1227,7 @@ spaceg.cpp
 spartanxtec.cpp
 spbactn.cpp
 spcforce.cpp
+spdamjes.cpp
 spdheat.cpp
 spdodgeb.cpp
 special_gambl.cpp

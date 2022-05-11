@@ -33,8 +33,6 @@ TODO:
 #include "emu.h"
 #include "cops1base.h"
 
-#include "debugger.h"
-
 
 cops1_base_device::cops1_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data) :
 	cpu_device(mconfig, type, tag, owner, clock),

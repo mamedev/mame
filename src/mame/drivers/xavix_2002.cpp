@@ -339,7 +339,7 @@ void xavix_state::xavix2002(machine_config &config)
 
 void xavix_i2c_jmat_state::xavix2002_i2c_jmat(machine_config &config)
 {
-	xavix2002_i2c_24c04(config);
+	xavix2002_i2c_24c08(config);
 
 	m_xavix2002io->read_0_callback().set(FUNC(xavix_i2c_jmat_state::read_extended_io0));
 	m_xavix2002io->write_0_callback().set(FUNC(xavix_i2c_jmat_state::write_extended_io0));
@@ -358,6 +358,13 @@ void xavix2002_superpttv_state::xavix2002_superpctv(machine_config& config)
 	m_xavix2002io->read_2_callback().set(FUNC(xavix2002_superpttv_state::read_extended_io2));
 }
 
+
+void xavix_i2c_state::xavix2002_i2c_24c08(machine_config &config)
+{
+	xavix2002(config);
+
+	I2C_24C08(config, "i2cmem", 0);
+}
 
 void xavix_i2c_state::xavix2002_i2c_24c04(machine_config &config)
 {
@@ -501,11 +508,11 @@ ROM_END
 
 
 CONS( 2004, xavtenni, 0, 0, xavix2002_i2c_24c04, xavix_i2c,  xavix_i2c_state,      init_xavix, "SSD Company LTD",         "XaviX Tennis (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2004, xavbaseb, 0, 0, xavix2002_i2c_24c04, xavix_i2c,  xavix_i2c_state,      init_xavix, "SSD Company LTD",         "XaviX Baseball (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, xavbaseb, 0, 0, xavix2002_i2c_24c08, xavix_i2c,  xavix_i2c_state,      init_xavix, "SSD Company LTD",         "XaviX Baseball (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2004, xavbowl,  0, 0, xavix2002_i2c_24c04, xavix_bowl, xavix_i2c_bowl_state, init_xavix, "SSD Company LTD",         "XaviX Bowling (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // has IR 'Camera'
 CONS( 2004, xavbox,   0, 0, xavix2002_i2c_jmat, xavix,  xavix_i2c_jmat_state,      init_xavix, "SSD Company LTD",         "XaviX Boxing (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // has IR 'Camera'
 // Bass Fishing PCB is just like Tennis except with an RF daughterboard.
-CONS( 2004, xavbassf, 0, 0, xavix2002_i2c_24c04, xavix_i2c,  xavix_i2c_state,      init_xavix, "SSD Company LTD",         "XaviX Bass Fishing (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, xavbassf, 0, 0, xavix2002_i2c_24c08, xavix_i2c,  xavix_i2c_state,      init_xavix, "SSD Company LTD",         "XaviX Bass Fishing (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // TODO: check SEEPROM type and hookup, banking!
 CONS( 2005, xavjmat,  0, 0, xavix2002_i2c_jmat,  xavix,      xavix_i2c_jmat_state, init_xavix, "SSD Company LTD",         "Jackie Chan J-Mat Fitness (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

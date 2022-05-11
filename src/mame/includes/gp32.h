@@ -45,49 +45,49 @@
 
 struct s3c240x_lcd_t
 {
-	uint32_t vramaddr_cur;
-	uint32_t vramaddr_max;
-	uint32_t offsize;
-	uint32_t pagewidth_cur;
-	uint32_t pagewidth_max;
-	uint32_t bppmode;
-	uint32_t bswp, hwswp;
-	uint32_t hozval, lineval;
-	int vpos, hpos;
+	uint32_t vramaddr_cur = 0;
+	uint32_t vramaddr_max = 0;
+	uint32_t offsize = 0;
+	uint32_t pagewidth_cur = 0;
+	uint32_t pagewidth_max = 0;
+	uint32_t bppmode = 0;
+	uint32_t bswp = 0, hwswp = 0;
+	uint32_t hozval = 0, lineval = 0;
+	int vpos = 0, hpos = 0;
 };
 
 struct smc_t
 {
-	int add_latch;
-	int chip;
-	int cmd_latch;
-	int do_read;
-	int do_write;
-	int read;
-	int wp;
-	int busy;
-	uint8_t datarx;
-	uint8_t datatx;
+	int add_latch = 0;
+	int chip = 0;
+	int cmd_latch = 0;
+	int do_read = 0;
+	int do_write = 0;
+	int read = 0;
+	int wp = 0;
+	int busy = 0;
+	uint8_t datarx = 0;
+	uint8_t datatx = 0;
 };
 
 struct i2s_t
 {
-	int l3d;
-	int l3m;
-	int l3c;
+	int l3d = 0;
+	int l3m = 0;
+	int l3c = 0;
 };
 
 struct s3c240x_iic_t
 {
-	uint8_t data[4];
-	int data_index;
-	uint16_t address;
+	uint8_t data[4]{};
+	int data_index = 0;
+	uint16_t address = 0;
 };
 
 struct s3c240x_iis_t
 {
-	uint16_t fifo[16/2];
-	int fifo_index;
+	uint16_t fifo[16/2]{};
+	int fifo_index = 0;
 };
 
 
@@ -120,34 +120,34 @@ private:
 	required_shared_ptr<uint32_t> m_s3c240x_ram;
 	std::unique_ptr<uint8_t[]> m_eeprom_data;
 	uint32_t m_s3c240x_lcd_regs[0x400/4];
-	emu_timer *m_s3c240x_lcd_timer;
+	emu_timer *m_s3c240x_lcd_timer = nullptr;
 	s3c240x_lcd_t m_s3c240x_lcd;
-	uint32_t m_s3c240x_lcd_palette[0x400/4];
-	uint32_t m_s3c240x_clkpow_regs[0x18/4];
-	uint32_t m_s3c240x_irq_regs[0x18/4];
-	emu_timer *m_s3c240x_pwm_timer[5];
-	uint32_t m_s3c240x_pwm_regs[0x44/4];
-	emu_timer *m_s3c240x_dma_timer[4];
-	uint32_t m_s3c240x_dma_regs[0x7c/4];
+	uint32_t m_s3c240x_lcd_palette[0x400/4]{};
+	uint32_t m_s3c240x_clkpow_regs[0x18/4]{};
+	uint32_t m_s3c240x_irq_regs[0x18/4]{};
+	emu_timer *m_s3c240x_pwm_timer[5]{};
+	uint32_t m_s3c240x_pwm_regs[0x44/4]{};
+	emu_timer *m_s3c240x_dma_timer[4]{};
+	uint32_t m_s3c240x_dma_regs[0x7c/4]{};
 	smc_t m_smc;
 	i2s_t m_i2s;
-	uint32_t m_s3c240x_gpio[0x60/4];
-	uint32_t m_s3c240x_memcon_regs[0x34/4];
-	uint32_t m_s3c240x_usb_host_regs[0x5C/4];
+	uint32_t m_s3c240x_gpio[0x60/4]{};
+	uint32_t m_s3c240x_memcon_regs[0x34/4]{};
+	uint32_t m_s3c240x_usb_host_regs[0x5C/4]{};
 	uint32_t m_s3c240x_uart_0_regs[0x2C/4];
 	uint32_t m_s3c240x_uart_1_regs[0x2C/4];
-	uint32_t m_s3c240x_usb_device_regs[0xBC/4];
-	uint32_t m_s3c240x_watchdog_regs[0x0C/4];
+	uint32_t m_s3c240x_usb_device_regs[0xBC/4]{};
+	uint32_t m_s3c240x_watchdog_regs[0x0C/4]{};
 	s3c240x_iic_t m_s3c240x_iic;
-	emu_timer *m_s3c240x_iic_timer;
-	uint32_t m_s3c240x_iic_regs[0x10/4];
+	emu_timer *m_s3c240x_iic_timer = nullptr;
+	uint32_t m_s3c240x_iic_regs[0x10/4]{};
 	s3c240x_iis_t m_s3c240x_iis;
-	emu_timer *m_s3c240x_iis_timer;
-	uint32_t m_s3c240x_iis_regs[0x14/4];
-	uint32_t m_s3c240x_rtc_regs[0x4C/4];
-	uint32_t m_s3c240x_adc_regs[0x08/4];
-	uint32_t m_s3c240x_spi_regs[0x18/4];
-	uint32_t m_s3c240x_mmc_regs[0x40/4];
+	emu_timer *m_s3c240x_iis_timer = nullptr;
+	uint32_t m_s3c240x_iis_regs[0x14/4]{};
+	uint32_t m_s3c240x_rtc_regs[0x4C/4]{};
+	uint32_t m_s3c240x_adc_regs[0x08/4]{};
+	uint32_t m_s3c240x_spi_regs[0x18/4]{};
+	uint32_t m_s3c240x_mmc_regs[0x40/4]{};
 	bitmap_rgb32 m_bitmap;
 	uint32_t s3c240x_lcd_r(offs_t offset);
 	void s3c240x_lcd_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

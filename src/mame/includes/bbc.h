@@ -259,9 +259,9 @@ protected:
 
 	output_finder<> m_motor_led;
 
-	int m_romsel;           // This is the latch that holds the sideways ROM bank to read
-	int m_paged_ram;        // BBC B+ memory handling
-	int m_vdusel;           // BBC B+ memory handling
+	int m_romsel = 0;           // This is the latch that holds the sideways ROM bank to read
+	int m_paged_ram = 0;        // BBC B+ memory handling
+	int m_vdusel = 0;           // BBC B+ memory handling
 
 	/*
 	    ACCCON
@@ -282,59 +282,59 @@ protected:
 	    ACCCON is a read/write register
 	*/
 
-	int m_acccon;
-	int m_acccon_irr;
-	int m_acccon_tst;
-	int m_acccon_ifj;
-	int m_acccon_itu;
-	int m_acccon_y;
-	int m_acccon_x;
-	int m_acccon_e;
-	int m_acccon_d;
+	int m_acccon = 0;
+	int m_acccon_irr = 0;
+	int m_acccon_tst = 0;
+	int m_acccon_ifj = 0;
+	int m_acccon_itu = 0;
+	int m_acccon_y = 0;
+	int m_acccon_x = 0;
+	int m_acccon_e = 0;
+	int m_acccon_d = 0;
 
 	void mc146818_set();
-	int m_mc146818_as;      // 6522 port b bit 7
-	int m_mc146818_ce;      // 6522 port b bit 6
+	int m_mc146818_as = 0;      // 6522 port b bit 7
+	int m_mc146818_ce = 0;      // 6522 port b bit 6
 
-	int m_via_system_porta;
+	int m_via_system_porta = 0;
 
 	// interrupt state
-	int m_adlc_irq;
-	int m_bus_nmi;
+	int m_adlc_irq = 0;
+	int m_bus_nmi = 0;
 
-	int m_column;           // this is a counter in the keyboard circuit
+	int m_column = 0;           // this is a counter in the keyboard circuit
 
 	/***************************************
 	  BBC 2C199 Serial Interface Cassette
 	****************************************/
 
-	double m_last_dev_val;
-	int m_wav_len;
-	int m_len0;
-	int m_len1;
-	int m_len2;
-	int m_len3;
-	uint8_t m_serproc_data;
-	int m_rxd_serial;
-	int m_dcd_serial;
-	int m_cts_serial;
-	int m_dcd_cass;
-	int m_rxd_cass;
-	int m_cass_out_enabled;
-	int m_txd;
-	uint32_t m_nr_high_tones;
-	int m_cass_out_samples_to_go;
-	int m_cass_out_bit;
-	int m_cass_out_phase;
-	emu_timer *m_tape_timer;
+	double m_last_dev_val = 0;
+	int m_wav_len = 0;
+	int m_len0 = 0;
+	int m_len1 = 0;
+	int m_len2 = 0;
+	int m_len3 = 0;
+	uint8_t m_serproc_data = 0;
+	int m_rxd_serial = 0;
+	int m_dcd_serial = 0;
+	int m_cts_serial = 0;
+	int m_dcd_cass = 0;
+	int m_rxd_cass = 0;
+	int m_cass_out_enabled = 0;
+	int m_txd = 0;
+	uint32_t m_nr_high_tones = 0;
+	int m_cass_out_samples_to_go = 0;
+	int m_cass_out_bit = 0;
+	int m_cass_out_phase = 0;
+	emu_timer *m_tape_timer = nullptr;
 
 
 	/**************************************
 	  WD1770 disc control
 	***************************************/
 
-	int m_fdc_irq;
-	int m_fdc_drq;
+	int m_fdc_irq = 0;
+	int m_fdc_drq = 0;
 
 	/**************************************
 	  Video Code
@@ -342,31 +342,31 @@ protected:
 
 // this is the real location of the start of the BBC's ram in the emulation
 // it can be changed if shadow ram is being used to point at the upper 32K of RAM
-	uint8_t *m_video_ram;
-	uint8_t m_pixel_bits[256];
-	int m_hsync;
-	int m_vsync;
+	uint8_t *m_video_ram = nullptr;
+	uint8_t m_pixel_bits[256]{};
+	int m_hsync = 0;
+	int m_vsync = 0;
 
-	uint8_t m_teletext_latch;
-	uint8_t m_vula_ctrl;
+	uint8_t m_teletext_latch = 0;
+	uint8_t m_vula_ctrl = 0;
 
 	struct video_nula {
-		uint8_t palette_mode;
-		uint8_t horiz_offset;
-		uint8_t left_blank;
-		uint8_t disable;
-		uint8_t attr_mode;
-		uint8_t attr_text;
-		uint8_t flash[8];
-		uint8_t palette_byte;
-		uint8_t palette_write;
+		uint8_t palette_mode = 0;
+		uint8_t horiz_offset = 0;
+		uint8_t left_blank = 0;
+		uint8_t disable = 0;
+		uint8_t attr_mode = 0;
+		uint8_t attr_text = 0;
+		uint8_t flash[8]{};
+		uint8_t palette_byte = 0;
+		uint8_t palette_write = 0;
 	} m_vnula;
 
-	int m_pixels_per_byte;
-	int m_cursor_size;
+	int m_pixels_per_byte = 0;
+	int m_cursor_size = 0;
 
-	uint8_t m_vula_palette[16];
-	uint8_t m_vula_palette_lookup[16];
+	uint8_t m_vula_palette[16]{};
+	uint8_t m_vula_palette_lookup[16]{};
 
 	void setvideoshadow(int vdusel);
 	void set_pixel_lookup();
@@ -379,7 +379,7 @@ protected:
 	uint16_t calculate_video_address(uint16_t ma, uint8_t ra);
 
 private:
-	emu_timer *m_reset_timer;
+	emu_timer *m_reset_timer = nullptr;
 };
 
 

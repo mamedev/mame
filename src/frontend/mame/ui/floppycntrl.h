@@ -39,6 +39,7 @@ private:
 
 	void do_load_create();
 	virtual void hook_load(const std::string &filename) override;
+	static bool can_format(const floppy_image_device::fs_info &fs);
 };
 
 } // namespace ui

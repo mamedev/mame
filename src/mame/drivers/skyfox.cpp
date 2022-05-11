@@ -334,7 +334,7 @@ ROM_START( skyfox )
 	ROM_LOAD( "skyfox7.bin", 0x40000, 0x10000, CRC(fa2ab5b4) SHA1(c0878b25dae28f7d49e14376ff885d1d4e3d5dfe) )
 	ROM_LOAD( "skyfox8.bin", 0x50000, 0x10000, CRC(0e3edc49) SHA1(3d1c59ecaabe1c9517203b7e814db41d5cff0cd4) )
 
-	ROM_REGION( 0x08000, "gfx2", 0 )    /* Background - do not dispose */
+	ROM_REGION( 0x08000, "gfx2", 0 )    /* Background */
 	ROM_LOAD( "skyfox10.bin", 0x0000, 0x8000, CRC(19f58f9c) SHA1(6887216243b47152129448cbb4c7d52309feed03) )
 
 	ROM_REGION( 0x300, "proms", 0 ) /* Color Proms */
@@ -359,7 +359,7 @@ ROM_START( exerizer )
 	ROM_LOAD( "7.7p",        0x40000, 0x10000, CRC(c9bbfe5c) SHA1(ce3f7d32baa8bb0bfc110877b5b5f4648ee959ac) )
 	ROM_LOAD( "8.7n",        0x50000, 0x10000, CRC(0e3edc49) SHA1(3d1c59ecaabe1c9517203b7e814db41d5cff0cd4) )   // 1-h
 
-	ROM_REGION( 0x08000, "gfx2", 0 )    /* Background - do not dispose */
+	ROM_REGION( 0x08000, "gfx2", 0 )    /* Background */
 	ROM_LOAD( "10.5e",       0x0000, 0x8000, CRC(19f58f9c) SHA1(6887216243b47152129448cbb4c7d52309feed03) ) // 1-j
 
 	ROM_REGION( 0x300, "proms", 0 ) /* Color Proms */
@@ -384,7 +384,7 @@ ROM_START( exerizerb )
 	ROM_LOAD( "1-g",         0x40000, 0x10000, CRC(c9bbfe5c) SHA1(ce3f7d32baa8bb0bfc110877b5b5f4648ee959ac) )
 	ROM_LOAD( "skyfox8.bin", 0x50000, 0x10000, CRC(0e3edc49) SHA1(3d1c59ecaabe1c9517203b7e814db41d5cff0cd4) )   // 1-h
 
-	ROM_REGION( 0x08000, "gfx2", 0 )    /* Background - do not dispose */
+	ROM_REGION( 0x08000, "gfx2", 0 )    /* Background */
 	ROM_LOAD( "skyfox10.bin", 0x0000, 0x8000, CRC(19f58f9c) SHA1(6887216243b47152129448cbb4c7d52309feed03) )    // 1-j
 
 	ROM_REGION( 0x300, "proms", 0 ) /* Color Proms */

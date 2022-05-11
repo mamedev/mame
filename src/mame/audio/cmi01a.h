@@ -79,21 +79,21 @@ private:
 	void update_wave_addr(int inc);
 
 	uint32_t    m_channel;
-	emu_timer * m_zx_timer;
-	uint8_t     m_zx_flag;
-	uint8_t     m_zx_ff;
+	emu_timer * m_zx_timer = nullptr;
+	uint8_t     m_zx_flag = 0;
+	uint8_t     m_zx_ff = 0;
 
-	emu_timer * m_eosi_timer;
+	emu_timer * m_eosi_timer = nullptr;
 
-	emu_timer * m_bcas_timer;
+	emu_timer * m_bcas_timer = nullptr;
 
 	std::unique_ptr<uint8_t[]>    m_wave_ram;
-	uint16_t  m_segment_cnt;
-	uint8_t   m_new_addr;     // Flag
-	uint8_t   m_vol_latch;
-	uint8_t   m_flt_latch;
-	uint8_t   m_rp;
-	uint8_t   m_ws;
+	uint16_t  m_segment_cnt = 0;
+	uint8_t   m_new_addr = 0;     // Flag
+	uint8_t   m_vol_latch = 0;
+	uint8_t   m_flt_latch = 0;
+	uint8_t   m_rp = 0;
+	uint8_t   m_ws = 0;
 	int       m_dir = 0;
 	int       m_env_dir = 0;
 	uint8_t   m_env = 0;

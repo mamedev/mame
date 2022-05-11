@@ -156,9 +156,9 @@ protected:
 	void sr16_mem(address_map &map);
 
 private:
-	uint8_t       m_kb_matrix;
-	uint8_t       m_leds;
-	uint8_t       m_lcd_digits[5];
+	uint8_t       m_kb_matrix = 0;
+	uint8_t       m_leds = 0;
+	uint8_t       m_lcd_digits[5]{};
 
 	required_device<hd44780_device> m_lcdc;
 	optional_device<cassette_image_device> m_cassette;

@@ -160,10 +160,20 @@ void lua_engine::initialize_input(sol::table &emu)
 				input_seq_type seq_type = seq_type_string ? s_seq_type_parser(*seq_type_string) : SEQ_TYPE_STANDARD;
 				return im.type_seq(type, *player, seq_type);
 			},
+			[] (ioport_manager &im, ioport_type type, std::optional<int> player)
+			{
+				if (!player)
+					player = 0;
+				return im.type_seq(type, *player);
+			},
 			[] (ioport_manager &im, input_type_entry const &type, std::optional<char const *> seq_type_string)
 			{
 				input_seq_type seq_type = seq_type_string ? s_seq_type_parser(*seq_type_string) : SEQ_TYPE_STANDARD;
 				return im.type_seq(type.type(), type.player(), seq_type);
+			},
+			[] (ioport_manager &im, input_type_entry const &type)
+			{
+				return im.type_seq(type.type(), type.player());
 			});
 	ioport_manager_type["set_type_seq"] = sol::overload(
 			[] (ioport_manager &im, ioport_type type, std::optional<int> player, std::optional<char const *> seq_type_string, input_seq const &seq)

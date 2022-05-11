@@ -66,10 +66,10 @@ protected:
 private:
 	void tube_rc6502_mem(address_map &map);
 
-	uint8_t m_default = 0;
-	uint8_t m_divider = 0;
-	uint8_t m_banking = 0;
-	uint8_t m_banknum = 0;
+	uint8_t m_default;
+	uint8_t m_divider;
+	uint8_t m_banking;
+	uint8_t m_banknum;
 };
 
 

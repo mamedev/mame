@@ -70,7 +70,6 @@ public:
 		, m_pic8259(*this, "pic8259")
 		, m_screen(*this, "screen")
 		, m_p_videoram(*this, "video")
-		, m_p_chargen(*this, "gfx1")
 	{ }
 
 	void mk98(machine_config &config);
@@ -103,7 +102,6 @@ private:
 	void mk98_map(address_map &map);
 
 	required_shared_ptr<u8> m_p_videoram;
-	required_region_ptr<u8> m_p_chargen;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -119,6 +117,7 @@ private:
 	uint8_t m_scancode = 0;
 	uint8_t m_kbdflag = 0;
 	int m_kbit = 0;
+	u8 m_p_chargen[0x800] = { };
 };
 
 
@@ -391,7 +390,8 @@ void mk98_state::video_w(offs_t offset, uint8_t data)
 	switch (offset)
 	{
 	case 2:
-		if (++m_font_upload > 63)
+		m_font_upload++;
+		if ((m_font_upload > 63) && (m_font_upload < 0x840))
 			m_p_chargen[m_font_upload - 64] = data;
 		break;
 
@@ -477,8 +477,6 @@ void mk98_state::mk98(machine_config &config)
 ROM_START( mk98 )
 	ROM_REGION(0x20000, "romdos", 0)
 	ROM_LOAD("e0000.bin", 0, 0x20000, CRC(85785bd5) SHA1(b10811715f44cf8e2b41baea7b62a35082e04048))
-
-	ROM_REGION(0x800, "gfx1", ROMREGION_ERASE00)
 ROM_END
 
 

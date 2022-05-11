@@ -115,7 +115,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="aliens">
-		<description>Aliens - Alien 2 (Prototype)</description>
+		<description>Aliens - Alien 2 (prototype)</description>
 		<year>1987</year>
 		<publisher>Square</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -126,7 +126,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="annsmb">
-		<description>All Night Nippon Super Mario Brothers (Promotion Card)</description>
+		<description>All Night Nippon Super Mario Brothers (promotion card)</description>
 		<year>1986</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="ANN-NSM"/>
@@ -776,7 +776,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="fcgolfsp" cloneof="fcgolf">
-		<description>Family Computer Golf Special Course (Prize Card)</description>
+		<description>Family Computer Golf Special Course (prize card)</description>
 		<year>19??</year>
 		<publisher>Nintendo</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -801,7 +801,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="fcgolfuj" cloneof="fcgolfu">
-		<description>Family Computer Golf Tournament - Japan Course (Prize Card)</description>
+		<description>Family Computer Golf Tournament - Japan Course (prize card)</description>
 		<year>19??</year>
 		<publisher>Nintendo</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1218,7 +1218,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="konekod" cloneof="koneko" supported="no">
-		<description>Koneko Monogatari - The Adventures of Chatran (Sample)</description>
+		<description>Koneko Monogatari - The Adventures of Chatran (sample)</description>
 		<year>1986</year>
 		<publisher>Pony Canyon</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1410,7 +1410,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 
 <!-- Sits at the title screen -->
 	<software name="michael" supported="no">
-		<description>Michael English Daibouken (Sample)</description>
+		<description>Michael English Daibouken (sample)</description>
 		<year>1987</year>
 		<publisher>Scorpion Soft</publisher>
 		<info name="serial" value="SCO-MEA"/>
@@ -1508,7 +1508,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="nazoraa2">
-		<description>Nazoraa Land Dai 2 Gou (Nazo Magazine Disk)</description>
+		<description>Nazoraa Land Dai 2 Gou (Nazo magazine disk)</description>
 		<year>1987</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="SSD-NZB"/>
@@ -1522,7 +1522,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="nazoraa3">
-		<description>Nazoraa Land Dai 3 Gou (Nazo Magazine Disk)</description>
+		<description>Nazoraa Land Dai 3 Gou (Nazo magazine disk)</description>
 		<year>1988</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="SSD-NZC"/>
@@ -1536,7 +1536,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="nazoraa">
-		<description>Nazoraa Land Soukan Gou (Nazo Magazine Disk)</description>
+		<description>Nazoraa Land Soukan Gou (Nazo magazine disk)</description>
 		<year>1987</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="SSD-NZL"/>
@@ -1550,7 +1550,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="nazoraaq">
-		<description>Nazoraa Land Special!! - Quiz Ou wo Sagase! (Nazo Magazine Disk)</description>
+		<description>Nazoraa Land Special!! - Quiz Ou wo Sagase! (Nazo magazine disk)</description>
 		<year>1987</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="SSD-NSP"/>
@@ -2156,7 +2156,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="zeldap" cloneof="zelda">
-		<description>Zelda no Densetsu - The Hyrule Fantasy (Prototype)</description>
+		<description>Zelda no Densetsu - The Hyrule Fantasy (prototype)</description>
 		<year>1986</year>
 		<publisher>Nintendo</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2255,7 +2255,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="fmcdiskc">
-		<description>FMC Disk Card Checker Ver 1.3 (v1.2) (Developer Card)</description>
+		<description>FMC Disk Card Checker Ver 1.3 (v1.2) (developer card)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2292,7 +2292,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 <!-- These come from a set of dev disks obtained from Sunsoft -->
 
 	<software name="adiantsup" cloneof="adiantsu">
-		<description>Adian no Tsue (Prototype)</description>
+		<description>Adian no Tsue (prototype)</description>
 		<year>1986</year>
 		<publisher>Sunsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2326,7 +2326,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="shanghai">
-		<description>Shanghai (Prototype)</description>
+		<description>Shanghai (prototype)</description>
 		<year>19??</year>
 		<publisher>Sunsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2337,7 +2337,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="shangh2">
-		<description>Shanghai 2 (Prototype, Dragon Layout)</description>
+		<description>Shanghai 2 (prototype, Dragon Layout)</description>
 		<year>19??</year>
 		<publisher>Sunsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2348,7 +2348,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="shangh2a" cloneof="shangh2">
-		<description>Shanghai 2 (Prototype, Scorpion Layout)</description>
+		<description>Shanghai 2 (prototype, Scorpion Layout)</description>
 		<year>19??</year>
 		<publisher>Sunsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2359,7 +2359,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="tiledit">
-		<description>Sunsoft Tile Editor (Newer)</description>
+		<description>Sunsoft Tile Editor (newer)</description>
 		<year>19??</year>
 		<publisher>Sunsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2370,7 +2370,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="tiledito" cloneof="tiledit">
-		<description>Sunsoft Tile Editor (Older)</description>
+		<description>Sunsoft Tile Editor (older)</description>
 		<year>19??</year>
 		<publisher>Sunsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2509,7 +2509,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="bublbobl1" cloneof="bublbobl">
-		<description>Bubble Bobble (Alt)</description>
+		<description>Bubble Bobble (alt)</description>
 		<year>1987</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="TFD-BUB"/>
@@ -2537,7 +2537,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="btime1" cloneof="btime">
-		<description>Burger Time (Alt)</description>
+		<description>Burger Time (alt)</description>
 		<year>1988</year>
 		<publisher>Data East</publisher>
 		<info name="serial" value="DFC-BGT"/>
@@ -2693,7 +2693,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="f1race1" cloneof="f1race">
-		<description>Famicom Grand Prix - F1 Race (Alt)</description>
+		<description>Famicom Grand Prix - F1 Race (alt)</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="FSC-FRGE"/>
@@ -2723,7 +2723,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 
 <!-- The following should be made of two separate 2-sided disks, not one disk with 4 sides! -->
 	<software name="shoniga1" cloneof="shoniga">
-		<description>Famicom Mukashi Banashi - Shin Onigashima (Alt)</description>
+		<description>Famicom Mukashi Banashi - Shin Onigashima (alt)</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="FMC-ON1, FMC-ON2"/>
@@ -2739,7 +2739,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 <!-- The following should be made of two separate 2-sided disks, not one disk with 4 sides! -->
 <!-- Is this a bad dump? -->
 	<software name="shoniga2" cloneof="shoniga" supported="no">
-		<description>Famicom Mukashi Banashi - Shin Onigashima (Alt 2)</description>
+		<description>Famicom Mukashi Banashi - Shin Onigashima (alt 2)</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="FMC-ON1, FMC-ON2"/>
@@ -2784,7 +2784,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 
 <!-- The following should be made of two separate 2-sided disks, not one disk with 4 sides! -->
 	<software name="fctantcla" cloneof="fctantcl">
-		<description>Famicom Tantei Club - Kieta Koukeisha (Alt)</description>
+		<description>Famicom Tantei Club - Kieta Koukeisha (alt)</description>
 		<year>1988</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="FMC-TC1, FMC-TC2"/>
@@ -2814,7 +2814,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 
 <!-- The following should be made of two separate 2-sided disks, not one disk with 4 sides! -->
 	<software name="fctantc2a" cloneof="fctantc2">
-		<description>Famicom Tantei Club Part II - Ushiro ni Tatsu Shoujo (Alt)</description>
+		<description>Famicom Tantei Club Part II - Ushiro ni Tatsu Shoujo (alt)</description>
 		<year>1989</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="FMC-TC3, FMC-TC4"/>
@@ -2884,7 +2884,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="famimag3a" cloneof="famimag1">
-		<description>Famimaga Disk Vol. 3 - All 1 (Alt)</description>
+		<description>Famimaga Disk Vol. 3 - All 1 (alt)</description>
 		<year>1991</year>
 		<publisher>Tokuma Shoten</publisher>
 		<info name="serial" value="GTS-ALD"/>
@@ -3053,7 +3053,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="gooniesa" cloneof="goonies">
-		<description>The Goonies (Alt)</description>
+		<description>The Goonies (alt)</description>
 		<year>1988</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="KDS-GNS"/>
@@ -3095,7 +3095,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="gunsmoke1" cloneof="gunsmoke">
-		<description>Gun.Smoke (Alt)</description>
+		<description>Gun.Smoke (alt)</description>
 		<year>1988</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="CAP-GUN"/>
@@ -3151,7 +3151,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="hikaris1" cloneof="hikaris">
-		<description>Hikari Shinwa - Palthena no Kagami (v1.1, Alt?)</description>
+		<description>Hikari Shinwa - Palthena no Kagami (v1.1, alt?)</description>
 		<year>1986</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="FMC-PTM"/>
@@ -3223,7 +3223,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="iceclimb1" cloneof="iceclimb">
-		<description>Ice Climber (Alt)</description>
+		<description>Ice Climber (alt)</description>
 		<year>1988</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="FMC-ICD"/>
@@ -3295,7 +3295,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 
 <!-- Save Disk Error -->
 	<software name="mettomag1" cloneof="mettomag" supported="no">
-		<description>Jikai Shounen Metto Mag (Alt)</description>
+		<description>Jikai Shounen Metto Mag (alt)</description>
 		<year>1987</year>
 		<publisher>Square</publisher>
 		<info name="serial" value="SQF-MTM"/>
@@ -3323,7 +3323,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="kmario1" cloneof="kmario">
-		<description>Kaettekita Mario Bros. (Alt)</description>
+		<description>Kaettekita Mario Bros. (alt)</description>
 		<year>1988</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="FMC-KMAR"/>
@@ -3337,7 +3337,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="kmario2" cloneof="kmario">
-		<description>Kaettekita Mario Bros. (Alt 2)</description>
+		<description>Kaettekita Mario Bros. (alt 2)</description>
 		<year>1988</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="FMC-KMAR"/>
@@ -3351,7 +3351,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="kmario3" cloneof="kmario">
-		<description>Kaettekita Mario Bros. (Alt 3)</description>
+		<description>Kaettekita Mario Bros. (alt 3)</description>
 		<year>1988</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="FMC-KMAR"/>
@@ -3365,7 +3365,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="kmario4" cloneof="kmario">
-		<description>Kaettekita Mario Bros. (Alt 4)</description>
+		<description>Kaettekita Mario Bros. (alt 4)</description>
 		<year>1988</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="FMC-KMAR"/>
@@ -3534,7 +3534,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="herobabl1" cloneof="herobabl">
-		<description>Matou no Houkai - The Hero of Babel (Alt)</description>
+		<description>Matou no Houkai - The Hero of Babel (alt)</description>
 		<year>1988</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="PNF-MAT (L30V5918)"/>
@@ -3787,7 +3787,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="sdgndgs1" cloneof="sdgndgs">
-		<description>SD Gundam World - Gachapon Senshi - Scramble Wars (Alt)</description>
+		<description>SD Gundam World - Gachapon Senshi - Scramble Wars (alt)</description>
 		<year>1988</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BAN-SGW"/>
@@ -3801,7 +3801,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="sdgndgs2" cloneof="sdgndgs">
-		<description>SD Gundam World - Gachapon Senshi - Scramble Wars (Alt 2)</description>
+		<description>SD Gundam World - Gachapon Senshi - Scramble Wars (alt 2)</description>
 		<year>1988</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BAN-SGW"/>
@@ -3829,7 +3829,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="sdgndgsmap1" cloneof="sdgndgs">
-		<description>SD Gundam World - Gachapon Senshi - Scramble Wars - Map Collection (Alt)</description>
+		<description>SD Gundam World - Gachapon Senshi - Scramble Wars - Map Collection (alt)</description>
 		<year>1989</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BAN-SG2"/>
@@ -3899,7 +3899,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="tamafrnd1" cloneof="tamafrnd">
-		<description>Tama &amp; Friends - 3 Choume Dai Bouken (Alt)</description>
+		<description>Tama &amp; Friends - 3 Choume Dai Bouken (alt)</description>
 		<year>1989</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BAN-UTM"/>
@@ -3984,7 +3984,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="tobidais1" cloneof="tobidais">
-		<description>Tobidase Daisakusen (Alt)</description>
+		<description>Tobidase Daisakusen (alt)</description>
 		<year>1987</year>
 		<publisher>Square</publisher>
 		<info name="serial" value="SQF-TDS"/>
@@ -3999,7 +3999,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 
 <!-- This is an unprotected copy?? -->
 	<software name="tobidais2" cloneof="tobidais">
-		<description>Tobidase Daisakusen (Hacked?)</description>
+		<description>Tobidase Daisakusen (hacked?)</description>
 		<year>1987</year>
 		<publisher>Square</publisher>
 		<info name="serial" value="SQF-TDS"/>
@@ -4056,7 +4056,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="ultraman1" cloneof="ultraman">
-		<description>Ultraman - Kaijuu Teikoku no Gyakushuu (Alt)</description>
+		<description>Ultraman - Kaijuu Teikoku no Gyakushuu (alt)</description>
 		<year>1987</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BAN-ULM"/>

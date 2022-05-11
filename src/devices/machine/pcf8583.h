@@ -166,7 +166,7 @@ private:
 	bool m_irq;
 	emu_timer * m_timer;
 
-	enum { STATE_IDLE, STATE_DEVSEL, STATE_REGISTER, STATE_DATAIN, STATE_DATAOUT };
+	enum { STATE_IDLE, STATE_DEVSEL, STATE_REGISTER, STATE_DATAIN, STATE_DATAOUT, STATE_READSELACK };
 };
 
 // device type definition

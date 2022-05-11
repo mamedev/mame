@@ -32,7 +32,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	uint8_t *m_rom = nullptr;
+	uint8_t *m_rom;
 };
 
 } // namespace bus::hp_dio

@@ -7,6 +7,12 @@
 
   preliminary driver by R. Belmont and Carl
 
+  TODO:
+  - Can't find CF card, throws "No boot device available", culprit may be lack of
+    PCI shadow RAM handling (which causes BIOS to boot in legacy mode);
+  - Handle STPCD0166BTC3 SoC properly, including PCI devices connected and SVGA
+    mods (wrongly draws only top screen with 640x200 with at486 -isa1 svga_s3);
+
   Hardware:
   - ST STPCD0166BTC3 486/66 + PC + VGA all on one chip
   - 4x AS4LC1M16E5-60TC 1M x 16 EDO DRAM
@@ -15,7 +21,7 @@
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "machine/lpci.h"
+#include "machine/pci.h"
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
 #include "video/pc_vga.h"
@@ -28,6 +34,7 @@ class fruitpc_state : public pcat_base_state
 public:
 	fruitpc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag)
+		, m_pciroot(*this, "pci")
 		, m_isabus(*this, "isa")
 		, m_inp(*this, "INP%u", 1U)
 	{ }
@@ -35,6 +42,7 @@ public:
 	void fruitpc(machine_config &config);
 
 private:
+	required_device<pci_root_device> m_pciroot;
 	required_device<isa8_device> m_isabus;
 	required_ioport_array<4> m_inp;
 
@@ -70,6 +78,7 @@ void fruitpc_state::fruitpc_io(address_map &map)
 	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
 	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
 	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::cs1_r), FUNC(ide_controller_device::cs1_w));
+//  map(0x0cf8, 0x0cff).rw(m_pcibus, FUNC(pci_bus_device::read), FUNC(pci_bus_device::write));
 }
 
 static INPUT_PORTS_START( fruitpc )
@@ -131,6 +140,9 @@ void fruitpc_state::fruitpc(machine_config &config)
 
 	m_dma8237_1->out_iow_callback<1>().set(FUNC(fruitpc_state::dma8237_1_dack_w));
 
+	PCI_ROOT(config, m_pciroot, 0);
+	// TODO: STPCD0166BTC3 host PCI
+
 	ISA8(config, m_isabus, 0);
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);
 	m_isabus->set_iospace("maincpu", AS_IO);
@@ -159,15 +171,3 @@ ROM_START( fruitpc )
 ROM_END
 
 GAME( 2006, fruitpc, 0, fruitpc, fruitpc, fruitpc_state, empty_init, ROT0, "<unknown>", "Fruit Land", MACHINE_IMPERFECT_GRAPHICS )
-
-// this doesn't really belong here, but is some kind of x86 pc-like hardware, exact CPU type etc. unknown
-// hardware ia by Paokai, motherboard has logos, large chip with logo too, http://www.paokai.com.tw/
-ROM_START( gogostrk )
-	ROM_REGION32_LE( 0x40000, "bios", 0 )
-	ROM_LOAD( "39sf020a.rom1", 0x000000, 0x040000, CRC(236d4d95) SHA1(50579acddc93c05d5f8e17ad3669a29d2dc49965) )
-
-	DISK_REGION( "ide:0:hdd:image" )    // 128 MB CF Card
-	DISK_IMAGE( "ggs-5-2-07", 0,SHA1(f214fd39ec8ac02f008823f4b179ea6c6835e1b8) )
-ROM_END
-
-GAME( 2007, gogostrk, 0, fruitpc, fruitpc, fruitpc_state, empty_init, ROT0, "American Alpha / Paokai", "Go Go Strike", MACHINE_NOT_WORKING ) // motherboard is dated 2006, if the CF card string is a date it's 2007

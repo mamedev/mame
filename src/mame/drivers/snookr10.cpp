@@ -3,6 +3,7 @@
 /**********************************************************************************
 
   SNOOKER 10 / SANDII'
+
   Driver by Roberto Fresca.
 
 
@@ -206,15 +207,15 @@
   To properly decrypt the thing 'on the fly' as the hardware does, I applied a bitswap into TILE_GET_INFO.
   This method rearrange the tile number for each tile called to be drawn.
 
-  The final algorithm is:
-                                                               digit #3
-                                                               +-------+ swapped digits 1 & 2
-                                                               |       |  +-------+------+
-    tile_offset = bitswap<16>((tile_offset & 0xfff),15,14,13,12, 8,9,10,11, 0,1,2,3, 4,5,6,7)
-                                                               | | |  |   | | | | || | | |
-                                                               inverted   inverted|inverted
-                                                               bitorder   bitorder|bitorder
-   Colors are scrambled in the following way:
+  The final algorithm is:                                                  +---- swapped ----+
+                                                               digit #3    digit #1   digit #2
+                                                               +-------+   +-----+    +-----+
+                                                               |       |   |     |    |     |
+  tile_offset = bitswap<16>((tile_offset & 0xfff),15,14,13,12, 8,9,10,11,  0,1,2,3,   4,5,6,7 )
+                                                               | | |  |    | | | |    | | | |
+                                                               inverted    inverted   inverted
+                                                               bitorder    bitorder   bitorder
+  Colors are scrambled in the following way:
 
     Normal  | Scrambled
     offset  |  offset
@@ -244,10 +245,10 @@
                                       1st nibble
                                   inverted bitorder
                                        | | | |
-    color_index = bitswap<8>(color_index,4,5,6,7,2,3,0,1)
+  color_index = bitswap<8>(color_index,4,5,6,7,2,3,0,1)
                                                <-> <->
                                               2nd nibble
-                                            swappeed pairs
+                                             swapped pairs
 
   Scary, huh?... ;-)
 
@@ -395,7 +396,7 @@
       |||||||||+----> 2    |
       ||||||||+-----> 3    |
       |||||||+------> 4    |
-      ||||||+-------> 9    |> FEDC0A517694328B -> encrypted tile index.
+      ||||||+-------> 9     > FEDC0A517694328B -> encrypted tile index.
       |||||+--------> 6    |
       ||||+---------> 7    |
       |||+----------> 1    |
@@ -438,7 +439,7 @@
 
   So, the algorithm to properly decrypt the color codes is the following one:
 
-    color_index = bitswap<8>(color_index,7,5,6,4,3,2,1,0)
+  color_index = bitswap<8>(color_index,7,5,6,4,3,2,1,0)
                                          | |
                                        swapped
 
@@ -627,10 +628,9 @@
 #include "snookr10.lh"
 
 
-/**********************
-* Read/Write Handlers *
-*   - Input Ports -   *
-**********************/
+/*******************************************
+*           Lamps and other I/O            *
+*******************************************/
 
 uint8_t snookr10_state::dsw_port_1_r()
 {
@@ -651,11 +651,6 @@ uint8_t snookr10_state::dsw_port_1_r()
 return ioport("SW1")->read();
 }
 
-
-/**********************
-* Read/Write Handlers *
-*  - Output Ports -   *
-**********************/
 
 /*  Lamps are multiplexed using a 6 bit matrix.
     The first 4 bits are from Port A, and the
@@ -697,17 +692,17 @@ void snookr10_state::output_port_0_w(uint8_t data)
 	m_bit4 = m_outporth & 1;
 	m_bit5 = (m_outporth >> 1) & 1;
 
-	m_lamps[0] = m_bit5;   /* Lamp 0 - START  */
-	m_lamps[1] = m_bit2;   /* Lamp 1 - CANCEL */
-	m_lamps[2] = m_bit0;   /* Lamp 2 - STOP1  */
-	m_lamps[3] = m_bit1;   /* Lamp 3 - STOP2  */
-	m_lamps[4] = m_bit0;   /* Lamp 4 - STOP3  */
-	m_lamps[5] = m_bit3;   /* Lamp 5 - STOP4  */
-	m_lamps[6] = m_bit4;   /* Lamp 6 - STOP5  */
+	m_lamps[0] = m_bit5;   // Lamp 0 - START
+	m_lamps[1] = m_bit2;   // Lamp 1 - CANCEL
+	m_lamps[2] = m_bit0;   // Lamp 2 - STOP1
+	m_lamps[3] = m_bit1;   // Lamp 3 - STOP2
+	m_lamps[4] = m_bit0;   // Lamp 4 - STOP3
+	m_lamps[5] = m_bit3;   // Lamp 5 - STOP4
+	m_lamps[6] = m_bit4;   // Lamp 6 - STOP5
 
-	machine().bookkeeping().coin_counter_w(0, data & 0x01);  /* Coin in */
-	machine().bookkeeping().coin_counter_w(1, data & 0x10);  /* Key in */
-	machine().bookkeeping().coin_counter_w(2, data & 0x04);  /* Payout x10 */
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);  // Coin in
+	machine().bookkeeping().coin_counter_w(1, data & 0x10);  // Key in
+	machine().bookkeeping().coin_counter_w(2, data & 0x04);  // Payout x10
 
 //  logerror("high: %04x - low: %X \n", m_outporth, m_outportl);
 //  popmessage("written : %02X", data);
@@ -738,13 +733,13 @@ void snookr10_state::output_port_1_w(uint8_t data)
 	m_bit4 = data & 1;
 	m_bit5 = (data >> 1) & 1;
 
-	m_lamps[0] = m_bit5;   /* Lamp 0 - START  */
-	m_lamps[1] = m_bit2;   /* Lamp 1 - CANCEL */
-	m_lamps[2] = m_bit0;   /* Lamp 2 - STOP1  */
-	m_lamps[3] = m_bit1;   /* Lamp 3 - STOP2  */
-	m_lamps[4] = m_bit0;   /* Lamp 4 - STOP3  */
-	m_lamps[5] = m_bit3;   /* Lamp 5 - STOP4  */
-	m_lamps[6] = m_bit4;   /* Lamp 6 - STOP5  */
+	m_lamps[0] = m_bit5;   // Lamp 0 - START
+	m_lamps[1] = m_bit2;   // Lamp 1 - CANCEL
+	m_lamps[2] = m_bit0;   // Lamp 2 - STOP1
+	m_lamps[3] = m_bit1;   // Lamp 3 - STOP2
+	m_lamps[4] = m_bit0;   // Lamp 4 - STOP3
+	m_lamps[5] = m_bit3;   // Lamp 5 - STOP4
+	m_lamps[6] = m_bit4;   // Lamp 6 - STOP5
 }
 
 
@@ -759,21 +754,21 @@ uint8_t snookr10_state::port2000_8_r()
 	return 0xff;
 }
 
-/*************************
-* Memory map information *
-*************************/
+/*********************************************
+*           Memory Map Information           *
+*********************************************/
 
 void snookr10_state::snookr10_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().share("nvram");   /* battery backed 6116 */
+	map(0x0000, 0x07ff).ram().share("nvram");  // battery backed 6116
 	map(0x1000, 0x1000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x3000, 0x3000).portr("IN0");        /* IN0 */
-	map(0x3001, 0x3001).portr("IN1");        /* IN1 */
-	map(0x3002, 0x3002).portr("IN2");        /* IN2 */
-	map(0x3003, 0x3003).portr("SW1");        /* DS1 */
-	map(0x3004, 0x3004).r(FUNC(snookr10_state::dsw_port_1_r));      /* complement of DS1, bit 7 */
-	map(0x5000, 0x5000).w(FUNC(snookr10_state::output_port_0_w));  /* OUT0 */
-	map(0x5001, 0x5001).w(FUNC(snookr10_state::output_port_1_w));  /* OUT1 */
+	map(0x3000, 0x3000).portr("IN0");          // IN0
+	map(0x3001, 0x3001).portr("IN1");          // IN1
+	map(0x3002, 0x3002).portr("IN2");          // IN2
+	map(0x3003, 0x3003).portr("SW1");          // DS1
+	map(0x3004, 0x3004).r(FUNC(snookr10_state::dsw_port_1_r));     // complement of DS1, bit 7
+	map(0x5000, 0x5000).w(FUNC(snookr10_state::output_port_0_w));  // OUT0
+	map(0x5001, 0x5001).w(FUNC(snookr10_state::output_port_1_w));  // OUT1
 	map(0x6000, 0x6fff).ram().w(FUNC(snookr10_state::snookr10_videoram_w)).share("videoram");
 	map(0x7000, 0x7fff).ram().w(FUNC(snookr10_state::snookr10_colorram_w)).share("colorram");
 	map(0x8000, 0xffff).rom();
@@ -781,14 +776,14 @@ void snookr10_state::snookr10_map(address_map &map)
 
 void snookr10_state::tenballs_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().share("nvram");   /* battery backed 6116 */
+	map(0x0000, 0x07ff).ram().share("nvram");  // battery backed 6116
 	map(0x1000, 0x1000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x4000, 0x4000).portr("IN0");        /* IN0 */
-	map(0x4001, 0x4001).portr("IN1");        /* IN1 */
-	map(0x4002, 0x4002).portr("IN2");        /* IN2 */
-	map(0x4003, 0x4003).portr("SW1");        /* DS1 */
-	map(0x5000, 0x5000).w(FUNC(snookr10_state::output_port_0_w));  /* OUT0 */
-	map(0x5001, 0x5001).w(FUNC(snookr10_state::output_port_1_w));  /* OUT1 */
+	map(0x4000, 0x4000).portr("IN0");          // IN0
+	map(0x4001, 0x4001).portr("IN1");          // IN1
+	map(0x4002, 0x4002).portr("IN2");          // IN2
+	map(0x4003, 0x4003).portr("SW1");          // DS1
+	map(0x5000, 0x5000).w(FUNC(snookr10_state::output_port_0_w));  // OUT0
+	map(0x5001, 0x5001).w(FUNC(snookr10_state::output_port_1_w));  // OUT1
 	map(0x6000, 0x6fff).ram().w(FUNC(snookr10_state::snookr10_videoram_w)).share("videoram");
 	map(0x7000, 0x7fff).ram().w(FUNC(snookr10_state::snookr10_colorram_w)).share("colorram");
 	map(0x8000, 0xffff).rom();
@@ -796,14 +791,14 @@ void snookr10_state::tenballs_map(address_map &map)
 
 void snookr10_state::crystalc_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().share("nvram");   /* battery backed 6116 */
-	map(0x1000, 0x1000).w(FUNC(snookr10_state::output_port_0_w));  /* OUT0 */
-	map(0x1001, 0x1001).w(FUNC(snookr10_state::output_port_1_w));  /* OUT1 */
-	map(0x2000, 0x2008).r(FUNC(snookr10_state::port2000_8_r));      /* unknown... protection or data channels? */
-	map(0x3000, 0x3000).portr("IN0");        /* IN0 */
-	map(0x3001, 0x3001).portr("IN1");        /* IN1 */
-	map(0x3002, 0x3002).portr("IN2");        /* IN2 */
-	map(0x3003, 0x3003).portr("SW1");        /* DS1 */
+	map(0x0000, 0x07ff).ram().share("nvram");  // battery backed 6116
+	map(0x1000, 0x1000).w(FUNC(snookr10_state::output_port_0_w));  // OUT0
+	map(0x1001, 0x1001).w(FUNC(snookr10_state::output_port_1_w));  // OUT1
+	map(0x2000, 0x2008).r(FUNC(snookr10_state::port2000_8_r));     // unknown. protection or data channels?
+	map(0x3000, 0x3000).portr("IN0");          // IN0
+	map(0x3001, 0x3001).portr("IN1");          // IN1
+	map(0x3002, 0x3002).portr("IN2");          // IN2
+	map(0x3003, 0x3003).portr("SW1");          // DS1
 	map(0x5000, 0x5000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x6000, 0x6fff).ram().w(FUNC(snookr10_state::snookr10_videoram_w)).share("videoram");
 	map(0x7000, 0x7fff).ram().w(FUNC(snookr10_state::snookr10_colorram_w)).share("colorram");
@@ -811,17 +806,17 @@ void snookr10_state::crystalc_map(address_map &map)
 }
 
 
-/*************************
-*      Input ports       *
-*************************/
+/*********************************************
+*                Input Ports                 *
+*********************************************/
 
-/*  Eliminated all PORT_IMPULSE limitations.
-    All Hold & Cancel buttons have a rattle sound in the real PCB. */
+//  Eliminated all PORT_IMPULSE limitations.
+//  All Hold & Cancel buttons have a rattle sound in the real PCB.
 
 static INPUT_PORTS_START( snookr10 )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Remote x100") PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Stop 1")    /* Input Test in stats mode */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Stop 1")  // Input Test in stats mode
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_NAME("Cancella (Cancel) / Play / Bet")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start (Deal) / Raddoppio (Double-Up)")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Stop 5 / Risk (Half Gamble) / Super Game")
@@ -873,8 +868,8 @@ static INPUT_PORTS_START( snookr10 )
 	PORT_DIPSETTING(    0x80, "STOP 5 button" )
 INPUT_PORTS_END
 
-/*  Eliminated all PORT_IMPULSE limitations.
-    All Hold & Cancel buttons have a rattle sound in the real PCB. */
+//  Eliminated all PORT_IMPULSE limitations.
+//  All Hold & Cancel buttons have a rattle sound in the real PCB.
 
 static INPUT_PORTS_START( apple10 )
 	PORT_INCLUDE( snookr10 )
@@ -903,40 +898,40 @@ static INPUT_PORTS_START( apple10 )
 	PORT_DIPSETTING(    0x80, "STOP 5 button" )
 INPUT_PORTS_END
 
-/*  Eliminated all PORT_IMPULSE limitations.
-    All Hold & Cancel buttons have a rattle sound in the real PCB. */
+//  Eliminated all PORT_IMPULSE limitations.
+//  All Hold & Cancel buttons have a rattle sound in the real PCB.
 
 static INPUT_PORTS_START( tenballs )
 	PORT_INCLUDE( snookr10 )
 
-	/* tenballs seems a prototype, most DIP
-	   switches seems to do nothing at all.
-	*/
+	// tenballs seems a prototype, most DIP
+	// switches seems to do nothing at all.
+
 	PORT_MODIFY("SW1")
 	PORT_DIPNAME( 0x03, 0x00, "Pool Value" )        PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x03, "100" )
 	PORT_DIPSETTING(    0x02, "200" )
 	PORT_DIPSETTING(    0x01, "500" )
 	PORT_DIPSETTING(    0x00, "1000" )
-	/* coinage is always 1 coin - 10 credits */
+	// coinage is always 1 coin - 10 credits
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	/* always play Super Game to payout */
+	// always play Super Game to payout
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	/* always manual payout */
+	// always manual payout
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	/* Super Game always ON */
+	// Super Game always ON
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1010,9 +1005,9 @@ static INPUT_PORTS_START( crystalca )
 INPUT_PORTS_END
 
 
-/*************************
-*    Graphics Layouts    *
-*************************/
+/*********************************************
+*              Graphics Layouts              *
+*********************************************/
 
 static const gfx_layout charlayout =
 {
@@ -1026,28 +1021,28 @@ static const gfx_layout charlayout =
 };
 
 
-/******************************
-* Graphics Decode Information *
-******************************/
+/**************************************************
+*           Graphics Decode Information           *
+**************************************************/
 
 static GFXDECODE_START( gfx_snookr10 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 16 )
 GFXDECODE_END
 
 
-/**************************
-*     Machine Drivers     *
-**************************/
+/*********************************************
+*              Machine Drivers               *
+*********************************************/
 
 void snookr10_state::snookr10(machine_config &config)
 {
-	/* basic machine hardware */
-	M65SC02(config, m_maincpu, XTAL(16'000'000)/8);    /* 2 MHz (1.999 MHz measured) */
+	// basic machine hardware
+	M65SC02(config, m_maincpu, XTAL(16'000'000) / 8);    // 2 MHz (1.999 MHz measured)
 	m_maincpu->set_addrmap(AS_PROGRAM, &snookr10_state::snookr10_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// video hardware
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -1061,16 +1056,16 @@ void snookr10_state::snookr10(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_snookr10);
 	PALETTE(config, "palette", FUNC(snookr10_state::snookr10_palette), 256);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, "oki", XTAL(1'000'000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.8);   /* 1 MHz (995.5 kHz measured); pin7 checked HIGH on PCB */
+	OKIM6295(config, "oki", XTAL(1'000'000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.8);  // 1 MHz (995.5 kHz measured); pin7 checked HIGH on PCB
 }
 
 void snookr10_state::apple10(machine_config &config)
 {
 	snookr10(config);
 
-	/* video hardware */
+	// video hardware
 	subdevice<palette_device>("palette")->set_init(FUNC(snookr10_state::apple10_palette));
 	MCFG_VIDEO_START_OVERRIDE(snookr10_state, apple10)
 }
@@ -1079,7 +1074,7 @@ void snookr10_state::tenballs(machine_config &config)
 {
 	snookr10(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &snookr10_state::tenballs_map);
 }
 
@@ -1087,7 +1082,7 @@ void snookr10_state::crystalc(machine_config &config)
 {
 	snookr10(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &snookr10_state::crystalc_map);
 
 	subdevice<palette_device>("palette")->set_init(FUNC(snookr10_state::crystalc_palette));
@@ -1095,9 +1090,9 @@ void snookr10_state::crystalc(machine_config &config)
 }
 
 
-/*************************
-*        Rom Load        *
-*************************/
+/*********************************************
+*                  Rom Load                  *
+*********************************************/
 
 ROM_START( snookr10 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1107,13 +1102,13 @@ ROM_START( snookr10 )
 	ROM_LOAD( "2.u22", 0x0000, 0x8000, CRC(a70d9c48) SHA1(3fa90190323526553866662afda4dbe1c94abeff) )
 	ROM_LOAD( "3.u25", 0x8000, 0x8000, CRC(3009faaa) SHA1(d1cda455b270cb9afa65b9701735a3a1f2a48df2) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // ADPCM samples
 	ROM_LOAD( "4.u18", 0x00000, 0x40000, CRC(17090d56) SHA1(3a4c247f96c80f8cf4c1389b273880c5ea6fc39d) )
 
-	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )  // default NVRAM
 	ROM_LOAD( "snooker_10_nvram.bin", 0x0000, 0x0800, CRC(d383363b) SHA1(88f0d9e53b0bd276d01cefd817f0edcd753322dc) )
 
-	/* this should be changed because the palette is stored in a normal ROM instead of a color PROM */
+	// this should be changed because the palette is stored in a normal ROM instead of a color PROM
 	ROM_REGION( 0x8000, "proms", 0 )
 	ROM_LOAD( "5.u27", 0x0000, 0x8000, CRC(f3d7d640) SHA1(f78060f4603e316fa3c2ec4ba6d7edf261cf6d8a) )
 ROM_END
@@ -1126,13 +1121,13 @@ ROM_START( apple10 )
 	ROM_LOAD( "2.u22", 0x0000, 0x8000, CRC(42b016f4) SHA1(59d1b77f8cb706a3878813111c6a71514c413784) )
 	ROM_LOAD( "3.u25", 0x8000, 0x8000, CRC(afc535dc) SHA1(ed2d65f3154c6d80b7b22bfef1f30232e4496128) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // ADPCM samples
 	ROM_LOAD( "4.u18", 0x00000, 0x40000, CRC(17090d56) SHA1(3a4c247f96c80f8cf4c1389b273880c5ea6fc39d) )
 
-	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )  // default NVRAM
 	ROM_LOAD( "apple_10_nvram.bin", 0x0000, 0x0800, CRC(00069b55) SHA1(378ca25dc3173252548bc27e80909e1b2b4d58db) )
 
-	/* this should be changed because the palette is stored in a normal ROM instead of a color PROM */
+	// this should be changed because the palette is stored in a normal ROM instead of a color PROM
 	ROM_REGION( 0x8000, "proms", 0 )
 	ROM_LOAD( "5.u27", 0x0000, 0x8000, CRC(3510d705) SHA1(2190c8199d29bf89e3007eb771cc6b0e2b58f6cd) )
 ROM_END
@@ -1145,10 +1140,10 @@ ROM_START( tenballs )
 	ROM_LOAD( "3.u16", 0x0000, 0x8000, CRC(9eb88a08) SHA1(ab52924103e2b14c598a21c3d77b053da37a0212) )
 	ROM_LOAD( "2.u15", 0x8000, 0x8000, CRC(a5091583) SHA1(c0775d9b77cb634d3702b6c08cdf73c867b6169a) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // ADPCM samples
 	ROM_LOAD( "1.u28", 0x00000, 0x40000, CRC(17090d56) SHA1(3a4c247f96c80f8cf4c1389b273880c5ea6fc39d) )
 
-	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )  // default NVRAM
 	ROM_LOAD( "ten_balls_nvram.bin", 0x0000, 0x0800, CRC(42a5803f) SHA1(2c8c9ec0f26a947cf9cfa2e91e9127725becdef5) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -1182,10 +1177,10 @@ ROM_START( crystalc )
 	ROM_LOAD( "crystals_colours_2_l.425.u16", 0x0000, 0x8000, CRC(834aba76) SHA1(86c1f282c11a4bb058ab702c237b76a620b99cc7) )
 	ROM_LOAD( "crystals_colours_3_l.425.u15", 0x8000, 0x8000, CRC(7f14f66a) SHA1(daba9a687b8985edfb61e21ba010544f97523bdc) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // ADPCM samples
 	ROM_LOAD( "crystals_colours_4.u28", 0x00000, 0x40000, CRC(ecc6b575) SHA1(f6032e89b30aebeab9ad721608277430084256bc) )
 
-	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )  // default NVRAM
 	ROM_LOAD( "crystals_colours_1.02_nvram.bin", 0x0000, 0x0800, CRC(20456301) SHA1(224da8fd8ea0997741bd5a7d51c8ca7f264d2302) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -1200,10 +1195,10 @@ ROM_START( crystalca )
 	ROM_LOAD( "crystals_colours_2.u16", 0x0000, 0x8000, CRC(527c07f6) SHA1(53ceb1d0267e1d76fa1a9325c9a1d2e8e034958d) )
 	ROM_LOAD( "crystals_colours_3.u15", 0x8000, 0x8000, CRC(e1003ab7) SHA1(a78bb2e1dc9d578d6a38072e2087f382cffa9f99) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // ADPCM samples
 	ROM_LOAD( "crystals_colours_4.u28", 0x00000, 0x40000, CRC(ecc6b575) SHA1(f6032e89b30aebeab9ad721608277430084256bc) )
 
-	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
+	ROM_REGION( 0x0800, "nvram", 0 )  // default NVRAM */
 	ROM_LOAD( "crystals_colours_1.01_nvram.bin", 0x0000, 0x0800, CRC(907d8828) SHA1(ffd302996bee81277c2280fc212d910e0801d81d) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -1211,11 +1206,11 @@ ROM_START( crystalca )
 ROM_END
 
 
-/*************************
-*      Game Drivers      *
-*************************/
+/*********************************************
+*                Game Drivers                *
+*********************************************/
 
-/*     YEAR  NAME       PARENT    MACHINE   INPUT      CLASS           INIT        ROT   COMPANY      FULLNAME                       FLAGS   LAYOUT */
+//     YEAR  NAME       PARENT    MACHINE   INPUT      CLASS           INIT        ROT   COMPANY      FULLNAME                       FLAGS   LAYOUT
 GAMEL( 1998, snookr10,  0,        snookr10, snookr10,  snookr10_state, empty_init, ROT0, "Sandii'",   "Snooker 10 (Ver 1.11)",       0,      layout_snookr10 )
 GAMEL( 1998, apple10,   0,        apple10,  apple10,   snookr10_state, empty_init, ROT0, "Sandii'",   "Apple 10 (Ver 1.21)",         0,      layout_snookr10 )
 GAMEL( 1997, tenballs,  snookr10, tenballs, tenballs,  snookr10_state, empty_init, ROT0, "<unknown>", "Ten Balls (Ver 1.05)",        0,      layout_snookr10 )

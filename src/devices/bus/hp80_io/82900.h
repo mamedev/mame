@@ -48,8 +48,8 @@ private:
 	// RAM
 	std::unique_ptr<uint8_t []> m_ram;
 
-	bool m_rom_enabled = 0;
-	uint8_t m_addr_latch = 0;
+	bool m_rom_enabled;
+	uint8_t m_addr_latch;
 
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
 	uint8_t cpu_mem_r(offs_t offset);

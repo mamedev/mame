@@ -596,7 +596,7 @@
 /* Unusual behavior: stacks PC-1 */
 #undef OP_JSR
 #define OP_JSR(MODE)                                                        \
-			CLK(CLK_OP + CLK_W16 + CLK_##MODE);                             \
+			CLK(6);                             \
 			DST = EA_##MODE();                                              \
 			g65816i_push_16(REGISTER_PC-1);                                       \
 			g65816i_jump_16(DST)
@@ -605,7 +605,7 @@
 /* Unusual behavior: stacks PC-1 */
 #undef OP_JSRAXI
 #define OP_JSRAXI()                                                         \
-			CLK(CLK_OP + CLK_W16 + CLK_AXI);                                \
+			CLK(8);                                \
 			DST = read_16_AXI(REGISTER_PB | (MAKE_UINT_16(OPER_16_IMM() + REGISTER_X))); \
 			g65816i_push_16(REGISTER_PC-1);                                       \
 			g65816i_jump_16(DST)

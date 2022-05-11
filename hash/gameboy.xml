@@ -4563,6 +4563,20 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="dangan">
+		<description>Dangan GB</description>
+		<year>2019</year>
+		<publisher>Catskull Electronics</publisher>
+		<info name="release" value="20190420" />
+		<info name="alt_title" value="弾丸GB" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="262144">
+				<rom name="dangan.bin" size="262144" crc="5359d6db" sha1="10029774046dabec2d8c0533caf94091f6e19071" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="darkman">
 		<description>Darkman (Europe, USA)</description>
 		<year>1992</year>
@@ -4674,6 +4688,18 @@ license:CC0
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
 				<rom name="dead heat scramble (usa).bin" size="65536" crc="9e3e3656" sha1="71e560dd2b5f5c4f4dcca0837c74bb1b843a15aa" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deathpla">
+		<description>Death Planet</description>
+		<year>2019</year>
+		<publisher>Catskull Electronics</publisher>
+		<info name="release" value="20191127" />
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="deathplanet.bin" size="32768" crc="956d9497" sha1="70c711f073c73f237ca5937e7ac5dc86200bcae5" />
 			</dataarea>
 		</part>
 	</software>
@@ -9686,6 +9712,19 @@ license:CC0
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="dmg-aigp-0.u1" size="262144" crc="94757be8" sha1="13f2fc0945fb7a90f4d87d8c4e310dec9af6b792" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="intoblue">
+		<description>Into the Blue</description>
+		<year>2019</year>
+		<publisher>Catskull Electronics</publisher>
+		<info name="release" value="20190409" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="131072">
+				<rom name="into the blue.bin" size="131072" crc="7714e96e" sha1="5ac7a349bb37c8767c9db264ed8ae7b7647fa8ea" />
 			</dataarea>
 		</part>
 	</software>
@@ -19489,6 +19528,18 @@ license:CC0
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="dmg-arsp-0.u1" size="262144" crc="2d33e175" sha1="08dad9ac1f045d1c9e403c4ea1368aee991e0094" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="retroid">
+		<description>Retroid</description>
+		<year>2018</year>
+		<publisher>Mega Cat Studios</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="262144">
+				<rom name="retroid.bin" size="262144" crc="9f759f25" sha1="4c7323d6a10852fe416c7bd581d6ffdd2d473bb5" />
 			</dataarea>
 		</part>
 	</software>

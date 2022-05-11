@@ -34,7 +34,7 @@ protected:
 
 	u16 m_io_regs[8];
 	u32 m_base20, m_base30, m_base40;
-	u32 m_rom_mask = 0;
+	u32 m_rom_mask;
 
 	// RTC
 	u8   m_rtc_setting;    /* Timer setting byte */
@@ -122,14 +122,14 @@ private:
 		READ_MODE = 0,
 		COMMAND_MODE
 	};
-	u8 m_flash_seq = 0;
-	u8 m_flash_command = 0;
-	bool m_write_flash = false;
-	bool m_writing_flash = false;
-	bool m_write_resetting = false;
-	u8 m_flash_mode = 0;
-	u8 m_flash_status = 0;
-	u8 m_flash_count = 0;
+	u8 m_flash_seq;
+	u8 m_flash_command;
+	bool m_write_flash;
+	bool m_writing_flash;
+	bool m_write_resetting;
+	u8 m_flash_mode;
+	u8 m_flash_status;
+	u8 m_flash_count;
 };
 
 

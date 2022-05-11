@@ -46,7 +46,7 @@ private:
 	optional_device_array<bbc_romslot_device, 16> m_rom;
 	required_ioport m_wp;
 
-	uint8_t m_romsel = 0;
+	uint8_t m_romsel;
 };
 
 
@@ -73,7 +73,7 @@ protected:
 private:
 	optional_device_array<bbc_romslot_device, 16> m_rom;
 
-	uint8_t m_romsel = 0;
+	uint8_t m_romsel;
 };
 
 

@@ -63,7 +63,7 @@ private:
 	int m_page;
 
 	// Is the SRAM buffered?
-	bool m_srammap = false;
+	bool m_srammap;
 
 	// RTC type
 	int m_rtctype;
@@ -77,7 +77,7 @@ private:
 
 	void decode(offs_t offset, bool& mmap, bool& sramsel, bool& xramsel, bool& rtcsel, bool& cs1fx, bool& cs3fx);
 
-	int m_rtc_int = 0;
+	int m_rtc_int;
 };
 
 } // end namespace bus::ti99::peb

@@ -37,7 +37,7 @@ protected:
 	virtual void identify_packet_device() override;
 	virtual void process_buffer() override;
 	virtual void ExecCommand() override;
-	bool m_media_change = false;
+	bool m_media_change;
 	uint16_t ultra_dma_mode;
 };
 

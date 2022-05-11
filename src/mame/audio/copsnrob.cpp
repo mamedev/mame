@@ -271,8 +271,8 @@ DISCRETE_CLASS_STEP_RESET(copsnrob_custom_noise, 2,
 	int     m_flip_flop = 0;
 	int     m_noise1_had_xtime = 0;
 	int     m_noise2_had_xtime = 0;
-	uint8_t   m_high_byte = 0;
-	uint8_t   m_low_byte = 0;
+	uint8_t m_high_byte = 0;
+	uint8_t m_low_byte = 0;
 	double  m_t_used = 0;
 	double  m_t1 = 0;
 );
@@ -284,9 +284,9 @@ DISCRETE_STEP(copsnrob_custom_noise)
 	double  t_used = m_t_used;
 	double  t1 = m_t1;
 	double  x_time = 0;
-	uint8_t   low_byte = m_low_byte;
-	uint8_t   high_byte = m_high_byte;
-	uint8_t   xnor_out;                           /* IC F2, pin 2 */
+	uint8_t low_byte = m_low_byte;
+	uint8_t high_byte = m_high_byte;
+	uint8_t xnor_out;                           /* IC F2, pin 2 */
 	int     last_noise1_bit = (low_byte >> 4) & 0x01;
 	int     last_noise2_bit = (low_byte >> 5) & 0x01;
 

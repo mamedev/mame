@@ -19,7 +19,6 @@
 \*********************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "arcompact.h"
 #include "arcompactdasm.h"
 

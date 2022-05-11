@@ -82,7 +82,7 @@ private:
 	required_shared_ptr<uint32_t> m_ram_base;
 	required_region_ptr<uint32_t> m_rom_base;
 
-	attotime        m_hblank_offset{};
+	attotime        m_hblank_offset;
 
 	uint8_t           m_irq_line_state = 0U;
 	uint8_t           m_irq_enable[3]{};

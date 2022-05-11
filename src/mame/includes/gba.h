@@ -48,26 +48,26 @@ private:
 	void audio_tick(int ref);
 
 	// DMA
-	emu_timer *m_dma_timer[4];
-	uint32_t m_dma_src[4];
-	uint32_t m_dma_dst[4];
-	uint16_t m_dma_cnt[4];
+	emu_timer *m_dma_timer[4]{};
+	uint32_t m_dma_src[4]{};
+	uint32_t m_dma_dst[4]{};
+	uint16_t m_dma_cnt[4]{};
 
 	// Timers
-	uint32_t m_timer_regs[4];
-	uint16_t m_timer_reload[4];
-	int m_timer_recalc[4];
+	uint32_t m_timer_regs[4]{};
+	uint16_t m_timer_reload[4]{};
+	int m_timer_recalc[4]{};
 
-	emu_timer *m_tmr_timer[4], *m_irq_timer;
+	emu_timer *m_tmr_timer[4]{}, *m_irq_timer = nullptr;
 
-	double m_timer_hz[4];
+	double m_timer_hz[4]{};
 
-	int m_fifo_a_ptr;
-	int m_fifo_b_ptr;
-	int m_fifo_a_in;
-	int m_fifo_b_in;
-	uint8_t m_fifo_a[20];
-	uint8_t m_fifo_b[20];
+	int m_fifo_a_ptr = 0;
+	int m_fifo_b_ptr = 0;
+	int m_fifo_a_in = 0;
+	int m_fifo_b_in = 0;
+	uint8_t m_fifo_a[20]{};
+	uint8_t m_fifo_b[20]{};
 
 
 	uint32_t gba_io_r(offs_t offset, uint32_t mem_mask = ~0);

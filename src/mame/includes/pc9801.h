@@ -118,7 +118,7 @@ protected:
 
 	static void floppy_formats(format_registration &fr);
 
-	u8 m_sys_type;
+	u8 m_sys_type = 0;
 };
 
 class pc9801_state : public pc98_base_state
@@ -204,7 +204,7 @@ protected:
 	u8 unk_r(offs_t offset);
 	uint8_t f0_r(offs_t offset);
 
-	uint8_t m_nmi_ff;
+	uint8_t m_nmi_ff = 0;
 
 	virtual u8 ppi_prn_portb_r();
 
@@ -241,7 +241,7 @@ protected:
 	uint8_t fdc_2hd_ctrl_r();
 	void fdc_2hd_ctrl_w(uint8_t data);
 
-	u8 m_fdc_2hd_ctrl;
+	u8 m_fdc_2hd_ctrl = 0;
 
 	bool fdc_drive_ready_r(upd765a_device *fdc);
 private:
@@ -250,7 +250,7 @@ private:
 	uint8_t fdc_2dd_ctrl_r();
 	void fdc_2dd_ctrl_w(uint8_t data);
 
-	u8 m_fdc_2dd_ctrl;
+	u8 m_fdc_2dd_ctrl = 0;
 
 //  DMA
 protected:
@@ -282,12 +282,12 @@ protected:
 	virtual void video_start() override;
 	void pc9801_palette(palette_device &palette) const;
 
-	uint8_t *m_char_rom;
-	uint8_t *m_kanji_rom;
+	uint8_t *m_char_rom = nullptr;
+	uint8_t *m_kanji_rom = nullptr;
 
 	struct {
-		uint8_t mode;
-		uint8_t tile[4], tile_index;
+		uint8_t mode = 0;
+		uint8_t tile[4]{}, tile_index = 0;
 	}m_grcg;
 
 	enum
@@ -310,8 +310,8 @@ protected:
 	uint8_t m_video_ff[8];
 	// TODO: move to derived state
 	uint8_t m_ex_video_ff[128];
-	u8 m_vram_bank;
-	u8 m_vram_disp;
+	u8 m_vram_bank = 0;
+	u8 m_vram_disp = 0;
 
 private:
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
@@ -325,26 +325,26 @@ private:
 	// (necessary for H98 high-reso mode, PC9821-E02, SVGA binds)
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	uint8_t m_font_line;
+	uint8_t m_font_line = 0;
 	std::unique_ptr<uint16_t[]> m_tvram;
-	uint8_t m_gfx_ff;
-	uint8_t m_txt_scroll_reg[8];
-	uint8_t m_pal_clut[4];
+	uint8_t m_gfx_ff = 0;
+	uint8_t m_txt_scroll_reg[8]{};
+	uint8_t m_pal_clut[4]{};
 
 //  SASI
-	uint8_t m_sasi_data;
-	int m_sasi_data_enable;
-	uint8_t m_sasi_ctrl;
+	uint8_t m_sasi_data = 0;
+	int m_sasi_data_enable = 0;
+	uint8_t m_sasi_ctrl = 0;
 
 //  Mouse
 protected:
 	struct{
-		uint8_t control;
-		uint8_t lx, ly;
-		uint8_t dx, dy;
-		uint8_t prev_dx, prev_dy;
-		uint8_t freq_reg;
-		uint8_t freq_index;
+		uint8_t control = 0;
+		uint8_t lx = 0, ly = 0;
+		uint8_t dx = 0, dy = 0;
+		uint8_t prev_dx = 0, prev_dy = 0;
+		uint8_t freq_reg = 0;
+		uint8_t freq_index = 0;
 	}m_mouse;
 
 private:
@@ -420,9 +420,9 @@ protected:
 	DECLARE_MACHINE_START(pc9801rs);
 	DECLARE_MACHINE_RESET(pc9801rs);
 
-	u8 m_gate_a20;
-	u8 m_dma_access_ctrl;
-	u8 m_ide_sel;
+	u8 m_gate_a20 = 0;
+	u8 m_dma_access_ctrl = 0;
+	u8 m_ide_sel = 0;
 
 	// starting from PC9801VF/U buzzer is substituted with a DAC1BIT
 	bool m_dac1bit_disable;
@@ -456,29 +456,29 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
-	emu_timer *m_fdc_timer;
+	emu_timer *m_fdc_timer = nullptr;
 
-	u8 m_fdc_mode;
+	u8 m_fdc_mode = 0;
 	u8 fdc_mode_r();
 	void fdc_mode_w(u8 data);
 	void fdc_set_density_mode(bool is_2hd);
 
 protected:
 	struct {
-		uint8_t pal_entry;
-		uint8_t r[16],g[16],b[16];
+		uint8_t pal_entry = 0;
+		uint8_t r[16]{}, g[16]{}, b[16]{};
 	}m_analog16;
 
 private:
 	// EGC, PC9801VX onward
 	struct {
-		uint16_t regs[8];
-		uint16_t pat[4];
-		uint16_t src[4];
-		int16_t count;
-		uint16_t leftover[4];
-		bool first;
-		bool init;
+		uint16_t regs[8]{};
+		uint16_t pat[4]{};
+		uint16_t src[4]{};
+		int16_t count = 0;
+		uint16_t leftover[4]{};
+		bool first = false;
+		bool init = false;
 	} m_egc;
 
 protected:

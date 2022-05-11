@@ -135,24 +135,24 @@ private:
 	required_device<isa8_device>  m_isabus;
 	optional_device<pc_kbdc_device>  m_pc_kbdc;
 
-	uint8_t   m_u73_q2 = 0;
-	uint8_t   m_out1 = 0;
-	int m_dma_channel = 0;
-	uint8_t m_dma_offset[4]{};
-	uint8_t m_pc_spkrdata = 0;
-	uint8_t m_pit_out2 = 0;
-	bool m_cur_eop = false;
+	uint8_t   m_u73_q2;
+	uint8_t   m_out1;
+	int m_dma_channel;
+	uint8_t m_dma_offset[4];
+	uint8_t m_pc_spkrdata;
+	uint8_t m_pit_out2;
+	bool m_cur_eop;
 
-	uint8_t m_nmi_enabled = 0;
+	uint8_t m_nmi_enabled;
 
-	uint8_t m_ram[768*1024]{};
-	uint8_t m_c800_ram[0x400]{};
-	uint8_t m_regs[0x400]{};
-	uint32_t m_offset = 0;
-	address_space *m_pcmem_space = nullptr, *m_pcio_space = nullptr;
-	bool m_reset_during_halt = false;
+	uint8_t m_ram[768*1024];
+	uint8_t m_c800_ram[0x400];
+	uint8_t m_regs[0x400];
+	uint32_t m_offset;
+	address_space *m_pcmem_space, *m_pcio_space;
+	bool m_reset_during_halt;
 
-	uint8_t m_6845_reg = 0;
+	uint8_t m_6845_reg;
 
 	// interface to the keyboard
 	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );

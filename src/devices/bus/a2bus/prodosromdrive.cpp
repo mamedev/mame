@@ -49,7 +49,7 @@ protected:
 private:
 	required_region_ptr<u8> m_rom;
 
-	u16 m_latch = 0;
+	u16 m_latch;
 };
 
 //**************************************************************************

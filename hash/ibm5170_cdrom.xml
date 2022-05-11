@@ -2515,7 +2515,7 @@ license:CC0
 		<description>PoiPon (Japan)</description>
 		<year>1997</year>
 		<publisher>Witty Wolf</publisher>
-		<info name="alt_title" value="ﾎﾟｲﾎﾟﾝ" />
+		<info name="alt_title" value="ポイポン" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="poipon" sha1="91c230bd6e14551794a1c28fd65c901187ce7786" />

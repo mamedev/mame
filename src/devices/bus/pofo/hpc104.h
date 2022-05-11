@@ -60,8 +60,8 @@ private:
 	memory_share_creator<uint8_t> m_nvram;
 	required_ioport m_io_sw1;
 
-	bool m_sw1 = false;
-	bool m_ncc1_out = false;
+	bool m_sw1;
+	bool m_ncc1_out;
 };
 
 

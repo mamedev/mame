@@ -39,28 +39,28 @@ private:
 
 	bool read_sector(bool first = false);
 
-	bool m_change = false;
-	bool m_newstat = false;
-	bool m_data = false;
-	uint8_t m_stat = 0;
-	uint8_t m_buf[2352]{};
-	int m_buf_count = 0;
-	int m_buf_idx = 0;
-	uint8_t m_cmdbuf[16]{};
-	int m_cmdbuf_count = 0;
-	int m_cmdrd_count = 0;
-	int m_cmdbuf_idx = 0;
-	uint8_t m_mode = 0;
-	uint8_t m_cmd = 0;
-	uint8_t m_conf = 0;
-	uint8_t m_irq = 0;
-	uint8_t m_dma = 0;
-	uint16_t m_dmalen = 0;
-	uint32_t m_readmsf = 0;
-	uint32_t m_readcount = 0;
-	bool m_locked = false;
-	int m_drvmode = 0;
-	int m_curtoctrk = 0;
+	bool m_change;
+	bool m_newstat;
+	bool m_data;
+	uint8_t m_stat;
+	uint8_t m_buf[2352];
+	int m_buf_count;
+	int m_buf_idx;
+	uint8_t m_cmdbuf[16];
+	int m_cmdbuf_count;
+	int m_cmdrd_count;
+	int m_cmdbuf_idx;
+	uint8_t m_mode;
+	uint8_t m_cmd;
+	uint8_t m_conf;
+	uint8_t m_irq;
+	uint8_t m_dma;
+	uint16_t m_dmalen;
+	uint32_t m_readmsf;
+	uint32_t m_readcount;
+	bool m_locked;
+	int m_drvmode;
+	int m_curtoctrk;
 	enum {
 		STAT_CMD_CHECK = 0x01,
 		STAT_PLAY_CDDA = 0x02,

@@ -293,6 +293,8 @@ SamRam
 
 uint8_t spectrum_state::pre_opcode_fetch_r(offs_t offset)
 {
+	if (is_contended(offset)) content_early();
+
 	/* this allows expansion devices to act upon opcode fetches from MEM addresses
 	   for example, interface1 detection fetches requires fetches at 0008 / 0708 to
 	   enable paged ROM and then fetches at 0700 to disable it
@@ -305,6 +307,8 @@ uint8_t spectrum_state::pre_opcode_fetch_r(offs_t offset)
 
 uint8_t spectrum_state::spectrum_data_r(offs_t offset)
 {
+	if (is_contended(offset)) content_early();
+
 	m_exp->pre_data_fetch(offset);
 	uint8_t retval = m_specmem->space(AS_PROGRAM).read_byte(offset);
 	m_exp->post_data_fetch(offset);
@@ -313,6 +317,9 @@ uint8_t spectrum_state::spectrum_data_r(offs_t offset)
 
 void spectrum_state::spectrum_data_w(offs_t offset, uint8_t data)
 {
+	if (is_contended(offset)) content_early();
+	if (is_vram_write(offset)) m_screen->update_now();
+
 	m_specmem->space(AS_PROGRAM).write_byte(offset,data);
 }
 
@@ -323,14 +330,9 @@ void spectrum_state::spectrum_rom_w(offs_t offset, uint8_t data)
 
 uint8_t spectrum_state::spectrum_rom_r(offs_t offset)
 {
-	uint8_t data;
-
-	if (m_exp->romcs())
-		data = m_exp->mreq_r(offset);
-	else
-		data = memregion("maincpu")->base()[offset];
-
-	return data;
+	return m_exp->romcs()
+		? m_exp->mreq_r(offset)
+		: memregion("maincpu")->base()[offset];
 }
 
 /*
@@ -341,33 +343,34 @@ uint8_t spectrum_state::spectrum_rom_r(offs_t offset)
 */
 void spectrum_state::spectrum_ula_w(offs_t offset, uint8_t data)
 {
+	if (is_contended(offset)) content_early();
+	content_early(1);
+
 	unsigned char Changed = m_port_fe_data^data;
 
 	/* border colour changed? */
-	if ((Changed & 0x07)!=0)
-		m_screen->update_now();
+	if ((Changed & 0x07)!=0) m_screen->update_now();
 
-	if ((Changed & (1<<4))!=0)
-		/* DAC output state */
-		m_speaker->level_w(BIT(data, 4));
+	/* DAC output state */
+	if ((Changed & (1<<4))!=0) m_speaker->level_w(BIT(data, 4));
 
-	if ((Changed & (1<<3))!=0)
-		/* write cassette data */
-		m_cassette->output((data & (1<<3)) ? -1.0 : +1.0);
+	/* write cassette data */
+	if ((Changed & (1<<3))!=0) m_cassette->output((data & (1<<3)) ? -1.0 : +1.0);
 
 	// Some exp devices use ula port unused bits 5-7:
 	// Beta v2/3/plus use bit 7, Beta clones use bits 6 and 7
-	if (m_exp)
-		m_exp->iorq_w(offset, data);
+	if (m_exp) m_exp->iorq_w(offset, data);
 
 	m_port_fe_data = data;
 }
-
 
 /* KT: more accurate keyboard reading */
 /* DJR: Spectrum+ keys added */
 uint8_t spectrum_state::spectrum_ula_r(offs_t offset)
 {
+	if (is_contended(offset)) content_early();
+	content_early(1);
+
 	int lines = offset >> 8;
 	int data = 0xff;
 
@@ -380,8 +383,7 @@ uint8_t spectrum_state::spectrum_ula_r(offs_t offset)
 	int joy2 = m_io_joy2.read_safe(0x1f) & 0x1f;
 
 	/* expansion port */
-	if (m_exp)
-		data = m_exp->iorq_r(offset);
+	if (m_exp) data = m_exp->iorq_r(offset);
 
 	/* Caps - V */
 	if ((lines & 1) == 0)
@@ -443,6 +445,12 @@ uint8_t spectrum_state::spectrum_ula_r(offs_t offset)
 
 void spectrum_state::spectrum_port_w(offs_t offset, uint8_t data)
 {
+	if (is_contended(offset))
+	{
+		content_early();
+		content_late();
+	}
+
 	// Pass through to expansion device if present
 	if (m_exp->get_card_device())
 		m_exp->iorq_w(offset | 1, data);
@@ -450,6 +458,12 @@ void spectrum_state::spectrum_port_w(offs_t offset, uint8_t data)
 
 uint8_t spectrum_state::spectrum_port_r(offs_t offset)
 {
+	if (is_contended(offset))
+	{
+		content_early();
+		content_late();
+	}
+
 	// Pass through to expansion device if present
 	if (m_exp->get_card_device())
 		return m_exp->iorq_r(offset | 1);
@@ -713,7 +727,6 @@ void spectrum_state::init_spectrum()
 void spectrum_state::machine_start()
 {
 	save_item(NAME(m_port_fe_data));
-	//TODO more
 }
 
 void spectrum_state::machine_reset()
@@ -749,30 +762,18 @@ void spectrum_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	case TIMER_IRQ_OFF:
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 		break;
-	case TIMER_SCANLINE:
-	{
-		auto vpos_next = m_screen->vpos() + 1;
-		if(vpos_next <= get_screen_area().bottom()) {
-			m_scanline_timer->adjust(m_screen->time_until_pos(vpos_next), get_screen_area().left());
-			m_screen->update_now();
-		}
-		break;
-	}
 	default:
 		throw emu_fatalerror("Unknown id in spectrum_state::device_timer");
 	}
 }
 
+attotime spectrum_state::time_until_int() {
+	return m_screen->time_until_pos(0, get_screen_area().left());
+};
+
 INTERRUPT_GEN_MEMBER(spectrum_state::spec_interrupt)
 {
-	timer_set(m_screen->time_until_pos(0), TIMER_IRQ_ON, 0);
-
-	/* Default implementation performs screen updates per scanline. Some other
-	clones e.g. pentagon do updates based on video_ram access, border updates,
-	and full frame refresh (for attributes flashing). Such clones may define own
-	*_interrupt config. */
-	if (m_scanline_timer != nullptr)
-		m_scanline_timer->adjust(m_screen->time_until_pos(get_screen_area().top() + 1));
+	timer_set(time_until_int(), TIMER_IRQ_ON, 0);
 }
 
 void spectrum_state::spectrum_common(machine_config &config)
@@ -783,6 +784,7 @@ void spectrum_state::spectrum_common(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &spectrum_state::spectrum_data);
 	m_maincpu->set_addrmap(AS_IO, &spectrum_state::spectrum_io);
 	m_maincpu->set_vblank_int("screen", FUNC(spectrum_state::spec_interrupt));
+	m_maincpu->nomreq_cb().set(FUNC(spectrum_state::spectrum_nomreq));
 
 	ADDRESS_MAP_BANK(config, m_specmem).set_map(&spectrum_state::spectrum_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x10000);
 
@@ -795,7 +797,7 @@ void spectrum_state::spectrum_common(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 
-	m_screen->set_raw(X1 / 2, 448, 312, {get_screen_area().left() - 48, get_screen_area().right() + 48, get_screen_area().top() - 48, get_screen_area().bottom() + 48});
+	m_screen->set_raw(X1 / 2, 448, 312, {get_screen_area().left() - 48, get_screen_area().right() + 48, get_screen_area().top() - 48, get_screen_area().bottom() + 56});
 	m_screen->set_screen_update(FUNC(spectrum_state::screen_update_spectrum));
 	m_screen->set_palette("palette");
 
@@ -911,8 +913,10 @@ ROM_START(spectrum)
 	ROMX_LOAD("diagrom.v50",0x0000,0x4000, CRC(054a2d6a) SHA1(2fa6f3b31d7bb610df78be5c4c80537cf6e5911d), ROM_BIOS(26))
 	ROM_SYSTEM_BIOS(27, "diagv51", "DiagROM v1.51")
 	ROMX_LOAD("diagrom.v51",0x0000,0x4000, CRC(83034df6) SHA1(e57b2c8a8e3563ea02a20eecd1d4cb6be9f9c2df), ROM_BIOS(27))
-	ROM_SYSTEM_BIOS(28, "alford37", "Brian Alford's Test ROM v0.37")
-	ROMX_LOAD("testromv037.bin", 0x0000,0x4000, CRC(a7ea3d1c) SHA1(f699b73abfb1ab53c063ac02ac6283705864c734), ROM_BIOS(28))
+	ROM_SYSTEM_BIOS(28, "diagv56", "DiagROM v1.56")
+	ROMX_LOAD("diagrom.v56",0x0000,0x4000, CRC(0ed22f7a) SHA1(37caf0bbc2d023ca5afaa12b3856ac90dbc83c51), ROM_BIOS(28))
+	ROM_SYSTEM_BIOS(29, "alford37", "Brian Alford's Test ROM v0.37")
+	ROMX_LOAD("testromv037.bin", 0x0000,0x4000, CRC(a7ea3d1c) SHA1(f699b73abfb1ab53c063ac02ac6283705864c734), ROM_BIOS(29))
 ROM_END
 
 ROM_START(specide)

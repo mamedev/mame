@@ -935,7 +935,8 @@ void m92_state::m92(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_m92);
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
+
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(m92_state,m92)
 
@@ -962,6 +963,9 @@ void m92_state::m92_banked(machine_config &config)
 	m92(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m92_state::m92_banked_map);
 	m_maincpu->set_addrmap(AS_IO, &m92_state::m92_banked_portmap);
+
+	// the 'banked' ROM setup also has a larger, banked palette
+	m_palette->set_format(palette_device::xBGR_555, 2048);
 }
 
 void m92_state::gunforce(machine_config &config)

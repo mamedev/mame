@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles, Couriersud,Stephane Humbert, Robbbert
+// copyright-holders:Aaron Giles, Couriersud, Stephane Humbert, Robbbert
 /***************************************************************************
 
     Galaxian-derived hardware
@@ -1753,6 +1753,13 @@ void galaxian_state::galaxian_map(address_map &map)
 	galaxian_map_discrete(map);
 }
 
+void galaxian_state::galartic_map(address_map &map)
+{
+	galaxian_map(map);
+
+	map(0x6002, 0x6002).unmapw(); // no coin lockout
+}
+
 void pisces_state::pisces_map(address_map &map)
 {
 	galaxian_map(map);
@@ -3065,6 +3072,27 @@ static INPUT_PORTS_START( superg )
 	PORT_DIPSETTING(    0x04, "5" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( galartic ) // TODO: any other differences?
+	PORT_INCLUDE(galaxian)
+
+	PORT_MODIFY("IN1")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x80, "A 2C/1C  B 1C/3C" )
+	PORT_DIPSETTING(    0x00, "A 2C/1C  B 1C/5C" )
+	PORT_DIPSETTING(    0xc0, "A 1C/1C  B 1C/3C" )
+	PORT_DIPSETTING(    0x40, "A 1C/1C  B 1C/5C" )
+
+	PORT_MODIFY("IN2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x00, "7000" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x04, "5" )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( swarm )
 	PORT_INCLUDE(galaxian)
@@ -4350,7 +4378,7 @@ static INPUT_PORTS_START( mooncrsl )
 	PORT_INCLUDE(mooncrst)
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) /* the game will crash at round 3 otherwise, could be protection (or a bad rom / bad hack) the same code is mostly patched out in mooncreg */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) // mooncrsl and mooncreg2 will crash at round 3 otherwise, could be protection (or a bad hack). The same code is mostly patched out in mooncreg
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
@@ -5079,38 +5107,26 @@ static INPUT_PORTS_START( thepitm )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) ) // turning both of these on boots with 9 credits?
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Free_Play ) )
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x00, "Game Speed" )
+	PORT_DIPSETTING(    0x00, "Slow" )
+	PORT_DIPSETTING(    0x01, "Fast" )
+	PORT_DIPNAME( 0x02, 0x00, "Time Limit" )
+	PORT_DIPSETTING(    0x00, "Long" )
+	PORT_DIPSETTING(    0x02, "Short" )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -5883,6 +5899,33 @@ static INPUT_PORTS_START( explorer )
 	PORT_DIPUNKNOWN( 0x20, 0x00 )
 	PORT_DIPUNKNOWN( 0x40, 0x00 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( takeoff )
+	PORT_INCLUDE( explorer )
+
+	PORT_MODIFY("IN3")
+	PORT_DIPNAME( 0x07, 0x01, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x03, "5" )
+	PORT_DIPSETTING(    0x04, "6" )
+	PORT_DIPSETTING(    0x05, "7" )
+	PORT_DIPSETTING(    0x06, "8" )
+	PORT_DIPSETTING(    0x07, "9" )
+	PORT_DIPNAME( 0x38, 0x20, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x00, "15000" )
+	PORT_DIPSETTING(    0x08, "20000" )
+	PORT_DIPSETTING(    0x10, "25000" )
+	PORT_DIPSETTING(    0x18, "30000" )
+	PORT_DIPSETTING(    0x20, "30000" )
+	PORT_DIPSETTING(    0x28, "50000" )
+	PORT_DIPSETTING(    0x30, "70000" )
+	PORT_DIPSETTING(    0x38, "90000" )
+	PORT_DIPUNKNOWN( 0x40, 0x00 )
+	PORT_DIPUNKNOWN( 0x80, 0x00 )
 INPUT_PORTS_END
 
 
@@ -7488,6 +7531,13 @@ void galaxian_state::galaxian(machine_config &config)
 	galaxian_base(config);
 
 	GALAXIAN_SOUND(config, "cust", 0);
+}
+
+void galaxian_state::galartic(machine_config &config)
+{
+	galaxian(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::galartic_map);
 }
 
 void pisces_state::pisces(machine_config &config)
@@ -9770,6 +9820,22 @@ ROM_START( galap4 )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
+ROM_END
+
+ROM_START( galartic )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "piii.1", 0x0000, 0x0800, CRC(78dd272d) SHA1(0a4f43a6f40ca65f73adcaac02469fb57f40041d) )
+	ROM_LOAD( "piii.2", 0x0800, 0x0800, CRC(465a9b45) SHA1(9eea6d30b856d959521cb935715006ba9deac53e) )
+	ROM_LOAD( "piii.3", 0x1000, 0x0800, CRC(03e36737) SHA1(3118d684d747dfd607617b0869fb25e4ac147eb1) )
+	ROM_LOAD( "piii.4", 0x1800, 0x0800, CRC(ce012b3f) SHA1(e6f976ae4a224d96376c287212ec50d03ccc6daa) )
+	ROM_LOAD( "piii.5", 0x2000, 0x0800, CRC(9ace06cf) SHA1(ab50baca0507fabcd78650fcf66a3b734ca95b84) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "piii.6", 0x0000, 0x0800, CRC(977e37cf) SHA1(88ff1e4edadf5cfc83413a1fe999aecf4ba72232) )
+	ROM_LOAD( "piii.7", 0x0800, 0x0800, CRC(d0ba22c9) SHA1(678b22d10e1ae7dcea068da838bf6bd648e9ee28) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
 ROM_START( swarm )
@@ -12568,6 +12634,34 @@ ROM_START( mooncreg ) // similar to the 'floritas' set but with original Moon Cr
 	ROM_REGION( 0x0020, "proms", 0 )
 	// not present in this set
 	ROM_LOAD( "prom_6331.10f", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) // Compatible with 82s123 PROM
+ROM_END
+
+
+ROM_START( mooncreg2 ) // more similar to 'floritasm'
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.bin",    0x0000, 0x0800, CRC(f82b5b29) SHA1(cd3336b690bb2af6c741a46e6cf96371b21c7373) )
+	ROM_LOAD( "2_bb.bin", 0x0800, 0x0800, CRC(b5e90c11) SHA1(fb43bc3ce1b25d13385ec59be2e8cf514270911a) ) // unique
+	ROM_LOAD( "3.bin",    0x1000, 0x0800, CRC(a1939def) SHA1(c9be93d325dde496d89e0735ec4e7abca932c0f6) )
+	ROM_LOAD( "4_b.bin",  0x1800, 0x0800, CRC(27f7cda1) SHA1(4d2eef64eddc021179b7e6fe7b8b40bc969491cb) )
+	ROM_LOAD( "5.bin",    0x2000, 0x0800, CRC(32cd9adc) SHA1(3143690712465d092d6c63f4826f220839d78958) )
+	ROM_LOAD( "6.bin",    0x2800, 0x0800, CRC(f0230048) SHA1(8a4363323530b21ee14dbe608aa0de5241d8bb39) )
+	ROM_LOAD( "7_r.bin",  0x3000, 0x0800, CRC(3e798858) SHA1(65b63a5aaf51f22f77537dfd01f49180227a1fb5) ) // unique
+	ROM_LOAD( "8.bin",    0x3800, 0x0800, CRC(bead5e83) SHA1(86d40eb5c16d1b9c9e7114af3eefedb50bd16cde) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "cm_2b.bin", 0x0000, 0x0800, CRC(528da705) SHA1(d726ee18b79774c982f88afb2a508eb5d5783193) )
+	ROM_LOAD( "cm_4.bin",  0x0800, 0x0200, CRC(5a4b17ea) SHA1(8a879dc34fdecc8a121c4a87abb981212fb05945) )
+	ROM_CONTINUE(          0x0c00, 0x0200 )
+	ROM_CONTINUE(          0x0a00, 0x0200 )
+	ROM_CONTINUE(          0x0e00, 0x0200 )
+	ROM_LOAD( "cm_1b.bin", 0x1000, 0x0800, CRC(4e79ff6b) SHA1(f72386a3766a7fcc7b4b8cedfa58b8d57f911f6f) )
+	ROM_LOAD( "cm_3.bin",  0x1800, 0x0200, CRC(e0edccbd) SHA1(0839a4c9b6e863d12253ae8e1732e80e08702228) )
+	ROM_CONTINUE(          0x1c00, 0x0200 )
+	ROM_CONTINUE(          0x1a00, 0x0200 )
+	ROM_CONTINUE(          0x1e00, 0x0200 )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "mb7051.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
 
@@ -15656,6 +15750,7 @@ GAME( 1980, galaxrfgg,   galaxian, galaxian,   galaxrf,    galaxian_state, init_
 GAME( 1980, galaxrcgg,   galaxian, galaxian,   galaxrf,    galaxian_state, init_galaxian,   ROT90,  "bootleg (Recreativos Covadonga)",            "Galaxian Growing Galaxip / Galaxian Nave Creciente (Recreativos Covadonga Spanish bootleg)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaxianrp,  galaxian, galaxian,   superg,     galaxian_state, init_galaxian,   ROT90,  "bootleg (Valadon Automation / Rene Pierre)", "Galaxian (Rene Pierre bootleg)",                                                               MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaxyx,     galaxian, galaxian,   superg,     galaxian_state, init_galaxian,   ROT90,  "bootleg",                                    "Galaxy X (bootleg of Galaxian)",                                                               MACHINE_SUPPORTS_SAVE )
+GAME( 1979, galartic,    galaxian, galartic,   galartic,   galaxian_state, init_galaxian,   ROT270, "bootleg (Artic System)",                     "Galaxian (Artic System bootleg)",                                                              MACHINE_SUPPORTS_SAVE )
 
 // These have the extra 'linescroll effect' title screens, like Moon Alien 2 but made out of a random tile, they lack an energy bar.
 GAME( 1979, moonaln,     galaxian, galaxian,   superg,     galaxian_state, init_galaxian,   ROT90,  "Namco / Nichibutsu (Karateco license?)", "Moon Alien",                          MACHINE_SUPPORTS_SAVE ) // or bootleg?
@@ -15799,7 +15894,8 @@ GAME( 198?, starfgmc,    mooncrst, mooncrst,   mooncrsa,   galaxian_state, init_
 GAME( 1980, spcdrag,     mooncrst, mooncrst,   smooncrs,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg",                      "Space Dragon (Moon Cresta bootleg)",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1980, floritas,    mooncrst, mooncrst,   smooncrs,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg",                      "Floritas (Moon Cresta bootleg)",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1980, floritasm,   mooncrst, mooncrst,   smooncrs,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Multivideo)",         "Floritas (Multivideo Spanish Moon Cresta bootleg)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1980, mooncreg,    mooncrst, mooncrst,   mooncreg,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Electrogame S.A.)",   "Moon Cresta (Electrogame S.A. Spanish bootleg)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1980, mooncreg,    mooncrst, mooncrst,   mooncreg,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Electrogame S.A.)",   "Moon Cresta (Electrogame S.A. Spanish bootleg, set 1)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1980, mooncreg2,   mooncrst, mooncrst,   mooncrsl,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Electrogame S.A.)",   "Moon Cresta (Electrogame S.A. Spanish bootleg, set 2)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1980, mooncrsl,    mooncrst, mooncrst,   mooncrsl,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Laguna S.A.)",        "Cresta Mundo (Laguna S.A. Spanish Moon Cresta bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, stera,       mooncrst, mooncrst,   smooncrs,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg",                      "Steraranger (Moon Cresta bootleg)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1980, mooncrgx,    mooncrst, galaxian,   mooncrgx,   galaxian_state, init_mooncrgx,   ROT270, "bootleg",                      "Moon Cresta (bootleg on Galaxian hardware)",             MACHINE_SUPPORTS_SAVE )
@@ -15914,7 +16010,7 @@ GAME( 1982, olmandingc,  amidar,   mandingarf, olmandingo, galaxian_state, init_
 GAME( 1980, theend,      0,        theend,     theend,     galaxian_state, init_theend,     ROT90,  "Konami",                             "The End",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1980, theends,     theend,   theend,     theend,     galaxian_state, init_theend,     ROT90,  "Konami (Stern Electronics license)", "The End (Stern Electronics)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1981, theendss,    theend,   theend,     theend,     galaxian_state, init_theend,     ROT90,  "bootleg (Sonic)",                    "The End (SegaSA / Sonic)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1981, takeoff,     theend,   takeoff,    explorer,   galaxian_state, init_explorer,   ROT90,  "bootleg (Sidam)",                    "Take Off (bootleg of The End)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // colors likely need bitswap<8> somewhere; needs different sound timer. reference: https://www.youtube.com/watch?v=iPYX3yJORTE
+GAME( 1981, takeoff,     theend,   takeoff,    takeoff,    galaxian_state, init_explorer,   ROT90,  "bootleg (Sidam)",                    "Take Off (bootleg of The End)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // colors likely need bitswap<8> somewhere; needs different sound timer. reference: https://www.youtube.com/watch?v=iPYX3yJORTE
 
 GAME( 1981, scramble,    0,        scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "Konami",                             "Scramble",                                                    MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scrambles,   scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "Konami (Stern Electronics license)", "Scramble (Stern Electronics set 1)",                          MACHINE_SUPPORTS_SAVE )

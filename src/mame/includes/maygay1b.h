@@ -77,21 +77,21 @@ private:
 	output_finder<256> m_lamps;
 	output_finder<8> m_triacs;
 
-	uint8_t m_lamppos;
-	int m_lamp_strobe;
-	int m_old_lamp_strobe;
-	int m_lamp_strobe2;
-	int m_old_lamp_strobe2;
-	int m_RAMEN;
-	int m_ALARMEN;
-	int m_PSUrelay;
-	bool m_Vmm;
-	int m_WDOG;
-	int m_NMIENABLE;
-	int m_meter;
+	uint8_t m_lamppos = 0;
+	int m_lamp_strobe = 0;
+	int m_old_lamp_strobe = 0;
+	int m_lamp_strobe2 = 0;
+	int m_old_lamp_strobe2 = 0;
+	int m_RAMEN = 0;
+	int m_ALARMEN = 0;
+	int m_PSUrelay = 0;
+	bool m_Vmm = false;
+	int m_WDOG = 0;
+	int m_NMIENABLE = 0;
+	int m_meter = 0;
 	TIMER_DEVICE_CALLBACK_MEMBER( maygay1b_nmitimer_callback );
-	uint8_t m_Lamps[256];
-	int m_optic_pattern;
+	uint8_t m_Lamps[256]{};
+	int m_optic_pattern = 0;
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 	void scanlines_w(uint8_t data);
 	void scanlines_2_w(uint8_t data);

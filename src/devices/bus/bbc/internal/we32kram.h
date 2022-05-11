@@ -42,7 +42,7 @@ protected:
 private:
 	void control_w(offs_t offset, uint8_t data);
 
-	uint8_t m_shadow = 0;
+	uint8_t m_shadow;
 	std::unique_ptr<uint8_t[]> m_ram;
 };
 

@@ -342,6 +342,8 @@ void xavix2_state::gpu_update(u16 count, u16 adr)
 		u32 y = (command >> 11) &  0x3ff;
 		u32 sx = 1+(descsize & 0xff);
 		u32 sy = 1 + ((descsize >> 8) & 0xff);
+		u32 scalex = (command >> 40) & 0x3; //only 1 and 2 seen as values for these two so far
+		u32 scaley = (command >> 46) & 0x3;
 		u32 bpp = 1 + ((descsize >> 24) & 7);
 		logerror("gpu    - data %06x size %08x w=%x h=%x ?=%x bpp=%x pal=%x\n", sadr, descsize, sx, sy, (descsize >> 16) & 0xff, bpp, descsize >> 27);
 
@@ -364,7 +366,13 @@ void xavix2_state::gpu_update(u16 count, u16 adr)
 					avail = 64;
 				}
 				u32 color = m_palette[palette | (v & mask)];
-				if (color) m_sd[y+yy][x+xx] = color;
+				if(color) {
+					for(u32 yyy = 0; yyy<scaley; yyy++) {
+						for(u32 xxx = 0; xxx < scalex; xxx++) {
+							m_sd[y+(yy*scaley)+yyy][x+(xx*scalex)+xxx] = color;
+						}
+					}
+				}
 				v >>= bpp;
 				avail -= bpp;
 			}

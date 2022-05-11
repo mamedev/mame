@@ -55,7 +55,7 @@ private:
 	optional_shared_ptr<uint16_t> m_screenram;
 
 	/* video-related */
-	tilemap_t      *m_tilemap[2];
+	tilemap_t      *m_tilemap[2]{};
 
 	DECLARE_WRITE_LINE_MEMBER(coin1_lockout_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_lockout_w);
@@ -87,7 +87,7 @@ private:
 	void thoop_map(address_map &map);
 
 	/* per-game configuration */
-	uint8_t m_sprite_palette_force_high;
+	uint8_t m_sprite_palette_force_high = 0;
 
 	static constexpr double FRAMERATE_922804 = 57.42;
 };

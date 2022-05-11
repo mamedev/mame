@@ -76,10 +76,6 @@ public:
 	// read a full line of text from the file
 	virtual char *gets(char *s, int n) = 0;
 
-	// get a pointer to a buffer that holds the full file data in RAM
-	// this function may cause the full file data to be read
-	virtual const void *buffer() = 0;
-
 	// open a file with the specified filename, read it into memory, and return a pointer
 	static std::error_condition load(std::string_view filename, void **data, std::uint32_t &length) noexcept;
 	static std::error_condition load(std::string_view filename, std::vector<uint8_t> &data) noexcept;

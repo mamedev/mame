@@ -69,16 +69,16 @@ private:
 	output_finder<3> m_gun_recoil;
 	output_finder<3> m_gun_led;
 
-	uint8_t m_cmos_write_enable;
-	uint16_t m_iodata[8];
-	uint8_t m_uart[8];
-	bool m_adc_int;
+	uint8_t m_cmos_write_enable = 0;
+	uint16_t m_iodata[8] = {};
+	uint8_t m_uart[8] = {};
+	bool m_adc_int = false;
 	std::unique_ptr<uint8_t[]> m_nvram_data;
 
-	uint8_t m_pic_command;
-	uint8_t m_pic_data;
-	uint8_t m_pic_clk;
-	uint8_t m_pic_status;
+	uint8_t m_pic_command = 0;
+	uint8_t m_pic_data = 0;
+	uint8_t m_pic_clk = 0;
+	uint8_t m_pic_status = 0;
 };
 
 #endif // MAME_INCLUDES_MIDXUNIT_H

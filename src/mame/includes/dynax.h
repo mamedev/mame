@@ -110,12 +110,12 @@ protected:
 	void dynax_extra_scrollx_w(uint8_t data);
 	void dynax_extra_scrolly_w(uint8_t data);
 
+	void tenkai_palette_w(offs_t offset, uint8_t data);
+
 	void hanamai_copylayer(bitmap_ind16 &bitmap, const rectangle &cliprect, int i );
 
 	DECLARE_MACHINE_START(dynax);
 	DECLARE_MACHINE_RESET(dynax);
-
-	void htengoku_banked_map(address_map &map);
 
 private:
 	void jantouki_vblank_ack_w(uint8_t data);
@@ -162,7 +162,6 @@ private:
 	void tenkai_ip_w(uint8_t data);
 	uint8_t tenkai_ip_r(offs_t offset);
 	uint8_t tenkai_palette_r(offs_t offset);
-	void tenkai_palette_w(offs_t offset, uint8_t data);
 	uint8_t tenkai_p3_r();
 	void tenkai_p3_w(uint8_t data);
 	void tenkai_p4_w(uint8_t data);
@@ -349,5 +348,7 @@ private:
 	uint8_t m_gekisha_val[2]{};
 
 };
+
+INPUT_PORTS_EXTERN( HANAFUDA_KEYS_BET );
 
 #endif // MAME_INCLUDES_DYNAX_H

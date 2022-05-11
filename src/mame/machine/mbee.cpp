@@ -757,7 +757,7 @@ image_init_result mbee_state::load_cart(device_image_interface &image, generic_s
 		}
 		m_pak_extended[pak_index] = (size > 0x1000) ? true : false;
 
-		slot->rom_alloc(m_pak_extended ? 0x2000 : 0x1000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+		slot->rom_alloc(m_pak_extended[pak_index] ? 0x2000 : 0x1000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 		slot->common_load_rom(slot->get_rom_base(), size, "rom");
 
 		// Validate the rom

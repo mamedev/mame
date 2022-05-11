@@ -18,6 +18,8 @@
 #include "peribox.h"
 #include "client_ws.hpp"
 
+#include <queue>
+
 namespace bus::ti99::peb {
 
 class tipi_attached_device;
@@ -37,6 +39,7 @@ public:
 private:
 	void device_start() override;
 	void device_reset() override;
+	void device_stop() override;
 	ioport_constructor device_input_ports() const override;
 	const tiny_rom_entry *device_rom_region() const override;
 	void device_add_mconfig(machine_config &config) override;
@@ -62,25 +65,32 @@ private:
 	int m_address;
 	bool m_dsr;
 	bool m_portaccess;
+	bool m_waitinit;
+	bool m_syncmode;
 
 	// DSR ROM
-	uint8_t* m_eprom = nullptr;
+	uint8_t* m_eprom;
 
 	// Websocket support
 	std::unique_ptr<webpp::ws_client> m_wsclient;
 	std::shared_ptr<webpp::ws_client::SendStream> m_send_stream;
 	std::unique_ptr<u8[]> m_rpimessage;
-	int m_msgindex = 0;
-	int m_msglength = 0;
-	emu_timer* m_restart_timer = nullptr;
-	int m_attempts = 0;
-	bool m_connected = 0;
+	int m_msgindex;
+	int m_msglength;
+	emu_timer* m_restart_timer;
+	int m_attempts;
+	bool m_connected;
+	bool m_rpiconn;
+
+	// Incoming queue
+	std::queue<u8> m_indqueue;
 
 	// Computer interface
-	u8 m_tc = 0;
-	u8 m_td = 0;
-	u8 m_rc = 0;
-	u8 m_rd = 0;
+	u8 m_tc;
+	u8 m_td;
+	u8 m_rc;
+
+	u8 m_lasttc;
 };
 
 /*

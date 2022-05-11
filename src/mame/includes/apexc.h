@@ -54,17 +54,17 @@ private:
 
 	void mem(address_map &map);
 
-	uint32_t m_panel_data_reg;    /* value of a data register on the control panel which can
+	uint32_t m_panel_data_reg = 0;    /* value of a data register on the control panel which can
 	                            be edited - the existence of this register is a personnal
 	                            guess */
 
 	std::unique_ptr<bitmap_ind16> m_bitmap;
 
-	uint32_t m_old_edit_keys;
-	int m_old_control_keys;
+	uint32_t m_old_edit_keys = 0;
+	int m_old_control_keys = 0;
 
-	int m_letters;
-	int m_pos;
+	int m_letters = 0;
+	int m_pos = 0;
 
 	required_device<apexc_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -77,7 +77,7 @@ private:
 	required_ioport m_panel_port;
 	required_ioport m_data_port;
 
-	emu_timer *m_input_timer;
+	emu_timer *m_input_timer = nullptr;
 
 	static const device_timer_id TIMER_POLL_INPUTS;
 	static const rgb_t palette_table[4];

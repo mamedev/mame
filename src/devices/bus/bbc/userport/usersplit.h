@@ -50,7 +50,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(cb2b_w);
 
 	required_device_array<bbc_userport_slot_device, 2> m_userport;
-	uint8_t m_selected = 0;
+	uint8_t m_selected;
 };
 
 

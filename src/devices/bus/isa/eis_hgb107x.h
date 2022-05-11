@@ -87,12 +87,12 @@ private:
 	required_ioport m_io_monitor;
 	required_region_ptr<uint8_t> m_chargen;
 
-	uint8_t m_vmode = 0;
-	rgb_t (*m_pal)[4]{};
-	rgb_t m_3111_pal[4]{};
-	rgb_t m_371x_pal[4]{};
+	uint8_t m_vmode;
+	rgb_t (*m_pal)[4];
+	rgb_t m_3111_pal[4];
+	rgb_t m_371x_pal[4];
 	bool m_installed;
-	hd6845s_device *m_hd6845s = nullptr;
+	hd6845s_device *m_hd6845s;
 public:
 	int m_framecnt;
 

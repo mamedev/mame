@@ -56,9 +56,9 @@ private:
 	required_device<ym2413_device> m_ym2413;
 	required_memory_bank m_okibank;
 
-	uint8_t           m_ym2413_volume;
-	uint8_t           m_overall_volume;
-	uint8_t           m_adpcm_bank;
+	uint8_t           m_ym2413_volume = 0;
+	uint8_t           m_overall_volume = 0;
+	uint8_t           m_adpcm_bank = 0;
 
 	static const atari_motion_objects_config s_mob_config;
 };

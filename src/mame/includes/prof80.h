@@ -90,12 +90,12 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(mstop_w);
 
 	// floppy state
-	int m_motor;
-	int m_ready;
-	int m_select;
+	int m_motor = 0;
+	int m_ready = 0;
+	int m_select = 0;
 
 	// timers
-	emu_timer   *m_floppy_motor_off_timer;
+	emu_timer   *m_floppy_motor_off_timer = nullptr;
 
 	void prof80_io(address_map &map);
 	void prof80_mem(address_map &map);

@@ -146,8 +146,6 @@
 #include "e132xs.h"
 #include "e132xsfe.h"
 
-#include "debugger.h"
-
 #include "32xsdefs.h"
 
 //#define VERBOSE 1

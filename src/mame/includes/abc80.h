@@ -161,17 +161,17 @@ public:
 	};
 
 	// keyboard state
-	int m_key_data;
-	int m_key_strobe;
-	int m_pio_astb;
+	int m_key_data = 0;
+	int m_key_strobe = 0;
+	int m_pio_astb = 0;
 
 	// video state
 	bitmap_rgb32 m_bitmap;
-	u8 m_latch;
-	int m_blink;
-	int m_c;
-	int m_r;
-	int m_mode;
+	u8 m_latch = 0;
+	int m_blink = 0;
+	int m_c = 0;
+	int m_r = 0;
+	int m_mode = 0;
 
 	// cassette state
 	bool m_motor;
@@ -179,11 +179,11 @@ public:
 	int m_tape_in_latch;
 
 	// timers
-	emu_timer *m_scanline_timer;
-	emu_timer *m_cassette_timer;
-	emu_timer *m_blink_timer;
-	emu_timer *m_vsync_on_timer;
-	emu_timer *m_vsync_off_timer;
+	emu_timer *m_scanline_timer = nullptr;
+	emu_timer *m_cassette_timer = nullptr;
+	emu_timer *m_blink_timer = nullptr;
+	emu_timer *m_vsync_on_timer = nullptr;
+	emu_timer *m_vsync_off_timer = nullptr;
 	void abc80(machine_config &config);
 	void abc80_video(machine_config &config);
 	void abc80_io(address_map &map);

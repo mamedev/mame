@@ -29,7 +29,7 @@ Published by Sega/Sega Toys (HPC-6*** serial codes)
 * ドラえもん のびたの まちなか ドキドキ たんけん!<10th> - Doraemon - Nobita no Machinaka Dokidoki Tanken! ~10th Anniversary Edition~ (Sega Toys - 200308xx - HPC-6126) [reprint HPC-6009]
 * トイストーリー2 ウッディ そうさく だいさくせん!!<10th> - Toy Story 2 - Woody Sousaku Daisakusen!! ~10th Anniversary Edition~ (Sega Toys - 20030714 - HPC-6127) [reprint HPC-6090]
 * ミッキーと大きな古時計<10th> - Mickey To Ooki na Furudokei ~10th Anniversary Edition~ (Sega Toys - 200308xx - HPC-6129) [reprint HPC-6023]
-* それいけ!アンパンマン はじめてあそぶピコソフト アンパンマンのいろ･かず･かたち ぬりえもできちゃうぞ! - Soreike! Anpanman Hajimete Asobu Pico Soft - Anpanman Noiro-Kazu-Katachi Nuriemo Dekichauzo! (Sega Toys - ???? - HPC-????)
+* それいけ!アンパンマン はじめてあそぶピコソフト アンパンマンのいろ・かず・かたち ぬりえもできちゃうぞ! - Soreike! Anpanman Hajimete Asobu Pico Soft - Anpanman Noiro-Kazu-Katachi Nuriemo Dekichauzo! (Sega Toys - ???? - HPC-????)
 * ディズニープリンセス 白雪姫 ～しらゆきひめ～ <Best> - Disney Princesses - Shirayukihime Best Selection (Sega Toys - 20040426 - HPC-6139)
 
 to be verified
@@ -908,7 +908,7 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		<publisher>Sega Toys</publisher>
 		<info name="serial" value="HPC-6145" />
 		<info name="release" value="20041018"/>
-		<info name="alt_title" value="ディズニープリンセス すてきにレッスン! ひらがな･カタカナ"/>
+		<info name="alt_title" value="ディズニープリンセス すてきにレッスン! ひらがな・カタカナ"/>
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-7090A" />
 			<feature name="ic1" value="EPOXY BLOCK IC1" />
@@ -1070,7 +1070,7 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		<year>199?</year>
 		<publisher>Shogakukan</publisher>
 		<info name="serial" value="T-226030"/>
-		<info name="alt_title" value="ドラえもん えんそく･いもほり･うんどうかい"/>
+		<info name="alt_title" value="ドラえもん えんそく・いもほり・うんどうかい"/>
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-6883A" />
 			<feature name="ic1" value="MPR-20221 J50" />
@@ -1086,7 +1086,7 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		<publisher>Shogakukan</publisher>
 		<info name="serial" value="T-226090"/>
 		<info name="release" value="200309xx"/>
-		<info name="alt_title" value="ドラえもん えんそく･いもほり･うんどうかい &lt;10th&gt;"/>
+		<info name="alt_title" value="ドラえもん えんそく・いもほり・うんどうかい &lt;10th&gt;"/>
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-7090A" />
 			<feature name="ic1" value="EPOXY BLOCK U1" />
@@ -1101,7 +1101,7 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		<year>199?</year>
 		<publisher>Shogakukan</publisher>
 		<info name="serial" value="T-226050"/>
-		<info name="alt_title" value="ドラえもん かぞえて･かんたん かず とけい"/>
+		<info name="alt_title" value="ドラえもん かぞえて・かんたん かず とけい"/>
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-7090A" />
 			<feature name="ic1" value="EPOXY BLOCK U1" />
@@ -1163,7 +1163,7 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		<publisher>Shogakukan</publisher>
 		<info name="serial" value="T-226040"/>
 		<info name="release" value="199908xx"/>
-		<info name="alt_title" value="ドラえもん よめたよ･かけたよ ひらがな カタカナ"/>
+		<info name="alt_title" value="ドラえもん よめたよ・かけたよ ひらがな カタカナ"/>
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-7090A" />
 			<feature name="ic1" value="9K0-0004-S" />
@@ -1211,7 +1211,7 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		<publisher>Bandai</publisher>
 		<info name="serial" value="T-133390"/>
 		<info name="release" value="20020315"/>
-		<info name="alt_title" value="どうぶつピコ ハムスターランド &lt;初回限定･ハムスター人形付属&gt;"/>
+		<info name="alt_title" value="どうぶつピコ ハムスターランド &lt;初回限定・ハムスター人形付属&gt;"/>
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-7967" />
 			<feature name="ic1" value="9K0-0052-RV08" />
@@ -1594,7 +1594,7 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		<year>2001</year>
 		<publisher>Gakken</publisher>
 		<info name="serial" value="T-169080"/>
-		<info name="alt_title" value="学研はじめての もじ･ことば"/>
+		<info name="alt_title" value="学研はじめての もじ・ことば"/>
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-7090A" />
 			<feature name="ic1" value="9K0-0034-RV" />
@@ -1670,7 +1670,7 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		<publisher>Gakken</publisher>
 		<info name="serial" value="T-169050"/>
 		<info name="release" value="199512xx"/>
-		<info name="alt_title" value="学研のおべんきょうソフト かず･すうじ"/>
+		<info name="alt_title" value="学研のおべんきょうソフト かず・すうじ"/>
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-7090A" />
 			<feature name="ic1" value="MPR-18585-16MX" />
@@ -2233,7 +2233,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<year>1996?</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="HPC-6035"/>
-		<info name="alt_title" value="怪盗セイント･テール セイントテールとワン･ツー･スリー!"/>
+		<info name="alt_title" value="怪盗セイント・テール セイントテールとワン・ツー・スリー!"/>
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-6883A" />
 			<feature name="ic1" value="MPR-18799 J42" />
@@ -2478,7 +2478,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<year>1998</year>
 		<publisher>Kodansha</publisher>
 		<info name="serial" value="T-255040"/>
-		<info name="alt_title" value="くまのプーさん クリストファー･ロビンを さがせ!"/>
+		<info name="alt_title" value="くまのプーさん クリストファー・ロビンを さがせ!"/>
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-6883A" />
 			<feature name="ic1" value="MPR-21835-S" />
@@ -4578,7 +4578,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<year>1994</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="T-133010"/>
-		<info name="alt_title" value="それいけ! アンパンマンのｹﾞｰﾑであそぼうアンパンマン"/>
+		<info name="alt_title" value="それいけ! アンパンマンのゲームであそぼうアンパンマン"/>
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-6434C" />
 			<feature name="ic1" value="MPR-16369-H" />
@@ -4928,7 +4928,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<publisher>Sega Toys</publisher>
 		<info name="serial" value="HPC-6114"/>
 		<info name="release" value="200207xx"/>
-		<info name="alt_title" value="トミカ・ピコ レスキューパーキング きんきゅうしゅつどう! はたらくのりもの &lt;初回･トミカ付属&gt; - Tomica Pico Rescue Parking Kinkyuushutsudou! Hataraku Norimono ~Shokai-Tomica Fuzoku~"/>
+		<info name="alt_title" value="トミカ・ピコ レスキューパーキング きんきゅうしゅつどう! はたらくのりもの &lt;初回・トミカ付属&gt; - Tomica Pico Rescue Parking Kinkyuushutsudou! Hataraku Norimono ~Shokai-Tomica Fuzoku~"/>
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-7438B" />
 			<feature name="u1" value="9B1-0014AR2" />
@@ -4947,7 +4947,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<publisher>Sega Toys</publisher>
 		<info name="serial" value="HPC-6101"/>
 		<info name="release" value="200112xx"/>
-		<info name="alt_title" value="とっとこハム太郎 はる･なつ･あき･ふゆ とっとこなかよし! ハムちゃんず!"/>
+		<info name="alt_title" value="とっとこハム太郎 はる・なつ・あき・ふゆ とっとこなかよし! ハムちゃんず!"/>
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-7090A" />
 			<feature name="ic1" value="EPOXY BLOCK U1" />

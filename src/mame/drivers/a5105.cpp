@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese, Robbbert
+// copyright-holders:Angelo Salese
 /***************************************************************************
 
 A5105

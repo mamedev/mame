@@ -106,8 +106,6 @@ void usgames_state::video_start()
 {
 	// assumes it can make an address mask from m_videoram.length() - 1
 	assert(!(m_videoram.length() & (m_videoram.length() - 1)));
-
-	m_gfxdecode->gfx(0)->set_source(m_charram);
 }
 
 void usgames_state::charram_w(offs_t offset, uint8_t data)
@@ -303,7 +301,7 @@ INPUT_PORTS_END
 
 
 static GFXDECODE_START( gfx_usgames )
-	GFXDECODE_ENTRY( nullptr, 0x2800, gfx_8x8x1, 0, 1 )
+	GFXDECODE_RAM( "charram", 0x2800, gfx_8x8x1, 0, 1 )
 GFXDECODE_END
 
 

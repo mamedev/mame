@@ -28,6 +28,8 @@ public:
 	// construction/destruction
 	nes_bcbattle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual uint8_t read_exp(offs_t offset) override;
+
 protected:
 	static constexpr device_timer_id TIMER_BATTLER = 1;
 
@@ -38,7 +40,6 @@ protected:
 
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual uint8_t read_exp(offs_t offset) override;
 	int read_current_bit();
 
 	required_device<barcode_reader_device> m_reader;

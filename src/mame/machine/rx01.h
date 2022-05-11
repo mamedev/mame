@@ -74,7 +74,7 @@ private:
 	uint16_t m_rxes = 0; // RX Error and Status
 	int m_unit = 0;
 	int m_interrupt = 0;
-	rx01_state m_state;
+	rx01_state m_state{};
 };
 
 // device type definition

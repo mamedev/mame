@@ -45,11 +45,11 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
-	bool m_readrom = false;
+	bool m_readrom;
 	int     m_active_slot;
 	int     m_fixed_slot;
 	int     m_next_free_slot;
-	ti99_cartridge_device*  m_cartridge[NUMBER_OF_CARTRIDGE_SLOTS]{};
+	ti99_cartridge_device*  m_cartridge[NUMBER_OF_CARTRIDGE_SLOTS];
 
 	void    set_slot(int slotnumber);
 	int     get_active_slot(bool changebase, offs_t offset);

@@ -2891,7 +2891,7 @@ NOTE:  There is known to exist an undumped version of Guardians on the
 **********************************************************
 
 
- P0-113A PCB with P1-106-1 & P1-107-1 duaghtercards
+ P0-113A PCB with P1-106-1 & P1-107-1 daughtercards
 
  program ROMs verified to match the P-FG01-1 set
 

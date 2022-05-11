@@ -155,100 +155,100 @@ protected:
 
 	struct
 	{
-		int sram_writeprotect;
-		int monitor;
-		int contrast;
-		int keyctrl;
-		uint16_t cputype;
+		int sram_writeprotect = 0;
+		int monitor = 0;
+		int contrast = 0;
+		int keyctrl = 0;
+		uint16_t cputype = 0;
 	} m_sysport;
 	struct
 	{
-		floppy_image_device *floppy[4];
-		int led_ctrl[4];
-		int led_eject[4];
-		int eject[4];
-		int motor;
-		int control_drives;
-		int select_drive;
+		floppy_image_device *floppy[4]{};
+		int led_ctrl[4]{};
+		int led_eject[4]{};
+		int eject[4]{};
+		int motor = 0;
+		int control_drives = 0;
+		int select_drive = 0;
 	} m_fdc;
 	struct
 	{
-		int ioc7;  // "Function B operation of joystick # one option"
-		int ioc6;  // "Function A operation of joystick # one option"
-		int joy1_enable;  // IOC4
-		int joy2_enable;  // IOC5
+		int ioc7 = 0;  // "Function B operation of joystick # one option"
+		int ioc6 = 0;  // "Function A operation of joystick # one option"
+		int joy1_enable = 0;  // IOC4
+		int joy2_enable = 0;  // IOC5
 	} m_joy;
 	struct
 	{
-		int rate;  // ADPCM sample rate
-		int pan;  // ADPCM output switch
-		int clock;  // ADPCM clock speed
+		int rate = 0;  // ADPCM sample rate
+		int pan = 0;  // ADPCM output switch
+		int clock = 0;  // ADPCM clock speed
 	} m_adpcm;
 	struct
 	{   // video controller at 0xe82000
-		unsigned short reg[3];
-		int text_pri;
-		int sprite_pri;
-		int gfx_pri;
-		int gfxlayer_pri[4];  // block displayed for each priority level
-		int tile8_dirty[1024];
-		int tile16_dirty[256];
-		int bg_visible_height;
-		int bg_visible_width;
-		int bg_hshift;
-		int bg_vshift;
-		int bg_hvres;  // bits 0,1 = H-Res, bits 2,3 = V-Res, bit 4 = L/H Freq (0=15.98kHz, 1=31.5kHz)
+		unsigned short reg[3]{};
+		int text_pri = 0;
+		int sprite_pri = 0;
+		int gfx_pri = 0;
+		int gfxlayer_pri[4]{};  // block displayed for each priority level
+		int tile8_dirty[1024]{};
+		int tile16_dirty[256]{};
+		int bg_visible_height = 0;
+		int bg_visible_width = 0;
+		int bg_hshift = 0;
+		int bg_vshift = 0;
+		int bg_hvres = 0;  // bits 0,1 = H-Res, bits 2,3 = V-Res, bit 4 = L/H Freq (0=15.98kHz, 1=31.5kHz)
 	} m_video;
 	struct
 	{
-		uint8_t irqstatus;
-		uint8_t fdcvector;
-		uint8_t fddvector;
-		uint8_t hdcvector;
-		uint8_t prnvector;
+		uint8_t irqstatus = 0;
+		uint8_t fdcvector = 0;
+		uint8_t fddvector = 0;
+		uint8_t hdcvector = 0;
+		uint8_t prnvector = 0;
 	} m_ioc;
 	struct
 	{
-		int inputtype;  // determines which input is to be received
-		bool irqactive;  // true if IRQ is being serviced
-		uint8_t irqvector;
-		char last_mouse_x;  // previous mouse x-axis value
-		char last_mouse_y;  // previous mouse y-axis value
-		int bufferempty;  // non-zero if buffer is empty
+		int inputtype = 0;  // determines which input is to be received
+		bool irqactive = false;  // true if IRQ is being serviced
+		uint8_t irqvector = 0;
+		char last_mouse_x = 0;  // previous mouse x-axis value
+		char last_mouse_y = 0;  // previous mouse y-axis value
+		int bufferempty = 0;  // non-zero if buffer is empty
 	} m_mouse;
 	struct
 	{
 		// port A
-		int mux1;  // multiplexer value
-		int seq1;  // part of 6-button input sequence.
-		emu_timer* io_timeout1;
+		int mux1 = 0;  // multiplexer value
+		int seq1 = 0;  // part of 6-button input sequence.
+		emu_timer* io_timeout1 = nullptr;
 		// port B
-		int mux2;  // multiplexer value
-		int seq2;  // part of 6-button input sequence.
-		emu_timer* io_timeout2;
+		int mux2 = 0;  // multiplexer value
+		int seq2 = 0;  // part of 6-button input sequence.
+		emu_timer* io_timeout2 = nullptr;
 	} m_mdctrl;
-	uint8_t m_ppi_port[3];
-	bool m_dmac_int;
-	bool m_mfp_int;
-	bool m_exp_irq2[2];
-	bool m_exp_irq4[2];
-	bool m_exp_nmi[2];
-	uint8_t m_current_ipl;
-	int m_led_state;
-	emu_timer* m_mouse_timer;
-	emu_timer* m_led_timer;
-	unsigned char m_scc_prev;
-	uint16_t m_ppi_prev;
-	emu_timer* m_fdc_tc;
-	emu_timer* m_adpcm_timer;
-	emu_timer* m_bus_error_timer;
-	uint16_t* m_spriteram;
-	tilemap_t* m_bg0_8;
-	tilemap_t* m_bg1_8;
-	tilemap_t* m_bg0_16;
-	tilemap_t* m_bg1_16;
-	int m_sprite_shift;
-	bool m_is_32bit;
+	uint8_t m_ppi_port[3]{};
+	bool m_dmac_int = false;
+	bool m_mfp_int = false;
+	bool m_exp_irq2[2]{};
+	bool m_exp_irq4[2]{};
+	bool m_exp_nmi[2]{};
+	uint8_t m_current_ipl = 0;
+	int m_led_state = 0;
+	emu_timer* m_mouse_timer = nullptr;
+	emu_timer* m_led_timer = nullptr;
+	unsigned char m_scc_prev = 0;
+	uint16_t m_ppi_prev = 0;
+	emu_timer* m_fdc_tc = nullptr;
+	emu_timer* m_adpcm_timer = nullptr;
+	emu_timer* m_bus_error_timer = nullptr;
+	uint16_t* m_spriteram = nullptr;
+	tilemap_t* m_bg0_8 = nullptr;
+	tilemap_t* m_bg1_8 = nullptr;
+	tilemap_t* m_bg0_16 = nullptr;
+	tilemap_t* m_bg1_16 = nullptr;
+	int m_sprite_shift = 0;
+	bool m_is_32bit = false;
 
 	TILE_GET_INFO_MEMBER(get_bg0_tile);
 	TILE_GET_INFO_MEMBER(get_bg1_tile);
@@ -344,7 +344,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void set_bus_error(uint32_t address, bool write, uint16_t mem_mask);
-	bool m_bus_error;
+	bool m_bus_error = false;
 };
 
 class x68ksupr_state : public x68k_state

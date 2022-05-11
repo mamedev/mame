@@ -51,8 +51,8 @@ protected:
 private:
 	DECLARE_WRITE_LINE_MEMBER(sampler_sync);
 
-	uint8_t m_dac_data[16]{};
-	int m_dac_ptr = 0;
+	uint8_t m_dac_data[16];
+	int m_dac_ptr;
 
 	required_device<dac_byte_interface> m_dac;
 	optional_device<filter_rc_device> m_filter;

@@ -91,7 +91,7 @@ namespace netlist
 	, m_time(netlist_time_ext::zero())
 	, m_mainclock(nullptr)
 	, m_use_stats(false)
-	, m_queue(config::MAX_QUEUE_SIZE::value,
+	, m_queue(config::max_queue_size::value,
 		detail::queue_t::id_delegate(&netlist_state_t :: find_net_id, &state),
 		detail::queue_t::obj_delegate(&netlist_state_t :: net_by_id, &state))
 	{
@@ -140,9 +140,10 @@ namespace netlist
 		//m_setup->parser().register_source<source_pattern_t>("../macro/nlm_{1}.cpp");
 #else
 #if 1
-		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/macro/nlm_{1}.cpp", true);
-		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/generated/nlm_{1}.cpp", true);
-		m_setup->parser().register_source<source_pattern_t>("src/lib/netlist/macro/modules/nlmod_{1}.cpp", true);
+		pstring dir = "src/lib/netlist/";
+		m_setup->parser().register_source<source_pattern_t>(dir + "/macro/nlm_{1}.cpp", true);
+		m_setup->parser().register_source<source_pattern_t>(dir + "/generated/nlm_{1}.cpp", true);
+		m_setup->parser().register_source<source_pattern_t>(dir + "/macro/modules/nlmod_{1}.cpp", true);
 		m_setup->parser().include("base_lib");
 #else
 		// FIXME: This is very slow - need optimized parsing scanning
@@ -210,12 +211,12 @@ namespace netlist
 		ENTRY(PUSE_FLOAT128)
 		ENTRY(PPMF_TYPE)
 		ENTRY(PHAS_PMF_INTERNAL)
-		ENTRY(NL_USE_MEMPOOL)
-		ENTRY(NL_USE_QUEUE_STATS)
+		ENTRY_EX(config::use_mempool::value)
+		ENTRY_EX(config::use_queue_stats::value)
 		ENTRY(NL_USE_COPY_INSTEAD_OF_REFERENCE)
 		ENTRY(NL_USE_FLOAT128)
-		ENTRY(NL_USE_FLOAT_MATRIX)
-		ENTRY(NL_USE_LONG_DOUBLE_MATRIX)
+		ENTRY_EX(config::use_float_matrix::value)
+		ENTRY_EX(config::use_long_double_matrix::value)
 		ENTRY(NL_DEBUG)
 		ENTRY(NVCCBUILD)
 
@@ -411,7 +412,7 @@ namespace netlist
 		log().verbose("Total time     {1:15}", total_time);
 
 		// FIXME: clang complains about unreachable code without
-		const bool clang_workaround_unreachable_code(NL_USE_QUEUE_STATS>0);
+		const bool clang_workaround_unreachable_code(config::use_queue_stats::value);
 		if (clang_workaround_unreachable_code)
 		{
 			// Only one serialization should be counted in total time

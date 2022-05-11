@@ -70,8 +70,8 @@ private:
 	optional_device<pia6821_device> m_pia;
 	optional_device<ide_controller_device> m_ide;
 
-	uint8_t m_pia_porta = 0;
-	uint8_t m_pia_portb = 0;
+	uint8_t m_pia_porta;
+	uint8_t m_pia_portb;
 
 	uint8_t pia_a_r();
 	uint8_t pia_b_r();

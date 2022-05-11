@@ -149,6 +149,8 @@
   * Mundial/Mondial (Italian/French),                 1987, Unknown.
   * Super 98 (3-hands, ICP-1),                        199?, Unknown.
   * unknown rocket/animal-themed poker,               199?, Unknown.
+  * Le Super Pendu (V1, words set #1),                198?, Voyageur de L'Espace Inc..
+  * Le Super Pendu (V1, words set #2),                198?, Voyageur de L'Espace Inc..
   * Mega Double Poker (conversion kit, set 1),        1990, Blitz System Inc.
   * Mega Double Poker (conversion kit, set 2),        1990, Blitz System Inc.
   * Maxi Double Poker (version 1.8),                  1990, Blitz System Inc.
@@ -994,6 +996,7 @@
 #include "pmpoker.lh"
 #include "goldnpkr.lh"
 #include "upndown.lh"
+#include "lespendu.lh"
 
 
 namespace {
@@ -1035,6 +1038,7 @@ public:
 	void caspoker(machine_config &config);
 	void icp_ext(machine_config &config);
 	void gldnirq0(machine_config &config);
+	void lespendu(machine_config &config);
 
 	void init_vkdlswwh();
 	void init_icp1db();
@@ -1059,11 +1063,15 @@ public:
 	void init_bonuspkr();
 	void init_super98();
 	void init_pokersis();
+	void init_lespendu();
+	void init_lespenduj();
 
 	uint8_t pottnpkr_mux_port_r();
 	void lamps_a_w(uint8_t data);
+	void lespendu_lamps_a_w(uint8_t data);
 	void sound_w(uint8_t data);
 	void mux_w(uint8_t data);
+	void lespendu_mux_w(uint8_t data);
 
 	uint32_t screen_update_goldnpkr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -1102,7 +1110,9 @@ private:
 	DECLARE_VIDEO_START(super21p);
 	void wcrdxtnd_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(mondial);
+	DECLARE_MACHINE_START(lespendu);
 	DECLARE_MACHINE_RESET(mondial);
+	DECLARE_MACHINE_RESET(lespendu);
 
 	void genie_map(address_map &map);
 	void goldnpkr_map(address_map &map);
@@ -1118,6 +1128,7 @@ private:
 	void witchcrd_map(address_map &map);
 	void super21p_map(address_map &map);
 	void icp_ext_map(address_map &map);
+	void lespendu_map(address_map &map);
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -1130,6 +1141,7 @@ private:
 	uint8_t m_ay8910_data = 0;
 	uint8_t m_ay8910_control = 0;
 };
+
 
 class blitz_state : public goldnpkr_state
 {
@@ -1479,9 +1491,19 @@ uint8_t goldnpkr_state::pottnpkr_mux_port_r()
 
 void goldnpkr_state::mux_w(uint8_t data)
 {
-	//logerror("mux_w: %2x\n",data);
 	m_mux_data = data ^ 0xff;   // inverted
 }
+
+void goldnpkr_state::lespendu_mux_w(uint8_t data)
+{
+	m_mux_data = data ^ 0xff;   // inverted
+
+	if(data == 0x00)
+		data = 0xff;
+
+	membank("bank0")->set_entry(data & 0x07); // for both sets
+}
+
 
 void goldnpkr_state::mux_port_w(uint8_t data)
 {
@@ -1490,7 +1512,6 @@ void goldnpkr_state::mux_port_w(uint8_t data)
 
 
 // demuxing ay8910 data/address from Falcon board, PIA portA out
-
 uint8_t goldnpkr_state::ay8910_data_r()
 {
 	return (m_ay8910_control & 0xc0) == 0x40 ? m_ay8910->data_r() : 0xff;
@@ -1587,11 +1608,35 @@ void goldnpkr_state::lamps_a_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(2, data & 0x20);  // counter 3
 }
 
+void goldnpkr_state::lespendu_lamps_a_w(uint8_t data)
+{
+/* Le Super Pendu lamps and counters wiring *
+
+  7654 3210
+  ---- ---x  Lamp 1.
+  ---- --x-  Lamp 2.
+  ---- -x--  Lamp 3.
+  ---- x---  Lamp 4.
+  ---x ----  Lamp 5.
+  --x- ----  Coin In counter.
+  xx-- ----  Unused.
+*/
+	data = data ^ 0xff;
+
+	m_lamps[0] = BIT(data, 0);  // lamp 0
+	m_lamps[1] = BIT(data, 1);  // lamp 1
+	m_lamps[2] = BIT(data, 2);  // lamp 2
+	m_lamps[3] = BIT(data, 3);  // lamp 3
+	m_lamps[4] = BIT(data, 4);  // lamp 4
+
+	// counter 0, adding extra coin when boot for difference of polarisation.
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 5));
+}
+
+
 void goldnpkr_state::sound_w(uint8_t data)
 {
 	// 555 voltage controlled
-	logerror("Sound Data: %2x\n",data & 0x0f);
-
 	// discrete sound is connected to PIA1, portA: bits 0-3
 	m_discrete->write(NODE_01, data >> 3 & 0x01);
 	m_discrete->write(NODE_10, data & 0x07);
@@ -1650,7 +1695,6 @@ void goldnpkr_state::witchcrd_map(address_map &map)
 	map(0x2800, 0x2fff).ram();
 	map(0x4000, 0x7fff).rom();
 }
-
 /*
    Witch Card (Video klein)
 
@@ -1805,6 +1849,21 @@ void goldnpkr_state::icp_ext_map(address_map &map)
 	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
 	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x2000, 0x3fff).rom();
+	map(0x6000, 0x7fff).rom();
+}
+
+void goldnpkr_state::lespendu_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+
+	map(0x5000, 0x5fff).bankr("bank0");
 	map(0x6000, 0x7fff).rom();
 }
 
@@ -4048,6 +4107,95 @@ static INPUT_PORTS_START( super21p )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START(lespendu)
+	// Multiplexed - 4x5bits
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )  PORT_NAME("Stats / Meters")                PORT_CODE(KEYCODE_0)  // stats
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 )  PORT_NAME("Button 4 / Stats Input Test")   PORT_CODE(KEYCODE_V)  // button 4 / stats test mode
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )  PORT_NAME("Button 1")                      PORT_CODE(KEYCODE_Z)  // button 1
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 )  PORT_NAME("Button 5 / Stats Exit")         PORT_CODE(KEYCODE_B)  // button 5
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 )  PORT_NAME("Button 2")                      PORT_CODE(KEYCODE_X)  // button 2
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )  PORT_NAME("Button 3")                      PORT_CODE(KEYCODE_C)  // button 3
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )    // 25¢ coin, 50¢ to play.
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
 /*********************************************
 *              Graphics Layouts              *
 *********************************************/
@@ -4113,6 +4261,11 @@ GFXDECODE_END
 static GFXDECODE_START( gfx_caspoker )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 128, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 128, 16 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_lespendu )
+	GFXDECODE_ENTRY( "gfx1", 0, fixedtilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, fixedtilelayout, 0, 16 )
 GFXDECODE_END
 
 
@@ -4267,6 +4420,20 @@ MACHINE_RESET_MEMBER(goldnpkr_state, mondial)
 
 	membank("bank1")->set_entry(seldsw);
 }
+
+MACHINE_START_MEMBER(goldnpkr_state, lespendu)
+{
+	m_lamps.resolve();
+
+	uint8_t *ROM = memregion("data")->base();
+	membank("bank0")->configure_entries(0, 8, &ROM[0], 0x1000);
+}
+
+MACHINE_RESET_MEMBER(goldnpkr_state, lespendu)
+{
+	membank("bank0")->set_entry(7);
+}
+
 
 /*********************************************
 *              Machine Drivers               *
@@ -4553,11 +4720,39 @@ void goldnpkr_state::gldnirq0(machine_config &config)
 {
 	goldnpkr(config);
 
+	// basic machine hardware
 	mc6845_device &crtc(MC6845(config.replace(), "crtc", CPU_CLOCK)); // 68B45 or 6845s @ CPU clock
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
 	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+}
+
+
+void goldnpkr_state::lespendu(machine_config &config)
+{
+	goldnpkr(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::lespendu_map);
+
+	m_pia[0]->writepb_handler().set(FUNC(goldnpkr_state::lespendu_lamps_a_w));
+
+	m_pia[1]->readpa_handler().set_ioport("SW1");
+	m_pia[1]->readpb_handler().set_ioport("SW2");
+	m_pia[1]->writepb_handler().set(FUNC(goldnpkr_state::lespendu_mux_w)); // ++ bankswitch
+
+	MCFG_MACHINE_START_OVERRIDE(goldnpkr_state, lespendu)
+	MCFG_MACHINE_RESET_OVERRIDE(goldnpkr_state, lespendu)
+
+	// video hardware
+	m_gfxdecode->set_info(gfx_lespendu);
+
+	mc6845_device &crtc(HD6845S(config.replace(), "crtc", CPU_CLOCK)); // Hitachi HD46505SP
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 }
 
 
@@ -4828,17 +5023,21 @@ ROM_START( goldnpkd )
 	ROM_LOAD( "bio5_1-20_2.bin",  0x6000, 0x1000, CRC(6b2ade97) SHA1(66adbe69f132f849c0a2a32d5a9575b0740c7a4c) )
 	ROM_LOAD( "bio5_1-20_3.bin",  0x7000, 0x1000, CRC(d1ee95e2) SHA1(95ad7f86f83fda94476508954bda1270fb5f17ad) )
 
-	ROM_REGION( 0x6000, "gfx1", 0 )  // gfx roms borrowed from golden poker
-	ROM_FILL(                 0x0000, 0x4000, 0x0000 ) // filling the R-G bitplanes.
-	ROM_LOAD( "gfx-3.bin",    0x4000, 0x2000, BAD_DUMP CRC(32705e1d) SHA1(84f9305af38179985e0224ae2ea54c01dfef6e12) )    // char rom + cards deck gfx, bitplane 3.
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(            0x0000, 0x1000, 0x00 )  // filling the R-G bitplanes.
+	ROM_LOAD( "u38.5a",  0x1000, 0x0800, CRC(52fd35d2) SHA1(ad8bf8c222ceb2e9b3b6d9033866867f1977c65f) )  // chars rom + cards deck gfx, bitplane 3.
+	ROM_IGNORE(                  0x0800)         // discarding 2nd half (cards deck gfx).
 
-	ROM_REGION( 0x6000, "gfx2", 0 )  // gfx roms borrowed from golden poker
-	ROM_LOAD( "gfx-1.bin",    0x0000, 0x2000, BAD_DUMP CRC(10b34856) SHA1(52e4cc81b36b4c807b1d4471c0f7bea66108d3fd) )    // cards deck gfx, bitplane 1.
-	ROM_LOAD( "gfx-2.bin",    0x2000, 0x2000, BAD_DUMP CRC(5fc965ef) SHA1(d9ecd7e9b4915750400e76ca604bec8152df1fe4) )    // cards deck gfx, bitplane 2.
-	ROM_COPY( "gfx1", 0x4800, 0x4000, 0x0800 )    // cards deck gfx, bitplane 3. found in the 2nd quarter of the char rom.
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "n43.2a",  0x0000, 0x0800, CRC(1419298b) SHA1(9e07c94c858f055d1c4987efd03c76cce936f4da) )  // cards deck gfx, bitplane 1.
+	ROM_IGNORE(                  0x0800)
+	ROM_LOAD( "n40.4a",  0x0800, 0x0800, CRC(e0b96dcf) SHA1(b06af94361dd951573f187df575b31a9ada0c3e9) )  // cards deck gfx, bitplane 2.
+	ROM_IGNORE(                  0x0800)
+	ROM_LOAD( "u38.5a",  0x1000, 0x0800, CRC(52fd35d2) SHA1(ad8bf8c222ceb2e9b3b6d9033866867f1977c65f) )  // chars rom + cards deck gfx, bitplane 3.
+	ROM_CONTINUE(        0x1000, 0x0800)         // discarding 1nd half (chars).
 
-	ROM_REGION( 0x0100, "proms", 0 )  // bipolar prom borrowed from golden poker
-	ROM_LOAD( "82s129n.bin",  0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.7d",  0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
 /*
@@ -4855,7 +5054,7 @@ ROM_END
 
   1- When the player wins a hand, game will automatically switch to HI-LO
      for double-up (no need to press the "double" button)
-	 
+
   2- A card is shown to the player, then the game is to guess the drawn card
     (BIG to guess bigger than actual card, LO to guess a lower card)
 
@@ -4874,17 +5073,21 @@ ROM_START( goldnpke )
 	ROM_LOAD( "g_2.bin",  0x6000, 0x1000, CRC(ce080d66) SHA1(c5e11f7dc52a4d1661661a06d39316ba6a944adc) )
 	ROM_LOAD( "g_3.bin",  0x7000, 0x1000, CRC(9d02b6f4) SHA1(bd01477268543d0edb2cec2a26bab0627a6d3414) )
 
-	ROM_REGION( 0x6000, "gfx1", 0 )  // gfx roms borrowed from golden poker
-	ROM_FILL(                 0x0000, 0x4000, 0x0000 ) // filling the R-G bitplanes.
-	ROM_LOAD( "gfx-3.bin",    0x4000, 0x2000, BAD_DUMP CRC(32705e1d) SHA1(84f9305af38179985e0224ae2ea54c01dfef6e12) )    // char rom + cards deck gfx, bitplane 3.
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(            0x0000, 0x1000, 0x00 )  // filling the R-G bitplanes.
+	ROM_LOAD( "u38.5a",  0x1000, 0x0800, CRC(52fd35d2) SHA1(ad8bf8c222ceb2e9b3b6d9033866867f1977c65f) )  // chars rom + cards deck gfx, bitplane 3.
+	ROM_IGNORE(                  0x0800)         // discarding 2nd half (cards deck gfx).
 
-	ROM_REGION( 0x6000, "gfx2", 0 )  // gfx roms borrowed from golden poker
-	ROM_LOAD( "gfx-1.bin",    0x0000, 0x2000, BAD_DUMP CRC(10b34856) SHA1(52e4cc81b36b4c807b1d4471c0f7bea66108d3fd) )    // cards deck gfx, bitplane 1.
-	ROM_LOAD( "gfx-2.bin",    0x2000, 0x2000, BAD_DUMP CRC(5fc965ef) SHA1(d9ecd7e9b4915750400e76ca604bec8152df1fe4) )    // cards deck gfx, bitplane 2.
-	ROM_COPY( "gfx1", 0x4800, 0x4000, 0x0800 )    // cards deck gfx, bitplane 3. found in the 2nd quarter of the char rom.
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "n43.2a",  0x0000, 0x0800, CRC(1419298b) SHA1(9e07c94c858f055d1c4987efd03c76cce936f4da) )  // cards deck gfx, bitplane 1.
+	ROM_IGNORE(                  0x0800)
+	ROM_LOAD( "n40.4a",  0x0800, 0x0800, CRC(e0b96dcf) SHA1(b06af94361dd951573f187df575b31a9ada0c3e9) )  // cards deck gfx, bitplane 2.
+	ROM_IGNORE(                  0x0800)
+	ROM_LOAD( "u38.5a",  0x1000, 0x0800, CRC(52fd35d2) SHA1(ad8bf8c222ceb2e9b3b6d9033866867f1977c65f) )  // chars rom + cards deck gfx, bitplane 3.
+	ROM_CONTINUE(        0x1000, 0x0800)         // discarding 1nd half (chars).
 
-	ROM_REGION( 0x0100, "proms", 0 )  // bipolar prom borrowed from golden poker
-	ROM_LOAD( "82s129n.bin",  0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.7d",  0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
 /*
@@ -4901,7 +5104,7 @@ ROM_END
 
   1- When the player wins a hand, game will automatically switch to HI-LO
      for double-up (no need to press the "double" button)
-	 
+
   2- A card is shown to the player, then the game is to guess the drawn card
     (BIG to guess bigger than actual card, LO to guess a lower card)
 
@@ -4915,21 +5118,25 @@ ROM_END
 */
 ROM_START( goldnpkf )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "hl_1.bin",  0x5000, 0x1000, BAD_DUMP CRC(d475cd13) SHA1(7c12b44ab938f26701587e57784f08e248e3afd2) )
-	ROM_LOAD( "hl_2.bin",  0x6000, 0x1000, BAD_DUMP CRC(304eb644) SHA1(c876e0d6121dee594c4f5d75273c74982c5bd524) )
-	ROM_LOAD( "hl_3.bin",  0x7000, 0x1000, BAD_DUMP CRC(47c15f44) SHA1(da7af46a8d17abffd30fffe6eb091d15f9f8f92c) )
+	ROM_LOAD( "hl_1.bin",  0x5000, 0x1000, CRC(d475cd13) SHA1(7c12b44ab938f26701587e57784f08e248e3afd2) )
+	ROM_LOAD( "hl_2.bin",  0x6000, 0x1000, CRC(304eb644) SHA1(c876e0d6121dee594c4f5d75273c74982c5bd524) )
+	ROM_LOAD( "hl_3.bin",  0x7000, 0x1000, CRC(47c15f44) SHA1(da7af46a8d17abffd30fffe6eb091d15f9f8f92c) )
 
-	ROM_REGION( 0x6000, "gfx1", 0 )  // gfx roms borrowed from golden poker
-	ROM_FILL(                 0x0000, 0x4000, 0x0000 ) // filling the R-G bitplanes.
-	ROM_LOAD( "gfx-3.bin",    0x4000, 0x2000, BAD_DUMP CRC(32705e1d) SHA1(84f9305af38179985e0224ae2ea54c01dfef6e12) )    // char rom + cards deck gfx, bitplane 3.
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(            0x0000, 0x1000, 0x00 )  // filling the R-G bitplanes.
+	ROM_LOAD( "u38.5a",  0x1000, 0x0800, CRC(52fd35d2) SHA1(ad8bf8c222ceb2e9b3b6d9033866867f1977c65f) )  // chars rom + cards deck gfx, bitplane 3.
+	ROM_IGNORE(                  0x0800)         // discarding 2nd half (cards deck gfx).
 
-	ROM_REGION( 0x6000, "gfx2", 0 )  // gfx roms borrowed from golden poker
-	ROM_LOAD( "gfx-1.bin",    0x0000, 0x2000, BAD_DUMP CRC(10b34856) SHA1(52e4cc81b36b4c807b1d4471c0f7bea66108d3fd) )    // cards deck gfx, bitplane 1.
-	ROM_LOAD( "gfx-2.bin",    0x2000, 0x2000, BAD_DUMP CRC(5fc965ef) SHA1(d9ecd7e9b4915750400e76ca604bec8152df1fe4) )    // cards deck gfx, bitplane 2.
-	ROM_COPY( "gfx1", 0x4800, 0x4000, 0x0800 )    // cards deck gfx, bitplane 3. found in the 2nd quarter of the char rom.
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "n43.2a",  0x0000, 0x0800, CRC(1419298b) SHA1(9e07c94c858f055d1c4987efd03c76cce936f4da) )  // cards deck gfx, bitplane 1.
+	ROM_IGNORE(                  0x0800)
+	ROM_LOAD( "n40.4a",  0x0800, 0x0800, CRC(e0b96dcf) SHA1(b06af94361dd951573f187df575b31a9ada0c3e9) )  // cards deck gfx, bitplane 2.
+	ROM_IGNORE(                  0x0800)
+	ROM_LOAD( "u38.5a",  0x1000, 0x0800, CRC(52fd35d2) SHA1(ad8bf8c222ceb2e9b3b6d9033866867f1977c65f) )  // chars rom + cards deck gfx, bitplane 3.
+	ROM_CONTINUE(        0x1000, 0x0800)         // discarding 1nd half (chars).
 
-	ROM_REGION( 0x0100, "proms", 0 )  // bipolar prom borrowed from golden poker
-	ROM_LOAD( "82s129n.bin",  0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.7d",  0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
 
@@ -11533,6 +11740,64 @@ ROM_START( super21p )
 ROM_END
 
 
+/********************************************************
+
+  Le Super Pendu.
+  Voyageur de L'Espace Inc.
+
+  French language hangman style game manufactured in Canada.
+  Conversion kit for modified Bonanza Enterprises hardware.
+
+  Prequel of "Le Pendu" game.
+
+  For more details, see the lependu.cpp driver.
+
+
+********************************************************/
+
+ROM_START( lespendu )  // board #1
+	ROM_REGION( 0x10000, "maincpu", 0 ) // program ROMs
+	ROM_LOAD( "pendu_2.12a",  0x6000, 0x1000, CRC(bd1c4763) SHA1(7f33b9866afcc456e3623e478abee77e1610d99b) )
+	ROM_LOAD( "pendu_3.14a",  0x7000, 0x1000, CRC(4c973c2d) SHA1(edaf488019fc1b72b9344488b898a27ef886c1f9) )
+
+	ROM_REGION( 0x08000, "data", 0 ) // banked data
+	ROM_LOAD( "pendu_1.11a",  0x0000, 0x8000, CRC(acaecf36) SHA1(290867f18c5376189d389e6e508b34637c726352) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(                  0x0000, 0x2000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "pendu_c.5a",    0x2000, 0x1000, CRC(c7cfc375) SHA1(d46b633ef007d0928fbd49b9703ab5248de8d545) )    // chars / other gfx, bitplane 3
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "pendu_a.2a",    0x0000, 0x0800, CRC(43770310) SHA1(e6c0d1d1b07a4c14fa26cfb4aedf1f94017bc9c3) )    // other gfx, bitplane2
+	ROM_LOAD( "pendu_b.3a",    0x0800, 0x0800, CRC(19471258) SHA1(d4e2cf05e00945e034f968dcc314cc8e5832b840) )    // other gfx, bitplane1
+	ROM_COPY( "gfx1",  0x2800, 0x1000, 0x0800 )    // other gfx, bitplane3. found in the 2nd half of the chars rom
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24s10n.7d",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+ROM_START( lespenduj )  // board #2
+	ROM_REGION( 0x10000, "maincpu", 0 ) // program ROMs
+	ROM_LOAD( "pendu_jeje.12a",    0x6000, 0x1000, CRC(71d0430b) SHA1(6b6e5e3a3f5c51809953189e53191a175b03cfb3) )
+	ROM_LOAD( "pendu_jeje_3.14a",  0x7000, 0x1000, CRC(8e1863a1) SHA1(0cfdd961fbc83219ee8f0e62432320a90c8296bf) )
+
+	ROM_REGION( 0x08000, "data", 0 ) // banked data
+	ROM_LOAD( "nosticker.11a",  0x0000, 0x8000, CRC(0a9853a3) SHA1(b9dabfd5b13b6ddddc2d8b266adc6e55f094e981) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(                      0x0000, 0x2000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "1a_pendu_jeje.5a",  0x2000, 0x1000, CRC(c7cfc375) SHA1(d46b633ef007d0928fbd49b9703ab5248de8d545) )    // chars / other gfx
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "2a_pendu_jeje.4a",    0x0000, 0x0800, CRC(19471258) SHA1(d4e2cf05e00945e034f968dcc314cc8e5832b840) )    // other gfx
+	ROM_LOAD( "3a_pendu_jeje.2a",    0x0800, 0x0800, CRC(2aefe346) SHA1(6540f126777c942737aeffd7f6f356ef2a71e146) )    // other gfx
+	ROM_COPY( "gfx1",        0x2800, 0x1000, 0x0800 )    // other gfx
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "pk.7d",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+
 /*********************************************
 *                Driver Init                 *
 *********************************************/
@@ -12012,6 +12277,40 @@ void goldnpkr_state::init_pokersis()
 	ROM[0x7ffd] = 0x5f;
 }
 
+
+void goldnpkr_state::init_lespendu()
+{
+	uint8_t *ROM0 = memregion("maincpu")->base();
+	uint8_t *ROM1 = memregion("data")->base();
+
+	ROM0[0x643d] = 0xff;  // skip checksum
+	ROM0[0x643f] = 0xff;  // skip checksum
+	ROM0[0x6461] = 0xff;  // changing value to store at $01c1 (RAM security patch)
+
+	ROM1[0x7aa3] = 0x20;  // restore to original call, before RAM security patch
+	ROM1[0x7aa4] = 0xc3;
+	ROM1[0x7aa5] = 0x78;
+
+	ROM0[0x75de] = 0x1f;  // fix lamps bug
+}
+
+void goldnpkr_state::init_lespenduj()
+{
+	uint8_t *ROM0 = memregion("maincpu")->base();
+	uint8_t *ROM1 = memregion("data")->base();
+
+	ROM0[0x643d] = 0xff;  // skip checksum
+	ROM0[0x643f] = 0xff;  // skip checksum
+	ROM0[0x6461] = 0xff;  // changing value to store at $01c1 (RAM security patch)
+
+	ROM1[0x7aa3] = 0x20;  // restore to original call, before RAM security patch
+	ROM1[0x7aa4] = 0xc8;
+	ROM1[0x7aa5] = 0x78;
+
+	ROM0[0x766c] = 0x17;  // fix lamps bug
+	ROM0[0x7749] = 0x17;  // fix lamps bug
+}
+
 } // anonymous namespace
 
 
@@ -12177,6 +12476,9 @@ GAME(  1987, pokermon,  0,        mondial,  mondial,  goldnpkr_state, empty_init
 GAME(  1998, super98,   bsuerte,  witchcrd, super98,  goldnpkr_state, init_super98,  ROT0,   "<unknown>",                "Super 98 (3-hands, ICP-1)",               0 )  // complex protection. see notes.
 
 GAME(  198?, animpkr,   0,        icp_ext,  animpkr,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "unknown rocket/animal-themed poker",      MACHINE_IMPERFECT_COLORS )  // banked program. how to switch gfx?
+
+GAMEL( 198?, lespendu,  0,        lespendu, lespendu, goldnpkr_state, init_lespendu, ROT0,   "Voyageur de L'Espace Inc.", "Le Super Pendu (V1, words set #1)",      0,                layout_lespendu )
+GAMEL( 198?, lespenduj, 0,        lespendu, lespendu, goldnpkr_state, init_lespenduj,ROT0,   "Voyageur de L'Espace Inc.", "Le Super Pendu (V1, words set #2)",      0,                layout_lespendu )
 
 
 /*************************************** SETS W/IRQ0 ***************************************/

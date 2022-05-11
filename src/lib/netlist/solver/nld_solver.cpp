@@ -23,9 +23,7 @@
 #include <algorithm>
 #include <type_traits>
 
-namespace netlist
-{
-namespace devices
+namespace netlist::devices
 {
 
 	// ----------------------------------------------------------------------------------------
@@ -56,8 +54,8 @@ namespace devices
 		const netlist_time_ext now(exec().time());
 		const std::size_t nthreads = m_params.m_parallel() < 2 ? 1 : std::min(static_cast<std::size_t>(m_params.m_parallel()), plib::omp::get_max_threads());
 		const netlist_time_ext sched(now + (nthreads <= 1 ? netlist_time_ext::zero() : netlist_time_ext::from_nsec(100)));
-		plib::uninitialised_array<solver::matrix_solver_t *, config::MAX_SOLVER_QUEUE_SIZE::value> tmp; //NOLINT
-		plib::uninitialised_array<netlist_time, config::MAX_SOLVER_QUEUE_SIZE::value> nt; //NOLINT
+		plib::uninitialised_array<solver::matrix_solver_t *, config::max_solver_queue_size::value> tmp; //NOLINT
+		plib::uninitialised_array<netlist_time, config::max_solver_queue_size::value> nt; //NOLINT
 		std::size_t p=0;
 
 		while (!m_queue.empty())
@@ -362,6 +360,7 @@ namespace devices
 						auto &pt = dynamic_cast<terminal_t &>(*term);
 						// check the connected terminal
 						const auto *const connected_terminals = nlstate.setup().get_connected_terminals(pt);
+						// NOLINTNEXTLINE proposal does not work for VS
 						for (auto ct = connected_terminals->begin(); *ct != nullptr; ct++)
 						{
 							analog_net_t &connected_net = (*ct)->net();
@@ -443,7 +442,7 @@ namespace devices
 			switch (params->m_fp_type())
 			{
 				case solver::matrix_fp_type_e::FLOAT:
-					if (!config::use_float_matrix())
+					if (!config::use_float_matrix::value)
 						log().info("FPTYPE {1} not supported. Using DOUBLE", params->m_fp_type().name());
 					ms = create_solvers<std::conditional_t<config::use_float_matrix::value, float, double>>(sname, params.get(), grp);
 					break;
@@ -451,7 +450,7 @@ namespace devices
 					ms = create_solvers<double>(sname, params.get(), grp);
 					break;
 				case solver::matrix_fp_type_e::LONGDOUBLE:
-					if (!config::use_long_double_matrix())
+					if (!config::use_long_double_matrix::value)
 						log().info("FPTYPE {1} not supported. Using DOUBLE", params->m_fp_type().name());
 					ms = create_solvers<std::conditional_t<config::use_long_double_matrix::value, long double, double>>(sname, params.get(), grp);
 					break;
@@ -512,5 +511,4 @@ namespace devices
 
 	NETLIB_DEVICE_IMPL(solver, "SOLVER", "FREQ")
 
-} // namespace devices
-} // namespace netlist
+} // namespace netlist::devices

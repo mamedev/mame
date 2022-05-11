@@ -131,25 +131,25 @@ private:
 	output_finder<3> m_lamps;
 
 	// interrupts
-	int m_x_pia_irqa;
-	int m_x_pia_irqb;
-	int m_y_pia_irqa;
-	int m_y_pia_irqb;
-	int m_tape_pia_irqa;
-	int m_tape_pia_irqb;
-	int m_kb_pia_irqa;
-	int m_kb_pia_irqb;
-	int m_gpib_pia_irqa;
-	int m_gpib_pia_irqb;
-	int m_com_pia_irqa;
-	int m_com_pia_irqb;
-	int m_acia_irq;
+	int m_x_pia_irqa = 0;
+	int m_x_pia_irqb = 0;
+	int m_y_pia_irqa = 0;
+	int m_y_pia_irqb = 0;
+	int m_tape_pia_irqa = 0;
+	int m_tape_pia_irqb = 0;
+	int m_kb_pia_irqa = 0;
+	int m_kb_pia_irqb = 0;
+	int m_gpib_pia_irqa = 0;
+	int m_gpib_pia_irqb = 0;
+	int m_com_pia_irqa = 0;
+	int m_com_pia_irqb = 0;
+	int m_acia_irq = 0;
 
 	// keyboard
-	int m_kc;
+	int m_kc = 0;
 
 	// GPIB
-	int m_talk;
+	int m_talk = 0;
 };
 
 class tek4052_state : public driver_device

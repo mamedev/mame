@@ -166,30 +166,19 @@ nes_sunsoft_dcs_device::nes_sunsoft_dcs_device(const machine_config &mconfig, co
 
 void nes_sunsoft_dcs_device::device_start()
 {
-	common_start();
+	nes_sunsoft_4_device::device_start();
+
 	ntb_enable_timer = timer_alloc(TIMER_PROTECT);
 	ntb_enable_timer->reset();
 	timer_freq = clocks_to_attotime(107520);
 
-	save_item(NAME(m_latch1));
-	save_item(NAME(m_latch2));
-	save_item(NAME(m_reg));
-	save_item(NAME(m_wram_enable));
 	save_item(NAME(m_exrom_enable));
 	save_item(NAME(m_timer_on));
 }
 
 void nes_sunsoft_dcs_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg16_89ab(0);
-	prg16_cdef(m_prg_chunks - 1);
-	chr8(0, m_chr_source);
-
-	m_reg = 0;
-	m_latch1 = 0;
-	m_latch2 = 0;
-	m_wram_enable = 0;
+	nes_sunsoft_4_device::pcb_reset();
 	m_exrom_enable = 0;
 	m_timer_on = 0;
 }

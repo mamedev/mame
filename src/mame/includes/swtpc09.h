@@ -176,33 +176,33 @@ private:
 	required_ioport m_sbug_double_density;
 	required_ioport m_piaide_flex_boot_cd00;
 
-	uint8_t m_pia_counter;             // this is the counter on pia porta
+	uint8_t m_pia_counter = 0;             // this is the counter on pia porta
 
-	uint8_t m_dmaf_high_address[4];    // dmaf2 or dmaf3 dma extended address reg
-	uint8_t m_dmaf2_interrupt_enable;
+	uint8_t m_dmaf_high_address[4]{};    // dmaf2 or dmaf3 dma extended address reg
+	uint8_t m_dmaf2_interrupt_enable = 0;
 
-	uint8_t m_system_type;             // flag to indicate hw and rom combination
-	uint8_t m_fdc_status;              // for floppy controller
-	int m_floppy_motor_on;
-	emu_timer *m_floppy_motor_timer;
-	floppy_image_device *m_fdc_floppy; // Current selected floppy.
-	uint8_t m_fdc_side;                // Current floppy side.
-	uint8_t m_fdc_dden;                // Current dden state.
-	uint8_t m_dmaf3_via_porta;
-	uint8_t m_dmaf3_via_portb;
-	uint8_t m_active_interrupt;
-	uint8_t m_interrupt;
+	uint8_t m_system_type = 0;             // flag to indicate hw and rom combination
+	uint8_t m_fdc_status = 0;              // for floppy controller
+	int m_floppy_motor_on = 0;
+	emu_timer *m_floppy_motor_timer = nullptr;
+	floppy_image_device *m_fdc_floppy = nullptr; // Current selected floppy.
+	uint8_t m_fdc_side = 0;                // Current floppy side.
+	uint8_t m_fdc_dden = 0;                // Current dden state.
+	uint8_t m_dmaf3_via_porta = 0;
+	uint8_t m_dmaf3_via_portb = 0;
+	uint8_t m_active_interrupt = 0;
+	uint8_t m_interrupt = 0;
 
-	address_space *m_banked_space;
+	address_space *m_banked_space = nullptr;
 
 	// TODO: move this in proper device
 
 	/* channel_data structure holds info about each 6844 DMA channel */
 	struct m6844_channel_data
 	{
-		int active;
-		int address;
-		int counter;
+		int active = 0;
+		int address = 0;
+		int counter = 0;
 		// Channel control register.
 		//  bit 0: Read / Write mode
 		//  bit 1: Mode control B
@@ -217,22 +217,22 @@ private:
 		//          read. Sets IRQ.
 		// Mode control A,B: 0,0 Mode2; 0,1 Mode 3; 1,0 Mode 0;
 		//                   1,1 Undefined.
-		uint8_t control;
-		int start_address;
-		int start_counter;
+		uint8_t control = 0;
+		int start_address = 0;
+		int start_counter = 0;
 	};
 
 	/* 6844 description */
 	m6844_channel_data m_m6844_channel[4];
-	uint8_t m_m6844_priority;
+	uint8_t m_m6844_priority = 0;
 	// Interrupt control register.
 	// Bit 0-3: channel interrupt enable, 1 enabled, 0 masked.
 	// Bit 4-6: unused
 	// Bit 7: Read only. Set to 1 when IRQ asserted. Clear when the
 	// control register associated with the channel that caused the
 	// interrut is read.
-	uint8_t m_m6844_interrupt;
-	uint8_t m_m6844_chain;
+	uint8_t m_m6844_interrupt = 0;
+	uint8_t m_m6844_chain = 0;
 	void m6844_update_interrupt();
 	void m6844_fdc_dma_transfer(uint8_t channel);
 	void m6844_hdc_dma_transfer(uint8_t channel);

@@ -466,7 +466,7 @@ void nes_namcot340_device::n340_hiwrite(offs_t offset, uint8_t data)
 		case 0x1000: case 0x1800:
 		case 0x2000: case 0x2800:
 		case 0x3000: case 0x3800:
-			chr1_x(offset / 0x800, data, CHRROM);
+			chr1_x(offset >> 11, data, CHRROM);
 			break;
 		case 0x4000:
 			// no cart found with wram, so it is not clear if this could work as in Namcot-175...
@@ -611,7 +611,7 @@ uint8_t nes_namcot163_device::read_m(offs_t offset)
 void nes_namcot163_device::write_m(offs_t offset, uint8_t data)
 {
 	// the pcb can separately protect each 2KB chunk of the external wram from writes
-	int bank = (offset & 0x1800) >> 11;
+	int bank = BIT(offset, 11, 2);
 	if (!m_battery.empty() && !BIT(m_wram_protect, bank))
 		m_battery[offset & (m_battery.size() - 1)] = data;
 }

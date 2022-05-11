@@ -9,7 +9,6 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "mn10200.h"
 #include "mn102dis.h"
 
@@ -224,6 +223,17 @@ void mn10200_device::device_start()
 
 		save_item(NAME(m_port[i].out), i);
 		save_item(NAME(m_port[i].dir), i);
+	}
+
+	// registering reads the value, so clear it before
+	m_pc = 0;
+	m_mdr = 0;
+	m_nmicr = 0;
+	m_iagr = 0;
+	for (int i=0; i != 4; i++)
+	{
+		m_d[i] = 0;
+		m_a[i] = 0;
 	}
 
 	// register for debugger

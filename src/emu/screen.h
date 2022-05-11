@@ -225,7 +225,7 @@ public:
 	screen_device &set_raw(u32 pixclock, u16 htotal, u16 hbend, u16 hbstart, u16 vtotal, u16 vbend, u16 vbstart)
 	{
 		assert(pixclock != 0);
-		m_clock = pixclock;
+		set_clock(pixclock);
 		m_refresh = HZ_TO_ATTOSECONDS(pixclock) * htotal * vtotal;
 		m_vblank = m_refresh / vtotal * (vtotal - (vbstart - vbend));
 		m_width = htotal;

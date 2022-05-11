@@ -774,13 +774,13 @@ void sstingray_state::sstingry(machine_config &config)
 void kyros_state::kyros(machine_config &config)
 {
 	base_config(config);
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 24_MHz_XTAL / 4);   /* Verified on bootleg PCB */
+	// basic machine hardware
+	M68000(config, m_maincpu, 24_MHz_XTAL / 4);   // Verified on original PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &kyros_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(kyros_state::irq1_line_hold));
 	m_maincpu->set_periodic_int(FUNC(kyros_state::irq2_line_hold), attotime::from_hz(60)); // MCU irq
 
-	Z80(config, m_audiocpu, 24_MHz_XTAL / 6); /* Verified on bootleg PCB */
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 4); // Verified on original PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &kyros_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &kyros_state::sound_iomap);
 	m_audiocpu->set_vblank_int("screen", FUNC(kyros_state::irq0_line_hold));
@@ -792,16 +792,16 @@ void kyros_state::kyros(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kyros);
 
 	// sound hardware
-	ym2203_device &ym(YM2203(config, "ym", 24_MHz_XTAL / 12));            // Verified on bootleg PCB
+	ym2203_device &ym(YM2203(config, "ym", 16_MHz_XTAL / 8));            // Verified on original PCB
 	ym.add_route(ALL_OUTPUTS, "speaker", 0.30);
 
-	ay8910_device &aysnd1(AY8910(config, "aysnd1", 24_MHz_XTAL / 12));    // Verified on bootleg PCB
+	ay8910_device &aysnd1(AY8910(config, "aysnd1", 16_MHz_XTAL / 8));    // Verified on original PCB
 	aysnd1.add_route(ALL_OUTPUTS, "speaker", 0.30);
 
-	ay8910_device &aysnd2(AY8910(config, "aysnd2", 24_MHz_XTAL / 12));    // Verified on bootleg PCB
+	ay8910_device &aysnd2(AY8910(config, "aysnd2", 16_MHz_XTAL / 8));    // Verified on original PCB
 	aysnd2.add_route(ALL_OUTPUTS, "speaker", 0.6);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.50); // unknown DAC
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.50);
 }
 
 void jongbou_state::jongbou(machine_config &config)

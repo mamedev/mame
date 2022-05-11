@@ -36,10 +36,10 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	uint8_t* m_fixed = nullptr;
-	uint32_t m_special_bank = 0;
-	uint16_t m_cart_ram[0x1000]{};
-	uint16_t m_cart_ram2[0x10000]{};
+	uint8_t* m_fixed;
+	uint32_t m_special_bank;
+	uint16_t m_cart_ram[0x1000];
+	uint16_t m_cart_ram2[0x10000];
 };
 
 // device type definition

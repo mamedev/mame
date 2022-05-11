@@ -57,18 +57,18 @@ private:
 	optional_shared_ptr<uint8_t> m_tomahawk_protection;
 	optional_ioport m_fake_port;
 
-	uint8_t      m_astrof_palette_bank;
-	uint8_t      m_red_on;
-	uint8_t      m_flipscreen;
-	uint8_t      m_screen_off;
-	uint16_t     m_abattle_count;
+	uint8_t      m_astrof_palette_bank = 0;
+	uint8_t      m_red_on = 0;
+	uint8_t      m_flipscreen = 0;
+	uint8_t      m_screen_off = 0;
+	uint16_t     m_abattle_count = 0;
 
 	/* sound-related */
-	uint8_t      m_port_1_last;
-	uint8_t      m_port_2_last;
-	uint8_t      m_astrof_start_explosion;
-	uint8_t      m_astrof_death_playing;
-	uint8_t      m_astrof_bosskill_playing;
+	uint8_t      m_port_1_last = 0;
+	uint8_t      m_port_2_last = 0;
+	uint8_t      m_astrof_start_explosion = 0;
+	uint8_t      m_astrof_death_playing = 0;
+	uint8_t      m_astrof_bosskill_playing = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

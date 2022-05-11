@@ -57,19 +57,19 @@ protected:
 	u8 pcm_r(offs_t offset);
 	void pcm_w(offs_t offset, u8 data);
 
-	u8 m_mask = 0;
+	u8 m_mask;
 
 private:
 	int queue_count();
 	u8 queue_pop();
 
-	u8 m_pcm_mode = 0, m_vol[7]{}, m_pcm_ctrl = 0, m_pcm_mute = 0;
-	uint16_t m_head = 0, m_tail = 0, m_count = 0, m_irq_rate = 0;
-	bool m_pcmirq = 0, m_fmirq = 0, m_pcm_clk = 0, m_init = 0;
+	u8 m_pcm_mode, m_vol[7], m_pcm_ctrl, m_pcm_mute;
+	uint16_t m_head, m_tail, m_count, m_irq_rate;
+	bool m_pcmirq, m_fmirq, m_pcm_clk, m_init;
 	required_device<dac_word_interface> m_ldac;
 	required_device<dac_word_interface> m_rdac;
 	std::vector<u8> m_queue;
-	emu_timer *m_dac_timer = nullptr;
+	emu_timer *m_dac_timer;
 };
 
 class pc9801_speakboard_device : public pc9801_86_device

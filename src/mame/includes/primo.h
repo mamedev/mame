@@ -86,12 +86,12 @@ private:
 	required_ioport m_reset_port;
 	required_shared_ptr<uint8_t> m_vram;
 
-	memory_region *m_cart1_rom;
-	memory_region *m_cart2_rom;
+	memory_region *m_cart1_rom = nullptr;
+	memory_region *m_cart2_rom = nullptr;
 
-	uint16_t m_video_memory_base;
-	uint8_t m_port_FD;
-	int m_nmi;
+	uint16_t m_video_memory_base = 0;
+	uint8_t m_port_FD = 0;
+	int m_nmi = 0;
 };
 
 

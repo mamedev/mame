@@ -2079,6 +2079,33 @@ if (BUSES["POFO"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/bus/rc2014/rc2014.h,BUSES["RC2014"] = true
+---------------------------------------------------
+
+if (BUSES["RC2014"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/rc2014/rc2014.cpp",
+		MAME_DIR .. "src/devices/bus/rc2014/rc2014.h",
+		MAME_DIR .. "src/devices/bus/rc2014/modules.cpp",
+		MAME_DIR .. "src/devices/bus/rc2014/modules.h",
+		MAME_DIR .. "src/devices/bus/rc2014/z80cpu.cpp",
+		MAME_DIR .. "src/devices/bus/rc2014/z80cpu.h",
+		MAME_DIR .. "src/devices/bus/rc2014/clock.cpp",
+		MAME_DIR .. "src/devices/bus/rc2014/clock.h",
+		MAME_DIR .. "src/devices/bus/rc2014/ram.cpp",
+		MAME_DIR .. "src/devices/bus/rc2014/ram.h",
+		MAME_DIR .. "src/devices/bus/rc2014/rom.cpp",
+		MAME_DIR .. "src/devices/bus/rc2014/rom.h",
+		MAME_DIR .. "src/devices/bus/rc2014/romram.cpp",
+		MAME_DIR .. "src/devices/bus/rc2014/romram.h",
+		MAME_DIR .. "src/devices/bus/rc2014/serial.cpp",
+		MAME_DIR .. "src/devices/bus/rc2014/serial.h",
+		MAME_DIR .. "src/devices/bus/rc2014/cf.cpp",
+		MAME_DIR .. "src/devices/bus/rc2014/cf.h",
+	}
+end
 
 ---------------------------------------------------
 --
@@ -2406,6 +2433,8 @@ if (BUSES["VME"]~=null) then
 		MAME_DIR .. "src/devices/bus/vme/vme_fcscsi.h",
 		MAME_DIR .. "src/devices/bus/vme/vme_hcpu30.cpp",
 		MAME_DIR .. "src/devices/bus/vme/vme_hcpu30.h",
+		MAME_DIR .. "src/devices/bus/vme/vme_smvme2000.cpp",
+		MAME_DIR .. "src/devices/bus/vme/vme_smvme2000.h",
 	}
 end
 
@@ -4809,5 +4838,25 @@ if (BUSES["PCE_CTRL"]~=null) then
 		MAME_DIR .. "src/devices/bus/pce_ctrl/joypad6.h",
 		MAME_DIR .. "src/devices/bus/pce_ctrl/multitap.cpp",
 		MAME_DIR .. "src/devices/bus/pce_ctrl/multitap.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/pc8801/pc8801_31.h,BUSES["PC8801"] = true
+---------------------------------------------------
+
+if (BUSES["PC8801"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/pc8801/pc8801_23.cpp",
+		MAME_DIR .. "src/devices/bus/pc8801/pc8801_23.h",
+		MAME_DIR .. "src/devices/bus/pc8801/pc8801_31.cpp",
+		MAME_DIR .. "src/devices/bus/pc8801/pc8801_31.h",
+		MAME_DIR .. "src/devices/bus/pc8801/pc8801_exp.cpp",
+		MAME_DIR .. "src/devices/bus/pc8801/pc8801_exp.h",
+		MAME_DIR .. "src/devices/bus/pc8801/pcg8100.cpp",
+		MAME_DIR .. "src/devices/bus/pc8801/pcg8100.h",
+		MAME_DIR .. "src/devices/bus/pc8801/jmbx1.cpp",
+		MAME_DIR .. "src/devices/bus/pc8801/jmbx1.h",
 	}
 end

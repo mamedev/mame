@@ -30,7 +30,7 @@ private:
 	uint32_t m_total_size;
 	uint8_t m_bank_mask;
 	uint8_t m_bank_selected[4];
-	uint8_t *m_bank_base[4]{};
+	uint8_t *m_bank_base[4];
 	uint8_t m_ramio_set_bits;
 };
 

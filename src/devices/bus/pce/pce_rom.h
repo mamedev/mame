@@ -103,7 +103,7 @@ private:
 	const uint32_t m_bram_size = 0x800*4;
 	uint8_t m_bram[0x800*4];
 
-	uint8_t m_bram_locked = false;
+	uint8_t m_bram_locked;
 };
 
 

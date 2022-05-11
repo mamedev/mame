@@ -24,75 +24,75 @@
 #include "discrete.h"
 
 DISCRETE_CLASS_STEP_RESET(dss_counter, 1,
-	int             m_clock_type;
-	int             m_out_type;
-	int             m_is_7492;
-	int             m_last_clock;
-	uint32_t          m_last_count;
-	//uint32_t          m_last;                 /* Last clock state */
-	uint32_t          m_min;
-	uint32_t          m_max;
-	uint32_t          m_diff;
-	double          m_t_left;               /* time unused during last sample in seconds */
+	int             m_clock_type = 0;
+	int             m_out_type = 0;
+	int             m_is_7492 = 0;
+	int             m_last_clock = 0;
+	uint32_t        m_last_count = 0;
+	//uint32_t        m_last = 0;             /* Last clock state */
+	uint32_t        m_min = 0;
+	uint32_t        m_max = 0;
+	uint32_t        m_diff = 0;
+	double          m_t_left = 0.0;         /* time unused during last sample in seconds */
 );
 
 DISCRETE_CLASS_STEP_RESET(dss_lfsr_noise, 2,
-	unsigned int    m_lfsr_reg;
-	int             m_last;                 /* Last clock state */
-	double          m_t_clock;              /* fixed counter clock in seconds */
-	double          m_t_left;               /* time unused during last sample in seconds */
-	//double          m_sample_step;
-	//double          m_t;
-	uint8_t           m_reset_on_high;
-	uint8_t           m_invert_output;
-	uint8_t           m_out_is_f0;
-	uint8_t           m_out_lfsr_reg;
+	unsigned int    m_lfsr_reg = 0;
+	int             m_last = 0;             /* Last clock state */
+	double          m_t_clock = 0.0;        /* fixed counter clock in seconds */
+	double          m_t_left = 0.0;         /* time unused during last sample in seconds */
+	//double          m_sample_step = 0.0;
+	//double          m_t = 0.0;
+	uint8_t         m_reset_on_high = 0;
+	uint8_t         m_invert_output = 0;
+	uint8_t         m_out_is_f0 = 0;
+	uint8_t         m_out_lfsr_reg = 0;
 );
 
 DISCRETE_CLASS_STEP_RESET(dss_noise, 2,
-	double          m_phase;
+	double          m_phase = 0.0;
 );
 
 DISCRETE_CLASS_STEP_RESET(dss_note, 1,
-	int             m_clock_type;
-	int             m_out_type;
-	int             m_last;                 /* Last clock state */
-	double          m_t_clock;              /* fixed counter clock in seconds */
-	double          m_t_left;               /* time unused during last sample in seconds */
-	int             m_max1;                 /* Max 1 Count stored as int for easy use. */
-	int             m_max2;                 /* Max 2 Count stored as int for easy use. */
-	int             m_count1;               /* current count1 */
-	int             m_count2;               /* current count2 */
+	int             m_clock_type = 0;
+	int             m_out_type = 0;
+	int             m_last = 0;             /* Last clock state */
+	double          m_t_clock = 0.0;        /* fixed counter clock in seconds */
+	double          m_t_left = 0.0;         /* time unused during last sample in seconds */
+	int             m_max1 = 0;             /* Max 1 Count stored as int for easy use. */
+	int             m_max2 = 0;             /* Max 2 Count stored as int for easy use. */
+	int             m_count1 = 0;           /* current count1 */
+	int             m_count2 = 0;           /* current count2 */
 );
 
 DISCRETE_CLASS_STEP_RESET(dss_sawtoothwave, 1,
-	double          m_phase;
-	int             m_type;
+	double          m_phase = 0.0;
+	int             m_type = 0;
 );
 
 DISCRETE_CLASS_STEP_RESET(dss_sinewave, 1,
-	double          m_phase;
+	double          m_phase = 0.0;
 );
 
 DISCRETE_CLASS_STEP_RESET(dss_squarewave, 1,
-	double          m_phase;
-	double          m_trigger;
+	double          m_phase = 0.0;
+	double          m_trigger = 0.0;
 );
 DISCRETE_CLASS_STEP_RESET(dss_squarewfix, 1,
-	int             m_flip_flop;
-	double          m_sample_step;
-	double          m_t_left;
-	double          m_t_off;
-	double          m_t_on;
+	int             m_flip_flop = 0;
+	double          m_sample_step = 0.0;
+	double          m_t_left = 0.0;
+	double          m_t_off = 0.0;
+	double          m_t_on = 0.0;
 );
 
 DISCRETE_CLASS_STEP_RESET(dss_squarewave2, 1,
-	double          m_phase;
-	double          m_trigger;
+	double          m_phase = 0.0;
+	double          m_trigger = 0.0;
 );
 
 DISCRETE_CLASS_STEP_RESET(dss_trianglewave, 1,
-	double          m_phase;
+	double          m_phase = 0.0;
 );
 
 /* Component specific modules */
@@ -107,13 +107,13 @@ class DISCRETE_CLASS_NAME(dss_inverter_osc): public discrete_base_node, public d
 public:
 	struct description
 	{
-		double  vB;
-		double  vOutLow;
-		double  vOutHigh;
-		double  vInFall;    // voltage that triggers the gate input to go low (0V) on fall
-		double  vInRise;    // voltage that triggers the gate input to go high (vGate) on rise
-		double  clamp;      // voltage is clamped to -clamp ... vb+clamp if clamp>= 0;
-		int     options;    // bitmapped options
+		double  vB = 0.0;
+		double  vOutLow = 0.0;
+		double  vOutHigh = 0.0;
+		double  vInFall = 0.0;  // voltage that triggers the gate input to go low (0V) on fall
+		double  vInRise = 0.0;  // voltage that triggers the gate input to go high (vGate) on rise
+		double  clamp = 0.0;    // voltage is clamped to -clamp ... vb+clamp if clamp>= 0;
+		int     options = 0.0;  // bitmapped options
 	};
 	enum {
 		IS_TYPE1 = 0x00,
@@ -124,8 +124,8 @@ public:
 		TYPE_MASK = 0x0f,
 		OUT_IS_LOGIC = 0x10
 	};
-	void step(void) override;
-	void reset(void) override;
+	void step() override;
+	void reset() override;
 protected:
 	inline double tftab(double x);
 	inline double tf(double x);
@@ -137,56 +137,56 @@ private:
 	DISCRETE_CLASS_INPUT(I_C,       4);
 	DISCRETE_CLASS_INPUT(I_R2,      5);
 
-	double          mc_v_cap;
-	double          mc_v_g2_old;
-	double          mc_w;
-	double          mc_wc;
-	double          mc_rp;
-	double          mc_r1;
-	double          mc_r2;
-	double          mc_c;
-	double          mc_tf_a;
-	double          mc_tf_b;
-	double          mc_tf_tab[DSS_INV_TAB_SIZE];
+	double          mc_v_cap = 0.0;
+	double          mc_v_g2_old = 0.0;
+	double          mc_w = 0.0;
+	double          mc_wc = 0.0;
+	double          mc_rp = 0.0;
+	double          mc_r1 = 0.0;
+	double          mc_r2 = 0.0;
+	double          mc_c = 0.0;
+	double          mc_tf_a = 0.0;
+	double          mc_tf_b = 0.0;
+	double          mc_tf_tab[DSS_INV_TAB_SIZE]{ 0.0 };
 };
 
 DISCRETE_CLASS_STEP_RESET(dss_op_amp_osc, 1,
-	const double *  m_r[8];                 /* pointers to resistor values */
-	int             m_type;
-	uint8_t           m_flip_flop;            /* flip/flop output state */
-	uint8_t           m_flip_flop_xor;        /* flip_flop ^ flip_flop_xor, 0 = discharge, 1 = charge */
-	uint8_t           m_output_type;
-	uint8_t           m_has_enable;
-	double          m_v_out_high;
-	double          m_threshold_low;        /* falling threshold */
-	double          m_threshold_high;       /* rising threshold */
-	double          m_v_cap;                /* current capacitor voltage */
-	double          m_r_total;              /* all input resistors in parallel */
-	double          m_i_fixed;              /* fixed current at the input */
-	double          m_i_enable;             /* fixed current at the input if enabled */
-	double          m_temp1;                /* Multi purpose */
-	double          m_temp2;                /* Multi purpose */
-	double          m_temp3;                /* Multi purpose */
-	double          m_is_linear_charge;
-	double          m_charge_rc[2];
-	double          m_charge_exp[2];
-	double          m_charge_v[2];
+	const double *  m_r[8]{ nullptr };      /* pointers to resistor values */
+	int             m_type = 0;
+	uint8_t         m_flip_flop = 0;        /* flip/flop output state */
+	uint8_t         m_flip_flop_xor = 0;    /* flip_flop ^ flip_flop_xor, 0 = discharge, 1 = charge */
+	uint8_t         m_output_type = 0;
+	uint8_t         m_has_enable = 0;
+	double          m_v_out_high = 0.0;
+	double          m_threshold_low = 0.0;  /* falling threshold */
+	double          m_threshold_high = 0.0; /* rising threshold */
+	double          m_v_cap = 0.0;          /* current capacitor voltage */
+	double          m_r_total = 0.0;        /* all input resistors in parallel */
+	double          m_i_fixed = 0.0;        /* fixed current at the input */
+	double          m_i_enable = 0.0;       /* fixed current at the input if enabled */
+	double          m_temp1 = 0.0;          /* Multi purpose */
+	double          m_temp2 = 0.0;          /* Multi purpose */
+	double          m_temp3 = 0.0;          /* Multi purpose */
+	double          m_is_linear_charge = 0.0;
+	double          m_charge_rc[2]{ 0.0 };
+	double          m_charge_exp[2]{ 0.0 };
+	double          m_charge_v[2]{ 0.0 };
 );
 
 DISCRETE_CLASS_STEP_RESET(dss_schmitt_osc, 1,
-	double          m_ration_in;            /* ratio of total charging voltage that comes from the input */
-	double          m_ratio_feedback;       /* ratio of total charging voltage that comes from the feedback */
-	double          m_v_cap;                /* current capacitor voltage */
-	double          m_rc;                   /* r*c */
-	double          m_exponent;
-	int             m_state;                /* state of the output */
-	int             m_enable_type;
-	uint8_t           m_input_is_voltage;
+	double          m_ration_in = 0.0;      /* ratio of total charging voltage that comes from the input */
+	double          m_ratio_feedback = 0.0; /* ratio of total charging voltage that comes from the feedback */
+	double          m_v_cap = 0.0;          /* current capacitor voltage */
+	double          m_rc = 0.0;             /* r*c */
+	double          m_exponent = 0.0;
+	int             m_state = 0;            /* state of the output */
+	int             m_enable_type = 0;
+	uint8_t         m_input_is_voltage = 0;
 );
 
 /* Not yet implemented */
 DISCRETE_CLASS_STEP_RESET(dss_adsrenv,  1,
-	//double          m_phase;
+	//double          m_phase = 0.0;
 );
 
 

@@ -960,7 +960,9 @@ BUSES["PSX_CONTROLLER"] = true
 BUSES["PSX_PARALLEL"] = true
 BUSES["QBUS"] = true
 BUSES["QL"] = true
+BUSES["RC2014"] = true
 BUSES["RS232"] = true
+BUSES["PC8801"] = true
 BUSES["RTPC_KBD"] = true
 BUSES["S100"] = true
 BUSES["SAITEK_OSA"] = true
@@ -1169,6 +1171,7 @@ FORMATS["THOM_CAS"] = true
 FORMATS["THOM_DSK"] = true
 FORMATS["TI99_DSK"] = true
 FORMATS["TIKI100_DSK"] = true
+FORMATS["TIM011_DSK"] = true
 FORMATS["TRD_DSK"] = true
 FORMATS["TRS80_DSK"] = true
 FORMATS["TRS_CAS"] = true
@@ -1210,7 +1213,6 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"akai",
 		"alesis",
 		"altos",
-		"ami",
 		"amirix",
 		"amiga",
 		"ampro",
@@ -1402,6 +1404,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"sanyo",
 		"saturn",
 		"segacons",
+		"selchow",
 		"sequential",
 		"sgi",
 		"sharp",
@@ -1703,6 +1706,8 @@ files {
 	MAME_DIR .. "src/mame/includes/z88.h",
 	MAME_DIR .. "src/mame/machine/upd65031.cpp",
 	MAME_DIR .. "src/mame/machine/upd65031.h",
+	MAME_DIR .. "src/mame/machine/z88_impexp.cpp",
+	MAME_DIR .. "src/mame/machine/z88_impexp.h",
 	MAME_DIR .. "src/mame/video/z88.cpp",
 }
 
@@ -1762,11 +1767,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/altos486.cpp",
 	MAME_DIR .. "src/mame/drivers/altos8600.cpp",
 	MAME_DIR .. "src/mame/machine/acs8600_ics.cpp",
-}
-
-createMESSProjects(_target, _subtarget, "ami")
-files {
-	MAME_DIR .. "src/mame/drivers/hh_amis2k.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "amirix")
@@ -2252,7 +2252,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/ac1.cpp",
 	MAME_DIR .. "src/mame/drivers/bcs3.cpp",
 	MAME_DIR .. "src/mame/drivers/c80.cpp",
-	MAME_DIR .. "src/mame/includes/c80.h",
 	MAME_DIR .. "src/mame/drivers/huebler.cpp",
 	MAME_DIR .. "src/mame/includes/huebler.h",
 	MAME_DIR .. "src/mame/drivers/jtc.cpp",
@@ -2410,9 +2409,6 @@ files {
 createMESSProjects(_target, _subtarget, "entex")
 files {
 	MAME_DIR .. "src/mame/drivers/advision.cpp",
-	MAME_DIR .. "src/mame/includes/advision.h",
-	MAME_DIR .. "src/mame/machine/advision.cpp",
-	MAME_DIR .. "src/mame/video/advision.cpp",
 	MAME_DIR .. "src/mame/drivers/sag.cpp",
 }
 
@@ -3375,6 +3371,7 @@ createMESSProjects(_target, _subtarget, "parker")
 files {
 	MAME_DIR .. "src/mame/drivers/talkingbb.cpp",
 	MAME_DIR .. "src/mame/drivers/talkingfb.cpp",
+	MAME_DIR .. "src/mame/drivers/wildfire.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "pitronic")
@@ -3694,6 +3691,11 @@ files {
 	MAME_DIR .. "src/mame/machine/megacd.h",
 	MAME_DIR .. "src/mame/machine/megacdcd.cpp",
 	MAME_DIR .. "src/mame/machine/megacdcd.h",
+}
+
+createMESSProjects(_target, _subtarget, "selchow")
+files {
+	MAME_DIR .. "src/mame/drivers/scrablex.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "sequential")
@@ -4744,6 +4746,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/pv9234.cpp",
 	MAME_DIR .. "src/mame/drivers/pwp14.cpp",
 	MAME_DIR .. "src/mame/drivers/qtsbc.cpp",
+	MAME_DIR .. "src/mame/drivers/rc2014.cpp",
 	MAME_DIR .. "src/mame/drivers/rd100.cpp",
 	MAME_DIR .. "src/mame/drivers/rvoice.cpp",
 	MAME_DIR .. "src/mame/drivers/sacstate.cpp",

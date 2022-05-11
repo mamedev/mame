@@ -24,7 +24,7 @@ protected:
 	virtual void adb_w(int state) override;
 
 private:
-	bool m_last_state = false;
+	bool m_last_state;
 	attotime m_last_state_time;
 };
 

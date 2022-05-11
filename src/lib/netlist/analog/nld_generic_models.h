@@ -20,9 +20,7 @@
 
 #define USE_TEXTBOOK_DIODE  (1)
 
-namespace netlist
-{
-namespace analog
+namespace netlist::analog
 {
 
 	// -----------------------------------------------------------------------------
@@ -374,7 +372,6 @@ namespace analog
 	};
 
 
-} // namespace analog
-} // namespace netlist
+} // namespace netlist::analog
 
 #endif // NLD_GENERIC_MODELS_H_

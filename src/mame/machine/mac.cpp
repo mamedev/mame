@@ -1195,6 +1195,9 @@ void mac_state::mac_driver_init(model_t model)
 	m_overlay = 1;
 	m_scsi_interrupt = 0;
 	m_model = model;
+	m_scc_interrupt = 0;
+	m_via_interrupt = 0;
+	m_via2_interrupt = 0;
 
 	m_rom_size = memregion("bootrom")->bytes();
 	m_rom_ptr = reinterpret_cast<uint32_t *>(memregion("bootrom")->base());

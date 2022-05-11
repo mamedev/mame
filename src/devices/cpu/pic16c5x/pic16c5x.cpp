@@ -74,7 +74,6 @@
 #include "emu.h"
 #include "pic16c5x.h"
 #include "16c5xdsm.h"
-#include "debugger.h"
 
 
 DEFINE_DEVICE_TYPE(PIC16C54, pic16c54_device, "pic16c54", "Microchip PIC16C54")

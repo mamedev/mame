@@ -87,35 +87,35 @@ protected:
 		uint8_t cursor_ctrl;
 
 		// 2D acceleration
-		uint16_t accel_opermode = 0;
-		uint8_t accel_command = 0;
-		uint8_t accel_fmix = 0;
-		uint32_t accel_drawflags = 0;
-		uint32_t accel_fgcolour = 0;
-		uint32_t accel_bgcolour = 0;
-		uint16_t accel_pattern_loc = 0;
-		int16_t accel_source_x = 0;
-		int16_t accel_source_y = 0;
-		int16_t accel_dest_x = 0;
-		int16_t accel_dest_y = 0;
-		int16_t accel_dim_x = 0;
-		int16_t accel_dim_y = 0;
-		uint32_t accel_style = 0;
-		uint32_t accel_ckey = 0;
-		int16_t accel_source_x_clip = 0;
-		int16_t accel_source_y_clip = 0;
-		int16_t accel_dest_x_clip = 0;
-		int16_t accel_dest_y_clip = 0;
-		uint32_t accel_fg_pattern_colour = 0;
-		uint32_t accel_bg_pattern_colour = 0;
-		uint8_t accel_pattern[0x80]{};
-		bool accel_busy = false;
-		bool accel_memwrite_active = false;  // true when writing to VRAM will push data to an ongoing command (SRCMONO/PATMONO)
-		int16_t accel_mem_x = 0;
-		int16_t accel_mem_y = 0;
-		uint32_t accel_transfer = 0;
+		uint16_t accel_opermode;
+		uint8_t accel_command;
+		uint8_t accel_fmix;
+		uint32_t accel_drawflags;
+		uint32_t accel_fgcolour;
+		uint32_t accel_bgcolour;
+		uint16_t accel_pattern_loc;
+		int16_t accel_source_x;
+		int16_t accel_source_y;
+		int16_t accel_dest_x;
+		int16_t accel_dest_y;
+		int16_t accel_dim_x;
+		int16_t accel_dim_y;
+		uint32_t accel_style;
+		uint32_t accel_ckey;
+		int16_t accel_source_x_clip;
+		int16_t accel_source_y_clip;
+		int16_t accel_dest_x_clip;
+		int16_t accel_dest_y_clip;
+		uint32_t accel_fg_pattern_colour;
+		uint32_t accel_bg_pattern_colour;
+		uint8_t accel_pattern[0x80];
+		bool accel_busy;
+		bool accel_memwrite_active;  // true when writing to VRAM will push data to an ongoing command (SRCMONO/PATMONO)
+		int16_t accel_mem_x;
+		int16_t accel_mem_y;
+		uint32_t accel_transfer;
 	} tri;
-	uint8_t m_version = 0;
+	uint8_t m_version;
 private:
 	uint8_t trident_seq_reg_read(uint8_t index);
 	void trident_seq_reg_write(uint8_t index, uint8_t data);

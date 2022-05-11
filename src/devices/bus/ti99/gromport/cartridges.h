@@ -112,13 +112,17 @@ private:
 		const std::string m_pathname;
 	};
 
-	bool    m_readrom = false;
+	bool    m_readrom;
 	int     m_pcbtype;
 	int     m_slot;
 	int     get_index_from_tagname();
 
 	std::unique_ptr<ti99_cartridge_pcb> m_pcb;          // inbound
 	cartridge_connector_device*    m_connector;    // outbound
+
+	// We use dynamically allocated space instead of memory regions
+	// because the required spaces are widely varying (8K to 32M)
+	std::unique_ptr<u8[]> m_romspace;
 
 	// RPK which is associated to this cartridge
 	// When we close it, the contents are saved to NVRAM if available
@@ -155,12 +159,12 @@ protected:
 	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const { m_cart->logerror(fmt, args...); }
 
 	ti99_cartridge_device*  m_cart;
-	tmc0430_device*     m_grom[5]{};
+	tmc0430_device*     m_grom[5];
 	bool                m_grom_idle;
 	int                 m_grom_size;
 	int                 m_rom_size;
 	int                 m_ram_size;
-	int                 m_bank_mask = 0;
+	int                 m_bank_mask;
 
 	uint8_t*              m_rom_ptr;
 	uint8_t*              m_ram_ptr;

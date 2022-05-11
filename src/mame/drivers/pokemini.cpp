@@ -59,34 +59,34 @@ protected:
 private:
 	struct PRC
 	{
-		uint8_t       colors_inverted;
-		uint8_t       background_enabled;
-		uint8_t       sprites_enabled;
-		uint8_t       copy_enabled;
-		uint8_t       map_size;
-		uint8_t       map_size_x;
-		uint8_t       frame_count;
-		uint8_t       max_frame_count;
-		uint32_t      bg_tiles;
-		uint32_t      spr_tiles;
-		uint8_t       count;
-		emu_timer   *count_timer;
+		uint8_t       colors_inverted = 0;
+		uint8_t       background_enabled = 0;
+		uint8_t       sprites_enabled = 0;
+		uint8_t       copy_enabled = 0;
+		uint8_t       map_size = 0;
+		uint8_t       map_size_x = 0;
+		uint8_t       frame_count = 0;
+		uint8_t       max_frame_count = 0;
+		uint32_t      bg_tiles = 0;
+		uint32_t      spr_tiles = 0;
+		uint8_t       count = 0;
+		emu_timer   *count_timer = nullptr;
 	};
 
 
 	struct TIMERS
 	{
-		emu_timer   *seconds_timer;
-		emu_timer   *hz256_timer;
-		emu_timer   *timer1;                // Timer 1 low or 16bit
-		emu_timer   *timer1_hi;             // Timer 1 hi
-		emu_timer   *timer2;                // Timer 2 low or 16bit
-		emu_timer   *timer2_hi;             // Timer 2 high
-		emu_timer   *timer3;                // Timer 3 low or 16bit
-		emu_timer   *timer3_hi;             // Timer 3 high
+		emu_timer   *seconds_timer = nullptr;
+		emu_timer   *hz256_timer = nullptr;
+		emu_timer   *timer1 = nullptr;                // Timer 1 low or 16bit
+		emu_timer   *timer1_hi = nullptr;             // Timer 1 hi
+		emu_timer   *timer2 = nullptr;                // Timer 2 low or 16bit
+		emu_timer   *timer2_hi = nullptr;             // Timer 2 high
+		emu_timer   *timer3 = nullptr;                // Timer 3 low or 16bit
+		emu_timer   *timer3_hi = nullptr;             // Timer 3 high
 	};
 
-	uint8_t m_pm_reg[0x100];
+	uint8_t m_pm_reg[0x100]{};
 	PRC m_prc;
 	TIMERS m_timers;
 	bitmap_ind16 m_bitmap;
@@ -119,7 +119,6 @@ private:
 	void timer3_callback();
 	void timer3_hi_callback();
 	void prc_counter_callback();
-
 };
 
 

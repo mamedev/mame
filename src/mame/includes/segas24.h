@@ -94,39 +94,39 @@ private:
 	static const uint8_t s_quizmeku_mlt[8];
 	static const uint8_t   s_dcclub_mlt[8];
 
-	uint8_t m_fdc_track_side;
-	uint8_t m_fdc_mode;
-	int m_fdc_status;
-	int m_fdc_track;
-	int m_fdc_sector;
-	int m_fdc_data;
-	int m_fdc_phys_track;
-	bool m_fdc_irq;
-	bool m_fdc_drq;
-	int m_fdc_span;
-	int m_fdc_index_count;
-	uint8_t *m_fdc_pt;
-	int m_track_size;
-	int m_cur_input_line;
-	uint8_t m_curbank;
-	uint8_t m_mlatch;
-	const uint8_t *m_mlatch_table;
+	uint8_t m_fdc_track_side = 0;
+	uint8_t m_fdc_mode = 0;
+	int m_fdc_status = 0;
+	int m_fdc_track = 0;
+	int m_fdc_sector = 0;
+	int m_fdc_data = 0;
+	int m_fdc_phys_track = 0;
+	bool m_fdc_irq = false;
+	bool m_fdc_drq = false;
+	int m_fdc_span = 0;
+	int m_fdc_index_count = 0;
+	uint8_t *m_fdc_pt = nullptr;
+	int m_track_size = 0;
+	int m_cur_input_line = 0;
+	uint8_t m_curbank = 0;
+	uint8_t m_mlatch = 0;
+	const uint8_t *m_mlatch_table = nullptr;
 
-	uint16_t m_irq_tdata, m_irq_tval;
-	uint8_t m_irq_tmode, m_irq_allow0, m_irq_allow1;
-	bool m_irq_timer_pend0;
-	bool m_irq_timer_pend1;
-	bool m_irq_yms;
-	bool m_irq_vblank;
-	bool m_irq_sprite;
+	uint16_t m_irq_tdata = 0, m_irq_tval = 0;
+	uint8_t m_irq_tmode = 0, m_irq_allow0 = 0, m_irq_allow1 = 0;
+	bool m_irq_timer_pend0 = false;
+	bool m_irq_timer_pend1 = false;
+	bool m_irq_yms = false;
+	bool m_irq_vblank = false;
+	bool m_irq_sprite = false;
 	attotime m_irq_synctime, m_irq_vsynctime;
 	required_device<timer_device> m_irq_timer;
 	required_device<timer_device> m_irq_timer_clear;
 	//timer_device *m_irq_frc;
 	required_device<timer_device> m_frc_cnt_timer;
-	uint8_t m_frc_mode;
+	uint8_t m_frc_mode = 0;
 
-	bool m_cnt1;
+	bool m_cnt1 = false;
 
 	required_device<segas24_tile_device> m_vtile;
 	required_device<segas24_sprite_device> m_vsprite;
@@ -177,7 +177,7 @@ private:
 
 	// game specific
 	TIMER_CALLBACK_MEMBER(gground_hack_timer_callback);
-	emu_timer *m_gground_hack_timer;
+	emu_timer *m_gground_hack_timer = nullptr;
 	required_ioport m_p1;
 	required_ioport m_p2;
 	required_ioport m_p3;

@@ -68,6 +68,24 @@
  F100 - ????  CDS disk 0 controller
  F300 - ????  CDS disk 1 controller
 
+The supplied flex and uniflex floppies all worked when this driver was
+created (2014-03-25), but have been broken since sometime in 2015.
+
+The message is the same for all 3 disks: Unable to identify the image format.
+
+Official notes:
+mess swtpc09 -flop1 DMAF2_BOOT.dsk
+press D to boot flex operating system. dir 0 will perform a directory of drive 0.
+
+mess swtpc09u -flop1 uflxbtsd.dsk
+type D to boot uniflex. This is a multiuser operating system, I need to add an extra terminal to this
+and then it would be cool to get it running multiuser.
+
+mess swtpc09d3 -window -flop1 UOS_3S_BOOT.dsk
+type D to boot uniflex. This one has potential to get harddisk support for uniflex in the future.
+
+mess swtpc09i  not working
+
 ***************************************************************************/
 
 /* Address map is dynamically setup when DAT memory is written to  */
@@ -609,8 +627,8 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT    CLASS          INIT            COMPANY  FULLNAME                    FLAGS
-COMP( 1980, swtpc09,   0,       0,      swtpc09,   swtpc09, swtpc09_state, init_swtpc09,   "SWTPC", "swtpc S/09 Sbug",          MACHINE_NO_SOUND_HW )
-COMP( 1980, swtpc09i,  swtpc09, 0,      swtpc09i,  swtpc09, swtpc09_state, init_swtpc09i,  "SWTPC", "swtpc S/09 Sbug + piaide", MACHINE_NO_SOUND_HW )
-COMP( 1980, swtpc09u,  swtpc09, 0,      swtpc09u,  swtpc09, swtpc09_state, init_swtpc09u,  "SWTPC", "swtpc S/09 UNIBug + DMAF2", MACHINE_NO_SOUND_HW )
-COMP( 1980, swtpc09d3, swtpc09, 0,      swtpc09d3, swtpc09, swtpc09_state, init_swtpc09d3, "SWTPC", "swtpc S/09 UNIBug + DMAF3", MACHINE_NO_SOUND_HW )
-COMP( 1980, swtpc09o,  swtpc09, 0,      swtpc09o,  swtpc09, swtpc09_state, init_swtpc09o,  "SWTPC", "swtpc S/09 OS9",           MACHINE_NO_SOUND_HW )
+COMP( 1980, swtpc09,   0,       0,      swtpc09,   swtpc09, swtpc09_state, init_swtpc09,   "SWTPC", "swtpc S/09 Sbug",          MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 1980, swtpc09i,  swtpc09, 0,      swtpc09i,  swtpc09, swtpc09_state, init_swtpc09i,  "SWTPC", "swtpc S/09 Sbug + piaide", MACHINE_NO_SOUND_HW  | MACHINE_NOT_WORKING )
+COMP( 1980, swtpc09u,  swtpc09, 0,      swtpc09u,  swtpc09, swtpc09_state, init_swtpc09u,  "SWTPC", "swtpc S/09 UNIBug + DMAF2", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 1980, swtpc09d3, swtpc09, 0,      swtpc09d3, swtpc09, swtpc09_state, init_swtpc09d3, "SWTPC", "swtpc S/09 UNIBug + DMAF3", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 1980, swtpc09o,  swtpc09, 0,      swtpc09o,  swtpc09, swtpc09_state, init_swtpc09o,  "SWTPC", "swtpc S/09 OS9",           MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )

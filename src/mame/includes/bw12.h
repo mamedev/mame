@@ -122,25 +122,25 @@ protected:
 	required_memory_bank m_bank;
 
 	/* memory state */
-	int m_curbank;
+	int m_curbank = 0;
 
 	/* PIT state */
-	int m_pit_out2;
+	int m_pit_out2 = 0;
 
 	/* keyboard state */
-	int m_key_data[9];
-	int m_key_sin;
-	int m_key_stb;
-	int m_key_shift;
+	int m_key_data[9]{};
+	int m_key_sin = 0;
+	int m_key_stb = 0;
+	int m_key_shift = 0;
 
 	/* floppy state */
-	int m_motor_on;
-	int m_motor0;
-	int m_motor1;
+	int m_motor_on = 0;
+	int m_motor0 = 0;
+	int m_motor1 = 0;
 
-	int m_centronics_busy;
-	int m_centronics_fault;
-	int m_centronics_perror;
+	int m_centronics_busy = 0;
+	int m_centronics_fault = 0;
+	int m_centronics_perror = 0;
 };
 
 #endif

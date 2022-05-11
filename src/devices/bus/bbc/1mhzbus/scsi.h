@@ -44,8 +44,8 @@ protected:
 private:
 	required_device<nscsi_callback_device> m_scsi;
 
-	int m_irq_enable = 0;
-	int m_irq_state = 0;
+	int m_irq_enable;
+	int m_irq_state;
 };
 
 

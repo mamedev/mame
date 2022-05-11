@@ -63,27 +63,27 @@ private:
 	required_device<hp_nanoprocessor_device> m_cpu;
 
 	// Internal RAM & I/F
-	uint8_t m_np_ram[ 256 ]{};
-	uint8_t m_ram_addr = 0;
-	uint8_t m_ram_data_in = 0;
+	uint8_t m_np_ram[ 256 ];
+	uint8_t m_ram_addr;
+	uint8_t m_ram_data_in;
 
 	// DC lines
-	uint8_t m_dc = 0;
+	uint8_t m_dc;
 
 	// NP interrupt
-	bool m_np_irq = false;
+	bool m_np_irq;
 
 	// Periodic interrupt
-	emu_timer *m_msec_timer = nullptr;
+	emu_timer *m_msec_timer;
 
 	// Interface state
-	bool m_flg = false;
-	bool m_inten = false;
-	bool m_intflag = false;
-	bool m_irq = false;
-	bool m_idr_full = false;
-	uint8_t m_idr = 0;  // Input Data Register
-	uint8_t m_odr = 0;  // Output Data Register
+	bool m_flg;
+	bool m_inten;
+	bool m_intflag;
+	bool m_irq;
+	bool m_idr_full;
+	uint8_t m_idr;  // Input Data Register
+	uint8_t m_odr;  // Output Data Register
 
 	// Clock chip emulation
 	typedef enum {
@@ -96,15 +96,15 @@ private:
 		CLOCK_DOM,  // Show   :DD
 	} clock_state_t;
 
-	emu_timer *m_clock_timer = nullptr;
-	unsigned m_clock_1s_div = 0;
-	clock_state_t m_clock_state{};
-	uint8_t m_clock_digits[ 3 ]{};
-	uint8_t m_clock_mux = 0;
-	bool m_clock_segh = false;
-	uint8_t m_clock_keys = 0;
-	uint8_t m_prev_clock_keys = 0;
-	unsigned m_clock_key_cnt = 0;
+	emu_timer *m_clock_timer;
+	unsigned m_clock_1s_div;
+	clock_state_t m_clock_state;
+	uint8_t m_clock_digits[ 3 ];
+	uint8_t m_clock_mux;
+	bool m_clock_segh;
+	uint8_t m_clock_keys;
+	uint8_t m_prev_clock_keys;
+	unsigned m_clock_key_cnt;
 
 	void half_init();
 	void set_flg(bool value);

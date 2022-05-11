@@ -20,10 +20,7 @@
 //  convert - convert a spice netlist
 // -------------------------------------------------
 
-namespace netlist
-{
-
-namespace convert
+namespace netlist::convert
 {
 
 using arena = plib::aligned_arena;
@@ -285,7 +282,6 @@ private:
 
 };
 
-} // namespace convert
-} // namespace netlist
+} // namespace netlist::convert
 
 #endif // NL_CONVERT_H_

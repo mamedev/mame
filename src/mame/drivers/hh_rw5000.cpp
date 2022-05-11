@@ -19,6 +19,7 @@ ROM source notes when dumped from another model, but confident it's the same:
 #include "cpu/rw5000/a5500.h"
 #include "cpu/rw5000/a5900.h"
 #include "cpu/rw5000/b5000.h"
+#include "cpu/rw5000/b5500.h"
 #include "cpu/rw5000/b6000.h"
 #include "cpu/rw5000/b6100.h"
 #include "video/pwm.h"
@@ -34,7 +35,7 @@ ROM source notes when dumped from another model, but confident it's the same:
 #include "misatk.lh"
 #include "rw10r.lh"
 #include "rw24k.lh"
-#include "rw31r.lh"
+#include "rw30r.lh"
 
 //#include "hh_rw5000_test.lh" // common test-layout - use external artwork
 
@@ -830,19 +831,27 @@ ROM_END
 
 /***************************************************************************
 
+  Rockwell 30R "Slide Rule Memory"
+  * B5500 MCU (label B5500PA, die label B5500)
+  * 9-digit 7seg LED display
+
   Rockwell 31R "Slide Rule Memory"
   * A5500 MCU (label A5502PA, die label A5500)
-  * 9-digit 7seg LED display
+  * rest is same as 30R
+
+  30R and 31R have the exact same functionality, even though they are on
+  different MCUs. There's also a 30R version on an A4600 MCU.
 
 ***************************************************************************/
 
-class rw31r_state : public hh_rw5000_state
+class rw30r_state : public hh_rw5000_state
 {
 public:
-	rw31r_state(const machine_config &mconfig, device_type type, const char *tag) :
+	rw30r_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_rw5000_state(mconfig, type, tag)
 	{ }
 
+	void rw30r(machine_config &config);
 	void rw31r(machine_config &config);
 
 private:
@@ -853,7 +862,7 @@ private:
 
 // handlers
 
-void rw31r_state::write_str(u16 data)
+void rw30r_state::write_str(u16 data)
 {
 	// STR0-STR8: digit select
 	// STR4-STR8: input mux
@@ -861,13 +870,13 @@ void rw31r_state::write_str(u16 data)
 	m_inp_mux = data >> 4;
 }
 
-void rw31r_state::write_seg(u16 data)
+void rw30r_state::write_seg(u16 data)
 {
 	// SEG0-SEG7: digit segment data
 	m_display->write_mx(bitswap<8>(data,0,7,6,5,4,3,2,1));
 }
 
-u8 rw31r_state::read_kb()
+u8 rw30r_state::read_kb()
 {
 	// KB: multiplexed inputs
 	return read_inputs(5);
@@ -875,7 +884,7 @@ u8 rw31r_state::read_kb()
 
 // config
 
-static INPUT_PORTS_START( rw31r )
+static INPUT_PORTS_START( rw30r )
 	PORT_START("IN.0") // STR4
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(". / +/-")
@@ -907,21 +916,38 @@ static INPUT_PORTS_START( rw31r )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("= / MR")
 INPUT_PORTS_END
 
-void rw31r_state::rw31r(machine_config &config)
+void rw30r_state::rw30r(machine_config &config)
 {
 	// basic machine hardware
-	A5500(config, m_maincpu, 250000); // approximation
-	m_maincpu->write_str().set(FUNC(rw31r_state::write_str));
-	m_maincpu->write_seg().set(FUNC(rw31r_state::write_seg));
-	m_maincpu->read_kb().set(FUNC(rw31r_state::read_kb));
+	B5500(config, m_maincpu, 250000); // approximation
+	m_maincpu->write_str().set(FUNC(rw30r_state::write_str));
+	m_maincpu->write_seg().set(FUNC(rw30r_state::write_seg));
+	m_maincpu->read_kb().set(FUNC(rw30r_state::read_kb));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	m_display->set_segmask(0x1ff, 0xff);
-	config.set_default_layout(layout_rw31r);
+	config.set_default_layout(layout_rw30r);
+}
+
+void rw30r_state::rw31r(machine_config &config)
+{
+	rw30r(config);
+
+	// basic machine hardware
+	A5500(config.replace(), m_maincpu, 250000); // approximation
+	m_maincpu->write_str().set(FUNC(rw30r_state::write_str));
+	m_maincpu->write_seg().set(FUNC(rw30r_state::write_seg));
+	m_maincpu->read_kb().set(FUNC(rw30r_state::read_kb));
 }
 
 // roms
+
+ROM_START( rw30r )
+	ROM_REGION( 0x400, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "b5500pa", 0x000, 0x280, CRC(937dd695) SHA1(bc286209943f49e9acccbf319b87c6ec24386894) )
+	ROM_CONTINUE(        0x380, 0x080 )
+ROM_END
 
 ROM_START( rw31r )
 	ROM_REGION( 0x400, "maincpu", ROMREGION_ERASE00 )
@@ -1076,7 +1102,8 @@ CONS( 1978, mbaseb,    0,       0, mbaseb,    mbaseb,    mbaseb_state,    empty_
 CONS( 1980, gravity,   0,       0, gravity,   gravity,   gravity_state,   empty_init, "Mattel Electronics", "Gravity (Mattel)", MACHINE_SUPPORTS_SAVE )
 
 COMP( 1974, rw10r,     0,       0, rw10r,     rw10r,     rw10r_state,     empty_init, "Rockwell", "10R (Rockwell)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1975, rw12r,     0,       0, rw10r,     rw10r,     rw10r_state,     empty_init, "Rockwell", "12R (Rockwell)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1975, rw18r,     0,       0, rw18r,     rw18r,     rw18r_state,     empty_init, "Rockwell", "18R (Rockwell)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1975, rw31r,     0,       0, rw31r,     rw31r,     rw31r_state,     empty_init, "Rockwell", "31R (Rockwell)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1975, rw12r,     0,       0, rw10r,     rw10r,     rw10r_state,     empty_init, "Rockwell", "12R: Square Root", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1975, rw18r,     0,       0, rw18r,     rw18r,     rw18r_state,     empty_init, "Rockwell", "18R: Memory", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1974, rw30r,     0,       0, rw30r,     rw30r,     rw30r_state,     empty_init, "Rockwell", "30R: Slide Rule Memory (B5500 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1975, rw31r,     rw30r,   0, rw31r,     rw30r,     rw30r_state,     empty_init, "Rockwell", "31R: Slide Rule Memory", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, rw24k,     0,       0, rw24k,     rw24k,     rw24k_state,     empty_init, "Rockwell", "24K (Rockwell)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

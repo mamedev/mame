@@ -2,7 +2,6 @@
 // copyright-holders:Olivier Galibert
 
 #include "emu.h"
-#include "debugger.h"
 #include "mb86233.h"
 #include "mb86233d.h"
 

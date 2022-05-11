@@ -68,8 +68,8 @@ protected:
 	void osi600_mem(address_map &map);
 
 	uint8_t m_cass_data[4]{};
-	bool m_cassbit = 0;
-	bool m_cassold = 0;
+	bool m_cassbit = false;
+	bool m_cassold = false;
 	required_device<cpu_device> m_maincpu;
 	required_device<acia6850_device> m_acia;
 	required_device<cassette_image_device> m_cass;

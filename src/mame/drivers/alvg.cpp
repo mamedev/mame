@@ -174,7 +174,7 @@ private:
 	u8 m_dmd_page = 0U;
 	u8 m_dmd_row = 0U;
 	u8 m_dmd_col = 0U;
-	bool m_dmd_plan = 0;
+	bool m_dmd_plan = false;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<cpu_device> m_maincpu;
@@ -1047,19 +1047,19 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1991, agsoccer,   0,        group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "A.G. Soccer Ball (R18u, 2.5L sound)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1991, agsoccera,  agsoccer, group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "A.G. Soccer Ball (R18u, 2.1 sound)",           MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1991, agsoccer07, agsoccer, group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "A.G. Soccer Ball (R07u)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1992, wrldtour,   0,        group3, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Al's Garage Band Goes On A World Tour (R01c)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1992, wrldtour2,  wrldtour, group3, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Al's Garage Band Goes On A World Tour (R02b)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1992, wrldtour3,  wrldtour, group3, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Al's Garage Band Goes On A World Tour (R06a)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1993, usafootb,   0,        group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "U.S.A. Football (R06u)",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1993, usafootba,  usafootb, group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "U.S.A. Football (R01u)",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1994, usafootf,   0,        group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "U.S.A. Football (P08, redemption)",            MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1993, mystcast,   0,        group3, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Mystery Castle (R02)",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1993, mystcasta,  mystcast, group3, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Mystery Castle (R03)",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1993, pstlpkr,    0,        group3, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Pistol Poker (R02)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1993, pstlpkr1,   pstlpkr,  group3, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Pistol Poker (R01)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1993, punchy,     0,        group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Punchy The Clown (R02)",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1993, punchy3,    punchy,   group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Punchy The Clown (R03)",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1993, dinoeggs,   0,        group2, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Dinosaur Eggs (R02)",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1991, agsoccer,   0,        group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "A.G. Soccer Ball (R18u, 2.5L sound)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, agsoccera,  agsoccer, group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "A.G. Soccer Ball (R18u, 2.1 sound)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, agsoccer07, agsoccer, group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "A.G. Soccer Ball (R07u)",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, wrldtour,   0,        group3, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Al's Garage Band Goes On A World Tour (R01c)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, wrldtour2,  wrldtour, group3, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Al's Garage Band Goes On A World Tour (R02b)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, wrldtour3,  wrldtour, group3, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Al's Garage Band Goes On A World Tour (R06a)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, usafootb,   0,        group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "U.S.A. Football (R06u)",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, usafootba,  usafootb, group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "U.S.A. Football (R01u)",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, usafootf,   0,        group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "U.S.A. Football (P08, redemption)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mystcast,   0,        group3, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Mystery Castle (R02)",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mystcasta,  mystcast, group3, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Mystery Castle (R03)",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, pstlpkr,    0,        group3, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Pistol Poker (R02)",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, pstlpkr1,   pstlpkr,  group3, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Pistol Poker (R01)",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, punchy,     0,        group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Punchy The Clown (R02)",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, punchy3,    punchy,   group1, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Punchy The Clown (R03)",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, dinoeggs,   0,        group2, alvg, alvg_state, empty_init, ROT0, "Alvin G", "Dinosaur Eggs (R02)",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

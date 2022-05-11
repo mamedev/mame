@@ -30,8 +30,8 @@ protected:
 
 	void update_irq_to_maincpu();
 
-	uint8_t fdc_irq_state = 0;
-	uint8_t dmac_irq_state = 0;
+	uint8_t fdc_irq_state;
+	uint8_t dmac_irq_state;
 
 private:
 	//dmac
@@ -66,7 +66,7 @@ private:
 	uint8_t m_tcr;
 
 	// Pointer to System ROMs needed by bootvect_r
-	uint16_t  *m_sysrom = nullptr;
+	uint16_t  *m_sysrom;
 };
 
 #endif // MAME_BUS_VME_VME_FCSCSI_H

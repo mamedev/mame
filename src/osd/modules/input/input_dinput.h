@@ -72,7 +72,7 @@ public:
 		std::string utf8_instance_id = utf8_instance_name + " product_" + guid_to_string(instance->guidProduct) + " instance_" + guid_to_string(instance->guidInstance);
 
 		// allocate memory for the device object
-		TDevice &devinfo = module.devicelist()->create_device<TDevice>(machine, std::move(utf8_instance_name), std::move(utf8_instance_id), module);
+		TDevice &devinfo = module.devicelist().create_device<TDevice>(machine, std::move(utf8_instance_name), std::move(utf8_instance_id), module);
 
 		// attempt to create a device
 		result = m_dinput->CreateDevice(instance->guidInstance, devinfo.dinput.device.GetAddressOf(), nullptr);
@@ -133,7 +133,7 @@ public:
 		return &devinfo;
 
 	error:
-		module.devicelist()->free_device(devinfo);
+		module.devicelist().free_device(devinfo);
 		return nullptr;
 	}
 

@@ -12,8 +12,6 @@
 
 #include "machine/diablo_hd.h"
 
-#include "debugger.h"
-
 #define ALTO2_TAG "alto2"
 
 /**

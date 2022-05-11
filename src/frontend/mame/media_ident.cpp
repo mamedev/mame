@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    media_ident.c
+    media_ident.cpp
 
     Media identify.
 
@@ -260,33 +260,27 @@ void media_identifier::digest_file(std::vector<file_info> &info, char const *pat
 
 		// load the file and process if it opens and has a valid length
 		util::core_file::ptr file;
-		if (util::core_file::open(path, OPEN_FLAG_READ, file) || !file)
+		std::error_condition err = util::core_file::open(path, OPEN_FLAG_READ, file);
+		if (err || !file)
 		{
-			osd_printf_error("%s: error opening file\n", path);
+			osd_printf_error("%s: error opening file (%s)\n", path, err ? err.message() : std::string("could not allocate pointer"));
 			return;
 		}
 		std::uint64_t length;
-		if (file->length(length))
+		err = file->length(length);
+		if (err)
 		{
-			osd_printf_error("%s: error getting file length\n", path);
+			osd_printf_error("%s: error getting file length (%s)\n", path, err.message());
 			return;
 		}
 		util::hash_collection hashes;
-		hashes.begin(util::hash_collection::HASH_TYPES_CRC_SHA1);
-		std::uint8_t buf[1024];
-		for (std::uint64_t remaining = length; remaining; )
+		std::size_t actual;
+		err = hashes.compute(*file, 0U, length, actual, util::hash_collection::HASH_TYPES_CRC_SHA1);
+		if (err)
 		{
-			std::size_t const block = std::min<std::uint64_t>(remaining, sizeof(buf));
-			std::size_t actual;
-			if (file->read(buf, block, actual) || !actual)
-			{
-				osd_printf_error("%s: error reading file\n", path);
-				return;
-			}
-			remaining -= actual;
-			hashes.buffer(buf, actual);
+			osd_printf_error("%s: error reading file (%s)\n", path, err.message());
+			return;
 		}
-		hashes.end();
 		info.emplace_back(path, length, std::move(hashes), file_flavour::RAW);
 		m_total++;
 	}

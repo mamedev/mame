@@ -2794,7 +2794,7 @@ void voodoo_1_device::recompute_video_timing(u32 hsyncon, u32 hsyncoff, u32 hvis
 	m_xoffs = hbp;
 	m_yoffs = vbp;
 	m_vsyncstart = vsyncoff;
-	m_vsyncstop = vsyncon;
+	m_vsyncstop = 0;
 	logerror("yoffs: %d vsyncstart: %d vsyncstop: %d\n", vbp, m_vsyncstart, m_vsyncstop);
 
 	adjust_vblank_start_timer();

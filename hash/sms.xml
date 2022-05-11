@@ -3033,6 +3033,7 @@ license:CC0
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="게임모음집188합" />
 		<part name="cart" interface="sms_cart">
+			<feature name="slot" value="korean_188in1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="game mo-eumjip 188 hap (kr).bin" size="1048576" crc="380d7400" sha1="35a5f9a52cce6d702ba7e68daa7b5a07bce5ca87" offset="000000" />
 			</dataarea>
@@ -6833,7 +6834,7 @@ license:CC0
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1318"/>
 		<info name="release" value="19870419"/>
-		<info name="alt_title" value="デカ - スケバン刑事II 少女鉄仮面伝説" />
+		<info name="alt_title" value="スケバン刑事II 少女鉄仮面伝説" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="sukeban deka ii - shoujo tekkamen densetsu (japan).bin" size="131072" crc="b13df647" sha1="5cd041990c7418ba63cde54f83d3e0e323b42c3b" offset="000000" />

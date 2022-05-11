@@ -625,7 +625,7 @@ void atlantis_state::a2d_data_w(uint16_t data)
 void atlantis_state::machine_start()
 {
 	/* set the fastest DRC options */
-	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS);
+	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS | MIPS3DRC_STRICT_VERIFY | MIPS3DRC_EXTRA_INSTR_CHECK);
 
 	// Allocate adc timer
 	m_adc_ready_timer = timer_alloc(0);

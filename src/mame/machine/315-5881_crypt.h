@@ -57,7 +57,7 @@ private:
 	std::unique_ptr<uint8_t[]> line_buffer;
 	std::unique_ptr<uint8_t[]> line_buffer_prev;
 	uint32_t prot_cur_address = 0;
-	uint16_t subkey, dec_hist = 0;
+	uint16_t subkey = 0, dec_hist = 0;
 	uint32_t dec_header = 0;
 
 	bool enc_ready = 0;

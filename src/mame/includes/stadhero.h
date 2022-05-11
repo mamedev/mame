@@ -41,7 +41,7 @@ private:
 
 	required_ioport m_coin;
 
-	tilemap_t *m_pf1_tilemap;
+	tilemap_t *m_pf1_tilemap = nullptr;
 
 	void int_ack_w(uint16_t data);
 	void pf1_data_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

@@ -461,7 +461,6 @@ void nes_disksys_device::load_disk(device_image_interface &image)
 	// if there is an header, skip it
 	image.fseek(header, SEEK_SET);
 	image.fread(m_fds_data.get(), 65500 * m_fds_sides);
-	return;
 }
 
 void nes_disksys_device::unload_disk(device_image_interface &image)

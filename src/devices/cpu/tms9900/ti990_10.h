@@ -11,7 +11,6 @@
 #pragma once
 
 
-#include "debugger.h"
 #include "tms99com.h"
 
 class ti990_10_device : public cpu_device

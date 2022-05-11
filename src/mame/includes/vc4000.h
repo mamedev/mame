@@ -66,31 +66,31 @@ public:
 private:
 	struct SPRITE_HELPER
 	{
-		uint8_t bitmap[10],x1,x2,y1,y2, res1, res2;
+		uint8_t bitmap[10], x1, x2, y1, y2, res1, res2;
 	};
 
 	struct SPRITE
 	{
 		const SPRITE_HELPER *data;
-		int mask;
-		int state;
-		int delay;
-		int size;
-		int y;
-		uint8_t scolor;
-		int finished;
-		int finished_now;
+		int mask = 0;
+		int state = 0;
+		int delay = 0;
+		int size = 0;
+		int y = 0;
+		uint8_t scolor = 0;
+		int finished = 0;
+		int finished_now = 0;
 	};
 
 	struct vc4000_video_t
 	{
 		SPRITE sprites[4];
-		int line;
-		uint8_t sprite_collision;
-		uint8_t background_collision;
+		int line = 0;
+		uint8_t sprite_collision = 0;
+		uint8_t background_collision = 0;
 		union
 		{
-			uint8_t data[0x100];
+			uint8_t data[0x100]{};
 			struct
 			{
 				SPRITE_HELPER sprites[3];
@@ -121,14 +121,14 @@ private:
 	uint8_t elektor_cass_r();
 	void elektor_cass_w(uint8_t data);
 	vc4000_video_t m_video;
-	uint8_t m_sprite_collision[0x20];
-	uint8_t m_background_collision[0x20];
-	uint8_t m_joy1_x;
-	uint8_t m_joy1_y;
-	uint8_t m_joy2_x;
-	uint8_t m_joy2_y;
-	uint8_t m_objects[512];
-	uint8_t m_irq_pause;
+	uint8_t m_sprite_collision[0x20]{};
+	uint8_t m_background_collision[0x20]{};
+	uint8_t m_joy1_x = 0;
+	uint8_t m_joy1_y = 0;
+	uint8_t m_joy2_x = 0;
+	uint8_t m_joy2_y = 0;
+	uint8_t m_objects[512]{};
+	uint8_t m_irq_pause = 0;
 	std::unique_ptr<bitmap_ind16> m_bitmap;
 	virtual void machine_start() override;
 	virtual void video_start() override;

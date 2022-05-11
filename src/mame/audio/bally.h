@@ -293,7 +293,7 @@ protected:
 	required_device<filter_rc_device> m_speech_filter;
 	required_device<tms5200_device> m_tms5200;
 
-	uint8_t m_sound_select;
+	uint8_t m_sound_select = 0;
 
 	uint8_t pia2_porta_r();
 

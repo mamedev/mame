@@ -11950,7 +11950,7 @@ license:CC0
 	</software>
 
 	<software name="dlair">
-		<description>Dragon's Lair</description>
+		<description>Dragon's Lair (3.5" HD, re-release)</description>
 		<year>1993</year>
 		<publisher>Merit Software</publisher>
 		<info name="developer" value="Sullivan Bluth Interactive Media" />
@@ -11967,6 +11967,192 @@ license:CC0
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Dragon's Lair [Merit Software] [1993] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="17f130a9" sha1="2b9a069f23241e6622064888c16854f0e2a8bd51"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dlair525" cloneof="dlair">
+		<description>Dragon's Lair (5.25" DD)</description>
+		<year>1990</year>
+		<publisher>Merit Software</publisher>
+		<info name="developer" value="Sullivan Bluth Interactive Media" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1990] [5.25DD] [Disk 01 of 13].img" size="368640" crc="d776e980" sha1="1bbde85e939709eb9310d341e406750fc38d4bc7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1990] [5.25DD] [Disk 02 of 13].img" size="368640" crc="7dacc47c" sha1="0ac74f4a6b32ddb1f268533e02aec28e55460c8b"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1990] [5.25DD] [Disk 03 of 13].img" size="368640" crc="9726e9f6" sha1="6814cd61c21d6dde7acf42462315a45a21c01e02"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1990] [5.25DD] [Disk 04 of 13].img" size="368640" crc="ce115351" sha1="894d69491d4c57f9a9e90f1ead196c292d35c9ea"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1990] [5.25DD] [Disk 05 of 13].img" size="368640" crc="5fe3b002" sha1="df30336e17b23348de555d8c571d6c494163e477"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1990] [5.25DD] [Disk 06 of 13].img" size="368640" crc="1966a5ab" sha1="311c51d5c08059f1724ebf409036b5a17272ee76"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1990] [5.25DD] [Disk 07 of 13].img" size="368640" crc="cdbf1454" sha1="55cc999f569be64a0714981712e28e6bdcc284fa"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1990] [5.25DD] [Disk 08 of 13].img" size="368640" crc="db040f90" sha1="27fb5c90228dc24b6d78ddf5e3285d00888c452d"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1990] [5.25DD] [Disk 09 of 13].img" size="368640" crc="b649788c" sha1="3e536b6ed4411a7c55b9ed66b6679f7f1a6f888a"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1990] [5.25DD] [Disk 10 of 13].img" size="368640" crc="7b0be33d" sha1="f0874d9b2cf6032d00ddb86912a6a7327211cd69"/>
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1990] [5.25DD] [Disk 11 of 13].img" size="368640" crc="e6dca8a2" sha1="83f14ebd4748ec30755a625250eb581434e1cc8e"/>
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1990] [5.25DD] [Disk 12 of 13].img" size="368640" crc="061c9ecc" sha1="baedfaf68fa1abc8649fc922f4962a8b18ea2716"/>
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1990] [5.25DD] [Disk 13 of 13].img" size="368640" crc="50cad757" sha1="cdf3598100a329c849eaa034f129bb8f28063135"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dlair525a" cloneof="dlair">
+		<description>Dragon's Lair (5.25" DD, older)</description>
+		<year>1989</year>
+		<publisher>Merit Software</publisher>
+		<info name="developer" value="Sullivan Bluth Interactive Media" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1989] [5.25DD] [Disk 01 of 13].img" size="368640" crc="63e76372" sha1="46785065572152b6015ba4937fac577fc6cfc2a7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1989] [5.25DD] [Disk 02 of 13].img" size="368640" crc="371e335e" sha1="9466563a824aa2a9c2d359083c9f69a537784ff2"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1989] [5.25DD] [Disk 03 of 13].img" size="368640" crc="809f39e5" sha1="0e61c6188ec32360055570c1b76399ec5e43f23d"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1989] [5.25DD] [Disk 04 of 13].img" size="368640" crc="e7087a0c" sha1="d33322ebecdd9a3566d1358a3052187ce1b69758"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1989] [5.25DD] [Disk 05 of 13].img" size="368640" crc="24db0798" sha1="0a169a62fb16faf4e5a0ab721c8b537fbab5f78f"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1989] [5.25DD] [Disk 06 of 13].img" size="368640" crc="ba652ef1" sha1="14f054b2122c02796e1182e2c291230b31e2ec82"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1989] [5.25DD] [Disk 07 of 13].img" size="368640" crc="6e2af55c" sha1="da5ee6df23df16879fc55b6866722e06fba15602"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1989] [5.25DD] [Disk 08 of 13].img" size="368640" crc="e62f0ac2" sha1="688874136230366fff747787c1eb344dd778b52e"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1989] [5.25DD] [Disk 09 of 13].img" size="368640" crc="6c832f42" sha1="42747cb7c91e0d116bd8559c7e3893679875037f"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1989] [5.25DD] [Disk 10 of 13].img" size="368640" crc="90bead8d" sha1="f82a392fd6239e2306b68fc0f571caeddf8c11e3"/>
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1989] [5.25DD] [Disk 11 of 13].img" size="368640" crc="bc826826" sha1="ee03b2428548f1c952879591804f5e9ef895d229"/>
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1989] [5.25DD] [Disk 12 of 13].img" size="368640" crc="857c2bde" sha1="89e15fb47111771edfcb7652c803f0c65e7669b9"/>
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Dragon's Lair [Merit Software] [1989] [5.25DD] [Disk 13 of 13].img" size="368640" crc="9b3235aa" sha1="8b800bcfa4b443ce719e83bb8e2e0f89fa946f44"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dlaira" cloneof="dlair">
+		<description>Dragon's Lair (3.5" DD)</description>
+		<year>1990</year>
+		<publisher>Merit Software</publisher>
+		<info name="developer" value="Sullivan Bluth Interactive Media" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Dragon's Lair [Merit Software] [1990] [3.5DD] [Disk 1 of 7].img" size="737280" crc="427a0228" sha1="1dc55efd9e29cf40cf7fb3d8f18c7bd638463767"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Dragon's Lair [Merit Software] [1990] [3.5DD] [Disk 2 of 7].img" size="737280" crc="140c3c14" sha1="6eae473a61211e3c92c7b92407a958570fbcaf08"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Dragon's Lair [Merit Software] [1990] [3.5DD] [Disk 3 of 7].img" size="737280" crc="dd7643f1" sha1="90c61bf6e9674b16da3a337148aaf07529f57fc8"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Dragon's Lair [Merit Software] [1990] [3.5DD] [Disk 4 of 7].img" size="737280" crc="95f5e10e" sha1="754a901e80b3874ca7aedd30e9e328ce372bdcd8"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Dragon's Lair [Merit Software] [1990] [3.5DD] [Disk 5 of 7].img" size="737280" crc="8472352b" sha1="951ada228f6b503590240a0826638a44767eb15a"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Dragon's Lair [Merit Software] [1990] [3.5DD] [Disk 6 of 7].img" size="737280" crc="32eb9f17" sha1="c04ee5b1f011d57382ad91ea39462339795cc2ef"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Dragon's Lair [Merit Software] [1990] [3.5DD] [Disk 7 of 7].img" size="737280" crc="3454a916" sha1="88fcfc7b9f653951023ee3b7cd9955eff9083ddc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17135,6 +17321,39 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="pyrotech">
+		<description>Pyrotechnica</description>
+		<year>1995</year>
+		<publisher>Psygnosis</publisher>
+		<info name="developer" value="Psygnosis" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Pyrotechnica [Psygnosis] [1995] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="1f7a62ae" sha1="38b68a84028ad975da06455803eed73039869f4b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Pyrotechnica [Psygnosis] [1995] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="52c47638" sha1="3ced7f33dca81a9e8542c1080f79103b98a1cde2" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Pyrotechnica [Psygnosis] [1995] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="ae8f40ac" sha1="8a90d602563e7e7e71e13980282a55f1ca57fe8e" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Pyrotechnica [Psygnosis] [1995] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="f8dc8055" sha1="a9232582b834de74cf301fa9017f10c7634fba2a" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Pyrotechnica [Psygnosis] [1995] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="3282c4c5" sha1="f7c080dd6949d5cc6c2fa124b13ca5991e0b0086" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="quarantin">
 		<description>Quarantine</description>
 		<year>1994</year>
@@ -17417,6 +17636,93 @@ license:CC0
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Realms of Chaos (USA) (v1.0) (Disk 3).img" size="1474560" crc="4611a516" sha1="157f4bb42c1293feb5bac9d7452619711bb4c1dd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="redbaron">
+		<description>Red Baron (VGA 256 colors version)</description>
+		<year>1991</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Dynamix" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Red Baron (VGA) [Sierra] [1991] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="a7b7e3b7" sha1="5718ebe5e5344c4ae3c8eacceb1ea1cb14a18ec8"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Red Baron (VGA) [Sierra] [1991] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="c21f2a67" sha1="035119b1eefd1248f34ee78aed7588ac12560855"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="redbarona" cloneof="redbaron">
+		<description>Red Baron (EGA 16 colors version)</description>
+		<year>1991</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Dynamix" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Red Baron (EGA) [Sierra] [1991] [3.5HD] [Disk 1 of 3].img" size="737280" crc="40812b87" sha1="0d0188217599c212752371dcb48c87fdbde691e3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Red Baron (EGA) [Sierra] [1991] [3.5HD] [Disk 2 of 3].img" size="737280" crc="59f01f8b" sha1="26cc05041c2fc1d71a456b0bb495b5f8dd45dd5d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Red Baron (EGA) [Sierra] [1991] [3.5HD] [Disk 3 of 3].img" size="737280" crc="cefe45a4" sha1="4149b7af1e6b20256053e40b5345ef4de78c3379"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="redbarmb">
+		<description>Red Baron: Mission Builder</description>
+		<year>1991</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Dynamix" />
+		<info name="usage" value="Add-on for Red Baron (VGA 256 colors version). Requires Red Baron (VGA 256 colors version) previously installed"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Red Baron - Mission Builder [Sierra] [1992] [3.5DD] [Disk 1 of 1].img" size="737280" crc="181231a8" sha1="72174691212deb37688ac853c51a52f1144c899e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rphantom">
+		<description>Return of the Phantom</description>
+		<year>1993</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="MPS Labs" />
+		<info name="version" value="version 2.00 3-Jun-93" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Return of the Phantom [MicroProse] [1993] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="78978b7a" sha1="485b689688cbeecadee7c786e7fa51f119ec1d23"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Return of the Phantom [MicroProse] [1993] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="ca8d1c5f" sha1="4eec88f64e60d99582a5b88c1007ae599a658bb0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Return of the Phantom [MicroProse] [1993] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="e2005d42" sha1="8a44f8f978fc0a2987de493d69eebefa7962f8f2"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Return of the Phantom [MicroProse] [1993] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="5d909461" sha1="486731f47716d49ce3557eb02eca83d9e2d686f8"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Return of the Phantom [MicroProse] [1993] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="957ef117" sha1="8134fc34910f30f34c4d4d0d8d0f8dcda420f5d3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18117,6 +18423,35 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="simcityw">
+		<description>SimCity Classic (Windows 3.x release) (3.5")</description>
+		<year>1993</year>
+		<publisher>Maxis</publisher>
+		<info name="version" value="1.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="SimCity Classic (Windows 3.x release) [Maxis] [1993] [3.5DD] [Disk 1 of 2] [Install Disk].img" size="737280" crc="a2a24523" sha1="15970109725d27fce3609f83c367b07b9979df1a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="SimCity Classic (Windows 3.x release) [Maxis] [1993] [3.5DD] [Disk 2 of 2] [Data Disk].img" size="737280" crc="7a72e17d" sha1="e7ba99908cd0cf491f9b3103b80ba29942729328"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simcityw525" cloneof="simcityw">
+		<description>SimCity Classic (Windows 3.x release) (5.25")</description>
+		<year>1993</year>
+		<publisher>Maxis</publisher>
+		<info name="version" value="1.1" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="SimCity Classic (Windows 3.x release) [Maxis] [1993] [5.25HD] [Disk 1 of 1].img" size="1228800" crc="5a87c7a4" sha1="6d668984561cbec5e2556925910c6275680f438d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="simcit2k">
 		<description>SimCity 2000 (Ver 1.00)</description>
 		<year>1994</year>
@@ -18266,12 +18601,34 @@ license:CC0
 		<info name="developer" value="Maxis" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="simlife.img" size="737280" crc="59898bed" sha1="346ae9fb47fe2a0324e2df8f1f77c09dd5c3d8ec"/>
+				<rom name="SimLife [Maxis] [1992] [3.5DD] [Disk 1 of 2].img" size="737280" crc="e1be65f7" sha1="23a7a17d6a6745ed860e1b266cb7d3b6f05fdeed"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="simlifed2.img" size="737280" crc="6e704c65" sha1="fc2e641147584f3a5675083edbd0cee355db3ba6"/>
+				<rom name="SimLife [Maxis] [1992] [3.5DD] [Disk 2 of 2].img" size="737280" crc="757c0e9d" sha1="e4a971834cc92e767fde324b2529e82229e58f0f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simlifew">
+		<description>SimLife (Windows 3.x release)</description>
+		<year>1993</year>
+		<publisher>Maxis</publisher>
+		<info name="developer" value="Maxis" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="SimLife (Windows 3.x release) [Maxis] [1993] [3.5DD] [Disk 1 of 3].img" size="737280" crc="40136c47" sha1="4a80d0ec9c6cc7360bfeb23323b0a520b79a35b4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="SimLife (Windows 3.x release) [Maxis] [1993] [3.5DD] [Disk 2 of 3].img" size="737280" crc="bafc7365" sha1="b2c88c8a1010897d469b9dbbb85053e25ea93626"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="SimLife (Windows 3.x release) [Maxis] [1993] [3.5DD] [Disk 3 of 3].img" size="737280" crc="31cfd3d2" sha1="50314726fdc3f94fb86ab35d6887ae663503be87"/>
 			</dataarea>
 		</part>
 	</software>

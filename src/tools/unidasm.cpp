@@ -66,6 +66,7 @@ using util::BIT;
 #include "cpu/hcd62121/hcd62121d.h"
 #include "cpu/hd61700/hd61700d.h"
 #include "cpu/hmcs40/hmcs40d.h"
+#include "cpu/hp2100/hp2100d.h"
 #include "cpu/hpc/hpcdasm.h"
 #include "cpu/hphybrid/hphybrid_dasm.h"
 #include "cpu/i386/i386dasm.h"
@@ -186,6 +187,7 @@ using util::BIT;
 #include "cpu/upd78k/upd78k3d.h"
 #include "cpu/upd78k/upd78k4d.h"
 #include "cpu/v60/v60d.h"
+#include "cpu/v620/v620dasm.h"
 #include "cpu/v810/v810dasm.h"
 #include "cpu/v850/v850dasm.h"
 #include "cpu/vax/vaxdasm.h"
@@ -394,6 +396,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "axc51core",       le,  0, []() -> util::disasm_interface * { return new axc51core_disassembler; } },
 	{ "axc208",          le,  0, []() -> util::disasm_interface * { return new ax208_disassembler; } },
 	{ "b5000",           le,  0, []() -> util::disasm_interface * { return new b5000_disassembler; } },
+	{ "b5500",           le,  0, []() -> util::disasm_interface * { return new b5500_disassembler; } },
 	{ "b6000",           le,  0, []() -> util::disasm_interface * { return new b6000_disassembler; } },
 	{ "b6100",           le,  0, []() -> util::disasm_interface * { return new b6100_disassembler; } },
 	{ "capricorn",       le,  0, []() -> util::disasm_interface * { return new capricorn_disassembler; } },
@@ -447,6 +450,8 @@ static const dasm_table_entry dasm_table[] =
 	{ "hd6309",          be,  0, []() -> util::disasm_interface * { return new hd6309_disassembler; } },
 	{ "hd63701",         be,  0, []() -> util::disasm_interface * { return new m680x_disassembler(63701); } },
 	{ "hmcs40",          le, -1, []() -> util::disasm_interface * { return new hmcs40_disassembler; } },
+	{ "hp2100",          be, -1, []() -> util::disasm_interface * { return new hp2100_disassembler; } },
+	{ "hp21mx",          be, -1, []() -> util::disasm_interface * { return new hp21mx_disassembler; } },
 	{ "hp_5061_3001",    be, -1, []() -> util::disasm_interface * { return new hp_5061_3001_disassembler; } },
 	{ "hp_5061_3011",    be, -1, []() -> util::disasm_interface * { return new hp_5061_3011_disassembler; } },
 	{ "hp_09825_67907",  be, -1, []() -> util::disasm_interface * { return new hp_09825_67907_disassembler; } },
@@ -654,6 +659,8 @@ static const dasm_table_entry dasm_table[] =
 	{ "upd78k0kx2",      le,  0, []() -> util::disasm_interface * { return new upd78k0kx2_disassembler; } },
 	{ "upi41",           le,  0, []() -> util::disasm_interface * { return new mcs48_disassembler(true, false); } },
 	{ "v60",             le,  0, []() -> util::disasm_interface * { return new v60_disassembler; } },
+	{ "v620",            be, -1, []() -> util::disasm_interface * { return new v620_disassembler; } },
+	{ "v75",             be, -1, []() -> util::disasm_interface * { return new v75_disassembler; } },
 	{ "v810",            le,  0, []() -> util::disasm_interface * { return new v810_disassembler; } },
 	{ "v850",            le,  0, []() -> util::disasm_interface * { return new v850_disassembler; } },
 	{ "v850es",          le,  0, []() -> util::disasm_interface * { return new v850es_disassembler; } },
@@ -679,7 +686,7 @@ class unidasm_data_buffer : public util::disasm_interface::data_buffer
 {
 public:
 	std::vector<u8> data;
-	offs_t base_pc;
+	offs_t base_pc = 0;
 	u32 size;
 
 	unidasm_data_buffer(util::disasm_interface *disasm, const dasm_table_entry *entry);

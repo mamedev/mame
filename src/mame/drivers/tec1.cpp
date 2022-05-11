@@ -2,7 +2,7 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-    TEC-1 driver, written by Robbbert in April, 2009 for MESS.
+TEC-1 driver, written by Robbbert in April, 2009.
 
 The TEC-1 was a single-board "computer" described in Talking Electronics
 magazine, issues number 10 and 11. Talking Electronics do not have dates on

@@ -104,7 +104,7 @@ void sm530_device::op_ats()
 
 void sm530_device::op_atf()
 {
-	// ATS: output ACC to F
+	// ATF: output ACC to F
 	m_write_f(m_acc);
 }
 

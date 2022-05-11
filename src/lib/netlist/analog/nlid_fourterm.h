@@ -11,8 +11,7 @@
 #include "nl_base.h"
 #include "plib/putil.h"
 
-namespace netlist {
-namespace analog {
+namespace netlist::analog {
 
 	// ----------------------------------------------------------------------------------------
 	// nld_VCCS
@@ -267,7 +266,6 @@ namespace analog {
 	};
 
 
-} // namespace analog
-} // namespace netlist
+} // namespace netlist::analog
 
 #endif // NLD_FOURTERM_H_

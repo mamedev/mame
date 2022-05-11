@@ -250,12 +250,12 @@ void nes_event2_device::write_m(offs_t offset, u8 data)
 		m_prgram[offset % m_prgram.size()] = data;
 }
 
-void nes_event2_device::set_chr(u8 chr, int chr_base, int chr_mask)
+void nes_event2_device::chr_cb(int start, int bank, int source)
 {
 	if (m_tqrom_mode)
-		nes_tqrom_device::set_chr(chr, chr_base, chr_mask);
+		nes_tqrom_device::chr_cb(start, bank, source);
 	else
-		nes_txrom_device::set_chr(chr, chr_base, chr_mask);
+		nes_txrom_device::chr_cb(start, bank, source);
 }
 
 

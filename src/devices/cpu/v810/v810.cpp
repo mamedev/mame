@@ -30,7 +30,6 @@
 #include "emu.h"
 #include "v810.h"
 #include "v810dasm.h"
-#include "debugger.h"
 
 #define clkIF 3
 #define clkMEM 3

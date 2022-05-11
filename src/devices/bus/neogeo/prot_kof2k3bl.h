@@ -29,9 +29,9 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	uint16_t m_overlay = 0;
-	uint32_t m_bank_base = 0;
-	uint16_t m_cartridge_ram[0x1000]{}; // bootlegs
+	uint16_t m_overlay;
+	uint32_t m_bank_base;
+	uint16_t m_cartridge_ram[0x1000]; // bootlegs
 };
 
 #endif // MAME_BUS_NEOGEO_PROT_KOF2K3BL_H

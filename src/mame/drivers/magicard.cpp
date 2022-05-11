@@ -7,6 +7,7 @@
 
   Preliminary driver by Roberto Fresca, David Haywood & Angelo Salese
 
+
   TODO:
   - driver based off raw guesses (we don't have relevant key docs);
   - Device-ize 66470
@@ -25,12 +26,14 @@
   - Is int1_w unconnected? Doesn't seem to be enabled by games so far;
   - puzzleme: confirm it has a ssg (mapping matches hotslots);
 
+
   Games running on this hardware:
 
   * Magic Card (set 1),                         Impera, 199?.
   * Magic Card (set 2),                         Impera, 199?.
   * Magic Card (set 3),                         Impera, 199?.
-  * Magic Card Export 94,                       Impera, 1994.
+  * Magic Card Export 94 (set 1),               Impera, 1994.
+  * Magic Card Export 94 (set 2),               Impera, 1994.
   * Magic Export (V.211A),                      Impera, 1994.
   * Magic Card Jackpot (4.01),                  Impera, 1998.
   * Magic Card - Wien (Sicherheitsversion 1.2), Impera, 1993.
@@ -42,6 +45,9 @@
   * Puzzle Me!,                                 Impera, 199?.
   * unknown 'TE06',                             Impera, 199?.
   * Lucky 7 (Impera),                           Impera, 199?.
+  * unknown Poker 'W',                          unknown, 1993.
+  * Dallas Poker,                               unknown, 1993.
+  * Kajot Card (Version 1.01, Wien Euro),       Amatic, 1993.
 
 
 *******************************************************************************
@@ -78,325 +84,27 @@
 
 *******************************************************************************
 
-   Magic Card Jackpot 4.01
-  (Also Magic Lotto Export)
-  -------------------------
+  Impera boards...
 
-  PCB Layout:
-   __________________________________________________________________________________________________
-  |                                                                                                  |
-  |                       SERIAL NUMBER                                                              |___
-  |                                                                                                  (A)_|
-  |  __     _____             ___________        _________                                            ___|
-  | |  |   /     \           |9524 GNN   |      |YMZ284-D |                                           ___|
-  | |  |  |BATTERY|          |HM514270AJ8|      |_________|                                           ___|
-  | |A |  |  +3V  |          |___________|                                                            ___|
-  | |  |  |       |                                       __________________         ________     __  ___|
-  | |  |   \_____/            ___________                |                  |       |ULN2803A|   |..| ___|
-  | |__|                     |9524 GNN   |               |  MUSIC           |       |________|   |..| ___|
-  |                          |HM514270AJ8|               |  TR9C1710-11PCA  |                    |..|(J)_|
-  |                          |___________|               |  SA119X/9612     |       _________    |..||
-  |    ___    ___                                        |__________________|      |74HC273N |   |..||
-  |   |   |  |   |                                                                 |_________|   |..||
-  |   |   |  |   |                                                                               |..||
-  |   | B |  | B |                                     _________                    _________    |..||
-  |   |   |  |   |                                    | 74HC04N |                  |74HC245N |   |__||
-  |   |   |  |   |                                    |_________|                  |_________|       |___
-  |   |___|  |___|                                                                                   A___|
-  |                                                                                                   ___|
-  |    _____                  ______________                                                          ___|
-  |   |     |                |              |                                        ________         ___|
-  |   |     |                |  PHILIPS     |     ___    ___________    ________    |ULN2803A|        ___|
-  |   |     | EI79465--A/02  |  SCC66470CAB |    | D |  |PIC16F84-10|  |   E    |   |________|        ___|
-  |   |  C  | LPL-CPU V4.0   |  172632=1/2  |    |___|  |___________|  |________|                     ___|
-  |   |     | MULTI GAME     |  DfD0032I3   |                                       _________         ___|
-  |   |     | 8603186        |              |                                      |74HC273N |        ___|
-  |   |     |                |              |                                      |_________|        ___|
-  |   |     |                |              |                                                         ___|
-  |   |_____|                |______________|                                 _     _________         ___|
-  |                                                                          |G|   |74HC245N |        ___|
-  |                                                                          |_|   |_________|        ___|
-  |   _______   _______                                                                               ___|
-  |  |]     [| |IC21   |                                 ______             ___                       ___|
-  |  |]  E  [| |       |                                |ALTERA|           |___|                __    ___|
-  |  |]  M  [| |       |                                | MAX  |             F      _________  |..|   ___|
-  |  |]  P  [| | MAGIC |     ________________           |      |                   |74HC245N | |..|   ___|
-  |  |]  T  [| | CARD  |    |                |          |EPM712|                   |_________| |..|   ___|
-  |  |]  Y  [| |JACKPOT|    |   PHILIPS      |          |8SQC10|                               |..|   ___|
-  |  |]     [| |       |    |  SCC68070CCA84 |          |0-15  |                               |..|   ___|
-  |  |]  S  [| |Version|    |  213140-1      |          |______|      X_TAL's                  |__|   ___|
-  |  |]  O  [| |   4.01|    |  DfD0103V3     |                      _   _   _                         ___|
-  |  |]  C  [| |       |    |                |    ALL RIGHTS       | | | | | |                        ___|
-  |  |]  K  [| |Vnr.:  |    |                |    BY  IMPERA       |1| |2| |3|                        ___|
-  |  |]  E  [| |11.7.98|    |                |                     |_| |_| |_|                        ___|
-  |  |]  T  [| |       |    |                |                                                        ___|
-  |  |]     [| |       |    |________________|                                                        ___|
-  |  |]_____[| |27C4002|                                                                              ___|
-  |  |_______| |_______|                               ___________                                    ___|
-  |    ___________________                            |RTC2421 A  |                                   ___|
-  |   |   :::::::::::::   |                           |___________|                                  Z___|
-  |   |___________________|                                                                          |
-  |__________________________________________________________________________________________________|
+  KNOWN REVS | Used with these games         | Differences to previews Revision
+  ======================================================================================================
+  V 1.04     | lucky7i                       | lowest known revision, does not have a socket for the PIC
+  ------------------------------------------------------------------------------------------------------
+  V 1.05     | unkte06, magicardw            | PIC16C54 + XTAL got added
+  ------------------------------------------------------------------------------------------------------
+  V 2.1      | puzzleme                      | ESI1, 24C02, YM2149F, RTC added
+  ------------------------------------------------------------------------------------------------------
+  V 2.2      | magicarde                     | 
+  ------------------------------------------------------------------------------------------------------
+  V 4.0      | magicardj, magicardf, magicle | ESI1 replaced by ALTERA MAX EPM7128SQC100
+             |                               | YM2149F replaced by YMZ284-D, MX29F1610 added
+  ------------------------------------------------------------------------------------------------------
 
-  Xtal 1: 30.000 MHz.
-  Xtal 2:  8.000 MHz.
-  Xtal 3: 19.660 MHz.
-
-  A = LT 0030 / LTC695CN / U18708
-  B = NEC Japan / D43256BGU-70LL / 0008XD041
-  C = MX B9819 / 29F1610MC-12C3 / M25685 / TAIWAN
-  D = 24C02C / 24C04 (Serial I2C Bus EEPROM with User-Defined Block Write Protection).
-  E = P0030SG / CD40106BCN
-  F = 74HCU04D
-  G = 74HC74D
-
-  Silkscreened on the solder side:
-
-  LEOTS.
-  2800
-  AT&S-F0 ML 94V-0
-
-  IMPERA AUSTRIA          -------
-  TEL: 0043/7242/27116     V 4.0
-  FAX: 0043/7242/27053    -------
 
 *******************************************************************************
 
-  QUINGO EXPORT Version 5.00
+  For PCB layouts and extra info see the ROM Load of each game below.
 
-  Hardware PCB informations : E179465--A/02 LPL-CPU V4.0/MULTI GAME 8603186
-
-  Eprom type ST M27c4002
-  Version 5.00
-  vnr 27.07.99 Cksum (provided) 79C5
-
-  Eeprom : 24c04A
-
-  PCB Layout:
-   __________________________________________________________________________________________________
-  |                                                                                                  |
-  |                       SERIAL NUMBER                                                              |___
-  |                                                                                                  (A)_|
-  |  __     _____             ___________        _________                                            ___|
-  | |  |   /     \           |9524 GNN   |      |YMZ284-D |                                           ___|
-  | |  |  |BATTERY|          |HM514270AJ8|      |_________|                                           ___|
-  | |A |  |  +3V  |          |___________|                                                            ___|
-  | |  |  |       |                                       __________________         ________     __  ___|
-  | |  |   \_____/            ___________                |                  |       |ULN2803A|   |..| ___|
-  | |__|                     |9524 GNN   |               |  MUSIC           |       |________|   |..| ___|
-  |                          |HM514270AJ8|               |  TR9C1710-11PCA  |                    |..|(J)_|
-  |                          |___________|               |  SA119X/9612     |       _________    |..||
-  |    ___    ___                                        |__________________|      |74HC273N |   |..||
-  |   |   |  |   |                                                                 |_________|   |..||
-  |   |   |  |   |                                                                               |..||
-  |   | B |  | B |                                     _________                    _________    |..||
-  |   |   |  |   |                                    | 74HC04N |                  |74HC245N |   |__||
-  |   |   |  |   |                                    |_________|                  |_________|       |___
-  |   |___|  |___|                                                                                   A___|
-  |                                                                                                   ___|
-  |    _____                  ______________                                                          ___|
-  |   |     |                |              |                                        ________         ___|
-  |   |     |                |  PHILIPS     |     ___    ___________    ________    |ULN2803A|        ___|
-  |   |     | EI79465--A/02  |  SCC66470CAB |    | D |  |PIC16F84-10|  |   E    |   |________|        ___|
-  |   |  C  | LPL-CPU V4.0   |  172632=1/2  |    |___|  |___________|  |________|                     ___|
-  |   |     | MULTI GAME     |  DfD0032I3   |                                       _________         ___|
-  |   |     | 8603186        |              |                                      |74HC273N |        ___|
-  |   |     |                |              |                                      |_________|        ___|
-  |   |     |                |              |                                                         ___|
-  |   |_____|                |______________|                                 _     _________         ___|
-  |                                                                          |G|   |74HC245N |        ___|
-  |                                                                          |_|   |_________|        ___|
-  |   _______   _______                                                                               ___|
-  |  |]     [| |IC21   |                                 ______             ___                       ___|
-  |  |]  E  [| |       |                                |ALTERA|           |___|                __    ___|
-  |  |]  M  [| |       |                                | MAX  |             F      _________  |..|   ___|
-  |  |]  P  [| |QUINGO |     ________________           |      |                   |74HC245N | |..|   ___|
-  |  |]  T  [| | EXPORT|    |                |          |EPM712|                   |_________| |..|   ___|
-  |  |]  Y  [| |       |    |   PHILIPS      |          |8SQC10|                               |..|   ___|
-  |  |]     [| |       |    |  SCC68070CCA84 |          |0-15  |                               |..|   ___|
-  |  |]  S  [| |Version|    |  213140-1      |          |______|      X_TAL's                  |__|   ___|
-  |  |]  O  [| |   5.00|    |  DfD0103V3     |                      _   _   _                         ___|
-  |  |]  C  [| |       |    |                |    ALL RIGHTS       | | | | | |                        ___|
-  |  |]  K  [| |Vnr.:  |    |                |    BY  IMPERA       |1| |2| |3|                        ___|
-  |  |]  E  [| |270799 |    |                |                     |_| |_| |_|                        ___|
-  |  |]  T  [| |       |    |                |                                                        ___|
-  |  |]     [| |       |    |________________|                                                        ___|
-  |  |]_____[| |27C4002|                                                                              ___|
-  |  |_______| |_______|                             ___________                                      ___|
-  |    ___________________                          |RTC2421 A  |   °°°°°                             ___|
-  |   |   :::::::::::::   |                         |___________|    CON5                            Z___|
-  |   |___________________|                                                                          |
-  |__________________________________________________________________________________________________|
-
-  Xtal 1: 30.000 MHz.
-  Xtal 2:  8.000 MHz.
-  Xtal 3: 19.660 MHz.
-
-  A = LT 0030 / LTC695CN / U18708
-  B = NEC Japan / D43256BGU-70LL / 0008XD041
-  C = MX B9819 / 29F1610MC-12C3 / M25685 / TAIWAN
-  D = 24C02C / 24C04 (Serial I2C Bus EEPROM with User-Defined Block Write Protection).
-  E = P0030SG / CD40106BCN
-  F = 74HCU04D
-  G = 74HC74D
-
-*******************************************************************************
-
-  BIG DEAL BELGIEN Version 5.04
-
-  Hardware PCB informations : E179465--A/02 LPL-CPU V4.0/MULTI GAME 8603186
-  Eprom type ST M27c4002
-  Version 5.04
-  vnr 21.05.01 Cksum (provided) C4B7
-
-  Eeprom : 24c04A
-
-  PCB Layout:
-   __________________________________________________________________________________________________
-  |                                                                                                  |
-  |                       SERIAL NUMBER                                                              |___
-  |                                                                                                  (A)_|
-  |  __     _____             ___________        _________                                            ___|
-  | |  |   /     \           |9524 GNN   |      |YMZ284-D |                                           ___|
-  | |  |  |BATTERY|          |HM514270AJ8|      |_________|                                           ___|
-  | |A |  |  +3V  |          |___________|                                                            ___|
-  | |  |  |       |                                       __________________         ________     __  ___|
-  | |  |   \_____/            ___________                |                  |       |ULN2803A|   |..| ___|
-  | |__|                     |9524 GNN   |               |  MUSIC           |       |________|   |..| ___|
-  |                          |HM514270AJ8|               |  TR9C1710-11PCA  |                    |..|(J)_|
-  |                          |___________|               |  SA119X/9612     |       _________    |..||
-  |    ___    ___                                        |__________________|      |74HC273N |   |..||
-  |   |   |  |   |                                                                 |_________|   |..||
-  |   |   |  |   |                                                                               |..||
-  |   | B |  | B |                                     _________                    _________    |..||
-  |   |   |  |   |                                    | 74HC04N |                  |74HC245N |   |__||
-  |   |   |  |   |                                    |_________|                  |_________|       |___
-  |   |___|  |___|                                                                                   A___|
-  |                                                                                                   ___|
-  |    _____                  ______________                                                          ___|
-  |   |     |                |              |                                        ________         ___|
-  |   |     |                |  PHILIPS     |     ___    ___________    ________    |ULN2803A|        ___|
-  |   |     | EI79465--A/02  |  SCC66470CAB |    | D |  |PIC16F84-10|  |   E    |   |________|        ___|
-  |   |  C  | LPL-CPU V4.0   |  172632=1/2  |    |___|  |___________|  |________|                     ___|
-  |   |     | MULTI GAME     |  DfD0032I3   |                                       _________         ___|
-  |   |     | 8603186        |              |                                      |74HC273N |        ___|
-  |   |     |                |              |                                      |_________|        ___|
-  |   |     |                |              |                                                         ___|
-  |   |_____|                |______________|                                 _     _________         ___|
-  |                                                                          |G|   |74HC245N |        ___|
-  |                                                                          |_|   |_________|        ___|
-  |   _______   _______                                                                               ___|
-  |  |]     [| |IC21   |                                 ______             ___                       ___|
-  |  |]  E  [| |       |                                |ALTERA|           |___|                __    ___|
-  |  |]  M  [| |  BIG  |                                | MAX  |             F      _________  |..|   ___|
-  |  |]  P  [| |  DEAL |     ________________           |      |                   |74HC245N | |..|   ___|
-  |  |]  T  [| |BELGIEN|    |                |          |EPM712|                   |_________| |..|   ___|
-  |  |]  Y  [| |       |    |   PHILIPS      |          |8SQC10|                               |..|   ___|
-  |  |]     [| |       |    |  SCC68070CCA84 |          |0-15  |                               |..|   ___|
-  |  |]  S  [| |Version|    |  213140-1      |          |______|      X_TAL's                  |__|   ___|
-  |  |]  O  [| |   5.04|    |  DfD0103V3     |                      _   _   _                         ___|
-  |  |]  C  [| |       |    |                |    ALL RIGHTS       | | | | | |                        ___|
-  |  |]  K  [| |Vnr.:  |    |                |    BY  IMPERA       |1| |2| |3|                        ___|
-  |  |]  E  [| |210501 |    |                |                     |_| |_| |_|                        ___|
-  |  |]  T  [| |       |    |                |                                                        ___|
-  |  |]     [| |       |    |________________|                                                        ___|
-  |  |]_____[| |27C4002|                                                                              ___|
-  |  |_______| |_______|                             ___________                                      ___|
-  |    ___________________                          |RTC2421 A  |   °°°°°                             ___|
-  |   |   :::::::::::::   |                         |___________|    CON5                            Z___|
-  |   |___________________|                                                                          |
-  |__________________________________________________________________________________________________|
-
-  Xtal 1: 30.000 MHz.
-  Xtal 2:  8.000 MHz.
-  Xtal 3: 19.660 MHz.
-
-  A = LT 0030 / LTC695CN / U18708
-  B = NEC Japan / D43256BGU-70LL / 0008XD041
-  C = MX B9819 / 29F1610MC-12C3 / M25685 / TAIWAN
-  D = 24C02C / 24C04 (Serial I2C Bus EEPROM with User-Defined Block Write Protection).
-  E = P0030SG / CD40106BCN
-  F = 74HCU04D
-  G = 74HC74D
-
-*******************************************************************************
-
-  BEL SLOTS EXP. Version 5.01
-
-  Hardware PCB informations : E179465--A/02 LPL-CPU V4.0/MULTI GAME 8603186
-  Eprom type ST M27c4002
-  Version 5.01
-  vnr 01.12.99 Cksum (provided) F718
-
-  Eeprom : 24c04A
-
-  PCB Layout:
-   __________________________________________________________________________________________________
-  |                                                                                                  |
-  |                       SERIAL NUMBER                                                              |___
-  |                                                                                                  (A)_|
-  |  __     _____             ___________        _________                                            ___|
-  | |  |   /     \           |9524 GNN   |      |YMZ284-D |                                           ___|
-  | |  |  |BATTERY|          |HM514270AJ8|      |_________|                                           ___|
-  | |A |  |  +3V  |          |___________|                                                            ___|
-  | |  |  |       |                                       __________________         ________     __  ___|
-  | |  |   \_____/            ___________                |                  |       |ULN2803A|   |..| ___|
-  | |__|                     |9524 GNN   |               |  MUSIC           |       |________|   |..| ___|
-  |                          |HM514270AJ8|               |  TR9C1710-11PCA  |                    |..|(J)_|
-  |                          |___________|               |  SA119X/9612     |       _________    |..||
-  |    ___    ___                                        |__________________|      |74HC273N |   |..||
-  |   |   |  |   |                                                                 |_________|   |..||
-  |   |   |  |   |                                                                               |..||
-  |   | B |  | B |                                     _________                    _________    |..||
-  |   |   |  |   |                                    | 74HC04N |                  |74HC245N |   |__||
-  |   |   |  |   |                                    |_________|                  |_________|       |___
-  |   |___|  |___|                                                                                   A___|
-  |                                                                                                   ___|
-  |    _____                  ______________                                                          ___|
-  |   |     |                |              |                                        ________         ___|
-  |   |     |                |  PHILIPS     |     ___    ___________    ________    |ULN2803A|        ___|
-  |   |     | EI79465--A/02  |  SCC66470CAB |    | D |  |PIC16F84-10|  |   E    |   |________|        ___|
-  |   |  C  | LPL-CPU V4.0   |  172632=1/2  |    |___|  |___________|  |________|                     ___|
-  |   |     | MULTI GAME     |  DfD0032I3   |                                       _________         ___|
-  |   |     | 8603186        |              |                                      |74HC273N |        ___|
-  |   |     |                |              |                                      |_________|        ___|
-  |   |     |                |              |                                                         ___|
-  |   |_____|                |______________|                                 _     _________         ___|
-  |                                                                          |G|   |74HC245N |        ___|
-  |                                                                          |_|   |_________|        ___|
-  |   _______   _______                                                                               ___|
-  |  |]     [| |IC21   |                                 ______             ___                       ___|
-  |  |]  E  [| |       |                                |ALTERA|           |___|                __    ___|
-  |  |]  M  [| |  BEL  |                                | MAX  |             F      _________  |..|   ___|
-  |  |]  P  [| | SLOTS |     ________________           |      |                   |74HC245N | |..|   ___|
-  |  |]  T  [| |  EXP. |    |                |          |EPM712|                   |_________| |..|   ___|
-  |  |]  Y  [| |       |    |   PHILIPS      |          |8SQC10|                               |..|   ___|
-  |  |]     [| |       |    |  SCC68070CCA84 |          |0-15  |                               |..|   ___|
-  |  |]  S  [| |Version|    |  213140-1      |          |______|      X_TAL's                  |__|   ___|
-  |  |]  O  [| |   5.01|    |  DfD0103V3     |                      _   _   _                         ___|
-  |  |]  C  [| |       |    |                |    ALL RIGHTS       | | | | | |                        ___|
-  |  |]  K  [| |Vnr.:  |    |                |    BY  IMPERA       |1| |2| |3|                        ___|
-  |  |]  E  [| |011299 |    |                |                     |_| |_| |_|                        ___|
-  |  |]  T  [| |       |    |                |                                                        ___|
-  |  |]     [| |       |    |________________|                                                        ___|
-  |  |]_____[| |27C4002|                                                                              ___|
-  |  |_______| |_______|                             ___________                                      ___|
-  |    ___________________                          |RTC2421 A  |   °°°°°                             ___|
-  |   |   :::::::::::::   |                         |___________|    CON5                            Z___|
-  |   |___________________|                                                                          |
-  |__________________________________________________________________________________________________|
-
-  Xtal 1: 30.000 MHz.
-  Xtal 2:  8.000 MHz.
-  Xtal 3: 19.660 MHz.
-
-  A = LT 0030 / LTC695CN / U18708
-  B = NEC Japan / D43256BGU-70LL / 0008XD041
-  C = MX B9819 / 29F1610MC-12C3 / M25685 / TAIWAN
-  D = 24C02C / 24C04 (Serial I2C Bus EEPROM with User-Defined Block Write Protection).
-  E = P0030SG / CD40106BCN
-  F = 74HCU04D
-  G = 74HC74D
 
 *******************************************************************************/
 
@@ -455,9 +163,9 @@ private:
 };
 
 
-/*************************
-*     Video Hardware     *
-*************************/
+/*********************************************
+*               Video Hardware               *
+*********************************************/
 
 /*
 66470
@@ -485,7 +193,7 @@ TODO: check this register,doesn't seem to be 100% correct.
    r  ........ .......1 BE  = bus error generated by watchdog timer
 */
 
-/*63 at post test,6d all the time.*/
+// 63 at post test, 6d all the time.
 #define SCC_CSR_VREG    (m_pcab_vregs[0x00/2] & 0xffff)
 #define SCC_CG_VREG     ((SCC_CSR_VREG & 0x10)>>4)
 
@@ -657,7 +365,7 @@ uint32_t magicard_state::screen_update_magicard(screen_device &screen, bitmap_rg
 
 	uint32_t count = ((SCC_VSR_VREG) / 2);
 
-	if(SCC_FG_VREG) //4bpp gfx
+	if(SCC_FG_VREG)  // 4bpp gfx
 	{
 		for(int y = 0; y < 300; y++)
 		{
@@ -689,7 +397,7 @@ uint32_t magicard_state::screen_update_magicard(screen_device &screen, bitmap_rg
 			}
 		}
 	}
-	else //8bpp gfx
+	else  // 8bpp gfx
 	{
 		for(int y = 0; y < 300; y++)
 		{
@@ -716,9 +424,9 @@ uint32_t magicard_state::screen_update_magicard(screen_device &screen, bitmap_rg
 }
 
 
-/*************************
-*      R/W Handlers      *
-*************************/
+/*********************************************
+*                R/W Handlers                *
+*********************************************/
 
 uint16_t magicard_state::test_r()
 {
@@ -754,16 +462,16 @@ void magicard_state::philips_66470_w(offs_t offset, uint16_t data, uint16_t mem_
 }
 
 
-/*************************
-*      Memory Maps       *
-*************************/
+/*********************************************
+*           Memory Map Information           *
+*********************************************/
 
 void magicard_state::magicard_map(address_map &map)
 {
 //  map.global_mask(0x1fffff);
 	map(0x00000000, 0x001ffbff).mirror(0x00200000).ram().share("magicram");
 	map(0x00600000, 0x007ffbff).ram().share("magicramb");
-	/* 001ffc00-001ffdff System I/O */
+	// 001ffc00-001ffdff System I/O
 	map(0x001ffc00, 0x001ffc01).mirror(0x7fe00000).portr("SYSTEM");
 	map(0x001ffc40, 0x001ffc41).mirror(0x7fe00000).r(FUNC(magicard_state::test_r));
 	map(0x001ffd01, 0x001ffd01).mirror(0x7fe00000).w("ramdac", FUNC(ramdac_device::index_w));
@@ -772,7 +480,7 @@ void magicard_state::magicard_map(address_map &map)
 	map(0x001ffd40, 0x001ffd43).mirror(0x7fe00000).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
 	map(0x001ffd80, 0x001ffd81).mirror(0x7fe00000).r(FUNC(magicard_state::test_r));
 	map(0x001ffd80, 0x001ffd81).mirror(0x7fe00000).nopw();
-	map(0x001fff80, 0x001fffbf).mirror(0x7fe00000).ram(); //DRAM I/O, not accessed by this game, CD buffer?
+	map(0x001fff80, 0x001fffbf).mirror(0x7fe00000).ram();  // DRAM I/O, not accessed by this game, CD buffer?
 	map(0x001fffe0, 0x001fffff).mirror(0x7fe00000).rw(FUNC(magicard_state::philips_66470_r), FUNC(magicard_state::philips_66470_w)).share("pcab_vregs");
 }
 
@@ -786,9 +494,9 @@ void magicard_state::hotslots_map(address_map &map)
 	map(0x00000000, 0x001ffbff).mirror(0x00200000).ram().share("magicram");
 	map(0x00600000, 0x007ffbff).ram().share("magicramb");
 	map(0x00800000, 0x009ffbff).ram().share("magicramb");
-	map(0x001fff80, 0x001fffbf).mirror(0x7fe00000).ram(); //DRAM I/O, not accessed by this game, CD buffer?
+	map(0x001fff80, 0x001fffbf).mirror(0x7fe00000).ram();  // DRAM I/O, not accessed by this game, CD buffer?
 	map(0x001fffe0, 0x001fffff).mirror(0x7fe00000).rw(FUNC(magicard_state::philips_66470_r), FUNC(magicard_state::philips_66470_w)).share("pcab_vregs");
-	map(0x00400000, 0x00403fff).ram(); // ? bigdeal0, magicardj accesses this as scratchram
+	map(0x00400000, 0x00403fff).ram();  // ? bigdeal0, magicardj accesses this as scratchram
 	map(0x00411000, 0x00411001).portr("SYSTEM");
 	map(0x00414001, 0x00414001).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x00414003, 0x00414003).w("ramdac", FUNC(ramdac_device::pal_w));
@@ -799,9 +507,10 @@ void magicard_state::hotslots_map(address_map &map)
 	map(0x00417001, 0x00417001).w("ssg", FUNC(ymz284_device::address_w));
 }
 
-/*************************
-*      Input ports       *
-*************************/
+
+/*********************************************
+*                Input Ports                 *
+*********************************************/
 
 static INPUT_PORTS_START( magicard )
 	PORT_START("SYSTEM")
@@ -829,6 +538,7 @@ static INPUT_PORTS_START( magicard )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
 	PORT_DIPNAME( 0x0100, 0x0100, "SYSTEM1" )
 	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
@@ -858,6 +568,10 @@ static INPUT_PORTS_START( magicard )
 INPUT_PORTS_END
 
 
+/******************************************
+*          Machine Start & Reset          *
+******************************************/
+
 void magicard_state::machine_reset()
 {
 	// TODO: confirm reset state
@@ -875,9 +589,9 @@ void magicard_state::machine_reset()
 }
 
 
-/*************************
-*    Machine Drivers     *
-*************************/
+/*********************************************
+*              Machine Drivers               *
+*********************************************/
 
 TIMER_DEVICE_CALLBACK_MEMBER(magicard_state::magicard_scanline_cb)
 {
@@ -900,7 +614,7 @@ void magicard_state::ramdac_map(address_map &map)
 
 void magicard_state::magicard(machine_config &config)
 {
-	SCC68070(config, m_maincpu, CLOCK_A); /* SCC-68070 CCA84 */
+	SCC68070(config, m_maincpu, CLOCK_A);  // SCC-68070 CCA84
 	m_maincpu->set_addrmap(AS_PROGRAM, &magicard_state::magicard_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(magicard_state::magicard_scanline_cb), "screen", 0, 1);
 
@@ -930,43 +644,128 @@ void magicard_state::hotslots(machine_config &config)
 	YMZ284(config, "ssg", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-/*************************
-*        Rom Load        *
-*************************/
+
+/*********************************************
+*                  Rom Load                  *
+*********************************************/
 
 ROM_START( magicard )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68070 Code & GFX */
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "magicorg.bin", 0x000000, 0x80000, CRC(810edf9f) SHA1(0f1638a789a4be7413aa019b4e198353ba9c12d9) )
 
-	ROM_REGION( 0x0100, "sereeprom", 0 ) /* Serial EPROM */
+	ROM_REGION( 0x0100, "sereeprom", 0 )  // Serial EPROM
 	ROM_LOAD16_WORD_SWAP("mgorigee.bin",    0x0000, 0x0100, CRC(73522889) SHA1(3e10d6c1585c3a63cff717a0b950528d5373c781) )
 ROM_END
 
 ROM_START( magicarda )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68070 Code & GFX */
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "mcorigg2.bin", 0x00000, 0x20000, CRC(48546aa9) SHA1(23099a5e4c9f2c3386496f6d7f5bb7d435a6fb16) )
 	ROM_RELOAD(                           0x40000, 0x20000 )
 	ROM_LOAD16_WORD_SWAP( "mcorigg1.bin", 0x20000, 0x20000, CRC(c9e4a38d) SHA1(812e5826b27c7ad98142a0f52fbdb6b61a2e31d7) )
 	ROM_RELOAD(                           0x40001, 0x20000 )
 
-	ROM_REGION( 0x0100, "sereeprom", 0 ) /* Serial EPROM */
+	ROM_REGION( 0x0100, "sereeprom", 0 )  // Serial EPROM
 	ROM_LOAD("mgorigee.bin",    0x0000, 0x0100, CRC(73522889) SHA1(3e10d6c1585c3a63cff717a0b950528d5373c781) )
 ROM_END
 
 ROM_START( magicardb )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68070 Code & GFX */
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "mg_8.bin", 0x00000, 0x80000, CRC(f5499765) SHA1(63bcf40b91b43b218c1f9ec1d126a856f35d0844) )
 
 	/*bigger than the other sets?*/
-	ROM_REGION( 0x20000, "other", 0 ) /* unknown */
+	ROM_REGION( 0x20000, "other", 0 )  // unknown
 	ROM_LOAD16_WORD_SWAP("mg_u3.bin",   0x00000, 0x20000, CRC(2116de31) SHA1(fb9c21ca936532e7c342db4bcaaac31c478b1a35) )
 ROM_END
 
+/*
+   Magic Card Jackpot 4.01
+  (Also Magic Lotto Export)
+  -------------------------
+
+  PCB Layout:
+   __________________________________________________________________________________________________
+  |                                                                                                  |
+  |                       SERIAL NUMBER                                                              |___
+  |                                                                                                  (A)_|
+  |  __     _____             ___________        _________                                            ___|
+  | |  |   /     \           |9524 GNN   |      |YMZ284-D |                                           ___|
+  | |  |  |BATTERY|          |HM514270AJ8|      |_________|                                           ___|
+  | |A |  |  +3V  |          |___________|                                                            ___|
+  | |  |  |       |                                       __________________         ________     __  ___|
+  | |  |   \_____/            ___________                |                  |       |ULN2803A|   |..| ___|
+  | |__|                     |9524 GNN   |               |  MUSIC           |       |________|   |..| ___|
+  |                          |HM514270AJ8|               |  TR9C1710-11PCA  |                    |..|(J)_|
+  |                          |___________|               |  SA119X/9612     |       _________    |..||
+  |    ___    ___                                        |__________________|      |74HC273N |   |..||
+  |   |   |  |   |                                                                 |_________|   |..||
+  |   |   |  |   |                                                                               |..||
+  |   | B |  | B |                                     _________                    _________    |..||
+  |   |   |  |   |                                    | 74HC04N |                  |74HC245N |   |__||
+  |   |   |  |   |                                    |_________|                  |_________|       |___
+  |   |___|  |___|                                                                                   A___|
+  |                                                                                                   ___|
+  |    _____                  ______________                                                          ___|
+  |   |     |                |              |                                        ________         ___|
+  |   |     |                |  PHILIPS     |     ___    ___________    ________    |ULN2803A|        ___|
+  |   |     | EI79465--A/02  |  SCC66470CAB |    | D |  |PIC16F84-10|  |   E    |   |________|        ___|
+  |   |  C  | LPL-CPU V4.0   |  172632=1/2  |    |___|  |___________|  |________|                     ___|
+  |   |     | MULTI GAME     |  DfD0032I3   |                                       _________         ___|
+  |   |     | 8603186        |              |                                      |74HC273N |        ___|
+  |   |     |                |              |                                      |_________|        ___|
+  |   |     |                |              |                                                         ___|
+  |   |_____|                |______________|                                 _     _________         ___|
+  |                                                                          |G|   |74HC245N |        ___|
+  |                                                                          |_|   |_________|        ___|
+  |   _______   _______                                                                               ___|
+  |  |]     [| |IC21   |                                 ______             ___                       ___|
+  |  |]  E  [| |       |                                |ALTERA|           |___|                __    ___|
+  |  |]  M  [| |       |                                | MAX  |             F      _________  |..|   ___|
+  |  |]  P  [| | MAGIC |     ________________           |      |                   |74HC245N | |..|   ___|
+  |  |]  T  [| | CARD  |    |                |          |EPM712|                   |_________| |..|   ___|
+  |  |]  Y  [| |JACKPOT|    |   PHILIPS      |          |8SQC10|                               |..|   ___|
+  |  |]     [| |       |    |  SCC68070CCA84 |          |0-15  |                               |..|   ___|
+  |  |]  S  [| |Version|    |  213140-1      |          |______|      X_TAL's                  |__|   ___|
+  |  |]  O  [| |   4.01|    |  DfD0103V3     |                      _   _   _                         ___|
+  |  |]  C  [| |       |    |                |    ALL RIGHTS       | | | | | |                        ___|
+  |  |]  K  [| |Vnr.:  |    |                |    BY  IMPERA       |1| |2| |3|                        ___|
+  |  |]  E  [| |11.7.98|    |                |                     |_| |_| |_|                        ___|
+  |  |]  T  [| |       |    |                |                                                        ___|
+  |  |]     [| |       |    |________________|                                                        ___|
+  |  |]_____[| |27C4002|                                                                              ___|
+  |  |_______| |_______|                               ___________                                    ___|
+  |    ___________________                            |RTC2421 A  |                                   ___|
+  |   |   :::::::::::::   |                           |___________|                                  Z___|
+  |   |___________________|                                                                          |
+  |__________________________________________________________________________________________________|
+
+  Xtal 1: 30.000 MHz.
+  Xtal 2:  8.000 MHz.
+  Xtal 3: 19.660 MHz.
+
+  A = LT 0030 / LTC695CN / U18708
+  B = NEC Japan / D43256BGU-70LL / 0008XD041
+  C = MX B9819 / 29F1610MC-12C3 / M25685 / TAIWAN
+  D = 24C02C / 24C04 (Serial I2C Bus EEPROM with User-Defined Block Write Protection).
+  E = P0030SG / CD40106BCN
+  F = 74HCU04D
+  G = 74HC74D
+
+  Silkscreened on the solder side:
+
+  LEOTS.
+  2800
+  AT&S-F0 ML 94V-0
+
+  IMPERA AUSTRIA          -------
+  TEL: 0043/7242/27116     V 4.0
+  FAX: 0043/7242/27053    -------
+
+*/
 ROM_START( magicardj )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68070 Code & GFX */
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "27c4002.ic21", 0x00000, 0x80000, CRC(ab2ed583) SHA1(a2d7148b785a8dfce8cff3b15ada293d65561c98) ) // sldh
 
-	ROM_REGION16_LE( 0x4280, "pic16f84", 0 ) // decapped and dumped
+	ROM_REGION16_LE( 0x4280, "pic16f84", 0 )  // decapped and dumped
 	ROM_LOAD("magicardj_4.01_pic16f84_code.bin",   0x0000, 0x0800, CRC(c6502436) SHA1(85c4126251bd60ec1f4e28615ec7f948ef8c088f) )
 	/*
 	{
@@ -992,16 +791,16 @@ ROM_START( magicardj )
 	ROM_FILL( 0x400f, 0x01, 0x00 )
 	ROM_LOAD("magicardj_4.01_pic16f84_data.bin",   0x4200, 0x0080, CRC(40961fef) SHA1(8617ef78d50842ea89d81d4db3728b3f799d7530) )
 
-	ROM_REGION( 0x200000, "other", 0 ) /* unknown contents */
+	ROM_REGION( 0x200000, "other", 0 )  // unknown contents
 	ROM_LOAD("29f1610mc.ic30",  0x000000, 0x200000, NO_DUMP )
 
-	ROM_REGION( 0x0100, "sereeprom", 0 ) /* Serial EPROM */
+	ROM_REGION( 0x0100, "sereeprom", 0 )  // Serial EPROM
 	ROM_LOAD("24c02c.ic26", 0x0000, 0x0100, CRC(b5c86862) SHA1(0debc0f7e7c506e5a4e2cae152548d80ad72fc2e) )
 ROM_END
 
 /*
   Magic Card Export 94
-  International Ver. 2.11a
+  International Ver. 2.11a (set 1)
   Vnr.29.07.94    CHECKSUM: A63D
 
   1x Philips SCC66470CAB 383610
@@ -1015,17 +814,86 @@ ROM_END
   Q1: 19.6608 Mhz
   Q2: 30.000 Mhz
   Q3: 3686.400  1Q08/95
+
 */
-
 ROM_START( magicarde )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68070 Code & GFX */
-	ROM_LOAD16_WORD_SWAP( "27c4002.ic21", 0x00000, 0x80000, CRC(b5f24412) SHA1(73ff05c19132932a419fef0d5dc985440ce70e83) )
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
+	ROM_LOAD16_WORD_SWAP( "27c4002_v2.11a_a63d.ic21", 0x00000, 0x80000, CRC(b5f24412) SHA1(73ff05c19132932a419fef0d5dc985440ce70e83) )
 
-	ROM_REGION( 0x2000, "pic16c54", 0 ) /* decapped */
+	ROM_REGION( 0x2000, "pic16c54", 0 )  // decapped
 	ROM_LOAD("pic16c54.ic29",   0x0000, 0x1fff, CRC(9c225a49) SHA1(249c12d23d1a85de828652c55a1a19ef8ec378ef) )
 
-	ROM_REGION( 0x0100, "sereeprom", 0 ) /* Serial EPROM */
+	ROM_REGION( 0x0100, "sereeprom", 0 )  // Serial EPROM
 	ROM_LOAD("st24c02.ic26",    0x0000, 0x0100, CRC(98287c67) SHA1(ad34e55c1ce4f77c27049dac88050ed3c94af1a0) )
+ROM_END
+
+/*
+  Magic Card Export 94
+  International Ver. 2.11a (set 2)
+  Vnr.29.07.94    CHECKSUM: 9505
+
+  1x Philips SCC66470CAB 383610
+  1x Philips SCC68070 CCA84 347141
+  1x ESI1 I9631
+  1x MUSIC TR9C1710-11PCA SA121X/9617
+  1x YAMAHA YM2149F 9614
+
+  XTAL:
+
+  Q1: 19.6608 Mhz
+  Q2: 30.000 Mhz
+  Q3: 3686.400  1Q08/95
+
+*/
+ROM_START( magicardea )
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
+	ROM_LOAD16_WORD_SWAP( "27c4002_v2.11a_9505.ic21", 0x00000, 0x80000, CRC(24c69c01) SHA1(0928800b9cfc2ae358f90b3f79c08acd2b2aa7d8) )
+
+	ROM_REGION( 0x2000, "pic16c54", 0 )  // decapped
+	ROM_LOAD("pic16c54.ic29",   0x0000, 0x1fff, CRC(9c225a49) SHA1(249c12d23d1a85de828652c55a1a19ef8ec378ef) )
+
+	ROM_REGION( 0x0100, "sereeprom", 0 )  // Serial EPROM
+	ROM_LOAD("st24c02.ic26",    0x0000, 0x0100, CRC(98287c67) SHA1(ad34e55c1ce4f77c27049dac88050ed3c94af1a0) )
+ROM_END
+
+/*
+  Magic Card Export 94
+  Clubversion Export v2.9a
+  Vnr.02.08.94    CHECKSUM: 5B64
+
+  1x Philips SCC66470CAB 383610
+  1x Philips SCC68070 CCA84 347141
+
+  Other components are unreadable
+  in the PCB picture.
+  
+*/
+ROM_START( magicardeb )
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
+	ROM_LOAD16_WORD_SWAP( "27c4002_v2.9a_5b64.ic21", 0x00000, 0x80000, CRC(81ad0437) SHA1(117e2681541f786874cd0bce7f8bfb2bffb0b548) )
+
+	// PIC undumped
+	// Serial EPROM undumped
+ROM_END
+
+/*
+  Magic Card Export
+  Version 4.01
+  Vnr.07.03.98    CHECKSUM: AF18
+
+  1x Philips SCC66470CAB 383610
+  1x Philips SCC68070 CCA84 347141
+
+  Other components are unreadable
+  in the PCB picture.
+  
+*/
+ROM_START( magicardec )
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
+	ROM_LOAD16_WORD_SWAP( "27c4002_v4.01_af18.ic21", 0x00000, 0x80000, CRC(7700fd22) SHA1(0555c08c82f56e6399a89f6408e52d9d0beba2ac) )
+
+	// PIC undumped
+	// Serial EPROM undumped
 ROM_END
 
 /*
@@ -1058,7 +926,6 @@ ROM_START( magicardf )
 ROM_END
 
 /*
-
   Magic Card - Wien
   Sicherheitsversion 1.2
 
@@ -1067,16 +934,16 @@ ROM_START( magicardw )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "am27c4096.bin", 0x00000, 0x80000, CRC(d9e2a4ec) SHA1(b3000ded242fa25709c90b9b2541c9d1d5cabebb) )
 
-	ROM_REGION( 0x1fff, "pic16c54", 0 ) // decapped
+	ROM_REGION( 0x1fff, "pic16c54", 0 )  // decapped
 	ROM_LOAD("pic16c54a.bin",   0x0000, 0x1fff, CRC(e777e814) SHA1(e0440be76fa1f3c7ae7d31e1b29a2ba73552231c) )
 ROM_END
 
 
 ROM_START( magicle )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68070 Code & GFX */
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "27c4002.ic21", 0x00000, 0x80000, CRC(73328346) SHA1(fca5f8a93f25377e659c2b291674d706ca37400e) )
 
-	ROM_REGION16_LE( 0x4280, "pic16f84", 0 ) // decapped and dumped
+	ROM_REGION16_LE( 0x4280, "pic16f84", 0 )  // decapped and dumped
 	ROM_LOAD("magicle_5.03_pic16f84_code.bin",   0x0000, 0x0800, CRC(22965864) SHA1(c421a9e9fac7c9c5dc01adda620dc8f5f16d94ba) )
 	/*
 {
@@ -1102,15 +969,14 @@ ROM_START( magicle )
 	ROM_FILL( 0x400f, 0x01, 0x00 )
 	ROM_LOAD("magicle_5.03_pic16f84_data.bin",   0x4200, 0x0080, CRC(b3cdf90f) SHA1(0afec6f78320e5fe653073769cdeb32918da061b) )
 
-	ROM_REGION( 0x200000, "other", 0 ) /* unknown contents */
+	ROM_REGION( 0x200000, "other", 0 )  // unknown contents
 	ROM_LOAD("29f1610mc.ic30",  0x000000, 0x200000, NO_DUMP )
 
-	ROM_REGION( 0x0200, "sereeprom", 0 ) /* Serial EPROM */
+	ROM_REGION( 0x0200, "sereeprom", 0 )  // Serial EPROM
 	ROM_LOAD("24c04a.ic26", 0x0000, 0x0200, CRC(48c4f473) SHA1(5355313cc96f655096e13bfae78be3ba2dfe8a2d) )
 ROM_END
 
 /*
-
   Hot Slots Version 6.00
 
   Hardware PCB informations:
@@ -1122,35 +988,102 @@ ROM_END
 
 */
 ROM_START( hotslots )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68070 Code & GFX */
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "hot_slots_v600_15.04.02.bin", 0x00000, 0x80000, CRC(35677999) SHA1(7462eef3734b9b6087102901967a168a60ab7710) )
 
-	ROM_REGION( 0x0100, "sereeprom", 0 ) /* Serial EPROM */
+	ROM_REGION( 0x0100, "sereeprom", 0 )  // Serial EPROM
 	ROM_LOAD16_WORD_SWAP("hot_slots_24c02.bin",          0x0000,  0x0100,  CRC(fcac71ad) SHA1(1bb31e9a2d847430dc0d011f672cf3726dc6280c) )
 ROM_END
 
 /*
-
   QUINGO EXPORT Version 5.00
 
   Hardware PCB informations : E179465--A/02 LPL-CPU V4.0/MULTI GAME 8603186
+
   Eprom type ST M27c4002
   Version 5.00
   vnr 27.07.99 Cksum (provided) 79C5
 
   Eeprom : 24c04A
 
+  PCB Layout:
+   __________________________________________________________________________________________________
+  |                                                                                                  |
+  |                       SERIAL NUMBER                                                              |___
+  |                                                                                                  (A)_|
+  |  __     _____             ___________        _________                                            ___|
+  | |  |   /     \           |9524 GNN   |      |YMZ284-D |                                           ___|
+  | |  |  |BATTERY|          |HM514270AJ8|      |_________|                                           ___|
+  | |A |  |  +3V  |          |___________|                                                            ___|
+  | |  |  |       |                                       __________________         ________     __  ___|
+  | |  |   \_____/            ___________                |                  |       |ULN2803A|   |..| ___|
+  | |__|                     |9524 GNN   |               |  MUSIC           |       |________|   |..| ___|
+  |                          |HM514270AJ8|               |  TR9C1710-11PCA  |                    |..|(J)_|
+  |                          |___________|               |  SA119X/9612     |       _________    |..||
+  |    ___    ___                                        |__________________|      |74HC273N |   |..||
+  |   |   |  |   |                                                                 |_________|   |..||
+  |   |   |  |   |                                                                               |..||
+  |   | B |  | B |                                     _________                    _________    |..||
+  |   |   |  |   |                                    | 74HC04N |                  |74HC245N |   |__||
+  |   |   |  |   |                                    |_________|                  |_________|       |___
+  |   |___|  |___|                                                                                   A___|
+  |                                                                                                   ___|
+  |    _____                  ______________                                                          ___|
+  |   |     |                |              |                                        ________         ___|
+  |   |     |                |  PHILIPS     |     ___    ___________    ________    |ULN2803A|        ___|
+  |   |     | EI79465--A/02  |  SCC66470CAB |    | D |  |PIC16F84-10|  |   E    |   |________|        ___|
+  |   |  C  | LPL-CPU V4.0   |  172632=1/2  |    |___|  |___________|  |________|                     ___|
+  |   |     | MULTI GAME     |  DfD0032I3   |                                       _________         ___|
+  |   |     | 8603186        |              |                                      |74HC273N |        ___|
+  |   |     |                |              |                                      |_________|        ___|
+  |   |     |                |              |                                                         ___|
+  |   |_____|                |______________|                                 _     _________         ___|
+  |                                                                          |G|   |74HC245N |        ___|
+  |                                                                          |_|   |_________|        ___|
+  |   _______   _______                                                                               ___|
+  |  |]     [| |IC21   |                                 ______             ___                       ___|
+  |  |]  E  [| |       |                                |ALTERA|           |___|                __    ___|
+  |  |]  M  [| |       |                                | MAX  |             F      _________  |..|   ___|
+  |  |]  P  [| |QUINGO |     ________________           |      |                   |74HC245N | |..|   ___|
+  |  |]  T  [| | EXPORT|    |                |          |EPM712|                   |_________| |..|   ___|
+  |  |]  Y  [| |       |    |   PHILIPS      |          |8SQC10|                               |..|   ___|
+  |  |]     [| |       |    |  SCC68070CCA84 |          |0-15  |                               |..|   ___|
+  |  |]  S  [| |Version|    |  213140-1      |          |______|      X_TAL's                  |__|   ___|
+  |  |]  O  [| |   5.00|    |  DfD0103V3     |                      _   _   _                         ___|
+  |  |]  C  [| |       |    |                |    ALL RIGHTS       | | | | | |                        ___|
+  |  |]  K  [| |Vnr.:  |    |                |    BY  IMPERA       |1| |2| |3|                        ___|
+  |  |]  E  [| |270799 |    |                |                     |_| |_| |_|                        ___|
+  |  |]  T  [| |       |    |                |                                                        ___|
+  |  |]     [| |       |    |________________|                                                        ___|
+  |  |]_____[| |27C4002|                                                                              ___|
+  |  |_______| |_______|                             ___________                                      ___|
+  |    ___________________                          |RTC2421 A  |   °°°°°                             ___|
+  |   |   :::::::::::::   |                         |___________|    CON5                            Z___|
+  |   |___________________|                                                                          |
+  |__________________________________________________________________________________________________|
+
+  Xtal 1: 30.000 MHz.
+  Xtal 2:  8.000 MHz.
+  Xtal 3: 19.660 MHz.
+
+  A = LT 0030 / LTC695CN / U18708
+  B = NEC Japan / D43256BGU-70LL / 0008XD041
+  C = MX B9819 / 29F1610MC-12C3 / M25685 / TAIWAN
+  D = 24C02C / 24C04 (Serial I2C Bus EEPROM with User-Defined Block Write Protection).
+  E = P0030SG / CD40106BCN
+  F = 74HCU04D
+  G = 74HC74D
+
 */
 ROM_START( quingo )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68070 Code & GFX */
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "quingo_export_v500_27.07.99.bin", 0x00000, 0x80000, CRC(2cd89fe3) SHA1(bdd256d5114227166aff1c9f84b573e5f00530fd) )
 
-	ROM_REGION( 0x0200, "sereeprom", 0 ) /* Serial EPROM */
+	ROM_REGION( 0x0200, "sereeprom", 0 )  // Serial EPROM
 	ROM_LOAD16_WORD_SWAP("quingo_24c04a.bin", 0x0000, 0x0200, BAD_DUMP CRC(d5e82b49) SHA1(7dbdf7d539cbd59a3ac546b6f50861c4958abb3a) ) // all AA & 55
 ROM_END
 
 /*
-
   BIG DEAL BELGIEN Version 5.04
 
   Hardware PCB informations : E179465--A/02 LPL-CPU V4.0/MULTI GAME 8603186
@@ -1158,20 +1091,86 @@ ROM_END
   Version 5.04
   vnr 21.05.01 Cksum (provided) C4B7
 
-
   Eeprom : 24c04A
+
+  PCB Layout:
+   __________________________________________________________________________________________________
+  |                                                                                                  |
+  |                       SERIAL NUMBER                                                              |___
+  |                                                                                                  (A)_|
+  |  __     _____             ___________        _________                                            ___|
+  | |  |   /     \           |9524 GNN   |      |YMZ284-D |                                           ___|
+  | |  |  |BATTERY|          |HM514270AJ8|      |_________|                                           ___|
+  | |A |  |  +3V  |          |___________|                                                            ___|
+  | |  |  |       |                                       __________________         ________     __  ___|
+  | |  |   \_____/            ___________                |                  |       |ULN2803A|   |..| ___|
+  | |__|                     |9524 GNN   |               |  MUSIC           |       |________|   |..| ___|
+  |                          |HM514270AJ8|               |  TR9C1710-11PCA  |                    |..|(J)_|
+  |                          |___________|               |  SA119X/9612     |       _________    |..||
+  |    ___    ___                                        |__________________|      |74HC273N |   |..||
+  |   |   |  |   |                                                                 |_________|   |..||
+  |   |   |  |   |                                                                               |..||
+  |   | B |  | B |                                     _________                    _________    |..||
+  |   |   |  |   |                                    | 74HC04N |                  |74HC245N |   |__||
+  |   |   |  |   |                                    |_________|                  |_________|       |___
+  |   |___|  |___|                                                                                   A___|
+  |                                                                                                   ___|
+  |    _____                  ______________                                                          ___|
+  |   |     |                |              |                                        ________         ___|
+  |   |     |                |  PHILIPS     |     ___    ___________    ________    |ULN2803A|        ___|
+  |   |     | EI79465--A/02  |  SCC66470CAB |    | D |  |PIC16F84-10|  |   E    |   |________|        ___|
+  |   |  C  | LPL-CPU V4.0   |  172632=1/2  |    |___|  |___________|  |________|                     ___|
+  |   |     | MULTI GAME     |  DfD0032I3   |                                       _________         ___|
+  |   |     | 8603186        |              |                                      |74HC273N |        ___|
+  |   |     |                |              |                                      |_________|        ___|
+  |   |     |                |              |                                                         ___|
+  |   |_____|                |______________|                                 _     _________         ___|
+  |                                                                          |G|   |74HC245N |        ___|
+  |                                                                          |_|   |_________|        ___|
+  |   _______   _______                                                                               ___|
+  |  |]     [| |IC21   |                                 ______             ___                       ___|
+  |  |]  E  [| |       |                                |ALTERA|           |___|                __    ___|
+  |  |]  M  [| |  BIG  |                                | MAX  |             F      _________  |..|   ___|
+  |  |]  P  [| |  DEAL |     ________________           |      |                   |74HC245N | |..|   ___|
+  |  |]  T  [| |BELGIEN|    |                |          |EPM712|                   |_________| |..|   ___|
+  |  |]  Y  [| |       |    |   PHILIPS      |          |8SQC10|                               |..|   ___|
+  |  |]     [| |       |    |  SCC68070CCA84 |          |0-15  |                               |..|   ___|
+  |  |]  S  [| |Version|    |  213140-1      |          |______|      X_TAL's                  |__|   ___|
+  |  |]  O  [| |   5.04|    |  DfD0103V3     |                      _   _   _                         ___|
+  |  |]  C  [| |       |    |                |    ALL RIGHTS       | | | | | |                        ___|
+  |  |]  K  [| |Vnr.:  |    |                |    BY  IMPERA       |1| |2| |3|                        ___|
+  |  |]  E  [| |210501 |    |                |                     |_| |_| |_|                        ___|
+  |  |]  T  [| |       |    |                |                                                        ___|
+  |  |]     [| |       |    |________________|                                                        ___|
+  |  |]_____[| |27C4002|                                                                              ___|
+  |  |_______| |_______|                             ___________                                      ___|
+  |    ___________________                          |RTC2421 A  |   °°°°°                             ___|
+  |   |   :::::::::::::   |                         |___________|    CON5                            Z___|
+  |   |___________________|                                                                          |
+  |__________________________________________________________________________________________________|
+
+  Xtal 1: 30.000 MHz.
+  Xtal 2:  8.000 MHz.
+  Xtal 3: 19.660 MHz.
+
+  A = LT 0030 / LTC695CN / U18708
+  B = NEC Japan / D43256BGU-70LL / 0008XD041
+  C = MX B9819 / 29F1610MC-12C3 / M25685 / TAIWAN
+  D = 24C02C / 24C04 (Serial I2C Bus EEPROM with User-Defined Block Write Protection).
+  E = P0030SG / CD40106BCN
+  F = 74HCU04D
+  G = 74HC74D
 
 */
 ROM_START( bigdeal0 )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68070 Code & GFX */
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "big_deal_belgien_v504_21.05.01.bin", 0x00000, 0x80000, CRC(3e3484db) SHA1(78bb655deacc57ad041a46de7ef153ce25922a8a) )
 
-	ROM_REGION( 0x0200, "sereeprom", 0 ) /* Serial EPROM */
+	ROM_REGION( 0x0200, "sereeprom", 0 )  // Serial EPROM
 	ROM_LOAD16_WORD_SWAP("big_deal_24c04a.bin", 0x0000, 0x0200, BAD_DUMP CRC(d5e82b49) SHA1(7dbdf7d539cbd59a3ac546b6f50861c4958abb3a) ) // all AA & 55
 ROM_END
 
 /*
-
   BEL SLOTS EXP. Version 5.01
 
   Hardware PCB informations : E179465--A/02 LPL-CPU V4.0/MULTI GAME 8603186
@@ -1181,12 +1180,80 @@ ROM_END
 
   Eeprom : 24c04A
 
+  PCB Layout:
+   __________________________________________________________________________________________________
+  |                                                                                                  |
+  |                       SERIAL NUMBER                                                              |___
+  |                                                                                                  (A)_|
+  |  __     _____             ___________        _________                                            ___|
+  | |  |   /     \           |9524 GNN   |      |YMZ284-D |                                           ___|
+  | |  |  |BATTERY|          |HM514270AJ8|      |_________|                                           ___|
+  | |A |  |  +3V  |          |___________|                                                            ___|
+  | |  |  |       |                                       __________________         ________     __  ___|
+  | |  |   \_____/            ___________                |                  |       |ULN2803A|   |..| ___|
+  | |__|                     |9524 GNN   |               |  MUSIC           |       |________|   |..| ___|
+  |                          |HM514270AJ8|               |  TR9C1710-11PCA  |                    |..|(J)_|
+  |                          |___________|               |  SA119X/9612     |       _________    |..||
+  |    ___    ___                                        |__________________|      |74HC273N |   |..||
+  |   |   |  |   |                                                                 |_________|   |..||
+  |   |   |  |   |                                                                               |..||
+  |   | B |  | B |                                     _________                    _________    |..||
+  |   |   |  |   |                                    | 74HC04N |                  |74HC245N |   |__||
+  |   |   |  |   |                                    |_________|                  |_________|       |___
+  |   |___|  |___|                                                                                   A___|
+  |                                                                                                   ___|
+  |    _____                  ______________                                                          ___|
+  |   |     |                |              |                                        ________         ___|
+  |   |     |                |  PHILIPS     |     ___    ___________    ________    |ULN2803A|        ___|
+  |   |     | EI79465--A/02  |  SCC66470CAB |    | D |  |PIC16F84-10|  |   E    |   |________|        ___|
+  |   |  C  | LPL-CPU V4.0   |  172632=1/2  |    |___|  |___________|  |________|                     ___|
+  |   |     | MULTI GAME     |  DfD0032I3   |                                       _________         ___|
+  |   |     | 8603186        |              |                                      |74HC273N |        ___|
+  |   |     |                |              |                                      |_________|        ___|
+  |   |     |                |              |                                                         ___|
+  |   |_____|                |______________|                                 _     _________         ___|
+  |                                                                          |G|   |74HC245N |        ___|
+  |                                                                          |_|   |_________|        ___|
+  |   _______   _______                                                                               ___|
+  |  |]     [| |IC21   |                                 ______             ___                       ___|
+  |  |]  E  [| |       |                                |ALTERA|           |___|                __    ___|
+  |  |]  M  [| |  BEL  |                                | MAX  |             F      _________  |..|   ___|
+  |  |]  P  [| | SLOTS |     ________________           |      |                   |74HC245N | |..|   ___|
+  |  |]  T  [| |  EXP. |    |                |          |EPM712|                   |_________| |..|   ___|
+  |  |]  Y  [| |       |    |   PHILIPS      |          |8SQC10|                               |..|   ___|
+  |  |]     [| |       |    |  SCC68070CCA84 |          |0-15  |                               |..|   ___|
+  |  |]  S  [| |Version|    |  213140-1      |          |______|      X_TAL's                  |__|   ___|
+  |  |]  O  [| |   5.01|    |  DfD0103V3     |                      _   _   _                         ___|
+  |  |]  C  [| |       |    |                |    ALL RIGHTS       | | | | | |                        ___|
+  |  |]  K  [| |Vnr.:  |    |                |    BY  IMPERA       |1| |2| |3|                        ___|
+  |  |]  E  [| |011299 |    |                |                     |_| |_| |_|                        ___|
+  |  |]  T  [| |       |    |                |                                                        ___|
+  |  |]     [| |       |    |________________|                                                        ___|
+  |  |]_____[| |27C4002|                                                                              ___|
+  |  |_______| |_______|                             ___________                                      ___|
+  |    ___________________                          |RTC2421 A  |   °°°°°                             ___|
+  |   |   :::::::::::::   |                         |___________|    CON5                            Z___|
+  |   |___________________|                                                                          |
+  |__________________________________________________________________________________________________|
+
+  Xtal 1: 30.000 MHz.
+  Xtal 2:  8.000 MHz.
+  Xtal 3: 19.660 MHz.
+
+  A = LT 0030 / LTC695CN / U18708
+  B = NEC Japan / D43256BGU-70LL / 0008XD041
+  C = MX B9819 / 29F1610MC-12C3 / M25685 / TAIWAN
+  D = 24C02C / 24C04 (Serial I2C Bus EEPROM with User-Defined Block Write Protection).
+  E = P0030SG / CD40106BCN
+  F = 74HCU04D
+  G = 74HC74D
+
 */
 ROM_START( belslots )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68070 Code & GFX */
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "bel_slots_exp_v501_01.12.99.bin", 0x00000, 0x80000, CRC(bd0b97ff) SHA1(9431359f91fd059c61441f4cb4924500889552a9) )
 
-	ROM_REGION( 0x0200, "sereeprom", 0 ) /* Serial EPROM */
+	ROM_REGION( 0x0200, "sereeprom", 0 )  // Serial EPROM
 	ROM_LOAD16_WORD_SWAP("bel_slots_exp_24c04a.bin", 0x0000, 0x0200, BAD_DUMP CRC(d5e82b49) SHA1(7dbdf7d539cbd59a3ac546b6f50861c4958abb3a) ) // all AA & 55
 ROM_END
 
@@ -1194,36 +1261,212 @@ ROM_END
   Puzzle Me!
   Impera.
 
-  TODO: PCB
+  PCB layout:
+   ___________________________________________________________________________________________________________________________ 
+  |                      ___    ___    ___    ___                                                                             |
+  |    ___              |   |  |   |  |   |  |   |                                                                            |
+  |   | B |             | A |  | A |  | A |  | A |    ______________________________________                                  |____ 
+  |   |___|    _____    |   |  |   |  |   |  |   |   |                                      |                                   ___|
+  |           |  _  |   |___|  |___|  |___|  |___|   |               YAMAHA                 |                                   ___|
+  |  _______  |BATTE|                                |               YM2149F                |                                   ___|
+  | |LTC695C| |RY   |    ___    ___    ___    ___    |                                  IC17|                                   ___|
+  | |_______| |  +  |   | E |  | E |  | E |  | E |   |______________________________________|                                   ___|
+  |           |_____|   | M |  | M |  | M |  | M |                                                                              ___|
+  |                     | P |  | P |  | P |  | P |           ___________________________           ______________      _____    ___|
+  |   ____    ____      | T |  | T |  | T |  | T |          |                           |         |   ULN2803A   |    | O O |   ___|
+  |  |HY62|  |HY62|     | Y |  | Y |  | Y |  | Y |          |       KDA0476CN_66        |         |______________|    | O O |  ____| 
+  |  |64AL|  |64AL|     |___|  |___|  |___|  |___|          |       KOREA    219    IC20|        ________________     | O O | |
+  |  |J_10|  |J_10|                                         |___________________________|       |    74HC273N    |    | O O | |
+  |  |    |  |    |                                                                             |________________|    | O O | |
+  |  |____|  |____|                                        ___________           ____________    ________________     | O O | |
+  |                                                       | 74HC04AP  |         |EMPTY SOCKET|  |    74HC245N    |    | O O | |
+  |  _______   _______                                    |___________|         |____________|  |________________|    | O O | |
+  | |       | |       |   XTAL1                                                                                       |_____| |____ 
+  | |       | |       |    _________________                 XTAL3                                 ______________        CON3   ___|
+  | | EMPTY | | EMPTY |   |    IMPERA 8     |        _____    _____________     _____________     |  TD62083AP   |              ___|
+  | | SOCKET| | SOCKET|   |     209751      |       |24C02|  |  PIC16C54   |   | HCF40106BE  |    |______________|              ___|
+  | |       | |       |   |   DfD9227I3 Y   |       |_____|  |_____________|   |_____________|   ________________               ___|
+  | |       | |       |   |                 |          IC26             IC29                    |    74HC273N    |              ___|
+  | |       | |       |   |  SCC 66470 CAB  |                                                   |________________|              ___|
+  | |       | |       |   |      317360     |                                                                                   ___|
+  | |       | |       |   |   DfD9501I3 Y   |                                                    ________________               ___|
+  | |  IC22A| |  IC21A|   |_________________|         __________________                        |    74HC245N    |              ___|
+  | |_______| |_______|                  IC19        |                  |                       |________________|              ___|
+  |  _______   _______                               |                  |                                                       ___|
+  | |       | |       |                              |       ESI 1      |                                                       ___|
+  | |       | |       |   XTAL2                      |       I9349      |                        ________________               ___|
+  | |       | |       |    _________________         |                  |                       |    74HC245N    |              ___|
+  | | EMPTY | |       |   |    IMPERA 7     |        |                  |                       |________________|              ___|
+  | | SOCKET| |27C4002|   |     204440      |        |              IC25|                                                       ___|
+  | |       | |       |   |   DfD9231V3 Y   |        |__________________|                                                       ___|
+  | |       | |       |   |                 |                                                                                   ___|
+  | |       | |       |   | SCC 68070 CCA84 |                                                                                   ___|
+  | |       | |       |   |     324320      |                                                                                   ___|
+  | |       | |       |   |   DfD9501V3 Y   |                                                                                   ___|
+  | |       | |       |   |_________________|                                                                                   ___|
+  | |   IC21| |   IC21|                  IC1               ______________    _________                                         ____| 
+  | |_______| |_______|                                   |  RTC 72421A  |  | DS1207  |                                       |
+  | IMPERA BOARD REV V2.1                                 |______________|  |_________|                                       |
+  |___________________________________________________________________________________________________________________________|
+
+  XTAL1 = 30.000
+  XTAL2 = 19.6608
+  XTAL3 = 3686.400
+
+  A = KM44C256CJ_6
+  B = TL7705ACP
+
 */
 ROM_START( puzzleme )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68070 Code & GFX */
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "27c4002.ic21", 0x00000, 0x80000, CRC(cd3bc5a9) SHA1(682f62eba454f4f00212b2a8dabb05d6747f22fd) )
 
-	ROM_REGION( 0x1fff, "pic16c54", 0 ) /* decapped */
+	ROM_REGION( 0x1fff, "pic16c54", 0 )  // decapped
 	ROM_LOAD("pic16c54.ic29",   0x0000, 0x1fff, CRC(6dd2bd8e) SHA1(380f6b952ddd3183e9ab5404866c30be015b3773) )
 
-	ROM_REGION( 0x0100, "sereeprom", 0 ) /* Serial EPROM */
+	ROM_REGION( 0x0100, "sereeprom", 0 )  // Serial EPROM
 	ROM_LOAD("x24c02p.ic26",    0x0000, 0x0100, CRC(bc940f53) SHA1(6b870019752ba5c446a5ad5155e4a81dfbf6e523) )
 ROM_END
 
 
 /*
+  Unknown 'TE06'
 
-  Unknown TE06
+  PCB layout:
+   ________________________________________________________________________________________________________________
+  |                                                                                                                |
+  |      __________                          _____________               ___________        ___                    |                            
+  |     |  74LS04  |                        |LC324256BP-70|             |     C     |      |   |     ___           |__ 
+  |     |__________|                        |_____________|             |___________|      |EMP|    |. .|           __|           
+  |                                          _____________                                 |TY |    |. .|           __|
+  |            ____                         |LC324256BP-70|                                |   |    |. .|           __|
+  |           | A  |                        |_____________|                                |SOC|    |. .|           __|
+  |           |____|                         _____________                                 |KET|    |. .|           __|
+  |                                         |LC324256BP-70|                                |___|    |. .|           __|
+  |                                         |_____________|           __________________            |. .|           __|
+  |                                          _____________           |   ADV476KN35E    |           |. .|           __|    
+  |                                         |LC324256BP-70|          |                  |           |___|           __|
+  | _______                                 |_____________|          |     OF19802.3    |                          |
+  ||DS1207 |                                                         |__________________|                          |
+  ||_______|                                                                                                       |                       
+  |         ___                       XTAL2                              __________                                |   
+  |        |   |        ________          ________________              | PIC16C54 |                               |        
+  |   ___  |PC7|       |        |        |                |             |__________|                               |__
+  |  |   | |4HC|       |        |        |    IMPERA 8    |                   XTAL3                                 __|
+  |  |HEF| |273|       |HYUNDAI |        |                |                                                         __|
+  |  |400| |P  |       |        |        |                |                                                         __|
+  |  |98B| |   |       |HY6264AL|        |     209751     |                                                         __|
+  |  |P  | |   |       |P_10    |        |                |                                                         __|
+  |  |   | |   |       |        |        |  DfD0922713 Y  |                                                         __|
+  |  |___| |___|       |        |        |                |                                ___   ___                __|
+  |                    | 9218A  |        |________________|              _____________    |   | |   |               __|
+  |   _______          |        |                                       |  74HC245N   |   |PC7| |ULN|               __|    
+  |  |       |         | KOREA  |                                       |_____________|   |4HC| |280|               __| 
+  |  |BATTERY|         |________|                                                         |273| |3A |               __|
+  |  |       |                                                                            |P  | |   |               __|
+  |  |_______|     ________   ________                                                    |   | |   |               __|
+  |               |        | |        |                                                   |   | |   |               __|
+  |               |        | |        |                                  _____________    |___| |___|               __|
+  |   ___         |        | |        |     XTAL1                       |  74HC245N   |    ___   ___                __|                                
+  |  | B |        |        | |        |    __________________           |_____________|   |   | |   |               __|
+  |  |___|        |        | |        |   |                  |                            |PC7| |ULN|               __|
+  |               | EMPTY  | |        |   |    IMPERA 7      |                            |4HC| |280|               __|
+  |               | SOCKET | |27C4002 |   |                  |                            |273| |3A |               __|
+  |               |        | |        |   |     230031       |           _____________    |P  | |   |               __|   
+  |   ___   ___   |        | |        |   |                  |          |  74HC245N   |   |   | |   |               __|
+  |  |   | |   |  |        | |        |   |   DfD9249V3 Y    |          |_____________|   |   | |   |               __|   
+  |  |PAL| |PAL|  |        | |        |   |                  |                            |___| |___|               __|
+  |  |CE | |CE |  |        | |        |   |                  |                             __________               __|
+  |  |   | |   |  |        | |        |   |                  |                            | CNY 74-4 |              __|
+  |  |   | |   |  |        | |        |   |__________________|           _____________    |__________|              __|                     
+  |  |   | |   |  |        | |        |                                 |  74HC245N   |                             __|
+  |  |   | |   |  |        | |        |                                 |_____________|                             __|
+  |  |___| |___|  |________| |________|                                                    ___________              __|
+  |                                                                                       |   DIP 1   |            |
+  | IMPERA BOARD REV V1.05                                                                |___________|            |
+  |________________________________________________________________________________________________________________|
+
+  A = TL7705ACP
+  B = DS1210
+  C = Cover scratched - unreadable
+
+  XTAL1 = 19.6608
+  XTAL2 = 30.000
+  XTAL3 = 3.686JB
 
 */
 ROM_START( unkte06 )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "m27c4002.bin", 0x00000, 0x80000, CRC(229a504f) SHA1(8033e9b4cb55f2364bf4606375ef9ac05fc715fe) )
 
-	ROM_REGION( 0x1fff, "pic16c56", 0 ) // decapped
+	ROM_REGION( 0x1fff, "pic16c56", 0 )  // decapped
 	ROM_LOAD("pic16c56.bin",   0x0000, 0x1fff, CRC(b5655603) SHA1(d9126c36f3fca7e769ea60aaa711bb304b4b6a11) )
 ROM_END
 
 /*
   Lucky 7
   Impera
+
+  PCB layout:
+   ________________________________________________________________________________________________________________
+  |                                                                                                                |
+  |      __________                          _____________               ___________        ___                    |                            
+  |     |  74LS04  |                        |HY51C4256S-10|             |     C     |      |904|     ___           |__ 
+  |     |__________|                        |_____________|             |___________|      |9  |    |. .|           __|           
+  |                                          _____________                                 |   |    |. .|           __|
+  |            ____                         |HY51C4256S-10|                                |LT1|    |. .|           __|
+  |           | A  |                        |_____________|                                |081|    |. .|           __|
+  |           |____|                         _____________                                 |CN |    |. .|           __|
+  |                                         |HY51C4256S-10|                                |___|    |. .|           __|
+  |                                         |_____________|           __________________            |. .|           __|
+  |                                          _____________           |   ADV476KN35E    |           |. .|           __|    
+  |                                         |HY51C4256S-10|          |                  |           |___|           __|
+  | _______                                 |_____________|          |     OF19802.3    |                          |
+  ||DS1207 |                                                         |__________________|                          |
+  ||_______|                                                                                                       |                       
+  |         ___                       XTAL2                                                                        |   
+  |        |   |        ________          ________________                                                         |        
+  |   ___  |PC7|       |        |        |                |                                                        |__
+  |  |   | |4HC|       |        |        |    IMPERA 8    |                                                         __|
+  |  |HEF| |273|       |HYUNDAI |        |                |                                                         __|
+  |  |400| |A  |       |        |        |                |                                                         __|
+  |  |98B| |   |       |HY6264AL|        |     160710     |                                                         __|
+  |  |P  | |   |       |P_10    |        |                |                                                         __|
+  |  |   | |   |       |        |        |  DTD9105I1 Y   |                                                         __|
+  |  |___| |___|       |        |        |                |                                ___   ___                __|
+  |                    | 9218A  |        |________________|              _____________    |   | |   |               __|
+  |   _______          |        |                                       |  74HC245AP  |   |PC7| |ULN|               __|    
+  |  |       |         | KOREA  |                                       |_____________|   |4HC| |280|               __| 
+  |  |BATTERY|         |________|                                                         |273| |3A |               __|
+  |  |       |                                                                            |AP | |   |               __|
+  |  |_______|     ________   ________                                                    |   | |   |               __|
+  |               |        | |        |                                                   |   | |   |               __|
+  |               |        | |        |                                  _____________    |___| |___|               __|
+  |   ___         |        | |        |     XTAL1                       |  74HC245AP  |    ___   ___                __|                                
+  |  | B |        |        | |        |    __________________           |_____________|   |   | |   |               __|
+  |  |___|        |        | |        |   |                  |                            |PC7| |ULN|               __|
+  |               |        | |        |   |    IMPERA 7      |                            |4HC| |280|               __|
+  |               |D27C210 | |D27C210 |   |                  |                            |273| |3A |               __|
+  |               |        | |        |   |     155200       |           _____________    |AP | |   |               __|   
+  |   ___   ___   |        | |        |   |                  |          |  74HC245AP  |   |   | |   |               __|
+  |  |   | |   |  |GAME-ROM| |        |   |   DfD9101V3 Y    |          |_____________|   |   | |   |               __|   
+  |  |PAL| |PAL|  | Lucky 7| |        |   |                  |                            |___| |___|               __|
+  |  |16L| |16L|  |        | |        |   |                  |                             __________               __|
+  |  |8  | |8  |  |VNr03-07| |        |   |                  |                            |  PC849   |              __|
+  |  |   | |   |  |Sum.D882| |        |   |__________________|           _____________    |__________|              __|                     
+  |  |   | |   |  |        | |        |                                 |  74HC245AP  |                             __|
+  |  |   | |   |  |        | |        |                                 |_____________|                             __|
+  |  |___| |___|  |________| |________|                                                    ___________              __|
+  |                                                                                       |   DIP 1   |            |
+  | IMPERA BOARD REV V1.04                                                                |___________|            |
+  |________________________________________________________________________________________________________________|
+
+  A = TL7705ACP
+  B = DS1210
+  C = Cover scratched - unreadable
+
+  XTAL1 = 19.6608
+  XTAL2 = 30.000
 
 */
 ROM_START( lucky7i )
@@ -1233,9 +1476,264 @@ ROM_START( lucky7i )
 ROM_END
 
 
-/*************************
-*      Driver Init       *
-*************************/
+/*
+  Unknown 'W'
+  Poker Game.
+  Version: 1.2 200/93
+
+  PCB layout:
+
+  +---------------------------------------------------------------------------------------+
+  |                                                                                       |
+  |        +--------+                   +----------+          +---------+  +--+           |
+  |        |74LS14N |                   |KM44C256CP|          |SAA1099P |  |  |           |
+  | +--+   +--------+                   +----------+          +---------+  |E |           +---+
+  | |GA|                                +----------+                       |  |             --|
+  | |L |       +----+                   |KM44C256CP|                       |  |             --|
+  | |16|       | A  |                   +----------+                       +--+             --|
+  | |V8|       +----+                   +----------+                                        --|
+  | |B |                                |KM44C256CP|       +--------------+                 --|
+  | |  |                                +----------+       | KDA0476CN-66 |                 --|
+  | +--+                                +----------+       | KOREA    219 |                 --|
+  |   +------+                          |KM44C256CP|       |              |                 --|
+  |   |DS1207|                          +----------+       +--------------+               +---+
+  |   +------+                                                                            |
+  |                                                                                       |
+  |           +--+                    +-------------+        +---------+                  |
+  | +--+ +--+ |  |   +------+         |SCC 66470 CAB|        |PIC16C58 |                  |
+  | |  | |  | |  |   |LH5164|         |206880       |        +---------+                  +---+  
+  | |B | |C | |D |   |D-10L |         |DfD9210I3 Y  |                                       --|
+  | |  | |  | |  |   |      |         |             |                                       --|
+  | |  | |  | |  |   |      |         | PHILIPS 1988|                                       --|
+  | +--+ +--+ |  |   |      |         |             |                     +--+              --|
+  |           +--+   |      |         |             |        +----------+ |  | +--+         --|
+  |                  |      |         |             |        |PC74HC245P| |  | |  |         --|
+  |                  |      |         +-------------+        +----------+ |F | |G |         --|
+  |                  |      |                                             |  | |  |         --|
+  |                  +------+                                             |  | |  |         --|
+  |               +------+ +------+                          +----------+ +--+ +--+         --|
+  |               |      | |      |                          |PC74HC245P| +--+              --|
+  |     +----+    |      | |  W   |    +-------------+       +----------+ |  | +--+         --|
+  |     | H  |    |      | |      |    |SCC 68070 CCA|                    |  | |  |         --|
+  |     +----+    |      | |      |    |           84|                    |F | |G |         --|
+  |               |      | |      |    |268340       |       +----------+ |  | |  |         --|
+  |     +--+ +--+ |EMPTY | |M     |    |DfD9349V3 Y  |       |PC74HC245P| |  | |  |         --|
+  |+--+ |PA| |PA| |  SLOT| |2     |    |             |       +----------+ +--+ +--+         --|
+  ||D | |L | |L | |      | |7     |    | PHILIPS 1988|                    +--------+        --|
+  ||I | |  | |  | |      | |C     |    |             |                    | PC849  |        --|
+  ||P | |16| |16| |      | |4     |    |             |       +----------+ +--------+        --|
+  ||  | |L8| |L8| |      | |0     |    +-------------+       |PC74HC245P|                   --|
+  ||2 | |  | |  | |      | |0     |                          +----------+                   --|
+  |+--+ +--+ +--+ |      | |2     |                                                       +---+
+  |               +------+ +------+                                       +---------+     |
+  |                                                                       |  DIP 1  |     |
+  |                                                                       +---------+     |
+  +---------------------------------------------------------------------------------------+
+
+  A: TL7705ACP
+  B: CD4040BE
+  C: HEF40098BP
+  D: PC74HC273P
+  E: LT1081CN
+  F: PC74HC273P
+  G: ULN2803A
+  H: DS1210
+
+
+  DIP 1:
+  +-------------------------------+
+  |O N                            |
+  |+-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+|
+  || | | | |#| |#| |#| |#| |#| |#||
+  |+-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+|
+  ||#| |#| | | | | | | | | | | | ||
+  |+-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+|
+  | 1   2   3   4   5   6   7   8 |
+  +-------------------------------+
+
+  DIP 2:
+  +-------------------------------+
+  |O N                            |
+  |+-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+|
+  ||#| |#| |#| |#| |#| | | |#| | ||
+  |+-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+|
+  || | | | | | | | | | |#| | | |#||
+  |+-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+|
+  | 1   2   3   4   5   6   7   8 |
+  +-------------------------------+
+
+*/
+ROM_START( unkpkr_w )
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
+	ROM_LOAD16_WORD_SWAP( "w.bin", 0x00000, 0x80000, CRC(28300427) SHA1(83ea014a818246f476d769ad06cb2eba1ce699e8) )
+ROM_END
+
+/*
+  Dallas Poker
+
+  PCB layout:
+  +------------------------------------------------------------------------------+
+  |                                                           +-------------+    |
+  | +---------+    XTAL1                                      |    +------+S|    |
+  | |  EMPTY  |                                               |    |AHF   |u|    |
+  | +---------+       +-------------+                         |    |Automa|b|    +---+
+  | +---------+       |SCC 66470 CAB|                         |    |tentec|b|      --|
+  | |P21014-07|       |466006       |       +---------+       |    |hnik  |o|      --|
+  | +---------+       |IfD9205I3 Y  |       |SAA1099P |       | X  |      |a|      --|
+  | +---------+       |             |       +---------+       | T  |8430 L|r|      --|
+  | |  EMPTY  |       | PHILIPS 1988|                         | A  |eibnit|d|      --|
+  | +---------+       |             |                         | L  |z     | |      --|
+  | +---------+       |             |                         | 3  |      | |      --|
+  | |P21014-07|       |             |       +---------------+ +--+ |Tel. 0| |      --|
+  | +---------+       +-------------+       |  ADV476KN35E  |    | |3452/3| |    +---+
+  | +---------+                             |   03-24 0S    |    | |249   | |    |
+  | |  EMPTY  |                             |   0F19802.3   |    | +------+ |    |
+  | +---------+                             +---------------+    +----------+    |
+  | +---------+         XTAL2                                                    |
+  | |P21014-07|       +-------------+                                            |
+  | +---------+       |SCC 68070 CBA|      +----+                                |
+  | +---------+       |           84|      | F  |                                +---+
+  | |  EMPTY  |       |             |      +----+                                  --|
+  | +---------+       |   203590    |                                              --|
+  | +---------+       | DfD9218V3 Y |                       +---------+            --|
+  | |P21014-07|       |             |                       |ULN 2803A|            --|
+  | +---------+       | PHILIPS 1988|                       +---------+            --|
+  |                   |             |      +----+                                  --|
+  |+--+ +--+ +--+     +-------------+      | F  |             +----+               --|
+  ||  | |A | |B |                          +----+             | G  |               --|
+  ||C | +--+ +--+                                             +----+               --|
+  ||  |                                                                            --|
+  |+--++--+                                                                        --|
+  |    |  |  +--+                          +----+                                  --|
+  |    |D |  |  |                          | F  |           +---------+            --|
+  |    |  |  |E |                          +----+           |ULN 2803A|            --|
+  |    |  |  |  | +--------------------+                    +---------+            --|
+  |    +--+  |  | |DALLAS POKER CZ/V1 P|                                           --|
+  |          +--+ |VNR:19-09-93        |                      +----+               --|
+  |               |SUM:8F8A/w   D27C210|                      | G  |               --|
+  |    +--+  +--+ +--------------------+   +----+             +----+               --|
+  |    |PA|  |PA|                          | F  |                                  --|
+  |    |L |  |L | +--------------------+   +----+            +--------+            --|
+  |    |16|  |16| |DALLAS POKER CZ/V1 B|                     | PC849  |            --|
+  |    |L8|  |L8| |VNR:19-09-93        |                     +--------+          +---+
+  |    |AC|  |AC| |SUM:EB91/w   D27C210|                     +---------+         |
+  |    |  |  |  | +--------------------+                     |  DIP 1  |         |
+  |    +--+  +--+                                            +---------+         |
+  +------------------------------------------------------------------------------+
+
+  XTAL1: 30.0000
+  XTAL2: 19.6608
+  XTAL3: 16.000
+
+  A: TL7705ACP
+  B: DS1210
+  C: DS1207
+  D: HEF40098BP / 759690T / Hnn9210P3
+  E: SN74LS14N
+  F: HC245A
+  G: PC74HC273T
+
+  Under the "DALLAS POKER CZ/V1 B" chip is a PC74HC273T chip soldered on the PCB.
+  Under the "DALLAS POKER CZ/V1 P" chip is a MB8464A-10L chip soldered on the PCB.
+
+  Subboard: Looks like an 40PIN MCU or PIC...only four wires connect the subboard 
+  with the mainboard. (GND & VCC and PIN21 and PIN22 from the 40pin-MCU/PIC)
+
+
+  DIP 1:
+  +-------------------------------+
+  |O N                            |
+  |+-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+|
+  || | |O| | | | | |O| |O| |O| |O||
+  |+-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+|
+  ||O| | | |O| |O| | | | | | | | ||
+  |+-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+|
+  | 1   2   3   4   5   6   7   8 |
+  +-------------------------------+
+
+*/
+ROM_START( dallaspk )
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
+	ROM_LOAD16_WORD_SWAP( "cz-v1-p.bin", 0x00000, 0x20000, CRC(ad575e3f) SHA1(4e22957c42610fec0a96bd85f4b766422b020d88) )
+	ROM_LOAD16_WORD_SWAP( "cz-v1-b.bin", 0x20000, 0x20000, CRC(2595d346) SHA1(34f09931d82b5376e4f3922222645c796dad0440) )
+ROM_END
+
+
+/*
+  Kajot Card
+  Version 1.01, Wien Euro.
+
+  Amatic.
+
+  PCB layout:
+   ___________________________________________________________________________________________________________________________ 
+  |                      ___    ___    ___    ___                                                                             |
+  |    ___              |   |  |   |  |   |  |   |                                                                            |
+  |   | B |             | A |  | A |  | A |  | A |    ______________________________________                                  |____ 
+  |   |___|    _____    |   |  |   |  |   |  |   |   |                                      |                                   ___|
+  |           |  _  |   |___|  |___|  |___|  |___|   |               YAMAHA                 |                                   ___|
+  |  _______  |BATTE|                                |               YM2149F                |                                   ___|
+  | |LTC695C| |RY   |    ___    ___    ___    ___    |                                  IC17|                                   ___|
+  | |_______| |  +  |   | E |  | E |  | E |  | E |   |______________________________________|                                   ___|
+  |           |_____|   | M |  | M |  | M |  | M |                                                                              ___|
+  |                     | P |  | P |  | P |  | P |           ___________________________           ______________      _____    ___|
+  |   ____    ____      | T |  | T |  | T |  | T |          |                           |         |   ULN2803A   |    | O O |   ___|
+  |  |HY62|  |HY62|     | Y |  | Y |  | Y |  | Y |          |       KDA0476CN_50        |         |______________|    | O O |  ____| 
+  |  |64AL|  |64AL|     |___|  |___|  |___|  |___|          |       KOREA   332B    IC20|        ________________     | O O | |
+  |  |J_10|  |J_10|                                         |___________________________|       |    74HC273N    |    | O O | |
+  |  |    |  |    |                                                                             |________________|    | O O | |
+  |  |____|  |____|                                        ___________           ____________    ________________     | O O | |
+  |                                                       | 74HC04AP  |         |EMPTY SOCKET|  |    74HC245N    |    | O O | |
+  |  _______   _______                                    |___________|         |____________|  |________________|    | O O | |
+  | |       | |       |   XTAL1                                                                                       |_____| |____ 
+  | |       | |       |    _________________                 XTAL3                                 ______________        CON3   ___|
+  | | EMPTY | | EMPTY |   |    IMPERA 8     |        _____    _____________     _____________     | EMPTY SOCKET |              ___|
+  | | SOCKET| | SOCKET|   |     209751      |       |24C02|  | EMPTY SOCKET|   | EMPTY SOCKET|    |______________|              ___|
+  | |       | |       |   |   DfD9227I3 Y   |       |_____|  |_____________|   |_____________|   ________________               ___|
+  | |       | |       |   |                 |          IC26             IC29                    |    74HC273N    |              ___|
+  | |       | |       |   |                 |                                                   |________________|              ___|
+  | |       | |       |   |                 |                                                                                   ___|
+  | |       | |       |   |                 |                                                    ________________               ___|
+  | |  IC22A| |  IC21A|   |_________________|         __________________                        |    74HC245N    |              ___|
+  | |_______| |_______|                  IC19        |                  |                       |________________|              ___|
+  |  _______   _______                               |                  |                                                       ___|
+  | |       | |       |                              |       ESI 1      |                                                       ___|
+  | |  02   | |  01   |   XTAL2                      |       I9407      |                        ________________               ___|
+  | |       | |       |    _________________         |                  |                       |    74HC245N    |              ___|
+  | |       | |       |   |                 |        |                  |                       |________________|              ___|
+  | |27C4002| |27C4002|   |                 |        |              IC25|                                                       ___|
+  | |       | |       |   |                 |        |__________________|                                                       ___|
+  | |       | |       |   |                 |                                                                                   ___|
+  | |       | |       |   | SCC 68070 CCA84 |                                                                                   ___|
+  | |       | |       |   |     288571      |                                                                                   ___|
+  | |       | |       |   |   DfD9414V3 Y   |                                                                                   ___|
+  | |       | |       |   |_________________|                                                                                   ___|
+  | |   IC22| |   IC21|                  IC1               ______________    _________                                         ____| 
+  | |_______| |_______|                                   |  RTC 72421A  |  |  EMPTY  |                                       |
+  | IMPERA BOARD REV V2.1                                 |______________|  |_________|                                       |
+  |___________________________________________________________________________________________________________________________|
+
+  XTAL1 = 30.000
+  XTAL2 = 19.6608
+  XTAL3 = 3686.400
+
+  A = KM44C256CJ-7
+  B = TL7705ACP
+
+*/
+ROM_START( kajotcrd )
+	ROM_REGION( 0x100000, "maincpu", 0 )  // 68070 Code & GFX
+	ROM_LOAD16_WORD_SWAP( "01.ic21", 0x00000, 0x80000, CRC(674aa36e) SHA1(483eb09950ff7c43a7147378f2e68d113c856905) )
+	ROM_LOAD16_WORD_SWAP( "02.ic22", 0x80000, 0x80000, CRC(ae52803e) SHA1(27f917b0f8b302bdab930e304b4977a4b8192cd5) )
+
+	ROM_REGION( 0x0100, "sereeprom", 0 )  // Serial EPROM
+	ROM_LOAD("x24c02.ic26",    0x0000, 0x0100, CRC(0f143d6f) SHA1(c293728a997cd0868705dced55955072c6ebf5c0) )
+ROM_END
+
+
+/*********************************************
+*                Driver Init                 *
+*********************************************/
 
 void magicard_state::init_magicard()
 {
@@ -1243,24 +1741,29 @@ void magicard_state::init_magicard()
 }
 
 
-/*************************
-*      Game Drivers      *
-*************************/
+/*********************************************
+*                Game Drivers                *
+*********************************************/
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT    COMPANY   FULLNAME                                     FLAGS
-
-GAME( 199?, magicard,  0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card (set 1)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 199?, magicarda, magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card (set 2)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 199?, magicardb, magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card (set 3)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1994, magicarde, magicard, hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card Export 94",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1994, magicardf, magicard, hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Export (V.211A)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1998, magicardj, 0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card III Jackpot (4.01)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1993, magicardw, magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Card - Wien (Sicherheitsversion 1.2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2001, magicle,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Magic Lotto Export (5.03)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2002, hotslots,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Hot Slots (6.00)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1999, quingo,    0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Quingo Export (5.00)",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1999, belslots,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Bel Slots Export (5.01)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2001, bigdeal0,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Big Deal Belgien (5.04)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 199?, puzzleme,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera", "Puzzle Me!",                                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 199?, unkte06,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "unknown Poker 'TE06'",                             MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // strings in ROM
-GAME( 199?, lucky7i,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera", "Lucky 7 (Impera)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME        PARENT    MACHINE   INPUT     STATE           INIT           ROT    COMPANY      FULLNAME                                     FLAGS
+GAME( 199?, magicard,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card (set 1)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, magicarda,  magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card (set 2)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, magicardb,  magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card (set 3)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1994, magicarde,  magicard, hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card Export 94 (v2.11a, set 1)",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1994, magicardea, magicard, hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card Export 94 (v2.11a, set 2)",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1994, magicardeb, magicard, hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card Export 94 (v2.9a)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1998, magicardec, magicard, hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card Export (v4.01)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1994, magicardf,  magicard, hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Export (V.211A)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1998, magicardj,  0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card III Jackpot (4.01)",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1993, magicardw,  magicard, magicard, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Card - Wien (Sicherheitsversion 1.2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2001, magicle,    0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Magic Lotto Export (5.03)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2002, hotslots,   0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Hot Slots (6.00)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, quingo,     0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Quingo Export (5.00)",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, belslots,   0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Bel Slots Export (5.01)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2001, bigdeal0,   0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Big Deal Belgien (5.04)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, puzzleme,   0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Puzzle Me!",                                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, unkte06,    0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera",    "unknown Poker 'TE06'",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // strings in ROM
+GAME( 199?, lucky7i,    0,        magicard, magicard, magicard_state, init_magicard, ROT0, "Impera",    "Lucky 7 (Impera)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1993, unkpkr_w,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "<unknown>", "unknown Poker 'W'",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1993, dallaspk,   0,        magicard, magicard, magicard_state, init_magicard, ROT0, "<unknown>", "Dallas Poker",                               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1993, kajotcrd,   0,        hotslots, magicard, magicard_state, init_magicard, ROT0, "Amatic",    "Kajot Card (Version 1.01, Wien Euro)",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

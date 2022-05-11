@@ -17,12 +17,6 @@ public:
 	nes_agci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void write_h(offs_t offset, uint8_t data) override;
-
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
 
@@ -37,10 +31,6 @@ public:
 	virtual void write_l(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
 
@@ -64,7 +54,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint8_t m_latch = 0;
+	uint8_t m_latch;
 	uint8_t m_ram[0xb00];
 };
 
@@ -148,10 +138,6 @@ public:
 	virtual void write_l(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
 
@@ -174,7 +160,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint8_t m_latch = 0;
+	uint8_t m_latch;
 };
 
 
@@ -198,7 +184,7 @@ protected:
 
 private:
 	void update_banks();
-	u8 m_latch = 0;
+	u8 m_latch;
 	u8 m_reg[6];
 
 	u16 m_irq_count, m_irq_count_latch;
@@ -224,7 +210,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint16_t m_latch = 0;
+	uint16_t m_latch;
 };
 
 
@@ -247,7 +233,7 @@ protected:
 
 private:
 	u8 m_jumper;
-	u16 m_latch = 0;
+	u16 m_latch;
 	u8 m_reg;
 };
 
@@ -272,7 +258,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint8_t m_latch = 0;
+	uint8_t m_latch;
 };
 #endif
 

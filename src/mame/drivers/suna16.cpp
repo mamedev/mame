@@ -314,6 +314,13 @@ MACHINE_START_MEMBER(suna16_state, bssoccer)
 	m_bank2->configure_entries(0, 8, memregion("pcm2")->base() + 0x1000, 0x10000);
 }
 
+MACHINE_START_MEMBER(suna16_state, sunaq)
+{
+	m_leds.resolve();
+
+	m_bank1->configure_entries(0, 8, memregion("pcm1")->base() + 0x1000, 0x10000);
+}
+
 /* Bank Switching */
 
 void suna16_state::bssoccer_pcm_1_bankswitch_w(uint8_t data)
@@ -942,8 +949,7 @@ void suna16_state::sunaq(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	MCFG_MACHINE_START_OVERRIDE(suna16_state,uballoon)
-	MCFG_MACHINE_RESET_OVERRIDE(suna16_state,uballoon)
+	MCFG_MACHINE_START_OVERRIDE(suna16_state, sunaq)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

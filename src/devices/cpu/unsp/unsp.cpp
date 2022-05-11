@@ -20,8 +20,6 @@
 #include "unsp.h"
 #include "unspfe.h"
 
-#include "debugger.h"
-
 #include "unspdasm.h"
 
 #include <climits>

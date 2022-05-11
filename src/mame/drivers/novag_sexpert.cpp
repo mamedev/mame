@@ -542,6 +542,13 @@ ROM_START( sexpertc1 ) // from model 902, ID = E3.0
 	ROM_LOAD("se_c22_h0.u2", 0x10000, 0x8000, CRC(2d085064) SHA1(76162322aa7d23a5c07e8356d0bbbb33816419af) )
 ROM_END
 
+ROM_START( sexpertc2 ) // ID = E1.2
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD("se_l_corfix.u3", 0x0000, 0x8000, CRC(d0f65341) SHA1(e8ebbfdbcf8ad613cc68acdb0db011eed855cb9f) ) // NEC D27C256AD-12
+	ROM_LOAD("se_h_corfix.u1", 0x8000, 0x8000, CRC(59dc112b) SHA1(e1031648da8fc9479d1134d3fd205af254610c1d) ) // Toshiba TC57256AD-12
+	ROM_LOAD("sef_h0_corfix.u2", 0x10000, 0x8000, CRC(c6a1419a) SHA1(017a0ffa9aa59438c879624a7ddea2071d1524b8) ) // Toshiba TC57256AD-15
+ROM_END
+
 
 ROM_START( sfortea )
 	ROM_REGION( 0x18000, "maincpu", 0 )
@@ -600,6 +607,7 @@ CONS( 1987, sexperta2, sexperta, 0, sexpert,  sexpert,  sexpert_state, init_sexp
 CONS( 1988, sexpertb,  sexperta, 0, sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag", "Super Expert (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 887
 CONS( 1990, sexpertc,  sexperta, 0, sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag", "Super Expert (version C, v3.6)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1990, sexpertc1, sexperta, 0, sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag", "Super Expert (version C, v3.0)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 902
+CONS( 1990, sexpertc2, sexperta, 0, sexpertb, sexpertb, sexpert_state, init_sexpert, "Novag", "Super Expert (version C, v1.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1987, sfortea,   0,        0, sforte,   sexpert,  sforte_state,  init_sexpert, "Novag", "Super Forte (version A, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, sfortea1,  sfortea,  0, sforte,   sexpert,  sforte_state,  init_sexpert, "Novag", "Super Forte (version A, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
