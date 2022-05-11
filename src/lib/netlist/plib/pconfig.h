@@ -115,15 +115,16 @@
 //
 //============================================================
 
-
 #if (NVCCBUILD > 0)
-	#if NVCCBUILD == 101
+	#if NVCCBUILD >= 101
 		#define NVCC_CONSTEXPR constexpr
 	#else
 		#define NVCC_CONSTEXPR constexpr
 	#endif
+	#if NVCCBUILD < 113
 	#if __cplusplus != 201402L
 		#error nvcc - use c++14 to compile
+	#endif
 	#endif
 #else
 	#define NVCC_CONSTEXPR constexpr

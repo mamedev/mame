@@ -140,13 +140,13 @@ namespace netlist::solver
 			// and thus belong into a different calculation. This applies to all solvers.
 
 			const std::size_t iN = size();
-			const auto reltol(static_cast<float_type>(m_params.m_reltol));
-			const auto vntol(static_cast<float_type>(m_params.m_vntol));
+			const float_type reltol(static_cast<float_type>(m_params.m_reltol));
+			const float_type vntol(static_cast<float_type>(m_params.m_vntol));
 			for (std::size_t i = 0; i < iN; i++)
 			{
-				const auto vold(static_cast<float_type>(this->m_terms[i].getV()));
-				const auto vnew(m_new_V[i]);
-				const auto tol(vntol + reltol * std::max(plib::abs(vnew),plib::abs(vold)));
+				const float_type vold(static_cast<float_type>(this->m_terms[i].getV()));
+				const float_type vnew(m_new_V[i]);
+				const float_type tol(vntol + reltol * std::max(plib::abs(vnew),plib::abs(vold)));
 				if (plib::abs(vnew - vold) > tol)
 					return true;
 			}
@@ -263,7 +263,7 @@ namespace netlist::solver
 				for (std::size_t i = 0; i < railstart; i++)
 					*tcr_r[i]       += static_cast<FT>(go[i]);
 
-				auto RHS_t(std::accumulate(Idr, Idr + term_count, plib::constants<source_type>::zero()));
+				auto RHS_t = std::accumulate(Idr, Idr + term_count, plib::constants<source_type>::zero());
 
 				for (std::size_t i = railstart; i < term_count; i++)
 					RHS_t +=  (- go[i]) * *cnV[i];
