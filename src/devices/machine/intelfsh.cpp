@@ -258,6 +258,7 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 	case FLASH_SST_39SF040:
 		m_bits = 8;
 		m_size = 0x80000;
+		m_addrmask = 0x7fff;
 		m_maker_id = MFG_SST;
 		m_device_id = 0xb7;
 		m_sector_is_4k = true;
