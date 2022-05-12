@@ -18,6 +18,7 @@
 #include "bus/rc2014/cf.h"
 #include "bus/rc2014/rtc.h"
 #include "bus/rc2014/sound.h"
+#include "bus/rc2014/ide.h"
 
 void rc2014_bus_modules(device_slot_interface &device)
 {
@@ -35,6 +36,8 @@ void rc2014_bus_modules(device_slot_interface &device)
 	device.option_add("rom_ram", RC2014_ROM_RAM_512);
 	device.option_add("ds1302_rtc", RC2014_DS1302_RTC);
 	device.option_add("ym_ay_sound", RC2014_YM_AY_SOUND);
+	device.option_add("82c55_ide", RC2014_82C55_IDE);
+	device.option_add("ide_hdd", RC2014_IDE_HDD);
 }
 
 void rc2014_ext_bus_modules(device_slot_interface &device)

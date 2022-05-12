@@ -11,7 +11,6 @@
 #include "sound/ay8910.h"
 #include "speaker.h"
 
-
 namespace {
 
 //**************************************************************************
@@ -31,9 +30,6 @@ protected:
     virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
     virtual ioport_constructor device_input_ports() const override;
-
-	uint8_t rtc_r(offs_t offset);
-	void rtc_w(offs_t offset, uint8_t data);
 private:
 	required_device<ay8910_device> m_ay8910;
     required_ioport_array<6> m_jp;
