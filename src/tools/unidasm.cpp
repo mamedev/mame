@@ -362,7 +362,6 @@ struct options
 	uint8_t                 lower;
 	uint8_t                 upper;
 	uint8_t                 flipped;
-	int                     mode;
 	const dasm_table_entry *dasm;
 	uint32_t                skip;
 	uint32_t                count;
@@ -1109,7 +1108,6 @@ static int parse_options(int argc, char *argv[], options *opts)
 {
 	bool pending_base = false;
 	bool pending_arch = false;
-	bool pending_mode = false;
 	bool pending_skip = false;
 	bool pending_count = false;
 
@@ -1121,7 +1119,7 @@ static int parse_options(int argc, char *argv[], options *opts)
 
 		// is it a switch?
 		if(curarg[0] == '-' && curarg[1] != '\0') {
-			if(pending_base || pending_arch || pending_mode || pending_skip || pending_count)
+			if(pending_base || pending_arch || pending_skip || pending_count)
 				goto usage;
 
 			if(tolower((uint8_t)curarg[1]) == 'a')
@@ -1132,8 +1130,6 @@ static int parse_options(int argc, char *argv[], options *opts)
 				opts->flipped = true;
 			else if(tolower((uint8_t)curarg[1]) == 'l')
 				opts->lower = true;
-			else if(tolower((uint8_t)curarg[1]) == 'm')
-				pending_mode = true;
 			else if(tolower((uint8_t)curarg[1]) == 's')
 				pending_skip = true;
 			else if(tolower((uint8_t)curarg[1]) == 'c')
@@ -1152,8 +1148,14 @@ static int parse_options(int argc, char *argv[], options *opts)
 		} else if(pending_base) {
 		// base PC
 			int result;
-			if(curarg[0] == '0' && curarg[1] == 'x')
-				result = sscanf(&curarg[2], "%x", &opts->basepc);
+			if(curarg[0] == '0') {
+				if(tolower((uint8_t)curarg[1]) == 'x')
+					result = sscanf(&curarg[2], "%x", &opts->basepc);
+				else if(tolower((uint8_t)curarg[1]) == 'o')
+					result = sscanf(&curarg[2], "%o", &opts->basepc);
+				else
+					result = sscanf(&curarg[1], "%o", &opts->basepc);
+			}
 			else if(curarg[0] == '$')
 				result = sscanf(&curarg[1], "%x", &opts->basepc);
 			else
@@ -1161,12 +1163,6 @@ static int parse_options(int argc, char *argv[], options *opts)
 			if(result != 1)
 				goto usage;
 			pending_base = false;
-
-		} else if(pending_mode) {
-			// mode
-			if(sscanf(curarg, "%d", &opts->mode) != 1)
-				goto usage;
-			pending_mode = false;
 
 		} else if(pending_arch) {
 			// architecture
@@ -1182,8 +1178,16 @@ static int parse_options(int argc, char *argv[], options *opts)
 		} else if(pending_skip) {
 			// skip bytes
 			int result;
-			if(curarg[0] == '0' && curarg[1] == 'x')
-				result = sscanf(&curarg[2], "%x", &opts->skip);
+			if(curarg[0] == '0') {
+				if(tolower((uint8_t)curarg[1]) == 'x')
+					result = sscanf(&curarg[2], "%x", &opts->skip);
+				else if(tolower((uint8_t)curarg[1]) == 'o')
+					result = sscanf(&curarg[2], "%o", &opts->skip);
+				else
+					result = sscanf(&curarg[1], "%o", &opts->skip);
+			}
+			else if(curarg[0] == '$')
+				result = sscanf(&curarg[1], "%x", &opts->skip);
 			else
 				result = sscanf(curarg, "%d", &opts->skip);
 			if(result != 1)
@@ -1207,7 +1211,7 @@ static int parse_options(int argc, char *argv[], options *opts)
 	}
 
 	// if we have a dangling option, error
-	if(pending_base || pending_arch || pending_mode || pending_skip || pending_count)
+	if(pending_base || pending_arch || pending_skip || pending_count)
 		goto usage;
 
 	// if no file or no architecture, fail
@@ -1218,7 +1222,7 @@ static int parse_options(int argc, char *argv[], options *opts)
 
 usage:
 	printf("Usage: %s <filename> -arch <architecture> [-basepc <pc>] \n", argv[0]);
-	printf("   [-mode <n>] [-norawbytes] [-xchbytes] [-flipped] [-upper] [-lower]\n");
+	printf("   [-norawbytes] [-xchbytes] [-flipped] [-upper] [-lower]\n");
 	printf("   [-skip <n>] [-count <n>] [-octal]\n");
 	printf("\n");
 	printf("Supported architectures:");
