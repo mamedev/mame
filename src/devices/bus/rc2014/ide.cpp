@@ -17,7 +17,6 @@ namespace {
 //  rc2014_ide_base
 //**************************************************************************
 
-
 class rc2014_ide_base : public device_t, public device_rc2014_card_interface
 {
 protected:
