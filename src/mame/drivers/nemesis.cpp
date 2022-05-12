@@ -1762,7 +1762,7 @@ void nemesis_state::machine_reset()
 void nemesis_state::set_screen_raw_params(machine_config &config)
 {
 	// 60.606060 Hz for 256x224
-	m_screen->set_raw(XTAL(18432000.0)/4,288,0,256,264,2*8,30*8);
+	m_screen->set_raw(XTAL(18432000.0)/3,384,0,256,264,2*8,30*8);
 }
 
 void nemesis_state::nemesis(machine_config &config)
