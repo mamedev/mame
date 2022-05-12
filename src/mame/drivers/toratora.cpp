@@ -394,21 +394,21 @@ void toratora_state::machine_reset()
 void toratora_state::toratora(machine_config &config)
 {
 	/* basic machine hardware */
-	M6800(config, m_maincpu, 5185000 / 8); /* 5.185 MHz XTAL divided by 8 (@ U94.12) */
+	M6800(config, m_maincpu, 5.185_MHz_XTAL / 8); /* 5.185 MHz XTAL divided by 8 (@ U94.12) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &toratora_state::main_map);
 	m_maincpu->set_periodic_int(FUNC(toratora_state::toratora_timer), attotime::from_hz(250)); /* timer counting at 250 Hz */
 
-	PIA6821(config, m_pia_u1, 0);
+	PIA6821(config, m_pia_u1);
 	m_pia_u1->writepb_handler().set(FUNC(toratora_state::port_b_u1_w));
 	m_pia_u1->irqa_handler().set(FUNC(toratora_state::main_cpu_irq));
 	m_pia_u1->irqb_handler().set(FUNC(toratora_state::main_cpu_irq));
 
-	PIA6821(config, m_pia_u3, 0);
+	PIA6821(config, m_pia_u3);
 	m_pia_u3->writepa_handler().set(FUNC(toratora_state::sn1_port_a_u3_w));
 	m_pia_u3->writepb_handler().set(FUNC(toratora_state::sn1_port_b_u3_w));
 	m_pia_u3->ca2_handler().set(FUNC(toratora_state::sn1_ca2_u3_w));
 
-	PIA6821(config, m_pia_u2, 0);
+	PIA6821(config, m_pia_u2);
 	m_pia_u2->readpb_handler().set_ioport("DSW");
 	m_pia_u2->writepa_handler().set(FUNC(toratora_state::sn2_port_a_u2_w));
 	m_pia_u2->writepb_handler().set(FUNC(toratora_state::sn2_port_b_u2_w));
@@ -417,10 +417,7 @@ void toratora_state::toratora(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_size(256, 256);
-	screen.set_visarea(0,256-1,8,248-1);
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_raw(5.185_MHz_XTAL, 320, 0, 256, 287, 8, 248);
 	screen.set_screen_update(FUNC(toratora_state::screen_update_toratora));
 
 	/* audio hardware */
