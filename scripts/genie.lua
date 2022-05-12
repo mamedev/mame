@@ -1100,7 +1100,6 @@ end
 				buildoptions {
 					"-Wno-maybe-uninitialized",
 					"-Wno-uninitialized",   -- netlist
-					"-Wno-address",     -- mips3.cpp
 				}
 			end
 		end
