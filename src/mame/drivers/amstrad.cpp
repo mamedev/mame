@@ -764,25 +764,6 @@ static INPUT_PORTS_START( aleste )
 INPUT_PORTS_END
 
 
-#if 0
-
-static const gfx_layout asic_sprite_layout =
-{
-	16,16,
-	16,
-	4,
-	{ 4,5,6,7 },
-	{ 0,8,16,24,32,40,48,56,64,72,80,88,96,104,112,120 },
-	{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128, 8*128, 9*128, 10*128, 11*128, 12*128, 13*128, 14*128, 15*128 },
-	16*16*8
-};
-
-static GFXDECODE_START( asic_sprite )
-	GFXDECODE_ENTRY( "user1", 0, asic_sprite_layout, 32, 1 )
-GFXDECODE_END
-#endif
-
-
 
 /*************************************
  *
