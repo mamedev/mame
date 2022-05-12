@@ -29,7 +29,6 @@
 #include "machine/input_merger.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
-#include "machine/bankdev.h"
 #include "machine/6522via.h"
 #include "machine/6840ptm.h"
 #include "sound/mm5837.h"
@@ -95,7 +94,6 @@ public:
 	void bankswitch_w(uint8_t data);
 
 	void beezer(machine_config &config);
-	void banked_map(address_map &map);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 protected:
@@ -112,7 +110,7 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<address_map_bank_device> m_sysbank;
+	memory_view m_sysbank;
 	required_memory_region m_banked_roms;
 	required_memory_bank m_rombank[7];
 	required_device<via6522_device> m_via_system;
@@ -148,25 +146,21 @@ private:
 void beezer_state::main_map(address_map &map)
 {
 	map(0x0000, 0xbfff).ram().share("videoram");
-	map(0xc000, 0xcfff).m(m_sysbank, FUNC(address_map_bank_device::amap8));
+	map(0xc000, 0xcfff).view(m_sysbank);
+	m_sysbank[0](0xc600, 0xc600).mirror(0x1ff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	m_sysbank[0](0xc800, 0xc80f).mirror(0x1f0).w(FUNC(beezer_state::palette_w));
+	m_sysbank[0](0xca00, 0xca00).mirror(0x1ff).r(FUNC(beezer_state::line_r));
+	m_sysbank[0](0xce00, 0xce0f).mirror(0x1f0).m("via_u6", FUNC(via6522_device::map));
+	m_sysbank[1](0xc000, 0xcfff).bankr("rombank_f1");
+	m_sysbank[2](0xc000, 0xcfff).bankr("rombank_f3");
+	m_sysbank[3](0xc000, 0xcfff).bankr("rombank_e1");
+	m_sysbank[4](0xc000, 0xcfff).bankr("rombank_e3");
+	m_sysbank[5](0xc000, 0xcfff).bankr("rombank_e5");
+	m_sysbank[6](0xc000, 0xcfff).bankr("rombank_f5");
+	m_sysbank[7](0xc000, 0xcfff).bankr("rombank_f7");
 	map(0xd000, 0xdfff).rom().region("maincpu", 0x0000).w(FUNC(beezer_state::bankswitch_w)); // g1
 	map(0xe000, 0xefff).rom().region("maincpu", 0x1000); // g3
 	map(0xf000, 0xffff).rom().region("maincpu", 0x2000); // g5
-}
-
-void beezer_state::banked_map(address_map &map)
-{
-	map(0x0600, 0x0600).mirror(0x1ff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x0800, 0x080f).mirror(0x1f0).w(FUNC(beezer_state::palette_w));
-	map(0x0a00, 0x0a00).mirror(0x1ff).r(FUNC(beezer_state::line_r));
-	map(0x0e00, 0x0e0f).mirror(0x1f0).m("via_u6", FUNC(via6522_device::map));
-	map(0x1000, 0x1fff).bankr("rombank_f1");
-	map(0x2000, 0x2fff).bankr("rombank_f3");
-	map(0x3000, 0x3fff).bankr("rombank_e1");
-	map(0x4000, 0x4fff).bankr("rombank_e3");
-	map(0x5000, 0x5fff).bankr("rombank_e5");
-	map(0x6000, 0x6fff).bankr("rombank_f5");
-	map(0x7000, 0x7fff).bankr("rombank_f7");
 }
 
 void beezer_state::sound_map(address_map &map)
@@ -451,7 +445,7 @@ void beezer_state::bankswitch_w(uint8_t data)
 	m_y = BIT(data, 4);
 	m_z = BIT(data, 5);
 
-	m_sysbank->set_bank(data & 0x07);
+	m_sysbank.select(data & 0x07);
 
 	for (int i = 0; i < 7; i++)
 		m_rombank[i]->set_entry(m_x);
@@ -498,17 +492,10 @@ void beezer_state::machine_reset()
 void beezer_state::beezer(machine_config &config)
 {
 	// basic machine hardware
-	MC6809(config, m_maincpu, XTAL(12'000'000) / 3);
+	MC6809(config, m_maincpu, 12_MHz_XTAL / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &beezer_state::main_map);
 
-	ADDRESS_MAP_BANK(config, m_sysbank, 0);
-	m_sysbank->set_addrmap(AS_PROGRAM, &beezer_state::banked_map);
-	m_sysbank->set_endianness(ENDIANNESS_BIG);
-	m_sysbank->set_data_width(8);
-	m_sysbank->set_addr_width(15);
-	m_sysbank->set_stride(0x1000);
-
-	MOS6522(config, m_via_system, XTAL(12'000'000) / 12);
+	MOS6522(config, m_via_system, 12_MHz_XTAL / 12);
 	m_via_system->readpa_handler().set(FUNC(beezer_state::via_system_pa_r));
 	m_via_system->readpb_handler().set(FUNC(beezer_state::via_system_pb_r));
 	m_via_system->writepa_handler().set(FUNC(beezer_state::via_system_pa_w));
@@ -521,23 +508,20 @@ void beezer_state::beezer(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(384, 256);
-	m_screen->set_visarea(16, 304-1, 0, 240-1); // 288 x 240, correct?
+	m_screen->set_raw(12_MHz_XTAL / 2, 384, 16, 304, 260, 0, 240); // 288 x 240, correct?
 	m_screen->set_screen_update(FUNC(beezer_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(beezer_state::palette_init), 16);
 
 	// sound hardware
-	MC6809(config, m_audiocpu, XTAL(4'000'000));
+	MC6809(config, m_audiocpu, 4_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &beezer_state::sound_map);
 
 	input_merger_device &audio_irqs(INPUT_MERGER_ANY_HIGH(config, "audio_irqs"));
 	audio_irqs.output_handler().set_inputline(m_audiocpu, M6809_IRQ_LINE);
 
-	MOS6522(config, m_via_audio, XTAL(4'000'000) / 4);
+	MOS6522(config, m_via_audio, 4_MHz_XTAL / 4);
 	m_via_audio->readpa_handler().set(FUNC(beezer_state::via_audio_pa_r));
 	m_via_audio->writepa_handler().set(FUNC(beezer_state::via_audio_pa_w));
 	m_via_audio->writepb_handler().set(FUNC(beezer_state::via_audio_pb_w));
@@ -546,7 +530,7 @@ void beezer_state::beezer(machine_config &config)
 	m_via_audio->cb2_handler().set(FUNC(beezer_state::dmod_data_w));
 	m_via_audio->irq_handler().set("audio_irqs", FUNC(input_merger_device::in_w<0>));
 
-	PTM6840(config, m_ptm, XTAL(4'000'000) / 4);
+	PTM6840(config, m_ptm, 4_MHz_XTAL / 4);
 	m_ptm->o1_callback().set(FUNC(beezer_state::ptm_o1_w));
 	m_ptm->o2_callback().set(FUNC(beezer_state::ptm_o2_w));
 	m_ptm->o3_callback().set(FUNC(beezer_state::ptm_o3_w));
