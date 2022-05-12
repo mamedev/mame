@@ -745,7 +745,7 @@ void powervr2_device::tex_get_info(texinfo *t)
 	t->cd = dilatechose[t->sizes];
 	t->palbase = 0;
 	t->vqbase = t->address;
-	t->blend = use_alpha ? blend_functions[t->blend_mode] : bl10;
+	t->blend = ignoretexalpha ? bl10 : blend_functions[t->blend_mode];
 
 	t->coltype = coltype;
 	t->tsinstruction = tsinstruction;
@@ -1817,7 +1817,7 @@ void powervr2_device::process_ta_fifo()
 		volume=(objcontrol >> 6) & 1;
 		coltype=(objcontrol >> 4) & 3;
 		texture=(objcontrol >> 3) & 1;
-		offset_color_enable=(objcontrol >> 2) & 1;
+		offset_color_enable=texture ? (objcontrol >> 2) & 1 : 0;
 		gouraud=(objcontrol >> 1) & 1;
 		uv16bit=(objcontrol >> 0) & 1;
 	}
@@ -1992,6 +1992,13 @@ void powervr2_device::process_ta_fifo()
 				paletteselector=(tafifo_buff[3] >> 21) & 0x3F;
 
 				LOGTATILE(" Texture at %08x format %d\n", (tafifo_buff[3] & 0x1FFFFF) << 3, pixelformat);
+			}
+			if (use_alpha == 0)
+			{
+				// Alpha value in base/offset color is to be treated as 1.0/0xFF.
+				poly_base_color[0] = 1.0;
+				if (offset_color_enable)
+					poly_offs_color[0] = 1.0;
 			}
 			if (paratype == 4)
 			{
