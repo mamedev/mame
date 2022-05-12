@@ -7,6 +7,8 @@
 If you have any questions about how this driver works, don't hesitate to
 ask.  - Mike Balfour (mab22@po.cwru.edu)
 
+- Video timings were measured using a logic analyzer by atrac17 on an original PCB.
+  The results were reviewed by Jose Tejada (jotego)
 
 TS 2004.12.26.:
 - Buccaneers - incomplete dump, different sound hw (YM2203x2)
@@ -626,7 +628,7 @@ void vigilant_state::vigilant(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	// Screen timings measured by atrac17 and reviewed by Jose Tejada (JOTEGO)
+	// Measured on PCB:
 	screen.set_raw( VIDEO_CLOCK/3 /* pixel clock*/, 384 /* total H */, 128, 384, 256+28 /* total V */, 0, 256 );
 	screen.set_screen_update(FUNC(vigilant_state::screen_update_vigilant));
 	screen.set_palette(m_palette);
