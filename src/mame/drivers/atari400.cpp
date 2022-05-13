@@ -325,7 +325,7 @@ private:
 
 	//required_device<cpu_device> m_maincpu;    // maincpu is already contained in atari_common_state
 	required_device<ram_device> m_ram;
-	required_device<pia6821_device> m_pia;
+	optional_device<pia6821_device> m_pia;
 	optional_device<dac_bit_interface> m_dac;
 	required_memory_region m_region_maincpu;
 	optional_device<a800_cart_slot_device> m_cart;
@@ -2130,19 +2130,6 @@ void a400_state::atari_common_nodac(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(a400_state::a400_palette), std::size(atari_colors) / 3);
 
-	PIA6821(config, m_pia, 0);
-	m_pia->readpa_handler().set_ioport("djoy_0_1");
-	m_pia->readpb_handler().set_ioport("djoy_2_3");
-	m_pia->ca2_handler().set("sio", FUNC(a8sio_device::motor_w));
-	m_pia->cb2_handler().set("fdc", FUNC(atari_fdc_device::pia_cb2_w));
-	m_pia->cb2_handler().append("sio", FUNC(a8sio_device::command_w));
-
-	a8sio_device &sio(A8SIO(config, "sio", nullptr));
-	//sio.clock_in().set("pokey", FUNC(pokey_device::bclk_w));
-	sio.data_in().set("pokey", FUNC(pokey_device::sid_w));
-	sio.proceed().set(m_pia, FUNC(pia6821_device::ca1_w));
-	sio.interrupt().set(m_pia, FUNC(pia6821_device::cb1_w));
-
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	POKEY(config, m_pokey, pokey_device::FREQ_17_EXACT);
@@ -2180,6 +2167,19 @@ void a400_state::atari_common(machine_config &config)
 	m_antic->set_gtia_tag(m_gtia);
 
 	/* devices */
+	PIA6821(config, m_pia, 0);
+	m_pia->readpa_handler().set_ioport("djoy_0_1");
+	m_pia->readpb_handler().set_ioport("djoy_2_3");
+	m_pia->ca2_handler().set("sio", FUNC(a8sio_device::motor_w));
+	m_pia->cb2_handler().set("fdc", FUNC(atari_fdc_device::pia_cb2_w));
+	m_pia->cb2_handler().append("sio", FUNC(a8sio_device::command_w));
+
+	a8sio_device &sio(A8SIO(config, "sio", nullptr));
+	//sio.clock_in().set("pokey", FUNC(pokey_device::bclk_w));
+	sio.data_in().set("pokey", FUNC(pokey_device::sid_w));
+	sio.proceed().set(m_pia, FUNC(pia6821_device::ca1_w));
+	sio.interrupt().set(m_pia, FUNC(pia6821_device::cb1_w));
+
 	ATARI_FDC(config, "fdc", 0);
 
 	A800_CART_SLOT(config, "cartleft", a800_left, nullptr);
@@ -2369,12 +2369,6 @@ void a400_state::a5200(machine_config &config)
 
 	ATARI_ANTIC(config, m_antic, 0);
 	m_antic->set_gtia_tag(m_gtia);
-
-	// PIA chip is not present
-	m_pia->readpa_handler().set_constant(0);
-	m_pia->readpb_handler().set_constant(0);
-	m_pia->cb2_handler().set_nop();
-	config.device_remove("sio");
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a5200 )
 
