@@ -266,8 +266,6 @@ void specpls3_state::port_7ffd_w(offs_t offset, uint8_t data)
 	/* paging disabled? */
 	if (m_port_7ffd_data & 0x20) return;
 
-	if ((m_port_7ffd_data ^ data) & 0x08) m_screen->update_now();
-
 	/* store new state */
 	m_port_7ffd_data = data;
 
@@ -342,6 +340,8 @@ void specpls3_state::machine_start()
 {
 	spectrum_128_state::machine_start();
 
+	save_item(NAME(m_port_1ffd_data));
+
 	// reconfigure ROMs
 	memory_region *rom = memregion("maincpu");
 	m_bank_rom[0]->configure_entries(0, 4, rom->base() + 0x10000, 0x4000);
@@ -352,6 +352,7 @@ void specpls3_state::machine_start()
 void specpls3_state::machine_reset()
 {
 	/* Initial configuration */
+	m_port_fe_data = -1;
 	m_port_7ffd_data = 0;
 	m_port_1ffd_data = 0;
 	plus3_update_memory();

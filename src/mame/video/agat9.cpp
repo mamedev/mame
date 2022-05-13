@@ -135,7 +135,7 @@ void agat9video_device::device_start()
 
 void agat9video_device::device_reset()
 {
-	// XXX to be confirmed
+	// TODO to be confirmed
 	m_video_mode = TEXT_LORES;
 	m_start_address = 0x7800;
 	m_mode = palette_index = 0;
@@ -152,7 +152,7 @@ uint8_t agat9video_device::read(offs_t offset)
 {
 	if(!machine().side_effects_disabled())
 		do_io(offset);
-	// XXX only 'Moscow' revision
+	// FIXME only 'Moscow' revision
 	return m_mode;
 }
 

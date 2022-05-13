@@ -24,9 +24,13 @@
 ***************************************************************************/
 void spectrum_state::video_start()
 {
+	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
+
 	m_frame_invert_count = 16;
 	m_screen_location = m_video_ram;
 	m_contention_pattern = {6, 5, 4, 3, 2, 1, 0, 0};
+	m_contention_offset = -1;
+	m_border4t_render_at = 2;
 }
 
 /***************************************************************************
@@ -116,14 +120,17 @@ u32 spectrum_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &
 
 void spectrum_state::spectrum_update_border(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &border)
 {
-	u8 mod = m_contention_pattern.empty() ? 1 : m_contention_pattern.size();
+	u8 mod = m_contention_pattern.empty() ? 1 : 8;
+	u8 at = m_contention_pattern.empty() ? 0 : m_border4t_render_at;
 	for (auto y = border.top(); y <= border.bottom(); y++)
 	{
 		u16 *pix = &(bitmap.pix(y, border.left()));
 		for (auto x = border.left(); x <= border.right(); )
 		{
-			if (x % mod == 0)
+			if (x % mod == at)
 			{
+				pix -= at;
+				x -= at;
 				for (auto m = 0; m < mod; m++, x++)
 					*pix++ = get_border_color(y, x);
 			}
@@ -136,6 +143,14 @@ void spectrum_state::spectrum_update_border(screen_device &screen, bitmap_ind16 
 	}
 }
 
+/* ULA reads screen data in 16px (8T) chunks as following:
+ T: |   0   |   1   |   2   |   3   |   4   |   5   |   6   |   7   |
+px: | 0 | 1 | 2 | 3 |*4*| 5 | 6 | 7 |*0*| 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+    | << !right <<  | char1 | attr1 | char2 | attr2 |   >> right >> |
+
+TODO Curren implementation only tracks char switch position. In order to track both (char and attr) we need to share
+     some state between screen->update() events.
+*/
 void spectrum_state::spectrum_update_screen(screen_device &screen_d, bitmap_ind16 &bitmap, const rectangle &screen)
 {
 	u8 *attrs_location = m_screen_location + 0x1800;
@@ -144,17 +159,26 @@ void spectrum_state::spectrum_update_screen(screen_device &screen_d, bitmap_ind1
 	{
 		u16 hpos = screen.left();
 		u16 x = hpos - get_screen_area().left();
-		if (x % 8)
+		bool chunk_right = x & 8;
+		if (x % 8 <= (chunk_right ? 0 : 4))
+		{
+			u8 shift = x % 8;
+			x -= shift;
+			hpos -= shift;
+		}
+		else
 		{
 			u8 shift = 8 - (x % 8);
 			x += shift;
 			hpos += shift;
+			chunk_right = !chunk_right;
 		}
 		u16 y = vpos - get_screen_area().top();
 		u8 *scr = &m_screen_location[((y & 7) << 8) | ((y & 0x38) << 2) | ((y & 0xc0) << 5) | (x >> 3)];
 		u8 *attr = &attrs_location[((y & 0xf8) << 2) | (x >> 3)];
 		u16 *pix = &(bitmap.pix(vpos, hpos));
-		while (hpos <= screen.right())
+
+		while ((hpos + (chunk_right ? 0 : 4)) <= screen.right())
 		{
 			u16 ink = ((*attr >> 3) & 0x08) | (*attr & 0x07);
 			u16 pap = (*attr >> 3) & 0x0f;
@@ -164,6 +188,7 @@ void spectrum_state::spectrum_update_screen(screen_device &screen_d, bitmap_ind1
 				*pix++ = (pix8 & b) ? ink : pap;
 			scr++;
 			attr++;
+			chunk_right = !chunk_right;
 		}
 	}
 }
@@ -182,7 +207,7 @@ void spectrum_state::content_early(s8 shift)
 	if (m_contention_pattern.empty() || vpos < get_screen_area().top() || vpos > get_screen_area().bottom())
 		return;
 
-	u64 now = m_maincpu->attotime_to_clocks(m_screen->frame_period() - time_until_int()) + shift;
+	u64 now = m_maincpu->total_cycles() - m_int_at + shift;
 	u64 cf = vpos * m_screen->width() * m_maincpu->clock() / m_screen->clock() + m_contention_offset;
 	u64 ct = cf + get_screen_area().width() * m_maincpu->clock() / m_screen->clock();
 
@@ -200,7 +225,7 @@ void spectrum_state::content_late()
 	if (m_contention_pattern.empty() || vpos < get_screen_area().top() || vpos > get_screen_area().bottom())
 		return;
 
-	u64 now = m_maincpu->attotime_to_clocks(m_screen->frame_period() - time_until_int()) + 1;
+	u64 now = m_maincpu->total_cycles() - m_int_at + 1;
 	u64 cf = vpos * m_screen->width() * m_maincpu->clock() / m_screen->clock() + m_contention_offset;
 	u64 ct = cf + get_screen_area().width() * m_maincpu->clock() / m_screen->clock();
 	for(auto i = 0x04; i; i >>= 1)

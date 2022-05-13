@@ -115,8 +115,13 @@ protected:
 
 	int m_ROMSelection = 0; // FIXME: this is used for various things in derived classes, but not by this base class, and should be removed
 	std::vector<u8> m_contention_pattern;
+	/* Pixel offset in 8px chunk (4T) when current chunk is rendered. */
+	u8 m_border4t_render_at = 0;
 	/* Defines offset in CPU cycles from screen left side. Early model (48/128/+2) typically use -1, later (+2A/+3) +1 */
 	s8 m_contention_offset = -1;
+	u64 m_int_at;
+
+	emu_timer *m_irq_off_timer;
 
 	uint8_t m_ram_disabled_by_beta;
 	uint8_t pre_opcode_fetch_r(offs_t offset);
@@ -140,7 +145,6 @@ protected:
 	void spectrum_palette(palette_device &palette) const;
 	virtual u32 screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(spec_interrupt);
-	virtual attotime time_until_int();
 
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);

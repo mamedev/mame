@@ -167,9 +167,9 @@ resulting mess can be seen in the F4 viewer display.
 
 void spectrum_128_state::video_start()
 {
-	m_frame_invert_count = 16;
+	spectrum_state::video_start();
 	m_screen_location = m_ram->pointer() + (5 << 14);
-	m_contention_pattern = {6, 5, 4, 3, 2, 1, 0, 0};
+	m_border4t_render_at = 6;
 }
 
 uint8_t spectrum_128_state::spectrum_128_pre_opcode_fetch_r(offs_t offset)
@@ -229,8 +229,6 @@ void spectrum_128_state::spectrum_128_port_7ffd_w(offs_t offset, uint8_t data)
 
 	/* disable paging? */
 	if (m_port_7ffd_data & 0x20) return;
-
-	if ((m_port_7ffd_data ^ data) & 0x08) m_screen->update_now();
 
 	/* store new state */
 	m_port_7ffd_data = data;
@@ -293,6 +291,10 @@ void spectrum_128_state::spectrum_128_fetch(address_map &map)
 
 void spectrum_128_state::machine_start()
 {
+	spectrum_state::machine_start();
+
+	save_item(NAME(m_port_7ffd_data));
+
 	/* rom 0 is 128K rom, rom 1 is 48 BASIC */
 	memory_region *rom = memregion("maincpu");
 	m_bank_rom[0]->configure_entries(0, 2, rom->base() + 0x10000, 0x4000);
@@ -313,22 +315,19 @@ void spectrum_128_state::machine_reset()
 
 	/* set initial ram config */
 	m_port_7ffd_data = 0;
-	m_port_1ffd_data = -1;
 	spectrum_128_update_memory();
 }
 
 bool spectrum_128_state::is_vram_write(offs_t offset) {
-	// TODO respect banks 2,5 mapped to 0xc000
-	return (BIT(m_port_7ffd_data, 3))
-		? offset >= 0x8000 && offset < 0x9b00
+	return (BIT(m_port_7ffd_data, 3) && m_bank_ram[3]->entry() == 7)
+		? offset >= 0xc000 && offset < 0xdb00
 		: spectrum_state::is_vram_write(offset);
 }
 
 bool spectrum_128_state::is_contended(offs_t offset) {
-	// Memory banks 1,3,5 and 7 are contended
 	u8 bank = m_bank_ram[3]->entry();
 	return spectrum_state::is_contended(offset)
-		|| ((offset >= 0xc000 && offset <= 0xffff) && (bank && 1));
+		|| ((offset >= 0xc000 && offset <= 0xffff) && (bank && 1)); // Memory banks 1,3,5 and 7 are contended
 }
 
 static const gfx_layout spectrum_charlayout =
