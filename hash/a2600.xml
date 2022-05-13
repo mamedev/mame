@@ -1429,7 +1429,7 @@ X-1414 : Streetracer
 	<software name="btcprty">
 		<description>Bachelor Party</description>
 		<year>1982</year>
-		<publisher>Mystique</publisher>
+		<publisher>American Multiple Industries</publisher>
 		<info name="serial" value="1002" />
 		<info name="programmer" value="Joel H. Martin" />
 		<sharedfeat name="compatibility" value="NTSC" />
@@ -1775,7 +1775,7 @@ X-1414 : Streetracer
 	<software name="beatem">
 		<description>Beat'Em and Eat'Em (Mystique)</description>
 		<year>1982</year>
-		<publisher>Mystique</publisher>
+		<publisher>American Multiple Industries</publisher>
 		<info name="serial" value="1003" />
 		<info name="programmer" value="Joel H. Martin" />
 		<part name="cart" interface="a2600_cart">
@@ -1802,7 +1802,7 @@ X-1414 : Streetracer
 	<software name="beateme" cloneof="beatem">
 		<description>Beat'Em and Eat'Em (PAL) (Mystique)</description>
 		<year>1982</year>
-		<publisher>Mystique</publisher>
+		<publisher>American Multiple Industries</publisher>
 		<info name="programmer" value="Joel H. Martin" />
 		<part name="cart" interface="a2600_cart">
 			<feature name="peripheral" value="paddles" />
@@ -2873,7 +2873,7 @@ X-1414 : Streetracer
 	<software name="burndesie" cloneof="burndesi">
 		<description>Burning Desire (PAL)</description>
 		<year>1982</year>
-		<publisher>American Multiple Industries</publisher>
+		<publisher>PlayAround</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="burning desire (1982) (mystique - american multiple industries) (1003) (pal).bin" size="4096" crc="f2593d9b" sha1="fcf8eeac23e146d20f93812ab5a9872045f95b52"/>
@@ -4394,7 +4394,7 @@ X-1414 : Streetracer
 	<software name="custer">
 		<description>Custer's Revenge</description>
 		<year>1982</year>
-		<publisher>Mystique</publisher>
+		<publisher>American Multiple Industries</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="custer's revenge (1982) (mystique - american multiple industries, joel h. martin) (1001).bin" size="4096" crc="21283941" sha1="4b3d02b59e17520b4d60236568d5cb50a4e6aeb3"/>
@@ -4405,7 +4405,7 @@ X-1414 : Streetracer
 	<software name="custere" cloneof="custer">
 		<description>Custer's Revenge (PAL)</description>
 		<year>1982</year>
-		<publisher>Mystique</publisher>
+		<publisher>American Multiple Industries</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="custer's revenge (1982) (mystique - american multiple industries, joel h. martin) (pal).bin" size="4096" crc="931c45c2" sha1="30a076f1db53f85799f0ad9cfce96724c39887f7"/>
@@ -6765,7 +6765,7 @@ X-1414 : Streetracer
 		</part>
 	</software>
 
-	<software name="generalr">
+	<software name="generalr" cloneof="custer">
 		<description>General Re-Treat (PAL)</description>
 		<year>1982</year>
 		<publisher>PlayAround</publisher>
@@ -17595,7 +17595,7 @@ X-1414 : Streetracer
 		</part>
 	</software>
 
-	<software name="westward">
+	<software name="westward" cloneof="custer">
 		<description>Westward Ho (PAL)</description>
 		<year>1982</year>
 		<publisher>PlayAround</publisher>
