@@ -608,10 +608,10 @@ void gollygho_state::dpram_word_w(offs_t offset, uint16_t data, uint16_t mem_mas
 				4 = porch
 				5 = backlight
 
-				Bubble Trouble
+				Bubble Trouble:
 				0 = shell
-				1 = ship
-				2 = trapdoor
+				1 = trapdoor
+				2 = ship
 				3 = chest
 				4 = unused?
 				5 = backlight
