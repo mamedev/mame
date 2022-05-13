@@ -14,8 +14,6 @@
 
   TODO:
   - proper MCU emulation (mame/machine/slapfght.cpp)
-  - alcon cocktail/flipscreen, it doesn't write to the flipscreen reg
-
 
 ****************************************************************************
 
@@ -1021,7 +1019,6 @@ void slapfght_state::slapfigh(machine_config &config)
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set(FUNC(slapfght_state::sound_reset_w));
-	mainlatch.q_out_cb<1>().set(FUNC(slapfght_state::flipscreen_w));
 	mainlatch.q_out_cb<3>().set(FUNC(slapfght_state::irq_enable_w));
 	mainlatch.q_out_cb<4>().set_membank("bank1");
 
@@ -1030,6 +1027,7 @@ void slapfght_state::slapfigh(machine_config &config)
 	m_audiocpu->set_periodic_int(FUNC(slapfght_state::sound_nmi), attotime::from_hz(180));
 
 	TAITO68705_MCU(config, m_bmcu, 36_MHz_XTAL/12); // 3MHz
+	m_bmcu->aux_out_cb<5>().set(FUNC(slapfght_state::flipscreen_w));
 	m_bmcu->aux_strobe_cb().set(FUNC(slapfght_state::scroll_from_mcu_w));
 
 	config.set_perfect_quantum(m_maincpu);
@@ -1057,6 +1055,15 @@ void slapfght_state::slapfigh(machine_config &config)
 	ay2.port_a_read_callback().set_ioport("DSW1");
 	ay2.port_b_read_callback().set_ioport("DSW2");
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+void slapfght_state::slapfigha(machine_config &config)
+{
+	slapfigh(config);
+
+	subdevice<ls259_device>("mainlatch")->q_out_cb<1>().set(FUNC(slapfght_state::flipscreen_w));
+
+	m_bmcu->aux_out_cb<5>().set_nop();
 }
 
 void slapfght_state::slapfighb1(machine_config &config)
@@ -2083,9 +2090,9 @@ GAME( 1985, tigerhb2,   tigerh,   tigerhb2,   tigerh,    slapfght_state, empty_i
 GAME( 1985, tigerhb3,   tigerh,   tigerhb2,   tigerh,    slapfght_state, empty_init,     ROT270, "bootleg",                         "Tiger-Heli (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, tigerhb4,   tigerh,   tigerhb4,   tigerh,    slapfght_state, empty_init,     ROT270, "bootleg",                         "Tiger-Heli (bootleg set 4)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // MCU not hooked up
 
-GAME( 1986, alcon,      0,        slapfigh,   slapfigh,  slapfght_state, init_slapfigh,  ROT270, "Toaplan / Taito America Corp.",   "Alcon (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1986, slapfigh,   alcon,    slapfigh,   slapfigh,  slapfght_state, init_slapfigh,  ROT270, "Toaplan / Taito",                 "Slap Fight (A77 set, 8606M PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1986, slapfigha,  alcon,    slapfigh,   slapfigh,  slapfght_state, init_slapfigh,  ROT270, "Toaplan / Taito",                 "Slap Fight (A76 set, GX-006-A PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1986, alcon,      0,        slapfigh,   slapfigh,  slapfght_state, init_slapfigh,  ROT270, "Toaplan / Taito America Corp.",   "Alcon (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, slapfigh,   alcon,    slapfigh,   slapfigh,  slapfght_state, init_slapfigh,  ROT270, "Toaplan / Taito",                 "Slap Fight (A77 set, 8606M PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, slapfigha,  alcon,    slapfigha,  slapfigh,  slapfght_state, init_slapfigh,  ROT270, "Toaplan / Taito",                 "Slap Fight (A76 set, GX-006-A PCB)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, slapfighb1, alcon,    slapfighb1, slapfigh,  slapfght_state, init_slapfigh,  ROT270, "bootleg",                         "Slap Fight (bootleg set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1986, slapfighb2, alcon,    slapfighb2, slapfigh,  slapfght_state, init_slapfigh,  ROT270, "bootleg",                         "Slap Fight (bootleg set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // England?
 GAME( 1986, slapfighb3, alcon,    slapfighb2, slapfigh,  slapfght_state, init_slapfigh,  ROT270, "bootleg",                         "Slap Fight (bootleg set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // PCB labeled 'slap fighter'
