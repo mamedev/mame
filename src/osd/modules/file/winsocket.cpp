@@ -25,10 +25,12 @@
 #include <cstdlib>
 #include <cctype>
 
+#define DEBUG_SOCKET (0)
 
 namespace {
 
 char const *const winfile_socket_identifier  = "socket.";
+char const *const winfile_udp_identifier = "udp.";
 
 
 class win_osd_socket : public osd_file
@@ -39,9 +41,11 @@ public:
 	win_osd_socket& operator=(win_osd_socket const &) = delete;
 	win_osd_socket& operator=(win_osd_socket &&) = delete;
 
-	win_osd_socket(SOCKET s, bool l) noexcept
+	win_osd_socket(SOCKET s, bool l, uint32_t dest = 0, uint32_t dport = 0) noexcept
 		: m_socket(s)
 		, m_listening(l)
+		, m_dest(dest)
+		, m_dport(dport)
 	{
 		assert(INVALID_SOCKET != m_socket);
 	}
@@ -109,11 +113,24 @@ public:
 
 	virtual std::error_condition write(void const *buffer, std::uint64_t offset, std::uint32_t length, std::uint32_t &actual) noexcept override
 	{
-		auto const result = send(m_socket, reinterpret_cast<const char *>(buffer), length, 0);
-		if (result < 0)
-			return wsa_error_to_file_error(WSAGetLastError());
-
-		actual = result;
+		if (!m_dest) {
+			auto const result = send(m_socket, reinterpret_cast<const char*>(buffer), length, 0);
+			if (result < 0)
+				return wsa_error_to_file_error(WSAGetLastError());
+			actual = result;
+		}
+		else
+		{
+			sockaddr_in dest;
+			dest.sin_family = AF_INET;
+			dest.sin_addr.s_addr = m_dest;
+			dest.sin_port = htons(m_dport);
+			//printf("Sending to %d bytes %s port %d\n", length, inet_ntoa(dest.sin_addr), m_dport);
+			auto const result = sendto(m_socket, reinterpret_cast<const char*>(buffer), length, 0, reinterpret_cast <sockaddr*> (&dest), sizeof(dest));
+			if (result < 0)
+				return wsa_error_to_file_error(WSAGetLastError());
+			actual = result;
+		}
 		return std::error_condition();
 	}
 
@@ -177,6 +194,8 @@ public:
 private:
 	SOCKET  m_socket;
 	bool    m_listening;
+	uint32_t m_dest;
+	uint32_t m_dport;
 };
 
 } // anonymous namespace
@@ -222,8 +241,11 @@ bool win_check_socket_path(std::string const &path) noexcept
 }
 
 
-std::error_condition win_open_socket(std::string const &path, std::uint32_t openflags, osd_file::ptr &file, std::uint64_t &filesize) noexcept
+std::error_condition win_open_tcp_socket(std::string const &path, std::uint32_t openflags, osd_file::ptr &file, std::uint64_t &filesize) noexcept
 {
+	if (DEBUG_SOCKET)
+		printf("Trying to open tcp socket %s\n", path.c_str());
+
 	char hostname[256];
 	int port;
 	std::sscanf(&path[strlen(winfile_socket_identifier)], "%255[^:]:%d", hostname, &port);
@@ -254,10 +276,13 @@ std::error_condition win_open_socket(std::string const &path, std::uint32_t open
 	osd_file::ptr result;
 	if (openflags & OPEN_FLAG_CREATE)
 	{
-		//printf("Listening for client at '%s' on port '%d'\n", hostname, port);
+		if (DEBUG_SOCKET)
+			printf("Listening for client at '%s' on port '%d'\n", hostname, port);
 		// bind socket...
 		if (bind(sock, reinterpret_cast<struct sockaddr const *>(&sai), sizeof(sai)) == SOCKET_ERROR)
 		{
+			if (DEBUG_SOCKET)
+				printf("bind error\n");
 			int const err = WSAGetLastError();
 			closesocket(sock);
 			return win_osd_socket::wsa_error_to_file_error(err);
@@ -266,6 +291,8 @@ std::error_condition win_open_socket(std::string const &path, std::uint32_t open
 		// start to listen...
 		if (listen(sock, 1) == SOCKET_ERROR)
 		{
+			if (DEBUG_SOCKET)
+				printf("listen error\n");
 			int const err = WSAGetLastError();
 			closesocket(sock);
 			return win_osd_socket::wsa_error_to_file_error(err);
@@ -276,9 +303,12 @@ std::error_condition win_open_socket(std::string const &path, std::uint32_t open
 	}
 	else
 	{
-		//printf("Connecting to server '%s' on port '%d'\n", hostname, port);
+		if (DEBUG_SOCKET)
+			printf("Connecting to server '%s' on port '%d'\n", hostname, port);
 		if (connect(sock, reinterpret_cast<struct sockaddr const *>(&sai), sizeof(sai)) == SOCKET_ERROR)
 		{
+			if (DEBUG_SOCKET)
+				printf("connect error\n");
 			int const err = WSAGetLastError();
 			closesocket(sock);
 			return win_osd_socket::wsa_error_to_file_error(err);
@@ -290,6 +320,117 @@ std::error_condition win_open_socket(std::string const &path, std::uint32_t open
 	{
 		closesocket(sock);
 		return std::errc::not_enough_memory;
+	}
+	file = std::move(result);
+	filesize = 0;
+	return std::error_condition();
+}
+
+bool win_check_udp_path(std::string const &path) noexcept
+{
+	if (strncmp(path.c_str(), winfile_udp_identifier, strlen(winfile_udp_identifier)) == 0 &&
+		strchr(path.c_str(), ':') != nullptr) return true;
+	return false;
+}
+
+
+std::error_condition win_open_udp_socket(std::string const &path, std::uint32_t openflags, osd_file::ptr &file, std::uint64_t &filesize) noexcept
+{
+	if (DEBUG_SOCKET)
+		printf("Trying to open udp socket %s\n", path.c_str());
+	char hostname[256];
+	int port;
+	std::sscanf(&path[strlen(winfile_udp_identifier)], "%255[^:]:%d", hostname, &port);
+	//std::sscanf(path.c_str(), "%255[^:]:%d", hostname, &port);
+
+	struct hostent const* const localhost = gethostbyname(hostname);
+	if (!localhost)
+		return std::errc::no_such_file_or_directory;
+	struct sockaddr_in sai;
+	memset(&sai, 0, sizeof(sai));
+	sai.sin_family = AF_INET;
+	sai.sin_port = htons(port);
+	sai.sin_addr = *reinterpret_cast<struct in_addr*>(localhost->h_addr);
+	SOCKET sock = socket(AF_INET, SOCK_DGRAM, 0);
+	if (INVALID_SOCKET == sock)
+		return win_osd_socket::wsa_error_to_file_error(WSAGetLastError());
+
+	int const flag = 1;
+	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<const char*>(&flag), sizeof(flag)) == SOCKET_ERROR)
+	{
+		if (DEBUG_SOCKET)
+			printf("SO_REUSEADDR error\n");
+		int const err = WSAGetLastError();
+		closesocket(sock);
+		return win_osd_socket::wsa_error_to_file_error(err);
+	}
+
+	// local socket support
+	osd_file::ptr result;
+	if (openflags & OPEN_FLAG_CREATE)
+	{
+		sai.sin_addr.s_addr = htonl(INADDR_ANY);
+		if (DEBUG_SOCKET)
+			printf("Listening on '%s' on port '%d'\n", hostname, port);
+		// bind socket...
+		if (bind(sock, reinterpret_cast<struct sockaddr const*>(&sai), sizeof(struct sockaddr)) == SOCKET_ERROR)
+		{
+			if (DEBUG_SOCKET)
+				printf("bind error\n");
+			int const err = WSAGetLastError();
+			closesocket(sock);
+			return win_osd_socket::wsa_error_to_file_error(err);
+		}
+		// Setup multicast
+		struct ip_mreq mreq;
+		mreq.imr_multiaddr = *reinterpret_cast<struct in_addr*>(localhost->h_addr);
+		mreq.imr_interface.s_addr = htonl(INADDR_ANY);
+		if (mreq.imr_multiaddr.S_un.S_un_b.s_b1 >= 224 && mreq.imr_multiaddr.S_un.S_un_b.s_b1 <= 239)
+		{
+			if (DEBUG_SOCKET)
+				printf("Setting up udp multicast %s\n", hostname);
+			if (setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&mreq, sizeof(mreq)) == SOCKET_ERROR) {
+				if (DEBUG_SOCKET)
+					printf("IP_ADD_MEMBERSHIP error\n");
+				int const err = WSAGetLastError();
+				closesocket(sock);
+				return win_osd_socket::wsa_error_to_file_error(err);
+			}
+		}
+		// Disable loopback on multicast
+		char const loop = 0;
+		if (setsockopt(sock, IPPROTO_IP, IP_MULTICAST_LOOP, &loop, sizeof(loop)))
+		{
+			if (DEBUG_SOCKET)
+				printf("IP_MULTICAST_LOOP error\n");
+			int const err = WSAGetLastError();
+			closesocket(sock);
+			return win_osd_socket::wsa_error_to_file_error(err);
+		}
+		// Set ttl on multicast
+		char const ttl = 15;
+		if (setsockopt(sock, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, sizeof(ttl)))
+		{
+			if (DEBUG_SOCKET)
+				printf("IP_MULTICAST_TTL error\n");
+			int const err = WSAGetLastError();
+			closesocket(sock);
+			return win_osd_socket::wsa_error_to_file_error(err);
+		}
+		result.reset(new (std::nothrow) win_osd_socket(sock, false, (*reinterpret_cast<struct in_addr*>(localhost->h_addr)).s_addr, port));
+		if (!result)
+		{
+			if (DEBUG_SOCKET)
+				printf("connect error\n");
+			int const err = WSAGetLastError();
+			closesocket(sock);
+			return win_osd_socket::wsa_error_to_file_error(err);
+		}
+	}
+	if (!result)
+	{
+		closesocket(sock);
+		return std::errc::permission_denied;
 	}
 	file = std::move(result);
 	filesize = 0;

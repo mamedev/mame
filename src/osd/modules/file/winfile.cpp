@@ -168,9 +168,11 @@ std::error_condition osd_file::open(std::string const &orig_path, uint32_t openf
 	catch (...) { return std::errc::not_enough_memory; }
 
 	if (win_check_socket_path(path))
-		return win_open_socket(path, openflags, file, filesize);
+		return win_open_tcp_socket(path, openflags, file, filesize);
 	else if (win_check_ptty_path(path))
 		return win_open_ptty(path, openflags, file, filesize);
+	else if (win_check_udp_path(path))
+		return win_open_udp_socket(path, openflags, file, filesize);
 
 	// convert path to TCHAR
 	osd::text::tstring t_path;
@@ -283,6 +285,17 @@ std::error_condition osd_file::open(std::string const &orig_path, uint32_t openf
 std::error_condition osd_file::openpty(ptr &file, std::string &name) noexcept
 {
 	return std::errc::not_supported; // TODO: revisit this error code
+}
+
+
+
+//============================================================
+//  osd_open_udp_socket
+//============================================================
+
+std::error_condition open_udp_socket(std::string const &path, std::uint32_t openflags, osd_file::ptr &file, std::uint64_t &filesize) noexcept
+{
+	return win_open_udp_socket(path, openflags, file, filesize);
 }
 
 
