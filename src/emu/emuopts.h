@@ -206,7 +206,6 @@
 class game_driver;
 class device_slot_interface;
 class emu_options;
-template <class DeviceType, class DeviceClass> class device_type_enumerator;
 
 class slot_option
 {
