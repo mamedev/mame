@@ -19,6 +19,7 @@
 #include "bus/rc2014/rtc.h"
 #include "bus/rc2014/sound.h"
 #include "bus/rc2014/ide.h"
+#include "bus/rc2014/fdc.h"
 
 void rc2014_bus_modules(device_slot_interface &device)
 {
@@ -38,6 +39,8 @@ void rc2014_bus_modules(device_slot_interface &device)
 	device.option_add("ym_ay_sound", RC2014_YM_AY_SOUND);
 	device.option_add("82c55_ide", RC2014_82C55_IDE);
 	device.option_add("ide_hdd", RC2014_IDE_HDD);
+	device.option_add("fdc9266", RC2014_FDC9266);
+	device.option_add("wd37c65", RC2014_WD37C65);
 }
 
 void rc2014_ext_bus_modules(device_slot_interface &device)
