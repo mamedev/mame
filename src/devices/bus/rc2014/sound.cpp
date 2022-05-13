@@ -14,7 +14,7 @@
 namespace {
 
 //**************************************************************************
-//  YM2149F/AY-3-8190 Sound card
+//  RC2014 YM2149F/AY-3-8190 Sound card
 //  Module author: Ed Brindley
 //**************************************************************************
 
@@ -121,4 +121,4 @@ ioport_constructor rc2014_ym_ay_device::device_input_ports() const
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_PRIVATE(RC2014_YM_AY_SOUND, device_rc2014_card_interface, rc2014_ym_ay_device, "rc2014_ym_ay", "YM2149F/AY-3-8190 Sound card")
+DEFINE_DEVICE_TYPE_PRIVATE(RC2014_YM_AY_SOUND, device_rc2014_card_interface, rc2014_ym_ay_device, "rc2014_ym_ay", "RC2014 YM2149F/AY-3-8190 Sound card")
