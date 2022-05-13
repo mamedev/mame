@@ -90,13 +90,14 @@ DEFINE_DEVICE_TYPE(R5000, r5000_device, "r5000", "MIPS R5000")
 u32 const r5000_device::s_fcc_masks[8] = { (1U << 23), (1U << 25), (1U << 26), (1U << 27), (1U << 28), (1U << 29), (1U << 30), (1U << 31) };
 u32 const r5000_device::s_fcc_shifts[8] = { 23, 25, 26, 27, 28, 29, 30, 31 };
 
-r4000_base_device::r4000_base_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, u32 prid, u32 fcr, cache_size icache_size, cache_size dcache_size, unsigned m32, unsigned m64, unsigned d32, unsigned d64)
+r4000_base_device::r4000_base_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, u32 prid, u32 fcr, cache_size icache_size, cache_size dcache_size, unsigned m32, unsigned m64, unsigned d32, unsigned d64, bool timer_interrupt_disabled)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config_le("program", ENDIANNESS_LITTLE, 64, 32)
 	, m_program_config_be("program", ENDIANNESS_BIG, 64, 32)
 	, m_hilo_cycles{ m32, m64, d32, d64 }
 	, m_r{}
 	, m_cp0{}
+	, m_timer_interrupt_disabled(timer_interrupt_disabled)
 	, m_f{}
 	, m_fcr0(fcr)
 {
@@ -1437,7 +1438,8 @@ void r4000_base_device::cp0_set(unsigned const reg, u64 const data)
 		break;
 	case CP0_Compare:
 		m_cp0[CP0_Compare] = u32(data);
-		CAUSE &= ~CAUSE_IPEX5;
+		if (!m_timer_interrupt_disabled)
+			CAUSE &= ~CAUSE_IPEX5;
 
 		cp0_update_timer(true);
 		break;
@@ -1577,6 +1579,9 @@ void r4000_base_device::cp0_tlbp()
 
 void r4000_base_device::cp0_update_timer(bool start)
 {
+	if (m_timer_interrupt_disabled)
+		return;
+
 	if (start || m_cp0_timer->enabled())
 	{
 		u32 const count = (total_cycles() - m_cp0_timer_zero) / 2;

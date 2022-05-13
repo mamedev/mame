@@ -57,7 +57,7 @@ protected:
 		CACHE_256K = 6,
 		CACHE_512K = 7,
 	};
-	r4000_base_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, u32 prid, u32 fcr, cache_size icache_size, cache_size dcache_size, unsigned m32, unsigned m64, unsigned d32, unsigned d64);
+	r4000_base_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, u32 prid, u32 fcr, cache_size icache_size, cache_size dcache_size, unsigned m32, unsigned m64, unsigned d32, unsigned d64, bool timer_interrupt_disabled);
 
 	enum cp0_reg : int
 	{
@@ -432,6 +432,7 @@ protected:
 	bool m_hard_reset;
 	bool m_ll_active;
 	bool m_bus_error;
+	bool m_timer_interrupt_disabled;
 	struct tlb_entry
 	{
 		u64 mask;
@@ -468,44 +469,64 @@ class r4000_device : public r4000_base_device
 {
 public:
 	// NOTE: R4000 chips prior to 3.0 have an xtlb bug
-	r4000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: r4000_base_device(mconfig, R4000, tag, owner, clock, 0x0430, 0x0500, CACHE_8K, CACHE_8K, 10, 20, 69, 133)
+	r4000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, bool timer_interrupt_disabled)
+		: r4000_base_device(mconfig, R4000, tag, owner, clock, 0x0430, 0x0500, CACHE_8K, CACHE_8K, 10, 20, 69, 133, timer_interrupt_disabled)
 	{
 		// no secondary cache
 		m_cp0[CP0_Config] |= CONFIG_SC;
+	}
+
+	r4000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: r4000_device(mconfig, tag, owner, clock, false)
+	{
 	}
 };
 
 class r4400_device : public r4000_base_device
 {
 public:
-	r4400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: r4000_base_device(mconfig, R4400, tag, owner, clock, 0x0440, 0x0500, CACHE_16K, CACHE_16K, 10, 20, 69, 133)
+	r4400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, bool timer_interrupt_disabled)
+		: r4000_base_device(mconfig, R4400, tag, owner, clock, 0x0440, 0x0500, CACHE_16K, CACHE_16K, 10, 20, 69, 133, timer_interrupt_disabled)
 	{
 		// no secondary cache
 		m_cp0[CP0_Config] |= CONFIG_SC;
+	}
+
+	r4400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: r4400_device(mconfig, tag, owner, clock, false)
+	{
 	}
 };
 
 class r4600_device : public r4000_base_device
 {
 public:
-	r4600_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: r4000_base_device(mconfig, R4600, tag, owner, clock, 0x2020, 0x2020, CACHE_16K, CACHE_16K, 10, 12, 42, 74)
+	r4600_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, bool timer_interrupt_disabled)
+		: r4000_base_device(mconfig, R4600, tag, owner, clock, 0x2020, 0x2020, CACHE_16K, CACHE_16K, 10, 12, 42, 74, timer_interrupt_disabled)
 	{
 		// no secondary cache
 		m_cp0[CP0_Config] |= CONFIG_SC;
 	}
+
+	r4600_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: r4600_device(mconfig, tag, owner, clock, false)
+		{
+		}
 };
 
 class r5000_device : public r4000_base_device
 {
 public:
-	r5000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: r4000_base_device(mconfig, R5000, tag, owner, clock, 0x2320, 0x2320, CACHE_32K, CACHE_32K, 5, 9, 36, 68)
+	r5000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, bool timer_interrupt_disabled)
+		: r4000_base_device(mconfig, R5000, tag, owner, clock, 0x2320, 0x2320, CACHE_32K, CACHE_32K, 5, 9, 36, 68, timer_interrupt_disabled)
 	{
 		// no secondary cache
 		m_cp0[CP0_Config] |= CONFIG_SC;
+	}
+
+	r5000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: r5000_device(mconfig, tag, owner, clock, false)
+	{
 	}
 
 private:
