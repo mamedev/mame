@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ernesto Corvi, Nicola Salmoria, David Haywood, Vas Crabb
+// copyright-holders:David Haywood, Vas Crabb
 #ifndef MAME_MACHINE_TAITO68705INTERFACE_H
 #define MAME_MACHINE_TAITO68705INTERFACE_H
 
