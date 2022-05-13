@@ -37,7 +37,7 @@ protected:
 	void mem1_w(offs_t offset, uint8_t data) { mem_w(offset, data, 1); }
 	void mem2_w(offs_t offset, uint8_t data) { mem_w(offset, data, 2); }
 	void mem3_w(offs_t offset, uint8_t data) { mem_w(offset, data, 3); }
-	
+
 	uint8_t mem0_r(offs_t offset) { return mem_r(offset, 0); }
 	uint8_t mem1_r(offs_t offset) { return mem_r(offset, 1); }
 	uint8_t mem2_r(offs_t offset) { return mem_r(offset, 2); }

@@ -29,14 +29,14 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-    virtual void device_reset() override;
+	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
-    virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override;
 private:
 	void control_w(offs_t offset, uint8_t data);
 
 	required_ioport m_addr;
-    required_ioport_array<4> m_jp;
+	required_ioport_array<4> m_jp;
 	required_device<upd765a_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 };
@@ -45,7 +45,7 @@ rc2014_fdc9266_device::rc2014_fdc9266_device(const machine_config &mconfig, cons
 	: device_t(mconfig, RC2014_FDC9266, tag, owner, clock)
 	, device_rc2014_card_interface(mconfig, *this)
 	, m_addr(*this, "SV1")
-    , m_jp(*this, "JP%u", 1U)
+	, m_jp(*this, "JP%u", 1U)
 	, m_fdc(*this, "fdc")
 	, m_floppy(*this, "fdc:%u", 0U)
 {
@@ -80,7 +80,7 @@ void rc2014_fdc9266_device::control_w(offs_t, uint8_t data)
 		m_floppy[0]->get_device()->mon_w(!BIT(data,1));
 	if (m_floppy[1]->get_device())
 		m_floppy[1]->get_device()->mon_w(!BIT(data,2));
-		
+
 	m_fdc->set_rate(BIT(data,6) ? 500000 : 250000);
 	m_fdc->reset_w(!BIT(data,7) ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -111,14 +111,14 @@ static INPUT_PORTS_START( rc2014_fdc9266_jumpers )
 	PORT_START("SV1")
 	PORT_CONFNAME( 0x7, 0x2, "Base Address" )
 	PORT_CONFSETTING( 0x0, "0x00" )
-    PORT_CONFSETTING( 0x1, "0x20" )
-    PORT_CONFSETTING( 0x2, "0x40" )
+	PORT_CONFSETTING( 0x1, "0x20" )
+	PORT_CONFSETTING( 0x2, "0x40" )
 	PORT_CONFSETTING( 0x3, "0x60" )
-    PORT_CONFSETTING( 0x4, "0x80" )
-    PORT_CONFSETTING( 0x5, "0xa0" )
-    PORT_CONFSETTING( 0x6, "0xc0" )
-    PORT_CONFSETTING( 0x7, "0xe0" )
-	PORT_START("JP1") 
+	PORT_CONFSETTING( 0x4, "0x80" )
+	PORT_CONFSETTING( 0x5, "0xa0" )
+	PORT_CONFSETTING( 0x6, "0xc0" )
+	PORT_CONFSETTING( 0x7, "0xe0" )
+	PORT_START("JP1")
 	PORT_CONFNAME( 0x1, 0x1, "Two Side" )
 	PORT_CONFSETTING( 0x0, "GND" )
 	PORT_CONFSETTING( 0x1, "None" )
@@ -155,15 +155,15 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-    virtual void device_reset() override;
+	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
-    virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// DACK confirmation is same as pulsing TC
 	uint8_t dack_r() { m_fdc->tc_w(true);  m_fdc->tc_w(false); return 0xff;}
 private:
 	required_ioport m_addr;
-    required_ioport_array<2> m_jp;
+	required_ioport_array<2> m_jp;
 	required_device<wd37c65c_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 };
@@ -172,7 +172,7 @@ rc2014_wd37c65_device::rc2014_wd37c65_device(const machine_config &mconfig, cons
 	: device_t(mconfig, RC2014_WD37C65, tag, owner, clock)
 	, device_rc2014_card_interface(mconfig, *this)
 	, m_addr(*this, "SV1")
-    , m_jp(*this, "JP%u", 1U)
+	, m_jp(*this, "JP%u", 1U)
 	, m_fdc(*this, "fdc")
 	, m_floppy(*this, "fdc:%u", 0U)
 {
@@ -208,14 +208,14 @@ static INPUT_PORTS_START( rc2014_wd37c65_jumpers )
 	PORT_START("SV1")
 	PORT_CONFNAME( 0x7, 0x2, "Base Address" )
 	PORT_CONFSETTING( 0x0, "0x00" )
-    PORT_CONFSETTING( 0x1, "0x20" )
-    PORT_CONFSETTING( 0x2, "0x40" )
+	PORT_CONFSETTING( 0x1, "0x20" )
+	PORT_CONFSETTING( 0x2, "0x40" )
 	PORT_CONFSETTING( 0x3, "0x60" )
-    PORT_CONFSETTING( 0x4, "0x80" )
-    PORT_CONFSETTING( 0x5, "0xa0" )
-    PORT_CONFSETTING( 0x6, "0xc0" )
-    PORT_CONFSETTING( 0x7, "0xe0" )
-	PORT_START("JP1") 
+	PORT_CONFSETTING( 0x4, "0x80" )
+	PORT_CONFSETTING( 0x5, "0xa0" )
+	PORT_CONFSETTING( 0x6, "0xc0" )
+	PORT_CONFSETTING( 0x7, "0xe0" )
+	PORT_START("JP1")
 	PORT_CONFNAME( 0x1, 0x1, "DACK" )
 	PORT_CONFSETTING( 0x0, "Share with DOR" )
 	PORT_CONFSETTING( 0x1, "Use offset 0" )

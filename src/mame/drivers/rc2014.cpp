@@ -79,7 +79,7 @@ public:
 	// Backplane 8 - 8 x 40pin slots
 	//
 	// Some modules are extended bus modules in standard slots
-	// 
+	//
 	void rc2014zed(machine_config &config)
 	{
 		RC2014_BUS(config, m_rc2014_bus, 0);
@@ -123,7 +123,7 @@ public:
 	// Compact Flash storage
 	//
 	// Backplane Pro - 12 x extended slots
-	// 
+	//
 	void rc2014pro(machine_config &config)
 	{
 		RC2014_EXT_BUS(config, m_rc2014_bus, 0);
@@ -140,7 +140,7 @@ public:
 		RC2014_EXT_SLOT(config, "bus:11", m_rc2014_bus, rc2014_ext_bus_modules, nullptr);
 		RC2014_EXT_SLOT(config, "bus:12", m_rc2014_bus, rc2014_ext_bus_modules, nullptr);
 	}
-	
+
 	//
 	// RC2014 Zed
 	//

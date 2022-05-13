@@ -26,22 +26,22 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-    virtual void device_reset() override;
+	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
-    virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	uint8_t rtc_r(offs_t offset);
 	void rtc_w(offs_t offset, uint8_t data);
 private:
 	required_device<ds1302_device> m_rtc;
-    required_ioport_array<6> m_addr;
+	required_ioport_array<6> m_addr;
 };
 
 rc2014_ds1302_device::rc2014_ds1302_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, RC2014_DS1302_RTC, tag, owner, clock)
 	, device_rc2014_card_interface(mconfig, *this)
 	, m_rtc(*this, "rtc")
-    , m_addr(*this, "A%u", 2U)
+	, m_addr(*this, "A%u", 2U)
 {
 }
 
@@ -52,8 +52,8 @@ void rc2014_ds1302_device::device_start()
 void rc2014_ds1302_device::device_reset()
 {
 	uint8_t addr = 0x00;
-    uint8_t index = 2;
-    for (auto& port: m_addr)
+	uint8_t index = 2;
+	for (auto& port: m_addr)
 	{
 		addr |= port->read() << index;
 		index++;
@@ -69,14 +69,14 @@ void rc2014_ds1302_device::device_add_mconfig(machine_config &config)
 
 uint8_t rc2014_ds1302_device::rtc_r(offs_t offset)
 {
-    return m_rtc->io_r() ? 0x01 : 0x00;
+	return m_rtc->io_r() ? 0x01 : 0x00;
 }
 
 void rc2014_ds1302_device::rtc_w(offs_t, uint8_t data)
 {
-    m_rtc->ce_w(BIT(data,4));
-    if (BIT(data,5)==0) m_rtc->io_w(BIT(data,7));
-    m_rtc->sclk_w(BIT(data,6));
+	m_rtc->ce_w(BIT(data,4));
+	if (BIT(data,5)==0) m_rtc->io_w(BIT(data,7));
+	m_rtc->sclk_w(BIT(data,6));
 }
 
 static INPUT_PORTS_START( rc2014_ds1302_jumpers )

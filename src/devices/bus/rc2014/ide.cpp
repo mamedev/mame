@@ -79,13 +79,13 @@ public:
 
 protected:
 	// device-level overrides
-    virtual void device_reset() override;
-    virtual ioport_constructor device_input_ports() const override;
+	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	void ppi_pc_w(uint8_t data) override;
 private:
-    required_ioport m_sw;
-    required_ioport_array<4> m_jp;
+	required_ioport m_sw;
+	required_ioport_array<4> m_jp;
 
 	uint8_t m_da0;
 	uint8_t m_da1;
@@ -96,7 +96,7 @@ private:
 rc2014_82c55_ide_device::rc2014_82c55_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: rc2014_ide_base(mconfig, RC2014_82C55_IDE, tag, owner, clock)
 	, m_sw(*this, "SW1")
-    , m_jp(*this, "JP%u", 1U)
+	, m_jp(*this, "JP%u", 1U)
 {
 }
 
@@ -209,12 +209,12 @@ public:
 
 protected:
 	// device-level overrides
-    virtual void device_reset() override;
-    virtual ioport_constructor device_input_ports() const override;
+	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	void ppi_pc_w(uint8_t data) override;
 private:
-    required_ioport m_jp;
+	required_ioport m_jp;
 };
 
 rc2014_ide_hdd_device::rc2014_ide_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -270,11 +270,11 @@ static INPUT_PORTS_START( rc2014_ide_hdd_jumpers )
 	PORT_CONFNAME( 0x7, 0x4, "Base Address" )
 	PORT_CONFSETTING( 0x1, "0x08" )
 	PORT_CONFSETTING( 0x2, "0x10" )
-    PORT_CONFSETTING( 0x3, "0x18" )
-    PORT_CONFSETTING( 0x4, "0x20" )
-    PORT_CONFSETTING( 0x5, "0x28" )
-    PORT_CONFSETTING( 0x6, "0x30" )
-    PORT_CONFSETTING( 0x7, "0x38" )
+	PORT_CONFSETTING( 0x3, "0x18" )
+	PORT_CONFSETTING( 0x4, "0x20" )
+	PORT_CONFSETTING( 0x5, "0x28" )
+	PORT_CONFSETTING( 0x6, "0x30" )
+	PORT_CONFSETTING( 0x7, "0x38" )
 	PORT_START("JP1")
 	PORT_CONFNAME( 0x1, 0x0, "Power" )
 	PORT_CONFSETTING( 0x0, "Bus" )

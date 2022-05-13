@@ -93,7 +93,7 @@ void dual_clock_base::device_start()
 }
 
 static constexpr u32 clock_mapping[] =
-{ 
+{
 	7'372'800/1,
 	7'372'800/2,
 	7'372'800/3,
