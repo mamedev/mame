@@ -17,7 +17,6 @@
 #include <system_error>
 
 #include <winsock2.h>
-#include <Ws2tcpip.h>
 
 
 //============================================================
@@ -28,9 +27,7 @@ bool win_init_sockets() noexcept;
 void win_cleanup_sockets() noexcept;
 
 bool win_check_socket_path(std::string const &path) noexcept;
-std::error_condition win_open_tcp_socket(std::string const &path, std::uint32_t openflags, osd_file::ptr &file, std::uint64_t &filesize) noexcept;
-bool win_check_udp_path(std::string const &path) noexcept;
-std::error_condition win_open_udp_socket(std::string const &path, std::uint32_t openflags, osd_file::ptr &file, std::uint64_t &filesize) noexcept;
+std::error_condition win_open_socket(std::string const &path, std::uint32_t openflags, osd_file::ptr &file, std::uint64_t &filesize) noexcept;
 
 bool win_check_ptty_path(std::string const &path) noexcept;
 std::error_condition win_open_ptty(std::string const &path, std::uint32_t openflags, osd_file::ptr &file, std::uint64_t &filesize) noexcept;
