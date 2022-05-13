@@ -2935,7 +2935,8 @@ a1200xl                         // 1982 Atari 1200 XL
 a130xe                          // 1986 Atari 130 XE
 a400                            // 1979 Atari 400
 a400pal                         // 1979 Atari 400 PAL
-a5200                           // Atari 5200
+a5200                           // 1982 Atari 5200
+a5200a                          // 1983 Atari 5200 (2-port)
 a600xl                          // 1983 Atari 600 XL
 a65xe                           // 1986 Atari 65 XE (XL Extended)
 a65xea                          // 1986? Atari 65 XE Arabic
