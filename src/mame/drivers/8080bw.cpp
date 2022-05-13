@@ -606,8 +606,7 @@ static INPUT_PORTS_START( astropal )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )
 
-	/* Dummy port for cocktail mode (not used) */
-	PORT_START(INVADERS_CAB_TYPE_PORT_TAG)
+	PORT_START(CABINET_PORT_TAG)        /* Dummy port for cocktail mode */
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -732,6 +731,9 @@ static INPUT_PORTS_START( sinvzen )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+
+	PORT_MODIFY(CABINET_PORT_TAG)        /* Dummy port for cocktail mode */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -757,6 +759,9 @@ static INPUT_PORTS_START( spaceat2 )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+
+	PORT_MODIFY(CABINET_PORT_TAG)        /* Dummy port for cocktail mode */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -1054,8 +1059,7 @@ static INPUT_PORTS_START( spclaser )
 	PORT_DIPSETTING(    0x00, "1 Coin/1 Or 2 Players" )
 	PORT_DIPSETTING(    0x80, "1 Coin/1 Player  2 Coins/2 Players" )   /* Irrelevant, causes bugs */
 
-	/* Dummy port for cocktail mode (not used) */
-	PORT_START(CABINET_PORT_TAG)
+	PORT_START(CABINET_PORT_TAG)        /* Dummy port for cocktail mode */
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -1270,7 +1274,7 @@ static INPUT_PORTS_START( cosmicmo )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 
-	PORT_MODIFY(CABINET_PORT_TAG)
+	PORT_MODIFY(CABINET_PORT_TAG)        /* Dummy port for cocktail mode */
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
