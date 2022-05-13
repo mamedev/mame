@@ -59,7 +59,6 @@ void nes_rex_dbz5_device::device_start()
 
 void nes_rex_dbz5_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	m_extra = 0;
 	mmc3_common_initialize(0xff, 0xff, 0);
 }
@@ -75,8 +74,6 @@ void nes_rex_sl1632_device::device_start()
 
 void nes_rex_sl1632_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-
 	m_mode = 0;
 	m_mirror[0] = m_mirror[1] = 0;
 	m_vrc2_prg_bank[0] = m_vrc2_prg_bank[1] = 0;

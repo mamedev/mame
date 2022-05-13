@@ -59,7 +59,6 @@ void nes_pxrom_device::device_start()
 
 void nes_pxrom_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg8_89(0);
 	prg8_ab((m_prg_chunks << 1) - 3);
 	prg8_cd((m_prg_chunks << 1) - 2);
@@ -73,7 +72,6 @@ void nes_pxrom_device::pcb_reset()
 
 void nes_fxrom_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);

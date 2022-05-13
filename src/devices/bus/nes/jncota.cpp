@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders: kmg, Fabio Priuli
+// copyright-holders:kmg
 /***********************************************************************************************************
 
 
@@ -50,7 +50,6 @@ void nes_jncota_kt1001_device::pcb_reset()
 {
 	prg32(0);
 	chr8(0, CHRROM);
-	set_nt_mirroring(PPU_MIRROR_HORZ);
 
 	m_reg[0] = m_reg[1] = m_reg[2] = 0;
 }
