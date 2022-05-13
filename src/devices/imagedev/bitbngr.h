@@ -37,8 +37,6 @@ public:
 
 	void output(uint8_t data);
 	uint32_t input(void *buffer, uint32_t length);
-	int send(uint8_t *buf, int len);
-	void flush_rx();
 
 protected:
 	// device_t implementation

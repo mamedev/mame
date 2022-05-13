@@ -102,19 +102,6 @@ public:
 	/// \return Result of the operation.
 	static std::error_condition openpty(ptr &file, std::string &name) noexcept;
 
-	/// \brief Create a UDP socket
-	///
-	/// \param [in] path Address of the socket to open.
-	/// \param [in] openflags Combination of #OPEN_FLAG_READ,
-	///   #OPEN_FLAG_WRITE specifying the requested access mode
-	///   and open behaviour.
-	/// \param [out] file Receives the file handle if the operation
-	///   succeeds.  Not valid if the operation fails.
-	/// \param [out] filesize Will be zero if the operation succeeded.
-	///   Not valid if the operation failed.
-	/// \return Result of the operation.
-	static std::error_condition open_udp_socket(std::string const &path, std::uint32_t openflags, osd_file::ptr &file, std::uint64_t &filesize) noexcept;
-
 	/// \brief Close an open file
 	virtual ~osd_file() { }
 

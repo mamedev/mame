@@ -28,13 +28,10 @@
 #include <unistd.h>
 
 
-#define DEBUG_SOCKET (0)
-
 namespace {
 
 char const *const posixfile_socket_identifier  = "socket.";
 char const *const posixfile_domain_identifier  = "domain.";
-char const *const posixfile_udp_identifier = "udp.";
 
 
 class posix_osd_socket : public osd_file
@@ -45,11 +42,9 @@ public:
 	posix_osd_socket& operator=(posix_osd_socket const &) = delete;
 	posix_osd_socket& operator=(posix_osd_socket &&) = delete;
 
-	posix_osd_socket(int sock, bool listening, uint32_t dest = 0, uint32_t dport = 0) noexcept
+	posix_osd_socket(int sock, bool listening) noexcept
 		: m_sock(sock)
 		, m_listening(listening)
-		, m_dest(dest)
-		, m_dport(dport)
 	{
 		assert(m_sock >= 0);
 	}
@@ -117,26 +112,11 @@ public:
 
 	virtual std::error_condition write(void const *buffer, std::uint64_t offset, std::uint32_t count, std::uint32_t &actual) noexcept override
 	{
-		if (!m_dest) {
-			ssize_t const result = ::write(m_sock, buffer, count);
-			if (result < 0)
-				return std::error_condition(errno, std::generic_category());
+		ssize_t const result = ::write(m_sock, buffer, count);
+		if (result < 0)
+			return std::error_condition(errno, std::generic_category());
 
-			actual = std::uint32_t(size_t(result));
-		}
-		else
-		{
-			sockaddr_in dest;
-			dest.sin_family = AF_INET;
-			dest.sin_addr.s_addr = m_dest;
-			dest.sin_port = htons(m_dport);
-			//printf("Sending to %d bytes %s port %d\n", count, inet_ntoa(dest.sin_addr), m_dport);
-			ssize_t const result = ::sendto(m_sock, reinterpret_cast<const char*>(buffer), count, 0, reinterpret_cast <sockaddr*> (&dest), sizeof(dest));
-			if (result < 0)
-				return std::error_condition(errno, std::generic_category());
-			actual = std::uint32_t(size_t(result));
-
-		}
+		actual = std::uint32_t(size_t(result));
 		return std::error_condition();
 	}
 
@@ -155,8 +135,6 @@ public:
 private:
 	int     m_sock;
 	bool    m_listening;
-	uint32_t m_dest;
-	uint32_t m_dport;
 };
 
 
@@ -231,19 +209,8 @@ bool posix_check_domain_path(std::string const &path) noexcept
 }
 
 
-bool posix_check_udp_path(std::string const &path) noexcept
+std::error_condition posix_open_socket(std::string const &path, std::uint32_t openflags, osd_file::ptr &file, std::uint64_t &filesize) noexcept
 {
-	if (strncmp(path.c_str(), posixfile_udp_identifier, strlen(posixfile_udp_identifier)) == 0 &&
-		strchr(path.c_str(), ':') != nullptr) return true;
-	return false;
-}
-
-
-std::error_condition posix_open_tcp_socket(std::string const &path, std::uint32_t openflags, osd_file::ptr &file, std::uint64_t &filesize) noexcept
-{
-	if (DEBUG_SOCKET)
-		printf("Trying to open tcp socket %s\n", path.c_str());
-
 	char hostname[256];
 	int port;
 	std::sscanf(&path[strlen(posixfile_socket_identifier)], "%255[^:]:%d", hostname, &port);
@@ -294,109 +261,4 @@ std::error_condition posix_open_domain(std::string const &path, std::uint32_t op
 	}
 
 	return create_socket(sau, sock, openflags, file, filesize);
-}
-
-std::error_condition posix_open_udp_socket(std::string const &path, std::uint32_t openflags, osd_file::ptr &file, std::uint64_t &filesize) noexcept
-{
-	if (DEBUG_SOCKET)
-		printf("Trying to open udp socket %s\n", path.c_str());
-
-	char hostname[256];
-	int port;
-	std::sscanf(&path[strlen(posixfile_udp_identifier)], "%255[^:]:%d", hostname, &port);
-
-	struct hostent const* const localhost = ::gethostbyname(hostname);
-	if (!localhost)
-		return std::errc::no_such_file_or_directory;
-
-	struct sockaddr_in sai;
-	memset(&sai, 0, sizeof(sai));
-	sai.sin_family = AF_INET;
-	sai.sin_port = htons(port);
-	sai.sin_addr = *reinterpret_cast<struct in_addr*>(localhost->h_addr);
-
-	int const sock = ::socket(AF_INET, SOCK_DGRAM, 0);
-	if (sock < 0)
-	{
-		if (DEBUG_SOCKET)
-			printf("socket() error\n");
-		return std::error_condition(errno, std::generic_category());
-	}
-
-	int const flag = 1;
-	if (::setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<const char*>(&flag), sizeof(flag)) < 0)
-	{
-		if (DEBUG_SOCKET)
-			printf("SO_REUSEADDR error\n");
-		::close(sock);
-		return std::error_condition(errno, std::generic_category());
-	}
-
-	// local socket support
-	osd_file::ptr result;
-	if (openflags & OPEN_FLAG_CREATE)
-	{
-		sai.sin_addr.s_addr = htonl(INADDR_ANY);
-		if (DEBUG_SOCKET)
-			printf("Listening on '%s' on port '%d'\n", hostname, port);
-
-		// bind socket...
-		if (::bind(sock, reinterpret_cast<struct sockaddr const*>(&sai), sizeof(struct sockaddr)) < 0)
-		{
-			printf("bind error\n");
-			std::error_condition sockbinderr(errno, std::generic_category());
-			::close(sock);
-			return sockbinderr;
-		}
-
-		// Setup multicast
-		struct ip_mreq mreq;
-		mreq.imr_multiaddr = *reinterpret_cast<struct in_addr*>(localhost->h_addr);
-		mreq.imr_interface.s_addr = htonl(INADDR_ANY);
-		if (DEBUG_SOCKET)
-			printf("imr_multaddr: %08x\n", mreq.imr_multiaddr.s_addr);
-		if ((mreq.imr_multiaddr.s_addr & 0xff) >= 224 && (mreq.imr_multiaddr.s_addr & 0xff) <= 239)
-		{
-			if (DEBUG_SOCKET)
-				printf("Setting up udp multicast %s\n", hostname);
-			if (::setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&mreq, sizeof(mreq)) < 0) {
-				if (DEBUG_SOCKET)
-					printf("IP_ADD_MEMBERSHIP error\n");
-				std::error_condition membererr(errno, std::generic_category());
-				::close(sock);
-				return membererr;
-			}
-		}
-
-		// Disable loopback on multicast
-		char const loop = 0;
-		if (::setsockopt(sock, IPPROTO_IP, IP_MULTICAST_LOOP, &loop, sizeof(loop)))
-		{
-			if (DEBUG_SOCKET)
-				printf("IP_MULTICAST_LOOP error\n");
-			std::error_condition multierr(errno, std::generic_category());
-			::close(sock);
-			return multierr;
-		}
-
-		// Set ttl on multicast
-		char const ttl = 15;
-		if (::setsockopt(sock, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, sizeof(ttl)))
-		{
-			if (DEBUG_SOCKET)
-				printf("IP_MULTICAST_TTL error\n");
-			std::error_condition multierr(errno, std::generic_category());
-			::close(sock);
-			return multierr;
-		}
-		result.reset(new (std::nothrow) posix_osd_socket(sock, false, (*reinterpret_cast<struct in_addr*>(localhost->h_addr)).s_addr, port));
-	}
-	if (!result)
-	{
-		::close(sock);
-		return std::errc::permission_denied;
-	}
-	file = std::move(result);
-	filesize = 0;
-	return std::error_condition();
 }
