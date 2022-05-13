@@ -249,7 +249,6 @@ void nes_sc127_device::device_start()
 
 void nes_sc127_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0xff);
 	chr8(0, m_chr_source);
 
@@ -271,7 +270,6 @@ void nes_mbaby_device::device_start()
 void nes_mbaby_device::pcb_reset()
 {
 	prg32((m_prg_chunks - 1) >> 1);
-	chr8(0, CHRRAM);
 
 	m_irq_enable = 0;
 	m_irq_count = 0;
@@ -286,7 +284,6 @@ void nes_asn_device::device_start()
 
 void nes_asn_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32((m_prg_chunks - 1) >> 1);
 	chr8(0, m_chr_source);
 
@@ -349,7 +346,6 @@ void nes_btl_dn_device::device_start()
 
 void nes_btl_dn_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -418,7 +414,6 @@ void nes_smb2jb_device::pcb_reset()
 	prg8_ab(0x09);
 	prg8_cd(0);    // switchable bank
 	prg8_ef(0x0b);
-	chr8(0, CHRRAM);
 
 	m_irq_enable = 0;
 	m_irq_count = 0;
@@ -443,7 +438,6 @@ void nes_0353_device::device_start()
 void nes_0353_device::pcb_reset()
 {
 	prg32((m_prg_chunks >> 1) - 1);    // fixed 32K bank
-	chr8(0, CHRRAM);
 
 	m_reg = 0;
 }
@@ -461,7 +455,6 @@ void nes_09034a_device::device_start()
 
 void nes_09034a_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
 	chr8(0, m_chr_source);
 
@@ -498,7 +491,6 @@ void nes_palthena_device::pcb_reset()
 	prg8_89(0x0c);
 	// 0xa000-0xbfff switchable bank
 	prg16_cdef(m_prg_chunks - 1);
-	chr8(0, CHRRAM);
 
 	m_reg = 0;
 }
@@ -511,9 +503,7 @@ void nes_tobidase_device::device_start()
 
 void nes_tobidase_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(2);
-	chr8(0, m_chr_source);
 
 	m_latch = 0;
 }
@@ -526,7 +516,6 @@ void nes_whirlwind_device::device_start()
 
 void nes_whirlwind_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32((m_prg_chunks >> 1) - 1);      // upper PRG: banks are always fixed
 	chr8(0, m_chr_source);
 
@@ -541,8 +530,6 @@ void nes_lh32_device::device_start()
 
 void nes_lh32_device::pcb_reset()
 {
-	chr8(0, CHRRAM);
-
 	prg32((m_prg_chunks - 1) >> 1);
 	// 0xc000-0xdfff reads/writes WRAM
 	m_latch = 0xf;
@@ -610,8 +597,6 @@ void nes_lh53_device::device_start()
 
 void nes_lh53_device::pcb_reset()
 {
-	chr8(0, CHRRAM);
-
 	prg8_89(0xc);
 	prg8_ab(0xd);   // last 2K are overlaid by WRAM
 	prg8_cd(0xe);   // first 6K are overlaid by WRAM
@@ -629,8 +614,6 @@ void nes_2708_device::device_start()
 
 void nes_2708_device::pcb_reset()
 {
-	chr8(0, CHRRAM);
-
 	prg32(7);
 	// the upper PRG banks never change, but there are 8K of WRAM overlaid to the ROM area based on reg1
 	m_reg[0] = 0;
@@ -645,8 +628,6 @@ void nes_ac08_device::device_start()
 
 void nes_ac08_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	chr8(0, m_chr_source);
 	prg32(0xff);
 	m_latch = 0xff;
 }
@@ -1059,7 +1040,7 @@ void nes_lh31_device::write_h(offs_t offset, u8 data)      // submapper 2
 	if (offset >= 0x6000)
 	{
 		m_reg = data;
-		chr8(data & (m_vrom_chunks - 1), m_chr_source);
+		chr8(data, m_chr_source);
 	}
 }
 

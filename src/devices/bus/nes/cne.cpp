@@ -37,17 +37,17 @@ DEFINE_DEVICE_TYPE(NES_CNE_FSB,     nes_cne_fsb_device,     "nes_cne_fsb",  "NES
 DEFINE_DEVICE_TYPE(NES_CNE_SHLZ,    nes_cne_shlz_device,    "nes_cne_shlz", "NES Cart C&E Sheng Huo Lie Zhuan PCB")
 
 
-nes_cne_decathl_device::nes_cne_decathl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_cne_decathl_device::nes_cne_decathl_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_CNE_DECATHL, tag, owner, clock)
 {
 }
 
-nes_cne_fsb_device::nes_cne_fsb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_cne_fsb_device::nes_cne_fsb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_CNE_FSB, tag, owner, clock)
 {
 }
 
-nes_cne_shlz_device::nes_cne_shlz_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_cne_shlz_device::nes_cne_shlz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_CNE_SHLZ, tag, owner, clock)
 {
 }
@@ -56,7 +56,6 @@ nes_cne_shlz_device::nes_cne_shlz_device(const machine_config &mconfig, const ch
 
 void nes_cne_fsb_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0xff);
 	chr8(0, m_chr_source);
 }
@@ -79,24 +78,20 @@ void nes_cne_fsb_device::pcb_reset()
 
  iNES: mapper 244
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_cne_decathl_device::write_h(offs_t offset, uint8_t data)
+void nes_cne_decathl_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("cne_decathl_w, offset: %04x, data: %02x\n", offset, data));
 
-	if (offset < 0x0065)
-		return;
-	if (offset < 0x00a5)
+	if (offset >= 0x0065)
 	{
-		prg32((offset - 0x0065) & 0x03);
-		return;
-	}
-	if (offset < 0x00e5)
-	{
-		chr8((offset - 0x00a5) & 0x07, CHRROM);
+		if (offset < 0x00a5)
+			prg32((offset - 0x0065) & 0x03);
+		else if (offset < 0x00e5)
+			chr8((offset - 0x00a5) & 0x07, CHRROM);
 	}
 }
 
@@ -113,11 +108,11 @@ void nes_cne_decathl_device::write_h(offs_t offset, uint8_t data)
 
  iNES: mapper 246
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_cne_fsb_device::write_m(offs_t offset, uint8_t data)
+void nes_cne_fsb_device::write_m(offs_t offset, u8 data)
 {
 	LOG_MMC(("cne_fsb write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -126,43 +121,31 @@ void nes_cne_fsb_device::write_m(offs_t offset, uint8_t data)
 		switch (offset & 0x0007)
 		{
 			case 0x0000:
-				prg8_89(data);
-				break;
 			case 0x0001:
-				prg8_ab(data);
-				break;
 			case 0x0002:
-				prg8_cd(data);
-				break;
 			case 0x0003:
-				prg8_ef(data);
+				prg8_x(offset & 0x03, data);
 				break;
 			case 0x0004:
-				chr2_0(data, CHRROM);
-				break;
 			case 0x0005:
-				chr2_2(data, CHRROM);
-				break;
 			case 0x0006:
-				chr2_4(data, CHRROM);
-				break;
 			case 0x0007:
-				chr2_6(data, CHRROM);
+				chr2_x((offset & 0x03) << 1, data, CHRROM);
 				break;
 		}
 	}
 	else
-		m_battery[offset] = data;
+		device_nes_cart_interface::write_m(offset, data);
 }
 
-uint8_t nes_cne_fsb_device::read_m(offs_t offset)
+u8 nes_cne_fsb_device::read_m(offs_t offset)
 {
 	LOG_MMC(("cne_fsb read_m, offset: %04x\n", offset));
 
 	if (offset >= 0x0800)
-		return m_battery[offset];
+		return device_nes_cart_interface::read_m(offset);
 
-	return 0xff;
+	return get_open_bus();
 }
 
 /*-------------------------------------------------
@@ -178,11 +161,11 @@ uint8_t nes_cne_fsb_device::read_m(offs_t offset)
 
  iNES: mapper 240
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_cne_shlz_device::write_l(offs_t offset, uint8_t data)
+void nes_cne_shlz_device::write_l(offs_t offset, u8 data)
 {
 	LOG_MMC(("cne_shlz write_l, offset: %04x, data: %02x\n", offset, data));
 

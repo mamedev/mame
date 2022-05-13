@@ -38,12 +38,12 @@ DEFINE_DEVICE_TYPE(NES_NINA006, nes_nina006_device, "nes_nina006", "NES Cart AVE
 DEFINE_DEVICE_TYPE(NES_MAXI15,  nes_maxi15_device,  "nes_maxi15",  "NES Cart AVE Maxi 15 PCB")
 
 
-nes_nina001_device::nes_nina001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_nina001_device::nes_nina001_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_NINA001, tag, owner, clock)
 {
 }
 
-nes_nina006_device::nes_nina006_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_nina006_device::nes_nina006_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_NINA006, tag, owner, clock)
 {
 }
@@ -66,7 +66,6 @@ void nes_maxi15_device::pcb_reset()
 {
 	prg32(0);
 	chr8(0, CHRROM);
-	set_nt_mirroring(PPU_MIRROR_VERT);
 
 	m_reg[0] = m_reg[1] = 0;
 }
@@ -93,9 +92,11 @@ void nes_maxi15_device::pcb_reset()
 
  -------------------------------------------------*/
 
-void nes_nina001_device::write_m(offs_t offset, uint8_t data)
+void nes_nina001_device::write_m(offs_t offset, u8 data)
 {
 	LOG_MMC(("nina-001 write_m, offset: %04x, data: %02x\n", offset, data));
+
+	device_nes_cart_interface::write_m(offset, data); // write WRAM
 
 	switch (offset)
 	{
@@ -109,8 +110,6 @@ void nes_nina001_device::write_m(offs_t offset, uint8_t data)
 			chr4_4(data, CHRROM);
 			break;
 	}
-
-	m_prgram[offset] = data;
 }
 
 /*-------------------------------------------------
@@ -126,7 +125,7 @@ void nes_nina001_device::write_m(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_nina006_device::write_l(offs_t offset, uint8_t data)
+void nes_nina006_device::write_l(offs_t offset, u8 data)
 {
 	LOG_MMC(("nina-006 write_l, offset: %04x, data: %02x\n", offset, data));
 
