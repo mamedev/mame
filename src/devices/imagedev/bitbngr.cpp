@@ -45,6 +45,19 @@ void bitbanger_device::output(uint8_t data)
 		fwrite(&data, 1);
 }
 
+/*-------------------------------------------------
+	native_output - outputs data buffer to a file
+-------------------------------------------------*/
+
+int bitbanger_device::send(uint8_t *buf, int len)
+{
+	if (exists())
+	{
+		return fwrite(buf, len);
+	}
+	// Announce we transfered everything
+	return len;
+}
 
 /*-------------------------------------------------
     native_input - inputs data from a file
@@ -58,6 +71,21 @@ uint32_t bitbanger_device::input(void *buffer, uint32_t length)
 		return 0;
 }
 
+/*-------------------------------------------------
+	flush_rx - Flushes all receive data from stream
+-------------------------------------------------*/
+void bitbanger_device::flush_rx(void)
+{
+	if (exists())
+	{
+		int rx_bytes;
+		auto tmp_buf = std::make_unique<uint8_t[]>(512);
+		while ((rx_bytes = fread(tmp_buf.get(), 512)))
+		{
+			//printf("Flushing rx %d bytes\n", rx_bytes);
+		}
+	}
+}
 
 
 /*-------------------------------------------------
