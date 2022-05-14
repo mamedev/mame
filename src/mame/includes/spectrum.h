@@ -123,7 +123,6 @@ protected:
 
 	emu_timer *m_irq_off_timer;
 
-	uint8_t m_ram_disabled_by_beta;
 	uint8_t pre_opcode_fetch_r(offs_t offset);
 	void spectrum_rom_w(offs_t offset, uint8_t data);
 	uint8_t spectrum_rom_r(offs_t offset);

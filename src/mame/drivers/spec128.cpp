@@ -282,6 +282,10 @@ void spectrum_128_state::spectrum_128_mem(address_map &map)
 	map(0x4000, 0x7fff).rw(FUNC(spectrum_128_state::spectrum_128_ram_r<1>), FUNC(spectrum_128_state::spectrum_128_ram_w<1>));
 	map(0x8000, 0xbfff).rw(FUNC(spectrum_128_state::spectrum_128_ram_r<2>), FUNC(spectrum_128_state::spectrum_128_ram_w<2>));
 	map(0xc000, 0xffff).rw(FUNC(spectrum_128_state::spectrum_128_ram_r<3>), FUNC(spectrum_128_state::spectrum_128_ram_w<3>));
+
+	//FIXME must be available for children. review/replace templates usage
+	FUNC(spectrum_128_state::spectrum_128_ram_r<0>);
+	FUNC(spectrum_128_state::spectrum_128_ram_w<0>);
 }
 
 void spectrum_128_state::spectrum_128_fetch(address_map &map)
@@ -301,16 +305,13 @@ void spectrum_128_state::machine_start()
 
 	for (auto i = 1; i < 4; i++)
 		m_bank_ram[i]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
+
+	m_bank_ram[1]->set_entry(5); /* Bank 5 is always in 0x4000 - 0x7fff */
+	m_bank_ram[2]->set_entry(2); /* Bank 2 is always in 0x8000 - 0xbfff */
 }
 
 void spectrum_128_state::machine_reset()
 {
-	/* Bank 5 is always in 0x4000 - 0x7fff */
-	m_bank_ram[1]->set_entry(5);
-
-	/* Bank 2 is always in 0x8000 - 0xbfff */
-	m_bank_ram[2]->set_entry(2);
-
 	spectrum_state::machine_reset();
 
 	/* set initial ram config */
@@ -365,7 +366,6 @@ void spectrum_128_state::spectrum_128(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_raw(X1_128_SINCLAIR / 5, 456, 311, {get_screen_area().left() - 48, get_screen_area().right() + 48, get_screen_area().top() - 48, get_screen_area().bottom() + 56});
-
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(spec128);
 
 	/* sound hardware */
