@@ -7468,7 +7468,7 @@ license:CC0
 
 	<software name="gberetp1" cloneof="gberetp3">
 		<!-- Notes: GBC only -->
-		<!--	Fixed to work on real hardware by replacing "C0" to "E0" at offset 0x153.	-->
+		<!--	Requires fixing by replacing "C0" to "E0" at offset 0x153.	-->
 		<description>Green Beret (prototype 1)</description>
 		<year>2000</year>
 		<publisher>Kak</publisher>
@@ -7476,7 +7476,7 @@ license:CC0
 			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="32768">
-				<rom name="green beret (prototype 1).bin" size="32768" crc="c66c546f" sha1="5b92b0db1af9803e27a4ebb23ad9ed8377d6d87b"/>
+				<rom name="green beret (prototype 1).bin" size="32768" crc="a0c612aa" sha1="110413a96bc8f3b0ca50c4881ef96ecb14932ebd"/>
 			</dataarea>
 			<dataarea name="nvram" size="2048">
 			</dataarea>
@@ -7485,14 +7485,14 @@ license:CC0
 
 	<software name="gberetp2" cloneof="gberetp3">
 		<!-- Notes: GBC only -->
-		<!--	Fixed to work on real hardware by replacing "C0" to "E0" at offset 0x154.	-->
+		<!--	Requires fixing by replacing "C0" to "E0" at offset 0x154.	-->
 		<description>Green Beret (prototype 2)</description>
 		<year>2000</year>
 		<publisher>Kak</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="65536">
-				<rom name="green beret (prototype 2).bin" size="65536" crc="702af305" sha1="f8e6ee070147c56e280abf2a31316ee8124b953c"/>
+				<rom name="green beret (prototype 2).bin" size="65536" crc="2ed509d9" sha1="1d2a66e1b29e8d782e30a7cbcac566f1d907d8c5"/>
 			</dataarea>
 			<dataarea name="nvram" size="2048">
 			</dataarea>
