@@ -51,10 +51,40 @@ void rc2014_ym_ay_device::device_reset()
 {
 	// Set clock
 	m_ay8910->set_clock(clock() / m_jp[4]->read()); // JP5
-	uint8_t base = m_jp[3]->read() << 4; // JP4
-	uint8_t offset = (m_jp[2]->read() == 1) ? 8 : (m_jp[2]->read() == 2) ? 4 : 0; // JP3
-	m_bus->installer(AS_IO)->install_write_handler(base, base, 0, 0, 0, write8smo_delegate(m_ay8910, FUNC(ay8910_device::data_w)));
-	m_bus->installer(AS_IO)->install_readwrite_handler(base+offset, base+offset, 0, 0, 0, read8smo_delegate(m_ay8910, FUNC(ay8910_device::data_r)), write8smo_delegate(m_ay8910, FUNC(ay8910_device::address_w)));
+	uint16_t base;
+	uint16_t reg;
+	// A13-A8 and A0 not connected
+	uint16_t mask = 0x3f01;
+	// JP2 - Addressing mode
+	if (m_jp[1]->read())
+	{
+		base = 0x8000; // A15 for Spectrum mode
+		mask |= 0x0F00; // A7-A4 are not connected
+	}
+	else
+	{
+		base = m_jp[3]->read() << 4; // JP4
+		base |= m_jp[0]->read() ? 0x10 : 0x00; // JP1
+		mask |= 0x8000; // A15 not connected
+	}
+	// JP3 - Register mode
+	switch(m_jp[2]->read())
+	{
+		case 0 : // A14 (Spectrum)
+			reg = 0x4000; // A14
+			mask |= 0x000c; // A2 and A3 not connected
+			break;
+		case 1 : // A3 (Base + 8)
+			reg = 0x0008; // A3
+			mask |= 0x4004; // A14 and A2 not connected
+			break;
+		default : // A2 (Base + 4)
+			reg = 0x0004; // A2
+			mask |= 0x4008; // A14 and A3 not connected
+			break;
+	}
+	m_bus->installer(AS_IO)->install_write_handler(base, base, 0, mask, 0, write8smo_delegate(m_ay8910, FUNC(ay8910_device::data_w)));
+	m_bus->installer(AS_IO)->install_readwrite_handler(base + reg, base + reg, 0, mask, 0, read8smo_delegate(m_ay8910, FUNC(ay8910_device::data_r)), write8smo_delegate(m_ay8910, FUNC(ay8910_device::address_w)));
 }
 
 void rc2014_ym_ay_device::device_add_mconfig(machine_config &config)
@@ -84,23 +114,15 @@ static INPUT_PORTS_START( rc2014_ym_ay_jumpers )
 	PORT_CONFSETTING( 0x1, "A3 (Base + 8)" )
 	PORT_CONFSETTING( 0x2, "A2 (Base + 4)" )
 	PORT_START("JP4")
-	PORT_CONFNAME( 0xf, 0xd, "Base Address" )
-	PORT_CONFSETTING( 0x0, "0x00" )
-	PORT_CONFSETTING( 0x1, "0x10" )
-	PORT_CONFSETTING( 0x2, "0x20" )
-	PORT_CONFSETTING( 0x3, "0x30" )
-	PORT_CONFSETTING( 0x4, "0x40" )
-	PORT_CONFSETTING( 0x5, "0x50" )
-	PORT_CONFSETTING( 0x6, "0x60" )
-	PORT_CONFSETTING( 0x7, "0x70" )
-	PORT_CONFSETTING( 0x8, "0x80" )
-	PORT_CONFSETTING( 0x9, "0x90" )
-	PORT_CONFSETTING( 0xa, "0xa0" )
-	PORT_CONFSETTING( 0xb, "0xb0" )
-	PORT_CONFSETTING( 0xc, "0xc0" )
-	PORT_CONFSETTING( 0xd, "0xd0" )
-	PORT_CONFSETTING( 0xe, "0xe0" )
-	PORT_CONFSETTING( 0xf, "0xf0" )
+	PORT_CONFNAME( 0xf, 0xc, "Base Address" )
+	PORT_CONFSETTING( 0x0, "0x00 / 0x10" )
+	PORT_CONFSETTING( 0x8, "0x80 / 0x90" )
+	PORT_CONFSETTING( 0x4, "0x40 / 0x50" )
+	PORT_CONFSETTING( 0xc, "0xC0 / 0xD0" )
+	PORT_CONFSETTING( 0x2, "0x20 / 0x30" )
+	PORT_CONFSETTING( 0xa, "0xA0 / 0xB0" )
+	PORT_CONFSETTING( 0x6, "0x60 / 0x70" )
+	PORT_CONFSETTING( 0xe, "0xE0 / 0xF0" )
 	PORT_START("JP5")
 	PORT_CONFNAME( 0x7, 0x4, "Divide by" )
 	PORT_CONFSETTING( 0x2, "2" )
