@@ -27210,9 +27210,10 @@ license:CC0
 	</software>
 	
 	<software name="nuwang2k" supported="no">
-		<description>Nü Wang Ge Dou 2000</description>
+		<description>Nǚwáng Gédòu 2000</description>
 		<year>200?</year>
 		<publisher>Vast Fame</publisher>
+		<info name="alt_title" value="女王格鬥2000"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_vfame" />
 			<dataarea name="rom" size="2097152">
