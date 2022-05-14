@@ -13,6 +13,7 @@
 
 #include "bus/rc2014/rc2014.h"
 
-DECLARE_DEVICE_TYPE(RC2014_YM_AY_SOUND, device_rc2014_card_interface)
+DECLARE_DEVICE_TYPE(RC2014_YM2149_SOUND, device_rc2014_card_interface)
+DECLARE_DEVICE_TYPE(RC2014_AY8190_SOUND, device_rc2014_card_interface)
 
 #endif // MAME_BUS_RC2014_SOUND_H
