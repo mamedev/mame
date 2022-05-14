@@ -13,7 +13,7 @@
 namespace {
 
 //**************************************************************************
-//  Real Time Clock DS1302 module
+//  RC2014 Real Time Clock DS1302 module
 //  Module author: Ed Brindley
 //**************************************************************************
 
@@ -104,4 +104,4 @@ ioport_constructor rc2014_ds1302_device::device_input_ports() const
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_PRIVATE(RC2014_DS1302_RTC, device_rc2014_card_interface, rc2014_ds1302_device, "rc2014_ds1302", "Real Time Clock DS1302 module")
+DEFINE_DEVICE_TYPE_PRIVATE(RC2014_DS1302_RTC, device_rc2014_card_interface, rc2014_ds1302_device, "rc2014_ds1302", "RC2014 Real Time Clock DS1302 module")
