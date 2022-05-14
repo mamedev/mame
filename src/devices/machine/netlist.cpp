@@ -289,11 +289,11 @@ void netlist_mame_analog_input_device::write(const double val)
 	m_value_for_device_timer = val * m_mult + m_offset;
 	if (m_value_for_device_timer != (*m_param)())
 	{
-		synchronize();
+		m_sync_timer->adjust(attotime::zero);
 	}
 }
 
-void netlist_mame_analog_input_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(netlist_mame_analog_input_device::sync_callback)
 {
 	update_to_current_time();
 #if NETLIST_CREATE_CSV
@@ -308,7 +308,7 @@ void netlist_mame_int_input_device::write(const uint32_t val)
 	if (v != (*m_param)())
 	{
 		LOGDEBUG("write %s\n", this->tag());
-		synchronize(0, v);
+		m_sync_timer->adjust(attotime::zero, v);
 }
 }
 
@@ -318,11 +318,11 @@ void netlist_mame_logic_input_device::write(const uint32_t val)
 	if (v != (*m_param)())
 	{
 		LOGDEBUG("write %s\n", this->tag());
-		synchronize(0, v);
+		m_sync_timer->adjust(attotime::zero, v);
 	}
 }
 
-void netlist_mame_int_input_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(netlist_mame_int_input_device::sync_callback)
 {
 	update_to_current_time();
 #if NETLIST_CREATE_CSV
@@ -331,7 +331,7 @@ void netlist_mame_int_input_device::device_timer(emu_timer &timer, device_timer_
 	m_param->set(param);
 }
 
-void netlist_mame_logic_input_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(netlist_mame_logic_input_device::sync_callback)
 {
 	update_to_current_time();
 #if NETLIST_CREATE_CSV
@@ -340,7 +340,7 @@ void netlist_mame_logic_input_device::device_timer(emu_timer &timer, device_time
 	m_param->set(param);
 }
 
-void netlist_mame_ram_pointer_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(netlist_mame_ram_pointer_device::sync_callback)
 {
 	m_data = (*m_param)();
 }
@@ -460,6 +460,7 @@ void netlist_mame_analog_input_device::device_start()
 		// disable automatic scaling for ioports
 		m_auto_port = false;
 	}
+	m_sync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(netlist_mame_analog_input_device::sync_callback), this));
 }
 
 void netlist_mame_analog_input_device::validity_helper(validity_checker &valid,
@@ -607,6 +608,7 @@ void netlist_mame_int_input_device::device_start()
 	{
 		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name);
 	}
+	m_sync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(netlist_mame_int_input_device::sync_callback), this));
 }
 
 void netlist_mame_int_input_device::validity_helper(validity_checker &valid,
@@ -649,6 +651,7 @@ void netlist_mame_logic_input_device::device_start()
 	{
 		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name);
 	}
+	m_sync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(netlist_mame_logic_input_device::sync_callback), this));
 }
 
 void netlist_mame_logic_input_device::validity_helper(validity_checker &valid,
@@ -702,6 +705,8 @@ void netlist_mame_ram_pointer_device::device_start()
 	}
 
 	m_data = (*m_param)();
+
+	m_sync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(netlist_mame_ram_pointer_device::sync_callback), this));
 }
 
 void netlist_mame_ram_pointer_device::validity_helper(validity_checker &valid,

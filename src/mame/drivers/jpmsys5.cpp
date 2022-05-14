@@ -638,17 +638,17 @@ WRITE_LINE_MEMBER(jpmsys5_state::pia_irq)
 
 uint8_t jpmsys5_state::u29_porta_r()
 {
-	int meter_bit =0;
+	int meter_bit = 0;
 
 	if (m_meters)
 	{
-		int combined_meter = m_meters->GetActivity(0) | m_meters->GetActivity(1) |
-							m_meters->GetActivity(2) | m_meters->GetActivity(3) |
-							m_meters->GetActivity(4) | m_meters->GetActivity(5) |
-							m_meters->GetActivity(6) | m_meters->GetActivity(7);
+		int combined_meter = m_meters->get_activity(0) | m_meters->get_activity(1) |
+							m_meters->get_activity(2) | m_meters->get_activity(3) |
+							m_meters->get_activity(4) | m_meters->get_activity(5) |
+							m_meters->get_activity(6) | m_meters->get_activity(7);
 
 		if (combined_meter)
-			meter_bit =  0x80;
+			meter_bit = 0x80;
 	}
 
 	return m_direct_port->read() | meter_bit;

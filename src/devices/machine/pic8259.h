@@ -59,16 +59,13 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual bool is_x86() const { return m_is_x86; }
 
+	TIMER_CALLBACK_MEMBER(irq_timer_tick);
+
 private:
-	static constexpr device_timer_id TIMER_CHECK_IRQ = 0;
-
-	inline void set_timer() { timer_set(attotime::zero, TIMER_CHECK_IRQ); }
 	void set_irq_line(int irq, int state);
-
 
 	enum class state_t : u8
 	{
@@ -83,6 +80,7 @@ private:
 	devcb_read_line m_in_sp_func;
 	devcb_read8 m_read_slave_ack_func;
 
+	emu_timer *m_irq_timer;
 	state_t m_state;
 
 	uint8_t m_isr;

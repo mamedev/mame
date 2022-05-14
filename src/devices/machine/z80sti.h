@@ -148,7 +148,6 @@ private:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_serial_interface overrides
 	virtual void tra_callback() override;
@@ -163,7 +162,7 @@ private:
 	// internal helpers
 	void check_interrupts();
 	void take_interrupt(int level);
-	void timer_count(int index);
+	TIMER_CALLBACK_MEMBER(timer_count);
 	void gpip_input(int bit, int state);
 
 	// device callbacks

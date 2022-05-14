@@ -68,7 +68,7 @@
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-class pit68230_device :  public device_t//, public device_execute_interface
+class pit68230_device :  public device_t
 {
 public:
 	// construction/destruction
@@ -279,12 +279,11 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// Interrupt methods
 	void trigger_interrupt(int source);
 
-	int m_icount;
+	TIMER_CALLBACK_MEMBER(tick_clock);
 
 	devcb_write8        m_pa_out_cb;
 	devcb_read8         m_pa_in_cb;
@@ -330,11 +329,6 @@ protected:
 
 	// Timers
 	emu_timer *pit_timer;
-
-	enum
-	{
-		TIMER_ID_PIT
-	};
 };
 
 // device type definition

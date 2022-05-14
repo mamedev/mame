@@ -60,8 +60,6 @@ enum
 	IRQ_BIT_ALARM = 0x01
 };
 
-static constexpr int ICM7170_TIMER_ID = 0;
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -88,7 +86,7 @@ void icm7170_device::device_start()
 	// resolve callbacks
 	m_out_irq_cb.resolve_safe();
 
-	m_timer = timer_alloc(ICM7170_TIMER_ID);
+	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(icm7170_device::clock_tick), this));
 
 	// TODO: frequency should be based on input clock and divisor
 	m_timer->adjust(attotime::from_hz(100), 0, attotime::from_hz(100));
@@ -110,10 +108,10 @@ void icm7170_device::device_reset()
 }
 
 //-------------------------------------------------
-//  device_timer - handles timer events
+//  clock_tick - advance the RTC's counters
 //-------------------------------------------------
 
-void icm7170_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(icm7170_device::clock_tick)
 {
 	// advance hundredths
 	m_irq_status |= IRQ_BIT_100TH_SECOND;

@@ -216,7 +216,7 @@ void upd765_family_device::device_start()
 
 	for(int i=0; i != 4; i++) {
 		char name[2];
-		flopi[i].tm = timer_alloc(i);
+		flopi[i].tm = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd765_family_device::update_floppy), this));
 		flopi[i].id = i;
 		if(select_connected) {
 			name[0] = '0'+i;
@@ -257,7 +257,7 @@ void upd765_family_device::device_start()
 	cur_live.fi = nullptr;
 
 	if(ready_polled) {
-		poll_timer = timer_alloc(TIMER_DRIVE_READY_POLLING);
+		poll_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd765_family_device::run_drive_ready_polling), this));
 		poll_timer->adjust(attotime::from_usec(100), 0, attotime::from_usec(1024));
 	} else
 		poll_timer = nullptr;
@@ -763,7 +763,7 @@ void upd765_family_device::live_delay(int state)
 {
 	cur_live.next_state = state;
 	if(cur_live.tm != machine().time())
-		cur_live.fi->tm->adjust(cur_live.tm - machine().time());
+		cur_live.fi->tm->adjust(cur_live.tm - machine().time(), cur_live.fi->id);
 	else
 		live_sync();
 }
@@ -827,7 +827,7 @@ void upd765_family_device::live_run(attotime limit)
 			// infinity looking for data too.
 
 			limit = machine().time() + attotime::from_msec(1);
-			cur_live.fi->tm->adjust(attotime::from_msec(1));
+			cur_live.fi->tm->adjust(attotime::from_msec(1), cur_live.fi->id);
 		}
 	}
 
@@ -1614,9 +1614,9 @@ void upd765_family_device::seek_start(floppy_info &fi)
 	seek_continue(fi);
 }
 
-void upd765_family_device::delay_cycles(emu_timer *tm, int cycles)
+void upd765_family_device::delay_cycles(floppy_info &fi, int cycles)
 {
-	tm->adjust(attotime::from_double(double(cycles)/cur_rate));
+	fi.tm->adjust(attotime::from_double(double(cycles)/cur_rate));
 }
 
 void upd765_family_device::seek_continue(floppy_info &fi)
@@ -1630,7 +1630,7 @@ void upd765_family_device::seek_continue(floppy_info &fi)
 				fi.dev->stp_w(0);
 			}
 			fi.sub_state = SEEK_WAIT_STEP_SIGNAL_TIME;
-			fi.tm->adjust(attotime::from_nsec(2500));
+			fi.tm->adjust(attotime::from_nsec(2500), fi.id);
 			return;
 
 		case SEEK_WAIT_STEP_SIGNAL_TIME:
@@ -1649,7 +1649,7 @@ void upd765_family_device::seek_continue(floppy_info &fi)
 					fi.pcn++;
 			}
 			fi.sub_state = SEEK_WAIT_STEP_TIME;
-			delay_cycles(fi.tm, 500*(16-(spec >> 12)));
+			delay_cycles(fi, 500*(16-(spec >> 12)));
 			return;
 
 		case SEEK_WAIT_STEP_TIME:
@@ -1680,7 +1680,7 @@ void upd765_family_device::seek_continue(floppy_info &fi)
 			if(done) {
 				fi.sub_state = SEEK_WAIT_DONE;
 				// recalibrate and seek takes some time, even if we don't move
-				fi.tm->adjust(attotime::from_nsec((fi.main_state == RECALIBRATE) ? 20000 : 10000));
+				fi.tm->adjust(attotime::from_nsec((fi.main_state == RECALIBRATE) ? 20000 : 10000), fi.id);
 				return;
 			}
 			fi.sub_state = SEEK_MOVE;
@@ -1792,7 +1792,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 		switch(fi.sub_state) {
 		case HEAD_LOAD:
 			LOGSTATE("HEAD_LOAD\n");
-			delay_cycles(fi.tm, 500*(spec & 0x00fe));
+			delay_cycles(fi, 500*(spec & 0x00fe));
 			fi.sub_state = HEAD_LOAD_DONE;
 			break;
 		case HEAD_LOAD_DONE:
@@ -1807,7 +1807,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 				fi.dev->stp_w(0);
 			}
 			fi.sub_state = SEEK_WAIT_STEP_SIGNAL_TIME;
-			fi.tm->adjust(attotime::from_nsec(2500));
+			fi.tm->adjust(attotime::from_nsec(2500), fi.id);
 			return;
 
 		case SEEK_WAIT_STEP_SIGNAL_TIME:
@@ -1820,7 +1820,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 				fi.dev->stp_w(1);
 
 			fi.sub_state = SEEK_WAIT_STEP_TIME;
-			delay_cycles(fi.tm, 500*(16-(spec >> 12)));
+			delay_cycles(fi, 500*(16-(spec >> 12)));
 			return;
 
 		case SEEK_WAIT_STEP_TIME:
@@ -2023,7 +2023,7 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 		switch(fi.sub_state) {
 		case HEAD_LOAD:
 			LOGSTATE("HEAD_LOAD\n");
-			delay_cycles(fi.tm, 500*(spec & 0x00fe));
+			delay_cycles(fi, 500*(spec & 0x00fe));
 			fi.sub_state = HEAD_LOAD_DONE;
 			break;
 		case HEAD_LOAD_DONE:
@@ -2164,7 +2164,7 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 		switch(fi.sub_state) {
 		case HEAD_LOAD:
 			LOGSTATE("HEAD_LOAD\n");
-			delay_cycles(fi.tm, 500*(spec & 0x00fe));
+			delay_cycles(fi, 500*(spec & 0x00fe));
 			fi.sub_state = HEAD_LOAD_DONE;
 			break;
 		case HEAD_LOAD_DONE:
@@ -2179,7 +2179,7 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 				fi.dev->stp_w(0);
 			}
 			fi.sub_state = SEEK_WAIT_STEP_SIGNAL_TIME;
-			fi.tm->adjust(attotime::from_nsec(2500));
+			fi.tm->adjust(attotime::from_nsec(2500), fi.id);
 			return;
 
 		case SEEK_WAIT_STEP_SIGNAL_TIME:
@@ -2192,7 +2192,7 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 				fi.dev->stp_w(1);
 
 			fi.sub_state = SEEK_WAIT_STEP_TIME;
-			delay_cycles(fi.tm, 500*(16-(spec >> 12)));
+			delay_cycles(fi, 500*(16-(spec >> 12)));
 			return;
 
 		case SEEK_WAIT_STEP_TIME:
@@ -2353,7 +2353,7 @@ void upd765_family_device::format_track_continue(floppy_info &fi)
 		switch(fi.sub_state) {
 		case HEAD_LOAD:
 			LOGSTATE("HEAD_LOAD\n");
-			delay_cycles(fi.tm, 500*(spec & 0x00fe));
+			delay_cycles(fi, 500*(spec & 0x00fe));
 			fi.sub_state = HEAD_LOAD_DONE;
 			break;
 		case HEAD_LOAD_DONE:
@@ -2438,7 +2438,7 @@ void upd765_family_device::read_id_continue(floppy_info &fi)
 		switch(fi.sub_state) {
 		case HEAD_LOAD:
 			LOGSTATE("HEAD_LOAD\n");
-			delay_cycles(fi.tm, 500*(spec & 0x00fe));
+			delay_cycles(fi, 500*(spec & 0x00fe));
 			fi.sub_state = HEAD_LOAD_DONE;
 			break;
 		case HEAD_LOAD_DONE:
@@ -2522,16 +2522,11 @@ std::string upd765_family_device::ttsn() const
 	return machine().time().to_string();
 }
 
-void upd765_family_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(upd765_family_device::update_floppy)
 {
-	if(id == TIMER_DRIVE_READY_POLLING) {
-		run_drive_ready_polling();
-		return;
-	}
-
 	live_sync();
 
-	floppy_info &fi = flopi[id];
+	floppy_info &fi = flopi[param];
 	switch(fi.sub_state) {
 	case SEEK_WAIT_STEP_SIGNAL_TIME:
 		fi.sub_state = SEEK_WAIT_STEP_SIGNAL_TIME_DONE;
@@ -2544,7 +2539,7 @@ void upd765_family_device::device_timer(emu_timer &timer, device_timer_id id, in
 	general_continue(fi);
 }
 
-void upd765_family_device::run_drive_ready_polling()
+TIMER_CALLBACK_MEMBER(upd765_family_device::run_drive_ready_polling)
 {
 	if(main_phase != PHASE_CMD || (fifocfg & FIF_POLL) || command_pos)
 		return;

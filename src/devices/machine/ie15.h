@@ -56,18 +56,18 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	TIMER_CALLBACK_MEMBER(hblank_onoff_tick);
 
 	virtual void rcv_complete() override;
 	virtual void tra_callback() override;
 	virtual void tra_complete() override;
 
 private:
-	static const device_timer_id TIMER_HBLANK = 0;
 	void scanline_callback();
 	void update_leds();
 	void draw_scanline(uint32_t *p, uint16_t offset, uint8_t scanline);

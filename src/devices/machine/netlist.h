@@ -382,13 +382,15 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(sync_callback);
 
 private:
 	netlist::param_num_t<netlist::nl_fptype> *m_param;
 	bool   m_auto_port;
 	const char *m_param_name;
 	double m_value_for_device_timer;
+	emu_timer *m_sync_timer;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -482,13 +484,15 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(sync_callback);
 
 private:
 	netlist::param_num_t<int> *m_param;
 	uint32_t m_mask;
 	uint32_t m_shift;
 	const char *m_param_name;
+	emu_timer *m_sync_timer;
 };
 
 
@@ -523,12 +527,14 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(sync_callback);
 
 private:
 	netlist::param_num_t<bool> *m_param;
 	uint32_t m_shift;
 	const char *m_param_name;
+	emu_timer *m_sync_timer;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -551,12 +557,14 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(sync_callback);
 
 private:
 	netlist::param_ptr_t *m_param;
 	const char *m_param_name;
 	uint8_t* m_data;
+	emu_timer *m_sync_timer;
 };
 
 // ----------------------------------------------------------------------------------------

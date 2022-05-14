@@ -144,9 +144,8 @@ class nscsi_full_device : public nscsi_device, public nscsi_slot_card_interface
 {
 public:
 	virtual void scsi_ctrl_changed() override;
-protected:
-	enum { SCSI_TIMER = 100 };
 
+protected:
 	// SCSI status returns
 	enum {
 		SS_GOOD                          = 0x00,
@@ -316,11 +315,12 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void scsi_message();
 	virtual void scsi_command();
 	virtual bool scsi_command_done(uint8_t command, uint8_t length);
+
+	TIMER_CALLBACK_MEMBER(update_tick);
 
 	void scsi_unknown_command();
 	void scsi_status_complete(uint8_t st);

@@ -826,7 +826,7 @@ void cio_base_device::device_start()
 	}
 
 	// allocate timer
-	m_timer = timer_alloc();
+	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cio_base_device::advance_counters), this));
 	m_timer->adjust(attotime::from_hz(clock() / 2), 0, attotime::from_hz(clock() / 2));
 
 	// resolve callbacks
@@ -885,10 +885,10 @@ void z8536_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  advance_counters -
 //-------------------------------------------------
 
-void cio_base_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(cio_base_device::advance_counters)
 {
 	if (counter_enabled(TIMER_1) && !counter_external_count(TIMER_1))
 	{

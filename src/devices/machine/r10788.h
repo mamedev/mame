@@ -43,11 +43,10 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(display_update);
 
 private:
-	static const device_timer_id TIMER_DISPLAY = 0;
-
 	uint8_t        m_reg[2][16];          //!< display registers
 	uint8_t        m_ktr;                 //!< transfer keyboard return value
 	uint8_t        m_kts;                 //!< transfer keyboard strobe value

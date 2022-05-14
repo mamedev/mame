@@ -190,7 +190,6 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
 	virtual void device_clock_changed() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -200,6 +199,14 @@ protected:
 	//virtual uint32_t execute_min_cycles() const noexcept override { return 114; }
 	// other internal states
 	int m_icount;
+
+	TIMER_CALLBACK_MEMBER(serout_ready_irq);
+	TIMER_CALLBACK_MEMBER(serout_complete_irq);
+	TIMER_CALLBACK_MEMBER(serin_ready_irq);
+	TIMER_CALLBACK_MEMBER(sync_write);
+	TIMER_CALLBACK_MEMBER(sync_noop);
+	TIMER_CALLBACK_MEMBER(sync_pot);
+	TIMER_CALLBACK_MEMBER(sync_set_irqst);
 
 private:
 
@@ -312,6 +319,14 @@ private:
 	double m_r_pullup;
 	double m_cap;
 	double m_v_ref;
+
+	emu_timer *m_serout_ready_timer;
+	emu_timer *m_serout_complete_timer;
+	emu_timer *m_serin_ready_timer;
+	emu_timer *m_sync_write_timer;
+	emu_timer *m_sync_noop_timer;
+	emu_timer *m_sync_pot_timer;
+	emu_timer *m_sync_set_irqst_timer;
 };
 
 

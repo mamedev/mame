@@ -44,7 +44,7 @@ void iwm_device::device_start()
 {
 	applefdintf_device::device_start();
 
-	m_timer = timer_alloc();
+	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(iwm_device::update_timer_tick), this));
 	save_item(NAME(m_last_sync));
 	save_item(NAME(m_next_state_change));
 	save_item(NAME(m_sync_update));
@@ -90,7 +90,7 @@ void iwm_device::device_reset()
 	m_devsel_cb(0);
 }
 
-void iwm_device::device_timer(emu_timer &, device_timer_id, int)
+TIMER_CALLBACK_MEMBER(iwm_device::update_timer_tick)
 {
 	if(m_active == MODE_DELAY) {
 		flush_write();

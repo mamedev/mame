@@ -22,9 +22,11 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void recv_cb(uint8_t *buf, int len) override;
+
+	TIMER_CALLBACK_MEMBER(tx_update);
+	TIMER_CALLBACK_MEMBER(rx_update);
 
 private:
 	enum { TIMER_TX, TIMER_RX };

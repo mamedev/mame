@@ -105,14 +105,14 @@ DEFINE_DEVICE_TYPE(MCCS1850, mccs1850_device, "mccs1850", "MCCS1850 RTC")
 
 
 //**************************************************************************
-//  INLINE HELPERS
+//  DEVICE FUNCTIONS
 //**************************************************************************
 
 //-------------------------------------------------
 //  check_interrupt -
 //-------------------------------------------------
 
-inline void mccs1850_device::check_interrupt()
+void mccs1850_device::check_interrupt()
 {
 	uint8_t status = m_ram[REGISTER_STATUS];
 	uint8_t control = m_ram[REGISTER_CONTROL];
@@ -140,7 +140,7 @@ inline void mccs1850_device::check_interrupt()
 //  set_pse_line -
 //-------------------------------------------------
 
-inline void mccs1850_device::set_pse_line(bool state)
+void mccs1850_device::set_pse_line(bool state)
 {
 	m_pse = state;
 
@@ -153,7 +153,7 @@ inline void mccs1850_device::set_pse_line(bool state)
 //  read_register -
 //-------------------------------------------------
 
-inline uint8_t mccs1850_device::read_register(offs_t offset)
+uint8_t mccs1850_device::read_register(offs_t offset)
 {
 	switch (offset)
 	{
@@ -183,7 +183,7 @@ inline uint8_t mccs1850_device::read_register(offs_t offset)
 //  write_register -
 //-------------------------------------------------
 
-inline void mccs1850_device::write_register(offs_t offset, uint8_t data)
+void mccs1850_device::write_register(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -247,7 +247,7 @@ inline void mccs1850_device::write_register(offs_t offset, uint8_t data)
 //  advance_seconds -
 //-------------------------------------------------
 
-inline void mccs1850_device::advance_seconds()
+TIMER_CALLBACK_MEMBER(mccs1850_device::advance_seconds)
 {
 	uint32_t alarm = (m_ram[REGISTER_ALARM_LATCH] << 24) | (m_ram[REGISTER_ALARM_LATCH + 1] << 16) | (m_ram[REGISTER_ALARM_LATCH + 2] << 8) | m_ram[REGISTER_ALARM_LATCH + 3];
 
@@ -324,7 +324,7 @@ void mccs1850_device::device_start()
 	nuc_cb.resolve();
 
 	// allocate timers
-	m_clock_timer = timer_alloc(TIMER_CLOCK);
+	m_clock_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mccs1850_device::advance_seconds), this));
 	m_clock_timer->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
 
 	// state saving
@@ -352,21 +352,6 @@ void mccs1850_device::device_reset()
 	else
 		m_ram[REGISTER_STATUS] = 0x80;
 	m_ram[REGISTER_CONTROL] = 0x00;
-}
-
-
-//-------------------------------------------------
-//  device_timer - handler timer events
-//-------------------------------------------------
-
-void mccs1850_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_CLOCK:
-		advance_seconds();
-		break;
-	}
 }
 
 
