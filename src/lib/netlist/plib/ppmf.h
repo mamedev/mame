@@ -33,8 +33,8 @@
 
 #include <algorithm>
 #include <cstdint> // uintptr_t
-#include <utility>
 #include <type_traits>
+#include <utility>
 
 //============================================================
 //  Macro magic

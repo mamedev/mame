@@ -51,7 +51,7 @@
 
 #define PINT_EXPECT(comp, exp1, exp2) \
 	if (!plib::testing::internal_assert(plib::testing::comp_ ## comp (), # exp1, # exp2, exp1, exp2)) \
-		std::cout << std::string(__FILE__) << std::string(":") << __LINE__ << std::string(":1: error: test failed\n")
+		std::cout << __FILE__ << ":" << __LINE__ << ":1: error: test failed\n"
 
 #define PINT_EXPECT_THROW(exp, excep) \
 	if (const char *ptest_f = __FILE__) \
