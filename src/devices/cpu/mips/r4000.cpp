@@ -200,44 +200,8 @@ void r4000_base_device::device_start()
 
 	R4000_ENDIAN_LE_BE(accessors(m_le), accessors(m_be));
 
-	/*
-	 * MIPS-III secondary cache tag size depends on the cache line size
-	 * (how many bytes are transferred with one cache operation) and the
-	 * size of the cache itself.
-	 * For example, the Sony NEWS NWS-5000X has a 1MB secondary cache
-	 * and a cache line size of 16 words. So, the slice of the physical
-	 * address used to index into the cache is bits 19:6.
-	 * See chapter 11 of the R4000 user manual for more details.
-	 */
 	if (SCACHE)
-	{
-		if (m_scache_line_size == 0)
-			fatalerror("SCACHE line size was not set!");
-
-		if (m_scache_line_size <= 0x10)
-			m_scache_line_index = 4;
-		else if (m_scache_line_size <= 0x20)
-		{
-			m_scache_line_index = 5;
-			m_cp0[CP0_Config] |= 1 << 22;
-		}
-		else if (m_scache_line_size <= 0x40)
-		{
-			m_scache_line_index = 6;
-			m_cp0[CP0_Config] |= 2 << 22;
-		}
-		else
-		{
-			m_scache_line_index = 7;
-			m_cp0[CP0_Config] |= 3 << 22;
-		}
-
-		m_scache_tag_size = m_scache_size >> m_scache_line_index;
-		m_scache_tag_mask = m_scache_size - 1;
-
-		m_scache_tag = std::make_unique<u32[]>(m_scache_tag_size);
 		save_pointer(NAME(m_scache_tag), m_scache_tag_size);
-	}
 }
 
 void r4000_base_device::device_reset()
@@ -4130,4 +4094,47 @@ std::string r4000_base_device::debug_unicode_string(u64 unicode_string_pointer)
 		result.assign(L"[unmapped]");
 
 	return utf8_from_wstring(result);
+}
+
+void r4000_base_device::configure_scache()
+{
+	if (m_scache_size > 0)
+	{
+		/*
+		* Secondary cache tag size depends on the cache line size
+		* (how many bytes are transferred with one cache operation) and the
+		* size of the cache itself.
+		* For example, the Sony NEWS NWS-5000X has a 1MB secondary cache
+		* and a cache line size of 16 words. So, the slice of the physical
+		* address used to index into the cache is bits 19:6.
+		* See chapter 11 of the R4000 user manual for more details.
+		*/
+		if (m_scache_line_size == 0)
+			fatalerror("SCACHE line size was not set!");
+
+		if (m_scache_line_size <= 0x10)
+			m_scache_line_index = 4;
+		else if (m_scache_line_size <= 0x20)
+		{
+			m_scache_line_index = 5;
+			m_cp0[CP0_Config] |= 1 << 22;
+		}
+		else if (m_scache_line_size <= 0x40)
+		{
+			m_scache_line_index = 6;
+			m_cp0[CP0_Config] |= 2 << 22;
+		}
+		else
+		{
+			m_scache_line_index = 7;
+			m_cp0[CP0_Config] |= 3 << 22;
+		}
+
+		m_scache_tag_size = m_scache_size >> m_scache_line_index;
+		m_scache_tag_mask = m_scache_size - 1;
+
+		m_scache_tag = std::make_unique<u32[]>(m_scache_tag_size);
+	}
+	else
+		m_cp0[CP0_Config] |= CONFIG_SC;
 }

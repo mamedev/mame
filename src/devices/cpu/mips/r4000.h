@@ -45,17 +45,6 @@ public:
 
 	void bus_error() { m_bus_error = true; }
 
-	// Secondary cache configuration
-	void set_scache_size(u32 size)
-	{
-		if (size != 0)
-			m_cp0[CP0_Config] &= ~CONFIG_SC;
-
-		m_scache_size = size;
-	}
-
-	void set_secondary_cache_line_size(u8 size) { m_scache_line_size = size; }
-
 protected:
 	enum cache_size
 	{
@@ -479,6 +468,7 @@ protected:
 	std::unique_ptr<u32[]> m_icache_data;
 
 	// experimental scache state
+	void configure_scache();
 	u32 m_scache_size; // Size in bytes
 	u8 m_scache_line_size;
 	u32 m_scache_line_index; // Secondary cache line shift
@@ -513,15 +503,16 @@ public:
 class r4400_device : public r4000_base_device
 {
 public:
-	r4400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, bool timer_interrupt_disabled)
+	r4400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, bool timer_interrupt_disabled, u32 scache_size, u8 scache_line_size)
 		: r4000_base_device(mconfig, R4400, tag, owner, clock, 0x0440, 0x0500, CACHE_16K, CACHE_16K, 10, 20, 69, 133, timer_interrupt_disabled)
 	{
-		// no secondary cache by default
-		m_cp0[CP0_Config] |= CONFIG_SC;
+		m_scache_size = scache_size;
+		m_scache_line_size = scache_line_size;
+		configure_scache();
 	}
 
 	r4400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: r4400_device(mconfig, tag, owner, clock, false)
+		: r4400_device(mconfig, tag, owner, clock, false, 0, 0)
 	{
 	}
 };
