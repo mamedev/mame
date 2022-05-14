@@ -7461,7 +7461,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="262144">
-				<rom name="green beret (prototype 3).gbc" size="262144" crc="fac3f4c5" sha1="dd69f3d9ef87198334b4cc0f54c88a29fb353e44"/>
+				<rom name="green beret (prototype 3).bin" size="262144" crc="fac3f4c5" sha1="dd69f3d9ef87198334b4cc0f54c88a29fb353e44"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7476,7 +7476,7 @@ license:CC0
 			<feature name="battery" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="32768">
-				<rom name="green beret (prototype 1).gbc" size="32768" crc="c66c546f" sha1="5b92b0db1af9803e27a4ebb23ad9ed8377d6d87b"/>
+				<rom name="green beret (prototype 1).bin" size="32768" crc="c66c546f" sha1="5b92b0db1af9803e27a4ebb23ad9ed8377d6d87b"/>
 			</dataarea>
 			<dataarea name="nvram" size="2048">
 			</dataarea>
@@ -7492,7 +7492,7 @@ license:CC0
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="65536">
-				<rom name="green beret (prototype 2).gbc" size="65536" crc="702af305" sha1="f8e6ee070147c56e280abf2a31316ee8124b953c"/>
+				<rom name="green beret (prototype 2).bin" size="65536" crc="702af305" sha1="f8e6ee070147c56e280abf2a31316ee8124b953c"/>
 			</dataarea>
 			<dataarea name="nvram" size="2048">
 			</dataarea>
