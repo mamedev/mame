@@ -4269,8 +4269,6 @@ files {
 	MAME_DIR .. "src/mame/includes/tagteam.h",
 	MAME_DIR .. "src/mame/video/tagteam.cpp",
 	MAME_DIR .. "src/mame/drivers/vball.cpp",
-	MAME_DIR .. "src/mame/includes/vball.h",
-	MAME_DIR .. "src/mame/video/vball.cpp",
 	MAME_DIR .. "src/mame/drivers/wwfsstar.cpp",
 	MAME_DIR .. "src/mame/includes/wwfsstar.h",
 	MAME_DIR .. "src/mame/video/wwfsstar.cpp",
