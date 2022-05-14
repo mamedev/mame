@@ -1447,6 +1447,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/fruitsamples.h,MACHINES["FRUITSAMPLES"] = true
+---------------------------------------------------
+
+if (MACHINES["FRUITSAMPLES"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/fruitsamples.cpp",
+		MAME_DIR .. "src/devices/machine/fruitsamples.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/gt913_io.h,MACHINES["GT913"] = true
 --@src/devices/machine/gt913_kbd.h,MACHINES["GT913"] = true
 --@src/devices/machine/gt913_snd.h,MACHINES["GT913"] = true

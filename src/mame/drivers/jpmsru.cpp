@@ -46,11 +46,11 @@
 #include "emu.h"
 
 #include "audio/nl_jpmsru.h"
-#include "machine/genfruit.h"
 #include "video/awpvid.h"
 
 #include "cpu/tms9900/tms9980a.h"
 
+#include "machine/fruitsamples.h"
 #include "machine/netlist.h"
 #include "machine/nvram.h"
 #include "machine/steppers.h"
@@ -68,17 +68,18 @@
 
 #define MAIN_CLOCK 6_MHz_XTAL
 
-class jpmsru_state : public genfruit_class
+class jpmsru_state : public driver_device
 {
 public:
 	jpmsru_state(const machine_config &mconfig, device_type type, const char *tag) : 
-			genfruit_class(mconfig, type, tag),
+			driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_inputs(*this, "IN%u", 0U),
 			m_reel(*this, "reel%u", 0U),
 			m_lamp(*this, "lamp%u", 0U),
 			m_digits(*this, "digit%u", 0U),
 			m_audio_in(*this, "nl_audio:in%u", 0U),
+			m_samples(*this, "samples"),
 			m_nvram(*this, "nvram", 0x80, ENDIANNESS_BIG),
 			m_dips(*this, "DIP%u", 0U)
 	{ }
@@ -154,6 +155,7 @@ private:
 	output_finder<56> m_lamp;
 	output_finder<2> m_digits;
 	required_device_array<netlist_mame_logic_input_device, 6> m_audio_in;
+	required_device<fruit_samples_device> m_samples;
 	
 	memory_share_creator<uint8_t> m_nvram;
 	optional_ioport_array<3> m_dips;
@@ -335,17 +337,17 @@ template<unsigned Meter>
 void jpmsru_state::out_meter_w(offs_t offset, uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(Meter, data);
-	if(data) m_samples->start(0, SAMPLE_METER);
+	// SRU doesn't have audible meters
 }
 
 void jpmsru_state::out_payout_cash_w(offs_t offset, uint8_t data)
 {
-	if(data) m_samples->start(1, SAMPLE_PAYOUT);
+	if(data) m_samples->play(fruit_samples_device::SAMPLE_PAYOUT);
 }
 
 void jpmsru_state::out_payout_token_w(offs_t offset, uint8_t data)
 {
-	if(data) m_samples->start(1, SAMPLE_PAYOUT);
+	if(data) m_samples->play(fruit_samples_device::SAMPLE_PAYOUT);
 }
 
 void jpmsru_state::out_coin_lockout_w(offs_t offset, uint8_t data)
@@ -721,8 +723,6 @@ INPUT_PORTS_END
 
 void jpmsru_state::machine_start()
 {
-	genfruit_class::machine_start();
-	
 	m_lamp.resolve();
 	m_digits.resolve();
 	
@@ -739,8 +739,6 @@ void jpmsru_state::machine_start()
 
 void jpmsru_state::init_jpmsru()
 {
-	genfruit_class::machine_reset();
-	
 	m_int1 = 0;
 	m_int2 = 0;
 	m_reelbits[0] = 0;
@@ -771,8 +769,6 @@ void jpmsru_state::jpmsru_3k(machine_config &config)
 	REEL(config, m_reel[3], SRU_200STEP_REEL, 8, 10, 0, 7, 200*2);
 	m_reel[3]->optic_handler().set(FUNC(jpmsru_state::opto_cb<3>));
 	
-	genfruit_audio(config);
-	
 	config.set_default_layout(layout_jpmsru);
 	
 	SPEAKER(config, "mono").front_center();
@@ -790,6 +786,8 @@ void jpmsru_state::jpmsru_3k(machine_config &config)
 	NETLIST_ANALOG_INPUT(config, "nl_audio:pot", "R8.DIAL");
 
 	NETLIST_STREAM_OUTPUT(config, "nl_audio:cout0", 0, "OUT").set_mult_offset(1.0, 0.0);
+
+	FRUIT_SAMPLES(config, m_samples);
 }
 
 // SRU with 3K ROM card and Bus Extension board

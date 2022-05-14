@@ -2331,8 +2331,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/jpms80.cpp",
 	MAME_DIR .. "src/mame/audio/nl_jpmsru.cpp",
 	MAME_DIR .. "src/mame/audio/nl_jpmsru.h",
-	MAME_DIR .. "src/mame/machine/genfruit.cpp",
-	MAME_DIR .. "src/mame/machine/genfruit.h",
 	MAME_DIR .. "src/mame/drivers/jpmsru.cpp",
 	MAME_DIR .. "src/mame/drivers/jpmimpct.cpp",
 	MAME_DIR .. "src/mame/includes/jpmimpct.h",
