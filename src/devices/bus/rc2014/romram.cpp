@@ -126,7 +126,7 @@ uint8_t rom_ram_512k_device::mem_r(offs_t offset, uint8_t bank)
 
 ROM_START(rc2014_rom_ram_512k)
 	ROM_REGION( 0x80000, "flash", 0)
-	ROM_DEFAULT_BIOS("1.512k")
+	ROM_DEFAULT_BIOS("3.0.1")
 	// Official ROMs distributed with kit
 	ROM_SYSTEM_BIOS(0, "1.512k", "RomWBW RC_Std.ROM 2.9.1-pre5")
 	ROMX_LOAD( "rc_1.512k.rom", 0x00000, 0x80000, CRC(f360d908) SHA1(e9c0c79f873eecff9184836025c13915630274c5), ROM_BIOS(0))
