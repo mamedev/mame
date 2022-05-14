@@ -88,7 +88,7 @@ public:
 		sample *= mmax;
 		sample = std::max(mmin, sample);
 		sample = std::min(mmax, sample);
-		const auto dest(static_cast<T>(sample));
+		const T dest(static_cast<T>(sample));
 		write(dest);
 	}
 

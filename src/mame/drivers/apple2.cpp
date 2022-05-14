@@ -299,6 +299,8 @@ void apple2_state::machine_start()
 		m_ram_ptr[adr+1] = 0xff;
 	}
 
+	m_joystick_x1_time = m_joystick_x2_time = m_joystick_y1_time = m_joystick_y2_time = 0;
+
 	// setup save states
 	save_item(NAME(m_speaker_state));
 	save_item(NAME(m_cassette_state));

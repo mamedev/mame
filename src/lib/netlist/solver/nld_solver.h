@@ -20,9 +20,7 @@
 // solver
 // ----------------------------------------------------------------------------------------
 
-namespace netlist
-{
-namespace devices
+namespace netlist::devices
 {
 	NETLIB_OBJECT(solver)
 	{
@@ -34,7 +32,7 @@ namespace devices
 		, m_fb_step(*this, "FB_step", NETLIB_DELEGATE(fb_step<false>))
 		, m_Q_step(*this, "Q_step")
 		, m_params(*this, "", solver::solver_parameter_defaults::get_instance())
-		, m_queue(config::MAX_SOLVER_QUEUE_SIZE::value,
+		, m_queue(config::max_solver_queue_size(),
 			queue_type::id_delegate(&NETLIB_NAME(solver) :: get_solver_id, this),
 			queue_type::obj_delegate(&NETLIB_NAME(solver) :: solver_by_id, this))
 		{
@@ -89,7 +87,6 @@ namespace devices
 
 	};
 
-} // namespace devices
-} // namespace netlist
+} // namespace netlist::devices
 
 #endif // NLD_SOLVER_H_

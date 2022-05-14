@@ -411,11 +411,10 @@ void news_r4k_state::machine_common(machine_config &config)
 	m_cpu->set_dcache_size(DCACHE_SIZE);
 	m_cpu->set_system_clock((75_MHz_XTAL).value() / 3); // because config[30:28] = 0b001
 #else
-	R4400(config, m_cpu, 75_MHz_XTAL);
+	R4400(config, m_cpu, 75_MHz_XTAL, true);
 #endif
 
 	m_cpu->set_addrmap(AS_PROGRAM, &news_r4k_state::cpu_map);
-	m_cpu->set_timer_interrupt_disable(true);
 	m_cpu->set_scache_size(SCACHE_SIZE);
 	m_cpu->set_secondary_cache_line_size(0x40); // because config[23:22] = 0b10
 

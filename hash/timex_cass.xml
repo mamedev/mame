@@ -151,17 +151,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="assaltoa">
-		<description>Assalto A Embaixada</description>
-		<year>1982</year>
-		<publisher>TMX Portugal Ltda</publisher>
-		<part name="cass" interface="spectrum_cass">
-			<dataarea name="cass" size="18866">
-				<rom name="assalto a embaixada (1982)(tmx portugal ltda).tzx" size="18866" crc="adb7e4a1" sha1="89b661813b6fcb19aecabd93f5921e2f884ad55c"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="astrobla">
 	<!--    Thought to be a bootleg of Quicksilva's Spectrum release.   -->
 		<description>Astro Blaster (bootleg?)</description>
@@ -653,10 +642,10 @@ license:CC0
 	<software name="intrs232">
 		<description>Interface RS232</description>
 		<year>198?</year>
-		<publisher>Timex Computer Corporation</publisher>
+		<publisher>TMX Portugal Ltda</publisher>
 		<part name="cass" interface="spectrum_cass">
 			<dataarea name="cass" size="418">
-				<rom name="interface rs232 (198x)(timex computer corporation).tzx" size="418" crc="81e729fd" sha1="88c2e38ca230f2cb535f7ea404f807f2cfed9f6c"/>
+				<rom name="interface rs232 - timex computer.tzx" size="418" crc="81e729fd" sha1="88c2e38ca230f2cb535f7ea404f807f2cfed9f6c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -859,18 +848,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="perigosns">
-	<!--    Portuguese adaptation of Jungle Trouble -->
-		<description>Perigos Na Selva</description>
-		<year>1983</year>
-		<publisher>TMX Portugal Ltda</publisher>
-		<part name="cass" interface="spectrum_cass">
-			<dataarea name="cass" size="23070">
-				<rom name="perigos na selva (1983)(tmx portugal ltda).tzx" size="23070" crc="61c78a5f" sha1="c5b5c0a590164db3f7f4f6d35c8d5327a804580e"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pershofi">
 		<description>Personal Home Finance</description>
 		<year>1983</year>
@@ -918,24 +895,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="prpresen">
-		<description>Programa de a presentaçao</description>
-		<year>1983</year>
-		<publisher>TMX Portugal Ltda</publisher>
-		<part name="cass1" interface="spectrum_cass">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="cass" size="64513">
-				<rom name="programa de a presentacao - side a (1983)(tmx portugal ltda).tzx" size="64513" crc="473f0089" sha1="3cfcc1e405f6dfcdd9f99be11651f5a680904fcc"/>
-			</dataarea>
-		</part>
-		<part name="cass2" interface="spectrum_cass">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="cass" size="87645">
-				<rom name="programa de a presentacao - side b (1983)(tmx portugal ltda).tzx" size="87645" crc="988ad0de" sha1="c4322b5a4f7560377c118746413c798f37aa6cc9"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="quadrach">
 		<description>Quadra-Chart</description>
 		<year>1983</year>
@@ -977,17 +936,6 @@ license:CC0
 		<part name="cass" interface="spectrum_cass">
 			<dataarea name="cass" size="8543">
 				<rom name="smart terminal 1 (1983)(timex computer corporation).tap" size="8543" crc="ac4ff16c" sha1="729956100e526e0fe89c1a82fc6930383259c697"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="spacerai">
-		<description>Space Raiders</description>
-		<year>1983</year>
-		<publisher>TMX Portugal Ltda</publisher>
-		<part name="cass" interface="spectrum_cass">
-			<dataarea name="cass" size="22651">
-				<rom name="space raiders (1983)(tmx portugal ltda).tzx" size="22651" crc="03aaf3e4" sha1="05fb367e864377853ed63b9a3e79be00fde37eae"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1376,4 +1324,31 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- ##################################################
+	      Covertapes from "Byte Power, 1st Class Magazine"
+	     ################################################## -->
+	<!--
+		Undumped covertapes confirmed to exist as of July 1988 (more may have been released afterwards):
+			August 1986
+			September 1986
+			October 1986
+			November 1986
+			December 1986 - January 1987
+			February 1987
+			Spring 1987
+			Fall 1987
+			May 1988
+	-->
+	<software name="bpfeb88">
+		<description>Byte Power (February 1988)</description>
+		<year>1988</year>
+		<publisher>Byte Power</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="141395">
+				<rom name="byte-power-02-1988.tzx" size="141395" crc="6556dc57" sha1="c9f740a2b2f47930321c078001f6fc3ec98e119a"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

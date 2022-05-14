@@ -40,11 +40,12 @@ public:
 	void tigerhb2(machine_config &config);
 	void tigerhb4(machine_config &config);
 	void getstarb2(machine_config &config);
-	void slapfighb2(machine_config &config);
 	void getstarb1(machine_config &config);
 	void perfrman(machine_config &config);
 	void slapfigh(machine_config &config);
+	void slapfigha(machine_config &config);
 	void slapfighb1(machine_config &config);
+	void slapfighb2(machine_config &config);
 
 	void init_banks();
 	void init_getstarb1();

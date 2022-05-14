@@ -1007,6 +1007,7 @@ function createMAMEProjects(_target, _subtarget, _name)
 		GEN_DIR  .. "mame/layout",
 	}
 	includedirs {
+		ext_includedir("asio"),
 		ext_includedir("flac"),
 		ext_includedir("glm"),
 		ext_includedir("jpeg"),
@@ -1445,6 +1446,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/bowltry.cpp",
 	MAME_DIR .. "src/mame/drivers/ohmygod.cpp",
 	MAME_DIR .. "src/mame/drivers/patapata.cpp",
+	MAME_DIR .. "src/mame/drivers/rallypnt.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "barcrest")
@@ -1542,6 +1544,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/cps1bl_pic.cpp",
 	MAME_DIR .. "src/mame/drivers/kenseim.cpp",
 	MAME_DIR .. "src/mame/drivers/cps2.cpp",
+	MAME_DIR .. "src/mame/machine/cps2comm.cpp",
+	MAME_DIR .. "src/mame/machine/cps2comm.h",
 	MAME_DIR .. "src/mame/machine/cps2crypt.cpp",
 	MAME_DIR .. "src/mame/machine/cps2crypt.h",
 	MAME_DIR .. "src/mame/drivers/cps3.cpp",
@@ -1755,8 +1759,6 @@ files {
 	MAME_DIR .. "src/mame/video/exprraid.cpp",
 	MAME_DIR .. "src/mame/drivers/ffantasy_ms.cpp",
 	MAME_DIR .. "src/mame/drivers/firetrap.cpp",
-	MAME_DIR .. "src/mame/includes/firetrap.h",
-	MAME_DIR .. "src/mame/video/firetrap.cpp",
 	MAME_DIR .. "src/mame/drivers/funkyjet.cpp",
 	MAME_DIR .. "src/mame/drivers/karnov.cpp",
 	MAME_DIR .. "src/mame/drivers/kchamp.cpp",
@@ -2982,8 +2984,6 @@ files {
 	MAME_DIR .. "src/mame/includes/namcos86.h",
 	MAME_DIR .. "src/mame/video/namcos86.cpp",
 	MAME_DIR .. "src/mame/drivers/pacland.cpp",
-	MAME_DIR .. "src/mame/includes/pacland.h",
-	MAME_DIR .. "src/mame/video/pacland.cpp",
 	MAME_DIR .. "src/mame/drivers/polepos.cpp",
 	MAME_DIR .. "src/mame/includes/polepos.h",
 	MAME_DIR .. "src/mame/audio/polepos.cpp",
@@ -4527,8 +4527,6 @@ createMAMEProjects(_target, _subtarget, "yunsung")
 files {
 	MAME_DIR .. "src/mame/drivers/nmg5.cpp",
 	MAME_DIR .. "src/mame/drivers/paradise.cpp",
-	MAME_DIR .. "src/mame/includes/paradise.h",
-	MAME_DIR .. "src/mame/video/paradise.cpp",
 	MAME_DIR .. "src/mame/drivers/yunsung8.cpp",
 	MAME_DIR .. "src/mame/drivers/yunsun16.cpp",
 	MAME_DIR .. "src/mame/includes/yunsun16.h",
@@ -4689,10 +4687,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/3do.cpp",
 	MAME_DIR .. "src/mame/includes/3do.h",
 	MAME_DIR .. "src/mame/machine/3do.cpp",
-	MAME_DIR .. "src/mame/drivers/4enraya.cpp",
-	MAME_DIR .. "src/mame/includes/4enraya.h",
-	MAME_DIR .. "src/mame/video/4enraya.cpp",
 	MAME_DIR .. "src/mame/drivers/4enlinea.cpp",
+	MAME_DIR .. "src/mame/drivers/4enraya.cpp",
 	MAME_DIR .. "src/mame/drivers/5clown.cpp",
 	MAME_DIR .. "src/mame/drivers/a1supply.cpp",
 	MAME_DIR .. "src/mame/drivers/acefruit.cpp",
@@ -4881,6 +4877,7 @@ files {
 	MAME_DIR .. "src/mame/includes/homedata.h",
 	MAME_DIR .. "src/mame/video/homedata.cpp",
 	MAME_DIR .. "src/mame/drivers/hotblock.cpp",
+	MAME_DIR .. "src/mame/drivers/hotchili.cpp",
 	MAME_DIR .. "src/mame/drivers/hotstuff.cpp",
 	MAME_DIR .. "src/mame/drivers/houseball.cpp",
 	MAME_DIR .. "src/mame/drivers/imolagp.cpp",

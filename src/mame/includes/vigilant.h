@@ -6,6 +6,7 @@
 #pragma once
 
 #include "audio/m72.h"
+#include "machine/timer.h"
 #include "emupal.h"
 
 class vigilant_state : public driver_device
@@ -14,6 +15,7 @@ public:
 	vigilant_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu"),
 		m_audio(*this, "m72"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -30,6 +32,7 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 	required_device<m72_audio_device> m_audio;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -51,6 +54,7 @@ private:
 	// common
 	void bank_select_w(uint8_t data);
 	void paletteram_w(offs_t offset, uint8_t data);
+	TIMER_DEVICE_CALLBACK_MEMBER(sound_nmi);
 
 	// vigilant and buccanrs
 	void vigilant_out2_w(uint8_t data);

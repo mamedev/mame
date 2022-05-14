@@ -20,7 +20,7 @@ if sys.version_info > (3, ):
 
 last_src = ""
 
-def process_entry(srcfile, name, params):
+def process_srcfile(srcfile):
     global last_src
     if (last_src != srcfile):
         last_src = srcfile
@@ -28,6 +28,13 @@ def process_entry(srcfile, name, params):
         print("// Source: {}".format(srcfile))
         print("// ---------------------------------------------------------------------")
         print("")
+
+def process_entry_external(srcfile, name):
+    process_srcfile(srcfile)
+    print("NETLIST_EXTERNAL({})".format(name))
+
+def process_entry(srcfile, name, params):
+    process_srcfile(srcfile)
     p = re.sub("\+","",params)
     ps = p.split(",")
     pusage = ""
@@ -54,24 +61,29 @@ def process_file(srcfile):
         ls = re.sub("\"","",ls)
         m = re.match(r"NETLIB_DEVICE_IMPL\((\w+),(\w+),([a-zA-Z0-9_+@,]*)", ls)
         #print("Line{}: {}".format(count, line.strip()))
-        if m != None:
+        if m is not None:
             process_entry(srcfile, m.group(2), m.group(3))
         else:
             m = re.match(r"NETLIB_DEVICE_IMPL_ALIAS\((\w+),(\w+),(\w+),([a-zA-Z0-9_+@,]*)", ls)
-            if m != None:
+            if m is not None:
                 process_entry(srcfile, m.group(3), m.group(4))
             else:
                 m = re.match(r"NETLIB_DEVICE_IMPL_NS\((\w+),(\w+),(\w+),([a-zA-Z0-9_+@,]*)", ls)
-                if m != None:
+                if m is not None:
                     process_entry(srcfile, m.group(3), m.group(4))
                 else:
                     m = re.match(r"LOCAL_LIB_ENTRY\((\w+)\)", ls)
-                    if m != None:
+                    if m is not None:
                         process_entry(srcfile, m.group(1), "")
                     else:
                         m = re.match(r"(static)*TRUTHTABLE_START\((\w+),(\w+),(\w+),([a-zA-Z0-9_+@,]*)", ls)
-                        if m != None:
+                        if m is not None:
                             process_entry(srcfile, m.group(2), m.group(5))
+                        else:
+                            #m = re.match(r"EXTERNAL_SOURCE\((\w+)\)", ls)
+                            m = re.match(r"NETLIST_START\((\w+)\)", ls)
+                            if m is not None:
+                                process_entry_external(srcfile, m.group(1))
 
     src.close()
 

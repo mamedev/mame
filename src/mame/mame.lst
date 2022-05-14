@@ -108,10 +108,10 @@ undoukai                        // A17 (c) 1984 Taito
 @source:4enlinea.cpp
 4enlinea                        // (c) 1991 Compumatic / CIC Play
 4enlineb                        // (c) 1991 Compumatic / CIC Play
+dardos                          // (c) 1992 Oper Coin
 k7_olym                         // (c) 1994 K7 Kursaal / NMI Electronics
 k7_olym30                       // (c) 1994 K7 Kursaal / NMI Electronics
 sprtdart                        // (c) 1993 Compumatic / Desarrollos y Recambios S.L.
-unkdarts                        // (c) 1992 Oper Coin.
 
 @source:4enraya.cpp
 4enraya                         // (c) 1990 IDSA
@@ -125,6 +125,7 @@ unkpacgb                        //
 unkpacgc                        //
 unksig                          // 1998?
 unksiga                         // 1998?
+unksigb                         // 1998?
 
 @source:4roses.cpp
 4roses                          // (c) 1999 Unknown
@@ -2934,7 +2935,8 @@ a1200xl                         // 1982 Atari 1200 XL
 a130xe                          // 1986 Atari 130 XE
 a400                            // 1979 Atari 400
 a400pal                         // 1979 Atari 400 PAL
-a5200                           // Atari 5200
+a5200                           // 1982 Atari 5200
+a5200a                          // 1983 Atari 5200 (2-port)
 a600xl                          // 1983 Atari 600 XL
 a65xe                           // 1986 Atari 65 XE (XL Extended)
 a65xea                          // 1986? Atari 65 XE Arabic
@@ -11982,6 +11984,7 @@ mjflove                         // "500" (c) 1996 Dynax
 mjgnight                        // "003" 2000 Techno-Top
 mjmyorn2                        // "71?" (c) 1993 Dynax
 mjmyornt                        // "71" (c) 1992 Dynax
+mjmyorntr                       //
 mjmyster                        // "77" (c) 1994 Dynax
 mjmyuniv                        // "85" (c) 1994 Dynax
 mjmywrld                        // "77" (c) 1994 Dynax
@@ -14707,6 +14710,7 @@ moonaln                         // [Nichibutsu] (Karateco license) or hack
 mooncmw                         // bootleg
 mooncptc                        // bootleg (Petaco S.A.)
 mooncreg                        // bootleg
+mooncreg2                       // bootleg
 mooncrgx                        // bootleg
 mooncrs2                        // bootleg
 mooncrs3                        // bootleg
@@ -16458,9 +16462,6 @@ heromem                         // E34 (c) 1997 Taito
 hexion                          // GX122 (c) 1992
 hexionb                         // bootleg
 
-@source:hh_amis2k.cpp
-wildfire                        // Parker Bros
-
 @source:hh_cop400.cpp
 bship82                         // Milton Bradley
 ctstein                         // Castle Toy
@@ -17017,6 +17018,9 @@ thrilldbu                       // GE713UF (c)1998 ?AB
 hotblock                        // (c) 1993 Nics? / NIX?
 hotblocka                       // (c) 1993 Nics? / NIX?
 hotblockb                       // (c) 1993 Nics? / NIX?
+
+@source:hotchili.cpp
+hotchili                        // (c) 1995 Pacific Gaming Pty Ltd.
 
 @source:hotstuff.cpp
 hotstuff                        //
@@ -33175,9 +33179,11 @@ svcpcba                         // 0269 (c) 2003 Playmore / Capcom - JAMMA PCB
 neoprint                        //
 npcartv1                        //
 npcramen                        //
+npeurver                        //
 npfpit                          //
 npmillen                        //
 npotogib                        //
+nppopeye                        //
 nprsp                           //
 npscv1                          //
 npskv                           //
@@ -33587,6 +33593,7 @@ tdragon2a                       // UPL-93091 (c) 1993 NMK
 tdragon3h
 tdragonb                        // bootleg
 tdragonb2                       // bootleg
+tdragonb3                       // bootleg
 tharrier                        // UPL-89053 (c) 1989 UPL
 tharrierb                       // Lettering bootleg
 tharrieru                       // UPL-89053 (c) 1989 UPL + American Sammy license
@@ -35229,6 +35236,7 @@ kov2                            // (c) 2000 Knights of Valor 2
 kov2100                         //
 kov2101                         //
 kov2102                         //
+kov21022                        //
 kov2103                         //
 kov2104                         //
 kov2106                         //
@@ -36468,6 +36476,9 @@ rainbow                         // 1983 DEC Rainbow 100-B
 rainbow100a                     // 1982 DEC Rainbow 100-A
 rainbow190                      // 1985 DEC Rainbow 190
 
+@source:rallypnt.cpp
+rallypnt2
+
 @source:rallyx.cpp
 commsega                        // (c) 1983 Sega
 cottong                         // bootleg
@@ -36750,6 +36761,7 @@ mt32                            //
 
 @source:roland_pr100.cpp
 pr100                           //
+pr100_201                       //
 
 @source:roland_r8.cpp
 r8                              //
@@ -36885,6 +36897,7 @@ mjvegasa                        // "50" 1991 Dynax
 mjyarou                         // (c) 1986 Visco / Video System
 mjyarou2                        // (c) 1986 Visco / Video System
 openmj                          // (c) 1982 Nichibutsu
+pongboo2                        // (c) 1997 OCT
 royalmah                        // Falcon bootleg
 royalmj                         // (c) 1982 Nichibutsu
 rkjanoh2                        // SNK / Dyna Corp
@@ -37174,6 +37187,7 @@ chesstrvi
 @source:saitek_corona.cpp
 corona
 coronaa
+coronab
 
 @source:saitek_cp2000.cpp
 cp2000
@@ -37580,6 +37594,9 @@ scorpio                         //
 
 @source:scotrsht.cpp
 scotrsht                        // GX545 (c) 1985
+
+@source:scrablex.cpp
+scrablex                        // Selchow & Righter
 
 @source:scramble.cpp
 800fath                         // (c) 1981 Amenip + U.S. Billiards license
@@ -41822,6 +41839,8 @@ batrideru                       // (c) 1998 Raizing/8ing
 batsugun                        // TP-030 (c) 1993 Toaplan
 batsuguna                       // TP-030 (c) 1993 Toaplan
 batsugunb                       //
+batsugunc                       // TP-030 (c) 1993 Toaplan
+batsugunbl                      // bootleg
 batsugunsp                      // TP-030 (c) 1993 Toaplan
 bbakraid                        // (c) 1999 8ing
 bbakraidc                       // (c) 1999 8ing
@@ -41838,6 +41857,7 @@ bgareggat2                      // (c) 1996 Raizing/8ing
 bgareggatw                      // (c) 1996 Raizing/8ing
 dogyuun                         // TP-022 (c) 1992 Toaplan
 dogyuuna                        // TP-022 (c) 1992 Toaplan
+dogyuunb                        // TP-022 (c) 1992 Toaplan
 dogyuunt                        // TP-022 (c) 1992 Toaplan
 fixeight                        // TP-026 (c) 1992 + Taito license
 fixeighta                       // TP-026 (c) 1992 + Taito license
@@ -43424,6 +43444,9 @@ wicat                           //
 @source:wico.cpp
 aftor                           //
 
+@source:wildfire.cpp
+wildfire                        // Parker Bros
+
 @source:wildpkr.cpp
 tabpkr                          // 199?, TAB Austira
 wildpkr                         // 199?, TAB Austria.
@@ -44539,3 +44562,10 @@ gs6809                          // Grant Searle's Simple 6809 Machine
 
 @source:ultim809.cpp
 ultim809
+
+@source:rc2014.cpp
+rc2014                          // RC2014 Classic
+rc2014pro                       // RC2014 Pro
+rc2014cl2                       // RC2014 Classic II
+rc2014zed                       // RC2014 Zed
+rc2014zedp                      // RC2014 Zed Pro

@@ -98,7 +98,6 @@ void nes_subor2_device::device_start()
 
 void nes_subor0_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(0x20);
 	chr8(0, m_chr_source);
@@ -108,7 +107,6 @@ void nes_subor0_device::pcb_reset()
 
 void nes_subor1_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(0x07);
 	chr8(0, m_chr_source);

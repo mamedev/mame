@@ -114,30 +114,26 @@ void cheekyms_state::machine_start()
 	save_item(NAME(m_irq_mask));
 }
 
-INTERRUPT_GEN_MEMBER(cheekyms_state::vblank_irq)
+WRITE_LINE_MEMBER(cheekyms_state::vblank_int_w)
 {
-	if(m_irq_mask)
-		device.execute().set_input_line(0, HOLD_LINE);
+	if (m_irq_mask)
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 
 void cheekyms_state::cheekyms(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 5000000/2);  /* 2.5 MHz */
+	Z80(config, m_maincpu, 5_MHz_XTAL / 2);  /* 2.5 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &cheekyms_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &cheekyms_state::io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(cheekyms_state::vblank_irq));
-
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 4*8, 28*8-1);
+	m_screen->set_raw(10.816_MHz_XTAL / 2, 352, 0, 256, 262, 32, 224);
 	m_screen->set_screen_update(FUNC(cheekyms_state::screen_update));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(cheekyms_state::vblank_int_w));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cheekyms);
 	PALETTE(config, m_palette, FUNC(cheekyms_state::cheekyms_palette), 0xc0);

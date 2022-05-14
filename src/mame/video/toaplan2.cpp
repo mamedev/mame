@@ -111,6 +111,25 @@ VIDEO_START_MEMBER(toaplan2_state,fixeightbl)
 	m_vdp[0]->init_scroll_regs();
 }
 
+VIDEO_START_MEMBER(toaplan2_state, batsugunbl)
+{
+	VIDEO_START_CALL_MEMBER(toaplan2);
+
+	// This bootleg has additional layer offsets. TODO: further refinement needed
+	m_vdp[0]->set_tm_extra_offsets(0, 0, 0, 0, 0);
+	m_vdp[0]->set_tm_extra_offsets(1, 0, 0, 0, 0);
+	m_vdp[0]->set_tm_extra_offsets(2, 0, 0, 0, 0);
+	m_vdp[0]->set_sp_extra_offsets(0x37, 0x07, 0, 0);
+
+	m_vdp[1]->set_tm_extra_offsets(0, -0x05, 0x07, 0, 0);
+	m_vdp[1]->set_tm_extra_offsets(1, -0x05, 0x07, 0, 0);
+	m_vdp[1]->set_tm_extra_offsets(2, 0, 0, 0, 0);
+	m_vdp[1]->set_sp_extra_offsets(0x39, 0x12, 0, 0);
+
+	m_vdp[0]->init_scroll_regs();
+	m_vdp[1]->init_scroll_regs();
+}
+
 VIDEO_START_MEMBER(toaplan2_state,bgaregga)
 {
 	VIDEO_START_CALL_MEMBER(toaplan2);

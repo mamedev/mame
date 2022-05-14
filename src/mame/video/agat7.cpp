@@ -87,7 +87,7 @@ void agat7video_device::device_start()
 
 void agat7video_device::device_reset()
 {
-	// XXX to be confirmed
+	// TODO to be confirmed
 	m_video_mode = TEXT_LORES;
 	m_start_address = 0x7800;
 }

@@ -110,6 +110,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<description>Adventures in Math</description>
 		<year>1983</year>
 		<publisher>IBM</publisher>
+		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "87136">
 				<rom name="Adventures In Math [1983] [5.25] [1 of 1].td0" size="87136" crc="37c2c084" sha1="87d6d6e3bb5a1ad44cdff8f1a349acb2d743bf6b"/>
@@ -148,6 +149,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<description>Amnesia</description>
 		<year>1986</year>
 		<publisher>Thomas M. Disch and Cognetics Corporation</publisher>
+		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="amnesia.img" size="737280" crc="bb109c06" sha1="02bf9aaeea08144d34e81e93c554ddbb1c026743"/>
@@ -374,6 +376,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<description>Boulder Dash</description>
 		<year>1984</year>
 		<publisher>First Star Software</publisher>
+		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "163840">
 				<rom name="bdash.img" size="163840" crc="c7135383" sha1="c757abf12b8b90d1f4b9e5a60cc3a043d0bdd3e9"/>
@@ -449,6 +452,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<description>BurgerTime</description>
 		<year>1983</year>
 		<publisher>Mattel Electronics</publisher>
+		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "48162">
 				<rom name="burgtime.td0" size="48162" crc="06c48d7d" sha1="af0462cbebba513a9a2538a41c098af599cf7fd1"/>
@@ -764,6 +768,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<year>1986</year>
 		<publisher>Roger Webster/Dan'l Leviton</publisher>
 		<info name="version" value="1.6" />
+		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "155712">
 				<rom name="earthly.td0" size="155712" crc="2d478c13" sha1="1387df6e1675129f4779a9a99e3e0898100bb252"/>
@@ -787,6 +792,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<description>Executive Suite</description>
 		<year>1982</year>
 		<publisher>Armonk Corporation</publisher>
+		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "179849">
 				<rom name="execst.td0" size="179849" crc="93b16f5f" sha1="9092bdb3fe82547b2a0d60eb57c28e5887d1ba70"/>
@@ -1053,18 +1059,6 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
-	<software name="hacker">
-		<description>Hacker</description>
-		<year>1985</year>
-		<publisher>Activision</publisher>
-		<info name="usage" value="PC Booter" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="185332">
-				<rom name="hacker.td0" size="185332" crc="f827c32d" sha1="6499c57f29a422da5324072ad491c59887387b8a"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="hacker2">
 		<description>Hacker II</description>
 		<year>1986</year>
@@ -1180,6 +1174,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<description>Inca</description>
 		<year>1985</year>
 		<publisher>Hayden Software</publisher>
+		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Inca [DC] (1985)(Hayden Software) [Adventure, Interactive Fiction].img" size="368640" crc="1f9fe250" sha1="e9d213695501f9d163d402310b3f5e34f1c4ff88"/>
@@ -1992,23 +1987,6 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
-	<software name="sexvixen">
-		<description>Sex Vixens from Space</description>
-		<year>1989</year>
-		<publisher>Free Spirit Software</publisher>
-		<info name="developer" value="Free Spirit Software" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size = "368640">
-				<rom name="Sex Vixens from Space [Free Spirit Software] [1989] [5.25DD] [Disk 1 of 2].img" size="368640" crc="8d479cd2" sha1="386b9004dfa5181a283f1dac6d40093fbad2cefc"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size = "368640">
-				<rom name="Sex Vixens from Space [Free Spirit Software] [1989] [5.25DD] [Disk 2 of 2].img" size="368640" crc="a3877e3a" sha1="080c3c8c4f40a0e1528c812c67bb92d763f31b6d"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="cboxing">
 		<description>Sierra Championship Boxing</description>
 		<year>1985</year>
@@ -2551,35 +2529,6 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
-	<software name="wcsoccer">
-		<description>World Championship Soccer (5.25")</description>
-		<year>1991</year>
-		<publisher>Elite</publisher>
-		<info name="developer" value="Sega" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size = "368640">
-				<rom name="World Championship Soccer [Elite] [1991] [5.25DD] [Disk 1 of 2].img" size="368640" crc="4a11940c" sha1="073745c4068a75728a4651d51efa9b2aed7811b2"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size = "368640">
-				<rom name="World Championship Soccer [Elite] [1991] [5.25DD] [Disk 2 of 2].img" size="368640" crc="63188d60" sha1="548afbdb42bab9b2ce8102938e7fa46ce9caf3c1"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wcsoccer35" cloneof="wcsoccer">
-		<description>World Championship Soccer (3.5")</description>
-		<year>1991</year>
-		<publisher>Elite</publisher>
-		<info name="developer" value="Sega" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="World Championship Soccer [Elite] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="af6ecc3f" sha1="be4b5d14d6d252b033b482aa71ac64b56cac4a63"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="baseball">
 		<description>The World's Greatest Baseball Game</description>
 		<year>1985</year>
@@ -2705,19 +2654,6 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="656393">
 				<rom name="bad dudes.td0" size="656393" crc="dc74c1ce" sha1="e28ff95cb1793d08a1e373a7096f9024aa1f0d89"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ys" supported="no">
-		<description>Ancient Land of Ys</description>
-		<year>1989</year>
-		<publisher>Kyodia Software Marketing</publisher>
-		<info name="usage" value="PC Booter" />
-		<info name="original_publisher" value="日本ファルコム (Nihon Falcom)" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="697170">
-				<rom name="ancient land of ys.td0" size="697170" crc="2ce1c65b" sha1="3e24853872cf98e10983c51ff51159dc7a61e063"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8327,6 +8263,18 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="ys" supported="no">
+		<description>Ancient Land of Ys</description>
+		<year>1989</year>
+		<publisher>Kyodia Software Marketing</publisher>
+		<info name="original_publisher" value="日本ファルコム (Nihon Falcom)" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="697170">
+				<rom name="ancient land of ys.td0" size="697170" crc="2ce1c65b" sha1="3e24853872cf98e10983c51ff51159dc7a61e063"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="apgbonus">
 		<description>Apogee Software Bonus Disk (Jumpman Lives!, Commander Keen in Invasion of the Vorticons)</description>
@@ -10997,6 +10945,17 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Gunship v429.05 [Microprose] [1987] [5.25DD] [Disk 2 of 2].img" size="368640" crc="edcb863f" sha1="3391538e151626280ae59875619dcb9bfafaf1c9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hacker">
+		<description>Hacker</description>
+		<year>1985</year>
+		<publisher>Activision</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="185332">
+				<rom name="hacker.td0" size="185332" crc="f827c32d" sha1="6499c57f29a422da5324072ad491c59887387b8a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14373,6 +14332,23 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="sexvixen">
+		<description>Sex Vixens from Space</description>
+		<year>1989</year>
+		<publisher>Free Spirit Software</publisher>
+		<info name="developer" value="Free Spirit Software" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Sex Vixens from Space [Free Spirit Software] [1989] [5.25DD] [Disk 1 of 2].img" size="368640" crc="8d479cd2" sha1="386b9004dfa5181a283f1dac6d40093fbad2cefc"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Sex Vixens from Space [Free Spirit Software] [1989] [5.25DD] [Disk 2 of 2].img" size="368640" crc="a3877e3a" sha1="080c3c8c4f40a0e1528c812c67bb92d763f31b6d"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="agidemos">
 		<description>Sierra Demo</description>
@@ -16186,6 +16162,35 @@ has been replaced with an all-zero block. -->
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="disk5.img" size="737280" crc="3c52c940" sha1="f383946bcf6c93a04011ae55203366150af7d920" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="wcsoccer">
+		<description>World Championship Soccer (5.25")</description>
+		<year>1991</year>
+		<publisher>Elite</publisher>
+		<info name="developer" value="Sega" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="World Championship Soccer [Elite] [1991] [5.25DD] [Disk 1 of 2].img" size="368640" crc="4a11940c" sha1="073745c4068a75728a4651d51efa9b2aed7811b2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="World Championship Soccer [Elite] [1991] [5.25DD] [Disk 2 of 2].img" size="368640" crc="63188d60" sha1="548afbdb42bab9b2ce8102938e7fa46ce9caf3c1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wcsoccer35" cloneof="wcsoccer">
+		<description>World Championship Soccer (3.5")</description>
+		<year>1991</year>
+		<publisher>Elite</publisher>
+		<info name="developer" value="Sega" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="World Championship Soccer [Elite] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="af6ecc3f" sha1="be4b5d14d6d252b033b482aa71ac64b56cac4a63"/>
 			</dataarea>
 		</part>
 	</software>

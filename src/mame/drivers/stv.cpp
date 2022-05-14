@@ -3807,6 +3807,13 @@ ROM_START( yattrmnp ) // ROM board stickered 837-13598
 	ROM_LOAD16_WORD_SWAP( "mpr-21124.ic11",    0x2800000, 0x0400000, CRC(10f073ac) SHA1(8c16d8ad9c435d44a7b4dd327cd44ffd2f7e895c) )
 	ROM_LOAD16_WORD_SWAP( "mpr-21123.ic12",    0x2c00000, 0x0400000, CRC(491b9166) SHA1(f1d5e5b7bef4fc99862b1b8178759e96ba4cb29c) )
 
+	// CGAL MAIN BD 837-12530. This game seems to use it as an I/O board (see strings in ROM), though the number of unpopulated spaces and the 'MAIN BD' seem to point to it being capable of much more
+	// 834-13246-01 YATTERMAN PLUS sticker
+	// main populated components: MC68360FE25C QUICC with integrated CPU32+ core, 32 MHz and 20 MHz XTALs, 315-6052 MACH111, 315-5649 I/O custom, 315-5296 I/O custom, 2 batteries
+	// main unpopulated components (as per PCB etches): 68EC000, 315-5687 SCSP, 2x 16M EPROMs, 2x HM514270 RAMs, MB8421, GAL16V8, 45.1584 MHz XTAL, TA8221 amplifier, a second 315-5296 I/O custom, COM20020 ULANC and much more
+	ROM_REGION( 0x20000, "io_cpu", 0 )
+	ROM_LOAD( "epr-21121.bin", 0x00000, 0x20000, CRC(d615bce0) SHA1(09c81e3ee1d2ff22c52a20158d6ad09962910c65) )
+
 	ROM_REGION( 0x200, "plds", ROMREGION_ERASE00 )
 	ROM_LOAD( "315-5930.ic19", 0x000, 0x117, CRC(d1201563) SHA1(a133b07240c0a4eb8bae4b438d98fc6148fb7f4f) )
 ROM_END

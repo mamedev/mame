@@ -547,12 +547,17 @@ uint8_t upd765_family_device::fifo_r()
 {
 	uint8_t r = 0xff;
 	switch(main_phase) {
+	case PHASE_CMD:
+		if(command_pos)
+			fifo_w(0xff);
+		LOGFIFO("fifo_r in command phase\n");
+		break;
 	case PHASE_EXEC:
 		if(machine().side_effects_disabled())
 			return fifo[0];
 		if(internal_drq)
 			return fifo_pop(false);
-		LOGFIFO("fifo_r in phase %d\n", main_phase);
+		LOGFIFO("fifo_r in execution phase\n");
 		break;
 
 	case PHASE_RESULT:
@@ -608,7 +613,7 @@ void upd765_family_device::fifo_w(uint8_t data)
 			fifo_push(data, false);
 			return;
 		}
-		LOGFIFO("fifo_w in phase %d\n", main_phase);
+		LOGFIFO("fifo_w in execution phase\n");
 		break;
 
 	default:
@@ -653,11 +658,10 @@ void upd765_family_device::enable_transfer()
 			check_irq();
 		}
 
-	} else {
-		// DMA
-		if(!drq)
-			set_drq(true);
 	}
+	// DMA
+	if(!drq)
+		set_drq(true);
 }
 
 void upd765_family_device::disable_transfer()
@@ -665,8 +669,8 @@ void upd765_family_device::disable_transfer()
 	if(spec & SPEC_ND) {
 		internal_drq = false;
 		check_irq();
-	} else
-		set_drq(false);
+	}
+	set_drq(false);
 }
 
 void upd765_family_device::fifo_push(uint8_t data, bool internal)

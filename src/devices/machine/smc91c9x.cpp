@@ -62,7 +62,7 @@ smc91c96_device::smc91c96_device(const machine_config &mconfig, const char *tag,
 
 smc91c9x_device::smc91c9x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, dev_type device_type)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_network_interface(mconfig, *this, 10.0f)
+	, device_network_interface(mconfig, *this, 10)
 	, m_device_type(device_type)
 	, m_num_ebuf(16)
 	, m_irq_handler(*this)

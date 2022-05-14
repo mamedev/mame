@@ -763,10 +763,9 @@ void nes_cart_slot_device::call_load_ines()
 			m_cart->set_ce(0x03, ce_state);
 		}
 		// iNES Mapper 232
-		else if (mapper == 210 && submapper == 1)
+		else if (mapper == 232 && submapper == 1)
 		{
-			submapper = 0;
-			logerror("Unimplemented NES 2.0 submapper: CAMERICA-BF9096.\n");
+			pcb_id = CAMERICA_BF9096_ALT;
 		}
 		// 268: SMD133 boards
 		else if (mapper == 268)
@@ -1038,11 +1037,6 @@ void nes_cart_slot_device::call_load_ines()
 				m_pcb_id = WAIXING_DQ8;    // Mapper 242 is used for 2 diff boards
 			break;
 
-		case BMC_GOLD_7IN1:
-			if (crc_hack)
-				m_pcb_id = BMC_MARIOPARTY_7IN1;    // Mapper 52 is used for 2 diff boards
-			break;
-
 		case BTL_MARIOBABY:
 			if (crc_hack)
 				m_pcb_id = BTL_AISENSHINICOL;    // Mapper 42 is used for 2 diff boards
@@ -1283,6 +1277,11 @@ const char * nes_cart_slot_device::get_default_card_ines(get_default_card_softwa
 		{
 			pcb_id = SOMARI_HUANG2; // Mapper 116 is used for 2 diff boards
 		}
+		// iNES Mapper 232
+		else if (mapper == 232 && submapper == 1)
+		{
+			pcb_id = CAMERICA_BF9096_ALT;
+		}
 	}
 
 	// solve mapper conflicts
@@ -1322,11 +1321,6 @@ const char * nes_cart_slot_device::get_default_card_ines(get_default_card_softwa
 		case WAIXING_WXZS:
 			if (crc_hack)
 				pcb_id = WAIXING_DQ8;    // Mapper 242 is used for 2 diff boards
-			break;
-
-		case BMC_GOLD_7IN1:
-			if (crc_hack)
-				pcb_id = BMC_MARIOPARTY_7IN1;    // Mapper 52 is used for 2 diff boards
 			break;
 
 		case BTL_MARIOBABY:
