@@ -65,4 +65,7 @@ PTEST(test_compile, compile)
 #else
 	PEXPECT_NE("PPMF_TYPE_GNUC_PMF_CONV not supported on this build", "");
 #endif
+#if defined(__EMSCRIPTEN__)
+	PEXPECT_EQ(plib::ppmf_internal::value,PPMF_TYPE_INTERNAL_ARM);
+#endif
 }
