@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+	// license:BSD-3-Clause
 // copyright-holders:Couriersud
 
 ///
@@ -33,7 +33,7 @@ namespace netlist
 		{
 			gsl_Expects(m_active_outputs >= 0);
 
-			if (!m_activate.isnull() && m_hint_deactivate)
+			if (m_activate && m_hint_deactivate)
 			{
 				if (++m_active_outputs == 1)
 				{

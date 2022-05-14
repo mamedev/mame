@@ -444,7 +444,7 @@ namespace plib {
 		}
 
 		bool isnull() const noexcept { return this->m_resolved == nullptr; }
-		//operator bool() const noexcept { return !isnull(); }
+		explicit operator bool() const noexcept { return !isnull(); }
 		bool has_object() const noexcept { return this->m_obj != nullptr; }
 		bool operator==(const pmfp_base &rhs) const { return this->m_resolved == rhs.m_resolved; }
 		bool operator!=(const pmfp_base &rhs) const { return !(*this == rhs); }
