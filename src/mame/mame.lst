@@ -44562,7 +44562,10 @@ ultim809
 
 @source:rc2014.cpp
 rc2014                          // RC2014 Classic
+rc2014bp5                       // RC2014 Backplane-5
+rc2014bp8                       // RC2014 Backplane-8
 rc2014pro                       // RC2014 Pro
+rc2014bppro                     // RC2014 Backplane Pro
 rc2014cl2                       // RC2014 Classic II
 rc2014zed                       // RC2014 Zed
 rc2014zedp                      // RC2014 Zed Pro

@@ -46,8 +46,6 @@ rc2014_bus_device::~rc2014_bus_device()
 
 void rc2014_bus_device::device_start()
 {
-	if (m_installer[AS_PROGRAM] == nullptr)
-		throw emu_fatalerror("Main address installer missing on RC2014 bus !!!");
 	// resolve callbacks
 	m_clk.resolve_safe();
 	m_int.resolve_safe();
@@ -74,7 +72,9 @@ void rc2014_bus_device::assign_installer(int index, address_space_installer *ins
 
 address_space_installer *rc2014_bus_device::installer(int index) const
 {
-	assert(index >= 0 && index < 4 && m_installer[index]);
+	assert(index >= 0 && index < 4);
+	if (m_installer[index] == nullptr )
+		throw emu_fatalerror("Address installer not set on RC2014 bus !!! Add CPU module.");
 	return m_installer[index];
 }
 
