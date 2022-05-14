@@ -230,7 +230,7 @@ private:
 	bool irq = false;
 	bool drq = false;
 	uint32_t tcounter;
-	uint8_t sync_period;
+	uint8_t sync_period = 5; // TODO: appropriate value for SPIFI
 	uint8_t clock_conv = 2; // TODO: appropriate value for SPIFI
 	emu_timer *tm;
 	int bus_id;
