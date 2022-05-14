@@ -4008,8 +4008,6 @@ files {
 	MAME_DIR .. "src/mame/video/groundfx.cpp",
 	MAME_DIR .. "src/mame/drivers/gsword.cpp",
 	MAME_DIR .. "src/mame/includes/gsword.h",
-	MAME_DIR .. "src/mame/machine/tait8741.cpp",
-	MAME_DIR .. "src/mame/machine/tait8741.h",
 	MAME_DIR .. "src/mame/video/gsword.cpp",
 	MAME_DIR .. "src/mame/drivers/gunbustr.cpp",
 	MAME_DIR .. "src/mame/includes/gunbustr.h",
