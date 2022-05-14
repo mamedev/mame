@@ -441,22 +441,20 @@ public:
 	virtual void write_ram(offs_t offset, uint8_t data) override;
 
 protected:
-	gb_rom_vfame_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	bool m_in_config_mode;
+	u8 m_running_val;
 	
-	bool m_in_config_mode = false;
-	u8 m_running_val = 0;
+	u8 m_6000;
+	u8 m_700x[15];
+	std::array<u8, 4> m_seq;
+	u8 m_seq_start_bank;
+	u16 m_seq_start_addr;
+	int m_seq_length;
+	int m_seq_bytes_left;
 	
-	u8 m_6000 = 0;
-	u8 m_700x[15] = {};
-	std::array<u8, 4> m_seq = {};
-	u8 m_seq_start_bank = 0;
-	u16 m_seq_start_addr = 0;
-	int m_seq_length = 0;
-	int m_seq_bytes_left = 0;
-	
-	bool m_shouldreplace = false;
-	u16 m_replace_start_addr = 0;
-	u8 m_replace_src_bank = 0;
+	bool m_shouldreplace;
+	u16 m_replace_start_addr;
+	u8 m_replace_src_bank;
 };
 
 // device type definition

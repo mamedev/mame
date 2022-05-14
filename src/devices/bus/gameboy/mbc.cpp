@@ -156,13 +156,20 @@ gb_rom_camera_device::gb_rom_camera_device(const machine_config &mconfig, const 
 {
 }
 
-gb_rom_vfame_device::gb_rom_vfame_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: gb_rom_mbc5_device(mconfig, type, tag, owner, clock)
-{
-}
-
 gb_rom_vfame_device::gb_rom_vfame_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: gb_rom_vfame_device(mconfig, GB_ROM_VFAME, tag, owner, clock)
+	: gb_rom_mbc5_device(mconfig, GB_ROM_VFAME, tag, owner, clock)
+	, m_in_config_mode(false)
+	, m_running_val(0)
+	, m_6000(0)
+	, m_700x({})
+	, m_seq({})
+	, m_seq_start_bank(0)
+	, m_seq_start_addr(0)
+	, m_seq_length(0)
+	, m_seq_bytes_left(0)
+	, m_shouldreplace(false)
+	, m_replace_start_addr(0)
+	, m_replace_src_bank(0)
 {
 }
 
@@ -1461,50 +1468,23 @@ uint8_t gb_rom_vfame_device::read_rom(offs_t offset)
 		m_seq_bytes_left = m_seq_length;
 	}
 	
-	if(m_seq_bytes_left > 0 && offset < 0x8000)
+	if (m_seq_bytes_left > 0 && offset < 0x8000)
 	{
 		m_seq_bytes_left--;
 		return m_seq[m_seq_length - m_seq_bytes_left - 1];
 	}
 	
-	if(m_shouldreplace && offset >= m_replace_start_addr && offset < 0x4000)
+	if (m_shouldreplace && offset >= m_replace_start_addr && offset < 0x4000)
 	{
 		return m_rom[m_replace_src_bank * 0x4000 + (offset & 0x3fff)];
 	}
 
-	if (offset < 0x4000)
-		return m_rom[rom_bank_map[m_latch_bank] * 0x4000 + (offset & 0x3fff)];
-	else
-		return m_rom[rom_bank_map[m_latch_bank2] * 0x4000 + (offset & 0x3fff)];
+	return gb_rom_mbc5_device::read_rom(offset);
 }
 
 void gb_rom_vfame_device::write_bank(offs_t offset, uint8_t data)
 {
-	if (offset < 0x2000)
-		m_ram_enable = ((data & 0x0f) == 0x0a) ? 1 : 0;
-	else if (offset < 0x3000)
-	{
-		// MBC5 has a 9 bit bank select
-		// Writing into 2000-2fff sets the lower 8 bits
-		m_latch_bank2 = (m_latch_bank2 & 0x100) | data;
-	}
-	else if (offset < 0x4000)
-	{
-		// MBC5 has a 9 bit bank select
-		// Writing into 3000-3fff sets the 9th bit
-		m_latch_bank2 = (m_latch_bank2 & 0xff) | ((data & 0x01) << 8);
-	}
-	else if (offset < 0x6000)
-	{
-		data &= 0x0f;
-		if (has_rumble)
-		{
-			m_rumble = BIT(data, 3);
-			data &= 0x7;
-		}
-		m_ram_bank = data;
-	}
-	else if (offset < 0x8000)
+	if (offset >= 0x6000)
 	{
 		u16 ea = offset & 0xf00f;
 		if (ea == 0x7000 && data == 0x96)
@@ -1548,18 +1528,5 @@ void gb_rom_vfame_device::write_bank(offs_t offset, uint8_t data)
 			m_shouldreplace = (m_700x[8] & 0xf) == 0xf;
 		}
 	}
-}
-
-uint8_t gb_rom_vfame_device::read_ram(offs_t offset)
-{
-	if (!m_ram.empty() && m_ram_enable)
-		return m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)];
-	else
-		return 0xff;
-}
-
-void gb_rom_vfame_device::write_ram(offs_t offset, uint8_t data)
-{
-	if (!m_ram.empty() && m_ram_enable)
-		m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)] = data;
+	else gb_rom_mbc5_device::write_bank(offset, data);
 }
