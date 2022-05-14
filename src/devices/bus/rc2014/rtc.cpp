@@ -34,14 +34,14 @@ protected:
 	void rtc_w(offs_t offset, uint8_t data);
 private:
 	required_device<ds1302_device> m_rtc;
-	required_ioport_array<6> m_addr;
+	required_ioport m_addr;
 };
 
 rc2014_ds1302_device::rc2014_ds1302_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, RC2014_DS1302_RTC, tag, owner, clock)
 	, device_rc2014_card_interface(mconfig, *this)
 	, m_rtc(*this, "rtc")
-	, m_addr(*this, "A%u", 2U)
+	, m_addr(*this, "SW1")
 {
 }
 
@@ -51,15 +51,8 @@ void rc2014_ds1302_device::device_start()
 
 void rc2014_ds1302_device::device_reset()
 {
-	uint8_t addr = 0x00;
-	uint8_t index = 2;
-	for (auto& port: m_addr)
-	{
-		addr |= port->read() << index;
-		index++;
-	}
-
-	m_bus->installer(AS_IO)->install_readwrite_handler(addr, addr, 0, 0, 0, read8sm_delegate(*this, FUNC(rc2014_ds1302_device::rtc_r)), write8sm_delegate(*this, FUNC(rc2014_ds1302_device::rtc_w)));
+	// A1 and A0 not connected
+	m_bus->installer(AS_IO)->install_readwrite_handler(m_addr->read(), m_addr->read(), 0, 0x03, 0, read8sm_delegate(*this, FUNC(rc2014_ds1302_device::rtc_r)), write8sm_delegate(*this, FUNC(rc2014_ds1302_device::rtc_w)));
 }
 
 void rc2014_ds1302_device::device_add_mconfig(machine_config &config)
@@ -80,30 +73,25 @@ void rc2014_ds1302_device::rtc_w(offs_t, uint8_t data)
 }
 
 static INPUT_PORTS_START( rc2014_ds1302_jumpers )
-	PORT_START("A2")
-	PORT_CONFNAME( 0x1, 0x0, "A2" )
-	PORT_CONFSETTING( 0x0, "0" )
-	PORT_CONFSETTING( 0x1, "1" )
-	PORT_START("A3")
-	PORT_CONFNAME( 0x1, 0x0, "A3" )
-	PORT_CONFSETTING( 0x0, "0" )
-	PORT_CONFSETTING( 0x1, "1" )
-	PORT_START("A4")
-	PORT_CONFNAME( 0x1, 0x0, "A4" )
-	PORT_CONFSETTING( 0x0, "0" )
-	PORT_CONFSETTING( 0x1, "1" )
-	PORT_START("A5")
-	PORT_CONFNAME( 0x1, 0x0, "A5" )
-	PORT_CONFSETTING( 0x0, "0" )
-	PORT_CONFSETTING( 0x1, "1" )
-	PORT_START("A6")
-	PORT_CONFNAME( 0x1, 0x1, "A6" )
-	PORT_CONFSETTING( 0x0, "0" )
-	PORT_CONFSETTING( 0x1, "1" )
-	PORT_START("A7")
-	PORT_CONFNAME( 0x1, 0x1, "A7" )
-	PORT_CONFSETTING( 0x0, "0" )
-	PORT_CONFSETTING( 0x1, "1" )
+	PORT_START("SW1")
+	PORT_DIPNAME(0x04, 0x00, "0x04") PORT_DIPLOCATION("Base Address:1")
+	PORT_DIPSETTING(0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(0x04, DEF_STR( On ) )
+	PORT_DIPNAME(0x08, 0x00, "0x08") PORT_DIPLOCATION("Base Address:2")
+	PORT_DIPSETTING(0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(0x08, DEF_STR( On ) )
+	PORT_DIPNAME(0x10, 0x00, "0x10") PORT_DIPLOCATION("Base Address:3")
+	PORT_DIPSETTING(0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(0x10, DEF_STR( On ) )
+	PORT_DIPNAME(0x20, 0x00, "0x20") PORT_DIPLOCATION("Base Address:4")
+	PORT_DIPSETTING(0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(0x20, DEF_STR( On ) )
+	PORT_DIPNAME(0x40, 0x40, "0x40") PORT_DIPLOCATION("Base Address:5")
+	PORT_DIPSETTING(0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(0x40, DEF_STR( On ) )
+	PORT_DIPNAME(0x80, 0x80, "0x80") PORT_DIPLOCATION("Base Address:6")
+	PORT_DIPSETTING(0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 ioport_constructor rc2014_ds1302_device::device_input_ports() const

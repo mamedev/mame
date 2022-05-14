@@ -35,12 +35,12 @@ void rc2014_bus_modules(device_slot_interface &device)
 	device.option_add("sio_40p", RC2014_DUAL_SERIAL_40P);
 	device.option_add("cf", RC2014_COMPACT_FLASH);
 	device.option_add("rom_ram", RC2014_ROM_RAM_512);
-	device.option_add("ds1302_rtc", RC2014_DS1302_RTC);
+	device.option_add("rtc", RC2014_DS1302_RTC);
 	device.option_add("ym_ay_sound", RC2014_YM_AY_SOUND);
 	device.option_add("82c55_ide", RC2014_82C55_IDE);
 	device.option_add("ide_hdd", RC2014_IDE_HDD);
-	device.option_add("fdc9266", RC2014_FDC9266);
-	device.option_add("wd37c65", RC2014_WD37C65);
+	device.option_add("fdc_smc", RC2014_FDC9266);
+	device.option_add("fdc_wdc", RC2014_WD37C65);
 }
 
 void rc2014_ext_bus_modules(device_slot_interface &device)
