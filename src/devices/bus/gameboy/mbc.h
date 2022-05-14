@@ -438,7 +438,7 @@ public:
 	virtual uint8_t read_rom(offs_t offset) override;
 	virtual void write_bank(offs_t offset, uint8_t data) override;
 
-protected:
+private:
 	bool m_in_config_mode;
 	u8 m_running_val;
 	
