@@ -63,10 +63,10 @@ void rc2014_ym_ay_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	AY8910(config, m_ay8910, 0);
-	m_ay8910->add_route(0, "lspeaker", 0.25);
-	m_ay8910->add_route(2, "lspeaker", 0.25);
-	m_ay8910->add_route(1, "rspeaker", 0.25);
+	m_ay8910->add_route(0, "rspeaker", 0.25);
 	m_ay8910->add_route(2, "rspeaker", 0.25);
+	m_ay8910->add_route(1, "lspeaker", 0.25);
+	m_ay8910->add_route(2, "lspeaker", 0.25);
 }
 
 static INPUT_PORTS_START( rc2014_ym_ay_jumpers )
