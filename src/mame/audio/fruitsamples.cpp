@@ -10,6 +10,21 @@
 
 #include "fruitsamples.h"
 
+#include "speaker.h"
+
+const char *const fruit_sample_names[fruit_samples_device::SAMPLE_END + 2] =
+{
+	"*fruitsamples",
+	"payout",
+	"meter",
+	nullptr   /* end of array */
+};
+const uint8_t fruit_sample_channels[fruit_samples_device::SAMPLE_END] =
+{
+	0,
+	1
+};
+
 DEFINE_DEVICE_TYPE(FRUIT_SAMPLES, fruit_samples_device, "fruit_samples", "Fruit machine mechanical samples")
 
 fruit_samples_device::fruit_samples_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -36,4 +51,5 @@ void fruit_samples_device::device_add_mconfig(machine_config &config)
 void fruit_samples_device::play(uint8_t index)
 {
 	if(index < SAMPLE_END) m_samples->start(fruit_sample_channels[index], index);
+	else fatalerror("fruit_samples_device: Sample index %d out of range\n", index);
 }

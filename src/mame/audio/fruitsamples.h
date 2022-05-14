@@ -6,14 +6,12 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_FRUITSAMPLES_H
-#define MAME_MACHINE_FRUITSAMPLES_H
+#ifndef MAME_AUDIO_FRUITSAMPLES_H
+#define MAME_AUDIO_FRUITSAMPLES_H
 
 #pragma once
 
 #include "sound/samples.h"
-
-#include "speaker.h"
 
 class fruit_samples_device : public device_t
 {
@@ -35,21 +33,8 @@ protected:
 
 private:
 	required_device<samples_device> m_samples;
-
-	const char *fruit_sample_names[SAMPLE_END + 2] =
-	{
-		"*fruitsamples",
-		"payout",
-		"meter",
-		nullptr   /* end of array */
-	};
-	const uint8_t fruit_sample_channels[SAMPLE_END] =
-	{
-		0,
-		1
-	};
 };
 
 DECLARE_DEVICE_TYPE(FRUIT_SAMPLES, fruit_samples_device)
 
-#endif // MAME_MACHINE_FRUITSAMPLES_H
+#endif // MAME_AUDIO_FRUITSAMPLES_H

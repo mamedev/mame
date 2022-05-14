@@ -1043,6 +1043,8 @@ files {
 	MAME_DIR .. "src/mame/audio/decobsmt.h",
 	MAME_DIR .. "src/mame/audio/efo_zsu.cpp",
 	MAME_DIR .. "src/mame/audio/efo_zsu.h",
+	MAME_DIR .. "src/mame/audio/fruitsamples.cpp",
+	MAME_DIR .. "src/mame/audio/fruitsamples.h",
 	MAME_DIR .. "src/mame/audio/rax.cpp",
 	MAME_DIR .. "src/mame/audio/rax.h",
 	MAME_DIR .. "src/mame/audio/segam1audio.cpp",

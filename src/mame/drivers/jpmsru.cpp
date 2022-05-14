@@ -45,12 +45,12 @@
 
 #include "emu.h"
 
+#include "audio/fruitsamples.h"
 #include "audio/nl_jpmsru.h"
 #include "video/awpvid.h"
 
 #include "cpu/tms9900/tms9980a.h"
 
-#include "machine/fruitsamples.h"
 #include "machine/netlist.h"
 #include "machine/nvram.h"
 #include "machine/steppers.h"
