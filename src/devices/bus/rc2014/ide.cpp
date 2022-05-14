@@ -108,7 +108,8 @@ void rc2014_82c55_ide_device::device_reset()
 	m_dior = (m_jp[3]->read() == 1) ? 1 : 6;
 
 	uint8_t base = m_sw->read(); // SW1
-	m_bus->installer(AS_IO)->install_readwrite_handler(base, base+0x03, 0, 0, 0, read8sm_delegate(m_ppi, FUNC(i8255_device::read)), write8sm_delegate(m_ppi, FUNC(i8255_device::write)));
+	// A15-A8 not connected
+	m_bus->installer(AS_IO)->install_readwrite_handler(base, base+0x03, 0, 0xff00, 0, read8sm_delegate(m_ppi, FUNC(i8255_device::read)), write8sm_delegate(m_ppi, FUNC(i8255_device::write)));
 }
 
 void rc2014_82c55_ide_device::ppi_pc_w(uint8_t data)
@@ -226,8 +227,8 @@ rc2014_ide_hdd_device::rc2014_ide_hdd_device(const machine_config &mconfig, cons
 void rc2014_ide_hdd_device::device_reset()
 {
 	uint8_t base = m_jp->read() << 3;
-	// A6 and A7 are not connected
-	m_bus->installer(AS_IO)->install_readwrite_handler(base, base+0x03, 0, 0xc0, 0, read8sm_delegate(m_ppi, FUNC(i8255_device::read)), write8sm_delegate(m_ppi, FUNC(i8255_device::write)));
+	// A15-A8 are not connected, A7,A6 and A2 must be 0
+	m_bus->installer(AS_IO)->install_readwrite_handler(base, base+0x03, 0, 0xff00, 0, read8sm_delegate(m_ppi, FUNC(i8255_device::read)), write8sm_delegate(m_ppi, FUNC(i8255_device::write)));
 }
 
 void rc2014_ide_hdd_device::ppi_pc_w(uint8_t data)

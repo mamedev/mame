@@ -70,10 +70,10 @@ void rom_ram_512k_device::device_start()
 	save_item(NAME(m_page_en));
 	save_item(NAME(m_page_reg));
 
-	// A3 not connected
-	m_bus->installer(AS_IO)->install_write_handler(0x70, 0x73, 0, 0x08, 0, write8sm_delegate(*this, FUNC(rom_ram_512k_device::page_w)));
-	// A3, A1 and A0 not connected
-	m_bus->installer(AS_IO)->install_write_handler(0x74, 0x74, 0, 0x0b, 0, write8sm_delegate(*this, FUNC(rom_ram_512k_device::page_en_w)));
+	// A15-A8 and A3 not connected
+	m_bus->installer(AS_IO)->install_write_handler(0x70, 0x73, 0, 0xff08, 0, write8sm_delegate(*this, FUNC(rom_ram_512k_device::page_w)));
+	// A15-A8, A3, A1 and A0 not connected
+	m_bus->installer(AS_IO)->install_write_handler(0x74, 0x74, 0, 0xff0b, 0, write8sm_delegate(*this, FUNC(rom_ram_512k_device::page_en_w)));
 
 	m_bus->installer(AS_PROGRAM)->install_readwrite_handler(0x0000, 0x3fff, 0, 0, 0, read8sm_delegate(*this, FUNC(rom_ram_512k_device::mem0_r)), write8sm_delegate(*this, FUNC(rom_ram_512k_device::mem0_w)));
 	m_bus->installer(AS_PROGRAM)->install_readwrite_handler(0x4000, 0x7fff, 0, 0, 0, read8sm_delegate(*this, FUNC(rom_ram_512k_device::mem1_r)), write8sm_delegate(*this, FUNC(rom_ram_512k_device::mem1_w)));

@@ -58,10 +58,10 @@ void rc2014_fdc9266_device::device_start()
 void rc2014_fdc9266_device::device_reset()
 {
 	uint8_t base = m_addr->read() << 5; // SV1
-	// A1 not connected
-	m_bus->installer(AS_IO)->install_read_handler(base+0x10, base+0x10, 0, 0x02, 0, read8smo_delegate(m_fdc, FUNC(upd765a_device::msr_r)));
-	m_bus->installer(AS_IO)->install_readwrite_handler(base+0x11, base+0x11, 0, 0x02, 0, read8smo_delegate(m_fdc, FUNC(upd765a_device::fifo_r)), write8smo_delegate(m_fdc, FUNC(upd765a_device::fifo_w)));
-	m_bus->installer(AS_IO)->install_write_handler(base+0x18, base+0x18, 0, 0x02, 0, write8sm_delegate(*this, FUNC(rc2014_fdc9266_device::control_w)));
+	// A15-A8 and A1 not connected
+	m_bus->installer(AS_IO)->install_read_handler(base+0x10, base+0x10, 0, 0xff02, 0, read8smo_delegate(m_fdc, FUNC(upd765a_device::msr_r)));
+	m_bus->installer(AS_IO)->install_readwrite_handler(base+0x11, base+0x11, 0, 0xff02, 0, read8smo_delegate(m_fdc, FUNC(upd765a_device::fifo_r)), write8smo_delegate(m_fdc, FUNC(upd765a_device::fifo_w)));
+	m_bus->installer(AS_IO)->install_write_handler(base+0x18, base+0x18, 0, 0xff02, 0, write8sm_delegate(*this, FUNC(rc2014_fdc9266_device::control_w)));
 	// TODO: Use jumpers
 }
 
@@ -185,13 +185,13 @@ void rc2014_wd37c65_device::device_start()
 void rc2014_wd37c65_device::device_reset()
 {
 	uint8_t base = m_addr->read() << 5; // SV1
-	// A1 not connected
-	m_bus->installer(AS_IO)->install_read_handler(base+0x10, base+0x10, 0, 0x02, 0, read8smo_delegate(m_fdc, FUNC(wd37c65c_device::msr_r)));
-	m_bus->installer(AS_IO)->install_readwrite_handler(base+0x11, base+0x11, 0, 0x02, 0, read8smo_delegate(m_fdc, FUNC(wd37c65c_device::fifo_r)), write8smo_delegate(m_fdc, FUNC(wd37c65c_device::fifo_w)));
+	// A15-A8 and A1 not connected
+	m_bus->installer(AS_IO)->install_read_handler(base+0x10, base+0x10, 0, 0xff02, 0, read8smo_delegate(m_fdc, FUNC(wd37c65c_device::msr_r)));
+	m_bus->installer(AS_IO)->install_readwrite_handler(base+0x11, base+0x11, 0, 0xff02, 0, read8smo_delegate(m_fdc, FUNC(wd37c65c_device::fifo_r)), write8smo_delegate(m_fdc, FUNC(wd37c65c_device::fifo_w)));
 
-	// A0 and A1 not connected
-	m_bus->installer(AS_IO)->install_write_handler(base+0x08, base+0x08, 0, 0x06, 0, write8smo_delegate(m_fdc, FUNC(wd37c65c_device::ccr_w)));
-	m_bus->installer(AS_IO)->install_readwrite_handler(base+0x18, base+0x18, 0, 0x06, 0, read8smo_delegate(*this, FUNC(rc2014_wd37c65_device::dack_r)), write8smo_delegate(m_fdc, FUNC(wd37c65c_device::dor_w)));
+	// A15-A8 and A0 and A1 not connected
+	m_bus->installer(AS_IO)->install_write_handler(base+0x08, base+0x08, 0, 0xff06, 0, write8smo_delegate(m_fdc, FUNC(wd37c65c_device::ccr_w)));
+	m_bus->installer(AS_IO)->install_readwrite_handler(base+0x18, base+0x18, 0, 0xff06, 0, read8smo_delegate(*this, FUNC(rc2014_wd37c65_device::dack_r)), write8smo_delegate(m_fdc, FUNC(wd37c65c_device::dor_w)));
 	// TODO: Use jumpers
 }
 

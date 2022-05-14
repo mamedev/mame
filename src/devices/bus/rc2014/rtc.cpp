@@ -51,8 +51,8 @@ void rc2014_ds1302_device::device_start()
 
 void rc2014_ds1302_device::device_reset()
 {
-	// A1 and A0 not connected
-	m_bus->installer(AS_IO)->install_readwrite_handler(m_addr->read(), m_addr->read(), 0, 0x03, 0, read8sm_delegate(*this, FUNC(rc2014_ds1302_device::rtc_r)), write8sm_delegate(*this, FUNC(rc2014_ds1302_device::rtc_w)));
+	// A15-A8, A1 and A0 not connected
+	m_bus->installer(AS_IO)->install_readwrite_handler(m_addr->read(), m_addr->read(), 0, 0xff03, 0, read8sm_delegate(*this, FUNC(rc2014_ds1302_device::rtc_r)), write8sm_delegate(*this, FUNC(rc2014_ds1302_device::rtc_w)));
 }
 
 void rc2014_ds1302_device::device_add_mconfig(machine_config &config)
