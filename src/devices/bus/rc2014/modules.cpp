@@ -20,6 +20,7 @@
 #include "bus/rc2014/sound.h"
 #include "bus/rc2014/ide.h"
 #include "bus/rc2014/fdc.h"
+#include "bus/rc2014/micro.h"
 
 void rc2014_bus_modules(device_slot_interface &device)
 {
@@ -42,6 +43,7 @@ void rc2014_bus_modules(device_slot_interface &device)
 	device.option_add("ide_hdd", RC2014_IDE_HDD);
 	device.option_add("fdc_smc", RC2014_FDC9266);
 	device.option_add("fdc_wdc", RC2014_WD37C65);
+	device.option_add("micro", RC2014_MICRO);
 }
 
 void rc2014_ext_bus_modules(device_slot_interface &device)
