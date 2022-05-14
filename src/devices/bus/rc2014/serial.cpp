@@ -58,6 +58,8 @@ void serial_io_device::device_resolve_objects()
 	m_bus->rx_callback().append(m_acia, FUNC(acia6850_device::write_rxd));
 }
 
+// JP1 is used to enable power from USB-to-Serial cable
+
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_115200 )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_115200 )
@@ -115,7 +117,7 @@ protected:
 dual_serial_base::dual_serial_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_clk_portb(0)
-	, m_portb(*this, "PORTB")
+	, m_portb(*this, "JP1")
 	, m_sio(*this, "sio")
 {
 }
@@ -149,10 +151,11 @@ void dual_serial_base::device_add_mconfig(machine_config &config)
 }
 
 static INPUT_PORTS_START( dual_serial_jumpers )
-	PORT_START("PORTB")
+	PORT_START("JP1")
 	PORT_CONFNAME( 0x1, 0x0, "Port B" )
 	PORT_CONFSETTING( 0x0, "CLK2 (Open)" )
 	PORT_CONFSETTING( 0x1, "CLK1 (Closed)" )
+	// JP2 and JP3 are used to enable power from USB-to-Serial cable
 INPUT_PORTS_END
 
 ioport_constructor dual_serial_base::device_input_ports() const
