@@ -12844,13 +12844,106 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="shanghai">
+		<description>Shanghai</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="354369">
+				<rom name="Shanghai.tap" size="354369" crc="b1a7e1a5" sha1="af46af0d38ea6f54d1da91890b02a5c2db7e2c67"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="topfuel">
+		<description>Shirley Muldowney's Top Fuel Challenge</description>
+		<year>1988</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="388074">
+				<rom name="Shirley_Muldowney's_Top_Fuel_Challenge.tap" size="388074" crc="b02f2e90" sha1="f409a65f063ac20238f06aeeb6a138381d6f042b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="shrtcirc">
 		<description>Short Circuit</description>
 		<year>1989</year>
 		<publisher>The Hit Squad</publisher>
+
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="522357">
 				<rom name="short circuit.tap" size="522357" crc="8f9cde33" sha1="534878fbe66ab1498f4393886de5bbec484179d0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shrtcirco" cloneof="shrtcirc" supported="no"> <!-- game loads to the title screen and locks up -->
+		<description>Short Circuit (Ocean)</description>
+		<year>1987</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="643155">
+				<rom name="Short_Circuit.tap" size="643155" crc="15120226" sha1="0ce48218c18a7028ed78b9d0c715b258a995e3fe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sidearms">
+		<description>Side Arms</description>
+		<year>1988</year>
+		<publisher>Go!</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="725318">
+				<rom name="Side_Arms_Side_1.tap" size="725318" crc="d76970a2" sha1="574ffdcd400b5395a0ea64dab387e84d0583dee5"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="749892">
+				<rom name="Side_Arms_Side_2.tap" size="749892" crc="1547455a" sha1="641e4fa3a6e8e24ab7d38166147bb01a3d0a15cf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sidewize">
+		<description>Sidewize</description>
+		<year>1987</year>
+		<publisher>Firebird</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="539146">
+				<rom name="Sidewize.tap" size="539146" crc="b775f60a" sha1="f9978fcfada9880f45acbdf42c979b30de62ec78"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sigma7">
+		<description>Sigma 7</description>
+		<year>1985</year>
+		<publisher>Durell</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="580372">
+				<rom name="Sigma_7.tap" size="580372" crc="04a03eea" sha1="eab9e1285402025e91add92931e0e052f4d5e12a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sservice">
+		<description>Silent Service</description>
+		<year>1985</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="909756">
+				<rom name="Silent_Service.tap" size="909756" crc="16923b72" sha1="a2fc8bf6a308752770ef0d879aca76c7fa67db56"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12867,15 +12960,119 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="silkwormv" cloneof="silkworm">
+		<description>Silkworm (Virgin)</description>
+		<year>1989</year>
+		<publisher>Virgin</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="536686">
+				<rom name="Silkworm.tap" size="536686" crc="ccd22960" sha1="57329acd325137b2580f55a9722472848290f81a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sirencit">
+		<description>Siren City</description>
+		<year>1983</year>
+		<publisher>Interceptor Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1715984">
+				<rom name="Siren_City.tap" size="1715984" crc="f3444b3f" sha1="34ab7e9c554ccdaf3082c07433948b3fc3dc0dd5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sirencitd" cloneof="sirencit">
+		<description>Siren City (Datamaxx)</description>
+		<year>198?</year>
+		<publisher>Datamaxx</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1715984">
+				<rom name="Siren_City.tap" size="1715984" crc="284fcaf5" sha1="6f7c6669dc676357367cb8c063cbfff16e55b99b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sixshoot">
+		<description>Six Shooter</description>
+		<year>1987</year>
+		<publisher>Dixons</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 1: Wizball"/>
+			<dataarea name="cass" size="712478">
+				<rom name="Six_Shooter_Tape_1_Side_1.tap" size="712478" crc="e61835a8" sha1="2509e7bd21ae392e7777727242efa47df46852cf"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 2: Head Over Heels / Terra Cresta"/>
+			<dataarea name="cass" size="1376034">
+				<rom name="Six_Shooter_Tape_1_Side_2.tap" size="1376034" crc="bcf5c76a" sha1="b34ad4b598089b2ffa7716857d214c024bf527e3"/>
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 1: Parallax"/>
+			<dataarea name="cass" size="702891">
+				<rom name="Six_Shooter_Tape_2_Side_1.tap" size="702891" crc="a312ee07" sha1="adc54a4c5e2fe50ee480c68dd11334a7f2707dd2"/>
+			</dataarea>
+		</part>
+
+		<part name="cass4" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 2: Hyper Sports / Mikie"/>
+			<dataarea name="cass" size="1342042">
+				<rom name="Six_Shooter_Tape_2_Side_2.tap" size="1342042" crc="86e50645" sha1="de3f4f3e716c2e7828029d929574130caebdd82d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skatecra">
+		<description>Skate Crazy</description>
+		<year>1988</year>
+		<publisher>Gremlin Graphics</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1: Part 1"/>
+			<dataarea name="cass" size="660023">
+				<rom name="Skate_Crazy_Part_1.tap" size="660023" crc="cc6253d3" sha1="ea675376df140508b50fed0cd49e702a6a79f8d5"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2: Part 2"/>
+			<dataarea name="cass" size="662475">
+				<rom name="Skate_Crazy_Part_2.tap" size="662475" crc="3ca78873" sha1="244e710df33227a3f5911df50b727bfd4d42ae8a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skateord">
+		<description>Skate or Die</description>
+		<year>1987</year>
+		<publisher>Electronic Arts</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="2414555">
+				<rom name="Skate_or_Die.tap" size="2414555" crc="19e83ba3" sha1="8a1ff8fd9ca0d1c2f67c1e9a6338ca85553b7b4d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="skatrock">
 		<description>Skate Rock Simulator</description>
 		<year>1988</year>
 		<publisher>Ricochet</publisher>
+
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="384129">
 				<rom name="skate rock simulator side a.tap" size="384129" crc="6206b92b" sha1="a41536410684885f1f3d32f0c0841cfc57503a36"/>
 			</dataarea>
 		</part>
+
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="373450">
 				<rom name="skate rock simulator side b.tap" size="373450" crc="b62714a6" sha1="d97a307473e269811974050e3bb370e09420b35d"/>
