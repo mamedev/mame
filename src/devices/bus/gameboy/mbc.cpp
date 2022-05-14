@@ -161,7 +161,7 @@ gb_rom_vfame_device::gb_rom_vfame_device(const machine_config &mconfig, const ch
 	, m_in_config_mode(false)
 	, m_running_val(0)
 	, m_6000(0)
-	, m_700x({})
+	, m_700x{}
 	, m_seq({})
 	, m_seq_start_bank(0)
 	, m_seq_start_addr(0)
