@@ -7,6 +7,12 @@ buildVS/x64/*
 buildVS/.vs/*
 nltool
 nlwav
+nltool.html
+nltool.js
+nltool.wasm
+nlwav.html
+nlwav.js
+nlwav.wasm
 
 # Windows executables
 *.exe
