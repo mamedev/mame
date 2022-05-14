@@ -121,6 +121,20 @@ public:
 		RC2014_SLOT(config, "bus:7", m_rc2014_bus, rc2014_bus_modules, nullptr);
 		RC2014_SLOT(config, "bus:8", m_rc2014_bus, rc2014_bus_modules, nullptr);
 	}
+
+	//
+	// RC2014 Mini
+	//
+	// Added by Chris Swan
+	// https://rc2014.co.uk/full-kits/rc2014-mini/
+	//
+	void rc2014mini(machine_config &config)
+	{
+		RC2014_BUS(config, m_rc2014_bus, 0);
+		RC2014_SLOT(config, "board", m_rc2014_bus, rc2014_bus_modules, "mini", true);
+		RC2014_SLOT(config, "bus:1", m_rc2014_bus, rc2014_bus_modules, nullptr);
+	}
+
 private:
 	required_device<rc2014_bus_device> m_rc2014_bus;
 };
@@ -138,6 +152,9 @@ ROM_START(rc2014zed)
 ROM_END
 
 ROM_START(rc2014bp8)
+ROM_END
+
+ROM_START(rc2014mini)
 ROM_END
 
 class rc2014pro_state : public driver_device
@@ -245,6 +262,8 @@ COMP( 2017, rc2014pro,    rc2014,   0,        rc2014pro,   0,       rc2014pro_st
 COMP( 2020, rc2014cl2,    rc2014,   0,        rc2014cl2,   0,       rc2014_state,    empty_init,    "RFC2795 Ltd",    "RC2014 Classic II",    MACHINE_SUPPORTS_SAVE )
 COMP( 2018, rc2014zed,    rc2014,   0,        rc2014zed,   0,       rc2014_state,    empty_init,    "RFC2795 Ltd",    "RC2014 Zed",           MACHINE_SUPPORTS_SAVE )
 COMP( 2018, rc2014zedp,   rc2014,   0,        rc2014zedp,  0,       rc2014pro_state, empty_init,    "RFC2795 Ltd",    "RC2014 Zed Pro",       MACHINE_SUPPORTS_SAVE )
+COMP( 2016, rc2014mini,   rc2014,   0,        rc2014mini,  0,       rc2014_state,    empty_init,    "RFC2795 Ltd",    "RC2014 Mini",          MACHINE_SUPPORTS_SAVE )
+
 // Backplanes
 COMP( 2016, rc2014bp5,    rc2014,   0,        rc2014bp5,   0,       rc2014_state,    empty_init,    "RFC2795 Ltd",    "RC2014 Backplane-5",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 2016, rc2014bp8,    rc2014,   0,        rc2014bp8,   0,       rc2014_state,    empty_init,    "RFC2795 Ltd",    "RC2014 Backplane-8",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

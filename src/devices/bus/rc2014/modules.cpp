@@ -44,6 +44,8 @@ void rc2014_bus_modules(device_slot_interface &device)
 	device.option_add("fdc_smc", RC2014_FDC9266);
 	device.option_add("fdc_wdc", RC2014_WD37C65);
 	device.option_add("micro", RC2014_MICRO);
+	// We can use fixed slot micro board as mini
+	device.option_add("mini", RC2014_MICRO);
 }
 
 void rc2014_ext_bus_modules(device_slot_interface &device)

@@ -44546,7 +44546,6 @@ simpr8210                       // Pioneer PR-8210
 
 @source:gsz80.cpp
 gsz80                           // Grant Searle's Simple Z-80 Machine
-rc2014mini                      // RC2014 Mini
 
 @source:gscpm.cpp
 gscpm                           // Grant Searle's Simple CP/M Machine
@@ -44569,3 +44568,4 @@ rc2014bppro                     // RC2014 Backplane Pro
 rc2014cl2                       // RC2014 Classic II
 rc2014zed                       // RC2014 Zed
 rc2014zedp                      // RC2014 Zed Pro
+rc2014mini                      // RC2014 Mini
