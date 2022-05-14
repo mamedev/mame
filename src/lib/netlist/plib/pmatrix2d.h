@@ -148,6 +148,13 @@ namespace plib
 		static constexpr const size_type align_size = align_traits<allocator_type>::align_size;
 		static constexpr const size_type stride_size = align_traits<allocator_type>::stride_size;
 
+	private:
+		size_type m_N;
+		size_type m_M;
+		std::vector<size_type, typename A::template allocator_type<size_type>> m_row;
+		std::vector<T, allocator_type> m_v;
+
+	public:
 		pmatrix2d_vrl() noexcept
 		: m_N(0), m_M(0), m_v()
 		{
@@ -163,7 +170,7 @@ namespace plib
 		pmatrix2d_vrl(const pmatrix2d_vrl &) = default;
 		pmatrix2d_vrl &operator=(const pmatrix2d_vrl &) = default;
 		pmatrix2d_vrl(pmatrix2d_vrl &&) noexcept = default;
-		pmatrix2d_vrl &operator=(pmatrix2d_vrl &&) noexcept = default;
+		pmatrix2d_vrl &operator=(pmatrix2d_vrl &&) noexcept(std::is_nothrow_move_constructible_v<decltype(m_row)> && std::is_nothrow_move_constructible_v<decltype(m_v)>) = default;
 
 		~pmatrix2d_vrl() = default;
 
@@ -233,12 +240,6 @@ namespace plib
 		}
 
 		size_type tx() const { return m_v.size(); }
-	private:
-
-		size_type m_N;
-		size_type m_M;
-		std::vector<size_type, typename A::template allocator_type<size_type>> m_row;
-		std::vector<T, allocator_type> m_v;
 	};
 
 
