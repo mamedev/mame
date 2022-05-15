@@ -37509,6 +37509,9 @@ savia84                         //
 @source:savquest.cpp
 savquest                        //
 
+@source:sb180.cpp
+sb180                          //
+
 @source:sb8085.cpp
 sb8085                          //
 
@@ -37542,6 +37545,9 @@ sbrkoutct                       // 034555-034559 proto ???? [6502]
 @source:sbugger.cpp
 sbugger                         // (c) 1981 Game-A-Tron
 sbuggera                        // (c) 1981 Game-A-Tron
+
+@source:sc111.cpp
+sc111                          //
 
 @source:sc2.cpp
 sc2                             //
