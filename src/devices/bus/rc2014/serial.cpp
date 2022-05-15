@@ -46,8 +46,8 @@ serial_io_device::serial_io_device(const machine_config &mconfig, const char *ta
 
 void serial_io_device::device_start()
 {
-	// A5, A4, A3, A2 and A1 not connected
-	m_bus->installer(AS_IO)->install_readwrite_handler(0x80, 0x81, 0, 0x3e, 0, read8sm_delegate(*m_acia, FUNC(acia6850_device::read)), write8sm_delegate(*m_acia, FUNC(acia6850_device::write)));
+	// A15-A8 and A5-A1 not connected
+	m_bus->installer(AS_IO)->install_readwrite_handler(0x80, 0x81, 0, 0xff3e, 0, read8sm_delegate(*m_acia, FUNC(acia6850_device::read)), write8sm_delegate(*m_acia, FUNC(acia6850_device::write)));
 }
 
 void serial_io_device::device_resolve_objects()
@@ -57,6 +57,8 @@ void serial_io_device::device_resolve_objects()
 
 	m_bus->rx_callback().append(m_acia, FUNC(acia6850_device::write_rxd));
 }
+
+// JP1 is used to enable power from USB-to-Serial cable
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_115200 )
@@ -115,7 +117,7 @@ protected:
 dual_serial_base::dual_serial_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_clk_portb(0)
-	, m_portb(*this, "PORTB")
+	, m_portb(*this, "JP1")
 	, m_sio(*this, "sio")
 {
 }
@@ -149,10 +151,11 @@ void dual_serial_base::device_add_mconfig(machine_config &config)
 }
 
 static INPUT_PORTS_START( dual_serial_jumpers )
-	PORT_START("PORTB")
+	PORT_START("JP1")
 	PORT_CONFNAME( 0x1, 0x0, "Port B" )
 	PORT_CONFSETTING( 0x0, "CLK2 (Open)" )
 	PORT_CONFSETTING( 0x1, "CLK1 (Closed)" )
+	// JP2 and JP3 are used to enable power from USB-to-Serial cable
 INPUT_PORTS_END
 
 ioport_constructor dual_serial_base::device_input_ports() const
@@ -189,11 +192,11 @@ dual_serial_device::dual_serial_device(const machine_config &mconfig, const char
 
 void dual_serial_device::device_start()
 {
-	// A2 not connected
-	m_bus->installer(AS_IO)->install_readwrite_handler(0x80, 0x80, 0, 0x04, 0, read8smo_delegate(*m_sio, FUNC(z80sio_device::ca_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::ca_w)));
-	m_bus->installer(AS_IO)->install_readwrite_handler(0x81, 0x81, 0, 0x04, 0, read8smo_delegate(*m_sio, FUNC(z80sio_device::da_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::da_w)));
-	m_bus->installer(AS_IO)->install_readwrite_handler(0x82, 0x82, 0, 0x04, 0, read8smo_delegate(*m_sio, FUNC(z80sio_device::cb_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::cb_w)));
-	m_bus->installer(AS_IO)->install_readwrite_handler(0x83, 0x83, 0, 0x04, 0, read8smo_delegate(*m_sio, FUNC(z80sio_device::db_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::db_w)));
+	// A15-A8 and A2 not connected
+	m_bus->installer(AS_IO)->install_readwrite_handler(0x80, 0x80, 0, 0xff04, 0, read8smo_delegate(*m_sio, FUNC(z80sio_device::ca_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::ca_w)));
+	m_bus->installer(AS_IO)->install_readwrite_handler(0x81, 0x81, 0, 0xff04, 0, read8smo_delegate(*m_sio, FUNC(z80sio_device::da_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::da_w)));
+	m_bus->installer(AS_IO)->install_readwrite_handler(0x82, 0x82, 0, 0xff04, 0, read8smo_delegate(*m_sio, FUNC(z80sio_device::cb_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::cb_w)));
+	m_bus->installer(AS_IO)->install_readwrite_handler(0x83, 0x83, 0, 0xff04, 0, read8smo_delegate(*m_sio, FUNC(z80sio_device::db_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::db_w)));
 }
 
 void dual_serial_device::device_resolve_objects()
@@ -238,11 +241,11 @@ dual_serial_device_40pin::dual_serial_device_40pin(const machine_config &mconfig
 
 void dual_serial_device_40pin::device_start()
 {
-	// A2 not connected
-	m_bus->installer(AS_IO)->install_readwrite_handler(0x80, 0x80, 0, 0x04, 0, read8smo_delegate(*m_sio, FUNC(z80sio_device::ca_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::ca_w)));
-	m_bus->installer(AS_IO)->install_readwrite_handler(0x81, 0x81, 0, 0x04, 0, read8smo_delegate(*m_sio, FUNC(z80sio_device::da_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::da_w)));
-	m_bus->installer(AS_IO)->install_readwrite_handler(0x82, 0x82, 0, 0x04, 0, read8smo_delegate(*m_sio, FUNC(z80sio_device::cb_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::cb_w)));
-	m_bus->installer(AS_IO)->install_readwrite_handler(0x83, 0x83, 0, 0x04, 0, read8smo_delegate(*m_sio, FUNC(z80sio_device::db_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::db_w)));
+	// A15-A8 and A2 not connected
+	m_bus->installer(AS_IO)->install_readwrite_handler(0x80, 0x80, 0, 0xff04, 0, read8smo_delegate(*m_sio, FUNC(z80sio_device::ca_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::ca_w)));
+	m_bus->installer(AS_IO)->install_readwrite_handler(0x81, 0x81, 0, 0xff04, 0, read8smo_delegate(*m_sio, FUNC(z80sio_device::da_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::da_w)));
+	m_bus->installer(AS_IO)->install_readwrite_handler(0x82, 0x82, 0, 0xff04, 0, read8smo_delegate(*m_sio, FUNC(z80sio_device::cb_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::cb_w)));
+	m_bus->installer(AS_IO)->install_readwrite_handler(0x83, 0x83, 0, 0xff04, 0, read8smo_delegate(*m_sio, FUNC(z80sio_device::db_r)), write8smo_delegate(*m_sio, FUNC(z80sio_device::db_w)));
 }
 
 void dual_serial_device_40pin::device_resolve_objects()

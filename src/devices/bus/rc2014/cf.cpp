@@ -28,7 +28,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_bus->int_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( tx_w ) { m_bus->tx_w(state); }
 
 	uint8_t ide_cs0_r(offs_t offset) { return m_ata->cs0_r(offset); }
@@ -46,13 +45,13 @@ compact_flash_device::compact_flash_device(const machine_config &mconfig, const 
 
 void compact_flash_device::device_start()
 {
-	// A7 not connected
-	m_bus->installer(AS_IO)->install_readwrite_handler(0x10, 0x17, 0, 0x80, 0, read8sm_delegate(*this, FUNC(compact_flash_device::ide_cs0_r)), write8sm_delegate(*this, FUNC(compact_flash_device::ide_cs0_w)));
+	// A15-A8 and A7 not connected
+	m_bus->installer(AS_IO)->install_readwrite_handler(0x10, 0x17, 0, 0xff80, 0, read8sm_delegate(*this, FUNC(compact_flash_device::ide_cs0_r)), write8sm_delegate(*this, FUNC(compact_flash_device::ide_cs0_w)));
 }
 
 void compact_flash_device::device_add_mconfig(machine_config &config)
 {
-	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 }
 
 }

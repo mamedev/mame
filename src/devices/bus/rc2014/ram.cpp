@@ -164,11 +164,10 @@ void ram_64k_device::update_banks()
 {
 	if (m_paged->read() == 0) return; // If not paged skip
 
-	if (m_bank == 0) {
+	if (m_bank == 0)
 		m_bus->installer(AS_PROGRAM)->install_write_handler(0x0000, 0x7fff, write8sm_delegate(*this, FUNC(ram_64k_device::ram_w)));
-	} else {
+	else
 		m_bus->installer(AS_PROGRAM)->install_ram(0x0000, 0x7fff, m_ram.get());
-	}
 }
 
 //**************************************************************************
@@ -204,7 +203,7 @@ void ram_64k_device_40pin::device_reset()
 		m_bus->installer(AS_PROGRAM)->install_ram(0x8000, 0xffff, m_ram.get() + 0x8000);
 		m_bus->installer(AS_PROGRAM)->install_write_handler(0x0000, 0x7fff, write8sm_delegate(*this, FUNC(ram_64k_device_40pin::ram_w)));
 	}
-	else 
+	else
 	{
 		m_bus->installer(AS_PROGRAM)->install_ram(m_start_addr->read() * 0x1000, 0xffff, m_ram.get() + m_start_addr->read() * 0x1000);
 	}
