@@ -19,18 +19,20 @@ neosprite_base_device::neosprite_base_device(
 		uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
+	, device_memory_interface(mconfig, *this)
 	, m_bppshift(4)
 	, m_region_zoomy(*this, "zoomy")
+	, m_space_config("vram",ENDIANNESS_BIG,16,16,-1,address_map_constructor(FUNC(neosprite_base_device::memmap), this))
 {
 }
 
 void neosprite_base_device::device_start()
 {
-	m_videoram = std::make_unique<uint16_t[]>(0x8000 + 0x800);
-	m_videoram_drawsource = m_videoram.get();
+	//m_videoram = std::make_unique<uint16_t[]>(0x8000 + 0x800);
+	m_videoram_drawsource = reinterpret_cast<uint16_t*>(space(AS_DATA).get_read_ptr(0));
 
 	/* clear allocated memory */
-	memset(m_videoram.get(), 0x00, (0x8000 + 0x800) * sizeof(uint16_t));
+	memset(m_videoram_drawsource, 0x00, (0x8000 + 0x800) * sizeof(uint16_t));
 
 	create_sprite_line_timer();
 	create_auto_animation_timer();
@@ -45,7 +47,7 @@ void neosprite_base_device::device_start()
 	m_auto_animation_frame_counter = 0;
 
 	/* register for state saving */
-	save_pointer(NAME(m_videoram), 0x8000 + 0x800);
+	//save_pointer(NAME(m_videoram), 0x8000 + 0x800);
 	save_item(NAME(m_vram_offset));
 	save_item(NAME(m_vram_read_buffer));
 	save_item(NAME(m_vram_modulo));
@@ -79,7 +81,7 @@ void neosprite_base_device::set_videoram_offset(uint16_t data)
 	m_vram_offset = (data & 0x8000 ? data & 0x87ff : data);
 
 	/* the read happens right away */
-	m_vram_read_buffer = m_videoram[m_vram_offset];
+	m_vram_read_buffer = m_videoram_drawsource[m_vram_offset];
 }
 
 
@@ -91,7 +93,7 @@ uint16_t neosprite_base_device::get_videoram_data()
 
 void neosprite_base_device::set_videoram_data(uint16_t data)
 {
-	m_videoram[m_vram_offset] = data;
+	m_videoram_drawsource[m_vram_offset] = data;
 
 	/* auto increment/decrement the current offset - A15 is NOT affected */
 	set_videoram_offset((m_vram_offset & 0x8000) | ((m_vram_offset + m_vram_modulo) & 0x7fff));
@@ -107,6 +109,20 @@ void neosprite_base_device::set_videoram_modulo(uint16_t data)
 uint16_t neosprite_base_device::get_videoram_modulo()
 {
 	return m_vram_modulo;
+}
+
+device_memory_interface::space_config_vector neosprite_base_device::memory_space_config() const
+{
+    return space_config_vector {
+        std::make_pair(AS_DATA, &m_space_config)
+    };
+}
+
+void neosprite_base_device::memmap(address_map &map)
+{
+	if (!has_configured_map(0)) {
+		map(0x0000, 0x87FF).ram();
+	}
 }
 
 
@@ -779,7 +795,7 @@ void neosprite_midas_device::device_start()
 
 void neosprite_midas_device::buffer_vram()
 {
-	memcpy(m_videoram_buffer.get(), m_videoram.get(), (0x8000 + 0x800) * sizeof(uint16_t));
+	memcpy(m_videoram_buffer.get(), m_videoram_drawsource, (0x8000 + 0x800) * sizeof(uint16_t));
 }
 
 inline void neosprite_midas_device::draw_fixed_layer_2pixels(uint32_t*&pixel_addr, int offset, uint8_t* gfx_base, const pen_t* char_pens)
