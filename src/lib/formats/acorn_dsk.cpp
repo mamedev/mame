@@ -55,12 +55,12 @@ int acorn_ssd_format::find_size(util::random_read &io, uint32_t form_factor, con
 
 		// test for Torch CPN - test pattern at sector &0018
 		io.read_at(0x32800, cat, 8, actual);
-		if (memcmp(cat, "\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd", 4) == 0 && size == (uint64_t)compute_track_size(f) * f.track_count * f.head_count)
+		if (memcmp(cat, "\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd", 8) == 0 && size == (uint64_t)compute_track_size(f) * f.track_count * f.head_count)
 			return i;
 
 		// test for HADFS - test pattern at sector 70
 		io.read_at(0x04610, cat, 8, actual);
-		if (memcmp(cat, "\x00\x28\x43\x29\x4a\x47\x48\x00", 4) == 0 && size == (uint64_t)compute_track_size(f) * f.track_count * f.head_count)
+		if (memcmp(cat, "\x00\x28\x43\x29\x4a\x47\x48\x00", 8) == 0 && size == (uint64_t)compute_track_size(f) * f.track_count * f.head_count)
 			return i;
 
 		// test for Kenda SD - offset &0962 = 0 SD/1 DD, offset &0963 = disk size blocks / 4 (block size = 1K, ie. 0x400 bytes), reserved tracks = 3, ie. 0x1e00 bytes, soft stagger = 2 sectors, ie. 0x200 bytes
@@ -113,7 +113,7 @@ int acorn_ssd_format::identify(util::random_read &io, uint32_t form_factor, cons
 	int type = find_size(io, form_factor, variants);
 
 	if (type != -1)
-		return FIFID_SIZE;
+		return FIFID_SIZE | FIFID_STRUCT;
 
 	return 0;
 }
@@ -207,14 +207,19 @@ int acorn_dsd_format::find_size(util::random_read &io, uint32_t form_factor, con
 
 		// test for Torch CPN - test pattern at sector &0018
 		io.read_at(0x1200, cat, 8, actual);
-		if (memcmp(cat, "\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd", 4) == 0 && size == (uint64_t)compute_track_size(f) * f.track_count * f.head_count)
+		if (memcmp(cat, "\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd", 8) == 0 && size == (uint64_t)compute_track_size(f) * f.track_count * f.head_count)
 			return i;
 
 		// test for HADFS - test pattern at sector 70
 		io.read_at(0x08c10, cat, 8, actual);
-		if (memcmp(cat, "\x00\x28\x43\x29\x4a\x47\x48\x00", 4) == 0 && size == (uint64_t)compute_track_size(f) * f.track_count * f.head_count)
+		if (memcmp(cat, "\x00\x28\x43\x29\x4a\x47\x48\x00", 8) == 0 && size == (uint64_t)compute_track_size(f) * f.track_count * f.head_count)
 			return i;
 
+		// test for FLEX - from System Information Record
+		io.read_at(0x0226, cat, 2, actual);
+		if ((memcmp(cat, "\x4f\x14", 2) == 0 || memcmp(cat, "\x4f\x0a", 2) == 0) && size == (uint64_t)compute_track_size(f) * f.track_count * f.head_count)
+			return i;
+		 
 		// read sector count from side 0 catalogue
 		io.read_at(0x100, cat, 8, actual);
 		sectors0 = ((cat[6] & 3) << 8) + cat[7];
@@ -246,7 +251,7 @@ int acorn_dsd_format::identify(util::random_read &io, uint32_t form_factor, cons
 	int type = find_size(io, form_factor, variants);
 
 	if (type != -1)
-		return FIFID_SIZE;
+		return FIFID_STRUCT | FIFID_SIZE;
 
 	return 0;
 }
@@ -351,7 +356,7 @@ int opus_ddos_format::identify(util::random_read &io, uint32_t form_factor, cons
 	int type = find_size(io, form_factor, variants);
 
 	if (type != -1)
-		return FIFID_SIZE;
+		return FIFID_STRUCT | FIFID_SIZE;
 
 	return 0;
 }
@@ -448,7 +453,7 @@ int acorn_adfs_old_format::identify(util::random_read &io, uint32_t form_factor,
 	int type = find_size(io, form_factor, variants);
 
 	if(type != -1)
-		return FIFID_SIZE;
+		return FIFID_STRUCT | FIFID_SIZE;
 
 	return 0;
 }
@@ -552,7 +557,7 @@ int acorn_adfs_new_format::identify(util::random_read &io, uint32_t form_factor,
 	int type = find_size(io, form_factor, variants);
 
 	if (type != -1)
-		return FIFID_SIZE;
+		return FIFID_STRUCT | FIFID_SIZE;
 
 	return 0;
 }
@@ -633,7 +638,7 @@ int acorn_dos_format::identify(util::random_read &io, uint32_t form_factor, cons
 	int type = find_size(io, form_factor, variants);
 
 	if (type != -1)
-		return FIFID_SIZE;
+		return FIFID_STRUCT | FIFID_SIZE;
 
 	return 0;
 }
