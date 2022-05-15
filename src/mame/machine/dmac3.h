@@ -35,14 +35,14 @@ public:
 	// Address map setup
 	template <typename... T>
 	void set_apbus_address_translator(T &&...args) { m_apbus_virt_to_phys_callback.set(std::forward<T>(args)...); }
-	template <dmac3_controller controller>
+	template <dmac3_controller Controller>
 	void map(address_map &map)
 	{
-		map(0x0, 0x3).rw(FUNC(dmac3_device::csr_r<controller>), FUNC(dmac3_device::csr_w<controller>));
-		map(0x4, 0x7).rw(FUNC(dmac3_device::intr_r<controller>), FUNC(dmac3_device::intr_w<controller>));
-		map(0x8, 0xb).rw(FUNC(dmac3_device::length_r<controller>), FUNC(dmac3_device::length_w<controller>));
-		map(0xc, 0xf).rw(FUNC(dmac3_device::address_r<controller>), FUNC(dmac3_device::address_w<controller>));
-		map(0x10, 0x13).rw(FUNC(dmac3_device::conf_r<controller>), FUNC(dmac3_device::conf_w<controller>));
+		map(0x0, 0x3).rw(FUNC(dmac3_device::csr_r<Controller>), FUNC(dmac3_device::csr_w<Controller>));
+		map(0x4, 0x7).rw(FUNC(dmac3_device::intr_r<Controller>), FUNC(dmac3_device::intr_w<Controller>));
+		map(0x8, 0xb).rw(FUNC(dmac3_device::length_r<Controller>), FUNC(dmac3_device::length_w<Controller>));
+		map(0xc, 0xf).rw(FUNC(dmac3_device::address_r<Controller>), FUNC(dmac3_device::address_w<Controller>));
+		map(0x10, 0x13).rw(FUNC(dmac3_device::conf_r<Controller>), FUNC(dmac3_device::conf_w<Controller>));
 	}
 
 	// Signal routing

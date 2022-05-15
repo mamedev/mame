@@ -104,17 +104,10 @@ void dmac3_device::address_w(dmac3_controller controller, uint32_t data)
 
 void dmac3_device::conf_w(dmac3_controller controller, uint32_t data)
 {
-#if (VERBOSE & LOG_REGISTER) > 0 
-	// No need for the extra comparison if logging isn't enabled
-	// Only log if something other than the access mode changed
-	// since, at least for now, DMAC and SPIFI accesses will go through regardless
-	// of this setting.
-
 	if ((data & ~CONF_WIDTH) != (m_controllers[controller].conf & ~CONF_WIDTH))
 	{
 		LOGMASKED(LOG_REGISTER, "dmac3-%d conf_w: 0x%x (%s)\n", controller, data, machine().describe_context());
 	}
-#endif
 
 	m_controllers[controller].conf = data;
 }
@@ -142,10 +135,10 @@ TIMER_CALLBACK_MEMBER(dmac3_device::irq_check)
 
 	// Scan each controller for an interrupt condition - if any of these are true, set IRQ.
 	// If both controllers have no interrupt conditions, IRQ can be cleared.
-	for (int controller = 0; controller < 2; ++controller)
+	for (const auto &controller : m_controllers)
 	{
-		const uint32_t intr = m_controllers[controller].intr;
-		newIrq |= ((intr & INTR_INT) && (intr & INTR_INTEN)); // External interrupt (SPIFI)
+		const uint32_t intr = controller.intr;
+		newIrq |= (intr & INTR_INT) && (intr & INTR_INTEN); // External interrupt (SPIFI)
 		newIrq |= (intr & INTR_EOPI) && (intr & INTR_EOPIE); // End-of-operation interrupt
 		newIrq |= (intr & INTR_DRQI) && (intr & INTR_DRQIE); // DRQ interrupt (?)
 		newIrq |= (intr & INTR_TCI) && (intr & INTR_TCIE);   // Transfer count interrupt (?)

@@ -62,6 +62,11 @@ cxd8442q_device::cxd8442q_device(const machine_config &mconfig, const char *tag,
 {
 }
 
+void cxd8442q_device::device_resolve_objects()
+{
+	out_irq.resolve_safe();
+}
+
 void cxd8442q_device::map(address_map &map)
 {
 	// Each channel has the same structure

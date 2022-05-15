@@ -128,7 +128,7 @@ protected:
 
 	// Interrupts
 	devcb_write_line out_irq;
-	void device_resolve_objects() override { out_irq.resolve_safe(); }
+	void device_resolve_objects() override;
 	void irq_check();
 
 	// device_t overrides
