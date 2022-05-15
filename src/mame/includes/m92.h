@@ -30,11 +30,6 @@ struct M92_pf_layer_info
 class m92_state : public driver_device
 {
 public:
-	enum
-	{
-			TIMER_SPRITEBUFFER
-	};
-
 	m92_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
@@ -132,7 +127,7 @@ private:
 	void ppan_portmap(address_map &map);
 	void sound_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(spritebuffer_done);
 };
 
 #endif // MAME_INCLUDES_M92_H

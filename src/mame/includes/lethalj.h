@@ -18,11 +18,6 @@
 class lethalj_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_GEN_EXT1_INT
-	};
-
 	lethalj_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -59,8 +54,9 @@ private:
 	void lethalj_map(address_map &map);
 
 	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void video_start() override;
+
+	TIMER_CALLBACK_MEMBER(gen_ext1_int);
 
 	required_device<tms34010_device> m_maincpu;
 	required_device<screen_device> m_screen;

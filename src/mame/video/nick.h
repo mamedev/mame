@@ -79,10 +79,11 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
+
+	TIMER_CALLBACK_MEMBER(scanline_tick);
 
 	uint8_t vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint8_t data);

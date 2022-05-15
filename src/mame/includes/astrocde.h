@@ -30,12 +30,6 @@
 class astrocde_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_INTERRUPT_OFF,
-		TIMER_SCANLINE
-	};
-
 	astrocde_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -148,6 +142,7 @@ public:
 	void profpac_palette(palette_device &palette) const;
 	uint32_t screen_update_astrocde(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_profpac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(interrupt_off);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 	inline int mame_vpos_to_astrocade_vpos(int scanline);
 	void init_savestate();
@@ -186,7 +181,6 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
 
 class seawolf2_state : public astrocde_state

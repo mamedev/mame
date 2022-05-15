@@ -48,7 +48,8 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(command_done);
 
 private:
 
@@ -188,6 +189,7 @@ private:
 	uint32_t readbits_from_ram(uint32_t & src_addr, uint32_t & bit_offs, uint32_t bits);
 	void load_texture();
 
+	emu_timer           *m_done_timer;
 	m2_bda_device       *m_bda;
 
 	devcb_write_line    m_general_int_handler;

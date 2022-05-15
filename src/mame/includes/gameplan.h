@@ -29,13 +29,6 @@ driver by Chris Moore
 class gameplan_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_CLEAR_SCREEN_DONE,
-		TIMER_VIA_IRQ_DELAYED,
-		TIMER_VIA_0_CAL
-	};
-
 	gameplan_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
@@ -56,7 +49,6 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via_0;
@@ -72,22 +64,23 @@ protected:
 
 private:
 	/* machine state */
-	uint8_t   m_current_port = 0U;
+	uint8_t    m_current_port = 0U;
 
 	/* video state */
 	std::unique_ptr<uint8_t[]>   m_videoram{};
-	size_t   m_videoram_size = 0U;
+	size_t     m_videoram_size = 0U;
 	uint8_t    m_video_x = 0U;
 	uint8_t    m_video_y = 0U;
 	uint8_t    m_video_command = 0U;
 	uint8_t    m_video_data = 0U;
 	uint8_t    m_video_previous = 0U;
+	emu_timer *m_clear_done_timer;
+	emu_timer *m_via_irq_timer;
 
 	/* devices */
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<riot6532_device> m_riot;
 	optional_device<generic_latch_8_device> m_soundlatch;
-
 
 	void io_select_w(uint8_t data);
 	uint8_t io_port_r();

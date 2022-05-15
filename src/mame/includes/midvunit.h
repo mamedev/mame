@@ -96,11 +96,6 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(motion_r);
 
 private:
-	enum
-	{
-		TIMER_SCANLINE
-	};
-
 	optional_shared_ptr<uint32_t> m_nvram;
 	required_shared_ptr<uint32_t> m_ram_base;
 	optional_shared_ptr<uint32_t> m_fastram_base;
@@ -197,6 +192,4 @@ private:
 
 	void midvplus_map(address_map &map);
 	void midvunit_map(address_map &map);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 };
