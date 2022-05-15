@@ -185,7 +185,6 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_bus->int_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( tx_w ) { m_bus->tx_w(state); }
 
 	uint8_t ide_cs0_r(offs_t offset) { return m_ata->cs0_r(offset); }
