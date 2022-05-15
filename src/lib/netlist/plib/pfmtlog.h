@@ -412,7 +412,7 @@ namespace plib {
 
 	};
 
-	using plog_delegate = plib::pmfp<void, plog_level, const pstring &>;
+	using plog_delegate = plib::pmfp<void (plog_level, const pstring &)>;
 
 	template <plog_level::E L, bool build_enabled = true>
 	class plog_channel : public pfmt_writer_t<plog_channel<L, build_enabled>, build_enabled>

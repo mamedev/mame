@@ -22,7 +22,6 @@
 #endif
 #endif
 
-// noexcept on move operator -> issue with macosx clang
 #define PCOPYASSIGNMOVE(name, def) \
 	PCOPYASSIGN(name, def) \
 	PMOVEASSIGN(name, def)
@@ -32,8 +31,8 @@
 	name &operator=(const name &) = def;
 
 #define PMOVEASSIGN(name, def)  \
-	name(name &&) /*noexcept*/ = def; \
-	name &operator=(name &&) /*noexcept*/ = def;
+	name(name &&) noexcept = def; \
+	name &operator=(name &&) noexcept = def;
 
 #if defined(EMSCRIPTEN)
 #undef EMSCRIPTEN
@@ -82,7 +81,8 @@ namespace plib
 		UNKNOWN,
 		CLANG,
 		GCC,
-		MSC
+		MSC,
+		NVCC
 	};
 
 	enum class ci_os
@@ -101,18 +101,19 @@ namespace plib
 		UNKNOWN,
 		X86,
 		ARM,
-		MIPS
+		MIPS,
+		IA64
 	};
 
 	struct compile_info
 	{
 	#ifdef _WIN32
 		using win32 = std::integral_constant<bool, true>;
-	#ifdef UNICODE
-		using unicode = std::integral_constant<bool, true>;
-	#else
-		using unicode = std::integral_constant<bool, false>;
-	#endif
+		#ifdef UNICODE
+			using unicode = std::integral_constant<bool, true>;
+		#else
+			using unicode = std::integral_constant<bool, false>;
+		#endif
 	#else
 		using win32 = std::integral_constant<bool, false>;
 		using unicode = std::integral_constant<bool, true>;
@@ -130,15 +131,18 @@ namespace plib
 		static constexpr int128_type int128_max() { return int128_type(); }
 		static constexpr uint128_type uint128_max() { return uint128_type(); }
 	#endif
-	#ifdef __clang__
+	#if (NVCCBUILD > 0)
+		using type = std::integral_constant<ci_compiler, ci_compiler::NVCC>;
+		using version = std::integral_constant<int, NVCCBUILD>;
+	#elif defined(_MSC_VER)
+		using type = std::integral_constant<ci_compiler, ci_compiler::MSC>;
+		using version = std::integral_constant<int, _MSC_VER>;
+	#elif defined(__clang__)
 		using type = std::integral_constant<ci_compiler, ci_compiler::CLANG>;
 		using version = std::integral_constant<int, (__clang_major__) * 100 + (__clang_minor__)>;
 	#elif defined(__GNUC__)
 		using type = std::integral_constant<ci_compiler, ci_compiler::GCC>;
 		using version = std::integral_constant<int, (__GNUC__) * 100 + (__GNUC_MINOR__)>;
-	#elif defined(_MSC_VER)
-		using type = std::integral_constant<ci_compiler, ci_compiler::MSC>;
-		using version = std::integral_constant<int, _MSC_VER>;
 	#else
 		using type = std::integral_constant<ci_compiler, ci_compiler::UNKNOWN>;
 		using version = std::integral_constant<int, 0>;
@@ -174,6 +178,8 @@ namespace plib
 		using arch = std::integral_constant<ci_arch, ci_arch::ARM>;
 	#elif defined(__MIPSEL__) || defined(__mips_isa_rev) || defined(__mips64)
 		using arch = std::integral_constant<ci_arch, ci_arch::MIPS>;
+	#elif defined(__ia64__)
+		using arch = std::integral_constant<ci_arch, ci_arch::IA64>;
 	#else
 		using arch = std::integral_constant<ci_arch, ci_arch::UNKNOWN>;
 	#endif
@@ -181,6 +187,11 @@ namespace plib
 		using mingw = std::integral_constant<bool, true>;
 	#else
 		using mingw = std::integral_constant<bool, false>;
+	#endif
+	#if defined(__APPLE__)
+		using clang_apple_noexcept_issue = std::integral_constant<bool, version::value < 1100>;
+	#else
+		using clang_apple_noexcept_issue = std::integral_constant<bool, false>;
 	#endif
 	};
 
@@ -314,6 +325,22 @@ namespace plib
 		std::copy(sp, sp + sizeof(S), dp);
 	}
 
+	/// \brief Test if type R has a stream operator << defined
+	///
+	/// has_ostram_operator<std::ostream, int>:: value should be true
+	///
+	/// \tparam LEFT Stream type
+	/// \tparam RIGHT Type to check for operator overload
+
+	template<class LEFT, class RIGHT>
+	struct has_ostream_operator_impl {
+		template<class V> static auto test(V*) -> decltype(std::declval<LEFT &>() << std::declval<V>());
+		template<typename> static auto test(...) -> std::false_type;
+		//static constexpr const bool value = std::is_same<LEFT &, decltype(test<RIGHT>(0))>::value;
+		using type = typename std::is_same<LEFT &, decltype(test<RIGHT>(nullptr))>::type;
+	};
+	template<class LEFT, class RIGHT>
+	struct has_ostream_operator : has_ostream_operator_impl<LEFT, RIGHT>::type {};
 
 } // namespace plib
 
