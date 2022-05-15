@@ -551,6 +551,8 @@ if (BUSES["BBC_INTERNAL"]~=null) then
 		MAME_DIR .. "src/devices/bus/bbc/internal/cumana68k.h",
 		MAME_DIR .. "src/devices/bus/bbc/internal/integrab.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/internal/integrab.h",
+		MAME_DIR .. "src/devices/bus/bbc/internal/memex.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/internal/memex.h",
 		MAME_DIR .. "src/devices/bus/bbc/internal/morleyaa.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/internal/morleyaa.h",
 		MAME_DIR .. "src/devices/bus/bbc/internal/overlay.cpp",
