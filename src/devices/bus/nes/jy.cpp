@@ -147,18 +147,18 @@ void nes_jy_typea_device::pcb_reset()
 uint8_t nes_jy_typea_device::nt_r(offs_t offset)
 {
 	int page = ((offset & 0xc00) >> 10);
-	irq_clock(0, 2);
+	irq_clock(false, 2);
 	return m_nt_access[page][offset & 0x3ff];
 }
 
 uint8_t nes_jy_typea_device::chr_r(offs_t offset)
 {
 	int bank = offset >> 10;
-	irq_clock(0, 2);
+	irq_clock(false, 2);
 	return m_chr_access[bank][offset & 0x3ff];
 }
 
-void nes_jy_typea_device::irq_clock(int mode, int blanked)
+void nes_jy_typea_device::irq_clock(bool blanked, int mode)
 {
 	bool clock = false, fire = false;
 
@@ -227,10 +227,10 @@ void nes_jy_typea_device::irq_clock(int mode, int blanked)
 
 TIMER_CALLBACK_MEMBER(nes_jy_typea_device::irq_timer_tick)
 {
-	irq_clock(0, 0);
+	irq_clock(false, 0);
 }
 
-void nes_jy_typea_device::scanline_irq(int scanline, int vblank, int blanked)
+void nes_jy_typea_device::scanline_irq(int scanline, bool vblank, bool blanked)
 {
 	if (scanline < ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
 		irq_clock(blanked, 1);
@@ -570,7 +570,7 @@ uint8_t nes_jy_typec_device::chr_r(offs_t offset)
 {
 	int bank = offset >> 10;
 
-	irq_clock(0, 2);
+	irq_clock(false, 2);
 	switch (offset & 0xff0)
 	{
 		case 0xfd0:

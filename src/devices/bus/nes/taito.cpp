@@ -217,7 +217,7 @@ void nes_tc0190fmc_device::write_h(offs_t offset, u8 data)
 
  -------------------------------------------------*/
 
-void nes_tc0190fmc_pal16r4_device::hblank_irq(int scanline, int vblank, int blanked)
+void nes_tc0190fmc_pal16r4_device::hblank_irq(int scanline, bool vblank, bool blanked)
 {
 	if (scanline < ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
 	{

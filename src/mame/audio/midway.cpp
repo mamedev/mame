@@ -91,7 +91,7 @@ uint8_t midway_ssio_device::read()
 
 void midway_ssio_device::write(offs_t offset, uint8_t data)
 {
-	synchronize(0, (offset << 8) | (data & 0xff));
+	m_synced_write_timer->adjust(attotime::zero, (offset << 8) | (data & 0xff));
 }
 
 
@@ -443,6 +443,8 @@ void midway_ssio_device::device_start()
 	save_item(NAME(m_mute));
 	save_item(NAME(m_overall));
 	save_item(NAME(m_duty_cycle));
+
+	m_synced_write_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midway_ssio_device::synced_write), this));
 }
 
 
@@ -460,10 +462,10 @@ void midway_ssio_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - timer callbacks
+//  synced_write
 //-------------------------------------------------
 
-void midway_ssio_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(midway_ssio_device::synced_write)
 {
 	m_data[param >> 8] = param & 0xff;
 }
@@ -508,7 +510,7 @@ uint8_t midway_sounds_good_device::read()
 
 void midway_sounds_good_device::write(uint8_t data)
 {
-	synchronize(0, data);
+	m_synced_write_timer->adjust(attotime::zero, data);
 }
 
 
@@ -637,6 +639,8 @@ void midway_sounds_good_device::device_start()
 {
 	save_item(NAME(m_status));
 	save_item(NAME(m_dacval));
+
+	m_synced_write_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midway_sounds_good_device::synced_write), this));
 }
 
 
@@ -650,10 +654,10 @@ void midway_sounds_good_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - timer callbacks
+//  synced_write
 //-------------------------------------------------
 
-void midway_sounds_good_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(midway_sounds_good_device::synced_write)
 {
 	m_pia->portb_w((param >> 1) & 0x0f);
 	m_pia->ca1_w(~param & 0x01);
@@ -703,7 +707,7 @@ uint8_t midway_turbo_cheap_squeak_device::read()
 
 void midway_turbo_cheap_squeak_device::write(uint8_t data)
 {
-	synchronize(0, data);
+	m_synced_write_timer->adjust(attotime::zero, data);
 }
 
 
@@ -804,6 +808,8 @@ void midway_turbo_cheap_squeak_device::device_start()
 {
 	save_item(NAME(m_status));
 	save_item(NAME(m_dacval));
+
+	m_synced_write_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midway_turbo_cheap_squeak_device::synced_write), this));
 }
 
 
@@ -817,10 +823,10 @@ void midway_turbo_cheap_squeak_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - timer callbacks
+//  synced_write
 //-------------------------------------------------
 
-void midway_turbo_cheap_squeak_device::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(midway_turbo_cheap_squeak_device::synced_write)
 {
 	m_pia->portb_w((param >> 1) & 0x0f);
 	m_pia->ca1_w(~param & 0x01);

@@ -700,7 +700,7 @@ void nes_yung08_device::pcb_reset()
 
  -------------------------------------------------*/
 
-void nes_sc127_device::hblank_irq(int scanline, int vblank, int blanked)
+void nes_sc127_device::hblank_irq(int scanline, bool vblank, bool blanked)
 {
 	if (scanline < ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE && m_irq_enable)
 	{
@@ -956,7 +956,7 @@ void nes_btl_cj_device::write_h(offs_t offset, u8 data)
  -------------------------------------------------*/
 
 /* Scanline based IRQ ? */
-void nes_btl_dn_device::hblank_irq(int scanline, int vblank, int blanked )
+void nes_btl_dn_device::hblank_irq(int scanline, bool vblank, bool blanked)
 {
 	if (!m_irq_count || ++m_irq_count < 240)
 		return;

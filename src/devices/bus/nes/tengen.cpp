@@ -159,7 +159,7 @@ TIMER_CALLBACK_MEMBER(nes_tengen032_device::irq_timer_tick)
 }
 
 
-void nes_tengen032_device::hblank_irq(int scanline, int vblank, int blanked)
+void nes_tengen032_device::hblank_irq(int scanline, bool vblank, bool blanked)
 {
 	if (!m_irq_mode) // we are in scanline mode!
 	{

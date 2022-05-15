@@ -85,7 +85,8 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(synced_write);
 
 private:
 	// internal helpers
@@ -101,6 +102,7 @@ private:
 	optional_ioport_array<5> m_ports;
 
 	// internal state
+	emu_timer *m_synced_write_timer;
 	uint8_t m_data[4];
 	uint8_t m_status;
 	uint8_t m_14024_count;
@@ -143,7 +145,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(synced_write);
 
 private:
 	// devices
@@ -153,6 +156,7 @@ private:
 	required_device_array<filter_biquad_device, 3> m_dac_filter;
 
 	// internal state
+	emu_timer *m_synced_write_timer;
 	uint8_t m_status;
 	uint16_t m_dacval;
 
@@ -183,7 +187,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(synced_write);
 
 private:
 	// devices
@@ -193,6 +198,7 @@ private:
 	required_device_array<filter_biquad_device, 3> m_dac_filter;
 
 	// internal state
+	emu_timer *m_synced_write_timer;
 	uint8_t m_status;
 	uint16_t m_dacval;
 

@@ -371,7 +371,7 @@ uint8_t nes_fukutake_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_futuremedia_device::hblank_irq(int scanline, int vblank, int blanked)
+void nes_futuremedia_device::hblank_irq(int scanline, bool vblank, bool blanked)
 {
 	//  if (scanline < ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
 	{
@@ -576,7 +576,7 @@ uint8_t nes_edu2k_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_jy830623c_device::hblank_irq(int scanline, int vblank, int blanked)
+void nes_jy830623c_device::hblank_irq(int scanline, bool vblank, bool blanked)
 {
 	if (scanline < ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
 	{

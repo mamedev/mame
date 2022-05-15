@@ -85,20 +85,16 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(hrtc_on);
+	TIMER_CALLBACK_MEMBER(drq_on);
+	TIMER_CALLBACK_MEMBER(scanline_tick);
 
 	void vrtc_start();
 	void vrtc_end();
 	void dma_start();
 
 	void recompute_parameters();
-
-	enum
-	{
-		TIMER_HRTC_ON,
-		TIMER_DRQ_ON,
-		TIMER_SCANLINE
-	};
 
 	enum
 	{

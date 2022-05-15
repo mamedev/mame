@@ -24,7 +24,7 @@ public:
 	virtual uint8_t chr_r(offs_t offset) override;
 	virtual uint8_t nt_r(offs_t offset) override;
 
-	virtual void scanline_irq(int scanline, int vblank, int blanked) override;
+	virtual void scanline_irq(int scanline, bool vblank, bool blanked) override;
 	virtual void pcb_reset() override;
 
 protected:
@@ -35,7 +35,7 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(irq_timer_tick);
 
-	void irq_clock(int blanked, int mode);
+	void irq_clock(bool blanked, int mode);
 	void update_banks(int reg);
 	void update_prg();
 	void update_chr();

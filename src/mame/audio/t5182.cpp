@@ -170,7 +170,7 @@ t5182_device::t5182_device(const machine_config &mconfig, const char *tag, devic
 
 void t5182_device::device_start()
 {
-	m_setirq_cb = timer_alloc(SETIRQ_CB);
+	m_setirq_cb = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(t5182_device::setirq_callback), this));
 
 	save_item(NAME(m_irqstate));
 	save_item(NAME(m_semaphore_main));
@@ -219,18 +219,6 @@ TIMER_CALLBACK_MEMBER( t5182_device::setirq_callback )
 		m_ourcpu->set_input_line(0,CLEAR_LINE);
 	else    /* IRQ pending */
 		m_ourcpu->set_input_line(0,ASSERT_LINE);
-}
-
-void t5182_device::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case SETIRQ_CB:
-		setirq_callback(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in t5182_device::device_timer");
-	}
 }
 
 void t5182_device::sound_irq_w(uint8_t data)

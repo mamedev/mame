@@ -128,9 +128,9 @@ private:
 	void playch10_palette(palette_device &palette) const;
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
-	void pc10_set_videorom_bank( int first, int count, int bank, int size );
-	void set_videoram_bank( int first, int count, int bank, int size );
-	void gboard_scanline_cb( int scanline, int vblank, int blanked );
+	void pc10_set_videorom_bank(int first, int count, int bank, int size);
+	void set_videoram_bank(int first, int count, int bank, int size);
+	void gboard_scanline_cb(int scanline, bool vblank, bool blanked);
 	DECLARE_WRITE_LINE_MEMBER(int_detect_w);
 	void mapper9_latch(offs_t offset);
 	void pc10_set_mirroring(int mirroring);

@@ -212,7 +212,7 @@ uint8_t nes_disksys_device::read_m(offs_t offset)
 	return m_prgram[offset];
 }
 
-void nes_disksys_device::hblank_irq(int scanline, int vblank, int blanked)
+void nes_disksys_device::hblank_irq(int scanline, bool vblank, bool blanked)
 {
 	// FIXME: This looks like a gross hack that ties the disk byte transfer IRQ to the PPU. Seriously?
 	if (m_irq_transfer)

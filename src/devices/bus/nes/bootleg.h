@@ -15,7 +15,7 @@ public:
 	nes_sc127_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual void write_h(offs_t offset, uint8_t data) override;
 
-	virtual void hblank_irq(int scanline, int vblank, int blanked) override;
+	virtual void hblank_irq(int scanline, bool vblank, bool blanked) override;
 	virtual void pcb_reset() override;
 
 protected:
@@ -127,7 +127,7 @@ public:
 	nes_btl_dn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual void write_h(offs_t offset, uint8_t data) override;
 
-	virtual void hblank_irq(int scanline, int vblank, int blanked) override;
+	virtual void hblank_irq(int scanline, bool vblank, bool blanked) override;
 	virtual void pcb_reset() override;
 
 protected:
