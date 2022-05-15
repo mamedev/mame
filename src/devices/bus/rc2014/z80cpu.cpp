@@ -27,8 +27,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	void addrmap_mem(address_map &map);
-	void addrmap_io(address_map &map);
+	void addrmap_mem(address_map &map) { map.unmap_value_high(); }
+	void addrmap_io(address_map &map) { map.unmap_value_high(); }
 
 	// object finders
 	required_device<z80_device> m_maincpu;
@@ -42,17 +42,6 @@ z80cpu_base::z80cpu_base(const machine_config &mconfig, device_type type, const 
 
 void z80cpu_base::device_start()
 {
-}
-
-void z80cpu_base::addrmap_mem(address_map &map)
-{
-	map.unmap_value_high();
-}
-
-void z80cpu_base::addrmap_io(address_map &map)
-{
-	map.unmap_value_high(); 
-	map.global_mask(0xff);
 }
 
 void z80cpu_base::device_add_mconfig(machine_config &config)

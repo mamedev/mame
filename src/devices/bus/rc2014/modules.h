@@ -13,6 +13,7 @@
 
 // supported devices
 void rc2014_bus_modules(device_slot_interface &device);
+void rc2014_mini_bus_modules(device_slot_interface &device);
 void rc2014_ext_bus_modules(device_slot_interface &device);
 void rc2014_rc80_bus_modules(device_slot_interface &device);
 

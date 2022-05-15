@@ -2106,6 +2106,16 @@ if (BUSES["RC2014"]~=null) then
 		MAME_DIR .. "src/devices/bus/rc2014/serial.h",
 		MAME_DIR .. "src/devices/bus/rc2014/cf.cpp",
 		MAME_DIR .. "src/devices/bus/rc2014/cf.h",
+		MAME_DIR .. "src/devices/bus/rc2014/rtc.cpp",
+		MAME_DIR .. "src/devices/bus/rc2014/rtc.h",
+		MAME_DIR .. "src/devices/bus/rc2014/sound.cpp",
+		MAME_DIR .. "src/devices/bus/rc2014/sound.h",
+		MAME_DIR .. "src/devices/bus/rc2014/ide.cpp",
+		MAME_DIR .. "src/devices/bus/rc2014/ide.h",
+		MAME_DIR .. "src/devices/bus/rc2014/fdc.cpp",
+		MAME_DIR .. "src/devices/bus/rc2014/fdc.h",
+		MAME_DIR .. "src/devices/bus/rc2014/micro.cpp",
+		MAME_DIR .. "src/devices/bus/rc2014/micro.h",
 	}
 end
 

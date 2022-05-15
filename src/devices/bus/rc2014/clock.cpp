@@ -93,7 +93,7 @@ void dual_clock_base::device_start()
 }
 
 static constexpr u32 clock_mapping[] =
-{ 
+{
 	7'372'800/1,
 	7'372'800/2,
 	7'372'800/3,
@@ -102,8 +102,8 @@ static constexpr u32 clock_mapping[] =
 	7'372'800/12,
 	7'372'800/24,
 	10'000,
-	0,
-	0
+	0, // TODO: Support manual clocking (not possible for now)
+	0  // TODO: Support external clocking
 };
 
 void dual_clock_base::device_reset()
