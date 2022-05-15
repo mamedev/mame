@@ -265,7 +265,7 @@ PTEST_F(pmfp_test_complex_return, multibase_test)
 	PEXPECT_NE(static_cast<void *>(static_cast<vb *>(&obj2)), static_cast<void *>(static_cast<vd1 *>(&obj2)));
 	PEXPECT_NE(static_cast<void *>(static_cast<vb *>(&obj2)), static_cast<void *>(static_cast<vd2 *>(&obj2)));
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined(__clang__)
 	f = make_forward_delegate(&forward::xp, &obj2);
 	PEXPECT_TRUE(f().second == 7);
 	std::cout << f().second << " " << obj2.xp().second << "\n";
@@ -345,7 +345,7 @@ PTEST_F(pmfp_test_simple_return, multibase_test)
 	PEXPECT_NE(static_cast<void *>(static_cast<vb *>(&obj2)), static_cast<void *>(static_cast<vd1 *>(&obj2)));
 	PEXPECT_NE(static_cast<void *>(static_cast<vb *>(&obj2)), static_cast<void *>(static_cast<vd2 *>(&obj2)));
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined(__clang__)
 	f = make_forward_delegate(&forward::xp, &obj2);
 	f(fr);
 	PEXPECT_TRUE(fr.second == 7);

@@ -73,8 +73,8 @@ namespace plib {
 				&& (ci::arch() == ci_arch::MIPS
 					|| ci::arch() == ci_arch::ARM
 					|| ci::os() == ci_os::EMSCRIPTEN))                           ? PPMF_TYPE_INTERNAL_ARM :
-			(ci::type() == ci_compiler::CLANG || ci::type() == ci_compiler::GCC) ? PPMF_TYPE_INTERNAL_ITANIUM :
 			(ci::type() == ci_compiler::MSC && ci::m64()) ?                        PPMF_TYPE_INTERNAL_MSC :
+			(ci::type() == ci_compiler::CLANG || ci::type() == ci_compiler::GCC) ? PPMF_TYPE_INTERNAL_ITANIUM :
 																				   PPMF_TYPE_PMF
 		};
 	};

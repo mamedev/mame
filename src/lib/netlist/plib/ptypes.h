@@ -134,15 +134,15 @@ namespace plib
 	#if (NVCCBUILD > 0)
 		using type = std::integral_constant<ci_compiler, ci_compiler::NVCC>;
 		using version = std::integral_constant<int, NVCCBUILD>;
+	#elif defined(_MSC_VER)
+		using type = std::integral_constant<ci_compiler, ci_compiler::MSC>;
+		using version = std::integral_constant<int, _MSC_VER>;
 	#elif defined(__clang__)
 		using type = std::integral_constant<ci_compiler, ci_compiler::CLANG>;
 		using version = std::integral_constant<int, (__clang_major__) * 100 + (__clang_minor__)>;
 	#elif defined(__GNUC__)
 		using type = std::integral_constant<ci_compiler, ci_compiler::GCC>;
 		using version = std::integral_constant<int, (__GNUC__) * 100 + (__GNUC_MINOR__)>;
-	#elif defined(_MSC_VER)
-		using type = std::integral_constant<ci_compiler, ci_compiler::MSC>;
-		using version = std::integral_constant<int, _MSC_VER>;
 	#else
 		using type = std::integral_constant<ci_compiler, ci_compiler::UNKNOWN>;
 		using version = std::integral_constant<int, 0>;
