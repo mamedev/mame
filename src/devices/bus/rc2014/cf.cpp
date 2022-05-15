@@ -52,7 +52,7 @@ void compact_flash_device::device_start()
 
 void compact_flash_device::device_add_mconfig(machine_config &config)
 {
-	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 }
 
 }

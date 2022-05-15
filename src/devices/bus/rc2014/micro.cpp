@@ -252,7 +252,7 @@ void rc2014_mini_cpm::update_banks()
 }
 void rc2014_mini_cpm::device_add_mconfig(machine_config &config)
 {
-	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 
 	RC2014_BUS(config, m_rc2014_bus, 0);
 	RC2014_SLOT(config, "ext:1", m_rc2014_bus, rc2014_bus_modules, nullptr);
