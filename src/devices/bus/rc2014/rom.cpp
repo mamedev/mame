@@ -150,7 +150,7 @@ void pagable_rom_device::device_reset()
 void pagable_rom_device::update_banks()
 {
 	if (m_bank == 0)
-		m_bus->installer(AS_PROGRAM)->install_rom(0x0000, m_end_addr, m_end_addr + 1, m_rom->base() + m_start_offset);
+		m_bus->installer(AS_PROGRAM)->install_rom(0x0000, m_end_addr, 0x0000, m_rom->base() + m_start_offset);
 }
 
 static INPUT_PORTS_START( pagable_rom_jumpers )
