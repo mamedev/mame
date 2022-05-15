@@ -96,6 +96,7 @@ z180asci_channel_base::z180asci_channel_base(const machine_config &mconfig, devi
 	, device_buffered_serial_interface(mconfig, *this)
 	, m_txa_handler(*this)
 	, m_rts_handler(*this)
+	, m_divisor(1)
 {
 	m_id = ((type == Z180ASCI_CHANNEL_0) || (type == Z180ASCI_EXT_CHANNEL_0)) ? 0 : 1;
 	m_ext = (type == Z180ASCI_EXT_CHANNEL_0) || (type == Z180ASCI_EXT_CHANNEL_1);
@@ -142,6 +143,7 @@ void z180asci_channel_base::device_reset()
 
 void z180asci_channel_base::device_clock_changed()
 {
+	LOG("Z180 ASCI%d set bitrate %d\n", m_id, uint32_t(clock() / m_divisor));
 	set_tra_rate(clock(), m_divisor);
 	set_rcv_rate(clock(), m_divisor);
 }
