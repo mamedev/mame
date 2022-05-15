@@ -48,8 +48,8 @@ namespace netlist::detail
 	public:
 		using entry_t = plib::pqentry_t<netlist_time_ext, O *>;
 		using base_queue = timed_queue<entry_t, false>;
-		using id_delegate = plib::pmfp<std::size_t, const O *>;
-		using obj_delegate = plib::pmfp<O *, std::size_t>;
+		using id_delegate = plib::pmfp<std::size_t (const O *)>;
+		using obj_delegate = plib::pmfp<O * (std::size_t)>;
 
 		explicit queue_base(std::size_t size, id_delegate get_id, obj_delegate get_obj)
 		: timed_queue<plib::pqentry_t<netlist_time_ext, O *>, false>(size)

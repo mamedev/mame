@@ -53,6 +53,9 @@ TIDY_FLAGSX += -modernize-use-nodiscard,
 #TIDY_FLAGSX += -cppcoreguidelines-prefer-member-initializer,
 #TIDY_FLAGSX += -modernize-use-transparent-functors,
 TIDY_FLAGSX += -readability-function-cognitive-complexity,
+TIDY_FLAGSX += -readability-uppercase-literal-suffix
+
+
 #TIDY_FLAGSX += -cppcoreguidelines-avoid-non-const-global-variables
 
 space :=
@@ -271,6 +274,9 @@ native:
 gcc9:
 	$(MAKE) CC=g++-9 LD=g++-9 CEXTRAFLAGS="-march=native -Wall -pedantic -Wpedantic -fext-numeric-literals -Wsign-compare -Wextra" EXTRALIBS="-lquadmath"
 
+emsdk:
+	emmake $(MAKE) CC=emcc LD=emcc CEXTRAFLAGS="-fexceptions" LDEXTRAFLAGS="-fexceptions --emrun" OBJ=obj/emsdk EXESUFFIX=.html
+	
 clang:
 	#$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native -msse4.2 -Weverything -Wall -pedantic -Wpedantic -Wunused-private-field -Wno-padded -Wno-unused-template -Wno-missing-variable-declarations -Wno-float-equal -Wconversion -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral  -Wno-exit-time-destructors"
 	$(MAKE) CC=clang++-13 LD=clang++-13 OBJ=obj/clang CEXTRAFLAGS="-march=native \
@@ -281,6 +287,8 @@ clang:
 		-Wmissing-variable-declarations -Wno-float-equal -Wconversion \
 		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wformat-nonliteral \
 		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override \
+		-Wno-embedded-directive \
+		-Wno-undefined-reinterpret-cast \
 		-Wunreachable-code \
 		-Wmissing-prototypes"
 
@@ -295,6 +303,7 @@ clang-libc:
 		-Wmissing-variable-declarations -Wno-float-equal -Wconversion \
 		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wformat-nonliteral \
 		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override \
+		-Wno-undefined-reinterpret-cast \
 		-Wunreachable-code \
 		-Wmissing-prototypes" \
 		LDEXTRAFLAGS=-stdlib=libc++

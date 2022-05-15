@@ -209,8 +209,6 @@ namespace netlist
 		ENTRY(PHAS_OPENMP)
 		ENTRY(PUSE_OPENMP)
 		ENTRY(PUSE_FLOAT128)
-		ENTRY(PPMF_TYPE)
-		ENTRY(PHAS_PMF_INTERNAL)
 		ENTRY_EX(config::use_mempool::value)
 		ENTRY_EX(config::use_queue_stats::value)
 		ENTRY(NL_USE_COPY_INSTEAD_OF_REFERENCE)
@@ -258,7 +256,7 @@ namespace netlist
 		ENTRY_EX(sizeof(plib::plog_level))
 
 		ENTRY_EX(sizeof(nldelegate))
-		ENTRY(PPMF_TYPE)
+		ENTRY(PPMF_FORCE_TYPE)
 		ENTRY(PHAS_PMF_INTERNAL)
 
 	#undef ENTRY
