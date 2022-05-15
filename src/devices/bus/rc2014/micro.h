@@ -14,5 +14,6 @@
 #include "bus/rc2014/rc2014.h"
 
 DECLARE_DEVICE_TYPE(RC2014_MICRO, device_rc2014_card_interface)
+DECLARE_DEVICE_TYPE(RC2014_MINI_CPM, device_rc2014_card_interface)
 
 #endif // MAME_BUS_RC2014_MICRO_H

@@ -44,8 +44,14 @@ void rc2014_bus_modules(device_slot_interface &device)
 	device.option_add("fdc_smc", RC2014_FDC9266);
 	device.option_add("fdc_wdc", RC2014_WD37C65);
 	device.option_add("micro", RC2014_MICRO);
-	// We can use fixed slot micro board as mini
+}
+
+// Mini mezzanine boards
+void rc2014_mini_bus_modules(device_slot_interface &device)
+{
+	rc2014_bus_modules(device);
 	device.option_add("mini", RC2014_MICRO);
+	device.option_add("mini_cpm", RC2014_MINI_CPM);
 }
 
 void rc2014_ext_bus_modules(device_slot_interface &device)

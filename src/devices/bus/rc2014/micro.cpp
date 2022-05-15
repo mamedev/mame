@@ -12,6 +12,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
+#include "bus/ata/ataintf.h"
 #include "bus/rs232/rs232.h"
 
 namespace {
@@ -46,6 +47,7 @@ private:
 	required_device<acia6850_device> m_acia;
 	required_memory_region m_rom;
 	required_ioport m_rom_selector;
+	required_ioport m_rom_present;
 
 	std::unique_ptr<u8[]> m_ram;
 
@@ -59,6 +61,7 @@ rc2014_micro::rc2014_micro(const machine_config &mconfig, const char *tag, devic
 	, m_acia(*this, "acia")
 	, m_rom(*this, "rom")
 	, m_rom_selector(*this, "JP2-JP4")
+	, m_rom_present(*this, "ROM")
 	, m_ram(nullptr)
 {
 }
@@ -83,7 +86,8 @@ void rc2014_micro::device_start()
 void rc2014_micro::device_reset()
 {
 	// Setup ROM
-	m_bus->installer(AS_PROGRAM)->install_rom(0x0000, 0x1fff, 0x0000, m_rom->base() + (m_rom_selector->read() & 7) * 0x2000);
+	if (m_rom_present->read())
+		m_bus->installer(AS_PROGRAM)->install_rom(0x0000, 0x1fff, 0x0000, m_rom->base() + (m_rom_selector->read() & 7) * 0x2000);
 }
 
 void rc2014_micro::device_resolve_objects()
@@ -139,6 +143,10 @@ static INPUT_PORTS_START( rc2014_micro_jumpers )
 	PORT_CONFSETTING( 0x5, "EMPTY5" )
 	PORT_CONFSETTING( 0x6, "EMPTY6" )
 	PORT_CONFSETTING( 0x7, "SCM" )
+	PORT_START("ROM")
+	PORT_CONFNAME( 0x1, 0x1, "ROM Socket" )
+	PORT_CONFSETTING( 0x0, "Empty" )
+	PORT_CONFSETTING( 0x1, "Populated" )
 INPUT_PORTS_END
 
 ioport_constructor rc2014_micro::device_input_ports() const
@@ -156,9 +164,122 @@ const tiny_rom_entry *rc2014_micro::device_rom_region() const
 	return ROM_NAME( rc2014_rom );
 }
 
+//**************************************************************************
+//  RC2014 Mini CP/M Upgrade module
+//  Module author: Spencer Owen
+//**************************************************************************
+
+class rc2014_mini_cpm : public device_t, public device_rc2014_card_interface
+{
+public:
+	// construction/destruction
+	rc2014_mini_cpm(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override { update_banks(); }
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_bus->int_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( tx_w ) { m_bus->tx_w(state); }
+
+	uint8_t ide_cs0_r(offs_t offset) { return m_ata->cs0_r(offset); }
+	void ide_cs0_w(offs_t offset, uint8_t data) { m_ata->cs0_w(offset, data); }
+	void reset_bank_w(offs_t, uint8_t) { m_bank = 0; update_banks(); }
+	void toggle_bank_w(offs_t, uint8_t) { m_bank = m_bank ? 0 : 1; update_banks(); }
+	void ram_w(offs_t offset, uint8_t data) { m_ram[offset] = data; }
+
+private:
+	void update_banks();
+
+	// base-class members
+	uint8_t m_bank;
+	uint8_t m_selected_bank;
+	std::unique_ptr<u8[]> m_ram;
+
+	required_device<ata_interface_device> m_ata;
+	required_memory_region m_rom;
+	required_ioport m_jp1;
+};
+
+rc2014_mini_cpm::rc2014_mini_cpm(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, RC2014_MINI_CPM, tag, owner, clock)
+	, device_rc2014_card_interface(mconfig, *this)
+	, m_ata(*this, "ata")
+	, m_rom(*this, "rom")
+	, m_jp1(*this, "JP1-JP2")
+{
+}
+
+void rc2014_mini_cpm::device_start()
+{
+	// Additional 32K RAM
+	m_ram = std::make_unique<u8[]>(0x8000);
+	std::fill_n(m_ram.get(), 0x8000, 0xff);
+	save_pointer(NAME(m_ram), 0x8000);
+	save_item(NAME(m_bank));
+
+	// A15-A8, A7 and A2-A0 not connected, A6 must be 0
+	m_bus->installer(AS_IO)->install_write_handler(0x30, 0x30, 0, 0xff87, 0, write8sm_delegate(*this, FUNC(rc2014_mini_cpm::reset_bank_w)));
+	m_bus->installer(AS_IO)->install_write_handler(0x38, 0x38, 0, 0xff87, 0, write8sm_delegate(*this, FUNC(rc2014_mini_cpm::toggle_bank_w)));
+	// A15-A8 and A7 not connected
+	m_bus->installer(AS_IO)->install_readwrite_handler(0x10, 0x17, 0, 0xff80, 0, read8sm_delegate(*this, FUNC(rc2014_mini_cpm::ide_cs0_r)), write8sm_delegate(*this, FUNC(rc2014_mini_cpm::ide_cs0_w)));
+}
+
+void rc2014_mini_cpm::device_reset()
+{
+	m_bank = 0;
+	m_selected_bank = m_jp1->read();
+	update_banks();
+}
+
+void rc2014_mini_cpm::update_banks()
+{
+	if (m_bank == 0)
+	{
+		m_bus->installer(AS_PROGRAM)->install_write_handler(0x0000, 0x7fff, write8sm_delegate(*this, FUNC(rc2014_mini_cpm::ram_w)));
+		m_bus->installer(AS_PROGRAM)->install_rom(0x0000, 0x3fff, 0x4000, m_rom->base() + (m_selected_bank * 0x4000));
+	} else {
+		m_bus->installer(AS_PROGRAM)->install_ram(0x0000, 0x7fff, m_ram.get());
+	}
+}
+void rc2014_mini_cpm::device_add_mconfig(machine_config &config)
+{
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
+}
+
+static INPUT_PORTS_START( rc2014_mini_cpm_jumpers )
+	PORT_START("JP1-JP2")
+	PORT_CONFNAME( 0x3, 0x1, "Bank" )
+	PORT_CONFSETTING( 0x0, "0" )
+	PORT_CONFSETTING( 0x1, "1" )
+	PORT_CONFSETTING( 0x2, "2" )
+	PORT_CONFSETTING( 0x3, "3" )
+INPUT_PORTS_END
+
+ioport_constructor rc2014_mini_cpm::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( rc2014_mini_cpm_jumpers );
+}
+
+ROM_START(rc2014_mini_cpm)
+	ROM_REGION( 0x10000, "rom",0 )
+	ROM_LOAD( "r0881099.bin", 0x00000, 0x10000, CRC(1f4b191c) SHA1(82d341478411c34f804b2be09f26b421f1533dc8) )
+ROM_END
+
+const tiny_rom_entry *rc2014_mini_cpm::device_rom_region() const
+{
+	return ROM_NAME( rc2014_mini_cpm );
+}
+
 }
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE_PRIVATE(RC2014_MICRO, device_rc2014_card_interface, rc2014_micro, "rc2014_micro", "RC2014 Micro module")
+DEFINE_DEVICE_TYPE_PRIVATE(RC2014_MINI_CPM, device_rc2014_card_interface, rc2014_mini_cpm, "rc2014_mini_cpm", "Mini CP/M Upgrade module")
