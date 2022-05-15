@@ -275,7 +275,7 @@ ioport_constructor rc2014_mini_cpm::device_input_ports() const
 
 ROM_START(rc2014_mini_cpm)
 	ROM_REGION( 0x10000, "rom",0 )
-	ROM_LOAD( "r0881099.bin", 0x00000, 0x10000, CRC(1f4b191c) SHA1(82d341478411c34f804b2be09f26b421f1533dc8) )
+	ROM_LOAD( "r0881099.bin", 0x00000, 0x10000, CRC(5619f399) SHA1(c96e9ebd6ce019c264aaea156532fcf807d4c74c) )
 ROM_END
 
 const tiny_rom_entry *rc2014_mini_cpm::device_rom_region() const
