@@ -212,7 +212,7 @@ rc2014_mini_cpm::rc2014_mini_cpm(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, RC2014_MINI_CPM, tag, owner, clock)
 	, device_rc2014_card_interface(mconfig, *this)
 	, m_ata(*this, "ata")
-	, m_rc2014_bus(*this, "ext")
+	, m_rc2014_bus(*this, ":bus")
 	, m_rom(*this, "rom")
 	, m_jp1(*this, "JP1-JP2")
 {
@@ -246,7 +246,9 @@ void rc2014_mini_cpm::update_banks()
 	{
 		m_bus->installer(AS_PROGRAM)->install_write_handler(0x0000, 0x7fff, write8sm_delegate(*this, FUNC(rc2014_mini_cpm::ram_w)));
 		m_bus->installer(AS_PROGRAM)->install_rom(0x0000, 0x3fff, 0x0000, m_rom->base() + (m_selected_bank * 0x4000));
-	} else {
+	}
+	else
+	{
 		m_bus->installer(AS_PROGRAM)->install_ram(0x0000, 0x7fff, m_ram.get());
 	}
 }
@@ -254,9 +256,8 @@ void rc2014_mini_cpm::device_add_mconfig(machine_config &config)
 {
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 
-	RC2014_BUS(config, m_rc2014_bus, 0);
-	RC2014_SLOT(config, "ext:1", m_rc2014_bus, rc2014_bus_modules, nullptr);
-	RC2014_SLOT(config, "ext:2", m_rc2014_bus, rc2014_bus_modules, nullptr);
+	RC2014_SLOT(config, "1", m_rc2014_bus, rc2014_bus_modules, nullptr);
+	RC2014_SLOT(config, "2", m_rc2014_bus, rc2014_bus_modules, nullptr);
 }
 
 static INPUT_PORTS_START( rc2014_mini_cpm_jumpers )
