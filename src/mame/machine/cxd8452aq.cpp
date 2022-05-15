@@ -53,14 +53,6 @@ cxd8452aq_device::cxd8452aq_device(const machine_config &mconfig, const char *ta
 	  m_apbus_virt_to_phys_callback(*this),
 	  m_bus(*this, finder_base::DUMMY_TAG, -1, 64) {}
 
-device_memory_interface::space_config_vector cxd8452aq_device::memory_space_config() const
-{
-	// Uses a similar trick that the Jazz MCT-ADR driver uses to translate accesses from the SONIC to the system bus
-	return space_config_vector{
-		std::make_pair(0, &main_bus_config),
-		std::make_pair(1, &sonic_config)};
-}
-
 void cxd8452aq_device::map(address_map &map)
 {
 	map(0x00, 0x03).rw(FUNC(cxd8452aq_device::control_r), FUNC(cxd8452aq_device::control_w));
@@ -72,6 +64,42 @@ void cxd8452aq_device::map(address_map &map)
 	map(0x18, 0x1b).rw(FUNC(cxd8452aq_device::tx_sonic_addr_r), FUNC(cxd8452aq_device::tx_sonic_addr_w));
 	map(0x1c, 0x1f).rw(FUNC(cxd8452aq_device::tx_host_addr_r), FUNC(cxd8452aq_device::tx_host_addr_w));
 	map(0x20, 0x23).rw(FUNC(cxd8452aq_device::tx_count_r), FUNC(cxd8452aq_device::tx_count_w));
+}
+
+void cxd8452aq_device::sonic_bus_map(address_map &map)
+{
+	map(0x0, 0xfffff).mirror(0xfff00000).rw(FUNC(cxd8452aq_device::sonic_r), FUNC(cxd8452aq_device::sonic_w));
+}
+
+void cxd8452aq_device::device_start()
+{
+	m_irq_handler.resolve_safe();
+	m_apbus_virt_to_phys_callback.resolve();
+	m_irq_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cxd8452aq_device::irq_check), this));
+	m_dma_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cxd8452aq_device::dma_check), this));
+}
+
+void cxd8452aq_device::device_reset() 
+{
+	m_sonic3_reg = {};
+}
+
+device_memory_interface::space_config_vector cxd8452aq_device::memory_space_config() const
+{
+	// Uses a similar trick that the Jazz MCT-ADR driver uses to translate accesses from the SONIC to the system bus
+	return space_config_vector{
+		std::make_pair(0, &main_bus_config),
+		std::make_pair(1, &sonic_config)};
+}
+
+uint8_t cxd8452aq_device::sonic_r(offs_t offset)
+{
+	return space(0).read_byte(offset);
+}
+
+void cxd8452aq_device::sonic_w(offs_t offset, uint8_t data)
+{
+	space(0).write_byte(offset, data);
 }
 
 uint32_t cxd8452aq_device::control_r(offs_t offset)
@@ -186,21 +214,6 @@ void cxd8452aq_device::rx_count_w(offs_t offset, uint32_t data)
 	m_irq_check->adjust(attotime::zero);
 }
 
-void cxd8452aq_device::sonic_bus_map(address_map &map)
-{
-	map(0x0, 0xfffff).mirror(0xfff00000).rw(FUNC(cxd8452aq_device::sonic_r), FUNC(cxd8452aq_device::sonic_w));
-}
-
-uint8_t cxd8452aq_device::sonic_r(offs_t offset)
-{
-	return space(0).read_byte(offset);
-}
-
-void cxd8452aq_device::sonic_w(offs_t offset, uint8_t data)
-{
-	space(0).write_byte(offset, data);
-}
-
 TIMER_CALLBACK_MEMBER(cxd8452aq_device::irq_check)
 {
 	bool newIrq = m_sonic3_reg.control & (EXT_INT | RX_DMA_COMPLETE | TX_DMA_COMPLETE);
@@ -267,15 +280,3 @@ TIMER_CALLBACK_MEMBER(cxd8452aq_device::dma_check)
 		m_dma_check->adjust(attotime::from_nsec(DMA_TIMER));
 	}
 }
-
-void cxd8452aq_device::device_start()
-{
-	m_irq_handler.resolve_safe();
-	m_apbus_virt_to_phys_callback.resolve();
-	m_irq_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cxd8452aq_device::irq_check), this));
-	m_dma_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cxd8452aq_device::dma_check), this));
-}
-
-void cxd8452aq_device::device_add_mconfig(machine_config &config) {}
-
-void cxd8452aq_device::device_reset() {}

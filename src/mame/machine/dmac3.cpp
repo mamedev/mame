@@ -37,6 +37,23 @@ void dmac3_device::device_start()
 	m_dma_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dmac3_device::dma_check), this));
 }
 
+void dmac3_device::device_reset()
+{
+	// Reset both controllers
+	reset_controller(dmac3_controller::CTRL0);
+	reset_controller(dmac3_controller::CTRL1);
+}
+
+void dmac3_device::reset_controller(dmac3_controller controller)
+{
+	m_controllers[controller].csr = 0;
+	m_controllers[controller].intr &= INTR_INT; // TODO: is the external interrupt bit preserved?
+	m_controllers[controller].length = 0;
+	m_controllers[controller].address = 0;
+	m_controllers[controller].conf = 0;
+	m_irq_check->adjust(attotime::zero);
+}
+
 uint32_t dmac3_device::csr_r(dmac3_controller controller)
 {
 	return m_controllers[controller].csr;
@@ -110,23 +127,6 @@ void dmac3_device::conf_w(dmac3_controller controller, uint32_t data)
 	}
 
 	m_controllers[controller].conf = data;
-}
-
-void dmac3_device::device_reset()
-{
-	// Reset both controllers
-	reset_controller(dmac3_controller::CTRL0);
-	reset_controller(dmac3_controller::CTRL1);
-}
-
-void dmac3_device::reset_controller(dmac3_controller controller)
-{
-	m_controllers[controller].csr = 0;
-	m_controllers[controller].intr &= INTR_INT; // TODO: is the external interrupt bit preserved?
-	m_controllers[controller].length = 0;
-	m_controllers[controller].address = 0;
-	m_controllers[controller].conf = 0;
-	m_irq_check->adjust(attotime::zero);
 }
 
 TIMER_CALLBACK_MEMBER(dmac3_device::irq_check)

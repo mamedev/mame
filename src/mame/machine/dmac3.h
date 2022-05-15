@@ -25,7 +25,6 @@ public:
 	dmac3_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 	// DMAC3 has two controllers on-chip
-	// The 5000X uses controllers 0 and 1 for SPIFI/SCSI bus 0 and 1 respectively
 	enum dmac3_controller
 	{
 		CTRL0 = 0,
@@ -76,36 +75,14 @@ public:
 	}
 
 protected:
-	// Overrides from device_t
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	// Connections to other devices
-	required_address_space m_bus;
-	devcb_write_line m_irq_handler;
-	devcb_read8::array<2> m_dma_r;  // XXX 32b? 64b?
-	devcb_write8::array<2> m_dma_w; // XXX 32b? 64b?
-	device_delegate<uint32_t(uint32_t)> m_apbus_virt_to_phys_callback;
-
-	// Timers and interrupts
-	emu_timer *m_irq_check;
-	emu_timer *m_dma_check;
-	bool m_irq = false;
-	TIMER_CALLBACK_MEMBER(irq_check);
-	TIMER_CALLBACK_MEMBER(dma_check);
-
-	// Other methods
-	void reset_controller(dmac3_controller controller);
-
-	// DMAC3 has two controllers on-chip
 	struct dmac3_register_file
 	{
 		uint32_t csr = 0;     // Status register
 		uint32_t intr = 0;    // Interrupt status register
 		uint32_t length = 0;  // Transfer count register
-		uint32_t address = 0; // Starting byte offset
+		uint32_t address = 0; // Starting byte address (APbus virtual or physical)
 		uint32_t conf = 0;    // Transaction configuration register
-		bool drq = false;     // XXX Is this something different from DREQ?
+		bool drq = false;     // TODO: Does the DMAC3 use INTR_DREQ as the DRQ?
 	} m_controllers[2];
 
 	// Bitmasks for DMAC3 registers
@@ -151,6 +128,26 @@ protected:
 		CONF_FASTACCESS = 0x0001, // DMAC3 access mode (see NetBSD source code)
 	};
 
+	// Connections to other devices
+	// TODO: DMAC3 probably transfers more than one byte at a time
+	required_address_space m_bus;
+	devcb_write_line m_irq_handler;
+	devcb_read8::array<2> m_dma_r;  
+	devcb_write8::array<2> m_dma_w;
+	device_delegate<uint32_t(uint32_t)> m_apbus_virt_to_phys_callback;
+
+	// Timers and interrupts
+	emu_timer *m_irq_check;
+	emu_timer *m_dma_check;
+	bool m_irq = false;
+
+	// Overrides from device_t
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// Other methods
+	void reset_controller(dmac3_controller controller);
+
 	// Register file accessors
 	uint32_t csr_r(dmac3_controller controller);
 	uint32_t intr_r(dmac3_controller controller);
@@ -164,7 +161,6 @@ protected:
 	void address_w(dmac3_controller controller, uint32_t data);
 	void conf_w(dmac3_controller controller, uint32_t data);
 
-	// Templates as partial functions for register file accessors since they can be bound at compile time
 	template <dmac3_controller Controller>
 	uint32_t csr_r() { return csr_r(Controller); }
 	template <dmac3_controller Controller>
@@ -186,6 +182,10 @@ protected:
 	void address_w(uint32_t data) { address_w(Controller, data); }
 	template <dmac3_controller Controller>
 	void conf_w(uint32_t data) { conf_w(Controller, data); }
+
+	// Timer callback methods
+	TIMER_CALLBACK_MEMBER(irq_check);
+	TIMER_CALLBACK_MEMBER(dma_check);
 };
 
 DECLARE_DEVICE_TYPE(DMAC3, dmac3_device)

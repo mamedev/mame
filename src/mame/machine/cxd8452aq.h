@@ -25,8 +25,12 @@ public:
 
 	template <typename... T>
 	void set_apbus_address_translator(T &&...args) { m_apbus_virt_to_phys_callback.set(std::forward<T>(args)...); }
+	
+	template <typename T>
+	void set_bus(T &&tag, int spacenum) { m_bus.set_tag(std::forward<T>(tag), spacenum); }
 
 	auto irq_out() { return m_irq_handler.bind(); }
+
 	void irq_w(int state)
 	{
 		if (state)
@@ -40,20 +44,46 @@ public:
 		m_irq_check->adjust(attotime::zero);
 	}
 
-	template <typename T>
-	void set_bus(T &&tag, int spacenum) { m_bus.set_tag(std::forward<T>(tag), spacenum); }
-
 protected:
+	struct sonic3_register_file
+	{
+		// General registers
+		uint32_t control = 0x80000000;
+		uint32_t config = 0x0;
+		uint32_t revision = 0x3;
+
+		// DMA registers
+		uint32_t rx_sonic_address = 0x0;
+		uint32_t rx_host_address = 0x0;
+		uint32_t rx_count = 0x0;
+		uint32_t tx_sonic_address = 0x0;
+		uint32_t tx_host_address = 0x0;
+		uint32_t tx_count = 0x0;
+	} m_sonic3_reg;
+
+	// Address maps
+	address_space_config main_bus_config;
+	address_space_config sonic_config;
+
+	// Interrupt handling
+	devcb_write_line m_irq_handler;
+	bool m_irq = false;
+	emu_timer *m_irq_check;
+
+	// APbus DMA
+	device_delegate<uint32_t(uint32_t)> m_apbus_virt_to_phys_callback;
+	required_address_space m_bus;
+	emu_timer *m_dma_check;
+
+	// Bus configuration
+	void sonic_bus_map(address_map &map);
+
 	// overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
 	virtual space_config_vector memory_space_config() const override;
 
-	// Address maps
-	void sonic_bus_map(address_map &map);
-	address_space_config main_bus_config;
-	address_space_config sonic_config;
+	// Bus access
 	uint8_t sonic_r(offs_t offset);
 	void sonic_w(offs_t offset, uint8_t data);
 
@@ -76,33 +106,9 @@ protected:
 	uint32_t rx_count_r(offs_t offset);
 	void rx_count_w(offs_t offset, uint32_t data);
 
-	// Interrupt handling
-	devcb_write_line m_irq_handler;
-	bool m_irq = false;
-	emu_timer *m_irq_check;
+	// Callback methods
 	TIMER_CALLBACK_MEMBER(irq_check);
-
-	// APbus DMA
-	device_delegate<uint32_t(uint32_t)> m_apbus_virt_to_phys_callback;
-	required_address_space m_bus;
-	emu_timer *m_dma_check;
 	TIMER_CALLBACK_MEMBER(dma_check);
-
-	struct sonic3_register_file
-	{
-		// General registers
-		uint32_t control = 0x80000000;
-		uint32_t config = 0x0;
-		uint32_t revision = 0x3;
-
-		// DMA registers
-		uint32_t rx_sonic_address = 0x0;
-		uint32_t rx_host_address = 0x0;
-		uint32_t rx_count = 0x0;
-		uint32_t tx_sonic_address = 0x0;
-		uint32_t tx_host_address = 0x0;
-		uint32_t tx_count = 0x0;
-	} m_sonic3_reg;
 };
 
 DECLARE_DEVICE_TYPE(CXD8452AQ, cxd8452aq_device)
