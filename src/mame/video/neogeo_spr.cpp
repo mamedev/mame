@@ -22,7 +22,7 @@ neosprite_base_device::neosprite_base_device(
 	, device_memory_interface(mconfig, *this)
 	, m_bppshift(4)
 	, m_region_zoomy(*this, "zoomy")
-	, m_space_config("vram",ENDIANNESS_BIG,16,16,-1,address_map_constructor(FUNC(neosprite_base_device::memmap), this))
+	, m_space_config("vram",ENDIANNESS_NATIVE,16,16,-1,address_map_constructor(FUNC(neosprite_base_device::memmap), this))
 {
 }
 
