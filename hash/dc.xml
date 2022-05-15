@@ -1059,7 +1059,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<!-- This is labeled "RevRev. A". It is unknown if there ever was a "Rev. 0" released. -->
+	<!-- This is labeled "Rev. A". It is unknown if there ever was a "Rev. 0" released. -->
 	<software name="aerodftthh" cloneof="aerowin2">
 		<!-- http://redump.org/disc/41914/
 		<rom name="Aero Dancing F - Todoroki Tsubasa no Hatsu Hikou (Japan).gdi" size="276" crc="d386ba8b" md5="ecbd5215b463d5a5a04143eb3fd8e64d" sha1="8ab03310918eff5612729e78f0f41a055c6f71b6"/>
