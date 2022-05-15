@@ -9,6 +9,7 @@ INPUT_PORTS_EXTERN( mpu4 );
 
 
 #include "gamball.lh"
+#include "m4addr.lh"
 
 
 void mpu4_state::init_m4_debug_mod4yam()
@@ -185,6 +186,147 @@ INPUT_PORTS_START( m4gambal )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")PORT_IMPULSE(5)
 INPUT_PORTS_END
 
+#define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
+
+void mpu4_state::init_m4addr()
+{
+	//Derived from Adders_&_Ladders_(Barcrest)_[C03_800_6jp].gam
+	init_m4default();
+	init_m4_hopper_tubes();
+	init_m4default_reels();
+	//PCKEY =0
+	//STKEY =0
+	//JPKEY =0
+	//JPSET =0
+	//DIP1_0=false
+	//DIP1_1=false
+	//DIP1_2=false
+	//DIP1_3=false
+	//DIP1_4=false
+	//DIP1_5=false
+	//DIP1_6=false
+	//DIP1_7=false
+	//DIP2_0=false
+	//DIP2_1=false
+	//DIP2_2=false
+	//DIP2_3=false
+	//DIP2_4=false
+	//DIP2_5=false
+	//DIP2_6=false
+	//DIP2_7=false
+	//Sound barcrest1
+	//Standard
+	//Volume 0 Stereo= 1
+	//Sample rate 16000
+	//Front door code 0 Cash door code 0
+}
+
+// while this has a layout it needs proper lamp descrambling (characteriser PAL) in the driver to driver the correct lamps in the layout
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( 0x10000, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+	ROM_END \
+	GAMEL( year, setname, parent, mod4yam, mpu4, mpu4_state, init_m4addr, ROT0, company, title, GAME_FLAGS, layout_m4addr )
+
+
+// "(C)1991 BARCREST"  and "A6L 0.1"
+GAME_CUSTOM( 1991, m4addr,       0,      "a6ls.p1",                  0x0000, 0x010000, CRC(9f97f57b) SHA1(402d1518bb78fdc489b06c2aabc771e5ce151847), "Barcrest","Adders & Ladders (Barcrest) (MPU4) (A6L 0.1, set 1)" )
+GAME_CUSTOM( 199?, m4addrc__d,   m4addr, "alddr20",                  0x0000, 0x010000, CRC(19cf4437) SHA1(b528823c476bebd1a9a6c720a4144294743693d2), "Barcrest","Adders & Ladders (Barcrest) (MPU4) (A6L 0.1, set 2)" ) // hack?
+GAME_CUSTOM( 1991, m4addr6ld,    m4addr, "a6ld.p1",                  0x0000, 0x010000, CRC(de555e12) SHA1(2233160f1c734c889c1c00dee202a928f18ad763), "Barcrest","Adders & Ladders (Barcrest) (MPU4) (A6L 0.1 D)" )
+GAME_CUSTOM( 1991, m4addr6lc,    m4addr, "a6lc.p1",                  0x0000, 0x010000, CRC(1e75fe67) SHA1(4497b19d4c512c934d445b4acf607dc2dc080d44), "Barcrest","Adders & Ladders (Barcrest) (MPU4) (A6L 0.1 C)" )
+GAME_CUSTOM( 1991, m4addr6lk,    m4addr, "a6lk.p1",                  0x0000, 0x010000, CRC(af5ae5c4) SHA1(20e40cf996c2c3b7b18ec104a374be1da193b94e), "Barcrest","Adders & Ladders (Barcrest) (MPU4) (A6L 0.1 K)" )
+GAME_CUSTOM( 1991, m4addr6ly,    m4addr, "adders ladders 20p 6.bin", 0x0000, 0x010000, CRC(62abeb34) SHA1(8069e6fde0673fdbc124a1a172dc988bb3205ff6), "Barcrest","Adders & Ladders (Barcrest) (MPU4) (A6L 0.1 Y)" )
+GAME_CUSTOM( 1991, m4addr6lyd,   m4addr, "a6ldy.p1",                 0x0000, 0x010000, CRC(82f060a5) SHA1(2e8474e6c17def07e35448b5bf8d453cce0f292c), "Barcrest","Adders & Ladders (Barcrest) (MPU4) (A6L 0.1 YD)" )
+GAME_CUSTOM( 1991, m4addr6lybd,  m4addr, "a6lbdy.p1",                0x0000, 0x010000, CRC(28064099) SHA1(c916f73911974440d4c79ecb51b343aad78f115b), "Barcrest","Adders & Ladders (Barcrest) (MPU4) (A6L 0.1 YBD)" )
+// "(C)1991 BARCREST" and "A6L 0.1" (but hack?)
+GAME_CUSTOM( 199?, m4addrc__b,   m4addr, "add20_101",                0x0000, 0x010000, CRC(361b7173) SHA1(dea2b1b0f5910e2fd3f45d220554f0e712dedada), "hack","Adders & Ladders (Barcrest) (MPU4) (A6L 0.1, hack, set 1)" )
+GAME_CUSTOM( 199?, m4addrc__k,   m4addr, "addl_20_.8",               0x0000, 0x010000, CRC(43c98f46) SHA1(0ca4a093b38fc04639e3f4bb742a8923b90d2ed1), "hack","Adders & Ladders (Barcrest) (MPU4) (A6L 0.1, hack, set 2)" )
+// "(C)1993  B.W.B." and "ADD 1.0"
+GAME_CUSTOM( 199?, m4addrc__l,   m4addr, "al10",                     0x0000, 0x010000, CRC(3c3c82b6) SHA1(cc5ffdd0837c9af31d5737a70430a01d1989cdcc), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0, 1993)" )
+// "(C)1994  B.W.B."  and "ADD 1.0" (actually version 10?)
+GAME_CUSTOM( 1994, m4addr10,     m4addr, "ad_05___.1o3",             0x0000, 0x010000, CRC(8d9e0f5d) SHA1(fecc844908876e161d0134ce3cc098e79e74e0b1), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0, set 1)" )
+GAME_CUSTOM( 1994, m4addr10d,    m4addr, "ad_05_d_.1o3",             0x0000, 0x010000, CRC(2d29040f) SHA1(ee2bdd5da1a7e4146419ffd8bad521a9c1b49aa2), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 D, set 1)" )
+GAME_CUSTOM( 1994, m4addr10c,    m4addr, "adi05___.1o3",             0x0000, 0x010000, CRC(050764b1) SHA1(364c50e4887c9fdd7ff62e63a6be4513336b4814), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 C, set 1)" )
+GAME_CUSTOM( 1994, m4addr10yd,   m4addr, "ad_05_b_.1o3",             0x0000, 0x010000, CRC(b10b194a) SHA1(4dc3f14ff3b903c49829f4a91136f9b03a5cb1ae), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 YD, set 1)" )
+GAME_CUSTOM( 1994, m4addr10_a,   m4addr, "ad_10___.1o3",             0x0000, 0x010000, CRC(d587cb00) SHA1(6574c42402f13e5f9cb8f951e0f59b499b2d025d), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0, set 2)" )
+GAME_CUSTOM( 1994, m4addr10d_a,  m4addr, "ad_10_d_.1o3",             0x0000, 0x010000, CRC(d7670d32) SHA1(09dfe2a7fe267f485efed234411efc92d9cce414), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 D, set 2)" )
+GAME_CUSTOM( 1994, m4addr10c_a,  m4addr, "adi10___.1o3",             0x0000, 0x010000, CRC(005caaa1) SHA1(b4b421c045012b5fbeaca95fa09d087a9c5e6b5b), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 C, set 2)" )
+GAME_CUSTOM( 1994, m4addr10yd_a, m4addr, "ad_10_b_.1o3",             0x0000, 0x010000, CRC(e2b5c0db) SHA1(9e1716186bb049c61dddaef2465fb1e55d2d93fd), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 YD, set 2)" )
+// "(C)1993  B.W.B."  and "ADD 3.0"
+GAME_CUSTOM( 1993, m4addr3,      m4addr, "ad_05___.3q3",             0x0000, 0x010000, CRC(ec6ed7ce) SHA1(dfad04b5f6c4ff0fd784ad20471f1cf84586f2cd), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 3.0, set 1)" )
+GAME_CUSTOM( 1993, m4addr3d,     m4addr, "ad_05_d_.3q3",             0x0000, 0x010000, CRC(8d05fba9) SHA1(9c69d7eec7ce0d647d4f8b8b0a6b7e54daa7a79f), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 3.0 D, set 1)" )
+GAME_CUSTOM( 1993, m4addr3yd,    m4addr, "ad_05_b_.3q3",             0x0000, 0x010000, CRC(d4c06db1) SHA1(dacb66b98f9d1d51eddc48b6946d517c277e588e), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 3.0 YD, set 1)" )
+GAME_CUSTOM( 1993, m4addr3_a,    m4addr, "ad_20___.3a3",             0x0000, 0x010000, CRC(c2431657) SHA1(b2b7541207eb3c898f9cf3df520bff396213b78a), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 3.0, set 2)" )
+GAME_CUSTOM( 1993, m4addr3d_a,   m4addr, "ad_20_d_.3a3",             0x0000, 0x010000, CRC(62304025) SHA1(59b7815bf1b5337f46083cef186fedd078a4ad37), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 3.0 D, set 2)" )
+GAME_CUSTOM( 1993, m4addr3yd_a,  m4addr, "ad_20_b_.3a3",             0x0000, 0x010000, CRC(19990a19) SHA1(ab1031513fb1e499da4a3001b5b26ff1e86cc628), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 3.0 YD, set 2)" )
+GAME_CUSTOM( 1993, m4addr3_b,    m4addr, "ad_20___.3n3",             0x0000, 0x010000, CRC(883ff001) SHA1(50540270dba31820ad99a4a4034c69d4a58d87c5), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 3.0, set 3)" )
+GAME_CUSTOM( 1993, m4addr3d_b,   m4addr, "ad_20_d_.3n3",             0x0000, 0x010000, CRC(cf254a00) SHA1(1e430b652e4023e28b5648b8bea63e778c6dafc9), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 3.0 D, set 3)" )
+GAME_CUSTOM( 1993, m4addr3yd_b,  m4addr, "ad_20_b_.3n3",             0x0000, 0x010000, CRC(65f9946f) SHA1(6bf6f315ed2dc6f603381d36dd408e951ace76bc), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 3.0 YD, set 3)" )
+GAME_CUSTOM( 1993, m4addr3_c,    m4addr, "ad_20___.3s3",             0x0000, 0x010000, CRC(b1d54cb6) SHA1(35205975ccdaccd5bf3c1b7bf9a26c5ef30050b3), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 3.0, set 4)" )
+GAME_CUSTOM( 1993, m4addr3d_c,   m4addr, "ad_20_d_.3s3",             0x0000, 0x010000, CRC(89d2301b) SHA1(62ad1a9e008063eb16442b50af806f061669dba7), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 3.0 D, set 4)" )
+GAME_CUSTOM( 1993, m4addr3yd_c,  m4addr, "ad_20_b_.3s3",             0x0000, 0x010000, CRC(86982248) SHA1(a6d876333777a29eb0504fa3636727ebcc104f0a), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 3.0 YD, set 4)" )
+GAME_CUSTOM( 1993, m4addr3_d,    m4addr, "adl5pv2",                  0x0000, 0x010000, CRC(09c39527) SHA1(16af3e552a7d6c6b802d2b1923523e9aa9de766a), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 3.0, set 5)" )
+// "(C)1994  B.W.B."  and "ADD 5.0"
+GAME_CUSTOM( 1994, m4addr5,      m4addr, "ad_05___.5a3",             0x0000, 0x010000, CRC(9821a988) SHA1(2be85a0b68e5e31401a5c753b40f3cf803589444), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 5.0, set 1)" )
+GAME_CUSTOM( 1994, m4addr5d,     m4addr, "ad_05_d_.5a3",             0x0000, 0x010000, CRC(b5be8114) SHA1(28dfe1d1cc1d9fc2bcc13fd6437602a6e8c90de2), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 5.0 D, set 1)" )
+GAME_CUSTOM( 1994, m4addr5c,     m4addr, "adi05___.5a3",             0x0000, 0x010000, CRC(03777f8c) SHA1(9e3fddc2130600f343df0531bf3e636b82c2f108), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 5.0 C, set 1)" )
+GAME_CUSTOM( 1994, m4addr5yd,    m4addr, "ad_05_b_.5a3",             0x0000, 0x010000, CRC(592cb1ae) SHA1(5696ecb3e9e6419f73087120b6a832fde606bacc), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 5.0 YD, set 1)" )
+GAME_CUSTOM( 1994, m4addr5_a,    m4addr, "ad_05___.5n3",             0x0000, 0x010000, CRC(86ac3564) SHA1(1dd9cf39d2aee11a3e1bbc68460c12f10e62aeaf), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 5.0, set 2)" )
+GAME_CUSTOM( 1994, m4addr5d_a,   m4addr, "ad_05_d_.5n3",             0x0000, 0x010000, CRC(ca2653d5) SHA1(30cd35627be8fb4fff2f0d61a6ab43cf3e4c1742), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 5.0 D, set 2)" )
+GAME_CUSTOM( 1994, m4addr5c_a,   m4addr, "adi05___.5n3",             0x0000, 0x010000, CRC(13003560) SHA1(aabad24748f9b1b09f1820bf1af932160e64fe3e), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 5.0 C, set 2)" )
+GAME_CUSTOM( 1994, m4addr5yd_a,  m4addr, "ad_05_b_.5n3",             0x0000, 0x010000, CRC(cdc8ca39) SHA1(33fdeef8ab8908f6908120aedf501ec3e9d7d23e), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 5.0 YD, set 2)" )
+// "(C)1993  B.W.B."  and "ADD 4.0"
+GAME_CUSTOM( 1993, m4addr4,      m4addr, "ad_05___.4s3",             0x0000, 0x010000, CRC(6d1a3c51) SHA1(0e4b985173c7c3bd5804573d99913d66a05d54fb), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 4.0, set 1)" )
+GAME_CUSTOM( 1993, m4addr4c,     m4addr, "adi05___.4s3",             0x0000, 0x010000, CRC(a4343a89) SHA1(cef67bbe03e6f535b530fc099f1b9a8bc7a2f864), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 4.0 C, set 1)" )
+GAME_CUSTOM( 1993, m4addr4d,     m4addr, "ad_05_d_.4s3",             0x0000, 0x010000, CRC(e672baf0) SHA1(bae2e2fe9f51b3b8da20fcefb145f6d35fa2d604), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 4.0 D, set 1)" )
+GAME_CUSTOM( 1993, m4addr4yd,    m4addr, "ad_05_b_.4s3",             0x0000, 0x010000, CRC(6bd6fdb6) SHA1(7ee1e80da5833b3eaf4b23035690a09379781584), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 4.0 YD, set 1)" )
+// "(C)1994  B.W.B."  and "ADD 4.0"
+GAME_CUSTOM( 1994, m4addr4_a,    m4addr, "ad_10___.4a3",             0x0000, 0x010000, CRC(9151dac3) SHA1(bf1c065a62e84a8073f8f9854981bedad60805be), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 4.0, set 2)" )
+GAME_CUSTOM( 1994, m4addr4c_a,   m4addr, "adi10___.4a3",             0x0000, 0x010000, CRC(2d2aa3cc) SHA1(21a7690c3fb7d158f4b4e6da63663778246ac902), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 4.0 C, set 2)" )
+GAME_CUSTOM( 1994, m4addr4c_b,   m4addr, "adi10___.4n3",             0x0000, 0x010000, CRC(af9aad00) SHA1(09729e73f27d9ac5d6ac7171191ed76aeaac3e3d), "Bwb","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 4.0 C, set 3)" )
+// "BIG DIPPER"  and ADD 1.0
+GAME_CUSTOM( 199?, m4addrc__h,   m4addr, "adders classic.bin",       0x0000, 0x010000, CRC(6bc1d2aa) SHA1(cf17e697ff0cfba999f6511f24051dbc3d0384ef), "hack","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0, hack)" )
+GAME_CUSTOM( 1994, m4addr_h1,    m4addr, "5p4addersladders.bin",     0x0000, 0x010000, CRC(03fc43da) SHA1(cf2fdb0d1ad702331ba004fd39072484b05e2b97), "hack","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 C, hack, set 1)" )
+GAME_CUSTOM( 1994, m4addr_h2,    m4addr, "ad05.6c",                  0x0000, 0x010000, CRC(0940e4aa) SHA1(e8e7f7249a18386af990999a4c06f001db7003c5), "hack","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 C, hack, set 2)" )
+GAME_CUSTOM( 199?, m4addrc,      m4addr, "add05_101",                0x0000, 0x010000, CRC(4b3fb104) SHA1(9dba619019a476ce317122a3553965b279c684ba), "hack","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 C, hack, set 3)" )
+GAME_CUSTOM( 199?, m4addrc__c,   m4addr, "add55",                    0x0000, 0x010000, CRC(48c5bc73) SHA1(18c9f70bad6141cca95b6bbcb4fc621e71f87700), "hack","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 C, hack, set 4)" )
+GAME_CUSTOM( 199?, m4addrc__m,   m4addr, "alad58c",                  0x0000, 0x010000, CRC(df9c46b8) SHA1(439ea1ce17aa89e19cedb78465b4388b72c8c5ed), "hack","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 C, hack, set 5)" )
+// "DADS  ARMY" and "ADD 1.0"
+GAME_CUSTOM( 199?, m4addrc__a,   m4addr, "add10_101",                0x0000, 0x010000, CRC(af8f8b4e) SHA1(712c33ed0f425dc10b79780b0cfce0ac5768e2d5), "hack","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 C, hack, set 6)" )
+GAME_CUSTOM( 199?, m4addrc__i,   m4addr, "addl_10_.4",               0x0000, 0x010000, CRC(c2d11126) SHA1(0eafe9dc30013ed5817ac303a4eea5ea82d62715), "hack","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 C, hack, set 7)" )
+GAME_CUSTOM( 199?, m4addrc__j,   m4addr, "addl_10_.8",               0x0000, 0x010000, CRC(9fc82c47) SHA1(0f56afc33f09fe22afc5ec74aeb496c32f9e623c), "hack","Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 C, hack, set 8)" )
+// no copyright string and "NNU 5.0" (possibly a different game?)
+GAME_CUSTOM( 199?, m4addrc__e,   m4addr, "classic adders + ladders_alt",     0x0000, 0x010000, CRC(ac948903) SHA1(e07023efd7722a661a2bbf93c0a168af70ad6c20), "hack","Adders & Ladders (Bwb / Barcrest) (MPU4) (NNU 5.0, hack, set 1)" )
+GAME_CUSTOM( 199?, m4addrc__f,   m4addr, "classic adders + ladders_alt2",    0x0000, 0x010000, CRC(843ed53d) SHA1(b1dff249df37800744e3fc9c32be20a62bd130a1), "hack","Adders & Ladders (Bwb / Barcrest) (MPU4) (NNU 5.0, hack, set 2)" )
+GAME_CUSTOM( 199?, m4addrc__n,   m4addr, "nik56c",                           0x0000, 0x010000, CRC(05fa11d1) SHA1(01d3d0c504489f1513a0c3aa26e910c9604f5366), "hack","Adders & Ladders (Bwb / Barcrest) (MPU4) (NNU 5.0, hack, set 3)" )
+
+
+
+#define M4ADDRCC_EXTRA_ROMS \
+	ROM_REGION( 0x48, "fakechr", 0 ) \
+	ROM_LOAD( "aal.chr", 0x0000, 0x000048, CRC(bb48409f) SHA1(adefde520104b8c3815260ee136460ddf3e9e4b2) )
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4ADDRCC_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4yam, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
+// "(C)1991 BARCREST" and "ADC 1.1"
+GAME_CUSTOM( 199?, m4addrcc,       0,          "adcs.p1", 0x0000, 0x010000, CRC(7247de78) SHA1(e390b4e912d7bc8c1ca5e42bf2e2753d4c2b4d17), "Barcrest","Adders & Ladders Classic Club (Barcrest) (MPU4) (ADC 1.1)" )
+GAME_CUSTOM( 199?, m4addrcc__c,    m4addrcc,   "adcd.p1", 0x0000, 0x010000, CRC(47e41c9a) SHA1(546aaaa5765b3bc91eeb9bf5a979ed68a2e72da8), "Barcrest","Adders & Ladders Classic Club (Barcrest) (MPU4) (ADC 1.1 D)" )
+GAME_CUSTOM( 199?, m4addrcc__a,    m4addrcc,   "adcf.p1", 0x0000, 0x010000, CRC(1dbbc990) SHA1(fb9439b43089e3135a719ab94b24dd65561d17cf), "Barcrest","Adders & Ladders Classic Club (Barcrest) (MPU4) (ADC 1.1 F)" )
+GAME_CUSTOM( 199?, m4addrcc__b,    m4addrcc,   "adcl.p1", 0x0000, 0x010000, CRC(89299196) SHA1(9a92b250b47b11536f8708429d69c95111ecdb98), "Barcrest","Adders & Ladders Classic Club (Barcrest) (MPU4) (ADC 1.1 L)" )
+// "(C)1991 BARCREST" and "ADC 0.5"
+GAME_CUSTOM( 199?, m4addrcc__d,    m4addrcc,   "adrscfm", 0x0000, 0x010000, CRC(6c95881a) SHA1(db658bd722c54fc84734105f1a9b0028b23179fb), "Barcrest","Adders & Ladders Classic Club (Barcrest) (MPU4) (ADC 0.5)" )
+
+
+
 ROM_START( m4tst )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
 	ROM_LOAD( "ut4.p1",  0xC000, 0x4000,  CRC(086dc325) SHA1(923caeb61347ac9d3e6bcec45998ddf04b2c8ffd))
@@ -229,7 +371,6 @@ ROM_START( m4voodoo )
 	ROM_LOAD( "ddo32", 0x0000, 0x010000, CRC(260dfef1) SHA1(2b4918e40808963a86d289cd251740a9b0bed70a) )
 ROM_END
 
-#define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
