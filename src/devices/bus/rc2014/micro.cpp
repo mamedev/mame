@@ -193,8 +193,6 @@ protected:
 	void toggle_bank_w(offs_t, uint8_t) { m_view_num = m_view_num ? 0 : 1; update_banks(); }
 
 private:
-	void view_map0(address_map &map) { map(0x0000, 0x3fff).bankr("bank").bankw("ram"); }
-	void view_map1(address_map &map) { map(0x0000, 0x7fff).bankrw("ram"); }
 	void update_banks() { m_view.select(m_view_num); }
 
 	// base-class members
@@ -233,8 +231,9 @@ void rc2014_mini_cpm::device_start()
 
 	// Install RAM/ROM
 	m_bus->installer(AS_PROGRAM)->install_view(0x0000, 0x7fff, m_view);
-	m_view[0].install_device(0x0000, 0x7fff, *this, &rc2014_mini_cpm::view_map0);
-	m_view[1].install_device(0x0000, 0x7fff, *this, &rc2014_mini_cpm::view_map1);
+	m_view[0].install_read_bank(0x0000, 0x3fff, m_rombank);
+	m_view[0].install_write_bank(0x0000, 0x3fff, m_rambank);
+	m_view[1].install_readwrite_bank(0x0000, 0x7fff, m_rambank);
 
 	// Setup banks
 	m_rombank->configure_entry(0, m_rom->base() + 0x0000);
