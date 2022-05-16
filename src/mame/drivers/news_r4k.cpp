@@ -163,6 +163,7 @@ public:
 		  m_scsi1(*this, "scsi1:7:spifi3"),
 		  m_scsibus0(*this, "scsi0"),
 		  m_scsibus1(*this, "scsi1"),
+		  m_dip_switch(*this, "FRONT_PANEL"),
 		  m_led(*this, "led%u", 0U) {}
 
 	void nws5000x(machine_config &config);
@@ -281,11 +282,13 @@ protected:
 	required_device<nscsi_bus_device> m_scsibus0;
 	required_device<nscsi_bus_device> m_scsibus1;
 
-	// LED control
+	// Front panel
+	required_ioport m_dip_switch;
 	output_finder<6> m_led;
-	void led_state_w(offs_t offset, uint32_t data);
 	const std::string LED_MAP[6] = {"LED_POWER", "LED_DISK", "LED_FLOPPY", "LED_SEC", "LED_NET", "LED_CD"};
-
+	void led_state_w(offs_t offset, uint32_t data);
+	uint64_t front_panel_r(offs_t offset);
+	
 	// Interrupts and other platform state
 	bool m_int_state[6] = {false, false, false, false, false, false};
 	uint32_t m_inten[6] = {0, 0, 0, 0, 0, 0};
@@ -348,7 +351,6 @@ protected:
 
 	// Other platform hardware emulation methods
 	uint32_t bus_error();
-	uint64_t front_panel_r(offs_t offset);
 
 	// RAM accessors
 	bool m_map_shift = false;
@@ -898,7 +900,7 @@ void news_r4k_state::init_nws5000x() { init_common(); }
  */
 uint64_t news_r4k_state::front_panel_r(offs_t offset)
 {
-	ioport_value dipsw = this->ioport("FRONT_PANEL")->read();
+	ioport_value dipsw = m_dip_switch->read();
 	dipsw |= 0xff00; // Matches physical platform
 	return ((uint64_t)dipsw << 32) | dipsw;
 }
