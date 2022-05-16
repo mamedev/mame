@@ -12,6 +12,8 @@
 
 #include "speaker.h"
 
+namespace {
+
 const char *const fruit_sample_names[fruit_samples_device::SAMPLE_END + 2] =
 {
 	"*fruitsamples",
@@ -19,11 +21,15 @@ const char *const fruit_sample_names[fruit_samples_device::SAMPLE_END + 2] =
 	"meter",
 	nullptr   /* end of array */
 };
+
 const uint8_t fruit_sample_channels[fruit_samples_device::SAMPLE_END] =
 {
 	0,
 	1
 };
+
+} // anonymous namespace
+
 
 DEFINE_DEVICE_TYPE(FRUIT_SAMPLES, fruit_samples_device, "fruit_samples", "Fruit machine mechanical samples")
 
@@ -50,6 +56,8 @@ void fruit_samples_device::device_add_mconfig(machine_config &config)
 
 void fruit_samples_device::play(uint8_t index)
 {
-	if(index < SAMPLE_END) m_samples->start(fruit_sample_channels[index], index);
-	else fatalerror("fruit_samples_device: Sample index %d out of range\n", index);
+	if (index < SAMPLE_END)
+		m_samples->start(fruit_sample_channels[index], index);
+	else
+		fatalerror("fruit_samples_device: Sample index %u out of range\n", index);
 }
