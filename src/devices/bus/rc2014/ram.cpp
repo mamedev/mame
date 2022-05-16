@@ -105,7 +105,7 @@ void ram_64k_base::device_reset()
 
 static INPUT_PORTS_START( ram_64k_jumpers )
 	PORT_START("START_ADDR")
-	PORT_CONFNAME( 0x4, 0x0, "Start address" )
+	PORT_CONFNAME( 0x7, 0x0, "Start address" )
 	PORT_CONFSETTING( 0x0, "0x0000" )
 	PORT_CONFSETTING( 0x1, "0x1000" )
 	PORT_CONFSETTING( 0x2, "0x2000" )
