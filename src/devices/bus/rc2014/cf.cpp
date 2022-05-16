@@ -26,6 +26,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	DECLARE_WRITE_LINE_MEMBER( tx_w ) { m_bus->tx_w(state); }
@@ -44,6 +45,10 @@ compact_flash_device::compact_flash_device(const machine_config &mconfig, const 
 }
 
 void compact_flash_device::device_start()
+{
+}
+
+void compact_flash_device::device_reset()
 {
 	// A15-A8 and A7 not connected
 	m_bus->installer(AS_IO)->install_readwrite_handler(0x10, 0x17, 0, 0xff80, 0, read8sm_delegate(*this, FUNC(compact_flash_device::ide_cs0_r)), write8sm_delegate(*this, FUNC(compact_flash_device::ide_cs0_w)));

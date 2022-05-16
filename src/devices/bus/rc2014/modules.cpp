@@ -9,18 +9,18 @@
 #include "emu.h"
 #include "bus/rc2014/rc2014.h"
 
-#include "bus/rc2014/z80cpu.h"
+#include "bus/rc2014/cf.h"
 #include "bus/rc2014/clock.h"
+#include "bus/rc2014/fdc.h"
+#include "bus/rc2014/ide.h"
+#include "bus/rc2014/micro.h"
 #include "bus/rc2014/ram.h"
 #include "bus/rc2014/rom.h"
 #include "bus/rc2014/romram.h"
-#include "bus/rc2014/serial.h"
-#include "bus/rc2014/cf.h"
 #include "bus/rc2014/rtc.h"
+#include "bus/rc2014/serial.h"
 #include "bus/rc2014/sound.h"
-#include "bus/rc2014/ide.h"
-#include "bus/rc2014/fdc.h"
-#include "bus/rc2014/micro.h"
+#include "bus/rc2014/z80cpu.h"
 
 void rc2014_bus_modules(device_slot_interface &device)
 {
