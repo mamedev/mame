@@ -2101,7 +2101,7 @@ Beyond that last category are the roms waiting to be classified.
 		</part>
 	</software>
 
-	<software name="mrbloopy">
+	<software name="mrbloopyp" cloneof="mrbloopy">
 		<!-- unknown/auction -->
 		<description>Mr. Bloopy - Saves the World (USA, prototype 19950216)</description>
 		<year>1994</year>
@@ -37466,6 +37466,18 @@ List of unclassified roms
 	</software>
 
 	<software name="cornbust">
+		<description>Corn Buster</description>
+		<year>2015</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="corn buster (world) (unl).sfc" size="2097152" crc="c380ff4a" sha1="4cb7ac9c3564bffdc6fc967686c69c838755bc7c" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cornbustp" cloneof="cornbust">
 		<description>Corn Buster (Euro, prototype)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -38470,8 +38482,20 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="dorkeymp">
+		<description>Dorke &amp; Ymp</description>
+		<year>2015</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="4194304">
+				<rom name="dorke &amp; ymp (world) (unl).sfc" size="4194304" crc="c3fa8238" sha1="61de74e32e1625ae318d38508fe865b324dcee93" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- binary built from source -->
-	<software name="dorque1">
+	<software name="dorque1" cloneof="dorkeymp">
 		<description>Dorque &amp; Imp (Euro, prototype World 1)</description>
 		<year>199?</year>
 		<publisher>Norse</publisher> <!-- cancelled -->
@@ -38484,7 +38508,7 @@ List of unclassified roms
 	</software>
 
 <!-- binary built from source -->
-	<software name="dorque2" cloneof="dorque1">
+	<software name="dorque2" cloneof="dorkeymp">
 		<description>Dorque &amp; Imp (Euro, prototype World 2)</description>
 		<year>199?</year>
 		<publisher>Norse</publisher> <!-- cancelled -->
@@ -38497,7 +38521,7 @@ List of unclassified roms
 	</software>
 
 <!-- binary built from source -->
-	<software name="dorque3" cloneof="dorque1">
+	<software name="dorque3" cloneof="dorkeymp">
 		<description>Dorque &amp; Imp (Euro, prototype World 3)</description>
 		<year>199?</year>
 		<publisher>Norse</publisher> <!-- cancelled -->
@@ -43762,6 +43786,18 @@ List of unclassified roms
 	</software>
 
 	<software name="ironcomm">
+		<description>Iron Commando</description>
+		<year>2017</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="iron commando (world) (unl).sfc" size="2097152" crc="b82e8499" sha1="21a56379dc2c4718dc407d14df47cd9bc8f6d292" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ironcommp" cloneof="ironcomm">
 		<description>Iron Commando (Euro, prototype)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -46613,6 +46649,18 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="legendpi" cloneof="legend">
+		<description>Legend (Piko reissue)</description>
+		<year>2017</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="legend (world) (unl).sfc" size="1048576" crc="fa66536d" sha1="fa868ed108891e84b62f27a92e539b8cb741f7f0" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="legendup" cloneof="legend">
 		<description>Legend (USA, prototype)</description>
 		<year>1994</year>
@@ -49181,6 +49229,18 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mr nutz (usa) (en,fr).sfc" size="1048576" crc="a99bdd9a" sha1="e803e7c067832c3a2604463e2262728117efeca4" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mrbloopy">
+		<description>Mr. Bloopy Saves the World</description>
+		<year>2014</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="mr. bloopy saves the world (world) (unl).sfc" size="2097152" crc="235a86d2" sha1="b057da5ee743a8f07063ace28c8b797a6d83e7b3" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -59547,6 +59607,18 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
+	<software name="noaharkpi" cloneof="noahark">
+		<description>Super Noah's Ark 3D (Piko reissue)</description>
+		<year>2013</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="super 3d noah's ark (world) (unl).sfc" size="1048576" crc="2b691ded" sha1="16965ee9b63fe2bcd4b32c6e6bb7c37f18d0c8a6" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="snova">
 		<description>Super Nova (USA)</description>
 		<year>1993</year>
@@ -60325,6 +60397,18 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
 				<rom name="super tennis (europe).sfc" size="524288" crc="0e31fdef" sha1="2c2b30c060b022a3fc9b0a7972b0fc7f18ec6007" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprthor">
+		<description>Super Thor Quest</description>
+		<year>2014</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="262144">
+				<rom name="super thor quest (world) (unl).sfc" size="262144" crc="8658f479" sha1="1f02984ede26df2594a8c1efbef447b931511f87" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
