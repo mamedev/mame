@@ -46,7 +46,6 @@
 #define SPEC_RETRACE_CYCLES       48   /* Cycles taken for horizontal retrace */
 #define SPEC_CYCLES_PER_LINE      224  /* Number of cycles to display a single line */
 
-
 class spectrum_state : public driver_device
 {
 public:
@@ -242,10 +241,8 @@ protected:
 	virtual bool is_contended(offs_t offset) override;
 	virtual bool is_vram_write(offs_t offset) override;
 
-	template <u8 Bank>
-	void spectrum_128_ram_w(offs_t offset, u8 data);
-	template <u8 Bank>
-	u8 spectrum_128_ram_r(offs_t offset);
+	template <u8 Bank> void spectrum_128_ram_w(offs_t offset, u8 data);
+	template <u8 Bank> u8 spectrum_128_ram_r(offs_t offset);
 
 private:
 	u8 spectrum_128_pre_opcode_fetch_r(offs_t offset);

@@ -198,8 +198,8 @@ u8 spectrum_128_state::spectrum_128_rom_r(offs_t offset)
 		: ((u8*)m_bank_rom[0]->base())[offset];
 }
 
-template <u8 Bank>
-void spectrum_128_state::spectrum_128_ram_w(offs_t offset, u8 data)
+template void spectrum_128_state::spectrum_128_ram_w<0>(offs_t offset, u8 data);
+template <u8 Bank> void spectrum_128_state::spectrum_128_ram_w(offs_t offset, u8 data)
 {
 	u16 addr = 0x4000 * Bank + offset;
 	if (is_contended(addr)) content_early();
@@ -208,8 +208,7 @@ void spectrum_128_state::spectrum_128_ram_w(offs_t offset, u8 data)
 	((u8*)m_bank_ram[Bank]->base())[offset] = data;
 }
 
-template <u8 Bank>
-u8 spectrum_128_state::spectrum_128_ram_r(offs_t offset)
+template <u8 Bank> u8 spectrum_128_state::spectrum_128_ram_r(offs_t offset)
 {
 	u16 addr = 0x4000 * Bank + offset;
 	if (is_contended(addr)) content_early();
@@ -282,10 +281,6 @@ void spectrum_128_state::spectrum_128_mem(address_map &map)
 	map(0x4000, 0x7fff).rw(FUNC(spectrum_128_state::spectrum_128_ram_r<1>), FUNC(spectrum_128_state::spectrum_128_ram_w<1>));
 	map(0x8000, 0xbfff).rw(FUNC(spectrum_128_state::spectrum_128_ram_r<2>), FUNC(spectrum_128_state::spectrum_128_ram_w<2>));
 	map(0xc000, 0xffff).rw(FUNC(spectrum_128_state::spectrum_128_ram_r<3>), FUNC(spectrum_128_state::spectrum_128_ram_w<3>));
-
-	//FIXME must be available for children. review/replace templates usage
-	FUNC(spectrum_128_state::spectrum_128_ram_r<0>);
-	FUNC(spectrum_128_state::spectrum_128_ram_w<0>);
 }
 
 void spectrum_128_state::spectrum_128_fetch(address_map &map)

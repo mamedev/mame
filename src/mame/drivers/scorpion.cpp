@@ -88,14 +88,14 @@ void scorpion_state::scorpion_update_memory()
 
 	m_bank_ram[3]->set_entry((m_port_7ffd_data & 0x07) | ((m_port_1ffd_data & 0x10)>>1));
 
-	if ((m_port_1ffd_data & 0x01)==0x01)
+	if (BIT(m_port_1ffd_data, 0))
 	{
-		m_bank_ram[0]->set_entry(4);
+		m_bank_ram[0]->set_entry(8);
 		m_bank0_rom.disable();
 	}
 	else
 	{
-		m_bank_rom[0]->set_entry((m_port_1ffd_data & 0x02)==0x02 ? 2 : BIT(m_port_7ffd_data, 4));
+		m_bank_rom[0]->set_entry(BIT(m_port_1ffd_data, 1) ? 2 : BIT(m_port_7ffd_data, 4));
 		m_bank0_rom.select(0);
 	}
 }
@@ -128,14 +128,14 @@ void scorpion_state::port_1ffd_w(offs_t offset, u8 data)
 
 u8 scorpion_state::beta_neutral_r(offs_t offset)
 {
-	if (m_maincpu->total_cycles() & 1) m_maincpu->adjust_icount(-1);
+	if (m_maincpu->total_cycles() & 1) m_maincpu->eat_cycles(1);
 
 	return m_program->read_byte(offset);
 }
 
 u8 scorpion_state::beta_enable_r(offs_t offset)
 {
-	if (m_maincpu->total_cycles() & 1) m_maincpu->adjust_icount(-1);
+	if (m_maincpu->total_cycles() & 1) m_maincpu->eat_cycles(1);
 
 	if(m_beta->started() && m_bank_rom[0]->entry() == 1) {
 		m_beta->enable();
@@ -146,7 +146,7 @@ u8 scorpion_state::beta_enable_r(offs_t offset)
 
 u8 scorpion_state::beta_disable_r(offs_t offset)
 {
-	if (m_maincpu->total_cycles() & 1) m_maincpu->adjust_icount(-1);
+	if (m_maincpu->total_cycles() & 1) m_maincpu->eat_cycles(1);
 
 	if (m_beta->started() && m_beta->is_active()) {
 		m_beta->disable();
