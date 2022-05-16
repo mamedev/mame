@@ -106,6 +106,7 @@ protected:
 	rc2014_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	address_space_installer *m_installer[4];

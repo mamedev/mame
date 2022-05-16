@@ -148,10 +148,6 @@ pagable_rom_device::pagable_rom_device(const machine_config &mconfig, const char
 void pagable_rom_device::device_start()
 {
 	save_item(NAME(m_bank));
-
-	// A15-A8, A7 and A2-A0 not connected, A6 must be 0
-	m_bus->installer(AS_IO)->install_write_handler(0x30, 0x30, 0, 0xff87, 0, write8sm_delegate(*this, FUNC(pagable_rom_device::reset_bank_w)));
-	m_bus->installer(AS_IO)->install_write_handler(0x38, 0x38, 0, 0xff87, 0, write8sm_delegate(*this, FUNC(pagable_rom_device::toggle_bank_w)));
 }
 
 void pagable_rom_device::device_reset()
@@ -170,6 +166,10 @@ void pagable_rom_device::device_reset()
 	m_start_offset &= page_mask[m_page_size_conf->read()];
 	m_end_addr = page_size[m_page_size_conf->read()] - 1;
 	reset_bank_w(0,0);
+
+	// A15-A8, A7 and A2-A0 not connected, A6 must be 0
+	m_bus->installer(AS_IO)->install_write_handler(0x30, 0x30, 0, 0xff87, 0, write8sm_delegate(*this, FUNC(pagable_rom_device::reset_bank_w)));
+	m_bus->installer(AS_IO)->install_write_handler(0x38, 0x38, 0, 0xff87, 0, write8sm_delegate(*this, FUNC(pagable_rom_device::toggle_bank_w)));
 }
 
 void pagable_rom_device::update_banks()

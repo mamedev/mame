@@ -79,13 +79,14 @@ void rc2014_micro::device_start()
 	save_pointer(NAME(m_ram), 0x8000);
 	m_bus->installer(AS_PROGRAM)->install_ram(0x8000, 0xffff, m_ram.get());
 
-	// Setup ACIA
-	// A15-A8 and A5-A1 not connected
-	m_bus->installer(AS_IO)->install_readwrite_handler(0x80, 0x81, 0, 0xff3e, 0, read8sm_delegate(*m_acia, FUNC(acia6850_device::read)), write8sm_delegate(*m_acia, FUNC(acia6850_device::write)));
 }
 
 void rc2014_micro::device_reset()
 {
+	// Setup ACIA
+	// A15-A8 and A5-A1 not connected
+	m_bus->installer(AS_IO)->install_readwrite_handler(0x80, 0x81, 0, 0xff3e, 0, read8sm_delegate(*m_acia, FUNC(acia6850_device::read)), write8sm_delegate(*m_acia, FUNC(acia6850_device::write)));
+
 	// Setup ROM
 	if (m_rom_present->read())
 		m_bus->installer(AS_PROGRAM)->install_rom(0x0000, 0x1fff, 0x0000, m_rom->base() + (m_rom_selector->read() & 7) * 0x2000);
@@ -224,16 +225,16 @@ void rc2014_mini_cpm::device_start()
 	std::fill_n(m_ram.get(), 0x8000, 0xff);
 	save_pointer(NAME(m_ram), 0x8000);
 	save_item(NAME(m_bank));
+}
 
+void rc2014_mini_cpm::device_reset()
+{
 	// A15-A8, A7 and A2-A0 not connected, A6 must be 0
 	m_bus->installer(AS_IO)->install_write_handler(0x30, 0x30, 0, 0xff87, 0, write8sm_delegate(*this, FUNC(rc2014_mini_cpm::reset_bank_w)));
 	m_bus->installer(AS_IO)->install_write_handler(0x38, 0x38, 0, 0xff87, 0, write8sm_delegate(*this, FUNC(rc2014_mini_cpm::toggle_bank_w)));
 	// A15-A8 and A7 not connected
 	m_bus->installer(AS_IO)->install_readwrite_handler(0x10, 0x17, 0, 0xff80, 0, read8sm_delegate(*this, FUNC(rc2014_mini_cpm::ide_cs0_r)), write8sm_delegate(*this, FUNC(rc2014_mini_cpm::ide_cs0_w)));
-}
 
-void rc2014_mini_cpm::device_reset()
-{
 	m_bank = 0;
 	m_selected_bank = m_jp1->read();
 	update_banks();
