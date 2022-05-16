@@ -1220,8 +1220,8 @@ void slot_option::set_bios(std::string &&text)
 {
 	if (!m_specified)
 	{
-		m_specified = true;
 		m_specified_value = value();
+		m_specified = true;
 	}
 	m_specified_bios = std::move(text);
 }
