@@ -267,7 +267,7 @@ private:
 		TECMO_WCUP94A_MCU,
 		TECMO_WCUP94B_MCU,
 		VGOAL_SOCCER_MCU
-	} m_mcutype;
+	};
 
 	int m_gametype = 0;
 	uint16_t m_prot_reg[2]{};
