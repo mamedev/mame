@@ -33,6 +33,8 @@
 
 #define PROJECT_48STEP_REEL     10
 
+#define SRU_200STEP_REEL        11
+
 
 class stepper_device : public device_t
 {
@@ -134,6 +136,7 @@ protected:
 		case STARPOINT_200STEP_REEL :
 		case GAMESMAN_200STEP_REEL :
 		case ECOIN_200STEP_REEL :
+		case SRU_200STEP_REEL :
 			m_max_steps = (200*2);
 			break;
 		}
