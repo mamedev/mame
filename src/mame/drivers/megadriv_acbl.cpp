@@ -367,13 +367,38 @@ uint16_t md_boot_state::barek2mb_r()
 	return 0x0000;
 }
 
-uint16_t md_boot_state::sonic3mb_r()
+void md_sonic3bl_state::prot_w(u8 data)
 {
-	if (m_maincpu->pc() == 0x1688) return 0x0300; // TODO: should work but doesn't? debug: just put 0x0300 at 0xfffffc during the first startup check to succesfully boot. Coins are stored in the same location
+	m_prot_cmd = data;
+}
 
-	// logerror("sonic3mb_r : %06x\n", m_maincpu->pc());
+// PIC simulation, it just handles coinage and DSWs
+uint16_t md_sonic3bl_state::prot_r()
+{
+	u16 res = 0;
+	switch (m_prot_cmd)
+	{
+		// POST, upper 8-bits part is fixed and needed for booting game,
+		// lower is DSW, cfr. PC=0x16c0/0x16c6 subroutines, lower 4 bits not actually handled by 68k side
+		case 0x33: res = 0x0300 | (m_in_mcu->read() & 0xff); break;
+		case 0x00:
+			// TODO: coinage
+			// lower 8-bits is adder for coins (i.e. with 0x202 will add 2 credits to the counter),
+			// bit 9 is coin state, active high
+			res = m_in_coin->read() & 0x88 ? 0x201 : 0;
+			break;
+		case 0x66:
+			// handshake or coin status after reading from commands 0x33 or 0x00,
+			// if bit 0 is high will tight loop until it's low
+			// we currently go the coin status route to not bother handling coin off manually.
+			res = m_in_coin->read() ? 1 : 0;
+			break;
+		default:
+			logerror("Unhandled %04x prot command\n", m_prot_cmd);
+			break;
+	}
 
-	return 0x0000;
+	return res;
 }
 
 uint16_t md_boot_state::dsw_r(offs_t offset)
@@ -720,6 +745,26 @@ INPUT_PORTS_START( twinktmb )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+INPUT_PORTS_START( sonic3mb )
+	PORT_INCLUDE( twinktmb )
+
+	PORT_MODIFY("MCU")
+	// TODO: actual diplocations
+	// lower 4 bits is for coinage? Not read by 68k
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x30, "1" )
+	PORT_DIPSETTING(    0x20, "2" )
+	PORT_DIPSETTING(    0x10, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPNAME( 0xc0, 0x00, "Time Limit" )
+	PORT_DIPSETTING(    0xc0, "1:00" )
+	PORT_DIPSETTING(    0x80, "2:00" )
+	PORT_DIPSETTING(    0x40, "3:00" )
+	PORT_DIPSETTING(    0x00, "4:00" )
+INPUT_PORTS_END
+
 
 // Verified from M68000 code
 INPUT_PORTS_START( srmdb )
@@ -1331,10 +1376,10 @@ void md_boot_state::init_sonic2mb()
 	init_megadrij();
 }
 
-void md_boot_state::init_sonic3mb()
+void md_sonic3bl_state::init_sonic3mb()
 {
-	// m_maincpu->space(AS_PROGRAM).install_write_handler(0x200000, 0x200001, write16smo_delegate(*this, FUNC(md_boot_state::sonic3mb_w))); // seems to write to PIC from here
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, read16smo_delegate(*this, FUNC(md_boot_state::sonic3mb_r))); // reads from PIC from here
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x200000, 0x200000, write8smo_delegate(*this, FUNC(md_sonic3bl_state::prot_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, read16smo_delegate(*this, FUNC(md_sonic3bl_state::prot_r)));
 
 	init_megadrij();
 }
@@ -1541,7 +1586,7 @@ GAME( 1993, srmdb,    0, megadrvb,     srmdb,    md_boot_state, init_srmdb,    R
 GAME( 1995, topshoot, 0, md_bootleg,   topshoot, md_boot_state, init_topshoot, ROT0, "Sun Mixing",               "Top Shooter",                                                                            0 )
 GAME( 1996, sbubsm,   0, md_bootleg,   sbubsm,   md_boot_state, init_sbubsm,   ROT0, "Sun Mixing",               "Super Bubble Bobble (Sun Mixing, Mega Drive clone hardware)",                            0 )
 GAME( 1993, sonic2mb, 0, md_bootleg,   sonic2mb, md_boot_state, init_sonic2mb, ROT0, "bootleg / Sega",           "Sonic The Hedgehog 2 (bootleg of Mega Drive version)",                                   0 ) // Flying wires going through the empty PIC space aren't completely understood
-GAME( 1993, sonic3mb, 0, md_bootleg,   twinktmb, md_boot_state, init_sonic3mb, ROT0, "bootleg / Sega",           "Sonic The Hedgehog 3 (bootleg of Mega Drive version)",                                   MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // undumped PIC
+GAME( 1993, sonic3mb, 0, md_bootleg,   sonic3mb, md_sonic3bl_state, init_sonic3mb, ROT0, "bootleg / Sega",           "Sonic The Hedgehog 3 (bootleg of Mega Drive version)",                                   MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // undumped PIC
 GAME( 1994, barek2mb, 0, md_bootleg,   barek2,   md_boot_state, init_barek2,   ROT0, "bootleg / Sega",           "Bare Knuckle II (bootleg of Mega Drive version)",                                        MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // Needs PIC hook up
 GAME( 1994, barek3mb, 0, megadrvb,     barek3,   md_boot_state, init_barek3,   ROT0, "bootleg / Sega",           "Bare Knuckle III (bootleg of Mega Drive version)",                                       0 )
 GAME( 1994, bk3ssrmb, 0, megadrvb_6b,  bk3ssrmb, md_boot_6button_state, init_bk3ssrmb, ROT0, "bootleg / Sega",   "Bare Knuckle III / Sunset Riders (bootleg of Mega Drive versions)",                      MACHINE_NOT_WORKING ) // Currently boots as Bare Knuckle III, mechanism to switch game not found yet
