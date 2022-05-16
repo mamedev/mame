@@ -198,7 +198,6 @@ u8 spectrum_128_state::spectrum_128_rom_r(offs_t offset)
 		: ((u8*)m_bank_rom[0]->base())[offset];
 }
 
-template void spectrum_128_state::spectrum_128_ram_w<0>(offs_t offset, u8 data);
 template <u8 Bank> void spectrum_128_state::spectrum_128_ram_w(offs_t offset, u8 data)
 {
 	u16 addr = 0x4000 * Bank + offset;
@@ -207,6 +206,8 @@ template <u8 Bank> void spectrum_128_state::spectrum_128_ram_w(offs_t offset, u8
 
 	((u8*)m_bank_ram[Bank]->base())[offset] = data;
 }
+// Base 128 models typically don't share RAM in bank0. Reserved for extension in 256+.
+template void spectrum_128_state::spectrum_128_ram_w<0>(offs_t offset, u8 data);
 
 template <u8 Bank> u8 spectrum_128_state::spectrum_128_ram_r(offs_t offset)
 {
