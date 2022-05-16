@@ -71,10 +71,92 @@ private:
 		DMA_OUT
 	};
 
-	static inline bool dma_command(dma_direction current_direction)
+	struct spifi_cmd_entry
 	{
-		return current_direction != DMA_NONE;
-	}
+		// NetBSD has these mapped as uint32_t to align the accesses and such
+		// in reality, these are all 8-bit values that are mapped, in typical NWS-5000 series
+		// fashion, to be 32-bit word aligned.
+		// the same probably applies to the register file.
+		uint8_t cdb[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		uint8_t quecode = 0;
+		uint8_t quetag = 0;
+		uint8_t idmsg = 0;
+		uint8_t status = 0;
+	};
+
+	struct register_file
+	{
+		uint32_t spstat = 0;
+		uint32_t cmlen = 0;
+		uint32_t cmdpage = 0;
+		// count_hi, count_mid, count_low
+
+		uint32_t svptr_hi = 0;
+		uint32_t svptr_mid = 0;
+		uint32_t svptr_low = 0;
+
+		uint32_t intr = 0;
+		uint32_t imask = 0;
+		uint32_t prctrl = 0;
+
+		uint32_t prstat = 0;
+		uint32_t init_status = 0;
+		uint32_t fifoctrl = 0;
+		uint32_t fifodata = 0;
+
+		uint32_t config = 0;
+		uint32_t data_xfer = 0;
+		uint32_t autocmd = 0;
+		uint32_t autostat = 0;
+
+		uint32_t resel = 0;
+		uint32_t select = 0;
+		// prcmd, which is used to trigger commands
+		uint32_t auxctrl = 0;
+
+		uint32_t autodata = 0;
+		uint32_t loopctrl = 0;
+		uint32_t loopdata = 0;
+		uint32_t identify = 0;
+
+		uint32_t complete = 0;
+		uint32_t scsi_status = 0x1; // Must be 0x1 for SPIFI to be recognized at boot
+		uint32_t data = 0;
+		uint32_t icond = 0;
+
+		uint32_t fastwide = 0;
+		uint32_t exctrl = 0;
+		uint32_t exstat = 0;
+		uint32_t test = 0;
+
+		uint32_t quematch = 0;
+		uint32_t quecode = 0;
+		uint32_t quetag = 0;
+		uint32_t quepage = 0;
+
+		spifi_cmd_entry cmbuf[8];
+	} spifi_reg;
+
+	// State tracking variables
+	dma_direction dma_dir;
+	scsi_mode mode;
+	scsi_data_target xfr_data_source;
+	int state;
+	int xfr_phase;
+	int command_pos;
+	bool irq = false;
+	bool drq = false;
+	uint32_t tcounter;
+	uint8_t sync_period = 5; // TODO: appropriate value for SPIFI
+	uint8_t clock_conv = 2; // TODO: appropriate value for SPIFI
+	int bus_id;
+	std::queue<uint32_t> m_even_fifo;
+	std::queue<uint32_t> m_odd_fifo;
+	emu_timer *tm;
+
+	// I/O ports
+	devcb_write_line m_irq_handler;
+	devcb_write_line m_drq_handler;
 
 	// State-related methods
 	void step(bool timeout);
@@ -154,92 +236,11 @@ private:
 	uint8_t cmd_buf_r(offs_t offset);
 	void cmd_buf_w(offs_t offset, uint8_t data);
 
-	struct spifi_cmd_entry
+	// Data helpers
+	inline bool dma_command(dma_direction current_direction)
 	{
-		// NetBSD has these mapped as uint32_t to align the accesses and such
-		// in reality, these are all 8-bit values that are mapped, in typical NWS-5000 series
-		// fashion, to be 32-bit word aligned.
-		// the same probably applies to the register file.
-		uint8_t cdb[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-		uint8_t quecode = 0;
-		uint8_t quetag = 0;
-		uint8_t idmsg = 0;
-		uint8_t status = 0;
-	};
-
-	struct register_file
-	{
-		uint32_t spstat = 0;
-		uint32_t cmlen = 0;
-		uint32_t cmdpage = 0;
-		// count_hi, count_mid, count_low
-
-		uint32_t svptr_hi = 0;
-		uint32_t svptr_mid = 0;
-		uint32_t svptr_low = 0;
-
-		uint32_t intr = 0;
-		uint32_t imask = 0;
-		uint32_t prctrl = 0;
-
-		uint32_t prstat = 0;
-		uint32_t init_status = 0;
-		uint32_t fifoctrl = 0;
-		uint32_t fifodata = 0;
-
-		uint32_t config = 0;
-		uint32_t data_xfer = 0;
-		uint32_t autocmd = 0;
-		uint32_t autostat = 0;
-
-		uint32_t resel = 0;
-		uint32_t select = 0;
-		// prcmd, which is used to trigger commands
-		uint32_t auxctrl = 0;
-
-		uint32_t autodata = 0;
-		uint32_t loopctrl = 0;
-		uint32_t loopdata = 0;
-		uint32_t identify = 0;
-
-		uint32_t complete = 0;
-		uint32_t scsi_status = 0x1; // Must be 0x1 for SPIFI to be recognized at boot
-		uint32_t data = 0;
-		uint32_t icond = 0;
-
-		uint32_t fastwide = 0;
-		uint32_t exctrl = 0;
-		uint32_t exstat = 0;
-		uint32_t test = 0;
-
-		uint32_t quematch = 0;
-		uint32_t quecode = 0;
-		uint32_t quetag = 0;
-		uint32_t quepage = 0;
-
-		spifi_cmd_entry cmbuf[8];
-	} spifi_reg;
-
-	// State tracking variables
-	dma_direction dma_dir;
-	scsi_mode mode;
-	scsi_data_target xfr_data_source;
-	int state;
-	int xfr_phase;
-	int command_pos;
-	bool irq = false;
-	bool drq = false;
-	uint32_t tcounter;
-	uint8_t sync_period = 5; // TODO: appropriate value for SPIFI
-	uint8_t clock_conv = 2; // TODO: appropriate value for SPIFI
-	emu_timer *tm;
-	int bus_id;
-	std::queue<uint32_t> m_even_fifo;
-	std::queue<uint32_t> m_odd_fifo;
-
-	// I/O ports
-	devcb_write_line m_irq_handler;
-	devcb_write_line m_drq_handler;
+		return current_direction != DMA_NONE;
+	}
 };
 
 DECLARE_DEVICE_TYPE(SPIFI3, spifi3_device)

@@ -183,13 +183,23 @@ void cxd8442q_device::write_fifo_ram(offs_t offset, uint32_t data, uint32_t mem_
 void cxd8442q_device::device_start()
 {
 	fifo_ram = std::make_unique<uint32_t[]>(FIFO_MAX_RAM_SIZE);
-	save_pointer(NAME(fifo_ram), FIFO_MAX_RAM_SIZE);
 	fifo_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cxd8442q_device::fifo_dma_execute), this));
 
 	for (int channel = 0; channel < FIFO_CH_TOTAL; ++channel)
 	{
 		fifo_channels[channel].resolve_callbacks();
 	}
+
+	save_pointer(NAME(fifo_ram), FIFO_MAX_RAM_SIZE);
+	save_item(STRUCT_MEMBER(fifo_channels, fifo_size));
+	save_item(STRUCT_MEMBER(fifo_channels, address));
+	save_item(STRUCT_MEMBER(fifo_channels, dma_mode));
+	save_item(STRUCT_MEMBER(fifo_channels, intctrl));
+	save_item(STRUCT_MEMBER(fifo_channels, intstat));
+	save_item(STRUCT_MEMBER(fifo_channels, count));
+	save_item(STRUCT_MEMBER(fifo_channels, drq));
+	save_item(STRUCT_MEMBER(fifo_channels, fifo_w_position));
+	save_item(STRUCT_MEMBER(fifo_channels, fifo_r_position));
 }
 
 void cxd8442q_device::device_reset()
@@ -214,7 +224,7 @@ TIMER_CALLBACK_MEMBER(cxd8442q_device::fifo_dma_execute)
 		}
 
 		// Check DRQ to see if the device is ready to give or receive data
-		if (this_channel.drq_r())
+		if (this_channel.drq)
 		{
 			if (this_channel.dma_cycle())
 			{
@@ -247,6 +257,17 @@ void cxd8442q_device::irq_check()
 		}
 	}
 	out_irq(irq_state);
+}
+
+void cxd8442q_device::apfifo_channel::reset()
+{
+	fifo_size = 0;
+	address = 0;
+	dma_mode = 0;
+	intctrl = 0;
+	intstat = 0;
+	count = 0;
+	drq = false;
 }
 
 bool cxd8442q_device::apfifo_channel::dma_cycle()

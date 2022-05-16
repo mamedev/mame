@@ -45,16 +45,14 @@ protected:
 		// Count of data to transfer or data received
 		uint32_t count = 0;
 
-		void reset()
-		{
-			fifo_size = 0;
-			address = 0;
-			dma_mode = 0;
-			intctrl = 0;
-			intstat = 0;
-			count = 0;
-			drq = false;
-		}
+		// DRQ status
+		bool drq = false;
+
+		// data pointers (within [address, address + fifo_size])
+		uint32_t fifo_w_position = 0;
+		uint32_t fifo_r_position = 0;
+
+		void reset();
 
 		bool dma_cycle();
 
@@ -74,11 +72,6 @@ protected:
 
 		void drq_w(int state);
 
-		bool drq_r()
-		{
-			return drq;
-		}
-
 	private:
 		// reference to parent device
 		cxd8442q_device &fifo_device;
@@ -86,13 +79,6 @@ protected:
 		// DMA callback pointers
 		devcb_read8 dma_r_callback;
 		devcb_write8 dma_w_callback;
-
-		// state tracking
-		bool drq = false;
-
-		// data pointers (within [address, address + fifo_size])
-		uint32_t fifo_w_position = 0;
-		uint32_t fifo_r_position = 0;
 	};
 
 public:

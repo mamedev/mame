@@ -77,6 +77,17 @@ void cxd8452aq_device::device_start()
 	m_apbus_virt_to_phys_callback.resolve();
 	m_irq_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cxd8452aq_device::irq_check), this));
 	m_dma_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cxd8452aq_device::dma_check), this));
+
+	save_item(STRUCT_MEMBER(m_sonic3_reg, control));
+	save_item(STRUCT_MEMBER(m_sonic3_reg, config));
+	save_item(STRUCT_MEMBER(m_sonic3_reg, revision));
+	save_item(STRUCT_MEMBER(m_sonic3_reg, rx_sonic_address));
+	save_item(STRUCT_MEMBER(m_sonic3_reg, rx_host_address));
+	save_item(STRUCT_MEMBER(m_sonic3_reg, rx_count));
+	save_item(STRUCT_MEMBER(m_sonic3_reg, tx_sonic_address));
+	save_item(STRUCT_MEMBER(m_sonic3_reg, tx_host_address));
+	save_item(STRUCT_MEMBER(m_sonic3_reg, tx_count));
+	save_item(NAME(m_irq));
 }
 
 void cxd8452aq_device::device_reset() 
