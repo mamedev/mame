@@ -49,15 +49,15 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(rtc_tick);
+	TIMER_CALLBACK_MEMBER(flash_tick);
+	TIMER_CALLBACK_MEMBER(speaker_tick);
 
 private:
 	inline void interrupt_refresh();
 	inline void update_rtc_interrupt();
 	inline void set_mode(int mode);
-	static const device_timer_id TIMER_RTC = 0;
-	static const device_timer_id TIMER_FLASH = 1;
-	static const device_timer_id TIMER_SPEAKER = 2;
 
 	devcb_read8        m_read_kb;
 	devcb_write_line   m_write_int;

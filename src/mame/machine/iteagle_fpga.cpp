@@ -103,7 +103,7 @@ void iteagle_fpga_device::device_start()
 	// RAM defaults to base address 0x000e0000
 	bank_infos[2].adr = 0x000e0000 & (~(bank_infos[2].size - 1));
 
-	m_timer = timer_alloc(0);
+	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(iteagle_fpga_device::assert_vblank_irq), this));
 
 	// Switch IO
 	m_in_cb.resolve_all_safe(0xffff);
@@ -205,9 +205,10 @@ void iteagle_fpga_device::update_sequence_eg1(uint32_t data)
 }
 
 //-------------------------------------------------
-//  device_timer - called when our device timer expires
+//  assert_vblank_irq -
 //-------------------------------------------------
-void iteagle_fpga_device::device_timer(emu_timer &timer, device_timer_id tid, int param)
+
+TIMER_CALLBACK_MEMBER(iteagle_fpga_device::assert_vblank_irq)
 {
 	//int beamy = m_screen->vpos();
 	//const rectangle &visarea = m_screen->visible_area();

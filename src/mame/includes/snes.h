@@ -322,20 +322,6 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-
-	enum
-	{
-		TIMER_NMI_TICK,
-		TIMER_HIRQ_TICK,
-		TIMER_RESET_OAM_ADDRESS,
-		TIMER_RESET_HDMA,
-		TIMER_UPDATE_IO,
-		TIMER_SCANLINE_TICK,
-		TIMER_HBLANK_TICK,
-		TIMER_SNES_LAST
-	};
-
 	/* misc */
 	uint16_t                m_hblank_offset = 0;
 	uint32_t                m_wram_address = 0;
@@ -358,6 +344,8 @@ protected:
 //  emu_timer             *m_div_timer = nullptr;
 //  emu_timer             *m_mult_timer = nullptr;
 	emu_timer             *m_io_timer = nullptr;
+	emu_timer             *m_oam_reset_addr_timer = nullptr;
+	emu_timer             *m_hdma_reset_timer = nullptr;
 
 	/* DMA/HDMA-related */
 	struct

@@ -51,19 +51,18 @@ public:
 	uint32_t sb_gdlend_r(offs_t offset, uint32_t mem_mask = ~0);   // 5f74f8
 
 protected:
-	enum { G1_TIMER_ID = 0x42 };
-
 	naomi_g1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 	virtual void dma_get_position(uint8_t *&base, uint32_t &limit, bool to_maincpu) = 0;
 	virtual void dma_advance(uint32_t size) = 0;
 
 	void set_ext_irq(int state) { ext_irq_cb(state); }
 	void set_reset_out() { reset_out_cb(ASSERT_LINE); }
+
+	TIMER_CALLBACK_MEMBER(trigger_gdrom_irq);
 
 private:
 	uint32_t gdstar, gdlen, gddir, gden, gdst;

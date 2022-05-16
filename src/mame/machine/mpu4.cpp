@@ -693,15 +693,10 @@ void mpu4_state::ic24_setup()
 }
 
 
-void mpu4_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(mpu4_state::update_ic24)
 {
-	switch(id)
-	{
-	case TIMER_IC24:
-		m_ic23_active=0;
-		ic24_output(1);
-		break;
-	}
+	m_ic23_active=0;
+	ic24_output(1);
 }
 
 
@@ -2167,7 +2162,7 @@ void mpu4_state::mpu4_config_common()
 	m_digits.resolve();
 	m_triacs.resolve();
 
-	m_ic24_timer = timer_alloc(TIMER_IC24);
+	m_ic24_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mpu4_state::update_ic24), this));
 	m_lamp_strobe_ext_persistence = 0;
 }
 

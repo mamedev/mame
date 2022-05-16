@@ -806,6 +806,8 @@ MACHINE_START_MEMBER(bublbobl_state,common)
 	m_sreset_old = CLEAR_LINE;
 	save_item(NAME(m_video_enable));
 	save_item(NAME(m_sreset_old));
+
+	m_irq_ack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bublbobl_state::irq_ack), this));
 }
 
 MACHINE_RESET_MEMBER(bublbobl_state,common) // things common on both tokio and bubble bobble hw
