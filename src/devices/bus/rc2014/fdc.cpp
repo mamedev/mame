@@ -8,10 +8,11 @@
 
 #include "emu.h"
 #include "fdc.h"
+
+#include "machine/upd765.h"
 #include "imagedev/floppy.h"
 #include "formats/imd_dsk.h"
 #include "formats/pc_dsk.h"
-#include "machine/upd765.h"
 
 namespace {
 
