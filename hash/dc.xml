@@ -551,7 +551,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track10.raw" size="34670832" md5="137bd822fed33a86f1d3aaf841500ffa" sha1="547aa69f3973c99608001fbffc4436e1a12d95c7"/>
 		<rom name="track11.iso" size="162893824" md5="1d4920973682a6f3260195ec975a9c05" sha1="25688c46191774b062a25ec382425f286ea22e51"/>
 		-->
-		<description>4x4 Evo (Euro, Prototype 20010109)</description>
+		<description>4x4 Evo (Euro, prototype 20010109)</description>
 		<year>2001</year>
 		<publisher>Gathering of Developers</publisher>
 		<info name="release" value="20010109"/>
@@ -649,7 +649,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="1735776" md5="8bafd2d23c80e5539dbd5ed65c5b7c4c" sha1="2b6fb002a412c2ac1fbe75f758e936efd59e7cb4"/>
 		<rom name="track03.iso" size="1032499200" md5="d210a684bdd78f0573f3fe70bbceb7cb" sha1="b8d53ca8f3c8be8860221d82e5ffd7f33447a4a9"/>
 		-->
-		<description>18 Wheeler: American Pro Trucker (USA, Prototype 20010202)</description>
+		<description>18 Wheeler: American Pro Trucker (USA, prototype 20010202)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
 		<info name="release" value="20010202"/>
@@ -667,7 +667,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="1237152" md5="87af6d21a8b10aeffb90874118531e29" sha1="b0d28980a64765c022b4b3e47244aad32a345270"/>
 		<rom name="track03.bin" size="1185760800" md5="2442c1b6e4d1b2c00ba05a49efa5fccd" sha1="a7834a9321c944e1bda9035cf1c79d3cc469608c"/>
 		-->
-		<description>18 Wheeler: American Pro Trucker (USA, Prototype 20010405)</description>
+		<description>18 Wheeler: American Pro Trucker (USA, prototype 20010405)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
 		<info name="release" value="20010405"/>
@@ -1024,7 +1024,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="Aero Dancing F (Japan) (Rev A) (Track 2).bin" size="37716672" crc="593fb5ea" md5="130e6981084b5c2aa9730bfe512f1f45" sha1="f96e2c38b4e665edf4396938001adfa1b5f0965e"/>
 		<rom name="Aero Dancing F (Japan) (Rev A) (Track 3).bin" size="1185760800" crc="de0f630f" md5="54b8315e58cc2460f6e966fd0ec1710d" sha1="a8c45e54a7adac237c6d94f30740403ac0709672"/>
 		-->
-		<description>Aero Dancing F (Jpn, Rev. A)</description>
+		<description>Aero Dancing F (Jpn, rev. A)</description>
 		<year>2000</year>
 		<publisher>CRI</publisher>
 		<info name="serial" value="T-6808M"/> <!-- Internal Serial: T-6804M -->
@@ -1206,7 +1206,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="Air (Japan) (Track 2).bin" size="2088576" crc="1859ea65" md5="652a31166a58b8f933e8a924e7c88780" sha1="0ecd537e42946f3e74c80c9fcb8d0bccccfc96f1"/>
 		<rom name="Air (Japan) (Track 3).bin" size="1185760800" crc="c31eea05" md5="40e703c7d584528dda2703d55c079c19" sha1="95e1864bba1d1787b6a2a7f5b37bf87e537d927b"/>
 		-->
-		<description>Air (Jpn, Rev. A)</description>
+		<description>Air (Jpn, rev. A)</description>
 		<year>2001</year>
 		<publisher>NEC Interchannel</publisher>
 		<info name="serial" value="T-20112M"/>
@@ -1316,7 +1316,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track29.raw" size="7858032" md5="dcd1a2bd98d617158a80fd09440ba319" sha1="5d0fce6e808417fcd6b8e8db5b825ed7c9b6d3ee"/>
 		<rom name="track30.bin" size="78321600" md5="939575ba42d8598af45855764ec01bcd" sha1="22fc338a50f001118a9f09ad6ac955b280793cee"/>
 		-->
-		<description>Airforce Delta (USA, Alt)</description>
+		<description>Airforce Delta (USA, alt)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-9501N"/>
@@ -1669,7 +1669,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!-- Apparently dumped via Dreamshell, which is known to give bad dumps. -->
-	<software name="alienfntop">
+	<software name="alienfntop" cloneof="alienfnto">
 		<!--
 		<rom name="ALIENFRONT_ONLINE.gdi" size="143" md5="0a3db521ea34e40a63967a0108d4bc78" sha1="397340cf23de1f66776741a3b9da8914c9b48203"/>
 		<rom name="track01.iso" size="921600" md5="98de8e5db931c9106cbf5c53b75f7cc7" sha1="5e23b9e4a63d4720e114bc777640bd65f0edca9b"/>
@@ -1678,7 +1678,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="13 818 000" md5="52d4f2952f4aca03f15d23825f5609b0" sha1="b00cc2ffa6abbd0908675ced977586fd9111d881"/>
 		<rom name="track05.iso" size="143 302 656" md5="d4ca27065a01df92300d240093d61ff5" sha1="2db3177f076caaa5e779a70f1ba546ac1b709e26"/>
 		-->
-		<description>Alien Front Online (USA, Prototype 20010625)</description>
+		<description>Alien Front Online (USA, prototype 20010625)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
 		<info name="release" value="20010625"/>
@@ -2680,7 +2680,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="1735776" md5="d09be539a7074a058159505b7f5fdcb3" sha1="db680939aae4bf61d0e588414c72a47c6dd92cdd"/>
 		<rom name="track03.bin" size="1185760800" md5="2554d92134f23d99a904212c8e729813" sha1="21141a6178f917131431996bf8c0f516bd352c4d"/>
 		-->
-		<description>Biohazard: Code: Veronica - Shokai Genteiban (Jpn, Alt)</description>
+		<description>Biohazard: Code: Veronica - Shokai Genteiban (Jpn, alt)</description>
 		<year>2000</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="T-1210M"/>
@@ -2767,7 +2767,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
 		<rom name="track03.iso" size="1032499200" md5="ea67d594eec4e08018690a49b5c06f33" sha1="64d82ddee0317d7b6a2503b3e0d06370423db016"/>
 		-->
-		<description>Resident Evil: Code: Veronica (Euro, Prototype 20000415)</description>
+		<description>Resident Evil: Code: Veronica (Euro, prototype 20000415)</description>
 		<year>2000</year>
 		<publisher>Eidos</publisher>
 		<info name="release" value="20000415"/>
@@ -3001,7 +3001,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="2471952" md5="079ba845b859ac77fa95232c9a6069ee" sha1="1aaa7d0297c252d9fd762f329ff491b7ba465c8e"/>
 		<rom name="track03.iso" size="1032499200" md5="ab675a4e4a0090f0b6411c7deb1dc2a0" sha1="106fd8c2e54ec70396b5e431e7e2d2a5db8ba9a9"/>
 		-->
-		<description>Blue Stinger (Fra, Prototype 19990824)</description>
+		<description>Blue Stinger (Fra, prototype 19990824)</description>
 		<year>1999</year>
 		<publisher>Activision</publisher>
 		<info name="release" value="19990824"/>
@@ -3275,7 +3275,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="1237152" md5="87af6d21a8b10aeffb90874118531e29" sha1="b0d28980a64765c022b4b3e47244aad32a345270"/>
 		<rom name="track03.bin" size="1185760800" md5="e072149f49ae5e68d74ef136494d4f56" sha1="195da4a378be110a549fc0de13db1fd71865bedf"/>
 		-->
-		<description>Bomberman Online (USA, Prototype 20010908)</description>
+		<description>Bomberman Online (USA, prototype 20010908)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
 		<info name="release" value="20010908"/>
@@ -3398,7 +3398,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="1641696" md5="709e6eedad732eff20a5856f38825989" sha1="facbfdd2acb4ed9e7c9df75b1fb97c89f79f87be"/>
 		<rom name="track03.bin" size="1185760800" md5="1fd9fa42a32c45dd4c8da143f86c4ed0" sha1="fcdd538d1523bfea1931c0fced062f461b061a24"/>
 		-->
-		<description>Broadband Passport (Jpn, Alt)</description>
+		<description>Broadband Passport (Jpn, alt)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="610-7883"/>
@@ -3922,7 +3922,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="1735776" md5="d09be539a7074a058159505b7f5fdcb3" sha1="db680939aae4bf61d0e588414c72a47c6dd92cdd"/>
 		<rom name="track03.bin" size="1185760800" md5="9e3ccf690f540fa8af05c6aa87e4fa57" sha1="58b8ed9fb9c6f991366a39acc27b955a3d4a8191"/>
 		-->
-		<description>Capcom vs. SNK: Millennium Fight 2000 (Jpn, Rev. 1)</description>
+		<description>Capcom vs. SNK: Millennium Fight 2000 (Jpn, rev. 1)</description>
 		<year>2000</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="T-1217M"/>
@@ -4418,7 +4418,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!-- The Sega Direct version shares the same disc as the regular edition (T-47801M) but comes with a bonus CD. -->
 	<software name="cfieldsd1" cloneof="cfield">
-		<description>Chaos Field (Jpn, Sega Direct, Rev. 1)</description>
+		<description>Chaos Field (Jpn, Sega Direct, rev. 1)</description>
 		<year>2004</year>
 		<publisher>Milestone Inc.</publisher>
 		<info name="serial" value="T-47801M, STRV-003 (Bonus CD)"/>
@@ -4770,7 +4770,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="1735776" md5="8659426a29f58924f5f0458cc720098b" sha1="e12b9ae5ebc79b7da5271bce29df450671ce5d93"/>
 		<rom name="track03.bin" size="1185760800" md5="9ae7fabd082d0b2711be8f75022f4845" sha1="fbd2a1b94d7c54b24e68f164ce72a1d648865b63"/>
 		-->
-		<description>Seaman: Kindan no Pet (Jpn, Rev. 1)</description>
+		<description>Seaman: Kindan no Pet (Jpn, rev. 1)</description>
 		<year>1999</year>
 		<publisher>Vivarium</publisher>
 		<info name="serial" value="T-39401M (Visual Memory Doukon Pack), T-39402M"/>
@@ -5393,7 +5393,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
 		<rom name="track03.bin" size="1185760800" md5="8b60130df37e3640dfc7807971ed3492" sha1="ad5d180494a44690fadf712d3644b726508d7995"/>
 		-->
-		<description>Confidential Mission (Euro, Prototype 20010409)</description>
+		<description>Confidential Mission (Euro, prototype 20010409)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
 		<info name="release" value="20010409"/>
@@ -6101,7 +6101,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="2526048" md5="fb87abc670c22e46c63dff8b15604a98" sha1="297c31400bfe737d24684896acab1fe74735a50b"/>
 		<rom name="track03.bin" size="1185760800" md5="6004523cfa0c47e5304675e500f51878" sha1="35759e29377163665419dc606671ecd42d43c005"/>
 		-->
-		<description>D no Shokutaku 2 (Jpn, Alt)</description>
+		<description>D no Shokutaku 2 (Jpn, alt)</description>
 		<year>1999</year>
 		<publisher>Warp</publisher>
 		<info name="serial" value="T-30003M, T-30004M, T-30005M, T-30006M"/>
@@ -6365,7 +6365,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track13.raw" size="  22111152" md5="cf1a3a276c6a5110e1d0b5be5852193f" sha1="839e9399375be6a47574e23ba899e2ca63419a42"/>
 		<rom name="track14.bin" size=" 314318928" md5="649e235acf8f5c4cac4b3ab33033dac5" sha1="06c964aa8da324951cf0e2ccb922e8de09a989e5"/>
 		-->
-		<description>Dave Mirra Freestyle BMX (World, Prototype 20000907)</description>
+		<description>Dave Mirra Freestyle BMX (World, prototype 20000907)</description>
 		<year>2000</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="release" value="20000907"/>
@@ -6395,7 +6395,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track13.raw" size="22111152" md5="1b8d426e09b63f14f839de30970e0e23" sha1="522a20ddcba4e3c87b390ce02405e2549dfc03fc"/>
 		<rom name="track14.iso" size="273692672" md5="0c9df058ac5260924aee993b79f3d467" sha1="74171c4104656777ce10b1f6b535a317f1163112"/>
 		-->
-		<description>Dave Mirra Freestyle BMX (World, Prototype 20001016)</description>
+		<description>Dave Mirra Freestyle BMX (World, prototype 20001016)</description>
 		<year>2000</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="release" value="20001016"/>
@@ -6472,7 +6472,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="1237152" md5="87af6d21a8b10aeffb90874118531e29" sha1="b0d28980a64765c022b4b3e47244aad32a345270"/>
 		<rom name="track03.bin" size="1181343744" md5="b9bc5395925eeec7e0a3d0a8f4280a7b" sha1="3551e007c91cccc0587e8e113c651dce29e8b8b2"/>
 		-->
-		<description>Daytona USA (USA, Prototype 20010214)</description>
+		<description>Daytona USA (USA, prototype 20010214)</description>
 		<year>200?</year>
 		<publisher>Hasbro</publisher>
 		<info name="release" value="20010214"/>
@@ -6491,7 +6491,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="  13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
 		<rom name="track03.iso" size="1032499200" md5="da08cfa1455a0d282e7b5292cac965b8" sha1="2ccde5fb8f21db9bd9f1f294cbc43e7a41413255"/>
 		-->
-		<description>Daytona USA 2001 (Euro, Prototype 20010227)</description>
+		<description>Daytona USA 2001 (Euro, prototype 20010227)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
 		<info name="release" value="20010227"/>
@@ -6713,7 +6713,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="  13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
 		<rom name="track03.iso" size="1032499200" md5="d9b5099bf1ddb0a5e2c30d6e847cec0d" sha1="17544d5c986661c554779d036152a820dd0f4854"/>
 		-->
-		<description>Dead or Alive 2 (Euro, Prototype 20000611)</description>
+		<description>Dead or Alive 2 (Euro, prototype 20000611)</description>
 		<year>2000</year>
 		<publisher>Acclaim</publisher>
 		<info name="release" value="20000611"/>
@@ -7155,7 +7155,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track19.raw" size="  29658720" md5="f93e8fe89492ff121228974ca65a7398" sha1="2555c8bd74db79a2241ae7f2722a3dfeda31de32"/>
 		<rom name="track20.iso" size=" 390031360" md5="a7ac75562c75f56e543993407a14dd0f" sha1="88c6320599b0f6b15b6c7280afafaa69c3b00e88"/>
 		-->
-		<description>Deep Fighter (Fra, Prototype 20000505)</description>
+		<description>Deep Fighter (Fra, prototype 20000505)</description>
 		<year>2000</year>
 		<publisher>Ubisoft</publisher>
 		<info name="release" value="20000505"/>
@@ -7867,7 +7867,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="1587600" md5="9a9bce6b675b3f5116eb1bda0c7f9d96" sha1="1f92e618545f508179d419b724eae4ca637a9195"/>
 		<rom name="track05.iso" size="727209984" md5="8fce0eeeab8af651d3efbf8719a98a87" sha1="15914a725d366cde04b56c03aa897396372be508"/>
 		-->
-		<description>Disney's 102 Dalmatians: Puppies to the Rescue (Euro, Prototype 20000110)</description>
+		<description>Disney's 102 Dalmatians: Puppies to the Rescue (Euro, prototype 20000110)</description>
 		<year>2000</year>
 		<publisher>Eidos</publisher>
 		<info name="release" value="20000110"/>
@@ -8585,7 +8585,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="1060752" md5="3a892db029c4b1ba6ed24ccdaf5cff62" sha1="36b69ee3a5dd70637228feaa14528ac23f848ee7"/>
 		<rom name="track05.iso" size="983638016" md5="c4b3470aa00f43eab77df065d51b66b1" sha1="1a237704f79ca41e6bbf07615006d878f253398b"/>
 		-->
-		<description>Draconus: Cult of the Wyrm (World, Prototype 20000127)</description>
+		<description>Draconus: Cult of the Wyrm (World, prototype 20000127)</description>
 		<year>2000</year>
 		<publisher>Crave</publisher>
 		<info name="release" value="20000127"/>
@@ -9408,7 +9408,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="1641696" md5="2d0707ff4c88581bfb98ba6f24aae855" sha1="d1fbe0e6d9ce44d770aff2a4bbb35f14e5600ecc"/>
 		<rom name="track03.bin" size="1185760800" md5="d9df28a55cd4c83a89c8b518754ee84a" sha1="fd6e896cc3bac91f15ff17dad04de2259251a432"/>
 		-->
-		<description>Dream Passport 2 (Jpn, Rev. 1)</description>
+		<description>Dream Passport 2 (Jpn, rev. 1)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="610-7180"/>
@@ -9583,7 +9583,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="6994848" md5="56e0a3b8ac470c6044ca978b5b0e74b7" sha1="0096772662c047020848dcabed170397c4177bf4"/>
 		<rom name="track03.bin" size="1185760800" md5="1b490423c98569f4e874608b312f2d95" sha1="307837ab77e6e9acf654c7f25f28f300a09fdd22"/>
 		-->
-		<description>Dream Passport 3 (Jpn, Alt)</description>
+		<description>Dream Passport 3 (Jpn, alt)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="610-7819, 610-7851 (Ch@b)"/>
@@ -9610,7 +9610,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="6994848" md5="ac9754e6ff8e4fa0d20aed11cad67aaa" sha1="023d8960b60350ebeced92fd8956e5b9dcfc8b6e"/>
 		<rom name="track03.bin" size="1185760800" md5="1b490423c98569f4e874608b312f2d95" sha1="307837ab77e6e9acf654c7f25f28f300a09fdd22"/>
 		-->
-		<description>Dream Passport 3 (Jpn, Alt 2)</description>
+		<description>Dream Passport 3 (Jpn, alt 2)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="610-7819, 610-7851 (Ch@b)"/>
@@ -10375,7 +10375,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
 		<rom name="track03.bin" size="1185760800" md5="0f3b5731b37fcfa655e771be3e5ff493" sha1="e542a7fe0230728e9c16a527045706849319cf81"/>
 		-->
-		<description>DreamKey (Euro, Rev. 1)</description>
+		<description>DreamKey (Euro, rev. 1)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="832-0002-05, 610-7373 (Box)"/>
@@ -11076,7 +11076,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="  9118704" md5="600718b01152a488f8a531ebf5982d5a" sha1="7b5cc11eeed728a8e30b38e8615c41a65a22b927"/>
 		<rom name="track05.bin" size="811990368" md5="125533300f84b4e20839f6e3c9e7a220" sha1="4c7034cb4d46af0f44bc4490266bbf6494f12ec9"/>
 		-->
-		<description>Ecco the Dolphin: Defender of the Future (Euro, Prototype 20000417 7AM)</description>
+		<description>Ecco the Dolphin: Defender of the Future (Euro, prototype 20000417 7AM)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="release" value="20000417"/>
@@ -11096,7 +11096,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="   9118704" md5="600718b01152a488f8a531ebf5982d5a" sha1="7b5cc11eeed728a8e30b38e8615c41a65a22b927"/>
 		<rom name="track05.bin" size="1058971536" md5="22ef9d9342d03da26c5a45d00da8209b" sha1="366b20789dc6ab4869125a1906ee5997965a8494"/>
 		-->
-		<description>Ecco the Dolphin: Defender of the Future (Euro, Prototype 20000417 2PM)</description>
+		<description>Ecco the Dolphin: Defender of the Future (Euro, prototype 20000417 2PM)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="release" value="20000417"/>
@@ -11116,7 +11116,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="   9118704" md5="600718b01152a488f8a531ebf5982d5a" sha1="7b5cc11eeed728a8e30b38e8615c41a65a22b927"/>
 		<rom name="track05.bin" size="1051071168" md5="dad3c6c1b6d8547f2f1952496ca06975" sha1="2a7569cf8adea3253f5eeb8452ff71d7f3fccbe2"/>
 		-->
-		<description>Ecco the Dolphin: Defender of the Future (Euro, Prototype 20000419)</description>
+		<description>Ecco the Dolphin: Defender of the Future (Euro, prototype 20000419)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="release" value="20000419"/>
@@ -11136,7 +11136,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="   9118704" md5="600718b01152a488f8a531ebf5982d5a" sha1="7b5cc11eeed728a8e30b38e8615c41a65a22b927"/>
 		<rom name="track05.bin" size="1052569392" md5="dba8c10d57fbeca2a157a34812bf0f0e" sha1="8489ff1fd7f97c8fa8a707d9a2705985c28e4e26"/>
 		-->
-		<description>Ecco the Dolphin: Defender of the Future (Euro, Prototype 20000421)</description>
+		<description>Ecco the Dolphin: Defender of the Future (Euro, prototype 20000421)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="release" value="20000421"/>
@@ -11156,7 +11156,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="   9118704" md5="600718b01152a488f8a531ebf5982d5a" sha1="7b5cc11eeed728a8e30b38e8615c41a65a22b927"/>
 		<rom name="track05.bin" size="1079513904" md5="e80c7be8bf4b96a80490c01faed80881" sha1="542fecde04d847493e2d0199297f96fde05af2e6"/>
 		-->
-		<description>Ecco the Dolphin: Defender of the Future (USA, Prototype 20000606)</description>
+		<description>Ecco the Dolphin: Defender of the Future (USA, prototype 20000606)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="release" value="20000606"/>
@@ -11181,7 +11181,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track09.raw" size=" 26749296" md5="db88cdb7051e8f048587ca6154aadea2" sha1="36c383455f5a4915b66a684afcbcef25b3023c39"/>
 		<rom name="track10.bin" size=" 74342016" md5="aadbe24755aa48f6c9ca4e6b221a210c" sha1="7ab6a0ee03c249c3441cb16386abe489b553d3c9"/>
 		-->
-		<description>Ecco the Dolphin: E3 Demo (USA, Prototype 19990508)</description>
+		<description>Ecco the Dolphin: E3 Demo (USA, prototype 19990508)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
 		<info name="release" value="19990508"/>
@@ -11201,7 +11201,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="  54881568" md5="c9fd012fa3e173ab6f646b2fd575da47" sha1="a89359218f9974130634a016202b5e4fada5bfb0"/>
 		<rom name="track05.bin" size="  16346400" md5="abe3159cc65386d1445c378d035ca6ef" sha1="3b778ac8640093ffa3e7d4307ad2a4231331eab1"/>
 		-->
-		<description>Ecco 3D (World, Prototype 19990506)</description>
+		<description>Ecco 3D (World, prototype 19990506)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
 		<info name="release" value="19990506"/>
@@ -11221,7 +11221,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="    898464" md5="a3aab7f95cfbba5e2fab45213ec72785" sha1="0d354c1358c621403c6d390c2c9f919698192cf9"/>
 		<rom name="track05.bin" size="  75184032" md5="d277a49b85017d09451c37f0e51e5a82" sha1="522ed4d64ccf0335406469af912e1b9ccee5c265"/>
 		-->
-		<description>Ecco II: Sentinels of the Universe (World, Prototype 20010219)</description>
+		<description>Ecco II: Sentinels of the Universe (World, prototype 20010219)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
 		<info name="release" value="20010219"/>
@@ -12224,7 +12224,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track27.raw" size="  4494672" md5="6456bf4dad0f3e62c43a2caa034dd148" sha1="bf69b778e708385ceef0020221c6934658fb9c97"/>
 		<rom name="track28.iso" size="246210560" md5="16cdc87b0f72deff19dd0721b6006470" sha1="4e2784ff736dd80f25eae46d1c4a78446030fc8e"/>
 		-->
-		<description>Millennium Soldier: Expendable (Euro, Prototype 19990715)</description>
+		<description>Millennium Soldier: Expendable (Euro, prototype 19990715)</description>
 		<year>1999</year>
 		<publisher>Infogrames</publisher>
 		<info name="release" value="19990715"/>
@@ -12442,7 +12442,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track22.raw" size=" 21751296" md5="4537353d84c2846af3cc17c981cce844" sha1="645c01a7d722f264f8eff8a89d87d4d4caa75b62"/>
 		<rom name="track23.iso" size="143550464" md5="d454268fced6e9743519781df717bc68" sha1="8434a32c16eaf3ae1521155ec50ae1aa59fc667b"/>
 		-->
-		<description>F1 World Grand Prix for Dreamcast (Euro, Prototype 19990903)</description>
+		<description>F1 World Grand Prix for Dreamcast (Euro, prototype 19990903)</description>
 		<year>1999</year>
 		<publisher>Video System</publisher>
 		<info name="release" value="19990903"/>
@@ -12579,7 +12579,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track23.raw" size=" 14300160" md5="b1749ada3caf745d2ad49bd6468e9490" sha1="d799ebbfc577489fa97e48984e322d57d3c887eb"/>
 		<rom name="track24.bin" size="259315056" md5="bddfebb031025f72c1da221943412eba" sha1="fa28fb7fdef593795b28d5902856a2f83f3648e0"/>
 		-->
-		<description>F1 World Grand Prix II for Dreamcast (Euro, Prototype 20000728)</description>
+		<description>F1 World Grand Prix II for Dreamcast (Euro, prototype 20000728)</description>
 		<year>2000</year>
 		<publisher>Video System</publisher>
 		<info name="release" value="20000728"/>
@@ -12618,7 +12618,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="1237152" md5="c0149abd5ae61eadb85ea67f84676d00" sha1="bcdc971432cd55516bf9f4de6f13c333d7386801"/>
 		<rom name="track03.bin" size="1185760800" md5="dd8449569e5ce5285cd57f89266e8b44" sha1="05022c6b2cdd4a51a7b77d5074029ece9f613ba7"/>
 		-->
-		<description>F355 Challenge: Passione Rossa (USA, Alt)</description>
+		<description>F355 Challenge: Passione Rossa (USA, alt)</description>
 		<year>2000</year>
 		<publisher>Acclaim</publisher>
 		<info name="serial" value="T-8119N"/>
@@ -12718,7 +12718,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="   1735776" md5="8659426a29f58924f5f0458cc720098b" sha1="e12b9ae5ebc79b7da5271bce29df450671ce5d93"/>
 		<rom name="track03.iso" size="1032499200" md5="1d6f32cf248c3c71ec13816c0760457a" sha1="a0987b02d59783769784f308829a5d19c1d55e69"/>
 		-->
-		<description>F355 Challenge: Passione Rossa (USA, Prototype 20000501)</description>
+		<description>F355 Challenge: Passione Rossa (USA, prototype 20000501)</description>
 		<year>2000</year>
 		<publisher>Acclaim</publisher>
 		<info name="release" value="20000501"/>
@@ -12737,7 +12737,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="   1237152" md5="87af6d21a8b10aeffb90874118531e29" sha1="b0d28980a64765c022b4b3e47244aad32a345270"/>
 		<rom name="track03.iso" size="1032499200" md5="fd0897f82a3634ee68d1ebe06cf23e18" sha1="0b8beb0cd7afff83d193635b77573c0eb915f89c"/>
 		-->
-		<description>F355 Challenge: Passione Rossa (USA, Prototype 20000821)</description>
+		<description>F355 Challenge: Passione Rossa (USA, prototype 20000821)</description>
 		<year>2000</year>
 		<publisher>Acclaim</publisher>
 		<info name="release" value="20000821"/>
@@ -12899,7 +12899,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track05.raw" size="1060752" md5="f5ed74c3b1e74e5df56c6845587b7413" sha1="888609c4ac6c9726c97b3abf99eddcac55ddf684"/>
 		<rom name="track06.bin" size="589994496" md5="b115255bf35c584a81d0d87b1aac3fa1" sha1="2faf95f5850caa971448ae0db14675fb0fd101cd"/>
 		-->
-		<description>Fighting Force 2 (USA, Alt)</description>
+		<description>Fighting Force 2 (USA, alt)</description>
 		<year>1999</year>
 		<publisher>Eidos Interactive</publisher>
 		<info name="serial" value="T-36801N"/>
@@ -12922,7 +12922,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="Fighting Force 2 (USA) (Track 5).bin" size="1237152" crc="95557332" md5="cb9f913312fff0782cd8c87568bcc047" sha1="cf9a3476b4886212c18868190f98d301f5205a09"/>
 		<rom name="Fighting Force 2 (USA) (Track 6).bin" size="590530752" crc="2cdb4717" md5="d2556d8cc02aa47718f0e12e148acfa2" sha1="e5e3a5adb1f8807be959fc53867606716d10f08c"/>
 		-->
-		<description>Fighting Force 2 (USA, Alt 2)</description>
+		<description>Fighting Force 2 (USA, alt 2)</description>
 		<year>1999</year>
 		<publisher>Eidos Interactive</publisher>
 		<info name="serial" value="T-36801N"/>
@@ -13004,7 +13004,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track05.raw" size=" 13818000" md5="e081e4437e3193c4f9f712f5d607ce52" sha1="415049310c4e753b5554b75fc9fc484b9b946179"/>
 		<rom name="track06.iso" size="553435136" md5="c644242a1da5c80d47edadd1c46431f4" sha1="e3d5514c8cacaa10240fa86790ea0c3fbd1aa5f4"/>
 		-->
-		<description>Fighting Force 2 (Euro, Prototype 19991202)</description>
+		<description>Fighting Force 2 (Euro, prototype 19991202)</description>
 		<year>1999</year>
 		<publisher>Eidos Interactive</publisher>
 		<info name="release" value="19991202"/>
@@ -13062,7 +13062,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
 		<rom name="track03.bin" size="1185760800" md5="5fe5e3cbaf2926414d3ff2530733c978" sha1="08f854b653a96ce6fddbe5e19c84a56e71481018"/>
 		-->
-		<description>Fighting Vipers 2 (Euro, Prototype 20001226)</description>
+		<description>Fighting Vipers 2 (Euro, prototype 20001226)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="952-0135-50"/>
@@ -13641,7 +13641,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="1166592" md5="c1774d74e7f31b8f2ef74af2d7f28010" sha1="f1849e96005ebd0d4e0762ec2357a08a723cda1f"/>
 		<rom name="track03.bin" size="1185760800" md5="73b443f96a919282364ef02105b8be74" sha1="626144e0343150604f76e152a3d1d58e3a4d5858"/>
 		-->
-		<description>Fur Fighters (Euro, Demo)</description>
+		<description>Fur Fighters (Euro, demo)</description>
 		<year>2000</year>
 		<publisher>Acclaim</publisher>
 		<info name="serial" value="D-0008-50"/>
@@ -13661,7 +13661,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="1237152" md5="87af6d21a8b10aeffb90874118531e29" sha1="b0d28980a64765c022b4b3e47244aad32a345270"/>
 		<rom name="track03.iso" size="1032499200" md5="770abc0397be7ff989ab546fc7db0443" sha1="674a4f65e587cefc12885c65702da8db16e0c1ad"/>
 		-->
-		<description>Fur Fighters (Euro, Prototype 20000602)</description>
+		<description>Fur Fighters (Euro, prototype 20000602)</description>
 		<year>2000</year>
 		<publisher>Acclaim</publisher>
 		<info name="release" value="20000602"/>
@@ -13680,7 +13680,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
 		<rom name="track03.iso" size="1032499200" md5="b8a77fc894940de9a135e441dabe6818" sha1="76da7b28000364cfb7f8d7b06673b25e781c26f1"/>
 		-->
-		<description>Fur Fighters (Euro, Prototype 20000612)</description>
+		<description>Fur Fighters (Euro, prototype 20000612)</description>
 		<year>2000</year>
 		<publisher>Acclaim</publisher>
 		<info name="release" value="20000612"/>
@@ -14100,7 +14100,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track08.raw" size="32709264" md5="17ed7c732b89f730aac31a5acc354dce" sha1="2d6ba782f07ada8cdcf51da1e7872670b0566514"/>
 		<rom name="track09.bin" size="918223152" md5="fce19201f27493075a1e7e78c4ad95e8" sha1="c988b5748a1770d2df328930c8cbc980712ea943"/>
 		-->
-		<description>Generator Vol. 1 (USA, Alt)</description>
+		<description>Generator Vol. 1 (USA, alt)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="SDC-00000"/>
@@ -14130,7 +14130,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track08.raw" size="32709264" md5="a66bc558c687fb6c40a6abad9fbd652f" sha1="41f31ac448d33244b886c98901efb8cdcc83f635"/>
 		<rom name="track09.bin" size="918223152" md5="fce19201f27493075a1e7e78c4ad95e8" sha1="c988b5748a1770d2df328930c8cbc980712ea943"/>
 		-->
-		<description>Generator Vol. 1 (USA, Alt 2)</description>
+		<description>Generator Vol. 1 (USA, alt 2)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="SDC-00000"/>
@@ -14160,7 +14160,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track08.raw" size="32709264" md5="162676a92e3d3752e0e43e10b09f365b" sha1="206f5258def8ee66e70f9fb1b409f5dab9d12de4"/>
 		<rom name="track09.bin" size="918223152" md5="fce19201f27493075a1e7e78c4ad95e8" sha1="c988b5748a1770d2df328930c8cbc980712ea943"/>
 		-->
-		<description>Generator Vol. 1 (USA, Alt 3)</description>
+		<description>Generator Vol. 1 (USA, alt 3)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="SDC-00000"/>
@@ -14190,7 +14190,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track08.raw" size="32709264" md5="2de618bf34e5e391c1292402b4de6b1b" sha1="52b520dc82da9ce58494d46032a71205e347a563"/>
 		<rom name="track09.bin" size="918223152" md5="fce19201f27493075a1e7e78c4ad95e8" sha1="c988b5748a1770d2df328930c8cbc980712ea943"/>
 		-->
-		<description>Generator Vol. 1 (USA, Alt 4)</description>
+		<description>Generator Vol. 1 (USA, alt 4)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="SDC-00000"/>
@@ -14248,7 +14248,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track09.raw" size="12089280" md5="3a1de40bc2a4d9f16e0a220e5878dcd7" sha1="9dd4200727175d757c83e73f12c46b563b341b98"/>
 		<rom name="track10.bin" size="1061365872" md5="5e9a18a98d1f0d9853b7e41d18195d24" sha1="4d0f5a6fd93eb0d2f5e20f709c8cf76706fc96ed"/>
 		-->
-		<description>Generator Vol. 2 (USA, Alt)</description>
+		<description>Generator Vol. 2 (USA, alt)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="51057"/>
@@ -14279,7 +14279,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track09.raw" size="12089280" md5="4ad593372b74e54bb9b5ce4c11a99fe7" sha1="9f84fb6289bec6155697b97a507870419cc78a1f"/>
 		<rom name="track10.bin" size="1061365872" md5="5e9a18a98d1f0d9853b7e41d18195d24" sha1="4d0f5a6fd93eb0d2f5e20f709c8cf76706fc96ed"/>
 		-->
-		<description>Generator Vol. 2 (USA, Alt 2)</description>
+		<description>Generator Vol. 2 (USA, alt 2)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="51057"/>
@@ -14468,7 +14468,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="2036832" md5="9cc20be2467dca722d83676483af5798" sha1="6fdd43aab2bc57db785c1748ce0d45e07f7711a4"/>
 		<rom name="track03.bin" size="1185760800" md5="ec82276c3c2192bb2f28f79a47b1f048" sha1="0047b2ca0f0003044e68e9667896145b50348d55"/>
 		-->
-		<description>Giant Gram 2000: Zen Nihon Pro Wres 3 Eikou no Yuusha-tachi (Jpn, Alt)</description>
+		<description>Giant Gram 2000: Zen Nihon Pro Wres 3 Eikou no Yuusha-tachi (Jpn, alt)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="HDR-0101"/>
@@ -14653,7 +14653,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="13818000" md5="e081e4437e3193c4f9f712f5d607ce52" sha1="415049310c4e753b5554b75fc9fc484b9b946179"/>
 		<rom name="track05.bin" size="222590928" md5="b50c3de37b5ff56ed613f8f4abf61d09" sha1="ee02c5e47edf6a7844083d12b86202f9d0c7e075"/>
 		-->
-		<description>GK: Giant Killers (Euro, Prototype 20010109)</description>
+		<description>GK: Giant Killers (Euro, prototype 20010109)</description>
 		<year>2001</year>
 		<publisher>AAA Game</publisher>
 		<info name="serial" value="952-0143-50"/>
@@ -14814,7 +14814,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="1237152" md5="ad8a2202e072192fad5f7726a7e9d144" sha1="ecb6171a873be3ad993e4b91b09d01e23c840348"/>
 		<rom name="track03.bin" size="1185760800" md5="4b2d952b3ac82e26b25430e3dee38908" sha1="4ec5eb9dd700ad942db4332b28229a8bfbbf38c1"/>
 		-->
-		<description>Tee Off (USA, Alt)</description>
+		<description>Tee Off (USA, alt)</description>
 		<year>1999</year>
 		<publisher>Acclaim</publisher>
 		<info name="serial" value="T-8108N"/>
@@ -14873,7 +14873,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="15551424" md5="2551d7c9f919ba04e3cecaa9d1b945ca" sha1="ca747e37f30b1c9a875d11272be502c8fdd10efc"/>
 		<rom name="track03.bin" size="1185760800" md5="5219fb69bb2f96430e7252ee2709d550" sha1="d2b2b0794493a5a0a85ece53af5d6ad142789e13"/>
 		-->
-		<description>Golf Shiyou yo (Jpn, Rev. A)</description>
+		<description>Golf Shiyou yo (Jpn, rev. A)</description>
 		<year>1999</year>
 		<publisher>Bottom Up</publisher>
 		<info name="serial" value="T-40901M"/>
@@ -14892,7 +14892,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="Golf Shiyou yo (Japan) (Rev B) (Track 2).bin" size="15904224" crc="73a29dd3" md5="94801204d825ce7f13236c5bb3268e7a" sha1="99fec046c7ddc0fad012116d016914352f0ecdff"/>
 		<rom name="Golf Shiyou yo (Japan) (Rev B) (Track 3).bin" size="1185760800" crc="9eafc931" md5="2b90e9e21f7981fd424ad4010bc9fa31" sha1="237ffb4e8a630ce74c60eed0e8ad73c7406aecac"/>
 		-->
-		<description>Golf Shiyou yo (Jpn, Rev. B)</description>
+		<description>Golf Shiyou yo (Jpn, rev. B)</description>
 		<year>2000</year>
 		<publisher>Bottom Up</publisher>
 		<info name="serial" value="T-40901M"/>
@@ -15185,7 +15185,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="1735776" md5="299599274bf003e5c440277e9300ebb3" sha1="9ab25eafdde07ca5c709d45f875b3124387835bd"/>
 		<rom name="track03.iso" size="1032499200" md5="17075f506b14aab7c5132b1ba34c0038" sha1="f15beeb19a8bbcafbcd7c2374c7f060714783dd2"/>
 		-->
-		<description>Grandia II - Tentou-you Demo (Jpn)</description>
+		<description>Grandia II - Tentou-you (Jpn, demo)</description>
 		<year>2000</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="610-7878"/>
@@ -16404,7 +16404,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track36.raw" size="21344400" md5="10660b8ec46f85890b47cdcd86016a00" sha1="253a5c641601c3324be93dbc42a819f9628f39c8"/>
 		<rom name="track37.bin" size="579088272" md5="43524daaebcea89fcf08165e8735b3b9" sha1="eb597ea970c73b27199e5c6a1d44afe4ee4a7181"/>
 		-->
-		<description>Hydro Thunder (USA, Rev. 1)</description>
+		<description>Hydro Thunder (USA, rev. 1)</description>
 		<year>200?</year>
 		<publisher>Midway</publisher>
 		<info name="serial" value="T-9702N"/>
@@ -16524,7 +16524,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track35.raw" size=" 21346752" md5="6fae8d53b2e771a297d8a852d00776dd" sha1="d035afed48af5275a82e5db9a6e5e4700b98744f"/>
 		<rom name="track36.iso" size="434581504" md5="02de9d0cdca472998b9e3bf9e33d8ef9" sha1="d885ab517240216f3f4f597ceca247753ee53980"/>
 		-->
-		<description>Hydro Thunder (World, Prototype 19990616)</description>
+		<description>Hydro Thunder (World, prototype 19990616)</description>
 		<year>1999</year>
 		<publisher>Midway</publisher>
 		<info name="release" value="19990616"/>
@@ -16577,7 +16577,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track36.raw" size=" 21344400" md5="4f44542a4dc9ee8774a812dc5414244e" sha1="d7199adeea5dd7d289586ada5a54a855110b2228"/>
 		<rom name="track37.iso" size="504270848" md5="c133f5b564dbe6e39558f28b46afbab2" sha1="ba8f9ab4076b14dd16989b66bedf25f4d9fd8737"/>
 		-->
-		<description>Hydro Thunder (Euro, Prototype 19990908)</description>
+		<description>Hydro Thunder (Euro, prototype 19990908)</description>
 		<year>1999</year>
 		<publisher>Midway</publisher>
 		<info name="release" value="19990908"/>
@@ -16847,7 +16847,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="Incoming - Jinrui Saishuu Kessen (Japan) (Track 13).bin" size="20916336" crc="280304e3" md5="fc5d1f0824677699a824b3c3ddedb615" sha1="05cc33e378fd977853efe1695854083150a233e3"/>
 		<rom name="Incoming - Jinrui Saishuu Kessen (Japan) (Track 14).bin" size="38779776" crc="4cfe0f6e" md5="615ae5810acd6e9dd3441450fdf3034f" sha1="f43dc2e3f636aa603831c6502c1344c5b4981a7f"/>
 		-->
-		<description>Incoming: Jinrui Saishuu Kessen (Jpn, Rev. 1)</description>
+		<description>Incoming: Jinrui Saishuu Kessen (Jpn, rev. 1)</description>
 		<year>1998</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="T-15001M"/>
@@ -16880,7 +16880,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track13.raw" size="20739936" md5="d6c74d7a365948404c494f0a82f4599f" sha1="258715ad794e5dccba3df9b9fd1dc70c306cf6c6"/>
 		<rom name="track14.iso" size="80334848" md5="6bd43e032402ab10939a7cab5b8f2695" sha1="cb410a46060a13d7bee14c6547c23f56e16d8517"/>
 		-->
-		<description>Incoming (Euro, Prototype 19990906)</description>
+		<description>Incoming (Euro, prototype 19990906)</description>
 		<year>1999</year>
 		<publisher>Rage Software</publisher>
 		<info name="release" value="19990906"/>
@@ -17507,7 +17507,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="1237152" md5="9eef669a6adf2577aedb687d0605fbfd" sha1="13ffe1f95015a5bd325c6cbc369ab2dd27ae461e"/>
 		<rom name="track03.bin" size="1185760800" md5="77bc0b131e14d35f909f02e6778b2c87" sha1="f9ed8434bc1570fd785d6f4900752adc91d39dd9"/>
 		-->
-		<description>Jet Grind Radio (USA, Prototype 20001002)</description>
+		<description>Jet Grind Radio (USA, prototype 20001002)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="release" value="20001002"/>
@@ -17526,7 +17526,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
 		<rom name="track03.iso" size="1032499200" md5="b6676bec4a24dacc43ca9376cd4970b5" sha1="2ec596cf2f5cf2f0aa7b2026964a301b477836a0"/>
 		-->
-		<description>Jet Set Radio (Euro, Prototype 20001003)</description>
+		<description>Jet Set Radio (Euro, prototype 20001003)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="release" value="20001003"/>
@@ -17803,7 +17803,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="2036832" md5="b62b490782ae03865592d79f13168c17" sha1="4fd817ccaa746651a1e277fdebd25ea4868ffb86"/>
 		<rom name="track03.bin" size="1185760800" md5="23e70871f0bc0cb0fc094ec4072b8629" sha1="a64cffa8a721b8730f8d80a908f0c3f1f823b7fd"/>
 		-->
-		<description>July (Jpn, Rev. 1)</description>
+		<description>July (Jpn, rev. 1)</description>
 		<year>1998</year>
 		<publisher>FortyFive</publisher>
 		<info name="serial" value="T-35401M"/>
@@ -18075,7 +18075,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track06.raw" size="  25799088" md5="a6d4032d6014e6d11f9a17aeaec8334c" sha1="b9bd6cec4d7fb36806aaf6943b8305d0641a00da"/>
 		<rom name="track07.bin" size="  52809456" md5="29364068520d85cb2d73ec7932506a1f" sha1="4616015d8cde9013ac2d1e7b4b86fcc6ea88cece"/>
 		-->
-		<description>Kao the Kangaroo (Demo) (World)</description>
+		<description>Kao the Kangaroo (World, demo)</description>
 		<year>2000</year>
 		<publisher>Titus</publisher>
 		<info name="serial" value="952-0100-50"/>
@@ -18572,7 +18572,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="1949808" md5="bc1d0aae3030443bcb14854048eb05d8" sha1="d0b02149b67f0d2f0f6c166f200bef58cfc7a301"/>
 		<rom name="track03.bin" size="1185760800" md5="c32cb43346b72d9a680cf85d8ed93152" sha1="89404fc6a39de3279d0ecf6dd2bb5a8c29a4e3b8"/>
 		-->
-		<description>Kuon no Kizuna: Sairinshou (Jpn, Rev. 1)</description>
+		<description>Kuon no Kizuna: Sairinshou (Jpn, rev. 1)</description>
 		<year>2000</year>
 		<publisher>FOG</publisher>
 		<info name="serial" value="T-36701M"/>
@@ -18789,7 +18789,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="   990192" md5="7f45034fc9b914871365595df8fb6f48" sha1="d6a9fdab713e1adc90763d1f73dbf605bab9cd70"/>
 		<rom name="track05.iso" size="161746944" md5="d9db618388b5d55f8dd476cd38aaf54d" sha1="f594937d17ac409142b8f44b1834c159564c6553"/>
 		-->
-		<description>Le Mans 24 Hours (World, Prototype 20000820)</description>
+		<description>Le Mans 24 Hours (World, prototype 20000820)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="release" value="20000820"/>
@@ -18945,7 +18945,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="  1060752" md5="3a892db029c4b1ba6ed24ccdaf5cff62" sha1="36b69ee3a5dd70637228feaa14528ac23f848ee7"/>
 		<rom name="track05.iso" size="578127872" md5="b632a79c74509455ea2ac9d8fe0656fb" sha1="bb972240d0a271c90a1dbb59594c732105839f10"/>
 		-->
-		<description>Legacy of Kain: Soul Reaver (Euro, Prototype 20000118)</description>
+		<description>Legacy of Kain: Soul Reaver (Euro, prototype 20000118)</description>
 		<year>2000</year>
 		<publisher>Eidos Interactive</publisher>
 		<info name="release" value="20000118"/>
@@ -19064,7 +19064,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track16.raw" size=" 34456800" md5="360d8a65327a2a5397c5c6d08155cc7b" sha1="71c25771b8ef427e0ab6fa5f7b0c5e71491f51a8"/>
 		<rom name="track17.iso" size=" 90777600" md5="dfaec113207035fa454caffcbb757a02" sha1="cf787ffdddf58b09f4b6d5122962c39fcd42db82"/>
 		-->
-		<description>Looney Tunes: Space Race (World, Prototype 19991014)</description>
+		<description>Looney Tunes: Space Race (World, prototype 19991014)</description>
 		<year>1999</year>
 		<publisher>Infogrames</publisher>
 		<info name="release" value="19991014"/>
@@ -19096,7 +19096,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track16.raw" size=" 34456800" md5="39989a8236d79b3e11b9077f1e53033f" sha1="8996620fee124bf191932d8c2406231dcb7de133"/>
 		<rom name="track17.bin" size="104252400" md5="8df80d1b78503db134bb174448152ea8" sha1="2f1a6e42b85b10c08c204147df4782e6a198b81e"/>
 		-->
-		<description>Looney Tunes: Space Race (World, Prototype 20000731)</description>
+		<description>Looney Tunes: Space Race (World, prototype 20000731)</description>
 		<year>2000</year>
 		<publisher>Infogrames</publisher>
 		<info name="release" value="20000731"/>
@@ -19301,7 +19301,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track12.raw" size=" 48422976" md5="16b9cfc248e2fa806a13878a7e47adac" sha1="d48c6b1ab2df3d245ecb9ecbfdfc03ae4c1dd125"/>
 		<rom name="track13.iso" size="128477184" md5="dcf451789e8202d65a3d854e6c53d01b" sha1="dc9d436f219f9afd77a070c397f517109a75498c"/>
 		-->
-		<description>Magforce Racing (World, Prototype 20000524)</description>
+		<description>Magforce Racing (World, prototype 20000524)</description>
 		<year>2000</year>
 		<publisher>Crave</publisher>
 		<info name="release" value="20000524"/>
@@ -19972,7 +19972,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track07.raw" size=" 12089280" md5="f5969521da574d2fbf591ca13392ea7e" sha1="0eba22cef97196e1a2d91c43dd700f81c99b0c91"/>
 		<rom name="track08.iso" size="209692672" md5="a1f1daf1c36db10c1cb8e4885662654d" sha1="cb53f6efb938f81a3d5469640be1232ba8ad28ff"/>
 		-->
-		<description>MDK 2 (World, Prototype 20000126 5PM)</description>
+		<description>MDK 2 (World, prototype 20000126 5PM)</description>
 		<year>2000</year>
 		<publisher>Interplay</publisher>
 		<info name="release" value="20000126"/>
@@ -19995,7 +19995,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track07.raw" size=" 12089280" md5="f5969521da574d2fbf591ca13392ea7e" sha1="0eba22cef97196e1a2d91c43dd700f81c99b0c91"/>
 		<rom name="track08.bin" size="239962800" md5="9dcbd2773c2f2e1570fe46290a534a14" sha1="54203e1c5423ff7e3fc9d7d7fa9bc485ab50d6ed"/>
 		-->
-		<description>MDK 2 (World, Prototype 20000126 7PM)</description>
+		<description>MDK 2 (World, prototype 20000126 7PM)</description>
 		<year>2000</year>
 		<publisher>Interplay</publisher>
 		<info name="release" value="20000126"/>
@@ -20016,7 +20016,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size=" 39332496" md5="40149dd92eacef8609df026dfc844287" sha1="c974953e8ce3608828f002ad6e6caccbe3502643"/>
 		<rom name="track05.iso" size="265670656" md5="fb6118f5d4e398a8d03fed191864d999" sha1="7b719c8b9860e1f5422748dc04d437b45fee0e3f"/>
 		-->
-		<description>Sega Mega Drive (World, Prototype 20010115)</description>
+		<description>Sega Mega Drive (World, prototype 20010115)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
 		<info name="release" value="20010115"/>
@@ -20334,7 +20334,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track10.raw" size=" 52863552" md5="4c3f9e5665b508a3e5bf0ef8ded1ab20" sha1="3d27d5fc15483719f57ceb544b6af429e0642333"/>
 		<rom name="track11.iso" size=" 86781952" md5="a47257ada1406f87e599d8637e5d7578" sha1="c1b1143d2d1642944d2a96f1e3c8e0c27b33f097"/>
 		-->
-		<description>Millennium Racer: Y2K Fighters (World, Prototype 20010604)</description>
+		<description>Millennium Racer: Y2K Fighters (World, prototype 20010604)</description>
 		<year>2001</year>
 		<publisher>Creat Studio</publisher>
 		<info name="release" value="20010604"/>
@@ -20494,7 +20494,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="882000" md5="d7777a272481a223fb3174934ebc4868" sha1="595665221a8978e276b50bc6ae59011133ef4447"/>
 		<rom name="track05.bin" size="1031683632" md5="f505987f9af094cd91f938b125f51e2f" sha1="17ca1be7416f7743186eab332cdf06e9219c8a1a"/>
 		-->
-		<description>Ball Breakers (USA, Prototype 20000924)</description>
+		<description>Ball Breakers (USA, prototype 20000924)</description>
 		<year>2000</year>
 		<publisher>Take-Two</publisher>
 		<info name="release" value="20000924"/>
@@ -20681,7 +20681,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track21.raw" size="  8072064" md5="d5644e1a205917662e5445fa2b075649" sha1="9f7386bfb8a7cfb940c3af102389a332baa798bd"/>
 		<rom name="track22.iso" size=" 98684928" md5="c6ae6e5392072ec6b3cdd2779b42f4c5" sha1="c6d8c842196ee724632026729251d834034bf25f"/>
 		-->
-		<description>Monaco Grand Prix: Racing Simulation 2 (Jpn, Prototype 19990106)</description>
+		<description>Monaco Grand Prix: Racing Simulation 2 (Jpn, prototype 19990106)</description>
 		<year>1999</year>
 		<publisher>Ubisoft</publisher>
 		<info name="release" value="19990106"/>
@@ -20874,7 +20874,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track52.raw" size="882000" md5="f0620fc1d5b6a118d153606c82a4555e" sha1="bb19856567c632f03e38f1de87ad7ed79c3c74ac"/>
 		<rom name="track53.bin" size="777176064" md5="abbbf07c6bccff43a4e7bd644bd8da32" sha1="5263f3580d1d9a0fc01ab20618eb78db630cb862"/>
 		-->
-		<description>Mortal Kombat Gold (USA, Rev. 1)</description>
+		<description>Mortal Kombat Gold (USA, rev. 1)</description>
 		<year>1999</year>
 		<publisher>Midway</publisher>
 		<info name="serial" value="T-9701N"/>
@@ -21027,7 +21027,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track52.raw" size="  1942752" md5="591a051b0bf6d85aa9762f65aa49025f" sha1="07acdf0ea7dbcc0591e1295c70c85cda0807dfa7"/>
 		<rom name="track53.iso" size="676556800" md5="fa32645edd472b1a9d8134a2e0561e65" sha1="f3b80af435cff953e9377f467af13c783cb155bb"/>
 		-->
-		<description>Mortal Kombat Gold (Euro, Prototype 19990828)</description>
+		<description>Mortal Kombat Gold (Euro, prototype 19990828)</description>
 		<year>1999</year>
 		<publisher>Midway</publisher>
 		<info name="release" value="19990828"/>
@@ -21235,7 +21235,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track28.raw" size=" 20888112" md5="11f5c8a89878c8fb8fdf6296dfb994f0" sha1="3349de2cea5e3ba47762aab70ff738dde6c51c4d"/>
 		<rom name="track29.iso" size=" 10295296" md5="3e6fd3cb1c582b0c985daac9aa540620" sha1="0976a68a0822c90720bf62ae3f6bb9ad66b239cd"/>
 		-->
-		<description>Mr. Driller (Euro, Prototype 20000918)</description>
+		<description>Mr. Driller (Euro, prototype 20000918)</description>
 		<year>2000</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="release" value="20000918"/>
@@ -21341,7 +21341,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
 		<rom name="track03.bin" size="1185760800" md5="38a3203513165cbb7c88ee50112b74c3" sha1="e1fa8b923356537107b521645e5ebe3e672001d5"/>
 		-->
-		<description>MSR: Metropolis Street Racer (Euro, Rev. B)</description>
+		<description>MSR: Metropolis Street Racer (Euro, rev. B)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK-51022-50"/>
@@ -21382,7 +21382,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="  1060752" md5="3a892db029c4b1ba6ed24ccdaf5cff62" sha1="36b69ee3a5dd70637228feaa14528ac23f848ee7"/>
 		<rom name="track05.iso" size="155680768" md5="847b7786fdd0e81febf890eb0df1b35b" sha1="4e85b3be2623e0dc5b389094016e82e1ce352f99"/>
 		-->
-		<description>MSR: Metropolis Street Racer (World, Prototype 20000509)</description>
+		<description>MSR: Metropolis Street Racer (World, prototype 20000509)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="release" value="20000509"/>
@@ -21658,7 +21658,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="1060752" md5="3a892db029c4b1ba6ed24ccdaf5cff62" sha1="36b69ee3a5dd70637228feaa14528ac23f848ee7"/>
 		<rom name="track05.iso" size="427399168" md5="9b5f5e0a9a1f4cf8e7514e5bd080649c" sha1="da375955766377659cf585944cef1308517dd70a"/>
 		-->
-		<description>NBA 2K (USA, Prototype 19990922)</description>
+		<description>NBA 2K (USA, prototype 19990922)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
 		<info name="release" value="19990922"/>
@@ -21679,7 +21679,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="1060752" md5="3a892db029c4b1ba6ed24ccdaf5cff62" sha1="36b69ee3a5dd70637228feaa14528ac23f848ee7"/>
 		<rom name="track05.iso" size="933912576" md5="6226ee946e9cd3bc450592cc995350ee" sha1="fa88a10f6dc75f2fef55439bac531b8ad6f50dc7"/>
 		-->
-		<description>NBA 2K (World, Prototype 19991221)</description>
+		<description>NBA 2K (World, prototype 19991221)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
 		<info name="release" value="19991221"/>
@@ -22351,7 +22351,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="1060752" md5="f4cca51b2d1cacfb71c3a2a95259500e" sha1="58d7ebc62a61fddf6bee07da2a11c4639b1c5386"/>
 		<rom name="track05.bin" size="1131253200" md5="950b7440802ce1f099d325e134376eb0" sha1="40d11183000e1685e9067cfbe94312deb828fdd0"/>
 		-->
-		<description>NFL 2K (USA, Alt 1)</description>
+		<description>NFL 2K (USA, alt 1)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="51003"/>
@@ -22374,7 +22374,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="1060752" md5="3fc13642cd326d398f0f1da04ce73b52" sha1="c416c83b9ffbd2e0903ca4720c3754b029bfafe6"/>
 		<rom name="track05.bin" size="1131253200" md5="950b7440802ce1f099d325e134376eb0" sha1="40d11183000e1685e9067cfbe94312deb828fdd0"/>
 		-->
-		<description>NFL 2K (USA, Alt 2)</description>
+		<description>NFL 2K (USA, alt 2)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="51003"/>
@@ -22403,7 +22403,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="1060752" md5="3a892db029c4b1ba6ed24ccdaf5cff62" sha1="36b69ee3a5dd70637228feaa14528ac23f848ee7"/>
 		<rom name="track05.bin" size="1131253200" md5="950b7440802ce1f099d325e134376eb0" sha1="40d11183000e1685e9067cfbe94312deb828fdd0"/>
 		-->
-		<description>NFL 2K (USA, Alt 3)</description>
+		<description>NFL 2K (USA, alt 3)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="51003"/>
@@ -22567,7 +22567,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="117183696" md5="97bc82e88c8d282031ae86026127399d" sha1="58ee5f397fb75b5b6c8e0f5b67f88ed2ae97ecfd"/>
 		<rom name="track05.bin" size="395472336" md5="63859fa5f23dd7fc280b8cc7b3bbc432" sha1="a189fdb686762e7cdd07d08d4ee69f644ca8fcb2"/>
 		-->
-		<description>NFL Blitz 2000 (USA, Rev. 1)</description>
+		<description>NFL Blitz 2000 (USA, rev. 1)</description>
 		<year>1999</year>
 		<publisher>Midway</publisher>
 		<info name="serial" value="T-9703N"/>
@@ -22610,7 +22610,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="117183696" md5="2b3721506f2db076f2e7fd503b0235a7" sha1="19f1e544d6d7f6cf91c62bdb25bfa55324968f31"/>
 		<rom name="track05.iso" size="344360960" md5="3660047dbf8a80416544b42b4f9dd6cc" sha1="c80c037ab610d1be409f8ce89e7eef53306cf37f"/>
 		-->
-		<description>NFL Blitz 2000 (Euro, Prototype 19990908)</description>
+		<description>NFL Blitz 2000 (Euro, prototype 19990908)</description>
 		<year>1999</year>
 		<publisher>Midway</publisher>
 		<info name="release" value="19990908"/>
@@ -22761,7 +22761,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="16696848" md5="477ddf28dcf25f2f34e4cc823f6baadd" sha1="57471fc523fb14f5ad52c06aaa3dd6b5858bc321"/>
 		<rom name="track05.bin" size="749843472" md5="b769b2beceb69533282d8ee7d9de6e43" sha1="4a29feee03c01b1436fb7af1b028cafb5df92645"/>
 		-->
-		<description>NHL 2K (USA, Prototype 20000131)</description>
+		<description>NHL 2K (USA, prototype 20000131)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="release" value="20000131"/>
@@ -22782,7 +22782,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="  16696848" md5="0235b9288538cae24da1e72e3392eaef" sha1="04cf85ff2b86b07e24a3cf824d0327bfc4427fa8"/>
 		<rom name="track05.iso" size=" 652924928" md5="31c7bdbaf7a37b95709ffdb21f5a7422" sha1="1953c99a0ec722e2b735d3fe730861c706a73ad8"/>
 		-->
-		<description>NHL 2K (USA, Prototype 20000131, Alt)</description>
+		<description>NHL 2K (USA, prototype 20000131, alt)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="release" value="20000131"/>
@@ -22803,7 +22803,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track04.raw" size="16696848" md5="477ddf28dcf25f2f34e4cc823f6baadd" sha1="57471fc523fb14f5ad52c06aaa3dd6b5858bc321"/>
 		<rom name="track05.iso" size="652924928" md5="6f36f50a55acd2d32e21c31ed7bfbc5c" sha1="eee953b7bc8e377d2a5282c2b71bae4caf9f600c"/>
 		-->
-		<description>NHL 2K (Euro, Prototype 20000321)</description>
+		<description>NHL 2K (Euro, prototype 20000321)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="release" value="20000321"/>
@@ -23156,7 +23156,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track89.raw" size="2116800" md5="8e0a93a14893adf0ae38da65b11ac28b" sha1="be54986a2cdfb03281934c647ae63a4f51dcd0a3"/>
 		<rom name="track90.bin" size="645616944" md5="d858e2483df915a5fb64d13dbf788bda" sha1="354f99ff4d358e5daf22df8eb353b0365720d139"/>
 		-->
-		<description>Nightmare Creatures II (USA, Prototype 20000509)</description>
+		<description>Nightmare Creatures II (USA, prototype 20000509)</description>
 		<year>2000</year>
 		<publisher>Konami</publisher>
 		<info name="release" value="20000509"/>
@@ -23262,7 +23262,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track89.raw" size="2116800" md5="8ac57390fa4ba17b0e138055267b3f6e" sha1="a74409044d54e3348432b3abaa4b99eb9fca08c7"/>
 		<rom name="track90.iso" size="617672704" md5="4432b85c32545829589d9a3f1cdd3160" sha1="f44b33508e9dc85abe4bb530022676eeb967aa38"/>
 		-->
-		<description>Nightmare Creatures II (Euro, Prototype 20000721)</description>
+		<description>Nightmare Creatures II (Euro, prototype 20000721)</description>
 		<year>2000</year>
 		<publisher>Konami</publisher>
 		<info name="release" value="20000721"/>
