@@ -3909,7 +3909,7 @@ license:CC0
 	</software>
 
 	<software name="mazemonp" cloneof="mazemon">
-		<description>Chou Mashin Eiyuu Den Wataru - Mazekko Monster (Japan, prototype)</description>
+		<description>Chou Mashin Eiyuuden Wataru - Mazekko Monster (Japan, prototype)</description>
 		<year>1997</year>
 		<publisher>Banpresto</publisher>
 		<info name="alt_title" value="超魔神英雄伝ワタル まぜっこモンスター" />
@@ -3924,7 +3924,7 @@ license:CC0
 	</software>
 
 	<software name="mazemon">
-		<description>Chou Mashin Eiyuu Den Wataru - Mazekko Monster (Japan)</description>
+		<description>Chou Mashin Eiyuuden Wataru - Mazekko Monster (Japan)</description>
 		<year>1997</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="DMG-AWAJ-JPN" />
@@ -3949,7 +3949,7 @@ license:CC0
 
 	<software name="mazemon2">
 		<!-- Notes: Also released by NP in 2000-08 -->
-		<description>Chou Mashin Eiyuu Den Wataru - Mazekko Monster 2 (Japan)</description>
+		<description>Chou Mashin Eiyuuden Wataru - Mazekko Monster 2 (Japan)</description>
 		<year>1998</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="DMG-AWMJ-JPN" />
