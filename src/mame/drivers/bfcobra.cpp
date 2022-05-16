@@ -2603,9 +2603,8 @@ void bfcobjam_state::genio_w( uint8_t data )
 	}
 
 	//bits 1 and 2 are for upd7759
-	m_upd7759_int->md_w(0);
+	m_upd7759_int->md_w(!BIT(data,1));
 	m_upd7759_int->reset_w(!BIT(data,2));
-	m_upd7759_int->start_w(BIT(data,1));
 }
 
 void bfcobjam_state::upd7759_w(uint8_t data)
