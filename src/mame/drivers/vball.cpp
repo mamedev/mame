@@ -20,7 +20,7 @@
  Remaining Issues:
  -1) IRQ & NMI code is totally guessed, and needs to be solved properly
 
-Measurements from Guru (someone needs to rewrite INTERRUPT_GEN() in video/vball.cpp):
+Measurements from Guru:
 6502 /IRQ = 1.720kHz
 6202 /NMI = 58 Hz
 VBlank = 58Hz
@@ -117,7 +117,6 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-
 		m_attribram(*this, "attribram"),
 		m_videoram(*this, "videoram"),
 		m_scrolly_lo(*this, "scrolly_lo"),

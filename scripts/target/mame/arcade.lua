@@ -4483,8 +4483,6 @@ files {
 	MAME_DIR .. "src/mame/includes/fromanc2.h",
 	MAME_DIR .. "src/mame/video/fromanc2.cpp",
 	MAME_DIR .. "src/mame/drivers/gstriker.cpp",
-	MAME_DIR .. "src/mame/includes/gstriker.h",
-	MAME_DIR .. "src/mame/video/gstriker.cpp",
 	MAME_DIR .. "src/mame/video/mb60553.cpp",
 	MAME_DIR .. "src/mame/video/mb60553.h",
 	MAME_DIR .. "src/mame/video/vs920a.cpp",

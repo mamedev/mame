@@ -295,6 +295,7 @@ public:
 	}
 
 	void init_cb3();
+	void init_cb3c();
 	void init_cb3e();
 	void init_cb3f();
 	void init_cherrys();
