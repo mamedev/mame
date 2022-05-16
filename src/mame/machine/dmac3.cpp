@@ -42,6 +42,7 @@ void dmac3_device::device_start()
 	save_item(STRUCT_MEMBER(m_controllers, address));
 	save_item(STRUCT_MEMBER(m_controllers, conf));
 	save_item(STRUCT_MEMBER(m_controllers, drq));
+	save_item(NAME(m_irq));
 }
 
 void dmac3_device::device_reset()
