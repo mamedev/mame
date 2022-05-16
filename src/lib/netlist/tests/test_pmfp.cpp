@@ -37,6 +37,7 @@ protected:
 
 PTEST_F(test_late_pmfp, late_pmfp)
 {
+#if !PPMF_USE_MAME_DELEGATES
 	plib::late_pmfp<plib::pmfp<void (int &)>> late(&Ta::ap);
 
 	Ta a;
@@ -45,19 +46,21 @@ PTEST_F(test_late_pmfp, late_pmfp)
 	int r(0);
 	mfp(r);
 	PEXPECT_TRUE(r == 1);
+#endif
 }
 
 PTEST(test_compile, compile)
 {
+#if !PPMF_USE_MAME_DELEGATES
 	plib::pmfp_base<PPMF_TYPE_PMF, void(int)> mfp_PPMF_TYPE_PMF;
 	plib::pmfp_base<PPMF_TYPE_INTERNAL_ITANIUM, void(int)> mfp_PPMF_TYPE_INTERNAL_ITANIUM;
 	plib::pmfp_base<PPMF_TYPE_INTERNAL_ARM, void(int)> mfp_PPMF_TYPE_INTERNAL_ARM;
 	plib::pmfp_base<PPMF_TYPE_INTERNAL_MSC, void(int)> mfp_PPMF_TYPE_INTERNAL_MSC;
-
 	PEXPECT_TRUE(mfp_PPMF_TYPE_PMF.isnull());
 	PEXPECT_TRUE(mfp_PPMF_TYPE_INTERNAL_ITANIUM.isnull());
 	PEXPECT_TRUE(mfp_PPMF_TYPE_INTERNAL_ARM.isnull());
 	PEXPECT_TRUE(mfp_PPMF_TYPE_INTERNAL_MSC.isnull());
+#endif
 
 #if defined(__GNUC__) && !defined(__clang__) && (NVCCBUILD == 0)
 	plib::pmfp_base<PPMF_TYPE_GNUC_PMF_CONV, void(int)> mfp_PPMF_TYPE_GNUC_PMF_CONV;

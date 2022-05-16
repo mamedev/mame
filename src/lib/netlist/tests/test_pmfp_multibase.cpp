@@ -274,6 +274,7 @@ PTEST_F(pmfp_test_complex_return, multibase_test)
 	PEXPECT_EQ(f().second, 8);
 	f = make_forward_delegate(&forward::zp, &obj2);
 	PEXPECT_EQ(f().second, 9);
+	//PEXPECT_EQ(plib::ppmf_internal::value, PPMF_TYPE_PMF);
 }
 
 PTEST_F(pmfp_test_simple_return, multibase_test)
@@ -357,4 +358,5 @@ PTEST_F(pmfp_test_simple_return, multibase_test)
 	f = make_forward_delegate(&forward::zp, &obj2);
 	f(fr);
 	PEXPECT_EQ(fr.second, 9);
+	//PEXPECT_EQ(plib::ppmf_internal::value, PPMF_TYPE_INTERNAL_MSC);
 }

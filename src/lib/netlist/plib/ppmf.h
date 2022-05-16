@@ -28,6 +28,91 @@
 ///
 ///
 
+/// \brief Enable experimental code on Visual Studio builds and VS clang llvm builds
+///
+/// This enambles experimal code which uses optimized builds the
+/// PPMF_TYPE_INTERNAL_MSC path also for complex (struct/union) return types.
+/// This currently depends on whether the code can adequately determine on
+/// x64 builds if the return type is returned through registers or passed as a
+/// second argument as a pointer to the member function.
+///
+/// ppmf uses a temporary storage for the return value. This causes for large sized
+/// return types a copy overhead. It would be easier if we would be able to obtain
+/// the RDX register on entry to call. On MSVC this seems not to be possible since on
+/// x64 inline assembly is not supported. An alternative would be to take the
+/// address of the first argument and substract sizeof(void *) from it. This would
+/// give us the address of the pointer to the return buffer. For member functions
+/// which do not have at least one parameter the approach does not work.
+/// In addition, this code has to be compiled with /w34716 to not abort on a
+/// missing return in the call function. The approach can be checked in godbolt.com
+/// with the following code:
+///
+/// ```
+/// #include <ios>
+/// #include <type_traits>
+/// #include <utility>
+/// #include <iostream>
+///
+/// using ret_t = std::pair<int *, int *>;
+///
+/// class xx
+/// {
+/// public:
+///
+/// int global = 10;
+///
+/// ret_t f(int x)
+/// {
+///     int * t = &x;
+///     ret_t **r = reinterpret_cast<ret_t **>(reinterpret_cast<uint8_t *>(t) - 8);
+///     (*r)->first = nullptr;
+///     (*r)->second = &global;
+/// }
+///
+/// };
+/// int main()
+/// {
+///     xx c;
+///     auto x = c.f(0);
+///     std::cout << x.first << " " << x.second << "\n";
+///     std::cout << *x.second << "\n";
+/// }
+/// ```
+/// The output from above is
+/// ```
+/// Program returned: 0
+/// 0000000000000000 0000005B0C7CF720
+/// 10
+/// ```
+///
+/// This code path is disabled by default currently.
+///
+#define PPMF_EXPERIMENTAL 0
+
+/// brief Enable using MAME delegates as a replacement for ppmf.
+///
+/// This define enables the use of MAME delegates (src/lib/util/delegate.h
+/// as a replacement to ppmf. Enable this setting if you want to use the nltool
+/// test suite (nltool -c tests) to produce comparisons to ppmf.
+///
+#define PPMF_USE_MAME_DELEGATES 0
+
+#if PPMF_USE_MAME_DELEGATES
+
+#include "../../util/delegate.h"
+
+namespace plib {
+	template<typename Signature>
+	class pmfp : public delegate<Signature>
+	{
+	public:
+		using basetype = delegate<Signature>;
+		using basetype::basetype;
+		using basetype::object;
+		explicit operator bool() const { return !this->isnull(); }
+	};
+}
+#else
 #include "pconfig.h"
 #include "ptypes.h"
 
@@ -48,12 +133,6 @@
 #define PPMF_TYPE_INTERNAL_ARM     3
 #define PPMF_TYPE_INTERNAL_MSC     4
 
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpmf-conversions"
-#pragma GCC diagnostic ignored "-Wpedantic"
-#endif
-
 #ifndef PPMF_FORCE_TYPE
 #define PPMF_FORCE_TYPE -1
 #endif
@@ -69,11 +148,11 @@ namespace plib {
 				&& ci::os() == ci_os::WINDOWS)                                   ? PPMF_TYPE_PMF :
 			(ci::mingw() && !ci::m64() && ci::version() >= 407)                  ? PPMF_TYPE_PMF :
 			(ci::mingw() && !ci::m64())                                          ? PPMF_TYPE_PMF : // Dropped support for mingw32 < 407 PPMF_TYPE_INTERNAL_ITANIUM :
+			(ci::env() == ci_env::MSVC && ci::m64())                             ? PPMF_TYPE_INTERNAL_MSC :
 			((ci::type() == ci_compiler::CLANG || ci::type() == ci_compiler::GCC)
 				&& (ci::arch() == ci_arch::MIPS
 					|| ci::arch() == ci_arch::ARM
 					|| ci::os() == ci_os::EMSCRIPTEN))                           ? PPMF_TYPE_INTERNAL_ARM :
-			(ci::type() == ci_compiler::MSC && ci::m64()) ?                        PPMF_TYPE_INTERNAL_MSC :
 			(ci::type() == ci_compiler::CLANG || ci::type() == ci_compiler::GCC) ? PPMF_TYPE_INTERNAL_ITANIUM :
 																				   PPMF_TYPE_PMF
 		};
@@ -92,6 +171,7 @@ namespace plib {
 	};
 
 	class mfp_generic_class;
+
 
 	///
 	/// \brief Used to derive a pointer to a member function.
@@ -117,36 +197,15 @@ namespace plib {
 			// NOLINTNEXTLINE(clang-analyzer-optin.cplusplus.UninitializedObject)
 		}
 
-	//private:
 		// extract the generic function and adjust the object pointer
-		void convert_to_generic(generic_function &func, mfp_generic_class *&object) const
-		{
-			// apply the "this" delta to the object first
-			// NOLINTNEXTLINE(clang-analyzer-core.UndefinedBinaryOperatorResult,cppcoreguidelines-pro-type-reinterpret-cast)
-			auto *o_p_delta = reinterpret_cast<mfp_generic_class *>(reinterpret_cast<std::uint8_t *>(object) + m_this_delta);
-
-			// if the low bit of the vtable index is clear, then it is just a raw function pointer
-			if ((m_function & 1) == 0)
-			{
-				// NOLINTNEXTLINE(performance-no-int-to-ptr,cppcoreguidelines-pro-type-reinterpret-cast)
-				func = reinterpret_cast<generic_function>(m_function);
-			}
-			else
-			{
-				// otherwise, it is the byte index into the vtable where the actual function lives
-				// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-				std::uint8_t *vtable_base = *reinterpret_cast<std::uint8_t **>(o_p_delta);
-				// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-				func = *reinterpret_cast<generic_function *>(vtable_base + m_function - 1);
-			}
-			object = o_p_delta;
-		}
+		void convert_to_generic(generic_function &func, mfp_generic_class *&object) const;
 
 		// actual state
-		uintptr_t m_function;         // first item can be one of two things:
-													//    if even, it's a pointer to the function
-													//    if odd, it's the byte offset into the vtable
-		ptrdiff_t m_this_delta;       // delta to apply to the 'this' pointer
+		uintptr_t m_function;   // first item can be one of two things:
+		                        //    if even, it's a pointer to the function
+		                        //    if odd, it's the byte offset into the vtable
+		                        //       or a byte offset into the function descriptors on IA64
+		ptrdiff_t m_this_delta; // delta to apply to the 'this' pointer
 	};
 
 	template <>
@@ -164,35 +223,15 @@ namespace plib {
 			*reinterpret_cast<MemberFunctionType *>(this) = mftp; // NOLINT
 		}
 
-	//private:
-		// extract the generic function and adjust the object pointer
-		void convert_to_generic(generic_function &func, mfp_generic_class *&object) const
-		{
-			if ((m_this_delta & 1) == 0)
-			{
-				// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-				object = reinterpret_cast<mfp_generic_class *>(reinterpret_cast<std::uint8_t *>(object) + (m_this_delta >> 1));
-				// NOLINTNEXTLINE(performance-no-int-to-ptr,cppcoreguidelines-pro-type-reinterpret-cast)
-				func = reinterpret_cast<generic_function>(m_function);
-			}
-			else
-			{
-				// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-				object = reinterpret_cast<mfp_generic_class *>(reinterpret_cast<std::uint8_t *>(object));
 
-				// otherwise, it is the byte index into the vtable where the actual function lives
-				// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-				std::uint8_t *vtable_base = *reinterpret_cast<std::uint8_t **>(object);
-				// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-				func = *reinterpret_cast<generic_function *>(vtable_base + m_function + m_this_delta - 1);
-			}
-		}
+		// extract the generic function and adjust the object pointer
+		void convert_to_generic(generic_function &func, mfp_generic_class *&object) const;
 
 		// actual state
-		uintptr_t               m_function;         // first item can be one of two things:
-													//    if even, it's a pointer to the function
-													//    if odd, it's the byte offset into the vtable
-		ptrdiff_t               m_this_delta;       // delta to apply to the 'this' pointer
+		uintptr_t m_function;   // first item can pointer to the function or a byte offset into the vtable
+		ptrdiff_t m_this_delta; // delta to apply to the 'this' pointer after right shifting by one bit
+		                        //    m_function is the byte offset into the vtable
+		                        //    On IA64 it may also be a byte offset into the function descriptors
 	};
 
 	template <>
@@ -206,53 +245,30 @@ namespace plib {
 
 		template<typename MemberFunctionType>
 		mfp_raw(MemberFunctionType mftp)
-		: m_function(0), m_this_delta(0), m_vptr_offs(0), m_vt_index(0), m_size(0)
+		: m_function(0), m_this_delta(0), m_vptr_index(0), m_vt_index(0), m_size(0)
 		{
 			static_assert(sizeof(*this) >= sizeof(MemberFunctionType), "size mismatch");
 			*reinterpret_cast<MemberFunctionType *>(this) = mftp; // NOLINT
 			m_size = sizeof(mftp); //NOLINT
 		}
 
-	//private:
 		// extract the generic function and adjust the object pointer
-		void convert_to_generic(generic_function &func, mfp_generic_class *&object) const
-		{
-			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-			auto *byteptr = reinterpret_cast<std::uint8_t *>(object);
-
-			// test for pointer to member function cast across virtual inheritance relationship
-			if ((sizeof(unknown_base_equiv) == m_size) && m_vt_index)
-			{
-				// add offset from "this" pointer to location of vptr, and add offset to virtual base from vtable
-				byteptr += m_vptr_offs;
-				// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-				std::uint8_t const *const vptr = *reinterpret_cast<std::uint8_t const *const *>(byteptr);
-				// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-				byteptr += *reinterpret_cast<int const *>(vptr + m_vt_index);
-			}
-
-			// add "this" pointer displacement if present in the pointer to member function
-			if (sizeof(single_base_equiv) < m_size)
-				byteptr += m_this_delta;
-			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-			object = reinterpret_cast<mfp_generic_class *>(byteptr);
-
-			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,performance-no-int-to-ptr)
-			auto const *funcx = reinterpret_cast<std::uint8_t const *>(m_function);
-			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,performance-no-int-to-ptr)
-			func = reinterpret_cast<generic_function>(std::uintptr_t(funcx));
-		}
+		void convert_to_generic(generic_function &func, mfp_generic_class *&object) const;
 
 		// actual state
-		uintptr_t m_function;         // first item can be one of two things:
-													//    if even, it's a pointer to the function
-													//    if odd, it's the byte offset into the vtable
+		uintptr_t m_function;         // pointer to the function
 		int       m_this_delta;       // delta to apply to the 'this' pointer
 
-		int       m_vptr_offs;     // only used for visual studio x64
-		int       m_vt_index;
+		int       m_vptr_index;       // index into the vptr table.
+		int       m_vt_index;         // offset to be applied after vptr table lookup.
 		unsigned  m_size;
 	};
+
+	template <typename R>
+	using pmf_is_register_return_type = std::integral_constant<bool,
+		std::is_void_v<R> ||
+		std::is_scalar_v<R> ||
+		std::is_reference_v<R>>;
 
 	template<int PMFINTERNAL, typename R, typename... Targs>
 	struct mfp_helper
@@ -295,10 +311,29 @@ namespace plib {
 
 		R call(Targs&&... args) const noexcept(true)
 		{
+#if defined(_MSC_VER) && (PPMF_EXPERIMENTAL)
+			if constexpr (pmf_is_register_return_type<R>::value)
+			{
+				// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+				const auto* func = reinterpret_cast<const generic_member_abi_function*>(&m_resolved);
+				return (*func)(m_obj, std::forward<Targs>(args)...);
+			}
+			else
+			{
+				using generic_member_abi_function_alt = void (*)(mfp_generic_class *,void *, Targs...);
+				// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+				const auto* func = reinterpret_cast<const generic_member_abi_function_alt*>(&m_resolved);
+				char temp[sizeof(typename std::conditional<std::is_void_v<R>, void *, R>::type)];
+				(*func)(m_obj, &temp[0], std::forward<Targs>(args)...);
+				return *reinterpret_cast<R *>(&temp);
+			}
+#else
 			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-			const auto* func = reinterpret_cast<const generic_member_abi_function *>(&m_resolved);
+			const auto* func = reinterpret_cast<const generic_member_abi_function*>(&m_resolved);
 			return (*func)(m_obj, std::forward<Targs>(args)...);
+#endif
 		}
+
 		generic_function_storage  m_resolved;
 		mfp_generic_class    *m_obj;
 	};
@@ -394,11 +429,11 @@ namespace plib {
 	};
 #endif
 
+
 	template <int PMFINTERNAL, typename R, typename... Targs>
 	using pmfp_helper_select = std::conditional<
-			std::is_void_v<R> ||
-			std::is_scalar_v<R> ||
-			std::is_reference_v<R> || PMFINTERNAL != PPMF_TYPE_INTERNAL_MSC,
+		pmf_is_register_return_type<R>::value
+		|| PMFINTERNAL != PPMF_TYPE_INTERNAL_MSC || (PPMF_EXPERIMENTAL),
 			mfp_helper<PMFINTERNAL, R, Targs...>, mfp_helper<PPMF_TYPE_PMF, R, Targs...>>;
 
 	template<int PMFINTERNAL, typename SIGNATURE> class pmfp_base;
@@ -514,8 +549,5 @@ namespace plib {
 
 } // namespace plib
 
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic pop
 #endif
-
 #endif // PPMF_H_
