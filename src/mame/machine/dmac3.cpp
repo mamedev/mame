@@ -35,6 +35,13 @@ void dmac3_device::device_start()
 
 	m_irq_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dmac3_device::irq_check), this));
 	m_dma_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dmac3_device::dma_check), this));
+
+	save_item(STRUCT_MEMBER(m_controllers, csr));
+	save_item(STRUCT_MEMBER(m_controllers, intr));
+	save_item(STRUCT_MEMBER(m_controllers, length));
+	save_item(STRUCT_MEMBER(m_controllers, address));
+	save_item(STRUCT_MEMBER(m_controllers, conf));
+	save_item(STRUCT_MEMBER(m_controllers, drq));
 }
 
 void dmac3_device::device_reset()
