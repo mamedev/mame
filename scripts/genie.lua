@@ -39,7 +39,7 @@ function str_to_version(str)
 		return val
 	end
 	local cnt = 10000
-	for word in string.gmatch(str, '([^.]+)') do
+	for word in string.gmatch(str, '([^.-]+)') do
 		if(tonumber(word) == nil) then
 			return val
 		end
