@@ -109,7 +109,7 @@ private:
 
 	offs_t m_scrambled_write_pc = 0;
 
-	segag80_decrypt_func m_decrypt;
+	segag80_decrypt_func m_decrypt{};
 	uint8_t m_background_pcb = 0;
 	double m_rweights[3]{};
 	double m_gweights[3]{};

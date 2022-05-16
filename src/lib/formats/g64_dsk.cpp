@@ -31,19 +31,19 @@ const uint32_t g64_format::c1541_cell_size[] =
 	3250  // 16MHz/13/4
 };
 
-int g64_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int g64_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	char h[8];
 
 	size_t actual;
 	io.read_at(0, h, 8, actual);
 	if (!memcmp(h, G64_FORMAT_HEADER, 8))
-		return 100;
+		return FIFID_SIGN;
 
 	return 0;
 }
 
-bool g64_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool g64_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint64_t size;
 	if (io.length(size))
@@ -118,7 +118,7 @@ int g64_format::generate_bitstream(int track, int head, int speed_zone, std::vec
 	return ((actual_cell_size >= cell_size-10) && (actual_cell_size <= cell_size+10)) ? speed_zone : -1;
 }
 
-bool g64_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool g64_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint8_t const zerofill[] = { 0x00, 0x00, 0x00, 0x00 };
 	std::vector<uint8_t> const prefill(TRACK_LENGTH, 0xff);
@@ -204,4 +204,4 @@ const char *g64_format::extensions() const
 	return "g64,g41,g71";
 }
 
-const floppy_format_type FLOPPY_G64_FORMAT = &floppy_image_format_creator<g64_format>;
+const g64_format FLOPPY_G64_FORMAT;

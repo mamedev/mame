@@ -70,7 +70,6 @@ public:
 		, m_pic8259(*this, "pic8259")
 		, m_screen(*this, "screen")
 		, m_p_videoram(*this, "video")
-		, m_p_chargen(*this, "gfx1")
 	{ }
 
 	void mk98(machine_config &config);
@@ -103,7 +102,6 @@ private:
 	void mk98_map(address_map &map);
 
 	required_shared_ptr<u8> m_p_videoram;
-	required_region_ptr<u8> m_p_chargen;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -119,6 +117,7 @@ private:
 	uint8_t m_scancode = 0;
 	uint8_t m_kbdflag = 0;
 	int m_kbit = 0;
+	u8 m_p_chargen[0x800] = { };
 };
 
 
@@ -382,7 +381,7 @@ uint8_t mk98_state::video_r(offs_t offset)
 	case 5:
 		return video_register_r();
 	}
-	
+
 	return 0xff;
 }
 
@@ -391,7 +390,8 @@ void mk98_state::video_w(offs_t offset, uint8_t data)
 	switch (offset)
 	{
 	case 2:
-		if (++m_font_upload > 63)
+		m_font_upload++;
+		if ((m_font_upload > 63) && (m_font_upload < 0x840))
 			m_p_chargen[m_font_upload - 64] = data;
 		break;
 
@@ -418,16 +418,16 @@ void mk98_state::mk98_map(address_map &map)
 void mk98_state::mk98_io(address_map &map)
 {
 	map.unmap_value_low();
-//	map(0x0000, 0x000f).unmaprw();
+//  map(0x0000, 0x000f).unmaprw();
 	map(0x0020, 0x002f).rw(m_pic8259, FUNC(mk98pic_device::read), FUNC(mk98pic_device::write));
 	map(0x0040, 0x004f).rw("pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
 	map(0x0060, 0x0063).rw(FUNC(mk98_state::keyboard_r), FUNC(mk98_state::keyboard_w));
-//	unidentified devices
-//	map(0x00a0, 0x00a1).unmapw();
-//	map(0x0110, 0x0111).unmapw();
-//	map(0x0112, 0x0113).unmaprw();
-//	map(0x0150, 0x0150).unmapw(); -- cart slot select
-//	map(0x0170, 0x0170).unmapw();
+//  unidentified devices
+//  map(0x00a0, 0x00a1).unmapw();
+//  map(0x0110, 0x0111).unmapw();
+//  map(0x0112, 0x0113).unmaprw();
+//  map(0x0150, 0x0150).unmapw(); -- cart slot select
+//  map(0x0170, 0x0170).unmapw();
 	map(0x03d0, 0x03df).rw(FUNC(mk98_state::video_r), FUNC(mk98_state::video_w));
 	map(0x03f8, 0x03fe).rw("uart0", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
 	map(0x03ff, 0x03ff).rw(FUNC(mk98_state::serial_r), FUNC(mk98_state::serial_w));
@@ -477,8 +477,6 @@ void mk98_state::mk98(machine_config &config)
 ROM_START( mk98 )
 	ROM_REGION(0x20000, "romdos", 0)
 	ROM_LOAD("e0000.bin", 0, 0x20000, CRC(85785bd5) SHA1(b10811715f44cf8e2b41baea7b62a35082e04048))
-
-	ROM_REGION(0x800, "gfx1", ROMREGION_ERASE00)
 ROM_END
 
 

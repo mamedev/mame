@@ -328,7 +328,6 @@ field:      X address   D           Function    Y address   D (part 2)
 #include "emu.h"
 #include "apexc.h"
 #include "apexcdsm.h"
-#include "debugger.h"
 
 
 DEFINE_DEVICE_TYPE(APEXC, apexc_cpu_device, "apexc_cpu", "APE(X)C")

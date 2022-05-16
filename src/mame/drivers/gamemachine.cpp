@@ -95,10 +95,10 @@ Grand Prix:
 #include "emu.h"
 
 #include "cpu/f8/f8.h"
-#include "video/pwm.h"
 #include "machine/f3853.h"
 #include "machine/netlist.h"
 #include "sound/spkrdev.h"
+#include "video/pwm.h"
 
 #include "speaker.h"
 

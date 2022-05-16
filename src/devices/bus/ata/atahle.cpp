@@ -94,6 +94,7 @@ void ata_hle_device::device_start()
 	save_item(NAME(m_command));
 	save_item(NAME(m_device_control));
 	save_item(NAME(m_revert_to_defaults));
+	save_item(NAME(m_8bit_data_transfers));
 
 	save_item(NAME(m_single_device));
 	save_item(NAME(m_resetting));

@@ -57,23 +57,23 @@ protected:
 	required_device<asic65_device> m_asic65;
 	optional_device<adc0808_device> m_adc;
 
-	uint16_t          m_playfield_base;
+	uint16_t          m_playfield_base = 0;
 
-	uint16_t          m_current_control;
-	uint8_t           m_playfield_tile_bank;
-	uint8_t           m_playfield_color_bank;
-	uint16_t          m_playfield_xscroll;
-	uint16_t          m_playfield_yscroll;
+	uint16_t          m_current_control = 0;
+	uint8_t           m_playfield_tile_bank = 0;
+	uint8_t           m_playfield_color_bank = 0;
+	uint16_t          m_playfield_xscroll = 0;
+	uint16_t          m_playfield_yscroll = 0;
 
 	required_shared_ptr<uint16_t> m_mo_command;
 
-	int             m_sloop_bank;
-	int             m_sloop_next_bank;
-	int             m_sloop_offset;
-	int             m_sloop_state;
-	uint16_t *        m_sloop_base;
+	int             m_sloop_bank = 0;
+	int             m_sloop_next_bank = 0;
+	int             m_sloop_offset = 0;
+	int             m_sloop_state = 0;
+	uint16_t *        m_sloop_base = nullptr;
 
-	uint32_t          m_last_accesses[8];
+	uint32_t          m_last_accesses[8]{};
 };
 
 class atarig42_0x200_state : public atarig42_state

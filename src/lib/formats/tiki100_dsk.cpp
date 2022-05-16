@@ -114,4 +114,4 @@ const tiki100_format::format tiki100_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_TIKI100_FORMAT = &floppy_image_format_creator<tiki100_format>;
+const tiki100_format FLOPPY_TIKI100_FORMAT;

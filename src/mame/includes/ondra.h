@@ -48,9 +48,9 @@ private:
 
 	void update_banks();
 
-	bool m_video_enable;
-	u8 m_bank_status;
-	u8 m_bank_old;
+	bool m_video_enable = false;
+	u8 m_bank_status = 0;
+	u8 m_bank_old = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;

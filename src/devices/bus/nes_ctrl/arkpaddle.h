@@ -27,22 +27,19 @@ public:
 	// construction/destruction
 	nes_vaus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual u8 read_bit34() override;
+	virtual void write(u8 data) override;
 
 protected:
 	nes_vaus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
-
-	virtual u8 read_bit34() override;
-	virtual void write(u8 data) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	required_ioport m_paddle;
 	required_ioport m_button;
-	u8 m_start_conv;
-	u8 m_latch;
+	u16 m_latch;
 };
 
 
@@ -54,13 +51,13 @@ public:
 	// construction/destruction
 	nes_vausfc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-protected:
-	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-
 	virtual u8 read_bit34() override { return 0; }
 	virtual u8 read_exp(offs_t offset) override;
 	virtual void write(u8 data) override;
+
+protected:
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<nes_control_port_device> m_daisychain;

@@ -73,19 +73,19 @@ protected:
 	u16 m_legion_cmd[4]; // legionjb only!
 
 	// video-related
-	tilemap_t  *m_bg_tilemap;
-	tilemap_t  *m_fg_tilemap;
-	tilemap_t  *m_tx_tilemap;
-	u16   m_scroll_msb;
-	u16   m_vreg;
-	u16   m_fg_scrollx;
-	u16   m_fg_scrolly;
-	u16   m_bg_scrollx;
-	u16   m_bg_scrolly;
-	int   m_scroll_type;
-	int   m_sprite_offy;
-	int   m_old_mcu_mode;
-	int   m_waiting_msb;
+	tilemap_t  *m_bg_tilemap = nullptr;
+	tilemap_t  *m_fg_tilemap = nullptr;
+	tilemap_t  *m_tx_tilemap = nullptr;
+	u16   m_scroll_msb = 0;
+	u16   m_vreg = 0;
+	u16   m_fg_scrollx = 0;
+	u16   m_fg_scrolly = 0;
+	u16   m_bg_scrollx = 0;
+	u16   m_bg_scrolly = 0;
+	int   m_scroll_type = 0;
+	int   m_sprite_offy = 0;
+	int   m_old_mcu_mode = 0;
+	int   m_waiting_msb = 0;
 
 	// read/write handlers
 	void terraf_io_w(offs_t offset, u16 data, u16 mem_mask);

@@ -62,6 +62,7 @@ private:
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(bestbest);
 	DECLARE_MACHINE_START(bssoccer);
+	DECLARE_MACHINE_START(sunaq);
 	DECLARE_MACHINE_START(uballoon);
 	DECLARE_MACHINE_RESET(uballoon);
 
@@ -103,6 +104,6 @@ private:
 	output_finder<4> m_leds;
 
 	std::unique_ptr<uint16_t[]> m_paletteram;
-	int m_color_bank;
-	uint8_t m_prot;
+	int m_color_bank = 0;
+	uint8_t m_prot = 0;
 };

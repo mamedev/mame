@@ -92,20 +92,20 @@ protected:
 	void sgyxz_sound_map(address_map &map);
 
 	/* sound hw */
-	int m_sample_buffer1;
-	int m_sample_buffer2;
-	int m_sample_select1;
-	int m_sample_select2;
+	int m_sample_buffer1 = 0;
+	int m_sample_buffer2 = 0;
+	int m_sample_select1 = 0;
+	int m_sample_select2 = 0;
 
 	/* video config */
-	uint8_t m_layer_enable_reg;
-	uint8_t m_layer_mask_reg[4];
-	int     m_layer_scroll1x_offset;
-	int     m_layer_scroll2x_offset;
-	int     m_layer_scroll3x_offset;
-	int     m_sprite_base;
-	int     m_sprite_list_end_marker;
-	int     m_sprite_x_offset;
+	uint8_t m_layer_enable_reg = 0;
+	uint8_t m_layer_mask_reg[4] = {};
+	int     m_layer_scroll1x_offset = 0;
+	int     m_layer_scroll2x_offset = 0;
+	int     m_layer_scroll3x_offset = 0;
+	int     m_sprite_base = 0;
+	int     m_sprite_list_end_marker = 0;
+	int     m_sprite_x_offset = 0;
 	std::unique_ptr<uint16_t[]> m_bootleg_sprite_ram;
 	std::unique_ptr<uint16_t[]> m_bootleg_work_ram;
 

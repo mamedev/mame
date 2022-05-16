@@ -328,7 +328,7 @@ void mkit09a_state::mkit09a(machine_config &config)
 	m_pia->readpb_handler().set(FUNC(mkit09a_state::pb_r));
 	m_pia->writepa_handler().set(FUNC(mkit09a_state::pa_w));
 	m_pia->writepb_handler().set(FUNC(mkit09a_state::pb_w));
-	m_pia->cb2_handler().set([] (bool state) { });  // stop errorlog filling up - is it a keyclick?
+	m_pia->cb2_handler().set_nop(); // stop errorlog filling up - is it a keyclick?
 	m_pia->irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 	m_pia->irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 

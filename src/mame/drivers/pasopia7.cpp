@@ -137,7 +137,7 @@ private:
 	uint8_t m_nmi_reset = 0;
 	uint8_t m_screen_type = 0;
 	void pasopia_nmi_trap();
-	uint8_t m_mux_data;
+	uint8_t m_mux_data = 0;
 	u8 m_porta_2 = 0;
 	bool m_spr_sw = false;
 	emu_timer *m_pio_timer = nullptr;

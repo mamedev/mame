@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="roland_tnsc1" description="Roland TN-SC1 Music Style Cards">
+<!--
+    Known cards:
+      Dumped Serial    Type             Name               Contents
+          No TN-SC1-01 Music Style Card Country            Bluegrass, Tex / Mex, Country Waltz, Country Rock
+         Yes TN-SC1-02 Music Style Card 50's and 60's      M'Town, Rock 'n' Roll 2, Mexican Rock, Slow Soul
+         Yes TN-SC1-03 Music Style Card 70's and 80's      Euro Pop, Rap, Funk 3, Big Rock
+          No TN-SC1-04 Music Style Card Around the World   March 2, Waltz 2, Polka 2, Foxtrot
+         Yes TN-SC1-05 Music Style Card Around the World 2 Calypso, Reggae 2, Ska, Caribbean
+         Yes TN-SC1-06 Music Style Card Piano Bar          Slow Waltz, Standard, Ballad 2, Ballad 3
+         Yes TN-SC1-07 Music Style Card Latin              Samba 2, Mambo, Beguine, Paso Doble
+          No TN-SC1-08 Music Style Card Enka               Enka 1, Enka 2, Enka 3, Enka 4
+          No TN-SC1-09 Music Style Card Japanese Pops      Japanese Pop 1, Japaneses Pop 2, Japanese Pop 3, Japanese Pop 4
+          No TN-SC1-10 Music Style Card Easy Eight         Swing 2, 8 Beat 3, 16 Beat 3, Disco 3, Waltz 4, 2 Beat, Latin Beat, Slow Rock 2
+          No TN-SC1-11 Music Style Card Dance 1            Slow Waltz 2, Slow Rock 3, Tango 2, Beguine 2
+          No TN-SC1-12 Music Style Card Dance 2            Bossanova 2, Samba 3, Lambada, Son
+          No TN-SC1-13 Music Style Card Dance 3            Boogie 2, Rock 'n' Roll 3, Shuffle 2, Rag Time
+          No TN-SC1-14 Music Style Card Dance 4            16 Beat 4, Blues, Slow Swing, Slow Soul 2
+-->
+
+	<software name="tnsc102" supported="no">
+		<!--
+		    1. M'Town
+		    2. Rock 'n' Roll 2
+		    3. Mexican Rock
+		    4. Slow Soul
+		-->
+		<description>50's and 60's (TN-SC1-02)</description>
+		<year>19??</year>
+		<publisher>Roland</publisher>
+		<part name="cart" interface="roland_tnsc1">
+			<dataarea name="rom" size="0x8000">
+				<rom name="rolandtnsc102.bin" size="0x8000" crc="d6169516" sha1="3fe56446d3ccd43a7165f34c0b0f3e8909f576fd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tnsc103" supported="no">
+		<!--
+		    1. Euro Pop
+		    2. Rap
+		    3. Funk 3
+		    4. Big Rock
+		-->
+		<description>70's and 80's (TN-SC1-03)</description>
+		<year>19??</year>
+		<publisher>Roland</publisher>
+		<part name="cart" interface="roland_tnsc1">
+			<dataarea name="rom" size="0x8000">
+				<rom name="rolandtnsc103.bin" size="0x8000" crc="856b233b" sha1="b01dec3807d9e98085e5849fce897d13ff4556ff"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tnsc105" supported="no">
+		<!--
+		    1. Calypso
+		    2. Reggae 2
+		    3. Ska
+		    4. Caribbean
+		-->
+		<description>Around the World 2 (TN-SC1-05)</description>
+		<year>19??</year>
+		<publisher>Roland</publisher>
+		<part name="cart" interface="roland_tnsc1">
+			<dataarea name="rom" size="0x8000">
+				<rom name="rolandtnsc105.bin" size="0x8000" crc="2cab6491" sha1="5d6cf11097919c2f636e86a1f182cdbf00be6abf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tnsc106" supported="no">
+		<!--
+		    1. Slow Waltz
+		    2. Standard
+		    3. Ballad 2
+		    4. Ballad 3
+		-->
+		<description>Piano Bar (TN-SC1-06)</description>
+		<year>19??</year>
+		<publisher>Roland</publisher>
+		<part name="cart" interface="roland_tnsc1">
+			<dataarea name="rom" size="0x8000">
+				<rom name="rolandtnsc106.bin" size="0x8000" crc="55745bfc" sha1="badd297924a150e310cc8dc26d46126136e4a052"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tnsc107" supported="no">
+		<!--
+		    1. Samba 2
+		    2. Mambo
+		    3. Beguine
+		    4. Paso Doble
+		-->
+		<description>Latin (TN-SC1-07)</description>
+		<year>19??</year>
+		<publisher>Roland</publisher>
+		<part name="cart" interface="roland_tnsc1">
+			<dataarea name="rom" size="0x8000">
+				<rom name="rolandtnsc107.bin" size="0x8000" crc="3da7d8f7" sha1="20a8f4a39a897135906fb20ef601dee3fafee1fe"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

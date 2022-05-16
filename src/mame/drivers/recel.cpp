@@ -95,7 +95,7 @@ private:
 	u8 m_strobe = 0U;
 	u16 m_nvram_addr = 0U;
 	u8 m_nvram_data = 0U;
-	bool m_nvram_prev_clk = 0;
+	bool m_nvram_prev_clk = false;
 	u8 m_prom_addr = 0U;
 };
 
@@ -507,17 +507,17 @@ ROM_END
 
 GAME(1977,  recel,       0,       recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Recel Bios",       MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING)
 
-GAME(1978,  r_alaska,    recel,   recel, recel,     recel_state, empty_init, ROT0, "Interflip", "Alaska",           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1978,  r_hotcold,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Inder",     "Hot & Cold",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1978,  r_screech,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Inder",     "Screech",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1978,  r_mrevil,    recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Mr Evil",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1978,  r_torneo,    recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Torneo",           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1978,  r_crzyrace,  recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Crazy Race",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1978,  r_fairfght,  recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Fair Fight",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1978,  r_pokrplus,  recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Poker Plus",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1979,  r_mrdoom,    recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Mr Doom",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1979,  r_cavalier,  recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Cavalier",         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1979,  r_swash,     recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Swashbuckler",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1979,  r_quijote,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Don Quijote",      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  r_flipper,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "The Flipper Game", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  r_blackm4,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Black Magic 4",    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1978,  r_alaska,    recel,   recel, recel,     recel_state, empty_init, ROT0, "Interflip", "Alaska",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_hotcold,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Inder",     "Hot & Cold",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_screech,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Inder",     "Screech",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_mrevil,    recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Mr Evil",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_torneo,    recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Torneo",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_crzyrace,  recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Crazy Race",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_fairfght,  recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Fair Fight",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  r_pokrplus,  recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Poker Plus",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  r_mrdoom,    recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Mr Doom",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  r_cavalier,  recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Cavalier",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  r_swash,     recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Swashbuckler",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  r_quijote,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Don Quijote",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  r_flipper,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "The Flipper Game", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  r_blackm4,   recel,   recel, recel,     recel_state, empty_init, ROT0, "Recel",     "Black Magic 4",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

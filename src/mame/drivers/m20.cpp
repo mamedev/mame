@@ -114,8 +114,8 @@ private:
 	void m20_io(address_map &map);
 	void m20_program_mem(address_map &map);
 
-	offs_t m_memsize;
-	uint8_t m_port21;
+	offs_t m_memsize = 0;
+	uint8_t m_port21 = 0;
 	void install_memory();
 
 	static void floppy_formats(format_registration &fr);

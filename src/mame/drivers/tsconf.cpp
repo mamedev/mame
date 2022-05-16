@@ -185,7 +185,7 @@ GFXDECODE_END
 void tsconf_state::video_start()
 {
 	spectrum_128_state::video_start();
-	m_scanline_timer->reset();
+	m_contention_pattern = {}; // disable inherited contention
 
 	m_ts_tilemap[TM_TS_CHAR] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsconf_state::get_tile_info_txt)), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 

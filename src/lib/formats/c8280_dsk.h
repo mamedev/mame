@@ -27,6 +27,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_C8280_FORMAT;
+extern const c8280_format FLOPPY_C8280_FORMAT;
 
 #endif // MAME_FORMATS_C8280_DSK_H

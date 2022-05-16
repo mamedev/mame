@@ -14,7 +14,6 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "score.h"
 #include "scoredsm.h"
 

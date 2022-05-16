@@ -435,8 +435,26 @@ DEVICE_IMAGE_LOAD_MEMBER( mtx_state::rompak_load )
 // more data from tape. todo: tapes which autorun after loading
 SNAPSHOT_LOAD_MEMBER(mtx_state::snapshot_cb)
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-	uint8_t *data = (uint8_t*)image.ptr();
+	uint64_t length = image.length();
+
+	if (length < 18)
+	{
+		image.seterror(image_error::INVALIDIMAGE, "File too short");
+		return image_init_result::FAIL;
+	}
+
+	if (length >= 0x10000 - 0x4000 + 18)
+	{
+		image.seterror(image_error::INVALIDIMAGE, "File too long");
+		return image_init_result::FAIL;
+	}
+
+	auto data = std::make_unique<uint8_t []>(length);
+	if (image.fread(data.get(), length) != length)
+	{
+		image.seterror(image_error::UNSPECIFIED, "Error reading file");
+		return image_init_result::FAIL;
+	}
 
 	// verify first byte
 	if (data[0] != 0xff)
@@ -451,11 +469,13 @@ SNAPSHOT_LOAD_MEMBER(mtx_state::snapshot_cb)
 	tape_name[15] = '\0';
 	image.message("Loading '%s'", tape_name);
 
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+
 	// reset memory map
 	bankswitch(0);
 
 	// start of system variables area
-	uint16_t system_variables_base = pick_integer_le(data, 16, 2);
+	uint16_t system_variables_base = pick_integer_le(data.get(), 16, 2);
 
 	// write system variables
 	uint16_t system_variables_size = 0;
@@ -483,19 +503,31 @@ SNAPSHOT_LOAD_MEMBER(mtx_state::snapshot_cb)
 
 QUICKLOAD_LOAD_MEMBER(mtx_state::quickload_cb)
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-	uint8_t *data = (uint8_t*)image.ptr();
+	uint64_t length = image.length();
 
-	if (image.length() < 4)
+	if (length < 4)
 	{
 		image.seterror(image_error::INVALIDIMAGE, "File too short");
 		return image_init_result::FAIL;
 	}
 
-	uint16_t code_base = pick_integer_le(data, 0, 2);
-	uint16_t code_length = pick_integer_le(data, 2, 2);
+	if (length >= 0x10000 - 0x4000 + 4)
+	{
+		image.seterror(image_error::INVALIDIMAGE, "File too long");
+		return image_init_result::FAIL;
+	}
 
-	if (image.length() < code_length)
+	auto data = std::make_unique<uint8_t []>(length);
+	if (image.fread(data.get(), length) != length)
+	{
+		image.seterror(image_error::UNSPECIFIED, "Error reading file");
+		return image_init_result::FAIL;
+	}
+
+	uint16_t code_base = pick_integer_le(data.get(), 0, 2);
+	uint16_t code_length = pick_integer_le(data.get(), 2, 2);
+
+	if (length < code_length)
 	{
 		image.seterror(image_error::INVALIDIMAGE, "File too short");
 		return image_init_result::FAIL;
@@ -511,6 +543,7 @@ QUICKLOAD_LOAD_MEMBER(mtx_state::quickload_cb)
 	bankswitch(0);
 
 	// write image data
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 	for (int i = 0; i < code_length; i++)
 		program.write_byte(code_base + i, data[4 + i]);
 

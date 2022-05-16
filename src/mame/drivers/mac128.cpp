@@ -240,8 +240,8 @@ private:
 
 	floppy_image_device *m_cur_floppy;
 	int m_hdsel, m_devsel;
-	int m_pwm_count_total, m_pwm_count_1;
-	float m_pwm_current_rpm[2];
+	int m_pwm_count_total = 0, m_pwm_count_1 = 0;
+	float m_pwm_current_rpm[2]{};
 
 	void phases_w(uint8_t phases);
 	void devsel_w(uint8_t devsel);
@@ -249,30 +249,30 @@ private:
 	void snd_push(uint8_t data);
 	void pwm_push(uint8_t data);
 
-	uint32_t m_overlay;
+	uint32_t m_overlay = 0;
 
-	int m_irq_count, m_ca2_data;
-	uint8_t m_mouse_bit[2], m_mouse_last[2];
-	int16_t m_mouse_last_m[2], m_mouse_count[2];
-	int m_screen_buffer;
-	emu_timer *m_scan_timer;
-	emu_timer *m_hblank_timer;
+	int m_irq_count = 0, m_ca2_data = 0;
+	uint8_t m_mouse_bit[2]{}, m_mouse_last[2]{};
+	int16_t m_mouse_last_m[2]{}, m_mouse_count[2]{};
+	int m_screen_buffer = 0;
+	emu_timer *m_scan_timer = nullptr;
+	emu_timer *m_hblank_timer = nullptr;
 
 	// interrupts
-	int m_scc_interrupt, m_via_interrupt, m_scsi_interrupt, m_last_taken_interrupt;
+	int m_scc_interrupt = 0, m_via_interrupt = 0, m_scsi_interrupt = 0, m_last_taken_interrupt = 0;
 
 	// DRQ
-	int m_scsi_drq;
+	int m_scsi_drq = 0;
 
 	// wait states for accessing the VIA
-	bool m_snd_enable;
-	bool m_main_buffer;
-	int m_snd_vol;
-	int m_adb_irq_pending;
-	int m_drive_select;
-	int m_scsiirq_enable;
-	u16 *m_ram_ptr, *m_rom_ptr;
-	u32 m_ram_mask, m_ram_size;
+	bool m_snd_enable = false;
+	bool m_main_buffer = false;
+	int m_snd_vol = 0;
+	int m_adb_irq_pending = 0;
+	int m_drive_select = 0;
+	int m_scsiirq_enable = 0;
+	u16 *m_ram_ptr = nullptr, *m_rom_ptr = nullptr;
+	u32 m_ram_mask = 0, m_ram_size = 0;
 };
 
 void mac128_state::machine_start()

@@ -118,7 +118,10 @@ private:
 		}
 
 		if (offset & 1)
+		{
 			offset |= 0x100000;
+			offset &= ~1;
+		}
 
 		return m_k056832->piratesh_rom_r(offset);
 	}
@@ -142,7 +145,7 @@ private:
 	static constexpr int NUM_LAYERS = 4;
 
 
-	u8 m_control, m_control2;
+	u8 m_control = 0, m_control2 = 0;
 };
 
 class konmedal68k_slot_state : public konmedal68k_state

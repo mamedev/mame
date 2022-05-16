@@ -2223,7 +2223,7 @@ static INPUT_PORTS_START( alphahob )
 	PORT_DIPNAME( 0x04, 0x00, "Missile Bonus Life" )      PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, "10k" )
 	PORT_DIPSETTING(    0x04, "15k" )
-	
+
 	PORT_MODIFY("IN3")
 	PORT_DIPNAME( 0x04, 0x00, "Missile Final UFO Bonus" ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
@@ -3212,7 +3212,7 @@ ROM_START( headonn )
 	ROM_LOAD( "prom.g2", 0x0000, 0x0020, CRC(67104ea9) SHA1(26b6bd2a1973b83bb9af4e3385d8cb14cb3f62f2) )
 
 	ROM_REGION( 0x0040, "user1", 0 )    /* timing PROMs */
-	ROM_LOAD( "prom.b6", 0x0000, 0x0020, CRC(67104ea9) SHA1(26b6bd2a1973b83bb9af4e3385d8cb14cb3f62f2) )    /* control PROM */
+	ROM_LOAD( "prom.b6", 0x0000, 0x0020, CRC(7e1cb76b) SHA1(3366ead65d49cab076ccdafbb13726c7e05f8b9a) )    /* control PROM */
 	ROM_LOAD( "prom.f2", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )    /* sequence PROM */
 ROM_END
 

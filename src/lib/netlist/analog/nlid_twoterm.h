@@ -44,9 +44,7 @@
 // Implementation
 // -----------------------------------------------------------------------------
 
-namespace netlist
-{
-namespace analog
+namespace netlist::analog
 {
 
 	// -----------------------------------------------------------------------------
@@ -687,7 +685,6 @@ namespace analog
 		std::vector<nl_fptype> m_funcparam;
 	};
 
-} // namespace analog
-} // namespace netlist
+} // namespace netlist::analog
 
 #endif // NLD_TWOTERM_H_

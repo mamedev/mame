@@ -54,4 +54,4 @@ const itt3030_format::format itt3030_format::formats[] = {
 
 
 
-const floppy_format_type FLOPPY_ITT3030_FORMAT = &floppy_image_format_creator<itt3030_format>;
+const itt3030_format FLOPPY_ITT3030_FORMAT;

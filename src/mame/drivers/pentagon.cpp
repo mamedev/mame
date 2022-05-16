@@ -118,13 +118,12 @@ void pentagon_state::pentagon_scr2_w(offs_t offset, uint8_t data)
 
 rectangle pentagon_state::get_screen_area()
 {
-	//TODO Possible because of incorrect z80 we have to adjust x+1 to make AccrossTheEdge look nicer
-	return rectangle{137, 137 + 255, 80, 80 + 191};
+	return rectangle{136, 136 + 255, 80, 80 + 191};
 }
 
 INTERRUPT_GEN_MEMBER(pentagon_state::pentagon_interrupt)
 {
-	timer_set(m_screen->time_until_pos(0) - m_maincpu->clocks_to_attotime(1), TIMER_IRQ_ON, 0);
+	timer_set(m_screen->time_until_pos(0) + /*???*/ m_maincpu->clocks_to_attotime(3), TIMER_IRQ_ON, 0);
 }
 
 uint8_t pentagon_state::beta_neutral_r(offs_t offset)
@@ -218,8 +217,8 @@ void pentagon_state::machine_reset()
 
 void pentagon_state::video_start()
 {
-	m_frame_invert_count = 16;
-	m_screen_location = m_ram->pointer() + (5 << 14);
+	spectrum_128_state::video_start();
+	m_contention_pattern = {};
 }
 
 static const gfx_layout spectrum_charlayout =

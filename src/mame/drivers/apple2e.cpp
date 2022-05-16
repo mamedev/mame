@@ -1060,6 +1060,7 @@ void apple2e_state::machine_start()
 		m_next_strobe = 1U;
 	}
 
+	m_joystick_x1_time = m_joystick_x2_time = m_joystick_y1_time = m_joystick_y2_time = 0;
 
 	// setup save states
 	save_item(NAME(m_speaker_state));
@@ -2320,6 +2321,7 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 				else if (m_accel_unlocked)
 				{
 					// disable acceleration
+					m_accel_fast = false;
 					accel_normal_speed();
 				}
 			}
@@ -2328,6 +2330,7 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 		case 0x5b: // Zip full speed
 			if (m_accel_unlocked)
 			{
+				m_accel_fast = true;
 				accel_full_speed();
 			}
 			break;
@@ -2343,6 +2346,10 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 			if (m_accel_unlocked)
 			{
 				m_accel_gameio = data;
+			}
+			else
+			{
+				do_io(offset, false);
 			}
 			break;
 

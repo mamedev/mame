@@ -29,6 +29,8 @@ inline void tc2048_state::spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y
 /* Update FLASH status for ts2068. Assumes flash update every 1/2s. */
 void ts2068_state::video_start()
 {
+	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
+
 	m_frame_invert_count = 30;
 	m_screen_location = m_video_ram;
 }
@@ -59,18 +61,16 @@ void ts2068_state::video_start()
 /* Draw a scanline in TS2068/TC2048 hires mode (code modified from COUPE.C) */
 void tc2048_state::hires_scanline(bitmap_ind16 &bitmap, int y, int borderlines)
 {
-	int x,b,scrx,scry;
-	unsigned short ink,pap;
-	unsigned char *attr, *scr;
+	u8 ink, pap;
 	bool invert_attrs = u64(m_screen->frame_number() / m_frame_invert_count) & 1;
 
-	scrx=TS2068_LEFT_BORDER;
-	scry=((y&7) * 8) + ((y&0x38)>>3) + (y&0xC0);
+	int scrx=TS2068_LEFT_BORDER;
+	int scry=((y&7) * 8) + ((y&0x38)>>3) + (y&0xC0);
 
-	scr=m_ram->pointer() + y*32;
-	attr=scr + 0x2000;
+	u8 *scr=m_ram->pointer() + y*32;
+	u8 *attr=scr + 0x2000;
 
-	for (x=0;x<32;x++)
+	for (int x=0;x<32;x++)
 	{
 		/* Get ink and paper colour with bright */
 		if (invert_attrs && (*attr & 0x80))
@@ -84,7 +84,7 @@ void tc2048_state::hires_scanline(bitmap_ind16 &bitmap, int y, int borderlines)
 			pap=((*attr)>>3) & 0x0f;
 		}
 
-		for (b=0x80;b!=0;b>>=1)
+		for (int b=0x80;b!=0;b>>=1)
 		{
 			if (*scr&b)
 			{

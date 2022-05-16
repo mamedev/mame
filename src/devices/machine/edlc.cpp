@@ -39,7 +39,7 @@ static const u8 ETH_BROADCAST[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 
 seeq8003_device::seeq8003_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_network_interface(mconfig, *this, 10.0f)
+	, device_network_interface(mconfig, *this, 10)
 	, m_out_int(*this)
 	, m_out_rxrdy(*this)
 	, m_out_txrdy(*this)

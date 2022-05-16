@@ -130,8 +130,8 @@ protected:
 	// PIC
 	optional_device<pic16c5x_device> m_pic;
 
-	u8 m_pic_iobits, m_pic_data, m_pic_data_rdy, m_pic_data_bit, m_pic_data_clk;
-	u8 m_pic_clk_mask, m_pic_in_mask, m_pic_out_mask, m_pic_dis_mask;
+	u8 m_pic_iobits = 0, m_pic_data = 0, m_pic_data_rdy = 0, m_pic_data_bit = 0, m_pic_data_clk = 0;
+	u8 m_pic_clk_mask = 0, m_pic_in_mask = 0, m_pic_out_mask = 0, m_pic_dis_mask = 0;
 
 	void log_cart_comm(const char *text, u8 data);
 	void pic_comm_reset();
@@ -278,7 +278,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	address_space_config m_space_config;
-	address_space *m_space;
+	address_space *m_space = nullptr;
 
 	required_shared_ptr<u16> m_ram;
 
@@ -292,10 +292,10 @@ protected:
 	void set_cart(int cart);
 	void reset_eeproms_except(int cart);
 
-	galgames_cart_device *m_carts[1+4];
+	galgames_cart_device *m_carts[1+4]{};
 
-	u8 m_cart;
-	bool m_is_ram_active;
+	u8 m_cart = 0;
+	bool m_is_ram_active = false;
 };
 
 device_memory_interface::space_config_vector galgames_slot_device::memory_space_config() const
@@ -773,9 +773,9 @@ protected:
 	required_device<galgames_slot_device> m_slot;
 	required_shared_ptr<u8> m_okiram;
 
-	u8 m_palette_offset;
-	u8 m_palette_index;
-	u8 m_palette_data[3];
+	u8 m_palette_offset = 0;
+	u8 m_palette_index = 0;
+	u8 m_palette_data[3]{};
 };
 
 WRITE_LINE_MEMBER(galgames_state::blitter_irq_callback)

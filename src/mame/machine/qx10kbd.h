@@ -28,9 +28,9 @@ protected:
 private:
 	required_ioport_array<16> m_rows;
 	required_device<cpu_device> m_mcu;
-	emu_timer *m_bit_timer;
-	u8 m_rxd;
-	int m_row, m_clk_state;
+	emu_timer *m_bit_timer = nullptr;
+	u8 m_rxd = 0;
+	int m_row = 0, m_clk_state = 0;
 };
 
 DECLARE_DEVICE_TYPE(QX10_KEYBOARD, qx10_keyboard_device)

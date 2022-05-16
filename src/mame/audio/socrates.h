@@ -28,14 +28,14 @@ private:
 	static const uint8_t s_volumeLUT[];
 
 	// internal state
-	sound_stream *  m_stream;
-	uint8_t           m_freq[2];      // channel 1,2 frequencies
-	uint8_t           m_vol[2];       // channel 1,2 volume
-	uint8_t           m_enable[2];    // channel 1,2 enable
-	uint8_t           m_channel3;     // channel 3 weird register
-	uint8_t           m_state[3];     // output states for channels 1,2,3
-	uint8_t           m_accum[3];     // accumulators for channels 1,2,3
-	uint16_t          m_DAC_output;   // output
+	sound_stream *  m_stream = nullptr;
+	uint8_t           m_freq[2]{};      // channel 1,2 frequencies
+	uint8_t           m_vol[2]{};       // channel 1,2 volume
+	uint8_t           m_enable[2]{};    // channel 1,2 enable
+	uint8_t           m_channel3 = 0;   // channel 3 weird register
+	uint8_t           m_state[3]{};     // output states for channels 1,2,3
+	uint8_t           m_accum[3]{};     // accumulators for channels 1,2,3
+	uint16_t          m_DAC_output = 0; // output
 };
 
 DECLARE_DEVICE_TYPE(SOCRATES_SOUND, socrates_snd_device)

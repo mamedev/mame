@@ -265,6 +265,7 @@ public:
 	void a800pal(machine_config &config);
 	void a400pal(machine_config &config);
 	void a5200(machine_config &config);
+	void a5200a(machine_config &config);
 	void a800(machine_config &config);
 	void a1200xl(machine_config &config);
 	void a800xlpal(machine_config &config);
@@ -324,7 +325,7 @@ private:
 
 	//required_device<cpu_device> m_maincpu;    // maincpu is already contained in atari_common_state
 	required_device<ram_device> m_ram;
-	required_device<pia6821_device> m_pia;
+	optional_device<pia6821_device> m_pia;
 	optional_device<dac_bit_interface> m_dac;
 	required_memory_region m_region_maincpu;
 	optional_device<a800_cart_slot_device> m_cart;
@@ -643,7 +644,7 @@ void a400_state::a5200_mem(address_map &map)
 	map(0x0000, 0x3fff).ram();
 	map(0x4000, 0xbfff).noprw(); // ROM installed at machine start
 	map(0xc000, 0xcfff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
-	map(0xd400, 0xdfff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
+	map(0xd400, 0xd4ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
 	// 0xe000-0xe7ff - Expansion?
 	map(0xe800, 0xefff).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0xf000, 0xffff).rom();
@@ -954,6 +955,31 @@ static INPUT_PORTS_START( a5200 )
 	PORT_BIT(0xff, 0x72, IPT_AD_STICK_Y) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0x00,0xe4) PORT_PLAYER(4)
 
 INPUT_PORTS_END
+
+
+
+static INPUT_PORTS_START( a5200a )
+	PORT_INCLUDE( a5200 )
+
+	PORT_MODIFY("djoy_b")    /* lower/upper buttons */
+	PORT_BIT(0x04, 0x04, IPT_UNUSED)
+	PORT_BIT(0x08, 0x08, IPT_UNUSED)
+	PORT_BIT(0x40, 0x40, IPT_UNUSED)
+	PORT_BIT(0x80, 0x80, IPT_UNUSED)
+
+	PORT_MODIFY("analog_4")
+	PORT_BIT(0xff, 0x72, IPT_UNUSED)
+
+	PORT_MODIFY("analog_5")
+	PORT_BIT(0xff, 0x72, IPT_UNUSED)
+
+	PORT_MODIFY("analog_6")
+	PORT_BIT(0xff, 0x72, IPT_UNUSED)
+
+	PORT_MODIFY("analog_7")
+	PORT_BIT(0xff, 0x72, IPT_UNUSED)
+INPUT_PORTS_END
+
 /***************************************************************
 Atari 5200 Palette Notes:
 
@@ -2104,19 +2130,6 @@ void a400_state::atari_common_nodac(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(a400_state::a400_palette), std::size(atari_colors) / 3);
 
-	PIA6821(config, m_pia, 0);
-	m_pia->readpa_handler().set_ioport("djoy_0_1");
-	m_pia->readpb_handler().set_ioport("djoy_2_3");
-	m_pia->ca2_handler().set("sio", FUNC(a8sio_device::motor_w));
-	m_pia->cb2_handler().set("fdc", FUNC(atari_fdc_device::pia_cb2_w));
-	m_pia->cb2_handler().append("sio", FUNC(a8sio_device::command_w));
-
-	a8sio_device &sio(A8SIO(config, "sio", nullptr));
-	//sio.clock_in().set("pokey", FUNC(pokey_device::bclk_w));
-	sio.data_in().set("pokey", FUNC(pokey_device::sid_w));
-	sio.proceed().set(m_pia, FUNC(pia6821_device::ca1_w));
-	sio.interrupt().set(m_pia, FUNC(pia6821_device::cb1_w));
-
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	POKEY(config, m_pokey, pokey_device::FREQ_17_EXACT);
@@ -2154,6 +2167,19 @@ void a400_state::atari_common(machine_config &config)
 	m_antic->set_gtia_tag(m_gtia);
 
 	/* devices */
+	PIA6821(config, m_pia, 0);
+	m_pia->readpa_handler().set_ioport("djoy_0_1");
+	m_pia->readpb_handler().set_ioport("djoy_2_3");
+	m_pia->ca2_handler().set("sio", FUNC(a8sio_device::motor_w));
+	m_pia->cb2_handler().set("fdc", FUNC(atari_fdc_device::pia_cb2_w));
+	m_pia->cb2_handler().append("sio", FUNC(a8sio_device::command_w));
+
+	a8sio_device &sio(A8SIO(config, "sio", nullptr));
+	//sio.clock_in().set("pokey", FUNC(pokey_device::bclk_w));
+	sio.data_in().set("pokey", FUNC(pokey_device::sid_w));
+	sio.proceed().set(m_pia, FUNC(pia6821_device::ca1_w));
+	sio.interrupt().set(m_pia, FUNC(pia6821_device::cb1_w));
+
 	ATARI_FDC(config, "fdc", 0);
 
 	A800_CART_SLOT(config, "cartleft", a800_left, nullptr);
@@ -2331,7 +2357,7 @@ void a400_state::a5200(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &a400_state::a5200_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(a400_state::a5200_interrupt), "screen", 0, 1);
 
-	// FIXME: should there be anything connected where other system have the fdc?
+	// Not used but exposed via expansion port
 	m_pokey->serin_r().set_constant(0);
 	m_pokey->serout_w().set_nop();
 	m_pokey->set_keyboard_callback(FUNC(a400_state::a5200_keypads));
@@ -2343,10 +2369,6 @@ void a400_state::a5200(machine_config &config)
 
 	ATARI_ANTIC(config, m_antic, 0);
 	m_antic->set_gtia_tag(m_gtia);
-
-	m_pia->readpa_handler().set_constant(0); // FIXME: is there anything connected here
-	m_pia->readpb_handler().set_constant(0); // FIXME: is there anything connected here
-	m_pia->cb2_handler().set_nop(); // FIXME: is there anything connected here
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a5200 )
 
@@ -2360,6 +2382,38 @@ void a400_state::a5200(machine_config &config)
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("16K");
+}
+
+/*
+From Analog Computing Magazine, issue 16 (1984-02):
+  Newer releases of the 5200 incorporate some minor hardware changes.
+  Controller ports 3 and 4 have been eliminated, making POT4 through
+  POT7, TRIG2, TRIG3, and bit 1 of CONSOL useless. A few of the
+  connector pins have been redefined. Pin 2 of the I/O expansion
+  connector now carries POKEY's Audio Out signal. Three pins on the
+  cartridge connector have changed to accomodate the new 2600 adapter.
+  The system clock, 02, is output on pin 14, isolated through a diode.
+  An alternate video input is taken from pin 24 and is also isolated
+  through a diode. Pin 30 provides an alternate audio input.
+
+  There is space on the newer boards for circuitry for a PAL (European
+  TV standard) version of the 5200. Also, on power-up, the monitor
+  program checks for the PAL version by examining the GTIA register PAL
+  after step 2 of the initialization routine. It also checks the
+  cartridge program for PAL compatibility. The byte at $BFE7 should
+  read $02 if compatible, or $00 if not. This is the only important
+  change to the monitor program. There are some additional hardware
+  changes, but none affects the machine's operation from the
+  programmer's view.
+*/
+void a400_state::a5200a(machine_config &config)
+{
+	a5200(config);
+
+	m_pokey->pot_r<4>().set_constant(0);
+	m_pokey->pot_r<5>().set_constant(0);
+	m_pokey->pot_r<6>().set_constant(0);
+	m_pokey->pot_r<7>().set_constant(0);
 }
 
 
@@ -2462,10 +2516,15 @@ ROM_END
 
 ROM_START(a5200)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_SYSTEM_BIOS(0, "default", "a5200")
-	ROMX_LOAD( "5200.rom",  0xf800, 0x0800, CRC(4248d3e3) SHA1(6ad7a1e8c9fad486fbec9498cb48bf5bc3adc530), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS(1, "alt", "a5200 (alt)")
-	ROMX_LOAD( "5200a.rom", 0xf800, 0x0800, CRC(c2ba2613) SHA1(1d2a3f00109d75d2d79fecb565775eb95b7d04d5), ROM_BIOS(1) )
+	ROM_LOAD( "co19156.u8", 0xf800, 0x0800, CRC(4248d3e3) SHA1(6ad7a1e8c9fad486fbec9498cb48bf5bc3adc530) )
+ROM_END
+
+ROM_START(a5200a)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_SYSTEM_BIOS(0, "default", "2-Port")
+	ROMX_LOAD( "co19156a.a8", 0xf800, 0x0800, CRC(c2ba2613) SHA1(1d2a3f00109d75d2d79fecb565775eb95b7d04d5), ROM_BIOS(0) ) // This breaks "K-Razy Shoot-Out", "Mountain King", and "Pitfall!"
+	ROM_SYSTEM_BIOS(1, "4port", "4-Port")
+	ROMX_LOAD( "co19156.u8", 0xf800, 0x0800, CRC(4248d3e3) SHA1(6ad7a1e8c9fad486fbec9498cb48bf5bc3adc530), ROM_BIOS(1) )
 ROM_END
 
 
@@ -2491,3 +2550,4 @@ COMP( 1986, a800xe,  a800xl, 0,      a800xl,    a800xl, a400_state, empty_init, 
 COMP( 1987, xegs,    0,      0,      xegs,      a800xl, a400_state, empty_init, "Atari", "Atari XE Game System", MACHINE_IMPERFECT_GRAPHICS )  // 64k RAM
 
 CONS( 1982, a5200,   0,      0,      a5200,     a5200,  a400_state, empty_init, "Atari", "Atari 5200",           0)
+CONS( 1983, a5200a,  a5200,  0,      a5200a,    a5200a, a400_state, empty_init, "Atari", "Atari 5200 (2-port)",  0)

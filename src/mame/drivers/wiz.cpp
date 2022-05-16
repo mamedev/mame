@@ -1069,6 +1069,33 @@ ROM_START( stinger2 )
 	ROM_LOAD( "stinger.a8",   0x0200, 0x0100, CRC(76b57629) SHA1(836763948753b7fed97c9e5d90a16dc4ba68f42a) )    /* blue component */
 ROM_END
 
+ROM_START( finger ) // AFC 02300 Rev.0 + AFC 03300 Rev.0 PCBs. Only the first three main CPU ROMs differ. Basically just a GFX hack of the stinger2 set.
+	ROM_REGION( 0xc000, "maincpu", 0 )
+	ROM_LOAD( "1.5j",  0x0000, 0x2000, CRC(4949ae39) SHA1(f24a38b5c8a9dbe01c60c93895af8729898bc324) )    // encrypted
+	ROM_LOAD( "2.7j",  0x2000, 0x2000, CRC(7288db11) SHA1(dd657e3912bf0e5e9c5bf840bb696739701800e8) )    // encrypted
+	ROM_LOAD( "3.8j",  0x4000, 0x2000, CRC(386c6207) SHA1(bb23c6f6bb279e39a3931fda3bafc4a6292e58b1) )    // encrypted
+	ROM_LOAD( "4.9j",  0x6000, 0x2000, CRC(230ba682) SHA1(c419ffebd021d41b3f5021948007fb6bcdb1cdf7) )    // encrypted
+	ROM_LOAD( "5.10j", 0x8000, 0x2000, CRC(a03a01da) SHA1(28fecac7a821ac4718242919840266a907160df0) )    // encrypted
+
+	ROM_REGION( 0x2000, "audiocpu", 0 )
+	ROM_LOAD( "6.9f", 0x0000, 0x2000, CRC(79757f0c) SHA1(71be938c32c6a84618763761786ecc5d7d47581a) )
+
+	ROM_REGION( 0x6000,  "gfx1", 0 )    // sprites/chars
+	ROM_LOAD( "7.9e",  0x0000, 0x2000, CRC(775489be) SHA1(5fccede323895626cf2eabd606ed21282aa36356) )
+	ROM_LOAD( "8.11e", 0x2000, 0x2000, CRC(43c61b3f) SHA1(5cdb6a5096b42406c2f2784d37e4e39207c35d40) )
+	ROM_LOAD( "9.14e", 0x4000, 0x2000, CRC(c9ed8fc7) SHA1(259d7681b663adb1c5fe057e2ef08469ddcbd3c3) )
+
+	ROM_REGION( 0x6000,  "gfx2", 0 )    // sprites/chars. Labels were actually all 1 but overwritten with a marker
+	ROM_LOAD( "10.9h",  0x0000, 0x2000, CRC(f6721930) SHA1(fb903f1deb5f093ff5fe129e213966af58a68339) )
+	ROM_LOAD( "11.11h", 0x2000, 0x2000, CRC(a4404e63) SHA1(50ae99748547af20e04f6c6c8c7eba85f967b9dc) )
+	ROM_LOAD( "12.14h", 0x4000, 0x2000, CRC(b60fa88c) SHA1(2d3bca35076625251933989f5e566d5d3290542b) )
+
+	ROM_REGION( 0x0300,  "proms", 0 )
+	ROM_LOAD( "6301.a7", 0x0000, 0x0100, CRC(52c06fc2) SHA1(b416077fcfabe0dbb1ca30752de6a219ea896f75) )    // red component
+	ROM_LOAD( "6301.b7", 0x0100, 0x0100, CRC(9985e575) SHA1(b0d609968917121325760f8d4777066abdb7ccfc) )    // green component
+	ROM_LOAD( "6301.a8", 0x0200, 0x0100, CRC(76b57629) SHA1(836763948753b7fed97c9e5d90a16dc4ba68f42a) )    // blue component
+ROM_END
+
 ROM_START( scion )
 	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "sc1",          0x0000, 0x2000, CRC(8dcad575) SHA1(3f194ece25e730b1cbbf3f332bbdebc3a6a72b0f) )
@@ -1161,6 +1188,7 @@ void wiz_state::init_stinger()
 
 GAME( 1983, stinger,  0,       stinger, stinger,  wiz_state, init_stinger, ROT90,  "Seibu Denshi", "Stinger", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, stinger2, stinger, stinger, stinger2, wiz_state, init_stinger, ROT90,  "Seibu Denshi", "Stinger (prototype?)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, finger,   stinger, stinger, stinger2, wiz_state, init_stinger, ROT90,  "bootleg",      "Finger (bootleg of Stinger)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, scion,    0,       scion,   scion,    wiz_state, empty_init,   ROT0,   "Seibu Denshi", "Scion", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, scionc,   scion,   scion,   scion,    wiz_state, empty_init,   ROT0,   "Seibu Denshi (Cinematronics license)", "Scion (Cinematronics)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, kungfut,  0,       kungfut, kungfut,  wiz_state, empty_init,   ROT0,   "Seibu Kaihatsu", "Kung-Fu Taikun (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_MICROPHONE )

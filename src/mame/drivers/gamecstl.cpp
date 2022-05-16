@@ -1,30 +1,57 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
+// thanks-to: Diego Nappino
 /*
     Cristaltec "Game Cristal" (MAME bootleg)
 
-    Skeleton driver by R. Belmont, based on taitowlf.c by Ville Linde
+    Skeleton driver by R. Belmont, based on taitowlf.cpp by Ville Linde
 
-    Note:
-    - bp 000F16B5 do bx=0x16bb (can't skip this check?)
-
-    Specs: P3-866, SiS 630 graphics card, SiS 7018 sound, Windows 98, DirectX 8.1.
-
-    Input is via a custom COM1 port JAMMA adaptor.
-
-    The custom emulator is a heavily modified version of MAME32.  If you extract the
-    disk image, it's in C:\GH4\GH4.EXE.  It's UPX compressed, so unpack it before doing
-    any forensics.  The emulator does run on Windows as new as XP Pro SP2 but you can't
-    control it due to the lack of the custom input.
+    Notes:
+    - Specs: P3-866, SiS 630 motherboard + integrated graphics card,
+      SiS 7018 sound, Windows 98SE, DirectX 8.1.
+    - Windows image can be booted with m55hipl driver.
+      It will try to install an "unnamed card" (svga_et4k?) then uses its own shell
+      "ialoader.exe" to boot the frontend, located in C:\WINDOWS.
+      It will eventually hang after throwing a "DirectX missing" error, trying to install
+      the ET4K drivers won't work (will BSoD at start of boot sequence).
+    - In order to bypass the shell launcher, you should:
+      1. edit C:\WINDOWS\system.ini and change shell property to explorer.exe
+      2. remove the autoexec.bat contents, it will otherwise copy a bunch of .ini
+         files from C:\dat to C:\WINDOWS, and replacing the system.ini shell launcher.
+    - (gamecstl) Device Manager installed devices:
+      - two Samsung SyncMaster 900SL monitors (?);
+      - SiS 630 display adapter;
+      - Samsung CD-ROM SC-152L;
+      - SiS 5513 Dual PCI IDE Controller;
+      - COM1, COM2, LPT1 enabled;
+      - a QDI USBDisk USB Mass Storage SCSI driver;
+      - a SiS 7001 PCI to USB Open Host Controller + USB root hub x 2;
+    - C:\drvs contains a collection of drivers, mostly the ones described above.
+    - Other parts of Windows are otherwise more or less stock, except for a footprint
+      inside C:\WINDOWS\temp:
+      1. has a Portuguese version of the Intel Processor Identification Utility,
+         most likely used for binding the emulator to the CPU serial via CPUID;
+      2. has u3spwd.exe (USB Flash Disk), likely used to copy the necessary files for
+         making the frontend to work;
+    - Input is via a custom COM1 port JAMMA adaptor.
+    - The custom emulator is a heavily modified version of MAME32. If you extract the
+      disk image, it's in C:\GH4\GH4.EXE. It's UPX compressed, so unpack it before doing
+      any forensics. The emulator does run on Windows as new as XP Pro SP2 but you can't
+      control it due to the lack of the custom input.
+    - C:\GH4\mvs contains movie clips of the emulated games.
+      These are MS-CRAM encoded, 288x208 at 20 fps, stereo MS ADPCM with 11025 Hz sample rate,
+      36 seconds length.
+      Mentioning this because SiS 630 has several HW registers dedicated to video playback,
+      which will be most likely used once we get there.
 
     Updates 27/11/2007 (Diego Nappino):
-    The COM1 port is opened at 19200 bps, No parity, 8 bit data,1 stop bit.
+    The COM1 port is opened at 19200 bps, No parity, 8 bit data, 1 stop bit.
     The protocol is based on a 6 bytes frame with a leading byte valued 0x05 and a trailing one at 0x02
     The four middle bytes are used, in negative logic (0xFF = No button pressed), to implement the inputs.
-    Each bit meaning as follows :
+    Each bit meaning as follows:
 
-               Byte 1         Byte 2          Byte 3        Byte 4
-       Bit 0    P1-Credit      P1-Button C     P2-Left        UNUSED
+             Byte 1         Byte 2          Byte 3        Byte 4
+    Bit 0    P1-Credit      P1-Button C     P2-Left        UNUSED
     Bit 1    P1-Start       P1-Button D     P2-Right       UNUSED
     Bit 2    P1-Down        P1-Button E     P2-Button A    SERVICE
     Bit 3    P1-Up          TEST            P2-Button B    UNUSED
@@ -33,7 +60,8 @@
     Bit 6    P1-Button A    P2-Down         P2-Button E    UNUSED
     Bit 7    P1-Button B    P2-Up           VIDEO-MODE     UNUSED
 
-    The JAMMA adaptor sends a byte frame each time an input changes. So, in example, if the P1-Button A and P1-Button B are both pressed, it will send :
+    The JAMMA adaptor sends a byte frame each time an input changes.
+    So for example, if the P1-Button A and P1-Button B are both pressed, it will send:
 
     0x05 0xFC 0xFF 0xFF 0xFF 0x02
 
@@ -42,8 +70,8 @@
     0x05 0xFF 0xFF 0xFF 0xFF 0x02
 
     CPUID info:
-    Original set:
 
+    Original set:
     CPUID Level:       EAX:           EBX:           ECX:           EDX:
     00000000       00000003       756E6547       6C65746E       49656E69
     00000001       0000068A       00000002       00000000       0387F9FF
@@ -51,7 +79,6 @@
     00000003       00000000       00000000       CA976D2E       000082F6
     80000000       00000000       00000000       CA976D2E       000082F6
     C0000000       00000000       00000000       CA976D2E       000082F6
-
 
     Version 2:
     CPUID Level:       EAX:           EBX:           ECX:           EDX:
@@ -78,10 +105,11 @@ class gamecstl_state : public pcat_base_state
 {
 public:
 	gamecstl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pcat_base_state(mconfig, type, tag),
-		m_cga_ram(*this, "cga_ram"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		: pcat_base_state(mconfig, type, tag)
+		, m_cga_ram(*this, "cga_ram")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		{ }
 
 	void gamecstl(machine_config &config);
 
@@ -412,7 +440,6 @@ void gamecstl_state::machine_reset()
 
 void gamecstl_state::gamecstl(machine_config &config)
 {
-	/* basic machine hardware */
 	PENTIUM3(config, m_maincpu, 200000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gamecstl_state::gamecstl_map);
 	m_maincpu->set_addrmap(AS_IO, &gamecstl_state::gamecstl_io);
@@ -420,6 +447,7 @@ void gamecstl_state::gamecstl(machine_config &config)
 
 	pcat_common(config);
 
+	// TODO: wrong, needs SiS 630 instead
 	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
 	pcibus.set_device(0, FUNC(gamecstl_state::intel82439tx_pci_r), FUNC(gamecstl_state::intel82439tx_pci_w));
 	pcibus.set_device(7, FUNC(gamecstl_state::intel82371ab_pci_r), FUNC(gamecstl_state::intel82371ab_pci_w));
@@ -427,7 +455,6 @@ void gamecstl_state::gamecstl(machine_config &config)
 	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
-	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -455,9 +482,10 @@ ROM_START(gamecstl)
 	ROM_LOAD( "bios.bin",     0x000000, 0x040000, BAD_DUMP CRC(27834ce9) SHA1(134c546dd75138c6f4bc5729b40e20e118454df9) )
 
 	ROM_REGION(0x08100, "gfx1", 0)
-	ROM_LOAD("cga.chr",     0x00000, 0x01000, BAD_DUMP CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
+	ROM_LOAD( "cga.chr",      0x00000, 0x01000, BAD_DUMP CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 
 	DISK_REGION( "ide:0:hdd:image" )
+	// Note: has filled NVRAM directory
 	DISK_IMAGE( "gamecstl", 0, SHA1(b431af3c42c48ba07972d77a3d24e60ee1e4359e) )
 ROM_END
 
@@ -466,7 +494,7 @@ ROM_START(gamecst2)
 	ROM_LOAD( "bios.bin",     0x000000, 0x040000, BAD_DUMP CRC(27834ce9) SHA1(134c546dd75138c6f4bc5729b40e20e118454df9) )
 
 	ROM_REGION(0x08100, "gfx1", 0)
-	ROM_LOAD("cga.chr",     0x00000, 0x01000, BAD_DUMP CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
+	ROM_LOAD( "cga.chr",      0x00000, 0x01000, BAD_DUMP CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "gamecst2", 0, SHA1(14e1b311cb474801c7bdda3164a0c220fb102159) )

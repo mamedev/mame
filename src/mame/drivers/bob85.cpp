@@ -53,10 +53,10 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(sod_w);
 	DECLARE_READ_LINE_MEMBER(sid_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
-	uint8_t m_prev_key;
-	uint8_t m_count_key;
-	u16 m_casscnt;
-	bool m_cassold, m_cassbit;
+	uint8_t m_prev_key = 0;
+	uint8_t m_count_key = 0;
+	u16 m_casscnt = 0;
+	bool m_cassold = false, m_cassbit = false;
 	void machine_start() override;
 	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;

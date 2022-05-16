@@ -66,9 +66,9 @@ protected:
 	virtual void video_start() override;
 
 private:
-	int m_test_x;
-	int m_test_y;
-	int m_start_offs;
+	int m_test_x = 0;
+	int m_test_y = 0;
+	int m_start_offs = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 

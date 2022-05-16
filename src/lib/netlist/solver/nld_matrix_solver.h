@@ -24,9 +24,7 @@
 
 #define PFDEBUG(x)
 
-namespace netlist
-{
-namespace solver
+namespace netlist::solver
 {
 
 	enum static_compile_target
@@ -64,35 +62,35 @@ namespace solver
 
 	struct solver_parameter_defaults
 	{
-		constexpr nl_fptype          m_freq() { return nlconst::magic(48000.0); }
+		static constexpr nl_fptype          m_freq() { return nlconst::magic(48000.0); }
 
 		// iteration parameters
-		constexpr nl_fptype          m_gs_sor() { return nlconst::magic(1.059); }
-		constexpr matrix_type_e      m_method() { return matrix_type_e::MAT_CR; }
-		constexpr matrix_fp_type_e   m_fp_type() { return matrix_fp_type_e::DOUBLE; }
-		constexpr nl_fptype          m_reltol() { return nlconst::magic(1e-3); }
-		constexpr nl_fptype          m_vntol() { return nlconst::magic(1e-7); }
-		constexpr nl_fptype          m_accuracy() { return nlconst::magic(1e-7); }
-		constexpr std::size_t        m_nr_loops() { return 250; }
-		constexpr std::size_t        m_gs_loops() { return 50; }
+		static constexpr nl_fptype          m_gs_sor() { return nlconst::magic(1.059); }
+		static constexpr matrix_type_e      m_method() { return matrix_type_e::MAT_CR; }
+		static constexpr matrix_fp_type_e   m_fp_type() { return matrix_fp_type_e::DOUBLE; }
+		static constexpr nl_fptype          m_reltol() { return nlconst::magic(1e-3); }
+		static constexpr nl_fptype          m_vntol() { return nlconst::magic(1e-7); }
+		static constexpr nl_fptype          m_accuracy() { return nlconst::magic(1e-7); }
+		static constexpr std::size_t        m_nr_loops() { return 250; }
+		static constexpr std::size_t        m_gs_loops() { return 50; }
 
 		// general parameters
-		constexpr nl_fptype          m_gmin() { return nlconst::magic(1e-9); }
-		constexpr bool               m_pivot() { return false; }
-		constexpr nl_fptype          m_nr_recalc_delay(){ return netlist_time::quantum().as_fp<nl_fptype>(); }
-		constexpr int                m_parallel() { return 0; }
+		static constexpr nl_fptype          m_gmin() { return nlconst::magic(1e-9); }
+		static constexpr bool               m_pivot() { return false; }
+		static constexpr nl_fptype          m_nr_recalc_delay(){ return netlist_time::quantum().as_fp<nl_fptype>(); }
+		static constexpr int                m_parallel() { return 0; }
 
-		constexpr nl_fptype          m_min_ts_ts() { return nlconst::magic(1e-9); }
+		static constexpr nl_fptype          m_min_ts_ts() { return nlconst::magic(1e-9); }
 		// automatic time step
-		constexpr bool               m_dynamic_ts() { return false; }
-		constexpr nl_fptype          m_dynamic_lte() { return nlconst::magic(1e-5); }
-		constexpr nl_fptype          m_dynamic_min_ts() { return nlconst::magic(1e-6); }
+		static constexpr bool               m_dynamic_ts() { return false; }
+		static constexpr nl_fptype          m_dynamic_lte() { return nlconst::magic(1e-5); }
+		static constexpr nl_fptype          m_dynamic_min_ts() { return nlconst::magic(1e-6); }
 
 		// matrix sorting
-		constexpr matrix_sort_type_e m_sort_type() { return matrix_sort_type_e::PREFER_IDENTITY_TOP_LEFT; }
+		static constexpr matrix_sort_type_e m_sort_type() { return matrix_sort_type_e::PREFER_IDENTITY_TOP_LEFT; }
 
 		// special
-		constexpr bool               m_use_gabs() { return true; }
+		static constexpr bool               m_use_gabs() { return true; }
 
 		static solver_parameter_defaults &get_instance()
 		{
@@ -134,9 +132,8 @@ namespace solver
 
 		// special
 		, m_use_gabs(parent, prefix + "USE_GABS", defaults.m_use_gabs())
-
+		, m_min_timestep(m_dynamic_min_ts())
 		{
-			m_min_timestep = m_dynamic_min_ts();
 			m_max_timestep = netlist_time::from_fp(plib::reciprocal(m_freq())).as_fp<decltype(m_max_timestep)>();
 
 			if (m_dynamic_ts)
@@ -304,7 +301,7 @@ namespace solver
 		virtual std::pair<pstring, pstring> create_solver_code(solver::static_compile_target target)
 		{
 			plib::unused_var(target);
-			return std::pair<pstring, pstring>("", plib::pfmt("/* solver doesn't support static compile */\n\n"));
+			return { "", plib::pfmt("/* solver doesn't support static compile */\n\n") };
 		}
 
 		// return number of floating point operations for solve
@@ -385,7 +382,6 @@ namespace solver
 		plib::aligned_vector<terms_for_net_t> m_rails_temp; // setup only
 	};
 
-} // namespace solver
-} // namespace netlist
+} // namespace netlist::solver
 
 #endif // NLD_MS_DIRECT_H_

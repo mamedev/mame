@@ -162,7 +162,7 @@ protected:
 
 	// internal state
 	emu_timer *         m_scanline_timer;
-	emu_timer *         m_irq2_gen_timer;
+	emu_timer *         m_irq2_gen_timer = nullptr;
 	uint8_t             m_irq2_state;
 	uint8_t             m_adc_select;
 	uint8_t             m_vblank_irq_state;

@@ -57,4 +57,4 @@ const abc_fd2_format::format abc_fd2_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_ABC_FD2_FORMAT = &floppy_image_format_creator<abc_fd2_format>;
+const abc_fd2_format FLOPPY_ABC_FD2_FORMAT;

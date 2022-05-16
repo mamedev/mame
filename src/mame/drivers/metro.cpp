@@ -71,13 +71,16 @@ To Do:
 -   For video related issues @see devices/video/imagetek_i4100.cpp
 -   Most games in service mode, seem to require that you press start1&2 *exactly at once*
     in order to advance to the next screen (e.g. holding 1 then pressing 2 doesn't work).
--   Coin lockout
 -   Interrupt timing needs figuring out properly, having it incorrect
     causes scrolling glitches in some games.  Test cases Mouse Go Go
     title screen, GunMaster title screen.  Changing it can cause
     excessive slowdown in said games however.
+-   karatour, ladykill, 3kokushi: understand what the irq source 5 is really tied to.
+    All these games also have a vblank delay check outside irq routine,
+    cfr. PC=1322 in karatour;
 -   vmetal: ES8712 actually controls a M6585 and an unknown logic selector chip.
 -   split these games into different files, check PCB markings.
+-   Coin lockout;
 
 Notes:
 
@@ -132,11 +135,6 @@ void metro_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	switch (id)
 	{
-	case TIMER_KARATOUR_IRQ:
-		if (m_vdp) m_vdp->clear_irq(5);
-		if (m_vdp2) m_vdp2->clear_irq(5);
-		if (m_vdp3) m_vdp3->clear_irq(5);
-		break;
 	case TIMER_MOUJA_IRQ:
 		if (m_vdp) m_vdp->set_irq(0);
 		if (m_vdp2) m_vdp2->set_irq(0);
@@ -184,18 +182,32 @@ TIMER_DEVICE_CALLBACK_MEMBER(metro_state::bangball_scanline)
 /* lev 2-7 (lev 1 seems sound related) */
 WRITE_LINE_MEMBER(metro_state::karatour_vblank_irq)
 {
+//  printf("%d %d %lld\n", state, m_screen->vpos(), m_screen->frame_number());
+
 	if (state)
 	{
-		/* write to scroll registers, the duration is a guess */
-		m_karatour_irq_timer->adjust(attotime::from_usec(2500));
-		if (m_vdp) m_vdp->set_irq(5);
-		if (m_vdp2) m_vdp2->set_irq(5);
-		if (m_vdp3) m_vdp3->set_irq(5);
-
 		if (m_vdp) m_vdp->screen_eof(state);
 		if (m_vdp2) m_vdp2->screen_eof(state);
 		if (m_vdp3) m_vdp3->screen_eof(state);
+
+		if (m_ext_irq_enable)
+		{
+			if (m_vdp) m_vdp->set_irq(5);
+			if (m_vdp2) m_vdp2->set_irq(5);
+			if (m_vdp3) m_vdp3->set_irq(5);
+		}
 	}
+	else
+	{
+		if (m_vdp) m_vdp->clear_irq(5);
+		if (m_vdp2) m_vdp2->clear_irq(5);
+		if (m_vdp3) m_vdp3->clear_irq(5);
+	}
+}
+
+WRITE_LINE_MEMBER(metro_state::ext_irq5_enable_w)
+{
+	m_ext_irq_enable = state;
 }
 
 void metro_state::mouja_irq_timer_ctrl_w(uint16_t data)
@@ -2139,30 +2151,30 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mouja )
 	PORT_START("IN0") //$478880
-	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT(  0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT(  0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-	PORT_BIT(  0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-	PORT_BIT(  0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 
 	PORT_START("IN1") //$478882
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
-	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE(0x0080, IP_ACTIVE_LOW)
 
@@ -2796,8 +2808,8 @@ void metro_state::i4100_config(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(58.2328); // VSync 58.2328Hz, HSync 15.32kHz
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(320, 240);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1500));
+	m_screen->set_size(392, 263);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
 	m_screen->set_screen_update("vdp", FUNC(imagetek_i4100_device::screen_update));
 }
@@ -2810,8 +2822,8 @@ void metro_state::i4220_config(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(58.2328); // VSync 58.2328Hz, HSync 15.32kHz
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(320, 240);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1500));
+	m_screen->set_size(392, 263);
 	m_screen->set_visarea(0, 320-1, 0, 224-1);
 	m_screen->set_screen_update("vdp2", FUNC(imagetek_i4100_device::screen_update));
 }
@@ -2824,8 +2836,8 @@ void metro_state::i4300_config(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(58.2328); // VSync 58.2328Hz, HSync 15.32kHz
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(320, 240);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1500));
+	m_screen->set_size(392, 263);
 	m_screen->set_visarea(0, 320-1, 0, 224-1);
 	m_screen->set_screen_update("vdp3", FUNC(imagetek_i4100_device::screen_update));
 }
@@ -2835,7 +2847,7 @@ void metro_state::i4100_config_360x224(machine_config &config)
 {
 	i4100_config(config);
 
-	m_screen->set_size(360, 224);
+//  m_screen->set_size(392, 263);
 	m_screen->set_visarea(0, 360-1, 0, 224-1);
 }
 
@@ -2843,7 +2855,7 @@ void metro_state::i4220_config_320x240(machine_config &config)
 {
 	i4220_config(config);
 
-	m_screen->set_size(320, 240);
+//  m_screen->set_size(320, 240);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
 }
 
@@ -2851,7 +2863,6 @@ void metro_state::i4220_config_304x224(machine_config &config)
 {
 	i4220_config(config);
 
-	m_screen->set_size(320, 240);
 	m_screen->set_visarea(0, 304-1, 0, 224-1);
 }
 
@@ -2860,7 +2871,7 @@ void metro_state::i4300_config_384x224(machine_config &config)
 	i4300_config(config);
 	m_vdp3->set_clock(32_MHz_XTAL);
 
-	m_screen->set_size(384, 240);
+//  m_screen->set_size(384, 240);
 	m_screen->set_visarea(0, 384-1, 0, 224-1);
 }
 
@@ -2868,7 +2879,7 @@ void metro_state::i4300_config_320x240(machine_config &config)
 {
 	i4300_config(config);
 
-	m_screen->set_size(384, 240);
+//  m_screen->set_size(384, 240);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
 }
 
@@ -3042,7 +3053,7 @@ void metro_state::karatour(machine_config &config)
 	/* video hardware */
 	i4100_config(config);
 	m_vdp->irq_cb().set_inputline(m_maincpu, M68K_IRQ_2);
-
+	m_vdp->ext_ctrl_0_cb().set(FUNC(metro_state::ext_irq5_enable_w));
 	m_screen->screen_vblank().set(FUNC(metro_state::karatour_vblank_irq));
 
 	/* sound hardware */
@@ -3067,6 +3078,7 @@ void metro_state::sankokushi(machine_config &config)
 	/* video hardware */
 	i4220_config_320x240(config);
 	m_vdp2->irq_cb().set_inputline(m_maincpu, M68K_IRQ_2);
+	m_vdp2->ext_ctrl_0_cb().set(FUNC(metro_state::ext_irq5_enable_w));
 
 	m_screen->screen_vblank().set(FUNC(metro_state::karatour_vblank_irq));
 
@@ -3117,7 +3129,7 @@ void metro_state::lastforg(machine_config &config)
 
 	i4100_config_360x224(config);
 	m_vdp->irq_cb().set_inputline(m_maincpu, M68K_IRQ_2);
-
+	m_vdp->ext_ctrl_0_cb().set(FUNC(metro_state::ext_irq5_enable_w));
 	m_screen->screen_vblank().set(FUNC(metro_state::karatour_vblank_irq));
 
 	/* sound hardware */
@@ -3385,8 +3397,12 @@ void metro_state::vmetal(machine_config &config)
 
 	m_vdp2->set_tmap_xoffsets(0,0,0);
 	m_vdp2->set_tmap_yoffsets(0,0,0);
-	m_vdp2->set_tmap_flip_xoffsets(16,16,16);
-	m_vdp2->set_tmap_flip_yoffsets(16,16,16);
+	// TODO: very fussy on screen geometry changes
+	// CRTC is set as 320x224, bottom 16 pixels are actually aligned properly when flip screen is on.
+	// Easiest alignment test is during story lore in attract, specifically at bomb explosion screen
+	// (latter being a sprite needs to be 1:1 aligned with underlying background layer)
+	m_vdp2->set_tmap_flip_xoffsets(88,88,88);
+	m_vdp2->set_tmap_flip_yoffsets(39,39,39);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3421,11 +3437,12 @@ void metro_state::blzntrnd(machine_config &config)
 	m_vdp2->set_vblank_irq_level(0);
 	m_vdp2->set_blit_irq_level(3);
 	m_vdp2->set_spriteram_buffered(true); // sprites are 1 frame delayed
+	m_vdp2->ext_ctrl_0_cb().set(FUNC(metro_state::ext_irq5_enable_w));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(58.2328); // VSync 58.2328Hz, HSync 15.32kHz
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(320, 240);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1500));
+	m_screen->set_size(392, 263);
 	m_screen->set_visarea(0, 304-1, 0, 224-1);
 	m_screen->set_screen_update(FUNC(metro_state::screen_update_psac_vdp2_mix));
 	m_screen->screen_vblank().set(FUNC(metro_state::karatour_vblank_irq));
@@ -5356,8 +5373,7 @@ void metro_state::init_metro()
 
 void metro_state::init_karatour()
 {
-	m_karatour_irq_timer = timer_alloc(TIMER_KARATOUR_IRQ);
-
+	save_item(NAME(m_ext_irq_enable));
 	init_metro();
 }
 
@@ -5395,7 +5411,7 @@ void metro_state::init_dharmak()
 void metro_state::init_blzntrnd()
 {
 	m_audiobank->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
-	m_karatour_irq_timer = timer_alloc(TIMER_KARATOUR_IRQ);
+	save_item(NAME(m_ext_irq_enable));
 }
 
 void metro_state::init_vmetal()
@@ -5413,7 +5429,7 @@ void metro_state::init_mouja()
 void metro_state::init_lastfortg()
 {
 	init_metro();
-	m_karatour_irq_timer = timer_alloc(TIMER_KARATOUR_IRQ);
+	save_item(NAME(m_ext_irq_enable));
 }
 
 /***************************************************************************

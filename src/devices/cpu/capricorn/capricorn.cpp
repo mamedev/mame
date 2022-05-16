@@ -8,7 +8,6 @@
 #include "emu.h"
 #include "capricorn.h"
 #include "capricorn_dasm.h"
-#include "debugger.h"
 
 // Register indexes
 // GP registers are named "R" & the octal representation of the index (00-77)

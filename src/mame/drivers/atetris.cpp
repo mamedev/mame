@@ -12,6 +12,55 @@
     Though of course none of the bootlegs have the actual SLAPSTIC, at
     least some appear to have simulated it using TTL and PLDs.
 
+**********************************************************************************
+
+Tetris (Atari, 1988)
+Hardware info by Guru
+
+PCB Layout
+----------
+
+TETRIS A044809
+ATARI GAMES (C) 1988 MADE IN USA
+|---------------------------------|
+| VID                             |
+|                                 |
+|                     LED         |
+|   P  P    65728                 |
+|J  O  O                          |
+|A  K  K                   ROM.A35|
+|M  E  E   SLAPSTIC       6264    |
+|M  Y  Y   ROM.F45              D |
+|A           EMPTY              I |
+|    TEST DSW4                  P |
+|     LM324                     4 |
+|   LED    X2804                0 |
+|VOL                              |
+|LA4465   6502         14.31818MHz|
+|---------------------------------|
+Notes:
+      POKEY - Atari POKEY sound and I/O chip. Clock 1.7897725MHz [14.31818/8]
+              Chip is marked '137430-001 ATARI GAMES, INC.'
+              This is identical/compatible with the more common 'AMI C012294' POKEY chip
+     LA4465 - Sanyo LA4465 Audio Power Amplifier
+        VID - 11 pin connector for separate video output signals (R, G, B, HSync, VSync)
+       6264 - Hyundai HY6264 8kBx8-bit SRAM
+      65728 - Harris HM3-65728 2kBx8-bit SRAM (compatible with 6116/2018 etc)
+  SLAPSTIC  - Atari custom protection SLAPSTIC  chip marked '137412-101 1984 ATARI GAMES'
+      DIP40 - Atari custom DIP40 chip marked 'SOS-137550-001 TAIWAN (M)8822 YVAGZK'. (M) is the Motorola logo
+    ROM.F45 - 27C512 EPROM with label '(C)1988 ATARI 8901 136066 1100'
+    ROM.A35 - 27C512 EPROM with label '(C)1988 ATARI 8901 136066 1101'
+      EMPTY - Empty DIP28 space (no socket or chip populated here)
+       TEST - Toggle switch to enable test mode (test is also on the JAMMA connector)
+       DSW4 - 4-position DIP switch at location H50
+      X2804 - XICOR X2804 512 byte x8-bit EEPROM
+      LM324 - Motorola LM324 Quad Operational Amplifier
+       6502 - UM6502A CPU. Clock 1.7897725 [14.31818/8]
+      HSync - 15.7014kHz
+      VSync - 59.9290Hz
+
+**********************************************************************************
+
 ****************************************************************************
 
     Memory map
@@ -458,6 +507,8 @@ static INPUT_PORTS_START( atetris )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
 
+	// The control panel has a start and an action button for both players. The board has them connected together on the JAMMA connector.
+	// So bit 0x01 actually is used by both player 1 start and action buttons and bit 0x10 is used by both player 2 start and action buttons
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
@@ -670,6 +721,7 @@ ROM_END
 
 /*
 Tetris (Korean bootleg of atetrisa set)
+Hardware info by Guru
 
 PCB Layout
 ----------

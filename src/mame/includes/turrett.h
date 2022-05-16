@@ -130,7 +130,7 @@ protected:
 
 private:
 	memory_access<28, 1, 0, ENDIANNESS_LITTLE>::cache m_cache;
-	sound_stream *m_stream;
+	sound_stream *m_stream = nullptr;
 
 	struct
 	{

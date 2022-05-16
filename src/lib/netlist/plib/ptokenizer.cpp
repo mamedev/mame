@@ -13,7 +13,7 @@ namespace plib {
 	PERRMSGV(MF_EXPECTED_IDENTIFIER_GOT_1,      1, "Expected an identifier, got <{1}>")
 	PERRMSGV(MF_EXPECTED_ID_OR_NUM_GOT_1,       1, "Expected an identifier or number, got <{1}>")
 	PERRMSGV(MF_EXPECTED_NUMBER_GOT_1,          1, "Expected a number, got <{1}>")
-	PERRMSGV(MF_EXPECTED_LONGINT_GOT_1,         1, "Expected a logn int, got <{1}>")
+	PERRMSGV(MF_EXPECTED_LONGINT_GOT_1,         1, "Expected a long int, got <{1}>")
 	PERRMSGV(MF_EXPECTED_LINENUM_GOT_1,         1, "Expected line number after line marker but got <{1}>")
 	PERRMSGV(MF_EXPECTED_FILENAME_GOT_1,        1, "Expected file name after line marker but got <{1}>")
 
@@ -234,7 +234,7 @@ namespace plib {
 				if (eof())
 					return token_t(token_type::ENDOFFILE);
 				if (c == '\r' || c == '\n')
-					return token_t(token_type::LINEMARKER, lm);
+					return { token_type::LINEMARKER, lm };
 				lm += c;
 			} while (true);
 		}
@@ -253,7 +253,7 @@ namespace plib {
 				c = getc();
 			}
 			ungetc(c);
-			return token_t(ret, tokstr);
+			return { ret, tokstr };
 		}
 
 		// not a number, try identifier
@@ -282,7 +282,7 @@ namespace plib {
 				tokstr += c;
 				c = getc();
 			}
-			return token_t(token_type::STRING, tokstr);
+			return { token_type::STRING, tokstr };
 		}
 		else
 		{
@@ -296,7 +296,7 @@ namespace plib {
 				{
 					auto id = m_tokens.find(tokstr);
 					if (id != m_tokens.end())
-						return token_t(id->second, tokstr);
+						return { id->second, tokstr };
 				}
 				c = getc();
 			}

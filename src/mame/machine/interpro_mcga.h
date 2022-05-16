@@ -64,10 +64,10 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	u16 m_control, m_error, m_memsize;
-	u8 m_frcrd, m_cbsub;
+	u16 m_control = 0, m_error = 0, m_memsize = 0;
+	u8 m_frcrd = 0, m_cbsub = 0;
 
-	u16 m_reg[3];
+	u16 m_reg[3]{};
 
 private:
 
@@ -116,7 +116,7 @@ public:
 	void error_control_w(u16 data) { m_error_control = data; }
 
 private:
-	u16 m_error_control;
+	u16 m_error_control = 0;
 };
 
 // device type definition

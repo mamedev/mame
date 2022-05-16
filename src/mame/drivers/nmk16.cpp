@@ -581,6 +581,15 @@ void nmk16_state::mustangb3_map(address_map &map)
 	map(0x0f0000, 0x0fffff).ram().w(FUNC(nmk16_state::mainram_strange_w)).share("mainram");
 }
 
+void nmk16_state::mustangb3_sound_map(address_map &map)
+{
+	tharrier_sound_map(map);
+
+	// remove some leftover banking calls, not needed since this bootleg uses smaller ROMs
+	map(0xf600, 0xf600).unmapw();
+	map(0xf700, 0xf700).unmapw();
+}
+
 void nmk16_state::twinactn_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
@@ -4349,7 +4358,7 @@ void nmk16_state::mustangb3(machine_config &config)
 	set_hacky_interrupt_timing(config);
 
 	Z80(config, m_audiocpu, 14318180/4);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::tharrier_sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::mustangb3_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &nmk16_state::tharrier_sound_io_map);
 
 	// video hardware
@@ -4512,11 +4521,11 @@ void nmk16_state::acrobatm(machine_config &config)
 	ymsnd.add_route(2, "mono", 0.50);
 	ymsnd.add_route(3, "mono", 1.20);
 
-	OKIM6295(config, m_oki[0], XTAL(16'000'000)/4, okim6295_device::PIN7_LOW); // (verified on PCB) on the PCB pin7 is not connected to gnd or +5v!
+	OKIM6295(config, m_oki[0], XTAL(16'000'000)/4, okim6295_device::PIN7_LOW); // (verified on PCB) on the PCB pin7 is connected to gnd
 	m_oki[0]->set_addrmap(0, &nmk16_state::oki1_map);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	OKIM6295(config, m_oki[1], XTAL(16'000'000)/4, okim6295_device::PIN7_LOW); // (verified on PCB) on the PCB pin7 is not connected to gnd or +5v!
+	OKIM6295(config, m_oki[1], XTAL(16'000'000)/4, okim6295_device::PIN7_LOW); // (verified on PCB) on the PCB pin7 is connected to gnd
 	m_oki[1]->set_addrmap(0, &nmk16_state::oki2_map);
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
 }
@@ -6269,39 +6278,113 @@ ROM_START( mustangb3 )
 	ROM_LOAD( "u12.bin", 0x00000, 0x20000, CRC(0a28eaca) SHA1(392bd5301904ffb92cf97999e406e238717afa45) )
 ROM_END
 
+
+/***************************************************************************
+
+Acrobat Mission (UPL / Taito, 1991)
+Hardware info by Guru
+
+AM91073
+M6100626A ACROBAT MISSION (sticker)
+|-------------------------------------------------------------------------|
+| LA4460  VOL   YM2203  6116    4.IC74                 1.IC101     52256  |
+|                                                                         |
+|         4558  M6295           |------|               2.IC100     52256  |
+|                     AM-05.IC54|NMK004|                                  |
+|       YM3014                  |------|             |------------------| |
+|               M6295                                |      68000       | |
+|                     AM-04.IC53                     |------------------| |
+|                                                                         |
+|             |------|                                                    |
+|             |NMK005|                                                    |
+|J            |------|                                               10MHz|
+|A                        SW2                                             |
+|M                                                                   16MHz|
+|M  NMK006                SW1                                             |
+|A  NMK006                             10.IC81 |------|                   |
+|   NMK006       S2564   |------|              |NMK902|     6116    6116  |
+|                        |NMK901|      11.IC80 |------|                   |
+|                S2564   |------|     |------|                            |
+|               |------|              |NMK903| 3.IC79              52256  |
+|               |NMK903|              |------|                            |
+|               |------|                            |------|       52256  |
+|   AM-03.IC8                                       |NMK009|              |
+|                                           |------||------|       52256  |
+|NMK007      6116                   6116    |NMK008|                      |
+|NMK007      6116                   6116    |------||------|       52256  |
+|NMK007                  AM01.IC42                  |NMK009|              |
+|        12MHz   AM02.IC29                          |------|              |
+|-------------------------------------------------------------------------|
+Notes:
+         68000 - Clock 10.000MHz
+        YM2203 - Clock 1.500MHz [12/8]
+         M6295 - 4.000MHz [12/3, both] and sample rate pin 7 LOW (both joined directly to ground)
+         VSync - 56.2057Hz
+         HSync - 15.6251kHz
+         SW1/2 - 8-position DIP switch
+         52256 - Sharp LH52256 32kBx8-bit SRAM
+          6116 - Hitachi HM6116 2kBx8-bit SRAM
+         S2564 - Seiko Instruments Inc. S2564RL-100 8kBx8-bit SRAM
+        NMK901 - NMK custom chip
+        NMK902 - NMK custom chip
+        NMK903 - NMK custom chip
+        NMK004 - Toshiba TMP90C840AF with 8Kbyte internal ROM disguised as a custom chip. Clock input 8.000MHz. Clock output on pin 17 is 2.000MHz
+        NMK005 - NMK custom chip
+        NMK006 - NMK custom resistor array (used on the controls and I/O)
+        NMK007 - NMK custom resistor array (used on the RGB outputs)
+        NMK008 - NMK custom chip
+        NMK009 - NMK custom chip
+        LA4460 - Sanyo LA4460 Audio Power Amplifier
+          4558 - Motorola MC4558 Dual Operational Amplifier
+        YM3014 - Yamaha YM3014 DAC. Serial clock input 1.500MHz [12/8]
+       1.IC101 \
+       2.IC100 / 27C010 128kBx8-bit EPROM (main program)
+        3.IC79 - 27C512 64kBx8-bit EPROM (foreground tiles)
+        4.IC74 - 27C512 64kBx8-bit EPROM (sound program)
+    AM-04.IC53 - 4Mbit mask ROM (OKI M6295 samples)
+    AM-05.IC54 - 4Mbit mask ROM (OKI M6295 samples)
+     AM-03.IC8 - 4Mbit mask ROM (background tiles)
+    AM-01.IC42 - 8Mbit 42 pin mask ROM (sprites)
+    AM-02.IC29 - 4Mbit 40 pin mask ROM (sprites)
+       10.IC81 - Signetics 82S129 bipolar PROM (when removed shows only blank screen and game does not boot)
+       11.IC80 - Signetics 82S135 bipolar PROM (when removed start-up tests pass but does not go in-game
+                 and the screen rolls horizontally, then the board resets after a few seconds)
+
+***************************************************************************/
+
 ROM_START( acrobatm )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "02_ic100.bin",    0x00000, 0x20000, CRC(3fe487f4) SHA1(29aba5debcfddff14e584a1c7c5a403e85fc6ec0) )
-	ROM_LOAD16_BYTE( "01_ic101.bin",    0x00001, 0x20000, CRC(17175753) SHA1(738865744badb78a0414ff650a94b97e516d0ea0) )
+	ROM_LOAD16_BYTE( "2.ic100",    0x00000, 0x20000, CRC(3fe487f4) SHA1(29aba5debcfddff14e584a1c7c5a403e85fc6ec0) )
+	ROM_LOAD16_BYTE( "1.ic101",    0x00001, 0x20000, CRC(17175753) SHA1(738865744badb78a0414ff650a94b97e516d0ea0) )
 
 	ROM_REGION( 0x20000, "fgtile", 0 )
-	ROM_LOAD( "03_ic79.bin",   0x000000, 0x10000, CRC(d86c186e) SHA1(2e263d4780f2ba7acc7faa88472c85216fbae6a3) ) // Characters
+	ROM_LOAD( "3.ic79",   0x000000, 0x10000, CRC(d86c186e) SHA1(2e263d4780f2ba7acc7faa88472c85216fbae6a3) ) // Characters
 
 	ROM_REGION( 0x100000, "bgtile", 0 )
-	ROM_LOAD( "09_ic8.bin",  0x000000, 0x100000, CRC(7c12afed) SHA1(ae793e41599355a126cbcce91cd2c9f212d21853) ) // Foreground
+	ROM_LOAD( "am-03.ic8",  0x000000, 0x100000, CRC(7c12afed) SHA1(ae793e41599355a126cbcce91cd2c9f212d21853) ) // Foreground
 
 	ROM_REGION( 0x180000, "sprites", 0 )
-	ROM_LOAD( "07_ic42.bin",  0x000000, 0x100000, CRC(5672bdaa) SHA1(5401a104d72904de19b73125451767bc63d36809) ) // Sprites
-	ROM_LOAD( "08_ic29.bin",  0x100000, 0x080000, CRC(b4c0ace3) SHA1(5d638781d588cfbf4025d002d5a2309049fe1ee5) )
+	ROM_LOAD( "am-01.ic42",  0x000000, 0x100000, CRC(5672bdaa) SHA1(5401a104d72904de19b73125451767bc63d36809) ) // Sprites
+	ROM_LOAD( "am-02.ic29",  0x100000, 0x080000, CRC(b4c0ace3) SHA1(5d638781d588cfbf4025d002d5a2309049fe1ee5) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "04_ic74.bin",    0x00000, 0x10000, CRC(176905fb) SHA1(135a184f44bedd93b293b9124fa0bd725e0ee93b) )
+	ROM_LOAD( "4.ic74",    0x00000, 0x10000, CRC(176905fb) SHA1(135a184f44bedd93b293b9124fa0bd725e0ee93b) )
 
 	ROM_REGION( 0x80000, "oki1", 0 )    // OKIM6295 samples
-	ROM_LOAD( "05_ic54.bin",    0x00000, 0x80000, CRC(3b8c2b0e) SHA1(72491da32512823540b67dc5027f21c74af08c7d) ) // 0x20000 - 0x80000 banked
+	ROM_LOAD( "am-05.ic54",    0x00000, 0x80000, CRC(3b8c2b0e) SHA1(72491da32512823540b67dc5027f21c74af08c7d) ) // 0x20000 - 0x80000 banked
 
 	ROM_REGION( 0x80000, "oki2", 0 )    // OKIM6295 samples
-	ROM_LOAD( "06_ic53.bin",    0x00000, 0x80000, CRC(c1517cd4) SHA1(5a91ddc608c7a6fbdd9f93e503d39eac02ef04a4) ) // 0x20000 - 0x80000 banked
+	ROM_LOAD( "am-04.ic53",    0x00000, 0x80000, CRC(c1517cd4) SHA1(5a91ddc608c7a6fbdd9f93e503d39eac02ef04a4) ) // 0x20000 - 0x80000 banked
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "10_ic81.bin",    0x0000, 0x0100, CRC(cfdbb86c) SHA1(588822f6308a860937349c9106c2b4b1a75823ec) )  // unknown
-	ROM_LOAD( "11_ic80.bin",    0x0100, 0x0100, CRC(633ab1c9) SHA1(acd99fcca41eaab7948ca84988352f1d7d519c61) )  // unknown
+	ROM_LOAD( "10.ic81",    0x0000, 0x0100, CRC(cfdbb86c) SHA1(588822f6308a860937349c9106c2b4b1a75823ec) )  // 82S129, unknown purpose
+	ROM_LOAD( "11.ic80",    0x0100, 0x0100, CRC(633ab1c9) SHA1(acd99fcca41eaab7948ca84988352f1d7d519c61) )  // 82S135, unknown purpose
 ROM_END
 
 /*
 
-S.B.S. Gomorrah (and Bio-ship Paladin with correct ROMs in place)
-UPL, 1993
+S.B.S. Gomorrah / Bio-ship Paladin (UPL, 1993)
+Hardware info by Guru
 
 PCB Layout
 ----------
@@ -6572,6 +6655,38 @@ ROM_START( tdragonb2 )
 	ROM_LOAD( "shinea2a2-01", 0x00000, 0x80000, CRC(4556e717) SHA1(efdec7c989436f97e8f18b157bfd5f9da55b29ba) )
 ROM_END
 
+ROM_START( tdragonb3 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "tms27c010a.19e", 0x00000, 0x20000, CRC(659167c4) SHA1(bd9dbdf751869730513db186324c60abed4bc05e) )
+	ROM_LOAD16_BYTE( "tms27c010a.19c", 0x00001, 0x20000, CRC(02f5befc) SHA1(5c0b9e7c5a811adf5c50b6ea6703df670e5a703f) )
+
+	ROM_REGION(0x20000, "audiocpu", 0 )
+	ROM_LOAD( "d27512.4b",          0x00000, 0x8000, CRC(99ee7505) SHA1(b97c8ee5e26e8554b5de506fba3b32cc2fde53c9) )
+	ROM_CONTINUE(                   0x10000, 0x8000 )
+	ROM_COPY( "audiocpu",  0x00000, 0x18000, 0x8000 )
+
+	ROM_REGION( 0x20000, "fgtile", 0 ) // 8x8
+	ROM_LOAD( "tms27c010a.2k", 0x00000, 0x20000, CRC(5144dc69) SHA1(e64d88dc0e7672f811868621f74ec209aeafbc6f) )
+
+	ROM_REGION( 0x100000, "bgtile", 0 ) // 16x16
+	ROM_LOAD( "unreadable.18h", 0x000000, 0x100000, BAD_DUMP CRC(d0bde826) SHA1(3b74d5fc88a4a9329e101ee72f393608d327d816) ) // undumpable on this PCB, probably the same as the original as the other 2 GFX ROMs are
+
+	ROM_REGION( 0x100000, "sprites", 0 )
+	ROM_LOAD16_WORD_SWAP( "upd27c8000.18f", 0x000000, 0x100000, CRC(3eedc2fe) SHA1(9f48986c231a8fbc07f2b39b2017d1e967b2ed3c) )
+
+	ROM_REGION( 0x40000, "unknown_rom", 0 ) // between the main CPU and the bgtile ROMs
+	ROM_LOAD( "tms27c020.20g", 0x00000, 0x40000, CRC(1ed8a2da) SHA1(8eabc35f1eb88f49b83baf8bd72229d40efed248) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "m27c512.1c", 0x00000, 0x10000, CRC(f6f6c4bf) SHA1(ea4cf74d968e254ae47c16c2f4c2f4bc1a528808) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "n82s147n.7f", 0x000, 0x200, CRC(ed0bd072) SHA1(66a6d435d8587c82ae96dd09c39ed5749fe00e24) )
+
+	ROM_REGION( 0x200, "plds", 0 )
+	ROM_LOAD( "pal16l8acn.8b", 0x000, 0x104, CRC(92fa095c) SHA1(4c7ece64c402ab4716fcf58d11c5b0b131a7c3e8) )
+ROM_END
+
 ROM_START( ssmissin )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ssm14.165",    0x00001, 0x20000, CRC(eda61b74) SHA1(6247682c27d2be7dff1fad407ccf86fe2a25f11c) )
@@ -6602,8 +6717,8 @@ ROM_END
 
 /*
 
-Air Attack
-Comad, 1996
+Air Attack (Comad, 1996)
+Hardware info by Guru
 
 68000 @ 8MHz
 Z80A @ 2MHz [8/4]
@@ -6958,8 +7073,8 @@ ROM_END
 
 /*
 
-Gun Nail
-NMK/Tecmo, 1993
+Gun Nail (NMK / Tecmo, 1993)
+Hardware info by Guru
 
 PCB Layout
 ----------
@@ -7303,8 +7418,8 @@ ROM_END
 
 /*
 
-Rapid Hero
-NMK, 1994
+Rapid Hero (NMK, 1994)
+Hardware info by Guru
 
 The main board has no ROMs at all except 3 PROMs. There is a plug-in daughter
 board that holds all the ROMs. It has the capacity for 3 socketed EPROMS and 7x
@@ -8384,10 +8499,8 @@ ROM_END
 
 /***************************************************************************
 
-                            Bubble 2000 (c)1998 Tuning
-
-Bubble 2000
-Tuning, 1998
+Bubble 2000 (Tuning, 1998)
+Hardware info by Guru
 
 CPU   : TMP68HC000P-10 (68000)
 SOUND : Z840006 (Z80, 44 pin QFP), YM2151, OKI M6295
@@ -8489,8 +8602,8 @@ ROM_END
 
 /***************************************************************************
 
-Hot Bubble
-Afega, 1998
+Hot Bubble (Afega, 1998)
+Hardware info by Guru
 
 PCB Layout
 ----------
@@ -8658,8 +8771,8 @@ ROM_END
 
 /***************************************************************************
 
-Fire Hawk - ESD, 2001
----------------------
+Fire Hawk (ESD, 2001)
+Hardware info by Guru
 
 - To enter test mode, hold on button 1 at boot up
 
@@ -8981,7 +9094,8 @@ GAME( 1997, tomagic,   0,         tomagic,      tomagic,      nmk16_tomagic_stat
 // these use the Seibu sound system (sound / music stolen from Raiden) rather than the bootleggers copying the nmk004
 GAME( 1990, mustangb,   mustang,  mustangb,     mustang,      nmk16_state, empty_init,           ROT0,   "bootleg",                       "US AAF Mustang (bootleg, set 1)", 0 )
 GAME( 1990, mustangb2,  mustang,  mustangb,     mustang,      nmk16_state, empty_init,           ROT0,   "bootleg (TAB Austria)",         "US AAF Mustang (TAB Austria bootleg)", 0 ) // PCB and ROMs have TAB Austria stickers
-GAME( 1991, tdragonb,   tdragon,  tdragonb,     tdragonb,     nmk16_state, init_tdragonb,        ROT270, "bootleg",                       "Thunder Dragon (bootleg, set 1)", 0 )
+GAME( 1991, tdragonb,   tdragon,  tdragonb,     tdragonb,     nmk16_state, init_tdragonb,        ROT270, "bootleg",                       "Thunder Dragon (bootleg with Raiden sounds, encrypted)", 0 )
+GAME( 1991, tdragonb3,  tdragon,  tdragonb,     tdragonb,     nmk16_state, empty_init,           ROT270, "bootleg",                       "Thunder Dragon (bootleg with Raiden sounds, unencrypted)", 0 )
 GAME( 1992, strahljbl,  strahl,   strahljbl,    strahljbl,    nmk16_state, empty_init,           ROT0,   "bootleg",                       "Koutetsu Yousai Strahl (Japan, bootleg)", 0 )
 
 // these are bootlegs with tharrier like sound hw
@@ -8989,7 +9103,7 @@ GAME( 1990, mustangb3,  mustang,  mustangb3,    mustang,      nmk16_state, empty
 GAME( 1989, tharrierb,  tharrier, tharrier,     tharrier,     nmk16_state, init_tharrier,        ROT270, "bootleg (Lettering)",           "Task Force Harrier (Lettering bootleg)", 0 )
 
 // bootleg with no audio CPU and only 1 Oki
-GAME( 1991, tdragonb2,  tdragon,  tdragonb2,    tdragon,      nmk16_state, empty_init,           ROT270, "bootleg",                       "Thunder Dragon (bootleg, set 2)", MACHINE_NOT_WORKING ) // GFX and input problems. IRQs related?
+GAME( 1991, tdragonb2,  tdragon,  tdragonb2,    tdragon,      nmk16_state, empty_init,           ROT270, "bootleg",                       "Thunder Dragon (bootleg with reduced sound system)", MACHINE_NOT_WORKING ) // GFX and input problems. IRQs related?
 
 // bootleg with cloned airbustr sound hardware
 GAME( 1992, gunnailb,   gunnail,  gunnailb,     gunnail,      nmk16_state, init_gunnailb,        ROT270, "bootleg",                      "GunNail (bootleg)", MACHINE_IMPERFECT_SOUND ) // crappy sound, unknown how much of it is incomplete emulation and how much bootleg quality

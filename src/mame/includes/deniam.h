@@ -44,23 +44,23 @@ private:
 	required_memory_region m_spritegfx;
 
 	/* video-related */
-	tilemap_t      *m_fg_tilemap;
-	tilemap_t      *m_bg_tilemap;
-	tilemap_t      *m_tx_tilemap;
-	int            m_display_enable;
-	int            m_bg_scrollx_offs;
-	int            m_bg_scrolly_offs;
-	int            m_fg_scrollx_offs;
-	int            m_fg_scrolly_offs;
-	int            m_bg_scrollx_reg;
-	int            m_bg_scrolly_reg;
-	int            m_bg_page_reg;
-	int            m_fg_scrollx_reg;
-	int            m_fg_scrolly_reg;
-	int            m_fg_page_reg;
-	int            m_bg_page[4];
-	int            m_fg_page[4];
-	u16            m_coinctrl;
+	tilemap_t      *m_fg_tilemap = nullptr;
+	tilemap_t      *m_bg_tilemap = nullptr;
+	tilemap_t      *m_tx_tilemap = nullptr;
+	int            m_display_enable = 0;
+	int            m_bg_scrollx_offs = 0;
+	int            m_bg_scrolly_offs = 0;
+	int            m_fg_scrollx_offs = 0;
+	int            m_fg_scrolly_offs = 0;
+	int            m_bg_scrollx_reg = 0;
+	int            m_bg_scrolly_reg = 0;
+	int            m_bg_page_reg = 0;
+	int            m_fg_scrollx_reg = 0;
+	int            m_fg_scrolly_reg = 0;
+	int            m_fg_page_reg = 0;
+	int            m_bg_page[4]{};
+	int            m_fg_page[4]{};
+	u16            m_coinctrl = 0;
 
 	/* devices */
 	void irq_ack_w(u16 data);

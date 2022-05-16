@@ -75,7 +75,7 @@ private:
 	output_finder<> m_led;
 
 	// display state
-	uint8_t m_data;
+	uint8_t m_data = 0;
 };
 
 #endif

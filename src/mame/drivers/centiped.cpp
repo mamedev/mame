@@ -1719,17 +1719,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,2),
-	2,
-	{ RGN_FRAC(1,2), 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
 static const gfx_layout spritelayout =
 {
 	8,16,
@@ -1743,13 +1732,13 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_centiped )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,   4, 4*4*4 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x2_planar,     0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,         4, 4*4*4 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_milliped )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 4 )
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 4*4, 4*4*4*4 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x2_planar,     0, 4 )
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,       4*4, 4*4*4*4 )
 GFXDECODE_END
 
 
@@ -2314,6 +2303,25 @@ ROM_START( warlords )
 ROM_END
 
 
+/*
+This is a conversion daughterboard for Atari Centipede PCBs.
+The Bullseye Darts PCB is screened (C) 1984 CVS Technology.
+PROM and PAL data recovered by mark shostak - 09 Feb 2003.
+
+The PCB utilizes a MAB2650A CPU; SN76496N DAC for sound; Century 109
+40-pin custom chip for protection, one 2114 (1024x4) SRAM and
+one 8-pin dip that has been rendered unidentifiable.
+
+Two jumper wires have been run to the Centipede PCB. The red wire
+runs from the 'audio' designation on the Bullseye Darts PCB (TP.A)
+to both C65 and R81. The second jumper wire, blue, is run from
+TP.B to the 'negative' side of R12.
+
+The board has two barnicles as follows:
+1) 2650 pin 22 to N82SS153 pin 4
+2) 2114 pin 10 to N82SS153 pin 14
+*/
+
 ROM_START( bullsdrt )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "27128.bin", 0x0000, 0x1000, CRC(2729f585) SHA1(6ffbfa5b62c497c3932ab71d0e3f407cae99cb59) )
@@ -2327,6 +2335,9 @@ ROM_START( bullsdrt )
 
 	ROM_REGION( 0x0200, "proms", 0 ) /* unknown */
 	ROM_LOAD( "82s147.bin",   0x0000, 0x0200, CRC(d841b7e0) SHA1(aab32645a613cd027aed98437db24704763cc147) )
+
+	ROM_REGION( 0xeb, "plds", 0 )
+	ROM_LOAD( "82s153.bin",   0x00, 0xeb, CRC(ff7e0ced) SHA1(b11dcb1937e01c23a3fad1d8c3cf0d969a80a122) )
 ROM_END
 
 

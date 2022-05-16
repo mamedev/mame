@@ -202,14 +202,14 @@ void ceres1_state::wfc_command(u8 command)
 		LOG("read sector drive %d chs %d,%d,%d count %d\n",
 			(m_wfc_sdh >> 3) & 3, m_wfc_cylinder & 0x3ff, (m_wfc_sdh >> 0) & 7, m_wfc_sector, m_wfc_count);
 		if (hdf)
-			hard_disk_read(hdf, get_lbasector(hdf), m_wfc_sram);
+			hdf->read(get_lbasector(hdf), m_wfc_sram);
 		m_wfc_offset = 0;
 		break;
 	case 3:
 		LOG("write sector drive %d chs %d,%d,%d count %d\n",
 			(m_wfc_sdh >> 3) & 3, m_wfc_cylinder & 0x3ff, (m_wfc_sdh >> 0) & 7, m_wfc_sector, m_wfc_count);
 		if (hdf)
-			hard_disk_write(hdf, get_lbasector(hdf), m_wfc_sram);
+			hdf->write(get_lbasector(hdf), m_wfc_sram);
 		m_wfc_offset = 0;
 		break;
 	case 4:
@@ -229,12 +229,12 @@ void ceres1_state::wfc_command(u8 command)
 
 int ceres1_state::get_lbasector(hard_disk_file *hdf)
 {
-	hard_disk_info const *info = hard_disk_get_info(hdf);
+	const auto &info = hdf->get_info();
 
 	int lbasector = m_wfc_cylinder & 0x3ff;
-	lbasector *= info->heads;
+	lbasector *= info.heads;
 	lbasector += (m_wfc_sdh >> 0) & 7;
-	lbasector *= info->sectors;
+	lbasector *= info.sectors;
 	lbasector += m_wfc_sector;
 
 	return lbasector;

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont, Robbbert
+// copyright-holders:R. Belmont
 /***************************************************************************
 
         Micro Craft Dimension 68000

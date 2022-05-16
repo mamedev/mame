@@ -113,7 +113,7 @@ private:
 
 	memory_passthrough_handler m_mmu_shadow_tap;
 
-	uint8_t m_prev_opcode;
+	uint8_t m_prev_opcode = 0;
 };
 
 

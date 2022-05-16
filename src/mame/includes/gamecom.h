@@ -179,13 +179,13 @@ struct GAMECOM_DMA
 	u16 dest_mask = 0U;
 	u8 transfer_mode = 0U;
 	s16 adjust_x = 0U;
-	bool decrement_y = 0;
-	bool overwrite_mode = 0;
+	bool decrement_y = false;
+	bool overwrite_mode = false;
 };
 
 struct GAMECOM_TIMER
 {
-	bool enabled = 0;
+	bool enabled = false;
 	u32 prescale_count = 0U;
 	u32 prescale_max = 0U;
 	u8 upcounter_max = 0U;
@@ -256,8 +256,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void gamecom_mem_map(address_map &map);
 
-	uint8_t *m_p_ram = 0;
-	uint8_t *m_cart_ptr = 0;
+	uint8_t *m_p_ram = nullptr;
+	uint8_t *m_cart_ptr = nullptr;
 	uint8_t m_lcdc_reg = 0U;
 	uint8_t m_lch_reg = 0U;
 	uint8_t m_lcv_reg = 0U;
@@ -265,16 +265,16 @@ private:
 	uint8_t m_sound1_cnt = 0U;
 	uint16_t m_scanline = 0U;
 	uint16_t m_base_address = 0U;
-	memory_region *m_cart1_rom = 0;
-	memory_region *m_cart2_rom = 0;
-	emu_timer *m_clock_timer = 0;
-	emu_timer *m_sound0_timer = 0;
-	emu_timer *m_sound1_timer = 0;
-	emu_timer *m_scanline_timer = 0;
+	memory_region *m_cart1_rom = nullptr;
+	memory_region *m_cart2_rom = nullptr;
+	emu_timer *m_clock_timer = nullptr;
+	emu_timer *m_sound0_timer = nullptr;
+	emu_timer *m_sound1_timer = nullptr;
+	emu_timer *m_scanline_timer = nullptr;
 	GAMECOM_DMA m_dma;
-	GAMECOM_TIMER m_timer[2]{};
+	GAMECOM_TIMER m_timer[2];
 	gamecom_sound_t m_sound;
-	bitmap_ind16 m_bitmap = 0;
+	bitmap_ind16 m_bitmap;
 	void gamecom_set_mmu(uint8_t mmu, uint8_t data);
 	void handle_stylus_press(int column);
 	void recompute_lcd_params();

@@ -321,6 +321,8 @@ offs_t spc700_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		flags = STEP_OVER;
 	else if (opcode->name == RET || opcode->name == RETI)
 		flags = STEP_OUT;
+	else if ((opcode->args[0] == REL || opcode->args[1] == REL) && opcode->name != BRA)
+		flags = STEP_COND;
 
 	if (opcode->args[0] == DP && (opcode->args[1] == DP || opcode->args[1] == IMM))
 	{

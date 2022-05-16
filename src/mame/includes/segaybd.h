@@ -135,12 +135,12 @@ private:
 	output_delegate m_output_cb2;
 
 	// internal state
-	uint16_t          m_pdrift_bank;
-	emu_timer *     m_scanline_timer;
-	int             m_irq2_scanline;
-	uint8_t           m_timer_irq_state;
-	uint8_t           m_vblank_irq_state;
-	uint8_t           m_misc_io_data;
+	uint16_t          m_pdrift_bank = 0;
+	emu_timer *     m_scanline_timer = nullptr;
+	int             m_irq2_scanline = 0;
+	uint8_t           m_timer_irq_state = 0;
+	uint8_t           m_vblank_irq_state = 0;
+	uint8_t           m_misc_io_data = 0;
 };
 
 #endif // MAME_INCLUDES_SEGAYBD_H

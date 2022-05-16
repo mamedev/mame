@@ -4,7 +4,6 @@
 #include "emu.h"
 #include "nanoprocessor.h"
 #include "nanoprocessor_dasm.h"
-#include "debugger.h"
 
 // Index of state variables
 enum {

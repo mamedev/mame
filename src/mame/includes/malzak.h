@@ -72,12 +72,12 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	std::unique_ptr<bitmap_rgb32> m_trom_bitmap;
 	std::unique_ptr<bitmap_rgb32> m_playfield_bitmap;
-	tilemap_t *m_playfield_tilemap;
-	int m_playfield_code[256];
-	int m_scrollx;
-	int m_scrolly;
-	int m_collision_counter;
-	u8  m_playfield_bank;
+	tilemap_t *m_playfield_tilemap = nullptr;
+	int m_playfield_code[256]{};
+	int m_scrollx = 0;
+	int m_scrolly = 0;
+	int m_collision_counter = 0;
+	u8  m_playfield_bank = 0;
 };
 
 #endif // MAME_INCLUDES_MALZAK_H

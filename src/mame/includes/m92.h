@@ -21,10 +21,10 @@
 
 struct M92_pf_layer_info
 {
-	tilemap_t *     tmap;
-	tilemap_t *     wide_tmap;
-	uint16_t          vram_base;
-	uint16_t          control[4];
+	tilemap_t *     tmap = nullptr;
+	tilemap_t *     wide_tmap = nullptr;
+	uint16_t          vram_base = 0;
+	uint16_t          control[4]{};
 };
 
 class m92_state : public driver_device
@@ -47,7 +47,8 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_upd71059c(*this, "upd71059c"),
-		m_mainbank(*this, "mainbank")
+		m_mainbank(*this, "mainbank"),
+		m_dsw(*this, "DSW")
 	{ }
 
 	void m92(machine_config &config);
@@ -86,15 +87,16 @@ private:
 	required_device<pic8259_device> m_upd71059c;
 
 	optional_memory_bank m_mainbank;
+	required_ioport m_dsw;
 
-	emu_timer *m_spritebuffer_timer;
-	uint32_t m_raster_irq_position;
-	uint16_t m_videocontrol;
-	uint8_t m_sprite_buffer_busy;
+	emu_timer *m_spritebuffer_timer = nullptr;
+	uint32_t m_raster_irq_position = 0;
+	uint16_t m_videocontrol = 0;
+	uint8_t m_sprite_buffer_busy = 0;
 	M92_pf_layer_info m_pf_layer[3];
-	uint16_t m_pf_master_control[4];
-	int32_t m_sprite_list;
-	uint8_t m_palette_bank;
+	uint16_t m_pf_master_control[4]{};
+	int32_t m_sprite_list = 0;
+	uint8_t m_palette_bank = 0;
 	std::vector<uint16_t> m_paletteram;
 
 	void coincounter_w(uint8_t data);

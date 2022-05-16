@@ -2128,7 +2128,7 @@ Plus, some games crash MAME at exit (e.g. some sorcer disks or some arcus disks)
 	<software name="revolty2">
 		<description>Revolty 2</description>
 		<year>1989</year>
-		<publisher>風雅ｼｽﾃﾑ (Fuga System)</publisher>
+		<publisher>風雅システム (Fuga System)</publisher>
 		<info name="release" value="198901xx"/>
 		<info name="alt_title" value="リボルティーII"/>
 		<part name="flop1" interface="floppy_5_25">

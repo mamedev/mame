@@ -82,10 +82,6 @@ private:
 
 void dsc_state::machine_start()
 {
-	// zerofill
-	m_inp_mux = 0;
-	m_led_select = 0;
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_select));

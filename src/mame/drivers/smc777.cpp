@@ -143,7 +143,7 @@ private:
 	uint8_t m_fdc_drq_flag = 0;
 	uint8_t m_system_data = 0;
 	struct { uint8_t r = 0, g = 0, b = 0; } m_pal;
-	uint8_t m_raminh,m_raminh_pending_change = 0; //bankswitch
+	uint8_t m_raminh = 0, m_raminh_pending_change = 0; //bankswitch
 	uint8_t m_raminh_prefetch = 0;
 	uint8_t m_pal_mode = 0;
 	uint8_t m_keyb_cmd = 0;

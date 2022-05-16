@@ -71,12 +71,12 @@ offs_t vt5x_disassembler::disassemble(std::ostream &stream, offs_t pc, const vt5
 	if (BIT(opcode, 7))
 	{
 		util::stream_format(stream, "LD %03o", opcode & 0177); // execution varies by mode
-		return 1;
+		return 1 | SUPPORTED;
 	}
 	else if ((opcode & 0017) == 0)
 	{
 		stream << m_opcodes_w[(opcode & 0160) >> 4];
-		return 1;
+		return 1 | SUPPORTED;
 	}
 	else
 	{
@@ -121,9 +121,9 @@ offs_t vt5x_disassembler::disassemble(std::ostream &stream, offs_t pc, const vt5
 			if ((opcode & 0164) == 0124) // IROM adjustment
 				nextpc += 0400;
 			util::stream_format(stream, " %04o", (nextpc & 01400) | opcodes.r8(pc + 1));
-			return 2;
+			return 2 | ((opcode & 0170) != 0130 ? STEP_COND : 0) | SUPPORTED;
 		}
 		else
-			return 1;
+			return 1 | SUPPORTED;
 	}
 }

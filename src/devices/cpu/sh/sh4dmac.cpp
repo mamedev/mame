@@ -3,7 +3,6 @@
 /* SHA3/4 DMA Controller */
 
 #include "emu.h"
-#include "debugger.h"
 #include "sh4.h"
 #include "sh4comn.h"
 #include "sh3comn.h"

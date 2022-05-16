@@ -90,21 +90,21 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
-	uint8_t ddrs[3];
-	uint8_t ports[3];
-	uint8_t pll_ctrl;
-	uint8_t timer_ctrl;
-	uint8_t timer_counter, ripple_counter;
-	uint8_t onesec;
-	uint8_t treq, byteack, tip, via_data, via_clock, last_adb;
-	uint64_t last_adb_time;
-	bool cuda_controls_power;
-	bool adb_in;
-	int reset_line;
-	int m_adb_dtime;
-	emu_timer *m_timer, *m_prog_timer;
-	uint8_t pram[0x100], disk_pram[0x100];
-	bool pram_loaded;
+	uint8_t ddrs[3]{};
+	uint8_t ports[3]{};
+	uint8_t pll_ctrl = 0;
+	uint8_t timer_ctrl = 0;
+	uint8_t timer_counter = 0, ripple_counter = 0;
+	uint8_t onesec = 0;
+	uint8_t treq = 0, byteack = 0, tip = 0, via_data = 0, via_clock = 0, last_adb = 0;
+	uint64_t last_adb_time = 0;
+	bool cuda_controls_power = false;
+	bool adb_in = false;
+	int reset_line = 0;
+	int m_adb_dtime = 0;
+	emu_timer *m_timer = nullptr, *m_prog_timer = nullptr;
+	uint8_t pram[0x100]{}, disk_pram[0x100]{};
+	bool pram_loaded = false;
 
 	void send_port(uint8_t offset, uint8_t data);
 };

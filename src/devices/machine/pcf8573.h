@@ -117,7 +117,7 @@ private:
 	int m_address;
 	int m_status;
 
-	enum { STATE_IDLE, STATE_ADDRESS, STATE_MODE, STATE_DATAIN, STATE_DATAOUT };
+	enum { STATE_IDLE, STATE_ADDRESS, STATE_MODE, STATE_DATAIN, STATE_DATAOUT, STATE_READSELACK };
 };
 
 // device type definition

@@ -102,15 +102,15 @@ private:
 	void timer_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void ramdac_w(offs_t offset, uint8_t data);
 
-	uint32_t scr1;
-	uint32_t scr2;
-	uint32_t irq_status;
+	uint32_t scr1 = 0;
+	uint32_t scr2 = 0;
+	uint32_t irq_status = 0;
 	uint32_t irq_mask = 0;
 	int irq_level = 0;
 	required_shared_ptr<uint32_t> vram;
 	uint8_t scsictrl = 0, scsistat = 0;
 
-	uint32_t phy[2];
+	uint32_t phy[2]{};
 
 	attotime timer_tbase;
 	uint16_t timer_vbase = 0;

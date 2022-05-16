@@ -221,20 +221,20 @@ private:
 
 	void geniusiq_mem(address_map &map);
 
-	uint16_t      m_gfx_y;
-	uint16_t      m_gfx_x;
-	uint32_t      m_gfx_base;
-	uint8_t       m_gfx_color[2];
-	uint8_t       m_mouse_posx;
-	uint8_t       m_mouse_posy;
-	uint16_t      m_mouse_gfx_posx;
-	uint16_t      m_mouse_gfx_posy;
-	uint8_t       m_cart_state;
+	uint16_t      m_gfx_y = 0;
+	uint16_t      m_gfx_x = 0;
+	uint32_t      m_gfx_base = 0;
+	uint8_t       m_gfx_color[2]{};
+	uint8_t       m_mouse_posx = 0;
+	uint8_t       m_mouse_posy = 0;
+	uint16_t      m_mouse_gfx_posx = 0;
+	uint16_t      m_mouse_gfx_posy = 0;
+	uint8_t       m_cart_state = 0;
 	struct
 	{
-		uint16_t  buffer[KEYBOARD_QUEUE_SIZE];
-		int     head;
-		int     tail;
+		uint16_t  buffer[KEYBOARD_QUEUE_SIZE]{};
+		int     head = 0;
+		int     tail = 0;
 	} m_keyboard;
 };
 

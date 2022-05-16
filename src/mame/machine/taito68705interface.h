@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ernesto Corvi, Nicola Salmoria, David Haywood, Vas Crabb
+// copyright-holders:David Haywood, Vas Crabb
 #ifndef MAME_MACHINE_TAITO68705INTERFACE_H
 #define MAME_MACHINE_TAITO68705INTERFACE_H
 
@@ -63,6 +63,7 @@ private:
 class taito68705_mcu_device : public taito68705_mcu_device_base
 {
 public:
+	template <unsigned N> auto aux_out_cb() { return m_aux_out_cb[N].bind(); }
 	auto aux_strobe_cb() { return m_aux_strobe_cb.bind(); }
 
 	taito68705_mcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -76,7 +77,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
-	devcb_write8    m_aux_strobe_cb;
+	devcb_write_line::array<6>  m_aux_out_cb;
+	devcb_write8                m_aux_strobe_cb;
 
 	u8  m_pb_output;
 };

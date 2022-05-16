@@ -96,6 +96,8 @@
   * Jolly Joker (original program, interleaved GFX, no logo),      Impera,             199?.
   * Jolly Joker (Solid State module in suicide board).             Impera,             199?.
   * Multi Win (Ver.0167, encrypted),                               Fun World,          1992.
+  * Multi Win (Ver.0091, encrypted),                               Fun World,          1991.
+  * Multi Win (EPM7032, encrypted),                                Amatic,             2001.
   * Power Card (Ver 0263, encrypted),                              Fun World,          1993.
   * Mega Card (Ver.0210, encrypted),                               Fun World,          1993.
   * Joker Card 300 (Ver.A267BC, encrypted),                        Amatic Trading,     1993.
@@ -6791,7 +6793,165 @@ ROM_END
 
 
 /*
+  Multi Win
+  Version 0091
+  1991-09-20
 
+  Different encryption scheme.
+  Looks like more close to megacrd.
+
++--------------------------------------------------------------------------------------+
+|                          +------+                                 +------+           |
+|   +------+    +--------+ |      |                                 |      |           |
+|   |      |    |74LS157N| |GOLDST|                                 |      | +--+      |
+|   |      |    +--------+ |AR    |                                 |SOUND | |  | +--+ +---+
+|   |      |    +--------+ |      |                                 |      | |  | |  |   --|
+|   |GOLDST|    |74LS157N| |GM76C2|                                 |AY-3-8| |K | |L |   --|
+|   |AR    |    +--------+ |8A-10 |                                 |91C   | |  | |  |   --|
+|   |      |    +--------+ |      |    +-------------------+        |      | |  | |  |   --|
+|   |GM68B4|    |74LS157N| |      |    | ::::::::::::::::: |        |      | +--+ +--+   --|
+|   |5S    |    +--------+ +------+    +-------------------+        |      |             --|
+|   |      |    +--------+                                          |      |  +--+       --|
+|   |9141  |    |74LS157N|                                          |      |  |  |       --|
+|   |      |    +--------+                +----------+ +----------+ |      |  |M |     +---+
+|   |      |                              |PAL16L8ACN| |   EMPTY  | |      |  |  |     |
+|   |      |                      +----+  +----------+ +----------+ |      |  |  |     |
+|   +------+   +--------------+   |XTAL|                            |      |  +--+     |
+|              |  KM6264BL-10 |   |    |   +--------------------+   +------+           |
+| +----------+ |   214Y KOREA |   |16.0|   |                    |   +------+           |
+| | 74LS245N | |              |   |00  |   |   FUN WORLD        |   |      |           |
+| +----------+ +--------------+   +----+   |        ELEKTRONIK  |   |      |           +---+
+|                                          |                    |   |      |             --|
+| +----------+     +----------+            +--------------------+   |S22LD |             --|
+| | 74LS374N |     | 74LS374N |                                     |      |             --|
+| +----------+     +----------+  +--+     +--+   +--------------+   | 9248 |             --|
+|                                |  |     |  |   |    EMPTY     |   |      |             --|
+|+--------------+    +--------+  |  |     |  |   |    SOCKET    |   |EF6821|  +--+       --|
+||Multi Win     |    |74LS194A|  |A |     |B |   |          IC25|   |P     |  |  |       --|
+||ZG 1          |    +--------+  |  |     |  |   +--------------+   |      |  |D |       --|
+||          IC10|    +--------+  |  |     |  |                      |      |  |I |       --|
+|+--------------+    |74LS194A|  +--+     |  |   +--------------+   |      |  |P |       --|
+|                    +--------+           +--+   |Multi Win     |   |      |  |1 |       --|
+|+--------------+    +--------+                  |91/F/1        |   |      |  |  |       --|
+||Multi Win     |    |74LS194A|  +--+ +--+ +--+  |          IC37|   |      |  +--+       --|
+||ZG 2          |    +--------+  |  | |  | |  |  +--------------+   +------+             --|
+||          IC11|    +--------+  |C | |  | |  |                     +------+             --|
+|+--------------+    |74LS194A|  |  | |D | |E |  +--------------+   |      |             --|
+|                    +--------+  |  | |  | |  |  |Multi Win     |   |      |             --|
+|+--------+ +-------+            +--+ |  | |  |  |91/F/2        |   |      |             --|
+||74LS174N| |74LS02N|                 |  | +--+  |          IC41|   |      |             --|
+|+--------+ +-------+                 +--+       +--------------+   |MC68B2|             --|
+|                                                                   |1P    |             --|
+|+--+  +--+  +--+                                              +--+ |      |             --|
+||  |  |  |  |  |          +--+        -                       |  | |0K2P  |             --|
+||F |  |  |  |  |          |I |                                |J | |      |             --|
+||  |  |G |  |H |          |  |     BATTERY                    |  | |LLFT92|             --|
+||  |  |  |  |  |          +--+                                |  | |24    |           +---+
+|+--+  |  |  |  |                      +                       +--+ |      |           |
+|      |  |  |  |                                                   |      |           |
+|      +--+  +--+                                                   +------+           |
++--------------------------------------------------------------------------------------+
+
+A: 74LS368AN       H: 74LS374N
+B: 74LS245N        I: MAX690CPA
+C: GD74LS393       J: DM74LS02N
+D: MN74HC241       K: ULN2003AN
+E: 74LS139N        L: SN74LS04N
+F: 74LS174N        M: ULN2003A
+G: DM74S472BN
+
+
+DIP 1:
++-------------------------------+
+|O N                            |
+|+-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+|
+|| | |#| |#| |#| | | | | | | | ||
+|+-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+|
+||#| | | | | | | |#| |#| |#| |#||
+|+-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+|
+| 1   2   3   4   5   6   7   8 |
++-------------------------------+
+
+
+
+FUNWORLD CUSTOM CPU-MODULE:
+
+       +---------------------+
+ A10 ==|01                 40|==
+     ==|                     |==
+     ==|       [] TI74F245A  |==
+     ==|                     |==
+     ==|                     |==
+     ==|       +--+          |==
+     ==|       |  | 65SC02   |==
+ VCC ==|       +--+          |== A00
+ A08 ==|                     |== A01
+ A09 ==|                     |== A02
+     ==|       [] 7400       |== A03
+     ==|                     |== A04
+     ==|    +-----------+    |== A05
+     ==|    | CY7C291A  |    |== A06
+     ==|    |           |    |== A07
+     ==|    |           |    |==
+     ==|    |           |    |==
+     ==|    |     1     |    |==
+     ==|    +-----------+    |==
+     ==|20                 21|== GND
+       +---------------------+
+
+*/
+ROM_START( multiwina )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "multiwin_91-f-1.ic37",  0x8000, 0x8000, CRC(88f122e0) SHA1(6b218e614ac86089321ad2ecb35b956de10031f3) )  // code in the 2nd half
+	ROM_LOAD( "multiwin_91-f-2.ic41",  0x0000, 0x8000, CRC(a09eda44) SHA1(b8bb6a2aa1b703b56e5fb0887d7e5dca28c388ea) )  // code in the 2nd half
+
+	ROM_REGION( 0x0800, "decode", 0 )   // from the CY7C291A inside of the custom CPU.
+	ROM_LOAD( "multiwin_cy7c291a.cpu",  0x0000, 0x0800, CRC(874abdaa) SHA1(b6457d5d501cdf0d38b01e3dadb48b8b97193db3) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "multiwin_zg2.ic11",   0x0000, 0x8000, CRC(2502778a) SHA1(04990c454ca55f1b3e6fdafebce3f2e9e6782329) )
+	ROM_LOAD( "multiwin_zg1.ic10",   0x8000, 0x8000, CRC(38547f3e) SHA1(1322a35ebc358ebc193c029500dc0abd6fd0c113) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "dm74s472.ic13",  0x0000, 0x0200, CRC(3bf9870c) SHA1(2bd99102a1f80ec07dbe3d41bdbcff11b237d680) )
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "multiwin_pal16l8acn.bin",  0x0000, 0x0104, NO_DUMP )
+ROM_END
+
+
+/*
+  Multi Win
+  Amatic, 2001.
+
+  Unknown version.
+  Game encrypted, using a daughterboard
+  with a Mexican R65C02 + Altera EPM7032.
+
+*/
+ROM_START( multiwinb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "win3.bin", 0x8000, 0x8000, CRC(5f01d620) SHA1(ddd86cba383f1e40e3821a58fc0ff7c1ac24de10) )
+
+	ROM_REGION( 0x0800, "altera", 0 )    // Altera EPM7032 object file
+	ROM_LOAD( "multiw1_epm7032.pof", 0x0000, 0x07ae, CRC(922d8d72) SHA1(2ad01fd0b4ddaa1098f3ffc203b6c502d1afd73a) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "win2.bin", 0x0000, 0x8000, CRC(bf031e5e) SHA1(1c971be5eb3e8c1a1b69ec9d00e46aa1fe26b8ee) )
+	ROM_LOAD( "win1.bin", 0x8000, 0x8000, CRC(8ea33d92) SHA1(5aa439181f0751040229ce75101dbdf8b3d68b6c) )
+
+	ROM_REGION( 0x0800, "proms", 0 )
+	ROM_LOAD( "291_n147.bin", 0x0000, 0x0800, CRC(e09e3a77) SHA1(2842875cff63650e15bf7eda3a730446c671c3ea) )
+
+	ROM_REGION( 0x0a00, "plds", 0 )
+	ROM_LOAD( "m1-20v8.bin",  0x0000, 0x0157, CRC(b05b51da) SHA1(5e43cc12cd8bcd820cb89d3008a02ea857daba6f) )
+	ROM_LOAD( "m2-20v8.bin",  0x0200, 0x0157, CRC(11852de6) SHA1(33fcf6f752a116e4df0492d17e0d5e53b31ce77d) )
+	ROM_LOAD( "16v8-3.bin",   0x0400, 0x0117, NO_DUMP )
+	ROM_LOAD( "jo393-4.bin",  0x0800, 0x0117, CRC(6eef3e7d) SHA1(2e1bb576f431743b133833c7c2f91a41a4fcbc37) )
+ROM_END
+
+
+/*
   Power Card (Fun World)
   Version 0263 / 1993-10-22
 
@@ -7382,16 +7542,17 @@ ROM_START( funquiz )    // Fun World Quiz
 	// 03 - Geographie
 	ROM_LOAD( "geo_1.bin",   0x38000, 0x8000, CRC(504da831) SHA1(4bef7bed4d300400c094cb30e9af55d3c6f47c29) )
 	ROM_LOAD( "geo_2.bin",   0x40000, 0x8000, CRC(7c563119) SHA1(9f3ae3ba3e4f60d9ea4b5c95aa5aaada8bb446a3) )
+	ROM_LOAD( "geo_3.bin",   0x48000, 0x8000, CRC(537ac6d2) SHA1(ed3eff9f7c71a6fe7ec59af2376a0b2ba17cc1c3) )
 
 	// 04 - Technik
-	ROM_LOAD( "tech_1.bin",  0x48000, 0x8000, CRC(cf5b9edc) SHA1(f1085c9915d21c4da581d06c9568d2bb47d467ed) )
+	ROM_LOAD( "tech_1.bin",  0x50000, 0x8000, CRC(cf5b9edc) SHA1(f1085c9915d21c4da581d06c9568d2bb47d467ed) )
 
 	// 05 - Sport
-	ROM_LOAD( "sport_2.bin", 0x50000, 0x8000, CRC(7accde63) SHA1(75ec3a02368d3a07d48ef9a9ff4ca7f8cf7798e2) )
+	ROM_LOAD( "sport_2.bin", 0x58000, 0x8000, CRC(7accde63) SHA1(75ec3a02368d3a07d48ef9a9ff4ca7f8cf7798e2) )
 
 	// 07 - Pop
-	ROM_LOAD( "pop_1.bin",   0x58000, 0x8000, CRC(5c74781e) SHA1(0a50a706fd397bb220e31f1a7adaa4204b242888) )
-	ROM_LOAD( "pop_2.bin",   0x60000, 0x8000, CRC(10103648) SHA1(6fdc1aa4dcc8919e46def1c19adc2b9686c0f72d) )
+	ROM_LOAD( "pop_1.bin",   0x60000, 0x8000, CRC(5c74781e) SHA1(0a50a706fd397bb220e31f1a7adaa4204b242888) )
+	ROM_LOAD( "pop_2.bin",   0x68000, 0x8000, CRC(10103648) SHA1(6fdc1aa4dcc8919e46def1c19adc2b9686c0f72d) )
 
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -7438,11 +7599,11 @@ ROM_START( funquiza )
 	// 05 - Geographie
 	ROM_LOAD( "geo1.bin",   0x48000, 0x8000, CRC(504da831) SHA1(4bef7bed4d300400c094cb30e9af55d3c6f47c29) )
 	ROM_LOAD( "geo2.bin",   0x50000, 0x8000, CRC(7c563119) SHA1(9f3ae3ba3e4f60d9ea4b5c95aa5aaada8bb446a3) )
-	ROM_LOAD( "geo3.bin",   0x58000, 0x8000, CRC(7c563119) SHA1(9f3ae3ba3e4f60d9ea4b5c95aa5aaada8bb446a3) )
+	ROM_LOAD( "geo3.bin",   0x58000, 0x8000, CRC(537ac6d2) SHA1(ed3eff9f7c71a6fe7ec59af2376a0b2ba17cc1c3) )
 
 	// 06 - Pop
-	ROM_LOAD( "pop_1.bin",   0x60000, 0x8000, CRC(5c74781e) SHA1(0a50a706fd397bb220e31f1a7adaa4204b242888) )
-	ROM_LOAD( "pop_2.bin",   0x68000, 0x8000, CRC(10103648) SHA1(6fdc1aa4dcc8919e46def1c19adc2b9686c0f72d) )
+	ROM_LOAD( "pop1.bin",   0x60000, 0x8000, CRC(5c74781e) SHA1(0a50a706fd397bb220e31f1a7adaa4204b242888) )
+	ROM_LOAD( "pop2.bin",   0x68000, 0x8000, CRC(10103648) SHA1(6fdc1aa4dcc8919e46def1c19adc2b9686c0f72d) )
 
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -7486,7 +7647,7 @@ ROM_START( funquizb )
 	// 05 - Geographie
 	ROM_LOAD( "geo1.bin",   0x48000, 0x8000, CRC(504da831) SHA1(4bef7bed4d300400c094cb30e9af55d3c6f47c29) )
 	ROM_LOAD( "geo2.bin",   0x50000, 0x8000, CRC(7c563119) SHA1(9f3ae3ba3e4f60d9ea4b5c95aa5aaada8bb446a3) )
-	ROM_LOAD( "geo3.bin",   0x58000, 0x8000, CRC(7c563119) SHA1(9f3ae3ba3e4f60d9ea4b5c95aa5aaada8bb446a3) )
+	ROM_LOAD( "geo3.bin",   0x58000, 0x8000, CRC(537ac6d2) SHA1(ed3eff9f7c71a6fe7ec59af2376a0b2ba17cc1c3) )
 
 	// 06 - Pop
 	ROM_LOAD( "pop1.bin",   0x60000, 0x8000, CRC(5c74781e) SHA1(0a50a706fd397bb220e31f1a7adaa4204b242888) )
@@ -8791,7 +8952,9 @@ GAMEL( 199?, jolyjokrp,  jolyjokr, fw2ndpal, funworld,  funworld_state, init_imp
 GAMEL( 199?, jolyjokrm,  jolyjokr, fw1stpal, funworld,  funworld_state, empty_init,    ROT0, "Impera",            "Jolly Joker (Solid State module in suicide board)", 0,                     layout_jollycrd )
 
 // Encrypted games...
-GAME(  1992, multiwin,   0,        multiwin, funworld,  multiwin_state, driver_init,   ROT0, "Fun World",         "Multi Win (Ver.0167, encrypted)",                 0 )
+GAME(  1992, multiwin,   0,        multiwin, funworld,  multiwin_state, driver_init,   ROT0, "Fun World",         "Multi Win (Ver.0167, encrypted)",                 0 ) // original funworld, encrypted.
+GAME(  1991, multiwina,  multiwin, megacard, funworld,  megacard_state, empty_init,    ROT0, "Fun World",         "Multi Win (Ver.0091, encrypted)",                 MACHINE_NOT_WORKING ) // different encryption scheme.
+GAME(  2001, multiwinb,  multiwin, fw2ndpal, funworld,  funworld_state, empty_init,    ROT0, "Amatic",            "Multi Win (EPM7032, encrypted)",                  MACHINE_NOT_WORKING ) // daughterboard with R65C02 + Altera EPM7032.
 GAME(  1993, powercrd,   0,        powercrd, funworld,  powercrd_state, empty_init,    ROT0, "Fun World",         "Power Card (Ver 0263, encrypted)",                0 ) // clone of Bonus Card.
 GAME(  1993, megacard,   0,        megacard, funworld,  megacard_state, empty_init,    ROT0, "Fun World",         "Mega Card (Ver.0210, encrypted)",                 0 )
 GAME(  1993, jokercrd,   0,        jokercrd, funworld,  jokercrd_state, empty_init,    ROT0, "Amatic Trading",    "Joker Card 300 (Ver.A267BC, encrypted)",          0 )

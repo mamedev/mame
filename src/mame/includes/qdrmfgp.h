@@ -53,10 +53,10 @@ private:
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_sndram;
 
-	uint16_t m_control;
-	int32_t m_gp2_irq_control;
-	int32_t m_pal;
-	emu_timer *m_gp2_timer;
+	uint16_t m_control = 0;
+	int32_t m_gp2_irq_control = 0;
+	int32_t m_pal = 0;
+	emu_timer *m_gp2_timer = nullptr;
 
 	void gp_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void gp2_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

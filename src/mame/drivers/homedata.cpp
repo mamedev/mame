@@ -1101,20 +1101,9 @@ INPUT_PORTS_END
 /**************************************************************************/
 
 
-static const gfx_layout char_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
 static GFXDECODE_START( gfx_mrokumei )
-	GFXDECODE_ENTRY( "gfx1", 0, char_layout, 0x6000, 0x100 )
-	GFXDECODE_ENTRY( "gfx2", 0, char_layout, 0x7000, 0x100 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb, 0x6000, 0x100 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_msb, 0x7000, 0x100 )
 GFXDECODE_END
 
 static const gfx_layout tile_layout =
@@ -1491,20 +1480,9 @@ void homedata_state::cpu2_map(address_map &map)
 
 
 
-static const gfx_layout mirderbychar_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
 static GFXDECODE_START( gfx_mirderby )
-	GFXDECODE_ENTRY( "gfx1", 0, mirderbychar_layout, 0x0000, 0x10 )
-	GFXDECODE_ENTRY( "gfx2", 0, mirderbychar_layout, 0x0000, 0x10 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb, 0x0000, 0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_msb, 0x0000, 0x10 )
 GFXDECODE_END
 
 /*   Miracle Derby - Ascot
@@ -2242,7 +2220,7 @@ GAME( 1988, mjclinica, mjclinic, mrokumei, mjhokite, homedata_state, empty_init,
 GAME( 1988, mrokumei,  0,        mrokumei, mjhokite, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Rokumeikan (Japan)",                          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1988, lastapos,  0,        reikaids, reikaids, homedata_state, init_reikaids, ROT0, "Home Data",  "The Last Apostle Puppetshow",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1988, reikaids,  lastapos, reikaids, reikaids, homedata_state, init_reikaids, ROT0, "Home Data",  "Reikai Doushi (Japan)",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1988, reikaids,  lastapos, reikaids, reikaids, homedata_state, init_reikaids, ROT0, "Home Data",  "Reikai Doushi - Chinese Exorcist (Japan)",            MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, battlcry,  0,        reikaids, battlcry, homedata_state, init_battlcry, ROT0, "Home Data",  "Battlecry (Version E)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, battlcryc, battlcry, reikaids, battlcry, homedata_state, init_battlcry, ROT0, "Home Data",  "Battlecry (Version C)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

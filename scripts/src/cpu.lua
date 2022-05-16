@@ -2853,29 +2853,41 @@ if opt_tool(CPUS, "SUPERFX") then
 end
 
 --------------------------------------------------
--- Rockwell B5000 family
---@src/devices/cpu/b5000/b5000.h,CPUS["B5000"] = true
---@src/devices/cpu/b5000/b6000.h,CPUS["B5000"] = true
---@src/devices/cpu/b5000/b6100.h,CPUS["B5000"] = true
+-- Rockwell A/B5000 family
+--@src/devices/cpu/rw5000/a5000.h,CPUS["RW5000"] = true
+--@src/devices/cpu/rw5000/a5500.h,CPUS["RW5000"] = true
+--@src/devices/cpu/rw5000/a5900.h,CPUS["RW5000"] = true
+--@src/devices/cpu/rw5000/b5000.h,CPUS["RW5000"] = true
+--@src/devices/cpu/rw5000/b5500.h,CPUS["RW5000"] = true
+--@src/devices/cpu/rw5000/b6000.h,CPUS["RW5000"] = true
+--@src/devices/cpu/rw5000/b6100.h,CPUS["RW5000"] = true
 --------------------------------------------------
 
-if CPUS["B5000"] then
+if CPUS["RW5000"] then
 	files {
-		MAME_DIR .. "src/devices/cpu/b5000/b5000base.cpp",
-		MAME_DIR .. "src/devices/cpu/b5000/b5000base.h",
-		MAME_DIR .. "src/devices/cpu/b5000/b5000.cpp",
-		MAME_DIR .. "src/devices/cpu/b5000/b5000.h",
-		MAME_DIR .. "src/devices/cpu/b5000/b5000op.cpp",
-		MAME_DIR .. "src/devices/cpu/b5000/b6000.cpp",
-		MAME_DIR .. "src/devices/cpu/b5000/b6000.h",
-		MAME_DIR .. "src/devices/cpu/b5000/b6100.cpp",
-		MAME_DIR .. "src/devices/cpu/b5000/b6100.h",
+		MAME_DIR .. "src/devices/cpu/rw5000/rw5000base.cpp",
+		MAME_DIR .. "src/devices/cpu/rw5000/rw5000base.h",
+		MAME_DIR .. "src/devices/cpu/rw5000/b5000.cpp",
+		MAME_DIR .. "src/devices/cpu/rw5000/b5000.h",
+		MAME_DIR .. "src/devices/cpu/rw5000/b5000op.cpp",
+		MAME_DIR .. "src/devices/cpu/rw5000/b5500.cpp",
+		MAME_DIR .. "src/devices/cpu/rw5000/b5500.h",
+		MAME_DIR .. "src/devices/cpu/rw5000/b6000.cpp",
+		MAME_DIR .. "src/devices/cpu/rw5000/b6000.h",
+		MAME_DIR .. "src/devices/cpu/rw5000/b6100.cpp",
+		MAME_DIR .. "src/devices/cpu/rw5000/b6100.h",
+		MAME_DIR .. "src/devices/cpu/rw5000/a5000.cpp",
+		MAME_DIR .. "src/devices/cpu/rw5000/a5000.h",
+		MAME_DIR .. "src/devices/cpu/rw5000/a5500.cpp",
+		MAME_DIR .. "src/devices/cpu/rw5000/a5500.h",
+		MAME_DIR .. "src/devices/cpu/rw5000/a5900.cpp",
+		MAME_DIR .. "src/devices/cpu/rw5000/a5900.h",
 	}
 end
 
-if opt_tool(CPUS, "B5000") then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/b5000/b5000d.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/b5000/b5000d.h")
+if opt_tool(CPUS, "RW5000") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/rw5000/rw5000d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/rw5000/rw5000d.h")
 end
 
 --------------------------------------------------
@@ -3111,6 +3123,16 @@ end
 if opt_tool(CPUS, "ALPHA") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/alpha/alphad.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/alpha/alphad.h")
+end
+
+--------------------------------------------------
+-- Hewlett-Packard HP2100 (disassembler only)
+--@src/devices/cpu/hp2100/hp2100.h,CPUS["HP2100"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "HP2100") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/hp2100/hp2100d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/hp2100/hp2100d.h")
 end
 
 --------------------------------------------------
@@ -3567,4 +3589,13 @@ end
 if opt_tool(CPUS, "M68HC16") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/m68hc16/cpu16dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/m68hc16/cpu16dasm.h")
+end
+
+--------------------------------------------------
+-- Varian 620, disassembler only
+--------------------------------------------------
+
+if opt_tool(CPUS, "V620") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/v620/v620dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/v620/v620dasm.h")
 end

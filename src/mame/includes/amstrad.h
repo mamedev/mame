@@ -119,9 +119,9 @@ private:
 	required_device<ram_device> m_ram;
 	optional_device<mc146818_device> m_rtc;  // Aleste 520EX only
 
-	int m_system_type;
-	uint8_t m_aleste_mode;
-	int m_plus_irq_cause;
+	int m_system_type = 0;
+	uint8_t m_aleste_mode = 0;
+	int m_plus_irq_cause = 0;
 
 /****************************
  * Gate Array data (CPC) -
@@ -129,35 +129,35 @@ private:
 	struct gate_array_t
 	{
 		std::unique_ptr<bitmap_ind16>    bitmap;        /* The bitmap we work on */
-		uint8_t   pen_selected;       /* Pen selection */
-		uint8_t   mrer;               /* Mode and ROM Enable Register */
-		uint8_t   upper_bank;
-		uint8_t   romdis;  // ROMDIS signal from the expansion port
+		uint8_t   pen_selected = 0;       /* Pen selection */
+		uint8_t   mrer = 0;               /* Mode and ROM Enable Register */
+		uint8_t   upper_bank = 0;
+		uint8_t   romdis = 0;  // ROMDIS signal from the expansion port
 
 		/* input signals from CRTC */
-		int     vsync;
-		int     hsync;
-		int     de;
-		int     ma;
-		int     ra;
+		int     vsync = 0;
+		int     hsync = 0;
+		int     de = 0;
+		int     ma = 0;
+		int     ra = 0;
 
 		/* used for timing */
-		int     hsync_after_vsync_counter;
-		int     hsync_counter;              /* The gate array counts CRTC HSYNC pulses using an internal 6-bit counter. */
+		int     hsync_after_vsync_counter = 0;
+		int     hsync_counter = 0;              /* The gate array counts CRTC HSYNC pulses using an internal 6-bit counter. */
 
 		/* used for drawing the screen */
 		attotime    last_draw_time;
-		int     y;
-		uint16_t  *draw_p;                    /* Position in the bitmap where we are currently drawing */
-		uint16_t  colour;
-		uint16_t  address;
-		uint8_t   *mode_lookup;
-		uint8_t   data;
-		uint8_t   ticks;
-		uint8_t   ticks_increment;
-		uint16_t  line_ticks;
-		uint8_t   colour_ticks;
-		uint8_t   max_colour_ticks;
+		int     y = 0;
+		uint16_t  *draw_p = nullptr;                    /* Position in the bitmap where we are currently drawing */
+		uint16_t  colour = 0;
+		uint16_t  address = 0;
+		uint8_t   *mode_lookup = nullptr;
+		uint8_t   data = 0;
+		uint8_t   ticks = 0;
+		uint8_t   ticks_increment = 0;
+		uint16_t  line_ticks = 0;
+		uint8_t   colour_ticks = 0;
+		uint8_t   max_colour_ticks = 0;
 	};
 
 	gate_array_t m_gate_array;
@@ -167,52 +167,52 @@ private:
  ****************************/
 	struct asic_t
 	{
-		uint8_t   *ram;               /* pointer to RAM used for the CPC+ ASIC memory-mapped registers */
-		uint8_t   enabled;            /* Are CPC plus features enabled/unlocked */
-		uint8_t   pri;                /* Programmable raster interrupt */
-		uint8_t   seqptr;             /* Current position in the ASIC unlocking sequence */
-		uint8_t   rmr2;               /* ROM mapping register 2 */
-		uint16_t  split_ma_base;      /* Used to handle split screen support */
-		uint16_t  split_ma_started;   /* Used to handle split screen support */
-		uint16_t  vpos;               /* Current logical scanline */
-		uint16_t  h_start;            /* Position where DE became active */
-		uint16_t  h_end;              /* Position where DE became inactive */
-		uint8_t   addr_6845;          /* We need these to store a shadow copy of R1 of the mc6845 */
-		uint8_t   horiz_disp;
-		uint8_t   hscroll;
-		uint8_t   de_start;           /* flag to check if DE is been enabled this frame yet */
-		bool      hsync_first_tick;   /* flag to check in first CRTC tick, used for knowing when to cover left side of screen to cover horizontal softscroll mess */
-		uint8_t   hsync_tick_count;
+		uint8_t   *ram = nullptr;               /* pointer to RAM used for the CPC+ ASIC memory-mapped registers */
+		uint8_t   enabled = 0;            /* Are CPC plus features enabled/unlocked */
+		uint8_t   pri = 0;                /* Programmable raster interrupt */
+		uint8_t   seqptr = 0;             /* Current position in the ASIC unlocking sequence */
+		uint8_t   rmr2 = 0;               /* ROM mapping register 2 */
+		uint16_t  split_ma_base = 0;      /* Used to handle split screen support */
+		uint16_t  split_ma_started = 0;   /* Used to handle split screen support */
+		uint16_t  vpos = 0;               /* Current logical scanline */
+		uint16_t  h_start = 0;            /* Position where DE became active */
+		uint16_t  h_end = 0;              /* Position where DE became inactive */
+		uint8_t   addr_6845 = 0;          /* We need these to store a shadow copy of R1 of the mc6845 */
+		uint8_t   horiz_disp = 0;
+		uint8_t   hscroll = 0;
+		uint8_t   de_start = 0;           /* flag to check if DE is been enabled this frame yet */
+		bool      hsync_first_tick = false;   /* flag to check in first CRTC tick, used for knowing when to cover left side of screen to cover horizontal softscroll mess */
+		uint8_t   hsync_tick_count = 0;
 
 		/* DMA */
-		uint8_t   dma_status;
-		uint8_t   dma_clear;          /* Set if DMA interrupts are to be cleared automatically */
-		uint8_t   dma_prescaler[3];   /* DMA channel prescaler */
-		uint16_t  dma_repeat[3];      /* Location of the DMA channel's last repeat */
-		uint16_t  dma_addr[3];        /* DMA channel address */
-		uint16_t  dma_loopcount[3];   /* Count loops taken on this channel */
-		uint16_t  dma_pause[3];       /* DMA pause count */
+		uint8_t   dma_status = 0;
+		uint8_t   dma_clear = 0;          /* Set if DMA interrupts are to be cleared automatically */
+		uint8_t   dma_prescaler[3]{};   /* DMA channel prescaler */
+		uint16_t  dma_repeat[3]{};      /* Location of the DMA channel's last repeat */
+		uint16_t  dma_addr[3]{};        /* DMA channel address */
+		uint16_t  dma_loopcount[3]{};   /* Count loops taken on this channel */
+		uint16_t  dma_pause[3]{};       /* DMA pause count */
 	};
 
 	asic_t m_asic;
-	int m_GateArray_RamConfiguration;
-	unsigned char *m_AmstradCPC_RamBanks[4];
-	unsigned char *m_Aleste_RamBanks[4];
-	int m_aleste_active_page[4];
-	unsigned char *m_Amstrad_ROM_Table[256];
-	uint8_t m_ppi_port_inputs[3];
-	uint8_t m_ppi_port_outputs[3];
-	int m_aleste_rtc_function;
-	int m_prev_reg;
-	uint16_t m_GateArray_render_colours[17];
-	uint8_t m_mode0_lookup[256];
-	uint8_t m_mode1_lookup[256];
-	uint8_t m_mode2_lookup[256];
-	int m_prev_data;
-	int m_printer_bit8_selected;
-	unsigned char m_Psg_FunctionSelected;
-	int m_previous_ppi_portc_w;
-	uint8_t m_amx_mouse_data;
+	int m_GateArray_RamConfiguration = 0;
+	unsigned char *m_AmstradCPC_RamBanks[4]{};
+	unsigned char *m_Aleste_RamBanks[4]{};
+	int m_aleste_active_page[4]{};
+	unsigned char *m_Amstrad_ROM_Table[256]{};
+	uint8_t m_ppi_port_inputs[3]{};
+	uint8_t m_ppi_port_outputs[3]{};
+	int m_aleste_rtc_function = 0;
+	int m_prev_reg = 0;
+	uint16_t m_GateArray_render_colours[17]{};
+	uint8_t m_mode0_lookup[256]{};
+	uint8_t m_mode1_lookup[256]{};
+	uint8_t m_mode2_lookup[256]{};
+	int m_prev_data = 0;
+	int m_printer_bit8_selected = 0;
+	unsigned char m_Psg_FunctionSelected = 0;
+	int m_previous_ppi_portc_w = 0;
+	uint8_t m_amx_mouse_data = 0;
 	void amstrad_plus_asic_4000_w(offs_t offset, uint8_t data);
 	void amstrad_plus_asic_6000_w(offs_t offset, uint8_t data);
 	uint8_t amstrad_plus_asic_4000_r(offs_t offset);
@@ -284,7 +284,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	memory_region *m_region_cart;
+	memory_region *m_region_cart = nullptr;
 
 	void amstrad_init_lookups();
 	void amstrad_vh_update_mode();
@@ -309,8 +309,8 @@ private:
 	void enumerate_roms();
 	static uint8_t kccomp_get_colour_element(int colour_value);
 
-	int m_centronics_busy;
-	uint8_t m_last_write;
+	int m_centronics_busy = 0;
+	uint8_t m_last_write = 0;
 };
 
 

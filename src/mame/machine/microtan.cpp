@@ -667,14 +667,27 @@ void microtan_state::snapshot_copy(uint8_t *snapshot_buff, int snapshot_size)
 
 SNAPSHOT_LOAD_MEMBER(microtan_state::snapshot_cb)
 {
-	uint8_t *snapshot_buff = (uint8_t*)image.ptr();
-	if (!snapshot_buff)
+	uint64_t snapshot_len = image.length();
+	if (snapshot_len < 4 || snapshot_len >= 66000)
+	{
+		//image.seterror(image_error::INVALIDIMAGE);
 		return image_init_result::FAIL;
+	}
 
-	if (verify_snapshot(snapshot_buff, image.length()) != image_verify_result::PASS)
+	auto snapshot_buff = std::make_unique<uint8_t []>(snapshot_len);
+	if (image.fread(snapshot_buff.get(), snapshot_len) != snapshot_len)
+	{
+		//image.seterror(image_error::UNSPECIFIED);
 		return image_init_result::FAIL;
+	}
 
-	snapshot_copy(snapshot_buff, image.length());
+	if (verify_snapshot(snapshot_buff.get(), snapshot_len) != image_verify_result::PASS)
+	{
+		//image.seterror(image_error::INVALIDIMAGE);
+		return image_init_result::FAIL;
+	}
+
+	snapshot_copy(snapshot_buff.get(), snapshot_len);
 	return image_init_result::PASS;
 }
 

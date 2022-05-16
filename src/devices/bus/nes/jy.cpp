@@ -98,7 +98,6 @@ void nes_jy_typea_device::device_start()
 
 void nes_jy_typea_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
 	chr8(0, m_chr_source);
 
@@ -262,7 +261,7 @@ uint8_t nes_jy_typea_device::read_l(offs_t offset)
 			return m_latch;
 	}
 
-	return get_open_bus();   // open bus
+	return get_open_bus();
 }
 
 void nes_jy_typea_device::write_l(offs_t offset, uint8_t data)
@@ -289,7 +288,7 @@ uint8_t nes_jy_typea_device::read_m(offs_t offset)
 	if (m_reg[0] & 0x80)
 		return m_prg[(m_bank_6000 & m_prg_mask) * 0x2000 + (offset & 0x1fff)];
 
-	return get_open_bus();   // open bus
+	return get_open_bus();
 }
 
 

@@ -41,7 +41,7 @@ bool pasti_format::supports_save() const
 	return false;
 }
 
-int pasti_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int pasti_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t h[16];
 	size_t actual;
@@ -49,7 +49,7 @@ int pasti_format::identify(util::random_read &io, uint32_t form_factor, const st
 
 	if(!memcmp(h, "RSY\0\3\0", 6) &&
 		(1 || (h[10] >= 80 && h[10] <= 82) || (h[10] >= 160 && h[10] <= 164)))
-		return 100;
+		return FIFID_SIGN;
 
 	return 0;
 }
@@ -64,7 +64,7 @@ static void hexdump(const uint8_t *d, int s)
 	}
 }
 
-bool pasti_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool pasti_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	size_t actual;
 	uint8_t fh[16];
@@ -165,7 +165,7 @@ bool pasti_format::load(util::random_read &io, uint32_t form_factor, const std::
 	return true;
 }
 
-const floppy_format_type FLOPPY_PASTI_FORMAT = &floppy_image_format_creator<pasti_format>;
+const pasti_format FLOPPY_PASTI_FORMAT;
 
 
 void pasti_format::wd_generate_track_from_observations(int track, int head, floppy_image *image, wd_obs &obs)

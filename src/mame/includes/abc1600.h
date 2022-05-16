@@ -124,7 +124,7 @@ private:
 	void spec_contr_reg_w(uint8_t data);
 
 	void dbrq_w(int state);
-	
+
 	uint8_t cio_pa_r();
 	uint8_t cio_pb_r();
 	void cio_pb_w(uint8_t data);
@@ -149,7 +149,6 @@ private:
 	int m_dmadis = 0;
 	int m_sysscc = 0;
 	int m_sysfs = 0;
-	int m_partst = 0;               // parity test
 
 	void abc1600_mem(address_map &map);
 	void mac_mem(address_map &map);

@@ -15,19 +15,8 @@ Games:
 - Sorcerer (#532)
 - Space Shuttle (#535)
 - Comet (#540)
-- Rat Race (#527)
-- Rat Race II (#533)
 
 The first time run, the display will show the model number. Press F3 to clear this.
-
-Rat Race is played in a cocktail cabinet, the player uses a joystick to tilt the
- board, to coax the ball into following lit arrows in a maze. After a successful
- navigation, the maze changes to something else faster and harder. It's almost an
- arcade game done mechanically. Obviously there is no way to emulate it in its intended
- form. Probably would have been a nice game, but it never passed the prototype stage.
- Currently it runs but the player display flashes randoms ones while a sound is produced
- every couple of seconds. Bad byte at "maincpu" D7FF. Technically the machine is a
- mixture of sys7 and sys9, so it will require more work.
 
 
 Here are the key codes to enable play:
@@ -39,10 +28,9 @@ Space Huttle      535  ASD hit 1                 ASD
 Comet             540  1                         X
 
 Status:
-- Pinballs (Sorcerer, Space Shuttle, Comet) are playable.
+- All machines are playable.
 
 ToDo:
-- Rat Race: need a manual, playboard contacts are unknown/don't respond.
 - Mechanical sounds
 
 *****************************************************************************************/
@@ -258,7 +246,7 @@ void s9_state::sol2_w(u8 data)
 		m_comma34 = BIT(data, 6);
 	}
 	for (u8 i = 0; i < 8; i++)
-		m_io_outputs[16U+i] = BIT(data, i);
+		m_io_outputs[8U+i] = BIT(data, i);
 }
 
 void s9_state::lamp0_w(u8 data)
@@ -425,21 +413,9 @@ void s9_state::s9(machine_config &config)
 	WILLIAMS_S9_SOUND(config, m_s9sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-/*-----------------------------------------------------------------------------
-/ Rat Race - Sys.9 (Game #527)- Prototype (displays as #500L1)
-/-----------------------------------------------------------------------------*/
-ROM_START(ratrc_l1)
-	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("ic20.532", 0x1000, 0x1000, CRC(0c5c7c09) SHA1(c93b39ba1460feee5850fcd3ca7cacb72c4c8ff3))
-	ROM_LOAD("ic14.532", 0x2000, 0x1000, CRC(c6f4bcf4) SHA1(d71c86299139abe3dd376a324315a039be82875c))
-	ROM_LOAD("ic17.532", 0x3000, 0x1000, CRC(0800c214) SHA1(3343c07fd550bb0759032628e01bb750135dab15))
-
-	ROM_REGION(0x8000, "s9sound:audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("b486.bin", 0x6000, 0x2000, CRC(c54b9402) SHA1(c56fc5f105fc2c1166e3b22bb09b72af79e0aec1))
-ROM_END
 
 /*-----------------------------
-/ Sorcerer (S9) 03/85 (#532)
+/ Sorcerer : 03/85 (#532)
 /------------------------------*/
 ROM_START(sorcr_l1)
 	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
@@ -467,13 +443,8 @@ ROM_START(sorcr_l2)
 	ROM_LOAD("cpu_u49.128", 0x4000, 0x4000, CRC(a0bae1e4) SHA1(dc5172aa1d59191d4119da20757cb2c2469f8fe3))
 ROM_END
 
-/*-----------------------------
-/ Rat Race II (Game #533)
-/ - never produced
-/-----------------------------*/
-
 /*---------------------------------
-/ Space Shuttle (S9) 12/84 (#535)
+/ Space Shuttle : 12/84 (#535)
 /----------------------------------*/
 ROM_START(sshtl_l7)
 	// Spanish licensed version by Stargame is identical to this set
@@ -499,7 +470,7 @@ ROM_START(sshtl_l3)
 ROM_END
 
 /*-------------------------
-/ Comet (S9) 06/85 (#540)
+/ Comet : 06/85 (#540)
 /--------------------------*/
 ROM_START(comet_l4)
 	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
@@ -527,13 +498,9 @@ ROM_END
 
 } // Anonymous namespace
 
-// Novelty
-GAME( 1983, ratrc_l1, 0,        s9, s9,    s9_state, init_rr,    ROT0, "Williams", "Rat Race (L-1)",              MACHINE_IS_SKELETON_MECHANICAL )
-
-// Pinball
-GAME( 1985, sorcr_l1, sorcr_l2, s9, sorcr, s9_state, empty_init, ROT0, "Williams", "Sorcerer (L-1)",              MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1985, sorcr_l2, 0,        s9, sorcr, s9_state, empty_init, ROT0, "Williams", "Sorcerer (L-2)",              MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1984, sshtl_l7, 0,        s9, sshtl, s9_state, empty_init, ROT0, "Williams", "Space Shuttle (L-7)",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1984, sshtl_l3, sshtl_l7, s9, sshtl, s9_state, empty_init, ROT0, "Williams", "Space Shuttle (L-3)",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1985, comet_l4, comet_l5, s9, s9,    s9_state, empty_init, ROT0, "Williams", "Comet (L-4)",                 MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1985, comet_l5, 0,        s9, s9,    s9_state, empty_init, ROT0, "Williams", "Comet (L-5)",                 MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1985, sorcr_l1, sorcr_l2, s9, sorcr, s9_state, empty_init, ROT0, "Williams", "Sorcerer (L-1)",              MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sorcr_l2, 0,        s9, sorcr, s9_state, empty_init, ROT0, "Williams", "Sorcerer (L-2)",              MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sshtl_l7, 0,        s9, sshtl, s9_state, empty_init, ROT0, "Williams", "Space Shuttle (L-7)",         MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sshtl_l3, sshtl_l7, s9, sshtl, s9_state, empty_init, ROT0, "Williams", "Space Shuttle (L-3)",         MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, comet_l4, comet_l5, s9, s9,    s9_state, empty_init, ROT0, "Williams", "Comet (L-4)",                 MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, comet_l5, 0,        s9, s9,    s9_state, empty_init, ROT0, "Williams", "Comet (L-5)",                 MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

@@ -156,20 +156,20 @@ public:
 	int m_nmi_enable;
 
 	// keyboard state
-	uint8_t m_kbd;
+	uint8_t m_kbd = 0;
 	int m_kb_bits;
 	int m_kbclk;
 	int m_kbdata;
 
 	// mouse state
-	uint8_t m_mouse_x_old;
-	uint8_t m_mouse_y_old;
-	uint8_t m_mouse_x;
-	uint8_t m_mouse_y;
+	uint8_t m_mouse_x_old = 0;
+	uint8_t m_mouse_y_old = 0;
+	uint8_t m_mouse_x = 0;
+	uint8_t m_mouse_y = 0;
 
 	// DMA state
-	uint8_t m_dma_page[4];
-	int m_dma_channel;
+	uint8_t m_dma_page[4]{};
+	int m_dma_channel = 0;
 	int m_dreq0;
 
 	// floppy state
@@ -182,12 +182,12 @@ public:
 	// printer state
 	int m_ack_int_enable;
 	int m_centronics_ack;
-	int m_centronics_busy;
-	int m_centronics_perror;
-	int m_centronics_select;
-	int m_centronics_fault;
-	uint8_t m_printer_data;
-	uint8_t m_printer_control;
+	int m_centronics_busy = 0;
+	int m_centronics_perror = 0;
+	int m_centronics_select = 0;
+	int m_centronics_fault = 0;
+	uint8_t m_printer_data = 0;
+	uint8_t m_printer_control = 0;
 
 	// sound state
 	int m_speaker_drive;

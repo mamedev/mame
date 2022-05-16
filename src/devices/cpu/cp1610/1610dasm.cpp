@@ -778,36 +778,43 @@ offs_t cp1610_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		size += 1;
 		ea = oprom16[1];
 		util::stream_format(stream, "BC   %04X",pc+2+ea);
+		flags = STEP_COND;
 		break;
 	case 0x202: /* 1 000 000 010 */
 		size += 1;
 		ea = oprom16[1];
 		util::stream_format(stream, "BOV  %04X",pc+2+ea);
+		flags = STEP_COND;
 		break;
 	case 0x203: /* 1 000 000 011 */
 		size += 1;
 		ea = oprom16[1];
 		util::stream_format(stream, "BPL  %04X",pc+2+ea);
+		flags = STEP_COND;
 		break;
 	case 0x204: /* 1 000 000 100 */
 		size += 1;
 		ea = oprom16[1];
 		util::stream_format(stream, "BZE  %04X",pc+2+ea);
+		flags = STEP_COND;
 		break;
 	case 0x205: /* 1 000 000 101 */
 		size += 1;
 		ea = oprom16[1];
 		util::stream_format(stream, "BLT  %04X",pc+2+ea);
+		flags = STEP_COND;
 		break;
 	case 0x206: /* 1 000 000 110 */
 		size += 1;
 		ea = oprom16[1];
 		util::stream_format(stream, "BLE  %04X",pc+2+ea);
+		flags = STEP_COND;
 		break;
 	case 0x207: /* 1 000 000 111 */
 		size += 1;
 		ea = oprom16[1];
 		util::stream_format(stream, "BUSC %04X",pc+2+ea);
+		flags = STEP_COND;
 		break;
 	case 0x208: /* 1 000 001 000 */
 		size += 1;
@@ -818,36 +825,43 @@ offs_t cp1610_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		size += 1;
 		ea = oprom16[1];
 		util::stream_format(stream, "BNC  %04X",pc+2+ea);
+		flags = STEP_COND;
 		break;
 	case 0x20a: /* 1 000 001 010 */
 		size += 1;
 		ea = oprom16[1];
 		util::stream_format(stream, "BNOV %04X",pc+2+ea);
+		flags = STEP_COND;
 		break;
 	case 0x20b: /* 1 000 001 011 */
 		size += 1;
 		ea = oprom16[1];
 		util::stream_format(stream, "BMI  %04X",pc+2+ea);
+		flags = STEP_COND;
 		break;
 	case 0x20c: /* 1 000 001 100 */
 		size += 1;
 		ea = oprom16[1];
 		util::stream_format(stream, "BNZE %04X",pc+2+ea);
+		flags = STEP_COND;
 		break;
 	case 0x20d: /* 1 000 001 101 */
 		size += 1;
 		ea = oprom16[1];
 		util::stream_format(stream, "BGE  %04X",pc+2+ea);
+		flags = STEP_COND;
 		break;
 	case 0x20e: /* 1 000 001 110 */
 		size += 1;
 		ea = oprom16[1];
 		util::stream_format(stream, "BGT  %04X",pc+2+ea);
+		flags = STEP_COND;
 		break;
 	case 0x20f: /* 1 000 001 111 */
 		size += 1;
 		ea = oprom16[1];
 		util::stream_format(stream, "BESC %04X",pc+2+ea);
+		flags = STEP_COND;
 		break;
 	case 0x210: /* 1 000 010 000 */
 	case 0x211: /* 1 000 010 001 */
@@ -868,6 +882,7 @@ offs_t cp1610_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		size += 1;
 		ea = oprom16[1];
 		util::stream_format(stream, "BEXT %04X,%01X",pc+2+ea,op&0x0f);
+		flags = STEP_COND;
 		break;
 	case 0x220: /* 1 000 100 000 */
 		size += 1;
@@ -878,36 +893,43 @@ offs_t cp1610_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		size += 1;
 		ea = oprom16[1];
 		util::stream_format(stream, "BC   %04X",pc+1-ea);
+		flags = STEP_COND;
 		break;
 	case 0x222: /* 1 000 100 010 */
 		size += 1;
 		ea = oprom16[1];
 		util::stream_format(stream, "BOV  %04X",pc+1-ea);
+		flags = STEP_COND;
 		break;
 	case 0x223: /* 1 000 100 011 */
 		size += 1;
 		ea = oprom16[1];
 		util::stream_format(stream, "BPL  %04X",pc+1-ea);
+		flags = STEP_COND;
 		break;
 	case 0x224: /* 1 000 100 100 */
 		size += 1;
 		ea = oprom16[1];
 		util::stream_format(stream, "BZE  %04X",pc+1-ea);
+		flags = STEP_COND;
 		break;
 	case 0x225: /* 1 000 100 101 */
 		size += 1;
 		ea = oprom16[1];
 		util::stream_format(stream, "BLT  %04X",pc+1-ea);
+		flags = STEP_COND;
 		break;
 	case 0x226: /* 1 000 100 110 */
 		size += 1;
 		ea = oprom16[1];
 		util::stream_format(stream, "BLE  %04X",pc+1-ea);
+		flags = STEP_COND;
 		break;
 	case 0x227: /* 1 000 100 111 */
 		size += 1;
 		ea = oprom16[1];
 		util::stream_format(stream, "BUSC %04X",pc+1-ea);
+		flags = STEP_COND;
 		break;
 	case 0x228: /* 1 000 101 000 */
 		size += 1;
@@ -918,36 +940,43 @@ offs_t cp1610_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		size += 1;
 		ea = oprom16[1];
 		util::stream_format(stream, "BNC  %04X",pc+1-ea);
+		flags = STEP_COND;
 		break;
 	case 0x22a: /* 1 000 101 010 */
 		size += 1;
 		ea = oprom16[1];
 		util::stream_format(stream, "BNOV %04X",pc+1-ea);
+		flags = STEP_COND;
 		break;
 	case 0x22b: /* 1 000 101 011 */
 		size += 1;
 		ea = oprom16[1];
 		util::stream_format(stream, "BMI  %04X",pc+1-ea);
+		flags = STEP_COND;
 		break;
 	case 0x22c: /* 1 000 101 100 */
 		size += 1;
 		ea = oprom16[1];
 		util::stream_format(stream, "BNZE %04X",pc+1-ea);
+		flags = STEP_COND;
 		break;
 	case 0x22d: /* 1 000 101 101 */
 		size += 1;
 		ea = oprom16[1];
 		util::stream_format(stream, "BGE  %04X",pc+1-ea);
+		flags = STEP_COND;
 		break;
 	case 0x22e: /* 1 000 101 110 */
 		size += 1;
 		ea = oprom16[1];
 		util::stream_format(stream, "BGT  %04X",pc+1-ea);
+		flags = STEP_COND;
 		break;
 	case 0x22f: /* 1 000 101 111 */
 		size += 1;
 		ea = oprom16[1];
 		util::stream_format(stream, "BESC %04X",pc+1-ea);
+		flags = STEP_COND;
 		break;
 	case 0x230: /* 1 000 110 000 */
 	case 0x231: /* 1 000 110 001 */
@@ -968,6 +997,7 @@ offs_t cp1610_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		size += 1;
 		ea = oprom16[1];
 		util::stream_format(stream, "BEXT %04X,%01X",pc+1-ea,op&0x0f);
+		flags = STEP_COND;
 		break;
 	case 0x240: /* 1 001 000 000 */
 	case 0x241: /* 1 001 000 001 */

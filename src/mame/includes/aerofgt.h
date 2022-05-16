@@ -62,17 +62,17 @@ public:
 	optional_memory_bank m_okibank;
 
 	/* video-related */
-	tilemap_t   *m_tilemap[2];
-	uint8_t     m_gfxbank[8];
-	uint16_t    m_bank[4];
-	uint16_t    m_scrollx[2];
-	uint16_t    m_scrolly[2];
-	bool        m_flip_screen;
-	uint16_t    m_wbbc97_bitmap_enable;
-	int       m_charpalettebank;
-	int       m_spritepalettebank;
-	int       m_sprite_gfx;
-	int       m_spikes91_lookup;
+	tilemap_t   *m_tilemap[2]{};
+	uint8_t     m_gfxbank[8]{};
+	uint16_t    m_bank[4]{};
+	uint16_t    m_scrollx[2]{};
+	uint16_t    m_scrolly[2]{};
+	bool        m_flip_screen = false;
+	uint16_t    m_wbbc97_bitmap_enable = 0;
+	int       m_charpalettebank = 0;
+	int       m_spritepalettebank = 0;
+	int       m_sprite_gfx = 0;
+	int       m_spikes91_lookup = 0;
 	uint32_t aerofgt_tile_callback( uint32_t code );
 
 	uint32_t aerofgt_old_tile_callback( uint32_t code );

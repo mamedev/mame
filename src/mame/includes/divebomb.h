@@ -62,10 +62,10 @@ private:
 	required_device<generic_latch_8_device> m_spr2fg_latch;
 	required_device<generic_latch_8_device> m_roz2fg_latch;
 
-	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_fg_tilemap = nullptr;
 
-	uint8_t m_roz_pal;
-	bool m_roz_enable[2];
+	uint8_t m_roz_pal = 0;
+	bool m_roz_enable[2]{};
 
 	void divebomb_palette(palette_device &palette) const;
 

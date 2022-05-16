@@ -32,7 +32,7 @@ const char *trd_format::extensions() const
 	return "trd";
 }
 
-int trd_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int trd_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint64_t size;
 	if (io.length(size))
@@ -110,4 +110,4 @@ const trd_format::format trd_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_TRD_FORMAT = &floppy_image_format_creator<trd_format>;
+const trd_format FLOPPY_TRD_FORMAT;

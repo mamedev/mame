@@ -14,15 +14,9 @@ class nes_agci_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_agci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_agci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_h(offs_t offset, uint8_t data) override;
-
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
+	virtual void write_h(offs_t offset, u8 data) override;
 };
 
 
@@ -32,15 +26,11 @@ class nes_dreamtech_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_dreamtech_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_dreamtech_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_l(offs_t offset, uint8_t data) override;
+	virtual void write_l(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
 
@@ -110,9 +100,9 @@ class nes_daou306_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_daou306_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_daou306_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
 
@@ -121,7 +111,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint8_t m_reg[16];
+	u8 m_reg[16];
 };
 
 
@@ -134,6 +124,8 @@ public:
 	nes_cc21_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
 };
 
 
@@ -148,10 +140,6 @@ public:
 	virtual void write_l(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
 

@@ -8,40 +8,17 @@
 //
 //============================================================
 
-#ifndef INPUT_SDLCOMMON_H_
-#define INPUT_SDLCOMMON_H_
+#ifndef MAME_OSD_INPUT_INPUT_SDLCOMMON_H
+#define MAME_OSD_INPUT_INPUT_SDLCOMMON_H
 
-#include <unordered_map>
+#pragma once
+
 #include <algorithm>
+#include <unordered_map>
 
 #define MAX_DEVMAP_ENTRIES  16
 #define SDL_MODULE_EVENT_BUFFER_SIZE 5
 
-// state information for a keyboard
-struct keyboard_state
-{
-	int32_t   state[0x3ff];                                   // must be int32_t!
-	int8_t    oldkey[MAX_KEYS];
-	int8_t    currkey[MAX_KEYS];
-};
-
-// state information for a mouse
-struct mouse_state
-{
-	int32_t lX, lY;
-	int32_t buttons[MAX_BUTTONS];
-};
-
-
-// state information for a joystick; DirectInput state must be first element
-struct joystick_state
-{
-	SDL_Joystick *device;
-	int32_t axes[MAX_AXES];
-	int32_t buttons[MAX_BUTTONS];
-	int32_t hatsU[MAX_HATS], hatsD[MAX_HATS], hatsL[MAX_HATS], hatsR[MAX_HATS];
-	int32_t balls[MAX_AXES];
-};
 
 struct device_map_t
 {
@@ -79,15 +56,14 @@ public:
 	{
 	}
 
-	void subscribe(int* event_types, int num_event_types, TSubscriber *subscriber)
+	template <size_t N>
+	void subscribe(int const (&event_types)[N], TSubscriber *subscriber)
 	{
 		std::lock_guard<std::mutex> scope_lock(m_lock);
 
 		// Add the subscription
-		for (int i = 0; i < num_event_types; i++)
-		{
-			m_subscription_index.emplace(event_types[i], subscriber);
-		}
+		for (int i : event_types)
+			m_subscription_index.emplace(i, subscriber);
 	}
 
 	void unsubscribe(TSubscriber *subscriber)
@@ -199,4 +175,4 @@ static inline void devmap_init(running_machine &machine, device_map_t *devmap, c
 	}
 }
 
-#endif
+#endif // MAME_OSD_INPUT_INPUT_SDLCOMMON_H

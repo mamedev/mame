@@ -55,7 +55,7 @@ private:
 	void jackpool_mem(address_map &map);
 
 	required_shared_ptr<uint16_t> m_vram;
-	uint8_t m_map_vreg;
+	uint8_t m_map_vreg = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;

@@ -57,20 +57,20 @@ protected:
 	required_memory_bank m_mainbank;
 
 	// video-related
-	tilemap_t *m_tilemap;
+	tilemap_t *m_tilemap = nullptr;
 	bitmap_ind16 m_tmpbitmap;
-	uint8_t m_gfxreg;
-	uint8_t m_flipscreen;
-	uint8_t m_flipscreen_old;
-	int16_t m_scrollx;
-	int16_t m_scrolly;
-	uint8_t m_screen_refresh;
+	uint8_t m_gfxreg = 0;
+	uint8_t m_flipscreen = 0;
+	uint8_t m_flipscreen_old = 0;
+	int16_t m_scrollx = 0;
+	int16_t m_scrolly = 0;
+	uint8_t m_screen_refresh = 0;
 
 	// misc
-	uint8_t m_port_select;
-	uint8_t m_adpcm_reset;
-	int m_adpcm_data;
-	uint8_t m_vclk_left;
+	uint8_t m_port_select = 0;
+	uint8_t m_adpcm_reset = 0;
+	int m_adpcm_data = 0;
+	uint8_t m_vclk_left = 0;
 
 	// devices
 	required_device<cpu_device> m_maincpu;

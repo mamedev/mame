@@ -58,7 +58,7 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 	u8 m_kbd_row = 0U;
-	bool m_spk_pol = 0;
+	bool m_spk_pol = false;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	memory_passthrough_handler m_rom_shadow_tap;

@@ -78,13 +78,13 @@ private:
 	required_ioport_array<3> m_dsw;
 	required_ioport m_jumpers;
 
-	u8 m_port00;
-	u8 m_keylatch;
-	u8 m_attrlatch;
-	u8 m_scroll;
+	u8 m_port00 = 0;
+	u8 m_keylatch = 0;
+	u8 m_attrlatch = 0;
+	u8 m_scroll = 0;
 	std::unique_ptr<u16[]> m_vram;
 
-	emu_timer *m_baud_clock;
+	emu_timer *m_baud_clock = nullptr;
 };
 
 void microterm_f8_state::machine_start()

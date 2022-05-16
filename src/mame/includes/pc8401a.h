@@ -65,7 +65,7 @@ public:
 	memory_share_creator<uint8_t> m_crt_ram;
 	required_ioport_array<10> m_io_y;
 
-	memory_region *m_cart_rom;
+	memory_region *m_cart_rom = nullptr;
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -89,13 +89,13 @@ public:
 	void bankswitch(uint8_t data);
 
 	// keyboard state
-	int m_key_strobe;           // key pressed
+	int m_key_strobe = 0;           // key pressed
 
 	// memory state
-	uint8_t m_mmr;                // memory mapping register
-	uint32_t m_io_addr;           // I/O ROM address counter
+	uint8_t m_mmr = 0;                // memory mapping register
+	uint32_t m_io_addr = 0;           // I/O ROM address counter
 
-	uint8_t m_key_latch;
+	uint8_t m_key_latch = 0;
 	TIMER_DEVICE_CALLBACK_MEMBER(pc8401a_keyboard_tick);
 	void pc8401a(machine_config &config);
 	void pc8401a_video(machine_config &config);

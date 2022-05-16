@@ -1,5 +1,5 @@
 // license:GPL-2.0+
-// copyright-holders:Raphael Nabet
+// copyright-holders:Raphael Nabet,Robbbert
 /*
     Experimental exelvision driver
 
@@ -41,24 +41,68 @@ Specs:
       to use a keyboard and two joysticks
     * mass storage: tape interface controlled by the main CPU
 
+More info about the keyboard:
+- The EXL100 has an infrared keyboard and 2 infrared joysticks. Each uses a MC14497 chip, which scans the
+   inputs and drives the infrared transmitter. We only emulate the keyboard, and it only works in Exel Basic.
+- The receiver uses a TEA1009 amplifier feeding a pair of NE567 PLL lock detectors. The first one detects
+   28437Hz and is for the keyboard and one joystick. When lock achieved, it causes INT1 on the subcpu. The
+   other NE567 detects 20000Hz, is for the other joystick, and causes INT3 on the subcpu.
+- Although a range of 8 metres was claimed, users found it was very critical in regard to correct positioning.
+- You don't hold a modifier key; you hit and release, then hit the key being modified. This also breaks
+   the natural keyboard emulation. Exel Basic will indicate if a modifier key is active.
+
 STATUS:
-    * EXL 100 cannot be emulated because the ROMs are not dumped
-    * EXELTEL stops early in the boot process and displays a red error screen,
-      presumably because the I/O processor is not emulated
+* EXL 100
+  - Most games do something, see table below
+* EXELTEL can get to the inbuilt "cart" but stops with a black screen,
+    presumably because the I/O processor is not emulated
+
+STATUS OF SOFTWARE:
+
+SWList name      Status
+---------------------------------------------------------------------------
+exelbas          works
+exelbasp         Cyan screen, hangs at start
+exelmax          options 1-4 work, 5-7 do nothing
+exeldrum         can get to the menu, which seems useless
+exelogo          can type into it but the usual commands get error
+exeltext         works but weird
+exlpaint         works
+exlmodem         it might work, need instructions
+capmenkr         works, video corruptions
+guppy            works
+imagix           video corruptions, can't proceed
+pindo            video corruptions, can select a game, how to play?
+quizzy           works, video corruptions
+tennis           the demo works, didn't try playing
+virus            works, 2nd screen is corrupt, press 1 there.
+wizord           works
+
+
+Using the cassette:
+- You must be in Exel Basic. There's no motor control.
+- To save: SAVE"1"  hit enter, put player in Record, hit Esc, it saves.
+- To load: LOAD"1"  hit enter, hit esc, put player in Play, it loads.
+- The cassette output is connected to the audio section, so games could use it as a 1-bit dac.
 
 TODO:
     * dump exeltel tms7042 I/O CPU ROM
-    * everything
+    * exeltel: everything
+    * The joysticks. No schematics of them have been found.
+    * Keyboard layout is preliminary.
+    * Keyboard response is terrible, but this might be normal.
+    * Add support for cassette k7 format - there's heaps of software for it.
 */
 
 
 #include "emu.h"
 
 #include "cpu/tms7000/tms7000.h"
-//#include "imagedev/cassette.h"
+#include "imagedev/cassette.h"
 #include "machine/spchrom.h"
 #include "machine/timer.h"
 #include "sound/tms5220.h"
+#include "sound/spkrdev.h"
 #include "video/tms3556.h"
 
 #include "bus/generic/slot.h"
@@ -77,11 +121,16 @@ class exelv_state : public driver_device
 {
 public:
 	exelv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_tms3556(*this, "tms3556"),
-			m_tms5220c(*this, "tms5220c"),
-			m_cart(*this, "cartslot")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_subcpu(*this, "subcpu")
+		, m_tms3556(*this, "tms3556")
+		, m_tms5220c(*this, "tms5220c")
+		, m_cart(*this, "cartslot")
+		, m_cass(*this, "cassette")
+		, m_speaker(*this, "speaker")
+		, m_io_keyboard(*this, "X%d", 0U)
+		, m_timer_k(*this, "timer_k")
 	{ }
 
 	void exeltel(machine_config &config);
@@ -89,9 +138,14 @@ public:
 
 private:
 	required_device<tms7000_device> m_maincpu;
+	optional_device<tms7041_device> m_subcpu;
 	required_device<tms3556_device> m_tms3556;
 	required_device<tms5220c_device> m_tms5220c;
 	optional_device<generic_slot_device> m_cart;
+	optional_device<cassette_image_device> m_cass;
+	optional_device<speaker_sound_device> m_speaker;
+	required_ioport_array<8> m_io_keyboard;
+	optional_device<timer_device> m_timer_k;
 
 	uint8_t mailbox_wx319_r();
 	void mailbox_wx318_w(uint8_t data);
@@ -107,6 +161,9 @@ private:
 
 	DECLARE_MACHINE_START(exl100);
 	DECLARE_MACHINE_START(exeltel);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
+	void machine_reset() override;
+	void machine_common();
 
 	/* tms7020 i/o ports */
 	uint8_t   m_tms7020_portb = 0;
@@ -115,6 +172,7 @@ private:
 	uint8_t   m_tms7041_portb = 0;
 	uint8_t   m_tms7041_portc = 0;
 	uint8_t   m_tms7041_portd = 0;
+	uint32_t  m_rom_size = 0;
 
 	/* mailbox data */
 	uint8_t   m_wx318 = 0;    /* data of 74ls374 labeled wx318 */
@@ -125,6 +183,14 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( exelvision_cartridge );
 	void tms7020_mem(address_map &map);
 	void tms7040_mem(address_map &map);
+
+	// variables for the keyboard
+	u8 k_channels[3] = { 0xff, 0xff, 0x3e }; // [0] = key down, [1] = key being sent; [2] = ch62
+	u8 k_ch_byte = 0; // 'k_channels' index; 0 = idly scanning the keyboard; 1 = sending a key; 2 = sending ch62
+	u8 k_ch_bit = 0; // bit# in the byte being sent; 0 = AGC, 1 = start bit, 2-7 = bits 0-5 of data, 8 = end of byte
+	bool k_bit_bit = 0; // the value of the bit of data being processed
+	bool k_bit_num = 0; // each bit gets 2 transmissions, this variable shows which half we are working on;
+	// if k_bit_bit is high then do interrupt then none; low has none then interrupt
 };
 
 
@@ -229,7 +295,7 @@ void exelv_state::mailbox_wx318_w(uint8_t data)
     A1 -
     A2 -
     A3 -
-    A4 -
+    A4 - R - cass in
     A5 -
     A6 -
     A7 -
@@ -237,7 +303,14 @@ void exelv_state::mailbox_wx318_w(uint8_t data)
 uint8_t exelv_state::tms7020_porta_r()
 {
 	LOG("tms7020_porta_r\n");
-	return ( m_tms7041_portb & 0x80 ) ? 0x01 : 0x00;
+	u8 data = ( m_tms7041_portb & 0x80 ) ? 0x01 : 0x00;
+	if (m_cass)
+	{
+		double level = (m_cass->input());
+		if (level < 0.02)
+			data |= 0x10;
+	}
+	return data;
 }
 
 
@@ -246,7 +319,7 @@ uint8_t exelv_state::tms7020_porta_r()
     B0 - W - TMS7041 port A bit 2 (REV2)
     B1 - W - TMS7041 port A bit 4 (REV4)
     B2 -
-    B3 -
+    B3 - W - cass out
     B4 -
     B5 -
     B6 -
@@ -256,6 +329,11 @@ void exelv_state::tms7020_portb_w(uint8_t data)
 {
 	LOG("tms7020_portb_w: data = 0x%02x\n", data);
 	m_tms7020_portb = data;
+	if (m_cass)
+	{
+		m_cass->output(BIT(data, 3) ? -1.0 : +1.0);
+		m_speaker->level_w(BIT(data, 3) ? -1.0 : +1.0);
+	}
 }
 
 
@@ -309,14 +387,18 @@ void exelv_state::tms7041_portb_w(uint8_t data)
 {
 	LOG("tms7041_portb_w: data = 0x%02x\n", data);
 
-	m_tms5220c->wsq_w((data & 0x01) ? 1 : 0);
-	m_tms5220c->rsq_w((data & 0x02) ? 1 : 0);
+	// optional code; tms5220 device works in different ways depending on if this exists or not
+	m_tms5220c->combined_rsq_wsq_w(data & 3);
 
 	LOG("TMS7020 %s int1\n",((data & 0x04) ? "clear" : "assert"));
-	m_maincpu->set_input_line(TMS7000_INT1_LINE, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+
+	/* Check for high->low transition on B2 */
+	// Using hold_line because the pulse is too short and can be missed by the other cpu
+	if ((BIT(m_tms7041_portb, 2)) && !BIT(data, 2))
+		m_maincpu->set_input_line(TMS7000_INT1_LINE, HOLD_LINE);
 
 	/* Check for low->high transition on B6 */
-	if (!(m_tms7041_portb & 0x40) && (data & 0x40))
+	if ((!BIT(m_tms7041_portb, 6)) && BIT(data, 6))
 	{
 		LOG("wx319 write 0x%02x\n", m_tms7041_portc);
 		m_wx319 = m_tms7041_portc;
@@ -382,10 +464,156 @@ void exelv_state::tms7041_portd_w(uint8_t data)
 */
 uint8_t exelv_state::rom_r(offs_t offset)
 {
-	if (m_cart && m_cart->exists())
-		return m_cart->read_rom(offset + 0x200);
+	if (m_rom_size && m_cart && m_cart->exists())
+	{
+		if (m_rom_size == 0x7e00)
+			return m_cart->read_rom(offset);
+		else
+			return m_cart->read_rom(offset + 0x200);
+	}
 
 	return 0;
+}
+
+// INFRARED KEYBOARD
+// Note: usec times are from the datasheet and should not be altered, but msec times are just guesswork.
+TIMER_DEVICE_CALLBACK_MEMBER(exelv_state::timer_k)
+{
+	// when a key pressed, a channel 0-61 is sent and repeated every 90ms. When released, send channel 62, then silence.
+
+	if (k_ch_byte < 2)
+	{
+		k_channels[0] = 0xff;
+		for (u8 row = 0; row < 8; row++)
+		{
+			u8 colin = m_io_keyboard[row]->read();
+			if (colin)
+			{
+				for (u8 j = 0; j < 8; j++)
+				{
+					if (BIT(colin, j))
+					{
+						k_channels[0] = row*8+j; // key pressed
+						if (k_ch_byte == 0)
+						{
+							// can accept it for processing
+							if (k_channels[1] == 0xff)
+								k_channels[1] = k_channels[0];
+							// init pointers
+							k_ch_bit = 0;
+							k_bit_num = 0;
+							k_ch_byte = 1;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// Idling; nothing pressed, nothing to do
+	if (k_ch_byte == 0)
+	{
+		m_timer_k->adjust(attotime::from_msec(25));
+		return;
+	}
+
+	// AGC bit - a single 540us pulse followed by a large gap
+	if (k_ch_bit == 0)
+	{
+		if (!k_bit_num)
+		{
+			m_subcpu->set_input_line(TMS7000_INT1_LINE, ASSERT_LINE);
+			k_bit_num = 1;
+			m_timer_k->adjust(attotime::from_usec(540));
+		}
+		else
+		{
+			m_subcpu->set_input_line(TMS7000_INT1_LINE, CLEAR_LINE);
+			k_bit_num = 0;
+			k_ch_bit = 1;
+			m_timer_k->adjust(attotime::from_usec(2840));
+		}
+		return;
+	}
+
+	// start bit - a hardcoded '1' - so send a 540us pulse followed by 590us of silence
+	if (k_ch_bit == 1)
+	{
+		if (!k_bit_num)
+		{
+			m_subcpu->set_input_line(TMS7000_INT1_LINE, ASSERT_LINE);
+			k_bit_num = 1;
+			m_timer_k->adjust(attotime::from_usec(540));
+		}
+		else
+		{
+			m_subcpu->set_input_line(TMS7000_INT1_LINE, CLEAR_LINE);
+			k_bit_num = 0;
+			k_ch_bit = 2;
+			m_timer_k->adjust(attotime::from_usec(590));
+		}
+		return;
+	}
+
+	// stop bit - not really a 'bit' - need to turn off any interrupt,
+	//  and prepare for either 90msec inter-byte gap, or ch62 terminating byte.
+	//  If we are already finishing up the terminating byte, then set to idle.
+	if (k_ch_bit == 8)
+	{
+		m_subcpu->set_input_line(TMS7000_INT1_LINE, CLEAR_LINE);
+		k_ch_bit = 0;
+		// just finished sending key
+		if (k_ch_byte == 1)
+		{
+			// key still down, send again in 90ms
+			if (k_channels[0] < 0xff)
+			{
+				m_timer_k->adjust(attotime::from_usec(90000));
+			}
+			else
+			// key was released, send ch62
+			{
+				k_ch_byte = 2;
+				m_timer_k->adjust(attotime::from_msec(3)); // signal end channel
+			}
+		}
+		else
+		// just finished sending ch62
+		if (k_ch_byte == 2)
+		{
+			// clean up and go back to looking at kbd
+			k_channels[1] = 0xff;
+			k_ch_byte = 0;
+			m_timer_k->adjust(attotime::from_msec(20));
+		}
+		return;
+	}
+
+	// data bits, LSB first
+	// 1st half of a bit
+	if (!k_bit_num)
+	{
+		k_bit_bit = BIT(k_channels[k_ch_byte], k_ch_bit-2);
+
+		if (k_bit_bit)
+			m_subcpu->set_input_line(TMS7000_INT1_LINE, ASSERT_LINE);
+		else
+			m_subcpu->set_input_line(TMS7000_INT1_LINE, CLEAR_LINE);
+
+		k_bit_num = 1;
+		m_timer_k->adjust(attotime::from_usec(590));
+		return;
+	}
+
+	// 2nd half of a bit
+	if (!k_bit_bit)
+		m_subcpu->set_input_line(TMS7000_INT1_LINE, ASSERT_LINE);
+	else
+		m_subcpu->set_input_line(TMS7000_INT1_LINE, CLEAR_LINE);
+
+	k_bit_num = 0;
+	k_ch_bit++; // next bit
+	m_timer_k->adjust(attotime::from_usec(540));
 }
 
 
@@ -446,18 +674,92 @@ void exelv_state::tms7040_mem(address_map &map)
 	map(0xc800, 0xefff).noprw();
 }
 
-
-/* keyboard: ??? */
 static INPUT_PORTS_START(exelv)
+	PORT_START("X0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_UP) PORT_NAME(UTF8_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT) PORT_NAME(UTF8_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DOWN) PORT_NAME(UTF8_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT) PORT_NAME(UTF8_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("_  -") PORT_CHAR('_')
 
-	PORT_START("exelv")
+	PORT_START("X1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LCONTROL) PORT_NAME("CTL")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CAPSLOCK) PORT_NAME("LOCK")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("/  :") PORT_CHAR('/')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ESC) PORT_CHAR(27)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("?  ,") PORT_CHAR('?')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LALT) PORT_NAME("FCT") // function key
 
+	PORT_START("X2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TAB) PORT_CHAR(9)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("\xe2\x86\x96") PORT_CHAR(UCHAR_MAMEKEY(HOME))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("+  =") PORT_CHAR('+')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_NAME("1  &") PORT_CHAR('1')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("6  $") PORT_CHAR('6')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("8  !") PORT_CHAR('8')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_NAME("0  \xc3\xa0") PORT_CHAR('0')
+
+	PORT_START("X3")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("\xe2\x8c\xab") PORT_CHAR(127)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_NAME(".  ;") PORT_CHAR('.')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_NAME("2  " e_ACUTE) PORT_CHAR('2')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_NAME("3  \"") PORT_CHAR('3')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_NAME("9  \xc3\xa7") PORT_CHAR('9')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("#  )") PORT_CHAR('#')
+
+	PORT_START("X4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT) PORT_NAME("SHIFT")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('O')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("<  [") PORT_CHAR('<')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('T')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
+
+	PORT_START("X5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('U')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('K')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_NAME(">  ]") PORT_CHAR('>')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
+
+	PORT_START("X6")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("~  ^") PORT_CHAR('~')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_NAME("4  '") PORT_CHAR('4')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("7  \xc3\xa8") PORT_CHAR('7')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RALT) PORT_NAME("*  \\") PORT_CHAR('*')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+
+	PORT_START("X7")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('L')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_NAME("5  (") PORT_CHAR('5')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("%  @") PORT_CHAR('%')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
 /* Machine Initialization */
 
-MACHINE_START_MEMBER( exelv_state, exl100)
+void exelv_state::machine_common()
 {
 	/* register for state saving */
 	save_item(NAME(m_tms7020_portb));
@@ -466,21 +768,49 @@ MACHINE_START_MEMBER( exelv_state, exl100)
 	save_item(NAME(m_tms7041_portd));
 	save_item(NAME(m_wx318));
 	save_item(NAME(m_wx319));
+	save_item(NAME(k_channels));
+	save_item(NAME(k_ch_byte));
+	save_item(NAME(k_ch_bit));
+	save_item(NAME(k_bit_bit));
+	save_item(NAME(k_bit_num));
+}
+
+MACHINE_START_MEMBER( exelv_state, exl100)
+{
+	machine_common();
+	save_item(NAME(m_rom_size));
+
+	m_rom_size = 0;
+	if (m_cart && m_cart->exists())
+		m_rom_size = m_cart->get_rom_size();
 }
 
 MACHINE_START_MEMBER( exelv_state, exeltel)
 {
+	machine_common();
+
 	uint8_t *rom = memregion("user1")->base() + 0x0200;
 	membank("bank1")->configure_entry(0, rom);
 	membank("bank1")->set_entry(0);
+}
 
-	/* register for state saving */
-	save_item(NAME(m_tms7020_portb));
-	save_item(NAME(m_tms7041_portb));
-	save_item(NAME(m_tms7041_portc));
-	save_item(NAME(m_tms7041_portd));
-	save_item(NAME(m_wx318));
-	save_item(NAME(m_wx319));
+void exelv_state::machine_reset()
+{
+	k_channels[0] = 0xff;
+	k_channels[1] = 0xff;
+	k_ch_byte = 0;
+	k_ch_bit = 0;
+	k_bit_bit = 0;
+	k_bit_num = 0;
+
+	if (m_timer_k)
+		m_timer_k->adjust(attotime::from_seconds(2));
+
+	if (m_subcpu)
+	{
+		m_subcpu->set_input_line(TMS7000_INT1_LINE, CLEAR_LINE);
+		m_subcpu->set_input_line(TMS7000_INT3_LINE, CLEAR_LINE);
+	}
 }
 
 
@@ -495,13 +825,13 @@ void exelv_state::exl100(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(exelv_state::exelv_hblank_interrupt), "screen", 0, 1);
 	MCFG_MACHINE_START_OVERRIDE(exelv_state, exl100)
 
-	tms7041_device &subcpu(TMS7041(config, "tms7041", 4.9152_MHz_XTAL));
-	subcpu.in_porta().set(FUNC(exelv_state::tms7041_porta_r));
-	subcpu.out_portb().set(FUNC(exelv_state::tms7041_portb_w));
-	subcpu.in_portc().set(FUNC(exelv_state::tms7041_portc_r));
-	subcpu.out_portc().set(FUNC(exelv_state::tms7041_portc_w));
-	subcpu.in_portd().set(FUNC(exelv_state::tms7041_portd_r));
-	subcpu.out_portd().set(FUNC(exelv_state::tms7041_portd_w));
+	TMS7041(config, m_subcpu, 4.9152_MHz_XTAL);
+	m_subcpu->in_porta().set(FUNC(exelv_state::tms7041_porta_r));
+	m_subcpu->out_portb().set(FUNC(exelv_state::tms7041_portb_w));
+	m_subcpu->in_portc().set(FUNC(exelv_state::tms7041_portc_r));
+	m_subcpu->out_portc().set(FUNC(exelv_state::tms7041_portc_w));
+	m_subcpu->in_portd().set(FUNC(exelv_state::tms7041_portd_r));
+	m_subcpu->out_portd().set(FUNC(exelv_state::tms7041_portd_w));
 
 	config.set_perfect_quantum(m_maincpu);
 
@@ -524,16 +854,25 @@ void exelv_state::exl100(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::RGB_3BIT);
 
+	TIMER(config, m_timer_k).configure_generic(FUNC(exelv_state::timer_k));
+
 	//SPEECHROM(config, "vsm", 0);
 
 	/* sound */
 	SPEAKER(config, "mono").front_center();
+	// The cassette output is connected into the audio circuit
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.30);
+
 	TMS5220C(config, m_tms5220c, 640000);
 	// m_tms5220c->set_speechrom_tag("vsm");
 	m_tms5220c->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, "cartslot", generic_linear_slot, "exelvision_cart", "bin,rom");
+
+	CASSETTE(config, m_cass, 0);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("exl100");
 }
@@ -597,7 +936,7 @@ ROM_START(exl100)
 	ROM_REGION(0x800, "maincpu", 0)
 	ROM_LOAD("exl100in.bin", 0x000, 0x800, CRC(049109a3) SHA1(98a07297dcdacef41c793c197b6496dac1e8e744))      /* TMS7020 ROM, correct */
 
-	ROM_REGION(0x1000, "tms7041", 0)
+	ROM_REGION(0x1000, "subcpu", 0)
 	ROM_LOAD("exl100_7041.bin", 0x0000, 0x1000, CRC(38f6fc7a) SHA1(b71d545664a974d8ad39bdf600c5b9884c3efab6))           /* TMS7041 internal ROM, correct  */
 //  ROM_REGION(0x8000, "vsm", 0)
 ROM_END

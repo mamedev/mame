@@ -69,7 +69,7 @@ private:
 	required_ioport m_baud;
 	output_finder<> m_caps_lamp;
 
-	u8 m_kbd_scan;
+	u8 m_kbd_scan = 0;
 };
 
 

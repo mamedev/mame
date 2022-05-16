@@ -44,20 +44,20 @@ private:
 	void do_blit();
 
 	std::unique_ptr<u8[]> m_framebuffer;
-	u8 m_pio2_pb_data;
+	u8 m_pio2_pb_data = 0;
 
 	required_device<address_map_bank_device> m_sprite_ram_bankdev;
 
-	u8 m_upperaddr;
-	u8 m_loweraddr;
+	u8 m_upperaddr = 0;
+	u8 m_loweraddr = 0;
 
-	u8 m_spritesize;
-	u8 m_pio0_pb_data;
-	u8 m_spritecodelow;
-	u8 m_spritecodehigh;
+	u8 m_spritesize = 0;
+	u8 m_pio0_pb_data = 0;
+	u8 m_spritecodelow = 0;
+	u8 m_spritecodehigh = 0;
 
-	int m_high_write;
-	u8 m_uppersprite;
+	int m_high_write = 0;
+	u8 m_uppersprite = 0;
 
 	u8 pio0_pa_r();
 	void pio0_pa_w(u8 data);

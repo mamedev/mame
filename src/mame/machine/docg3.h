@@ -72,26 +72,26 @@ private:
 	void sec_2_write16(uint32_t offset, uint16_t data);
 	void sec_2_write8(uint32_t offset, uint8_t data);
 
-	int m_size;
+	int m_size = 0;
 
-	uint32_t m_planes;
-	uint32_t m_blocks;
-	uint32_t m_pages;
-	uint32_t m_user_data_size;
-	uint32_t m_extra_area_size;
-	std::unique_ptr<uint8_t[]> m_data[3];
-	uint32_t m_data_size[3];
-	uint8_t  m_sec_2[0x800];
-	uint32_t m_data_1036;
-	uint32_t m_data_1036_count;
-	uint32_t m_transfer_offset;
-	uint8_t  m_device;
-	uint32_t m_block;
-	uint32_t m_page;
-	uint32_t m_plane;
-	uint32_t m_transfersize;
-	uint8_t  m_test;
-	uint32_t m_address_count;
+	uint32_t m_planes = 0;
+	uint32_t m_blocks = 0;
+	uint32_t m_pages = 0;
+	uint32_t m_user_data_size = 0;
+	uint32_t m_extra_area_size = 0;
+	std::unique_ptr<uint8_t[]> m_data[3]{};
+	uint32_t m_data_size[3]{};
+	uint8_t  m_sec_2[0x800]{};
+	uint32_t m_data_1036 = 0;
+	uint32_t m_data_1036_count = 0;
+	uint32_t m_transfer_offset = 0;
+	uint8_t  m_device = 0;
+	uint32_t m_block = 0;
+	uint32_t m_page = 0;
+	uint32_t m_plane = 0;
+	uint32_t m_transfersize = 0;
+	uint8_t  m_test = 0;
+	uint32_t m_address_count = 0;
 };
 
 // device type definition

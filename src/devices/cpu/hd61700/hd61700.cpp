@@ -26,8 +26,6 @@
 #include "hd61700.h"
 #include "hd61700d.h"
 
-#include "debugger.h"
-
 
 // internal ROM
 #define INT_ROM                 0x0c00

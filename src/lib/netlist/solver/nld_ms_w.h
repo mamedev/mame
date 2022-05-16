@@ -45,9 +45,7 @@
 
 #include <algorithm>
 
-namespace netlist
-{
-namespace solver
+namespace netlist::solver
 {
 
 	template <typename FT, int SIZE>
@@ -328,7 +326,7 @@ namespace solver
 		}
 		m_cnt++;
 
-		if (false)
+		if (false) // NOLINT
 			for (unsigned i=0; i<iN; i++)
 			{
 				float_type tmp = plib::constants<FT>::zero();
@@ -350,7 +348,6 @@ namespace solver
 		this->solve_non_dynamic();
 	}
 
-} // namespace solver
-} // namespace netlist
+} // namespace netlist::solver
 
 #endif // NLD_MS_DIRECT_H_

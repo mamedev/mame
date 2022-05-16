@@ -134,7 +134,7 @@ namespace netlist
 		pstring valstr() const override
 		{
 			// returns something which errors
-			return pstring("PTRERROR");
+			return { "PTRERROR" };
 		}
 
 	private:

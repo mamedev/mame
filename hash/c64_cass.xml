@@ -12613,13 +12613,70 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="salamandi" cloneof="salamand">
+		<description>Salamander (Imagine)</description>
+		<year>1988</year>
+		<publisher>Imagine</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1390242">
+				<rom name="Salamander.tap" size="1390242" crc="d2173b21" sha1="d171241323454bc53bc5c7e516ff81acb34250a2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sanxion">
+		<description>Sanxion</description>
+		<year>1986</year>
+		<publisher>Thalamus</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="706901">
+				<rom name="Sanxion.tap" size="706901" crc="72fcb208" sha1="82b5e6dcaa3a97a81a101f8316d66192278b892e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="saracen">
 		<description>Saracen</description>
 		<year>1988</year>
 		<publisher>Americana</publisher>
+
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="976175">
 				<rom name="saracen.tap" size="976175" crc="505c4431" sha1="9ff75ca511b8aa0a8f53ed7f551c815391fabb10"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="savage">
+		<description>Savage</description>
+		<year>1988</year>
+		<publisher>Firebird</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1: Introduction &amp; Level 1"/>
+			<dataarea name="cass" size="1130456">
+				<rom name="Savage_Side_1.tap" size="1130456" crc="7d989b76" sha1="5204a4a9d7a82aa00354ec72dca63d34885bfffe"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2: Level 2 &amp; Level 3"/>
+			<dataarea name="cass" size="962726">
+				<rom name="Savage_Side_2.tap" size="962726" crc="8daa7343" sha1="60a13ff8d8cd70f786d2e35c4f3e0436515148a9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scooby" supported="no"> <!-- game loads to the title screen but crashes once player has started a game -->
+		<description>Scooby-Doo</description>
+		<year>1986</year>
+		<publisher>Elite Systems</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="626873">
+				<rom name="Scooby-Doo.tap" size="626873" crc="6072a6dd" sha1="5253c7220accee2ca8b5ed7b2237faf109fb031f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12632,6 +12689,30 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="581494">
 				<rom name="Scorpion.tap" size="581494" crc="4bcad9a5" sha1="324ba64ca2f542f52b34cac5af33186cde374f6e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scorpionp" cloneof="scorpion">
+		<description>Scorpion (Prism Leisure)</description>
+		<year>1992</year>
+		<publisher>Prism Leisure</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="582694">
+				<rom name="Scorpion.tap" size="582694" crc="d2b4495a" sha1="b72439b7b229ff2fa69b7356960c91875af0d57d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdadrian">
+		<description>The Secret Diary of Adrian Mole</description>
+		<year>1985</year>
+		<publisher>Mosaic Publishing</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1922286">
+				<rom name="Secret_Diary_of_Adrian_Mole_,_The.tap" size="1922286" crc="a7d78937" sha1="66ee0b509ea5df03335b076411ea4270aa403713"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12672,6 +12753,43 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="sentinelu" cloneof="sentinel">
+		<description>Sentinel (U.S. Gold)</description>
+		<year>1984</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="483834">
+				<rom name="Sentinel.tap" size="483834" crc="28b6c650" sha1="5e465e0ac5f2bb8715373e26913ae5aad7e5ac71"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="483834">
+				<rom name="Sentinel_a1.tap" size="483834" crc="3255050e" sha1="1120755bb7ac2f97a9e06bca94ea4b3f4b94e5d9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tsentinl">
+		<description>The Sentinel</description>
+		<year>1986</year>
+		<publisher>Firebird</publisher>
+		<info name="alt_title" value="The Sentry"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="454434">
+				<rom name="Sentinel,_The.tap" size="454434" crc="412afb73" sha1="df7d1892d14661c95e07abde5c7c3d6261d3d58d"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="454368">
+				<rom name="Sentinel,_The_a1.tap" size="454368" crc="e3d2ec04" sha1="ce352b05a13ea29d0d2426386509e6df2dcb8dad"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="shado">
 		<description>Shado BBC Emulator Software</description>
 		<year>1985</year>
@@ -12680,6 +12798,36 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="1025435">
 				<rom name="shado.tap" size="1025435" crc="696f1803" sha1="963df883bcf76c7d398f44be04e4980c2c92bdfa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shadowsk">
+		<description>Shadow Skimmer</description>
+		<year>1987</year>
+		<publisher>The Edge</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="437733">
+				<rom name="Shadow_Skimmer.tap" size="437733" crc="998f6c36" sha1="c4f791190ed5e9a0b72d12fb372e69c00a86f758"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="437733">
+				<rom name="Shadow_Skimmer_a1.tap" size="437733" crc="887c2702" sha1="5316d0cc6a8b9adfa693277b80a2909d20f67115"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shadowso" supported="no"> <!-- tape loads but doesn't run (remains stuck showing light blue screen) -->
+		<description>Shadows of Mordor</description>
+		<year>1987</year>
+		<publisher>Melbourne House</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="682118">
+				<rom name="Shadows_of_Mordor.tap" size="682118" crc="0680edaa" sha1="f645f0cdcd8f48579559d97e4dea06e6445241c0"/>
 			</dataarea>
 		</part>
 	</software>

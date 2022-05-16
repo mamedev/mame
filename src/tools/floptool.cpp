@@ -139,7 +139,13 @@ static int identify(int argc, char *argv[])
 
 		bool first = true;
 		for(const auto &e : scores) {
-			printf("%-*s %c %3d - %-*s %s\n", sz, first ? argv[i] : "", first ? ':' : ' ', e.first, sz2, e.second->m_format->name(), e.second->m_format->description());
+			printf("%-*s %c %c%c%c%c%c - %-*s %s\n", sz, first ? argv[i] : "", first ? ':' : ' ',
+				   e.first & 0x10 ? '+' : '.',
+				   e.first & 0x08 ? '+' : '.',
+				   e.first & 0x04 ? '+' : '.',
+				   e.first & 0x02 ? '+' : '.',
+				   e.first & 0x01 ? '+' : '.',
+				   sz2, e.second->m_format->name(), e.second->m_format->description());
 			first = false;
 		}
 	}
@@ -277,7 +283,7 @@ static void dir_scan(u32 depth, fs::filesystem_t::dir_t dir, std::vector<std::ve
 				if(!meta.has(m.m_name))
 					continue;
 				size_t slot = nmap.find(m.m_name)->second;
-				std::string val = fs::meta_value::to_string(m.m_type, meta.get(m.m_name));
+				std::string val = meta.get(m.m_name).to_string();
 				if(slot == 0)
 					val = head + "dir  " + val;
 				entries[id][slot] = val;
@@ -295,7 +301,7 @@ static void dir_scan(u32 depth, fs::filesystem_t::dir_t dir, std::vector<std::ve
 				if(!meta.has(m.m_name))
 					continue;
 				size_t slot = nmap.find(m.m_name)->second;
-				std::string val = fs::meta_value::to_string(m.m_type, meta.get(m.m_name));
+				std::string val = meta.get(m.m_name).to_string();
 				if(slot == 0)
 					val = head + (c.m_type == fs::dir_entry_type::system_file ? "sys  " : "file ") + val;
 				entries[id][slot] = val;
@@ -317,7 +323,7 @@ static int generic_dir(image_handler &ih)
 	if(!vmeta.empty()) {
 		std::string vinf = "Volume:";
 		for(const auto &e : vmetad)
-			vinf += util::string_format(" %s=%s", fs::meta_data::entry_name(e.m_name), fs::meta_value::to_string(e.m_type, vmeta.get(e.m_name)));
+			vinf += util::string_format(" %s=%s", fs::meta_data::entry_name(e.m_name), vmeta.get(e.m_name).to_string());
 		printf("%s\n\n", vinf.c_str());
 	}
 

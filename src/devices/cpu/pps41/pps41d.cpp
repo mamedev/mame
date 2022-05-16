@@ -77,17 +77,17 @@ const u32 pps41_common_disassembler::s_flags[] =
 	// MM76
 	0,
 	0, 0, 0, 0,
-	0, 0, 0,
+	0, 0, STEP_COND,
 	0, 0,
-	0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, STEP_COND, STEP_COND,
+	0, 0, STEP_COND, STEP_COND, 0, 0, 0, STEP_COND, 0, STEP_COND,
 	STEP_OUT, STEP_OUT, 0, 0, 0, STEP_OVER, STEP_OVER, 0,
-	0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	STEP_COND, STEP_COND, STEP_COND,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, STEP_COND, STEP_COND, STEP_COND, STEP_COND, 0, 0,
 
 	// MM78
-	0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0,
+	STEP_COND, STEP_COND, 0, 0, 0,
+	STEP_COND, 0, 0, 0, 0, 0,
 	0, STEP_OVER
 };
 

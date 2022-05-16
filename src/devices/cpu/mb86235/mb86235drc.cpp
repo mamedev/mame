@@ -13,7 +13,6 @@
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 #include "cpu/drcumlsh.h"
-#include "debugger.h"
 
 #include "mb86235defs.h"
 

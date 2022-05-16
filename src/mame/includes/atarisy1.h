@@ -83,8 +83,8 @@ protected:
 	required_device<atari_motion_objects_device> m_mob;
 	required_device<palette_device> m_palette;
 
-	uint8_t           m_joystick_type;
-	uint8_t           m_trackball_type;
+	uint8_t           m_joystick_type = 0;
+	uint8_t           m_trackball_type = 0;
 
 	optional_device<adc0808_device> m_adc;
 	optional_device<input_merger_device> m_ajsint;
@@ -94,16 +94,16 @@ protected:
 	required_device<tilemap_device> m_alpha_tilemap;
 	required_shared_ptr<uint16_t> m_xscroll;
 	required_shared_ptr<uint16_t> m_yscroll;
-	uint16_t          m_playfield_lookup[256];
-	uint8_t           m_playfield_tile_bank;
-	uint16_t          m_playfield_priority_pens;
+	uint16_t          m_playfield_lookup[256]{};
+	uint8_t           m_playfield_tile_bank = 0;
+	uint16_t          m_playfield_priority_pens = 0;
 	required_device<timer_device> m_yscroll_reset_timer;
 
 	// INT3 tracking
-	int             m_next_timer_scanline;
+	int             m_next_timer_scanline = 0;
 	required_device<timer_device> m_scanline_timer;
 	required_device<timer_device> m_int3off_timer;
-	uint8_t           m_scanline_int_state;
+	uint8_t           m_scanline_int_state = 0;
 
 	// speech
 	optional_device<tms5220_device> m_tms;
@@ -112,11 +112,11 @@ protected:
 	optional_device<via6522_device> m_via;
 
 	// graphics bank tracking
-	uint8_t           m_bank_gfx[3][8];
-	uint8_t           m_bank_color_shift[MAX_GFX_ELEMENTS];
-	uint8_t           m_bankselect;
+	uint8_t           m_bank_gfx[3][8]{};
+	uint8_t           m_bank_color_shift[MAX_GFX_ELEMENTS]{};
+	uint8_t           m_bankselect = 0;
 
-	uint8_t           m_cur[2][2];
+	uint8_t           m_cur[2][2]{};
 
 	void video_int_ack_w(uint8_t data = 0);
 	template<int Input> uint8_t digital_joystick_r();

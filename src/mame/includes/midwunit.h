@@ -80,12 +80,12 @@ private:
 	required_shared_ptr<uint16_t> m_mainram;
 	required_ioport_array<4> m_ports;
 
-	uint8_t m_cmos_write_enable;
-	uint16_t m_iodata[8];
-	uint8_t m_ioshuffle[16];
-	uint8_t m_uart[8];
-	uint8_t m_security_bits;
-	uint16_t *m_umk3_palette;
+	uint8_t m_cmos_write_enable = 0;
+	uint16_t m_iodata[8] = {};
+	uint8_t m_ioshuffle[16] = {};
+	uint8_t m_uart[8] = {};
+	uint8_t m_security_bits = 0;
+	uint16_t *m_umk3_palette = nullptr;
 };
 
 #endif // MAME_INCLUDES_MIDWUNIT_H

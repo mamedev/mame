@@ -157,20 +157,20 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_ioport_array<4> m_in_track;
 
-	tilemap_t *m_tilemap;
+	tilemap_t *m_tilemap = nullptr;
 	std::unique_ptr<bitmap_ind16> m_seabitmap[2];
 	struct
 	{
-		uint8_t offs;
-		uint8_t x;
-		uint8_t y;
+		uint8_t offs = 0;
+		uint8_t x = 0;
+		uint8_t y = 0;
 		bitmap_ind16 bitmap;
 	}m_obj[2];
 
-	uint8_t m_layer_en;
-	uint8_t m_in_select;
-	bool m_screen_flip;
-	uint8_t m_sea_bank;
+	uint8_t m_layer_en = 0;
+	uint8_t m_in_select = 0;
+	bool m_screen_flip = false;
+	uint8_t m_sea_bank = 0;
 
 	void init_seabitmap();
 	void obj_reg_w(uint8_t which,uint8_t reg, uint8_t data);

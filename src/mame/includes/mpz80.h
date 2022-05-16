@@ -73,9 +73,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( s100_nmi_w );
 
 	// memory state
-	uint32_t m_addr;
-	uint8_t m_task;
-	uint8_t m_mask;
+	uint32_t m_addr = 0;
+	uint8_t m_task = 0;
+	uint8_t m_mask = 0;
 
 	// interrupt state
 	int m_nmi;

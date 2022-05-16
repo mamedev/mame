@@ -612,7 +612,8 @@ void qx10_state::sqw_out(uint8_t state)
 	{
 		cnt = (cnt + 1) & 0xfff;
 	}
-	if (BIT(cnt, 11) && !BIT(m_counter, 11)) {
+	if (BIT(cnt, 11) && !BIT(m_counter, 11))
+	{
 		update_fdd_motor(1);
 	}
 

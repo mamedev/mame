@@ -42,4 +42,4 @@ const coco_rawdsk_format::format coco_rawdsk_format::formats[] =
 };
 
 
-const floppy_format_type FLOPPY_COCO_RAWDSK_FORMAT = &floppy_image_format_creator<coco_rawdsk_format>;
+const coco_rawdsk_format FLOPPY_COCO_RAWDSK_FORMAT;

@@ -192,17 +192,6 @@ INPUT_PORTS_END
 
 
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
 static const gfx_layout spritelayout =
 {
 	16,16,
@@ -217,9 +206,9 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_finalizr )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,        0, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,  16*16, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    16*16, 16 )  // to handle 8x8 sprites
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb,     0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,         16*16, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_msb, 16*16, 16 )  // to handle 8x8 sprites
 GFXDECODE_END
 
 

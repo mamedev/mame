@@ -12,8 +12,10 @@
       * nebulus: 20 lines off with aa310;
       * lotustc2: abuses color flipping;
       * quazer: needs in-flight DMA;
-    - improve sound DAC writes;
-    - subclass this for VIDC20 emulation (RiscPC);
+    - move DAC handling into a separate sub-device(s),
+      particularly needed for proper VIDC20 mixing and likely for fixing aliasing
+      issues in VIDC10;
+    - complete VIDC20 emulation (RiscPC/ssfindo.cpp);
     - Are CRTC values correct? VGA modes have a +1 in display line;
 
 **********************************************************************************************/
@@ -208,7 +210,7 @@ void acorn_vidc10_device::device_reset()
 {
 	m_cursor_enable = false;
 	memset(m_stereo_image, 4, m_sound_max_channels);
-	for (int ch=0;ch<m_sound_max_channels;ch++)
+	for (int ch = 0; ch < m_sound_max_channels; ch++)
 		refresh_stereo_image(ch);
 	m_video_timer->adjust(attotime::never);
 	m_sound_timer->adjust(attotime::never);
@@ -317,11 +319,11 @@ inline void acorn_vidc10_device::update_4bpp_palette(u16 index, u32 paldata)
 
 void acorn_vidc10_device::pal_data_display_w(offs_t offset, u32 data)
 {
-	update_4bpp_palette(offset+0x100, data);
+	update_4bpp_palette(offset + 0x100, data);
 	//printf("%02x: %01x %01x %01x [%d]\n",offset,r,g,b,screen().vpos());
 
 	// 8bpp
-	for(int idx=0;idx<0x100;idx+=0x10)
+	for (int idx = 0; idx < 0x100; idx += 0x10)
 	{
 		int b = ((data & 0x700) >> 8) | ((idx & 0x80) >> 4);
 		int g = ((data & 0x030) >> 4) | ((idx & 0x60) >> 3);
@@ -415,8 +417,8 @@ inline void acorn_vidc10_device::refresh_stereo_image(u8 channel)
 	const float left_gain[8] = { 1.0f, 2.0f, 1.66f, 1.34f, 1.0f, 0.66f, 0.34f, 0.0f };
 	const float right_gain[8] = { 1.0f, 0.0f, 0.34f, 0.66f, 1.0f, 1.34f, 1.66f, 2.0f };
 
-	m_lspeaker->set_input_gain(channel,left_gain[m_stereo_image[channel]]*m_sound_input_gain);
-	m_rspeaker->set_input_gain(channel,right_gain[m_stereo_image[channel]]*m_sound_input_gain);
+	m_lspeaker->set_input_gain(channel, left_gain[m_stereo_image[channel]] * m_sound_input_gain);
+	m_rspeaker->set_input_gain(channel, right_gain[m_stereo_image[channel]] * m_sound_input_gain);
 	//printf("%d %f %f\n",channel,m_lspeaker->input(channel).gain(),m_rspeaker->input(channel).gain());
 }
 
@@ -454,7 +456,7 @@ void acorn_vidc10_device::refresh_sound_frequency()
 	{
 		// TODO: Range is between 3 and 256 usecs
 		double sndhz = 1e6 / ((m_sound_frequency_latch & 0xff) + 2);
-		sndhz /= m_sound_internal_divider;
+		sndhz /= get_dac_mode() == true ? 2.0 : 8.0;
 		m_sound_timer->adjust(attotime::zero, 0, attotime::from_hz(sndhz));
 		//printf("VIDC: audio DMA start, sound freq %d, sndhz = %f\n", (m_crtc_regs[0xc0] & 0xff)-2, sndhz);
 	}
@@ -479,17 +481,17 @@ void acorn_vidc10_device::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, 
 
 	//printf("%d %d %d %d\n",ystart, ysize, cliprect.min_y, cliprect.max_y);
 
-	for (int srcy = raster_ystart; srcy<ysize; srcy++)
+	for (int srcy = raster_ystart; srcy < ysize; srcy++)
 	{
-		int dsty = (srcy + ystart)*(m_crtc_interlace+1);
-		for (int srcx = 0; srcx<xsize; srcx++)
+		int dsty = (srcy + ystart) * (m_crtc_interlace+1);
+		for (int srcx = 0; srcx < xsize; srcx++)
 		{
 			u8 pen = vram[srcx + srcy * xsize];
 			int dstx = (srcx*xchar_size) + xstart;
 
-			for (int xi=0;xi<xchar_size;xi++)
+			for (int xi = 0; xi < xchar_size; xi++)
 			{
-				u16 dot = ((pen>>(xi*pen_byte_size)) & pen_mask);
+				u16 dot = (pen >> (xi * pen_byte_size)) & pen_mask;
 				if (is_cursor == true && dot == 0)
 					continue;
 				dot += pen_base;
@@ -556,7 +558,11 @@ READ_LINE_MEMBER(acorn_vidc10_device::flyback_r)
 	return false;
 }
 
-// VIDC20
+/*
+ *
+ * VIDC20 overrides
+ *
+ */
 
 void arm_vidc20_device::regs_map(address_map &map)
 {
@@ -564,6 +570,7 @@ void arm_vidc20_device::regs_map(address_map &map)
 	map(0x10, 0x1f).w(FUNC(arm_vidc20_device::vidc20_pal_data_index_w));
 	map(0x40, 0x7f).w(FUNC(arm_vidc20_device::vidc20_pal_data_cursor_w));
 	map(0x80, 0x9f).w(FUNC(arm_vidc20_device::vidc20_crtc_w));
+//  map(0xa0, 0xa7) stereo image
 	map(0xb0, 0xb0).w(FUNC(arm_vidc20_device::vidc20_sound_frequency_w));
 	map(0xb1, 0xb1).w(FUNC(arm_vidc20_device::vidc20_sound_control_w));
 	map(0xd0, 0xdf).w(FUNC(arm_vidc20_device::fsynreg_w));
@@ -572,6 +579,7 @@ void arm_vidc20_device::regs_map(address_map &map)
 
 arm_vidc20_device::arm_vidc20_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: acorn_vidc10_device(mconfig, ARM_VIDC20, tag, owner, clock, 2)
+	, m_dac32(*this, "serial_dac_%u", 0)
 {
 	m_space_config = address_space_config("regs_space", ENDIANNESS_LITTLE, 32, 8, -2, address_map_constructor(FUNC(arm_vidc20_device::regs_map), this));
 	m_pal_4bpp_base = 0x000;
@@ -583,8 +591,20 @@ arm_vidc20_device::arm_vidc20_device(const machine_config &mconfig, const char *
 void arm_vidc20_device::device_add_mconfig(machine_config &config)
 {
 	acorn_vidc10_device::device_add_mconfig(config);
-	// ...
-	// TODO: for simplicity we may as well add separate DACs for 32-bit mode
+
+	// FIXME: disable DACs for the time being
+	// so that it won't mixin with QS1000 source for ssfindo.cpp games
+	for (int i = 0; i < m_sound_max_channels; i++)
+	{
+		m_dac[i]->reset_routes();
+		m_dac[i]->add_route(0, m_lspeaker, 0.0);
+		m_dac[i]->add_route(0, m_rspeaker, 0.0);
+	}
+
+	// For simplicity we separate DACs for 32-bit mode
+	// TODO: how stereo image copes with this if at all?
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac32[0], 0).add_route(ALL_OUTPUTS, m_lspeaker, 0.25);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac32[1], 0).add_route(ALL_OUTPUTS, m_rspeaker, 0.25);
 }
 
 void arm_vidc20_device::device_config_complete()
@@ -623,12 +643,29 @@ void arm_vidc20_device::device_reset()
 	// TODO: sensible defaults
 	m_vco_r_modulo = 1;
 	m_vco_v_modulo = 1;
+
+	// make sure DACs don't output any undefined behaviour for now
+	// (will cause wild DC offset in ssfindo.cpp games)
+	for (int ch = 0; ch < 8; ch ++)
+		write_dac(ch, 0);
+
+	write_dac32(0, 0);
+	write_dac32(1, 0);
 }
 
 void arm_vidc20_device::device_timer(emu_timer &timer, device_timer_id id, int param)
 {
 	acorn_vidc10_device::device_timer(timer, id, param);
+	// TODO: other timers
 }
+
+inline void arm_vidc20_device::refresh_stereo_image(u8 channel)
+{
+	// TODO: set_input_gain hampers with both QS1000 and serial DAC mode
+	// Best option is to move the legacy DAC handling into a separate device,
+	// make it proper 8 channel output while clients are responsible of mix-ins
+}
+
 
 inline void arm_vidc20_device::update_8bpp_palette(u16 index, u32 paldata)
 {
@@ -732,7 +769,7 @@ void arm_vidc20_device::vidc20_control_w(u32 data)
 	// ---- --00: VCLK
 	// ---- --01: HCLK
 	// ---- --10: RCLK ("recommended" 24 MHz)
-	// ---- --11: undefined, prolly same as RCLK
+	// ---- --11: undefined, probably same as RCLK
 	m_pixel_source = data & 3;
 	m_pixel_rate = (data & 0x1c) >> 2;
 	// (data & 0x700) >> 8 FIFO load
@@ -750,6 +787,26 @@ void arm_vidc20_device::vidc20_sound_control_w(u32 data)
 {
 	// TODO: VIDC10 mode, ext clock bit 0
 	m_dac_serial_mode = BIT(data, 1);
+
+	if (m_dac_serial_mode)
+	{
+		m_dac32[0]->set_output_gain(0, 1.0);
+		m_dac32[1]->set_output_gain(0, 1.0);
+
+		for (int ch = 0; ch < m_sound_max_channels; ch++)
+			m_dac[ch]->set_output_gain(0, 0.0);
+	}
+	else
+	{
+		m_dac32[0]->set_output_gain(0, 0.0);
+		m_dac32[1]->set_output_gain(0, 0.0);
+
+		for (int ch = 0; ch < m_sound_max_channels; ch++)
+		{
+			//m_dac[ch]->set_output_gain(0, 0.0);
+			refresh_stereo_image(ch);
+		}
+	}
 }
 
 void arm_vidc20_device::vidc20_sound_frequency_w(u32 data)
@@ -761,7 +818,7 @@ void arm_vidc20_device::vidc20_sound_frequency_w(u32 data)
 
 void arm_vidc20_device::write_dac32(u8 channel, u16 data)
 {
-	m_dac[channel & 1]->write(data);
+	m_dac32[channel & 1]->write(data);
 }
 
 bool arm_vidc20_device::get_dac_mode()
@@ -774,5 +831,3 @@ u32 arm_vidc20_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	// TODO: support for true color modes
 	return acorn_vidc10_device::screen_update(screen, bitmap, cliprect);
 }
-
-

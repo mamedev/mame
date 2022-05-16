@@ -7821,10 +7821,12 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 7:14 234fc:5
 
 
 50fa ffff trapt    w .          234fc:6
+	m_pc += 2; // increase before else stackframe & return addresses are incorrect
 	m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
 
 
 50fb ffff trapt    l .          234fc:8
+	m_pc += 4; // increase before else stackframe & return addresses are incorrect
 	m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
 
 
@@ -7845,18 +7847,16 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 7:14 234fc:5
 
 
 50fa f0ff trapcc   w .          234fc:6
+	m_pc += 2;    /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(M68KMAKE_CC) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 2;
 	}
 
 
 50fb f0ff trapcc   l .          234fc:8
+	m_pc += 4;  /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(M68KMAKE_CC) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 4;
 	}
 
 

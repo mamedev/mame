@@ -68,7 +68,7 @@ ToDo:
 - 80 column mode (used in Turbo Monitor)
 
 Keyboard:
-- okean240 - external ascii keyboard
+- okean240  - external ascii keyboard
 - okean240a - internal keyboard
 - okean240t - serial keyboard & screen
 
@@ -131,7 +131,7 @@ private:
 	u8 m_j = 0U;
 	u8 m_scroll = 0U;
 	u8 m_tog = 0U;
-	bool m_key_pressed = 0;
+	bool m_key_pressed = false;
 	u8 m_kbd_row = 0U;
 	required_shared_ptr<u8> m_p_videoram;
 	optional_ioport_array<11> m_io_keyboard;

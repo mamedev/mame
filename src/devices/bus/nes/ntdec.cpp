@@ -79,7 +79,6 @@ void nes_ntdec_fh_device::pcb_reset()
 {
 	prg32((m_prg_chunks - 1) >> 1);
 	chr8(0, CHRROM);
-	set_nt_mirroring(PPU_MIRROR_VERT);
 }
 
 void nes_ntdec_n715021_device::pcb_reset()

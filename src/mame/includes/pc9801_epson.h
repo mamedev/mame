@@ -50,8 +50,8 @@ private:
 
 	template <unsigned which> void shadow_ipl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	u8 m_shadow_ipl_bank;
-	bool m_itf_bank_enable;
+	u8 m_shadow_ipl_bank = 0;
+	bool m_itf_bank_enable = false;
 //  u8 m_itf_bank;
 };
 

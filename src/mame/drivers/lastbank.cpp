@@ -58,8 +58,8 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
-	uint8_t m_mux_data;
-	uint8_t m_sound_flags;
+	uint8_t m_mux_data = 0;
+	uint8_t m_sound_flags = 0;
 
 	void output_w(offs_t offset, uint8_t data);
 

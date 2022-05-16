@@ -42,12 +42,12 @@ private:
 	required_device<dac_word_interface> m_dac;
 	required_region_ptr<int8_t> m_samples;
 
-	emu_timer * m_dac_update_timer;
-	bool        m_output_active;
-	int         m_count;
-	int         m_shift;
-	uint32_t      m_cur_sample;
-	uint8_t       m_cmd[5];
+	emu_timer * m_dac_update_timer = nullptr;
+	bool        m_output_active = false;
+	int         m_count = 0;
+	int         m_shift = 0;
+	uint32_t      m_cur_sample = 0;
+	uint8_t       m_cmd[5]{};
 };
 
 
@@ -156,9 +156,9 @@ protected:
 	void sr16_mem(address_map &map);
 
 private:
-	uint8_t       m_kb_matrix;
-	uint8_t       m_leds;
-	uint8_t       m_lcd_digits[5];
+	uint8_t       m_kb_matrix = 0;
+	uint8_t       m_leds = 0;
+	uint8_t       m_lcd_digits[5]{};
 
 	required_device<hd44780_device> m_lcdc;
 	optional_device<cassette_image_device> m_cassette;

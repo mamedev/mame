@@ -78,10 +78,10 @@ private:
 	void ccpu_map(address_map &map);
 	void hcpu_map(address_map &map);
 
-	bool m_zcen = 0;
-	bool m_gten = 0;
-	bool m_disp_on = 0;
-	bool m_diag_on = 0;
+	bool m_zcen = false;
+	bool m_gten = false;
+	bool m_disp_on = false;
+	bool m_diag_on = false;
 	u8 m_firqtimer = 0U;
 	u8 m_diag_segments = 0U;
 	virtual void machine_start() override;
@@ -525,4 +525,4 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(1984,  aftor,  0,  wico,  wico, wico_state, empty_init, ROT0,  "Wico", "Af-Tor", MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1984,  aftor,  0,  wico,  wico, wico_state, empty_init, ROT0,  "Wico", "Af-Tor", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

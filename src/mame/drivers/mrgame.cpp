@@ -153,11 +153,11 @@ private:
 	required_ioport_array<7> m_io_keyboard;
 	output_finder<128> m_io_outputs; // 24 solenoids + 104 lamps
 
-	bool m_ack1 = 0;
-	bool m_ack2 = 0;
-	bool m_ackv = 0;
-	bool m_flip = 0;
-	bool m_intst = 0;
+	bool m_ack1 = false;
+	bool m_ack2 = false;
+	bool m_ackv = false;
+	bool m_flip = false;
+	bool m_intst = false;
 	u8 m_data = 0U;
 	u8 m_sxx = 0U;
 	u8 m_irq_state = 0U;
@@ -167,7 +167,7 @@ private:
 	u8 m_video_data = 0U;
 	u8 m_video_status = 0U;
 
-	tilemap_t *m_tilemap;
+	tilemap_t *m_tilemap = nullptr;
 };
 
 
@@ -974,10 +974,10 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(1988,  dakar,     0,         mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "Dakar",              MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1989,  fasttrack, motrshow,  mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "Fast Track",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1989,  motrshow,  0,         mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "Motor Show (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1989,  motrshowa, motrshow,  mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "Motor Show (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1989,  motrshowb, motrshow,  mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "Motor Show (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1990,  macattck,  0,         macattck,  mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "Mac Attack",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1990,  wcup90,    0,         wcup90,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "World Cup 90",       MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1988,  dakar,     0,         mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "Dakar",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  fasttrack, motrshow,  mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "Fast Track",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  motrshow,  0,         mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "Motor Show (set 1)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  motrshowa, motrshow,  mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "Motor Show (set 2)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  motrshowb, motrshow,  mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "Motor Show (set 3)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  macattck,  0,         macattck,  mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "Mac Attack",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  wcup90,    0,         wcup90,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "World Cup 90",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

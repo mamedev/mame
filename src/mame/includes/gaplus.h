@@ -18,8 +18,8 @@ public:
 	static constexpr unsigned MAX_STARS = 250;
 
 	struct star {
-		float x,y;
-		int col,set;
+		float x = 0, y = 0;
+		int col = 0, set = 0;
 	};
 
 	enum
@@ -104,18 +104,18 @@ protected:
 	required_memory_region m_gfx1_region;
 	required_memory_region m_gfx2_region;
 
-	int m_type;
+	int m_type = 0;
 
-	tilemap_t *m_bg_tilemap;
-	uint8_t m_starfield_control[4];
-	int m_total_stars;
-	int m_starfield_framecount;
+	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_starfield_control[4]{};
+	int m_total_stars = 0;
+	int m_starfield_framecount = 0;
 	struct star m_stars[MAX_STARS];
-	uint8_t m_main_irq_mask;
-	uint8_t m_sub_irq_mask;
-	uint8_t m_sub2_irq_mask;
-	emu_timer *m_namcoio0_run_timer;
-	emu_timer *m_namcoio1_run_timer;
+	uint8_t m_main_irq_mask = 0;
+	uint8_t m_sub_irq_mask = 0;
+	uint8_t m_sub2_irq_mask = 0;
+	emu_timer *m_namcoio0_run_timer = nullptr;
+	emu_timer *m_namcoio1_run_timer = nullptr;
 };
 
 class gaplusd_state : public gaplus_base_state

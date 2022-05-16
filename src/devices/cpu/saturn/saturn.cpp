@@ -12,8 +12,6 @@
 #include "emu.h"
 #include "saturn.h"
 
-#include "debugger.h"
-
 
 //#define VERBOSE 1
 #include "logmacro.h"

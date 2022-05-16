@@ -113,7 +113,7 @@ protected: // HACK FOR MC6845
 	optional_device<upd765a_device> m_fdc;
 	required_memory_bank_array<4> m_bankhandler_r, m_bankhandler_w;
 
-	char m_memory_config[4];
+	char m_memory_config[4]{};
 	emu_timer *m_keyboard_timer = nullptr;
 	int m_membank_rom_mask = 0;
 	int m_membank_internal_ram_mask = 0;
@@ -124,7 +124,7 @@ protected: // HACK FOR MC6845
 	int m_irq_status = 0;
 	int m_irq_latch = 0;
 	int m_irq_latch_mask = 0;
-	int m_sound_channel_periods[2];
+	int m_sound_channel_periods[2]{};
 	int m_previous_inputport_10_state = 0;
 	int m_previous_alarm_state = 0;
 	memory_region *m_card_ram = nullptr;

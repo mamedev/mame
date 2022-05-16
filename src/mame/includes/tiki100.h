@@ -140,25 +140,25 @@ private:
 	};
 
 	// memory state
-	bool m_rome;
-	bool m_vire;
+	bool m_rome = false;
+	bool m_vire = false;
 
 	// video state
-	uint8_t m_scroll;
-	uint8_t m_mode;
-	uint8_t m_palette_val;
-	uint8_t m_current_pixel;
+	uint8_t m_scroll = 0;
+	uint8_t m_mode = 0;
+	uint8_t m_palette_val = 0;
+	uint8_t m_current_pixel = 0;
 
 	// keyboard state
-	int m_keylatch;
+	int m_keylatch = 0;
 
 	// printer state
-	int m_centronics_ack;
-	int m_centronics_busy;
-	int m_centronics_perror;
+	int m_centronics_ack = 0;
+	int m_centronics_busy = 0;
+	int m_centronics_perror = 0;
 
 	// serial state
-	bool m_st;
+	bool m_st = false;
 
 };
 

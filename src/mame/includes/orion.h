@@ -88,24 +88,24 @@ protected:
 	static void orion_floppy_formats(format_registration &fr);
 	void machine_start() override;
 
-	uint8_t m_orion128_video_mode;
-	uint8_t m_orion128_video_page;
-	uint8_t m_orion128_video_width;
-	uint8_t m_video_mode_mask;
-	uint8_t m_orionpro_pseudo_color;
-	uint8_t m_romdisk_lsb;
-	uint8_t m_romdisk_msb;
-	uint8_t m_orion128_memory_page;
-	uint8_t m_orionz80_memory_page;
-	uint8_t m_orionz80_dispatcher;
-	uint8_t m_speaker_data;
-	uint8_t m_orionpro_ram0_segment;
-	uint8_t m_orionpro_ram1_segment;
-	uint8_t m_orionpro_ram2_segment;
-	uint8_t m_orionpro_page;
-	uint8_t m_orionpro_128_page;
-	uint8_t m_orionpro_rom2_segment;
-	uint8_t m_orionpro_dispatcher;
+	uint8_t m_orion128_video_mode = 0;
+	uint8_t m_orion128_video_page = 0;
+	uint8_t m_orion128_video_width = 0;
+	uint8_t m_video_mode_mask = 0;
+	uint8_t m_orionpro_pseudo_color = 0;
+	uint8_t m_romdisk_lsb = 0;
+	uint8_t m_romdisk_msb = 0;
+	uint8_t m_orion128_memory_page = 0;
+	uint8_t m_orionz80_memory_page = 0;
+	uint8_t m_orionz80_dispatcher = 0;
+	uint8_t m_speaker_data = 0;
+	uint8_t m_orionpro_ram0_segment = 0;
+	uint8_t m_orionpro_ram1_segment = 0;
+	uint8_t m_orionpro_ram2_segment = 0;
+	uint8_t m_orionpro_page = 0;
+	uint8_t m_orionpro_128_page = 0;
+	uint8_t m_orionpro_rom2_segment = 0;
+	uint8_t m_orionpro_dispatcher = 0;
 
 	required_device<fd1793_device> m_fdc;
 

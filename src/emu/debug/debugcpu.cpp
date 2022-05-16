@@ -427,6 +427,7 @@ device_debug::device_debug(device_t &device)
 	, m_instrhook(nullptr)
 	, m_stepaddr(0)
 	, m_stepsleft(0)
+	, m_delay_steps(0)
 	, m_stopaddr(0)
 	, m_stoptime(attotime::zero)
 	, m_stopirq(0)
@@ -688,11 +689,11 @@ void device_debug::privilege_hook()
 	if ((m_flags & DEBUG_FLAG_STOP_PRIVILEGE) != 0)
 	{
 		bool matched = true;
-		if (m_privilege_condition && !m_privilege_condition->is_empty())
+		if (m_stop_condition && !m_stop_condition->is_empty())
 		{
 			try
 			{
-				matched = m_privilege_condition->execute();
+				matched = m_stop_condition->execute();
 			}
 			catch (expression_error &)
 			{
@@ -750,19 +751,53 @@ void device_debug::instruction_hook(offs_t curpc)
 	// handle single stepping
 	if (!debugcpu.is_stopped() && (m_flags & DEBUG_FLAG_STEPPING_ANY) != 0)
 	{
-		// is this an actual step?
-		if (m_stepaddr == ~0 || curpc == m_stepaddr)
+		bool do_step = true;
+		if ((m_flags & (DEBUG_FLAG_CALL_IN_PROGRESS | DEBUG_FLAG_TEST_IN_PROGRESS)) != 0)
 		{
-			// decrement the count and reset the breakpoint
+			if (curpc == m_stepaddr)
+			{
+				if ((~m_flags & (DEBUG_FLAG_TEST_IN_PROGRESS | DEBUG_FLAG_STEPPING_BRANCH_FALSE)) == 0)
+				{
+					debugcpu.set_execution_stopped();
+					do_step = false;
+				}
+
+				// reset the breakpoint
+				m_flags &= ~(DEBUG_FLAG_CALL_IN_PROGRESS | DEBUG_FLAG_TEST_IN_PROGRESS);
+				m_delay_steps = 0;
+			}
+			else if (m_delay_steps != 0)
+			{
+				m_delay_steps--;
+				if (m_delay_steps == 0)
+				{
+					// branch taken or subroutine entered (TODO: interrupt acknowledgment or interleaved multithreading can falsely trigger this)
+					if ((m_flags & DEBUG_FLAG_TEST_IN_PROGRESS) != 0 && (m_flags & (DEBUG_FLAG_STEPPING_OUT | DEBUG_FLAG_STEPPING_BRANCH_TRUE)) != 0)
+					{
+						debugcpu.set_execution_stopped();
+						do_step = false;
+					}
+					if ((m_flags & DEBUG_FLAG_CALL_IN_PROGRESS) != 0)
+						do_step = false;
+					m_flags &= ~DEBUG_FLAG_TEST_IN_PROGRESS;
+				}
+			}
+			else
+				do_step = false;
+		}
+
+		// is this an actual step?
+		if (do_step)
+		{
+			// decrement the count
 			m_stepsleft--;
-			m_stepaddr = ~0;
 
 			// if we hit 0, stop
 			if (m_stepsleft == 0)
 				debugcpu.set_execution_stopped();
 
 			// update every 100 steps until we are within 200 of the end
-			else if ((m_flags & DEBUG_FLAG_STEPPING_OUT) == 0 && (m_stepsleft < 200 || m_stepsleft % 100 == 0))
+			else if ((m_flags & (DEBUG_FLAG_STEPPING_OUT | DEBUG_FLAG_STEPPING_BRANCH_TRUE | DEBUG_FLAG_STEPPING_BRANCH_FALSE)) == 0 && (m_stepsleft < 200 || m_stepsleft % 100 == 0))
 			{
 				machine.debug_view().update_all();
 				machine.debug_view().flush_osd_updates();
@@ -849,7 +884,7 @@ void device_debug::instruction_hook(offs_t curpc)
 	}
 
 	// handle step out/over on the instruction we are about to execute
-	if ((m_flags & (DEBUG_FLAG_STEPPING_OVER | DEBUG_FLAG_STEPPING_OUT)) != 0 && m_stepaddr == ~0)
+	if ((m_flags & (DEBUG_FLAG_STEPPING_OVER | DEBUG_FLAG_STEPPING_OUT | DEBUG_FLAG_STEPPING_BRANCH)) != 0 && (m_flags & (DEBUG_FLAG_CALL_IN_PROGRESS | DEBUG_FLAG_TEST_IN_PROGRESS)) == 0)
 		prepare_for_step_overout(m_state->pcbase());
 
 	// no longer in debugger code
@@ -928,7 +963,7 @@ void device_debug::single_step(int numsteps)
 
 	m_device.machine().rewind_capture();
 	m_stepsleft = numsteps;
-	m_stepaddr = ~0;
+	m_delay_steps = 0;
 	m_flags |= DEBUG_FLAG_STEPPING;
 	m_device.machine().debugger().cpu().set_execution_running();
 }
@@ -945,7 +980,7 @@ void device_debug::single_step_over(int numsteps)
 
 	m_device.machine().rewind_capture();
 	m_stepsleft = numsteps;
-	m_stepaddr = ~0;
+	m_delay_steps = 0;
 	m_flags |= DEBUG_FLAG_STEPPING_OVER;
 	m_device.machine().debugger().cpu().set_execution_running();
 }
@@ -961,8 +996,9 @@ void device_debug::single_step_out()
 	assert(m_exec != nullptr);
 
 	m_device.machine().rewind_capture();
+	m_stop_condition.reset();
 	m_stepsleft = 100;
-	m_stepaddr = ~0;
+	m_delay_steps = 0;
 	m_flags |= DEBUG_FLAG_STEPPING_OUT;
 	m_device.machine().debugger().cpu().set_execution_running();
 }
@@ -1060,8 +1096,25 @@ void device_debug::go_privilege(const char *condition)
 {
 	assert(m_exec != nullptr);
 	m_device.machine().rewind_invalidate();
-	m_privilege_condition = std::make_unique<parsed_expression>(*m_symtable, condition);
+	m_stop_condition = std::make_unique<parsed_expression>(*m_symtable, condition);
 	m_flags |= DEBUG_FLAG_STOP_PRIVILEGE;
+	m_device.machine().debugger().cpu().set_execution_running();
+}
+
+
+//-------------------------------------------------
+//  go_branch - execute until branch taken or
+//  not taken
+//-------------------------------------------------
+
+void device_debug::go_branch(bool sense, const char *condition)
+{
+	assert(m_exec != nullptr);
+	m_device.machine().rewind_invalidate();
+	m_stop_condition = std::make_unique<parsed_expression>(*m_symtable, condition);
+	m_stepsleft = 100;
+	m_delay_steps = 0;
+	m_flags |= sense ? DEBUG_FLAG_STEPPING_BRANCH_TRUE : DEBUG_FLAG_STEPPING_BRANCH_FALSE;
 	m_device.machine().debugger().cpu().set_execution_running();
 }
 
@@ -1385,7 +1438,6 @@ void device_debug::set_track_pc(bool value)
 //  track_pc_visited - returns a boolean stating
 //  if this PC has been visited or not.  CRC32 is
 //  done in this function on currently active CPU.
-//  TODO: Take a CPU context as input
 //-------------------------------------------------
 
 bool device_debug::track_pc_visited(offs_t pc) const
@@ -1399,7 +1451,6 @@ bool device_debug::track_pc_visited(offs_t pc) const
 
 //-------------------------------------------------
 //  set_track_pc_visited - set this pc as visited.
-//  TODO: Take a CPU context as input
 //-------------------------------------------------
 
 void device_debug::set_track_pc_visited(offs_t pc)
@@ -1625,12 +1676,32 @@ void device_debug::prepare_for_step_overout(offs_t pc)
 
 	// disassemble the current instruction and get the flags
 	u32 dasmresult = buffer.disassemble_info(pc);
+	if ((dasmresult & util::disasm_interface::SUPPORTED) == 0)
+		return;
+
+	bool step_out = (m_flags & DEBUG_FLAG_STEPPING_OUT) != 0 && (dasmresult & util::disasm_interface::STEP_OUT) != 0;
+	bool test_cond = (dasmresult & util::disasm_interface::STEP_COND) != 0 && ((m_flags & (DEBUG_FLAG_STEPPING_BRANCH_TRUE | DEBUG_FLAG_STEPPING_BRANCH_FALSE)) != 0 || step_out);
+	if (test_cond && m_stop_condition && !m_stop_condition->is_empty())
+	{
+		try
+		{
+			test_cond = m_stop_condition->execute();
+		}
+		catch (expression_error &)
+		{
+			test_cond = false;
+		}
+	}
 
 	// if flags are supported and it's a call-style opcode, set a temp breakpoint after that instruction
-	if ((dasmresult & util::disasm_interface::SUPPORTED) != 0 && (dasmresult & util::disasm_interface::STEP_OVER) != 0)
+	// (TODO: this completely fails for subroutines that consume inline operands or use alternate returns)
+	if ((dasmresult & util::disasm_interface::STEP_OVER) != 0 || test_cond)
 	{
 		int extraskip = (dasmresult & util::disasm_interface::OVERINSTMASK) >> util::disasm_interface::OVERINSTSHIFT;
 		pc = buffer.next_pc_wrap(pc, dasmresult & util::disasm_interface::LENGTHMASK);
+		m_delay_steps = extraskip + 1;
+		if (m_stepsleft < m_delay_steps)
+			m_stepsleft = m_delay_steps;
 
 		// if we need to skip additional instructions, advance as requested
 		while (extraskip-- > 0) {
@@ -1638,13 +1709,17 @@ void device_debug::prepare_for_step_overout(offs_t pc)
 			pc = buffer.next_pc_wrap(pc, result & util::disasm_interface::LENGTHMASK);
 		}
 		m_stepaddr = pc;
+		if ((dasmresult & util::disasm_interface::STEP_OVER) != 0)
+			m_flags |= DEBUG_FLAG_CALL_IN_PROGRESS;
+		if (test_cond)
+			m_flags |= DEBUG_FLAG_TEST_IN_PROGRESS;
 	}
 
 	// if we're stepping out and this isn't a step out instruction, reset the steps until stop to a high number
-	// (TODO: this doesn't work with conditional return instructions)
-	if ((m_flags & DEBUG_FLAG_STEPPING_OUT) != 0)
+	if ((m_flags & (DEBUG_FLAG_STEPPING_OUT | DEBUG_FLAG_STEPPING_BRANCH_TRUE | DEBUG_FLAG_STEPPING_BRANCH_FALSE)) != 0)
 	{
-		if ((dasmresult & util::disasm_interface::SUPPORTED) != 0 && (dasmresult & util::disasm_interface::STEP_OUT) == 0)
+		// make sure to also reset the number of steps for conditionals that may be single-instruction loops
+		if (test_cond || !step_out)
 			m_stepsleft = 100;
 		else
 		{

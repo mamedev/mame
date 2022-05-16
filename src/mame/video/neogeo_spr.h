@@ -51,24 +51,24 @@ public:
 	void set_pens(const pen_t* pens);
 
 	std::unique_ptr<uint16_t[]>     m_videoram;
-	uint16_t     *m_videoram_drawsource;
+	uint16_t     *m_videoram_drawsource = nullptr;
 
-	uint16_t     m_vram_offset;
-	uint16_t     m_vram_read_buffer;
-	uint16_t     m_vram_modulo;
+	uint16_t     m_vram_offset = 0;
+	uint16_t     m_vram_read_buffer = 0;
+	uint16_t     m_vram_modulo = 0;
 
-	uint32_t     m_sprite_gfx_address_mask;
+	uint32_t     m_sprite_gfx_address_mask = 0;
 
-	uint8_t      m_auto_animation_speed;
-	uint8_t      m_auto_animation_disabled;
-	uint8_t      m_auto_animation_counter;
-	uint8_t      m_auto_animation_frame_counter;
+	uint8_t      m_auto_animation_speed = 0;
+	uint8_t      m_auto_animation_disabled = 0;
+	uint8_t      m_auto_animation_counter = 0;
+	uint8_t      m_auto_animation_frame_counter = 0;
 
-	uint8_t      m_fixed_layer_source;
-	uint8_t      m_fixed_layer_bank_type;
+	uint8_t      m_fixed_layer_source = 0;
+	uint8_t      m_fixed_layer_bank_type = 0;
 
-	emu_timer  *m_auto_animation_timer;
-	emu_timer  *m_sprite_line_timer;
+	emu_timer  *m_auto_animation_timer = nullptr;
+	emu_timer  *m_sprite_line_timer = nullptr;
 
 	TIMER_CALLBACK_MEMBER(auto_animation_timer_callback);
 	TIMER_CALLBACK_MEMBER(sprite_line_timer_callback);
@@ -86,10 +86,10 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	uint32_t get_region_mask(uint8_t* rgn, uint32_t rgn_size);
-	uint8_t* m_region_sprites; uint32_t m_region_sprites_size;
-	uint8_t* m_region_fixed; uint32_t m_region_fixed_size;
-	memory_region* m_region_fixedbios;
-	const pen_t   *m_pens;
+	uint8_t* m_region_sprites = nullptr; uint32_t m_region_sprites_size = 0;
+	uint8_t* m_region_fixed = nullptr; uint32_t m_region_fixed_size = 0;
+	memory_region* m_region_fixedbios = nullptr;
+	const pen_t   *m_pens = nullptr;
 
 	required_region_ptr<uint8_t> m_region_zoomy;
 };

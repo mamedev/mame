@@ -55,7 +55,6 @@ March 2013 NPW:
 *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "konami.h"
 #include "m6809inl.h"
 #include "6x09dasm.h"

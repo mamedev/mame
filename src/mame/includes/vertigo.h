@@ -62,11 +62,11 @@ private:
 
 	struct am2901
 	{
-		uint32_t ram[16];   /* internal ram */
-		uint32_t d;         /* direct data D input */
-		uint32_t q;         /* Q register */
-		uint32_t f;         /* F ALU result */
-		uint32_t y;         /* Y output */
+		uint32_t ram[16]{};   /* internal ram */
+		uint32_t d = 0;         /* direct data D input */
+		uint32_t q = 0;         /* Q register */
+		uint32_t f = 0;         /* F ALU result */
+		uint32_t y = 0;         /* Y output */
 	};
 
 	class vector_generator
@@ -114,11 +114,11 @@ private:
 
 	struct vproc
 	{
-		uint16_t sram[64]; /* external sram */
-		uint16_t ramlatch; /* latch between 2901 and sram */
-		uint16_t rom_adr;  /* vector ROM/RAM address latch */
-		uint32_t pc;       /* program counter */
-		uint32_t ret;      /* return address */
+		uint16_t sram[64]{}; /* external sram */
+		uint16_t ramlatch = 0; /* latch between 2901 and sram */
+		uint16_t rom_adr = 0;  /* vector ROM/RAM address latch */
+		uint32_t pc = 0;       /* program counter */
+		uint32_t ret = 0;      /* return address */
 
 	};
 
@@ -136,7 +136,7 @@ private:
 	required_device<adc0808_device> m_adc;
 	required_shared_ptr<uint16_t> m_vectorram;
 	attotime m_irq4_time;
-	uint8_t m_irq_state;
+	uint8_t m_irq_state = 0;
 	vproc m_vs;
 	am2901 m_bsp;
 	vector_generator m_vgen;
