@@ -136,17 +136,22 @@ namespace plib {
 				// otherwise, it is the byte index into the vtable where the actual function lives
 				// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 				std::uint8_t *vtable_base = *reinterpret_cast<std::uint8_t **>(o_p_delta);
-				// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-				func = *reinterpret_cast<generic_function *>(vtable_base + m_function - 1);
+				if (compile_info::arch() == ci_arch::IA64)
+					// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+					func = reinterpret_cast<generic_function>(uintptr_t(vtable_base + m_function - 1));
+				else
+					// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+					func = *reinterpret_cast<generic_function *>(vtable_base + m_function - 1);
 			}
 			object = o_p_delta;
 		}
 
 		// actual state
-		uintptr_t m_function;         // first item can be one of two things:
-													//    if even, it's a pointer to the function
-													//    if odd, it's the byte offset into the vtable
-		ptrdiff_t m_this_delta;       // delta to apply to the 'this' pointer
+		uintptr_t m_function;   // first item can be one of two things:
+		                        //    if even, it's a pointer to the function
+		                        //    if odd, it's the byte offset into the vtable
+		                        //       or a byte offset into the function descriptors on IA64
+		ptrdiff_t m_this_delta; // delta to apply to the 'this' pointer
 	};
 
 	template <>
@@ -168,31 +173,32 @@ namespace plib {
 		// extract the generic function and adjust the object pointer
 		void convert_to_generic(generic_function &func, mfp_generic_class *&object) const
 		{
+			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+			object = reinterpret_cast<mfp_generic_class *>(reinterpret_cast<std::uint8_t *>(object) + (m_this_delta >> 1));
 			if ((m_this_delta & 1) == 0)
 			{
-				// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-				object = reinterpret_cast<mfp_generic_class *>(reinterpret_cast<std::uint8_t *>(object) + (m_this_delta >> 1));
 				// NOLINTNEXTLINE(performance-no-int-to-ptr,cppcoreguidelines-pro-type-reinterpret-cast)
 				func = reinterpret_cast<generic_function>(m_function);
 			}
 			else
 			{
 				// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-				object = reinterpret_cast<mfp_generic_class *>(reinterpret_cast<std::uint8_t *>(object));
-
-				// otherwise, it is the byte index into the vtable where the actual function lives
-				// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-				std::uint8_t *vtable_base = *reinterpret_cast<std::uint8_t **>(object);
-				// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-				func = *reinterpret_cast<generic_function *>(vtable_base + m_function + m_this_delta - 1);
+				std::uint8_t *vtable_base = *reinterpret_cast<std::uint8_t **>(object) + m_function;
+				if (compile_info::arch::value == ci_arch::IA64)
+					// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+					func = reinterpret_cast<generic_function>(uintptr_t(vtable_base));
+				else
+					// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+					func = *reinterpret_cast<generic_function *>(vtable_base);
 			}
 		}
 
 		// actual state
-		uintptr_t               m_function;         // first item can be one of two things:
-													//    if even, it's a pointer to the function
-													//    if odd, it's the byte offset into the vtable
-		ptrdiff_t               m_this_delta;       // delta to apply to the 'this' pointer
+		uintptr_t m_function;   // first item can pointer to the function or a byte offset into the vtable
+		ptrdiff_t m_this_delta; // delta to apply to the 'this' pointer after right shifting by one bit
+		                        //    if even, m_function is a pointer to the function
+		                        //    if odd,  m_function is the byte offset into the vtable
+		                        //       or a byte offset into the function descriptors on IA64
 	};
 
 	template <>
@@ -244,12 +250,10 @@ namespace plib {
 		}
 
 		// actual state
-		uintptr_t m_function;         // first item can be one of two things:
-													//    if even, it's a pointer to the function
-													//    if odd, it's the byte offset into the vtable
+		uintptr_t m_function;         // pointer to the function
 		int       m_this_delta;       // delta to apply to the 'this' pointer
 
-		int       m_vptr_offs;     // only used for visual studio x64
+		int       m_vptr_offs;
 		int       m_vt_index;
 		unsigned  m_size;
 	};
