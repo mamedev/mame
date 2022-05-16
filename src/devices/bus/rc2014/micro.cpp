@@ -78,14 +78,14 @@ void rc2014_micro::device_start()
 	std::fill_n(m_ram.get(), 0x8000, 0xff);
 	save_pointer(NAME(m_ram), 0x8000);
 	m_bus->installer(AS_PROGRAM)->install_ram(0x8000, 0xffff, m_ram.get());
-
-	// Setup ACIA
-	// A15-A8 and A5-A1 not connected
-	m_bus->installer(AS_IO)->install_readwrite_handler(0x80, 0x81, 0, 0xff3e, 0, read8sm_delegate(*m_acia, FUNC(acia6850_device::read)), write8sm_delegate(*m_acia, FUNC(acia6850_device::write)));
 }
 
 void rc2014_micro::device_reset()
 {
+	// Setup ACIA
+	// A15-A8 and A5-A1 not connected
+	m_bus->installer(AS_IO)->install_readwrite_handler(0x80, 0x81, 0, 0xff3e, 0, read8sm_delegate(*m_acia, FUNC(acia6850_device::read)), write8sm_delegate(*m_acia, FUNC(acia6850_device::write)));
+
 	// Setup ROM
 	if (m_rom_present->read())
 		m_bus->installer(AS_PROGRAM)->install_rom(0x0000, 0x1fff, 0x0000, m_rom->base() + (m_rom_selector->read() & 7) * 0x2000);
@@ -189,22 +189,23 @@ protected:
 
 	uint8_t ide_cs0_r(offs_t offset) { return m_ata->cs0_r(offset); }
 	void ide_cs0_w(offs_t offset, uint8_t data) { m_ata->cs0_w(offset, data); }
-	void reset_bank_w(offs_t, uint8_t) { m_bank = 0; update_banks(); }
-	void toggle_bank_w(offs_t, uint8_t) { m_bank = m_bank ? 0 : 1; update_banks(); }
-	void ram_w(offs_t offset, uint8_t data) { m_ram[offset] = data; }
+	void reset_bank_w(offs_t, uint8_t) { m_view_num = 0; update_banks(); }
+	void toggle_bank_w(offs_t, uint8_t) { m_view_num = m_view_num ? 0 : 1; update_banks(); }
 
 private:
-	void update_banks();
+	void update_banks() { m_view.select(m_view_num); }
 
 	// base-class members
-	uint8_t m_bank;
-	uint8_t m_selected_bank;
+	uint8_t m_view_num;
 	std::unique_ptr<u8[]> m_ram;
 
 	required_device<ata_interface_device> m_ata;
 	required_device<rc2014_bus_device> m_rc2014_bus;
 	required_memory_region m_rom;
 	required_ioport m_jp1;
+	memory_view m_view;
+	memory_bank_creator m_rombank;
+	memory_bank_creator m_rambank;
 };
 
 rc2014_mini_cpm::rc2014_mini_cpm(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -214,6 +215,9 @@ rc2014_mini_cpm::rc2014_mini_cpm(const machine_config &mconfig, const char *tag,
 	, m_rc2014_bus(*this, ":bus")
 	, m_rom(*this, "rom")
 	, m_jp1(*this, "JP1-JP2")
+	, m_view(*this, "view")
+	, m_rombank(*this, "bank")
+	, m_rambank(*this, "ram")
 {
 }
 
@@ -223,34 +227,37 @@ void rc2014_mini_cpm::device_start()
 	m_ram = std::make_unique<u8[]>(0x8000);
 	std::fill_n(m_ram.get(), 0x8000, 0xff);
 	save_pointer(NAME(m_ram), 0x8000);
-	save_item(NAME(m_bank));
+	save_item(NAME(m_view_num));
 
+	// Install RAM/ROM
+	m_bus->installer(AS_PROGRAM)->install_view(0x0000, 0x7fff, m_view);
+	m_view[0].install_read_bank(0x0000, 0x3fff, m_rombank);
+	m_view[0].install_write_bank(0x0000, 0x3fff, m_rambank);
+	m_view[1].install_readwrite_bank(0x0000, 0x7fff, m_rambank);
+
+	// Setup banks
+	m_rombank->configure_entry(0, m_rom->base() + 0x0000);
+	m_rombank->configure_entry(1, m_rom->base() + 0x4000);
+	m_rombank->configure_entry(2, m_rom->base() + 0x8000);
+	m_rombank->configure_entry(3, m_rom->base() + 0xc000);
+
+	m_rambank->configure_entry(0, m_ram.get());
+}
+
+void rc2014_mini_cpm::device_reset()
+{
 	// A15-A8, A7 and A2-A0 not connected, A6 must be 0
 	m_bus->installer(AS_IO)->install_write_handler(0x30, 0x30, 0, 0xff87, 0, write8sm_delegate(*this, FUNC(rc2014_mini_cpm::reset_bank_w)));
 	m_bus->installer(AS_IO)->install_write_handler(0x38, 0x38, 0, 0xff87, 0, write8sm_delegate(*this, FUNC(rc2014_mini_cpm::toggle_bank_w)));
 	// A15-A8 and A7 not connected
 	m_bus->installer(AS_IO)->install_readwrite_handler(0x10, 0x17, 0, 0xff80, 0, read8sm_delegate(*this, FUNC(rc2014_mini_cpm::ide_cs0_r)), write8sm_delegate(*this, FUNC(rc2014_mini_cpm::ide_cs0_w)));
-}
 
-void rc2014_mini_cpm::device_reset()
-{
-	m_bank = 0;
-	m_selected_bank = m_jp1->read();
+	// Set default banks
+	m_view_num = 0;
+	m_rombank->set_entry(m_jp1->read());
 	update_banks();
 }
 
-void rc2014_mini_cpm::update_banks()
-{
-	if (m_bank == 0)
-	{
-		m_bus->installer(AS_PROGRAM)->install_write_handler(0x0000, 0x7fff, write8sm_delegate(*this, FUNC(rc2014_mini_cpm::ram_w)));
-		m_bus->installer(AS_PROGRAM)->install_rom(0x0000, 0x3fff, 0x0000, m_rom->base() + (m_selected_bank * 0x4000));
-	}
-	else
-	{
-		m_bus->installer(AS_PROGRAM)->install_ram(0x0000, 0x7fff, m_ram.get());
-	}
-}
 void rc2014_mini_cpm::device_add_mconfig(machine_config &config)
 {
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);

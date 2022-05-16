@@ -8,10 +8,11 @@
 
 #include "emu.h"
 #include "fdc.h"
+
+#include "machine/upd765.h"
 #include "imagedev/floppy.h"
 #include "formats/imd_dsk.h"
 #include "formats/pc_dsk.h"
-#include "machine/upd765.h"
 
 namespace {
 
@@ -160,7 +161,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// DACK confirmation is same as pulsing TC
-	uint8_t dack_r() { m_fdc->tc_w(true);  m_fdc->tc_w(false); return 0xff;}
+	uint8_t dack_r(address_space &space, offs_t) { m_fdc->tc_w(true);  m_fdc->tc_w(false); return space.unmap(); }
 private:
 	required_ioport m_addr;
 	required_ioport_array<2> m_jp;
@@ -191,7 +192,8 @@ void rc2014_wd37c65_device::device_reset()
 
 	// A15-A8 and A0 and A1 not connected
 	m_bus->installer(AS_IO)->install_write_handler(base+0x08, base+0x08, 0, 0xff06, 0, write8smo_delegate(m_fdc, FUNC(wd37c65c_device::ccr_w)));
-	m_bus->installer(AS_IO)->install_readwrite_handler(base+0x18, base+0x18, 0, 0xff06, 0, read8smo_delegate(*this, FUNC(rc2014_wd37c65_device::dack_r)), write8smo_delegate(m_fdc, FUNC(wd37c65c_device::dor_w)));
+	m_bus->installer(AS_IO)->install_write_handler(base+0x18, base+0x18, 0, 0xff06, 0, write8smo_delegate(m_fdc, FUNC(wd37c65c_device::dor_w)));
+	m_bus->installer(AS_IO)->install_read_handler(base+0x18, base+0x18, 0, 0xff06, 0, read8m_delegate(*this, FUNC(rc2014_wd37c65_device::dack_r)));
 	// TODO: Use jumpers
 }
 

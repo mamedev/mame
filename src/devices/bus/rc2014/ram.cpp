@@ -69,7 +69,6 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 	DECLARE_WRITE_LINE_MEMBER( page_w ) { m_bank = state; update_banks(); }
-	void ram_w(offs_t offset, uint8_t data) { m_ram[offset] = data; }
 
 	virtual void update_banks() = 0;
 
@@ -105,7 +104,7 @@ void ram_64k_base::device_reset()
 
 static INPUT_PORTS_START( ram_64k_jumpers )
 	PORT_START("START_ADDR")
-	PORT_CONFNAME( 0x4, 0x0, "Start address" )
+	PORT_CONFNAME( 0x7, 0x0, "Start address" )
 	PORT_CONFSETTING( 0x0, "0x0000" )
 	PORT_CONFSETTING( 0x1, "0x1000" )
 	PORT_CONFSETTING( 0x2, "0x2000" )
@@ -165,7 +164,7 @@ void ram_64k_device::update_banks()
 	if (m_paged->read() == 0) return; // If not paged skip
 
 	if (m_bank == 0)
-		m_bus->installer(AS_PROGRAM)->install_write_handler(0x0000, 0x7fff, write8sm_delegate(*this, FUNC(ram_64k_device::ram_w)));
+		m_bus->installer(AS_PROGRAM)->install_writeonly(0x0000, 0x7fff, m_ram.get());
 	else
 		m_bus->installer(AS_PROGRAM)->install_ram(0x0000, 0x7fff, m_ram.get());
 }
@@ -201,7 +200,7 @@ void ram_64k_device_40pin::device_reset()
 	if (m_paged->read())
 	{
 		m_bus->installer(AS_PROGRAM)->install_ram(0x8000, 0xffff, m_ram.get() + 0x8000);
-		m_bus->installer(AS_PROGRAM)->install_write_handler(0x0000, 0x7fff, write8sm_delegate(*this, FUNC(ram_64k_device_40pin::ram_w)));
+		m_bus->installer(AS_PROGRAM)->install_writeonly(0x0000, 0x7fff, m_ram.get());
 	}
 	else
 	{
