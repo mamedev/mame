@@ -7,7 +7,7 @@ Homedata Games
 driver by Phil Stroffolino and Nicola Salmoria
 
 
-*1987 X77 Mahjong Hourouki Part1 -Seisyun Hen-
+*1987 X77 Mahjong Hourouki Part1 -Seishun Hen-
 *1987 X72 Mahjong Hourouki Gaiden
 *1988 X73 Mahjong Joshi Pro-wres -Give up 5 byou mae-
 *1988 A74 Mahjong Hourouki Okite
@@ -79,7 +79,7 @@ TODO:
 
 
 ----------------------------------------------------------------------------
-Mahjong Hourouki Part1 -Seisyun Hen- [麻雀放浪記 青春編]
+Mahjong Hourouki Part1 -Seishun Hen- [麻雀放浪記 青春編]
 (c)1987 Home Data
 
 Board:  A77-PWB-A-(A)
@@ -2212,7 +2212,7 @@ void homedata_state::init_mirderby()
 }
 
 
-GAME( 1987, hourouki,  0,        mrokumei, mjhokite, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Hourouki Part 1 - Seisyun Hen (Japan)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hourouki,  0,        mrokumei, mjhokite, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Hourouki Part 1 - Seishun Hen (Japan)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, mhgaiden,  0,        mrokumei, mjhokite, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Hourouki Gaiden (Japan)",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1988, mjhokite,  0,        mrokumei, mjhokite, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Hourouki Okite (Japan)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1988, mjclinic,  0,        mrokumei, mjhokite, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Clinic (Japan, set 1)",                       MACHINE_SUPPORTS_SAVE )
