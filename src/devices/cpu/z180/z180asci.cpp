@@ -103,6 +103,7 @@ z180asci_channel_base::z180asci_channel_base(const machine_config &mconfig, devi
 	, m_txa(0)
 	, m_rts(0)
 	, m_divisor(1)
+	, m_brg(nullptr)
 	, m_id(id)
 	, m_ext(ext)
 {
@@ -113,10 +114,13 @@ void z180asci_channel_base::device_resolve_objects()
 	// resolve callbacks
 	m_txa_handler.resolve_safe();
 	m_rts_handler.resolve_safe();
+	m_cka_handler.resolve_safe();
 }
 
 void z180asci_channel_base::device_start()
 {
+	m_brg = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z180asci_channel_base::brg_callback), this));
+
 	save_item(NAME(m_asci_cntla));
 	save_item(NAME(m_asci_cntlb));
 	save_item(NAME(m_asci_stat));
@@ -134,6 +138,8 @@ void z180asci_channel_base::device_start()
 
 void z180asci_channel_base::device_reset()
 {
+	m_brg->adjust(attotime::never);
+
 	m_irq = 0;
 
 	m_asci_ext = 0;
@@ -150,6 +156,10 @@ void z180asci_channel_base::device_clock_changed()
 	LOG("Z180 ASCI%d set bitrate %d\n", m_id, uint32_t(clock() / m_divisor));
 	set_tra_rate(clock(), m_divisor);
 	set_rcv_rate(clock(), m_divisor);
+}
+
+TIMER_CALLBACK_MEMBER( z180asci_channel_base::brg_callback )
+{
 }
 
 uint8_t z180asci_channel_base::cntla_r()

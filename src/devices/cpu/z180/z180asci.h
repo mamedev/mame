@@ -64,6 +64,9 @@ protected:
 	virtual void tra_complete() override;
 	virtual void received_byte(u8 byte) override;
 
+
+	TIMER_CALLBACK_MEMBER(brg_callback);
+
 	void output_txa(int txa);
 	void output_rts(int rts);
 
@@ -84,6 +87,7 @@ protected:
 	int		  m_txa;
 	int		  m_rts;
 	uint32_t  m_divisor;
+	emu_timer *m_brg; 
 	const int  m_id;
 	const bool m_ext;
 };
