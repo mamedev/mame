@@ -166,9 +166,9 @@ namespace netlist
 
 	/// \brief Delegate type for device notification.
 	///
-	using nldelegate = plib::pmfp<void>;
-	using nldelegate_ts = plib::pmfp<void, timestep_type, nl_fptype>;
-	using nldelegate_dyn = plib::pmfp<void>;
+	using nldelegate = plib::pmfp<void ()>;
+	using nldelegate_ts = plib::pmfp<void (timestep_type, nl_fptype)>;
+	using nldelegate_dyn = plib::pmfp<void ()>;
 
 	namespace detail {
 

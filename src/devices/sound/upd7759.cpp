@@ -390,8 +390,6 @@ void upd775x_device::advance_state()
 	{
 		// Idle state: we stick around here while there's nothing to do
 		case STATE_IDLE:
-			// If we have dropped back to idle state we always switch back to stand alone mode
-			m_mode = MODE_STAND_ALONE;
 			m_clocks_left = 4;
 			break;
 
@@ -678,7 +676,7 @@ void upd7759_device::internal_start_w(int state)
 
 	m_channel->update();
 
-	if (m_state == STATE_IDLE && oldstart && !m_start && m_reset)
+	if (m_state == STATE_IDLE && m_mode == MODE_STAND_ALONE && oldstart && !m_start && m_reset)
 	{
 		m_state = STATE_START;
 
@@ -725,11 +723,18 @@ void upd7759_device::internal_md_w(int state)
 
 	m_channel->update();
 
-	if (m_state == STATE_IDLE && old_md && !m_md && m_reset)
+	if (m_state == STATE_IDLE && m_reset)
 	{
-		m_mode = MODE_SLAVE;
-		m_state = STATE_START;
-		m_timer->adjust(attotime::zero);
+		if (old_md && !m_md)
+		{
+			m_mode = MODE_SLAVE;
+			m_state = STATE_START;
+			m_timer->adjust(attotime::zero);
+		}
+		else if (!old_md && m_md)
+		{
+			m_mode = MODE_STAND_ALONE;
+		}
 	}
 }
 

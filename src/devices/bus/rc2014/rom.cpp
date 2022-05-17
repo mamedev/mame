@@ -53,14 +53,14 @@ void switchable_rom_device::device_reset()
 static INPUT_PORTS_START( switchable_rom_jumpers )
 	PORT_START("A13-A15")   /* jumpers to select ROM region */
 	PORT_CONFNAME( 0x7, 0x7, "ROM Bank" )
-	PORT_CONFSETTING( 0x0, "BASIC" )
-	PORT_CONFSETTING( 0x1, "EMPTY1" )
-	PORT_CONFSETTING( 0x2, "EMPTY2" )
-	PORT_CONFSETTING( 0x3, "EMPTY3" )
-	PORT_CONFSETTING( 0x4, "EMPTY4" )
-	PORT_CONFSETTING( 0x5, "EMPTY5" )
-	PORT_CONFSETTING( 0x6, "EMPTY6" )
-	PORT_CONFSETTING( 0x7, "SCM" )
+	PORT_CONFSETTING( 0x0, "Bank 0" )
+	PORT_CONFSETTING( 0x1, "Bank 1" )
+	PORT_CONFSETTING( 0x2, "Bank 2" )
+	PORT_CONFSETTING( 0x3, "Bank 3" )
+	PORT_CONFSETTING( 0x4, "Bank 4" )
+	PORT_CONFSETTING( 0x5, "Bank 5" )
+	PORT_CONFSETTING( 0x6, "Bank 6" )
+	PORT_CONFSETTING( 0x7, "Bank 7" )
 INPUT_PORTS_END
 
 ioport_constructor switchable_rom_device::device_input_ports() const
@@ -68,14 +68,39 @@ ioport_constructor switchable_rom_device::device_input_ports() const
 	return INPUT_PORTS_NAME( switchable_rom_jumpers );
 }
 
-ROM_START(rc2014_rom)
+ROM_START(rc2014_switchable_rom)
 	ROM_REGION( 0x10000, "rom",0 )
-	ROM_LOAD( "r0000009.bin",    0x0000, 0x10000, CRC(3fb1ced7) SHA1(40a030b931ebe6cca654ce056c228297f245b057) )
+	//
+	// Decoding ROM labels
+	//
+	// 0 - Empty bank, available for user to program
+	// R - Microsoft BASIC, for 32k RAM, 68B50 ACIA, with origin 0x0000
+	// K - Microsoft BASIC, for 56k RAM, 68B50 ACIA, with origin 0x0000
+	// 1 - CP/M Monitor, for pageable ROM, 64k RAM, 68B50 ACIA, CF Module at 0x10, with origin at 0x0000
+	// 2 - Microsoft BASIC, for 32k RAM, SIO/2, with origin 0x0000
+	// 4 - Microsoft BASIC, for 56k RAM, SIO/2, with origin 0x0000
+	// 6 - CP/M Monitor, for pageable ROM, 64k RAM, SIO/2, CF Module at 0x10, with origin at 0x0000
+	// 88 - Small Computer Monitor for pageable ROM, 64k RAM, SIO/2 or 68B50 ACIA, with Microsoft BASIC a
+	//      and CP/M boot options [Note that this is a 16k image, so Page Size needs to be set to 16k and
+	//      only A14 and A15 jumpers to select]
+	// 9 - Small Computer Monitor for any ROM, any RAM, any UART
+	//
+	ROM_DEFAULT_BIOS("r0000009")
+	ROM_SYSTEM_BIOS(0, "r0000009", "BASIC 32K ACIA + SCM")
+	ROMX_LOAD( "r0000009.bin",    0x0000, 0x10000, CRC(3fb1ced7) SHA1(40a030b931ebe6cca654ce056c228297f245b057), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "00001000", "CP/M Monitor ACIA")
+	ROMX_LOAD( "00001000.bin",    0x0000, 0x10000, CRC(e6509de9) SHA1(e5f3b528e972f63cd243bd5057e7e7850436b671), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "k0001000", "BASIC 56K + CP/M Monitor ACIA")
+	ROMX_LOAD( "k0001000.bin",    0x0000, 0x10000, CRC(619a9c3e) SHA1(c1213316746a6e2a7d2030b283f75c4f3a9c177a), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(3, "r0001000", "BASIC 32K + CP/M Monitor ACIA")
+	ROMX_LOAD( "r0001000.bin",    0x0000, 0x10000, CRC(5b174833) SHA1(97c204ada65129ef61507faf74e29c8ec7a05064), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(4, "r0001009", "BASIC 32K + CP/M Monitor ACIA + SCM")
+	ROMX_LOAD( "r0001009.bin",    0x0000, 0x10000, CRC(074a2d70) SHA1(0077ab5e669da6e95ed2f66c9e759067c4236e36), ROM_BIOS(4))
 ROM_END
 
 const tiny_rom_entry *switchable_rom_device::device_rom_region() const
 {
-	return ROM_NAME( rc2014_rom );
+	return ROM_NAME( rc2014_switchable_rom );
 }
 
 //**************************************************************************
@@ -123,9 +148,6 @@ pagable_rom_device::pagable_rom_device(const machine_config &mconfig, const char
 void pagable_rom_device::device_start()
 {
 	save_item(NAME(m_bank));
-
-	m_bus->installer(AS_IO)->install_write_handler(0x30, 0x30, write8sm_delegate(*this, FUNC(pagable_rom_device::reset_bank_w)));
-	m_bus->installer(AS_IO)->install_write_handler(0x38, 0x38, write8sm_delegate(*this, FUNC(pagable_rom_device::toggle_bank_w)));
 }
 
 void pagable_rom_device::device_reset()
@@ -144,6 +166,10 @@ void pagable_rom_device::device_reset()
 	m_start_offset &= page_mask[m_page_size_conf->read()];
 	m_end_addr = page_size[m_page_size_conf->read()] - 1;
 	reset_bank_w(0,0);
+
+	// A15-A8, A7 and A2-A0 not connected, A6 must be 0
+	m_bus->installer(AS_IO)->install_write_handler(0x30, 0x30, 0, 0xff87, 0, write8sm_delegate(*this, FUNC(pagable_rom_device::reset_bank_w)));
+	m_bus->installer(AS_IO)->install_write_handler(0x38, 0x38, 0, 0xff87, 0, write8sm_delegate(*this, FUNC(pagable_rom_device::toggle_bank_w)));
 }
 
 void pagable_rom_device::update_banks()
@@ -199,8 +225,27 @@ ioport_constructor pagable_rom_device::device_input_ports() const
 }
 
 ROM_START(rc2014_pagable_rom)
+	//
+	// Decoding ROM labels
+	//
+	// 0 - Empty bank, available for user to program
+	// R - Microsoft BASIC, for 32k RAM, 68B50 ACIA, with origin 0x0000
+	// K - Microsoft BASIC, for 56k RAM, 68B50 ACIA, with origin 0x0000
+	// 1 - CP/M Monitor, for pageable ROM, 64k RAM, 68B50 ACIA, CF Module at 0x10, with origin at 0x0000
+	// 2 - Microsoft BASIC, for 32k RAM, SIO/2, with origin 0x0000
+	// 4 - Microsoft BASIC, for 56k RAM, SIO/2, with origin 0x0000
+	// 6 - CP/M Monitor, for pageable ROM, 64k RAM, SIO/2, CF Module at 0x10, with origin at 0x0000
+	// 88 - Small Computer Monitor for pageable ROM, 64k RAM, SIO/2 or 68B50 ACIA, with Microsoft BASIC a
+	//      and CP/M boot options [Note that this is a 16k image, so Page Size needs to be set to 16k and
+	//      only A14 and A15 jumpers to select]
+	// 9 - Small Computer Monitor for any ROM, any RAM, any UART
+	//
 	ROM_REGION( 0x10000, "rom",0 )
-	ROM_LOAD( "24886009.bin", 0x00000, 0x10000, CRC(2731ca52) SHA1(e9ac663cb85de4e3e041bce444712c00f46b6eb2) )
+	ROM_DEFAULT_BIOS("24886009")
+	ROM_SYSTEM_BIOS(0, "24886009", "BASIC 32K/56K SIO/2 + CP/M + SCM Pagable + SCM")
+	ROMX_LOAD( "24886009.bin", 0x00000, 0x10000, CRC(2731ca52) SHA1(e9ac663cb85de4e3e041bce444712c00f46b6eb2), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "24006000", "BASIC 32K/56K SIO/2 + CP/M Monitor")
+	ROMX_LOAD( "24006000.bin", 0x00000, 0x10000, CRC(3532872b) SHA1(ff5b3873abdcbe8ab48f62a9dbdf39314b938e89), ROM_BIOS(1))
 ROM_END
 
 const tiny_rom_entry *pagable_rom_device::device_rom_region() const

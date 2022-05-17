@@ -14,7 +14,7 @@
 //**************************************************************************
 
 //-------------------------------------------------
-//  rc2014_bus_device 
+//  rc2014_bus_device
 //-------------------------------------------------
 
 rc2014_bus_device::rc2014_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -40,14 +40,12 @@ rc2014_bus_device::rc2014_bus_device(const machine_config &mconfig, const char *
 rc2014_bus_device::~rc2014_bus_device()
 {
 	for(size_t i = 0; i < m_daisy.size(); i++)
-    	delete [] m_daisy_chain[i];
+		delete [] m_daisy_chain[i];
 	delete [] m_daisy_chain;
 }
 
 void rc2014_bus_device::device_start()
 {
-	if (m_installer[AS_PROGRAM] == nullptr)
-		throw emu_fatalerror("Main address installer missing on RC2014 bus !!!");
 	// resolve callbacks
 	m_clk.resolve_safe();
 	m_int.resolve_safe();
@@ -57,6 +55,11 @@ void rc2014_bus_device::device_start()
 	m_user2.resolve_safe();
 	m_user3.resolve_safe();
 	m_user4.resolve_safe();
+}
+
+void rc2014_bus_device::device_reset()
+{
+	installer(AS_IO)->unmap_readwrite(0, (1 << installer(AS_IO)->space_config().addr_width()) - 1);
 }
 
 void rc2014_bus_device::set_bus_clock(u32 clock)
@@ -74,7 +77,9 @@ void rc2014_bus_device::assign_installer(int index, address_space_installer *ins
 
 address_space_installer *rc2014_bus_device::installer(int index) const
 {
-	assert(index >= 0 && index < 4 && m_installer[index]); 
+	assert(index >= 0 && index < 4);
+	if (m_installer[index] == nullptr )
+		throw emu_fatalerror("Address installer not set on RC2014 bus !!! Add CPU module.");
 	return m_installer[index];
 }
 
@@ -91,7 +96,7 @@ const z80_daisy_config* rc2014_bus_device::get_daisy_chain()
 }
 
 //-------------------------------------------------
-//  device_rc2014_card_interface 
+//  device_rc2014_card_interface
 //-------------------------------------------------
 
 device_rc2014_card_interface::device_rc2014_card_interface(const machine_config &mconfig, device_t &device)
@@ -138,7 +143,7 @@ void rc2014_slot_device::device_resolve_objects()
 //**************************************************************************
 
 //-------------------------------------------------
-//  rc2014_ext_bus_device 
+//  rc2014_ext_bus_device
 //-------------------------------------------------
 
 rc2014_ext_bus_device::rc2014_ext_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -175,7 +180,7 @@ void rc2014_ext_bus_device::device_start()
 }
 
 //-------------------------------------------------
-//  device_rc2014_ext_card_interface 
+//  device_rc2014_ext_card_interface
 //-------------------------------------------------
 
 device_rc2014_ext_card_interface::device_rc2014_ext_card_interface(const machine_config &mconfig, device_t &device)
@@ -221,7 +226,7 @@ void rc2014_ext_slot_device::device_resolve_objects()
 //**************************************************************************
 
 //-------------------------------------------------
-//  rc2014_rc80_bus_device 
+//  rc2014_rc80_bus_device
 //-------------------------------------------------
 
 rc2014_rc80_bus_device::rc2014_rc80_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -241,7 +246,7 @@ void rc2014_rc80_bus_device::device_start()
 }
 
 //-------------------------------------------------
-//  device_rc2014_rc80_card_interface 
+//  device_rc2014_rc80_card_interface
 //-------------------------------------------------
 
 device_rc2014_rc80_card_interface::device_rc2014_rc80_card_interface(const machine_config &mconfig, device_t &device)

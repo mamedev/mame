@@ -35,33 +35,37 @@ end
 
 function str_to_version(str)
 	local val = 0
-	if (str == nil or str == '') then
+	if not str then
 		return val
 	end
-	local cnt = 10000
-	for word in string.gmatch(str, '([^.]+)') do
-		if(tonumber(word) == nil) then
+	local scale = 10000
+	for word, sep in str:gmatch('([^.-]+)([.-]?)') do
+		local part = tonumber(word)
+		if not part then
 			return val
 		end
-		val = val + tonumber(word) * cnt
-		cnt = cnt / 100
+		val = val + tonumber(word) * scale
+		scale = scale // 100
+		if (scale == 0) or (sep ~= '.') then
+			return val
+		end
 	end
 	return val
 end
 
 function findfunction(x)
 	assert(type(x) == "string")
-	local f=_G
+	local f = _G
 	for v in x:gmatch("[^%.]+") do
-	if type(f) ~= "table" then
-		return nil, "looking for '"..v.."' expected table, not "..type(f)
-	end
-	f=f[v]
+		if type(f) ~= "table" then
+			return nil, "looking for '" .. v .. "' expected table, not " .. type(f)
+		end
+		f = f[v]
 	end
 	if type(f) == "function" then
-	return f
+		return f
 	else
-	return nil, "expected function, not "..type(f)
+		return nil, "expected function, not " .. type(f)
 	end
 end
 
@@ -1098,8 +1102,8 @@ end
 			end
 			if version >= 120000 then
 				buildoptions {
-					"-Wno-maybe-uninitialized",
-					"-Wno-uninitialized",   -- netlist
+					"-Wno-error=maybe-uninitialized",
+					"-Wno-error=uninitialized",   -- netlist
 				}
 			end
 		end

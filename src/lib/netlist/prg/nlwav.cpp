@@ -177,7 +177,7 @@ private:
 class log_processor
 {
 public:
-	using callback_type = plib::pmfp<void, std::size_t, double, double>;
+	using callback_type = plib::pmfp<void (std::size_t, double, double)>;
 
 	struct elem
 	{
@@ -256,7 +256,7 @@ private:
 
 struct aggregator
 {
-	using callback_type = plib::pmfp<void, std::size_t, double, double>;
+	using callback_type = plib::pmfp<void (std::size_t, double, double)>;
 
 	aggregator(std::size_t channels, double quantum, callback_type cb)
 	: m_channels(channels)
@@ -299,7 +299,7 @@ private:
 
 struct filter_hp
 {
-	using callback_type = plib::pmfp<void, std::size_t, double, double>;
+	using callback_type = plib::pmfp<void (std::size_t, double, double)>;
 
 	filter_hp(double freq, bool boost, std::size_t channels, callback_type cb)
 	: m_cb(cb)
@@ -335,7 +335,7 @@ private:
 
 struct filter_lp
 {
-	using callback_type = plib::pmfp<void, std::size_t, double, double>;
+	using callback_type = plib::pmfp<void (std::size_t, double, double)>;
 
 	filter_lp(double freq, std::size_t channels, callback_type cb)
 	: m_cb(cb)

@@ -1,17 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-/* It's a standard 486 PC motherboard, gfx card etc. with expansion ROM board
+/**************************************************************************************************
 
- probably impossible to emulate right now due to the bad / missing (blank when read) rom
- although it would be a good idea if somebody checked for sure
+  It's a standard 486 PC motherboard, gfx card etc. with expansion ROM board
+
+  probably impossible to emulate right now due to the bad / missing (blank when read) rom
+  although it would be a good idea if somebody checked for sure
 
 TODO:
-- bp 932d1, ROM banking that reads at 0xffffe???
+- Doesn't detect proper CPU type;
+- "Memory test fail" at POST, needs um8498f "memory controller" emulation
+  (non-PCI with shadow RAM?), also cfr. correlated at.cpp romsets;
+- Sometimes POST will trip an invalid groupFF_16 modrm FF at 000F00B2, causing an hang;
+- bp 932d1, ROM banking that reads at 0xffffe? Is um8498f ROM boot capable?
 
-*/
-
-/*
-
+===================================================================================================
 readme by f205v
 
 Game: Pango Fun
@@ -26,14 +29,14 @@ Main PCB (it's a standard 486 motherboard):
 1x 80486
 1x oscillator 14.31818 MHz
 
-Video PCB (it's a standard VGA EISA board):
+Video PCB (it's a standard VGA ISA board):
 
 1x CIRRUS CLGD5401-42QC-B-31063-198AC
 
 Sound PCB (missing, it's a standard ISA 16bit sound card):
 ?
 
-ROMs PCB (it's a custom PCB, with EISA connector to motherboard on one side and JAMMA connetcor on the other side):
+ROMs PCB (it's a custom PCB, with ISA connector to motherboard on one side and JAMMA connetcor on the other side):
 1x NE555P
 
 
@@ -42,12 +45,12 @@ ROMs:-----------
 Main PCB (it's a standard 486 motherboard):
 1x 27C512 (bios)
 
-Video PCB (it's a standard VGA EISA board):
+Video PCB (it's a standard VGA ISA board):
 1x maskrom (28pin) (VGAbios)(not dumped)
 
 Sound PCB (missing, it's a standard ISA 16bit sound card):
 
-ROMs PCB (it's a custom PCB, with EISA connector to motherboard on one side and JAMMA connetcor on the other side):
+ROMs PCB (it's a custom PCB, with ISA connector to motherboard on one side and JAMMA connector on the other side):
 5x AM27C040 (u11,u12,u31,u32,u33)
 1x TMS27C040 (u13)(probably corrupted)
 1x INTEL27C010A (u39)
@@ -62,15 +65,15 @@ Notes:----------
 Main PCB (it's a standard 486 motherboard):
 1x Keyboard DIN connector (not used)
 
-Video PCB (it's a standard VGA EISA board):
+Video PCB (it's a standard VGA ISA board):
 1x VGA connetctor (to ROMs PCB)
 1x red/black cable (to ROMs PCB)
 
 Sound PCB (missing, it's a standard ISA 16bit sound card):
 1x stereo audio out (to ROMs PCB)
 
-ROMs PCB (it's a custom PCB, with EISA connector to motherboard on one side and JAMMA connetcor on the other side):
-1x EISA connector (into motherboard)
+ROMs PCB (it's a custom PCB, with ISA connector to motherboard on one side and JAMMA connetcor on the other side):
+1x ISA connector (into motherboard)
 1x JAMMA edge connector
 1x VGA in connector (from Video PCB)
 1x stereo audio jack (from sound card)
@@ -92,7 +95,7 @@ it was an action/strategy videogame published by Proxxima Software (Rome, Italy)
 later ported to PC machines and published in 1994 by AIM Games software (US) and in
 Arcade Version (Coin-Op) by InfoCube (Pisa, Italy)
 
-*/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
@@ -126,8 +129,7 @@ void pangofun_state::pcat_map(address_map &map)
 	map(0x000e0000, 0x000effff).rom().region("game_prg", 0);
 	map(0x000f0000, 0x000fffff).rom().region("bios", 0);
 	/* TODO: correct RAM mapping/size? */
-	map(0x00100000, 0x00ffffff).noprw();
-	map(0x01000000, 0x01ffffff).ram();
+	map(0x00100000, 0x01ffffff).ram();
 	map(0x02000000, 0xfffeffff).noprw();
 	map(0xffff0000, 0xffffffff).rom().region("bios", 0);
 }
@@ -151,22 +153,22 @@ void pangofun_state::machine_start()
 void pangofun_state::pangofun(machine_config &config)
 {
 	/* basic machine hardware */
-	I486(config, m_maincpu, 25000000);    /* I486 ?? Mhz (25 according to POST) */
+	I486(config, m_maincpu, XTAL(40'000'000)); // um486sxlc-40
 	m_maincpu->set_addrmap(AS_PROGRAM, &pangofun_state::pcat_map);
 	m_maincpu->set_addrmap(AS_IO, &pangofun_state::pcat_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	/* video hardware */
 	pcvideo_vga(config);
-	subdevice<screen_device>("screen")->set_refresh_hz(60);
-	subdevice<screen_device>("screen")->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 
 	pcat_common(config);
+
+	// TODO: um8498f
 }
 
 
 ROM_START(pangofun)
-	ROM_REGION32_LE(0x20000, "bios", 0) /* motherboard bios */
+	ROM_REGION32_LE(0x10000, "bios", 0) /* motherboard bios */
 	ROM_LOAD("bios.bin", 0x000000, 0x10000, CRC(e70168ff) SHA1(4a0d985c218209b7db2b2d33f606068aae539020) )
 
 	ROM_REGION32_LE(0x20000, "video_bios", 0)    /* Trident TVGA9000 BIOS */

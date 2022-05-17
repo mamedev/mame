@@ -5,8 +5,8 @@
 Grand Striker, V Goal Soccer, World Cup '94
 driver by Farfetch'd and David Haywood
 
-Grand Striker (c)199?  Human
-V Goal Soccer (c)199?  Tecmo (2 sets)
+Grand Striker (c)1993  Human
+V Goal Soccer (c)1994  Tecmo
 Tecmo World Cup '94 (c) 1994 Tecmo
 
 ******************************************************************************
@@ -23,8 +23,6 @@ in the video).
 
 Grand Striker has an IRQ2 which is probably network related.
 
-DSWs need correctly mapping, they're just commented for the moment.
-
 TODO:
 - Finish hooking up the inputs
 - Tilemap scrolling/rotation/zooming or whatever effect it needs
@@ -36,16 +34,6 @@ TODO:
 - Tecmo World Cup '94 also has no name entry whatsoever.
 
 ******************************************************************************/
-
-#include "emu.h"
-#include "includes/gstriker.h"
-
-#include "cpu/m68000/m68000.h"
-#include "cpu/z80/z80.h"
-#include "machine/vs9209.h"
-#include "sound/ymopn.h"
-#include "speaker.h"
-
 
 /*** README INFO **************************************************************
 
@@ -97,7 +85,7 @@ scrgs107.u99    23c8000  - Sounds
 *** ROMSET: vgoalsoc
 
 V Goal Soccer
-Tecmo 199x?
+Tecmo 1994
 
 This game runs on Video Systems h/w.
 
@@ -137,9 +125,9 @@ c13_u11.u11     HN624116 - GFX
 c13_u12.u12     HN624116 - GFX
 
 
-*** ROMSET: vgoalsca
+*** ROMSET: vgoalsoca
 
-Tecmo V Goal Soccer (c)1994? Tecmo
+Tecmo V Goal Soccer (c)1994 Tecmo
 
 CPU: 68000, Z80
 Sound: YM2610
@@ -186,9 +174,184 @@ Frequencies: 68k is XTAL_32MHZ/2
 
 ******************************************************************************/
 
+#include "emu.h"
+
+#include "machine/vs9209.h"
+#include "video/mb60553.h"
+#include "video/vs920a.h"
+#include "video/vsystem_spr.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "machine/6850acia.h"
+#include "machine/gen_latch.h"
+#include "machine/mb3773.h"
+#include "sound/ymopn.h"
+
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+// configurable logging
+#define LOG_MIXER      (1U << 1)
+#define LOG_PROTECTION (1U << 2)
+
+//#define VERBOSE (LOG_GENERAL | LOG_MIXER | LOG_PROTECTION)
+
+#include "logmacro.h"
+
+#define LOGMIXER(...)      LOGMASKED(LOG_MIXER,      __VA_ARGS__)
+#define LOGPROTECTION(...) LOGMASKED(LOG_PROTECTION, __VA_ARGS__)
+
+
+namespace {
+
+class gstriker_state : public driver_device
+{
+public:
+	gstriker_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_spr(*this, "vsystem_spr"),
+		m_bg(*this, "zoomtilemap"),
+		m_tx(*this, "texttilemap"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_watchdog(*this, "watchdog"),
+		m_acia(*this, "acia"),
+		m_cg10103_vram(*this, "cg10103_vram"),
+		m_buffered_spriteram(*this, "buffere_spriteram%u", 0U, 0x2000U, ENDIANNESS_BIG),
+		m_work_ram(*this, "work_ram"),
+		m_mixerregs(*this, "mixerregs"),
+		m_soundbank(*this, "soundbank")
+	{ }
+
+	void base(machine_config &config);
+	void twc94(machine_config &config);
+	void gstriker(machine_config &config);
+	void vgoal(machine_config &config);
+
+	void init_vgoalsoc();
+	void init_twcup94();
+	void init_twcup94a();
+	void init_twcup94b();
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<vsystem_spr_device> m_spr;
+	required_device<mb60553_zooming_tilemap_device> m_bg;
+	required_device<vs920a_text_tilemap_device> m_tx;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<mb3773_device> m_watchdog;
+	optional_device<acia6850_device> m_acia;
+
+	required_shared_ptr<uint16_t> m_cg10103_vram;
+	memory_share_array_creator<uint16_t, 2> m_buffered_spriteram;
+	required_shared_ptr<uint16_t> m_work_ram;
+	required_shared_ptr<uint16_t> m_mixerregs;
+	required_memory_bank m_soundbank;
+
+	enum
+	{
+		TECMO_WCUP94_MCU = 1,
+		TECMO_WCUP94A_MCU,
+		TECMO_WCUP94B_MCU,
+		VGOAL_SOCCER_MCU
+	};
+
+	int m_gametype = 0;
+	uint16_t m_prot_reg[2]{};
+
+	// common
+	void sh_bankswitch_w(uint8_t data);
+
+	// vgoalsoc and twrldc
+	void twcup94_prot_reg_w(uint8_t data);
+
+	// vgoalsoc only
+	uint16_t vbl_toggle_r();
+	void vbl_toggle_w(uint16_t data);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+
+	void mcu_init();
+	void gstriker_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_map(address_map &map);
+	void twcup94_map(address_map &map);
+};
+
+
+// video
+
+/*** VIDEO UPDATE/START **********************************************/
+
+void gstriker_state::video_start()
+{
+	// Initialize the chip for the score plane
+	m_tx->set_transparent_pen(0xf);
+
+	// Initialize the chip for the screen plane
+	m_bg->set_transparent_pen(0xf);
+}
+
+WRITE_LINE_MEMBER(gstriker_state::screen_vblank)
+{
+	// sprites are two frames ahead
+	// TODO: probably all Video System games are (Aero Fighters definitely desyncs wrt background)
+	if(state)
+	{
+		memcpy(m_buffered_spriteram[0], m_cg10103_vram, 0x2000);
+		memcpy(m_buffered_spriteram[1], m_buffered_spriteram[0], 0x2000);
+	}
+}
+
+
+uint32_t gstriker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_mixerregs[8] & 0x07ff, cliprect); // complete guess, causes green behind test grid in twc94 and blue behind title screen on gstriker
+
+	/*
+	[4] AAAA BBBB ---- ---- sprite priority number A/B?
+	[5] xxxx ---- ---- ---- background layer priority number?
+	[6] xxxx ---- ---- ---- foreground layer priority number?
+	*/
+	LOGMIXER("%04x %04x %04x %04x %04x %04x %04x %04x | %04x %04x %04x %04x %04x %04x %04x %04x", m_mixerregs[0], m_mixerregs[1], m_mixerregs[2], m_mixerregs[3], m_mixerregs[4], m_mixerregs[5], m_mixerregs[6], m_mixerregs[7], m_mixerregs[8], m_mixerregs[9], m_mixerregs[10], m_mixerregs[11], m_mixerregs[12], m_mixerregs[13], m_mixerregs[14], m_mixerregs[15]);
+
+	m_spr->set_pal_base((m_mixerregs[0] & 0xf000) >> 8);
+	m_bg->set_pal_base((m_mixerregs[1] & 0xf000) >> 8);
+	m_tx->set_pal_base((m_mixerregs[2] & 0xf000) >> 8);
+
+
+	// Sandwiched screen/sprite0/score/sprite1. Surely wrong, probably needs sprite orthogonality
+	m_bg->draw(screen, bitmap, cliprect, 0);
+
+	m_spr->draw_sprites(m_buffered_spriteram[1], 0x2000, screen, bitmap, cliprect, 0x2, 0x0);
+
+	m_tx->draw(screen, bitmap, cliprect, 0);
+
+	m_spr->draw_sprites(m_buffered_spriteram[1], 0x2000, screen, bitmap, cliprect, 0x2, 0x2);
+
+	return 0;
+}
+
+
+// machine
+
 void gstriker_state::machine_start()
 {
-	membank("soundbank")->configure_entries(0, 8, memregion("audiocpu")->base(), 0x8000);
+	m_soundbank->configure_entries(0, 8, memregion("audiocpu")->base(), 0x8000);
 
 	if (m_acia.found())
 	{
@@ -202,31 +365,15 @@ void gstriker_state::machine_start()
 
 void gstriker_state::sh_bankswitch_w(uint8_t data)
 {
-	membank("soundbank")->set_entry(data & 0x07);
+	m_soundbank->set_entry(data & 0x07);
 }
 
 /*** GFX DECODE **************************************************************/
 
-static const gfx_layout gs_16x16x4_layout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,1,2,3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28,
-	32+0,32+4,32+8,32+12,32+16,32+20,32+24,32+28
-	},
-
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-		8*64,9*64,10*64,11*64,12*64,13*64,14*64,15*64
-	},
-	16*64
-};
-
 static GFXDECODE_START( gfx_gstriker )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb, 0, 256 )
-	GFXDECODE_ENTRY( "gfx2", 0, gs_16x16x4_layout,    0, 256 )
-	GFXDECODE_ENTRY( "gfx3", 0, gs_16x16x4_layout,    0, 256 )
+	GFXDECODE_ENTRY( "fix_tiles",    0, gfx_8x8x4_packed_lsb,   0, 256 )
+	GFXDECODE_ENTRY( "scroll_tiles", 0, gfx_16x16x4_packed_msb, 0, 256 )
+	GFXDECODE_ENTRY( "sprites",      0, gfx_16x16x4_packed_msb, 0, 256 )
 GFXDECODE_END
 
 
@@ -238,7 +385,7 @@ void gstriker_state::twcup94_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x103fff).rw(m_bg, FUNC(mb60553_zooming_tilemap_device::vram_r), FUNC(mb60553_zooming_tilemap_device::vram_w));
-	map(0x140000, 0x141fff).ram().share("cg10103_m_vram");
+	map(0x140000, 0x141fff).ram().share(m_cg10103_vram);
 	map(0x180000, 0x180fff).rw(m_tx, FUNC(vs920a_text_tilemap_device::vram_r), FUNC(vs920a_text_tilemap_device::vram_w));
 	map(0x181000, 0x181fff).rw(m_bg, FUNC(mb60553_zooming_tilemap_device::line_r), FUNC(mb60553_zooming_tilemap_device::line_w));
 	map(0x1c0000, 0x1c0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette").mirror(0x00f000);
@@ -246,11 +393,11 @@ void gstriker_state::twcup94_map(address_map &map)
 	map(0x200000, 0x20000f).rw(m_bg, FUNC(mb60553_zooming_tilemap_device::regs_r), FUNC(mb60553_zooming_tilemap_device::regs_w));
 	map(0x200010, 0x200011).nopw();
 	map(0x200020, 0x200021).nopw();
-	map(0x200040, 0x20005f).ram().share("mixerregs");
+	map(0x200040, 0x20005f).ram().share(m_mixerregs);
 	map(0x200080, 0x20009f).rw("io", FUNC(vs9209_device::read), FUNC(vs9209_device::write)).umask16(0x00ff);
-	map(0x2000a1, 0x2000a1).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x2000a1, 0x2000a1).w("soundlatch", FUNC(generic_latch_8_device::write));
 
-	map(0xffc000, 0xffffff).ram().share("work_ram");
+	map(0xffc000, 0xffffff).ram().share(m_work_ram);
 }
 
 void gstriker_state::gstriker_map(address_map &map)
@@ -263,7 +410,7 @@ void gstriker_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x77ff).rom();
 	map(0x7800, 0x7fff).ram();
-	map(0x8000, 0xffff).bankr("soundbank");
+	map(0x8000, 0xffff).bankr(m_soundbank);
 }
 
 void gstriker_state::sound_io_map(address_map &map)
@@ -271,8 +418,8 @@ void gstriker_state::sound_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 	map(0x04, 0x04).w(FUNC(gstriker_state::sh_bankswitch_w));
-	map(0x08, 0x08).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
-	map(0x0c, 0x0c).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x08, 0x08).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));
+	map(0x0c, 0x0c).r("soundlatch", FUNC(generic_latch_8_device::read));
 }
 
 
@@ -478,7 +625,7 @@ INPUT_PORTS_END
 
 void gstriker_state::base(machine_config &config)
 {
-	Z80(config, m_audiocpu, 8000000/2); /* 4 MHz ??? */
+	Z80(config, m_audiocpu, 8_MHz_XTAL / 2); // 4 MHz ???
 	m_audiocpu->set_addrmap(AS_PROGRAM, &gstriker_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &gstriker_state::sound_io_map);
 
@@ -488,7 +635,7 @@ void gstriker_state::base(machine_config &config)
 	io.portc_input_cb().set_ioport("SYSTEM");
 	io.portd_input_cb().set_ioport("DSW1");
 	io.porte_input_cb().set_ioport("DSW2");
-	io.porth_input_cb().set(m_soundlatch, FUNC(generic_latch_8_device::pending_r)).lshift(0);
+	io.porth_input_cb().set("soundlatch", FUNC(generic_latch_8_device::pending_r)).lshift(0);
 	io.porth_output_cb().set("watchdog", FUNC(mb3773_device::write_line_ck)).bit(3);
 
 	MB3773(config, m_watchdog, 0);
@@ -496,7 +643,7 @@ void gstriker_state::base(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(5000)); /* hand-tuned, it needs a bit */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(5000)); // hand-tuned, it needs a bit
 	m_screen->set_size(64*8, 64*8);
 	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
 	m_screen->set_screen_update(FUNC(gstriker_state::screen_update));
@@ -523,11 +670,11 @@ void gstriker_state::base(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
-	m_soundlatch->set_separate_acknowledge(true);
+	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
+	soundlatch.data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	soundlatch.set_separate_acknowledge(true);
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8_MHz_XTAL));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "lspeaker", 0.25);
 	ymsnd.add_route(0, "rspeaker", 0.25);
@@ -537,7 +684,7 @@ void gstriker_state::base(machine_config &config)
 
 void gstriker_state::gstriker(machine_config &config)
 {
-	M68000(config, m_maincpu, 10000000);
+	M68000(config, m_maincpu, 20_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gstriker_state::gstriker_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gstriker_state::irq1_line_hold));
 
@@ -551,11 +698,13 @@ void gstriker_state::gstriker(machine_config &config)
 
 void gstriker_state::twc94(machine_config &config)
 {
-	M68000(config, m_maincpu, 16000000);
+	M68000(config, m_maincpu, 32_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gstriker_state::twcup94_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gstriker_state::irq1_line_hold));
 
 	base(config);
+
+	m_audiocpu->set_clock(20_MHz_XTAL / 4);
 
 	subdevice<vs9209_device>("io")->porth_output_cb().append(FUNC(gstriker_state::twcup94_prot_reg_w));
 }
@@ -579,19 +728,19 @@ ROM_START( gstriker )
 	ROM_REGION( 0x40000, "audiocpu", 0 )
 	ROM_LOAD( "human-3_27c1001.u87",  0x00000, 0x20000, CRC(2f28c01e) SHA1(63829ad7969d197b2f2c87cb88bdb9e9880ed2d6) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 ) // score tilemap
+	ROM_REGION( 0x20000, "fix_tiles", 0 ) // score
 	ROM_LOAD( "human-2_27c1024.u79",  0x00000, 0x20000, CRC(a981993b) SHA1(ed92c7581d2b84a8628744dd5f8a2266c45dcd5b) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 ) // scroll tilemap
+	ROM_REGION( 0x200000, "scroll_tiles", 0 )
 	ROM_LOAD( "human_scr-gs-105_m531602c-44_3405356.u2",  0x00000, 0x200000, CRC(d584b568) SHA1(64c5e4fdbb859873e51f62d8f5314598108270ef) )
-	ROM_LOAD( "human_scr-gs-105_m531602c-44_3405356.u4",  0x00000, 0x200000, CRC(d584b568) SHA1(64c5e4fdbb859873e51f62d8f5314598108270ef) ) // same content, dif pos on board
+	ROM_LOAD( "human_scr-gs-105_m531602c-44_3405356.u4",  0x00000, 0x200000, CRC(d584b568) SHA1(64c5e4fdbb859873e51f62d8f5314598108270ef) ) // same content, different position on board
 
-	ROM_REGION( 0x1000000, "gfx3", 0 )
+	ROM_REGION( 0x1000000, "sprites", 0 )
 	ROM_LOAD( "human_scr-gs-101_m531602c-40_3405351.u25", 0x000000, 0x200000, CRC(becaea24) SHA1(e96fca863f49f50992f56c7defa5a69599608785) )
 	ROM_LOAD( "human_scr-gs-102_m531602c-41_3405355.u24", 0x200000, 0x200000, CRC(0dae7aba) SHA1(304f336994be33fa8239c13e6fd9967c06f97d5c) )
 	ROM_LOAD( "human_scr-gs-103_m531602c-42_3405353.u23", 0x400000, 0x200000, CRC(3448fe92) SHA1(c4c2d2d5610795aff6633b0601ff484897598904) )
 	ROM_LOAD( "human_scr-gs-104_m531602c-43_3405354.u22", 0x600000, 0x200000, CRC(0ac33e5a) SHA1(9d7717d80f2c6817bac3fad50c39e04f0aa94255) )
-	ROM_LOAD( "human-4_27c240.u6",   0xf80000, 0x080000, CRC(a990f9bb) SHA1(7ce31d4c650eb244e2ab285f253a98d6613b7dc8) ) // extra european team flags
+	ROM_LOAD( "human-4_27c240.u6",                        0xf80000, 0x080000, CRC(a990f9bb) SHA1(7ce31d4c650eb244e2ab285f253a98d6613b7dc8) ) // extra European team flags
 
 	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "human_scr-gs-106_m532001b-16_3402370.u93", 0x00000, 0x040000, CRC(93c9868c) SHA1(dcecb34e46405155e35aaf134b8547430d23f5a7) )
@@ -614,19 +763,19 @@ ROM_START( gstrikera )
 	ROM_REGION( 0x40000, "audiocpu", 0 )
 	ROM_LOAD( "human-3_27c1001.u87",  0x00000, 0x20000, CRC(2f28c01e) SHA1(63829ad7969d197b2f2c87cb88bdb9e9880ed2d6) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 ) // score tilemap
+	ROM_REGION( 0x20000, "fix_tiles", 0 ) // score
 	ROM_LOAD( "human-2_27c1024.u79",  0x00000, 0x20000, CRC(a981993b) SHA1(ed92c7581d2b84a8628744dd5f8a2266c45dcd5b) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 ) // scroll tilemap
+	ROM_REGION( 0x200000, "scroll_tiles", 0 )
 	ROM_LOAD( "human_scr-gs-105_m531602c-44_3405356.u2",  0x00000, 0x200000, CRC(d584b568) SHA1(64c5e4fdbb859873e51f62d8f5314598108270ef) )
-	ROM_LOAD( "human_scr-gs-105_m531602c-44_3405356.u4",  0x00000, 0x200000, CRC(d584b568) SHA1(64c5e4fdbb859873e51f62d8f5314598108270ef) ) // same content, dif pos on board
+	ROM_LOAD( "human_scr-gs-105_m531602c-44_3405356.u4",  0x00000, 0x200000, CRC(d584b568) SHA1(64c5e4fdbb859873e51f62d8f5314598108270ef) ) // same content, different position on board
 
-	ROM_REGION( 0x1000000, "gfx3", 0 )
+	ROM_REGION( 0x1000000, "sprites", 0 )
 	ROM_LOAD( "human_scr-gs-101_m531602c-40_3405351.u25", 0x000000, 0x200000, CRC(becaea24) SHA1(e96fca863f49f50992f56c7defa5a69599608785) )
 	ROM_LOAD( "human_scr-gs-102_m531602c-41_3405355.u24", 0x200000, 0x200000, CRC(0dae7aba) SHA1(304f336994be33fa8239c13e6fd9967c06f97d5c) )
 	ROM_LOAD( "human_scr-gs-103_m531602c-42_3405353.u23", 0x400000, 0x200000, CRC(3448fe92) SHA1(c4c2d2d5610795aff6633b0601ff484897598904) )
 	ROM_LOAD( "human_scr-gs-104_m531602c-43_3405354.u22", 0x600000, 0x200000, CRC(0ac33e5a) SHA1(9d7717d80f2c6817bac3fad50c39e04f0aa94255) )
-	ROM_LOAD( "human-4_27c240.u6",   0xf80000, 0x080000, CRC(a990f9bb) SHA1(7ce31d4c650eb244e2ab285f253a98d6613b7dc8) ) // extra european team flags
+	ROM_LOAD( "human-4_27c240.u6",                        0xf80000, 0x080000, CRC(a990f9bb) SHA1(7ce31d4c650eb244e2ab285f253a98d6613b7dc8) ) // extra European team flags
 
 	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "human_scr-gs-106_m532001b-16_3402370.u93", 0x00000, 0x040000, CRC(93c9868c) SHA1(dcecb34e46405155e35aaf134b8547430d23f5a7) )
@@ -634,7 +783,7 @@ ROM_START( gstrikera )
 	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "scrgs107.u99", 0x00000, 0x100000, CRC(ecc0a01b) SHA1(239e832b7d22925460a8f44eb82e782cd13aba49) )
 
-	/* PALs were protected on this version, used the ones from the "gstriker" set */
+	// PALs were protected on this version, used the ones from the "gstriker" set
 	ROM_REGION( 0x1000, "plds", 0 )
 	ROM_LOAD( "pal16l8.s201a.u52",   0x0000, 0x0104, CRC(724faf0f) SHA1(755fad09d188af58efce733a9f1256b1abc7c360) )
 	ROM_LOAD( "pal16l8.s202a.u74",   0x0200, 0x0104, CRC(ad5c4722) SHA1(0aad71b73c6674e15596b7de59160a5156a4118d) )
@@ -650,14 +799,14 @@ ROM_START( gstrikerj )
 	ROM_REGION( 0x40000, "audiocpu", 0 )
 	ROM_LOAD( "human3.u87",  0x00000, 0x20000, CRC(2f28c01e) SHA1(63829ad7969d197b2f2c87cb88bdb9e9880ed2d6) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 ) // score tilemap
+	ROM_REGION( 0x20000, "fix_tiles", 0 ) // score
 	ROM_LOAD( "human2.u79",  0x00000, 0x20000, CRC(9ad17eb3) SHA1(614b2630e02745f675b1791a514a90131264d545) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 ) // scroll tilemap
+	ROM_REGION( 0x200000, "scroll_tiles", 0 )
 	ROM_LOAD( "human_scr-gs-105_m531602c-44_3405356.u2",  0x00000, 0x200000, CRC(d584b568) SHA1(64c5e4fdbb859873e51f62d8f5314598108270ef) )
-	ROM_LOAD( "human_scr-gs-105_m531602c-44_3405356.u4",  0x00000, 0x200000, CRC(d584b568) SHA1(64c5e4fdbb859873e51f62d8f5314598108270ef) ) // same content, dif pos on board
+	ROM_LOAD( "human_scr-gs-105_m531602c-44_3405356.u4",  0x00000, 0x200000, CRC(d584b568) SHA1(64c5e4fdbb859873e51f62d8f5314598108270ef) ) // same content, different position on board
 
-	ROM_REGION( 0x1000000, "gfx3", 0 )
+	ROM_REGION( 0x1000000, "sprites", 0 )
 	ROM_LOAD( "human_scr-gs-101_m531602c-40_3405351.u25", 0x000000, 0x200000, CRC(becaea24) SHA1(e96fca863f49f50992f56c7defa5a69599608785) )
 	ROM_LOAD( "human_scr-gs-102_m531602c-41_3405355.u24", 0x200000, 0x200000, CRC(0dae7aba) SHA1(304f336994be33fa8239c13e6fd9967c06f97d5c) )
 	ROM_LOAD( "human_scr-gs-103_m531602c-42_3405353.u23", 0x400000, 0x200000, CRC(3448fe92) SHA1(c4c2d2d5610795aff6633b0601ff484897598904) )
@@ -670,7 +819,7 @@ ROM_START( gstrikerj )
 	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "scrgs107.u99", 0x00000, 0x100000, CRC(ecc0a01b) SHA1(239e832b7d22925460a8f44eb82e782cd13aba49) )
 
-	/* PALs were protected on this version, used the ones from the "gstriker" set */
+	// PALs were protected on this version, used the ones from the "gstriker" set
 	ROM_REGION( 0x1000, "plds", 0 )
 	ROM_LOAD( "pal16l8.s201a.u52",   0x0000, 0x0104, CRC(724faf0f) SHA1(755fad09d188af58efce733a9f1256b1abc7c360) )
 	ROM_LOAD( "pal16l8.s202a.u74",   0x0200, 0x0104, CRC(ad5c4722) SHA1(0aad71b73c6674e15596b7de59160a5156a4118d) )
@@ -680,7 +829,7 @@ ROM_START( gstrikerj )
 ROM_END
 
 
-/* these were bruteforced from secured pal16l8 devices found on a twcup94a set, probably the same for all sets? */
+// these were bruteforced from secured pal16l8 devices found on a twcup94a set, probably the same for all sets?
 #define TWCUP94_PLD_DEVICES \
 	ROM_LOAD( "s2031a.u39", 0x0000, 0x0117, CRC(66f6020f) SHA1(b44a9ad51c1987bab14fb044b3ee37d73ec96fa7) ) \
 	ROM_LOAD( "s2032a.u64", 0x0200, 0x0117, CRC(e186728e) SHA1(c6ad476566d48585944e7f7889667899f654619b) ) \
@@ -699,14 +848,14 @@ ROM_START( vgoalsoc )
 	ROM_REGION( 0x20000, "mcu", 0 )
 	ROM_LOAD( "vgoalsoc_hd6473258p10", 0x00000, 0x20000, NO_DUMP )
 
-	ROM_REGION( 0x20000, "gfx1", 0 ) // score tilemap
+	ROM_REGION( 0x20000, "fix_tiles", 0 ) // score
 	ROM_LOAD( "c16_u48.u48",  0x000000, 0x020000, CRC(ca059e7f) SHA1(2fa48b0fec1210575f3a1ecee7d2aec0af3fa9c4) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 ) // screen tilemap
+	ROM_REGION( 0x100000, "scroll_tiles", 0 ) // screen
 	ROM_LOAD( "c13_u20.u20",  0x000000, 0x100000, CRC(bc6e07e8) SHA1(3f164165a2eed909aaf38d1ae23a622482d39f96) )
-	ROM_LOAD( "c13_u17.u17",  0x000000, 0x100000, CRC(bc6e07e8) SHA1(3f164165a2eed909aaf38d1ae23a622482d39f96) ) // same content, dif pos on board
+	ROM_LOAD( "c13_u17.u17",  0x000000, 0x100000, CRC(bc6e07e8) SHA1(3f164165a2eed909aaf38d1ae23a622482d39f96) ) // same content, different position on board
 
-	ROM_REGION( 0x400000, "gfx3", 0 )
+	ROM_REGION( 0x400000, "sprites", 0 )
 	ROM_LOAD( "c13_u11.u11",  0x000000, 0x200000, CRC(76d09f27) SHA1(ffef83954426f9e56bbe2d98b32cea675c063fab) )
 	ROM_LOAD( "c13_u12.u12",  0x200000, 0x200000, CRC(a3874419) SHA1(c9fa283106ada3419e311f400fcf4251b32318c4) )
 
@@ -720,7 +869,7 @@ ROM_START( vgoalsoc )
 	TWCUP94_PLD_DEVICES
 ROM_END
 
-ROM_START( vgoalsca )
+ROM_START( vgoalsoca )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "vgoalc16.u37", 0x00000, 0x80000, CRC(775ef300) SHA1(d0ab1c13a19ce646c6edfc25a0c0994989560cbc) )
 
@@ -730,14 +879,14 @@ ROM_START( vgoalsca )
 	ROM_REGION( 0x20000, "mcu", 0 )
 	ROM_LOAD( "vgoalsoc_hd6473258p10", 0x00000, 0x20000, NO_DUMP )
 
-	ROM_REGION( 0x20000, "gfx1", 0 ) // fixed tile
+	ROM_REGION( 0x20000, "fix_tiles", 0 )
 	ROM_LOAD( "c16_u48.u48",  0x000000, 0x020000, CRC(ca059e7f) SHA1(2fa48b0fec1210575f3a1ecee7d2aec0af3fa9c4) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 ) // scroll tile
+	ROM_REGION( 0x100000, "scroll_tiles", 0 )
 	ROM_LOAD( "c13_u20.u20",  0x000000, 0x100000, CRC(bc6e07e8) SHA1(3f164165a2eed909aaf38d1ae23a622482d39f96) )
-	ROM_LOAD( "c13_u17.u17",  0x000000, 0x100000, CRC(bc6e07e8) SHA1(3f164165a2eed909aaf38d1ae23a622482d39f96) ) // same content, dif pos on board
+	ROM_LOAD( "c13_u17.u17",  0x000000, 0x100000, CRC(bc6e07e8) SHA1(3f164165a2eed909aaf38d1ae23a622482d39f96) ) // same content, different position on board
 
-	ROM_REGION( 0x400000, "gfx3", 0 )
+	ROM_REGION( 0x400000, "sprites", 0 )
 	ROM_LOAD( "c13_u11.u11",  0x000000, 0x200000, CRC(76d09f27) SHA1(ffef83954426f9e56bbe2d98b32cea675c063fab) )
 	ROM_LOAD( "c13_u12.u12",  0x200000, 0x200000, CRC(a3874419) SHA1(c9fa283106ada3419e311f400fcf4251b32318c4) )
 
@@ -761,14 +910,14 @@ ROM_START( twcup94 )
 	ROM_REGION( 0x20000, "mcu", 0 )
 	ROM_LOAD( "twcup94_hd6473258p10", 0x00000, 0x20000, NO_DUMP )
 
-	ROM_REGION( 0x20000, "gfx1", 0 ) // fixed tile
+	ROM_REGION( 0x20000, "fix_tiles", 0 )
 	ROM_LOAD( "11.u48", 0x000000, 0x020000, CRC(37d6dcb6) SHA1(679dd8b615497fff23c4638d413b5d4a724d3f2a) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 ) // scroll tile
+	ROM_REGION( 0x200000, "scroll_tiles", 0 )
 	ROM_LOAD( "u17", 0x000000, 0x200000, CRC(a5e40a61) SHA1(a2cb452fb069862570870653b29b045d12caf062) )
 	ROM_LOAD( "u20", 0x000000, 0x200000, CRC(a5e40a61) SHA1(a2cb452fb069862570870653b29b045d12caf062) )
 
-	ROM_REGION( 0x800000, "gfx3", 0 )
+	ROM_REGION( 0x800000, "sprites", 0 )
 	ROM_LOAD( "u11", 0x000000, 0x200000, CRC(dd93fd45) SHA1(26491815b5443fe6d8b1ef4d795c5151fd75c101) )
 	ROM_LOAD( "u12", 0x200000, 0x200000, CRC(8e3c9bd2) SHA1(bfd23157c836148a3860ccea5191f656fdd98ef4) )
 	ROM_LOAD( "u13", 0x400000, 0x200000, CRC(8db6b3a9) SHA1(9422cd5d6fb57a7eaa7a13bdf4ccee1f8b57f773) )
@@ -794,14 +943,14 @@ ROM_START( twcup94a )
 	ROM_REGION( 0x20000, "mcu", 0 )
 	ROM_LOAD( "twcup94_hd6473258p10", 0x00000, 0x20000, NO_DUMP )
 
-	ROM_REGION( 0x20000, "gfx1", 0 ) // fixed tile
+	ROM_REGION( 0x20000, "fix_tiles", 0 )
 	ROM_LOAD( "twrdc94a_11.u48", 0x000000, 0x020000, CRC(37d6dcb6) SHA1(679dd8b615497fff23c4638d413b5d4a724d3f2a) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 ) // scroll tile
+	ROM_REGION( 0x200000, "scroll_tiles", 0 )
 	ROM_LOAD( "u17", 0x000000, 0x200000, CRC(a5e40a61) SHA1(a2cb452fb069862570870653b29b045d12caf062) )
 	ROM_LOAD( "u20", 0x000000, 0x200000, CRC(a5e40a61) SHA1(a2cb452fb069862570870653b29b045d12caf062) )
 
-	ROM_REGION( 0x800000, "gfx3", 0 )
+	ROM_REGION( 0x800000, "sprites", 0 )
 	ROM_LOAD( "u11", 0x000000, 0x200000, CRC(dd93fd45) SHA1(26491815b5443fe6d8b1ef4d795c5151fd75c101) )
 	ROM_LOAD( "u12", 0x200000, 0x200000, CRC(8e3c9bd2) SHA1(bfd23157c836148a3860ccea5191f656fdd98ef4) )
 	ROM_LOAD( "u13", 0x400000, 0x200000, CRC(8db6b3a9) SHA1(9422cd5d6fb57a7eaa7a13bdf4ccee1f8b57f773) )
@@ -827,14 +976,14 @@ ROM_START( twcup94b )
 	ROM_REGION( 0x20000, "mcu", 0 )
 	ROM_LOAD( "twcup94_hd6473258p10", 0x00000, 0x20000, NO_DUMP )
 
-	ROM_REGION( 0x20000, "gfx1", 0 ) // fixed tile
+	ROM_REGION( 0x20000, "fix_tiles", 0 )
 	ROM_LOAD( "11.u48", 0x000000, 0x020000, CRC(37d6dcb6) SHA1(679dd8b615497fff23c4638d413b5d4a724d3f2a) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 ) // scroll tile
+	ROM_REGION( 0x200000, "scroll_tiles", 0 )
 	ROM_LOAD( "u17", 0x000000, 0x200000, CRC(a5e40a61) SHA1(a2cb452fb069862570870653b29b045d12caf062) )
 	ROM_LOAD( "u20", 0x000000, 0x200000, CRC(a5e40a61) SHA1(a2cb452fb069862570870653b29b045d12caf062) )
 
-	ROM_REGION( 0x800000, "gfx3", 0 )
+	ROM_REGION( 0x800000, "sprites", 0 )
 	ROM_LOAD( "u11", 0x000000, 0x200000, CRC(dd93fd45) SHA1(26491815b5443fe6d8b1ef4d795c5151fd75c101) )
 	ROM_LOAD( "u12", 0x200000, 0x200000, CRC(8e3c9bd2) SHA1(bfd23157c836148a3860ccea5191f656fdd98ef4) )
 	ROM_LOAD( "u13", 0x400000, 0x200000, CRC(8db6b3a9) SHA1(9422cd5d6fb57a7eaa7a13bdf4ccee1f8b57f773) )
@@ -853,21 +1002,21 @@ ROM_END
 
 
 /******************************************************************************************
-Simple protection check concept.The M68k writes a command and the MCU
+Simple protection check concept. The M68k writes a command and the MCU
 returns the PC at address 0xffc000.
-The problem is that only the concept is easy,beating this protection requires a good
+The problem is that only the concept is easy, beating this protection requires a good
 amount of time without a trojan...
 
 Misc Notes:
 -Protection routine is at 0x890
 -An original feature of this game is that if you enter into service mode the game gives you
 the possibility to test various stuff on a pre-registered play such as the speed or
-the zooming.To use it,you should use Player 2 Start button to show the test screens
+the zooming. To use it, you should use Player 2 Start button to show the test screens
 or to advance into the tests.
 ******************************************************************************************/
 #define PC(_num_)\
-		m_work_ram[0x000/2] = (_num_ & 0xffff0000) >> 16;\
-		m_work_ram[0x002/2] = (_num_ & 0x0000ffff) >> 0;
+		m_work_ram[0x000 / 2] = (_num_ & 0xffff0000) >> 16;\
+		m_work_ram[0x002 / 2] = (_num_ & 0x0000ffff) >> 0;
 
 
 void gstriker_state::twcup94_prot_reg_w(uint8_t data)
@@ -877,7 +1026,7 @@ void gstriker_state::twcup94_prot_reg_w(uint8_t data)
 
 	// Command byte is also written to VS9209 port F, which is set for input only.
 	// Does the MCU somehow strobe it out of there?
-	uint8_t mcu_data = m_work_ram[0x00f/2] & 0x00ff;
+	uint8_t mcu_data = m_work_ram[0x00f / 2] & 0x00ff;
 
 	if( ((m_prot_reg[1] & 4) == 0) && ((m_prot_reg[0] & 4) == 4) )
 	{
@@ -886,8 +1035,8 @@ void gstriker_state::twcup94_prot_reg_w(uint8_t data)
 			case TECMO_WCUP94_MCU:
 				switch (mcu_data)
 				{
-					#define NULL_SUB 0x0000828E
-					case 0x53: PC(0x00000A4C); break; // boot -> main loop
+					#define NULL_SUB 0x0000828e
+					case 0x53: PC(0x00000a4c); break; // boot -> main loop
 
 					/*
 					    68 and 62 could be sprite or sound changes, or ?
@@ -902,12 +1051,12 @@ void gstriker_state::twcup94_prot_reg_w(uint8_t data)
 					    }
 					*/
 					case 0x68: PC(NULL_SUB); break; // time up doesn't block long enough for pk shootout
-					case 0x61: PC(0x00003AF4); break; // after time up, pk shootout???
-					case 0x65: PC(0x00003F26); break;
+					case 0x61: PC(0x00003af4); break; // after time up, pk shootout???
+					case 0x65: PC(0x00003f26); break;
 
 					// 62->72
-					case 0x62: PC(NULL_SUB); break; // after lose shootout, continue ???
-					case 0x72: PC(0x0000409E); break; // game over
+					case 0x62: PC(NULL_SUB); break; // after losing shootout, continue ???
+					case 0x72: PC(0x0000409e); break; // game over
 
 					/*
 					    Attract mode is pre programmed loop called from main
@@ -917,21 +1066,21 @@ void gstriker_state::twcup94_prot_reg_w(uint8_t data)
 					    further up around 0x1410b0.)
 
 					    The loop begins with three prot calls:
-					    one always present (may be diversion to 0x0010DC8 unreachable code
+					    one always present (may be diversion to 0x0010dc8 unreachable code
 					    and prot cases 6a,79,6f) and two alternating calls.
 					    The loop is 6e -> [6b|69] -> top11 -> (4 segment)playdemo
 
 					    These are the likely suspects for attract mode:
-					    0x0010E28 red tecmo on black
+					    0x0010E28 red Tecmo on black
 					    0x0010EEC bouncing ball and player with game title
 					    0x00117A2 single segment demo play with player sprites at 0x140000
 					    0x001120A sliding display of player photos
 					    0x0010DC8 unreachable code at end of attract loop with cases 6a,79,6f
 
 					*/
-					case 0x6e: PC(0x00010E28); break; // loop
-					case 0x6b: PC(0x00010EEC); break; // attract even
-					case 0x69: PC(0x0001120A); break; // attract odd
+					case 0x6e: PC(0x00010e28); break; // loop
+					case 0x6b: PC(0x00010eec); break; // attract even
+					case 0x69: PC(0x0001120a); break; // attract odd
 
 					// In "continue" screen
 					// if( w@FFE078 & 80) 75
@@ -944,7 +1093,7 @@ void gstriker_state::twcup94_prot_reg_w(uint8_t data)
 					case 0x6f: PC(NULL_SUB); break;
 
 					default:
-						logerror("Unknown MCU CMD %04x\n",mcu_data);
+						LOGPROTECTION("Unknown MCU CMD %04x\n", mcu_data);
 						PC(NULL_SUB);
 						break;
 
@@ -957,25 +1106,25 @@ void gstriker_state::twcup94_prot_reg_w(uint8_t data)
 
 				switch (mcu_data)
 				{
-					#define NULL_SUB 0x0000829E
-					case 0x53: PC(0x00000A5C); break; // POST
+					#define NULL_SUB 0x0000829e
+					case 0x53: PC(0x00000a5c); break; // POST
 
 					case 0x68: PC(NULL_SUB); break; // time up doesn't block long enough for pk shootout
-					case 0x61: PC(0x00003B04); break; // after time up, pk shootout???
-					case 0x65: PC(0x00003F36); break;
+					case 0x61: PC(0x00003b04); break; // after time up, pk shootout???
+					case 0x65: PC(0x00003f36); break;
 
-					case 0x62: PC(NULL_SUB); break; // after lose shootout, continue ???
-					case 0x72: PC(0x000040AE); break; // game over
+					case 0x62: PC(NULL_SUB); break; // after losing shootout, continue ???
+					case 0x72: PC(0x000040ae); break; // game over
 
 					case 0x75: PC(0x005098); break; // match adder, and check if limit is reached for ending
 
 					// attract mode
-					case 0x6e: PC(0x00010E38); break; // loop
-					case 0x6b: PC(0x00010EFC); break; // attract even
-					case 0x69: PC(0x0001121A); break; // attract odd
+					case 0x6e: PC(0x00010e38); break; // loop
+					case 0x6b: PC(0x00010efc); break; // attract even
+					case 0x69: PC(0x0001121a); break; // attract odd
 
 					default:
-						logerror("Unknown MCU CMD %04x\n",mcu_data);
+						LOGPROTECTION("Unknown MCU CMD %04x\n", mcu_data);
 						PC(NULL_SUB);
 						break;
 
@@ -988,25 +1137,25 @@ void gstriker_state::twcup94_prot_reg_w(uint8_t data)
 
 				switch (mcu_data)
 				{
-					#define NULL_SUB (0x00830A)
+					#define NULL_SUB (0x00830a)
 					case 0x53: PC(0x000a80); break; // POST
 
 					case 0x68: PC(NULL_SUB); break; // time up doesn't block long enough for pk shootout
-					case 0x61: PC(0x003B72); break; // after time up, pk shootout???
-					case 0x65: PC(0x003FA4); break;
+					case 0x61: PC(0x003b72); break; // after time up, pk shootout???
+					case 0x65: PC(0x003fa4); break;
 
-					case 0x62: PC(NULL_SUB); break; // after lose shootout, continue ???
-					case 0x72: PC(0x411C); break; // game over
+					case 0x62: PC(NULL_SUB); break; // after losing shootout, continue ???
+					case 0x72: PC(0x411c); break; // game over
 
 					case 0x75: PC(0x5106); break; // match adder, and check if limit is reached for ending
 
 					// attract mode
-					case 0x6e: PC(0x00010EF0); break; // loop
-					case 0x6b: PC(0x00010FB4); break; // attract even
-					case 0x69: PC(0x000112D2); break; // attract odd
+					case 0x6e: PC(0x00010ef0); break; // loop
+					case 0x6b: PC(0x00010fb4); break; // attract even
+					case 0x69: PC(0x000112d2); break; // attract odd
 
 					default:
-						logerror("Unknown MCU CMD %04x\n",mcu_data);
+						LOGPROTECTION("Unknown MCU CMD %04x\n", mcu_data);
 						PC(NULL_SUB);
 						break;
 
@@ -1019,17 +1168,17 @@ void gstriker_state::twcup94_prot_reg_w(uint8_t data)
 				switch (mcu_data)
 				{
 					case 0x33: PC(0x00063416); break; // *after game over, is this right?
-					case 0x3d: PC(0x0006275C); break; // after sprite ram init, team select
-					case 0x42: PC(0x0006274E); break; // after press start, init sprite ram
+					case 0x3d: PC(0x0006275c); break; // after sprite ram init, team select
+					case 0x42: PC(0x0006274e); break; // after press start, init sprite ram
 					case 0x43: PC(0x0006a000); break; // POST
 					case 0x50: PC(0x00001900); break; // enter main loop
-					case 0x65: PC(0x0006532C); break; // results
+					case 0x65: PC(0x0006532c); break; // results
 					case 0x70: PC(0x00063416); break; // *attract loop ends, what should happen after "standings" display?
-					case 0x74: PC(0x000650D8); break; // after time up, show scores and continue
-					case 0x79: PC(0x0006072E); break; // after select, start match
+					case 0x74: PC(0x000650d8); break; // after time up, show scores and continue
+					case 0x79: PC(0x0006072e); break; // after select, start match
 
 					default:
-						logerror("Unknown MCU CMD %04x\n",mcu_data);
+						LOGPROTECTION("Unknown MCU CMD %04x\n",mcu_data);
 						PC(0x00000586); // rts
 						break;
 				}
@@ -1040,7 +1189,7 @@ void gstriker_state::twcup94_prot_reg_w(uint8_t data)
 
 /*
     vgoalsoc uses a set of programmable timers.
-    There is a code implementation for at 00065F00 that appears to have
+    There is a code implementation for at 00065f00 that appears to have
     been RTSed out.
     I'm guessing it was replaced with an external implementation.
 
@@ -1051,14 +1200,14 @@ void gstriker_state::twcup94_prot_reg_w(uint8_t data)
     More likely these timers are driven entirely by the MCU.
 */
 //m_work_ram[ (0xffe900 - 0xffc00) ]
-#define COUNTER1_ENABLE m_work_ram[0x2900/2] >> 8
-#define COUNTER2_ENABLE (m_work_ram[0x2900/2] & 0xff)
-#define TICK_1 m_work_ram[0x2908/2]
-#define TICKCOUNT_1 m_work_ram[0x290a/2]
-#define TICK_2 m_work_ram[0x290c/2]
-#define TICKCOUNT_3 m_work_ram[0x290e/2]
-#define COUNTER_1 m_work_ram[0x2928/2]
-#define COUNTER_2 m_work_ram[0x292a/2]
+#define COUNTER1_ENABLE m_work_ram[0x2900 / 2] >> 8
+#define COUNTER2_ENABLE (m_work_ram[0x2900 / 2] & 0xff)
+#define TICK_1 m_work_ram[0x2908 / 2]
+#define TICKCOUNT_1 m_work_ram[0x290a / 2]
+#define TICK_2 m_work_ram[0x290c / 2]
+#define TICKCOUNT_3 m_work_ram[0x290e / 2]
+#define COUNTER_1 m_work_ram[0x2928 / 2]
+#define COUNTER_2 m_work_ram[0x292a / 2]
 uint16_t gstriker_state::vbl_toggle_r()
 {
 	return 0xff;
@@ -1066,20 +1215,20 @@ uint16_t gstriker_state::vbl_toggle_r()
 
 void gstriker_state::vbl_toggle_w(uint16_t data)
 {
-	if( COUNTER1_ENABLE == 1 )
+	if (COUNTER1_ENABLE == 1)
 	{
 		TICK_1 = (TICK_1 - 1) & 0xff;   // 8bit
-		if( TICK_1 <= 0 )
+		if (TICK_1 <= 0)
 		{
 			TICK_1 = TICKCOUNT_1;
 			COUNTER_1 = (COUNTER_1 - 1);// & 0xff; has to be 16bit for continue timer.
 		}
 	}
 
-	if( COUNTER2_ENABLE == 2 )
+	if (COUNTER2_ENABLE == 2)
 	{
 		TICK_2  = (TICK_2 - 1) & 0xff;
-		if( TICK_2 <= 0 )
+		if (TICK_2 <= 0)
 		{
 			TICK_2 = TICKCOUNT_3;
 			COUNTER_2 = (COUNTER_2 - 1);// & 0xff;
@@ -1119,6 +1268,8 @@ void gstriker_state::init_vgoalsoc()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200090, 0x200091, read16smo_delegate(*this, FUNC(gstriker_state::vbl_toggle_r)));
 }
 
+} // anonymous namespace
+
 
 /*** GAME DRIVERS ************************************************************/
 
@@ -1127,9 +1278,9 @@ GAME( 1993, gstrikera, gstriker, gstriker, gstriker, gstriker_state, empty_init,
 GAME( 1993, gstrikerj, gstriker, gstriker, gstriker, gstriker_state, empty_init, ROT0, "Human", "Grand Striker (Japan)",           MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 
-/* Similar, but not identical hardware, appear to be protected by an MCU :-( */
-GAME( 1994, vgoalsoc, 0,        vgoal, vgoalsoc, gstriker_state, init_vgoalsoc, ROT0, "Tecmo", "V Goal Soccer (Europe)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // has ger/hol/arg/bra/ita/eng/spa/fra
-GAME( 1994, vgoalsca, vgoalsoc, vgoal, vgoalsoc, gstriker_state, init_vgoalsoc, ROT0, "Tecmo", "V Goal Soccer (US/Japan/Korea)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // has ger/hol/arg/bra/ita/kor/usa/jpn
-GAME( 1994, twcup94,  0,        twc94, twcup94,  gstriker_state, init_twcup94,  ROT0, "Tecmo", "Tecmo World Cup '94 (set 1)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, twcup94a, twcup94,  twc94, twcup94,  gstriker_state, init_twcup94a, ROT0, "Tecmo", "Tecmo World Cup '94 (set 2)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, twcup94b, twcup94,  twc94, twcup94,  gstriker_state, init_twcup94b, ROT0, "Tecmo", "Tecmo World Cup '94 (set 3)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+// Similar, but not identical hardware, appear to be protected by an MCU
+GAME( 1994, vgoalsoc,  0,        vgoal, vgoalsoc, gstriker_state, init_vgoalsoc, ROT0, "Tecmo", "V Goal Soccer (Europe)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // has ger/hol/arg/bra/ita/eng/spa/fra
+GAME( 1994, vgoalsoca, vgoalsoc, vgoal, vgoalsoc, gstriker_state, init_vgoalsoc, ROT0, "Tecmo", "V Goal Soccer (US/Japan/Korea)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // has ger/hol/arg/bra/ita/kor/usa/jpn
+GAME( 1994, twcup94,   0,        twc94, twcup94,  gstriker_state, init_twcup94,  ROT0, "Tecmo", "Tecmo World Cup '94 (set 1)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, twcup94a,  twcup94,  twc94, twcup94,  gstriker_state, init_twcup94a, ROT0, "Tecmo", "Tecmo World Cup '94 (set 2)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, twcup94b,  twcup94,  twc94, twcup94,  gstriker_state, init_twcup94b, ROT0, "Tecmo", "Tecmo World Cup '94 (set 3)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
