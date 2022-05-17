@@ -2483,6 +2483,15 @@ ROM_START( m4funh )
 ROM_END
 
 
+
+// Not the same as Barcrest Everyone's A Winner? has "(C) J.A. Brown 1991" in the ROM
+ROM_START( m4eaw51 ) \
+	ROM_REGION( 0x010000, "maincpu", 0 )
+	ROM_LOAD( "everyones a winner v2-5p", 0x08000, 0x008000, CRC(eb8f2fc5) SHA1(0d3614bd5ff561d17bef0d1e620f2f812b8fed5b))
+ROM_END
+
+
+
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 
 
@@ -2859,3 +2868,5 @@ GAME(198?, m4funh,    0,          mod4oki,    mpu4,    mpu4_state, init_m4defaul
 GAME(199?, m4sunseta, m4sunset,   mod4oki,    mpu4,    mpu4_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (B25 1.2, set 1)",GAME_FLAGS )
 GAME(199?, m4sunsetb, m4sunset,   mod4oki,    mpu4,    mpu4_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (B25 1.2, set 2)",GAME_FLAGS )
 GAME(199?, m4sunsetc, m4sunset,   mod4oki,    mpu4,    mpu4_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (OSB 0.2)",GAME_FLAGS ) // might be a mod 2
+
+GAME(1991, m4eaw51,   0,          mod2,       mpu4,    mpu4_state, init_m4default, ROT0, "<unknown>", "Everyone's A Winner (EAW5.1, J.A. Brown) (MPU4)", GAME_FLAGS )

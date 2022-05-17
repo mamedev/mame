@@ -194,6 +194,13 @@ public:
 	void mod4oki_chr(machine_config& config);
 
 	void mod4oki_5r(machine_config &config);
+	void mod4oki_5r_chr(machine_config &config);
+
+	void mod4oki_den(machine_config &config);
+	void mod4oki_crmaze(machine_config &config);
+	void mod4oki_cashmn(machine_config &config);
+	void mod4oki_cashmna(machine_config &config);
+
 	void mod4oki_alt(machine_config &config);
 	void mod4yam(machine_config &config);
 	void mpu4_common(machine_config &config);
@@ -425,8 +432,6 @@ protected:
 	int m_t3l = 0;
 	int m_t3h = 0;
 	uint8_t m_numbanks = 0;
-	
-	//const bwb_chr_table* m_bwb_chr_table1 = nullptr;
 };
 
 INPUT_PORTS_EXTERN( mpu4 );

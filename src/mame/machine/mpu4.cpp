@@ -2869,6 +2869,13 @@ void mpu4_state::mod4oki_5r(machine_config &config)
 	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
 
+
+void mpu4_state::mod4oki_5r_chr(machine_config &config)
+{
+	mod4oki_5r(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+}
+
 void mpu4_state::bwboki(machine_config &config)
 {
 	mpu4base(config);
