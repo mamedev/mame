@@ -131,35 +131,35 @@ ROM_END
 ROM_START( m4calicl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ca2s.p1", 0x0000, 0x010000, CRC(fad153fd) SHA1(bd1f1a5c73624df45d01cb4853d87e998e434d7a) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "ca2s.chr", 0x0000, 0x000048, CRC(97618d38) SHA1(7958e99684d50b9bdb56c97f7fcfe161f0824578) )
 ROM_END
 
 ROM_START( m4calicla )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ca2d.p1", 0x0000, 0x010000, CRC(75eb8c6f) SHA1(1bb923d06dcfa24eaf9533c083f68f4bd840834f) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "ca2s.chr", 0x0000, 0x000048, CRC(97618d38) SHA1(7958e99684d50b9bdb56c97f7fcfe161f0824578) )
 ROM_END
 
 ROM_START( m4caliclb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ca2f.p1", 0x0000, 0x010000, CRC(6c53cf29) SHA1(2e58453891ab4faa17ef58a81c5f3c0618d046a5) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "ca2s.chr", 0x0000, 0x000048, CRC(97618d38) SHA1(7958e99684d50b9bdb56c97f7fcfe161f0824578) )
 ROM_END
 
 ROM_START( m4caliclc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cald.p1", 0x0000, 0x010000, CRC(296fdeeb) SHA1(7782c0c7d8f44e2c0d48cc24c13015241e47b9ec) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "ca2s.chr", 0x0000, 0x000048, CRC(97618d38) SHA1(7958e99684d50b9bdb56c97f7fcfe161f0824578) )
 ROM_END
 
 ROM_START( m4calicld )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cals.p1", 0x0000, 0x010000, CRC(28a1c5fe) SHA1(e8474df609ea7f3517780b54d6f493987aad3650) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "ca2s.chr", 0x0000, 0x000048, CRC(97618d38) SHA1(7958e99684d50b9bdb56c97f7fcfe161f0824578) )
 ROM_END
 
@@ -179,7 +179,7 @@ ROM_START( m4oldtmr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dot11.bin",  0x00000, 0x10000,  CRC(da095666) SHA1(bc7654dc9da1f830a43f925db8079f27e18bb61e))
 
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "m470.chr", 0x0000, 0x000048, CRC(10d302d4) SHA1(5858e550470a25dcd64efe004c79e6e9783bce07) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
@@ -190,7 +190,7 @@ ROM_START( m4casot )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "casrom.bin",  0x00000, 0x10000,  CRC(da095666) SHA1(bc7654dc9da1f830a43f925db8079f27e18bb61e) ) // == old timer   (aka b&wrom.bin)
 
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "caschar.chr", 0x0000, 0x000048, CRC(10d302d4) SHA1(5858e550470a25dcd64efe004c79e6e9783bce07) ) // ( aka b&wchrt.chr )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
@@ -203,7 +203,7 @@ ROM_START( m4jpmcla )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jcv2.epr",  0x00000, 0x10000,  CRC(da095666) SHA1(bc7654dc9da1f830a43f925db8079f27e18bb61e) ) // == old timer
 
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "jcchr.chr", 0x0000, 0x000048, CRC(e370e271) SHA1(2b712dd3590c31356e8b0b62ffc64ff8ce444f73) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
@@ -222,7 +222,7 @@ ROM_END
 
 
 #define M4CHASEI_EXTRAS \
-	ROM_REGION( 0x48, "fakechr", 0 ) \
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 ) \
 	ROM_LOAD( "chaseinvaders.chr", 0x0000, 0x000048, CRC(d7703dcd) SHA1(16fd998d1b44f35c10e5486882aa7f2d018dc82b) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "cha.s1", 0x000000, 0x080000, CRC(8200b6bc) SHA1(bcc4ffbddcdcc1dd994fe29e9b24e83272f59442) ) \
@@ -298,7 +298,7 @@ ROM_END
 
 
 #define M4CLBVEG_EXTRAS \
-	ROM_REGION( 0x48, "fakechr", 0 ) \
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 ) \
 	ROM_LOAD( "cvegas.chr", 0x0000, 0x000048, CRC(a6c341b0) SHA1(c8c838c9bb1ced52889504b9cea8d88f1e7fa79f) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "cvegass1.hex", 0x0000, 0x080000, CRC(13a8c857) SHA1(c66e10bca1ad54f467b9c5eacd502c54397c09b2) ) \
@@ -449,7 +449,7 @@ ROM_START( m4crjwlc )
 ROM_END
 
 #define M4CRJWL2_EXTRAS \
-	ROM_REGION( 0x48, "fakechr", 0 ) \
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 ) \
 	ROM_LOAD( "chr.chr", 0x0000, 0x000048, CRC(c5812913) SHA1(d167b1f512c183cf01a1f4e1c1588ea0ae21331b) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "cjcs1.hex", 0x000000, 0x080000, CRC(2ac3ba9f) SHA1(3332f29f81918c34aeec3da6f7d001dc9922840d) ) \
@@ -509,7 +509,7 @@ ROM_START( m4exgam )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "czep30.bin", 0x0000, 0x010000, CRC(4614e6f6) SHA1(5602a68e9b47394cb31bbcd49a9920e19af6242f) )
 
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "ceg.chr", 0x0000, 0x000048, CRC(f694224e) SHA1(936ab5e349fa59accbb37959cce9519fd97f3978) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
@@ -567,7 +567,7 @@ ROM_START( m4gldgat )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dgg22.bin", 0x0000, 0x010000, CRC(ef8498df) SHA1(6bf164ef18445e83e4510a000bc924cbe916ad99) )
 
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "m450.chr", 0x0000, 0x000048, CRC(fb7b2a45) SHA1(b6d5537bde9c05a3e79221a5577b8ae77bace9e6) )
 ROM_END
 
@@ -651,7 +651,7 @@ ROM_START( m4holdtm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dht10.hex", 0x0000, 0x010000, CRC(217d382b) SHA1(a27dd107c554d4787967633dff998d3962ee0ea5) )
 
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "ht01.chr", 0x0000, 0x000048, CRC(0fc2bb52) SHA1(0d0e47938f6e00166e7352732ddfb7c610f44db2) )
 	ROM_LOAD( "m400.chr", 0x0000, 0x000048, CRC(8f00f720) SHA1(ea59fa2a3b016a7ae83be3caf863de87ce7aeffa) )
 
@@ -963,7 +963,7 @@ ROM_START( m4magtbo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "crmtb14.epr", 0x0000, 0x010000, CRC(79e1746c) SHA1(794317f3aba7b1a7994cde89d81abc2b687d0821) )
 
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "ctp.chr", 0x0000, 0x000048, CRC(ead61793) SHA1(f38a38601a67804111b8f8cf0a05d35ed79b7ed1) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
@@ -980,7 +980,7 @@ ROM_START( m4reeltm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "real.bin", 0x0000, 0x010000, CRC(5bd54924) SHA1(23fcf13c52ee7b9b39f30f999a9102171fffd642) ) // == m4wildtm
 
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "charter.chr", 0x0000, 0x000048, CRC(4ff4eda2) SHA1(092435e34d79775910316a7bed0f90c4f086e5c4) )
 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
@@ -1085,7 +1085,7 @@ ROM_END
 
 
 #define M4SUPBJC_EXTRAS \
-	ROM_REGION( 0x48, "fakechr", 0 ) \
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 ) \
 	ROM_LOAD( "sbj.chr", 0x0000, 0x000048, CRC(cc4b7911) SHA1(9f8a96a1f8b0f9b33b852e93483ce5c684703349) ) \
 	ROM_REGION( 0x100000, "altmsm6376", 0 ) \
 	ROM_LOAD( "sbjsnd1.hex", 0x000000, 0x080000, CRC(70388bec) SHA1(256fa01b57049d73e88b0bb270fccb555b12dfb7) ) \
@@ -1200,7 +1200,7 @@ ROM_END
 
 
 #define M4TOPTIM_EXTRAS \
-	ROM_REGION( 0x48, "fakechr", 0 ) \
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 ) \
 	ROM_LOAD( "ttimer.chr", 0x0000, 0x000048, CRC(f694224e) SHA1(936ab5e349fa59accbb37959cce9519fd97f3978) ) \
 	ROM_REGION( 0x080000, "msm6376", 0 ) \
 	ROM_LOAD( "toptimer-snd.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
@@ -1223,7 +1223,7 @@ ROM_END
 
 
 #define M4TROPCL_EXTRAS \
-	ROM_REGION( 0x48, "fakechr", 0 ) \
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 ) \
 	ROM_LOAD( "tro20.chr", 0x0000, 0x000048, CRC(97618d38) SHA1(7958e99684d50b9bdb56c97f7fcfe161f0824578) )
 
 ROM_START( m4tropcl )
@@ -1258,7 +1258,7 @@ ROM_END
 
 
 #define M4TBPLAY_EXTRAS \
-	ROM_REGION( 0x48, "fakechr", 0 ) \
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 ) \
 	ROM_LOAD( "dtpchr.chr", 0x0000, 0x000048, CRC(7743df66) SHA1(69b1943837ccf8671861ac8ef690138b41de0e5b) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "dtps10_1", 0x000000, 0x080000, CRC(d1d2c981) SHA1(6a4940248b0bc8df0a9de0d60e98cfebf1962504) ) \
@@ -1298,7 +1298,7 @@ ROM_START( m4twintm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "d2t11.bin", 0x0000, 0x010000, CRC(6a76ac6f) SHA1(824912ff1fc3155d11d32b597be53481532fdf5e) )
 
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "m533.chr", 0x0000, 0x000048, CRC(b1d7e29b) SHA1(e8ef07f85780e24b5f406478de50287b740379d9) )
 
 	ROM_REGION( 0x080000, "msm6376", 0 )
@@ -1328,7 +1328,7 @@ ROM_START( m4univ )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dun20", 0x0000, 0x010000, CRC(6a845d4d) SHA1(82bfc3f3a0ede76a4d482efc71b0390610db7acf) )
 
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "dunchr.chr", 0x0000, 0x000048, CRC(f694224e) SHA1(936ab5e349fa59accbb37959cce9519fd97f3978) )
 
 	ROM_REGION( 0x080000, "msm6376", 0 )
@@ -1376,7 +1376,7 @@ ROM_START( m4wildtm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "wildtimer.bin", 0x0000, 0x010000, CRC(5bd54924) SHA1(23fcf13c52ee7b9b39f30f999a9102171fffd642) ) // == m4reeltm
 
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "charter.chr", 0x0000, 0x000048, CRC(4ff4eda2) SHA1(092435e34d79775910316a7bed0f90c4f086e5c4) )
 
 	ROM_REGION( 0x080000, "msm6376", 0 )
@@ -2455,7 +2455,7 @@ ROM_END
 ROM_START( m4sunseta )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "b2512s.p1", 0x0000, 0x010000, CRC(8c509538) SHA1(eab6a1e44e77cb48cf490616facc74932acc93c5) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "sunsetb.chr", 0x0000, 0x000048, CRC(f166963b) SHA1(5cc6ada61036d8dbeca470e9548f9f5d2bd545a8) )
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
 ROM_END
@@ -2463,7 +2463,7 @@ ROM_END
 ROM_START( m4sunsetb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "b2512y.p1", 0x0000, 0x010000, CRC(65fa2cd9) SHA1(d2ab1ae25d5425a0788f86535a20d3ebe4a9db2b) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "sunsetb.chr", 0x0000, 0x000048, CRC(f166963b) SHA1(5cc6ada61036d8dbeca470e9548f9f5d2bd545a8) )
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
 ROM_END
@@ -2471,7 +2471,7 @@ ROM_END
 ROM_START( m4sunsetc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sunboul-5p3.bin", 0x0000, 0x010000, CRC(5ccbf062) SHA1(cf587018511d1a06624d271f2fde4e40f16ec87c) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "sunsetb.chr", 0x0000, 0x000048, CRC(f166963b) SHA1(5cc6ada61036d8dbeca470e9548f9f5d2bd545a8) )
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
 ROM_END

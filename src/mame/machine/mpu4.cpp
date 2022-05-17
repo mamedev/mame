@@ -458,9 +458,9 @@ MACHINE_RESET_MEMBER(mpu4_state,mpu4)
 	m_IC23G2A   = 0;
 	m_IC23G2B   = 0;
 
-	m_prot_col  = 0;
-	m_chr_counter    = 0;
-	m_chr_value     = 0;
+	//m_prot_col  = 0;
+	//m_chr_counter    = 0;
+	//m_chr_value     = 0;
 
 
 	if (m_numbanks)
@@ -1873,255 +1873,33 @@ INPUT_PORTS_START( grtecp )
 INPUT_PORTS_END
 
 
-
-/*
-Characteriser (CHR)
-
-As built, the CHR is a PAL which can perform basic bit manipulation according to
-an as yet unknown unique key. However, the programmers decided to best use this protection device in read/write/compare
-cycles, storing almost the entire 'hidden' data table in the ROMs in plain sight. Only later rebuilds by BwB
-avoided this 'feature' of the development kit, and will need a different setup.
-
-This information has been used to generate the CHR tables loaded by the programs, until a key can be determined.
-
-For most Barcrest games, the following method was used:
-
-The initial 'PALTEST' routine as found in the Barcrest programs simply writes the first 'call' to the CHR space,
-to read back the 'response'. There is no attempt to alter the order or anything else, just
-a simple runthrough of the entire data table. The only 'catch' in this is to note that the CHR chip always scans
-through the table starting at the last accessed data value, unless 00 is used to reset to the beginning. This is obviously
-a simplification, in fact the PAL does bit manipulation with some latching.
-
-However, a final 8 byte row, that controls the lamp matrix is not tested - to date, no-one outside of Barcrest knows
-how this is generated, and currently trial and error is the only sensible method. It is noted that the default,
-of all 00, is sometimes the correct answer, particularly in non-Barcrest use of the CHR chip, though when used normally,
-there are again fixed call values.
-
-Apparently, just before the characteriser is checked bit 1 at 0x61DF is checked and if zero the characteriser
-check is bypassed. This may be something to look at for prototype ROMs and hacks.
-
-*/
-
-
-void mpu4_state::characteriser_w(offs_t offset, uint8_t data)
+uint8_t mpu4_state::bwb_characteriser_r(offs_t offset)
 {
-	int x;
-	int call=data;
-	LOG_CHR_FULL(("%s Characteriser write offset %02X data %02X\n", machine().describe_context(), offset, data));
-	if (!m_current_chr_table)
-	{
-		logerror("%s No Characteriser Table\n", machine().describe_context());
-		return;
-	}
+	//if (bwb_characteriser_r)
+	//	bwb_characteriser_r(offset);
 
+	return 0x00;
+}
 
-
-	if (offset == 0)
-	{
-		{
-			if (call == 0)
-			{
-				m_prot_col = 0;
-			}
-			else
-			{
-				for (x = m_prot_col; x < 64; x++)
-				{
-					if  (m_current_chr_table[(x)].call == call)
-					{
-						m_prot_col = x;
-						LOG_CHR(("Characteriser find column %02X\n",m_prot_col));
-						break;
-					}
-				}
-			}
-		}
-	}
-	else if (offset == 2)
-	{
-		LOG_CHR(("Characteriser write 2 data %02X\n",data));
-		// Rather than the search strategy, we can map the calls directly here. Note that they are hex versions of the square number series
-		switch (call)
-		{
-		case 0x00:
-			m_lamp_col = 0;
-			break;
-
-		case 0x01:
-			m_lamp_col = 1;
-			break;
-
-		case 0x04:
-			m_lamp_col = 2;
-			break;
-
-		case 0x09:
-			m_lamp_col = 3;
-			break;
-
-		case 0x10:
-			m_lamp_col = 4;
-			break;
-
-		case 0x19:
-			m_lamp_col = 5;
-			break;
-
-		case 0x24:
-			m_lamp_col = 6;
-			break;
-
-		case 0x31:
-			m_lamp_col = 7;
-			break;
-		}
-		LOG_CHR(("Characteriser find 2 column %02X\n",m_lamp_col));
-	}
+void mpu4_state::bwb_characteriser_w(offs_t offset, uint8_t data)
+{
+	//if (m_characteriser)
+	//	bwb_characteriser_w(offset, data);
 }
 
 
 uint8_t mpu4_state::characteriser_r(address_space &space, offs_t offset)
 {
-	if (!m_current_chr_table)
-	{
-		logerror("%s No Characteriser Table\n", machine().describe_context());
+	if (m_characteriser)
+		return m_characteriser->read(offset);
 
-		/* a cheat ... many early games use a standard check */
-		int addr = m_maincpu->state_int(M6809_X);
-		if ((addr>=0x800) && (addr<=0xfff)) return 0x00; // prevent recursion, only care about ram/rom areas for this cheat.
-
-		uint8_t ret = space.read_byte(addr);
-		logerror(" (returning %02x)",ret);
-
-		logerror("\n");
-
-		return ret;
-	}
-
-	LOG_CHR(("Characteriser read offset %02X \n",offset));
-	if (offset == 0)
-	{
-		LOG_CHR(("Characteriser read data %02X \n",m_current_chr_table[m_prot_col].response));
-		return m_current_chr_table[m_prot_col].response;
-	}
-
-	if (offset == 3)
-	{
-		LOG_CHR(("Characteriser read data off 3 %02X \n",m_current_chr_table[m_lamp_col+64].response));
-		return m_current_chr_table[m_lamp_col+64].response;
-	}
-	return 0;
+	return 0x00;
 }
 
-/*
-BwB Characteriser (CHR)
-
-The BwB method of protection is considerably different to the Barcrest one, with any
-incorrect behaviour manifesting in ridiculously large payouts. The hardware is the
-same, however the main weakness of the software has been eliminated.
-
-In fact, the software seems deliberately designed to mislead, but is (fortunately for
-us) prone to similar weaknesses that allow a per game solution.
-
-Project Amber performed a source analysis (available on request) which appears to make things work.
-Said weaknesses (A Cheats Guide according to Project Amber)
-
-The common initialisation sequence is "00 04 04 0C 0C 1C 14 2C 5C 2C"
-                                        0  1  2  3  4  5  6  7  8
-Using debug search for the first read from said string (best to find it first).
-
-At this point, the X index on the CPU is at the magic number address.
-
-The subsequent calls for each can be found based on the magic address
-
-           (0) = ( (BWBMagicAddress))
-           (1) = ( (BWBMagicAddress + 1))
-           (2) = ( (BWBMagicAddress + 2))
-           (3) = ( (BWBMagicAddress + 4))
-           (4) = ( (BWBMagicAddress - 5))
-           (5) = ( (BWBMagicAddress - 4))
-           (6) = ( (BWBMagicAddress - 3))
-           (7) = ( (BWBMagicAddress - 2))
-           (8) = ( (BWBMagicAddress - 1))
-
-These return the standard init sequence as above.
-
-For ease of understanding, we use three tables, one holding the common responses
-and two holding the appropriate call and response pairs for the two stages of operation
-*/
-
-
-void mpu4_state::bwb_characteriser_w(offs_t offset, uint8_t data)
+void mpu4_state::characteriser_w(offs_t offset, uint8_t data)
 {
-	int x;
-	int call=data;
-	LOG_CHR_FULL(("%s Characteriser write offset %02X data %02X\n", machine().describe_context(), offset, data));
-	if (!m_current_chr_table)
-		fatalerror("%s No Characteriser Table\n", machine().describe_context().c_str());
-
-	if ((offset & 0x3f)== 0)//initialisation is always at 0x800
-	{
-		if (!m_chr_state)
-		{
-			m_chr_state=1;
-			m_chr_counter=0;
-		}
-		if (call == 0)
-		{
-			m_init_col ++;
-		}
-		else
-		{
-			m_init_col =0;
-		}
-	}
-
-	m_chr_value = machine().rand();
-	for (x = 0; x < 4; x++)
-	{
-		if  (m_current_chr_table[(x)].call == call)
-		{
-			if (x == 0) // reinit
-			{
-				m_bwb_return = 0;
-			}
-			m_chr_value = bwb_chr_table_common[(m_bwb_return)];
-			m_bwb_return++;
-			break;
-		}
-	}
-}
-
-uint8_t mpu4_state::bwb_characteriser_r(offs_t offset)
-{
-	LOG_CHR(("Characteriser read offset %02X \n",offset));
-
-
-	if (offset ==0)
-	{
-		switch (m_chr_counter)
-		{
-		case 6:
-		case 13:
-		case 20:
-		case 27:
-		case 34:
-			return m_bwb_chr_table1[(((m_chr_counter + 1) / 7) - 1)].response;
-
-		default:
-			if (m_chr_counter > 34)
-			{
-				m_chr_counter = 35;
-				m_chr_state = 2;
-			}
-			m_chr_counter ++;
-			return m_chr_value;
-		}
-	}
-	else
-	{
-		return m_chr_value;
-	}
+	if (m_characteriser)
+		m_characteriser->write(offset, data);
 }
 
 /* Common configurations */
@@ -2217,94 +1995,7 @@ MACHINE_START_MEMBER(mpu4_state,mpu4cry)
 	m_mod_number=4;
 }
 
-/* CHR Tables */
 
-static mpu4_chr_table andycp10c_data[72] = {
-{0x00, 0x00},{0x1a, 0x14},{0x04, 0x04},{0x10, 0x54},{0x18, 0x4c},{0x0f, 0x20},{0x13, 0x50},{0x1b, 0x44},
-{0x03, 0x5c},{0x07, 0x78},{0x17, 0x70},{0x1d, 0x48},{0x36, 0x6c},{0x35, 0x60},{0x2b, 0x14},{0x28, 0x48},
-{0x39, 0x2c},{0x21, 0x6c},{0x22, 0x6c},{0x25, 0x28},{0x2c, 0x64},{0x29, 0x10},{0x31, 0x08},{0x34, 0x6c},
-{0x0a, 0x24},{0x1f, 0x5c},{0x06, 0x78},{0x0e, 0x34},{0x1c, 0x00},{0x12, 0x50},{0x1e, 0x00},{0x0d, 0x50},
-{0x14, 0x0c},{0x0a, 0x6c},{0x19, 0x2c},{0x15, 0x60},{0x06, 0x54},{0x0f, 0x00},{0x08, 0x58},{0x1b, 0x74},
-{0x1e, 0x00},{0x04, 0x14},{0x01, 0x4c},{0x0c, 0x60},{0x18, 0x1c},{0x1a, 0x74},{0x11, 0x4c},{0x0b, 0x64},
-{0x03, 0x5c},{0x17, 0x78},{0x10, 0x78},{0x1d, 0x78},{0x0e, 0x34},{0x07, 0x44},{0x12, 0x54},{0x09, 0x40},
-{0x0d, 0x50},{0x1f, 0x48},{0x16, 0x6c},{0x05, 0x28},{0x13, 0x60},{0x1c, 0x14},{0x02, 0x4c},{0x00, 0x00},
-{0x00, 0x04},{0x01, 0x58},{0x04, 0x14},{0x09, 0x58},{0x10, 0x50},{0x19, 0x1c},{0x24, 0x10},{0x31, 0x10}
-};
-
-static mpu4_chr_table ccelbr_data[72] = {
-{0x00, 0x00},{0x1a, 0x84},{0x04, 0x8c},{0x10, 0xb8},{0x18, 0x74},{0x0f, 0x80},{0x13, 0x1c},{0x1b, 0xb4},
-{0x03, 0xd8},{0x07, 0x74},{0x17, 0x00},{0x1d, 0xd4},{0x36, 0xc8},{0x35, 0x78},{0x2b, 0xa4},{0x28, 0x4c},
-{0x39, 0xe0},{0x21, 0xdc},{0x22, 0xf4},{0x25, 0x88},{0x2c, 0x78},{0x29, 0x24},{0x31, 0x84},{0x34, 0xcc},
-{0x0a, 0xb8},{0x1f, 0x74},{0x06, 0x90},{0x0e, 0x48},{0x1c, 0xa0},{0x12, 0x1c},{0x1e, 0x24},{0x0d, 0x94},
-{0x14, 0xc8},{0x0a, 0xb8},{0x19, 0x74},{0x15, 0x00},{0x06, 0x94},{0x0f, 0x48},{0x08, 0x30},{0x1b, 0x90},
-{0x1e, 0x08},{0x04, 0x60},{0x01, 0xd4},{0x0c, 0x58},{0x18, 0xf4},{0x1a, 0x18},{0x11, 0x74},{0x0b, 0x80},
-{0x03, 0xdc},{0x17, 0x74},{0x10, 0xd0},{0x1d, 0x58},{0x0e, 0x24},{0x07, 0x94},{0x12, 0xd8},{0x09, 0x34},
-{0x0d, 0x90},{0x1f, 0x58},{0x16, 0xf4},{0x05, 0x88},{0x13, 0x38},{0x1c, 0x24},{0x02, 0xd4},{0x00, 0x00},
-{0x00, 0x00},{0x01, 0x50},{0x04, 0x00},{0x09, 0x50},{0x10, 0x10},{0x19, 0x40},{0x24, 0x04},{0x31, 0x00}
-};
-
-
-static mpu4_chr_table gmball_data[72] = {
-{0x00, 0x00},{0x1a, 0x0c},{0x04, 0x50},{0x10, 0x90},{0x18, 0xb0},{0x0f, 0x38},{0x13, 0xd4},{0x1b, 0xa0},
-{0x03, 0xbc},{0x07, 0xd4},{0x17, 0x30},{0x1d, 0x90},{0x36, 0x38},{0x35, 0xc4},{0x2b, 0xac},{0x28, 0x70},
-{0x39, 0x98},{0x21, 0xdc},{0x22, 0xdc},{0x25, 0x54},{0x2c, 0x80},{0x29, 0xb4},{0x31, 0x38},{0x34, 0xcc},
-{0x0a, 0xe8},{0x1f, 0xf8},{0x06, 0xd4},{0x0e, 0x30},{0x1c, 0x00},{0x12, 0x84},{0x1e, 0x2c},{0x0d, 0xc8},
-{0x14, 0xf8},{0x0a, 0x4c},{0x19, 0x58},{0x15, 0xd4},{0x06, 0xa8},{0x0f, 0x78},{0x08, 0x44},{0x1b, 0x0c},
-{0x1e, 0x48},{0x04, 0x50},{0x01, 0x98},{0x0c, 0xd4},{0x18, 0xb0},{0x1a, 0xa0},{0x11, 0xa4},{0x0b, 0x3c},
-{0x03, 0xdc},{0x17, 0xd4},{0x10, 0xb8},{0x1d, 0xd4},{0x0e, 0x30},{0x07, 0x88},{0x12, 0xe0},{0x09, 0x24},
-{0x0d, 0x8c},{0x1f, 0xf8},{0x16, 0xcc},{0x05, 0x70},{0x13, 0x90},{0x1c, 0x20},{0x02, 0x9c},{0x00, 0x00},
-{0x00, 0x00},{0x01, 0x18},{0x04, 0x08},{0x09, 0x10},{0x10, 0x00},{0x19, 0x18},{0x24, 0x08},{0x31, 0x00}
-};
-
-
-
-
-static mpu4_chr_table grtecp_data[72] = {
-{0x00, 0x00},{0x1a, 0x84},{0x04, 0xa4},{0x10, 0xac},{0x18, 0x70},{0x0f, 0x80},{0x13, 0x2c},{0x1b, 0xc0},
-{0x03, 0xbc},{0x07, 0x5c},{0x17, 0x5c},{0x1d, 0x5c},{0x36, 0xdc},{0x35, 0x5c},{0x2b, 0xcc},{0x28, 0x68},
-{0x39, 0xd0},{0x21, 0xb8},{0x22, 0xdc},{0x25, 0x54},{0x2c, 0x08},{0x29, 0x58},{0x31, 0x54},{0x34, 0x90},
-{0x0a, 0xb8},{0x1f, 0x5c},{0x06, 0x5c},{0x0e, 0x44},{0x1c, 0x84},{0x12, 0xac},{0x1e, 0xe0},{0x0d, 0xbc},
-{0x14, 0xcc},{0x0a, 0xe8},{0x19, 0x70},{0x15, 0x00},{0x06, 0x8c},{0x0f, 0x70},{0x08, 0x00},{0x1b, 0x84},
-{0x1e, 0xa4},{0x04, 0xa4},{0x01, 0xbc},{0x0c, 0xdc},{0x18, 0x5c},{0x1a, 0xcc},{0x11, 0xe8},{0x0b, 0xe0},
-{0x03, 0xbc},{0x17, 0x4c},{0x10, 0xc8},{0x1d, 0xf8},{0x0e, 0xd4},{0x07, 0xa8},{0x12, 0x68},{0x09, 0x40},
-{0x0d, 0x0c},{0x1f, 0xd8},{0x16, 0xdc},{0x05, 0x54},{0x13, 0x98},{0x1c, 0x44},{0x02, 0x9c},{0x00, 0x00},
-{0x00, 0x00},{0x01, 0x18},{0x04, 0x00},{0x09, 0x18},{0x10, 0x08},{0x19, 0x10},{0x24, 0x00},{0x31, 0x00}
-};
-
-static mpu4_chr_table oldtmr_data[72] = {
-{0x00, 0x00},{0x1a, 0x90},{0x04, 0xc0},{0x10, 0x54},{0x18, 0xa4},{0x0f, 0xf0},{0x13, 0x64},{0x1b, 0x90},
-{0x03, 0xe4},{0x07, 0xd4},{0x17, 0x60},{0x1d, 0xb4},{0x36, 0xc0},{0x35, 0x70},{0x2b, 0x80},{0x28, 0x74},
-{0x39, 0xa4},{0x21, 0xf4},{0x22, 0xe4},{0x25, 0xd0},{0x2c, 0x64},{0x29, 0x10},{0x31, 0x20},{0x34, 0x90},
-{0x0a, 0xe4},{0x1f, 0xf4},{0x06, 0xc4},{0x0e, 0x70},{0x1c, 0x00},{0x12, 0x14},{0x1e, 0x00},{0x0d, 0x14},
-{0x14, 0xa0},{0x0a, 0xf0},{0x19, 0x64},{0x15, 0x10},{0x06, 0x84},{0x0f, 0x70},{0x08, 0x00},{0x1b, 0x90},
-{0x1e, 0x40},{0x04, 0x90},{0x01, 0xe4},{0x0c, 0xf4},{0x18, 0x64},{0x1a, 0x90},{0x11, 0x64},{0x0b, 0x90},
-{0x03, 0xe4},{0x17, 0x50},{0x10, 0x24},{0x1d, 0xb4},{0x0e, 0xe0},{0x07, 0xd4},{0x12, 0xe4},{0x09, 0x50},
-{0x0d, 0x04},{0x1f, 0xb4},{0x16, 0xc0},{0x05, 0xd0},{0x13, 0x64},{0x1c, 0x90},{0x02, 0xe4},{0x00, 0x00},
-{0x00, 0x00},{0x01, 0x00},{0x04, 0x00},{0x09, 0x00},{0x10, 0x00},{0x19, 0x10},{0x24, 0x00},{0x31, 0x00}
-};
-
-static const bwb_chr_table blsbys_data1[5] = {
-//Magic number 724A
-
-// PAL Codes
-// 0   1   2  3  4  5  6  7  8
-// ??  ?? 20 0F 24 3C 36 27 09
-
-	{0x67},{0x17},{0x0f},{0x24},{0x3c},
-};
-
-static mpu4_chr_table blsbys_data[8] = {
-{0xEF, 0x02},{0x81, 0x00},{0xCE, 0x00},{0x00, 0x2e},
-{0x06, 0x20},{0xC6, 0x0f},{0xF8, 0x24},{0x8E, 0x3c},
-};
-
-// set percentage and other options. 2e 20 0f
-// PAL Codes
-// 0   1   2  3  4  5  6  7  8
-// 42  2E 20 0F 24 3C 36 27 09
-	//      6  0  7  0  8  0  7  0  0  8
-//request 36 42 27 42 09 42 27 42 42 09
-//verify  00 04 04 0C 0C 1C 14 2C 5C 2C
 
 void mpu4_state::init_m4_low_volt_alt()
 {
@@ -2452,7 +2143,7 @@ void mpu4_state::init_m4_andycp10c()
 {
 	init_m4default();
 	init_m4_small_extender();
-	m_current_chr_table = andycp10c_data;
+	// TODOxx: m_current_chr_table = andycp10c_data;
 }
 
 void mpu4_state::init_m_oldtmr()
@@ -2460,33 +2151,33 @@ void mpu4_state::init_m_oldtmr()
 	init_m4_six_reel_std();
 	init_m4default_banks();
 
-	m_current_chr_table = oldtmr_data;
+	// TODOxx: m_current_chr_table = oldtmr_data;
 }
 
 void mpu4_state::init_m_ccelbr()
 {
 	init_m4default();
-	m_current_chr_table = ccelbr_data;
+	// TODOxx: m_current_chr_table = ccelbr_data;
 }
 
 void mpu4_state::init_m4gambal()
 {
 	init_m4default();
-	m_current_chr_table = gmball_data;
+	// TODOxx:  m_current_chr_table = gmball_data;
 }
 
 void mpu4_state::init_m_grtecp()
 {
-	m_current_chr_table = grtecp_data;
+	// TODOxx:  m_current_chr_table = grtecp_data;
 }
 
 void mpu4_state::init_m_blsbys()
 {
 	m_bwb_bank = 1;
-	init_m4_five_reel_std();
-	m_bwb_chr_table1 = blsbys_data1;
-	m_current_chr_table = blsbys_data;
+	// TODOxx: m_bwb_chr_table1 = blsbys_data1;
+	// TODOxx:  m_current_chr_table = blsbys_data;
 	init_m4default_big();
+	init_m4_five_reel_std();
 }
 
 
@@ -2520,7 +2211,7 @@ void mpu4_state::init_m4default()
 
 void mpu4_state::init_m4default_big()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
+	init_m4default_reels();
 	m_aux1_invert = 0;
 	m_aux2_invert = 0;
 	m_door_invert = 0;
@@ -2528,28 +2219,26 @@ void mpu4_state::init_m4default_big()
 	int size = memregion("maincpu")->bytes();
 	if (size <= 0x10000)
 	{
-		printf("Error: Extended banking selected on set <=0x10000 in size, ignoring\n");
-		init_m4default_reels();
-		m_bwb_bank = 0;
-		init_m4default_banks();
+		fatalerror("Error: Extended banking selected on set <=0x10000 in size\n");
 	}
-	else
-	{
-		m_bwb_bank = 1;
-		space.install_write_handler(0x0858, 0x0858, write8smo_delegate(*this, FUNC(mpu4_state::bankswitch_w)));
-		space.install_write_handler(0x0878, 0x0878, write8smo_delegate(*this, FUNC(mpu4_state::bankset_w)));
-		uint8_t *rom = memregion("maincpu")->base();
 
-		m_numbanks = size / 0x10000;
-		m_bank1->configure_entries(0, m_numbanks, &rom[0x01000], 0x10000);
-		m_numbanks--;
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-		// some Bwb games must default to the last bank, does anything not like this
-		// behavior?
-		// some Bwb games don't work anyway tho, they seem to dislike something else
-		// about the way the regular banking behaves, not related to the CB2 stuff
-		m_bank1->set_entry(m_numbanks);
-	}
+	m_bwb_bank = 1;
+	space.install_write_handler(0x0858, 0x0858, write8smo_delegate(*this, FUNC(mpu4_state::bankswitch_w)));
+	space.install_write_handler(0x0878, 0x0878, write8smo_delegate(*this, FUNC(mpu4_state::bankset_w)));
+	uint8_t *rom = memregion("maincpu")->base();
+
+	m_numbanks = size / 0x10000;
+	m_bank1->configure_entries(0, m_numbanks, &rom[0x01000], 0x10000);
+	m_numbanks--;
+
+	// some Bwb games must default to the last bank, does anything not like this
+	// behavior?
+	// some Bwb games don't work anyway tho, they seem to dislike something else
+	// about the way the regular banking behaves, not related to the CB2 stuff
+	m_bank1->set_entry(m_numbanks);
+	
 }
 
 

@@ -211,10 +211,6 @@ MACHINE_RESET_MEMBER(mpu4dealem_state,dealem_vid)
 	m_IC23G1    = 1;
 	m_IC23G2A   = 0;
 	m_IC23G2B   = 0;
-
-	m_prot_col  = 0;
-	m_chr_counter    = 0;
-	m_chr_value     = 0;
 }
 
 

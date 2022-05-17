@@ -11,11 +11,13 @@
 #include "sound/okim6376.h"
 #include "sound/upd7759.h"
 #include "sound/ymopl.h"
-#include "machine/steppers.h"
-#include "machine/roc10937.h"
-#include "machine/meters.h"
 
 #include "machine/bacta_datalogger.h"
+#include "machine/meters.h"
+#include "machine/mpu4_characteriser_pal.h"
+#include "machine/roc10937.h"
+#include "machine/steppers.h"
+
 
 #include "emupal.h"
 
@@ -87,19 +89,6 @@ static const uint8_t bwb_chr_table_common[10]= {0x00,0x04,0x04,0x0c,0x0c,0x1c,0x
 #define HOPPER_NONDUART_A   4
 #define HOPPER_NONDUART_B   5
 
-/* Lookup table for CHR data */
-
-struct mpu4_chr_table
-{
-	uint8_t call;
-	uint8_t response;
-};
-
-struct bwb_chr_table//dynamically populated table for BwB protection
-{
-	uint8_t response = 0;
-};
-
 
 class mpu4_state : public driver_device
 {
@@ -128,11 +117,11 @@ public:
 		, m_ym2413(*this, "ym2413")
 		, m_ay8913(*this, "ay8913")
 		, m_dataport(*this, "dataport")
+		, m_characteriser(*this, "characteriser")
 		, m_lamps(*this, "lamp%u", 0U)
 		, m_mpu4leds(*this, "mpu4led%u", 0U)
 		, m_digits(*this, "digit%u", 0U)
 		, m_triacs(*this, "triac%u", 0U)
-		, m_current_chr_table(nullptr)
 	 { }
 
 	void init_m4default_alt();
@@ -200,7 +189,10 @@ public:
 	void bwboki(machine_config &config);
 	void mod2(machine_config &config);
 	void mod2_alt(machine_config &config);
+
 	void mod4oki(machine_config &config);
+	void mod4oki_chr(machine_config& config);
+
 	void mod4oki_5r(machine_config &config);
 	void mod4oki_alt(machine_config &config);
 	void mod4yam(machine_config &config);
@@ -233,6 +225,10 @@ public:
 	void mpu4_type4_7reel(machine_config &config);
 	void mpu4_bwb_7reel(machine_config &config);
 	void mpu4base(machine_config &config);
+
+	void mod4yam_m4addr(machine_config &config);
+	void mod4yam_gambal(machine_config &config);
+	void mod4yam_supst(machine_config &config);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
@@ -340,6 +336,7 @@ protected:
 	optional_device<ym2413_device> m_ym2413;
 	optional_device<ay8913_device> m_ay8913;
 	optional_device<bacta_datalogger_device> m_dataport;
+	optional_device<mpu4_characteriser_pal> m_characteriser;
 
 	// not all systems have this many lamps/LEDs/digits but the driver is too much of a mess to split up now
 
@@ -383,8 +380,7 @@ protected:
 	int m_IC23GC = 0;
 	int m_IC23GB = 0;
 	int m_IC23GA = 0;
-	int m_prot_col = 0;
-	int m_lamp_col = 0;
+
 	int m_init_col = 0;
 	int m_reel_flag = 0;
 	int m_ic23_active = 0;
@@ -416,10 +412,10 @@ protected:
 	int m_card_live = 0;
 	int m_led_extender = 0;
 	int m_bwb_bank = 0;
-	int m_chr_state = 0;
-	int m_chr_counter = 0;
-	int m_chr_value = 0;
-	int m_bwb_return = 0;
+	//int m_chr_state = 0;
+	//int m_chr_counter = 0;
+	//int m_chr_value = 0;
+	//int m_bwb_return = 0;
 	int m_pageval = 0;
 	int m_pageset = 0;
 	int m_hopper = 0;
@@ -429,8 +425,8 @@ protected:
 	int m_t3l = 0;
 	int m_t3h = 0;
 	uint8_t m_numbanks = 0;
-	mpu4_chr_table* m_current_chr_table = nullptr;
-	const bwb_chr_table* m_bwb_chr_table1 = nullptr;
+	
+	//const bwb_chr_table* m_bwb_chr_table1 = nullptr;
 };
 
 INPUT_PORTS_EXTERN( mpu4 );

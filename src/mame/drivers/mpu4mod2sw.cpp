@@ -290,7 +290,7 @@ ROM_START( m4stakeu )
 	ROM_LOAD( "su4_4.p2", 0x8000, 0x004000, CRC(8c2e0872) SHA1(9b0f1195d740e51085007417041428b449b3ee51) )
 	ROM_LOAD( "su4_4.p3", 0x6000, 0x002000, CRC(0c25955b) SHA1(71f0ebbf088abc3ad860f9a1c7a830348a979289) )
 
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "m400.chr", 0x0000, 0x000048, CRC(8f00f720) SHA1(ea59fa2a3b016a7ae83be3caf863de87ce7aeffa) )
 ROM_END
 
@@ -298,7 +298,7 @@ ROM_START( m4stakeua )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "stakeup.hex", 0x6000, 0x00a000, CRC(a7ac8f19) SHA1(ec87512e16ff0252012067ad655c3fcee1d2e908) ) // needs to be split
 
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "m400.chr", 0x0000, 0x000048, CRC(8f00f720) SHA1(ea59fa2a3b016a7ae83be3caf863de87ce7aeffa) )
 ROM_END
 
@@ -432,7 +432,7 @@ ROM_END
 ROM_START( m4topgr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "topgear.hex", 0x6000, 0x00a000, CRC(539cc3d7) SHA1(7d5c9eccd2d929189e8d82783fc630b2f3cacd24) ) // needs to be split
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "topgear.chr", 0x0000, 0x000048, CRC(88578212) SHA1(c6c451b835c465e13de22bbe0dd472dbd2f8f504) )
 ROM_END
 
@@ -506,14 +506,14 @@ ROM_END
 ROM_START( m4cashmx )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cash_matrix_20p.bin", 0x0000, 0x010000, CRC(3f2ebfeb) SHA1(1dbabe81204f4b149c125aca3413d8e521a690ca) )
-	ROM_REGION( 0x10000, "fakechr", 0 )
+	ROM_REGION( 0x10000, "characteriser:fakechr", 0 )
 	ROM_LOAD( "cm.chr", 0x0000, 0x000048, CRC(3de2e6a6) SHA1(04e86e90561783f93d5e9d7a8b7f6dd3ea4f78f6) )
 ROM_END
 
 ROM_START( m4cashmxa )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cashmat1.hex", 0x0000, 0x010000, CRC(36f1a4bb) SHA1(7eefcbb1be539fcc302d226fa567e8691e85c360) )
-	ROM_REGION( 0x10000, "fakechr", 0 )
+	ROM_REGION( 0x10000, "characteriser:fakechr", 0 )
 	ROM_LOAD( "cm.chr", 0x0000, 0x000048, CRC(3de2e6a6) SHA1(04e86e90561783f93d5e9d7a8b7f6dd3ea4f78f6) )
 ROM_END
 
@@ -540,56 +540,56 @@ ROM_END
 ROM_START( m4eighth )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "wonder.hex", 0x0000, 0x010000, CRC(6fcaab11) SHA1(a462d4c50000e62af4c52980338cee073e4175a9) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "wonder.chr", 0x0000, 0x000048, CRC(df5dd758) SHA1(b8ae33480a13d621cf104da770e419b6e485bf33) )
 ROM_END
 
 ROM_START( m4eightha )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ewc02__0.3", 0x0000, 0x010000, CRC(3ea4c626) SHA1(c10b3ba1f806f9d685b9de25fab3a15cbb8e94c3) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "wonder.chr", 0x0000, 0x000048, CRC(df5dd758) SHA1(b8ae33480a13d621cf104da770e419b6e485bf33) )
 ROM_END
 
 ROM_START( m4eighthb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ewc05__0.3", 0x0000, 0x010000, CRC(691d2694) SHA1(08deeb25a23a65059be877d11c570db2db66564c) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "wonder.chr", 0x0000, 0x000048, CRC(df5dd758) SHA1(b8ae33480a13d621cf104da770e419b6e485bf33) )
 ROM_END
 
 ROM_START( m4eighthc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ewc10__0.3", 0x0000, 0x010000, CRC(7a3b03d5) SHA1(13fb31ffb17edb0502ec47488d7f6b169834b0e4) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "wonder.chr", 0x0000, 0x000048, CRC(df5dd758) SHA1(b8ae33480a13d621cf104da770e419b6e485bf33) )
 ROM_END
 
 ROM_START( m4eighthd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ewc10d_0.3", 0x0000, 0x010000, BAD_DUMP CRC(9131f8d4) SHA1(404ab0e359b81a26fcddaa9773ed3234dae0a754) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "wonder.chr", 0x0000, 0x000048, CRC(df5dd758) SHA1(b8ae33480a13d621cf104da770e419b6e485bf33) )
 ROM_END
 
 ROM_START( m4eighthe )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ewc20__0.3", 0x0000, 0x010000, CRC(1b6babd3) SHA1(7b919f48a1a0a1a5ecc930a59fd27b2f9fe7509b) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "wonder.chr", 0x0000, 0x000048, CRC(df5dd758) SHA1(b8ae33480a13d621cf104da770e419b6e485bf33) )
 ROM_END
 
 ROM_START( m4eighthf )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ewc20c_0.3", 0x0000, 0x010000, CRC(9f6f8836) SHA1(e519f3c42ef7f157c88e68a706a96e42a8cfba4d) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "wonder.chr", 0x0000, 0x000048, CRC(df5dd758) SHA1(b8ae33480a13d621cf104da770e419b6e485bf33) )
 ROM_END
 
 ROM_START( m4eighthg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ewc20d_0.3", 0x0000, 0x010000, CRC(dd26057e) SHA1(dfada02b18f748620966b351b2fe5e03af2b9c7e) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "wonder.chr", 0x0000, 0x000048, CRC(df5dd758) SHA1(b8ae33480a13d621cf104da770e419b6e485bf33) )
 ROM_END
 
@@ -627,21 +627,21 @@ ROM_END
 ROM_START( m4intcep )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ints.p1", 0x0000, 0x010000, CRC(6c6b61ca) SHA1(521cf68b9086baffe739d2b12dd28a13afb84b80) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "int.chr", 0x0000, 0x000048, CRC(5915f545) SHA1(f8490a74aefe2a27d8e59b13dbd5fa78b8ab2166) )
 ROM_END
 
 ROM_START( m4intcepa )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "intx.p1", 0x0000, 0x010000, CRC(6e435db6) SHA1(17114fe54c74a140e116bec5a027219f7f5a70d6) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "int.chr", 0x0000, 0x000048, CRC(5915f545) SHA1(f8490a74aefe2a27d8e59b13dbd5fa78b8ab2166) )
 ROM_END
 
 ROM_START( m4intcepb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "int11.bin", 0x0000, 0x010000, CRC(0beb156f) SHA1(9ac318a524c549df907a995e896cd90434634e72) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "int.chr", 0x0000, 0x000048, CRC(5915f545) SHA1(f8490a74aefe2a27d8e59b13dbd5fa78b8ab2166) )
 ROM_END
 
@@ -680,7 +680,7 @@ ROM_END
 ROM_START( m4nifty )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nifty.hex", 0x0000, 0x010000, CRC(84931755) SHA1(b4e568e1e4c237ea3f7ca6156b8a89cb40faf425) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "nifty.chr", 0x0000, 0x000048, CRC(1ce9977d) SHA1(06616842d4062e3285044a9924e35faee3f8f3f5) )
 ROM_END
 
@@ -688,7 +688,7 @@ ROM_START( m4niftya )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nf2_1.p2", 0x6000, 0x002000, CRC(fde4010e) SHA1(440c888e80bd65f4d8c4081be66ad79db8e19618) )
 	ROM_LOAD( "nf2_1c.p1", 0x8000, 0x008000, CRC(52e954a5) SHA1(c402eaaf3f482d996f9a1312f97f057627734416) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "nifty.chr", 0x0000, 0x000048, CRC(1ce9977d) SHA1(06616842d4062e3285044a9924e35faee3f8f3f5) )
 ROM_END
 
@@ -696,7 +696,7 @@ ROM_START( m4niftyb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nf2_1.p2", 0x6000, 0x002000, CRC(fde4010e) SHA1(440c888e80bd65f4d8c4081be66ad79db8e19618) )
 	ROM_LOAD( "nf2_1l.p1", 0x8000, 0x008000, CRC(bb297210) SHA1(cb570a015699d396dacb9fb09397ef157ceb8c97) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "nifty.chr", 0x0000, 0x000048, CRC(1ce9977d) SHA1(06616842d4062e3285044a9924e35faee3f8f3f5) )
 ROM_END
 
@@ -770,7 +770,7 @@ ROM_END
 ROM_START( m4sunset )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sunsetboulivard2p.bin", 0x0000, 0x010000, CRC(c83a0b84) SHA1(a345d1e4914ad08d40980022f63e10879e2ef32f) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "sunsetb.chr", 0x0000, 0x000048, CRC(f166963b) SHA1(5cc6ada61036d8dbeca470e9548f9f5d2bd545a8) )
 ROM_END
 
@@ -782,119 +782,119 @@ ROM_END
 ROM_START( m4sunsetd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sunsetb.hex", 0x0000, 0x010000, CRC(53e848a9) SHA1(62cd50003a8bd580b68128324ac98974470ce803) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "sunsetb.chr", 0x0000, 0x000048, CRC(f166963b) SHA1(5cc6ada61036d8dbeca470e9548f9f5d2bd545a8) )
 ROM_END
 
 ROM_START( m4sunsete )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sbc02__1.1", 0x0000, 0x010000, CRC(0c4cad79) SHA1(0595d149958ccc4e5bfeb67fb021c314232a7ca0) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "sunsetb.chr", 0x0000, 0x000048, CRC(f166963b) SHA1(5cc6ada61036d8dbeca470e9548f9f5d2bd545a8) )
 ROM_END
 
 ROM_START( m4sunsetf )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sbc05__1.0", 0x0000, 0x010000, CRC(e70acd03) SHA1(96339f9e2011bd1f3ac1eab42ae55466526b48f8) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "sunsetb.chr", 0x0000, 0x000048, CRC(f166963b) SHA1(5cc6ada61036d8dbeca470e9548f9f5d2bd545a8) )
 ROM_END
 
 ROM_START( m4sunsetg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sbc10__1.0", 0x0000, 0x010000, CRC(c93b9185) SHA1(209307c7a2dec14e3d65d45c3eb4f1faa1881671) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "sunsetb.chr", 0x0000, 0x000048, CRC(f166963b) SHA1(5cc6ada61036d8dbeca470e9548f9f5d2bd545a8) )
 ROM_END
 
 ROM_START( m4sunseth )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sbc10d_1.0", 0x0000, 0x010000, CRC(ab1e65c5) SHA1(6a8e497765dc4f4a41e0128856447fcdf5319975) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "sunsetb.chr", 0x0000, 0x000048, CRC(f166963b) SHA1(5cc6ada61036d8dbeca470e9548f9f5d2bd545a8) )
 ROM_END
 
 ROM_START( m4sunseti )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sbc20__1.0", 0x0000, 0x010000, CRC(4d1651c5) SHA1(f8e2fd4e8afc068f23ef32f81b7eb20e8f33d787) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "sunsetb.chr", 0x0000, 0x000048, CRC(f166963b) SHA1(5cc6ada61036d8dbeca470e9548f9f5d2bd545a8) )
 ROM_END
 
 ROM_START( m4sunsetj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sbc20d_1.0", 0x0000, 0x010000, CRC(9c1dea06) SHA1(0433d892143e5d74c29b99917571af4675d0d9c4) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "sunsetb.chr", 0x0000, 0x000048, CRC(f166963b) SHA1(5cc6ada61036d8dbeca470e9548f9f5d2bd545a8) )
 ROM_END
 
 ROM_START( m4sunsetk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sbo02__1.1", 0x0000, 0x010000, CRC(3a2541ef) SHA1(fd5e84bed8fdb3e3cedf8bc5c8d8070c781d5b44) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "sunsetb.chr", 0x0000, 0x000048, CRC(f166963b) SHA1(5cc6ada61036d8dbeca470e9548f9f5d2bd545a8) )
 ROM_END
 
 ROM_START( m4sunsetl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sbo05__1.0", 0x0000, 0x010000, CRC(87e2ff53) SHA1(02b4f87aaf5786a3f0f0eb4bac4bcc756960885c) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "sunsetb.chr", 0x0000, 0x000048, CRC(f166963b) SHA1(5cc6ada61036d8dbeca470e9548f9f5d2bd545a8) )
 ROM_END
 
 ROM_START( m4sunsetm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sbo10__1.0", 0x0000, 0x010000, CRC(5bb9c3ff) SHA1(ea2d30713e351de72f76bb642d5a778899c56634) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "sunsetb.chr", 0x0000, 0x000048, CRC(f166963b) SHA1(5cc6ada61036d8dbeca470e9548f9f5d2bd545a8) )
 ROM_END
 
 ROM_START( m4sunsetn )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sbo10d_1.0", 0x0000, 0x010000, CRC(50b5dd43) SHA1(1a8e2725b688c989695bdb71fa8ee3c7a5fa035b) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "sunsetb.chr", 0x0000, 0x000048, CRC(f166963b) SHA1(5cc6ada61036d8dbeca470e9548f9f5d2bd545a8) )
 ROM_END
 
 ROM_START( m4sunseto )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sbo10dy1.0", 0x0000, 0x010000, CRC(8e7508c0) SHA1(e3000e7f8dc806392faab235b50f3584c8ce61eb) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "sunsetb.chr", 0x0000, 0x000048, CRC(f166963b) SHA1(5cc6ada61036d8dbeca470e9548f9f5d2bd545a8) )
 ROM_END
 
 ROM_START( m4sunsetp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sbo20__1.0", 0x0000, 0x010000, CRC(6a652ff2) SHA1(b51d6e59948cf8b1f5ca926d0930b3f8c18cec18) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "sunsetb.chr", 0x0000, 0x000048, CRC(f166963b) SHA1(5cc6ada61036d8dbeca470e9548f9f5d2bd545a8) )
 ROM_END
 
 ROM_START( m4sunsetq )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sbo20c_1.0", 0x0000, 0x010000, CRC(d6ba347a) SHA1(0ac93bad181b462036c5c28ea871716c1d393b49) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "sunsetb.chr", 0x0000, 0x000048, CRC(f166963b) SHA1(5cc6ada61036d8dbeca470e9548f9f5d2bd545a8) )
 ROM_END
 
 ROM_START( m4sunsetr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sbo20d_1.0", 0x0000, 0x010000, CRC(ffe841a8) SHA1(50ab96c9c28d11f17316bd386d7a83cd5198a583) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "sunsetb.chr", 0x0000, 0x000048, CRC(f166963b) SHA1(5cc6ada61036d8dbeca470e9548f9f5d2bd545a8) )
 ROM_END
 
 ROM_START( m4sunsets )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sbo20dy1.0", 0x0000, 0x010000, CRC(7d0023ef) SHA1(efb0202082acdbb37d5ed8af5222cfac3b4bbaca) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "sunsetb.chr", 0x0000, 0x000048, CRC(f166963b) SHA1(5cc6ada61036d8dbeca470e9548f9f5d2bd545a8) )
 ROM_END
 
 ROM_START( m4sunsett )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sbo20y_1.0", 0x0000, 0x010000, CRC(9b25ba02) SHA1(0b6b7c53c136724d74837dd5bcdf544e4a2696b0) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "sunsetb.chr", 0x0000, 0x000048, CRC(f166963b) SHA1(5cc6ada61036d8dbeca470e9548f9f5d2bd545a8) )
 ROM_END
 
@@ -950,7 +950,7 @@ ROM_START( m4tribnk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "triplebank_1.bin", 0x0000, 0x010000, CRC(efeb5810) SHA1(e882f3ce028dcd4705365e0c17dab8d5839e4901) )
 
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "trip.chr", 0x0000, 0x000048, CRC(7d9348ea) SHA1(c0b32a5c964e5d0a9e715a282c92f2ca61547c25) )
 ROM_END
 
@@ -1002,7 +1002,7 @@ ROM_START( m4alpha )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "alphabet.hex", 0x6000, 0x00a000, CRC(2bf0d7fd) SHA1(143543f45bfae379233a8c21959618e5ad8034e4) )
 
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "m435.chr", 0x0000, 0x000048, CRC(1e8df0e3) SHA1(02ecde48b9ce49884062eeea4a399c8d52bbe323) )
 ROM_END
 
@@ -1306,14 +1306,14 @@ ROM_END
 ROM_START( m4take2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ttos.p1", 0x0000, 0x010000, CRC(d7943729) SHA1(76fcaf7dbfa7863a4dfe2804e2d472dcfec13124) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "taketwo.chr", 0x0000, 0x000048, CRC(61c0b52b) SHA1(9defb30a186dc237625fc2476dd8650e7fe289af) )
 ROM_END
 
 ROM_START( m4take2a )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "take220p", 0x0000, 0x010000, CRC(b536311a) SHA1(234945d2419c8391307db5b5d01d228894441faf) ) // contains inaccessible data before 0x1000
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "taketwo.chr", 0x0000, 0x000048, CRC(61c0b52b) SHA1(9defb30a186dc237625fc2476dd8650e7fe289af) )
 ROM_END
 
@@ -1349,7 +1349,7 @@ ROM_START( m4celclb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cels.p1",  0x00000, 0x10000,  CRC(19d2162f) SHA1(24fe435809352725e7614c32e2184142f355298e))
 
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "cels.chr", 0x0000, 0x000048, CRC(fe250f3a) SHA1(8b1d569a667921ba1768e7eebba81182466cfabf) )
 ROM_END
 
@@ -1405,7 +1405,7 @@ ROM_START( m4tridic )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "trp.bin", 0x0000, 0x010000, CRC(d91fb9b2) SHA1(a06a868a17f84e2a012b0fe28025458e4f899c1d) ) // == m4atlan
 
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "tdice.chr", 0x0000, 0x000048, CRC(6d28754a) SHA1(beb7724e9f621d315b2f16abfd3bbc6a99077a05) )
 ROM_END
 
@@ -1533,14 +1533,14 @@ ROM_END
 ROM_START( m4bjac )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bjak1.8", 0x0000, 0x010000, CRC(e6a3c263) SHA1(fb28657cb43a0f24354382518d5d5be9cfdfa1d1) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "bj.chr", 0x0000, 0x000048, CRC(b7851f82) SHA1(a6b2ae283b8e251169508ab6a2cba2fb70f706bf) )
 ROM_END
 
 ROM_START( m4bjaca )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "c2js.p1", 0x0000, 0x010000, CRC(3e6dd1f3) SHA1(dbd87368124244931b8868eb740b02a1775ed734) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "bj.chr", 0x0000, 0x000048, CRC(b7851f82) SHA1(a6b2ae283b8e251169508ab6a2cba2fb70f706bf) )
 ROM_END
 
@@ -1588,21 +1588,21 @@ ROM_END
 ROM_START( m4frtfl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "frtfull", 0x0000, 0x010000, CRC(4f5389e2) SHA1(bb6d43d428c1e8db07fe58d1b83c05ce5fcdcc7d) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "fruitfull.chr", 0x0000, 0x000048, CRC(b6057802) SHA1(ef6dbb45f5594e759f6d1363f36ba05097100be4) )
 ROM_END
 
 ROM_START( m4frtfla )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "fruitfull.hex", 0x0000, 0x010000, CRC(c264d497) SHA1(93843efbf1b4207a4722f49dd5dddf2c52bb1b8f) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "fruitfull.chr", 0x0000, 0x000048, CRC(b6057802) SHA1(ef6dbb45f5594e759f6d1363f36ba05097100be4) )
 ROM_END
 
 ROM_START( m4frtflc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ffcs.p1", 0x0000, 0x010000, CRC(db917142) SHA1(0f32f0c1ed6733b4557fd19f24f2b1dda26ccc44) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "fruitfull.chr", 0x0000, 0x000048, CRC(b6057802) SHA1(ef6dbb45f5594e759f6d1363f36ba05097100be4) )
 ROM_END
 
@@ -1625,14 +1625,14 @@ ROM_END
 ROM_START( m4jpjmp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "vjcs.p1", 0x0000, 0x010000, CRC(90280752) SHA1(bc2fcefc00adbae9ca2e116108b53ab932ab57b2) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "jj.chr", 0x0000, 0x000048, CRC(abf2340a) SHA1(6cfeb84db61e647da0a46faa87fa003a34b46f5c) )
 ROM_END
 
 ROM_START( m4jpjmpa )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jackjump-vjc1-3.bin", 0x0000, 0x010000, CRC(fa713c10) SHA1(766912ea891166d7d7f0360e81bdad58b6064eb1) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "jj.chr", 0x0000, 0x000048, CRC(abf2340a) SHA1(6cfeb84db61e647da0a46faa87fa003a34b46f5c) )
 ROM_END
 
@@ -1640,35 +1640,35 @@ ROM_END
 ROM_START( m4milclb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mi2d.p1", 0x0000, 0x010000, CRC(ce697bbd) SHA1(86c1729014eff9925a5f62189236a9c5bd11534b) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "millc.chr", 0x0000, 0x000048, CRC(5e94580c) SHA1(d8251caf825ba0a23c06459d270e1e0999bde5c4) )
 ROM_END
 
 ROM_START( m4milclba )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mi2f.p1", 0x0000, 0x010000, CRC(224922a4) SHA1(59bc1fbfe20c533eb6462f01196a5f2d35ceb92d) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "millc.chr", 0x0000, 0x000048, CRC(5e94580c) SHA1(d8251caf825ba0a23c06459d270e1e0999bde5c4) )
 ROM_END
 
 ROM_START( m4milclbb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mi2s.p1", 0x0000, 0x010000, CRC(f69b69c7) SHA1(4f881f5307db2c100535fa75a8eb42d0f7382c93) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "millc.chr", 0x0000, 0x000048, CRC(5e94580c) SHA1(d8251caf825ba0a23c06459d270e1e0999bde5c4) )
 ROM_END
 
 ROM_START( m4milclbc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mild.p1", 0x0000, 0x010000, CRC(16da3df9) SHA1(0f1838f99c14763132c2a3b79363496c6baa5e88) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "millc.chr", 0x0000, 0x000048, CRC(5e94580c) SHA1(d8251caf825ba0a23c06459d270e1e0999bde5c4) )
 ROM_END
 
 ROM_START( m4milclbd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mils.p1", 0x0000, 0x010000, CRC(0742defd) SHA1(ac25d8adb40bc5b4124241cc5d970d4c10c6f5fd) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "millc.chr", 0x0000, 0x000048, CRC(5e94580c) SHA1(d8251caf825ba0a23c06459d270e1e0999bde5c4) )
 ROM_END
 
@@ -1682,14 +1682,14 @@ ROM_END
 ROM_START( m4dbl9 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "du91.0", 0x0000, 0x010000, CRC(6207753d) SHA1(b19bcb60707b73f37e9bd8177d0b15847af0213f) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "du91.chr", 0x0000, 0x000048, CRC(9724122d) SHA1(a41687eec84cad453c1a2a89317078f48ca0895f) )
 ROM_END
 
 ROM_START( m4dbl9a )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "d9s_6.bin", 0x0000, 0x010000, CRC(6029d46a) SHA1(0823f29f17562675a6f250429e46655c0b2e8f2c) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "du91.chr", 0x0000, 0x000048, CRC(9724122d) SHA1(a41687eec84cad453c1a2a89317078f48ca0895f) )
 ROM_END
 
@@ -1747,7 +1747,7 @@ ROM_END
 ROM_START( m4btclok )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "beattheclock.hex", 0x6000, 0x00a000, CRC(a0d4e463) SHA1(45d1df08bfd70caf63b14d2ccc56038ed85e23d0) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "btc.chr", 0x0000, 0x000048, CRC(c77e5215) SHA1(c9e26ed593840cbc47dad893ea4df476f1d69ecd) )
 ROM_END
 

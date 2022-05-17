@@ -675,7 +675,7 @@ ROM_END
 ROM_START( m4hotcsh )
 	ROM_REGION( 0x010000, "maincpu", 0 )
 	ROM_LOAD( "hc3_0k.bin", 0x0000, 0x010000, CRC(e3cfa94a) SHA1(d21d2dac4edbf3fde9adab399bdd530e034af122) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "db.chr", 0x00, 0x48, CRC(0fc2bb52) SHA1(0d0e47938f6e00166e7352732ddfb7c610f44db2) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
@@ -686,7 +686,7 @@ ROM_END
 ROM_START( m4hotcsha )
 	ROM_REGION( 0x010000, "maincpu", 0 )
 	ROM_LOAD( "hc3_0ki.bin", 0x0000, 0x010000, CRC(646f8c29) SHA1(19d60faf77a7a83efc3ea4b614a4bc1dee53b8d8) )
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "db.chr", 0x00, 0x48, CRC(0fc2bb52) SHA1(0d0e47938f6e00166e7352732ddfb7c610f44db2) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
@@ -698,7 +698,7 @@ ROM_START( m4hotcshb )
 	ROM_REGION( 0x010000, "maincpu", 0 )
 	ROM_LOAD( "hc3_0kx.bin", 0x0000, 0x010000, CRC(3abebe72) SHA1(fec09ca41e8e43628140456bb44ce6e7c66f5270) )
 
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "db.chr", 0x00, 0x48, CRC(0fc2bb52) SHA1(0d0e47938f6e00166e7352732ddfb7c610f44db2) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
@@ -710,7 +710,7 @@ ROM_START( m4hotcshc )
 	ROM_REGION( 0x010000, "maincpu", 0 )
 	ROM_LOAD( "empire-hotcashv2-0.bin", 0x0000, 0x010000, CRC(b7ec5af3) SHA1(9454feecc7d7c533fed7134118acd2117ebe2591) )
 
-	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "db.chr", 0x00, 0x48, CRC(0fc2bb52) SHA1(0d0e47938f6e00166e7352732ddfb7c610f44db2) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
