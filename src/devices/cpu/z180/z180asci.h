@@ -23,6 +23,7 @@ public:
 	// inline configuration
 	auto txa_handler() { return m_txa_handler.bind(); }
 	auto rts_handler() { return m_rts_handler.bind(); }
+	auto cka_handler() { return m_cka_handler.bind(); }
 
 	uint8_t cntla_r();
 	uint8_t cntlb_r();
@@ -44,6 +45,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( rxa_wr );
 	DECLARE_WRITE_LINE_MEMBER( cts_wr ) { m_cts = state; }
 	DECLARE_WRITE_LINE_MEMBER( dcd_wr ) { m_dcd = state; }
+	DECLARE_WRITE_LINE_MEMBER( cka_wr );
 
 	virtual void state_add(device_state_interface &parent) = 0;
 
@@ -67,6 +69,7 @@ protected:
 
 	devcb_write_line m_txa_handler;
 	devcb_write_line m_rts_handler;
+	devcb_write_line m_cka_handler;
 
 	uint8_t   m_asci_cntla;                  // ASCI control register A
 	uint8_t   m_asci_cntlb;                  // ASCI control register B

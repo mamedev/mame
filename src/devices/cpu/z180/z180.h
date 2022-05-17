@@ -110,6 +110,8 @@ public:
 	auto txa0_wr_callback() { return subdevice<z180asci_channel_base>("asci_0")->txa_handler(); }
 	auto txa1_wr_callback() { return subdevice<z180asci_channel_base>("asci_1")->txa_handler(); }
 	auto rts0_wr_callback() { return subdevice<z180asci_channel_base>("asci_0")->rts_handler(); }
+	auto cka0_wr_callback() { return subdevice<z180asci_channel_base>("asci_0")->cka_handler(); }
+	auto cka1_wr_callback() { return subdevice<z180asci_channel_base>("asci_1")->cka_handler(); }
 
 	bool get_tend0();
 	bool get_tend1();
@@ -119,6 +121,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( cts0_w ) { m_asci[0]->cts_wr(state); }
 	DECLARE_WRITE_LINE_MEMBER( cts1_w ) { m_asci[1]->cts_wr(state); }
 	DECLARE_WRITE_LINE_MEMBER( dcd0_w ) { m_asci[0]->dcd_wr(state); }
+	DECLARE_WRITE_LINE_MEMBER( cka0_w ) { m_asci[0]->cka_wr(state); }
+	DECLARE_WRITE_LINE_MEMBER( cka1_w ) { m_asci[1]->cka_wr(state); }
 
 protected:
 	// construction/destruction

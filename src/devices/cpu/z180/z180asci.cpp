@@ -96,6 +96,7 @@ z180asci_channel_base::z180asci_channel_base(const machine_config &mconfig, devi
 	, device_buffered_serial_interface(mconfig, *this)
 	, m_txa_handler(*this)
 	, m_rts_handler(*this)
+	, m_cka_handler(*this)
 	, m_cts(0)
 	, m_dcd(0)
 	, m_irq(0)
@@ -277,6 +278,10 @@ DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::rxa_wr )
 	device_buffered_serial_interface::rx_w(state);
 }
 
+
+DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::cka_wr )
+{
+}
 
 void z180asci_channel_base::output_txa(int txa)
 {
