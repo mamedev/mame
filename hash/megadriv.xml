@@ -16304,7 +16304,8 @@ https://segaretro.org/Feng_Kuang_Tao_Hua_Yuan
 	</software>
 
 	<software name="fengshen">
-		<description>Feng Shen Ying Jie Chuan (Tw)</description>
+		<!-- Blanked header -->
+		<description>Fēngshén Yīngjié Chuán (Tw)</description>
 		<year>1996</year>
 		<publisher>Chuanpu Technologies</publisher>
 		<notes><![CDATA[
@@ -16312,14 +16313,19 @@ https://segaretro.org/Feng_Shen_Ying_Jie_Chuan
 ]]></notes>
 		<info name="alt_title" value="封神英傑傳"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="feng shen ying jie chuan (chi) (unl).bin" size="2097152" crc="6a382b60" sha1="7a6e06846a94df2df2417d6509e398c29354dc68"/>
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="fengshena" cloneof="fengshen">
-		<description>Feng Shen Ying Jie Chuan (Tw, Alt?)</description>
+		<!-- Hacked according to NoIntro to have SRAM declared in header -->
+		<!-- Has "By Ken Xie" at $130 -->
+		<description>Fēngshén Yīngjié Chuán (Tw, Alt?)</description>
 		<year>1996</year>
 		<publisher>Chuanpu Technologies</publisher>
 		<info name="alt_title" value="封神英傑傳"/>
