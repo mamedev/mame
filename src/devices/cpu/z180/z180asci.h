@@ -62,6 +62,9 @@ protected:
 	virtual void tra_complete() override;
 	virtual void received_byte(u8 byte) override;
 
+	void output_txa(int txa);
+	void output_rts(int rts);
+
 	devcb_write_line m_txa_handler;
 	devcb_write_line m_rts_handler;
 
@@ -75,6 +78,8 @@ protected:
 	int		  m_cts;
 	int		  m_dcd;
 	int       m_irq;
+	int		  m_txa;
+	int		  m_rts;
 	uint32_t  m_divisor;
 	const int  m_id;
 	const bool m_ext;

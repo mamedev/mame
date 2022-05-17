@@ -27,7 +27,7 @@
 #define Z180_CNTLA1_MPE         0x80
 #define Z180_CNTLA1_RE          0x40
 #define Z180_CNTLA1_TE          0x20
-#define Z180_CNTLA1_CKA1D       0x10
+#define Z180_CNTLA1_CKA1D       0x10 // ext
 #define Z180_CNTLA1_MPBR_EFR    0x08
 #define Z180_CNTLA1_MODE        0x07
 
@@ -63,7 +63,7 @@
 #define Z180_STAT1_PE           0x20
 #define Z180_STAT1_FE           0x10
 #define Z180_STAT1_RIE          0x08
-#define Z180_STAT1_CTS1E        0x04
+#define Z180_STAT1_CTS1E        0x04 //ext
 #define Z180_STAT1_TDRE         0x02
 #define Z180_STAT1_TIE          0x01
 
@@ -96,6 +96,11 @@ z180asci_channel_base::z180asci_channel_base(const machine_config &mconfig, devi
 	, device_buffered_serial_interface(mconfig, *this)
 	, m_txa_handler(*this)
 	, m_rts_handler(*this)
+	, m_cts(0)
+	, m_dcd(0)
+	, m_irq(0)
+	, m_txa(0)
+	, m_rts(0)
 	, m_divisor(1)
 	, m_id(id)
 	, m_ext(ext)
@@ -128,17 +133,15 @@ void z180asci_channel_base::device_start()
 
 void z180asci_channel_base::device_reset()
 {
-	m_asci_cntla = 0;
-	m_asci_cntlb = 7; // SS2,SS1 and SS0 are 1 after reset
-	m_asci_tdr = 0;
-	m_asci_rdr = 0;
-	m_asci_stat = 2; // set TDRE=1 on reset
 	m_irq = 0;
-	m_cts = 0;
-	m_dcd = 0;
+
 	m_asci_ext = 0;
 	m_asci_tc.w = 0;
+
 	m_divisor = 1;
+
+	output_txa(1);
+	output_rts(1);
 }
 
 void z180asci_channel_base::device_clock_changed()
@@ -202,7 +205,8 @@ void z180asci_channel_base::cntla_w(uint8_t data)
 {
 	LOG("Z180 CNTLA%d wr $%02x\n", m_id, data);
 	m_asci_cntla = data;
-	set_data_frame(1, (data & 4) ? 8 : 7, (data & 2) ? PARITY_ODD : PARITY_NONE, (data & 2) ? STOP_BITS_2 : STOP_BITS_1);
+	output_rts(BIT(data,4));
+	set_data_frame(1, BIT(data,2) ? 8 : 7, BIT(data,1) ? PARITY_ODD : PARITY_NONE, BIT(data,0) ? STOP_BITS_2 : STOP_BITS_1);
 }
 
 void z180asci_channel_base::cntlb_w(uint8_t data)
@@ -273,6 +277,26 @@ DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::rxa_wr )
 	device_buffered_serial_interface::rx_w(state);
 }
 
+
+void z180asci_channel_base::output_txa(int txa)
+{
+	if (m_txa != txa)
+	{
+		m_txa = txa;
+
+		m_txa_handler(m_txa);
+	}
+}
+
+void z180asci_channel_base::output_rts(int rts)
+{
+	if (m_rts != rts)
+	{
+		m_rts = rts;
+		m_rts_handler(m_rts);
+	}
+}
+
 //**************************************************************************
 //  z180asci_channel_0
 //**************************************************************************
@@ -292,7 +316,7 @@ void z180asci_channel_0::device_reset()
 	z180asci_channel_base::device_reset();
 	m_asci_cntla = (m_asci_cntla & Z180_CNTLA0_MPBR_EFR) | Z180_CNTLA0_RTS0;
 	m_asci_cntlb = (m_asci_cntlb & (Z180_CNTLB0_MPBT | Z180_CNTLB0_CTS_PS)) | 0x07;
-	m_asci_stat = m_asci_stat & (Z180_STAT0_DCD0 | Z180_STAT0_TDRE);
+	m_asci_stat = (m_asci_stat & Z180_STAT0_DCD0) | Z180_STAT0_TDRE;
 }
 
 void z180asci_channel_0::state_add(device_state_interface &parent)
