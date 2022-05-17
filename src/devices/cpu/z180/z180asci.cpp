@@ -150,39 +150,33 @@ void z180asci_channel_base::device_clock_changed()
 
 uint8_t z180asci_channel_base::cntla_r()
 {
-	uint8_t data = m_asci_cntla;
-	LOG("Z180 CNTLA%d rd $%02x\n", m_id, data);
-	return data;
+	LOG("Z180 CNTLA%d rd $%02x\n", m_id, m_asci_cntla);
+	return m_asci_cntla;
 }
 
 uint8_t z180asci_channel_base::cntlb_r()
 {
-	uint8_t data = m_asci_cntlb;
-	LOG("Z180 CNTLB%d rd $%02x\n", m_id, data);
-	return data;
+	LOG("Z180 CNTLB%d rd $%02x\n", m_id, m_asci_cntlb);
+	return m_asci_cntlb;
 }
 
 uint8_t z180asci_channel_base::stat_r()
 {
-	uint8_t data = m_asci_stat;
-	LOG("Z180 STAT%d  rd $%02x\n", m_id, data);
-	return data;
+	LOG("Z180 STAT%d  rd $%02x\n", m_id, m_asci_stat);
+	return m_asci_stat;
 }
 
 uint8_t z180asci_channel_base::tdr_r()
 {
-	uint8_t data = m_asci_tdr;
-	LOG("Z180 TDR%d   rd $%02x\n", m_id, data);
-	return data;
+	LOG("Z180 TDR%d   rd $%02x\n", m_id, m_asci_tdr);
+	return m_asci_tdr;
 }
 
 uint8_t z180asci_channel_base::rdr_r()
 {
-	uint8_t data = m_asci_rdr;
-	LOG("Z180 RDR%d   rd $%02x\n", m_id, data);
+	LOG("Z180 RDR%d   rd $%02x\n", m_id, m_asci_rdr);
 	m_asci_stat &= ~0x80;
-
-	return data;
+	return m_asci_rdr;
 }
 
 uint8_t z180asci_channel_base::asext_r()
@@ -193,16 +187,14 @@ uint8_t z180asci_channel_base::asext_r()
 
 uint8_t z180asci_channel_base::astcl_r()
 {
-	uint8_t data = m_asci_tc.b.l;
-	LOG("Z180 ASTC%dL rd $%02x ($%04x)\n", m_id, data, m_asci_tc.w);
-	return data;
+	LOG("Z180 ASTC%dL rd $%02x ($%04x)\n", m_id, m_asci_tc.b.l, m_asci_tc.w);
+	return m_asci_tc.b.l;
 }
 
 uint8_t z180asci_channel_base::astch_r()
 {
-	uint8_t data = m_asci_tc.b.h;
-	LOG("Z180 ASTC%dH rd $%02x ($%04x)\n", m_id, data, m_asci_tc.w);
-	return data;
+	LOG("Z180 ASTC%dH rd $%02x ($%04x)\n", m_id, m_asci_tc.b.h, m_asci_tc.w);
+	return m_asci_tc.b.h;
 }
 
 void z180asci_channel_base::cntla_w(uint8_t data)
@@ -259,7 +251,8 @@ void z180asci_channel_base::tra_complete()
 {
 	device_buffered_serial_interface::tra_complete();
 	m_asci_stat |= 0x02; // set TDRE
-	if (m_asci_stat & Z180_STAT0_TIE) {
+	if (m_asci_stat & Z180_STAT0_TIE)
+	{
 		m_irq = 1;
 	}
 }
@@ -268,7 +261,8 @@ void z180asci_channel_base::received_byte(u8 byte)
 {
 	m_asci_stat |= 0x80;
 	m_asci_rdr = byte;
-	if (m_asci_stat & Z180_STAT0_RIE) {
+	if (m_asci_stat & Z180_STAT0_RIE)
+	{
 		m_irq = 1;
 	}
 }
