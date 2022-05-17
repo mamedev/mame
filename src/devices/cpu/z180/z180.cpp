@@ -1770,8 +1770,8 @@ void z8s180_device::device_reset()
 
 void z8s180_device::device_clock_changed()
 {
-	m_asci[0]->set_clock((m_cmr & 0x80) ? (clock() * 2) : (m_ccr & 0x80) ? clock() : (clock() / 2));
-	m_asci[1]->set_clock((m_cmr & 0x80) ? (clock() * 2) : (m_ccr & 0x80) ? clock() : (clock() / 2));
+	m_asci[0]->set_clock((m_cmr & 0x80) ? DERIVED_CLOCK(2,1) : (m_ccr & 0x80) ? DERIVED_CLOCK(1,1) : DERIVED_CLOCK(1,2));
+	m_asci[1]->set_clock((m_cmr & 0x80) ? DERIVED_CLOCK(2,1) : (m_ccr & 0x80) ? DERIVED_CLOCK(1,1) : DERIVED_CLOCK(1,2));
 }
 
 /* Handle PRT timers, decreasing them after 20 clocks and returning the new icount base that needs to be used for the next check */
