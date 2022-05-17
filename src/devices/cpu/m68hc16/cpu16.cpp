@@ -4244,6 +4244,7 @@ void cpu16_device::execute_run()
 
 		case seq::MOVW_IXP_EXT_2B:
 			m_tmp = m_tmp << 8 | m_data.read_byte(m_ea);
+			m_ea = (m_ea - 1) & 0xfffff;
 			m_sequence = seq::MOVW_IXP_EXT_3;
 			advance();
 			m_icount -= 2;
@@ -5403,6 +5404,7 @@ void cpu16_device::execute_run()
 			m_start = false;
 			m_icount -= 2;
 			break;
+
 		case seq::SUBA_IND8:
 			m_fetch_pipe[0] = m_cache.read_word(m_pc);
 			m_ea = (m_index_regs[BIT(m_fetch_pipe[2], 12, 2)] + (m_fetch_pipe[2] & 0x00ff)) & 0xfffff;
