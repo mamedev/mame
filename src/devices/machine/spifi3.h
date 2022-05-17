@@ -51,20 +51,22 @@ protected:
 	virtual void scsi_ctrl_changed() override;
 
 private:
-	enum scsi_mode
+	static constexpr int FIFO_SIZE = 8;
+
+	enum scsi_mode : uint8_t
 	{
 		MODE_D, // Disconnected
 		MODE_T, // Target
 		MODE_I  // Initiator
 	};
 
-	enum scsi_data_target
+	enum scsi_data_target : uint8_t
 	{
 		COMMAND_BUFFER,
 		FIFO
 	};
 
-	enum dma_direction
+	enum dma_direction : uint8_t
 	{
 		DMA_NONE,
 		DMA_IN,
@@ -137,21 +139,76 @@ private:
 		spifi_cmd_entry cmbuf[8];
 	} spifi_reg;
 
+	template<typename T>
+	class spifi_queue
+	{
+	public:
+		uint32_t head;
+		uint32_t tail;
+		uint32_t size;
+		T fifo[FIFO_SIZE];
+
+		spifi_queue() { clear_queue(); }
+
+		uint32_t get_size() { return size; }
+
+		bool empty() { return size == 0; }
+
+		bool full() { return size == FIFO_SIZE; }
+
+		void clear_queue()
+		{
+			head = 0;
+			tail = 0;
+			size = 0;
+
+			for (int i = 0; i < FIFO_SIZE; ++i)
+			{
+				fifo[i] = 0;
+			}
+		}
+
+		void push(T value)
+		{
+			if(size == FIFO_SIZE)
+			{
+				fatalerror("SPIFI3: FIFO overflow!");
+			}
+
+			fifo[tail] = value;
+			tail = (tail + 1) % FIFO_SIZE;
+			++size;
+		}
+
+		T pop()
+		{
+			if (size == 0) 
+			{
+				fatalerror("SPIFI3: FIFO underflow!");
+			}
+
+			const T removed_value = fifo[head];
+			head = (head + 1) % FIFO_SIZE;
+			--size;
+			return removed_value;
+		}
+	};
+
 	// State tracking variables
 	dma_direction dma_dir;
 	scsi_mode mode;
 	scsi_data_target xfr_data_source;
-	int state;
-	int xfr_phase;
-	int command_pos;
+	uint32_t state;
+	uint32_t xfr_phase;
+	uint32_t command_pos;
 	bool irq = false;
 	bool drq = false;
 	uint32_t tcounter;
 	uint8_t sync_period = 5; // TODO: appropriate value for SPIFI
 	uint8_t clock_conv = 2; // TODO: appropriate value for SPIFI
-	int bus_id;
-	std::queue<uint32_t> m_even_fifo;
-	std::queue<uint32_t> m_odd_fifo;
+	uint32_t bus_id;
+	spifi_queue<uint8_t> m_even_fifo;
+	spifi_queue<uint8_t> m_odd_fifo;
 	emu_timer *tm;
 
 	// I/O ports
@@ -169,26 +226,26 @@ private:
 	void function_bus_complete();
 	void bus_complete();
 	void dma_set(dma_direction dir);
-	void decrement_tcounter(int count = 1);
+	void decrement_tcounter(uint32_t count = 1);
 	bool transfer_count_zero();
-	void delay(int cycles);
-	void delay_cycles(int cycles);
+	void delay(uint32_t cycles);
+	void delay_cycles(uint32_t cycles);
 	void arbitrate();
 	void clear_fifo();
-	void auto_phase_transfer(int new_phase);
-	void start_autodata(int data_phase);
+	void auto_phase_transfer(uint32_t new_phase);
+	void start_autodata(uint32_t data_phase);
 	void start_autostat();
-	void start_automsg(int msg_phase);
+	void start_automsg(uint32_t msg_phase);
 	void start_autocmd();
-	dma_direction dma_setting(int target_id);
+	dma_direction dma_setting(uint32_t target_id);
 
 	// Register processing methods
-	int get_target_id();
-	bool autodata_active(int target_id);
-	bool autodata_in(int target_id);
-	bool autodata_out(int target_id);
-	void autostat_done(int target_id);
-	bool autostat_active(int target_id);
+	uint32_t get_target_id();
+	bool autodata_active(uint32_t target_id);
+	bool autodata_in(uint32_t target_id);
+	bool autodata_out(uint32_t target_id);
+	void autostat_done(uint32_t target_id);
+	bool autostat_active(uint32_t target_id);
 	bool automsg_active();
 	bool autocmd_active();
 

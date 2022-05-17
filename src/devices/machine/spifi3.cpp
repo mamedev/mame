@@ -38,6 +38,10 @@
 
 DEFINE_DEVICE_TYPE(SPIFI3, spifi3_device, "spifi3", "HP 1TV3-0302 SPIFI3 SCSI-2 Protocol Controller")
 
+ALLOW_SAVE_TYPE(spifi3_device::scsi_mode)
+ALLOW_SAVE_TYPE(spifi3_device::scsi_data_target)
+ALLOW_SAVE_TYPE(spifi3_device::dma_direction)
+
 namespace
 {
 	// AUXCTRL constants and functions
@@ -244,19 +248,13 @@ namespace
 		}
 		return spstat_val;
 	}
-
-	inline void clear_queue(std::queue<uint32_t>& queue)
-	{
-		while (!queue.empty())
-		{
-			queue.pop();
-		}
-	}
 }
 
 spifi3_device::spifi3_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: nscsi_device(mconfig, SPIFI3, tag, owner, clock),
 	  nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF),
+	  m_even_fifo(),
+	  m_odd_fifo(),
 	  m_irq_handler(*this),
 	  m_drq_handler(*this)
 {
@@ -266,9 +264,9 @@ void spifi3_device::device_start()
 {
 	nscsi_device::device_start();
 
-	// TODO: save_item(NAME(dma_dir));
-	// TODO: save_item(NAME(mode));
-	// TODO: save_item(NAME(xfr_data_source));
+	save_item(NAME(dma_dir));
+	save_item(NAME(mode));
+	save_item(NAME(xfr_data_source));
 	save_item(NAME(state));
 	save_item(NAME(xfr_phase));
 	save_item(NAME(command_pos));
@@ -319,8 +317,14 @@ void spifi3_device::device_start()
 	save_item(STRUCT_MEMBER(spifi_reg.cmbuf, quetag));
 	save_item(STRUCT_MEMBER(spifi_reg.cmbuf, idmsg));
 	save_item(STRUCT_MEMBER(spifi_reg.cmbuf, status));
-	// TODO: save_item(NAME(m_even_fifo));
-	// TODO: save_item(NAME(m_odd_fifo));
+	save_item(STRUCT_MEMBER(m_even_fifo, head));
+	save_item(STRUCT_MEMBER(m_even_fifo, tail));
+	save_item(STRUCT_MEMBER(m_even_fifo, size));
+	save_item(STRUCT_MEMBER(m_even_fifo, fifo));
+	save_item(STRUCT_MEMBER(m_odd_fifo, head));
+	save_item(STRUCT_MEMBER(m_odd_fifo, tail));
+	save_item(STRUCT_MEMBER(m_odd_fifo, size));
+	save_item(STRUCT_MEMBER(m_odd_fifo, fifo));
 
 	m_irq_handler.resolve_safe();
 	m_drq_handler.resolve_safe();
@@ -469,7 +473,7 @@ uint32_t spifi3_device::fifoctrl_r()
 {
 	LOGMASKED(LOG_REGISTER, "read spifi_reg.fifoctrl = 0x%x\n", spifi_reg.fifoctrl);
 
-	const auto evenCount = 8 - m_even_fifo.size();
+	const auto evenCount = FIFO_SIZE - m_even_fifo.get_size();
 	spifi_reg.fifoctrl &= ~FIFOC_FSLOT;
 	spifi_reg.fifoctrl |= evenCount & FIFOC_FSLOT;
 
@@ -490,13 +494,13 @@ void spifi3_device::fifoctrl_w(uint32_t data)
 	} // likely RO - probably fifo overrun. Whatever this is, it would cause NetBSD to panic
 	if (spifi_reg.fifoctrl & FIFOC_CLREVEN)
 	{
-		LOG("Clearing even FIFO of %d items\n", m_even_fifo.size());
-		clear_queue(m_even_fifo);
+		LOG("Clearing even FIFO of %d items\n", m_even_fifo.get_size());
+		m_even_fifo.clear_queue();
 	}
 	if (spifi_reg.fifoctrl & FIFOC_CLRODD)
 	{
-		LOG("Clearing odd FIFO of %d items\n", m_odd_fifo.size());
-		clear_queue(m_odd_fifo);
+		LOG("Clearing odd FIFO of %d items\n", m_odd_fifo.get_size());
+		m_odd_fifo.clear_queue();
 	}
 	if (spifi_reg.fifoctrl & FIFOC_FLUSH)
 	{
@@ -686,8 +690,8 @@ void spifi3_device::exctrl_w(uint32_t data)
 
 void spifi3_device::clear_fifo()
 {
-	clear_queue(m_even_fifo);
-	clear_queue(m_odd_fifo);
+	m_even_fifo.clear_queue();
+	m_odd_fifo.clear_queue();
 }
 
 void spifi3_device::prcmd_w(uint32_t data)
@@ -698,62 +702,62 @@ void spifi3_device::prcmd_w(uint32_t data)
 	const auto cmd = data & PRCMD_MASK;
 	switch (cmd)
 	{
-	case PRC_DATAOUT:
-	{
-		state = INIT_XFR;
-		xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
-
-		const dma_direction luntar_dma_setting = dma_setting(bus_id) == DMA_OUT ? DMA_OUT : DMA_NONE;
-		dma_set(luntar_dma_setting);
-		LOGMASKED(LOG_CMD, "start command DATAOUT, DMA = %d\n", luntar_dma_setting);
-		spifi_reg.spstat = SPS_DATAOUT;
-		break;
-	}
-	case PRC_DATAIN:
-	{
-		state = INIT_XFR;
-		xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
-
-		const dma_direction luntar_dma_setting = dma_setting(bus_id) == DMA_IN ? DMA_IN : DMA_NONE;
-		dma_set(luntar_dma_setting);
-		LOGMASKED(LOG_CMD, "start command DATAIN, DMA = %d\n", luntar_dma_setting);
-		spifi_reg.spstat = SPS_DATAIN;
-		break;
-	}
-	case PRC_MSGOUT:
-	case PRC_MSGIN:
-	case PRC_COMMAND:
-	case PRC_STATUS:
-	{
-		LOGMASKED(LOG_CMD, "start command %s\n", prcmd_command_names[cmd]);
-		state = INIT_XFR;
-		xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
-
-		command_pos = 0;
-		dma_set(DMA_NONE);
-		spifi_reg.spstat = prcmd_to_spstat(cmd);
-		break;
-	}
-	case PRC_TRPAD:
-	{
-		LOGMASKED(LOG_CMD, "start command TRPAD\n");
-		xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
-		if (xfr_phase & S_INP)
+		case PRC_DATAOUT:
 		{
-			state = INIT_XFR_RECV_PAD_WAIT_REQ;
+			state = INIT_XFR;
+			xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
+
+			const dma_direction luntar_dma_setting = dma_setting(bus_id) == DMA_OUT ? DMA_OUT : DMA_NONE;
+			dma_set(luntar_dma_setting);
+			LOGMASKED(LOG_CMD, "start command DATAOUT, DMA = %d\n", luntar_dma_setting);
+			spifi_reg.spstat = SPS_DATAOUT;
+			break;
 		}
-		else
+		case PRC_DATAIN:
 		{
-			state = INIT_XFR_SEND_PAD_WAIT_REQ;
+			state = INIT_XFR;
+			xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
+
+			const dma_direction luntar_dma_setting = dma_setting(bus_id) == DMA_IN ? DMA_IN : DMA_NONE;
+			dma_set(luntar_dma_setting);
+			LOGMASKED(LOG_CMD, "start command DATAIN, DMA = %d\n", luntar_dma_setting);
+			spifi_reg.spstat = SPS_DATAIN;
+			break;
 		}
-		scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
-		break;
-	}
-	default:
-	{
-		LOG("Unimplemented command %d!\n", data);
-		return;
-	}
+		case PRC_MSGOUT:
+		case PRC_MSGIN:
+		case PRC_COMMAND:
+		case PRC_STATUS:
+		{
+			LOGMASKED(LOG_CMD, "start command %s\n", prcmd_command_names[cmd]);
+			state = INIT_XFR;
+			xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
+
+			command_pos = 0;
+			dma_set(DMA_NONE);
+			spifi_reg.spstat = prcmd_to_spstat(cmd);
+			break;
+		}
+		case PRC_TRPAD:
+		{
+			LOGMASKED(LOG_CMD, "start command TRPAD\n");
+			xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
+			if (xfr_phase & S_INP)
+			{
+				state = INIT_XFR_RECV_PAD_WAIT_REQ;
+			}
+			else
+			{
+				state = INIT_XFR_SEND_PAD_WAIT_REQ;
+			}
+			scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+			break;
+		}
+		default:
+		{
+			LOG("Unimplemented command %d!\n", data);
+			return;
+		}
 	}
 
 	if (data != PRC_TRPAD)
@@ -865,7 +869,7 @@ void spifi3_device::check_drq()
 
 		case DMA_OUT: // memory to device
 		{
-			drq_state = !transfer_count_zero() && m_even_fifo.size() < 8;
+			drq_state = !transfer_count_zero() && !m_even_fifo.full();
 			break;
 		}
 	}
@@ -908,12 +912,7 @@ void spifi3_device::send_byte(scsi_data_target data_source)
 	else if (data_source == FIFO && (state & STATE_MASK) != INIT_XFR_SEND_PAD)
 	{
 		// Send next data from FIFO
-		if (m_even_fifo.empty())
-		{
-			fatalerror("spifi3_device::send_byte - Tried to send data with an empty FIFO!\n");
-		}
-		scsi_bus->data_w(scsi_refid, m_even_fifo.front());
-		m_even_fifo.pop();
+		scsi_bus->data_w(scsi_refid, m_even_fifo.pop());
 		check_drq();
 	}
 	else
@@ -978,11 +977,11 @@ void spifi3_device::dma_set(dma_direction dir)
 	// account for data already in the fifo
 	if (dir == DMA_OUT && !m_even_fifo.empty())
 	{
-		decrement_tcounter(m_even_fifo.size());
+		decrement_tcounter(m_even_fifo.get_size());
 	}
 }
 
-void spifi3_device::decrement_tcounter(int count)
+void spifi3_device::decrement_tcounter(uint32_t count)
 {
 	if (!dma_command(dma_dir))
 	{
@@ -1001,7 +1000,7 @@ void spifi3_device::decrement_tcounter(int count)
 	}
 }
 
-void spifi3_device::delay(int cycles)
+void spifi3_device::delay(uint32_t cycles)
 {
 	if (!clock_conv)
 	{
@@ -1011,7 +1010,7 @@ void spifi3_device::delay(int cycles)
 	tm->adjust(clocks_to_attotime(cycles));
 }
 
-void spifi3_device::delay_cycles(int cycles)
+void spifi3_device::delay_cycles(uint32_t cycles)
 {
 	tm->adjust(clocks_to_attotime(cycles));
 }
@@ -1034,13 +1033,8 @@ void spifi3_device::dma_w(uint8_t val)
 
 uint8_t spifi3_device::dma_r()
 {
-	LOGMASKED(LOG_DATA, "dma_r called! Fifo count = %d, state = %d.%d, tcounter = %d\n", m_even_fifo.size(), state & STATE_MASK, (state & SUB_MASK) >> SUB_SHIFT, tcounter);
-	if (m_even_fifo.empty())
-	{
-		fatalerror("spifi_3::dma_r called with empty FIFO!");
-	}
-	uint8_t val = m_even_fifo.front();
-	m_even_fifo.pop();
+	LOGMASKED(LOG_DATA, "dma_r called! Fifo count = %d, state = %d.%d, tcounter = %d\n", m_even_fifo.get_size(), state & STATE_MASK, (state & SUB_MASK) >> SUB_SHIFT, tcounter);
+	uint8_t val = m_even_fifo.pop();
 	decrement_tcounter();
 	check_drq();
 	step(false);
@@ -1059,7 +1053,7 @@ void spifi3_device::scsi_ctrl_changed()
 	step(false);
 }
 
-spifi3_device::dma_direction spifi3_device::dma_setting(int target_id)
+spifi3_device::dma_direction spifi3_device::dma_setting(uint32_t target_id)
 {
 	// TODO: LUN? That is also written to this register in NetBSD
 	//       (and probably NEWS-OS). Need to figure out how to get
@@ -1074,32 +1068,32 @@ spifi3_device::dma_direction spifi3_device::dma_setting(int target_id)
 	return result;
 }
 
-int spifi3_device::get_target_id()
+uint32_t spifi3_device::get_target_id()
 {
 	return (spifi_reg.select & SEL_TARGET) >> 4;
 }
 
-bool spifi3_device::autodata_active(int target_id)
+bool spifi3_device::autodata_active(uint32_t target_id)
 {
 	return (spifi_reg.autodata & ADATA_EN) && ((spifi_reg.autodata & ADATA_TARGET_ID) == target_id);
 }
 
-bool spifi3_device::autodata_in(int target_id)
+bool spifi3_device::autodata_in(uint32_t target_id)
 {
 	return autodata_active(target_id) && (spifi_reg.autodata & ADATA_IN);
 }
 
-bool spifi3_device::autodata_out(int target_id)
+bool spifi3_device::autodata_out(uint32_t target_id)
 {
 	return autodata_active(target_id) && !(spifi_reg.autodata & ADATA_IN);
 }
 
-void spifi3_device::autostat_done(int target_id)
+void spifi3_device::autostat_done(uint32_t target_id)
 {
 	spifi_reg.autostat &= ~(1 << target_id);
 }
 
-bool spifi3_device::autostat_active(int target_id)
+bool spifi3_device::autostat_active(uint32_t target_id)
 {
 	return spifi_reg.autostat & (1 << target_id);
 }
@@ -1123,7 +1117,7 @@ void spifi3_device::start_autostat()
 	dma_set(DMA_NONE);
 }
 
-void spifi3_device::start_automsg(int msg_phase)
+void spifi3_device::start_automsg(uint32_t msg_phase)
 {
 	LOGMASKED(LOG_AUTO, "start AUTOMSG\n");
 	state = INIT_XFR;
@@ -1142,7 +1136,7 @@ void spifi3_device::start_autocmd()
 	dma_set(DMA_NONE);
 }
 
-void spifi3_device::start_autodata(int data_phase)
+void spifi3_device::start_autodata(uint32_t data_phase)
 {
 	LOGMASKED(LOG_AUTO, "start AUTODATA\n");
 	state = INIT_XFR;
@@ -1159,7 +1153,7 @@ void spifi3_device::start_autodata(int data_phase)
  * This is called when a new xfr_phase is detected and there is the possibility of an
  * auto-progression to a new phase
  */
-void spifi3_device::auto_phase_transfer(int new_phase)
+void spifi3_device::auto_phase_transfer(uint32_t new_phase)
 {
 	if (xfr_phase == new_phase)
 	{
@@ -1657,7 +1651,7 @@ void spifi3_device::step(bool timeout)
 				case S_PHASE_MSG_IN:
 				{
 					// can't receive if the fifo is full
-					if (m_even_fifo.size() == 8 && !(xfr_phase == S_PHASE_STATUS && autostat_active(bus_id) && !(xfr_phase == S_PHASE_MSG_IN && automsg_active())))
+					if (m_even_fifo.full() && !(xfr_phase == S_PHASE_STATUS && autostat_active(bus_id) && !(xfr_phase == S_PHASE_MSG_IN && automsg_active())))
 					{
 						break;
 					}
@@ -1711,7 +1705,7 @@ void spifi3_device::step(bool timeout)
 				{
 					// Dump the remaining contents of the FIFO - at this point, the transfer counter is exhausted so whatever
 					// is left in the queue is pad byte junk read after the real data was received but before the DMA transfer completed
-					clear_queue(m_even_fifo);
+					m_even_fifo.clear_queue();
 
 					// See above
 					spifi_reg.icond = ICOND_UXPHASEZ;
@@ -1727,7 +1721,7 @@ void spifi3_device::step(bool timeout)
 				LOGMASKED(LOG_DATA, "Non-DMA transfer out complete\n");
 				auto_phase_transfer(new_phase);
 			}
-			else if (xfr_data_source == FIFO && (!dma_command(dma_dir) && ((xfr_phase & S_INP) == S_INP) && m_even_fifo.size() == 1))
+			else if (xfr_data_source == FIFO && (!dma_command(dma_dir) && ((xfr_phase & S_INP) == S_INP) && m_even_fifo.get_size() == 1))
 			{
 				LOGMASKED(LOG_DATA, "Non-DMA transfer in complete\n");
 				auto_phase_transfer(new_phase);
