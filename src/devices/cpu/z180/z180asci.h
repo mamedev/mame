@@ -50,7 +50,7 @@ public:
 	int check_interrupt() { return m_irq; }
 	void clear_interrupt() { m_irq = 0; }
 protected:
-	z180asci_channel_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	z180asci_channel_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const int id, const bool ext);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;
@@ -75,9 +75,9 @@ protected:
 	int		  m_cts;
 	int		  m_dcd;
 	int       m_irq;
-	int       m_id;
-	bool      m_ext;
 	uint32_t  m_divisor;
+	const int  m_id;
+	const bool m_ext;
 };
 
 //**************************************************************************
@@ -94,7 +94,7 @@ public:
 	void asext_w(uint8_t data) override;
 	void state_add(device_state_interface &parent) override;
 protected:
-	z180asci_channel_0(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	z180asci_channel_0(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const bool ext);
 	// device-level overrides
 	virtual void device_reset() override;
 };
@@ -113,7 +113,7 @@ public:
 	void asext_w(uint8_t data) override;
 	void state_add(device_state_interface &parent) override;
 protected:
-	z180asci_channel_1(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	z180asci_channel_1(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const bool ext);
 	// device-level overrides
 	virtual void device_reset() override;
 };
