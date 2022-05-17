@@ -97,9 +97,6 @@ z180_device::z180_device(const machine_config &mconfig, device_type type, const 
 	, m_extended_io(extended_io)
 	, m_tend0_cb(*this)
 	, m_tend1_cb(*this)
-	, m_txa0_cb(*this)
-	, m_txa1_cb(*this)
-	, m_rts0_cb(*this)
 {
 	// some arbitrary initial values
 	m_csio_trdr = 0;
@@ -148,9 +145,6 @@ void z180_device::device_resolve_objects()
 {
 	m_tend0_cb.resolve_safe();
 	m_tend1_cb.resolve_safe();
-	m_txa0_cb.resolve_safe();
-	m_txa1_cb.resolve_safe();
-	m_rts0_cb.resolve_safe();
 }
 
 #define CF  0x01
@@ -1754,21 +1748,15 @@ void z180_device::device_reset()
 void z180_device::device_add_mconfig(machine_config &config)
 {
 	Z180ASCI_CHANNEL_0(config, m_asci[0], DERIVED_CLOCK(1,2));
-	m_asci[0]->txa_handler().set(FUNC(z180_device::txa0_trampoline_w));
-	m_asci[0]->rts_handler().set(FUNC(z180_device::rts0_trampoline_w));
 
 	Z180ASCI_CHANNEL_1(config, m_asci[1], DERIVED_CLOCK(1,2));
-	m_asci[1]->txa_handler().set(FUNC(z180_device::txa1_trampoline_w));
 }
 
 void z8s180_device::device_add_mconfig(machine_config &config)
 {
 	Z180ASCI_EXT_CHANNEL_0(config, m_asci[0], DERIVED_CLOCK(1,2));
-	m_asci[0]->txa_handler().set(FUNC(z8s180_device::txa0_trampoline_w));
-	m_asci[0]->rts_handler().set(FUNC(z8s180_device::rts0_trampoline_w));
 
 	Z180ASCI_EXT_CHANNEL_1(config, m_asci[1], DERIVED_CLOCK(1,2));
-	m_asci[1]->txa_handler().set(FUNC(z8s180_device::txa1_trampoline_w));
 }
 
 void z8s180_device::device_reset()

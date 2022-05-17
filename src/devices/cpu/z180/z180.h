@@ -107,9 +107,9 @@ class z180_device : public cpu_device, public z80_daisy_chain_interface
 public:
 	auto tend0_wr_callback() { return m_tend0_cb.bind(); }
 	auto tend1_wr_callback() { return m_tend1_cb.bind(); }
-	auto txa0_wr_callback() { return m_txa0_cb.bind(); }
-	auto txa1_wr_callback() { return m_txa1_cb.bind(); }
-	auto rts0_wr_callback() { return m_rts0_cb.bind(); }
+	auto txa0_wr_callback() { return subdevice<z180asci_channel_base>("asci_0")->txa_handler(); }
+	auto txa1_wr_callback() { return subdevice<z180asci_channel_base>("asci_1")->txa_handler(); }
+	auto rts0_wr_callback() { return subdevice<z180asci_channel_base>("asci_0")->rts_handler(); }
 
 	bool get_tend0();
 	bool get_tend1();
@@ -156,10 +156,6 @@ protected:
 
 	virtual uint8_t z180_internal_port_read(uint8_t port);
 	virtual void z180_internal_port_write(uint8_t port, uint8_t data);
-
-	DECLARE_WRITE_LINE_MEMBER( txa0_trampoline_w ) { m_txa0_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( txa1_trampoline_w ) { m_txa1_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( rts0_trampoline_w ) { m_rts0_cb(state); }
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
@@ -225,8 +221,6 @@ private:
 	int m_extra_cycles;           /* extra cpu cycles */
 	uint8_t *m_cc[6];
 	devcb_write_line m_tend0_cb, m_tend1_cb;
-	devcb_write_line m_txa0_cb, m_txa1_cb;
-	devcb_write_line m_rts0_cb;
 
 	typedef void (z180_device::*opcode_func)();
 	static const opcode_func s_z180ops[6][0x100];
