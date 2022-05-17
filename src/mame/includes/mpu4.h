@@ -202,7 +202,12 @@ public:
 	void mod4oki_cashmna(machine_config &config);
 
 	void mod4oki_alt(machine_config &config);
+
 	void mod4yam(machine_config &config);
+	void mod4yam_cheatchr(machine_config &config);
+	void mod4yam_chr(machine_config &config);
+
+
 	void mpu4_common(machine_config &config);
 	void mpu4_common2(machine_config &config);
 	void mpu4crys(machine_config &config);
@@ -235,7 +240,6 @@ public:
 
 	void mod4yam_m4addr(machine_config &config);
 	void mod4yam_gambal(machine_config &config);
-	void mod4yam_supst(machine_config &config);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;

@@ -37,18 +37,10 @@ ROM_START( m4rltst )
 ROM_END
 
 
-
-
-
 ROM_START( m4addrd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dal12.bin", 0x0000, 0x010000, CRC(4affa79a) SHA1(68bceab42b3616641a34a64a83306175ffc1ce32) )
 ROM_END
-
-
-
-
-
 
 
 ROM_START( m4amhiwy )
@@ -61,13 +53,6 @@ ROM_START( m4amhiwy )
 ROM_END
 
 
-
-
-
-
-
-
-
 ROM_START( m4blkwhd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dbw11.bin", 0x0000, 0x010000, CRC(337aaa2c) SHA1(26b12ea3ada9668293c6b44d62458590e5b4ac8f) )
@@ -77,11 +62,11 @@ ROM_START( m4blkwhd )
 ROM_END
 
 
-
 ROM_START( m4blkbul )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cbb08.epr", 0x0000, 0x010000, CRC(09376df6) SHA1(ba3b101accb6bbfbf75b9d22621dbda4efcb7769) )
 ROM_END
+
 
 ROM_START( m4blkcat )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -95,11 +80,6 @@ ROM_START( m4blkcat )
 ROM_END
 
 
-
-
-
-
-
 ROM_START( m4bluedm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dbd10.bin", 0x0000, 0x010000, CRC(b75e319d) SHA1(8b81e852e318cfde1f5ff2123e1ef7076b208253) )
@@ -109,8 +89,6 @@ ROM_START( m4bluedm )
 ROM_END
 
 
-
-
 ROM_START( m4brook )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "brkl10.epr", 0x0000, 0x010000, CRC(857255b3) SHA1(cfd77918a19b2532a02b8bb3fa8e2716db31fb0e) )
@@ -118,7 +96,6 @@ ROM_START( m4brook )
 	ROM_REGION( 0x100000, "msm6376", 0 )
 	ROM_LOAD( "brkl_snd.epr", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
 ROM_END
-
 
 
 ROM_START( m4bucks )
@@ -164,9 +141,6 @@ ROM_START( m4calicld )
 ROM_END
 
 
-
-
-
 ROM_START( m4casmul )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "casinomultiplay.bin", 0x0000, 0x010000, CRC(2ebd1800) SHA1(d15e2593d17d8db9c6946af3366cf429ad291f76) )
@@ -196,7 +170,6 @@ ROM_START( m4casot )
 	ROM_REGION( 0x100000, "msm6376", 0 )
 	ROM_LOAD( "cassound.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) ) // ( aka b&wsound.bin )
 ROM_END
-
 
 
 ROM_START( m4jpmcla )
@@ -277,24 +250,11 @@ ROM_START( m4chaseig )
 ROM_END
 
 
-
-
-
-
 ROM_START( m4c9c )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cncs.p1", 0x0000, 0x010000, CRC(10f15e2a) SHA1(c17ab13764d74302246984245485cb7692913b44) )
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) // should this set have an OKI?
 ROM_END
-
-
-
-
-
-
-
-
-
 
 
 #define M4CLBVEG_EXTRAS \
@@ -350,8 +310,6 @@ ROM_START( m4clbxb )
 	ROM_LOAD( "clx12f.p1", 0x0000, 0x020000, CRC(3e6a82fe) SHA1(01ef9a15a3cf9b1191c573b36fb5758e79c3adc1) )
 	M4CLBX_EXTRAS
 ROM_END
-
-
 
 
 ROM_START( m4crzjk )
@@ -501,10 +459,6 @@ ROM_START( m4dracb )
 ROM_END
 
 
-
-
-
-
 ROM_START( m4exgam )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "czep30.bin", 0x0000, 0x010000, CRC(4614e6f6) SHA1(5602a68e9b47394cb31bbcd49a9920e19af6242f) )
@@ -541,10 +495,6 @@ ROM_START( m4fortcbb )
 ROM_END
 
 
-
-
-
-
 ROM_START( m4frtgm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "fruit.bin", 0x0000, 0x010000, CRC(dbe44316) SHA1(15cd49dd2e6166f7a7668663f7fea802d6cbb12f) )
@@ -552,14 +502,6 @@ ROM_START( m4frtgm )
 	ROM_REGION( 0x800000, "msm6376", 0 ) // this isn't OKI, or is corrupt (bad size)
 	ROM_LOAD( "fruitsnd.bin", 0x0000, 0x010000, CRC(86547dc7) SHA1(4bf64f22e84c0ee82d961b0ba64932b8bf6a521f) ) // matches 'Replay' on SC1 hardware, probably just belongs there.. or this is eurocoin with different sound hw here?
 ROM_END
-
-
-
-
-
-
-
-
 
 
 
@@ -578,9 +520,6 @@ ROM_START( m4gldjok )
 	ROM_REGION( 0x100000, "msm6376", 0 )
 	ROM_LOAD( "sdgj.snd", 0x0000, 0x080000, CRC(b6cd118b) SHA1(51c5d694ed0dfde8d3fd682f2471d83eec236736) )
 ROM_END
-
-
-
 
 
 
@@ -644,9 +583,6 @@ ROM_START( m4hirisee )
 ROM_END
 
 
-
-
-
 ROM_START( m4holdtm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dht10.hex", 0x0000, 0x010000, CRC(217d382b) SHA1(a27dd107c554d4787967633dff998d3962ee0ea5) )
@@ -658,10 +594,6 @@ ROM_START( m4holdtm )
 	ROM_REGION( 0x100000, "msm6376", 0 )
 	ROM_LOAD( "sun01.hex", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
 ROM_END
-
-
-
-
 
 
 ROM_START( m4jok300 )
@@ -681,11 +613,6 @@ ROM_START( m4jokmil )
 ROM_END
 
 
-
-
-
-
-
 ROM_START( m4joljokh )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jollyjokerhungarian.bin", 0x0000, 0x010000, CRC(85b6a406) SHA1(e277f9d3b62faead04d65efbc06de7f4a50ae38d) )
@@ -693,13 +620,6 @@ ROM_START( m4joljokh )
 	ROM_REGION( 0x100000, "msm6376", 0 )
 	ROM_LOAD( "jollyjokerhungariansnd.bin", 0x0000, 0x080000, CRC(93460383) SHA1(2b179a1dde09ebdfe8c84641899df7be87d443e5) )
 ROM_END
-
-
-
-
-
-
-
 
 
 ROM_START( m4lineup )
@@ -793,8 +713,6 @@ ROM_START( m4luckwbf )
 ROM_END
 
 
-
-
 ROM_START( m4magdrg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dmd10.bin", 0x0000, 0x010000, CRC(9cc4f2f8) SHA1(46a90ffa18d35ad2b06542f91120c02bc34f0c40) )
@@ -819,15 +737,6 @@ ROM_START( m4magrep )
 	ROM_REGION( 0x100000, "msm6376", 0 )
 	ROM_LOAD( "mrdsound.bin", 0x000000, 0x080000, CRC(9b035fa6) SHA1(51b7e5bc3abdf4f1beba2347146a91a2b3f4de35) )
 ROM_END
-
-
-
-
-
-
-
-
-
 
 
 ROM_START( m4nspot )
@@ -857,8 +766,6 @@ ROM_START( m4nile )
 ROM_END
 
 
-
-
 ROM_START( m4nudshf )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nusx.p1", 0x0000, 0x010000, CRC(87caab84) SHA1(e2492ad0d25ded4d760c4cbe05e9b51ca1a10544) )
@@ -878,7 +785,6 @@ ROM_START( m4nudshfc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nusxc.p1", 0x0000, 0x010000, CRC(e2557b45) SHA1(a9d1514d4fe3897f6fcef22a5039d6bdff8126ff) )
 ROM_END
-
 
 
 ROM_START( m4ordmnd )
@@ -902,9 +808,6 @@ ROM_START( m4ptblkc )
 ROM_END
 
 
-
-
-
 ROM_START( m4prem )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dpm14.bin", 0x0000, 0x010000, CRC(de344759) SHA1(d3e7514da83bbf1eba63661fb0675a6230af93cd) )
@@ -914,23 +817,6 @@ ROM_START( m4prem )
 ROM_END
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ROM_START( m4rdht )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "drh12", 0x0000, 0x010000, CRC(b26cd308) SHA1(4e29f6cce773232a1c43cd2fb3ce9b844c446bb8) ) // aka gdjb
@@ -938,11 +824,6 @@ ROM_START( m4rdht )
 	ROM_REGION( 0x100000, "msm6376", 0 )
 	ROM_LOAD( "drh_1.snd", 0x0000, 0x080000, CRC(f652cd0c) SHA1(9ce986bc12bcf22a57e065329e82671d19cc96d7) ) // aka gn.snd
 ROM_END
-
-
-
-
-
 
 
 ROM_START( m4rwb )
@@ -955,10 +836,6 @@ ROM_START( m4rwb )
 ROM_END
 
 
-
-
-
-
 ROM_START( m4magtbo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "crmtb14.epr", 0x0000, 0x010000, CRC(79e1746c) SHA1(794317f3aba7b1a7994cde89d81abc2b687d0821) )
@@ -969,11 +846,6 @@ ROM_START( m4magtbo )
 	ROM_REGION( 0x100000, "msm6376", 0 )
 	ROM_LOAD( "scrmtb.snd", 0x000000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
 ROM_END
-
-
-
-
-
 
 
 ROM_START( m4reeltm )
@@ -996,10 +868,6 @@ ROM_START( m4ringfr )
 ROM_END
 
 
-
-
-
-
 ROM_START( m4roadrn )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dro19", 0x0000, 0x010000, CRC(8b591766) SHA1(df156390b427e31cdda64826a6c1d2457c915f25) )
@@ -1008,8 +876,6 @@ ROM_START( m4roadrn )
 	ROM_LOAD( "dro_1.snd", 0x000000, 0x080000, CRC(895cfe63) SHA1(02134e149cef3526bbdb6cb93ef3efa283b9d6a2) )
 	ROM_LOAD( "dro_2.snd", 0x080000, 0x080000, CRC(1d5c8d4f) SHA1(15c18ae7286807cdc0feb825b958eae808445690) )
 ROM_END
-
-
 
 
 ROM_START( m4royjwl )
@@ -1022,7 +888,6 @@ ROM_START( m4royjwl )
 ROM_END
 
 
-
 ROM_START( m4salsa )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dsa15.epr", 0x0000, 0x010000, CRC(22b60b0b) SHA1(4ad184d1557bfd01650684ea9d8ad794fded65f7) )
@@ -1030,10 +895,6 @@ ROM_START( m4salsa )
 	ROM_REGION( 0x100000, "msm6376", 0 )
 	ROM_LOAD( "dsa_1@97c2.snd", 0x0000, 0x080000, CRC(0281a6dd) SHA1(a35a8cd0da32c51f77856ea3eeff7c58fd032333) )
 ROM_END
-
-
-
-
 
 
 ROM_START( m4showtm )
@@ -1045,31 +906,6 @@ ROM_START( m4showtm )
 ROM_END
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ROM_START( m4steptm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dst11.bin", 0x0000, 0x010000, CRC(3960f210) SHA1(c7c4fe74cb9a53eaa9114a84240de3bce4ffe75e) )
@@ -1077,11 +913,6 @@ ROM_START( m4steptm )
 	ROM_REGION( 0x080000, "msm6376", 0 )
 	ROM_LOAD( "sdun01.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
 ROM_END
-
-
-
-
-
 
 
 #define M4SUPBJC_EXTRAS \
@@ -1137,11 +968,6 @@ ROM_START( m4supbfa )
 ROM_END
 
 
-
-
-
-
-
 ROM_START( m4take5 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "take5.bin", 0x0000, 0x020000, CRC(24beb7d6) SHA1(746beccaf57fd0c54c8cf8d742b8ef50563a40fd) )
@@ -1150,8 +976,6 @@ ROM_START( m4take5 )
 	ROM_LOAD( "tfive1.hex", 0x000000, 0x080000, CRC(70f16892) SHA1(e6448831d3ce7fa251b40023bc7d5d6dee9d6793) )
 	ROM_LOAD( "tfive2.hex", 0x080000, 0x080000, CRC(5fc888b0) SHA1(8d50ee4f36bd36aed5d0e7a77f76bd6caffc6376) )
 ROM_END
-
-
 
 
 #define M4TECHNO_EXTRAS \
@@ -1171,18 +995,10 @@ ROM_START( m4technoa )
 ROM_END
 
 
-
-
-
-
-
-
 ROM_START( m4toma )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dtk23.bin", 0x0000, 0x010000, CRC(ffba2b96) SHA1(c7635023ac5181e661e808c6b44ac1add58f4f56) )
 ROM_END
-
-
 
 
 ROM_START( m4topdk )
@@ -1196,7 +1012,6 @@ ROM_START( m4toprn )
 	ROM_LOAD( "toprun_v1_1.bin", 0xc000, 0x004000, CRC(9b924324) SHA1(7b155467f30cc22f7cda301ae770fb2a889c9c66) )
 	ROM_LOAD( "toprun_v1_2.bin", 0x8000, 0x004000, CRC(940fafa9) SHA1(2a8b669c51c8df50710bd8b552ab30a5d1a136ab) )
 ROM_END
-
 
 
 #define M4TOPTIM_EXTRAS \
@@ -1217,9 +1032,6 @@ ROM_START( m4toptima )
 	ROM_LOAD( "dtt2-1.bin", 0x0000, 0x010000, CRC(f9c84a34) SHA1(ad654442f580d6a49658f0e4e39bacbd9d0d0018) )
 	M4TOPTIM_EXTRAS
 ROM_END
-
-
-
 
 
 #define M4TROPCL_EXTRAS \
@@ -1283,17 +1095,6 @@ ROM_START( m4tbplayb )
 ROM_END
 
 
-
-
-
-
-
-
-
-
-
-
-
 ROM_START( m4twintm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "d2t11.bin", 0x0000, 0x010000, CRC(6a76ac6f) SHA1(824912ff1fc3155d11d32b597be53481532fdf5e) )
@@ -1322,8 +1123,6 @@ ROM_START( m4twistb )
 ROM_END
 
 
-
-
 ROM_START( m4univ )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dun20", 0x0000, 0x010000, CRC(6a845d4d) SHA1(82bfc3f3a0ede76a4d482efc71b0390610db7acf) )
@@ -1336,8 +1135,6 @@ ROM_START( m4univ )
 ROM_END
 
 
-
-
 ROM_START( m4vegastg )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "vs.p1", 0x0000, 0x020000, CRC(4099d572) SHA1(91a7c1575013e61c754b2c2cb841e7687b76d7f9) )
@@ -1347,10 +1144,6 @@ ROM_START( m4vegastg )
 ROM_END
 
 
-
-
-
-
 ROM_START( m4vivalvd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dlv11.bin", 0x0000, 0x010000, CRC(a890184c) SHA1(26d9952bf2eb4b55d21cdb934ffc73ff1a1cfbac) )
@@ -1358,18 +1151,6 @@ ROM_START( m4vivalvd )
 	ROM_REGION( 0x080000, "msm6376", 0 )
 	ROM_LOAD( "vegssnd.bin", 0x0000, 0x080000, CRC(93fd4253) SHA1(69feda7ffc56defd515c9cd1ce204af3d9731a3f) )
 ROM_END
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 ROM_START( m4wildtm )
@@ -1394,22 +1175,6 @@ ROM_START( m4ch30 )
 ROM_END
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ROM_START( m4czne )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "czone 6.bin", 0x0000, 0x010000, CRC(e5b2b64e) SHA1(b73a2aed7b04184bc7c5c3d0a11d44e624a47428) )
@@ -1424,10 +1189,6 @@ ROM_START( m4holywd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "hollywood 5p.bin", 0x0000, 0x010000, CRC(fb4ebb6e) SHA1(1ccfa81c173011ce70640097c85b532fd44f5a6e) )
 ROM_END
-
-
-
-
 
 
 #define M4LAZY_EXTRAS \
@@ -1453,33 +1214,10 @@ ROM_START( m4lazyb )
 ROM_END
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ROM_START( m4specu )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "speculator.bin", 0x8000, 0x008000, CRC(4035d20c) SHA1(4a534294c5c7332eacd09ca44f351d6a6850cc29) )
 ROM_END
-
-
-
-
-
-
-
 
 
 ROM_START( m4sunclb )
@@ -1491,7 +1229,6 @@ ROM_START( m4sunclba )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sucxed_0.2", 0x0000, 0x010000, CRC(70802bc3) SHA1(69b36f716cb608931f933cb58e47232b18064f9d) )
 ROM_END
-
 
 
 ROM_START( m4sunscl )
@@ -1508,8 +1245,6 @@ ROM_START( m4sunsclb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sc_xef__.3_3", 0x0000, 0x010000, CRC(8e7e1100) SHA1(7648ea860a546081388a213845e27312730f46d9) )
 ROM_END
-
-
 
 
 /* Vifico MPU4 games.
@@ -1637,7 +1372,6 @@ ROM_START( m4aao )
 ROM_END
 
 
-
 ROM_START( m4bandgd )
 	ROM_REGION( 0x020000, "maincpu", 0 )
 	ROM_LOAD( "bog.bin", 0x0000, 0x020000, CRC(21186fb9) SHA1(3d536098c7541cbdf02d68a18a38cae71155d7ff) )
@@ -1645,7 +1379,6 @@ ROM_START( m4bandgd )
 	ROM_REGION( 0x080000, "msm6376", 0 )
 	ROM_LOAD( "bandsofgoldsnd.bin", 0x0000, 0x080000, CRC(95c6235f) SHA1(a13afa048b73fabfad229b5c2f8ef5ee9948d9fb) )
 ROM_END
-
 
 
 ROM_START( m4bigben )
@@ -1676,7 +1409,6 @@ ROM_START( m4bigbenb )
 ROM_END
 
 
-
 ROM_START( m4bigbend )
 	ROM_REGION( 0x010000, "maincpu", 0 )
 	ROM_LOAD( "bb_2_1.bin", 0x0000, 0x010000, CRC(d3511805) SHA1(c86756998d36e729874c71a5d6442785069c57e9) )
@@ -1694,9 +1426,6 @@ ROM_START( m4bigbene )
 	ROM_LOAD( "big-bensnd1.bin", 0x000000, 0x080000, CRC(e41c3ec1) SHA1(a0c09f51229afcd14f09bb9080d4f3bb198b2050) )
 	ROM_LOAD( "big-bensnd2.bin", 0x080000, 0x080000, CRC(ed71dbe1) SHA1(e67ca3c178caacb99118bacfcd7612e699f40455) )
 ROM_END
-
-
-
 
 
 ROM_START( m4boltbl )
@@ -1740,7 +1469,6 @@ ROM_START( m4snookr )
 ROM_END
 
 
-
 ROM_START( m4stakex )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "stakex.bin", 0x0000, 0x010000, CRC(098c7117) SHA1(27f04cfb88ef870fc30afd055cf32ffe448275ea) )
@@ -1762,14 +1490,6 @@ ROM_START( m4stand2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "stand 2 del 8.bin", 0x08000, 0x08000, CRC(a9a5edc7) SHA1(035d3f3b3373cec475753f1b0de2f4db48d6d288) )
 ROM_END
-
-
-
-
-
-
-
-
 
 
 ROM_START( m4bigban )
@@ -1820,14 +1540,6 @@ ROM_START( m4sctagt )
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
 	// Missing?
 ROM_END
-
-
-
-
-
-
-
-
 
 
 ROM_START( m4cld02 )
@@ -1882,7 +1594,6 @@ ROM_START( m4matdr )
 ROM_END
 
 
-
 ROM_START( m4hslo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "hot30", 0x0000, 0x010000, CRC(62f2c420) SHA1(5ae89a1b585738255e8d9ae153c3c63b4a2893e4) )
@@ -1927,7 +1638,6 @@ ROM_START( m4sbxe )
 	ROM_LOAD( "superbea.10p", 0x8000, 0x008000, CRC(70020466) SHA1(473c9feb9ce0024b870612af19ec8a47a7798506) )
 	M4SBX_EXTRAS
 ROM_END
-
 
 
 ROM_START( m4bclimb )
@@ -2142,19 +1852,6 @@ ROM_START( m4riotrp )
 ROM_END
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 #define M4SURF_EXTRAS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
 	ROM_LOAD( "s_surf.sn1", 0x000000, 0x080000, CRC(f20a7d69) SHA1(7887230613b497dc71a60125dd1e265ebbc8eb23) ) \
@@ -2315,12 +2012,6 @@ ROM_START( m4hapfrtb )
 ROM_END
 
 
-
-
-
-
-
-
 ROM_START( m4sunday )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "sunday_sport_v11", 0x0000, 0x010000, CRC(14147d59) SHA1(03b14f4f83a545b3252702267ac012b3be76013d) )
@@ -2348,16 +2039,12 @@ ROM_START( m4cbing )
 ROM_END
 
 
-
 ROM_START( m4nod )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nod.bin", 0x0000, 0x010000, CRC(bc738af5) SHA1(8df436139554ccfb48c4db0a32e3333dbf3c4f46) )
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) //region was called "upd" but machine is mod4oki? Which one is correct?
 	ROM_LOAD( "nodsnd.bin", 0x0000, 0x080000, CRC(2134494a) SHA1(3b665bf79567a71195b20e76c50b02707d15b78d) )
 ROM_END
-
-
-
 
 
 ROM_START( m4aliz )
@@ -2374,8 +2061,6 @@ ROM_START( m4aliz )
 ROM_END
 
 
-
-
 ROM_START( m4c2 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "ci2-0601.bin", 0x0000, 0x010000, CRC(84cc8aca) SHA1(1471e3ad9c9ba957b6cc99c204fe588cc55fbc50) )
@@ -2390,9 +2075,6 @@ ROM_START( m4coney )
 ROM_END
 
 
-
-
-
 ROM_START( m4goldnn )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "goldenyears10.bin", 0x0000, 0x020000, CRC(1074bac6) SHA1(967ee64f267a80017fc95bbc6c5a38354e9cab65) )
@@ -2402,10 +2084,6 @@ ROM_START( m4goldnn )
 	ROM_LOAD( "tgyosnd.p2", 0x080000, 0x080000, CRC(43d28a0a) SHA1(5863e493e84641e4fabcd69e6402e3bcca87dde2) )
 	ROM_LOAD( "tgyosnd.p3", 0x100000, 0x080000, CRC(b5b9eb68) SHA1(8d5a0a687dd7096da8dfd2a59c6fe96f4b1949f9) )
 ROM_END
-
-
-
-
 
 
 ROM_START( m4mgpn )
@@ -2420,21 +2098,11 @@ ROM_START( m4mgpn )
 ROM_END
 
 
-
-
-
-
-
-
 ROM_START( m4spotln )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "gsp01.p1", 0x0000, 0x020000, CRC(54c56a07) SHA1(27f21872a7ffe0c497983fa5bbb59e967bf48974) )
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
 ROM_END
-
-
-
-
 
 
 ROM_START( m4vivan )
@@ -2445,11 +2113,6 @@ ROM_START( m4vivan )
 	ROM_LOAD( "vlvsound1.bin", 0x0000, 0x080000, CRC(ce4da47a) SHA1(7407f8053ee482db4d8d0732fdd7229aa531b405) )
 	ROM_LOAD( "vlvsound2.bin", 0x0000, 0x080000, CRC(571c00d1) SHA1(5e7be40d3caae88dc3a580415f8ab796f6efd67f) )
 ROM_END
-
-
-
-
-
 
 
 ROM_START( m4sunseta )
@@ -2481,7 +2144,6 @@ ROM_START( m4funh )
 	ROM_LOAD( "funhouse.bin", 0x00000, 0x10000, CRC(4e342025) SHA1(288125ff5e3da7249d89dfcc3cd0915f791f7d43) )
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) // no idea if it uses an OKI
 ROM_END
-
 
 
 // Not the same as Barcrest Everyone's A Winner? has "(C) J.A. Brown 1991" in the ROM
@@ -2869,4 +2531,4 @@ GAME(199?, m4sunseta, m4sunset,   mod4oki,    mpu4,    mpu4_state, init_m4defaul
 GAME(199?, m4sunsetb, m4sunset,   mod4oki,    mpu4,    mpu4_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (B25 1.2, set 2)",GAME_FLAGS )
 GAME(199?, m4sunsetc, m4sunset,   mod4oki,    mpu4,    mpu4_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (OSB 0.2)",GAME_FLAGS ) // might be a mod 2
 
-GAME(1991, m4eaw51,   0,          mod2,       mpu4,    mpu4_state, init_m4default, ROT0, "<unknown>", "Everyone's A Winner (EAW5.1, J.A. Brown) (MPU4)", GAME_FLAGS )
+GAME(1991, m4eaw51,   0,          mod2,       mpu4,    mpu4_state, init_m4default, ROT0, "<unknown>", "Everyone's A Winner (EAW 5.1, J.A. Brown) (MPU4)", GAME_FLAGS )

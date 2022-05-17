@@ -2830,6 +2830,22 @@ void mpu4_state::mod4yam(machine_config &config)
 	m_ym2413->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
 
+void mpu4_state::mod4yam_cheatchr(machine_config &config)
+{
+	mod4yam(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+//	m_characteriser->set_lamp_table(xxx_lamp_scramble);
+}
+
+void mpu4_state::mod4yam_chr(machine_config &config)
+{
+	mod4yam(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+}
+
+
 void mpu4_state::mod4oki(machine_config &config)
 {
 	mpu4base(config);
