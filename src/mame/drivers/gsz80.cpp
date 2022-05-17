@@ -98,11 +98,6 @@ ROM_START(gsz80)
 	ROM_LOAD("gsz80.bin",   0x0000, 0x2000, CRC(6f4bc7e5) SHA1(9008fe3b9754ec5537b3ad90f748096602ba008e))
 ROM_END
 
-ROM_START(rc2014mini)
-	ROM_REGION( 0x10000, "maincpu",0 )
-	ROM_LOAD( "r0000009.bin",    0x0000, 0x10000, CRC(3fb1ced7) SHA1(40a030b931ebe6cca654ce056c228297f245b057))
-ROM_END
-
 } // anonymous namespace
 
 
