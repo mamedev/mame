@@ -192,6 +192,7 @@ public:
 
 	void mod4oki(machine_config &config);
 	void mod4oki_chr(machine_config& config);
+	void mod4oki_cheatchr(machine_config& config);
 
 	void mod4oki_5r(machine_config &config);
 	void mod4oki_5r_chr(machine_config &config);
