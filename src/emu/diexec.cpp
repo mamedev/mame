@@ -475,7 +475,7 @@ void device_execute_interface::interface_post_reset()
 //  information for this device
 //-------------------------------------------------
 
-void device_execute_interface::interface_clock_changed()
+void device_execute_interface::interface_clock_changed(bool sync_on_new_clock_domain)
 {
 	// a clock of zero disables the device
 	if (device().clock() == 0)
@@ -491,6 +491,10 @@ void device_execute_interface::interface_clock_changed()
 	// recompute cps and spc
 	m_cycles_per_second = clocks_to_cycles(device().clock());
 	m_attoseconds_per_cycle = HZ_TO_ATTOSECONDS(m_cycles_per_second);
+
+	// resynchronize the localtime to the clock domain when asked to
+	if (sync_on_new_clock_domain)
+		m_localtime = attotime::from_ticks(m_localtime.as_ticks(device().clock())+1, device().clock());
 
 	// update the device's divisor
 	s64 attos = m_attoseconds_per_cycle;
