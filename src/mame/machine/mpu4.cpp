@@ -1578,7 +1578,7 @@ INPUT_PORTS_START( mpu4 )
 	PORT_DIPNAME( 0x04, 0x00, "Scottish Coin Handling" ) PORT_DIPLOCATION("DIL2:03")//20p payout
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x08, 0x08, "Out of Credit Display Inhibit" ) PORT_DIPLOCATION("DIL2:04")  // many games need this on to boot
+	PORT_DIPNAME( 0x08, 0x00, "Out of Credit Display Inhibit" ) PORT_DIPLOCATION("DIL2:04")  // many games need this 'OFF' to display attract cycles
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
 	PORT_DIPNAME( 0x10, 0x00, "OCD Audio Enable" ) PORT_DIPLOCATION("DIL2:05")
