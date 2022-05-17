@@ -232,7 +232,6 @@ private:
 	u8 m_stop_enabled;
 
 	void pia_lpt_pa_w(u8 data);
-	int pia_lpt_ca1_r();
 	void pia_lpt_ca2_w(int state);
 	uint8_t pia_lpt_pb_r();
 	uint8_t m_printer_data;
@@ -549,12 +548,6 @@ void exorciser_state::pia_lpt_pa_w(u8 data)
 	m_printer_data = data;
 }
 
-int exorciser_state::pia_lpt_ca1_r()
-{
-	// External parallel printer busy input.
-	return 0;
-}
-
 void exorciser_state::pia_lpt_ca2_w(int state)
 {
 	// External parallel printer data ready.
@@ -706,7 +699,7 @@ void exorciser_state::exorciser(machine_config &config)
 	// MEX68PI Parallel printer port
 	PIA6821(config, m_pia_lpt, 0);
 	m_pia_lpt->writepa_handler().set(FUNC(exorciser_state::pia_lpt_pa_w));
-	m_pia_lpt->readca1_handler().set(FUNC(exorciser_state::pia_lpt_ca1_r));
+	m_pia_lpt->ca1_w(0); // External parallel printer busy input.
 	m_pia_lpt->ca2_handler().set(FUNC(exorciser_state::pia_lpt_ca2_w));
 	m_pia_lpt->readpb_handler().set(FUNC(exorciser_state::pia_lpt_pb_r));
 
