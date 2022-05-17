@@ -782,7 +782,7 @@ void cpu16_device::pshm_step(int n)
 			m_tmp = m_d;
 			break;
 		}
-		[[fall_through]];
+		[[fallthrough]];
 
 	case 1:
 		if (BIT(m_fetch_pipe[2], 1))
@@ -791,7 +791,7 @@ void cpu16_device::pshm_step(int n)
 			m_tmp = m_e;
 			break;
 		}
-		[[fall_through]];
+		[[fallthrough]];
 
 	case 2:
 		if (BIT(m_fetch_pipe[2], 2))
@@ -800,7 +800,7 @@ void cpu16_device::pshm_step(int n)
 			m_tmp = get_ix(0);
 			break;
 		}
-		[[fall_through]];
+		[[fallthrough]];
 
 	case 3:
 		if (BIT(m_fetch_pipe[2], 3))
@@ -809,7 +809,7 @@ void cpu16_device::pshm_step(int n)
 			m_tmp = get_ix(1);
 			break;
 		}
-		[[fall_through]];
+		[[fallthrough]];
 
 	case 4:
 		if (BIT(m_fetch_pipe[2], 4))
@@ -818,7 +818,7 @@ void cpu16_device::pshm_step(int n)
 			m_tmp = get_ix(2);
 			break;
 		}
-		[[fall_through]];
+		[[fallthrough]];
 
 	case 5:
 		if (BIT(m_fetch_pipe[2], 5))
@@ -827,7 +827,7 @@ void cpu16_device::pshm_step(int n)
 			m_tmp = get_k();
 			break;
 		}
-		[[fall_through]];
+		[[fallthrough]];
 
 	case 6:
 		if (BIT(m_fetch_pipe[2], 6))
@@ -836,7 +836,7 @@ void cpu16_device::pshm_step(int n)
 			m_tmp = m_ccr;
 			break;
 		}
-		[[fall_through]];
+		[[fallthrough]];
 
 	default:
 		m_sequence = seq::PSHM_8;
