@@ -25,25 +25,15 @@ public:
 	void init_trucocl();
 
 protected:
-	enum
-	{
-		TIMER_DAC_IRQ
-	};
-
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	TIMER_CALLBACK_MEMBER(dac_irq);
 
 private:
-	int m_cur_dac_address = 0;
-	int m_cur_dac_address_index = 0;
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_colorram;
-	tilemap_t *m_bg_tilemap = nullptr;
-
-	uint8_t m_irq_mask = 0;
-	emu_timer *m_dac_irq_timer = nullptr;
+	void main_map(address_map &map);
+	void main_io(address_map &map);
 
 	void irq_enable_w(uint8_t data);
 	void trucocl_videoram_w(offs_t offset, uint8_t data);
@@ -53,12 +43,19 @@ private:
 	void trucocl_palette(palette_device &palette) const;
 	uint32_t screen_update_trucocl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(trucocl_interrupt);
+
+	int m_cur_dac_address = 0;
+	int m_cur_dac_address_index = 0;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	tilemap_t *m_bg_tilemap = nullptr;
+
+	uint8_t m_irq_mask = 0;
+	emu_timer *m_dac_irq_timer = nullptr;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_byte_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
-
-	void main_map(address_map &map);
-	void main_io(address_map &map);
 };
 
 #endif // MAME_INCLUDES_TRUCOCL_H

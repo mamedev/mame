@@ -64,7 +64,7 @@ void m3745x_device::device_start()
 
 	for (int i = TIMER_1; i <= TIMER_3; i++)
 	{
-		m_timers[i] = timer_alloc(i);
+		m_timers[i] = machine().scheduler().timer_alloc(timer_expired_delegate());
 	}
 	m_timers[TIMER_ADC] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m3745x_device::adc_complete), this));
 

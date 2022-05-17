@@ -43,7 +43,7 @@ K051316_CB_MEMBER(rollerg_state::zoom_callback)
 
 ***************************************************************************/
 
-uint32_t rollerg_state::screen_update_rollerg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rollerg_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int bg_colorbase = 16;
 

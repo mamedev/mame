@@ -324,6 +324,9 @@ private:
 	u32                     m_cycles_per_second;        // cycles per second, adjusted for multipliers
 	attoseconds_t           m_attoseconds_per_cycle;    // attoseconds per adjusted clock cycle
 
+	emu_timer *             m_spin_end_timer;           // timer for triggering the end of spin_until_time
+	emu_timer *             m_pulse_end_timers[MAX_INPUT_LINES]; // timer for ending input-line pulses
+
 	// callbacks
 	TIMER_CALLBACK_MEMBER(timed_trigger_callback) { trigger(param); }
 

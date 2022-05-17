@@ -223,25 +223,25 @@ TIMER_CALLBACK_MEMBER( t5182_device::setirq_callback )
 
 void t5182_device::sound_irq_w(uint8_t data)
 {
-	synchronize(SETIRQ_CB, CPU_ASSERT);
+	m_setirq_cb->adjust(attotime::zero, CPU_ASSERT);
 }
 
 void t5182_device::ym2151_irq_ack_w(uint8_t data)
 {
-	synchronize(SETIRQ_CB, YM2151_ACK);
+	m_setirq_cb->adjust(attotime::zero, YM2151_ACK);
 }
 
 void t5182_device::cpu_irq_ack_w(uint8_t data)
 {
-	synchronize(SETIRQ_CB, CPU_CLEAR);
+	m_setirq_cb->adjust(attotime::zero, CPU_CLEAR);
 }
 
 WRITE_LINE_MEMBER(t5182_device::ym2151_irq_handler)
 {
 	if (state)
-		synchronize(SETIRQ_CB, YM2151_ASSERT);
+		m_setirq_cb->adjust(attotime::zero, YM2151_ASSERT);
 	else
-		synchronize(SETIRQ_CB, YM2151_CLEAR);
+		m_setirq_cb->adjust(attotime::zero, YM2151_CLEAR);
 }
 
 uint8_t t5182_device::sharedram_semaphore_snd_r()

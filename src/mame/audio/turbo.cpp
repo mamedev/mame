@@ -61,6 +61,10 @@ if (!((data >> 4) & 1)) osd_printf_debug("/TRIG4\n");
 //  osel = (osel & 6) | ((data >> 5) & 1);
 //  update_samples(samples);
 }
+#else
+TIMER_CALLBACK_MEMBER(turbo_state::update_sound_a)
+{
+}
 #endif
 
 
@@ -112,7 +116,7 @@ void turbo_state::sound_a_w(uint8_t data)
 #else
 
 	if (((data ^ m_last_sound_a) & 0x1e) && (m_last_sound_a & 0x1e) != 0x1e)
-		machine().scheduler().timer_set(attotime::from_hz(20000), FUNC(update_sound_a), data);
+		m_delayed_sound_timer->adjust(attotime::from_hz(20000), data);
 	else
 		update_sound_a(data);
 

@@ -246,6 +246,8 @@ void turbo_state::machine_start()
 	save_item(NAME(m_collision));
 	save_item(NAME(m_last_analog));
 	save_item(NAME(m_accel));
+
+	m_delayed_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(turbo_state::update_sound_a), this));
 }
 
 

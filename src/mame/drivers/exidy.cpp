@@ -181,11 +181,6 @@ namespace {
 class exidy_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_COLLISION_IRQ
-	};
-
 	exidy_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -209,14 +204,14 @@ public:
 	void pepper2(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_color_latch;
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-	virtual void video_start() override;
 
 	void base(machine_config &config);
 
@@ -236,6 +231,7 @@ private:
 	required_shared_ptr<uint8_t> m_sprite_enable;
 	optional_shared_ptr<uint8_t> m_characterram;
 
+	emu_timer *m_collision_latch_timer = nullptr;
 	uint8_t m_collision_mask = 0;
 	uint8_t m_collision_invert = 0;
 	int m_is_2bpp = 0;
@@ -247,10 +243,11 @@ private:
 
 	void mtrap_ocl_w(uint8_t data);
 
-	uint32_t screen_update_exidy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(exidy_vblank_interrupt);
 
+	TIMER_CALLBACK_MEMBER(latch_collision);
 	void latch_condition(int collision);
 	void set_1_color(int index, int which);
 	void set_colors();
@@ -1297,21 +1294,13 @@ void exidy_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 ***************************************************************************/
 
-void exidy_state::device_timer(emu_timer &timer, device_timer_id id, int param)
+TIMER_CALLBACK_MEMBER(exidy_state::latch_collision)
 {
-	switch (id)
-	{
-	case TIMER_COLLISION_IRQ:
-		/* latch the collision bits */
-		latch_condition(param);
+	/* latch the collision bits */
+	latch_condition(param);
 
-		/* set the IRQ line */
-		m_maincpu->set_input_line(0, ASSERT_LINE);
-
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in exidy_state::device_timer");
-	}
+	/* set the IRQ line */
+	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -1376,7 +1365,7 @@ void exidy_state::check_collision()
 
 				/* if we got one, trigger an interrupt */
 				if ((current_collision_mask & m_collision_mask) && (count++ < 128))
-					timer_set(m_screen->time_until_pos(org_1_x + sx, org_1_y + sy), TIMER_COLLISION_IRQ, current_collision_mask);
+					m_collision_latch_timer->adjust(m_screen->time_until_pos(org_1_x + sx, org_1_y + sy), current_collision_mask);
 			}
 
 			if (m_motion_object_2_vid.pix(sy, sx) != 0xff)
@@ -1384,7 +1373,7 @@ void exidy_state::check_collision()
 				/* check for background collision (M2CHAR) */
 				if (m_background_bitmap.pix(org_2_y + sy, org_2_x + sx) != 0)
 					if ((m_collision_mask & 0x08) && (count++ < 128))
-						timer_set(m_screen->time_until_pos(org_2_x + sx, org_2_y + sy), TIMER_COLLISION_IRQ, 0x08);
+						m_collision_latch_timer->adjust(m_screen->time_until_pos(org_2_x + sx, org_2_y + sy), 0x08);
 			}
 		}
 }
@@ -1397,7 +1386,7 @@ void exidy_state::check_collision()
  *
  *************************************/
 
-uint32_t exidy_state::screen_update_exidy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t exidy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* refresh the colors from the palette (static or dynamic) */
 	set_colors();
@@ -1422,6 +1411,11 @@ uint32_t exidy_state::screen_update_exidy(screen_device &screen, bitmap_ind16 &b
  *  Machine init
  *
  *************************************/
+
+void exidy_state::machine_start()
+{
+	m_collision_latch_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(exidy_state::latch_collision), this));
+}
 
 void spectar_state::machine_start()
 {
@@ -1487,7 +1481,7 @@ void exidy_state::base(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_raw(EXIDY_PIXEL_CLOCK, EXIDY_HTOTAL, EXIDY_HBEND, EXIDY_HBSTART, EXIDY_VTOTAL, EXIDY_VBEND, EXIDY_VBSTART);
-	m_screen->set_screen_update(FUNC(exidy_state::screen_update_exidy));
+	m_screen->set_screen_update(FUNC(exidy_state::screen_update));
 	m_screen->set_palette(m_palette);
 }
 

@@ -113,7 +113,6 @@ void starfire_state::sound_w(offs_t offset, uint8_t data)
 	m_sound_lock->write(BIT(data, 5));
 	m_sound_scanner->write(BIT(data, 6));
 	m_sound_overheat->write(BIT(data, 7));
-	synchronize();
 }
 
 void fireone_state::sound_w(offs_t offset, uint8_t data)

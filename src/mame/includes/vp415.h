@@ -79,7 +79,8 @@ public:
 private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+
+	TIMER_CALLBACK_MEMBER(drive_2ppr_tick);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -274,8 +275,6 @@ private:
 	static const char *const I8255_TAG;
 	static const char *const CHARGEN_TAG;
 	static const char *const SYNCGEN_TAG;
-
-	static const device_timer_id DRIVE_2PPR_ID;
 };
 
 #endif // MAME_INCLUDES_VP415_H

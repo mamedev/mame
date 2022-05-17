@@ -44,7 +44,7 @@ TIMER_CALLBACK_MEMBER(poly_state::set_protect)
 void poly_state::set_protect_w(uint8_t data)
 {
 	/* set protect after 1 E cycle */
-	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(2), timer_expired_delegate(FUNC(poly_state::set_protect), this));
+	m_protect_timer->adjust(m_maincpu->cycles_to_attotime(2));
 }
 
 

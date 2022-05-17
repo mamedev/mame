@@ -35,13 +35,8 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 
 private:
-	enum
-	{
-		TIMER_PAD_FUNC
-	};
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	uint16_t irq_read(offs_t offset);
@@ -77,6 +72,7 @@ private:
 	};
 
 	pcfx_pad_t m_pad;
+	emu_timer *m_pad_timer;
 
 	inline void check_irqs();
 	inline void set_irq_line(int line, int state);
@@ -141,18 +137,6 @@ uint16_t pcfx_state::pad_r(offs_t offset)
 	return res;
 }
 
-void pcfx_state::device_timer(emu_timer &timer, device_timer_id id, int param)
-{
-	switch (id)
-	{
-	case TIMER_PAD_FUNC:
-		pad_func(param);
-		break;
-	default:
-		throw emu_fatalerror("Unknown id in pcfx_state::device_timer");
-	}
-}
-
 TIMER_CALLBACK_MEMBER(pcfx_state::pad_func)
 {
 	const char *const padnames[] = { "P1", "P2" };
@@ -178,7 +162,7 @@ void pcfx_state::pad_w(offs_t offset, uint16_t data)
 		*/
 		if(data & 1 && (!(m_pad.ctrl[port_type] & 1)))
 		{
-			timer_set(attotime::from_usec(1000), TIMER_PAD_FUNC, port_type); // TODO: time
+			m_pad_timer->adjust(attotime::from_usec(1000), port_type); // TODO: time
 		}
 
 		m_pad.ctrl[port_type] = data & 7;
@@ -415,6 +399,8 @@ void pcfx_state::machine_start()
 		m_pad.status[i] = 0;
 		m_pad.latch[i] = 0;
 	};
+
+	m_pad_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pcfx_state::pad_func), this));
 }
 
 void pcfx_state::machine_reset()

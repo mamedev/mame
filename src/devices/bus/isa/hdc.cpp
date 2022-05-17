@@ -195,7 +195,7 @@ st11m_device::st11m_device(const machine_config &mconfig, const char *tag, devic
 void xt_hdc_device::device_start()
 {
 	m_buffer = std::make_unique<uint8_t[]>(256*512);   // maximum possible transfer
-	m_timer = timer_alloc();
+	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xt_hdc_device::process_command), this));
 	m_irq_handler.resolve_safe();
 	m_drq_handler.resolve_safe();
 }

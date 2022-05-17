@@ -101,7 +101,7 @@ public:
 		m_cpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 		// set a timer to go off right away
-		timer_set(attotime::zero);
+		machine().scheduler().timer_alloc(timer_expired_delegate())->adjust(attotime::zero);
 	}
 
 	// dump the current CPU state
@@ -170,6 +170,7 @@ private:
 	required_device<ppc603e_device> m_cpu;
 	required_shared_ptr<u64> m_ram;
 	address_space *m_space;
+	emu_timer *m_sync_timer;
 };
 
 

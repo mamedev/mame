@@ -79,6 +79,8 @@ void mhavoc_state::machine_start()
 	save_item(NAME(m_gamma_irq_clock));
 
 	save_item(NAME(m_speech_write_buffer));
+
+	m_gamma_sync_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 }
 
 
@@ -132,7 +134,7 @@ TIMER_CALLBACK_MEMBER(mhavoc_state::delayed_gamma_w)
 	m_gamma->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	/* the sound CPU needs to reply in 250microseconds (according to Neil Bradley) */
-	machine().scheduler().timer_set(attotime::from_usec(250), timer_expired_delegate());
+	m_gamma_sync_timer->adjust(attotime::from_usec(250));
 }
 
 

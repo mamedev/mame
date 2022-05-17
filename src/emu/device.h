@@ -704,12 +704,6 @@ public:
 	attotime clocks_to_attotime(u64 clocks) const noexcept;
 	u64 attotime_to_clocks(const attotime &duration) const noexcept;
 
-	// timer interfaces
-	emu_timer *timer_alloc(device_timer_id id = 0);
-	void timer_set(const attotime &duration, device_timer_id id = 0, int param = 0);
-	void synchronize(device_timer_id id = 0, int param = 0) { timer_set(attotime::zero, id, param); }
-	void timer_expired(emu_timer &timer, device_timer_id id, int param) { device_timer(timer, id, param); }
-
 	/// \brief Register data for save states
 	///
 	/// Registers data to be automatically saved/restored.  Can be used
@@ -976,7 +970,6 @@ protected:
 
 	virtual void device_clock_changed();
 	virtual void device_debug_setup();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param);
 
 	//------------------- end derived class overrides
 

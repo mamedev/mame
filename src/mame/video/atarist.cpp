@@ -130,7 +130,7 @@ inline pen_t st_state::shift_mode_2()
 //  shifter_tick -
 //-------------------------------------------------
 
-void st_state::shifter_tick()
+TIMER_CALLBACK_MEMBER(st_state::shifter_tick)
 {
 	int y = m_screen->vpos();
 	int x = m_screen->hpos();
@@ -195,7 +195,7 @@ void st_state::draw_pixel(int x, int y, u32 pen)
 		m_bitmap.pix(y, x) = pen;
 }
 
-void st_state::glue_tick()
+TIMER_CALLBACK_MEMBER(st_state::glue_tick)
 {
 	int y = m_screen->vpos();
 	int x = m_screen->hpos();
@@ -667,7 +667,7 @@ void st_state::blitter_op(uint16_t s, uint32_t dstaddr, uint16_t mask)
 //  blitter_tick -
 //-------------------------------------------------
 
-void st_state::blitter_tick()
+TIMER_CALLBACK_MEMBER(st_state::blitter_tick)
 {
 	do
 	{
@@ -1052,7 +1052,7 @@ void st_state::blitter_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 				m_mfp->i3_w(1);
 
 				int nops = BLITTER_NOPS[m_blitter_op][m_blitter_hop]; // each NOP takes 4 cycles
-				timer_set(attotime::from_hz((Y2/4)/(4*nops)), TIMER_BLITTER_TICK);
+				m_blitter_timer->adjust(attotime::from_hz((Y2/4)/(4*nops)));
 			}
 		}
 	}
@@ -1070,8 +1070,9 @@ void st_state::blitter_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void st_state::video_start()
 {
-	m_shifter_timer = timer_alloc(TIMER_SHIFTER_TICK);
-	m_glue_timer = timer_alloc(TIMER_GLUE_TICK);
+	m_shifter_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st_state::shifter_tick), this));
+	m_glue_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st_state::glue_tick), this));
+	m_blitter_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st_state::blitter_tick), this));
 
 //  m_shifter_timer->adjust(m_screen->time_until_pos(0), 0, attotime::from_hz(Y2/4)); // 125 ns
 	m_glue_timer->adjust(m_screen->time_until_pos(0), 0, attotime::from_hz(Y2/16)); // 500 ns

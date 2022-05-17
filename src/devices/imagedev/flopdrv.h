@@ -210,6 +210,7 @@ protected:
 	/* rotation per minute => gives index pulse frequency */
 	float m_rpm;
 
+	emu_timer *m_wpt_timer;
 	int m_id_index;
 
 	device_t *m_controller;

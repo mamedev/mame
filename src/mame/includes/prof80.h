@@ -53,6 +53,10 @@ public:
 	void prof80(machine_config &config);
 
 private:
+	virtual void machine_start() override;
+
+	TIMER_CALLBACK_MEMBER(motor_off);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<prof80_mmu_device> m_mmu;
 	required_device<upd1990a_device> m_rtc;
@@ -67,14 +71,6 @@ private:
 	required_memory_region m_rom;
 	required_ioport m_j4;
 	required_ioport m_j5;
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
-	virtual void machine_start() override;
-
-	enum
-	{
-		TIMER_ID_MOTOR
-	};
 
 	void flr_w(uint8_t data);
 	uint8_t status_r();

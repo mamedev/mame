@@ -191,7 +191,8 @@ private:
 
 	uint16_t m_c64_bitmap[2], m_bitmapmulti[4], m_mono[2], m_multi[4], m_ecmcolor[2], m_colors[4], m_spritemulti[4];
 
-	int m_lastline, m_rasterline;
+	int m_lastline;
+	int m_rasterline;
 
 	int m_interlace;
 	int m_columns, m_rows;
@@ -224,6 +225,7 @@ private:
 	devcb_read8 m_lightpen_button_cb;
 	devcb_read8 m_lightpen_x_cb;
 	devcb_read8 m_lightpen_y_cb;
+	emu_timer *m_lightpen_timer;
 
 	/* C64 memory access */
 	devcb_read8      m_c64_mem_r_cb;

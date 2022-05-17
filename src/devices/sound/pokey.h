@@ -114,14 +114,6 @@ public:
 		SKSTAT_C =  0x0F
 	};
 
-	enum /* sync-operations */
-	{
-		SYNC_NOOP       = 11,
-		SYNC_SET_IRQST  = 12,
-		SYNC_POT        = 13,
-		SYNC_WRITE      = 14
-	};
-
 	enum output_type
 	{
 		LEGACY_LINEAR = 0,
@@ -235,7 +227,7 @@ private:
 				if (m_parent->m_IRQEN & m_INTMask)
 				{
 					/* Exposed state has changed: This should only be updated after a resync ... */
-					m_parent->synchronize(SYNC_SET_IRQST, m_INTMask);
+					m_parent->m_sync_set_irqst_timer->adjust(attotime::zero, m_INTMask);
 				}
 			}
 		}

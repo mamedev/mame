@@ -81,6 +81,7 @@ void rx01_device::device_add_mconfig(machine_config &config)
 
 void rx01_device::device_start()
 {
+	m_command_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rx01_device::service_command),this));
 }
 
 
@@ -90,6 +91,8 @@ void rx01_device::device_start()
 
 void rx01_device::device_reset()
 {
+	m_command_timer->adjust(attotime::never);
+
 	for(auto & elem : m_image)
 	{
 		elem->floppy_mon_w(0); // turn it on
@@ -173,7 +176,7 @@ void rx01_device::command_write(uint16_t data)
 					break;
 		}
 	}
-	machine().scheduler().timer_set(attotime::from_msec(100), timer_expired_delegate(FUNC(rx01_device::service_command),this));
+	m_command_timer->adjust(attotime::from_msec(100));
 }
 
 uint16_t rx01_device::status_read()
@@ -187,7 +190,7 @@ void rx01_device::data_write(uint16_t data)
 //  printf("data_write %04x\n",data);
 	// data can be written only if TR is set
 	if (BIT(m_rxcs,7)) m_rxdb = data;
-	machine().scheduler().timer_set(attotime::from_msec(100), timer_expired_delegate(FUNC(rx01_device::service_command),this));
+	m_command_timer->adjust(attotime::from_msec(100));
 }
 
 uint16_t rx01_device::data_read()

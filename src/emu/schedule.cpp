@@ -111,7 +111,7 @@ inline emu_timer &emu_timer::init(device_t &device, device_timer_id id, bool tem
 	m_machine = &device.machine();
 	m_next = nullptr;
 	m_prev = nullptr;
-	m_callback = timer_expired_delegate(FUNC(emu_timer::device_timer_expired), this);
+	m_callback = timer_expired_delegate();
 	m_param = 0;
 	m_enabled = false;
 	m_temporary = temporary;
@@ -301,17 +301,6 @@ void emu_timer::dump() const
 			machine().logerror(" cb=%s\n", m_callback.name());
 	else
 		machine().logerror(" dev=%s id=%d\n", m_device->tag(), m_id);
-}
-
-
-//-------------------------------------------------
-//  device_timer_expired - trampoline to avoid a
-//  conditional jump on the hot path
-//-------------------------------------------------
-
-void emu_timer::device_timer_expired(emu_timer &timer, s32 param)
-{
-	timer.m_device->timer_expired(timer, timer.m_id, param);
 }
 
 

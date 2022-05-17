@@ -160,6 +160,9 @@ void pce_cd_device::device_start()
 	m_adpcm_fadein_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pce_cd_device::adpcm_fadein_callback),this));
 	m_adpcm_fadein_timer->adjust(attotime::never);
 
+	m_ack_clear_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pce_cd_device::clear_ack),this));
+	m_ack_clear_timer->adjust(attotime::never);
+
 	// m_cd_file pointer is setup at a later stage because it is still empty when this function is called
 
 	// TODO: add proper restore for the cd data...
@@ -1446,7 +1449,7 @@ uint8_t pce_cd_device::get_cd_data_byte()
 		if (m_scsi_IO)
 		{
 			m_scsi_ACK = 1;
-			machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(15), timer_expired_delegate(FUNC(pce_cd_device::clear_ack),this));
+			m_ack_clear_timer->adjust(m_maincpu->cycles_to_attotime(15));
 		}
 	}
 	return data;

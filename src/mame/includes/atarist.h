@@ -75,14 +75,6 @@ enum
 class st_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_MOUSE_TICK,
-		TIMER_SHIFTER_TICK,
-		TIMER_GLUE_TICK,
-		TIMER_BLITTER_TICK
-	};
-
 	st_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, M68000_TAG),
@@ -205,19 +197,19 @@ protected:
 	void blitter_op_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void blitter_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void mouse_tick();
+	TIMER_CALLBACK_MEMBER(mouse_tick);
 	inline pen_t shift_mode_0();
 	inline pen_t shift_mode_1();
 	inline pen_t shift_mode_2();
-	void shifter_tick();
+	TIMER_CALLBACK_MEMBER(shifter_tick);
 	inline void shifter_load();
 	inline void draw_pixel(int x, int y, u32 pen);
-	void glue_tick();
+	TIMER_CALLBACK_MEMBER(glue_tick);
 	void set_screen_parameters();
 	void blitter_source();
 	uint16_t blitter_hop();
 	void blitter_op(uint16_t s, uint32_t dstaddr, uint16_t mask);
-	void blitter_tick();
+	TIMER_CALLBACK_MEMBER(blitter_tick);
 
 	// driver
 	uint16_t fdc_data_r(offs_t offset);
@@ -324,6 +316,7 @@ protected:
 	emu_timer *m_mouse_timer = nullptr;
 	emu_timer *m_glue_timer = nullptr;
 	emu_timer *m_shifter_timer = nullptr;
+	emu_timer *m_blitter_timer = nullptr;
 
 	bitmap_rgb32 m_bitmap = 0;
 
@@ -339,7 +332,6 @@ protected:
 	void st_map(address_map &map);
 	void keyboard(machine_config &config);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
@@ -362,12 +354,6 @@ public:
 class ste_state : public st_state
 {
 public:
-	enum
-	{
-		TIMER_DMASOUND_TICK,
-		TIMER_MICROWIRE_TICK
-	};
-
 	ste_state(const machine_config &mconfig, device_type type, const char *tag)
 		: st_state(mconfig, type, tag),
 			m_lmc1992(*this, LMC1992_TAG)
@@ -402,9 +388,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_monochrome );
 
 	void dmasound_set_state(int level);
-	void dmasound_tick();
+	TIMER_CALLBACK_MEMBER(dmasound_tick);
 	void microwire_shift();
-	void microwire_tick();
+	TIMER_CALLBACK_MEMBER(microwire_tick);
 	void state_save();
 
 	// shifter state
@@ -438,7 +424,6 @@ public:
 	void ste(machine_config &config);
 	void ste_map(address_map &map);
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
 	virtual void video_start() override;
 };

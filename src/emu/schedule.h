@@ -76,7 +76,6 @@ private:
 	void register_save();
 	void schedule_next_period();
 	void dump() const;
-	static void device_timer_expired(emu_timer &timer, s32 param);
 
 	// internal state
 	running_machine *   m_machine;      // reference to the owning machine
