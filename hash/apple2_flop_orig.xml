@@ -22640,4 +22640,171 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="jumpman">
+		<description>Jumpman</description>
+		<year>1983</year>
+		<publisher>Epyx</publisher>
+		<info name="release" value="2022-05-11"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Jumpman" is a 1983 action game developed and distributed by Epyx. It runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Beginner levels"/>
+			<dataarea name="flop" size="234776">
+				<rom name="jumpman - beginner levels.woz" size="234776" crc="5a113793" sha1="fbe71d6b9e2fc9c10015ed2ec01b94a0d70024a9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Advanced levels"/>
+			<dataarea name="flop" size="234776">
+				<rom name="jumpman - advanced levels.woz" size="234776" crc="51c438bc" sha1="b4cb7b54f461688bb513feae050036aa1b0ec7ca"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="emp2is10">
+		<description>Empire II: Interstellar Sharks (Version 1.0)</description>
+		<year>1982</year>
+		<publisher>Edu-Ware</publisher>
+		<info name="release" value="2022-05-11"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Empire II: Interstellar Sharks" is a 1982 simulation game developed by David Mullich, Ken Delgado, Mike St. Jean, Jim Wootton, Wendy Peterson, and Pam Pollack, and distributed by Edu-Ware Services. This is version 1.0. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234881">
+				<rom name="empire ii- interstellar sharks.woz" size="234881" crc="9a6a5b21" sha1="1d4cd53272930c29ccd48aef40c8fdb590e5c311"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="surmth20">
+		<description>Survival Math (Version 2.0)</description>
+		<year>1985</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Survival Math" is a 1985 educational game designed by Walter Koetke and distributed by Sunburst Communications. This is version 2.0. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234814">
+				<rom name="survival math.woz" size="234814" crc="6d646e06" sha1="1d1ec8b1f67e8835f36c44fe8bacb0cfa2d3a1df"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tbtpaps13">
+		<description>Teasers by Tobbs: Puzzles and Problem Solving (Version 1.3)</description>
+		<year>1982</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Teasers by Tobbs: Puzzles and Problem Solving" is a 1982 educational game authored by Tom O'Brien and distributed by Sunburst Communications. This is version 1.3. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234852">
+				<rom name="teasers by tobbs- puzzles and problem solving.woz" size="234852" crc="ec73b80b" sha1="b8213f89a886d23f12b9d94190f82f4eae1b73ca"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tgsquad">
+		<description>The Geometric Supposer: Quadrilaterals</description>
+		<year>1986</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"The Geometric Supposer: Quadrilaterals" is a 1986 educational program by Judah L. Schwartz and Michal Yerushalmy, and distributed by Sunburst Communications. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234849">
+				<rom name="the geometric supposer- quadrilaterals.woz" size="234849" crc="457b9a05" sha1="f9ef50533975b4474051a6a42141e93a1a5b0c26"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tgtang">
+		<description>Targets: A Numbers Game</description>
+		<year>1985</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Targets: A Numbers Game" is a 1985 educational game designed by T.C. O'Brien II, programmed by Andrew Lorenz, and distributed by Sunburst Communications. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234836">
+				<rom name="targets- a numbers game.woz" size="234836" crc="343980eb" sha1="7d45fbc51a115319dedb3c560e470ecfe3da1c02"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tgstri">
+		<description>The Geometric Supposer: Triangles</description>
+		<year>1985</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"The Geometric Supposer: Triangles" is a 1985 educational program by Judah L. Schwartz and Michal Yerushalmy, and distributed by Sunburst Communications. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234833">
+				<rom name="the geometric supposer- triangles.woz" size="234833" crc="251da185" sha1="7095b073ea38d41aca74c9957b44bc8922fc0494"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tkrmad">
+		<description>The King's Rule: Mathematics and Discovery</description>
+		<year>1984</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"The King's Rule: Mathematics and Discovery" is a 1984 educational program designed by Tom O'Brien, programmed by Tom Raich and Mike Fish, and distributed by Sunburst Communications. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234846">
+				<rom name="the king's rule- mathematics and discovery.woz" size="234846" crc="bfefe27a" sha1="cf0beacfe1cece58a390c0c9903025470e385ba1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wqstbss">
+		<description>Word Quest: Binary Search Strategies</description>
+		<year>1985</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Word Quest: Binary Search Strategies" is a 1985 educational game by Judah L. Schwartz and distributed by Sunburst Communications. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234826">
+				<rom name="word quest- binary search strategies.woz" size="234826" crc="a559b0c3" sha1="fcfa01b5a2ae6fec3f348f8059730b3834267e93"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tpuzlr">
+		<description>The Puzzler: A Program for Developing Reading Strategies</description>
+		<year>1984</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2022-05-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"The Puzzler: A Program for Developing Reading Strategies" is a 1984 educational program developed by Janet Gollan, Audrey Shillington, Douglas Denby, Douglas Inkpen, Arthur Willer, Dale Burnett, and Larry Miller, and distributed by Sunburst Communications. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234929">
+				<rom name="the puzzler.woz" size="234929" crc="c46c6136" sha1="b97472d741f8d879e5ac6bebdf88bf078f12c385"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
