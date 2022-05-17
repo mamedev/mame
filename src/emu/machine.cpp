@@ -1116,7 +1116,19 @@ std::string running_machine::nvram_filename(device_t &device) const
 		if (software != nullptr && *software != '\0')
 			result << PATH_SEPARATOR << software;
 
-		std::string tag(device.tag());
+		std::string tag;
+		for (device_t *dev = &device; dev->owner() != nullptr; dev = dev->owner())
+		{
+			std::ostringstream dev_tag;
+			dev_tag << ":" << dev->basetag();
+			device_slot_interface *intf;
+			if (dev->owner() && dev->owner()->interface(intf))
+			{
+				if (dev->system_bios() != 0 && dev->default_bios() != dev->system_bios())
+					util::stream_format(dev_tag, "_%d", dev->system_bios() - 1);
+			}
+			tag = dev_tag.str() + tag;
+		}
 		tag.erase(0, 1);
 		strreplacechr(tag,':', '_');
 		result << PATH_SEPARATOR << tag;
