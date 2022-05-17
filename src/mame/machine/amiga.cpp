@@ -163,10 +163,10 @@ void amiga_state::machine_start()
 	m_chip_ram_mask = (m_chip_ram.bytes() - 1) & ~1;
 
 	// set up the timers
-	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(amiga_state::amiga_irq_proc), this));
-	m_blitter_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(amiga_state::amiga_blitter_proc), this));
-	m_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(amiga_state::serial_shift), this));
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(amiga_state::scanline_callback), this));
+	m_irq_timer = timer_alloc(FUNC(amiga_state::amiga_irq_proc), this);
+	m_blitter_timer = timer_alloc(FUNC(amiga_state::amiga_blitter_proc), this);
+	m_serial_timer = timer_alloc(FUNC(amiga_state::serial_shift), this);
+	m_scanline_timer = timer_alloc(FUNC(amiga_state::scanline_callback), this);
 
 	// start the scanline timer
 	m_scanline_timer->adjust(m_screen->time_until_pos(0));

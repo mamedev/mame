@@ -2014,16 +2014,16 @@ void sega315_5124_device::device_start()
 	screen().register_screen_bitmap(m_tmpbitmap);
 	screen().register_screen_bitmap(m_y1_bitmap);
 
-	m_display_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega315_5124_device::process_line_timer), this));
+	m_display_timer = timer_alloc(FUNC(sega315_5124_device::process_line_timer), this);
 	m_display_timer->adjust(screen().time_until_pos(0, DISPLAY_CB_HPOS), 0, screen().scan_period());
-	m_pending_flags_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega315_5124_device::eol_flag_check), this));
+	m_pending_flags_timer = timer_alloc(FUNC(sega315_5124_device::eol_flag_check), this);
 	m_pending_flags_timer->adjust(screen().time_until_pos(0, WIDTH - 1), 0, screen().scan_period());
-	m_draw_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega315_5124_device::draw_scanline), this));
-	m_lborder_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega315_5124_device::draw_lborder), this));
-	m_rborder_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega315_5124_device::draw_rborder), this));
-	m_hint_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega315_5124_device::trigger_hint), this));
-	m_vint_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega315_5124_device::trigger_vint), this));
-	m_nmi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega315_5124_device::update_nmi), this));
+	m_draw_timer = timer_alloc(FUNC(sega315_5124_device::draw_scanline), this);
+	m_lborder_timer = timer_alloc(FUNC(sega315_5124_device::draw_lborder), this);
+	m_rborder_timer = timer_alloc(FUNC(sega315_5124_device::draw_rborder), this);
+	m_hint_timer = timer_alloc(FUNC(sega315_5124_device::trigger_hint), this);
+	m_vint_timer = timer_alloc(FUNC(sega315_5124_device::trigger_vint), this);
+	m_nmi_timer = timer_alloc(FUNC(sega315_5124_device::update_nmi), this);
 
 	save_item(NAME(m_status));
 	save_item(NAME(m_pending_status));

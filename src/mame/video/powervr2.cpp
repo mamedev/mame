@@ -3915,21 +3915,21 @@ void powervr2_device::device_start()
 
 	computedilated();
 
-//  vbout_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::vbout),this));
-//  vbin_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::vbin),this));
-	hbin_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::hbin),this));
-	yuv_timer_end = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::yuv_convert_end),this));
+//  vbout_timer = timer_alloc(FUNC(powervr2_device::vbout), this);
+//  vbin_timer = timer_alloc(FUNC(powervr2_device::vbin), this);
+	hbin_timer = timer_alloc(FUNC(powervr2_device::hbin), this);
+	yuv_timer_end = timer_alloc(FUNC(powervr2_device::yuv_convert_end), this);
 
-	endofrender_timer_isp = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::endofrender_isp),this));
-	endofrender_timer_tsp = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::endofrender_tsp),this));
-	endofrender_timer_video = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::endofrender_video),this));
+	endofrender_timer_isp = timer_alloc(FUNC(powervr2_device::endofrender_isp), this);
+	endofrender_timer_tsp = timer_alloc(FUNC(powervr2_device::endofrender_tsp), this);
+	endofrender_timer_video = timer_alloc(FUNC(powervr2_device::endofrender_video), this);
 
-	opaque_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::transfer_opaque_list_irq),this));
-	opaque_modifier_volume_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::transfer_opaque_modifier_volume_list_irq),this));
-	translucent_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::transfer_translucent_list_irq),this));
-	translucent_modifier_volume_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::transfer_translucent_modifier_volume_list_irq),this));
-	punch_through_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::transfer_punch_through_list_irq),this));
-	dma_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::pvr_dma_irq),this));
+	opaque_irq_timer = timer_alloc(FUNC(powervr2_device::transfer_opaque_list_irq), this);
+	opaque_modifier_volume_irq_timer = timer_alloc(FUNC(powervr2_device::transfer_opaque_modifier_volume_list_irq), this);
+	translucent_irq_timer = timer_alloc(FUNC(powervr2_device::transfer_translucent_list_irq), this);
+	translucent_modifier_volume_irq_timer = timer_alloc(FUNC(powervr2_device::transfer_translucent_modifier_volume_list_irq), this);
+	punch_through_irq_timer = timer_alloc(FUNC(powervr2_device::transfer_punch_through_list_irq), this);
+	dma_irq_timer = timer_alloc(FUNC(powervr2_device::pvr_dma_irq), this);
 
 	fake_accumulationbuffer_bitmap = std::make_unique<bitmap_rgb32>(2048,2048);
 

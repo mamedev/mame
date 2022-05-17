@@ -254,7 +254,7 @@ void archimedes_keyboard_device::device_start()
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_2);
 	set_rate(31250);
 
-	m_mouse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(archimedes_keyboard_device::update_mouse), this));
+	m_mouse_timer = timer_alloc(FUNC(archimedes_keyboard_device::update_mouse), this);
 
 	save_item(NAME(m_mouse_x));
 	save_item(NAME(m_mouse_y));

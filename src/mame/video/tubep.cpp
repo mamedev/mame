@@ -328,7 +328,7 @@ void tubep_state::video_start()
 {
 	m_spritemap = std::make_unique<uint8_t[]>(256*256*2);
 
-	m_sprite_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tubep_state::assert_sprite_int), this));
+	m_sprite_timer = timer_alloc(FUNC(tubep_state::assert_sprite_int), this);
 
 	/* Set up save state */
 	save_item(NAME(m_romD_addr));

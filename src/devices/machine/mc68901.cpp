@@ -405,10 +405,10 @@ void mc68901_device::device_start()
 	m_iack_chain_cb.resolve();
 
 	/* create the timers */
-	m_timer[TIMER_A] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc68901_device::timer_count), this));
-	m_timer[TIMER_B] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc68901_device::timer_count), this));
-	m_timer[TIMER_C] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc68901_device::timer_count), this));
-	m_timer[TIMER_D] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc68901_device::timer_count), this));
+	m_timer[TIMER_A] = timer_alloc(FUNC(mc68901_device::timer_count), this);
+	m_timer[TIMER_B] = timer_alloc(FUNC(mc68901_device::timer_count), this);
+	m_timer[TIMER_C] = timer_alloc(FUNC(mc68901_device::timer_count), this);
+	m_timer[TIMER_D] = timer_alloc(FUNC(mc68901_device::timer_count), this);
 
 	/* register for state saving */
 	save_item(NAME(m_gpip));

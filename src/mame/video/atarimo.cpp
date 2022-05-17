@@ -326,7 +326,7 @@ void atari_motion_objects_device::device_start()
 		m_gfxlookup[i] = m_gfxindex;
 
 	// allocate a timer to periodically force update
-	m_force_update_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(atari_motion_objects_device::force_update), this));
+	m_force_update_timer = timer_alloc(FUNC(atari_motion_objects_device::force_update), this);
 	m_force_update_timer->adjust(screen().time_until_pos(0));
 
 	// register for save states

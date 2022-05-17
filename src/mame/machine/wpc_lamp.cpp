@@ -56,7 +56,7 @@ void wpc_lamp_device::device_start()
 	save_item(NAME(col));
 	save_item(NAME(row));
 
-	timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wpc_lamp_device::update_lamps), this));
+	timer = timer_alloc(FUNC(wpc_lamp_device::update_lamps), this);
 }
 
 void wpc_lamp_device::device_reset()

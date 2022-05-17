@@ -113,7 +113,7 @@ void iteagle_fpga_device::device_start()
 	// RAM defaults to base address 0x000e0000
 	bank_infos[2].adr = 0x000e0000 & (~(bank_infos[2].size - 1));
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(iteagle_fpga_device::assert_vblank_irq), this));
+	m_timer = timer_alloc(FUNC(iteagle_fpga_device::assert_vblank_irq), this);
 
 	// Switch IO
 	m_in_cb.resolve_all_safe(0xffff);

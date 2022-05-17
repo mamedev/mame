@@ -547,7 +547,7 @@ INPUT_PORTS_END
 
 void sol20_state::machine_start()
 {
-	m_cassette_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sol20_state::sol20_cassette_tc), this));
+	m_cassette_timer = timer_alloc(FUNC(sol20_state::sol20_cassette_tc), this);
 	save_item(NAME(m_sol20_fa));
 	save_item(NAME(m_sol20_fc));
 	save_item(NAME(m_sol20_fe));

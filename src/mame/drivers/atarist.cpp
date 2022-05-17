@@ -1833,7 +1833,7 @@ void st_state::machine_start()
 	// allocate timers
 	if (m_mousex.found())
 	{
-		m_mouse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st_state::mouse_tick), this));
+		m_mouse_timer = timer_alloc(FUNC(st_state::mouse_tick), this);
 		m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(500));
 	}
 
@@ -1891,8 +1891,8 @@ void ste_state::machine_start()
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16s_delegate(*m_cart, FUNC(generic_slot_device::read16_rom)));
 
 	/* allocate timers */
-	m_dmasound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ste_state::dmasound_tick), this));
-	m_microwire_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ste_state::microwire_tick), this));
+	m_dmasound_timer = timer_alloc(FUNC(ste_state::dmasound_tick), this);
+	m_microwire_timer = timer_alloc(FUNC(ste_state::microwire_tick), this);
 
 	/* register for state saving */
 	state_save();

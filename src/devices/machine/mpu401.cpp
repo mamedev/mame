@@ -127,7 +127,7 @@ mpu401_device::mpu401_device(const machine_config &mconfig, const char *tag, dev
 void mpu401_device::device_start()
 {
 	write_irq.resolve_safe();
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mpu401_device::serial_tick), this));
+	m_timer = timer_alloc(FUNC(mpu401_device::serial_tick), this);
 }
 
 //-------------------------------------------------

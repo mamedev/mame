@@ -36,7 +36,7 @@ naomi_g1_device::naomi_g1_device(const machine_config &mconfig, device_type type
 
 void naomi_g1_device::device_start()
 {
-	timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(naomi_g1_device::trigger_gdrom_irq), this));
+	timer = timer_alloc(FUNC(naomi_g1_device::trigger_gdrom_irq), this);
 	irq_cb.resolve_safe();
 	ext_irq_cb.resolve_safe();
 	reset_out_cb.resolve_safe();

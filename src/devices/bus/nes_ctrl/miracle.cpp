@@ -64,7 +64,7 @@ nes_miracle_device::nes_miracle_device(const machine_config &mconfig, const char
 
 void nes_miracle_device::device_start()
 {
-	strobe_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_miracle_device::strobe_tick), this));
+	strobe_timer = timer_alloc(FUNC(nes_miracle_device::strobe_tick), this);
 	strobe_timer->adjust(attotime::never);
 	save_item(NAME(m_strobe_on));
 	save_item(NAME(m_sent_bits));

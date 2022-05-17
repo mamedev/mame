@@ -383,7 +383,7 @@ WRITE_LINE_MEMBER(uchroma68_state::kansas_w)
 
 void uchroma68_state::machine_start()
 {
-	m_kbd_strobe_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(uchroma68_state::kbd_strobe), this));
+	m_kbd_strobe_timer = timer_alloc(FUNC(uchroma68_state::kbd_strobe), this);
 	m_kbd_strobe = 1;
 
 	save_item(NAME(m_kbd_strobe));

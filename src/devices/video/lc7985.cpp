@@ -31,7 +31,7 @@ const tiny_rom_entry *lc7985_device::device_rom_region() const
 void lc7985_device::device_start()
 {
 	m_cgrom = m_cgrom_region.found() ? m_cgrom_region : memregion("cgrom")->base();
-	m_busy_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lc7985_device::clear_busy_flag), this));
+	m_busy_timer = timer_alloc(FUNC(lc7985_device::clear_busy_flag), this);
 
 	save_item(NAME(m_ddram));
 	save_item(NAME(m_cgram));

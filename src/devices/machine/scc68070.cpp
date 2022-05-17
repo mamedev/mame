@@ -183,13 +183,13 @@ void scc68070_device::device_start()
 	save_item(STRUCT_MEMBER(m_mmu.desc, segment));
 	save_item(STRUCT_MEMBER(m_mmu.desc, base));
 
-	m_timers.timer0_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scc68070_device::timer0_callback), this));
+	m_timers.timer0_timer = timer_alloc(FUNC(scc68070_device::timer0_callback), this);
 	m_timers.timer0_timer->adjust(attotime::never);
 
-	m_uart.rx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scc68070_device::rx_callback), this));
+	m_uart.rx_timer = timer_alloc(FUNC(scc68070_device::rx_callback), this);
 	m_uart.rx_timer->adjust(attotime::never);
 
-	m_uart.tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scc68070_device::tx_callback), this));
+	m_uart.tx_timer = timer_alloc(FUNC(scc68070_device::tx_callback), this);
 	m_uart.tx_timer->adjust(attotime::never);
 }
 

@@ -626,7 +626,7 @@ void v99x8_device::device_start()
 		for (int addr = m_vram_size; addr < 0x30000; addr++) m_vram_space->write_byte(addr, 0xff);
 	}
 
-	m_line_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(v99x8_device::update_line), this));
+	m_line_timer = timer_alloc(FUNC(v99x8_device::update_line), this);
 
 	palette_init();
 

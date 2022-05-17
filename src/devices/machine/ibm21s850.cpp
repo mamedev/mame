@@ -43,7 +43,7 @@ void ibm21s85x_base_device::device_start()
 {
 	save_item(NAME(m_regs));
 
-	m_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ibm21s85x_base_device::reset_tick), this));
+	m_reset_timer = timer_alloc(FUNC(ibm21s85x_base_device::reset_tick), this);
 
 	m_reset_cb.resolve_safe();
 }

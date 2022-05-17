@@ -247,7 +247,7 @@ void htmusic_device::device_start()
 	m_stream = stream_alloc(0, 2, clock() / 128);
 
 	// allocate timer
-	m_dsp_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(htmusic_device::dsp_tick), this));
+	m_dsp_timer = timer_alloc(FUNC(htmusic_device::dsp_tick), this);
 
 	// register for save states
 	save_item(NAME(m_wave_ram));

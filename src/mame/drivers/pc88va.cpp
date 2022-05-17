@@ -1415,18 +1415,18 @@ uint8_t pc88va_state::get_slave_ack(offs_t offset)
 
 void pc88va_state::machine_start()
 {
-	m_tc_clear_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc88va_state::pc8801fd_upd765_tc_to_zero), this));
+	m_tc_clear_timer = timer_alloc(FUNC(pc88va_state::pc8801fd_upd765_tc_to_zero), this);
 	m_tc_clear_timer->adjust(attotime::never);
 
-	m_fdc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc88va_state::pc88va_fdc_timer), this));
+	m_fdc_timer = timer_alloc(FUNC(pc88va_state::pc88va_fdc_timer), this);
 	m_fdc_timer->adjust(attotime::never);
 
-	m_motor_start_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc88va_state::pc88va_fdc_motor_start_0), this));
-	m_motor_start_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc88va_state::pc88va_fdc_motor_start_1), this));
+	m_motor_start_timer[0] = timer_alloc(FUNC(pc88va_state::pc88va_fdc_motor_start_0), this);
+	m_motor_start_timer[1] = timer_alloc(FUNC(pc88va_state::pc88va_fdc_motor_start_1), this);
 	m_motor_start_timer[0]->adjust(attotime::never);
 	m_motor_start_timer[1]->adjust(attotime::never);
 
-	m_t3_mouse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc88va_state::t3_mouse_callback), this));
+	m_t3_mouse_timer = timer_alloc(FUNC(pc88va_state::t3_mouse_callback), this);
 	m_t3_mouse_timer->adjust(attotime::never);
 
 	floppy_image_device *floppy;

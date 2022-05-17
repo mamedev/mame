@@ -86,10 +86,10 @@ void sgi_mc_device::device_start()
 	m_sys_id = 0x03; // rev. C MC
 	m_sys_id |= m_eisa_present() << 4;
 
-	m_rpss_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sgi_mc_device::rpss_tick), this));
+	m_rpss_timer = timer_alloc(FUNC(sgi_mc_device::rpss_tick), this);
 	m_rpss_timer->adjust(attotime::never);
 
-	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sgi_mc_device::perform_dma), this));
+	m_dma_timer = timer_alloc(FUNC(sgi_mc_device::perform_dma), this);
 	m_dma_timer->adjust(attotime::never);
 
 	save_item(NAME(m_cpu_control));

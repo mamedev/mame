@@ -207,7 +207,7 @@ k7659_keyboard_device::k7659_keyboard_device(const machine_config &mconfig, cons
 
 void k7659_keyboard_device::device_start()
 {
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(k7659_keyboard_device::scan_keyboard), this));
+	m_timer = timer_alloc(FUNC(k7659_keyboard_device::scan_keyboard), this);
 	// state saving
 	save_item(NAME(m_lookup));
 	save_item(NAME(m_key));

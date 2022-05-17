@@ -122,9 +122,9 @@ void cdp1864_device::device_start()
 	m_stream = stream_alloc(0, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
 
 	// allocate timers
-	m_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cdp1864_device::int_tick), this));
-	m_efx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cdp1864_device::efx_tick), this));
-	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cdp1864_device::dma_tick), this));
+	m_int_timer = timer_alloc(FUNC(cdp1864_device::int_tick), this);
+	m_efx_timer = timer_alloc(FUNC(cdp1864_device::efx_tick), this);
+	m_dma_timer = timer_alloc(FUNC(cdp1864_device::dma_tick), this);
 
 	// find devices
 	screen().register_screen_bitmap(m_bitmap);

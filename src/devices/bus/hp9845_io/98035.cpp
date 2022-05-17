@@ -186,8 +186,8 @@ void hp98035_io_card_device::device_start()
 	save_item(NAME(m_prev_clock_keys));
 	save_item(NAME(m_clock_key_cnt));
 
-	m_msec_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp98035_io_card_device::msec_tick), this));
-	m_clock_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp98035_io_card_device::clock_tick), this));
+	m_msec_timer = timer_alloc(FUNC(hp98035_io_card_device::msec_tick), this);
+	m_clock_timer = timer_alloc(FUNC(hp98035_io_card_device::clock_tick), this);
 }
 
 void hp98035_io_card_device::device_reset()

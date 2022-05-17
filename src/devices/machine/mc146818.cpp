@@ -77,9 +77,9 @@ mc146818_device::mc146818_device(const machine_config &mconfig, device_type type
 void mc146818_device::device_start()
 {
 	m_data = make_unique_clear<uint8_t[]>(data_size());
-	m_clock_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc146818_device::clock_tick), this));
-	m_update_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc146818_device::time_tick), this));
-	m_periodic_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc146818_device::periodic_tick), this));
+	m_clock_timer = timer_alloc(FUNC(mc146818_device::clock_tick), this);
+	m_update_timer = timer_alloc(FUNC(mc146818_device::time_tick), this);
+	m_periodic_timer = timer_alloc(FUNC(mc146818_device::periodic_tick), this);
 
 	m_write_irq.resolve_safe();
 	m_write_sqw.resolve_safe();

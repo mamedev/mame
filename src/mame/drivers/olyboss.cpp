@@ -301,7 +301,7 @@ void olyboss_state::ppic_w(u8 data)
 
 void olyboss_state::machine_start()
 {
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(olyboss_state::toggle_tim), this));
+	m_timer = timer_alloc(FUNC(olyboss_state::toggle_tim), this);
 	const char *type = m_fdd0->get_device()->shortname();
 	if(!strncmp(type, "floppy_525_qd", 13))
 		m_fdctype = 0xa0;

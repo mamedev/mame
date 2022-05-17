@@ -5415,7 +5415,7 @@ void metro_state::init_vmetal()
 
 void metro_state::init_mouja()
 {
-	m_mouja_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(metro_state::mouja_irq), this));
+	m_mouja_irq_timer = timer_alloc(FUNC(metro_state::mouja_irq), this);
 	m_okibank->configure_entries(0, 8, memregion("oki")->base(), 0x20000);
 }
 

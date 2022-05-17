@@ -115,7 +115,7 @@ WRITE_LINE_MEMBER(tv990_state::vblank_irq)
 
 void tv990_state::machine_start()
 {
-	m_rowtimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tv990_state::trigger_row_irq), this));
+	m_rowtimer = timer_alloc(FUNC(tv990_state::trigger_row_irq), this);
 
 	save_item(NAME(tvi1111_regs));
 	save_item(NAME(m_rowh));

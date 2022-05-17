@@ -121,7 +121,7 @@ void positron_state::machine_start()
 	// select task 0
 	m_mmu.active_key = 0;
 
-	m_fuse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(positron_state::fuse_update), this));
+	m_fuse_timer = timer_alloc(FUNC(positron_state::fuse_update), this);
 	m_fuse_timer->adjust(attotime::never);
 	m_fuse_timer_running = false;
 	m_irq_ack = false;

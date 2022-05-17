@@ -60,7 +60,7 @@ nes_tengen037_device::nes_tengen037_device(const machine_config &mconfig, const 
 void nes_tengen032_device::device_start()
 {
 	common_start();
-	irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_tengen032_device::irq_timer_tick), this));
+	irq_timer = timer_alloc(FUNC(nes_tengen032_device::irq_timer_tick), this);
 	timer_freq = clocks_to_attotime(4);
 	irq_timer->adjust(attotime::zero, 0, timer_freq);
 

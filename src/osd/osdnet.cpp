@@ -38,7 +38,7 @@ class osd_netdev *open_netdev(int id, class device_network_interface *ifdev, int
 osd_netdev::osd_netdev(class device_network_interface *ifdev, int rate)
 {
 	m_dev = ifdev;
-	m_timer = ifdev->device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(osd_netdev::recv), this));
+	m_timer = ifdev->device().timer_alloc(FUNC(osd_netdev::recv), this);
 	m_timer->adjust(attotime::from_hz(rate), 0, attotime::from_hz(rate));
 }
 

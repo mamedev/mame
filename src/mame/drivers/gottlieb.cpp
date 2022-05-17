@@ -235,7 +235,7 @@ void gottlieb_state::machine_start()
 	save_item(NAME(m_gfxcharhi));
 	save_item(NAME(m_weights));
 
-	m_nmi_clear_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gottlieb_state::nmi_clear), this));
+	m_nmi_clear_timer = timer_alloc(FUNC(gottlieb_state::nmi_clear), this);
 
 	/* see if we have a laserdisc */
 	if (m_laserdisc != nullptr)
@@ -246,9 +246,9 @@ void gottlieb_state::machine_start()
 		m_maincpu->space(AS_PROGRAM).install_write_handler(0x05806, 0x05806, 0, 0x07f8, 0, write8smo_delegate(*this, FUNC(gottlieb_state::laserdisc_select_w)));
 
 		/* allocate a timer for serial transmission, and one for philips code processing */
-		m_laserdisc_bit_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gottlieb_state::laserdisc_bit_callback), this));
-		m_laserdisc_bit_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gottlieb_state::laserdisc_bit_off_callback), this));
-		m_laserdisc_philips_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gottlieb_state::laserdisc_philips_callback), this));
+		m_laserdisc_bit_timer = timer_alloc(FUNC(gottlieb_state::laserdisc_bit_callback), this);
+		m_laserdisc_bit_off_timer = timer_alloc(FUNC(gottlieb_state::laserdisc_bit_off_callback), this);
+		m_laserdisc_philips_timer = timer_alloc(FUNC(gottlieb_state::laserdisc_philips_callback), this);
 
 		/* create some audio RAM */
 		m_laserdisc_audio_buffer = std::make_unique<u8[]>(AUDIORAM_SIZE);

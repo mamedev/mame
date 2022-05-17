@@ -316,7 +316,7 @@ void atetris_state::machine_start()
 	}
 
 	// Allocate interrupt timer
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(atetris_state::interrupt_gen), this));
+	m_interrupt_timer = timer_alloc(FUNC(atetris_state::interrupt_gen), this);
 }
 
 

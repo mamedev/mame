@@ -59,7 +59,7 @@ void upd7004_device::device_start()
 	m_in_cb.resolve_all_safe(0x3ff);
 
 	// allocate timers
-	m_cycle_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd7004_device::update_state), this));
+	m_cycle_timer = timer_alloc(FUNC(upd7004_device::update_state), this);
 	m_cycle_timer->adjust(attotime::never);
 
 	// register for save states

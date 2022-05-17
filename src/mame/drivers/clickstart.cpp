@@ -170,7 +170,7 @@ void clickstart_state::machine_start()
 
 	save_item(NAME(m_unk_portc_toggle));
 
-	m_uart_tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(clickstart_state::handle_uart_tx), this));
+	m_uart_tx_timer = timer_alloc(FUNC(clickstart_state::handle_uart_tx), this);
 	m_uart_tx_timer->adjust(attotime::never);
 }
 

@@ -83,10 +83,10 @@ void dave_device::device_start()
 	m_write_rh.resolve_safe();
 
 	// allocate timers
-	m_timer_1hz = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dave_device::update_1hz_timer), this));
+	m_timer_1hz = timer_alloc(FUNC(dave_device::update_1hz_timer), this);
 	m_timer_1hz->adjust(attotime::from_hz(2), 0, attotime::from_hz(2));
 
-	m_timer_50hz = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dave_device::update_50hz_timer), this));
+	m_timer_50hz = timer_alloc(FUNC(dave_device::update_50hz_timer), this);
 	m_timer_50hz->adjust(attotime::from_hz(2000), 0, attotime::from_hz(2000));
 
 	// state saving

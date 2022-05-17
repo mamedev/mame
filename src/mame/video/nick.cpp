@@ -140,7 +140,7 @@ void nick_device::device_start()
 	m_write_virq.resolve_safe();
 
 	// allocate timers
-	m_timer_scanline = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nick_device::scanline_tick), this));
+	m_timer_scanline = timer_alloc(FUNC(nick_device::scanline_tick), this);
 	m_timer_scanline->adjust(screen().time_until_pos(0, 0), 0, screen().scan_period());
 
 	// state saving

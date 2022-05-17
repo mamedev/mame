@@ -45,7 +45,7 @@ void geebee_sound_device::device_start()
 	m_channel = stream_alloc(0, 1, clock() / 3 / 2 / 384);
 	m_vcount = 0;
 
-	m_volume_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(geebee_sound_device::volume_decay_tick), this));
+	m_volume_timer = timer_alloc(FUNC(geebee_sound_device::volume_decay_tick), this);
 
 	save_item(NAME(m_sound_latch));
 	save_item(NAME(m_sound_signal));

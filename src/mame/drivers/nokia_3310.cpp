@@ -232,10 +232,10 @@ void noki3310_state::machine_start()
 	m_dsp_ram = std::make_unique<uint16_t[]>(0x800);      // DSP shared RAM
 
 	// allocate timers
-	m_timer0 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(noki3310_state::timer0), this));
-	m_timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(noki3310_state::timer1), this));
-	m_timer_watchdog = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(noki3310_state::timer_watchdog), this));
-	m_timer_fiq8 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(noki3310_state::timer_fiq8), this));
+	m_timer0 = timer_alloc(FUNC(noki3310_state::timer0), this);
+	m_timer1 = timer_alloc(FUNC(noki3310_state::timer1), this);
+	m_timer_watchdog = timer_alloc(FUNC(noki3310_state::timer_watchdog), this);
+	m_timer_fiq8 = timer_alloc(FUNC(noki3310_state::timer_fiq8), this);
 }
 
 void noki3310_state::machine_reset()

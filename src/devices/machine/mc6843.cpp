@@ -18,7 +18,7 @@ mc6843_device::mc6843_device(const machine_config &mconfig, const char *tag, dev
 void mc6843_device::device_start()
 {
 	m_irq.resolve_safe();
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc6843_device::update_tick), this));
+	m_timer = timer_alloc(FUNC(mc6843_device::update_tick), this);
 	m_floppy = nullptr;
 
 	m_dir  = 0x00;

@@ -835,15 +835,15 @@ void screen_device::device_start()
 	m_container->set_user_settings(settings);
 
 	// allocate the VBLANK timers
-	m_vblank_begin_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(screen_device::vblank_begin), this));
-	m_vblank_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(screen_device::vblank_end), this));
+	m_vblank_begin_timer = timer_alloc(FUNC(screen_device::vblank_begin), this);
+	m_vblank_end_timer = timer_alloc(FUNC(screen_device::vblank_end), this);
 
 	// allocate a timer to reset partial updates
-	m_scanline0_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(screen_device::first_scanline_tick), this));
+	m_scanline0_timer = timer_alloc(FUNC(screen_device::first_scanline_tick), this);
 
 	// allocate a timer to generate per-scanline updates
 	if ((m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0 || m_scanline_cb)
-		m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(screen_device::scanline_tick), this));
+		m_scanline_timer = timer_alloc(FUNC(screen_device::scanline_tick), this);
 
 	// configure the screen with the default parameters
 	configure(m_width, m_height, m_visarea, m_refresh);

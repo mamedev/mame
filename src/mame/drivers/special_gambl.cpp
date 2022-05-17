@@ -135,7 +135,7 @@ void dinaris_state::machine_start()
 	save_item(NAME(m_sram_en));
 	save_item(NAME(m_cold_boot));
 
-	emu_timer *cold_boot_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dinaris_state::update_boot_flag), this));
+	emu_timer *cold_boot_timer = timer_alloc(FUNC(dinaris_state::update_boot_flag), this);
 	cold_boot_timer->adjust(attotime::from_msec(100));
 }
 

@@ -214,8 +214,8 @@ smioc_device::smioc_device(const machine_config &mconfig, const char *tag, devic
 
 void smioc_device::device_start()
 {
-	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(smioc_device::raise_drq), this));
-	m_451_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(smioc_device::raise_int1), this));
+	m_dma_timer = timer_alloc(FUNC(smioc_device::raise_drq), this);
+	m_451_timer = timer_alloc(FUNC(smioc_device::raise_int1), this);
 
 	/* Resolve callbacks */
 	m_m68k_r_cb.resolve_safe(0);

@@ -171,7 +171,7 @@ TIMER_CALLBACK_MEMBER(mecmouse_device::poll_mouse)
 
 void mecmouse_device::device_start()
 {
-	m_poll_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mecmouse_device::poll_mouse), this));
+	m_poll_timer = timer_alloc(FUNC(mecmouse_device::poll_mouse), this);
 	// The poll time cannot depend on the console settings, since the TI-99/4A
 	// has no clock line on the joystick port. The rate is not mentioned in
 	// the specs; however, if it is too low, the mouse pointer will do jumps

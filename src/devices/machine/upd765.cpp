@@ -216,7 +216,7 @@ void upd765_family_device::device_start()
 
 	for(int i=0; i != 4; i++) {
 		char name[2];
-		flopi[i].tm = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd765_family_device::update_floppy), this));
+		flopi[i].tm = timer_alloc(FUNC(upd765_family_device::update_floppy), this);
 		flopi[i].id = i;
 		if(select_connected) {
 			name[0] = '0'+i;
@@ -257,7 +257,7 @@ void upd765_family_device::device_start()
 	cur_live.fi = nullptr;
 
 	if(ready_polled) {
-		poll_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd765_family_device::run_drive_ready_polling), this));
+		poll_timer = timer_alloc(FUNC(upd765_family_device::run_drive_ready_polling), this);
 		poll_timer->adjust(attotime::from_usec(100), 0, attotime::from_usec(1024));
 	} else
 		poll_timer = nullptr;

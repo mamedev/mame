@@ -624,7 +624,7 @@ void exorciser_state::machine_start()
 	save_item(NAME(m_printer_data));
 	save_item(NAME(m_printer_data_ready));
 
-	m_trace_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(exorciser_state::assert_trace), this));
+	m_trace_timer = timer_alloc(FUNC(exorciser_state::assert_trace), this);
 }
 
 static DEVICE_INPUT_DEFAULTS_START(exorterm)

@@ -95,8 +95,8 @@ private:
 void pwrview_state::machine_start()
 {
 	save_item(NAME(m_vram));
-	m_tmr0ext = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pwrview_state::update_tmr0), this));
-	m_tmrkbd = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pwrview_state::update_kbd), this));
+	m_tmr0ext = timer_alloc(FUNC(pwrview_state::update_tmr0), this);
+	m_tmrkbd = timer_alloc(FUNC(pwrview_state::update_kbd), this);
 	membank("vram1")->configure_entries(0, 0x400, &m_vram[0], 0x80);
 	membank("vram2")->configure_entries(0, 0x400, &m_vram[0], 0x80);
 }

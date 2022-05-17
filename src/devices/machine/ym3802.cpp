@@ -38,8 +38,8 @@ void ym3802_device::device_start()
 	m_irq_handler.resolve_safe();
 	m_txd_handler.resolve_safe();
 	m_rxd_handler.resolve_safe(0xff);
-	m_midi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ym3802_device::transmit_clk), this));
-	m_midi_counter_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ym3802_device::midi_clk), this));
+	m_midi_timer = timer_alloc(FUNC(ym3802_device::transmit_clk), this);
+	m_midi_counter_timer = timer_alloc(FUNC(ym3802_device::midi_clk), this);
 	save_item(NAME(m_reg));
 }
 

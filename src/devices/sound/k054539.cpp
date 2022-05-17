@@ -507,7 +507,7 @@ u8 k054539_device::read(offs_t offset)
 
 void k054539_device::device_start()
 {
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(k054539_device::call_timer_handler), this));
+	m_timer = timer_alloc(FUNC(k054539_device::call_timer_handler), this);
 
 	// resolve / bind callbacks
 	m_timer_handler.resolve_safe();

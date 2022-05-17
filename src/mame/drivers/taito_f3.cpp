@@ -437,7 +437,7 @@ INTERRUPT_GEN_MEMBER(taito_f3_state::interrupt2)
 
 void taito_f3_state::machine_start()
 {
-	m_interrupt3_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(taito_f3_state::trigger_int3), this));
+	m_interrupt3_timer = timer_alloc(FUNC(taito_f3_state::trigger_int3), this);
 
 	save_item(NAME(m_coin_word));
 }

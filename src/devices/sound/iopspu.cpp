@@ -31,10 +31,10 @@ void iop_spu_device::device_start()
 	m_ram = std::make_unique<uint16_t[]>(2 * 1024 * 1024); // ?
 
 	if (!m_core[0].m_autodma_done_timer_hack)
-		m_core[0].m_autodma_done_timer_hack = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(iop_spu_device::autodma_done_timer_hack), this));
+		m_core[0].m_autodma_done_timer_hack = timer_alloc(FUNC(iop_spu_device::autodma_done_timer_hack), this);
 
 	if (!m_core[1].m_autodma_done_timer_hack)
-		m_core[1].m_autodma_done_timer_hack = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(iop_spu_device::autodma_done_timer_hack), this));
+		m_core[1].m_autodma_done_timer_hack = timer_alloc(FUNC(iop_spu_device::autodma_done_timer_hack), this);
 
 	save_item(NAME(m_core[0].m_status));
 	save_item(NAME(m_core[0].m_start_port_addr));

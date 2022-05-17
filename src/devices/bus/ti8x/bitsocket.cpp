@@ -64,7 +64,7 @@ void bit_socket_device::device_add_mconfig(machine_config &config)
 
 void bit_socket_device::device_start()
 {
-	m_poll_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bit_socket_device::poll_tick), this));
+	m_poll_timer = timer_alloc(FUNC(bit_socket_device::poll_tick), this);
 
 	save_item(NAME(m_tip_in));
 	save_item(NAME(m_ring_in));

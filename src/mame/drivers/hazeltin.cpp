@@ -232,7 +232,7 @@ void hazl1500_state::machine_start()
 {
 	m_screen_buf = std::make_unique<float[]>(SCREEN_HTOTAL * SCREEN_VTOTAL);
 
-	m_iowq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hazl1500_state::update_iowq), this));
+	m_iowq_timer = timer_alloc(FUNC(hazl1500_state::update_iowq), this);
 	m_iowq_timer->adjust(attotime::never);
 
 	m_uart->write_swe(0);

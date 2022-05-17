@@ -97,7 +97,7 @@ hd61830_device::hd61830_device(const machine_config &mconfig, const char *tag, d
 void hd61830_device::device_start()
 {
 	// allocate timers
-	m_busy_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hd61830_device::clear_busy_flag), this));
+	m_busy_timer = timer_alloc(FUNC(hd61830_device::clear_busy_flag), this);
 
 	// resolve callbacks
 	m_read_rd.resolve_safe(0);

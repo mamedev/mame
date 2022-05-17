@@ -392,7 +392,7 @@ void cdp1869_device::device_start()
 	m_out_char_ram_func.resolve();
 
 	// allocate timers
-	m_prd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cdp1869_device::prd_update), this));
+	m_prd_timer = timer_alloc(FUNC(cdp1869_device::prd_update), this);
 	m_dispoff = 0;
 	update_prd_changed_timer();
 

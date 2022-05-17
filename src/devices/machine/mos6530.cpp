@@ -66,7 +66,7 @@ void mos6530_device::device_start()
 	m_out_pb_cb.resolve_safe();
 
 	/* allocate timers */
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mos6530_device::end_state), this));
+	m_timer = timer_alloc(FUNC(mos6530_device::end_state), this);
 
 	/* register for save states */
 	save_item(NAME(m_port[0].m_in));

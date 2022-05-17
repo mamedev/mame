@@ -422,7 +422,7 @@ void prof80_state::machine_start()
 	m_rtc->oe_w(1);
 
 	// create timer
-	m_floppy_motor_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(prof80_state::motor_off), this));
+	m_floppy_motor_off_timer = timer_alloc(FUNC(prof80_state::motor_off), this);
 
 	// register for state saving
 	save_item(NAME(m_motor));

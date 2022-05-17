@@ -147,8 +147,8 @@ void cop452_device::device_start()
 {
 	m_out_handlers.resolve_all_safe();
 
-	m_timers[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cop452_device::timer_tick), this));
-	m_timers[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cop452_device::timer_tick), this));
+	m_timers[0] = timer_alloc(FUNC(cop452_device::timer_tick), this);
+	m_timers[1] = timer_alloc(FUNC(cop452_device::timer_tick), this);
 
 	save_item(NAME(m_mode));
 	save_item(NAME(m_clk_div_4));

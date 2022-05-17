@@ -101,7 +101,7 @@ void a2bus_corvfdc02_device::device_start()
 {
 	m_rom = device().machine().root_device().memregion(this->subtag(FDC02_ROM_REGION).c_str())->base();
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a2bus_corvfdc02_device::tc_tick), this));
+	m_timer = timer_alloc(FUNC(a2bus_corvfdc02_device::tc_tick), this);
 
 	save_item(NAME(m_fdc_local_status));
 	save_item(NAME(m_fdc_local_command));

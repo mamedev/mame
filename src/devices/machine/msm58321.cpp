@@ -209,15 +209,15 @@ void msm58321_device::device_start()
 	m_busy_handler.resolve_safe();
 
 	// allocate timers
-	m_clock_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(msm58321_device::clock_tick), this));
+	m_clock_timer = timer_alloc(FUNC(msm58321_device::clock_tick), this);
 	m_clock_timer->adjust(clocks_to_attotime(32768/1024), 0, clocks_to_attotime(32768/1024));
 
 	// busy signal active period is approximately 427 µs
-	m_busy_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(msm58321_device::release_busy), this));
+	m_busy_timer = timer_alloc(FUNC(msm58321_device::release_busy), this);
 	m_busy_timer->adjust(clocks_to_attotime(32768 - 14), 0, clocks_to_attotime(32768));
 
 	// standard signal active period is approximately 122 µs
-	m_standard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(msm58321_device::assert_standard), this));
+	m_standard_timer = timer_alloc(FUNC(msm58321_device::assert_standard), this);
 	m_standard_timer->adjust(clocks_to_attotime(32768-4), 0, clocks_to_attotime(32768));
 
 	// state saving

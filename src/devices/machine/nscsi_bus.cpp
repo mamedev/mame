@@ -233,7 +233,7 @@ const char *const nscsi_full_device::command_names[256] = {
 void nscsi_full_device::device_start()
 {
 	nscsi_device::device_start();
-	scsi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nscsi_full_device::update_tick), this));
+	scsi_timer = timer_alloc(FUNC(nscsi_full_device::update_tick), this);
 	save_item(NAME(scsi_cmdbuf));
 	save_item(NAME(scsi_sense_buffer));
 	save_item(NAME(scsi_cmdsize));

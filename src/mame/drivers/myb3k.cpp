@@ -722,7 +722,7 @@ void myb3k_state::machine_start()
 	save_pointer(NAME(m_dma_page), sizeof(m_dma_page));
 	save_item(NAME(m_io_status));
 
-	m_key_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(myb3k_state::key_interrupt), this));
+	m_key_timer = timer_alloc(FUNC(myb3k_state::key_interrupt), this);
 }
 
 void myb3k_state::machine_reset()

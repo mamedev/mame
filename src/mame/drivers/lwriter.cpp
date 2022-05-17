@@ -313,7 +313,7 @@ void lwriter_state::machine_start()
 	m_vram = make_unique_clear<uint8_t []>(FB_WIDTH * FB_HEIGHT / 8);
 
 	// do stuff here later on like setting up printer mechanisms HLE timers etc
-	m_pb6_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lwriter_state::pb6_tick), this));
+	m_pb6_timer = timer_alloc(FUNC(lwriter_state::pb6_tick), this);
 
 	m_pb6_timer->adjust(attotime::from_hz(PB6_CLK));
 	// Initialize ca1 to 1 so that we don't miss the first interrupt/transition to 0

@@ -280,7 +280,7 @@ void gp9001vdp_device::device_start()
 	m_gp9001_cb.resolve();
 	m_vint_out_cb.resolve();
 
-	m_raise_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp9001vdp_device::raise_irq), this));
+	m_raise_irq_timer = timer_alloc(FUNC(gp9001vdp_device::raise_irq), this);
 
 	save_item(NAME(m_scroll_reg));
 	save_item(NAME(m_voffs));

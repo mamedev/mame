@@ -143,9 +143,9 @@ void cococart_slot_device::device_start()
 {
 	for(int i=0; i < TIMER_POOL; i++ )
 	{
-		m_cart_line.timer[i]    = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cococart_slot_device::cart_line_timer_tick), this));
-		m_nmi_line.timer[i]     = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cococart_slot_device::nmi_line_timer_tick), this));
-		m_halt_line.timer[i]    = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cococart_slot_device::halt_line_timer_tick), this));
+		m_cart_line.timer[i]    = timer_alloc(FUNC(cococart_slot_device::cart_line_timer_tick), this);
+		m_nmi_line.timer[i]     = timer_alloc(FUNC(cococart_slot_device::nmi_line_timer_tick), this);
+		m_halt_line.timer[i]    = timer_alloc(FUNC(cococart_slot_device::halt_line_timer_tick), this);
 	}
 
 	m_cart_line.timer_index     = 0;

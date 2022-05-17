@@ -94,7 +94,7 @@ void ripple_counter_device::device_resolve_objects()
 void ripple_counter_device::device_start()
 {
 	// initialize timers
-	m_count_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ripple_counter_device::advance_counter), this));
+	m_count_timer = timer_alloc(FUNC(ripple_counter_device::advance_counter), this);
 
 	// register internal state
 	save_item(NAME(m_count));

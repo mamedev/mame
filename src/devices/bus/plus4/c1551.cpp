@@ -439,7 +439,7 @@ void c1551_device::device_start()
 	m_leds.resolve();
 
 	// allocate timers
-	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(c1551_device::irq_timer_tick), this));
+	m_irq_timer = timer_alloc(FUNC(c1551_device::irq_timer_tick), this);
 	m_irq_timer->adjust(attotime::zero, CLEAR_LINE);
 
 	// install image callbacks

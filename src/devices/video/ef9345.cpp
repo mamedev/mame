@@ -132,8 +132,8 @@ ts9347_device::ts9347_device(const machine_config &mconfig, const char *tag, dev
 
 void ef9345_device::device_start()
 {
-	m_busy_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ef9345_device::clear_busy_flag), this));
-	m_blink_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ef9345_device::blink_tick), this));
+	m_busy_timer = timer_alloc(FUNC(ef9345_device::clear_busy_flag), this);
+	m_blink_timer = timer_alloc(FUNC(ef9345_device::blink_tick), this);
 
 	m_videoram = &space(0);
 

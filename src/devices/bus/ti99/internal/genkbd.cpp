@@ -576,8 +576,8 @@ WRITE_LINE_MEMBER(geneve_xt_101_hle_keyboard_device::data_write)
 void geneve_xt_101_hle_keyboard_device::device_start()
 {
 	set_pc_kbdc_device();
-	m_poll_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(geneve_xt_101_hle_keyboard_device::poll_tick), this));
-	m_send_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(geneve_xt_101_hle_keyboard_device::send_tick), this));
+	m_poll_timer = timer_alloc(FUNC(geneve_xt_101_hle_keyboard_device::poll_tick), this);
+	m_send_timer = timer_alloc(FUNC(geneve_xt_101_hle_keyboard_device::send_tick), this);
 
 	// state saving
 	save_item(NAME(m_queue_length));

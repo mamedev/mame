@@ -266,17 +266,17 @@ void s3c44b0_device::device_start()
 
 	m_cpu->space(AS_PROGRAM).cache(m_cache);
 
-	for (int i = 0; i < 6; i++) m_pwm.timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s3c44b0_device::pwm_timer_exp),this));
-	for (auto & elem : m_uart) elem.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s3c44b0_device::uart_timer_exp),this));
-	for (auto & elem : m_zdma) elem.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s3c44b0_device::zdma_timer_exp),this));
-	for (auto & elem : m_bdma) elem.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s3c44b0_device::bdma_timer_exp),this));
+	for (int i = 0; i < 6; i++) m_pwm.timer[i] = timer_alloc(FUNC(s3c44b0_device::pwm_timer_exp), this);
+	for (auto & elem : m_uart) elem.timer = timer_alloc(FUNC(s3c44b0_device::uart_timer_exp), this);
+	for (auto & elem : m_zdma) elem.timer = timer_alloc(FUNC(s3c44b0_device::zdma_timer_exp), this);
+	for (auto & elem : m_bdma) elem.timer = timer_alloc(FUNC(s3c44b0_device::bdma_timer_exp), this);
 
-	m_lcd.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s3c44b0_device::lcd_timer_exp),this));
-	m_wdt.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s3c44b0_device::wdt_timer_exp),this));
-	m_sio.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s3c44b0_device::sio_timer_exp),this));
-	m_adc.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s3c44b0_device::adc_timer_exp),this));
-	m_iic.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s3c44b0_device::iic_timer_exp),this));
-	m_iis.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s3c44b0_device::iis_timer_exp),this));
+	m_lcd.timer = timer_alloc(FUNC(s3c44b0_device::lcd_timer_exp), this);
+	m_wdt.timer = timer_alloc(FUNC(s3c44b0_device::wdt_timer_exp), this);
+	m_sio.timer = timer_alloc(FUNC(s3c44b0_device::sio_timer_exp), this);
+	m_adc.timer = timer_alloc(FUNC(s3c44b0_device::adc_timer_exp), this);
+	m_iic.timer = timer_alloc(FUNC(s3c44b0_device::iic_timer_exp), this);
+	m_iis.timer = timer_alloc(FUNC(s3c44b0_device::iis_timer_exp), this);
 
 	video_start();
 

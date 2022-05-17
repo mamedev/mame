@@ -365,7 +365,7 @@ void dmg_ppu_device::common_start()
 	m_vram = make_unique_clear<uint8_t[]>(m_vram_size);
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(dmg_ppu_device::videoptr_restore), this));
-	m_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dmg_ppu_device::update_tick), this));
+	m_lcd_timer = timer_alloc(FUNC(dmg_ppu_device::update_tick), this);
 
 	m_program_space = &m_lr35902->space(AS_PROGRAM);
 

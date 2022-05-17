@@ -122,7 +122,7 @@ TIMER_CALLBACK_MEMBER(qwak_state::interrupt_callback)
 
 void qwak_state::machine_start()
 {
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(runaway_state::interrupt_callback),this));
+	m_interrupt_timer = timer_alloc(FUNC(runaway_state::interrupt_callback), this);
 
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(qwak_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 30);
 }

@@ -72,7 +72,7 @@ void mm74c922_device::device_start()
 	change_output_lines();
 
 	// allocate timers
-	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mm74c922_device::perform_scan), this));
+	m_scan_timer = timer_alloc(FUNC(mm74c922_device::perform_scan), this);
 	m_scan_timer->adjust(attotime::zero, 0, attotime::from_hz(500)); // approximate rate from a 100n capacitor
 
 	// register for state saving

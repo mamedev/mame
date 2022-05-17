@@ -103,7 +103,7 @@ void asr733_device::device_start()
 	m_keyint_line.resolve();
 	m_lineint_line.resolve();
 
-	m_line_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(asr733_device::line_tick), this));
+	m_line_timer = timer_alloc(FUNC(asr733_device::line_tick), this);
 
 	uint8_t *dst;
 

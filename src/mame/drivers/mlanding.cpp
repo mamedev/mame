@@ -210,7 +210,7 @@ void mlanding_state::machine_start()
 	save_item(NAME(m_msm2_vck2));
 
 	// Allocate DMA timers
-	m_dma_done_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mlanding_state::dma_complete), this));
+	m_dma_done_timer = timer_alloc(FUNC(mlanding_state::dma_complete), this);
 }
 
 

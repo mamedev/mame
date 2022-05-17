@@ -152,7 +152,7 @@ void cdp1871_device::device_start()
 	change_output_lines();
 
 	// allocate timers
-	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cdp1871_device::perform_scan), this));
+	m_scan_timer = timer_alloc(FUNC(cdp1871_device::perform_scan), this);
 	m_scan_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()));
 
 	// register for state saving

@@ -137,7 +137,6 @@ public:
 	void dskchg_w(int state) { if (dskchg_writable) dskchg = state; }
 	void ds_w(int state) { ds = state; check_led(); }
 
-	void index_resync();
 	attotime time_next_index();
 	attotime get_next_transition(const attotime &from_when);
 	void write_flux(const attotime &start, const attotime &end, int transition_count, const attotime *transitions);

@@ -439,7 +439,7 @@ void esqpanel_device::device_start()
 			return write_contents(o);
 		});
 
-		m_external_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(esqpanel_device::check_external_panel_server), this));
+		m_external_timer = timer_alloc(FUNC(esqpanel_device::check_external_panel_server), this);
 		m_external_timer->enable(false);
 	}
 }

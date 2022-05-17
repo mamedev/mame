@@ -96,9 +96,9 @@ void wd1010_device::device_start()
 	m_out_data_cb.resolve_safe();
 
 	// allocate timer
-	m_seek_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wd1010_device::update_seek), this));
-	m_read_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wd1010_device::delayed_read), this));
-	m_write_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wd1010_device::delayed_write), this));
+	m_seek_timer = timer_alloc(FUNC(wd1010_device::update_seek), this);
+	m_read_timer = timer_alloc(FUNC(wd1010_device::delayed_read), this);
+	m_write_timer = timer_alloc(FUNC(wd1010_device::delayed_write), this);
 
 	// register for save states
 	save_item(NAME(m_intrq));

@@ -235,7 +235,7 @@ void es5503_device::device_start()
 	output_rate = (clock() / 8) / (oscsenabled + 2);
 	m_stream = stream_alloc(0, output_channels, output_rate);
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(es5503_device::delayed_stream_update), this));
+	m_timer = timer_alloc(FUNC(es5503_device::delayed_stream_update), this);
 }
 
 void es5503_device::device_clock_changed()

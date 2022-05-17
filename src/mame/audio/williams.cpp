@@ -232,7 +232,7 @@ void williams_cvsd_sound_device::device_start()
 	save_item(NAME(m_talkback));
 
 	// allocate timers
-	m_sync_write_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(williams_cvsd_sound_device::sync_write), this));
+	m_sync_write_timer = timer_alloc(FUNC(williams_cvsd_sound_device::sync_write), this);
 }
 
 
@@ -567,9 +567,9 @@ void williams_narc_sound_device::device_start()
 	save_item(NAME(m_sound_int_state));
 
 	// allocate timers
-	m_sync_master_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(williams_narc_sound_device::sync_master_command), this));
-	m_sync_slave_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(williams_narc_sound_device::sync_slave_command), this));
-	m_sync_clear_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(williams_narc_sound_device::sync_clear), this));
+	m_sync_master_timer = timer_alloc(FUNC(williams_narc_sound_device::sync_master_command), this);
+	m_sync_slave_timer = timer_alloc(FUNC(williams_narc_sound_device::sync_slave_command), this);
+	m_sync_clear_timer = timer_alloc(FUNC(williams_narc_sound_device::sync_clear), this);
 }
 
 
@@ -807,8 +807,8 @@ void williams_adpcm_sound_device::device_start()
 	save_item(NAME(m_talkback));
 	save_item(NAME(m_sound_int_state));
 
-	m_sync_command_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(williams_adpcm_sound_device::sync_command), this));
-	m_irq_clear_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(williams_adpcm_sound_device::irq_clear), this));
+	m_sync_command_timer = timer_alloc(FUNC(williams_adpcm_sound_device::sync_command), this);
+	m_irq_clear_timer = timer_alloc(FUNC(williams_adpcm_sound_device::irq_clear), this);
 }
 
 

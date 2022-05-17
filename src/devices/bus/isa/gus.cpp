@@ -402,10 +402,10 @@ void gf1_device::device_start()
 	m_stream = stream_alloc(0,2,clock() / (14 * 16));
 
 	// init timers
-	m_timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gf1_device::adlib_timer1_tick), this));
-	m_timer2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gf1_device::adlib_timer2_tick), this));
-	m_dmatimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gf1_device::dma_tick), this));
-	m_voltimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gf1_device::update_volume_ramps), this));
+	m_timer1 = timer_alloc(FUNC(gf1_device::adlib_timer1_tick), this);
+	m_timer2 = timer_alloc(FUNC(gf1_device::adlib_timer2_tick), this);
+	m_dmatimer = timer_alloc(FUNC(gf1_device::dma_tick), this);
+	m_voltimer = timer_alloc(FUNC(gf1_device::update_volume_ramps), this);
 
 	save_item(NAME(m_wave_ram));
 

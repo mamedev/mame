@@ -101,7 +101,7 @@ mdcr_device::mdcr_device(machine_config const &mconfig, char const *tag, device_
 
 void mdcr_device::device_start()
 {
-	m_read_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mdcr_device::read_timer_tick), this));
+	m_read_timer = timer_alloc(FUNC(mdcr_device::read_timer_tick), this);
 	m_read_timer->adjust(attotime::from_hz(44100), 0, attotime::from_hz(44100));
 
 	save_item(NAME(m_fwd));

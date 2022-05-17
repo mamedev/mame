@@ -967,11 +967,11 @@ void vk100_state::machine_start()
 		m_col_array[i] = ioport(kbdcol);
 	}
 
-	m_vg_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vk100_state::execute_vg), this));
+	m_vg_timer = timer_alloc(FUNC(vk100_state::execute_vg), this);
 	// TODO: figure out the best way to bring up the i8251 timers
-	//m_i8251_rx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vk100_state::i8251_rx_tick), this));
-	//m_i8251_tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vk100_state::i8251_tx_tick), this));
-	//m_i8251_sync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vk100_state::i8251_sync), this));
+	//m_i8251_rx_timer = timer_alloc(FUNC(vk100_state::i8251_rx_tick), this);
+	//m_i8251_tx_timer = timer_alloc(FUNC(vk100_state::i8251_tx_tick), this);
+	//m_i8251_sync_timer = timer_alloc(FUNC(vk100_state::i8251_sync), this);
 }
 
 WRITE_LINE_MEMBER(vk100_state::crtc_vsync)

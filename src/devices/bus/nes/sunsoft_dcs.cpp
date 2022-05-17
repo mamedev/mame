@@ -168,7 +168,7 @@ void nes_sunsoft_dcs_device::device_start()
 {
 	nes_sunsoft_4_device::device_start();
 
-	ntb_enable_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_sunsoft_dcs_device::protect_tick), this));
+	ntb_enable_timer = timer_alloc(FUNC(nes_sunsoft_dcs_device::protect_tick), this);
 	ntb_enable_timer->reset();
 	timer_freq = clocks_to_attotime(107520);
 

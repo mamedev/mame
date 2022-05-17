@@ -63,7 +63,7 @@ void psxsio_device::device_start()
 	m_dtr_handler.resolve_safe();
 	m_rts_handler.resolve_safe();
 
-	m_timer = machine().scheduler().timer_alloc( timer_expired_delegate( FUNC( psxsio_device::sio_tick ), this ) );
+	m_timer = timer_alloc( FUNC( psxsio_device::sio_tick ), this );
 	m_mode = 0;
 	m_control = 0;
 	m_baud = 0;

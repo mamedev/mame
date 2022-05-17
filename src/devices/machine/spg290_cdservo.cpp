@@ -36,7 +36,7 @@ void spg290_cdservo_device::device_start()
 	m_irq_cb.resolve_safe();
 	m_space_write_cb.resolve_safe();
 
-	m_cdtimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg290_cdservo_device::cd_update), this));
+	m_cdtimer = timer_alloc(FUNC(spg290_cdservo_device::cd_update), this);
 	m_dsp_memory = std::make_unique<uint32_t[]>(0x10000);
 
 	save_item(NAME(m_addr));

@@ -40,8 +40,8 @@ void centronics_printer_device::device_add_mconfig(machine_config &config)
 
 void centronics_printer_device::device_start()
 {
-	m_ack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(centronics_printer_device::ack_timer_tick), this));
-	m_busy_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(centronics_printer_device::busy_timer_tick), this));
+	m_ack_timer = timer_alloc(FUNC(centronics_printer_device::ack_timer_tick), this);
+	m_busy_timer = timer_alloc(FUNC(centronics_printer_device::busy_timer_tick), this);
 
 	/* register for state saving */
 	save_item(NAME(m_strobe));

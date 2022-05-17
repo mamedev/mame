@@ -214,7 +214,7 @@ void rmnimbus_state::machine_reset()
 
 void rmnimbus_state::machine_start()
 {
-	m_nimbus_mouse.m_mouse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rmnimbus_state::do_mouse), this));
+	m_nimbus_mouse.m_mouse_timer = timer_alloc(FUNC(rmnimbus_state::do_mouse), this);
 
 	/* setup debug commands */
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)

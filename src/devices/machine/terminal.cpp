@@ -346,7 +346,7 @@ void generic_terminal_device::device_add_mconfig(machine_config &config)
 void generic_terminal_device::device_start()
 {
 	m_buffer = std::make_unique<uint8_t []>(m_width * m_height);
-	m_bell_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(generic_terminal_device::bell_off), this));
+	m_bell_timer = timer_alloc(FUNC(generic_terminal_device::bell_off), this);
 	m_keyboard_cb.resolve();
 	save_pointer(NAME(m_buffer), m_width * m_height);
 	save_item(NAME(m_x_pos));

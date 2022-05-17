@@ -746,7 +746,7 @@ IRQ_CALLBACK_MEMBER(octopus_state::x86_irq_cb)
 
 void octopus_state::machine_start()
 {
-	m_timer_beep = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(octopus_state::beep_off), this));
+	m_timer_beep = timer_alloc(FUNC(octopus_state::beep_off), this);
 	m_vidctrl = 0xff;
 
 	// install RAM

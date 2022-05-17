@@ -203,7 +203,7 @@ void f5220_kbd_device::device_start()
 	m_int_handler.resolve_safe();
 
 	// timer for initial keyboard data
-	m_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(f5220_kbd_device::reset_done), this));
+	m_reset_timer = timer_alloc(FUNC(f5220_kbd_device::reset_done), this);
 	m_reset_timer->adjust(attotime::from_msec(1000));
 
 	// register for state saving

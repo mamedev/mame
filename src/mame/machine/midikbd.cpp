@@ -81,7 +81,7 @@ void midi_keyboard_device::device_start()
 	set_tra_rate(clock());
 	m_out_tx_func.resolve_safe();
 	m_head = m_tail = 0;
-	m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midi_keyboard_device::scan_keyboard), this));
+	m_keyboard_timer = timer_alloc(FUNC(midi_keyboard_device::scan_keyboard), this);
 	m_keyboard_timer->adjust(attotime::from_msec(10), 0, attotime::from_msec(10));
 }
 

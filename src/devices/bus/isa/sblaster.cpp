@@ -1341,7 +1341,7 @@ void isa16_sblaster16_device::device_start()
 
 void sb_device::device_start()
 {
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sb_device::timer_tick), this));
+	m_timer = timer_alloc(FUNC(sb_device::timer_tick), this);
 
 	save_item(NAME(m_dack_out));
 	save_item(NAME(m_onebyte_midi));

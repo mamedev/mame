@@ -373,8 +373,8 @@ void h19_state::machine_start()
 	save_item(NAME(m_keyclickactive));
 	save_item(NAME(m_bellactive));
 
-	m_key_click_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(h19_state::key_click_off), this));
-	m_bell_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(h19_state::bell_off), this));
+	m_key_click_timer = timer_alloc(FUNC(h19_state::key_click_off), this);
+	m_bell_timer = timer_alloc(FUNC(h19_state::bell_off), this);
 }
 
 

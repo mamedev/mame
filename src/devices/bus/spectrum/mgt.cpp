@@ -379,7 +379,7 @@ void spectrum_disciple_device::device_start()
 	save_item(NAME(m_control));
 	save_item(NAME(m_reset_delay));
 
-	m_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spectrum_disciple_device::reset_tick), this));
+	m_reset_timer = timer_alloc(FUNC(spectrum_disciple_device::reset_tick), this);
 }
 
 //-------------------------------------------------

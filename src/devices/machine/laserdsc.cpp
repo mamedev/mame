@@ -227,7 +227,7 @@ void laserdisc_device::device_start()
 	init_audio();
 
 	// register our timer
-	m_vbi_fetch_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(laserdisc_device::fetch_vbi_data), this));
+	m_vbi_fetch_timer = timer_alloc(FUNC(laserdisc_device::fetch_vbi_data), this);
 
 	// register callbacks
 	machine().configuration().config_register(

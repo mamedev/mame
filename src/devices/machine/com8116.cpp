@@ -142,11 +142,11 @@ void com8116_device::device_start()
 	// allocate timers
 	if (!m_fx4_handler.isnull())
 	{
-		m_fx4_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(com8116_device::fx4_tick), this));
+		m_fx4_timer = timer_alloc(FUNC(com8116_device::fx4_tick), this);
 		m_fx4_timer->adjust(attotime::from_hz((clock() / 4) * 2), 0, attotime::from_hz((clock() / 4)) * 2);
 	}
-	m_fr_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(com8116_device::fr_tick), this));
-	m_ft_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(com8116_device::ft_tick), this));
+	m_fr_timer = timer_alloc(FUNC(com8116_device::fr_tick), this);
+	m_ft_timer = timer_alloc(FUNC(com8116_device::ft_tick), this);
 
 	for (int i = 0; i < 16; i++)
 		LOGMASKED(LOG_TABLE, "Output Frequency %01X: 16X %f Hz\n", i, double(clock()) / m_divisors[i] / 16.0);

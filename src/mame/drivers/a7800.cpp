@@ -1367,7 +1367,7 @@ void a7800_state::machine_start()
 		}
 	}
 
-	m_dma_start_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a7800_state::maria_startdma), this));
+	m_dma_start_timer = timer_alloc(FUNC(a7800_state::maria_startdma), this);
 }
 
 void a7800_state::machine_reset()

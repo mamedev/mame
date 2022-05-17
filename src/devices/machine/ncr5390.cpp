@@ -199,7 +199,7 @@ void ncr5390_device::device_start()
 	config = 0;
 	bus_id = 0;
 	select_timeout = 0;
-	tm = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ncr5390_device::update_tick), this));
+	tm = timer_alloc(FUNC(ncr5390_device::update_tick), this);
 }
 
 void ncr5390_device::device_reset()

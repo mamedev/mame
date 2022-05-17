@@ -112,7 +112,7 @@ void c8050_fdc_device::device_start()
 	m_write_error.resolve_safe();
 
 	// allocate timer
-	t_gen = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(c8050_fdc_device::update_state), this));
+	t_gen = timer_alloc(FUNC(c8050_fdc_device::update_state), this);
 
 	// register for state saving
 	save_item(NAME(m_mtr0));

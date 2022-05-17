@@ -1057,9 +1057,9 @@ void amstrad_state::video_start()
 	m_gate_array.hsync_after_vsync_counter = 3;
 	std::fill(std::begin(m_GateArray_render_colours), std::end(m_GateArray_render_colours), 0);
 
-	m_pc2_low_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(amstrad_state::amstrad_pc2_low), this));
-	m_video_update_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(amstrad_state::amstrad_video_update_timer), this));
-	m_set_resolution_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(amstrad_state::cb_set_resolution), this));
+	m_pc2_low_timer = timer_alloc(FUNC(amstrad_state::amstrad_pc2_low), this);
+	m_video_update_timer = timer_alloc(FUNC(amstrad_state::amstrad_video_update_timer), this);
+	m_set_resolution_timer = timer_alloc(FUNC(amstrad_state::cb_set_resolution), this);
 }
 
 

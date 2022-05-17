@@ -1791,8 +1791,8 @@ void dec8_state::machine_start()
 	uint32_t max_bank = (memregion("maincpu")->bytes() - 0x10000) / 0x4000;
 	m_mainbank->configure_entries(0, max_bank, &ROM[0x10000], 0x4000);
 
-	m_i8751_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dec8_state::mcu_irq_clear), this));
-	m_m6502_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dec8_state::audiocpu_nmi_clear), this));
+	m_i8751_timer = timer_alloc(FUNC(dec8_state::mcu_irq_clear), this);
+	m_m6502_timer = timer_alloc(FUNC(dec8_state::audiocpu_nmi_clear), this);
 
 	m_i8751_p2 = 0xff;
 	m_latch = 0;

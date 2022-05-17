@@ -15,7 +15,7 @@ void apexc_state::machine_start()
 {
 	teletyper_init();
 
-	m_input_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apexc_state::check_inputs), this));
+	m_input_timer = timer_alloc(FUNC(apexc_state::check_inputs), this);
 	m_input_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
 
 	m_panel_data_reg = 0;

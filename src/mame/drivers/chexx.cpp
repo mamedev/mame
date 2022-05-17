@@ -356,7 +356,7 @@ void chexx_state::machine_start()
 	m_leds.resolve();
 	m_lamps.resolve();
 
-	m_update_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(chexx_state::update), this));
+	m_update_timer = timer_alloc(FUNC(chexx_state::update), this);
 }
 
 void chexx_state::digitalker_set_bank(uint8_t bank)

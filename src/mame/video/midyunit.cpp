@@ -48,8 +48,8 @@ VIDEO_START_MEMBER(midyunit_state,common)
 
 	m_nvram->set_base(m_cmos_ram.get(), 0x2000 * 4);
 
-	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midyunit_state::dma_callback), this));
-	m_autoerase_line_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midyunit_state::autoerase_line), this));
+	m_dma_timer = timer_alloc(FUNC(midyunit_state::dma_callback), this);
+	m_autoerase_line_timer = timer_alloc(FUNC(midyunit_state::autoerase_line), this);
 
 	/* reset all the globals */
 	m_cmos_page = 0;

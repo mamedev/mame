@@ -611,8 +611,8 @@ void segas16a_state::machine_start()
 {
 	m_lamps.resolve();
 
-	m_i8751_sync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(segas16a_state::i8751_sync), this));
-	m_ppi_sync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(segas16a_state::ppi_sync), this));
+	m_i8751_sync_timer = timer_alloc(FUNC(segas16a_state::i8751_sync), this);
+	m_ppi_sync_timer = timer_alloc(FUNC(segas16a_state::ppi_sync), this);
 }
 
 

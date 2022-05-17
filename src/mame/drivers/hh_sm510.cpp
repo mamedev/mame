@@ -171,7 +171,7 @@ void hh_sm510_state::machine_start()
 	}
 
 	// 1kHz display decay ticks
-	m_display_decay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hh_sm510_state::display_decay_tick),this));
+	m_display_decay_timer = timer_alloc(FUNC(hh_sm510_state::display_decay_tick), this);
 	m_display_decay_timer->adjust(attotime::from_hz(1024), 0, attotime::from_hz(1024));
 
 	// register for savestates

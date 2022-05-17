@@ -177,7 +177,7 @@ void ym2154_device::write(offs_t offset, u8 data)
 void ym2154_device::device_start()
 {
 	// allocate our timer
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ym2154_device::delayed_irq), this));
+	m_timer = timer_alloc(FUNC(ym2154_device::delayed_irq), this);
 
 	// resolve the handlers
 	m_update_irq.resolve();

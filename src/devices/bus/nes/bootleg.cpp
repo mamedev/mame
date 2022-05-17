@@ -259,7 +259,7 @@ void nes_sc127_device::pcb_reset()
 void nes_mbaby_device::device_start()
 {
 	common_start();
-	irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_mbaby_device::irq_timer_tick), this));
+	irq_timer = timer_alloc(FUNC(nes_mbaby_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -293,7 +293,7 @@ void nes_asn_device::pcb_reset()
 void nes_smb3p_device::device_start()
 {
 	common_start();
-	irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_smb3p_device::irq_timer_tick), this));
+	irq_timer = timer_alloc(FUNC(nes_smb3p_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -316,7 +316,7 @@ void nes_smb3p_device::pcb_reset()
 void nes_batmanfs_device::device_start()
 {
 	common_start();
-	irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_batmanfs_device::irq_timer_tick), this));
+	irq_timer = timer_alloc(FUNC(nes_batmanfs_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -356,7 +356,7 @@ void nes_btl_dn_device::pcb_reset()
 void nes_smb2j_device::device_start()
 {
 	common_start();
-	irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_smb2j_device::irq_timer_tick), this));
+	irq_timer = timer_alloc(FUNC(nes_smb2j_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -378,7 +378,7 @@ void nes_smb2j_device::pcb_reset()
 void nes_smb2ja_device::device_start()
 {
 	common_start();
-	irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_smb2ja_device::irq_timer_tick), this));
+	irq_timer = timer_alloc(FUNC(nes_smb2ja_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -400,7 +400,7 @@ void nes_smb2ja_device::pcb_reset()
 void nes_smb2jb_device::device_start()
 {
 	common_start();
-	irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_smb2jb_device::irq_timer_tick), this));
+	irq_timer = timer_alloc(FUNC(nes_smb2jb_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -445,7 +445,7 @@ void nes_0353_device::pcb_reset()
 void nes_09034a_device::device_start()
 {
 	common_start();
-	irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_09034a_device::irq_timer_tick), this));
+	irq_timer = timer_alloc(FUNC(nes_09034a_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -466,7 +466,7 @@ void nes_09034a_device::pcb_reset()
 void nes_l001_device::device_start()
 {
 	common_start();
-	irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_l001_device::irq_timer_tick), this));
+	irq_timer = timer_alloc(FUNC(nes_l001_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_count));
@@ -587,7 +587,7 @@ void nes_lh51_device::pcb_reset()
 void nes_lh53_device::device_start()
 {
 	common_start();
-	irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_lh53_device::irq_timer_tick), this));
+	irq_timer = timer_alloc(FUNC(nes_lh53_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -645,7 +645,7 @@ void nes_rt01_device::pcb_reset()
 void nes_yung08_device::device_start()
 {
 	common_start();
-	irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_yung08_device::irq_timer_tick), this));
+	irq_timer = timer_alloc(FUNC(nes_yung08_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_count));

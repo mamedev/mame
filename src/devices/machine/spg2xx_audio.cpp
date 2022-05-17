@@ -73,7 +73,7 @@ sunplus_gcm394_audio_device::sunplus_gcm394_audio_device(const machine_config &m
 
 void spg2xx_audio_device::device_start()
 {
-	m_audio_beat = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_audio_device::audio_beat_tick), this));
+	m_audio_beat = timer_alloc(FUNC(spg2xx_audio_device::audio_beat_tick), this);
 	m_audio_beat->adjust(attotime::never);
 
 	m_stream = stream_alloc(0, 2, 281250/4);
@@ -107,7 +107,7 @@ void spg2xx_audio_device::device_start()
 
 		memset(m_adpcm36_state + i, 0, sizeof(adpcm36_state));
 
-		m_channel_irq[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_audio_device::irq_tick), this));
+		m_channel_irq[i] = timer_alloc(FUNC(spg2xx_audio_device::irq_tick), this);
 		m_channel_irq[i]->adjust(attotime::never);
 	}
 

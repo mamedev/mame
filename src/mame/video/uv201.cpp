@@ -117,10 +117,10 @@ void uv201_device::device_start()
 	m_read_db.resolve_safe(0);
 
 	// allocate timers
-	m_timer_y_odd = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(uv201_device::y_update_tick), this));
-	m_timer_y_even = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(uv201_device::y_update_tick), this));
-	m_timer_hblank_on = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(uv201_device::hblank_on), this));
-	m_timer_hblank_off = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(uv201_device::hblank_off), this));
+	m_timer_y_odd = timer_alloc(FUNC(uv201_device::y_update_tick), this);
+	m_timer_y_even = timer_alloc(FUNC(uv201_device::y_update_tick), this);
+	m_timer_hblank_on = timer_alloc(FUNC(uv201_device::hblank_on), this);
+	m_timer_hblank_off = timer_alloc(FUNC(uv201_device::hblank_off), this);
 
 	initialize_palette();
 

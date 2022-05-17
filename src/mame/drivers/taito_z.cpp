@@ -3163,7 +3163,7 @@ void sci_state::machine_start()
 
 	save_item(NAME(m_sci_int6));
 
-	m_int6_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sci_state::trigger_int6), this));
+	m_int6_timer = timer_alloc(FUNC(sci_state::trigger_int6), this);
 }
 
 void nightstr_state::machine_start()

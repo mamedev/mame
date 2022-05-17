@@ -45,7 +45,7 @@ void am9519_device::device_start()
 	save_item(NAME(m_aclear));
 	save_item(NAME(m_cmd));
 
-	m_irq_check_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(am9519_device::check_irqs), this));
+	m_irq_check_timer = timer_alloc(FUNC(am9519_device::check_irqs), this);
 	m_irq_check_timer->adjust(attotime::never);
 }
 

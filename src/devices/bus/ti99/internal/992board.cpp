@@ -302,8 +302,8 @@ void video992_device::device_start()
 	m_vertical_size = TOTAL_VERT_NTSC;
 	m_tmpbmp.allocate(TOTAL_HORZ, TOTAL_VERT_NTSC);
 
-	m_hold_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(video992_device::hold_cpu), this));
-	m_free_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(video992_device::free_cpu), this));
+	m_hold_timer = timer_alloc(FUNC(video992_device::hold_cpu), this);
+	m_free_timer = timer_alloc(FUNC(video992_device::free_cpu), this);
 
 	m_border_color = rgb_t::black();
 	m_background_color = rgb_t::white();

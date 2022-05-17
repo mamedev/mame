@@ -255,7 +255,7 @@ void huc6260_device::write(offs_t offset, uint8_t data)
 
 void huc6260_device::device_start()
 {
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(huc6260_device::update_events), this));
+	m_timer = timer_alloc(FUNC(huc6260_device::update_events), this);
 	m_bmp = std::make_unique<bitmap_ind16>(WPF, LPF);
 
 	/* Resolve callbacks */

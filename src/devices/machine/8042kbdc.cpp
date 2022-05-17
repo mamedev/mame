@@ -80,7 +80,7 @@ void kbdc8042_device::device_start()
 	m_speaker = 0;
 	m_offset1 = 0;
 
-	m_update_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(kbdc8042_device::update_timer), this));
+	m_update_timer = timer_alloc(FUNC(kbdc8042_device::update_timer), this);
 	m_update_timer->adjust(attotime::never);
 }
 

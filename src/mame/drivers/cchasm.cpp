@@ -425,7 +425,7 @@ void cchasm_state::machine_start()
 	m_xcenter = visarea.xcenter() << 16;
 	m_ycenter = visarea.ycenter() << 16;
 
-	m_refresh_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cchasm_state::refresh_end), this));
+	m_refresh_end_timer = timer_alloc(FUNC(cchasm_state::refresh_end), this);
 
 	m_coin_flag = 0;
 	m_sound_flags = 0;

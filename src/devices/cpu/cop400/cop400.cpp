@@ -1031,7 +1031,7 @@ void cop400_cpu_device::serial_tick()
 	}
 }
 
-TIMER_CALLBACK_MEMBER(cop400_cpu_device::counter_tick)
+TIMER_CALLBACK_MEMBER(cop400_cpu_device::advance_counter)
 {
 	T++;
 
@@ -1084,7 +1084,7 @@ void cop400_cpu_device::device_start()
 	m_counter_timer = nullptr;
 	if (m_has_counter)
 	{
-		m_counter_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cop400_cpu_device::counter_tick), this));
+		m_counter_timer = timer_alloc(FUNC(cop400_cpu_device::advance_counter), this);
 		m_counter_timer->adjust(attotime::zero, 0, attotime::from_ticks(m_cki * 4, clock()));
 	}
 

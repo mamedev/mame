@@ -22,8 +22,8 @@
 
 void mcr68_state::machine_start()
 {
-	m_493_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mcr68_state::mcr68_493_callback), this));
-	m_493_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mcr68_state::mcr68_493_off_callback), this));
+	m_493_on_timer = timer_alloc(FUNC(mcr68_state::mcr68_493_callback), this);
+	m_493_off_timer = timer_alloc(FUNC(mcr68_state::mcr68_493_off_callback), this);
 }
 
 void mcr68_state::machine_reset()

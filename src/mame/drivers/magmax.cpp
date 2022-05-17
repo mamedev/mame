@@ -69,7 +69,7 @@ TIMER_CALLBACK_MEMBER(magmax_state::scanline_callback)
 void magmax_state::machine_start()
 {
 	// Create interrupt timer
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(magmax_state::scanline_callback),this));
+	m_interrupt_timer = timer_alloc(FUNC(magmax_state::scanline_callback), this);
 
 	// Set up save state
 	save_item(NAME(m_sound_latch));

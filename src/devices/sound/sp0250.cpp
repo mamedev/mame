@@ -73,7 +73,7 @@ void sp0250_device::device_start()
 	{
 		m_drq(ASSERT_LINE);
 		attotime period = attotime::from_hz(frame_rate);
-		m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sp0250_device::delayed_stream_update), this));
+		m_timer = timer_alloc(FUNC(sp0250_device::delayed_stream_update), this);
 		m_timer->adjust(period, 0, period);
 	}
 

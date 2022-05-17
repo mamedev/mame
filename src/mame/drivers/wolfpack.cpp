@@ -31,7 +31,7 @@ TIMER_CALLBACK_MEMBER(wolfpack_state::periodic_callback)
 void wolfpack_state::machine_start()
 {
 	m_led.resolve();
-	m_periodic_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wolfpack_state::periodic_callback), this));
+	m_periodic_timer = timer_alloc(FUNC(wolfpack_state::periodic_callback), this);
 }
 
 void wolfpack_state::machine_reset()

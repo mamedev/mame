@@ -180,7 +180,7 @@ void gime_device::device_start()
 	m_firq = 0x00;
 
 	// allocate timer
-	m_gime_clock_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gime_device::timer_elapsed), this));
+	m_gime_clock_timer = timer_alloc(FUNC(gime_device::timer_elapsed), this);
 
 	// setup banks
 	assert(std::size(m_read_banks) == std::size(m_write_banks));

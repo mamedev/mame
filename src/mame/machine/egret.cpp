@@ -399,7 +399,7 @@ void egret_device::device_start()
 	}
 #endif
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(egret_device::seconds_tick), this));
+	m_timer = timer_alloc(FUNC(egret_device::seconds_tick), this);
 	save_item(NAME(ddrs[0]));
 	save_item(NAME(ddrs[1]));
 	save_item(NAME(ddrs[2]));

@@ -60,7 +60,7 @@ void a8sio_cassette_device::device_start()
 	save_item(NAME(m_old_cass_signal));
 	save_item(NAME(m_signal_count));
 
-	m_read_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a8sio_cassette_device::read_tick), this));
+	m_read_timer = timer_alloc(FUNC(a8sio_cassette_device::read_tick), this);
 }
 
 void a8sio_cassette_device::device_reset()

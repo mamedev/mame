@@ -130,8 +130,8 @@ void jaleco_ms32_sysctrl_device::device_start()
 	save_item(NAME(m_timer.irq_enable));
 	save_item(NAME(m_timer.interval));
 
-	m_timer.prg_irq = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jaleco_ms32_sysctrl_device::prg_timer_tick), this));
-	m_timer_scanline = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jaleco_ms32_sysctrl_device::flush_scanline_timer), this));
+	m_timer.prg_irq = timer_alloc(FUNC(jaleco_ms32_sysctrl_device::prg_timer_tick), this);
+	m_timer_scanline = timer_alloc(FUNC(jaleco_ms32_sysctrl_device::flush_scanline_timer), this);
 }
 
 

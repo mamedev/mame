@@ -391,7 +391,7 @@ void mjsister_state::machine_start()
 	m_vram = make_unique_clear<uint8_t[]>(0x10000);
 	m_vrambank->configure_entries(0, 2, m_vram.get(), 0x8000);
 
-	m_dac_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mjsister_state::dac_callback), this));
+	m_dac_timer = timer_alloc(FUNC(mjsister_state::dac_callback), this);
 
 	save_pointer(NAME(m_vram), 0x10000);
 	save_item(NAME(m_dac_busy));

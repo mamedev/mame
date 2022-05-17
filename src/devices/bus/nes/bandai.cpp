@@ -122,7 +122,7 @@ void nes_oekakids_device::pcb_reset()
 void nes_fcg_device::device_start()
 {
 	common_start();
-	irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_fcg_device::irq_timer_tick), this));
+	irq_timer = timer_alloc(FUNC(nes_fcg_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -142,7 +142,7 @@ void nes_fcg_device::pcb_reset()
 void nes_lz93d50_24c01_device::device_start()
 {
 	common_start();
-	irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_lz93d50_24c01_device::irq_timer_tick), this));
+	irq_timer = timer_alloc(FUNC(nes_lz93d50_24c01_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -164,7 +164,7 @@ void nes_lz93d50_24c01_device::pcb_reset()
 void nes_fjump2_device::device_start()
 {
 	common_start();
-	irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_fjump2_device::irq_timer_tick), this));
+	irq_timer = timer_alloc(FUNC(nes_fjump2_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_reg));

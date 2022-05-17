@@ -568,7 +568,7 @@ void comx35_state::machine_start()
 	save_item(NAME(m_prd));
 	save_item(NAME(m_cr1));
 
-	m_reset_done_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(comx35_state::reset_done), this));
+	m_reset_done_timer = timer_alloc(FUNC(comx35_state::reset_done), this);
 }
 
 

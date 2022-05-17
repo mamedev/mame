@@ -237,7 +237,7 @@ void ksm_state::machine_start()
 	m_tmpclip = rectangle(0, KSM_DISP_HORZ - 1, 0, KSM_DISP_VERT - 1);
 	m_tmpbmp.allocate(KSM_DISP_HORZ, KSM_DISP_VERT);
 
-	m_brg = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ksm_state::clock_brg), this));
+	m_brg = timer_alloc(FUNC(ksm_state::clock_brg), this);
 }
 
 void ksm_state::ksm_ppi_porta_w(uint8_t data)

@@ -231,8 +231,8 @@ nes_datach_device::nes_datach_device(const machine_config &mconfig, const char *
 void nes_datach_device::device_start()
 {
 	common_start();
-	irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_datach_device::irq_timer_tick), this));
-	serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_datach_device::serial_tick), this));
+	irq_timer = timer_alloc(FUNC(nes_datach_device::irq_timer_tick), this);
+	serial_timer = timer_alloc(FUNC(nes_datach_device::serial_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 	serial_timer->adjust(attotime::zero, 0, clocks_to_attotime(1000));
 

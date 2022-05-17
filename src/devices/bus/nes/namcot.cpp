@@ -140,7 +140,7 @@ void nes_namcot3425_device::pcb_reset()
 void nes_namcot340_device::device_start()
 {
 	common_start();
-	irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_namcot340_device::irq_timer_tick), this));
+	irq_timer = timer_alloc(FUNC(nes_namcot340_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -165,7 +165,7 @@ void nes_namcot340_device::pcb_reset()
 void nes_namcot175_device::device_start()
 {
 	common_start();
-	irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_namcot175_device::irq_timer_tick), this));
+	irq_timer = timer_alloc(FUNC(nes_namcot175_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -192,7 +192,7 @@ void nes_namcot175_device::pcb_reset()
 void nes_namcot163_device::device_start()
 {
 	common_start();
-	irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_namcot163_device::irq_timer_tick), this));
+	irq_timer = timer_alloc(FUNC(nes_namcot163_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));

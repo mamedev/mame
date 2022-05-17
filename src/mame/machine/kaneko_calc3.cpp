@@ -62,7 +62,7 @@ kaneko_calc3_device::kaneko_calc3_device(const machine_config &mconfig, const ch
 void kaneko_calc3_device::device_start()
 {
 	initial_scan_tables();
-	m_runtimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(kaneko_calc3_device::mcu_run_trigger), this));
+	m_runtimer = timer_alloc(FUNC(kaneko_calc3_device::mcu_run_trigger), this);
 
 	save_item(NAME(m_mcu_status));
 	save_item(NAME(m_mcu_command_offset));

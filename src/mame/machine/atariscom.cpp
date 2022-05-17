@@ -62,9 +62,9 @@ void atari_sound_comm_device::device_start()
 	save_item(NAME(m_sound_to_main_data));
 
 	// allocate timers
-	m_sound_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(atari_sound_comm_device::delayed_sound_reset), this));
-	m_sound_write_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(atari_sound_comm_device::delayed_sound_write), this));
-	m_6502_write_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(atari_sound_comm_device::delayed_6502_write), this));
+	m_sound_reset_timer = timer_alloc(FUNC(atari_sound_comm_device::delayed_sound_reset), this);
+	m_sound_write_timer = timer_alloc(FUNC(atari_sound_comm_device::delayed_sound_write), this);
+	m_6502_write_timer = timer_alloc(FUNC(atari_sound_comm_device::delayed_6502_write), this);
 }
 
 

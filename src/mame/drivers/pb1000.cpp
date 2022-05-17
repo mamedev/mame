@@ -455,7 +455,7 @@ void pb1000_state::machine_start()
 
 	membank("bank1")->set_base(m_rom_reg->base());
 
-	m_kb_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pb1000_state::keyboard_timer),this));
+	m_kb_timer = timer_alloc(FUNC(pb1000_state::keyboard_timer), this);
 	m_kb_timer->adjust(attotime::from_hz(192), 0, attotime::from_hz(192));
 }
 

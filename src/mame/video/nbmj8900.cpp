@@ -359,7 +359,7 @@ void nbmj8900_state::video_start()
 	m_screen_width = m_screen->width();
 	m_screen_height = m_screen->height();
 
-	m_blitter_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nbmj8900_state::clear_busy_flag), this));
+	m_blitter_timer = timer_alloc(FUNC(nbmj8900_state::clear_busy_flag), this);
 
 	m_screen->register_screen_bitmap(m_tmpbitmap0);
 	m_screen->register_screen_bitmap(m_tmpbitmap1);

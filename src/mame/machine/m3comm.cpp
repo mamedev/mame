@@ -163,7 +163,7 @@ m3comm_device::m3comm_device(const machine_config &mconfig, const char *tag, dev
 
 void m3comm_device::device_start()
 {
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m3comm_device::trigger_irq5), this));
+	m_timer = timer_alloc(FUNC(m3comm_device::trigger_irq5), this);
 	m_timer->adjust(attotime::from_usec(10000));
 }
 

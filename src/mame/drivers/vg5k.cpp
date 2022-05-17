@@ -358,7 +358,7 @@ void vg5k_state::machine_start()
 	save_item(NAME(m_printer_latch));
 	save_item(NAME(m_printer_signal));
 
-	m_z80_irq_clear_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vg5k_state::z80_irq_clear),this));
+	m_z80_irq_clear_timer = timer_alloc(FUNC(vg5k_state::z80_irq_clear), this);
 }
 
 void vg5k_state::machine_reset()

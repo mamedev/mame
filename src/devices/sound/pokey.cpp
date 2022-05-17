@@ -265,13 +265,13 @@ void pokey_device::device_start()
 
 	m_stream = stream_alloc(0, 1, clock());
 
-	m_serout_ready_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pokey_device::serout_ready_irq), this));
-	m_serout_complete_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pokey_device::serout_complete_irq), this));
-	m_serin_ready_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pokey_device::serin_ready_irq), this));
-	m_sync_write_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pokey_device::sync_write), this));
-	m_sync_noop_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pokey_device::sync_noop), this));
-	m_sync_pot_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pokey_device::sync_pot), this));
-	m_sync_set_irqst_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pokey_device::sync_set_irqst), this));
+	m_serout_ready_timer = timer_alloc(FUNC(pokey_device::serout_ready_irq), this);
+	m_serout_complete_timer = timer_alloc(FUNC(pokey_device::serout_complete_irq), this);
+	m_serin_ready_timer = timer_alloc(FUNC(pokey_device::serin_ready_irq), this);
+	m_sync_write_timer = timer_alloc(FUNC(pokey_device::sync_write), this);
+	m_sync_noop_timer = timer_alloc(FUNC(pokey_device::sync_noop), this);
+	m_sync_pot_timer = timer_alloc(FUNC(pokey_device::sync_pot), this);
+	m_sync_set_irqst_timer = timer_alloc(FUNC(pokey_device::sync_set_irqst), this);
 
 	save_item(STRUCT_MEMBER(m_channel, m_borrow_cnt));
 	save_item(STRUCT_MEMBER(m_channel, m_counter));

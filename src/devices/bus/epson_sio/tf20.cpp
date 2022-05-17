@@ -149,8 +149,8 @@ void epson_tf20_device::device_start()
 	if (!m_ram->started())
 		throw device_missing_dependencies();
 
-	m_timer_serial = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(epson_tf20_device::serial_tick), this));
-	m_timer_tc = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(epson_tf20_device::tc_tick), this));
+	m_timer_serial = timer_alloc(FUNC(epson_tf20_device::serial_tick), this);
+	m_timer_tc = timer_alloc(FUNC(epson_tf20_device::tc_tick), this);
 
 	// enable second half of ram
 	m_cpu->space(AS_PROGRAM).install_ram(0x8000, 0xffff, m_ram->pointer() + 0x8000);

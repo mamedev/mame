@@ -199,7 +199,7 @@ WRITE_LINE_MEMBER( jaguar_state::external_int )
 
 void jaguar_state::sound_start()
 {
-	m_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jaguar_state::serial_update), this));
+	m_serial_timer = timer_alloc(FUNC(jaguar_state::serial_update), this);
 
 	m_gpu_irq_state = 0;
 

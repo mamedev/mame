@@ -73,7 +73,7 @@ void ds2404_device::device_start()
 	for (auto & elem : m_state)
 		elem = STATE_IDLE;
 
-	m_tick_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ds2404_device::timer_tick), this));
+	m_tick_timer = timer_alloc(FUNC(ds2404_device::timer_tick), this);
 	m_tick_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
 }
 

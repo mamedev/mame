@@ -79,7 +79,7 @@ void i7220_device::device_start()
 	intrq_cb.resolve_safe();
 	drq_cb.resolve_safe();
 
-	m_bi.tm = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(i7220_device::general_continue), this));
+	m_bi.tm = timer_alloc(FUNC(i7220_device::general_continue), this);
 
 	// register for state saving
 	save_item(NAME(m_regs));

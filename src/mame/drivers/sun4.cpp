@@ -837,8 +837,8 @@ void sun4_base_state::machine_start()
 	}
 
 	// allocate timers for the built-in two channel timer
-	m_c0_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sun4_base_state::timer0_tick), this));
-	m_c1_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sun4_base_state::timer1_tick), this));
+	m_c0_timer = timer_alloc(FUNC(sun4_base_state::timer0_tick), this);
+	m_c1_timer = timer_alloc(FUNC(sun4_base_state::timer1_tick), this);
 	m_c0_timer->adjust(attotime::from_usec(1), 0, attotime::from_usec(1));
 	m_c1_timer->adjust(attotime::from_usec(1), 0, attotime::from_usec(1));
 

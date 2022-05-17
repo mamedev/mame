@@ -556,7 +556,7 @@ void ymz280b_device::device_start()
 
 	for (int i = 0; i < 8; i++)
 	{
-		m_voice[i].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ymz280b_device::update_irq_state_timer_common), this));
+		m_voice[i].timer = timer_alloc(FUNC(ymz280b_device::update_irq_state_timer_common), this);
 	}
 
 	/* create the stream */

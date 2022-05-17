@@ -272,8 +272,6 @@ protected:
 		REG_TCR_TOUT_PC7_INT    = 0xe0, // 1 1 1
 	};
 
-	void tick_clock();
-
 	pit68230_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
 
 	// device-level overrides

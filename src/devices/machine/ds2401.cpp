@@ -60,8 +60,8 @@ void ds2401_device::device_start()
 	save_item(NAME(m_rx));
 	save_item(NAME(m_tx));
 
-	m_timer_main  = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ds2401_device::main_tick), this));
-	m_timer_reset = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ds2401_device::reset_tick), this));
+	m_timer_main  = timer_alloc(FUNC(ds2401_device::main_tick), this);
+	m_timer_reset = timer_alloc(FUNC(ds2401_device::reset_tick), this);
 }
 
 void ds2401_device::device_reset()

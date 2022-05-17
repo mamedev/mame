@@ -918,14 +918,14 @@ ROM_END
 void pasopia7_state::init_p7_raster()
 {
 	m_screen_type = 1;
-	m_pio_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pasopia7_state::pio_timer), this));
+	m_pio_timer = timer_alloc(FUNC(pasopia7_state::pio_timer), this);
 	m_pio_timer->adjust(attotime::from_hz(5000), 0, attotime::from_hz(5000));
 }
 
 void pasopia7_state::init_p7_lcd()
 {
 	m_screen_type = 0;
-	m_pio_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pasopia7_state::pio_timer), this));
+	m_pio_timer = timer_alloc(FUNC(pasopia7_state::pio_timer), this);
 	m_pio_timer->adjust(attotime::from_hz(5000), 0, attotime::from_hz(5000));
 }
 

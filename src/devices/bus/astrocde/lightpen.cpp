@@ -31,7 +31,7 @@ astrocade_lightpen_device::~astrocade_lightpen_device()
 
 void astrocade_lightpen_device::device_start()
 {
-	m_pen_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(astrocade_lightpen_device::trigger_tick), this));
+	m_pen_timer = timer_alloc(FUNC(astrocade_lightpen_device::trigger_tick), this);
 
 	save_item(NAME(m_retrigger));
 }

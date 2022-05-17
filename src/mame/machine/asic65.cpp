@@ -129,7 +129,7 @@ void asic65_device::device_start()
 	save_item(NAME(m_tdata));
 	save_item(NAME(m_param));
 
-	m_synced_write_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(asic65_device::synced_write), this));
+	m_synced_write_timer = timer_alloc(FUNC(asic65_device::synced_write), this);
 }
 
 //-------------------------------------------------

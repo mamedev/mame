@@ -86,8 +86,8 @@ void mace_device::device_start()
 	save_item(NAME(m_ust_msc.m_vin2_msc_ust));
 	save_item(NAME(m_ust_msc.m_vout_msc_ust));
 
-	m_timer_ust = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mace_device::ust_tick), this));
-	m_timer_msc = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mace_device::msc_tick), this));
+	m_timer_ust = timer_alloc(FUNC(mace_device::ust_tick), this);
+	m_timer_msc = timer_alloc(FUNC(mace_device::msc_tick), this);
 	m_timer_ust->adjust(attotime::never);
 	m_timer_msc->adjust(attotime::never);
 }

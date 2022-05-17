@@ -349,10 +349,10 @@ mfm_harddisk_device::~mfm_harddisk_device()
 
 void mfm_harddisk_device::device_start()
 {
-	m_index_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mfm_harddisk_device::index_timer), this));
-	m_spinup_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mfm_harddisk_device::recalibrate), this));
-	m_seek_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mfm_harddisk_device::seek_update), this));
-	m_cache_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mfm_harddisk_device::cache_update), this));
+	m_index_timer = timer_alloc(FUNC(mfm_harddisk_device::index_timer), this);
+	m_spinup_timer = timer_alloc(FUNC(mfm_harddisk_device::recalibrate), this);
+	m_seek_timer = timer_alloc(FUNC(mfm_harddisk_device::seek_update), this);
+	m_cache_timer = timer_alloc(FUNC(mfm_harddisk_device::cache_update), this);
 
 	m_rev_time = attotime::from_hz(m_rpm/60);
 	m_index_timer->adjust(attotime::from_hz(m_rpm/60), 0, attotime::from_hz(m_rpm/60));

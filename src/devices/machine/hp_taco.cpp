@@ -578,9 +578,9 @@ void hp_taco_device::device_start()
 	save_item(NAME(m_working_reg));
 	save_item(NAME(m_bit_idx));
 
-	m_gap_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp_taco_device::gap_timer_tick), this));
-	m_evd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp_taco_device::evd_timer_tick), this));
-	m_error_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp_taco_device::error_timer_tick), this));
+	m_gap_timer = timer_alloc(FUNC(hp_taco_device::gap_timer_tick), this);
+	m_evd_timer = timer_alloc(FUNC(hp_taco_device::evd_timer_tick), this);
+	m_error_timer = timer_alloc(FUNC(hp_taco_device::error_timer_tick), this);
 }
 
 void hp_taco_device::device_reset()

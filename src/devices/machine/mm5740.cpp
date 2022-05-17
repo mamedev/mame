@@ -79,7 +79,7 @@ void mm5740_device::device_start()
 	m_write_data_ready.resolve_safe();
 
 	// allocate timers
-	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mm5740_device::perform_scan), this));
+	m_scan_timer = timer_alloc(FUNC(mm5740_device::perform_scan), this);
 	m_scan_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
 
 	// state saving

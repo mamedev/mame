@@ -1536,7 +1536,7 @@ MACHINE_START_MEMBER( pet_state, pet )
 	}
 
 	if (!m_sync_timer)
-		m_sync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pet_state::sync_tick), this));
+		m_sync_timer = timer_alloc(FUNC(pet_state::sync_tick), this);
 
 	// state saving
 	save_item(NAME(m_key));

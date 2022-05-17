@@ -332,7 +332,7 @@ void ti99_handset_device::pulse_clock()
 
 void ti99_handset_device::device_start()
 {
-	m_delay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ti99_handset_device::delayed_data_ack), this));
+	m_delay_timer = timer_alloc(FUNC(ti99_handset_device::delayed_data_ack), this);
 	save_item(NAME(m_ack));
 	save_item(NAME(m_clock_high));
 	save_item(NAME(m_buf));

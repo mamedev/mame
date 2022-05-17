@@ -118,7 +118,7 @@ applefdc_base_device::applefdc_base_device(applefdc_base_device::applefdc_t fdc_
 void applefdc_base_device::device_start()
 {
 	// timer
-	m_motor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(applefdc_base_device::turn_motor_onoff), this));
+	m_motor_timer = timer_alloc(FUNC(applefdc_base_device::turn_motor_onoff), this);
 
 	// state
 	m_write_byte        = 0x00;

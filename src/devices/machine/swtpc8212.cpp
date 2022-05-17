@@ -383,7 +383,7 @@ void swtpc8212_device::device_resolve_objects()
 
 void swtpc8212_device::device_start()
 {
-	m_bell_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(swtpc8212_device::bell_off), this));
+	m_bell_timer = timer_alloc(FUNC(swtpc8212_device::bell_off), this);
 
 	save_item(NAME(m_latch_data));
 	save_item(NAME(m_keyboard_data));

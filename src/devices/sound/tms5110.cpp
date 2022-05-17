@@ -1051,7 +1051,7 @@ void tms5110_device::device_start()
 	m_stream = stream_alloc(0, 1, clock() / 80);
 
 	m_state = CTL_STATE_INPUT; /* most probably not defined */
-	m_romclk_hack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tms5110_device::romclk_hack_toggle), this));
+	m_romclk_hack_timer = timer_alloc(FUNC(tms5110_device::romclk_hack_toggle), this);
 
 	register_for_save_states();
 }
@@ -1355,7 +1355,7 @@ void tmsprom_device::device_start()
 	m_pdc_cb.resolve_safe();
 	m_ctl_cb.resolve_safe();
 
-	m_romclk_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tmsprom_device::update_romclk), this));
+	m_romclk_timer = timer_alloc(FUNC(tmsprom_device::update_romclk), this);
 	m_romclk_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()));
 
 	m_bit = 0;

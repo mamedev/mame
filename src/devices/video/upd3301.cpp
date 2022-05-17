@@ -152,8 +152,8 @@ void upd3301_device::device_start()
 	m_attr_fetch_cb.resolve();
 
 	// allocate timers
-	m_hrtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd3301_device::hrtc_update), this));
-	m_vrtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd3301_device::vrtc_update), this));
+	m_hrtc_timer = timer_alloc(FUNC(upd3301_device::hrtc_update), this);
+	m_vrtc_timer = timer_alloc(FUNC(upd3301_device::vrtc_update), this);
 
 	// state saving
 	save_item(NAME(m_y));

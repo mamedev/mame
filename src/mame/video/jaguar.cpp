@@ -821,10 +821,10 @@ void jaguar_state::video_start()
 	memset(&m_gpu_regs, 0, sizeof(m_gpu_regs));
 	m_cpu_irq_state = 0;
 
-	m_object_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jaguar_state::scanline_update), this));
-	m_blitter_done_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jaguar_state::blitter_done), this));
-	m_pit_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jaguar_state::pit_update), this));
-	m_gpu_sync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jaguar_state::gpu_sync), this));
+	m_object_timer = timer_alloc(FUNC(jaguar_state::scanline_update), this);
+	m_blitter_done_timer = timer_alloc(FUNC(jaguar_state::blitter_done), this);
+	m_pit_timer = timer_alloc(FUNC(jaguar_state::pit_update), this);
+	m_gpu_sync_timer = timer_alloc(FUNC(jaguar_state::gpu_sync), this);
 
 	adjust_object_timer(0);
 	m_blitter_done_timer->adjust(attotime::never);

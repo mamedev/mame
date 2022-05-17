@@ -442,7 +442,7 @@ WRITE_LINE_MEMBER(dectalk_state::dectalk_reset)
 
 void dectalk_state::machine_start()
 {
-	m_outfifo_read_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dectalk_state::outfifo_read_cb), this));
+	m_outfifo_read_timer = timer_alloc(FUNC(dectalk_state::outfifo_read_cb), this);
 	m_outfifo_read_timer->adjust(attotime::from_hz(10000));
 	save_item(NAME(m_infifo));
 	save_item(NAME(m_infifo_count));

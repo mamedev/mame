@@ -326,7 +326,7 @@ void pc_keyboard_device::device_start()
 		ioport_charqueue_empty_delegate(&pc_keyboard_device::charqueue_empty, this));
 
 	m_out_keypress_func.resolve_safe();
-	m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(at_keyboard_device::poll_keys), this));
+	m_keyboard_timer = timer_alloc(FUNC(at_keyboard_device::poll_keys), this);
 }
 
 void at_keyboard_device::device_start()

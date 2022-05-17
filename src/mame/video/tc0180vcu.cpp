@@ -101,7 +101,7 @@ void tc0180vcu_device::device_start()
 	m_framebuffer[1] = std::make_unique<bitmap_ind16>(512, 256);
 
 	screen().register_vblank_callback(vblank_state_delegate(&tc0180vcu_device::vblank_callback, this));
-	m_intl_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tc0180vcu_device::update_intl), this));
+	m_intl_timer = timer_alloc(FUNC(tc0180vcu_device::update_intl), this);
 
 	save_item(NAME(m_bg_rambank));
 	save_item(NAME(m_fg_rambank));

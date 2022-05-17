@@ -314,8 +314,8 @@ TIMER_CALLBACK_MEMBER(ldplayer_state::autoplay)
 
 void ldplayer_state::machine_start()
 {
-	m_vsync_update_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ldplayer_state::vsync_update), this));
-	m_autoplay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ldplayer_state::autoplay), this));
+	m_vsync_update_timer = timer_alloc(FUNC(ldplayer_state::vsync_update), this);
+	m_autoplay_timer = timer_alloc(FUNC(ldplayer_state::autoplay), this);
 }
 
 
@@ -381,8 +381,8 @@ TIMER_CALLBACK_MEMBER(pr8210_state::bit_off)
 void pr8210_state::machine_start()
 {
 	ldplayer_state::machine_start();
-	m_bit_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pr8210_state::bit_on), this));
-	m_bit_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pr8210_state::bit_off), this));
+	m_bit_timer = timer_alloc(FUNC(pr8210_state::bit_on), this);
+	m_bit_off_timer = timer_alloc(FUNC(pr8210_state::bit_off), this);
 }
 
 void pr8210_state::machine_reset()

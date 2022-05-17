@@ -297,7 +297,7 @@ void symbolics_state::init_symbolics()
 void symbolics_state::machine_start()
 {
 	//save_item(NAME(m_parity_error_has_occurred));
-	//m_outfifo_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(symbolics_state::outfifo_read_cb), this));
+	//m_outfifo_timer = timer_alloc(FUNC(symbolics_state::outfifo_read_cb), this);
 }
 
 /* reset */

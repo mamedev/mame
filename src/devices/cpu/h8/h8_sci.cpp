@@ -249,7 +249,7 @@ void h8_sci_device::device_start()
 	tx_cb.resolve_safe();
 	clk_cb.resolve_safe();
 
-	sync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(h8_sci_device::sync_tick), this));
+	sync_timer = timer_alloc(FUNC(h8_sci_device::sync_tick), this);
 
 	if(external_clock_period.is_never()) {
 		internal_to_external_ratio = 0;

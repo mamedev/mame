@@ -114,8 +114,8 @@ void sensorboard_device::device_start()
 		m_out_count.resolve();
 	}
 
-	m_undotimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sensorboard_device::undo_tick),this));
-	m_sensortimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sensorboard_device::sensor_off),this));
+	m_undotimer = timer_alloc(FUNC(sensorboard_device::undo_tick), this);
+	m_sensortimer = timer_alloc(FUNC(sensorboard_device::sensor_off), this);
 	cancel_sensor();
 
 	u16 wmask = ~((1 << m_width) - 1);

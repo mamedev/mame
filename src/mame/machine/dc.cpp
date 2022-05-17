@@ -549,7 +549,7 @@ void dc_state::machine_start()
 	// save states
 	save_pointer(NAME(dc_sysctrl_regs), 0x200/4);
 
-	m_ch2_dma_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dc_state::ch2_dma_irq), this));
+	m_ch2_dma_irq_timer = timer_alloc(FUNC(dc_state::ch2_dma_irq), this);
 }
 
 void dc_state::machine_reset()

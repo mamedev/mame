@@ -240,7 +240,7 @@ void pc9801_kbd_device::device_start()
 {
 	m_write_irq.resolve_safe();
 
-	m_rxtimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc9801_kbd_device::rx_timer_tick), this));
+	m_rxtimer = timer_alloc(FUNC(pc9801_kbd_device::rx_timer_tick), this);
 	m_rxtimer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
 }
 

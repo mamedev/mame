@@ -121,7 +121,7 @@ void nes_disksys_device::device_start()
 	m_disk->floppy_install_load_proc(nes_disksys_device::load_proc);
 	m_disk->floppy_install_unload_proc(nes_disksys_device::unload_proc);
 
-	irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_disksys_device::irq_timer_tick), this));
+	irq_timer = timer_alloc(FUNC(nes_disksys_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_fds_motor_on));

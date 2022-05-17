@@ -35,7 +35,7 @@ void dp8573_device::device_start()
 	save_item(NAME(m_pfr));
 	save_item(NAME(m_millis));
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dp8573_device::msec_tick), this));
+	m_timer = timer_alloc(FUNC(dp8573_device::msec_tick), this);
 	m_timer->adjust(attotime::never);
 
 	m_intr_cb.resolve_safe();

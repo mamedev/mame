@@ -63,7 +63,7 @@ ioport_constructor pseudo_terminal_device::device_input_ports() const
 
 void pseudo_terminal_device::device_start()
 {
-	m_timer_poll = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pseudo_terminal_device::update_queue), this));
+	m_timer_poll = timer_alloc(FUNC(pseudo_terminal_device::update_queue), this);
 
 	open();
 }

@@ -45,7 +45,7 @@ void harddriv_state::device_start()
 
 	init_video();
 
-	m_xdsp_serial_irq_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(harddriv_state::xdsp_sport1_irq_off_callback), this));
+	m_xdsp_serial_irq_off_timer = timer_alloc(FUNC(harddriv_state::xdsp_sport1_irq_off_callback), this);
 }
 
 

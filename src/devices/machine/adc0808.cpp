@@ -84,7 +84,7 @@ void adc0808_device::device_start()
 	m_in_cb.resolve_all_safe(0xff);
 
 	// allocate timers
-	m_cycle_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(adc0808_device::update_state), this));
+	m_cycle_timer = timer_alloc(FUNC(adc0808_device::update_state), this);
 	m_cycle_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()));
 
 	// register for save states

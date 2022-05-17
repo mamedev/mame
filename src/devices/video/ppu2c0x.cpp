@@ -220,9 +220,9 @@ void ppu2c0x_device::start_nopalram()
 	m_int_callback.resolve_safe();
 
 	// allocate timers
-	m_hblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ppu2c0x_device::hblank_tick), this));
-	m_nmi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ppu2c0x_device::nmi_tick), this));
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ppu2c0x_device::scanline_tick), this));
+	m_hblank_timer = timer_alloc(FUNC(ppu2c0x_device::hblank_tick), this);
+	m_nmi_timer = timer_alloc(FUNC(ppu2c0x_device::nmi_tick), this);
+	m_scanline_timer = timer_alloc(FUNC(ppu2c0x_device::scanline_tick), this);
 
 	/* initialize the scanline handling portion */
 	m_scanline_timer->adjust(screen().time_until_pos(1));

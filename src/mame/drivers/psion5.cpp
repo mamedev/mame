@@ -80,10 +80,10 @@ void psion5mx_state::machine_start()
 
 	save_item(NAME(m_ports));
 
-	m_timers[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(psion5mx_state::update_timer1), this));
-	m_timers[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(psion5mx_state::update_timer2), this));
-	m_periodic = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(psion5mx_state::update_periodic_irq), this));
-	m_rtc_ticker = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(psion5mx_state::update_rtc), this));
+	m_timers[0] = timer_alloc(FUNC(psion5mx_state::update_timer1), this);
+	m_timers[1] = timer_alloc(FUNC(psion5mx_state::update_timer2), this);
+	m_periodic = timer_alloc(FUNC(psion5mx_state::update_periodic_irq), this);
+	m_rtc_ticker = timer_alloc(FUNC(psion5mx_state::update_rtc), this);
 }
 
 void psion5mx_state::machine_reset()

@@ -211,7 +211,7 @@ void vboysnd_device::device_start()
 	// create the stream
 	m_stream = stream_alloc(0, 2, rate);
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vboysnd_device::delayed_stream_update), this));
+	m_timer = timer_alloc(FUNC(vboysnd_device::delayed_stream_update), this);
 	m_timer->adjust(attotime::zero, 0, rate ? attotime::from_hz(rate / 4) : attotime::never);
 
 	for (int i=0; i<2048; i++)

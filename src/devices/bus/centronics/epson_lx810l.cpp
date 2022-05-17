@@ -329,7 +329,7 @@ void epson_lx810l_device::device_start()
 	m_online_led.resolve();
 	m_ready_led.resolve();
 
-	m_cr_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(epson_lx810l_device::cr_tick), this));
+	m_cr_timer = timer_alloc(FUNC(epson_lx810l_device::cr_tick), this);
 }
 
 

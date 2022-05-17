@@ -137,9 +137,9 @@ void coco_state::device_start()
 		DIECOM_LIGHTGUN_LX_TAG, DIECOM_LIGHTGUN_LY_TAG, DIECOM_LIGHTGUN_BUTTONS_TAG);
 
 	// timers
-	m_hiresjoy_transition_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(coco_state::joystick_update), this));
-	m_hiresjoy_transition_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(coco_state::joystick_update), this));
-	m_diecom_lightgun_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(coco_state::diecom_lightgun_hit), this));
+	m_hiresjoy_transition_timer[0] = timer_alloc(FUNC(coco_state::joystick_update), this);
+	m_hiresjoy_transition_timer[1] = timer_alloc(FUNC(coco_state::joystick_update), this);
+	m_diecom_lightgun_timer = timer_alloc(FUNC(coco_state::diecom_lightgun_hit), this);
 
 	// cart slot
 	m_cococart->set_cart_base_update(cococart_base_update_delegate(&coco_state::update_cart_base, this));

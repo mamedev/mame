@@ -163,7 +163,7 @@ GFXDECODE_END
 
 void trucocl_state::machine_start()
 {
-	m_dac_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(trucocl_state::dac_irq), this));
+	m_dac_irq_timer = timer_alloc(FUNC(trucocl_state::dac_irq), this);
 }
 
 void trucocl_state::machine_reset()

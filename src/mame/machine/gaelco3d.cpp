@@ -207,8 +207,8 @@ void gaelco_serial_device::device_start()
 	assert(strlen(tag()) < 20);
 
 	m_irq_handler.resolve_safe();
-	m_sync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gaelco_serial_device::link_cb), this));
-	m_status_set_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gaelco_serial_device::set_status_cb), this));
+	m_sync_timer = timer_alloc(FUNC(gaelco_serial_device::link_cb), this);
+	m_status_set_timer = timer_alloc(FUNC(gaelco_serial_device::set_status_cb), this);
 
 	/* register for save states */
 	//save_item(NAME(earom->offset));

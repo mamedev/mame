@@ -968,13 +968,13 @@ void gottlieb_sound_p4_device::device_add_mconfig(machine_config &config)
 void gottlieb_sound_p4_device::device_start()
 {
 	// set up the NMI timers
-	m_nmi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gottlieb_sound_p4_device::set_nmi), this));
-	m_nmi_clear_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gottlieb_sound_p4_device::clear_nmi), this));
+	m_nmi_timer = timer_alloc(FUNC(gottlieb_sound_p4_device::set_nmi), this);
+	m_nmi_clear_timer = timer_alloc(FUNC(gottlieb_sound_p4_device::clear_nmi), this);
 	m_nmi_rate = 0;
 	nmi_timer_adjust();
 
 	// set up other timers
-	m_latch_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gottlieb_sound_p4_device::update_latch), this));
+	m_latch_timer = timer_alloc(FUNC(gottlieb_sound_p4_device::update_latch), this);
 
 	// register for save states
 	save_item(NAME(m_nmi_rate));

@@ -660,7 +660,7 @@ void next_state::phy_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	logerror("phy_w %d %08x (%08x)\n", offset, phy[offset], maincpu->pc());
 }
 
-TIMER_CALLBACK_MEMBER(next_state::timer_update)
+TIMER_CALLBACK_MEMBER(next_state::timer_tick)
 {
 	irq_set(29, true);
 	timer_data = timer_next_data;
@@ -862,7 +862,7 @@ void next_state::machine_start()
 		save_item(NAME(dma_slots[i].drq), i);
 	}
 
-	timer_tm = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(next_state::timer_update), this));
+	timer_tm = timer_alloc(FUNC(next_state::timer_tick), this);
 }
 
 void next_state::machine_reset()

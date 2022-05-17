@@ -4795,9 +4795,9 @@ void hdc92x4_device::device_start()
 	m_in_dma.resolve_safe(0);
 
 	// allocate timers
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hdc92x4_device::gen_timer_expired), this));
-	m_cmd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hdc92x4_device::com_timer_expired), this));
-	// m_live_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hdc92x4_device::live_timer_expired), this));
+	m_timer = timer_alloc(FUNC(hdc92x4_device::gen_timer_expired), this);
+	m_cmd_timer = timer_alloc(FUNC(hdc92x4_device::com_timer_expired), this);
+	// m_live_timer = timer_alloc(FUNC(hdc92x4_device::live_timer_expired), this);
 
 	m_live_state.state = IDLE;
 }

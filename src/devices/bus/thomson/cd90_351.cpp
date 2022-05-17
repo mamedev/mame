@@ -78,7 +78,7 @@ void cd90_351_device::device_add_mconfig(machine_config &config)
 void cd90_351_device::device_start()
 {
 	m_rom_bank->configure_entries(0, 4, m_rom->base(), 0x800);
-	m_timer_motoroff = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cd90_351_device::motor_off), this));
+	m_timer_motoroff = timer_alloc(FUNC(cd90_351_device::motor_off), this);
 
 	save_item(NAME(m_cmd0));
 	save_item(NAME(m_cmd1));

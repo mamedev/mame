@@ -390,7 +390,7 @@ void wd33c9x_base_device::device_start()
 {
 	m_irq_cb.resolve_safe();
 	m_drq_cb.resolve_safe();
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wd33c9x_base_device::update_step), this));
+	m_timer = timer_alloc(FUNC(wd33c9x_base_device::update_step), this);
 	save_item(NAME(m_addr));
 	save_item(NAME(m_regs));
 	save_item(NAME(m_command_length));

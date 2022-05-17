@@ -233,7 +233,7 @@ void hp9k3xx_state::machine_reset()
 
 void hp9k3xx_state::machine_start()
 {
-	m_bus_error_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp9k3xx_state::bus_error_timeout), this));
+	m_bus_error_timer = timer_alloc(FUNC(hp9k3xx_state::bus_error_timeout), this);
 	m_bus_error = false;
 	save_item(NAME(m_bus_error));
 }

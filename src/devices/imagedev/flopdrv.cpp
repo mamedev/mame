@@ -129,7 +129,7 @@ void legacy_floppy_image_device::floppy_drive_init()
 	/* initialise flags */
 	m_flags = 0;
 	m_index_pulse_callback = nullptr;
-	m_index_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(legacy_floppy_image_device::floppy_drive_index_callback),this));
+	m_index_timer = timer_alloc(FUNC(legacy_floppy_image_device::floppy_drive_index_callback), this);
 	m_idx = 0;
 
 	floppy_drive_set_geometry(m_config->floppy_type);
@@ -694,7 +694,7 @@ void legacy_floppy_image_device::device_start()
 //  m_out_dskchg_func(m_dskchg);
 
 	/* write-protect callback */
-	m_wpt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(legacy_floppy_image_device::set_wpt), this));
+	m_wpt_timer = timer_alloc(FUNC(legacy_floppy_image_device::set_wpt), this);
 }
 
 

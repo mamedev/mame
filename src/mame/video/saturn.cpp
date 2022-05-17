@@ -2193,7 +2193,7 @@ int saturn_state::stv_vdp1_start ( void )
 	/* Kidou Senshi Z Gundam - Zenpen Zeta no Kodou loves to use the user cliprect vars in an undefined state ... */
 	m_vdp1.user_cliprect.set(0, 512, 0, 256);
 
-	m_vdp1.draw_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(saturn_state::vdp1_draw_end),this));
+	m_vdp1.draw_end_timer = timer_alloc(FUNC(saturn_state::vdp1_draw_end), this);
 	// save state
 	save_pointer(NAME(m_vdp1_regs), 0x020/2);
 	save_pointer(NAME(m_vdp1_vram), 0x100000/4);

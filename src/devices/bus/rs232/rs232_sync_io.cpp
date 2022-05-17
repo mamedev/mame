@@ -113,7 +113,7 @@ void rs232_sync_io_device::device_add_mconfig(machine_config &config)
 
 void rs232_sync_io_device::device_start()
 {
-	m_clk_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rs232_sync_io_device::clock_tick), this));
+	m_clk_timer = timer_alloc(FUNC(rs232_sync_io_device::clock_tick), this);
 }
 
 void rs232_sync_io_device::device_reset()

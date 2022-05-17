@@ -756,7 +756,7 @@ void namcona1_state::machine_start()
 	save_item(NAME(m_mcu_port6));
 	save_item(NAME(m_mcu_port8));
 
-	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcona1_state::set_scanline_interrupt), this));
+	m_scan_timer = timer_alloc(FUNC(namcona1_state::set_scanline_interrupt), this);
 }
 
 // the MCU boots the 68000

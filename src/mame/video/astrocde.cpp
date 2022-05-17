@@ -175,9 +175,9 @@ void astrocde_state::profpac_palette(palette_device &palette) const
 void astrocde_state::video_start()
 {
 	/* allocate timers */
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(astrocde_state::scanline_callback), this));
+	m_scanline_timer = timer_alloc(FUNC(astrocde_state::scanline_callback), this);
 	m_scanline_timer->adjust(m_screen->time_until_pos(1), 1);
-	m_intoff_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(astrocde_state::interrupt_off), this));
+	m_intoff_timer = timer_alloc(FUNC(astrocde_state::interrupt_off), this);
 
 	/* register for save states */
 	init_savestate();
@@ -191,9 +191,9 @@ void astrocde_state::video_start()
 VIDEO_START_MEMBER(astrocde_state,profpac)
 {
 	/* allocate timers */
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(astrocde_state::scanline_callback), this));
+	m_scanline_timer = timer_alloc(FUNC(astrocde_state::scanline_callback), this);
 	m_scanline_timer->adjust(m_screen->time_until_pos(1), 1);
-	m_intoff_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(astrocde_state::interrupt_off), this));
+	m_intoff_timer = timer_alloc(FUNC(astrocde_state::interrupt_off), this);
 
 	/* allocate videoram */
 	m_profpac_videoram = std::make_unique<uint16_t[]>(0x4000 * 4);

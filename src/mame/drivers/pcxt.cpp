@@ -527,7 +527,7 @@ TIMER_CALLBACK_MEMBER(pcxt_state::sample_tick)
 
 void pcxt_state::machine_start()
 {
-	m_sample = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pcxt_state::sample_tick), this));
+	m_sample = timer_alloc(FUNC(pcxt_state::sample_tick), this);
 
 	m_status = 0;
 	m_clr_status = 0;

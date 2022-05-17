@@ -128,9 +128,9 @@ void bsmt2000_device::device_start()
 	save_item(NAME(m_write_pending));
 
 	// allocate timers
-	m_deferred_reset = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bsmt2000_device::deferred_reset), this));
-	m_deferred_reg_write = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bsmt2000_device::deferred_reg_write), this));
-	m_deferred_data_write = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bsmt2000_device::deferred_data_write), this));
+	m_deferred_reset = timer_alloc(FUNC(bsmt2000_device::deferred_reset), this);
+	m_deferred_reg_write = timer_alloc(FUNC(bsmt2000_device::deferred_reg_write), this);
+	m_deferred_data_write = timer_alloc(FUNC(bsmt2000_device::deferred_data_write), this);
 }
 
 

@@ -760,7 +760,7 @@ void mos6560_device::device_start()
 	}
 
 	// allocate timers
-	m_line_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mos6560_device::raster_interrupt_gen), this));
+	m_line_timer = timer_alloc(FUNC(mos6560_device::raster_interrupt_gen), this);
 	m_line_timer->adjust(screen().scan_period(), 0, screen().scan_period());
 
 	// initialize sound

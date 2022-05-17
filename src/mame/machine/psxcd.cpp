@@ -117,7 +117,7 @@ void psxcd_device::device_start()
 
 	for (int i = 0; i < MAX_PSXCD_TIMERS; i++)
 	{
-		m_timers[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(psxcd_device::handle_event), this));
+		m_timers[i] = timer_alloc(FUNC(psxcd_device::handle_event), this);
 		m_timerinuse[i] = false;
 		m_results[i] = nullptr;
 	}

@@ -52,7 +52,7 @@ iq151_staper_device::iq151_staper_device(const machine_config &mconfig, const ch
 
 void iq151_staper_device::device_start()
 {
-	m_printer_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(iq151_staper_device::pc2_low_tick), this));
+	m_printer_timer = timer_alloc(FUNC(iq151_staper_device::pc2_low_tick), this);
 }
 
 //-------------------------------------------------

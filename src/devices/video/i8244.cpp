@@ -153,10 +153,10 @@ void i8244_device::device_start()
 	m_irq_func.resolve_safe();
 
 	// allocate timers
-	m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(i8244_device::vblank_start), this));
+	m_vblank_timer = timer_alloc(FUNC(i8244_device::vblank_start), this);
 	m_vblank_timer->adjust(screen().time_until_pos(m_vblank_start, m_hblank_start - 1), 0, screen().frame_period());
 
-	m_hblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(i8244_device::hblank_start), this));
+	m_hblank_timer = timer_alloc(FUNC(i8244_device::hblank_start), this);
 	m_hblank_timer->adjust(screen().time_until_pos(0, m_hblank_start), 0, screen().scan_period());
 
 	// allocate a stream

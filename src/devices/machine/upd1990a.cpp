@@ -92,11 +92,11 @@ void upd1990a_device::device_start()
 	m_testmode = false;
 
 	// allocate timers
-	m_timer_clock = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd1990a_device::clock_tick), this));
+	m_timer_clock = timer_alloc(FUNC(upd1990a_device::clock_tick), this);
 	m_timer_clock->adjust(attotime::from_hz(clock() / 32768.0), 0, attotime::from_hz(clock() / 32768.0)); // 1 second on XTAL(32'768)
-	m_timer_tp = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd1990a_device::tp_tick), this));
-	m_timer_data_out = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd1990a_device::data_out_tick), this));
-	m_timer_test_mode = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd1990a_device::test_tick), this));
+	m_timer_tp = timer_alloc(FUNC(upd1990a_device::tp_tick), this);
+	m_timer_data_out = timer_alloc(FUNC(upd1990a_device::data_out_tick), this);
+	m_timer_test_mode = timer_alloc(FUNC(upd1990a_device::test_tick), this);
 
 	// state saving
 	save_item(NAME(m_time_counter));

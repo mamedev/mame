@@ -560,7 +560,7 @@ void vme_hcpu30_card_device::device_start()
 {
 	LOG("vme_hcpu30_card_device::device_start %s\n", tag());
 
-	m_bus_error_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vme_hcpu30_card_device::bus_error_off), this));
+	m_bus_error_timer = timer_alloc(FUNC(vme_hcpu30_card_device::bus_error_off), this);
 }
 
 void vme_hcpu30_card_device::device_reset()

@@ -374,7 +374,7 @@ void gunbustr_state::init_gunbustr()
 	/* Speedup handler */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x203acc, 0x203acf, read32smo_delegate(*this, FUNC(gunbustr_state::main_cycle_r)));
 
-	m_interrupt5_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gunbustr_state::trigger_irq5), this));
+	m_interrupt5_timer = timer_alloc(FUNC(gunbustr_state::trigger_irq5), this);
 }
 
 void gunbustr_state::init_gunbustrj()

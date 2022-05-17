@@ -205,9 +205,9 @@ void lc8670_cpu_device::device_start()
 	m_lcd_update_func.resolve();
 
 	// setup timers
-	m_basetimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lc8670_cpu_device::base_timer_update), this));
+	m_basetimer = timer_alloc(FUNC(lc8670_cpu_device::base_timer_update), this);
 	m_basetimer->adjust(attotime::from_hz(m_clocks[unsigned(clock_source::SUB)]), 0, attotime::from_hz(m_clocks[unsigned(clock_source::SUB)]));
-	m_clocktimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lc8670_cpu_device::clock_timer_update), this));
+	m_clocktimer = timer_alloc(FUNC(lc8670_cpu_device::clock_timer_update), this);
 
 	// register state for debugger
 	state_add(LC8670_PC  , "PC"  , m_pc).callimport().callexport().formatstr("%04X");

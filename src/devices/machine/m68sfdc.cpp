@@ -73,8 +73,8 @@ void m68sfdc_device::device_start()
 	m_irq_handler.resolve_safe();
 	m_nmi_handler.resolve_safe();
 
-	m_timer_head_load = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m68sfdc_device::head_load_update), this));
-	m_timer_timeout = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m68sfdc_device::timeout_expired), this));
+	m_timer_head_load = timer_alloc(FUNC(m68sfdc_device::head_load_update), this);
+	m_timer_timeout = timer_alloc(FUNC(m68sfdc_device::timeout_expired), this);
 	save_item(NAME(m_select_0));
 	save_item(NAME(m_select_1));
 	save_item(NAME(m_select_2));
@@ -98,7 +98,7 @@ void m68sfdc_device::device_start()
 
 	m_floppy = nullptr;
 
-	t_gen = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m68sfdc_device::general_update), this));
+	t_gen = timer_alloc(FUNC(m68sfdc_device::general_update), this);
 }
 
 void m68sfdc_device::device_reset()

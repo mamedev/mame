@@ -152,7 +152,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	TIMER_CALLBACK_MEMBER(counter_tick);
+	TIMER_CALLBACK_MEMBER(advance_counter);
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;

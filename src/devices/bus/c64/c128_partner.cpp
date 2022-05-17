@@ -98,7 +98,7 @@ c128_partner_cartridge_device::c128_partner_cartridge_device(const machine_confi
 void c128_partner_cartridge_device::device_start()
 {
 	// simulate the 16.7ms pulse from CIA1 PB2 that would arrive thru the joystick port dongle
-	t_joyb2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(c128_partner_cartridge_device::update_joyb2), this));
+	t_joyb2 = timer_alloc(FUNC(c128_partner_cartridge_device::update_joyb2), this);
 	t_joyb2->adjust(attotime::from_msec(16), 0, attotime::from_msec(16));
 
 	// state saving

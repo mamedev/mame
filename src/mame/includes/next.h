@@ -202,7 +202,7 @@ private:
 	bool screen_color = false;
 	bool vbl_enabled = false;
 
-	TIMER_CALLBACK_MEMBER(timer_update);
+	TIMER_CALLBACK_MEMBER(timer_tick);
 	void timer_start();
 	void timer_update();
 

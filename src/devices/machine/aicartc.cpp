@@ -54,7 +54,7 @@ void aicartc_device::device_validity_check(validity_checker &valid) const
 
 void aicartc_device::device_start()
 {
-	m_clock_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aicartc_device::clock_tick), this));
+	m_clock_timer = timer_alloc(FUNC(aicartc_device::clock_tick), this);
 	m_clock_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
 }
 

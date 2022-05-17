@@ -487,10 +487,10 @@ void hp_dc100_tape_device::device_start()
 	save_item(NAME(m_next_hole_pos));
 	save_item(NAME(m_image_dirty));
 
-	m_bit_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp_dc100_tape_device::bit_timer_tick), this));
-	m_tacho_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp_dc100_tape_device::tacho_timer_tick), this));
-	m_hole_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp_dc100_tape_device::hole_timer_tick), this));
-	m_motion_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp_dc100_tape_device::motion_timer_tick), this));
+	m_bit_timer = timer_alloc(FUNC(hp_dc100_tape_device::bit_timer_tick), this);
+	m_tacho_timer = timer_alloc(FUNC(hp_dc100_tape_device::tacho_timer_tick), this);
+	m_hole_timer = timer_alloc(FUNC(hp_dc100_tape_device::hole_timer_tick), this);
+	m_motion_timer = timer_alloc(FUNC(hp_dc100_tape_device::motion_timer_tick), this);
 }
 
 void hp_dc100_tape_device::device_reset()

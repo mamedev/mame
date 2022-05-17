@@ -2065,7 +2065,7 @@ MACHINE_START_MEMBER( cbm2_state, cbm2 )
 	// allocate timer
 	int todclk = (m_ntsc ? 60 : 50) * 2;
 
-	m_todclk_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cbm2_state::tod_tick), this));
+	m_todclk_timer = timer_alloc(FUNC(cbm2_state::tod_tick), this);
 	m_todclk_timer->adjust(attotime::from_hz(todclk), 0, attotime::from_hz(todclk));
 
 	// state saving

@@ -172,7 +172,7 @@ void hp9845_printer_device::device_start()
 	save_item(NAME(m_fsm_state));
 	save_item(NAME(m_cur_line));
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp9845_printer_device::clear_busy_flag), this));
+	m_timer = timer_alloc(FUNC(hp9845_printer_device::clear_busy_flag), this);
 }
 
 void hp9845_printer_device::device_reset()

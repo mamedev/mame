@@ -52,8 +52,8 @@ void mb8795_device::device_start()
 	drq_rx_cb.resolve();
 
 	memset(mac, 0, 6);
-	timer_tx = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mb8795_device::tx_update), this));
-	timer_rx = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mb8795_device::rx_update), this));
+	timer_tx = timer_alloc(FUNC(mb8795_device::tx_update), this);
+	timer_rx = timer_alloc(FUNC(mb8795_device::rx_update), this);
 }
 
 void mb8795_device::device_reset()

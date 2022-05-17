@@ -113,8 +113,8 @@ void hd44780_device::device_start()
 
 	m_pixel_update_cb.resolve();
 
-	m_busy_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hd44780_device::clear_busy_flag), this));
-	m_blink_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hd44780_device::blink_tick), this));
+	m_busy_timer = timer_alloc(FUNC(hd44780_device::clear_busy_flag), this);
+	m_blink_timer = timer_alloc(FUNC(hd44780_device::blink_tick), this);
 	m_blink_timer->adjust(attotime::from_msec(409), 0, attotime::from_msec(409));
 
 	// state saving

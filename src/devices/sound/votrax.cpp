@@ -170,7 +170,7 @@ void votrax_sc01_device::device_start()
 	m_sclock = m_mainclock / 18.0;
 	m_cclock = m_mainclock / 36.0;
 	m_stream = stream_alloc(0, 1, m_sclock);
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(votrax_sc01_device::phone_tick), this));
+	m_timer = timer_alloc(FUNC(votrax_sc01_device::phone_tick), this);
 
 	// reset outputs
 	m_ar_cb.resolve_safe();

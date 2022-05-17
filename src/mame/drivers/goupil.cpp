@@ -441,7 +441,7 @@ void goupil_base_state::machine_reset()
 
 void goupil_g1_state::machine_start()
 {
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(goupil_g1_state::scanline_tick), this));
+	m_scanline_timer = timer_alloc(FUNC(goupil_g1_state::scanline_tick), this);
 }
 
 void goupil_g1_state::machine_reset()

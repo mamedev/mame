@@ -2162,7 +2162,7 @@ void mpu4_state::mpu4_config_common()
 	m_digits.resolve();
 	m_triacs.resolve();
 
-	m_ic24_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mpu4_state::update_ic24), this));
+	m_ic24_timer = timer_alloc(FUNC(mpu4_state::update_ic24), this);
 	m_lamp_strobe_ext_persistence = 0;
 }
 

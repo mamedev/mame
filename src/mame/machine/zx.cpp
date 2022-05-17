@@ -14,7 +14,7 @@
 void zx_state::init_zx()
 {
 	m_program = &m_maincpu->space(AS_PROGRAM);
-	m_tape_input = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(zx_state::zx_tape_input), this));
+	m_tape_input = timer_alloc(FUNC(zx_state::zx_tape_input), this);
 
 	if(m_ram->size() == 32768)
 		m_program->unmap_readwrite(0x8000, 0xbfff);

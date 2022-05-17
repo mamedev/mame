@@ -14,7 +14,7 @@ void maple_device::device_start()
 {
 	host->register_port(host_port, this);
 
-	timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(maple_device::reply_ready), this));
+	timer = timer_alloc(FUNC(maple_device::reply_ready), this);
 
 	save_item(NAME(reply_buffer));
 	save_item(NAME(reply_size));

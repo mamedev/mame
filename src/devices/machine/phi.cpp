@@ -381,8 +381,8 @@ void phi_device::device_start()
 	m_dmarq_write_func.resolve_safe();
 	m_sys_cntrl_read_func.resolve_safe(0);
 
-	m_sh_dly_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(phi_device::delayed_update), this));
-	m_c_dly_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(phi_device::delayed_update), this));
+	m_sh_dly_timer = timer_alloc(FUNC(phi_device::delayed_update), this);
+	m_c_dly_timer = timer_alloc(FUNC(phi_device::delayed_update), this);
 }
 
 void phi_device::device_reset()

@@ -73,7 +73,7 @@ nes_jy_typec_device::nes_jy_typec_device(const machine_config &mconfig, const ch
 void nes_jy_typea_device::device_start()
 {
 	common_start();
-	irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_jy_typea_device::irq_timer_tick), this));
+	irq_timer = timer_alloc(FUNC(nes_jy_typea_device::irq_timer_tick), this);
 	irq_timer->reset();
 	timer_freq = clocks_to_attotime(1);
 

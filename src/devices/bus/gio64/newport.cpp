@@ -1111,7 +1111,7 @@ gio64_xl24_device::gio64_xl24_device(const machine_config &mconfig, const char *
 
 void newport_base_device::device_start()
 {
-	m_dcb_timeout_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(newport_base_device::dcb_timeout_tick), this));
+	m_dcb_timeout_timer = timer_alloc(FUNC(newport_base_device::dcb_timeout_tick), this);
 
 	save_item(NAME(m_rex3.m_draw_mode0));
 	save_item(NAME(m_rex3.m_color_host));

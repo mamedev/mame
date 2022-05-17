@@ -307,7 +307,7 @@ void ef9365_device::device_start()
 {
 	m_irq_handler.resolve_safe();
 
-	m_busy_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ef9365_device::clear_busy_flag), this));
+	m_busy_timer = timer_alloc(FUNC(ef9365_device::clear_busy_flag), this);
 
 	m_videoram = &space(0);
 	m_current_color = 0x00;

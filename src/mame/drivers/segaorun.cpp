@@ -3023,9 +3023,9 @@ ROM_END
 void segaorun_state::init_generic()
 {
 	// allocate a scanline timer
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(segaorun_state::scanline_tick), this));
+	m_scanline_timer = timer_alloc(FUNC(segaorun_state::scanline_tick), this);
 
-	m_irq2_gen_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(segaorun_state::irq2_gen_tick), this));
+	m_irq2_gen_timer = timer_alloc(FUNC(segaorun_state::irq2_gen_tick), this);
 
 	// configure the NVRAM to point to our workram
 	if (m_nvram != nullptr)

@@ -62,8 +62,8 @@ void nsc810_device::device_start()
 	m_timer_out[0](0);
 	m_timer_out[1](0);
 
-	m_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nsc810_device::timer_tick<0>), this));
-	m_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nsc810_device::timer_tick<1>), this));
+	m_timer[0] = timer_alloc(FUNC(nsc810_device::timer_tick<0>), this);
+	m_timer[1] = timer_alloc(FUNC(nsc810_device::timer_tick<1>), this);
 }
 
 void nsc810_device::device_reset()

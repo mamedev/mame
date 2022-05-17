@@ -109,7 +109,7 @@ epson_pf10_device::epson_pf10_device(const machine_config &mconfig, const char *
 
 void epson_pf10_device::device_start()
 {
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(epson_pf10_device::serial_clk_tick), this));
+	m_timer = timer_alloc(FUNC(epson_pf10_device::serial_clk_tick), this);
 }
 
 //-------------------------------------------------

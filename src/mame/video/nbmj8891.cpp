@@ -478,7 +478,7 @@ VIDEO_START_MEMBER( nbmj8891_state, _1layer )
 	int width = m_screen->width();
 	int height = m_screen->height();
 
-	m_blitter_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nbmj8891_state::clear_busy_flag), this));
+	m_blitter_timer = timer_alloc(FUNC(nbmj8891_state::clear_busy_flag), this);
 	m_screen->register_screen_bitmap(m_tmpbitmap0);
 	m_videoram0 = std::make_unique<uint8_t[]>(width * height);
 	m_palette_ptr = std::make_unique<uint8_t[]>(0x200);
@@ -510,7 +510,7 @@ void nbmj8891_state::video_start()
 	int width = m_screen->width();
 	int height = m_screen->height();
 
-	m_blitter_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nbmj8891_state::clear_busy_flag), this));
+	m_blitter_timer = timer_alloc(FUNC(nbmj8891_state::clear_busy_flag), this);
 	m_screen->register_screen_bitmap(m_tmpbitmap0);
 	m_screen->register_screen_bitmap(m_tmpbitmap1);
 	m_videoram0 = std::make_unique<uint8_t[]>(width * height);

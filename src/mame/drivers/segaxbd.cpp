@@ -330,7 +330,7 @@ void segaxbd_state::device_start()
 	video_start();
 
 	// allocate a scanline timer
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(segaxbd_state::scanline_tick), this));
+	m_scanline_timer = timer_alloc(FUNC(segaxbd_state::scanline_tick), this);
 
 	// save state
 	save_item(NAME(m_timer_irq_state));

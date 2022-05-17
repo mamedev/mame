@@ -368,7 +368,7 @@ void cidelsa_state::machine_start()
 	/* register for state saving */
 	save_item(NAME(m_reset));
 
-	m_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cidelsa_state::reset_done), this));
+	m_reset_timer = timer_alloc(FUNC(cidelsa_state::reset_done), this);
 }
 
 void draco_state::machine_start()

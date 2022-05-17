@@ -1994,7 +1994,7 @@ void tmnt_state::machine_start()
 	save_item(NAME(m_sorted_layer));
 	save_item(NAME(m_irq5_mask));
 
-	m_audio_nmi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tmnt_state::audio_nmi), this));
+	m_audio_nmi_timer = timer_alloc(FUNC(tmnt_state::audio_nmi), this);
 }
 
 MACHINE_RESET_MEMBER(tmnt_state,common)

@@ -100,7 +100,7 @@ void vp415_state::machine_reset()
 
 void vp415_state::machine_start()
 {
-	m_drive_2ppr_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vp415_state::drive_2ppr_tick), this));
+	m_drive_2ppr_timer = timer_alloc(FUNC(vp415_state::drive_2ppr_tick), this);
 }
 
 TIMER_CALLBACK_MEMBER(vp415_state::drive_2ppr_tick)

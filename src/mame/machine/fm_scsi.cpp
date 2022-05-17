@@ -79,8 +79,8 @@ void fmscsi_device::device_start()
 	m_drq_handler.resolve_safe();
 
 	// allocate read timer
-	m_transfer_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fmscsi_device::update_transfer), this));
-	m_phase_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fmscsi_device::set_phase), this));
+	m_transfer_timer = timer_alloc(FUNC(fmscsi_device::update_transfer), this);
+	m_phase_timer = timer_alloc(FUNC(fmscsi_device::set_phase), this);
 }
 
 void fmscsi_device::device_reset()

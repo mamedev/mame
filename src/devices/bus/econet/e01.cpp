@@ -426,7 +426,7 @@ void econet_e01_device::device_start()
 	m_led.resolve();
 
 	// allocate timers
-	m_clk_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(econet_e01_device::clk_tick), this));
+	m_clk_timer = timer_alloc(FUNC(econet_e01_device::clk_tick), this);
 
 	// register for state saving
 	save_item(NAME(m_adlc_ie));

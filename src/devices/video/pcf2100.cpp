@@ -59,7 +59,7 @@ void pcf2100_device::device_start()
 	m_write_segs.resolve_safe();
 
 	// timer
-	m_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pcf2100_device::update_output_latches), this));
+	m_lcd_timer = timer_alloc(FUNC(pcf2100_device::update_output_latches), this);
 	attotime period = attotime::from_hz(clock());
 	m_lcd_timer->adjust(period, 0, period);
 

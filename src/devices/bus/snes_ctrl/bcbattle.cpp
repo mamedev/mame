@@ -91,7 +91,7 @@ void snes_bcbattle_device::device_start()
 	// lacking emulation of the standalone Barcode Battler, we refresh periodically the input from the reader
 	// proper emulation would have the standalone unit acknowledging that a new barcode has been scanned
 	// and sending the proper serial bits, instead of our read_current_bit() function!
-	battler_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_bcbattle_device::scan_tick), this));
+	battler_timer = timer_alloc(FUNC(snes_bcbattle_device::scan_tick), this);
 	battler_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1000));
 
 	save_item(NAME(m_current_barcode));

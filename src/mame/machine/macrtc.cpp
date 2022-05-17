@@ -54,7 +54,7 @@ rtc3430042_device::rtc3430042_device(const machine_config &mconfig, const char *
 void rtc3430042_device::device_start()
 {
 	// allocate timers
-	m_clock_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rtc3430042_device::seconds_tick), this));
+	m_clock_timer = timer_alloc(FUNC(rtc3430042_device::seconds_tick), this);
 	m_clock_timer->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
 
 	// state saving

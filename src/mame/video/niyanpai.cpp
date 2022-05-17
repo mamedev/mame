@@ -365,7 +365,7 @@ void niyanpai_state::video_start()
 	m_clut[1] = std::make_unique<uint8_t[]>(0x1000);
 	m_clut[2] = std::make_unique<uint8_t[]>(0x1000);
 	m_nb19010_busyflag = 1;
-	m_blitter_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(niyanpai_state::clear_busy_flag), this));
+	m_blitter_timer = timer_alloc(FUNC(niyanpai_state::clear_busy_flag), this);
 
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));

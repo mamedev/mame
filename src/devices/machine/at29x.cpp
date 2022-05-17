@@ -477,7 +477,7 @@ void at29x_device::device_start()
 {
 	m_programming_buffer = std::make_unique<uint8_t[]>(m_sector_size);
 	m_eememory = std::make_unique<uint8_t[]>(m_memory_size+2);
-	m_programming_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(at29x_device::step_programming), this));
+	m_programming_timer = timer_alloc(FUNC(at29x_device::step_programming), this);
 
 	// TODO: Complete 16-bit handling
 	m_address_mask = m_memory_size/(m_word_width/8) - 1;

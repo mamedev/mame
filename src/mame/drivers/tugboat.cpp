@@ -86,7 +86,7 @@ private:
 
 void tugboat_state::machine_start()
 {
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tugboat_state::trigger_int), this));
+	m_interrupt_timer = timer_alloc(FUNC(tugboat_state::trigger_int), this);
 	m_maincpu->space(AS_PROGRAM).specific(m_program);
 
 	save_item(NAME(m_hd46505_0_reg));

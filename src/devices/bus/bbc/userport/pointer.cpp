@@ -151,7 +151,7 @@ bbc_tracker_device::bbc_tracker_device(const machine_config &mconfig, const char
 
 void bbc_pointer_device::device_start()
 {
-	m_pointer_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bbc_pointer_device::update), this));
+	m_pointer_timer = timer_alloc(FUNC(bbc_pointer_device::update), this);
 }
 
 

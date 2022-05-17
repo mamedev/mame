@@ -715,9 +715,9 @@ void i80186_cpu_device::device_start()
 	m_reloc = 0;
 	m_last_dma = 0;
 
-	m_timer[0].int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(i80186_cpu_device::timer_elapsed), this));
-	m_timer[1].int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(i80186_cpu_device::timer_elapsed), this));
-	m_timer[2].int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(i80186_cpu_device::timer_elapsed), this));
+	m_timer[0].int_timer = timer_alloc(FUNC(i80186_cpu_device::timer_elapsed), this);
+	m_timer[1].int_timer = timer_alloc(FUNC(i80186_cpu_device::timer_elapsed), this);
+	m_timer[2].int_timer = timer_alloc(FUNC(i80186_cpu_device::timer_elapsed), this);
 
 	m_out_tmrout0_func.resolve_safe();
 	m_out_tmrout1_func.resolve_safe();

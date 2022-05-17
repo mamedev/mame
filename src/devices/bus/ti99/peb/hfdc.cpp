@@ -883,7 +883,7 @@ void myarc_hfdc_device::write_buffer(uint8_t data)
 void myarc_hfdc_device::device_start()
 {
 	m_dsrrom = memregion(TI99_DSRROM)->base();
-	m_motor_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(myarc_hfdc_device::motor_off), this));
+	m_motor_on_timer = timer_alloc(FUNC(myarc_hfdc_device::motor_off), this);
 	// The HFDC does not use READY; it has on-board RAM for DMA
 	m_current_floppy = nullptr;
 	m_current_harddisk = nullptr;

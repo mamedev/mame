@@ -60,7 +60,7 @@ void alesis_dm3ag_device::device_add_mconfig(machine_config &config)
 
 void alesis_dm3ag_device::device_start()
 {
-	m_dac_update_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alesis_dm3ag_device::dac_update), this));
+	m_dac_update_timer = timer_alloc(FUNC(alesis_dm3ag_device::dac_update), this);
 }
 
 //-------------------------------------------------

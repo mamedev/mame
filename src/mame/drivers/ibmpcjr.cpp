@@ -129,9 +129,9 @@ void pcjr_state::driver_init()
 
 void pcjr_state::machine_start()
 {
-	m_pc_int_delay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pcjr_state::delayed_irq), this));
-	m_pcjr_watchdog = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pcjr_state::watchdog_expired), this));
-	m_keyb_signal_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pcjr_state::kb_signal), this));
+	m_pc_int_delay_timer = timer_alloc(FUNC(pcjr_state::delayed_irq), this);
+	m_pcjr_watchdog = timer_alloc(FUNC(pcjr_state::watchdog_expired), this);
+	m_keyb_signal_timer = timer_alloc(FUNC(pcjr_state::kb_signal), this);
 }
 
 void pcjr_state::machine_reset()

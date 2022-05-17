@@ -110,7 +110,7 @@ sns_sa1_device::sns_sa1_device(const machine_config &mconfig, const char *tag, d
 void sns_sa1_device::device_start()
 {
 	m_internal_ram = make_unique_clear<u8[]>(0x800);
-	m_sa1_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sns_sa1_device::timer_tick), this));
+	m_sa1_timer = timer_alloc(FUNC(sns_sa1_device::timer_tick), this);
 
 	m_scpu_ctrl = 0;
 	m_nmi_vector = 0;

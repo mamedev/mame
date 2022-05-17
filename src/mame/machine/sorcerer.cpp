@@ -421,8 +421,8 @@ u8 sorcerer_state::portfe_r()
 // ************ MACHINE **************
 void sorcerer_state::machine_start_common(offs_t endmem)
 {
-	m_cassette_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sorcerer_state::cassette_tc), this));
-	m_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sorcerer_state::serial_tc), this));
+	m_cassette_timer = timer_alloc(FUNC(sorcerer_state::cassette_tc), this);
+	m_serial_timer = timer_alloc(FUNC(sorcerer_state::serial_tc), this);
 
 	m_halt = false;
 

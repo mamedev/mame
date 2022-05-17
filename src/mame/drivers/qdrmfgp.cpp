@@ -504,7 +504,7 @@ MACHINE_START_MEMBER(qdrmfgp_state,qdrmfgp)
 MACHINE_START_MEMBER(qdrmfgp_state,qdrmfgp2)
 {
 	/* sound irq (CCU? 240Hz) */
-	m_gp2_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(qdrmfgp_state::gp2_timer_callback), this));
+	m_gp2_timer = timer_alloc(FUNC(qdrmfgp_state::gp2_timer_callback), this);
 	m_gp2_timer->adjust(attotime::from_hz(XTAL(18'432'000)/76800), 0, attotime::from_hz(XTAL(18'432'000)/76800));
 
 	MACHINE_START_CALL_MEMBER( qdrmfgp );

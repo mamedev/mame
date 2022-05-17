@@ -68,7 +68,7 @@ void jag_blitter_device::device_start()
 	save_item(NAME(m_a1.xstep));
 	save_item(NAME(m_a1.ystep));
 
-	m_command_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jag_blitter_device::command_run), this));
+	m_command_timer = timer_alloc(FUNC(jag_blitter_device::command_run), this);
 }
 
 

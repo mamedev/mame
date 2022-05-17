@@ -82,7 +82,7 @@ void ay3600_device::device_start()
 	m_write_ako.resolve_safe();
 
 	// allocate timers
-	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ay3600_device::perform_scan), this));
+	m_scan_timer = timer_alloc(FUNC(ay3600_device::perform_scan), this);
 	m_scan_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
 
 	m_ako = 0;

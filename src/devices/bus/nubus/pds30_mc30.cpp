@@ -98,7 +98,7 @@ void nubus_xceedmc30_device::device_start()
 	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32s_delegate(*this, FUNC(nubus_xceedmc30_device::vram_r)), write32s_delegate(*this, FUNC(nubus_xceedmc30_device::vram_w)));
 	nubus().install_device(slotspace+0x800000, slotspace+0xefffff, read32s_delegate(*this, FUNC(nubus_xceedmc30_device::xceedmc30_r)), write32s_delegate(*this, FUNC(nubus_xceedmc30_device::xceedmc30_w)));
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nubus_xceedmc30_device::vbl_tick), this));
+	m_timer = timer_alloc(FUNC(nubus_xceedmc30_device::vbl_tick), this);
 	m_timer->adjust(screen().time_until_pos(479, 0), 0);
 }
 

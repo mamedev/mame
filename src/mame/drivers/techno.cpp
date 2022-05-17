@@ -362,8 +362,8 @@ void techno_state::machine_start()
 	save_item(NAME(m_snd_ack));
 	save_item(NAME(m_last_solenoid));
 
-	m_irq_set_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(techno_state::set_irq1), this));
-	m_irq_advance_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(techno_state::clear_irq1), this));
+	m_irq_set_timer = timer_alloc(FUNC(techno_state::set_irq1), this);
+	m_irq_advance_timer = timer_alloc(FUNC(techno_state::clear_irq1), this);
 }
 
 void techno_state::machine_reset()

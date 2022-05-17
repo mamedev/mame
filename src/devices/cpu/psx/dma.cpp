@@ -64,7 +64,7 @@ void psxdma_device::device_start()
 	{
 		psx_dma_channel *dma = &m_channel[ index ];
 
-		dma->timer = machine().scheduler().timer_alloc( timer_expired_delegate( FUNC( psxdma_device::dma_finished ), this ) );
+		dma->timer = timer_alloc( FUNC( psxdma_device::dma_finished ), this );
 
 		save_item( NAME( dma->n_base ), index );
 		save_item( NAME( dma->n_blockcontrol ), index );

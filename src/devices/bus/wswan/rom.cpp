@@ -89,7 +89,7 @@ void ws_rom_device::device_start()
 	// Set up RTC timer
 	if (m_has_rtc)
 	{
-		rtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ws_rom_device::rtc_tick), this));
+		rtc_timer = timer_alloc(FUNC(ws_rom_device::rtc_tick), this);
 		rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 	}
 

@@ -618,9 +618,9 @@ void duscc_channel::device_start()
 	m_cid = (m_uart->m_variant & duscc_device::SET_CMOS) ? 0x7f : 0xff; // TODO: support CMOS rev A = 0xbf
 
 	// Timers
-	duscc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(duscc_channel::check_zero_detect), this));
-	rtxc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(duscc_channel::rtxc_tick), this));
-	trxc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(duscc_channel::trxc_tick), this));
+	duscc_timer = timer_alloc(FUNC(duscc_channel::check_zero_detect), this);
+	rtxc_timer = timer_alloc(FUNC(duscc_channel::rtxc_tick), this);
+	trxc_timer = timer_alloc(FUNC(duscc_channel::trxc_tick), this);
 
 	// state saving
 	save_item(NAME(m_cmr1));

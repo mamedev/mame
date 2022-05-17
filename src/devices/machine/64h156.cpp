@@ -92,7 +92,7 @@ void c64h156_device::device_start()
 	m_write_byte.resolve_safe();
 
 	// allocate timer
-	t_gen = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(c64h156_device::update_tick), this));
+	t_gen = timer_alloc(FUNC(c64h156_device::update_tick), this);
 
 	// register for state saving
 	save_item(NAME(m_mtr));

@@ -131,7 +131,7 @@ void wpc_out_device::device_start()
 	save_item(NAME(previous_gi_update));
 	save_item(NAME(gi_time));
 
-	timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wpc_out_device::update_outputs), this));
+	timer = timer_alloc(FUNC(wpc_out_device::update_outputs), this);
 }
 
 void wpc_out_device::device_reset()

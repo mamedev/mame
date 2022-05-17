@@ -41,7 +41,7 @@ void x68k_hdc_image_device::device_start()
 	m_status = 0x00;
 	m_status_port = 0x00;
 	m_phase = sasi_phase::BUSFREE;
-	m_req_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_hdc_image_device::req_timer_callback), this));
+	m_req_timer = timer_alloc(FUNC(x68k_hdc_image_device::req_timer_callback), this);
 
 	save_item(NAME(m_phase));
 	save_item(NAME(m_status_port));

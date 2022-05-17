@@ -64,8 +64,8 @@ pce220_serial_device::~pce220_serial_device()
 
 void pce220_serial_device::device_start()
 {
-	m_send_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pce220_serial_device::send_tick), this));
-	m_receive_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pce220_serial_device::receive_tick), this));
+	m_send_timer = timer_alloc(FUNC(pce220_serial_device::send_tick), this);
+	m_receive_timer = timer_alloc(FUNC(pce220_serial_device::receive_tick), this);
 	m_send_timer->reset();
 	m_receive_timer->reset();
 }

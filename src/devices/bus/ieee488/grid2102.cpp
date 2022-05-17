@@ -86,7 +86,7 @@ grid210x_device::grid210x_device(const machine_config &mconfig, device_type type
 void grid210x_device::device_start() {
 	m_bus->ndac_w(this, 1);
 	m_bus->nrfd_w(this, 1);
-	m_delay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(grid210x_device::delay_tick), this));
+	m_delay_timer = timer_alloc(FUNC(grid210x_device::delay_tick), this);
 }
 
 TIMER_CALLBACK_MEMBER(grid210x_device::delay_tick) {

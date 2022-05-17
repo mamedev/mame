@@ -640,9 +640,9 @@ void intv_state::machine_start()
 		m_cart->save_ram();
 	}
 
-	m_int2_complete_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(intv_state::interrupt2_complete), this));
-	m_int_complete_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(intv_state::interrupt_complete), this));
-	m_btb_fill_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(intv_state::btb_fill), this));
+	m_int2_complete_timer = timer_alloc(FUNC(intv_state::interrupt2_complete), this);
+	m_int_complete_timer = timer_alloc(FUNC(intv_state::interrupt_complete), this);
+	m_btb_fill_timer = timer_alloc(FUNC(intv_state::btb_fill), this);
 }
 
 

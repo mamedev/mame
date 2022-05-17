@@ -235,9 +235,9 @@ void sega_scu_device::device_start()
 
 	m_hostspace = &m_hostcpu->space(AS_PROGRAM);
 
-	m_dma_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega_scu_device::dma_tick<DMALV0_ID>), this));
-	m_dma_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega_scu_device::dma_tick<DMALV1_ID>), this));
-	m_dma_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega_scu_device::dma_tick<DMALV2_ID>), this));
+	m_dma_timer[0] = timer_alloc(FUNC(sega_scu_device::dma_tick<DMALV0_ID>), this);
+	m_dma_timer[1] = timer_alloc(FUNC(sega_scu_device::dma_tick<DMALV1_ID>), this);
+	m_dma_timer[2] = timer_alloc(FUNC(sega_scu_device::dma_tick<DMALV2_ID>), this);
 }
 
 

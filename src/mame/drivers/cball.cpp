@@ -112,7 +112,7 @@ TIMER_CALLBACK_MEMBER(cball_state::interrupt_callback)
 
 void cball_state::machine_start()
 {
-	m_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cball_state::interrupt_callback), this));
+	m_int_timer = timer_alloc(FUNC(cball_state::interrupt_callback), this);
 }
 
 void cball_state::machine_reset()

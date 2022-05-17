@@ -292,7 +292,7 @@ void decocpu_type1_device::device_start()
 	m_write_lamp.resolve_safe();
 	m_write_solenoid.resolve_safe();
 
-	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(decocpu_type1_device::irq_trigger), this));
+	m_irq_timer = timer_alloc(FUNC(decocpu_type1_device::irq_trigger), this);
 	m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES, E_CLOCK), 1);
 	m_irq_active = false;
 

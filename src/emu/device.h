@@ -704,6 +704,9 @@ public:
 	attotime clocks_to_attotime(u64 clocks) const noexcept;
 	u64 attotime_to_clocks(const attotime &duration) const noexcept;
 
+	// timer interfaces
+	template <typename... T> emu_timer *timer_alloc(T &&... args);
+
 	/// \brief Register data for save states
 	///
 	/// Registers data to be automatically saved/restored.  Can be used

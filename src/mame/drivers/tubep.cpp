@@ -306,7 +306,7 @@ TIMER_CALLBACK_MEMBER(tubep_state::scanline_callback)
 void tubep_state::machine_start()
 {
 	// Create interrupt timer
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tubep_state::scanline_callback), this));
+	m_interrupt_timer = timer_alloc(FUNC(tubep_state::scanline_callback), this);
 }
 
 
@@ -456,7 +456,7 @@ TIMER_CALLBACK_MEMBER(rjammer_state::scanline_callback)
 void rjammer_state::machine_start()
 {
 	// Create interrupt timer
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rjammer_state::scanline_callback), this));
+	m_interrupt_timer = timer_alloc(FUNC(rjammer_state::scanline_callback), this);
 
 	// Set up save state
 	save_item(NAME(m_msm5205_toggle));

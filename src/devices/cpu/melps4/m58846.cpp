@@ -39,7 +39,7 @@ m58846_device::m58846_device(const machine_config &mconfig, const char *tag, dev
 void m58846_device::device_start()
 {
 	melps4_cpu_device::device_start();
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m58846_device::timer_update), this));
+	m_timer = timer_alloc(FUNC(m58846_device::timer_update), this);
 }
 
 

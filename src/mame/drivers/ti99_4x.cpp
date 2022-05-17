@@ -863,7 +863,7 @@ void ti99_4x_state::driver_start()
 	// Removing the TMS9928a requires to add a replacement for the GROMCLK.
 	// In the real hardware this is a circuit (REPL99x) that fits into the VDP socket
 	if (m_model == MODEL_4EV)
-		m_gromclk_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ti99_4x_state::gromclk_tick), this));
+		m_gromclk_timer = timer_alloc(FUNC(ti99_4x_state::gromclk_tick), this);
 
 	save_item(NAME(m_keyboard_column));
 	save_item(NAME(m_check_alphalock));

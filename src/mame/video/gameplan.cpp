@@ -231,8 +231,8 @@ void gameplan_state::video_start()
 	m_videoram_size = (HBSTART - HBEND) * (VBSTART - VBEND);
 	m_videoram = std::make_unique<uint8_t[]>(m_videoram_size);
 
-	m_clear_done_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gameplan_state::clear_screen_done_callback), this));
-	m_via_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gameplan_state::via_irq_delayed), this));
+	m_clear_done_timer = timer_alloc(FUNC(gameplan_state::clear_screen_done_callback), this);
+	m_via_irq_timer = timer_alloc(FUNC(gameplan_state::via_irq_delayed), this);
 
 	/* register for save states */
 	save_pointer(NAME(m_videoram), m_videoram_size);

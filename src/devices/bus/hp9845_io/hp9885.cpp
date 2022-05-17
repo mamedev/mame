@@ -336,9 +336,9 @@ void hp9885_device::device_start()
 	save_item(NAME(m_am_detector));
 	save_item(NAME(m_crc));
 
-	m_fsm_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp9885_device::fsm_tick), this));
-	m_head_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp9885_device::head_tick), this));
-	m_bit_byte_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp9885_device::bit_byte_tick), this));
+	m_fsm_timer = timer_alloc(FUNC(hp9885_device::fsm_tick), this);
+	m_head_timer = timer_alloc(FUNC(hp9885_device::head_tick), this);
+	m_bit_byte_timer = timer_alloc(FUNC(hp9885_device::bit_byte_tick), this);
 
 	m_drive = m_drive_connector->get_device();
 

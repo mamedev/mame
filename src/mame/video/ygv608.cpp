@@ -483,8 +483,8 @@ void ygv608_device::device_start()
 	// TODO: tagging configuration
 	m_vblank_handler.resolve();
 	m_raster_handler.resolve();
-	m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ygv608_device::update_vblank_flag), this));
-	m_raster_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ygv608_device::update_raster_flag), this));
+	m_vblank_timer = timer_alloc(FUNC(ygv608_device::update_vblank_flag), this);
+	m_raster_timer = timer_alloc(FUNC(ygv608_device::update_raster_flag), this);
 
 	register_state_save();
 }

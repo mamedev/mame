@@ -624,7 +624,7 @@ void tms9901_device::device_start()
 	// Allow for using asynchronous and synchronous clocks
 	if (clock() != 0)
 	{
-		m_decrementer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tms9901_device::decrement_tick), this));
+		m_decrementer = timer_alloc(FUNC(tms9901_device::decrement_tick), this);
 		m_decrementer->adjust(attotime::from_hz(clock() / 64.), 0, attotime::from_hz(clock() / 64.));
 	}
 

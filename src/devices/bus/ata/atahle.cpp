@@ -110,8 +110,8 @@ void ata_hle_device::device_start()
 
 	save_item(NAME(m_identify_buffer));
 
-	m_busy_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ata_hle_device::busy_tick), this));
-	m_buffer_empty_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ata_hle_device::empty_tick), this));
+	m_busy_timer = timer_alloc(FUNC(ata_hle_device::busy_tick), this);
+	m_buffer_empty_timer = timer_alloc(FUNC(ata_hle_device::empty_tick), this);
 }
 
 void ata_hle_device::device_reset()

@@ -415,10 +415,10 @@ void antic_device::device_start()
 	save_pointer(NAME(m_used_colors), 21 * 256);
 
 	/* timers */
-	m_cycle_steal_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(antic_device::steal_cycles), this));
-	m_issue_dli_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(antic_device::issue_dli), this));
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(antic_device::scanline_render), this));
-	m_line_done_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(antic_device::line_done), this));
+	m_cycle_steal_timer = timer_alloc(FUNC(antic_device::steal_cycles), this);
+	m_issue_dli_timer = timer_alloc(FUNC(antic_device::issue_dli), this);
+	m_scanline_timer = timer_alloc(FUNC(antic_device::scanline_render), this);
+	m_line_done_timer = timer_alloc(FUNC(antic_device::line_done), this);
 
 	m_cycle_steal_timer->adjust(attotime::never);
 	m_issue_dli_timer->adjust(attotime::never);

@@ -896,13 +896,13 @@ void lisa_state::init_mac_xl()
 
 void lisa_state::machine_start()
 {
-	m_mouse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lisa_state::handle_mouse),this));
+	m_mouse_timer = timer_alloc(FUNC(lisa_state::handle_mouse), this);
 
 	/* read command every ms (don't know the real value) */
-	m_cops_ready_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lisa_state::set_COPS_ready), this));
+	m_cops_ready_timer = timer_alloc(FUNC(lisa_state::set_COPS_ready), this);
 	m_cops_ready_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
 
-	m_cops_cmd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lisa_state::read_COPS_command), this));
+	m_cops_cmd_timer = timer_alloc(FUNC(lisa_state::read_COPS_command), this);
 	m_cops_cmd_timer->adjust(attotime::never);
 
 	m_nvram->set_base(m_fdc_ram, 1024);

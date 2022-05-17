@@ -673,9 +673,9 @@ void upd7220_device::device_start()
 	m_write_blank.resolve_safe();
 
 	// allocate timers
-	m_vsync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd7220_device::vsync_update), this));
-	m_hsync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd7220_device::hsync_update), this));
-	m_blank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd7220_device::blank_update), this));
+	m_vsync_timer = timer_alloc(FUNC(upd7220_device::vsync_update), this);
+	m_hsync_timer = timer_alloc(FUNC(upd7220_device::hsync_update), this);
+	m_blank_timer = timer_alloc(FUNC(upd7220_device::blank_update), this);
 
 	// register for state saving
 	save_item(NAME(m_ra));

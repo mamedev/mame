@@ -250,10 +250,10 @@ void rastersp_state::machine_start()
 	//membank("bank3")->set_base(&m_dram[0x300000/4]);
 
 	if (!m_tms_timer1)
-		m_tms_timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rastersp_state::tms_timer1), this));
+		m_tms_timer1 = timer_alloc(FUNC(rastersp_state::tms_timer1), this);
 
 	if (!m_tms_tx_timer)
-		m_tms_tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rastersp_state::tms_tx_timer), this));
+		m_tms_tx_timer = timer_alloc(FUNC(rastersp_state::tms_tx_timer), this);
 
 #if USE_SPEEDUP_HACK
 	m_dsp->space(AS_PROGRAM).install_read_handler(0x809923, 0x809923, read32smo_delegate(*this, FUNC(rastersp_state::dsp_speedup_r)));
@@ -278,7 +278,7 @@ void fbcrazy_state::machine_start()
 {
 	rastersp_state::machine_start();
 
-	m_trackball_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fbcrazy_state::trackball_timer), this));
+	m_trackball_timer = timer_alloc(FUNC(fbcrazy_state::trackball_timer), this);
 
 	save_item(NAME(m_aux_port3_data));
 	save_item(NAME(m_trackball_ctr));

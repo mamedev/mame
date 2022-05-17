@@ -61,7 +61,7 @@ void pcf8573_device::device_start()
 	m_sec_cb.resolve_safe();
 
 	// allocate timers
-	m_clock_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pcf8573_device::clock_tick), this));
+	m_clock_timer = timer_alloc(FUNC(pcf8573_device::clock_tick), this);
 	m_clock_timer->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
 
 	// state saving
@@ -250,7 +250,7 @@ WRITE_LINE_MEMBER(pcf8573_device::scl_w)
 							}
 							break;
 						}
-						
+
 						if( m_state != STATE_IDLE )
 						{
 							m_sdar = 0 ;

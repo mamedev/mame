@@ -108,7 +108,7 @@ void nanoreseau_device::device_add_mconfig(machine_config &config)
 
 void nanoreseau_device::device_start()
 {
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nanoreseau_device::answer_tick), this));
+	m_timer = timer_alloc(FUNC(nanoreseau_device::answer_tick), this);
 	save_item(NAME(m_answer_step));
 }
 

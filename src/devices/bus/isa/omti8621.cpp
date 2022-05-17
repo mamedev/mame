@@ -288,7 +288,7 @@ void omti8621_device::device_start()
 
 	m_sector_buffer.resize(OMTI_DISK_SECTOR_SIZE*OMTI_MAX_BLOCK_COUNT);
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(omti8621_device::trigger_interrupt), this));
+	m_timer = timer_alloc(FUNC(omti8621_device::trigger_interrupt), this);
 
 	our_disks[0] = subdevice<omti_disk_image_device>(OMTI_DISK0_TAG);
 	our_disks[1] = subdevice<omti_disk_image_device>(OMTI_DISK1_TAG);

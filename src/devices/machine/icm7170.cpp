@@ -86,7 +86,7 @@ void icm7170_device::device_start()
 	// resolve callbacks
 	m_out_irq_cb.resolve_safe();
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(icm7170_device::clock_tick), this));
+	m_timer = timer_alloc(FUNC(icm7170_device::clock_tick), this);
 
 	// TODO: frequency should be based on input clock and divisor
 	m_timer->adjust(attotime::from_hz(100), 0, attotime::from_hz(100));

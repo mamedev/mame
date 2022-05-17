@@ -83,8 +83,8 @@ void s3virge_vga_device::device_start()
 	save_item(vga.sequencer.data,"Sequencer Registers");
 	save_item(vga.attribute.data,"Attribute Registers");
 
-	m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vga_device::vblank_timer_cb),this));
-	m_draw_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s3virge_vga_device::draw_step_tick), this));
+	m_vblank_timer = timer_alloc(FUNC(vga_device::vblank_timer_cb), this);
+	m_draw_timer = timer_alloc(FUNC(s3virge_vga_device::draw_step_tick), this);
 
 	memset(&s3, 0, sizeof(s3));
 	memset(&s3virge, 0, sizeof(s3virge));

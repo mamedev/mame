@@ -795,9 +795,9 @@ void dcs_audio_device::device_start()
 	}
 
 	/* allocate timers */
-	m_s1_ack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dcs_audio_device::s1_ack_callback1), this));
-	m_s1_ack2_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dcs_audio_device::s1_ack_callback2), this));
-	m_s2_ack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dcs_audio_device::s2_ack_callback), this));
+	m_s1_ack_timer = timer_alloc(FUNC(dcs_audio_device::s1_ack_callback1), this);
+	m_s1_ack2_timer = timer_alloc(FUNC(dcs_audio_device::s1_ack_callback2), this);
+	m_s2_ack_timer = timer_alloc(FUNC(dcs_audio_device::s2_ack_callback), this);
 
 	/* non-RAM based automatically acks */
 	m_auto_ack = true;

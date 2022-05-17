@@ -369,7 +369,7 @@ void tv912_state::machine_start()
 	m_dispram = make_unique_clear<u8[]>(0x1000);
 	m_dispram_bank->configure_entries(0, 2, m_dispram.get(), 0x800);
 
-	m_baudgen_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tv912_state::update_baudgen), this));
+	m_baudgen_timer = timer_alloc(FUNC(tv912_state::update_baudgen), this);
 	m_baudgen_timer->adjust(attotime::zero, 0);
 
 	save_item(NAME(m_force_blank));

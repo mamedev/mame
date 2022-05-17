@@ -211,7 +211,7 @@ void i8087_device::device_start()
 	m_busy_handler.resolve_safe();
 	m_int_handler(0);
 	m_busy_handler(1);
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(i8087_device::release_busy), this));
+	m_timer = timer_alloc(FUNC(i8087_device::release_busy), this);
 	build_opcode_table();
 }
 

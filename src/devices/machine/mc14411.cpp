@@ -115,7 +115,7 @@ void mc14411_device::device_start()
 
 	for (int i = TIMER_F1; i <= TIMER_F16; i++)
 	{
-		m_fx_timers[i].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc14411_device::timer_tick), this));
+		m_fx_timers[i].timer = timer_alloc(FUNC(mc14411_device::timer_tick), this);
 		m_fx_timers[i].enabled = true;
 	}
 
@@ -124,7 +124,7 @@ void mc14411_device::device_start()
 	save_item(STRUCT_MEMBER(m_fx_timers, state));
 	save_item(STRUCT_MEMBER(m_fx_timers, enabled));
 
-	m_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc14411_device::reset_tick), this));
+	m_reset_timer = timer_alloc(FUNC(mc14411_device::reset_tick), this);
 }
 
 

@@ -168,8 +168,8 @@ void scc8530_legacy_device::device_start()
 	lastIRQStat = 0;
 	IRQType = IRQ_NONE;
 
-	channel[0].baudtimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scc8530_legacy_device::baud_expire), this));
-	channel[1].baudtimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scc8530_legacy_device::baud_expire), this));
+	channel[0].baudtimer = timer_alloc(FUNC(scc8530_legacy_device::baud_expire), this);
+	channel[1].baudtimer = timer_alloc(FUNC(scc8530_legacy_device::baud_expire), this);
 }
 
 

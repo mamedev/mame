@@ -49,8 +49,8 @@ vino_device::vino_device(const machine_config &mconfig, const char *tag, device_
 
 void vino_device::device_start()
 {
-	m_channels[0].m_fetch_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vino_device::fetch_pixel), this));
-	m_channels[1].m_fetch_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vino_device::fetch_pixel), this));
+	m_channels[0].m_fetch_timer = timer_alloc(FUNC(vino_device::fetch_pixel), this);
+	m_channels[1].m_fetch_timer = timer_alloc(FUNC(vino_device::fetch_pixel), this);
 
 	save_item(NAME(m_rev_id));
 	save_item(NAME(m_control));

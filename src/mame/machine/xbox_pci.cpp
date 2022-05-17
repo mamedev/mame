@@ -722,7 +722,7 @@ void mcpx_ohci_device::device_start()
 			m_interrupt_handler(state);
 		}
 	);
-	timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mcpx_ohci_device::usb_update), this));
+	timer = timer_alloc(FUNC(mcpx_ohci_device::usb_update), this);
 	ohci_usb->set_timer(timer);
 	ohci_usb->start();
 	for (int i=0;i < connecteds_count;i++)
@@ -874,7 +874,7 @@ void mcpx_apu_device::device_start()
 	memset(apust.voices_position_end, 0, sizeof(apust.voices_position_end));
 	memset(apust.voices_position_increment, 0, sizeof(apust.voices_position_increment));
 	apust.space = &cpu->space();
-	apust.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mcpx_apu_device::audio_update), this));
+	apust.timer = timer_alloc(FUNC(mcpx_apu_device::audio_update), this);
 	apust.timer->enable(false);
 }
 

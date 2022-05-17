@@ -225,9 +225,9 @@ void wpc_dot_state::init_wpc_dot()
 	m_dmdbanks[4]->set_entry(4);
 	m_dmdbanks[5]->configure_entries(0, 16, &m_dmdram[0x0000],0x200);
 	m_dmdbanks[5]->set_entry(5);
-	m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wpc_dot_state::vblank_tick), this));
+	m_vblank_timer = timer_alloc(FUNC(wpc_dot_state::vblank_tick), this);
 	m_vblank_timer->adjust(attotime::from_hz(60),0,attotime::from_hz(60*4));
-	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wpc_dot_state::trigger_irq), this));
+	m_irq_timer = timer_alloc(FUNC(wpc_dot_state::trigger_irq), this);
 	m_irq_timer->adjust(attotime::from_hz(976),0,attotime::from_hz(976));
 	m_bankmask = (memregion("code")->bytes() >> 14) - 1;
 	logerror("WPC: ROM bank mask = %02x\n",m_bankmask);

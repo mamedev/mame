@@ -32,7 +32,7 @@ upd7002_device::upd7002_device(const machine_config &mconfig, const char *tag, d
 
 void upd7002_device::device_start()
 {
-	m_conversion_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd7002_device::conversion_complete), this));
+	m_conversion_timer = timer_alloc(FUNC(upd7002_device::conversion_complete), this);
 	m_get_analogue_cb.resolve();
 	m_eoc_cb.resolve();
 

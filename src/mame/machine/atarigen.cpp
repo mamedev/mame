@@ -28,7 +28,7 @@ atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, 
 
 void atarigen_state::machine_start()
 {
-	m_unhalt_cpu_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(atarigen_state::unhalt_cpu), this));
+	m_unhalt_cpu_timer = timer_alloc(FUNC(atarigen_state::unhalt_cpu), this);
 }
 
 

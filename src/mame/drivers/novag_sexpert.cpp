@@ -182,7 +182,7 @@ private:
 void sforte_state::machine_start()
 {
 	sexpert_state::machine_start();
-	m_beeptimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sforte_state::beep),this));
+	m_beeptimer = timer_alloc(FUNC(sforte_state::beep), this);
 }
 
 

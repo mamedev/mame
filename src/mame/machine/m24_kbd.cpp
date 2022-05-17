@@ -217,7 +217,7 @@ void m24_keyboard_device::device_start()
 {
 	m_out_data.resolve_safe();
 	m_out_data(1);
-	m_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m24_keyboard_device::reset_mcu), this));
+	m_reset_timer = timer_alloc(FUNC(m24_keyboard_device::reset_mcu), this);
 }
 
 void m24_keyboard_device::device_reset()

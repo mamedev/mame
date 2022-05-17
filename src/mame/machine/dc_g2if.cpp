@@ -74,7 +74,7 @@ void dc_g2if_device::device_start()
 {
 	for (int i = 0; i < 4; i++)
 	{
-		m_dma[i].end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dc_g2if_device::dma_end_tick), this));
+		m_dma[i].end_timer = timer_alloc(FUNC(dc_g2if_device::dma_end_tick), this);
 	}
 
 	m_int_w.resolve();

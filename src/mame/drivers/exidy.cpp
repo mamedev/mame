@@ -1436,7 +1436,7 @@ uint32_t exidy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 void exidy_state::machine_start()
 {
-	m_collision_latch_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(exidy_state::latch_collision), this));
+	m_collision_latch_timer = timer_alloc(FUNC(exidy_state::latch_collision), this);
 }
 
 void spectar_state::machine_start()

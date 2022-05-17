@@ -348,10 +348,10 @@ void tx0_state::tx0_machine_stop()
 
 void tx0_state::machine_start()
 {
-	m_tape_reader.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tx0_state::reader_callback),this));
-	m_tape_puncher.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tx0_state::puncher_callback),this));
-	m_typewriter.prt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tx0_state::prt_callback),this));
-	m_dis_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tx0_state::dis_callback),this));
+	m_tape_reader.timer = timer_alloc(FUNC(tx0_state::reader_callback), this);
+	m_tape_puncher.timer = timer_alloc(FUNC(tx0_state::puncher_callback), this);
+	m_typewriter.prt_timer = timer_alloc(FUNC(tx0_state::prt_callback), this);
+	m_dis_timer = timer_alloc(FUNC(tx0_state::dis_callback), this);
 
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&tx0_state::tx0_machine_stop,this));
 }

@@ -1660,22 +1660,22 @@ void pokemini_state::machine_start()
 	memset( m_pm_reg, 0, sizeof(m_pm_reg) );
 
 	/* Set up timers */
-	m_timers.seconds_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pokemini_state::seconds_timer_callback), this));
+	m_timers.seconds_timer = timer_alloc(FUNC(pokemini_state::seconds_timer_callback), this);
 	m_timers.seconds_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 
-	m_timers.hz256_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pokemini_state::timer_256hz_callback), this));
+	m_timers.hz256_timer = timer_alloc(FUNC(pokemini_state::timer_256hz_callback), this);
 	m_timers.hz256_timer->adjust(attotime::zero, 0, attotime::from_hz(256));
 
-	m_timers.timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pokemini_state::timer1_callback), this));
-	m_timers.timer1_hi = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pokemini_state::timer1_hi_callback), this));
-	m_timers.timer2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pokemini_state::timer2_callback), this));
-	m_timers.timer2_hi = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pokemini_state::timer2_hi_callback), this));
-	m_timers.timer3 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pokemini_state::timer3_callback), this));
-	m_timers.timer3_hi = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pokemini_state::timer3_hi_callback), this));
+	m_timers.timer1 = timer_alloc(FUNC(pokemini_state::timer1_callback), this);
+	m_timers.timer1_hi = timer_alloc(FUNC(pokemini_state::timer1_hi_callback), this);
+	m_timers.timer2 = timer_alloc(FUNC(pokemini_state::timer2_callback), this);
+	m_timers.timer2_hi = timer_alloc(FUNC(pokemini_state::timer2_hi_callback), this);
+	m_timers.timer3 = timer_alloc(FUNC(pokemini_state::timer3_callback), this);
+	m_timers.timer3_hi = timer_alloc(FUNC(pokemini_state::timer3_hi_callback), this);
 
 	/* Set up the PRC */
 	m_prc.max_frame_count = 2;
-	m_prc.count_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pokemini_state::prc_counter_callback), this));
+	m_prc.count_timer = timer_alloc(FUNC(pokemini_state::prc_counter_callback), this);
 	m_prc.count_timer->adjust( attotime::zero, 0, m_maincpu->cycles_to_attotime(55640 / 65) );
 }
 

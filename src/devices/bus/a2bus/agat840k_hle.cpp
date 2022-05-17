@@ -139,8 +139,8 @@ void a2bus_agat840k_hle_device::device_start()
 
 	m_mxcs = MXCSR_SYNC;
 
-	m_timer_wait = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a2bus_agat840k_hle_device::timer_wait_tick), this));
-	m_timer_seek = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a2bus_agat840k_hle_device::timer_seek_tick), this));
+	m_timer_wait = timer_alloc(FUNC(a2bus_agat840k_hle_device::timer_wait_tick), this);
+	m_timer_seek = timer_alloc(FUNC(a2bus_agat840k_hle_device::timer_seek_tick), this);
 
 	m_seektime = 6000; // 6 ms, per es5323.txt
 	m_waittime = 32;   // 16 bits x 2 us

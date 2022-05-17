@@ -1375,11 +1375,11 @@ void corvus_hdc_device::device_start() {
 	m_recv_bytes = 0;                          // We aren't waiting on additional data from the host
 
 	// Set up a timer to handle the four-second host-to-controller timeout
-	m_timeout_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(corvus_hdc_device::process_timeout), this));
+	m_timeout_timer = timer_alloc(FUNC(corvus_hdc_device::process_timeout), this);
 	m_timeout_timer->adjust(attotime::from_seconds(4));
 	m_timeout_timer->enable(0);        // Start this timer out disabled
 
-	m_cmd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(corvus_hdc_device::complete_function), this));
+	m_cmd_timer = timer_alloc(FUNC(corvus_hdc_device::complete_function), this);
 
 	//
 	// Define all of the packet sizes for the commands

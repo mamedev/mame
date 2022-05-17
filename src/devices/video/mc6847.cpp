@@ -157,10 +157,10 @@ void mc6847_friend_device::device_start()
 	m_write_fsync.resolve_safe();
 
 	/* create the timers */
-	m_frame_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc6847_friend_device::new_frame), this));
-	m_hsync_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc6847_friend_device::horizontal_sync_changed), this));
-	m_hsync_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc6847_friend_device::horizontal_sync_changed), this));
-	m_fsync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc6847_friend_device::change_field_sync), this));
+	m_frame_timer = timer_alloc(FUNC(mc6847_friend_device::new_frame), this);
+	m_hsync_on_timer = timer_alloc(FUNC(mc6847_friend_device::horizontal_sync_changed), this);
+	m_hsync_off_timer = timer_alloc(FUNC(mc6847_friend_device::horizontal_sync_changed), this);
+	m_fsync_timer = timer_alloc(FUNC(mc6847_friend_device::change_field_sync), this);
 
 	m_frame_timer->adjust(clocks_to_attotime(0), 0, clocks_to_attotime(TIMER_HSYNC_PERIOD * m_divider));
 	m_hsync_on_timer->adjust(clocks_to_attotime(TIMER_HSYNC_ON_TIME * m_divider), 1, clocks_to_attotime(TIMER_HSYNC_PERIOD * m_divider));

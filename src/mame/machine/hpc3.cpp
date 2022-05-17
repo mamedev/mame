@@ -150,7 +150,7 @@ void hpc3_device::device_start()
 		save_item(NAME(m_pbus_dma[i].m_config), i);
 		save_item(NAME(m_pbus_dma[i].m_control), i);
 
-		m_pbus_dma[i].m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hpc3_device::do_pbus_dma), this));
+		m_pbus_dma[i].m_timer = timer_alloc(FUNC(hpc3_device::do_pbus_dma), this);
 		m_pbus_dma[i].m_timer->adjust(attotime::never);
 	}
 
@@ -166,7 +166,7 @@ void hpc3_device::device_start()
 	save_pointer(NAME(m_enet_fifo[ENET_RECV]), 32);
 	save_pointer(NAME(m_enet_fifo[ENET_XMIT]), 40);
 
-	m_enet_tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hpc3_device::enet_transmit), this));
+	m_enet_tx_timer = timer_alloc(FUNC(hpc3_device::enet_transmit), this);
 }
 
 void hpc3_device::device_reset()

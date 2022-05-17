@@ -2060,9 +2060,9 @@ void cmi_state::machine_start()
 	m_q133_rom = (uint8_t *)m_q133_region->base();
 
 	// allocate timers for the built-in two channel timer
-	m_map_switch_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cmi_state::switch_map), this));
-	m_hblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cmi_state::hblank), this));
-	m_jam_timeout_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cmi_state::jam_timeout), this));
+	m_map_switch_timer = timer_alloc(FUNC(cmi_state::switch_map), this);
+	m_hblank_timer = timer_alloc(FUNC(cmi_state::hblank), this);
+	m_jam_timeout_timer = timer_alloc(FUNC(cmi_state::jam_timeout), this);
 
 	m_map_switch_timer->adjust(attotime::never);
 	m_hblank_timer->adjust(attotime::never);

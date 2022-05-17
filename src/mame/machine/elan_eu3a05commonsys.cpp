@@ -247,7 +247,7 @@ void elan_eu3a05commonsys_device::device_start()
 	save_item(NAME(m_custom_irq_vector));
 	save_item(NAME(m_custom_nmi_vector));
 
-	m_unk_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(elan_eu3a05commonsys_device::unknown_timer_tick), this));
+	m_unk_timer = timer_alloc(FUNC(elan_eu3a05commonsys_device::unknown_timer_tick), this);
 	m_unk_timer->adjust(attotime::never);
 }
 

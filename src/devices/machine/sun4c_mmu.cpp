@@ -100,7 +100,7 @@ void sun4_mmu_base_device::device_start()
 	m_type1_w.resolve_safe();
 
 	// allocate timer for system reset
-	m_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sun4_mmu_base_device::reset_off_tick), this));
+	m_reset_timer = timer_alloc(FUNC(sun4_mmu_base_device::reset_off_tick), this);
 	m_reset_timer->adjust(attotime::never);
 
 	m_segmap = std::make_unique<std::unique_ptr<uint8_t[]>[]>(16);

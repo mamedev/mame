@@ -137,7 +137,7 @@ void ncr539x_device::device_start()
 	m_out_irq_cb.resolve_safe();
 	m_out_drq_cb.resolve_safe();
 
-	m_operation_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ncr539x_device::execute_operation), this));
+	m_operation_timer = timer_alloc(FUNC(ncr539x_device::execute_operation), this);
 }
 
 //-------------------------------------------------

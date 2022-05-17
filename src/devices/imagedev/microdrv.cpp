@@ -70,7 +70,7 @@ void microdrive_image_device::device_start()
 	m_right = std::make_unique<uint8_t[]>(MDV_IMAGE_LENGTH / 2);
 
 	// allocate timers
-	m_bit_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(microdrive_image_device::bit_timer), this));
+	m_bit_timer = timer_alloc(FUNC(microdrive_image_device::bit_timer), this);
 	m_bit_timer->adjust(attotime::zero, 0, attotime::from_hz(MDV_BITRATE));
 	m_bit_timer->enable(0);
 

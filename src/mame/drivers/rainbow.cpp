@@ -892,10 +892,10 @@ static void rainbow_floppies(device_slot_interface &device)
 void rainbow_base_state::machine_start()
 {
 	m_power_good = false; // Simulate AC_OK signal from power supply.
-	cmd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rainbow_base_state::command_tick), this));
+	cmd_timer = timer_alloc(FUNC(rainbow_base_state::command_tick), this);
 	cmd_timer->adjust(attotime::from_msec(MS_TO_POWER_GOOD));
 
-	switch_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rainbow_base_state::switch_off_tick), this));
+	switch_off_timer = timer_alloc(FUNC(rainbow_base_state::switch_off_tick), this);
 	switch_off_timer->adjust(attotime::from_msec(10));
 
 	m_digits.resolve();

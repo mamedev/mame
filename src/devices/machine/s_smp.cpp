@@ -89,7 +89,7 @@ void s_smp_device::device_start()
 	space(AS_DATA).specific(m_data);
 	space(AS_DATA).cache(m_dcache);
 
-	m_tick_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s_smp_device::update_timers), this));
+	m_tick_timer = timer_alloc(FUNC(s_smp_device::update_timers), this);
 
 	save_item(NAME(m_timer_enabled));
 	save_item(NAME(m_subcounter));

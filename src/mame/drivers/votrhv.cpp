@@ -409,7 +409,7 @@ TIMER_CALLBACK_MEMBER(hc120_state::scan_keys)
 
 void votrhv_state::machine_start()
 {
-	m_resume_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(votrhv_state::resume_tick), this));
+	m_resume_timer = timer_alloc(FUNC(votrhv_state::resume_tick), this);
 
 	m_leds.resolve();
 
@@ -432,7 +432,7 @@ void hc120_state::machine_start()
 {
 	votrhv_state::machine_start();
 
-	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hc120_state::scan_keys), this));
+	m_scan_timer = timer_alloc(FUNC(hc120_state::scan_keys), this);
 }
 
 void hc120_state::machine_reset()

@@ -443,7 +443,7 @@ void blockade_state::machine_start()
 {
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(blockade_state::tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(blockade_state::vblank_tick), this));
+	m_vblank_timer = timer_alloc(FUNC(blockade_state::vblank_tick), this);
 
 	// register for save states
 	save_item(NAME(m_coin_latch));

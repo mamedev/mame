@@ -257,8 +257,8 @@ void arm_iomd_device::device_start()
 
 	m_host_space = &m_host_cpu->space(AS_PROGRAM);
 
-	m_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(arm_iomd_device::timer_elapsed), this));
-	m_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(arm_iomd_device::timer_elapsed), this));
+	m_timer[0] = timer_alloc(FUNC(arm_iomd_device::timer_elapsed), this);
+	m_timer[1] = timer_alloc(FUNC(arm_iomd_device::timer_elapsed), this);
 	save_pointer(NAME(m_timer_in), std::size(m_timer_in));
 	save_pointer(NAME(m_timer_out), std::size(m_timer_out));
 	save_pointer(NAME(m_timer_counter), std::size(m_timer_counter));

@@ -387,8 +387,8 @@ void mekd1_state::machine_reset()
 void mekd1_state::machine_start()
 {
 	// Allocate timers
-	m_bit_rate_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mekd1_state::bit_rate), this));
-	m_bit_rate_half_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mekd1_state::bit_rate_half), this));
+	m_bit_rate_timer = timer_alloc(FUNC(mekd1_state::bit_rate), this);
+	m_bit_rate_half_timer = timer_alloc(FUNC(mekd1_state::bit_rate_half), this);
 
 	save_item(NAME(m_bit_rate_out));
 	save_item(NAME(m_bit_rate_half_out));

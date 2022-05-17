@@ -32,7 +32,7 @@ void ad1848_device::device_add_mconfig(machine_config &config)
 
 void ad1848_device::device_start()
 {
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ad1848_device::update_tick), this));
+	m_timer = timer_alloc(FUNC(ad1848_device::update_tick), this);
 	m_irq_cb.resolve_safe();
 	m_drq_cb.resolve_safe();
 	save_item(NAME(m_regs.idx));

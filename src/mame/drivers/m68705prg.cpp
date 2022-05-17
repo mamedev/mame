@@ -100,7 +100,7 @@ protected:
 		m_addr = 0x0000;
 		m_pb_val = 0xff;
 
-		m_input_poll_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m68705prg_state_base::input_poll_callback), this));
+		m_input_poll_timer = timer_alloc(FUNC(m68705prg_state_base::input_poll_callback), this);
 		m_input_poll_timer->adjust(attotime::from_hz(120), 0, attotime::from_hz(120));
 	}
 

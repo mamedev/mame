@@ -58,7 +58,7 @@ void jvc_xvd701_device::device_start()
 	output_ri(0);
 	output_cts(0);
 
-	m_timer_response = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jvc_xvd701_device::send_response), this));
+	m_timer_response = timer_alloc(FUNC(jvc_xvd701_device::send_response), this);
 }
 
 void jvc_xvd701_device::device_reset()

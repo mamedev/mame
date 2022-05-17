@@ -916,7 +916,7 @@ void cat_state::machine_start()
 	m_wdt_counter = 0;
 	m_video_enable = 1;
 	m_video_invert = 0;
-	m_6ms_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cat_state::counter_6ms_callback), this));
+	m_6ms_timer = timer_alloc(FUNC(cat_state::counter_6ms_callback), this);
 	subdevice<nvram_device>("nvram")->set_base(m_svram, 0x4000);
 }
 

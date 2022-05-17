@@ -456,8 +456,8 @@ void destroyr_state::palette_init(palette_device &palette) const
 
 void destroyr_state::machine_start()
 {
-	m_dial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(destroyr_state::dial_callback), this));
-	m_frame_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(destroyr_state::frame_callback), this));
+	m_dial_timer = timer_alloc(FUNC(destroyr_state::dial_callback), this);
+	m_frame_timer = timer_alloc(FUNC(destroyr_state::frame_callback), this);
 
 	save_item(NAME(m_cursor));
 	save_item(NAME(m_wavemod));

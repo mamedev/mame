@@ -478,9 +478,9 @@ void fuuki32_state::machine_start()
 
 	m_soundbank->configure_entries(0, 0x10, &ROM[0], 0x8000);
 
-	m_level_1_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fuuki32_state::level1_interrupt), this));
-	m_vblank_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fuuki32_state::vblank_interrupt), this));
-	m_raster_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fuuki32_state::raster_interrupt), this));
+	m_level_1_interrupt_timer = timer_alloc(FUNC(fuuki32_state::level1_interrupt), this);
+	m_vblank_interrupt_timer = timer_alloc(FUNC(fuuki32_state::vblank_interrupt), this);
+	m_raster_interrupt_timer = timer_alloc(FUNC(fuuki32_state::raster_interrupt), this);
 
 	save_item(NAME(m_spr_buffered_tilebank));
 }

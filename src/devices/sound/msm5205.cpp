@@ -99,8 +99,8 @@ void msm5205_device::device_start()
 
 	/* stream system initialize */
 	m_stream = stream_alloc(0, 1, clock());
-	m_vck_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(msm5205_device::toggle_vck), this));
-	m_capture_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(msm5205_device::update_adpcm), this));
+	m_vck_timer = timer_alloc(FUNC(msm5205_device::toggle_vck), this);
+	m_capture_timer = timer_alloc(FUNC(msm5205_device::update_adpcm), this);
 
 	/* register for save states */
 	save_item(NAME(m_data));

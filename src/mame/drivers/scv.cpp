@@ -582,7 +582,7 @@ WRITE_LINE_MEMBER( scv_state::upd1771_ack_w )
 
 void scv_state::machine_start()
 {
-	m_vb_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scv_state::vblank_update), this));
+	m_vb_timer = timer_alloc(FUNC(scv_state::vblank_update), this);
 
 	save_item(NAME(m_porta));
 	save_item(NAME(m_portc));

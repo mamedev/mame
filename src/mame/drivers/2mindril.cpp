@@ -336,8 +336,8 @@ void _2mindril_state::machine_start()
 	save_item(NAME(m_irq_reg));
 
 #ifdef UNUSED_FUNCTION
-	m_shutter_req_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(_2mindril_state::set_shutter_req), this));
-	m_defender_req_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(_2mindril_state::set_defender_req), this));
+	m_shutter_req_timer = timer_alloc(FUNC(_2mindril_state::set_shutter_req), this);
+	m_defender_req_timer = timer_alloc(FUNC(_2mindril_state::set_defender_req), this);
 #endif
 }
 

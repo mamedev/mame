@@ -236,7 +236,7 @@ void m92_state::master_control_w(offs_t offset, uint16_t data, uint16_t mem_mask
 
 VIDEO_START_MEMBER(m92_state,m92)
 {
-	m_spritebuffer_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m92_state::spritebuffer_done), this));
+	m_spritebuffer_timer = timer_alloc(FUNC(m92_state::spritebuffer_done), this);
 
 	memset(m_pf_master_control, 0, sizeof(m_pf_master_control));
 	m_videocontrol = 0;

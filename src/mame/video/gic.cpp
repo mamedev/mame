@@ -114,7 +114,7 @@ void gic_device::device_start()
 	// Let the screen create our temporary bitmap with the screen's dimensions
 	screen().register_screen_bitmap(m_bitmap);
 
-	m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gic_device::vblank_tick), this));
+	m_vblank_timer = timer_alloc(FUNC(gic_device::vblank_tick), this);
 	m_vblank_timer->adjust( screen().time_until_pos(1, END_ACTIVE_SCAN + 18 ), 0, screen().scan_period() );
 
 	// allocate the audio stream

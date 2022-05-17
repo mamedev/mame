@@ -101,7 +101,7 @@ ds1202_device::ds1202_device(const machine_config &mconfig, const char *tag, dev
 void ds1302_device::device_start()
 {
 	// allocate timers
-	m_clock_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ds1302_device::clock_tick), this));
+	m_clock_timer = timer_alloc(FUNC(ds1302_device::clock_tick), this);
 	m_clock_timer->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
 
 	m_clk = 0;

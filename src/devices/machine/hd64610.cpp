@@ -175,7 +175,7 @@ void hd64610_device::device_start()
 	m_out_1hz_cb.resolve_safe();
 
 	// allocate timers
-	m_counter_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hd64610_device::update_counter), this));
+	m_counter_timer = timer_alloc(FUNC(hd64610_device::update_counter), this);
 	m_counter_timer->adjust(attotime::from_hz(clock() / 256), 0, attotime::from_hz(clock() / 256));
 
 	// state saving

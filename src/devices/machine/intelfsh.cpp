@@ -531,7 +531,7 @@ tms_29f040_device::tms_29f040_device(const machine_config &mconfig, const char *
 void intelfsh_device::device_start()
 {
 	m_data = std::make_unique<uint8_t []>(m_size);
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(intelfsh_device::delay_tick), this));
+	m_timer = timer_alloc(FUNC(intelfsh_device::delay_tick), this);
 
 	save_item( NAME(m_status) );
 	save_item( NAME(m_flash_mode) );

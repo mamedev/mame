@@ -150,12 +150,12 @@ void philips_22vp931_device::device_start()
 	laserdisc_device::device_start();
 
 	// allocate timers
-	m_process_vbi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(philips_22vp931_device::process_vbi_data), this));
-	m_deferred_data_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(philips_22vp931_device::process_deferred_data), this));
-	m_irq_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(philips_22vp931_device::irq_off), this));
-	m_strobe_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(philips_22vp931_device::data_strobe_off), this));
-	m_erp_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(philips_22vp931_device::erp_off), this));
-	m_track_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(philips_22vp931_device::half_track_tick), this));
+	m_process_vbi_timer = timer_alloc(FUNC(philips_22vp931_device::process_vbi_data), this);
+	m_deferred_data_timer = timer_alloc(FUNC(philips_22vp931_device::process_deferred_data), this);
+	m_irq_off_timer = timer_alloc(FUNC(philips_22vp931_device::irq_off), this);
+	m_strobe_off_timer = timer_alloc(FUNC(philips_22vp931_device::data_strobe_off), this);
+	m_erp_off_timer = timer_alloc(FUNC(philips_22vp931_device::erp_off), this);
+	m_track_timer = timer_alloc(FUNC(philips_22vp931_device::half_track_tick), this);
 }
 
 

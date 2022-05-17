@@ -280,7 +280,7 @@ void sn76496_base_device::device_start()
 
 	m_ready_state = true;
 
-	m_ready_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sn76496_base_device::delayed_ready), this));
+	m_ready_timer = timer_alloc(FUNC(sn76496_base_device::delayed_ready), this);
 	m_ready_handler(ASSERT_LINE);
 
 	register_for_save_states();

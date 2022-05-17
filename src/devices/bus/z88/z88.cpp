@@ -76,7 +76,7 @@ void z88cart_slot_device::device_start()
 	// resolve callbacks
 	m_out_flp_cb.resolve_safe();
 
-	m_flp_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z88cart_slot_device::close_flap), this));
+	m_flp_timer = timer_alloc(FUNC(z88cart_slot_device::close_flap), this);
 	m_flp_timer->reset();
 }
 

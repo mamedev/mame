@@ -69,10 +69,10 @@ void m5074x_device::device_start()
 	m_read_p.resolve_all_safe(0);
 	m_write_p.resolve_all_safe();
 
-	m_timers[TIMER_1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m5074x_device::timer1_tick), this));
-	m_timers[TIMER_2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m5074x_device::timer2_tick), this));
-	m_timers[TIMER_X] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m5074x_device::timerx_tick), this));
-	m_timers[TIMER_ADC] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m5074x_device::adc_complete), this));
+	m_timers[TIMER_1] = timer_alloc(FUNC(m5074x_device::timer1_tick), this);
+	m_timers[TIMER_2] = timer_alloc(FUNC(m5074x_device::timer2_tick), this);
+	m_timers[TIMER_X] = timer_alloc(FUNC(m5074x_device::timerx_tick), this);
+	m_timers[TIMER_ADC] = timer_alloc(FUNC(m5074x_device::adc_complete), this);
 
 	m740_device::device_start();
 

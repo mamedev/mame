@@ -733,8 +733,8 @@ void newbrain_state::machine_start()
 	m_digits.resolve();
 
 	// initialize timers
-	m_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(newbrain_state::clear_reset), this));
-	m_power_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(newbrain_state::power_on), this));
+	m_reset_timer = timer_alloc(FUNC(newbrain_state::clear_reset), this);
+	m_power_timer = timer_alloc(FUNC(newbrain_state::power_on), this);
 
 	m_reset_timer->adjust(attotime::never);
 	m_power_timer->adjust(attotime::from_usec(get_pwrup_t()));

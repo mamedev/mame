@@ -629,7 +629,7 @@ void atlantis_state::machine_start()
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS | MIPS3DRC_STRICT_VERIFY | MIPS3DRC_EXTRA_INSTR_CHECK);
 
 	// Allocate adc timer
-	m_adc_ready_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(atlantis_state::adc_ready), this));
+	m_adc_ready_timer = timer_alloc(FUNC(atlantis_state::adc_ready), this);
 
 	// Save states
 	save_item(NAME(m_cmos_write_enabled));

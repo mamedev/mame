@@ -1917,7 +1917,7 @@ MACHINE_START_MEMBER(pc9801vm_state,pc9801rs)
 
 	m_sys_type = 0x80 >> 6;
 
-	m_fdc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc9801vm_state::fdc_trigger), this));
+	m_fdc_timer = timer_alloc(FUNC(pc9801vm_state::fdc_trigger), this);
 
 	save_item(NAME(m_dac1bit_disable));
 

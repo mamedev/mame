@@ -164,7 +164,7 @@ void i82586_base_device::device_start()
 
 	m_out_irq.resolve_safe();
 
-	m_cu_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(i82586_base_device::cu_execute), this));
+	m_cu_timer = timer_alloc(FUNC(i82586_base_device::cu_execute), this);
 	m_cu_timer->enable(false);
 
 	save_item(NAME(m_cx));

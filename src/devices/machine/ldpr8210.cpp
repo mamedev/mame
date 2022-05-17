@@ -277,8 +277,8 @@ void pioneer_pr8210_device::control_w(uint8_t data)
 void pioneer_pr8210_device::device_start()
 {
 	// alocate timers
-	m_process_vbi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pioneer_pr8210_device::process_vbi_data), this));
-	m_vsync_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pioneer_pr8210_device::vsync_off), this));
+	m_process_vbi_timer = timer_alloc(FUNC(pioneer_pr8210_device::process_vbi_data), this);
+	m_vsync_off_timer = timer_alloc(FUNC(pioneer_pr8210_device::vsync_off), this);
 
 	// resolve outputs
 	m_audio1.resolve();
@@ -961,8 +961,8 @@ void simutrek_special_device::player_vsync(const vbi_metadata &vbi, int fieldnum
 void simutrek_special_device::device_start()
 {
 	// alocate timers
-	m_irq_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(simutrek_special_device::irq_off), this));
-	m_latch_data_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(simutrek_special_device::latch_data), this));
+	m_irq_off_timer = timer_alloc(FUNC(simutrek_special_device::irq_off), this);
+	m_latch_data_timer = timer_alloc(FUNC(simutrek_special_device::latch_data), this);
 
 	// pass through to the parent
 	pioneer_pr8210_device::device_start();

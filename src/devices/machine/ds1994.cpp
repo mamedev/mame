@@ -111,9 +111,9 @@ void ds1994_device::device_start()
 	elem = STATE_IDLE;
 
 	// timers
-	m_timer_main  = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ds1994_device::main_tick), this));
-	m_timer_reset = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ds1994_device::reset_tick), this));
-	m_timer_clock = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ds1994_device::clock_tick), this));
+	m_timer_main  = timer_alloc(FUNC(ds1994_device::main_tick), this);
+	m_timer_reset = timer_alloc(FUNC(ds1994_device::reset_tick), this);
+	m_timer_clock = timer_alloc(FUNC(ds1994_device::clock_tick), this);
 
 	m_timer_clock->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
 }

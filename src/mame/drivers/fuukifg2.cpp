@@ -410,9 +410,9 @@ void fuuki16_state::machine_start()
 
 	m_soundbank->configure_entries(0, 3, &ROM[0x8000], 0x8000);
 
-	m_level_1_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fuuki16_state::level1_interrupt), this));
-	m_vblank_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fuuki16_state::vblank_interrupt), this));
-	m_raster_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fuuki16_state::raster_interrupt), this));
+	m_level_1_interrupt_timer = timer_alloc(FUNC(fuuki16_state::level1_interrupt), this);
+	m_vblank_interrupt_timer = timer_alloc(FUNC(fuuki16_state::vblank_interrupt), this);
+	m_raster_interrupt_timer = timer_alloc(FUNC(fuuki16_state::raster_interrupt), this);
 }
 
 

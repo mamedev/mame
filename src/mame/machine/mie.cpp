@@ -89,7 +89,7 @@ mie_device::mie_device(const machine_config &mconfig, const char *tag, device_t 
 void mie_device::device_start()
 {
 	maple_device::device_start();
-	timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mie_device::update_irq_reply), this));
+	timer = timer_alloc(FUNC(mie_device::update_irq_reply), this);
 
 	save_item(NAME(gpiodir));
 	save_item(NAME(gpio_val));

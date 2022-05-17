@@ -355,9 +355,9 @@ ioport_constructor myb3k_keyboard_device::device_input_ports() const
 void myb3k_keyboard_device::device_start()
 {
 	m_keyboard_cb.resolve();
-	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(myb3k_keyboard_device::scan_keys), this));
-	m_first_byte_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(myb3k_keyboard_device::send_first_byte), this));
-	m_second_byte_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(myb3k_keyboard_device::send_second_byte), this));
+	m_scan_timer = timer_alloc(FUNC(myb3k_keyboard_device::scan_keys), this);
+	m_first_byte_timer = timer_alloc(FUNC(myb3k_keyboard_device::send_first_byte), this);
+	m_second_byte_timer = timer_alloc(FUNC(myb3k_keyboard_device::send_second_byte), this);
 }
 
 void myb3k_keyboard_device::device_reset()

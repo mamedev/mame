@@ -515,7 +515,7 @@ void popper_state::machine_start()
 	m_layer1_tilemap->set_transparent_pen(0);
 
 	// allocate and start scanline timer
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(popper_state::scanline_tick), this));
+	m_scanline_timer = timer_alloc(FUNC(popper_state::scanline_tick), this);
 	m_scanline_timer->adjust(m_screen->time_until_pos(0, 0));
 
 	// register for save states

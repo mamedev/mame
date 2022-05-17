@@ -420,7 +420,7 @@ void eurocom2_state::machine_reset()
 
 void eurocom2_state::machine_start()
 {
-	m_sst = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(eurocom2_state::toggle_sst), this));
+	m_sst = timer_alloc(FUNC(eurocom2_state::toggle_sst), this);
 	m_tmpbmp.allocate(VC_DISP_HORZ, VC_DISP_VERT);
 	m_kbd_data = 0;
 }

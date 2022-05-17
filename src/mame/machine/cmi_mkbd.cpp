@@ -73,7 +73,7 @@ void cmi_music_keyboard_device::device_resolve_objects()
 
 void cmi_music_keyboard_device::device_start()
 {
-	m_cmi10_scnd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cmi_music_keyboard_device::scnd_update), this));
+	m_cmi10_scnd_timer = timer_alloc(FUNC(cmi_music_keyboard_device::scnd_update), this);
 	m_cmi10_scnd_timer->adjust(attotime::from_hz(4000000 / 4 / 2048 / 2), 0, attotime::from_hz(4000000 / 4 / 2048 / 2));
 
 	m_scnd = 0;

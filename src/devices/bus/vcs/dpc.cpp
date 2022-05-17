@@ -31,7 +31,7 @@ dpc_device::dpc_device(const machine_config& mconfig, const char* tag, device_t*
 
 void dpc_device::device_start()
 {
-	m_oscillator = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dpc_device::oscillator_tick), this));
+	m_oscillator = timer_alloc(FUNC(dpc_device::oscillator_tick), this);
 	m_oscillator->reset();
 
 	save_item(STRUCT_MEMBER(m_df, top));

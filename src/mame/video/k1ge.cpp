@@ -795,8 +795,8 @@ void k1ge_device::device_start()
 	m_vblank_pin_w.resolve();
 	m_hblank_pin_w.resolve();
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(k1ge_device::timer_callback), this));
-	m_hblank_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(k1ge_device::hblank_on_timer_callback), this));
+	m_timer = timer_alloc(FUNC(k1ge_device::timer_callback), this);
+	m_hblank_on_timer = timer_alloc(FUNC(k1ge_device::hblank_on_timer_callback), this);
 	m_vram = make_unique_clear<uint8_t[]>(0x4000);
 	m_bitmap = std::make_unique<bitmap_ind16>(screen().width(), screen().height() );
 

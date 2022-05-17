@@ -46,7 +46,7 @@ dmv_k210_device::dmv_k210_device(const machine_config &mconfig, const char *tag,
 
 void dmv_k210_device::device_start()
 {
-	m_clk1_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dmv_k210_device::strobe_tick), this));
+	m_clk1_timer = timer_alloc(FUNC(dmv_k210_device::strobe_tick), this);
 
 	// register for state saving
 	save_item(NAME(m_portb));

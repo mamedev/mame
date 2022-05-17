@@ -1586,7 +1586,7 @@ void sunplus_gcm394_base_device::device_start()
 
 	m_nand_read_cb.resolve_safe(0);
 
-	m_unk_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sunplus_gcm394_base_device::unknown_tick), this));
+	m_unk_timer = timer_alloc(FUNC(sunplus_gcm394_base_device::unknown_tick), this);
 	m_unk_timer->adjust(attotime::never);
 
 	save_item(NAME(m_dma_params));

@@ -913,9 +913,9 @@ void tms9902_device::device_start()
 	m_xmit_cb.resolve_safe();
 	m_ctrl_cb.resolve_safe();
 
-	m_dectimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tms9902_device::decrementer_expired), this));
-	m_recvtimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tms9902_device::recv_tick), this));
-	m_sendtimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tms9902_device::send_tick), this));
+	m_dectimer = timer_alloc(FUNC(tms9902_device::decrementer_expired), this);
+	m_recvtimer = timer_alloc(FUNC(tms9902_device::recv_tick), this);
+	m_sendtimer = timer_alloc(FUNC(tms9902_device::send_tick), this);
 
 	save_item(NAME(m_LDCTRL));
 	save_item(NAME(m_LDIR));

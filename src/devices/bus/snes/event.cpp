@@ -38,7 +38,7 @@ void sns_pfest94_device::device_start()
 {
 	m_dsp_prg.resize(0x2000/sizeof(uint32_t));
 	m_dsp_data.resize(0x800/sizeof(uint16_t));
-	pfest94_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sns_pfest94_device::event_tick), this));
+	pfest94_timer = timer_alloc(FUNC(sns_pfest94_device::event_tick), this);
 	pfest94_timer->reset();
 
 	save_item(NAME(m_base_bank));

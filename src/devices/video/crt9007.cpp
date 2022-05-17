@@ -505,13 +505,13 @@ void crt9007_device::device_resolve_objects()
 void crt9007_device::device_start()
 {
 	// allocate timers
-	m_hsync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(crt9007_device::hsync_update), this));
-	m_vsync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(crt9007_device::vsync_update), this));
-	m_vlt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(crt9007_device::vlt_update), this));
-	m_curs_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(crt9007_device::cursor_update), this));
-	m_drb_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(crt9007_device::drb_update), this));
-	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(crt9007_device::dma_update), this));
-	m_frame_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(crt9007_device::frame_update), this));
+	m_hsync_timer = timer_alloc(FUNC(crt9007_device::hsync_update), this);
+	m_vsync_timer = timer_alloc(FUNC(crt9007_device::vsync_update), this);
+	m_vlt_timer = timer_alloc(FUNC(crt9007_device::vlt_update), this);
+	m_curs_timer = timer_alloc(FUNC(crt9007_device::cursor_update), this);
+	m_drb_timer = timer_alloc(FUNC(crt9007_device::drb_update), this);
+	m_dma_timer = timer_alloc(FUNC(crt9007_device::dma_update), this);
+	m_frame_timer = timer_alloc(FUNC(crt9007_device::frame_update), this);
 
 	// save state
 	save_item(NAME(m_reg));

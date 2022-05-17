@@ -2700,19 +2700,19 @@ void towns_state::driver_start()
 	//towns_sprram = std::make_unique<uint8_t[]>(0x20000);
 	m_towns_serial_rom = std::make_unique<uint8_t[]>(256/8);
 	init_serial_rom();
-	m_towns_kb_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::poll_keyboard), this));
-	m_towns_mouse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::mouse_timeout), this));
-	m_towns_wait_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::wait_end), this));
-	m_towns_freerun_counter = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::freerun_inc), this));
-	m_towns_intervaltimer2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::intervaltimer2_timeout), this));
-	m_towns_status_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::towns_cd_status_ready), this));
-	m_towns_cdda_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::towns_delay_cdda), this));
+	m_towns_kb_timer = timer_alloc(FUNC(towns_state::poll_keyboard), this);
+	m_towns_mouse_timer = timer_alloc(FUNC(towns_state::mouse_timeout), this);
+	m_towns_wait_timer = timer_alloc(FUNC(towns_state::wait_end), this);
+	m_towns_freerun_counter = timer_alloc(FUNC(towns_state::freerun_inc), this);
+	m_towns_intervaltimer2 = timer_alloc(FUNC(towns_state::intervaltimer2_timeout), this);
+	m_towns_status_timer = timer_alloc(FUNC(towns_state::towns_cd_status_ready), this);
+	m_towns_cdda_timer = timer_alloc(FUNC(towns_state::towns_delay_cdda), this);
 
 	memset(&m_video,0,sizeof(struct towns_video_controller));
 	memset(&m_towns_cd,0,sizeof(struct towns_cdrom_controller));
 	m_towns_cd.status = 0x01;  // CDROM controller ready
 	m_towns_cd.buffer_ptr = -1;
-	m_towns_cd.read_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::towns_cdrom_read_byte),this));
+	m_towns_cd.read_timer = timer_alloc(FUNC(towns_state::towns_cdrom_read_byte), this);
 
 	save_pointer(m_video.towns_crtc_reg,"CRTC registers",32);
 	save_pointer(m_video.towns_video_reg,"Video registers",2);

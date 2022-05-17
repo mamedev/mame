@@ -455,7 +455,7 @@ void vme_fccpu20_device::device_start()
 	m_vme->install_device(base + 2, base + 3, // Channel B - Control
 			read8_delegate(*subdevice<z80sio_device>("pit"), FUNC(z80sio_device::cb_r)), write8_delegate(*subdevice<z80sio_device>("pit"), FUNC(z80sio_device::cb_w)), 0x00ff);
 #endif
-	m_arbiter_start = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vme_fccpu20_device::grant_bus), this));
+	m_arbiter_start = timer_alloc(FUNC(vme_fccpu20_device::grant_bus), this);
 }
 
 void vme_fccpu20_device::device_reset()

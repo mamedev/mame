@@ -75,7 +75,7 @@ void er1400_device::device_start()
 	m_data_array = std::make_unique<u16[]>(100);
 	save_pointer(NAME(m_data_array), 100);
 
-	m_data_propagation_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(er1400_device::propagate_data), this));
+	m_data_propagation_timer = timer_alloc(FUNC(er1400_device::propagate_data), this);
 }
 
 

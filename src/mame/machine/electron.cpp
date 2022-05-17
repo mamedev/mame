@@ -575,8 +575,8 @@ void electron_state::machine_start()
 
 	m_ula.interrupt_status = 0x82;
 	m_ula.interrupt_control = 0x00;
-	m_tape_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(electron_state::electron_tape_timer_handler), this));
-	m_beep_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(electron_state::setup_beep), this));
+	m_tape_timer = timer_alloc(FUNC(electron_state::electron_tape_timer_handler), this);
+	m_beep_timer = timer_alloc(FUNC(electron_state::setup_beep), this);
 
 	/* register save states */
 	save_item(STRUCT_MEMBER(m_ula, interrupt_status));

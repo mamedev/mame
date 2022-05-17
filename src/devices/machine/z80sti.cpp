@@ -121,10 +121,10 @@ void z80sti_device::device_start()
 	m_out_tdo_cb.resolve_safe();
 
 	// create the counter timers
-	m_timer[TIMER_A] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z80sti_device::timer_count), this));
-	m_timer[TIMER_B] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z80sti_device::timer_count), this));
-	m_timer[TIMER_C] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z80sti_device::timer_count), this));
-	m_timer[TIMER_D] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z80sti_device::timer_count), this));
+	m_timer[TIMER_A] = timer_alloc(FUNC(z80sti_device::timer_count), this);
+	m_timer[TIMER_B] = timer_alloc(FUNC(z80sti_device::timer_count), this);
+	m_timer[TIMER_C] = timer_alloc(FUNC(z80sti_device::timer_count), this);
+	m_timer[TIMER_D] = timer_alloc(FUNC(z80sti_device::timer_count), this);
 
 	// create serial receive clock timer
 	if (m_rx_clock > 0)

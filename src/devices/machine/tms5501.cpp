@@ -88,11 +88,11 @@ void tms5501_device::device_start()
 	m_write_xo.resolve_safe();
 
 	// create timers
-	m_timer[TIMER_1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tms5501_device::timer_expired), this));
-	m_timer[TIMER_2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tms5501_device::timer_expired), this));
-	m_timer[TIMER_3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tms5501_device::timer_expired), this));
-	m_timer[TIMER_4] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tms5501_device::timer_expired), this));
-	m_timer[TIMER_5] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tms5501_device::timer_expired), this));
+	m_timer[TIMER_1] = timer_alloc(FUNC(tms5501_device::timer_expired), this);
+	m_timer[TIMER_2] = timer_alloc(FUNC(tms5501_device::timer_expired), this);
+	m_timer[TIMER_3] = timer_alloc(FUNC(tms5501_device::timer_expired), this);
+	m_timer[TIMER_4] = timer_alloc(FUNC(tms5501_device::timer_expired), this);
+	m_timer[TIMER_5] = timer_alloc(FUNC(tms5501_device::timer_expired), this);
 
 	// state saving
 	save_item(NAME(m_rb));

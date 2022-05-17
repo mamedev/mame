@@ -81,9 +81,9 @@ sk1100_link_cable_device::sk1100_link_cable_device(const machine_config &mconfig
 
 void sk1100_link_cable_device::device_start()
 {
-	m_timer_poll = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sk1100_link_cable_device::update_queue), this));
-	m_timer_send = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sk1100_link_cable_device::send_tick), this));
-	m_timer_read = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sk1100_link_cable_device::read_tick), this));
+	m_timer_poll = timer_alloc(FUNC(sk1100_link_cable_device::update_queue), this);
+	m_timer_send = timer_alloc(FUNC(sk1100_link_cable_device::send_tick), this);
+	m_timer_read = timer_alloc(FUNC(sk1100_link_cable_device::read_tick), this);
 
 	/* register for state saving */
 	save_item(NAME(m_data));

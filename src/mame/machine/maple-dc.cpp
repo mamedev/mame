@@ -38,7 +38,7 @@ void maple_dc_device::register_port(int port, maple_device *device)
 void maple_dc_device::device_start()
 {
 	logerror("maple_dc_device started\n");
-	timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(maple_dc_device::dma_timer_tick), this));
+	timer = timer_alloc(FUNC(maple_dc_device::dma_timer_tick), this);
 	irq_cb.resolve_safe();
 
 	mdstar = 0;

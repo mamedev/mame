@@ -38,8 +38,8 @@ void btoads_state::machine_start()
 	save_item(NAME(m_sound_int_state));
 	save_pointer(NAME(m_nvram_data), 0x2000);
 
-	m_delayed_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(btoads_state::delayed_sound), this));
-	m_audio_sync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(btoads_state::audio_sync), this));
+	m_delayed_sound_timer = timer_alloc(FUNC(btoads_state::delayed_sound), this);
+	m_audio_sync_timer = timer_alloc(FUNC(btoads_state::audio_sync), this);
 }
 
 

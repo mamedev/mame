@@ -305,9 +305,9 @@ void upd65031_device::device_start()
 	m_out_mem_cb.resolve();
 
 	// allocate timers
-	m_rtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd65031_device::rtc_tick), this));
-	m_flash_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd65031_device::flash_tick), this));
-	m_speaker_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd65031_device::speaker_tick), this));
+	m_rtc_timer = timer_alloc(FUNC(upd65031_device::rtc_tick), this);
+	m_flash_timer = timer_alloc(FUNC(upd65031_device::flash_tick), this);
+	m_speaker_timer = timer_alloc(FUNC(upd65031_device::speaker_tick), this);
 	m_rtc_timer->adjust(attotime::from_msec(5), 0, attotime::from_msec(5));
 	m_flash_timer->adjust(attotime::from_hz(2), 0, attotime::from_hz(2));
 	m_speaker_timer->reset();

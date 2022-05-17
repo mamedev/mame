@@ -442,10 +442,10 @@ abc77_device::abc77_device(const machine_config &mconfig, const char *tag, devic
 void abc77_device::device_start()
 {
 	// allocate timers
-	m_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(abc77_device::serial_clock), this));
+	m_serial_timer = timer_alloc(FUNC(abc77_device::serial_clock), this);
 	m_serial_timer->adjust(attotime::from_hz(19200), 0, attotime::from_hz(19200)); // ALE/32
 
-	m_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(abc77_device::reset_tick), this));
+	m_reset_timer = timer_alloc(FUNC(abc77_device::reset_tick), this);
 }
 
 

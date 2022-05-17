@@ -120,7 +120,7 @@ uint8_t zx_state::ula_high_r(offs_t offset)
 
 void zx_state::video_start()
 {
-	m_ula_hsync = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(zx_state::zx_ula_hsync), this));
+	m_ula_hsync = timer_alloc(FUNC(zx_state::zx_ula_hsync), this);
 	m_ula_char_buffer = 0xffff;
 
 	m_bitmap_render = std::make_unique<bitmap_ind16>(384, 311);

@@ -22,7 +22,7 @@ void swim1_device::device_start()
 {
 	applefdintf_device::device_start();
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(swim1_device::update), this));
+	m_timer = timer_alloc(FUNC(swim1_device::update), this);
 	save_item(NAME(m_last_sync));
 	save_item(NAME(m_flux_write_start));
 	save_item(NAME(m_flux_write));

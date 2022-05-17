@@ -1070,9 +1070,9 @@ void st_state::blitter_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void st_state::video_start()
 {
-	m_shifter_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st_state::shifter_tick), this));
-	m_glue_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st_state::glue_tick), this));
-	m_blitter_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st_state::blitter_tick), this));
+	m_shifter_timer = timer_alloc(FUNC(st_state::shifter_tick), this);
+	m_glue_timer = timer_alloc(FUNC(st_state::glue_tick), this);
+	m_blitter_timer = timer_alloc(FUNC(st_state::blitter_tick), this);
 
 //  m_shifter_timer->adjust(m_screen->time_until_pos(0), 0, attotime::from_hz(Y2/4)); // 125 ns
 	m_glue_timer->adjust(m_screen->time_until_pos(0), 0, attotime::from_hz(Y2/16)); // 500 ns

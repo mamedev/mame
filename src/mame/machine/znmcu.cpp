@@ -28,7 +28,7 @@ void znmcu_device::device_start()
 	m_dataout_handler.resolve_safe();
 	m_dsr_handler.resolve_safe();
 
-	m_mcu_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(znmcu_device::mcu_tick), this));
+	m_mcu_timer = timer_alloc(FUNC(znmcu_device::mcu_tick), this);
 
 	m_dataout_handler(1);
 	m_dsr_handler(1);

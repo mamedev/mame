@@ -252,7 +252,7 @@ void m2_bda_device::device_start()
 	save_pointer(NAME(m_ram), ram_size / sizeof(uint32_t));
 
 	// Set a timer to pull data from the DSPP FIFO into the DACs
-	m_dac_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m2_bda_device::dac_update), this));
+	m_dac_timer = timer_alloc(FUNC(m2_bda_device::dac_update), this);
 	m_dac_timer->adjust(attotime::from_hz(16.9345));
 }
 
@@ -806,8 +806,8 @@ void m2_vdu_device::device_start()
 	m_vint1_int_handler.resolve_safe();
 
 	// Initialize line interrupt timers
-	m_vint0_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m2_vdu_device::vint0_set), this));
-	m_vint1_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m2_vdu_device::vint1_set), this));
+	m_vint0_timer = timer_alloc(FUNC(m2_vdu_device::vint0_set), this);
+	m_vint1_timer = timer_alloc(FUNC(m2_vdu_device::vint1_set), this);
 
 	// Calculate H/V count bias values (1 = start of blanking)
 	const rectangle visarea = m_screen->visible_area();
@@ -1496,8 +1496,8 @@ void m2_cde_device::device_start()
 	m_sdbg_out_handler.resolve_safe();
 
 	// Init DMA
-	m_dma[0].m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m2_cde_device::next_dma), this));
-	m_dma[1].m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m2_cde_device::next_dma), this));
+	m_dma[0].m_timer = timer_alloc(FUNC(m2_cde_device::next_dma), this);
+	m_dma[1].m_timer = timer_alloc(FUNC(m2_cde_device::next_dma), this);
 
 	// Register state for saving
 	save_item(NAME(m_sdbg_cntl));
@@ -1524,7 +1524,7 @@ void m2_cde_device::device_start()
 	}
 
 	// Allocate other timers
-	m_cd_ready_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m2_cde_device::trigger_ready_int), this));
+	m_cd_ready_timer = timer_alloc(FUNC(m2_cde_device::trigger_ready_int), this);
 }
 
 //-------------------------------------------------

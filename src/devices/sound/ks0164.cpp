@@ -54,7 +54,7 @@ void ks0164_device::device_start()
 
 	m_stream = stream_alloc(0, 2, clock()/3/2/2/32);
 	space().cache(m_mem_cache);
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ks0164_device::irq_timer_tick), this));
+	m_timer = timer_alloc(FUNC(ks0164_device::irq_timer_tick), this);
 
 	m_midi_tx.resolve_safe();
 

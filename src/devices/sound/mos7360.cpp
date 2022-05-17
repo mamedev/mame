@@ -285,12 +285,12 @@ void mos7360_device::device_start()
 	m_read_k.resolve_safe(0xff);
 
 	// allocate timers
-	m_timer[TIMER_ID_1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mos7360_device::timer_expired), this));
-	m_timer[TIMER_ID_2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mos7360_device::timer_expired), this));
-	m_timer[TIMER_ID_3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mos7360_device::timer_expired), this));
-	m_line_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mos7360_device::raster_interrupt_gen), this));
+	m_timer[TIMER_ID_1] = timer_alloc(FUNC(mos7360_device::timer_expired), this);
+	m_timer[TIMER_ID_2] = timer_alloc(FUNC(mos7360_device::timer_expired), this);
+	m_timer[TIMER_ID_3] = timer_alloc(FUNC(mos7360_device::timer_expired), this);
+	m_line_timer = timer_alloc(FUNC(mos7360_device::raster_interrupt_gen), this);
 	m_line_timer->adjust(screen().scan_period(), 0, screen().scan_period());
-	m_frame_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mos7360_device::frame_interrupt_gen), this));
+	m_frame_timer = timer_alloc(FUNC(mos7360_device::frame_interrupt_gen), this);
 	m_frame_timer->adjust(screen().frame_period(), 0, screen().frame_period());
 
 	// allocate screen bitmap

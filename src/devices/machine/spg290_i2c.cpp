@@ -26,7 +26,7 @@ void spg290_i2c_device::device_start()
 	m_irq_cb.resolve_safe();
 	m_i2c_read_cb.resolve_safe(0);
 	m_i2c_write_cb.resolve_safe();
-	m_i2c_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg290_i2c_device::i2c_update), this));
+	m_i2c_timer = timer_alloc(FUNC(spg290_i2c_device::i2c_update), this);
 
 	save_item(NAME(m_config));
 	save_item(NAME(m_irq_control));

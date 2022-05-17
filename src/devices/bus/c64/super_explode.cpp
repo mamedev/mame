@@ -51,7 +51,7 @@ c64_super_explode_cartridge_device::c64_super_explode_cartridge_device(const mac
 void c64_super_explode_cartridge_device::device_start()
 {
 	// allocate timer
-	m_exrom_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(c64_super_explode_cartridge_device::update_exrom), this));
+	m_exrom_timer = timer_alloc(FUNC(c64_super_explode_cartridge_device::update_exrom), this);
 
 	// state saving
 	save_item(NAME(m_bank));

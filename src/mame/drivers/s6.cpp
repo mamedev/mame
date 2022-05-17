@@ -441,7 +441,7 @@ void s6_state::machine_start()
 	save_item(NAME(m_data_ok));
 	save_item(NAME(m_lamp_data));
 
-	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s6_state::irq_timer), this));
+	m_irq_timer = timer_alloc(FUNC(s6_state::irq_timer), this);
 	m_irq_timer->adjust(attotime::from_ticks(980,3580000/4),1);
 }
 

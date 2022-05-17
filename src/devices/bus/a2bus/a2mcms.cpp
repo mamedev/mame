@@ -207,8 +207,8 @@ void mcms_device::device_start()
 {
 	m_write_irq.resolve();
 	m_stream = stream_alloc(0, 2, 31250);
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mcms_device::set_irq_tick), this));
-	m_clrtimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mcms_device::clr_irq_tick), this));
+	m_timer = timer_alloc(FUNC(mcms_device::set_irq_tick), this);
+	m_clrtimer = timer_alloc(FUNC(mcms_device::clr_irq_tick), this);
 	m_enabled = false;
 	memset(m_vols, 0, sizeof(m_vols));
 	memset(m_table, 0, sizeof(m_table));

@@ -101,7 +101,7 @@ void iphone2g_spi_device::device_start()
 	save_item(NAME(m_tx_data));
 	save_item(NAME(m_status));
 
-	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(iphone2g_spi_device::send_irq), this));
+	m_irq_timer = timer_alloc(FUNC(iphone2g_spi_device::send_irq), this);
 }
 
 void iphone2g_spi_device::device_reset()
@@ -189,7 +189,7 @@ void iphone2g_timer_device::device_resolve_objects()
 
 void iphone2g_timer_device::device_start()
 {
-	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(iphone2g_timer_device::send_irq), this));
+	m_irq_timer = timer_alloc(FUNC(iphone2g_timer_device::send_irq), this);
 }
 
 void iphone2g_timer_device::device_reset()

@@ -103,9 +103,9 @@ void timer_device::device_validity_check(validity_checker &valid) const
 void timer_device::device_start()
 {
 	if (m_type == TIMER_TYPE_SCANLINE)
-		m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(timer_device::scanline_tick), this));
+		m_timer = timer_alloc(FUNC(timer_device::scanline_tick), this);
 	else
-		m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(timer_device::generic_tick), this));
+		m_timer = timer_alloc(FUNC(timer_device::generic_tick), this);
 
 	m_callback.resolve();
 

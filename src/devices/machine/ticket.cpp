@@ -137,7 +137,7 @@ void ticket_dispenser_device::device_start()
 	m_ticketdispensed = (m_status_sense == TICKET_STATUS_ACTIVE_HIGH);
 	m_ticketnotdispensed = !m_ticketdispensed;
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ticket_dispenser_device::update_output_state), this));
+	m_timer = timer_alloc(FUNC(ticket_dispenser_device::update_output_state), this);
 
 	m_output.resolve();
 

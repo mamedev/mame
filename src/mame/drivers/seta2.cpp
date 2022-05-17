@@ -740,7 +740,7 @@ void funcube_touchscreen_device::device_start()
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
 	set_tra_rate(9600);
 	m_button_state = 0x00;
-	emu_timer *tm = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(funcube_touchscreen_device::read_buttons), this));
+	emu_timer *tm = timer_alloc(FUNC(funcube_touchscreen_device::read_buttons), this);
 	tm->adjust(attotime::from_ticks(1, clock()), 0, attotime::from_ticks(1, clock()));
 	m_tx_cb.resolve_safe();
 

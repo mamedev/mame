@@ -229,7 +229,7 @@ void pc9801_86_device::device_start()
 
 	m_io_base = 0;
 
-	m_dac_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc9801_86_device::dac_tick), this));
+	m_dac_timer = timer_alloc(FUNC(pc9801_86_device::dac_tick), this);
 	save_item(NAME(m_count));
 	save_item(NAME(m_queue));
 	save_item(NAME(m_irq_rate));

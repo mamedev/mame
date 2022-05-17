@@ -122,7 +122,7 @@ void es1373_device::device_start()
 	// create the stream
 	m_stream = stream_alloc(0, 2, 44100/2);
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(es1373_device::delayed_stream_update), this));
+	m_timer = timer_alloc(FUNC(es1373_device::delayed_stream_update), this);
 	m_timer->adjust(attotime::zero, 0, attotime::from_hz(44100/2/16));
 
 	// Save states

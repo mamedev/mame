@@ -132,7 +132,7 @@ TIMER_CALLBACK_MEMBER(spg2xx_game_marc250_state::toggle2_tick)
 void spg2xx_game_marc101_state::machine_start()
 {
 	spg2xx_game_state::machine_start();
-	m_pulse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_game_marc101_state::toggle_tick), this));
+	m_pulse_timer = timer_alloc(FUNC(spg2xx_game_marc101_state::toggle_tick), this);
 	m_pulse_timer->adjust(attotime::never);
 
 }
@@ -149,7 +149,7 @@ void spg2xx_game_marc101_state::machine_reset()
 void spg2xx_game_marc250_state::machine_start()
 {
 	spg2xx_game_marc101_state::machine_start();
-	m_pulse_timer2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_game_marc250_state::toggle2_tick), this));
+	m_pulse_timer2 = timer_alloc(FUNC(spg2xx_game_marc250_state::toggle2_tick), this);
 	m_pulse_timer2->adjust(attotime::never);
 
 	// hack, makes x-racer3 and some others more stable, TODO: find out what is really wrong

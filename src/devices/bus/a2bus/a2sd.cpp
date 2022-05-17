@@ -101,7 +101,7 @@ a2bus_a2sd_device::a2bus_a2sd_device(const machine_config &mconfig, const char *
 
 void a2bus_a2sd_device::device_start()
 {
-	m_shift_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a2bus_a2sd_device::shift_tick), this));
+	m_shift_timer = timer_alloc(FUNC(a2bus_a2sd_device::shift_tick), this);
 
 	save_item(NAME(m_datain));
 	save_item(NAME(m_in_latch));

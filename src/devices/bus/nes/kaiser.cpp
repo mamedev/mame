@@ -188,7 +188,7 @@ void nes_ks7022_device::pcb_reset()
 void nes_ks7032_device::device_start()
 {
 	common_start();
-	irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_ks7032_device::irq_timer_tick), this));
+	irq_timer = timer_alloc(FUNC(nes_ks7032_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_latch));
@@ -230,7 +230,7 @@ void nes_ks7016_device::pcb_reset()
 void nes_ks7017_device::device_start()
 {
 	common_start();
-	irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_ks7017_device::irq_timer_tick), this));
+	irq_timer = timer_alloc(FUNC(nes_ks7017_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_latch));

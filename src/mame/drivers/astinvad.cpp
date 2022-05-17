@@ -264,9 +264,9 @@ TIMER_CALLBACK_MEMBER(astinvad_state::kamikaze_int_gen)
 
 MACHINE_START_MEMBER(astinvad_state,kamikaze)
 {
-	m_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(astinvad_state::kamikaze_int_gen), this));
+	m_int_timer = timer_alloc(FUNC(astinvad_state::kamikaze_int_gen), this);
 	m_int_timer->adjust(m_screen->time_until_pos(128), 128);
-	m_int_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(astinvad_state::kamikaze_int_off), this));
+	m_int_off_timer = timer_alloc(FUNC(astinvad_state::kamikaze_int_off), this);
 
 	save_item(NAME(m_screen_flip));
 	save_item(NAME(m_screen_red));

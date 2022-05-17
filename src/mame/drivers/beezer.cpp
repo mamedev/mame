@@ -440,8 +440,8 @@ void beezer_state::machine_start()
 		m_rombank[i]->configure_entries(0, 2, m_banked_roms->base() + (i * 0x2000), 0x1000);
 
 	// allocate timers
-	m_dac_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(beezer_state::dac_update_cb), this));
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(beezer_state::scanline_cb), this));
+	m_dac_timer = timer_alloc(FUNC(beezer_state::dac_update_cb), this);
+	m_scanline_timer = timer_alloc(FUNC(beezer_state::scanline_cb), this);
 
 	// register for state saving
 	save_item(NAME(m_ch_sign));

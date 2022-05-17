@@ -696,7 +696,7 @@ void pmd85_state::common_driver_init()
 {
 	m_previous_level = 0;
 	m_clk_level = m_clk_level_tape = 1;
-	m_cassette_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pmd85_state::cassette_timer_callback), this));
+	m_cassette_timer = timer_alloc(FUNC(pmd85_state::cassette_timer_callback), this);
 	m_cassette_timer->adjust(attotime::zero, 0, attotime::from_hz(2400));
 }
 

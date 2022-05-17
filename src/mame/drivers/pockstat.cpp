@@ -882,7 +882,7 @@ void pockstat_state::machine_start()
 {
 	for (uint32_t index = 0; index < TIMER_COUNT; index++)
 	{
-		m_timers[index].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pockstat_state::timer_tick), this));
+		m_timers[index].timer = timer_alloc(FUNC(pockstat_state::timer_tick), this);
 		m_timers[index].timer->adjust(attotime::never, index);
 		m_timers[index].count = 0;
 	}
@@ -890,7 +890,7 @@ void pockstat_state::machine_start()
 	m_rtc_regs.time = 0x01000000;
 	m_rtc_regs.date = 0x19990101;
 
-	m_rtc_regs.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pockstat_state::rtc_tick),this));
+	m_rtc_regs.timer = timer_alloc(FUNC(pockstat_state::rtc_tick), this);
 	m_rtc_regs.timer->adjust(attotime::from_hz(1), TIMER_COUNT);
 
 	std::string region_tag;

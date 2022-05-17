@@ -534,7 +534,7 @@ void nbmj8688_state::gfxdraw(int gfxtype)
 
 void nbmj8688_state::common_video_start()
 {
-	m_blitter_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nbmj8688_state::clear_busy_flag), this));
+	m_blitter_timer = timer_alloc(FUNC(nbmj8688_state::clear_busy_flag), this);
 
 	m_tmpbitmap = std::make_unique<bitmap_ind16>(512, 256);
 	m_videoram = make_unique_clear<uint16_t[]>(512 * 256);

@@ -79,8 +79,8 @@ void balsente_state::machine_start()
 	save_item(NAME(m_grudge_steering_result));
 	save_item(NAME(m_grudge_last_steering));
 
-	m_irq_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(balsente_state::irq_off), this));
-	m_adc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(balsente_state::adc_finished), this));
+	m_irq_off_timer = timer_alloc(FUNC(balsente_state::irq_off), this);
+	m_adc_timer = timer_alloc(FUNC(balsente_state::adc_finished), this);
 }
 
 

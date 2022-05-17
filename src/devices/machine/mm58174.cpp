@@ -50,9 +50,9 @@ mm58174_device::mm58174_device(const machine_config &mconfig, const char *tag, d
 
 void mm58174_device::device_start()
 {
-	m_rtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mm58174_device::clock_tick), this));
+	m_rtc_timer = timer_alloc(FUNC(mm58174_device::clock_tick), this);
 	m_rtc_timer->adjust(attotime::zero, 0, attotime::from_msec(100));
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mm58174_device::scheduler_sync), this));
+	m_interrupt_timer = timer_alloc(FUNC(mm58174_device::scheduler_sync), this);
 
 	// register for state saving
 	save_item(NAME(m_control));

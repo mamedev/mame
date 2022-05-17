@@ -27,7 +27,7 @@ tiny_rom_entry const *qx10_keyboard_device::device_rom_region() const
 
 void qx10_keyboard_device::device_start()
 {
-	m_bit_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(qx10_keyboard_device::toggle_clk), this));
+	m_bit_timer = timer_alloc(FUNC(qx10_keyboard_device::toggle_clk), this);
 	m_bit_timer->adjust(attotime::from_hz(2400), 0, attotime::from_hz(2400));
 	m_clk_state = 0;
 }

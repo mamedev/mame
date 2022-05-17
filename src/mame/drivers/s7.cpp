@@ -658,7 +658,7 @@ void s7_state::machine_start()
 	save_item(NAME(m_game));
 	save_item(NAME(m_comma));
 
-	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s7_state::irq_timer), this));
+	m_irq_timer = timer_alloc(FUNC(s7_state::irq_timer), this);
 	m_irq_timer->adjust(attotime::from_ticks(980,3580000/4),1);
 	subdevice<nvram_device>("nvram")->set_base(m_nvram, sizeof(m_nvram));
 }

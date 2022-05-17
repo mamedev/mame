@@ -418,7 +418,7 @@ void mekd5_state::machine_start()
 	save_item(NAME(m_segment));
 	save_item(NAME(m_digit));
 
-	m_trace_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mekd5_state::trace_tick), this));
+	m_trace_timer = timer_alloc(FUNC(mekd5_state::trace_tick), this);
 }
 
 void mekd5_state::machine_reset()

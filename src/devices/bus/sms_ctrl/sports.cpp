@@ -174,7 +174,7 @@ sms_sports_pad_device::sms_sports_pad_device(const machine_config &mconfig, cons
 
 void sms_sports_pad_device::device_start()
 {
-	m_sportspad_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sms_sports_pad_device::read_tick), this));
+	m_sportspad_timer = timer_alloc(FUNC(sms_sports_pad_device::read_tick), this);
 
 	save_item(NAME(m_read_state));
 	save_item(NAME(m_th_pin_state));

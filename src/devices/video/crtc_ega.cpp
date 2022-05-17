@@ -596,12 +596,12 @@ void crtc_ega_device::device_start()
 	m_end_update_cb.resolve();
 
 	/* create the timers */
-	m_line_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(crtc_ega_device::handle_line_timer), this));
-	m_de_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(crtc_ega_device::de_off_tick), this));
-	m_cursor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(crtc_ega_device::cursor_tick), this));
-	m_hsync_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(crtc_ega_device::hsync_on), this));
-	m_hsync_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(crtc_ega_device::hsync_off), this));
-	m_light_pen_latch_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(crtc_ega_device::latch_light_pen), this));
+	m_line_timer = timer_alloc(FUNC(crtc_ega_device::handle_line_timer), this);
+	m_de_off_timer = timer_alloc(FUNC(crtc_ega_device::de_off_tick), this);
+	m_cursor_timer = timer_alloc(FUNC(crtc_ega_device::cursor_tick), this);
+	m_hsync_on_timer = timer_alloc(FUNC(crtc_ega_device::hsync_on), this);
+	m_hsync_off_timer = timer_alloc(FUNC(crtc_ega_device::hsync_off), this);
+	m_light_pen_latch_timer = timer_alloc(FUNC(crtc_ega_device::latch_light_pen), this);
 
 	/* Use some large startup values */
 	m_horiz_char_total = 0xff;

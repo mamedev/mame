@@ -70,7 +70,7 @@ void am2910_device::device_start()
 	m_vect.resolve_safe();
 
 	if (clock())
-		m_execute_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(am2910_device::clock_tick), this));
+		m_execute_timer = timer_alloc(FUNC(am2910_device::clock_tick), this);
 	else
 		m_execute_timer = nullptr;
 }

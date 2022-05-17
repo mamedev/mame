@@ -364,7 +364,7 @@ VIDEO_START_MEMBER(nbmj9195_state,_1layer)
 	int width = m_screen->width();
 	int height = m_screen->height();
 
-	m_blitter_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nbmj9195_state::clear_busy_flag), this));
+	m_blitter_timer = timer_alloc(FUNC(nbmj9195_state::clear_busy_flag), this);
 
 	m_screen->register_screen_bitmap(m_tmpbitmap[0]);
 	m_videoram[0] = make_unique_clear<uint16_t[]>(width * height);
@@ -404,7 +404,7 @@ void nbmj9195_state::video_start()
 	int width = m_screen->width();
 	int height = m_screen->height();
 
-	m_blitter_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nbmj9195_state::clear_busy_flag), this));
+	m_blitter_timer = timer_alloc(FUNC(nbmj9195_state::clear_busy_flag), this);
 
 	m_screen->register_screen_bitmap(m_tmpbitmap[0]);
 	m_screen->register_screen_bitmap(m_tmpbitmap[1]);

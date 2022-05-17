@@ -1218,14 +1218,14 @@ void mc6845_device::device_start()
 	m_out_vsync_cb.resolve_safe();
 
 	/* create the timers */
-	m_line_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc6845_device::handle_line_timer), this));
-	m_de_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc6845_device::de_off_tick), this));
-	m_cursor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc6845_device::cursor_tick), this));
-	m_hsync_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc6845_device::hsync_on), this));
-	m_hsync_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc6845_device::hsync_off), this));
-	m_light_pen_latch_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc6845_device::latch_light_pen), this));
-	m_upd_adr_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc6845_device::adr_update_tick), this));
-	m_upd_trans_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc6845_device::transparent_update_tick), this));
+	m_line_timer = timer_alloc(FUNC(mc6845_device::handle_line_timer), this);
+	m_de_off_timer = timer_alloc(FUNC(mc6845_device::de_off_tick), this);
+	m_cursor_timer = timer_alloc(FUNC(mc6845_device::cursor_tick), this);
+	m_hsync_on_timer = timer_alloc(FUNC(mc6845_device::hsync_on), this);
+	m_hsync_off_timer = timer_alloc(FUNC(mc6845_device::hsync_off), this);
+	m_light_pen_latch_timer = timer_alloc(FUNC(mc6845_device::latch_light_pen), this);
+	m_upd_adr_timer = timer_alloc(FUNC(mc6845_device::adr_update_tick), this);
+	m_upd_trans_timer = timer_alloc(FUNC(mc6845_device::transparent_update_tick), this);
 
 	/* Use some large startup values */
 	m_horiz_char_total = 0xff;
@@ -1455,7 +1455,7 @@ void mos8563_device::device_start()
 	mc6845_device::device_start();
 
 	/* create the timers */
-	m_block_copy_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mos8563_device::block_copy_tick), this));
+	m_block_copy_timer = timer_alloc(FUNC(mos8563_device::block_copy_tick), this);
 
 	m_supports_status_reg_d5 = true;
 	m_supports_status_reg_d6 = true;

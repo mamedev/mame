@@ -57,7 +57,7 @@ void hd44352_device::device_start()
 {
 	m_on_cb.resolve_safe();
 
-	m_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hd44352_device::on_tick), this));
+	m_on_timer = timer_alloc(FUNC(hd44352_device::on_tick), this);
 	m_on_timer->adjust(attotime::from_hz(m_clock/16384), 0, attotime::from_hz(m_clock/16384));
 
 	save_item( NAME(m_control_lines));

@@ -63,7 +63,7 @@ void hlcd0515_device::device_start()
 	m_write_data.resolve_safe();
 
 	// timer
-	m_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hlcd0515_device::scan_lcd), this));
+	m_lcd_timer = timer_alloc(FUNC(hlcd0515_device::scan_lcd), this);
 	attotime period = attotime::from_hz(clock() / 2);
 	m_lcd_timer->adjust(period, 0, period);
 

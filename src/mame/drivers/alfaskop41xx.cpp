@@ -476,10 +476,10 @@ void alfaskop4110_state::machine_start()
 	save_item(NAME(m_irq));
 	save_item(NAME(m_imsk));
 
-	m_poll_start_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alfaskop4110_state::poll_start), this));
+	m_poll_start_timer = timer_alloc(FUNC(alfaskop4110_state::poll_start), this);
 	m_poll_start_timer->adjust(attotime::from_msec(5000));
 
-	m_poll_bit_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alfaskop4110_state::poll_bit), this));
+	m_poll_bit_timer = timer_alloc(FUNC(alfaskop4110_state::poll_bit), this);
 	m_poll_bit_timer->adjust(attotime::never);
 }
 

@@ -82,7 +82,7 @@ void pc11_device::device_start()
 	save_item(NAME(m_tbuf));
 
 	// about 300 cps
-	m_read_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc11_device::read_tick), this));
+	m_read_timer = timer_alloc(FUNC(pc11_device::read_tick), this);
 	m_read_timer->adjust(attotime::from_usec(333), 0, attotime::from_usec(333));
 }
 

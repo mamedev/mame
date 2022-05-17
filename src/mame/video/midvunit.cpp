@@ -53,7 +53,7 @@ TIMER_CALLBACK_MEMBER(midvunit_state::scanline_timer_cb)
 
 void midvunit_state::video_start()
 {
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midvunit_state::scanline_timer_cb), this));
+	m_scanline_timer = timer_alloc(FUNC(midvunit_state::scanline_timer_cb), this);
 
 	m_poly = std::make_unique<midvunit_renderer>(*this);
 

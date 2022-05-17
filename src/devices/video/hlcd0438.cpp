@@ -36,7 +36,7 @@ void hlcd0438_device::device_start()
 	m_write_data.resolve_safe();
 
 	// timer (when LCD pin is oscillator)
-	m_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hlcd0438_device::toggle_lcd), this));
+	m_lcd_timer = timer_alloc(FUNC(hlcd0438_device::toggle_lcd), this);
 	attotime period = (clock() != 0) ? attotime::from_hz(2 * clock()) : attotime::never;
 	m_lcd_timer->adjust(period, 0, period);
 

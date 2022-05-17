@@ -104,7 +104,7 @@ void fga002_device::device_start()
 	m_liack7_cb.resolve_safe(0);
 
 	// Timers
-	fga_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fga002_device::timer_tick), this));
+	fga_timer = timer_alloc(FUNC(fga002_device::timer_tick), this);
 
 	save_pointer (NAME (m_fga002), sizeof(m_fga002));
 

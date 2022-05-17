@@ -158,9 +158,9 @@ void i8275_device::device_start()
 	m_display_cb.resolve();
 
 	// allocate timers
-	m_hrtc_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(i8275_device::hrtc_on), this));
-	m_drq_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(i8275_device::drq_on), this));
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(i8275_device::scanline_tick), this));
+	m_hrtc_on_timer = timer_alloc(FUNC(i8275_device::hrtc_on), this);
+	m_drq_on_timer = timer_alloc(FUNC(i8275_device::drq_on), this);
+	m_scanline_timer = timer_alloc(FUNC(i8275_device::scanline_tick), this);
 
 	// state saving
 	save_item(NAME(m_status));

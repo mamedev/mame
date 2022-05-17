@@ -1724,8 +1724,8 @@ void ymf271_device::init_state()
 
 void ymf271_device::device_start()
 {
-	m_timA = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ymf271_device::timer_a_expired), this));
-	m_timB = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ymf271_device::timer_b_expired), this));
+	m_timA = timer_alloc(FUNC(ymf271_device::timer_a_expired), this);
+	m_timB = timer_alloc(FUNC(ymf271_device::timer_b_expired), this);
 
 	m_irq_handler.resolve();
 

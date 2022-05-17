@@ -54,7 +54,7 @@ e0516_device::e0516_device(const machine_config &mconfig, const char *tag, devic
 void e0516_device::device_start()
 {
 	// allocate timers
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(e0516_device::timer_tick), this));
+	m_timer = timer_alloc(FUNC(e0516_device::timer_tick), this);
 	m_timer->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
 
 	// state saving

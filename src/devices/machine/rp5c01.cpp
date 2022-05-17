@@ -201,10 +201,10 @@ void rp5c01_device::device_start()
 	// allocate timers
 	if (clock() > 0)
 	{
-		m_clock_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rp5c01_device::advance_1hz_clock), this));
+		m_clock_timer = timer_alloc(FUNC(rp5c01_device::advance_1hz_clock), this);
 		m_clock_timer->adjust(attotime::from_hz(clock() / 16384), 0, attotime::from_hz(clock() / 16384));
 
-		m_16hz_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rp5c01_device::advance_16hz_clock), this));
+		m_16hz_timer = timer_alloc(FUNC(rp5c01_device::advance_16hz_clock), this);
 		m_16hz_timer->adjust(attotime::from_hz(clock() / 1024), 0, attotime::from_hz(clock() / 1024));
 	}
 

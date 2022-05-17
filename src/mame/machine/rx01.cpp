@@ -81,7 +81,7 @@ void rx01_device::device_add_mconfig(machine_config &config)
 
 void rx01_device::device_start()
 {
-	m_command_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rx01_device::service_command),this));
+	m_command_timer = timer_alloc(FUNC(rx01_device::service_command), this);
 }
 
 

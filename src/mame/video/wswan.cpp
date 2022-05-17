@@ -90,7 +90,7 @@ void wswan_video_device::device_start()
 {
 	screen().register_screen_bitmap(m_bitmap);
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wswan_video_device::scanline_interrupt), this));
+	m_timer = timer_alloc(FUNC(wswan_video_device::scanline_interrupt), this);
 	m_timer->adjust(attotime::from_ticks(256, clock()), 0, attotime::from_ticks(256, clock()));
 
 	// bind callbacks

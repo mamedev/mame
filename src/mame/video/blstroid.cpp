@@ -70,8 +70,8 @@ const atari_motion_objects_config blstroid_state::s_mob_config =
 
 void blstroid_state::video_start()
 {
-	m_irq_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(blstroid_state::irq_off), this));
-	m_irq_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(blstroid_state::irq_on), this));
+	m_irq_off_timer = timer_alloc(FUNC(blstroid_state::irq_off), this);
+	m_irq_on_timer = timer_alloc(FUNC(blstroid_state::irq_on), this);
 
 	m_scanline_int_state = false;
 

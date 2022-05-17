@@ -175,10 +175,10 @@ void wd_fdc_device_base::device_start()
 	if (!has_enmf && !enmf_cb.isnull())
 		logerror("Warning, this chip doesn't have an ENMF line.\n");
 
-	t_gen = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wd_fdc_device_base::generic_tick), this));
-	t_cmd = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wd_fdc_device_base::cmd_w_tick), this));
-	t_track = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wd_fdc_device_base::track_w_tick), this));
-	t_sector = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wd_fdc_device_base::sector_w_tick), this));
+	t_gen = timer_alloc(FUNC(wd_fdc_device_base::generic_tick), this);
+	t_cmd = timer_alloc(FUNC(wd_fdc_device_base::cmd_w_tick), this);
+	t_track = timer_alloc(FUNC(wd_fdc_device_base::track_w_tick), this);
+	t_sector = timer_alloc(FUNC(wd_fdc_device_base::sector_w_tick), this);
 	dden = disable_mfm;
 	enmf = false;
 	floppy = nullptr;

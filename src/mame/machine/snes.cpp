@@ -975,23 +975,23 @@ uint8_t snes_state::oldjoy2_read(int latched)
 void snes_state::snes_init_timers()
 {
 	/* init timers and stop them */
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_state::snes_scanline_tick), this));
+	m_scanline_timer = timer_alloc(FUNC(snes_state::snes_scanline_tick), this);
 	m_scanline_timer->adjust(attotime::never);
-	m_hblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_state::snes_hblank_tick), this));
+	m_hblank_timer = timer_alloc(FUNC(snes_state::snes_hblank_tick), this);
 	m_hblank_timer->adjust(attotime::never);
-	m_nmi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_state::snes_nmi_tick), this));
+	m_nmi_timer = timer_alloc(FUNC(snes_state::snes_nmi_tick), this);
 	m_nmi_timer->adjust(attotime::never);
-	m_hirq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_state::snes_hirq_tick_callback), this));
+	m_hirq_timer = timer_alloc(FUNC(snes_state::snes_hirq_tick_callback), this);
 	m_hirq_timer->adjust(attotime::never);
 	//m_div_timer = timer_alloc(TIMER_DIV);
 	//m_div_timer->adjust(attotime::never);
 	//m_mult_timer = timer_alloc(TIMER_MULT);
 	//m_mult_timer->adjust(attotime::never);
-	m_io_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_state::snes_update_io), this));
+	m_io_timer = timer_alloc(FUNC(snes_state::snes_update_io), this);
 	m_io_timer->adjust(attotime::never);
-	m_oam_reset_addr_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_state::snes_reset_oam_address), this));
+	m_oam_reset_addr_timer = timer_alloc(FUNC(snes_state::snes_reset_oam_address), this);
 	m_oam_reset_addr_timer->adjust(attotime::never);
-	m_hdma_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_state::snes_reset_hdma), this));
+	m_hdma_reset_timer = timer_alloc(FUNC(snes_state::snes_reset_hdma), this);
 	m_hdma_reset_timer->adjust(attotime::never);
 
 	// SNES hcounter has a 0-339 range.  hblank starts at counter 260.

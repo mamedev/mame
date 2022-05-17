@@ -736,7 +736,7 @@ WRITE_LINE_MEMBER(hp_ipc_state::irq_7)
 
 void hp_ipc_state::machine_start()
 {
-	m_bus_error_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp_ipc_state::clear_bus_error), this));
+	m_bus_error_timer = timer_alloc(FUNC(hp_ipc_state::clear_bus_error), this);
 	m_bus_error = false;
 
 	m_bankdev->set_bank(1);

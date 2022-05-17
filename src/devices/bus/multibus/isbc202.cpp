@@ -397,9 +397,9 @@ void isbc202_device::device_start()
 		d->get_device()->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&isbc202_device::floppy_index_cb , this));
 	}
 
-	m_timeout_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(isbc202_device::timeout_tick), this));
-	m_byte_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(isbc202_device::byte_tick), this));
-	m_f_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(isbc202_device::f_tick), this));
+	m_timeout_timer = timer_alloc(FUNC(isbc202_device::timeout_tick), this);
+	m_byte_timer = timer_alloc(FUNC(isbc202_device::byte_tick), this);
+	m_f_timer = timer_alloc(FUNC(isbc202_device::f_tick), this);
 
 	m_mem_space = &m_bus->space(AS_PROGRAM);
 	m_bus->space(AS_IO).install_readwrite_handler(0x78, 0x7f, read8m_delegate(*this, FUNC(isbc202_device::io_r)), write8m_delegate(*this, FUNC(isbc202_device::io_w)));

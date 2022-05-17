@@ -1724,10 +1724,10 @@ void aristmk4_state::machine_start()
 	m_credit_out_meter.resolve();
 	m_hopper_motor_out.resolve();
 	m_lamps.resolve();
-	m_power_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aristmk4_state::power_fail), this));
-	m_note_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aristmk4_state::note_input_reset), this));
-	m_coin_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aristmk4_state::coin_input_reset), this));
-	m_hopper_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aristmk4_state::hopper_reset), this));
+	m_power_timer = timer_alloc(FUNC(aristmk4_state::power_fail), this);
+	m_note_reset_timer = timer_alloc(FUNC(aristmk4_state::note_input_reset), this);
+	m_coin_reset_timer = timer_alloc(FUNC(aristmk4_state::coin_input_reset), this);
+	m_hopper_reset_timer = timer_alloc(FUNC(aristmk4_state::hopper_reset), this);
 }
 
 void aristmk4_state::machine_reset()

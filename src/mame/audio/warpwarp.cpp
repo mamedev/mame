@@ -54,8 +54,8 @@ void warpwarp_sound_device::device_start()
 	m_clock_1v = clock() / 3 / 2 / 384;
 	m_channel = stream_alloc(0, 1, m_clock_16h);
 
-	m_sound_volume_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(warpwarp_sound_device::sound_decay_tick), this));
-	m_music_volume_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(warpwarp_sound_device::music_decay_tick), this));
+	m_sound_volume_timer = timer_alloc(FUNC(warpwarp_sound_device::sound_decay_tick), this);
+	m_music_volume_timer = timer_alloc(FUNC(warpwarp_sound_device::music_decay_tick), this);
 
 	save_item(NAME(m_sound_latch));
 	save_item(NAME(m_music1_latch));

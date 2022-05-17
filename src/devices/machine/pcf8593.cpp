@@ -63,7 +63,7 @@ void pcf8593_device::device_start()
 {
 	_logerror( 0, ("pcf8593_init\n"));
 	memset(m_register, 0, sizeof(m_register));
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pcf8593_device::clock_tick), this));
+	m_timer = timer_alloc(FUNC(pcf8593_device::clock_tick), this);
 	m_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 }
 

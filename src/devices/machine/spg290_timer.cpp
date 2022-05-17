@@ -22,7 +22,7 @@ spg290_timer_device::spg290_timer_device(const machine_config &mconfig, const ch
 void spg290_timer_device::device_start()
 {
 	m_irq_cb.resolve_safe();
-	m_tick_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg290_timer_device::timer_update), this));
+	m_tick_timer = timer_alloc(FUNC(spg290_timer_device::timer_update), this);
 
 	save_item(NAME(m_enabled));
 	save_item(NAME(m_control));

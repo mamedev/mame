@@ -214,7 +214,7 @@ void mystston_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 
 	// create the interrupt timer
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mystston_state::interrupt_callback), this));
+	m_interrupt_timer = timer_alloc(FUNC(mystston_state::interrupt_callback), this);
 }
 
 

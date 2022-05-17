@@ -498,10 +498,10 @@ void abc99_device::device_start()
 {
 	m_leds.resolve();
 	// allocate timers
-	m_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(abc99_device::serial_clock), this));
+	m_serial_timer = timer_alloc(FUNC(abc99_device::serial_clock), this);
 	m_serial_timer->adjust(MCS48_ALE_CLOCK(XTAL(6'000'000)/3), 0, MCS48_ALE_CLOCK(XTAL(6'000'000)/3));
 
-	m_mouse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(abc99_device::scan_mouse), this));
+	m_mouse_timer = timer_alloc(FUNC(abc99_device::scan_mouse), this);
 
 	// state saving
 	save_item(NAME(m_si));

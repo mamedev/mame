@@ -66,7 +66,7 @@ void m3745x_device::device_start()
 	{
 		m_timers[i] = machine().scheduler().timer_alloc(timer_expired_delegate());
 	}
-	m_timers[TIMER_ADC] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m3745x_device::adc_complete), this));
+	m_timers[TIMER_ADC] = timer_alloc(FUNC(m3745x_device::adc_complete), this);
 
 	m740_device::device_start();
 

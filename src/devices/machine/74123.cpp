@@ -49,8 +49,8 @@ void ttl74123_device::device_start()
 {
 	m_output_changed_cb.resolve_safe();
 
-	m_clear_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ttl74123_device::clear_callback), this));
-	m_output_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ttl74123_device::output_callback), this));
+	m_clear_timer = timer_alloc(FUNC(ttl74123_device::clear_callback), this);
+	m_output_timer = timer_alloc(FUNC(ttl74123_device::output_callback), this);
 
 	/* register for state saving */
 	save_item(NAME(m_a));

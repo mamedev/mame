@@ -33,7 +33,7 @@ void nextkbd_device::device_start()
 	int_power_cb.resolve_safe();
 	int_nmi_cb.resolve_safe();
 
-	poll_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nextkbd_device::update_tick), this));
+	poll_timer = timer_alloc(FUNC(nextkbd_device::update_tick), this);
 
 	save_item(NAME(ctrl_snd));
 	save_item(NAME(ctrl_kms));

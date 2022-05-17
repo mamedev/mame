@@ -520,7 +520,7 @@ void micro3d_state::init_botss()
 
 void micro3d_state::machine_start()
 {
-	m_mac_done_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(micro3d_state::mac_done_callback), this));
+	m_mac_done_timer = timer_alloc(FUNC(micro3d_state::mac_done_callback), this);
 }
 
 void micro3d_state::machine_reset()

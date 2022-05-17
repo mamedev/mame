@@ -44,8 +44,8 @@ void clock_device::device_start()
 	save_item(NAME(m_thigh));
 	save_item(NAME(m_tlow));
 
-	m_timer_init = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(clock_device::clock_init), this));
-	m_timer_tick = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(clock_device::clock_tick), this));
+	m_timer_init = timer_alloc(FUNC(clock_device::clock_init), this);
+	m_timer_tick = timer_alloc(FUNC(clock_device::clock_tick), this);
 	reinit();
 }
 

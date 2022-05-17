@@ -170,7 +170,6 @@ private:
 	mfmhd_image_format_t*   m_format;
 	chd_file   *m_chd;
 	void        head_move();
-	void        recalibrate();
 
 	// Common routine for read/write
 	bool            find_position(attotime &from_when, const attotime &limit, int &bytepos, int &bitpos);

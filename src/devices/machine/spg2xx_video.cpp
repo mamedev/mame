@@ -52,7 +52,7 @@ void spg2xx_video_device::device_start()
 	m_guny_in.resolve_safe(0);
 	m_gunx_in.resolve_safe(0);
 
-	m_screenpos_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_video_device::screenpos_hit), this));
+	m_screenpos_timer = timer_alloc(FUNC(spg2xx_video_device::screenpos_hit), this);
 	m_screenpos_timer->adjust(attotime::never);
 
 	save_item(NAME(m_video_regs));

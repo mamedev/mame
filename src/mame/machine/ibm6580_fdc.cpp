@@ -61,7 +61,7 @@ void dw_fdc_device::device_start()
 	m_out_data.resolve_safe();
 	m_out_clock.resolve_safe();
 	m_out_strobe.resolve_safe();
-	m_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dw_fdc_device::assert_reset_line), this));
+	m_reset_timer = timer_alloc(FUNC(dw_fdc_device::assert_reset_line), this);
 }
 
 void dw_fdc_device::device_reset()

@@ -249,9 +249,9 @@ void upd775x_device::device_start()
 	save_item(NAME(m_mode));
 	save_item(NAME(m_md));
 
-	m_sync_port_write = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd775x_device::sync_port_write), this));
-	m_sync_reset_write = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd775x_device::internal_reset_w), this));
-	m_sync_start_write = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd775x_device::internal_start_w), this));
+	m_sync_port_write = timer_alloc(FUNC(upd775x_device::sync_port_write), this);
+	m_sync_reset_write = timer_alloc(FUNC(upd775x_device::internal_reset_w), this);
+	m_sync_start_write = timer_alloc(FUNC(upd775x_device::internal_start_w), this);
 }
 
 void upd775x_device::device_clock_changed()
@@ -272,8 +272,8 @@ void upd7759_device::device_start()
 
 	m_sample_offset_shift = 1;
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd7759_device::drq_update), this));
-	m_sync_md_write = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd7759_device::internal_md_w), this));
+	m_timer = timer_alloc(FUNC(upd7759_device::drq_update), this);
+	m_sync_md_write = timer_alloc(FUNC(upd7759_device::internal_md_w), this);
 
 	m_drqcallback.resolve_safe();
 }

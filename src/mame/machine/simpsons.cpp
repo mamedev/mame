@@ -79,8 +79,8 @@ void simpsons_state::machine_start()
 	save_item(NAME(m_layerpri));
 	save_pointer(NAME(m_spriteram), 0x1000 / 2);
 
-	m_dma_start_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(simpsons_state::dma_start), this));
-	m_dma_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(simpsons_state::dma_end), this));
+	m_dma_start_timer = timer_alloc(FUNC(simpsons_state::dma_start), this);
+	m_dma_end_timer = timer_alloc(FUNC(simpsons_state::dma_end), this);
 }
 
 void simpsons_state::machine_reset()

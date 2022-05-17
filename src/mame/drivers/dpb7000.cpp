@@ -754,10 +754,10 @@ void dpb7000_state::machine_start()
 	save_item(NAME(m_csr));
 	save_item(NAME(m_sys_ctrl));
 
-	m_field_in_clk = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dpb7000_state::field_in), this));
+	m_field_in_clk = timer_alloc(FUNC(dpb7000_state::field_in), this);
 	m_field_in_clk->adjust(attotime::never);
 
-	m_field_out_clk = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dpb7000_state::field_out), this));
+	m_field_out_clk = timer_alloc(FUNC(dpb7000_state::field_out), this);
 	m_field_out_clk->adjust(attotime::never);
 
 	// Disc Sequencer Card
@@ -777,7 +777,7 @@ void dpb7000_state::machine_start()
 	save_item(NAME(m_diskseq_ucode_latch));
 	save_item(NAME(m_diskseq_cc_inputs));
 	save_item(NAME(m_diskseq_cyl_read_pending));
-	m_diskseq_complete_clk = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dpb7000_state::diskseq_complete), this));
+	m_diskseq_complete_clk = timer_alloc(FUNC(dpb7000_state::diskseq_complete), this);
 	m_diskseq_complete_clk->adjust(attotime::never);
 
 	// Floppy Disc Controller Card
@@ -891,9 +891,9 @@ void dpb7000_state::machine_start()
 	save_item(NAME(m_tablet_tx_bit));
 	save_item(NAME(m_tablet_pen_in_proximity));
 	save_item(NAME(m_tablet_state));
-	m_tablet_tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dpb7000_state::tablet_tx_tick), this));
+	m_tablet_tx_timer = timer_alloc(FUNC(dpb7000_state::tablet_tx_tick), this);
 	m_tablet_tx_timer->adjust(attotime::never);
-	m_tablet_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dpb7000_state::tablet_irq_tick), this));
+	m_tablet_irq_timer = timer_alloc(FUNC(dpb7000_state::tablet_irq_tick), this);
 	m_tablet_irq_timer->adjust(attotime::never);
 
 	m_yuv_lut = std::make_unique<uint32_t[]>(0x1000000);

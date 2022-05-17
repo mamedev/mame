@@ -564,7 +564,7 @@ void tipi_card_device::device_start()
 	save_item(NAME(m_rc));
 	save_item(NAME(m_lasttc));
 
-	m_restart_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tipi_card_device::open_websocket), this));
+	m_restart_timer = timer_alloc(FUNC(tipi_card_device::open_websocket), this);
 	m_rpiconn = (m_rpi->exists());
 }
 

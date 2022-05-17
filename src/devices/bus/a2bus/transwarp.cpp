@@ -158,7 +158,7 @@ a2bus_transwarp_device::a2bus_transwarp_device(const machine_config &mconfig, co
 
 void a2bus_transwarp_device::device_start()
 {
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a2bus_transwarp_device::clock_adjust_tick), this));
+	m_timer = timer_alloc(FUNC(a2bus_transwarp_device::clock_adjust_tick), this);
 
 	save_item(NAME(m_bEnabled));
 	save_item(NAME(m_bReadA2ROM));

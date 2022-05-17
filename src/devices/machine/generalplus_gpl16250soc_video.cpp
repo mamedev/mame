@@ -210,7 +210,7 @@ void gcm394_base_video_device::device_start()
 
 	m_space_read_cb.resolve_safe(0);
 
-	m_screenpos_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gcm394_base_video_device::screen_pos_reached), this));
+	m_screenpos_timer = timer_alloc(FUNC(gcm394_base_video_device::screen_pos_reached), this);
 	m_screenpos_timer->adjust(attotime::never);
 
 	save_item(NAME(m_page0_addr_lsb));

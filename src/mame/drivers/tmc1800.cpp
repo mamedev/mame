@@ -745,7 +745,7 @@ void nano_state::machine_start()
 	save_item(NAME(m_keylatch));
 
 	/* allocate timers */
-	m_ef4_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nano_state::assert_ef4), this));
+	m_ef4_timer = timer_alloc(FUNC(nano_state::assert_ef4), this);
 }
 
 void nano_state::machine_reset()

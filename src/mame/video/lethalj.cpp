@@ -91,7 +91,7 @@ void lethalj_state::video_start()
 	/* predetermine blitter info */
 	m_blitter_rows = m_blitter_base.length() / BLITTER_SOURCE_WIDTH;
 
-	m_gen_ext1_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lethalj_state::gen_ext1_int), this));
+	m_gen_ext1_int_timer = timer_alloc(FUNC(lethalj_state::gen_ext1_int), this);
 
 	m_vispage = 0;
 }

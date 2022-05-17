@@ -1506,8 +1506,8 @@ void towns_state::video_start()
 {
 	m_video.towns_vram_wplane = 0x00;
 	m_video.towns_sprite_page = 0;
-	m_video.sprite_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::draw_sprites), this));
-	m_video.vblank_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::towns_vblank_end), this));
+	m_video.sprite_timer = timer_alloc(FUNC(towns_state::draw_sprites), this);
+	m_video.vblank_end_timer = timer_alloc(FUNC(towns_state::towns_vblank_end), this);
 }
 
 uint32_t towns_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

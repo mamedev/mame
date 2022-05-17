@@ -395,8 +395,8 @@ void cuda_device::device_start()
 	write_via_clock.resolve_safe();
 	write_via_data.resolve_safe();
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cuda_device::seconds_tick), this));
-	m_prog_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cuda_device::timer_tick), this));
+	m_timer = timer_alloc(FUNC(cuda_device::seconds_tick), this);
+	m_prog_timer = timer_alloc(FUNC(cuda_device::timer_tick), this);
 	save_item(NAME(ddrs[0]));
 	save_item(NAME(ddrs[1]));
 	save_item(NAME(ddrs[2]));

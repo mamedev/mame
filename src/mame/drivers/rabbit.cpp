@@ -439,7 +439,7 @@ void rabbit_state::video_start()
 	m_sprite_bitmap = std::make_unique<bitmap_ind16>(0x1000,0x1000);
 	m_sprite_clip.set(0, 0x1000-1, 0, 0x1000-1);
 
-	m_blit_done_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rabbit_state::blit_done), this));
+	m_blit_done_timer = timer_alloc(FUNC(rabbit_state::blit_done), this);
 
 	save_pointer(NAME(m_tilemap_ram[0]), 0x20000/4);
 	save_pointer(NAME(m_tilemap_ram[1]), 0x20000/4);

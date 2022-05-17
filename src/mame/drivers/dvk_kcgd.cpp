@@ -209,9 +209,9 @@ void kcgd_state::machine_start()
 	m_tmpclip = rectangle(0, KCGD_DISP_HORZ - 1, 0, KCGD_DISP_VERT - 1);
 	m_tmpbmp.allocate(KCGD_DISP_HORZ, KCGD_DISP_VERT);
 // future
-//  m_vsync_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(kcgd_state::vsync_tick), this));
+//  m_vsync_on_timer = timer_alloc(FUNC(kcgd_state::vsync_tick), this);
 //  m_vsync_on_timer->adjust(m_screen->time_until_pos(0, 0), 0, m_screen->frame_period());
-	m_500hz_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(kcgd_state::toggle_500hz), this));
+	m_500hz_timer = timer_alloc(FUNC(kcgd_state::toggle_500hz), this);
 	m_500hz_timer->adjust(attotime::from_hz(500), 0, attotime::from_hz(500));
 }
 

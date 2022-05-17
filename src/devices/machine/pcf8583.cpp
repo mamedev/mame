@@ -55,7 +55,7 @@ pcf8583_device::pcf8583_device(const machine_config &mconfig, const char *tag, d
 
 void pcf8583_device::device_start()
 {
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pcf8583_device::clock_tick), this));
+	m_timer = timer_alloc(FUNC(pcf8583_device::clock_tick), this);
 	m_timer->adjust(attotime::from_hz(100), 0, attotime::from_hz(100));
 
 	save_item(NAME(m_scl));
@@ -309,7 +309,7 @@ WRITE_LINE_MEMBER(pcf8583_device::scl_w)
 							m_register++;
 							break;
 						}
-						
+
 						if (m_state != STATE_IDLE)
 						{
 							m_sdar = 0 ;

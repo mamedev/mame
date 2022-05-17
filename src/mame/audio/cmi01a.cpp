@@ -166,9 +166,9 @@ void cmi01a_device::device_start()
 {
 	m_wave_ram = std::make_unique<uint8_t[]>(0x4000);
 
-	m_zx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cmi01a_device::zx_timer_cb), this));
-	m_eosi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cmi01a_device::eosi_timer_cb), this));
-	m_bcas_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cmi01a_device::bcas_tick), this));
+	m_zx_timer = timer_alloc(FUNC(cmi01a_device::zx_timer_cb), this);
+	m_eosi_timer = timer_alloc(FUNC(cmi01a_device::eosi_timer_cb), this);
+	m_bcas_timer = timer_alloc(FUNC(cmi01a_device::bcas_tick), this);
 
 	m_zx_timer->adjust(attotime::never);
 	m_eosi_timer->adjust(attotime::never);

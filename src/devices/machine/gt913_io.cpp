@@ -32,8 +32,8 @@ void gt913_io_hle_device::device_start()
 	m_cpu_io = &m_cpu->space(AS_IO);
 	m_intc = siblingdevice<h8_intc_device>(m_intc_tag);
 
-	m_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gt913_io_hle_device::irq_timer_tick), this));
-	m_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gt913_io_hle_device::irq_timer_tick), this));
+	m_timer[0] = timer_alloc(FUNC(gt913_io_hle_device::irq_timer_tick), this);
+	m_timer[1] = timer_alloc(FUNC(gt913_io_hle_device::irq_timer_tick), this);
 
 	save_item(NAME(m_timer_control));
 	save_item(NAME(m_timer_rate));

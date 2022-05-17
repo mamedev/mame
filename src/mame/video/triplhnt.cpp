@@ -24,7 +24,7 @@ void triplhnt_state::video_start()
 
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(triplhnt_state::get_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 
-	m_hit_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(triplhnt_state::set_collision), this));
+	m_hit_timer = timer_alloc(FUNC(triplhnt_state::set_collision), this);
 
 	save_item(NAME(m_cmos));
 	save_item(NAME(m_da_latch));

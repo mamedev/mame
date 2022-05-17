@@ -337,7 +337,7 @@ abc800_keyboard_device::abc800_keyboard_device(const machine_config &mconfig, co
 void abc800_keyboard_device::device_start()
 {
 	// allocate timers
-	m_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(abc800_keyboard_device::serial_clock), this));
+	m_serial_timer = timer_alloc(FUNC(abc800_keyboard_device::serial_clock), this);
 	m_serial_timer->adjust(attotime::from_hz(XTAL(5'990'400)/(3*5)/20), 0, attotime::from_hz(XTAL(5'990'400)/(3*5)/20)); // ???
 
 	// state saving

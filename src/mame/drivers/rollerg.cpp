@@ -221,7 +221,7 @@ void rollerg_state::machine_start()
 	membank("bank1")->configure_entries(6, 2, &ROM[0x10000], 0x4000);
 	membank("bank1")->set_entry(0);
 
-	m_nmi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rollerg_state::sound_nmi), this));
+	m_nmi_timer = timer_alloc(FUNC(rollerg_state::sound_nmi), this);
 
 	save_item(NAME(m_readzoomroms));
 }

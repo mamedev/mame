@@ -532,9 +532,9 @@ void tms9914_device::device_start()
 	m_int_write_func.resolve_safe();
 	m_accrq_write_func.resolve_safe();
 
-	m_sh_dly_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tms9914_device::fsm_tick), this));
-	m_ah_dly_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tms9914_device::fsm_tick), this));
-	m_c_dly_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tms9914_device::fsm_tick), this));
+	m_sh_dly_timer = timer_alloc(FUNC(tms9914_device::fsm_tick), this);
+	m_ah_dly_timer = timer_alloc(FUNC(tms9914_device::fsm_tick), this);
+	m_c_dly_timer = timer_alloc(FUNC(tms9914_device::fsm_tick), this);
 }
 
 void tms9914_device::device_reset()

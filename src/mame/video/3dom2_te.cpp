@@ -743,7 +743,7 @@ void m2_te_device::device_start()
 	save_item(NAME(m_db.m_regs));
 
 	// Allocate timers
-	m_done_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m2_te_device::command_done), this));
+	m_done_timer = timer_alloc(FUNC(m2_te_device::command_done), this);
 }
 
 

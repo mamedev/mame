@@ -74,7 +74,7 @@ device_memory_interface::space_config_vector at28c64b_device::memory_space_confi
 
 void at28c64b_device::device_start()
 {
-	m_write_timer = machine().scheduler().timer_alloc( timer_expired_delegate( FUNC( at28c64b_device::write_complete ), this ) );
+	m_write_timer = timer_alloc( FUNC( at28c64b_device::write_complete ), this );
 
 	save_item( NAME(m_a9_12v) );
 	save_item( NAME(m_oe_12v) );

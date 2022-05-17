@@ -103,7 +103,7 @@ sms_light_phaser_device::sms_light_phaser_device(const machine_config &mconfig, 
 void sms_light_phaser_device::device_start()
 {
 	save_item(NAME(m_sensor_last_state));
-	m_lphaser_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sms_light_phaser_device::sensor_check), this));
+	m_lphaser_timer = timer_alloc(FUNC(sms_light_phaser_device::sensor_check), this);
 }
 
 

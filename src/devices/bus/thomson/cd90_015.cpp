@@ -69,7 +69,7 @@ TIMER_CALLBACK_MEMBER(cd90_015_device::motor_tick)
 void cd90_015_device::device_start()
 {
 	for(int i=0; i != 4; i++)
-		m_motor_timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cd90_015_device::motor_tick), this));
+		m_motor_timer[i] = timer_alloc(FUNC(cd90_015_device::motor_tick), this);
 	save_item(NAME(m_select));
 }
 

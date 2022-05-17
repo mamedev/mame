@@ -353,8 +353,8 @@ TIMER_CALLBACK_MEMBER(x68k_state::md_6button_port2_timeout)
 
 void x68k_state::md_6button_init()
 {
-	m_mdctrl.io_timeout1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::md_6button_port1_timeout), this));
-	m_mdctrl.io_timeout2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::md_6button_port2_timeout), this));
+	m_mdctrl.io_timeout1 = timer_alloc(FUNC(x68k_state::md_6button_port1_timeout), this);
+	m_mdctrl.io_timeout2 = timer_alloc(FUNC(x68k_state::md_6button_port2_timeout), this);
 }
 
 uint8_t x68k_state::md_6button_r(int port)
@@ -1560,11 +1560,11 @@ void x68k_state::driver_init()
 	// copy last half of BIOS to a user region, to use for initial startup
 	memcpy(user2,(rom+0xff0000),0x10000);
 
-	m_mouse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x68ksupr_state::scc_ack), this));
-	m_led_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x68ksupr_state::led_callback), this));
-	m_fdc_tc = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x68ksupr_state::floppy_tc_tick), this));
-	m_adpcm_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x68ksupr_state::adpcm_drq_tick), this));
-	m_bus_error_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x68ksupr_state::bus_error), this));
+	m_mouse_timer = timer_alloc(FUNC(x68ksupr_state::scc_ack), this);
+	m_led_timer = timer_alloc(FUNC(x68ksupr_state::led_callback), this);
+	m_fdc_tc = timer_alloc(FUNC(x68ksupr_state::floppy_tc_tick), this);
+	m_adpcm_timer = timer_alloc(FUNC(x68ksupr_state::adpcm_drq_tick), this);
+	m_bus_error_timer = timer_alloc(FUNC(x68ksupr_state::bus_error), this);
 
 	// Initialise timers for 6-button MD controllers
 	md_6button_init();

@@ -168,8 +168,8 @@ void acorn_vidc10_device::device_start()
 	save_pointer(NAME(m_cursor_vram), m_cursor_vram_size);
 	save_pointer(NAME(m_stereo_image), m_sound_max_channels);
 
-	m_video_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(acorn_vidc10_device::vblank_timer), this));
-	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(acorn_vidc10_device::sound_drq_timer), this));
+	m_video_timer = timer_alloc(FUNC(acorn_vidc10_device::vblank_timer), this);
+	m_sound_timer = timer_alloc(FUNC(acorn_vidc10_device::sound_drq_timer), this);
 
 	// generate u255 law lookup table
 	// cfr. page 48 of the VIDC20 manual, page 33 of the VIDC manual

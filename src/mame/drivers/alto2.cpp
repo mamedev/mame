@@ -299,7 +299,7 @@ void alto2_state::alto2(machine_config &config)
 void alto2_state::driver_init()
 {
 	// Create a timer which fires twice per frame, once for each field
-	m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_state::handle_vblank), this));
+	m_vblank_timer = timer_alloc(FUNC(alto2_state::handle_vblank), this);
 	m_vblank_timer->adjust(attotime::from_hz(30*2), 0, attotime::from_hz(30*2));
 }
 

@@ -181,7 +181,7 @@ void mb89352_device::device_start()
 	m_drq_cb.resolve_safe();
 
 	// allocate read timer
-	m_transfer_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mb89352_device::transfer_tick), this));
+	m_transfer_timer = timer_alloc(FUNC(mb89352_device::transfer_tick), this);
 }
 
 void mb89352_device::device_reset()

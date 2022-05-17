@@ -85,7 +85,7 @@ void vii_state::machine_start()
 		m_bank->set_entry(0);
 	}
 
-	m_ctrl_poll_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vii_state::poll_controls), this));
+	m_ctrl_poll_timer = timer_alloc(FUNC(vii_state::poll_controls), this);
 	m_ctrl_poll_timer->adjust(attotime::never);
 
 	save_item(NAME(m_controller_input));

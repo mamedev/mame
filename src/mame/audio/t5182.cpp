@@ -170,7 +170,7 @@ t5182_device::t5182_device(const machine_config &mconfig, const char *tag, devic
 
 void t5182_device::device_start()
 {
-	m_setirq_cb = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(t5182_device::setirq_callback), this));
+	m_setirq_cb = timer_alloc(FUNC(t5182_device::setirq_callback), this);
 
 	save_item(NAME(m_irqstate));
 	save_item(NAME(m_semaphore_main));

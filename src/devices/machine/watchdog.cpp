@@ -60,7 +60,7 @@ void watchdog_timer_device::device_start()
 {
 	// initialize the watchdog
 	m_counter = 0;
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(watchdog_timer_device::watchdog_expired), this));
+	m_timer = timer_alloc(FUNC(watchdog_timer_device::watchdog_expired), this);
 
 	if (m_vblank_count != 0)
 	{

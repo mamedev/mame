@@ -47,7 +47,7 @@ void i8271_device::device_start()
 
 	for(int i=0; i != 2; i++) {
 		char name[2];
-		flopi[i].tm = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(i8271_device::floppy_tick), this));
+		flopi[i].tm = timer_alloc(FUNC(i8271_device::floppy_tick), this);
 		flopi[i].id = i;
 		if(select_connected) {
 			name[0] = '0'+i;

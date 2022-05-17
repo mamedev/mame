@@ -51,7 +51,7 @@ z88_impexp_device::z88_impexp_device(const machine_config &mconfig, const char *
 
 void z88_impexp_device::device_start()
 {
-	m_timer_poll = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z88_impexp_device::poll_queue), this));
+	m_timer_poll = timer_alloc(FUNC(z88_impexp_device::poll_queue), this);
 }
 
 //-------------------------------------------------

@@ -82,9 +82,9 @@ void scsihle_device::device_start()
 {
 	t10_start(*this);
 
-	req_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scsihle_device::req_tick), this));
-	sel_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scsihle_device::sel_tick), this));
-	dataout_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scsihle_device::dataout_tick), this));
+	req_timer = timer_alloc(FUNC(scsihle_device::req_tick), this);
+	sel_timer = timer_alloc(FUNC(scsihle_device::sel_tick), this);
+	dataout_timer = timer_alloc(FUNC(scsihle_device::dataout_tick), this);
 }
 
 void scsihle_device::device_reset()

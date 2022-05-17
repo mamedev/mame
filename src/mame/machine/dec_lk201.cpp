@@ -523,10 +523,10 @@ lk201_device::lk201_device(const machine_config &mconfig, const char *tag, devic
 
 void lk201_device::device_start()
 {
-	m_count = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lk201_device::timer_irq), this));
+	m_count = timer_alloc(FUNC(lk201_device::timer_irq), this);
 	m_tx_handler.resolve_safe();
 
-	m_beeper = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lk201_device::beeper_off), this));
+	m_beeper = timer_alloc(FUNC(lk201_device::beeper_off), this);
 
 	m_led_wait.resolve();
 	m_led_compose.resolve();

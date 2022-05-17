@@ -99,7 +99,7 @@ void nubus_radiustpd_device::device_start()
 	nubus().install_device(slotspace+0x80000, slotspace+0xeffff, read32s_delegate(*this, FUNC(nubus_radiustpd_device::radiustpd_r)), write32s_delegate(*this, FUNC(nubus_radiustpd_device::radiustpd_w)));
 	nubus().install_device(slotspace+0x980000, slotspace+0x9effff, read32s_delegate(*this, FUNC(nubus_radiustpd_device::radiustpd_r)), write32s_delegate(*this, FUNC(nubus_radiustpd_device::radiustpd_w)));
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nubus_radiustpd_device::vbl_tick), this));
+	m_timer = timer_alloc(FUNC(nubus_radiustpd_device::vbl_tick), this);
 	m_timer->adjust(screen().time_until_pos(479, 0), 0);
 }
 

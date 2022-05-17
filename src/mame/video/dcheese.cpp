@@ -86,8 +86,8 @@ void dcheese_state::video_start()
 	m_dstbitmap = std::make_unique<bitmap_ind16>(DSTBITMAP_WIDTH, DSTBITMAP_HEIGHT);
 
 	// create timers
-	m_blitter_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dcheese_state::blitter_done), this));
-	m_signal_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dcheese_state::signal_irq), this));
+	m_blitter_timer = timer_alloc(FUNC(dcheese_state::blitter_done), this);
+	m_signal_irq_timer = timer_alloc(FUNC(dcheese_state::signal_irq), this);
 
 	// register for saving
 	save_item(NAME(m_blitter_color));

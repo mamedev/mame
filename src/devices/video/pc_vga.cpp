@@ -351,7 +351,7 @@ void vga_device::device_start()
 	save_item(NAME(vga.dac.color));
 	save_item(NAME(vga.dac.dirty));
 
-	m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vga_device::vblank_timer_cb),this));
+	m_vblank_timer = timer_alloc(FUNC(vga_device::vblank_timer_cb), this);
 }
 
 void svga_device::device_start()

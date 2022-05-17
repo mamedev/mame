@@ -245,7 +245,7 @@ void ti990_10_state::panel_write(uint8_t data)
 
 void ti990_10_state::machine_start()
 {
-	m_load_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ti990_10_state::clear_load), this));
+	m_load_timer = timer_alloc(FUNC(ti990_10_state::clear_load), this);
 
 #if 0
 	/* load specific ti990/12 rom page */

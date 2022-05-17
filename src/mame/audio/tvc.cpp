@@ -32,7 +32,7 @@ void tvc_sound_device::device_start()
 	m_write_sndint.resolve_safe();
 
 	m_stream = stream_alloc(0, 1, machine().sample_rate());
-	m_sndint_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tvc_sound_device::trigger_int), this));
+	m_sndint_timer = timer_alloc(FUNC(tvc_sound_device::trigger_int), this);
 }
 
 //-------------------------------------------------

@@ -102,7 +102,7 @@ TO DO :
 
 void tehkanwc_state::machine_start()
 {
-	m_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tehkanwc_state::reset_audiocpu), this));
+	m_reset_timer = timer_alloc(FUNC(tehkanwc_state::reset_audiocpu), this);
 
 	save_item(NAME(m_track0));
 	save_item(NAME(m_track1));

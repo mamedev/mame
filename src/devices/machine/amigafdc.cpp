@@ -86,7 +86,7 @@ void amiga_fdc_device::device_start()
 
 	floppy = nullptr;
 
-	t_gen = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(amiga_fdc_device::update_tick), this));
+	t_gen = timer_alloc(FUNC(amiga_fdc_device::update_tick), this);
 }
 
 void amiga_fdc_device::device_reset()

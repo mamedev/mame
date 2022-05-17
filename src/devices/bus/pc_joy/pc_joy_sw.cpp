@@ -24,7 +24,7 @@ pc_mssw_pad_device::pc_mssw_pad_device(const machine_config& mconfig, const char
 
 void pc_mssw_pad_device::device_start()
 {
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc_mssw_pad_device::timer_tick), this));
+	m_timer = timer_alloc(FUNC(pc_mssw_pad_device::timer_tick), this);
 }
 
 void pc_mssw_pad_device::device_reset()

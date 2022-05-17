@@ -729,8 +729,8 @@ void apple3_state::init_apple3()
 	m_via[1]->write_pb6(1);
 	m_via[1]->write_pb7(1);
 
-	m_scanstart = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apple3_state::scanstart_cb),this));
-	m_scanend = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apple3_state::scanend_cb),this));
+	m_scanstart = timer_alloc(FUNC(apple3_state::scanstart_cb), this);
+	m_scanend = timer_alloc(FUNC(apple3_state::scanend_cb), this);
 
 	apple3_update_memory();
 

@@ -305,9 +305,9 @@ void remote488_device::ieee488_ren(int state)
 
 void remote488_device::device_start()
 {
-	m_poll_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(remote488_device::process_input_msgs), this));
-	m_hb_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(remote488_device::heartbeat_tick), this));
-	m_ah_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(remote488_device::checkpoint_timeout_tick), this));
+	m_poll_timer = timer_alloc(FUNC(remote488_device::process_input_msgs), this);
+	m_hb_timer = timer_alloc(FUNC(remote488_device::heartbeat_tick), this);
+	m_ah_timer = timer_alloc(FUNC(remote488_device::checkpoint_timeout_tick), this);
 }
 
 void remote488_device::device_reset()

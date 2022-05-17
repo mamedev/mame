@@ -58,7 +58,7 @@ void psxrcnt_device::device_start()
 
 	for( n = 0; n < 3; n++ )
 	{
-		root_counter[ n ].timer = machine().scheduler().timer_alloc( timer_expired_delegate( FUNC( psxrcnt_device::timer_update ), this ) );
+		root_counter[ n ].timer = timer_alloc( FUNC( psxrcnt_device::timer_update ), this );
 		save_item(NAME(root_counter[ n ].n_count), n);
 		save_item(NAME(root_counter[ n ].n_mode), n);
 		save_item(NAME(root_counter[ n ].n_target), n);

@@ -403,7 +403,7 @@ void s11_state::machine_start()
 	save_item(NAME(m_row));
 	save_item(NAME(m_lamp_data));
 
-	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s11_state::irq_timer), this));
+	m_irq_timer = timer_alloc(FUNC(s11_state::irq_timer), this);
 	m_irq_timer->adjust(attotime::from_ticks(32,E_CLOCK),0);
 }
 

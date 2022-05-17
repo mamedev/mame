@@ -256,7 +256,7 @@ uint32_t gpworld_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 void gpworld_state::machine_start()
 {
-	m_irq_stop_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gpworld_state::irq_stop), this));
+	m_irq_stop_timer = timer_alloc(FUNC(gpworld_state::irq_stop), this);
 }
 
 

@@ -80,7 +80,7 @@ void r10788_device::device_start()
 	save_item(NAME(m_io_counter));
 	save_item(NAME(m_scan_counter));
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(r10788_device::display_update), this));
+	m_timer = timer_alloc(FUNC(r10788_device::display_update), this);
 	// recurring timer every 36 cycles
 	m_timer->adjust(clocks_to_attotime(36), 0, clocks_to_attotime(36));
 }

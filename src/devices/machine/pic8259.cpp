@@ -428,7 +428,7 @@ void pic8259_device::device_start()
 
 	m_inta_sequence = 0;
 
-	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pic8259_device::irq_timer_tick), this));
+	m_irq_timer = timer_alloc(FUNC(pic8259_device::irq_timer_tick), this);
 }
 
 

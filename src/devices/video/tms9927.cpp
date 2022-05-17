@@ -89,8 +89,8 @@ void tms9927_device::device_start()
 	m_write_hsyn.resolve();
 
 	// allocate timers
-	m_vsync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tms9927_device::toggle_vsync), this));
-	m_hsync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tms9927_device::toggle_hsync), this));
+	m_vsync_timer = timer_alloc(FUNC(tms9927_device::toggle_vsync), this);
+	m_hsync_timer = timer_alloc(FUNC(tms9927_device::toggle_hsync), this);
 
 	// register for state saving
 	save_item(NAME(m_reg));

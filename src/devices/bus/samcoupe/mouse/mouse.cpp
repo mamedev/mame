@@ -64,7 +64,7 @@ sam_mouse_device::sam_mouse_device(const machine_config &mconfig, const char *ta
 void sam_mouse_device::device_start()
 {
 	// allocate timer
-	m_reset = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sam_mouse_device::reset_tick), this));
+	m_reset = timer_alloc(FUNC(sam_mouse_device::reset_tick), this);
 
 	// register for savestates
 	save_item(NAME(m_mouse_index));

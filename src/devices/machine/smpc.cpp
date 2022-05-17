@@ -285,10 +285,10 @@ void smpc_hle_device::device_start()
 	save_item(NAME(m_rtc_data));
 	save_item(NAME(m_smem));
 
-	m_cmd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(smpc_hle_device::handle_command), this));
-	m_rtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(smpc_hle_device::handle_rtc_increment), this));
-	m_intback_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(smpc_hle_device::intback_continue_request), this));
-	m_sndres_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(smpc_hle_device::sound_reset), this));
+	m_cmd_timer = timer_alloc(FUNC(smpc_hle_device::handle_command), this);
+	m_rtc_timer = timer_alloc(FUNC(smpc_hle_device::handle_rtc_increment), this);
+	m_intback_timer = timer_alloc(FUNC(smpc_hle_device::intback_continue_request), this);
+	m_sndres_timer = timer_alloc(FUNC(smpc_hle_device::sound_reset), this);
 
 	m_rtc_data[0] = DectoBCD(systime.local_time.year / 100);
 	m_rtc_data[1] = DectoBCD(systime.local_time.year % 100);

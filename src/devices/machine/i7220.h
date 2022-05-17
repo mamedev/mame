@@ -169,7 +169,6 @@ private:
 	void update_drq();
 
 	void start_command(int cmd);
-	void general_continue();
 	void command_end(bool success);
 
 	void command_fail_start();

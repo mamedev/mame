@@ -644,7 +644,7 @@ void mos6526_device::device_start()
 	// allocate timer
 	if (m_tod_clock != 0)
 	{
-		m_tod_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mos6526_device::advance_tod_clock), this));
+		m_tod_timer = timer_alloc(FUNC(mos6526_device::advance_tod_clock), this);
 		m_tod_timer->adjust(attotime::from_hz(m_tod_clock), 0, attotime::from_hz(m_tod_clock));
 	}
 

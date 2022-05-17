@@ -324,7 +324,7 @@ void mccs1850_device::device_start()
 	nuc_cb.resolve();
 
 	// allocate timers
-	m_clock_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mccs1850_device::advance_seconds), this));
+	m_clock_timer = timer_alloc(FUNC(mccs1850_device::advance_seconds), this);
 	m_clock_timer->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
 
 	// state saving

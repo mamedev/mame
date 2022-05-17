@@ -126,7 +126,7 @@ void k053260_device::device_start()
 	for (int i = 0; i < 4; i++)
 		m_voice[i].voice_start(i);
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(k053260_device::update_state_outputs), this));
+	m_timer = timer_alloc(FUNC(k053260_device::update_state_outputs), this);
 }
 
 

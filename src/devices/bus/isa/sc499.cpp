@@ -332,8 +332,8 @@ void sc499_device::device_start()
 
 	LOGMASKED(LOG_LEVEL1, "%s: start sc499", cpu_context());
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sc499_device::timer_func), this));
-	m_timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sc499_device::timer_func), this));
+	m_timer = timer_alloc(FUNC(sc499_device::timer_func), this);
+	m_timer1 = timer_alloc(FUNC(sc499_device::timer_func), this);
 
 	m_installed = false;
 

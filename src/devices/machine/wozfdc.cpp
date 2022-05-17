@@ -79,8 +79,8 @@ void wozfdc_device::device_start()
 {
 	m_rom_p6 = machine().root_device().memregion(this->subtag(DISKII_P6_REGION).c_str())->base();
 
-	timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wozfdc_device::generic_tick), this));
-	delay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wozfdc_device::delayed_tick), this));
+	timer = timer_alloc(FUNC(wozfdc_device::generic_tick), this);
+	delay_timer = timer_alloc(FUNC(wozfdc_device::delayed_tick), this);
 
 	save_item(NAME(last_6502_write));
 	save_item(NAME(mode_write));

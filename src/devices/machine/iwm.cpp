@@ -34,7 +34,7 @@ void iwm_device::device_start()
 {
 	applefdintf_device::device_start();
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(iwm_device::update_timer_tick), this));
+	m_timer = timer_alloc(FUNC(iwm_device::update_timer_tick), this);
 	save_item(NAME(m_last_sync));
 	save_item(NAME(m_next_state_change));
 	save_item(NAME(m_sync_update));

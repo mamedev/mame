@@ -50,7 +50,7 @@ ioport_constructor null_modem_device::device_input_ports() const
 
 void null_modem_device::device_start()
 {
-	m_timer_poll = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(null_modem_device::update_queue), this));
+	m_timer_poll = timer_alloc(FUNC(null_modem_device::update_queue), this);
 }
 
 WRITE_LINE_MEMBER(null_modem_device::update_serial)

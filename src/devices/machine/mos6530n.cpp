@@ -184,7 +184,7 @@ void mos6530_device_base::device_start()
 	m_out_pb_cb.resolve_all_safe();
 
 	// allocate timer
-	t_gen = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mos6530_device_base::update), this));
+	t_gen = timer_alloc(FUNC(mos6530_device_base::update), this);
 
 	// state saving
 	save_item(NAME(m_pa_in));

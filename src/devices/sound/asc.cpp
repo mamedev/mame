@@ -66,7 +66,7 @@ void asc_device::device_start()
 
 	memset(m_regs, 0, sizeof(m_regs));
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(asc_device::delayed_stream_update), this));
+	m_timer = timer_alloc(FUNC(asc_device::delayed_stream_update), this);
 
 	save_item(NAME(m_fifo_a_rdptr));
 	save_item(NAME(m_fifo_b_rdptr));

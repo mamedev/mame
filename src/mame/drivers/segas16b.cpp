@@ -1267,7 +1267,7 @@ void segas16b_state::machine_start()
 {
 	m_lamps.resolve();
 
-	m_i8751_sync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(segas16b_state::i8751_sync), this));
+	m_i8751_sync_timer = timer_alloc(FUNC(segas16b_state::i8751_sync), this);
 }
 
 //-------------------------------------------------
@@ -9674,7 +9674,7 @@ void segas16b_state::init_generic_korean()
 	m_segaic16vid->m_display_enable = 1;
 
 	// allocate a sound timer
-	emu_timer *timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(segas16b_state::atomicp_sound_irq), this));
+	emu_timer *timer = timer_alloc(FUNC(segas16b_state::atomicp_sound_irq), this);
 	timer->adjust(attotime::from_hz(10000), 0, attotime::from_hz(10000));
 }
 void segas16b_state::init_lockonph()

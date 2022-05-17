@@ -44,7 +44,7 @@ nt7534_device::nt7534_device(const machine_config &mconfig, device_type type, co
 
 void nt7534_device::device_start()
 {
-	m_busy_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nt7534_device::clear_busy_flag), this));
+	m_busy_timer = timer_alloc(FUNC(nt7534_device::clear_busy_flag), this);
 
 	m_pixel_update_cb.resolve();
 

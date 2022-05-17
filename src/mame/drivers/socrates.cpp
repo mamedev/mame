@@ -333,10 +333,10 @@ void socrates_state::kbmcu_sim_fifo_head_clear()
 
 void socrates_state::machine_start()
 {
-	m_kbmcu_sim_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(socrates_state::kbmcu_sim_cb), this));
+	m_kbmcu_sim_timer = timer_alloc(FUNC(socrates_state::kbmcu_sim_cb), this);
 	m_kbmcu_sim_timer->adjust(attotime::from_hz((XTAL(21'477'272)/6)/3000)); // timer rate is a massive guess, depends on instructions per loop of mcu
-	m_clear_speech_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(socrates_state::clear_speech_cb), this));
-	m_clear_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(socrates_state::clear_irq_cb), this));
+	m_clear_speech_timer = timer_alloc(FUNC(socrates_state::clear_speech_cb), this);
+	m_clear_irq_timer = timer_alloc(FUNC(socrates_state::clear_irq_cb), this);
 	save_item(NAME(m_rom_bank));
 	save_item(NAME(m_ram_bank));
 	save_item(NAME(m_scroll_offset));

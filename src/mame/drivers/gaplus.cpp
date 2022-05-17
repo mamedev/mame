@@ -484,8 +484,8 @@ void gaplus_state::out_lamps1(uint8_t data)
 
 void gaplus_base_state::machine_start()
 {
-	m_namcoio0_run_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gaplus_base_state::namcoio0_run), this));
-	m_namcoio1_run_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gaplus_base_state::namcoio1_run), this));
+	m_namcoio0_run_timer = timer_alloc(FUNC(gaplus_base_state::namcoio0_run), this);
+	m_namcoio1_run_timer = timer_alloc(FUNC(gaplus_base_state::namcoio1_run), this);
 
 	save_item(NAME(m_main_irq_mask));
 	save_item(NAME(m_sub_irq_mask));

@@ -734,8 +734,8 @@ void tms9928a_device::device_start()
 	/* back bitmap */
 	m_tmpbmp.allocate(m_total_horz, TOTAL_VERT_PAL);
 
-	m_line_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tms9928a_device::update_line), this));
-	m_gromclk_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tms9928a_device::clock_grom), this));
+	m_line_timer = timer_alloc(FUNC(tms9928a_device::update_line), this);
+	m_gromclk_timer = timer_alloc(FUNC(tms9928a_device::clock_grom), this);
 
 	m_INT = 1; // force initial update
 

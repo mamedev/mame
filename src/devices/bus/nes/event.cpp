@@ -61,7 +61,7 @@ void nes_event_device::device_start()
 {
 	nes_sxrom_device::device_start();
 
-	event_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_event_device::event_tick), this));
+	event_timer = timer_alloc(FUNC(nes_event_device::event_tick), this);
 	event_timer->adjust(attotime::never);
 
 	save_item(NAME(m_nwc_init));
@@ -87,7 +87,7 @@ void nes_event2_device::device_start()
 {
 	mmc3_start();
 
-	event_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_event2_device::event_tick), this));
+	event_timer = timer_alloc(FUNC(nes_event2_device::event_tick), this);
 	event_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_tqrom_mode));

@@ -87,7 +87,7 @@ void midway_cheap_squeak_deluxe_device::device_start()
 	save_item(NAME(m_status));
 	save_item(NAME(m_dacval));
 
-	m_pia_sync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midway_cheap_squeak_deluxe_device::sync_pia), this));
+	m_pia_sync_timer = timer_alloc(FUNC(midway_cheap_squeak_deluxe_device::sync_pia), this);
 }
 
 //-------------------------------------------------

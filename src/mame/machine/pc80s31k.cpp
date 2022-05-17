@@ -324,7 +324,7 @@ TIMER_CALLBACK_MEMBER(pc80s31_device::tc_zero_tick)
 
 void pc80s31_device::device_start()
 {
-	m_tc_zero_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc80s31_device::tc_zero_tick), this));
+	m_tc_zero_timer = timer_alloc(FUNC(pc80s31_device::tc_zero_tick), this);
 
 	save_item(NAME(m_irq_vector));
 }

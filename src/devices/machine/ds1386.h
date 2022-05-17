@@ -172,8 +172,6 @@ protected:
 	void time_of_day_alarm();
 	void watchdog_alarm();
 
-	void advance_hundredths();
-
 	void copy_ram_to_registers();
 	void copy_registers_to_ram();
 

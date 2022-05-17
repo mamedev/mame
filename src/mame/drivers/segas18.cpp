@@ -162,7 +162,7 @@ void segas18_state::machine_start()
 {
 	m_gun_recoil.resolve(); // lghost
 	m_soundbank->configure_entries(0, 256, memregion("soundcpu")->base(), 0x2000);
-	m_init_boost_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(segas18_state::initial_boost), this));
+	m_init_boost_timer = timer_alloc(FUNC(segas18_state::initial_boost), this);
 }
 
 void segas18_state::machine_reset()

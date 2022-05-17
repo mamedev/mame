@@ -188,9 +188,9 @@ void zx8302_device::device_start()
 	m_in_raw2_cb.resolve_safe(0);
 
 	// allocate timers
-	m_baudx4_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(zx8302_device::baudx4_tick), this));
-	m_rtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(zx8302_device::rtc_tick), this));
-	m_gap_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(zx8302_device::trigger_gap_int), this));
+	m_baudx4_timer = timer_alloc(FUNC(zx8302_device::baudx4_tick), this);
+	m_rtc_timer = timer_alloc(FUNC(zx8302_device::rtc_tick), this);
+	m_gap_timer = timer_alloc(FUNC(zx8302_device::trigger_gap_int), this);
 
 	m_rtc_timer->adjust(attotime::zero, 0, attotime::from_hz(m_rtc_clock / 32768));
 	m_gap_timer->adjust(attotime::zero, 0, attotime::from_msec(31));

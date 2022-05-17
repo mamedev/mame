@@ -840,7 +840,7 @@ void wgp_state::machine_start()
 {
 	m_z80bank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 
-	m_cpub_int6_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wgp_state::trigger_cpu_b_int6), this));
+	m_cpub_int6_timer = timer_alloc(FUNC(wgp_state::trigger_cpu_b_int6), this);
 
 	save_item(NAME(m_cpua_ctrl));
 	save_item(NAME(m_port_sel));

@@ -447,7 +447,7 @@ void floppy_image_device::device_start()
 	stp = 1;
 	wpt = 0;
 	dskchg = exists() ? 1 : 0;
-	index_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(floppy_image_device::index_resync), this));
+	index_timer = timer_alloc(FUNC(floppy_image_device::index_resync), this);
 	image_dirty = false;
 	ready = true;
 	ready_counter = 0;

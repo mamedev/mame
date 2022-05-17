@@ -33,7 +33,7 @@ void saa1043_device::device_start()
 
 	m_outputs.resolve_all_safe();
 
-	m_timers[OUT_V2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(saa1043_device::toggle_v2), this));
+	m_timers[OUT_V2] = timer_alloc(FUNC(saa1043_device::toggle_v2), this);
 	m_timers[OUT_V2]->adjust(m_h * 6, 1);
 }
 

@@ -122,7 +122,7 @@ void acefruit_state::machine_start()
 
 void acefruit_state::video_start()
 {
-	m_refresh_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(acefruit_state::refresh_tick), this));
+	m_refresh_timer = timer_alloc(FUNC(acefruit_state::refresh_tick), this);
 }
 
 INTERRUPT_GEN_MEMBER(acefruit_state::vblank)

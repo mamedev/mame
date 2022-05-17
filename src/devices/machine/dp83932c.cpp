@@ -82,7 +82,7 @@ void dp83932c_device::device_start()
 {
 	m_out_int.resolve();
 
-	m_command = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dp83932c_device::command), this));
+	m_command = timer_alloc(FUNC(dp83932c_device::command), this);
 
 	save_item(NAME(m_int_state));
 	save_item(NAME(m_reg));

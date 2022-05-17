@@ -62,8 +62,8 @@ void wd1000_device::device_start()
 	m_drq_cb.resolve();
 
 	// Allocate timers
-	m_seek_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wd1000_device::update_seek), this));
-	m_drq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wd1000_device::delayed_drq), this));
+	m_seek_timer = timer_alloc(FUNC(wd1000_device::update_seek), this);
+	m_drq_timer = timer_alloc(FUNC(wd1000_device::delayed_drq), this);
 
 	// Empty buffer.
 	m_buffer_index = 0;

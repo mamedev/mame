@@ -683,7 +683,7 @@ void pioneer_ldv4200hle_device::device_start()
 	m_serial_tx.resolve_safe();
 
 	// allocate timers
-	m_vbi_fetch = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pioneer_ldv4200hle_device::process_vbi_data), this));
+	m_vbi_fetch = timer_alloc(FUNC(pioneer_ldv4200hle_device::process_vbi_data), this);
 
 	// register state saving
 	save_item(NAME(m_cmd_buffer));

@@ -440,9 +440,9 @@ TIMER_CALLBACK_MEMBER(abc80_state::clear_keyboard)
 void abc80_state::machine_start()
 {
 	// start timers
-	m_cassette_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(abc80_state::cassette_update), this));
+	m_cassette_timer = timer_alloc(FUNC(abc80_state::cassette_update), this);
 	m_cassette_timer->adjust(attotime::from_hz(44100), 0, attotime::from_hz(44100));
-	m_keyboard_clear_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(abc80_state::clear_keyboard), this));
+	m_keyboard_clear_timer = timer_alloc(FUNC(abc80_state::clear_keyboard), this);
 
 	// register for state saving
 	save_item(NAME(m_key_data));

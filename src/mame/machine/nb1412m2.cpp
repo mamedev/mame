@@ -158,9 +158,9 @@ void nb1412m2_device::device_start()
 	save_item(NAME(m_const90));
 	save_item(NAME(m_timer_rate));
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nb1412m2_device::main_timer_tick), this));
+	m_timer = timer_alloc(FUNC(nb1412m2_device::main_timer_tick), this);
 	m_timer->adjust(attotime::never);
-	m_dac_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nb1412m2_device::update_dac), this));
+	m_dac_timer = timer_alloc(FUNC(nb1412m2_device::update_dac), this);
 
 	m_dac_cb.resolve_safe();
 }

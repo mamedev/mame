@@ -168,9 +168,9 @@ void atari_vad_device::device_start()
 	m_scanline_int_cb.resolve_safe();
 
 	// allocate timers
-	m_scanline_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(atari_vad_device::scanline_int), this));
-	m_tilerow_update_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(atari_vad_device::update_tilerow), this));
-	m_eof_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(atari_vad_device::eof_update), this));
+	m_scanline_int_timer = timer_alloc(FUNC(atari_vad_device::scanline_int), this);
+	m_tilerow_update_timer = timer_alloc(FUNC(atari_vad_device::update_tilerow), this);
+	m_eof_timer = timer_alloc(FUNC(atari_vad_device::eof_update), this);
 
 	// register for save states
 	save_item(NAME(m_palette_bank));          // which palette bank is enabled

@@ -69,7 +69,7 @@ void sed1500_device::device_start()
 	m_write_segs.resolve_safe();
 
 	// timer
-	m_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sed1500_device::update_segs), this));
+	m_lcd_timer = timer_alloc(FUNC(sed1500_device::update_segs), this);
 	attotime period = attotime::from_hz(clock() / 64);
 	m_lcd_timer->adjust(period, 0, period);
 

@@ -274,7 +274,7 @@ void nightmare_state::machine_start()
 {
 	save_item(NAME(m_reset));
 
-	m_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nightmare_state::clear_reset), this));
+	m_reset_timer = timer_alloc(FUNC(nightmare_state::clear_reset), this);
 }
 
 /* Machine Reset */

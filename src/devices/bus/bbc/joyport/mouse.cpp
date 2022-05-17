@@ -75,7 +75,7 @@ bbcmc_mouse_device::bbcmc_mouse_device(const machine_config &mconfig, const char
 
 void bbcmc_mouse_device::device_start()
 {
-	m_mouse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bbcmc_mouse_device::update), this));
+	m_mouse_timer = timer_alloc(FUNC(bbcmc_mouse_device::update), this);
 }
 
 

@@ -310,7 +310,7 @@ void vic3_device::device_start()
 	}
 
 
-	m_lightpen_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vic3_device::timer_timeout), this));
+	m_lightpen_timer = timer_alloc(FUNC(vic3_device::timer_timeout), this);
 }
 
 //-------------------------------------------------

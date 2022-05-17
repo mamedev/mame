@@ -605,7 +605,7 @@ void itech8_state::nmi_ack_w(uint8_t data)
 MACHINE_START_MEMBER(itech8_state,sstrike)
 {
 	/* we need to update behind the beam as well */
-	m_behind_beam_update_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(itech8_state::behind_the_beam_update), this));
+	m_behind_beam_update_timer = timer_alloc(FUNC(itech8_state::behind_the_beam_update), this);
 	m_behind_beam_update_timer->adjust(m_screen->time_until_pos(0), 32);
 
 	itech8_state::machine_start();
@@ -633,8 +633,8 @@ void itech8_state::machine_start()
 		m_fixed->set_entry(0);
 	}
 
-	m_irq_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(itech8_state::irq_off), this));
-	m_blitter_done_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(itech8_state::blitter_done), this));
+	m_irq_off_timer = timer_alloc(FUNC(itech8_state::irq_off), this);
+	m_blitter_done_timer = timer_alloc(FUNC(itech8_state::blitter_done), this);
 
 	save_item(NAME(m_grom_bank));
 	save_item(NAME(m_blitter_int));
@@ -648,7 +648,7 @@ void grmatch_state::machine_start()
 {
 	itech8_state::machine_start();
 
-	m_palette_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(grmatch_state::palette_update), this));
+	m_palette_timer = timer_alloc(FUNC(grmatch_state::palette_update), this);
 }
 
 void itech8_state::machine_reset()
@@ -2686,7 +2686,7 @@ void grmatch_state::driver_init()
 
 void itech8_state::init_slikshot()
 {
-	m_delayed_z80_control_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(itech8_state::delayed_z80_control_w), this));
+	m_delayed_z80_control_timer = timer_alloc(FUNC(itech8_state::delayed_z80_control_w), this);
 
 	save_item(NAME(m_z80_ctrl));
 	save_item(NAME(m_z80_port_val));

@@ -214,7 +214,7 @@ void hyhoo_state::hyhoo_gfxdraw()
 
 void hyhoo_state::video_start()
 {
-	m_blitter_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hyhoo_state::clear_busy_flag), this));
+	m_blitter_timer = timer_alloc(FUNC(hyhoo_state::clear_busy_flag), this);
 
 	m_screen->register_screen_bitmap(m_tmpbitmap);
 	save_item(NAME(m_blitter_destx));

@@ -72,7 +72,7 @@ void stfight_state::machine_start()
 	m_main_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
 	m_main_bank->set_entry(0);
 
-	m_int1_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(stfight_state::rst08_tick), this));
+	m_int1_timer = timer_alloc(FUNC(stfight_state::rst08_tick), this);
 
 	save_item(NAME(m_coin_state));
 	save_item(NAME(m_fm_data));

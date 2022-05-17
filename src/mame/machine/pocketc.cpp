@@ -22,7 +22,7 @@ TIMER_CALLBACK_MEMBER(pocketc_state::power_up_done)
 void pocketc_state::machine_start()
 {
 	m_cpu_nvram->set_base(m_maincpu->internal_ram(), 96);
-	m_power_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pocketc_state::power_up_done), this));
+	m_power_timer = timer_alloc(FUNC(pocketc_state::power_up_done), this);
 }
 
 void pocketc_state::machine_reset()

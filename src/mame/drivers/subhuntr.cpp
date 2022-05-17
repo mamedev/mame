@@ -105,7 +105,7 @@ private:
 
 void subhuntr_state::machine_start()
 {
-	m_video_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(subhuntr_state::video_callback), this));
+	m_video_timer = timer_alloc(FUNC(subhuntr_state::video_callback), this);
 	m_tilemap = &machine().tilemap().create(*m_gfx, tilemap_get_info_delegate(*this, FUNC(subhuntr_state::tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 8);
 	m_tilemap->set_transparent_pen(0);
 

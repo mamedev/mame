@@ -98,7 +98,7 @@ TILE_GET_INFO_MEMBER(tank8_state::get_tile_info)
 
 void tank8_state::video_start()
 {
-	m_collision_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tank8_state::set_collision), this));
+	m_collision_timer = timer_alloc(FUNC(tank8_state::set_collision), this);
 
 	m_screen->register_screen_bitmap(m_helper1);
 	m_screen->register_screen_bitmap(m_helper2);

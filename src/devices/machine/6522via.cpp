@@ -267,11 +267,11 @@ void via6522_device::device_start()
 	m_sr = 0;
 
 	m_time2 = m_time1 = machine().time();
-	m_t1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(via6522_device::t1_tick), this));
-	m_t2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(via6522_device::t2_tick), this));
-	m_ca2_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(via6522_device::ca2_tick), this));
-	m_shift_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(via6522_device::shift_tick), this));
-	m_shift_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(via6522_device::shift_irq_tick), this));
+	m_t1 = timer_alloc(FUNC(via6522_device::t1_tick), this);
+	m_t2 = timer_alloc(FUNC(via6522_device::t2_tick), this);
+	m_ca2_timer = timer_alloc(FUNC(via6522_device::ca2_tick), this);
+	m_shift_timer = timer_alloc(FUNC(via6522_device::shift_tick), this);
+	m_shift_irq_timer = timer_alloc(FUNC(via6522_device::shift_irq_tick), this);
 
 	/* save state register */
 	save_item(NAME(m_in_a));

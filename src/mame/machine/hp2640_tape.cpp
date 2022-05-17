@@ -253,8 +253,8 @@ void hp2640_tape_device::device_start()
 	m_led0_handler.resolve_safe();
 	m_led1_handler.resolve_safe();
 
-	m_gap_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp2640_tape_device::gap_timer_tick), this));
-	m_cell_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp2640_tape_device::cell_timer_tick), this));
+	m_gap_timer = timer_alloc(FUNC(hp2640_tape_device::gap_timer_tick), this);
+	m_cell_timer = timer_alloc(FUNC(hp2640_tape_device::cell_timer_tick), this);
 
 	save_item(NAME(m_selected_drive));
 	save_item(NAME(m_cmd_reg));

@@ -201,8 +201,8 @@ void hle_device::device_add_mconfig(machine_config &config)
 void hle_device::device_start()
 {
 	m_leds.resolve();
-	m_click_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hle_device::click_off), this));
-	m_beep_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hle_device::beep_off), this));
+	m_click_timer = timer_alloc(FUNC(hle_device::click_off), this);
+	m_beep_timer = timer_alloc(FUNC(hle_device::beep_off), this);
 
 	save_item(NAME(m_make_count));
 	save_item(NAME(m_keyclick));

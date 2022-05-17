@@ -125,7 +125,7 @@ void pit68230_device::device_start()
 	m_pirq_out_cb.resolve_safe();
 
 	// Timers
-	pit_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pit68230_device::tick_clock), this));
+	pit_timer = timer_alloc(FUNC(pit68230_device::tick_clock), this);
 
 	// state saving
 	save_item(NAME(m_pgcr));

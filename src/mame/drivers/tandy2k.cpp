@@ -924,8 +924,8 @@ void tandy2k_state::machine_start()
 
 	program.install_ram(0x00000, ram_size - 1, ram);
 
-	m_mouse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tandy2k_state::update_mouse), this));
-	m_mcu_delay = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tandy2k_state::mcu_delay_cb), this));
+	m_mouse_timer = timer_alloc(FUNC(tandy2k_state::update_mouse), this);
+	m_mcu_delay = timer_alloc(FUNC(tandy2k_state::mcu_delay_cb), this);
 
 	// register for state saving
 	save_item(NAME(m_dma_mux));

@@ -271,9 +271,9 @@ void victor_9000_fdc_device::device_start()
 	m_lbrdy_cb.resolve_safe();
 
 	// allocate timer
-	t_gen = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(victor_9000_fdc_device::gen_tick), this));
-	t_tach0 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(victor_9000_fdc_device::tach0_tick), this));
-	t_tach1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(victor_9000_fdc_device::tach1_tick), this));
+	t_gen = timer_alloc(FUNC(victor_9000_fdc_device::gen_tick), this);
+	t_tach0 = timer_alloc(FUNC(victor_9000_fdc_device::tach0_tick), this);
+	t_tach1 = timer_alloc(FUNC(victor_9000_fdc_device::tach1_tick), this);
 
 	// state saving
 	save_item(NAME(m_da));

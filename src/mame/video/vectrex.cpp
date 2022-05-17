@@ -233,12 +233,12 @@ void vectrex_base_state::video_start()
 
 	vector_add_point_function = &vectrex_base_state::add_point;
 
-	m_refresh = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vectrex_base_state::refresh), this));
-	m_zero_integrators_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vectrex_base_state::zero_integrators), this));
-	m_update_analog_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vectrex_base_state::update_analog), this));
-	m_update_blank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vectrex_base_state::update_blank), this));
-	m_update_mux_enable_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vectrex_base_state::update_mux_enable), this));
-	m_update_ramp_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vectrex_base_state::update_ramp), this));
+	m_refresh = timer_alloc(FUNC(vectrex_base_state::refresh), this);
+	m_zero_integrators_timer = timer_alloc(FUNC(vectrex_base_state::zero_integrators), this);
+	m_update_analog_timer = timer_alloc(FUNC(vectrex_base_state::update_analog), this);
+	m_update_blank_timer = timer_alloc(FUNC(vectrex_base_state::update_blank), this);
+	m_update_mux_enable_timer = timer_alloc(FUNC(vectrex_base_state::update_mux_enable), this);
+	m_update_ramp_timer = timer_alloc(FUNC(vectrex_base_state::update_ramp), this);
 
 	m_display_start = 0;
 	m_display_end = 0;
@@ -256,18 +256,18 @@ void vectrex_state::video_start()
 
 	m_imager_freq = 1;
 
-	m_imager_eye_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vectrex_state::imager_eye), this));
+	m_imager_eye_timer = timer_alloc(FUNC(vectrex_state::imager_eye), this);
 	m_imager_eye_timer->adjust(attotime::from_hz(m_imager_freq), 2, attotime::from_hz(m_imager_freq));
 
 	for (int i = 0; i < 3; i++)
 	{
-		m_imager_color_timers[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vectrex_state::imager_change_color), this));
+		m_imager_color_timers[i] = timer_alloc(FUNC(vectrex_state::imager_change_color), this);
 		m_imager_color_timers[i]->adjust(attotime::never);
 	}
 
-	m_imager_level_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vectrex_state::update_level), this));
+	m_imager_level_timer = timer_alloc(FUNC(vectrex_state::update_level), this);
 
-	m_lp_t = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vectrex_state::lightpen_trigger), this));
+	m_lp_t = timer_alloc(FUNC(vectrex_state::lightpen_trigger), this);
 }
 
 

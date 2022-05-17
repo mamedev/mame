@@ -191,9 +191,9 @@ void hp9895_device::device_start()
 	save_item(NAME(m_hiden));
 	save_item(NAME(m_mgnena));
 
-	m_timeout_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp9895_device::timeout_timer_tick), this));
-	m_byte_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp9895_device::byte_timer_tick), this));
-	m_half_bit_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp9895_device::half_bit_timer_tick), this));
+	m_timeout_timer = timer_alloc(FUNC(hp9895_device::timeout_timer_tick), this);
+	m_byte_timer = timer_alloc(FUNC(hp9895_device::byte_timer_tick), this);
+	m_half_bit_timer = timer_alloc(FUNC(hp9895_device::half_bit_timer_tick), this);
 
 	for (auto& d : m_drives) {
 		d->get_device()->setup_ready_cb(floppy_image_device::ready_cb(&hp9895_device::floppy_ready_cb , this));

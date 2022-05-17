@@ -196,7 +196,7 @@ INPUT_PORTS_END
 void poly_state::machine_start()
 {
 	m_dat_bank = 0;
-	m_protect_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(poly_state::set_protect), this));
+	m_protect_timer = timer_alloc(FUNC(poly_state::set_protect), this);
 }
 
 

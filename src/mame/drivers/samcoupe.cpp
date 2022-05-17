@@ -545,7 +545,7 @@ void samcoupe_state::machine_start()
 	m_pages = m_ram->size() / 0x4000; // 16 or 32
 
 	/* schedule our video updates */
-	m_video_update_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(samcoupe_state::sam_video_update_callback), this));
+	m_video_update_timer = timer_alloc(FUNC(samcoupe_state::sam_video_update_callback), this);
 	m_video_update_timer->adjust(m_screen->time_until_pos(0, 0));
 
 	// register for save states
@@ -561,7 +561,7 @@ void samcoupe_state::machine_start()
 	machine().save().register_postload(save_prepost_delegate(FUNC(samcoupe_state::postload), this));
 
 	// allocate machine timers
-	m_irq_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(samcoupe_state::irq_off), this));
+	m_irq_off_timer = timer_alloc(FUNC(samcoupe_state::irq_off), this);
 	m_irq_off_timer->adjust(attotime::never);
 }
 

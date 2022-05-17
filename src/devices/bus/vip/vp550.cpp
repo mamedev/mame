@@ -67,7 +67,7 @@ vp550_device::vp550_device(const machine_config &mconfig, const char *tag, devic
 void vp550_device::device_start()
 {
 	// allocate timers
-	m_sync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vp550_device::sync_tick), this));
+	m_sync_timer = timer_alloc(FUNC(vp550_device::sync_tick), this);
 	m_sync_timer->adjust(attotime::from_hz(50), 0, attotime::from_hz(50));
 	m_sync_timer->enable(0);
 }

@@ -182,7 +182,7 @@ void midtunit_video_device::device_start()
 	m_logged_rom.reset();
 	m_log_png = false;
 
-	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midtunit_video_device::dma_done), this));
+	m_dma_timer = timer_alloc(FUNC(midtunit_video_device::dma_done), this);
 
 	/* reset all the globals */
 	m_gfxbank_offset[0] = 0x000000;

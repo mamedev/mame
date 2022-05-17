@@ -232,7 +232,7 @@ void asterix_state::machine_start()
 	save_item(NAME(m_tilebanks));
 	save_item(NAME(m_spritebanks));
 
-	m_audio_nmi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(asterix_state::audio_nmi), this));
+	m_audio_nmi_timer = timer_alloc(FUNC(asterix_state::audio_nmi), this);
 }
 
 void asterix_state::machine_reset()

@@ -384,7 +384,7 @@ void imagetek_i4100_device::device_start()
 	m_gfxrom_size = m_gfxrom.bytes();
 
 	m_irq_cb.resolve_safe();
-	m_blit_done_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(imagetek_i4100_device::blit_done), this));
+	m_blit_done_timer = timer_alloc(FUNC(imagetek_i4100_device::blit_done), this);
 
 	m_spritelist = std::make_unique<sprite_t []>(0x1000 / 8);
 	m_sprite_end = m_spritelist.get();

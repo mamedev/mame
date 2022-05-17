@@ -197,7 +197,7 @@ MACHINE_START_MEMBER(tm990189_state,tm990_189)
 	m_digitsel = 0;
 	m_LED_state = 0;
 
-	m_load_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tm990189_state::clear_load), this));
+	m_load_timer = timer_alloc(FUNC(tm990189_state::clear_load), this);
 }
 
 MACHINE_START_MEMBER(tm990189_state,tm990_189_v)
@@ -504,7 +504,7 @@ tm990_189_rs232_image_device::tm990_189_rs232_image_device(const machine_config 
 
 void tm990_189_rs232_image_device::device_start()
 {
-	m_rs232_input_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tm990_189_rs232_image_device::rs232_input_tick), this));
+	m_rs232_input_timer = timer_alloc(FUNC(tm990_189_rs232_image_device::rs232_input_tick), this);
 }
 
 TIMER_CALLBACK_MEMBER(tm990_189_rs232_image_device::rs232_input_tick)

@@ -383,7 +383,7 @@ TIMER_CALLBACK_MEMBER(vidbrain_state::joystick_tick)
 void vidbrain_state::machine_start()
 {
 	// allocate timers
-	m_timer_ne555 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vidbrain_state::joystick_tick), this));
+	m_timer_ne555 = timer_alloc(FUNC(vidbrain_state::joystick_tick), this);
 
 	// register for state saving
 	save_item(NAME(m_keylatch));

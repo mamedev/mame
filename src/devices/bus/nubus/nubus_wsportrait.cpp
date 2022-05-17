@@ -100,7 +100,7 @@ void nubus_wsportrait_device::device_start()
 	nubus().install_device(slotspace+0x900000, slotspace+0x900000+VRAM_SIZE-1, read32s_delegate(*this, FUNC(nubus_wsportrait_device::vram_r)), write32s_delegate(*this, FUNC(nubus_wsportrait_device::vram_w)));
 	nubus().install_device(slotspace+0x80000, slotspace+0xeffff, read32s_delegate(*this, FUNC(nubus_wsportrait_device::wsportrait_r)), write32s_delegate(*this, FUNC(nubus_wsportrait_device::wsportrait_w)));
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nubus_wsportrait_device::vbl_tick), this));
+	m_timer = timer_alloc(FUNC(nubus_wsportrait_device::vbl_tick), this);
 	m_timer->adjust(screen().time_until_pos(869, 0), 0);
 }
 

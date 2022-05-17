@@ -114,7 +114,7 @@ void jmfb_device::device_start()
 
 	nubus().install_device(slotspace+0x200000, slotspace+0x2003ff, read32s_delegate(*this, FUNC(jmfb_device::mac_48gc_r)), write32s_delegate(*this, FUNC(jmfb_device::mac_48gc_w)));
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jmfb_device::vbl_tick), this));
+	m_timer = timer_alloc(FUNC(jmfb_device::vbl_tick), this);
 	m_screen = nullptr;    // can we look this up now?
 }
 

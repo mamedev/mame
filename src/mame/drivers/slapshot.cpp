@@ -391,7 +391,7 @@ void slapshot_state::machine_start()
 {
 	m_z80bank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 
-	m_int6_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(slapshot_state::trigger_int6), this));
+	m_int6_timer = timer_alloc(FUNC(slapshot_state::trigger_int6), this);
 }
 
 

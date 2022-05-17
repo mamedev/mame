@@ -161,7 +161,7 @@ void spacefb_state::start_interrupt_timer()
 
 void spacefb_state::machine_start()
 {
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spacefb_state::interrupt_callback), this));
+	m_interrupt_timer = timer_alloc(FUNC(spacefb_state::interrupt_callback), this);
 
 	save_item(NAME(m_sound_latch));
 }

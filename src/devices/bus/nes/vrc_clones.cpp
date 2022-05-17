@@ -140,7 +140,7 @@ void nes_2yudb_device::pcb_reset()
 void nes_900218_device::device_start()
 {
 	nes_konami_vrc2_device::device_start();
-	irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_900218_device::irq_timer_tick), this));
+	irq_timer = timer_alloc(FUNC(nes_900218_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -268,7 +268,7 @@ void nes_tf1201_device::device_start()
 void nes_th21311_device::device_start()
 {
 	nes_konami_vrc2_device::device_start();
-	irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nes_th21311_device::irq_timer_tick), this));
+	irq_timer = timer_alloc(FUNC(nes_th21311_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));

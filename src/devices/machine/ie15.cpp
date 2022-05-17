@@ -489,10 +489,10 @@ void ie15_device::device_start()
 	m_sdv_led.resolve();
 	m_prd_led.resolve();
 
-	m_hblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ie15_device::hblank_onoff_tick), this));
+	m_hblank_timer = timer_alloc(FUNC(ie15_device::hblank_onoff_tick), this);
 	m_hblank_timer->adjust(attotime::never);
 
-	m_beepoff_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ie15_device::ie15_beepoff), this));
+	m_beepoff_timer = timer_alloc(FUNC(ie15_device::ie15_beepoff), this);
 	m_video.ptr1 = m_video.ptr2 = m_latch = 0;
 
 	m_tmpbmp = std::make_unique<uint32_t[]>(IE15_TOTAL_HORZ * IE15_TOTAL_VERT);

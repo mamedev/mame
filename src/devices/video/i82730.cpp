@@ -81,7 +81,7 @@ void i82730_device::device_start()
 	m_update_row_cb.resolve();
 
 	// allocate row timer
-	m_row_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(i82730_device::row_update), this));
+	m_row_timer = timer_alloc(FUNC(i82730_device::row_update), this);
 }
 
 //-------------------------------------------------

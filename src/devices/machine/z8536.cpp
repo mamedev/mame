@@ -826,7 +826,7 @@ void cio_base_device::device_start()
 	}
 
 	// allocate timer
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cio_base_device::advance_counters), this));
+	m_timer = timer_alloc(FUNC(cio_base_device::advance_counters), this);
 	m_timer->adjust(attotime::from_hz(clock() / 2), 0, attotime::from_hz(clock() / 2));
 
 	// resolve callbacks

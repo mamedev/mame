@@ -275,8 +275,8 @@ static void wicat_floppies(device_slot_interface &device)
 
 void wicat_state::driver_start()
 {
-	m_kb_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wicat_state::poll_kb), this));
-	m_kb_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wicat_state::kb_serial_tick), this));
+	m_kb_timer = timer_alloc(FUNC(wicat_state::poll_kb), this);
+	m_kb_serial_timer = timer_alloc(FUNC(wicat_state::kb_serial_tick), this);
 }
 
 void wicat_state::machine_start()

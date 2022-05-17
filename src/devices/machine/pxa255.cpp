@@ -1501,21 +1501,21 @@ void pxa255_periphs_device::device_start()
 	{
 		if (index != 3)
 		{
-			m_dma_regs.timer[index] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pxa255_periphs_device::dma_end_tick), this));
+			m_dma_regs.timer[index] = timer_alloc(FUNC(pxa255_periphs_device::dma_end_tick), this);
 		}
 		else
 		{
-			m_dma_regs.timer[index] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pxa255_periphs_device::audio_dma_end_tick), this));
+			m_dma_regs.timer[index] = timer_alloc(FUNC(pxa255_periphs_device::audio_dma_end_tick), this);
 		}
 	}
 
 	for (int index = 0; index < 4; index++)
 	{
-		m_ostimer_regs.timer[index] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pxa255_periphs_device::ostimer_match_tick), this));
+		m_ostimer_regs.timer[index] = timer_alloc(FUNC(pxa255_periphs_device::ostimer_match_tick), this);
 	}
 
-	m_lcd_regs.dma[0].eof = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pxa255_periphs_device::lcd_dma_eof_tick), this));
-	m_lcd_regs.dma[1].eof = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pxa255_periphs_device::lcd_dma_eof_tick), this));
+	m_lcd_regs.dma[0].eof = timer_alloc(FUNC(pxa255_periphs_device::lcd_dma_eof_tick), this);
+	m_lcd_regs.dma[1].eof = timer_alloc(FUNC(pxa255_periphs_device::lcd_dma_eof_tick), this);
 
 	m_lcd_palette = make_unique_clear<uint32_t[]>(0x100);
 	m_lcd_framebuffer = make_unique_clear<uint8_t[]>(0x100000);
@@ -1528,7 +1528,7 @@ void pxa255_periphs_device::device_start()
 	m_gpio1_r.resolve_safe(0xffffffff);
 	m_gpio2_r.resolve_safe(0xffffffff);
 
-	m_rtc_regs.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pxa255_periphs_device::rtc_tick), this));
+	m_rtc_regs.timer = timer_alloc(FUNC(pxa255_periphs_device::rtc_tick), this);
 }
 
 void pxa255_periphs_device::device_reset()

@@ -155,9 +155,9 @@ void pioneer_ldv1000_device::device_start()
 	laserdisc_device::device_start();
 
 	// allocate timers
-	m_multitimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pioneer_ldv1000_device::multijump_tick), this));
-	m_vsync_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pioneer_ldv1000_device::vsync_off), this));
-	m_process_vbi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pioneer_ldv1000_device::process_vbi_data), this));
+	m_multitimer = timer_alloc(FUNC(pioneer_ldv1000_device::multijump_tick), this);
+	m_vsync_off_timer = timer_alloc(FUNC(pioneer_ldv1000_device::vsync_off), this);
+	m_process_vbi_timer = timer_alloc(FUNC(pioneer_ldv1000_device::process_vbi_data), this);
 
 	m_command_strobe_cb.resolve_safe();
 }

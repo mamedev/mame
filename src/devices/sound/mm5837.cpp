@@ -47,7 +47,7 @@ void mm5837_device::device_start()
 	m_output_cb.resolve_safe();
 
 	// get timer
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mm5837_device::update_clock_output), this));
+	m_timer = timer_alloc(FUNC(mm5837_device::update_clock_output), this);
 
 	// register for save states
 	save_item(NAME(m_source.m_shift));

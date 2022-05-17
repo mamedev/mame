@@ -335,13 +335,13 @@ INPUT_CHANGED_MEMBER(z80net_state::z80net_nmi)
 
 void z80ne_state::machine_start()
 {
-	m_timer_nmi = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z80ne_state::pulse_nmi), this));
+	m_timer_nmi = timer_alloc(FUNC(z80ne_state::pulse_nmi), this);
 
 	m_lx383_digits.resolve();
 
 	m_lx385_ctrl = 0x1f;
-	m_cassette_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z80ne_state::cassette_tc), this));
-	m_kbd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z80ne_state::kbd_scan), this));
+	m_cassette_timer = timer_alloc(FUNC(z80ne_state::cassette_tc), this);
+	m_kbd_timer = timer_alloc(FUNC(z80ne_state::kbd_scan), this);
 	m_kbd_timer->adjust(attotime::from_hz(1000), 0, attotime::from_hz(1000));
 }
 

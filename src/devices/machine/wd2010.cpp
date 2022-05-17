@@ -202,10 +202,10 @@ void wd2010_device::device_start()
 	m_in_sc_cb.resolve_safe(0);
 
 	/* allocate a timer for commands */
-	m_cmd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wd2010_device::command_complete), this));
-	m_complete_write_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wd2010_device::complete_write), this));
-	m_deassert_write_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wd2010_device::deassert_write), this));
-	m_deassert_read_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wd2010_device::deassert_read), this));
+	m_cmd_timer = timer_alloc(FUNC(wd2010_device::command_complete), this);
+	m_complete_write_timer = timer_alloc(FUNC(wd2010_device::complete_write), this);
+	m_deassert_write_timer = timer_alloc(FUNC(wd2010_device::deassert_write), this);
+	m_deassert_read_timer = timer_alloc(FUNC(wd2010_device::deassert_read), this);
 }
 
 

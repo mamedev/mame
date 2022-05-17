@@ -1653,7 +1653,7 @@ void tms5220_device::device_start()
 	/* initialize a stream */
 	m_stream = stream_alloc(0, 1, clock() / 80);
 
-	m_timer_io_ready = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tms5220_device::set_io_ready), this));
+	m_timer_io_ready = timer_alloc(FUNC(tms5220_device::set_io_ready), this);
 
 	/* not during reset which is called from within a write! */
 	m_io_ready = true;

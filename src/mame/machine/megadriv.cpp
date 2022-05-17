@@ -802,7 +802,7 @@ void md_base_state::machine_start()
 	save_item(NAME(m_megadrive_io_ctrl_regs));
 	save_item(NAME(m_megadrive_io_tx_regs));
 
-	m_genz80.z80_run_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(md_base_state::megadriv_z80_run_state), this));
+	m_genz80.z80_run_timer = timer_alloc(FUNC(md_base_state::megadriv_z80_run_state), this);
 }
 
 void md_base_state::machine_reset()

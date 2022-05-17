@@ -306,7 +306,7 @@ void sitcom_timer_state::machine_start()
 	m_test_led.resolve();
 	m_dac.resolve();
 
-	m_shutter_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sitcom_timer_state::shutter_tick), this));
+	m_shutter_timer = timer_alloc(FUNC(sitcom_timer_state::shutter_tick), this);
 
 	save_item(NAME(m_shutter));
 	save_item(NAME(m_dac_cs));

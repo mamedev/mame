@@ -1321,7 +1321,7 @@ TIM_BORROWOUT   EQU %00000001
 void lynx_state::timer_init(int which)
 {
 	memset(&m_timer[which], 0, sizeof(LYNX_TIMER));
-	m_timer[which].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lynx_state::timer_shot), this));
+	m_timer[which].timer = timer_alloc(FUNC(lynx_state::timer_shot), this);
 
 	save_item(NAME(m_timer[which].bakup), which);
 	save_item(NAME(m_timer[which].cntrl1), which);
@@ -1989,9 +1989,9 @@ void lynx_state::machine_start()
 	for (int i = 0; i < NR_LYNX_TIMERS; i++)
 		timer_init(i);
 
-	m_blitter_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lynx_state::blitter_timer), this));
-	m_loopback_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lynx_state::uart_loopback_timer), this));
-	m_uart_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lynx_state::uart_timer), this));
+	m_blitter_timer = timer_alloc(FUNC(lynx_state::blitter_timer), this);
+	m_loopback_timer = timer_alloc(FUNC(lynx_state::uart_loopback_timer), this);
+	m_uart_timer = timer_alloc(FUNC(lynx_state::uart_timer), this);
 }
 
 

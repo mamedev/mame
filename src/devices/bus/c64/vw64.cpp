@@ -81,7 +81,7 @@ c64_vizawrite_cartridge_device::c64_vizawrite_cartridge_device(const machine_con
 void c64_vizawrite_cartridge_device::device_start()
 {
 	// allocate timer
-	m_game_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(c64_vizawrite_cartridge_device::update_game), this));
+	m_game_timer = timer_alloc(FUNC(c64_vizawrite_cartridge_device::update_game), this);
 }
 
 

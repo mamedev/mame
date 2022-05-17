@@ -113,7 +113,7 @@ void am9513_device::device_start()
 	// Set up frequency timers
 	for (int f = 0; f < 5; f++)
 	{
-		m_freq_timer[f] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(am9513_device::timer_tick), this));
+		m_freq_timer[f] = timer_alloc(FUNC(am9513_device::timer_tick), this);
 		m_freq_timer_selected[f] = (f == 0) ? (m_fout_cb.isnull() ? 0x3e : 0x3f) : 0;
 		m_freq_timer_cycle[f] = 0;
 	}

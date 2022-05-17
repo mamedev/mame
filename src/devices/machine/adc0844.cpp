@@ -67,7 +67,7 @@ void adc0844_device::device_start()
 	m_ch4_cb.resolve_safe(0xff);
 
 	// allocate timers
-	m_conversion_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(adc0844_device::conversion_complete), this));
+	m_conversion_timer = timer_alloc(FUNC(adc0844_device::conversion_complete), this);
 
 	// register for save states
 	save_item(NAME(m_channel));

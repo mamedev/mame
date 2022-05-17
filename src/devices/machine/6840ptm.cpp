@@ -95,9 +95,9 @@ void ptm6840_device::device_start()
 	m_out_cb.resolve_all_safe();
 	m_irq_cb.resolve_safe();
 
-	m_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ptm6840_device::timeout), this));
-	m_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ptm6840_device::timeout), this));
-	m_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ptm6840_device::timeout), this));
+	m_timer[0] = timer_alloc(FUNC(ptm6840_device::timeout), this);
+	m_timer[1] = timer_alloc(FUNC(ptm6840_device::timeout), this);
+	m_timer[2] = timer_alloc(FUNC(ptm6840_device::timeout), this);
 
 	for (auto & elem : m_timer)
 	{

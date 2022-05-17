@@ -322,7 +322,7 @@ GFXDECODE_END
 
 void fgoal_state::machine_start()
 {
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fgoal_state::interrupt_callback), this));
+	m_interrupt_timer = timer_alloc(FUNC(fgoal_state::interrupt_callback), this);
 
 	save_item(NAME(m_xpos));
 	save_item(NAME(m_ypos));

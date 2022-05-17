@@ -1316,7 +1316,7 @@ void diablo_hd_device::device_start()
 
 	m_packs = 1;        // FIXME: get from configuration?
 	m_unit = strstr(m_image->tag(), "diablo0") ? 0 : 1;
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(diablo_hd_device::sector_mark_tick), this));
+	m_timer = timer_alloc(FUNC(diablo_hd_device::sector_mark_tick), this);
 }
 
 void diablo_hd_device::device_reset()

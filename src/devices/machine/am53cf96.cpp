@@ -169,7 +169,7 @@ void am53cf96_device::device_start()
 	save_item( NAME( xfer_state ) );
 	save_item( NAME( last_id ) );
 
-	m_transfer_timer = machine().scheduler().timer_alloc( timer_expired_delegate( FUNC( am53cf96_device::irq_timer_tick ), this ) );
+	m_transfer_timer = timer_alloc( FUNC( am53cf96_device::irq_timer_tick ), this );
 }
 
 // retrieve data from the SCSI controller

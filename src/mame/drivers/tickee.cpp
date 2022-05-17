@@ -188,13 +188,13 @@ TIMER_CALLBACK_MEMBER(tickee_state::setup_gun_interrupts)
 VIDEO_START_MEMBER(tickee_state,tickee)
 {
 	/* start a timer going on the first scanline of every frame */
-	m_setup_gun_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tickee_state::setup_gun_interrupts), this));
+	m_setup_gun_timer = timer_alloc(FUNC(tickee_state::setup_gun_interrupts), this);
 
 	/* initialize gun set/clear interrupts for both players */
-	m_set_gun_int_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tickee_state::trigger_gun_interrupt), this));
-	m_set_gun_int_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tickee_state::trigger_gun_interrupt), this));
-	m_clear_gun_int_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tickee_state::clear_gun_interrupt), this));
-	m_clear_gun_int_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tickee_state::clear_gun_interrupt), this));
+	m_set_gun_int_timer[0] = timer_alloc(FUNC(tickee_state::trigger_gun_interrupt), this);
+	m_set_gun_int_timer[1] = timer_alloc(FUNC(tickee_state::trigger_gun_interrupt), this);
+	m_clear_gun_int_timer[0] = timer_alloc(FUNC(tickee_state::clear_gun_interrupt), this);
+	m_clear_gun_int_timer[1] = timer_alloc(FUNC(tickee_state::clear_gun_interrupt), this);
 }
 
 VIDEO_RESET_MEMBER(tickee_state,tickee)

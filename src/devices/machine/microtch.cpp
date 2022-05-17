@@ -221,7 +221,7 @@ void microtouch_device::device_start()
 	m_last_y = 0;
 	m_last_touch_state = -1;
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(microtouch_device::update_output), this));
+	m_timer = timer_alloc(FUNC(microtouch_device::update_output), this);
 	m_timer->adjust(attotime::from_hz(167*5), 0, attotime::from_hz(167*5));
 
 	m_format = FORMAT_UNKNOWN;

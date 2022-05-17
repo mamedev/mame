@@ -2751,7 +2751,7 @@ ROM_END
 void segaybd_state::init_generic()
 {
 	// allocate a scanline timer
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(segaybd_state::irq2_gen_tick), this));
+	m_scanline_timer = timer_alloc(FUNC(segaybd_state::irq2_gen_tick), this);
 
 	// save state
 	save_item(NAME(m_pdrift_bank));

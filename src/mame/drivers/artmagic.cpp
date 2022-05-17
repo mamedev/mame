@@ -71,7 +71,7 @@ WRITE_LINE_MEMBER(artmagic_state::m68k_gen_int)
 
 void artmagic_state::machine_start()
 {
-	m_irq_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(artmagic_state::irq_off), this));
+	m_irq_off_timer = timer_alloc(FUNC(artmagic_state::irq_off), this);
 
 	save_item(NAME(m_tms_irq));
 	save_item(NAME(m_hack_irq));

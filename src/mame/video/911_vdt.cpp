@@ -170,9 +170,9 @@ void vdt911_device::device_start()
 	/* set up cursor blink clock.  2Hz frequency -> .25s half-period. */
 	/*m_blink_clock =*/
 
-	m_blink_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vdt911_device::blink_tick), this));
-	m_beep_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vdt911_device::beep_off), this));
-	m_line_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vdt911_device::line_tick), this));
+	m_blink_timer = timer_alloc(FUNC(vdt911_device::blink_tick), this);
+	m_beep_timer = timer_alloc(FUNC(vdt911_device::beep_off), this);
+	m_line_timer = timer_alloc(FUNC(vdt911_device::line_tick), this);
 
 	m_blink_timer->adjust(attotime::from_msec(0), 0, attotime::from_msec(250));
 

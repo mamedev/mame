@@ -145,22 +145,22 @@ void pce_cd_device::device_start()
 
 	m_subcode_buffer = std::make_unique<uint8_t[]>(96);
 
-	m_data_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pce_cd_device::data_timer_callback),this));
+	m_data_timer = timer_alloc(FUNC(pce_cd_device::data_timer_callback), this);
 	m_data_timer->adjust(attotime::never);
-	m_adpcm_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pce_cd_device::adpcm_dma_timer_callback),this));
+	m_adpcm_dma_timer = timer_alloc(FUNC(pce_cd_device::adpcm_dma_timer_callback), this);
 	m_adpcm_dma_timer->adjust(attotime::never);
 
-	m_cdda_fadeout_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pce_cd_device::cdda_fadeout_callback),this));
+	m_cdda_fadeout_timer = timer_alloc(FUNC(pce_cd_device::cdda_fadeout_callback), this);
 	m_cdda_fadeout_timer->adjust(attotime::never);
-	m_cdda_fadein_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pce_cd_device::cdda_fadein_callback),this));
+	m_cdda_fadein_timer = timer_alloc(FUNC(pce_cd_device::cdda_fadein_callback), this);
 	m_cdda_fadein_timer->adjust(attotime::never);
 
-	m_adpcm_fadeout_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pce_cd_device::adpcm_fadeout_callback),this));
+	m_adpcm_fadeout_timer = timer_alloc(FUNC(pce_cd_device::adpcm_fadeout_callback), this);
 	m_adpcm_fadeout_timer->adjust(attotime::never);
-	m_adpcm_fadein_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pce_cd_device::adpcm_fadein_callback),this));
+	m_adpcm_fadein_timer = timer_alloc(FUNC(pce_cd_device::adpcm_fadein_callback), this);
 	m_adpcm_fadein_timer->adjust(attotime::never);
 
-	m_ack_clear_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pce_cd_device::clear_ack),this));
+	m_ack_clear_timer = timer_alloc(FUNC(pce_cd_device::clear_ack), this);
 	m_ack_clear_timer->adjust(attotime::never);
 
 	// m_cd_file pointer is setup at a later stage because it is still empty when this function is called

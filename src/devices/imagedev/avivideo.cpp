@@ -46,7 +46,7 @@ avivideo_image_device::~avivideo_image_device()
 
 void avivideo_image_device::device_start()
 {
-	m_frame_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(avivideo_image_device::frame_timer), this));
+	m_frame_timer = timer_alloc(FUNC(avivideo_image_device::frame_timer), this);
 	m_frame_timer->adjust(attotime::never);
 
 	save_item(NAME(m_frame_count));

@@ -99,7 +99,7 @@ void nubus_m2video_device::device_start()
 	nubus().install_device(slotspace+0x900000, slotspace+VRAM_SIZE-1+0x900000, read32s_delegate(*this, FUNC(nubus_m2video_device::vram_r)), write32s_delegate(*this, FUNC(nubus_m2video_device::vram_w)));
 	nubus().install_device(slotspace+0x80000, slotspace+0xeffff, read32s_delegate(*this, FUNC(nubus_m2video_device::m2video_r)), write32s_delegate(*this, FUNC(nubus_m2video_device::m2video_w)));
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nubus_m2video_device::vbl_tick), this));
+	m_timer = timer_alloc(FUNC(nubus_m2video_device::vbl_tick), this);
 	m_timer->adjust(screen().time_until_pos(479, 0), 0);
 }
 

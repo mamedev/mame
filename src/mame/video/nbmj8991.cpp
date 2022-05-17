@@ -279,7 +279,7 @@ void nbmj8991_state::gfxdraw()
 ******************************************************************************/
 void nbmj8991_state::video_start()
 {
-	m_blitter_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nbmj8991_state::clear_busy_flag), this));
+	m_blitter_timer = timer_alloc(FUNC(nbmj8991_state::clear_busy_flag), this);
 
 	int width = m_screen->width();
 	int height = m_screen->height();

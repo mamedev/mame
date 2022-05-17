@@ -43,7 +43,7 @@ void wpc_device::device_start()
 	m_bank_w.resolve_safe();
 	m_dmdbank_w.resolve_safe();
 
-	m_zc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wpc_device::zerocross_set), this));
+	m_zc_timer = timer_alloc(FUNC(wpc_device::zerocross_set), this);
 	m_zc_timer->adjust(attotime::from_hz(120),0,attotime::from_hz(120));
 }
 

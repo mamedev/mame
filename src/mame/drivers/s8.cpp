@@ -561,7 +561,7 @@ void s8_state::machine_start()
 	save_item(NAME(m_comma12));
 	save_item(NAME(m_comma34));
 
-	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s8_state::irq_timer), this));
+	m_irq_timer = timer_alloc(FUNC(s8_state::irq_timer), this);
 	m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
 }
 

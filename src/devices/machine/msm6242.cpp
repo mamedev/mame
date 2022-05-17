@@ -100,7 +100,7 @@ void msm6242_device::device_start()
 	m_out_int_handler.resolve();
 
 	// let's call the timer callback every tick
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(msm6242_device::rtc_timer_callback), this));
+	m_timer = timer_alloc(FUNC(msm6242_device::rtc_timer_callback), this);
 	m_timer->adjust(attotime::zero);
 
 	// set up registers

@@ -230,7 +230,7 @@ void pinsnd88_device::device_start()
 	m_syncq_cb.resolve_safe();
 
 	/* timer */
-	m_sync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pinsnd88_device::sync_callback), this));
+	m_sync_timer = timer_alloc(FUNC(pinsnd88_device::sync_callback), this);
 	m_sync_timer->adjust(attotime::never);
 	save_item(NAME(m_old_resetq_state));
 	save_item(NAME(m_data_in));

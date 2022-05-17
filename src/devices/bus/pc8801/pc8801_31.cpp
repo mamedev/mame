@@ -82,7 +82,7 @@ void pc8801_31_device::device_resolve_objects()
 
 void pc8801_31_device::device_start()
 {
-	m_sel_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc8801_31_device::select_off), this));
+	m_sel_off_timer = timer_alloc(FUNC(pc8801_31_device::select_off), this);
 
 	save_item(NAME(m_clock_hb));
 	save_item(NAME(m_cddrive_enable));

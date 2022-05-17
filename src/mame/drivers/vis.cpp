@@ -63,7 +63,7 @@ void vis_audio_device::device_start()
 	m_isa->set_dma_channel(7, this, false);
 	m_isa->install_device(0x0220, 0x022f, read8sm_delegate(*this, FUNC(vis_audio_device::pcm_r)), write8sm_delegate(*this, FUNC(vis_audio_device::pcm_w)));
 	m_isa->install_device(0x0388, 0x038b, read8sm_delegate(*subdevice<ymf262_device>("ymf262"), FUNC(ymf262_device::read)), write8sm_delegate(*subdevice<ymf262_device>("ymf262"), FUNC(ymf262_device::write)));
-	m_pcm = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vis_audio_device::pcm_update), this));
+	m_pcm = timer_alloc(FUNC(vis_audio_device::pcm_update), this);
 	m_pcm->adjust(attotime::never);
 }
 

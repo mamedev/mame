@@ -65,10 +65,10 @@ void ef9340_1_device::device_start()
 	// let the screen create our temporary bitmap with the screen's dimensions
 	screen().register_screen_bitmap(m_tmp_bitmap);
 
-	m_line_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ef9340_1_device::draw_scanline), this));
+	m_line_timer = timer_alloc(FUNC(ef9340_1_device::draw_scanline), this);
 	m_line_timer->adjust(screen().time_until_pos(0, 0), 0, screen().scan_period());
 
-	m_blink_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ef9340_1_device::blink_update), this));
+	m_blink_timer = timer_alloc(FUNC(ef9340_1_device::blink_update), this);
 	m_blink_timer->adjust(screen().time_until_pos(0, 0), 0, screen().frame_period());
 
 	// zerofill

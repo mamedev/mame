@@ -186,7 +186,7 @@ TIMER_CALLBACK_MEMBER(sprint4_state::nmi_callback)
 
 void sprint4_state::machine_start()
 {
-	m_nmi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sprint4_state::nmi_callback), this));
+	m_nmi_timer = timer_alloc(FUNC(sprint4_state::nmi_callback), this);
 
 	save_item(NAME(m_da_latch));
 	save_item(NAME(m_steer_FF1));

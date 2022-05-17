@@ -84,7 +84,7 @@ c1531_device::c1531_device(const machine_config &mconfig, const char *tag, devic
 void c2n_device::device_start()
 {
 	// allocate timers
-	m_read_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(c2n_device::read_tick), this));
+	m_read_timer = timer_alloc(FUNC(c2n_device::read_tick), this);
 	m_read_timer->adjust(attotime::from_hz(44100), 0, attotime::from_hz(44100));
 }
 

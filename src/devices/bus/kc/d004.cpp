@@ -131,7 +131,7 @@ void kc_d004_device::device_start()
 {
 	m_rom  = memregion(Z80_TAG)->base();
 
-	m_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(kc_d004_device::reset_tick), this));
+	m_reset_timer = timer_alloc(FUNC(kc_d004_device::reset_tick), this);
 }
 
 //-------------------------------------------------

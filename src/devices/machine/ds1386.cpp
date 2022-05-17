@@ -78,15 +78,15 @@ void ds1386_device::device_start()
 	m_sqw_cb(1);
 
 	// allocate timers
-	m_clock_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ds1386_device::advance_hundredths), this));
+	m_clock_timer = timer_alloc(FUNC(ds1386_device::advance_hundredths), this);
 	m_clock_timer->adjust(attotime::from_hz(100), 0, attotime::from_hz(100));
-	m_square_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ds1386_device::square_tick), this));
+	m_square_timer = timer_alloc(FUNC(ds1386_device::square_tick), this);
 	m_square_timer->adjust(attotime::never);
-	m_watchdog_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ds1386_device::watchdog_tick), this));
+	m_watchdog_timer = timer_alloc(FUNC(ds1386_device::watchdog_tick), this);
 	m_watchdog_timer->adjust(attotime::never);
-	m_inta_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ds1386_device::inta_timer_elapsed), this));
+	m_inta_timer = timer_alloc(FUNC(ds1386_device::inta_timer_elapsed), this);
 	m_inta_timer->adjust(attotime::never);
-	m_intb_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ds1386_device::intb_timer_elapsed), this));
+	m_intb_timer = timer_alloc(FUNC(ds1386_device::intb_timer_elapsed), this);
 	m_intb_timer->adjust(attotime::never);
 
 	// state saving

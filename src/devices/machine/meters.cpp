@@ -38,7 +38,7 @@ void meters_device::device_start()
 		m_meter_info[i].state     = 0;
 		m_meter_info[i].count     = 0;
 		m_meter_info[i].on        = 0;
-		m_meter_info[i].meter_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(meters_device::count_tick), this));
+		m_meter_info[i].meter_timer = timer_alloc(FUNC(meters_device::count_tick), this);
 
 		save_item(NAME(m_meter_info[i].state), i);
 		save_item(NAME(m_meter_info[i].count), i);

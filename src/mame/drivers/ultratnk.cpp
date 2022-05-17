@@ -68,7 +68,7 @@ TIMER_CALLBACK_MEMBER(ultratnk_state::nmi_callback)
 
 void ultratnk_state::machine_start()
 {
-	m_nmi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ultratnk_state::nmi_callback), this));
+	m_nmi_timer = timer_alloc(FUNC(ultratnk_state::nmi_callback), this);
 
 	save_item(NAME(m_da_latch));
 	save_item(NAME(m_collision));

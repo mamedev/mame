@@ -226,7 +226,7 @@ void pc1512_keyboard_device::device_start()
 {
 	m_leds.resolve();
 	// allocate timers
-	m_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc1512_keyboard_device::reset_timer_tick), this));
+	m_reset_timer = timer_alloc(FUNC(pc1512_keyboard_device::reset_timer_tick), this);
 
 	// resolve callbacks
 	m_write_clock.resolve_safe();

@@ -768,8 +768,8 @@ void thayers_state::machine_start()
 	m_digits.resolve();
 	memset(&m_ssi263, 0, sizeof(m_ssi263));
 
-	m_intrq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(thayers_state::intrq_tick), this));
-	m_phoneme_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(thayers_state::phoneme_tick), this));
+	m_intrq_timer = timer_alloc(FUNC(thayers_state::intrq_tick), this);
+	m_phoneme_timer = timer_alloc(FUNC(thayers_state::phoneme_tick), this);
 }
 
 void thayers_state::machine_reset()

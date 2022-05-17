@@ -450,7 +450,7 @@ void riot6532_device::device_start()
 	m_irq_cb.resolve_safe();
 
 	/* allocate timers */
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(riot6532_device::timer_end), this));
+	m_timer = timer_alloc(FUNC(riot6532_device::timer_end), this);
 
 	/* register for save states */
 	save_item(NAME(m_port[0].m_in));

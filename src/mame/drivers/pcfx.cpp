@@ -400,7 +400,7 @@ void pcfx_state::machine_start()
 		m_pad.latch[i] = 0;
 	};
 
-	m_pad_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pcfx_state::pad_func), this));
+	m_pad_timer = timer_alloc(FUNC(pcfx_state::pad_func), this);
 }
 
 void pcfx_state::machine_reset()

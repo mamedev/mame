@@ -41,7 +41,7 @@ mb3773_device::mb3773_device( const machine_config &mconfig, const char *tag, de
 
 void mb3773_device::device_start()
 {
-	m_watchdog_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mb3773_device::watchdog_expired), this));
+	m_watchdog_timer = timer_alloc(FUNC(mb3773_device::watchdog_expired), this);
 
 	save_item( NAME(m_ck) );
 }

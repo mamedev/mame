@@ -2768,7 +2768,7 @@ void taitof2_state::machine_start()
 		}
 	}
 
-	m_int6_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(taitof2_state::trigger_int6), this));
+	m_int6_timer = timer_alloc(FUNC(taitof2_state::trigger_int6), this);
 }
 
 void taitof2_state::taito_f2(machine_config &config)
