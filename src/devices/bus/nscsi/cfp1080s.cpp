@@ -36,6 +36,7 @@ void cfp1080s_device::device_start()
 void cfp1080s_device::mem_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).rom().region("firmware", 0);
+	map(0xff081, 0xff081).lr8(NAME([]() { return 0x80; })); // status register of some peripheral
 }
 
 void cfp1080s_device::device_add_mconfig(machine_config &config)
