@@ -75,7 +75,6 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_READ_LINE_MEMBER( cb1_r );
 	DECLARE_READ_LINE_MEMBER( distance_r );
 	DECLARE_READ_LINE_MEMBER( fuel_sensor_r );
 	uint8_t keyboard_r();
@@ -149,6 +148,7 @@ INPUT_PORTS_END
 void eacc_state::machine_reset()
 {
 	m_cb2 = 0;
+	m_pia->cb1_w(1);
 }
 
 void eacc_state::machine_start()
@@ -165,7 +165,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(eacc_state::cb1_timer)
 {
 	m_cb1 ^= 1; // 15hz
 	if (m_cb2)
-		m_maincpu->set_input_line(M6802_IRQ_LINE, ASSERT_LINE);
+		m_pia->cb1_w(m_cb1);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(eacc_state::nmi_timer)
@@ -175,11 +175,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(eacc_state::nmi_timer)
 		m_nmi = true;
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
-}
-
-READ_LINE_MEMBER( eacc_state::cb1_r )
-{
-	return (m_cb2) ? m_cb1 : 1;
 }
 
 READ_LINE_MEMBER( eacc_state::distance_r )
@@ -195,6 +190,7 @@ READ_LINE_MEMBER( eacc_state::fuel_sensor_r )
 WRITE_LINE_MEMBER( eacc_state::cb2_w )
 {
 	m_cb2 = state;
+	m_pia->cb1_w((m_cb2) ? m_cb1 : 1);
 }
 
 uint8_t eacc_state::keyboard_r()
@@ -264,7 +260,6 @@ void eacc_state::eacc(machine_config &config)
 	PIA6821(config, m_pia, 0);
 	m_pia->readpb_handler().set(FUNC(eacc_state::keyboard_r));
 	m_pia->readca1_handler().set(FUNC(eacc_state::distance_r));
-	m_pia->readcb1_handler().set(FUNC(eacc_state::cb1_r));
 	m_pia->readca2_handler().set(FUNC(eacc_state::fuel_sensor_r));
 	m_pia->writepa_handler().set(FUNC(eacc_state::segment_w));
 	m_pia->writepb_handler().set(FUNC(eacc_state::digit_w));

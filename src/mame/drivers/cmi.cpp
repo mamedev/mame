@@ -335,7 +335,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( cmi02_ptm_irq );
 	DECLARE_WRITE_LINE_MEMBER( cmi02_ptm_o2 );
 	DECLARE_WRITE_LINE_MEMBER( cmi02_pia2_irqa_w );
-	DECLARE_READ_LINE_MEMBER( cmi02_pia2_ca1_r );
 	DECLARE_WRITE_LINE_MEMBER( cmi02_pia2_cb2_w );
 
 	uint8_t cmi07_r();
@@ -1583,12 +1582,6 @@ WRITE_LINE_MEMBER( cmi_state::cmi02_pia2_irqa_w )
 	set_interrupt(CPU_2, IRQ_ADINT_LEVEL, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ_LINE_MEMBER( cmi_state::cmi02_pia2_ca1_r )
-{
-	LOG("%s: cmi02_pia2_ca1_r: %d\n", machine().describe_context(), 0);
-	return 0;
-}
-
 WRITE_LINE_MEMBER( cmi_state::cmi02_pia2_cb2_w )
 {
 	LOG("%s: cmi02_pia2_cb2_w: %d\n", machine().describe_context(), state);
@@ -2197,7 +2190,7 @@ void cmi_state::cmi2x(machine_config &config)
 
 	PIA6821(config, m_cmi02_pia[1]); // pia_cmi02_2_config
 	m_cmi02_pia[1]->irqa_handler().set(FUNC(cmi_state::cmi02_pia2_irqa_w));
-	m_cmi02_pia[1]->readca1_handler().set(FUNC(cmi_state::cmi02_pia2_ca1_r));
+	m_cmi02_pia[1]->ca1_w(0);
 	m_cmi02_pia[1]->cb2_handler().set(FUNC(cmi_state::cmi02_pia2_cb2_w));
 
 	PTM6840(config, m_cmi02_ptm, SYSTEM_CAS_CLOCK);
