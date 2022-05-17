@@ -1178,7 +1178,7 @@ Requires [disc swap]
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
-Optionally requires [32X] and [disc swap]
+Has optional unemulated [32X] mode, which in turn needs [disc swap]
 ]]></notes>
 		<info name="release" value="199503xx" />
 		<info name="serial" value="4438"/>
