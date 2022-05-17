@@ -1483,18 +1483,12 @@ Error BaseRAPass::runLocalAllocator() noexcept {
       cc()->_setCursor(unconditionalJump ? prev->prev() : prev);
 
       if (consecutive->hasEntryAssignment()) {
-        ASMJIT_PROPAGATE(
-          lra.switchToAssignment(
-            consecutive->entryPhysToWorkMap(),
-            consecutive->entryWorkToPhysMap(),
-            consecutive->liveIn(),
-            consecutive->isAllocated(),
-            false));
+        ASMJIT_PROPAGATE(lra.switchToAssignment(consecutive->entryPhysToWorkMap(), consecutive->liveIn(), consecutive->isAllocated(), false));
       }
       else {
         ASMJIT_PROPAGATE(lra.spillRegsBeforeEntry(consecutive));
         ASMJIT_PROPAGATE(setBlockEntryAssignment(consecutive, block, lra._curAssignment));
-        lra._curAssignment.copyFrom(consecutive->entryPhysToWorkMap(), consecutive->entryWorkToPhysMap());
+        lra._curAssignment.copyFrom(consecutive->entryPhysToWorkMap());
       }
     }
 
@@ -1526,7 +1520,7 @@ Error BaseRAPass::runLocalAllocator() noexcept {
     }
 
     // If we switched to some block we have to update the local allocator.
-    lra.replaceAssignment(block->entryPhysToWorkMap(), block->entryWorkToPhysMap());
+    lra.replaceAssignment(block->entryPhysToWorkMap());
   }
 
   _clobberedRegs.op<Support::Or>(lra._clobberedRegs);
@@ -1546,12 +1540,10 @@ Error BaseRAPass::setBlockEntryAssignment(RABlock* block, const RABlock* fromBlo
   }
 
   PhysToWorkMap* physToWorkMap = clonePhysToWorkMap(fromAssignment.physToWorkMap());
-  WorkToPhysMap* workToPhysMap = cloneWorkToPhysMap(fromAssignment.workToPhysMap());
-
-  if (ASMJIT_UNLIKELY(!physToWorkMap || !workToPhysMap))
+  if (ASMJIT_UNLIKELY(!physToWorkMap))
     return DebugUtils::errored(kErrorOutOfMemory);
 
-  block->setEntryAssignment(physToWorkMap, workToPhysMap);
+  block->setEntryAssignment(physToWorkMap);
 
   // True if this is the first (entry) block, nothing to do in this case.
   if (block == fromBlock) {
@@ -1561,10 +1553,6 @@ Error BaseRAPass::setBlockEntryAssignment(RABlock* block, const RABlock* fromBlo
 
     return kErrorOk;
   }
-
-  RAAssignment as;
-  as.initLayout(_physRegCount, workRegs());
-  as.initMaps(physToWorkMap, workToPhysMap);
 
   const ZoneBitVector& liveOut = fromBlock->liveOut();
   const ZoneBitVector& liveIn = block->liveIn();
@@ -1578,94 +1566,85 @@ Error BaseRAPass::setBlockEntryAssignment(RABlock* block, const RABlock* fromBlo
       RAWorkReg* workReg = workRegById(workId);
 
       RegGroup group = workReg->group();
-      uint32_t physId = as.workToPhysId(group, workId);
+      uint32_t physId = fromAssignment.workToPhysId(group, workId);
 
       if (physId != RAAssignment::kPhysNone)
-        as.unassign(group, workId, physId);
+        physToWorkMap->unassign(group, physId, _physRegIndex.get(group) + physId);
     }
   }
 
-  return blockEntryAssigned(as);
+  return blockEntryAssigned(physToWorkMap);
 }
 
 Error BaseRAPass::setSharedAssignment(uint32_t sharedAssignmentId, const RAAssignment& fromAssignment) noexcept {
   ASMJIT_ASSERT(_sharedAssignments[sharedAssignmentId].empty());
 
   PhysToWorkMap* physToWorkMap = clonePhysToWorkMap(fromAssignment.physToWorkMap());
-  WorkToPhysMap* workToPhysMap = cloneWorkToPhysMap(fromAssignment.workToPhysMap());
-
-  if (ASMJIT_UNLIKELY(!physToWorkMap || !workToPhysMap))
+  if (ASMJIT_UNLIKELY(!physToWorkMap))
     return DebugUtils::errored(kErrorOutOfMemory);
 
-  _sharedAssignments[sharedAssignmentId].assignMaps(physToWorkMap, workToPhysMap);
+  _sharedAssignments[sharedAssignmentId].assignPhysToWorkMap(physToWorkMap);
+
   ZoneBitVector& sharedLiveIn = _sharedAssignments[sharedAssignmentId]._liveIn;
   ASMJIT_PROPAGATE(sharedLiveIn.resize(allocator(), workRegCount()));
 
-  RAAssignment as;
-  as.initLayout(_physRegCount, workRegs());
-
   Support::Array<uint32_t, Globals::kNumVirtGroups> sharedAssigned {};
-
   for (RABlock* block : blocks()) {
     if (block->sharedAssignmentId() == sharedAssignmentId) {
       ASMJIT_ASSERT(!block->hasEntryAssignment());
 
       PhysToWorkMap* entryPhysToWorkMap = clonePhysToWorkMap(fromAssignment.physToWorkMap());
-      WorkToPhysMap* entryWorkToPhysMap = cloneWorkToPhysMap(fromAssignment.workToPhysMap());
-
-      if (ASMJIT_UNLIKELY(!entryPhysToWorkMap || !entryWorkToPhysMap))
+      if (ASMJIT_UNLIKELY(!entryPhysToWorkMap))
         return DebugUtils::errored(kErrorOutOfMemory);
 
-      block->setEntryAssignment(entryPhysToWorkMap, entryWorkToPhysMap);
-      as.initMaps(entryPhysToWorkMap, entryWorkToPhysMap);
+      block->setEntryAssignment(entryPhysToWorkMap);
 
       const ZoneBitVector& liveIn = block->liveIn();
       sharedLiveIn.or_(liveIn);
 
       for (RegGroup group : RegGroupVirtValues{}) {
         sharedAssigned[group] |= entryPhysToWorkMap->assigned[group];
+
+        uint32_t physBaseIndex = _physRegIndex.get(group);
         Support::BitWordIterator<RegMask> it(entryPhysToWorkMap->assigned[group]);
 
         while (it.hasNext()) {
           uint32_t physId = it.next();
-          uint32_t workId = as.physToWorkId(group, physId);
+          uint32_t workId = entryPhysToWorkMap->workIds[physBaseIndex + physId];
 
           if (!liveIn.bitAt(workId))
-            as.unassign(group, workId, physId);
+            entryPhysToWorkMap->unassign(group, physId, physBaseIndex + physId);
         }
       }
     }
   }
 
-  {
-    as.initMaps(physToWorkMap, workToPhysMap);
+  for (RegGroup group : RegGroupVirtValues{}) {
+    uint32_t physBaseIndex = _physRegIndex.get(group);
+    Support::BitWordIterator<RegMask> it(_availableRegs[group] & ~sharedAssigned[group]);
 
-    for (RegGroup group : RegGroupVirtValues{}) {
-      Support::BitWordIterator<RegMask> it(_availableRegs[group] & ~sharedAssigned[group]);
-
-      while (it.hasNext()) {
-        uint32_t physId = it.next();
-        if (as.isPhysAssigned(group, physId)) {
-          uint32_t workId = as.physToWorkId(group, physId);
-          as.unassign(group, workId, physId);
-        }
-      }
+    while (it.hasNext()) {
+      uint32_t physId = it.next();
+      if (Support::bitTest(physToWorkMap->assigned[group], physId))
+        physToWorkMap->unassign(group, physId, physBaseIndex + physId);
     }
   }
 
-  return blockEntryAssigned(as);
+  return blockEntryAssigned(physToWorkMap);
 }
 
-Error BaseRAPass::blockEntryAssigned(const RAAssignment& as) noexcept {
+Error BaseRAPass::blockEntryAssigned(const PhysToWorkMap* physToWorkMap) noexcept {
   // Complex allocation strategy requires to record register assignments upon block entry (or per shared state).
   for (RegGroup group : RegGroupVirtValues{}) {
     if (!_strategy[group].isComplex())
       continue;
 
-    Support::BitWordIterator<RegMask> it(as.assigned(group));
+    uint32_t physBaseIndex = _physRegIndex[group];
+    Support::BitWordIterator<RegMask> it(physToWorkMap->assigned[group]);
+
     while (it.hasNext()) {
       uint32_t physId = it.next();
-      uint32_t workId = as.physToWorkId(group, physId);
+      uint32_t workId = physToWorkMap->workIds[physBaseIndex + physId];
 
       RAWorkReg* workReg = workRegById(workId);
       workReg->addAllocatedMask(Support::bitMask(physId));
