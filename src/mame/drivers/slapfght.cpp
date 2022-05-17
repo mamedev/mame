@@ -2116,4 +2116,3 @@ GAME( 1986, grdian,     0,        slapfigh,   getstar,   slapfght_state, init_sl
 GAME( 1986, getstarj,   grdian,   slapfigh,   getstarj,  slapfght_state, init_slapfigh,  ROT0,   "Toaplan / Taito",                                       "Get Star (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, getstarb1,  grdian,   getstarb1,  getstarj,  slapfght_state, init_getstarb1, ROT0,   "bootleg",                                               "Get Star (bootleg set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1986, getstarb2,  grdian,   getstarb2,  getstarb2, slapfght_state, init_getstarb2, ROT0,   "bootleg",                                               "Get Star (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-z
