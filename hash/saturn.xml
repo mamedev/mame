@@ -18824,7 +18824,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Lupin the 3rd Chronicles (Lupin + Fujiko Version) Disc 1 (T-18805G)... -->
 	<!-- Identifying Lupin the 3rd Chronicles (Lupin + Fujiko Version) Disc 2 (T-18805G)... -->
 	<software name="lupincr" supported="no">
-		<description>Lupin the 3rd Chronicles (Lupin + Fujiko version) (Jpn)</description>
+		<description>Lupin the 3rd Chronicles (Lupin + Fujiko Version) (Jpn)</description>
 		<year>1997</year>
 		<publisher>Spike</publisher>
 		<info name="serial" value="T-18805G"/>
@@ -30330,7 +30330,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying 0691-Atlantis-fre-cd1... -->
 	<!-- Identifying 0691-Atlantis-fre-cd2... -->
 	<software name="atlantisf" cloneof="atlantis" supported="no">
-		<description>Atlantis - Secrets d'un Monde Oublié (Fra)</description>
+		<description>Atlantis - Secrets d'un monde oublié (Fra)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81091-09"/>
@@ -39035,7 +39035,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Sonic 3D (Tech Demo - Oct 08)... -->
 	<software name="sonic3dtd" cloneof="sonic3d" supported="no">
-		<description>Sonic 3D (tech demo oct 08)</description>
+		<description>Sonic 3D (tech demo Oct 08)</description>
 		<year>1996?</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="sat_cdrom">
