@@ -175,7 +175,8 @@ uint8_t z180asci_channel_base::tdr_r()
 uint8_t z180asci_channel_base::rdr_r()
 {
 	LOG("Z180 RDR%d   rd $%02x\n", m_id, m_asci_rdr);
-	m_asci_stat &= ~0x80;
+	if (!machine().side_effects_disabled())
+		m_asci_stat &= ~0x80;
 	return m_asci_rdr;
 }
 
