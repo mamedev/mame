@@ -17,7 +17,7 @@
 //  z180asci_channel_base
 //**************************************************************************
 
-class z180asci_channel_base : public device_t, public device_buffered_serial_interface<4U>
+class z180asci_channel_base : public device_t
 {
 public:
 	// inline configuration
@@ -60,9 +60,9 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_clock_changed() override;
 
-	virtual void tra_callback() override;
-	virtual void tra_complete() override;
-	virtual void received_byte(u8 byte) override;
+	//virtual void tra_callback() override;
+	//virtual void tra_complete() override;
+	//virtual void received_byte(u8 byte) override;
 
 
 	TIMER_CALLBACK_MEMBER(brg_callback);
@@ -81,6 +81,14 @@ protected:
 	uint8_t   m_asci_rdr;                    // ASCI receive data register
 	uint8_t   m_asci_ext;                    // ASCI extension control register
 	PAIR16    m_asci_tc;                     // ASCI time constant
+
+	uint8_t   m_tsr;
+	uint8_t   m_rsr;
+	uint8_t   m_data_fifo[4];
+	uint8_t   m_status_fifo[4];
+	int		  m_fifo_head;
+	int		  m_fifo_tail;
+
 	int		  m_cts;
 	int		  m_dcd;
 	int       m_irq;

@@ -93,7 +93,7 @@
 
 z180asci_channel_base::z180asci_channel_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const int id, const bool ext)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_buffered_serial_interface(mconfig, *this)
+//	, device_buffered_serial_interface(mconfig, *this)
 	, m_txa_handler(*this)
 	, m_rts_handler(*this)
 	, m_cka_handler(*this)
@@ -108,6 +108,7 @@ z180asci_channel_base::z180asci_channel_base(const machine_config &mconfig, devi
 	, m_ext(ext)
 {
 }
+
 
 void z180asci_channel_base::device_resolve_objects()
 {
@@ -132,8 +133,15 @@ void z180asci_channel_base::device_start()
 		save_item(NAME(m_asci_tc.w));
 	}
 	save_item(NAME(m_divisor));
-	transmit_register_reset();
-	receive_register_reset();
+	save_item(NAME(m_tsr));
+	save_item(NAME(m_rsr));
+	save_item(NAME(m_data_fifo));
+	save_item(NAME(m_status_fifo));
+	save_item(NAME(m_fifo_head));
+	save_item(NAME(m_fifo_tail));
+
+	//transmit_register_reset();
+	//receive_register_reset();
 }
 
 void z180asci_channel_base::device_reset()
@@ -147,6 +155,9 @@ void z180asci_channel_base::device_reset()
 
 	m_divisor = 1;
 
+	m_fifo_head = 0;
+	m_fifo_tail = 0;
+
 	output_txa(1);
 	output_rts(1);
 }
@@ -154,8 +165,8 @@ void z180asci_channel_base::device_reset()
 void z180asci_channel_base::device_clock_changed()
 {
 	LOG("Z180 ASCI%d set bitrate %d\n", m_id, uint32_t(clock() / m_divisor));
-	set_tra_rate(clock(), m_divisor);
-	set_rcv_rate(clock(), m_divisor);
+	//set_tra_rate(clock(), m_divisor);
+	//set_rcv_rate(clock(), m_divisor);
 }
 
 TIMER_CALLBACK_MEMBER( z180asci_channel_base::brg_callback )
@@ -170,8 +181,9 @@ uint8_t z180asci_channel_base::cntla_r()
 
 uint8_t z180asci_channel_base::cntlb_r()
 {
-	LOG("Z180 CNTLB%d rd $%02x\n", m_id, m_asci_cntlb);
-	return m_asci_cntlb;
+	uint8_t data = (m_asci_cntlb & 0x0d) | (m_cts << 5);
+	LOG("Z180 CNTLB%d rd $%02x\n", m_id, data);
+	return data;
 }
 
 uint8_t z180asci_channel_base::stat_r()
@@ -217,7 +229,7 @@ void z180asci_channel_base::cntla_w(uint8_t data)
 	LOG("Z180 CNTLA%d wr $%02x\n", m_id, data);
 	m_asci_cntla = data;
 	output_rts(BIT(data,4));
-	set_data_frame(1, BIT(data,2) ? 8 : 7, BIT(data,1) ? PARITY_ODD : PARITY_NONE, BIT(data,0) ? STOP_BITS_2 : STOP_BITS_1);
+	//set_data_frame(1, BIT(data,2) ? 8 : 7, BIT(data,1) ? PARITY_ODD : PARITY_NONE, BIT(data,0) ? STOP_BITS_2 : STOP_BITS_1);
 }
 
 void z180asci_channel_base::cntlb_w(uint8_t data)
@@ -237,7 +249,7 @@ void z180asci_channel_base::tdr_w(uint8_t data)
 	LOG("Z180 TDR%d   wr $%02x\n", m_id, data);
 	m_asci_tdr = data;
 	m_asci_stat &= ~0x02; // clear TDRE
-	transmit_byte(m_asci_tdr);
+	//transmit_byte(m_asci_tdr);
 }
 
 void z180asci_channel_base::rdr_w(uint8_t data)
@@ -257,7 +269,7 @@ void z180asci_channel_base::astch_w(uint8_t data)
 	LOG("Z180 ASTC%dH wr $%02x\n", m_id, data);
 	m_asci_tc.b.h = data;
 }
-
+/*
 void z180asci_channel_base::tra_callback()
 {
 	m_txa_handler(transmit_register_get_data_bit());
@@ -282,10 +294,10 @@ void z180asci_channel_base::received_byte(u8 byte)
 		m_irq = 1;
 	}
 }
-
+*/
 DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::rxa_wr )
 {
-	device_buffered_serial_interface::rx_w(state);
+	//device_buffered_serial_interface::rx_w(state);
 }
 
 
