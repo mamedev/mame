@@ -154,7 +154,7 @@ protected:
 	void rm16(uint16_t addr, PAIR &r);
 	virtual void wm(uint16_t addr, uint8_t value);
 	void wm16(uint16_t addr, PAIR &r);
-	void wm16back(uint16_t addr, PAIR &r);
+	void wm16_sp(PAIR &r);
 	virtual uint8_t rop();
 	virtual uint8_t arg();
 	virtual uint16_t arg16();

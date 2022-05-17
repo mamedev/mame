@@ -111,7 +111,7 @@ CFG_PARAMS[] =
 i82586_base_device::i82586_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endian, u8 datawidth, u8 addrwidth)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
-	, device_network_interface(mconfig, *this, 10.0f)
+	, device_network_interface(mconfig, *this, 10)
 	, m_space_config("shared", endian, datawidth, addrwidth)
 	, m_out_irq(*this)
 	, m_cx(false)

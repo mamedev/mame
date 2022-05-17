@@ -403,6 +403,38 @@ void reel_device::advance_phase()
 			break;
 		}
 		break;
+		
+		case SRU_200STEP_REEL :
+		//Standard drive table is 2,3,1,9,8,c,4,6
+		//Starpoint mechanism, custom for JPM?
+		switch (m_pattern)
+		{
+			case 0x02:
+			m_phase = 7;
+			break;
+			case 0x03:
+			m_phase = 6;
+			break;
+			case 0x01:
+			m_phase = 5;
+			break;
+			case 0x09:
+			m_phase = 4;
+			break;
+			case 0x08:
+			m_phase = 3;
+			break;
+			case 0x0c:
+			m_phase = 2;
+			break;
+			case 0x04:
+			m_phase = 1;
+			break;
+			case 0x06:
+			m_phase = 0;
+			break;
+		}
+		break;
 
 		case PROJECT_48STEP_REEL :
 		//Standard drive table is 8,c,4,5,1,3,2,a

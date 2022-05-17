@@ -298,6 +298,12 @@ ROM_END
 
 ROM_START( coronaa )
 	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("w2_a14_u2.u2", 0x0000, 0x8000, CRC(92a44b92) SHA1(06e25421c34cf9c30c585b261d04b823c4a39b36) )
+	ROM_LOAD("bw2_a14_u3.u3", 0x8000, 0x8000, CRC(abe87285) SHA1(b15f7ddeac78d252cf413ba4085523e44c6d15df) )
+ROM_END
+
+ROM_START( coronab )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("w2_a14c_u2.u2", 0x0000, 0x8000, CRC(be82e199) SHA1(cfcc573774b6907ed137dca01fa7f3fce493a89f) )
 	ROM_LOAD("bw2_a14_u3.u3", 0x8000, 0x8000, CRC(abe87285) SHA1(b15f7ddeac78d252cf413ba4085523e44c6d15df) )
 ROM_END
@@ -312,4 +318,5 @@ ROM_END
 
 /*    YEAR  NAME      PARENT  CMP MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS */
 CONS( 1990, corona,   0,       0, corona,  corona, corona_state, empty_init, "Saitek", "Kasparov Corona (ver. D+)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka Corona II
-CONS( 1988, coronaa,  corona,  0, corona,  corona, corona_state, empty_init, "Saitek", "Kasparov Corona (ver. C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, coronaa,  corona,  0, corona,  corona, corona_state, empty_init, "Saitek", "Kasparov Corona (ver. C, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, coronab,  corona,  0, corona,  corona, corona_state, empty_init, "Saitek", "Kasparov Corona (ver. C, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

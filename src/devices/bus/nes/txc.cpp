@@ -85,7 +85,6 @@ void nes_txc_22211_device::device_start()
 
 void nes_txc_22211_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
 	chr8(0, m_chr_source);
 	m_reg[0] = m_reg[1] = m_reg[2] = m_reg[3] = 0;

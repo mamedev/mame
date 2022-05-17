@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders: kmg, Fabio Priuli
+// copyright-holders:kmg
 #ifndef MAME_BUS_NES_BATLAB_H
 #define MAME_BUS_NES_BATLAB_H
 

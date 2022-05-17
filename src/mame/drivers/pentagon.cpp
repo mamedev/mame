@@ -217,8 +217,8 @@ void pentagon_state::machine_reset()
 
 void pentagon_state::video_start()
 {
-	m_frame_invert_count = 16;
-	m_screen_location = m_ram->pointer() + (5 << 14);
+	spectrum_128_state::video_start();
+	m_contention_pattern = {};
 }
 
 static const gfx_layout spectrum_charlayout =

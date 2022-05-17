@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders: kmg, Fabio Priuli
+// copyright-holders:kmg
 #ifndef MAME_BUS_NES_MMC1_CLONES_H
 #define MAME_BUS_NES_MMC1_CLONES_H
 
@@ -165,6 +165,7 @@ protected:
 
 	virtual void set_prg() override { nes_sxrom_device::set_prg(0x08, 0x07); }
 	virtual void set_chr() override { nes_sxrom_device::set_chr(0x20, 0x1f); }
+	virtual void set_mirror() override {} // hardwired to vertical mirroring
 
 private:
 	void update_banks();

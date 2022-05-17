@@ -98,7 +98,6 @@ void nes_namcot3433_device::device_start()
 
 void nes_namcot3433_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(m_prg_chunks - 2);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -114,7 +113,6 @@ void nes_namcot3446_device::device_start()
 
 void nes_namcot3446_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -131,7 +129,6 @@ void nes_namcot3425_device::device_start()
 
 void nes_namcot3425_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -156,7 +153,6 @@ void nes_namcot340_device::device_start()
 
 void nes_namcot340_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -183,7 +179,6 @@ void nes_namcot175_device::device_start()
 
 void nes_namcot175_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -231,7 +226,6 @@ void nes_namcot163_device::device_start()
 
 void nes_namcot163_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);

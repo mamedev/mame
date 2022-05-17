@@ -2290,8 +2290,8 @@ ROM_END
 
 
 /*
-Chuka Taisen
-Taito, 1988
+Chuka Taisen, Taito, 1988
+Hardware info by Guru
 
  Seta: P0-028-A
 Taito: K1100416A J1100332A
@@ -2487,8 +2487,8 @@ ROM_END
 
 
 /*
-The New Zealand Story
-Taito, 1988
+The New Zealand Story, Taito, 1988
+Hardware info by Guru
 
 PCB Layout ("New style PCB" with 3x z80 and no M-chip, and a daughterboard with ROMs and z80)
 ----------
@@ -2612,19 +2612,84 @@ ROM_START( tnzsj )
 	ROM_LOAD( "b53-15.pal16l8a.subpcb.ic6.jed", 0x03000, 0x01000, NO_DUMP) // on sub pcb
 ROM_END
 
-/* tnzs - old style PCB sets
-The New Zealand Story
-Taito, 1988
 
-Taito ID: K1100356A
-          J1100156A
-          MAIN PCB
-Seta ID: P0-041A
-*/
-/* This pcb is derived from the Chuka Taisen,DrToppel and Arkanoid 2 pcbs, replacing the two color PROMs with color RAM;
-   There is an M-chip i8x42 (with Taito silkscreen) and no 3rd z80.
-   There is no daughter-pcb like the later TNZS pcb has.
-   GFX Roms on the pcb are 28 pin 23C1000/TC531000 128K mask ROMs */
+/**********************************************************************************
+
+The New Zealand Story, Taito, 1988
+Hardware info by Guru
+
+This version uses 8x 28 pin 1 megabit mask ROMs on the main board. There is no daughterboard on top.
+The PCB is very similar to Chuka Taisen, Dr Toppel, Extermination, Kabuki Z and Arkanoid 2 but replaces the two color PROMs with color RAM.
+The PCB has Seta chips so it has 2 sets of PCB numbers and stickers.
+The Taito logo on the PCB is the newer style with the 'A' split into 2 curved shapes.
+
+PCB Layout
+----------
+
+SETA:
+P0-041A
+NEW ZEALAND STORY 905-1054 (sticker)
+
+TAITO:
+K1100365A J1100156A
+K1100356A N. Z.LAND STORY (sticker)
+|--------------------------------------------------|
+|             X1-006                       12MHz   |
+| MB3730  X1-007      8464    X1-001A              |
+|                                                  |
+| VOL                         X1-002A              |
+|      4558                                        |
+|    YM3014    SW                                  |
+|                                                  |
+|        SWB                           B53_08.U8   |
+|J                                                 |
+|A                                     B53_07.U7   |
+|M       SWA            B53_10.U32                 |
+|M                      62256          B53_06.U6   |
+|A                                                 |
+|                                      B53_05.U5   |
+|                                                  |
+|                                      B53_04.U4   |
+|                    B06-101.U36                   |
+|       YM2203   Z80B   6264           B53_03.U3   |
+|                    B53-12.U35                    |
+|X2-005(x5)                            B53-02.U2   |
+|          B53-09.U46      B06-12.U26              |
+|    X1-004     B53_11.U38 B06-13.U25  B53_01.U1   |
+|                      Z80B(1)                     |
+|--------------------------------------------------|
+Notes:
+         Z80B(1) - Z80 CPU. Clock 6.000MHz [12/2] (main CPU)
+            Z80B - Z80 CPU. Clock 6.000MHz [12/2] (sound CPU)
+          YM2203 - Yamaha YM2203 FM Operator Type-N(OPN) sound chip. Clock 3.000MHz [12/4]
+          YM3014 - Yamaha YM3014 Serial Input Floating D/A Converter. Clock 1.000MHz [12/12]
+            4558 - 4558 Dual Operational Amplifier
+          MB3730 - Fujitsu MB3730 Audio Power Amp
+          X2-005 - Custom resistor array used for inputs
+          X1-004 - Seta custom chip marked 'X1-004 in SDIP52 package used for I/O
+          X1-006 - Seta custom chip marked 'X1-006' in SDIP64 package used for palette and pixel mixing functions
+          X1-007 - Seta custom chip marked 'X1-007' in SDIP42 package
+                   RGB and sync on the JAMMA connector are tied to this chip so it's likely an RGB DAC
+         X1-001A - Seta custom graphics chip \
+         X1-002A - Seta custom graphics chip / These work together to create both sprites, tiles and text layer graphics
+           SWA/B - 8-position DIP switch
+              SW - Push button switch for reset
+            8464 - Fujitsu MB8464 8kBx8-bit SRAM (color RAM)
+           62256 - Hitachi HM62256 32kBx8-bit SRAM (main program RAM)
+            6264 - Hitachi HM6462 8kBx8-bit SRAM (sound program RAM)
+    B53_01 to 08 - 23C1000/TC531000 28 pin mask ROMs (graphics)
+      B53-09.U46 - Custom chip marked 'TAITO B53-09 161 832100' in DIP40 package
+                   This is really an i8042/i8742 micro-controller with 2kBx8-bit internal ROM and is known as the 'M-Chip'
+      B53_10.U32 - 27C1000 EPROM (main program)
+      B53_11.U38 - 27C512 EPROM (sound program)
+      B53-12.U35 - PAL16L8 marked 'B53-12'
+     B06-101.U36 - PAL16L8 marked 'B06-101' \
+      B06-12.U26 - PAL16L8 marked 'B06-12'   | Note game 'B06' is Extermination
+      B06-13.U25 - PAL16L8 marked 'B06-13'  /
+           HSync - 15.6245kHz
+           VSync - 59.1836Hz
+
+**********************************************************************************/
 
 ROM_START( tnzso )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k + bankswitch areas for the first CPU */
@@ -2771,8 +2836,8 @@ ROM_START( tnzsop ) // prototype (location test?) version; has different ROM lab
 ROM_END
 
 /*
-Kabuki Z
-Taito, 1988
+Kabuki Z, Taito, 1988
+Hardware info by Guru
 
 This PCB runs on Taito/Seta hardware and the exact same newer PCB as The New Zealand Story.
 As such, everything here also applies to The New Zealand Story.

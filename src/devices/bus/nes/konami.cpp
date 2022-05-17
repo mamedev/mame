@@ -95,7 +95,6 @@ void nes_konami_vrc1_device::device_start()
 
 void nes_konami_vrc1_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -112,7 +111,6 @@ void nes_konami_vrc2_device::device_start()
 
 void nes_konami_vrc2_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -136,7 +134,6 @@ void nes_konami_vrc3_device::device_start()
 
 void nes_konami_vrc3_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -251,10 +248,8 @@ u8 nes_konami_vrc2_device::read_m(offs_t offset)
 {
 	LOG_MMC(("VRC-2 read_m, offset: %04x\n", offset));
 
-	if (!m_battery.empty())
-		return m_battery[offset & (m_battery.size() - 1)];
-	else if (!m_prgram.empty())
-		return m_prgram[offset & (m_prgram.size() - 1)];
+	if (!m_battery.empty() || !m_prgram.empty())
+		return device_nes_cart_interface::read_m(offset);
 	else    // VRC2 was planned with EEPROM support; the non-working feature behaves as a vestigial 1-bit latch in $6000-$6fff on certain boards (contraj, ggoemon2 depend on this)
 		return (offset < 0x1000) ? (get_open_bus() & 0xfe) | (m_latch & 1) : get_open_bus();
 }
@@ -263,10 +258,8 @@ void nes_konami_vrc2_device::write_m(offs_t offset, u8 data)
 {
 	LOG_MMC(("VRC-2 write_m, offset: %04x, data: %02x\n", offset, data));
 
-	if (!m_battery.empty())
-		m_battery[offset & (m_battery.size() - 1)] = data;
-	else if (!m_prgram.empty())
-		m_prgram[offset & (m_prgram.size() - 1)] = data;
+	if (!m_battery.empty() || !m_prgram.empty())
+		device_nes_cart_interface::write_m(offset, data);
 	else if (offset < 0x1000)
 		m_latch = data;
 }

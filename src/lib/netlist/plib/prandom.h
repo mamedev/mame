@@ -123,8 +123,8 @@ namespace plib
 	template <typename FT, typename T>
 	FT normalize_uniform(T &p, FT m = constants<FT>::one(), FT b = constants<FT>::zero()) noexcept
 	{
-		constexpr const auto mmin(narrow_cast<FT>(T::min()));
-		constexpr const auto mmax(narrow_cast<FT>(T::max()));
+		constexpr const FT mmin(narrow_cast<FT>(T::min()));
+		constexpr const FT mmax(narrow_cast<FT>(T::max()));
 		// -> 0 to a
 		return (narrow_cast<FT>(p())- mmin) / (mmax - mmin) * m - b;
 	}
@@ -206,7 +206,7 @@ namespace plib
 					// double: 1.000000e-305
 					// float: 9.999999e-37
 					// FIXME: with 128 bit randoms log(s)/w will fail 1/(2^128) ~ 2.9e-39
-					const auto m(m_stddev * plib::sqrt(-constants<FT>::two() * plib::log(s)/s));
+					const FT m(m_stddev * plib::sqrt(-constants<FT>::two() * plib::log(s)/s));
 					m_buf[i] = /*mean+*/ m * v1;
 					m_buf[i+1] = /*mean+*/ m * v2;
 				}

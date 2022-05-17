@@ -9,13 +9,25 @@
 #include "emu.h"
 #include "midwayic.h"
 
+#define LOG_IRQ             (1U << 1)
+#define LOG_NVRAM           (1U << 2)
+#define LOG_FIFO            (1U << 3)
+#define LOG_IOASIC          (1U << 4)
+#define LOG_PIC             (1U << 5)
+#define LOG_UART            (1U << 6)
 
-#define LOG_NVRAM           (0)
+//#define VERBOSE (LOG_IRQ | LOG_FIFO | LOG_IOASIC | LOG_PIC | LOG_UART)
+#include "logmacro.h"
 
+#define LOGIRQ(...)         LOGMASKED(LOG_IRQ, __VA_ARGS__)
+#define LOGNVRAM(...)       LOGMASKED(LOG_NVRAM, __VA_ARGS__)
+#define LOGFIFO(...)        LOGMASKED(LOG_FIFO, __VA_ARGS__)
+#define LOGIOASIC(...)      LOGMASKED(LOG_IOASIC, __VA_ARGS__)
+#define LOGPIC(...)         LOGMASKED(LOG_PIC, __VA_ARGS__)
+#define LOGUART(...)        LOGMASKED(LOG_UART, __VA_ARGS__)
+
+// Prints serial uart transmit to mame console
 #define PRINTF_DEBUG        (0)
-#define LOG_IOASIC          (0)
-#define LOG_FIFO            (0)
-
 
 /*************************************
  *
@@ -185,7 +197,7 @@ u8 midway_serial_pic_device::read()
 {
 	if (!machine().side_effects_disabled())
 	{
-		logerror("%s:security R = %04X\n", machine().describe_context(), m_buff);
+		LOGPIC("%s:security R = %04X\n", machine().describe_context(), m_buff);
 		m_status = 1;
 	}
 	return m_buff;
@@ -194,7 +206,7 @@ u8 midway_serial_pic_device::read()
 
 void midway_serial_pic_device::write(u8 data)
 {
-	logerror("%s:security W = %04X\n", machine().describe_context(), data);
+	LOGPIC("%s:security W = %04X\n", machine().describe_context(), data);
 
 	/* status seems to reflect the clock bit */
 	m_status = (data >> 4) & 1;
@@ -415,7 +427,7 @@ u8 midway_serial_pic2_device::status_r()
 			result = 1;
 		}
 
-		logerror("%s:PIC status %d\n", machine().describe_context(), result);
+		LOGPIC("%s:PIC status %d\n", machine().describe_context(), result);
 	}
 	return result;
 }
@@ -427,7 +439,7 @@ u8 midway_serial_pic2_device::read()
 
 	/* PIC data register */
 	if (!machine().side_effects_disabled())
-		logerror("%s:PIC data read (index=%d total=%d latch=%03X) =", machine().describe_context(), m_index, m_total, m_latch);
+		LOGPIC("%s:PIC data read (index=%d total=%d latch=%03X) =", machine().describe_context(), m_index, m_total, m_latch);
 
 	/* return the current result */
 	if (m_latch & 0xf00)
@@ -438,22 +450,18 @@ u8 midway_serial_pic2_device::read()
 		result = 0xff;
 
 	if (!machine().side_effects_disabled())
-		logerror("%02X\n", result);
+		LOGPIC("%02X\n", result);
 	return result;
 }
 
 
 void midway_serial_pic2_device::write(u8 data)
 {
-	static FILE *nvramlog;
-	if (LOG_NVRAM && !nvramlog)
-		nvramlog = fopen("nvram.log", "w");
-
 	/* PIC command register */
 	if (m_state == 0)
-		logerror("%s:PIC command %02X\n", machine().describe_context(), data);
+		LOGPIC("%s:PIC command %02X\n", machine().describe_context(), data);
 	else
-		logerror("%s:PIC data %02X\n", machine().describe_context(), data);
+		LOGPIC("%s:PIC data %02X\n", machine().describe_context(), data);
 
 	/* store in the latch, along with a bit to indicate we have data */
 	m_latch = (data & 0x00f) | 0x480;
@@ -586,8 +594,7 @@ void midway_serial_pic2_device::write(u8 data)
 				{
 					m_state = 0;
 					m_nvram[m_nvram_addr] |= m_latch << 4;
-					if (nvramlog)
-						fprintf(nvramlog, "Write byte %02X = %02X\n", m_nvram_addr, m_nvram[m_nvram_addr]);
+					LOGNVRAM("Write byte %02X = %02X\n", m_nvram_addr, m_nvram[m_nvram_addr]);
 				}
 				break;
 
@@ -614,8 +621,7 @@ void midway_serial_pic2_device::write(u8 data)
 					m_total = 0;
 					m_index = 0;
 					m_buffer[m_total++] = m_nvram[m_nvram_addr];
-					if (nvramlog)
-						fprintf(nvramlog, "Read byte %02X = %02X\n", m_nvram_addr, m_nvram[m_nvram_addr]);
+					LOGNVRAM("Read byte %02X = %02X\n", m_nvram_addr, m_nvram[m_nvram_addr]);
 				}
 				break;
 
@@ -828,14 +834,14 @@ void midway_ioasic_device::update_ioasic_irq()
 		if (!m_irq_callback.isnull())
 			m_irq_callback(m_irq_state ? ASSERT_LINE : CLEAR_LINE);
 		if (m_irq_state && (m_reg[IOASIC_UARTIN] & 0x1000))
-			logerror("IOASIC: Asserting IRQ INTCTRL=%04x INTSTAT=%04X\n", m_reg[IOASIC_INTCTL], m_reg[IOASIC_INTSTAT]);
+			LOGIRQ("IOASIC: Asserting IRQ INTCTRL=%04x INTSTAT=%04X\n", m_reg[IOASIC_INTCTL], m_reg[IOASIC_INTSTAT]);
 	}
 }
 
 
 void midway_ioasic_device::cage_irq_handler(uint8_t data)
 {
-	logerror("CAGE irq handler: %d\n", data);
+	LOGIRQ("CAGE irq handler: %d\n", data);
 	m_sound_irq_state = 0;
 	if (data & atari_cage_device::CAGE_IRQ_REASON_DATA_READY)
 		m_sound_irq_state |= 0x0040;
@@ -847,7 +853,7 @@ void midway_ioasic_device::cage_irq_handler(uint8_t data)
 
 WRITE_LINE_MEMBER(midway_ioasic_device::ioasic_input_empty)
 {
-//  logerror("ioasic_input_empty(%d)\n", state);
+	LOGFIFO("ioasic_input_empty(%d)\n", state);
 	if (state)
 		m_sound_irq_state |= 0x0080;
 	else
@@ -858,7 +864,7 @@ WRITE_LINE_MEMBER(midway_ioasic_device::ioasic_input_empty)
 
 WRITE_LINE_MEMBER(midway_ioasic_device::ioasic_output_full)
 {
-//  logerror("ioasic_output_full(%d)\n", state);
+	LOGFIFO("ioasic_output_full(%d)\n", state);
 	if (state)
 		m_sound_irq_state |= 0x0040;
 	else
@@ -886,8 +892,8 @@ uint16_t midway_ioasic_device::fifo_r()
 		m_fifo_bytes--;
 		update_ioasic_irq();
 
-		if (LOG_FIFO && (m_fifo_bytes < 4 || m_fifo_bytes >= FIFO_SIZE - 4))
-			logerror("fifo_r(%04X): FIFO bytes = %d!\n", result, m_fifo_bytes);
+		if (m_fifo_bytes < 4 || m_fifo_bytes >= FIFO_SIZE - 4)
+			LOGFIFO("fifo_r(%04X): FIFO bytes = %d!\n", result, m_fifo_bytes);
 
 		/* if we just cleared the buffer, this may generate an IRQ on the master CPU */
 		/* because of the way the streaming code works, we need to make sure that the */
@@ -896,14 +902,12 @@ uint16_t midway_ioasic_device::fifo_r()
 		if (m_fifo_bytes == 0 && m_has_dcs)
 		{
 			m_fifo_force_buffer_empty_pc = m_dcs_cpu->pc();
-			if (LOG_FIFO)
-				logerror("fifo_r(%04X): FIFO empty, PC = %04X\n", result, m_fifo_force_buffer_empty_pc);
+			LOGFIFO("fifo_r(%04X): FIFO empty, PC = %04X\n", result, m_fifo_force_buffer_empty_pc);
 		}
 	}
 	else
 	{
-		if (LOG_FIFO)
-			logerror("fifo_r(): nothing to read!\n");
+		LOGFIFO("fifo_r(): nothing to read!\n");
 	}
 	return result;
 }
@@ -938,8 +942,7 @@ uint16_t midway_ioasic_device::fifo_status_r(address_space &space)
 		{
 			m_fifo_force_buffer_empty_pc = 0;
 			result |= 0x08;
-			if (LOG_FIFO)
-				logerror("ioasic_fifo_status_r(%04X): force empty, PC = %04X\n", result, currpc);
+			LOGFIFO("ioasic_fifo_status_r(%04X): force empty, PC = %04X\n", result, currpc);
 		}
 	}
 
@@ -958,8 +961,7 @@ WRITE_LINE_MEMBER(midway_ioasic_device::fifo_reset_w)
 		m_force_fifo_full = 0;
 		update_ioasic_irq();
 	}
-	if (LOG_FIFO)
-		logerror("%s:fifo_reset(%d)\n", machine().describe_context(), state);
+	LOGFIFO("%s:fifo_reset(%d)\n", machine().describe_context(), state);
 }
 
 
@@ -971,13 +973,12 @@ void midway_ioasic_device::fifo_w(uint16_t data)
 		m_fifo[m_fifo_in++ % FIFO_SIZE] = data;
 		m_fifo_bytes++;
 		update_ioasic_irq();
-		if (LOG_FIFO && (m_fifo_bytes < 4 || m_fifo_bytes >= FIFO_SIZE - 4))
-			logerror("fifo_w(%04X): FIFO bytes = %d!\n", data, m_fifo_bytes);
+		if (m_fifo_bytes < 4 || m_fifo_bytes >= FIFO_SIZE - 4)
+			LOGFIFO("fifo_w(%04X): FIFO bytes = %d!\n", data, m_fifo_bytes);
 	}
 	else
 	{
-		if (LOG_FIFO)
-			logerror("fifo_w(%04X): out of space!\n", data);
+		LOGFIFO("fifo_w(%04X): out of space!\n", data);
 	}
 	m_dcs->fifo_notify(m_fifo_bytes, FIFO_SIZE);
 }
@@ -985,8 +986,7 @@ void midway_ioasic_device::fifo_w(uint16_t data)
 
 void midway_ioasic_device::fifo_full_w(uint16_t data)
 {
-	if (LOG_FIFO)
-		logerror("fifo_full_w(%04X)\n", data);
+	LOGFIFO("fifo_full_w(%04X)\n", data);
 	m_force_fifo_full = 1;
 	update_ioasic_irq();
 	m_dcs->fifo_notify(m_fifo_bytes, FIFO_SIZE);
@@ -1048,7 +1048,7 @@ uint32_t midway_ioasic_device::read(address_space &space, offs_t offset)
 		case IOASIC_UARTIN:
 			m_reg[offset] &= ~0x1000;
 			if (result & 0x1000)
-				logerror("%s: ioasic_r(%d) = %08X\n", machine().describe_context(), offset, result);
+				LOGUART("%s: ioasic_r(%d) = %08X\n", machine().describe_context(), offset, result);
 			// Add lf
 			if ((result & 0xff)==0x0d)
 				m_reg[offset] = 0x300a;
@@ -1097,8 +1097,8 @@ uint32_t midway_ioasic_device::read(address_space &space, offs_t offset)
 			break;
 	}
 
-	if (LOG_IOASIC && offset != IOASIC_SOUNDSTAT && offset != IOASIC_SOUNDIN)
-		logerror("%s:ioasic_r(%d) = %08X\n", machine().describe_context(), offset, result);
+	if (offset != IOASIC_SOUNDSTAT && offset != IOASIC_SOUNDIN)
+		LOGIOASIC("%s:ioasic_r(%d) = %08X\n", machine().describe_context(), offset, result);
 
 	return result;
 }
@@ -1141,8 +1141,8 @@ void midway_ioasic_device::write(offs_t offset, uint32_t data, uint32_t mem_mask
 		COMBINE_DATA(&m_reg[offset]);
 	newreg = m_reg[offset];
 
-	if (LOG_IOASIC && offset != IOASIC_SOUNDOUT)
-		logerror("%s ioasic_w(%d) = %08X\n", machine().describe_context(), offset, data);
+	if (offset != IOASIC_SOUNDOUT)
+		LOGIOASIC("%s ioasic_w(%d) = %08X\n", machine().describe_context(), offset, data);
 
 	switch (offset)
 	{
@@ -1165,7 +1165,7 @@ void midway_ioasic_device::write(offs_t offset, uint32_t data, uint32_t mem_mask
 			break;
 
 		case IOASIC_UARTCONTROL:
-			logerror("%s: IOASIC uart control = %04X INTCTRL=%04x\n", machine().describe_context(), data, m_reg[IOASIC_INTCTL]);
+			LOGMASKED(LOG_IOASIC | LOG_UART, "%s: IOASIC uart control = %04X INTCTRL=%04x\n", machine().describe_context(), data, m_reg[IOASIC_INTCTL]);
 			break;
 
 		case IOASIC_UARTOUT:
@@ -1184,12 +1184,11 @@ void midway_ioasic_device::write(offs_t offset, uint32_t data, uint32_t mem_mask
 					logerror("%c", data & 0xff);
 				}
 			}
-			//logerror("IOASIC uart tx data = %04X\n", data);
+			LOGUART("IOASIC uart tx data = %04X\n", data);
 			break;
 
 		case IOASIC_SOUNDCTL:
-			if (LOG_IOASIC)
-				logerror("%s: write IOASIC_SOUNDCTL=%04x\n", machine().describe_context(), data);
+			LOGIOASIC("%s: write IOASIC_SOUNDCTL=%04x\n", machine().describe_context(), data);
 			/* sound reset? */
 			if (m_has_dcs)
 			{
@@ -1244,8 +1243,8 @@ void midway_ioasic_device::write(offs_t offset, uint32_t data, uint32_t mem_mask
 			/* bit  7 = sound output buffer empty */
 			/* bit 14 = LED */
 			/* bit 15 = TI320Cx Mode Enable */
-			if (LOG_IOASIC && ((oldreg ^ newreg) & 0x3ff6))
-				logerror("IOASIC interrupt control = %04X\n", data);
+			if ((oldreg ^ newreg) & 0x3ff6)
+				LOGMASKED(LOG_IOASIC | LOG_IRQ, "IOASIC interrupt control = %04X\n", data);
 			update_ioasic_irq();
 			break;
 

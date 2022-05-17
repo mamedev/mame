@@ -58,7 +58,6 @@ void nes_action53_device::pcb_start(running_machine &machine, u8 *ciram_ptr, boo
 
 void nes_action53_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	// register content is not touched by reset
 }
 

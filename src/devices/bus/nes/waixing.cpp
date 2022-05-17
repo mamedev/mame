@@ -183,7 +183,6 @@ void nes_waixing_a_device::device_start()
 
 void nes_waixing_a_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	mmc3_common_initialize(0xff, 0xff, 0);
 
 	std::fill(std::begin(mapper_ram), std::end(mapper_ram), 0x00);
@@ -191,7 +190,6 @@ void nes_waixing_a_device::pcb_reset()
 
 void nes_waixing_g_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	mmc3_common_initialize(0xff, 0xff, 0);
 
 	std::fill(std::begin(mapper_ram), std::end(mapper_ram), 0x00);
@@ -219,8 +217,6 @@ void nes_waixing_j_device::device_start()
 
 void nes_waixing_j_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-
 	m_reg[0] = 0x01;
 	m_reg[1] = 0x02;
 	m_reg[2] = 0x7e;
@@ -250,8 +246,6 @@ void nes_waixing_sec_device::device_start()
 
 void nes_waixing_sec_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-
 	m_reg = 0;
 	mmc3_common_initialize(0xff, 0xff, 0);
 }
@@ -264,7 +258,6 @@ void nes_waixing_sgzlz_device::device_start()
 
 void nes_waixing_sgzlz_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
 	chr8(0, m_chr_source);
 
@@ -279,20 +272,11 @@ void nes_waixing_ffv_device::device_start()
 
 void nes_waixing_ffv_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(0x1f);
 	chr8(0, m_chr_source);
 
 	m_reg[0] = m_reg[1] = 0;
-}
-
-void nes_waixing_wxzs2_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
-	set_nt_mirroring(PPU_MIRROR_VERT);
 }
 
 void nes_waixing_fs304_device::device_start()
@@ -303,7 +287,6 @@ void nes_waixing_fs304_device::device_start()
 
 void nes_waixing_fs304_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
 	chr8(0, m_chr_source);
 

@@ -120,6 +120,10 @@ private:
 	std::unique_ptr<ti99_cartridge_pcb> m_pcb;          // inbound
 	cartridge_connector_device*    m_connector;    // outbound
 
+	// We use dynamically allocated space instead of memory regions
+	// because the required spaces are widely varying (8K to 32M)
+	std::unique_ptr<u8[]> m_romspace;
+
 	// RPK which is associated to this cartridge
 	// When we close it, the contents are saved to NVRAM if available
 	std::unique_ptr<rpk> m_rpk;

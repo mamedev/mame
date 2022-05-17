@@ -22,6 +22,9 @@
 #include "machine/i8251.h"
 #include "machine/mb87013.h"
 
+
+namespace {
+
 class roland_pr100_state : public driver_device
 {
 public:
@@ -118,4 +121,13 @@ ROM_START(pr100)
 	ROM_LOAD("roland_mbm27c512-20.ic10", 0x00000, 0x10000, CRC(41160b69) SHA1(11e5fb001dd004a5625d9a75fb1acac4ade614c8))
 ROM_END
 
-SYST(1987, pr100, 0, 0, pr100, pr100, roland_pr100_state, empty_init, "Roland", "PR-100 Digital Sequencer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+ROM_START(pr100_201)
+	ROM_REGION(0x10000, "program", 0)
+	ROM_LOAD("pr100-201_mbm27c512-20.ic10", 0x00000, 0x10000, CRC(2f3bc01c) SHA1(114ff687ffac4d517edba77d427422c4d2a6d369))
+ROM_END
+
+} // anonymous namespace
+
+
+SYST(1987, pr100,     0,     0, pr100, pr100, roland_pr100_state, empty_init, "Roland", "PR-100 Digital Sequencer (v2.02)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+SYST(1987, pr100_201, pr100, 0, pr100, pr100, roland_pr100_state, empty_init, "Roland", "PR-100 Digital Sequencer (v2.01)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -115,7 +115,6 @@ void nes_oekakids_device::pcb_reset()
 	prg32(0);
 	chr4_0(0, CHRRAM);
 	chr4_4(3, CHRRAM);
-	set_nt_mirroring(PPU_MIRROR_LOW);
 	m_latch = 0;
 	m_reg = 0;
 }
@@ -132,7 +131,6 @@ void nes_fcg_device::device_start()
 
 void nes_fcg_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -154,7 +152,6 @@ void nes_lz93d50_24c01_device::device_start()
 
 void nes_lz93d50_24c01_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);

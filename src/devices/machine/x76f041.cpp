@@ -362,6 +362,9 @@ WRITE_LINE_MEMBER( x76f041_device::write_scl )
 		case STATE_RESET_READ_PASSWORD:
 		case STATE_MASS_PROGRAM:
 		case STATE_MASS_ERASE:
+			// FIXME: Processing on the rising edge of the clock causes sda to change state while clock is high
+			// which is not allowed. Also need to ensure that only valid device-id's and commands
+			// are acknowledged.
 			if( m_scl == 0 && state != 0 )
 			{
 				if( m_bit < 8 )
@@ -592,6 +595,8 @@ WRITE_LINE_MEMBER( x76f041_device::write_scl )
 
 		case STATE_READ_DATA:
 		case STATE_READ_CONFIGURATION_REGISTERS:
+			// FIXME: Processing on the rising edge of the clock causes sda to change state while clock is high
+			// which is not allowed.
 			if( m_scl == 0 && state != 0 )
 			{
 				if( m_bit < 8 )

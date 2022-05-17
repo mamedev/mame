@@ -48,7 +48,7 @@ namespace netlist
 		{
 			gsl_Expects(m_active_outputs >= 1);
 
-			if (m_activate && m_hint_deactivate)
+			if (!m_activate.isnull() && m_hint_deactivate)
 				if (--m_active_outputs == 0)
 				{
 					m_activate(false); //dec_active();
@@ -78,7 +78,7 @@ namespace netlist
 		}
 
 	protected:
-		using activate_delegate = plib::pmfp<void, bool>;
+		using activate_delegate = plib::pmfp<void (bool)>;
 
 		activate_delegate m_activate;
 

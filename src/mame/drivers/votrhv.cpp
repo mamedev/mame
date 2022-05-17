@@ -705,7 +705,7 @@ ROM_START(hc110)
 	ROM_LOAD("ea8316e032.ic7", 0x1000, 0x0800, CRC(5df1270c) SHA1(5c81fcb2bb2c0bf509aa9fc11a92071cd469e407))
 	ROM_LOAD("ea8316e033.ic6", 0x1800, 0x0800, CRC(0d7e246c) SHA1(1454c6c7ef3743320443c7bd1f37df6a25ff7795))
 
-	ROM_REGION(0x0400, "bootrom", 0)
+	ROM_REGION(0x0600, "bootrom", 0)
 	// ic12 is unpopulated
 	ROM_LOAD("7031r2.sn74s472.ic11", 0x0000, 0x0200, CRC(6ef744c9) SHA1(6a92e520adb3c47b849241648ec2ca4107edfd8f))
 	ROM_LOAD("7031r3.sn74s472.ic10", 0x0200, 0x0200, CRC(0800b0e6) SHA1(9e0481bf6c5feaf6506ac241a2baf83fb9342033))
@@ -723,7 +723,7 @@ ROM_START(hc120) // ic10 and ic11 are Rev B? is there an older revision undumped
 	ROM_LOAD("ea8316e032.ic7", 0x1000, 0x0800, CRC(5df1270c) SHA1(5c81fcb2bb2c0bf509aa9fc11a92071cd469e407))
 	ROM_LOAD("ea8316e033.ic6", 0x1800, 0x0800, CRC(0d7e246c) SHA1(1454c6c7ef3743320443c7bd1f37df6a25ff7795))
 
-	ROM_REGION(0x0400, "bootrom", 0)
+	ROM_REGION(0x0600, "bootrom", 0)
 	// ic12 is unpopulated
 	ROM_LOAD("7037__r2b.sn74s472.ic11", 0x0000, 0x0200, CRC(44de1bb1) SHA1(53e6811baf37af5da0648e906fee6c6acf259b82))
 	ROM_LOAD("7037__r3b.sn74s472.ic10", 0x0200, 0x0200, CRC(688be8c7) SHA1(c9bdc7472cabcdddc23e63f45afbfcc835bb8f69))

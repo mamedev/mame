@@ -10,13 +10,21 @@ license:CC0
 <softwarelist name="specpls3_flop" description="Sinclair ZX Spectrum +3 disk images">
 
 <!--
-    SPS / CAPS Releases
-    http://www.softpres.org/_media/files:datafiles.zip?id=download&cache=cache
+	Known undumped:
+		Chichén Itzá (likely but unconfirmed)
+		Comando Tracer (dual-system Spectrum/Amstrad release)
+		Psycho Pigs UXB
 
-    Known missing IPF dumps:
+    Known missing SPS/CAPS IPF dumps (http://www.softpres.org/_media/files:datafiles.zip?id=download&cache=cache):
         3585    LED Storm: Lazer Enhanced Destruction
         3607    Rock Star Ate My Hamster
         3625    Tiger Road
+	
+	Observations:
+		Artura (alt): Side B has Hardball for the Amstrad CPC, was this edition accidentally sold like this?
+	
+	TO DO:
+		Some DSK images may come from the same releases as their respective IPFs. These cases need to be compared and verified to be the same thing before the redundant (and inferior) DSKs can be discarded.
 -->
 
 	<software name="qoscrup">
@@ -7545,17 +7553,18 @@ license:CC0
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="arturaa" cloneof="artura">
 	<!-- May be the same edition as the IPF -->
+	<!--	Side B has Hardball for the Amstrad CPC, was this edition accidentally sold like this?	-->
 		<description>Artura (alt)</description>
 		<year>1989</year>
 		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
-			<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A: Artura (ZX Spectrum)"/>
 			<dataarea name="flop" size="194816">
 				<rom name="artura (1989)(gremlin graphics)(side a).dsk" size="194816" crc="a60019cb" sha1="3303b24cc705b4b6051223d653288ef115d90b2d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3">
-			<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B: Hardball (Amstrad CPC)"/>
 			<dataarea name="flop" size="194816">
 				<rom name="artura (1989)(gremlin graphics)(side b).dsk" size="194816" crc="9e8f9c27" sha1="4e2b395bbaf8e08341f515cdfc5744931d72872b" offset="0" />
 			</dataarea>
@@ -9066,21 +9075,13 @@ license:CC0
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="comtracr">
-	<!-- This is a dual-system Spectrum/Amstrad release (Side A: ZX Spectrum, Side B: Amstrad CPC) -->
 		<description>Comando Tracer</description>
 		<year>1988</year>
 		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
-		<!-- Dump of side A might come from standalone version -->
 			<feature name="part_id" value="Side A: ZX Spectrum"/>
 			<dataarea name="flop" size="75008">
 				<rom name="comando tracer (1988)(dinamic)(es).dsk" size="75008" crc="985c2136" sha1="be76783bd8429b9f3ec2cd8702e7419b1c632ee6" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3">
-			<feature name="part_id" value="Side B: Amstrad CPC"/>
-			<dataarea name="flop" size = "69871">
-				<rom name="comando tracer (s) (1988) (cpm) [original].dsk" size="69871" crc="0261b785" sha1="767457b02516699c9d463f6c0ba69402fe87a813" offset="0" />
 			</dataarea>
 		</part>
 	</software>

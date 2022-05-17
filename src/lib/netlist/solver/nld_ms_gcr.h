@@ -19,9 +19,7 @@
 
 #include <algorithm>
 
-namespace netlist
-{
-namespace solver
+namespace netlist::solver
 {
 
 	template <typename FT, int SIZE>
@@ -308,7 +306,7 @@ namespace solver
 		generate_code(strm);
 		strm.writeline("}\n");
 		// some compilers (_WIN32, _WIN64, mac osx) need an explicit cast
-		return std::pair<pstring, pstring>(name, putf8string(t.str()));
+		return { name, putf8string(t.str()) };
 	}
 
 	template <typename FT, int SIZE>
@@ -337,7 +335,6 @@ namespace solver
 		}
 	}
 
-} // namespace solver
-} // namespace netlist
+} // namespace netlist::solver
 
 #endif // NLD_MS_GCR_H_

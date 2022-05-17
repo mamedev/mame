@@ -206,7 +206,7 @@ namespace netlist
 
 			std::size_t id() const { return m_id; }
 		private:
-			using setter_t = plib::pmfp<void,nl_fptype>;
+			using setter_t = plib::pmfp<void (nl_fptype)>;
 
 			template <typename S>
 			void setter(nl_fptype v)

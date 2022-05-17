@@ -10640,7 +10640,11 @@ ROM_START( super7 )
 	ROM_LOAD( "gal20v8.bin",   0x000, 0x114, NO_DUMP )
 ROM_END
 
-ROM_START( chthree )
+/*
+  Channel Three
+  Seems a modded version of Cherry Master.
+
+*/ROM_START( chthree )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.u40",   0x0000, 0x8000, CRC(3d677758) SHA1(d2d13e54d3b55460a05b0ca42e12d8a6d72954ba) ) // 1ST AND 2ND HALF IDENTICAL
 	ROM_IGNORE(0x8000)
@@ -10655,8 +10659,8 @@ ROM_START( chthree )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_LOAD( "3.u49",   0x0000, 0x2000, CRC(b541cbc0) SHA1(ab8666c06a71fa8364c71d14715ddf9e222064cd) )
-	ROM_LOAD( "4.u50",   0x2000, 0x2000, CRC(95ecd2aa) SHA1(73452c77dd83f96038d197bad5e37f0b3d9de561) )
-	ROM_LOAD( "5.u51",   0x4000, 0x2000, CRC(a99c87ba) SHA1(4d74ded22da25e093b09d0a4abfbd3e1eabd816c) )
+	ROM_LOAD( "5.u51",   0x2000, 0x2000, CRC(a99c87ba) SHA1(4d74ded22da25e093b09d0a4abfbd3e1eabd816c) )
+	ROM_LOAD( "4.u50",   0x4000, 0x2000, CRC(95ecd2aa) SHA1(73452c77dd83f96038d197bad5e37f0b3d9de561) )
 	ROM_LOAD( "6.u52",   0x6000, 0x2000, CRC(5b19025d) SHA1(8e861ed8249811fdf50de8ca9c44fe1176a7e340) )
 
 	ROM_REGION( 0x10000, "user1", 0 )
@@ -10669,12 +10673,13 @@ ROM_START( chthree )
 	ROM_REGION( 0x200, "proms2", 0 )
 	ROM_LOAD( "82s129.u24", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 
-	ROM_REGION( 0x800, "plds", 0 ) // PALs dumps from a 27c020 adapter are available, need checking / conversion
-	ROM_LOAD( "16l8_u18.bin", 0x0000, 0x117, NO_DUMP )
-	ROM_LOAD( "16l8_u31.bin", 0x0200, 0x117, NO_DUMP )
-	ROM_LOAD( "16l8_u32.bin", 0x0400, 0x117, NO_DUMP )
-	ROM_LOAD( "16l8_u30.bin", 0x0600, 0x117, NO_DUMP )
+	ROM_REGION( 0x800, "plds", 0 ) // PALs were bruteforced and converted.
+	ROM_LOAD( "tibpal_16l8.u18", 0x0000, 0x117, CRC(374f878e) SHA1(3b3a66dd1addbd4a8678ef8000a5426651010ebd) )
+	ROM_LOAD( "tibpal_16l8.u30", 0x0200, 0x117, CRC(d3cfa978) SHA1(9aae06336be34818896c39d9af9c19d8b2035548) )
+	ROM_LOAD( "tibpal_16l8.u31", 0x0400, 0x117, CRC(97f1f441) SHA1(bc9e7bba675df363e7fcad18efad89f6a543b2a4) )
+	ROM_LOAD( "tibpal_16l8.u32", 0x0600, 0x117, CRC(8a5a8ded) SHA1(abb2bb51f0ead55606cc279ca4bef400d62730b0) )
 ROM_END
+
 
 /*
 2764.u10                m4.64                   IDENTICAL
@@ -19217,6 +19222,20 @@ void cb3_state::init_cherrys()
 	}
 }
 
+void cb3_state::init_cb3c()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	std::vector<uint8_t> buffer(0x10000);
+
+	memcpy(&buffer[0], rom, 0x10000);
+
+	for (int i = 0; i < 0x10000; i++)
+	{
+		rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 10, 11, 12, 9, 15, 0, 14, 13, 8, 7, 6, 5, 4, 3, 2, 1)];
+		rom[i] = bitswap<8>(rom[i], 1, 0, 6, 4, 7, 5, 3, 2);
+	}
+}
 
 void cb3_state::init_cb3e()
 {
@@ -19582,7 +19601,7 @@ GAMEL( 199?, ncb3,      0,        ncb3,     ncb3,     cb3_state,      empty_init
 GAMEL( 199?, cb3a,      ncb3,     ncb3,     cb3a,     cb3_state,      empty_init,     ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 2)",          0,                 layout_cherryb3 )
 GAMEL( 199?, cb3,       ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3,       ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, encrypted)",      0,                 layout_cherryb3 )
 GAMEL( 199?, cb3b,      ncb3,     cherrys,  ncb3,     cb3_state,      init_cherrys,   ROT0, "Dyna",              "Cherry Bonus III (alt)",                      0,                 layout_cherryb3 )
-GAME(  199?, cb3c,      ncb3,     cb3c,     chrygld,  cb3_state,      init_cb3,       ROT0, "bootleg",           "Cherry Bonus III (alt, set 2)",               MACHINE_NOT_WORKING) // encrypted
+GAME(  199?, cb3c,      ncb3,     cb3c,     chrygld,  cb3_state,      init_cb3c,      ROT0, "bootleg",           "Cherry Bonus III (Ivanhoe V46-0799)",         MACHINE_NOT_WORKING) // decryption should be good, but different memory map
 GAMEL( 199?, cb3d,      ncb3,     ncb3,     ncb3,     cb3_state,      empty_init,     ROT0, "bootleg",           "Cherry Bonus III (set 3)",                    0,                 layout_cherryb3 )
 GAMEL( 199?, cb3e,      ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e,      ROT0, "bootleg",           "Cherry Bonus III (set 4, encrypted bootleg)", 0,                 layout_chrygld )
 GAMEL( 199?, cb3f,      ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3f,      ROT0, "bootleg (Cleco)",   "Cherry Bonus III (set 5, encrypted bootleg)", MACHINE_NOT_WORKING, layout_chrygld ) // partially decrypted, stops at 'call attendant'

@@ -53,7 +53,7 @@ public:
 		m_kernal(*this, "kernal"),
 		m_charom(*this, "charom"),
 		m_color_ram(*this, "color_ram"),
-		m_row(*this, "ROW%u", 0),
+		m_col(*this, "COL%u", 0),
 		m_restore(*this, "RESTORE"),
 		m_lock(*this, "LOCK")
 	{ }
@@ -81,7 +81,7 @@ private:
 	required_region_ptr<uint8_t> m_kernal;
 	required_region_ptr<uint8_t> m_charom;
 	required_shared_ptr<uint8_t> m_color_ram;
-	required_ioport_array<8> m_row;
+	required_ioport_array<8> m_col;
 	required_ioport m_restore;
 	required_ioport m_lock;
 
@@ -106,6 +106,7 @@ private:
 
 	uint8_t via2_pa_r();
 	uint8_t via2_pb_r();
+	void via2_pa_w(uint8_t data);
 	void via2_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( via2_ca2_w );
 	DECLARE_WRITE_LINE_MEMBER( via2_cb2_w );
@@ -114,6 +115,7 @@ private:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_vc20);
 	// keyboard state
+	int m_key_row;
 	int m_key_col;
 	int m_light_pen;
 	int m_user_joy0;
@@ -402,7 +404,7 @@ void vic20_state::vic_colorram_map(address_map &map)
 //-------------------------------------------------
 
 static INPUT_PORTS_START( vic20 )
-	PORT_START( "ROW0" )
+	PORT_START( "COL0" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Del  Inst") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2)     PORT_CHAR(0xA3)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)          PORT_CHAR('+')
@@ -412,7 +414,7 @@ static INPUT_PORTS_START( vic20 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3)              PORT_CHAR('3') PORT_CHAR('#')
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1)              PORT_CHAR('1') PORT_CHAR('!')
 
-	PORT_START( "ROW1" )
+	PORT_START( "COL1" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE)     PORT_CHAR('*')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P)              PORT_CHAR('P')
@@ -422,7 +424,7 @@ static INPUT_PORTS_START( vic20 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W)              PORT_CHAR('W')
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x90") PORT_CODE(KEYCODE_TILDE) PORT_CHAR(0x2190)
 
-	PORT_START( "ROW2" )
+	PORT_START( "COL2" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Crsr Right Left") PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)          PORT_CHAR(';') PORT_CHAR(']')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L)              PORT_CHAR('L')
@@ -432,7 +434,7 @@ static INPUT_PORTS_START( vic20 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A)              PORT_CHAR('A')
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TAB)            PORT_CHAR(UCHAR_SHIFT_2)
 
-	PORT_START( "ROW3" )
+	PORT_START( "COL3" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Crsr Down Up") PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH)          PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA)          PORT_CHAR(',') PORT_CHAR('<')
@@ -442,7 +444,7 @@ static INPUT_PORTS_START( vic20 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Shift (Left)") PORT_CODE(KEYCODE_LSHIFT)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Stop Run") PORT_CODE(KEYCODE_HOME)
 
-	PORT_START( "ROW4" )
+	PORT_START( "COL4" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1)             PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHAR(UCHAR_MAMEKEY(F2))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Shift (Right)") PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP)           PORT_CHAR('.') PORT_CHAR('>')
@@ -452,7 +454,7 @@ static INPUT_PORTS_START( vic20 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z)              PORT_CHAR('Z')
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE)          PORT_CHAR(' ')
 
-	PORT_START( "ROW5" )
+	PORT_START( "COL5" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2)             PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_CHAR(UCHAR_MAMEKEY(F4))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH)      PORT_CHAR('=')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)          PORT_CHAR(':') PORT_CHAR('[')
@@ -462,7 +464,7 @@ static INPUT_PORTS_START( vic20 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S)              PORT_CHAR('S')
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CBM") PORT_CODE(KEYCODE_LCONTROL)
 
-	PORT_START( "ROW6" )
+	PORT_START( "COL6" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F3)             PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_CHAR(UCHAR_MAMEKEY(F6))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x91  Pi") PORT_CODE(KEYCODE_DEL) PORT_CHAR(0x2191,'^') PORT_CHAR(0x03C0)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE)      PORT_CHAR('@')
@@ -472,7 +474,7 @@ static INPUT_PORTS_START( vic20 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E)              PORT_CHAR('E')
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q)              PORT_CHAR('Q')
 
-	PORT_START( "ROW7" )
+	PORT_START( "COL7" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F4)             PORT_CHAR(UCHAR_MAMEKEY(F7)) PORT_CHAR(UCHAR_MAMEKEY(F8))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Home  Clr") PORT_CODE(KEYCODE_INSERT) PORT_CHAR(UCHAR_MAMEKEY(HOME))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS)         PORT_CHAR('-')
@@ -498,7 +500,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( vic1001 )
 	PORT_INCLUDE( vic20 )
 
-	PORT_MODIFY( "ROW0" )
+	PORT_MODIFY( "COL0" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR(0xA5)
 INPUT_PORTS_END
 
@@ -510,24 +512,24 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( vic20s )
 	PORT_INCLUDE( vic20 )
 
-	PORT_MODIFY( "ROW0" )
+	PORT_MODIFY( "COL0" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2)     PORT_CHAR(':') PORT_CHAR('*')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)          PORT_CHAR('-')
 
-	PORT_MODIFY( "ROW1" )
+	PORT_MODIFY( "COL1" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE)     PORT_CHAR('@')
 
-	PORT_MODIFY( "ROW2" )
+	PORT_MODIFY( "COL2" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)          PORT_CHAR(0x00C4)
 
-	PORT_MODIFY( "ROW5" )
+	PORT_MODIFY( "COL5" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH)      PORT_CHAR(';') PORT_CHAR('+')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)          PORT_CHAR(0x00D6)
 
-	PORT_MODIFY( "ROW6" )
+	PORT_MODIFY( "COL6" )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE)      PORT_CHAR(0x00C5)
 
-	PORT_MODIFY( "ROW7" )
+	PORT_MODIFY( "COL7" )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS)         PORT_CHAR('=')
 INPUT_PORTS_END
 
@@ -635,7 +637,7 @@ uint8_t vic20_state::via2_pa_r()
 
 	for (int i = 0; i < 8; i++)
 	{
-		if (!BIT(m_key_col, i)) data &= m_row[i]->read();
+		if (!BIT(m_key_col, i)) data &= m_col[i]->read();
 	}
 
 	return data;
@@ -663,9 +665,38 @@ uint8_t vic20_state::via2_pb_r()
 	// joystick
 	uint8_t joy = m_joy->read_joy();
 
-	data &= BIT(joy, 3) << 7;
+	data &= (BIT(joy, 3) << 7) | 0x7f;
+
+	for (int i = 0; i < 8; i++)
+	{
+		if (!BIT(m_key_row, i))
+			for (int c = 0; c < 8; c++)
+				if (!BIT(m_col[c]->read(), i))
+					data &= ~(1 << c);
+	}
 
 	return data;
+}
+
+void vic20_state::via2_pa_w(uint8_t data)
+{
+	/*
+
+		bit     description
+
+		PA0     ROW 0
+		PA1     ROW 1
+		PA2     ROW 2
+		PA3     ROW 3
+		PA4     ROW 4
+		PA5     ROW 5
+		PA6     ROW 6
+		PA7     ROW 7
+
+	*/
+
+	// keyboard row
+	m_key_row = data;
 }
 
 void vic20_state::via2_pb_w(uint8_t data)
@@ -737,7 +768,11 @@ void vic20_state::machine_start()
 		if (!(offset % 64)) data ^= 0xff;
 	}
 
+	m_key_row = 0xff;
+	m_key_col = 0xff;
+
 	// state saving
+	save_item(NAME(m_key_row));
 	save_item(NAME(m_key_col));
 	save_item(NAME(m_light_pen));
 	save_item(NAME(m_user_joy0));
@@ -873,6 +908,7 @@ void vic20_state::add_clocked_devices(machine_config &config, uint32_t clock)
 	MOS6522(config, m_via2, clock);
 	m_via2->readpa_handler().set(FUNC(vic20_state::via2_pa_r));
 	m_via2->readpb_handler().set(FUNC(vic20_state::via2_pb_r));
+	m_via2->writepa_handler().set(FUNC(vic20_state::via2_pa_w));
 	m_via2->writepb_handler().set(FUNC(vic20_state::via2_pb_w));
 	m_via2->ca2_handler().set(FUNC(vic20_state::via2_ca2_w));
 	m_via2->cb2_handler().set(FUNC(vic20_state::via2_cb2_w));

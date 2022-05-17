@@ -151,11 +151,11 @@ void h8500_disassembler::format_reglist(std::ostream &stream, u8 x)
 			if (first)
 				first = false;
 			else
-				stream << ",";
+				stream << ',';
 			format_reg(stream, start, true);
 			if (n - 1 != start)
 			{
-				stream << "-";
+				stream << '-';
 				format_reg(stream, n - 1, true);
 			}
 			start = -1;
@@ -184,24 +184,24 @@ void h8500_disassembler::format_ea(std::ostream &stream, u8 ea, u16 disp)
 	if (ea >= 0xe0)
 	{
 		if (ea >= 0xf0)
-			util::stream_format(stream, "@(H'%04X,", disp);
+			util::stream_format(stream, "@(H'%04X, ", disp);
 		else if (s16(disp) >= -9 && s16(disp) <= 9)
-			util::stream_format(stream, "@(%d,", s16(disp));
+			util::stream_format(stream, "@(%d, ", s16(disp));
 		else if (s16(disp) < 0)
-			util::stream_format(stream, "@(-H'%02X,", u16(-disp));
+			util::stream_format(stream, "@(-H'%02X, ", u16(-disp));
 		else
-			util::stream_format(stream, "@(H'%02X,", disp);
+			util::stream_format(stream, "@(H'%02X, ", disp);
 		format_reg(stream, ea & 0x07, true);
-		stream << ")";
+		stream << ')';
 	}
 	else if (ea >= 0xb0)
 	{
-		stream << "@";
+		stream << '@';
 		if ((ea & 0xf0) == 0xb0)
-			stream << "-";
+			stream << '-';
 		format_reg(stream, ea & 0x07, true);
 		if ((ea & 0xf0) == 0xc0)
-			stream << "+";
+			stream << '+';
 	}
 	else if (ea >= 0xa0)
 		format_reg(stream, ea & 0x07, BIT(ea, 3));
@@ -215,21 +215,10 @@ void h8500_disassembler::format_ea(std::ostream &stream, u8 ea, u16 disp)
 	}
 }
 
-offs_t h8500_disassembler::dasm_illegal(std::ostream &stream, std::initializer_list<u8> ops)
+offs_t h8500_disassembler::dasm_illegal(std::ostream &stream, u8 op)
 {
-	util::stream_format(stream, "%-9s", ".DATA.B");
-
-	bool first = true;
-	for (u8 op : ops)
-	{
-		if (first)
-			first = false;
-		else
-			stream << ",";
-		util::stream_format(stream, "H'%02X", op);
-	}
-
-	return (ops.end() - ops.begin()) | SUPPORTED;
+	util::stream_format(stream, "%-9sH'%02X", ".DATA.B", op);
+	return 1 | SUPPORTED;
 }
 
 offs_t h8500_disassembler::dasm_general(std::ostream &stream, offs_t pc, u8 ea, const h8500_disassembler::data_buffer &opcodes)
@@ -256,7 +245,7 @@ offs_t h8500_disassembler::dasm_general(std::ostream &stream, offs_t pc, u8 ea, 
 	{
 		util::stream_format(stream, "%-9s", "XCH");
 		format_reg(stream, ea & 0x07, w);
-		stream << ",";
+		stream << ", ";
 		format_reg(stream, op & 0x07, w);
 		return (eabytes + 1) | SUPPORTED;
 	}
@@ -269,17 +258,17 @@ offs_t h8500_disassembler::dasm_general(std::ostream &stream, offs_t pc, u8 ea, 
 				format_creg(stream, op & 0x07, w);
 			else
 				format_reg(stream, op & 0x07, w);
-			stream << ",";
+			stream << ", ";
 		}
 		format_ea(stream, ea, disp);
 		if ((op & 0xf8) == 0x88)
 		{
-			stream << ",";
+			stream << ", ";
 			format_creg(stream, op & 0x07, w);
 		}
 		else if ((op & 0xf0) != 0x90)
 		{
-			stream << ",";
+			stream << ", ";
 			format_reg(stream, op & 0x07, w);
 		}
 		return (eabytes + 1) | SUPPORTED;
@@ -291,7 +280,7 @@ offs_t h8500_disassembler::dasm_general(std::ostream &stream, offs_t pc, u8 ea, 
 			util::stream_format(stream, "#%d", op & 0x0f);
 		else
 			format_reg(stream, op & 0x07, w);
-		stream << ",";
+		stream << ", ";
 		format_ea(stream, ea, disp);
 		return (eabytes + 1) | SUPPORTED;
 	}
@@ -308,14 +297,14 @@ offs_t h8500_disassembler::dasm_general(std::ostream &stream, offs_t pc, u8 ea, 
 			format_imm16(stream, opcodes.r16(pc + eabytes + 1));
 		else
 			format_imm8(stream, opcodes.r8(pc + eabytes + 1));
-		stream << ",";
+		stream << ", ";
 		format_ea(stream, ea, disp);
 		return (eabytes + (BIT(op, 0) ? 3 : 2)) | SUPPORTED;
 	}
 	else if ((op & 0xfa) == 0x08)
 	{
 		// ADD:Q
-		util::stream_format(stream, "%-9s#%s%d,", util::string_format("ADD.%c", w ? 'W' : 'B'), BIT(op, 2) ? "-" : "", BIT(op, 0) ? 2 : 1);
+		util::stream_format(stream, "%-9s#%s%d, ", util::string_format("ADD.%c", w ? 'W' : 'B'), BIT(op, 2) ? "-" : "", BIT(op, 0) ? 2 : 1);
 		format_ea(stream, ea, disp);
 		return (eabytes + 1) | SUPPORTED;
 	}
@@ -328,13 +317,13 @@ offs_t h8500_disassembler::dasm_general(std::ostream &stream, offs_t pc, u8 ea, 
 			if (BIT(op2, 4))
 			{
 				format_reg(stream, op2 & 0x07, w);
-				stream << ",";
+				stream << ", ";
 				format_ea(stream, ea, disp);
 			}
 			else
 			{
 				format_ea(stream, ea, disp);
-				stream << ",";
+				stream << ", ";
 				format_reg(stream, op2 & 0x07, w);
 			}
 			return (eabytes + 2) | SUPPORTED;
@@ -343,29 +332,15 @@ offs_t h8500_disassembler::dasm_general(std::ostream &stream, offs_t pc, u8 ea, 
 		{
 			util::stream_format(stream, "%-9s", "DADD.B");
 			format_reg(stream, ea & 0x07, w);
-			stream << ",";
+			stream << ", ";
 			format_reg(stream, op2 & 0x07, w);
 			return (eabytes + 2) | SUPPORTED;
 		}
 		else
-		{
-			if (eabytes == 3)
-				return dasm_illegal(stream, {ea, u8(disp >> 8), u8(disp), op, op2});
-			else if (eabytes == 2)
-				return dasm_illegal(stream, {ea, u8(disp), op, op2});
-			else
-				return dasm_illegal(stream, {ea, op, op2});
-		}
+			return dasm_illegal(stream, ea);
 	}
 	else
-	{
-		if (eabytes == 3)
-			return dasm_illegal(stream, {ea, u8(disp >> 8), u8(disp), op});
-		else if (eabytes == 2)
-			return dasm_illegal(stream, {ea, u8(disp), op});
-		else
-			return dasm_illegal(stream, {ea, op});
-	}
+		return dasm_illegal(stream, ea);
 }
 
 offs_t h8500_disassembler::dasm_misc(std::ostream &stream, offs_t pc, u8 ea, const h8500_disassembler::data_buffer &opcodes)
@@ -402,7 +377,7 @@ offs_t h8500_disassembler::dasm_misc(std::ostream &stream, offs_t pc, u8 ea, con
 	{
 		util::stream_format(stream, "%-9s", util::string_format("SCB/%s", ea == 0x01 ? "F" : ea == 0x06 ? "NE" : ea == 0x07 ? "EQ" : "?"));
 		format_reg(stream, op & 0x07, true);
-		stream << ",";
+		stream << ", ";
 		format_bdisp(stream, s16(s8(opcodes.r8(pc + 2))), pc + 3);
 		return 3 | STEP_COND | SUPPORTED;
 	}
@@ -426,7 +401,7 @@ offs_t h8500_disassembler::dasm_misc(std::ostream &stream, offs_t pc, u8 ea, con
 		return 2 | STEP_OUT | SUPPORTED;
 	}
 	else
-		return dasm_illegal(stream, {ea, op});
+		return dasm_illegal(stream, ea);
 }
 
 offs_t h8500_disassembler::dasm_immop(std::ostream &stream, offs_t pc, bool w, const h8500_disassembler::data_buffer &opcodes)
@@ -443,7 +418,7 @@ offs_t h8500_disassembler::dasm_immop(std::ostream &stream, offs_t pc, bool w, c
 			format_imm16(stream, imm);
 		else
 			format_imm8(stream, imm);
-		stream << ",";
+		stream << ", ";
 		if (BIT(op, 3) && op >= 0x48 && op < 0x90)
 			format_creg(stream, op & 0x07, w);
 		else
@@ -451,12 +426,7 @@ offs_t h8500_disassembler::dasm_immop(std::ostream &stream, offs_t pc, bool w, c
 		return (w ? 4 : 3) | SUPPORTED;
 	}
 	else
-	{
-		if (w)
-			return dasm_illegal(stream, {0x04, u8(imm), op});
-		else
-			return dasm_illegal(stream, {0x0c, u8(imm >> 8), u8(imm), op});
-	}
+		return dasm_illegal(stream, w ? 0x04 : 0x0c);
 }
 
 offs_t h8500_disassembler::disassemble(std::ostream &stream, offs_t pc, const h8500_disassembler::data_buffer &opcodes, const h8500_disassembler::data_buffer &params)
@@ -473,12 +443,12 @@ offs_t h8500_disassembler::disassemble(std::ostream &stream, offs_t pc, const h8
 		if (BIT(op, 4))
 		{
 			format_reg(stream, op & 0x07, w);
-			stream << ",";
+			stream << ", ";
 		}
 		format_ea(stream, (op >= 0x80 ? 0xe6 : 0x05) | (op & 0x08), disp);
 		if (!BIT(op, 4))
 		{
-			stream << ",";
+			stream << ", ";
 			format_reg(stream, op & 0x07, w);
 		}
 		return 2 | SUPPORTED;
@@ -492,7 +462,7 @@ offs_t h8500_disassembler::disassemble(std::ostream &stream, offs_t pc, const h8
 			format_imm16(stream, opcodes.r16(pc + 1));
 		else
 			format_imm8(stream, opcodes.r8(pc + 1));
-		stream << ",";
+		stream << ", ";
 		format_reg(stream, op & 0x07, w);
 		return (w ? 3 : 2) | SUPPORTED;
 	}
@@ -518,7 +488,7 @@ offs_t h8500_disassembler::disassemble(std::ostream &stream, offs_t pc, const h8
 			return 4 | (BIT(op, 4) ? STEP_OVER : 0) | SUPPORTED;
 		}
 		else
-			return dasm_illegal(stream, {op});
+			return dasm_illegal(stream, op);
 
 	case 0x01: case 0x06: case 0x07: case 0x11:
 		return dasm_misc(stream, pc, op, opcodes);
@@ -526,7 +496,7 @@ offs_t h8500_disassembler::disassemble(std::ostream &stream, offs_t pc, const h8
 	case 0x02:
 		util::stream_format(stream, "%-9s", "LDM.W");
 		format_ea(stream, 0xcf, 0);
-		stream << ",";
+		stream << ", ";
 		format_reglist(stream, opcodes.r8(pc + 1));
 		return 2 | SUPPORTED;
 
@@ -572,7 +542,7 @@ offs_t h8500_disassembler::disassemble(std::ostream &stream, offs_t pc, const h8
 	case 0x12:
 		util::stream_format(stream, "%-9s", "STM.W");
 		format_reglist(stream, opcodes.r8(pc + 1));
-		stream << ",";
+		stream << ", ";
 		format_ea(stream, 0xbf, 0);
 		return 2 | SUPPORTED;
 
@@ -587,7 +557,7 @@ offs_t h8500_disassembler::disassemble(std::ostream &stream, offs_t pc, const h8
 	case 0x17: case 0x1f:
 		util::stream_format(stream, "%-9s", "LINK");
 		format_reg(stream, 6, true);
-		stream << ",";
+		stream << ", ";
 		if (BIT(op, 3))
 			format_imm16(stream, opcodes.r16(pc + 1));
 		else
@@ -603,6 +573,6 @@ offs_t h8500_disassembler::disassemble(std::ostream &stream, offs_t pc, const h8
 		return 1 | SUPPORTED;
 
 	default:
-		return dasm_illegal(stream, {op});
+		return dasm_illegal(stream, op);
 	}
 }
