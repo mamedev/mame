@@ -10972,6 +10972,33 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="pcd1904">
+		<!--
+		Origin: Foxhack
+		<rom name="PCD1904 (Track 1).bin" size="818496" crc="1d037f6d" md5="05dde46197ea63a14510717960e414fd" sha1="0a805e88a5f40e5fd6ba8a579cb6ca0cf379ed05" />
+		<rom name="PCD1904 (Track 2).bin" size="100018800" crc="24233b6d" md5="24444ff73512426f74e2fc0505bf0df6" sha1="34c8dd58666d502ede55d632e643bd121426a1a0" />
+		<rom name="PCD1904 (Track 3).bin" size="16581600" crc="b779625b" md5="fc057c2568599b68bd3a657e3688ef85" sha1="b3c4ad5df7568b0a891d192bc49f673e352fd243" />
+		<rom name="PCD1904 (Track 4).bin" size="4762800" crc="88c2e4e9" md5="cd6402f0b46c83996d24826a03186c3c" sha1="5690073a9162bf31123e07f6fdd8e1ddcc8077d4" />
+		<rom name="PCD1904 (Track 5).bin" size="132300000" crc="c4a7ee90" md5="3c4731edeffded203ab96c184edd84d1" sha1="723f14cad145fb8dc197d2066ae77fb09a775d93" />
+		<rom name="PCD1904 (Track 6).bin" size="38631600" crc="099b3382" md5="2bc8816b0d2194801e6a98e756067613" sha1="79712b1aa0a0b5b4901d3ed91cde25ac871b029d" />
+		<rom name="PCD1904 (Track 7).bin" size="26460000" crc="7b76c4b6" md5="4586c3b510abf2dee4ac532a2ad6bf86" sha1="3407398b97cae5d5af4121cd2759c85f1dcf4b49" />
+		<rom name="PCD1904 (Track 8).bin" size="26283600" crc="825108c2" md5="c118c88266b337ebbd5df15bca71a8a5" sha1="24d9e26729e780891a598657fabf11a41708f67a" />
+		<rom name="PCD1904 (Track 9).bin" size="41207040" crc="823fb562" md5="f2abea76d3e4d823c2356232ad60d39c" sha1="ce794bbf1b299107133cb8797342e44868d90b6c" />
+
+		Note: This is a Windows ISO9660-formatted CD that included Photo CD on CD-Interactive, Version 3.1 (April 14, 1993). This disc also works under Windows
+		3.1, and includes demo software for that platform.
+
+		-->
+		<description>The Photo CD Book Companion CD-ROM</description>
+		<year>1994</year>
+		<publisher>Abacus</publisher>
+		<part name="cdrom" interface="cdi_cdrom">
+			<diskarea name="cdrom">
+				<disk name="pcd1904" sha1="19c7875a0329b2a75b3c0c05fa646536473e8c7d"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- this is just bad, and has visible corruption during the startup animations as a result of bad sectors -->
 	<software name="gose">
 		<description>Go - Special Edition</description>
