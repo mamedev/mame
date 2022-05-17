@@ -223,7 +223,6 @@ namespace plib {
 			*reinterpret_cast<MemberFunctionType *>(this) = mftp; // NOLINT
 		}
 
-
 		// extract the generic function and adjust the object pointer
 		void convert_to_generic(generic_function &func, mfp_generic_class *&object) const;
 
