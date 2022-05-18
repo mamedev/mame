@@ -104,6 +104,7 @@ private:
 	u8 wmg_pia_0_r(offs_t offset);
 	void wmg_c400_w(u8 data);
 	void wmg_d000_w(u8 data);
+	void wmg_blitter_w(offs_t, u8);
 	DECLARE_WRITE_LINE_MEMBER(wmg_port_select_w);
 	void wmg_sound_reset_w(u8 data);
 	void wmg_vram_select_w(u8 data);
@@ -157,13 +158,13 @@ void wmg_state::wmg_banked_map(address_map &map)
 	map(0x0401, 0x0401).w(FUNC(wmg_state::wmg_sound_reset_w));
 	map(0x0804, 0x0807).r(FUNC(wmg_state::wmg_pia_0_r)).w(m_pia[0], FUNC(pia6821_device::write));
 	map(0x080c, 0x080f).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x0900, 0x09ff).w(FUNC(wmg_state::wmg_vram_select_w));
-	map(0x0a00, 0x0a07).w(FUNC(wmg_state::blitter_w));
+	map(0x0900, 0x09ff).nopr().w(FUNC(wmg_state::wmg_vram_select_w));
+	map(0x0a00, 0x0a07).w(FUNC(wmg_state::wmg_blitter_w));
 	map(0x0b00, 0x0bff).r(FUNC(wmg_state::video_counter_r));
 	map(0x0bff, 0x0bff).w(FUNC(wmg_state::watchdog_reset_w));
 	map(0x0c00, 0x0fff).rw(FUNC(wmg_state::wmg_nvram_r), FUNC(wmg_state::wmg_nvram_w));
 	map(0x1000, 0x4fff).rom().region("maincpu", 0x68000); // Defender roms
-/* These next one is actually banked in CPU 1, but its not something Mame can handle very well. Placed here instead. */
+	// This one is actually banked in CPU 1, but its not something Mame can handle very well. Placed here instead. */
 	map(0xd000, 0xefff).ram().share("nvram");
 }
 
@@ -331,6 +332,16 @@ u8 wmg_state::wmg_nvram_r(offs_t offset)
 void wmg_state::wmg_nvram_w(offs_t offset, u8 data)
 {
 	m_p_ram[offset+(m_wmg_c400<<10)] = data;
+}
+
+/*************************************
+ *
+ *  Blitter
+ *
+ *************************************/
+void wmg_state::wmg_blitter_w(offs_t offset, u8 data)
+{
+	blitter_w(m_maincpu->space(AS_PROGRAM), offset, data);
 }
 
 /*************************************
