@@ -26372,6 +26372,30 @@ m4gambal                        // Gamball (Barcrest)
 m4gambal__a                     //
 m4gambal__b                     //
 m4gambal__c                     //
+m4gbust                         // Ghost Buster (Barcrest)
+m4gbust__a                      //
+m4gbust__b                      //
+m4gbust__c                      //
+m4gbust__d                      //
+m4gbust__e                      //
+m4gbust__f                      //
+m4gbust__g                      //
+m4gbust__h                      //
+m4gbust__i                      //
+m4gbust__j                      //
+m4gbust__k                      //
+m4gbust__l                      //
+m4gbust__m                      //
+m4gbust__n                      //
+m4gbust__o                      //
+m4gbust__p                      //
+m4gbust__q                      //
+m4gbust__r                      //
+m4gbust__s                      //
+m4gbust__t                      //
+m4gbust__u                      //
+m4gbust__v                      //
+m4gbust__w                      //
 m4graff                         // Graffiti (Barcrest)
 m4graff__a                      //
 m4graff__b                      //
@@ -27695,30 +27719,6 @@ m4gb006                         // Games Bond 006 (Barcrest)
 m4gb006__a                      //
 m4gb006__b                      //
 m4gb006__c                      //
-m4gbust                         // Ghost Buster (Barcrest)
-m4gbust__a                      //
-m4gbust__b                      //
-m4gbust__c                      //
-m4gbust__d                      //
-m4gbust__e                      //
-m4gbust__f                      //
-m4gbust__g                      //
-m4gbust__h                      //
-m4gbust__i                      //
-m4gbust__j                      //
-m4gbust__k                      //
-m4gbust__l                      //
-m4gbust__m                      //
-m4gbust__n                      //
-m4gbust__o                      //
-m4gbust__p                      //
-m4gbust__q                      //
-m4gbust__r                      //
-m4gbust__s                      //
-m4gbust__t                      //
-m4gbust__u                      //
-m4gbust__v                      //
-m4gbust__w                      //
 m4gclue                         // Give Us A Clue (Barcrest)
 m4gclue__a                      //
 m4gclue__b                      //
