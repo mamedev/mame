@@ -604,15 +604,11 @@ int upd3301_device::vrtc_r()
 UPD3301_FETCH_ATTRIBUTE( upd3301_device::default_attr_fetch )
 {
 	const u8 attr_max_size = 80;
-	std::array<u16, attr_max_size> attr_extend_info;
+	std::array<u16, attr_max_size> attr_extend_info = {0};
 
 	// elthlead (pc8801) uses b&w no attributes/no special control mode
-	// 0-fill buffer seems enough
 	if (m_gfx_mode == 1)
-	{
-		std::fill(attr_extend_info.begin(), attr_extend_info.end(), 0x00);
 		return attr_extend_info;
-	}
 
 	// TODO: may actually fetch in LIFO order
 	// Some edge cases in pc8801 N88 Basic (status on bottom), jettermi and play6lim backs up this theory.
