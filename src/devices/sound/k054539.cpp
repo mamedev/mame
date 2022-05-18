@@ -104,33 +104,25 @@ void k054539_device::keyoff(int channel)
 		regs[0x22c] &= ~(1 << channel);
 }
 
-void k054539_device::advance_filter(int channel, int val) {
-    float *hist = filter_hist[channel];
-    hist[0] = hist[1];
-    hist[1] = hist[2];
-    hist[2] = hist[3];
-    hist[3] = ((float) val) / 32768.0f;
+void k054539_device::advance_filter(int channel, int val)
+{
+	float *hist = filter_hist[channel];
+	hist[0] = hist[1];
+	hist[1] = hist[2];
+	hist[2] = hist[3];
+	hist[3] = ((float) val) / 32768.0f;
 }
 
-float k054539_device::calculate_filter(int channel, float t) {
-    // Cubic hermite interpolation
-    // t is domain [0,1]
+float k054539_device::calculate_filter(int channel, float t)
+{
+	// Cubic hermite interpolation
+	// t is domain [0,1]
 
-    float *hist = filter_hist[channel];
-    float a = (-hist[0] / 2.0f) +
-              (3.0f * hist[1] / 2.0f) -
-              (3.0f * hist[2] / 2.0f) +
-              (hist[3] / 2.0f);
-    float b = hist[0] -
-              (5.0f * hist[1] / 2.0f) +
-              (2.0f * hist[2]) -
-              (hist[3] / 2.0f);
-    float c = (-hist[0] / 2.0f) +
-              (hist[2] / 2.0f);
-    return (a * t * t * t) +
-            (b * t * t) +
-            (c * t) +
-            hist[1];
+	const float *hist = filter_hist[channel];
+	const float a = (-hist[0] / 2.0f) + (3.0f * hist[1] / 2.0f) - (3.0f * hist[2] / 2.0f) + (hist[3] / 2.0f);
+	const float b = hist[0] - (5.0f * hist[1] / 2.0f) + (2.0f * hist[2]) - (hist[3] / 2.0f);
+	const float c = (-hist[0] / 2.0f) + (hist[2] / 2.0f);
+	return (a * t * t * t) + (b * t * t) + (c * t) + hist[1];
 }
 
 void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
@@ -224,13 +216,13 @@ void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_
 					cur_pval = chan->pval;
 				}
 
-                float filter_frac = 0, filter_val;
+				float filter_frac = 0;
 
 				switch(base2[0] & 0xc) {
 				case 0x0: { // 8bit pcm
 					cur_pfrac += delta;
 					while(cur_pfrac & ~0xffff) {
-                        cur_pfrac += fdelta;
+						cur_pfrac += fdelta;
 						cur_pos += pdelta;
 
 						cur_pval = cur_val;
@@ -246,10 +238,10 @@ void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_
 							break;
 						}
 
-                        advance_filter(ch, cur_val);
-                    }
+						advance_filter(ch, cur_val);
+					}
 
-                    filter_frac = (float)(cur_pfrac & 0xffff) / 65536.0f;
+					filter_frac = (float)(cur_pfrac & 0xffff) / 65536.0f;
 					break;
 				}
 
@@ -274,10 +266,10 @@ void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_
 							break;
 						}
 
-                        advance_filter(ch, cur_val);
+						advance_filter(ch, cur_val);
 					}
 
-                    filter_frac = (float)(cur_pfrac & 0xffff) / 65536.0f;
+					filter_frac = (float)(cur_pfrac & 0xffff) / 65536.0f;
 					break;
 				}
 
@@ -315,10 +307,10 @@ void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_
 						else if(cur_val > 32767)
 							cur_val = 32767;
 
-                        advance_filter(ch, cur_val);
+						advance_filter(ch, cur_val);
 					}
 
-                    filter_frac = (float)(cur_pfrac & 0xffff) / 65536.0f;
+					filter_frac = (float)(cur_pfrac & 0xffff) / 65536.0f;
 
 					cur_pfrac >>= 1;
 					if(cur_pos & 1)
@@ -331,7 +323,7 @@ void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_
 					break;
 				}
 
-                filter_val = calculate_filter(ch, filter_frac);
+				const float filter_val = calculate_filter(ch, filter_frac);
 
 				lval += filter_val * lvol;
 				rval += filter_val * rvol;
@@ -348,9 +340,9 @@ void k054539_device::sound_stream_update(sound_stream &stream, std::vector<read_
 					base1[0x0e] = cur_pos>>16 & 0xff;
 				}
 			} else {
-                // Fill the interpolation vectors with silence when channel is disabled
-                advance_filter(ch, 0);
-            }
+				// Fill the interpolation vectors with silence when channel is disabled
+				advance_filter(ch, 0);
+			}
 		reverb_pos = (reverb_pos + 1) & 0x1fff;
 		outputs[0].put_int(sample, lval * 32768.0f, 32768);
 		outputs[1].put_int(sample, rval * 32768.0f, 32768);
@@ -368,7 +360,7 @@ void k054539_device::init_chip()
 {
 	memset(regs, 0, sizeof(regs));
 	memset(posreg_latch, 0, sizeof(posreg_latch)); //*
-    memset(filter_hist, 0, sizeof(filter_hist));
+	memset(filter_hist, 0, sizeof(filter_hist));
 	flags |= UPDATE_AT_KEYON; //* make it default until proven otherwise
 
 	ram = std::make_unique<uint8_t []>(0x4000);

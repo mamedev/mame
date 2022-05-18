@@ -87,7 +87,7 @@ private:
 	uint8_t posreg_latch[8][3];
 	int flags;
 
-    float filter_hist[8][4];
+	float filter_hist[8][4];
 
 	unsigned char regs[0x230];
 	std::unique_ptr<uint8_t []> ram;
@@ -109,8 +109,8 @@ private:
 	void keyon(int channel);
 	void keyoff(int channel);
 	void init_chip();
-    void advance_filter(int channel, int val);
-    float calculate_filter(int channel, float t);
+	void advance_filter(int channel, int val);
+	float calculate_filter(int channel, float t);
 };
 
 DECLARE_DEVICE_TYPE(K054539, k054539_device)
