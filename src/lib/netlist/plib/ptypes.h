@@ -200,9 +200,9 @@ namespace plib
 		using clang_apple_noexcept_issue = std::integral_constant<bool, false>;
 	#endif
 	#if defined(__ia64__)
-		using abi_function_function_descriptors = std::integral_constant<bool, true>;
+		using abi_vtable_function_descriptors = std::integral_constant<bool, true>;
 	#else
-		using abi_function_function_descriptors = std::integral_constant<bool, false>;
+		using abi_vtable_function_descriptors = std::integral_constant<bool, false>;
 	#endif
 	#if defined(_MSC_VER)
 		using env = std::integral_constant<ci_env, ci_env::MSVC>;

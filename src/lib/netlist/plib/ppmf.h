@@ -30,60 +30,19 @@
 
 /// \brief Enable experimental code on Visual Studio builds and VS clang llvm builds
 ///
-/// This enambles experimal code which uses optimized builds the
+/// This enables experimental code which uses optimized builds the
 /// PPMF_TYPE_INTERNAL_MSC path also for complex (struct/union) return types.
 /// This currently depends on whether the code can adequately determine on
 /// x64 builds if the return type is returned through registers or passed as a
 /// second argument as a pointer to the member function.
 ///
-/// ppmf uses a temporary storage for the return value. This causes for large sized
-/// return types a copy overhead. It would be easier if we would be able to obtain
-/// the RDX register on entry to call. On MSVC this seems not to be possible since on
-/// x64 inline assembly is not supported. An alternative would be to take the
-/// address of the first argument and substract sizeof(void *) from it. This would
-/// give us the address of the pointer to the return buffer. For member functions
-/// which do not have at least one parameter the approach does not work.
-/// In addition, this code has to be compiled with /w34716 to not abort on a
-/// missing return in the call function. The approach can be checked in godbolt.com
-/// with the following code:
-///
-/// ```
-/// #include <ios>
-/// #include <type_traits>
-/// #include <utility>
-/// #include <iostream>
-///
-/// using ret_t = std::pair<int *, int *>;
-///
-/// class xx
-/// {
-/// public:
-///
-/// int global = 10;
-///
-/// ret_t f(int x)
-/// {
-///     int * t = &x;
-///     ret_t **r = reinterpret_cast<ret_t **>(reinterpret_cast<uint8_t *>(t) - 8);
-///     (*r)->first = nullptr;
-///     (*r)->second = &global;
-/// }
-///
-/// };
-/// int main()
-/// {
-///     xx c;
-///     auto x = c.f(0);
-///     std::cout << x.first << " " << x.second << "\n";
-///     std::cout << *x.second << "\n";
-/// }
-/// ```
-/// The output from above is
-/// ```
-/// Program returned: 0
-/// 0000000000000000 0000005B0C7CF720
-/// 10
-/// ```
+/// The experimental code uses a temporary storage for the return value. This a
+/// copy overhead for causes for large sized return types a copy overhead.
+/// It would be easier if we would be able to obtain the RDX register on entry
+/// to the call. On MSVC this seems not to be possible since on x64 inline
+/// assembly is not supported. Even with clang-cl inline assembly this was not
+/// successful when optimized code was compiled. Therefore we have to live with
+/// the limitations.
 ///
 /// This code path is disabled by default currently.
 ///
@@ -113,6 +72,7 @@ namespace plib {
 	};
 }
 #else
+
 #include "pconfig.h"
 #include "ptypes.h"
 
@@ -189,13 +149,7 @@ namespace plib {
 		using generic_function = void (*)();
 
 		template<typename MemberFunctionType>
-		mfp_raw(MemberFunctionType mftp)
-		: m_function(0), m_this_delta(0)
-		{
-			static_assert(sizeof(*this) >= sizeof(MemberFunctionType), "size mismatch");
-			*reinterpret_cast<MemberFunctionType *>(this) = mftp; // NOLINT
-			// NOLINTNEXTLINE(clang-analyzer-optin.cplusplus.UninitializedObject)
-		}
+		mfp_raw(MemberFunctionType mftp);
 
 		// extract the generic function and adjust the object pointer
 		void convert_to_generic(generic_function &func, mfp_generic_class *&object) const;
@@ -216,12 +170,7 @@ namespace plib {
 		using generic_function = void (*)();
 
 		template<typename MemberFunctionType>
-		mfp_raw(MemberFunctionType mftp)
-		: m_function(0), m_this_delta(0)
-		{
-			static_assert(sizeof(*this) >= sizeof(MemberFunctionType), "size mismatch");
-			*reinterpret_cast<MemberFunctionType *>(this) = mftp; // NOLINT
-		}
+		mfp_raw(MemberFunctionType mftp);
 
 		// extract the generic function and adjust the object pointer
 		void convert_to_generic(generic_function &func, mfp_generic_class *&object) const;
@@ -243,13 +192,7 @@ namespace plib {
 		struct single_base_equiv { generic_function fptr; };
 
 		template<typename MemberFunctionType>
-		mfp_raw(MemberFunctionType mftp)
-		: m_function(0), m_this_delta(0), m_vptr_index(0), m_vt_index(0), m_size(0)
-		{
-			static_assert(sizeof(*this) >= sizeof(MemberFunctionType), "size mismatch");
-			*reinterpret_cast<MemberFunctionType *>(this) = mftp; // NOLINT
-			m_size = sizeof(mftp); //NOLINT
-		}
+		mfp_raw(MemberFunctionType mftp);
 
 		// extract the generic function and adjust the object pointer
 		void convert_to_generic(generic_function &func, mfp_generic_class *&object) const;
@@ -267,7 +210,9 @@ namespace plib {
 	using pmf_is_register_return_type = std::integral_constant<bool,
 		std::is_void_v<R> ||
 		std::is_scalar_v<R> ||
-		std::is_reference_v<R>>;
+		std::is_reference_v<R> ||
+		std::is_same_v<std::remove_cv_t<R>, compile_info::int128_type> ||
+		std::is_same_v<std::remove_cv_t<R>, compile_info::uint128_type> >;
 
 	template<int PMFINTERNAL, typename R, typename... Targs>
 	struct mfp_helper
@@ -282,31 +227,10 @@ namespace plib {
 		using raw_type = mfp_raw<PMFINTERNAL>;
 		using generic_function_storage = typename raw_type::generic_function;
 
-		mfp_helper()
-		: m_obj(nullptr)
-		{
-			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-			auto *s = reinterpret_cast<std::uint8_t *>(&m_resolved);
-			std::fill(s, s + sizeof(m_resolved), 0);
-		}
+		mfp_helper();
 
 		template<typename O, typename F>
-		void bind(O *object, F *mftp)
-		{
-			typename traits::template specific_member_function<O> pFunc;
-			static_assert(sizeof(pFunc) >= sizeof(F), "size error");
-			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-			//*reinterpret_cast<F *>(&pFunc) = *mftp;
-			reinterpret_copy(*mftp, pFunc);
-			raw_type mfpo(pFunc);
-			generic_function_storage rfunc(nullptr);
-			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-			auto *robject = reinterpret_cast<mfp_generic_class *>(object);
-			mfpo.convert_to_generic(rfunc, robject);
-			reinterpret_copy(rfunc, this->m_resolved);
-			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-			m_obj = reinterpret_cast<mfp_generic_class *>(robject);
-		}
+		void bind(O *object, F *mftp);
 
 		R call(Targs&&... args) const noexcept(true)
 		{
@@ -322,7 +246,7 @@ namespace plib {
 				using generic_member_abi_function_alt = void (*)(mfp_generic_class *,void *, Targs...);
 				// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 				const auto* func = reinterpret_cast<const generic_member_abi_function_alt*>(&m_resolved);
-				char temp[sizeof(typename std::conditional<std::is_void_v<R>, void *, R>::type)];
+				std::uint8_t temp[sizeof(typename std::conditional<std::is_void_v<R>, void *, R>::type)];
 				(*func)(m_obj, &temp[0], std::forward<Targs>(args)...);
 				return *reinterpret_cast<R *>(&temp);
 			}
@@ -347,23 +271,10 @@ namespace plib {
 		template <class C>
 		using member_abi_function      = typename traits::template specific_member_function<C>;
 
-		mfp_helper()
-		: m_obj(nullptr)
-		, m_stub(nullptr)
-		{
-			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-			auto *s = reinterpret_cast<std::uint8_t *>(&m_resolved);
-			std::fill(s, s + sizeof(m_resolved), 0);
-		}
+		mfp_helper();
 
 		template<typename O, typename F>
-		void bind(O *object, F *mftp)
-		{
-			reinterpret_copy(*mftp, this->m_resolved);
-			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-			m_obj = reinterpret_cast<mfp_generic_class *>(object);
-			m_stub = &stub<O>;
-		}
+		void bind(O *object, F *mftp);
 
 		R call(Targs&&... args) const noexcept(true)
 		{
@@ -378,14 +289,7 @@ namespace plib {
 
 	private:
 		template<typename O>
-		static R stub(const generic_member_function *funci, mfp_generic_class *obji, Targs&&... args) noexcept(true)
-		{
-			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-			auto *obj = reinterpret_cast<O *>(obji);
-			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-			auto *func = reinterpret_cast<const member_abi_function<O> *>(funci);
-			return (obj->*(*func))(std::forward<Targs>(args)...);
-		}
+		static R stub(const generic_member_function* funci, mfp_generic_class* obji, Targs&&... args) noexcept(true);
 	};
 
 #if NVCCBUILD == 0
@@ -398,23 +302,10 @@ namespace plib {
 		template <class C>
 		using member_abi_function      = typename traits::template member_static_ptr<C>;
 
-		mfp_helper()
-		: m_obj(nullptr)
-		{
-			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-			auto *s = reinterpret_cast<std::uint8_t *>(&m_resolved);
-			std::fill(s, s + sizeof(m_resolved), 0);
-		}
+		mfp_helper();
 
 		template<typename O, typename F>
-		void bind(O *object, F *mftp)
-		{
-			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-			member_abi_function<O> t = reinterpret_cast<member_abi_function<O>>(object->*(*mftp));
-			reinterpret_copy(t, this->m_resolved);
-			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-			m_obj = reinterpret_cast<mfp_generic_class *>(object);
-		}
+		void bind(O *object, F *mftp);
 
 		R call(Targs&&... args) const noexcept(true)
 		{
@@ -427,7 +318,6 @@ namespace plib {
 		mfp_generic_class    *m_obj;
 	};
 #endif
-
 
 	template <int PMFINTERNAL, typename R, typename... Targs>
 	using pmfp_helper_select = std::conditional<
@@ -515,13 +405,7 @@ namespace plib {
 		using static_creator = return_type (*)(const generic_member_function *, mfp_generic_class *);
 
 		template<typename O>
-		late_pmfp(typename traits::template specific_member_function<O> mftp)
-		: m_creator(creator<O>)
-		{
-			static_assert(sizeof(m_raw) >= sizeof(typename traits::template specific_member_function<O>), "size issue");
-			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-			*reinterpret_cast<typename traits::template specific_member_function<O> *>(&m_raw) = mftp;
-		}
+		late_pmfp(typename traits::template specific_member_function<O> mftp);
 
 		template<typename O>
 		return_type operator()(O *object) const
@@ -533,18 +417,139 @@ namespace plib {
 	private:
 
 		template <typename O>
-		static return_type creator(const generic_member_function *raw, mfp_generic_class *obj)
-		{
-			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-			auto p = reinterpret_cast<const typename traits::template specific_member_function<O> *>(raw);
-			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-			auto o = reinterpret_cast<O *>(obj);
-			return return_type(*p, o);
-		}
+		static return_type creator(const generic_member_function *raw, mfp_generic_class *obj);
 
 		generic_member_function m_raw;
 		static_creator m_creator;
 	};
+
+	template<typename MemberFunctionType>
+	mfp_raw<PPMF_TYPE_INTERNAL_ITANIUM>::mfp_raw(MemberFunctionType mftp)
+	: m_function(0), m_this_delta(0)
+	{
+		static_assert(sizeof(*this) >= sizeof(MemberFunctionType), "size mismatch");
+		*reinterpret_cast<MemberFunctionType *>(this) = mftp; // NOLINT
+		// NOLINTNEXTLINE(clang-analyzer-optin.cplusplus.UninitializedObject)
+	}
+
+	template<typename MemberFunctionType>
+	mfp_raw<PPMF_TYPE_INTERNAL_ARM>::mfp_raw(MemberFunctionType mftp)
+	: m_function(0), m_this_delta(0)
+	{
+		static_assert(sizeof(*this) >= sizeof(MemberFunctionType), "size mismatch");
+		*reinterpret_cast<MemberFunctionType *>(this) = mftp; // NOLINT
+	}
+
+	template<typename MemberFunctionType>
+	mfp_raw<PPMF_TYPE_INTERNAL_MSC>::mfp_raw(MemberFunctionType mftp)
+	: m_function(0), m_this_delta(0), m_vptr_index(0), m_vt_index(0), m_size(0)
+	{
+		static_assert(sizeof(*this) >= sizeof(MemberFunctionType), "size mismatch");
+		*reinterpret_cast<MemberFunctionType *>(this) = mftp; // NOLINT
+		m_size = sizeof(mftp); //NOLINT
+	}
+
+	template<int PMFINTERNAL, typename R, typename... Targs>
+	mfp_helper<PMFINTERNAL, R, Targs...>::mfp_helper()
+	: m_obj(nullptr)
+	{
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		auto *s = reinterpret_cast<std::uint8_t *>(&m_resolved);
+		std::fill(s, s + sizeof(m_resolved), 0);
+	}
+
+	template<int PMFINTERNAL, typename R, typename... Targs>
+	template<typename O, typename F>
+	void mfp_helper<PMFINTERNAL, R, Targs...>::bind(O *object, F *mftp)
+	{
+		typename traits::template specific_member_function<O> pFunc;
+		static_assert(sizeof(pFunc) >= sizeof(F), "size error");
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		//*reinterpret_cast<F *>(&pFunc) = *mftp;
+		reinterpret_copy(*mftp, pFunc);
+		raw_type mfpo(pFunc);
+		generic_function_storage rfunc(nullptr);
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		auto *robject = reinterpret_cast<mfp_generic_class *>(object);
+		mfpo.convert_to_generic(rfunc, robject);
+		reinterpret_copy(rfunc, this->m_resolved);
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		m_obj = reinterpret_cast<mfp_generic_class *>(robject);
+	}
+
+	template<typename R, typename... Targs>
+	mfp_helper<PPMF_TYPE_PMF, R, Targs...>::mfp_helper()
+	: m_obj(nullptr)
+	, m_stub(nullptr)
+	{
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		auto *s = reinterpret_cast<std::uint8_t *>(&m_resolved);
+		std::fill(s, s + sizeof(m_resolved), 0);
+	}
+
+	template<typename R, typename... Targs>
+	template<typename O, typename F>
+	void mfp_helper<PPMF_TYPE_PMF, R, Targs...>::bind(O *object, F *mftp)
+	{
+		reinterpret_copy(*mftp, this->m_resolved);
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		m_obj = reinterpret_cast<mfp_generic_class *>(object);
+		m_stub = &stub<O>;
+	}
+
+	template<typename R, typename... Targs>
+	template<typename O>
+	R mfp_helper<PPMF_TYPE_PMF, R, Targs...>::stub(const generic_member_function* funci, mfp_generic_class* obji, Targs&&... args) noexcept(true)
+	{
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		auto* obj = reinterpret_cast<O*>(obji);
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		auto* func = reinterpret_cast<const member_abi_function<O> *>(funci);
+		return (obj->*(*func))(std::forward<Targs>(args)...);
+	}
+
+#if NVCCBUILD == 0
+	template<typename R, typename... Targs>
+	mfp_helper<PPMF_TYPE_GNUC_PMF_CONV, R, Targs...>::mfp_helper()
+	: m_obj(nullptr)
+	{
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		auto *s = reinterpret_cast<std::uint8_t *>(&m_resolved);
+		std::fill(s, s + sizeof(m_resolved), 0);
+	}
+
+	template<typename R, typename... Targs>
+	template<typename O, typename F>
+	void mfp_helper<PPMF_TYPE_GNUC_PMF_CONV, R, Targs...>::bind(O *object, F *mftp)
+	{
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		member_abi_function<O> t = reinterpret_cast<member_abi_function<O>>(object->*(*mftp));
+		reinterpret_copy(t, this->m_resolved);
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		m_obj = reinterpret_cast<mfp_generic_class *>(object);
+	}
+#endif
+
+	template<typename T>
+	template<typename O>
+	late_pmfp<T>::late_pmfp(typename traits::template specific_member_function<O> mftp)
+	: m_creator(creator<O>)
+	{
+		static_assert(sizeof(m_raw) >= sizeof(typename traits::template specific_member_function<O>), "size issue");
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		*reinterpret_cast<typename traits::template specific_member_function<O> *>(&m_raw) = mftp;
+	}
+
+	template<typename T>
+	template<typename O>
+	typename late_pmfp<T>::return_type late_pmfp<T>::creator(const typename late_pmfp<T>::generic_member_function *raw, mfp_generic_class *obj)
+	{
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		auto p = reinterpret_cast<const typename late_pmfp<T>::traits::template specific_member_function<O> *>(raw);
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		auto o = reinterpret_cast<O *>(obj);
+		return return_type(*p, o);
+	}
 
 } // namespace plib
 

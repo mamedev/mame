@@ -32,7 +32,7 @@ namespace plib {
 			// otherwise, it is the byte index into the vtable where the actual function lives
 			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 			std::uint8_t *vtable_base = *reinterpret_cast<std::uint8_t **>(o_p_delta);
-			if (compile_info::abi_function_function_descriptors::value)
+			if (compile_info::abi_vtable_function_descriptors::value)
 				// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 				func = reinterpret_cast<generic_function>(uintptr_t(vtable_base + m_function - 1));
 			else
@@ -55,7 +55,7 @@ namespace plib {
 		{
 			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 			std::uint8_t *vtable_base = *reinterpret_cast<std::uint8_t **>(object) + m_function;
-			if (compile_info::abi_function_function_descriptors::value)
+			if (compile_info::abi_vtable_function_descriptors::value)
 				// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 				func = reinterpret_cast<generic_function>(uintptr_t(vtable_base));
 			else
