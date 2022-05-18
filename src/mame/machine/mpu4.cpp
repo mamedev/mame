@@ -2848,6 +2848,35 @@ void mpu4_state::mod4yam_cheatchr(machine_config &config)
 //	m_characteriser->set_lamp_table(xxx_lamp_scramble);
 }
 
+void mpu4_state::mod4yam_cheatchr_tri98(machine_config &config)
+{
+	mod4yam(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::m4dtri98_lamp_scramble);
+}
+
+void mpu4_state::mod4yam_cheatchr_lv(machine_config &config)
+{
+	mod4yam(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::m4lv_lamp_scramble);
+}
+
+void mpu4_state::mod4yam_cheatchr_m683(machine_config &config)
+{
+	mod4yam(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::m683_lamp_scramble);
+}
+
+
+
 void mpu4_state::mod4yam_chr(machine_config &config)
 {
 	mod4yam(config);

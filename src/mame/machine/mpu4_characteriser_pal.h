@@ -51,6 +51,19 @@ public:
 	// these can be identified as games expecting a chr response starting with '00 84 94 3c ec 5c ec 50 2c 68 60 ac'
 	static constexpr uint8_t m4dtri98_lamp_scramble[8] = { 0x03, 0xAF, 0x87, 0xAB, 0xA3, 0x8F, 0x87, 0x83 };
 
+	// m4supst__bi etc.
+	static constexpr uint8_t m4lv_lamp_scramble[9] = { 0x00, 0x18, 0x10, 0x08 ,0x00, 0x08, 0x00, 0x00 };
+
+	// games with sequence starting 00 24 24 2C E0 B4 B8 4C E8 D8 (m4eaw__a9 etc.)
+	static constexpr uint8_t m683_lamp_scramble[8] = { 0x03, 0xAF, 0x27, 0x8F, 0x0F, 0xA7, 0x27, 0x07 };
+
+	// games with sequence starting 00 44 44 4c e0 d4 d8 2c e8 b8 (m4overmn)
+	static constexpr uint8_t otm_lamp_scramble[8] = { 0x00, 0x4C, 0x44, 0x04, 0x38, 0x74, 0x74, 0x20 };
+
+	
+
+	//
+	//00 28 20 08 08 20 20 00
 
 protected:
 	virtual void device_start() override;

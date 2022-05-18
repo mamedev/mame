@@ -196,6 +196,9 @@ public:
 	void mod4oki_chr(machine_config &config);
 	void mod4oki_cheatchr(machine_config &config);
 	void mod4oki_cheatchr_tri98(machine_config &config);
+	void mod4oki_cheatchr_lv(machine_config &config);
+	void mod4oki_cheatchr_m683(machine_config &config);
+	void mod4oki_cheatchr_otm(machine_config &config);
 
 	void mod4oki_5r(machine_config &config);
 	void mod4oki_5r_chr(machine_config &config);
@@ -203,12 +206,15 @@ public:
 
 	void mod4oki_den(machine_config &config);
 	void mod4oki_crmaze(machine_config &config);
-	void mod4oki_cashmna(machine_config &config);
 
 	void mod4oki_alt(machine_config &config);
 
 	void mod4yam(machine_config &config);
 	void mod4yam_cheatchr(machine_config &config);
+	void mod4yam_cheatchr_tri98(machine_config &config);
+	void mod4yam_cheatchr_lv(machine_config &config);
+	void mod4yam_cheatchr_m683(machine_config &config);
+
 	void mod4yam_chr(machine_config &config);
 
 
