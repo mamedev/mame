@@ -1063,6 +1063,11 @@ end
 					"-Wno-xor-used-as-pow", -- clang 10.0 complains that expressions like 10 ^ 7 look like exponention
 				}
 			end
+			if version >= 140000 then
+				buildoptions {
+					"-Wno-bitwise-instead-of-logical", -- clang 14.0 complains about &, | on bools in asmjit
+				}
+			end
 		else
 			if version < 70000 then
 				print("GCC version 7.0 or later needed")
