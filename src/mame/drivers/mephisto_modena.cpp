@@ -5,7 +5,7 @@
 
 Mephisto Modena
 
-The chess engine is by Frans Morsch, same one as Sphinx Dominator 2.05.
+The chess engine is by Frans Morsch, same one as CXG Sphinx Dominator 2.05.
 Hold Pawn + Knight buttons at boot for test mode.
 
 Hardware notes:
