@@ -26284,446 +26284,7 @@ m4wayin                         // Way In (Barcrest)
 m4wayina                        //
 m4wildms                        // Wild Mystery (Barcrest)
 
-@source:mpu4mod4yam.cpp
-m4acechs                        // Ace Chase (Bwb)
-m4acechs__a                     //
-m4acechs__b                     //
-m4acechs__c                     //
-m4acechs__d                     //
-m4acechs__e                     //
-m4acechs__f                     //
-m4acechs__g                     //
-m4acechs__h                     //
-m4acechs__i                     //
-m4acechs__j                     //
-m4acechs__k                     //
-m4acechs__l                     //
-m4acechs__m                     //
-m4acechs__n                     //
-m4acechs__o                     //
-m4acechs__p                     //
-m4acechs__q                     //
-m4acechs__r                     //
-m4acechs__s                     //
-m4acechs__t                     //
-m4acechs__u                     //
-m4addr                          // Adders & Ladders (Barcrest)
-m4addr_h1                       //
-m4addr_h2                       //
-m4addr10                        //
-m4addr10_a                      //
-m4addr10c                       //
-m4addr10c_a                     //
-m4addr10d                       //
-m4addr10d_a                     //
-m4addr10yd                      //
-m4addr10yd_a                    //
-m4addr3                         //
-m4addr3_a                       //
-m4addr3_b                       //
-m4addr3_c                       //
-m4addr3_d                       //
-m4addr3d                        //
-m4addr3d_a                      //
-m4addr3d_b                      //
-m4addr3d_c                      //
-m4addr3yd                       //
-m4addr3yd_a                     //
-m4addr3yd_b                     //
-m4addr3yd_c                     //
-m4addr4                         //
-m4addr4_a                       //
-m4addr4c                        //
-m4addr4c_a                      //
-m4addr4c_b                      //
-m4addr4d                        //
-m4addr4yd                       //
-m4addr5                         //
-m4addr5_a                       //
-m4addr5c                        //
-m4addr5c_a                      //
-m4addr5d                        //
-m4addr5d_a                      //
-m4addr5yd                       //
-m4addr5yd_a                     //
-m4addr6lc                       //
-m4addr6ld                       //
-m4addr6lk                       //
-m4addr6ly                       //
-m4addr6lybd                     //
-m4addr6lyd                      //
-m4addrc                         // Adders & Ladders Classic (Barcrest)
-m4addrc__a                      //
-m4addrc__b                      //
-m4addrc__c                      //
-m4addrc__d                      //
-m4addrc__e                      //
-m4addrc__f                      //
-m4addrc__h                      //
-m4addrc__i                      //
-m4addrc__j                      //
-m4addrc__k                      //
-m4addrc__l                      //
-m4addrc__m                      //
-m4addrc__n                      //
-m4addrcc                        // Adders & Ladders Classic Club (Barcrest)
-m4addrcc__a                     //
-m4addrcc__b                     //
-m4addrcc__c                     //
-m4addrcc__d                     //
-m4clbshf                        // Club Shuffle (Barcrest)
-m4cojok                         // Carry On Joker (Barcrest)
-m4cojok__a                      //
-m4cojok__b                      //
-m4cojok__c                      //
-m4cojok__d                      //
-m4cojok__e                      //
-m4cojok__f                      //
-m4fastfw                        // Fast Forward (Barcrest - Bwb)
-m4fastfw__a                     //
-m4fastfw__b                     //
-m4fastfw__c                     //
-m4fastfw__d                     //
-m4fastfw__e                     //
-m4fastfw__f                     //
-m4gambal                        // Gamball (Barcrest)
-m4gambal__a                     //
-m4gambal__b                     //
-m4gambal__c                     //
-m4gbust                         // Ghost Buster (Barcrest)
-m4gbust__a                      //
-m4gbust__b                      //
-m4gbust__c                      //
-m4gbust__d                      //
-m4gbust__e                      //
-m4gbust__f                      //
-m4gbust__g                      //
-m4gbust__h                      //
-m4gbust__i                      //
-m4gbust__j                      //
-m4gbust__k                      //
-m4gbust__l                      //
-m4gbust__m                      //
-m4gbust__n                      //
-m4gbust__o                      //
-m4gbust__p                      //
-m4gbust__q                      //
-m4gbust__r                      //
-m4gbust__s                      //
-m4gbust__t                      //
-m4gbust__u                      //
-m4gbust__v                      //
-m4gbust__w                      //
-m4graff                         // Graffiti (Barcrest)
-m4graff__a                      //
-m4graff__b                      //
-m4graffd                        //
-m4hypclb                        // Hyper Viper Club (Barcrest)
-m4hypclb__a                     //
-m4hypclb__b                     //
-m4hypclb__c                     //
-m4joljokd                       //
-m4monte                         // Monte Carlo (Barcrest)
-m4monte__a                      //
-m4monte__b                      //
-m4monte__c                      //
-m4monte__d                      //
-m4monte__e                      //
-m4monte__f                      //
-m4monte__g                      //
-m4monte__h                      //
-m4monte__i                      //
-m4monte__j                      //
-m4monte__k                      //
-m4monte__l                      //
-m4monte__m                      //
-m4monteza
-m4montezb
-m4montezc
-m4montezd
-m4monteze
-m4montezf
-m4montezg
-m4montezh
-m4montezi
-m4montezj
-m4nudbnk                        // Nudge Banker (Barcrest)
-m4nudbnk__a                     //
-m4nudbnk__b                     //
-m4nudbnk__c                     //
-m4nudbnk__d                     //
-m4przmc                         // Prize Monte Carlo (Barcrest)
-m4przmc__a                      //
-m4przmc__b                      //
-m4przmc__c                      //
-m4przmc__d                      //
-m4przmc__e                      //
-m4przmc__f                      //
-m4przmc__g                      //
-m4przmc__h                     //
-m4przmc__i                     //
-m4przmc__j                     //
-m4przmc__k                     //
-m4przmc__l                     //
-m4przmc__m                     //
-m4przmc__n                     //
-m4przmc__o                     //
-m4przmc__p                     //
-m4przmc__q                     //
-m4przmc__r                     //
-m4przmc__s                     //
-m4przsss                        // Prize Spend Spend Spend (Barcrest)
-m4przsss__0                     //
-m4przsss__1                     //
-m4przsss__a                     //
-m4przsss__b                     //
-m4przsss__c                     //
-m4przsss__d                     //
-m4przsss__e                     //
-m4przsss__f                     //
-m4przsss__g                     //
-m4przsss__h                     //
-m4przsss__i                     //
-m4przsss__j                     //
-m4przsss__k                     //
-m4przsss__l                     //
-m4przsss__m                     //
-m4przsss__n                     //
-m4przsss__o                     //
-m4przsss__p                     //
-m4przsss__q                     //
-m4przsss__r                     //
-m4przsss__s                     //
-m4przsss__t                     //
-m4przsss__u                     //
-m4przsss__v                     //
-m4przsss__w                     //
-m4przsss__x                     //
-m4przsss__y                     //
-m4przsss__z                     //
-m4ra                            // Red Alert (Barcrest)
-m4ra__a                         //
-m4ra__b                         //
-m4ra__c                         //
-m4ra__d                         //
-m4ra__e                         //
-m4ra__f                         //
-m4ra__g                         //
-m4ra__h                         //
-m4ra__i                         //
-m4ra__j                         //
-m4ra__k                         //
-m4ra__l                         //
-m4ra__m                         //
-m4ra__n                         //
-m4ra__o                         //
-m4ra__p                         //
-m4ra__q                         //
-m4ra__r                         //
-m4sayno                         // Say No More (Barcrest)
-m4sayno__a                      //
-m4sayno__b                      //
-m4sayno__c                      //
-m4sayno__d                      //
-m4sss                           // Spend Spend Spend (Barcrest)
-m4sss__b                        //
-m4sss__c                        //
-m4sss__d                        //
-m4sss__e                        //
-m4sss__f                        //
-m4sss__g                        //
-m4sss__h                        //
-m4sss__i                        //
-m4sss__j                        //
-m4sss__k                        //
-m4sss__l                        //
-m4sstrek                        // Super Streak (bootleg)
-m4stc                           // Unknown MPU4 'STC 0.1' (Barcrest)
-m4shv                           // Super Hyper Viper (Barcrest)
-m4shv__0
-m4shv__1
-m4shv__10
-m4shv__11
-m4shv__12
-m4shv__2
-m4shv__3
-m4shv__4
-m4shv__5
-m4shv__6
-m4shv__7
-m4shv__8
-m4shv__9
-m4shv__a                        
-m4shv__b
-m4shv__c
-m4shv__d
-m4shv__e
-m4shv__f
-m4shv__g
-m4shv__h
-m4shv__i
-m4shv__j
-m4shv__k
-m4shv__l
-m4shv__m
-m4shv__n
-m4shv__o
-m4shv__p
-m4shv__q
-m4shv__r
-m4shv__s
-m4shv__t
-m4shv__u
-m4shv__v
-m4shv__w
-m4shv__x
-m4shv__y
-m4shv__z
-m4supst                         // Super Streak (Barcrest)
-m4supst__0                      //
-m4supst__1                      //
-m4supst__2                      //
-m4supst__3                      //
-m4supst__4                      //
-m4supst__5                      //
-m4supst__6                      //
-m4supst__7                      //
-m4supst__8                      //
-m4supst__9                      //
-m4supst__a                      //
-m4supst__a0                     //
-m4supst__a1                     //
-m4supst__a2                     //
-m4supst__a3                     //
-m4supst__a4                     //
-m4supst__a5                     //
-m4supst__a6                     //
-m4supst__a7                     //
-m4supst__a8                     //
-m4supst__a9                     //
-m4supst__aa                     //
-m4supst__ab                     //
-m4supst__ac                     //
-m4supst__ad                     //
-m4supst__ae                     //
-m4supst__af                     //
-m4supst__ag                     //
-m4supst__ah                     //
-m4supst__ai                     //
-m4supst__aj                     //
-m4supst__ak                     //
-m4supst__al                     //
-m4supst__am                     //
-m4supst__an                     //
-m4supst__ao                     //
-m4supst__ap                     //
-m4supst__aq                     //
-m4supst__ar                     //
-m4supst__as                     //
-m4supst__at                     //
-m4supst__au                     //
-m4supst__av                     //
-m4supst__aw                     //
-m4supst__ax                     //
-m4supst__ay                     //
-m4supst__az                     //
-m4supst__b                      //
-m4supst__b0                     //
-m4supst__b1                     //
-m4supst__b2                     //
-m4supst__b3                     //
-m4supst__b4                     //
-m4supst__b5                     //
-m4supst__ba                     //
-m4supst__bb                     //
-m4supst__bc                     //
-m4supst__bd                     //
-m4supst__be                     //
-m4supst__bf                     //
-m4supst__bg                     //
-m4supst__bh                     //
-m4supst__bi                     //
-m4supst__bj                     //
-m4supst__bk                     //
-m4supst__bl                     //
-m4supst__bm                     //
-m4supst__bn                     //
-m4supst__bo                     //
-m4supst__bp                     //
-m4supst__bq                     //
-m4supst__br                     //
-m4supst__bs                     //
-m4supst__bt                     //
-m4supst__bu                     //
-m4supst__bv                     //
-m4supst__bw                     //
-m4supst__bx                     //
-m4supst__by                     //
-m4supst__bz                     //
-m4supst__c                      //
-m4supst__d                      //
-m4supst__e                      //
-m4supst__f                      //
-m4supst__g                      //
-m4supst__h                      //
-m4supst__i                      //
-m4supst__j                      //
-m4supst__k                      //
-m4supst__l                      //
-m4supst__m                      //
-m4supst__n                      //
-m4supst__o                      //
-m4supst__p                      //
-m4supst__q                      //
-m4supst__r                      //
-m4supst__s                      //
-m4supst__t                      //
-m4supst__u                      //
-m4supst__v                      //
-m4supst__w                      //
-m4supst__x                      //
-m4supst__y                      //
-m4supst__z                      //
-m4tst                           // MPU4 Unit Test (Program 4)
-m4vivalv                        // Viva Las Vegas (Barcrest)
-m4vivalv__0                     //
-m4vivalv__1                     //
-m4vivalv__2                     //
-m4vivalv__3                     //
-m4vivalv__4                     //
-m4vivalv__5                     //
-m4vivalv__6                     //
-m4vivalv__7                     //
-m4vivalv__8                     //
-m4vivalv__a                     //
-m4vivalv__b                     //
-m4vivalv__c                     //
-m4vivalv__d                     //
-m4vivalv__e                     //
-m4vivalv__f                     //
-m4vivalv__g                     //
-m4vivalv__h                     //
-m4vivalv__i                     //
-m4vivalv__j                     //
-m4vivalv__k                     //
-m4vivalv__l                     //
-m4vivalv__m                     //
-m4vivalv__n                     //
-m4vivalv__o                     //
-m4vivalv__p                     //
-m4vivalv__q                     //
-m4vivalv__r                     //
-m4vivalv__s                     //
-m4vivalv__t                     //
-m4vivalv__u                     //
-m4vivalv__v                     //
-m4vivalv__w                     //
-m4vivalv__x                     //
-m4vivalv__y                     //
-m4vivalv__z                     //
-m4voodoo                        // Voodoo 1000 (Barcrest)
-
-@source:mpu4sw.cpp
+@source:mpu4mod4oki.cpp
 m4actbnk                        // Action Bank (Barcrest)
 m4actbnk__a                     //
 m4actbnk__b                     //
@@ -29938,6 +29499,445 @@ m4wta__w                        //
 m4wta__x                        //
 m4wta__y                        //
 m4wta__z                        //
+
+@source:mpu4mod4yam.cpp
+m4acechs                        // Ace Chase (Bwb)
+m4acechs__a                     //
+m4acechs__b                     //
+m4acechs__c                     //
+m4acechs__d                     //
+m4acechs__e                     //
+m4acechs__f                     //
+m4acechs__g                     //
+m4acechs__h                     //
+m4acechs__i                     //
+m4acechs__j                     //
+m4acechs__k                     //
+m4acechs__l                     //
+m4acechs__m                     //
+m4acechs__n                     //
+m4acechs__o                     //
+m4acechs__p                     //
+m4acechs__q                     //
+m4acechs__r                     //
+m4acechs__s                     //
+m4acechs__t                     //
+m4acechs__u                     //
+m4addr                          // Adders & Ladders (Barcrest)
+m4addr_h1                       //
+m4addr_h2                       //
+m4addr10                        //
+m4addr10_a                      //
+m4addr10c                       //
+m4addr10c_a                     //
+m4addr10d                       //
+m4addr10d_a                     //
+m4addr10yd                      //
+m4addr10yd_a                    //
+m4addr3                         //
+m4addr3_a                       //
+m4addr3_b                       //
+m4addr3_c                       //
+m4addr3_d                       //
+m4addr3d                        //
+m4addr3d_a                      //
+m4addr3d_b                      //
+m4addr3d_c                      //
+m4addr3yd                       //
+m4addr3yd_a                     //
+m4addr3yd_b                     //
+m4addr3yd_c                     //
+m4addr4                         //
+m4addr4_a                       //
+m4addr4c                        //
+m4addr4c_a                      //
+m4addr4c_b                      //
+m4addr4d                        //
+m4addr4yd                       //
+m4addr5                         //
+m4addr5_a                       //
+m4addr5c                        //
+m4addr5c_a                      //
+m4addr5d                        //
+m4addr5d_a                      //
+m4addr5yd                       //
+m4addr5yd_a                     //
+m4addr6lc                       //
+m4addr6ld                       //
+m4addr6lk                       //
+m4addr6ly                       //
+m4addr6lybd                     //
+m4addr6lyd                      //
+m4addrc                         // Adders & Ladders Classic (Barcrest)
+m4addrc__a                      //
+m4addrc__b                      //
+m4addrc__c                      //
+m4addrc__d                      //
+m4addrc__e                      //
+m4addrc__f                      //
+m4addrc__h                      //
+m4addrc__i                      //
+m4addrc__j                      //
+m4addrc__k                      //
+m4addrc__l                      //
+m4addrc__m                      //
+m4addrc__n                      //
+m4addrcc                        // Adders & Ladders Classic Club (Barcrest)
+m4addrcc__a                     //
+m4addrcc__b                     //
+m4addrcc__c                     //
+m4addrcc__d                     //
+m4clbshf                        // Club Shuffle (Barcrest)
+m4cojok                         // Carry On Joker (Barcrest)
+m4cojok__a                      //
+m4cojok__b                      //
+m4cojok__c                      //
+m4cojok__d                      //
+m4cojok__e                      //
+m4cojok__f                      //
+m4fastfw                        // Fast Forward (Barcrest - Bwb)
+m4fastfw__a                     //
+m4fastfw__b                     //
+m4fastfw__c                     //
+m4fastfw__d                     //
+m4fastfw__e                     //
+m4fastfw__f                     //
+m4gambal                        // Gamball (Barcrest)
+m4gambal__a                     //
+m4gambal__b                     //
+m4gambal__c                     //
+m4gbust                         // Ghost Buster (Barcrest)
+m4gbust__a                      //
+m4gbust__b                      //
+m4gbust__c                      //
+m4gbust__d                      //
+m4gbust__e                      //
+m4gbust__f                      //
+m4gbust__g                      //
+m4gbust__h                      //
+m4gbust__i                      //
+m4gbust__j                      //
+m4gbust__k                      //
+m4gbust__l                      //
+m4gbust__m                      //
+m4gbust__n                      //
+m4gbust__o                      //
+m4gbust__p                      //
+m4gbust__q                      //
+m4gbust__r                      //
+m4gbust__s                      //
+m4gbust__t                      //
+m4gbust__u                      //
+m4gbust__v                      //
+m4gbust__w                      //
+m4graff                         // Graffiti (Barcrest)
+m4graff__a                      //
+m4graff__b                      //
+m4graffd                        //
+m4hypclb                        // Hyper Viper Club (Barcrest)
+m4hypclb__a                     //
+m4hypclb__b                     //
+m4hypclb__c                     //
+m4joljokd                       //
+m4monte                         // Monte Carlo (Barcrest)
+m4monte__a                      //
+m4monte__b                      //
+m4monte__c                      //
+m4monte__d                      //
+m4monte__e                      //
+m4monte__f                      //
+m4monte__g                      //
+m4monte__h                      //
+m4monte__i                      //
+m4monte__j                      //
+m4monte__k                      //
+m4monte__l                      //
+m4monte__m                      //
+m4monteza
+m4montezb
+m4montezc
+m4montezd
+m4monteze
+m4montezf
+m4montezg
+m4montezh
+m4montezi
+m4montezj
+m4nudbnk                        // Nudge Banker (Barcrest)
+m4nudbnk__a                     //
+m4nudbnk__b                     //
+m4nudbnk__c                     //
+m4nudbnk__d                     //
+m4przmc                         // Prize Monte Carlo (Barcrest)
+m4przmc__a                      //
+m4przmc__b                      //
+m4przmc__c                      //
+m4przmc__d                      //
+m4przmc__e                      //
+m4przmc__f                      //
+m4przmc__g                      //
+m4przmc__h                     //
+m4przmc__i                     //
+m4przmc__j                     //
+m4przmc__k                     //
+m4przmc__l                     //
+m4przmc__m                     //
+m4przmc__n                     //
+m4przmc__o                     //
+m4przmc__p                     //
+m4przmc__q                     //
+m4przmc__r                     //
+m4przmc__s                     //
+m4przsss                        // Prize Spend Spend Spend (Barcrest)
+m4przsss__0                     //
+m4przsss__1                     //
+m4przsss__a                     //
+m4przsss__b                     //
+m4przsss__c                     //
+m4przsss__d                     //
+m4przsss__e                     //
+m4przsss__f                     //
+m4przsss__g                     //
+m4przsss__h                     //
+m4przsss__i                     //
+m4przsss__j                     //
+m4przsss__k                     //
+m4przsss__l                     //
+m4przsss__m                     //
+m4przsss__n                     //
+m4przsss__o                     //
+m4przsss__p                     //
+m4przsss__q                     //
+m4przsss__r                     //
+m4przsss__s                     //
+m4przsss__t                     //
+m4przsss__u                     //
+m4przsss__v                     //
+m4przsss__w                     //
+m4przsss__x                     //
+m4przsss__y                     //
+m4przsss__z                     //
+m4ra                            // Red Alert (Barcrest)
+m4ra__a                         //
+m4ra__b                         //
+m4ra__c                         //
+m4ra__d                         //
+m4ra__e                         //
+m4ra__f                         //
+m4ra__g                         //
+m4ra__h                         //
+m4ra__i                         //
+m4ra__j                         //
+m4ra__k                         //
+m4ra__l                         //
+m4ra__m                         //
+m4ra__n                         //
+m4ra__o                         //
+m4ra__p                         //
+m4ra__q                         //
+m4ra__r                         //
+m4sayno                         // Say No More (Barcrest)
+m4sayno__a                      //
+m4sayno__b                      //
+m4sayno__c                      //
+m4sayno__d                      //
+m4sss                           // Spend Spend Spend (Barcrest)
+m4sss__b                        //
+m4sss__c                        //
+m4sss__d                        //
+m4sss__e                        //
+m4sss__f                        //
+m4sss__g                        //
+m4sss__h                        //
+m4sss__i                        //
+m4sss__j                        //
+m4sss__k                        //
+m4sss__l                        //
+m4sstrek                        // Super Streak (bootleg)
+m4stc                           // Unknown MPU4 'STC 0.1' (Barcrest)
+m4shv                           // Super Hyper Viper (Barcrest)
+m4shv__0
+m4shv__1
+m4shv__10
+m4shv__11
+m4shv__12
+m4shv__2
+m4shv__3
+m4shv__4
+m4shv__5
+m4shv__6
+m4shv__7
+m4shv__8
+m4shv__9
+m4shv__a                        
+m4shv__b
+m4shv__c
+m4shv__d
+m4shv__e
+m4shv__f
+m4shv__g
+m4shv__h
+m4shv__i
+m4shv__j
+m4shv__k
+m4shv__l
+m4shv__m
+m4shv__n
+m4shv__o
+m4shv__p
+m4shv__q
+m4shv__r
+m4shv__s
+m4shv__t
+m4shv__u
+m4shv__v
+m4shv__w
+m4shv__x
+m4shv__y
+m4shv__z
+m4supst                         // Super Streak (Barcrest)
+m4supst__0                      //
+m4supst__1                      //
+m4supst__2                      //
+m4supst__3                      //
+m4supst__4                      //
+m4supst__5                      //
+m4supst__6                      //
+m4supst__7                      //
+m4supst__8                      //
+m4supst__9                      //
+m4supst__a                      //
+m4supst__a0                     //
+m4supst__a1                     //
+m4supst__a2                     //
+m4supst__a3                     //
+m4supst__a4                     //
+m4supst__a5                     //
+m4supst__a6                     //
+m4supst__a7                     //
+m4supst__a8                     //
+m4supst__a9                     //
+m4supst__aa                     //
+m4supst__ab                     //
+m4supst__ac                     //
+m4supst__ad                     //
+m4supst__ae                     //
+m4supst__af                     //
+m4supst__ag                     //
+m4supst__ah                     //
+m4supst__ai                     //
+m4supst__aj                     //
+m4supst__ak                     //
+m4supst__al                     //
+m4supst__am                     //
+m4supst__an                     //
+m4supst__ao                     //
+m4supst__ap                     //
+m4supst__aq                     //
+m4supst__ar                     //
+m4supst__as                     //
+m4supst__at                     //
+m4supst__au                     //
+m4supst__av                     //
+m4supst__aw                     //
+m4supst__ax                     //
+m4supst__ay                     //
+m4supst__az                     //
+m4supst__b                      //
+m4supst__b0                     //
+m4supst__b1                     //
+m4supst__b2                     //
+m4supst__b3                     //
+m4supst__b4                     //
+m4supst__b5                     //
+m4supst__ba                     //
+m4supst__bb                     //
+m4supst__bc                     //
+m4supst__bd                     //
+m4supst__be                     //
+m4supst__bf                     //
+m4supst__bg                     //
+m4supst__bh                     //
+m4supst__bi                     //
+m4supst__bj                     //
+m4supst__bk                     //
+m4supst__bl                     //
+m4supst__bm                     //
+m4supst__bn                     //
+m4supst__bo                     //
+m4supst__bp                     //
+m4supst__bq                     //
+m4supst__br                     //
+m4supst__bs                     //
+m4supst__bt                     //
+m4supst__bu                     //
+m4supst__bv                     //
+m4supst__bw                     //
+m4supst__bx                     //
+m4supst__by                     //
+m4supst__bz                     //
+m4supst__c                      //
+m4supst__d                      //
+m4supst__e                      //
+m4supst__f                      //
+m4supst__g                      //
+m4supst__h                      //
+m4supst__i                      //
+m4supst__j                      //
+m4supst__k                      //
+m4supst__l                      //
+m4supst__m                      //
+m4supst__n                      //
+m4supst__o                      //
+m4supst__p                      //
+m4supst__q                      //
+m4supst__r                      //
+m4supst__s                      //
+m4supst__t                      //
+m4supst__u                      //
+m4supst__v                      //
+m4supst__w                      //
+m4supst__x                      //
+m4supst__y                      //
+m4supst__z                      //
+m4tst                           // MPU4 Unit Test (Program 4)
+m4vivalv                        // Viva Las Vegas (Barcrest)
+m4vivalv__0                     //
+m4vivalv__1                     //
+m4vivalv__2                     //
+m4vivalv__3                     //
+m4vivalv__4                     //
+m4vivalv__5                     //
+m4vivalv__6                     //
+m4vivalv__7                     //
+m4vivalv__8                     //
+m4vivalv__a                     //
+m4vivalv__b                     //
+m4vivalv__c                     //
+m4vivalv__d                     //
+m4vivalv__e                     //
+m4vivalv__f                     //
+m4vivalv__g                     //
+m4vivalv__h                     //
+m4vivalv__i                     //
+m4vivalv__j                     //
+m4vivalv__k                     //
+m4vivalv__l                     //
+m4vivalv__m                     //
+m4vivalv__n                     //
+m4vivalv__o                     //
+m4vivalv__p                     //
+m4vivalv__q                     //
+m4vivalv__r                     //
+m4vivalv__s                     //
+m4vivalv__t                     //
+m4vivalv__u                     //
+m4vivalv__v                     //
+m4vivalv__w                     //
+m4vivalv__x                     //
+m4vivalv__y                     //
+m4vivalv__z                     //
+m4voodoo                        // Voodoo 1000 (Barcrest)
 
 @source:mpu4union.cpp
 m4crzbn                         // Crazy Bingo
