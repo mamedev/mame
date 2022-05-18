@@ -283,7 +283,7 @@ void cpu16_device::set_ix(int which, u16 value) noexcept
 
 u8 cpu16_device::get_xk(int which) const noexcept
 {
-	return (m_index_regs[which] & 0xf0000) << 16;
+	return (m_index_regs[which] & 0xf0000) >> 16;
 }
 
 void cpu16_device::set_xk(int which, u8 value) noexcept
