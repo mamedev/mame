@@ -1856,6 +1856,12 @@ if (BUSES["MTX"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/mtx/exp.cpp",
 		MAME_DIR .. "src/devices/bus/mtx/exp.h",
+		MAME_DIR .. "src/devices/bus/mtx/cfx.cpp",
+		MAME_DIR .. "src/devices/bus/mtx/cfx.h",
+		MAME_DIR .. "src/devices/bus/mtx/magrom.cpp",
+		MAME_DIR .. "src/devices/bus/mtx/magrom.h",
+		MAME_DIR .. "src/devices/bus/mtx/rompak.cpp",
+		MAME_DIR .. "src/devices/bus/mtx/rompak.h",
 		MAME_DIR .. "src/devices/bus/mtx/sdx.cpp",
 		MAME_DIR .. "src/devices/bus/mtx/sdx.h",
 	}
