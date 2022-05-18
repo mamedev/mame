@@ -26481,6 +26481,46 @@ m4sss__k                        //
 m4sss__l                        //
 m4sstrek                        // Super Streak (bootleg)
 m4stc                           // Unknown MPU4 'STC 0.1' (Barcrest)
+m4shv                           // Super Hyper Viper (Barcrest)
+m4shv__0
+m4shv__1
+m4shv__10
+m4shv__11
+m4shv__12
+m4shv__2
+m4shv__3
+m4shv__4
+m4shv__5
+m4shv__6
+m4shv__7
+m4shv__8
+m4shv__9
+m4shv__a                        
+m4shv__b
+m4shv__c
+m4shv__d
+m4shv__e
+m4shv__f
+m4shv__g
+m4shv__h
+m4shv__i
+m4shv__j
+m4shv__k
+m4shv__l
+m4shv__m
+m4shv__n
+m4shv__o
+m4shv__p
+m4shv__q
+m4shv__r
+m4shv__s
+m4shv__t
+m4shv__u
+m4shv__v
+m4shv__w
+m4shv__x
+m4shv__y
+m4shv__z
 m4supst                         // Super Streak (Barcrest)
 m4supst__0                      //
 m4supst__1                      //
@@ -27896,29 +27936,6 @@ m4hypclb                        // Hyper Viper Club (Barcrest)
 m4hypclb__a                     //
 m4hypclb__b                     //
 m4hypclb__c                     //
-m4hypvip                        // Hyper Viper (Barcrest)
-m4hypvip__a                     //
-m4hypvip__b                     //
-m4hypvip__c                     //
-m4hypvip__d                     //
-m4hypvip__e                     //
-m4hypvip__f                     //
-m4hypvip__g                     //
-m4hypvip__h                     //
-m4hypvip__i                     //
-m4hypvip__j                     //
-m4hypvip__k                     //
-m4hypvip__l                     //
-m4hypvip__m                     //
-m4hypvip__n                     //
-m4hypvip__o                     //
-m4hypvip__p                     //
-m4hypvip__q                     //
-m4hypvip__r                     //
-m4hypvip__s                     //
-m4hypvip__t                     //
-m4hypvip__u                     //
-m4hypvip__v                     //
 m4jolgem                        // Jolly Gems (Barcrest)
 m4jolgem__0                     //
 m4jolgem__1                     //
@@ -29300,23 +29317,6 @@ m4ssclas__c                     //
 m4ssclas__d                     //
 m4ssclas__e                     //
 m4ssclas__f                     //
-m4suphv                         // Super Hyper Viper (Barcrest)
-m4suphv__a                      //
-m4suphv__b                      //
-m4suphv__c                      //
-m4suphv__d                      //
-m4suphv__e                      //
-m4suphv__f                      //
-m4suphv__g                      //
-m4suphv__h                      //
-m4suphv__i                      //
-m4suphv__j                      //
-m4suphv__k                      //
-m4suphv__l                      //
-m4suphv__m                      //
-m4suphv__n                      //
-m4suphv__o                      //
-m4suphv__p                      //
 m4takepk                        // Take Your Pick (Barcrest)
 m4takepk__0                     //
 m4takepk__1                     //

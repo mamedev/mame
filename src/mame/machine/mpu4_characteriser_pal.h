@@ -68,6 +68,10 @@ private:
 	int m_lamp_col = 0;
 
 	optional_region_ptr<uint8_t> m_protregion; // some of the simulations have a fake ROM to assist them
+
+	static constexpr bool IDENTIFICATION_HELPER = true;
+	int m_temp_debug_write_count;
+	uint8_t m_temp_debug_table[64];
 };
 
 

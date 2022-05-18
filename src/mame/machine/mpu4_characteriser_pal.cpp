@@ -58,6 +58,10 @@ mpu4_characteriser_pal::mpu4_characteriser_pal(const machine_config &mconfig, de
 
 void mpu4_characteriser_pal::device_start()
 {
+	for (int i=0;i<64;i++)
+		m_temp_debug_table[i] = 0x00;
+
+	m_temp_debug_write_count = 0;
 }
 
 void mpu4_characteriser_pal::device_reset()
@@ -287,12 +291,6 @@ void mpu4_characteriser_pal::protection_w(uint8_t data)
 	}
 	else
 	{
-		if (!m_current_chr_table && !m_protregion)
-		{
-			logerror("No Characteriser Table\n");
-			return;
-		}
-
 		for (int x = m_prot_col; x < 64; x++)
 		{
 			uint8_t call = challenge_table[x];
@@ -363,40 +361,56 @@ void mpu4_characteriser_pal::write(offs_t offset, uint8_t data)
 
 uint8_t mpu4_characteriser_pal::protection_r()
 {
-	if (!m_current_chr_table && !m_protregion)
+	if (m_allow_6809_cheat)
 	{
-		if (m_allow_6809_cheat)
-		{
-			/* a cheat ... many early games use a standard check */
-			int addr = m_cpu->state_int(M6809_X);
-			if ((addr >= 0x800) && (addr <= 0xfff)) return 0x00; // prevent recursion, only care about ram/rom areas for this cheat.
+		/* a cheat ... many early games use a standard check */
+		int addr = m_cpu->state_int(M6809_X);
+		if ((addr >= 0x800) && (addr <= 0xfff)) return 0x00; // prevent recursion, only care about ram/rom areas for this cheat.
 
-			uint8_t ret = m_cpu->space(AS_PROGRAM).read_byte(addr);
-			logerror("%s: Characteriser protection_r WITH NO TABLE (attempting to cheat, returning %02x)\n", machine().describe_context(), ret);
-			return ret;
-		}
-		else
+		uint8_t ret = m_cpu->space(AS_PROGRAM).read_byte(addr);
+		logerror("%s: Characteriser protection_r WITH NO TABLE (attempting to cheat, col is %02x returning %02x from addr %04x)\n", machine().describe_context(), m_prot_col, ret, addr);
+
+		m_temp_debug_table[m_prot_col] = ret;
+
+		if (IDENTIFICATION_HELPER)
 		{
-			uint8_t ret = 0x00;
-			logerror("%s: Characteriser protection_r WITH NO TABLE (returning %02x)\n", machine().describe_context(), ret);
-			return ret;
-		}
-	}
-	else
-	{
-		uint8_t ret = 0x00;
-		if (m_protregion)
-		{
-			ret = m_protregion[m_prot_col];
-		}
-		else
-		{
-			ret = m_current_chr_table[m_prot_col];
-			logerror("%s: Characteriser protection_r WITH TABLE (returning %02x)\n", machine().describe_context(), ret);
+			if (m_temp_debug_write_count <= 64)
+				m_temp_debug_write_count++;
+
+			if (m_temp_debug_write_count == 64)
+			{
+				printf("Characteriser Sequence:\n");
+				for (int i = 0; i < 64; i++)
+				{
+					printf("%02x ", m_temp_debug_table[i]);
+				}
+				printf("\n");
+			}
 		}
 
 		return ret;
 	}
+
+	// not cheating, but no table set
+	if (!m_current_chr_table && !m_protregion)
+	{
+		uint8_t ret = 0x00;
+		logerror("%s: Characteriser protection_r WITH NO TABLE (returning %02x)\n", machine().describe_context(), ret);
+		return ret;
+	}
+
+	// use table
+	uint8_t ret = 0x00;
+	if (m_protregion)
+	{
+		ret = m_protregion[m_prot_col];
+	}
+	else
+	{
+		ret = m_current_chr_table[m_prot_col];
+		logerror("%s: Characteriser protection_r WITH TABLE (returning %02x)\n", machine().describe_context(), ret);
+	}
+	return ret;
 }
 
 uint8_t mpu4_characteriser_pal::lamp_scramble_r()
@@ -418,7 +432,7 @@ uint8_t mpu4_characteriser_pal::lamp_scramble_r()
 		else
 		{
 			ret = m_current_lamp_table[m_lamp_col];
-		logerror("%s: Characteriser lamp_scramble_r WITH TABLE (table offset %02x, returning %02x)\n", machine().describe_context(), m_lamp_col, ret);
+			logerror("%s: Characteriser lamp_scramble_r WITH TABLE (table offset %02x, returning %02x)\n", machine().describe_context(), m_lamp_col, ret);
 		}
 
 		return ret;		
