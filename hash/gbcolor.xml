@@ -7477,7 +7477,7 @@ license:CC0
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="32768">
 				<rom name="green beret (prototype 1).bin" size="32768" crc="a0c612aa" sha1="110413a96bc8f3b0ca50c4881ef96ecb14932ebd"/>
-				<rom value="0xe0" size="1" offset="339" loadflag="fill" />
+				<rom value="0xe0" size="1" offset="0x153" loadflag="fill" />
 			</dataarea>
 			<dataarea name="nvram" size="2048">
 			</dataarea>
@@ -7494,7 +7494,7 @@ license:CC0
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="65536">
 				<rom name="green beret (prototype 2).bin" size="65536" crc="2ed509d9" sha1="1d2a66e1b29e8d782e30a7cbcac566f1d907d8c5"/>
-				<rom value="0xe0" size="1" offset="340" loadflag="fill" />
+				<rom value="0xe0" size="1" offset="0x154" loadflag="fill" />
 			</dataarea>
 			<dataarea name="nvram" size="2048">
 			</dataarea>
