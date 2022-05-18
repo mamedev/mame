@@ -432,9 +432,9 @@ void wmg_state::machine_start()
 	uint8_t *cpu = memregion("maincpu")->base();
 	uint8_t *snd = memregion("soundcpu")->base();
 	m_mainbank->configure_entry(0, m_videoram);
-	m_mainbank->configure_entries(1, 8, &cpu[0x10000], 0x10000);  // Gfx etc
-	m_codebank->configure_entries(0, 8, &cpu[0x1d000], 0x10000);  // Code
-	m_soundbank->configure_entries(0, 8, &snd[0x10000], 0x1000);  // Sound
+	m_mainbank->configure_entries(1, 8, &cpu[0x00000], 0x10000);  // Gfx etc
+	m_codebank->configure_entries(0, 8, &cpu[0x0d000], 0x10000);  // Code
+	m_soundbank->configure_entries(0, 8, &snd[0x00000], 0x1000);  // Sound
 
 	save_item(NAME(m_wmg_c400));
 	save_item(NAME(m_wmg_d000));
@@ -573,23 +573,23 @@ void wmg_state::wmg(machine_config &config)
  *
  *************************************/
 ROM_START( wmg )
-	ROM_REGION( 0x90000, "maincpu", 0 )
-	ROM_LOAD( "wmg.cpu", 0x10000, 0x80000, CRC(975516ec) SHA1(571aaf9bff8ebfc36448cd9394b47bcfae7d1b83) )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "wmg.cpu", 0x00000, 0x80000, CRC(975516ec) SHA1(571aaf9bff8ebfc36448cd9394b47bcfae7d1b83) )
 
 	/* This little HACK! lets the menu boot up.
 	It patches a jump to some new code, which sets a few memory locations, and sets the stack pointer.
 	Then it jumps back to continue the main run. */
 
-	ROM_COPY( "maincpu", 0x1e0da, 0x1f800, 0x0001b )
-	ROM_FILL( 0x1f81b, 1, 0x7e )
-	ROM_FILL( 0x1f81c, 1, 0xe0 )
-	ROM_FILL( 0x1f81d, 1, 0xba )
-	ROM_FILL( 0x1e0b7, 1, 0x7e )
-	ROM_FILL( 0x1e0b8, 1, 0xf8 )
-	ROM_FILL( 0x1e0b9, 1, 0x00 )
+	ROM_COPY( "maincpu", 0xe0da, 0xf800, 0x0001b )
+	ROM_FILL( 0xf81b, 1, 0x7e )
+	ROM_FILL( 0xf81c, 1, 0xe0 )
+	ROM_FILL( 0xf81d, 1, 0xba )
+	ROM_FILL( 0xe0b7, 1, 0x7e )
+	ROM_FILL( 0xe0b8, 1, 0xf8 )
+	ROM_FILL( 0xe0b9, 1, 0x00 )
 
-	ROM_REGION( 0x18000, "soundcpu", 0 )
-	ROM_LOAD( "wmg.snd",         0x10000, 0x8000, CRC(1d08990e) SHA1(7bfb29426b3876f113e6ec3bc6c2fce9d2d1eb0c) )
+	ROM_REGION( 0x8000, "soundcpu", 0 )
+	ROM_LOAD( "wmg.snd",         0x0000, 0x8000, CRC(1d08990e) SHA1(7bfb29426b3876f113e6ec3bc6c2fce9d2d1eb0c) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "decoder.4",       0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
