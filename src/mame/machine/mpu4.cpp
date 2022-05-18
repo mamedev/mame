@@ -2805,6 +2805,15 @@ void mpu4_state::mod2(machine_config &config)
 	mpu4_std_6reel(config);
 }
 
+void mpu4_state::mod2_cheatchr(machine_config &config)
+{
+	mod2(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+//	m_characteriser->set_lamp_table(xxx_lamp_scramble);
+}
+
 void mpu4_state::mod2_alt(machine_config &config)
 {
 	mpu4base(config);
@@ -2885,8 +2894,14 @@ void mpu4_state::mod4oki_5r(machine_config &config)
 	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
 
-
 void mpu4_state::mod4oki_5r_chr(machine_config &config)
+{
+	mod4oki_5r(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+}
+
+
+void mpu4_state::mod4oki_5r_cheatchr(machine_config &config)
 {
 	mod4oki_5r(config);
 	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);

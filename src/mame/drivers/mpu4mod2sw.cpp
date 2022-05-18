@@ -2107,3 +2107,44 @@ GAME(199?, m4joltavb, m4joltav,   mod2, mpu4,            mpu4_state, init_m4defa
 // Bad CHR Alarm
 GAME(199?, m4btclok,  0,          mod2, mpu4,            mpu4_state, init_m4default,     ROT0,   "Barcrest","Beat The Clock (Barcrest) (MPU4)",GAME_FLAGS )
 GAME(199?, m4brktak,  0,          mod2, mpu4,            mpu4_state, init_m4default,     ROT0,   "Barcrest","Break & Take (Barcrest) (MPU4)",GAME_FLAGS )
+
+
+// these were found in with mod4oki sets, but don't attempt to play samples, only use the AY
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+	ROM_END \
+	GAME(year, setname, parent, mod2_cheatchr, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
+// sequence 00 c0 e0 b0 38 c4 f0 30 58 9c 9c 9c dc 9c dc 94  (Same as Ten Ten Do It Again)
+// "(C)1991 BARCREST" and "NN3 0.1"
+GAME_CUSTOM( 199?, m4nnww2,       0,       "nn3xs.p1",     0x0000, 0x010000, CRC(13d02d21) SHA1(8e4dac8e60538884d3f3a92fc1bb9f41276be4c8), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4, Mod2 type) (NN3 0.1 X)" )
+GAME_CUSTOM( 199?, m4nnww2__a,    m4nnww2, "nn3xad.p1",    0x0000, 0x010000, CRC(8ccfceb8) SHA1(762ab26826d3d2a4dd7999a71724389344e9dafb), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4, Mod2 type) (NN3 0.1 XAD)" )
+GAME_CUSTOM( 199?, m4nnww2__b,    m4nnww2, "nn3xb.p1",     0x0000, 0x010000, CRC(9b0dd473) SHA1(9975dafea8c7d6ccfc9f826adb1a0d3d0ed9740a), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4, Mod2 type) (NN3 0.1 BX)" )
+GAME_CUSTOM( 199?, m4nnww2__c,    m4nnww2, "nn3xbd.p1",    0x0000, 0x010000, CRC(21bf4a89) SHA1(200c9ccc4bc2a93fcd0f68bb00ad4391bdeecda1), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4, Mod2 type) (NN3 0.1 BXD)" )
+GAME_CUSTOM( 199?, m4nnww2__d,    m4nnww2, "nn3xd.p1",     0x0000, 0x010000, CRC(11e22c45) SHA1(6da31eea7b25612d99cc79f6f9579622f105c862), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4, Mod2 type) (NN3 0.1 XD)" )
+GAME_CUSTOM( 199?, m4nnww2__e,    m4nnww2, "nn3xdk.p1",    0x0000, 0x010000, CRC(0f4642c6) SHA1(53a0b8bc102c2b1c0db71887470b70852b09a4e9), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4, Mod2 type) (NN3 0.1 KXD)" )
+GAME_CUSTOM( 199?, m4nnww2__f,    m4nnww2, "nn3xdy.p1",    0x0000, 0x010000, CRC(ba3c1cf0) SHA1(ab94227018c3f9173e6a648749d455afd1ed36ce), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4, Mod2 type) (NN3 0.1 YXD)" )
+GAME_CUSTOM( 199?, m4nnww2__g,    m4nnww2, "nn3xk.p1",     0x0000, 0x010000, CRC(ec3a9831) SHA1(0b3ba86faf39cf3a1e42cb1c31fd2c50c24d65dc), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4, Mod2 type) (NN3 0.1 KX)" )
+GAME_CUSTOM( 199?, m4nnww2__h,    m4nnww2, "nn3xr.p1",     0x0000, 0x010000, CRC(6416481c) SHA1(b06ed4964d9cbf403905504ac68abdab53131476), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4, Mod2 type) (NN3 0.1 RX)" )
+GAME_CUSTOM( 199?, m4nnww2__i,    m4nnww2, "nn3xrd.p1",    0x0000, 0x010000, CRC(0fd3f9b9) SHA1(99115b217cfc54b52469ffc77e7a7592907c53ea), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4, Mod2 type) (NN3 0.1 RD)" ) // X not set here
+GAME_CUSTOM( 199?, m4nnww2__j,    m4nnww2, "nn3xy.p1",     0x0000, 0x010000, CRC(8a5d0f4b) SHA1(ef727e7ee8bb20d1b201927186a1a4f83e1e7497), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4, Mod2 type) (NN3 0.1 YX)" )
+
+// sequence 00 14 10 c0 8c a8 68 30 d0 58 e4 dc f4 08 f0 08 b0
+// "(C)1991 BARCREST" and "NNU 5.2"
+GAME_CUSTOM( 199?, m4nnww2__k,    m4nnww2, "nnus.p1",      0x0000, 0x010000, CRC(3e3a829e) SHA1(5aa3a56e007bad4dacdc3c993c87569e4250eecd), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4, Mod2 type) (NNU 5.2)" )
+GAME_CUSTOM( 199?, m4nnww2__l,    m4nnww2, "nnux.p1",      0x0000, 0x010000, CRC(38806ebf) SHA1(a897a33e3260de1b284b01a65d1da7cbe05d51f8), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4, Mod2 type) (NNU 5.2 X)" )
+GAME_CUSTOM( 199?, m4nnww2__m,    m4nnww2, "nnuxb.p1",     0x0000, 0x010000, CRC(c4dba8df) SHA1(0f8516cc9b2f0be9d1c936667974cd8116018dad), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4, Mod2 type) (NNU 5.2 BX)" )
+GAME_CUSTOM( 199?, m4nnww2__n,    m4nnww2, "nnuxc.p1",     0x0000, 0x010000, CRC(797e0c4d) SHA1(211b0a804643731275d0075461f8d94985fde1db), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4, Mod2 type) (NNU 5.2 CX)" )
+// "(C)1991 BARCREST" and "NNU 4.0"
+GAME_CUSTOM( 199?, m4nnww2__o,    m4nnww2, "nnu40x.bin",   0x0000, 0x010000, CRC(63e3d7df) SHA1(1a5a00185ec5150f5b05765f06297d7884540aaf), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4, Mod2 type) (NNU 4.0 X)" )
+
+
+// different protection
+// no copyright string and "NNU 3.4"
+GAME_CUSTOM( 199?, m4nnww2__hx1,  m4nnww2, "nnww2010",     0x0000, 0x010000, CRC(67b1c7b5) SHA1(495e25bc2051ab78e473cd0c36e0c1825c06db14), "hack","Nudge Nudge Wink Wink (Barcrest) (MPU4, Mod2 type) (NNU 3.4, hack, set 1)" )
+GAME_CUSTOM( 199?, m4nnww2__hx2,  m4nnww2, "wink2010",     0x0000, 0x010000, CRC(056a2ffa) SHA1(9da96d70ff850b6672ae7009253e179fa7159db4), "hack","Nudge Nudge Wink Wink (Barcrest) (MPU4, Mod2 type) (NNU 3.4, hack, set 2)" )
+

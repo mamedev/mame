@@ -188,6 +188,8 @@ public:
 
 	void bwboki(machine_config &config);
 	void mod2(machine_config &config);
+	void mod2_cheatchr(machine_config &config);
+	
 	void mod2_alt(machine_config &config);
 
 	void mod4oki(machine_config &config);
@@ -197,6 +199,7 @@ public:
 
 	void mod4oki_5r(machine_config &config);
 	void mod4oki_5r_chr(machine_config &config);
+	void mod4oki_5r_cheatchr(machine_config &config);
 
 	void mod4oki_den(machine_config &config);
 	void mod4oki_crmaze(machine_config &config);
