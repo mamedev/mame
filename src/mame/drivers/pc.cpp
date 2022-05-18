@@ -1405,13 +1405,13 @@ void pc_state::zenith(machine_config &config)
 
 ROM_START( zdsupers )
 	ROM_REGION(0x10000,"bios", 0)
-	ROM_SYSTEM_BIOS( 0, "v31d", "v3.1d" )
+	ROM_SYSTEM_BIOS( 0, "v31d", "v3.1D" )
 	ROMX_LOAD("z184m v3.1d.10d", 0x8000, 0x8000, CRC(44012c3b) SHA1(f2f28979798874386ca8ba3dd3ead24ae7c2aeb4), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS( 1, "v29e", "v2.9e" )
+	ROM_SYSTEM_BIOS( 1, "v29e", "v2.9E" )
 	ROMX_LOAD("z184m v2.9e.10d", 0x8000, 0x8000, CRC(de2f200b) SHA1(ad5ce601669a82351e412fc6c1c70c47779a1e55), ROM_BIOS(1))
 ROM_END
 
-/****************************************************** Zenith Z-150 series ***
+/****************************************************** Zenith Z-150 Series ***
 
 Form factor: Desktop
 Bus: 8 slot passive backplane: 1) CPU/memory card
@@ -1443,7 +1443,7 @@ ROM_START( zdz150 )
 	ROM_LOAD("444-229-18.bin", 0xc000, 0x4000, CRC(a6078b8a) SHA1(9a970013f5109a5003365eb2923cc26f08516dcb))
 ROM_END
 
-/****************************************************** Zenith Z-160 series ***
+/****************************************************** Zenith Z-160 Series ***
 
 Form factor: (Trans-)Portable
 
@@ -1452,6 +1452,32 @@ Form factor: (Trans-)Portable
 ROM_START( zdz160 )
 	ROM_REGION(0x10000, "bios", 0)
 	ROM_LOAD("f800ffff.rom", 0x8000, 0x8000, CRC(46dd9695) SHA1(beaf6b45cecdadf630a94902fa84006bf00e2b3d))
+ROM_END
+
+/****************************************************** Zenith Z-180 Series ***
+
+Links:  https://www.1000bit.it/ad/bro/zenith/z180.pdf
+Form Factor: Laptop
+CPU: 80C88 @ 4.77 MHz, FPU socket present
+OSC: XTAL1 24 MHz, XTAL2 14.318 MHz, XTAL3 21.47727 MHz, XTAL4 16 MHz, XTAL5 1.8432 MHz (8570), XTAL6 4 MHz (HD6305V0)
+RAM: 640 KB
+Bus: no internal slots
+Video: CGA
+Display: LCD 80 x 25 characters, 600 x 200 pixels.
+Mass storage: 1x 3.5" 720K floppy and 20MB harddisk
+On board ports: serial, parallel, ext. keyboard, ext. CGA video, ext. floppy
+HDD: OMTI 20509B, OMTI 20513, LH5764 (not dumped)
+Modem: 80C31B @ 3.5795 MHz, INS82C50
+
+******************************************************************************/
+
+ROM_START( zdz180 )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD("101ad_b920.rom", 0x8000, 0x8000, CRC(2f40a6b3) SHA1(ef6eb3acdf7729308a1e89574f84509929910767))
+	ROM_REGION(0x4000, "hd", 0)
+	ROM_LOAD("hd.rom", 0x0000, 0x4000, CRC(35b7084a) SHA1(3b3b9e414d13143e7883256d32035f36a98c95f6))
+	ROM_REGION(0x2000, "modem", 0)
+	ROM_LOAD("abbeaa2_45e4_15-06-88.rom", 0x0000, 0x2000, CRC(98f9652f) SHA1(91e706067574666c8698c819ead7e84e55b9ba1a))
 ROM_END
 
 /************************************************************** CompuAdd 810 **
@@ -2374,8 +2400,9 @@ COMP( 1987, vpcii,          ibm5150, 0,      vpcii,          pccga,    pc_state,
 COMP( 1988, laser_turbo_xt, ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "VTech",                           "Laser Turbo XT",        0 )
 COMP( 1989, laser_xt3,      ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "VTech",                           "Laser XT/3",            0 )
 COMP( 1987, zdsupers,       ibm5150, 0,      zenith,         pccga,    pc_state, empty_init,    "Zenith Data Systems",             "SuperSport",            0 )
-COMP( 198?, zdz150,         ibm5150, 0,      zenith,         pccga,    pc_state, empty_init,    "Zenith Data Systems",             "Z-150 series",          0 )
-COMP( 198?, zdz160,         ibm5150, 0,      zenith,         pccga,    pc_state, empty_init,    "Zenith Data Systems",             "Z-160 series",          0 )
+COMP( 198?, zdz150,         ibm5150, 0,      zenith,         pccga,    pc_state, empty_init,    "Zenith Data Systems",             "Z-150 Series",          0 )
+COMP( 198?, zdz160,         ibm5150, 0,      zenith,         pccga,    pc_state, empty_init,    "Zenith Data Systems",             "Z-160 Series",          0 )
+COMP( 1987, zdz180,         ibm5150, 0,      zenith,         pccga,    pc_state, empty_init,    "Zenith Data Systems",             "Z-180 Series",          MACHINE_NOT_WORKING )
 COMP( 2010, sergeysxt,      ibm5150, 0,      modernxt,       pccga,    pc_state, empty_init,    "Sergey Kiselev",                  "Sergey's XT",           MACHINE_NOT_WORKING )
 COMP( 2012, xiprocessor,    ibm5150, 0,      modernxt,       pccga,    pc_state, empty_init,    "Sergey Kiselev",                  "Xi processor board",    MACHINE_NOT_WORKING )
 COMP( 2017, micro88,        ibm5150, 0,      modernxt,       pccga,    pc_state, empty_init,    "Sergey Kiselev",                  "Micro 8088",            MACHINE_NOT_WORKING )
