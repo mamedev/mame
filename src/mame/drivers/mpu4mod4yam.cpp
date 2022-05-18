@@ -535,6 +535,29 @@ GAME_CUSTOM( 199?, m4przmc__e,  m4przmc,    "msss.p1",  0x0000, 0x010000, CRC(c8
 GAME_CUSTOM( 199?, m4przmc__f,  m4przmc,    "mssy.p1",  0x0000, 0x010000, CRC(159f4baa) SHA1(073c13e6bff4a641b29e5a45f88e3533aff460e4), "Barcrest","Prize Monte Carlo (MSS 1.6 Y) (Barcrest) (MPU4)" )
 GAME_CUSTOM( 1991, m4przmc__g,  m4przmc,    "montvnd",  0x0000, 0x010000, CRC(9858bb1d) SHA1(a2d3de2cec7420cc6f7da2239bdc79d7c4b7394e), "Barcrest","Prize Monte Carlo (MSS 1.6 C) (Barcrest) (MPU4)" )
 
+// sets below were in Prize Money sets, but boot to show 'Monte Carlo with Prizes'
+
+// needs chr sequence starting 00 50 40 14 4c 80 34 44 5c 9c 9c
+// "(C)1995  B.W.B." and "MC 53.0"
+GAME_CUSTOM( 199?, m4przmc__h,    m4przmc,   "mt_05a__.3o3", 0x0000, 0x010000, CRC(4175f4a9) SHA1(b0e172e4862aa3b7be7accefc90e98d07d449b65), "Bwb","Prize Monte Carlo (MC 53.0 K) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4przmc__i,    m4przmc,   "mt_05s__.3o3", 0x0000, 0x010000, CRC(92d674b7) SHA1(a828a9b0d870122bc09d865de90b8efa428f3fd0), "Bwb","Prize Monte Carlo (MC 53.0) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4przmc__j,    m4przmc,   "mt_05sb_.3o3", 0x0000, 0x010000, CRC(1158e506) SHA1(8c91bfe29545bbbc0d136a8c9abef785cadc3c64), "Bwb","Prize Monte Carlo (MC 53.0 YD) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4przmc__k,    m4przmc,   "mt_05sd_.3o3", 0x0000, 0x010000, CRC(5ed3d947) SHA1(4b9bc9be6e79014ad6ca95293eb464af39e40dc1), "Bwb","Prize Monte Carlo (MC 53.0 D) (Barcrest) (MPU4)" )
+// "(C)1995  B.W.B." and "MC103.0"
+GAME_CUSTOM( 199?, m4przmc__l,    m4przmc,   "mt_10a__.3o3", 0x0000, 0x010000, CRC(6a8172a4) SHA1(92c081535258677e90d9f9748a168926c7a0cbed), "Bwb","Prize Monte Carlo (MC103.0 K) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4przmc__m,    m4przmc,   "mt_10s__.3o3", 0x0000, 0x010000, CRC(1b66f0f8) SHA1(308227b0144f0568df8190810e0de627b413a742), "Bwb","Prize Monte Carlo (MC103.0) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4przmc__n,    m4przmc,   "mt_10sb_.3o3", 0x0000, 0x010000, CRC(06a33d34) SHA1(5fa1269a7cf42ef14e2a19143a07bf28b38ad920), "Bwb","Prize Monte Carlo (MC103.0 YD) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4przmc__o,    m4przmc,   "mt_10sd_.3o3", 0x0000, 0x010000, CRC(42629cb1) SHA1(12f695e1f70bf93100c1af8052dcee9131711510), "Bwb","Prize Monte Carlo (MC103.0 D) (Barcrest) (MPU4)" )
+
+// needs chr sequence starting 00 50 10 a0 68 14 b0 88 bc e4 48
+// "(C)1995  B.W.B." and "MT054.0"
+GAME_CUSTOM( 199?, m4przmc__p,    m4przmc,   "mt_05a__.4o1", 0x0000, 0x010000, CRC(637fecee) SHA1(8c970bdf703177c71dde5c774c75929ac42b6eb0), "Bwb","Prize Monte Carlo (MT054.0 K) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4przmc__q,    m4przmc,   "mti05___.4o1", 0x0000, 0x010000, CRC(0e82c258) SHA1(c4aa7d32bcd9418e2919be8be8a2f9e60d46f316), "Bwb","Prize Monte Carlo (MT054.0 C) (Barcrest) (MPU4)" )
+// "(C)1995  B.W.B." and "MT104.0"
+GAME_CUSTOM( 199?, m4przmc__r,    m4przmc,   "mt_10a__.4o1", 0x0000, 0x010000, CRC(36eeac30) SHA1(daa662392874806d18d4a161d39caed7e0abca73), "Bwb","Prize Monte Carlo (MT104.0 K) (Barcrest) (MPU4)" )
+GAME_CUSTOM( 199?, m4przmc__s,    m4przmc,   "mti10___.4o1", 0x0000, 0x010000, CRC(a35e0571) SHA1(9a22946047e76392f0c4534f892ee9ae9e700503), "Bwb","Prize Monte Carlo (MT104.0 C) (Barcrest) (MPU4)" )
+
+
 
 /*****************************************************************************************************************************************************************************
 *

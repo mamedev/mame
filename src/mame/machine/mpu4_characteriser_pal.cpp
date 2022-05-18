@@ -401,15 +401,17 @@ uint8_t mpu4_characteriser_pal::protection_r()
 
 	// use table
 	uint8_t ret = 0x00;
-	if (m_protregion)
-	{
-		ret = m_protregion[m_prot_col];
-	}
-	else
+
+	if (m_current_lamp_table)
 	{
 		ret = m_current_chr_table[m_prot_col];
 		logerror("%s: Characteriser protection_r WITH TABLE (returning %02x)\n", machine().describe_context(), ret);
 	}
+	else if (m_protregion)
+	{
+		ret = m_protregion[m_prot_col];
+	}
+
 	return ret;
 }
 
@@ -423,16 +425,17 @@ uint8_t mpu4_characteriser_pal::lamp_scramble_r()
 	}
 	else
 	{
-		uint8_t ret;
-		if (m_protregion)
-		{
-			ret = m_protregion[m_lamp_col + 64];
-			logerror("%s: Characteriser lamp_scramble_r WITH FAKE ROM (table offset %02x, returning %02x)\n", machine().describe_context(), m_lamp_col, ret);
-		}
-		else
+		uint8_t ret = 0x00;
+
+		if (m_current_lamp_table)
 		{
 			ret = m_current_lamp_table[m_lamp_col];
 			logerror("%s: Characteriser lamp_scramble_r WITH TABLE (table offset %02x, returning %02x)\n", machine().describe_context(), m_lamp_col, ret);
+		}
+		else if (m_protregion)
+		{
+			ret = m_protregion[m_lamp_col + 64];
+			logerror("%s: Characteriser lamp_scramble_r WITH FAKE ROM (table offset %02x, returning %02x)\n", machine().describe_context(), m_lamp_col, ret);
 		}
 
 		return ret;		

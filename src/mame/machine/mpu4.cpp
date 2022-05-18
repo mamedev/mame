@@ -2890,6 +2890,9 @@ void mpu4_state::mod4oki_5r_chr(machine_config &config)
 {
 	mod4oki_5r(config);
 	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+//	m_characteriser->set_lamp_table(xxx_lamp_scramble);
 }
 
 void mpu4_state::bwboki(machine_config &config)
