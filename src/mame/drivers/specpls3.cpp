@@ -211,25 +211,43 @@ void specpls3_state::plus3_update_memory()
 	{
 		/* Extended memory paging */
 		int MemorySelection = (m_port_1ffd_data >> 1) & 0x03;
-		const int *memory_selection = &spectrum_plus3_memory_selections[(MemorySelection << 2)];
+		LOG("extended memory paging: %02x\n", MemorySelection);
+		const int *memory_selection = &spectrum_plus3_memory_selections[MemorySelection << 2];
+
+		/* FIXME Currently can't perform bank switches by setting entries this way. Most likely in some
+		         places (driver or core) still trying to access memory using base of entry=0 disrespecting
+				 which one is selected.
+			ROM:"rick dangerous (1989)(firebird).dsk"
+
 		m_bank_ram[0]->set_entry(memory_selection[0]);
 		m_bank_ram[1]->set_entry(memory_selection[1]);
 		m_bank_ram[2]->set_entry(memory_selection[2]);
 		m_bank_ram[3]->set_entry(memory_selection[3]);
-		LOG("extended memory paging: %02x\n", MemorySelection);
+		*/
+		m_bank_ram[0]->set_base(m_ram->pointer() + (memory_selection[0] << 14));
+		m_bank_ram[1]->set_base(m_ram->pointer() + (memory_selection[1] << 14));
+		m_bank_ram[2]->set_base(m_ram->pointer() + (memory_selection[2] << 14));
+		m_bank_ram[3]->set_base(m_ram->pointer() + (memory_selection[3] << 14));
 	}
 	else
 	{
-		m_bank_rom[0]->set_entry(BIT(m_port_7ffd_data, 4) | ((m_port_1ffd_data >> 1) & 0x02));
+		//m_bank_rom[0]->set_entry(BIT(m_port_7ffd_data, 4) | ((m_port_1ffd_data >> 1) & 0x02));
 
 		/* Reset memory between 0x4000 - 0xbfff in case extended paging was being used */
-		/* Bank 5 in 0x4000 - 0x7fff */
-		m_bank_ram[1]->set_entry(5);
-		/* Bank 2 in 0x8000 - 0xbfff */
-		m_bank_ram[2]->set_entry(2);
-		/* select ram at 0x0c000-0x0ffff */
+		//m_bank_ram[1]->set_entry(5); /* Bank 5 in 0x4000 - 0x7fff */
+		//m_bank_ram[2]->set_entry(2); /* Bank 2 in 0x8000 - 0xbfff */
+		//m_bank_ram[3]->set_entry(m_port_7ffd_data & 0x07); /* select ram at 0x0c000-0x0ffff */
+		//LOG("RAM at 0xc000: %02x\n", m_bank_ram[3]->entry());
+
+		int ROMSelection = BIT(m_port_7ffd_data, 4) | ((m_port_1ffd_data >> 1) & 0x02);
+		m_bank_rom[0]->set_base(memregion("maincpu")->base() + 0x10000 + (ROMSelection << 14));
+
+		/* Reset memory between 0x4000 - 0xbfff in case extended paging was being used */
+		m_bank_ram[1]->set_base(m_ram->pointer() + (5 << 14)); /* Bank 5 in 0x4000 - 0x7fff */
+		m_bank_ram[2]->set_base(m_ram->pointer() + (2 << 14)); /* Bank 2 in 0x8000 - 0xbfff */
+
 		int ram_page = m_port_7ffd_data & 0x07;
-		m_bank_ram[3]->set_entry(ram_page);
+		m_bank_ram[3]->set_base(m_ram->pointer() + (ram_page<<14)); /* select ram at 0x0c000-0x0ffff */
 		LOG("RAM at 0xc000: %02x\n", ram_page);
 	}
 }
@@ -411,8 +429,8 @@ void specpls3_state::spectrum_plus3(machine_config &config)
 
 	UPD765A(config, m_upd765, 16_MHz_XTAL / 4, true, false); // clocked through SED9420
 	m_upd765->us_wr_callback().set(FUNC(specpls3_state::plus3_us_w));
-	FLOPPY_CONNECTOR(config, "upd765:0", specpls3_floppies, "3ssdd", floppy_image_device::default_mfm_floppy_formats); // internal drive
-	FLOPPY_CONNECTOR(config, "upd765:1", specpls3_floppies, "3ssdd", floppy_image_device::default_mfm_floppy_formats); // external drive
+	FLOPPY_CONNECTOR(config, "upd765:0", specpls3_floppies, "3ssdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true); // internal drive
+	FLOPPY_CONNECTOR(config, "upd765:1", specpls3_floppies, "3ssdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true); // external drive
 
 	SOFTWARE_LIST(config, "flop_list").set_original("specpls3_flop");
 }
