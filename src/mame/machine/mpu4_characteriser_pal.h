@@ -29,7 +29,7 @@ public:
 		m_cpu.set_tag(std::forward<T>(tag));
 	}
 
-	void set_lamp_table(uint8_t* table)
+	void set_lamp_table(const uint8_t* table)
 	{
 		m_current_lamp_table = table;
 	}
@@ -47,6 +47,11 @@ public:
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
+	// while most games use unique keys and lamp scrambles, a lot use the same 'tri98' table, and this lamp scramble
+	// these can be identified as games expecting a chr response starting with '00 84 94 3c ec 5c ec 50 2c 68 60 ac'
+	static constexpr uint8_t m4dtri98_lamp_scramble[8] = { 0x03, 0xAF, 0x87, 0xAB, 0xA3, 0x8F, 0x87, 0x83 };
+
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -63,7 +68,7 @@ private:
 
 	bool m_allow_6809_cheat = false;
 	uint8_t* m_current_chr_table = nullptr;
-	uint8_t* m_current_lamp_table = nullptr;
+	const uint8_t* m_current_lamp_table = nullptr;
 	int m_prot_col = 0;
 	int m_lamp_col = 0;
 
