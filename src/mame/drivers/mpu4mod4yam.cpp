@@ -1119,6 +1119,27 @@ GAME_CUSTOM( 199?, m4shv__12,   m4shv,   "hypv_20_.4",           0x0000, 0x01000
 
 /*****************************************************************************************************************************************************************************
 *
+* Hyper Viper Club 
+* 
+*****************************************************************************************************************************************************************************/
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+	ROM_END \
+	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
+// "(C)1991 BARCREST" and "HPC 0.5"
+GAME_CUSTOM( 199?, m4hypclb,       0,          "hpcs.p1",  0x0000, 0x010000, CRC(55601e10) SHA1(78c3f13cd122e86ff8b7750b375c26e56c6b27c6), "Barcrest","Hyper Viper Club (Barcrest) (MPU4) (HPC 0.5)" )
+GAME_CUSTOM( 199?, m4hypclb__c,    m4hypclb,   "hpcd.p1",  0x0000, 0x010000, CRC(7fac8944) SHA1(32f0f16ef6c4b99fe70464341a1ce226f6221122), "Barcrest","Hyper Viper Club (Barcrest) (MPU4) (HPC 0.5 D)" )
+GAME_CUSTOM( 199?, m4hypclb__a,    m4hypclb,   "hpcf.p1",  0x0000, 0x010000, CRC(2931a558) SHA1(2f7fe541edc502738dd6603435deaef1cb26a1e2), "Barcrest","Hyper Viper Club (Barcrest) (MPU4) (HPC 0.5 F)" )
+GAME_CUSTOM( 199?, m4hypclb__b,    m4hypclb,   "hpcfd.p1", 0x0000, 0x010000, CRC(b127e577) SHA1(da034086bb92934f73d1a2be776f91462274479d), "Barcrest","Hyper Viper Club (Barcrest) (MPU4) (HPC 0.5 FD)" )
+
+
+/*****************************************************************************************************************************************************************************
+*
 * Misc Other Sets
 * 
 *****************************************************************************************************************************************************************************/
