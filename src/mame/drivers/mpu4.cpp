@@ -105,39 +105,29 @@ ROM_START( m4bucks )
 ROM_END
 
 
-ROM_START( m4calicl )
+ROM_START( m4calicl ) // protection is cheatchr_shuffle
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ca2s.p1", 0x0000, 0x010000, CRC(fad153fd) SHA1(bd1f1a5c73624df45d01cb4853d87e998e434d7a) )
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "ca2s.chr", 0x0000, 0x000048, CRC(97618d38) SHA1(7958e99684d50b9bdb56c97f7fcfe161f0824578) )
 ROM_END
 
 ROM_START( m4calicla )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ca2d.p1", 0x0000, 0x010000, CRC(75eb8c6f) SHA1(1bb923d06dcfa24eaf9533c083f68f4bd840834f) )
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "ca2s.chr", 0x0000, 0x000048, CRC(97618d38) SHA1(7958e99684d50b9bdb56c97f7fcfe161f0824578) )
 ROM_END
 
 ROM_START( m4caliclb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ca2f.p1", 0x0000, 0x010000, CRC(6c53cf29) SHA1(2e58453891ab4faa17ef58a81c5f3c0618d046a5) )
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "ca2s.chr", 0x0000, 0x000048, CRC(97618d38) SHA1(7958e99684d50b9bdb56c97f7fcfe161f0824578) )
 ROM_END
 
 ROM_START( m4caliclc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cald.p1", 0x0000, 0x010000, CRC(296fdeeb) SHA1(7782c0c7d8f44e2c0d48cc24c13015241e47b9ec) )
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "ca2s.chr", 0x0000, 0x000048, CRC(97618d38) SHA1(7958e99684d50b9bdb56c97f7fcfe161f0824578) )
 ROM_END
 
 ROM_START( m4calicld )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cals.p1", 0x0000, 0x010000, CRC(28a1c5fe) SHA1(e8474df609ea7f3517780b54d6f493987aad3650) )
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "ca2s.chr", 0x0000, 0x000048, CRC(97618d38) SHA1(7958e99684d50b9bdb56c97f7fcfe161f0824578) )
 ROM_END
 
 
@@ -149,6 +139,7 @@ ROM_START( m4casmul )
 	ROM_LOAD( "casinomultiplaysnd.bin", 0x0000, 0x080000, CRC(be293e95) SHA1(bf0d419c898920a7546b542d8b205e25004ef04f) )
 ROM_END
 
+// 00 90 C0 54 A4 F0 64 90 E4 D4 60 B4
 ROM_START( m4oldtmr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dot11.bin",  0x00000, 0x10000,  CRC(da095666) SHA1(bc7654dc9da1f830a43f925db8079f27e18bb61e))
@@ -193,7 +184,7 @@ ROM_START( m4ceptr )
 	ROM_LOAD( "cepsnd.p2", 0x080000, 0x080000, CRC(a82f0096) SHA1(45b6b5a2ae06b45add9cdbb9f5e6f834687b4902) )
 ROM_END
 
-
+// 00 50 40 90 A8 6C C4 30 C8 AC A4 F8 D4   alf_lamp_scramble
 #define M4CHASEI_EXTRAS \
 	ROM_REGION( 0x48, "characteriser:fakechr", 0 ) \
 	ROM_LOAD( "chaseinvaders.chr", 0x0000, 0x000048, CRC(d7703dcd) SHA1(16fd998d1b44f35c10e5486882aa7f2d018dc82b) ) \
@@ -256,7 +247,7 @@ ROM_START( m4c9c )
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) // should this set have an OKI?
 ROM_END
 
-
+// 00 44 44 54 34 04 54 14 34 14 20 74 04 60   same as some everyone's a winner sets?
 #define M4CLBVEG_EXTRAS \
 	ROM_REGION( 0x48, "characteriser:fakechr", 0 ) \
 	ROM_LOAD( "cvegas.chr", 0x0000, 0x000048, CRC(a6c341b0) SHA1(c8c838c9bb1ced52889504b9cea8d88f1e7fa79f) ) \
@@ -406,6 +397,7 @@ ROM_START( m4crjwlc )
 	M4CRJWL_EXTRAS
 ROM_END
 
+// 00 24 24 2C 70 20 0C 60 3C 5C 5C 5C 7C   mod4oki_cheatchr_duty
 #define M4CRJWL2_EXTRAS \
 	ROM_REGION( 0x48, "characteriser:fakechr", 0 ) \
 	ROM_LOAD( "chr.chr", 0x0000, 0x000048, CRC(c5812913) SHA1(d167b1f512c183cf01a1f4e1c1588ea0ae21331b) ) \
@@ -458,7 +450,7 @@ ROM_START( m4dracb )
 	M4DRAC_EXTRAS
 ROM_END
 
-
+// 00 60 68 BC D0 2C 94 20 E4 E8 BC F0  // m400?
 ROM_START( m4exgam )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "czep30.bin", 0x0000, 0x010000, CRC(4614e6f6) SHA1(5602a68e9b47394cb31bbcd49a9920e19af6242f) )
@@ -504,7 +496,8 @@ ROM_START( m4frtgm )
 ROM_END
 
 
-
+// same as some super hyper viper?
+// 00 90 18 E4 A8 3C F4 48 74 50 20 F0
 ROM_START( m4gldgat )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dgg22.bin", 0x0000, 0x010000, CRC(ef8498df) SHA1(6bf164ef18445e83e4510a000bc924cbe916ad99) )
@@ -582,13 +575,12 @@ ROM_START( m4hirisee )
 	ROM_LOAD( "hrise206", 0x0000, 0x010000, CRC(58b4bbdd) SHA1(0b76d27147fbadba97328eb9d2dc81cff9d576e0) )
 ROM_END
 
-
+// 00 60 68 BC D0 2C 94 20 E4 E8 BC
 ROM_START( m4holdtm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dht10.hex", 0x0000, 0x010000, CRC(217d382b) SHA1(a27dd107c554d4787967633dff998d3962ee0ea5) )
 
 	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "ht01.chr", 0x0000, 0x000048, CRC(0fc2bb52) SHA1(0d0e47938f6e00166e7352732ddfb7c610f44db2) )
 	ROM_LOAD( "m400.chr", 0x0000, 0x000048, CRC(8f00f720) SHA1(ea59fa2a3b016a7ae83be3caf863de87ce7aeffa) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
@@ -835,7 +827,7 @@ ROM_START( m4rwb )
 	ROM_LOAD( "rwb_2.snd", 0x080000, 0x080000, CRC(54a2b2fd) SHA1(25875ff873bf22df510e7a4c56c336fbabcbdedb) )
 ROM_END
 
-
+// 00 C0 D0 1C EC 78 AC 30 4C 2C 24
 ROM_START( m4magtbo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "crmtb14.epr", 0x0000, 0x010000, CRC(79e1746c) SHA1(794317f3aba7b1a7994cde89d81abc2b687d0821) )
@@ -847,7 +839,7 @@ ROM_START( m4magtbo )
 	ROM_LOAD( "scrmtb.snd", 0x000000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
 ROM_END
 
-
+// 00 24 24 A4 68 14 C4 28 D4 8C D8
 ROM_START( m4reeltm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "real.bin", 0x0000, 0x010000, CRC(5bd54924) SHA1(23fcf13c52ee7b9b39f30f999a9102171fffd642) ) // == m4wildtm
@@ -914,7 +906,7 @@ ROM_START( m4steptm )
 	ROM_LOAD( "sdun01.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
 ROM_END
 
-
+// 00 14 04 94 A8 6C C4 30 8C E8 E0 BC D4   m574
 #define M4SUPBJC_EXTRAS \
 	ROM_REGION( 0x48, "characteriser:fakechr", 0 ) \
 	ROM_LOAD( "sbj.chr", 0x0000, 0x000048, CRC(cc4b7911) SHA1(9f8a96a1f8b0f9b33b852e93483ce5c684703349) ) \
@@ -1013,7 +1005,7 @@ ROM_START( m4toprn )
 	ROM_LOAD( "toprun_v1_2.bin", 0x8000, 0x004000, CRC(940fafa9) SHA1(2a8b669c51c8df50710bd8b552ab30a5d1a136ab) )
 ROM_END
 
-
+// 00 60 68 BC D0 2C 94 20 E4 E8 BC F0   m400?
 #define M4TOPTIM_EXTRAS \
 	ROM_REGION( 0x48, "characteriser:fakechr", 0 ) \
 	ROM_LOAD( "ttimer.chr", 0x0000, 0x000048, CRC(f694224e) SHA1(936ab5e349fa59accbb37959cce9519fd97f3978) ) \
@@ -1034,40 +1026,32 @@ ROM_START( m4toptima )
 ROM_END
 
 
-#define M4TROPCL_EXTRAS \
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 ) \
-	ROM_LOAD( "tro20.chr", 0x0000, 0x000048, CRC(97618d38) SHA1(7958e99684d50b9bdb56c97f7fcfe161f0824578) )
-
-ROM_START( m4tropcl )
+ROM_START( m4tropcl ) // cheatchr_shuffle
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tros.p1", 0x0000, 0x010000, CRC(5e86c3fc) SHA1(ce2419991559839a8875060c1afe0f030190010a) )
-	M4TROPCL_EXTRAS
 ROM_END
 
 ROM_START( m4tropcla )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tr2d.p1", 0x0000, 0x010000, CRC(0cc23f89) SHA1(a66c8c28073f53381c43e3e597f15f81c5c61479) )
-	M4TROPCL_EXTRAS
 ROM_END
 
 ROM_START( m4tropclb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tr2f.p1", 0x0000, 0x010000, CRC(fbdcd06f) SHA1(27ccdc83e60a62227d33d8cf3d516fc43908ab99) )
-	M4TROPCL_EXTRAS
 ROM_END
 
 ROM_START( m4tropclc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tr2s.p1", 0x0000, 0x010000, CRC(6d43375c) SHA1(5be1dc85374c6a1235e0b137b46ebd7a2d7d922a) )
-	M4TROPCL_EXTRAS
 ROM_END
 
 ROM_START( m4tropcld )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "trod.p1", 0x0000, 0x010000, CRC(60c84612) SHA1(84dc8b34e41436331832c1a32ddac0fce269488a) )
-	M4TROPCL_EXTRAS
 ROM_END
 
+// 00 C0 D0 38 EC 5C EC 14 68 2C 24 E8
 
 #define M4TBPLAY_EXTRAS \
 	ROM_REGION( 0x48, "characteriser:fakechr", 0 ) \
@@ -1094,7 +1078,7 @@ ROM_START( m4tbplayb )
 	M4TBPLAY_EXTRAS
 ROM_END
 
-
+// 00 14 10 A0 8C C8 68 50 B0 38 64
 ROM_START( m4twintm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "d2t11.bin", 0x0000, 0x010000, CRC(6a76ac6f) SHA1(824912ff1fc3155d11d32b597be53481532fdf5e) )
@@ -1122,7 +1106,7 @@ ROM_START( m4twistb )
 	ROM_LOAD( "twistagain-mki-27.bin", 0x8000, 0x008000, CRC(357f7072) SHA1(8a23509fff79a83a819b27eff8de8db08c679e3f) )
 ROM_END
 
-
+// 00 60 68 BC D0 2C 94 20 E4 E8   m400
 ROM_START( m4univ )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dun20", 0x0000, 0x010000, CRC(6a845d4d) SHA1(82bfc3f3a0ede76a4d482efc71b0390610db7acf) )
@@ -1280,6 +1264,7 @@ Just one different byte between the three "Escalera y Tobogan" sets, at address 
  1270: 0xF6
 May be the game serial number hard-encoded on the EPROM?
 */
+// 00 84 8c d8 74 80 4c 90 e8 78 54 60 84 2c
 ROM_START( m4esctbg )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "ma-15_b-1925-94_esc_1.6a_n-1270.rom1", 0x0000, 0x10000, CRC(6fa2a0ef) SHA1(3b60b545e417a45e61e3babbe27758a053ced926) )
@@ -2244,11 +2229,11 @@ GAME(199?, m4techno,  0,          mod4oki_alt,mpu4,    mpu4_state, init_m4altree
 GAME(199?, m4technoa, m4techno,   mod4oki_alt,mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","Techno Reel (Barcrest) (MPU4) (DTE) (set 2)",GAME_FLAGS )
 GAME(199?, m4twintm,  0,          mod4oki_alt,mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","Twin Timer (Barcrest) (MPU4) (D2T 1.1)",GAME_FLAGS )
 GAME(199?, m4blkbul,  0,          mod2_alt,   mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","Super Play (Black Bull?) (Czech) (Barcrest) [XSP] (MPU4)",GAME_FLAGS ) // complains about coin dip
-GAME(199?, m4calicl,  0,          mod2_alt,   mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4calicla, m4calicl,   mod2_alt,   mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
-GAME(199?, m4caliclb, m4calicl,   mod2_alt,   mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
-GAME(199?, m4caliclc, m4calicl,   mod2_alt,   mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
-GAME(199?, m4calicld, m4calicl,   mod2_alt,   mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (set 5)",GAME_FLAGS )
+GAME(199?, m4calicl,  0,          mod2_alt_cheatchr_shuffle,   mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4calicla, m4calicl,   mod2_alt_cheatchr_shuffle,   mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4caliclb, m4calicl,   mod2_alt_cheatchr_shuffle,   mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
+GAME(199?, m4caliclc, m4calicl,   mod2_alt_cheatchr_shuffle,   mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
+GAME(199?, m4calicld, m4calicl,   mod2_alt_cheatchr_shuffle,   mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (set 5)",GAME_FLAGS )
 
 GAME(199?, m4bucks,   0,          mod2_alt,   mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","Bucks Fizz Club (Barcrest) (MPU4)",GAME_FLAGS )
 
@@ -2268,11 +2253,12 @@ GAME(199?, m4supbf,   0,          mod2_alt,   mpu4,    mpu4_state, init_m4altree
 GAME(199?, m4supbfa,  m4supbf,    mod2_alt,   mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","Super Bucks Fizz Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
 
 GAME(199?, m4toma,    0,          mod2_alt,   mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","Tomahawk (Barcrest) (MPU4)",GAME_FLAGS )
-GAME(199?, m4tropcl,  0,          mod2_alt,   mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4tropcla, m4tropcl,   mod2_alt,   mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
-GAME(199?, m4tropclb, m4tropcl,   mod2_alt,   mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
-GAME(199?, m4tropclc, m4tropcl,   mod2_alt,   mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
-GAME(199?, m4tropcld, m4tropcl,   mod2_alt,   mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (set 5)",GAME_FLAGS )
+
+GAME(199?, m4tropcl,  0,          mod2_alt_cheatchr_shuffle,   mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4tropcla, m4tropcl,   mod2_alt_cheatchr_shuffle,   mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4tropclb, m4tropcl,   mod2_alt_cheatchr_shuffle,   mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
+GAME(199?, m4tropclc, m4tropcl,   mod2_alt_cheatchr_shuffle,   mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
+GAME(199?, m4tropcld, m4tropcl,   mod2_alt_cheatchr_shuffle,   mpu4,    mpu4_state, init_m4altreels, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (set 5)",GAME_FLAGS )
 
 
 // these all seem quite close to Old Timer (unsurprising, many are called XX timer), the 'altreels' is just the same as the oldtimer init, but with the 'guess' CHR emulation
@@ -2394,9 +2380,9 @@ GAME(199?, m4sctagt,  0,          mod4oki,    mpu4,    mpu4_state, init_m4defaul
 
 // Others
 
-GAME(1994, m4esctbg,  0,          mod4oki,    mpu4,    mpu4_state, init_m4default,     ROT0, "Vifico", "Escalera Tobogan (MPU4, set 1)", GAME_FLAGS )
-GAME(1994, m4esctbga, m4esctbg,   mod4oki,    mpu4,    mpu4_state, init_m4default,     ROT0, "Vifico", "Escalera Tobogan (MPU4, set 2)", GAME_FLAGS )
-GAME(1994, m4esctbgb, m4esctbg,   mod4oki,    mpu4,    mpu4_state, init_m4default,     ROT0, "Vifico", "Escalera Tobogan (MPU4, set 3)", GAME_FLAGS )
+GAME(1994, m4esctbg,  0,          mod4oki_cheatchr,    mpu4,    mpu4_state, init_m4default,     ROT0, "Vifico", "Escalera Tobogan (MPU4, set 1)", GAME_FLAGS )
+GAME(1994, m4esctbga, m4esctbg,   mod4oki_cheatchr,    mpu4,    mpu4_state, init_m4default,     ROT0, "Vifico", "Escalera Tobogan (MPU4, set 2)", GAME_FLAGS )
+GAME(1994, m4esctbgb, m4esctbg,   mod4oki_cheatchr,    mpu4,    mpu4_state, init_m4default,     ROT0, "Vifico", "Escalera Tobogan (MPU4, set 3)", GAME_FLAGS )
 
 GAMEL(199?, m4aao,    0,          mod4oki,    mpu4,    mpu4_state, init_m4aao,     ROT0,   "Eurotek","Against All Odds (Eurotek) (MPU4)",GAME_FLAGS, layout_m4aao )
 GAME(199?, m4bandgd,  0,          mod4oki,    mpu4,    mpu4_state, init_m4default, ROT0,   "Eurogames","Bands Of Gold (Eurogames) (MPU4)",GAME_FLAGS )

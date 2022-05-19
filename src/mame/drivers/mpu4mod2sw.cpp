@@ -284,6 +284,7 @@ ROM_START( m4sgrabb )
 ROM_END
 
 
+// 00 60 68 BC D0 2C 94 20 E4 E8 BC F0 88
 ROM_START( m4stakeu )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "su4_4.p1", 0xc000, 0x004000, CRC(e534edba) SHA1(0295013e3e9271f7e5023b8de670a4903578bf05) )
@@ -433,7 +434,7 @@ ROM_START( m4topgr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "topgear.hex", 0x6000, 0x00a000, CRC(539cc3d7) SHA1(7d5c9eccd2d929189e8d82783fc630b2f3cacd24) ) // needs to be split
 	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "topgear.chr", 0x0000, 0x000048, CRC(88578212) SHA1(c6c451b835c465e13de22bbe0dd472dbd2f8f504) )
+	ROM_LOAD( "topgear.chr", 0x0000, 0x000048, CRC(88578212) SHA1(c6c451b835c465e13de22bbe0dd472dbd2f8f504) ) // nonsense
 ROM_END
 
 ROM_START( m4bj )
@@ -502,7 +503,7 @@ ROM_START( m4cashcod )
 	ROM_LOAD( "cash connect 70.bin", 0x0000, 0x010000, CRC(8b4f8056) SHA1(a9e7927ac9aa2ee1dccf207f4b249ae90c4c713d) )
 ROM_END
 
-
+// 00 14 10 C0 8C A8 68 30 D0 58 E4 DC F4  (same as some nudge nudge wink wink sets)
 ROM_START( m4cashmx )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cash_matrix_20p.bin", 0x0000, 0x010000, CRC(3f2ebfeb) SHA1(1dbabe81204f4b149c125aca3413d8e521a690ca) )
@@ -537,6 +538,7 @@ ROM_START( m4dblup )
 	ROM_LOAD( "du15.bin", 0x0000, 0x010000, CRC(76d4f30d) SHA1(91b131bec6d38d09ffafbde985d03ba4d8fcb307) )
 ROM_END
 
+// 00 50 40 90 A8 6C C4 30 C8 AC A4 F8 D4   alf_lamp_scramble
 ROM_START( m4eighth )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "wonder.hex", 0x0000, 0x010000, CRC(6fcaab11) SHA1(a462d4c50000e62af4c52980338cee073e4175a9) )
@@ -623,7 +625,7 @@ ROM_START( m4grandsa )
 	ROM_LOAD( "gd11p2.bin", 0x6000, 0x002000, CRC(3fe26112) SHA1(bfc1c83fc6f341c6f4be937496f9bd0d69e49485) )
 ROM_END
 
-
+// 00 BC B8 FC BC DC FC FC FC
 ROM_START( m4intcep )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ints.p1", 0x0000, 0x010000, CRC(6c6b61ca) SHA1(521cf68b9086baffe739d2b12dd28a13afb84b80) )
@@ -677,6 +679,7 @@ ROM_START( m4moneym )
 	ROM_LOAD( "moneymaker-v16.bin", 0x0000, 0x010000, CRC(77f52665) SHA1(48a67b651385834658f1acb11ccde12b73393ced) )
 ROM_END
 
+// 00 E4 EC F8 54 08 D0 80 44   same as some nudge nudge wink wink
 ROM_START( m4nifty )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nifty.hex", 0x0000, 0x010000, CRC(84931755) SHA1(b4e568e1e4c237ea3f7ca6156b8a89cb40faf425) )
@@ -767,6 +770,7 @@ ROM_START( m4starbr )
 	ROM_LOAD( "dsb28j.bin", 0x0000, 0x010000, CRC(2f21b614) SHA1(9cc47b879ad8ff81147a5d66fe9a41118aa722f2) )
 ROM_END
 
+// 00 60 60 C0 58 44 E0 50 A8 9C CC BC E4
 ROM_START( m4sunset )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sunsetboulivard2p.bin", 0x0000, 0x010000, CRC(c83a0b84) SHA1(a345d1e4914ad08d40980022f63e10879e2ef32f) )
@@ -946,6 +950,7 @@ ROM_START( m4toptak )
 	ROM_LOAD( "toptake.bin", 0x8000, 0x008000, CRC(52e74d55) SHA1(72c14474b9c799d682ccd8bc20af86ce7dd6be64) )
 ROM_END
 
+// 00 60 60 24 68 C0 34 44 6C 8C 9C
 ROM_START( m4tribnk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "triplebank_1.bin", 0x0000, 0x010000, CRC(efeb5810) SHA1(e882f3ce028dcd4705365e0c17dab8d5839e4901) )
@@ -998,6 +1003,7 @@ void mpu4_state::init_m4alpha()
 	//Front door code 255 Cash door code 255
 }
 
+// 00 50 40 14 4C 80 34 44 5C    same as some monte carlo sets
 ROM_START( m4alpha )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "alphabet.hex", 0x6000, 0x00a000, CRC(2bf0d7fd) SHA1(143543f45bfae379233a8c21959618e5ad8034e4) )
@@ -1302,7 +1308,7 @@ ROM_START( m4bluemnb )
 	ROM_LOAD( "blm20p-6", 0x0000, 0x010000, CRC(4b9f83cf) SHA1(7014da9f7fc20443251dd5b2817f06a4ef862afd) ) // contains inaccessible data before 0x1000
 ROM_END
 
-
+// 00 50 40 14 C4 B0 A4 30 C4 74 00   // same as some red hot roll, prize roller etc.
 ROM_START( m4take2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ttos.p1", 0x0000, 0x010000, CRC(d7943729) SHA1(76fcaf7dbfa7863a4dfe2804e2d472dcfec13124) )
@@ -1345,6 +1351,7 @@ ROM_START( m4loadmnb )
 	ROM_LOAD( "la11l.bin", 0x0000, 0x010000, CRC(2d1f8e7a) SHA1(9e5a8b7827925f757784ea4726e3c4897056cdf6) )
 ROM_END
 
+// 00 84 8C B8 74 80 1C B4 D8 74 00 D4 C8
 ROM_START( m4celclb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cels.p1",  0x00000, 0x10000,  CRC(19d2162f) SHA1(24fe435809352725e7614c32e2184142f355298e))
@@ -1400,7 +1407,7 @@ ROM_START( m4atlan )
 	ROM_LOAD( "dat14.bin", 0x0000, 0x010000, CRC(d91fb9b2) SHA1(a06a868a17f84e2a012b0fe28025458e4f899c1d) ) // == m4tridic
 ROM_END
 
-
+// 00 60 60 24 E0 E8 1C 74 C4 6C  (same as some others, but blank lamp data?)
 ROM_START( m4tridic )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "trp.bin", 0x0000, 0x010000, CRC(d91fb9b2) SHA1(a06a868a17f84e2a012b0fe28025458e4f899c1d) ) // == m4atlan
@@ -1530,6 +1537,8 @@ ROM_START( m4suptrn )
 	ROM_LOAD( "dsu21", 0x0000, 0x010000, CRC(b09f63e3) SHA1(8dba0731e1ed5e7056ec6ad1fa269b5b77629745) )
 ROM_END
 
+
+// 00 60 60 A0 38 64 E0 30 C8 9C AC
 ROM_START( m4bjac )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bjak1.8", 0x0000, 0x010000, CRC(e6a3c263) SHA1(fb28657cb43a0f24354382518d5d5be9cfdfa1d1) )
@@ -1585,6 +1594,7 @@ ROM_START( m4classa )
 	ROM_LOAD( "dfc20dsl.bin", 0x0000, 0x010000, CRC(dc1c8b87) SHA1(52235f9d393c574fdd26aa2ec60e6db70538fb9d) )
 ROM_END
 
+// 00 44 44 C4 58 60 C0 50 8C B8 E0   (same as some jolly gems)
 ROM_START( m4frtfl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "frtfull", 0x0000, 0x010000, CRC(4f5389e2) SHA1(bb6d43d428c1e8db07fe58d1b83c05ce5fcdcc7d) )
@@ -1622,6 +1632,7 @@ ROM_START( m4thehit )
 	ROM_LOAD( "dth17.bin", 0x0000, 0x010000, CRC(93947de4) SHA1(e04c34edf39d264e3fa91bf6dfd757088e1c08e4) )
 ROM_END
 
+// 00 84 C4 E4 4C 10 28 90 E8 78 34 28 B0   same as some viva las vegas
 ROM_START( m4jpjmp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "vjcs.p1", 0x0000, 0x010000, CRC(90280752) SHA1(bc2fcefc00adbae9ca2e116108b53ab932ab57b2) )
@@ -1636,7 +1647,7 @@ ROM_START( m4jpjmpa )
 	ROM_LOAD( "jj.chr", 0x0000, 0x000048, CRC(abf2340a) SHA1(6cfeb84db61e647da0a46faa87fa003a34b46f5c) )
 ROM_END
 
-
+//  00 84 A4 E4 B0 34 54 44 D4 64 80 F4 24  same as some cash attack and ten out of ten
 ROM_START( m4milclb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mi2d.p1", 0x0000, 0x010000, CRC(ce697bbd) SHA1(86c1729014eff9925a5f62189236a9c5bd11534b) )
@@ -1678,7 +1689,7 @@ ROM_START( m4bigchd )
 	ROM_LOAD( "bch15.bin", 0x0000, 0x010000, CRC(b745b19f) SHA1(b654af35200c69604a3c30e3df1252f8bedc2000) )
 ROM_END
 
-
+// 00 24 24 A4 4C 10 88 50 A8 D8 9C 9C
 ROM_START( m4dbl9 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "du91.0", 0x0000, 0x010000, CRC(6207753d) SHA1(b19bcb60707b73f37e9bd8177d0b15847af0213f) )
@@ -1744,6 +1755,7 @@ ROM_START( m4joltavb )
 	ROM_LOAD( "jto20d_1.1", 0x0000, 0x010000, CRC(dff09dfc) SHA1(c13f31f7d96075f7c94ae5e79fc1f9b8ce7e4c80) )
 ROM_END
 
+// 45 84 94 3C EC 5C EC 50 2C 68
 ROM_START( m4btclok )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "beattheclock.hex", 0x6000, 0x00a000, CRC(a0d4e463) SHA1(45d1df08bfd70caf63b14d2ccc56038ed85e23d0) )

@@ -105,6 +105,11 @@ public:
 
 	// games with sequence starting 00 50 40 90 a8 6c c4 30 c8
 	static constexpr uint8_t alf_lamp_scramble[8] = { 0x00, 0x58, 0x50, 0x1C, 0x10, 0x58, 0x50, 0x10 };
+	                                              //    03    DB    53    9B    93    5B    53    13
+
+	// games with sequence starting 00 84 A4 AC 70 80 2C C0 BC 5C
+	static constexpr uint8_t shuffle_lamp_scramble[8] = { 0x00, 0x18, 0x00, 0x18, 0x08, 0x10, 0x00, 0x00 };
+	
 
 protected:
 	virtual void device_start() override;

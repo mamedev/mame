@@ -816,7 +816,7 @@ GAME_CUSTOM( 199?, m4acechs__u,    m4acechs,   "aei20___.3_1", 0x0000, 0x010000,
 * 
 *****************************************************************************************************************************************************************************/
 
-// 00 14 04 94 A8 6C C4 30 8C E8 E0 BC D4
+// 00 14 04 94 A8 6C C4 30 8C E8 E0 BC D4   m574
 
 #define M4SUPST_EXTRA_ROMS \
 	ROM_REGION( 0x48, "characteriser:fakechr", 0 ) \
@@ -1017,6 +1017,8 @@ GAME_CUSTOM( 199?, m4fastfw__f,    m4fastfw,   "fastf206",     0x0000, 0x010000,
 
 // This ROM was included in the sets, but it appears to be a 68k family (not plain 68000) program ROM, and has a (c)1998 MAB Systems in it, it does not belong here
 //	ROM_LOAD( "vivalasvegas4.bin", 0x0000, 0x080000, CRC(76971425) SHA1(0974a9dce51cc3dd4e26cec11a948c9c8021fde4) )
+
+// 00 84 C4 E4 4C 10 28 90 E8 78 34
 
 #define M4VIVALV_EXTRA_ROMS \
 	ROM_REGION( 0x48, "characteriser:fakechr", 0 ) /* from viva last vegas 'six' set */ \
@@ -1268,11 +1270,10 @@ ROM_START( m4joljokd )
 	ROM_LOAD( "djj15.bin", 0x0000, 0x010000, CRC(155cb134) SHA1(c1026effeceba131df9681afd91ccd6fb43b738a) )
 ROM_END
 
-ROM_START( m4clbshf )
+
+ROM_START( m4clbshf ) // cheatchr_shuffle
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "csss.p1", 0x0000, 0x010000, CRC(32dd9b96) SHA1(93831858b2f0ada8e4a0aa2fae59d12c53287df1) )
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "club_shuffle.chr", 0x0000, 0x000048, CRC(97618d38) SHA1(7958e99684d50b9bdb56c97f7fcfe161f0824578) )
 ROM_END
 
 ROM_START( m4graffd )
@@ -1294,7 +1295,7 @@ GAME(199?, m4stc,     0,        mod4yam_cheatchr, mpu4, mpu4_state, init_m4defau
 
 GAME(199?, m4joljokd, m4joljok, mod4yam_cheatchr, mpu4, mpu4_state, init_m4default,  ROT0,   "Barcrest","Jolly Joker (Barcrest) [Dutch] (MPU4) (DJJ)",GAME_FLAGS) // Geen Tubes
 
-GAME(199?, m4clbshf,  0,        mod4yam_chr,      mpu4, mpu4_state, init_m4default,  ROT0,   "Barcrest","Club Shuffle (Barcrest) (MPU4)",GAME_FLAGS) // set stake (runs if you do)
+GAME(199?, m4clbshf,  0,        mod4yam_cheatchr_shuffle, mpu4, mpu4_state, init_m4default,  ROT0,   "Barcrest","Club Shuffle (Barcrest) (MPU4)",GAME_FLAGS) // set stake (runs if you do)
 
 GAME(199?, m4voodoo,  0,        mod4yam_cheatchr, mpu4, mpu4_state, init_m4default,  ROT0,   "Barcrest","Voodoo 1000 (Barcrest) (Dutch) (MPU4) (DDO 3.2)",GAME_FLAGS ) // ROL F SETUP ALM
 

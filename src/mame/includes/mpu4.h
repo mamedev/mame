@@ -189,8 +189,10 @@ public:
 	void bwboki(machine_config &config);
 	void mod2(machine_config &config);
 	void mod2_cheatchr(machine_config &config);
+	void mod2_cheatchr_shuffle(machine_config &config);
 	
 	void mod2_alt(machine_config &config);
+	void mod2_alt_cheatchr_shuffle(machine_config &config);
 
 	void mod4oki(machine_config &config);
 	void mod4oki_chr(machine_config &config);
@@ -211,6 +213,7 @@ public:
 	void mod4oki_cheatchr_duty(machine_config &config);
 	void mod4oki_cheatchr_andybt(machine_config &config);
 	void mod4oki_cheatchr_alf(machine_config &config);
+	void mod4oki_cheatchr_shuffle(machine_config &config);
 
 
 
@@ -218,6 +221,7 @@ public:
 	void mod4oki_5r_chr(machine_config &config);
 	void mod4oki_5r_cheatchr(machine_config &config);
 	void mod4oki_5r_cheatchr_m574(machine_config &config);
+	void mod4oki_5r_cheatchr_shuffle(machine_config &config);
 
 	void mod4oki_crmaze(machine_config &config);
 
@@ -229,6 +233,7 @@ public:
 	void mod4yam_cheatchr_lv(machine_config &config);
 	void mod4yam_cheatchr_m683(machine_config &config);
 	void mod4yam_cheatchr_m407(machine_config &config);
+	void mod4yam_cheatchr_shuffle(machine_config &config);
 
 	void mod4yam_chr(machine_config &config);
 

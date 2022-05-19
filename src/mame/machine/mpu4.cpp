@@ -2814,6 +2814,15 @@ void mpu4_state::mod2_cheatchr(machine_config &config)
 //	m_characteriser->set_lamp_table(xxx_lamp_scramble);
 }
 
+void mpu4_state::mod2_cheatchr_shuffle(machine_config &config)
+{
+	mod2(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::shuffle_lamp_scramble);
+}
+
 void mpu4_state::mod2_alt(machine_config &config)
 {
 	mpu4base(config);
@@ -2825,6 +2834,14 @@ void mpu4_state::mod2_alt(machine_config &config)
 	mpu4_type2_6reel(config);
 }
 
+void mpu4_state::mod2_alt_cheatchr_shuffle(machine_config &config)
+{
+	mod2_alt(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::shuffle_lamp_scramble);
+}
 
 
 void mpu4_state::mod4yam(machine_config &config)
@@ -2882,6 +2899,15 @@ void mpu4_state::mod4yam_cheatchr_m407(machine_config &config)
 	m_characteriser->set_cpu_tag("maincpu");
 	m_characteriser->set_allow_6809_cheat(true);
 	m_characteriser->set_lamp_table(mpu4_characteriser_pal::m407_lamp_scramble);
+}
+
+void mpu4_state::mod4yam_cheatchr_shuffle(machine_config &config)
+{
+	mod4yam(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::shuffle_lamp_scramble);
 }
 
 
@@ -2956,6 +2982,14 @@ void mpu4_state::mod4oki_5r_cheatchr_m574(machine_config &config)
 	m_characteriser->set_lamp_table(mpu4_characteriser_pal::m574_lamp_scramble);
 }
 
+void mpu4_state::mod4oki_5r_cheatchr_shuffle(machine_config &config)
+{
+	mod4oki_5r(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::shuffle_lamp_scramble);
+}
 
 void mpu4_state::bwboki(machine_config &config)
 {

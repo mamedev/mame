@@ -320,6 +320,15 @@ void mpu4_state::mod4oki_cheatchr_alf(machine_config &config)
 	m_characteriser->set_lamp_table(mpu4_characteriser_pal::alf_lamp_scramble);
 }
 
+void mpu4_state::mod4oki_cheatchr_shuffle(machine_config &config)
+{
+	mod4oki(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::shuffle_lamp_scramble);
+}
+
 
 void mpu4_state::mod4oki_cheatchr_rr6(machine_config &config)
 {
@@ -1092,7 +1101,7 @@ GAME_CUSTOM( 1991, m4andyge5tyd,       m4andyge,   "a5tdy.p1",                 0
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ANDYGE_EXTRA_ROMS \
 	ROM_END \
-	GAMEL( year, setname, parent, mod4oki_5r_cheatchr, grtecp, mpu4_state, init_m4andyge, ROT0, company, title, GAME_FLAGS, layout_m4andyge )
+	GAMEL( year, setname, parent, mod4oki_5r_cheatchr_shuffle, grtecp, mpu4_state, init_m4andyge, ROT0, company, title, GAME_FLAGS, layout_m4andyge )
 
 
 // expects sequence starting 00 84 a4 ac 70 80 2c c0 bc 5c 5c 5c dc 5c cc 68 d0 (same as some Berzerk sets)
@@ -1900,7 +1909,7 @@ GAME_CUSTOM( 199?, m4wta__5,  m4wta,  "wnty.p1",                                
 		ROM_LOAD( name, offset, length, hash ) \
 		M4WTA_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_shuffle, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // do not boot with wn5s.chr, need cheatchr
 // sequence 00 84 a4 ac 70 80 2c c0 bc 5c 5c  (same as some Berzerk and Great Escape sets)
@@ -1962,7 +1971,7 @@ GAME_CUSTOM( 199?, m4wta__af, m4wta,  "wta5.5n",                                
 		ROM_LOAD( name, offset, length, hash ) \
 		M4PRZWTA_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_shuffle, mpu4, mpu4_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
 
 // boot, need proper lamp descramble
 
@@ -3244,7 +3253,7 @@ GAME_CUSTOM( 199?, m4vivaes__aq,   m4vivaes,   "vspa20st",             0x0000, 0
 		ROM_LOAD( name, offset, length, hash ) \
 		M4VIVAES_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_chr, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_shuffle, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 
 // 00 84 a4 ac 70 80 2c c0 bc 5c 5c 5c dc 5c cc  (same as some Berzerk, Andy's GE etc.)
@@ -6134,7 +6143,7 @@ GAME_CUSTOM( 199?, m4bagtel__b,    m4bagtel,   "bg201dy.p1",   0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BERSER_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_shuffle, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // needs chr sequence starting 00 84 a4 ac 70 80 2c c0 bc 5c 5c 5c dc (Same as some Andy's Great Escape sets)
 // "(C)1991 BARCREST" and "BES 0.6"
