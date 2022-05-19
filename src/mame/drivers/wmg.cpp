@@ -164,7 +164,7 @@ void wmg_state::wmg_banked_map(address_map &map)
 	map(0x0bff, 0x0bff).w(FUNC(wmg_state::watchdog_reset_w));
 	map(0x0c00, 0x0fff).rw(FUNC(wmg_state::wmg_nvram_r), FUNC(wmg_state::wmg_nvram_w));
 	map(0x1000, 0x4fff).rom().region("maincpu", 0x58000); // Defender roms
-	// This one is actually banked in CPU 1, but its not something Mame can handle very well. Placed here instead. */
+	// This one is actually banked in CPU 1, but its not something Mame can handle very well. Placed here instead.
 	map(0xd000, 0xefff).ram().share("nvram");
 }
 

@@ -23,8 +23,8 @@ Here are the key codes to enable play:
 
 Game              NUM  Start game                End ball
 -----------------------------------------------------------------------------------------------
-Sorcerer          532  AD hit 1                  AD
-Space Huttle      535  ASD hit 1                 ASD
+Sorcerer          532  ASD hit 1                 ASD
+Space Shuttle     535  ASD hit 1                 ASD
 Comet             540  1                         X
 
 Status:
