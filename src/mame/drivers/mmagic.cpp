@@ -1,8 +1,8 @@
-// license:GPL-2.0+
-// copyright-holders:Dirk Best
+// license: GPL-2.0+
+// copyright-holders: Dirk Best
 /***************************************************************************
 
-    "Monkey Magic" ?? 1979 Nintendo
+    "Monkey Magic" © 1979 Nintendo
 
 
     Dumping info provided by Andrew Welburn:
@@ -55,9 +55,20 @@
 #include "screen.h"
 #include "tilemap.h"
 
-#define LOG_AUDIO 1
 
 namespace {
+
+
+//**************************************************************************
+//  CONSTANTS / MACROS
+//**************************************************************************
+
+#define LOG_AUDIO 1
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
 class mmagic_state : public driver_device
 {
@@ -79,41 +90,10 @@ public:
 		m_audio(0x00)
 	{ }
 
-	void config(machine_config& config)
-	{
-		// basic machine hardware
-		I8085A(config, m_maincpu, 6.144_MHz_XTAL); // NEC D8085A
-		m_maincpu->set_addrmap(AS_PROGRAM, &mmagic_state::mmagic_mem);
-		m_maincpu->set_addrmap(AS_IO, &mmagic_state::mmagic_io);
-
-		// video hardware
-		SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-		m_screen->set_raw(6.144_MHz_XTAL, 384, 0, 256, 264, 0, 192);
-		m_screen->set_screen_update(FUNC(mmagic_state::screen_update));
-
-		GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode);
-
-		PALETTE(config, m_palette, FUNC(mmagic_state::palette_init), 16);
-
-		TILEMAP(config, m_tilemap, m_gfxdecode, 1, 8, 12, TILEMAP_SCAN_ROWS, 32, 16).set_info_callback(FUNC(mmagic_state::tile_get_info));
-
-		// sound hardware
-		SPEAKER(config, "mono").front_center();
-		SAMPLES(config, m_samples);
-		m_samples->set_channels(1);
-		m_samples->set_samples_names(sample_names);
-		m_samples->add_route(ALL_OUTPUTS, "mono", 0.5);
-		// TODO: replace samples with SN76477 + discrete sound
-	}
+	void mmagic(machine_config &config);
 
 protected:
-	virtual void machine_start() override
-	{
-		save_item(NAME(m_ball_x));
-		save_item(NAME(m_ball_y));
-		save_item(NAME(m_tile_color_base));
-		save_item(NAME(m_audio));
-	}
+	virtual void machine_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -126,162 +106,58 @@ private:
 	required_device<samples_device> m_samples;
 	required_region_ptr<uint8_t> m_tile_colors;
 
+	void mem_map(address_map& map);
+	void io_map(address_map& map);
+
+	uint8_t paddle_r();
+	uint8_t buttons_r();
+
+	uint8_t vblank_r();
+	void ball_x_w(uint8_t data);
+	void ball_y_w(uint8_t data);
+	void color_w(uint8_t data);
+	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
+	void palette_init(palette_device& palette) const;
+	TILE_GET_INFO_MEMBER(tile_info);
+
+	void audio_w(uint8_t data);
+
 	uint8_t m_ball_x;
 	uint8_t m_ball_y;
 	uint8_t m_tile_color_base;
 	uint8_t m_audio;
-
-	// basic machine hardware
-
-	void mmagic_mem(address_map& map)
-	{
-		map.unmap_value_high();
-		map(0x0000, 0x17ff).rom();
-		map(0x2000, 0x21ff).ram();
-		map(0x3000, 0x31ff).ram().w(m_tilemap, FUNC(tilemap_device::write8)).share("tilemap");
-		map(0x8002, 0x8002).w(FUNC(mmagic_state::ball_x_w));
-		map(0x8003, 0x8003).w(FUNC(mmagic_state::ball_y_w));
-		map(0x8004, 0x8004).r(FUNC(mmagic_state::vblank_r));
-	}
-
-	void ball_x_w(uint8_t data)
-	{
-		m_ball_x = data;
-	}
-
-	void ball_y_w(uint8_t data)
-	{
-		m_ball_y = data;
-	}
-
-	uint8_t vblank_r()
-	{
-		// bit 0 = vblank, other bits unused
-		return 0xfe | m_screen->vblank();
-	}
-
-	void mmagic_io(address_map& map)
-	{
-		map.global_mask(0xff);
-		map(0x80, 0x80).w(FUNC(mmagic_state::color_w));
-		map(0x81, 0x81).w(FUNC(mmagic_state::audio_w));
-		map(0x85, 0x85).r(FUNC(mmagic_state::paddle_r));
-		map(0x86, 0x86).r(FUNC(mmagic_state::buttons_r));
-		map(0x87, 0x87).portr("DIPSW");
-	}
-
-	void color_w(uint8_t data)
-	{
-		// bit 3 is flip screen
-		flip_screen_set(BIT(data, 3));
-
-		// bit 6 switches the palette (actually there is only a single differently colored tile)
-		int tile_color_base = BIT(data, 6) << 7;
-		if (m_tile_color_base != tile_color_base)
-		{
-			m_tilemap->mark_all_dirty();
-			m_tile_color_base = tile_color_base;
-		}
-
-		// other bits are always 0
-	}
-
-	void audio_w(uint8_t data)
-	{
-		if (LOG_AUDIO)
-			logerror("audio_w: %02x\n", data);
-
-		data ^= 0xff;
-		if (data != m_audio)
-		{
-			if (BIT(data, 7))
-				m_samples->start(0, m_audio & 7);
-
-			m_audio = data;
-		}
-	}
-
-	uint8_t paddle_r()
-	{
-		return flip_screen() ? m_analog[0]->read() : m_analog[1]->read();
-	}
-
-	uint8_t buttons_r()
-	{
-		return flip_screen() ? m_in[0]->read() : m_in[1]->read() | (m_in[0]->read() & ~1);
-	}
-
-	// video hardware
-
-	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
-	{
-		m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-
-		// draw ball (if not disabled)
-		if (m_ball_x != 0xff)
-		{
-			static const int BALL_SIZE = 4;
-			int ball_y = (m_ball_y >> 4) * 12 + (m_ball_y & 0x0f);
-			bitmap.plot_box(flip_screen() ? 255 - m_ball_x : m_ball_x, flip_screen() ? 191 - ball_y : ball_y, BALL_SIZE, BALL_SIZE, rgb_t::white());
-		}
-
-		return 0;
-	}
-
-	void palette_init(palette_device& palette) const
-	{
-		for (int i = 0; i < 16; i++)
-		{
-			int const r = (!BIT(i, 0) && BIT(i, 1)) ? 0xff : 0x00;
-			int const g = (!BIT(i, 0) && BIT(i, 2)) ? 0xff : 0x00;
-			int const b = (!BIT(i, 0) && BIT(i, 3)) ? 0xff : 0x00;
-
-			palette.set_pen_color(i, rgb_t(r, g, b));
-		}
-	}
-
-	static constexpr gfx_layout tile_layout =
-	{
-		8, 12,                  /* 8 x 12 tiles */
-		128,                    /* 128 tiles */
-		1,                      /* 1 bits per pixel */
-		{ 0 },                  /* no bitplanes */
-		/* x offsets */
-		{ 3, 2, 1, 0, 7, 6, 5, 4 },
-		/* y offsets */
-		{ 0 * 8, 1 * 8, 2 * 8, 3 * 8, 4 * 8, 5 * 8, 6 * 8, 7 * 8, 8 * 8, 9 * 8, 10 * 8, 11 * 8 },
-		16 * 8                  /* every tile takes 16 bytes */
-	};
-
-	static constexpr GFXDECODE_START(gfxdecode)
-		GFXDECODE_ENTRY("tiles", 0x0000, tile_layout, 0, 8)
-	GFXDECODE_END
-
-	TILE_GET_INFO_MEMBER(tile_get_info)
-	{
-		uint32_t code = m_tilemap->basemem_read(tile_index) & 0x7f;
-		uint32_t color = m_tile_colors[code | m_tile_color_base];
-
-		tileinfo.set(0, code, color, 0);
-	}
-
-	// sound hardware
-
-	static constexpr const char* const sample_names[] =
-	{
-		"*mmagic",
-		"4",
-		"3",
-		"5",
-		"2",
-		"2-2",
-		"6",
-		"6-2",
-		"1",
-		nullptr
-	};
 };
 
+
+//**************************************************************************
+//  ADDRESS MAPS
+//**************************************************************************
+
+void mmagic_state::mem_map(address_map& map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x17ff).rom();
+	map(0x2000, 0x21ff).ram();
+	map(0x3000, 0x31ff).ram().w(m_tilemap, FUNC(tilemap_device::write8)).share("tilemap");
+	map(0x8002, 0x8002).w(FUNC(mmagic_state::ball_x_w));
+	map(0x8003, 0x8003).w(FUNC(mmagic_state::ball_y_w));
+	map(0x8004, 0x8004).r(FUNC(mmagic_state::vblank_r));
+}
+
+void mmagic_state::io_map(address_map& map)
+{
+	map.global_mask(0xff);
+	map(0x80, 0x80).w(FUNC(mmagic_state::color_w));
+	map(0x81, 0x81).w(FUNC(mmagic_state::audio_w));
+	map(0x85, 0x85).r(FUNC(mmagic_state::paddle_r));
+	map(0x86, 0x86).r(FUNC(mmagic_state::buttons_r));
+	map(0x87, 0x87).portr("DIPSW");
+}
+
+
+//**************************************************************************
+//  INPUTS
+//**************************************************************************
 
 static INPUT_PORTS_START( mmagic )
 	PORT_START("DIPSW")
@@ -320,6 +196,188 @@ static INPUT_PORTS_START( mmagic )
 	PORT_BIT(0xff, 0x80, IPT_PADDLE) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_CENTERDELTA(0) PORT_PLAYER(2)
 INPUT_PORTS_END
 
+uint8_t mmagic_state::paddle_r()
+{
+	return flip_screen() ? m_analog[0]->read() : m_analog[1]->read();
+}
+
+uint8_t mmagic_state::buttons_r()
+{
+	return flip_screen() ? m_in[0]->read() : m_in[1]->read() | (m_in[0]->read() & ~1);
+}
+
+
+//**************************************************************************
+//  VIDEO EMULATION
+//**************************************************************************
+
+uint8_t mmagic_state::vblank_r()
+{
+	// bit 0 = vblank, other bits unused
+	return 0xfe | m_screen->vblank();
+}
+
+void mmagic_state::ball_x_w(uint8_t data)
+{
+	m_ball_x = data;
+}
+
+void mmagic_state::ball_y_w(uint8_t data)
+{
+	m_ball_y = data;
+}
+
+void mmagic_state::color_w(uint8_t data)
+{
+	// bit 3 is flip screen
+	flip_screen_set(BIT(data, 3));
+
+	// bit 6 switches the palette (actually there is only a single differently colored tile)
+	int tile_color_base = BIT(data, 6) << 7;
+	if (m_tile_color_base != tile_color_base)
+	{
+		m_tilemap->mark_all_dirty();
+		m_tile_color_base = tile_color_base;
+	}
+
+	// other bits are always 0
+}
+
+uint32_t mmagic_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+{
+	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	// draw ball (if not disabled)
+	if (m_ball_x != 0xff)
+	{
+		static const int BALL_SIZE = 4;
+		int ball_y = (m_ball_y >> 4) * 12 + (m_ball_y & 0x0f);
+		bitmap.plot_box(flip_screen() ? 255 - m_ball_x : m_ball_x, flip_screen() ? 191 - ball_y : ball_y, BALL_SIZE, BALL_SIZE, rgb_t::white());
+	}
+
+	return 0;
+}
+
+void mmagic_state::palette_init(palette_device& palette) const
+{
+	for (int i = 0; i < 16; i++)
+	{
+		int const r = (!BIT(i, 0) && BIT(i, 1)) ? 0xff : 0x00;
+		int const g = (!BIT(i, 0) && BIT(i, 2)) ? 0xff : 0x00;
+		int const b = (!BIT(i, 0) && BIT(i, 3)) ? 0xff : 0x00;
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+}
+
+static constexpr gfx_layout tile_layout =
+{
+	8, 12, // 8x12 tiles
+	128,   // 128 tiles
+	1,     // 1 bits per pixel
+	{ 0 }, // no bitplanes
+	// x offsets
+	{ 3, 2, 1, 0, 7, 6, 5, 4 },
+	// y offsets
+	{ 0 * 8, 1 * 8, 2 * 8, 3 * 8, 4 * 8, 5 * 8, 6 * 8, 7 * 8, 8 * 8, 9 * 8, 10 * 8, 11 * 8 },
+	16 * 8 // every tile takes 16 bytes
+};
+
+static constexpr GFXDECODE_START(gfxdecode)
+	GFXDECODE_ENTRY("tiles", 0x0000, tile_layout, 0, 8)
+GFXDECODE_END
+
+TILE_GET_INFO_MEMBER(mmagic_state::tile_info)
+{
+	uint32_t code = m_tilemap->basemem_read(tile_index) & 0x7f;
+	uint32_t color = m_tile_colors[code | m_tile_color_base];
+
+	tileinfo.set(0, code, color, 0);
+}
+
+
+//**************************************************************************
+//  AUDIO EMULATION
+//**************************************************************************
+
+static constexpr const char* const sample_names[] =
+{
+	"*mmagic",
+	"4",
+	"3",
+	"5",
+	"2",
+	"2-2",
+	"6",
+	"6-2",
+	"1",
+	nullptr
+};
+
+void mmagic_state::audio_w(uint8_t data)
+{
+	if (LOG_AUDIO)
+		logerror("audio_w: %02x\n", data);
+
+	data ^= 0xff;
+	if (data != m_audio)
+	{
+		if (BIT(data, 7))
+			m_samples->start(0, m_audio & 7);
+
+		m_audio = data;
+	}
+}
+
+
+//**************************************************************************
+//  DRIVER INIT
+//**************************************************************************
+
+void mmagic_state::machine_start()
+{
+	save_item(NAME(m_ball_x));
+	save_item(NAME(m_ball_y));
+	save_item(NAME(m_tile_color_base));
+	save_item(NAME(m_audio));
+}
+
+
+//**************************************************************************
+//  MACHINE DEFINTIONS
+//**************************************************************************
+
+void mmagic_state::mmagic(machine_config& config)
+{
+	// basic machine hardware
+	I8085A(config, m_maincpu, 6.144_MHz_XTAL); // NEC D8085A
+	m_maincpu->set_addrmap(AS_PROGRAM, &mmagic_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &mmagic_state::io_map);
+
+	// video hardware
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(6.144_MHz_XTAL, 384, 0, 256, 264, 0, 192);
+	m_screen->set_screen_update(FUNC(mmagic_state::screen_update));
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode);
+
+	PALETTE(config, m_palette, FUNC(mmagic_state::palette_init), 16);
+
+	TILEMAP(config, m_tilemap, m_gfxdecode, 1, 8, 12, TILEMAP_SCAN_ROWS, 32, 16).set_info_callback(FUNC(mmagic_state::tile_info));
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(1);
+	m_samples->set_samples_names(sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.5);
+	// TODO: replace samples with SN76477 + discrete sound
+}
+
+
+//**************************************************************************
+//  ROM DEFINITIONS
+//**************************************************************************
 
 ROM_START( mmagic )
 	ROM_REGION(0x1800, "maincpu", 0)
@@ -341,7 +399,13 @@ ROM_START( mmagic )
 	ROM_LOAD("7j.7jk", 0x000, 0x200, CRC(b7eb8e1c) SHA1(b65a8efb88668dcf1c1d00e31a9b15a67c2972c8))
 ROM_END
 
+
 } // anonymous namespace
 
+
+//**************************************************************************
+//  GAME DRIVERS
+//**************************************************************************
+
 //    YEAR  NAME    PARENT  MACHINE INPUT   CLASS         INIT        ROT     COMPANY     FULLNAME        FLAGS
-GAME( 1979, mmagic, 0,      config, mmagic, mmagic_state, empty_init, ROT90, "Nintendo", "Monkey Magic", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1979, mmagic, 0,      mmagic, mmagic, mmagic_state, empty_init, ROT90, "Nintendo", "Monkey Magic", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
