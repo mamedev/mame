@@ -329,6 +329,15 @@ void mpu4_state::mod4oki_cheatchr_shuffle(machine_config &config)
 	m_characteriser->set_lamp_table(mpu4_characteriser_pal::shuffle_lamp_scramble);
 }
 
+void mpu4_state::mod4oki_cheatchr_clbveg(machine_config &config)
+{
+	mod4oki(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::clbveg_lamp_scramble);
+}
+
 
 void mpu4_state::mod4oki_cheatchr_rr6(machine_config &config)
 {
@@ -1124,6 +1133,15 @@ GAME_CUSTOM( 1991, m4andyge28kd,       m4andyge,   "a28dk.p1",                 0
 GAME_CUSTOM( 1991, m4andyge28y,        m4andyge,   "a28y.p1",                  0x0000, 0x010000, CRC(fb1c83b7) SHA1(76b40e1ea47732ae0f6e9557c2d0445421122ac8), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (A28 0.1 Y)" )
 GAME_CUSTOM( 1991, m4andyge28yd,       m4andyge,   "a28dy.p1",                 0x0000, 0x010000, CRC(05ef8b21) SHA1(762aaad6892511ba1f3266c1ed0a09850339cc63), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (A28 0.1 YD)" )
 
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( 0x10000, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4ANDYGE_EXTRA_ROMS \
+	ROM_END \
+	GAMEL( year, setname, parent, mod4oki_5r_cheatchr_clbveg, grtecp, mpu4_state, init_m4andyge, ROT0, company, title, GAME_FLAGS, layout_m4andyge )
+
 // expects sequence starting 00 44 44 54 34 04 54 14 34 14 20 74 04
 // "(C)1995  B.W.B."  and "AGC 2.0"
 GAME_CUSTOM( 1995, m4andygegc2,        m4andyge,   "ag_05__c.2_1",             0x0000, 0x010000, CRC(c38c11a3) SHA1(c2d81d99a842eac8dff3e0be57f37af9eb534ad1), "Bwb","Andy's Great Escape (Bwb / Barcrest) (MPU4) (AGC 2.0)" )
@@ -1699,8 +1717,8 @@ GAME_CUSTOM( 199?, m4toot__zb,   m4toot, "tot15t",       0x0000, 0x020000, CRC(1
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "er4snd.p1", 0x000000, 0x080000, CRC(32fd0836) SHA1(ea68252b690fe1d6070209cbcfb65fe20926c6ce) ) \
 	ROM_LOAD( "er4snd.p2", 0x080000, 0x080000, CRC(1df9c24f) SHA1(f0d31b1bec6f3a9791f7fabe57b45687df900efa) )
-#undef GAME_CUSTOM
 
+#undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
@@ -1759,24 +1777,15 @@ GAME_CUSTOM( 199?, m4eaw__s,  m4eaw,  "ceu02k.p1",                0x0000, 0x0100
 GAME_CUSTOM( 199?, m4eaw__t,  m4eaw,  "ceu02r.p1",                0x0000, 0x010000, CRC(1a882a6a) SHA1(c966be957e7a78c33a28afd79ba60c69a6de42b8), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (CEU 0.2 R/ ER4 0.2)" )
 GAME_CUSTOM( 199?, m4eaw__v,  m4eaw,  "ceu02y.p1",                0x0000, 0x010000, CRC(87e30284) SHA1(4c598a33b73cfe6338c0f51408f2a6c1abfa978b), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (CEU 0.2 Y / ER4 0.2)" )
 
-
-#define M4EAW_EXTRA_ROMS_ALT \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
-	ROM_LOAD( "er4snd.p1", 0x000000, 0x080000, CRC(32fd0836) SHA1(ea68252b690fe1d6070209cbcfb65fe20926c6ce) ) \
-	ROM_LOAD( "er4snd.p2", 0x080000, 0x080000, CRC(1df9c24f) SHA1(f0d31b1bec6f3a9791f7fabe57b45687df900efa) )
-
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
-		M4EAW_EXTRA_ROMS_ALT \
+		M4EAW_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_clbveg, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
-// do not boot with m683.chr, need cheatchr
-
-// boots with cheatchr
 // sequence 00 44 44 54 34 04 54 14 34 14 20 74
 // "(C)1991 BARCREST" and "ER2 0.1"
 GAME_CUSTOM( 199?, m4eaw__at, m4eaw,  "er2s.p1",                  0x0000, 0x010000, CRC(bfee8157) SHA1(3ce5a2ec16f06c753a054a9f645efbcd26f411ab), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (ER2 0.1)" )
@@ -1809,10 +1818,9 @@ GAME_CUSTOM( 199?, m4eaw__bl, m4eaw,  "erty.p1",                  0x0000, 0x0100
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
-		M4EAW_EXTRA_ROMS_ALT \
+		M4EAW_EXTRA_ROMS \
 	ROM_END \
 	GAME(year, setname, parent, mod4oki_cheatchr_tri98, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
-
 
 // sequence 00 84 94 3c ec 5c ec 50 2c 68 60 ac 74 00  (tri98?)
 // "(C)1991 BARCREST" and "ER4 0.1" (startup is ENN 0.1)

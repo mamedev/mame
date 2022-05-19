@@ -2944,6 +2944,25 @@ void mpu4_state::mod4oki_alt(machine_config &config)
 	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
 
+void mpu4_state::mod4oki_alt_cheatchr_alf(machine_config &config)
+{
+	mod4oki_alt(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::alf_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_alt_cheatchr_clbveg(machine_config &config)
+{
+	mod4oki_alt(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::clbveg_lamp_scramble);
+}
+
+
 void mpu4_state::mod4oki_5r(machine_config &config)
 {
 	mpu4base(config);
@@ -2990,6 +3009,16 @@ void mpu4_state::mod4oki_5r_cheatchr_shuffle(machine_config &config)
 	m_characteriser->set_allow_6809_cheat(true);
 	m_characteriser->set_lamp_table(mpu4_characteriser_pal::shuffle_lamp_scramble);
 }
+
+void mpu4_state::mod4oki_5r_cheatchr_clbveg(machine_config &config)
+{
+	mod4oki_5r(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::clbveg_lamp_scramble);
+}
+
 
 void mpu4_state::bwboki(machine_config &config)
 {
