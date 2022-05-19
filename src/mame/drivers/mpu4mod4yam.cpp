@@ -1102,22 +1102,7 @@ GAME_CUSTOM( 199?, m4vivalv__8,    m4vivalv,   "vegas15t",                     0
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
-
-// expects chr sequence starting 00 90 18 e4 a8 3c f4 48 74 50 20 f0 18 e4 98 e4
-// "(C)1991 BARCREST" and "H6Y 0.3"
-GAME_CUSTOM( 199?, m4shv,       0,       "h6ys.p1",              0x0000, 0x010000, CRC(4af914ff) SHA1(3d9b7c65ec1129ee64e3f4e14e43e4c39c76166b), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3, set 1)" )
-GAME_CUSTOM( 199?, m4shv__a,    m4shv,   "h6yc.p1",              0x0000, 0x010000, CRC(8faca3bc) SHA1(9d666371f1118ccb1a94bfc4e6c79b540a84842b), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3 C)" )
-GAME_CUSTOM( 199?, m4shv__b,    m4shv,   "h6yd.p1",              0x0000, 0x010000, CRC(862e7f5b) SHA1(2f5bbc31978fb9fd0ba17f0de220152da87cf06f), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3 D)" )
-GAME_CUSTOM( 199?, m4shv__c,    m4shv,   "h6yk.p1",              0x0000, 0x010000, CRC(51f43c88) SHA1(d6ee4f537d09b33e9b13c972e1bda01a28f54f8e), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3 K)" )
-GAME_CUSTOM( 199?, m4shv__d,    m4shv,   "h6yy.p1",              0x0000, 0x010000, CRC(bed4b3bb) SHA1(7c592fbc6541c03777ff0498db90c575b3193222), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3 Y)" )
-GAME_CUSTOM( 199?, m4shv__e,    m4shv,   "hyperviper.bin",       0x0000, 0x010000, CRC(8373f6a3) SHA1(79bff20ab80ffe11447595c6fe8e5ab90d432e17), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3, set 2)" ) // hack?
-// "(C)1991 BARCREST" and "H6Y 0.2"
-GAME_CUSTOM( 199?, m4shv__f,    m4shv,   "hvypr206",             0x0000, 0x010000, CRC(e1d96b8c) SHA1(e21b1bdbca1bae41f0e7274e3521f99eb984759e), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.2 Y)" )
-
-// expects chr sequence starting 00 14 04 54 64 14 64 14 64 54 20 74 04
- // "(C)1995  B.W.B." and "HVC 1.0"
-GAME_CUSTOM( 199?, m4shv__g,    m4shv,   "5p4hypervyper.bin",    0x0000, 0x010000, CRC(51ac9288) SHA1(1580079b6e710506ab03e1d8a89af65cd06cedd2), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVC 1.0 C)" )
+	GAME(year, setname, parent, mod4yam_cheatchr_m407, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // expects chr sequence starting 00 e0 a8 38 94 48 50 60 e4 e8 58 f0
 // "(C)1993  B.W.B." and "HVP 3.0"
@@ -1138,6 +1123,31 @@ GAME_CUSTOM( 199?, m4shv__t,    m4shv,   "hv_05_d_.3o3",         0x0000, 0x01000
 GAME_CUSTOM( 199?, m4shv__u,    m4shv,   "hv_10___.3o3",         0x0000, 0x010000, CRC(02e4d86a) SHA1(47aa83e8bcd85e8ba7fb972cdd1ead7fe21e0418), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, set 3)" )
 GAME_CUSTOM( 199?, m4shv__v,    m4shv,   "hv_10_d_.3o3",         0x0000, 0x010000, CRC(85f176b9) SHA1(30380d58bf2834829764cbdbdc7d950632e61e6d), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, set 4)" )
 GAME_CUSTOM( 199?, m4shv__w,    m4shv,   "hvi05___.3o3",         0x0000, 0x010000, CRC(cdba80a5) SHA1(6c9fac7e5ee324b18922cc7a053495f1977bcb6d), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, set 5)" )
+
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+	ROM_END \
+	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
+// expects chr sequence starting 00 90 18 e4 a8 3c f4 48 74 50 20 f0 18 e4 98 e4
+// "(C)1991 BARCREST" and "H6Y 0.3"
+GAME_CUSTOM( 199?, m4shv,       0,       "h6ys.p1",              0x0000, 0x010000, CRC(4af914ff) SHA1(3d9b7c65ec1129ee64e3f4e14e43e4c39c76166b), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3, set 1)" )
+GAME_CUSTOM( 199?, m4shv__a,    m4shv,   "h6yc.p1",              0x0000, 0x010000, CRC(8faca3bc) SHA1(9d666371f1118ccb1a94bfc4e6c79b540a84842b), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3 C)" )
+GAME_CUSTOM( 199?, m4shv__b,    m4shv,   "h6yd.p1",              0x0000, 0x010000, CRC(862e7f5b) SHA1(2f5bbc31978fb9fd0ba17f0de220152da87cf06f), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3 D)" )
+GAME_CUSTOM( 199?, m4shv__c,    m4shv,   "h6yk.p1",              0x0000, 0x010000, CRC(51f43c88) SHA1(d6ee4f537d09b33e9b13c972e1bda01a28f54f8e), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3 K)" )
+GAME_CUSTOM( 199?, m4shv__d,    m4shv,   "h6yy.p1",              0x0000, 0x010000, CRC(bed4b3bb) SHA1(7c592fbc6541c03777ff0498db90c575b3193222), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3 Y)" )
+GAME_CUSTOM( 199?, m4shv__e,    m4shv,   "hyperviper.bin",       0x0000, 0x010000, CRC(8373f6a3) SHA1(79bff20ab80ffe11447595c6fe8e5ab90d432e17), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3, set 2)" ) // hack?
+// "(C)1991 BARCREST" and "H6Y 0.2"
+GAME_CUSTOM( 199?, m4shv__f,    m4shv,   "hvypr206",             0x0000, 0x010000, CRC(e1d96b8c) SHA1(e21b1bdbca1bae41f0e7274e3521f99eb984759e), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.2 Y)" )
+
+// expects chr sequence starting 00 14 04 54 64 14 64 14 64 54 20 74 04
+ // "(C)1995  B.W.B." and "HVC 1.0"
+GAME_CUSTOM( 199?, m4shv__g,    m4shv,   "5p4hypervyper.bin",    0x0000, 0x010000, CRC(51ac9288) SHA1(1580079b6e710506ab03e1d8a89af65cd06cedd2), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVC 1.0 C)" )
+
 
 // expects chr sequence starting 00 90 18 e4 a8 3c f4 48 74 50 20 f0 18
 // "(C)1993  B.W.B." and "HVP 4.0"

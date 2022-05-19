@@ -199,10 +199,22 @@ public:
 	void mod4oki_cheatchr_lv(machine_config &config);
 	void mod4oki_cheatchr_m683(machine_config &config);
 	void mod4oki_cheatchr_otm(machine_config &config);
+	void mod4oki_cheatchr_m441(machine_config &config);
+	void mod4oki_cheatchr_m462(machine_config &config);
+	void mod4oki_cheatchr_wta(machine_config &config);
+	void mod4oki_cheatchr_du91(machine_config &config);
+	void mod4oki_cheatchr_rr6(machine_config &config);
+	void mod4oki_cheatchr_rhm(machine_config &config);
+	void mod4oki_cheatchr_m574(machine_config &config);
+	void mod4oki_cheatchr_viva(machine_config &config);
+	void mod4oki_cheatchr_m407(machine_config &config);
+
+
 
 	void mod4oki_5r(machine_config &config);
 	void mod4oki_5r_chr(machine_config &config);
 	void mod4oki_5r_cheatchr(machine_config &config);
+	void mod4oki_5r_cheatchr_m574(machine_config &config);
 
 	void mod4oki_den(machine_config &config);
 	void mod4oki_crmaze(machine_config &config);
@@ -214,6 +226,7 @@ public:
 	void mod4yam_cheatchr_tri98(machine_config &config);
 	void mod4yam_cheatchr_lv(machine_config &config);
 	void mod4yam_cheatchr_m683(machine_config &config);
+	void mod4yam_cheatchr_m407(machine_config &config);
 
 	void mod4yam_chr(machine_config &config);
 
