@@ -53,22 +53,31 @@ menu_bios_selection::menu_bios_selection(mame_ui_manager &mui, render_container 
 
 int menu_bios_selection::current_bios(device_t *device)
 {
-	int bios_val = device->default_bios();
 	const char *val;
+	std::string bios;
 	if (device->owner())
 	{
 		const char *slot_option_name = device->owner()->tag() + 1;
-		std::string bios = machine().options().slot_option(slot_option_name).bios();
-		if (bios.empty()) val = nullptr; else val = bios.c_str();
+		bios = machine().options().slot_option(slot_option_name).bios();
+		val = bios.empty() ?  nullptr : bios.c_str();
 	}
 	else
 	{
 		val = machine().options().value("bios");
 	}
 	if (val)
-		bios_val = atoi(val) + 1;
-
-	return bios_val;
+	{
+		for (romload::system_bios const &bios : romload::entries(device->rom_region()).get_system_bioses())
+		{
+			uint32_t const bios_flags(bios.get_value());
+			std::string bios_number = std::to_string(bios_flags - 1);
+			if (!core_stricmp(bios_number.c_str(), val) || !core_stricmp(bios.get_name(), val))
+			{
+				return bios_flags;
+			}
+		}
+	}
+	return device->system_bios();
 }
 
 void menu_bios_selection::populate(float &customtop, float &custombottom)

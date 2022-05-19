@@ -1124,8 +1124,14 @@ std::string running_machine::nvram_filename(device_t &device) const
 			device_slot_interface *intf;
 			if (dev->owner() && dev->owner()->interface(intf))
 			{
-				if (dev->system_bios() != 0 && dev->default_bios() != dev->system_bios())
-					util::stream_format(dev_tag, "_%d", dev->system_bios() - 1);
+				for (romload::system_bios const &bios : romload::entries(dev->rom_region()).get_system_bioses())
+				{
+					if (dev->system_bios() == bios.get_value())
+					{
+						util::stream_format(dev_tag, "_%s", bios.get_name());
+						break;
+					}
+				}
 			}
 			tag = dev_tag.str() + tag;
 		}
