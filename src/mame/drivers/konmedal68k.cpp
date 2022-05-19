@@ -804,6 +804,19 @@ ROM_START(spcpokan)
 	ROM_LOAD("642-a02-4f.bin", 0x080000, 0x080000, CRC(99265f42) SHA1(047ebf8ab5454ce8504b837fec17002b7d7da30f))
 ROM_END
 
+ROM_START( gangoemd )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* main program */
+	ROM_LOAD16_WORD_SWAP( "747-a05-2n.bin", 0x000000, 0x080000, CRC(fb9e827d) SHA1(e46cf94a687029ebbce55f1eb240111a2988623b) )
+
+	ROM_REGION( 0x100000, "k056832", 0 )   /* tilemaps */
+	ROM_LOAD( "747-a06-14n.bin", 0x000000, 0x080000, CRC(c14d334f) SHA1(df3bf2fbc2d9b9943650e609b0bcfc12b7b076cc) )
+	ROM_LOAD( "747-a07-17n.bin", 0x080000, 0x080000, CRC(f7a2bfc6) SHA1(de02bdb23a348f377949a22af5376dd76845e991) )
+
+	ROM_REGION( 0x100000, "ymz", 0 )
+	ROM_LOAD( "747-a01-2f.bin", 0x000000, 0x080000, CRC(375047b3) SHA1(5e446d4ad3be3157173f3e11158c017cc6eee157) )
+	ROM_LOAD( "747-a02-4f.bin", 0x080000, 0x080000, CRC(4a8d6bcc) SHA1(91b0e8a29423de306e3e0f6ac113cc4a69b05249) )
+ROM_END
+
 ROM_START(unkkonmd) // probably Dragon Palace
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP("662-unk-2n.bin", 0x000000, 0x080000, CRC(e6168538) SHA1(093153adc97bc4add67bb1477b9ad3b25fee26f0))
@@ -852,6 +865,7 @@ GAME( 1998, kattobas, 0, koropens, kattobas, konmedal68k_state, empty_init, ROT0
 GAME( 1999, pwrchanc, 0, pwrchanc, kzaurus,  konmedal68k_state, empty_init, ROT0, "Konami", "Powerful Chance", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, ymcapsul, 0, kzaurus,  kzaurus,  konmedal68k_state, empty_init, ROT0, "Konami", "Yu-Gi-Oh Monster Capsule", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, spcpokan, 0, spcpokan, spcpokan, konmedal68k_state, empty_init, ROT0, "Konami", "Space Pokan", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1997, gangoemd, 0, kzaurus,  kzaurus,  konmedal68k_state, empty_init, ROT0, "Konami", "Ganbare Goemon", MACHINE_IMPERFECT_GRAPHICS )
 
 // Higher resolution display.  These are Pachinko / Pachislot machines, will require simulation of mechanical parts / ball sensors.
 GAME( 1996, crossmg2,  0, slot,     crossmg2, konmedal68k_slot_state, empty_init, ROT0, "Konami", "Cross Magic Mark 2", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_MECHANICAL )
