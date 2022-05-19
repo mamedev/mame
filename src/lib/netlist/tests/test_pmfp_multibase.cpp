@@ -41,6 +41,37 @@ class pmfp_test_complex_return : public plib::testing::Test
 protected:
 	using ret_t = std::pair<void *, int>;
 
+	template <std::size_t N>
+	class tstruct
+	{
+	public:
+		struct r1type
+		{
+			char m[N];
+		};
+
+		r1type f1(const char v)
+		{
+			r1type r;
+			for (std::size_t i=0; i<N; i++) r.m[i] = v;
+			return r;
+		}
+
+		template <typename T>
+		T ft(const T v)
+		{
+			return v;
+		}
+
+		template <typename T>
+		T run_ft(const T v)
+		{
+			using pf_t = plib::pmfp<T (const T)>;
+			pf_t pf(&tstruct::ft<T>, this);
+			return pf(v);
+		}
+	};
+
 	//using test_delegate1 = plib::pmfp<ret_t (int, int)>;
 	using test_delegate = plib::pmfp<ret_t ()>;
 
@@ -274,6 +305,66 @@ PTEST_F(pmfp_test_complex_return, multibase_test)
 	PEXPECT_EQ(f().second, 8);
 	f = make_forward_delegate(&forward::zp, &obj2);
 	PEXPECT_EQ(f().second, 9);
+	//PEXPECT_EQ(plib::ppmf_internal::value, PPMF_TYPE_PMF);
+
+	// test return size handling
+
+	tstruct<3> ts3;
+	using pfmp3_t = plib::pmfp<tstruct<3>::r1type(char)>;
+	pfmp3_t pf3(&tstruct<3>::f1, &ts3);
+	auto r3 = pf3(3);
+	PEXPECT_EQ(static_cast<int>(r3.m[2]), 3);
+	PEXPECT_EQ(sizeof(r3), 3u);
+
+	tstruct<5> ts5;
+	using pfmp5_t = plib::pmfp<tstruct<5>::r1type(char)>;
+	pfmp5_t pf5(&tstruct<5>::f1, &ts5);
+	auto r5 = pf5(5);
+	PEXPECT_EQ(static_cast<int>(r5.m[3]), 5);
+	PEXPECT_EQ(sizeof(r5), 5u);
+
+	tstruct<8> ts8;
+	using pfmp8_t = plib::pmfp<tstruct<8>::r1type(char)>;
+	pfmp8_t pf8(&tstruct<8>::f1, &ts8);
+	auto r8 = pf8(8);
+	PEXPECT_EQ(static_cast<int>(r8.m[3]), 8);
+	PEXPECT_EQ(sizeof(r8), 8u);
+
+	tstruct<9> ts9;
+	using pfmp9_t = plib::pmfp<tstruct<9>::r1type (char)>;
+	pfmp9_t pf9(&tstruct<9>::f1, &ts9);
+	auto r9=pf9(9);
+	PEXPECT_EQ(static_cast<int>(r9.m[3]), 9);
+	PEXPECT_EQ(sizeof(r9), 9u);
+
+	tstruct<17> ts17;
+	using pfmp17_t = plib::pmfp<tstruct<17>::r1type(char)>;
+	pfmp17_t pf17(&tstruct<17>::f1, &ts17);
+	auto r17 = pf17(17);
+	PEXPECT_EQ(static_cast<int>(r17.m[3]), 17);
+	PEXPECT_EQ(sizeof(r17), 17u);
+
+#if !(defined(_MSC_VER) && !defined(__clang__))
+	if constexpr (plib::compile_info::has_int128::value)
+	{
+		PEXPECT_EQ(static_cast<int>(ts17.run_ft<INT128>(17)), 17); // FIXME: no operator << for INT128 yet
+		PEXPECT_EQ(sizeof(INT128), 16u);
+	}
+#endif	
+	PEXPECT_EQ(ts17.run_ft<long double>(17), 17);
+	PEXPECT_EQ(ts17.run_ft<double>(17), 17);
+	PEXPECT_EQ(ts17.run_ft<int>(17), 17);
+	PEXPECT_EQ(ts17.run_ft<bool>(true), true);
+	PEXPECT_EQ(ts17.run_ft<std::size_t>(20), 20u);
+
+	struct tt1_t { int a; int b; };
+	tt1_t tt1 = { 8, 9 };
+	auto tt1r = ts17.run_ft<tt1_t>(tt1);
+	PEXPECT_EQ(tt1.a, tt1r.a);
+	PEXPECT_EQ(tt1.b, tt1r.b);
+
+	PEXPECT_EQ(sizeof(ret_t), 16u);
+
 }
 
 PTEST_F(pmfp_test_simple_return, multibase_test)
@@ -357,4 +448,5 @@ PTEST_F(pmfp_test_simple_return, multibase_test)
 	f = make_forward_delegate(&forward::zp, &obj2);
 	f(fr);
 	PEXPECT_EQ(fr.second, 9);
+	//PEXPECT_EQ(plib::ppmf_internal::value, PPMF_TYPE_INTERNAL_MSC);
 }
