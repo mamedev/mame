@@ -139,36 +139,25 @@ ROM_START( m4casmul )
 	ROM_LOAD( "casinomultiplaysnd.bin", 0x0000, 0x080000, CRC(be293e95) SHA1(bf0d419c898920a7546b542d8b205e25004ef04f) )
 ROM_END
 
-// 00 90 C0 54 A4 F0 64 90 E4 D4 60 B4
-ROM_START( m4oldtmr )
+ROM_START( m4oldtmr ) // mod4oki_alt_cheatchr_m470
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dot11.bin",  0x00000, 0x10000,  CRC(da095666) SHA1(bc7654dc9da1f830a43f925db8079f27e18bb61e))
-
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "m470.chr", 0x0000, 0x000048, CRC(10d302d4) SHA1(5858e550470a25dcd64efe004c79e6e9783bce07) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
 	ROM_LOAD( "sdot01.bin", 0x0000, 0x080000, CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
 ROM_END
 
-ROM_START( m4casot )
+ROM_START( m4casot ) // mod4oki_alt_cheatchr_m470
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "casrom.bin",  0x00000, 0x10000,  CRC(da095666) SHA1(bc7654dc9da1f830a43f925db8079f27e18bb61e) ) // == old timer   (aka b&wrom.bin)
-
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "caschar.chr", 0x0000, 0x000048, CRC(10d302d4) SHA1(5858e550470a25dcd64efe004c79e6e9783bce07) ) // ( aka b&wchrt.chr )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
 	ROM_LOAD( "cassound.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) ) // ( aka b&wsound.bin )
 ROM_END
 
-
-ROM_START( m4jpmcla )
+ROM_START( m4jpmcla ) // mod4oki_alt_cheatchr_m470
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jcv2.epr",  0x00000, 0x10000,  CRC(da095666) SHA1(bc7654dc9da1f830a43f925db8079f27e18bb61e) ) // == old timer
-
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "jcchr.chr", 0x0000, 0x000048, CRC(e370e271) SHA1(2b712dd3590c31356e8b0b62ffc64ff8ce444f73) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
 	ROM_LOAD( "sjcv2.snd", 0x0000, 0x080000, CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
@@ -2317,9 +2306,12 @@ GAME(199?, m4blkcat,  0,          mod4oki,    mpu4,    mpu4_state, init_m4defaul
 GAME(199?, m4gnsmk,   0,          mod4oki,    mpu4,    mpu4_state, init_m4default, ROT0,   "Barcrest","Gun Smoke (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
 GAME(199?, m4blkbuld, m4blkbul,   mod4oki,    mpu4,    mpu4_state, init_m4default, ROT0,   "Barcrest","Gun Smoke (Barcrest) (Dutch, alt sound roms) (MPU4)",GAME_FLAGS ) // not sure either set of sound roms is right
 GAME(199?, m4blkwhd,  0,          mod4oki,    mpu4,    mpu4_state, init_m4default, ROT0,   "Barcrest","Black & White (Barcrest) [Dutch] (MPU4) (DBW 1.1)",GAME_FLAGS )
-GAME(199?, m4oldtmr,  0,          mod4oki_alt,mpu4,    mpu4_state, init_m_oldtmr,  ROT0,   "Barcrest","Old Timer (Barcrest) (Dutch) (MPU4) (DOT1.1)",GAME_FLAGS )
-GAME(199?, m4casot,   m4oldtmr,   mod4oki_alt,mpu4,    mpu4_state, init_m_oldtmr,  ROT0,   "Barcrest","Old Timer (Barcrest) (Dutch, alt 'Black and White' sound roms) (DOT1.1)",GAME_FLAGS ) // uses the same program???
-GAME(199?, m4jpmcla,  m4oldtmr,   mod4oki_alt,mpu4,    mpu4_state, init_m_oldtmr,  ROT0,   "Barcrest","Old Timer (Barcrest) (Dutch, alt 'JPM Classic' sound roms) (DOT1.1)",GAME_FLAGS ) // uses the same program???
+
+// these 3 sets are identical, just with different sound ROMs, probably hacks?
+GAME(199?, m4oldtmr,  0,          mod4oki_alt_cheatchr_m470,mpu4,    mpu4_state, init_m_oldtmr,  ROT0,   "Barcrest","Old Timer (Barcrest) (Dutch) (MPU4) (DOT1.1)",GAME_FLAGS )
+GAME(199?, m4casot,   m4oldtmr,   mod4oki_alt_cheatchr_m470,mpu4,    mpu4_state, init_m_oldtmr,  ROT0,   "Barcrest","Old Timer (Barcrest) (Dutch, alt 'Black and White' sound roms) (DOT1.1)",GAME_FLAGS ) // uses the same program???
+GAME(199?, m4jpmcla,  m4oldtmr,   mod4oki_alt_cheatchr_m470,mpu4,    mpu4_state, init_m_oldtmr,  ROT0,   "Barcrest","Old Timer (Barcrest) (Dutch, alt 'JPM Classic' sound roms) (DOT1.1)",GAME_FLAGS ) // uses the same program???
+
 GAME(199?, m4tbplay,  0,          mod4oki,    mpu4,    mpu4_state, init_m4default, ROT0,   "Barcrest","Turbo Play (Barcrest) (Dutch) (MPU4) (DTP) (set 1)",GAME_FLAGS )
 GAME(199?, m4tbplaya, m4tbplay,   mod4oki,    mpu4,    mpu4_state, init_m4default, ROT0,   "Barcrest","Turbo Play (Barcrest) (Dutch) (MPU4) (DTP) (set 2)",GAME_FLAGS )
 GAME(199?, m4tbplayb, m4tbplay,   mod4oki,    mpu4,    mpu4_state, init_m4default, ROT0,   "Barcrest","Turbo Play (Barcrest) (Dutch) (MPU4) (DTP) (set 3)",GAME_FLAGS )

@@ -113,6 +113,14 @@ public:
 	// games with sequence starting 00 44 44 54 34 04 54 14 34 14 20 74 04 60
 	static constexpr uint8_t clbveg_lamp_scramble[8] = { 0x00, 0x70, 0x40, 0x70, 0x50, 0x60, 0x40, 0x40 };
 
+	// this sequence is used for m4oldtmr and m4tic__l, but m4oldtmr does not appear to use the lamp scramble, and the data is not valid for m4tic__l
+	// so is probably incorrect
+	// games with sequence starting 00 90 C0 54 A4 F0 64 90 E4 D4 60 B4
+	static constexpr uint8_t m470_lamp_scramble[8] = { 0xFF, 0xFF, 0x10, 0x3F, 0x15, 0xFF, 0xFF, 0xFF }; // one 'm470' set was set to all blank?
+	
+
+
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;

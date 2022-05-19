@@ -2962,6 +2962,15 @@ void mpu4_state::mod4oki_alt_cheatchr_clbveg(machine_config &config)
 	m_characteriser->set_lamp_table(mpu4_characteriser_pal::clbveg_lamp_scramble);
 }
 
+void mpu4_state::mod4oki_alt_cheatchr_m470(machine_config &config)
+{
+	mod4oki_alt(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::m470_lamp_scramble);
+}
+
 
 void mpu4_state::mod4oki_5r(machine_config &config)
 {

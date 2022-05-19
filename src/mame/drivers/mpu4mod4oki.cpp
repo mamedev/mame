@@ -366,6 +366,14 @@ void mpu4_state::mod4oki_cheatchr_otm(machine_config &config)
 	m_characteriser->set_lamp_table(mpu4_characteriser_pal::otm_lamp_scramble);
 }
 
+void mpu4_state::mod4oki_cheatchr_m470(machine_config &config)
+{
+	mod4oki(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::m470_lamp_scramble);
+}
 
 void mpu4_state::init_m4_showstring()
 {
@@ -7341,6 +7349,15 @@ GAME_CUSTOM( 199?, m4tic__a,  m4tic,  "tt_20a_c.1_1", 0x0000, 0x010000, CRC(18a6
 GAME_CUSTOM( 199?, m4tic__c,  m4tic,  "tt_20b_c.1_1", 0x0000, 0x010000, CRC(d35079ab) SHA1(d109af8ef6f4d26b505f63df10d5850ddc0c0b65), "Bwb","Tic Tac Toe (Barcrest) (MPU4) (TT  1.0 B)" )
 GAME_CUSTOM( 199?, m4tic__e,  m4tic,  "tt_20bdc.1_1", 0x0000, 0x010000, CRC(2a43efd4) SHA1(9f6e568ca95a5f4e1a4e82eda2d15dfa225e65ea), "Bwb","Tic Tac Toe (Barcrest) (MPU4) (TT  1.0 BD)" )
 GAME_CUSTOM( 199?, m4tic__i,  m4tic,  "tt_20s_c.1_1", 0x0000, 0x010000, CRC(65a38960) SHA1(48ffdda1c5c98742124418429c510de9f5b90270), "Bwb","Tic Tac Toe (Barcrest) (MPU4) (TT  1.0 CB)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4TIC_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_cheatchr_m470, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // needs chr sequence starting 00 90 c0 54 a4 f0 64 90 e4 d4 60
 // "(C)1995  B.W.B." and "TT_ 3.0"

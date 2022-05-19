@@ -215,6 +215,7 @@ public:
 	void mod4oki_cheatchr_alf(machine_config &config);
 	void mod4oki_cheatchr_shuffle(machine_config &config);
 	void mod4oki_cheatchr_clbveg(machine_config &config);
+	void mod4oki_cheatchr_m470(machine_config &config);
 
 
 
@@ -230,6 +231,7 @@ public:
 	void mod4oki_alt(machine_config &config);
 	void mod4oki_alt_cheatchr_alf(machine_config &config);
 	void mod4oki_alt_cheatchr_clbveg(machine_config &config);
+	void mod4oki_alt_cheatchr_m470(machine_config &config);
 
 
 
