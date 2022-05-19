@@ -208,6 +208,9 @@ public:
 	void mod4oki_cheatchr_m574(machine_config &config);
 	void mod4oki_cheatchr_viva(machine_config &config);
 	void mod4oki_cheatchr_m407(machine_config &config);
+	void mod4oki_cheatchr_duty(machine_config &config);
+	void mod4oki_cheatchr_andybt(machine_config &config);
+	void mod4oki_cheatchr_alf(machine_config &config);
 
 
 
@@ -216,7 +219,6 @@ public:
 	void mod4oki_5r_cheatchr(machine_config &config);
 	void mod4oki_5r_cheatchr_m574(machine_config &config);
 
-	void mod4oki_den(machine_config &config);
 	void mod4oki_crmaze(machine_config &config);
 
 	void mod4oki_alt(machine_config &config);

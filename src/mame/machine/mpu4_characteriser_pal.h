@@ -96,7 +96,15 @@ public:
 	
 	static constexpr uint8_t m407_lamp_scramble[8] = { 0x03, 0xC7, 0x83, 0xC3, 0xC3, 0xA3, 0x83, 0xC3 };
 
-	
+
+	// games with sequence starting 00 24 24 2c 70 20 0c 60 3c 5c 5c 5c 7c 4c 68
+	static constexpr uint8_t duty_lamp_scramble[8] = { 0x00, 0x38, 0x24, 0x18, 0x08, 0x34, 0x20, 0x00 };
+
+	// games with sequence starting 00 84 94 5c ec 3c ec 30 4c 68 60 cc
+	static constexpr uint8_t andybt_lamp_scramble[8] = { 0x00, 0x48, 0x00, 0x48, 0x44, 0x08, 0x00, 0x00 };
+
+	// games with sequence starting 00 50 40 90 a8 6c c4 30 c8
+	static constexpr uint8_t alf_lamp_scramble[8] = { 0x00, 0x58, 0x50, 0x1C, 0x10, 0x58, 0x50, 0x10 };
 
 protected:
 	virtual void device_start() override;
