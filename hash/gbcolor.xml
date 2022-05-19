@@ -7453,6 +7453,54 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="gberetp3">
+		<!-- Notes: GBC only -->
+		<description>Green Beret (prototype 3)</description>
+		<year>2000</year>
+		<publisher>ClearWater Interactive</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="262144">
+				<rom name="green beret (prototype 3).bin" size="262144" crc="fac3f4c5" sha1="dd69f3d9ef87198334b4cc0f54c88a29fb353e44"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gberetp1" cloneof="gberetp3">
+		<!-- Notes: GBC only -->
+		<!--	Developed without testing on real hardware, requires fixing by replacing "C0" to "E0" at offset 0x153.	-->
+		<description>Green Beret (prototype 1)</description>
+		<year>2000</year>
+		<publisher>Kak</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="battery" value="Batt CR1616" />
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="32768">
+				<rom name="green beret (prototype 1).bin" size="32768" crc="a0c612aa" sha1="110413a96bc8f3b0ca50c4881ef96ecb14932ebd"/>
+				<rom value="0xe0" size="1" offset="0x153" loadflag="fill" />
+			</dataarea>
+			<dataarea name="nvram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gberetp2" cloneof="gberetp3">
+		<!-- Notes: GBC only -->
+		<!--	Developed without testing on real hardware, requires fixing by replacing "C0" to "E0" at offset 0x154.	-->
+		<description>Green Beret (prototype 2)</description>
+		<year>2000</year>
+		<publisher>Kak</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="65536">
+				<rom name="green beret (prototype 2).bin" size="65536" crc="2ed509d9" sha1="1d2a66e1b29e8d782e30a7cbcac566f1d907d8c5"/>
+				<rom value="0xe0" size="1" offset="0x154" loadflag="fill" />
+			</dataarea>
+			<dataarea name="nvram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gremlins">
 		<!-- Notes: GBC only -->
 		<description>Gremlins Unleashed (Europe)</description>
