@@ -96,23 +96,8 @@ public:
 			m_ram(*this, RAM_TAG),
 			m_rs232(*this, RS232_TAG),
 			m_ymsnd(*this, YM2149_TAG),
-			m_p31(*this, "P31"),
-			m_p32(*this, "P32"),
-			m_p33(*this, "P33"),
-			m_p34(*this, "P34"),
-			m_p35(*this, "P35"),
-			m_p36(*this, "P36"),
-			m_p37(*this, "P37"),
-			m_p40(*this, "P40"),
-			m_p41(*this, "P41"),
-			m_p42(*this, "P42"),
-			m_p43(*this, "P43"),
-			m_p44(*this, "P44"),
-			m_p45(*this, "P45"),
-			m_p46(*this, "P46"),
-			m_p47(*this, "P47"),
-			m_joy0(*this, "IKBD_JOY0"),
-			m_joy1(*this, "IKBD_JOY1"),
+			m_keys(*this, "P%o", 030),
+			m_joy(*this, "IKBD_JOY%u", 0U),
 			m_mousex(*this, "IKBD_MOUSEX"),
 			m_mousey(*this, "IKBD_MOUSEY"),
 			m_config(*this, "config"),
@@ -144,23 +129,8 @@ protected:
 	required_device<ram_device> m_ram;
 	required_device<rs232_port_device> m_rs232;
 	required_device<ym2149_device> m_ymsnd;
-	required_ioport m_p31;
-	required_ioport m_p32;
-	required_ioport m_p33;
-	required_ioport m_p34;
-	required_ioport m_p35;
-	required_ioport m_p36;
-	required_ioport m_p37;
-	required_ioport m_p40;
-	required_ioport m_p41;
-	required_ioport m_p42;
-	required_ioport m_p43;
-	required_ioport m_p44;
-	required_ioport m_p45;
-	required_ioport m_p46;
-	required_ioport m_p47;
-	optional_ioport m_joy0;
-	optional_ioport m_joy1;
+	required_ioport_array<16> m_keys;
+	optional_ioport_array<2> m_joy;
 	optional_ioport m_mousex;
 	optional_ioport m_mousey;
 	optional_ioport m_config;
@@ -337,7 +307,11 @@ protected:
 	void ikbd_map(address_map &map);
 	void cpu_space_map(address_map &map);
 	void st_map(address_map &map);
+	void megast_map(address_map &map);
 	void keyboard(machine_config &config);
+
+	uint16_t fpu_r();
+	void fpu_w(uint16_t data);
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
 	virtual void machine_start() override;
@@ -353,10 +327,7 @@ public:
 		: st_state(mconfig, type, tag)
 	{ }
 
-	uint16_t fpu_r();
-	void fpu_w(uint16_t data);
 	void megast(machine_config &config);
-	void megast_map(address_map &map);
 };
 
 class ste_state : public st_state

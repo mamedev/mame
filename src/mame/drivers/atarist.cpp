@@ -541,21 +541,9 @@ uint8_t st_state::ikbd_port1_r()
 	uint8_t data = 0xff;
 
 	// keyboard data
-	if (!BIT(m_ikbd_keylatch, 1)) data &= m_p31->read();
-	if (!BIT(m_ikbd_keylatch, 2)) data &= m_p32->read();
-	if (!BIT(m_ikbd_keylatch, 3)) data &= m_p33->read();
-	if (!BIT(m_ikbd_keylatch, 4)) data &= m_p34->read();
-	if (!BIT(m_ikbd_keylatch, 5)) data &= m_p35->read();
-	if (!BIT(m_ikbd_keylatch, 6)) data &= m_p36->read();
-	if (!BIT(m_ikbd_keylatch, 7)) data &= m_p37->read();
-	if (!BIT(m_ikbd_keylatch, 8)) data &= m_p40->read();
-	if (!BIT(m_ikbd_keylatch, 9)) data &= m_p41->read();
-	if (!BIT(m_ikbd_keylatch, 10)) data &= m_p42->read();
-	if (!BIT(m_ikbd_keylatch, 11)) data &= m_p43->read();
-	if (!BIT(m_ikbd_keylatch, 12)) data &= m_p44->read();
-	if (!BIT(m_ikbd_keylatch, 13)) data &= m_p45->read();
-	if (!BIT(m_ikbd_keylatch, 14)) data &= m_p46->read();
-	if (!BIT(m_ikbd_keylatch, 15)) data &= m_p47->read();
+	for (int i = 1; i < 16; i++)
+		if (!BIT(m_ikbd_keylatch, i))
+			data &= m_keys[i]->read();
 
 	return data;
 }
@@ -579,7 +567,7 @@ uint8_t st_state::ikbd_port2_r()
 
 	*/
 
-	uint8_t data = m_joy1.read_safe(0x06) & 0x06;
+	uint8_t data = m_joy[1].read_safe(0x06) & 0x06;
 
 	// serial receive
 	data |= m_ikbd_tx << 3;
@@ -666,7 +654,7 @@ uint8_t st_state::ikbd_port4_r()
 
 	if (m_ikbd_joy) return 0xff;
 
-	uint8_t data = m_joy0.read_safe(0xff);
+	uint8_t data = m_joy[0].read_safe(0xff);
 
 	if ((m_config->read() & 0x01) == 0)
 	{
@@ -712,14 +700,14 @@ void st_state::ikbd_port4_w(uint8_t data)
 //  fpu_r -
 //-------------------------------------------------
 
-uint16_t megast_state::fpu_r()
+uint16_t st_state::fpu_r()
 {
 	// HACK diagnostic cartridge wants to see this value
 	return 0x0802;
 }
 
 
-void megast_state::fpu_w(uint16_t data)
+void st_state::fpu_w(uint16_t data)
 {
 }
 
@@ -1265,7 +1253,37 @@ void st_state::st_map(address_map &map)
 	map(0xff8608, 0xff860d).rw(FUNC(st_state::dma_counter_r), FUNC(st_state::dma_base_w)).umask16(0x00ff);
 	map(0xff8800, 0xff8800).rw(YM2149_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0xfc);
 	map(0xff8802, 0xff8802).rw(YM2149_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w)).mirror(0xfc);
-#if 0
+	// no blitter on original ST
+	map(0xfffa00, 0xfffa3f).rw(m_mfp, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
+	map(0xfffc00, 0xfffc03).rw(m_acia[0], FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
+	map(0xfffc04, 0xfffc07).rw(m_acia[1], FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
+}
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( megast_map )
+//-------------------------------------------------
+
+void st_state::megast_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x000007).rom().region(M68000_TAG, 0);
+	map(0x000008, 0x1fffff).ram();
+	map(0x200000, 0x3fffff).ram();
+	//map(0xfa0000, 0xfbffff)      // mapped by the cartslot
+	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0);
+//  map(0xff7f30, 0xff7f31).rw(FUNC(st_state::blitter_dst_inc_y_r), FUNC(st_state::blitter_dst_inc_y_w) // for TOS 1.02
+	map(0xff8001, 0xff8001).rw(FUNC(st_state::mmu_r), FUNC(st_state::mmu_w));
+	map(0xff8200, 0xff8203).rw(FUNC(st_state::shifter_base_r), FUNC(st_state::shifter_base_w)).umask16(0x00ff);
+	map(0xff8204, 0xff8209).r(FUNC(st_state::shifter_counter_r)).umask16(0x00ff);
+	map(0xff820a, 0xff820a).rw(FUNC(st_state::shifter_sync_r), FUNC(st_state::shifter_sync_w));
+	map(0xff8240, 0xff825f).rw(FUNC(st_state::shifter_palette_r), FUNC(st_state::shifter_palette_w));
+	map(0xff8260, 0xff8260).rw(FUNC(st_state::shifter_mode_r), FUNC(st_state::shifter_mode_w));
+	map(0xff8604, 0xff8605).rw(FUNC(st_state::fdc_data_r), FUNC(st_state::fdc_data_w));
+	map(0xff8606, 0xff8607).rw(FUNC(st_state::dma_status_r), FUNC(st_state::dma_mode_w));
+	map(0xff8608, 0xff860d).rw(FUNC(st_state::dma_counter_r), FUNC(st_state::dma_base_w)).umask16(0x00ff);
+	map(0xff8800, 0xff8800).rw(YM2149_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
+	map(0xff8802, 0xff8802).w(YM2149_TAG, FUNC(ay8910_device::data_w));
 	map(0xff8a00, 0xff8a1f).rw(FUNC(st_state::blitter_halftone_r), FUNC(st_state::blitter_halftone_w));
 	map(0xff8a20, 0xff8a21).rw(FUNC(st_state::blitter_src_inc_x_r), FUNC(st_state::blitter_src_inc_x_w));
 	map(0xff8a22, 0xff8a23).rw(FUNC(st_state::blitter_src_inc_y_r), FUNC(st_state::blitter_src_inc_y_w));
@@ -1278,51 +1296,8 @@ void st_state::st_map(address_map &map)
 	map(0xff8a38, 0xff8a39).rw(FUNC(st_state::blitter_count_y_r), FUNC(st_state::blitter_count_y_w));
 	map(0xff8a3a, 0xff8a3b).rw(FUNC(st_state::blitter_op_r), FUNC(st_state::blitter_op_w));
 	map(0xff8a3c, 0xff8a3d).rw(FUNC(st_state::blitter_ctrl_r), FUNC(st_state::blitter_ctrl_w));
-#endif
 	map(0xfffa00, 0xfffa3f).rw(m_mfp, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
-	map(0xfffc00, 0xfffc03).rw(m_acia[0], FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
-	map(0xfffc04, 0xfffc07).rw(m_acia[1], FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
-}
-
-
-//-------------------------------------------------
-//  ADDRESS_MAP( megast_map )
-//-------------------------------------------------
-
-void megast_state::megast_map(address_map &map)
-{
-	map.unmap_value_high();
-	map(0x000000, 0x000007).rom().region(M68000_TAG, 0);
-	map(0x000008, 0x1fffff).ram();
-	map(0x200000, 0x3fffff).ram();
-	//map(0xfa0000, 0xfbffff)      // mapped by the cartslot
-	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0);
-//  map(0xff7f30, 0xff7f31).rw(FUNC(megast_state::blitter_dst_inc_y_r), FUNC(megast_state::blitter_dst_inc_y_w) // for TOS 1.02
-	map(0xff8001, 0xff8001).rw(FUNC(megast_state::mmu_r), FUNC(megast_state::mmu_w));
-	map(0xff8200, 0xff8203).rw(FUNC(megast_state::shifter_base_r), FUNC(megast_state::shifter_base_w)).umask16(0x00ff);
-	map(0xff8204, 0xff8209).r(FUNC(megast_state::shifter_counter_r)).umask16(0x00ff);
-	map(0xff820a, 0xff820a).rw(FUNC(megast_state::shifter_sync_r), FUNC(megast_state::shifter_sync_w));
-	map(0xff8240, 0xff825f).rw(FUNC(megast_state::shifter_palette_r), FUNC(megast_state::shifter_palette_w));
-	map(0xff8260, 0xff8260).rw(FUNC(megast_state::shifter_mode_r), FUNC(megast_state::shifter_mode_w));
-	map(0xff8604, 0xff8605).rw(FUNC(megast_state::fdc_data_r), FUNC(megast_state::fdc_data_w));
-	map(0xff8606, 0xff8607).rw(FUNC(megast_state::dma_status_r), FUNC(megast_state::dma_mode_w));
-	map(0xff8608, 0xff860d).rw(FUNC(megast_state::dma_counter_r), FUNC(megast_state::dma_base_w)).umask16(0x00ff);
-	map(0xff8800, 0xff8800).rw(YM2149_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
-	map(0xff8802, 0xff8802).w(YM2149_TAG, FUNC(ay8910_device::data_w));
-	map(0xff8a00, 0xff8a1f).rw(FUNC(megast_state::blitter_halftone_r), FUNC(megast_state::blitter_halftone_w));
-	map(0xff8a20, 0xff8a21).rw(FUNC(megast_state::blitter_src_inc_x_r), FUNC(megast_state::blitter_src_inc_x_w));
-	map(0xff8a22, 0xff8a23).rw(FUNC(megast_state::blitter_src_inc_y_r), FUNC(megast_state::blitter_src_inc_y_w));
-	map(0xff8a24, 0xff8a27).rw(FUNC(megast_state::blitter_src_r), FUNC(megast_state::blitter_src_w));
-	map(0xff8a28, 0xff8a2d).rw(FUNC(megast_state::blitter_end_mask_r), FUNC(megast_state::blitter_end_mask_w));
-	map(0xff8a2e, 0xff8a2f).rw(FUNC(megast_state::blitter_dst_inc_x_r), FUNC(megast_state::blitter_dst_inc_x_w));
-	map(0xff8a30, 0xff8a31).rw(FUNC(megast_state::blitter_dst_inc_y_r), FUNC(megast_state::blitter_dst_inc_y_w));
-	map(0xff8a32, 0xff8a35).rw(FUNC(megast_state::blitter_dst_r), FUNC(megast_state::blitter_dst_w));
-	map(0xff8a36, 0xff8a37).rw(FUNC(megast_state::blitter_count_x_r), FUNC(megast_state::blitter_count_x_w));
-	map(0xff8a38, 0xff8a39).rw(FUNC(megast_state::blitter_count_y_r), FUNC(megast_state::blitter_count_y_w));
-	map(0xff8a3a, 0xff8a3b).rw(FUNC(megast_state::blitter_op_r), FUNC(megast_state::blitter_op_w));
-	map(0xff8a3c, 0xff8a3d).rw(FUNC(megast_state::blitter_ctrl_r), FUNC(megast_state::blitter_ctrl_w));
-	map(0xfffa00, 0xfffa3f).rw(m_mfp, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
-	map(0xfffa40, 0xfffa57).rw(FUNC(megast_state::fpu_r), FUNC(megast_state::fpu_w));
+	map(0xfffa40, 0xfffa57).rw(FUNC(st_state::fpu_r), FUNC(st_state::fpu_w));
 	map(0xfffc00, 0xfffc03).rw(m_acia[0], FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
 	map(0xfffc04, 0xfffc07).rw(m_acia[1], FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
 	map(0xfffc20, 0xfffc3f).rw(RP5C15_TAG, FUNC(rp5c15_device::read), FUNC(rp5c15_device::write)).umask16(0x00ff);
@@ -1337,6 +1312,25 @@ void ste_state::ste_map(address_map &map)
 {
 	st_map(map);
 	map(0xe00000, 0xe3ffff).rom().region(M68000_TAG, 0);
+	map(0xff8901, 0xff8901).rw(FUNC(ste_state::sound_dma_control_r), FUNC(ste_state::sound_dma_control_w));
+	map(0xff8902, 0xff8907).rw(FUNC(ste_state::sound_dma_base_r), FUNC(ste_state::sound_dma_base_w)).umask16(0x00ff);
+	map(0xff8908, 0xff890d).r(FUNC(ste_state::sound_dma_counter_r)).umask16(0x00ff);
+	map(0xff890e, 0xff8913).rw(FUNC(ste_state::sound_dma_end_r), FUNC(ste_state::sound_dma_end_w)).umask16(0x00ff);
+	map(0xff8921, 0xff8921).rw(FUNC(ste_state::sound_mode_r), FUNC(ste_state::sound_mode_w));
+	map(0xff8922, 0xff8923).rw(FUNC(ste_state::microwire_data_r), FUNC(ste_state::microwire_data_w));
+	map(0xff8924, 0xff8925).rw(FUNC(ste_state::microwire_mask_r), FUNC(ste_state::microwire_mask_w));
+	map(0xff8a00, 0xff8a1f).rw(FUNC(ste_state::blitter_halftone_r), FUNC(ste_state::blitter_halftone_w));
+	map(0xff8a20, 0xff8a21).rw(FUNC(ste_state::blitter_src_inc_x_r), FUNC(ste_state::blitter_src_inc_x_w));
+	map(0xff8a22, 0xff8a23).rw(FUNC(ste_state::blitter_src_inc_y_r), FUNC(ste_state::blitter_src_inc_y_w));
+	map(0xff8a24, 0xff8a27).rw(FUNC(ste_state::blitter_src_r), FUNC(ste_state::blitter_src_w));
+	map(0xff8a28, 0xff8a2d).rw(FUNC(ste_state::blitter_end_mask_r), FUNC(ste_state::blitter_end_mask_w));
+	map(0xff8a2e, 0xff8a2f).rw(FUNC(ste_state::blitter_dst_inc_x_r), FUNC(ste_state::blitter_dst_inc_x_w));
+	map(0xff8a30, 0xff8a31).rw(FUNC(ste_state::blitter_dst_inc_y_r), FUNC(ste_state::blitter_dst_inc_y_w));
+	map(0xff8a32, 0xff8a35).rw(FUNC(ste_state::blitter_dst_r), FUNC(ste_state::blitter_dst_w));
+	map(0xff8a36, 0xff8a37).rw(FUNC(ste_state::blitter_count_x_r), FUNC(ste_state::blitter_count_x_w));
+	map(0xff8a38, 0xff8a39).rw(FUNC(ste_state::blitter_count_y_r), FUNC(ste_state::blitter_count_y_w));
+	map(0xff8a3a, 0xff8a3b).rw(FUNC(ste_state::blitter_op_r), FUNC(ste_state::blitter_op_w));
+	map(0xff8a3c, 0xff8a3d).rw(FUNC(ste_state::blitter_ctrl_r), FUNC(ste_state::blitter_ctrl_w));
 	map(0xff9200, 0xff9201).portr("JOY0");
 	map(0xff9202, 0xff9203).portr("JOY1");
 	map(0xff9210, 0xff9211).portr("PADDLE0X");
@@ -1354,10 +1348,16 @@ void ste_state::ste_map(address_map &map)
 
 void megaste_state::megaste_map(address_map &map)
 {
-	st_map(map);
+	megast_map(map);
 	map(0xe00000, 0xe3ffff).rom().region(M68000_TAG, 0);
 	map(0xff8c80, 0xff8c87).rw(Z8530_TAG, FUNC(scc8530_legacy_device::reg_r), FUNC(scc8530_legacy_device::reg_w)).umask16(0x00ff);
-	map(0xfffc20, 0xfffc3f).rw(RP5C15_TAG, FUNC(rp5c15_device::read), FUNC(rp5c15_device::write)).umask16(0x00ff);
+	map(0xff8901, 0xff8901).rw(FUNC(megaste_state::sound_dma_control_r), FUNC(megaste_state::sound_dma_control_w));
+	map(0xff8902, 0xff8907).rw(FUNC(megaste_state::sound_dma_base_r), FUNC(megaste_state::sound_dma_base_w)).umask16(0x00ff);
+	map(0xff8908, 0xff890d).r(FUNC(megaste_state::sound_dma_counter_r)).umask16(0x00ff);
+	map(0xff890e, 0xff8913).rw(FUNC(megaste_state::sound_dma_end_r), FUNC(megaste_state::sound_dma_end_w)).umask16(0x00ff);
+	map(0xff8921, 0xff8921).rw(FUNC(megaste_state::sound_mode_r), FUNC(megaste_state::sound_mode_w));
+	map(0xff8922, 0xff8923).rw(FUNC(megaste_state::microwire_data_r), FUNC(megaste_state::microwire_data_w));
+	map(0xff8924, 0xff8925).rw(FUNC(megaste_state::microwire_mask_r), FUNC(megaste_state::microwire_mask_w));
 }
 
 
@@ -1423,6 +1423,9 @@ void stbook_state::stbook_map(address_map &map)
 //-------------------------------------------------
 
 static INPUT_PORTS_START( ikbd )
+	PORT_START("P30")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_START("P31")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Control") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
 	PORT_BIT( 0xef, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1570,19 +1573,19 @@ static INPUT_PORTS_START( st )
 	PORT_INCLUDE( ikbd )
 
 	PORT_START("IKBD_JOY0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2) PORT_8WAY PORT_CONDITION("config", 0x01, EQUALS, 0x01) // XB
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY PORT_CONDITION("config", 0x01, EQUALS, 0x01) // XA
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(2) PORT_8WAY PORT_CONDITION("config", 0x01, EQUALS, 0x01) // YA
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(2) PORT_8WAY PORT_CONDITION("config", 0x01, EQUALS, 0x01) // YB
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_8WAY PORT_CONDITION("config", 0x01, EQUALS, 0x01) // XB
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY PORT_CONDITION("config", 0x01, EQUALS, 0x01) // XA
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_8WAY PORT_CONDITION("config", 0x01, EQUALS, 0x01) // YA
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_8WAY PORT_CONDITION("config", 0x01, EQUALS, 0x01) // YB
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
 
 	PORT_START("IKBD_JOY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_CONDITION("config", 0x01, EQUALS, 0x01)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 
 	PORT_START("IKBD_MOUSEX")
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_CONDITION("config", 0x01, EQUALS, 0x00)
@@ -1999,6 +2002,7 @@ void st_state::floppy_formats(format_registration &fr)
 	fr.add(FLOPPY_ST_FORMAT);
 	fr.add(FLOPPY_MSA_FORMAT);
 	fr.add(FLOPPY_PASTI_FORMAT);
+	fr.add(FLOPPY_IPF_FORMAT);
 }
 
 static void atari_floppies(device_slot_interface &device)
@@ -2054,13 +2058,13 @@ void st_state::common(machine_config &config)
 	m_rs232->cts_handler().set(m_mfp, FUNC(mc68901_device::i2_w));
 	m_rs232->ri_handler().set(m_mfp, FUNC(mc68901_device::i6_w));
 
-	ACIA6850(config, m_acia[0], 0);
+	ACIA6850(config, m_acia[0]);
 	m_acia[0]->txd_handler().set(FUNC(st_state::ikbd_tx_w));
 	m_acia[0]->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<0>));
 	m_acia[0]->write_cts(0);
 	m_acia[0]->write_dcd(0);
 
-	ACIA6850(config, m_acia[1], 0);
+	ACIA6850(config, m_acia[1]);
 	m_acia[1]->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
 	m_acia[1]->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<1>));
 	m_acia[1]->write_cts(0);
@@ -2085,11 +2089,12 @@ void st_state::common(machine_config &config)
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("st_flop");
+	SOFTWARE_LIST(config, "cart_list").set_original("st_cart");
 }
 
 void st_state::keyboard(machine_config &config)
 {
-	hd6301v1_cpu_device &ikbd(HD6301V1(config, HD6301V1_TAG, Y2/8));
+	hd6301v1_cpu_device &ikbd(HD6301V1(config, HD6301V1_TAG, 4_MHz_XTAL));
 	ikbd.set_addrmap(AS_PROGRAM, &st_state::ikbd_map);
 	ikbd.in_p1_cb().set(FUNC(st_state::ikbd_port1_r));
 	ikbd.in_p2_cb().set(FUNC(st_state::ikbd_port2_r));
@@ -2120,9 +2125,6 @@ void st_state::st(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 1.00);
-
-	// cartridge
-	SOFTWARE_LIST(config, "cart_list").set_original("st_cart");
 
 	// internal ram
 	RAM(config, m_ram);
@@ -2155,9 +2157,6 @@ void megast_state::megast(machine_config &config)
 
 	// devices
 	RP5C15(config, RP5C15_TAG, XTAL(32'768));
-
-	// cartridge
-	SOFTWARE_LIST(config, "cart_list").set_original("st_cart");
 
 	// internal ram
 	RAM(config, m_ram);
@@ -2195,9 +2194,6 @@ void ste_state::ste(machine_config &config)
     custom_dac.add_route(1, "lspeaker", 0.50);
 */
 	LMC1992(config, LMC1992_TAG);
-
-	// cartridge
-//  SOFTWARE_LIST(config, "cart_list").set_original("ste_cart");
 
 	// internal ram
 	RAM(config, m_ram);
@@ -3093,27 +3089,27 @@ COMP( 1987, megast_de,  st,       0,      megast,   st,     megast_state,  empty
 COMP( 1987, megast_fr,  st,       0,      megast,   st,     megast_state,  empty_init, "Atari", "MEGA ST (France)",      MACHINE_NOT_WORKING )
 COMP( 1987, megast_se,  st,       0,      megast,   st,     megast_state,  empty_init, "Atari", "MEGA ST (Sweden)",      MACHINE_NOT_WORKING )
 COMP( 1987, megast_sg,  st,       0,      megast,   st,     megast_state,  empty_init, "Atari", "MEGA ST (Switzerland)", MACHINE_NOT_WORKING )
-COMP( 1989, ste,        0,        0,      ste,      ste,    ste_state,     empty_init, "Atari", "STE (USA)",             MACHINE_NOT_WORKING )
-COMP( 1989, ste_uk,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STE (UK)",              MACHINE_NOT_WORKING )
-COMP( 1989, ste_de,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STE (Germany)",         MACHINE_NOT_WORKING )
-COMP( 1989, ste_es,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STE (Spain)",           MACHINE_NOT_WORKING )
-COMP( 1989, ste_fr,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STE (France)",          MACHINE_NOT_WORKING )
-COMP( 1989, ste_it,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STE (Italy)",           MACHINE_NOT_WORKING )
-COMP( 1989, ste_se,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STE (Sweden)",          MACHINE_NOT_WORKING )
-COMP( 1989, ste_sg,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STE (Switzerland)",     MACHINE_NOT_WORKING )
+COMP( 1989, ste,        0,        0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (USA)",             MACHINE_NOT_WORKING )
+COMP( 1989, ste_uk,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (UK)",              MACHINE_NOT_WORKING )
+COMP( 1989, ste_de,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (Germany)",         MACHINE_NOT_WORKING )
+COMP( 1989, ste_es,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (Spain)",           MACHINE_NOT_WORKING )
+COMP( 1989, ste_fr,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (France)",          MACHINE_NOT_WORKING )
+COMP( 1989, ste_it,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (Italy)",           MACHINE_NOT_WORKING )
+COMP( 1989, ste_se,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (Sweden)",          MACHINE_NOT_WORKING )
+COMP( 1989, ste_sg,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (Switzerland)",     MACHINE_NOT_WORKING )
 //COMP( 1990, stbook,     ste,      0,      stbook,   stbook, stbook_state,  empty_init, "Atari", "STBook",                MACHINE_NOT_WORKING )
 COMP( 1990, tt030,      0,        0,      tt030,    tt030,  ste_state,     empty_init, "Atari", "TT030 (USA)",           MACHINE_NOT_WORKING )
 COMP( 1990, tt030_uk,   tt030,    0,      tt030,    tt030,  ste_state,     empty_init, "Atari", "TT030 (UK)",            MACHINE_NOT_WORKING )
 COMP( 1990, tt030_de,   tt030,    0,      tt030,    tt030,  ste_state,     empty_init, "Atari", "TT030 (Germany)",       MACHINE_NOT_WORKING )
 COMP( 1990, tt030_fr,   tt030,    0,      tt030,    tt030,  ste_state,     empty_init, "Atari", "TT030 (France)",        MACHINE_NOT_WORKING )
 COMP( 1990, tt030_pl,   tt030,    0,      tt030,    tt030,  ste_state,     empty_init, "Atari", "TT030 (Poland)",        MACHINE_NOT_WORKING )
-COMP( 1991, megaste,    ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STE (USA)",        MACHINE_NOT_WORKING )
-COMP( 1991, megaste_uk, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STE (UK)",         MACHINE_NOT_WORKING )
-COMP( 1991, megaste_de, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STE (Germany)",    MACHINE_NOT_WORKING )
-COMP( 1991, megaste_es, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STE (Spain)",      MACHINE_NOT_WORKING )
-COMP( 1991, megaste_fr, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STE (France)",     MACHINE_NOT_WORKING )
-COMP( 1991, megaste_it, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STE (Italy)",      MACHINE_NOT_WORKING )
-COMP( 1991, megaste_se, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STE (Sweden)",     MACHINE_NOT_WORKING )
+COMP( 1991, megaste,    ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STe (USA)",        MACHINE_NOT_WORKING )
+COMP( 1991, megaste_uk, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STe (UK)",         MACHINE_NOT_WORKING )
+COMP( 1991, megaste_de, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STe (Germany)",    MACHINE_NOT_WORKING )
+COMP( 1991, megaste_es, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STe (Spain)",      MACHINE_NOT_WORKING )
+COMP( 1991, megaste_fr, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STe (France)",     MACHINE_NOT_WORKING )
+COMP( 1991, megaste_it, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STe (Italy)",      MACHINE_NOT_WORKING )
+COMP( 1991, megaste_se, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STe (Sweden)",     MACHINE_NOT_WORKING )
 COMP( 1992, falcon30,   0,        0,      falcon,   falcon, ste_state,     empty_init, "Atari", "Falcon030",             MACHINE_NOT_WORKING )
 COMP( 1992, falcon40,   falcon30, 0,      falcon40, falcon, ste_state,     empty_init, "Atari", "Falcon040 (prototype)", MACHINE_NOT_WORKING )
 //COMP( 1989, stacy,      st,       0,      stacy,    stacy,  st_state,      empty_init, "Atari", "Stacy",                 MACHINE_NOT_WORKING )
