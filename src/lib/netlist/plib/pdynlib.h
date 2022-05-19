@@ -7,14 +7,13 @@
 ///
 /// \file pdynlib.h
 ///
+/// Dynamic loading of libraries
+///
 
 #include "pstring.h"
 #include "ptypes.h"
 
 namespace plib {
-	// ----------------------------------------------------------------------------------------
-	// pdynlib: dynamic loading of libraries  ...
-	// ----------------------------------------------------------------------------------------
 
 	class dynlib_base
 	{
@@ -46,7 +45,7 @@ namespace plib {
 	{
 	public:
 		explicit dynlib(const pstring &libname);
-		dynlib(const pstring &path, const pstring &libname);
+		dynlib(/*[[maybe_unused]]*/ const pstring &path, const pstring &libname);
 
 		~dynlib() override;
 

@@ -135,7 +135,7 @@ namespace netlist
 					}
 					pstring paramfq = name + "." + tp;
 
-					log().debug("Defparam: {1}\n", paramfq);
+					log().debug("Default parameter: {1}\n", paramfq);
 
 					register_param(paramfq, *ptok);
 
@@ -496,12 +496,12 @@ pstring setup_t::termtype_as_str(detail::core_terminal_t &in)
 
 pstring setup_t::get_initial_param_val(const pstring &name, const pstring &def) const
 {
-	// when get_intial_param_val is called the parameter <name> is already registered
-	// and the value (valstr()) is set to the default value, e.g. "74XX"
-	// If thus $(IC5E.A.MODEL) is given for name=="IC5E.A.MODEL" valstr() below
+	// When `get_intial_param_val` is called the parameter `<name>` is already registered
+	// and the value `(valstr())` is set to the default value, e.g. "74XX"
+	// If thus `$(IC5E.A.MODEL)` is given for `name=="IC5E.A.MODEL"` `valstr()` below
 	// will return the default.
 	// FIXME: It may be more explicit and stable to test if pattern==name and return
-	// def in this case.
+	// `def` in this case.
 
 	auto i = m_abstract.m_param_values.find(name);
 	auto found_pat(false);
@@ -839,7 +839,7 @@ void setup_t::merge_nets(detail::net_t &thisnet, detail::net_t &othernet)
 
 	if (othernet.is_rail_net())
 	{
-		log().debug("othernet is railnet\n");
+		log().debug("other net is a rail net\n");
 		merge_nets(othernet, thisnet);
 	}
 	else
@@ -1704,25 +1704,22 @@ bool source_netlist_t::parse(nlparse_t &setup, const pstring &name)
 	return (!strm.empty()) ? setup.parse_stream(std::move(strm), name) : false;
 }
 
-plib::istream_uptr source_string_t::stream(const pstring &name)
+plib::istream_uptr source_string_t::stream([[maybe_unused]] const pstring &name)
 {
-	plib::unused_var(name);
 	plib::istream_uptr ret(std::make_unique<std::istringstream>(putf8string(m_str)), name);
 	ret->imbue(std::locale::classic());
 	return ret;
 }
 
-plib::istream_uptr source_mem_t::stream(const pstring &name)
+plib::istream_uptr source_mem_t::stream( [[maybe_unused]] const pstring &name)
 {
-	plib::unused_var(name);
 	plib::istream_uptr ret(std::make_unique<std::istringstream>(m_str, std::ios_base::binary), name);
 	ret->imbue(std::locale::classic());
 	return ret;
 }
 
-plib::istream_uptr source_file_t::stream(const pstring &name)
+plib::istream_uptr source_file_t::stream( [[maybe_unused]] const pstring &name)
 {
-	plib::unused_var(name);
 	auto f = std::make_unique<plib::ifstream>(plib::filesystem::u8path(m_filename));
 	if (f->is_open())
 	{
@@ -1732,7 +1729,7 @@ plib::istream_uptr source_file_t::stream(const pstring &name)
 	return plib::istream_uptr();
 }
 
-plib::istream_uptr source_pattern_t::stream(const pstring &name)
+plib::istream_uptr source_pattern_t::stream( [[maybe_unused]] const pstring &name)
 {
 	pstring filename = plib::pfmt(m_pattern)(m_force_lowercase ? plib::lcase(name) : name);
 	auto f = std::make_unique<plib::ifstream>(plib::filesystem::u8path(filename));
@@ -1756,9 +1753,8 @@ bool source_proc_t::parse(nlparse_t &setup, const pstring &name)
 	return false;
 }
 
-plib::istream_uptr source_proc_t::stream(const pstring &name)
+plib::istream_uptr source_proc_t::stream( [[maybe_unused]] const pstring &name)
 {
-	plib::unused_var(name);
 	return plib::istream_uptr();
 }
 

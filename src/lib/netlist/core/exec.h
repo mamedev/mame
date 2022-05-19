@@ -70,11 +70,10 @@ namespace netlist
 		// only used by nltool to create static c-code
 		devices::nld_solver *solver() const noexcept { return m_solver; }
 
-		// force late type resolution
+		// FIXME: force late type resolution
 		template <typename X = devices::nld_solver>
-		nl_fptype gmin(X *solv = nullptr) const noexcept
+		nl_fptype gmin([[maybe_unused]] X *solv = nullptr) const noexcept
 		{
-			plib::unused_var(solv);
 			return static_cast<X *>(m_solver)->gmin();
 		}
 

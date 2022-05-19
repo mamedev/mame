@@ -85,7 +85,8 @@ namespace netlist
 		log_type & log();
 
 	public:
-		virtual void timestep(timestep_type ts_type, nl_fptype st) noexcept { plib::unused_var(ts_type, st); }
+		virtual void timestep([[maybe_unused]] timestep_type ts_type,
+			[[maybe_unused]] nl_fptype st) noexcept { }
 		virtual void update_terminals() noexcept { }
 
 		virtual void update_param() noexcept {}

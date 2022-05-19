@@ -216,7 +216,7 @@ namespace netlist
 		ENTRY_EX(config::use_float_matrix::value)
 		ENTRY_EX(config::use_long_double_matrix::value)
 		ENTRY(NL_DEBUG)
-		ENTRY(NVCCBUILD)
+		ENTRY(__NVCC__)
 
 		ENTRY(__cplusplus)
 		ENTRY(__VERSION__)
@@ -275,7 +275,7 @@ namespace netlist
 
 	void netlist_t::reset()
 	{
-		log().debug("Searching for mainclock\n");
+		log().debug("Searching for main clock\n");
 		m_mainclock = m_state.get_single_device<devices::NETLIB_NAME(mainclock)>("mainclock");
 
 		log().debug("Searching for solver\n");
@@ -447,7 +447,7 @@ namespace netlist
 		{
 			auto *ep = entry.second.get();
 			auto *stats = ep->stats();
-			// Factor of 3 offers best performace increase
+			// Factor of 3 offers best performance increase
 			if (stats->m_stat_inc_active() > 3 * stats->m_stat_total_time.count()
 				&& stats->m_stat_inc_active() > trigger)
 				log().verbose("HINT({}, NO_DEACTIVATE) // {} {} {}", ep->name(),
@@ -725,7 +725,7 @@ namespace netlist
 		// NOLINTNEXTLINE(readability-implicit-bool-conversion)
 		if (!(gt && go && Idr) && (gt || go || Idr))
 		{
-			throw nl_exception("Inconsistent nullptrs for terminal {}", name());
+			throw nl_exception("Either all pointers must be set or none for terminal {}", name());
 		}
 
 		m_gt = gt;
@@ -768,11 +768,10 @@ namespace netlist
 	// logic_output_t
 	// ----------------------------------------------------------------------------------------
 
-	logic_output_t::logic_output_t(device_t &dev, const pstring &aname, bool dummy)
+	logic_output_t::logic_output_t(device_t &dev, const pstring &aname, [[maybe_unused]] bool dummy)
 		: logic_t(dev, aname, STATE_OUT, nldelegate())
 		, m_my_net(dev.state(), name() + ".net", this)
 	{
-		plib::unused_var(dummy);
 		this->set_net(&m_my_net);
 		state().register_net(device_arena::owned_ptr<logic_net_t>(&m_my_net, false));
 		state().setup().register_term(*this);
@@ -829,7 +828,7 @@ namespace netlist
 	// Parameters ...
 	// ----------------------------------------------------------------------------------------
 
-	// deviceless, it's the responsibility of the owner to register!
+	// device-less, it's the responsibility of the owner to register!
 	param_t::param_t(const pstring &name)
 		: device_object_t(nullptr, name)
 	{
@@ -880,7 +879,7 @@ namespace netlist
 	param_str_t::param_str_t(netlist_state_t &state, const pstring &name, const pstring &val)
 	: param_t(name)
 	{
-		// deviceless parameter, no registration, owner is responsible
+		// device-less parameter, no registration, owner is responsible
 		m_param = plib::make_unique<pstring, host_arena>(val);
 		*m_param = state.setup().get_initial_param_val(this->name(),val);
 	}

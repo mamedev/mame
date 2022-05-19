@@ -1411,7 +1411,7 @@ NETLIST_END()
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006367.PDF
+//-   http://pdf.datasheetcatalog.com/datasheet/nationalsemiconductor/DS006367.PDF
 //-
 //-         +------+-----+---+---++---+----+
 //-         | CLRQ | CLK | J | K || Q | QQ |
@@ -2658,7 +2658,7 @@ static NETLIST_START(TTL_9312_DIP)
 	)
 NETLIST_END()
 
-// FIXME: Documenation
+// FIXME: Documentation
 static NETLIST_START(TTL_9314_DIP)
 	TTL_9314(A)
 
@@ -2750,7 +2750,7 @@ static NETLIST_START(TTL_9321_DIP)
 NETLIST_END()
 
 
-//FIXME: Documenation
+//FIXME: Documentation
 static NETLIST_START(TTL_9334_DIP)
 	TTL_9334(A)
 

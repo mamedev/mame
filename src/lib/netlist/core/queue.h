@@ -76,9 +76,8 @@ namespace netlist::detail
 			manager.save_item(this, &m_times[0], module + "." + "times", m_times.size());
 			manager.save_item(this, &m_net_ids[0], module + "." + "names", m_net_ids.size());
 		}
-		void on_pre_save(plib::state_manager_t &manager) override
+		void on_pre_save([[maybe_unused]] plib::state_manager_t &manager) override
 		{
-			plib::unused_var(manager);
 			m_qsize = this->size();
 			for (std::size_t i = 0; i < m_qsize; i++ )
 			{
@@ -86,9 +85,8 @@ namespace netlist::detail
 				m_net_ids[i] = m_get_id(this->listptr()[i].object());
 			}
 		}
-		void on_post_load(plib::state_manager_t &manager) override
+		void on_post_load([[maybe_unused]] plib::state_manager_t &manager) override
 		{
-			plib::unused_var(manager);
 			this->clear();
 			for (std::size_t i = 0; i < m_qsize; i++ )
 			{

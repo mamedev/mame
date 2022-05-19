@@ -825,6 +825,7 @@ int nlwav_app::execute()
 
 PMAIN(nlwav_app)
 
+// spell-checker:disable
 //
 // Der Daten-Abschnitt enth??lt die Abtastwerte:
 // Offset  L??nge  Inhalt  Beschreibung
@@ -846,3 +847,4 @@ PMAIN(nlwav_app)
 // 32 (0x20)   2   <block align>   Frame-Gr????e = <Anzahl der Kan??le>????????((<Bits/Sample (eines Kanals)>???+???7)???/???8)   (Division ohne Rest)
 // 34 (0x22)   2   <bits/sample>   Anzahl der Datenbits pro Samplewert je Kanal (z. B. 12)
 //
+// spell-checker:enable

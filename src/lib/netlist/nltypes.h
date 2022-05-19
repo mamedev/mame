@@ -202,9 +202,8 @@ namespace netlist
 		template<netlist_time::internal_type value0>
 		struct times_ns1
 		{
-			static constexpr netlist_time value(std::size_t N = 0)
+			static constexpr netlist_time value([[maybe_unused]] std::size_t N = 0)
 			{
-				plib::unused_var(N);
 				return NLTIME_FROM_NS(value0);
 			}
 		};

@@ -40,11 +40,10 @@ dynlib::dynlib(const pstring &libname)
 	//  printf("library <%s> not found: %s\n", libname.c_str(), dlerror());
 	}
 
-dynlib::dynlib(const pstring &path, const pstring &libname)
+dynlib::dynlib( [[maybe_unused]] const pstring &path, const pstring &libname)
 : m_lib(nullptr)
 {
 	// FIXME: implement path search
-	plib::unused_var(path);
 	//  printf("win: loading <%s>\n", libname.c_str());
 #ifdef _WIN32
 	if (!libname.empty())

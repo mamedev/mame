@@ -29,9 +29,8 @@ operator << (std::basic_ostream<char>& os, const std::pair<F, S> &p)
 
 template <class T>
 typename std::enable_if_t<!plib::has_ostream_operator<std::basic_ostream<char>, T>::value, std::basic_ostream<char>&>
-operator << (std::basic_ostream<char>& os, const T &p)
+operator << ([[maybe_unused]] std::basic_ostream<char>& os, [[maybe_unused]] const T &p)
 {
-	plib::unused_var(p);
 	os << std::string(typeid(T).name());
 	return os;
 }
@@ -350,7 +349,7 @@ PTEST_F(pmfp_test_complex_return, multibase_test)
 		PEXPECT_EQ(static_cast<int>(ts17.run_ft<INT128>(17)), 17); // FIXME: no operator << for INT128 yet
 		PEXPECT_EQ(sizeof(INT128), 16u);
 	}
-#endif	
+#endif
 	PEXPECT_EQ(ts17.run_ft<long double>(17), 17);
 	PEXPECT_EQ(ts17.run_ft<double>(17), 17);
 	PEXPECT_EQ(ts17.run_ft<int>(17), 17);

@@ -1319,7 +1319,9 @@ int tool_app_t::execute()
 			convert();
 		else if (cmd == "tests")
 		{
-			return PRUN_ALL_TESTS();
+			return PRUN_ALL_TESTS(opt_verb() ? ::plib::testing::loglevel::INFO
+				: opt_quiet() ? ::plib::testing::loglevel::ERROR
+				: ::plib::testing::loglevel::WARNING);
 		}
 		else
 		{
