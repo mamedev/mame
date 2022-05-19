@@ -91,8 +91,8 @@ public:
 
 	void clcd_palette(palette_device &palette) const
 	{
-		palette.set_pen_color(0, rgb_t(36,72,36));
-		palette.set_pen_color(1, rgb_t(2,4,2));
+		palette.set_pen_color(0, rgb_t(124, 149, 143));
+		palette.set_pen_color(1, rgb_t(54,64,65));
 	}
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
