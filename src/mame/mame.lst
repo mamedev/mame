@@ -23606,14 +23606,15 @@ tankbatl                        // (c) 1992 Microprose Games Inc.
 dm3270                          //
 
 @source:microdar.cpp
-covidarts                       // (c) 1997 Covielsa
-dibifuca                        // (c) 199? Compumatic
-dibif743                        // (c) 199? Compumatic
-dibif727                        // (c) 199? Compumatic
 cfarwest                        // (c) 1997 Compumatic
+covidarts                       // (c) 1997 Covielsa
+dibif727                        // (c) 199? Compumatic / Bifuca
+dibif743                        // (c) 199? Compumatic / Bifuca
+dibifuca                        // (c) 199? Compumatic / Bifuca
+diolakoa                        // (c) 1997 Compumatic / Olakoa
+diola827                        // (c) 1997 Compumatic / Olakoa
+minidart                        // (c) 2009 Compumatic
 prospdp                         // (c) 1997 Compumatic
-diolakoa                        // (c) 1997 Compumatic
-diola827                        // (c) 1997 Compumatic
 
 @source:microdec.cpp
 md2                             //

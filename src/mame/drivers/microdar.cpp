@@ -65,6 +65,7 @@ ________________________________________________________________________________
 |  NO   | King Dart 2         | CIC Play          | Slightly different PCB layout. Regular MCU instead of REF34VA       | Darts                      |
 |  NO   | Sagitario           | CIC Play          | CPU silkscreened "REF 0034 9115S", without manufacturer logos       | Darts                      |
 |  YES  | Far West            | Compumatic        | Standard Microdar SPD with Philips REF34VA                          | Electromechanical shooting |
+|  YES  | Minidart            | Compumatic        | Compumatic Microdard-V6 PCB. Atmel AT89S51 instead of the REF34 MCU | Darts
 |  NO   | Party Darts         | Compumatic        | More info: http://www.recreativas.org/party-darts-4906-compumatic   | Darts                      |
 |  YES  | Unknown             | Compumatic        | Compumatic ProSPDP-V3 PCB (Philips REF34VA + REF0096 + REF8032)     | Darts                      |
 |  YES  | Diana Bifuca        | Compumatic/Bifuca | Standard Microdar SPD with Philips REF34VA. "Bifuca" string on ROM  | Darts                      |
@@ -75,8 +76,6 @@ ________________________________________________________________________________
 |  NO   | Champion            | unknown           | ProSPDP PCB. https://www.recreativas.org/champion-6137-compumatic   | Darts                      |
 |  NO   | Paradise Dart Sport | unknown           | Standard Microdar SPD with RE34VA (without Philips logo)            | Darts                      |
 |_______|_____________________|___________________|_____________________________________________________________________|____________________________|
-
-There's a later revision of the Compumatic Microdar, smaller, with a standard Atmel AT89S51 instead of the REF34 MCU.
 
 */
 
@@ -333,6 +332,26 @@ ROM_START(cfarwest)
 ROM_END
 
 
+/** Compumatic Minidart.
+ Microdar V6 PCB. 24MHz xtal. Atmel AT89S51 intead of the usual REF34VA and a custom chip labeled "Toronto 2707" 
+ (but referred as REF0097 on the manual) instead of the REF0096.
+*/
+ROM_START(minidart)
+	// Not REF34VA, but a regular Atmel AT89S51
+	ROM_REGION(0x1000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD("at89s51.ic1", 0x0000, 0x1000, NO_DUMP)
+
+	ROM_REGION(0x40000, "program", 0)
+	ROM_LOAD("minidart_v0.00.ic3", 0x00000, 0x40000, CRC(5ab9f755) SHA1(e80d5d0e8fc8bc246dcf9ef82c7a656f8a1b86ff)) // MINIDART 0.00 COMPUMATIC S.L. 2009
+
+	ROM_REGION(0x800, "eeprom", 0)
+	ROM_LOAD("24lc16b.ic6", 0x000, 0x800, NO_DUMP)
+
+	ROM_REGION(0x117, "plds", 0)
+	ROM_LOAD("atf16v8b.ic4", 0x000, 0x117, NO_DUMP)
+ROM_END
+
+
 /* Compumatic ProSPDP-V3 PCB
   ____________________________________________________________________________________________________
 __|_  ________ ___ ___ ___ __________ ____________ ________ __________ ____ ________ __________       |
@@ -484,3 +503,4 @@ GAME(1997, prospdp,   0,        prospdp,   microdar, microdar_state, empty_init,
 GAME(1997, diolakoa,  0,        microdv5,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Olakoa", "Diana Olakoa (v8.38)",                           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1997, diola827,  diolakoa, microdv5,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Olakoa", "Diana Olakoa (v8.27)",                           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1997, covidarts, 0,        covidarts, microdar, microdar_state, empty_init, ROT0, "Covielsa",            "Covidarts",                                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(2009, minidart,  0,        prospdp,   microdar, microdar_state, empty_init, ROT0, "Compumatic",          "Minidart",                                       MACHINE_IS_SKELETON_MECHANICAL)
