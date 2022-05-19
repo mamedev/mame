@@ -3517,7 +3517,7 @@ uint8_t royalcrdf_state::royalcrdf_opcode_r(offs_t offset)
 		0x02, 0x02, 0xa6, 0x82, 0x02, 0x02, 0x06, 0x82, 0x02, 0x02, 0xa6, 0x00, 0x02, 0x02, 0x06, 0x00
 	};
 
-	uint8_t data {_maincpu->space(AS_PROGRAM).read_byte(offset)};
+	uint8_t data {m_maincpu->space(AS_PROGRAM).read_byte(offset)};
 
 	if(offset < 0x800)
 		data = bitswap<8>(data ^ 0x22, 2, 6, 7, 4, 3, 1, 5, 0);
@@ -3555,8 +3555,7 @@ void royalcrdf_state::royalcrdf(machine_config &config)
 	R65C02(config.replace(), m_maincpu, CPU_CLOCK);  // to avoid the NMI into BRK bug...
 	m_maincpu->set_addrmap(AS_PROGRAM, &royalcrdf_state::royalcrdf_map);
 
-	_maincpu = reinterpret_cast<cpu_device*>(config.device("maincpu"));
-	_maincpu->set_addrmap(AS_OPCODES, &royalcrdf_state::royalcrdf_opcodes_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &royalcrdf_state::royalcrdf_opcodes_map);
 }
 
 
@@ -3583,7 +3582,7 @@ uint8_t multiwin_state::multiwin_opcode_r(offs_t offset)
 		0x00, 0x00, 0x10, 0x00, 0x20, 0x00, 0x30, 0x00, 0x00, 0xb5, 0x10, 0xb5, 0x20, 0xb5, 0x30, 0xb5
 	};
 
-	uint8_t data {_maincpu->space(AS_PROGRAM).read_byte(offset)};
+	uint8_t data {m_maincpu->space(AS_PROGRAM).read_byte(offset)};
 	unsigned idx {bitswap<4>(offset, 6,9,5,3)};
 
 	return bitswap<8>(data, bs[idx&7][4],6,bs[idx&7][3],bs[idx&7][2],3,bs[idx&7][1],1,bs[idx&7][0]) ^ xm[idx];
@@ -3607,8 +3606,46 @@ void multiwin_state::multiwin(machine_config &config)
 {
 	fw2ndpal(config);
 
-	_maincpu = reinterpret_cast<cpu_device*>(config.device("maincpu"));
-	_maincpu->set_addrmap(AS_OPCODES, &multiwin_state::multiwin_opcodes_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &multiwin_state::multiwin_opcodes_map);
+}
+
+
+class multiwina_state : public funworld_state
+{
+public:
+	multiwina_state(const machine_config &mconfig, device_type type, const char* tag):
+		funworld_state(mconfig, type, tag),
+		m_decode(*this, "decode")
+	{
+	}
+
+	void multiwina(machine_config& config);
+
+private:
+	required_region_ptr<uint8_t> m_decode;
+
+	uint8_t opcode_r(offs_t offset);
+
+	void opcodes_map(address_map& map);
+};
+
+uint8_t multiwina_state::opcode_r(offs_t offset)
+{
+
+	uint8_t data {m_maincpu->space(AS_PROGRAM).read_byte(offset)};
+	return m_decode[(offset & 3) * 0x100 + data];
+}
+
+void multiwina_state::opcodes_map(address_map &map)
+{
+	map(0x0000, 0xffff).r(FUNC(multiwina_state::opcode_r));
+}
+
+void multiwina_state::multiwina(machine_config &config)
+{
+	fw2ndpal(config);
+
+	m_maincpu->set_addrmap(AS_OPCODES, &multiwina_state::opcodes_map);
 }
 
 
@@ -3623,7 +3660,6 @@ public:
 	void powercrd(machine_config& config);
 
 private:
-	cpu_device* _maincpu {};
 	uint8_t powercrd_opcode_r(offs_t offset);
 
 	void powercrd_opcodes_map(address_map& map);
@@ -3713,7 +3749,7 @@ uint8_t powercrd_state::powercrd_opcode_r(offs_t offset)
 		  UNKN, 0x86, 0x29, 0x4a, UNKN, UNKN, 0x18, 0x98, UNKN, UNKN, UNKN, 0x9c, UNKN, 0x7a, UNKN, 0x48 } // f_
 	}};
 
-	uint8_t data {_maincpu->space(AS_PROGRAM).read_byte(offset)};
+	uint8_t data {m_maincpu->space(AS_PROGRAM).read_byte(offset)};
 	return decryption_tables[offset & 3][data];
 }
 
@@ -3726,8 +3762,7 @@ void powercrd_state::powercrd(machine_config &config)
 {
 	fw2ndpal(config);
 
-	_maincpu = reinterpret_cast<cpu_device*>(config.device("maincpu"));
-	_maincpu->set_addrmap(AS_OPCODES, &powercrd_state::powercrd_opcodes_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &powercrd_state::powercrd_opcodes_map);
 }
 
 class megacard_state : public funworld_state
@@ -3741,7 +3776,6 @@ public:
 	void megacard(machine_config& config);
 
 private:
-	cpu_device* _maincpu {};
 	uint8_t megacard_opcode_r(offs_t offset);
 
 	void megacard_opcodes_map(address_map& map);
@@ -3828,7 +3862,7 @@ uint8_t megacard_state::megacard_opcode_r(offs_t offset)
 		  UNKN, UNKN, 0xa9, UNKN, 0xf0, UNKN, UNKN, UNKN, UNKN, UNKN, UNKN, 0x18, UNKN, UNKN, UNKN, UNKN } // f_
 	}};
 
-	uint8_t data {_maincpu->space(AS_PROGRAM).read_byte(offset)};
+	uint8_t data {m_maincpu->space(AS_PROGRAM).read_byte(offset)};
 	return decryption_tables[offset & 3][data];
 }
 
@@ -3841,8 +3875,7 @@ void megacard_state::megacard(machine_config &config)
 {
 	fw2ndpal(config);
 
-	_maincpu = reinterpret_cast<cpu_device*>(config.device("maincpu"));
-	_maincpu->set_addrmap(AS_OPCODES, &megacard_state::megacard_opcodes_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &megacard_state::megacard_opcodes_map);
 }
 
 class jokercrd_state : public funworld_state
@@ -3856,7 +3889,6 @@ public:
 	void jokercrd(machine_config& config);
 
 private:
-	cpu_device* _maincpu {};
 	uint8_t jokercrd_opcode_r(offs_t offset);
 
 	void jokercrd_opcodes_map(address_map& map);
@@ -3977,7 +4009,7 @@ uint8_t jokercrd_state::jokercrd_opcode_r(offs_t offset)
 		  0xe9, UNKN, UNKN, 0xa9, UNKN, UNKN, 0xe8, UNKN, UNKN, 0xc9, 0xa8, UNKN, UNKN, 0x48, UNKN, UNKN } // f_
 	}};
 
-	uint8_t data {_maincpu->space(AS_PROGRAM).read_byte(offset)};
+	uint8_t data {m_maincpu->space(AS_PROGRAM).read_byte(offset)};
 	return decryption_tables[offset & 3][data];
 }
 
@@ -3990,8 +4022,7 @@ void jokercrd_state::jokercrd(machine_config &config)
 {
 	fw2ndpal(config);
 
-	_maincpu = reinterpret_cast<cpu_device*>(config.device("maincpu"));
-	_maincpu->set_addrmap(AS_OPCODES, &jokercrd_state::jokercrd_opcodes_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &jokercrd_state::jokercrd_opcodes_map);
 }
 
 
@@ -6798,7 +6829,7 @@ ROM_END
   1991-09-20
 
   Different encryption scheme.
-  Looks like more close to megacrd.
+  Looks closer to megacard.
 
 +--------------------------------------------------------------------------------------+
 |                          +------+                                 +------+           |
@@ -8953,7 +8984,7 @@ GAMEL( 199?, jolyjokrm,  jolyjokr, fw1stpal, funworld,  funworld_state, empty_in
 
 // Encrypted games...
 GAME(  1992, multiwin,   0,        multiwin, funworld,  multiwin_state, driver_init,   ROT0, "Fun World",         "Multi Win (Ver.0167, encrypted)",                 0 ) // original funworld, encrypted.
-GAME(  1991, multiwina,  multiwin, megacard, funworld,  megacard_state, empty_init,    ROT0, "Fun World",         "Multi Win (Ver.0091, encrypted)",                 MACHINE_NOT_WORKING ) // different encryption scheme.
+GAME(  1991, multiwina,  multiwin, multiwina,funworld,  multiwina_state,empty_init,    ROT0, "Fun World",         "Multi Win (Ver.0091, encrypted)",                 MACHINE_NOT_WORKING ) // different encryption scheme.
 GAME(  2001, multiwinb,  multiwin, fw2ndpal, funworld,  funworld_state, empty_init,    ROT0, "Amatic",            "Multi Win (EPM7032, encrypted)",                  MACHINE_NOT_WORKING ) // daughterboard with R65C02 + Altera EPM7032.
 GAME(  1993, powercrd,   0,        powercrd, funworld,  powercrd_state, empty_init,    ROT0, "Fun World",         "Power Card (Ver 0263, encrypted)",                0 ) // clone of Bonus Card.
 GAME(  1993, megacard,   0,        megacard, funworld,  megacard_state, empty_init,    ROT0, "Fun World",         "Mega Card (Ver.0210, encrypted)",                 0 )
