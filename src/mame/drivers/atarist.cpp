@@ -355,8 +355,8 @@ public:
 		: ste_state(mconfig, type, tag)
 	{ }
 
-	uint16_t cache_r();
-	void cache_w(uint16_t data);
+	[[maybe_unused]] uint16_t cache_r();
+	[[maybe_unused]] void cache_w(uint16_t data);
 
 	uint16_t m_cache = 0;
 	void megaste(machine_config &config);
@@ -376,10 +376,10 @@ public:
 
 	required_ioport m_sw400;
 
-	uint16_t config_r();
-	void lcd_control_w(uint16_t data);
+	[[maybe_unused]] uint16_t config_r();
+	[[maybe_unused]] void lcd_control_w(uint16_t data);
 
-	void psg_pa_w(uint8_t data);
+	[[maybe_unused]] void psg_pa_w(uint8_t data);
 	uint8_t mfp_gpio_r();
 	void stbook_map(address_map &map);
 protected:
