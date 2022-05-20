@@ -2807,8 +2807,6 @@ if (BUSES["CENTRONICS"]~=null) then
 		MAME_DIR .. "src/devices/bus/centronics/covox.h",
 		MAME_DIR .. "src/devices/bus/centronics/digiblst.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/digiblst.h",
-		MAME_DIR .. "src/devices/bus/centronics/dpadppsx.cpp",
-		MAME_DIR .. "src/devices/bus/centronics/dpadppsx.h",
 		MAME_DIR .. "src/devices/bus/centronics/dsjoy.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/dsjoy.h",
 		MAME_DIR .. "src/devices/bus/centronics/epson_ex800.cpp",
@@ -2817,12 +2815,8 @@ if (BUSES["CENTRONICS"]~=null) then
 		MAME_DIR .. "src/devices/bus/centronics/epson_lx800.h",
 		MAME_DIR .. "src/devices/bus/centronics/epson_lx810l.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/epson_lx810l.h",
-		MAME_DIR .. "src/devices/bus/centronics/megatap.cpp",
-		MAME_DIR .. "src/devices/bus/centronics/megatap.h",
 		MAME_DIR .. "src/devices/bus/centronics/nec_p72.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/nec_p72.h",
-		MAME_DIR .. "src/devices/bus/centronics/playsaver.cpp",
-		MAME_DIR .. "src/devices/bus/centronics/playsaver.h",
 		MAME_DIR .. "src/devices/bus/centronics/printer.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/printer.h",
 		MAME_DIR .. "src/devices/bus/centronics/samdac.cpp",
@@ -2862,12 +2856,6 @@ if (BUSES["RS232"]~=null) then
 		MAME_DIR .. "src/devices/bus/rs232/ie15.h",
 		MAME_DIR .. "src/devices/bus/rs232/keyboard.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/keyboard.h",
-		MAME_DIR .. "src/devices/bus/rs232/k573eamr.cpp",
-		MAME_DIR .. "src/devices/bus/rs232/k573eamr.h",
-		MAME_DIR .. "src/devices/bus/rs232/k573mrtb.cpp",
-		MAME_DIR .. "src/devices/bus/rs232/k573mrtb.h",
-		MAME_DIR .. "src/devices/bus/rs232/k573msu.cpp",
-		MAME_DIR .. "src/devices/bus/rs232/k573msu.h",
 		MAME_DIR .. "src/devices/bus/rs232/loopback.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/loopback.h",
 		MAME_DIR .. "src/devices/bus/rs232/mboardd.cpp",
@@ -4344,74 +4332,19 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/psx_ctrl/card.h,BUSES["PSX_CARD"] = true
----------------------------------------------------
-
-if (BUSES["PSX_CARD"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/bus/psx_ctrl/card.cpp",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/card.h",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/cardhle.cpp",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/cardhle.h",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/dtlh3020.cpp",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/dtlh3020.h",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/mx4sio.cpp",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/mx4sio.h",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/scph1020.cpp",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/scph1020.h",
-	}
-end
-
-
----------------------------------------------------
---
---@src/devices/bus/psx_ctrl/ctrl.h,BUSES["PSX_CONTROLLER"] = true
+--@src/devices/bus/psx/ctlrport.h,BUSES["PSX_CONTROLLER"] = true
 ---------------------------------------------------
 
 if (BUSES["PSX_CONTROLLER"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/bus/psx_ctrl/ctrl.cpp",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/ctrl.h",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/ctrlhle.cpp",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/ctrlhle.h",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/scph1010.cpp",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/scph1010.h",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/scph1030.cpp",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/scph1030.h",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/scph1070.cpp",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/scph1070.h",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/scph1110.cpp",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/scph1110.h",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/scph1150.cpp",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/scph1150.h",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/scph1200.cpp",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/scph1200.h",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/scph2000.cpp",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/scph2000.h",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/scph10010.cpp",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/scph10010.h",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/scph10160.cpp",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/scph10160.h",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/slph00001.cpp",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/slph00001.h",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/slph00014.cpp",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/slph00014.h",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/slph00034.cpp",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/slph00034.h",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/slph00126.cpp",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/slph00126.h",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/ru014.cpp",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/ru014.h",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/ru017.cpp",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/ru017.h",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/ru018.cpp",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/ru018.h",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/ru024.cpp",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/ru024.h",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/ru029.cpp",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/ru029.h",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/ru037.cpp",
-		MAME_DIR .. "src/devices/bus/psx_ctrl/ru037.h",
+		MAME_DIR .. "src/devices/bus/psx/ctlrport.cpp",
+		MAME_DIR .. "src/devices/bus/psx/ctlrport.h",
+		MAME_DIR .. "src/devices/bus/psx/analogue.cpp",
+		MAME_DIR .. "src/devices/bus/psx/analogue.h",
+		MAME_DIR .. "src/devices/bus/psx/multitap.cpp",
+		MAME_DIR .. "src/devices/bus/psx/multitap.h",
+		MAME_DIR .. "src/devices/bus/psx/memcard.cpp",
+		MAME_DIR .. "src/devices/bus/psx/memcard.h",
 	}
 end
 
