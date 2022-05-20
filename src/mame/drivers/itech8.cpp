@@ -608,6 +608,8 @@ MACHINE_START_MEMBER(itech8_state,sstrike)
 	m_behind_beam_update_timer = timer_alloc(FUNC(itech8_state::behind_the_beam_update), this);
 	m_behind_beam_update_timer->adjust(m_screen->time_until_pos(0), 32);
 
+	m_delayed_z80_control_timer = timer_alloc(FUNC(itech8_state::delayed_z80_control_w), this);
+
 	itech8_state::machine_start();
 }
 

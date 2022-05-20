@@ -898,6 +898,11 @@ void dcs2_audio_device::device_start()
 	if (m_transfer.hle_enabled)
 		m_transfer.watchdog = subdevice<timer_device>("dcs_hle_timer");
 
+	/* allocate timers */
+	m_s1_ack_timer = timer_alloc(FUNC(dcs_audio_device::s1_ack_callback1), this);
+	m_s1_ack2_timer = timer_alloc(FUNC(dcs_audio_device::s1_ack_callback2), this);
+	m_s2_ack_timer = timer_alloc(FUNC(dcs_audio_device::s2_ack_callback), this);
+
 	/* register for save states */
 	dcs_register_state();
 

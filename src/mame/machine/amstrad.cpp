@@ -1057,9 +1057,7 @@ void amstrad_state::video_start()
 	m_gate_array.hsync_after_vsync_counter = 3;
 	std::fill(std::begin(m_GateArray_render_colours), std::end(m_GateArray_render_colours), 0);
 
-	m_pc2_low_timer = timer_alloc(FUNC(amstrad_state::amstrad_pc2_low), this);
 	m_video_update_timer = timer_alloc(FUNC(amstrad_state::amstrad_video_update_timer), this);
-	m_set_resolution_timer = timer_alloc(FUNC(amstrad_state::cb_set_resolution), this);
 }
 
 
@@ -3084,9 +3082,15 @@ TIMER_CALLBACK_MEMBER(amstrad_state::cb_set_resolution)
 	m_screen->configure( 1024, height, visarea, refresh );
 }
 
+void amstrad_state::alloc_timers()
+{
+	m_pc2_low_timer = timer_alloc(FUNC(amstrad_state::amstrad_pc2_low), this);
+	m_set_resolution_timer = timer_alloc(FUNC(amstrad_state::cb_set_resolution), this);
+}
 
 MACHINE_START_MEMBER(amstrad_state,amstrad)
 {
+	alloc_timers();
 	m_system_type = SYSTEM_CPC;
 	m_centronics->write_data7(0);
 }
@@ -3109,6 +3113,7 @@ MACHINE_RESET_MEMBER(amstrad_state,amstrad)
 
 MACHINE_START_MEMBER(amstrad_state,plus)
 {
+	alloc_timers();
 	m_asic.ram = m_region_user1->base();  // 16kB RAM for ASIC, memory-mapped registers.
 	m_system_type = SYSTEM_PLUS;
 	m_centronics->write_data7(0);
@@ -3156,6 +3161,7 @@ MACHINE_RESET_MEMBER(amstrad_state,plus)
 
 MACHINE_START_MEMBER(amstrad_state,gx4000)
 {
+	alloc_timers();
 	m_asic.ram = m_region_user1->base();  // 16kB RAM for ASIC, memory-mapped registers.
 	m_system_type = SYSTEM_GX4000;
 
@@ -3198,6 +3204,7 @@ MACHINE_RESET_MEMBER(amstrad_state,gx4000)
 
 MACHINE_START_MEMBER(amstrad_state,kccomp)
 {
+	alloc_timers();
 	m_system_type = SYSTEM_CPC;
 	m_centronics->write_data7(0);
 
@@ -3227,6 +3234,7 @@ MACHINE_RESET_MEMBER(amstrad_state,kccomp)
 
 MACHINE_START_MEMBER(amstrad_state,aleste)
 {
+	alloc_timers();
 	m_system_type = SYSTEM_ALESTE;
 	m_centronics->write_data7(0);
 }

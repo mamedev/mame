@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Devin Acker, Melissa Goad
 
-// ARM PrimeCell PL910/PL192 VIC emulation
+// ARM PrimeCell PL190/PL192 VIC emulation
 
 #include "emu.h"
 #include "machine/vic_pl192.h"
@@ -55,6 +55,8 @@ void vic_pl190_device::device_start()
 	save_item(NAME(priority_mask));
 	save_item(NAME(priority));
 	save_item(NAME(protection));
+
+	m_irq_sync_timer = timer_alloc(FUNC(vic_pl190_device::irq_sync_tick), this);
 }
 
 void vic_pl192_device::device_start()

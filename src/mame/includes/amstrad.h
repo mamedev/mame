@@ -209,6 +209,7 @@ private:
 	unsigned char m_Psg_FunctionSelected = 0;
 	int m_previous_ppi_portc_w = 0;
 	uint8_t m_amx_mouse_data = 0;
+	void alloc_timers();
 	void amstrad_plus_asic_4000_w(offs_t offset, uint8_t data);
 	void amstrad_plus_asic_6000_w(offs_t offset, uint8_t data);
 	uint8_t amstrad_plus_asic_4000_r(offs_t offset);

@@ -480,7 +480,7 @@ uint8_t ef9365_device::get_last_readback_word(int bitplane_number, int *pixel_of
 
 //-------------------------------------------------
 //  draw_border: Draw the left and right borders
-//  ( No border for the moment ;) )
+//  ( No border for the moment )
 //-------------------------------------------------
 
 void ef9365_device::draw_border(uint16_t line)
@@ -492,7 +492,7 @@ void ef9365_device::draw_border(uint16_t line)
 //  at the x & y position with the m_current_color color
 //-------------------------------------------------
 
-void ef9365_device::plot(int x_pos,int y_pos)
+void ef9365_device::plot(int x_pos, int y_pos)
 {
 	if ((x_pos >= 0 && y_pos >= 0) && (x_pos < bitplane_xres && y_pos < bitplane_yres))
 	{
@@ -503,7 +503,7 @@ void ef9365_device::plot(int x_pos,int y_pos)
 			if (m_registers[EF936X_REG_CTRL1] & 0x02)
 			{
 				// Pen
-				for (int p = 0 ; p < nb_of_bitplanes; p++)
+				for (int p = 0; p < nb_of_bitplanes; p++)
 				{
 					offs_t offset = BITPLANE_MAX_SIZE * p + ((y_pos * bitplane_xres + x_pos) >> 3);
 					uint8_t current_pix = m_videoram->read_byte(offset);
@@ -543,7 +543,7 @@ const static uint8_t vectortype_code[4][8] =
 //  (Bresenham's line algorithm)
 //-------------------------------------------------
 
-int ef9365_device::draw_vector(uint16_t start_x,uint16_t start_y, int16_t delta_x, int16_t delta_y)
+int ef9365_device::draw_vector(uint16_t start_x, uint16_t start_y, int16_t delta_x, int16_t delta_y)
 {
 	LOG("EF9365 draw_vector : Start=(%d,%d) End=(%d,%d)\n", start_x, start_y, start_x + delta_x, start_y + delta_y);
 
@@ -737,8 +737,8 @@ int ef9365_device::draw_character(uint8_t c, bool block, bool smallblock)
 	uint16_t x = get_x_reg();
 	uint16_t y = get_y_reg();
 
-	uint32_t x_char_res = 5;
-	uint32_t y_char_res = 8;
+	int x_char_res = 5;
+	int y_char_res = 8;
 
 	if (smallblock)
 	{
@@ -759,9 +759,9 @@ int ef9365_device::draw_character(uint8_t c, bool block, bool smallblock)
 
 	if (c < 0x60)
 	{
-		for (uint32_t x_char = 0; x_char < x_char_res; x_char++)
+		for (int x_char = 0; x_char < x_char_res; x_char++)
 		{
-			for (uint32_t y_char = y_char_res - 1; y_char >= 0; y_char--)
+			for (int y_char = y_char_res - 1; y_char >= 0; y_char--)
 			{
 				if (block || get_char_pix(c, x_char, ((y_char_res - 1) - y_char)))
 				{
@@ -841,7 +841,7 @@ void ef9365_device::dump_bitplanes_word()
 
 	LOG("dump : x = %d , y = %d\n", get_x_reg(), get_y_reg());
 
-	for (int p = 0; p < nb_of_bitplanes ; p++)
+	for (int p = 0; p < nb_of_bitplanes; p++)
 	{
 		const uint8_t value = m_videoram->read_byte(BITPLANE_MAX_SIZE * p + (pixel_ptr >> 3));
 		if (pixel_ptr & 0x4)
@@ -892,7 +892,7 @@ void ef9365_device::screen_scanning(bool force_clear)
 		{
 			for (int x = 0; x < bitplane_xres; x++)
 			{
-				for (int p = 0 ; p < nb_of_bitplanes; p++)
+				for (int p = 0; p < nb_of_bitplanes; p++)
 				{
 					offs_t offset = BITPLANE_MAX_SIZE * p + ((y * bitplane_xres + x) >> 3);
 					uint8_t current_pix = m_videoram->read_byte(offset);

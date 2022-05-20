@@ -390,11 +390,10 @@ void device_execute_interface::interface_pre_start()
 		m_timedint_timer = m_scheduler->timer_alloc(timer_expired_delegate(FUNC(device_execute_interface::trigger_periodic_interrupt), this));
 
 	// allocate a timer for triggering the end of spin-until conditions
-	m_spin_end_timer = m_scheduler->timer_alloc(timer_expired_delegate(FUNC(device_execute_interface::irq_pulse_clear), this));
+	m_spin_end_timer = m_scheduler->timer_alloc(timer_expired_delegate(FUNC(device_execute_interface::timed_trigger_callback), this));
 
 	// allocate input-pulse timers if we have input lines
-	u32 const lines = execute_input_lines();
-	for (u32 i = 0; i < lines && i < MAX_INPUT_LINES; i++)
+	for (u32 i = 0; i < MAX_INPUT_LINES; i++)
 		m_pulse_end_timers[i] = m_scheduler->timer_alloc(timer_expired_delegate(FUNC(device_execute_interface::irq_pulse_clear), this));
 }
 

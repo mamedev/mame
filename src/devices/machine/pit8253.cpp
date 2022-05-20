@@ -982,6 +982,7 @@ TIMER_CALLBACK_MEMBER(pit_counter_device::update_tick)
 
 TIMER_CALLBACK_MEMBER(pit_counter_device::control_w_deferred)
 {
+	update();
 	uint8_t data = (uint8_t)param;
 	if (CTRL_ACCESS(data) == 0)
 	{
@@ -1006,6 +1007,7 @@ TIMER_CALLBACK_MEMBER(pit_counter_device::control_w_deferred)
 
 TIMER_CALLBACK_MEMBER(pit_counter_device::count_w_deferred)
 {
+	update();
 	uint8_t data = (uint8_t)param;
 	bool middle_of_a_cycle = (machine().time() > m_last_updated && m_clockin != 0);
 
@@ -1092,6 +1094,7 @@ void pit8253_device::write(offs_t offset, uint8_t data)
 
 TIMER_CALLBACK_MEMBER(pit_counter_device::gate_w_deferred)
 {
+	update();
 	int state = param;
 	LOG2("gate_w(): state=%d\n", state);
 
