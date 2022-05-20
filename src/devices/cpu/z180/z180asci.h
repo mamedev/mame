@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "diserial.h"
+#include "machine/clock.h"
 
 //**************************************************************************
 //  z180asci_channel_base
@@ -55,20 +55,24 @@ protected:
 	z180asci_channel_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const int id, const bool ext);
 
 	// device-level overrides
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_resolve_objects() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_clock_changed() override;
 
-	//virtual void tra_callback() override;
-	//virtual void tra_complete() override;
-	//virtual void received_byte(u8 byte) override;
+	enum serial_state
+	{
+		STATE_START,
+		STATE_DATA,
+		STATE_STOP
+	};
 
-
-	TIMER_CALLBACK_MEMBER(brg_callback);
 
 	void output_txa(int txa);
 	void output_rts(int rts);
+
+	required_device<clock_device> m_brg;
 
 	devcb_write_line m_txa_handler;
 	devcb_write_line m_rts_handler;
@@ -93,9 +97,17 @@ protected:
 	int		  m_dcd;
 	int       m_irq;
 	int		  m_txa;
+	int 	  m_rxa;
 	int		  m_rts;
+
 	uint32_t  m_divisor;
-	emu_timer *m_brg; 
+
+	int m_clock_state;
+	int m_tx_state;
+	int m_tx_counter;
+	int m_rx_state;
+	int m_rx_counter;
+
 	const int  m_id;
 	const bool m_ext;
 };
