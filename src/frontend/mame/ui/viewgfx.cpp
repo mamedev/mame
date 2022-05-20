@@ -117,7 +117,7 @@ public:
 				break;
 
 			case view::GFXSET:
-				if (!m_gfxset.m_devices.empty())
+				if (m_gfxset.has_gfx())
 					return handle_gfxset(mui, container, uistate);
 				m_mode = view::TILEMAP;
 				break;
@@ -132,9 +132,6 @@ public:
 	}
 
 private:
-	static constexpr int MAX_ZOOM_LEVEL = 8; // maximum tilemap zoom ratio screen:native
-	static constexpr int MIN_ZOOM_LEVEL = 8; // minimum tilemap zoom ratio native:screen
-
 	enum class view
 	{
 		PALETTE,
@@ -142,8 +139,9 @@ private:
 		TILEMAP
 	};
 
-	struct palette
+	class palette
 	{
+	public:
 		enum class subset
 		{
 			PENS,
@@ -171,31 +169,9 @@ private:
 
 			// handle colormap selection (open bracket,close bracket)
 			if (input.pressed(IPT_UI_PREV_GROUP))
-			{
-				if (subset::INDIRECT == m_which)
-				{
-					m_which = subset::PENS;
-				}
-				else if (0 < m_index)
-				{
-					--m_index;
-					set_device(machine);
-					m_which = m_interface->indirect_entries() ? subset::INDIRECT : subset::PENS;
-				}
-			}
+				prev_group(machine);
 			if (input.pressed(IPT_UI_NEXT_GROUP))
-			{
-				if ((subset::PENS == m_which) && m_interface->indirect_entries())
-				{
-					m_which = subset::INDIRECT;
-				}
-				else if ((m_count - 1) > m_index)
-				{
-					++m_index;
-					set_device(machine);
-					m_which = subset::PENS;
-				}
-			}
+				next_group(machine);
 
 			// cache some info in locals
 			int const total = (subset::INDIRECT == m_which) ? m_interface->indirect_entries() : m_interface->entries();
@@ -237,17 +213,62 @@ private:
 		{
 			m_interface = palette_interface_enumerator(machine.root_device()).byindex(m_index);
 		}
+
+		void next_group(running_machine &machine) noexcept
+		{
+			if ((subset::PENS == m_which) && m_interface->indirect_entries())
+			{
+				m_which = subset::INDIRECT;
+			}
+			else if ((m_count - 1) > m_index)
+			{
+				++m_index;
+				set_device(machine);
+				m_which = subset::PENS;
+			}
+		}
+
+		void prev_group(running_machine &machine) noexcept
+		{
+			if (subset::INDIRECT == m_which)
+			{
+				m_which = subset::PENS;
+			}
+			else if (0 < m_index)
+			{
+				--m_index;
+				set_device(machine);
+				m_which = m_interface->indirect_entries() ? subset::INDIRECT : subset::PENS;
+			}
+		}
 	};
 
-	struct gfxset
+	class gfxset
 	{
+	public:
 		struct devinfo
 		{
 			struct setinfo
 			{
+				void next_color() noexcept
+				{
+					if ((m_color_count + 1) > m_color)
+						++m_color;
+					else
+						m_color = 0U;
+				}
+
+				void prev_color() noexcept
+				{
+					if (m_color)
+						--m_color;
+					else
+						m_color = m_color_count - 1;
+				}
+
 				device_palette_interface *m_palette = nullptr;
 				int m_offset = 0;
-				int m_color = 0;
+				unsigned m_color = 0;
 				unsigned m_color_count = 0U;
 				uint8_t m_rotate = 0U;
 				uint8_t m_columns = 16U;
@@ -300,6 +321,11 @@ private:
 			}
 		}
 
+		bool has_gfx() const noexcept
+		{
+			return !m_devices.empty();
+		}
+
 		bool handle_keys(running_machine &machine, int xcells, int ycells)
 		{
 			auto &input = machine.ui_input();
@@ -309,24 +335,13 @@ private:
 			// handle previous/next group
 			if (input.pressed(IPT_UI_PREV_GROUP))
 			{
-				if (m_set > 0)
-					--m_set;
-				else if (m_device > 0)
-					m_set = m_devices[--m_device].m_setcount - 1;
-				result = true;
+				if (prev_group())
+					result = true;
 			}
 			if (input.pressed(IPT_UI_NEXT_GROUP))
 			{
-				if (m_set < (m_devices[m_device].m_setcount - 1))
-				{
-					++m_set;
-				}
-				else if (m_device < (m_devices.size() - 1))
-				{
-					++m_device;
-					m_set = 0;
-				}
-				result = true;
+				if (next_group())
+					result = true;
 			}
 
 			auto &info = m_devices[m_device];
@@ -407,24 +422,12 @@ private:
 			// handle color selection (left,right)
 			if (input.pressed_repeat(IPT_UI_LEFT, 4))
 			{
-				set.m_color -= 1;
+				set.prev_color();
 				result = true;
 			}
 			if (input.pressed_repeat(IPT_UI_RIGHT, 4))
 			{
-				set.m_color += 1;
-				result = true;
-			}
-
-			// clamp within range
-			if (set.m_color >= set.m_color_count)
-			{
-				set.m_color = set.m_color_count - 1;
-				result = true;
-			}
-			if (set.m_color < 0)
-			{
-				set.m_color = 0;
+				set.next_color();
 				result = true;
 			}
 
@@ -434,10 +437,49 @@ private:
 		std::vector<devinfo> m_devices;
 		unsigned m_device = 0U;
 		unsigned m_set = 0U;
+
+	private:
+		bool next_group() noexcept
+		{
+			if ((m_devices[m_device].m_setcount - 1) > m_set)
+			{
+				++m_set;
+				return true;
+			}
+			else if ((m_devices.size() - 1) > m_device)
+			{
+				++m_device;
+				m_set = 0U;
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		bool prev_group() noexcept
+		{
+			if (m_set)
+			{
+				--m_set;
+				return true;
+			}
+			else if (m_device)
+			{
+				m_set = m_devices[--m_device].m_setcount - 1;
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
 	};
 
-	struct tilemap
+	class tilemap
 	{
+	public:
 		bool handle_keys(running_machine &machine, float pixelscale)
 		{
 			auto &input = machine.ui_input();
@@ -455,83 +497,26 @@ private:
 				result = true;
 			}
 
-			// cache some info in locals
-			tilemap_t *tilemap = machine.tilemap().find(m_index);
-			uint32_t mapwidth = tilemap->width();
-			uint32_t mapheight = tilemap->height();
-
-			const bool at_max_zoom = !m_auto_zoom && !m_zoom_frac && m_zoom == MAX_ZOOM_LEVEL;
-			const bool at_min_zoom = !m_auto_zoom && m_zoom_frac && m_zoom == MIN_ZOOM_LEVEL;
-
 			// handle zoom (minus,plus)
-			if (input.pressed(IPT_UI_ZOOM_OUT) && !at_min_zoom)
+			if (input.pressed(IPT_UI_ZOOM_OUT))
 			{
-				if (m_auto_zoom)
+				if (zoom_out(pixelscale))
 				{
-					// auto zoom never uses fractional factors
-					m_zoom = std::lround(pixelscale) - 1;
-					m_zoom_frac = !m_zoom;
-					if (m_zoom_frac)
-						m_zoom = 2;
-					m_auto_zoom = false;
+					result = true;
+					machine.popmessage(m_zoom_frac ? _("Zoom = 1/%1$d") : _("Zoom = %1$d"), m_zoom);
 				}
-				else if (m_zoom_frac)
-				{
-					// remaining in fractional zoom range
-					m_zoom++;
-				}
-				else if (m_zoom == 1)
-				{
-					// entering fractional zoom range
-					m_zoom++;
-					m_zoom_frac = true;
-				}
-				else
-				{
-					// remaining in integer zoom range
-					m_zoom--;
-				}
-
-				result = true;
-
-				machine.popmessage(m_zoom_frac ? _("Zoom = 1/%1$d") : _("Zoom = %1$d"), m_zoom);
 			}
-
-			if (input.pressed(IPT_UI_ZOOM_IN) && !at_max_zoom)
+			if (input.pressed(IPT_UI_ZOOM_IN))
 			{
-				if (m_auto_zoom)
+				if (zoom_in(pixelscale))
 				{
-					// auto zoom never uses fractional factors
-					m_zoom = std::min<int>(std::lround(pixelscale) + 1, MAX_ZOOM_LEVEL);
-					m_zoom_frac = false;
-					m_auto_zoom = false;
+					result = true;
+					machine.popmessage(m_zoom_frac ? _("Zoom = 1/%1$d") : _("Zoom = %1$d"), m_zoom);
 				}
-				else if (!m_zoom_frac)
-				{
-					// remaining in integer zoom range
-					m_zoom++;
-				}
-				else if (m_zoom == 2)
-				{
-					// entering integer zoom range
-					m_zoom--;
-					m_zoom_frac = false;
-				}
-				else
-				{
-					// remaining in fractional zoom range
-					m_zoom--;
-				}
-
-				result = true;
-
-				machine.popmessage(m_zoom_frac ? _("Zoom = 1/%1$d") : _("Zoom = %1$d"), m_zoom);
 			}
-
 			if (input.pressed(IPT_UI_ZOOM_DEFAULT) && !m_auto_zoom)
 			{
 				m_auto_zoom = true;
-
 				machine.popmessage(_("Expand to fit"));
 			}
 
@@ -576,9 +561,7 @@ private:
 			}
 
 			// handle navigation (up,down,left,right), taking orientation into account
-			int step = 8; // this may be applied more than once if multiple directions are pressed
-			if (machine.input().code_pressed(KEYCODE_LSHIFT)) step = 1;
-			if (machine.input().code_pressed(KEYCODE_LCONTROL)) step = 64;
+			int const step = scroll_step(machine); // this may be applied more than once if multiple directions are pressed
 			if (input.pressed_repeat(IPT_UI_UP, 4))
 			{
 				if (m_rotate & ORIENTATION_SWAP_XY)
@@ -612,6 +595,11 @@ private:
 				result = true;
 			}
 
+			// cache some info in locals
+			tilemap_t *const tilemap = machine.tilemap().find(m_index);
+			uint32_t const mapwidth = tilemap->width();
+			uint32_t const mapheight = tilemap->height();
+
 			// clamp within range
 			while (m_xoffs < 0)
 				m_xoffs += mapwidth;
@@ -633,11 +621,100 @@ private:
 		bool m_auto_zoom = true;
 		uint8_t m_rotate = 0U;
 		uint32_t m_flags = TILEMAP_DRAW_ALL_CATEGORIES;
+
+	private:
+		static constexpr int MAX_ZOOM_LEVEL = 8; // maximum tilemap zoom ratio screen:native
+		static constexpr int MIN_ZOOM_LEVEL = 8; // minimum tilemap zoom ratio native:screen
+
+		bool zoom_in(float pixelscale) noexcept
+		{
+			if (m_auto_zoom)
+			{
+				// auto zoom never uses fractional factors
+				m_zoom = std::min<int>(std::lround(pixelscale) + 1, MAX_ZOOM_LEVEL);
+				m_zoom_frac = false;
+				m_auto_zoom = false;
+				return true;
+			}
+			else if (m_zoom_frac || (MAX_ZOOM_LEVEL > m_zoom))
+			{
+				if (!m_zoom_frac)
+				{
+					// remaining in integer zoom range
+					m_zoom++;
+				}
+				else if (m_zoom == 2)
+				{
+					// entering integer zoom range
+					m_zoom--;
+					m_zoom_frac = false;
+				}
+				else
+				{
+					// remaining in fractional zoom range
+					m_zoom--;
+				}
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		bool zoom_out(float pixelscale) noexcept
+		{
+			if (m_auto_zoom)
+			{
+				// auto zoom never uses fractional factors
+				m_zoom = std::lround(pixelscale) - 1;
+				m_zoom_frac = !m_zoom;
+				if (m_zoom_frac)
+					m_zoom = 2;
+				m_auto_zoom = false;
+				return true;
+			}
+			else if (!m_zoom_frac || (MIN_ZOOM_LEVEL > m_zoom))
+			{
+				if (m_zoom_frac)
+				{
+					// remaining in fractional zoom range
+					m_zoom++;
+				}
+				else if (m_zoom == 1)
+				{
+					// entering fractional zoom range
+					m_zoom++;
+					m_zoom_frac = true;
+				}
+				else
+				{
+					// remaining in integer zoom range
+					m_zoom--;
+				}
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		static int scroll_step(running_machine &machine)
+		{
+			auto &input = machine.input();
+			if (input.code_pressed(KEYCODE_LCONTROL) || input.code_pressed(KEYCODE_RCONTROL))
+				return 64;
+			else if (input.code_pressed(KEYCODE_LSHIFT) || input.code_pressed(KEYCODE_RSHIFT))
+				return 1;
+			else
+				return 8;
+		}
 	};
 
 	bool is_relevant() const noexcept
 	{
-		return m_palette.m_count || !m_gfxset.m_devices.empty() || m_machine.tilemap().count();
+		return m_palette.m_count || m_gfxset.has_gfx() || m_machine.tilemap().count();
 	}
 
 	uint32_t handle_general_keys(bool uistate)
@@ -719,13 +796,8 @@ private:
 			title_buf << (indirect ? _(" COLORS") : _(" PENS"));
 
 		// if the mouse pointer is over one of our cells, add some info about the corresponding palette entry
-		int32_t mouse_target_x, mouse_target_y;
-		bool mouse_button;
-		render_target *const mouse_target = m_machine.ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
 		float mouse_x, mouse_y;
-		if (mouse_target
-				&& mouse_target->map_point_container(mouse_target_x, mouse_target_y, container, mouse_x, mouse_y)
-				&& cellboxbounds.includes(mouse_x, mouse_y))
+		if (map_mouse(container, cellboxbounds, mouse_x, mouse_y))
 		{
 			int const index = m_palette.m_offset + int((mouse_x - cellboxbounds.x0) / cellwidth) + (int((mouse_y - cellboxbounds.y0) / cellheight) * m_palette.m_columns);
 			if (index < total)
@@ -913,13 +985,8 @@ private:
 
 		// if the mouse pointer is over a pixel in a tile, add some info about the tile and pixel
 		bool found_pixel = false;
-		int32_t mouse_target_x, mouse_target_y;
-		bool mouse_button;
-		render_target *const mouse_target = m_machine.ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
 		float mouse_x, mouse_y;
-		if (mouse_target
-				&& mouse_target->map_point_container(mouse_target_x, mouse_target_y, container, mouse_x, mouse_y)
-				&& cellboxbounds.includes(mouse_x, mouse_y))
+		if (map_mouse(container, cellboxbounds, mouse_x, mouse_y))
 		{
 			int const code = set.m_offset + int((mouse_x - cellboxbounds.x0) / cellwidth) + int((mouse_y - cellboxbounds.y0) / cellheight) * xcells;
 			int xpixel = int((mouse_x - cellboxbounds.x0) / (cellwidth / cellxpix)) % cellxpix;
@@ -1086,13 +1153,8 @@ private:
 		util::stream_format(title_buf, "TILEMAP %d/%d", m_tilemap.m_index + 1, m_machine.tilemap().count());
 
 		// if the mouse pointer is over a tile, add some info about its coordinates and color
-		int32_t mouse_target_x, mouse_target_y;
-		bool mouse_button;
-		render_target *const mouse_target = m_machine.ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
 		float mouse_x, mouse_y;
-		if (mouse_target
-				&& mouse_target->map_point_container(mouse_target_x, mouse_target_y, container, mouse_x, mouse_y)
-				&& mapboxbounds.includes(mouse_x, mouse_y))
+		if (map_mouse(container, mapboxbounds, mouse_x, mouse_y))
 		{
 			int xpixel = (mouse_x - mapboxbounds.x0) * targwidth;
 			int ypixel = (mouse_y - mapboxbounds.y0) * targheight;
@@ -1171,6 +1233,9 @@ private:
 		// handle the redraw
 		if (m_bitmap_dirty)
 		{
+			// pre-fill with transparency
+			m_bitmap.fill(0);
+
 			// loop over rows
 			for (int y = 0, index = set.m_offset; y < ycells; y++)
 			{
@@ -1192,10 +1257,6 @@ private:
 						else // otherwise, fill with transparency
 							m_bitmap.fill(0, cellbounds);
 					}
-				}
-				else // otherwise, fill with transparency
-				{
-					m_bitmap.fill(0, cellbounds);
 				}
 			}
 
@@ -1236,16 +1297,28 @@ private:
 			// free the old stuff
 			if (m_texture)
 				m_machine.render().texture_free(m_texture);
-			m_bitmap.reset();
 
 			// allocate new stuff
-			m_bitmap.allocate(width, height);
+			m_bitmap.resize(width, height);
 			m_texture = m_machine.render().texture_alloc();
 			m_texture->set_bitmap(m_bitmap, m_bitmap.cliprect(), TEXFORMAT_ARGB32);
 
 			// force a redraw
 			m_bitmap_dirty = true;
 		}
+	}
+
+	bool map_mouse(render_container &container, render_bounds const &clip, float &x, float &y) const
+	{
+		int32_t target_x, target_y;
+		bool button;
+		render_target *const target = m_machine.ui_input().find_mouse(&target_x, &target_y, &button);
+		if (!target)
+			return false;
+		else if (!target->map_point_container(target_x, target_y, container, x, y))
+			return false;
+		else
+			return clip.includes(x, y);
 	}
 
 	running_machine &m_machine;
