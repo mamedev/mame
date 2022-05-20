@@ -75,8 +75,6 @@ WRITE_LINE_MEMBER(null_modem_device::update_serial)
 	output_dsr(0);
 	output_cts(0);
 
-	m_rts = 0;
-	m_dtr = 0;
 	m_xoff = 0;
 }
 

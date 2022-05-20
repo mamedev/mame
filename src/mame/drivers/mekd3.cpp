@@ -183,8 +183,6 @@ private:
 	void led_segment_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(led_update);
 	void page_w(uint8_t data);
-	void trace_timer_w(uint8_t data);
-	uint8_t trace_timer_r();
 
 	required_device<m6802_cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -198,7 +196,6 @@ private:
 
 	uint8_t m_rom_page;
 	uint8_t m_ram_page;
-	uint8_t m_trace;
 	uint8_t m_segment;
 	uint8_t m_digit;
 
@@ -251,9 +248,6 @@ private:
 	MC6845_UPDATE_ROW(update_row);
 	uint8_t r2_pia_pa_r();
 	uint8_t r2_pia_pb_r();
-	DECLARE_WRITE_LINE_MEMBER(r2_hsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(r2_vsync_changed);
-	DECLARE_READ_LINE_MEMBER(r2_pia_cb1_r);
 	optional_device<mc6845_device> m_mc6845;
 	optional_device<palette_device> m_palette;
 	optional_device<screen_device> m_screen;
@@ -265,7 +259,6 @@ private:
 	optional_ioport m_r2_display_format;
 	void kbd_put(uint8_t data);
 	uint8_t m_term_data;
-	bool m_r2_vsync;
 };
 
 
@@ -462,23 +455,6 @@ void mekd3_state::page_w(uint8_t data)
 	// TODO switch the ROM bank entry.
 	m_ram_page = (data >> 3) & 0x07;
 	m_ram_bank->set_entry(m_ram_page);
-}
-
-/***********************************************************
-
-    Trace timer
-
-************************************************************/
-
-void mekd3_state::trace_timer_w(uint8_t data)
-{
-	m_trace = data;
-	m_kpd_pia->ca1_w(data);
-}
-
-uint8_t mekd3_state::trace_timer_r()
-{
-	return m_trace;
 }
 
 /***********************************************************
@@ -810,22 +786,6 @@ uint8_t mekd3_state::r2_pia_pb_r()
 	return (display_format << 6) | mode;
 }
 
-WRITE_LINE_MEMBER(mekd3_state::r2_hsync_changed)
-{
-	m_r2_pia->cb2_w(state);
-}
-
-WRITE_LINE_MEMBER(mekd3_state::r2_vsync_changed)
-{
-	m_r2_vsync = state;
-	m_r2_pia->cb1_w(state);
-}
-
-READ_LINE_MEMBER(mekd3_state::r2_pia_cb1_r)
-{
-	return m_r2_vsync;
-}
-
 MC6845_UPDATE_ROW(mekd3_state::update_row)
 {
 	const pen_t *pen = m_palette->pens();
@@ -906,7 +866,6 @@ void mekd3_state::machine_start()
 
 	save_item(NAME(m_rom_page));
 	save_item(NAME(m_ram_page));
-	save_item(NAME(m_trace));
 	save_item(NAME(m_segment));
 	save_item(NAME(m_digit));
 	save_item(NAME(m_cts));
@@ -918,7 +877,6 @@ void mekd3_state::machine_start()
 	save_item(NAME(m_cass_txbit));
 	save_item(NAME(m_cass_last_txbit));
 	save_item(NAME(m_term_data));
-	save_item(NAME(m_r2_vsync));
 }
 
 void mekd3_state::machine_reset()
@@ -950,8 +908,7 @@ void mekd3_state::machine_reset()
 	// MEK68R2
 	m_r2_pia->ca1_w(ASSERT_LINE);
 	m_r2_pia->ca2_w(ASSERT_LINE);
-	m_r2_vsync = 0;
-	m_r2_pia->cb1_w(m_r2_vsync);
+	m_r2_pia->cb1_w(0);
 	m_r2_pia->cb2_w(0);
 }
 
@@ -998,14 +955,14 @@ void mekd3_state::mekd3(machine_config &config)
 	m_kpd_pia->readcb1_handler().set(FUNC(mekd3_state::keypad_cb1_r));
 	m_kpd_pia->writepa_handler().set(FUNC(mekd3_state::led_segment_w));
 	m_kpd_pia->writepb_handler().set(FUNC(mekd3_state::led_digit_w));
-	m_kpd_pia->readca1_handler().set(FUNC(mekd3_state::trace_timer_r));
+	m_kpd_pia->ca1_w(0);
 	m_kpd_pia->irqa_handler().set(m_mainnmi, FUNC(input_merger_device::in_w<0>));
 	m_kpd_pia->irqb_handler().set(m_mainnmi, FUNC(input_merger_device::in_w<1>));
 
 	// CP1, CP2, /CTG, /CTC are available at SK1, and not used here.
 	MC6846(config, m_mc6846, XTAL_MEKD3 / 4);  // Same as the cpu clock
 	m_mc6846->out_port().set(FUNC(mekd3_state::page_w));
-	m_mc6846->cto().set(FUNC(mekd3_state::trace_timer_w));
+	m_mc6846->cto().set(m_kpd_pia, FUNC(pia6821_device::ca1_w)); // trace timer
 	m_mc6846->irq().set(m_mainirq, FUNC(input_merger_device::in_w<0>));
 
 	// MEK68IO
@@ -1072,8 +1029,8 @@ void mekd3_state::mekd3(machine_config &config)
 	m_mc6845->set_show_border_area(false);
 	m_mc6845->set_char_width(8);
 	m_mc6845->set_update_row_callback(FUNC(mekd3_state::update_row));
-	m_mc6845->out_hsync_callback().set(FUNC(mekd3_state::r2_hsync_changed));
-	m_mc6845->out_vsync_callback().set(FUNC(mekd3_state::r2_vsync_changed));
+	m_mc6845->out_hsync_callback().set(m_r2_pia, FUNC(pia6821_device::cb2_w));
+	m_mc6845->out_vsync_callback().set(m_r2_pia, FUNC(pia6821_device::cb1_w));
 
 	// PA is the keyboard data and a mode flag.
 	// CA1 is keyboard strobe.
@@ -1083,7 +1040,6 @@ void mekd3_state::mekd3(machine_config &config)
 	PIA6821(config, m_r2_pia, 0);
 	m_r2_pia->readpa_handler().set(FUNC(mekd3_state::r2_pia_pa_r));
 	m_r2_pia->readpb_handler().set(FUNC(mekd3_state::r2_pia_pb_r));
-	m_r2_pia->readcb1_handler().set(FUNC(mekd3_state::r2_pia_cb1_r));
 	m_r2_pia->irqa_handler().set(m_mainirq, FUNC(input_merger_device::in_w<6>));
 	m_r2_pia->irqb_handler().set(m_mainirq, FUNC(input_merger_device::in_w<7>));
 

@@ -180,6 +180,7 @@ PSOURCES := \
 	$(PSRC)/pfmtlog.cpp \
 	$(PSRC)/pmain.cpp \
 	$(PSRC)/poptions.cpp \
+	$(PSRC)/ppmf.cpp \
 	$(PSRC)/ppreprocessor.cpp \
 	$(PSRC)/ptokenizer.cpp \
 	$(PSRC)/putil.cpp \

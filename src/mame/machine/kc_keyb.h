@@ -45,8 +45,6 @@ protected:
 	void transmit_scancode(uint8_t scan_code);
 
 private:
-	static constexpr device_timer_id TIMER_TRANSMIT_PULSE = 1;
-
 	// internal state
 	emu_timer *        m_timer_transmit_pulse;
 	devcb_write_line   m_write_out;

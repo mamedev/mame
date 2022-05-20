@@ -94,7 +94,7 @@ public:
 	void lan(machine_config &config);
 
 	void init_jpmsru();
-	
+
 	template <unsigned N> DECLARE_READ_LINE_MEMBER(opto_r) { return m_opto[N]; }
 protected:
 	virtual void machine_start() override;
@@ -131,7 +131,7 @@ private:
 	void outputs_ndu(address_map &map);
 	void outputs_dud(address_map &map);
 	void outputs_lan(address_map &map);
-	
+
 	bool m_int1;
 	bool m_int2;
 	bool m_int1_en;
@@ -144,7 +144,7 @@ private:
 	bool m_busext_bdir;
 	uint8_t m_busext_mode;
 	uint8_t m_busext_addr;
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(int1);
 	TIMER_DEVICE_CALLBACK_MEMBER(int2);
 
@@ -156,7 +156,7 @@ private:
 	output_finder<2> m_digits;
 	required_device_array<netlist_mame_logic_input_device, 6> m_audio_in;
 	required_device<fruit_samples_device> m_samples;
-	
+
 	memory_share_creator<uint8_t> m_nvram;
 	optional_ioport_array<3> m_dips;
 };
@@ -193,7 +193,7 @@ void jpmsru_state::jpmsru_io(address_map &map)
 void jpmsru_state::jpmsru_busext_io(address_map &map)
 {
 	jpmsru_io(map);
-	
+
 	map(0x80, 0x87).rw(FUNC(jpmsru_state::busext_data_r), FUNC(jpmsru_state::busext_data_w));
 	map(0x88, 0x89).w(FUNC(jpmsru_state::busext_bdir_w));
 	map(0x8a, 0x8d).w(FUNC(jpmsru_state::busext_mode_w));
@@ -205,7 +205,7 @@ void jpmsru_state::jpmsru_busext_io(address_map &map)
 void jpmsru_state::outputs_ewn(address_map &map)
 {
 	jpmsru_busext_io(map);
-	
+
 	map(0x3a, 0x3b).w(FUNC(jpmsru_state::out_meter_w<0>));
 	map(0x3c, 0x3d).w(FUNC(jpmsru_state::out_meter_w<1>));
 	map(0x3e, 0x3f).w(FUNC(jpmsru_state::out_meter_w<2>));
@@ -221,7 +221,7 @@ void jpmsru_state::outputs_ewn(address_map &map)
 void jpmsru_state::outputs_ewn2(address_map &map)
 {
 	jpmsru_io(map);
-	
+
 	map(0x3a, 0x3b).w(FUNC(jpmsru_state::out_meter_w<0>));
 	map(0x3c, 0x3d).w(FUNC(jpmsru_state::out_meter_w<1>));
 	map(0x3e, 0x3f).w(FUNC(jpmsru_state::out_meter_w<2>));
@@ -237,7 +237,7 @@ void jpmsru_state::outputs_ewn2(address_map &map)
 void jpmsru_state::outputs_ndu(address_map &map)
 {
 	jpmsru_busext_io(map);
-	
+
 	map(0x3a, 0x3b).w(FUNC(jpmsru_state::out_meter_w<0>));
 	map(0x3c, 0x3d).w(FUNC(jpmsru_state::out_meter_w<1>));
 	map(0x3e, 0x3f).w(FUNC(jpmsru_state::out_meter_w<2>));
@@ -254,7 +254,7 @@ void jpmsru_state::outputs_ndu(address_map &map)
 void jpmsru_state::outputs_dud(address_map &map)
 {
 	jpmsru_io(map);
-	
+
 	map(0x3a, 0x3b).w(FUNC(jpmsru_state::out_meter_w<0>));
 	map(0x3c, 0x3d).w(FUNC(jpmsru_state::out_meter_w<1>));
 	map(0x3e, 0x3f).w(FUNC(jpmsru_state::out_meter_w<2>));
@@ -271,6 +271,7 @@ void jpmsru_state::outputs_dud(address_map &map)
 void jpmsru_state::outputs_lan(address_map &map)
 {
 	jpmsru_io(map);
+
 	map(0x38, 0x39).w(FUNC(jpmsru_state::out_meter_w<0>));
 	map(0x3a, 0x3b).w(FUNC(jpmsru_state::out_meter_w<1>));
 	map(0x3c, 0x3d).w(FUNC(jpmsru_state::out_meter_w<2>));
@@ -296,7 +297,7 @@ void jpmsru_state::reel_w(offs_t offset, uint8_t data)
 	const int reel = (offset & 0xc) >> 2;
 	const int bit = offset & 0x3;
 	m_reelbits[reel] = (m_reelbits[reel] & ~(1 << bit)) | (data ? (1 << bit) : 0);
-	
+
 	if(bit == 3) 
 	{
 		m_reel[reel]->update(m_reelbits[reel]);
@@ -327,7 +328,7 @@ void jpmsru_state::out_disp_w(offs_t offset, uint8_t data)
 		case 4: m_disp_d1 = data; break;
 		case 5: m_disp_d2 = data; break;
 	}
-	
+
 	static constexpr uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 };
 	if(m_disp_d1) m_digits[1] = patterns[m_disp_digit];
 	if(m_disp_d2) m_digits[0] = patterns[m_disp_digit];
@@ -378,7 +379,7 @@ void jpmsru_state::int1_en_w(offs_t offset, uint8_t data)
 {
 	if(m_int1_en && !data) m_int1 = 0; // Acknowledge on high->low transition
 	m_int1_en = data;
-	
+
 	update_int();
 }
 
@@ -386,7 +387,7 @@ void jpmsru_state::int2_en_w(offs_t offset, uint8_t data)
 {
 	if(m_int2_en && !data) m_int2 = 0; // Acknowledge on high->low transition
 	m_int2_en = data;
-	
+
 	update_int();
 }
 
@@ -460,7 +461,7 @@ static INPUT_PORTS_START( jpmsru_inputs )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
-	
+
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -480,14 +481,14 @@ static INPUT_PORTS_START( jpmsru_inputs )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("10p Token")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p")
-	
+
 	PORT_START("POT")
 	PORT_ADJUSTER( 50, "Tone Pot" )  NETLIST_ANALOG_PORT_CHANGED("nl_audio", "pot")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( j_ewn )
 	PORT_INCLUDE( jpmsru_inputs )
-	
+
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2")
@@ -498,7 +499,7 @@ static INPUT_PORTS_START( j_ewn )
 
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Nudge Up")
-	
+
 	PORT_START("DIP0")
 	PORT_DIPNAME( 0x0f, 0x00, "Nudge chance" )
 	PORT_DIPSETTING (   0x0f, "1%" )
@@ -532,7 +533,7 @@ static INPUT_PORTS_START( j_ewn )
 	PORT_DIPSETTING (   0x50, "41%" )
 	PORT_DIPSETTING (   0x60, "43%" )
 	PORT_DIPSETTING (   0x70, "45%" )
-	
+
 	PORT_START("DIP1")
 	PORT_DIPNAME( 0x0f, 0x00, "Hold chance" )
 	PORT_DIPSETTING (   0x0f, "17%" )
@@ -558,7 +559,7 @@ static INPUT_PORTS_START( j_ewn )
 	PORT_DIPSETTING(    0x20, DEF_STR(On) )
 	PORT_DIPUNUSED( 0x40, 0x00 )
 	PORT_DIPUNUSED( 0x80, 0x00 )
-	
+
 	PORT_START("DIP2")
 	PORT_DIPUNUSED( 0x01, 0x00 )
 	PORT_DIPUNUSED( 0x02, 0x00 )
@@ -572,12 +573,12 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( j_ewn2 )
 	PORT_INCLUDE( jpmsru_inputs )
-	
+
 	PORT_MODIFY("IN0")
 	PORT_CONFNAME( 0x80, 0x80, "5p/10p jumper" )
-	PORT_CONFSETTING(	 0x00, "5p" )
-	PORT_CONFSETTING(	 0x80, "10p" )
-	
+	PORT_CONFSETTING(    0x00, "5p" )
+	PORT_CONFSETTING(    0x80, "10p" )
+
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2")
@@ -592,7 +593,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( j_ndu )
 	PORT_INCLUDE( jpmsru_inputs )
-	
+
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2")
@@ -603,7 +604,7 @@ static INPUT_PORTS_START( j_ndu )
 
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Nudge Up")
-	
+
 	PORT_START("DIP0")
 	PORT_DIPNAME( 0x0f, 0x00, "Nudge chance" )
 	PORT_DIPSETTING (   0x0f, "1%" )
@@ -637,7 +638,7 @@ static INPUT_PORTS_START( j_ndu )
 	PORT_DIPSETTING (   0x50, "41%" )
 	PORT_DIPSETTING (   0x60, "43%" )
 	PORT_DIPSETTING (   0x70, "45%" )
-	
+
 	PORT_START("DIP1")
 	PORT_DIPNAME( 0x0f, 0x00, "Hold chance" )
 	PORT_DIPSETTING (   0x0f, "17%" )
@@ -661,7 +662,7 @@ static INPUT_PORTS_START( j_ndu )
 	PORT_DIPSETTING(    0x20, DEF_STR(On) )
 	PORT_DIPUNUSED( 0x40, 0x00 )
 	PORT_DIPUNUSED( 0x80, 0x00 )
-	
+
 	PORT_START("DIP2")
 	PORT_DIPUNUSED( 0x01, 0x00 )
 	PORT_DIPUNUSED( 0x02, 0x00 )
@@ -675,7 +676,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( j_dud )
 	PORT_INCLUDE( jpmsru_inputs )
-	
+
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2")
@@ -690,16 +691,16 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( j_dud2 )
 	PORT_INCLUDE( j_dud )
-	
+
 	PORT_MODIFY("IN0")
 	PORT_CONFNAME( 0x80, 0x80, "5p/10p jumper" )
-	PORT_CONFSETTING(	 0x00, "5p" )
-	PORT_CONFSETTING(	 0x80, "10p" )
+	PORT_CONFSETTING(    0x00, "5p" )
+	PORT_CONFSETTING(    0x80, "10p" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( j_lan )
 	PORT_INCLUDE( jpmsru_inputs )
-	
+
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2")
@@ -714,7 +715,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( j_lan2 )
 	PORT_INCLUDE( j_lan )
-	
+
 	PORT_MODIFY("IN0")
 	PORT_CONFNAME( 0x80, 0x80, "5p/10p jumper" )
 	PORT_CONFSETTING(	 0x00, "5p" )
@@ -725,7 +726,7 @@ void jpmsru_state::machine_start()
 {
 	m_lamp.resolve();
 	m_digits.resolve();
-	
+
 	save_item(NAME(m_reelbits[0]));
 	save_item(NAME(m_reelbits[1]));
 	save_item(NAME(m_reelbits[2]));
@@ -756,10 +757,10 @@ void jpmsru_state::jpmsru_3k(machine_config &config)
 	TMS9980A(config, m_maincpu, MAIN_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jpmsru_state::jpmsru_3k_map);
 	m_maincpu->set_addrmap(AS_IO, &jpmsru_state::jpmsru_io);
-	
+
 	TIMER(config, "int1").configure_periodic(FUNC(jpmsru_state::int1), attotime::from_hz(MAIN_CLOCK / 32768)); // 183.1 Hz reel timing
 	TIMER(config, "int2").configure_periodic(FUNC(jpmsru_state::int2), attotime::from_hz(100)); // 100 Hz from AC zero crossing detector
-	
+
 	REEL(config, m_reel[0], SRU_200STEP_REEL, 8, 10, 0, 7, 200*2);
 	m_reel[0]->optic_handler().set(FUNC(jpmsru_state::opto_cb<0>));
 	REEL(config, m_reel[1], SRU_200STEP_REEL, 8, 10, 0, 7, 200*2);
@@ -768,9 +769,9 @@ void jpmsru_state::jpmsru_3k(machine_config &config)
 	m_reel[2]->optic_handler().set(FUNC(jpmsru_state::opto_cb<2>));
 	REEL(config, m_reel[3], SRU_200STEP_REEL, 8, 10, 0, 7, 200*2);
 	m_reel[3]->optic_handler().set(FUNC(jpmsru_state::opto_cb<3>));
-	
+
 	config.set_default_layout(layout_jpmsru);
-	
+
 	SPEAKER(config, "mono").front_center();
 
 	NETLIST_SOUND(config, "nl_audio", 48000)
@@ -794,9 +795,9 @@ void jpmsru_state::jpmsru_3k(machine_config &config)
 void jpmsru_state::jpmsru_3k_busext(machine_config &config)
 {
 	jpmsru_3k(config);
-	
+
 	m_maincpu->set_addrmap(AS_IO, &jpmsru_state::jpmsru_busext_io);
-	
+
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
 
@@ -961,21 +962,21 @@ ROM_END
 
 #define GAME_FLAGS MACHINE_NOT_WORKING|MACHINE_MECHANICAL|MACHINE_REQUIRES_ARTWORK|MACHINE_IMPERFECT_SOUND|MACHINE_SUPPORTS_SAVE
 
-GAMEL( 1979?, j_ewn,     0,        ewn,  j_ewn,  jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Nudger (JPM) (SRU) (revision 20, 5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_ewn )
-GAMEL( 1981?, j_ewna,    j_ewn,    ewn2, j_ewn2, jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Nudger (JPM) (SRU) (revision 26A, £2 Jackpot)", GAME_FLAGS, layout_j_ewn )
-GAMEL( 1981?, j_ewnb,    j_ewn,    ewn2, j_ewn2, jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Nudger (JPM) (SRU) (£2 Jackpot)", GAME_FLAGS, layout_j_ewn )
-GAMEL( 1979?, j_ndu,     0,        ndu,  j_ndu,  jpmsru_state, init_jpmsru, ROT0, "JPM", "Nudge Double Up (JPM) (SRU) (revision 17, 5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_ndu )
-GAMEL( 1979?, j_ndua,    j_ndu,    ndu,  j_ndu,  jpmsru_state, init_jpmsru, ROT0, "JPM", "Nudge Double Up (JPM) (SRU) (revision 17, 5p Stake, £1 Jackpot, lower %)", GAME_FLAGS, layout_j_ndu )
-GAMEL( 1980?, j_dud,     0,        dud,  j_dud,  jpmsru_state, init_jpmsru, ROT0, "JPM", "Nudge Double Up Deluxe (JPM) (SRU) (revision 10, 5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_dud )
-GAMEL( 1981?, j_duda,    j_dud,    dud,  j_dud2, jpmsru_state, init_jpmsru, ROT0, "JPM", "Nudge Double Up Deluxe (JPM) (SRU) (£2 Jackpot)", GAME_FLAGS, layout_j_dud )
-GAMEL( 1981?, j_dt,      j_dud,    dud,  j_dud2, jpmsru_state, init_jpmsru, ROT0, "JPM", "Double Top (JPM) (SRU) (revision 13, £2 Jackpot)", GAME_FLAGS, layout_j_dud )
-GAMEL( 1980?, j_lan,     0,        lan,  j_lan,  jpmsru_state, init_jpmsru, ROT0, "JPM", "Lite A Nudge (JPM) (SRU) (revision 17F, 5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_lan )
-GAMEL( 1981?, j_lana,    j_lan,    lan,  j_lan2, jpmsru_state, init_jpmsru, ROT0, "JPM", "Lite A Nudge (JPM) (SRU) (£2 Jackpot)", GAME_FLAGS, layout_j_lan )
+GAMEL( 1979?, j_ewn,     0,        ewn,       j_ewn,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Nudger (JPM) (SRU) (revision 20, 5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_ewn )
+GAMEL( 1981?, j_ewna,    j_ewn,    ewn2,      j_ewn2,        jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Nudger (JPM) (SRU) (revision 26A, £2 Jackpot)", GAME_FLAGS, layout_j_ewn )
+GAMEL( 1981?, j_ewnb,    j_ewn,    ewn2,      j_ewn2,        jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Nudger (JPM) (SRU) (£2 Jackpot)", GAME_FLAGS, layout_j_ewn )
+GAMEL( 1979?, j_ndu,     0,        ndu,       j_ndu,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Nudge Double Up (JPM) (SRU) (revision 17, 5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_ndu )
+GAMEL( 1979?, j_ndua,    j_ndu,    ndu,       j_ndu,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Nudge Double Up (JPM) (SRU) (revision 17, 5p Stake, £1 Jackpot, lower %)", GAME_FLAGS, layout_j_ndu )
+GAMEL( 1980?, j_dud,     0,        dud,       j_dud,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Nudge Double Up Deluxe (JPM) (SRU) (revision 10, 5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_dud )
+GAMEL( 1981?, j_duda,    j_dud,    dud,       j_dud2,        jpmsru_state, init_jpmsru, ROT0, "JPM", "Nudge Double Up Deluxe (JPM) (SRU) (£2 Jackpot)", GAME_FLAGS, layout_j_dud )
+GAMEL( 1981?, j_dt,      j_dud,    dud,       j_dud2,        jpmsru_state, init_jpmsru, ROT0, "JPM", "Double Top (JPM) (SRU) (revision 13, £2 Jackpot)", GAME_FLAGS, layout_j_dud )
+GAMEL( 1980?, j_lan,     0,        lan,       j_lan,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Lite A Nudge (JPM) (SRU) (revision 17F, 5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_lan )
+GAMEL( 1981?, j_lana,    j_lan,    lan,       j_lan2,        jpmsru_state, init_jpmsru, ROT0, "JPM", "Lite A Nudge (JPM) (SRU) (£2 Jackpot)", GAME_FLAGS, layout_j_lan )
 // Unsorted
-GAMEL(198?,  j_ews,      0,        jpmsru_3k,        jpmsru_inputs, jpmsru_state, init_jpmsru, ROT0, "JPM","Each Way Shuffle (Barcrest?, set 1, revision 16)", MACHINE_IS_SKELETON_MECHANICAL, layout_jpmsru )
-GAMEL(198?,  j_ews8a,    j_ews,    jpmsru_3k,        jpmsru_inputs, jpmsru_state, init_jpmsru, ROT0, "JPM","Each Way Shuffle (Barcrest?, set 2, revision 8a)", MACHINE_IS_SKELETON_MECHANICAL, layout_jpmsru )
-GAMEL(198?,  j_luckac,   0,        jpmsru_3k,        jpmsru_inputs, jpmsru_state, init_jpmsru, ROT0, "JPM","Lucky Aces (Unk)",                                MACHINE_IS_SKELETON_MECHANICAL, layout_jpmsru )
-GAMEL(198?,  j_super2,   0,        jpmsru_3k,        jpmsru_inputs, jpmsru_state, init_jpmsru, ROT0, "JPM","Super 2 (JPM)",                                         MACHINE_IS_SKELETON_MECHANICAL, layout_jpmsru )
-GAMEL(198?,  j_luck2,    0,        jpmsru_4k,        jpmsru_inputs, jpmsru_state, init_jpmsru, ROT0, "JPM","Lucky 2's",                                     MACHINE_IS_SKELETON_MECHANICAL, layout_jpmsru )
-GAMEL(198?,  j_unk,      0,        jpmsru_4k,        jpmsru_inputs, jpmsru_state, init_jpmsru, ROT0, "JPM?","unknown SRU Game (JPM?)",                              MACHINE_IS_SKELETON_MECHANICAL, layout_jpmsru )
-GAMEL(198?,  j_plus2,    0,        jpmsru_4k,         jpmsru_inputs, jpmsru_state, init_jpmsru, ROT0, "JPM","Plus 2 (JPM)",                                          MACHINE_IS_SKELETON_MECHANICAL, layout_jpmsru )
+GAMEL( 198?,  j_ews,     0,        jpmsru_3k, jpmsru_inputs, jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Shuffle (Barcrest?, set 1, revision 16)", MACHINE_IS_SKELETON_MECHANICAL, layout_jpmsru )
+GAMEL( 198?,  j_ews8a,   j_ews,    jpmsru_3k, jpmsru_inputs, jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Shuffle (Barcrest?, set 2, revision 8a)", MACHINE_IS_SKELETON_MECHANICAL, layout_jpmsru )
+GAMEL( 198?,  j_luckac,  0,        jpmsru_3k, jpmsru_inputs, jpmsru_state, init_jpmsru, ROT0, "JPM", "Lucky Aces (Unk)", MACHINE_IS_SKELETON_MECHANICAL, layout_jpmsru )
+GAMEL( 198?,  j_super2,  0,        jpmsru_3k, jpmsru_inputs, jpmsru_state, init_jpmsru, ROT0, "JPM", "Super 2 (JPM)", MACHINE_IS_SKELETON_MECHANICAL, layout_jpmsru )
+GAMEL( 198?,  j_luck2,   0,        jpmsru_4k, jpmsru_inputs, jpmsru_state, init_jpmsru, ROT0, "JPM", "Lucky 2's", MACHINE_IS_SKELETON_MECHANICAL, layout_jpmsru )
+GAMEL( 198?,  j_unk,     0,        jpmsru_4k, jpmsru_inputs, jpmsru_state, init_jpmsru, ROT0, "JPM?","unknown SRU Game (JPM?)", MACHINE_IS_SKELETON_MECHANICAL, layout_jpmsru )
+GAMEL( 198?,  j_plus2,   0,        jpmsru_4k, jpmsru_inputs, jpmsru_state, init_jpmsru, ROT0, "JPM", "Plus 2 (JPM)", MACHINE_IS_SKELETON_MECHANICAL, layout_jpmsru )

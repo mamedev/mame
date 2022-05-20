@@ -50,7 +50,6 @@ private:
 	uint8_t flip_bits(uint8_t data);
 	uint8_t pia_pa_r();
 	void pia_pa_w(u8 data);
-	int pia_ca1_r();
 	void pia_ca2_w(int state);
 	uint8_t pia_pb_r();
 	void pia_pb_w(u8 data);
@@ -67,7 +66,6 @@ private:
 	u8 m_head_load;
 	u8 m_crc;
 	u8 m_last_crc;
-	u8 m_pia_ca1;
 	u8 m_pia_cb2;
 	u8 m_reset;
 	u8 m_enable_drive_write;

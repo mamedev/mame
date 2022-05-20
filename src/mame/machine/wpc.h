@@ -78,8 +78,6 @@
 class wpc_device : public device_t
 {
 public:
-	static constexpr device_timer_id TIMER_IRQ = 1;
-
 	wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	uint8_t read(offs_t offset);

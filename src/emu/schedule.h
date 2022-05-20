@@ -46,7 +46,6 @@ class emu_timer
 
 	// allocation and re-use
 	emu_timer &init(running_machine &machine, timer_expired_delegate callback, bool temporary);
-	emu_timer &init(device_t &device, device_timer_id id, bool temporary);
 	emu_timer &release();
 
 public:
@@ -88,8 +87,6 @@ private:
 	attotime            m_period;       // the repeat frequency of the timer
 	attotime            m_start;        // time when the timer was started
 	attotime            m_expire;       // time when the timer will expire
-	device_t *          m_device;       // for device timers, a pointer to the device
-	device_timer_id     m_id;           // for device timers, the ID of the timer
 };
 
 
@@ -123,10 +120,6 @@ public:
 	emu_timer *timer_alloc(timer_expired_delegate callback);
 	void timer_set(const attotime &duration, timer_expired_delegate callback, int param = 0);
 	void synchronize(timer_expired_delegate callback = timer_expired_delegate(), int param = 0) { timer_set(attotime::zero, callback, param); }
-
-	// timers, specified by device/id; generally devices should use the device_t methods instead
-	emu_timer *timer_alloc(device_t &device, device_timer_id id = 0);
-	void timer_set(const attotime &duration, device_t &device, device_timer_id id = 0, int param = 0);
 
 	// debugging
 	void dump_timers() const;

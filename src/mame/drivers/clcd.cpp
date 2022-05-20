@@ -91,8 +91,8 @@ public:
 
 	void clcd_palette(palette_device &palette) const
 	{
-		palette.set_pen_color(0, rgb_t(36,72,36));
-		palette.set_pen_color(1, rgb_t(2,4,2));
+		palette.set_pen_color(0, rgb_t(124, 149, 143));
+		palette.set_pen_color(1, rgb_t(54,64,65));
 	}
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -740,6 +740,9 @@ ROM_START( clcd )
 	ROM_LOAD( "sept-m-13apr.u104",  0x08000, 0x8000, CRC(41028c3c) SHA1(fcab6f0bbeef178eb8e5ecf82d9c348d8f318a8f))
 	ROM_LOAD( "sizapr.u103",        0x10000, 0x8000, CRC(0aa91d9f) SHA1(f0842f370607f95d0a0ec6afafb81bc063c32745))
 	ROM_LOAD( "kizapr.u102",        0x18000, 0x8000, CRC(59103d52) SHA1(e49c20b237a78b54c2cb26b133d5903bb60bd8ef))
+	// Patch RTC register table by swapping day & month values
+	ROM_FILL(0x1c216, 1, 0x09)
+	ROM_FILL(0x1c217, 1, 0x07)
 
 	ROM_REGION( 0x800, "lcd_char_rom", 0 )
 	ROM_LOAD( "lcd-char-rom.u16",   0x00000, 0x800, CRC(7b6d3867) SHA1(cb594801438849f933ddc3e64b03b56f42f59f09))

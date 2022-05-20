@@ -36,7 +36,6 @@ protected:
 
 private:
 	void pia_b_w(uint8_t data);
-	uint8_t pia_cb1_r();
 	DECLARE_WRITE_LINE_MEMBER(pia_irq_b);
 	TIMER_CALLBACK_MEMBER(mpt_timer_callback);
 	DECLARE_WRITE_LINE_MEMBER(pia_irqa_w);
@@ -83,7 +82,7 @@ void ss50_mpt_device::device_add_mconfig(machine_config &config)
 {
 	PIA6821(config, m_pia, 0);
 	m_pia->writepb_handler().set(FUNC(ss50_mpt_device::pia_b_w));
-	m_pia->readcb1_handler().set(FUNC(ss50_mpt_device::pia_cb1_r));
+	m_pia->cb1_w(0);
 	m_pia->irqa_handler().set(FUNC(ss50_mpt_device::pia_irqa_w));
 	m_pia->irqb_handler().set(FUNC(ss50_mpt_device::pia_irqb_w));
 }
@@ -169,11 +168,6 @@ void ss50_mpt_device::pia_b_w(uint8_t data)
 		m_mpt_duration = duration;
 	}
 	m_mpt_timer->enable(true);
-}
-
-uint8_t ss50_mpt_device::pia_cb1_r()
-{
-	return m_mpt_timer_state;
 }
 
 TIMER_CALLBACK_MEMBER(ss50_mpt_device::mpt_timer_callback)

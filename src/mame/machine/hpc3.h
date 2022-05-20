@@ -122,8 +122,6 @@ protected:
 	void enet_misc_w(u32 data);
 	bool enet_rx_bc_dec(unsigned const count = 1);
 
-	static const device_timer_id TIMER_PBUS_DMA = 0;
-
 	struct pbus_dma_t
 	{
 		bool m_active = false;

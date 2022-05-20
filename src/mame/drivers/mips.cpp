@@ -229,6 +229,7 @@
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/rs232/rs232.h"
+#include "bus/rs232/hlemouse.h"
 
 // video and audio
 #include "screen.h"
@@ -737,6 +738,13 @@ static void mips_scsi_devices(device_slot_interface &device)
 	device.option_add("cdrom", NSCSI_CDROM);
 }
 
+static void mips_rs232_devices(device_slot_interface &device)
+{
+	default_rs232_devices(device);
+
+	device.option_add("mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
+}
+
 void rx2030_state::rx2030(machine_config &config)
 {
 	R2000A(config, m_cpu, 33.333_MHz_XTAL / 2, 32768, 32768);
@@ -787,7 +795,7 @@ void rx2030_state::rx2030(machine_config &config)
 	m_scc->out_int_callback().set_inputline(m_iop, INPUT_LINE_IRQ3);
 
 	// scc channel A (tty0)
-	RS232_PORT(config, m_tty[0], default_rs232_devices, nullptr);
+	RS232_PORT(config, m_tty[0], mips_rs232_devices, nullptr);
 	m_tty[0]->cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
 	m_tty[0]->dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
 	m_tty[0]->rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
@@ -795,7 +803,7 @@ void rx2030_state::rx2030(machine_config &config)
 	m_scc->out_txda_callback().set(m_tty[0], FUNC(rs232_port_device::write_txd));
 
 	// scc channel B (tty1)
-	RS232_PORT(config, m_tty[1], default_rs232_devices, nullptr);
+	RS232_PORT(config, m_tty[1], mips_rs232_devices, nullptr);
 	m_tty[1]->cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
 	m_tty[1]->dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
 	m_tty[1]->rxd_handler().set(m_scc, FUNC(z80scc_device::rxb_w));
@@ -856,6 +864,7 @@ void rx2030_state::rs2030(machine_config &config)
 	m_cpu->set_addrmap(AS_PROGRAM, &rx2030_state::rs2030_map);
 
 	m_kbd->set_default_option(STR_KBD_MICROSOFT_NATURAL);
+	m_tty[0]->set_default_option("mouse");
 
 	// video hardware (1280x1024x8bpp @ 60Hz), 40 parts vram
 	u32 const pixclock = 108'189'000;

@@ -62,9 +62,6 @@ private:
 	required_region_ptr<uint8_t> m_data;
 	devcb_write8 m_dac_cb;
 
-	static const device_timer_id TIMER_MAIN = 1;
-	static const device_timer_id TIMER_DAC = 2;
-
 	void rom_address_w(offs_t offset, uint8_t data);
 	uint8_t rom_decrypt_r();
 	void rom_op_w(uint8_t data);

@@ -343,8 +343,8 @@ void netlist_mame_device::register_memregion_source(netlist::nlparse_t &parser, 
 
 void netlist_mame_analog_input_device::write(const double val)
 {
-	m_value_for_device_timer = val * m_mult + m_offset;
-	if (m_value_for_device_timer != (*m_param)())
+	m_value_to_sync = val * m_mult + m_offset;
+	if (m_value_to_sync != (*m_param)())
 	{
 		m_sync_timer->adjust(attotime::zero);
 	}
@@ -353,8 +353,8 @@ void netlist_mame_analog_input_device::write(const double val)
 TIMER_CALLBACK_MEMBER(netlist_mame_analog_input_device::sync_callback)
 {
 	update_to_current_time();
-	nl_owner().log_csv().log_add(m_param_name, m_value_for_device_timer, true);
-	m_param->set(m_value_for_device_timer);
+	nl_owner().log_csv().log_add(m_param_name, m_value_to_sync, true);
+	m_param->set(m_value_to_sync);
 }
 
 void netlist_mame_int_input_device::write(const uint32_t val)
@@ -432,7 +432,7 @@ netlist_mame_analog_input_device::netlist_mame_analog_input_device(const machine
 	, m_param(nullptr)
 	, m_auto_port(true)
 	, m_param_name(param_name)
-	, m_value_for_device_timer(0)
+	, m_value_to_sync(0)
 {
 }
 
@@ -442,7 +442,7 @@ netlist_mame_analog_input_device::netlist_mame_analog_input_device(const machine
 	, m_param(nullptr)
 	, m_auto_port(true)
 	, m_param_name("")
-	, m_value_for_device_timer(0)
+	, m_value_to_sync(0)
 {
 }
 

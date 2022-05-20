@@ -414,7 +414,7 @@ private:
 	netlist::param_num_t<netlist::nl_fptype> *m_param;
 	bool   m_auto_port;
 	const char *m_param_name;
-	double m_value_for_device_timer;
+	double m_value_to_sync;
 	emu_timer *m_sync_timer;
 };
 

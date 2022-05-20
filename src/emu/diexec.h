@@ -216,7 +216,7 @@ protected:
 	virtual void interface_post_start() override;
 	virtual void interface_pre_reset() override;
 	virtual void interface_post_reset() override;
-	virtual void interface_clock_changed() override;
+	virtual void interface_clock_changed(bool sync_on_new_clock_domain) override;
 
 	// for use by devcpu for now...
 	int current_input_state(unsigned i) const { return m_input[i].m_curstate; }

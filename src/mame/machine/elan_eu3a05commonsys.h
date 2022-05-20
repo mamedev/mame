@@ -64,7 +64,6 @@ private:
 	uint8_t radica_5009_unk_r() { return machine().rand(); }
 
 	emu_timer *m_unk_timer = nullptr;
-	static const device_timer_id TIMER_UNK = 0;
 	int m_whichtimer;
 
 };

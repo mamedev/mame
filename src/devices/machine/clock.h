@@ -32,9 +32,6 @@ protected:
 	TIMER_CALLBACK_MEMBER(clock_tick);
 
 private:
-	static constexpr device_timer_id TID_CLOCK_INIT = 0;
-	static constexpr device_timer_id TID_CLOCK_TICK = 1;
-
 	void reinit();
 	void output();
 

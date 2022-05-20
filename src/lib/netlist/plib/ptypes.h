@@ -105,6 +105,12 @@ namespace plib
 		IA64
 	};
 
+	enum class ci_env
+	{
+		DEFAULT,
+		MSVC
+	};
+
 	struct compile_info
 	{
 	#ifdef _WIN32
@@ -134,15 +140,15 @@ namespace plib
 	#if (NVCCBUILD > 0)
 		using type = std::integral_constant<ci_compiler, ci_compiler::NVCC>;
 		using version = std::integral_constant<int, NVCCBUILD>;
-	#elif defined(_MSC_VER)
-		using type = std::integral_constant<ci_compiler, ci_compiler::MSC>;
-		using version = std::integral_constant<int, _MSC_VER>;
 	#elif defined(__clang__)
 		using type = std::integral_constant<ci_compiler, ci_compiler::CLANG>;
 		using version = std::integral_constant<int, (__clang_major__) * 100 + (__clang_minor__)>;
 	#elif defined(__GNUC__)
 		using type = std::integral_constant<ci_compiler, ci_compiler::GCC>;
 		using version = std::integral_constant<int, (__GNUC__) * 100 + (__GNUC_MINOR__)>;
+	#elif defined(_MSC_VER)
+		using type = std::integral_constant<ci_compiler, ci_compiler::MSC>;
+		using version = std::integral_constant<int, _MSC_VER>;
 	#else
 		using type = std::integral_constant<ci_compiler, ci_compiler::UNKNOWN>;
 		using version = std::integral_constant<int, 0>;
@@ -192,6 +198,16 @@ namespace plib
 		using clang_apple_noexcept_issue = std::integral_constant<bool, version::value < 1100>;
 	#else
 		using clang_apple_noexcept_issue = std::integral_constant<bool, false>;
+	#endif
+	#if defined(__ia64__)
+		using abi_vtable_function_descriptors = std::integral_constant<bool, true>;
+	#else
+		using abi_vtable_function_descriptors = std::integral_constant<bool, false>;
+	#endif
+	#if defined(_MSC_VER)
+		using env = std::integral_constant<ci_env, ci_env::MSVC>;
+	#else
+		using env = std::integral_constant<ci_env, ci_env::DEFAULT>;
 	#endif
 	};
 

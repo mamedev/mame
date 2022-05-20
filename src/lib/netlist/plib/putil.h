@@ -146,10 +146,10 @@ namespace plib
 	// simple hash
 	// ----------------------------------------------------------------------------------------
 
-	template <typename T>
-	std::size_t hash(const T *buf, std::size_t size)
+	template <typename V, typename T>
+	V hash(const T *buf, std::size_t size)
 	{
-		std::size_t result = 5381; // NOLINT
+		V result = 5381; // NOLINT
 		for (const T* p = buf; p != buf + size; p++)
 			result = ((result << 5) + result ) ^ (result >> (32 - 5)) ^ narrow_cast<std::size_t>(*p); // NOLINT
 		return result;

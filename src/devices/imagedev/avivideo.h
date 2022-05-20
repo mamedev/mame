@@ -51,8 +51,6 @@ protected:
 	TIMER_CALLBACK_MEMBER(frame_timer);
 
 private:
-	static constexpr device_timer_id TIMER_FRAME = 0;
-
 	bitmap_argb32 *m_frame;
 	avi_file::ptr m_avi;
 

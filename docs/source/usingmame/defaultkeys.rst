@@ -35,8 +35,8 @@ and saving/loading save states.
 
     If you are running with -debug, this key sends a ‘break’ in emulation.
 
-    When the on-screen display is visible, you can use the following
-    keys to control it:
+    When a slider control is visible, you can use the following keys to control
+    it:
 
     * **Up** - select previous parameter to modify.
     * **Down** - select next parameter to modify.
@@ -115,8 +115,10 @@ and saving/loading save states.
     * **Home**/**End** - move to top/bottom of list.
     * **Left**/**Right** - change color displayed.
     * **R** - rotate tiles 90 degrees clockwise.
-    * **-**/**+** - increase/decrease the number of tiles per row.
-    * **0** - restore the default number of tiles per row.
+    * **-**/**+** - increase/decrease the number of tiles per row (hold Shift to
+      restrict to integer scale factors).
+    * **0** - restore the default number of tiles per row (hold Shift to
+      restrict to integer scale factors).
     * **Enter** - switch to tilemap viewer.
 
     Tilemap mode:

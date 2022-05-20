@@ -49,7 +49,6 @@ private:
 	required_device<legacy_floppy_image_device> m_disk;
 	required_device<rp2c33_sound_device> m_sound;
 
-	static const device_timer_id TIMER_IRQ = 0;
 	emu_timer *irq_timer;
 
 	void load_disk(device_image_interface &image);

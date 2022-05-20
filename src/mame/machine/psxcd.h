@@ -157,7 +157,7 @@ private:
 	bool open = false;
 	bool m_mute = false;
 	bool m_dmaload = false;
-	device_timer_id next_read_event{};
+	int next_read_event{};
 	int64_t next_sector_t = 0;
 	uint32_t autopause_sector = 0;
 	uint32_t start_read_delay = 0;

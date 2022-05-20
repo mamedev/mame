@@ -24068,7 +24068,8 @@ dyndeka2b                       // 1998.05 Dynamite Deka 2 (Japan)
 fvipers                         // 1995.11 Fighting Vipers (Revision D)
 fvipersb                        // 1995.11 Fighting Vipers (Revision B)
 gunblade                        // 1996.04 Gunblade N.Y. (Revision A)
-hotd                            // 1997.03 The House of the Dead
+hotd                            // 1997.0? The House of the Dead (Revision A)
+hotdo                           // 1997.03 The House of the Dead
 hotdp                           // 1997.01 The House of the Dead (prototype)
 indy500                         // 1995.07 Indy 500 (Revision A, Newer)
 indy500d                        // 1995.07 Indy 500 Deluxe (Revision A)
@@ -34260,6 +34261,7 @@ sx16                            // Sanyo SX-16
 zdsupers                        // Zenith SuperSport
 zdz150                          // Zenith Z-150 series
 zdz160                          // Zenith Z-160 series
+zdz180                          // Zenith Z-180 series
 ledgmodd                        // Leading Edge Model D
 ledgmodm                        // Leading Edge Model M
 eaglepc2                        // Eagle PC-2
