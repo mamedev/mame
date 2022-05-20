@@ -507,7 +507,7 @@ void geneve_xt_101_hle_keyboard_device::send_key()
 	if (m_clock_line == CLEAR_LINE)
 	{
 		m_reset_timer--;
-		if (!m_reset_timer == 0)
+		if (m_reset_timer == 0)
 		{
 			LOG("Reset triggered\n");
 			reset_line(0);
