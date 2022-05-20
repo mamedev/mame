@@ -1,43 +1,14 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, smf
 /*
 
-XL 80 cartridge
-(c) 1984 Data 20 Corporation
-
-PCB Layout
-----------
-
-        |==================================|
-        |   LS175    LS20    LS139         |
-        |   LS157                          |
-|=======|                                  |
-|=|                          RAM           |
-|=|    LS157      LS157             LS165  |
-|=|                                        |
-|=|                                     CN1|
-|=|          CRTC            ROM1          |
-|=|                                        |
-|=|    ROM0          LS245   LS151         |
-|=|                             14.31818MHz|
-|=======|            LS174   LS00          |
-        |                           HCU04  |
-        |    LS74    LS161   LS74          |
-        |==================================|
-
-Notes:
-    All IC's shown.
-
-    CRTC    - Hitachi HD46505SP
-    RAM     - Toshiba TMM2016AP-12 2Kx8 Static RAM
-    ROM0    - GI 9433CS-0090 8Kx8 ROM
-    ROM1    - GI 9316CS-F67 2Kx8 ROM "DTC"
-    CN1     - RCA video output
+Z80 Video Pak
+(c) 1983 Data 20 Corporation
 
 */
 
 #include "emu.h"
-#include "xl80.h"
+#include "z80videopak.h"
 #include "screen.h"
 
 
@@ -57,16 +28,16 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(C64_XL80, c64_xl80_device, "c64_xl80", "C64 XL 80 cartridge")
+DEFINE_DEVICE_TYPE(C64_Z80VIDEOPAK, c64_z80videopak_device, "c64_z80videopak", "Data20 Z80 Video Pak")
 
 
 //-------------------------------------------------
-//  ROM( c64_xl80 )
+//  ROM( c64_z80videopak )
 //-------------------------------------------------
 
-ROM_START( c64_xl80 )
+ROM_START( c64_z80videopak )
 	ROM_REGION( 0x800, HD46505SP_TAG, 0 )
-	ROM_LOAD( "dtc.u14", 0x000, 0x800, CRC(9edf5e58) SHA1(4b244e6d94a7653a2e52c351589f0b469119fb04) )
+	ROM_LOAD( "c68297 vid pak cg.u18", 0x000, 0x800, CRC(9edf5e58) SHA1(4b244e6d94a7653a2e52c351589f0b469119fb04) )
 ROM_END
 
 
@@ -74,16 +45,16 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const tiny_rom_entry *c64_xl80_device::device_rom_region() const
+const tiny_rom_entry *c64_z80videopak_device::device_rom_region() const
 {
-	return ROM_NAME( c64_xl80 );
+	return ROM_NAME( c64_z80videopak );
 }
 
 //-------------------------------------------------
 //  mc6845
 //-------------------------------------------------
 
-MC6845_UPDATE_ROW( c64_xl80_device::crtc_update_row )
+MC6845_UPDATE_ROW( c64_z80videopak_device::crtc_update_row )
 {
 	pen_t const *const pen = m_palette->pens();
 
@@ -111,10 +82,10 @@ MC6845_UPDATE_ROW( c64_xl80_device::crtc_update_row )
 }
 
 //-------------------------------------------------
-//  GFXDECODE( c64_xl80 )
+//  GFXDECODE( c64_videopak )
 //-------------------------------------------------
 
-static GFXDECODE_START( gfx_c64_xl80 )
+static GFXDECODE_START( gfx_c64_z80videopak )
 	GFXDECODE_ENTRY(HD46505SP_TAG, 0x0000, gfx_8x8x1, 0, 1)
 GFXDECODE_END
 
@@ -123,22 +94,24 @@ GFXDECODE_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void c64_xl80_device::device_add_mconfig(machine_config &config)
+void c64_z80videopak_device::device_add_mconfig(machine_config &config)
 {
+	c64_cpm_cartridge_device::device_add_mconfig(config);
+
 	screen_device &screen(SCREEN(config, MC6845_SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::white()));
 	screen.set_screen_update(HD46505SP_TAG, FUNC(hd6845s_device::screen_update));
 	screen.set_size(80*8, 24*8);
 	screen.set_visarea(0, 80*8-1, 0, 24*8-1);
 	screen.set_refresh_hz(50);
 
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_c64_xl80);
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_c64_z80videopak);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	HD6845S(config, m_crtc, XTAL(14'318'181) / 8);
 	m_crtc->set_screen(MC6845_SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(c64_xl80_device::crtc_update_row));
+	m_crtc->set_update_row_callback(FUNC(c64_z80videopak_device::crtc_update_row));
 }
 
 
@@ -148,17 +121,15 @@ void c64_xl80_device::device_add_mconfig(machine_config &config)
 //**************************************************************************
 
 //-------------------------------------------------
-//  c64_xl80_device - constructor
+//  c64_z80videopak_device - constructor
 //-------------------------------------------------
 
-c64_xl80_device::c64_xl80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_XL80, tag, owner, clock),
-	device_c64_expansion_card_interface(mconfig, *this),
+c64_z80videopak_device::c64_z80videopak_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+	c64_cpm_cartridge_device(mconfig, C64_Z80VIDEOPAK, tag, owner, clock),
 	m_crtc(*this, HD46505SP_TAG),
 	m_palette(*this, "palette"),
 	m_char_rom(*this, HD46505SP_TAG),
-	m_ram(*this, "ram", RAM_SIZE, ENDIANNESS_LITTLE),
-	m_case(0)
+	m_ram(*this, "ram", RAM_SIZE, ENDIANNESS_LITTLE)
 {
 }
 
@@ -167,10 +138,12 @@ c64_xl80_device::c64_xl80_device(const machine_config &mconfig, const char *tag,
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void c64_xl80_device::device_start()
+void c64_z80videopak_device::device_start()
 {
 	// state saving
 	save_item(NAME(m_case));
+
+	c64_cpm_cartridge_device::device_start();
 }
 
 
@@ -178,8 +151,12 @@ void c64_xl80_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void c64_xl80_device::device_reset()
+void c64_z80videopak_device::device_reset()
 {
+	m_case = 0;
+	m_exrom = 0;
+
+	c64_cpm_cartridge_device::device_reset();
 }
 
 
@@ -187,14 +164,14 @@ void c64_xl80_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t c64_xl80_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_z80videopak_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!roml)
 	{
-		if (BIT(offset, 12))
+		if (BIT(offset, 11))
 			data = m_ram[offset & 0x7ff];
 		else
-			data = m_roml[offset & 0xfff];
+			data = m_roml[offset & 0x7ff];
 	}
 	else if (!io2 && !BIT(offset, 1))
 	{
@@ -210,9 +187,12 @@ uint8_t c64_xl80_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_xl80_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_z80videopak_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
-	if (offset >= 0x9800 && offset < 0xa000)
+	c64_cpm_cartridge_device::c64_cd_w(offset, data, sphi2, ba, roml, romh, io1, io2);
+
+	if ((!m_exrom && offset >= 0x9800 && offset < 0xa000) ||
+		(m_exrom && offset >= 0xf800 && offset < 0x10000))
 	{
 		m_ram[offset & 0x7ff] = data;
 	}
@@ -226,6 +206,8 @@ void c64_xl80_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, i
 	else if (!io2)
 	{
 		m_case = BIT(data, 0);
+		// BIT(data, 1); // unknown
 		// BIT(data, 2); // unknown
+		m_exrom = BIT(data, 4);
 	}
 }
