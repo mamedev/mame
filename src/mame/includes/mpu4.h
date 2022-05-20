@@ -171,7 +171,6 @@ public:
 	void init_m4_showstring_big();
 	void init_connect4();
 	void init_m4altreels();//legacy, will be removed once things are sorted out
-	void init_m_grtecp();//legacy, will be removed once things are sorted out RE: CHR
 	void init_m4tenten();
 	void init_m4actbnk();
 	void init_m4actclb();
@@ -192,6 +191,7 @@ public:
 	void mod2_cheatchr_shuffle(machine_config &config);
 	
 	void mod2_alt(machine_config &config);
+	void mod2_alt_cheatchr(machine_config &config);
 	void mod2_alt_cheatchr_shuffle(machine_config &config);
 
 	void mod4oki(machine_config &config);
@@ -229,6 +229,7 @@ public:
 	void mod4oki_crmaze(machine_config &config);
 
 	void mod4oki_alt(machine_config &config);
+	void mod4oki_alt_cheatchr(machine_config &config);
 	void mod4oki_alt_cheatchr_alf(machine_config &config);
 	void mod4oki_alt_cheatchr_clbveg(machine_config &config);
 	void mod4oki_alt_cheatchr_m470(machine_config &config);

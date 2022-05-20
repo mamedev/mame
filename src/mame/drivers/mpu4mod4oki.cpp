@@ -1041,7 +1041,6 @@ void mpu4_state::init_m4andyge()
 	init_m4_hopper_tubes();
 	init_m4_small_extender();
 	init_m4_five_reel_std();
-	init_m_grtecp();
 
 	//PCKEY =1
 	//STKEY =3

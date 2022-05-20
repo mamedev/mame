@@ -56,7 +56,8 @@ public:
 
 	// m4supst__bi etc.
 	static constexpr uint8_t m4lv_lamp_scramble[9] = { 0x00, 0x18, 0x10, 0x08 ,0x00, 0x08, 0x00, 0x00 };
-
+	                                              //     03    EB    63    CB    C3    6B    63    43    in sunsetb (complete table?)
+    
 	// games with sequence starting 00 24 24 2C E0 B4 B8 4C E8 D8 (m4eaw__a9 etc.)
 	static constexpr uint8_t m683_lamp_scramble[8] = { 0x03, 0xAF, 0x27, 0x8F, 0x0F, 0xA7, 0x27, 0x07 };
 

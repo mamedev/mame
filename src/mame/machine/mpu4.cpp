@@ -2166,10 +2166,6 @@ void mpu4_state::init_m4gambal()
 	// TODOxx:  m_current_chr_table = gmball_data;
 }
 
-void mpu4_state::init_m_grtecp()
-{
-	// TODOxx:  m_current_chr_table = grtecp_data;
-}
 
 void mpu4_state::init_m_blsbys()
 {
@@ -2834,6 +2830,14 @@ void mpu4_state::mod2_alt(machine_config &config)
 	mpu4_type2_6reel(config);
 }
 
+void mpu4_state::mod2_alt_cheatchr(machine_config &config)
+{
+	mod2_alt(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+}
+
 void mpu4_state::mod2_alt_cheatchr_shuffle(machine_config &config)
 {
 	mod2_alt(config);
@@ -2943,6 +2947,15 @@ void mpu4_state::mod4oki_alt(machine_config &config)
 	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
+
+void mpu4_state::mod4oki_alt_cheatchr(machine_config &config)
+{
+	mod4oki_alt(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+}
+
 
 void mpu4_state::mod4oki_alt_cheatchr_alf(machine_config &config)
 {
