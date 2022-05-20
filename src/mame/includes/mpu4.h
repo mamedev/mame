@@ -244,6 +244,7 @@ public:
 	void mod4yam_cheatchr_m683(machine_config &config);
 	void mod4yam_cheatchr_m407(machine_config &config);
 	void mod4yam_cheatchr_shuffle(machine_config &config);
+	void mod4yam_cheatchr_vivlv(machine_config &config);
 
 	void mod4yam_chr(machine_config &config);
 

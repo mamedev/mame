@@ -233,15 +233,12 @@ public:
 
 	void mpu4_vid(machine_config &config);
 	void mpu4_vid_strike(machine_config &config);
+	void mpu4_vid_cheatchr(machine_config &config);
 
 	void bwbvid(machine_config &config);
 
 	void crmaze_base(machine_config &config);
 	void crmaze(machine_config &config);
-	void crmazea(machine_config &config);
-	void crmaze2(machine_config &config);
-	void crmaze3(machine_config &config);
-	void crmaze3a(machine_config &config);
 
 	void bwbvid_oki(machine_config &config);
 	void bwbvid_oki_bt471(machine_config &config);
@@ -2175,6 +2172,14 @@ void mpu4vid_state::mpu4_vid(machine_config &config)
 	m_acia_1->irq_handler().set(FUNC(mpu4vid_state::m68k_acia_irq));
 }
 
+void mpu4vid_state::mpu4_vid_cheatchr(machine_config &config)
+{
+	mpu4_vid(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("video");
+	m_characteriser->set_allow_68k_cheat(true);
+}
+
 void mpu4vid_state::mpu4_vid_strike(machine_config& config)
 {
 	mpu4_vid(config);
@@ -2193,74 +2198,13 @@ void mpu4vid_state::crmaze_base(machine_config &config)
 	m_pia5->writepb_handler().set_nop();
 }
 
-static uint8_t crmaze_data[64] = {
-	0x00, 0x34, 0x14, 0x0C, 0x54, 0x04, 0x24, 0x34,	0x94, 0x94, 0x0C, 0x5C, 0x6C, 0x44, 0x24, 0x24,
-	0x3C, 0x6C, 0xCC, 0x4C, 0xC4, 0xA4, 0x24, 0x24,	0x34, 0x84, 0xB4, 0x1C, 0x64, 0x24, 0x34, 0x04,
-	0x24, 0x34, 0x8C, 0xC4, 0xB4, 0x1C, 0xE4, 0x24,	0x34, 0x14, 0x10, 0x84, 0x24, 0x34, 0x04, 0x24,
-	0xB4, 0x04, 0x24, 0x3C, 0x74, 0x94, 0x0C, 0xC4,	0xA4, 0x24, 0x24, 0x34, 0x04, 0x34, 0x94, 0x00
-};
-
 void mpu4vid_state::crmaze(machine_config& config)
 {
 	crmaze_base(config);
 	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-	m_characteriser->set_character_table(crmaze_data);
-}
+	m_characteriser->set_cpu_tag("video");
+	m_characteriser->set_allow_68k_cheat(true);
 
-static uint8_t crmazea_data[64] = {
-	0x00, 0x0C, 0x90, 0xE0, 0xA4, 0xAC, 0x78, 0x5C,	0xDC, 0xD4, 0xA0, 0xEC, 0x78, 0x54, 0x48, 0x50,
-	0xC8, 0xF8, 0xDC, 0x94, 0xE0, 0x24, 0x0C, 0xD8,	0x5C, 0xD4, 0x68, 0x18, 0x14, 0xC8, 0x38, 0x5C,
-	0xDC, 0x5C, 0xDC, 0xD4, 0x68, 0x18, 0xD4, 0x60,	0x0C, 0x90, 0xE8, 0xF8, 0xD4, 0x60, 0x44, 0x4C,
-	0xD8, 0xD4, 0xE8, 0xF8, 0x9C, 0xD4, 0xE8, 0x30,	0x48, 0xD8, 0xDC, 0x94, 0xE8, 0x38, 0xDC, 0x00
-};
-
-void mpu4vid_state::crmazea(machine_config& config)
-{
-	crmaze_base(config);
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-	m_characteriser->set_character_table(crmazea_data);
-}
-
-static uint8_t crmaze2_data[64] = {
-	0x00, 0x88, 0x54, 0x40, 0x88, 0x54, 0x40, 0x88,	0x74, 0x28, 0x30, 0x60, 0x80, 0x84, 0xC4, 0xA4,
-	0xC4, 0x8C, 0x74, 0x08, 0x30, 0x00, 0x80, 0x84,	0xC4, 0x84, 0xAC, 0x5C, 0x90, 0x44, 0x88, 0x74,
-	0x00, 0x80, 0xC4, 0x84, 0xAC, 0x5C, 0xB0, 0x24,	0x88, 0x54, 0x08, 0x30, 0x00, 0x88, 0x34, 0x08,
-	0x70, 0x00, 0x80, 0xC4, 0x84, 0xAC, 0x34, 0x00,	0xA0, 0x84, 0x84, 0x8C, 0x34, 0x00, 0xA8, 0x00
-};
-
-void mpu4vid_state::crmaze2(machine_config& config)
-{
-	crmaze_base(config);
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-	m_characteriser->set_character_table(crmaze2_data);
-}
-
-static uint8_t crmaze3_data[64] = {
-	0x00, 0x84, 0x94, 0x3C, 0xEC, 0x5C, 0xEC, 0x50,	0x2C, 0x68, 0x60, 0xAC, 0x74, 0x00, 0xAC, 0x58,
-	0xEC, 0x7C, 0xEC, 0x58, 0xE0, 0x90, 0x18, 0xEC,	0x54, 0x28, 0x68, 0x44, 0x84, 0xB4, 0x10, 0x20,
-	0x84, 0xBC, 0xE8, 0x70, 0x24, 0x84, 0xB8, 0xE0,	0x94, 0x14, 0x2C, 0x64, 0x8C, 0x50, 0x28, 0x4C,
-	0x6C, 0x60, 0xA0, 0xBC, 0xCC, 0x78, 0xE8, 0x50,	0x20, 0xAC, 0x74, 0x04, 0xA4, 0x94, 0x3C, 0x00
-};
-
-void mpu4vid_state::crmaze3(machine_config& config)
-{
-	crmaze_base(config);
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-	m_characteriser->set_character_table(crmaze3_data);
-}
-
-static uint8_t crmaze3a_data[64] = {
-	0x00, 0x0C, 0x60, 0x84, 0x34, 0x08, 0xC0, 0x14,	0xA8, 0xF0, 0x10, 0xA0, 0x1C, 0xE4, 0x1C, 0xE4,
-	0x34, 0xA8, 0xF8, 0x64, 0x8C, 0xF0, 0x30, 0x08,	0xE8, 0xF8, 0xE4, 0x3C, 0x44, 0x8C, 0x58, 0xC4,
-	0x3C, 0x6C, 0x68, 0xC0, 0x9C, 0x64, 0x04, 0x0C,	0x48, 0x60, 0xAC, 0xF8, 0xE4, 0x14, 0xA8, 0x78,
-	0xEC, 0xD0, 0xB0, 0xB0, 0x38, 0xE4, 0x9C, 0xE4,	0xBC, 0xE4, 0x1C, 0x64, 0x8C, 0x58, 0xEC, 0x00
-};
-
-void mpu4vid_state::crmaze3a(machine_config& config)
-{
-	crmaze_base(config);
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-	m_characteriser->set_character_table(crmaze3a_data);
 }
 
 void mpu4vid_state::vid_oki(machine_config &config)
@@ -8853,21 +8797,21 @@ GAMEL( 1993, v4cmazeb,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_crm
 GAMEL( 1993, v4cmazec,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_crmaze,  ROT0, "Barcrest","The Crystal Maze (v1.3 alt) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9
 GAMEL( 1993, v4cmazed,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_crmaze,  ROT0, "Barcrest","The Crystal Maze (v1.1) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze2p )//SWP 0.6
 
-GAMEL( 1993, v4cmaze_amld,   v4cmaze,  crmazea,     crmaze,   mpu4vid_state, init_crmaze,   ROT0, "Barcrest","The Crystal Maze (v0.1, AMLD) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze2p )//SWP 0.9 (actually newer than the 1.1 set then??)
+GAMEL( 1993, v4cmaze_amld,   v4cmaze,  crmaze,     crmaze,   mpu4vid_state, init_crmaze,   ROT0, "Barcrest","The Crystal Maze (v0.1, AMLD) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze2p )//SWP 0.9 (actually newer than the 1.1 set then??)
 
-GAMEL( 1993, v4cmaze2,   v4bios,   crmaze2,     crmaze,   mpu4vid_state, init_crmaze,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.2) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 1.0
-GAMEL( 1993, v4cmaze2d,  v4cmaze2, crmaze2,     crmaze,   mpu4vid_state, init_crmaze,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.2, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0D
-GAMEL( 1993, v4cmaze2b,  v4cmaze2, crmaze2,     crmaze,   mpu4vid_state, init_crmaze,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.0) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 1.0
-GAMEL( 1993, v4cmaze2c,  v4cmaze2, crmaze2,     crmaze,   mpu4vid_state, init_crmaze,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v?.?) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )// bad rom?
+GAMEL( 1993, v4cmaze2,   v4bios,   crmaze,     crmaze,   mpu4vid_state, init_crmaze,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.2) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 1.0
+GAMEL( 1993, v4cmaze2d,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.2, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0D
+GAMEL( 1993, v4cmaze2b,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.0) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 1.0
+GAMEL( 1993, v4cmaze2c,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v?.?) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )// bad rom?
 
-GAMEL( 1993, v4cmaze2_amld,  v4cmaze2, crmaze_base,     crmaze,   mpu4vid_state, init_crmaze,  ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v0.1, AMLD) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 1.0 /* unprotected? proto? */
+GAMEL( 1993, v4cmaze2_amld,  v4cmaze2, crmaze,     crmaze,   mpu4vid_state, init_crmaze,  ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v0.1, AMLD) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 1.0 /* unprotected? proto? */
 
-GAMEL( 1994, v4cmaze3,   v4bios,   crmaze3,    crmaze,   mpu4vid_state, init_crmaze_flutter,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.9) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 0.7
-GAMEL( 1994, v4cmaze3d,  v4cmaze3, crmaze3,    crmaze,   mpu4vid_state, init_crmaze_flutter,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.9, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7D
-GAMEL( 1994, v4cmaze3b,  v4cmaze3, crmaze3,    crmaze,   mpu4vid_state, init_crmaze_flutter,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.8) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 0.7
-GAMEL( 1994, v4cmaze3c,  v4cmaze3, crmaze3,    crmaze,   mpu4vid_state, init_crmaze_flutter,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.6) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )// missing one program rom
+GAMEL( 1994, v4cmaze3,   v4bios,   crmaze,    crmaze,   mpu4vid_state, init_crmaze_flutter,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.9) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 0.7
+GAMEL( 1994, v4cmaze3d,  v4cmaze3, crmaze,    crmaze,   mpu4vid_state, init_crmaze_flutter,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.9, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7D
+GAMEL( 1994, v4cmaze3b,  v4cmaze3, crmaze,    crmaze,   mpu4vid_state, init_crmaze_flutter,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.8) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 0.7
+GAMEL( 1994, v4cmaze3c,  v4cmaze3, crmaze,    crmaze,   mpu4vid_state, init_crmaze_flutter,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.6) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )// missing one program rom
 
-GAMEL( 1994, v4cmaze3_amld,  v4cmaze3, crmaze3a,     crmaze,   mpu4vid_state, init_crmaze_flutter,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v1.2, AMLD) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 0.7
+GAMEL( 1994, v4cmaze3_amld,  v4cmaze3, crmaze,     crmaze,   mpu4vid_state, init_crmaze_flutter,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v1.2, AMLD) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 0.7
 
 //Year is a guess, based on the use of the 'Coin Man' logo
 GAME(  1996?,v4mate,     v4bios,   mating,     mating,   mpu4vid_state, init_mating,    ROT0, "Barcrest","The Mating Game (v0.4) (MPU4 Video)",GAME_FLAGS_OK )//SWP 0.2
@@ -8889,48 +8833,48 @@ GAMEL(  199?, v4barqstd,  v4barqst, mpu4_vid_strike,   barquest,  mpu4vid_state,
 
 /* Quiz games - Questions not decoded properly on games below (no complete characteriser table) */
 
-GAME(  199?, v4turnov,   v4bios,    mpu4_vid,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.3) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4turnova,  v4turnov,  mpu4_vid,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.33) (MPU4 Video)",GAME_FLAGS ) // the 2nd 3 is likely be a machine type, because much like Strike It Lucky and Wize Move the pairing 68k ROM doesn't change
-GAME(  199?, v4turnovc,  v4turnov,  mpu4_vid,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.3O) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4turnovd,  v4turnov,  mpu4_vid,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v?.?) (MPU4 Video)",GAME_FLAGS ) // only have a single program ROM
+GAME(  199?, v4turnov,   v4bios,    mpu4_vid_cheatchr,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4turnova,  v4turnov,  mpu4_vid_cheatchr,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.33) (MPU4 Video)",GAME_FLAGS ) // the 2nd 3 is likely be a machine type, because much like Strike It Lucky and Wize Move the pairing 68k ROM doesn't change
+GAME(  199?, v4turnovc,  v4turnov,  mpu4_vid_cheatchr,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.3O) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4turnovd,  v4turnov,  mpu4_vid_cheatchr,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v?.?) (MPU4 Video)",GAME_FLAGS ) // only have a single program ROM
 
-GAME(  1990, v4skltrk,   v4bios,    mpu4_vid,   skiltrek, mpu4vid_state, init_skiltrek,  ROT0, "Barcrest","Skill Trek (v1.1) (MPU4 Video, set 1)",GAME_FLAGS ) // 10 pound max
-GAME(  1990, v4skltrka,  v4skltrk,  mpu4_vid,   skiltrek, mpu4vid_state, init_skiltrek,  ROT0, "Barcrest","Skill Trek (v1.1) (MPU4 Video, set 2)",GAME_FLAGS ) // 12 pound max
+GAME(  1990, v4skltrk,   v4bios,    mpu4_vid_cheatchr,   skiltrek, mpu4vid_state, init_skiltrek,  ROT0, "Barcrest","Skill Trek (v1.1) (MPU4 Video, set 1)",GAME_FLAGS ) // 10 pound max
+GAME(  1990, v4skltrka,  v4skltrk,  mpu4_vid_cheatchr,   skiltrek, mpu4vid_state, init_skiltrek,  ROT0, "Barcrest","Skill Trek (v1.1) (MPU4 Video, set 2)",GAME_FLAGS ) // 12 pound max
 
-GAME(  1989, v4tmach,     v4bios,   mpu4_vid,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 3 Questions) (MPU4 Video)",GAME_FLAGS )
-GAME(  1989, v4tmachd,    v4tmach,  mpu4_vid,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 3 Questions) (Datapak) (MPU4 Video)",GAME_FLAGS )
-GAME(  1989, v4tmach1,    v4tmach,  mpu4_vid,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 1 Questions) (MPU4 Video)",GAME_FLAGS )
-GAME(  1989, v4tmach1d,   v4tmach,  mpu4_vid,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 1 Questions) (Datapak) (MPU4 Video)",GAME_FLAGS )
-GAME(  1989, v4tmach2,    v4tmach,  mpu4_vid,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 2 Questions) (MPU4 Video)",GAME_FLAGS )
-GAME(  1989, v4tmach2d,   v4tmach,  mpu4_vid,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 2 Questions) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4tmach,     v4bios,   mpu4_vid_cheatchr,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 3 Questions) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4tmachd,    v4tmach,  mpu4_vid_cheatchr,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 3 Questions) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4tmach1,    v4tmach,  mpu4_vid_cheatchr,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 1 Questions) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4tmach1d,   v4tmach,  mpu4_vid_cheatchr,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 1 Questions) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4tmach2,    v4tmach,  mpu4_vid_cheatchr,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 2 Questions) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4tmach2d,   v4tmach,  mpu4_vid_cheatchr,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 2 Questions) (Datapak) (MPU4 Video)",GAME_FLAGS )
 
 /* Quiz games - Games below are missing question ROMs */
 
-GAME(  1990, v4sklcsh,   v4bios,   mpu4_vid,   skiltrek, mpu4vid_state, init_v4barqst,  ROT0, "Barcrest","Skill Cash (v1.1) (MPU4 Video)",GAME_FLAGS )
+GAME(  1990, v4sklcsh,   v4bios,   mpu4_vid_cheatchr,   skiltrek, mpu4vid_state, init_v4barqst,  ROT0, "Barcrest","Skill Cash (v1.1) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4eyedwn,   v4bios,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_eyesdown,  ROT0, "Barcrest","Eyes Down (v1.3) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4eyedwnd,  v4eyedwn, mpu4_vid,   mpu4vid,   mpu4vid_state, init_eyesdown,  ROT0, "Barcrest","Eyes Down (v1.3, Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4eyedwn,   v4bios,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_eyesdown,  ROT0, "Barcrest","Eyes Down (v1.3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4eyedwnd,  v4eyedwn, mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_eyesdown,  ROT0, "Barcrest","Eyes Down (v1.3, Datapak) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?, v4quidgr,   v4bios,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_quidgrid,  ROT0, "Barcrest","Ten Quid Grid (v1.2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4quidgrd,  v4quidgr, mpu4_vid,   mpu4vid,   mpu4vid_state, init_quidgrid,  ROT0, "Barcrest","Ten Quid Grid (v1.2, Datapak) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4quidgr2,  v4quidgr, mpu4_vid,   mpu4vid,   mpu4vid_state, init_quidgrid,  ROT0, "Barcrest","Ten Quid Grid (v2.4) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4quidgr2d, v4quidgr, mpu4_vid,   mpu4vid,   mpu4vid_state, init_quidgrid,  ROT0, "Barcrest","Ten Quid Grid (v2.4, Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4quidgr,   v4bios,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_quidgrid,  ROT0, "Barcrest","Ten Quid Grid (v1.2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4quidgrd,  v4quidgr, mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_quidgrid,  ROT0, "Barcrest","Ten Quid Grid (v1.2, Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4quidgr2,  v4quidgr, mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_quidgrid,  ROT0, "Barcrest","Ten Quid Grid (v2.4) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4quidgr2d, v4quidgr, mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_quidgrid,  ROT0, "Barcrest","Ten Quid Grid (v2.4, Datapak) (MPU4 Video)",GAME_FLAGS )
 
-GAMEL( 199?, v4barqs2,   v4bios,   mpu4_vid,   barquest,   mpu4vid_state, init_v4barqst2, ROT0, "Barcrest","Barquest 2 (v0.3) (MPU4 Video)",GAME_FLAGS,layout_v4barqst )
+GAMEL( 199?, v4barqs2,   v4bios,   mpu4_vid_cheatchr,   barquest,   mpu4vid_state, init_v4barqst2, ROT0, "Barcrest","Barquest 2 (v0.3) (MPU4 Video)",GAME_FLAGS,layout_v4barqst )
 
 // again the 2nd '3' seems to indicate a machine type, not a version
-GAME(  199?, v4wize,     v4bios,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.3) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4wized,    v4wize,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.3d) (Datapak) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4wizeb,    v4wize,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.33) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4wizec,    v4wize,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.3d3) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4wize,     v4bios,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4wized,    v4wize,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.3d) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4wizeb,    v4wize,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.33) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4wizec,    v4wize,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.3d3) (Datapak) (MPU4 Video)",GAME_FLAGS )
 // older code, 1x 68k ROM is missing in addition to questions being missing
-GAME(  199?, v4wizeo,    v4wize,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4wizeo,    v4wize,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.2) (MPU4 Video)",GAME_FLAGS )
 // newer? code, only 1x 68k ROM is dumped (and it appears to be slightly corrupt)
-GAME(  199?, v4wizen,    v4wize,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v?.?) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4wizen,    v4wize,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v?.?) (MPU4 Video)",GAME_FLAGS )
 
 
-GAME(  1991, v4opt3,     v4bios,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4opt3,    ROT0, "Barcrest","Option 3 (v1.0) (MPU4 Video)",GAME_FLAGS )
-GAME(  1991, v4opt3d,    v4opt3,   mpu4_vid,   mpu4vid,   mpu4vid_state, init_v4opt3,    ROT0, "Barcrest","Option 3 (v1.0) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  1991, v4opt3,     v4bios,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_v4opt3,    ROT0, "Barcrest","Option 3 (v1.0) (MPU4 Video)",GAME_FLAGS )
+GAME(  1991, v4opt3d,    v4opt3,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_v4opt3,    ROT0, "Barcrest","Option 3 (v1.0) (Datapak) (MPU4 Video)",GAME_FLAGS )
 
 /* ----------------------------------------------------------------  */
 /* Games below are newer BWB games and use their own game and revision specific MPU4 base ROMs (which must be correctly paired with video ROMs of the same revision) and sometimes differing hardware setups */

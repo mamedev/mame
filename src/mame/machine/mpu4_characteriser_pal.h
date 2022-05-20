@@ -7,6 +7,7 @@
 #pragma once
 
 #include "cpu/m6809/m6809.h"
+#include "cpu/m68000/m68000.h"
 
 DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_PAL, mpu4_characteriser_pal)
 
@@ -42,6 +43,11 @@ public:
 	void set_allow_6809_cheat(bool allow)
 	{
 		m_allow_6809_cheat = allow;
+	}
+
+	void set_allow_68k_cheat(bool allow)
+	{
+		m_allow_68k_cheat = allow;
 	}
 
 	uint8_t read(offs_t offset);
@@ -118,9 +124,11 @@ public:
 	// so is probably incorrect
 	// games with sequence starting 00 90 C0 54 A4 F0 64 90 E4 D4 60 B4
 	static constexpr uint8_t m470_lamp_scramble[8] = { 0xFF, 0xFF, 0x10, 0x3F, 0x15, 0xFF, 0xFF, 0xFF }; // one 'm470' set was set to all blank?
+
+	// games with sequence starting  00 84 C4 E4 4C 10 28 90 E8 78 34
+	static constexpr uint8_t vivlv_lamp_scramble[8] = { 0x00, 0x28, 0x00, 0x28, 0x20, 0x08, 0x00, 0x00 };
+
 	
-
-
 
 protected:
 	virtual void device_start() override;
@@ -137,6 +145,8 @@ private:
 	optional_device<cpu_device> m_cpu; // needed for some of the protection 'cheats'
 
 	bool m_allow_6809_cheat = false;
+	bool m_allow_68k_cheat = false;
+
 	uint8_t* m_current_chr_table = nullptr;
 	const uint8_t* m_current_lamp_table = nullptr;
 	int m_prot_col = 0;

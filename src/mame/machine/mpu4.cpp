@@ -2150,8 +2150,6 @@ void mpu4_state::init_m_oldtmr()
 {
 	init_m4_six_reel_std();
 	init_m4default_banks();
-
-	// TODOxx: m_current_chr_table = oldtmr_data;
 }
 
 void mpu4_state::init_m_ccelbr()
@@ -2886,6 +2884,16 @@ void mpu4_state::mod4yam_cheatchr_lv(machine_config &config)
 	m_characteriser->set_allow_6809_cheat(true);
 	m_characteriser->set_lamp_table(mpu4_characteriser_pal::m4lv_lamp_scramble);
 }
+
+void mpu4_state::mod4yam_cheatchr_vivlv(machine_config &config)
+{
+	mod4yam(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::vivlv_lamp_scramble);
+}
+
 
 void mpu4_state::mod4yam_cheatchr_m683(machine_config &config)
 {
