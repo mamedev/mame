@@ -126,17 +126,27 @@ void mtx_cfx_device::portc_w(uint8_t data)
 	switch (BIT(data, 3, 2))
 	{
 	case 0x01: // CS0
-		if (BIT(data, 5)) // WRITE
+		switch (BIT(data, 5, 2))
+		{
+		case 0x01: // WRITE
 			m_ide->cs0_w(data & 0x07, m_ide_data);
-		if (BIT(data, 6)) // READ
+			break;
+		case 0x02: // READ
 			m_ide_data = m_ide->cs0_r(data & 0x07);
+			break;
+		}
 		break;
 
 	case 0x02: // CS1
-		if (BIT(data, 5)) // WRITE
+		switch (BIT(data, 5, 2))
+		{
+		case 0x01: // WRITE
 			m_ide->cs1_w(data & 0x07, m_ide_data);
-		if (BIT(data, 6)) // READ
+			break;
+		case 0x02: // READ
 			m_ide_data = m_ide->cs1_r(data & 0x07);
+			break;
+		}
 		break;
 	}
 }
