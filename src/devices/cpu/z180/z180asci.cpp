@@ -190,13 +190,39 @@ void z180asci_channel_base::device_add_mconfig(machine_config &config)
 
 void z180asci_channel_base::device_clock_changed()
 {
+	 // Divide ratio
+	m_divisor = (m_asci_ext & Z180_ASEXT0_X1_BIT_CLK0) ? 1 : ((m_asci_cntlb & Z180_CNTLB0_DR) ? 64 : 16);
+
+	if ((m_asci_cntlb & Z180_CNTLB0_SS) == Z180_CNTLB0_SS)
+	{
+		// External clock
+		m_bgr_divisor = 0;
+	}
+	else
+	{
+		if (m_asci_ext & Z180_ASEXT0_BRG0_MODE)
+		{
+			// Extended boud rate generator mode
+			m_bgr_divisor = m_asci_tc.w + 2;
+		}
+		else
+		{
+			// Regular bitrate generator mode
+			m_bgr_divisor = 1 << (m_asci_cntlb & Z180_CNTLB0_SS);
+			m_bgr_divisor *= ((m_asci_cntlb & Z180_CNTLB0_CTS_PS) ? 30 : 10); // Prescale
+		}
+	}
+
 	if (m_bgr_divisor)
 	{
-		LOG("Z180 ASCI%d set bitrate %d\n", m_id, uint32_t(clock() / m_bgr_divisor));
+		LOG("Z180 ASCI%d set bitrate %d\n", m_id, uint32_t(clock() / m_bgr_divisor / m_divisor));
 		m_brg->set_clock(DERIVED_CLOCK(1,m_bgr_divisor));
 	}
 	else
+	{
+		LOG("Z180 ASCI%d set bitrate 0, using external\n", m_id);
 		m_brg->set_clock(0);
+	}
 }
 
 uint8_t z180asci_channel_base::cntla_r()
@@ -266,29 +292,6 @@ void z180asci_channel_base::cntlb_w(uint8_t data)
 {
 	LOG("Z180 CNTLB%d wr $%02x\n", m_id, data);
 	m_asci_cntlb = data;
-
-	 // Divide ratio
-	m_divisor = (m_asci_ext & Z180_ASEXT0_X1_BIT_CLK0) ? 1 : ((m_asci_cntlb & Z180_CNTLB0_DR) ? 64 : 16);
-
-	if ((m_asci_cntlb & Z180_CNTLB0_SS) == Z180_CNTLB0_SS)
-	{
-		// External clock
-		m_bgr_divisor = 0;
-	}
-	else
-	{
-		if (m_asci_ext & Z180_ASEXT0_BRG0_MODE)
-		{
-			// Extended boud rate generator mode
-			m_bgr_divisor = m_asci_tc.w + 2;
-		}
-		else
-		{
-			// Regular bitrate generator mode
-			m_bgr_divisor = 1 << (m_asci_cntlb & Z180_CNTLB0_SS);
-			m_bgr_divisor *= ((m_asci_cntlb & Z180_CNTLB0_CTS_PS) ? 30 : 10); // Prescale
-		}
-	}
 	device_clock_changed();
 }
 
@@ -312,12 +315,14 @@ void z180asci_channel_base::astcl_w(uint8_t data)
 {
 	LOG("Z180 ASTC%dL wr $%02x\n", m_id, data);
 	m_asci_tc.b.l = data;
+	device_clock_changed();
 }
 
 void z180asci_channel_base::astch_w(uint8_t data)
 {
 	LOG("Z180 ASTC%dH wr $%02x\n", m_id, data);
 	m_asci_tc.b.h = data;
+	device_clock_changed();
 }
 
 DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::rxa_wr )
@@ -526,6 +531,7 @@ void z180asci_channel_0::asext_w(uint8_t data)
 {
 	LOG("Z180 ASEXT0 wr $%02x ($%02x)\n", data,  data & Z180_ASEXT0_MASK & ~Z180_ASEXT0_BRK_DET);
 	m_asci_ext = (m_asci_ext & Z180_ASEXT0_BRK_DET) | (data & Z180_ASEXT0_MASK & ~Z180_ASEXT0_BRK_DET);
+	device_clock_changed();
 }
 
 //**************************************************************************
@@ -573,6 +579,7 @@ void z180asci_channel_1::asext_w(uint8_t data)
 {
 	LOG("Z180 ASEXT1 wr $%02x ($%02x)\n", data,  data & Z180_ASEXT1_MASK & ~Z180_ASEXT1_BRK_DET);
 	m_asci_ext = (m_asci_ext & Z180_ASEXT1_BRK_DET) | (data & Z180_ASEXT1_MASK & ~Z180_ASEXT1_BRK_DET);
+	device_clock_changed();
 }
 
 //**************************************************************************
