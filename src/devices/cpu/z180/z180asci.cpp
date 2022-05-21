@@ -9,84 +9,55 @@
 #include "emu.h"
 #include "z180.h"
 
-#define VERBOSE 1
+//#define VERBOSE 1
 
 #include "logmacro.h"
 
 /* 00 ASCI control register A ch 0 */
-#define Z180_CNTLA0_MPE         0x80
-#define Z180_CNTLA0_RE          0x40
-#define Z180_CNTLA0_TE          0x20
-#define Z180_CNTLA0_RTS0        0x10
-#define Z180_CNTLA0_MPBR_EFR    0x08
-#define Z180_CNTLA0_MODE        0x07
-#define Z180_CNTLA0_MODE_DATA   0x04
-#define Z180_CNTLA0_MODE_PARITY 0x02
-#define Z180_CNTLA0_MODE_STOPB  0x01
+#define Z180_CNTLA_MPE         0x80
+#define Z180_CNTLA_RE          0x40
+#define Z180_CNTLA_TE          0x20
+#define Z180_CNTLA_RTS0        0x10
+#define Z180_CNTLA_MPBR_EFR    0x08
+#define Z180_CNTLA_MODE        0x07
+#define Z180_CNTLA_MODE_DATA   0x04
+#define Z180_CNTLA_MODE_PARITY 0x02
+#define Z180_CNTLA_MODE_STOPB  0x01
 
 /* 01 ASCI control register A ch 1 */
-#define Z180_CNTLA1_MPE         0x80
-#define Z180_CNTLA1_RE          0x40
-#define Z180_CNTLA1_TE          0x20
-#define Z180_CNTLA1_CKA1D       0x10 // ext
-#define Z180_CNTLA1_MPBR_EFR    0x08
-#define Z180_CNTLA1_MODE        0x07
+#define Z180_CNTLA1_CKA1D      0x10
 
-/* 02 ASCI control register B ch 0 */
-#define Z180_CNTLB0_MPBT        0x80
-#define Z180_CNTLB0_MP          0x40
-#define Z180_CNTLB0_CTS_PS      0x20
-#define Z180_CNTLB0_PEO         0x10
-#define Z180_CNTLB0_DR          0x08
-#define Z180_CNTLB0_SS          0x07
-
-/* 03 ASCI control register B ch 1 */
-#define Z180_CNTLB1_MPBT        0x80
-#define Z180_CNTLB1_MP          0x40
-#define Z180_CNTLB1_CTS_PS      0x20
-#define Z180_CNTLB1_PEO         0x10
-#define Z180_CNTLB1_DR          0x08
-#define Z180_CNTLB1_SS          0x07
+/* 02/03 ASCI control register B ch 0 */
+#define Z180_CNTLB_MPBT        0x80
+#define Z180_CNTLB_MP          0x40
+#define Z180_CNTLB_CTS_PS      0x20
+#define Z180_CNTLB_PEO         0x10
+#define Z180_CNTLB_DR          0x08
+#define Z180_CNTLB_SS          0x07
 
 /* 04 ASCI status register 0 (all bits read-only except RIE and TIE) */
-#define Z180_STAT0_RDRF         0x80
-#define Z180_STAT0_OVRN         0x40
-#define Z180_STAT0_PE           0x20
-#define Z180_STAT0_FE           0x10
-#define Z180_STAT0_RIE          0x08
-#define Z180_STAT0_DCD0         0x04
-#define Z180_STAT0_TDRE         0x02
-#define Z180_STAT0_TIE          0x01
+#define Z180_STAT_RDRF         0x80
+#define Z180_STAT_OVRN         0x40
+#define Z180_STAT_PE           0x20
+#define Z180_STAT_FE           0x10
+#define Z180_STAT_RIE          0x08
+#define Z180_STAT_DCD0         0x04
+#define Z180_STAT_TDRE         0x02
+#define Z180_STAT_TIE          0x01
 
 /* 05 ASCI status register 1 (all bits read-only except RIE, CTS1E and TIE) */
-#define Z180_STAT1_RDRF         0x80
-#define Z180_STAT1_OVRN         0x40
-#define Z180_STAT1_PE           0x20
-#define Z180_STAT1_FE           0x10
-#define Z180_STAT1_RIE          0x08
-#define Z180_STAT1_CTS1E        0x04 //ext
-#define Z180_STAT1_TDRE         0x02
-#define Z180_STAT1_TIE          0x01
+#define Z180_STAT1_CTS1E       0x04
 
-/* 12 (Z8S180/Z8L180) ASCI extension control register 0 (break detect is read-only) */
-#define Z180_ASEXT0_DCD0        0x40
-#define Z180_ASEXT0_CTS0        0x20
-#define Z180_ASEXT0_X1_BIT_CLK0 0x10
-#define Z180_ASEXT0_BRG0_MODE   0x08
-#define Z180_ASEXT0_BRK_EN      0x04
-#define Z180_ASEXT0_BRK_DET     0x02
-#define Z180_ASEXT0_BRK_SEND    0x01
+/* 12/13 (Z8S180/Z8L180) ASCI extension control register 0 (break detect is read-only) */
+#define Z180_ASEXT_DCD0        0x40
+#define Z180_ASEXT_CTS0        0x20
+#define Z180_ASEXT_X1_BIT_CLK0 0x10
+#define Z180_ASEXT_BRG0_MODE   0x08
+#define Z180_ASEXT_BRK_EN      0x04
+#define Z180_ASEXT_BRK_DET     0x02
+#define Z180_ASEXT_BRK_SEND    0x01
+#define Z180_ASEXT_MASK        0x7f
 
-#define Z180_ASEXT0_MASK        0x7f
-
-/* 13 (Z8S180/Z8L180) ASCI extension control register 1 (break detect is read-only) */
-#define Z180_ASEXT1_X1_BIT_CLK1 0x10
-#define Z180_ASEXT1_BRG1_MODE   0x08
-#define Z180_ASEXT1_BRK_EN      0x04
-#define Z180_ASEXT1_BRK_DET     0x02
-#define Z180_ASEXT1_BRK_SEND    0x01
-
-#define Z180_ASEXT1_MASK        0x1f
 
 //**************************************************************************
 //  z180asci_channel_base
@@ -192,16 +163,16 @@ void z180asci_channel_base::device_add_mconfig(machine_config &config)
 void z180asci_channel_base::device_clock_changed()
 {
 	 // Divide ratio
-	m_divisor = (m_asci_ext & Z180_ASEXT0_X1_BIT_CLK0) ? 1 : ((m_asci_cntlb & Z180_CNTLB0_DR) ? 64 : 16);
+	m_divisor = (m_asci_ext & Z180_ASEXT_X1_BIT_CLK0) ? 1 : ((m_asci_cntlb & Z180_CNTLB_DR) ? 64 : 16);
 
-	if ((m_asci_cntlb & Z180_CNTLB0_SS) == Z180_CNTLB0_SS)
+	if ((m_asci_cntlb & Z180_CNTLB_SS) == Z180_CNTLB_SS)
 	{
 		// External clock
 		m_bgr_divisor = 0;
 	}
 	else
 	{
-		if (m_asci_ext & Z180_ASEXT0_BRG0_MODE)
+		if (m_asci_ext & Z180_ASEXT_BRG0_MODE)
 		{
 			// Extended boud rate generator mode
 			m_bgr_divisor = m_asci_tc.w + 2;
@@ -209,8 +180,8 @@ void z180asci_channel_base::device_clock_changed()
 		else
 		{
 			// Regular bitrate generator mode
-			m_bgr_divisor = 1 << (m_asci_cntlb & Z180_CNTLB0_SS);
-			m_bgr_divisor *= ((m_asci_cntlb & Z180_CNTLB0_CTS_PS) ? 30 : 10); // Prescale
+			m_bgr_divisor = 1 << (m_asci_cntlb & Z180_CNTLB_SS);
+			m_bgr_divisor *= ((m_asci_cntlb & Z180_CNTLB_CTS_PS) ? 30 : 10); // Prescale
 		}
 	}
 
@@ -259,13 +230,13 @@ uint8_t z180asci_channel_base::rdr_r()
 		if (m_fifo_rd != m_fifo_wr)
 		{
 			m_asci_rdr = m_data_fifo[m_fifo_rd];
-			m_asci_stat &= ~(Z180_STAT0_OVRN | Z180_STAT0_PE | Z180_STAT0_FE);
+			m_asci_stat &= ~(Z180_STAT_OVRN | Z180_STAT_PE | Z180_STAT_FE);
 			m_asci_stat |= m_error_fifo[m_fifo_rd];
-			if (m_asci_stat & (Z180_STAT0_OVRN | Z180_STAT0_PE | Z180_STAT0_FE))
+			if (m_asci_stat & (Z180_STAT_OVRN | Z180_STAT_PE | Z180_STAT_FE))
 				m_irq = 1;
 			m_fifo_rd = (m_fifo_rd + 1) & 3;
 			if (m_fifo_rd == m_fifo_wr) // empty
-				m_asci_stat &= ~Z180_STAT0_RDRF;
+				m_asci_stat &= ~Z180_STAT_RDRF;
 		}
 	}
 	return m_asci_rdr;
@@ -292,12 +263,12 @@ uint8_t z180asci_channel_base::astch_r()
 void z180asci_channel_base::cntla_w(uint8_t data)
 {
 	LOG("Z180 CNTLA%d wr $%02x\n", m_id, data);
-	m_asci_cntla = data & ~(Z180_CNTLA0_MPBR_EFR | Z180_CNTLA0_RTS0);
-	output_rts(BIT(data,4)); // Z180_CNTLA0_RTS0
-	if (data & Z180_CNTLA0_MPBR_EFR) // Error Flag Reset
+	m_asci_cntla = data & ~(Z180_CNTLA_MPBR_EFR | Z180_CNTLA_RTS0);
+	output_rts(BIT(data,4)); // Z180_CNTLA_RTS0
+	if (data & Z180_CNTLA_MPBR_EFR) // Error Flag Reset
 	{
-		m_asci_stat &= ~(Z180_STAT1_OVRN | Z180_STAT1_PE | Z180_STAT1_FE);
-		m_asci_ext &= ~(Z180_ASEXT0_BRK_DET);
+		m_asci_stat &= ~(Z180_STAT_OVRN | Z180_STAT_PE | Z180_STAT_FE);
+		m_asci_ext &= ~(Z180_ASEXT_BRK_DET);
 	}
 }
 
@@ -312,7 +283,7 @@ void z180asci_channel_base::tdr_w(uint8_t data)
 {
 	LOG("Z180 TDR%d   wr $%02x\n", m_id, data);
 	m_asci_tdr = data;
-	m_asci_stat &= ~Z180_STAT0_TDRE;
+	m_asci_stat &= ~Z180_STAT_TDRE;
 	m_tx_bits = 0;
 	m_tx_state = STATE_START;
 	m_tsr = m_asci_tdr;
@@ -321,7 +292,7 @@ void z180asci_channel_base::tdr_w(uint8_t data)
 void z180asci_channel_base::rdr_w(uint8_t data)
 {
 	LOG("Z180 RDR%d   wr $%02x\n", m_id, data);
-	if (!(m_asci_stat & Z180_STAT0_RDRF))
+	if (!(m_asci_stat & Z180_STAT_RDRF))
 		set_fifo_data(data, 0);
 }
 
@@ -341,6 +312,8 @@ void z180asci_channel_base::astch_w(uint8_t data)
 
 DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::cts_wr )
 {
+	// For channel 1, CTS can be disabled
+	if (m_id && (m_asci_stat && Z180_STAT1_CTS1E) == 0) return;
 	m_cts = state;
 }
 
@@ -369,6 +342,9 @@ DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::brg_wr )
 
 DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::cka_wr )
 {
+	// For channel 1, CKA can be disabled
+	if (m_id && (m_asci_cntla && Z180_CNTLA1_CKA1D)) return;
+
 	if(state != m_clock_state) {
 		m_clock_state = state;
 		if(!state)
@@ -384,7 +360,7 @@ void z180asci_channel_base::transmit_edge()
 	if (m_tx_counter != m_divisor) return;
 	m_tx_counter = 0;
 
-	if (m_asci_cntla & Z180_CNTLA0_TE)
+	if (m_asci_cntla & Z180_CNTLA_TE)
 	{
 		switch (m_tx_state)
 		{
@@ -398,19 +374,19 @@ void z180asci_channel_base::transmit_edge()
 			output_txa(BIT(m_tsr, 0));
 			m_tx_parity ^= BIT(m_tsr, 0);
 			m_tsr >>= 1;
-			if (m_tx_bits == ((m_asci_cntla & Z180_CNTLA0_MODE_DATA) ? 8 : 7))
+			if (m_tx_bits == ((m_asci_cntla & Z180_CNTLA_MODE_DATA) ? 8 : 7))
 			{
-				m_tx_state = (m_asci_cntlb & Z180_CNTLB0_MP) ? STATE_MPB : (m_asci_cntla & Z180_CNTLA0_MODE_PARITY) ? STATE_PARITY : STATE_STOP;
-				m_tx_bits = (m_asci_cntla & Z180_CNTLA0_MODE_STOPB) ? 2 : 1;
+				m_tx_state = (m_asci_cntlb & Z180_CNTLB_MP) ? STATE_MPB : (m_asci_cntla & Z180_CNTLA_MODE_PARITY) ? STATE_PARITY : STATE_STOP;
+				m_tx_bits = (m_asci_cntla & Z180_CNTLA_MODE_STOPB) ? 2 : 1;
 			}
 			break;
-		case Z180_CNTLB0_MP:
+		case Z180_CNTLB_MP:
 			m_tx_state = STATE_STOP;
-			output_txa(m_asci_cntlb & Z180_CNTLB0_MPBT ? 1 : 0);
+			output_txa(m_asci_cntlb & Z180_CNTLB_MPBT ? 1 : 0);
 			break;
 		case STATE_PARITY:
 			m_tx_state = STATE_STOP;
-			if (m_asci_cntlb & Z180_CNTLB0_PEO) m_tx_parity ^= 1; // odd parity
+			if (m_asci_cntlb & Z180_CNTLB_PEO) m_tx_parity ^= 1; // odd parity
 			output_txa(m_tx_parity);
 			break;
 		case STATE_STOP:
@@ -420,8 +396,8 @@ void z180asci_channel_base::transmit_edge()
 				if (m_tx_bits == 0)
 				{
 					output_txa(1);
-					m_asci_stat |= Z180_STAT0_TDRE;
-					if (m_asci_stat & Z180_STAT0_TIE)
+					m_asci_stat |= Z180_STAT_TDRE;
+					if (m_asci_stat & Z180_STAT_TIE)
 					{
 						m_irq = 1;
 					}
@@ -438,7 +414,7 @@ void z180asci_channel_base::receive_edge()
 	if (m_rx_counter != m_divisor) return;
 	m_rx_counter = 0;
 
-	if (m_asci_cntla & Z180_CNTLA0_RE)
+	if (m_asci_cntla & Z180_CNTLA_RE)
 	{
 		switch (m_rx_state)
 		{
@@ -456,31 +432,31 @@ void z180asci_channel_base::receive_edge()
 			m_rsr |= m_rxa << m_rx_bits;
 			m_rx_parity ^= m_rxa;
 			m_rx_bits++;
-			if (m_rx_bits == ((m_asci_cntla & Z180_CNTLA0_MODE_DATA) ? 8 : 7))
+			if (m_rx_bits == ((m_asci_cntla & Z180_CNTLA_MODE_DATA) ? 8 : 7))
 			{
-				m_rx_bits = (m_asci_cntla & Z180_CNTLA0_MODE_STOPB) ? 2 : 1;
-				m_rx_state = (m_asci_cntlb & Z180_CNTLB0_MP) ? STATE_MPB : (m_asci_cntla & Z180_CNTLA0_MODE_PARITY) ? STATE_PARITY : STATE_STOP;
+				m_rx_bits = (m_asci_cntla & Z180_CNTLA_MODE_STOPB) ? 2 : 1;
+				m_rx_state = (m_asci_cntlb & Z180_CNTLB_MP) ? STATE_MPB : (m_asci_cntla & Z180_CNTLA_MODE_PARITY) ? STATE_PARITY : STATE_STOP;
 			}
 			break;
 		case STATE_MPB:
 			m_rx_state = STATE_STOP;
-			m_asci_cntla |= m_rxa ? Z180_CNTLA0_MPBR_EFR : 0; 
+			m_asci_cntla |= m_rxa ? Z180_CNTLA_MPBR_EFR : 0; 
 			break;
 		case STATE_PARITY:
 			m_rx_state = STATE_STOP;
-			if (m_asci_cntlb & Z180_CNTLB0_PEO) m_rx_parity ^= 1; // odd parity
+			if (m_asci_cntlb & Z180_CNTLB_PEO) m_rx_parity ^= 1; // odd parity
 			if (m_rx_parity != m_rxa)
-				m_rx_error |= Z180_STAT0_PE;
+				m_rx_error |= Z180_STAT_PE;
 			break;
 		case STATE_STOP:
 			if (m_rxa == 0)
-				m_rx_error |= Z180_STAT0_FE;
+				m_rx_error |= Z180_STAT_FE;
 
 			m_rx_bits--;
 			if (m_rx_bits == 0)
 			{
 				// Skip only if MPE mode active and MPB is 0
-				if (!((m_asci_cntla & Z180_CNTLA0_MPE) && ((m_asci_cntla & Z180_CNTLA0_MPBR_EFR) == 0)))
+				if (!((m_asci_cntla & Z180_CNTLA_MPE) && ((m_asci_cntla & Z180_CNTLA_MPBR_EFR) == 0)))
 				{
 					set_fifo_data(m_rsr, m_rx_error);
 				}
@@ -497,15 +473,15 @@ void z180asci_channel_base::set_fifo_data(uint8_t data, uint8_t error)
 	m_error_fifo[m_fifo_wr] = error;
 	if (((m_fifo_wr + 1) & 3) == m_fifo_rd) // overrun
 	{
-		m_error_fifo[m_fifo_wr] |= Z180_STAT0_OVRN;
+		m_error_fifo[m_fifo_wr] |= Z180_STAT_OVRN;
 	}
 	else
 	{
-		m_error_fifo[m_fifo_wr] &= Z180_STAT0_OVRN;
+		m_error_fifo[m_fifo_wr] &= Z180_STAT_OVRN;
 		m_fifo_wr = (m_fifo_wr + 1) & 3;
 	}
-	m_asci_stat |= Z180_STAT0_RDRF;
-	if (m_asci_stat & Z180_STAT0_RIE)
+	m_asci_stat |= Z180_STAT_RDRF;
+	if (m_asci_stat & Z180_STAT_RIE)
 	{
 		m_irq = 1;
 	}
@@ -547,9 +523,9 @@ z180asci_channel_0::z180asci_channel_0(const machine_config &mconfig, const char
 void z180asci_channel_0::device_reset()
 {
 	z180asci_channel_base::device_reset();
-	cntla_w((m_asci_cntla & Z180_CNTLA0_MPBR_EFR) | Z180_CNTLA0_RTS0);
-	cntlb_w((m_asci_cntlb & (Z180_CNTLB0_MPBT | Z180_CNTLB0_CTS_PS)) | 0x07);
-	m_asci_stat = (m_asci_stat & Z180_STAT0_DCD0) | Z180_STAT0_TDRE;
+	cntla_w((m_asci_cntla & Z180_CNTLA_MPBR_EFR) | Z180_CNTLA_RTS0);
+	cntlb_w((m_asci_cntlb & (Z180_CNTLB_MPBT | Z180_CNTLB_CTS_PS)) | 0x07);
+	m_asci_stat = (m_asci_stat & Z180_STAT_DCD0) | Z180_STAT_TDRE;
 }
 
 void z180asci_channel_0::state_add(device_state_interface &parent)
@@ -561,21 +537,21 @@ void z180asci_channel_0::state_add(device_state_interface &parent)
 	parent.state_add(Z180_RDR0,   "RDR0",    m_asci_rdr);
 	if (m_ext)
 	{
-		parent.state_add(Z180_ASEXT0, "ASEXT0",  m_asci_ext).mask(Z180_ASEXT0_MASK);
+		parent.state_add(Z180_ASEXT0, "ASEXT0",  m_asci_ext).mask(Z180_ASEXT_MASK);
 		parent.state_add(Z180_ASTC0,  "ASTC0",   m_asci_tc.w);
 	}
 }
 
 void z180asci_channel_0::stat_w(uint8_t data)
 {
-	LOG("Z180 STAT0  wr $%02x ($%02x)\n", data,  data & (Z180_STAT0_RIE | Z180_STAT0_TIE));
-	m_asci_stat = (m_asci_stat & ~(Z180_STAT0_RIE | Z180_STAT0_TIE)) | (data & (Z180_STAT0_RIE | Z180_STAT0_TIE));
+	LOG("Z180 STAT0  wr $%02x ($%02x)\n", data,  data & (Z180_STAT_RIE | Z180_STAT_TIE));
+	m_asci_stat = (m_asci_stat & ~(Z180_STAT_RIE | Z180_STAT_TIE)) | (data & (Z180_STAT_RIE | Z180_STAT_TIE));
 }
 
 void z180asci_channel_0::asext_w(uint8_t data)
 {
-	LOG("Z180 ASEXT0 wr $%02x ($%02x)\n", data,  data & Z180_ASEXT0_MASK & ~Z180_ASEXT0_BRK_DET);
-	m_asci_ext = (m_asci_ext & Z180_ASEXT0_BRK_DET) | (data & Z180_ASEXT0_MASK & ~Z180_ASEXT0_BRK_DET);
+	LOG("Z180 ASEXT0 wr $%02x ($%02x)\n", data,  data & Z180_ASEXT_MASK & ~Z180_ASEXT_BRK_DET);
+	m_asci_ext = (m_asci_ext & Z180_ASEXT_BRK_DET) | (data & Z180_ASEXT_MASK & ~Z180_ASEXT_BRK_DET);
 	device_clock_changed();
 }
 
@@ -595,9 +571,9 @@ z180asci_channel_1::z180asci_channel_1(const machine_config &mconfig, const char
 void z180asci_channel_1::device_reset()
 {
 	z180asci_channel_base::device_reset();
-	cntla_w((m_asci_cntla & Z180_CNTLA1_MPBR_EFR) | Z180_CNTLA1_CKA1D);
-	cntlb_w((m_asci_cntlb & Z180_CNTLB1_MPBT) | 0x07);
-	m_asci_stat = Z180_STAT1_TDRE;
+	cntla_w((m_asci_cntla & Z180_CNTLA_MPBR_EFR) | Z180_CNTLA1_CKA1D);
+	cntlb_w((m_asci_cntlb & Z180_CNTLB_MPBT) | 0x07);
+	m_asci_stat = Z180_STAT_TDRE;
 }
 
 void z180asci_channel_1::state_add(device_state_interface &parent)
@@ -609,21 +585,21 @@ void z180asci_channel_1::state_add(device_state_interface &parent)
 	parent.state_add(Z180_RDR1,   "RDR1",    m_asci_rdr);
 	if (m_ext)
 	{
-		parent.state_add(Z180_ASEXT1, "ASEXT1",  m_asci_ext).mask(Z180_ASEXT1_MASK);
+		parent.state_add(Z180_ASEXT1, "ASEXT1",  m_asci_ext).mask(Z180_ASEXT_MASK);
 		parent.state_add(Z180_ASTC1,  "ASTC1",   m_asci_tc.w);
 	}
 }
 
 void z180asci_channel_1::stat_w(uint8_t data)
 {
-	LOG("Z180 STAT1  wr $%02x ($%02x)\n", data,  data & (Z180_STAT1_RIE | Z180_STAT1_CTS1E | Z180_STAT1_TIE));
-	m_asci_stat = (m_asci_stat & ~(Z180_STAT1_RIE | Z180_STAT1_CTS1E | Z180_STAT1_TIE)) | (data & (Z180_STAT1_RIE | Z180_STAT1_CTS1E | Z180_STAT1_TIE));
+	LOG("Z180 STAT1  wr $%02x ($%02x)\n", data,  data & (Z180_STAT_RIE | Z180_STAT1_CTS1E | Z180_STAT_TIE));
+	m_asci_stat = (m_asci_stat & ~(Z180_STAT_RIE | Z180_STAT1_CTS1E | Z180_STAT_TIE)) | (data & (Z180_STAT_RIE | Z180_STAT1_CTS1E | Z180_STAT_TIE));
 }
 
 void z180asci_channel_1::asext_w(uint8_t data)
 {
-	LOG("Z180 ASEXT1 wr $%02x ($%02x)\n", data,  data & Z180_ASEXT1_MASK & ~Z180_ASEXT1_BRK_DET);
-	m_asci_ext = (m_asci_ext & Z180_ASEXT1_BRK_DET) | (data & Z180_ASEXT1_MASK & ~Z180_ASEXT1_BRK_DET);
+	LOG("Z180 ASEXT1 wr $%02x ($%02x)\n", data,  data & Z180_ASEXT_MASK & ~Z180_ASEXT_BRK_DET);
+	m_asci_ext = (m_asci_ext & Z180_ASEXT_BRK_DET) | (data & Z180_ASEXT_MASK & ~Z180_ASEXT_BRK_DET);
 	device_clock_changed();
 }
 
