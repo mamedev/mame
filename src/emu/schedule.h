@@ -118,7 +118,7 @@ public:
 
 	// timers, specified by callback/name
 	emu_timer *timer_alloc(timer_expired_delegate callback);
-	void timer_set(const attotime &duration, timer_expired_delegate callback, int param = 0);
+	[[deprecated("timer_set is deprecated; please avoid anonymous timers. Use TIMER_CALLBACK_MEMBER and an allocated emu_timer instead.")]] void timer_set(const attotime &duration, timer_expired_delegate callback, int param = 0);
 	void synchronize(timer_expired_delegate callback = timer_expired_delegate(), int param = 0) { timer_set(attotime::zero, callback, param); }
 
 	// debugging
