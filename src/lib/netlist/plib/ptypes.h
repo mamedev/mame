@@ -221,7 +221,7 @@ namespace plib
 	#if defined(__APPLE__)
 		using clang_apple_noexcept_issue = std::integral_constant<bool, version::vmajor::value < 11>;
 	#else
-		using clang_noexcept_issue = std::integral_constant<bool, (type::value == ci_compiler::CLANG) && (version::value < 800)>;
+		using clang_noexcept_issue = std::integral_constant<bool, (type::value == ci_compiler::CLANG) && (version::vmajor::value < 8)>;
 	#endif
 	#if defined(__ia64__)
 		using abi_vtable_function_descriptors = std::integral_constant<bool, true>;
