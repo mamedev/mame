@@ -503,11 +503,10 @@ namespace netlist::solver
 		return netlist_time::from_fp(m_params.m_max_timestep);
 	}
 
-	netlist_time matrix_solver_t::solve(netlist_time_ext now, const char *source)
+	netlist_time matrix_solver_t::solve(netlist_time_ext now, [[maybe_unused]] const char *source)
 	{
 		auto delta = static_cast<netlist_time>(now - m_last_step());
 		PFDEBUG(printf("solve %.10f\n", delta.as_double());)
-		plib::unused_var(source);
 
 		// We are already up to date. Avoid oscillations.
 		// FIXME: Make this a parameter!

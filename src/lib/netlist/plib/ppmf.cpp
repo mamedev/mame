@@ -15,7 +15,7 @@
 
 namespace plib {
 
-	void mfp_raw<PPMF_TYPE_INTERNAL_ITANIUM>::convert_to_generic(generic_function &func, mfp_generic_class *&object) const
+	void mfp_raw<ppmf_type::INTERNAL_ITANIUM>::convert_to_generic(generic_function &func, mfp_generic_class *&object) const
 	{
 		// apply the "this" delta to the object first
 		// NOLINTNEXTLINE(clang-analyzer-core.UndefinedBinaryOperatorResult,cppcoreguidelines-pro-type-reinterpret-cast)
@@ -42,7 +42,7 @@ namespace plib {
 		object = o_p_delta;
 	}
 
-	void mfp_raw<PPMF_TYPE_INTERNAL_ARM>::convert_to_generic(generic_function &func, mfp_generic_class *&object) const
+	void mfp_raw<ppmf_type::INTERNAL_ARM>::convert_to_generic(generic_function &func, mfp_generic_class *&object) const
 	{
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		object = reinterpret_cast<mfp_generic_class *>(reinterpret_cast<std::uint8_t *>(object) + (m_this_delta >> 1));
@@ -64,9 +64,9 @@ namespace plib {
 		}
 	}
 
-	struct unknown_base_equiv_novtdisp { mfp_raw<PPMF_TYPE_INTERNAL_MSC>::generic_function fptr; int thisdisp, vptrdisp; };
+	struct unknown_base_equiv_novtdisp { mfp_raw<ppmf_type::INTERNAL_MSC>::generic_function fptr; int thisdisp, vptrdisp; };
 
-	void mfp_raw<PPMF_TYPE_INTERNAL_MSC>::convert_to_generic(generic_function &func, mfp_generic_class *&object) const
+	void mfp_raw<ppmf_type::INTERNAL_MSC>::convert_to_generic(generic_function &func, mfp_generic_class *&object) const
 	{
 		//printf("%lx, %lx, %lx, %lx %lx\n", m_function, m_this_delta, m_vptr_offs, m_vt_index, m_size);
 

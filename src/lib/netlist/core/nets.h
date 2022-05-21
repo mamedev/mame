@@ -17,11 +17,9 @@
 #include "../plib/plists.h"
 #include "../plib/pstring.h"
 
-// Enable the setting below to avoid queue pushes were at execution
-// no action will be taken. This is academically cleaner, but slower than
-// allowing this to happen and filter it during during "process".
-
-#define AVOID_NOOP_QUEUE_PUSHES (0)
+#ifndef AVOID_NOOP_QUEUE_PUSHES
+#error AVOID_NOOP_QUEUE_PUSHES not defined
+#endif
 
 namespace netlist
 {
@@ -72,12 +70,12 @@ namespace netlist
 
 				m_next_scheduled_time = exec().time() + delay;
 #if (AVOID_NOOP_QUEUE_PUSHES)
-					m_in_queue = (m_list_active.empty() ? queue_status::DELAYED_DUE_TO_INACTIVE
-						: (m_new_Q != m_cur_Q ? queue_status::QUEUED : queue_status::DELIVERED));
+				m_in_queue = (m_list_active.empty() ? queue_status::DELAYED_DUE_TO_INACTIVE
+					: (m_new_Q != m_cur_Q ? queue_status::QUEUED : queue_status::DELIVERED));
 				if (m_in_queue == queue_status::QUEUED)
 					exec().qpush(m_next_scheduled_time, this);
-					else
-						update_inputs();
+				else
+					update_inputs();
 #else
 				m_in_queue = m_list_active.empty() ? queue_status::DELAYED_DUE_TO_INACTIVE : queue_status::QUEUED;
 				if (m_in_queue == queue_status::QUEUED)

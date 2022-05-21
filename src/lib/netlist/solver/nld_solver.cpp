@@ -150,15 +150,13 @@ namespace netlist::devices
 			plib::omp::set_num_threads(nthreads);
 			plib::omp::for_static(static_cast<std::size_t>(0), solvers.size(), [&solvers, now](std::size_t i)
 				{
-					const netlist_time ts = solvers[i]->ptr->solve(now);
-					plib::unused_var(ts);
+					[[maybe_unused]] const netlist_time ts = solvers[i]->ptr->solve(now);
 				});
 		}
 		else
 			for (auto & solver : solvers)
 			{
-				const netlist_time ts = solver->ptr->solve(now);
-				plib::unused_var(ts);
+				[[maybe_unused]] const netlist_time ts = solver->ptr->solve(now);
 			}
 
 		for (auto & solver : solvers)

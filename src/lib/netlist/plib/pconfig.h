@@ -83,8 +83,8 @@
 #define PALIGNAS_VECTOROPT()
 #endif
 
-// FIXME: Breaks mame build on windows mingw due to -Wattribute
-//        also triggers -Wattribute on ARM
+// FIXME: Breaks mame build on windows mingw due to `-Wattribute`
+//        also triggers `-Wattribute` on ARM
 //        This is fixed on mingw version 10
 // FIXME: no error on cross-compile - need further checks
 #if defined(__GNUC__) && ((defined(_WIN32) && __GNUC__ < 10) || defined(__arm__) || defined(__ARMEL__))
@@ -115,30 +115,16 @@
 //
 //============================================================
 
-#if (NVCCBUILD > 0)
-	#if NVCCBUILD >= 101
-		#define NVCC_CONSTEXPR constexpr
-	#else
-		#define NVCC_CONSTEXPR constexpr
-	#endif
-	#if NVCCBUILD < 113
-	#if __cplusplus != 201402L
-		#error nvcc - use c++14 to compile
-	#endif
-	#endif
+#if defined(_MSC_VER)
+	// Ok
+#elif __cplusplus == 201103L
+	#error c++11 not supported - you need c++17
+#elif __cplusplus == 201402L
+	#error c++14 not supported - you need c++17
+#elif __cplusplus == 201703L
+	// Ok
 #else
-	#define NVCC_CONSTEXPR constexpr
-	#if __cplusplus == 201103L
-		#error c++11 not supported - you need c++14
-	#elif __cplusplus == 201402L
-		// Ok
-	#elif __cplusplus == 201703L
-		// Ok
-	#elif defined(_MSC_VER)
-		// Ok
-	#else
-		#error "C++ version not supported"
-	#endif
+	#error "C++ version not supported"
 #endif
 
 

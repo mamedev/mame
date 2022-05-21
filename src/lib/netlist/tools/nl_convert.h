@@ -72,7 +72,7 @@ protected:
 
 	struct replace_t
 	{
-		pstring m_ce; // controlling element - must be twoterm
+		pstring m_ce; // controlling element - must be a two terminal element
 		pstring m_repterm; // replace with terminal
 		pstring m_net; // connect to net
 	};

@@ -60,10 +60,9 @@ namespace plib
 		}
 
 		template <typename O, typename T = std::enable_if_t<!ptime_le<ptime<O, RES>, ptime>::value, int>>
-		constexpr explicit ptime(const ptime<O, RES> &rhs, T dummy = 0) noexcept
+		constexpr explicit ptime(const ptime<O, RES> &rhs,[[maybe_unused]] T dummy = 0) noexcept
 		: m_time(static_cast<TYPE>(rhs.m_time))
 		{
-			plib::unused_var(dummy);
 		}
 
 		template <typename O>

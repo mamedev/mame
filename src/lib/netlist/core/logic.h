@@ -140,10 +140,9 @@ namespace netlist
 		///
 		/// This function terminates if actually called.
 		///
-		[[noreturn]] static void set_tristate(netlist_sig_t v,
-			netlist_time ts_off_on, netlist_time ts_on_off)
+		[[noreturn]] static void set_tristate([[maybe_unused]] netlist_sig_t v,
+			[[maybe_unused]] netlist_time ts_off_on, [[maybe_unused]] netlist_time ts_on_off)
 		{
-			plib::unused_var(v, ts_off_on, ts_on_off);
 			plib::terminate("set_tristate on logic_output should never be called!");
 		}
 	private:

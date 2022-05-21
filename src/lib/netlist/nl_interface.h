@@ -33,6 +33,7 @@ namespace netlist
 		/// The following code is an example on how to add the device to
 		/// the netlist factory.
 		///
+		/// ```
 		///     const pstring pin(m_in);
 		///     pstring dname = pstring("OUT_") + pin;
 		///
@@ -48,7 +49,7 @@ namespace netlist
 		///
 		///     parser.factory().add<cb_t, netlist::nl_fptype, lb_t>(dname,
 		///         netlist::factory::properties("-", PSOURCELOC()), 1e-6, std::forward<lb_t>(lambda));
-		///
+		/// ```
 
 		template <typename FUNC>
 		NETLIB_OBJECT(analog_callback)
@@ -160,7 +161,6 @@ namespace netlist
 						if (m_buffer != nullptr)
 						{
 							const nl_fptype v = (*m_buffer)[m_pos];
-							//m_params[i]->set(v * m_param_mults[i]() + m_param_offsets[i]());
 							m_param_setter(v * m_param_mult() + m_param_offset());
 						}
 				}

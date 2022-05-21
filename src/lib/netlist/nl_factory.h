@@ -129,7 +129,6 @@ namespace factory {
 							const pstring &name, std::tuple<Args...>& args, std::index_sequence<Is...>)
 		{
 			return plib::make_unique<C>(pool, anetlist, name, std::forward<Args>(std::get<Is>(args))...);
-			//return anetlist.make_pool_object<C>(anetlist, name, std::forward<Args>(std::get<Is>(args))...);
 		}
 
 		dev_uptr make_device(device_arena &pool,
@@ -144,7 +143,6 @@ namespace factory {
 			const pstring &name) override
 		{
 			return make_device(pool, anetlist, name, m_args);
-			//return pool.make_unique<C>(anetlist, name);
 		}
 
 		static uptr create(const pstring &name, properties &&props, Args&&... args)

@@ -55,15 +55,13 @@ namespace netlist::solver
 		plib::pmatrix2d<float_type *> m_mat_ptr;
 
 		template <typename T, typename M>
-		void log_fill(const T &fill, M &mat)
+		void log_fill(const T &fill,[[maybe_unused]] M &mat)
 		{
 			const std::size_t iN = fill.size();
 
 			// FIXME: Not yet working, mat_cr.h needs some more work
 #if 0
 			auto mat_GE = dynamic_cast<plib::pGEmatrix_cr_t<typename M::base> *>(&mat);
-#else
-			plib::unused_var(mat);
 #endif
 			std::vector<unsigned> levL(iN, 0);
 			std::vector<unsigned> levU(iN, 0);

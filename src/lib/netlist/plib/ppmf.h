@@ -20,7 +20,7 @@
 ///      Use the same approach as MAME for deriving the function pointer.
 ///      This is compiler-dependent as well
 ///
-///  Benchmarks for ./nltool -c run  -t 10 -n pongf src/mame/machine/nl_pongf.cpp
+///  Benchmarks for `./nltool -c run  -t 10 -n pongf src/mame/machine/nl_pongf.cpp`
 ///
 ///  PMF_TYPE_INTERNAL:       215%    215%    564%    580%
 ///  PMF_TYPE_GNUC_PMF:       163%    196%    516%    490%
@@ -31,7 +31,7 @@
 /// \brief Enable experimental code on Visual Studio builds and VS clang llvm builds
 ///
 /// This enables experimental code which uses optimized builds the
-/// PPMF_TYPE_INTERNAL_MSC path also for complex (struct/union) return types.
+/// ppmf_type::INTERNAL_MSC path also for complex (struct/union) return types.
 /// This currently depends on whether the code can adequately determine on
 /// x64 builds if the return type is returned through registers or passed as a
 /// second argument as a pointer to the member function.
@@ -46,7 +46,9 @@
 ///
 /// This code path is disabled by default currently.
 ///
+#if !defined(PPMF_EXPERIMENTAL)
 #define PPMF_EXPERIMENTAL 0
+#endif
 
 /// brief Enable using MAME delegates as a replacement for ppmf.
 ///
@@ -54,7 +56,9 @@
 /// as a replacement to ppmf. Enable this setting if you want to use the nltool
 /// test suite (nltool -c tests) to produce comparisons to ppmf.
 ///
+#if !defined(PPMF_USE_MAME_DELEGATES)
 #define PPMF_USE_MAME_DELEGATES 0
+#endif
 
 #if PPMF_USE_MAME_DELEGATES
 
@@ -87,39 +91,43 @@ namespace plib {
 
 //#define PPMF_FORCE_TYPE 0
 
-#define PPMF_TYPE_PMF              0
-#define PPMF_TYPE_GNUC_PMF_CONV    1
-#define PPMF_TYPE_INTERNAL_ITANIUM 2
-#define PPMF_TYPE_INTERNAL_ARM     3
-#define PPMF_TYPE_INTERNAL_MSC     4
-
 #ifndef PPMF_FORCE_TYPE
 #define PPMF_FORCE_TYPE -1
 #endif
 
 namespace plib {
 
-	struct ppmf_internal
+	enum class ppmf_type
+	{
+		PMF,
+		GNUC_PMF_CONV,
+		INTERNAL_ITANIUM,
+		INTERNAL_ARM,
+		INTERNAL_MSC
+	};
+
+
+	struct ppmf_internal_selector
 	{
 		using ci = compile_info;
-		enum { value =
-			(PPMF_FORCE_TYPE >= 0)                                               ? PPMF_FORCE_TYPE :
+		constexpr static ppmf_type value =
+			(PPMF_FORCE_TYPE >= 0)                                               ? static_cast<ppmf_type>(PPMF_FORCE_TYPE) :
 			(ci::type() == ci_compiler::CLANG && !ci::m64()
-				&& ci::os() == ci_os::WINDOWS)                                   ? PPMF_TYPE_PMF :
-			(ci::mingw() && !ci::m64() && ci::version() >= 407)                  ? PPMF_TYPE_PMF :
-			(ci::mingw() && !ci::m64())                                          ? PPMF_TYPE_PMF : // Dropped support for mingw32 < 407 PPMF_TYPE_INTERNAL_ITANIUM :
-			(ci::env() == ci_env::MSVC && ci::m64())                             ? PPMF_TYPE_INTERNAL_MSC :
+				&& ci::os() == ci_os::WINDOWS)                                   ? ppmf_type::PMF :
+			(ci::mingw() && !ci::m64() && ci::version::full() >= typed_version<4,7>::full()) ? ppmf_type::PMF :
+			(ci::mingw() && !ci::m64())                                          ? ppmf_type::PMF : // Dropped support for mingw32 < 407 ppmf_type::INTERNAL_ITANIUM :
+			(ci::env() == ci_env::MSVC && ci::m64())                             ? ppmf_type::INTERNAL_MSC :
 			((ci::type() == ci_compiler::CLANG || ci::type() == ci_compiler::GCC)
 				&& (ci::arch() == ci_arch::MIPS
 					|| ci::arch() == ci_arch::ARM
-					|| ci::os() == ci_os::EMSCRIPTEN))                           ? PPMF_TYPE_INTERNAL_ARM :
-			(ci::type() == ci_compiler::CLANG || ci::type() == ci_compiler::GCC) ? PPMF_TYPE_INTERNAL_ITANIUM :
-																				   PPMF_TYPE_PMF
-		};
+					|| ci::os() == ci_os::EMSCRIPTEN))                           ? ppmf_type::INTERNAL_ARM :
+			(ci::type() == ci_compiler::CLANG || ci::type() == ci_compiler::GCC) ? ppmf_type::INTERNAL_ITANIUM :
+																				   ppmf_type::PMF
+		;
 	};
 
-	static_assert(!(compile_info::type() == ci_compiler::CLANG && (PPMF_FORCE_TYPE) ==  (PPMF_TYPE_GNUC_PMF_CONV)), "clang does not support PPMF_TYPE_GNUC_PMF_CONV");
-	static_assert(!(compile_info::type() == ci_compiler::NVCC && (PPMF_FORCE_TYPE) ==  (PPMF_TYPE_GNUC_PMF_CONV)), "nvcc does not support PPMF_TYPE_GNUC_PMF_CONV");
+	static_assert(!(compile_info::type() == ci_compiler::CLANG && ppmf_internal_selector::value ==  (ppmf_type::GNUC_PMF_CONV)), "clang does not support ppmf_type::GNUC_PMF_CONV");
+	static_assert(!(compile_info::env() == ci_env::NVCC && ppmf_internal_selector::value ==  (ppmf_type::GNUC_PMF_CONV)), "nvcc does not support ppmf_type::GNUC_PMF_CONV");
 
 	template<typename R, typename... Targs>
 	struct mfp_traits
@@ -138,11 +146,11 @@ namespace plib {
 	///
 	/// The following class was derived from the MAME delegate.h code.
 	///
-	template <int PMFINTERNAL>
+	template <ppmf_type PMFINTERNAL>
 	class mfp_raw;
 
 	template <>
-	class mfp_raw<PPMF_TYPE_INTERNAL_ITANIUM>
+	class mfp_raw<ppmf_type::INTERNAL_ITANIUM>
 	{
 	public:
 		// construct from any member function pointer
@@ -156,14 +164,14 @@ namespace plib {
 
 		// actual state
 		uintptr_t m_function;   // first item can be one of two things:
-		                        //    if even, it's a pointer to the function
-		                        //    if odd, it's the byte offset into the vtable
-		                        //       or a byte offset into the function descriptors on IA64
+								//    if even, it's a pointer to the function
+								//    if odd, it's the byte offset into the vtable
+								//       or a byte offset into the function descriptors on IA64
 		ptrdiff_t m_this_delta; // delta to apply to the 'this' pointer
 	};
 
 	template <>
-	class mfp_raw<PPMF_TYPE_INTERNAL_ARM>
+	class mfp_raw<ppmf_type::INTERNAL_ARM>
 	{
 	public:
 		// construct from any member function pointer
@@ -178,12 +186,12 @@ namespace plib {
 		// actual state
 		uintptr_t m_function;   // first item can pointer to the function or a byte offset into the vtable
 		ptrdiff_t m_this_delta; // delta to apply to the 'this' pointer after right shifting by one bit
-		                        //    m_function is the byte offset into the vtable
-		                        //    On IA64 it may also be a byte offset into the function descriptors
+								//    m_function is the byte offset into the vtable
+								//    On IA64 it may also be a byte offset into the function descriptors
 	};
 
 	template <>
-	class mfp_raw<PPMF_TYPE_INTERNAL_MSC>
+	class mfp_raw<ppmf_type::INTERNAL_MSC>
 	{
 	public:
 		// construct from any member function pointer
@@ -214,11 +222,11 @@ namespace plib {
 		std::is_same_v<std::remove_cv_t<R>, compile_info::int128_type> ||
 		std::is_same_v<std::remove_cv_t<R>, compile_info::uint128_type> >;
 
-	template<int PMFINTERNAL, typename R, typename... Targs>
+	template<ppmf_type PMFINTERNAL, typename R, typename... Targs>
 	struct mfp_helper
 	{
 	protected:
-		static_assert(PMFINTERNAL >= PPMF_TYPE_INTERNAL_ITANIUM && PMFINTERNAL <= PPMF_TYPE_INTERNAL_MSC, "Invalid PMF type");
+		static_assert(PMFINTERNAL >= ppmf_type::INTERNAL_ITANIUM && PMFINTERNAL <= ppmf_type::INTERNAL_MSC, "Invalid PMF type");
 
 		using traits = mfp_traits<R, Targs...>;
 		using generic_member_function = typename traits::template specific_member_function<mfp_generic_class>;
@@ -262,7 +270,7 @@ namespace plib {
 	};
 
 	template<typename R, typename... Targs>
-	struct mfp_helper<PPMF_TYPE_PMF, R, Targs...>
+	struct mfp_helper<ppmf_type::PMF, R, Targs...>
 	{
 	protected:
 		using traits = mfp_traits<R, Targs...>;
@@ -292,9 +300,9 @@ namespace plib {
 		static R stub(const generic_member_function* funci, mfp_generic_class* obji, Targs&&... args) noexcept(true);
 	};
 
-#if NVCCBUILD == 0
+#if !defined(__NVCC__)
 	template<typename R, typename... Targs>
-	struct mfp_helper<PPMF_TYPE_GNUC_PMF_CONV, R, Targs...>
+	struct mfp_helper<ppmf_type::GNUC_PMF_CONV, R, Targs...>
 	{
 	protected:
 		using traits = mfp_traits<R, Targs...>;
@@ -319,15 +327,15 @@ namespace plib {
 	};
 #endif
 
-	template <int PMFINTERNAL, typename R, typename... Targs>
+	template <ppmf_type PMFINTERNAL, typename R, typename... Targs>
 	using pmfp_helper_select = std::conditional<
 		pmf_is_register_return_type<R>::value
-		|| PMFINTERNAL != PPMF_TYPE_INTERNAL_MSC || (PPMF_EXPERIMENTAL),
-			mfp_helper<PMFINTERNAL, R, Targs...>, mfp_helper<PPMF_TYPE_PMF, R, Targs...>>;
+		|| PMFINTERNAL != ppmf_type::INTERNAL_MSC || (PPMF_EXPERIMENTAL),
+			mfp_helper<PMFINTERNAL, R, Targs...>, mfp_helper<ppmf_type::PMF, R, Targs...>>;
 
-	template<int PMFINTERNAL, typename SIGNATURE> class pmfp_base;
+	template<ppmf_type PMFINTERNAL, typename SIGNATURE> class pmfp_base;
 
-	template<int PMFINTERNAL, typename R, typename... Targs>
+	template<ppmf_type PMFINTERNAL, typename R, typename... Targs>
 	class pmfp_base<PMFINTERNAL, R (Targs...)> : public pmfp_helper_select<PMFINTERNAL, R, Targs...>::type
 	{
 	public:
@@ -377,7 +385,7 @@ namespace plib {
 	};
 
 	template<typename Signature>
-	using pmfp = pmfp_base<ppmf_internal::value, Signature>;
+	using pmfp = pmfp_base<ppmf_internal_selector::value, Signature>;
 
 	///
 	/// \brief Class to support delegate late binding
@@ -424,7 +432,7 @@ namespace plib {
 	};
 
 	template<typename MemberFunctionType>
-	mfp_raw<PPMF_TYPE_INTERNAL_ITANIUM>::mfp_raw(MemberFunctionType mftp)
+	mfp_raw<ppmf_type::INTERNAL_ITANIUM>::mfp_raw(MemberFunctionType mftp)
 	: m_function(0), m_this_delta(0)
 	{
 		static_assert(sizeof(*this) >= sizeof(MemberFunctionType), "size mismatch");
@@ -433,7 +441,7 @@ namespace plib {
 	}
 
 	template<typename MemberFunctionType>
-	mfp_raw<PPMF_TYPE_INTERNAL_ARM>::mfp_raw(MemberFunctionType mftp)
+	mfp_raw<ppmf_type::INTERNAL_ARM>::mfp_raw(MemberFunctionType mftp)
 	: m_function(0), m_this_delta(0)
 	{
 		static_assert(sizeof(*this) >= sizeof(MemberFunctionType), "size mismatch");
@@ -441,7 +449,7 @@ namespace plib {
 	}
 
 	template<typename MemberFunctionType>
-	mfp_raw<PPMF_TYPE_INTERNAL_MSC>::mfp_raw(MemberFunctionType mftp)
+	mfp_raw<ppmf_type::INTERNAL_MSC>::mfp_raw(MemberFunctionType mftp)
 	: m_function(0), m_this_delta(0), m_vptr_index(0), m_vt_index(0), m_size(0)
 	{
 		static_assert(sizeof(*this) >= sizeof(MemberFunctionType), "size mismatch");
@@ -449,7 +457,7 @@ namespace plib {
 		m_size = sizeof(mftp); //NOLINT
 	}
 
-	template<int PMFINTERNAL, typename R, typename... Targs>
+	template<ppmf_type PMFINTERNAL, typename R, typename... Targs>
 	mfp_helper<PMFINTERNAL, R, Targs...>::mfp_helper()
 	: m_obj(nullptr)
 	{
@@ -458,7 +466,7 @@ namespace plib {
 		std::fill(s, s + sizeof(m_resolved), 0);
 	}
 
-	template<int PMFINTERNAL, typename R, typename... Targs>
+	template<ppmf_type PMFINTERNAL, typename R, typename... Targs>
 	template<typename O, typename F>
 	void mfp_helper<PMFINTERNAL, R, Targs...>::bind(O *object, F *mftp)
 	{
@@ -478,7 +486,7 @@ namespace plib {
 	}
 
 	template<typename R, typename... Targs>
-	mfp_helper<PPMF_TYPE_PMF, R, Targs...>::mfp_helper()
+	mfp_helper<ppmf_type::PMF, R, Targs...>::mfp_helper()
 	: m_obj(nullptr)
 	, m_stub(nullptr)
 	{
@@ -489,7 +497,7 @@ namespace plib {
 
 	template<typename R, typename... Targs>
 	template<typename O, typename F>
-	void mfp_helper<PPMF_TYPE_PMF, R, Targs...>::bind(O *object, F *mftp)
+	void mfp_helper<ppmf_type::PMF, R, Targs...>::bind(O *object, F *mftp)
 	{
 		reinterpret_copy(*mftp, this->m_resolved);
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
@@ -499,7 +507,7 @@ namespace plib {
 
 	template<typename R, typename... Targs>
 	template<typename O>
-	R mfp_helper<PPMF_TYPE_PMF, R, Targs...>::stub(const generic_member_function* funci, mfp_generic_class* obji, Targs&&... args) noexcept(true)
+	R mfp_helper<ppmf_type::PMF, R, Targs...>::stub(const generic_member_function* funci, mfp_generic_class* obji, Targs&&... args) noexcept(true)
 	{
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		auto* obj = reinterpret_cast<O*>(obji);
@@ -508,9 +516,9 @@ namespace plib {
 		return (obj->*(*func))(std::forward<Targs>(args)...);
 	}
 
-#if NVCCBUILD == 0
+#if !defined(__NVCC__)
 	template<typename R, typename... Targs>
-	mfp_helper<PPMF_TYPE_GNUC_PMF_CONV, R, Targs...>::mfp_helper()
+	mfp_helper<ppmf_type::GNUC_PMF_CONV, R, Targs...>::mfp_helper()
 	: m_obj(nullptr)
 	{
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
@@ -520,7 +528,7 @@ namespace plib {
 
 	template<typename R, typename... Targs>
 	template<typename O, typename F>
-	void mfp_helper<PPMF_TYPE_GNUC_PMF_CONV, R, Targs...>::bind(O *object, F *mftp)
+	void mfp_helper<ppmf_type::GNUC_PMF_CONV, R, Targs...>::bind(O *object, F *mftp)
 	{
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		member_abi_function<O> t = reinterpret_cast<member_abi_function<O>>(object->*(*mftp));
