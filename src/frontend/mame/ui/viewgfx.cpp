@@ -1056,19 +1056,27 @@ uint32_t gfx_viewer::handle_gfxset(mame_ui_manager &mui, render_container &conta
 	float pixelscale = 0.0f;
 	while (xcells > 1)
 	{
-		pixelscale = (cellboxwidth / xcells) / cellxpix;
+		pixelscale = cellboxwidth / (xcells * cellxpix);
 		if (set.m_integer_scale)
 			pixelscale = std::floor(pixelscale);
 		if (0.25f <= pixelscale)
 			break;
 		xcells--;
 	}
-	set.m_columns = xcells;
+	if (0.0f == pixelscale)
+		pixelscale = cellboxwidth / (xcells * cellxpix);
 
 	// in the Y direction, we just display as many as we can
-	int const ycells = int(cellboxheight / (pixelscale * cellypix));
+	int ycells = int(cellboxheight / (pixelscale * cellypix));
+	if (!ycells)
+	{
+		ycells = 1;
+		pixelscale = cellboxheight / cellypix;
+		xcells = int(cellboxwidth / (pixelscale * cellxpix));
+	}
 
 	// now determine the actual cellbox size
+	set.m_columns = xcells;
 	cellboxwidth = std::min(cellboxwidth, xcells * pixelscale * cellxpix);
 	cellboxheight = std::min(cellboxheight, ycells * pixelscale * cellypix);
 
