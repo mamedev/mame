@@ -373,7 +373,7 @@ uint8_t electronsp_state::electron_fred_r(offs_t offset)
 	{
 		data = electron_state::electron_fred_r(offset);
 	}
-	return data;;
+	return data;
 }
 
 void electronsp_state::electron_fred_w(offs_t offset, uint8_t data)

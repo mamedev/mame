@@ -111,7 +111,7 @@ private:
 				uint8_t sprite_collision;
 			} d;
 		} reg;
-	} ;
+	};
 
 	void vc4000_sound_ctl(offs_t offset, uint8_t data);
 	uint8_t vc4000_key_r(offs_t offset);
