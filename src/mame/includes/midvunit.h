@@ -114,6 +114,7 @@ private:
 	uint16_t m_video_regs[16]{};
 	uint8_t m_dma_data_index = 0;
 	emu_timer *m_scanline_timer = nullptr;
+	emu_timer *m_eoi_timer = nullptr;
 	std::unique_ptr<midvunit_renderer> m_poly;
 	uint8_t m_galil_input_index = 0;
 	uint8_t m_galil_input_length = 0;
@@ -171,6 +172,7 @@ private:
 	DECLARE_MACHINE_RESET(midvplus);
 	uint32_t screen_update_midvunit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanline_timer_cb);
+	TIMER_CALLBACK_MEMBER(eoi_timer_cb);
 	required_device<tms32031_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<palette_device> m_palette;
