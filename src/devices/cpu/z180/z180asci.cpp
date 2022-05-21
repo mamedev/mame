@@ -133,9 +133,10 @@ void z180asci_channel_base::device_start()
 	save_item(NAME(m_tsr));
 	save_item(NAME(m_rsr));
 	save_item(NAME(m_data_fifo));
-	save_item(NAME(m_status_fifo));
-	save_item(NAME(m_fifo_head));
-	save_item(NAME(m_fifo_tail));
+	save_item(NAME(m_error_fifo));
+	save_item(NAME(m_fifo_wr));
+	save_item(NAME(m_fifo_rd));
+	save_item(NAME(m_rx_error));
 
 	save_item(NAME(m_cts));
 	save_item(NAME(m_dcd));
@@ -163,8 +164,8 @@ void z180asci_channel_base::device_reset()
 	m_asci_ext = 0;
 	m_asci_tc.w = 0;
 
-	m_fifo_head = 0;
-	m_fifo_tail = 0;
+	m_fifo_wr = 0;
+	m_fifo_rd = 0;
 
 	output_txa(1);
 	output_rts(1);
@@ -254,7 +255,19 @@ uint8_t z180asci_channel_base::rdr_r()
 {
 	LOG("Z180 RDR%d   rd $%02x\n", m_id, m_asci_rdr);
 	if (!machine().side_effects_disabled())
-		m_asci_stat &= ~Z180_STAT0_RDRF;
+	{
+		if (m_fifo_rd != m_fifo_wr)
+		{
+			m_asci_rdr = m_data_fifo[m_fifo_rd];
+			m_asci_stat &= ~(Z180_STAT0_OVRN | Z180_STAT0_PE | Z180_STAT0_FE);
+			m_asci_stat |= m_error_fifo[m_fifo_rd];
+			if (m_asci_stat & (Z180_STAT0_OVRN | Z180_STAT0_PE | Z180_STAT0_FE))
+				m_irq = 1;
+			m_fifo_rd = (m_fifo_rd + 1) & 3;
+			if (m_fifo_rd == m_fifo_wr) // empty
+				m_asci_stat &= ~Z180_STAT0_RDRF;
+		}
+	}
 	return m_asci_rdr;
 }
 
@@ -308,7 +321,8 @@ void z180asci_channel_base::tdr_w(uint8_t data)
 void z180asci_channel_base::rdr_w(uint8_t data)
 {
 	LOG("Z180 RDR%d   wr $%02x\n", m_id, data);
-	m_asci_rdr = data;
+	if (!(m_asci_stat & Z180_STAT0_RDRF))
+		set_fifo_data(data, 0);
 }
 
 void z180asci_channel_base::astcl_w(uint8_t data)
@@ -323,6 +337,20 @@ void z180asci_channel_base::astch_w(uint8_t data)
 	LOG("Z180 ASTC%dH wr $%02x\n", m_id, data);
 	m_asci_tc.b.h = data;
 	device_clock_changed();
+}
+
+DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::cts_wr )
+{
+	m_cts = state;
+}
+
+DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::dcd_wr )
+{
+	if (m_id)
+		return;
+	m_dcd = state;
+	if (m_dcd)
+		m_irq = 1;
 }
 
 DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::rxa_wr )
@@ -392,7 +420,7 @@ void z180asci_channel_base::transmit_edge()
 				if (m_tx_bits == 0)
 				{
 					output_txa(1);
-					m_asci_stat |= 0x02; // set TDRE
+					m_asci_stat |= Z180_STAT0_TDRE;
 					if (m_asci_stat & Z180_STAT0_TIE)
 					{
 						m_irq = 1;
@@ -420,6 +448,7 @@ void z180asci_channel_base::receive_edge()
 				m_rx_state = STATE_DATA;
 				m_rx_bits = 0;
 				m_rx_parity = 0;
+				m_rx_error = 0;
 				m_rsr = 0;
 			}
 			break;
@@ -440,32 +469,48 @@ void z180asci_channel_base::receive_edge()
 		case STATE_PARITY:
 			m_rx_state = STATE_STOP;
 			if (m_asci_cntlb & Z180_CNTLB0_PEO) m_rx_parity ^= 1; // odd parity
-			//TODO: check parity
+			if (m_rx_parity != m_rxa)
+				m_rx_error |= Z180_STAT0_PE;
 			break;
 		case STATE_STOP:
-			if (m_rxa == 1)
+			if (m_rxa == 0)
+				m_rx_error |= Z180_STAT0_FE;
+
+			m_rx_bits--;
+			if (m_rx_bits == 0)
 			{
-				m_rx_bits--;
-				if (m_rx_bits == 0)
+				// Skip only if MPE mode active and MPB is 0
+				if (!((m_asci_cntla & Z180_CNTLA0_MPE) && ((m_asci_cntla & Z180_CNTLA0_MPBR_EFR) == 0)))
 				{
-					// Skip only if MPE mode active and MPB is 0
-					if (!((m_asci_cntla & Z180_CNTLA0_MPE) && ((m_asci_cntla & Z180_CNTLA0_MPBR_EFR) == 0)))
-					{
-						m_asci_stat |= Z180_STAT0_RDRF;
-						m_asci_rdr = m_rsr;
-					}
-					if (m_asci_stat & Z180_STAT0_RIE)
-					{
-						m_irq = 1;
-					}
-					m_rx_state = STATE_START;
+					set_fifo_data(m_rsr, m_rx_error);
 				}
+				m_rx_state = STATE_START;
 			}
 			break;
 		}
 	}
 }
 
+void z180asci_channel_base::set_fifo_data(uint8_t data, uint8_t error)
+{
+	m_data_fifo[m_fifo_wr] = data;
+	m_error_fifo[m_fifo_wr] = error;
+	if (((m_fifo_wr + 1) & 3) == m_fifo_rd) // overrun
+	{
+		m_error_fifo[m_fifo_wr] |= Z180_STAT0_OVRN;
+	}
+	else
+	{
+		m_error_fifo[m_fifo_wr] &= Z180_STAT0_OVRN;
+		m_fifo_wr = (m_fifo_wr + 1) & 3;
+	}
+	m_asci_stat |= Z180_STAT0_RDRF;
+	if (m_asci_stat & Z180_STAT0_RIE)
+	{
+		m_irq = 1;
+	}
+
+}
 void z180asci_channel_base::output_txa(int txa)
 {
 	if (m_txa != txa)

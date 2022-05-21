@@ -43,8 +43,8 @@ public:
 	void astch_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( rxa_wr );
-	DECLARE_WRITE_LINE_MEMBER( cts_wr ) { m_cts = state; }
-	DECLARE_WRITE_LINE_MEMBER( dcd_wr ) { m_dcd = state; }
+	DECLARE_WRITE_LINE_MEMBER( cts_wr );
+	DECLARE_WRITE_LINE_MEMBER( dcd_wr );
 	DECLARE_WRITE_LINE_MEMBER( cka_wr );
 
 	virtual void state_add(device_state_interface &parent) = 0;
@@ -62,8 +62,10 @@ protected:
 	virtual void device_clock_changed() override;
 
 	DECLARE_WRITE_LINE_MEMBER( brg_wr );
+
 	void transmit_edge();
 	void receive_edge();
+	void set_fifo_data(uint8_t data, uint8_t error);
 
 	enum serial_state
 	{
@@ -95,9 +97,10 @@ protected:
 	uint8_t   m_tsr;
 	uint8_t   m_rsr;
 	uint8_t   m_data_fifo[4];
-	uint8_t   m_status_fifo[4];
-	int		  m_fifo_head;
-	int		  m_fifo_tail;
+	uint8_t   m_error_fifo[4];
+	uint8_t   m_rx_error;
+	int		  m_fifo_wr;
+	int		  m_fifo_rd;
 
 	int		  m_cts;
 	int		  m_dcd;
