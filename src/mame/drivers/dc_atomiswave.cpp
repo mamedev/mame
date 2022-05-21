@@ -1486,7 +1486,7 @@ GAME( 2003, sushibar,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, 
 GAME( 2003, demofist,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Polygon Magic / Dimps",    "Demolish Fist", GAME_FLAGS ) // Jun 02 2003 16:45:35
 GAME( 2003, maxspeed,  awbios,   aw1c, aw1w, atomiswave_state, init_atomiswave, ROT0,   "SIMS / Sammy",             "Maximum Speed", GAME_FLAGS ) // Jun 09 2003 10:20:37
 GAME( 2003, dolphin,   awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy",                    "Dolphin Blue", GAME_FLAGS ) // Jun 27 2003 09:00:03
-GAME( 2003, kov7sprt,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "IGS / Sammy",              "Knights of Valour - The Seven Spirits / Xin Sanguo Zhan Ji Qixing Zhuansheng / Shin Sangoku Senki Shissei Tensei", GAME_FLAGS ) // Nov 24 2003 16:56:01
+GAME( 2003, kov7sprt,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "IGS / Sammy",              "Knights of Valour - The Seven Spirits / Xin Sanguo Zhan Ji Qixing Zhuansheng / Shin Sangoku Senki Shichisei Tensei", GAME_FLAGS ) // Nov 24 2003 16:56:01
 GAME( 2004, ggisuka,   awbios,   aw4c, aw4c, atomiswave_state, init_atomiswave, ROT0,   "Arc System Works / Sammy", "Guilty Gear Isuka", GAME_FLAGS ) // Jan 14 2004 10:04:24
 GAME( 2004, rumblefp,  rumblef,  aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy / Dimps",            "The Rumble Fish (prototype)", GAME_FLAGS ) // Feb 20 2004 09:15:34
 GAME( 2004, rangrmsn,  awbios,   aw2c, aw1w, atomiswave_state, init_atomiswave, ROT0,   "RIZ Inc./ Sammy",          "Ranger Mission", GAME_FLAGS ) // Mar 01 2004 19:08:15
