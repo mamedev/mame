@@ -99,15 +99,15 @@ protected:
 	uint8_t   m_data_fifo[4];
 	uint8_t   m_error_fifo[4];
 	uint8_t   m_rx_error;
-	int		  m_fifo_wr;
-	int		  m_fifo_rd;
+	int       m_fifo_wr;
+	int       m_fifo_rd;
 
-	int		  m_cts;
-	int		  m_dcd;
+	int       m_cts;
+	int       m_dcd;
 	int       m_irq;
-	int		  m_txa;
-	int 	  m_rxa;
-	int		  m_rts;
+	int       m_txa;
+	int       m_rxa;
+	int       m_rts;
 
 	uint32_t  m_bgr_divisor;
 	uint32_t  m_divisor;
@@ -121,6 +121,8 @@ protected:
 	int m_rx_parity;
 	int m_rx_bits;
 	int m_rx_counter;
+
+	bool m_rx_enabled;
 
 	const int  m_id;
 	const bool m_ext;

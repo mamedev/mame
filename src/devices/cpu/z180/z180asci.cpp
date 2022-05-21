@@ -56,7 +56,9 @@
 #define Z180_ASEXT_BRK_EN      0x04
 #define Z180_ASEXT_BRK_DET     0x02
 #define Z180_ASEXT_BRK_SEND    0x01
-#define Z180_ASEXT_MASK        0x7f
+
+#define Z180_ASEXT0_MASK        0x7f
+#define Z180_ASEXT1_MASK        0x1f
 
 
 //**************************************************************************
@@ -121,13 +123,15 @@ void z180asci_channel_base::device_start()
 
 	save_item(NAME(m_clock_state));
 	save_item(NAME(m_tx_state));
-	save_item(NAME(m_tx_parity));	
+	save_item(NAME(m_tx_parity));
 	save_item(NAME(m_tx_bits));
 	save_item(NAME(m_tx_counter));
 	save_item(NAME(m_rx_state));
-	save_item(NAME(m_rx_parity));	
+	save_item(NAME(m_rx_parity));
 	save_item(NAME(m_rx_bits));
 	save_item(NAME(m_rx_counter));
+
+	save_item(NAME(m_rx_enabled));
 }
 
 void z180asci_channel_base::device_reset()
@@ -152,6 +156,7 @@ void z180asci_channel_base::device_reset()
 	m_rx_parity = 0;
 	m_rx_bits = 0;
 	m_rx_counter = 0;
+	m_rx_enabled = true;
 }
 
 void z180asci_channel_base::device_add_mconfig(machine_config &config)
@@ -312,8 +317,17 @@ void z180asci_channel_base::astch_w(uint8_t data)
 
 DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::cts_wr )
 {
-	// For channel 1, CTS can be disabled
-	if (m_id && (m_asci_stat && Z180_STAT1_CTS1E) == 0) return;
+	if (m_id)
+	{
+		// For channel 1, CTS can be disabled
+		if ((m_asci_stat && Z180_STAT1_CTS1E) == 0) return;
+	}
+	else 
+	{
+		// For channel 0, high resets TDRE
+		if (m_ext && state && (m_asci_ext && Z180_ASEXT_CTS0) == 0)
+			m_asci_stat |= Z180_STAT_TDRE;
+	}
 	m_cts = state;
 }
 
@@ -321,6 +335,11 @@ DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::dcd_wr )
 {
 	if (m_id)
 		return;
+
+	// In extended mode, DCD autoenables RX if configured
+	if (m_ext && (m_asci_ext && Z180_ASEXT_DCD0) == 0)
+		m_rx_enabled = state ? false : true;
+
 	m_dcd = state;
 	if (m_dcd)
 		m_irq = 1;
@@ -414,6 +433,8 @@ void z180asci_channel_base::receive_edge()
 	if (m_rx_counter != m_divisor) return;
 	m_rx_counter = 0;
 
+	if (!m_rx_enabled) return;
+
 	if (m_asci_cntla & Z180_CNTLA_RE)
 	{
 		switch (m_rx_state)
@@ -440,7 +461,7 @@ void z180asci_channel_base::receive_edge()
 			break;
 		case STATE_MPB:
 			m_rx_state = STATE_STOP;
-			m_asci_cntla |= m_rxa ? Z180_CNTLA_MPBR_EFR : 0; 
+			m_asci_cntla |= m_rxa ? Z180_CNTLA_MPBR_EFR : 0;
 			break;
 		case STATE_PARITY:
 			m_rx_state = STATE_STOP;
@@ -537,7 +558,7 @@ void z180asci_channel_0::state_add(device_state_interface &parent)
 	parent.state_add(Z180_RDR0,   "RDR0",    m_asci_rdr);
 	if (m_ext)
 	{
-		parent.state_add(Z180_ASEXT0, "ASEXT0",  m_asci_ext).mask(Z180_ASEXT_MASK);
+		parent.state_add(Z180_ASEXT0, "ASEXT0",  m_asci_ext).mask(Z180_ASEXT0_MASK);
 		parent.state_add(Z180_ASTC0,  "ASTC0",   m_asci_tc.w);
 	}
 }
@@ -550,8 +571,8 @@ void z180asci_channel_0::stat_w(uint8_t data)
 
 void z180asci_channel_0::asext_w(uint8_t data)
 {
-	LOG("Z180 ASEXT0 wr $%02x ($%02x)\n", data,  data & Z180_ASEXT_MASK & ~Z180_ASEXT_BRK_DET);
-	m_asci_ext = (m_asci_ext & Z180_ASEXT_BRK_DET) | (data & Z180_ASEXT_MASK & ~Z180_ASEXT_BRK_DET);
+	LOG("Z180 ASEXT0 wr $%02x ($%02x)\n", data,  data & Z180_ASEXT0_MASK & ~Z180_ASEXT_BRK_DET);
+	m_asci_ext = (m_asci_ext & Z180_ASEXT_BRK_DET) | (data & Z180_ASEXT0_MASK & ~Z180_ASEXT_BRK_DET);
 	device_clock_changed();
 }
 
@@ -585,7 +606,7 @@ void z180asci_channel_1::state_add(device_state_interface &parent)
 	parent.state_add(Z180_RDR1,   "RDR1",    m_asci_rdr);
 	if (m_ext)
 	{
-		parent.state_add(Z180_ASEXT1, "ASEXT1",  m_asci_ext).mask(Z180_ASEXT_MASK);
+		parent.state_add(Z180_ASEXT1, "ASEXT1",  m_asci_ext).mask(Z180_ASEXT1_MASK);
 		parent.state_add(Z180_ASTC1,  "ASTC1",   m_asci_tc.w);
 	}
 }
@@ -598,8 +619,8 @@ void z180asci_channel_1::stat_w(uint8_t data)
 
 void z180asci_channel_1::asext_w(uint8_t data)
 {
-	LOG("Z180 ASEXT1 wr $%02x ($%02x)\n", data,  data & Z180_ASEXT_MASK & ~Z180_ASEXT_BRK_DET);
-	m_asci_ext = (m_asci_ext & Z180_ASEXT_BRK_DET) | (data & Z180_ASEXT_MASK & ~Z180_ASEXT_BRK_DET);
+	LOG("Z180 ASEXT1 wr $%02x ($%02x)\n", data,  data & Z180_ASEXT1_MASK & ~Z180_ASEXT_BRK_DET);
+	m_asci_ext = (m_asci_ext & Z180_ASEXT_BRK_DET) | (data & Z180_ASEXT1_MASK & ~Z180_ASEXT_BRK_DET);
 	device_clock_changed();
 }
 
