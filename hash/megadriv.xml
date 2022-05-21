@@ -13956,6 +13956,17 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
+	<software name="custodian">
+		<description>Custodian</description>
+		<year>2018</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="custodian (world) (unl).bin" size="1048576" crc="3245e60c" sha1="ecd5bb3edb65d09649f6a0e66554be3948d28b75"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cutiesuz">
 		<description>Cutie Suzuki no Ringside Angel (Jpn)</description>
 		<year>1990</year>
@@ -14853,6 +14864,21 @@ but dumps still have to be confirmed.
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="duke nukem 3d (bra).bin" size="4194304" crc="6bd2accb" sha1="a4663f2b96787a92db604a92491fa27e2b5ced9e"/>
+			</dataarea>
+			<dataarea name="sram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dukenk3dpi" cloneof="dukenk3d">
+		<description>Duke Nukem 3D (Piko reissue)</description>
+		<year>2015</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
+			<feature name="pcb" value="RET-SMD-01"/>
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="duke nukem 3d - directors cut (world) (unl).bin" size="4194304" crc="7a851b5a" sha1="490aa19321718033a6fd2d4dc434e723f3d91d63"/>
 			</dataarea>
 			<dataarea name="sram" size="65536">
 			</dataarea>
@@ -16051,6 +16077,20 @@ but dumps still have to be confirmed.
 				<rom name="unknown chinese game 1 (chi).bin" size="2097152" crc="dfacb9ff" sha1="4283bb9aec05098b9f6b1739e1b02c1bb1f8242f"/>
 			</dataarea>
 			<dataarea name="sram" size="16384">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="canon" cloneof="fengshen">
+		<description>Canon - The Legend of the New Gods</description>
+		<year>2019</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="canon - the legend of the new gods (world) (unl).bin" size="2097152" crc="f85dd66d" sha1="76c2ff5d704b5996a97f6b50375edac860f8d4dd"/>
+			</dataarea>
+			<dataarea name="sram" size="8192"> <!-- according to internal header but not confirmed -->
 			</dataarea>
 		</part>
 	</software>
@@ -19528,6 +19568,20 @@ but dumps still have to be confirmed.
 				<rom name="rockman mega world (jpn) (alt).bin" size="2097152" crc="85c956ef" sha1="a435ac53589a29dbb655662c942daab425d3f6bd"/>
 			</dataarea>
 			<dataarea name="sram" size="16384">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="noahark">
+		<description>Mega Noah's Ark 3D</description>
+		<year>2018</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="mega 3d noah's ark (unl).bin" size="2097152" crc="409165c2" sha1="98491dfce3cbe72cd550161c1ffc6de1f337361e"/>
+			</dataarea>
+			<dataarea name="sram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -25256,6 +25310,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="watermar" cloneof="shuihu">
+		<description>Water Margin - A Tale of Clouds and Wind</description>
+		<year>2015</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="water margin - a tale of clouds and wind (world) (unl).bin" size="2097152" crc="7f93b916" sha1="309e601697891fc90cffe090e993330402b47457"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="shuihuzh">
 		<description>Shui Hu Zhuan (Chi)</description>
 		<year>1996</year>
@@ -27830,6 +27895,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="switchbl">
+		<description>Switchblade</description>
+		<year>2019</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="switchblade (world) (unl).bin" size="1048576" crc="53dd2706" sha1="8147e0a75b23f9475cd616d50725f669ae182af9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="swordsod">
 		<description>Sword of Sodan (Euro, USA)</description>
 		<year>1990</year>
@@ -30162,6 +30238,19 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="wisdomtc">
+		<description>Wisdom Tree Collection</description>
+		<year>2017</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_mcpir"/>
+			<feature name="pcb" value="P-08C V1.1"/>
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="wisdom tree collection (world) (unl).bin" size="2097152" crc="e77806a8" sha1="e68bb4302a5450d3698cbea0c517fa8e8fd943e9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wiznlizu" cloneof="wiznliz">
 		<description>Wiz'n'Liz (USA)</description>
 		<year>1993</year>
@@ -31698,6 +31787,18 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="yang jia jiang - yang warrior family (chi) (unl).bin" size="2097152" crc="6604a79e" sha1="6fcc3102fc22b42049e6eae9a1c30c8a7f022d14"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yangfam" cloneof="yangji">
+		<description>Clan of Heroes - Generals of the Yang Family</description>
+		<year>2017</year>
+		<publisher>Piko Interactive</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="MD-03B"/>
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="clan of heroes - generals of the yang family (world) (unl).bin" size="2097152" crc="aeb3c10c" sha1="a347cd6918ce85c4e1c743fb0792cd56166ed858"/>
 			</dataarea>
 		</part>
 	</software>
