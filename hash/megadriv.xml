@@ -10351,7 +10351,7 @@ but dumps still have to be confirmed.
 		<description>The Adventures of Mighty Max (USA)</description>
 		<year>1994</year>
 		<publisher>Ocean</publisher>
-        <sharedfeat name="compatibility" value="NTSC-U,NTSC-J"/>
+		<sharedfeat name="compatibility" value="NTSC-U,NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="adventures of mighty max, the (usa).bin" size="1048576" crc="55f13a00" sha1="147364ce2de49a85bb64dd7f1075d9687d4fe89e"/>

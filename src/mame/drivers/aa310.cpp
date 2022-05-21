@@ -339,7 +339,7 @@ public:
 	void aa3010(machine_config &config);
 	void aa3020(machine_config &config);
 	void aa4000(machine_config &config);
-	
+
 	required_device<pcf8583_device> m_i2cmem;
 
 protected:
@@ -396,7 +396,7 @@ protected:
 private:
 	required_device<acorn_lc_device> m_lc;
 	required_device<acorn_bmu_device> m_bmu;
-	
+
 };
 
 

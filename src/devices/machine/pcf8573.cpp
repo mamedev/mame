@@ -250,7 +250,7 @@ WRITE_LINE_MEMBER(pcf8573_device::scl_w)
 							}
 							break;
 						}
-						
+
 						if( m_state != STATE_IDLE )
 						{
 							m_sdar = 0 ;

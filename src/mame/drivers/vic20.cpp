@@ -682,16 +682,16 @@ void vic20_state::via2_pa_w(uint8_t data)
 {
 	/*
 
-		bit     description
+	    bit     description
 
-		PA0     ROW 0
-		PA1     ROW 1
-		PA2     ROW 2
-		PA3     ROW 3
-		PA4     ROW 4
-		PA5     ROW 5
-		PA6     ROW 6
-		PA7     ROW 7
+	    PA0     ROW 0
+	    PA1     ROW 1
+	    PA2     ROW 2
+	    PA3     ROW 3
+	    PA4     ROW 4
+	    PA5     ROW 5
+	    PA6     ROW 6
+	    PA7     ROW 7
 
 	*/
 

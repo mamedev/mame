@@ -71,7 +71,7 @@ public:
 		std::optional<u8>   m_current_granule;
 		u8                  m_maximum_granules;
 		u16                 m_last_sector_bytes;
-		std::bitset<256>	m_visited_granules;
+		std::bitset<256>    m_visited_granules;
 	};
 
 	class file : public ifile_t {
@@ -428,7 +428,7 @@ bool impl::granule_iterator::next(u8 &granule, u16 &byte_count)
 
 			// check for cycles, which should only happen if the disk is corrupt (or not in RS-DOS format)
 			if (m_visited_granules[*next_granule])
-				next_granule = std::nullopt;	// this is corrupt!
+				next_granule = std::nullopt;    // this is corrupt!
 			else
 				m_visited_granules.set(*next_granule);
 		}

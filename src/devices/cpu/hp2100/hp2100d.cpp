@@ -145,7 +145,7 @@ offs_t hp2100_disassembler::dasm_srg(std::ostream &stream, u16 inst) const
 			stream << s_shift_ops[BIT(inst, 11)][BIT(inst, 0, 3)];
 		}
 	}
-	
+
 	return 1 | flags;
 }
 

@@ -10,21 +10,21 @@ license:CC0
 <softwarelist name="specpls3_flop" description="Sinclair ZX Spectrum +3 disk images">
 
 <!--
-	Known undumped:
-		Chichén Itzá (likely but unconfirmed)
-		Comando Tracer (dual-system Spectrum/Amstrad release)
-		Psycho Pigs UXB
+    Known undumped:
+        Chichén Itzá (likely but unconfirmed)
+        Comando Tracer (dual-system Spectrum/Amstrad release)
+        Psycho Pigs UXB
 
     Known missing SPS/CAPS IPF dumps (http://www.softpres.org/_media/files:datafiles.zip?id=download&cache=cache):
         3585    LED Storm: Lazer Enhanced Destruction
         3607    Rock Star Ate My Hamster
         3625    Tiger Road
-	
-	Observations:
-		Artura (alt): Side B has Hardball for the Amstrad CPC, was this edition accidentally sold like this?
-	
-	TO DO:
-		Some DSK images may come from the same releases as their respective IPFs. These cases need to be compared and verified to be the same thing before the redundant (and inferior) DSKs can be discarded.
+
+    Observations:
+        Artura (alt): Side B has Hardball for the Amstrad CPC, was this edition accidentally sold like this?
+
+    TO DO:
+        Some DSK images may come from the same releases as their respective IPFs. These cases need to be compared and verified to be the same thing before the redundant (and inferior) DSKs can be discarded.
 -->
 
 	<software name="qoscrup">
@@ -7553,7 +7553,7 @@ license:CC0
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="arturaa" cloneof="artura">
 	<!-- May be the same edition as the IPF -->
-	<!--	Side B has Hardball for the Amstrad CPC, was this edition accidentally sold like this?	-->
+	<!--    Side B has Hardball for the Amstrad CPC, was this edition accidentally sold like this?  -->
 		<description>Artura (alt)</description>
 		<year>1989</year>
 		<publisher>Gremlin Graphics Software</publisher>

@@ -403,7 +403,7 @@ void reel_device::advance_phase()
 			break;
 		}
 		break;
-		
+
 		case SRU_200STEP_REEL :
 		//Standard drive table is 2,3,1,9,8,c,4,6
 		//Starpoint mechanism, custom for JPM?

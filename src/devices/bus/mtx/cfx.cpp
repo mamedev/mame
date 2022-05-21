@@ -110,14 +110,14 @@ void mtx_cfx_device::device_reset()
 void mtx_cfx_device::portc_w(uint8_t data)
 {
 	/*
-		b0 A0
-		b1 A1
-		b2 A2
-		b3 CS0
-		b4 CS1
-		b5 WRITE
-		b6 READ
-		b7 RESET
+	    b0 A0
+	    b1 A1
+	    b2 A2
+	    b3 CS0
+	    b4 CS1
+	    b5 WRITE
+	    b6 READ
+	    b7 RESET
 	*/
 
 	if (BIT(data, 7))
