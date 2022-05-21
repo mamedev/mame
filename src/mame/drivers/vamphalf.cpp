@@ -522,7 +522,7 @@ void vamphalf_state::qs1000_p3_w(u8 data)
 void vamphalf_state::common_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram().share("wram");
-	map(0x40000000, 0x4003ffff).rw(FUNC(vamphalf_state::vram_r), FUNC(vamphalf_state::vram_w));;
+	map(0x40000000, 0x4003ffff).rw(FUNC(vamphalf_state::vram_r), FUNC(vamphalf_state::vram_w));
 	map(0x80000000, 0x8000ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xfff00000, 0xffffffff).rom().region("maincpu", 0);
 }

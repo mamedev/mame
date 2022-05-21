@@ -466,7 +466,7 @@ u8 exorciser_state::prom_r(offs_t offset)
 	case 0:
 		return 0;
 	case 1: {
-		u8 byte = m_rs232_config->read();;
+		u8 byte = m_rs232_config->read();
 		if (!m_irq)
 			byte |= 0xf0;
 		return byte;
