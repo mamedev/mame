@@ -17,6 +17,7 @@ namespace netlist
 	///  Use the state_var template to define a variable whose value is saved.
 	///  Within a device definition use
 	///
+	/// ```
 	///      NETLIB_OBJECT(abc)
 	///      {
 	///          NETLIB_CONSTRUCTOR(abc)
@@ -24,6 +25,8 @@ namespace netlist
 	///          ...
 	///          state_var<unsigned> m_var;
 	///      }
+	/// ```
+	///
 	template <typename T>
 	struct state_var
 	{

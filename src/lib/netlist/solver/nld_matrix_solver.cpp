@@ -1,6 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Couriersud
 
+// Names
+// spell-checker: words Raphson, Seidel
+//
+// Specific technical terms
+// spell-checker: words vsolver
+
 #include "nld_solver.h"
 #include "core/setup.h"
 #include "nl_setup.h"
@@ -12,7 +18,7 @@ namespace netlist::solver
 
 	terms_for_net_t::terms_for_net_t(analog_net_t * net)
 		: m_net(net)
-		, m_railstart(0)
+		, m_rail_start(0)
 	{
 	}
 
@@ -144,27 +150,31 @@ namespace netlist::solver
 			m_dynamic_funcs.emplace_back(nldelegate_dyn(&core_device_t::update_terminals, d));
 	}
 
+	/// \brief Sort terminals
+	///
+	/// @param sort Sort algorithm to use.
+	///
+	/// Sort in descending order by number of connected matrix voltages.
+	///The idea is, that for Gauss-Seidel algorithm the first voltage computed
+	/// depends on the greatest number of previous voltages thus taking into
+	/// account the maximum amount of information.
+	///
+	/// This actually improves performance on popeye slightly. Average
+	/// GS computations reduce from 2.509 to 2.370
+	///
+	/// Smallest to largest : 2.613
+	/// Unsorted            : 2.509
+	/// Largest to smallest : 2.370
+	//
+	/// Sorting as a general matrix pre-conditioning is mentioned in
+	/// literature but I have found no articles about Gauss Seidel.
+	///
+	/// For Gaussian Elimination however increasing order is better suited.
+	/// NOTE: Even better would be to sort on elements right of the matrix diagonal.
+	/// FIXME: This entry needs an update.
+	///
 	void matrix_solver_t::sort_terms(matrix_sort_type_e sort)
 	{
-		// Sort in descending order by number of connected matrix voltages.
-		// The idea is, that for Gauss-Seidel algo the first voltage computed
-		// depends on the greatest number of previous voltages thus taking into
-		// account the maximum amout of information.
-		//
-		// This actually improves performance on popeye slightly. Average
-		// GS computations reduce from 2.509 to 2.370
-		//
-		// Smallest to largest : 2.613
-		// Unsorted            : 2.509
-		// Largest to smallest : 2.370
-		//
-		// Sorting as a general matrix pre-conditioning is mentioned in
-		// literature but I have found no articles about Gauss Seidel.
-		//
-		// For Gaussian Elimination however increasing order is better suited.
-		// NOTE: Even better would be to sort on elements right of the matrix diagonal.
-		//
-
 		const std::size_t iN = m_terms.size();
 
 		switch (sort)
@@ -211,7 +221,7 @@ namespace netlist::solver
 					for (std::size_t k = 0; k < iN - 1; k++)
 						for (std::size_t i = k+1; i < iN; i++)
 						{
-							if ((static_cast<int>(m_terms[k].railstart()) - static_cast<int>(m_terms[i].railstart())) * sort_order < 0)
+							if ((static_cast<int>(m_terms[k].rail_start()) - static_cast<int>(m_terms[i].rail_start())) * sort_order < 0)
 							{
 								std::swap(m_terms[i], m_terms[k]);
 							}
@@ -238,7 +248,7 @@ namespace netlist::solver
 
 		for (std::size_t k = 0; k < iN; k++)
 		{
-			m_terms[k].set_railstart(m_terms[k].count());
+			m_terms[k].set_rail_start(m_terms[k].count());
 			for (std::size_t i = 0; i < m_rails_temp[k].count(); i++)
 				this->m_terms[k].add_terminal(m_rails_temp[k].terms()[i], m_rails_temp[k].m_connected_net_idx.data()[i], false);
 		}
@@ -259,7 +269,7 @@ namespace netlist::solver
 
 			t.m_nz.clear();
 
-			for (std::size_t i = 0; i < t.railstart(); i++)
+			for (std::size_t i = 0; i < t.rail_start(); i++)
 				if (!plib::container::contains(t.m_nz, static_cast<unsigned>(other[i])))
 					t.m_nz.push_back(static_cast<unsigned>(other[i]));
 
@@ -293,7 +303,7 @@ namespace netlist::solver
 				}
 			}
 
-			for (std::size_t i = 0; i < t.railstart(); i++)
+			for (std::size_t i = 0; i < t.rail_start(); i++)
 				if (!plib::container::contains(t.m_nzrd, static_cast<unsigned>(other[i])) && other[i] >= static_cast<int>(k + 1))
 					t.m_nzrd.push_back(static_cast<unsigned>(other[i]));
 
@@ -334,7 +344,7 @@ namespace netlist::solver
 				}
 			}
 		}
-		log().verbose("Number of mults/adds for {1}: {2}", name(), m_ops);
+		log().verbose("Number of multiplications/additions for {1}: {2}", name(), m_ops);
 
 		if ((false))
 			for (std::size_t k = 0; k < iN; k++)
@@ -368,7 +378,7 @@ namespace netlist::solver
 		for (std::size_t k = 0; k < iN; k++)
 		{
 			max_count = std::max(max_count, m_terms[k].count());
-			max_rail = std::max(max_rail, m_terms[k].railstart());
+			max_rail = std::max(max_rail, m_terms[k].rail_start());
 		}
 
 		m_gtn.resize(iN, max_count);
@@ -445,7 +455,7 @@ namespace netlist::solver
 		do
 		{
 			update_dynamic();
-			// Gauss-Seidel will revert to Gaussian elemination if steps exceeded.
+			// Gauss-Seidel will revert to Gaussian elimination if steps exceeded.
 			this->m_stat_calculations++;
 			this->vsolve_non_dynamic();
 			this_resched = this->check_err();
@@ -472,11 +482,11 @@ namespace netlist::solver
 			backup();
 			step(timestep_type::FORWARD, netlist_time::from_fp(m_params.m_min_ts_ts()));
 			resched = solve_nr_base();
-			// update timestep calculation
+			// update time step calculation
 			next_time_step = compute_next_timestep(m_params.m_min_ts_ts(), m_params.m_min_ts_ts(), m_params.m_max_timestep);
 			delta -= netlist_time::from_fp(m_params.m_min_ts_ts());
 		}
-		// try remaining time using compute_next_timestep
+		// try remaining time using compute_next_time step
 		while (delta > netlist_time::zero())
 		{
 			if (next_time_step > delta)
@@ -516,7 +526,7 @@ namespace netlist::solver
 			return timestep_device_count() > 0 ? netlist_time::from_fp(m_params.m_min_timestep) : netlist_time::zero();
 		}
 
-		backup(); // save voltages for backup and timestep calculation
+		backup(); // save voltages for backup and time step calculation
 		// update all terminals for new time step
 		m_last_step = now;
 
@@ -650,7 +660,7 @@ namespace netlist::solver
 			log().verbose("Solver {1}", this->name());
 			log().verbose("       ==> {1} nets", this->m_terms.size());
 			log().verbose("       has {1} dynamic elements", this->dynamic_device_count());
-			log().verbose("       has {1} timestep elements", this->timestep_device_count());
+			log().verbose("       has {1} time step elements", this->timestep_device_count());
 			log().verbose("       {1:6.3} average newton raphson loops",
 						static_cast<fptype>(this->m_stat_newton_raphson) / static_cast<fptype>(this->m_stat_vsolver_calls));
 			log().verbose("       {1:10} invocations ({2:6.0} Hz)  {3:10} gs fails ({4:6.2} %) {5:6.3} average",

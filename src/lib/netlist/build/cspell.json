@@ -1,32 +1,46 @@
 {
 "words" : [
-	"MAME",
-	"netlist",
-	"netlists",
+	"astable",
+	"behavioural",
 	"datasheet",
-	"cmos",
-	"opamp",
-	"opamps",
-	"mosfet",
-	"mosfets",
-	"Chebyshev",
-	"Fairchild",
-	"Schmitt",
-	"Transconductance",
-	"nmos",
-	"pmos",
-	"retriggerable", // not in leo
-	"presettable", // not in leo
-	"misformatted", // not in leo
-	"monostable",
+	"datasheets",
 	"demultiplexer",
 	"demultiplexers",
-	"behavioural",
 	"highpass",
-	"nltool",
-	"nvcc",
+	"lowpass",
+	"misformatted", // not in leo
+	"monostable",
+	"presettable", // not in leo
+	"transconductance",
+	"retriggerable", // not in leo
+	// Names
+	"Chebyshev",
+	"Raphson",
+	"Schmitt",
+	"Schottky",
+	"Zener",
+	// Company names
+	"Fairchild",
+	"Signetics",
+	"Mostek",
+	// Technical terms
+	"cmos",
+	"mosfet",
+	"mosfets",
+	"nmos",
+	"opamp",
+	"opamps",
+	"pmos",
+	// Specific project terms
+	"MAME",
 	"Couriersud",
-	"plib", // FIXME: Remove everything below here again
+	"netlist",
+	"netlists",
+	"nltool",
+	"nlwav",
+	"nvcc",
+	// FIXME: Remove everything below here again
+	"plib",
 	"ppmf"
 ],
 "languageSettings": [
@@ -69,7 +83,9 @@
 			// Project specific exclusions start here
 			"/\/\/ copyright-holders.*/",
 			"/\/\/- Pinalias:/",
-			"/\/\/#.*/"                        // commented source code
+			"/\/\/#.*/",                       // commented source code
+			"\/\/ Source:.*/",                 // generated code
+			"/\\$[A-z0-9][^\\s]*/"           // everything starting with a $
 		]
 	}
 ]

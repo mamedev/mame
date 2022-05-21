@@ -82,6 +82,7 @@ namespace plib {
 
 #include <algorithm>
 #include <cstdint> // uintptr_t
+#include <cstddef> // ptrdiff_t
 #include <type_traits>
 #include <utility>
 
@@ -162,7 +163,26 @@ namespace plib {
 		// extract the generic function and adjust the object pointer
 		void convert_to_generic(generic_function &func, mfp_generic_class *&object) const;
 
-		// actual state
+		/// \brief Byte offset into the vtable
+		///
+		/// On x86-64, the vtable contains pointers to code, and function pointers
+		/// are pointers to code. To obtain a function pointer for a virtual
+		/// member function, you fetch a pointer to code from the vtable.
+		///
+		/// On traditional PPC64, the vtable contains pointers to function
+		/// descriptors, and function pointers are pointers to function descriptors.
+		/// To obtain a function pointer for a virtual member function, you
+		/// fetch a pointer to a function descriptor from the vtable.
+		/// On IA64, the vtable contains function descriptors, and function
+		/// pointers are pointers to function descriptors. To obtain a
+		/// function pointer for a virtual member function, you calculate
+		/// the address of the function descriptor in the vtable.
+		/// Simply adding the byte offset to the vtable pointer creates a
+		/// function pointer on IA64 because the vtable contains function
+		/// descriptors; on most other targets, the vtable contains function
+		/// pointers, so you need to fetch the function pointer after
+		/// calculating its address in the vtable.
+		///
 		uintptr_t m_function;   // first item can be one of two things:
 								//    if even, it's a pointer to the function
 								//    if odd, it's the byte offset into the vtable
@@ -394,6 +414,7 @@ namespace plib {
 	/// is virtual, the vtable may not yet be fully constructed. In these cases
 	/// the following class allows to construct the delegate later.
 	///
+	/// ```
 	///     plib::late_pmfp<plib::pmfp<void, pstring>> a(&nld_7493::printer);
 	///     // Store the a object somewhere
 	///
@@ -401,7 +422,7 @@ namespace plib {
 	///
 	///     auto delegate_obj = a(this);
 	///     delegate_obj(pstring("Hello World!"));
-	///
+	/// ```
 	template<typename T>
 	class late_pmfp
 	{
@@ -472,8 +493,8 @@ namespace plib {
 	{
 		typename traits::template specific_member_function<O> pFunc;
 		static_assert(sizeof(pFunc) >= sizeof(F), "size error");
-		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-		//*reinterpret_cast<F *>(&pFunc) = *mftp;
+		//# NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+		//# *reinterpret_cast<F *>(&pFunc) = *mftp;
 		reinterpret_copy(*mftp, pFunc);
 		raw_type mfpo(pFunc);
 		generic_function_storage rfunc(nullptr);

@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Couriersud
 
+// Names
+// spell-checker: words Woodbury,
 
 #include "nl_factory.h"
 #include "core/setup.h"
@@ -465,7 +467,7 @@ namespace netlist::devices
 			log().verbose("Solver {1}", ms->name());
 			log().verbose("       ==> {1} nets", grp.size());
 			log().verbose("       has {1} dynamic elements", ms->dynamic_device_count());
-			log().verbose("       has {1} timestep elements", ms->timestep_device_count());
+			log().verbose("       has {1} time step elements", ms->timestep_device_count());
 			for (auto &n : grp)
 			{
 				log().verbose("Net {1}", n->name());

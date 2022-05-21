@@ -1491,8 +1491,8 @@ const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 
 	auto ret = plib::make_unique<logic_family_std_proxy_t, host_arena>(ft);
 
-	ret->m_low_thresh_PCNT = modv.m_IVL();
-	ret->m_high_thresh_PCNT = modv.m_IVH();
+	ret->m_low_threshold_PCNT = modv.m_IVL();
+	ret->m_high_threshold_PCNT = modv.m_IVH();
 	ret->m_low_VO = modv.m_OVL();
 	ret->m_high_VO = modv.m_OVH();
 	ret->m_R_low = modv.m_ORL();
@@ -1711,14 +1711,14 @@ plib::istream_uptr source_string_t::stream([[maybe_unused]] const pstring &name)
 	return ret;
 }
 
-plib::istream_uptr source_mem_t::stream( [[maybe_unused]] const pstring &name)
+plib::istream_uptr source_mem_t::stream([[maybe_unused]] const pstring &name)
 {
 	plib::istream_uptr ret(std::make_unique<std::istringstream>(m_str, std::ios_base::binary), name);
 	ret->imbue(std::locale::classic());
 	return ret;
 }
 
-plib::istream_uptr source_file_t::stream( [[maybe_unused]] const pstring &name)
+plib::istream_uptr source_file_t::stream([[maybe_unused]] const pstring &name)
 {
 	auto f = std::make_unique<plib::ifstream>(plib::filesystem::u8path(m_filename));
 	if (f->is_open())
@@ -1729,7 +1729,7 @@ plib::istream_uptr source_file_t::stream( [[maybe_unused]] const pstring &name)
 	return plib::istream_uptr();
 }
 
-plib::istream_uptr source_pattern_t::stream( [[maybe_unused]] const pstring &name)
+plib::istream_uptr source_pattern_t::stream([[maybe_unused]] const pstring &name)
 {
 	pstring filename = plib::pfmt(m_pattern)(m_force_lowercase ? plib::lcase(name) : name);
 	auto f = std::make_unique<plib::ifstream>(plib::filesystem::u8path(filename));
@@ -1753,7 +1753,7 @@ bool source_proc_t::parse(nlparse_t &setup, const pstring &name)
 	return false;
 }
 
-plib::istream_uptr source_proc_t::stream( [[maybe_unused]] const pstring &name)
+plib::istream_uptr source_proc_t::stream([[maybe_unused]] const pstring &name)
 {
 	return plib::istream_uptr();
 }

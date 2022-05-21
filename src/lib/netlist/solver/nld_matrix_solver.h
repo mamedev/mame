@@ -4,6 +4,9 @@
 #ifndef NLD_MATRIX_SOLVER_H_
 #define NLD_MATRIX_SOLVER_H_
 
+// Names
+// spell-checker: words Raphson, Seidel
+
 ///
 /// \file nld_matrix_solver.h
 ///
@@ -183,7 +186,7 @@ namespace netlist::solver
 
 		std::size_t count() const noexcept { return m_terms.size(); }
 
-		std::size_t railstart() const noexcept { return m_railstart; }
+		std::size_t rail_start() const noexcept { return m_rail_start; }
 
 		terminal_t **terms() noexcept { return m_terms.data(); }
 
@@ -193,7 +196,7 @@ namespace netlist::solver
 
 		bool is_net(const analog_net_t * net) const noexcept { return net == m_net; }
 
-		void set_railstart(std::size_t val) noexcept { m_railstart = val; }
+		void set_rail_start(std::size_t val) noexcept { m_rail_start = val; }
 
 		PALIGNAS_VECTOROPT()
 
@@ -205,7 +208,7 @@ namespace netlist::solver
 	private:
 		analog_net_t * m_net;
 		plib::aligned_vector<terminal_t *> m_terms;
-		std::size_t m_railstart;
+		std::size_t m_rail_start;
 	};
 
 	class proxied_analog_output_t : public analog_output_t
@@ -256,7 +259,7 @@ namespace netlist::solver
 		/// \brief Immediately solve system at current time
 		///
 		/// This should only be called from update and update_param events.
-		/// It's purpose is to bring voltage values to the current timestep.
+		/// It's purpose is to bring voltage values to the current time step.
 		/// This will be called BEFORE updating object properties.
 		void solve_now()
 		{
@@ -316,11 +319,11 @@ namespace netlist::solver
 		virtual void backup() = 0;
 		virtual void restore() = 0;
 
-		std::size_t max_railstart() const noexcept
+		std::size_t max_rail_start() const noexcept
 		{
 			std::size_t max_rail = 0;
 			for (std::size_t k = 0; k < m_terms.size(); k++)
-				max_rail = std::max(max_rail, m_terms[k].railstart());
+				max_rail = std::max(max_rail, m_terms[k].rail_start());
 			return max_rail;
 		}
 

@@ -119,7 +119,7 @@ namespace plib
 	};
 
 	// <sys/types.h> on ubuntu system may define major and minor as macros
-	// That's why we use vmajor, .. here
+	// That's why we use `vmajor`, .. here
 	template <std::size_t MAJOR, std::size_t MINOR>
 	struct typed_version
 	{
@@ -159,7 +159,7 @@ namespace plib
 		using version = typed_version<__clang_major__, __clang_minor__>;
 	#elif defined(__GNUC__)
 		using type = std::integral_constant<ci_compiler, ci_compiler::GCC>;
-		using version = typed_version< __GNUC__, __GNUC_MINOR__ >;
+		using version = typed_version<__GNUC__, __GNUC_MINOR__>;
 	#elif defined(_MSC_VER)
 		using type = std::integral_constant<ci_compiler, ci_compiler::MSC>;
 		using version = typed_version<_MSC_VER / 100, _MSC_VER % 100>;
@@ -169,10 +169,10 @@ namespace plib
 	#endif
 	#if defined(_LIBCPP_VERSION)
 		using cpp_stdlib = std::integral_constant<ci_cpp_stdlib, ci_cpp_stdlib::LIBCPP>;
-		using cpp_stdlib_version = std::integral_constant<int, ((_LIBCPP_VERSION) / 1000) * 100 + ((_LIBCPP_VERSION) / 100) % 10>;
+		using cpp_stdlib_version = typed_version<(_LIBCPP_VERSION) / 1000, ((_LIBCPP_VERSION) / 100) % 10>;
 	#elif defined(__GLIBCXX__)
 		using cpp_stdlib = std::integral_constant<ci_cpp_stdlib, ci_cpp_stdlib::LIBSTDCXX>;
-		using cpp_stdlib_version = std::integral_constant<int, (_GLIBCXX_RELEASE) * 100>;
+		using cpp_stdlib_version = typed_version<(_GLIBCXX_RELEASE), 0>;
 	#else
 		using cpp_stdlib = std::integral_constant<ci_cpp_stdlib, ci_cpp_stdlib::UNKNOWN>;
 		using cpp_stdlib_version = std::integral_constant<int, 0>;
@@ -286,7 +286,7 @@ namespace plib
 
 	template<typename T> struct is_floating_point : public std::is_floating_point<T> { };
 
-	template< class T >
+	template<class T>
 	struct is_arithmetic : std::integral_constant<bool,
 		plib::is_integral<T>::value || plib::is_floating_point<T>::value> {};
 
@@ -350,7 +350,7 @@ namespace plib
 
 	/// \brief mark arguments as not used for compiler
 	///
-	/// @tparam Ts unsused parameters
+	/// \tparam Ts unused parameters
 	///
 	template<typename... Ts>
 	inline void unused_var(Ts&&...) noexcept {} // NOLINT(readability-named-parameter) // FIXME: remove unused var completely
@@ -377,7 +377,7 @@ namespace plib
 
 	/// \brief Test if type R has a stream operator << defined
 	///
-	/// has_ostram_operator<std::ostream, int>:: value should be true
+	/// has_ostream_operator<std::ostream, int>:: value should be true
 	///
 	/// \tparam LEFT Stream type
 	/// \tparam RIGHT Type to check for operator overload

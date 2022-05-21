@@ -22,7 +22,7 @@
 ///
 /// The approach is iterative and applied for each row changed.
 ///
-/// The performance for a typical circuit like kidniki compared to Gaussian
+/// The performance for a typical circuit like `kidniki` compared to Gaussian
 /// elimination is poor:
 ///
 /// a) The code needs to be run for each row change.
@@ -239,7 +239,7 @@ namespace netlist::solver
 					auto lamba(plib::constants<FT>::zero());
 					std::array<float_type, m_pitch> w = {0};
 
-					// compute w and lamba
+					// compute w and lambda
 					for (std::size_t i = 0; i < iN; i++)
 						z[i] = Ainv(i, row); // u is row'th column
 
@@ -251,7 +251,7 @@ namespace netlist::solver
 						std::size_t col = cols[j];
 						float_type f = v[col];
 						for (std::size_t k = 0; k < iN; k++)
-							w[k] += Ainv(col,k) * f; // Transpose(Ainv) * v
+							w[k] += Ainv(col,k) * f; //# Transpose(Ainv) * v
 					}
 
 					lamba = -plib::reciprocal(plib::constants<float_type>::one() + lamba);

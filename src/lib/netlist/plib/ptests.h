@@ -10,13 +10,13 @@
 /// google tests compatible (hopefully) test macros. This is work in progress!
 ///
 
+#include <algorithm>
 #include <exception>
 #include <functional>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <algorithm>
-#include <sstream>
 
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wglobal-constructors"
