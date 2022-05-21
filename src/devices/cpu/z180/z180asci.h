@@ -61,10 +61,15 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_clock_changed() override;
 
+	DECLARE_WRITE_LINE_MEMBER( brg_wr );
+	void transmit_edge();
+	void receive_edge();
+
 	enum serial_state
 	{
 		STATE_START,
 		STATE_DATA,
+		STATE_PARITY,
 		STATE_STOP
 	};
 
@@ -100,12 +105,17 @@ protected:
 	int 	  m_rxa;
 	int		  m_rts;
 
+	uint32_t  m_bgr_divisor;
 	uint32_t  m_divisor;
 
 	int m_clock_state;
 	int m_tx_state;
+	int m_tx_parity;
+	int m_tx_bits;
 	int m_tx_counter;
 	int m_rx_state;
+	int m_rx_parity;
+	int m_rx_bits;
 	int m_rx_counter;
 
 	const int  m_id;

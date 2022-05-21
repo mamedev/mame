@@ -19,6 +19,7 @@
 #define Z180_CNTLA0_TE          0x20
 #define Z180_CNTLA0_RTS0        0x10
 #define Z180_CNTLA0_MPBR_EFR    0x08
+#define Z180_CNTLA0_MODE        0x07
 #define Z180_CNTLA0_MODE_DATA   0x04
 #define Z180_CNTLA0_MODE_PARITY 0x02
 #define Z180_CNTLA0_MODE_STOPB  0x01
@@ -101,6 +102,7 @@ z180asci_channel_base::z180asci_channel_base(const machine_config &mconfig, devi
 	, m_dcd(0)
 	, m_irq(0)
 	, m_rts(0)
+	, m_bgr_divisor(0)
 	, m_divisor(0)
 	, m_id(id)
 	, m_ext(ext)
@@ -142,22 +144,24 @@ void z180asci_channel_base::device_start()
 	save_item(NAME(m_rxa));
 	save_item(NAME(m_rts));
 
+	save_item(NAME(m_bgr_divisor));
 	save_item(NAME(m_divisor));
 
 	save_item(NAME(m_clock_state));
 	save_item(NAME(m_tx_state));
+	save_item(NAME(m_tx_parity));	
+	save_item(NAME(m_tx_bits));
 	save_item(NAME(m_tx_counter));
 	save_item(NAME(m_rx_state));
+	save_item(NAME(m_rx_parity));	
+	save_item(NAME(m_rx_bits));
 	save_item(NAME(m_rx_counter));
-
 }
 
 void z180asci_channel_base::device_reset()
 {
 	m_asci_ext = 0;
 	m_asci_tc.w = 0;
-
-	m_divisor = 1;
 
 	m_fifo_head = 0;
 	m_fifo_tail = 0;
@@ -168,24 +172,28 @@ void z180asci_channel_base::device_reset()
 	m_tsr = 0;
 	m_rxa = 1;
 	m_clock_state = 0;
-	m_tx_state = STATE_START;
+	m_tx_state = STATE_STOP;
+	m_tx_parity = 0;
+	m_tx_bits = 0;
 	m_tx_counter = 0;
 	m_rx_state = STATE_START;
+	m_rx_parity = 0;
+	m_rx_bits = 0;
 	m_rx_counter = 0;
 }
 
 void z180asci_channel_base::device_add_mconfig(machine_config &config)
 {
 	CLOCK(config, m_brg, 0);
-	m_brg->signal_handler().append(*this, FUNC(z180asci_channel_base::cka_wr));
+	m_brg->signal_handler().append(*this, FUNC(z180asci_channel_base::brg_wr));
 }
 
 void z180asci_channel_base::device_clock_changed()
 {
-	if (m_divisor)
+	if (m_bgr_divisor)
 	{
-		LOG("Z180 ASCI%d set bitrate %d\n", m_id, uint32_t(clock() / m_divisor));
-		m_brg->set_clock(DERIVED_CLOCK(1,m_divisor));
+		LOG("Z180 ASCI%d set bitrate %d\n", m_id, uint32_t(clock() / m_bgr_divisor));
+		m_brg->set_clock(DERIVED_CLOCK(1,m_bgr_divisor));
 	}
 	else
 		m_brg->set_clock(0);
@@ -247,7 +255,6 @@ void z180asci_channel_base::cntla_w(uint8_t data)
 	LOG("Z180 CNTLA%d wr $%02x\n", m_id, data);
 	m_asci_cntla = data;
 	output_rts(BIT(data,4));
-	//set_data_frame(1, BIT(data,2) ? 8 : 7, BIT(data,1) ? PARITY_ODD : PARITY_NONE, BIT(data,0) ? STOP_BITS_2 : STOP_BITS_1);
 }
 
 void z180asci_channel_base::cntlb_w(uint8_t data)
@@ -255,10 +262,28 @@ void z180asci_channel_base::cntlb_w(uint8_t data)
 	LOG("Z180 CNTLB%d wr $%02x\n", m_id, data);
 	m_asci_cntlb = data;
 
-	m_divisor = 1<<(m_asci_cntlb & 0x07);
-	m_divisor *= ((m_asci_cntlb & 0x20) ? 30 : 10);
-	m_divisor *= ((m_asci_cntlb & 0x08) ? 64 : 16);
+	 // Divide ratio
+	m_divisor = (m_asci_ext & Z180_ASEXT0_X1_BIT_CLK0) ? 1 : ((m_asci_cntlb & Z180_CNTLB0_DR) ? 64 : 16);
 
+	if ((m_asci_cntlb & Z180_CNTLB0_SS) == Z180_CNTLB0_SS)
+	{
+		// External clock
+		m_bgr_divisor = 0;
+	}
+	else
+	{
+		if (m_asci_ext & Z180_ASEXT0_BRG0_MODE)
+		{
+			// Extended boud rate generator mode
+			m_bgr_divisor = m_asci_tc.w + 2;
+		}
+		else
+		{
+			// Regular bitrate generator mode
+			m_bgr_divisor = 1 << (m_asci_cntlb & Z180_CNTLB0_SS);
+			m_bgr_divisor *= ((m_asci_cntlb & Z180_CNTLB0_CTS_PS) ? 30 : 10); // Prescale
+		}
+	}
 	device_clock_changed();
 }
 
@@ -267,7 +292,7 @@ void z180asci_channel_base::tdr_w(uint8_t data)
 	LOG("Z180 TDR%d   wr $%02x\n", m_id, data);
 	m_asci_tdr = data;
 	m_asci_stat &= ~0x02; // clear TDRE
-	m_tx_counter = 8;
+	m_tx_bits = 0;
 	m_tx_state = STATE_START;
 	m_tsr = m_asci_tdr;
 }
@@ -295,31 +320,62 @@ DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::rxa_wr )
 	m_rxa = state;
 }
 
+DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::brg_wr )
+{
+	if (!state)
+		transmit_edge();
+	else
+		receive_edge();
+}
+
 
 DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::cka_wr )
 {
 	if(state != m_clock_state) {
 		m_clock_state = state;
-		if(m_clock_state) {
+		if(!state)
+			transmit_edge();
+		else
+			receive_edge();
+	}
+}
 
-			switch (m_tx_state)
+void z180asci_channel_base::transmit_edge()
+{
+	m_tx_counter++;
+	if (m_tx_counter != m_divisor) return;
+	m_tx_counter = 0;
+
+	if (m_asci_cntla & Z180_CNTLA0_TE)
+	{
+		switch (m_tx_state)
+		{
+		case STATE_START:
+			output_txa(0);
+			m_tx_state = STATE_DATA;
+			m_tx_parity = 0;
+			break;
+		case STATE_DATA:
+			m_tx_bits++;
+			output_txa(BIT(m_tsr, 0));
+			m_tx_parity ^= BIT(m_tsr, 0);
+			m_tsr >>= 1;
+			if (m_tx_bits == ((m_asci_cntla & Z180_CNTLA0_MODE_DATA) ? 8 : 7))
 			{
-			case STATE_START:
-				if(m_tx_counter > 0)
-				{
-					output_txa(0);
-					m_tx_state = STATE_DATA;
-				}
-				break;
-			case STATE_DATA:
-				m_tx_counter--;
-				output_txa(BIT(m_tsr, 0));
-				m_tsr >>= 1;
-				if (m_tx_counter == 0)
-					m_tx_state = STATE_STOP;
-				break;
-			case STATE_STOP:
-				if (m_tx_counter == 0)
+				m_tx_state = (m_asci_cntla & Z180_CNTLA0_MODE_PARITY) ? STATE_PARITY : STATE_STOP;
+				m_tx_bits = (m_asci_cntla & Z180_CNTLA0_MODE_STOPB) ? 2 : 1;
+			}
+			break;
+		case STATE_PARITY:
+			m_tx_state = STATE_STOP;
+			if (m_asci_cntlb & Z180_CNTLB0_PEO) m_tx_parity ^= 1; // odd parity
+			output_txa(m_tx_parity);
+			break;
+		case STATE_STOP:
+			if (m_tx_bits)
+			{
+				m_tx_bits--;
+				if (m_tx_bits == 0)
 				{
 					output_txa(1);
 					m_asci_stat |= 0x02; // set TDRE
@@ -327,30 +383,52 @@ DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::cka_wr )
 					{
 						m_irq = 1;
 					}
-					m_tx_counter--;
 				}
-				break;
 			}
+			break;
+		}
+	}
+}
 
+void z180asci_channel_base::receive_edge()
+{
+	m_rx_counter++;
+	if (m_rx_counter != m_divisor) return;
+	m_rx_counter = 0;
 
-			switch (m_rx_state)
+	if (m_asci_cntla & Z180_CNTLA0_RE)
+	{
+		switch (m_rx_state)
+		{
+		case STATE_START:
+			if(m_rxa == 0)
 			{
-			case STATE_START:
-				if(m_rxa == 0)
-				{
-					m_rx_state = STATE_DATA;
-					m_rx_counter = 0;
-					m_rsr = 0;
-				}
-				break;
-			case STATE_DATA:
-				m_rsr |= m_rxa << m_rx_counter;
-				m_rx_counter++;
-				if (m_rx_counter == 8)
-					m_rx_state = STATE_STOP;
-				break;
-			case STATE_STOP:
-				if (m_rxa == 1)
+				m_rx_state = STATE_DATA;
+				m_rx_bits = 0;
+				m_rx_parity = 0;
+				m_rsr = 0;
+			}
+			break;
+		case STATE_DATA:
+			m_rsr |= m_rxa << m_rx_bits;
+			m_rx_parity ^= m_rxa;
+			m_rx_bits++;
+			if (m_rx_bits == ((m_asci_cntla & Z180_CNTLA0_MODE_DATA) ? 8 : 7))
+			{
+				m_rx_bits = (m_asci_cntla & Z180_CNTLA0_MODE_STOPB) ? 2 : 1;
+				m_rx_state = (m_asci_cntla & Z180_CNTLA0_MODE_PARITY) ? STATE_PARITY : STATE_STOP;
+			}
+			break;
+		case STATE_PARITY:
+			m_rx_state = STATE_STOP;
+			if (m_asci_cntlb & Z180_CNTLB0_PEO) m_rx_parity ^= 1; // odd parity
+			//TODO: check parity
+			break;
+		case STATE_STOP:
+			if (m_rxa == 1)
+			{
+				m_rx_bits--;
+				if (m_rx_bits == 0)
 				{
 					m_asci_stat |= 0x80;
 					m_asci_rdr = m_rsr;
@@ -358,11 +436,10 @@ DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::cka_wr )
 					{
 						m_irq = 1;
 					}
-					m_rx_counter = 0;
 					m_rx_state = STATE_START;
 				}
-				break;
 			}
+			break;
 		}
 	}
 }
@@ -403,8 +480,8 @@ z180asci_channel_0::z180asci_channel_0(const machine_config &mconfig, const char
 void z180asci_channel_0::device_reset()
 {
 	z180asci_channel_base::device_reset();
-	m_asci_cntla = (m_asci_cntla & Z180_CNTLA0_MPBR_EFR) | Z180_CNTLA0_RTS0;
-	m_asci_cntlb = (m_asci_cntlb & (Z180_CNTLB0_MPBT | Z180_CNTLB0_CTS_PS)) | 0x07;
+	cntla_w((m_asci_cntla & Z180_CNTLA0_MPBR_EFR) | Z180_CNTLA0_RTS0);
+	cntlb_w((m_asci_cntlb & (Z180_CNTLB0_MPBT | Z180_CNTLB0_CTS_PS)) | 0x07);
 	m_asci_stat = (m_asci_stat & Z180_STAT0_DCD0) | Z180_STAT0_TDRE;
 }
 
@@ -450,8 +527,8 @@ z180asci_channel_1::z180asci_channel_1(const machine_config &mconfig, const char
 void z180asci_channel_1::device_reset()
 {
 	z180asci_channel_base::device_reset();
-	m_asci_cntla = (m_asci_cntla & Z180_CNTLA1_MPBR_EFR) | Z180_CNTLA1_CKA1D;
-	m_asci_cntlb = (m_asci_cntlb & Z180_CNTLB1_MPBT) | 0x07;
+	cntla_w((m_asci_cntla & Z180_CNTLA1_MPBR_EFR) | Z180_CNTLA1_CKA1D);
+	cntlb_w((m_asci_cntlb & Z180_CNTLB1_MPBT) | 0x07);
 	m_asci_stat = Z180_STAT1_TDRE;
 }
 
