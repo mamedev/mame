@@ -47,6 +47,7 @@ void bbc_cumana68k_device::cumana68k_mem(address_map &map)
 
 void bbc_cumana68k_device::floppy_formats(format_registration &fr)
 {
+	fr.add_mfm_containers();
 	fr.add(FLOPPY_OS9_FORMAT);
 }
 

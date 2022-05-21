@@ -84,6 +84,13 @@ namespace plib
 		MSC
 	};
 
+	enum class ci_cpp_stdlib
+	{
+		UNKNOWN,
+		LIBSTDCXX,
+		LIBCPP
+	};
+
 	enum class ci_os
 	{
 		UNKNOWN,
@@ -160,6 +167,16 @@ namespace plib
 		using type = std::integral_constant<ci_compiler, ci_compiler::UNKNOWN>;
 		using version = typed_version<0, 0>;
 	#endif
+	#if defined(_LIBCPP_VERSION)
+		using cpp_stdlib = std::integral_constant<ci_cpp_stdlib, ci_cpp_stdlib::LIBCPP>;
+		using cpp_stdlib_version = std::integral_constant<int, ((_LIBCPP_VERSION) / 1000) * 100 + ((_LIBCPP_VERSION) / 100) % 10>;
+	#elif defined(__GLIBCXX__)
+		using cpp_stdlib = std::integral_constant<ci_cpp_stdlib, ci_cpp_stdlib::LIBSTDCXX>;
+		using cpp_stdlib_version = std::integral_constant<int, (_GLIBCXX_RELEASE) * 100>;
+	#else
+		using cpp_stdlib = std::integral_constant<ci_cpp_stdlib, ci_cpp_stdlib::UNKNOWN>;
+		using cpp_stdlib_version = std::integral_constant<int, 0>;
+	#endif
 	#ifdef __unix__
 		using is_unix = std::integral_constant<bool, true>;
 	#else
@@ -204,7 +221,7 @@ namespace plib
 	#if defined(__APPLE__)
 		using clang_apple_noexcept_issue = std::integral_constant<bool, version::vmajor::value < 11>;
 	#else
-		using clang_apple_noexcept_issue = std::integral_constant<bool, false>;
+		using clang_noexcept_issue = std::integral_constant<bool, (type::value == ci_compiler::CLANG) && (version::value < 800)>;
 	#endif
 	#if defined(__ia64__)
 		using abi_vtable_function_descriptors = std::integral_constant<bool, true>;
