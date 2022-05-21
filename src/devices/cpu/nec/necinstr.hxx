@@ -52,7 +52,7 @@ OP( 0x0f, i_pre_nec  ) { uint32_t ModRM, tmp, tmp2;
 			PutMemW(DS1, Wreg(IY), (GetMemW(DS1, Wreg(IY)) & ~(((1 << tmp2) - 1) << tmp)) | ((Wreg(AW) & ((1 << tmp2) - 1)) << tmp));
 			if (tmp + tmp2 > 15) {
 				Wreg(IY) += 2;
-				PutMemW(DS1, Wreg(IY), (GetMemW(DS1, Wreg(IY)) & ~((1 << (tmp2 - (16 - tmp))) - 1)) | (Wreg(AW) >> (16 - tmp)) & ((1 << (tmp2 - (16 - tmp))) - 1));
+				PutMemW(DS1, Wreg(IY), (GetMemW(DS1, Wreg(IY)) & ~((1 << (tmp2 - (16 - tmp))) - 1)) | ((Wreg(AW) >> (16 - tmp)) & ((1 << (tmp2 - (16 - tmp))) - 1)));
 			}
 			PutRMByte(ModRM, (tmp + tmp2) & 0x0f);
 			// When and how many extra cycles are taken is not documented:
