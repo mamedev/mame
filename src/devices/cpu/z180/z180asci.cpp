@@ -253,8 +253,13 @@ uint8_t z180asci_channel_base::astch_r()
 void z180asci_channel_base::cntla_w(uint8_t data)
 {
 	LOG("Z180 CNTLA%d wr $%02x\n", m_id, data);
-	m_asci_cntla = data;
-	output_rts(BIT(data,4));
+	m_asci_cntla = data & ~(Z180_CNTLA0_MPBR_EFR | Z180_CNTLA0_RTS0);
+	output_rts(BIT(data,4)); // Z180_CNTLA0_RTS0
+	if (data & Z180_CNTLA0_MPBR_EFR) // Error Flag Reset
+	{
+		m_asci_stat &= ~(Z180_STAT1_OVRN | Z180_STAT1_PE | Z180_STAT1_FE);
+		m_asci_ext &= ~(Z180_ASEXT0_BRK_DET);
+	}
 }
 
 void z180asci_channel_base::cntlb_w(uint8_t data)
@@ -362,9 +367,13 @@ void z180asci_channel_base::transmit_edge()
 			m_tsr >>= 1;
 			if (m_tx_bits == ((m_asci_cntla & Z180_CNTLA0_MODE_DATA) ? 8 : 7))
 			{
-				m_tx_state = (m_asci_cntla & Z180_CNTLA0_MODE_PARITY) ? STATE_PARITY : STATE_STOP;
+				m_tx_state = (m_asci_cntlb & Z180_CNTLB0_MP) ? STATE_MPB : (m_asci_cntla & Z180_CNTLA0_MODE_PARITY) ? STATE_PARITY : STATE_STOP;
 				m_tx_bits = (m_asci_cntla & Z180_CNTLA0_MODE_STOPB) ? 2 : 1;
 			}
+			break;
+		case Z180_CNTLB0_MP:
+			m_tx_state = STATE_STOP;
+			output_txa(m_asci_cntlb & Z180_CNTLB0_MPBT ? 1 : 0);
 			break;
 		case STATE_PARITY:
 			m_tx_state = STATE_STOP;
@@ -416,8 +425,12 @@ void z180asci_channel_base::receive_edge()
 			if (m_rx_bits == ((m_asci_cntla & Z180_CNTLA0_MODE_DATA) ? 8 : 7))
 			{
 				m_rx_bits = (m_asci_cntla & Z180_CNTLA0_MODE_STOPB) ? 2 : 1;
-				m_rx_state = (m_asci_cntla & Z180_CNTLA0_MODE_PARITY) ? STATE_PARITY : STATE_STOP;
+				m_rx_state = (m_asci_cntlb & Z180_CNTLB0_MP) ? STATE_MPB : (m_asci_cntla & Z180_CNTLA0_MODE_PARITY) ? STATE_PARITY : STATE_STOP;
 			}
+			break;
+		case STATE_MPB:
+			m_rx_state = STATE_STOP;
+			m_asci_cntla |= m_rxa ? Z180_CNTLA0_MPBR_EFR : 0; 
 			break;
 		case STATE_PARITY:
 			m_rx_state = STATE_STOP;
@@ -430,8 +443,12 @@ void z180asci_channel_base::receive_edge()
 				m_rx_bits--;
 				if (m_rx_bits == 0)
 				{
-					m_asci_stat |= 0x80;
-					m_asci_rdr = m_rsr;
+					// Skip only if MPE mode active and MPB is 0
+					if (!((m_asci_cntla & Z180_CNTLA0_MPE) && ((m_asci_cntla & Z180_CNTLA0_MPBR_EFR) == 0)))
+					{
+						m_asci_stat |= Z180_STAT0_RDRF;
+						m_asci_rdr = m_rsr;
+					}
 					if (m_asci_stat & Z180_STAT0_RIE)
 					{
 						m_irq = 1;

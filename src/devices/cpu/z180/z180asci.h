@@ -69,6 +69,7 @@ protected:
 	{
 		STATE_START,
 		STATE_DATA,
+		STATE_MPB,
 		STATE_PARITY,
 		STATE_STOP
 	};
