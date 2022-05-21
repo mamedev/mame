@@ -55,6 +55,8 @@ VIDEO_START_MEMBER(slapfght_state, perfrman)
 {
 	m_pf1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(slapfght_state::get_pf_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
+	m_pf1_tilemap->set_scrolldy(-16, 0);
+
 	m_pf1_tilemap->set_transparent_pen(0);
 }
 
@@ -152,7 +154,7 @@ void slapfght_state::draw_perfrman_sprites(bitmap_ind16 &bitmap, const rectangle
 		*/
 
 		int code = src[offs + 0];
-		int sy = src[offs + 3] - 1;
+		int sy = src[offs + 3] - 17;
 		int sx = src[offs + 1] - 13;
 		int pri = src[offs + 2] >> 6 & 3;
 		int color = (src[offs + 2] >> 1 & 3) | (src[offs + 2] << 2 & 4) | (m_palette_bank << 3);
@@ -160,8 +162,8 @@ void slapfght_state::draw_perfrman_sprites(bitmap_ind16 &bitmap, const rectangle
 
 		if (flip_screen())
 		{
-			sy = 256 - sy;
-			sx = 240 - sx;
+			sy = (206 - sy) & 0xff;
+			sx = 284 - sx;
 			fx = fy = 1;
 		}
 
