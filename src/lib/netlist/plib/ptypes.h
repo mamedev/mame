@@ -219,7 +219,7 @@ namespace plib
 		using mingw = std::integral_constant<bool, false>;
 	#endif
 	#if defined(__APPLE__)
-		using clang_apple_noexcept_issue = std::integral_constant<bool, version::vmajor::value < 11>;
+		using clang_noexcept_issue = std::integral_constant<bool, version::vmajor::value < 11>;
 	#else
 		using clang_noexcept_issue = std::integral_constant<bool, (type::value == ci_compiler::CLANG) && (version::vmajor::value < 8)>;
 	#endif
