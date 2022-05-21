@@ -37,7 +37,7 @@
 #define DIPPINS(pin1, ...)                                                     \
 		setup.register_dip_alias_arr( # pin1 ", " # __VA_ARGS__);
 
-// to be used to reference new library truthtable devices
+// to be used to reference new library truth table devices
 #define NET_REGISTER_DEV(type, name)                                           \
 		setup.register_dev(# type, # name);
 
@@ -69,9 +69,8 @@
 		void NETLIST_NAME(name)(netlist::nlparse_t &setup);
 
 #define NETLIST_START(name)                                                    \
-void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
+void NETLIST_NAME(name)([[maybe_unused]] netlist::nlparse_t &setup)            \
 {                                                                              \
-	plib::unused_var(setup);
 
 #define NETLIST_END()  }
 
@@ -105,7 +104,7 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 		setup.register_frontier(# attach, PSTRINGIFY_VA(r_in), PSTRINGIFY_VA(r_out));
 
 // -----------------------------------------------------------------------------
-// truthtable defines
+// truth table defines
 // -----------------------------------------------------------------------------
 
 #define TRUTHTABLE_START(cname, in, out, pdef_params)                          \
@@ -139,7 +138,7 @@ namespace netlist
 {
 
 	// -----------------------------------------------------------------------------
-	// truthtable desc
+	// truth table desc
 	// -----------------------------------------------------------------------------
 
 	struct tt_desc
@@ -186,7 +185,7 @@ namespace netlist
 
 		void register_link(const pstring &sin, const pstring &sout);
 		void register_link_arr(const pstring &terms);
-		// also called from devices for latebinding connected terminals
+		// also called from devices for late binding connected terminals
 		void register_link_fqn(const pstring &sin, const pstring &sout);
 
 		void register_param(const pstring &param, const pstring &value);
@@ -268,7 +267,6 @@ namespace netlist
 		plib::psource_collection_t                  m_sources;
 		detail::abstract_t &                        m_abstract;
 
-		//std::unordered_map<pstring, parser_t::token_store>    m_source_cache;
 		log_type &m_log;
 		unsigned m_frontier_cnt;
 	};

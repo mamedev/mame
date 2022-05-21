@@ -90,15 +90,17 @@ namespace plib {
 	{
 		using arena_storage_type = P;
 
-		constexpr arena_deleter_base(arena_storage_type *a = nullptr) noexcept
+		constexpr arena_deleter_base( /*[[maybe_unused]]*/ arena_storage_type *a = nullptr) noexcept
 		{
+			// gcc 7.2 (mingw) and 7.5 (ubuntu) don't accept maybe_unused here
 			plib::unused_var(a);
 		}
 
 		template<typename U, typename = typename
 			   std::enable_if<std::is_convertible< U*, T*>::value>::type>
-		arena_deleter_base(const arena_deleter_base<P, U, true> &rhs) noexcept
+		arena_deleter_base( /*[[maybe_unused]]*/ const arena_deleter_base<P, U, true> &rhs) noexcept
 		{
+			// gcc 7.2 (mingw) and 7.5 (ubuntu) don't accept maybe_unused here
 			plib::unused_var(rhs);
 		}
 
@@ -454,9 +456,8 @@ namespace plib {
 			#endif
 		}
 
-		bool operator ==(const aligned_arena &rhs) const noexcept
+		bool operator ==([[maybe_unused]] const aligned_arena &rhs) const noexcept
 		{
-			plib::unused_var(rhs);
 			return true;
 		}
 
@@ -464,10 +465,9 @@ namespace plib {
 
 	struct std_arena : public arena_base<std_arena, true, true>
 	{
-		static inline void *allocate( size_t alignment, size_t size )
+		static inline void *allocate([[maybe_unused]] size_t alignment, size_t size )
 		{
 			inc_alloc_stat(size);
-			unused_var(alignment);
 			return ::operator new(size);
 		}
 
@@ -477,9 +477,8 @@ namespace plib {
 			::operator delete(ptr);
 		}
 
-		bool operator ==(const aligned_arena &rhs) const noexcept
+		bool operator ==([[maybe_unused]] const aligned_arena &rhs) const noexcept
 		{
-			plib::unused_var(rhs);
 			return true;
 		}
 	};
@@ -636,9 +635,8 @@ namespace plib {
 
 		~paged_arena() = default;
 
-		static void *allocate(size_t align, size_t size)
+		static void *allocate([[maybe_unused]] size_t align, size_t size)
 		{
-			plib::unused_var(align);
 			//size = ((size + PG_SIZE - 1) / PG_SIZE) * PG_SIZE;
 			return arena().allocate(PG_SIZE, size);
 		}

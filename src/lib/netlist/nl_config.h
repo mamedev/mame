@@ -44,7 +44,6 @@
 /// again. Compiling in all solvers may increase compile
 /// time significantly.
 ///
-
 #ifndef NL_USE_ACADEMIC_SOLVERS
 #define NL_USE_ACADEMIC_SOLVERS (1)
 #endif
@@ -58,31 +57,38 @@
 /// By default it is disabled since it is not as fast as
 /// the default approach. It is up to 20% slower.
 ///
-
 #ifndef NL_USE_COPY_INSTEAD_OF_REFERENCE
-#define NL_USE_COPY_INSTEAD_OF_REFERENCE (0)//FIXME: Move to config struct later
+#define NL_USE_COPY_INSTEAD_OF_REFERENCE (0) // FIXME: Move to config struct later
 #endif
 
 /// \brief Use backward Euler integration
 ///
 /// This will use backward Euler instead of trapezoidal integration.
 ///
-/// FIXME: Longterm this will become a runtime setting. Only the capacitor model
+/// FIXME: Long term this will become a runtime setting. Only the capacitor model
 /// currently has a trapezoidal version and there is no support currently for
 /// variable capacitors.
 /// The change will have impact on timings since trapezoidal improves timing
 /// accuracy.
-
 #ifndef NL_USE_BACKWARD_EULER
-#define NL_USE_BACKWARD_EULER (1)
+#define NL_USE_BACKWARD_EULER (1) // FIXME: Move to config struct later
 #endif
 
-/// \brief  Use the __float128 type for matrix calculations.
+/// \brief  Compile matrix solvers using the __float128 type.
 ///
 /// Defaults to \ref PUSE_FLOAT128
-
 #ifndef NL_USE_FLOAT128
 #define NL_USE_FLOAT128 PUSE_FLOAT128
+#endif
+
+/// \brief Avoid unnecessary queue pushes
+///
+/// Enable the setting below to avoid queue pushes were at execution
+/// no action will be taken. This is academically cleaner, but slower than
+/// allowing this to happen and filter it during during "process".
+/// This is used in core/nets.h
+#ifndef AVOID_NOOP_QUEUE_PUSHES
+#define AVOID_NOOP_QUEUE_PUSHES (0)  // FIXME: Move to config struct later
 #endif
 
 //============================================================
@@ -149,8 +155,8 @@ namespace netlist
 
 		/// \brief Resolution as clocks per second for timing
 		///
-		/// Uses 100 pico second resolution. This is aligned to MAME's
-		/// attotime resolution.
+		/// Uses 100 picosecond resolution. This is aligned to MAME's
+		/// `attotime` resolution.
 		///
 		/// The table below shows the maximum run times depending on
 		/// time type size and resolution.

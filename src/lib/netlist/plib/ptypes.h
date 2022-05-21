@@ -81,8 +81,7 @@ namespace plib
 		UNKNOWN,
 		CLANG,
 		GCC,
-		MSC,
-		NVCC
+		MSC
 	};
 
 	enum class ci_cpp_stdlib
@@ -115,7 +114,18 @@ namespace plib
 	enum class ci_env
 	{
 		DEFAULT,
-		MSVC
+		MSVC,
+		NVCC
+	};
+
+	// <sys/types.h> on ubuntu system may define major and minor as macros
+	// That's why we use vmajor, .. here
+	template <std::size_t MAJOR, std::size_t MINOR>
+	struct typed_version
+	{
+		using vmajor = std::integral_constant<std::size_t, MAJOR>;
+		using vminor = std::integral_constant<std::size_t, MINOR>;
+		using full = std::integral_constant<std::size_t, MAJOR * 100 + MINOR>;
 	};
 
 	struct compile_info
@@ -144,21 +154,18 @@ namespace plib
 		static constexpr int128_type int128_max() { return int128_type(); }
 		static constexpr uint128_type uint128_max() { return uint128_type(); }
 	#endif
-	#if (NVCCBUILD > 0)
-		using type = std::integral_constant<ci_compiler, ci_compiler::NVCC>;
-		using version = std::integral_constant<int, NVCCBUILD>;
-	#elif defined(__clang__)
+	#if defined(__clang__)
 		using type = std::integral_constant<ci_compiler, ci_compiler::CLANG>;
-		using version = std::integral_constant<int, (__clang_major__) * 100 + (__clang_minor__)>;
+		using version = typed_version<__clang_major__, __clang_minor__>;
 	#elif defined(__GNUC__)
 		using type = std::integral_constant<ci_compiler, ci_compiler::GCC>;
-		using version = std::integral_constant<int, (__GNUC__) * 100 + (__GNUC_MINOR__)>;
+		using version = typed_version< __GNUC__, __GNUC_MINOR__ >;
 	#elif defined(_MSC_VER)
 		using type = std::integral_constant<ci_compiler, ci_compiler::MSC>;
-		using version = std::integral_constant<int, _MSC_VER>;
+		using version = typed_version<_MSC_VER / 100, _MSC_VER % 100>;
 	#else
 		using type = std::integral_constant<ci_compiler, ci_compiler::UNKNOWN>;
-		using version = std::integral_constant<int, 0>;
+		using version = typed_version<0, 0>;
 	#endif
 	#if defined(_LIBCPP_VERSION)
 		using cpp_stdlib = std::integral_constant<ci_cpp_stdlib, ci_cpp_stdlib::LIBCPP>;
@@ -212,9 +219,9 @@ namespace plib
 		using mingw = std::integral_constant<bool, false>;
 	#endif
 	#if defined(__APPLE__)
-		using clang_noexcept_issue = std::integral_constant<bool, version::value < 1100>;
+		using clang_noexcept_issue = std::integral_constant<bool, version::vmajor::value < 11>;
 	#else
-		using clang_noexcept_issue = std::integral_constant<bool, (type::value == ci_compiler::CLANG) && (version::value < 800)>;
+		using clang_noexcept_issue = std::integral_constant<bool, (type::value == ci_compiler::CLANG) && (version::vmajor::value < 8)>;
 	#endif
 	#if defined(__ia64__)
 		using abi_vtable_function_descriptors = std::integral_constant<bool, true>;
@@ -223,8 +230,18 @@ namespace plib
 	#endif
 	#if defined(_MSC_VER)
 		using env = std::integral_constant<ci_env, ci_env::MSVC>;
+		using env_version = typed_version<_MSC_VER / 100, _MSC_VER % 100>;
+	#elif defined(__NVCC__) || defined(__CUDACC__)
+		using env = std::integral_constant<ci_env, ci_env::NVCC>;
+		using env_version = typed_version<__CUDA_API_VER_MAJOR__, __CUDA_API_VER_MINOR__>;
+		#if defined(__CUDA_ARCH__)
+			using cuda_arch = std::integral_constant<std::size_t, __CUDA_ARCH__>;
+		#else
+			using cuda_arch = std::integral_constant<std::size_t, 0>;
+	#endif
 	#else
 		using env = std::integral_constant<ci_env, ci_env::DEFAULT>;
+		using env_version = version;
 	#endif
 	};
 
@@ -336,7 +353,7 @@ namespace plib
 	/// @tparam Ts unsused parameters
 	///
 	template<typename... Ts>
-	inline void unused_var(Ts&&...) noexcept {} // NOLINT(readability-named-parameter)
+	inline void unused_var(Ts&&...) noexcept {} // NOLINT(readability-named-parameter) // FIXME: remove unused var completely
 
 	/// \brief copy type S to type D byte by byte
 	///

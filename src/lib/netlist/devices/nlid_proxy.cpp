@@ -1,9 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Couriersud
-/*
- * nlid_proxy.cpp
- *
- */
+
+///
+/// \file nlid_proxy.cpp
+///
+///
 
 #include "nlid_proxy.h"
 #include "core/setup.h"

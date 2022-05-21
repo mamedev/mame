@@ -104,7 +104,7 @@ namespace plib {
 
 	bool fpsignalenabler::m_enable = false; // NOLINT
 
-	//FIXME: mingw needs to be compiled with "-fnon-call-exceptions"
+	//FIXME: mingw needs to be compiled with `-fnon-call-exceptions`
 
 	fpsignalenabler::fpsignalenabler(unsigned fpexceptions)
 	{
