@@ -602,7 +602,7 @@ void asr733_device::check_keyboard()
 		unshifted = 0, shift, control,
 		/* special value to stop repeat if the modifier state changes */
 		special_debounce = -1
-	} ;
+	};
 
 	enum { repeat_delay = 5 /* approx. 1/10s */ };
 

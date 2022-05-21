@@ -123,7 +123,7 @@ void lckydraw_state::bus_w(offs_t offset, u8 data)
 		case 0:
 		case 14:
 			m_ram[offset] = data;
-			break;;
+			break;
 		case 2:
 			// solenoids
 			{
