@@ -228,7 +228,7 @@ uint8_t z180asci_channel_base::rdr_r()
 {
 	LOG("Z180 RDR%d   rd $%02x\n", m_id, m_asci_rdr);
 	if (!machine().side_effects_disabled())
-		m_asci_stat &= ~0x80;
+		m_asci_stat &= ~Z180_STAT0_RDRF;
 	return m_asci_rdr;
 }
 
@@ -296,7 +296,7 @@ void z180asci_channel_base::tdr_w(uint8_t data)
 {
 	LOG("Z180 TDR%d   wr $%02x\n", m_id, data);
 	m_asci_tdr = data;
-	m_asci_stat &= ~0x02; // clear TDRE
+	m_asci_stat &= ~Z180_STAT0_TDRE;
 	m_tx_bits = 0;
 	m_tx_state = STATE_START;
 	m_tsr = m_asci_tdr;
