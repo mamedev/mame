@@ -7632,7 +7632,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="wboymlndp" cloneof="wboymlnd">
-		<description>Wonder Boy in Monster Land (prototype)</description>
+		<description>Super Wonder Boy - Monster Land (prototype)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -7661,7 +7661,7 @@ license:CC0
 	<!-- From Bock: "This hack does two things: force the game to run in Japanese mode (with an harder difficulty level), and allows to
 	Pause the game by pressing LEFT+RIGHT+Button 2 on joypad 1 (a combination that cannot be done on a normal SMS joypad). -->
 	<software name="wboymlnda" cloneof="wboymlnd">
-		<description>Wonder Boy in Monster Land (Euro, USA, Hacked?)</description>
+		<description>Super Wonder Boy - Monster World (Japan, hacked?)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
