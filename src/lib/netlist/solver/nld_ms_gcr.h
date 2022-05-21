@@ -281,7 +281,7 @@ namespace netlist::solver
 		plib::putf8_fmt_writer w(&t);
 		generate_code(w);
 		//std::hash<typename std::remove_const<std::remove_reference<decltype(t.str())>::type>::type> h;
-		return plib::pfmt("nl_gcr_{1:x}_{2}_{3}_{4}")(plib::hash( t.str().c_str(), t.str().size() ))(mat.nz_num)(str_fptype)(str_floattype);
+		return plib::pfmt("nl_gcr_{1:x}_{2}_{3}_{4}")(plib::hash<uint64_t>( t.str().c_str(), t.str().size() ))(mat.nz_num)(str_fptype)(str_floattype);
 	}
 
 	template <typename FT, int SIZE>

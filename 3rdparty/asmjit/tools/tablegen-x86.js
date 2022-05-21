@@ -1786,6 +1786,7 @@ class AdditionalInfoTable extends core.Task {
   run() {
     const insts = this.ctx.insts;
     const rwInfoTable = new IndexedArray();
+    const instFlagsTable = new IndexedArray();
     const additionaInfoTable = new IndexedArray();
 
     // If the instruction doesn't read any flags it should point to the first index.
@@ -1800,9 +1801,48 @@ class AdditionalInfoTable extends core.Task {
       var [r, w] = this.rwFlagsOf(dbInsts);
       const rData = r.map(function(flag) { return `FLAG(${flag})`; }).join(" | ") || "0";
       const wData = w.map(function(flag) { return `FLAG(${flag})`; }).join(" | ") || "0";
-      const rwDataIndex = rwInfoTable.addIndexed(`{ ${rData}, ${wData} }`);
+      const instFlags = Object.create(null);
 
-      inst.additionalInfoIndex = additionaInfoTable.addIndexed(`{ { ${features} }, ${rwDataIndex}, 0 }`);
+      switch (inst.name) {
+        case "kmovb":
+        case "kmovd":
+        case "kmovq":
+        case "kmovw":
+        case "mov":
+        case "movq":
+        case "movsd":
+        case "movss":
+        case "movapd":
+        case "movaps":
+        case "movdqa":
+        case "movdqu":
+        case "movupd":
+        case "movups":
+        case "vmovapd":
+        case "vmovaps":
+        case "vmovdqa":
+        case "vmovdqa8":
+        case "vmovdqa16":
+        case "vmovdqa32":
+        case "vmovdqa64":
+        case "vmovdqu":
+        case "vmovdqu8":
+        case "vmovdqu16":
+        case "vmovdqu32":
+        case "vmovdqu64":
+        case "vmovq":
+        case "vmovsd":
+        case "vmovss":
+        case "vmovupd":
+        case "vmovups":
+          instFlags["MovOp"] = true;
+          break;
+      }
+
+      const instFlagsIndex = instFlagsTable.addIndexed("InstRWFlags(" + CxxUtils.flags(instFlags, (f) => { return `FLAG(${f})`; }, "FLAG(None)") + ")");
+      const rwInfoIndex = rwInfoTable.addIndexed(`{ ${rData}, ${wData} }`);
+
+      inst.additionalInfoIndex = additionaInfoTable.addIndexed(`{ ${instFlagsIndex}, ${rwInfoIndex}, { ${features} } }`);
     });
 
     var s = `#define EXT(VAL) uint32_t(CpuFeatures::X86::k##VAL)\n` +
@@ -1811,8 +1851,12 @@ class AdditionalInfoTable extends core.Task {
             `\n` +
             `#define FLAG(VAL) uint32_t(CpuRWFlags::kX86_##VAL)\n` +
             `const InstDB::RWFlagsInfoTable InstDB::_rwFlagsInfoTable[] = {\n${StringUtils.format(rwInfoTable, kIndent, true)}\n};\n` +
+            `#undef FLAG\n` +
+            `\n` +
+            `#define FLAG(VAL) uint32_t(InstRWFlags::k##VAL)\n` +
+            `const InstRWFlags InstDB::_instFlagsTable[] = {\n${StringUtils.format(instFlagsTable, kIndent, true)}\n};\n` +
             `#undef FLAG\n`;
-    this.inject("AdditionalInfoTable", disclaimer(s), additionaInfoTable.length * 8 + rwInfoTable.length * 8);
+    this.inject("AdditionalInfoTable", disclaimer(s), additionaInfoTable.length * 8 + rwInfoTable.length * 8 + instFlagsTable.length * 4);
   }
 
   rwFlagsOf(dbInsts) {
@@ -2030,7 +2074,12 @@ class InstRWInfoTable extends core.Task {
           "InstDB::RWInfoRm::kCategory" + rmInfo.category.padEnd(10),
           StringUtils.decToHex(rmInfo.rmIndexes, 2),
           String(Math.max(rmInfo.memFixed, 0)).padEnd(2),
-          CxxUtils.flags({ "InstDB::RWInfoRm::kFlagAmbiguous": Boolean(rmInfo.memAmbiguous) }),
+          CxxUtils.flags({
+            "InstDB::RWInfoRm::kFlagAmbiguous": Boolean(rmInfo.memAmbiguous),
+            "InstDB::RWInfoRm::kFlagMovssMovsd": Boolean(inst.name === "movss" || inst.name === "movsd"),
+            "InstDB::RWInfoRm::kFlagPextrw": Boolean(inst.name === "pextrw"),
+            "InstDB::RWInfoRm::kFlagFeatureIfRMI": Boolean(rmInfo.memExtensionIfRMI)
+          }),
           rmInfo.memExtension === "None" ? "0" : "uint32_t(CpuFeatures::X86::k" + rmInfo.memExtension + ")"
         );
 
@@ -2284,7 +2333,8 @@ class InstRWInfoTable extends core.Task {
       memFixed: this.rmFixedSize(dbInsts),
       memAmbiguous: this.rmIsAmbiguous(dbInsts),
       memConsistent: this.rmIsConsistent(dbInsts),
-      memExtension: this.rmExtension(dbInsts)
+      memExtension: this.rmExtension(dbInsts),
+      memExtensionIfRMI: this.rmExtensionIfRMI(dbInsts)
     };
 
     if (info.memFixed !== -1)
@@ -2493,13 +2543,31 @@ class InstRWInfoTable extends core.Task {
       case "pextrw":
         return "SSE4_1";
 
+      case "vpslld":
+      case "vpsllq":
+      case "vpsrad":
+      case "vpsrld":
+      case "vpsrlq":
+        return "AVX512_F";
+
       case "vpslldq":
+      case "vpsllw":
+      case "vpsraw":
       case "vpsrldq":
+      case "vpsrlw":
         return "AVX512_BW";
 
       default:
         return "None";
     }
+  }
+
+  rmExtensionIfRMI(dbInsts) {
+    if (!dbInsts.length)
+      return 0;
+
+    const name = dbInsts[0].name;
+    return /^(vpslld|vpsllq|vpsrad|vpsrld|vpsrlq|vpslldq|vpsllw|vpsraw|vpsrldq|vpsrlw)$/.test(name);
   }
 }
 

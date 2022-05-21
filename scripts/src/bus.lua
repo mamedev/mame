@@ -939,6 +939,8 @@ if (BUSES["C64"]~=null) then
 		MAME_DIR .. "src/devices/bus/c64/xl80.h",
 		MAME_DIR .. "src/devices/bus/c64/zaxxon.cpp",
 		MAME_DIR .. "src/devices/bus/c64/zaxxon.h",
+		MAME_DIR .. "src/devices/bus/c64/z80videopak.cpp",
+		MAME_DIR .. "src/devices/bus/c64/z80videopak.h",
 		MAME_DIR .. "src/devices/bus/c64/user.cpp",
 		MAME_DIR .. "src/devices/bus/c64/user.h",
 		MAME_DIR .. "src/devices/bus/c64/4dxh.cpp",
@@ -1856,6 +1858,12 @@ if (BUSES["MTX"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/mtx/exp.cpp",
 		MAME_DIR .. "src/devices/bus/mtx/exp.h",
+		MAME_DIR .. "src/devices/bus/mtx/cfx.cpp",
+		MAME_DIR .. "src/devices/bus/mtx/cfx.h",
+		MAME_DIR .. "src/devices/bus/mtx/magrom.cpp",
+		MAME_DIR .. "src/devices/bus/mtx/magrom.h",
+		MAME_DIR .. "src/devices/bus/mtx/rompak.cpp",
+		MAME_DIR .. "src/devices/bus/mtx/rompak.h",
 		MAME_DIR .. "src/devices/bus/mtx/sdx.cpp",
 		MAME_DIR .. "src/devices/bus/mtx/sdx.h",
 	}
@@ -4714,6 +4722,8 @@ if (BUSES["MULTIBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/multibus/cpuap.h",
 		MAME_DIR .. "src/devices/bus/multibus/serad.cpp",
 		MAME_DIR .. "src/devices/bus/multibus/serad.h",
+		MAME_DIR .. "src/devices/bus/multibus/labtam3232.cpp",
+		MAME_DIR .. "src/devices/bus/multibus/labtam3232.h",
 	}
 end
 

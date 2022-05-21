@@ -174,8 +174,6 @@ private:
 	void pia1_kbA_w(uint8_t data);
 	uint8_t pia1_kbB_r();
 	void pia1_kbB_w(uint8_t data);
-	DECLARE_READ_LINE_MEMBER( pia1_ca1_r );
-	DECLARE_READ_LINE_MEMBER( pia1_cb1_r );
 	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER( pia1_cb2_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(rtc_w);
@@ -393,17 +391,6 @@ uint8_t e100_state::pia1_kbB_r()
 	return m_pia1_B;
 }
 
-READ_LINE_MEMBER(e100_state::pia1_ca1_r)
-{
-	// TODO: Make this a slot device for time meassurements
-	return ASSERT_LINE;  // Default is handshake for serial port TODO: Fix RS 232 handshake as default
-}
-
-READ_LINE_MEMBER(e100_state::pia1_cb1_r)
-{
-	return m_rs232->rxd_r();
-}
-
 WRITE_LINE_MEMBER(e100_state::pia1_ca2_w)
 {
 	// TODO: Make this a slot device to trigger time meassurements
@@ -563,8 +550,7 @@ void e100_state::e100(machine_config &config)
 	m_pia1->readpa_handler().set(FUNC(e100_state::pia1_kbA_r));
 	m_pia1->writepb_handler().set(FUNC(e100_state::pia1_kbB_w));
 	m_pia1->readpb_handler().set(FUNC(e100_state::pia1_kbB_r));
-	m_pia1->readca1_handler().set(FUNC(e100_state::pia1_ca1_r));
-	m_pia1->readcb1_handler().set(FUNC(e100_state::pia1_cb1_r));
+	m_pia1->ca1_w(ASSERT_LINE); // TODO: Make this a slot device for time meassurements. Default is handshake for serial port TODO: Fix RS 232 handshake as default
 	m_pia1->ca2_handler().set(FUNC(e100_state::pia1_ca2_w));
 	m_pia1->cb2_handler().set(FUNC(e100_state::pia1_cb2_w));
 
@@ -574,6 +560,7 @@ void e100_state::e100(machine_config &config)
 
 	/* Serial port support */
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(m_pia1, FUNC(pia6821_device::cb1_w));
 
 	SPEAKER(config, "mono").front_center();
 	/* Cassette support - E100 uses 300 baud Kansas City Standard with 1200/2400 Hz modulation */

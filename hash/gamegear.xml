@@ -1262,13 +1262,14 @@ a certain item) -->
 	</software>
 
 <!-- This prototype doesn't work on real hardware, nor in MAME, due to a timing issue in its initialization code. It can be made to work by changing the instruction at $02E41 (EI) to 0x00 (NOP). -->
-	<software name="brkthru" supported="no">
+	<software name="brkthru">
 		<description>BreakThru! (prototype)</description>
 		<year>1994</year>
 		<publisher>Spectrum Holobyte</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="breakthru [proto].bin" size="131072" crc="64d7a694" sha1="571bd543320bc67c4103630c804705955bc5250a"/>
+				<rom size="1" offset="0x02e41" value="0x00" loadflag="fill"/>
 			</dataarea>
 		</part>
 	</software>

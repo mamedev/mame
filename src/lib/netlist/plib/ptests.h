@@ -15,6 +15,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <sstream>
 
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wglobal-constructors"
@@ -35,43 +37,80 @@
 
 #define PTEST(name, desc) PINT_TEST(name, desc)
 #define PTEST_F(name, desc) PINT_TEST_F(name, desc, name)
-#define PRUN_ALL_TESTS() plib::testing::run_all_tests()
+#define PRUN_ALL_TESTS(loglevel) plib::testing::run_all_tests(loglevel)
 
 #define PINT_TEST(name, desc) PINT_TEST_F(name, desc, plib::testing::Test)
 
+#define PINT_TESTNAME(name, desc) name ## _ ## desc
+#define PINT_LOCATION() ::plib::testing::test_location(__FILE__, __LINE__)
+#define PINT_SET_LAST(loc) this->m_parameters->m_last_source = loc
+
+#define PINT_REGISTER(name, desc) \
+	extern const plib::testing::reg_entry<PINT_TESTNAME(name, desc)> PINT_TESTNAME(name, desc  ## _reg); \
+	const plib::testing::reg_entry<PINT_TESTNAME(name, desc)> PINT_TESTNAME(name, desc  ## _reg)(#name, #desc, PINT_LOCATION()); \
+
 #define PINT_TEST_F(name, desc, base) \
-	class name ## _ ## desc : public base \
+	class PINT_TESTNAME(name, desc) : public base \
 	{ public:\
 		void desc (); \
 		void run() override { desc (); } \
 	}; \
-	extern const plib::testing::reg_entry<name ## _ ## desc> name ## _ ## desc ## _reg; \
-	const plib::testing::reg_entry<name ## _ ## desc> name ## _ ## desc ## _reg(#name, #desc); \
-	void name ## _ ## desc :: desc ()
+	PINT_REGISTER(name, desc) \
+	void PINT_TESTNAME(name, desc) :: desc ()
 
 #define PINT_EXPECT(comp, exp1, exp2) \
-	if (!plib::testing::internal_assert(plib::testing::comp_ ## comp (), # exp1, # exp2, exp1, exp2)) \
-		std::cout << __FILE__ << ":" << __LINE__ << ":1: error: test failed\n"
+	if (true) \
+	{ \
+		::plib::testing::test_location source = PINT_LOCATION(); PINT_SET_LAST(source); \
+		m_parameters->m_num_tests++; \
+		if (!this->internal_assert(plib::testing::comp_ ## comp (), # exp1, # exp2, exp1, exp2)) \
+			this->test_error(source) << "test failed" << std::endl; \
+	} else do {} while (0)
 
 #define PINT_EXPECT_THROW(exp, excep) \
-	if (const char *ptest_f = __FILE__) \
+	if (true) \
 	{ \
-		try { exp; std::cout << ptest_f << ":" << __LINE__ << ":1: error: no " #excep " exception thrown\n";} \
-		catch (excep &) { std::cout << "\tOK: got " #excep " for " # exp "\n";} \
-		catch (std::exception &ptest_e) { std::cout << ptest_f << ":" << __LINE__ << ":1: error: unexpected exception thrown: " << ptest_e.what() << "\n"; } \
-		catch (...) { std::cout << ptest_f << ":" << __LINE__ << ":1: error: unexpected exception thrown\n"; } \
+		::plib::testing::test_location source = PINT_LOCATION(); PINT_SET_LAST(source); \
+		m_parameters->m_num_tests++; \
+		try { exp; this->test_error(source) << "no " #excep " exception thrown" << std::endl;} \
+		catch (excep &) { this->test_ok() << "got " #excep " for " # exp "" << std::endl;} \
+		catch (std::exception &ptest_e) { this->test_error(source) << "unexpected exception thrown: " << ptest_e.what() << std::endl; } \
+		catch (...) { this->test_error(source) << "unexpected exception thrown" << std::endl; } \
 	} else do {} while (0)
 
 #define PINT_EXPECT_NO_THROW(exp) \
-	if (const char *ptest_f = __FILE__) \
+	if (true) \
 	{ \
-		try { exp; std::cout << "\tOK: got no exception for " # exp "\n";} \
-		catch (std::exception &ptest_e) { std::cout << ptest_f << ":" << __LINE__ << ":1: error: unexpected exception thrown: " << ptest_e.what() << "\n"; } \
-		catch (...) { std::cout << ptest_f << ":" << __LINE__ << ":1: error: unexpected exception thrown\n"; } \
+		::plib::testing::test_location source = PINT_LOCATION(); PINT_SET_LAST(source); \
+		m_parameters->m_num_tests++; \
+		try { exp; this->test_ok() << "got no exception for " # exp << std::endl;} \
+		catch (std::exception &ptest_e) { this->test_error(source) << "unexpected exception thrown: " << ptest_e.what() << std::endl; } \
+		catch (...) { this->test_error(source) << "unexpected exception thrown" << std::endl; } \
 	} else do {} while (0)
 
 namespace plib::testing
 {
+	enum class loglevel
+	{
+		INFO,
+		WARNING,
+		ERROR
+	};
+
+	using test_location = std::pair<const char *, std::size_t>;
+
+	struct test_parameters
+	{
+		loglevel m_loglevel = loglevel::INFO;
+		std::size_t m_num_errors = 0;
+		std::size_t m_num_tests = 0;
+		test_location m_last_source = {"", 0 };
+	};
+
+	static std::ostream &stream_error(std::ostream &os, test_location loc)
+	{
+		return os << loc.first << ":" << loc.second << ":1: error: ";
+	}
 
 	class Test
 	{
@@ -87,13 +126,54 @@ namespace plib::testing
 		virtual void run() {}
 		virtual void SetUp() {}
 		virtual void TearDown() {}
+
+		void set_parameters(test_parameters *params)
+		{
+			m_parameters = params;
+		}
+	protected:
+		std::ostream & test_ok() { return output(loglevel::INFO) << "\tOK: "; }
+		std::ostream & test_fail() { return output(loglevel::WARNING) << "\tFAIL: "; }
+		std::ostream & test_error(const test_location & loc)
+		{
+			return stream_error(output(loglevel::ERROR), loc);
+		}
+
+		template <typename C, typename T1, typename T2>
+		bool internal_assert(C comp,
+			const char* exp1, const char* exp2,
+			const T1& val1, const T2& val2);
+		test_parameters *m_parameters = nullptr;
+	private:
+		std::ostream &output(loglevel ll)
+		{
+			if (ll == loglevel::ERROR)
+				m_parameters->m_num_errors++;
+			return (ll >= m_parameters->m_loglevel) ? std::cout : m_nulstream;
+		}
+		std::ostringstream m_nulstream;
 	};
+
+	template <typename C, typename T1, typename T2>
+	bool Test::internal_assert(C comp,
+		const char* exp1, const char* exp2,
+		const T1& val1, const T2& val2)
+	{
+		if (comp(val1, val2))
+		{
+			test_ok() << exp1 << " " << C::opstr() << " " << exp2 << std::endl;
+			return true;
+		}
+		test_fail() << exp1 << " " << C::opstr() << " " << exp2
+			<< " <" << val1 << ">,<" << val2 << ">" << std::endl;
+		return false;
+	}
 
 	struct reg_entry_base
 	{
 		using list_t = std::vector<reg_entry_base *>;
-		reg_entry_base(const std::string &n, const std::string &d)
-		: name(n), desc(d)
+		reg_entry_base(const char *n, const char *d, test_location l)
+		: name(n), desc(d), location(l)
 		{
 			registry().push_back(this);
 		}
@@ -107,8 +187,9 @@ namespace plib::testing
 
 		virtual Test *create() const { return nullptr; }
 
-		std::string name;
-		std::string desc;
+		const char *name;
+		const char *desc;
+		test_location location;
 	public:
 		static list_t & registry()
 		{
@@ -125,36 +206,81 @@ namespace plib::testing
 		Test *create() const override { return new T(); } // NOLINT
 	};
 
-	template <typename C, typename T1, typename T2>
-	bool internal_assert(C comp,
-		const char* exp1, const char* exp2,
-		const T1& val1, const T2& val2)
+	template <typename L>
+	std::pair<bool, std::string> catch_exception(L lambda)
 	{
-		if (comp(val1, val2))
-		{
-			std::cout << "\tOK: " << exp1 << " " << C::opstr() << " " << exp2 << "\n";
-			return true;
+		try {
+			lambda();
 		}
-		std::cout << "\tFAIL: " << exp1 << " " << C::opstr() << " " << exp2
-			<< " <" << val1 << ">,<" << val2 << ">\n";
-		return false;
+		catch (std::exception &ptest_e)
+		{
+			return { true, ptest_e.what() };
+		}
+		catch (...)
+		{
+			return { true, "" };
+		}
+		return { false, "" };
 	}
 
-	static inline int run_all_tests()
+	static inline int run_all_tests(loglevel ll)
 	{
-		std::cout << "======================================\n";
-		std::cout << "Running " << reg_entry_base::registry().size() << " tests\n";
-		std::cout << "======================================\n";
-		for (auto &e : reg_entry_base::registry())
+		std::cout << "================================================" << std::endl;
+		std::cout << "Running " << reg_entry_base::registry().size() << " test groups" << std::endl;
+		std::cout << "================================================" << std::endl;
+
+		auto &list = reg_entry_base::registry();
+
+		std::sort(list.begin(), list.end(), [](reg_entry_base *a, reg_entry_base *b) {
+			return (a->name < b->name);
+		});
+
+		std::size_t total_errors(0);
+		std::size_t total_tests(0);
+
+		for (auto &e : list)
 		{
-			std::cout << e->name << "::" << e->desc << ":\n";
-			Test *t = e->create();
-			t->SetUp();
-			t->run();
-			t->TearDown();
-			delete t;
+			test_parameters params;
+			params.m_loglevel = ll;
+			params.m_last_source = e->location;
+
+			std::cout << e->name << "::" << e->desc << ":" << std::endl;
+			Test *t = nullptr;
+
+			std::pair<bool, std::string> r;
+			if ((r = catch_exception([&]{
+				t = e->create();
+				t->set_parameters(&params);
+			})).first)
+			{
+				stream_error(std::cout, e->location) << "unexpected exception thrown during instantiation" << (r.second != "" ? ": " + r.second : "") << std::endl;
+				total_errors++;
+			}
+			else if ((r = catch_exception([&]{ t->SetUp(); })).first)
+			{
+				stream_error(std::cout, e->location) << "unexpected exception thrown during Setup" << (r.second != "" ? ": " + r.second : "") << std::endl;
+				total_errors++;
+			}
+			else if ((r = catch_exception([&]{ t->run(); })).first)
+			{
+				stream_error(std::cout, params.m_last_source) << "unexpected exception thrown during run after this line" << (r.second != "" ? ": " + r.second : "") << std::endl;
+				total_errors++;
+			}
+			else if ((r = catch_exception([&]{ t->TearDown(); })).first)
+			{
+				stream_error(std::cout, e->location) << "unexpected exception thrown during Teardown" << (r.second != "" ? ": " + r.second : "") << std::endl;
+				total_errors++;
+			}
+
+			total_errors += params.m_num_errors;
+			total_tests += params.m_num_tests;
+			if (t != nullptr)
+				delete t;
 		}
-		return 0;
+		std::cout << "================================================" << std::endl;
+		std::cout << "Found " << total_errors << " errors in " << total_tests << " tests from " << reg_entry_base::registry().size() << " test groups" << std::endl;
+		std::cout << "================================================" << std::endl;
+		return (total_errors ? 1 : 0);
 	}
 
 #define DEF_COMP(name, op) \

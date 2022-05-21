@@ -3,6 +3,8 @@
 #ifndef MAME_BUS_RS232_NULL_MODEM_H
 #define MAME_BUS_RS232_NULL_MODEM_H
 
+#pragma once
+
 #include "rs232.h"
 #include "imagedev/bitbngr.h"
 #include "diserial.h"

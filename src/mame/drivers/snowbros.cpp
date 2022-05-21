@@ -267,7 +267,7 @@ void snowbros_state::wintbob_map(address_map &map)
 	map(0xa00000, 0xa00001).w(FUNC(snowbros_state::snowbros_irq2_ack_w));  /* IRQ 2 acknowledge */
 }
 
-/* Honey Dolls */
+/* Honey Doll */
 
 void snowbros_state::honeydol_map(address_map &map)
 {
@@ -1898,7 +1898,7 @@ void snowbros_state::honeydol(machine_config &config)
 void snowbros_state::twinadv(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(12'000'000)); /* 12MHz like Honey Dolls ? */
+	M68000(config, m_maincpu, XTAL(12'000'000)); /* 12MHz like Honey Doll ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &snowbros_state::twinadv_map);
 	TIMER(config, "scantimer", 0).configure_scanline(FUNC(snowbros_state::snowbros_irq), "screen", 0, 1);
 	WATCHDOG_TIMER(config, "watchdog");
@@ -3091,7 +3091,7 @@ GAME( 1999, moremorp,   0,        semiprot,    moremore, snowbros_state, init_3i
 // This is very similar to the SemiCom titles, but unprotected.
 GAME( 2002, 4in1boot,   0,        _4in1,       4in1boot, snowbros_state, init_4in1boot, ROT0, "K1 Soft", "Puzzle King (PacMan 2, Tetris, HyperMan 2, Snow Bros.)" , MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995, honeydol,   0,        honeydol,    honeydol, snowbros_state, empty_init,    ROT0, "Barko Corp.", "Honey Dolls", MACHINE_SUPPORTS_SAVE ) // based on snowbros code..
+GAME( 1995, honeydol,   0,        honeydol,    honeydol, snowbros_state, empty_init,    ROT0, "Barko Corp.", "Honey Doll", MACHINE_SUPPORTS_SAVE ) // based on snowbros code..
 
 GAME( 1995, twinadv,    0,        twinadv,     twinadv,  snowbros_state, empty_init,    ROT0, "Barko Corp.", "Twin Adventure (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, twinadvk,   twinadv,  twinadv,     twinadv,  snowbros_state, empty_init,    ROT0, "Barko Corp.", "Twin Adventure (Korea)", MACHINE_SUPPORTS_SAVE )

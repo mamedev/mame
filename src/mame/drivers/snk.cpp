@@ -344,6 +344,114 @@ Notes:
       JP*   - 2x 2-pin jumper to set ROM sizes 1M/512K for ROMs 2J-2T. Jumper is set to 512K
 
 
+Ikari Warriors (SNK 1986) - older 22-way version
+Hardware info by Guru
+
+Top Board
+---------
+A5004UP03-04
+|-------------------------------------------------------|
+|CN8 4584 4532 4532 PST518   1   3                     |-|
+|    4584 4532 4532      4584                          | |
+|CN7 4584 4584 4071 4071         2       A5004-3       | |
+|                                                      | |
+|                                                      | |
+|                                                      | |
+|                                                      |-|
+|                                                       |
+|2  DIP1                                                |
+|2  DIP2                     8MHz                       |
+|W                                                      |
+|A                           Z80A  P2   P1             |-|
+|Y     4559                                            | |
+|      4559                                A5004-2     | |
+|            YM3014  P5 P6 Z80A(1)                     | |
+|CN5   4559                    Z80A                    | |
+|M51516 4559           YM3526     P4    P3             | |
+| VOL VOL    YM3014  YM3526 2016                       |-|
+|-------------------------------------------------------|
+Notes:
+        CN7/8 - Rotary joystick connectors
+       M51516 - Mitsubishi M51516 Power AMP
+       DIP1/2 - 8-position DIP switches
+        1,2,3 - Fujitsu MB7122 or Signetics 82S137 Bi-Polar PROMs
+       A5004* - PALs
+         4559 - NEC uPC4559 Dual Operational Amplifier
+       YM3014 - Yamaha YM3014 DAC. Clock 1.000MHz
+       YM3526 - Yamaha YM3526 FM Operator Type-L (OPL) Sound Chip. Clock 4.000MHz [8/2]
+         2016 - 2kBx8-bit SRAM
+          CN5 - 2 pin power connector joining to middle board
+        P1-P4 - 27C128/27C256 EPROMs (main/sub program)
+        P5-P6 - 27C128/27C256 EPROMs (sound program)
+      Z80A(1) - Z80 sound CPU. Clock 4.000MHz [8/2]
+         Z80A - Z80 main and sub CPU. Clock 3.350MHz [13.4/4, source is OSC on bottom board]
+
+
+Middle Board
+------------
+A5004UP02-01
+ |-------------------------------------------------------|
+ |            6116                  2018     2018       |-|
+ |                                     2018     2018    | |
+ |                                                      | |
+ |                                                      | |
+ |                                                      | |
+|-|   P7  P8  P9  P10                                   | |
+| |                                                     |-|
+| |                                                      |
+| |                                                  CN5 |
+| |                                                      |
+| |                                                      |
+| |                                                     |-|
+|-|                                                     | |
+ |                                                      | |
+ |                                                      | |
+ |                                                      | |
+ |CN6      6116  6116                       A5004-4     | |
+ |      6116  6116                                      |-|
+ |-------------------------------------------------------|
+Notes:
+      CN5/6 - Auxiliary power input connectors
+         P7 - 27C128 EPROM (text layer tiles)
+     P8-P10 - 27C256 EPROMs (16x16 tiles)
+       6116 - 2kBx8-bit SRAM
+       2018 - Toshiba TMM2018 2kBx8-bit SRAM
+    A5004-4 - PAL
+
+
+Video Board
+-----------
+A5004UP01-02
+ |-------------------------------------------------------|
+ |                        13.4MHz                       |-|
+ |                                                      | |
+ |                                                      | |
+ |    6116  6116                                        | |
+ |                                                      | |
+|-|                                        A5004-1      | |
+| |                                                     |-|
+| |                                                      |
+| |                                                  CN4 |
+| |                                                      |
+| |                                6116  6116            |
+| |                                                     |-|
+|-|   P13 P12 P11                            P17 P19    | |
+ |                                                      | |
+ |                                                      | |
+ |    P16 P15 P14                            P18 P20    | |
+ |                                                      | |
+ |                                                      |-|
+ |-------------------------------------------------------|
+Notes:
+      CN4 - Auxiliary power input connector joining to middle board
+  P11-P16 - 27C256 EPROMs (32x32 tiles)
+  P17-P20 - 27C256 EPROMs (background tiles)
+  A5004-1 - PAL
+     6116 - 2kBx8-bit SRAM
+
+
+***************************************************************************
+
 Driver notes:
 ------
 

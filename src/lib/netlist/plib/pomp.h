@@ -55,12 +55,10 @@ void for_static_np(const I start, const I end, const T &what) noexcept(noexcept(
 }
 
 
-inline void set_num_threads(const std::size_t threads) noexcept
+inline void set_num_threads([[maybe_unused]] const std::size_t threads) noexcept
 {
 #if PHAS_OPENMP && PUSE_OPENMP
 	omp_set_num_threads(threads);
-#else
-	plib::unused_var(threads);
 #endif
 }
 

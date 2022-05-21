@@ -16,7 +16,6 @@
 
 #include <array>
 #include <fstream>
-#include <fstream>
 #include <ios>
 #include <iostream>
 #include <memory>
@@ -26,7 +25,7 @@
 
 namespace plib {
 
-	/// \brief wrapper around isteam read
+	/// \brief wrapper around istream read
 	///
 	template <typename S, typename T>
 	static S & istream_read(S &is, T * data, size_t len)
@@ -37,7 +36,7 @@ namespace plib {
 		return is.read(reinterpret_cast<ct *>(data), gsl::narrow<std::streamsize>(len * sizeof(T)));
 	}
 
-	/// \brief wrapper around osteam write
+	/// \brief wrapper around ostream write
 	///
 	template <typename S, typename T>
 	static S & ostream_write(S &os, const T * data, size_t len)
@@ -366,7 +365,7 @@ class ifstream : public std::ifstream
 {
 public:
 
-	using filename_type = std::conditional<compile_info::win32() && (!compile_info::mingw() || compile_info::version()>=900),
+	using filename_type = std::conditional<compile_info::win32() && (!compile_info::mingw() || compile_info::version::vmajor()>=9),
 		pstring_t<pwchar_traits>, pstring_t<putf8_traits>>::type;
 
 	template <typename T>
@@ -387,7 +386,7 @@ public:
 class ofstream : public std::ofstream
 {
 public:
-	using filename_type = std::conditional<compile_info::win32() && (!compile_info::mingw() || compile_info::version()>=900),
+	using filename_type = std::conditional<compile_info::win32() && (!compile_info::mingw() || compile_info::version::vmajor()>=9),
 		pstring_t<pwchar_traits>, pstring_t<putf8_traits>>::type;
 
 	template <typename T>

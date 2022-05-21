@@ -81,12 +81,11 @@ namespace plib
 	template <typename FT, int SIZE>
 	struct mat_precondition_diag
 	{
-		mat_precondition_diag(std::size_t size, int dummy = 0)
+		mat_precondition_diag(std::size_t size, [[maybe_unused]] int dummy = 0)
 		: m_mat(size)
 		, m_diag(size)
 		, nzcol(size)
 		{
-			plib::unused_var(dummy);
 		}
 
 		template <typename M>
@@ -120,19 +119,19 @@ namespace plib
 				// ILUT: 265%
 				FT v(0.0);
 #if 0
-				// doesn't works, Mame perforamnce drops significantly%
+				// doesn't works, Mame performance drops significantly%
 				// 136%
 				for (std::size_t j = m_mat.row_idx[i]; j< m_mat.row_idx[i+1]; j++)
 					v += m_mat.A[j] * m_mat.A[j];
 				m_diag[i] = reciprocal(std::sqrt(v));
 #elif 0
-				// works halfway, i.e. Mame perforamnce 50%
+				// works halfway, i.e. Mame performance 50%
 				// 147% - lowest average solution time with 7.094
 				for (std::size_t j = m_mat.row_idx[i]; j< m_mat.row_idx[i+1]; j++)
 					v += m_mat.A[j] * m_mat.A[j];
 				m_diag[i] = m_mat.A[m_mat.diag[i]] / v;
 #elif 0
-				// works halfway, i.e. Mame perforamnce 50%
+				// works halfway, i.e. Mame performance 50%
 				// sum over column i
 				// 344% - lowest average solution time with 3.06
 				std::size_t nzcolp = 0;
@@ -145,7 +144,7 @@ namespace plib
 				}
 				m_diag[i] = m_mat.A[m_mat.diag[i]] / v;
 #elif 0
-				// works halfway, i.e. Mame perforamnce 50%
+				// works halfway, i.e. Mame performance 50%
 				// 151%
 				for (std::size_t j = m_mat.row_idx[i]; j< m_mat.row_idx[i+1]; j++)
 					v += plib::abs(m_mat.A[j]);
@@ -175,10 +174,9 @@ namespace plib
 	template <typename FT, int SIZE>
 	struct mat_precondition_none
 	{
-		mat_precondition_none(std::size_t size, int dummy = 0)
+		mat_precondition_none(std::size_t size, [[maybe_unused]] int dummy = 0)
 		: m_mat(size)
 		{
-			plib::unused_var(dummy);
 		}
 
 		template <typename M>
@@ -198,9 +196,8 @@ namespace plib
 		}
 
 		template<typename V>
-		void solve_inplace(V &v)
+		void solve_inplace([[maybe_unused]] V &v)
 		{
-			plib::unused_var(v);
 		}
 
 		plib::pmatrix_cr<FT, SIZE> m_mat;
@@ -344,9 +341,8 @@ namespace plib
 		}
 
 		template <int k, typename OPS, typename VT>
-		bool do_k(OPS &ops, VT &x, std::size_t &itr_used, FT rho_delta, bool dummy)
+		bool do_k(OPS &ops, VT &x, std::size_t &itr_used, FT rho_delta, [[maybe_unused]] bool dummy)
 		{
-			plib::unused_var(dummy);
 			if (do_k<k-1, OPS>(ops, x, itr_used, rho_delta, do_khelper<k-1>::value))
 				return true;
 

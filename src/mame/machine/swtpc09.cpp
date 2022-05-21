@@ -76,11 +76,6 @@ uint8_t swtpc09_state::pia0_a_r()
 	return m_pia_counter;
 }
 
-uint8_t swtpc09_state::pia0_ca1_r()
-{
-	return 0;
-}
-
 WRITE_LINE_MEMBER( swtpc09_state::pia0_irq_a )
 {
 	if ( m_pia->irq_a_state())

@@ -1,11 +1,29 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder, Olivier Galibert
 #include "emu.h"
-#include "includes/atarist.h"
+
+#include "machine/ataristb.h"
+#include "video/atarist.h"
+
+#include "bus/centronics/ctronics.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+#include "bus/midi/midi.h"
+#include "bus/rs232/rs232.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/m6800/m6801.h"
+#include "imagedev/floppy.h"
+#include "machine/6850acia.h"
+#include "machine/8530scc.h"
 #include "machine/clock.h"
 #include "machine/input_merger.h"
-#include "bus/midi/midi.h"
-#include "video/atarist.h"
+#include "machine/mc68901.h"
+#include "machine/ram.h"
+#include "machine/rescap.h"
+#include "machine/rp5c15.h"
+#include "machine/wd_fdc.h"
+#include "sound/ay8910.h"
+#include "sound/lmc1992.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -42,10 +60,331 @@
 
 #define LOG 0
 
+namespace {
+
+#define M68000_TAG      "m68000"
+#define HD6301V1_TAG    "hd6301"
+#define YM2149_TAG      "ym2149"
+#define MC6850_0_TAG    "mc6850_0"
+#define MC6850_1_TAG    "mc6850_1"
+#define Z8530_TAG       "z8530"
+#define COP888_TAG      "u703"
+#define RP5C15_TAG      "rp5c15"
+#define YM3439_TAG      "ym3439"
+#define MC68901_TAG     "mc68901"
+#define LMC1992_TAG     "lmc1992"
+#define WD1772_TAG      "wd1772"
+#define SCREEN_TAG      "screen"
+#define CENTRONICS_TAG  "centronics"
+#define RS232_TAG       "rs232"
+
+// Atari ST
+
+#define Y1      XTAL(2'457'600)
+
+// 32028400 also exists
+#define Y2      32084988.0
+#define Y2_NTSC 32042400.0
+
+// STBook
+
+#define U517    XTAL(16'000'000)
+#define Y200    XTAL(2'457'600)
+#define Y700    XTAL(10'000'000)
+
+#define DMA_STATUS_DRQ              0x04
+#define DMA_STATUS_SECTOR_COUNT     0x02
+#define DMA_STATUS_ERROR            0x01
+
+#define DMA_MODE_READ_WRITE         0x100
+#define DMA_MODE_FDC_HDC_ACK        0x080
+#define DMA_MODE_ENABLED            0x040
+#define DMA_MODE_SECTOR_COUNT       0x010
+#define DMA_MODE_FDC_HDC_CS         0x008
+#define DMA_MODE_A1                 0x004
+#define DMA_MODE_A0                 0x002
+#define DMA_MODE_ADDRESS_MASK       0x006
+
+#define DMA_SECTOR_SIZE             512
+
+static const double DMASOUND_RATE[] = { Y2/640.0/8.0, Y2/640.0/4.0, Y2/640.0/2.0, Y2/640.0 };
+
 static const int IKBD_MOUSE_XYA[3][4] = { { 0, 0, 0, 0 }, { 1, 1, 0, 0 }, { 0, 1, 1, 0 } };
 static const int IKBD_MOUSE_XYB[3][4] = { { 0, 0, 0, 0 }, { 0, 1, 1, 0 }, { 1, 1, 0, 0 } };
 
-static const double DMASOUND_RATE[] = { Y2/640.0/8.0, Y2/640.0/4.0, Y2/640.0/2.0, Y2/640.0 };
+enum
+{
+	IKBD_MOUSE_PHASE_STATIC = 0,
+	IKBD_MOUSE_PHASE_POSITIVE,
+	IKBD_MOUSE_PHASE_NEGATIVE
+};
+
+class st_state : public driver_device
+{
+public:
+	enum
+	{
+		TIMER_MOUSE_TICK
+	};
+
+	st_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+			m_maincpu(*this, M68000_TAG),
+			m_stb(*this, "stb"),
+			m_ikbd(*this, HD6301V1_TAG),
+			m_fdc(*this, WD1772_TAG),
+			m_floppy(*this, WD1772_TAG ":%u", 0U),
+			m_mfp(*this, MC68901_TAG),
+			m_acia(*this, {MC6850_0_TAG, MC6850_1_TAG}),
+			m_centronics(*this, CENTRONICS_TAG),
+			m_cart(*this, "cartslot"),
+			m_ram(*this, RAM_TAG),
+			m_rs232(*this, RS232_TAG),
+			m_ymsnd(*this, YM2149_TAG),
+			m_keys(*this, "P%o", 030),
+			m_joy(*this, "IKBD_JOY%u", 0U),
+			m_mousex(*this, "IKBD_MOUSEX"),
+			m_mousey(*this, "IKBD_MOUSEY"),
+			m_config(*this, "config"),
+			m_ikbd_mouse_x(0),
+			m_ikbd_mouse_y(0),
+			m_ikbd_mouse_px(IKBD_MOUSE_PHASE_STATIC),
+			m_ikbd_mouse_py(IKBD_MOUSE_PHASE_STATIC),
+			m_ikbd_mouse_pc(0),
+			m_ikbd_joy(1),
+			m_monochrome(1),
+			m_video(*this, "video"),
+			m_screen(*this, "screen"),
+			m_led(*this, "led1")
+	{ }
+
+	DECLARE_WRITE_LINE_MEMBER( write_monochrome );
+
+	void st(machine_config &config);
+
+protected:
+	required_device<m68000_base_device> m_maincpu;
+	optional_device<st_blitter_device> m_stb;
+	required_device<cpu_device> m_ikbd;
+	required_device<wd1772_device> m_fdc;
+	required_device_array<floppy_connector, 2> m_floppy;
+	required_device<mc68901_device> m_mfp;
+	required_device_array<acia6850_device, 2> m_acia;
+	required_device<centronics_device> m_centronics;
+	required_device<generic_slot_device> m_cart;
+	required_device<ram_device> m_ram;
+	required_device<rs232_port_device> m_rs232;
+	required_device<ym2149_device> m_ymsnd;
+	required_ioport_array<16> m_keys;
+	optional_ioport_array<2> m_joy;
+	optional_ioport m_mousex;
+	optional_ioport m_mousey;
+	optional_ioport m_config;
+
+	void mouse_tick();
+
+	// driver
+	uint16_t fdc_data_r(offs_t offset);
+	void fdc_data_w(offs_t offset, uint16_t data);
+	uint16_t dma_status_r();
+	void dma_mode_w(uint16_t data);
+	uint8_t dma_counter_r(offs_t offset);
+	void dma_base_w(offs_t offset, uint8_t data);
+	uint8_t mmu_r();
+	void mmu_w(uint8_t data);
+	uint16_t berr_r();
+	void berr_w(uint16_t data);
+	uint8_t ikbd_port1_r();
+	uint8_t ikbd_port2_r();
+	void ikbd_port2_w(uint8_t data);
+	void ikbd_port3_w(uint8_t data);
+	uint8_t ikbd_port4_r();
+	void ikbd_port4_w(uint8_t data);
+
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+
+	void psg_pa_w(uint8_t data);
+
+	DECLARE_WRITE_LINE_MEMBER( ikbd_tx_w );
+
+	DECLARE_WRITE_LINE_MEMBER( reset_w );
+
+	void toggle_dma_fifo();
+	void flush_dma_fifo();
+	void fill_dma_fifo();
+	void fdc_dma_transfer();
+
+	void configure_memory();
+	void state_save();
+
+	/* memory state */
+	uint8_t m_mmu = 0U;
+
+	/* keyboard state */
+	uint16_t m_ikbd_keylatch = 0U;
+	uint8_t m_ikbd_mouse = 0U;
+	uint8_t m_ikbd_mouse_x;
+	uint8_t m_ikbd_mouse_y;
+	uint8_t m_ikbd_mouse_px;
+	uint8_t m_ikbd_mouse_py;
+	uint8_t m_ikbd_mouse_pc;
+	int m_ikbd_tx = 0;
+	int m_ikbd_joy;
+	int m_midi_tx = 0;
+
+	/* floppy state */
+	uint32_t m_dma_base = 0U;
+	uint16_t m_dma_error = 0U;
+	uint16_t m_fdc_mode = 0U;
+	uint8_t m_fdc_sectors = 0U;
+	uint16_t m_fdc_fifo[2][8]{};
+	int m_fdc_fifo_sel = 0;
+	int m_fdc_fifo_index = 0;
+	int m_fdc_fifo_msb = 0;
+	int m_fdc_fifo_empty[2]{};
+	int m_fdc_dmabytes = 0;
+
+	/* timers */
+	emu_timer *m_mouse_timer = nullptr;
+
+	static void floppy_formats(format_registration &fr);
+
+	int m_monochrome;
+	required_device<st_video_device> m_video;
+	required_device<screen_device> m_screen;
+
+	void common(machine_config &config);
+	void ikbd_map(address_map &map);
+	void cpu_space_map(address_map &map);
+	void st_map(address_map &map);
+	void megast_map(address_map &map);
+	void keyboard(machine_config &config);
+
+	uint16_t fpu_r();
+	void fpu_w(uint16_t data);
+
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	virtual void machine_start() override;
+
+	output_finder<> m_led;
+};
+
+class megast_state : public st_state
+{
+public:
+	megast_state(const machine_config &mconfig, device_type type, const char *tag)
+		: st_state(mconfig, type, tag)
+	{ }
+
+	void megast(machine_config &config);
+};
+
+class ste_state : public st_state
+{
+public:
+	enum
+	{
+		TIMER_DMASOUND_TICK,
+		TIMER_MICROWIRE_TICK
+	};
+
+	ste_state(const machine_config &mconfig, device_type type, const char *tag)
+		: st_state(mconfig, type, tag),
+			m_lmc1992(*this, LMC1992_TAG)
+	{ }
+
+	optional_device<lmc1992_device> m_lmc1992;
+
+	uint8_t sound_dma_control_r();
+	uint8_t sound_dma_base_r(offs_t offset);
+	uint8_t sound_dma_counter_r(offs_t offset);
+	uint8_t sound_dma_end_r(offs_t offset);
+	uint8_t sound_mode_r();
+	void sound_dma_control_w(uint8_t data);
+	void sound_dma_base_w(offs_t offset, uint8_t data);
+	void sound_dma_end_w(offs_t offset, uint8_t data);
+	void sound_mode_w(uint8_t data);
+	uint16_t microwire_data_r();
+	void microwire_data_w(uint16_t data);
+	uint16_t microwire_mask_r();
+	void microwire_mask_w(uint16_t data);
+
+	DECLARE_WRITE_LINE_MEMBER( write_monochrome );
+
+	void dmasound_set_state(int level);
+	void dmasound_tick();
+	void microwire_shift();
+	void microwire_tick();
+	void state_save();
+
+	/* microwire state */
+	uint16_t m_mw_data = 0U;
+	uint16_t m_mw_mask = 0U;
+	int m_mw_shift = 0;
+
+	/* DMA sound state */
+	uint32_t m_dmasnd_base = 0U;
+	uint32_t m_dmasnd_end = 0U;
+	uint32_t m_dmasnd_cntr = 0U;
+	uint32_t m_dmasnd_baselatch = 0U;
+	uint32_t m_dmasnd_endlatch = 0U;
+	uint8_t m_dmasnd_ctrl = 0U;
+	uint8_t m_dmasnd_mode = 0U;
+	uint8_t m_dmasnd_fifo[8]{};
+	uint8_t m_dmasnd_samples = 0U;
+	int m_dmasnd_active = 0;
+
+	// timers
+	emu_timer *m_microwire_timer = 0;
+	emu_timer *m_dmasound_timer = 0;
+
+	void falcon40(machine_config &config);
+	void tt030(machine_config &config);
+	void falcon(machine_config &config);
+	void ste(machine_config &config);
+	void ste_map(address_map &map);
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
+	virtual void machine_start() override;
+};
+
+class megaste_state : public ste_state
+{
+public:
+	megaste_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ste_state(mconfig, type, tag)
+	{ }
+
+	[[maybe_unused]] uint16_t cache_r();
+	[[maybe_unused]] void cache_w(uint16_t data);
+
+	uint16_t m_cache = 0;
+	void megaste(machine_config &config);
+	void megaste_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+};
+
+class stbook_state : public ste_state
+{
+public:
+	stbook_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ste_state(mconfig, type, tag),
+			m_sw400(*this, "SW400")
+	{ }
+
+	required_ioport m_sw400;
+
+	[[maybe_unused]] uint16_t config_r();
+	[[maybe_unused]] void lcd_control_w(uint16_t data);
+
+	[[maybe_unused]] void psg_pa_w(uint8_t data);
+	uint8_t mfp_gpio_r();
+	void stbook_map(address_map &map);
+protected:
+	virtual void machine_start() override;
+};
 
 
 //**************************************************************************
@@ -58,15 +397,6 @@ void st_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 	{
 	case TIMER_MOUSE_TICK:
 		mouse_tick();
-		break;
-	case TIMER_SHIFTER_TICK:
-		shifter_tick();
-		break;
-	case TIMER_GLUE_TICK:
-		glue_tick();
-		break;
-	case TIMER_BLITTER_TICK:
-		blitter_tick();
 		break;
 	default:
 		throw emu_fatalerror("Unknown id in st_state::device_timer");
@@ -541,21 +871,9 @@ uint8_t st_state::ikbd_port1_r()
 	uint8_t data = 0xff;
 
 	// keyboard data
-	if (!BIT(m_ikbd_keylatch, 1)) data &= m_p31->read();
-	if (!BIT(m_ikbd_keylatch, 2)) data &= m_p32->read();
-	if (!BIT(m_ikbd_keylatch, 3)) data &= m_p33->read();
-	if (!BIT(m_ikbd_keylatch, 4)) data &= m_p34->read();
-	if (!BIT(m_ikbd_keylatch, 5)) data &= m_p35->read();
-	if (!BIT(m_ikbd_keylatch, 6)) data &= m_p36->read();
-	if (!BIT(m_ikbd_keylatch, 7)) data &= m_p37->read();
-	if (!BIT(m_ikbd_keylatch, 8)) data &= m_p40->read();
-	if (!BIT(m_ikbd_keylatch, 9)) data &= m_p41->read();
-	if (!BIT(m_ikbd_keylatch, 10)) data &= m_p42->read();
-	if (!BIT(m_ikbd_keylatch, 11)) data &= m_p43->read();
-	if (!BIT(m_ikbd_keylatch, 12)) data &= m_p44->read();
-	if (!BIT(m_ikbd_keylatch, 13)) data &= m_p45->read();
-	if (!BIT(m_ikbd_keylatch, 14)) data &= m_p46->read();
-	if (!BIT(m_ikbd_keylatch, 15)) data &= m_p47->read();
+	for (int i = 1; i < 16; i++)
+		if (!BIT(m_ikbd_keylatch, i))
+			data &= m_keys[i]->read();
 
 	return data;
 }
@@ -579,7 +897,7 @@ uint8_t st_state::ikbd_port2_r()
 
 	*/
 
-	uint8_t data = m_joy1.read_safe(0x06) & 0x06;
+	uint8_t data = m_joy[1].read_safe(0x06) & 0x06;
 
 	// serial receive
 	data |= m_ikbd_tx << 3;
@@ -666,7 +984,7 @@ uint8_t st_state::ikbd_port4_r()
 
 	if (m_ikbd_joy) return 0xff;
 
-	uint8_t data = m_joy0.read_safe(0xff);
+	uint8_t data = m_joy[0].read_safe(0xff);
 
 	if ((m_config->read() & 0x01) == 0)
 	{
@@ -712,14 +1030,14 @@ void st_state::ikbd_port4_w(uint8_t data)
 //  fpu_r -
 //-------------------------------------------------
 
-uint16_t megast_state::fpu_r()
+uint16_t st_state::fpu_r()
 {
 	// HACK diagnostic cartridge wants to see this value
 	return 0x0802;
 }
 
 
-void megast_state::fpu_w(uint16_t data)
+void st_state::fpu_w(uint16_t data)
 {
 }
 
@@ -731,7 +1049,9 @@ WRITE_LINE_MEMBER( st_state::write_monochrome )
 
 WRITE_LINE_MEMBER( st_state::reset_w )
 {
-	//glue_reset();
+	m_video->reset();
+	if (m_stb.found())
+		m_stb->reset();
 	m_mfp->reset();
 	m_ikbd->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	m_ymsnd->reset();
@@ -1255,30 +1575,17 @@ void st_state::st_map(address_map &map)
 	//map(0xfa0000, 0xfbffff)      // mapped by the cartslot
 	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0).w(FUNC(st_state::berr_w));
 	map(0xff8001, 0xff8001).rw(FUNC(st_state::mmu_r), FUNC(st_state::mmu_w));
-	map(0xff8200, 0xff8203).rw(FUNC(st_state::shifter_base_r), FUNC(st_state::shifter_base_w)).umask16(0x00ff);
-	map(0xff8204, 0xff8209).r(FUNC(st_state::shifter_counter_r)).umask16(0x00ff);
-	map(0xff820a, 0xff820a).rw(FUNC(st_state::shifter_sync_r), FUNC(st_state::shifter_sync_w));
-	map(0xff8240, 0xff825f).rw(FUNC(st_state::shifter_palette_r), FUNC(st_state::shifter_palette_w));
-	map(0xff8260, 0xff8260).rw(FUNC(st_state::shifter_mode_r), FUNC(st_state::shifter_mode_w));
+	map(0xff8200, 0xff8203).rw(m_video, FUNC(st_video_device::shifter_base_r), FUNC(st_video_device::shifter_base_w)).umask16(0x00ff);
+	map(0xff8204, 0xff8209).r(m_video, FUNC(st_video_device::shifter_counter_r)).umask16(0x00ff);
+	map(0xff820a, 0xff820a).rw(m_video, FUNC(st_video_device::shifter_sync_r), FUNC(st_video_device::shifter_sync_w));
+	map(0xff8240, 0xff825f).rw(m_video, FUNC(st_video_device::shifter_palette_r), FUNC(st_video_device::shifter_palette_w));
+	map(0xff8260, 0xff8260).rw(m_video, FUNC(st_video_device::shifter_mode_r), FUNC(st_video_device::shifter_mode_w));
 	map(0xff8604, 0xff8605).rw(FUNC(st_state::fdc_data_r), FUNC(st_state::fdc_data_w));
 	map(0xff8606, 0xff8607).rw(FUNC(st_state::dma_status_r), FUNC(st_state::dma_mode_w));
 	map(0xff8608, 0xff860d).rw(FUNC(st_state::dma_counter_r), FUNC(st_state::dma_base_w)).umask16(0x00ff);
 	map(0xff8800, 0xff8800).rw(YM2149_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0xfc);
 	map(0xff8802, 0xff8802).rw(YM2149_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w)).mirror(0xfc);
-#if 0
-	map(0xff8a00, 0xff8a1f).rw(FUNC(st_state::blitter_halftone_r), FUNC(st_state::blitter_halftone_w));
-	map(0xff8a20, 0xff8a21).rw(FUNC(st_state::blitter_src_inc_x_r), FUNC(st_state::blitter_src_inc_x_w));
-	map(0xff8a22, 0xff8a23).rw(FUNC(st_state::blitter_src_inc_y_r), FUNC(st_state::blitter_src_inc_y_w));
-	map(0xff8a24, 0xff8a27).rw(FUNC(st_state::blitter_src_r), FUNC(st_state::blitter_src_w));
-	map(0xff8a28, 0xff8a2d).rw(FUNC(st_state::blitter_end_mask_r), FUNC(st_state::blitter_end_mask_w));
-	map(0xff8a2e, 0xff8a2f).rw(FUNC(st_state::blitter_dst_inc_x_r), FUNC(st_state::blitter_dst_inc_x_w));
-	map(0xff8a30, 0xff8a31).rw(FUNC(st_state::blitter_dst_inc_y_r), FUNC(st_state::blitter_dst_inc_y_w));
-	map(0xff8a32, 0xff8a35).rw(FUNC(st_state::blitter_dst_r), FUNC(st_state::blitter_dst_w));
-	map(0xff8a36, 0xff8a37).rw(FUNC(st_state::blitter_count_x_r), FUNC(st_state::blitter_count_x_w));
-	map(0xff8a38, 0xff8a39).rw(FUNC(st_state::blitter_count_y_r), FUNC(st_state::blitter_count_y_w));
-	map(0xff8a3a, 0xff8a3b).rw(FUNC(st_state::blitter_op_r), FUNC(st_state::blitter_op_w));
-	map(0xff8a3c, 0xff8a3d).rw(FUNC(st_state::blitter_ctrl_r), FUNC(st_state::blitter_ctrl_w));
-#endif
+	// no blitter on original ST
 	map(0xfffa00, 0xfffa3f).rw(m_mfp, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
 	map(0xfffc00, 0xfffc03).rw(m_acia[0], FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
 	map(0xfffc04, 0xfffc07).rw(m_acia[1], FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
@@ -1289,7 +1596,7 @@ void st_state::st_map(address_map &map)
 //  ADDRESS_MAP( megast_map )
 //-------------------------------------------------
 
-void megast_state::megast_map(address_map &map)
+void st_state::megast_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x000007).rom().region(M68000_TAG, 0);
@@ -1297,32 +1604,32 @@ void megast_state::megast_map(address_map &map)
 	map(0x200000, 0x3fffff).ram();
 	//map(0xfa0000, 0xfbffff)      // mapped by the cartslot
 	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0);
-//  map(0xff7f30, 0xff7f31).rw(FUNC(megast_state::blitter_dst_inc_y_r), FUNC(megast_state::blitter_dst_inc_y_w) // for TOS 1.02
-	map(0xff8001, 0xff8001).rw(FUNC(megast_state::mmu_r), FUNC(megast_state::mmu_w));
-	map(0xff8200, 0xff8203).rw(FUNC(megast_state::shifter_base_r), FUNC(megast_state::shifter_base_w)).umask16(0x00ff);
-	map(0xff8204, 0xff8209).r(FUNC(megast_state::shifter_counter_r)).umask16(0x00ff);
-	map(0xff820a, 0xff820a).rw(FUNC(megast_state::shifter_sync_r), FUNC(megast_state::shifter_sync_w));
-	map(0xff8240, 0xff825f).rw(FUNC(megast_state::shifter_palette_r), FUNC(megast_state::shifter_palette_w));
-	map(0xff8260, 0xff8260).rw(FUNC(megast_state::shifter_mode_r), FUNC(megast_state::shifter_mode_w));
-	map(0xff8604, 0xff8605).rw(FUNC(megast_state::fdc_data_r), FUNC(megast_state::fdc_data_w));
-	map(0xff8606, 0xff8607).rw(FUNC(megast_state::dma_status_r), FUNC(megast_state::dma_mode_w));
-	map(0xff8608, 0xff860d).rw(FUNC(megast_state::dma_counter_r), FUNC(megast_state::dma_base_w)).umask16(0x00ff);
+//  map(0xff7f30, 0xff7f31).rw(m_stb, FUNC(st_blitter_device::dst_inc_y_r), FUNC(st_blitter_device::dst_inc_y_w) // for TOS 1.02
+	map(0xff8001, 0xff8001).rw(FUNC(st_state::mmu_r), FUNC(st_state::mmu_w));
+	map(0xff8200, 0xff8203).rw(m_video, FUNC(st_video_device::shifter_base_r), FUNC(st_video_device::shifter_base_w)).umask16(0x00ff);
+	map(0xff8204, 0xff8209).r(m_video, FUNC(st_video_device::shifter_counter_r)).umask16(0x00ff);
+	map(0xff820a, 0xff820a).rw(m_video, FUNC(st_video_device::shifter_sync_r), FUNC(st_video_device::shifter_sync_w));
+	map(0xff8240, 0xff825f).rw(m_video, FUNC(st_video_device::shifter_palette_r), FUNC(st_video_device::shifter_palette_w));
+	map(0xff8260, 0xff8260).rw(m_video, FUNC(st_video_device::shifter_mode_r), FUNC(st_video_device::shifter_mode_w));
+	map(0xff8604, 0xff8605).rw(FUNC(st_state::fdc_data_r), FUNC(st_state::fdc_data_w));
+	map(0xff8606, 0xff8607).rw(FUNC(st_state::dma_status_r), FUNC(st_state::dma_mode_w));
+	map(0xff8608, 0xff860d).rw(FUNC(st_state::dma_counter_r), FUNC(st_state::dma_base_w)).umask16(0x00ff);
 	map(0xff8800, 0xff8800).rw(YM2149_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 	map(0xff8802, 0xff8802).w(YM2149_TAG, FUNC(ay8910_device::data_w));
-	map(0xff8a00, 0xff8a1f).rw(FUNC(megast_state::blitter_halftone_r), FUNC(megast_state::blitter_halftone_w));
-	map(0xff8a20, 0xff8a21).rw(FUNC(megast_state::blitter_src_inc_x_r), FUNC(megast_state::blitter_src_inc_x_w));
-	map(0xff8a22, 0xff8a23).rw(FUNC(megast_state::blitter_src_inc_y_r), FUNC(megast_state::blitter_src_inc_y_w));
-	map(0xff8a24, 0xff8a27).rw(FUNC(megast_state::blitter_src_r), FUNC(megast_state::blitter_src_w));
-	map(0xff8a28, 0xff8a2d).rw(FUNC(megast_state::blitter_end_mask_r), FUNC(megast_state::blitter_end_mask_w));
-	map(0xff8a2e, 0xff8a2f).rw(FUNC(megast_state::blitter_dst_inc_x_r), FUNC(megast_state::blitter_dst_inc_x_w));
-	map(0xff8a30, 0xff8a31).rw(FUNC(megast_state::blitter_dst_inc_y_r), FUNC(megast_state::blitter_dst_inc_y_w));
-	map(0xff8a32, 0xff8a35).rw(FUNC(megast_state::blitter_dst_r), FUNC(megast_state::blitter_dst_w));
-	map(0xff8a36, 0xff8a37).rw(FUNC(megast_state::blitter_count_x_r), FUNC(megast_state::blitter_count_x_w));
-	map(0xff8a38, 0xff8a39).rw(FUNC(megast_state::blitter_count_y_r), FUNC(megast_state::blitter_count_y_w));
-	map(0xff8a3a, 0xff8a3b).rw(FUNC(megast_state::blitter_op_r), FUNC(megast_state::blitter_op_w));
-	map(0xff8a3c, 0xff8a3d).rw(FUNC(megast_state::blitter_ctrl_r), FUNC(megast_state::blitter_ctrl_w));
+	map(0xff8a00, 0xff8a1f).rw(m_stb, FUNC(st_blitter_device::halftone_r), FUNC(st_blitter_device::halftone_w));
+	map(0xff8a20, 0xff8a21).rw(m_stb, FUNC(st_blitter_device::src_inc_x_r), FUNC(st_blitter_device::src_inc_x_w));
+	map(0xff8a22, 0xff8a23).rw(m_stb, FUNC(st_blitter_device::src_inc_y_r), FUNC(st_blitter_device::src_inc_y_w));
+	map(0xff8a24, 0xff8a27).rw(m_stb, FUNC(st_blitter_device::src_r), FUNC(st_blitter_device::src_w));
+	map(0xff8a28, 0xff8a2d).rw(m_stb, FUNC(st_blitter_device::end_mask_r), FUNC(st_blitter_device::end_mask_w));
+	map(0xff8a2e, 0xff8a2f).rw(m_stb, FUNC(st_blitter_device::dst_inc_x_r), FUNC(st_blitter_device::dst_inc_x_w));
+	map(0xff8a30, 0xff8a31).rw(m_stb, FUNC(st_blitter_device::dst_inc_y_r), FUNC(st_blitter_device::dst_inc_y_w));
+	map(0xff8a32, 0xff8a35).rw(m_stb, FUNC(st_blitter_device::dst_r), FUNC(st_blitter_device::dst_w));
+	map(0xff8a36, 0xff8a37).rw(m_stb, FUNC(st_blitter_device::count_x_r), FUNC(st_blitter_device::count_x_w));
+	map(0xff8a38, 0xff8a39).rw(m_stb, FUNC(st_blitter_device::count_y_r), FUNC(st_blitter_device::count_y_w));
+	map(0xff8a3a, 0xff8a3b).rw(m_stb, FUNC(st_blitter_device::op_r), FUNC(st_blitter_device::op_w));
+	map(0xff8a3c, 0xff8a3d).rw(m_stb, FUNC(st_blitter_device::ctrl_r), FUNC(st_blitter_device::ctrl_w));
 	map(0xfffa00, 0xfffa3f).rw(m_mfp, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
-	map(0xfffa40, 0xfffa57).rw(FUNC(megast_state::fpu_r), FUNC(megast_state::fpu_w));
+	map(0xfffa40, 0xfffa57).rw(FUNC(st_state::fpu_r), FUNC(st_state::fpu_w));
 	map(0xfffc00, 0xfffc03).rw(m_acia[0], FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
 	map(0xfffc04, 0xfffc07).rw(m_acia[1], FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
 	map(0xfffc20, 0xfffc3f).rw(RP5C15_TAG, FUNC(rp5c15_device::read), FUNC(rp5c15_device::write)).umask16(0x00ff);
@@ -1337,6 +1644,25 @@ void ste_state::ste_map(address_map &map)
 {
 	st_map(map);
 	map(0xe00000, 0xe3ffff).rom().region(M68000_TAG, 0);
+	map(0xff8901, 0xff8901).rw(FUNC(ste_state::sound_dma_control_r), FUNC(ste_state::sound_dma_control_w));
+	map(0xff8902, 0xff8907).rw(FUNC(ste_state::sound_dma_base_r), FUNC(ste_state::sound_dma_base_w)).umask16(0x00ff);
+	map(0xff8908, 0xff890d).r(FUNC(ste_state::sound_dma_counter_r)).umask16(0x00ff);
+	map(0xff890e, 0xff8913).rw(FUNC(ste_state::sound_dma_end_r), FUNC(ste_state::sound_dma_end_w)).umask16(0x00ff);
+	map(0xff8921, 0xff8921).rw(FUNC(ste_state::sound_mode_r), FUNC(ste_state::sound_mode_w));
+	map(0xff8922, 0xff8923).rw(FUNC(ste_state::microwire_data_r), FUNC(ste_state::microwire_data_w));
+	map(0xff8924, 0xff8925).rw(FUNC(ste_state::microwire_mask_r), FUNC(ste_state::microwire_mask_w));
+	map(0xff8a00, 0xff8a1f).rw(m_stb, FUNC(st_blitter_device::halftone_r), FUNC(st_blitter_device::halftone_w));
+	map(0xff8a20, 0xff8a21).rw(m_stb, FUNC(st_blitter_device::src_inc_x_r), FUNC(st_blitter_device::src_inc_x_w));
+	map(0xff8a22, 0xff8a23).rw(m_stb, FUNC(st_blitter_device::src_inc_y_r), FUNC(st_blitter_device::src_inc_y_w));
+	map(0xff8a24, 0xff8a27).rw(m_stb, FUNC(st_blitter_device::src_r), FUNC(st_blitter_device::src_w));
+	map(0xff8a28, 0xff8a2d).rw(m_stb, FUNC(st_blitter_device::end_mask_r), FUNC(st_blitter_device::end_mask_w));
+	map(0xff8a2e, 0xff8a2f).rw(m_stb, FUNC(st_blitter_device::dst_inc_x_r), FUNC(st_blitter_device::dst_inc_x_w));
+	map(0xff8a30, 0xff8a31).rw(m_stb, FUNC(st_blitter_device::dst_inc_y_r), FUNC(st_blitter_device::dst_inc_y_w));
+	map(0xff8a32, 0xff8a35).rw(m_stb, FUNC(st_blitter_device::dst_r), FUNC(st_blitter_device::dst_w));
+	map(0xff8a36, 0xff8a37).rw(m_stb, FUNC(st_blitter_device::count_x_r), FUNC(st_blitter_device::count_x_w));
+	map(0xff8a38, 0xff8a39).rw(m_stb, FUNC(st_blitter_device::count_y_r), FUNC(st_blitter_device::count_y_w));
+	map(0xff8a3a, 0xff8a3b).rw(m_stb, FUNC(st_blitter_device::op_r), FUNC(st_blitter_device::op_w));
+	map(0xff8a3c, 0xff8a3d).rw(m_stb, FUNC(st_blitter_device::ctrl_r), FUNC(st_blitter_device::ctrl_w));
 	map(0xff9200, 0xff9201).portr("JOY0");
 	map(0xff9202, 0xff9203).portr("JOY1");
 	map(0xff9210, 0xff9211).portr("PADDLE0X");
@@ -1354,10 +1680,16 @@ void ste_state::ste_map(address_map &map)
 
 void megaste_state::megaste_map(address_map &map)
 {
-	st_map(map);
+	megast_map(map);
 	map(0xe00000, 0xe3ffff).rom().region(M68000_TAG, 0);
 	map(0xff8c80, 0xff8c87).rw(Z8530_TAG, FUNC(scc8530_legacy_device::reg_r), FUNC(scc8530_legacy_device::reg_w)).umask16(0x00ff);
-	map(0xfffc20, 0xfffc3f).rw(RP5C15_TAG, FUNC(rp5c15_device::read), FUNC(rp5c15_device::write)).umask16(0x00ff);
+	map(0xff8901, 0xff8901).rw(FUNC(megaste_state::sound_dma_control_r), FUNC(megaste_state::sound_dma_control_w));
+	map(0xff8902, 0xff8907).rw(FUNC(megaste_state::sound_dma_base_r), FUNC(megaste_state::sound_dma_base_w)).umask16(0x00ff);
+	map(0xff8908, 0xff890d).r(FUNC(megaste_state::sound_dma_counter_r)).umask16(0x00ff);
+	map(0xff890e, 0xff8913).rw(FUNC(megaste_state::sound_dma_end_r), FUNC(megaste_state::sound_dma_end_w)).umask16(0x00ff);
+	map(0xff8921, 0xff8921).rw(FUNC(megaste_state::sound_mode_r), FUNC(megaste_state::sound_mode_w));
+	map(0xff8922, 0xff8923).rw(FUNC(megaste_state::microwire_data_r), FUNC(megaste_state::microwire_data_w));
+	map(0xff8924, 0xff8925).rw(FUNC(megaste_state::microwire_mask_r), FUNC(megaste_state::microwire_mask_w));
 }
 
 
@@ -1376,15 +1708,15 @@ void stbook_state::stbook_map(address_map &map)
 	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0);
 /*  map(0xf00000, 0xf1ffff).rw(FUNC(stbook_state::stbook_ide_r), FUNC(stbook_state::stbook_ide_w));
     map(0xff8000, 0xff8001).rw(FUNC(stbook_state::stbook_mmu_r), FUNC(stbook_state::stbook_mmu_w));
-    map(0xff8200, 0xff8203).rw(FUNC(stbook_state::stbook_shifter_base_r), FUNC(stbook_state::stbook_shifter_base_w));
-    map(0xff8204, 0xff8209).rw(FUNC(stbook_state::stbook_shifter_counter_r), FUNC(stbook_state::stbook_shifter_counter_w));
-    map(0xff820a, 0xff820a).rw(FUNC(stbook_state::stbook_shifter_sync_r), FUNC(stbook_state::stbook_shifter_sync_w));
-    map(0xff820c, 0xff820d).rw(FUNC(stbook_state::stbook_shifter_base_low_r), FUNC(stbook_state::stbook_shifter_base_low_w));
-    map(0xff820e, 0xff820f).rw(FUNC(stbook_state::stbook_shifter_lineofs_r), FUNC(stbook_state::stbook_shifter_lineofs_w));
-    map(0xff8240, 0xff8241).rw(FUNC(stbook_state::stbook_shifter_palette_r), FUNC(stbook_state::stbook_shifter_palette_w));
-    map(0xff8260, 0xff8260).rw(FUNC(stbook_state::stbook_shifter_mode_r), FUNC(stbook_state::stbook_shifter_mode_w));
-    map(0xff8264, 0xff8265).rw(FUNC(stbook_state::stbook_shifter_pixelofs_r), FUNC(stbook_state::stbook_shifter_pixelofs_w));
-    map(0xff827e, 0xff827f).w(FUNC(stbook_state::lcd_control_w));*/
+    map(0xff8200, 0xff8203).rw(m_video, FUNC(stbook_video_device::stbook_shifter_base_r), FUNC(stbook_video_device::stbook_shifter_base_w));
+    map(0xff8204, 0xff8209).rw(m_video, FUNC(stbook_video_device::stbook_shifter_counter_r), FUNC(stbook_video_device::stbook_shifter_counter_w));
+    map(0xff820a, 0xff820a).rw(m_video, FUNC(stbook_video_device::stbook_shifter_sync_r), FUNC(stbook_video_device::stbook_shifter_sync_w));
+    map(0xff820c, 0xff820d).rw(m_video, FUNC(stbook_video_device::stbook_shifter_base_low_r), FUNC(stbook_video_device::stbook_shifter_base_low_w));
+    map(0xff820e, 0xff820f).rw(m_video, FUNC(stbook_video_device::stbook_shifter_lineofs_r), FUNC(stbook_video_device::stbook_shifter_lineofs_w));
+    map(0xff8240, 0xff8241).rw(m_video, FUNC(stbook_video_device::stbook_shifter_palette_r), FUNC(stbook_video_device::stbook_shifter_palette_w));
+    map(0xff8260, 0xff8260).rw(m_video, FUNC(stbook_video_device::stbook_shifter_mode_r), FUNC(stbook_video_device::stbook_shifter_mode_w));
+    map(0xff8264, 0xff8265).rw(m_video, FUNC(stbook_video_device::stbook_shifter_pixelofs_r), FUNC(stbook_video_device::stbook_shifter_pixelofs_w));
+    map(0xff827e, 0xff827f).w(m_video, FUNC(stbook_video_device::lcd_control_w));*/
 	map(0xff8800, 0xff8800).rw(YM3439_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 	map(0xff8802, 0xff8802).w(YM3439_TAG, FUNC(ay8910_device::data_w));
 /*  map(0xff8901, 0xff8901).rw(FUNC(stbook_state::sound_dma_control_r), FUNC(stbook_state::sound_dma_control_w));
@@ -1394,18 +1726,18 @@ void stbook_state::stbook_map(address_map &map)
     map(0xff8921, 0xff8921).rw(FUNC(stbook_state::sound_mode_r), FUNC(stbook_state::sound_mode_w));
     map(0xff8922, 0xff8923).rw(FUNC(stbook_state::microwire_data_r), FUNC(stbook_state::microwire_data_w));
     map(0xff8924, 0xff8925).rw(FUNC(stbook_state::microwire_mask_r), FUNC(stbook_state::microwire_mask_w));
-    map(0xff8a00, 0xff8a1f).rw(FUNC(stbook_state::blitter_halftone_r), FUNC(stbook_state::blitter_halftone_w));
-    map(0xff8a20, 0xff8a21).rw(FUNC(stbook_state::blitter_src_inc_x_r), FUNC(stbook_state::blitter_src_inc_x_w));
-    map(0xff8a22, 0xff8a23).rw(FUNC(stbook_state::blitter_src_inc_y_r), FUNC(stbook_state::blitter_src_inc_y_w));
-    map(0xff8a24, 0xff8a27).rw(FUNC(stbook_state::blitter_src_r), FUNC(stbook_state::blitter_src_w));
-    map(0xff8a28, 0xff8a2d).rw(FUNC(stbook_state::blitter_end_mask_r), FUNC(stbook_state::blitter_end_mask_w));
-    map(0xff8a2e, 0xff8a2f).rw(FUNC(stbook_state::blitter_dst_inc_x_r), FUNC(stbook_state::blitter_dst_inc_x_w));
-    map(0xff8a30, 0xff8a31).rw(FUNC(stbook_state::blitter_dst_inc_y_r), FUNC(stbook_state::blitter_dst_inc_y_w));
-    map(0xff8a32, 0xff8a35).rw(FUNC(stbook_state::blitter_dst_r), FUNC(stbook_state::blitter_dst_w));
-    map(0xff8a36, 0xff8a37).rw(FUNC(stbook_state::blitter_count_x_r), FUNC(stbook_state::blitter_count_x_w));
-    map(0xff8a38, 0xff8a39).rw(FUNC(stbook_state::blitter_count_y_r), FUNC(stbook_state::blitter_count_y_w));
-    map(0xff8a3a, 0xff8a3b).rw(FUNC(stbook_state::blitter_op_r), FUNC(stbook_state::blitter_op_w));
-    map(0xff8a3c, 0xff8a3d).rw(FUNC(stbook_state::blitter_ctrl_r), FUNC(stbook_state::blitter_ctrl_w));
+    map(0xff8a00, 0xff8a1f).rw(m_stb, FUNC(st_blitter_device::halftone_r), FUNC(st_blitter_device::halftone_w));
+    map(0xff8a20, 0xff8a21).rw(m_stb, FUNC(st_blitter_device::src_inc_x_r), FUNC(st_blitter_device::src_inc_x_w));
+    map(0xff8a22, 0xff8a23).rw(m_stb, FUNC(st_blitter_device::src_inc_y_r), FUNC(st_blitter_device::src_inc_y_w));
+    map(0xff8a24, 0xff8a27).rw(m_stb, FUNC(st_blitter_device::src_r), FUNC(st_blitter_device::src_w));
+    map(0xff8a28, 0xff8a2d).rw(m_stb, FUNC(st_blitter_device::end_mask_r), FUNC(st_blitter_device::end_mask_w));
+    map(0xff8a2e, 0xff8a2f).rw(m_stb, FUNC(st_blitter_device::dst_inc_x_r), FUNC(st_blitter_device::dst_inc_x_w));
+    map(0xff8a30, 0xff8a31).rw(m_stb, FUNC(st_blitter_device::dst_inc_y_r), FUNC(st_blitter_device::dst_inc_y_w));
+    map(0xff8a32, 0xff8a35).rw(m_stb, FUNC(st_blitter_device::dst_r), FUNC(st_blitter_device::dst_w));
+    map(0xff8a36, 0xff8a37).rw(m_stb, FUNC(st_blitter_device::count_x_r), FUNC(st_blitter_device::count_x_w));
+    map(0xff8a38, 0xff8a39).rw(m_stb, FUNC(st_blitter_device::count_y_r), FUNC(st_blitter_device::count_y_w));
+    map(0xff8a3a, 0xff8a3b).rw(m_stb, FUNC(st_blitter_device::op_r), FUNC(st_blitter_device::op_w));
+    map(0xff8a3c, 0xff8a3d).rw(m_stb, FUNC(st_blitter_device::ctrl_r), FUNC(st_blitter_device::ctrl_w));
     map(0xff9200, 0xff9201).r(FUNC(stbook_state::config_r));
     map(0xff9202, 0xff9203).rw(FUNC(stbook_state::lcd_contrast_r), FUNC(stbook_state::lcd_contrast_w));
     map(0xff9210, 0xff9211).rw(FUNC(stbook_state::power_r), FUNC(stbook_state::power_w));
@@ -1423,6 +1755,9 @@ void stbook_state::stbook_map(address_map &map)
 //-------------------------------------------------
 
 static INPUT_PORTS_START( ikbd )
+	PORT_START("P30")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_START("P31")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Control") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
 	PORT_BIT( 0xef, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1570,19 +1905,19 @@ static INPUT_PORTS_START( st )
 	PORT_INCLUDE( ikbd )
 
 	PORT_START("IKBD_JOY0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2) PORT_8WAY PORT_CONDITION("config", 0x01, EQUALS, 0x01) // XB
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY PORT_CONDITION("config", 0x01, EQUALS, 0x01) // XA
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(2) PORT_8WAY PORT_CONDITION("config", 0x01, EQUALS, 0x01) // YA
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(2) PORT_8WAY PORT_CONDITION("config", 0x01, EQUALS, 0x01) // YB
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_8WAY PORT_CONDITION("config", 0x01, EQUALS, 0x01) // XB
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY PORT_CONDITION("config", 0x01, EQUALS, 0x01) // XA
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_8WAY PORT_CONDITION("config", 0x01, EQUALS, 0x01) // YA
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_8WAY PORT_CONDITION("config", 0x01, EQUALS, 0x01) // YB
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
 
 	PORT_START("IKBD_JOY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_CONDITION("config", 0x01, EQUALS, 0x01)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 
 	PORT_START("IKBD_MOUSEX")
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_CONDITION("config", 0x01, EQUALS, 0x00)
@@ -1887,10 +2222,6 @@ void st_state::machine_start()
 	m_mfp->i4_w(1);
 	m_mfp->i5_w(1);
 	m_mfp->i7_w(1);
-
-	m_shifter_base = 0;
-	m_shifter_ofs = 0;
-	m_shifter_mode = 0;
 }
 
 
@@ -1944,10 +2275,6 @@ void ste_state::machine_start()
 	m_mfp->i4_w(1);
 	m_mfp->i5_w(1);
 	m_mfp->i7_w(1);
-
-	m_shifter_base = 0;
-	m_shifter_ofs = 0;
-	m_shifter_mode = 0;
 }
 
 
@@ -1999,6 +2326,7 @@ void st_state::floppy_formats(format_registration &fr)
 	fr.add(FLOPPY_ST_FORMAT);
 	fr.add(FLOPPY_MSA_FORMAT);
 	fr.add(FLOPPY_PASTI_FORMAT);
+	fr.add(FLOPPY_IPF_FORMAT);
 }
 
 static void atari_floppies(device_slot_interface &device)
@@ -2054,13 +2382,13 @@ void st_state::common(machine_config &config)
 	m_rs232->cts_handler().set(m_mfp, FUNC(mc68901_device::i2_w));
 	m_rs232->ri_handler().set(m_mfp, FUNC(mc68901_device::i6_w));
 
-	ACIA6850(config, m_acia[0], 0);
+	ACIA6850(config, m_acia[0]);
 	m_acia[0]->txd_handler().set(FUNC(st_state::ikbd_tx_w));
 	m_acia[0]->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<0>));
 	m_acia[0]->write_cts(0);
 	m_acia[0]->write_dcd(0);
 
-	ACIA6850(config, m_acia[1], 0);
+	ACIA6850(config, m_acia[1]);
 	m_acia[1]->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
 	m_acia[1]->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<1>));
 	m_acia[1]->write_cts(0);
@@ -2085,11 +2413,12 @@ void st_state::common(machine_config &config)
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("st_flop");
+	SOFTWARE_LIST(config, "cart_list").set_original("st_cart");
 }
 
 void st_state::keyboard(machine_config &config)
 {
-	hd6301v1_cpu_device &ikbd(HD6301V1(config, HD6301V1_TAG, Y2/8));
+	hd6301v1_cpu_device &ikbd(HD6301V1(config, HD6301V1_TAG, 4_MHz_XTAL));
 	ikbd.set_addrmap(AS_PROGRAM, &st_state::ikbd_map);
 	ikbd.in_p1_cb().set(FUNC(st_state::ikbd_port1_r));
 	ikbd.in_p2_cb().set(FUNC(st_state::ikbd_port2_r));
@@ -2112,17 +2441,17 @@ void st_state::st(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_screen_update(FUNC(st_state::screen_update));
+	m_screen->set_screen_update(m_video, FUNC(st_video_device::screen_update));
 	m_screen->set_raw(Y2/2, ATARIST_HTOT_PAL*2, ATARIST_HBEND_PAL*2, ATARIST_HBSTART_PAL*2, ATARIST_VTOT_PAL, ATARIST_VBEND_PAL, ATARIST_VBSTART_PAL);
 
-	PALETTE(config, m_palette).set_entries(16);
+	ST_VIDEO(config, m_video, Y2);
+	m_video->set_screen(m_screen);
+	m_video->set_ram_space(m_maincpu, AS_PROGRAM);
+	m_video->de_callback().set(m_mfp, FUNC(mc68901_device::tbi_w));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 1.00);
-
-	// cartridge
-	SOFTWARE_LIST(config, "cart_list").set_original("st_cart");
 
 	// internal ram
 	RAM(config, m_ram);
@@ -2142,12 +2471,19 @@ void megast_state::megast(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &megast_state::megast_map);
 
+	ST_BLITTER(config, m_stb, Y2/4);
+	m_stb->set_space(m_maincpu, AS_PROGRAM);
+	m_stb->int_callback().set(m_mfp, FUNC(mc68901_device::i3_w));
+
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_screen_update(FUNC(megast_state::screen_update));
+	m_screen->set_screen_update(m_video, FUNC(st_video_device::screen_update));
 	m_screen->set_raw(Y2/4, ATARIST_HTOT_PAL, ATARIST_HBEND_PAL, ATARIST_HBSTART_PAL, ATARIST_VTOT_PAL, ATARIST_VBEND_PAL, ATARIST_VBSTART_PAL);
 
-	PALETTE(config, m_palette).set_entries(16);
+	ST_VIDEO(config, m_video, Y2);
+	m_video->set_screen(m_screen);
+	m_video->set_ram_space(m_maincpu, AS_PROGRAM);
+	m_video->de_callback().set(m_mfp, FUNC(mc68901_device::tbi_w));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -2155,9 +2491,6 @@ void megast_state::megast(machine_config &config)
 
 	// devices
 	RP5C15(config, RP5C15_TAG, XTAL(32'768));
-
-	// cartridge
-	SOFTWARE_LIST(config, "cart_list").set_original("st_cart");
 
 	// internal ram
 	RAM(config, m_ram);
@@ -2177,12 +2510,19 @@ void ste_state::ste(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &ste_state::ste_map);
 
+	ST_BLITTER(config, m_stb, Y2/4);
+	m_stb->set_space(m_maincpu, AS_PROGRAM);
+	m_stb->int_callback().set(m_mfp, FUNC(mc68901_device::i3_w));
+
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_screen_update(FUNC(ste_state::screen_update));
+	m_screen->set_screen_update(m_video, FUNC(ste_video_device::screen_update));
 	m_screen->set_raw(Y2/4, ATARIST_HTOT_PAL, ATARIST_HBEND_PAL, ATARIST_HBSTART_PAL, ATARIST_VTOT_PAL, ATARIST_VBEND_PAL, ATARIST_VBSTART_PAL);
 
-	PALETTE(config, m_palette).set_entries(512);
+	STE_VIDEO(config, m_video, Y2);
+	m_video->set_screen(m_screen);
+	m_video->set_ram_space(m_maincpu, AS_PROGRAM);
+	m_video->de_callback().set(m_mfp, FUNC(mc68901_device::tbi_w));
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -2195,9 +2535,6 @@ void ste_state::ste(machine_config &config)
     custom_dac.add_route(1, "lspeaker", 0.50);
 */
 	LMC1992(config, LMC1992_TAG);
-
-	// cartridge
-//  SOFTWARE_LIST(config, "cart_list").set_original("ste_cart");
 
 	// internal ram
 	RAM(config, m_ram);
@@ -2236,14 +2573,21 @@ void stbook_state::stbook(machine_config &config)
 
 	//COP888(config, COP888_TAG, Y700);
 
+	ST_BLITTER(config, m_stb, U517/2);
+	m_stb->set_space(m_maincpu, AS_PROGRAM);
+	m_stb->int_callback().set(m_mfp, FUNC(mc68901_device::i3_w));
+
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
-	m_screen->set_screen_update(FUNC(stbook_state::screen_update));
+	m_screen->set_screen_update(m_video, FUNC(stbook_video_device::screen_update));
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(640, 400);
 	m_screen->set_visarea(0, 639, 0, 399);
 
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	STBOOK_VIDEO(config, m_video, Y2);
+	m_video->set_screen(m_screen);
+	m_video->set_ram_space(m_maincpu, AS_PROGRAM);
+	m_video->de_callback().set(m_mfp, FUNC(mc68901_device::tbi_w));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -2279,13 +2623,13 @@ void stbook_state::stbook(machine_config &config)
 	m_rs232->cts_handler().set(m_mfp, FUNC(mc68901_device::i2_w));
 	m_rs232->ri_handler().set(m_mfp, FUNC(mc68901_device::i6_w));
 
-	ACIA6850(config, m_acia[0], 0);
+	ACIA6850(config, m_acia[0]);
 	m_acia[0]->txd_handler().set(FUNC(st_state::ikbd_tx_w));
 	m_acia[0]->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<0>));
 	m_acia[0]->write_cts(0);
 	m_acia[0]->write_dcd(0);
 
-	ACIA6850(config, m_acia[1], 0);
+	ACIA6850(config, m_acia[1]);
 	m_acia[1]->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
 	m_acia[1]->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<1>));
 	m_acia[1]->write_cts(0);
@@ -3072,6 +3416,8 @@ ROM_START( falcon40 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
+} // anonymous namespace
+
 
 
 //**************************************************************************
@@ -3093,27 +3439,27 @@ COMP( 1987, megast_de,  st,       0,      megast,   st,     megast_state,  empty
 COMP( 1987, megast_fr,  st,       0,      megast,   st,     megast_state,  empty_init, "Atari", "MEGA ST (France)",      MACHINE_NOT_WORKING )
 COMP( 1987, megast_se,  st,       0,      megast,   st,     megast_state,  empty_init, "Atari", "MEGA ST (Sweden)",      MACHINE_NOT_WORKING )
 COMP( 1987, megast_sg,  st,       0,      megast,   st,     megast_state,  empty_init, "Atari", "MEGA ST (Switzerland)", MACHINE_NOT_WORKING )
-COMP( 1989, ste,        0,        0,      ste,      ste,    ste_state,     empty_init, "Atari", "STE (USA)",             MACHINE_NOT_WORKING )
-COMP( 1989, ste_uk,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STE (UK)",              MACHINE_NOT_WORKING )
-COMP( 1989, ste_de,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STE (Germany)",         MACHINE_NOT_WORKING )
-COMP( 1989, ste_es,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STE (Spain)",           MACHINE_NOT_WORKING )
-COMP( 1989, ste_fr,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STE (France)",          MACHINE_NOT_WORKING )
-COMP( 1989, ste_it,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STE (Italy)",           MACHINE_NOT_WORKING )
-COMP( 1989, ste_se,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STE (Sweden)",          MACHINE_NOT_WORKING )
-COMP( 1989, ste_sg,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STE (Switzerland)",     MACHINE_NOT_WORKING )
+COMP( 1989, ste,        0,        0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (USA)",             MACHINE_NOT_WORKING )
+COMP( 1989, ste_uk,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (UK)",              MACHINE_NOT_WORKING )
+COMP( 1989, ste_de,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (Germany)",         MACHINE_NOT_WORKING )
+COMP( 1989, ste_es,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (Spain)",           MACHINE_NOT_WORKING )
+COMP( 1989, ste_fr,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (France)",          MACHINE_NOT_WORKING )
+COMP( 1989, ste_it,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (Italy)",           MACHINE_NOT_WORKING )
+COMP( 1989, ste_se,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (Sweden)",          MACHINE_NOT_WORKING )
+COMP( 1989, ste_sg,     ste,      0,      ste,      ste,    ste_state,     empty_init, "Atari", "STe (Switzerland)",     MACHINE_NOT_WORKING )
 //COMP( 1990, stbook,     ste,      0,      stbook,   stbook, stbook_state,  empty_init, "Atari", "STBook",                MACHINE_NOT_WORKING )
 COMP( 1990, tt030,      0,        0,      tt030,    tt030,  ste_state,     empty_init, "Atari", "TT030 (USA)",           MACHINE_NOT_WORKING )
 COMP( 1990, tt030_uk,   tt030,    0,      tt030,    tt030,  ste_state,     empty_init, "Atari", "TT030 (UK)",            MACHINE_NOT_WORKING )
 COMP( 1990, tt030_de,   tt030,    0,      tt030,    tt030,  ste_state,     empty_init, "Atari", "TT030 (Germany)",       MACHINE_NOT_WORKING )
 COMP( 1990, tt030_fr,   tt030,    0,      tt030,    tt030,  ste_state,     empty_init, "Atari", "TT030 (France)",        MACHINE_NOT_WORKING )
 COMP( 1990, tt030_pl,   tt030,    0,      tt030,    tt030,  ste_state,     empty_init, "Atari", "TT030 (Poland)",        MACHINE_NOT_WORKING )
-COMP( 1991, megaste,    ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STE (USA)",        MACHINE_NOT_WORKING )
-COMP( 1991, megaste_uk, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STE (UK)",         MACHINE_NOT_WORKING )
-COMP( 1991, megaste_de, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STE (Germany)",    MACHINE_NOT_WORKING )
-COMP( 1991, megaste_es, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STE (Spain)",      MACHINE_NOT_WORKING )
-COMP( 1991, megaste_fr, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STE (France)",     MACHINE_NOT_WORKING )
-COMP( 1991, megaste_it, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STE (Italy)",      MACHINE_NOT_WORKING )
-COMP( 1991, megaste_se, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STE (Sweden)",     MACHINE_NOT_WORKING )
+COMP( 1991, megaste,    ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STe (USA)",        MACHINE_NOT_WORKING )
+COMP( 1991, megaste_uk, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STe (UK)",         MACHINE_NOT_WORKING )
+COMP( 1991, megaste_de, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STe (Germany)",    MACHINE_NOT_WORKING )
+COMP( 1991, megaste_es, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STe (Spain)",      MACHINE_NOT_WORKING )
+COMP( 1991, megaste_fr, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STe (France)",     MACHINE_NOT_WORKING )
+COMP( 1991, megaste_it, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STe (Italy)",      MACHINE_NOT_WORKING )
+COMP( 1991, megaste_se, ste,      0,      megaste,  st,     megaste_state, empty_init, "Atari", "MEGA STe (Sweden)",     MACHINE_NOT_WORKING )
 COMP( 1992, falcon30,   0,        0,      falcon,   falcon, ste_state,     empty_init, "Atari", "Falcon030",             MACHINE_NOT_WORKING )
 COMP( 1992, falcon40,   falcon30, 0,      falcon40, falcon, ste_state,     empty_init, "Atari", "Falcon040 (prototype)", MACHINE_NOT_WORKING )
 //COMP( 1989, stacy,      st,       0,      stacy,    stacy,  st_state,      empty_init, "Atari", "Stacy",                 MACHINE_NOT_WORKING )

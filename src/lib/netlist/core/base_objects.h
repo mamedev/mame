@@ -201,7 +201,7 @@ namespace netlist::detail {
 		/// Going forward setting this to 8 will allow 8-bit signal
 		/// busses to be used in netlist, e.g. for more complex memory
 		/// arrangements.
-		/// Mimimum value is 2 here to support tristate output on proxies.
+		/// Minimum value is 2 here to support tristate output on proxies.
 		static constexpr const unsigned int INP_BITS = 2;
 
 		static constexpr const unsigned int INP_MASK = (1 << INP_BITS) - 1;
@@ -264,9 +264,8 @@ namespace netlist::detail {
 
 		state_var_sig m_Q;
 #else
-		void set_copied_input(const netlist_sig_t &val) const noexcept { plib::unused_var(val); } // NOLINT: static means more message elsewhere
+		void set_copied_input([[maybe_unused]] const netlist_sig_t &val) const noexcept { } // NOLINT: static means more message elsewhere
 #endif
-
 		void set_delegate(const nldelegate &delegate) noexcept { m_delegate = delegate; }
 		const nldelegate &delegate() const noexcept { return m_delegate; }
 		void run_delegate() const noexcept { return m_delegate(); }

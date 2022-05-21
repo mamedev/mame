@@ -391,7 +391,7 @@ void vic_pl192_device::device_start()
 
 void vic_pl192_device::device_reset()
 {
-	vic_pl190_device::device_start();
+	vic_pl190_device::device_reset();
 
 	sw_priority_mask = 0xffff;
 	daisy_priority = 0xf;

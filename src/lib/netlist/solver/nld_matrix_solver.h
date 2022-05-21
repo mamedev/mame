@@ -263,8 +263,7 @@ namespace netlist::solver
 			// this should only occur outside of execution and thus
 			// using time should be safe.
 
-			const netlist_time new_timestep = solve(exec().time(), "solve_now");
-			plib::unused_var(new_timestep);
+			[[maybe_unused]] const netlist_time new_timestep = solve(exec().time(), "solve_now");
 
 			update_inputs();
 
@@ -280,8 +279,7 @@ namespace netlist::solver
 			// We only need to update the net first if this is a time stepping net
 			if (timestep_device_count() > 0)
 			{
-				const netlist_time new_timestep = solve(exec().time(), "change_state");
-				plib::unused_var(new_timestep);
+				[[maybe_unused]] const netlist_time new_timestep = solve(exec().time(), "change_state");
 				update_inputs();
 			}
 			f();
@@ -298,9 +296,8 @@ namespace netlist::solver
 
 		virtual void log_stats();
 
-		virtual std::pair<pstring, pstring> create_solver_code(solver::static_compile_target target)
+		virtual std::pair<pstring, pstring> create_solver_code([[maybe_unused]] solver::static_compile_target target)
 		{
-			plib::unused_var(target);
 			return { "", plib::pfmt("/* solver doesn't support static compile */\n\n") };
 		}
 

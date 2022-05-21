@@ -24,7 +24,7 @@ Undumped cartridges:
 			<dataarea name="rom" width="16" endianness="big" size="0x10000">
 				<rom name="st 4.4 hi.bin" size="0x8000" crc="9ece1359" sha1="58fb686e1f15048105b56502251c0f5a0084d3bb" offset="0x0000" loadflag="load16_byte" />
 				<rom name="st 4.4 lo.bin" size="0x8000" crc="f18e717c" sha1="92fab18c8046f9c1b9ddf2a82e48713a6df0c802" offset="0x0001" loadflag="load16_byte" />
-				</dataarea>
+			</dataarea>
 		</part>
 	</software>
 
@@ -48,7 +48,7 @@ Undumped cartridges:
 			<dataarea name="rom" width="16" endianness="big" size="0x10000">
 				<rom name="megaste 1.5 hi.bin" size="0x8000" crc="4d1f118e" sha1="7b1c282db728e3702496e5d5f5b89b94a80d28fd" offset="0x0000" loadflag="load16_byte" />
 				<rom name="megaste 1.5 lo.bin" size="0x8000" crc="76225df0" sha1="d32325b065b34d5b06448f8fa13434b3493ca1e2" offset="0x0001" loadflag="load16_byte" />
-				</dataarea>
+			</dataarea>
 		</part>
 	</software>
 
@@ -60,7 +60,7 @@ Undumped cartridges:
 			<dataarea name="rom" width="16" endianness="big" size="0x10000">
 				<rom name="tt 1.4 hi.bin" size="0x8000" crc="62c433d8" sha1="82d43792282e1eeda3469519a4356b7f9fa9c29f" offset="0x0000" loadflag="load16_byte" />
 				<rom name="tt 1.4 lo.bin" size="0x8000" crc="37b931af" sha1="2ef2fc4e5f45f9b5c4a3a007a8bc001684eb0337" offset="0x0001" loadflag="load16_byte" />
-				</dataarea>
+			</dataarea>
 		</part>
 	</software>
 
