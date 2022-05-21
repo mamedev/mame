@@ -38,7 +38,7 @@ public:
 	virtual void stat_w(uint8_t data) = 0;
 	void tdr_w(uint8_t data);
 	void rdr_w(uint8_t data);
-	virtual void asext_w(uint8_t data) = 0;
+	virtual void asext_w(uint8_t data);
 	void astcl_w(uint8_t data);
 	void astch_w(uint8_t data);
 
@@ -73,7 +73,8 @@ protected:
 		STATE_DATA,
 		STATE_MPB,
 		STATE_PARITY,
-		STATE_STOP
+		STATE_STOP,
+		STATE_BREAK
 	};
 
 
