@@ -2,8 +2,8 @@
 // copyright-holders:Carlos A. Lozano, Rob Rosenbrock, Phil Stroffolino
 /***************************************************************************
 
-Solar Warrior / Xain'd Sleena
-Technos, 1986
+Solar-Warrior / Xain'd Sleena (Technos, 1986)
+Hardware info by Guru
 
 PCB Layout
 ----------
@@ -12,80 +12,90 @@ Top Board
 
 TA-0019-P1-03
 |------------------------------------------------------------------------|
-|M51516 YM3014 YM2203 YM2203 68A09 P2-0.49                               |
-|       YM3014                                                           |
-|                                  6116                                 |--|
+|M51516  558   YM3014 YM2203 68A09 P2-0.IC49                             |
+|  VOL   558   YM3014 YM2203                                             |
+|        558                       6116                                 |--|
 |                                                                       |  |
-|        2018                      *                                    |  |
+|        2018(1)                   *                                    |  |
 |        6148                                                           |  |
-|                           PT-0.59                                     |  |
-|                                  P3-0.46                              |  |
+|                           PT-0.IC59                                   |  |
+|                                  P3-0.IC46                            |  |
 |                                                                       |  |
 |J                                                                      |  |
-|A    DSW2                         P4-0.45                              |--|
+|A     SW2                         P4-0.IC45                            |--|
 |M                                                     2018              |
 |M                                                                       |
-|A                                 P5-0.44                               |
-|     DSW1                                                               |
+|A                                 P5-0.IC44                             |
+|      SW1                                                               |
 |                                                                       |--|
-|                                  P6-0.43                              |  |
-|            68B09                                                      |  |
-|                                              68B09                    |  |
-|                   P9-02.66       P7-0.42                              |  |
+|                                  P6-0.IC43                            |  |
+|            68B09(1)                                                   |  |
+|                                              68B09(2)                 |  |
+|                   P9-02.IC66     P7-0.IC42                            |  |
 |                                                                       |  |
 |                                                                       |  |
-| 68705             PA-03.65       P8-0.41                              |  |
-| (PZ-0.113)                                P1-02.29  P0-02.15   6264   |--|
+| 68705             PA-03.IC65     P8-0.IC41                            |  |
+| (PZ-0.IC113)                             P1-02.IC29  P0-02.IC15  6264 |--|
 |                                                                        |
-|                                  *                                     |
+|                         T518A    *                                     |
 |------------------------------------------------------------------------|
 Notes:
-        6809 - Hitachi HD68A09 / HD68B09 CPU, running at 1.500MHz [12/8] (x3, DIP40)
-      YM2203 - Yamaha YM2203C sound chip, running at 3.000MHz [12/4] (x2, DIP40)
-       68705 - Motorola MC68705P5S Microcontroller, running at 3.000MHz [12/4] (labelled 'PZ-0', DIP28)
-           * - Empty socket
-        6264 - Hitachi HM6264LP-15 8K x8 SRAM (DIP28)
-        2018 - Toshiba TMM2018D-45 2K x8 SRAM (DIP24)
-        6148 - Hitachi HM6148HP-45 1K x4 SRAM (DIP18)
-        6116 - Hitachi HM6116LP-3 2K x8 SRAM (DIP24)
+       68A09 - Hitachi HD68A09P CPU. Clock 1.500MHz [12/8] (sound CPU)          \
+    68B09(1) - Hitachi HD68B09EP CPU. Clock 1.500MHz [12/8] (main program CPU)   | Note: Despite the CPUs being A and B types
+    68B09(2) - Hitachi HD68B09EP CPU. Clock 1.500MHz [12/8] (sub program CPU)   /        they ALL run at 1.5MHz
+      YM2203 - Yamaha YM2203 FM Operator Type-N(OPN) sound chip. Clock 3.000MHz [12/4]
+      YM3014 - Yamaha YM3014 Serial Input Floating D/A Converter. Clock 1.0000MHz [12/4/3]
+       68705 - Motorola MC68705P5S Micro-Controller. Clock 3.000MHz [12/4] (labelled 'PZ-0')
+           * - Empty sockets
+        6264 - Hitachi HM6264LP-15 8kBx8-bit SRAM (main+sub program RAM)
+        2018 - Toshiba TMM2018D-45 2kBx8-bit SRAM (tile RAM)
+     2018(1) - Toshiba TMM2018D-45 2kBx8-bit SRAM  \ (color RAM)
+        6148 - Hitachi HM6148HP-45 1kBx4-bit SRAM  /
+        6116 - Hitachi HM6116LP-3 2kBx8-bit SRAM (DIP24) (sound program RAM)
+      M51516 - Mitsubishi M51516L 12W BTL Audio Power Amplifier
+       T518A - Mitsumi Electric PST518A System Reset IC with low voltage detection reset 4.2V
+         558 - Hitachi HA17558 Dual Operational Amplifier
+       SW1/2 - 8-position DIP switch
+       HSync - 15.6165kHz \
+       VSync - 57.4138Hz  / measured on bottom board on logic near 12MHz xtal
 
-       VSync - 57Hz
+        ROMs - Name           Device       Use
+               P9-02.IC66     TMM24256   \ CPU1 program
+               PA-03.IC65     MBM27256   /
 
-        ROMs - Name         Device       Use
-               P9-02.66     TMM24256   \ CPU1 program
-               PA-03.65     MBM27256   /
+               P0-02.IC15     TMM24256   \ CPU2 program
+               P1-02.IC29     TMM24256   /
 
-               P0-02.15     TMM24256   \ CPU2 program
-               P1-02.29     TMM24256   /
+               P2-0.IC49      TMM24256     Sound CPU program
 
-               P2-0.49      TMM24256     Sound CPU program
+               P3-0.IC46      TMM24256   / Tiles
+               P4-0.IC45      TMM24256   |
+               P5-0.IC44      TMM24256   |
+               P6-0.IC43      TMM24256   |
+               P7-0.IC42      TMM24256   |
+               P8-0.IC41      TMM24256   /
 
-               P3-0.46      TMM24256   / GFX
-               P4-0.45      TMM24256   |
-               P5-0.44      TMM24256   |
-               P6-0.43      TMM24256   |
-               P7-0.42      TMM24256   |
-               P8-0.41      TMM24256   /
+               PT-0.IC59      Fujitsu MB7114E 256x4-bit PROM used for priority
 
 Bottom Board
 
 TA-0019-P2-03
 |------------------------------------------------------------------------|
-|    PK-0.136  PC-0.114                                                  |
-|    PL-0.135  PD-0.113                                                  |
+|    PK-0.IC136  PC-0.IC114                                              |
+|    PL-0.IC135  PD-0.IC113                                              |
 |                                                                       |--|
-|    PM-0.134  PE-0.112                                                 |  |
-|    PN-02.133 PF-02.111                                                |  |
+|    PM-0.IC134  PE-0.IC112                                             |  |
+|    PN-02.IC133 PF-02.IC111                                            |  |
 |                                                                       |  |
-|           2018                                                        |  |
+|           2018(1)                                                     |  |
 |                                                                       |  |
-|    PO-0.131  PG-0.109                                                 |  |
+|    PO-0.IC131  PG-0.IC109                                             |  |
 |                                                                       |  |
-|    PP-0.130  PH-0.108                                                 |--|
+|    PP-0.IC130  PH-0.IC108                                             |--|
 |                                                                  12MHz |
-|    PQ-0.129  PI-0.107                                PB-0.24           |
+|    PQ-0.IC129  PI-0.IC107                            PB-0.IC24         |
 |                                                                        |
-|    PR-0.128  PJ-0.106                                6116              |
+|    PR-0.IC128  PJ-0.IC106                            6116              |
 |                                                                       |--|
 |         2018                                                          |  |
 |                                                                       |  |
@@ -99,27 +109,35 @@ TA-0019-P2-03
 |             2018                                                       |
 |------------------------------------------------------------------------|
 Notes:
-        2018 - Toshiba TMM2018D-45 2K x8 SRAM (DIP24)
+        2018 - Toshiba TMM2018D-45 2kBx8-bit SRAM (sprite RAM)
+     2018(1) - Toshiba TMM2018D-45 2kBx8-bit SRAM (tile RAM)
+        6116 - Hitachi HM6116 2kBx8-bit SRAM (character / text layer RAM)
 
-        ROMs - Name         Device       Use
-               PB-0.24      TMM24256   / GFX
-               PC-0.114     TMM24256   |
-               PD-0.113     TMM24256   |
-               PE-0.112     TMM24256   |
-               PF-02.111    MBM27256   |
-               PG-0.109     TMM24256   |
-               PH-0.108     TMM24256   |
-               PI-0.107     TMM24256   |
-               PJ-0.106     TMM24256   |
-               PK-0.136     TMM24256   |
-               PL-0.135     TMM24256   |
-               PM-0.134     TMM24256   |
-               PN-02.133    MBM27256   |
-               PO-0.131     TMM24256   |
-               PP-0.130     TMM24256   |
-               PQ-0.129     TMM24256   |
-               PR-0.128     TMM24256   /
+        ROMs - Name           Device       Use
+               PB-0.IC24      TMM24256     Characters / text layer
 
+               PC-0.IC114     TMM24256   \
+               PD-0.IC113     TMM24256   |
+               PE-0.IC112     TMM24256   |
+               PF-02.IC111    MBM27256   | Tiles (PN-02 and PF-02 are unique to Solar-Warrior)
+               PK-0.IC136     TMM24256   |
+               PL-0.IC135     TMM24256   |
+               PM-0.IC134     TMM24256   |
+               PN-02.IC133    MBM27256   /
+
+               PG-0.IC109     TMM24256   \
+               PH-0.IC108     TMM24256   |
+               PI-0.IC107     TMM24256   |
+               PJ-0.IC106     TMM24256   |
+               PO-0.IC131     TMM24256   | Sprites
+               PP-0.IC130     TMM24256   |
+               PQ-0.IC129     TMM24256   |
+               PR-0.IC128     TMM24256   /
+
+***************************************************************************
+
+
+Driver notes:
 
 Driver by Carlos A. Lozano & Rob Rosenbrock & Phil Stroffolino
 Updates by Bryan McPhail, 12/12/2004:
@@ -552,7 +570,7 @@ ROM_START( xsleena )
 	ROM_LOAD( "pz-0.113",      0x0000, 0x0800, CRC(a432a907) SHA1(4708a40e3a82dec2c5a64bc5da884a37d503cb6b) ) /* MC68705P5S MCU internal code */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "pb-01.ic24",   0x00000, 0x8000, CRC(83c00dd8) SHA1(8e9b19281039b63072270c7a63d9fb30cda570fd) ) /* chars */
+	ROM_LOAD( "pb-0.ic24",   0x00000, 0x8000, CRC(83c00dd8) SHA1(8e9b19281039b63072270c7a63d9fb30cda570fd) ) /* chars */
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
 	ROM_LOAD( "pk-0.ic136",   0x00000, 0x8000, CRC(11eb4247) SHA1(5d2f1fa07b8fb1c6bebfdb02c39282d29813791b) ) /* tiles */
@@ -606,7 +624,7 @@ ROM_START( xsleenaj )
 	ROM_LOAD( "pz-0.113",      0x0000, 0x0800, CRC(a432a907) SHA1(4708a40e3a82dec2c5a64bc5da884a37d503cb6b) ) /* MC68705P5S MCU internal code */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "pb-01.ic24",   0x00000, 0x8000, CRC(83c00dd8) SHA1(8e9b19281039b63072270c7a63d9fb30cda570fd) ) /* chars */
+	ROM_LOAD( "pb-0.ic24",   0x00000, 0x8000, CRC(83c00dd8) SHA1(8e9b19281039b63072270c7a63d9fb30cda570fd) ) /* chars */
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
 	ROM_LOAD( "pk-0.ic136",   0x00000, 0x8000, CRC(11eb4247) SHA1(5d2f1fa07b8fb1c6bebfdb02c39282d29813791b) ) /* tiles */
@@ -660,7 +678,7 @@ ROM_START( solrwarr )
 	ROM_LOAD( "pz-0.113",      0x0000, 0x0800, CRC(a432a907) SHA1(4708a40e3a82dec2c5a64bc5da884a37d503cb6b) ) /* MC68705P5S MCU internal code */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "pb-01.ic24",   0x00000, 0x8000, CRC(83c00dd8) SHA1(8e9b19281039b63072270c7a63d9fb30cda570fd) ) /* chars */
+	ROM_LOAD( "pb-0.ic24",   0x00000, 0x8000, CRC(83c00dd8) SHA1(8e9b19281039b63072270c7a63d9fb30cda570fd) ) /* chars */
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
 	ROM_LOAD( "pk-0.ic136",   0x00000, 0x8000, CRC(11eb4247) SHA1(5d2f1fa07b8fb1c6bebfdb02c39282d29813791b) ) /* tiles */
@@ -711,7 +729,7 @@ ROM_START( xsleenab )
 	ROM_LOAD( "p2-0.ic49",     0x8000, 0x8000, CRC(a5318cb8) SHA1(35fb28c5598e39f22552bb036ae356b78422f080) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "pb-01.ic24",   0x00000, 0x8000, CRC(83c00dd8) SHA1(8e9b19281039b63072270c7a63d9fb30cda570fd) ) /* chars */
+	ROM_LOAD( "pb-0.ic24",   0x00000, 0x8000, CRC(83c00dd8) SHA1(8e9b19281039b63072270c7a63d9fb30cda570fd) ) /* chars */
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
 	ROM_LOAD( "pk-0.ic136",   0x00000, 0x8000, CRC(11eb4247) SHA1(5d2f1fa07b8fb1c6bebfdb02c39282d29813791b) ) /* tiles */
@@ -762,7 +780,7 @@ ROM_START( xsleenaba )
 	ROM_LOAD( "p2-0.ic49",     0x8000, 0x8000, CRC(a5318cb8) SHA1(35fb28c5598e39f22552bb036ae356b78422f080) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "pb-01.ic24",   0x00000, 0x8000, CRC(83c00dd8) SHA1(8e9b19281039b63072270c7a63d9fb30cda570fd) ) /* chars */
+	ROM_LOAD( "pb-0.ic24",   0x00000, 0x8000, CRC(83c00dd8) SHA1(8e9b19281039b63072270c7a63d9fb30cda570fd) ) /* chars */
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
 	ROM_LOAD( "pk-0.ic136",   0x00000, 0x8000, CRC(11eb4247) SHA1(5d2f1fa07b8fb1c6bebfdb02c39282d29813791b) ) /* tiles */
