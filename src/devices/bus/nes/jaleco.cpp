@@ -319,22 +319,19 @@ TIMER_CALLBACK_MEMBER(nes_ss88006_device::irq_timer_tick)
 {
 	if (m_irq_enable)
 	{
-		if (m_irq_mode & 0x08)  // 4bits counter
-		{
-			u16 mask = 0xffff;            // 16-bit counter (default)
+		u16 mask = 0xffff;            // 16-bit counter (default)
 
-			if (BIT(m_irq_mode, 3))       // 4-bit counter
-				mask = 0x000f;
-			else if (BIT(m_irq_mode, 2))  // 8-bit counter
-				mask = 0x00ff;
-			else if (BIT(m_irq_mode, 1))  // 12-bit counter
-				mask = 0x0fff;
+		if (BIT(m_irq_mode, 3))       // 4-bit counter
+			mask = 0x000f;
+		else if (BIT(m_irq_mode, 2))  // 8-bit counter
+			mask = 0x00ff;
+		else if (BIT(m_irq_mode, 1))  // 12-bit counter
+			mask = 0x0fff;
 
-			m_irq_count = (m_irq_count & ~mask) | ((m_irq_count - 1) & mask);
+		m_irq_count = (m_irq_count & ~mask) | ((m_irq_count - 1) & mask);
 
-			if ((m_irq_count & mask) == mask)
-				set_irq_line(ASSERT_LINE);
-		}
+		if ((m_irq_count & mask) == mask)
+			set_irq_line(ASSERT_LINE);
 	}
 }
 
