@@ -4754,7 +4754,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/sb180.cpp",
 	MAME_DIR .. "src/mame/drivers/sb8085.cpp",
 	MAME_DIR .. "src/mame/drivers/sbrain.cpp",
-	MAME_DIR .. "src/mame/drivers/sc111.cpp",
 	MAME_DIR .. "src/mame/drivers/seattlecmp.cpp",
 	MAME_DIR .. "src/mame/drivers/sh4robot.cpp",
 	MAME_DIR .. "src/mame/drivers/sansa_fuze.cpp",

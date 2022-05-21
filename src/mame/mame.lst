@@ -37546,9 +37546,6 @@ sbrkoutct                       // 034555-034559 proto ???? [6502]
 sbugger                         // (c) 1981 Game-A-Tron
 sbuggera                        // (c) 1981 Game-A-Tron
 
-@source:sc111.cpp
-sc111                          //
-
 @source:sc2.cpp
 sc2                             //
 sc2a                            //
