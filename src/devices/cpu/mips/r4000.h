@@ -392,6 +392,9 @@ protected:
 	std::string debug_string_array(u64 array_pointer);
 	std::string debug_unicode_string(u64 unicode_string_pointer);
 
+	// configuration helpers
+	void configure_scache();
+
 	// device configuration state
 	address_space_config m_program_config_le;
 	address_space_config m_program_config_be;
@@ -468,7 +471,6 @@ protected:
 	std::unique_ptr<u32[]> m_icache_data;
 
 	// experimental scache state
-	void configure_scache();
 	u32 m_scache_size; // Size in bytes
 	u8 m_scache_line_size;
 	u32 m_scache_line_index; // Secondary cache line shift

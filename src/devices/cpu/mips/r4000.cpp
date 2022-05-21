@@ -1214,12 +1214,9 @@ void r4000_base_device::cp0_cache(u32 const op)
 		if (ICACHE)
 		{
 			m_icache_tag[(ADDR(m_r[RSREG], s16(op)) & m_icache_mask_hi) >> m_icache_shift] &= ~ICACHE_V;
+			break;
 		}
-		else
-		{
-			//LOGMASKED(LOG_CACHE, "cache 0x%08x unimplemented (%s)\n", op, machine().describe_context());
-		}
-		break;
+		[[fallthrough]];
 	case 0x04: // index load tag (I)
 		if (ICACHE)
 		{
@@ -1227,24 +1224,19 @@ void r4000_base_device::cp0_cache(u32 const op)
 
 			m_cp0[CP0_TagLo] = ((tag & ICACHE_PTAG) << 8) | ((tag & ICACHE_V) >> 18) | ((tag & ICACHE_P) >> 25);
 			m_cp0[CP0_ECC] = 0; // data ecc or parity
+
+			break;
 		}
-		else
-		{
-			//LOGMASKED(LOG_CACHE, "cache 0x%08x unimplemented (%s)\n", op, machine().describe_context());
-		}
-		break;
+		[[fallthrough]];
 	case 0x08: // index store tag (I)
 		if (ICACHE)
 		{
 			// FIXME: compute parity
 			m_icache_tag[(ADDR(m_r[RSREG], s16(op)) & m_icache_mask_hi) >> m_icache_shift] =
 				(m_cp0[CP0_TagLo] & TAGLO_PTAGLO) >> 8 | (m_cp0[CP0_TagLo] & TAGLO_PSTATE) << 18;
+			break;
 		}
-		else
-		{
-			//LOGMASKED(LOG_CACHE, "cache 0x%08x unimplemented (%s)\n", op, machine().describe_context());
-		}
-		break;
+		[[fallthrough]];
 	case 0x01: // index writeback invalidate (D)
 	case 0x02: // index invalidate (SI)
 	case 0x03: // index writeback invalidate (SD)
@@ -1288,9 +1280,8 @@ void r4000_base_device::cp0_cache(u32 const op)
 		if (SCACHE)
 		{
 			// Get virtual and physical addresses
-			u64 const virtual_address = ADDR(m_r[RSREG], s16(op));
-
 			// TODO: translation type for CACHE instruction?
+			u64 const virtual_address = ADDR(m_r[RSREG], s16(op));
 			u64 physical_address = virtual_address;
 			translate_result const t = translate(TRANSLATE_READ, physical_address);
 			if (t == ERROR || t == MISS)
@@ -4110,7 +4101,7 @@ void r4000_base_device::configure_scache()
 		* See chapter 11 of the R4000 user manual for more details.
 		*/
 		if (m_scache_line_size == 0)
-			fatalerror("SCACHE line size was not set!");
+			fatalerror("SCACHE size set but line size was not set!");
 
 		if (m_scache_line_size <= 0x10)
 			m_scache_line_index = 4;
