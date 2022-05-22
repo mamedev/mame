@@ -91,6 +91,7 @@ protected:
 	void electron_colours(palette_device &palette) const;
 	uint32_t screen_update_electron(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(electron_tape_timer_handler);
+	void cassette_bit_received(int bit);
 	TIMER_CALLBACK_MEMBER(setup_beep);
 	TIMER_CALLBACK_MEMBER(electron_scanline_interrupt);
 
@@ -149,6 +150,9 @@ protected:
 		int stop_bit = 0;
 		int tape_running = 0;
 		uint8_t tape_byte = 0;
+		double last_tap_val = 0.0;
+		int tap_val_length = 0;
+		int len[4]{};
 	};
 
 	ULA m_ula;

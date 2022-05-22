@@ -55,7 +55,7 @@ void electron_state::electron_tape_start()
 	m_ula.high_tone_set = 0;
 	m_ula.bit_count = 0;
 	m_ula.tape_running = 1;
-	m_tape_timer->adjust(attotime::zero, 0, attotime::from_hz(4800));
+	m_tape_timer->adjust(attotime::zero, 0, attotime::from_hz(44100));
 }
 
 void electron_state::electron_tape_stop()
@@ -69,75 +69,89 @@ void electron_state::electron_tape_stop()
 
 TIMER_CALLBACK_MEMBER(electron_state::electron_tape_timer_handler)
 {
-	if ( m_ula.cassette_motor_mode )
+	if (m_ula.cassette_motor_mode)
 	{
-		double tap_val;
-		tap_val = m_cassette->input();
-		if ( tap_val < -0.5 )
+		double tap_val = m_cassette->input();
+		if ((tap_val >= 0.0 && m_ula.last_tap_val < 0.0) || (tap_val < 0.0 && m_ula.last_tap_val >= 0.0))
 		{
-			m_ula.tape_value = ( m_ula.tape_value << 8 ) | TAPE_LOW;
-			m_ula.tape_steps++;
+			if (m_ula.tap_val_length > (9 * 3))
+			{
+				for (int i = 0; i <= 3; i++)
+					m_ula.len[i] = 0;
+				m_ula.tap_val_length = 0;
+			}
+
+			for (int i = 3; i > 0; i--)
+				m_ula.len[i] = m_ula.len[i-1];
+			m_ula.len[0] = m_ula.tap_val_length;
+
+			m_ula.tap_val_length = 0;
+
+			if ((m_ula.len[0] + m_ula.len[1]) >= (18 + 18 - 5))
+			{
+				cassette_bit_received(0);
+				for (int i = 0; i <= 3; i++)
+					m_ula.len[i] = 0;
+			}
+
+			if (((m_ula.len[0] + m_ula.len[1] + m_ula.len[2] + m_ula.len[3]) <= (18 + 18 + 5)) && (m_ula.len[3] != 0))
+			{
+				cassette_bit_received(1);
+				for (int i = 0; i <= 3; i++)
+					m_ula.len[i] = 0;
+			}
 		}
-		else if ( tap_val > 0.5 )
+		m_ula.tap_val_length++;
+		m_ula.last_tap_val = tap_val;
+	}
+}
+
+
+void electron_state::cassette_bit_received(int bit)
+{
+	switch (m_ula.bit_count)
+	{
+	case 0: // start bit
+		m_ula.start_bit = bit;
+		if (m_ula.start_bit)
 		{
-			m_ula.tape_value = ( m_ula.tape_value << 8 ) | TAPE_HIGH;
-			m_ula.tape_steps++;
+			if (m_ula.high_tone_set)
+			{
+				return;
+			}
 		}
 		else
 		{
-			m_ula.tape_steps = 0;
-			m_ula.bit_count = 0;
 			m_ula.high_tone_set = 0;
-			m_ula.tape_value = 0x80808080;
 		}
-		if ( m_ula.tape_steps > 2 && ( m_ula.tape_value == 0x0000FFFF || m_ula.tape_value == 0x00FF00FF ) )
+		break;
+	case 1: case 2: case 3: case 4:
+	case 5: case 6: case 7: case 8:
+		//logerror("++ Read regular bit: %d\n", bit ? 0 : 1);
+		m_ula.tape_byte = (m_ula.tape_byte >> 1) | (bit ? 0x80 : 0);
+		break;
+	case 9: // stop bit
+		m_ula.stop_bit = bit;
+		//logerror("++ Read stop bit: %d\n", m_ula.stop_bit);
+		if (m_ula.start_bit && m_ula.stop_bit && m_ula.tape_byte == 0xFF && !m_ula.high_tone_set)
 		{
-			m_ula.tape_steps = 0;
-			switch( m_ula.bit_count )
-			{
-			case 0: /* start bit */
-				m_ula.start_bit = ( ( m_ula.tape_value == 0x0000FFFF ) ? 0 : 1 );
-				//logerror( "++ Read start bit: %d\n", m_ula.start_bit );
-				if ( m_ula.start_bit )
-				{
-					if ( m_ula.high_tone_set )
-					{
-						m_ula.bit_count--;
-					}
-				}
-				else
-				{
-					m_ula.high_tone_set = 0;
-				}
-				break;
-			case 1: case 2: case 3: case 4:
-			case 5: case 6: case 7: case 8:
-				//logerror( "++ Read regular bit: %d\n", m_ula.tape_value == 0x0000FFFF ? 0 : 1 );
-				m_ula.tape_byte = ( m_ula.tape_byte >> 1 ) | ( m_ula.tape_value == 0x0000FFFF ? 0 : 0x80 );
-				break;
-			case 9: /* stop bit */
-				m_ula.stop_bit = ( ( m_ula.tape_value == 0x0000FFFF ) ? 0 : 1 );
-				//logerror( "++ Read stop bit: %d\n", m_ula.stop_bit );
-				if ( m_ula.start_bit && m_ula.stop_bit && m_ula.tape_byte == 0xFF && !m_ula.high_tone_set )
-				{
-					electron_interrupt_handler( INT_SET, INT_HIGH_TONE );
-					m_ula.high_tone_set = 1;
-				}
-				else if ( !m_ula.start_bit && m_ula.stop_bit )
-				{
-					//logerror( "-- Byte read from tape: %02x\n", m_ula.tape_byte );
-					electron_interrupt_handler( INT_SET, INT_RECEIVE_FULL );
-				}
-				else
-				{
-					logerror( "Invalid start/stop bit combination detected: %d,%d\n", m_ula.start_bit, m_ula.stop_bit );
-				}
-				break;
-			}
-			m_ula.bit_count = ( m_ula.bit_count + 1 ) % 10;
+			electron_interrupt_handler(INT_SET, INT_HIGH_TONE);
+			m_ula.high_tone_set = 1;
 		}
+		else if (!m_ula.start_bit && m_ula.stop_bit)
+		{
+			//logerror("-- Byte read from tape: %02x\n", m_ula.tape_byte);
+			electron_interrupt_handler(INT_SET, INT_RECEIVE_FULL);
+		}
+		else
+		{
+			logerror("Invalid start/stop bit combination detected: %d,%d\n", m_ula.start_bit, m_ula.stop_bit);
+		}
+		break;
 	}
+	m_ula.bit_count = (m_ula.bit_count + 1) % 10;
 }
+
 
 uint8_t electron_state::electron64_fetch_r(offs_t offset)
 {
@@ -612,6 +626,9 @@ void electron_state::machine_start()
 	save_item(STRUCT_MEMBER(m_ula, screen_mode));
 	save_item(STRUCT_MEMBER(m_ula, cassette_motor_mode));
 	save_item(STRUCT_MEMBER(m_ula, capslock_mode));
+	save_item(STRUCT_MEMBER(m_ula, last_tap_val));
+	save_item(STRUCT_MEMBER(m_ula, tap_val_length));
+	save_item(STRUCT_MEMBER(m_ula, len));
 	save_item(NAME(m_mrb_mapped));
 	save_item(NAME(m_vdu_drivers));
 }
