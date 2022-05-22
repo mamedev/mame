@@ -542,11 +542,11 @@ void renderer_bgfx::render_post_screen_quad(int view, render_primitive* prim, bg
 	vertex(&vertices[4], x[2], y[2], 0, 0xffffffff, u[2], v[2]);
 	vertex(&vertices[5], x[0], y[0], 0, 0xffffffff, u[0], v[0]);
 
-	uint32_t texture_flags = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP;
+	uint32_t texture_flags = 0U;
+	if (!PRIMFLAG_GET_TEXWRAP(prim->flags))
+		texture_flags |= BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP;
 	if (video_config.filter == 0)
-	{
 		texture_flags |= BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT;
-	}
 
 	uint32_t blend = PRIMFLAG_GET_BLENDMODE(prim->flags);
 	bgfx::setVertexBuffer(0,buffer);
@@ -602,11 +602,11 @@ void renderer_bgfx::render_textured_quad(render_primitive* prim, bgfx::Transient
 	vertex(&vertices[4], x[2], y[2], 0, rgba, u[2], v[2]);
 	vertex(&vertices[5], x[0], y[0], 0, rgba, u[0], v[0]);
 
-	uint32_t texture_flags = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP;
+	uint32_t texture_flags = 0U;
+	if (!PRIMFLAG_GET_TEXWRAP(prim->flags))
+		texture_flags |= BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP;
 	if (video_config.filter == 0)
-	{
 		texture_flags |= BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT;
-	}
 
 	const bool is_screen = PRIMFLAG_GET_SCREENTEX(prim->flags);
 	uint16_t tex_width(prim->texture.width);
