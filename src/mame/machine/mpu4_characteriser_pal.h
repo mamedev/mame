@@ -50,13 +50,26 @@ public:
 		m_allow_68k_cheat = allow;
 	}
 
+	void set_use_4k_table_sim(bool largetable)
+	{
+		m_is_4ksim = largetable;
+	}
+
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
-	// While most games use unique keys and lamp scrambles, several do write the same sequences and expect the
-	// same responses.  It is possible PALs were reused.  Sometimes the lamp tables are masked subsets, as
-	// they were handcrafted when the layouts were made, they could also be incorrect in places.
-	
+	/* While some games use unique keysand lamp scrambles, several do write the same sequencesand expect the
+	   same responses.  It is possible PALs were reused.  Sometimes the lamp tables are masked subsets, as
+	   they were handcrafted when the layouts were made, they could also be incorrect in places.
+
+	   The code checking the responses always masks with 0xfc, so the real responses from the devices could
+	   have the lowest 2 bits set depending on the device state, but this is ignored.
+
+	   Likewise the code to read the lamps typically masks out bits, so presumably the lamp scrambles for
+	   some PAL types have been worked out from tests on real hardware?
+
+	*/
+
 	// these can be identified as games expecting a chr response starting with '00 84 94 3c ec 5c ec 50 2c 68 60 ac'
 	static constexpr uint8_t m4dtri98_lamp_scramble[8] = { 0x03, 0xAF, 0x87, 0xAB, 0xA3, 0x8F, 0x87, 0x83 };
 
@@ -144,13 +157,15 @@ private:
 
 	optional_device<cpu_device> m_cpu; // needed for some of the protection 'cheats'
 
-	bool m_allow_6809_cheat = false;
-	bool m_allow_68k_cheat = false;
+	bool m_allow_6809_cheat;
+	bool m_allow_68k_cheat;
 
-	uint8_t* m_current_chr_table = nullptr;
-	const uint8_t* m_current_lamp_table = nullptr;
-	int m_prot_col = 0;
-	int m_lamp_col = 0;
+	uint8_t* m_current_chr_table;
+	const uint8_t* m_current_lamp_table;
+	int m_prot_col;
+	int m_lamp_col;
+	int m_4krow;
+	bool m_is_4ksim;
 
 	optional_region_ptr<uint8_t> m_protregion; // some of the simulations have a fake ROM to assist them
 
@@ -160,11 +175,5 @@ private:
 };
 
 
-class mpu4_characteriser_pal_4ksim : public mpu4_characteriser_pal
-{
-public:
-	// construction/destruction
-	mpu4_characteriser_pal_4ksim(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
-};
 
 #endif // MAME_MACHINE_MPU4_CHARACTERISER_PAL_H
