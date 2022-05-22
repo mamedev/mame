@@ -371,10 +371,11 @@ static void specpls3_floppies(device_slot_interface &device)
 	device.option_add("3ssdd", FLOPPY_3_SSDD);
 }
 
-bool specpls3_state::is_contended(offs_t offset) {
+bool specpls3_state::is_contended(offs_t offset)
+{
 	u8 bank = m_bank_ram[3]->entry();
 	return spectrum_state::is_contended(offset)
-		|| ((offset >= 0xc000 && offset <= 0xffff) && (bank & 4)); // Memory banks 4,5,6 and 7 are contended
+		|| ((offset >= 0xc000 && offset <= 0xffff) && (bank & 4)); // Memory banks 4, 5, 6 and 7 are contended
 }
 
 /* F4 Character Displayer */

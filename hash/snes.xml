@@ -54721,7 +54721,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="SHVC-ASFJ-JPN" />
 		<info name="release" value="19941202" />
-		<info name="alt_title" value="制服伝説 プリティ・ファイ ター" />
+		<info name="alt_title" value="制服伝説 プリティ・ファイター" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="2097152">
