@@ -110,7 +110,7 @@ namespace netlist::detail {
 	private:
 	};
 
-	/// \brief Base class for all objects bejng owned by a netlist
+	/// \brief Base class for all objects being owned by a netlist
 	///
 	/// The object provides adds \ref netlist_state_t and \ref netlist_t
 	/// accessors.

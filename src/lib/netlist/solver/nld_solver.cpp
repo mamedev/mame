@@ -415,9 +415,9 @@ namespace netlist::devices
 					}
 					else
 					{
-						auto *otherterm = dynamic_cast<terminal_t *>(t);
-						if (otherterm != nullptr)
-							if (state().setup().get_connected_terminal(*otherterm)->net().is_rail_net())
+						auto *other_terminal = dynamic_cast<terminal_t *>(t);
+						if (other_terminal != nullptr)
+							if (state().setup().get_connected_terminal(*other_terminal)->net().is_rail_net())
 								railterms++;
 					}
 				}

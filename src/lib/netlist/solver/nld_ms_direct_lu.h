@@ -212,13 +212,13 @@ nl_double matrix_solver_direct_t<m_N, storage_N>::compute_next_timestep()
 template <unsigned m_N, unsigned storage_N>
 void matrix_solver_direct_t<m_N, storage_N>::add_term(int k, terminal_t *term)
 {
-	if (term->m_otherterm->net().isRailNet())
+	if (term->m_other_terminal->net().isRailNet())
 	{
 		m_rails_temp[k].add(term, -1, false);
 	}
 	else
 	{
-		int ot = get_net_idx(&term->m_otherterm->net());
+		int ot = get_net_idx(&term->m_other_terminal->net());
 		if (ot>=0)
 		{
 			m_terms[k]->add(term, ot, true);
@@ -296,7 +296,7 @@ void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 		int *other = m_terms[k]->connected_net_idx();
 		for (unsigned i = 0; i < m_terms[k]->count(); i++)
 			if (other[i] != -1)
-				other[i] = get_net_idx(&m_terms[k]->terms()[i]->m_otherterm->net());
+				other[i] = get_net_idx(&m_terms[k]->terms()[i]->m_other_terminal->net());
 	}
 
 #endif
@@ -416,7 +416,7 @@ void matrix_solver_direct_t<m_N, storage_N>::build_LE_RHS(nl_double * RESTRICT r
 			rhsk_a = rhsk_a + Idr[i];
 
 		for (int i = m_terms[k]->m_rail_start; i < terms_count; i++)
-			//#rhsk = rhsk + go[i] * terms[i]->m_otherterm->net().as_analog().Q_Analog();
+			//#rhsk = rhsk + go[i] * terms[i]->m_other_terminal->net().as_analog().Q_Analog();
 			rhsk_b = rhsk_b + go[i] * *other_cur_analog[i];
 
 		rhs[k] = rhsk_a + rhsk_b;

@@ -193,7 +193,7 @@ namespace netlist
 		nlparse_t &parser();
 		const nlparse_t &parser() const;
 
-		// FIXME: make a postload member and include code there
+		// FIXME: make a post load member and include code there
 		void rebuild_lists(); // must be called after post_load !
 
 		static void compile_defines(std::vector<std::pair<pstring, pstring>> &defs);

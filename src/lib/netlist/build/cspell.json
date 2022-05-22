@@ -25,6 +25,7 @@
 	"Mostek",
 	// Technical terms
 	"cmos",
+	"kaby", // Kaby Lake
 	"mosfet",
 	"mosfets",
 	"nmos",
@@ -38,10 +39,8 @@
 	"netlists",
 	"nltool",
 	"nlwav",
-	"nvcc",
+	"nvcc"
 	// FIXME: Remove everything below here again
-	"plib",
-	"ppmf"
 ],
 "languageSettings": [
 	// This one works with Python
@@ -85,7 +84,8 @@
 			"/\/\/- Pinalias:/",
 			"/\/\/#.*/",                       // commented source code
 			"\/\/ Source:.*/",                 // generated code
-			"/\\$[A-z0-9][^\\s]*/"           // everything starting with a $
+			"/\\$[A-z0-9][^\\s]*/",            // everything starting with a $
+			"/[A-z][^\\s]::[^\\s]+/"           // any namespace qualifier
 		]
 	}
 ]

@@ -4,6 +4,10 @@
 #ifndef PLIB_GMRES_H_
 #define PLIB_GMRES_H_
 
+// Names
+// spell-checker: words Burkardt, Saad, Yousef
+//
+
 ///
 /// \file gmres.h
 ///
@@ -203,7 +207,7 @@ namespace plib
 		plib::pmatrix_cr<FT, SIZE> m_mat;
 	};
 
-	// FIXME: hardcoding RESTART to 20 becomes an issue on very large
+	// FIXME: hard coding RESTART to 20 becomes an issue on very large
 	// systems.
 
 	template <typename FT, int SIZE, int RESTARTMAX = 16>
@@ -270,7 +274,7 @@ namespace plib
 				// ==> rho / accuracy = sqrt(y * y)
 				//
 				// This approach will approximate the iterative stop condition
-				// based |xnew - xold| pretty precisely. But it is slow, or expressed
+				// based `|xnew - xold|` pretty precisely. But it is slow, or expressed
 				// differently: The invest doesn't pay off.
 				//
 
@@ -506,7 +510,7 @@ namespace plib
 		}
 	private:
 
-		//typedef typename plib::mat_cr_t<FT, SIZE>::index_type mattype;
+		//#typedef typename plib::mat_cr_t<FT, SIZE>::index_type mattype;
 
 		plib::parray<float_type, SIZE> residual;
 		plib::parray<float_type, SIZE> Ax;
