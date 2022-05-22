@@ -14,51 +14,51 @@
 #include "logmacro.h"
 
 /* 00 ASCI control register A ch 0 */
-#define Z180_CNTLA_MPE         0x80
-#define Z180_CNTLA_RE          0x40
-#define Z180_CNTLA_TE          0x20
-#define Z180_CNTLA_RTS0        0x10
-#define Z180_CNTLA_MPBR_EFR    0x08
-#define Z180_CNTLA_MODE        0x07
-#define Z180_CNTLA_MODE_DATA   0x04
-#define Z180_CNTLA_MODE_PARITY 0x02
-#define Z180_CNTLA_MODE_STOPB  0x01
+static constexpr u8 Z180_CNTLA_MPE         = 0x80;
+static constexpr u8 Z180_CNTLA_RE          = 0x40;
+static constexpr u8 Z180_CNTLA_TE          = 0x20;
+static constexpr u8 Z180_CNTLA_RTS0        = 0x10;
+static constexpr u8 Z180_CNTLA_MPBR_EFR    = 0x08;
+static constexpr u8 Z180_CNTLA_MODE        = 0x07;
+static constexpr u8 Z180_CNTLA_MODE_DATA   = 0x04;
+static constexpr u8 Z180_CNTLA_MODE_PARITY = 0x02;
+static constexpr u8 Z180_CNTLA_MODE_STOPB  = 0x01;
 
 /* 01 ASCI control register A ch 1 */
-#define Z180_CNTLA1_CKA1D      0x10
+static constexpr u8 Z180_CNTLA1_CKA1D      = 0x10;
 
 /* 02/03 ASCI control register B ch 0 */
-#define Z180_CNTLB_MPBT        0x80
-#define Z180_CNTLB_MP          0x40
-#define Z180_CNTLB_CTS_PS      0x20
-#define Z180_CNTLB_PEO         0x10
-#define Z180_CNTLB_DR          0x08
-#define Z180_CNTLB_SS          0x07
+static constexpr u8 Z180_CNTLB_MPBT        = 0x80;
+static constexpr u8 Z180_CNTLB_MP          = 0x40;
+static constexpr u8 Z180_CNTLB_CTS_PS      = 0x20;
+static constexpr u8 Z180_CNTLB_PEO         = 0x10;
+static constexpr u8 Z180_CNTLB_DR          = 0x08;
+static constexpr u8 Z180_CNTLB_SS          = 0x07;
 
 /* 04 ASCI status register 0 (all bits read-only except RIE and TIE) */
-#define Z180_STAT_RDRF         0x80
-#define Z180_STAT_OVRN         0x40
-#define Z180_STAT_PE           0x20
-#define Z180_STAT_FE           0x10
-#define Z180_STAT_RIE          0x08
-#define Z180_STAT_DCD0         0x04
-#define Z180_STAT_TDRE         0x02
-#define Z180_STAT_TIE          0x01
+static constexpr u8 Z180_STAT_RDRF         = 0x80;
+static constexpr u8 Z180_STAT_OVRN         = 0x40;
+static constexpr u8 Z180_STAT_PE           = 0x20;
+static constexpr u8 Z180_STAT_FE           = 0x10;
+static constexpr u8 Z180_STAT_RIE          = 0x08;
+static constexpr u8 Z180_STAT_DCD0         = 0x04;
+static constexpr u8 Z180_STAT_TDRE         = 0x02;
+static constexpr u8 Z180_STAT_TIE          = 0x01;
 
 /* 05 ASCI status register 1 (all bits read-only except RIE, CTS1E and TIE) */
-#define Z180_STAT1_CTS1E       0x04
+static constexpr u8 Z180_STAT1_CTS1E       = 0x04;
 
 /* 12/13 (Z8S180/Z8L180) ASCI extension control register 0 (break detect is read-only) */
-#define Z180_ASEXT_DCD0        0x40
-#define Z180_ASEXT_CTS0        0x20
-#define Z180_ASEXT_X1_BIT_CLK0 0x10
-#define Z180_ASEXT_BRG0_MODE   0x08
-#define Z180_ASEXT_BRK_EN      0x04
-#define Z180_ASEXT_BRK_DET     0x02
-#define Z180_ASEXT_BRK_SEND    0x01
+static constexpr u8 Z180_ASEXT_DCD0        = 0x40;
+static constexpr u8 Z180_ASEXT_CTS0        = 0x20;
+static constexpr u8 Z180_ASEXT_X1_BIT_CLK0 = 0x10;
+static constexpr u8 Z180_ASEXT_BRG0_MODE   = 0x08;
+static constexpr u8 Z180_ASEXT_BRK_EN      = 0x04;
+static constexpr u8 Z180_ASEXT_BRK_DET     = 0x02;
+static constexpr u8 Z180_ASEXT_BRK_SEND    = 0x01;
 
-#define Z180_ASEXT0_MASK        0x7f
-#define Z180_ASEXT1_MASK        0x1f
+static constexpr u8 Z180_ASEXT0_MASK       = 0x7f;
+static constexpr u8 Z180_ASEXT1_MASK       = 0x1f;
 
 
 //**************************************************************************
@@ -363,6 +363,7 @@ DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::rxa_wr )
 
 DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::brg_wr )
 {
+	m_cka_handler(state);
 	if (!state)
 		transmit_edge();
 	else
