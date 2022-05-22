@@ -81,8 +81,8 @@ namespace plib {
 #include "ptypes.h"
 
 #include <algorithm>
-#include <cstdint> // uintptr_t
 #include <cstddef> // ptrdiff_t
+#include <cstdint> // uintptr_t
 #include <type_traits>
 #include <utility>
 
