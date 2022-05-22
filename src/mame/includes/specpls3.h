@@ -49,6 +49,8 @@ private:
 	void plus3_io(address_map &map);
 	void plus3_mem(address_map &map);
 
+	static void floppy_formats(format_registration &fr);
+
 	optional_device<upd765a_device> m_upd765;
 	optional_device_array<floppy_connector, 2> m_flop;
 };

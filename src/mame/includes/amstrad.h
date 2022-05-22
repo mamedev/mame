@@ -256,6 +256,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( cpc_romdis );
 	void rom_select(uint8_t data);
 
+	static void amstrad_floppy_formats(format_registration &fr);
 	static void aleste_floppy_formats(format_registration &fr);
 
 	IRQ_CALLBACK_MEMBER(amstrad_cpu_acknowledge_int);
