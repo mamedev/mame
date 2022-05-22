@@ -60,6 +60,7 @@ TODO:
 #include "video/pwm.h"
 #include "machine/clock.h"
 #include "machine/timer.h"
+#include "sound/flt_vol.h"
 #include "sound/spkrdev.h"
 
 #include "speaker.h"
@@ -680,7 +681,8 @@ class flash_state : public hh_pic16_state
 {
 public:
 	flash_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_pic16_state(mconfig, type, tag)
+		hh_pic16_state(mconfig, type, tag),
+		m_volume(*this, "volume")
 	{ }
 
 	void flash(machine_config &config);
@@ -689,6 +691,8 @@ protected:
 	virtual void machine_start() override;
 
 private:
+	required_device<filter_volume_device> m_volume;
+
 	void update_display();
 	void write_b(u8 data);
 	u8 read_c();
@@ -697,7 +701,6 @@ private:
 	void speaker_update();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
 	double m_speaker_volume = 0.0;
-	std::vector<double> m_speaker_levels;
 };
 
 void flash_state::machine_start()
@@ -714,8 +717,7 @@ void flash_state::speaker_update()
 		m_speaker_volume = 50.0;
 
 	// it takes a bit before it actually starts fading
-	double vol = (m_speaker_volume > 1.0) ? 1.0 : m_speaker_volume;
-	m_speaker->level_w(BIT(m_b, 7) * 0x7fff * vol);
+	m_volume->flt_volume_set_volume(std::min(m_speaker_volume, 1.0));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(flash_state::speaker_decay_sim)
@@ -737,8 +739,10 @@ void flash_state::write_b(u8 data)
 	m_b = data;
 	update_display();
 
-	// B6: speaker on
 	// B7: speaker out
+	m_speaker->level_w(BIT(data, 7));
+
+	// B6: speaker on
 	speaker_update();
 }
 
@@ -790,15 +794,10 @@ void flash_state::flash(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "volume", 0.25);
+	FILTER_VOLUME(config, m_volume).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	TIMER(config, "speaker_decay").configure_periodic(FUNC(flash_state::speaker_decay_sim), attotime::from_msec(1));
-
-	// set volume levels (set_output_gain is too slow for sub-frame intervals)
-	m_speaker_levels.resize(0x8000);
-	for (int i = 0; i < 0x8000; i++)
-		m_speaker_levels[i] = double(i) / 32768.0;
-	m_speaker->set_levels(0x8000, &m_speaker_levels[0]);
 }
 
 // roms
@@ -1120,7 +1119,8 @@ class leboom_state : public hh_pic16_state
 {
 public:
 	leboom_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_pic16_state(mconfig, type, tag)
+		hh_pic16_state(mconfig, type, tag),
+		m_volume(*this, "volume")
 	{ }
 
 	void leboom(machine_config &config);
@@ -1129,6 +1129,8 @@ protected:
 	virtual void machine_start() override;
 
 private:
+	required_device<filter_volume_device> m_volume;
+
 	u8 read_a();
 	void write_b(u8 data);
 	void write_c(u8 data);
@@ -1136,7 +1138,6 @@ private:
 	void speaker_update();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
 	double m_speaker_volume = 0.0;
-	std::vector<double> m_speaker_levels;
 };
 
 void leboom_state::machine_start()
@@ -1152,7 +1153,7 @@ void leboom_state::speaker_update()
 	if (~m_c & 0x80)
 		m_speaker_volume = 1.0;
 
-	m_speaker->level_w(BIT(m_c, 6) * 0x7fff * m_speaker_volume);
+	m_volume->flt_volume_set_volume(m_speaker_volume);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(leboom_state::speaker_decay_sim)
@@ -1177,10 +1178,12 @@ void leboom_state::write_b(u8 data)
 void leboom_state::write_c(u8 data)
 {
 	// C4: single led
-	m_display->matrix(1, data >> 4 & 1);
+	m_display->matrix(1, BIT(data, 4));
+
+	// C6: speaker out
+	m_speaker->level_w(BIT(data, 6));
 
 	// C7: speaker on
-	// C6: speaker out
 	m_c = data;
 	speaker_update();
 }
@@ -1240,15 +1243,10 @@ void leboom_state::leboom(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "volume", 0.25);
+	FILTER_VOLUME(config, m_volume).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	TIMER(config, "speaker_decay").configure_periodic(FUNC(leboom_state::speaker_decay_sim), attotime::from_msec(5));
-
-	// set volume levels (set_output_gain is too slow for sub-frame intervals)
-	m_speaker_levels.resize(0x8000);
-	for (int i = 0; i < 0x8000; i++)
-		m_speaker_levels[i] = double(i) / 32768.0;
-	m_speaker->set_levels(0x8000, &m_speaker_levels[0]);
 }
 
 // roms

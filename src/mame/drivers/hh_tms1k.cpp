@@ -201,6 +201,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "machine/tmc0999.h"
 #include "machine/tms1024.h"
 #include "sound/beep.h"
+#include "sound/flt_vol.h"
 #include "sound/s14001a.h"
 #include "sound/sn76477.h"
 #include "video/hlcd0515.h"
@@ -5074,6 +5075,7 @@ class mmarvin_state : public hh_tms1k_state
 public:
 	mmarvin_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_tms1k_state(mconfig, type, tag),
+		m_volume(*this, "volume"),
 		m_speed_timer(*this, "speed")
 	{ }
 
@@ -5083,6 +5085,7 @@ protected:
 	virtual void machine_start() override;
 
 private:
+	required_device<filter_volume_device> m_volume;
 	required_device<timer_device> m_speed_timer;
 
 	void update_display();
@@ -5090,10 +5093,8 @@ private:
 	void write_o(u16 data);
 	u8 read_k();
 
-	void speaker_update();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
 	double m_speaker_volume = 0.0;
-	std::vector<double> m_speaker_levels;
 };
 
 void mmarvin_state::machine_start()
@@ -5104,14 +5105,9 @@ void mmarvin_state::machine_start()
 
 // handlers
 
-void mmarvin_state::speaker_update()
-{
-	m_speaker->level_w(BIT(m_r, 10) * 0x7fff * m_speaker_volume);
-}
-
 TIMER_DEVICE_CALLBACK_MEMBER(mmarvin_state::speaker_decay_sim)
 {
-	speaker_update();
+	m_volume->flt_volume_set_volume(m_speaker_volume);
 
 	// volume decays when speaker is off, decay scale is determined by tone dial
 	double step = (1.01 - 1.003) / 255.0; // approximation
@@ -5136,17 +5132,17 @@ void mmarvin_state::write_r(u16 data)
 		m_speed_timer->adjust(attotime::from_msec(2100 - (u8)m_inputs[4]->read() * step));
 	}
 
+	// R10: speaker out
+	m_speaker->level_w(BIT(m_r, 10));
+
 	// R9: trigger speaker on
 	if (m_r & 0x200 && ~data & 0x200)
-		m_speaker_volume = 1.0;
+		m_volume->flt_volume_set_volume(m_speaker_volume = 1.0);
 
 	// R0,R1: digit/led select
 	// R7: digit DP
 	m_r = data;
 	update_display();
-
-	// R10: speaker out
-	speaker_update();
 }
 
 void mmarvin_state::write_o(u16 data)
@@ -5210,16 +5206,10 @@ void mmarvin_state::mmarvin(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "volume", 0.25);
+	FILTER_VOLUME(config, m_volume).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	TIMER(config, "speaker_decay").configure_periodic(FUNC(mmarvin_state::speaker_decay_sim), attotime::from_msec(1));
-
-	// set volume levels (set_output_gain is too slow for sub-frame intervals)
-	m_speaker_levels.resize(0x8000);
-	for (int i = 0; i < 0x8000; i++)
-		m_speaker_levels[i] = double(i) / 32768.0;
-	m_speaker->set_levels(0x8000, &m_speaker_levels[0]);
 }
 
 // roms
