@@ -72,7 +72,7 @@ namespace netlist::devices {
 #endif
 			}
 			for (auto &q : m_Q)
-				if (q.has_net() && !exec().nlstate().core_terms(q.net()).empty())
+				if (q.has_net() && !exec().nl_state().core_terms(q.net()).empty())
 					active_outputs++;
 			set_active_outputs(active_outputs);
 		}
@@ -278,7 +278,7 @@ namespace netlist::devices {
 	};
 
 	// ----------------------------------------------------------------------------------------
-	// Truthtable parsing ....
+	// Truth table parsing ....
 	// ----------------------------------------------------------------------------------------
 
 	using tt_bitset = pbitset<std::uint_least64_t>;
@@ -366,7 +366,7 @@ namespace netlist::devices {
 	};
 
 	// ----------------------------------------------------------------------------------------
-	// Truthtable class ....
+	// Truth table class ....
 	// ----------------------------------------------------------------------------------------
 
 	template<std::size_t m_NI, std::size_t m_NO>
@@ -378,7 +378,7 @@ namespace netlist::devices {
 		// checks
 		nl_assert_always(io.size() == 2, "too many '|'");
 		std::vector<pstring> inout(plib::psplit(io[0], ','));
-		nl_assert_always(inout.size() == m_num_bits, "bitcount wrong");
+		nl_assert_always(inout.size() == m_num_bits, "bit count wrong");
 		std::vector<pstring> outputs(plib::psplit(io[1], ','));
 		nl_assert_always(outputs.size() == m_NO, "output count wrong");
 
@@ -393,18 +393,18 @@ namespace netlist::devices {
 		{
 			inout[i] = plib::trim(inout[i]);
 		}
-		if (0 < m_NI) m_I.emplace(0, *this, inout[0]); //, nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<0>, this));
-		if (1 < m_NI) m_I.emplace(1, *this, inout[1]); //, nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<1>, this));
-		if (2 < m_NI) m_I.emplace(2, *this, inout[2]); //, nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<2>, this));
-		if (3 < m_NI) m_I.emplace(3, *this, inout[3]); //, nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<3>, this));
-		if (4 < m_NI) m_I.emplace(4, *this, inout[4]); //, nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<4>, this));
-		if (5 < m_NI) m_I.emplace(5, *this, inout[5]); //, nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<5>, this));
-		if (6 < m_NI) m_I.emplace(6, *this, inout[6]); //, nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<6>, this));
-		if (7 < m_NI) m_I.emplace(7, *this, inout[7]); //, nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<7>, this));
-		if (8 < m_NI) m_I.emplace(8, *this, inout[8]); //, nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<8>, this));
-		if (9 < m_NI) m_I.emplace(9, *this, inout[9]); //, nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<9>, this));
-		if (10 < m_NI) m_I.emplace(10, *this, inout[10]); //, nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<10>, this));
-		if (11 < m_NI) m_I.emplace(11, *this, inout[11]); //, nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<11>, this));
+		if (0 < m_NI) m_I.emplace(0, *this, inout[0]); //# nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<0>, this));
+		if (1 < m_NI) m_I.emplace(1, *this, inout[1]); //# nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<1>, this));
+		if (2 < m_NI) m_I.emplace(2, *this, inout[2]); //# nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<2>, this));
+		if (3 < m_NI) m_I.emplace(3, *this, inout[3]); //# nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<3>, this));
+		if (4 < m_NI) m_I.emplace(4, *this, inout[4]); //# nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<4>, this));
+		if (5 < m_NI) m_I.emplace(5, *this, inout[5]); //# nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<5>, this));
+		if (6 < m_NI) m_I.emplace(6, *this, inout[6]); //# nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<6>, this));
+		if (7 < m_NI) m_I.emplace(7, *this, inout[7]); //# nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<7>, this));
+		if (8 < m_NI) m_I.emplace(8, *this, inout[8]); //# nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<8>, this));
+		if (9 < m_NI) m_I.emplace(9, *this, inout[9]); //# nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<9>, this));
+		if (10 < m_NI) m_I.emplace(10, *this, inout[10]); //# nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<10>, this));
+		if (11 < m_NI) m_I.emplace(11, *this, inout[11]); //# nldelegate(&nld_truthtable_t<m_NI, m_NO>::update_N<11>, this));
 #endif
 		for (std::size_t i=0; i < m_NO; i++)
 		{
@@ -421,7 +421,7 @@ namespace netlist::devices {
 	}
 
 	// ----------------------------------------------------------------------------------------
-	// Truthtable factory ....
+	// Truth table factory ....
 	// ----------------------------------------------------------------------------------------
 
 	template<unsigned m_NI, unsigned m_NO>
@@ -512,7 +512,7 @@ namespace netlist::devices {
 	}
 
 	// ----------------------------------------------------------------------------------------
-	// parseline
+	// parse line
 	// ----------------------------------------------------------------------------------------
 
 	void truthtable_parser::parseline(unsigned cur, std::vector<pstring> list,
@@ -553,7 +553,7 @@ namespace netlist::devices {
 			{
 				// cutoff previous inputs and outputs for ignore
 				if (m_out_state[nstate] != m_out_state.mask() &&  m_out_state[nstate] != val)
-					throw nl_exception(plib::pfmt("Error in truthtable: State {1:04} already set, {2} != {3}\n")
+					throw nl_exception(plib::pfmt("Error in truth table: State {1:04} already set, {2} != {3}\n")
 							.x(nstate.as_uint())(m_out_state[nstate])(val) );
 				m_out_state.set(nstate, val);
 				for (std::size_t j=0; j<m_NO; j++)
@@ -593,7 +593,7 @@ namespace netlist::devices {
 			std::vector<uint_least8_t> tindex;
 
 			//
-			// FIXME: evaluation of outputs should be done in parseline to
+			// FIXME: evaluation of outputs should be done in parse_line to
 			//        enable the use of inputs for output values, i.e. "I1" or "~I1"
 			//  in addition to "0" and "1".
 
@@ -649,7 +649,7 @@ namespace netlist::devices {
 		for (size_t i=0; i<m_size; i++)
 		{
 			if (m_out_state[i] == m_out_state.mask())
-				throw nl_exception(plib::pfmt("truthtable: found element not set {1}\n").x(i) );
+				throw nl_exception(plib::pfmt("truth table: found element not set {1}\n").x(i) );
 			m_out_state.set(i, m_out_state[i] | (ign[i] << m_NO));
 		}
 	}
@@ -695,7 +695,7 @@ namespace netlist::factory {
 			ENTRY(11, props);
 			ENTRY(12, props);
 			default:
-				pstring msg = plib::pfmt("unable to create truthtable<{1},{2}>")(desc.ni)(desc.no);
+				pstring msg = plib::pfmt("unable to create truth table<{1},{2}>")(desc.ni)(desc.no);
 				nl_assert_always(false, putf8string(msg).c_str());
 		}
 		ret->m_desc = desc.desc;

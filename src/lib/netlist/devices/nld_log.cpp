@@ -151,7 +151,7 @@ namespace netlist::devices {
 		~NETLIB_NAME(wav)();
 		analog_input_t m_I;
 	private:
-		// FIXME: rewrite sound/wavwrite.h to be an object ...
+		// FIXME: rewrite `sound/wavwrite.h` to be an object ...
 		void *m_file;
 	);
 	#endif
@@ -160,7 +160,7 @@ namespace netlist::devices {
 
 
 	// FIXME: Implement wav later, this must be clock triggered device where the input to be written
-	//        is on a subdevice ..
+	//        is on a sub device ..
 	#if 0
 	NETLIB_START(wav)
 	{

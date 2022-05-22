@@ -45,7 +45,7 @@ namespace plib {
 	{
 	public:
 		explicit dynlib(const pstring &libname);
-		dynlib(/*[[maybe_unused]]*/ const pstring &path, const pstring &libname);
+		dynlib(const pstring &path, const pstring &libname);
 
 		~dynlib() override;
 

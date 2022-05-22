@@ -340,7 +340,7 @@ void nl_convert_spice_t::convert_block(const str_list &contents)
 void nl_convert_spice_t::convert(const pstring &contents)
 {
 	std::vector<pstring> spnl(plib::psplit(contents, '\n'));
-	std::vector<pstring> after_linecontinuation;
+	std::vector<pstring> after_line_continuation;
 
 	// Add gnd net
 
@@ -358,24 +358,24 @@ void nl_convert_spice_t::convert(const pstring &contents)
 			line += inl.substr(1);
 		else
 		{
-			after_linecontinuation.push_back(line);
+			after_line_continuation.push_back(line);
 			line = inl;
 		}
 	}
-	after_linecontinuation.push_back(line);
+	after_line_continuation.push_back(line);
 	spnl.clear(); // no longer needed
 
 	// Process sub circuits
 
 	std::vector<std::vector<pstring>> subckts;
 	std::vector<pstring> nl;
-	auto inp = after_linecontinuation.begin();
-	while (inp != after_linecontinuation.end())
+	auto inp = after_line_continuation.begin();
+	while (inp != after_line_continuation.end())
 	{
 		if (plib::startsWith(*inp, ".SUBCKT"))
 		{
 			std::vector<pstring> sub;
-			while (inp != after_linecontinuation.end())
+			while (inp != after_line_continuation.end())
 			{
 				auto s(*inp);
 				sub.push_back(s);

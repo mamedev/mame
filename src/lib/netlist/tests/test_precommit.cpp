@@ -4,7 +4,7 @@
 ///
 /// \file test_pmfp.cpp
 ///
-/// tests for plib::pmfp
+/// tests for `plib::pmfp`
 ///
 
 #include "plib/pconfig.h"

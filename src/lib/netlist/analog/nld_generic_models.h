@@ -161,7 +161,7 @@ namespace netlist::analog
 	struct generic_capacitor_const
 	{
 	public:
-		generic_capacitor_const( [[maybe_unused]] core_device_t &dev, [[maybe_unused]] const pstring &name)
+		generic_capacitor_const([[maybe_unused]] core_device_t &dev, [[maybe_unused]] const pstring &name)
 		: m_gmin(nlconst::zero())
 		, m_vn(0)
 		, m_in(0)

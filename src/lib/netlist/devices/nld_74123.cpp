@@ -250,7 +250,7 @@ namespace netlist::devices {
 		{
 			return ((in[0]() ^ 1) | (in[1]() ^ 1)) & in[2](); // (~A1 | ~A2) & B
 		}
-		template<typename T> static constexpr netlist_sig_t clear( [[maybe_unused]] const T &in) { return 1; }
+		template<typename T> static constexpr netlist_sig_t clear([[maybe_unused]] const T &in) { return 1; }
 	};
 
 	struct desc_9602 : public desc_74123

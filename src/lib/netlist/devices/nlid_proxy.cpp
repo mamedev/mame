@@ -93,9 +93,9 @@ namespace netlist::devices {
 		const auto vn(m_tn->net().Q_Analog());
 		const auto vp(m_tp->net().Q_Analog());
 
-		if (logic_family()->is_above_high_thresh_V(v, vn, vp))
+		if (logic_family()->is_above_high_threshold_V(v, vn, vp))
 			out().push(1, netlist_time::quantum());
-		else if (logic_family()->is_below_low_thresh_V(v, vn, vp))
+		else if (logic_family()->is_below_low_threshold_V(v, vn, vp))
 			out().push(0, netlist_time::quantum());
 		else
 		{

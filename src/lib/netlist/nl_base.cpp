@@ -73,12 +73,12 @@ namespace netlist
 
 	netlist_state_t & detail::netlist_object_t::state() noexcept
 	{
-		return m_netlist.nlstate();
+		return m_netlist.nl_state();
 	}
 
 	const netlist_state_t & detail::netlist_object_t::state() const noexcept
 	{
-		return m_netlist.nlstate();
+		return m_netlist.nl_state();
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -89,7 +89,7 @@ namespace netlist
 	: m_state(state)
 	, m_solver(nullptr)
 	, m_time(netlist_time_ext::zero())
-	, m_mainclock(nullptr)
+	, m_main_clock(nullptr)
 	, m_use_stats(false)
 	, m_queue(config::max_queue_size::value,
 		detail::queue_t::id_delegate(&netlist_state_t :: find_net_id, &state),
@@ -276,7 +276,7 @@ namespace netlist
 	void netlist_t::reset()
 	{
 		log().debug("Searching for main clock\n");
-		m_mainclock = m_state.get_single_device<devices::NETLIB_NAME(mainclock)>("mainclock");
+		m_main_clock = m_state.get_single_device<devices::NETLIB_NAME(mainclock)>("mainclock");
 
 		log().debug("Searching for solver\n");
 		m_solver = m_state.get_single_device<devices::NETLIB_NAME(solver)>("solver");
@@ -284,8 +284,8 @@ namespace netlist
 		// Don't reset time
 		//m_time = netlist_time_ext::zero();
 		m_queue.clear();
-		if (m_mainclock != nullptr)
-			m_mainclock->m_Q.net().set_next_scheduled_time(m_time);
+		if (m_main_clock != nullptr)
+			m_main_clock->m_Q.net().set_next_scheduled_time(m_time);
 		//if (m_solver != nullptr)
 		//  m_solver->reset();
 
@@ -376,8 +376,8 @@ namespace netlist
 			netlist_state_t::stats_info si{m_queue, m_stat_mainloop, m_perf_out_processed};
 			m_state.print_stats(si);
 		}
-		log().verbose("Current pool memory allocated: {1:12} kB", nlstate().pool().cur_alloc() >> 10);
-		log().verbose("Maximum pool memory allocated: {1:12} kB", nlstate().pool().max_alloc() >> 10);
+		log().verbose("Current pool memory allocated: {1:12} kB", nl_state().pool().cur_alloc() >> 10);
+		log().verbose("Maximum pool memory allocated: {1:12} kB", nl_state().pool().max_alloc() >> 10);
 	}
 
 	void netlist_state_t::print_stats(stats_info &si) const
@@ -602,13 +602,13 @@ namespace netlist
 	// net_t
 	// ----------------------------------------------------------------------------------------
 
-	detail::net_t::net_t(netlist_state_t &nl, const pstring &aname, core_terminal_t *railterminal)
+	detail::net_t::net_t(netlist_state_t &nl, const pstring &aname, core_terminal_t *rail_terminal)
 		: netlist_object_t(nl.exec(), aname)
 		, m_new_Q(*this, "m_new_Q", netlist_sig_t(0))
 		, m_cur_Q (*this, "m_cur_Q", netlist_sig_t(0))
 		, m_in_queue(*this, "m_in_queue", queue_status::DELIVERED)
 		, m_next_scheduled_time(*this, "m_time", netlist_time_ext::zero())
-		, m_railterminal(railterminal)
+		, m_rail_terminal(rail_terminal)
 	{
 		props::add(this, props::value_type());
 	}
@@ -618,7 +618,7 @@ namespace netlist
 		// rebuild m_list
 
 		m_list_active.clear();
-		for (auto & term : exec().nlstate().core_terms(*this))
+		for (auto & term : exec().nl_state().core_terms(*this))
 			if (term->terminal_state() != logic_t::STATE_INP_PASSIVE)
 			{
 				m_list_active.push_back(term);
@@ -643,7 +643,7 @@ namespace netlist
 		// rebuild m_list and reset terminals to active or analog out state
 
 		m_list_active.clear();
-		for (core_terminal_t *ct : exec().nlstate().core_terms(*this))
+		for (core_terminal_t *ct : exec().nl_state().core_terms(*this))
 		{
 			ct->reset();
 			if (ct->terminal_state() != logic_t::STATE_INP_PASSIVE)
@@ -656,8 +656,8 @@ namespace netlist
 	// logic_net_t
 	// ----------------------------------------------------------------------------------------
 
-	logic_net_t::logic_net_t(netlist_state_t &nl, const pstring &aname, detail::core_terminal_t *railterminal)
-		: net_t(nl, aname, railterminal)
+	logic_net_t::logic_net_t(netlist_state_t &nl, const pstring &aname, detail::core_terminal_t *rail_terminal)
+		: net_t(nl, aname, rail_terminal)
 	{
 	}
 
@@ -665,8 +665,8 @@ namespace netlist
 	// analog_net_t
 	// ----------------------------------------------------------------------------------------
 
-	analog_net_t::analog_net_t(netlist_state_t &nl, const pstring &aname, detail::core_terminal_t *railterminal)
-		: net_t(nl, aname, railterminal)
+	analog_net_t::analog_net_t(netlist_state_t &nl, const pstring &aname, detail::core_terminal_t *rail_terminal)
+		: net_t(nl, aname, rail_terminal)
 		, m_cur_Analog(*this, "m_cur_Analog", nlconst::zero())
 		, m_solver(nullptr)
 	{
@@ -704,20 +704,20 @@ namespace netlist
 	// ----------------------------------------------------------------------------------------
 
 	terminal_t::terminal_t(core_device_t &dev, const pstring &aname,
-		terminal_t *otherterm, nldelegate delegate)
-	: terminal_t(dev, aname, otherterm, { nullptr, nullptr }, delegate)
+		terminal_t *other_terminal, nldelegate delegate)
+	: terminal_t(dev, aname, other_terminal, { nullptr, nullptr }, delegate)
 	{
 	}
 
 	terminal_t::terminal_t(core_device_t &dev, const pstring &aname,
-		terminal_t *otherterm, const std::array<terminal_t *, 2> &splitterterms,
+		terminal_t *other_terminal, const std::array<terminal_t *, 2> &splitterterms,
 		nldelegate delegate)
 	: analog_t(dev, aname, STATE_BIDIR, delegate)
 	, m_Idr(nullptr)
 	, m_go(nullptr)
 	, m_gt(nullptr)
 	{
-		state().setup().register_term(*this, otherterm, splitterterms);
+		state().setup().register_term(*this, other_terminal, splitterterms);
 	}
 
 	void terminal_t::set_ptrs(nl_fptype *gt, nl_fptype *go, nl_fptype *Idr) noexcept(false)
@@ -999,7 +999,7 @@ namespace netlist
 
 		qpush(stop, nullptr);
 
-		if (m_mainclock == nullptr)
+		if (m_main_clock == nullptr)
 		{
 			m_time = m_queue.top().exec_time();
 			detail::net_t *obj(m_queue.top().object());
@@ -1018,8 +1018,8 @@ namespace netlist
 		}
 		else
 		{
-			logic_net_t &mc_net(m_mainclock->m_Q.net());
-			const netlist_time inc(m_mainclock->m_inc);
+			logic_net_t &mc_net(m_main_clock->m_Q.net());
+			const netlist_time inc(m_main_clock->m_inc);
 			netlist_time_ext mc_time(mc_net.next_scheduled_time());
 
 			do

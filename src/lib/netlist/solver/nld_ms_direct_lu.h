@@ -1,12 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Couriersud
-/*
- * nld_ms_direct.h
- *
- */
+
+///
+/// \file nld_ms_direct.h
+///
+///
 #if 0
 #ifndef NLD_MS_DIRECT_H_
 #define NLD_MS_DIRECT_H_
+
+// Names
+// spell-checker: words Seidel,Crout
+
 
 #include "solver/nld_solver.h"
 #include "solver/nld_matrix_solver.h"
@@ -199,21 +204,21 @@ nl_double matrix_solver_direct_t<m_N, storage_N>::compute_next_timestep()
 		if (new_solver_timestep > m_params.m_max_timestep)
 			new_solver_timestep = m_params.m_max_timestep;
 	}
-	//if (new_solver_timestep > 10.0 * hn)
-	//    new_solver_timestep = 10.0 * hn;
+	//#if (new_solver_timestep > 10.0 * hn)
+	//#    new_solver_timestep = 10.0 * hn;
 	return new_solver_timestep;
 }
 
 template <unsigned m_N, unsigned storage_N>
 void matrix_solver_direct_t<m_N, storage_N>::add_term(int k, terminal_t *term)
 {
-	if (term->m_otherterm->net().isRailNet())
+	if (term->m_other_terminal->net().isRailNet())
 	{
 		m_rails_temp[k].add(term, -1, false);
 	}
 	else
 	{
-		int ot = get_net_idx(&term->m_otherterm->net());
+		int ot = get_net_idx(&term->m_other_terminal->net());
 		if (ot>=0)
 		{
 			m_terms[k]->add(term, ot, true);
@@ -222,7 +227,7 @@ void matrix_solver_direct_t<m_N, storage_N>::add_term(int k, terminal_t *term)
 		else // if (ot<0)
 		{
 			m_rails_temp[k].add(term, ot, true);
-			netlist().error("found term with missing othernet {1}\n", term->name());
+			netlist().error("found term with missing other net {1}\n", term->name());
 		}
 	}
 }
@@ -244,7 +249,7 @@ void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 
 	for (unsigned k = 0; k < N(); k++)
 	{
-		m_terms[k]->m_railstart = m_terms[k]->count();
+		m_terms[k]->m_rail_start = m_terms[k]->count();
 		for (unsigned i = 0; i < m_rails_temp[k].count(); i++)
 			this->m_terms[k]->add(m_rails_temp[k].terms()[i], m_rails_temp[k].connected_net_idx()[i], false);
 
@@ -257,7 +262,7 @@ void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 	/* Sort in descending order by number of connected matrix voltages.
 	 * The idea is, that for Gauss-Seidel algo the first voltage computed
 	 * depends on the greatest number of previous voltages thus taking into
-	 * account the maximum amout of information.
+	 * account the maximum amount of information.
 	 *
 	 * This actually improves performance on popeye slightly. Average
 	 * GS computations reduce from 2.509 to 2.370
@@ -279,7 +284,7 @@ void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 	for (unsigned k = 0; k < N() / 2; k++)
 		for (unsigned i = 0; i < N() - 1; i++)
 		{
-			if ((m_terms[i]->m_railstart - m_terms[i+1]->m_railstart) * sort_order < 0)
+			if ((m_terms[i]->m_rail_start - m_terms[i+1]->m_rail_start) * sort_order < 0)
 			{
 				std::swap(m_terms[i],m_terms[i+1]);
 				std::swap(m_nets[i], m_nets[i+1]);
@@ -291,7 +296,7 @@ void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 		int *other = m_terms[k]->connected_net_idx();
 		for (unsigned i = 0; i < m_terms[k]->count(); i++)
 			if (other[i] != -1)
-				other[i] = get_net_idx(&m_terms[k]->terms()[i]->m_otherterm->net());
+				other[i] = get_net_idx(&m_terms[k]->terms()[i]->m_other_terminal->net());
 	}
 
 #endif
@@ -325,7 +330,7 @@ void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 
 		for (unsigned j = 0; j < N(); j++)
 		{
-			for (unsigned i = 0; i < t->m_railstart; i++)
+			for (unsigned i = 0; i < t->m_rail_start; i++)
 			{
 				if (!t->m_nzrd.contains(other[i]) && other[i] >= (int) (k + 1))
 					t->m_nzrd.add(other[i]);
@@ -378,7 +383,7 @@ void matrix_solver_direct_t<m_N, storage_N>::build_LE_A()
 
 		nl_double akk  = 0.0;
 		const unsigned terms_count = m_terms[k]->count();
-		const unsigned railstart =  m_terms[k]->m_railstart;
+		const unsigned rail_start =  m_terms[k]->m_rail_start;
 		const nl_double * RESTRICT gt = m_terms[k]->gt();
 		const nl_double * RESTRICT go = m_terms[k]->go();
 		const int * RESTRICT net_other = m_terms[k]->connected_net_idx();
@@ -388,7 +393,7 @@ void matrix_solver_direct_t<m_N, storage_N>::build_LE_A()
 
 		A(k,k) += akk;
 
-		for (unsigned i = 0; i < railstart; i++)
+		for (unsigned i = 0; i < rail_start; i++)
 			A(k, net_other[i]) -= go[i];
 	}
 }
@@ -410,8 +415,8 @@ void matrix_solver_direct_t<m_N, storage_N>::build_LE_RHS(nl_double * RESTRICT r
 		for (int i = 0; i < terms_count; i++)
 			rhsk_a = rhsk_a + Idr[i];
 
-		for (int i = m_terms[k]->m_railstart; i < terms_count; i++)
-			//rhsk = rhsk + go[i] * terms[i]->m_otherterm->net().as_analog().Q_Analog();
+		for (int i = m_terms[k]->m_rail_start; i < terms_count; i++)
+			//#rhsk = rhsk + go[i] * terms[i]->m_other_terminal->net().as_analog().Q_Analog();
 			rhsk_b = rhsk_b + go[i] * *other_cur_analog[i];
 
 		rhs[k] = rhsk_a + rhsk_b;
@@ -438,7 +443,7 @@ void matrix_solver_direct_t<m_N, storage_N>::LE_solve()
 		for (j=0;j<kN;j++)
 			if ((temp=fabs(m_A[i][j])) > big)
 				big=temp;
-		//if (big == 0.0) nrerror("Singular matrix in routine LUDCMP");
+		//#if (big == 0.0) nrerror("Singular matrix in routine LUDCMP");
 		vv[i]=1.0/big;
 	}
 #endif

@@ -1,22 +1,28 @@
 // license:BSD-3-Clause
 // copyright-holders:Couriersud
 
+// Names
+// spell-checker: words Farid, Naim, Jahn, Margraf, Habchi, Raimund, Qucs
 //
-// nld_mosfet.cpp
-//
-// Formulas in here based on the following Sources:
-//
-// https://www.imperial.ac.uk/pls/portallive/docs/1/7292573.PDF
-// http://www3.imperial.ac.uk/pls/portallive/docs/1/56133736.PDF
-// https://people.rit.edu/lffeee/SPICE_MOSFET_Model_Intro.pdf
-// https://people.rit.edu/lffeee/SPICE.pdf
-// http://web.mit.edu/course/6/6.012/SPR98/www/lectures/S98_Lecture10.pdf
-// http://homepages.rpi.edu/~sawyes/Models_review.pdf
-// http://jaco.ec.t.kanazawa-u.ac.jp/edu/mix/pdf/3.pdf
-//
-// Farid N. Naim, Circuit Simulation (Wiley-IEEE Press, 2010).
-// Stefan Jahn, Michael Margraf, Vincent Habchi and Raimund Jacob, "Qucs Technical Papers" (2007)
-//
+// Specific technical terms
+// spell-checker: words Cgso, Cgdo, Cgbo, Cjsw, Mjsw, Ucrit, Uexp, Utra, Neff, Tnom, capval, Udsat, Utst
+
+///
+/// \file nld_mosfet.cpp
+///
+/// Formulas in here based on the following Sources:
+///
+/// https:///www.imperial.ac.uk/pls/portallive/docs/1/7292573.PDF
+/// http://www3.imperial.ac.uk/pls/portallive/docs/1/56133736.PDF
+/// https://people.rit.edu/lffeee/SPICE_MOSFET_Model_Intro.pdf
+/// https://people.rit.edu/lffeee/SPICE.pdf
+/// http://web.mit.edu/course/6/6.012/SPR98/www/lectures/S98_Lecture10.pdf
+/// http://homepages.rpi.edu/~sawyes/Models_review.pdf
+/// http://jaco.ec.t.kanazawa-u.ac.jp/edu/mix/pdf/3.pdf
+///
+/// Farid N. Naim, Circuit Simulation (Wiley-IEEE Press, 2010).
+/// Stefan Jahn, Michael Margraf, Vincent Habchi and Raimund Jacob, "Qucs Technical Papers" (2007)
+///
 
 #include "solver/nld_solver.h"
 #include "../nl_setup.h"
@@ -35,7 +41,7 @@ namespace analog
 	// nld_FET - Base classes
 	// -----------------------------------------------------------------------------
 
-	/// \brief Class representing the nmos/pmos model paramers.
+	/// \brief Class representing the nmos/pmos model parameters.
 	///
 	///  This is the model representation of the nmos model.
 	///
@@ -202,10 +208,10 @@ namespace analog
 		, m_Cgb(nlconst::zero())
 		, m_Cgs(nlconst::zero())
 		, m_Cgd(nlconst::zero())
-		, m_capmod(2)
+		, m_capacitor_model(2)
 		, m_Vgs(*this, "m_Vgs", nlconst::zero())
 		, m_Vgd(*this, "m_Vgd", nlconst::zero())
-		, m_modacc(m_model)
+		, m_model_acc(m_model)
 	{
 			register_subalias("S", m_SG.P());   // Source
 			register_subalias("G", m_SG.N());   // Gate
@@ -219,9 +225,9 @@ namespace analog
 			set_qtype((m_model.type() == "NMOS_DEFAULT") ? FET_NMOS : FET_PMOS);
 			m_polarity = (qtype() == FET_NMOS ? nlconst::one() : -nlconst::one());
 
-			m_capmod = m_modacc.m_CAPMOD;
-			// printf("capmod %d %g %g\n", m_capmod, (nl_fptype)m_modacc.m_VTO, m_polarity);
-			nl_assert_always(m_capmod == 0 || m_capmod == 2, "Error: CAPMODEL invalid value");
+			m_capacitor_model = m_model_acc.m_CAPMOD;
+			//# printf("capmod %d %g %g\n", m_capacitor_model, (nl_fptype)m_model_acc.m_VTO, m_polarity);
+			nl_assert_always(m_capacitor_model == 0 || m_capacitor_model == 2, "Error: CAPMODEL invalid value");
 
 			//
 			// From http://ltwiki.org/LTspiceHelp/LTspiceHelp/M_MOSFET.htm :
@@ -233,51 +239,51 @@ namespace analog
 			//  But couldn't find a formula for lambda anywhere
 			//
 
-			m_lambda = m_modacc.m_LAMBDA; // FIXME: m_lambda only set once
+			m_lambda = m_model_acc.m_LAMBDA; // FIXME: m_lambda only set once
 
 			// calculate effective channel length
-			m_Leff = m_modacc.m_L - 2 * m_modacc.m_LD;
+			m_Leff = m_model_acc.m_L - 2 * m_model_acc.m_LD;
 			nl_assert_always(m_Leff > nlconst::zero(), "Effective Lateral diffusion would be negative for model");
 
-			nl_fptype Cox = (m_modacc.m_TOX > nlconst::zero()) ? (constants::eps_SiO2() * constants::eps_0() / m_modacc.m_TOX) : nlconst::zero();
+			nl_fptype Cox = (m_model_acc.m_TOX > nlconst::zero()) ? (constants::eps_SiO2() * constants::eps_0() / m_model_acc.m_TOX) : nlconst::zero();
 
 			// calculate DC transconductance coefficient
-			if (m_modacc.m_KP > nlconst::zero())
-				m_beta = m_modacc.m_KP * m_modacc.m_W / m_Leff;
-			else if (Cox > nlconst::zero() && m_modacc.m_UO > nlconst::zero())
-				m_beta = m_modacc.m_UO * nlconst::magic(1e-4) * Cox * m_modacc.m_W / m_Leff;
+			if (m_model_acc.m_KP > nlconst::zero())
+				m_beta = m_model_acc.m_KP * m_model_acc.m_W / m_Leff;
+			else if (Cox > nlconst::zero() && m_model_acc.m_UO > nlconst::zero())
+				m_beta = m_model_acc.m_UO * nlconst::magic(1e-4) * Cox * m_model_acc.m_W / m_Leff;
 			else
-				m_beta = nlconst::magic(2e-5) * m_modacc.m_W / m_Leff;
+				m_beta = nlconst::magic(2e-5) * m_model_acc.m_W / m_Leff;
 
 			//FIXME::UT can disappear
 			const nl_fptype Vt = constants::T0() * constants::k_b() / constants::Q_e();
 
 			// calculate surface potential if not given
 
-			if (m_modacc.m_PHI > nlconst::zero())
-				m_phi = m_modacc.m_PHI;
-			else if (m_modacc.m_NSUB > nlconst::zero())
+			if (m_model_acc.m_PHI > nlconst::zero())
+				m_phi = m_model_acc.m_PHI;
+			else if (m_model_acc.m_NSUB > nlconst::zero())
 			{
-				nl_assert_always(m_modacc.m_NSUB * nlconst::magic(1e6) >= constants::NiSi(), "Error calculating phi for model");
-				m_phi = nlconst::two() * Vt * plib::log (m_modacc.m_NSUB * nlconst::magic(1e6) / constants::NiSi());
+				nl_assert_always(m_model_acc.m_NSUB * nlconst::magic(1e6) >= constants::NiSi(), "Error calculating phi for model");
+				m_phi = nlconst::two() * Vt * plib::log (m_model_acc.m_NSUB * nlconst::magic(1e6) / constants::NiSi());
 			}
 			else
 				m_phi = nlconst::magic(0.6);
 
 			// calculate bulk threshold if not given
-			if (m_modacc.m_GAMMA > nlconst::zero())
-				m_gamma = m_modacc.m_GAMMA;
+			if (m_model_acc.m_GAMMA > nlconst::zero())
+				m_gamma = m_model_acc.m_GAMMA;
 			else
 			{
-				if (Cox > nlconst::zero() && m_modacc.m_NSUB > nlconst::zero())
+				if (Cox > nlconst::zero() && m_model_acc.m_NSUB > nlconst::zero())
 					m_gamma = plib::sqrt (nlconst::two()
 						* constants::Q_e() * constants::eps_Si() * constants::eps_0()
-						* m_modacc.m_NSUB * nlconst::magic(1e6)) / Cox;
+						* m_model_acc.m_NSUB * nlconst::magic(1e6)) / Cox;
 				else
 					m_gamma = nlconst::zero();
 			}
 
-			m_vto = m_modacc.m_VTO;
+			m_vto = m_model_acc.m_VTO;
 			// FIXME zero conversion
 			if(m_vto == nlconst::zero())
 				log().warning(MW_MOSFET_THRESHOLD_VOLTAGE(m_model.name()));
@@ -285,21 +291,21 @@ namespace analog
 			// FIXME: VTO if missing may be calculated from TPG, NSS and temperature. Usually models
 			// specify VTO so skip this here.
 
-			m_CoxWL = Cox * m_modacc.m_W * m_Leff;
+			m_CoxWL = Cox * m_model_acc.m_W * m_Leff;
 
-			//printf("Cox: %g\n", m_Cox);
+			//#printf("Cox: %g\n", m_Cox);
 		}
 
-		NETLIB_IS_TIMESTEP(true || m_capmod != 0)
+		NETLIB_IS_TIMESTEP(true || m_capacitor_model != 0)
 
 		NETLIB_TIMESTEPI()
 		{
-			if (m_capmod != 0)
+			if (m_capacitor_model != 0)
 			{
 				if (ts_type == timestep_type::FORWARD)
 				{
-					//const nl_nl_fptype Ugd = -m_DG.deltaV() * m_polarity; // Gate - Drain
-					//const nl_nl_fptype Ugs = -m_SG.deltaV() * m_polarity; // Gate - Source
+					//#const nl_nl_fptype Ugd = -m_DG.deltaV() * m_polarity; // Gate - Drain
+					//#const nl_nl_fptype Ugs = -m_SG.deltaV() * m_polarity; // Gate - Source
 					const nl_fptype Ugd = m_Vgd; // Gate - Drain
 					const nl_fptype Ugs = m_Vgs; // Gate - Source
 					const nl_fptype Ubs = nlconst::zero(); // Bulk - Source == 0 if connected
@@ -325,9 +331,9 @@ namespace analog
 			NETLIB_NAME(FET)::reset();
 			// Bulk diodes
 
-			m_D_BD.set_param(m_modacc.m_ISD, m_modacc.m_N, exec().gmin(), constants::T0());
+			m_D_BD.set_param(m_model_acc.m_ISD, m_model_acc.m_N, exec().gmin(), constants::T0());
 			#if (!BODY_CONNECTED_TO_SOURCE)
-				m_D_BS.set_param(m_modacc.m_ISS, m_modacc.m_N, exec().gmin(), constants::T0());
+				m_D_BS.set_param(m_model_acc.m_ISS, m_model_acc.m_N, exec().gmin(), constants::T0());
 			#endif
 		}
 
@@ -375,10 +381,10 @@ namespace analog
 		nl_fptype m_Cgs;
 		nl_fptype m_Cgd;
 
-		int m_capmod;
+		int m_capacitor_model;
 		state_var<nl_fptype> m_Vgs;
 		state_var<nl_fptype> m_Vgd;
-		fet_model_t m_modacc;
+		fet_model_t m_model_acc;
 
 		void set_cap(generic_capacitor<capacitor_e::VARIABLE_CAPACITY> &cap,
 			nl_fptype capval, nl_fptype V,
@@ -515,7 +521,7 @@ namespace analog
 				gds = beta * (Vctrl - absVds) + m_lambda * m_beta * absVds * (Vctrl - absVds / nlconst::two());
 			}
 
-			// backgate transconductance
+			// back gate transconductance
 			const nl_fptype bgtc = (phi_m_Vbulk != nlconst::zero()) ? (m_gamma / phi_m_Vbulk / nlconst::two()) : nlconst::zero();
 			gmb = gm * bgtc;
 		}
@@ -570,7 +576,7 @@ namespace analog
 		const nl_fptype gBS = -gbs;
 		nl_fptype gBB =  gbs + gbd;
 
-		if (m_capmod != 0)
+		if (m_capacitor_model != 0)
 		{
 			const nl_fptype Vgb = Vgs - Vbs;
 
@@ -579,9 +585,9 @@ namespace analog
 			else
 				calculate_caps(Vgd, Vgs, Vth, m_Cgd, m_Cgs, m_Cgb);
 
-			set_cap(m_cap_gb, m_Cgb + m_modacc.m_CGBO * m_Leff, Vgb, gGG, gGB, gBG, gBB, IG, IB);
-			set_cap(m_cap_gs, m_Cgs + m_modacc.m_CGSO * m_modacc.m_W, Vgs, gGG, gGS, gSG, gSS, IG, IS);
-			set_cap(m_cap_gd, m_Cgd + m_modacc.m_CGDO * m_modacc.m_W, Vgd, gGG, gGD, gDG, gDD, IG, ID);
+			set_cap(m_cap_gb, m_Cgb + m_model_acc.m_CGBO * m_Leff, Vgb, gGG, gGB, gBG, gBB, IG, IB);
+			set_cap(m_cap_gs, m_Cgs + m_model_acc.m_CGSO * m_model_acc.m_W, Vgs, gGG, gGS, gSG, gSS, IG, IS);
+			set_cap(m_cap_gd, m_Cgd + m_model_acc.m_CGDO * m_model_acc.m_W, Vgd, gGG, gGD, gDG, gDD, IG, ID);
 		}
 
 		// Source connected to body, Diode S-B shorted!
