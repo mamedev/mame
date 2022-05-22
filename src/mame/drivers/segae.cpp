@@ -868,6 +868,9 @@ static INPUT_PORTS_START( megrescu )
 	PORT_DIPSETTING(    0x0c, "2" )
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPNAME(0x10, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(   0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(   0x10, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
 uint32_t systeme_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
