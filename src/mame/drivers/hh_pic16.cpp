@@ -694,9 +694,10 @@ private:
 	u8 read_c();
 	void write_c(u8 data);
 
-	void speaker_decay_reset();
+	void speaker_update();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
 	double m_speaker_volume = 0.0;
+	std::vector<double> m_speaker_levels;
 };
 
 void flash_state::machine_start()
@@ -707,21 +708,21 @@ void flash_state::machine_start()
 
 // handlers
 
-void flash_state::speaker_decay_reset()
+void flash_state::speaker_update()
 {
 	if (~m_b & 0x40)
-		m_speaker_volume = 20.0;
+		m_speaker_volume = 50.0;
 
 	// it takes a bit before it actually starts fading
 	double vol = (m_speaker_volume > 1.0) ? 1.0 : m_speaker_volume;
-	m_speaker->set_output_gain(0, vol);
+	m_speaker->level_w(BIT(m_b, 7) * 0x7fff * vol);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(flash_state::speaker_decay_sim)
 {
 	// volume decays when speaker is off (divisor and timer period determine duration)
-	speaker_decay_reset();
-	m_speaker_volume /= 1.15;
+	speaker_update();
+	m_speaker_volume /= 1.0075;
 }
 
 void flash_state::update_display()
@@ -738,8 +739,7 @@ void flash_state::write_b(u8 data)
 
 	// B6: speaker on
 	// B7: speaker out
-	speaker_decay_reset();
-	m_speaker->level_w(data >> 7 & 1);
+	speaker_update();
 }
 
 u8 flash_state::read_c()
@@ -791,7 +791,14 @@ void flash_state::flash(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
-	TIMER(config, "speaker_decay").configure_periodic(FUNC(flash_state::speaker_decay_sim), attotime::from_msec(25));
+
+	TIMER(config, "speaker_decay").configure_periodic(FUNC(flash_state::speaker_decay_sim), attotime::from_msec(1));
+
+	// set volume levels (set_output_gain is too slow for sub-frame intervals)
+	m_speaker_levels.resize(0x8000);
+	for (int i = 0; i < 0x8000; i++)
+		m_speaker_levels[i] = double(i) / 32768.0;
+	m_speaker->set_levels(0x8000, &m_speaker_levels[0]);
 }
 
 // roms
@@ -1126,9 +1133,10 @@ private:
 	void write_b(u8 data);
 	void write_c(u8 data);
 
-	void speaker_decay_reset();
+	void speaker_update();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
 	double m_speaker_volume = 0.0;
+	std::vector<double> m_speaker_levels;
 };
 
 void leboom_state::machine_start()
@@ -1139,19 +1147,19 @@ void leboom_state::machine_start()
 
 // handlers
 
-void leboom_state::speaker_decay_reset()
+void leboom_state::speaker_update()
 {
 	if (~m_c & 0x80)
 		m_speaker_volume = 1.0;
 
-	m_speaker->set_output_gain(0, m_speaker_volume);
+	m_speaker->level_w(BIT(m_c, 6) * 0x7fff * m_speaker_volume);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(leboom_state::speaker_decay_sim)
 {
 	// volume decays when speaker is off (divisor and timer period determine duration)
-	speaker_decay_reset();
-	m_speaker_volume /= 1.015;
+	speaker_update();
+	m_speaker_volume /= 1.005;
 }
 
 u8 leboom_state::read_a()
@@ -1172,11 +1180,9 @@ void leboom_state::write_c(u8 data)
 	m_display->matrix(1, data >> 4 & 1);
 
 	// C7: speaker on
-	m_c = data;
-	speaker_decay_reset();
-
 	// C6: speaker out
-	m_speaker->level_w(data >> 6 & 1);
+	m_c = data;
+	speaker_update();
 }
 
 // config
@@ -1235,7 +1241,14 @@ void leboom_state::leboom(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
-	TIMER(config, "speaker_decay").configure_periodic(FUNC(leboom_state::speaker_decay_sim), attotime::from_msec(25));
+
+	TIMER(config, "speaker_decay").configure_periodic(FUNC(leboom_state::speaker_decay_sim), attotime::from_msec(5));
+
+	// set volume levels (set_output_gain is too slow for sub-frame intervals)
+	m_speaker_levels.resize(0x8000);
+	for (int i = 0; i < 0x8000; i++)
+		m_speaker_levels[i] = double(i) / 32768.0;
+	m_speaker->set_levels(0x8000, &m_speaker_levels[0]);
 }
 
 // roms
