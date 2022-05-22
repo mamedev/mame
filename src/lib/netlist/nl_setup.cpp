@@ -971,7 +971,7 @@ bool setup_t::connect_input_input(detail::core_terminal_t &t1, detail::core_term
 	if (t1.has_net())
 	{
 		if (t1.net().is_rail_net())
-			ret = connect(t2, t1.net().railterminal());
+			ret = connect(t2, t1.net().rail_terminal());
 		if (!ret)
 		{
 			for (auto & t : nlstate().core_terms(t1.net()))
@@ -986,7 +986,7 @@ bool setup_t::connect_input_input(detail::core_terminal_t &t1, detail::core_term
 	if (!ret && t2.has_net())
 	{
 		if (t2.net().is_rail_net())
-			ret = connect(t1, t2.net().railterminal());
+			ret = connect(t1, t2.net().rail_terminal());
 		if (!ret)
 		{
 			for (auto & t : nlstate().core_terms(t2.net()))

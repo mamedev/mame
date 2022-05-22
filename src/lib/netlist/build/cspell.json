@@ -39,8 +39,9 @@
 	"netlists",
 	"nltool",
 	"nlwav",
-	"nvcc"
+	"nvcc",
 	// FIXME: Remove everything below here again
+	"pstring"
 ],
 "languageSettings": [
 	// This one works with Python
@@ -66,10 +67,10 @@
 		// Turn off compound words, because it is only checking strings.
 		"allowCompoundWords": false,
 		// Only check comments and strings
-		"includeRegExpList": [
-			"CStyleComment",
-			"string"
-		],
+		//"includeRegExpList": [
+		//	"CStyleComment",
+		//	"string"
+		//],
 		"ignoreRegExpList": [
 			"/#include.*/",                    // Exclude includes, because they are also strings
 			"/#pragma.*/",                     // Exclude pragmas, they may include strings
@@ -85,7 +86,7 @@
 			"/\/\/#.*/",                       // commented source code
 			"\/\/ Source:.*/",                 // generated code
 			"/\\$[A-z0-9][^\\s]*/",            // everything starting with a $
-			"/[A-z][^\\s]::[^\\s]+/"           // any namespace qualifier
+			"/[A-z][^\\s]+::[^\\s]+/"           // any namespace qualifier
 		]
 	}
 ]

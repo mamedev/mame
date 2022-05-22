@@ -72,7 +72,7 @@ namespace netlist::devices {
 #endif
 			}
 			for (auto &q : m_Q)
-				if (q.has_net() && !exec().nlstate().core_terms(q.net()).empty())
+				if (q.has_net() && !exec().nl_state().core_terms(q.net()).empty())
 					active_outputs++;
 			set_active_outputs(active_outputs);
 		}
