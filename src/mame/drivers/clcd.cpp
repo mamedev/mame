@@ -662,25 +662,25 @@ INPUT_PORTS_END
 void clcd_state::clcd(machine_config &config)
 {
 	/* basic machine hardware */
-	M65C02(config, m_maincpu, 2000000);
+	M65C02(config, m_maincpu, 1000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &clcd_state::clcd_mem);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline("maincpu", m65c02_device::IRQ_LINE);
 
-	via6522_device &via0(R65C22(config, "via0", 2000000));
+	via6522_device &via0(R65C22(config, "via0", 1000000));
 	via0.writepa_handler().set(FUNC(clcd_state::via0_pa_w));
 	via0.writepb_handler().set(FUNC(clcd_state::via0_pb_w));
 	via0.cb1_handler().set(FUNC(clcd_state::via0_cb1_w));
 	via0.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 
-	via6522_device &via1(R65C22(config, "via1", 2000000));
+	via6522_device &via1(R65C22(config, "via1", 1000000));
 	via1.writepa_handler().set(FUNC(clcd_state::via1_pa_w));
 	via1.writepb_handler().set(FUNC(clcd_state::via1_pb_w));
 	via1.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 	via1.ca2_handler().set(m_centronics, FUNC(centronics_device::write_strobe)).invert();
 	via1.cb2_handler().set("speaker", FUNC(speaker_sound_device::level_w));
 
-	MOS6551(config, m_acia, 2000000);
+	MOS6551(config, m_acia, 1000000);
 	m_acia->set_xtal(XTAL(1'843'200));
 	m_acia->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
