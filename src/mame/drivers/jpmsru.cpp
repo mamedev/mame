@@ -1,46 +1,46 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, SomeRandomGuyIdk
 /**********************************************************************
-	
-	JPM Stepper Reel Unit
-	
-	JPM's first CPU-based fruit machine platform, from late 1978/1979.
-	Notably the first system to use stepper reels instead of EM reels.
-	Uses a 1.5MHz TMS9980A CPU together with some TTL for I/O providing
-	56 outputs (16 used by reels) & 24 inputs (8 used by optos), 
-	a ROM card holding game ROMs, and a selection of expansion boards. 
-	Sound is output by a simple 6-tone NE556-based circuit.
-	
-	TODO:
-	- Layouts
-	- Netlist audio works but isn't quite right. The tone pot needs to
-	  be set to 17% for it to not cut out, and even then popping can be heard.
-	  Needs a look from someone with more analog knowledge than me.
-	- Add remaining games
-	
-	Expansion boards:
-	Bus Extension
-	Optional board with 128 nibbles NVRAM and 24 DIP switches, only supported by early JPM games
-	
-	Input Extension
-	Same as Bus Extension except with 8 extra inputs replacing the NVRAM (moved to ROM card), used by club games
-	
-	Logic Extension
-	56 extra outputs addressed from CRU memory, accessed via 9 existing outputs
-	
-	Maxi Logic Extension
-	64 extra outputs addressed from CRU memory, accessed via 9 existing outputs
-	
-	Mini Logic Extension
-	16 extra outputs addressed directly from CRU memory
-	
-	Output Extension
-	16 extra outputs addressed from main memory
-	
-	ROM cards:
-	Most SRU games used a 3K ROM card for storage. A few later games had a 4K card,
-	and a 6K card with 512 nibbles of NVRAM was used for club games.
-	
+
+    JPM Stepper Reel Unit
+
+    JPM's first CPU-based fruit machine platform, from late 1978/1979.
+    Notably the first system to use stepper reels instead of EM reels.
+    Uses a 1.5MHz TMS9980A CPU together with some TTL for I/O providing
+    56 outputs (16 used by reels) & 24 inputs (8 used by optos),
+    a ROM card holding game ROMs, and a selection of expansion boards.
+    Sound is output by a simple 6-tone NE556-based circuit.
+
+    TODO:
+    - Layouts
+    - Netlist audio works but isn't quite right. The tone pot needs to
+      be set to 17% for it to not cut out, and even then popping can be heard.
+      Needs a look from someone with more analog knowledge than me.
+    - Add remaining games
+
+    Expansion boards:
+    Bus Extension
+    Optional board with 128 nibbles NVRAM and 24 DIP switches, only supported by early JPM games
+
+    Input Extension
+    Same as Bus Extension except with 8 extra inputs replacing the NVRAM (moved to ROM card), used by club games
+
+    Logic Extension
+    56 extra outputs addressed from CRU memory, accessed via 9 existing outputs
+
+    Maxi Logic Extension
+    64 extra outputs addressed from CRU memory, accessed via 9 existing outputs
+
+    Mini Logic Extension
+    16 extra outputs addressed directly from CRU memory
+
+    Output Extension
+    16 extra outputs addressed from main memory
+
+    ROM cards:
+    Most SRU games used a 3K ROM card for storage. A few later games had a 4K card,
+    and a 6K card with 512 nibbles of NVRAM was used for club games.
+
 **********************************************************************/
 
 #include "emu.h"
@@ -71,7 +71,7 @@
 class jpmsru_state : public driver_device
 {
 public:
-	jpmsru_state(const machine_config &mconfig, device_type type, const char *tag) : 
+	jpmsru_state(const machine_config &mconfig, device_type type, const char *tag) :
 			driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_inputs(*this, "IN%u", 0U),
@@ -165,10 +165,10 @@ void jpmsru_state::jpmsru_3k_map(address_map &map)
 {
 	map(0x0000, 0x0bff).rom();
 	map(0x0e00, 0x0eff).ram();
-	/* Some sort of peculiar data logging system used by later JPM games. 
-       It consists of 32 bytes of memory where games write various statistics 
-       (total plays, win amount, win symbol, gamble win/lose etc.) either as numeric values 
-       or ASCII text. Most likely for JPM internal use only. */
+	/* Some sort of peculiar data logging system used by later JPM games.
+	   It consists of 32 bytes of memory where games write various statistics
+	   (total plays, win amount, win symbol, gamble win/lose etc.) either as numeric values
+	   or ASCII text. Most likely for JPM internal use only. */
 	map(0x1400, 0x141f).ram();
 }
 
@@ -298,7 +298,7 @@ void jpmsru_state::reel_w(offs_t offset, uint8_t data)
 	const int bit = offset & 0x3;
 	m_reelbits[reel] = (m_reelbits[reel] & ~(1 << bit)) | (data ? (1 << bit) : 0);
 
-	if(bit == 3) 
+	if(bit == 3)
 	{
 		m_reel[reel]->update(m_reelbits[reel]);
 		const char reelnames[4][6] = { "reel1", "reel2", "reel3", "reel4" };
@@ -319,7 +319,7 @@ void jpmsru_state::out_lamp_ext_w(offs_t offset, uint8_t data)
 
 void jpmsru_state::out_disp_w(offs_t offset, uint8_t data)
 {
-	switch(offset) 
+	switch(offset)
 	{
 		case 0: m_disp_digit = (m_disp_digit & ~0x01) | (data ? 0x00 : 0x01); break;
 		case 1: m_disp_digit = (m_disp_digit & ~0x02) | (data ? 0x00 : 0x02); break;
@@ -433,7 +433,7 @@ uint8_t jpmsru_state::busext_dips_r(offs_t offset)
 
 TIMER_DEVICE_CALLBACK_MEMBER(jpmsru_state::int1)
 {
-	if(m_int1_en) 
+	if(m_int1_en)
 	{
 		m_int1 = 1;
 		update_int();
@@ -442,7 +442,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(jpmsru_state::int1)
 
 TIMER_DEVICE_CALLBACK_MEMBER(jpmsru_state::int2)
 {
-	if(m_int2_en) 
+	if(m_int2_en)
 	{
 		m_int2 = 1;
 		update_int();
@@ -718,8 +718,8 @@ static INPUT_PORTS_START( j_lan2 )
 
 	PORT_MODIFY("IN0")
 	PORT_CONFNAME( 0x80, 0x80, "5p/10p jumper" )
-	PORT_CONFSETTING(	 0x00, "5p" )
-	PORT_CONFSETTING(	 0x80, "10p" )
+	PORT_CONFSETTING(    0x00, "5p" )
+	PORT_CONFSETTING(    0x80, "10p" )
 INPUT_PORTS_END
 
 void jpmsru_state::machine_start()

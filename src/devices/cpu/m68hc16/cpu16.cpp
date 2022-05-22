@@ -363,7 +363,7 @@ void cpu16_device::device_start()
 	save_item(NAME(m_sl));
 	save_item(NAME(m_index_mask));
 	save_item(NAME(m_sequence));
-	save_item(NAME(m_ea));	
+	save_item(NAME(m_ea));
 	save_item(NAME(m_tmp));
 	save_item(NAME(m_start));
 }

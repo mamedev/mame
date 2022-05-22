@@ -7468,7 +7468,7 @@ license:CC0
 
 	<software name="gberetp1" cloneof="gberetp3">
 		<!-- Notes: GBC only -->
-		<!--	Developed without testing on real hardware, requires fixing by replacing "C0" to "E0" at offset 0x153.	-->
+		<!--    Developed without testing on real hardware, requires fixing by replacing "C0" to "E0" at offset 0x153.  -->
 		<description>Green Beret (prototype 1)</description>
 		<year>2000</year>
 		<publisher>Kak</publisher>
@@ -7486,7 +7486,7 @@ license:CC0
 
 	<software name="gberetp2" cloneof="gberetp3">
 		<!-- Notes: GBC only -->
-		<!--	Developed without testing on real hardware, requires fixing by replacing "C0" to "E0" at offset 0x154.	-->
+		<!--    Developed without testing on real hardware, requires fixing by replacing "C0" to "E0" at offset 0x154.  -->
 		<description>Green Beret (prototype 2)</description>
 		<year>2000</year>
 		<publisher>Kak</publisher>

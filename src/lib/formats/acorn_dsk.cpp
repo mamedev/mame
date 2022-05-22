@@ -219,7 +219,7 @@ int acorn_dsd_format::find_size(util::random_read &io, uint32_t form_factor, con
 		io.read_at(0x0226, cat, 2, actual);
 		if ((memcmp(cat, "\x4f\x14", 2) == 0 || memcmp(cat, "\x4f\x0a", 2) == 0) && size == (uint64_t)compute_track_size(f) * f.track_count * f.head_count)
 			return i;
-		 
+
 		// read sector count from side 0 catalogue
 		io.read_at(0x100, cat, 8, actual);
 		sectors0 = ((cat[6] & 3) << 8) + cat[7];

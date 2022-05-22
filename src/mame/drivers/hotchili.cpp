@@ -130,7 +130,7 @@
   23 OVER 5000 CREDITS CALL ATT.
   24 OVER 10000 CREDITS CALL ATT.
   25 NO HAY MENSAJE
-  26 1ST GAMBLE OVER 
+  26 1ST GAMBLE OVER
   27 NO MESSAGE
   28 FOR HAND PAY PRESS COLLECT
   29 FREE GAME #1
@@ -187,12 +187,12 @@ public:
 
 	void hotchili(machine_config &config);
 	void init_hc();
-	
+
 
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
-	
+
 private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -200,7 +200,7 @@ private:
 
 	void seta001_ctrl_write(offs_t offs, uint8_t data);
 	uint8_t seta001_ctrl_read(offs_t offs);
-	
+
 	//external ram
 	void extram_w(offs_t offset, uint8_t data);
 	uint8_t extram_r(offs_t offset);
@@ -213,11 +213,11 @@ private:
 	//inports
 	uint8_t inport0_r();
 	uint8_t inport3_r();
- 
+
 	//outports
 	void outp1_w(offs_t offset, uint8_t data);
 	void outp2_w(offs_t offset, uint8_t data);
-    
+
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<seta001_device> m_seta001;
@@ -295,7 +295,7 @@ void hotchili_state::hc_map(address_map &map)
 	map(0xe000, 0xe2ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r8), FUNC(seta001_device::spriteylow_w8));
 	map(0xe300, 0xe303).ram().w(m_seta001, FUNC(seta001_device::spritectrl_w8));
 	map(0xe800, 0xe800).w(m_seta001, FUNC(seta001_device::spritebgflag_w8));
-	map(0xf000, 0xf00c).rw( FUNC(hotchili_state::extram_r), FUNC(hotchili_state::extram_w)); 
+	map(0xf000, 0xf00c).rw( FUNC(hotchili_state::extram_r), FUNC(hotchili_state::extram_w));
 	map(0xf200, 0xf200).w(FUNC(hotchili_state::outp2_w));       // outport (mem img ca85h)
 	map(0xf300, 0xf300).w(FUNC(hotchili_state::bankswitch_w));
 	map(0xf400, 0xf40c).w(FUNC(hotchili_state::outp1_w));       // 4 outports 0,4,8,c (mem img ca81h - ca84h)
@@ -317,10 +317,10 @@ static INPUT_PORTS_START( hotchili )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("All Clear / Configuration")  // pressed on startup
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unknown
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )  // active: enables RNG and read inputs on secondary buffer (inputs with special timing)   
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )  // active: enables RNG and read inputs on secondary buffer (inputs with special timing)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Meter Reading Key") PORT_TOGGLE
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_U) PORT_NAME("Jackpot Reset Key") 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_6) PORT_NAME("Clear Att. Key")    //Next Page into Input or Output Test 
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_U) PORT_NAME("Jackpot Reset Key")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_6) PORT_NAME("Clear Att. Key")    //Next Page into Input or Output Test
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_NAME("Collect")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8) PORT_NAME("Reserve / Next (Met.Read)")
 
@@ -400,7 +400,7 @@ uint8_t hotchili_state::inport0_r()
 
 uint8_t hotchili_state::inport3_r()
 {
-    return m_meters;  // meters signal feedback
+	return m_meters;  // meters signal feedback
 }
 
 
@@ -418,18 +418,18 @@ void hotchili_state::outp1_w(offs_t offset, uint8_t data)
 			m_lamp[1] = BIT(data,1);  // 2nd Start
 			m_lamp[2] = BIT(data,2);  // 3rd Start
 			m_lamp[3] = BIT(data,3);  // 4th Start
-			m_lamp[4] = BIT(data,4);  // 5th Start 
-			m_lamp[5] = BIT(data,5); 
+			m_lamp[4] = BIT(data,4);  // 5th Start
+			m_lamp[5] = BIT(data,5);
 			m_lamp[6] = BIT(data,6);
 			m_lamp[7] = BIT(data,7);  // Motor Hopper
 			break;
 
 		case 1:
 			m_lamp[8]  = BIT(data,0);  // 1st Start - Test Mode
-			m_lamp[9]  = BIT(data,1);  // 2nd Start 
+			m_lamp[9]  = BIT(data,1);  // 2nd Start
 			m_lamp[10] = BIT(data,2);  // 3rd Start
 			m_lamp[11] = BIT(data,3);  // 4th Start
-			m_lamp[12] = BIT(data,4);  // 5th Start 
+			m_lamp[12] = BIT(data,4);  // 5th Start
 			m_lamp[13] = BIT(data,5);  // Coin Lock Out Coil
 			m_lamp[14] = BIT(data,6);  // Divert Solenoid
 			m_lamp[15] = BIT(data,7);  // Divert Solenoid
@@ -572,7 +572,7 @@ void hotchili_state::hotchili(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_screen_update(FUNC(hotchili_state::screen_update));
 	m_screen->screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
-	m_screen->set_palette(m_palette);   
+	m_screen->set_palette(m_palette);
 
 	SETA001_SPRITE(config, m_seta001, 16'000'000, m_palette, gfx_hotchili);
 	m_seta001->set_fg_yoffsets( -0x12, 0x0e );
