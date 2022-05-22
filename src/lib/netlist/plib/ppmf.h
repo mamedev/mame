@@ -173,10 +173,12 @@ namespace plib {
 		/// descriptors, and function pointers are pointers to function descriptors.
 		/// To obtain a function pointer for a virtual member function, you
 		/// fetch a pointer to a function descriptor from the vtable.
+		///
 		/// On IA64, the vtable contains function descriptors, and function
 		/// pointers are pointers to function descriptors. To obtain a
 		/// function pointer for a virtual member function, you calculate
 		/// the address of the function descriptor in the vtable.
+		///
 		/// Simply adding the byte offset to the vtable pointer creates a
 		/// function pointer on IA64 because the vtable contains function
 		/// descriptors; on most other targets, the vtable contains function
@@ -184,9 +186,8 @@ namespace plib {
 		/// calculating its address in the vtable.
 		///
 		uintptr_t m_function;   // first item can be one of two things:
-								//    if even, it's a pointer to the function
+								//    if even, it's a function pointer
 								//    if odd, it's the byte offset into the vtable
-								//       or a byte offset into the function descriptors on IA64
 		ptrdiff_t m_this_delta; // delta to apply to the 'this' pointer
 	};
 
@@ -204,10 +205,10 @@ namespace plib {
 		void convert_to_generic(generic_function &func, mfp_generic_class *&object) const;
 
 		// actual state
-		uintptr_t m_function;   // first item can pointer to the function or a byte offset into the vtable
+		uintptr_t m_function;   // first item can be a function pointer or a byte offset into the vtable
 		ptrdiff_t m_this_delta; // delta to apply to the 'this' pointer after right shifting by one bit
-								//    m_function is the byte offset into the vtable
-								//    On IA64 it may also be a byte offset into the function descriptors
+								//    if even, m_function is a fuction pointer
+								//    if odd, m_function is the byte offset into the vtable
 	};
 
 	template <>
