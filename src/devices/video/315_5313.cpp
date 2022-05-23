@@ -3,12 +3,12 @@
 /*
     Sega 315-5313 VDP emulation, used by Mega Drive/Genesis
 
-    TODO:
-    - Video, DMA timing and HV counter seem incorrect,
-      they need verification on real hardware.
-    - Support 128KB VRAM configuration, did any hardware use it?
-    - Is border area displayable?
-    - 32X overlay with H32 mode, did all known software use this?
+TODO:
+- Video, DMA timing and HV counter are incorrect,
+  they need verification on real hardware.
+- Support 128KB VRAM configuration, did any hardware use it?
+- Is border area displayable?
+- 32X overlay with H32 mode, did all known software use this?
 */
 
 #include "emu.h"
@@ -255,24 +255,13 @@ void sega315_5313_device::device_add_mconfig(machine_config &config)
 TIMER_CALLBACK_MEMBER(sega315_5313_device::irq6_on_timer_callback)
 {
 // m_irq6_pending = 1;
-	if (MEGADRIVE_REG01_IRQ6_ENABLE && m_irq6_pending)
+	if (MEGADRIVE_REG01_IRQ6_ENABLE)
 		m_lv6irqline_callback(true);
-	else
-	{
-		m_irq6_pending = 0;
-		m_lv6irqline_callback(false);
-	}
 }
 
 TIMER_CALLBACK_MEMBER(sega315_5313_device::irq4_on_timer_callback)
 {
-	if (MEGADRIVE_REG0_IRQ4_ENABLE && m_irq4_pending)
-		m_lv4irqline_callback(true);
-	else
-	{
-		m_irq4_pending = 0;
-		m_lv4irqline_callback(false);
-	}
+	m_lv4irqline_callback(true);
 }
 
 static const gfx_layout md_debug_8x8_layout =
@@ -606,23 +595,23 @@ void sega315_5313_device::vdp_set_register(int regnum, u8 value)
 		// but delayed a bit.
 		// Note that irq 6 is masked for about 5 frames, leaving the assumption that it mustn't
 		// be left on during all this time.
-		if (MEGADRIVE_REG0_IRQ4_ENABLE && m_irq4_pending)
-			m_lv4irqline_callback(true);
-		else
+		if (m_irq4_pending)
 		{
-			m_irq4_pending = 0;
-			m_lv4irqline_callback(false);
+			if (MEGADRIVE_REG0_IRQ4_ENABLE)
+				m_lv4irqline_callback(true);
+			else
+				m_lv4irqline_callback(false);
 		}
 	}
 
 	if (regnum == 0x01)
 	{
-		if (MEGADRIVE_REG01_IRQ6_ENABLE && m_irq6_pending)
-			m_lv6irqline_callback(true);
-		else
+		if (m_irq6_pending)
 		{
-			m_irq6_pending = 0;
-			m_lv6irqline_callback(false);
+			if (MEGADRIVE_REG01_IRQ6_ENABLE)
+				m_lv6irqline_callback(true);
+			else
+				m_lv6irqline_callback(false);
 		}
 	}
 
@@ -2334,7 +2323,8 @@ void sega315_5313_device::vdp_handle_eof()
 	int scr_mul = 1;
 
 	m_vblank_flag = 0;
-	//m_irq6_pending = 0; /* NO! (breaks warlock) */
+	// Not here, breaks warlock
+	//m_irq6_pending = 0;
 
 	/* Set it to -1 here, so it becomes 0 when the first timer kicks in */
 	if (!m_use_alt_timing) m_scanline_counter = -1;

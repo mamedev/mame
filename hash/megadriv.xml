@@ -2881,11 +2881,14 @@ No [VDP] sprites
 
 
 <!-- This was marked as rev. A on the EA sticker, but its header (and ROM markings) uses the Jpn title... weird situation :-)  -->
-	<software name="fatalrewa" cloneof="fatalrew" supported="yes">
+	<software name="fatalrewa" cloneof="fatalrew" supported="no">
 		<!-- Originally marked as Fatal Rewind, boots as The Killing Game Show -->
 		<description>The Killing Game Show (Euro)</description>
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+Crashes after EA logo, requires better [VDP] irq handling
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="PWB SC40X1 REV B"/>
 			<feature name="u1" value="KILLING GAME SHOW KIL03"/>  <!-- location not really marked on PCB, using u1 for consistency -->
@@ -2902,8 +2905,7 @@ No [VDP] sprites
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
 		<notes><![CDATA[
-Boots in PAL mode only, in NTSC it crashes with diverging behaviour if debugger is on.
-Randomly doesn't show EA logo animation at boot
+Crashes after EA logo, requires better [VDP] irq handling
 ]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="PWB SC40X1 REV B"/>
@@ -7918,13 +7920,10 @@ Unsupported [Sega Mouse] peripheral
 	</software>
 
 
-	<software name="sracer" supported="partial">
+	<software name="sracer" supported="yes">
 		<description>Street Racer (Euro)</description>
 		<year>1995</year>
 		<publisher>Ubi Soft</publisher>
-		<notes><![CDATA[
-Corrupted Ubi Soft and Vivid Image logos
-]]></notes>
 		<info name="developer" value="Vivid Image"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
@@ -16261,10 +16260,13 @@ https://segaretro.org/Elitserien_96
 		</part>
 	</software>
 
-	<software name="killshow" cloneof="fatalrew" supported="yes">
+	<software name="killshow" cloneof="fatalrew" supported="no">
 		<description>The Killing Game Show (Jpn)</description>
 		<year>1993</year>
 		<publisher>Electronic Arts Victor</publisher>
+		<notes><![CDATA[
+Crashes after EA logo, requires better [VDP] irq handling
+]]></notes>
 		<info name="serial" value="EM20021"/>
 		<info name="release" value="19930820"/>
 		<info name="alt_title" value="キリング・ゲーム・ショー"/>
@@ -25279,10 +25281,13 @@ Throws "this game is [...] european megadrive system" even with megadriv system 
 		</part>
 	</software>
 
-	<software name="sesame" supported="yes">
+	<software name="sesame" supported="no">
 		<description>Sesame Street Counting Cafe (USA)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+Black screen, requires better [VDP] irq handling
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="sesame street counting cafe (usa).bin" size="1048576" crc="0a4f48c3" sha1="d5ef2b50cf1a22e07401f6a14c7946df66d8b605"/>
@@ -27617,9 +27622,6 @@ $040000-$0fffff, $280000-$2fffff, $380000-$3fffff - junk copies of above
 		<description>Street Racer (Euro, prototype 19950321)</description>
 		<year>1995</year>
 		<publisher>Ubi Soft</publisher>
-		<notes><![CDATA[
-Corrupted Ubi Soft and Vivid Image logos
-]]></notes>
 		<info name="developer" value="Vivid Image"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
