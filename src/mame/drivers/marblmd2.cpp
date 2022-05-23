@@ -66,6 +66,22 @@ uint32_t marblmd2_state::screen_update_marblmd2(screen_device &screen, bitmap_in
 	bitmap_ind8 &priority_bitmap = screen.priority();
 	priority_bitmap.fill(0, cliprect);
 	m_vad->playfield().draw(screen, bitmap, cliprect, 0, 0x00);
+
+	// draw and merge the MO
+	bitmap_ind16 &mobitmap = m_vad->mob().bitmap();
+	for (const sparse_dirty_rect *rect = m_vad->mob().first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
+		for (int y = rect->top(); y <= rect->bottom(); y++)
+		{
+			uint16_t const *const mo = &mobitmap.pix(y);
+			uint16_t *const pf = &bitmap.pix(y);
+			for (int x = rect->left(); x <= rect->right(); x++)
+				if (mo[x] != 0xffff)
+				{
+					// not yet verified
+					pf[x] = mo[x];
+				}
+		}
+
 	return 0;
 }
 
@@ -95,7 +111,7 @@ void marblmd2_state::marblmd2_map(address_map& map)
 
 	map(0x600050, 0x600051).w(FUNC(marblmd2_state::latch_w));
 
-	map(0x601000, 0x6013ff).ram(); // some kind of NVRAM?
+	map(0x601000, 0x6013ff).ram(); // some kind of NVRAM or protection?
 
 	map(0x607000, 0x607001).nopw();
 	
@@ -181,13 +197,13 @@ const atari_motion_objects_config marblmd2_state::s_mob_config =
 	0,                  // pixel offset for SLIPs 
 	0,                  // maximum number of links to visit/scanline (0=all) 
 
-	0x000,              // base palette entry 
-	0x100,              // maximum number of colors 
+	0x080,              // base palette entry 
+	0x080,              // maximum number of colors 
 	0,                  // transparent pen index 
 
 	{{ 0x03ff,0,0,0 }}, // mask for the link 
 	{{ 0,0x7fff,0,0 }}, // mask for the code index 
-	{{ 0,0,0x000f,0 }}, // mask for the color 
+	{{ 0,0,0x0007,0 }}, // mask for the color 
 	{{ 0,0,0xff80,0 }}, // mask for the X position 
 	{{ 0,0,0,0xff80 }}, // mask for the Y position 
 	{{ 0,0,0,0x0070 }}, // mask for the width, in tiles
@@ -255,14 +271,14 @@ ROM_START( marblmd2 )
 	ROM_LOAD( "aud0.12c",  0x00000, 0x10000, CRC(89a8d90a) SHA1(cd73483d0bcfe2c8134d005c4417975f9a2cb658) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "pf0h.1p",  0x80000, 0x20000, CRC(a6297a83) SHA1(ffe9ea41d1ba7bb3d0260f3fcf0e970112098d46) )
 	ROM_LOAD( "pf0l.3p",  0x00000, 0x20000, CRC(a4fe377a) SHA1(a8a1a8027da778e5ad406a65814eec999b0f81af) )
-	ROM_LOAD( "pf1h.1m",  0xa0000, 0x20000, CRC(5b40f1bb) SHA1(cf0de8679ab0dd9460324ce72b4bfac029591506) )
 	ROM_LOAD( "pf1l.3m",  0x20000, 0x20000, CRC(5dc7aaa8) SHA1(4fb815e9bcf6bcdf1b7976a3dea2b6d1dd6a8f6b) )
-	ROM_LOAD( "pf2h.1k",  0xc0000, 0x20000, CRC(18323df9) SHA1(9c4add4733bcfe7202b53d86f1bca4b9d207e22a) )
 	ROM_LOAD( "pf2l.3k",  0x40000, 0x20000, CRC(0c7c5f74) SHA1(26f1d36f70f4e8354537d0d67764a1c9be35e8f7) )
-	ROM_LOAD( "pf3h.1j",  0xe0000, 0x20000, CRC(05d86ef8) SHA1(47eefd7112a3a3be16f0b4496cf034c8f7a69b1b) )
 	ROM_LOAD( "pf3l.3j",  0x60000, 0x20000, CRC(0a780429) SHA1(a9d7d564507c31dafc448726b04293d6a582cff5) )
+	ROM_LOAD( "pf0h.1p",  0x80000, 0x20000, CRC(a6297a83) SHA1(ffe9ea41d1ba7bb3d0260f3fcf0e970112098d46) )
+	ROM_LOAD( "pf1h.1m",  0xa0000, 0x20000, CRC(5b40f1bb) SHA1(cf0de8679ab0dd9460324ce72b4bfac029591506) )
+	ROM_LOAD( "pf2h.1k",  0xc0000, 0x20000, CRC(18323df9) SHA1(9c4add4733bcfe7202b53d86f1bca4b9d207e22a) )
+	ROM_LOAD( "pf3h.1j",  0xe0000, 0x20000, CRC(05d86ef8) SHA1(47eefd7112a3a3be16f0b4496cf034c8f7a69b1b) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "mo0l.7p",  0x00000, 0x20000, CRC(950d95a3) SHA1(3f38da7b6eeaa87cc84b98c9d535468b0c060f6d) )
