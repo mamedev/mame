@@ -99,15 +99,13 @@ private:
 	void latch_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(lcd_update_w);
 
-	u8 m_latch[5];
+	u8 m_latch[5] = { };
 	u8 m_dac_data = 0;
 	u8 m_lcd_update = 0;
 };
 
 void debut_state::machine_start()
 {
-	memset(m_latch, 0, sizeof(m_latch));
-
 	// resolve handlers
 	m_out_digit.resolve();
 

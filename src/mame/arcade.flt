@@ -473,7 +473,6 @@ galpanic.cpp
 galpanic_ms.cpp
 galspnbl.cpp
 gambl186.cpp
-gamecstl.cpp
 gamemasters.cpp
 gameplan.cpp
 gammagic.cpp
@@ -564,6 +563,7 @@ homedata.cpp
 homerun.cpp
 hornet.cpp
 hotblock.cpp
+hotchili.cpp
 hotstuff.cpp
 houseball.cpp
 hshavoc.cpp
@@ -1054,6 +1054,7 @@ radikaldarts.cpp
 raiden.cpp
 raiden2.cpp
 raiden_ms.cpp
+rallypnt.cpp
 rallyx.cpp
 rampart.cpp
 ramtek.cpp
@@ -1191,6 +1192,7 @@ silvmil.cpp
 simpl156.cpp
 simple_st0016.cpp
 simpsons.cpp
+sis630.cpp
 skeetsht.cpp
 skimaxx.cpp
 skopro.cpp

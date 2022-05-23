@@ -12,9 +12,7 @@
 
 #include <numeric>
 
-namespace netlist
-{
-namespace solver
+namespace netlist::solver
 {
 
 	template <typename FT, int SIZE>
@@ -30,7 +28,7 @@ namespace solver
 		: matrix_solver_t(main_solver, name, nets, params)
 		, m_new_V(size)
 		, m_RHS(size)
-		, m_mat_ptr(size, this->max_railstart() + 1)
+		, m_mat_ptr(size, this->max_rail_start() + 1)
 		, m_last_V(size, nlconst::zero())
 		, m_DD_n_m_1(size, nlconst::zero())
 		, m_h_n_m_1(size, nlconst::magic(1e-6)) // we need a non zero value here
@@ -48,24 +46,22 @@ namespace solver
 		static constexpr const std::size_t SIZEABS = plib::parray<FT, SIZE>::SIZEABS();
 		static constexpr const std::size_t m_pitch_ABS = (((SIZEABS + 0) + 7) / 8) * 8;
 
-		//PALIGNAS_VECTOROPT() parrays define alignment already
+		//PALIGNAS_VECTOROPT() `parray` defines alignment already
 		plib::parray<float_type, SIZE> m_new_V;
-		//PALIGNAS_VECTOROPT() parrays define alignment already
+		//PALIGNAS_VECTOROPT() `parray` defines alignment already
 		plib::parray<float_type, SIZE> m_RHS;
 
-		//PALIGNAS_VECTOROPT() parrays define alignment already
+		//PALIGNAS_VECTOROPT() `parray` defines alignment already
 		plib::pmatrix2d<float_type *> m_mat_ptr;
 
 		template <typename T, typename M>
-		void log_fill(const T &fill, M &mat)
+		void log_fill(const T &fill, [[maybe_unused]] M &mat)
 		{
 			const std::size_t iN = fill.size();
 
 			// FIXME: Not yet working, mat_cr.h needs some more work
 #if 0
 			auto mat_GE = dynamic_cast<plib::pGEmatrix_cr_t<typename M::base> *>(&mat);
-#else
-			plib::unused_var(mat);
 #endif
 			std::vector<unsigned> levL(iN, 0);
 			std::vector<unsigned> levU(iN, 0);
@@ -142,13 +138,13 @@ namespace solver
 			// and thus belong into a different calculation. This applies to all solvers.
 
 			const std::size_t iN = size();
-			const auto reltol(static_cast<float_type>(m_params.m_reltol));
-			const auto vntol(static_cast<float_type>(m_params.m_vntol));
+			const float_type reltol(static_cast<float_type>(m_params.m_reltol));
+			const float_type vntol(static_cast<float_type>(m_params.m_vntol));
 			for (std::size_t i = 0; i < iN; i++)
 			{
-				const auto vold(static_cast<float_type>(this->m_terms[i].getV()));
-				const auto vnew(m_new_V[i]);
-				const auto tol(vntol + reltol * std::max(plib::abs(vnew),plib::abs(vold)));
+				const float_type vold(static_cast<float_type>(this->m_terms[i].getV()));
+				const float_type vnew(m_new_V[i]);
+				const float_type tol(vntol + reltol * std::max(plib::abs(vnew),plib::abs(vold)));
 				if (plib::abs(vnew - vold) > tol)
 					return true;
 			}
@@ -211,7 +207,7 @@ namespace solver
 			{
 				std::size_t cnt(0);
 				// build pointers into the compressed row format matrix for each terminal
-				for (std::size_t j=0; j< this->m_terms[k].railstart();j++)
+				for (std::size_t j=0; j< this->m_terms[k].rail_start();j++)
 				{
 					int other = this->m_terms[k].m_connected_net_idx[j];
 					if (other >= 0)
@@ -220,8 +216,8 @@ namespace solver
 						cnt++;
 					}
 				}
-				nl_assert_always(cnt == this->m_terms[k].railstart(), "Count and railstart mismatch");
-				m_mat_ptr[k][this->m_terms[k].railstart()] = &(mat[k][k]);
+				nl_assert_always(cnt == this->m_terms[k].rail_start(), "Count and rail start mismatch");
+				m_mat_ptr[k][this->m_terms[k].rail_start()] = &(mat[k][k]);
 			}
 		}
 
@@ -249,25 +245,25 @@ namespace solver
 
 				using source_type = typename decltype(m_gtn)::value_type;
 				const std::size_t term_count = net.count();
-				const std::size_t railstart = net.railstart();
+				const std::size_t rail_start = net.rail_start();
 				const auto &go = m_gonn[k];
 				const auto &gt = m_gtn[k];
 				const auto &Idr = m_Idrn[k];
 				const auto &cnV = m_connected_net_Vn[k];
 
-				// FIXME: gonn, gtn and Idr - which float types should they have?
+				//# FIXME: gonn, gtn and Idr - which float types should they have?
 
 				auto gtot_t = std::accumulate(gt, gt + term_count, plib::constants<source_type>::zero());
 
 				// update diagonal element ...
-				*tcr_r[railstart] = static_cast<FT>(gtot_t); //mat.A[mat.diag[k]] += gtot_t;
+				*tcr_r[rail_start] = static_cast<FT>(gtot_t); //# mat.A[mat.diag[k]] += gtot_t;
 
-				for (std::size_t i = 0; i < railstart; i++)
+				for (std::size_t i = 0; i < rail_start; i++)
 					*tcr_r[i]       += static_cast<FT>(go[i]);
 
-				auto RHS_t(std::accumulate(Idr, Idr + term_count, plib::constants<source_type>::zero()));
+				auto RHS_t = std::accumulate(Idr, Idr + term_count, plib::constants<source_type>::zero());
 
-				for (std::size_t i = railstart; i < term_count; i++)
+				for (std::size_t i = rail_start; i < term_count; i++)
 					RHS_t +=  (- go[i]) * *cnV[i];
 
 				m_RHS[k] = static_cast<FT>(RHS_t);
@@ -276,9 +272,9 @@ namespace solver
 
 	private:
 		// state - variable time_stepping
-		//PALIGNAS_VECTOROPT() parrays define alignment already
+		//PALIGNAS_VECTOROPT() `parray` defines alignment already
 		plib::parray<fptype, SIZE> m_last_V;
-		// PALIGNAS_VECTOROPT() parrays define alignment already
+		//PALIGNAS_VECTOROPT() `parray` defines alignment already
 		plib::parray<fptype, SIZE> m_DD_n_m_1;
 		// PALIGNAS_VECTOROPT() parrays define alignment already
 		plib::parray<fptype, SIZE> m_h_n_m_1;
@@ -287,7 +283,6 @@ namespace solver
 
 	};
 
-} // namespace solver
-} // namespace netlist
+} // namespace netlist::solver
 
 #endif // NLD_MATRIX_SOLVER_EXT_H_

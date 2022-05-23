@@ -14745,7 +14745,11 @@ ROM_END
 
 ROM_START( skelagon )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	// first half of 36.bin is missing
+	// first 4k of game is missing, take it from SF-X
+	ROM_LOAD( "sfx_b-0.1j",   0x0000, 0x1000, BAD_DUMP CRC(e5bc6952) SHA1(7bfb772418d738d3c49fd59c0bfc04590945977a) )
+	ROM_IGNORE( 0x1000 )
+	ROM_FILL( 0x24, 0x01, 0xca )
+
 	ROM_LOAD( "31.bin",       0x1000, 0x1000, CRC(ae6f8647) SHA1(801e88b91c204f2797e5ce45390ea6eec27a3f54) )
 	ROM_LOAD( "32.bin",       0x2000, 0x1000, CRC(a28c5838) SHA1(0a37de7986c494d1522ce76635dd1fa6d03f05c7) )
 	ROM_LOAD( "33.bin",       0x3000, 0x1000, CRC(32f7e99c) SHA1(2718063a77eeeb8067a9cad7ff3d9e0266b61566) )
@@ -16052,7 +16056,7 @@ GAME( 19??, aracnis,     scorpion, scorpnmc,   aracnis,    galaxian_state,     i
 
 // SF-X hardware; based on Scramble with extra Z80 and 8255 driving a DAC-based sample player
 GAME( 1983, sfx,         0,        sfx,        sfx,        nihon_sfx_state, init_sfx,       ORIENTATION_FLIP_X, "Nihon Game (Nichibutsu license)",     "SF-X",         MACHINE_SUPPORTS_SAVE )
-GAME( 1983, skelagon,    sfx,      sfx,        sfx,        nihon_sfx_state, init_sfx,       ORIENTATION_FLIP_X, "Nihon Game (Nichibutsu USA license)", "Skelagon",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
+GAME( 1983, skelagon,    sfx,      sfx,        sfx,        nihon_sfx_state, init_sfx,       ORIENTATION_FLIP_X, "Nihon Game (Nichibutsu USA license)", "Skelagon",     MACHINE_SUPPORTS_SAVE)
 GAME( 1982, monsterz,    0,        monsterz,   monsterz,   monsterz_state,  init_monsterz,  ORIENTATION_FLIP_X, "Nihon Game",                          "Monster Zero (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, monsterza,   monsterz, monsterz,   monsterz,   monsterz_state,  init_monsterz,  ORIENTATION_FLIP_X, "Nihon Game",                          "Monster Zero (set 2)", MACHINE_SUPPORTS_SAVE )
 

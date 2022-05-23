@@ -87,7 +87,6 @@ public:
 	void cpu09(machine_config &config);
 
 protected:
-	DECLARE_READ_LINE_MEMBER(ca1_r);
 	u8 pa_r();
 	void pa_w(u8 data);
 	void pb_w(u8 data);
@@ -307,12 +306,6 @@ void cpu09_state::pb_w(u8 data)
 {
 }
 
-// cass in
-READ_LINE_MEMBER( cpu09_state::ca1_r )
-{
-	return m_cassold;
-}
-
 u8 ivg09_state::pb_ivg_r()
 {
 	u8 ret = m_term_data;
@@ -413,7 +406,7 @@ void cpu09_state::cpu09(machine_config &config)
 
 	PIA6821(config, m_pia0, 0);
 	m_pia0->readpa_handler().set(FUNC(cpu09_state::pa_r));
-	m_pia0->readca1_handler().set(FUNC(cpu09_state::ca1_r));
+	m_pia0->ca1_w(0);
 	m_pia0->writepa_handler().set(FUNC(cpu09_state::pa_w));
 	m_pia0->writepb_handler().set(FUNC(cpu09_state::pb_w));
 

@@ -144,7 +144,7 @@ namespace netlist
 	///
 
 	using device_arena = std::conditional_t<config::use_mempool::value,
-		plib::mempool_arena<plib::aligned_arena, NL_MEMPOOL_ALIGN>,
+		plib::mempool_arena<plib::aligned_arena, config::mempool_align::value>,
 		plib::aligned_arena>;
 	using host_arena   = plib::aligned_arena;
 
@@ -154,7 +154,7 @@ namespace netlist
 	//  Types needed by various includes
 	//============================================================
 
-	/// \brief Timestep type.
+	/// \brief Time step type.
 	///
 	/// May be either FORWARD or RESTORE
 	///
@@ -166,9 +166,9 @@ namespace netlist
 
 	/// \brief Delegate type for device notification.
 	///
-	using nldelegate = plib::pmfp<void>;
-	using nldelegate_ts = plib::pmfp<void, timestep_type, nl_fptype>;
-	using nldelegate_dyn = plib::pmfp<void>;
+	using nldelegate = plib::pmfp<void ()>;
+	using nldelegate_ts = plib::pmfp<void (timestep_type, nl_fptype)>;
+	using nldelegate_dyn = plib::pmfp<void ()>;
 
 	namespace detail {
 
@@ -183,7 +183,7 @@ namespace netlist
 	} // namespace detail
 
 	using netlist_time = plib::ptime<std::int64_t, config::INTERNAL_RES::value>;
-	using netlist_time_ext = plib::ptime<std::conditional<NL_PREFER_INT128 && plib::compile_info::has_int128::value, INT128, std::int64_t>::type, config::INTERNAL_RES::value>;
+	using netlist_time_ext = plib::ptime<std::conditional<config::prefer_int128::value && plib::compile_info::has_int128::value, INT128, std::int64_t>::type, config::INTERNAL_RES::value>;
 
 	static_assert(noexcept(netlist_time::from_nsec(1)), "Not evaluated as constexpr");
 
@@ -202,9 +202,8 @@ namespace netlist
 		template<netlist_time::internal_type value0>
 		struct times_ns1
 		{
-			static constexpr netlist_time value(std::size_t N = 0)
+			static constexpr netlist_time value([[maybe_unused]] std::size_t N = 0)
 			{
-				plib::unused_var(N);
 				return NLTIME_FROM_NS(value0);
 			}
 		};

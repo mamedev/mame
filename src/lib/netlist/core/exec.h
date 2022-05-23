@@ -47,27 +47,19 @@ namespace netlist
 		template<typename... Args>
 		void qpush(Args&&...args) noexcept
 		{
-#if (!NL_USE_QUEUE_STATS)
-			m_queue.emplace<false>(std::forward<Args>(args)...); // NOLINT(performance-move-const-arg)
-#else
-			if (!m_use_stats)
+			if (config::use_queue_stats::value && m_use_stats)
 				m_queue.emplace<false>(std::forward<Args>(args)...); // NOLINT(performance-move-const-arg)
 			else
 				m_queue.emplace<true>(std::forward<Args>(args)...); // NOLINT(performance-move-const-arg)
-#endif
 		}
 
 		template <class R>
 		void qremove(const R &elem) noexcept
 		{
-#if (!NL_USE_QUEUE_STATS)
-			m_queue.remove<false>(elem);
-#else
-			if (!m_use_stats)
-				m_queue.remove<false>(elem);
-			else
+			if (config::use_queue_stats::value && m_use_stats)
 				m_queue.remove<true>(elem);
-#endif
+			else
+				m_queue.remove<false>(elem);
 		}
 
 		// Control functions
@@ -78,16 +70,15 @@ namespace netlist
 		// only used by nltool to create static c-code
 		devices::nld_solver *solver() const noexcept { return m_solver; }
 
-		// force late type resolution
+		// FIXME: force late type resolution
 		template <typename X = devices::nld_solver>
-		nl_fptype gmin(X *solv = nullptr) const noexcept
+		nl_fptype gmin([[maybe_unused]] X *solver = nullptr) const noexcept
 		{
-			plib::unused_var(solv);
 			return static_cast<X *>(m_solver)->gmin();
 		}
 
-		netlist_state_t &nlstate() noexcept { return m_state; }
-		const netlist_state_t &nlstate() const noexcept { return m_state; }
+		netlist_state_t &nl_state() noexcept { return m_state; }
+		const netlist_state_t &nl_state() const noexcept { return m_state; }
 
 		log_type & log() noexcept { return m_state.log(); }
 		const log_type &log() const noexcept { return m_state.log(); }
@@ -108,7 +99,7 @@ namespace netlist
 		// mostly rw
 		//PALIGNAS(16)
 		netlist_time_ext                    m_time;
-		devices::nld_mainclock *            m_mainclock;
+		devices::nld_mainclock *            m_main_clock;
 
 		//PALIGNAS_CACHELINE()
 		//PALIGNAS(16)

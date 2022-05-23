@@ -606,8 +606,7 @@ static INPUT_PORTS_START( astropal )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )
 
-	/* Dummy port for cocktail mode (not used) */
-	PORT_START(INVADERS_CAB_TYPE_PORT_TAG)
+	PORT_START(CABINET_PORT_TAG)        /* Dummy port for cocktail mode */
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -732,6 +731,9 @@ static INPUT_PORTS_START( sinvzen )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+
+	PORT_MODIFY(CABINET_PORT_TAG)        /* Dummy port for cocktail mode */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -757,6 +759,9 @@ static INPUT_PORTS_START( spaceat2 )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+
+	PORT_MODIFY(CABINET_PORT_TAG)        /* Dummy port for cocktail mode */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -1054,8 +1059,7 @@ static INPUT_PORTS_START( spclaser )
 	PORT_DIPSETTING(    0x00, "1 Coin/1 Or 2 Players" )
 	PORT_DIPSETTING(    0x80, "1 Coin/1 Player  2 Coins/2 Players" )   /* Irrelevant, causes bugs */
 
-	/* Dummy port for cocktail mode (not used) */
-	PORT_START(CABINET_PORT_TAG)
+	PORT_START(CABINET_PORT_TAG)        /* Dummy port for cocktail mode */
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -1270,7 +1274,7 @@ static INPUT_PORTS_START( cosmicmo )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 
-	PORT_MODIFY(CABINET_PORT_TAG)
+	PORT_MODIFY(CABINET_PORT_TAG)        /* Dummy port for cocktail mode */
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -3028,8 +3032,7 @@ void _8080bw_state::vortex(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_usec(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)));
 
 	/* video hardware */
-	// TODO: replace with modified invaders color renderer code allowing midscanline color writes
-	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_invaders));
+	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_vortex));
 
 	/* add shifter */
 	MB14241(config, m_mb14241);
@@ -5849,7 +5852,7 @@ GAME( 1980?,invrvngeb,   invrvnge, invrvnge,  invrvnge,  _8080bw_state,  init_in
 GAME( 1980?,invrvngedu,  invrvnge, invrvnge,  invrvnge,  _8080bw_state,  init_invrvnge, ROT270, "Zenitone-Microsec Ltd. (Dutchford license)", "Invader's Revenge (Dutchford, single PCB)",               MACHINE_SUPPORTS_SAVE )
 GAME( 1980?,invrvngegw,  invrvnge, invrvnge,  invrvnge,  _8080bw_state,  empty_init,    ROT270, "Zenitone-Microsec Ltd. (Game World license)", "Invader's Revenge (Game World, single PCB)",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
 
-GAME( 1980, vortex,      0,        vortex,    vortex,    _8080bw_state,  init_vortex,   ROT270, "Zilec Electronics",                  "Vortex",                                                          MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // Encrypted 8080/IO
+GAME( 1980, vortex,      0,        vortex,    vortex,    _8080bw_state,  init_vortex,   ROT270, "Zilec Electronics",                  "Vortex",                                                          MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // Encrypted 8080/IO
 
 GAME( 1979, rollingc,    0,        rollingc,  rollingc,  _8080bw_state,  empty_init,    ROT270, "Nichibutsu",                         "Rolling Crash / Moon Base",                                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 

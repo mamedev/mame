@@ -89,7 +89,6 @@ private:
 	void pegasus_controls_w(u8 data);
 	void pegasus_keyboard_w(u8 data);
 	void pegasus_pcg_w(offs_t offset, u8 data);
-	DECLARE_READ_LINE_MEMBER(pegasus_keyboard_irq);
 	DECLARE_READ_LINE_MEMBER(pegasus_cassette_r);
 	DECLARE_WRITE_LINE_MEMBER(pegasus_cassette_w);
 	DECLARE_WRITE_LINE_MEMBER(pegasus_firq_clr);
@@ -106,7 +105,6 @@ private:
 	void pegasusm_mem(address_map &map);
 
 	u8 m_kbd_row = 0U;
-	bool m_kbd_irq = false;
 	u8 m_control_bits = 0U;
 	std::unique_ptr<u8[]> m_pcg;
 	void pegasus_decrypt_rom(u8 *ROM);
@@ -140,7 +138,7 @@ u8 pegasus_state::pegasus_keyboard_r()
 	for (unsigned i = 0; i < 8; i++)
 		if (!BIT(m_kbd_row, i)) data &= m_io_keyboard[i]->read();
 
-	m_kbd_irq = (data == 0xff) ? 1 : 0;
+	m_pia_s->cb1_w((data == 0xff) ? 1 : 0);
 	if (BIT(m_control_bits, 3))
 		data <<= 4;
 	return data;
@@ -161,11 +159,6 @@ void pegasus_state::pegasus_controls_w(u8 data)
 */
 
 	m_control_bits = data;
-}
-
-READ_LINE_MEMBER( pegasus_state::pegasus_keyboard_irq )
-{
-	return m_kbd_irq;
 }
 
 READ_LINE_MEMBER( pegasus_state::pegasus_cassette_r )
@@ -475,14 +468,13 @@ void pegasus_state::machine_start()
 	m_pcg = make_unique_clear<u8[]>(0x0800);
 	save_pointer(NAME(m_pcg), 0x0800);
 	save_item(NAME(m_kbd_row));
-	save_item(NAME(m_kbd_irq));
 	save_item(NAME(m_control_bits));
 }
 
 void pegasus_state::machine_reset()
 {
 	m_kbd_row = 0;
-	m_kbd_irq = 1;
+	m_pia_s->cb1_w(1);
 	m_control_bits = 0;
 }
 
@@ -519,7 +511,6 @@ void pegasus_state::pegasus(machine_config &config)
 	PIA6821(config, m_pia_s, 0);
 	m_pia_s->readpb_handler().set(FUNC(pegasus_state::pegasus_keyboard_r));
 	m_pia_s->readca1_handler().set(FUNC(pegasus_state::pegasus_cassette_r));
-	m_pia_s->readcb1_handler().set(FUNC(pegasus_state::pegasus_keyboard_irq));
 	m_pia_s->writepa_handler().set(FUNC(pegasus_state::pegasus_keyboard_w));
 	m_pia_s->writepb_handler().set(FUNC(pegasus_state::pegasus_controls_w));
 	m_pia_s->ca2_handler().set(FUNC(pegasus_state::pegasus_cassette_w));

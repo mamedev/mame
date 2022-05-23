@@ -75,7 +75,6 @@ private:
 	static void floppy_uniflex_formats(format_registration &fr);
 
 	uint8_t pia0_a_r();
-	uint8_t pia0_ca1_r();
 	DECLARE_WRITE_LINE_MEMBER( pia0_irq_a );
 
 	DECLARE_WRITE_LINE_MEMBER(io_irq_w);

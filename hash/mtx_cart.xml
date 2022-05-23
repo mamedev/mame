@@ -6,13 +6,97 @@ license:CC0
 
 <softwarelist name="mtx_cart" description="Memotech MTX ROMPAK cartridges">
 
+	<software name="magrom100" cloneof="magrom">
+		<description>MAGROM v1.00</description>
+		<year>2014</year>
+		<publisher>Martin Allcorn</publisher>
+		<part name="cart" interface="mtx_cart">
+			<feature name="slot" value="magrom" />
+			<dataarea name="rom" size="524288">
+				<rom name="gamerom512v100.bin" size="524288" crc="84cf4bed" sha1="9a8b720ade7fe6b8fb272512e4d0a8e8e2e193db"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magrom102" cloneof="magrom">
+		<description>MAGROM v1.02</description>
+		<year>2014</year>
+		<publisher>Martin Allcorn</publisher>
+		<part name="cart" interface="mtx_cart">
+			<feature name="slot" value="magrom" />
+			<dataarea name="rom" size="524288">
+				<rom name="gamerom512v102.bin" size="524288" crc="6e1dd84e" sha1="57dbad4c460386afbab4dea270ddef06b4178f2c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magrom103" cloneof="magrom">
+		<description>MAGROM v1.03(SP)</description>
+		<year>2014</year>
+		<publisher>Martin Allcorn</publisher>
+		<part name="cart" interface="mtx_cart">
+			<feature name="slot" value="magrom" />
+			<dataarea name="rom" size="524288">
+				<rom name="gamerom512v103.bin" size="524288" crc="3d9ea96d" sha1="85f4fecda24f25549f8d4ab860efd7dacdbb7b17"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magrom104" cloneof="magrom">
+		<description>MAGROM v1.04</description>
+		<year>2014</year>
+		<publisher>Martin Allcorn</publisher>
+		<part name="cart" interface="mtx_cart">
+			<feature name="slot" value="magrom" />
+			<dataarea name="rom" size="524288">
+				<rom name="gamerom512v104.bin" size="524288" crc="145e5fd0" sha1="4a43ec6c9d9c9b29ff330599e003bfd842e6de06"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magrom105" cloneof="magrom">
+		<description>MAGROM v1.05</description>
+		<year>2017</year>
+		<publisher>Martin Allcorn</publisher>
+		<part name="cart" interface="mtx_cart">
+			<feature name="slot" value="magrom" />
+			<dataarea name="rom" size="524288">
+				<rom name="gamerom512v105.bin" size="524288" crc="98240ee9" sha1="d119f22373557ba840bfa416d123d3363493d3a9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magrom">
+		<description>MAGROM v1.05a</description>
+		<year>2020</year>
+		<publisher>Martin Allcorn</publisher>
+		<part name="cart" interface="mtx_cart">
+			<feature name="slot" value="magrom" />
+			<dataarea name="rom" size="524288">
+				<rom name="gamerom512v105a.bin" size="524288" crc="e3f495c4" sha1="2c0b16baeefb329a1ee8e55b06b72bbfc6a86302"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magrom2">
+		<description>MAGROM v2.00</description>
+		<year>2017</year>
+		<publisher>Martin Allcorn</publisher>
+		<part name="cart" interface="mtx_cart">
+			<feature name="slot" value="magrom" />
+			<dataarea name="rom" size="524288">
+				<rom name="magrom2-b190,280.bin" size="524288" crc="cbc13a32" sha1="476df6e6f5cb934be91136bfc8fcc963f90edc42"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="node" supported="no">
 		<description>MTX Node Ring</description>
 		<year>198?</year>
 		<publisher>Memotech</publisher>
 		<part name="cart" interface="mtx_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="node.rom" size="8192" crc="cb05a1b8" sha1="b040e5f062b460d4465050da31be66075dee2844" offset="0"/>
+				<rom name="node.rom" size="8192" crc="cb05a1b8" sha1="b040e5f062b460d4465050da31be66075dee2844"/>
 			</dataarea>
 		</part>
 	</software>

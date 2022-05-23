@@ -51,8 +51,9 @@
 #include "cpu/m6800/m6800.h"
 #include "eacc.lh"
 #include "machine/6821pia.h"
+#include "machine/7474.h"
+#include "machine/clock.h"
 #include "machine/nvram.h"
-#include "machine/timer.h"
 
 
 class eacc_state : public driver_device
@@ -63,6 +64,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_pia(*this, "pia")
 		, m_p_nvram(*this, "nvram")
+		, m_7474(*this, "7474")
 		, m_io_keyboard(*this, "X%u", 0U)
 		, m_digits(*this, "digit%u", 0U)
 		, m_leds(*this, "led%u", 0U)
@@ -75,24 +77,23 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	DECLARE_READ_LINE_MEMBER( cb1_r );
-	DECLARE_READ_LINE_MEMBER( distance_r );
-	DECLARE_READ_LINE_MEMBER( fuel_sensor_r );
+	DECLARE_WRITE_LINE_MEMBER(scan_w);
+	DECLARE_WRITE_LINE_MEMBER(cb2_w);
+	DECLARE_WRITE_LINE_MEMBER(inputs_w);
 	uint8_t keyboard_r();
-	DECLARE_WRITE_LINE_MEMBER( cb2_w );
 	void digit_w(uint8_t data);
 	void segment_w(uint8_t data);
-	TIMER_DEVICE_CALLBACK_MEMBER(cb1_timer);
-	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer);
 	void mem_map(address_map &map);
+	void do_nmi(bool, bool);
 	uint8_t m_digit = 0U;
-	bool m_cb1 = 0;
-	bool m_cb2 = 0;
-	bool m_nmi = 0;
+	bool m_cb2 = false;
+	bool m_scan = false;
+	bool m_disp = false;
 
 	required_device<m6802_cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
 	required_shared_ptr<uint8_t> m_p_nvram;
+	required_device<ttl7474_device> m_7474;
 	required_ioport_array<4> m_io_keyboard;
 	output_finder<7> m_digits;
 	output_finder<8> m_leds;
@@ -148,7 +149,8 @@ INPUT_PORTS_END
 
 void eacc_state::machine_reset()
 {
-	m_cb2 = 0;
+	m_cb2 = false; // pia is supposed to set this low at reset
+	m_digit = 0;
 }
 
 void eacc_state::machine_start()
@@ -156,45 +158,44 @@ void eacc_state::machine_start()
 	m_digits.resolve();
 	m_leds.resolve();
 
-	save_item(NAME(m_cb1));
 	save_item(NAME(m_cb2));
-	save_item(NAME(m_nmi));
+	save_item(NAME(m_scan));
+	save_item(NAME(m_digit));
+	save_item(NAME(m_disp));
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(eacc_state::cb1_timer)
+WRITE_LINE_MEMBER( eacc_state::inputs_w )
 {
-	m_cb1 ^= 1; // 15hz
-	if (m_cb2)
-		m_maincpu->set_input_line(M6802_IRQ_LINE, ASSERT_LINE);
+	if (state)
+		m_pia->ca1_w(machine().rand() & 1); // movement
+	else
+		m_pia->ca2_w(machine().rand() & 1); // fuel usage
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(eacc_state::nmi_timer)
+void eacc_state::do_nmi(bool in_scan, bool in_cb2)
 {
-	if (m_cb2)
+	if (in_scan && in_cb2)
 	{
-		m_nmi = true;
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_7474->clock_w(0);
 	}
-}
-
-READ_LINE_MEMBER( eacc_state::cb1_r )
-{
-	return (m_cb2) ? m_cb1 : 1;
-}
-
-READ_LINE_MEMBER( eacc_state::distance_r )
-{
-	return machine().rand() & 1; // needs random pulses to simulate movement
-}
-
-READ_LINE_MEMBER( eacc_state::fuel_sensor_r )
-{
-	return machine().rand() & 1; // needs random pulses to simulate fuel usage
+	else
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		m_7474->clock_w(1);
+	}
 }
 
 WRITE_LINE_MEMBER( eacc_state::cb2_w )
 {
-	m_cb2 = state;
+	m_cb2 = state ? 1 : 0;
+	do_nmi(m_scan, m_cb2);
+}
+
+WRITE_LINE_MEMBER( eacc_state::scan_w )
+{
+	m_scan = state ? 1 : 0;
+	do_nmi(m_scan, m_cb2);
 }
 
 uint8_t eacc_state::keyboard_r()
@@ -219,8 +220,9 @@ void eacc_state::segment_w(uint8_t data)
 	//d1 segment f
 	//d0 segment g
 
-	if (!m_nmi)
+	if (m_disp)
 	{
+		m_disp = false;
 		if (BIT(m_digit, 7))
 		{
 			data ^= 0xff;
@@ -239,12 +241,8 @@ void eacc_state::segment_w(uint8_t data)
 
 void eacc_state::digit_w(uint8_t data)
 {
-	if (m_nmi)
-	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-		m_nmi = false;
-	}
 	m_digit = data & 0xf8;
+	m_disp = true;
 }
 
 
@@ -263,9 +261,6 @@ void eacc_state::eacc(machine_config &config)
 
 	PIA6821(config, m_pia, 0);
 	m_pia->readpb_handler().set(FUNC(eacc_state::keyboard_r));
-	m_pia->readca1_handler().set(FUNC(eacc_state::distance_r));
-	m_pia->readcb1_handler().set(FUNC(eacc_state::cb1_r));
-	m_pia->readca2_handler().set(FUNC(eacc_state::fuel_sensor_r));
 	m_pia->writepa_handler().set(FUNC(eacc_state::segment_w));
 	m_pia->writepb_handler().set(FUNC(eacc_state::digit_w));
 	m_pia->cb2_handler().set(FUNC(eacc_state::cb2_w));
@@ -273,8 +268,18 @@ void eacc_state::eacc(machine_config &config)
 	m_pia->irqb_handler().set_inputline("maincpu", M6802_IRQ_LINE);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	TIMER(config, "eacc_nmi").configure_periodic(FUNC(eacc_state::nmi_timer), attotime::from_hz(600));
-	TIMER(config, "eacc_cb1").configure_periodic(FUNC(eacc_state::cb1_timer), attotime::from_hz(30));
+
+	TTL7474(config, m_7474, 0);
+	m_7474->output_cb().set(m_pia, FUNC(pia6821_device::cb1_w));
+
+	clock_device &eacc_scan(CLOCK(config, "eacc_scan", 600)); // 74C14 with 100k & 10nF = 1200Hz, but article says 600.
+	eacc_scan.signal_handler().set(FUNC(eacc_state::scan_w));
+
+	clock_device &eacc_cb1(CLOCK(config, "eacc_cb1", 15)); // cpu E -> MM5369 -> 15Hz
+	eacc_cb1.signal_handler().set(m_7474, FUNC(ttl7474_device::d_w));
+
+	clock_device &eacc_rnd(CLOCK(config, "eacc_rnd", 30)); // random pulse for distance and fuel
+	eacc_rnd.signal_handler().set(FUNC(eacc_state::inputs_w));
 }
 
 

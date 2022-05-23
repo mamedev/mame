@@ -576,9 +576,8 @@ bool source_token_t::parse(nlparse_t &setup, const pstring &name)
 	return false;
 }
 
-plib::istream_uptr source_token_t::stream(const pstring &name)
+plib::istream_uptr source_token_t::stream([[maybe_unused]] const pstring &name)
 {
-	plib::unused_var(name);
 	return plib::istream_uptr();
 }
 

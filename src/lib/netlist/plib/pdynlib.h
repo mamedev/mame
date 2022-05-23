@@ -7,14 +7,13 @@
 ///
 /// \file pdynlib.h
 ///
+/// Dynamic loading of libraries
+///
 
 #include "pstring.h"
 #include "ptypes.h"
 
 namespace plib {
-	// ----------------------------------------------------------------------------------------
-	// pdynlib: dynamic loading of libraries  ...
-	// ----------------------------------------------------------------------------------------
 
 	class dynlib_base
 	{
@@ -102,8 +101,8 @@ namespace plib {
 		dynproc() : m_sym(nullptr) { }
 
 		dynproc(dynlib_base &dl, const pstring &name) noexcept
+		: m_sym(dl.getsym<calltype>(name))
 		{
-			m_sym = dl.getsym<calltype>(name);
 		}
 
 		void load(dynlib_base &dl, const pstring &name) noexcept

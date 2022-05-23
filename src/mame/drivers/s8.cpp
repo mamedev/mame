@@ -170,7 +170,6 @@ private:
 	void sound_w(u8 data);
 	u8 switch_r();
 	void switch_w(u8 data);
-	DECLARE_READ_LINE_MEMBER(pia21_ca1_r);
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { } // enable solenoids
 	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { m_io_outputs[16] = state; } // dummy to stop error log filling up
@@ -424,12 +423,6 @@ void s8_state::sound_w(u8 data)
 	m_sound_data = data;
 }
 
-READ_LINE_MEMBER( s8_state::pia21_ca1_r )
-{
-// sound busy
-	return 1;
-}
-
 WRITE_LINE_MEMBER( s8_state::pia21_ca2_w )
 {
 // sound ns
@@ -606,7 +599,7 @@ void s8_state::s8(machine_config &config)
 	PIA6821(config, m_pia21, 0);
 	m_pia21->readpa_handler().set(FUNC(s8_state::sound_r));
 	m_pia21->set_port_a_input_overrides_output_mask(0xff);
-	m_pia21->readca1_handler().set(FUNC(s8_state::pia21_ca1_r));
+	m_pia21->ca1_w(1); // sound busy
 	m_pia21->writepa_handler().set(FUNC(s8_state::sound_w));
 	m_pia21->writepb_handler().set(FUNC(s8_state::sol2_w));
 	m_pia21->ca2_handler().set(FUNC(s8_state::pia21_ca2_w));

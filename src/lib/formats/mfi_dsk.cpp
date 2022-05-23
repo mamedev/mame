@@ -192,7 +192,7 @@ bool mfi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				return false;
 			}
 
-			std::vector<uint32_t> &trackbuf = image->get_buffer(cyl >> 2, head, cyl & 3);;
+			std::vector<uint32_t> &trackbuf = image->get_buffer(cyl >> 2, head, cyl & 3);
 			trackbuf.clear();
 
 			converter(uncompressed, trackbuf);

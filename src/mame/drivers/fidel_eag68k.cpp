@@ -198,8 +198,7 @@ public:
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
-		m_inputs(*this, "IN.%u", 0),
-		m_rotate(true)
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	// machine configs
@@ -238,7 +237,7 @@ protected:
 	void leds_w(offs_t offset, u8 data);
 	void digit_w(offs_t offset, u8 data);
 
-	bool m_rotate;
+	bool m_rotate = true;
 	u8 m_select = 0;
 	u8 m_7seg_data = 0;
 	u8 m_led_data = 0;

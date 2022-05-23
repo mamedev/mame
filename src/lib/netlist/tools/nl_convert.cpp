@@ -12,10 +12,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace netlist
-{
-
-namespace convert
+namespace netlist::convert
 {
 
 // FIXME: temporarily defined here - should be in a file
@@ -343,7 +340,7 @@ void nl_convert_spice_t::convert_block(const str_list &contents)
 void nl_convert_spice_t::convert(const pstring &contents)
 {
 	std::vector<pstring> spnl(plib::psplit(contents, '\n'));
-	std::vector<pstring> after_linecontinuation;
+	std::vector<pstring> after_line_continuation;
 
 	// Add gnd net
 
@@ -351,7 +348,7 @@ void nl_convert_spice_t::convert(const pstring &contents)
 
 	pstring line = "";
 
-	// process linecontinuation
+	// process line continuation
 
 	for (const auto &i : spnl)
 	{
@@ -361,24 +358,24 @@ void nl_convert_spice_t::convert(const pstring &contents)
 			line += inl.substr(1);
 		else
 		{
-			after_linecontinuation.push_back(line);
+			after_line_continuation.push_back(line);
 			line = inl;
 		}
 	}
-	after_linecontinuation.push_back(line);
+	after_line_continuation.push_back(line);
 	spnl.clear(); // no longer needed
 
-	// Process subcircuits
+	// Process sub circuits
 
 	std::vector<std::vector<pstring>> subckts;
 	std::vector<pstring> nl;
-	auto inp = after_linecontinuation.begin();
-	while (inp != after_linecontinuation.end())
+	auto inp = after_line_continuation.begin();
+	while (inp != after_line_continuation.end())
 	{
 		if (plib::startsWith(*inp, ".SUBCKT"))
 		{
 			std::vector<pstring> sub;
-			while (inp != after_linecontinuation.end())
+			while (inp != after_line_continuation.end())
 			{
 				auto s(*inp);
 				sub.push_back(s);
@@ -466,7 +463,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				else if (tt[0] == ".MODEL")
 				{
 					pstring mod(rem(tt,2));
-					// Filter out ngspice X=X model declarations
+					// Filter out `ngspice` X=X model declarations
 					if (tt[1] != mod)
 						out("NET_MODEL(\"{} {}\")\n", m_subckt + tt[1], mod);
 				}
@@ -480,13 +477,12 @@ void nl_convert_spice_t::process_line(const pstring &line)
 			case 'Q':
 			{
 				// check for fourth terminal ... should be numeric net
-				// including "0" or start with "N" (ltspice)
+				// including "0" or start with "N" (`ltspice`)
 
 				pstring model;
 				pstring pins ="CBE";
 				bool err(false);
-				auto nval = plib::pstonum_ne<long>(tt[4], err);
-				plib::unused_var(nval);
+				[[maybe_unused]] auto nval = plib::pstonum_ne<long>(tt[4], err);
 
 				if ((!err || plib::startsWith(tt[4], "N")) && tt.size() > 5)
 					model = tt[5];
@@ -528,7 +524,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				add_term(tt[1], tt[0] + ".1");
 				add_term(tt[2], tt[0] + ".2");
 				break;
-			case 'B':  // arbitrary behavioural current source - needs manual work afterwords
+			case 'B':  // arbitrary behavioural current source - needs manual work afterwards
 				add_device("CS", tt[0], "/*" + rem(tt, 3) + "*/");
 				add_term(tt[1], tt[0] + ".P");
 				add_term(tt[2], tt[0] + ".N");
@@ -565,7 +561,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 						add_term(nextnet, devname, 1);
 						add_term(net2[0], devname, 2);
 						add_term(net2[1], devname, 3);
-						//add_device_extra(devname, "PARAM({}, {})", devname + ".G", tt[scoeff+i]);
+						//# add_device_extra(devname, "PARAM({}, {})", devname + ".G", tt[scoeff+i]);
 						lastnet = nextnet;
 					}
 				}
@@ -600,7 +596,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 						pstring extranetname = devname + "net";
 						m_replace.push_back({tt[sce+i], devname + ".IP", extranetname });
 						add_term(extranetname, devname + ".IN");
-						//add_device_extra(devname, "PARAM({}, {})", devname + ".G", tt[scoeff+i]);
+						//# add_device_extra(devname, "PARAM({}, {})", devname + ".G", tt[scoeff+i]);
 					}
 				}
 				break;
@@ -738,7 +734,7 @@ nl_convert_eagle_t::tokenizer::tokenizer(nl_convert_eagle_t &convert)
 	this->identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-")
 		.number_chars(".0123456789", "0123456789eE-.") //FIXME: processing of numbers
 		.whitespace(pstring("") + ' ' + static_cast<char>(9) +  static_cast<char>(10) + static_cast<char>(13))
-		// FIXME: gnetlist doesn't print comments
+		// FIXME: netlist doesn't print comments
 		.comment("/*", "*/", "//")
 		.string_char('\'');
 	m_tok_ADD = register_token("ADD");
@@ -881,7 +877,7 @@ nl_convert_rinf_t::tokenizer::tokenizer(nl_convert_rinf_t &convert)
 	this->identifier_chars(".abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_-")
 		.number_chars("0123456789", "0123456789eE-.") //FIXME: processing of numbers
 		.whitespace(pstring("") + ' ' + static_cast<char>(9) +  static_cast<char>(10) + static_cast<char>(13))
-		// FIXME: gnetlist doesn't print comments
+		// FIXME: netlist doesn't print comments
 		.comment("","","//") // FIXME:needs to be confirmed
 		.string_char('"');
 	m_tok_HEA = register_token(".HEA");
@@ -1112,5 +1108,4 @@ void nl_convert_rinf_t::convert(const pstring &contents)
 
 }
 
-} // namespace convert
-} // namespace netlist
+} // namespace netlist::convert

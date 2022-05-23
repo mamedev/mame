@@ -135,7 +135,7 @@ namespace netlist
 					}
 					pstring paramfq = name + "." + tp;
 
-					log().debug("Defparam: {1}\n", paramfq);
+					log().debug("Default parameter: {1}\n", paramfq);
 
 					register_param(paramfq, *ptok);
 
@@ -496,12 +496,12 @@ pstring setup_t::termtype_as_str(detail::core_terminal_t &in)
 
 pstring setup_t::get_initial_param_val(const pstring &name, const pstring &def) const
 {
-	// when get_intial_param_val is called the parameter <name> is already registered
-	// and the value (valstr()) is set to the default value, e.g. "74XX"
-	// If thus $(IC5E.A.MODEL) is given for name=="IC5E.A.MODEL" valstr() below
+	// When `get_intial_param_val` is called the parameter `<name>` is already registered
+	// and the value `(valstr())` is set to the default value, e.g. "74XX"
+	// If thus `$(IC5E.A.MODEL)` is given for `name=="IC5E.A.MODEL"` `valstr()` below
 	// will return the default.
 	// FIXME: It may be more explicit and stable to test if pattern==name and return
-	// def in this case.
+	// `def` in this case.
 
 	auto i = m_abstract.m_param_values.find(name);
 	auto found_pat(false);
@@ -839,7 +839,7 @@ void setup_t::merge_nets(detail::net_t &thisnet, detail::net_t &othernet)
 
 	if (othernet.is_rail_net())
 	{
-		log().debug("othernet is railnet\n");
+		log().debug("other net is a rail net\n");
 		merge_nets(othernet, thisnet);
 	}
 	else
@@ -971,7 +971,7 @@ bool setup_t::connect_input_input(detail::core_terminal_t &t1, detail::core_term
 	if (t1.has_net())
 	{
 		if (t1.net().is_rail_net())
-			ret = connect(t2, t1.net().railterminal());
+			ret = connect(t2, t1.net().rail_terminal());
 		if (!ret)
 		{
 			for (auto & t : nlstate().core_terms(t1.net()))
@@ -986,7 +986,7 @@ bool setup_t::connect_input_input(detail::core_terminal_t &t1, detail::core_term
 	if (!ret && t2.has_net())
 	{
 		if (t2.net().is_rail_net())
-			ret = connect(t1, t2.net().railterminal());
+			ret = connect(t1, t2.net().rail_terminal());
 		if (!ret)
 		{
 			for (auto & t : nlstate().core_terms(t2.net()))
@@ -1336,7 +1336,7 @@ models_t::model_t models_t::get_model(const pstring &model)
 	if (map.empty())
 		model_parse(model , map);
 
-	return model_t(model, map);
+	return { model, map };
 }
 
 pstring models_t::model_t::value_str(const pstring &entity) const
@@ -1491,8 +1491,8 @@ const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 
 	auto ret = plib::make_unique<logic_family_std_proxy_t, host_arena>(ft);
 
-	ret->m_low_thresh_PCNT = modv.m_IVL();
-	ret->m_high_thresh_PCNT = modv.m_IVH();
+	ret->m_low_threshold_PCNT = modv.m_IVL();
+	ret->m_high_threshold_PCNT = modv.m_IVH();
 	ret->m_low_VO = modv.m_OVL();
 	ret->m_high_VO = modv.m_OVH();
 	ret->m_R_low = modv.m_ORL();
@@ -1685,7 +1685,7 @@ void setup_t::prepare_to_run()
 	for (auto &n : m_nlstate.nets())
 	{
 		for (auto & term : m_nlstate.core_terms(*n))
-			if (!term->delegate())
+			if (term->delegate().isnull())
 			{
 				log().fatal(MF_DELEGATE_NOT_SET_1(term->name()));
 				throw nl_exception(MF_DELEGATE_NOT_SET_1(term->name()));
@@ -1704,41 +1704,38 @@ bool source_netlist_t::parse(nlparse_t &setup, const pstring &name)
 	return (!strm.empty()) ? setup.parse_stream(std::move(strm), name) : false;
 }
 
-plib::istream_uptr source_string_t::stream(const pstring &name)
+plib::istream_uptr source_string_t::stream([[maybe_unused]] const pstring &name)
 {
-	plib::unused_var(name);
 	plib::istream_uptr ret(std::make_unique<std::istringstream>(putf8string(m_str)), name);
 	ret->imbue(std::locale::classic());
 	return ret;
 }
 
-plib::istream_uptr source_mem_t::stream(const pstring &name)
+plib::istream_uptr source_mem_t::stream([[maybe_unused]] const pstring &name)
 {
-	plib::unused_var(name);
 	plib::istream_uptr ret(std::make_unique<std::istringstream>(m_str, std::ios_base::binary), name);
 	ret->imbue(std::locale::classic());
 	return ret;
 }
 
-plib::istream_uptr source_file_t::stream(const pstring &name)
+plib::istream_uptr source_file_t::stream([[maybe_unused]] const pstring &name)
 {
-	plib::unused_var(name);
 	auto f = std::make_unique<plib::ifstream>(plib::filesystem::u8path(m_filename));
 	if (f->is_open())
 	{
-		return plib::istream_uptr(std::move(f), m_filename);
+		return { std::move(f), m_filename };
 	}
 
 	return plib::istream_uptr();
 }
 
-plib::istream_uptr source_pattern_t::stream(const pstring &name)
+plib::istream_uptr source_pattern_t::stream([[maybe_unused]] const pstring &name)
 {
 	pstring filename = plib::pfmt(m_pattern)(m_force_lowercase ? plib::lcase(name) : name);
 	auto f = std::make_unique<plib::ifstream>(plib::filesystem::u8path(filename));
 	if (f->is_open())
 	{
-		return plib::istream_uptr(std::move(f), filename);
+		return { std::move(f), filename };
 	}
 
 	return plib::istream_uptr();
@@ -1756,9 +1753,8 @@ bool source_proc_t::parse(nlparse_t &setup, const pstring &name)
 	return false;
 }
 
-plib::istream_uptr source_proc_t::stream(const pstring &name)
+plib::istream_uptr source_proc_t::stream([[maybe_unused]] const pstring &name)
 {
-	plib::unused_var(name);
 	return plib::istream_uptr();
 }
 

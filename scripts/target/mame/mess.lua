@@ -960,6 +960,7 @@ BUSES["PSX_CONTROLLER"] = true
 BUSES["PSX_PARALLEL"] = true
 BUSES["QBUS"] = true
 BUSES["QL"] = true
+BUSES["RC2014"] = true
 BUSES["RS232"] = true
 BUSES["PC8801"] = true
 BUSES["RTPC_KBD"] = true
@@ -1170,6 +1171,7 @@ FORMATS["THOM_CAS"] = true
 FORMATS["THOM_DSK"] = true
 FORMATS["TI99_DSK"] = true
 FORMATS["TIKI100_DSK"] = true
+FORMATS["TIM011_DSK"] = true
 FORMATS["TRD_DSK"] = true
 FORMATS["TRS80_DSK"] = true
 FORMATS["TRS_CAS"] = true
@@ -1402,6 +1404,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"sanyo",
 		"saturn",
 		"segacons",
+		"selchow",
 		"sequential",
 		"sgi",
 		"sharp",
@@ -1703,6 +1706,8 @@ files {
 	MAME_DIR .. "src/mame/includes/z88.h",
 	MAME_DIR .. "src/mame/machine/upd65031.cpp",
 	MAME_DIR .. "src/mame/machine/upd65031.h",
+	MAME_DIR .. "src/mame/machine/z88_impexp.cpp",
+	MAME_DIR .. "src/mame/machine/z88_impexp.h",
 	MAME_DIR .. "src/mame/video/z88.cpp",
 }
 
@@ -1917,7 +1922,8 @@ files {
 	MAME_DIR .. "src/mame/machine/atarifdc.cpp",
 	MAME_DIR .. "src/mame/machine/atarifdc.h",
 	MAME_DIR .. "src/mame/drivers/atarist.cpp",
-	MAME_DIR .. "src/mame/includes/atarist.h",
+	MAME_DIR .. "src/mame/machine/ataristb.cpp",
+	MAME_DIR .. "src/mame/machine/ataristb.h",
 	MAME_DIR .. "src/mame/video/atarist.cpp",
 	MAME_DIR .. "src/mame/video/atarist.h",
 	MAME_DIR .. "src/mame/drivers/lynx.cpp",
@@ -3384,6 +3390,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/nforcepc.cpp",
 	MAME_DIR .. "src/mame/drivers/pc.cpp",
 	MAME_DIR .. "src/mame/drivers/pcipc.cpp",
+	MAME_DIR .. "src/mame/drivers/sis630.cpp",
 	MAME_DIR .. "src/mame/drivers/tandy1t.cpp",
 	MAME_DIR .. "src/mame/drivers/tosh1000.cpp",
 	MAME_DIR .. "src/mame/machine/tosh1000_bram.cpp",
@@ -3686,6 +3693,11 @@ files {
 	MAME_DIR .. "src/mame/machine/megacd.h",
 	MAME_DIR .. "src/mame/machine/megacdcd.cpp",
 	MAME_DIR .. "src/mame/machine/megacdcd.h",
+}
+
+createMESSProjects(_target, _subtarget, "selchow")
+files {
+	MAME_DIR .. "src/mame/drivers/scrablex.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "sequential")
@@ -4736,6 +4748,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/pv9234.cpp",
 	MAME_DIR .. "src/mame/drivers/pwp14.cpp",
 	MAME_DIR .. "src/mame/drivers/qtsbc.cpp",
+	MAME_DIR .. "src/mame/drivers/rc2014.cpp",
 	MAME_DIR .. "src/mame/drivers/rd100.cpp",
 	MAME_DIR .. "src/mame/drivers/rvoice.cpp",
 	MAME_DIR .. "src/mame/drivers/sacstate.cpp",

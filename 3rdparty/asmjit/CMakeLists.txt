@@ -249,7 +249,8 @@ if (ASMJIT_SANITIZE)
   endif()
 endif()
 
-if (NOT WIN32)
+# Do not link to pthread on Android as it's part of C runtime.
+if (NOT WIN32 AND NOT ANDROID)
   list(APPEND ASMJIT_DEPS pthread)
 endif()
 

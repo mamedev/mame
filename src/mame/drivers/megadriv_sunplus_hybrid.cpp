@@ -76,24 +76,18 @@ static INPUT_PORTS_START( megadriv_sunplus )
 	PORT_INCLUDE( md_common )
 
 	PORT_MODIFY("PAD1")
-#if 0
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
-#else
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-#endif
+	//PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("PAD2")
-#if 0
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 )
-##else
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-#endif
+	//PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -171,7 +165,7 @@ ROM_END
 
 
 // Two systems in one unit - Genesis on a Chip and SunPlus, only the SunPlus part is currently emulated.  Genesis on a chip is a very poor implementation with many issues on real hardware.
-// This should actually boot to a menu on the MD size, with the SunPlus only being enabled if selected from that menu.  MD side menu runs in some enhanced / custom MD mode though.
+// This should actually boot to a menu on the MD side, with the SunPlus only being enabled if selected from that menu.  MD side menu runs in some enhanced / custom MD mode though.
 // Badminton hangs, as it does in the 49-in-1 above
-CONS( 2009, reactmd,  0, 0, megadriv_sunplus_pal,    megadriv_sunplus, megadriv_sunplus_state,      init_reactmd,    "AtGames / Sega / Waixing",                              "Reactor MD (PAL)",                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2009, reactmd,  0, 0, megadriv_sunplus_pal, megadriv_sunplus, megadriv_sunplus_state, init_reactmd, "AtGames / Sega / Waixing", "Reactor MD (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 

@@ -83,7 +83,7 @@ public:
 
 	// Active low lines. We're using ASSERT=0 / CLEAR=1
 	line_state      ready_r() { return m_ready? ASSERT_LINE : CLEAR_LINE; }
-	line_state      seek_complete_r() { return m_seek_complete? ASSERT_LINE : CLEAR_LINE; } ;
+	line_state      seek_complete_r() { return m_seek_complete? ASSERT_LINE : CLEAR_LINE; }
 	line_state      trk00_r() { return m_current_cylinder==0? ASSERT_LINE : CLEAR_LINE; }
 
 	// Data output towards controller

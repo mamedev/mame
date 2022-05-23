@@ -20,10 +20,7 @@
 //  convert - convert a spice netlist
 // -------------------------------------------------
 
-namespace netlist
-{
-
-namespace convert
+namespace netlist::convert
 {
 
 using arena = plib::aligned_arena;
@@ -75,7 +72,7 @@ protected:
 
 	struct replace_t
 	{
-		pstring m_ce; // controlling element - must be twoterm
+		pstring m_ce; // controlling element - must be a two terminal element
 		pstring m_repterm; // replace with terminal
 		pstring m_net; // connect to net
 	};
@@ -285,7 +282,6 @@ private:
 
 };
 
-} // namespace convert
-} // namespace netlist
+} // namespace netlist::convert
 
 #endif // NL_CONVERT_H_

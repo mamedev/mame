@@ -100,6 +100,7 @@ void bbc_tube_x25_device::device_add_mconfig(machine_config &config)
 	TUBE(config, m_ula);
 	m_ula->pnmi_handler().set_inputline(m_z80[0], INPUT_LINE_NMI);
 	m_ula->pirq_handler().set_inputline(m_z80[0], INPUT_LINE_IRQ0);
+	m_ula->prst_handler().set_inputline(m_z80[0], INPUT_LINE_RESET);
 
 	Z80(config, m_z80[1], 12_MHz_XTAL / 4);
 	m_z80[1]->set_addrmap(AS_PROGRAM, &bbc_tube_x25_device::secondary_mem);

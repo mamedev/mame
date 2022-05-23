@@ -10,13 +10,21 @@ license:CC0
 <softwarelist name="specpls3_flop" description="Sinclair ZX Spectrum +3 disk images">
 
 <!--
-    SPS / CAPS Releases
-    http://www.softpres.org/_media/files:datafiles.zip?id=download&cache=cache
+    Known undumped:
+        Chichén Itzá (likely but unconfirmed)
+        Comando Tracer (dual-system Spectrum/Amstrad release)
+        Psycho Pigs UXB
 
-    Known missing IPF dumps:
+    Known missing SPS/CAPS IPF dumps (http://www.softpres.org/_media/files:datafiles.zip?id=download&cache=cache):
         3585    LED Storm: Lazer Enhanced Destruction
         3607    Rock Star Ate My Hamster
         3625    Tiger Road
+
+    Observations:
+        Artura (alt): Side B has Hardball for the Amstrad CPC, was this edition accidentally sold like this?
+
+    TO DO:
+        Some DSK images may come from the same releases as their respective IPFs. These cases need to be compared and verified to be the same thing before the redundant (and inferior) DSKs can be discarded.
 -->
 
 	<software name="qoscrup">
@@ -7545,17 +7553,18 @@ license:CC0
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="arturaa" cloneof="artura">
 	<!-- May be the same edition as the IPF -->
+	<!--    Side B has Hardball for the Amstrad CPC, was this edition accidentally sold like this?  -->
 		<description>Artura (alt)</description>
 		<year>1989</year>
 		<publisher>Gremlin Graphics Software</publisher>
 		<part name="flop1" interface="floppy_3">
-			<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A: Artura (ZX Spectrum)"/>
 			<dataarea name="flop" size="194816">
 				<rom name="artura (1989)(gremlin graphics)(side a).dsk" size="194816" crc="a60019cb" sha1="3303b24cc705b4b6051223d653288ef115d90b2d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3">
-			<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B: Hardball (Amstrad CPC)"/>
 			<dataarea name="flop" size="194816">
 				<rom name="artura (1989)(gremlin graphics)(side b).dsk" size="194816" crc="9e8f9c27" sha1="4e2b395bbaf8e08341f515cdfc5744931d72872b" offset="0" />
 			</dataarea>
@@ -9066,21 +9075,13 @@ license:CC0
 
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="comtracr">
-	<!-- This is a dual-system Spectrum/Amstrad release (Side A: ZX Spectrum, Side B: Amstrad CPC) -->
 		<description>Comando Tracer</description>
 		<year>1988</year>
 		<publisher>Dinamic Software</publisher>
 		<part name="flop1" interface="floppy_3">
-		<!-- Dump of side A might come from standalone version -->
 			<feature name="part_id" value="Side A: ZX Spectrum"/>
 			<dataarea name="flop" size="75008">
 				<rom name="comando tracer (1988)(dinamic)(es).dsk" size="75008" crc="985c2136" sha1="be76783bd8429b9f3ec2cd8702e7419b1c632ee6" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3">
-			<feature name="part_id" value="Side B: Amstrad CPC"/>
-			<dataarea name="flop" size = "69871">
-				<rom name="comando tracer (s) (1988) (cpm) [original].dsk" size="69871" crc="0261b785" sha1="767457b02516699c9d463f6c0ba69402fe87a813" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -20231,6 +20232,24 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="mis5estr">
+		<description>Made in Spain 5 Estrellas</description>
+		<year>1989</year>
+		<publisher>Zigurat Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Side A: Presentación, Sir Fred, Humphrey"/>
+			<dataarea name="flop" size="171225">
+				<rom name="made in spain 5 estrellas - side 1.dsk" size="171225" crc="4be77f9d" sha1="bfba9faef9193b1fe735b5540ee558f0ea586a6e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Side B: Fred, El Misterio del Nilo, Afteroids"/>
+			<dataarea name="flop" size="156579">
+				<rom name="made in spain 5 estrellas - side 2.dsk" size="156579" crc="bebd4a73" sha1="00076cda545b36315fc19ce17b6666387fde81cd" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="m3unlock">
 		<description>M3 Unlock</description>
 		<year>1990</year>
@@ -20522,6 +20541,17 @@ license:CC0
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="195635">
 				<rom name="shoot-out.dsk" size="195635" crc="f1d2de4a" sha1="b637f338f92e03742553f0400e12ab81874119de" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sptenis">
+		<description>Simulador Profesional de Tenis</description>
+		<year>1990</year>
+		<publisher>Dinamic Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="75255">
+				<rom name="simulador profesional de tenis.dsk" size="75255" crc="b824547a" sha1="d23559d0b4505403efbeb5d7c561b0e5a1a8c425" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

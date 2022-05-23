@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Couriersud
 
+// Names
+// spell-checker: words Woodbury,
 
 #include "nl_factory.h"
 #include "core/setup.h"
@@ -23,9 +25,7 @@
 #include <algorithm>
 #include <type_traits>
 
-namespace netlist
-{
-namespace devices
+namespace netlist::devices
 {
 
 	// ----------------------------------------------------------------------------------------
@@ -56,8 +56,8 @@ namespace devices
 		const netlist_time_ext now(exec().time());
 		const std::size_t nthreads = m_params.m_parallel() < 2 ? 1 : std::min(static_cast<std::size_t>(m_params.m_parallel()), plib::omp::get_max_threads());
 		const netlist_time_ext sched(now + (nthreads <= 1 ? netlist_time_ext::zero() : netlist_time_ext::from_nsec(100)));
-		plib::uninitialised_array<solver::matrix_solver_t *, config::MAX_SOLVER_QUEUE_SIZE::value> tmp; //NOLINT
-		plib::uninitialised_array<netlist_time, config::MAX_SOLVER_QUEUE_SIZE::value> nt; //NOLINT
+		plib::uninitialised_array<solver::matrix_solver_t *, config::max_solver_queue_size::value> tmp; //NOLINT
+		plib::uninitialised_array<netlist_time, config::max_solver_queue_size::value> nt; //NOLINT
 		std::size_t p=0;
 
 		while (!m_queue.empty())
@@ -152,15 +152,13 @@ namespace devices
 			plib::omp::set_num_threads(nthreads);
 			plib::omp::for_static(static_cast<std::size_t>(0), solvers.size(), [&solvers, now](std::size_t i)
 				{
-					const netlist_time ts = solvers[i]->ptr->solve(now);
-					plib::unused_var(ts);
+					[[maybe_unused]] const netlist_time ts = solvers[i]->ptr->solve(now);
 				});
 		}
 		else
 			for (auto & solver : solvers)
 			{
-				const netlist_time ts = solver->ptr->solve(now);
-				plib::unused_var(ts);
+				[[maybe_unused]] const netlist_time ts = solver->ptr->solve(now);
 			}
 
 		for (auto & solver : solvers)
@@ -362,6 +360,7 @@ namespace devices
 						auto &pt = dynamic_cast<terminal_t &>(*term);
 						// check the connected terminal
 						const auto *const connected_terminals = nlstate.setup().get_connected_terminals(pt);
+						// NOLINTNEXTLINE proposal does not work for VS
 						for (auto ct = connected_terminals->begin(); *ct != nullptr; ct++)
 						{
 							analog_net_t &connected_net = (*ct)->net();
@@ -416,9 +415,9 @@ namespace devices
 					}
 					else
 					{
-						auto *otherterm = dynamic_cast<terminal_t *>(t);
-						if (otherterm != nullptr)
-							if (state().setup().get_connected_terminal(*otherterm)->net().is_rail_net())
+						auto *other_terminal = dynamic_cast<terminal_t *>(t);
+						if (other_terminal != nullptr)
+							if (state().setup().get_connected_terminal(*other_terminal)->net().is_rail_net())
 								railterms++;
 					}
 				}
@@ -443,7 +442,7 @@ namespace devices
 			switch (params->m_fp_type())
 			{
 				case solver::matrix_fp_type_e::FLOAT:
-					if (!config::use_float_matrix())
+					if (!config::use_float_matrix::value)
 						log().info("FPTYPE {1} not supported. Using DOUBLE", params->m_fp_type().name());
 					ms = create_solvers<std::conditional_t<config::use_float_matrix::value, float, double>>(sname, params.get(), grp);
 					break;
@@ -451,7 +450,7 @@ namespace devices
 					ms = create_solvers<double>(sname, params.get(), grp);
 					break;
 				case solver::matrix_fp_type_e::LONGDOUBLE:
-					if (!config::use_long_double_matrix())
+					if (!config::use_long_double_matrix::value)
 						log().info("FPTYPE {1} not supported. Using DOUBLE", params->m_fp_type().name());
 					ms = create_solvers<std::conditional_t<config::use_long_double_matrix::value, long double, double>>(sname, params.get(), grp);
 					break;
@@ -468,7 +467,7 @@ namespace devices
 			log().verbose("Solver {1}", ms->name());
 			log().verbose("       ==> {1} nets", grp.size());
 			log().verbose("       has {1} dynamic elements", ms->dynamic_device_count());
-			log().verbose("       has {1} timestep elements", ms->timestep_device_count());
+			log().verbose("       has {1} time step elements", ms->timestep_device_count());
 			for (auto &n : grp)
 			{
 				log().verbose("Net {1}", n->name());
@@ -512,5 +511,4 @@ namespace devices
 
 	NETLIB_DEVICE_IMPL(solver, "SOLVER", "FREQ")
 
-} // namespace devices
-} // namespace netlist
+} // namespace netlist::devices

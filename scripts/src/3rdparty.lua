@@ -2234,6 +2234,13 @@ project "asmjit"
 	uuid "4539757c-6e99-4bae-b3d0-b342a7c49539"
 	kind "StaticLib"
 
+	configuration { "gmake or ninja" }
+	if (_OPTIONS["gcc"] ~= nil) and (not string.find(_OPTIONS["gcc"], "clang")) and (str_to_version(_OPTIONS["gcc_version"]) < 80000) then
+		buildoptions {
+			"-Wno-maybe-uninitialized",
+		}
+	end
+
 	configuration { }
 
 	if _OPTIONS["targetos"]=="macosx" and _OPTIONS["gcc"]~=nil then

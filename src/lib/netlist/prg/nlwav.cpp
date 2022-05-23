@@ -21,7 +21,7 @@
 // is a common agreement in serious recording applications while
 // still recording the file. So a playback application can determine that the
 // given file is still being recorded. As soon as the recording application
-// finishes the ongoing recording, it writes the correct values for RIFF lenth
+// finishes the ongoing recording, it writes the correct values for RIFF length
 // and data chunk length to the file.
 //
 // http://de.wikipedia.org/wiki/RIFF_WAVE
@@ -88,7 +88,7 @@ public:
 		sample *= mmax;
 		sample = std::max(mmin, sample);
 		sample = std::min(mmax, sample);
-		const auto dest(static_cast<T>(sample));
+		const T dest(static_cast<T>(sample));
 		write(dest);
 	}
 
@@ -177,7 +177,7 @@ private:
 class log_processor
 {
 public:
-	using callback_type = plib::pmfp<void, std::size_t, double, double>;
+	using callback_type = plib::pmfp<void (std::size_t, double, double)>;
 
 	struct elem
 	{
@@ -256,7 +256,7 @@ private:
 
 struct aggregator
 {
-	using callback_type = plib::pmfp<void, std::size_t, double, double>;
+	using callback_type = plib::pmfp<void (std::size_t, double, double)>;
 
 	aggregator(std::size_t channels, double quantum, callback_type cb)
 	: m_channels(channels)
@@ -299,7 +299,7 @@ private:
 
 struct filter_hp
 {
-	using callback_type = plib::pmfp<void, std::size_t, double, double>;
+	using callback_type = plib::pmfp<void (std::size_t, double, double)>;
 
 	filter_hp(double freq, bool boost, std::size_t channels, callback_type cb)
 	: m_cb(cb)
@@ -335,7 +335,7 @@ private:
 
 struct filter_lp
 {
-	using callback_type = plib::pmfp<void, std::size_t, double, double>;
+	using callback_type = plib::pmfp<void (std::size_t, double, double)>;
 
 	filter_lp(double freq, std::size_t channels, callback_type cb)
 	: m_cb(cb)
@@ -401,7 +401,7 @@ public:
 				val = outsam * m_amp;
 			} while (plib::abs(val) > 1.0);
 			// FIXME: log this in state and provide on verbose output
-			//printf("dynamp adjusted to %f at %f\n", m_amp, time);
+			//printf("dynamic amplification adjusted to %f at %f\n", m_amp, time);
 		}
 		m_samples[chan] = val;
 	}
@@ -825,6 +825,7 @@ int nlwav_app::execute()
 
 PMAIN(nlwav_app)
 
+// spell-checker:disable
 //
 // Der Daten-Abschnitt enth??lt die Abtastwerte:
 // Offset  L??nge  Inhalt  Beschreibung
@@ -846,3 +847,4 @@ PMAIN(nlwav_app)
 // 32 (0x20)   2   <block align>   Frame-Gr????e = <Anzahl der Kan??le>????????((<Bits/Sample (eines Kanals)>???+???7)???/???8)   (Division ohne Rest)
 // 34 (0x22)   2   <bits/sample>   Anzahl der Datenbits pro Samplewert je Kanal (z. B. 12)
 //
+// spell-checker:enable

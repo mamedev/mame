@@ -82,7 +82,6 @@ private:
 	void pia0_ca2_w(int state);
 
 	void pia1_pa_w(uint8_t data);
-	int pia1_ca1_r();
 	void pia1_ca2_w(int state);
 
 	uint8_t m_keyboard_data;

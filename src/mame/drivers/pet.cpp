@@ -1674,7 +1674,6 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 	PIA6821(config, m_pia1, 0);
 	m_pia1->readpa_handler().set(FUNC(pet_state::pia1_pa_r));
 	m_pia1->readpb_handler().set(FUNC(pet_state::pia1_pb_r));
-	m_pia1->readca1_handler().set(PET_DATASSETTE_PORT_TAG, FUNC(pet_datassette_port_device::read));
 	m_pia1->writepa_handler().set(FUNC(pet_state::pia1_pa_w));
 	m_pia1->ca2_handler().set(FUNC(pet_state::pia1_ca2_w));
 	m_pia1->cb2_handler().set(PET_DATASSETTE_PORT_TAG, FUNC(pet_datassette_port_device::motor_w));
@@ -1694,7 +1693,7 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 	m_ieee->srq_callback().set(m_pia2, FUNC(pia6821_device::cb1_w));
 	m_ieee->atn_callback().set(m_pia2, FUNC(pia6821_device::ca1_w));
 
-	PET_DATASSETTE_PORT(config, PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c2n").read_handler().set(M6520_1_TAG, FUNC(pia6821_device::ca1_w));
+	PET_DATASSETTE_PORT(config, PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c2n").read_handler().set(m_pia1, FUNC(pia6821_device::ca1_w));
 	PET_DATASSETTE_PORT(config, PET_DATASSETTE_PORT2_TAG, cbm_datassette_devices, nullptr).read_handler().set(M6522_TAG, FUNC(via6522_device::write_cb1));
 
 	PET_EXPANSION_SLOT(config, m_exp, XTAL(16'000'000)/16, pet_expansion_cards, nullptr);

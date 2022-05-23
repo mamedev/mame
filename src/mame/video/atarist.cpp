@@ -13,7 +13,8 @@
 
 #include "emu.h"
 #include "video/atarist.h"
-#include "includes/atarist.h"
+#include "cpu/m68000/m68000.h"
+#include "screen.h"
 
 
 
@@ -21,7 +22,10 @@
 //  CONSTANTS / MACROS
 //**************************************************************************
 
-#define LOG 0
+DEFINE_DEVICE_TYPE(ST_VIDEO, st_video_device, "st_video", "Atari ST Video ASICs")
+DEFINE_DEVICE_TYPE(STE_VIDEO, ste_video_device, "ste_video", "Atari STe Video ASICs")
+//DEFINE_DEVICE_TYPE(STBOOK_VIDEO, stbook_video_device, "stbook_video", "Atari STbook Video ASICs")
+//DEFINE_DEVICE_TYPE(TT_VIDEO, tt_video_device, "tt_video", "Atari TT Video ASICs")
 
 static const int BLITTER_NOPS[16][4] =
 {
@@ -52,7 +56,7 @@ static const int BLITTER_NOPS[16][4] =
 //  shift_mode_0 -
 //-------------------------------------------------
 
-inline pen_t st_state::shift_mode_0()
+inline pen_t st_video_device::shift_mode_0()
 {
 	int color = (BIT(m_shifter_rr[3], 15) << 3) | (BIT(m_shifter_rr[2], 15) << 2) | (BIT(m_shifter_rr[1], 15) << 1) | BIT(m_shifter_rr[0], 15);
 
@@ -61,7 +65,7 @@ inline pen_t st_state::shift_mode_0()
 	m_shifter_rr[2] <<= 1;
 	m_shifter_rr[3] <<= 1;
 
-	return m_palette->pen(color);
+	return pen(color);
 }
 
 
@@ -69,7 +73,7 @@ inline pen_t st_state::shift_mode_0()
 //  shift_mode_1 -
 //-------------------------------------------------
 
-inline pen_t st_state::shift_mode_1()
+inline pen_t st_video_device::shift_mode_1()
 {
 	int color = (BIT(m_shifter_rr[1], 15) << 1) | BIT(m_shifter_rr[0], 15);
 
@@ -85,7 +89,7 @@ inline pen_t st_state::shift_mode_1()
 		m_shifter_shift = 0;
 	}
 
-	return m_palette->pen(color);
+	return pen(color);
 }
 
 
@@ -93,7 +97,7 @@ inline pen_t st_state::shift_mode_1()
 //  shift_mode_2 -
 //-------------------------------------------------
 
-inline pen_t st_state::shift_mode_2()
+inline pen_t st_video_device::shift_mode_2()
 {
 	int color = BIT(m_shifter_rr[0], 15);
 
@@ -122,7 +126,7 @@ inline pen_t st_state::shift_mode_2()
 		break;
 	}
 
-	return m_palette->pen(color);
+	return pen(color);
 }
 
 
@@ -130,10 +134,10 @@ inline pen_t st_state::shift_mode_2()
 //  shifter_tick -
 //-------------------------------------------------
 
-void st_state::shifter_tick()
+TIMER_CALLBACK_MEMBER(st_video_device::shifter_tick)
 {
-	int y = m_screen->vpos();
-	int x = m_screen->hpos();
+	int y = screen().vpos();
+	int x = screen().hpos();
 
 	pen_t pen;
 
@@ -152,7 +156,7 @@ void st_state::shifter_tick()
 		break;
 
 	default:
-		pen = m_palette->black_pen();
+		pen = black_pen();
 		break;
 	}
 
@@ -164,10 +168,9 @@ void st_state::shifter_tick()
 //  shifter_load -
 //-------------------------------------------------
 
-inline void st_state::shifter_load()
+inline void st_video_device::shifter_load()
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-	uint16_t data = program.read_word(m_shifter_ofs);
+	uint16_t data = m_ram_space->read_word(m_shifter_ofs);
 
 	m_shifter_ir[m_shifter_bitplane] = data;
 	m_shifter_bitplane++;
@@ -189,24 +192,20 @@ inline void st_state::shifter_load()
 //  glue_tick -
 //-------------------------------------------------
 
-void st_state::draw_pixel(int x, int y, u32 pen)
+void st_video_device::draw_pixel(int x, int y, u32 pen)
 {
 	if(x < m_bitmap.width() && y < m_bitmap.height())
 		m_bitmap.pix(y, x) = pen;
 }
 
-void st_state::glue_tick()
+TIMER_CALLBACK_MEMBER(st_video_device::glue_tick)
 {
-	int y = m_screen->vpos();
-	int x = m_screen->hpos();
+	int y = screen().vpos();
+	int x = screen().hpos();
 
 	int v = (y >= m_shifter_y_start) && (y < m_shifter_y_end);
 	int h = (x >= m_shifter_x_start) && (x < m_shifter_x_end);
 
-	if(m_shifter_mode == 1) {
-		int dt = 8;
-		h = (x >= m_shifter_x_start-dt) && (x < m_shifter_x_end-dt);
-	}
 	int de = h && v;
 
 	if(!x) {
@@ -216,7 +215,7 @@ void st_state::glue_tick()
 
 	if (de != m_shifter_de)
 	{
-		m_mfp->tbi_w(de);
+		m_de_callback(de);
 		m_shifter_de = de;
 	}
 
@@ -227,13 +226,13 @@ void st_state::glue_tick()
 
 	if ((y == m_shifter_vblank_start) && (x == 0))
 	{
-		m_maincpu->set_input_line(M68K_IRQ_4, HOLD_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_4, HOLD_LINE); // FIXME: make this a callback instead
 		m_shifter_ofs = m_shifter_base;
 	}
 
 	if (x == m_shifter_hblank_start)
 	{
-		m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE); // FIXME: make this a callback instead
 //      m_shifter_ofs += (m_shifter_lineofs * 2); // STe
 	}
 
@@ -280,7 +279,7 @@ void st_state::glue_tick()
 		break;
 
 	default:
-		pen = m_palette->black_pen();
+		pen = black_pen();
 		break;
 	}
 }
@@ -290,7 +289,7 @@ void st_state::glue_tick()
 //  set_screen_parameters -
 //-------------------------------------------------
 
-void st_state::set_screen_parameters()
+void st_video_device::set_screen_parameters()
 {
 	if (m_shifter_sync & 0x02)
 	{
@@ -317,7 +316,7 @@ void st_state::set_screen_parameters()
 //  shifter_base_r -
 //-------------------------------------------------
 
-uint8_t st_state::shifter_base_r(offs_t offset)
+uint8_t st_video_device::shifter_base_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -340,7 +339,7 @@ uint8_t st_state::shifter_base_r(offs_t offset)
 //  shifter_base_w -
 //-------------------------------------------------
 
-void st_state::shifter_base_w(offs_t offset, uint8_t data)
+void st_video_device::shifter_base_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -361,7 +360,7 @@ void st_state::shifter_base_w(offs_t offset, uint8_t data)
 //  shifter_counter_r -
 //-------------------------------------------------
 
-uint8_t st_state::shifter_counter_r(offs_t offset)
+uint8_t st_video_device::shifter_counter_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -388,7 +387,7 @@ uint8_t st_state::shifter_counter_r(offs_t offset)
 //  shifter_sync_r -
 //-------------------------------------------------
 
-uint8_t st_state::shifter_sync_r()
+uint8_t st_video_device::shifter_sync_r()
 {
 	return m_shifter_sync;
 }
@@ -398,7 +397,7 @@ uint8_t st_state::shifter_sync_r()
 //  shifter_sync_w -
 //-------------------------------------------------
 
-void st_state::shifter_sync_w(uint8_t data)
+void st_video_device::shifter_sync_w(uint8_t data)
 {
 	m_shifter_sync = data;
 	logerror("SHIFTER Sync %x\n", m_shifter_sync);
@@ -410,7 +409,7 @@ void st_state::shifter_sync_w(uint8_t data)
 //  shifter_mode_r -
 //-------------------------------------------------
 
-uint8_t st_state::shifter_mode_r()
+uint8_t st_video_device::shifter_mode_r()
 {
 	return m_shifter_mode;
 }
@@ -420,7 +419,7 @@ uint8_t st_state::shifter_mode_r()
 //  shifter_mode_w -
 //-------------------------------------------------
 
-void st_state::shifter_mode_w(uint8_t data)
+void st_video_device::shifter_mode_w(uint8_t data)
 {
 	m_shifter_mode = data;
 	logerror("SHIFTER Mode %x\n", m_shifter_mode);
@@ -431,7 +430,7 @@ void st_state::shifter_mode_w(uint8_t data)
 //  shifter_palette_r -
 //-------------------------------------------------
 
-uint16_t st_state::shifter_palette_r(offs_t offset)
+uint16_t st_video_device::shifter_palette_r(offs_t offset)
 {
 	return m_shifter_palette[offset] | 0xf888;
 }
@@ -441,12 +440,12 @@ uint16_t st_state::shifter_palette_r(offs_t offset)
 //  shifter_palette_w -
 //-------------------------------------------------
 
-void st_state::shifter_palette_w(offs_t offset, uint16_t data)
+void st_video_device::shifter_palette_w(offs_t offset, uint16_t data)
 {
 	m_shifter_palette[offset] = data;
 	//  logerror("SHIFTER Palette[%x] = %x\n", offset, data);
 
-	m_palette->set_pen_color(offset, pal3bit(data >> 8), pal3bit(data >> 4), pal3bit(data));
+	set_pen_color(offset, pal3bit(data >> 8), pal3bit(data >> 4), pal3bit(data));
 }
 
 
@@ -459,7 +458,7 @@ void st_state::shifter_palette_w(offs_t offset, uint16_t data)
 //  shifter_base_low_r -
 //-------------------------------------------------
 
-uint8_t ste_state::shifter_base_low_r()
+uint8_t ste_video_device::shifter_base_low_r()
 {
 	return m_shifter_base & 0xfe;
 }
@@ -469,7 +468,7 @@ uint8_t ste_state::shifter_base_low_r()
 //  shifter_base_low_w -
 //-------------------------------------------------
 
-void ste_state::shifter_base_low_w(uint8_t data)
+void ste_video_device::shifter_base_low_w(uint8_t data)
 {
 	m_shifter_base = (m_shifter_base & 0x3fff00) | (data & 0xfe);
 	logerror("SHIFTER Video Base Address %06x\n", m_shifter_base);
@@ -480,7 +479,7 @@ void ste_state::shifter_base_low_w(uint8_t data)
 //  shifter_counter_r -
 //-------------------------------------------------
 
-uint8_t ste_state::shifter_counter_r(offs_t offset)
+uint8_t ste_video_device::shifter_counter_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -507,7 +506,7 @@ uint8_t ste_state::shifter_counter_r(offs_t offset)
 //  shifter_counter_w -
 //-------------------------------------------------
 
-void ste_state::shifter_counter_w(offs_t offset, uint8_t data)
+void ste_video_device::shifter_counter_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -533,7 +532,7 @@ void ste_state::shifter_counter_w(offs_t offset, uint8_t data)
 //  shifter_palette_w -
 //-------------------------------------------------
 
-void ste_state::shifter_palette_w(offs_t offset, uint16_t data)
+void ste_video_device::shifter_palette_w(offs_t offset, uint16_t data)
 {
 	int r = ((data >> 7) & 0x0e) | BIT(data, 11);
 	int g = ((data >> 3) & 0x0e) | BIT(data, 7);
@@ -542,7 +541,7 @@ void ste_state::shifter_palette_w(offs_t offset, uint16_t data)
 	m_shifter_palette[offset] = data;
 	logerror("SHIFTER palette %x = %x\n", offset, data);
 
-	m_palette->set_pen_color(offset, r, g, b);
+	set_pen_color(offset, r, g, b);
 }
 
 
@@ -550,7 +549,7 @@ void ste_state::shifter_palette_w(offs_t offset, uint16_t data)
 //  shifter_lineofs_r -
 //-------------------------------------------------
 
-uint8_t ste_state::shifter_lineofs_r()
+uint8_t ste_video_device::shifter_lineofs_r()
 {
 	return m_shifter_lineofs;
 }
@@ -560,7 +559,7 @@ uint8_t ste_state::shifter_lineofs_r()
 //  shifter_lineofs_w -
 //-------------------------------------------------
 
-void ste_state::shifter_lineofs_w(uint8_t data)
+void ste_video_device::shifter_lineofs_w(uint8_t data)
 {
 	m_shifter_lineofs = data;
 	logerror("SHIFTER Line Offset %x\n", m_shifter_lineofs);
@@ -571,7 +570,7 @@ void ste_state::shifter_lineofs_w(uint8_t data)
 //  shifter_pixelofs_r -
 //-------------------------------------------------
 
-uint8_t ste_state::shifter_pixelofs_r()
+uint8_t ste_video_device::shifter_pixelofs_r()
 {
 	return m_shifter_pixelofs;
 }
@@ -581,7 +580,7 @@ uint8_t ste_state::shifter_pixelofs_r()
 //  shifter_pixelofs_w -
 //-------------------------------------------------
 
-void ste_state::shifter_pixelofs_w(uint8_t data)
+void ste_video_device::shifter_pixelofs_w(uint8_t data)
 {
 	m_shifter_pixelofs = data & 0x0f;
 	logerror("SHIFTER Pixel Offset %x\n", m_shifter_pixelofs);
@@ -590,495 +589,47 @@ void ste_state::shifter_pixelofs_w(uint8_t data)
 
 
 //**************************************************************************
-//  BLITTER
-//**************************************************************************
-
-//-------------------------------------------------
-//  blitter_source -
-//-------------------------------------------------
-
-void st_state::blitter_source()
-{
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-	uint16_t data = program.read_word(m_blitter_src);
-
-	if (m_blitter_src_inc_x < 0)
-	{
-		m_blitter_srcbuf = (data << 16) | (m_blitter_srcbuf >> 16);
-	}
-	else
-	{
-		m_blitter_srcbuf = (m_blitter_srcbuf << 16) | data;
-	}
-}
-
-
-//-------------------------------------------------
-//  blitter_hop -
-//-------------------------------------------------
-
-uint16_t st_state::blitter_hop()
-{
-	uint16_t source = m_blitter_srcbuf >> (m_blitter_skew & 0x0f);
-	uint16_t halftone = m_blitter_halftone[m_blitter_ctrl & 0x0f];
-
-	if (m_blitter_ctrl & ATARIST_BLITTER_CTRL_SMUDGE)
-	{
-		halftone = m_blitter_halftone[source & 0x0f];
-	}
-
-	switch (m_blitter_hop)
-	{
-	case 0:
-		return 0xffff;
-	case 1:
-		return halftone;
-	case 2:
-		return source;
-	case 3:
-		return source & halftone;
-	}
-
-	return 0;
-}
-
-
-//-------------------------------------------------
-//  blitter_op -
-//-------------------------------------------------
-
-void st_state::blitter_op(uint16_t s, uint32_t dstaddr, uint16_t mask)
-{
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	uint16_t d = program.read_word(dstaddr);
-	uint16_t result = 0;
-
-	if (m_blitter_op & 0x08) result = (~s & ~d);
-	if (m_blitter_op & 0x04) result |= (~s & d);
-	if (m_blitter_op & 0x02) result |= (s & ~d);
-	if (m_blitter_op & 0x01) result |= (s & d);
-
-	program.write_word(dstaddr, result);
-}
-
-
-//-------------------------------------------------
-//  blitter_tick -
-//-------------------------------------------------
-
-void st_state::blitter_tick()
-{
-	do
-	{
-		if (m_blitter_skew & ATARIST_BLITTER_SKEW_FXSR)
-		{
-			blitter_source();
-			m_blitter_src += m_blitter_src_inc_x;
-		}
-
-		blitter_source();
-		blitter_op(blitter_hop(), m_blitter_dst, m_blitter_endmask1);
-		m_blitter_xcount--;
-
-		while (m_blitter_xcount > 0)
-		{
-			m_blitter_src += m_blitter_src_inc_x;
-			m_blitter_dst += m_blitter_dst_inc_x;
-
-			if (m_blitter_xcount == 1)
-			{
-				if (!(m_blitter_skew & ATARIST_BLITTER_SKEW_NFSR))
-				{
-					blitter_source();
-				}
-
-				blitter_op(blitter_hop(), m_blitter_dst, m_blitter_endmask3);
-			}
-			else
-			{
-				blitter_source();
-				blitter_op(blitter_hop(), m_blitter_dst, m_blitter_endmask2);
-			}
-
-			m_blitter_xcount--;
-		}
-
-		m_blitter_src += m_blitter_src_inc_y;
-		m_blitter_dst += m_blitter_dst_inc_y;
-
-		if (m_blitter_dst_inc_y < 0)
-		{
-			m_blitter_ctrl = (m_blitter_ctrl & 0xf0) | (((m_blitter_ctrl & 0x0f) - 1) & 0x0f);
-		}
-		else
-		{
-			m_blitter_ctrl = (m_blitter_ctrl & 0xf0) | (((m_blitter_ctrl & 0x0f) + 1) & 0x0f);
-		}
-
-		m_blitter_xcount = m_blitter_xcountl;
-		m_blitter_ycount--;
-	}
-	while (m_blitter_ycount > 0);
-
-	m_blitter_ctrl &= 0x7f;
-
-	m_mfp->i3_w(0);
-}
-
-
-//-------------------------------------------------
-//  blitter_halftone_r -
-//-------------------------------------------------
-
-uint16_t st_state::blitter_halftone_r(offs_t offset)
-{
-	return m_blitter_halftone[offset];
-}
-
-
-//-------------------------------------------------
-//  blitter_src_inc_x_r -
-//-------------------------------------------------
-
-uint16_t st_state::blitter_src_inc_x_r()
-{
-	return m_blitter_src_inc_x;
-}
-
-
-//-------------------------------------------------
-//  blitter_src_inc_y_r -
-//-------------------------------------------------
-
-uint16_t st_state::blitter_src_inc_y_r()
-{
-	return m_blitter_src_inc_y;
-}
-
-
-//-------------------------------------------------
-//  blitter_src_r -
-//-------------------------------------------------
-
-uint16_t st_state::blitter_src_r(offs_t offset)
-{
-	switch (offset)
-	{
-	case 0:
-		return (m_blitter_src >> 16) & 0xff;
-	case 1:
-		return m_blitter_src & 0xfffe;
-	}
-
-	return 0;
-}
-
-
-//-------------------------------------------------
-//  blitter_end_mask_r -
-//-------------------------------------------------
-
-uint16_t st_state::blitter_end_mask_r(offs_t offset)
-{
-	switch (offset)
-	{
-	case 0:
-		return m_blitter_endmask1;
-	case 1:
-		return m_blitter_endmask2;
-	case 2:
-		return m_blitter_endmask3;
-	}
-
-	return 0;
-}
-
-
-//-------------------------------------------------
-//  blitter_dst_inc_x_r -
-//-------------------------------------------------
-
-uint16_t st_state::blitter_dst_inc_x_r()
-{
-	return m_blitter_dst_inc_x;
-}
-
-
-//-------------------------------------------------
-//  blitter_dst_inc_y_r -
-//-------------------------------------------------
-
-uint16_t st_state::blitter_dst_inc_y_r()
-{
-	return m_blitter_dst_inc_y;
-}
-
-
-//-------------------------------------------------
-//  blitter_dst_r -
-//-------------------------------------------------
-
-uint16_t st_state::blitter_dst_r(offs_t offset)
-{
-	switch (offset)
-	{
-	case 0:
-		return (m_blitter_dst >> 16) & 0xff;
-	case 1:
-		return m_blitter_dst & 0xfffe;
-	}
-
-	return 0;
-}
-
-
-//-------------------------------------------------
-//  blitter_count_x_r -
-//-------------------------------------------------
-
-uint16_t st_state::blitter_count_x_r()
-{
-	return m_blitter_xcount;
-}
-
-
-//-------------------------------------------------
-//  blitter_count_y_r -
-//-------------------------------------------------
-
-uint16_t st_state::blitter_count_y_r()
-{
-	return m_blitter_ycount;
-}
-
-
-//-------------------------------------------------
-//  blitter_op_r -
-//-------------------------------------------------
-
-uint16_t st_state::blitter_op_r(offs_t offset, uint16_t mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		return m_blitter_hop;
-	}
-	else
-	{
-		return m_blitter_op;
-	}
-}
-
-
-//-------------------------------------------------
-//  blitter_ctrl_r -
-//-------------------------------------------------
-
-uint16_t st_state::blitter_ctrl_r(offs_t offset, uint16_t mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		return m_blitter_ctrl;
-	}
-	else
-	{
-		return m_blitter_skew;
-	}
-}
-
-
-//-------------------------------------------------
-//  blitter_halftone_w -
-//-------------------------------------------------
-
-void st_state::blitter_halftone_w(offs_t offset, uint16_t data)
-{
-	m_blitter_halftone[offset] = data;
-}
-
-
-//-------------------------------------------------
-//  blitter_src_inc_x_w -
-//-------------------------------------------------
-
-void st_state::blitter_src_inc_x_w(uint16_t data)
-{
-	m_blitter_src_inc_x = data & 0xfffe;
-}
-
-
-//-------------------------------------------------
-//  blitter_src_inc_y_w -
-//-------------------------------------------------
-
-void st_state::blitter_src_inc_y_w(uint16_t data)
-{
-	m_blitter_src_inc_y = data & 0xfffe;
-}
-
-
-//-------------------------------------------------
-//  blitter_src_w -
-//-------------------------------------------------
-
-void st_state::blitter_src_w(offs_t offset, uint16_t data)
-{
-	switch (offset)
-	{
-	case 0:
-		m_blitter_src = (data & 0xff) | (m_blitter_src & 0xfffe);
-		break;
-
-	case 1:
-		m_blitter_src = (m_blitter_src & 0xff0000) | (data & 0xfffe);
-		break;
-	}
-}
-
-
-//-------------------------------------------------
-//  blitter_end_mask_w -
-//-------------------------------------------------
-
-void st_state::blitter_end_mask_w(offs_t offset, uint16_t data)
-{
-	switch (offset)
-	{
-	case 0:
-		m_blitter_endmask1 = data;
-		break;
-
-	case 1:
-		m_blitter_endmask2 = data;
-		break;
-
-	case 2:
-		m_blitter_endmask3 = data;
-		break;
-	}
-}
-
-
-//-------------------------------------------------
-//  blitter_dst_inc_x_w -
-//-------------------------------------------------
-
-void st_state::blitter_dst_inc_x_w(uint16_t data)
-{
-	m_blitter_dst_inc_x = data & 0xfffe;
-}
-
-
-//-------------------------------------------------
-//  blitter_dst_inc_y_w -
-//-------------------------------------------------
-
-void st_state::blitter_dst_inc_y_w(uint16_t data)
-{
-	m_blitter_dst_inc_y = data & 0xfffe;
-}
-
-
-//-------------------------------------------------
-//  blitter_dst_w -
-//-------------------------------------------------
-
-void st_state::blitter_dst_w(offs_t offset, uint16_t data)
-{
-	switch (offset)
-	{
-	case 0:
-		m_blitter_dst = (data & 0xff) | (m_blitter_dst & 0xfffe);
-		break;
-
-	case 1:
-		m_blitter_dst = (m_blitter_dst & 0xff0000) | (data & 0xfffe);
-		break;
-	}
-}
-
-
-//-------------------------------------------------
-//  blitter_count_x_w -
-//-------------------------------------------------
-
-void st_state::blitter_count_x_w(uint16_t data)
-{
-	m_blitter_xcount = data;
-}
-
-
-//-------------------------------------------------
-//  blitter_count_y_w -
-//-------------------------------------------------
-
-void st_state::blitter_count_y_w(uint16_t data)
-{
-	m_blitter_ycount = data;
-}
-
-
-//-------------------------------------------------
-//  blitter_op_w -
-//-------------------------------------------------
-
-void st_state::blitter_op_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_blitter_hop = (data >> 8) & 0x03;
-	}
-	else
-	{
-		m_blitter_op = data & 0x0f;
-	}
-}
-
-
-//-------------------------------------------------
-//  blitter_ctrl_w -
-//-------------------------------------------------
-
-void st_state::blitter_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_blitter_ctrl = (data >> 8) & 0xef;
-
-		if (!(m_blitter_ctrl & ATARIST_BLITTER_CTRL_BUSY))
-		{
-			if ((data >> 8) & ATARIST_BLITTER_CTRL_BUSY)
-			{
-				m_mfp->i3_w(1);
-
-				int nops = BLITTER_NOPS[m_blitter_op][m_blitter_hop]; // each NOP takes 4 cycles
-				timer_set(attotime::from_hz((Y2/4)/(4*nops)), TIMER_BLITTER_TICK);
-			}
-		}
-	}
-	else
-	{
-		m_blitter_skew = data & 0xcf;
-	}
-}
-
-
-
-//**************************************************************************
 //  VIDEO
 //**************************************************************************
 
-void st_state::video_start()
+st_video_device::st_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_palette_interface(mconfig, *this)
+	, device_video_interface(mconfig, *this, true)
+	, m_ram_space(*this, finder_base::DUMMY_TAG, 0)
+	, m_maincpu(*this, "^m68000") // FIXME: use callbacks instead
+	, m_de_callback(*this)
 {
-	m_shifter_timer = timer_alloc(TIMER_SHIFTER_TICK);
-	m_glue_timer = timer_alloc(TIMER_GLUE_TICK);
+}
 
-//  m_shifter_timer->adjust(m_screen->time_until_pos(0), 0, attotime::from_hz(Y2/4)); // 125 ns
-	m_glue_timer->adjust(m_screen->time_until_pos(0), 0, attotime::from_hz(Y2/16)); // 500 ns
+st_video_device::st_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: st_video_device(mconfig, ST_VIDEO, tag, owner, clock)
+{
+}
 
-	m_screen->register_screen_bitmap(m_bitmap);
+ste_video_device::ste_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: st_video_device(mconfig, STE_VIDEO, tag, owner, clock)
+{
+}
 
-	/* register for state saving */
+
+void st_video_device::device_resolve_objects()
+{
+	m_de_callback.resolve_safe();
+}
+
+
+void st_video_device::device_start()
+{
+	m_shifter_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st_video_device::shifter_tick), this));
+	m_glue_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st_video_device::glue_tick), this));
+
+//  m_shifter_timer->adjust(screen().time_until_pos(0), 0, clocks_to_attotime(4)); // 125 ns
+	m_glue_timer->adjust(screen().time_until_pos(0), 0, clocks_to_attotime(16)); // 500 ns
+
+	screen().register_screen_bitmap(m_bitmap);
+
+	// register for state saving
 	save_item(NAME(m_shifter_base));
 	save_item(NAME(m_shifter_ofs));
 	save_item(NAME(m_shifter_sync));
@@ -1092,43 +643,30 @@ void st_state::video_start()
 	save_item(NAME(m_shifter_v));
 	save_item(NAME(m_shifter_de));
 
-	save_item(NAME(m_blitter_halftone));
-	save_item(NAME(m_blitter_src_inc_x));
-	save_item(NAME(m_blitter_src_inc_y));
-	save_item(NAME(m_blitter_dst_inc_x));
-	save_item(NAME(m_blitter_dst_inc_y));
-	save_item(NAME(m_blitter_src));
-	save_item(NAME(m_blitter_dst));
-	save_item(NAME(m_blitter_endmask1));
-	save_item(NAME(m_blitter_endmask2));
-	save_item(NAME(m_blitter_endmask3));
-	save_item(NAME(m_blitter_xcount));
-	save_item(NAME(m_blitter_ycount));
-	save_item(NAME(m_blitter_xcountl));
-	save_item(NAME(m_blitter_hop));
-	save_item(NAME(m_blitter_op));
-	save_item(NAME(m_blitter_ctrl));
-	save_item(NAME(m_blitter_skew));
+	m_shifter_base = 0;
+	m_shifter_ofs = 0;
+	m_shifter_mode = 0;
 
 	set_screen_parameters();
 }
 
-
-void ste_state::video_start()
+void ste_video_device::device_start()
 {
-	st_state::video_start();
+	st_video_device::device_start();
 
 	// register for state saving
 	save_item(NAME(m_shifter_lineofs));
 	save_item(NAME(m_shifter_pixelofs));
 }
 
-void stbook_state::video_start()
+
+void st_video_device::device_reset()
 {
+	// TODO: reset glue chip
 }
 
 
-uint32_t st_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t st_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;

@@ -12,9 +12,7 @@
 #include "nld_ms_direct.h"
 #include "nld_solver.h"
 
-namespace netlist
-{
-namespace solver
+namespace netlist::solver
 {
 
 	// ----------------------------------------------------------------------------------------
@@ -51,7 +49,6 @@ namespace solver
 
 	};
 
-} // namespace solver
-} // namespace netlist
+} // namespace netlist::solver
 
 #endif // NLD_MS_DIRECT2_H_

@@ -1808,8 +1808,8 @@ void mips3_device::handle_cop0(uint32_t op)
 		case 0x08:  /* BC */
 			switch (RTREG)
 			{
-				case 0x00:  /* BCzF */  if (!m_cf[0]) ADDPC(SIMMVAL);               break;
-				case 0x01:  /* BCzF */  if (m_cf[0]) ADDPC(SIMMVAL);                break;
+				case 0x00:  /* BCzF */  if (!m_cf[0][0]) ADDPC(SIMMVAL);               break;
+				case 0x01:  /* BCzF */  if (m_cf[0][0]) ADDPC(SIMMVAL);                break;
 				case 0x02:  /* BCzFL */ invalid_instruction(op);                            break;
 				case 0x03:  /* BCzTL */ invalid_instruction(op);                            break;
 				default:    invalid_instruction(op);                                        break;
@@ -3009,8 +3009,8 @@ void mips3_device::handle_cop2(uint32_t op)
 		case 0x08:  /* BC */
 			switch (RTREG)
 			{
-				case 0x00:  /* BCzF */  if (!m_cf[2]) ADDPC(SIMMVAL);                   break;
-				case 0x01:  /* BCzT */  if (m_cf[2]) ADDPC(SIMMVAL);                    break;
+				case 0x00:  /* BCzF */  if (!m_cf[2][0]) ADDPC(SIMMVAL);                   break;
+				case 0x01:  /* BCzT */  if (m_cf[2][0]) ADDPC(SIMMVAL);                    break;
 				case 0x02:  /* BCzFL */ invalid_instruction(op);                        break;
 				case 0x03:  /* BCzTL */ invalid_instruction(op);                        break;
 				default:    invalid_instruction(op);                                    break;

@@ -83,7 +83,7 @@ namespace plib {
 	};
 
 	// FIXME: currently only a stub for later use. More use could be added by
-	// using “-fnon-call-exceptions" and sigaction to enable c++ exception supported.
+	// using `-fnon-call-exceptions` and sigaction to enable c++ exception supported.
 	//
 
 	class fpexception_e : public pexception

@@ -139,7 +139,7 @@ Error InstInternal::queryRWInfo(Arch arch, const BaseInst& inst, const Operand_*
   if (ASMJIT_UNLIKELY(!Inst::isDefinedId(realId)))
     return DebugUtils::errored(kErrorInvalidInstruction);
 
-  out->_instFlags = 0;
+  out->_instFlags = InstRWFlags::kNone;
   out->_opCount = uint8_t(opCount);
   out->_rmFeature = 0;
   out->_extraReg.reset();

@@ -44,9 +44,7 @@
 // Implementation
 // -----------------------------------------------------------------------------
 
-namespace netlist
-{
-namespace analog
+namespace netlist::analog
 {
 
 	// -----------------------------------------------------------------------------
@@ -60,9 +58,8 @@ namespace analog
 		return b ? *h : d2;
 	}
 	template<>
-	inline core_device_t &bselect(bool b, netlist_state_t &d1, core_device_t &d2)
+	inline core_device_t &bselect(bool b, [[maybe_unused]] netlist_state_t &d1, core_device_t &d2)
 	{
-		plib::unused_var(d1);
 		if (b)
 			throw nl_exception("bselect with netlist and b==true");
 		return d2;
@@ -75,7 +72,7 @@ namespace analog
 		, m_N(*this, "2", &m_P, NETLIB_DELEGATE(termhandler))
 		{
 		}
-		//NETLIB_CONSTRUCTOR_EX(twoterm, nldelegate owner_delegate)
+		//#NETLIB_CONSTRUCTOR_EX(twoterm, nldelegate owner_delegate)
 		template <class C>
 		NETLIB_NAME(twoterm)(C &owner, const pstring &name, nldelegate owner_delegate) \
 				: base_type(owner, name)
@@ -236,7 +233,7 @@ namespace analog
 
 	private:
 		param_fp_t m_R;
-		// protect set_R ... it's a recipe to desaster when used to bypass the parameter
+		// protect set_R ... it's a recipe to disaster when used to bypass the parameter
 		using NETLIB_NAME(R_base)::set_R;
 		using NETLIB_NAME(R_base)::set_G;
 	};
@@ -447,7 +444,7 @@ namespace analog
 		state_var<nl_fptype> m_last_G;
 	};
 
-	/// \brief Class representing the diode model paramers.
+	/// \brief Class representing the diode model parameters.
 	///
 	///  This is the model representation of the diode model. Typically, SPICE uses
 	///  the following parameters. A "Y" in the first column indicates that the
@@ -687,7 +684,6 @@ namespace analog
 		std::vector<nl_fptype> m_funcparam;
 	};
 
-} // namespace analog
-} // namespace netlist
+} // namespace netlist::analog
 
 #endif // NLD_TWOTERM_H_

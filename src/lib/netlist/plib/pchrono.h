@@ -110,7 +110,7 @@ namespace plib {
 		#if PUSE_ACCURATE_STATS && PHAS_RDTSCP
 		//
 		// kills performance completely, but is accurate
-		// cpuid serializes, but clobbers ebx and ecx
+		// `cpuid` serializes, but clobbers ebx and ecx
 		//
 
 		struct exact_ticks : public base_ticks<exact_ticks, int64_t>
