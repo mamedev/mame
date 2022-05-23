@@ -48,6 +48,7 @@ private:
 
 	uint32_t screen_update_marblmd2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	bitmap_ind16 m_tempbitmap;
 	uint16_t m_latch_data = 0U;
 
 	static const atari_motion_objects_config s_mob_config;
@@ -55,6 +56,8 @@ private:
 
 void marblmd2_state::video_start()
 {
+	m_screen->register_screen_bitmap(m_tempbitmap);
+	m_tempbitmap.fill(0);
 }
 
 uint32_t marblmd2_state::screen_update_marblmd2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -65,7 +68,20 @@ uint32_t marblmd2_state::screen_update_marblmd2(screen_device &screen, bitmap_in
 	// draw the playfield
 	bitmap_ind8 &priority_bitmap = screen.priority();
 	priority_bitmap.fill(0, cliprect);
-	m_vad->playfield().draw(screen, bitmap, cliprect, 0, 0x00);
+	m_vad->playfield().draw(screen, m_tempbitmap, cliprect, 0, 0x00);
+
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		uint16_t *const src = &m_tempbitmap.pix(y);
+		uint16_t *const dst = &bitmap.pix(y);
+
+		// top bit of the gfxdata appears to be priority, so we don't want it in the render bitmap
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			dst[x] = src[x] & 0x007f;
+		}
+	}
+
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_vad->mob().bitmap();
@@ -141,7 +157,7 @@ static INPUT_PORTS_START( marblmd2 )
 	PORT_BIT( 0xfe00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("600012")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN ) // maybe dips
+	PORT_BIT( 0x007f, IP_ACTIVE_LOW, IPT_UNKNOWN ) // maybe dips
 	PORT_DIPNAME( 0x0080, 0x0080, "Number of Players" )
 	PORT_DIPSETTING(      0x0000, "2" )
 	PORT_DIPSETTING(      0x0080, "3" )
@@ -209,7 +225,7 @@ const atari_motion_objects_config marblmd2_state::s_mob_config =
 	1,                  // number of motion object banks 
 	1,                  // are the entries linked? 
 	0,                  // are the entries split? 
-	1,                  // render in reverse order? 
+	0,                  // render in reverse order? 
 	0,                  // render in swapped X/Y order? 
 	0,                  // does the neighbor bit affect the next object? 
 	0,                  // pixels per SLIP entry (0 for no-slip) 
