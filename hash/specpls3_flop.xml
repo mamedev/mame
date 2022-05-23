@@ -20232,6 +20232,24 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="mis5estr">
+		<description>Made in Spain 5 Estrellas</description>
+		<year>1989</year>
+		<publisher>Zigurat Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Side A: Presentación, Sir Fred, Humphrey"/>
+			<dataarea name="flop" size="171225">
+				<rom name="made in spain 5 estrellas - side 1.dsk" size="171225" crc="4be77f9d" sha1="bfba9faef9193b1fe735b5540ee558f0ea586a6e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Side B: Fred, El Misterio del Nilo, Afteroids"/>
+			<dataarea name="flop" size="156579">
+				<rom name="made in spain 5 estrellas - side 2.dsk" size="156579" crc="bebd4a73" sha1="00076cda545b36315fc19ce17b6666387fde81cd" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="m3unlock">
 		<description>M3 Unlock</description>
 		<year>1990</year>
@@ -20523,6 +20541,17 @@ license:CC0
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="195635">
 				<rom name="shoot-out.dsk" size="195635" crc="f1d2de4a" sha1="b637f338f92e03742553f0400e12ab81874119de" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sptenis">
+		<description>Simulador Profesional de Tenis</description>
+		<year>1990</year>
+		<publisher>Dinamic Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="75255">
+				<rom name="simulador profesional de tenis.dsk" size="75255" crc="b824547a" sha1="d23559d0b4505403efbeb5d7c561b0e5a1a8c425" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
