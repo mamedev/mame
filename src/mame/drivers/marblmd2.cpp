@@ -132,16 +132,14 @@ void marblmd2_state::marblmd2_map(address_map& map)
 	map(0x607000, 0x607001).nopw();
 	
 	map(0x7c0000, 0x7c03ff).rw("palette", FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0xff00).share("palette");
-	// where should this map, if it exists?
 	map(0x7cffc0, 0x7cffff).ram().rw(m_vad, FUNC(atari_vad_device::control_read), FUNC(atari_vad_device::control_write));
 
 	map(0x7d0000, 0x7d7fff).ram();
 	map(0x7d8000, 0x7d9fff).ram().w(m_vad, FUNC(atari_vad_device::playfield_latched_lsb_w)).share("vad:playfield");
-	map(0x7da000, 0x7dbfff).ram().share("vad:mob");
+	map(0x7da000, 0x7dbeff).ram().share("vad:mob");
+	map(0x7dbf00, 0x7dbf7f).ram().share("vad:eof");
+	map(0x7dbf80, 0x7dbfff).ram().share("vad:mob:slip");
 	map(0x7f8000, 0x7fbfff).ram();
-
-	// where should this map, if it exists?
-	map(0xff8f00, 0xff8f7f).ram().share("vad:eof");
 }
 
 static INPUT_PORTS_START( marblmd2 )
