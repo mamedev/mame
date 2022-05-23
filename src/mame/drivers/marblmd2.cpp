@@ -263,7 +263,6 @@ void marblmd2_state::marblmd2(machine_config &config)
 {
 	M68000(config, m_maincpu, XTAL(14'318'181)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &marblmd2_state::marblmd2_map);
-	m_maincpu->set_vblank_int("screen", FUNC(marblmd2_state::irq4_line_hold)); // this should be coming from the VAD below, but isn't??
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_mm2);
 
@@ -277,7 +276,7 @@ void marblmd2_state::marblmd2(machine_config &config)
 
 	ATARI_VAD(config, m_vad, 0, m_screen);
 	m_vad->scanline_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
-	m_vad->set_xoffsets(2, 6);
+	m_vad->set_xoffsets(4, 4);
 
 	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, marblmd2_state::s_mob_config).set_gfxdecode("gfxdecode");
 	m_mob->set_xoffset(-1);
