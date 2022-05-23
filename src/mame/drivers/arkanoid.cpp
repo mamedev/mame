@@ -1702,8 +1702,8 @@ ROM_END
 
 ROM_START( arkatour2 ) // Tournament version, newer
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "a75-28.ic36",   0x0000, 0x8000, CRC(f3b1923e) SHA1(377a417ad99c9de2eadad7338bc2c7e83d08cb2f) )
-	ROM_LOAD( "a75-27.ic37",   0x8000, 0x8000, CRC(7c74987b) SHA1(fb7612ea2af87a3e1bc794c25b004881930d4dc8) ) // 1xxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "a75-36.ic16",   0x0000, 0x8000, CRC(f3b1923e) SHA1(377a417ad99c9de2eadad7338bc2c7e83d08cb2f) )
+	ROM_LOAD( "a75-37.ic17",   0x8000, 0x8000, CRC(7c74987b) SHA1(fb7612ea2af87a3e1bc794c25b004881930d4dc8) ) // 1xxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x0800, "mcu:mcu", 0 )
 	ROM_LOAD( "a75_38.ic14",  0x0000, 0x0800, NO_DUMP )
@@ -2288,7 +2288,7 @@ GAME( 1986, arkatayt,     arkanoid, aysnd,    arkatayt,  arkanoid_state, empty_i
 GAME( 1986, arktayt2,     arkanoid, aysnd,    arktayt2,  arkanoid_state, empty_init,     ROT90, "bootleg (Tayto)",                             "Arkanoid (Tayto bootleg, harder)",            MACHINE_SUPPORTS_SAVE )
 // Other games
 GAME( 1987, arkatour,     0,        arkanoid, arkanoid,  arkanoid_state, empty_init,     ROT90, "Taito America Corporation (Romstar license)", "Tournament Arkanoid (US, older)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1987, arkatour2,    arkatour, arkanoid, arkanoid,  arkanoid_state, empty_init,     ROT90, "Taito America Corporation (Romstar license)", "Tournament Arkanoid (US, newer)",             MACHINE_SUPPORTS_SAVE ) // same FRI,  6 JUN 1986, 15:49 string for both sets, but labels show this is newer
+GAME( 1987, arkatour2,    arkatour, arkanoid, arkanoid,  arkanoid_state, empty_init,     ROT90, "Taito America Corporation (Romstar license)", "Tournament Arkanoid (US, newer)",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // same FRI,  6 JUN 1986, 15:49 string for both sets, but labels show this is newer
 
 GAME( 19??, tetrsark,     0,        bootleg,  tetrsark,  arkanoid_state, init_tetrsark,  ROT0,  "D.R. Korea",                                  "Tetris (D.R. Korea, set 1, encrypted)",       MACHINE_SUPPORTS_SAVE )
 GAME( 19??, tetrsark2,    tetrsark, bootleg,  tetrsark,  arkanoid_state, init_tetrsark2, ROT0,  "D.R. Korea",                                  "Tetris (D.R. Korea, set 2)",                  MACHINE_SUPPORTS_SAVE )
