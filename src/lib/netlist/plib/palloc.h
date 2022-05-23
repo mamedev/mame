@@ -431,6 +431,8 @@ namespace plib {
 			}
 			return p;
 		#else
+			// see https://en.cppreference.com/w/c/memory/aligned_alloc
+			size = ((size + alignment - 1) / alignment) * alignment;
 			return static_cast<gsl::owner<void *>>(aligned_alloc(alignment, size));
 		#endif
 		#else
