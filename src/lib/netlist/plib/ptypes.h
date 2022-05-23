@@ -47,7 +47,9 @@ namespace plib
 	template <typename BASEARENA, std::size_t MINALIGN>
 	class mempool_arena;
 
+	template <std::size_t MINALLOC = 0>
 	struct aligned_arena;
+
 	class dynlib_base;
 
 	template<bool debug_enabled>

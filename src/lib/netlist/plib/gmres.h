@@ -34,16 +34,16 @@ namespace plib
 		static constexpr float value = 0.0;
 	};
 
-	template <typename FT, int SIZE>
+	template < typename ARENA, typename FT, int SIZE>
 	struct mat_precondition_ILU
 	{
-		using mat_type = plib::pmatrix_cr<FT, SIZE>;
+		using mat_type = plib::pmatrix_cr<ARENA, FT, SIZE>;
 		using matLU_type = plib::pLUmatrix_cr<mat_type>;
 
-		mat_precondition_ILU(std::size_t size, std::size_t ilu_scale = 4
-			, std::size_t bw = plib::pmatrix_cr<FT, SIZE>::FILL_INFINITY)
-		: m_mat(narrow_cast<typename mat_type::index_type>(size))
-		, m_LU(narrow_cast<typename mat_type::index_type>(size))
+		mat_precondition_ILU(ARENA &arena, std::size_t size, std::size_t ilu_scale = 4
+			, std::size_t bw = plib::pmatrix_cr<ARENA, FT, SIZE>::FILL_INFINITY)
+		: m_mat(arena, narrow_cast<typename mat_type::index_type>(size))
+		, m_LU(arena, narrow_cast<typename mat_type::index_type>(size))
 		, m_ILU_scale(narrow_cast<std::size_t>(ilu_scale))
 		, m_band_width(bw)
 		{
@@ -82,11 +82,11 @@ namespace plib
 		std::size_t             m_band_width;
 	};
 
-	template <typename FT, int SIZE>
+	template <typename ARENA, typename FT, int SIZE>
 	struct mat_precondition_diag
 	{
-		mat_precondition_diag(std::size_t size, [[maybe_unused]] int dummy = 0)
-		: m_mat(size)
+		mat_precondition_diag(ARENA & arena, std::size_t size, [[maybe_unused]] int dummy = 0)
+		: m_mat(arena, size)
 		, m_diag(size)
 		, nzcol(size)
 		{
@@ -170,12 +170,12 @@ namespace plib
 				v[i] = v[i] * m_diag[i];
 		}
 
-		plib::pmatrix_cr<FT, SIZE> m_mat;
+		plib::pmatrix_cr<ARENA, FT, SIZE> m_mat;
 		plib::parray<FT, SIZE> m_diag;
 		plib::parray<std::vector<std::size_t>, SIZE > nzcol;
 	};
 
-	template <typename FT, int SIZE>
+	template <typename ARENA, typename FT, int SIZE>
 	struct mat_precondition_none
 	{
 		mat_precondition_none(std::size_t size, [[maybe_unused]] int dummy = 0)
@@ -204,7 +204,7 @@ namespace plib
 		{
 		}
 
-		plib::pmatrix_cr<FT, SIZE> m_mat;
+		plib::pmatrix_cr<ARENA, FT, SIZE> m_mat;
 	};
 
 	// FIXME: hard coding RESTART to 20 becomes an issue on very large

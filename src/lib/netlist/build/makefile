@@ -304,8 +304,8 @@ clang:
 		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override \
 		-Wno-embedded-directive \
 		-Wno-undefined-reinterpret-cast \
-		-Wunreachable-code \
-		-Wmissing-prototypes"
+		-Wunreachable-code -Wno-gnu-alignof-expression \
+		-Wmissing-prototypes -Wno-error=deprecated"
 
 clang-libc:
 	#clang-11 currently broken

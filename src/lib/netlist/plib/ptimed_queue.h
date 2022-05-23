@@ -75,13 +75,13 @@ namespace plib {
 	};
 
 	// Use TS = true for a threadsafe queue
-	template <class T, bool TS>
+	template <class A, class T, bool TS>
 	class timed_queue_linear
 	{
 	public:
 
-		explicit timed_queue_linear(const std::size_t list_size)
-		: m_list(list_size)
+		explicit timed_queue_linear(A &arena, const std::size_t list_size)
+		: m_list(arena, list_size)
 		{
 			clear();
 		}
@@ -195,7 +195,7 @@ namespace plib {
 
 		mutex_type               m_lock;
 		T *                      m_end;
-		aligned_vector<T>        m_list;
+		plib::arena_vector<A, T> m_list;
 
 	public:
 		// profiling
@@ -205,7 +205,7 @@ namespace plib {
 		pperfcount_t<true> m_prof_remove; // NOLINT
 	};
 
-	template <class T, bool TS>
+	template <class A, class T, bool TS>
 	class timed_queue_heap
 	{
 	public:
@@ -215,8 +215,8 @@ namespace plib {
 			constexpr bool operator()(const T &a, const T &b) const noexcept { return b <= a; }
 		};
 
-		explicit timed_queue_heap(const std::size_t list_size)
-		: m_list(list_size)
+		explicit timed_queue_heap(A &arena, const std::size_t list_size)
+		: m_list(arena, list_size)
 		{
 			clear();
 		}
@@ -292,9 +292,9 @@ namespace plib {
 		using mutex_type = pspin_mutex<TS>;
 		using lock_guard_type = std::lock_guard<mutex_type>;
 
-		mutex_type         m_lock;
-		T *                m_end;
-		aligned_vector<T>  m_list;
+		mutex_type               m_lock;
+		T *                      m_end;
+		plib::arena_vector<A, T> m_list;
 
 	public:
 		// profiling
