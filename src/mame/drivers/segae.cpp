@@ -199,7 +199,7 @@ ROMs:
 
 Game                     IC2         IC3         IC4         IC5         IC7
 ---------------------------------------------------------------------------------
-Megumi Rescue*           IC-2        IC-3        IC-4        IC-5        IC-7
+Megumi Rescue            V10.30 IC-2 V10.30 IC-3 V10.30 IC-4 V10.30 IC-5 V10.30 IC-7
 Hang-On Jr.              EPR-7261    EPR-7260    EPR-7259    EPR-7258    EPR-7257B
 Transformer              EPR-7350    EPR-7606    EPR-7348    EPR-7347    EPR-7605
            /Astro Flash  EPR-7350    EPR-7349    EPR-7348    EPR-7347    EPR-7723
@@ -209,13 +209,6 @@ Opa Opa (unencrypted)    EPR-11019   EPR-11020   EPR-11021   EPR-11022   EPR-110
 Opa Opa (encrypted)      EPR-11220   EPR-11221   EPR-11222   EPR-11223   EPR-11224
 Fantasy Zone 2           EPR-11412   EPR-11413   EPR-11414   EPR-11415   EPR-11416
 Tetris                   -           -           EPR-12211   EPR-12212   EPR-12213
-
-* Only one board for Megumi Rescue has been seen (from an eBay auction), ROM labels where in this form:
-
-MEGUMI RESCUE
-IC-7
-(C)1987 SEGA/EXA
-
 
 A System E PCB can run all of the games simply by swapping the EPROMs plus CPU.
 Well, in theory anyway. To run the non-encrypted games, just swap EPROMs and they will work.
