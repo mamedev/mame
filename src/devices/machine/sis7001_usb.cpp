@@ -46,7 +46,7 @@ void sis7001_usb_device::config_map(address_map &map)
 void sis7001_usb_device::io_map(address_map &map)
 {
 	// operational mode
-	map(0x000, 0x000).lr32(NAME([]() { return 0x00000110; }));
+	map(0x000, 0x003).lr32(NAME([]() { return 0x00000110; }));
 	// ...
 	// HcFmInterval (Windows OSes fails if this isn't r/w)
 	map(0x034, 0x037).lrw32(
@@ -55,7 +55,7 @@ void sis7001_usb_device::io_map(address_map &map)
 	);
 	// ...
 	 // HcRhDescriptorA, writeable except for 0x4ff
-	map(0x048, 0x04c).lr32(NAME([this]() { return 0x01000000 | m_downstream_ports; }));
+	map(0x048, 0x04b).lr32(NAME([this]() { return 0x01000000 | m_downstream_ports; }));
 	// ...
 //	map(0x05c, 0x05c) last item for function 2, missing on function 3
 
