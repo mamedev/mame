@@ -1382,12 +1382,18 @@ void debugger_commands::execute_go_branch(bool sense, const std::vector<std::str
 void debugger_commands::execute_go_next_instruction(const std::vector<std::string> &params)
 {
 	u64 count = 1;
+	static constexpr u64 MAX_COUNT = 512;
 
 	// if we have a parameter, use it instead */
 	if (params.size() > 0 && !validate_number_parameter(params[0], count))
 		return;
 	if (count == 0)
 		return;
+	if (count > MAX_COUNT)
+	{
+		m_console.printf("Too many instructions (must be %d or fewer)\n", MAX_COUNT);
+		return;
+	}
 
 	device_state_interface *stateintf;
 	device_t *cpu = m_machine.debugger().console().get_visible_cpu();
