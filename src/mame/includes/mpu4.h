@@ -55,7 +55,6 @@
 static const uint8_t reel_mux_table[8]= {0,4,2,6,1,5,3,7};//include 7, although I don't think it's used, this is basically a wire swap
 static const uint8_t reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
 
-static const uint8_t bwb_chr_table_common[10]= {0x00,0x04,0x04,0x0c,0x0c,0x1c,0x14,0x2c,0x5c,0x2c};
 
 //reel info
 #define STANDARD_REEL  0    // As originally designed 3/4 reels
@@ -433,7 +432,6 @@ protected:
 	int m_IC23GB = 0;
 	int m_IC23GA = 0;
 
-	int m_init_col = 0;
 	int m_reel_flag = 0;
 	int m_ic23_active = 0;
 	int m_led_lamp = 0;
@@ -464,10 +462,7 @@ protected:
 	int m_card_live = 0;
 	int m_led_extender = 0;
 	int m_bwb_bank = 0;
-	//int m_chr_state = 0;
-	//int m_chr_counter = 0;
-	//int m_chr_value = 0;
-	//int m_bwb_return = 0;
+
 	int m_pageval = 0;
 	int m_pageset = 0;
 	int m_hopper = 0;

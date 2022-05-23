@@ -267,7 +267,6 @@ public:
 	void init_mating();
 	void init_skiltrek();
 	void init_cybcas();
-	void init_v4frfact();
 	void init_bwbhack();
 
 protected:
@@ -303,7 +302,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vid_o2_callback);
 	DECLARE_WRITE_LINE_MEMBER(vid_o3_callback);
 	uint8_t pia_ic5_porta_track_r();
-	void mpu4vid_char_cheat( int address);
 	DECLARE_WRITE_LINE_MEMBER(update_mpu68_interrupts);
 	uint16_t mpu4_vid_vidram_r(offs_t offset);
 	void mpu4_vid_vidram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -329,10 +327,8 @@ private:
 	void mpu4_6809_map(address_map &map);
 	void mpu4_6809_german_map(address_map &map);
 
-	void vidcharacteriser_4k_lookup_w(offs_t offset, uint8_t data);
 	uint8_t vidcharacteriser_4k_lookup_r(offs_t offset);
-	//uint8_t m_4krow;
-	//uint8_t *m_4ktable;
+
 	void hack_bwb_startup_protection();
 
 	uint8_t mpu4_vid_bt_a00004_r(offs_t offset);
@@ -1922,7 +1918,7 @@ void mpu4vid_state::mpu4_68k_map(address_map& map)
 void mpu4vid_state::mpu4_68k_map_strike(address_map& map)
 {
 	mpu4_68k_map_base(map);
-	map(0xffd000, 0xffd00f).rw(FUNC(mpu4vid_state::vidcharacteriser_4k_lookup_r), FUNC(mpu4vid_state::vidcharacteriser_4k_lookup_w)).umask16(0x00ff);
+	map(0xffd000, 0xffd00f).rw(FUNC(mpu4vid_state::vidcharacteriser_4k_lookup_r), FUNC(mpu4vid_state::vidcharacteriser_w)).umask16(0x00ff);
 }
 
 
@@ -2273,22 +2269,6 @@ void mpu4vid_state::bwbvid_oki_bt471_german(machine_config &config)
 }
 
 
-/*
-Characteriser (CHR)
- The question data on the quiz games gets passed through the characteriser, the tables tested at startup are just a
- very specific test with known responses to make sure the device functions properly.  Unless there is extra encryption
- applied to just the question ROMs then the assumptions made here are wrong, because the questions don't decode.
-
- Perhaps the address lines for the question ROMS are scrambled somehow to make things decode, but how?
-
- It seems more likely that the Characteriser (PAL) acts as a challenge / response system, but various writes cause
- 'latching' behavior because if you study the sequence written at startup you can see that the same write value should
- generate different responses.
-
- Note:
- the 'challenge' part of the startup check is always the same
-*/
-
 void mpu4vid_state::vidcharacteriser_w(offs_t offset, uint8_t data)
 {
 	if (m_characteriser)
@@ -2312,11 +2292,6 @@ uint8_t mpu4vid_state::vidcharacteriser_r(offs_t offset)
 }
 
 
-void mpu4vid_state::vidcharacteriser_4k_lookup_w(offs_t offset, uint8_t data)
-{
-	m_characteriser->write(offset, data);
-}
-
 uint8_t mpu4vid_state::vidcharacteriser_4k_lookup_r(offs_t offset)
 {
 	uint8_t ret = m_characteriser->read(offset);
@@ -2334,21 +2309,6 @@ uint8_t mpu4vid_state::vidcharacteriser_4k_lookup_r(offs_t offset)
 	return ret;
 }
 
-
-#if 0
-static const bwb_chr_table prizeinv_data1[5] = {
-//This is all wrong, but without BWB Vid booting,
-//I can't find the right values. These should be close though
-	{0x67},{0x17},{0x0f},{0x24},{0x3c},
-};
-#endif
-
-#if 0// TODOxx:
-static mpu4_chr_table prizeinv_data[8] = {
-{0xEF, 0x02},{0x81, 0x00},{0xCE, 0x00},{0x00, 0x2e},
-{0x06, 0x20},{0xC6, 0x0f},{0xF8, 0x24},{0x8E, 0x3c},
-};
-#endif
 
 /*
 void mpu4vid_state::init_adders()
@@ -2392,9 +2352,6 @@ void mpu4vid_state::init_strikeit()
 {
 	m_led_extender = SIMPLE_CARD;
 	m_reels = 0;//currently no hybrid games
-	// TODOxx: m_current_chr_table = nullptr;
-	// TODOxx: m_4ktable = memregion( "characteriser:fakechr" )->base();
-	// TODOxx: m_4krow = 0;
 }
 
 void mpu4vid_state::init_turnover()
@@ -2415,10 +2372,6 @@ void mpu4vid_state::init_quidgrid()
 	// TODOxx: m_current_chr_table = quidgrid_data;
 }
 
-void mpu4vid_state::init_v4frfact()
-{
-	mpu4vid_char_cheat(0x4f6);
-}
 
 void mpu4vid_state::hack_bwb_startup_protection()
 {
@@ -2556,37 +2509,22 @@ void mpu4vid_state::init_cybcas()
 }
 
 
-void mpu4vid_state::mpu4vid_char_cheat( int address)
-{
-#if 0 // TODOxx:
-	uint8_t* cheattable = memregion( "video" )->base()+address;
-	m_current_chr_table = blank_data;
-	for (int i=0;i<72;i++)
-	{
-		m_current_chr_table[i].response = cheattable++[0];
-		m_current_chr_table[i].call = cheattable++[0];
-	}
-#endif
-}
+
 
 void mpu4vid_state::init_v4barqst()
 {
-	mpu4vid_char_cheat(0x154);
 }
 
 void mpu4vid_state::init_v4barqst2()
 {
-	mpu4vid_char_cheat(0x15c);
 }
 
 void mpu4vid_state::init_v4wize()
 {
-	mpu4vid_char_cheat(0x16c);
 }
 
 void mpu4vid_state::init_v4opt3()
 {
-	mpu4vid_char_cheat(0x164);
 }
 
 
@@ -9289,13 +9227,14 @@ GAME(  199?, v4rencasi,  v4rencas, bwbvid,     mpu4,     mpu4vid_state, init_bwb
 
 /* Uncertain BIOS */
 // has a Barcrest style Characteriser check, not a BWB one?
-GAME(  199?, v4frfact,   v4bios,   crmaze,     bwbvid,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 1) (MPU4 Video)", GAME_FLAGS )
-GAME(  199?, v4frfacta,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 2) (MPU4 Video)", GAME_FLAGS )
-GAME(  199?, v4frfactb,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 3) (MPU4 Video)", GAME_FLAGS )
-GAME(  199?, v4frfactc,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 4) (MPU4 Video)", GAME_FLAGS )
-GAME(  199?, v4frfactd,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 5) (MPU4 Video)", GAME_FLAGS )
-GAME(  199?, v4frfacte,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 6) (MPU4 Video)", GAME_FLAGS )
-GAME(  199?, v4frfactf,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, init_v4frfact,    ROT0, "BWB","Fruit Factory (BWB) (set 7) (MPU4 Video)", GAME_FLAGS )
+// 00 44 44 54 58 24 54 50 58 3c 34 18 7c 34 48 30 58 7c 7c 2c 70 00 04 4c 70 18 3c 64 44 54 00 14 48 70 58 3c 3c 64 04 44 44 44 5c 34 58 74 58 74 58 3c 7c 3c 64 54 58 34 50 18 7c 2c 70 00 5c 00
+GAME(  199?, v4frfact,   v4bios,   crmaze,     bwbvid,   mpu4vid_state, empty_init,    ROT0, "BWB","Fruit Factory (BWB) (set 1) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfacta,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, empty_init,    ROT0, "BWB","Fruit Factory (BWB) (set 2) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfactb,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, empty_init,    ROT0, "BWB","Fruit Factory (BWB) (set 3) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfactc,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, empty_init,    ROT0, "BWB","Fruit Factory (BWB) (set 4) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfactd,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, empty_init,    ROT0, "BWB","Fruit Factory (BWB) (set 5) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfacte,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, empty_init,    ROT0, "BWB","Fruit Factory (BWB) (set 6) (MPU4 Video)", GAME_FLAGS )
+GAME(  199?, v4frfactf,  v4frfact, crmaze,     bwbvid,   mpu4vid_state, empty_init,    ROT0, "BWB","Fruit Factory (BWB) (set 7) (MPU4 Video)", GAME_FLAGS )
 
 /* Nova - is this the same video board? One of the games displays 'Resetting' but the others do nothing interesting and access strange addresses */
 /* All contain BWB video in the BIOS rom tho, Cyber Casino also needs a Jackpot link? */

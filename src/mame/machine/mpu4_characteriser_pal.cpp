@@ -36,6 +36,7 @@ check is bypassed. This may be something to look at for prototype ROMs and hacks
 #include "mpu4_characteriser_pal.h"
 
 DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_PAL, mpu4_characteriser_pal, "mpu4chrpal", "Barcrest MPU4 Characteriser PAL")
+DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_PAL_BWB, mpu4_characteriser_pal_bwb, "mpu4chrpalbwb", "Barcrest MPU4 Characteriser PAL (BWB type)")
 
 mpu4_characteriser_pal::mpu4_characteriser_pal(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mpu4_characteriser_pal(mconfig, MPU4_CHARACTERISER_PAL, tag, owner, clock)
@@ -46,10 +47,10 @@ mpu4_characteriser_pal::mpu4_characteriser_pal(const machine_config &mconfig, co
 
 mpu4_characteriser_pal::mpu4_characteriser_pal(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
+	m_current_chr_table(nullptr),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_allow_6809_cheat(false),
 	m_allow_68k_cheat(false),
-	m_current_chr_table(nullptr),
 	m_current_lamp_table(nullptr),
 	m_prot_col(0),
 	m_lamp_col(0),
@@ -116,7 +117,7 @@ static mpu4_chr_table grtecp_data[72] = {
 
 
 
-static const bwb_chr_table cybcas_data1[5] = {
+static const uint8_t cybcas_data1[5] = {
 //Magic num4ber 724A
 
 // PAL Codes
@@ -134,7 +135,7 @@ static mpu4_chr_table cybcas_data[8] = {
 /* CHR Tables */
 
 
-static const bwb_chr_table blsbys_data1[5] = {
+static const uint8_t blsbys_data1[5] = {
 //Magic number 724A
 
 // PAL Codes
@@ -367,11 +368,6 @@ uint8_t mpu4_characteriser_pal::read(offs_t offset)
 	return 0;
 }
 
-#if 0
-
-
-
-
 
 
 /*
@@ -412,35 +408,40 @@ and two holding the appropriate call and response pairs for the two stages of op
 */
 
 
-void mpu4_state::bwb_characteriser_w(offs_t offset, uint8_t data)
+mpu4_characteriser_pal_bwb::mpu4_characteriser_pal_bwb(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mpu4_characteriser_pal(mconfig, MPU4_CHARACTERISER_PAL_BWB, tag, owner, clock)
+{
+}
+
+void mpu4_characteriser_pal_bwb::write(offs_t offset, uint8_t data)
 {
 	int x;
-	int call=data;
-	LOG_CHR_FULL(("%s Characteriser write offset %02x data %02x\n", machine().describe_context(), offset, data));
+	int call = data;
+	logerror("%s Characteriser write offset %02x data %02x\n", machine().describe_context(), offset, data);
 	if (!m_current_chr_table)
 		fatalerror("%s No Characteriser Table\n", machine().describe_context().c_str());
 
-	if ((offset & 0x3f)== 0)//initialisation is always at 0x800
+	if ((offset & 0x3f) == 0)//initialisation is always at 0x800
 	{
 		if (!m_chr_state)
 		{
-			m_chr_state=1;
-			m_chr_counter=0;
+			m_chr_state = 1;
+			m_chr_counter = 0;
 		}
 		if (call == 0)
 		{
-			m_init_col ++;
+			m_init_col++;
 		}
 		else
 		{
-			m_init_col =0;
+			m_init_col = 0;
 		}
 	}
 
 	m_chr_value = machine().rand();
 	for (x = 0; x < 4; x++)
 	{
-		if  (m_current_chr_table[(x)].call == call)
+		if (m_current_chr_table[(x)]/*.call*/ == call)
 		{
 			if (x == 0) // reinit
 			{
@@ -453,12 +454,11 @@ void mpu4_state::bwb_characteriser_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t mpu4_state::bwb_characteriser_r(offs_t offset)
+uint8_t mpu4_characteriser_pal_bwb::read(offs_t offset)
 {
-	LOG_CHR(("Characteriser read offset %02x \n",offset));
+	logerror("Characteriser read offset %02x \n", offset);
 
-
-	if (offset ==0)
+	if (offset == 0)
 	{
 		switch (m_chr_counter)
 		{
@@ -467,7 +467,7 @@ uint8_t mpu4_state::bwb_characteriser_r(offs_t offset)
 		case 20:
 		case 27:
 		case 34:
-			return m_bwb_chr_table1[(((m_chr_counter + 1) / 7) - 1)].response;
+			return m_bwb_chr_table1[(((m_chr_counter + 1) / 7) - 1)];
 
 		default:
 			if (m_chr_counter > 34)
@@ -475,7 +475,7 @@ uint8_t mpu4_state::bwb_characteriser_r(offs_t offset)
 				m_chr_counter = 35;
 				m_chr_state = 2;
 			}
-			m_chr_counter ++;
+			m_chr_counter++;
 			return m_chr_value;
 		}
 	}
@@ -485,4 +485,5 @@ uint8_t mpu4_state::bwb_characteriser_r(offs_t offset)
 	}
 }
 
-#endif
+
+
