@@ -3390,6 +3390,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/nforcepc.cpp",
 	MAME_DIR .. "src/mame/drivers/pc.cpp",
 	MAME_DIR .. "src/mame/drivers/pcipc.cpp",
+	MAME_DIR .. "src/mame/drivers/sis630.cpp",
 	MAME_DIR .. "src/mame/drivers/tandy1t.cpp",
 	MAME_DIR .. "src/mame/drivers/tosh1000.cpp",
 	MAME_DIR .. "src/mame/machine/tosh1000_bram.cpp",
