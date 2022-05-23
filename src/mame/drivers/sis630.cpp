@@ -39,8 +39,9 @@
        hangs there;
     \- GUI is never recognized no matter what, punts with DirectX not installed;
 
-    - xubuntu 6.10: throws several SCSIDEV unhandled $51 & $46 commands, eventually punts to
-      prompt with a "can't access tty: job control turned off" (on live CD) or
+    - xubuntu 6.10: throws several SCSIDEV unhandled $46 & $51 commands
+	  (get configuration/read disc information),
+	  eventually punts to prompt with a "can't access tty: job control turned off" (on live CD) or
       hangs at "Configuring network interfaces" (on actual install);
 
     - xubuntu 10.10: stalls after '900 ethernet check;
@@ -298,6 +299,7 @@ ROM_END
 
 
 COMP( 2000, shutms11, 0,      0,      sis630,  sis630, sis630_state, empty_init, "Shuttle", "MS11 PC", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
 // Arcade based games
 GAME( 2002, gamecstl, 0,              gamecstl, sis630, sis630_state, empty_init, ROT0, "Cristaltec", "GameCristal",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2002, gamecst2, gamecstl,       gamecstl, sis630, sis630_state, empty_init, ROT0, "Cristaltec", "GameCristal (version 2.613)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

@@ -9,12 +9,12 @@
 #include "pci.h"
 #include "machine/pci-ide.h"
 
-class sis5513_ide_device : public pci_device 
+class sis5513_ide_device : public pci_device
 {
 public:
 	template <typename T> sis5513_ide_device(
 		const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
-	    T &&host_tag, uint32_t bmspace = AS_PROGRAM
+		T &&host_tag, uint32_t bmspace = AS_PROGRAM
 	) : sis5513_ide_device(mconfig, tag, owner, clock)
 	{
 		// IDE controller with 0xd0 as programming i/f "ATA Host Adapters standard"
@@ -33,10 +33,10 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-//	virtual void reset_all_mappings() override;
+//  virtual void reset_all_mappings() override;
 
-	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
-						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
+//  virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+//                         uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 	virtual void config_map(address_map &map) override;
 
@@ -51,9 +51,13 @@ private:
 	devcb_write_line m_irq_pri_callback;
 	devcb_write_line m_irq_sec_callback;
 	required_address_space m_bus_master_space;
-//	virtual void address_base_w(offs_t offset, uint32_t data) override;
 
-//	u32 m_bar[4]{};
+	bool ide1_mode();
+	bool ide2_mode();
+
+	u32 bar_r(offs_t offset);
+	void bar_w(offs_t offset, u32 data);
+	u32 m_bar[5]{};
 
 	void prog_if_w(u8 data);
 	u8 ide_ctrl_0_r();
@@ -73,7 +77,8 @@ private:
 	uint8_t ide2_read_cs1_r();
 	void ide2_write_cs1_w(uint8_t data);
 
-	void compatible_io_map(address_map &map);
+//  void compatible_io_map(address_map &map);
+	void flush_ide_mode();
 
 	u8 unmap_log_r(offs_t offset);
 	void unmap_log_w(offs_t offset, u8 data);
