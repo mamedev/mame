@@ -1296,6 +1296,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/liberatr.cpp",
 	MAME_DIR .. "src/mame/includes/liberatr.h",
 	MAME_DIR .. "src/mame/video/liberatr.cpp",
+	MAME_DIR .. "src/mame/drivers/marblmd2.cpp",
 	MAME_DIR .. "src/mame/drivers/mediagx.cpp",
 	MAME_DIR .. "src/mame/drivers/metalmx.cpp",
 	MAME_DIR .. "src/mame/includes/metalmx.h",
