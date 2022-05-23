@@ -1306,7 +1306,6 @@ configuration { "vs20*" }
 		}
 
 		buildoptions {
-			"/WX",     -- Treats all compiler warnings as errors.
 			"/w45038", -- warning C5038: data member 'member1' will be initialized after data member 'member2'
 		}
 
