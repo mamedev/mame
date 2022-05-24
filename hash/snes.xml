@@ -38812,6 +38812,31 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="dbzfb" supported="no">
+		<description>Dragon Ball Z - Final Bout (pirate)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="4194304">
+				<rom name="dragon ball z - final bout (pirate).sfc" size="4194304" crc="85164f9d" sha1="a27dde45890be69d6921c77c0b36b5f33a576cb4" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- FIXME: this cracked version should be removed once the real dump above is emulated. -->
+	<software name="dbzfbh" cloneof="dbzfb">
+		<description>Dragon Ball Z - Final Bout (pirate, hacked)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="4194304">
+				<rom name="dragon ball z - final bout (pirate - hacked).sfc" size="4194304" crc="a911c842" sha1="48ebb510529ab0c52ec792a44ccfc112929b49b6" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dbzhypd">
 		<description>Dragon Ball Z - Hyper Dimension (Fra)</description>
 		<year>1996</year>
