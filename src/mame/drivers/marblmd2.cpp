@@ -1,6 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+/*
+	TODO:
+	- Issues in service mode (eg. RAM check fails) could just be prototype issues
+	- Check if there's any trackball reading code anywhere, or if this is really joystick only
+
+*/
+
 #include "emu.h"
 
 #include "audio/atarijsa.h"
@@ -69,6 +76,7 @@ uint32_t marblmd2_state::screen_update_marblmd2(screen_device &screen, bitmap_in
 	bitmap_ind8 &priority_bitmap = screen.priority();
 	priority_bitmap.fill(0, cliprect);
 	m_vad->playfield().draw(screen, m_tempbitmap, cliprect, 0, 0x00);
+	bitmap_ind16 &mobitmap = m_vad->mob().bitmap();
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -82,21 +90,33 @@ uint32_t marblmd2_state::screen_update_marblmd2(screen_device &screen, bitmap_in
 		}
 	}
 
-
-	// draw and merge the MO
-	bitmap_ind16 &mobitmap = m_vad->mob().bitmap();
 	for (const sparse_dirty_rect *rect = m_vad->mob().first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
+	{
 		for (int y = rect->top(); y <= rect->bottom(); y++)
 		{
+			uint16_t *const pf2 = &m_tempbitmap.pix(y);
+
 			uint16_t const *const mo = &mobitmap.pix(y);
 			uint16_t *const pf = &bitmap.pix(y);
 			for (int x = rect->left(); x <= rect->right(); x++)
+			{
 				if (mo[x] != 0xffff)
 				{
-					// not yet verified
-					pf[x] = mo[x];
+					if (pf2[x] & 0x80) // check against top bit of temp pf render
+					{
+						if ((mo[x] & 0x80) == 0x80)
+							pf[x] = mo[x];
+					}
+					else
+					{
+						pf[x] = mo[x] | 0x80;
+					}
+
 				}
+			}
 		}
+	}
+
 
 	return 0;
 }
@@ -230,13 +250,13 @@ const atari_motion_objects_config marblmd2_state::s_mob_config =
 	0,                  // pixel offset for SLIPs 
 	0,                  // maximum number of links to visit/scanline (0=all) 
 
-	0x080,              // base palette entry 
-	0x080,              // maximum number of colors 
+	0x000,              // base palette entry 
+	0x100,              // maximum number of colors 
 	0,                  // transparent pen index 
 
 	{{ 0x03ff,0,0,0 }}, // mask for the link 
 	{{ 0,0x7fff,0,0 }}, // mask for the code index 
-	{{ 0,0,0x0007,0 }}, // mask for the color 
+	{{ 0,0,0x000f,0 }}, // mask for the color 
 	{{ 0,0,0xff80,0 }}, // mask for the X position 
 	{{ 0,0,0,0xff80 }}, // mask for the Y position 
 	{{ 0,0,0,0x0070 }}, // mask for the width, in tiles
