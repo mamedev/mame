@@ -18,7 +18,7 @@
 	- verify XTALs, clocks, volume balance, dipswitches etc.
 
 	Non-Bugs:
-	- objects appear over text boxes during scroll before levels, verified to happen hardware
+	- objects appear over text boxes during scroll before levels, verified to happen on hardware
 
 
 */
