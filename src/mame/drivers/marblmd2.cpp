@@ -101,7 +101,7 @@ uint32_t marblmd2_state::screen_update_marblmd2(screen_device &screen, bitmap_in
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint16_t *const src = &m_tempbitmap.pix(y);
+		uint16_t const *const src = &m_tempbitmap.pix(y);
 		uint16_t *const dst = &bitmap.pix(y);
 
 		// top bit of the gfxdata appears to be priority, so we don't want it in the render bitmap
@@ -115,8 +115,7 @@ uint32_t marblmd2_state::screen_update_marblmd2(screen_device &screen, bitmap_in
 	{
 		for (int y = rect->top(); y <= rect->bottom(); y++)
 		{
-			uint16_t *const pf2 = &m_tempbitmap.pix(y);
-
+			uint16_t const *const pf2 = &m_tempbitmap.pix(y);
 			uint16_t const *const mo = &mobitmap.pix(y);
 			uint16_t *const pf = &bitmap.pix(y);
 			for (int x = rect->left(); x <= rect->right(); x++)
@@ -125,7 +124,7 @@ uint32_t marblmd2_state::screen_update_marblmd2(screen_device &screen, bitmap_in
 				{
 					if (pf2[x] & 0x80) // check against top bit of temp pf render
 					{
-						if ((mo[x] & 0x80) == 0x80)
+						if (mo[x] & 0x80)
 							pf[x] = mo[x];
 					}
 					else
@@ -137,7 +136,6 @@ uint32_t marblmd2_state::screen_update_marblmd2(screen_device &screen, bitmap_in
 			}
 		}
 	}
-
 
 	return 0;
 }
