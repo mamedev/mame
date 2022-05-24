@@ -5,6 +5,9 @@
 #include "nl_base.h"
 #include "nlid_twoterm.h"
 
+// Names
+// spell-checker: words Ebers, Moll
+
 // FIXME: Remove QBJT_switch - no more use
 
 namespace netlist
@@ -174,7 +177,7 @@ namespace analog
 	NETLIB_OBJECT_DERIVED(QBJT_switch, QBJT)
 	{
 		NETLIB_CONSTRUCTOR(QBJT_switch)
-		, m_modacc(m_model)
+		, m_bjt_model(m_model)
 		, m_RB(*this, "m_RB", NETLIB_DELEGATE(termhandler))
 		, m_RC(*this, "m_RC", NETLIB_DELEGATE(termhandler))
 		, m_BC(*this, "m_BC", NETLIB_DELEGATE(termhandler))
@@ -206,7 +209,7 @@ namespace analog
 		NETLIB_UPDATE_TERMINALSI();
 
 	private:
-		bjt_model_t m_modacc;
+		bjt_model_t m_bjt_model;
 		nld_twoterm m_RB;
 		nld_twoterm m_RC;
 		nld_twoterm m_BC;
@@ -227,7 +230,7 @@ namespace analog
 	{
 	public:
 		NETLIB_CONSTRUCTOR(QBJT_EB)
-		, m_modacc(m_model)
+		, m_bjt_model(m_model)
 		, m_gD_BC(*this, "m_D_BC")
 		, m_gD_BE(*this, "m_D_BE")
 		, m_D_CB(*this, "m_D_CB", NETLIB_DELEGATE(termhandler))
@@ -245,13 +248,13 @@ namespace analog
 			connect(m_D_EB.N(), m_D_CB.N());
 			connect(m_D_CB.P(), m_D_EC.N());
 
-			if (m_modacc.m_CJE > nlconst::zero())
+			if (m_bjt_model.m_CJE > nlconst::zero())
 			{
 				create_and_register_subdevice(*this, "m_CJE", m_CJE);
 				connect("B", "m_CJE.1");
 				connect("E", "m_CJE.2");
 			}
-			if (m_modacc.m_CJC > nlconst::zero())
+			if (m_bjt_model.m_CJC > nlconst::zero())
 			{
 				create_and_register_subdevice(*this, "m_CJC", m_CJC);
 				connect("B", "m_CJC.1");
@@ -276,7 +279,7 @@ namespace analog
 		NETLIB_UPDATE_TERMINALSI();
 
 	private:
-		bjt_model_t m_modacc;
+		bjt_model_t m_bjt_model;
 		generic_diode<diode_e::BIPOLAR> m_gD_BC;
 		generic_diode<diode_e::BIPOLAR> m_gD_BE;
 
@@ -315,13 +318,13 @@ namespace analog
 
 	NETLIB_UPDATE_PARAM(QBJT_switch)
 	{
-		nl_fptype IS = m_modacc.m_IS;
-		nl_fptype BF = m_modacc.m_BF;
-		nl_fptype NF = m_modacc.m_NF;
-		//nl_fptype VJE = m_modacc.dValue("VJE", 0.75);
+		nl_fptype IS = m_bjt_model.m_IS;
+		nl_fptype BF = m_bjt_model.m_BF;
+		nl_fptype NF = m_bjt_model.m_NF;
+		//nl_fptype VJE = m_bjt_model.dValue("VJE", 0.75);
 
 		// FIXME: check for PNP as well and bail out
-		set_qtype(m_modacc.m_type);
+		set_qtype(m_bjt_model.m_type);
 
 		nl_fptype alpha = BF / (nlconst::one() + BF);
 
@@ -375,12 +378,12 @@ namespace analog
 		if (m_CJE)
 		{
 			m_CJE->reset();
-			m_CJE->set_cap_embedded(m_modacc.m_CJE);
+			m_CJE->set_cap_embedded(m_bjt_model.m_CJE);
 		}
 		if (m_CJC)
 		{
 			m_CJC->reset();
-			m_CJC->set_cap_embedded(m_modacc.m_CJC);
+			m_CJC->set_cap_embedded(m_bjt_model.m_CJC);
 		}
 	}
 
@@ -412,15 +415,15 @@ namespace analog
 
 	NETLIB_UPDATE_PARAM(QBJT_EB)
 	{
-		nl_fptype IS = m_modacc.m_IS;
-		nl_fptype BF = m_modacc.m_BF;
-		nl_fptype NF = m_modacc.m_NF;
-		nl_fptype BR = m_modacc.m_BR;
-		nl_fptype NR = m_modacc.m_NR;
-		//nl_fptype VJE = m_m_modacc.dValue("VJE", 0.75);
+		nl_fptype IS = m_bjt_model.m_IS;
+		nl_fptype BF = m_bjt_model.m_BF;
+		nl_fptype NF = m_bjt_model.m_NF;
+		nl_fptype BR = m_bjt_model.m_BR;
+		nl_fptype NR = m_bjt_model.m_NR;
+		//nl_fptype VJE = m_m_bjt_model.dValue("VJE", 0.75);
 
 		// FIXME: check for PNP as well and bail out
-		set_qtype(m_modacc.m_type);
+		set_qtype(m_bjt_model.m_type);
 
 		m_alpha_f = BF / (nlconst::one() + BF);
 		m_alpha_r = BR / (nlconst::one() + BR);

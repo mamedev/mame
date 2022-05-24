@@ -736,8 +736,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<!-- Requires 32x add-on! -->
-	<software name="corpse32" cloneof="corpse">
+	<software name="corpse32" cloneof="corpse" supported="no">
 		<!-- Source: redump.org - http://redump.org/disc/2965/
 		<rom name="Corpse Killer (USA) (32X).cue" size="220" crc="5d439045" />
 		<rom name="Corpse Killer (USA) (32X) (Track 1).bin" size="624898176" crc="acd1f057" />
@@ -746,9 +745,14 @@ See: http://rawdump.net/
 		<description>Corpse Killer (USA, 32X)</description>
 		<year>1995</year>
 		<publisher>Digital Pictures</publisher>
+		<notes><![CDATA[
+Hangs on BIOS logo
+Requires [32X] add-on
+]]></notes>
 		<info name="serial" value="T-16201F"/>
 		<info name="ring_code" value="GW 02361 RE-1 SRCR##03"/>
-		<sharedfeat name="requirement" value="32x"/>
+		<!-- <sharedfeat name="requirement" value="32x"/> -->
+		<info name="usage" value="Requires to be run with 32x_scd"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="corpse killer (usa, 32x)" sha1="68a6c75bc730025e90fa413c107090e7f4e377e0"/>
@@ -802,7 +806,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<software name="dracunl">
+	<software name="dracunl" supported="no">
 		<!-- Source: redump.org - http://redump.org/disc/21040/ http://redump.org/disc/21041/
 		<rom name="Dracula Unleashed (USA) (Disc 1).cue" size="257" crc="93ade26e" md5="fa725eb12ee7eb683144986261c33bf1" sha1="fdb6ad28c7fc21f99e35684502bcd32dfc1abb1b"/>
 		<rom name="Dracula Unleashed (USA) (Disc 1) (Track 1).bin" size="544372752" crc="0e728a6c" md5="282a9be8157a6167a389c7fff475ed3a" sha1="927b6d0525010265059ab1ee4d23c6a0598b7fb8"/>
@@ -815,6 +819,9 @@ See: http://rawdump.net/
 		<description>Dracula Unleashed (USA)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Requires [disc swap]
+]]></notes>
 		<info name="serial" value="4420"/>
 		<info name="ring_code" value="CDAC-053000 14 (Disc 1) / CDAC-053100 4 (Disc 2)"/>
 		<part name="cdrom1" interface="scd_cdrom">
@@ -1156,7 +1163,8 @@ See: http://rawdump.net/
 	</software>
 
 	<!-- This game came in a bundle with both a Sega CD compatible disc and one which takes advantage of the 32X expansion. -->
-	<software name="fahrenhe">
+	<!-- TODO: where to load disc 2? Does it detects 32x automatically and just then prompt user? -->
+	<software name="fahrenhe" supported="partial">
 		<!-- Source: redump.org - http://redump.org/disc/29440/ http://redump.org/disc/29441/
 		<rom name="Fahrenheit (USA) (Disc 1) (Key Disc) (Sega CD).cue" size="262" crc="8982108b" md5="0b0a464fd029c7df830ad19ed1bfe099" sha1="825a83edb4966e0d9beaafc2d94233a2a0bc30f0"/>
 		<rom name="Fahrenheit (USA) (Disc 1) (Key Disc) (Sega CD) (Track 1).bin" size="593710656" crc="e22ff784" md5="f96fdb4fc2f8a6308c46d8af793d5c21" sha1="436141455a4726ce065d37db8e39f540c303de0a"/>
@@ -1169,6 +1177,9 @@ See: http://rawdump.net/
 		<description>Fahrenheit (USA, Sega CD &amp; 32X CD)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Has optional unemulated [32X] mode, which in turn needs [disc swap]
+]]></notes>
 		<info name="release" value="199503xx" />
 		<info name="serial" value="4438"/>
 		<info name="ring_code" value="CDAC-088300 1 (Disc 1) / CDAC-088400 1 (Disc 2)"/>
@@ -1344,7 +1355,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<software name="gztexas">
+	<software name="gztexas" supported="no">
 		<!-- Source: redump.org - http://redump.org/disc/19472/ http://redump.org/disc/19473/
 		<rom name="Ground Zero Texas (USA) (Disc 1).cue" size="257" crc="d0c584c7" md5="113dd7490af1f86d08f70448d443ed93" sha1="2041c4c954bb0b19ede6dbef1190836c9f2c72b7"/>
 		<rom name="Ground Zero Texas (USA) (Disc 1) (Track 1).bin" size="629355216" crc="20b937a8" md5="27eac38ea6f5deee11367f0062f55608" sha1="d151430da0d6e25af45ecd0a9133dea9a1d1d285"/>
@@ -1357,6 +1368,9 @@ See: http://rawdump.net/
 		<description>Ground Zero Texas (USA)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
+		<notes><![CDATA[
+Requires [disc swap]
+]]></notes>
 		<info name="ring_code" value="CDAC-053200 2, CDAC-053200 4 (Disc 1) / CDAC-053300 1 (Disc 2)"/>
 		<info name="serial" value="T-93145"/>
 		<part name="cdrom1" interface="scd_cdrom">
@@ -2233,7 +2247,6 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<!-- Requires 32x add-on! -->
 	<software name="ntrap32" cloneof="ntrap">
 		<!-- Source: redump.org - http://redump.org/disc/17550/ http://redump.org/disc/17551/
 		<rom name="Night Trap (USA) (Disc 1) (32X).cue" size="232" crc="40b701ce" />
@@ -2247,9 +2260,15 @@ See: http://rawdump.net/
 		<description>Night Trap (USA, 32X)</description>
 		<year>1994</year>
 		<publisher>Digital Pictures</publisher>
+		<notes><![CDATA[
+Hangs on BIOS logo
+Requires [32X] add-on
+Requires [disc swap]
+]]></notes>
 		<info name="serial" value="T-16202F"/>
 		<info name="ring_code" value="GW 00161.1 RE-1 SRCR##02 (Disc 1) / GW 00161.2 RE-1 SRCR##02 (Disc 2)"/>
-		<sharedfeat name="requirement" value="32x"/>
+		<!--<sharedfeat name="requirement" value="32x"/>-->
+		<info name="usage" value="Requires to be run with 32x_scd"/>
 		<part name="cdrom1" interface="scd_cdrom">
 			<feature name="part_id" value="Disc 1" />
 			<diskarea name="cdrom">
@@ -2266,7 +2285,7 @@ See: http://rawdump.net/
 	</software>
 
 	<!-- This is a dump from the original edition. Investigate if the re-release is different. -->
-	<software name="ntrapa" cloneof="ntrap">
+	<software name="ntrapa" cloneof="ntrap" supported="no">
 		<!-- Source: redump.org - http://redump.org/disc/17158/ http://redump.org/disc/17159/
 		<rom name="Night Trap (USA) (Disc 1).cue" size="91" crc="b5fae72b" />
 		<rom name="Night Trap (USA) (Disc 1).bin" size="616997808" crc="900cf0aa" />
@@ -2277,6 +2296,9 @@ See: http://rawdump.net/
 		<description>Night Trap (USA)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Required [disc swap]
+]]></notes>
 		<info name="serial" value="4903"/>
 		<info name="release" value="199211xx" />
 		<info name="ring_code" value="CDRM-1027400 5 (Disc 1) / CDRM-1027410 2, CDRM-1027410 1 (Disc 2)"/>
@@ -2296,7 +2318,7 @@ See: http://rawdump.net/
 	</software>
 
 	<!-- Only the first disk is different from the parent. -->
-	<software name="ntrapb" cloneof="ntrap">
+	<software name="ntrapb" cloneof="ntrap" supported="no">
 		<!-- Source: redump.org - http://redump.org/disc/20867/ http://redump.org/disc/17159/
 		<rom name="Night Trap (USA) (Disc 1) (Alt).cue" size="97" crc="f2950016" md5="c9261a74b06972b2e1fbf7addc5fb5a0" sha1="2456d059254e74ebaf8b8f17fc665222fa47c323"/>
 		<rom name="Night Trap (USA) (Disc 1) (Alt).bin" size="616645008" crc="133b76ce" md5="6bfe493a225713115096d730edf77afe" sha1="9cd08d3718e17134a013cae92a52a2ac0b226b77"/>
@@ -2307,6 +2329,9 @@ See: http://rawdump.net/
 		<description>Night Trap (USA, alt)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Requires [disc swap]
+]]></notes>
 		<info name="serial" value="4903"/>
 		<info name="release" value="199211xx" />
 		<info name="ring_code" value="CDRM-1027400 3 (Disc 1) / CDRM-1027410 2, CDRM-1027410 1 (Disc 2)"/>
@@ -2331,7 +2356,7 @@ See: http://rawdump.net/
 	Mega Drive/Genesis while playing the game, the music and sound effects will
 	be improved. As such, this disc is not really a game in it's own right.
 	-->
-	<software name="psgaesd">
+	<software name="psgaesd" supported="no">
 		<!-- Source: redump.org - http://redump.org/disc/19787/
 		<rom name="Pier Solar and the Great Architects Enhanced Soundtrack Disc (USA).cue" size="622" crc="6d317fa8" md5="f0e03431664704058746f511e21c0958" sha1="ef30161fe9b6737346530bd74644996b3dc58041"/>
 		<rom name="Pier Solar and the Great Architects Enhanced Soundtrack Disc (USA) (Track 1).bin" size="511769328" crc="59200094" md5="5861f8067b1a3b8f1f6567e844a58dd3" sha1="649ca22c941afb50613167a942fd82b0c0b93384"/>
@@ -2342,10 +2367,14 @@ See: http://rawdump.net/
 		<description>Pier Solar and the Great Architects Enhanced Soundtrack Disc (World)</description>
 		<year>2010</year>
 		<publisher>WaterMelon</publisher>
+		<notes><![CDATA[
+No support for Mega CD cart slots
+]]></notes>
 		<info name="serial" value="T-574013, T-574016, T-574016-50"/>
 		<info name="release" value="20101214" />
 		<info name="ring_code" value="Enhanced Soundtrack Disc WM WM 2234612235072235144* Enhanced Soundtrack Disc WM B"/>
-		<sharedfeat name="requirement" value="megadriv -psolar"/>
+		<!--<sharedfeat name="requirement" value="megadriv -psolar"/>-->
+		<info name="usage" value="Requires to be run with megadriv psolar cart"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="pier solar and the great architects enhanced soundtrack disc (world)" sha1="1f26cce723ef044f449d87cdb624a2937f40f5d9"/>
@@ -2608,7 +2637,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<software name="roadaven">
+	<software name="roadaven" supported="no">
 		<!-- Source: redump.org - http://redump.org/disc/29313/
 		<rom name="Road Avenger (USA).cue" size="453" crc="9e7d5e08" md5="840ebb398cce8d27cf3a5d253d8b575d" sha1="cd2b55540b911786886f43aae99e228d9f85efc5"/>
 		<rom name="Road Avenger (USA) (Track 1).bin" size="317816352" crc="cf3bd177" md5="71e1578e091e0d5df4b07f4f26e4d2c9" sha1="9cf7095ab8f7a5aa5df046d0b665263f4f506f19"/>
@@ -2619,6 +2648,9 @@ See: http://rawdump.net/
 		<description>Road Avenger (USA)</description>
 		<year>1993</year>
 		<publisher>Renovation</publisher>
+		<notes><![CDATA[
+Black screen, requires sub CPU to be overclocked by 1.5x
+]]></notes>
 		<info name="serial" value="T-6207"/>
 		<info name="release" value="199303xx" />
 		<info name="ring_code" value="SEGA6207 R1D MFD BY JVC"/>
@@ -2819,7 +2851,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<software name="holmes2">
+	<software name="holmes2" supported="no">
 		<!-- Source: redump.org - http://redump.org/disc/17162/ http://redump.org/disc/17163/
 		<rom name="Sherlock Holmes - Consulting Detective Vol. II (USA) (Disc 1).cue" size="292" crc="a33aa103" />
 		<rom name="Sherlock Holmes - Consulting Detective Vol. II (USA) (Disc 1) (Track 1).bin" size="529374048" crc="94a913b7" />
@@ -2832,6 +2864,9 @@ See: http://rawdump.net/
 		<description>Sherlock Holmes - Consulting Detective Vol. II (USA)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Requires [disc swap]
+]]></notes>
 		<info name="serial" value="4653"/>
 		<info name="release" value="199305xx" />
 		<info name="ring_code" value="CDAC-041000 1 (Disc 1), CDAC-041100 2 (Disc 2)"/>
@@ -2976,7 +3011,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<software name="slamcity">
+	<software name="slamcity" supported="no">
 		<!-- Source: redump.org - http://redump.org/disc/28031/ http://redump.org/disc/28032/ http://redump.org/disc/28033/ http://redump.org/disc/28034/
 		<rom name="Slam City with Scottie Pippen (USA) (Disc 1) (Fingers).cue" size="301" crc="3f50c8bc" md5="35ca36913af0a3df72cf8c3492eceec1" sha1="e3511c717bb78966f75e0dd4a2190b5d390faefe"/>
 		<rom name="Slam City with Scottie Pippen (USA) (Disc 1) (Fingers) (Track 1).bin" size="587070960" crc="becd1484" md5="99a012c46ec31fec5f9538eaa510bd5a" sha1="f32cf26f6fa4acf12807e7f1064e9e202d11cff3"/>
@@ -2997,6 +3032,9 @@ See: http://rawdump.net/
 		<description>Slam City with Scottie Pippen (USA, rev. A)</description>
 		<year>1994</year>
 		<publisher>Digital Pictures</publisher>
+		<notes><![CDATA[
+Requires [disc swap]
+]]></notes>
 		<info name="serial" value="T-162035"/>
 		<info name="release" value="199411xx" />
 		<info name="ring_code" value="GW 02711.1 RE-1 SRCR##01 (Disc 1) / GW 02711.2 RE-1 SRCR**01 (Disc 2) / GW 02711.3 RE-1 SRCR##01 (Disc 3) / GW 02711.4 RE-1 SRCR##01 (Disc 4)"/>
@@ -4251,7 +4289,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<software name="gztexasa" cloneof="gztexas">
+	<software name="gztexasa" cloneof="gztexas" supported="no">
 		<!-- Source: TOSEC-ISO
 		<rom name="Ground Zero Texas (1993)(Sony Imagesoft)(NTSC)(US)(Disc 1 of 2)[!].cue" size="329" crc="b82ac042" />
 		<rom name="Ground Zero Texas (1993)(Sony Imagesoft)(NTSC)(US)(Disc 1 of 2)(Track 1 of 2)[!].iso" size="548009984" crc="e397fe2d" />
@@ -4264,6 +4302,9 @@ See: http://rawdump.net/
 		<description>Ground Zero Texas (USA, alt)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
+		<notes><![CDATA[
+Requires [disc swap]
+]]></notes>
 		<info name="serial" value="T-93145"/>
 		<info name="ring_code" value="CDAC-053300 2 (Disc 2)"/>
 		<part name="cdrom1" interface="scd_cdrom">
@@ -4581,7 +4622,7 @@ See: http://rawdump.net/
 	</software>
 
 	<!-- Only the first disc is dumped to redump.org standard. The second disc is a TOSEC-ISO dump. -->
-	<software name="prizefig">
+	<software name="prizefig" supported="no">
 		<!-- Source: TOSEC-ISO & redump.org - http://redump.org/disc/28629/
 		<rom name="Prize Fighter (USA) (Disc 1).cue" size="226" crc="008693c6" md5="5d9afab480f10aff98863b7bb6e35eb2" sha1="88788d86717177eca87075169ee40d0fdc683286"/>
 		<rom name="Prize Fighter (USA) (Disc 1) (Track 1).bin" size="410527488" crc="7d3f2a3c" md5="f8c2e9f9adc690908bd753c5c5ad1511" sha1="a310fc47ee68ba2f6c860b24b11be76ac4f08d86"/>
@@ -4594,6 +4635,9 @@ See: http://rawdump.net/
 		<description>Prize Fighter (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Requires [disc swap]
+]]></notes>
 		<info name="serial" value="MK-4206"/>
 		<info name="ring_code" value="CDAC-052700 2 (Disc 1)"/>
 		<part name="cdrom1" interface="scd_cdrom">
@@ -4729,7 +4773,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<software name="slamcitya" cloneof="slamcity">
+	<software name="slamcitya" cloneof="slamcity" supported="no">
 		<!-- Source: TOSEC-ISO
 		<rom name="Slam City with Scottie Pippen (1994)(Digital Pictures)(NTSC)(US)(Disc 1 of 4)[!][Fingers][GW 02711.1].cue" size="399" crc="59d841d8" />
 		<rom name="Slam City with Scottie Pippen (1994)(Digital Pictures)(NTSC)(US)(Disc 1 of 4)(Track 1 of 2)[!][Fingers][GW 02711.1].iso" size="511191040" crc="6747b14f" />
@@ -4750,6 +4794,9 @@ See: http://rawdump.net/
 		<description>Slam City with Scottie Pippen (USA)</description>
 		<year>1994</year>
 		<publisher>Digital Pictures</publisher>
+		<notes><![CDATA[
+Requires [disc swap]
+]]></notes>
 		<info name="serial" value="T-162035"/>
 		<info name="release" value="199411xx" />
 		<info name="ring_code" value="GW 02711.1 (Disc 1) / GW 02711.2 (Disc 2) / GW 02711.3 (Disc 3) / GW 02711.4 (Disc 4)"/>
@@ -4782,8 +4829,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<!-- Requires 32x add-on! -->
-	<software name="slamcity32" cloneof="slamcity">
+	<software name="slamcity32" cloneof="slamcity" supported="no">
 		<!-- Source: TOSEC-ISO
 		<rom name="Slam City with Scottie Pippen (1994)(Digital Pictures)(NTSC)(US)(Disc 1 of 4)[!][Fingers][32X].cue" size="385" crc="55a0b768" />
 		<rom name="Slam City with Scottie Pippen (1994)(Digital Pictures)(NTSC)(US)(Disc 1 of 4)(Track 1 of 2)[!][Fingers][32X].iso" size="529147904" crc="1c6665b1" />
@@ -4804,8 +4850,14 @@ See: http://rawdump.net/
 		<description>Slam City with Scottie Pippen (USA, 32X)</description>
 		<year>1994</year>
 		<publisher>Digital Pictures</publisher>
+		<notes><![CDATA[
+Hangs on BIOS logo
+Requires [32X] add-on
+Requires [disc swap]
+]]></notes>
 		<info name="serial" value="T16204F"/>
-		<sharedfeat name="requirement" value="32x"/>
+		<!-- <sharedfeat name="requirement" value="32x"/> -->
+		<info name="usage" value="Requires to be run with 32x_scd"/>
 		<part name="cdrom1" interface="scd_cdrom">
 			<feature name="part_id" value="Disc 1 - Fingers" />
 			<diskarea name="cdrom">
@@ -4872,7 +4924,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<software name="supremew">
+	<software name="supremew" supported="no">
 		<!-- Source: TOSEC-ISO
 		<rom name="Supreme Warrior - Ying Heung (1994)(Digital Pictures)(NTSC)(US)(Disc 1 of 2)[!][Fire & Earth][GW 02411.1 RE-1].cue" size="417" crc="503b570d" />
 		<rom name="Supreme Warrior - Ying Heung (1994)(Digital Pictures)(NTSC)(US)(Disc 1 of 2)(Track 1 of 2)[!][Fire & Earth][GW 02411.1 RE-1].iso" size="427319296" crc="c12c22aa" />
@@ -4885,6 +4937,9 @@ See: http://rawdump.net/
 		<description>Supreme Warrior (USA)</description>
 		<year>1994</year>
 		<publisher>Digital Pictures</publisher>
+		<notes><![CDATA[
+Requires [disc swap]
+]]></notes>
 		<info name="serial" value="T-162045"/>
 		<info name="alt_title" value="Supreme Warrior - Ying Heung (Box)" />
 		<info name="ring_code" value="GW 02411.1 RE-1 (Disc 1), GW 02411.2 RE-1 (Disc 2)"/>
@@ -4902,8 +4957,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<!-- Requires 32x add-on! -->
-	<software name="supremew32" cloneof="supremew">
+	<software name="supremew32" cloneof="supremew" supported="no">
 		<!-- Source: TOSEC-ISO
 		<rom name="Supreme Warrior - Ying Heung (1994)(Digital Pictures)(NTSC)(US)(en-zh)(Disc 1 of 2)[!][Fire & Earth][32X].cue" size="407" crc="6c4630fc" />
 		<rom name="Supreme Warrior - Ying Heung (1994)(Digital Pictures)(NTSC)(US)(en-zh)(Disc 1 of 2)(Track 1 of 2)[!][Fire & Earth][32X].iso" size="459593728" crc="a65565f4" />
@@ -4916,9 +4970,15 @@ See: http://rawdump.net/
 		<description>Supreme Warrior (USA, 32X)</description>
 		<year>1994</year>
 		<publisher>Digital Pictures</publisher>
+		<notes><![CDATA[
+Hangs on BIOS logo
+Requires [32X] add-on
+Requires [disc swap]
+]]></notes>
 		<info name="serial" value="T-16203F"/>
 		<info name="alt_title" value="Supreme Warrior - Ying Heung (Box)" />
-		<sharedfeat name="requirement" value="32x"/>
+		<!-- <sharedfeat name="requirement" value="32x"/> -->
+		<info name="usage" value="Requires to be run with 32x_scd"/>
 		<part name="cdrom1" interface="scd_cdrom">
 			<feature name="part_id" value="Disc 1 - Fire and Earth" />
 			<diskarea name="cdrom">
@@ -5470,10 +5530,13 @@ See: http://rawdump.net/
 
 	<!-- Sourced from the hiddenpalace forums - http://hiddenpalace.org/forums/viewtopic.php?t=2880 -->
 	<!-- Marked as bad dump as it's an MP3-based dump, but probably it's also a broken dump. -->
-	<software name="johnnymn">
+	<software name="johnnymn" supported="no">
 		<description>Johnny Mnemonic (USA, prototype)</description>
 		<year>1995?</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Requires [disc swap]
+]]></notes>
 		<part name="cdrom1" interface="scd_cdrom">
 			<feature name="part_id" value="Disc 1" />
 			<diskarea name="cdrom1">
@@ -5607,7 +5670,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<software name="ntrap">
+	<software name="ntrap" supported="no">
 		<!-- Source: TruRip
 		<rom name="Media (CD-ROM)\Night Trap (Rerelease) (1994)(Digital Pictures)(US) - (Disc 1 of 2).ccd" size="934" crc="a9d84328" md5="2d6273e67c6602ac5756c3dedabe23ca" sha1="7534eaccfd1977956f36e7492516e0252a111e79"/>
 		<rom name="Media (CD-ROM)\Night Trap (Rerelease) (1994)(Digital Pictures)(US) - (Disc 1 of 2).img" size="619613232" crc="7cb50000" md5="6061e5642a6070ca6e46269386f4cf06" sha1="53693355efedd1b5afdb24aca323697c860ffd46"/>
@@ -5620,6 +5683,9 @@ See: http://rawdump.net/
 		<description>Night Trap (USA, Re-Release)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Requires [disc swap]
+]]></notes>
 		<info name="serial" value="T-162105"/>
 		<part name="cdrom1" interface="scd_cdrom">
 			<feature name="part_id" value="Disc 1" />
@@ -5654,11 +5720,14 @@ See: http://rawdump.net/
 	</software>
 
 	<!-- Marked as bad dump as it's an MP3-based dump. -->
-	<software name="pennsmok">
+	<software name="pennsmok" supported="no">
 		<!-- Unknown source -->
 		<description>Penn &amp; Teller's Smoke and Mirrors (USA, prototype)</description>
 		<year>1995?</year>
 		<publisher>Absolute Entertainment</publisher>
+		<notes><![CDATA[
+Requires [disc swap]
+]]></notes>
 		<part name="cdrom1" interface="scd_cdrom">
 			<feature name="part_id" value="Disc 1" />
 			<diskarea name="cdrom">
@@ -5766,7 +5835,7 @@ See: http://rawdump.net/
 	</software>
 
 	<!--
-	<software name="surgical32x" cloneof="surgical">
+	<software name="surgical32" cloneof="surgical">
 	    <description>Surgical Strike (Bra, 32X)</description>
 	    <year>1996</year>
 	    <publisher>Sega</publisher>

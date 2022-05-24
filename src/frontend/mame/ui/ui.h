@@ -24,11 +24,11 @@
 #include <any>
 #include <cassert>
 #include <ctime>
-#include <map>
 #include <set>
 #include <string_view>
 #include <typeindex>
 #include <typeinfo>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -229,7 +229,7 @@ public:
 private:
 	using handler_callback_func = delegate<uint32_t (render_container &)>;
 	using device_feature_set = std::set<std::pair<std::string, std::string> >;
-	using session_data_map = std::map<std::type_index, std::any>;
+	using session_data_map = std::unordered_map<std::type_index, std::any>;
 
 	// instance variables
 	std::unique_ptr<render_font> m_font;

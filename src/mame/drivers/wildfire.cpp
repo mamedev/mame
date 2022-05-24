@@ -37,8 +37,10 @@ TODO:
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/amis2000/amis2000.h"
 #include "machine/timer.h"
+#include "sound/flt_vol.h"
 #include "sound/spkrdev.h"
 #include "video/pwm.h"
 #include "speaker.h"
@@ -55,7 +57,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_display(*this, "display"),
-		m_speaker(*this, "speaker")
+		m_speaker(*this, "speaker"),
+		m_volume(*this, "volume")
 	{ }
 
 	void wildfire(machine_config &config);
@@ -67,20 +70,18 @@ private:
 	required_device<amis2000_base_device> m_maincpu;
 	required_device<pwm_display_device> m_display;
 	required_device<speaker_sound_device> m_speaker;
+	required_device<filter_volume_device> m_volume;
 
 	void update_display();
 	void write_d(u8 data);
 	void write_a(u16 data);
-	DECLARE_WRITE_LINE_MEMBER(write_f);
 
 	void speaker_update();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
 	double m_speaker_volume = 0.0;
-	std::vector<double> m_speaker_levels;
 
 	u16 m_a = 0;
 	u8 m_d = 0;
-	int m_f = 0;
 };
 
 void wildfire_state::machine_start()
@@ -88,7 +89,6 @@ void wildfire_state::machine_start()
 	// register for savestates
 	save_item(NAME(m_a));
 	save_item(NAME(m_d));
-	save_item(NAME(m_f));
 	save_item(NAME(m_speaker_volume));
 }
 
@@ -103,7 +103,7 @@ void wildfire_state::speaker_update()
 	if (~m_a & 0x1000)
 		m_speaker_volume = 1.0;
 
-	m_speaker->level_w(m_f * 0x7fff * m_speaker_volume);
+	m_volume->flt_volume_set_volume(m_speaker_volume);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(wildfire_state::speaker_decay_sim)
@@ -133,13 +133,6 @@ void wildfire_state::write_a(u16 data)
 	update_display();
 
 	// A12: speaker on
-	speaker_update();
-}
-
-WRITE_LINE_MEMBER(wildfire_state::write_f)
-{
-	// F: speaker out
-	m_f = state;
 	speaker_update();
 }
 
@@ -178,7 +171,7 @@ void wildfire_state::wildfire(machine_config &config)
 	m_maincpu->read_i().set_ioport("IN.0");
 	m_maincpu->write_d().set(FUNC(wildfire_state::write_d));
 	m_maincpu->write_a().set(FUNC(wildfire_state::write_a));
-	m_maincpu->write_f().set(FUNC(wildfire_state::write_f));
+	m_maincpu->write_f().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(12, 8);
@@ -188,15 +181,10 @@ void wildfire_state::wildfire(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "volume", 0.25);
+	FILTER_VOLUME(config, m_volume).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	TIMER(config, "speaker_decay").configure_periodic(FUNC(wildfire_state::speaker_decay_sim), attotime::from_usec(100));
-
-	// set volume levels (set_output_gain is too slow for sub-frame intervals)
-	m_speaker_levels.resize(0x8000);
-	for (int i = 0; i < 0x8000; i++)
-		m_speaker_levels[i] = double(i) / 32768.0;
-	m_speaker->set_levels(0x8000, &m_speaker_levels[0]);
 }
 
 

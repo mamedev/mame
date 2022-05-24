@@ -39,7 +39,6 @@ namespace plib {
 		using reverse_iterator = std::reverse_iterator<iterator>;
 		using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-		//uninitialised_array_t() noexcept = default;
 		uninitialised_array() noexcept = default;
 
 		uninitialised_array(const uninitialised_array &) = default;

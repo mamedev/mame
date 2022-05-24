@@ -4,6 +4,13 @@
 #ifndef NLD_MS_W_H_
 #define NLD_MS_W_H_
 
+// Names
+// spell-checker: words Woodbury, Raphson,
+//
+// Specific technical terms
+// spell-checker: words Cgso, Cgdo, Cgbo, Cjsw, Mjsw, Ucrit, Uexp, Utra, Neff, Tnom, capval, Udsat, Utst
+
+
 ///
 /// \file nld_ms_direct.h
 ///
@@ -34,8 +41,8 @@
 /// for uk being unit vectors for full rank (max(k) == n) is identical to the
 /// inverse of A.
 ///
-/// The approach performs relatively well for matrices up to n ~ 40 (kidniki using frontiers).
-/// Kidniki without frontiers has n==88. Here, the average number of Newton-Raphson
+/// The approach performs relatively well for matrices up to n ~ 40 (`kidniki` using frontiers).
+/// `Kidniki` without frontiers has n==88. Here, the average number of Newton-Raphson
 /// loops increase to 20. It looks like that the approach for larger matrices
 /// introduces numerical instability.
 ///
@@ -82,7 +89,7 @@ namespace netlist::solver
 		template <typename T1, typename T2>
 		float_ext_type &W(const T1 &r, const T2 &c) { return m_W[r][c]; }
 
-		// access to Ainv for fixed columns over row, there store transposed
+		// access to the inverted matrix for fixed columns over row, values stored transposed
 		template <typename T1, typename T2>
 		float_ext_type &Ainv(const T1 &r, const T2 &c) { return m_Ainv[c][r]; }
 		template <typename T1>
@@ -109,7 +116,7 @@ namespace netlist::solver
 		array2D<float_ext_type, storage_N, m_pitch> H;
 		std::array<unsigned, storage_N> rows;
 		array2D<unsigned, storage_N, m_pitch> cols;
-		std::array<unsigned, storage_N> colcount;
+		std::array<unsigned, storage_N> col_count;
 
 		unsigned m_cnt;
 	};
@@ -225,7 +232,7 @@ namespace netlist::solver
 
 			// determine changed rows
 
-			unsigned rowcount=0;
+			unsigned row_count=0;
 			#define VT(r,c) (A(r,c) - lA(r,c))
 
 			for (unsigned row = 0; row < iN; row ++)
@@ -235,20 +242,20 @@ namespace netlist::solver
 				for (auto & col : nz)
 				{
 					if (A(row,col) != lA(row,col))
-						cols[rowcount][cc++] = col;
+						cols[row_count][cc++] = col;
 				}
 				if (cc > 0)
 				{
-					colcount[rowcount] = cc;
-					rows[rowcount++] = row;
+					col_count[row_count] = cc;
+					rows[row_count++] = row;
 				}
 			}
-			if (rowcount > 0)
+			if (row_count > 0)
 			{
 				// construct w = transform(V) * y
-				// dim: rowcount x iN
+				// dim: row_count x iN
 				//
-				for (unsigned i = 0; i < rowcount; i++)
+				for (unsigned i = 0; i < row_count; i++)
 				{
 					const unsigned r = rows[i];
 					FT tmp = plib::constants<FT>::zero();
@@ -257,32 +264,32 @@ namespace netlist::solver
 					w[i] = tmp;
 				}
 
-				for (unsigned i = 0; i < rowcount; i++)
-					for (unsigned k=0; k< rowcount; k++)
+				for (unsigned i = 0; i < row_count; i++)
+					for (unsigned k=0; k< row_count; k++)
 						H[i][k] = plib::constants<FT>::zero();
 
-				for (unsigned i = 0; i < rowcount; i++)
+				for (unsigned i = 0; i < row_count; i++)
 					H[i][i] = plib::constants<FT>::one();
 				// Construct H = (I + VT*Z)
-				for (unsigned i = 0; i < rowcount; i++)
-					for (unsigned k=0; k< colcount[i]; k++)
+				for (unsigned i = 0; i < row_count; i++)
+					for (unsigned k=0; k< col_count[i]; k++)
 					{
 						const unsigned col = cols[i][k];
 						float_type f = VT(rows[i],col);
 						// FIXME: comparison to zero
 						if (f != plib::constants<float_type>::zero())
-							for (unsigned j= 0; j < rowcount; j++)
+							for (unsigned j= 0; j < row_count; j++)
 								H[i][j] += f * Ainv(col,rows[j]);
 					}
 
 				// Gaussian elimination of H
-				for (unsigned i = 0; i < rowcount; i++)
+				for (unsigned i = 0; i < row_count; i++)
 				{
 					// FIXME: comparison to zero
 					if (H[i][i] == plib::constants<float_type>::zero())
 						plib::perrlogger("{} H singular\n", this->name());
 					const float_type f = plib::reciprocal(H[i][i]);
-					for (unsigned j = i+1; j < rowcount; j++)
+					for (unsigned j = i+1; j < row_count; j++)
 					{
 						const float_type f1 = - f * H[j][i];
 
@@ -291,7 +298,7 @@ namespace netlist::solver
 						{
 							float_type *pj = &H[j][i+1];
 							const float_type *pi = &H[i][i+1];
-							for (unsigned k = 0; k < rowcount-i-1; k++)
+							for (unsigned k = 0; k < row_count-i-1; k++)
 								pj[k] += f1 * pi[k];
 								//H[j][k] += f1 * H[i][k];
 							w[j] += f1 * w[i];
@@ -300,12 +307,12 @@ namespace netlist::solver
 				}
 				// Back substitution
 				//inv(H) w = t     w = H t
-				for (unsigned j = rowcount; j-- > 0; )
+				for (unsigned j = row_count; j-- > 0; )
 				{
 					float_type tmp = 0;
 					const float_type *pj = &H[j][j+1];
 					const float_type *tj = &t[j+1];
-					for (unsigned k = 0; k < rowcount-j-1; k++)
+					for (unsigned k = 0; k < row_count-j-1; k++)
 						tmp += pj[k] * tj[k];
 						//tmp += H[j][k] * t[k];
 					t[j] = (w[j] - tmp) / H[j][j];
@@ -315,7 +322,7 @@ namespace netlist::solver
 				for (unsigned i=0; i<iN; i++)
 				{
 					float_type tmp = plib::constants<FT>::zero();
-					for (unsigned j=0; j<rowcount;j++)
+					for (unsigned j=0; j<row_count;j++)
 					{
 						const unsigned row = rows[j];
 						tmp += Ainv(i,row) * t[j];

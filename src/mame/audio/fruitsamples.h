@@ -2,7 +2,7 @@
 // copyright-holders:SomeRandomGuyIdk
 /***************************************************************************
 
-	Fruit machine mechanical sound samples
+    Fruit machine mechanical sound samples
 
 ***************************************************************************/
 

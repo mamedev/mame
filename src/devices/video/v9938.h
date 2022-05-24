@@ -241,7 +241,7 @@ private:
 		void (v99x8_device::*border_32)(uint32_t*);
 		void (v99x8_device::*sprites)(int, uint8_t*);
 		void (v99x8_device::*draw_sprite_32)(uint32_t*, uint8_t*);
-	} ;
+	};
 	static const v99x8_mode s_modes[];
 	emu_timer *m_line_timer;
 	uint8_t m_pal_ntsc;

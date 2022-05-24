@@ -21,7 +21,7 @@
 // is a common agreement in serious recording applications while
 // still recording the file. So a playback application can determine that the
 // given file is still being recorded. As soon as the recording application
-// finishes the ongoing recording, it writes the correct values for RIFF lenth
+// finishes the ongoing recording, it writes the correct values for RIFF length
 // and data chunk length to the file.
 //
 // http://de.wikipedia.org/wiki/RIFF_WAVE
@@ -401,7 +401,7 @@ public:
 				val = outsam * m_amp;
 			} while (plib::abs(val) > 1.0);
 			// FIXME: log this in state and provide on verbose output
-			//printf("dynamp adjusted to %f at %f\n", m_amp, time);
+			//printf("dynamic amplification adjusted to %f at %f\n", m_amp, time);
 		}
 		m_samples[chan] = val;
 	}
@@ -825,6 +825,7 @@ int nlwav_app::execute()
 
 PMAIN(nlwav_app)
 
+// spell-checker:disable
 //
 // Der Daten-Abschnitt enth??lt die Abtastwerte:
 // Offset  L??nge  Inhalt  Beschreibung
@@ -846,3 +847,4 @@ PMAIN(nlwav_app)
 // 32 (0x20)   2   <block align>   Frame-Gr????e = <Anzahl der Kan??le>????????((<Bits/Sample (eines Kanals)>???+???7)???/???8)   (Division ohne Rest)
 // 34 (0x22)   2   <bits/sample>   Anzahl der Datenbits pro Samplewert je Kanal (z. B. 12)
 //
+// spell-checker:enable

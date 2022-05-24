@@ -41,7 +41,12 @@
     1.7 | 600010 (CRY) Add carry digits to AC (according to MBR)
     1.8 | 603000 (HLT) Halt computer
 
-    ANL and ORL were added in the first half of 1959 (M-5001-6).
+    ANL and ORL were added in May 1959, along with TRA (M-5001-6).
+    LLR and SLR were added a few months later (M-5001-7).
+
+    A few derived OPRs not mentioned in M-5001-27 are documented in
+    the listing of the updated vocabulary table for the TRA-patched
+    version of UT3.
 
     Mnemonics and relative timing of operate class micro-instructions
     after 1960 (as given in M-5001-27-3 and M-5001-27-4):
@@ -77,6 +82,10 @@
     1.8 | 603000 (HLT) Halt computer
 
     Previously supported Input-Output Stop group codes were unchanged.
+    However, the old semantics of R1L cycling AC left after reading one
+    line are no longer obtainable because AMB now occurs after rather than
+    before IOS. Anticipation of this incompatibity (q.v. M-5001-16) is
+    likely why R1L is unlisted in M-5001-27.
 
 ***************************************************************************/
 
@@ -129,7 +138,7 @@ offs_t tx0_64kw_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 
 void tx0_64kw_disassembler::dasm_opr(std::ostream &stream, u32 inst)
 {
-switch (inst)
+	switch (inst)
 	{
 	case 0600012:
 		stream << "cry";
@@ -157,6 +166,10 @@ switch (inst)
 
 	case 0600100:
 		stream << "pen";
+		break;
+
+	case 0600121:
+		stream << "cpa";
 		break;
 
 	case 0600200:
@@ -193,6 +206,10 @@ switch (inst)
 
 	case 0622061:
 		stream << "dsc";
+		break;
+
+	case 0622100:
+		stream << "dip";
 		break;
 
 	case 0624000:
@@ -241,6 +258,10 @@ switch (inst)
 
 	case 0740004:
 		stream << "tac";
+		break;
+
+	case 0740012:
+		stream << "lal";
 		break;
 
 	case 0740022:
@@ -739,7 +760,7 @@ offs_t tx0_8kw_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			stream << "arx";
 			break;
 
-		case 0100000: case 0140000:
+		case 0100000:
 			stream << "cla";
 			break;
 
@@ -751,7 +772,7 @@ offs_t tx0_8kw_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			stream << "lal";
 			break;
 
-		case 0100022: case 0140022:
+		case 0100022:
 			stream << "lac";
 			break;
 
@@ -759,7 +780,7 @@ offs_t tx0_8kw_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			stream << "lacUlxr";
 			break;
 
-		case 0100040: case 0140040:
+		case 0100040:
 			stream << "clc";
 			break;
 

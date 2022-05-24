@@ -473,7 +473,6 @@ galpanic.cpp
 galpanic_ms.cpp
 galspnbl.cpp
 gambl186.cpp
-gamecstl.cpp
 gamemasters.cpp
 gameplan.cpp
 gammagic.cpp
@@ -748,6 +747,7 @@ majorpkr.cpp
 malzak.cpp
 manohman.cpp
 mappy.cpp
+marblmd2.cpp
 marineb.cpp
 marinedt.cpp
 mario.cpp
@@ -1193,6 +1193,7 @@ silvmil.cpp
 simpl156.cpp
 simple_st0016.cpp
 simpsons.cpp
+sis630.cpp
 skeetsht.cpp
 skimaxx.cpp
 skopro.cpp

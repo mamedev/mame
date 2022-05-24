@@ -13,7 +13,7 @@
 #include "../nl_setup.h"
 
 #ifdef RES_R
-#warning "Do not include rescap.h in a netlist environment"
+#warning "Do not include `rescap.h` in a netlist environment"
 #endif
 #ifndef RES_R
 #define RES_R(res) (res)

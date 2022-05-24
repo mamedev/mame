@@ -4,6 +4,10 @@
 #ifndef NLD_MS_SOR_MAT_H_
 #define NLD_MS_SOR_MAT_H_
 
+// Names
+// spell-checker: words Seidel,
+//
+
 ///
 /// \file nld_ms_sor.h
 ///

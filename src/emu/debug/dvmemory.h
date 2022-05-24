@@ -127,6 +127,7 @@ private:
 	// memory access
 	bool read(u8 size, offs_t offs, u64 &data);
 	void write(u8 size, offs_t offs, u64 data);
+	bool write_digit(offs_t offs, u8 pos, u8 digit);
 	bool read(u8 size, offs_t offs, extFloat80_t &data);
 	bool read_chunk(offs_t address, int chunknum, u64 &chunkdata);
 	void generate_row(debug_view_char *destmin, debug_view_char *destmax, debug_view_char *destrow, offs_t address);

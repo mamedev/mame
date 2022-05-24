@@ -1699,6 +1699,26 @@ ROM_START( arkatour ) // Tournament version
 	ROM_LOAD( "a75-35.ic22",    0x0400, 0x0200, CRC(38acfd3b) SHA1(2841e9db047aa039eff8567a518b6250b355507b) )  /* blue component */
 ROM_END
 
+
+ROM_START( arkatour2 ) // Tournament version, newer
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "a75-36.ic16",   0x0000, 0x8000, CRC(f3b1923e) SHA1(377a417ad99c9de2eadad7338bc2c7e83d08cb2f) )
+	ROM_LOAD( "a75-37.ic17",   0x8000, 0x8000, CRC(7c74987b) SHA1(fb7612ea2af87a3e1bc794c25b004881930d4dc8) ) // 1xxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x0800, "mcu:mcu", 0 )
+	ROM_LOAD( "a75_38.ic14",  0x0000, 0x0800, NO_DUMP )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "a75-29.ic64",   0x00000, 0x8000, CRC(5ddea3cf) SHA1(58f16515898b7cc2697bf7663a60d9ca0db6da95) )
+	ROM_LOAD( "a75-30.ic63",   0x08000, 0x8000, CRC(5fcf2e85) SHA1(f721f0afb0550cc64bff26681856a7576398d9b5) )
+	ROM_LOAD( "a75-31.ic62",   0x10000, 0x8000, CRC(7b76b192) SHA1(a68aa08717646a6c322cf3455df07f50df9e9f33) )
+
+	ROM_REGION( 0x0600, "proms", 0 )
+	ROM_LOAD( "a75-33.ic24",    0x0000, 0x0200, CRC(b4bf3c81) SHA1(519188937ac9728c653fabac877e37dc43c3f71a) )  // red component
+	ROM_LOAD( "a75-34.ic23",    0x0200, 0x0200, CRC(de85a803) SHA1(325214995996de36a0470fbfc00e4e393c0b17ad) )  // green component
+	ROM_LOAD( "a75-35.ic22",    0x0400, 0x0200, CRC(38acfd3b) SHA1(2841e9db047aa039eff8567a518b6250b355507b) )  // blue component
+ROM_END
+
 // Everything from here on is bootlegs
 
 ROM_START( arkanoidjbl ) // bootleg with MCU copied from real Taito code, but notice screen hacked up.
@@ -2267,7 +2287,8 @@ GAME( 1988, paddle2,      arkanoid, bootleg,  paddle2,   arkanoid_state, init_pa
 GAME( 1986, arkatayt,     arkanoid, aysnd,    arkatayt,  arkanoid_state, empty_init,     ROT90, "bootleg (Tayto)",                             "Arkanoid (Tayto bootleg)",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1986, arktayt2,     arkanoid, aysnd,    arktayt2,  arkanoid_state, empty_init,     ROT90, "bootleg (Tayto)",                             "Arkanoid (Tayto bootleg, harder)",            MACHINE_SUPPORTS_SAVE )
 // Other games
-GAME( 1987, arkatour,     0,        arkanoid, arkanoid,  arkanoid_state, empty_init,     ROT90, "Taito America Corporation (Romstar license)", "Tournament Arkanoid (US)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1987, arkatour,     0,        arkanoid, arkanoid,  arkanoid_state, empty_init,     ROT90, "Taito America Corporation (Romstar license)", "Tournament Arkanoid (US, older)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1987, arkatour2,    arkatour, arkanoid, arkanoid,  arkanoid_state, empty_init,     ROT90, "Taito America Corporation (Romstar license)", "Tournament Arkanoid (US, newer)",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // same FRI,  6 JUN 1986, 15:49 string for both sets, but labels show this is newer
 
 GAME( 19??, tetrsark,     0,        bootleg,  tetrsark,  arkanoid_state, init_tetrsark,  ROT0,  "D.R. Korea",                                  "Tetris (D.R. Korea, set 1, encrypted)",       MACHINE_SUPPORTS_SAVE )
 GAME( 19??, tetrsark2,    tetrsark, bootleg,  tetrsark,  arkanoid_state, init_tetrsark2, ROT0,  "D.R. Korea",                                  "Tetris (D.R. Korea, set 2)",                  MACHINE_SUPPORTS_SAVE )

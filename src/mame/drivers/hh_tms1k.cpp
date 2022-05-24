@@ -101,7 +101,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP1218   TMS1100   1980, Entex Basketball 2 (6010)
  @MP1219   TMS1100   1980, U.S. Games Super Sports-4
  @MP1221   TMS1100   1980, Entex Raise The Devil (6011)
- *MP1228   TMS1100   1980, Entex Musical Marvin (6014)
+ @MP1228   TMS1100   1980, Entex Musical Marvin (6014)
  @MP1231   TMS1100   1984, Tandy 3 in 1 Sports Arena (model 60-2178)
  @MP1296   TMS1100   1982, Entex Black Knight Pinball (6081)
  @MP1311   TMS1100   1981, Bandai TC7: Air Traffic Control
@@ -201,6 +201,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "machine/tmc0999.h"
 #include "machine/tms1024.h"
 #include "sound/beep.h"
+#include "sound/flt_vol.h"
 #include "sound/s14001a.h"
 #include "sound/sn76477.h"
 #include "video/hlcd0515.h"
@@ -5051,6 +5052,179 @@ ROM_START( ebknight )
 	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, BAD_DUMP CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) ) // not verified, taken from raisedvl
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_ebknight_output.pla", 0, 365, BAD_DUMP CRC(00db663b) SHA1(6eae12503364cfb1f863df0e57970d3e766ec165) ) // "
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Entex Musical Marvin
+  * TMS1100 MP1228 (no decap)
+  * 1 7seg LED, 8 other leds, 1-bit sound with volume decay
+  * dials for speed, tone (volume decay), volume (also off/on switch)
+
+  The design patent was assigned to Hanzawa (Japan), so it's probably
+  manufactured by them.
+
+***************************************************************************/
+
+class mmarvin_state : public hh_tms1k_state
+{
+public:
+	mmarvin_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag),
+		m_volume(*this, "volume"),
+		m_speed_timer(*this, "speed")
+	{ }
+
+	void mmarvin(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	required_device<filter_volume_device> m_volume;
+	required_device<timer_device> m_speed_timer;
+
+	void update_display();
+	void write_r(u16 data);
+	void write_o(u16 data);
+	u8 read_k();
+
+	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
+	double m_speaker_volume = 0.0;
+};
+
+void mmarvin_state::machine_start()
+{
+	hh_tms1k_state::machine_start();
+	save_item(NAME(m_speaker_volume));
+}
+
+// handlers
+
+TIMER_DEVICE_CALLBACK_MEMBER(mmarvin_state::speaker_decay_sim)
+{
+	m_volume->flt_volume_set_volume(m_speaker_volume);
+
+	// volume decays when speaker is off, decay scale is determined by tone dial
+	double step = (1.01 - 1.003) / 255.0; // approximation
+	m_speaker_volume /= 1.01 - (double)(u8)m_inputs[5]->read() * step;
+}
+
+void mmarvin_state::update_display()
+{
+	u8 digit = bitswap<7>(m_o,6,2,1,0,5,4,3); // 7seg is upside-down
+	m_display->matrix(m_r, (m_o << 1 & 0x100) | (m_r & 0x80) | digit);
+}
+
+void mmarvin_state::write_r(u16 data)
+{
+	// R2-R5: input mux
+	m_inp_mux = data >> 2 & 0xf;
+
+	// R6: trigger speed dial timer
+	if (m_r & 0x40 && ~data & 0x40)
+	{
+		double step = (2100 - 130) / 255.0; // duration range is around 0.13s to 2.1s
+		m_speed_timer->adjust(attotime::from_msec(2100 - (u8)m_inputs[4]->read() * step));
+	}
+
+	// R10: speaker out
+	m_speaker->level_w(BIT(m_r, 10));
+
+	// R9: trigger speaker on
+	if (m_r & 0x200 && ~data & 0x200)
+		m_volume->flt_volume_set_volume(m_speaker_volume = 1.0);
+
+	// R0,R1: digit/led select
+	// R7: digit DP
+	m_r = data;
+	update_display();
+}
+
+void mmarvin_state::write_o(u16 data)
+{
+	// O0-O7: led data
+	m_o = data;
+	update_display();
+}
+
+u8 mmarvin_state::read_k()
+{
+	// K1-K4: multiplexed inputs
+	// K8: speed dial state
+	return (read_inputs(4) & 7) | (m_speed_timer->enabled() ? 0 : 8);
+}
+
+// config
+
+static INPUT_PORTS_START( mmarvin )
+	PORT_START("IN.0") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("Mode")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_NAME("Button Do 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_NAME("Button Re")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_NAME("Button Mi")
+
+	PORT_START("IN.2") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_NAME("Button Fa")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_NAME("Button Sol")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_NAME("Button La")
+
+	PORT_START("IN.3") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_NAME("Button Ti")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_NAME("Button Do 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Space")
+
+	PORT_START("IN.4")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CENTERDELTA(0) PORT_PLAYER(1) PORT_NAME("Speed Dial")
+
+	PORT_START("IN.5")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CENTERDELTA(0) PORT_PLAYER(2) PORT_NAME("Tone Dial")
+INPUT_PORTS_END
+
+void mmarvin_state::mmarvin(machine_config &config)
+{
+	// basic machine hardware
+	TMS1100(config, m_maincpu, 300000); // approximation - RC osc. R=51K, C=47pF
+	m_maincpu->k().set(FUNC(mmarvin_state::read_k));
+	m_maincpu->r().set(FUNC(mmarvin_state::write_r));
+	m_maincpu->o().set(FUNC(mmarvin_state::write_o));
+
+	TIMER(config, "speed").configure_generic(nullptr);
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(2, 9);
+	m_display->set_segmask(1, 0xff);
+	//config.set_default_layout(layout_mmarvin);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "volume", 0.25);
+	FILTER_VOLUME(config, m_volume).add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	TIMER(config, "speaker_decay").configure_periodic(FUNC(mmarvin_state::speaker_decay_sim), attotime::from_msec(1));
+}
+
+// roms
+
+ROM_START( mmarvin )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1228", 0x0000, 0x0800, CRC(68ce3ab6) SHA1(15f7fb3f438116bf6128f11c981bdc0852d5a4ec) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, BAD_DUMP CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) ) // not verified
+	ROM_REGION( 365, "maincpu:opla", ROMREGION_ERASE00 )
+	ROM_LOAD( "tms1100_mmarvin_output.pla", 0, 365, NO_DUMP )
+
+	ROM_REGION16_LE( 0x40, "maincpu:opla_b", ROMREGION_ERASE00 ) // verified, electronic dump
+	ROM_LOAD16_BYTE( "tms1100_mmarvin_output.bin", 0, 0x20, CRC(a274951f) SHA1(7e91ddd42c132942a32351649eaf1107b5b0285c) )
 ROM_END
 
 
@@ -14195,6 +14369,7 @@ CONS( 1980, efootb4 ,   0,         0, efootb4,   efootb4,   efootb4_state,   emp
 CONS( 1980, ebaskb2 ,   0,         0, ebaskb2,   ebaskb2,   ebaskb2_state,   empty_init, "Entex", "Electronic Basketball 2 (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, raisedvl,   0,         0, raisedvl,  raisedvl,  raisedvl_state,  empty_init, "Entex", "Raise The Devil Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1982, ebknight,   0,         0, ebknight,  raisedvl,  raisedvl_state,  empty_init, "Entex", "Black Knight Pinball (Entex)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1980, mmarvin,    0,         0, mmarvin,   mmarvin,   mmarvin_state,   empty_init, "Entex", "Musical Marvin", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
 CONS( 1979, f2pbball,   0,         0, f2pbball,  f2pbball,  f2pbball_state,  empty_init, "Fonas", "2 Player Baseball (Fonas)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, f3in1,      0,         0, f3in1,     f3in1,     f3in1_state,     empty_init, "Fonas", "3 in 1: Football, Basketball, Soccer", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

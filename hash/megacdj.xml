@@ -1309,7 +1309,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ntrap">
+	<software name="ntrap" supported="no">
 		<!-- source redump.org
 		<rom name="Night Trap (Japan) (Disc 1).cue" size="224" crc="f3527896" />
 		<rom name="Night Trap (Japan) (Disc 1) (Track 1).bin" size="615875904" crc="17744c64" />
@@ -1322,6 +1322,9 @@ license:CC0
 		<description>Night Trap (Jpn)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Requires [disc swap]
+]]></notes>
 		<info name="serial" value="G-6025"/>
 		<info name="disk_ring" value="G-6025P-00148 1 (Disc 1), G-6025P-00149 1 (Disc 2)"/>
 		<info name="release" value="19931119"/>
@@ -2344,7 +2347,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="timegal">
+	<software name="timegal" supported="no">
 		<!-- source redump.org
 		<rom name="Time Gal (Japan).cue" size="202" crc="a50da29e" />
 		<rom name="Time Gal (Japan) (Track 1).bin" size="304652208" crc="1a756c12" />
@@ -2353,6 +2356,9 @@ license:CC0
 		<description>Time Gal (Jpn)</description>
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
+		<notes><![CDATA[
+Black screen, requires sub CPU to be overclocked by 1.5x
+]]></notes>
 		<info name="serial" value="T-32114"/>
 		<info name="disk_ring" value="T-32114P-00031-R1M V"/>
 		<info name="release" value="19921113"/>
@@ -2832,7 +2838,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="anettfut">
+	<software name="anettfut" supported="no">
 		<!-- source toseciso
 		<rom name="Anett Futatabi (1993)(Wolf Team)(NTSC)(JP)(en)[!].cue" size="4562" crc="e29146cb" />
 		<rom name="Anett Futatabi (1993)(Wolf Team)(NTSC)(JP)(en)(Track 01 of 31)[!].iso" size="31488000" crc="ed405f82" />
@@ -2870,6 +2876,9 @@ license:CC0
 		<description>Anett Futatabi (Jpn)</description>
 		<year>1993</year>
 		<publisher>Wolf Team</publisher>
+		<notes><![CDATA[
+Black screen, requires sub CPU to be overclocked by 1.5x
+]]></notes>
 		<info name="serial" value="T-32104"/>
 		<info name="release" value="19930330"/>
 		<info name="alt_title" value="アネット再び"/>
@@ -4389,7 +4398,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="prizefig">
+	<software name="prizefig" supported="no">
 		<!-- source toseciso
 		<rom name="Prize Fighter (1993)(Sega)(NTSC)(JP)(Disc 1 of 2)[!].cue" size="301" crc="6caf1452" />
 		<rom name="Prize Fighter (1993)(Sega)(NTSC)(JP)(Disc 1 of 2)(Track 1 of 2)[!].iso" size="346562560" crc="3c4783bc" />
@@ -4402,6 +4411,9 @@ license:CC0
 		<description>Prize Fighter (Jpn)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Requires [disc swap]
+]]></notes>
 		<info name="serial" value="G-6037"/>
 		<info name="release" value="19950324"/>
 		<info name="alt_title" value="プライズファイター"/>
@@ -4585,7 +4597,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="rbfx">
+	<software name="rbfx" supported="no">
 		<!-- source toseciso
 		<rom name="Road Blaster FX (1992)(Wolf Team)(NTSC)(JP)(en)[!].cue" size="589" crc="78b59c82" />
 		<rom name="Road Blaster FX (1992)(Wolf Team)(NTSC)(JP)(en)(Track 1 of 4)[!].iso" size="276729856" crc="0cd3a154" />
@@ -4596,6 +4608,9 @@ license:CC0
 		<description>Road Blaster FX (Jpn)</description>
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
+		<notes><![CDATA[
+Black screen, requires sub CPU to be overclocked by 1.5x
+]]></notes>
 		<info name="serial" value="T-32124"/>
 		<info name="release" value="19921218"/>
 		<info name="alt_title" value="ロードブラスターFX"/>

@@ -67,7 +67,7 @@ namespace netlist::solver
 			{
 				std::size_t cnt(0);
 				// build pointers into the compressed row format matrix for each terminal
-				for (std::size_t j=0; j< this->m_terms[k].railstart();j++)
+				for (std::size_t j=0; j< this->m_terms[k].rail_start();j++)
 				{
 					int other = this->m_terms[k].m_connected_net_idx[j];
 					for (auto i = mat.row_idx[k]; i <  mat.row_idx[k+1]; i++)
@@ -78,8 +78,8 @@ namespace netlist::solver
 							break;
 						}
 				}
-				nl_assert(cnt == this->m_terms[k].railstart());
-				this->m_mat_ptr[k][this->m_terms[k].railstart()] = &mat.A[mat.diag[k]];
+				nl_assert(cnt == this->m_terms[k].rail_start());
+				this->m_mat_ptr[k][this->m_terms[k].rail_start()] = &mat.A[mat.diag[k]];
 			}
 
 			this->state().log().verbose("maximum fill: {1}", gr.first);
@@ -144,11 +144,11 @@ namespace netlist::solver
 		{
 			auto &net = this->m_terms[k];
 
-			// FIXME: gonn, gtn and Idr - which float types should they have?
+			//# FIXME: gonn, gtn and Idr - which float types should they have?
 
 			//auto gtot_t = std::accumulate(gt, gt + term_count, plib::constants<FT>::zero());
-			//*tcr_r[railstart] = static_cast<FT>(gtot_t); //mat.A[mat.diag[k]] += gtot_t;
-			auto pd = this->m_mat_ptr[k][net.railstart()] - &this->mat.A[0];
+			//*tcr_r[rail_start] = static_cast<FT>(gtot_t); //mat.A[mat.diag[k]] += gtot_t;
+			auto pd = this->m_mat_ptr[k][net.rail_start()] - &this->mat.A[0];
 #if 0
 			pstring terms = plib::pfmt("m_A{1} = gt[{2}]")(pd, this->m_gtn.didx(k,0));
 			for (std::size_t i=1; i < net.count(); i++)
@@ -159,10 +159,10 @@ namespace netlist::solver
 			for (std::size_t i=0; i < net.count(); i++)
 				strm("\tm_A{1} += gt[{2}];\n", pd, this->m_gtn.didx(k,i));
 #endif
-			//for (std::size_t i = 0; i < railstart; i++)
+			//for (std::size_t i = 0; i < rail_start; i++)
 			//  *tcr_r[i]       += static_cast<FT>(go[i]);
 
-			for (std::size_t i = 0; i < net.railstart(); i++)
+			for (std::size_t i = 0; i < net.rail_start(); i++)
 			{
 				auto p = this->m_mat_ptr[k][i] - &this->mat.A[0];
 				strm("\tm_A{1} += go[{2}];\n", p, this->m_gonn.didx(k,i));
@@ -173,10 +173,10 @@ namespace netlist::solver
 			terms = plib::pfmt("{1} RHS{2} = Idr[{3}]")(fptype, k, this->m_Idrn.didx(k,0));
 			for (std::size_t i=1; i < net.count(); i++)
 				terms += plib::pfmt(" + Idr[{1}]")(this->m_Idrn.didx(k,i));
-			//for (std::size_t i = railstart; i < term_count; i++)
+			//for (std::size_t i = rail_start; i < term_count; i++)
 			//  RHS_t +=  (- go[i]) * *cnV[i];
 
-			for (std::size_t i = net.railstart(); i < net.count(); i++)
+			for (std::size_t i = net.rail_start(); i < net.count(); i++)
 				terms += plib::pfmt(" - go[{1}] * *cnV[{2}]")(this->m_gonn.didx(k,i), this->m_connected_net_Vn.didx(k,i));
 
 			strm("\t{1};\n", terms);
@@ -185,10 +185,10 @@ namespace netlist::solver
 			strm("\t{1} RHS{2} = Idr[{3}];\n", fptype, k, this->m_Idrn.didx(k,0));
 			for (std::size_t i=1; i < net.count(); i++)
 				strm("\tRHS{1} += Idr[{2}];\n", k, this->m_Idrn.didx(k,i));
-			//for (std::size_t i = railstart; i < term_count; i++)
+			//for (std::size_t i = rail_start; i < term_count; i++)
 			//  RHS_t +=  (- go[i]) * *cnV[i];
 
-			for (std::size_t i = net.railstart(); i < net.count(); i++)
+			for (std::size_t i = net.rail_start(); i < net.count(); i++)
 				strm("\tRHS{1} -= go[{2}] * *cnV[{3}];\n", k, this->m_gonn.didx(k,i), this->m_connected_net_Vn.didx(k,i));
 
 #endif
@@ -196,7 +196,7 @@ namespace netlist::solver
 
 		for (std::size_t i = 0; i < iN - 1; i++)
 		{
-			//const auto &nzbd = this->m_terms[i].m_nzbd;
+			//#const auto &nzbd = this->m_terms[i].m_nzbd;
 			const auto *nzbd = mat.nzbd(i);
 			const auto nzbd_count = mat.nzbd_count(i);
 

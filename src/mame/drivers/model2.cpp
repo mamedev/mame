@@ -1103,7 +1103,7 @@ void model2_state::fbvram_bankB_w(offs_t offset, u16 data, u16 mem_mask) { COMBI
 /* common map for all Model 2 versions */
 void model2_state::model2_base_mem(address_map &map)
 {
-	map(0x00000000, 0x001fffff).rom().nopw().flags(i960_cpu_device::BURST);;
+	map(0x00000000, 0x001fffff).rom().nopw().flags(i960_cpu_device::BURST);
 
 	map(0x00500000, 0x005fffff).ram().share("workram").flags(i960_cpu_device::BURST);
 

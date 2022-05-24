@@ -86,7 +86,7 @@ u8 ac1_state::ac1_port_b_r()
 // standard ascii keyboard with bit 7 high
 u8 ac1_state::ac1_port_a_r()
 {
-	u8 line[7] = { 0,0,0,0,0,0,0} ;
+	u8 line[7] = { 0,0,0,0,0,0,0 };
 
 	line[6] = m_io_line[6]->read();
 	if (BIT(line[6], 2,3))

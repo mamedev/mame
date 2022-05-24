@@ -110,33 +110,43 @@ void mtx_cfx_device::device_reset()
 void mtx_cfx_device::portc_w(uint8_t data)
 {
 	/*
-		b0 A0
-		b1 A1
-		b2 A2
-		b3 CS0
-		b4 CS1
-		b5 WRITE
-		b6 READ
-		b7 RESET
+	    b0 A0
+	    b1 A1
+	    b2 A2
+	    b3 CS0
+	    b4 CS1
+	    b5 WRITE
+	    b6 READ
+	    b7 RESET
 	*/
 
 	if (BIT(data, 7))
 		m_ide->reset();
 
-	switch (BIT(data, 5, 2))
+	switch (BIT(data, 3, 2))
 	{
-	case 0x01: // WRITE
-		if (BIT(data, 3))      // CS0
+	case 0x01: // CS0
+		switch (BIT(data, 5, 2))
+		{
+		case 0x01: // WRITE
 			m_ide->cs0_w(data & 0x07, m_ide_data);
-		else if (BIT(data, 4)) // CS1
-			m_ide->cs1_w(data & 0x07, m_ide_data);
+			break;
+		case 0x02: // READ
+			m_ide_data = m_ide->cs0_r(data & 0x07);
+			break;
+		}
 		break;
 
-	case 0x02: // READ
-		if (BIT(data, 3))      // CS0
-			m_ide_data = m_ide->cs0_r(data & 0x07);
-		else if (BIT(data, 4)) // CS1
+	case 0x02: // CS1
+		switch (BIT(data, 5, 2))
+		{
+		case 0x01: // WRITE
+			m_ide->cs1_w(data & 0x07, m_ide_data);
+			break;
+		case 0x02: // READ
 			m_ide_data = m_ide->cs1_r(data & 0x07);
+			break;
+		}
 		break;
 	}
 }
