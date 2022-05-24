@@ -579,6 +579,7 @@ void atarig42_state::atarig42(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	ATARI_JSA_III(config, m_jsa, 0);
+	m_jsa->set_inverted_coins();
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_5);
 	m_jsa->test_read_cb().set_ioport("IN2").bit(6);
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 0.8);

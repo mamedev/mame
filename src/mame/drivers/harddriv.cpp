@@ -1935,6 +1935,7 @@ void steeltal_board_device_state::device_add_mconfig(machine_config &config) //t
 	SPEAKER(config, "mono").front_center();
 
 	ATARI_JSA_III(config, m_jsa, 0);
+	m_jsa->set_inverted_coins();
 	m_jsa->main_int_cb().set(FUNC(harddriv_state::sound_int_write_line));
 	m_jsa->test_read_cb().set_ioport("IN0").bit(5);
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
