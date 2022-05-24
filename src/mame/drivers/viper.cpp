@@ -98,7 +98,7 @@
         p911(all)           Goes in-game. Controllers are not emulated. Various graphical glitches.
         tsurugi,j           Goes in-game. Controllers are not emulated. Various graphical glitches.
 
-        gticlub2,drivparty  Attract mode works. Coins up. Hangs in various places. Will crash with "network error" after stage is selected.
+        gticlub2,ea         Attract mode works. Coins up. Hangs in various places. Will crash with "network error" after stage is selected.
         thrild2,a           Attract mode with partial graphics. Coins up. Hangs in various places.
 
         sscopefh            Graphics heavily glitched. Gun controller is not emulated. Sensor error and hopper error stop it from working.
@@ -2315,7 +2315,7 @@ INPUT_PORTS_START( gticlub2 )
 	// TODO: specific analog channel for hand brake
 INPUT_PORTS_END
 
-INPUT_PORTS_START( drivparty )
+INPUT_PORTS_START( gticlub2ea )
 	PORT_INCLUDE( gticlub2 )
 
 	PORT_MODIFY("IN2")
@@ -2894,7 +2894,7 @@ ROM_START(gticlub2) //*
 	DISK_IMAGE( "941b02", 0,  SHA1(943bc9b1ea7273a8382b94c8a75010dfe296df14) )
 ROM_END
 
-ROM_START(drivparty) //*
+ROM_START(gticlub2ea) //*
 	VIPER_BIOS
 
 	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
@@ -3043,7 +3043,7 @@ ROM_START(p911ud) //*
 	DISK_IMAGE( "a00eaa02", 0, SHA1(81565a2dce2e2b0a7927078a784354948af1f87c) ) // Is actually UAD/EAD
 ROM_END
 
-ROM_START(p247) //*
+ROM_START(p911ed) //*
 	VIPER_BIOS
 
 	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
@@ -3056,7 +3056,7 @@ ROM_START(p247) //*
 	DISK_IMAGE( "a00eaa02", 0, SHA1(81565a2dce2e2b0a7927078a784354948af1f87c) ) // Is actually UAD/EAD
 ROM_END
 
-ROM_START(p247b)
+ROM_START(p911ea)
 	VIPER_BIOS
 
 	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
@@ -3430,7 +3430,7 @@ GAME(2000, code1d,    kviper,    viper,     code1d,     viper_state, init_viperc
 GAME(2000, code1db,   code1d,    viper,     code1d,     viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.16 (ver UAB)", MACHINE_NOT_WORKING)
 GAME(2000, code1da,   code1d,    viper,     code1d,     viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch (ver UAA)", MACHINE_NOT_WORKING)
 GAME(2000, gticlub2,  kviper,    viper,     gticlub2,   viper_state, init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver JAB)", MACHINE_NOT_WORKING)
-GAME(2000, drivparty, gticlub2,  viper,     drivparty,  viper_state, init_vipercf,  ROT0,  "Konami", "Driving Party: Racing in Italy (ver EAA)", MACHINE_NOT_WORKING)
+GAME(2000, gticlub2ea,gticlub2,  viper,     gticlub2ea, viper_state, init_vipercf,  ROT0,  "Konami", "Driving Party: Racing in Italy (ver EAA)", MACHINE_NOT_WORKING)
 GAME(2001, jpark3,    kviper,    viper,     jpark3,     viper_state, init_vipercf,  ROT0,  "Konami", "Jurassic Park III (ver EBC)", MACHINE_NOT_WORKING)
 GAME(2001, jpark3u,   jpark3,    viper,     jpark3,     viper_state, init_vipercf,  ROT0,  "Konami", "Jurassic Park III (ver UBC)", MACHINE_NOT_WORKING)
 GAME(2001, mocapglf,  kviper,    viper_omz, mocapglf,   viper_state, init_vipercf,  ROT90, "Konami", "Mocap Golf (ver UAA)", MACHINE_NOT_WORKING)
@@ -3441,8 +3441,8 @@ GAME(2000, p911k,     p911,      viper,     p911,       viper_state, init_viperc
 GAME(2000, p911ac,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver AAC)", MACHINE_NOT_WORKING)
 GAME(2000, p911kc,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver KAC)", MACHINE_NOT_WORKING)
 GAME(2000, p911ud,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 911 (ver UAD)", MACHINE_NOT_WORKING)
-GAME(2000, p247,      p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 24/7 (ver EAD)", MACHINE_NOT_WORKING)
-GAME(2000, p247b,     p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 24/7 (ver EAD, alt)", MACHINE_NOT_WORKING)
+GAME(2000, p911ed,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 24/7 (ver EAD)", MACHINE_NOT_WORKING)
+GAME(2000, p911ea,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 24/7 (ver EAD, alt)", MACHINE_NOT_WORKING)
 GAME(2000, p911j,     p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver JAE)", MACHINE_NOT_WORKING)
 GAME(2001, p9112,     kviper,    viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 911 2 (VER. UAA:B)", MACHINE_NOT_WORKING)
 GAME(2001, sscopex,   kviper,    viper,     sscopex,    viper_state, init_vipercf,  ROT0,  "Konami", "Silent Scope EX (ver UAA)", MACHINE_NOT_WORKING)
