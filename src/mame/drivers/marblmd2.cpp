@@ -322,7 +322,7 @@ TILE_GET_INFO_MEMBER(marblmd2_state::get_playfield_tile_info)
 // XTALs are guessed based on other Atari titles of the same period
 void marblmd2_state::marblmd2(machine_config &config)
 {
-	M68000(config, m_maincpu, XTAL(14'318'181)/2);
+	M68000(config, m_maincpu, XTAL(14'318'181));
 	m_maincpu->set_addrmap(AS_PROGRAM, &marblmd2_state::marblmd2_map);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_mm2);
