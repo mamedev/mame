@@ -226,7 +226,7 @@ const atari_motion_objects_config marblmd2_state::s_mob_config =
 	0,                  // render in reverse order? 
 	0,                  // render in swapped X/Y order? 
 	0,                  // does the neighbor bit affect the next object? 
-	0,                  // pixels per SLIP entry (0 for no-slip) 
+	8,                  // pixels per SLIP entry (0 for no-slip) 
 	0,                  // pixel offset for SLIPs 
 	0,                  // maximum number of links to visit/scanline (0=all) 
 
