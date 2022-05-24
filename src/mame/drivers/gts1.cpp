@@ -72,16 +72,13 @@ Z22  5101L     4-bit static RAM
 Z23  MM6351-IJ Personality PROM
 
 
-ToDo:
-- When game started it plays the startup tune and kicks the ball to the shooter - but then
-  -- You can't add more players;
-  -- No switches register, so unable to score;
-  -- The score flashes the high score as if the game had ended;
-  -- You can still hit tilt (9-key) and X until it really is game over.
-  -- If the lucky number matches you'll still get a free credit.
-  -- Some games will go straight to test 11, or instant game over.
+Status:
+- All games are playable, to an extent
 
-- Z80-based sound board for hexagone and sahalove.
+ToDo:
+- Hunt down the remaining CPU bugs.
+- The sound-board sounds are very weird.
+- Z80-based sound board for hexagone and sahalove (no info available).
 
 *****************************************************************************************************/
 
@@ -502,7 +499,7 @@ void gts1_state::gts1_solenoid_w(offs_t offset, u8 data) // WORKS
 		m_io_outputs[offset] = data;
 }
 
-u8 gts1_state::gts1_switches_r(offs_t offset) // only switches with offset 0 are working; can't go in-game to try the others **********
+u8 gts1_state::gts1_switches_r(offs_t offset)
 {
 	u8 data = 0;
 	if (offset > 7)
@@ -512,7 +509,7 @@ u8 gts1_state::gts1_switches_r(offs_t offset) // only switches with offset 0 are
 				data |= BIT(m_switches[i]->read(), offset & 7);
 				//LOG("%s: switches[bit %X of %X, using offset of %X] got %x\n", __FUNCTION__, i, m_strobe, offset&7, data);
 			}
-	return data ? 0 : 1;    // FIXME: inverted or normal?
+	return data ? 0 : 1;
 }
 
 void gts1_state::gts1_switches_w(offs_t offset, u8 data) // WORKS
@@ -686,7 +683,7 @@ u8 gts1_state::gts1_lamp_apm_r(offs_t offset) // Think this works - dips seem to
  * @param offset 0 ... 2 = group
  * @param data 4 bit value to write
  */
-void gts1_state::gts1_lamp_apm_w(offs_t offset, u8 data) // Working for the dips, not sure about the PM address. ***********
+void gts1_state::gts1_lamp_apm_w(offs_t offset, u8 data)
 {
 	switch (offset) {
 		case 0: // LD1-LD4 on jumper J5
@@ -715,14 +712,14 @@ void gts1_state::gts1_lamp_apm_w(offs_t offset, u8 data) // Working for the dips
 	}
 }
 
-u8 gts1_state::gts1_pa_r() // TODO: address normal or inverted? data normal or inverted? ***************
+u8 gts1_state::gts1_pa_r()
 {
 	u16 addr = m_6351_addr ^ 0x3ff;
 	// return nibble from personality module ROM
 	u8 data = m_pm[addr];
 	LOG("%s: PROM READ @[%03x]:%02x\n", __FUNCTION__, addr, data);
 	//machine().debug_break();
-	return ~data;  // inverted = game over at start; normal = test mode at start
+	return data;
 }
 
 void gts1_state::gts1_do_w(u8 data)

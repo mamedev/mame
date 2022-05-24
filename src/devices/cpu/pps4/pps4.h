@@ -84,6 +84,7 @@ protected:
 	memory_access<12, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
 	memory_access< 8, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 	int     m_icount;
+	int     m_wasldi;
 
 	u8        m_A;        //!< Accumulator A(4:1)
 	u8        m_X;        //!< X register X(4:1)
