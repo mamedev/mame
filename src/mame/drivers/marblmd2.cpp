@@ -279,7 +279,7 @@ void marblmd2_state::marblmd2(machine_config &config)
 	m_vad->set_xoffsets(4, 4);
 
 	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, marblmd2_state::s_mob_config).set_gfxdecode("gfxdecode");
-	m_mob->set_xoffset(-1);
+	//m_mob->set_xoffset(-1);
 
 	TILEMAP(config, "vad:playfield", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(marblmd2_state::get_playfield_tile_info));
 
