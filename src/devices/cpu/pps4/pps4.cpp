@@ -94,6 +94,7 @@ pps4_device::pps4_device(const machine_config &mconfig, device_type type, const 
 	, m_dia_cb(*this)
 	, m_dib_cb(*this)
 	, m_do_cb(*this)
+	, m_wasldi(0)
 {
 }
 
@@ -613,12 +614,10 @@ void pps4_device::iEXD()
  */
 void pps4_device::iLDI()
 {
-	// previous LDI instruction?
-	if (0x70 == (m_Ip & 0xf0)) {
-		LOG("%s: skip prev:%02x op:%02x\n", __FUNCTION__, m_Ip, m_I1);
-		return;
-	}
-	m_A = ~m_I1 & 15;
+	if (!m_wasldi)
+		m_A = ~m_I1 & 15;
+
+	m_wasldi = 2;
 }
 
 /**
@@ -816,8 +815,8 @@ void pps4_device::iXS()
  */
 void pps4_device::iCYS()
 {
-	const u16 sa = (m_SA >> 4) | (m_A << 8);
-	m_A = m_SA & 15;
+	const u16 sa = (m_SA >> 4) | ((m_A^15) << 8);
+	m_A = ~m_SA & 15;
 	m_SA = sa;
 }
 
@@ -1326,6 +1325,8 @@ void pps4_device::iSAG()
 void pps4_device::execute_one()
 {
 	m_I1 = ROP();
+	if (m_wasldi)
+		m_wasldi--;
 	if (m_Skip) {
 		m_Skip = 0;
 		LOG("%s: skip op:%02x\n", __FUNCTION__, m_I1);
