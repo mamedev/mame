@@ -2,9 +2,24 @@
 // copyright-holders:David Haywood
 
 /*
+	Supported Games:
+
+	Marble Madness II (prototype)
+
+	Not Dumped:
+
+	Marble Man: Marble Madness II (earlier version of the game before it was changed to use Joysticks)
+
+	-------------------------------------------
+ 
 	TODO:
 	- Issues in service mode (eg. RAM check fails) could just be prototype issues
-	- Check if there's any trackball reading code anywhere, or if this is really joystick only
+	- EEPROM hookup
+	- verify XTALs, clocks, volume balance, dipswitches etc.
+
+	Non-Bugs:
+	- objects appear over text boxes during scroll before levels, verified to happen hardware
+
 
 */
 
@@ -38,6 +53,7 @@ public:
 
 protected:
 	virtual void video_start() override;
+	virtual void machine_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -60,6 +76,11 @@ private:
 
 	static const atari_motion_objects_config s_mob_config;
 };
+
+void marblmd2_state::machine_start()
+{
+	save_item(NAME(m_latch_data));
+}
 
 void marblmd2_state::video_start()
 {
@@ -147,7 +168,7 @@ void marblmd2_state::marblmd2_map(address_map& map)
 
 	map(0x600050, 0x600051).w(FUNC(marblmd2_state::latch_w));
 
-	map(0x601000, 0x6013ff).ram(); // some kind of NVRAM or protection?
+	map(0x601000, 0x6013ff).ram(); // some kind of NVRAM?
 
 	map(0x607000, 0x607001).nopw();
 	
@@ -174,8 +195,28 @@ static INPUT_PORTS_START( marblmd2 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xfe00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("600012")
-	PORT_BIT( 0x007f, IP_ACTIVE_LOW, IPT_UNKNOWN ) // maybe dips
+	PORT_START("600012") // assume at least one bank of 8 dips lives here
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0080, 0x0080, "Number of Players" )
 	PORT_DIPSETTING(      0x0000, "2" )
 	PORT_DIPSETTING(      0x0080, "3" )
@@ -344,4 +385,4 @@ ROM_START( marblmd2 )
 	ROM_LOAD( "sound.12e",  0x60000, 0x20000, CRC(bab2f8e5) SHA1(bbe2d693d40e5eeba315fe7b6380a2030b66f23e) )
 ROM_END
 
-GAME( 1991, marblmd2, 0, marblmd2, marblmd2, marblmd2_state, empty_init, ROT0,  "Atari Games", "Marble Madness II (prototype)", MACHINE_NOT_WORKING )
+GAME( 1991, marblmd2, 0, marblmd2, marblmd2, marblmd2_state, empty_init, ROT0,  "Atari Games", "Marble Madness II (prototype)", MACHINE_SUPPORTS_SAVE )
