@@ -186,16 +186,18 @@ void marblmd2_state::marblmd2_map(address_map& map)
 static INPUT_PORTS_START( marblmd2 )
 
 	PORT_START("600000")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) // also acts as START3
+	PORT_BIT( 0x00fe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // also acts as START1
 	PORT_BIT( 0xfe00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("600002")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN ) // acts as a 'freeze' input, probably not connected
+	PORT_BIT( 0x00fe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) // also acts as START2
 	PORT_BIT( 0xfe00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("600012") // assume at least one bank of 8 dips lives here
+	PORT_START("600012") // assume at least one bank of 8 dips lives here, but could be something else
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -211,13 +213,13 @@ static INPUT_PORTS_START( marblmd2 )
 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, "Number of Players (Test Mode)" ) // this one controls 'number of players' in Control Test
+	PORT_DIPSETTING(      0x0000, "2" )
+	PORT_DIPSETTING(      0x0020, "3" )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "Number of Players" )
+	PORT_DIPNAME( 0x0080, 0x0080, "Number of Players (Game)" )
 	PORT_DIPSETTING(      0x0000, "2" )
 	PORT_DIPSETTING(      0x0080, "3" )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -277,7 +279,7 @@ static GFXDECODE_START( gfx_mm2 )
 	GFXDECODE_ENTRY( "gfx2", 0, molayout,   0x0, 0x10  )
 GFXDECODE_END
 
-// WRONG
+
 const atari_motion_objects_config marblmd2_state::s_mob_config =
 {
 	1,                  // index to which gfx system 
@@ -340,7 +342,6 @@ void marblmd2_state::marblmd2(machine_config &config)
 	m_vad->set_xoffsets(4, 4);
 
 	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, marblmd2_state::s_mob_config).set_gfxdecode("gfxdecode");
-	//m_mob->set_xoffset(-1);
 
 	TILEMAP(config, "vad:playfield", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(marblmd2_state::get_playfield_tile_info));
 
