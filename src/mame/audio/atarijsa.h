@@ -60,7 +60,7 @@ public:
 	// configuration
 	auto test_read_cb() { return m_test_read_cb.bind(); }
 	auto main_int_cb() { return m_main_int_cb.bind(); }
-	void set_swapped_coins(bool swap) { m_swapped_coins = swap; } // for Xybots
+	void set_swapped_coins(bool swap) { m_swapped_coins = swap; }
 
 	// getters
 	m6502_device &soundcpu() const { return *m_jsacpu; }
