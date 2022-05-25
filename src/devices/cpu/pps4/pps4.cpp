@@ -95,6 +95,7 @@ pps4_device::pps4_device(const machine_config &mconfig, device_type type, const 
 	, m_dib_cb(*this)
 	, m_do_cb(*this)
 	, m_wasldi(0)
+	, m_waslbl(0)
 {
 }
 
@@ -855,18 +856,17 @@ void pps4_device::iCYS()
  */
 void pps4_device::iLB()
 {
-	// previous LB or LBL instruction?
-	if (0xc0 == (m_Ip & 0xf0) || 0x00 == m_Ip) {
-		LOG("%s: skip prev:%02x op:%02x\n", __FUNCTION__, m_Ip, m_I1);
-		return;
+	if (!m_waslbl)
+	{
+		m_SB = m_SA;
+		m_SA = (m_P + 1) & 0xFFF;
+		m_P = (3 << 6) | (m_I1 & 15);
+		m_B = ~ARG() & 255;
+		m_P = m_SA;
+		// swap SA and SB
+		std::swap(m_SA, m_SB);
 	}
-	m_SB = m_SA;
-	m_SA = (m_P + 1) & 0xFFF;
-	m_P = (3 << 6) | (m_I1 & 15);
-	m_B = ~ARG() & 255;
-	m_P = m_SA;
-	// swap SA and SB
-	std::swap(m_SA, m_SB);
+	m_waslbl = 2;
 }
 
 /**
@@ -895,12 +895,10 @@ void pps4_device::iLB()
 void pps4_device::iLBL()
 {
 	m_I2 = ARG();
-	// previous LB or LBL instruction?
-	if (0xc0 == (m_Ip & 0xf0) || 0x00 == m_Ip) {
-		LOG("%s: skip prev:%02x op:%02x\n", __FUNCTION__, m_Ip, m_I1);
-		return;
-	}
-	m_B = ~m_I2 & 255;  // Note: immediate is 1's complement
+	if (!m_waslbl)
+		m_B = ~m_I2 & 255;  // Note: immediate is 1's complement
+
+	m_waslbl = 2;
 }
 
 /**
@@ -1327,6 +1325,8 @@ void pps4_device::execute_one()
 	m_I1 = ROP();
 	if (m_wasldi)
 		m_wasldi--;
+	if (m_waslbl)
+		m_waslbl--;
 	if (m_Skip) {
 		m_Skip = 0;
 		LOG("%s: skip op:%02x\n", __FUNCTION__, m_I1);
@@ -1635,6 +1635,8 @@ void pps4_device::device_reset()
 	m_I1 = 0;        // Most recent instruction I(8:1)
 	m_I2 = 0;       // Most recent parameter I2(8:1)
 	m_Ip = 0;       // Previous instruction I(8:1)
+	m_wasldi = 0;
+	m_waslbl = 0;
 }
 
 void pps4_2_device::device_reset()
