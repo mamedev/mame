@@ -65,9 +65,8 @@ ________________________________________________________________________________
 |  NO   | King Dart 2         | CIC Play          | Slightly different PCB layout. Regular MCU instead of REF34VA       | Darts                      |
 |  NO   | Sagitario           | CIC Play          | CPU silkscreened "REF 0034 9115S", without manufacturer logos       | Darts                      |
 |  YES  | Far West            | Compumatic        | Standard Microdar SPD with Philips REF34VA                          | Electromechanical shooting |
-|  YES  | Minidart            | Compumatic        | Compumatic Microdard-V6 PCB. Atmel AT89S51 instead of the REF34 MCU | Darts
+|  YES  | Minidart            | Compumatic        | Compumatic Microdard-V6 PCB. Atmel AT89S51 instead of the REF34 MCU | Darts                      |
 |  NO   | Party Darts         | Compumatic        | More info: http://www.recreativas.org/party-darts-4906-compumatic   | Darts                      |
-|  YES  | Unknown             | Compumatic        | Compumatic ProSPDP-V3 PCB (Philips REF34VA + REF0096 + REF8032)     | Darts                      |
 |  YES  | Diana Bifuca        | Compumatic/Bifuca | Standard Microdar SPD with Philips REF34VA. "Bifuca" string on ROM  | Darts                      |
 |  YES  | Diana Olakoa        | Compumatic/Olaoka | Compumatic Microdard-V5 PCB (REF0034 + REF0032 + REF0096)           | Darts                      |
 |  YES  | Covidarts           | Covielsa          | Not from Compumatic, but similar hardware. 80C31 (ROMless MCU)      | Darts                      |
@@ -270,6 +269,65 @@ ROM_START(dibif727)
 	ROM_LOAD("24lc16b.ic8", 0x000, 0x800, CRC(1cae70db) SHA1(575d4c787fd65950417e85fdb34d2961fc327c74))
 ROM_END
 
+/* Diana Bifuca (unknown version) on Compumatic ProSPDP-V3 PCB
+  ____________________________________________________________________________________________________
+__|_  ________ ___ ___ ___ __________ ____________ ________ __________ ____ ________ __________       |
+|   ||_CN105_| 110 123 119 |__CN125_| |__CN124___| |_CN121| |__CN112_|CN127 |_CN128| |__CN103_|   ___ |
+| C |                                               _______ __________                          : |C ||
+| N |                                               |CN116| |__CN115_|  BATTERY 3.6V              |N ||
+| 1 |   ______               ______   ______       ______                                         |1 ||
+| 1 | CD4514BCWM             MM74HC   MM74HC     CD4514BCWM           ______       ___________    |0 ||
+| 3 |  ___________  _____   _____       _____________        ______   MM74HC       |COMPUMATIC|   |6 ||
+|   |  |UDN2981A_| 74HC00D 74HC00D   :  GM76C88ALK-15        MM74HC   ______       | REF0096  |Xtal__||
+|   |  ___________        ______      _______________  ___   ______   |HC367       |__________|   |C ||
+|   |: |TD62683AP|        MM74HC      |  28SF040A   | 25C16N TLC77051P               Xtal 16.000  |N ||
+|   |: ___________                    |_____________|           __________  ____                  |1 ||
+|   |: |TD62683AP|    _____           _________________      ATF16V8B-15PC LM358                  |0 ||
+|   |: ___________    |REF |          |PHILIPS REF34VA| Xtal     _________                TEST    |9 ||
+|   |  |TD62683AP|    |8032|   ____   |_______________| 24.000   |ULN2803A|              SWITCH   |__||
+|___|                 |____|   CN122                                                             CN102|
+  | ________       _________   ____  _______________  ___________________ _____ _________  ________   |
+  | |_CN101_|      |__CN111_|  CN126 |___CN108______| |_____CN107________|CN114 |_CN118_| |_CN120_|   |
+  |___________________________________________________________________________________________________|
+
+CN101 = DISPLAY INFO
+CN102 = SPEAKER
+CN103 = CARD/NOTE
+CN105 = 6 pin: GND, RX, TX, TEL, CTL, 12V
+CN106 = EXPANSION
+CN107 = POWER SUPPLY
+CN108 = BUTTON PRO
+CN109 = PAN-LED
+CN110 = 2 pin: GND / KEY
+CN111 = ACCEPTOR
+CN112 = TARGET A
+CN113 = DISPLAY
+CN114 = 2 pin: GND, DISP
+CN116 = 3 pin: BI, SS, SM
+CN118 = GUN A
+CN120 = GUN B
+CN122 = ICC (3 pin: T, GND, X)
+CN123 = CNT, +12
+CN124 = INTA PRO
+CN125 = LED-RING
+CN126 = COIN
+CN127 = FDD (4 pin: +5, FDD, GND, +12)
+CN128 = TROB (5 pin: BUL, OUL, REL, THL, +12)
+*/
+ROM_START(dibifpspdp)
+	// REF34VA K0V951 Phr0038 F
+	PHILIPS_REF34VA
+
+	ROM_REGION(0x80000, "program", 0)
+	ROM_LOAD("28sf040a.ic3", 0x00000, 0x80000, CRC(f5727a08) SHA1(f4185afc62c1d1f6cb6c772ea40062ced9b2130a)) // COMPUMATIC RESEARCH S.L. (c) 1997
+
+	ROM_REGION(0x800, "eeprom", 0)
+	ROM_LOAD("25c16n.ic8", 0x000, 0x800, CRC(a89a5016) SHA1(84cb29477b1917225e972c2a25e396567c145719)) // Atmel 25C16N
+
+	ROM_REGION(0x117, "plds", 0)
+	ROM_LOAD("atf16v8b.ic7", 0x000, 0x117, CRC(85e98105) SHA1(9b3389eedd62b3e599559a03e9664ed1e374d60b))
+ROM_END
+
 /* Info about "Far West":
  The sound contains shooting samples and a small sample of the Rawhide main theme.
  Background layout (four shooting targets as food cans with led circles), see https://youtu.be/YVxThMwhvKQ
@@ -349,66 +407,6 @@ ROM_START(minidart)
 
 	ROM_REGION(0x117, "plds", 0)
 	ROM_LOAD("atf16v8b.ic4", 0x000, 0x117, NO_DUMP)
-ROM_END
-
-
-/* Compumatic ProSPDP-V3 PCB
-  ____________________________________________________________________________________________________
-__|_  ________ ___ ___ ___ __________ ____________ ________ __________ ____ ________ __________       |
-|   ||_CN105_| 110 123 119 |__CN125_| |__CN124___| |_CN121| |__CN112_|CN127 |_CN128| |__CN103_|   ___ |
-| C |                                               _______ __________                          : |C ||
-| N |                                               |CN116| |__CN115_|  BATTERY 3.6V              |N ||
-| 1 |   ______               ______   ______       ______                                         |1 ||
-| 1 | CD4514BCWM             MM74HC   MM74HC     CD4514BCWM           ______       ___________    |0 ||
-| 3 |  ___________  _____   _____       _____________        ______   MM74HC       |COMPUMATIC|   |6 ||
-|   |  |UDN2981A_| 74HC00D 74HC00D   :  GM76C88ALK-15        MM74HC   ______       | REF0096  |Xtal__||
-|   |  ___________        ______      _______________  ___   ______   |HC367       |__________|   |C ||
-|   |: |TD62683AP|        MM74HC      |  28SF040A   | 25C16N TLC77051P               Xtal 16.000  |N ||
-|   |: ___________                    |_____________|           __________  ____                  |1 ||
-|   |: |TD62683AP|    _____           _________________      ATF16V8B-15PC LM358                  |0 ||
-|   |: ___________    |REF |          |PHILIPS REF34VA| Xtal     _________                TEST    |9 ||
-|   |  |TD62683AP|    |8032|   ____   |_______________| 24.000   |ULN2803A|              SWITCH   |__||
-|___|                 |____|   CN122                                                             CN102|
-  | ________       _________   ____  _______________  ___________________ _____ _________  ________   |
-  | |_CN101_|      |__CN111_|  CN126 |___CN108______| |_____CN107________|CN114 |_CN118_| |_CN120_|   |
-  |___________________________________________________________________________________________________|
-
-CN101 = DISPLAY INFO
-CN102 = SPEAKER
-CN103 = CARD/NOTE
-CN105 = 6 pin: GND, RX, TX, TEL, CTL, 12V
-CN106 = EXPANSION
-CN107 = POWER SUPPLY
-CN108 = BUTTON PRO
-CN109 = PAN-LED
-CN110 = 2 pin: GND / KEY
-CN111 = ACCEPTOR
-CN112 = TARGET A
-CN113 = DISPLAY
-CN114 = 2 pin: GND, DISP
-CN116 = 3 pin: BI, SS, SM
-CN118 = GUN A
-CN120 = GUN B
-CN122 = ICC (3 pin: T, GND, X)
-CN123 = CNT, +12
-CN124 = INTA PRO
-CN125 = LED-RING
-CN126 = COIN
-CN127 = FDD (4 pin: +5, FDD, GND, +12)
-CN128 = TROB (5 pin: BUL, OUL, REL, THL, +12)
-*/
-ROM_START(prospdp)
-	// REF34VA K0V951 Phr0038 F
-	PHILIPS_REF34VA
-
-	ROM_REGION(0x80000, "program", 0)
-	ROM_LOAD("28sf040a.ic3", 0x00000, 0x80000, CRC(f5727a08) SHA1(f4185afc62c1d1f6cb6c772ea40062ced9b2130a))
-
-	ROM_REGION(0x800, "eeprom", 0)
-	ROM_LOAD("25c16n.ic8", 0x000, 0x800, CRC(a89a5016) SHA1(84cb29477b1917225e972c2a25e396567c145719)) // Atmel 25C16N
-
-	ROM_REGION(0x117, "plds", 0)
-	ROM_LOAD("atf16v8b.ic7", 0x000, 0x117, CRC(85e98105) SHA1(9b3389eedd62b3e599559a03e9664ed1e374d60b))
 ROM_END
 
 
@@ -495,12 +493,12 @@ ROM_START(covidarts)
 ROM_END
 
 
-GAME(199?, dibifuca,  0,        microdar,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (v9.25)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(199?, dibif743,  dibifuca, microdar,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (v7.43)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(199?, dibif727,  dibifuca, microdar,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (v7.27)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1997, cfarwest,  0,        microdar,  microdar, microdar_state, empty_init, ROT0, "Compumatic",          "Far West (Compumatic)",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1997, prospdp,   0,        prospdp,   microdar, microdar_state, empty_init, ROT0, "Compumatic",          "unknown Compumatic ProSPDP based darts machine", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1997, diolakoa,  0,        microdv5,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Olakoa", "Diana Olakoa (v8.38)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1997, diola827,  diolakoa, microdv5,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Olakoa", "Diana Olakoa (v8.27)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1997, covidarts, 0,        covidarts, microdar, microdar_state, empty_init, ROT0, "Covielsa",            "Covidarts",                                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(2009, minidart,  0,        prospdp,   microdar, microdar_state, empty_init, ROT0, "Compumatic",          "Minidart",                                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(199?, dibifuca,   0,        microdar,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (v9.25)",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(199?, dibif743,   dibifuca, microdar,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (v7.43)",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(199?, dibif727,   dibifuca, microdar,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (v7.27)",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1997, dibifpspdp, dibifuca, prospdp,   microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (unknown version, ProSPDP based)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1997, cfarwest,   0,        microdar,  microdar, microdar_state, empty_init, ROT0, "Compumatic",          "Far West (Compumatic)",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1997, diolakoa,   0,        microdv5,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Olakoa", "Diana Olakoa (v8.38)",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1997, diola827,   diolakoa, microdv5,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Olakoa", "Diana Olakoa (v8.27)",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1997, covidarts,  0,        covidarts, microdar, microdar_state, empty_init, ROT0, "Covielsa",            "Covidarts",                                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(2009, minidart,   0,        prospdp,   microdar, microdar_state, empty_init, ROT0, "Compumatic",          "Minidart",                                      MACHINE_IS_SKELETON_MECHANICAL)
