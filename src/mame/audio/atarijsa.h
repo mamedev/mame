@@ -198,8 +198,6 @@ protected:
 	// internal state
 	double              m_pokey_volume;
 	double              m_tms5220_volume;
-
-private:
 };
 
 
