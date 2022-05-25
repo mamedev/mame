@@ -100,7 +100,6 @@ protected:
 	u8        m_FF2;      //!< Flip-flop 2
 	u8        m_I1;        //!< Most recent instruction I(8:1)
 	u8        m_I2;       //!< Most recent parameter I2(8:1)
-	u8        m_Ip;       //!< Previous instruction I(8:1)
 
 	//! return memory at address B(12:1)
 	inline u8 M();

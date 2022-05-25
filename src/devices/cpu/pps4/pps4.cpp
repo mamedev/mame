@@ -155,7 +155,6 @@ std::unique_ptr<util::disasm_interface> pps4_device::create_disassembler()
 inline u8 pps4_device::ROP()
 {
 	const u8 op = m_cache.read_byte(m_P & 0xFFF);
-	m_Ip = m_I1;         // save previous opcode
 	m_P = (m_P + 1) & 0xFFF;
 	m_icount -= 1;
 	return op;
@@ -1573,7 +1572,8 @@ void pps4_device::device_start()
 	save_item(NAME(m_FF2));
 	save_item(NAME(m_I1));
 	save_item(NAME(m_I2));
-	save_item(NAME(m_Ip));
+	save_item(NAME(m_wasldi));
+	save_item(NAME(m_waslbl));
 
 	state_add( PPS4_PC, "PC", m_P ).mask(0xFFF).formatstr("%03X");
 	state_add( PPS4_A, "A",  m_A ).formatstr("%01X");
@@ -1585,7 +1585,6 @@ void pps4_device::device_start()
 	state_add( PPS4_B, "B",  m_B ).formatstr("%03X");
 	state_add( PPS4_I1, "I1",  m_I1 ).formatstr("%02X").noshow();
 	state_add( PPS4_I2, "I2",  m_I2 ).formatstr("%02X").noshow();
-	state_add( PPS4_Ip, "Ip",  m_Ip ).formatstr("%02X").noshow();
 	state_add( STATE_GENPC,    "GENPC", m_P ).noshow();
 	state_add( STATE_GENPCBASE,"CURPC", m_P ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_C).formatstr("%3s").noshow();
@@ -1634,9 +1633,8 @@ void pps4_device::device_reset()
 	m_FF2 = 0;      // Flip-flop 2
 	m_I1 = 0;        // Most recent instruction I(8:1)
 	m_I2 = 0;       // Most recent parameter I2(8:1)
-	m_Ip = 0;       // Previous instruction I(8:1)
-	m_wasldi = 0;
-	m_waslbl = 0;
+	m_wasldi = 0;   // was last instruction LDI?
+	m_waslbl = 0;   // was last instruction LB/LBL?
 }
 
 void pps4_2_device::device_reset()
