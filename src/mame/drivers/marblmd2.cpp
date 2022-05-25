@@ -68,7 +68,7 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 
-	uint32_t screen_update_marblmd2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	bitmap_ind16 m_tempbitmap;
 	uint16_t m_latch_data = 0U;
@@ -87,7 +87,7 @@ void marblmd2_state::video_start()
 	m_tempbitmap.fill(0);
 }
 
-uint32_t marblmd2_state::screen_update_marblmd2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t marblmd2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// start drawing
 	m_vad->mob().draw_async(cliprect);
@@ -159,8 +159,8 @@ void marblmd2_state::marblmd2_map(address_map& map)
 	map(0x600010, 0x600011).portr("600010");
 	map(0x600012, 0x600013).portr("600012");
 	map(0x600020, 0x600021).portr("600020");
-	map(0x600030, 0x600031).r(m_jsa, FUNC(atari_jsa_iii_device::main_response_r));
-	map(0x600040, 0x600041).w(m_jsa, FUNC(atari_jsa_iii_device::main_command_w));
+	map(0x600031, 0x600031).r(m_jsa, FUNC(atari_jsa_iii_device::main_response_r));
+	map(0x600041, 0x600041).w(m_jsa, FUNC(atari_jsa_iii_device::main_command_w));
 
 	map(0x600050, 0x600051).w(FUNC(marblmd2_state::latch_w));
 
@@ -181,8 +181,8 @@ void marblmd2_state::marblmd2_map(address_map& map)
 	map(0x7f8000, 0x7fbfff).ram();
 }
 
-static INPUT_PORTS_START( marblmd2 )
 
+static INPUT_PORTS_START( marblmd2 )
 	PORT_START("600000")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) // also acts as START3
 	PORT_BIT( 0x00fe, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -244,7 +244,6 @@ static INPUT_PORTS_START( marblmd2 )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
 INPUT_PORTS_END
 
 
@@ -330,7 +329,7 @@ void marblmd2_state::marblmd2(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
-	m_screen->set_screen_update(FUNC(marblmd2_state::screen_update_marblmd2));
+	m_screen->set_screen_update(FUNC(marblmd2_state::screen_update));
 	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 256).set_membits(8);

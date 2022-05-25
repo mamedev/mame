@@ -570,6 +570,8 @@ HRESULT dinput_api_helper::enum_attached_devices(int devclass, device_enum_inter
 
 #else // defined(OSD_WINDOWS)
 
+#include "input_module.h"
+
 MODULE_NOT_SUPPORTED(keyboard_input_dinput, OSD_KEYBOARDINPUT_PROVIDER, "dinput")
 MODULE_NOT_SUPPORTED(mouse_input_dinput, OSD_MOUSEINPUT_PROVIDER, "dinput")
 MODULE_NOT_SUPPORTED(joystick_input_dinput, OSD_JOYSTICKINPUT_PROVIDER, "dinput")
