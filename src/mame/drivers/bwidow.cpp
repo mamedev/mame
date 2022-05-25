@@ -344,14 +344,14 @@ void bwidow_state::spacduel_coin_counter_w(uint8_t data)
 	if (data == m_lastdata) return;
 	m_leds[0] = BIT(~data, 5); // start lamp
 	m_leds[1] = BIT(~data, 4); // select lamp
-	machine().bookkeeping().coin_lockout_w(0, !BIT(data,3));
-	machine().bookkeeping().coin_lockout_w(1, !BIT(data,3));
-	machine().bookkeeping().coin_lockout_w(2, !BIT(data,3));
-	machine().bookkeeping().coin_counter_w(0, BIT(data,0));
-	machine().bookkeeping().coin_counter_w(1, BIT(data,1));
-	machine().bookkeeping().coin_counter_w(2, BIT(data,2));
-	m_avg->set_flip_x(~data & 0x40);
-	m_avg->set_flip_y(~data & 0x80);
+	machine().bookkeeping().coin_lockout_w(0, !BIT(data, 3));
+	machine().bookkeeping().coin_lockout_w(1, !BIT(data, 3));
+	machine().bookkeeping().coin_lockout_w(2, !BIT(data, 3));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
+	machine().bookkeeping().coin_counter_w(2, BIT(data, 2));
+	m_avg->set_flip_x(BIT(~data, 6));
+	m_avg->set_flip_y(BIT(~data, 7));
 	m_lastdata = data;
 }
 
@@ -675,7 +675,6 @@ static INPUT_PORTS_START( spacduel )
 
 	/* Cabinet type.  The cocktail's harness has a jumper between pins
 	   R and P, which maps to bit 7 of address 0x0907 */
-
 	PORT_START("CABINET")
 	PORT_CONFNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
 	PORT_CONFSETTING(   0x00, DEF_STR( Upright ) )
