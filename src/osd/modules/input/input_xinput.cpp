@@ -298,6 +298,8 @@ void xinput_joystick_device::configure()
 
 #else // defined(OSD_WINDOWS)
 
+#include "input_module.h"
+
 MODULE_NOT_SUPPORTED(xinput_joystick_module, OSD_JOYSTICKINPUT_PROVIDER, "xinput")
 
 #endif // defined(OSD_WINDOWS)

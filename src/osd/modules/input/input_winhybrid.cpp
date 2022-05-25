@@ -431,6 +431,8 @@ private:
 
 #else // defined(OSD_WINDOWS)
 
+#include "input_module.h"
+
 MODULE_NOT_SUPPORTED(winhybrid_joystick_module, OSD_JOYSTICKINPUT_PROVIDER, "winhybrid")
 
 #endif // defined(OSD_WINDOWS)

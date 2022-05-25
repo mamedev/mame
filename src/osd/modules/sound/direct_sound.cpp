@@ -547,11 +547,11 @@ void sound_direct_sound::destroy_buffers()
 	m_primary_buffer.release();
 }
 
+} // anonymous namespace
+
 
 #else // defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 	MODULE_NOT_SUPPORTED(sound_direct_sound, OSD_SOUND_PROVIDER, "dsound")
 #endif // defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
-
-} // anonymous namespace
 
 MODULE_DEFINITION(SOUND_DSOUND, sound_direct_sound)
