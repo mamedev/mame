@@ -11,14 +11,13 @@
 	Marble Man: Marble Madness II (earlier version of the game before it was changed to use Joysticks)
 
 	-------------------------------------------
- 
+
 	TODO:
 	- Issues in service mode (eg. RAM check fails) could just be prototype issues
 	- verify XTALs, clocks, volume balance, dipswitches etc.
 
 	Non-Bugs:
 	- objects appear over text boxes during scroll before levels, verified to happen on hardware
-
 
 */
 
@@ -131,7 +130,6 @@ uint32_t marblmd2_state::screen_update_marblmd2(screen_device &screen, bitmap_in
 					{
 						pf[x] = mo[x] | 0x80;
 					}
-
 				}
 			}
 		}
@@ -171,7 +169,7 @@ void marblmd2_state::marblmd2_map(address_map& map)
 	map(0x601000, 0x601fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 
 	map(0x607000, 0x607001).nopw();
-	
+
 	map(0x7c0000, 0x7c03ff).rw("palette", FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0xff00).share("palette");
 	map(0x7cffc0, 0x7cffff).ram().rw(m_vad, FUNC(atari_vad_device::control_read), FUNC(atari_vad_device::control_write));
 
@@ -223,7 +221,6 @@ static INPUT_PORTS_START( marblmd2 )
 	PORT_DIPSETTING(      0x0000, "2" )
 	PORT_DIPSETTING(      0x0080, "3" )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
 
 	PORT_START("600020")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
@@ -282,36 +279,36 @@ GFXDECODE_END
 
 const atari_motion_objects_config marblmd2_state::s_mob_config =
 {
-	1,                  // index to which gfx system 
-	1,                  // number of motion object banks 
-	1,                  // are the entries linked? 
-	0,                  // are the entries split? 
-	0,                  // render in reverse order? 
-	0,                  // render in swapped X/Y order? 
-	0,                  // does the neighbor bit affect the next object? 
-	8,                  // pixels per SLIP entry (0 for no-slip) 
-	0,                  // pixel offset for SLIPs 
-	0,                  // maximum number of links to visit/scanline (0=all) 
+	1,                  // index to which gfx system
+	1,                  // number of motion object banks
+	1,                  // are the entries linked?
+	0,                  // are the entries split?
+	0,                  // render in reverse order?
+	0,                  // render in swapped X/Y order?
+	0,                  // does the neighbor bit affect the next object?
+	8,                  // pixels per SLIP entry (0 for no-slip)
+	0,                  // pixel offset for SLIPs
+	0,                  // maximum number of links to visit/scanline (0=all)
 
-	0x000,              // base palette entry 
-	0x100,              // maximum number of colors 
-	0,                  // transparent pen index 
+	0x000,              // base palette entry
+	0x100,              // maximum number of colors
+	0,                  // transparent pen index
 
-	{{ 0x03ff,0,0,0 }}, // mask for the link 
-	{{ 0,0x7fff,0,0 }}, // mask for the code index 
-	{{ 0,0,0x000f,0 }}, // mask for the color 
-	{{ 0,0,0xff80,0 }}, // mask for the X position 
-	{{ 0,0,0,0xff80 }}, // mask for the Y position 
+	{{ 0x03ff,0,0,0 }}, // mask for the link
+	{{ 0,0x7fff,0,0 }}, // mask for the code index
+	{{ 0,0,0x000f,0 }}, // mask for the color
+	{{ 0,0,0xff80,0 }}, // mask for the X position
+	{{ 0,0,0,0xff80 }}, // mask for the Y position
 	{{ 0,0,0,0x0070 }}, // mask for the width, in tiles
-	{{ 0,0,0,0x0007 }}, // mask for the height, in tiles 
-	{{ 0,0x8000,0,0 }}, // mask for the horizontal flip 
-	{{ 0 }},            // mask for the vertical flip 
-	{{ 0,0,0x0070,0 }}, // mask for the priority 
-	{{ 0 }},            // mask for the neighbor 
-	{{ 0 }},            // mask for absolute coordinates 
+	{{ 0,0,0,0x0007 }}, // mask for the height, in tiles
+	{{ 0,0x8000,0,0 }}, // mask for the horizontal flip
+	{{ 0 }},            // mask for the vertical flip
+	{{ 0,0,0x0070,0 }}, // mask for the priority
+	{{ 0 }},            // mask for the neighbor
+	{{ 0 }},            // mask for absolute coordinates
 
-	{{ 0 }},            // mask for the special value 
-	0,                  // resulting value to indicate "special" 
+	{{ 0 }},            // mask for the special value
+	0,                  // resulting value to indicate "special"
 };
 
 TILE_GET_INFO_MEMBER(marblmd2_state::get_playfield_tile_info)
@@ -324,7 +321,7 @@ TILE_GET_INFO_MEMBER(marblmd2_state::get_playfield_tile_info)
 // XTALs are guessed based on other Atari titles of the same period
 void marblmd2_state::marblmd2(machine_config &config)
 {
-	M68000(config, m_maincpu, XTAL(14'318'181));
+	M68000(config, m_maincpu, 14.318181_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &marblmd2_state::marblmd2_map);
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
@@ -332,7 +329,6 @@ void marblmd2_state::marblmd2(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_mm2);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(marblmd2_state::screen_update_marblmd2));
 	m_screen->set_palette("palette");
@@ -347,7 +343,7 @@ void marblmd2_state::marblmd2(machine_config &config)
 
 	TILEMAP(config, "vad:playfield", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(marblmd2_state::get_playfield_tile_info));
 
-	// sound hardware 
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	ATARI_JSA_III(config, m_jsa, 0);
@@ -358,13 +354,13 @@ void marblmd2_state::marblmd2(machine_config &config)
 }
 
 ROM_START( marblmd2 )
-	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 Code 
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "rom0l.18c",  0x00001, 0x20000, CRC(a4db40d9) SHA1(ae8313c9bb513143472347a7705bec33783bad7e) )
 	ROM_LOAD16_BYTE( "rom0h.20c",  0x00000, 0x20000, CRC(d1a17d67) SHA1(7ac434858fa94e4bb4bb7d0603f699667494aa0d) )
 	ROM_LOAD16_BYTE( "rom1l.18e",  0x40001, 0x20000, CRC(b6fb08b5) SHA1(0ce9c1a5d70133ffc879cfe548646c04de371e13) )
 	ROM_LOAD16_BYTE( "rom1h.20e",  0x40000, 0x20000, CRC(b2a361a8) SHA1(b7c58404642a494532597cceb946463e3a6f56b3) )
 
-	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code 
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "aud0.12c",  0x00000, 0x10000, CRC(89a8d90a) SHA1(cd73483d0bcfe2c8134d005c4417975f9a2cb658) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
