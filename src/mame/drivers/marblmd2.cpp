@@ -14,7 +14,6 @@
  
 	TODO:
 	- Issues in service mode (eg. RAM check fails) could just be prototype issues
-	- EEPROM hookup
 	- verify XTALs, clocks, volume balance, dipswitches etc.
 
 	Non-Bugs:
@@ -30,6 +29,7 @@
 #include "video/atarivad.h"
 
 #include "cpu/m68000/m68000.h"
+#include "machine/eeprompar.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -166,7 +166,9 @@ void marblmd2_state::marblmd2_map(address_map& map)
 
 	map(0x600050, 0x600051).w(FUNC(marblmd2_state::latch_w));
 
-	map(0x601000, 0x6013ff).ram(); // some kind of NVRAM?
+	map(0x600060, 0x600061).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
+
+	map(0x601000, 0x601fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 
 	map(0x607000, 0x607001).nopw();
 	
@@ -322,8 +324,10 @@ TILE_GET_INFO_MEMBER(marblmd2_state::get_playfield_tile_info)
 // XTALs are guessed based on other Atari titles of the same period
 void marblmd2_state::marblmd2(machine_config &config)
 {
-	M68000(config, m_maincpu, XTAL(14'318'181)/2);
+	M68000(config, m_maincpu, XTAL(14'318'181));
 	m_maincpu->set_addrmap(AS_PROGRAM, &marblmd2_state::marblmd2_map);
+
+	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_mm2);
 
@@ -347,6 +351,7 @@ void marblmd2_state::marblmd2(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	ATARI_JSA_III(config, m_jsa, 0);
+	m_jsa->set_swapped_coins(true);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_6);
 	m_jsa->test_read_cb().set_ioport("600010").bit(6);
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
