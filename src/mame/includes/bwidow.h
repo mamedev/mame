@@ -4,6 +4,7 @@
 #ifndef MAME_INCLUDES_BWIDOW_H
 #define MAME_INCLUDES_BWIDOW_H
 
+#include "video/avgdvg.h"
 #include "machine/er2055.h"
 
 #define MASTER_CLOCK (XTAL(12'096'000))
@@ -16,7 +17,9 @@ public:
 	bwidow_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_avg(*this, "avg")
 		, m_earom(*this, "earom")
+		, m_cabinet(*this, "CABINET")
 		, m_in3(*this, "IN3")
 		, m_in4(*this, "IN4")
 		, m_dsw2(*this, "DSW2")
@@ -52,7 +55,9 @@ protected:
 
 	int m_lastdata = 0;
 	required_device<cpu_device> m_maincpu;
+	required_device<avg_device> m_avg;
 	required_device<er2055_device> m_earom;
+	optional_ioport m_cabinet;
 	optional_ioport m_in3;
 	optional_ioport m_in4;
 	optional_ioport m_dsw2;
