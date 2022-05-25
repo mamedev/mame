@@ -156,7 +156,8 @@ private:
 	/* timers */
 	emu_timer *m_line_timer;
 	emu_timer *m_de_off_timer;
-	emu_timer *m_cursor_timer;
+	emu_timer *m_cursor_on_timer;
+	emu_timer *m_cursor_off_timer;
 	emu_timer *m_hsync_on_timer;
 	emu_timer *m_hsync_off_timer;
 	emu_timer *m_light_pen_latch_timer;
@@ -183,7 +184,8 @@ private:
 	void set_cur(int state);
 	TIMER_CALLBACK_MEMBER(handle_line_timer);
 	TIMER_CALLBACK_MEMBER(de_off_tick);
-	TIMER_CALLBACK_MEMBER(cursor_tick);
+	TIMER_CALLBACK_MEMBER(cursor_on);
+	TIMER_CALLBACK_MEMBER(cursor_off);
 	TIMER_CALLBACK_MEMBER(hsync_on);
 	TIMER_CALLBACK_MEMBER(hsync_off);
 	TIMER_CALLBACK_MEMBER(latch_light_pen);

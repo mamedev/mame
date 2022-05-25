@@ -200,6 +200,7 @@ private:
 	attotime m_time2;
 	uint8_t m_t2_active;
 	emu_timer *m_ca2_timer;
+	emu_timer *m_cb2_timer;
 
 	emu_timer *m_shift_timer;
 	emu_timer *m_shift_irq_timer;

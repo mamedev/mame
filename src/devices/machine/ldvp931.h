@@ -92,6 +92,7 @@ private:
 
 	// internal state
 	required_device<i8049_device> m_i8049_cpu;        // CPU index of the 8049
+	emu_timer *         m_initial_vbi_timer;
 	emu_timer *         m_process_vbi_timer;
 	emu_timer *         m_deferred_data_timer;
 	emu_timer *         m_irq_off_timer;

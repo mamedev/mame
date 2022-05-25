@@ -87,7 +87,7 @@ private:
 	struct fx_timer
 	{
 		emu_timer *timer;
-		uint32_t state;
+		bool state;
 		bool enabled;
 	};
 

@@ -158,13 +158,13 @@ void mc6847_friend_device::device_start()
 
 	/* create the timers */
 	m_frame_timer = timer_alloc(FUNC(mc6847_friend_device::new_frame), this);
-	m_hsync_on_timer = timer_alloc(FUNC(mc6847_friend_device::horizontal_sync_changed), this);
-	m_hsync_off_timer = timer_alloc(FUNC(mc6847_friend_device::horizontal_sync_changed), this);
+	m_hsync_on_timer = timer_alloc(FUNC(mc6847_friend_device::change_horizontal_sync), this);
+	m_hsync_off_timer = timer_alloc(FUNC(mc6847_friend_device::change_horizontal_sync), this);
 	m_fsync_timer = timer_alloc(FUNC(mc6847_friend_device::change_field_sync), this);
 
-	m_frame_timer->adjust(clocks_to_attotime(0), 0, clocks_to_attotime(TIMER_HSYNC_PERIOD * m_divider));
+	m_frame_timer->adjust(clocks_to_attotime(0), 0, clocks_to_attotime(m_tpfs * TIMER_HSYNC_PERIOD * m_divider));
 	m_hsync_on_timer->adjust(clocks_to_attotime(TIMER_HSYNC_ON_TIME * m_divider), 1, clocks_to_attotime(TIMER_HSYNC_PERIOD * m_divider));
-	m_hsync_off_timer->adjust(clocks_to_attotime(TIMER_HSYNC_ON_TIME * m_divider), 0, clocks_to_attotime(TIMER_HSYNC_PERIOD * m_divider));
+	m_hsync_off_timer->adjust(clocks_to_attotime(TIMER_HSYNC_OFF_TIME * m_divider), 0, clocks_to_attotime(TIMER_HSYNC_PERIOD * m_divider));
 
 	m_top_border_scanlines = 0;
 	m_body_scanlines = 0;
@@ -276,8 +276,9 @@ std::string mc6847_friend_device::scanline_zone_string(scanline_zone zone) const
 //  change_horizontal_sync
 //-------------------------------------------------
 
-void mc6847_friend_device::change_horizontal_sync(bool line)
+TIMER_CALLBACK_MEMBER(mc6847_friend_device::change_horizontal_sync)
 {
+	bool line = (bool)param;
 	g_profiler.start(PROFILER_USER1);
 
 	// are we on a rising edge?

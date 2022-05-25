@@ -922,15 +922,15 @@ void ti85_state::ti83pse_count( uint8_t timer, uint8_t data)
 		switch (timer)
 		{
 		case CRYSTAL_TIMER1:
-			m_crystal_timer1->adjust(attotime::zero, 0, attotime::from_hz(32768.0f / m_ctimer[timer].divsor));
+			m_crystal_timer1->adjust(attotime::zero, CRYSTAL_TIMER1, attotime::from_hz(32768.0f / m_ctimer[timer].divsor));
 			m_crystal_timer1->enable(true);
 			break;
 		case CRYSTAL_TIMER2:
-			m_crystal_timer2->adjust(attotime::zero, 0, attotime::from_hz(32768.0f / m_ctimer[timer].divsor));
+			m_crystal_timer2->adjust(attotime::zero, CRYSTAL_TIMER2, attotime::from_hz(32768.0f / m_ctimer[timer].divsor));
 			m_crystal_timer2->enable(true);
 			break;
 		case CRYSTAL_TIMER3:
-			m_crystal_timer3->adjust(attotime::zero, 0, attotime::from_hz(32768.0f / m_ctimer[timer].divsor));
+			m_crystal_timer3->adjust(attotime::zero, CRYSTAL_TIMER3, attotime::from_hz(32768.0f / m_ctimer[timer].divsor));
 			m_crystal_timer3->enable(true);
 			break;
 

@@ -270,6 +270,7 @@ void via6522_device::device_start()
 	m_t1 = timer_alloc(FUNC(via6522_device::t1_tick), this);
 	m_t2 = timer_alloc(FUNC(via6522_device::t2_tick), this);
 	m_ca2_timer = timer_alloc(FUNC(via6522_device::ca2_tick), this);
+	m_cb2_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 	m_shift_timer = timer_alloc(FUNC(via6522_device::shift_tick), this);
 	m_shift_irq_timer = timer_alloc(FUNC(via6522_device::shift_irq_tick), this);
 
@@ -351,6 +352,7 @@ void via6522_device::device_reset()
 	m_t1->adjust(attotime::never);
 	m_t2->adjust(attotime::never);
 	m_ca2_timer->adjust(attotime::never);
+	m_cb2_timer->adjust(attotime::never);
 	m_shift_timer->adjust(attotime::never);
 	m_shift_irq_timer->adjust(attotime::never);
 }
@@ -506,14 +508,17 @@ TIMER_CALLBACK_MEMBER(via6522_device::shift_tick)
 	{
 		if (SI_O2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
 		{
+			printf("Adjusting shift timer to 1 clock\n");
 			m_shift_timer->adjust(clocks_to_attotime(1));
 		}
 		else if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SI_T2_CONTROL(m_acr))
 		{
+			printf("Adjusting shift timer to %d clocks\n", (m_t2ll + 2) / 2);
 			m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2) / 2);
 		}
 		else // otherwise we stop it
 		{
+			printf("Stopping shift timer\n");
 			m_shift_timer->adjust(attotime::never);
 		}
 	}
@@ -524,6 +529,7 @@ TIMER_CALLBACK_MEMBER(via6522_device::t1_tick)
 	if (T1_CONTINUOUS (m_acr))
 	{
 		m_t1_pb7 = !m_t1_pb7;
+		printf("ADjusting T1 timer to %d clocks\n", TIMER1_VALUE + IFR_DELAY);
 		m_t1->adjust(clocks_to_attotime(TIMER1_VALUE + IFR_DELAY));
 	}
 	else
@@ -840,6 +846,11 @@ void via6522_device::write(offs_t offset, u8 data)
 		{
 			m_out_cb2 = 0;
 			m_cb2_handler(m_out_cb2);
+		}
+
+		if (CB2_PULSE_OUTPUT(m_pcr))
+		{
+			m_cb2_timer->adjust(clocks_to_attotime(1));
 		}
 		break;
 

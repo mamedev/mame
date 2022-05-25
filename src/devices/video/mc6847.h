@@ -489,7 +489,7 @@ private:
 	uint32_t m_partial_scanline_clocks;
 
 	// functions
-	virtual void change_horizontal_sync(bool line);
+	virtual TIMER_CALLBACK_MEMBER(change_horizontal_sync);
 	TIMER_CALLBACK_MEMBER(change_field_sync);
 	void update_field_sync_timer();
 	void next_scanline();

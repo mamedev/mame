@@ -150,6 +150,7 @@ void philips_22vp931_device::device_start()
 	laserdisc_device::device_start();
 
 	// allocate timers
+	m_initial_vbi_timer = timer_alloc(FUNC(philips_22vp931_device::process_vbi_data), this);
 	m_process_vbi_timer = timer_alloc(FUNC(philips_22vp931_device::process_vbi_data), this);
 	m_deferred_data_timer = timer_alloc(FUNC(philips_22vp931_device::process_deferred_data), this);
 	m_irq_off_timer = timer_alloc(FUNC(philips_22vp931_device::irq_off), this);
@@ -227,7 +228,7 @@ TIMER_CALLBACK_MEMBER(philips_22vp931_device::process_vbi_data)
 		line++;
 	}
 	if (line <= LASERDISC_CODE_LINE18 + 1)
-		m_deferred_data_timer->adjust(screen().time_until_pos(line*2, which * 2 * screen().width() / 4), (line << 2) + which);
+		m_process_vbi_timer->adjust(screen().time_until_pos(line*2, which * 2 * screen().width() / 4), (line << 2) + which);
 }
 
 
@@ -350,8 +351,9 @@ void philips_22vp931_device::player_vsync(const vbi_metadata &vbi, int fieldnum,
 
 int32_t philips_22vp931_device::player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime)
 {
-	// set the first VBI timer to go at the start of line 16
-	m_process_vbi_timer->adjust(screen().time_until_pos(16*2), LASERDISC_CODE_LINE16 << 2);
+	// player_update is invoked by the parent device at line 16, so call our VBI processing timer directly
+	m_initial_vbi_timer->adjust(screen().time_until_pos(16*2), LASERDISC_CODE_LINE16 << 2);
+	//process_vbi_data(LASERDISC_CODE_LINE16 << 2);
 
 	// play forward by default
 	return fieldnum;

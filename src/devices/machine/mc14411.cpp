@@ -111,12 +111,11 @@ void mc14411_device::device_start()
 {
 	LOGSETUP("mc14411_device::device_start\n");
 
-	m_out_fx_cbs.resolve_all_safe();
-
 	for (int i = TIMER_F1; i <= TIMER_F16; i++)
 	{
 		m_fx_timers[i].timer = timer_alloc(FUNC(mc14411_device::timer_tick), this);
 		m_fx_timers[i].enabled = true;
+		m_out_fx_cbs[i].resolve();
 	}
 
 	save_item(NAME(m_divider));
@@ -171,6 +170,8 @@ void mc14411_device::timer_disable_all()
 
 void mc14411_device::arm_timer(int i)
 {
+	if (m_out_fx_cbs[i].isnull())
+		return;
 	int divider = s_counter_divider[i];
 	if (i < TIMER_F15)
 		divider *= s_divider_select[m_divider];
@@ -192,7 +193,9 @@ void mc14411_device::device_reset()
 	for (int i = TIMER_F1; i <= TIMER_F16; i++)
 	{
 		// Reset line according to datasheet and remember it for transitions to come
-		m_out_fx_cbs[i](m_fx_timers[i].state = (i < TIMER_F15 ? 0 : 1));
+		m_fx_timers[i].state = !(i < TIMER_F15);
+		if (!m_out_fx_cbs[i].isnull())
+			m_out_fx_cbs[i](m_fx_timers[i].state);
 	}
 
 	if (m_reset == ASSERT_LINE)
@@ -209,7 +212,8 @@ void mc14411_device::device_reset()
 
 TIMER_CALLBACK_MEMBER(mc14411_device::timer_tick)
 {
-	m_out_fx_cbs[param](m_fx_timers[param].state & 1);
+	m_out_fx_cbs[param](m_fx_timers[param].state);
+	m_fx_timers[param].state = !m_fx_timers[param].state;
 }
 
 

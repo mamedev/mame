@@ -1620,7 +1620,7 @@ void upd765_family_device::seek_start(floppy_info &fi)
 
 void upd765_family_device::delay_cycles(floppy_info &fi, int cycles)
 {
-	fi.tm->adjust(attotime::from_double(double(cycles)/cur_rate));
+	fi.tm->adjust(attotime::from_double(double(cycles)/cur_rate), fi.id);
 }
 
 void upd765_family_device::seek_continue(floppy_info &fi)
