@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_BUS_MULTIBUS_LABTAM3232_H
-#define MAME_BUS_MULTIBUS_LABTAM3232_H
+#ifndef MAME_BUS_MULTIBUS_LABTAM_3232_H
+#define MAME_BUS_MULTIBUS_LABTAM_3232_H
 
 #pragma once
 
@@ -13,13 +13,12 @@
 #include "machine/ns32082.h"
 #include "machine/ns32202.h"
 
-
-class labtam3232_device
+class labtam_3232_device
 	: public device_t
 	, public device_multibus_interface
 {
 public:
-	labtam3232_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	labtam_3232_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
 	// device_t overrides
@@ -47,6 +46,6 @@ private:
 	bool m_installed;
 };
 
-DECLARE_DEVICE_TYPE(LABTAM3232, labtam3232_device)
+DECLARE_DEVICE_TYPE(LABTAM_3232, labtam_3232_device)
 
-#endif // MAME_BUS_MULTIBUS_LABTAM3232_H
+#endif // MAME_BUS_MULTIBUS_LABTAM_3232_H
