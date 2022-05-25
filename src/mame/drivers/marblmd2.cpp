@@ -351,6 +351,7 @@ void marblmd2_state::marblmd2(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	ATARI_JSA_III(config, m_jsa, 0);
+	m_jsa->set_swapped_coins(true);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_6);
 	m_jsa->test_read_cb().set_ioport("600010").bit(6);
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);

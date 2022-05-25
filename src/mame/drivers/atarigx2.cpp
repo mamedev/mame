@@ -1525,7 +1525,6 @@ void atarigx2_state::atarigx2(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	ATARI_JSA_IIIS(config, m_jsa, 0);
-	m_jsa->set_inverted_coins();
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_5);
 	m_jsa->test_read_cb().set_ioport("SERVICE").bit(6);
 	m_jsa->add_route(0, "lspeaker", 0.7);

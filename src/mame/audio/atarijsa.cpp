@@ -178,7 +178,7 @@ INPUT_PORTS_START( jsa_i_ioports )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, atari_jsa_base_device, main_test_read_line) // self test
 INPUT_PORTS_END
 
-INPUT_PORTS_START( jsa_i_ioports_inverted_coins )
+INPUT_PORTS_START( jsa_i_ioports_swapped_coins )
 	PORT_INCLUDE( jsa_i_ioports )
 
 	PORT_MODIFY("JSAI")
@@ -198,7 +198,7 @@ INPUT_PORTS_START( jsa_ii_ioports )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, atari_jsa_base_device, main_test_read_line) // self test
 INPUT_PORTS_END
 
-INPUT_PORTS_START( jsa_ii_ioports_inverted_coins )
+INPUT_PORTS_START( jsa_ii_ioports_swapped_coins )
 	PORT_INCLUDE( jsa_ii_ioports )
 
 	PORT_MODIFY("JSAII")
@@ -208,8 +208,8 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( jsa_iii_ioports )
 	PORT_START("JSAIII")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, atari_jsa_base_device, main_test_read_line) // self test
@@ -218,12 +218,12 @@ INPUT_PORTS_START( jsa_iii_ioports )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, atari_jsa_base_device, main_test_read_line) // self test
 INPUT_PORTS_END
 
-INPUT_PORTS_START( jsa_iii_ioports_inverted_coins )
+INPUT_PORTS_START( jsa_iii_ioports_swapped_coins )
 	PORT_INCLUDE( jsa_iii_ioports )
 
 	PORT_MODIFY("JSAIII")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 INPUT_PORTS_END
 
 //**************************************************************************
@@ -249,7 +249,7 @@ atari_jsa_base_device::atari_jsa_base_device(const machine_config &mconfig, devi
 		m_ym2151_volume(1.0),
 		m_ym2151_ct1(0),
 		m_ym2151_ct2(0),
-		m_inverted_coins(false)
+		m_swapped_coins(false)
 {
 }
 
@@ -823,7 +823,7 @@ void atari_jsa_i_device::device_add_mconfig(machine_config &config)
 
 ioport_constructor atari_jsa_i_device::device_input_ports() const
 {
-	return m_inverted_coins ? INPUT_PORTS_NAME( jsa_i_ioports_inverted_coins ) : INPUT_PORTS_NAME( jsa_i_ioports );
+	return m_swapped_coins ? INPUT_PORTS_NAME( jsa_i_ioports_swapped_coins ) : INPUT_PORTS_NAME( jsa_i_ioports );
 }
 
 
@@ -948,7 +948,7 @@ void atari_jsa_ii_device::device_add_mconfig(machine_config &config)
 
 ioport_constructor atari_jsa_ii_device::device_input_ports() const
 {
-	return m_inverted_coins ? INPUT_PORTS_NAME( jsa_ii_ioports_inverted_coins ) : INPUT_PORTS_NAME( jsa_ii_ioports );
+	return m_swapped_coins ? INPUT_PORTS_NAME( jsa_ii_ioports_swapped_coins ) : INPUT_PORTS_NAME( jsa_ii_ioports );
 }
 
 
@@ -1032,7 +1032,7 @@ void atari_jsa_iii_device::device_add_mconfig(machine_config &config)
 
 ioport_constructor atari_jsa_iii_device::device_input_ports() const
 {
-	return m_inverted_coins ? INPUT_PORTS_NAME( jsa_iii_ioports_inverted_coins ) : INPUT_PORTS_NAME( jsa_iii_ioports );
+	return m_swapped_coins ? INPUT_PORTS_NAME( jsa_iii_ioports_swapped_coins ) : INPUT_PORTS_NAME( jsa_iii_ioports );
 }
 
 

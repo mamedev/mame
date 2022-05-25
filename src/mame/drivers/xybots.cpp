@@ -207,9 +207,9 @@ void xybots_state::xybots(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	ATARI_JSA_I(config, m_jsa, 0);
+	m_jsa->set_swapped_coins(true);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_2);
 	m_jsa->test_read_cb().set_ioport("FFE200").bit(8);
-	m_jsa->set_inverted_coins();
 	m_jsa->add_route(0, "rspeaker", 1.0);
 	m_jsa->add_route(1, "lspeaker", 1.0);
 	config.device_remove("jsa:pokey");
