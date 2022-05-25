@@ -6,46 +6,31 @@
 //
 //============================================================
 
-#include "input_module.h"
 #include "modules/osdmodule.h"
 
 #if defined(OSD_WINDOWS)
 
+#include "emu.h"
+
+#include "input_dinput.h"
+#include "input_xinput.h"
+
 #include <list>
 #include <vector>
 
-// standard windows headers
-#include <windows.h>
-#include <wrl/client.h>
+#include <oleauto.h>
 #include <wbemcli.h>
 
-// XInput/DirectInput
-#include <xinput.h>
-#include <dinput.h>
-
-#undef interface
-
-// MAME headers
-#include "emu.h"
-
-// MAMEOS headers
-#include "strconv.h"
-#include "winmain.h"
-
-#include "input_common.h"
-#include "input_windows.h"
-#include "input_xinput.h"
-#include "input_dinput.h"
 
 namespace {
 
 using namespace Microsoft::WRL;
 
-template<class TCom>
+template <class TCom>
 class ComArray
 {
 private:
-	std::vector<TCom*> m_entries;
+	std::vector<TCom *> m_entries;
 
 public:
 	ComArray(size_t capacity) : m_entries(capacity, nullptr)

@@ -6,32 +6,29 @@
 //
 //============================================================
 
-#include "input_module.h"
 #include "modules/osdmodule.h"
 
 #if defined(OSD_WINDOWS)
 
-// standard windows headers
-#include <windows.h>
-#include <tchar.h>
-#undef interface
+// MAME headers
+#include "emu.h"
+
+#include "input_windows.h"
+
+#include "winmain.h"
+#include "window.h"
+
+#include "modules/lib/osdlib.h"
+#include "strconv.h"
 
 #include <algorithm>
 #include <functional>
 #include <mutex>
 #include <new>
 
-// MAME headers
-#include "emu.h"
-#include "strconv.h"
-
-// MAMEOS headers
-#include "modules/lib/osdlib.h"
-#include "winmain.h"
-#include "window.h"
-
-#include "input_common.h"
-#include "input_windows.h"
+// standard windows headers
+#include <windows.h>
+#include <tchar.h>
 
 
 namespace {
