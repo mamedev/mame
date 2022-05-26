@@ -7,25 +7,18 @@
 //============================================================
 
 #include "input_module.h"
-#include "modules/osdmodule.h"
 
 #if defined(OSD_WINDOWS)
 
-// standard windows headers
-#include <windows.h>
-#include <tchar.h>
-#undef interface
-
-// MAME headers
 #include "emu.h"
+
+#include "input_windows.h"
+
 #include "strconv.h"
 
-// MAMEOS headers
-#include "winmain.h"
-#include "window.h"
+// standard windows headers
+#include <tchar.h>
 
-#include "input_common.h"
-#include "input_windows.h"
 
 namespace {
 

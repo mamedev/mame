@@ -1,10 +1,28 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles, Brad Hughes
+//============================================================
+//
+//  input_dinput.h - Windows DirectInput support
+//
+//============================================================
 #ifndef MAME_OSD_INPUT_INPUT_DINPUT_H
 #define MAME_OSD_INPUT_INPUT_DINPUT_H
 
 #pragma once
 
-#include "input_common.h"
+#include "input_windows.h"
+
 #include "modules/lib/osdlib.h"
+#include "modules/lib/osdobj_common.h"
+
+#include "window.h"
+
+#include "strconv.h"
+
+#include <dinput.h>
+#include <windows.h>
+#include <wrl/client.h>
+
 
 //============================================================
 //  dinput_device - base directinput device
@@ -52,14 +70,14 @@ public:
 	virtual ~dinput_api_helper();
 	int initialize();
 
-	template<class TDevice>
-	TDevice* create_device(
-		running_machine &machine,
-		input_module_base &module,
-		LPCDIDEVICEINSTANCE instance,
-		LPCDIDATAFORMAT format1,
-		LPCDIDATAFORMAT format2,
-		dinput_cooperative_level cooperative_level)
+	template <class TDevice>
+	TDevice *create_device(
+			running_machine &machine,
+			input_module_base &module,
+			LPCDIDEVICEINSTANCE instance,
+			LPCDIDATAFORMAT format1,
+			LPCDIDATAFORMAT format2,
+			dinput_cooperative_level cooperative_level)
 	{
 		HRESULT result;
 		std::shared_ptr<win_window_info> window;
