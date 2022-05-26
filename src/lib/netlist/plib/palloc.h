@@ -454,7 +454,7 @@ namespace plib {
 			return ::operator new(size);
 		#endif
 #else
-			return ::operator new(size, static_cast<std::align_val_t>(alignment));
+			return ::operator new(size, std::align_val_t(alignment));
 #endif
 		}
 
@@ -475,7 +475,7 @@ namespace plib {
 				::operator delete(ptr);
 			#endif
 #else
-			::operator delete(ptr, static_cast<std::align_val_t>(alignment));
+			::operator delete(ptr, std::align_val_t(alignment));
 #endif
 		}
 
