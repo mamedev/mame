@@ -49,7 +49,7 @@ namespace plib {
 		: m_arena(a), m_info({ALIGN ? ALIGN : alignof(T), sizeof(T)} ) { }
 
 		template<typename U, typename =
-		std::enable_if_t<std::is_convertible_v< U*, T*>>>
+		std::enable_if_t<std::is_convertible_v<U *, T *>>>
 		constexpr arena_deleter_base(const arena_deleter_base<P, U, ALIGN, false> &rhs) noexcept
 		: m_arena(rhs.m_arena), m_info(rhs.m_info) { }
 
@@ -74,7 +74,7 @@ namespace plib {
 		}
 
 		template<typename U, typename =
-		std::enable_if_t<std::is_convertible_v< U*, T*>>>
+		std::enable_if_t<std::is_convertible_v<U *, T *>>>
 		constexpr arena_deleter_base(const arena_deleter_base<P, U, ALIGN, true> &rhs) noexcept
 		: m_info(rhs.m_info)
 		{
@@ -265,7 +265,7 @@ namespace plib {
 			plib::unused_var(a); // GCC 7.x does not like the maybe_unused
 		}
 
-		template <class U, typename = std::enable_if_t<!std::is_same<T, U>::value>>
+		template <class U, typename = std::enable_if_t<!std::is_same_v<T, U>>>
 		arena_allocator(const arena_allocator<ARENA, U, ALIGN, HSA>& rhs) noexcept
 		: m_a(rhs.m_a)
 		{
