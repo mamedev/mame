@@ -1850,6 +1850,22 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="linkfoeu" cloneof="linkfoe">
+		<!--
+		Origin: Redump
+		http://redump.org/disc/75613/
+		<rom name="Link - The Faces of Evil (USA).cue" size="117" crc="3f511bd6" md5="b17d9e4d7276c2c30f1546eef2d57437" sha1="bc4ab1e401c39138283afb4538ba8593218f1203"/>
+		<rom name="Link - The Faces of Evil (USA).bin" size="601933248" crc="d7d2dc8a" md5="0785cae36359d0ed6d90a7624a8a8681" sha1="6e280552344a25e4078a12e704e9b753495352d7"/>		-->
+		<description>Link - The Faces of Evil (USA)</description>
+		<year>1993</year>
+		<publisher>Philips</publisher>
+		<part name="cdrom" interface="cdi_cdrom">
+			<diskarea name="cdrom">
+				<disk name="link - the faces of evil (usa)" sha1="e9deb9df291474b9a4db2e5ce444bb98c149faa6"/>
+			</diskarea>
+		</part>
+	</software>
+	
 	<software name="litildvl" supported="no">
 		<!--
 		Origin: TOSEC
