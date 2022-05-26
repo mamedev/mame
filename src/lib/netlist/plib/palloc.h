@@ -49,7 +49,7 @@ namespace plib {
 		: m_arena(a), m_info({ALIGN ? ALIGN : alignof(T), sizeof(T)} ) { }
 
 		template<typename U, typename =
-		std::enable_if_t<std::is_convertible< U*, T*>::value>>
+		std::enable_if_t<std::is_convertible_v< U*, T*>>>
 		constexpr arena_deleter_base(const arena_deleter_base<P, U, ALIGN, false> &rhs) noexcept
 		: m_arena(rhs.m_arena), m_info(rhs.m_info) { }
 
@@ -74,7 +74,7 @@ namespace plib {
 		}
 
 		template<typename U, typename =
-		std::enable_if_t<std::is_convertible< U*, T*>::value>>
+		std::enable_if_t<std::is_convertible_v< U*, T*>>>
 		constexpr arena_deleter_base(const arena_deleter_base<P, U, ALIGN, true> &rhs) noexcept
 		: m_info(rhs.m_info)
 		{
