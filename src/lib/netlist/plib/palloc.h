@@ -49,7 +49,7 @@ namespace plib {
 		: m_arena(a), m_info({ALIGN ? ALIGN : alignof(T), sizeof(T)} ) { }
 
 		template<typename U, typename =
-		typename std::enable_if_t<std::is_convertible< U*, T*>::value>>
+		std::enable_if_t<std::is_convertible< U*, T*>::value>>
 		constexpr arena_deleter_base(const arena_deleter_base<P, U, ALIGN, false> &rhs) noexcept
 		: m_arena(rhs.m_arena), m_info(rhs.m_info) { }
 
@@ -74,7 +74,7 @@ namespace plib {
 		}
 
 		template<typename U, typename =
-		typename std::enable_if_t<std::is_convertible< U*, T*>::value>>
+		std::enable_if_t<std::is_convertible< U*, T*>::value>>
 		constexpr arena_deleter_base(const arena_deleter_base<P, U, ALIGN, true> &rhs) noexcept
 		: m_info(rhs.m_info)
 		{
@@ -238,7 +238,7 @@ namespace plib {
 		static_assert((align_size % alignof(T)) == 0,
 			"ALIGN must be greater than alignof(T) and a multiple");
 
-		template <typename U = int, typename = typename std::enable_if_t<HSA && sizeof(U)>>
+		template <typename U = int, typename = std::enable_if_t<HSA && sizeof(U)>>
 		//[[deprecated]]
 		arena_allocator() noexcept
 		: m_a(arena_type::instance())
@@ -252,20 +252,20 @@ namespace plib {
 		arena_allocator &operator=(arena_allocator &&) noexcept = default;
 
 		template <typename U = int>
-		arena_allocator(/*[[maybe_unused]]*/ typename std::enable_if_t<HSA && sizeof(U), arena_type> & a) noexcept
+		arena_allocator(/*[[maybe_unused]]*/ std::enable_if_t<HSA && sizeof(U), arena_type> & a) noexcept
 		: m_a(arena_type::instance())
 		{
 			plib::unused_var(a); // GCC 7.x does not like the maybe_unused
 		}
 
 		template <typename U = int>
-		arena_allocator(/*[[maybe_unused]]*/ typename std::enable_if_t<!HSA && sizeof(U), arena_type> & a) noexcept
+		arena_allocator(/*[[maybe_unused]]*/ std::enable_if_t<!HSA && sizeof(U), arena_type> & a) noexcept
 		: m_a(a)
 		{
 			plib::unused_var(a); // GCC 7.x does not like the maybe_unused
 		}
 
-		template <class U, typename = typename std::enable_if_t<!std::is_same<T, U>::value>>
+		template <class U, typename = std::enable_if_t<!std::is_same<T, U>::value>>
 		arena_allocator(const arena_allocator<ARENA, U, ALIGN, HSA>& rhs) noexcept
 		: m_a(rhs.m_a)
 		{
