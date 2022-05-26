@@ -133,7 +133,7 @@ namespace plib {
 		{ }
 
 		owned_ptr(pointer p, bool owned, D deleter)
-		: m_ptr(p), m_deleter(std::forward<deleter_type>(deleter)), m_is_owned(owned)
+		: m_ptr(p), m_deleter(std::move(deleter)), m_is_owned(owned)
 		{ }
 
 
@@ -144,11 +144,10 @@ namespace plib {
 		owned_ptr & operator =(owned_ptr<DC, DC_D> &&r)  noexcept
 		{
 			if (m_is_owned && (m_ptr != nullptr))
-				//delete m_ptr;
 				m_deleter(m_ptr);
 			m_is_owned = r.m_is_owned;
 			m_ptr = r.m_ptr;
-			m_deleter = std::forward<DC_D>(r.m_deleter);
+			m_deleter = std::move(r.m_deleter);
 			r.m_is_owned = false;
 			r.m_ptr = nullptr;
 			return *this;
@@ -156,7 +155,7 @@ namespace plib {
 
 		owned_ptr(owned_ptr &&r) noexcept
 		: m_ptr(r.m_ptr)
-		, m_deleter(std::forward<deleter_type>(r.m_deleter))
+		, m_deleter(std::move(r.m_deleter))
 		, m_is_owned(r.m_is_owned)
 		{
 			r.m_is_owned = false;
@@ -166,11 +165,10 @@ namespace plib {
 		owned_ptr &operator=(owned_ptr &&r) noexcept
 		{
 			if (m_is_owned && (m_ptr != nullptr))
-				//delete m_ptr;
 				m_deleter(m_ptr);
 			m_is_owned = r.m_is_owned;
 			m_ptr = r.m_ptr;
-			m_deleter = std::forward<deleter_type>(r.m_deleter);
+			m_deleter = std::move(r.m_deleter);
 			r.m_is_owned = false;
 			r.m_ptr = nullptr;
 			return *this;
@@ -179,7 +177,7 @@ namespace plib {
 		template<typename DC, typename DC_D>
 		owned_ptr(owned_ptr<DC, DC_D> &&r) noexcept
 		: m_ptr(static_cast<pointer >(r.get()))
-		, m_deleter(std::forward<DC_D>(r.m_deleter))
+		, m_deleter(std::move(r.m_deleter))
 		, m_is_owned(r.is_owned())
 		{
 			r.release();
