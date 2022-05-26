@@ -88,8 +88,7 @@ namespace plib {
 	};
 
 ///
-///
-/// putf8reader_t digests linux & dos/windows text files
+/// \brief digests linux & dos/windows text files
 ///
 // NOLINTNEXTLINE(cppcoreguidelines-special-member-functions)
 class putf8_reader
@@ -201,9 +200,9 @@ private:
 	std::unique_ptr<std::istream> m_strm;
 };
 
-// -----------------------------------------------------------------------------
-// putf8writer_t: writer on top of ostream
-// -----------------------------------------------------------------------------
+///
+/// \brief writer on top of ostream
+///
 
 class putf8_writer
 {
@@ -265,9 +264,9 @@ public:
 private:
 };
 
-// -----------------------------------------------------------------------------
-// pbinary_writer_t: writer on top of ostream
-// -----------------------------------------------------------------------------
+///
+/// \brief writer on top of ostream
+///
 
 class pbinary_writer
 {

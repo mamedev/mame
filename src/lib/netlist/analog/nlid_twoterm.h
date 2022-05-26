@@ -72,7 +72,7 @@ namespace netlist::analog
 		, m_N(*this, "2", &m_P, NETLIB_DELEGATE(termhandler))
 		{
 		}
-		//NETLIB_CONSTRUCTOR_EX(twoterm, nldelegate owner_delegate)
+		//#NETLIB_CONSTRUCTOR_EX(twoterm, nldelegate owner_delegate)
 		template <class C>
 		NETLIB_NAME(twoterm)(C &owner, const pstring &name, nldelegate owner_delegate) \
 				: base_type(owner, name)
@@ -233,7 +233,7 @@ namespace netlist::analog
 
 	private:
 		param_fp_t m_R;
-		// protect set_R ... it's a recipe to desaster when used to bypass the parameter
+		// protect set_R ... it's a recipe to disaster when used to bypass the parameter
 		using NETLIB_NAME(R_base)::set_R;
 		using NETLIB_NAME(R_base)::set_G;
 	};
@@ -444,7 +444,7 @@ namespace netlist::analog
 		state_var<nl_fptype> m_last_G;
 	};
 
-	/// \brief Class representing the diode model paramers.
+	/// \brief Class representing the diode model parameters.
 	///
 	///  This is the model representation of the diode model. Typically, SPICE uses
 	///  the following parameters. A "Y" in the first column indicates that the

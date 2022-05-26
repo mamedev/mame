@@ -72,16 +72,13 @@ Z22  5101L     4-bit static RAM
 Z23  MM6351-IJ Personality PROM
 
 
-ToDo:
-- When game started it plays the startup tune and kicks the ball to the shooter - but then
-  -- You can't add more players;
-  -- No switches register, so unable to score;
-  -- The score flashes the high score as if the game had ended;
-  -- You can still hit tilt (9-key) and X until it really is game over.
-  -- If the lucky number matches you'll still get a free credit.
-  -- Some games will go straight to test 11, or instant game over.
+Status:
+- All games are playable, to an extent
 
-- Z80-based sound board for hexagone and sahalove.
+ToDo:
+- Hunt down the remaining CPU bugs.
+- The sound-board sounds are very weird.
+- Z80-based sound board for hexagone and sahalove (no info available).
 
 *****************************************************************************************************/
 
@@ -164,7 +161,6 @@ private:
 	u16 m_6351_addr = 0U;         //!< ROM MM6351 address (12 bits)
 	u8 m_z30_out = 0U;            //!< 4-to-16 decoder outputs
 	u8 m_lamp_data = 0U;
-	u8 m_snd_save = 0U;
 };
 
 void gts1_state::gts1_map(address_map &map)
@@ -405,7 +401,6 @@ void gts1_state::machine_start()
 	save_item(NAME(m_6351_addr));
 	save_item(NAME(m_z30_out));
 	save_item(NAME(m_lamp_data));
-	save_item(NAME(m_snd_save));
 }
 
 void gts1_state::machine_reset()
@@ -418,7 +413,6 @@ void gts1_state::machine_reset()
 	m_6351_addr = 0x3ff;
 	m_z30_out = 0U;
 	m_lamp_data = 0U;
-	m_snd_save = 0U;
 }
 
 u8 gts1_state::gts1_solenoid_r(offs_t offset) // does nothing
@@ -428,7 +422,7 @@ u8 gts1_state::gts1_solenoid_r(offs_t offset) // does nothing
 	return data;
 }
 
-void gts1_state::gts1_solenoid_w(offs_t offset, u8 data) // WORKS
+void gts1_state::gts1_solenoid_w(offs_t offset, u8 data)
 {
 	//LOG("%s: solenoid #[%02X] gets data=%X\n", __FUNCTION__, offset, data);
 	switch (offset)
@@ -442,36 +436,42 @@ void gts1_state::gts1_solenoid_w(offs_t offset, u8 data) // WORKS
 			m_samples->start(0, 6);
 		break;
 	case  2:  // tens chime
-		m_snd_save = data ? (m_snd_save | 4) : (m_snd_save & 0xfb);
 		if (m_p1_sound)
 		{
 			m_p1_sound->set_clock(593);
 			m_p1_sound->set_state(data);
 		}
 		else
-		if (!m_p2_sound && data)
+		if (m_p2_sound)
+			m_p2_sound->write(data ? 11 : 15);
+		else
+		if (data)
 			m_samples->start(3, 3);
 		break;
 	case  3:  // hundreds chime
-		m_snd_save = data ? (m_snd_save | 2) : (m_snd_save & 0xfd);
 		if (m_p1_sound)
 		{
 			m_p1_sound->set_clock(265);
 			m_p1_sound->set_state(data);
 		}
 		else
-		if (!m_p2_sound && data)
+		if (m_p2_sound)
+			m_p2_sound->write(data ? 13 : 15);
+		else
+		if (data)
 			m_samples->start(2, 2);
 		break;
 	case  4:  // thousands chime
-		m_snd_save = data ? (m_snd_save | 1) : (m_snd_save & 0xfe);
 		if (m_p1_sound)
 		{
 			m_p1_sound->set_clock(153);
 			m_p1_sound->set_state(data);
 		}
 		else
-		if (!m_p2_sound && data)
+		if (m_p2_sound)
+			m_p2_sound->write(data ? 14 : 15);
+		else
+		if (data)
 			m_samples->start(1, 1);
 		break;
 	case  5:  // optional per machine
@@ -495,14 +495,12 @@ void gts1_state::gts1_solenoid_w(offs_t offset, u8 data) // WORKS
 	case 15:    // spare
 		break;
 	}
-	if (m_p2_sound)
-		m_p2_sound->write(m_snd_save);
 
 	if (offset < 8)
 		m_io_outputs[offset] = data;
 }
 
-u8 gts1_state::gts1_switches_r(offs_t offset) // only switches with offset 0 are working; can't go in-game to try the others **********
+u8 gts1_state::gts1_switches_r(offs_t offset)
 {
 	u8 data = 0;
 	if (offset > 7)
@@ -512,7 +510,7 @@ u8 gts1_state::gts1_switches_r(offs_t offset) // only switches with offset 0 are
 				data |= BIT(m_switches[i]->read(), offset & 7);
 				//LOG("%s: switches[bit %X of %X, using offset of %X] got %x\n", __FUNCTION__, i, m_strobe, offset&7, data);
 			}
-	return data ? 0 : 1;    // FIXME: inverted or normal?
+	return data ? 0 : 1;
 }
 
 void gts1_state::gts1_switches_w(offs_t offset, u8 data) // WORKS
@@ -686,8 +684,9 @@ u8 gts1_state::gts1_lamp_apm_r(offs_t offset) // Think this works - dips seem to
  * @param offset 0 ... 2 = group
  * @param data 4 bit value to write
  */
-void gts1_state::gts1_lamp_apm_w(offs_t offset, u8 data) // Working for the dips, not sure about the PM address. ***********
+void gts1_state::gts1_lamp_apm_w(offs_t offset, u8 data)
 {
+	u8 sndcmd = 0;
 	switch (offset) {
 		case 0: // LD1-LD4 on jumper J5
 			m_lamp_data = data & 15;
@@ -699,9 +698,11 @@ void gts1_state::gts1_lamp_apm_w(offs_t offset, u8 data) // Working for the dips
 				if (m_p2_sound)
 				{
 					// Sound card has inputs from tilt and game over relays
-					m_snd_save = BIT(m_lamp_data, 0) ? (m_snd_save | 0x40) : (m_snd_save & 0xbf);
-					m_snd_save = BIT(m_lamp_data, 1) ? (m_snd_save | 0x08) : (m_snd_save & 0xf7);
-					m_p2_sound->write(m_snd_save);
+					if (BIT(m_lamp_data, 0))
+						sndcmd |= 0x40;
+					if (BIT(m_lamp_data, 1))
+						sndcmd |= 0x08;
+					m_p2_sound->write(sndcmd);
 				}
 			}
 			if ((m_z30_out >= 1) && (m_z30_out <= 9))
@@ -715,14 +716,14 @@ void gts1_state::gts1_lamp_apm_w(offs_t offset, u8 data) // Working for the dips
 	}
 }
 
-u8 gts1_state::gts1_pa_r() // TODO: address normal or inverted? data normal or inverted? ***************
+u8 gts1_state::gts1_pa_r()
 {
 	u16 addr = m_6351_addr ^ 0x3ff;
 	// return nibble from personality module ROM
 	u8 data = m_pm[addr];
 	LOG("%s: PROM READ @[%03x]:%02x\n", __FUNCTION__, addr, data);
 	//machine().debug_break();
-	return ~data;  // inverted = game over at start; normal = test mode at start
+	return data;
 }
 
 void gts1_state::gts1_do_w(u8 data)
@@ -1068,11 +1069,11 @@ GAME(1977,  cleoptra, gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gott
 GAME(1978,  sinbad,   gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Sinbad",                               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1978,  sinbadn,  sinbad, p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Sinbad (Norway)",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1978,  jokrpokr, gts1,   p0,  jokrpokr, gts1_state, empty_init, ROT0, "Gottlieb",         "Joker Poker",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  dragon,   gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Dragon",                               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979,  solaride, gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Solar Ride",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979,  countdwn, gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Count-Down",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // NE555 beeper
+GAME(1978,  dragon,   gts1,   p1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Dragon",                               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  solaride, gts1,   p1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Solar Ride",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  countdwn, gts1,   p1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Count-Down",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1978,  closeenc, gts1,   p1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Close Encounters of the Third Kind",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1978,  charlies, gts1,   p1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Charlie's Angels",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1979,  pinpool,  gts1,   p1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Pinball Pool",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

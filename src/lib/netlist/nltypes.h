@@ -154,7 +154,7 @@ namespace netlist
 	//  Types needed by various includes
 	//============================================================
 
-	/// \brief Timestep type.
+	/// \brief Time step type.
 	///
 	/// May be either FORWARD or RESTORE
 	///

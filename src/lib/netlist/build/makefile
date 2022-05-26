@@ -232,7 +232,7 @@ ALLFILES = $(ALLSOURCES) $(VSFILES) $(DOCS) $(OTHERFILES)
 MAKEFILE_TARGETS_WITHOUT_INCLUDE := \
 	clang clang-5 clang-libc gcc9 mingw native nvcc \
 	clean depend doc generated manpages maketree \
-	runtests tidy
+	runtests tidy fix_permissions precommit srcclean
 
 BUILD_DIRS = $(OBJDIRS) man html
 

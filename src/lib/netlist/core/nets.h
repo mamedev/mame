@@ -41,7 +41,7 @@ namespace netlist
 				DELIVERED
 			};
 
-			net_t(netlist_state_t &nl, const pstring &aname, core_terminal_t *railterminal = nullptr);
+			net_t(netlist_state_t &nl, const pstring &aname, core_terminal_t *rail_terminal = nullptr);
 
 			PCOPYASSIGNMOVE(net_t, delete)
 
@@ -136,8 +136,8 @@ namespace netlist
 			constexpr const netlist_time_ext &next_scheduled_time() const noexcept { return m_next_scheduled_time; }
 			void set_next_scheduled_time(netlist_time_ext ntime) noexcept { m_next_scheduled_time = ntime; }
 
-			bool is_rail_net() const noexcept { return !(m_railterminal == nullptr); }
-			core_terminal_t & railterminal() const noexcept { return *m_railterminal; }
+			bool is_rail_net() const noexcept { return !(m_rail_terminal == nullptr); }
+			core_terminal_t & rail_terminal() const noexcept { return *m_rail_terminal; }
 
 			void add_to_active_list(core_terminal_t &term) noexcept
 			{
@@ -149,7 +149,7 @@ namespace netlist
 				else
 				{
 					m_list_active.push_front(&term);
-					railterminal().device().do_inc_active();
+					rail_terminal().device().do_inc_active();
 					if (m_in_queue == queue_status::DELAYED_DUE_TO_INACTIVE)
 					{
 #if (AVOID_NOOP_QUEUE_PUSHES)
@@ -187,7 +187,7 @@ namespace netlist
 						m_in_queue = queue_status::DELAYED_DUE_TO_INACTIVE;
 					}
 #endif
-					railterminal().device().do_dec_active();
+					rail_terminal().device().do_dec_active();
 				}
 			}
 
@@ -261,7 +261,7 @@ namespace netlist
 			plib::linkedlist_t<core_terminal_t> m_list_active;
 			state_var<netlist_time_ext>  m_next_scheduled_time;
 
-			core_terminal_t * m_railterminal;
+			core_terminal_t * m_rail_terminal;
 			//std::vector<core_terminal_t *> m_core_terms; // save post-start m_list ...
 
 		};
@@ -271,7 +271,7 @@ namespace netlist
 	{
 	public:
 
-		analog_net_t(netlist_state_t &nl, const pstring &aname, detail::core_terminal_t *railterminal = nullptr);
+		analog_net_t(netlist_state_t &nl, const pstring &aname, detail::core_terminal_t *rail_terminal = nullptr);
 
 		void reset() noexcept override;
 
@@ -298,7 +298,7 @@ namespace netlist
 	{
 	public:
 
-		logic_net_t(netlist_state_t &nl, const pstring &aname, detail::core_terminal_t *railterminal = nullptr);
+		logic_net_t(netlist_state_t &nl, const pstring &aname, detail::core_terminal_t *rail_terminal = nullptr);
 
 		using detail::net_t::Q;
 		using detail::net_t::initial;

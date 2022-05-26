@@ -1454,6 +1454,7 @@ ROM_END
   ИМ-50  Космический полёт   Kosmicheskiy polyot  Space Flight        The Model ID is the same as Весёлая арифметика (Vesyolaya arithmetika, export version: Amusing Arithmetic) (not emulated in MAME)
   ИМ-51  Морская атака       Morskaya ataka       -                   -
   ИМ-53  Атака астероидов    Ataka asteroidov     -                   Graphics are very similar to ИМ-50
+  -      Цирк                Circus (Tsirk)       -                   Unknown Model ID
 
 ***************************************************************************/
 
@@ -1478,6 +1479,7 @@ public:
 	void kosmicpt(machine_config &config);
 	void morataka(machine_config &config);
 	void atakaast(machine_config &config);
+	void ecircus(machine_config &config);
 };
 
 // config
@@ -1582,6 +1584,11 @@ void gnw_mmouse_state::morataka(machine_config &config)
 void gnw_mmouse_state::atakaast(machine_config &config)
 {
 	kb1013vk12_common(config, 1620, 1080); // R mask option ?
+}
+
+void gnw_mmouse_state::ecircus(machine_config &config)
+{
+	kb1013vk12_common(config, 1657, 1080); // R mask option ?
 }
 
 // roms
@@ -1696,6 +1703,14 @@ ROM_START( atakaast )
 
 	ROM_REGION( 105570, "screen", 0)
 	ROM_LOAD( "atakaast.svg", 0, 105570, CRC(3d79aacc) SHA1(bc25969f4d6fa75b320130c920ac0bdc8fb44cbd) )
+ROM_END
+
+ROM_START( ecircus )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "ecircus.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 124643, "screen", 0)
+	ROM_LOAD( "ecircus.svg", 0, 124643, CRC(079f25db) SHA1(defa784c80e01ce6affbb424930674114275bea1) )
 ROM_END
 
 
@@ -9990,6 +10005,7 @@ CONS( 19??, nochnyev,     gnw_mmouse,  0, nochnyev,     gnw_mmouse,   gnw_mmouse
 CONS( 19??, kosmicpt,     gnw_mmouse,  0, kosmicpt,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Kosmicheskiy polyot", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 19??, morataka,     gnw_mmouse,  0, morataka,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Morskaja ataka", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1992, atakaast,     gnw_mmouse,  0, atakaast,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Ataka asteroidov", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 19??, ecircus,      gnw_mmouse,  0, ecircus,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Circus (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, kosmicmt,     gnw_fire,    0, kosmicmt,     gnw_fire,     gnw_fire_state,     empty_init, "bootleg (Elektronika)", "Kosmicheskiy most", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1990, auslalom,     0,           0, auslalom,     auslalom,     auslalom_state,     empty_init, "Elektronika", "Autoslalom", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 

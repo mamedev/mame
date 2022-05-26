@@ -555,7 +555,9 @@ uint8_t z80_device::arg()
 
 uint16_t z80_device::arg16()
 {
-	return arg() | (arg() << 8);
+	u8 const res = arg();
+
+	return (u16(arg()) << 8) | res;
 }
 
 /***************************************************************

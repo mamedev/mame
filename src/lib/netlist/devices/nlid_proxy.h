@@ -1,15 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Couriersud
-/*
- * nlid_proxy.h
- *
- * netlist proxy devices
- *
- * This file contains internal headers
- */
 
 #ifndef NLID_PROXY_H_
 #define NLID_PROXY_H_
+
+///
+/// \file nlid_proxy.h
+///
+/// netlist proxy devices
+///
+/// This file contains internal headers
+///
+
 
 #include "analog/nlid_twoterm.h"
 #include "nl_base.h"

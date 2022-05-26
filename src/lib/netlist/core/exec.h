@@ -72,13 +72,13 @@ namespace netlist
 
 		// FIXME: force late type resolution
 		template <typename X = devices::nld_solver>
-		nl_fptype gmin([[maybe_unused]] X *solv = nullptr) const noexcept
+		nl_fptype gmin([[maybe_unused]] X *solver = nullptr) const noexcept
 		{
 			return static_cast<X *>(m_solver)->gmin();
 		}
 
-		netlist_state_t &nlstate() noexcept { return m_state; }
-		const netlist_state_t &nlstate() const noexcept { return m_state; }
+		netlist_state_t &nl_state() noexcept { return m_state; }
+		const netlist_state_t &nl_state() const noexcept { return m_state; }
 
 		log_type & log() noexcept { return m_state.log(); }
 		const log_type &log() const noexcept { return m_state.log(); }
@@ -99,7 +99,7 @@ namespace netlist
 		// mostly rw
 		//PALIGNAS(16)
 		netlist_time_ext                    m_time;
-		devices::nld_mainclock *            m_mainclock;
+		devices::nld_mainclock *            m_main_clock;
 
 		//PALIGNAS_CACHELINE()
 		//PALIGNAS(16)

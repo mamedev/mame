@@ -206,6 +206,10 @@ TIMER_CALLBACK_MEMBER(st_video_device::glue_tick)
 	int v = (y >= m_shifter_y_start) && (y < m_shifter_y_end);
 	int h = (x >= m_shifter_x_start) && (x < m_shifter_x_end);
 
+	if(m_shifter_mode == 1 && (m_shifter_sync & 0x02)) {
+		int dt = 8;
+		h = (x >= m_shifter_x_start-dt) && (x < m_shifter_x_end-dt);
+	}
 	int de = h && v;
 
 	if(!x) {

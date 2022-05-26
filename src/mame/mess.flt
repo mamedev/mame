@@ -967,6 +967,7 @@ sg1000.cpp
 sh4robot.cpp
 shine.cpp
 si5500.cpp
+sis630.cpp
 sitcom.cpp
 sk1.cpp
 sk101bl.cpp

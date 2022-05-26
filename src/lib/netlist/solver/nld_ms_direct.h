@@ -49,7 +49,7 @@ namespace netlist::solver
 		template <typename T>
 		void LE_back_subst(T & x);
 
-		// PALIGNAS_VECTOROPT() parrays define alignment already
+		// PALIGNAS_VECTOROPT() `parray` defines alignment already
 		plib::parray2D<FT, SIZE, m_pitch_ABS> m_A;
 	};
 
@@ -86,25 +86,25 @@ namespace netlist::solver
 			for (std::size_t i = 0; i < kN; i++)
 			{
 				// Find the row with the largest first value
-				std::size_t maxrow = i;
+				std::size_t max_row = i;
 				for (std::size_t j = i + 1; j < kN; j++)
 				{
-					if (plib::abs(m_A[j][i]) > plib::abs(m_A[maxrow][i]))
-					//if (m_A[j][i] * m_A[j][i] > m_A[maxrow][i] * m_A[maxrow][i])
-						maxrow = j;
+					if (plib::abs(m_A[j][i]) > plib::abs(m_A[max_row][i]))
+					//#if (m_A[j][i] * m_A[j][i] > m_A[max_row][i] * m_A[max_row][i])
+						max_row = j;
 				}
 
-				if (maxrow != i)
+				if (max_row != i)
 				{
 #if 0
-					// Swap the maxrow and ith row
+					// Swap the max_row and ith row
 					for (std::size_t k = 0; k < kN; k++) {
-						std::swap(m_A[i][k], m_A[maxrow][k]);
+						std::swap(m_A[i][k], m_A[max_row][k]);
 					}
 #else
-						std::swap(m_A[i], m_A[maxrow]);
+						std::swap(m_A[i], m_A[max_row]);
 #endif
-					std::swap(this->m_RHS[i], this->m_RHS[maxrow]);
+					std::swap(this->m_RHS[i], this->m_RHS[max_row]);
 				}
 				// FIXME: Singular matrix?
 				const auto &Ai = m_A[i];
