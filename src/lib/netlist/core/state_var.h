@@ -179,7 +179,7 @@ namespace netlist
 
 namespace plib
 {
-	template<typename X>
+	template <typename X>
 	struct ptype_traits<netlist::state_var<X>> : ptype_traits<X>
 	{
 	};

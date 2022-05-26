@@ -26,7 +26,7 @@
 namespace plib
 {
 
-	template<typename T, int N, typename C = uint16_t>
+	template<typename ARENA, typename T, int N, typename C = uint16_t>
 	struct pmatrix_cr
 	{
 		using index_type = C;
@@ -38,7 +38,7 @@ namespace plib
 		pmatrix_cr(const pmatrix_cr &) = default;
 		pmatrix_cr &operator=(const pmatrix_cr &) = default;
 		pmatrix_cr(pmatrix_cr &&) noexcept(std::is_nothrow_move_constructible<parray<value_type, NSQ>>::value) = default;
-		pmatrix_cr &operator=(pmatrix_cr &&) noexcept(std::is_nothrow_move_assignable<parray<value_type, NSQ>>::value && std::is_nothrow_move_assignable<pmatrix2d_vrl<index_type>>::value) = default;
+		pmatrix_cr &operator=(pmatrix_cr &&) noexcept(std::is_nothrow_move_assignable<parray<value_type, NSQ>>::value && std::is_nothrow_move_assignable<pmatrix2d_vrl<ARENA, index_type>>::value) = default;
 
 		enum constants_e
 		{
@@ -57,14 +57,14 @@ namespace plib
 		// NOLINTNEXTLINE
 		std::size_t nz_num;
 
-		explicit pmatrix_cr(std::size_t n)
+		explicit pmatrix_cr(ARENA &arena, std::size_t n)
 		: diag(n)
 		, row_idx(n+1)
 		, col_idx(n*n)
 		, A(n*n)
 		, nz_num(0)
 		//, nzbd(n * (n+1) / 2)
-		, m_nzbd(n, n)
+		, m_nzbd(arena, n, n)
 		, m_size(n)
 		{
 			for (std::size_t i=0; i<n+1; i++)
@@ -237,7 +237,7 @@ namespace plib
 		// FIXME: this should be private
 		// NOLINTNEXTLINE
 		//parray<std::vector<index_type>, N > m_nzbd;    // Support for gaussian elimination
-		pmatrix2d_vrl<index_type> m_nzbd;    // Support for gaussian elimination
+		pmatrix2d_vrl<ARENA, index_type> m_nzbd;    // Support for gaussian elimination
 	private:
 		//parray<C, N < 0 ? -N * (N-1) / 2 : N * (N+1) / 2 > nzbd;    // Support for gaussian elimination
 		std::size_t m_size;
@@ -254,8 +254,9 @@ namespace plib
 		pGEmatrix_cr(pGEmatrix_cr &&) noexcept(std::is_nothrow_move_constructible<base_type>::value) = default;
 		pGEmatrix_cr &operator=(pGEmatrix_cr &&) noexcept(std::is_nothrow_move_assignable<base_type>::value) = default;
 
-		explicit pGEmatrix_cr(std::size_t n)
-		: B(n)
+		template<typename ARENA>
+		explicit pGEmatrix_cr(ARENA &arena, std::size_t n)
+		: B(arena, n)
 		{
 		}
 
@@ -491,8 +492,9 @@ namespace plib
 		pLUmatrix_cr(pLUmatrix_cr &&) noexcept(std::is_nothrow_move_constructible<base_type>::value) = default;
 		pLUmatrix_cr &operator=(pLUmatrix_cr &&) noexcept(std::is_nothrow_move_assignable<base_type>::value) = default;
 
-		explicit pLUmatrix_cr(std::size_t n)
-		: B(n)
+		template<typename ARENA>
+		explicit pLUmatrix_cr(ARENA &arena, std::size_t n)
+		: B(arena, n)
 		, ilu_rows(n+1)
 		, m_ILUp(0)
 		{

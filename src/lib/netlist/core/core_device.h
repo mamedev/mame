@@ -113,7 +113,7 @@ namespace netlist
 
 		~base_device_t() noexcept override = default;
 
-		template<class O, class C, typename... Args>
+		template <class O, class C, typename... Args>
 		void create_and_register_subdevice(O& owner, const pstring &name, device_arena::unique_ptr<C> &dev, Args&&... args)
 		{
 			dev = state().make_pool_object<C>(owner, name, std::forward<Args>(args)...);

@@ -135,7 +135,7 @@ namespace netlist::detail {
 		const netlist_t & exec() const noexcept { return m_netlist; }
 
 		// to ease template design
-		template<typename T, typename... Args>
+		template <typename T, typename... Args>
 		device_arena::unique_ptr<T> make_pool_object(Args&&... args)
 		{
 			return state().make_pool_object<T>(std::forward<Args>(args)...);
