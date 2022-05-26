@@ -57,7 +57,7 @@ namespace netlist::analog
 		auto *h = dynamic_cast<core_device_t *>(&d1);
 		return b ? *h : d2;
 	}
-	template<>
+	template <>
 	inline core_device_t &bselect(bool b, [[maybe_unused]] netlist_state_t &d1, core_device_t &d2)
 	{
 		if (b)

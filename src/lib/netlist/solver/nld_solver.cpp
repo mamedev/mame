@@ -50,7 +50,7 @@ namespace netlist::devices
 
 #if 1
 
-	template<bool KEEP_STATS>
+	template <bool KEEP_STATS>
 	NETLIB_HANDLER(solver, fb_step)
 	{
 		const netlist_time_ext now(exec().time());
@@ -174,7 +174,7 @@ namespace netlist::devices
 
 	// FIXME: should be created in device space
 	template <class C, class A>
-	NETLIB_NAME(solver)::solver_ptr create_it(A & arena, NETLIB_NAME(solver) &main_solver, pstring name,
+	NETLIB_NAME(solver)::solver_ptr create_it(A &arena, NETLIB_NAME(solver) &main_solver, pstring name,
 		NETLIB_NAME(solver)::net_list_t &nets,
 		const solver::solver_parameters_t *params, std::size_t size)
 	{

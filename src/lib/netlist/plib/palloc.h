@@ -49,7 +49,7 @@ namespace plib {
 		: m_arena(a), m_info({ALIGN ? ALIGN : alignof(T), sizeof(T)} ) { }
 
 		template<typename U, typename =
-		typename std::enable_if<std::is_convertible< U*, T*>::value>::type>
+		typename std::enable_if_t<std::is_convertible< U*, T*>::value>>
 		constexpr arena_deleter_base(const arena_deleter_base<P, U, ALIGN, false> &rhs) noexcept
 		: m_arena(rhs.m_arena), m_info(rhs.m_info) { }
 
@@ -74,7 +74,7 @@ namespace plib {
 		}
 
 		template<typename U, typename =
-		typename std::enable_if<std::is_convertible< U*, T*>::value>::type>
+		typename std::enable_if_t<std::is_convertible< U*, T*>::value>>
 		constexpr arena_deleter_base(const arena_deleter_base<P, U, ALIGN, true> &rhs) noexcept
 		: m_info(rhs.m_info)
 		{
@@ -140,7 +140,7 @@ namespace plib {
 		owned_ptr(const owned_ptr &r) = delete;
 		owned_ptr & operator =(owned_ptr &r) = delete;
 
-		template<typename DC, typename DC_D>
+		template <typename DC, typename DC_D>
 		owned_ptr & operator =(owned_ptr<DC, DC_D> &&r)  noexcept
 		{
 			if (m_is_owned && (m_ptr != nullptr))
@@ -240,7 +240,7 @@ namespace plib {
 		static_assert((align_size % alignof(T)) == 0,
 			"ALIGN must be greater than alignof(T) and a multiple");
 
-		template <typename U = int, typename = typename std::enable_if<HSA && sizeof(U)>::type>
+		template <typename U = int, typename = typename std::enable_if_t<HSA && sizeof(U)>>
 		//[[deprecated]]
 		arena_allocator() noexcept
 		: m_a(arena_type::instance())
@@ -267,7 +267,7 @@ namespace plib {
 			plib::unused_var(a); // GCC 7.x does not like the maybe_unused
 		}
 
-		template <class U, typename = typename std::enable_if<!std::is_same<T, U>::value>>
+		template <class U, typename = typename std::enable_if_t<!std::is_same<T, U>::value>>
 		arena_allocator(const arena_allocator<ARENA, U, ALIGN, HSA>& rhs) noexcept
 		: m_a(rhs.m_a)
 		{
@@ -358,8 +358,7 @@ namespace plib {
 		template <class T, size_type ALIGN = 0>
 		allocator_type<T, ALIGN> get_allocator()
 		{
-			// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-			return *reinterpret_cast<P *>(this);
+			return *static_cast<P *>(this);
 		}
 
 	protected:
@@ -455,7 +454,7 @@ namespace plib {
 			return ::operator new(size);
 		#endif
 #else
-		return ::operator new(size, static_cast<std::align_val_t>(alignment));
+			return ::operator new(size, static_cast<std::align_val_t>(alignment));
 #endif
 		}
 
@@ -801,7 +800,7 @@ namespace plib {
 		: arena_vector_base(arena)
 		{
 			if (A::min_align / sizeof(T) > 0)
-				this->reserve(A::min_align / sizeof(T) );
+				this->reserve(A::min_align / sizeof(T));
 		}
 
 	};

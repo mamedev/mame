@@ -255,7 +255,7 @@ namespace plib
 		pGEmatrix_cr &operator=(pGEmatrix_cr &&) noexcept(std::is_nothrow_move_assignable<base_type>::value) = default;
 
 		template<typename ARENA>
-		explicit pGEmatrix_cr(ARENA & arena, std::size_t n)
+		explicit pGEmatrix_cr(ARENA &arena, std::size_t n)
 		: B(arena, n)
 		{
 		}

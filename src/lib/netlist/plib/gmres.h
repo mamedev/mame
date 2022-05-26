@@ -34,7 +34,7 @@ namespace plib
 		static constexpr float value = 0.0;
 	};
 
-	template < typename ARENA, typename FT, int SIZE>
+	template <typename ARENA, typename FT, int SIZE>
 	struct mat_precondition_ILU
 	{
 		using mat_type = plib::pmatrix_cr<ARENA, FT, SIZE>;
@@ -57,7 +57,7 @@ namespace plib
 		}
 
 
-		template<typename R, typename V>
+		template <typename R, typename V>
 		void calc_rhs(R &rhs, const V &v)
 		{
 			m_mat.mult_vec(rhs, v);
@@ -68,7 +68,7 @@ namespace plib
 			m_LU.incomplete_LU_factorization(m_mat);
 		}
 
-		template<typename V>
+		template <typename V>
 		void solve_inplace(V &v)
 		{
 			m_LU.solveLU(v);
@@ -85,7 +85,7 @@ namespace plib
 	template <typename ARENA, typename FT, int SIZE>
 	struct mat_precondition_diag
 	{
-		mat_precondition_diag(ARENA & arena, std::size_t size, [[maybe_unused]] int dummy = 0)
+		mat_precondition_diag(ARENA &arena, std::size_t size, [[maybe_unused]] int dummy = 0)
 		: m_mat(arena, size)
 		, m_diag(size)
 		, nzcol(size)
@@ -110,7 +110,7 @@ namespace plib
 			}
 		}
 
-		template<typename R, typename V>
+		template <typename R, typename V>
 		void calc_rhs(R &rhs, const V &v)
 		{
 			m_mat.mult_vec(rhs, v);
@@ -163,7 +163,7 @@ namespace plib
 			}
 		}
 
-		template<typename V>
+		template <typename V>
 		void solve_inplace(V &v)
 		{
 			for (std::size_t i = 0; i< m_diag.size(); i++)
@@ -189,7 +189,7 @@ namespace plib
 			m_mat.build_from_fill_mat(fill, 0);
 		}
 
-		template<typename R, typename V>
+		template <typename R, typename V>
 		void calc_rhs(R &rhs, const V &v)
 		{
 			m_mat.mult_vec(rhs, v);
@@ -199,7 +199,7 @@ namespace plib
 		{
 		}
 
-		template<typename V>
+		template <typename V>
 		void solve_inplace([[maybe_unused]] V &v)
 		{
 		}

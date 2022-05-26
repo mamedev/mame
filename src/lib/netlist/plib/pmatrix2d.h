@@ -17,7 +17,7 @@
 namespace plib
 {
 
-	template<typename T, typename A>
+	template<typename A, typename T>
 	class pmatrix2d
 	{
 	public:
@@ -40,7 +40,7 @@ namespace plib
 		{
 		}
 
-		pmatrix2d(size_type N, size_type M, A &arena)
+		pmatrix2d(A &arena, size_type N, size_type M)
 		: m_N(N), m_M(M), m_v(), m_a(arena)
 		{
 			gsl_Expects(N>0);
