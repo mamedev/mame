@@ -508,17 +508,14 @@ TIMER_CALLBACK_MEMBER(via6522_device::shift_tick)
 	{
 		if (SI_O2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
 		{
-			printf("Adjusting shift timer to 1 clock\n");
 			m_shift_timer->adjust(clocks_to_attotime(1));
 		}
 		else if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SI_T2_CONTROL(m_acr))
 		{
-			printf("Adjusting shift timer to %d clocks\n", (m_t2ll + 2) / 2);
 			m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2) / 2);
 		}
 		else // otherwise we stop it
 		{
-			printf("Stopping shift timer\n");
 			m_shift_timer->adjust(attotime::never);
 		}
 	}
@@ -529,7 +526,6 @@ TIMER_CALLBACK_MEMBER(via6522_device::t1_tick)
 	if (T1_CONTINUOUS (m_acr))
 	{
 		m_t1_pb7 = !m_t1_pb7;
-		printf("ADjusting T1 timer to %d clocks\n", TIMER1_VALUE + IFR_DELAY);
 		m_t1->adjust(clocks_to_attotime(TIMER1_VALUE + IFR_DELAY));
 	}
 	else

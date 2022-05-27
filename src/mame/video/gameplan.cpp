@@ -205,21 +205,6 @@ WRITE_LINE_MEMBER(gameplan_state::video_command_trigger_w)
 }
 
 
-TIMER_CALLBACK_MEMBER(gameplan_state::via_irq_delayed)
-{
-	m_maincpu->set_input_line(0, param);
-}
-
-
-WRITE_LINE_MEMBER(gameplan_state::via_irq)
-{
-	/* Kaos sits in a tight loop polling the VIA irq flags register, but that register is
-	   cleared by the irq handler. Therefore, I wait a bit before triggering the irq to
-	   leave time for the program to see the flag change. */
-	m_via_irq_timer->adjust(attotime::from_usec(50), state);
-}
-
-
 /*************************************
  *
  *  Start
@@ -232,7 +217,6 @@ void gameplan_state::video_start()
 	m_videoram = std::make_unique<uint8_t[]>(m_videoram_size);
 
 	m_clear_done_timer = timer_alloc(FUNC(gameplan_state::clear_screen_done_callback), this);
-	m_via_irq_timer = timer_alloc(FUNC(gameplan_state::via_irq_delayed), this);
 
 	/* register for save states */
 	save_pointer(NAME(m_videoram), m_videoram_size);

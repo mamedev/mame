@@ -59,7 +59,6 @@ protected:
 	void video_data_w(uint8_t data);
 	void gameplan_video_command_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(video_command_trigger_w);
-	DECLARE_WRITE_LINE_MEMBER(via_irq);
 	uint32_t screen_update_gameplan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
@@ -75,7 +74,6 @@ private:
 	uint8_t    m_video_data = 0U;
 	uint8_t    m_video_previous = 0U;
 	emu_timer *m_clear_done_timer;
-	emu_timer *m_via_irq_timer;
 
 	/* devices */
 	optional_device<cpu_device> m_audiocpu;
@@ -92,7 +90,6 @@ private:
 
 	uint32_t screen_update_leprechn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(clear_screen_done_callback);
-	TIMER_CALLBACK_MEMBER(via_irq_delayed);
 	void leprechn_video_command_w(uint8_t data);
 	uint8_t leprechn_videoram_r();
 	void gameplan_get_pens( pen_t *pens );

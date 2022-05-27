@@ -642,7 +642,8 @@ void intv_state::machine_start()
 
 	m_int2_complete_timer = timer_alloc(FUNC(intv_state::interrupt2_complete), this);
 	m_int_complete_timer = timer_alloc(FUNC(intv_state::interrupt_complete), this);
-	m_btb_fill_timer = timer_alloc(FUNC(intv_state::btb_fill), this);
+	for (int row = 0; row < stic_device::BACKTAB_HEIGHT; row++)
+		m_btb_fill_timers[row] = timer_alloc(FUNC(intv_state::btb_fill), this);
 }
 
 
@@ -678,7 +679,7 @@ INTERRUPT_GEN_MEMBER(intv_state::interrupt)
 		const uint32_t row_cycles = (stic_device::CYCLES_PER_SCANLINE * stic_device::Y_SCALE * stic_device::CARD_HEIGHT - stic_device::ROW_BUSRQ) * row;
 		const uint32_t total_cycles = stic_device::FIRST_FETCH - stic_device::FRAME_BUSRQ + stic_device::CYCLES_PER_SCANLINE * stic_device::Y_SCALE * delay + row_cycles;
 		attotime duration = m_maincpu->cycles_to_attotime(total_cycles);
-		m_btb_fill_timer->adjust(duration);
+		m_btb_fill_timers[row]->adjust(duration);
 	}
 
 	if (delay == 0)

@@ -67,7 +67,7 @@ private:
 
 	emu_timer *m_int_complete_timer;
 	emu_timer *m_int2_complete_timer;
-	emu_timer *m_btb_fill_timer;
+	emu_timer *m_btb_fill_timers[stic_device::BACKTAB_HEIGHT];
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ay8914_device> m_sound;
