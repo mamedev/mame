@@ -3851,6 +3851,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mainsnk.cpp",
 	MAME_DIR .. "src/mame/includes/mainsnk.h",
 	MAME_DIR .. "src/mame/video/mainsnk.cpp",
+	MAME_DIR .. "src/mame/drivers/miconkit.cpp",
 	MAME_DIR .. "src/mame/drivers/munchmo.cpp",
 	MAME_DIR .. "src/mame/includes/munchmo.h",
 	MAME_DIR .. "src/mame/video/munchmo.cpp",

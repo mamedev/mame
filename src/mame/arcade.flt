@@ -796,6 +796,7 @@ mgames.cpp
 mgavegas.cpp
 mgolf.cpp
 mhavoc.cpp
+miconkit.cpp
 micro3d.cpp
 microdar.cpp
 micropin.cpp
