@@ -2900,6 +2900,11 @@ files {
 	MAME_DIR .. "src/mame/video/kyocera.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "labtam")
+files {
+	MAME_DIR .. "src/mame/drivers/labtam.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "leapfrog")
 files {
 	MAME_DIR .. "src/mame/drivers/leapster.cpp",

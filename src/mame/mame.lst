@@ -19992,6 +19992,9 @@ skywolf3                        // bootleg
 sonofphx                        // bootleg
 srdmissn                        // (c) 1986 Taito Corporation
 
+@source:labtam.cpp
+labtam                          // Labtam 3000 model 3006
+
 @source:labyrunr.cpp
 labyrunr                        // GX771 (c) 1987 (Japan)
 labyrunrk                       // GX771 (c) 1987 (Japan)

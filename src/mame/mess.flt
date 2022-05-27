@@ -535,6 +535,7 @@ kron.cpp
 krz2000.cpp
 ktm3.cpp
 kyocera.cpp
+labtam.cpp
 laser3k.cpp
 lb186.cpp
 lbpc.cpp
