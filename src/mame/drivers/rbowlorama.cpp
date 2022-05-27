@@ -10,7 +10,7 @@
     -Boot from USB flash drive.
 
  Additional I/O board that serves also as protection (labeled "HYdra V2.3"),
- connected via RD-232 (DB9):
+ connected via RS-232 (DB9):
      _________
    _| RS-232 |________________________
   | |__DB9___|              ········ |
