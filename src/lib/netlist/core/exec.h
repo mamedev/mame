@@ -44,7 +44,7 @@ namespace netlist
 
 		const detail::queue_t &queue() const noexcept { return m_queue; }
 
-		template<typename... Args>
+		template <typename... Args>
 		void qpush(Args&&...args) noexcept
 		{
 			if (config::use_queue_stats::value && m_use_stats)

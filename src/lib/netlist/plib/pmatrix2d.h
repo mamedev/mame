@@ -17,7 +17,7 @@
 namespace plib
 {
 
-	template<typename T, typename A = aligned_arena>
+	template<typename A, typename T>
 	class pmatrix2d
 	{
 	public:
@@ -35,13 +35,13 @@ namespace plib
 		using pointer = T *;
 		using const_pointer = const T *;
 
-		pmatrix2d() noexcept
-		: m_N(0), m_M(0), m_stride(8), m_v(nullptr)
+		pmatrix2d(A &arena) noexcept
+		: m_N(0), m_M(0), m_stride(8), m_v(nullptr), m_a(arena)
 		{
 		}
 
-		pmatrix2d(size_type N, size_type M)
-		: m_N(N), m_M(M), m_v()
+		pmatrix2d(A &arena, size_type N, size_type M)
+		: m_N(N), m_M(M), m_v(), m_a(arena)
 		{
 			gsl_Expects(N>0);
 			gsl_Expects(M>0);
@@ -136,25 +136,26 @@ namespace plib
 	};
 
 	// variable row length matrix
-	template<typename T, typename A = aligned_arena>
+	template<typename A, typename T>
 	class pmatrix2d_vrl
 	{
 	public:
 		using size_type = std::size_t;
 		using value_type = T;
 		using arena_type = A;
+
 		using allocator_type = typename A::template allocator_type<T, PALIGN_VECTOROPT>;
 
 		static constexpr const size_type align_size = align_traits<allocator_type>::align_size;
 		static constexpr const size_type stride_size = align_traits<allocator_type>::stride_size;
 
-		pmatrix2d_vrl() noexcept
-		: m_N(0), m_M(0), m_v()
+		pmatrix2d_vrl(A &arena) noexcept
+		: m_N(0), m_M(0), m_row(arena), m_v(arena)
 		{
 		}
 
-		pmatrix2d_vrl(size_type N, size_type M)
-		: m_N(N), m_M(M), m_v()
+		pmatrix2d_vrl(A &arena, size_type N, size_type M)
+		: m_N(N), m_M(M), m_row(arena), m_v(arena)
 		{
 			m_row.resize(N + 1, 0);
 			m_v.resize(N); //FIXME
@@ -237,8 +238,8 @@ namespace plib
 
 		size_type m_N;
 		size_type m_M;
-		std::vector<size_type, typename A::template allocator_type<size_type>> m_row;
-		std::vector<T, allocator_type> m_v;
+		plib::arena_vector<A, size_type, PALIGN_VECTOROPT> m_row;
+		plib::arena_vector<A, T, PALIGN_VECTOROPT> m_v;
 	};
 
 

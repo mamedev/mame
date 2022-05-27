@@ -27,7 +27,7 @@ namespace netlist::solver
 	{
 	public:
 
-		using mat_type = plib::pGEmatrix_cr<plib::pmatrix_cr<FT, SIZE>>;
+		using mat_type = plib::pGEmatrix_cr<plib::pmatrix_cr<arena_type, FT, SIZE>>;
 		using base_type = matrix_solver_ext_t<FT, SIZE>;
 		using fptype = typename base_type::fptype;
 
@@ -35,7 +35,7 @@ namespace netlist::solver
 			const matrix_solver_t::net_list_t &nets,
 			const solver::solver_parameters_t *params, const std::size_t size)
 		: matrix_solver_ext_t<FT, SIZE>(main_solver, name, nets, params, size)
-		, mat(static_cast<typename mat_type::index_type>(size))
+		, mat(this->m_arena, static_cast<typename mat_type::index_type>(size))
 		, m_proc()
 		{
 			const std::size_t iN = this->size();
@@ -112,7 +112,7 @@ namespace netlist::solver
 
 	private:
 
-		using mat_index_type = typename plib::pmatrix_cr<FT, SIZE>::index_type;
+		using mat_index_type = typename plib::pmatrix_cr<arena_type, FT, SIZE>::index_type;
 
 		void generate_code(plib::putf8_fmt_writer &strm);
 

@@ -27,7 +27,7 @@
 // http://de.wikipedia.org/wiki/RIFF_WAVE
 //
 
-using arena = plib::aligned_arena;
+using arena = plib::aligned_arena<>;
 
 class wav_t
 {

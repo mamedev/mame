@@ -61,6 +61,7 @@ namespace netlist::solver
 		, FLOATQ128
 	)
 
+	using arena_type = plib::mempool_arena<plib::aligned_arena<>, 1024>;
 	using static_compile_container = std::vector<std::pair<pstring, pstring>>;
 
 	struct solver_parameter_defaults
@@ -178,7 +179,7 @@ namespace netlist::solver
 	class terms_for_net_t
 	{
 	public:
-		terms_for_net_t(analog_net_t * net = nullptr);
+		terms_for_net_t(arena_type &arena, analog_net_t * net = nullptr);
 
 		void clear();
 
@@ -200,14 +201,14 @@ namespace netlist::solver
 
 		PALIGNAS_VECTOROPT()
 
-		plib::aligned_vector<unsigned> m_nz;   //!< all non zero for multiplication
-		plib::aligned_vector<unsigned> m_nzrd; //!< non zero right of the diagonal for elimination, may include RHS element
-		plib::aligned_vector<unsigned> m_nzbd; //!< non zero below of the diagonal for elimination
+		plib::arena_vector<arena_type, unsigned> m_nz;   //!< all non zero for multiplication
+		plib::arena_vector<arena_type, unsigned> m_nzrd; //!< non zero right of the diagonal for elimination, may include RHS element
+		plib::arena_vector<arena_type, unsigned> m_nzbd; //!< non zero below of the diagonal for elimination
 
-		plib::aligned_vector<int> m_connected_net_idx;
+		plib::arena_vector<arena_type, int> m_connected_net_idx;
 	private:
+		plib::arena_vector<arena_type, terminal_t *> m_terms;
 		analog_net_t * m_net;
-		plib::aligned_vector<terminal_t *> m_terms;
 		std::size_t m_rail_start;
 	};
 
@@ -230,8 +231,7 @@ namespace netlist::solver
 	public:
 		using list_t = std::vector<matrix_solver_t *>;
 		using fptype = nl_fptype;
-		using arena_type = plib::mempool_arena<plib::aligned_arena, PALIGN_VECTOROPT>;
-		using net_list_t =  plib::aligned_vector<analog_net_t *>;
+		using net_list_t =  std::vector<analog_net_t *>;
 
 		// after every call to solve, update inputs must be called.
 		// this can be done as well as a batch to ease parallel processing.
@@ -328,16 +328,17 @@ namespace netlist::solver
 		}
 
 		const solver_parameters_t &m_params;
+		arena_type m_arena;
 
-		plib::pmatrix2d_vrl<fptype, arena_type>    m_gonn;
-		plib::pmatrix2d_vrl<fptype, arena_type>    m_gtn;
-		plib::pmatrix2d_vrl<fptype, arena_type>    m_Idrn;
-		plib::pmatrix2d_vrl<fptype *, arena_type>  m_connected_net_Vn;
+		plib::pmatrix2d_vrl<arena_type, fptype>   m_gonn;
+		plib::pmatrix2d_vrl<arena_type, fptype>   m_gtn;
+		plib::pmatrix2d_vrl<arena_type, fptype>   m_Idrn;
+		plib::pmatrix2d_vrl<arena_type, fptype *> m_connected_net_Vn;
 
 		state_var<std::size_t> m_iterative_fail;
 		state_var<std::size_t> m_iterative_total;
 
-		plib::aligned_vector<terms_for_net_t> m_terms; // setup only
+		std::vector<terms_for_net_t> m_terms; // setup only
 
 	private:
 
@@ -373,13 +374,13 @@ namespace netlist::solver
 		state_var<std::size_t> m_stat_vsolver_calls;
 
 		state_var<netlist_time_ext> m_last_step;
-		plib::aligned_vector<nldelegate_ts> m_step_funcs;
-		plib::aligned_vector<nldelegate_dyn> m_dynamic_funcs;
-		plib::aligned_vector<device_arena::unique_ptr<proxied_analog_output_t>> m_inps;
+		plib::arena_vector<arena_type, nldelegate_ts> m_step_funcs;
+		plib::arena_vector<arena_type, nldelegate_dyn> m_dynamic_funcs;
+		plib::arena_vector<arena_type, device_arena::unique_ptr<proxied_analog_output_t>> m_inps;
 
 		std::size_t m_ops;
 
-		plib::aligned_vector<terms_for_net_t> m_rails_temp; // setup only
+		std::vector<terms_for_net_t> m_rails_temp; // setup only
 	};
 
 } // namespace netlist::solver

@@ -1909,6 +1909,7 @@ cactusco                        // (c) 2007
 callwld                         // (c) 2007
 calyking                        // (c) 2005
 canaryrc                        // (c) 2006
+centrion                        // (c) 2007
 cmtonig                         // (c) 2005
 cinhell                         // (c) 2004
 corrida                         // (c) 2005
@@ -2077,6 +2078,7 @@ silkrda6                        // (c) 2006
 silgola6                        // (c) 2002
 skydnca6                        // (c) 2008
 spgcarn                         // (c) 1999
+spgcarnjc                       // (c) 2003
 spgcarnq                        // (c) 2001
 spgfest                         // (c) 2008
 stardrft                        // (c) 2003
@@ -19990,6 +19992,9 @@ skywolf3                        // bootleg
 sonofphx                        // bootleg
 srdmissn                        // (c) 1986 Taito Corporation
 
+@source:labtam.cpp
+labtam                          // Labtam 3000 model 3006
+
 @source:labyrunr.cpp
 labyrunr                        // GX771 (c) 1987 (Japan)
 labyrunrk                       // GX771 (c) 1987 (Japan)
@@ -24057,9 +24062,10 @@ daytonata                       // 1994?   Kyle Hodgetts hack
 daytonagtx                      // 2004    Kyle Hodgetts hack
 desert                          // 1994.07 Desert Tank
 doa                             // 1997.01 Dead or Alive (Revision C)
-doab                            // 1996.12 Dead or Alive (Revision B)
-doaa                            // 1996.11 Dead or Alive (Revision A)
+doaa                            // 1996.12 Dead or Alive (Revision A)
 doaab                           // 1996.11 Dead or Alive (Revision A)
+doaae                           // 1996.11 Dead or Alive (Revision A)
+doab                            // 1996.12 Dead or Alive (Revision B)
 dynabb                          // 1996.08 Dynamite Baseball
 dynabb97                        // 1997.04 Dynamite Baseball 97 (Revision A)
 dynamcop                        // 1998.09 Dynamic Cop (Export)
@@ -38981,7 +38987,7 @@ simpsons4pe                     // GX072 (c) 1991 (World)
 @source:sis630.cpp
 gamecst2                        // MAME based bootleg, version 2.613
 gamecstl                        // MAME based bootleg
-shutms11						// (c) 2000
+shutms11                        // (c) 2000
 
 @source:sitcom.cpp
 sitcom                          //
@@ -44169,6 +44175,9 @@ psr70                           // 1985 PSR-70
 
 @source:ympsr340.cpp
 psr340                          // 1999 PSR-340
+
+@source:ymqy70.cpp
+qy70                            // 1997 QY-70
 
 @source:ymrx15.cpp
 rx15                            //

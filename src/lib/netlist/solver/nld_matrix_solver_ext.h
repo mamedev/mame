@@ -28,7 +28,7 @@ namespace netlist::solver
 		: matrix_solver_t(main_solver, name, nets, params)
 		, m_new_V(size)
 		, m_RHS(size)
-		, m_mat_ptr(size, this->max_rail_start() + 1)
+		, m_mat_ptr(m_arena, size, this->max_rail_start() + 1)
 		, m_last_V(size, nlconst::zero())
 		, m_DD_n_m_1(size, nlconst::zero())
 		, m_h_n_m_1(size, nlconst::magic(1e-6)) // we need a non zero value here
@@ -52,7 +52,7 @@ namespace netlist::solver
 		plib::parray<float_type, SIZE> m_RHS;
 
 		//PALIGNAS_VECTOROPT() `parray` defines alignment already
-		plib::pmatrix2d<float_type *> m_mat_ptr;
+		plib::pmatrix2d<arena_type, float_type *> m_mat_ptr;
 
 		template <typename T, typename M>
 		void log_fill(const T &fill, [[maybe_unused]] M &mat)

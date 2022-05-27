@@ -535,6 +535,7 @@ kron.cpp
 krz2000.cpp
 ktm3.cpp
 kyocera.cpp
+labtam.cpp
 laser3k.cpp
 lb186.cpp
 lbpc.cpp
@@ -1228,6 +1229,7 @@ ympsr16.cpp
 ympsr40.cpp
 ympsr60.cpp
 ympsr340.cpp
+ymqy70.cpp
 ymrx15.cpp
 ymsy35.cpp
 ymtx81z.cpp

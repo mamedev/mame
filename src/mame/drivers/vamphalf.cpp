@@ -1389,36 +1389,57 @@ void vamphalf_qdsp_state::yorijori(machine_config &config)
 
 /*
 
-Vamp 1/2 (Semi Vamp)
-Danbi, 1999
+Vamp x1/2 (Danbi, 1999)
+Hardware info by Guru
 
-Later DANBI PCB:
-+-----------------------------------------------+
-|     VR1         KA12    VROM1                 |
-|                                               |
-|                 BS901  AD-65   ROML01  ROMU01 |
-|                                ROML00  ROMU00 |
-|                     62256                     |
-|J                    62256         +----------+|
-|A            +------+              |Quicklogic||
-|M    DRAM1   |E1-16T|   ROM1       | QL2003   ||
-|M            +------+              | XPL84C   ||
-|A                    62256         +----------+|
-|          GAL1       62256                     |
-|      93C46     +----------+     62256         |
-|                |Quicklogic|     62256         |
-|                | QL2003   |     62256         |
-|      50.000MHz | XPL84C   |     62256         |
-|B1 B2 B3        +----------+ 28.000MHz         |
-+-----------------------------------------------+
+DANBI (no PCB number)
+|----------------------------------------------|
+|uPC1241 VOL      KA12   VROM1                 |
+|       LM324 LM324                            |
+|      7805       BS901  AD-65   ROML01 ROMU01 |
+|                                ROML00 ROMU00 |
+|                     52258                    |
+|                     52258        |--------|  |
+|             |------|             |        |  |
+|J T2316162   |E1-16T| ROM1        | QL2003 |  |
+|A            |------|             |        |  |
+|M                    52258        |--------|  |
+|M                    52258                    |
+|A  PALCE22V10H   |--------|                   |
+|     93C46       |        |      52258        |
+|T518A            | QL2003 |      52258        |
+|  RESET    50MHz |        |      52258        |
+|SERV SETUP EMUIO1|--------|28MHz 52258        |
+|----------------------------------------------|
+Notes:
+      E1-16T - Hyperstone E1-16T 32-bit RISC/DSP Microprocessor. Clock 50.000MHz
+       AD-65 - OKI M6295 rebadged as AD-65. Clock 1.750MHz [28/16]. Pin 7 HIGH
+       BS109 - Yamaha YM2151 8-Channel 4-Operator OPM (FM Operator Type-M) sound chip rebadged as BS109. Clock 3.500MHz [28/8]
+        KA12 - Yamaha YM3012 DAC. Clock 1.750MHz [28/8/2]. Source = YM2151 pin 23
+       LM324 - Texas Instruments LM324 Quad Operational Amplifier
+     uPC1241 - NEC uPC1241 7W AF Audio Power Amplifier
+       52258 - Sharp LH52258 32kBx8-bit SRAM or HMC HM2H256 32kBx8-bit SRAM in SOJ28 package
+    T2316162 - Taiwan Memory Technology T2316162 1MBx16-bit EDO Page-Mode DRAM
+               or Samsung KM416C1200 1MBx16-bit EDO Page-Mode DRAM in SOJ42 package
+       T518A - Mitsumi Electric PST518A System Reset IC with low voltage detection reset 4.2V
+      QL2003 - QuickLogic QL2003-XPL84C pASIC-family FPGA in PLCC84 package
+        SERV - Push button tact switch for service credit
+       SETUP - Push button tact switch for test mode
+       RESET - Push button tact switch for manual reset
+      EMUIO1 - Not-populated 20 pin header. Possible for extra controls.
+ PALCE22V10H - AMD PALCE22V10H Programmable Array Logic (PAL)
+       93C46 - ST Microelectronics ST93C46 128x8 / 64x16 Serial EEPROM
+               ORG pin is tied high on the PCB so the x16 mode is selected
+        ROM1 - Texas Instruments TMS27C040 512kBx8-bit EPROM (main program)
+       VROM1 - AMIC A278308 256kBx8-bit OTP EPROM, compatible with 27C020 etc (OKI samples)
+      ROML00 \
+      ROML01 |
+      ROMU00 | Macronix MX29F1610MC-12 SOP44 16Mbit FlashROM (sprites)
+      ROMU01 /
+       HSync - 15.6249kHz
+       VSync - 59.1855Hz
 
-     CPU: Hyperstone E1-16T
-Graphics: QuickLogic QL2003-XPL84
-   Sound: Oki M6295 rebadged as AD-65
-          YM3012/YM2151 rebadged as KA12/BS901
-    ROMs: ROML00/01, ROMU00/01 - Macronix MX29F1610MC-12 SOP44 16MBit FlashROM
-   DRAM1: TM T2316162A 1M x16 EDO DRAM (SOJ44)
-
+***************************************************************************
 
 Ealier DANBI PCB:
 +-----------------------------------------------+
@@ -1448,10 +1469,6 @@ Graphics: Actel A40MX04-F PL84
     ROMs: ROML01, ROMU01 - SOP44 32MBit mask ROM for ELC & EVI
           ROML00, ROMU00 - unpopulated
    DRAM1: LG Semi GM71C18163 1M x16 EDO DRAM (SOJ44)
-
-
-
-Both PCBs:
    VROM1: Macronix MX27C2000 2MBit DIP32 EPROM
     ROM1: ST M27C4001 4MBit DIP32 EPROM
 

@@ -50,7 +50,7 @@ namespace netlist::devices
 
 #if 1
 
-	template<bool KEEP_STATS>
+	template <bool KEEP_STATS>
 	NETLIB_HANDLER(solver, fb_step)
 	{
 		const netlist_time_ext now(exec().time());
@@ -173,12 +173,12 @@ namespace netlist::devices
 #endif
 
 	// FIXME: should be created in device space
-	template <class C>
-	NETLIB_NAME(solver)::solver_ptr create_it(NETLIB_NAME(solver) &main_solver, pstring name,
+	template <class C, class A>
+	NETLIB_NAME(solver)::solver_ptr create_it(A &arena, NETLIB_NAME(solver) &main_solver, pstring name,
 		NETLIB_NAME(solver)::net_list_t &nets,
 		const solver::solver_parameters_t *params, std::size_t size)
 	{
-		return plib::make_unique<C, device_arena>(main_solver, name, nets, params, size);
+		return plib::make_unique<C>(arena, main_solver, name, nets, params, size);
 	}
 
 	template <typename FT, int SIZE>
@@ -189,22 +189,22 @@ namespace netlist::devices
 		switch (params->m_method())
 		{
 			case solver::matrix_type_e::MAT_CR:
-				return create_it<solver::matrix_solver_GCR_t<FT, SIZE>>(*this, solvername, nets, params, size);
+				return create_it<solver::matrix_solver_GCR_t<FT, SIZE>>(state().pool(), *this, solvername, nets, params, size);
 			case solver::matrix_type_e::MAT:
-				return create_it<solver::matrix_solver_direct_t<FT, SIZE>>(*this, solvername, nets, params, size);
+				return create_it<solver::matrix_solver_direct_t<FT, SIZE>>(state().pool(), *this, solvername, nets, params, size);
 			case solver::matrix_type_e::GMRES:
-				return create_it<solver::matrix_solver_GMRES_t<FT, SIZE>>(*this, solvername, nets, params, size);
+				return create_it<solver::matrix_solver_GMRES_t<FT, SIZE>>(state().pool(), *this, solvername, nets, params, size);
 #if (NL_USE_ACADEMIC_SOLVERS)
 			case solver::matrix_type_e::SOR:
-				return create_it<solver::matrix_solver_SOR_t<FT, SIZE>>(*this, solvername, nets, params, size);
+				return create_it<solver::matrix_solver_SOR_t<FT, SIZE>>(state().pool(), *this, solvername, nets, params, size);
 			case solver::matrix_type_e::SOR_MAT:
-				return create_it<solver::matrix_solver_SOR_mat_t<FT, SIZE>>(*this, solvername, nets, params, size);
+				return create_it<solver::matrix_solver_SOR_mat_t<FT, SIZE>>(state().pool(), *this, solvername, nets, params, size);
 			case solver::matrix_type_e::SM:
 				// Sherman-Morrison Formula
-				return create_it<solver::matrix_solver_sm_t<FT, SIZE>>(*this, solvername, nets, params, size);
+				return create_it<solver::matrix_solver_sm_t<FT, SIZE>>(state().pool(), *this, solvername, nets, params, size);
 			case solver::matrix_type_e::W:
 				// Woodbury Formula
-				return create_it<solver::matrix_solver_w_t<FT, SIZE>>(*this, solvername, nets, params, size);
+				return create_it<solver::matrix_solver_w_t<FT, SIZE>>(state().pool(), *this, solvername, nets, params, size);
 #else
 			//case solver::matrix_type_e::GMRES:
 			case solver::matrix_type_e::SOR:
@@ -212,7 +212,7 @@ namespace netlist::devices
 			case solver::matrix_type_e::SM:
 			case solver::matrix_type_e::W:
 				state().log().warning(MW_SOLVER_METHOD_NOT_SUPPORTED(params->m_method().name(), "MAT_CR"));
-				return create_it<solver::matrix_solver_GCR_t<FT, SIZE>>(*this, solvername, nets, params, size);
+				return create_it<solver::matrix_solver_GCR_t<FT, SIZE>>(state().pool(), *this, solvername, nets, params, size);
 #endif
 		}
 		return solver_ptr();
@@ -228,9 +228,9 @@ namespace netlist::devices
 		{
 #if !defined(__EMSCRIPTEN__)
 			case 1:
-				return plib::make_unique<solver::matrix_solver_direct1_t<FT>, device_arena>(*this, sname, nets, params);
+				return plib::make_unique<solver::matrix_solver_direct1_t<FT>>(state().pool(), *this, sname, nets, params);
 			case 2:
-				return plib::make_unique<solver::matrix_solver_direct2_t<FT>, device_arena>(*this, sname, nets, params);
+				return plib::make_unique<solver::matrix_solver_direct2_t<FT>>(state().pool(), *this, sname, nets, params);
 			case 3:
 				return create_solver<FT, 3>(3, sname, params, nets);
 			case 4:
@@ -437,7 +437,7 @@ namespace netlist::devices
 		{
 			solver_ptr ms;
 			pstring sname = plib::pfmt("Solver_{1}")(m_mat_solvers.size());
-			params_uptr params = plib::make_unique<solver::solver_parameters_t, solver_arena>(*this, sname + ".", m_params);
+			params_uptr params = plib::make_unique<solver::solver_parameters_t>(state().pool(), *this, sname + ".", m_params);
 
 			switch (params->m_fp_type())
 			{
