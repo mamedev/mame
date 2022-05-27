@@ -61,18 +61,18 @@
 #include "netlist/nl_setup.h"
 
 #include "jpmsru.lh"
-#include "j_ewn.lh"
-#include "j_ndu.lh"
 #include "j_dud.lh"
-#include "j_lan.lh"
-#include "j_super2.lh"
+#include "j_ewn.lh"
 #include "j_ews.lh"
 #include "j_ewsdlx.lh"
-#include "j_ssh.lh"
-#include "j_lt.lh"
-#include "j_plus2.lh"
-#include "j_sup2p.lh"
 #include "j_la.lh"
+#include "j_lan.lh"
+#include "j_lt.lh"
+#include "j_ndu.lh"
+#include "j_plus2.lh"
+#include "j_ssh.lh"
+#include "j_sup2p.lh"
+#include "j_super2.lh"
 
 #define MAIN_CLOCK 6_MHz_XTAL
 
@@ -103,7 +103,6 @@ public:
 	void ews(machine_config &config);
 	void lt(machine_config &config);
 	void sup2p(machine_config &config);
-	void la(machine_config &config);
 
 	void init_jpmsru();
 
@@ -145,9 +144,7 @@ private:
 	void outputs_dud(address_map &map);
 	void outputs_lan(address_map &map);
 	void outputs_ews(address_map &map);
-	void outputs_lt(address_map &map);
 	void outputs_sup2p(address_map &map);
-	void outputs_la(address_map &map);
 
 	bool m_int1;
 	bool m_int2;
@@ -158,7 +155,6 @@ private:
 	int m_disp_digit;
 	bool m_disp_d1;
 	bool m_disp_d2;
-	bool m_coin_lockout;
 	bool m_busext_bdir;
 	uint8_t m_busext_mode;
 	uint8_t m_busext_addr;
@@ -327,26 +323,6 @@ void jpmsru_state::outputs_ews(address_map &map)
 	map(0x80, 0x9f).w(FUNC(jpmsru_state::out_lamp_ext_w));
 }
 
-void jpmsru_state::outputs_lt(address_map &map)
-{
-	jpmsru_io(map);
-
-	map(0x38, 0x39).w(FUNC(jpmsru_state::out_meter_w<0>));
-	map(0x3a, 0x3b).w(FUNC(jpmsru_state::out_meter_w<1>));
-	map(0x3c, 0x3d).w(FUNC(jpmsru_state::out_meter_w<2>));
-	map(0x3e, 0x3f).w(FUNC(jpmsru_state::out_meter_w<3>));
-	map(0x40, 0x41).w(FUNC(jpmsru_state::out_meter_w<4>));
-	map(0x42, 0x4d).w(FUNC(jpmsru_state::out_disp_w));
-	map(0x4e, 0x4f).w(FUNC(jpmsru_state::out_meter_w<5>));
-	map(0x50, 0x51).w(FUNC(jpmsru_state::out_meter_w<6>));
-	map(0x54, 0x55).w(FUNC(jpmsru_state::out_50p_lockout_w));
-	map(0x6a, 0x6b).w(FUNC(jpmsru_state::out_payout_cash_w));
-	map(0x6c, 0x6d).w(FUNC(jpmsru_state::out_payout_token_w));
-	map(0x6e, 0x6f).w(FUNC(jpmsru_state::out_coin_lockout_w));
-	// Mini Logic Extension outputs, used for extra lamps
-	map(0x80, 0x9f).w(FUNC(jpmsru_state::out_lamp_ext_w));
-}
-
 void jpmsru_state::outputs_sup2p(address_map &map)
 {
 	jpmsru_io(map);
@@ -358,25 +334,6 @@ void jpmsru_state::outputs_sup2p(address_map &map)
 	map(0x54, 0x55).w(FUNC(jpmsru_state::out_50p_lockout_w));
 	map(0x6a, 0x6b).w(FUNC(jpmsru_state::out_payout_cash_w));
 	map(0x6e, 0x6f).w(FUNC(jpmsru_state::out_coin_lockout_w));
-}
-
-void jpmsru_state::outputs_la(address_map &map)
-{
-	jpmsru_io(map);
-
-	map(0x38, 0x39).w(FUNC(jpmsru_state::out_meter_w<0>));
-	map(0x3a, 0x3b).w(FUNC(jpmsru_state::out_meter_w<1>));
-	map(0x3c, 0x3d).w(FUNC(jpmsru_state::out_meter_w<2>));
-	map(0x3e, 0x3f).w(FUNC(jpmsru_state::out_meter_w<3>));
-	map(0x40, 0x41).w(FUNC(jpmsru_state::out_meter_w<4>));
-	map(0x42, 0x4d).w(FUNC(jpmsru_state::out_disp_w));
-	map(0x4e, 0x4f).w(FUNC(jpmsru_state::out_meter_w<5>));
-	map(0x50, 0x51).w(FUNC(jpmsru_state::out_meter_w<6>));
-	map(0x6a, 0x6b).w(FUNC(jpmsru_state::out_payout_cash_w));
-	map(0x6c, 0x6d).w(FUNC(jpmsru_state::out_payout_token_w));
-	map(0x6e, 0x6f).w(FUNC(jpmsru_state::out_coin_lockout_w));
-	// Mini Logic Extension outputs, used for extra lamps
-	map(0x80, 0x9f).w(FUNC(jpmsru_state::out_lamp_ext_w));
 }
 
 uint8_t jpmsru_state::inputs_r(offs_t offset)
@@ -445,7 +402,6 @@ void jpmsru_state::out_payout_token_w(offs_t offset, uint8_t data)
 
 void jpmsru_state::out_coin_lockout_w(offs_t offset, uint8_t data)
 {
-	m_coin_lockout = !data;
 	machine().bookkeeping().coin_lockout_w(0, !data);
 	machine().bookkeeping().coin_lockout_w(1, !data);
 	machine().bookkeeping().coin_lockout_w(2, !data);
@@ -455,10 +411,7 @@ void jpmsru_state::out_coin_lockout_w(offs_t offset, uint8_t data)
 void jpmsru_state::out_50p_lockout_w(offs_t offset, uint8_t data)
 {
 	// 50p is always coin 4
-	if(!m_coin_lockout)
-		machine().bookkeeping().coin_lockout_w(3, !data);
-	else
-		machine().bookkeeping().coin_lockout_w(3, 1);
+	machine().bookkeeping().coin_lockout_w(3, !data);
 }
 
 void jpmsru_state::audio_w(offs_t offset, uint8_t data)
@@ -1061,21 +1014,53 @@ void jpmsru_state::jpmsru_4k(machine_config &config)
 }
 
 // Game configs
-#define SRU_MCONFIG(GAME, CONFIG)	void jpmsru_state::GAME(machine_config &config)\
-									{\
-										CONFIG(config);\
-										m_maincpu->set_addrmap(AS_IO, &jpmsru_state::outputs_##GAME);\
-									}
+void jpmsru_state::ewn(machine_config &config)
+{
+	jpmsru_3k_busext(config);
+	m_maincpu->set_addrmap(AS_IO, &jpmsru_state::outputs_ewn);
+}
 
-SRU_MCONFIG( ewn, jpmsru_3k_busext )
-SRU_MCONFIG( ewn2, jpmsru_3k )
-SRU_MCONFIG( ndu, jpmsru_3k_busext )
-SRU_MCONFIG( dud, jpmsru_3k )
-SRU_MCONFIG( lan, jpmsru_3k )
-SRU_MCONFIG( ews, jpmsru_3k )
-SRU_MCONFIG( lt, jpmsru_4k )
-SRU_MCONFIG( sup2p, jpmsru_3k )
-SRU_MCONFIG( la, jpmsru_3k )
+void jpmsru_state::ewn2(machine_config &config)
+{
+	jpmsru_3k(config);
+	m_maincpu->set_addrmap(AS_IO, &jpmsru_state::outputs_ewn2);
+}
+
+void jpmsru_state::ndu(machine_config &config)
+{
+	jpmsru_3k_busext(config);
+	m_maincpu->set_addrmap(AS_IO, &jpmsru_state::outputs_ndu);
+}
+
+void jpmsru_state::dud(machine_config &config)
+{
+	jpmsru_3k(config);
+	m_maincpu->set_addrmap(AS_IO, &jpmsru_state::outputs_dud);
+}
+
+void jpmsru_state::lan(machine_config &config)
+{
+	jpmsru_3k(config);
+	m_maincpu->set_addrmap(AS_IO, &jpmsru_state::outputs_lan);
+}
+
+void jpmsru_state::ews(machine_config &config)
+{
+	jpmsru_3k(config);
+	m_maincpu->set_addrmap(AS_IO, &jpmsru_state::outputs_ews);
+}
+
+void jpmsru_state::lt(machine_config &config)
+{
+	jpmsru_4k(config);
+	m_maincpu->set_addrmap(AS_IO, &jpmsru_state::outputs_ews);
+}
+
+void jpmsru_state::sup2p(machine_config &config)
+{
+	jpmsru_3k(config);
+	m_maincpu->set_addrmap(AS_IO, &jpmsru_state::outputs_sup2p);
+}
 
 ROM_START( j_ewn )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1293,4 +1278,4 @@ GAMEL( 1982,  j_ts,      j_lt,     lt,        j_lt,          jpmsru_state, init_
 GAMEL( 198?,  j_plus2,   j_lt,     lt,        j_plus2,       jpmsru_state, init_jpmsru, ROT0, "CTL", "Plus 2 (CTL) (SRU) (2p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_plus2 ) // £1/2p rebuild of Lucky 2's
 GAMEL( 1983?, j_goldn2,  j_lt,     lt,        j_plus2,       jpmsru_state, init_jpmsru, ROT0, "CTL", "Golden 2's (CTL) (SRU) (2p Stake, £1.50 Jackpot)", GAME_FLAGS, layout_j_plus2 ) // £1.50 JP version of above
 GAMEL( 198?,  j_sup2p,   0,        sup2p,     j_sup2p,       jpmsru_state, init_jpmsru, ROT0, "Mdm", "Super 2p Shuffle (Mdm) (SRU) (2p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_sup2p )
-GAMEL( 1983?, j_la,      0,        la,        j_la,          jpmsru_state, init_jpmsru, ROT0, "<unknown>", "Lucky Aces (SRU) (£1.50 Jackpot)", GAME_FLAGS, layout_j_la )
+GAMEL( 1983?, j_la,      0,        lan,       j_la,          jpmsru_state, init_jpmsru, ROT0, "<unknown>", "Lucky Aces (SRU) (£1.50 Jackpot)", GAME_FLAGS, layout_j_la )
