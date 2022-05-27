@@ -26,7 +26,6 @@ TODO:
 - unknown XTAL/CPU clock
 - any peripheral chips?
 - correct video timing
-- any other (dip) switches?
 
 ******************************************************************************/
 
@@ -196,15 +195,19 @@ static INPUT_PORTS_START( micon2 )
 	PORT_START("IN.4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) // button
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_CONFNAME( 0x04, 0x04, DEF_STR( Cabinet ) )
+	PORT_CONFSETTING(    0x04, DEF_STR( Upright ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x30, 0x10, "Replay" )           PORT_DIPLOCATION("DSW:4,3")
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x10, "400" )
+	PORT_DIPSETTING(    0x20, "500" )
+	PORT_DIPSETTING(    0x30, "600" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSW:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Lives ) )   PORT_DIPLOCATION("DSW:1")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x80, "5" )
 INPUT_PORTS_END
