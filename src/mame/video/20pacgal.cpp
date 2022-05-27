@@ -454,7 +454,6 @@ void _20pacgal_state::_20pacgal_video(machine_config &config)
 	screen.set_visarea(0, SCREEN_WIDTH - 1, 0, SCREEN_HEIGHT - 1);
 	screen.set_screen_update(FUNC(_20pacgal_state::screen_update_20pacgal));
 	screen.screen_vblank().set(FUNC(_20pacgal_state::vblank_irq));
-	screen.set_orientation(ROT90);
 
 	PALETTE(config, m_palette, FUNC(_20pacgal_state::starpal_init), NUM_PENS + NUM_PENS);
 }

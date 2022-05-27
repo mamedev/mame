@@ -395,7 +395,7 @@ WRITE_LINE_MEMBER(_20pacgal_state::vblank_irq)
 		m_maincpu->set_input_line(0, HOLD_LINE); // TODO: assert breaks the inputs in 25pacman test mode
 }
 
-static DEVICE_INPUT_DEFAULTS_START( terminal )
+static DEVICE_INPUT_DEFAULTS_START( null_modem )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_115200 )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_115200 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
@@ -412,7 +412,7 @@ void _20pacgal_state::_20pacgal(machine_config &config)
 	m_maincpu->txa0_wr_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
-	m_rs232->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
+	m_rs232->set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(null_modem));
 	m_rs232->rxd_handler().set(m_maincpu, FUNC(z180_device::rxa0_w));
 
 	EEPROM_93C46_8BIT(config, m_eeprom);
@@ -432,7 +432,7 @@ void _20pacgal_state::_20pacgal(machine_config &config)
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
 }
 
-static DEVICE_INPUT_DEFAULTS_START( terminal_57600 )
+static DEVICE_INPUT_DEFAULTS_START( null_modem_57600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_57600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_57600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
@@ -448,7 +448,7 @@ void _25pacman_state::_25pacman(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &_25pacman_state::_25pacman_map);
 	m_maincpu->set_addrmap(AS_IO, &_25pacman_state::_25pacman_io_map);
 
-	m_rs232->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal_57600));
+	m_rs232->set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(null_modem_57600));
 
 	AMD_29LV200T(config, "flash");
 }
@@ -559,12 +559,12 @@ void _20pacgal_state::init_25pacman()
  *
  *************************************/
 
-GAME( 2006, 25pacman,   0,        _25pacman, 25pacman,  _25pacman_state, init_25pacman, 0, "Namco / Cosmodog", "Pac-Man - 25th Anniversary Edition (Rev 3.00)",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 2005, 25pacmano,  25pacman, _20pacgal, 25pacmano, _20pacgal_state, init_25pacman, 0, "Namco / Cosmodog", "Pac-Man - 25th Anniversary Edition (Rev 2.00)",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 2006, 25pacman,   0,        _25pacman, 25pacman,  _25pacman_state, init_25pacman, ROT90, "Namco / Cosmodog", "Pac-Man - 25th Anniversary Edition (Rev 3.00)",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 2005, 25pacmano,  25pacman, _20pacgal, 25pacmano, _20pacgal_state, init_25pacman, ROT90, "Namco / Cosmodog", "Pac-Man - 25th Anniversary Edition (Rev 2.00)",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 
-GAME( 2000, 20pacgal,   0,        _20pacgal, 20pacgal,  _20pacgal_state, init_20pacgal, 0, "Namco / Cosmodog", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.08)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 2000, 20pacgalr4, 20pacgal, _20pacgal, 20pacgal,  _20pacgal_state, init_20pacgal, 0, "Namco / Cosmodog", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 2000, 20pacgalr3, 20pacgal, _20pacgal, 20pacgal,  _20pacgal_state, init_20pacgal, 0, "Namco / Cosmodog", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.03)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 2000, 20pacgalr2, 20pacgal, _20pacgal, 20pacgal,  _20pacgal_state, init_20pacgal, 0, "Namco / Cosmodog", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.02)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 2000, 20pacgalr1, 20pacgal, _20pacgal, 20pacgal,  _20pacgal_state, init_20pacgal, 0, "Namco / Cosmodog", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.01)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 2000, 20pacgalr0, 20pacgal, _20pacgal, 20pacgal,  _20pacgal_state, init_20pacgal, 0, "Namco / Cosmodog", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 2000, 20pacgal,   0,        _20pacgal, 20pacgal,  _20pacgal_state, init_20pacgal, ROT90, "Namco / Cosmodog", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.08)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 2000, 20pacgalr4, 20pacgal, _20pacgal, 20pacgal,  _20pacgal_state, init_20pacgal, ROT90, "Namco / Cosmodog", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 2000, 20pacgalr3, 20pacgal, _20pacgal, 20pacgal,  _20pacgal_state, init_20pacgal, ROT90, "Namco / Cosmodog", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.03)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 2000, 20pacgalr2, 20pacgal, _20pacgal, 20pacgal,  _20pacgal_state, init_20pacgal, ROT90, "Namco / Cosmodog", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.02)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 2000, 20pacgalr1, 20pacgal, _20pacgal, 20pacgal,  _20pacgal_state, init_20pacgal, ROT90, "Namco / Cosmodog", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.01)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 2000, 20pacgalr0, 20pacgal, _20pacgal, 20pacgal,  _20pacgal_state, init_20pacgal, ROT90, "Namco / Cosmodog", "Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion (V1.00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
