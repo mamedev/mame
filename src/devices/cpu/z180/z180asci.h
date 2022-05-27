@@ -100,28 +100,28 @@ protected:
 	uint8_t   m_data_fifo[4];
 	uint8_t   m_error_fifo[4];
 	uint8_t   m_rx_error;
-	int       m_fifo_wr;
-	int       m_fifo_rd;
+	uint8_t   m_fifo_wr;
+	uint8_t   m_fifo_rd;
 
-	int       m_cts;
-	int       m_dcd;
-	int       m_irq;
-	int       m_txa;
-	int       m_rxa;
-	int       m_rts;
+	uint8_t   m_cts;
+	uint8_t   m_dcd;
+	uint8_t   m_irq;
+	uint8_t   m_txa;
+	uint8_t   m_rxa;
+	uint8_t   m_rts;
 
-	uint32_t  m_bgr_divisor;
+	uint32_t  m_brg_divisor;
 	uint32_t  m_divisor;
 
-	int m_clock_state;
-	int m_tx_state;
-	int m_tx_parity;
-	int m_tx_bits;
-	int m_tx_counter;
-	int m_rx_state;
-	int m_rx_parity;
-	int m_rx_bits;
-	int m_rx_counter;
+	uint8_t   m_clock_state;
+	uint8_t   m_tx_state;
+	uint8_t   m_tx_parity;
+	uint8_t   m_tx_bits;
+	uint8_t   m_tx_counter;
+	uint8_t   m_rx_state;
+	uint8_t   m_rx_parity;
+	uint8_t   m_rx_bits;
+	uint8_t   m_rx_counter;
 
 	bool m_rx_enabled;
 

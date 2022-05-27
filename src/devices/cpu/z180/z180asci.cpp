@@ -75,7 +75,7 @@ z180asci_channel_base::z180asci_channel_base(const machine_config &mconfig, devi
 	, m_dcd(0)
 	, m_irq(0)
 	, m_rts(0)
-	, m_bgr_divisor(0)
+	, m_brg_divisor(0)
 	, m_divisor(0)
 	, m_id(id)
 	, m_ext(ext)
@@ -118,7 +118,7 @@ void z180asci_channel_base::device_start()
 	save_item(NAME(m_rxa));
 	save_item(NAME(m_rts));
 
-	save_item(NAME(m_bgr_divisor));
+	save_item(NAME(m_brg_divisor));
 	save_item(NAME(m_divisor));
 
 	save_item(NAME(m_clock_state));
@@ -173,27 +173,27 @@ void z180asci_channel_base::device_clock_changed()
 	if ((m_asci_cntlb & Z180_CNTLB_SS) == Z180_CNTLB_SS)
 	{
 		// External clock
-		m_bgr_divisor = 0;
+		m_brg_divisor = 0;
 	}
 	else
 	{
 		if (m_asci_ext & Z180_ASEXT_BRG0_MODE)
 		{
 			// Extended boud rate generator mode
-			m_bgr_divisor = m_asci_tc.w + 2;
+			m_brg_divisor = m_asci_tc.w + 2;
 		}
 		else
 		{
 			// Regular bitrate generator mode
-			m_bgr_divisor = 1 << (m_asci_cntlb & Z180_CNTLB_SS);
-			m_bgr_divisor *= ((m_asci_cntlb & Z180_CNTLB_CTS_PS) ? 30 : 10); // Prescale
+			m_brg_divisor = 1 << (m_asci_cntlb & Z180_CNTLB_SS);
+			m_brg_divisor *= ((m_asci_cntlb & Z180_CNTLB_CTS_PS) ? 30 : 10); // Prescale
 		}
 	}
 
-	if (m_bgr_divisor)
+	if (m_brg_divisor)
 	{
-		LOG("Z180 ASCI%d set bitrate %d\n", m_id, uint32_t(clock() / m_bgr_divisor / m_divisor));
-		m_brg->set_clock(DERIVED_CLOCK(1,m_bgr_divisor));
+		LOG("Z180 ASCI%d set bitrate %d\n", m_id, uint32_t(clock() / m_brg_divisor / m_divisor));
+		m_brg->set_clock(DERIVED_CLOCK(1,m_brg_divisor));
 	}
 	else
 	{
