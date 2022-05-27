@@ -4529,8 +4529,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/paradise.cpp",
 	MAME_DIR .. "src/mame/drivers/yunsung8.cpp",
 	MAME_DIR .. "src/mame/drivers/yunsun16.cpp",
-	MAME_DIR .. "src/mame/includes/yunsun16.h",
-	MAME_DIR .. "src/mame/video/yunsun16.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "zaccaria")
