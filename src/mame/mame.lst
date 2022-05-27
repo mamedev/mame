@@ -23605,6 +23605,9 @@ mice2_6502                      // (c) 1986 Microtek International, Inc.
 mice2_8085                      // (c) 1986 Microtek International, Inc.
 mice2_6809                      // (c) 1986 Microtek International, Inc.
 
+@source:miconkit.cpp
+micon2
+
 @source:micral.cpp
 micral                          //
 questarm
