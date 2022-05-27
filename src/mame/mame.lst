@@ -44170,6 +44170,9 @@ psr70                           // 1985 PSR-70
 @source:ympsr340.cpp
 psr340                          // 1999 PSR-340
 
+@source:ymqy70.cpp
+qy70                            // 1997 QY-70
+
 @source:ymrx15.cpp
 rx15                            //
 
