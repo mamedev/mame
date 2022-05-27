@@ -49,6 +49,17 @@ enum mapwr1_mask : u8
 	MAPWR1_RESB = 0x80, // resident bus select
 };
 
+enum drvstatus_mask : u8
+{
+	DRVSTATUS_A  = 0x01, // FD0 is mini floppy
+	DRVSTATUS_C  = 0x02, // FD1 is mini floppy
+	DRVSTATUS_E  = 0x04, // FD2 is mini floppy
+	DRVSTATUS_G  = 0x08, // FD3 is mini floppy
+	DRVSTATUS_B  = 0x10, // not used
+	DRVSTATUS_D  = 0x20, // not used
+	DRVSTATUS_SS = 0x40, // 8" floppy is single-sided
+};
+
 DEFINE_DEVICE_TYPE(LABTAM_Z80SBC, labtam_z80sbc_device, "labtam_z80sbc", "Labtam Z80 SBC")
 
 labtam_z80sbc_device::labtam_z80sbc_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
@@ -63,11 +74,8 @@ labtam_z80sbc_device::labtam_z80sbc_device(machine_config const &mconfig, char c
 	, m_sio(*this, "sio")
 	, m_fdd(*this, "fdd%u", 0U)
 	, m_eprom(*this, "eprom%u", 0U)
-	, m_ram0_select(*this, "E15E")
-	, m_ram1_select(*this, "E15D")
-	, m_pio0_select(*this, "E15A")
-	, m_pio1_select(*this, "E15B")
-	, m_pio2_select(*this, "E15C")
+	, m_e15(*this, "E15%c", 'A')
+	, m_e21(*this, "E21")
 	, m_installed(false)
 {
 }
@@ -175,6 +183,21 @@ static INPUT_PORTS_START(labtam_z80sbc)
 	PORT_DIPSETTING(0xd0000, "d0000h")
 	PORT_DIPSETTING(0xe0000, "e0000h")
 	PORT_DIPSETTING(0xf0000, "f0000h")
+
+	PORT_START("E21")
+	PORT_DIPNAME(0x01, 0x01, "FD0 is 5.25\"") PORT_DIPLOCATION("E21:1")
+	PORT_DIPSETTING(0x00, DEF_STR(Yes))
+	PORT_DIPSETTING(0x01, DEF_STR(No))
+	PORT_DIPNAME(0x02, 0x00, "FD1 is 5.25\"") PORT_DIPLOCATION("E21:3")
+	PORT_DIPSETTING(0x00, DEF_STR(Yes))
+	PORT_DIPSETTING(0x02, DEF_STR(No))
+	PORT_DIPNAME(0x04, 0x00, "FD2 is 5.25\"") PORT_DIPLOCATION("E21:5")
+	PORT_DIPSETTING(0x00, DEF_STR(Yes))
+	PORT_DIPSETTING(0x04, DEF_STR(No))
+	PORT_DIPNAME(0x08, 0x08, "FD3 is 5.25\"") PORT_DIPLOCATION("E21:7")
+	PORT_DIPSETTING(0x00, DEF_STR(Yes))
+	PORT_DIPSETTING(0x08, DEF_STR(No))
+	PORT_DIPUNUSED_DIPLOC(0x70, 0x70, "E21:2,4,6")
 INPUT_PORTS_END
 
 const tiny_rom_entry *labtam_z80sbc_device::device_rom_region() const
@@ -211,13 +234,13 @@ void labtam_z80sbc_device::device_reset()
 {
 	if (!m_installed)
 	{
-		u32 const ram0_select = m_ram0_select->read();
-		u32 const ram1_select = m_ram1_select->read();
+		u32 const ram0_select = m_e15[4]->read();
+		u32 const ram1_select = m_e15[3]->read();
 
 		m_bus->space(AS_PROGRAM).install_ram(ram0_select, ram0_select | 0xffff, m_ram0.get());
 		m_bus->space(AS_PROGRAM).install_ram(ram1_select, ram1_select | 0xffff, m_ram0.get());
 
-		u16 const pio_select = m_pio2_select->read() | m_pio1_select->read() | m_pio0_select->read();
+		u16 const pio_select = m_e15[2]->read() | m_e15[1]->read() | m_e15[0]->read();
 
 		m_bus->space(AS_IO).install_write_handler(pio_select | 0, pio_select | 0, write8smo_delegate(*this, FUNC(labtam_z80sbc_device::fdcclr_w)));
 		m_bus->space(AS_IO).install_write_handler(pio_select | 2, pio_select | 2, write8smo_delegate(*this, FUNC(labtam_z80sbc_device::netclr_w)));
@@ -233,8 +256,7 @@ void labtam_z80sbc_device::device_reset()
 	m_map_enabled = false;
 	m_map_num = 0;
 
-	// TODO: unsure what the bits represent
-	m_drvstatus = 0xf0;
+	m_dma[0]->iei_w(1);
 }
 
 static void z80sbc_floppies(device_slot_interface &device)
@@ -252,25 +274,54 @@ void labtam_z80sbc_device::device_add_mconfig(machine_config &config)
 	m_cpu->set_addrmap(AS_IO, &labtam_z80sbc_device::cpu_pio);
 	m_cpu->set_irq_acknowledge_callback(m_uic, FUNC(am9519_device::iack_cb));
 
-	AM9513(config, m_stc, 20_MHz_XTAL / 4);
+	/*
+	 * While not a full Z80 daisy chain, the Z80DMAs, Z80SIO and Am9519 have
+	 * their EI/EO lines connected such that only one will assert the Z80
+	 * /INT line at once.
+	 */
 
+	Z80DMA(config, m_dma[0], 20_MHz_XTAL / 4);
+	m_dma[0]->out_int_callback().set_inputline(m_cpu, INPUT_LINE_IRQ0);
+	m_dma[0]->out_ieo_callback().set(m_dma[1], FUNC(z80dma_device::iei_w));
+	m_dma[0]->out_busreq_callback().set(m_dma[0], FUNC(z80dma_device::bai_w));
+	m_dma[0]->in_mreq_callback().set(FUNC(labtam_z80sbc_device::map_r<7>));
+	m_dma[0]->out_mreq_callback().set(FUNC(labtam_z80sbc_device::map_w<7>));
+	m_dma[0]->in_iorq_callback().set(m_fdc, FUNC(wd2793_device::data_r));
+	m_dma[0]->out_iorq_callback().set(m_fdc, FUNC(wd2793_device::data_w));
+
+	Z80DMA(config, m_dma[1], 20_MHz_XTAL / 4);
+	m_dma[1]->out_int_callback().set_inputline(m_cpu, INPUT_LINE_IRQ0);
+	//m_dma[1]->out_ieo_callback().set(m_sio, FUNC(z80sio_device::iei_w));
+	m_dma[1]->out_busreq_callback().set(m_dma[1], FUNC(z80dma_device::bai_w));
+	m_dma[1]->in_mreq_callback().set(FUNC(labtam_z80sbc_device::map_r<7>));
+	m_dma[1]->out_mreq_callback().set(FUNC(labtam_z80sbc_device::map_w<7>));
+
+	// TODO: implement iei/ieo on z80sio
+	Z80SIO(config, m_sio, 20_MHz_XTAL / 4);
+	//m_sio->out_int_callback().set_inputline(m_cpu, INPUT_LINE_IRQ0);
+	//m_sio->out_ieo_callback().set(m_uic, FUNC(am9519_device::iei_w));
+
+	// TODO: implement iei/ieo on am9519
 	AM9519(config, m_uic);
 	m_uic->out_int_callback().set_inputline(m_cpu, INPUT_LINE_IRQ0);
 
+	WD2793(config, m_fdc, 2'000'000);
+	m_fdc->intrq_wr_callback().set(m_uic, FUNC(am9519_device::ireq2_w));
+	m_fdc->intrq_wr_callback().append(FUNC(labtam_z80sbc_device::int_w<3>));
+	m_fdc->drq_wr_callback().set(m_dma[0], FUNC(z80dma_device::rdy_w));
+
+	// WD1002 irq -> Am9519 ireq3
+
+	AM9513(config, m_stc, 4'000'000);
+	m_stc->out4_cb().set(m_uic, FUNC(am9519_device::ireq5_w));
+
 	MM58167(config, m_rtc, 32.768_kHz_XTAL);
-	Z80DMA(config, m_dma[0], 0);
-	Z80DMA(config, m_dma[1], 0);
-	Z80SIO(config, m_sio, 0);
+	m_rtc->irq().set(m_uic, FUNC(am9519_device::ireq6_w));
 
-	WD2793(config, m_fdc, 2_MHz_XTAL);
-	m_fdc->intrq_wr_callback().set(m_uic, FUNC(am9519_device::ireq3_w));
-	//m_fdc->drq_wr_callback().set(m_dma[0], FUNC(z80dma_device::rdy_w));
-	m_fdc->ready_wr_callback().set([this](int state) { if (!state) m_drvstatus |= 0xf; else m_drvstatus &= ~0xf; });
-
-	FLOPPY_CONNECTOR(config, m_fdd[0], z80sbc_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_fdd[0], z80sbc_floppies, "dsdd8", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_fdd[1], z80sbc_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_fdd[2], z80sbc_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_fdd[3], z80sbc_floppies, "dsdd8", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_fdd[3], z80sbc_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 void labtam_z80sbc_device::cpu_mem(address_map &map)
@@ -281,7 +332,7 @@ void labtam_z80sbc_device::cpu_mem(address_map &map)
 	 * 4000..5fff  eprom 1
 	 * e000..ffff  eprom 0
 	 */
-	map(0x0000, 0xffff).rw(FUNC(labtam_z80sbc_device::map_r), FUNC(labtam_z80sbc_device::map_w));
+	map(0x0000, 0xffff).rw(FUNC(labtam_z80sbc_device::mem_r), FUNC(labtam_z80sbc_device::mem_w));
 }
 
 void labtam_z80sbc_device::cpu_pio(address_map &map)
@@ -291,11 +342,11 @@ void labtam_z80sbc_device::cpu_pio(address_map &map)
 
 	map(0x0010, 0x0010).select(0xff00).lw8([this](offs_t offset, u8 data) { m_map_lo[offset >> 8] = data; }, "mapwr0");
 	map(0x0018, 0x0018).select(0xff00).lw8([this](offs_t offset, u8 data) { m_map_hi[offset >> 8] = data & 0xf0; }, "mapwr1");
-	map(0x0020, 0x0020).mirror(0xff00).lw8([this](u8 data) { m_map_enabled = true; }, "intswt");
-	map(0x0028, 0x0028).mirror(0xff00).lw8([this](u8 data) { m_map_enabled = true; m_map_num = data & 0x0f; }, "mapnum");
+	map(0x0020, 0x0020).mirror(0xff00).lw8([this](u8 data) { m_map_enabled = true; LOG("intswt 0x%02x mapnum 0x%02x (%s)\n", data, m_map_num, machine().describe_context()); }, "intswt");
+	map(0x0028, 0x0028).mirror(0xff00).lw8([this](u8 data) { m_map_enabled = true; m_map_num = data & 0x0f; LOG("mapnum 0x%02x (%s)\n", data, machine().describe_context()); }, "mapnum");
 
-	map(0x0030, 0x0033).mirror(0xff00).lw8([this](offs_t offset, u8 data) { m_fdc->set_floppy(!data ? m_fdd[offset]->get_device() : nullptr); }, "driveN");
-	//map(0x0038, 0x0038); // TODO: fltrest: reset drive fault
+	map(0x0030, 0x0033).mirror(0xff00).w(FUNC(labtam_z80sbc_device::drive_w));
+	map(0x0038, 0x0038).mirror(0xff00).lw8([this](u8 data) { LOG("reset drive fault\n"); }, "fltrest");
 	map(0x0040, 0x0043).mirror(0xff00).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
 	map(0x0048, 0x004b).mirror(0xff00).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x0050, 0x0051).mirror(0xff00).rw(m_stc, FUNC(am9513_device::read8), FUNC(am9513_device::write8));
@@ -303,83 +354,107 @@ void labtam_z80sbc_device::cpu_pio(address_map &map)
 	map(0x0059, 0x0059).mirror(0xff00).rw(m_uic, FUNC(am9519_device::stat_r), FUNC(am9519_device::cmd_w));
 
 	//map(0x0060, 0x0067); // TODO: wd1001
-	map(0x0068, 0x0068).mirror(0xff00).lr8([this]() { return m_drvstatus; }, "drvstatus");
+
+	map(0x0068, 0x0068).mirror(0xff00).r(FUNC(labtam_z80sbc_device::drvstatus_r));
 
 	map(0x0070, 0x0070).select(0xff00).lr8([this](offs_t offset) { return m_map_lo[offset >> 8]; }, "maprd0");
-	map(0x0078, 0x0078).select(0xff00).lr8([this](offs_t offset) { return m_map_hi[offset >> 8]; }, "maprd1");
+	map(0x0078, 0x0078).select(0xff00).lr8([this](offs_t offset) { return m_map_hi[offset >> 8]; }, "maprd1"); // TODO: code at 167c reads maprd1 lower 3 bits?
 
 	map(0x0080, 0x0080).mirror(0xff00).rw(m_dma[0], FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	map(0x00a0, 0x00a0).mirror(0xff00).rw(m_dma[1], FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	map(0x00e0, 0x00ff).mirror(0xff00).rw(m_rtc, FUNC(mm58167_device::read), FUNC(mm58167_device::write));
 }
 
-u8 labtam_z80sbc_device::map_r(offs_t offset)
+u8 labtam_z80sbc_device::mem_r(offs_t offset)
 {
 	if (m_map_enabled)
-	{
-		u8 const entry = ((offset >> 8) & 0xf8) | (m_map_num & 0x07);
-		u8 const lo = m_map_lo[entry];
-		u8 const hi = m_map_hi[entry];
-
-		u32 const address = u32(hi & MAPWR1_MA19) << 15 | u32(lo) << 11 | (offset & 0x7ff);
-
-		if (hi & MAPWR1_RESB)
-		{
-			// TODO: use address space to decode resident bus
-			switch (address & 0xf000)
-			{
-			case 0x2000:
-				return m_sram[address & 0x7ff];
-			case 0x4000:
-			case 0x5000:
-				return m_eprom[1][address & 0x1fff];
-			case 0xe000:
-			case 0xf000:
-				return m_eprom[0][address & 0x1fff];
-			default:
-				LOG("map_r hi 0x%02x lo 0x%02x address 0x%05x\n", hi, lo, address);
-				return 0;
-			}
-		}
-		else
-			// Theory: when mapper is deactivated, its outputs are all forced high, resulting
-			// in RESB|MEM|WP flags and resident bus address |= 0xf800.
-			return m_bus->space((hi & MAPWR1_MEM) ? AS_PROGRAM : AS_IO).read_byte(address);
-	}
+		return map_r(m_map_num, offset);
 	else
+		// Theory: when mapper is deactivated, its outputs are all forced high, resulting
+		// in set RESB|MEM|WP flags and resident bus address |= 0xf800.
 		return m_eprom[0][0x1800 | (offset & 0x7ff)];
 }
 
-void labtam_z80sbc_device::map_w(offs_t offset, u8 data)
+void labtam_z80sbc_device::mem_w(offs_t offset, u8 data)
 {
 	if (m_map_enabled)
+		map_w(m_map_num, offset, data);
+	else
+		LOG("mem_w unmapped offset 0x%04x data 0x%02x (%s)\n", offset, data, machine().describe_context());
+}
+
+u8 labtam_z80sbc_device::map_r(unsigned map_num, offs_t offset)
+{
+	u8 const entry = ((offset >> 8) & 0xf8) | (map_num & 0x07);
+	u8 const lo = m_map_lo[entry];
+	u8 const hi = m_map_hi[entry];
+
+	u32 const address = u32(hi & MAPWR1_MA19) << 15 | u32(lo) << 11 | (offset & 0x7ff);
+
+	if (hi & MAPWR1_RESB)
 	{
-		u8 const entry = ((offset >> 8) & 0xf8) | (m_map_num & 0x07);
-		u8 const lo = m_map_lo[entry];
-		u8 const hi = m_map_hi[entry];
-
-		u32 const address = u32(hi & MAPWR1_MA19) << 15 | u32(lo) << 11 | (offset & 0x7ff);
-
-		// TODO: suppress write-protected accesses
-
-		if (hi & MAPWR1_RESB)
+		// TODO: use address space to decode resident bus
+		switch (address & 0xf000)
 		{
-			// TODO: use address space to decode resident bus
-			switch (address & 0xf000)
-			{
-			case 0x2000:
-				m_sram[address & 0x7ff] = data;
-				break;
-			default:
-				LOG("map_w hi 0x%02x lo 0x%02x address 0x%05x data 0x%02x\n", hi, lo, address, data);
-				break;
-			}
+		case 0x2000:
+			return m_sram[address & 0x7ff];
+		case 0x4000:
+		case 0x5000:
+			return m_eprom[1][address & 0x1fff];
+		case 0xe000:
+		case 0xf000:
+			return m_eprom[0][address & 0x1fff];
+		default:
+			LOG("map_r hi 0x%02x lo 0x%02x address 0x%05x (%s)\n", hi, lo, address, machine().describe_context());
+			return 0;
 		}
-		else
-			m_bus->space((hi & MAPWR1_MEM) ? AS_PROGRAM : AS_IO).write_byte(address, data);
 	}
 	else
-		LOG("map_w map disabled offset 0x%04x data 0x%02x (%s)\n", offset, data, machine().describe_context());
+		return m_bus->space((hi & MAPWR1_MEM) ? AS_PROGRAM : AS_IO).read_byte(address);
+}
+
+void labtam_z80sbc_device::map_w(unsigned map_num, offs_t offset, u8 data)
+{
+	u8 const entry = ((offset >> 8) & 0xf8) | (map_num & 0x07);
+	u8 const lo = m_map_lo[entry];
+	u8 const hi = m_map_hi[entry];
+
+	u32 const address = u32(hi & MAPWR1_MA19) << 15 | u32(lo) << 11 | (offset & 0x7ff);
+
+	// TODO: suppress write-protected accesses
+
+	if (hi & MAPWR1_RESB)
+	{
+		// TODO: use address space to decode resident bus
+		switch (address & 0xf000)
+		{
+		case 0x2000:
+			m_sram[address & 0x7ff] = data;
+			break;
+		default:
+			LOG("map_w hi 0x%02x lo 0x%02x address 0x%05x data 0x%02x (%s)\n", hi, lo, address, data, machine().describe_context());
+			break;
+		}
+	}
+	else
+		m_bus->space((hi & MAPWR1_MEM) ? AS_PROGRAM : AS_IO).write_byte(address, data);
+}
+
+void labtam_z80sbc_device::drive_w(offs_t offset, u8 data)
+{
+	LOG("drive_w %s drive %d (%s)\n", data ? "select" : "deselect", offset, machine().describe_context());
+
+	if (data)
+	{
+		m_drive = offset;
+		m_fdc->enmf_w(BIT(m_e21->read(), offset));
+		m_fdc->set_floppy(m_fdd[*m_drive]->get_device());
+	}
+	else
+	{
+		m_drive.reset();
+		m_fdc->set_floppy(nullptr);
+	}
 }
 
 void labtam_z80sbc_device::fdcclr_w(u8 data)
@@ -395,10 +470,25 @@ void labtam_z80sbc_device::netclr_w(u8 data)
 void labtam_z80sbc_device::fdcattn_w(u8 data)
 {
 	LOG("fdcattn_w 0x%02x (%s)\n", data, machine().describe_context());
+	m_uic->ireq4_w(1);
 }
 
 u8 labtam_z80sbc_device::fdcstatus_r()
 {
 	LOG("fdcstatus_r (%s)\n", machine().describe_context());
 	return 0x3c;
+}
+
+u8 labtam_z80sbc_device::drvstatus_r()
+{
+	u8 data = m_e21->read();
+
+	// TODO: read selected floppy twosid_r()
+#if 0
+	floppy_image_device *fid = m_fdd[*m_drive]->get_device();
+	if (fid && !fid->twosid_r())
+		data |= DRVSTATUS_SS;
+#endif
+
+	return data;
 }

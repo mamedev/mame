@@ -37,14 +37,22 @@ private:
 	void cpu_mem(address_map &map);
 	void cpu_pio(address_map &map);
 
-	u8 map_r(offs_t offset);
-	void map_w(offs_t offset, u8 data);
+	// cpu memory handlers
+	u8 mem_r(offs_t offset);
+	void mem_w(offs_t offset, u8 data);
+
+	// memory mapping handlers
+	u8 map_r(unsigned map_num, offs_t offset);
+	void map_w(unsigned map_num, offs_t offset, u8 data);
+	template <unsigned M> u8 map_r(offs_t offset) { return map_r(M, offset); }
+	template <unsigned M> void map_w(offs_t offset, u8 data) { map_w(M, offset, data); }
 
 	void drive_w(offs_t offset, u8 data);
 	void fdcclr_w(u8 data);
 	void netclr_w(u8 data);
 	void fdcattn_w(u8 data);
 	u8 fdcstatus_r();
+	u8 drvstatus_r();
 
 	required_device<z80_device> m_cpu;
 	required_device<am9513_device> m_stc;
@@ -58,11 +66,8 @@ private:
 
 	optional_region_ptr_array<u8, 2> m_eprom;
 
-	required_ioport m_ram0_select;
-	required_ioport m_ram1_select;
-	required_ioport m_pio0_select;
-	required_ioport m_pio1_select;
-	required_ioport m_pio2_select;
+	required_ioport_array<5> m_e15; // multibus address assignments
+	required_ioport m_e21;          // floppy drive option selection
 
 	std::unique_ptr<u8[]> m_ram0;
 	std::unique_ptr<u8[]> m_ram1;
@@ -74,7 +79,7 @@ private:
 	bool m_map_enabled;
 	u8 m_map_num;
 
-	u8 m_drvstatus;
+	std::optional<u8> m_drive;
 
 	bool m_installed;
 };
