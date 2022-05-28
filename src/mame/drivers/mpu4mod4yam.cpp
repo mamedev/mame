@@ -7,43 +7,27 @@
 
 INPUT_PORTS_EXTERN( mpu4 );
 
+namespace {
+
+class mpu4mod4yam_machines_state : public mpu4_state
+{
+public:
+
+	mpu4mod4yam_machines_state(const machine_config &mconfig, device_type type, const char *tag) :
+		mpu4_state(mconfig, type, tag)
+	{
+	}
+
+	void init_m4addr();
+	void mod4yam_m4addr(machine_config &config);
+	void mod4yam_gambal(machine_config &config);
+};
 
 #include "gamball.lh"
 #include "m4addr.lh"
 
 
-void mpu4_state::init_m4_debug_mod4yam()
-{
-	init_m4default();
-
-	// many original barcrest / bwb sets have identification info around here
-	// this helps with sorting
-	uint8_t *src = memregion( "maincpu" )->base();
-	int size = memregion( "maincpu" )->bytes();
-
-	for (int j = 0; j < size; j += 0x10000)
-	{
-		if (size > 0x10000) printf("\nblock 0x%06x:\n",j);
-		printf("\ncopyright string:\n");
-		for (int i = 0xffe0; i < 0xfff0; i++)
-		{
-			printf("%c", src[j+i]);
-		}
-		printf("\n\nidentification string:\n");
-		for (int i = 0xff28; i < 0xff30; i++)
-		{
-			printf("%c", src[j+i]);
-		}
-		printf("\n");
-	}
-}
-
-void mpu4_state::init_m4_showstring_mod4yam()
-{
-	init_m4_debug_mod4yam();
-	init_m4debug();
-}
-
+}; // anonymous namespace
 
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 
@@ -55,7 +39,7 @@ void mpu4_state::init_m4_showstring_mod4yam()
 *****************************************************************************************************************************************************************************/
 
 
-void mpu4_state::init_m4addr()
+void mpu4mod4yam_machines_state::init_m4addr()
 {
 	//Derived from Adders_&_Ladders_(Barcrest)_[C03_800_6jp].gam
 	init_m4default();
@@ -117,7 +101,7 @@ INPUT_PORTS_END
 
 static uint8_t m4addr_lamp_scramble[8] = { 0x00, 0x60, 0x60, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
-void mpu4_state::mod4yam_m4addr(machine_config &config)
+void mpu4mod4yam_machines_state::mod4yam_m4addr(machine_config &config)
 {
 	mod4yam(config);
 	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
@@ -133,7 +117,7 @@ void mpu4_state::mod4yam_m4addr(machine_config &config)
 		ROM_REGION( 0x10000, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAMEL( year, setname, parent, mod4yam_m4addr, m4addr, mpu4_state, init_m4addr, ROT0, company, title, flags, layout_m4addr )
+	GAMEL( year, setname, parent, mod4yam_m4addr, m4addr, mpu4mod4yam_machines_state, init_m4addr, ROT0, company, title, flags, layout_m4addr )
 
 // sequence 00 60 60 44 e0 e8 1c 74 a4 6c 14 84 e8 1c f4 (same as Luxor / Prize Luxor?)
 // "(C)1991 BARCREST"  and "A6L 0.1"
@@ -238,7 +222,7 @@ GAME_CUSTOM( 199?, m4addrc__n,   m4addr, "nik56c",                           0x0
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ADDRCC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_chr, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4yam_chr, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // REEL A SETUP ALM
 
@@ -263,7 +247,7 @@ GAME_CUSTOM( 199?, m4addrcc__d,    m4addrcc,   "adrscfm", 0x0000, 0x010000, CRC(
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr_lv, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4yam_cheatchr_lv, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // 00 14 04 94 c8 68 a0 50 8c e8 e0 dc (same as some Crystal Maze etc. sets)
 GAME_CUSTOM( 199?, m4cojok,     0,          "cojx.p1",      0x0000, 0x010000, CRC(a9c0aefb) SHA1(c5b367a01ddee2cb90e266f1e62459b9b96eb3e3), "Barcrest","Carry On Joker (Barcrest) (MPU4) (set 1)" )
@@ -426,7 +410,7 @@ INPUT_PORTS_END
 
 static uint8_t m4gambal_lamp_scramble[8] = { 0x00, 0x18, 0x08, 0x10, 0x00, 0x18, 0x08, 0x00 };
 
-void mpu4_state::mod4yam_gambal(machine_config &config)
+void mpu4mod4yam_machines_state::mod4yam_gambal(machine_config &config)
 {
 	mod4yam(config);
 	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
@@ -442,7 +426,7 @@ void mpu4_state::mod4yam_gambal(machine_config &config)
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAMEL( year, setname, parent, mod4yam_gambal, mpu4, mpu4_state, init_m4gambal, ROT0, company, title, MACHINE_REQUIRES_ARTWORK | MACHINE_MECHANICAL, layout_gamball )
+	GAMEL( year, setname, parent, mod4yam_gambal, mpu4, mpu4mod4yam_machines_state, init_m4gambal, ROT0, company, title, MACHINE_REQUIRES_ARTWORK | MACHINE_MECHANICAL, layout_gamball )
 
 // 00 0c 50 90 b0 38 d4 a0
 GAME_CUSTOM( 199?, m4gambal,       0,          "gbbx.p1",  0x0000, 0x010000, CRC(0b5adcd0) SHA1(1a198bd4a1e7d6bf4cf025c43d35aaef351415fc), "Barcrest","Gamball (Barcrest) (MPU4) (set 1)" )
@@ -463,7 +447,7 @@ GAME_CUSTOM( 199?, m4gambal__c,    m4gambal,   "gbll20-6", 0x0000, 0x010000, CRC
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // boot, need proper lamp descramble
 
@@ -485,7 +469,7 @@ GAME_CUSTOM( 199?, m4graff__b,  m4graff,    "graxc.p1", 0x0000, 0x010000, CRC(76
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // boot, need proper lamp descramble
 
@@ -534,7 +518,7 @@ GAME_CUSTOM( 1996, m4montezg,   m4monte,    "mx_25_bc.3_1", 0x0000, 0x010000, CR
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // boot, need proper lamp descramble
 // 00 50 40 14 4c 80 34 44 5c 9c 9c 9c dc 9c dc
@@ -583,7 +567,7 @@ GAME_CUSTOM( 199?, m4przmc__s,    m4przmc,   "mti10___.4o1", 0x0000, 0x010000, C
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // boot, need proper lamp descramble
 
@@ -610,7 +594,7 @@ GAME_CUSTOM( 199?, m4nudbnk__d,    m4nudbnk,   "sbnx.p1",  0x0000, 0x010000, CRC
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // boot, need proper lamp descramble
 
@@ -649,7 +633,7 @@ GAME_CUSTOM( 199?, m4sss__l,  m4sss,  "sxi10___.2_1",     0x0000, 0x010000, CRC(
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // boot, need proper lamp descramble
 
@@ -703,7 +687,7 @@ GAME_CUSTOM( 199?, m4przsss__1,    m4przsss,   "sspc.p1",      0x0000, 0x010000,
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // boot, need proper lamp descramble
 
@@ -754,7 +738,7 @@ GAME_CUSTOM( 199?, m4ra__r,    m4ra,   "redx_20_.8",   0x0000, 0x010000, CRC(b5e
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // boot, need proper lamp descramble
 
@@ -782,7 +766,7 @@ GAME_CUSTOM( 199?, m4sayno__c,  m4sayno,    "snm 6.bin",            0x0000, 0x01
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // 00 90 c0 54 8c 68 24 90 cc 6c 24 9c bc 34 88
 // (C)1995  B.W.B. and AE5 3.0
@@ -839,7 +823,7 @@ GAME_CUSTOM( 199?, m4acechs__s,    m4acechs,   "aei10___.2_3", 0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SUPST_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_chr, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4yam_chr, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // boot
 GAME_CUSTOM( 199?, m4supst__au, m4supst,    "sp8b.p1",              0x0000, 0x010000, CRC(3b12d7e8) SHA1(92a15e5f8391d74c192e8386abdb8853a76bff05), "Barcrest","Super Streak (Barcrest) (MPU4) (SP8 0.1, set 1)" )
@@ -904,7 +888,7 @@ GAME_CUSTOM( 199?, m4supst__ah, m4supst,    "csu03y.p1",            0x0000, 0x01
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr_lv, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4yam_cheatchr_lv, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 
 
@@ -944,7 +928,7 @@ GAME_CUSTOM( 199?, m4supst__b4, m4supst,    "superstreak1deb.bin",  0x0000, 0x01
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SUPST_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr_tri98, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4yam_cheatchr_tri98, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // different CHR - hopper
 // 00 84 94 3c ec 5c ec 50 2c 68 60 ac
@@ -1006,7 +990,7 @@ GAME_CUSTOM( 199?, m4supst__b5, m4supst,    "supst2515",            0x0000, 0x01
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // 00 a0 a8 18 f4 2c 70 60 e4 e8 58 d4 2c 50 60 80 8c 7c
 GAME_CUSTOM( 199?, m4fastfw,       0,          "ffo05__1.0",   0x0000, 0x010000, CRC(8b683969) SHA1(7469b551e4d6f65550d54ee39b2bac07cf3dbd4b), "Bwb / Barcrest","Fast Forward (Barcrest) (MPU4) (set 1)" )
@@ -1040,7 +1024,7 @@ GAME_CUSTOM( 199?, m4fastfw__f,    m4fastfw,   "fastf206",     0x0000, 0x010000,
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr_vivlv, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4yam_cheatchr_vivlv, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // "(C)1991 BARCREST" and "VLV 1.1"
 GAME_CUSTOM( 199?, m4vivalv,       0,          "vlvs.p1",                      0x0000, 0x010000, CRC(b7fb3e19) SHA1(c6cc4175f8c100fc37e6e7014b0744054b4e547a), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (VLV 1.1, set 7)" )
@@ -1060,7 +1044,7 @@ GAME_CUSTOM( 199?, m4vivalv__h,    m4vivalv,   "viva206",                      0
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // 00 c0 e0 b0 38 c4 f0 30 58 9c 9c 9c dc 9c
 // (C)1993  B.W.B. and "VL_ 2.0" - boots with cheatchr
@@ -1115,7 +1099,7 @@ GAME_CUSTOM( 199?, m4vivalv__8,    m4vivalv,   "vegas15t",                     0
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr_m407, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4yam_cheatchr_m407, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // expects chr sequence starting 00 e0 a8 38 94 48 50 60 e4 e8 58 f0
 // "(C)1993  B.W.B." and "HVP 3.0"
@@ -1143,7 +1127,7 @@ GAME_CUSTOM( 199?, m4shv__w,    m4shv,   "hvi05___.3o3",         0x0000, 0x01000
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // expects chr sequence starting 00 90 18 e4 a8 3c f4 48 74 50 20 f0 18 e4 98 e4  (same as some Spend Spend Spend)
 // "(C)1991 BARCREST" and "H6Y 0.3"
@@ -1195,7 +1179,7 @@ GAME_CUSTOM( 199?, m4shv__12,   m4shv,   "hypv_20_.4",           0x0000, 0x01000
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // 00 c0 c8 1c f4 68 14 50 70 50 20 f0 48 34 60 80 a8
 // "(C)1991 BARCREST" and "HPC 0.5"
@@ -1218,7 +1202,7 @@ GAME_CUSTOM( 199?, m4hypclb__b,    m4hypclb,   "hpcfd.p1", 0x0000, 0x010000, CRC
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // some of these ROMs (the non-D ones?) contain a 'Barcrest Video' string, why? there's no footage to support it being a video game
 
@@ -1301,21 +1285,21 @@ ROM_START( m4voodoo )
 	ROM_LOAD( "ddo32", 0x0000, 0x010000, CRC(260dfef1) SHA1(2b4918e40808963a86d289cd251740a9b0bed70a) )
 ROM_END
 
-GAME(198?, m4tst, 0, mod4yam, mpu4, mpu4_state, init_m4default, ROT0,"Barcrest","MPU4 Unit Test (Program 4)",MACHINE_MECHANICAL )
+GAME(198?, m4tst, 0, mod4yam, mpu4, mpu4mod4yam_machines_state, init_m4default, ROT0,"Barcrest","MPU4 Unit Test (Program 4)",MACHINE_MECHANICAL )
 
 // 00 84 94 3c ec 5c ec 50 2c 68 60 ac 74 00 ac 58 ec
-GAME(199?, m4stc,     0,        mod4yam_cheatchr, mpu4, mpu4_state, init_m4default,  ROT0,   "Barcrest","unknown MPU4 'STC 0.1' (Barcrest) (MPU4)",GAME_FLAGS) // Hopper
+GAME(199?, m4stc,     0,        mod4yam_cheatchr, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","unknown MPU4 'STC 0.1' (Barcrest) (MPU4)",GAME_FLAGS) // Hopper
 
 // 00 84 8c b8 74 80 1c b4 d8 74 00 d4 c8 78 a4
-GAME(199?, m4joljokd, m4joljok, mod4yam_cheatchr, mpu4, mpu4_state, init_m4default,  ROT0,   "Barcrest","Jolly Joker (Barcrest) [Dutch] (MPU4) (DJJ)",GAME_FLAGS) // Geen Tubes
+GAME(199?, m4joljokd, m4joljok, mod4yam_cheatchr, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Jolly Joker (Barcrest) [Dutch] (MPU4) (DJJ)",GAME_FLAGS) // Geen Tubes
 
 // 00 84 a4 ac 70 80 2c c0 bc 5c 5c 5c dc 5c
-GAME(199?, m4clbshf,  0,        mod4yam_cheatchr_shuffle, mpu4, mpu4_state, init_m4default,  ROT0,   "Barcrest","Club Shuffle (Barcrest) (MPU4)",GAME_FLAGS) // set stake (runs if you do)
+GAME(199?, m4clbshf,  0,        mod4yam_cheatchr_shuffle, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Club Shuffle (Barcrest) (MPU4)",GAME_FLAGS) // set stake (runs if you do)
 
 // 00 50 40 14 4c 80 34 44 5c 9c 9c 9c dc 9c dc 94
-GAME(199?, m4voodoo,  0,        mod4yam_cheatchr, mpu4, mpu4_state, init_m4default,  ROT0,   "Barcrest","Voodoo 1000 (Barcrest) (Dutch) (MPU4) (DDO 3.2)",GAME_FLAGS ) // ROL F SETUP ALM
+GAME(199?, m4voodoo,  0,        mod4yam_cheatchr, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Voodoo 1000 (Barcrest) (Dutch) (MPU4) (DDO 3.2)",GAME_FLAGS ) // ROL F SETUP ALM
 
 // 00 c0 d0 38 ec 5c ec 14 68 2c 24 e8 74 00 e8 14
-GAME(199?, m4graffd,  m4graff,  mod4yam_cheatchr, mpu4, mpu4_state, init_m4default,  ROT0,   "Barcrest","Grafitti (Barcrest) [Dutch] (MPU4)",GAME_FLAGS ) // ROL D SETUP ALM
+GAME(199?, m4graffd,  m4graff,  mod4yam_cheatchr, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Grafitti (Barcrest) [Dutch] (MPU4)",GAME_FLAGS ) // ROL D SETUP ALM
 
-GAME(199?, m4sstrek,  m4supst,  mod4yam,          mpu4, mpu4_state, init_m4default,  ROT0,   "bootleg","Super Streak (bootleg) (MPU4) (SS2 1.0)",GAME_FLAGS) // unprotected, no characteriser PAL required
+GAME(199?, m4sstrek,  m4supst,  mod4yam,          mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "bootleg","Super Streak (bootleg) (MPU4) (SS2 1.0)",GAME_FLAGS) // unprotected, no characteriser PAL required

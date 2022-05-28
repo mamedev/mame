@@ -166,16 +166,8 @@ public:
 	void init_m4tst();
 	void init_m_ccelbr();
 	void init_m4gambal();
-	void init_m4_showstring_mod4yam();
-	void init_m4_debug_mod4yam();
-	void init_m4_showstring_mod2();
-	void init_connect4();
+
 	void init_m4altreels();//legacy, will be removed once things are sorted out
-	void init_m4actclb();
-	void init_m4actpak();
-	void init_m4addr();
-	void init_m4alladv();
-	void init_m4alpha();
 	void init_m4apachg();
 
 	void bwboki(machine_config &config);
@@ -261,9 +253,6 @@ public:
 	void mpu4_type4_7reel(machine_config &config);
 	void mpu4_bwb_7reel(machine_config &config);
 	void mpu4base(machine_config &config);
-
-	void mod4yam_m4addr(machine_config &config);
-	void mod4yam_gambal(machine_config &config);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param) override;
