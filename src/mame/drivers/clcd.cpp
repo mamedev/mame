@@ -411,12 +411,13 @@ public:
 
 	void via0_pb_w(uint8_t data)
 	{
+		write_key_poll(BIT(data, 0));
+		m_rtc->cs2_w(BIT(data, 1));
 		m_iec->host_atn_w(!BIT(data, 3));
 		m_iec->host_clk_w(!BIT(data, 4));
 		m_iec->host_data_w(!BIT(data, 5));
 
-		write_key_poll((data >> 0) & 1);
-		m_rtc->cs2_w((data >> 1) & 1);
+		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(2000));
 	}
 
 	WRITE_LINE_MEMBER(write_key_poll)
