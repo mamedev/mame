@@ -261,7 +261,7 @@ ROM_START( m4rckrolb )
 	ROM_LOAD( "rocksnd.bin", 0x0000, 0x080000, CRC(c3e96650) SHA1(71952267d3149786cfef1dd49cc070664bb007a4) )
 ROM_END
 
-}; // anonymous namespace
+} // anonymous namespace
 
 
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)

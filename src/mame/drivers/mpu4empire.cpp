@@ -25,7 +25,7 @@ public:
 
 #include "m4apachg.lh"
 
-}; // anonymous namespace
+} // anonymous namespace
 
 
 

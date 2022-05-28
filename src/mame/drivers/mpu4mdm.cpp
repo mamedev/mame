@@ -427,7 +427,7 @@ ROM_START( m4ewshft )
 	ROM_LOAD( "each_way_shifter-snd2.bin", 0x080000, 0x080000, CRC(e3ce5ec5) SHA1(9c7eefa4042b1b1aca3d0fbefcad10db34992c43) )
 ROM_END
 
-}; // anonymous namespace
+} // anonymous namespace
 
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 

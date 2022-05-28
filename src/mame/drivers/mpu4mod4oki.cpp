@@ -7,101 +7,110 @@
 
   Currently in this file:
 
+  	Regular Machines
+	------------
+
+	10 X 10
+	Action Bank
 	Andy Capp
 	Andy Capp (Dutch game)
 	Andy Loves Flo
-	Duty Free
-	Showcase Duty Free
-	Prize Duty Free
-	Road Hog
-	Andy's Great Escape
-	Dennis The Menace
-	The Crystal Maze
-	Showcase Crystal Maze
-	Cash Machine
-	Top Tenner
-	Ten Out Of Ten
-	Everyone's A Winner
-	Winner Takes All
-	Prize Winner Takes All
-	Let The Good Times Roll
-	Jackpot Gems
-	Jackpot Gems Classic
-	Jolly Gems
-	Hit The Top
-	Nudge Nudge Wink Wink Classic
-	Run For Your Money
-	Prize Run For Your Money
-	Ready Steady Go
-	Magnificent 7s
-	Make A Mint
-	Viva Espana
-	Viva Espana Showcase
-	Prize Viva Espana
-	Pot Black
-	Place Your Bets
-	Cloud Nine
-	Tutti Fruity
-	Cash Attack
-	Red Hot Roll (Classic?)
-	Up Up and Away
-	Rich & Famous
-	Prize Rich And Famous
-	Viz
-	Take Your Pick
-	Over The Moon
-	Luxor
-	Prize Luxor
-	Hi Jinx
-	Cash Lines
-	Lucky Las Vegas
-	Lucky Las Vegas Classic
-	Lucky Strike
-	10 X 10
 	Andy's Full House
-	Boulder Dash
-	Prize Money
-	Prize Money Showcase
-	Prize High Roller
-	Give Us A Clue
-	Vegas Strip
-	Hot Rod
-	Buccaneer
-	Jewel In the Crown
+	Andy's Great Escape
 	Bagatelle
 	Berserk
-	Ten Ten Do It Again
-	Action Bank
-	Crystal Dome
-	Rocket Money
-	Mad House
-	New Hit the Top
-	Prize Fruit & Loot
-	Prize What's On
-	Road Hog 2 - I'm Back
-	Lucky Strike Club
-	Top Dog
-	Kings & Queens
-	Kings & Queens Classic
-	Take Your Pick Club
-	Andy's Big Time Club
-	The Streak
+	Boulder Dash
+	Buccaneer
+	Cash Attack
+	Cash Encounters
+	Cash Lines
+	Cash Machine
+	Cloud Nine
 	Copy Cat
+	Cosmic Casino
+	Dennis The Menace
+	Duty Free
+	Duty Free (Prize version)
+	Duty Free (Showcase version)
+	Everyone's A Winner
+	Fruit & Loot (Prize version)
+	Games Bond 006
+	Give Us A Clue
+	Hi Jinx
+	High Roller (Prize version)
+	Hit The Top
+	Hot Rod
+	Jackpot Gems
+	Jackpot Gems (Classic)
+	Jewel In the Crown
+	Jolly Gems
+	Kings & Queens
+	Kings & Queens (Classic)
+	Let The Good Times Roll
+	Lucky Las Vegas
+	Lucky Las Vegas (Classic)
+	Lucky Strike
+	Lucky Strike Club
+	Luxor
+	Luxor (Prize version)
+	Mad House
+	Magnificent 7s
+	Make A Mint
+	New Hit the Top
+	Nudge Nudge Wink Wink (Classic)
+	Ooh Aah Dracula
+	Over The Moon
+	Place Your Bets
+	Pot Black
+	Prize Money
+	Prize Money (Showcase version)
+	Prize Run For Your Money
+	Ready Steady Go
+	Red Hot Roll (Classic?)
+	Rich & Famous
+	Rich & Famous (Prize version)
+	Road Hog
+	Road Hog 2 - I'm Back
+	Rocket Money
+	Rocky Horror Show
+	Run For Your Money
+	Squids In
+	Super Streak (Classic)
+	Take Your Pick
+	Ten Out Of Ten
+	Ten Ten Do It Again
+	The Crystal Dome
+	The Crystal Maze
+	The Crystal Maze (Showcase version)
+	The Streak
+	Tic Tac Toe
+	Tic Tac Toe (Classic)
+	Tic Tac Toe (Gold)
+	Top Dog
+	Top Tenner
+	Tutti Fruity
+	Up Up and Away
+	Vegas Strip
+	Viva Espana
+	Viva Espana (Prize version)
+	Viva Espana (Showcase versino)
+	Viz
+	What's On (Prize version)
+	Winner Takes All
+	Winner Takes All (Prize version)	
+
+	Club Machines
+	------------
+	club machines have 4 reels and different gameplay compared to non-club machines
+
+	Andy's Big Time Club
 	Bank Roller Club
+	Calamari Club
+	Double Diamond Club
 	Red Hot Roll Club
 	Road Hog Club
-	Games Bond 006
-	Cash Encounters
-	Rocky Horror Show
-	Ooh Aah Dracula
-	Tic Tac Toe
-	Tic Tac Toe Classic
-	Tic Tac Toe Gold
-	Super Streak Classic
-	Squids In
-	Calamari Club
-	Cosmic Casino
-	Double Diamond Club
+	Take Your Pick Club
+
 
 	---------
 
@@ -123,6 +132,9 @@ INPUT_PORTS_EXTERN( mpu4 );
 INPUT_PORTS_EXTERN( grtecp );
 INPUT_PORTS_EXTERN( mpu4jackpot8tkn );
 INPUT_PORTS_EXTERN( mpu4jackpot8per );
+INPUT_PORTS_EXTERN( mpu4jackpot8tkn20p );
+INPUT_PORTS_EXTERN( mpu4jackpot8tkn20p90pc );
+
 
 namespace {
 
@@ -154,7 +166,7 @@ public:
 #include "m4andyge.lh"
 #include "m4tenten.lh"
 
-}; // anonymous namespace
+} // anonymous namespace
 
 /* Explanation of automatically generated descriptions
 
@@ -6079,7 +6091,10 @@ GAME_CUSTOM( 199?, m4actbnk__i,    m4actbnk,   "actad.p1", 0x0000, 0x010000, CRC
 
 /*****************************************************************************************************************************************************************************
 *
-* Crystal Dome
+* The Crystal Dome
+* a version of 'The Crystal Maze' without 'The Crystal Maze' title?
+*
+* - these all require a Jackpot Key and Stake to be set, valid combinations not confirmed outside of 8GBP Token / 20p
 * 
 *****************************************************************************************************************************************************************************/
 
@@ -6088,37 +6103,36 @@ GAME_CUSTOM( 199?, m4actbnk__i,    m4actbnk,   "actad.p1", 0x0000, 0x010000, CRC
 	ROM_LOAD( "cd2snd.p1", 0x000000, 0x080000, CRC(65a2dc92) SHA1(2c55a858ab17325189bed1974daf708c380541de) ) \
 	ROM_LOAD( "cd2snd.p2", 0x080000, 0x080000, CRC(b1bb4678) SHA1(8e8ab0a8d1b3e70dcb56d071193fdb5f34af7d14) )
 #undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+#define GAME_CUSTOM(year, setname,parent,inputs,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4CRDOME_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr_tri98, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_tri98, inputs, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
 
-// boots with 20p / 8GBP Token Jackpot setup
-// 
+
 // "(C)1993 BARCREST" and "CD2 1.2"
-GAME_CUSTOM( 199?, m4crdome,       0,          "cd212s.p1",    0x0000, 0x020000, CRC(f7d9d5e3) SHA1(1378e28c0a2c59a42a440502f20cc011625f43b5), "Barcrest","Crystal Dome (Barcrest) (MPU4) (CD2 1.2)" )
-GAME_CUSTOM( 199?, m4crdome__j,    m4crdome,   "cd212k.p1",    0x0000, 0x020000, CRC(673b10a1) SHA1(996ade8193f448970beea2c5b81d9f27c05f162f), "Barcrest","Crystal Dome (Barcrest) (MPU4) (CD2 1.2 K)" )
-GAME_CUSTOM( 199?, m4crdome__a,    m4crdome,   "cd212c.p1",    0x0000, 0x020000, CRC(1ab605e5) SHA1(03327b2fac9d3d2891dc5950aa89ac4947c7b444), "Barcrest","Crystal Dome (Barcrest) (MPU4) (CD2 1.2 C)" )
-GAME_CUSTOM( 199?, m4crdome__b,    m4crdome,   "cd212ad.p1",   0x0000, 0x020000, CRC(c76cab39) SHA1(abbe5d629929ff89b499cd4d0e15e9fa13fc33de), "Barcrest","Crystal Dome (Barcrest) (MPU4) (CD2 1.2 AD)" )
-GAME_CUSTOM( 199?, m4crdome__c,    m4crdome,   "cd212b.p1",    0x0000, 0x020000, CRC(2dfcb8f7) SHA1(ba711fb20556c447f4bb3a11fc1cc6a3599bfd6d), "Barcrest","Crystal Dome (Barcrest) (MPU4) (CD2 1.2 B)" )
-GAME_CUSTOM( 199?, m4crdome__d,    m4crdome,   "cd212bd.p1",   0x0000, 0x020000, CRC(4a7605fc) SHA1(2a8a327d6dce8f7be1938d5a3854594adf5c092c), "Barcrest","Crystal Dome (Barcrest) (MPU4) (CD2 1.2 BD)" )
-GAME_CUSTOM( 199?, m4crdome__e,    m4crdome,   "cd212d.p1",    0x0000, 0x020000, CRC(50e7b381) SHA1(58141910fbbc2624da737a2ba273b79a6da695d3), "Barcrest","Crystal Dome (Barcrest) (MPU4) (CD2 1.2 D)" )
-GAME_CUSTOM( 199?, m4crdome__f,    m4crdome,   "cd212dk.p1",   0x0000, 0x020000, CRC(00b1adaa) SHA1(ba089bf86fcc8817ae756ed5609aaf876d1ee5a5), "Barcrest","Crystal Dome (Barcrest) (MPU4) (CD2 1.2 KD)" )
-GAME_CUSTOM( 199?, m4crdome__g,    m4crdome,   "cd212dr.p1",   0x0000, 0x020000, CRC(b3be169b) SHA1(eb4699fdce371d94feec410c640bd49bfdccba98), "Barcrest","Crystal Dome (Barcrest) (MPU4) (CD2 1.2 RD)" )
-GAME_CUSTOM( 199?, m4crdome__h,    m4crdome,   "cd212dy.p1",   0x0000, 0x020000, CRC(87528d54) SHA1(974fa2c29af43c903add28dca0ea3b04f612d2f7), "Barcrest","Crystal Dome (Barcrest) (MPU4) (CD2 1.2 YD)" )
-GAME_CUSTOM( 199?, m4crdome__i,    m4crdome,   "cd212r.p1",    0x0000, 0x020000, CRC(d434ab90) SHA1(d42258bd965e8a028a418681a1307234c9b1c450), "Barcrest","Crystal Dome (Barcrest) (MPU4) (CD2 1.2 R)" )
-GAME_CUSTOM( 199?, m4crdome__k,    m4crdome,   "cd212y.p1",    0x0000, 0x020000, CRC(e0d8305f) SHA1(ddf1125eba0e470f6ae811fe050d4000300cfd0c), "Barcrest","Crystal Dome (Barcrest) (MPU4) (CD2 1.2 Y)" )
+GAME_CUSTOM( 199?, m4crdome,       0,          mpu4jackpot8tkn20p,    "cd212s.p1",    0x0000, 0x020000, CRC(f7d9d5e3) SHA1(1378e28c0a2c59a42a440502f20cc011625f43b5), "Barcrest","The Crystal Dome (Barcrest) (MPU4) (CD2 1.2)" )
+GAME_CUSTOM( 199?, m4crdome__j,    m4crdome,   mpu4jackpot8tkn20p,    "cd212k.p1",    0x0000, 0x020000, CRC(673b10a1) SHA1(996ade8193f448970beea2c5b81d9f27c05f162f), "Barcrest","The Crystal Dome (Barcrest) (MPU4) (CD2 1.2 K)" )
+GAME_CUSTOM( 199?, m4crdome__a,    m4crdome,   mpu4jackpot8tkn20p,    "cd212c.p1",    0x0000, 0x020000, CRC(1ab605e5) SHA1(03327b2fac9d3d2891dc5950aa89ac4947c7b444), "Barcrest","The Crystal Dome (Barcrest) (MPU4) (CD2 1.2 C)" )
+GAME_CUSTOM( 199?, m4crdome__b,    m4crdome,   mpu4jackpot8tkn20p,    "cd212ad.p1",   0x0000, 0x020000, CRC(c76cab39) SHA1(abbe5d629929ff89b499cd4d0e15e9fa13fc33de), "Barcrest","The Crystal Dome (Barcrest) (MPU4) (CD2 1.2 AD)" )
+GAME_CUSTOM( 199?, m4crdome__c,    m4crdome,   mpu4jackpot8tkn20p,    "cd212b.p1",    0x0000, 0x020000, CRC(2dfcb8f7) SHA1(ba711fb20556c447f4bb3a11fc1cc6a3599bfd6d), "Barcrest","The Crystal Dome (Barcrest) (MPU4) (CD2 1.2 B)" )
+GAME_CUSTOM( 199?, m4crdome__d,    m4crdome,   mpu4jackpot8tkn20p,    "cd212bd.p1",   0x0000, 0x020000, CRC(4a7605fc) SHA1(2a8a327d6dce8f7be1938d5a3854594adf5c092c), "Barcrest","The Crystal Dome (Barcrest) (MPU4) (CD2 1.2 BD)" )
+GAME_CUSTOM( 199?, m4crdome__e,    m4crdome,   mpu4jackpot8tkn20p,    "cd212d.p1",    0x0000, 0x020000, CRC(50e7b381) SHA1(58141910fbbc2624da737a2ba273b79a6da695d3), "Barcrest","The Crystal Dome (Barcrest) (MPU4) (CD2 1.2 D)" )
+GAME_CUSTOM( 199?, m4crdome__f,    m4crdome,   mpu4jackpot8tkn20p,    "cd212dk.p1",   0x0000, 0x020000, CRC(00b1adaa) SHA1(ba089bf86fcc8817ae756ed5609aaf876d1ee5a5), "Barcrest","The Crystal Dome (Barcrest) (MPU4) (CD2 1.2 KD)" )
+GAME_CUSTOM( 199?, m4crdome__g,    m4crdome,   mpu4jackpot8tkn20p,    "cd212dr.p1",   0x0000, 0x020000, CRC(b3be169b) SHA1(eb4699fdce371d94feec410c640bd49bfdccba98), "Barcrest","The Crystal Dome (Barcrest) (MPU4) (CD2 1.2 RD)" )
+GAME_CUSTOM( 199?, m4crdome__h,    m4crdome,   mpu4jackpot8tkn20p90pc,"cd212dy.p1",   0x0000, 0x020000, CRC(87528d54) SHA1(974fa2c29af43c903add28dca0ea3b04f612d2f7), "Barcrest","The Crystal Dome (Barcrest) (MPU4) (CD2 1.2 YD)" )
+GAME_CUSTOM( 199?, m4crdome__i,    m4crdome,   mpu4jackpot8tkn20p,    "cd212r.p1",    0x0000, 0x020000, CRC(d434ab90) SHA1(d42258bd965e8a028a418681a1307234c9b1c450), "Barcrest","The Crystal Dome (Barcrest) (MPU4) (CD2 1.2 R)" )
+GAME_CUSTOM( 199?, m4crdome__k,    m4crdome,   mpu4jackpot8tkn20p90pc,"cd212y.p1",    0x0000, 0x020000, CRC(e0d8305f) SHA1(ddf1125eba0e470f6ae811fe050d4000300cfd0c), "Barcrest","The Crystal Dome (Barcrest) (MPU4) (CD2 1.2 Y)" )
 // "(C)1993 BARCREST" and "CD2 1.0"
-GAME_CUSTOM( 199?, m4crdome__m,    m4crdome,   "cdome10",      0x0000, 0x020000, CRC(945c9277) SHA1(6afee54b332152f6767781a040799d865999b292), "Barcrest","Crystal Dome (Barcrest) (MPU4) (CD2 1.0 C)" )
+GAME_CUSTOM( 199?, m4crdome__m,    m4crdome,   mpu4jackpot8tkn20p,    "cdome10",      0x0000, 0x020000, CRC(945c9277) SHA1(6afee54b332152f6767781a040799d865999b292), "Barcrest","The Crystal Dome (Barcrest) (MPU4) (CD2 1.0 C)" )
 // "(C)1993 BARCREST" and "CD2 0.2"
-GAME_CUSTOM( 199?, m4crdome__n,    m4crdome,   "cdome8ac",     0x0000, 0x020000, CRC(0553bfe6) SHA1(77abfa556f04dca1be52fbed357807e6ada10458), "Barcrest","Crystal Dome (Barcrest) (MPU4) (CD2 0.2 C)" )
+GAME_CUSTOM( 199?, m4crdome__n,    m4crdome,   mpu4jackpot8tkn20p,    "cdome8ac",     0x0000, 0x020000, CRC(0553bfe6) SHA1(77abfa556f04dca1be52fbed357807e6ada10458), "Barcrest","The Crystal Dome (Barcrest) (MPU4) (CD2 0.2 C)" )
 
 // different protection
 // no copyright string and "CD2 1.2"
-GAME_CUSTOM( 199?, m4crdome__l,    m4crdome,   "cdom15r",      0x0000, 0x020000, CRC(28f9ee8e) SHA1(e3484933dd0b8ddc2eeefc4dc95ce5379565e750), "hack","Crystal Dome (Barcrest) (MPU4) (CD2 1.2, hack)" )
+GAME_CUSTOM( 199?, m4crdome__l,    m4crdome,   mpu4jackpot8tkn20p,    "cdom15r",      0x0000, 0x020000, CRC(28f9ee8e) SHA1(e3484933dd0b8ddc2eeefc4dc95ce5379565e750), "hack","The Crystal Dome (Barcrest) (MPU4) (CD2 1.2, hack)" )
 
 
 /*****************************************************************************************************************************************************************************

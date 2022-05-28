@@ -20,7 +20,7 @@ public:
 	}
 };
 
-}; // anonymous namespace
+} // anonymous namespace
 
 
 ROM_START( m4bangin )

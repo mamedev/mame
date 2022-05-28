@@ -767,7 +767,7 @@ ROM_START( m4ndupc )
 	M4NDUP_SOUND
 ROM_END
 
-}; // anonymous namespace
+} // anonymous namespace
 
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 

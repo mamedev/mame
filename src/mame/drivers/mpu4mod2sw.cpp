@@ -48,7 +48,7 @@ public:
 #include "m4alpha.lh"
 #include "connect4.lh"
 
-}; // anonymous namespace
+} // anonymous namespace
 
 
 

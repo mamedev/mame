@@ -2135,7 +2135,7 @@ ROM_START( m4eaw51 ) \
 	ROM_LOAD( "everyones a winner v2-5p", 0x08000, 0x008000, CRC(eb8f2fc5) SHA1(0d3614bd5ff561d17bef0d1e620f2f812b8fed5b))
 ROM_END
 
-}; // anonymous namespace
+} // anonymous namespace
 
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 

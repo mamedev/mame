@@ -26,7 +26,7 @@ public:
 	}
 };
 
-}; // anonymous namespace
+} // anonymous namespace
 
 
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)

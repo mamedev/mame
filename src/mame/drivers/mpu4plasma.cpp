@@ -191,7 +191,7 @@ ROM_START( m4elite )
 	M4ELITE_PLASMA
 ROM_END
 
-}; // anonymous namespace
+} // anonymous namespace
 
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 
