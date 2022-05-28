@@ -2816,23 +2816,31 @@ void mpu4_state::mod2(machine_config &config)
 	mpu4_std_6reel(config);
 }
 
-void mpu4_state::mod2_cheatchr(machine_config &config)
+void mpu4_state::mod2_cheatchr_table(machine_config &config, const uint8_t* table)
 {
 	mod2(config);
 	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
 	m_characteriser->set_cpu_tag("maincpu");
 	m_characteriser->set_allow_6809_cheat(true);
-//	m_characteriser->set_lamp_table(xxx_lamp_scramble);
+	m_characteriser->set_lamp_table(table);
+}
+
+void mpu4_state::mod2_cheatchr(machine_config &config)
+{
+	mod2_cheatchr_table(config, nullptr);
 }
 
 void mpu4_state::mod2_cheatchr_shuffle(machine_config &config)
 {
-	mod2(config);
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-	m_characteriser->set_cpu_tag("maincpu");
-	m_characteriser->set_allow_6809_cheat(true);
-	m_characteriser->set_lamp_table(mpu4_characteriser_pal::shuffle_lamp_scramble);
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::shuffle_lamp_scramble);
 }
+
+void mpu4_state::mod2_cheatchr_lv(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::m4lv_lamp_scramble);
+}
+
+// alt reel setup
 
 void mpu4_state::mod2_alt(machine_config &config)
 {
@@ -2845,21 +2853,23 @@ void mpu4_state::mod2_alt(machine_config &config)
 	mpu4_type2_6reel(config);
 }
 
-void mpu4_state::mod2_alt_cheatchr(machine_config &config)
+void mpu4_state::mod2_alt_cheatchr_table(machine_config &config, const uint8_t* table)
 {
 	mod2_alt(config);
 	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
 	m_characteriser->set_cpu_tag("maincpu");
 	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(table);
+}
+
+void mpu4_state::mod2_alt_cheatchr(machine_config &config)
+{
+	mod2_alt_cheatchr_table(config, nullptr);
 }
 
 void mpu4_state::mod2_alt_cheatchr_shuffle(machine_config &config)
 {
-	mod2_alt(config);
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-	m_characteriser->set_cpu_tag("maincpu");
-	m_characteriser->set_allow_6809_cheat(true);
-	m_characteriser->set_lamp_table(mpu4_characteriser_pal::shuffle_lamp_scramble);
+	mod2_alt_cheatchr_table(config, mpu4_characteriser_pal::shuffle_lamp_scramble);
 }
 
 /***********************************************************************************************
@@ -2935,6 +2945,11 @@ void mpu4_state::mod4yam_cheatchr_shuffle(machine_config &config)
 void mpu4_state::mod4yam_cheatchr_m574(machine_config &config)
 {
 	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::m574_lamp_scramble);
+}
+
+void mpu4_state::mod4yam_cheatchr_viva(machine_config &config)
+{
+	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::viva_lamp_scramble);
 }
 
 /***********************************************************************************************

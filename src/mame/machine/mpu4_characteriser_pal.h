@@ -84,7 +84,8 @@ public:
 	                                               //    00    38    30    18    14    3C    34    14
                                                    //    00    38    30    18    10    38    30    14
 
-   // games with sequence starting 00 c4 c4 44 c4 44 44 c4 cc 3c
+	// games with sequence starting 00 c4 c4 44 c4 44 44 c4 cc 3c
+	// this seems to be the same sequence as the MPU4 Video game 'Strike It Lucky' where we're having to use a 4k table for the question scramble
 	static constexpr uint8_t m462_lamp_scramble[8] = { 0x03, 0xC3, 0xC7, 0x4F, 0x47, 0xE7, 0xC7, 0x47 };
 	                                               //    04    44    44    48    40    60    40    40   rhog2
 

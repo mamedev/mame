@@ -173,9 +173,13 @@ public:
 
 	void mod2(machine_config &config);
 	void mod2_cheatchr(machine_config &config);
+	void mod2_cheatchr_table(machine_config &config, const uint8_t* table);
 	void mod2_cheatchr_shuffle(machine_config &config);
+	void mod2_cheatchr_lv(machine_config &config);
+
 	void mod2_alt(machine_config &config);
 	void mod2_alt_cheatchr(machine_config &config);
+	void mod2_alt_cheatchr_table(machine_config &config, const uint8_t* table);
 	void mod2_alt_cheatchr_shuffle(machine_config &config);
 
 	void mod4oki(machine_config &config);
@@ -227,6 +231,7 @@ public:
 	void mod4yam_cheatchr_m683(machine_config &config);
 	void mod4yam_cheatchr_shuffle(machine_config &config);
 	void mod4yam_cheatchr_vivlv(machine_config &config);
+	void mod4yam_cheatchr_viva(machine_config &config);
 	void mod4yam_chr(machine_config &config);
 
 	void mpu4_common(machine_config &config);
