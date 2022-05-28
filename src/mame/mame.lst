@@ -14816,6 +14816,7 @@ superbon                        // bootleg
 superg                          // hack
 supergs                         // Silver Systems hack
 supergx                         // [1980] Nichibutsu
+supershp                        // bootleg
 suprheli                        // bootleg
 swarm                           // hack
 tazmania                        // (c) 1982 Stern
@@ -23626,13 +23627,15 @@ tankbatl                        // (c) 1992 Microprose Games Inc.
 dm3270                          //
 
 @source:microdar.cpp
-dibifuca                        // (c) 199? Compumatic
-dibif743                        // (c) 199? Compumatic
-dibif727                        // (c) 199? Compumatic
 cfarwest                        // (c) 1997 Compumatic
-prospdp                         // (c) 1997 Compumatic
-diolakoa                        // (c) 1997 Compumatic
-diola827                        // (c) 1997 Compumatic
+covidarts                       // (c) 1997 Covielsa
+dibifpspdp                      // (c) 1997 Compumatic / Bifuca
+dibif727                        // (c) 199? Compumatic / Bifuca
+dibif743                        // (c) 199? Compumatic / Bifuca
+dibifuca                        // (c) 199? Compumatic / Bifuca
+diola827                        // (c) 1997 Compumatic / Olakoa
+diolakoa                        // (c) 1997 Compumatic / Olakoa
+minidart                        // (c) 2009 Compumatic
 
 @source:microdec.cpp
 md2                             //
@@ -42672,11 +42675,13 @@ invds                           // 367-382 (c) 1979 Sega
 invho2                          // 271-286 (c) 1979 Sega
 invho2a                         // 326-341 (c) 1979 Sega
 invinco                         // 310-318 (c) 1979 Sega
+nostromo                        // bootleg
 nsub                            // 268-275 (c) 1980 Sega
 pulsar                          // 790-805 (c) 1981 Sega
 safari                          // 57-66 [1977 Gremlin?]
 safaria                         // bootleg?
-samurai                         // 289-302 + upgrades (c) 1980 Sega
+samurai                         // 1217-1230 (c) Sega
+samuraij                        // 289-302 + upgrades (c) 1980 Sega
 spacetrk                        // 630-645 (c) 1980 Sega
 spacetrkc                       // (c) 1980 Sega
 sspacaho                        // ? epr00001.bin - epr00008.bin

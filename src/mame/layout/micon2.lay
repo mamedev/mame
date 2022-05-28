@@ -14,11 +14,11 @@ license:CC0
 		</rect>
 		<rect>
 			<bounds x="0" y="55.5" width="1" height="128" />
-			<color red="1" green="1" blue="1" />
+			<color red="1" green="1" blue="0.2" />
 		</rect>
 		<rect>
 			<bounds x="0" y="63.5" width="1" height="112" />
-			<color red="0.2" green="1" blue="1" />
+			<color red="0.2" green="1" blue="0.2" />
 		</rect>
 		<rect>
 			<bounds x="0" y="71.5" width="1" height="96" />

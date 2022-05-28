@@ -1326,6 +1326,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"kurzweil",
 		"kyber",
 		"kyocera",
+		"labtam",
 		"leapfrog",
 		"learsiegler",
 		"lsi",
