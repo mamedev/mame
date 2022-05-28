@@ -168,7 +168,6 @@ public:
 	void init_m4gambal();
 
 	void init_m4altreels();//legacy, will be removed once things are sorted out
-	void init_m4apachg();
 
 	void bwboki(machine_config &config);
 
