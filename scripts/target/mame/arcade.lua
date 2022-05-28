@@ -1453,9 +1453,9 @@ createMAMEProjects(_target, _subtarget, "barcrest")
 files {
 	MAME_DIR .. "src/mame/drivers/mpu2.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu3.cpp",
-	MAME_DIR .. "src/mame/machine/mpu4.cpp",
-	MAME_DIR .. "src/mame/includes/mpu4.h",
 	MAME_DIR .. "src/mame/drivers/mpu4.cpp",
+	MAME_DIR .. "src/mame/includes/mpu4.h",
+	MAME_DIR .. "src/mame/drivers/mpu4unsorted.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu4avan.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu4bwb.cpp",
 	MAME_DIR .. "src/mame/drivers/mpu4concept.cpp",

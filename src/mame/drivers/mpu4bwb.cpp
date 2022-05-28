@@ -40,14 +40,14 @@ INPUT_PORTS_EXTERN( mpu4 );
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BIGMT_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4_state, init_m4default ,ROT0,company,title,GAME_FLAGS )
 
 GAME_CUSTOM( 199?, m4bigmt,     0,          "bigm1320",     0x0000, 0x010000, CRC(a5085347) SHA1(93a7f7656e53461270e04190ff538959d6c917c1), "Bwb","The Big Match (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4bigmt__a,  m4bigmt,    "tb_20___.7_1", 0x0000, 0x010000, CRC(22fae0f0) SHA1(a875adccf96fbbff69f5fe76720514767cdcae66), "Bwb","The Big Match (Bwb) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4bigmt__b,  m4bigmt,    "tb_20_b_.7_1", 0x0000, 0x010000, CRC(40d140a3) SHA1(fd4de8dd827db933481f671e4f10684c3b7a363a), "Bwb","The Big Match (Bwb) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4bigmt__c,  m4bigmt,    "tb_20_d_.7_1", 0x0000, 0x010000, CRC(86ed18c5) SHA1(1699645532134bd830e3fc2c3ff4b67b5d67ba3e), "Bwb","The Big Match (Bwb) (MPU4) (set 4)" )
 GAME_CUSTOM( 199?, m4bigmt__d,  m4bigmt,    "tb_20_k_.7_1", 0x0000, 0x010000, CRC(e4c6b896) SHA1(ccf656d14ad68edb0aea99d4d3621540b899cdb7), "Bwb","The Big Match (Bwb) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4bigmt__e,  m4bigmt,    "tb______.1_2", 0x0000, 0x004000, CRC(be2a3989) SHA1(5ef857101335f90cd9f6147ec330ae281bb97b2b), "Bwb","The Big Match (Bwb) (MPU4) (set 6)" )
+//GAME_CUSTOM( 199?, m4bigmt__e,  m4bigmt,    "tb______.1_2", 0x0000, 0x004000, CRC(be2a3989) SHA1(5ef857101335f90cd9f6147ec330ae281bb97b2b), "Bwb","The Big Match (Bwb) (MPU4) (set 6)" ) // this is just a corrupt sound ROM with garbage after 0x2000
 GAME_CUSTOM( 199?, m4bigmt__f,  m4bigmt,    "tbi20___.7_1", 0x0000, 0x010000, CRC(104f45cc) SHA1(c28c08b44c46db9d0eade1f60aeda120c3981a03), "Bwb","The Big Match (Bwb) (MPU4) (set 7)" )
 
 
