@@ -57,6 +57,8 @@ license:CC0
 		<element name="reel6" ref="Steppers" state="0">
 			<bounds x="280" y="300" width="50" height="50"/>
 		</element>
+
+		<!-- standard lamps -->
 		<repeat count="16">
 			<param name="s" start="0" increment="8" />
 			<param name="x" start="0" increment="8" />
@@ -68,6 +70,20 @@ license:CC0
 				</element>
 			</repeat>
 		</repeat>
+
+		<!-- extender board lamps (not always used) -->
+		<repeat count="16">
+			<param name="s" start="128" increment="8" />
+			<param name="x" start="0" increment="8" />
+			<repeat count="8">
+				<param name="n" start="~s~" increment="1" />
+				<param name="y" start="80" increment="8" />
+				<element name="lamp~n~" ref="matrixlamp" state="0" blend="add">
+					<bounds x="~x~" y="~y~" width="7" height="7" />
+				</element>
+			</repeat>
+		</repeat>
+
 		<repeat count="8">
 			<param name="n" start="0" increment="1" />
 			<param name="x" start="300" increment="8" />

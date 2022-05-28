@@ -155,7 +155,6 @@ public:
 	void init_m4actbnk();
 	void init_m4andybt();
 
-	void mod4oki_crmaze(machine_config &config);
 };
 
 
@@ -1065,17 +1064,6 @@ GAME_CUSTOM( 199?, m4denmen_h3,    m4denmen,   "denm2010",                     0
 
 // boots
 
-static uint8_t m4crmaze_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // no lamp scramble?
-
-void mpu4mod4oki_machines_state::mod4oki_crmaze(machine_config &config)
-{
-	mod4oki(config);
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-	m_characteriser->set_cpu_tag("maincpu");
-	m_characteriser->set_allow_6809_cheat(true);
-	m_characteriser->set_lamp_table(m4crmaze_lamp_scramble);
-}
-
 
 #define M4CRMAZE_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
@@ -1121,7 +1109,7 @@ GAME_CUSTOM( 1993, m4crmaze__m,    m4crmaze,   "crystalmaze15.bin",    0x0000, 0
 		ROM_LOAD( name, offset, length, hash ) \
 		M4CRMAZE_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_crmaze, mpu4jackpot8tkn, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr, mpu4jackpot8tkn, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // different protection
 // roms below are a smaller size, have they been hacked to not use banking, or are they bad, they're all Bwb versions but all have the Barcrest at the end blanked out rather than replaced
@@ -1141,6 +1129,8 @@ GAME_CUSTOM( 199?, m4crmaze__s,    m4crmaze,   "cmaz58t",              0x0000, 0
 /*****************************************************************************************************************************************************************************
 *
 * Showcase Crystal Maze
+*
+* - these sets require both a Jackpot key and Stake key
 * 
 *****************************************************************************************************************************************************************************/
 
@@ -1150,27 +1140,27 @@ GAME_CUSTOM( 199?, m4crmaze__s,    m4crmaze,   "cmaz58t",              0x0000, 0
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
 	/* missing */
 #undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+#define GAME_CUSTOM(year, setname,parent,input,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SHOCM_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr_lv, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_lv, input, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
 
 // expects sequence starting 00 14 04 94 c8 68 a0 50 8c e8 e0 (same as regular Crystal Maze)
 // "(C)1993 BARCREST" and "SCM 0.1"
-GAME_CUSTOM( 199?, m4shocm,     0,          "scms.p1",  0x0000, 0x020000, CRC(8cb17f49) SHA1(6c67d5d65567ba3677f51f9c636e1f8e253111de), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (SCM 0.1)" )
-GAME_CUSTOM( 199?, m4shocm__a,  m4shocm,    "scmad.p1", 0x0000, 0x020000, CRC(0960b887) SHA1(02b029760d141664a7c5860a29b158d8c2dec4e7), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (SCM 0.1 AD)" )
-GAME_CUSTOM( 199?, m4shocm__b,  m4shocm,    "scmb.p1",  0x0000, 0x020000, CRC(c96e88cd) SHA1(61abff544c979efabf5e53d2c53d7cbe90c1f265), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (SCM 0.1 B)" )
-GAME_CUSTOM( 199?, m4shocm__c,  m4shocm,    "scmbd.p1", 0x0000, 0x020000, CRC(847a1642) SHA1(0bb6d2494888c5e45bf4bfd0f6ba123283346361), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (SCM 0.1 BD)" )
-GAME_CUSTOM( 199?, m4shocm__d,  m4shocm,    "scmd.p1",  0x0000, 0x020000, CRC(b47583bb) SHA1(ed7449764c03d1bd1a45a8891a7a4f9e73c1a9e6), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (SCM 0.1 D)" )
-GAME_CUSTOM( 199?, m4shocm__e,  m4shocm,    "scmdj.p1", 0x0000, 0x020000, CRC(a0af8091) SHA1(3b6a5e8825cdff40051630d26ca5654173482692), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (SCM 0.1 DJ)" )
-GAME_CUSTOM( 199?, m4shocm__f,  m4shocm,    "scmdk.p1", 0x0000, 0x020000, CRC(cebdbe14) SHA1(4da55b365d5eaf558c44eaee33b3ebdc6b6882fa), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (SCM 0.1 KD)" )
-GAME_CUSTOM( 199?, m4shocm__g,  m4shocm,    "scmdy.p1", 0x0000, 0x020000, CRC(495e9eea) SHA1(f10ff85e37538083919af1eec9dabfacd1ac524b), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (SCM 0.1 YD)" )
-GAME_CUSTOM( 199?, m4shocm__h,  m4shocm,    "scmj.p1",  0x0000, 0x020000, CRC(edbb1e1e) SHA1(9a6f4f17d138d7df76bc30a2b16e0bc6ee6149e6), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (SCM 0.1 J)" )
-GAME_CUSTOM( 199?, m4shocm__i,  m4shocm,    "scmy.p1",  0x0000, 0x020000, CRC(044a0065) SHA1(e5deb75e7d05787f1e820352aec99abebd3530b6), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (SCM 0.1 Y)" )
-GAME_CUSTOM( 199?, m4shocm__j,  m4shocm,    "scmk.p1",  0x0000, 0x020000, CRC(83a9209b) SHA1(011ecd85c435c02b4868ed74012e16c73beb6e99), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (SCM 0.1 K)" )
+GAME_CUSTOM( 199?, m4shocm,     0,          mpu4jackpot8tkn20p,    "scms.p1",  0x0000, 0x020000, CRC(8cb17f49) SHA1(6c67d5d65567ba3677f51f9c636e1f8e253111de), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (SCM 0.1)" )
+GAME_CUSTOM( 199?, m4shocm__a,  m4shocm,    mpu4jackpot8tkn20p,    "scmad.p1", 0x0000, 0x020000, CRC(0960b887) SHA1(02b029760d141664a7c5860a29b158d8c2dec4e7), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (SCM 0.1 AD)" )
+GAME_CUSTOM( 199?, m4shocm__b,  m4shocm,    mpu4jackpot8tkn20p,    "scmb.p1",  0x0000, 0x020000, CRC(c96e88cd) SHA1(61abff544c979efabf5e53d2c53d7cbe90c1f265), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (SCM 0.1 B)" )
+GAME_CUSTOM( 199?, m4shocm__c,  m4shocm,    mpu4jackpot8tkn20p,    "scmbd.p1", 0x0000, 0x020000, CRC(847a1642) SHA1(0bb6d2494888c5e45bf4bfd0f6ba123283346361), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (SCM 0.1 BD)" )
+GAME_CUSTOM( 199?, m4shocm__d,  m4shocm,    mpu4jackpot8tkn20p,    "scmd.p1",  0x0000, 0x020000, CRC(b47583bb) SHA1(ed7449764c03d1bd1a45a8891a7a4f9e73c1a9e6), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (SCM 0.1 D)" )
+GAME_CUSTOM( 199?, m4shocm__e,  m4shocm,    mpu4jackpot8tkn20p,    "scmdj.p1", 0x0000, 0x020000, CRC(a0af8091) SHA1(3b6a5e8825cdff40051630d26ca5654173482692), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (SCM 0.1 DJ)" )
+GAME_CUSTOM( 199?, m4shocm__f,  m4shocm,    mpu4jackpot8tkn20p,    "scmdk.p1", 0x0000, 0x020000, CRC(cebdbe14) SHA1(4da55b365d5eaf558c44eaee33b3ebdc6b6882fa), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (SCM 0.1 KD)" )
+GAME_CUSTOM( 199?, m4shocm__g,  m4shocm,    mpu4jackpot8tkn20p90pc,"scmdy.p1", 0x0000, 0x020000, CRC(495e9eea) SHA1(f10ff85e37538083919af1eec9dabfacd1ac524b), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (SCM 0.1 YD)" )
+GAME_CUSTOM( 199?, m4shocm__h,  m4shocm,    mpu4jackpot8tkn20p,    "scmj.p1",  0x0000, 0x020000, CRC(edbb1e1e) SHA1(9a6f4f17d138d7df76bc30a2b16e0bc6ee6149e6), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (SCM 0.1 J)" )
+GAME_CUSTOM( 199?, m4shocm__i,  m4shocm,    mpu4jackpot8tkn20p90pc,"scmy.p1",  0x0000, 0x020000, CRC(044a0065) SHA1(e5deb75e7d05787f1e820352aec99abebd3530b6), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (SCM 0.1 Y)" )
+GAME_CUSTOM( 199?, m4shocm__j,  m4shocm,    mpu4jackpot8tkn20p,    "scmk.p1",  0x0000, 0x020000, CRC(83a9209b) SHA1(011ecd85c435c02b4868ed74012e16c73beb6e99), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (SCM 0.1 K)" )
 
 
 /*****************************************************************************************************************************************************************************
@@ -2359,6 +2349,7 @@ GAME_CUSTOM( 199?, m4hittop__2,    m4hittop,   "hit04y.p1",    0x0000, 0x010000,
 //	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 //	ROM_LOAD( "m574.chr", 0x0000, 0x000048, CRC(cc4b7911) SHA1(9f8a96a1f8b0f9b33b852e93483ce5c684703349) )
 
+// 17ALM (need hopper, use Q to open door and run in demo mode)
 
 #define M4NNWW_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
@@ -3687,6 +3678,7 @@ GAME_CUSTOM( 199?, m4tutfrt__a5,   m4tutfrt,   "tui05___.1a3",         0x0000, 0
 * Cash Attack
 * 
 *****************************************************************************************************************************************************************************/
+
 
 #define M4CASHAT_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \

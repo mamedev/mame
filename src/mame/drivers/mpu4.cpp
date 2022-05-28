@@ -279,7 +279,7 @@ void mpu4_state::lamp_extend_large(int data,int column,int active)
 	{
 		m_card_live = 1;
 		//depending on bit 7, we can access one of two 'blocks' of 64 lamps
-		lampbase = bit7 ? 0 : 64;
+		lampbase = bit7 ? 64 : 0;
 		if ( data & 0x3f )
 		{
 			m_lamp_sense = 1;
