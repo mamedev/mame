@@ -1147,6 +1147,8 @@ void bbc_state::bbca(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED);
 	m_cassette->set_interface("bbc_cass");
 
+	BBC_ELK_CASIN(config, m_casin);
+
 	/* acia */
 	ACIA6850(config, m_acia, 0);
 	m_acia->txd_handler().set(FUNC(bbc_state::write_txd));
@@ -1688,6 +1690,8 @@ void bbcm_state::bbcm(machine_config &config)
 	m_cassette->set_formats(bbc_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED);
 	m_cassette->set_interface("bbc_cass");
+
+	BBC_ELK_CASIN(config, m_casin);
 
 	/* acia */
 	ACIA6850(config, m_acia, 0);

@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include "machine/bbc_elk_casin.h"
 #include "machine/ram.h"
 #include "machine/6522via.h"
 #include "machine/input_merger.h"
@@ -49,6 +50,7 @@ public:
 		, m_keybd(*this, "LINE.%u", 0)
 		, m_exp(*this, "exp")
 		, m_ram(*this, RAM_TAG)
+		, m_casin(*this, "casin")
 		, m_mrb(*this, "MRB")
 		, m_capslock_led(*this, "capslock_led")
 	{ }
@@ -118,6 +120,7 @@ protected:
 	required_ioport_array<14> m_keybd;
 	required_device<electron_expansion_slot_device> m_exp;
 	required_device<ram_device> m_ram;
+	required_device<bbc_elk_casin_device> m_casin;
 	optional_ioport m_mrb;
 	output_finder<> m_capslock_led;
 
@@ -150,9 +153,6 @@ protected:
 		int stop_bit = 0;
 		int tape_running = 0;
 		uint8_t tape_byte = 0;
-		double last_tap_val = 0.0;
-		int tap_val_length = 0;
-		int len[4]{};
 	};
 
 	ULA m_ula;

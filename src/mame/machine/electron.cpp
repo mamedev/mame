@@ -55,13 +55,14 @@ void electron_state::electron_tape_start()
 	m_ula.high_tone_set = 0;
 	m_ula.bit_count = 0;
 	m_ula.tape_running = 1;
-	m_tape_timer->adjust(attotime::zero, 0, attotime::from_hz(44100));
+	m_tape_timer->adjust(attotime::zero, 0, attotime::from_hz(bbc_elk_casin_device::SAMPLING_FREQUENCY));
 }
 
 void electron_state::electron_tape_stop()
 {
 	m_ula.tape_running = 0;
 	m_tape_timer->reset();
+	m_casin->reset();
 }
 
 #define TAPE_LOW    0x00;
@@ -71,38 +72,9 @@ TIMER_CALLBACK_MEMBER(electron_state::electron_tape_timer_handler)
 {
 	if (m_ula.cassette_motor_mode)
 	{
-		double tap_val = m_cassette->input();
-		if ((tap_val >= 0.0 && m_ula.last_tap_val < 0.0) || (tap_val < 0.0 && m_ula.last_tap_val >= 0.0))
-		{
-			if (m_ula.tap_val_length > (9 * 3))
-			{
-				for (int i = 0; i <= 3; i++)
-					m_ula.len[i] = 0;
-				m_ula.tap_val_length = 0;
-			}
-
-			for (int i = 3; i > 0; i--)
-				m_ula.len[i] = m_ula.len[i-1];
-			m_ula.len[0] = m_ula.tap_val_length;
-
-			m_ula.tap_val_length = 0;
-
-			if ((m_ula.len[0] + m_ula.len[1]) >= (18 + 18 - 5))
-			{
-				cassette_bit_received(0);
-				for (int i = 0; i <= 3; i++)
-					m_ula.len[i] = 0;
-			}
-
-			if (((m_ula.len[0] + m_ula.len[1] + m_ula.len[2] + m_ula.len[3]) <= (18 + 18 + 5)) && (m_ula.len[3] != 0))
-			{
-				cassette_bit_received(1);
-				for (int i = 0; i <= 3; i++)
-					m_ula.len[i] = 0;
-			}
+		if (m_casin->input(m_cassette->input())) {
+			cassette_bit_received(m_casin->casin());
 		}
-		m_ula.tap_val_length++;
-		m_ula.last_tap_val = tap_val;
 	}
 }
 
@@ -626,9 +598,6 @@ void electron_state::machine_start()
 	save_item(STRUCT_MEMBER(m_ula, screen_mode));
 	save_item(STRUCT_MEMBER(m_ula, cassette_motor_mode));
 	save_item(STRUCT_MEMBER(m_ula, capslock_mode));
-	save_item(STRUCT_MEMBER(m_ula, last_tap_val));
-	save_item(STRUCT_MEMBER(m_ula, tap_val_length));
-	save_item(STRUCT_MEMBER(m_ula, len));
 	save_item(NAME(m_mrb_mapped));
 	save_item(NAME(m_vdu_drivers));
 }

@@ -1045,67 +1045,31 @@ TIMER_CALLBACK_MEMBER(bbc_state::tape_timer_cb)
 	}
 	else
 	{
-		double dev_val = m_cassette->input();
-
-		// look for edges on the cassette wave
-		if (((dev_val>=0.0) && (m_last_dev_val<0.0)) || ((dev_val<0.0) && (m_last_dev_val>=0.0)))
+		if (m_casin->input(m_cassette->input()))
 		{
-			if (m_wav_len>(9*3))
+			if (m_casin->casin())
 			{
-				//this is too long to receive anything so reset the serial IC. This is a hack, this should be done as a timer in the MC6850 code.
-				logerror ("Cassette length %d\n",m_wav_len);
-				m_nr_high_tones = 0;
-				m_dcd_cass = 0;
-				update_acia_dcd();
-				m_len0=0;
-				m_len1=0;
-				m_len2=0;
-				m_len3=0;
-				m_wav_len=0;
-			}
-
-			m_len3=m_len2;
-			m_len2=m_len1;
-			m_len1=m_len0;
-			m_len0=m_wav_len;
-
-			m_wav_len=0;
-			logerror ("cassette  %d  %d  %d  %d\n",m_len3,m_len2,m_len1,m_len0);
-
-			if ((m_len0+m_len1)>=(18+18-5))
-			{
-				/* Clock a 0 onto the serial line */
-				logerror("Serial value 0\n");
-				m_nr_high_tones = 0;
-				m_dcd_cass = 0;
-				update_acia_dcd();
-				mc6850_receive_clock(0);
-				m_len0=0;
-				m_len1=0;
-				m_len2=0;
-				m_len3=0;
-			}
-
-			if (((m_len0+m_len1+m_len2+m_len3)<=41) && (m_len3!=0))
-			{
-				/* Clock a 1 onto the serial line */
-				logerror("Serial value 1\n");
 				m_nr_high_tones++;
-				if ( m_nr_high_tones > 100 )
+				if (m_nr_high_tones > 100)
 				{
 					m_dcd_cass = 1;
 					update_acia_dcd();
 				}
 				mc6850_receive_clock(1);
-				m_len0=0;
-				m_len1=0;
-				m_len2=0;
-				m_len3=0;
+			}
+			else
+			{
+				m_nr_high_tones = 0;
+				m_dcd_cass = 0;
+				update_acia_dcd();
+				mc6850_receive_clock(0);
 			}
 		}
-
-		m_wav_len++;
-		m_last_dev_val=dev_val;
+		else if (m_casin->timeout())
+		{
+			m_dcd_cass = 0;
+			update_acia_dcd();
+		}
 	}
 }
 
@@ -1183,17 +1147,13 @@ void bbc_state::cassette_motor(bool motor_state)
 	if (motor_state)
 	{
 		m_cassette->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-		m_tape_timer->adjust(attotime::zero, 0, attotime::from_hz(44100));
+		m_tape_timer->adjust(attotime::zero, 0, attotime::from_hz(bbc_elk_casin_device::SAMPLING_FREQUENCY));
 	}
 	else
 	{
 		m_cassette->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 		m_tape_timer->reset();
-		m_len0 = 0;
-		m_len1 = 0;
-		m_len2 = 0;
-		m_len3 = 0;
-		m_wav_len = 0;
+		m_casin->reset();
 		m_cass_out_phase = 0;
 		m_cass_out_samples_to_go = 4;
 	}

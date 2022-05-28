@@ -270,6 +270,8 @@ void electron_state::electron(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED);
 	m_cassette->set_interface("bbc_cass");
 
+	BBC_ELK_CASIN(config, m_casin);
+
 	/* expansion port */
 	ELECTRON_EXPANSION_SLOT(config, m_exp, 16_MHz_XTAL, electron_expansion_devices, "plus3");
 	m_exp->set_option_machine_config("plus3", plus3_default);

@@ -18,6 +18,7 @@
 #include "machine/74259.h"
 #include "machine/6522via.h"
 #include "machine/6850acia.h"
+#include "machine/bbc_elk_casin.h"
 #include "machine/clock.h"
 #include "machine/mc6854.h"
 #include "machine/ram.h"
@@ -101,6 +102,7 @@ public:
 		, m_bankdev(*this, "bankdev")
 		, m_bbcconfig(*this, "BBCCONFIG")
 		, m_motor_led(*this, "motor_led")
+		, m_casin(*this, "casin")
 	{ }
 
 	enum class monitor_type
@@ -258,6 +260,7 @@ protected:
 	optional_ioport m_bbcconfig;
 
 	output_finder<> m_motor_led;
+	required_device<bbc_elk_casin_device> m_casin;
 
 	int m_romsel = 0;           // This is the latch that holds the sideways ROM bank to read
 	int m_paged_ram = 0;        // BBC B+ memory handling
@@ -308,12 +311,6 @@ protected:
 	  BBC 2C199 Serial Interface Cassette
 	****************************************/
 
-	double m_last_dev_val = 0;
-	int m_wav_len = 0;
-	int m_len0 = 0;
-	int m_len1 = 0;
-	int m_len2 = 0;
-	int m_len3 = 0;
 	uint8_t m_serproc_data = 0;
 	int m_rxd_serial = 0;
 	int m_dcd_serial = 0;

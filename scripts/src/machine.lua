@@ -199,6 +199,18 @@ if (MACHINES["AUTOCONFIG"]~=null) then
 end
 
 
+--------------------------------------------------
+--
+--@src/devices/machine/bbc_elk_casin.h,MACHINES["BBC_ELK_CASIN"] = true
+--------------------------------------------------
+
+if (MACHINES["BBC_ELK_CASIN"]~=null) then
+    files {
+        MAME_DIR .. "src/devices/machine/bbc_elk_casin.cpp",
+        MAME_DIR .. "src/devices/machine/bbc_elk_casinc.h",
+    }
+end
+
 ---------------------------------------------------
 --
 --@src/devices/machine/cop452.h,MACHINES["COP452"] = true
