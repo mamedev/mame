@@ -24567,11 +24567,6 @@ m4sunsetb                       //
 m4sunsetc                       //
 m4supbf                         // Super Bucks Fizz Club (Barcrest)
 m4supbfa                        //
-m4supbjc                        // Super Blackjack Club (Barcrest)
-m4supbjca                       //
-m4supbjcb                       //
-m4supbjcc                       //
-m4supbjcd                       //
 m4surf                          // Super Surfin' (Gemini)
 m4surfa                         //
 m4surfb                         //
@@ -28877,6 +28872,11 @@ m4ssclas__c                     //
 m4ssclas__d                     //
 m4ssclas__e                     //
 m4ssclas__f                     //
+m4supbjc                        // Super Blackjack Club (Barcrest)
+m4supbjca                       //
+m4supbjcb                       //
+m4supbjcc                       //
+m4supbjcd                       //
 m4takepk                        // Take Your Pick (Barcrest)
 m4takepk__0                     //
 m4takepk__1                     //

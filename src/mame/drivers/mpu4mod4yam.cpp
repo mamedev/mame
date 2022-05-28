@@ -649,6 +649,14 @@ GAME_CUSTOM( 199?, m4przsss__f,    m4przsss,   "ps302k.p1",    0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4przsss__g,    m4przsss,   "ps302s.p1",    0x0000, 0x010000, CRC(4521c521) SHA1(90b5e444829ecc9a9b3e46f942830d263fbf02d3), "Barcrest","Prize Spend Spend Spend (Barcrest) (MPU4) (set 8)" )
 GAME_CUSTOM( 199?, m4przsss__h,    m4przsss,   "ps302y.p1",    0x0000, 0x010000, CRC(2ffed329) SHA1(a917161a7ea8312ef6a4a9a85f36f3b0a42b3a0c), "Barcrest","Prize Spend Spend Spend (Barcrest) (MPU4) (set 9)" )
 
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+	ROM_END \
+	GAME(year, setname, parent, mod4yam_cheatchr_m574, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
 // 00 14 04 94 a8 6c c4 30 8c e8 e0 bc d4 28 4c c0 38
 // (C)1991 BARCREST and PS8 0.1
 GAME_CUSTOM( 199?, m4przsss__i,    m4przsss,   "ps8ad.p1",     0x0000, 0x010000, CRC(48917a87) SHA1(d32ac9e30ebddb6ca1d6a7d6c38026338c6df2cd), "Barcrest","Prize Spend Spend Spend (Barcrest) (MPU4) (set 10)" )
@@ -812,18 +820,13 @@ GAME_CUSTOM( 199?, m4acechs__s,    m4acechs,   "aei10___.2_3", 0x0000, 0x010000,
 
 // 00 14 04 94 A8 6C C4 30 8C E8 E0 BC D4   m574
 
-#define M4SUPST_EXTRA_ROMS \
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 ) \
-	ROM_LOAD( "ss.chr", 0x0000, 0x000048, CRC(bd206d57) SHA1(ecfe38d9b4823ae6bc2fc440c243e6ae5e2edaa4) )
-
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
-		M4SUPST_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_chr, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4yam_cheatchr_m574, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // boot
 GAME_CUSTOM( 199?, m4supst__au, m4supst,    "sp8b.p1",              0x0000, 0x010000, CRC(3b12d7e8) SHA1(92a15e5f8391d74c192e8386abdb8853a76bff05), "Barcrest","Super Streak (Barcrest) (MPU4) (SP8 0.1, set 1)" )
@@ -926,7 +929,6 @@ GAME_CUSTOM( 199?, m4supst__b4, m4supst,    "superstreak1deb.bin",  0x0000, 0x01
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
-		M4SUPST_EXTRA_ROMS \
 	ROM_END \
 	GAME(year, setname, parent, mod4yam_cheatchr_tri98, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 

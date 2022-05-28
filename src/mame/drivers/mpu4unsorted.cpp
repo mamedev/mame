@@ -20,6 +20,7 @@
 
 // in mpu4.cpp
 INPUT_PORTS_EXTERN( mpu4 );
+INPUT_PORTS_EXTERN( mpu420p );
 INPUT_PORTS_EXTERN( mpu4_cw );
 INPUT_PORTS_EXTERN( mpu4jackpot8tkn );
 INPUT_PORTS_EXTERN( mpu4jackpot8per );
@@ -914,47 +915,6 @@ ROM_START( m4steptm )
 	ROM_LOAD( "sdun01.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
 ROM_END
 
-// 00 14 04 94 A8 6C C4 30 8C E8 E0 BC D4   m574
-#define M4SUPBJC_EXTRAS \
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 ) \
-	ROM_LOAD( "sbj.chr", 0x0000, 0x000048, CRC(cc4b7911) SHA1(9f8a96a1f8b0f9b33b852e93483ce5c684703349) ) \
-	ROM_REGION( 0x100000, "altmsm6376", 0 ) \
-	ROM_LOAD( "sbjsnd1.hex", 0x000000, 0x080000, CRC(70388bec) SHA1(256fa01b57049d73e88b0bb270fccb555b12dfb7) ) \
-	ROM_LOAD( "sbjsnd2.hex", 0x080000, 0x080000, CRC(1d588554) SHA1(48c092ce83d2f881fc217a3d566e896718ad6f24) ) \
-	ROM_REGION( 0x100000, "msm6376", 0 ) \
-	ROM_LOAD( "sbj.s1", 0x000000, 0x080000, CRC(9bcba966) SHA1(5ced282aca9d39ebf0828aa19357026d5298e955) ) \
-	ROM_LOAD( "sbj.s2", 0x080000, 0x080000, CRC(1d588554) SHA1(48c092ce83d2f881fc217a3d566e896718ad6f24) )
-
-
-ROM_START( m4supbjc )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "sbjs.p1", 0x0000, 0x010000, CRC(f7fb2b99) SHA1(c860d3f95ee3fde02bf00b2e20eeee0ebaf01912) )
-	M4SUPBJC_EXTRAS
-ROM_END
-
-ROM_START( m4supbjca )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "sbjd.p1", 0x0000, 0x010000, CRC(555361f4) SHA1(f5327b811ab3421307dc59d209a216798cd54393) )
-	M4SUPBJC_EXTRAS
-ROM_END
-
-ROM_START( m4supbjcb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "sbjf.p1", 0x0000, 0x010000, CRC(7966deff) SHA1(5cdb6c80ef56b27878eb1fffd6fdf31060e56291) )
-	M4SUPBJC_EXTRAS
-ROM_END
-
-ROM_START( m4supbjcc )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "sbjl.p1", 0x0000, 0x010000, CRC(fc47ed74) SHA1(f29b2caac8168410e534e2f224c98dd4bbb9a7f7) )
-	M4SUPBJC_EXTRAS
-ROM_END
-
-ROM_START( m4supbjcd )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "superbjclub.bin", 0x0000, 0x010000, CRC(68d11d27) SHA1(a0303f845fb5f5b396a7be3ca17a9eaf1a7baef4) )
-	M4SUPBJC_EXTRAS
-ROM_END
 
 
 ROM_START( m4supbf )
@@ -2179,13 +2139,6 @@ GAME(199?, m4crjwl2,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_sta
 GAME(199?, m4crjwl2a, m4crjwl2,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","Crown Jewels Mk II Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
 GAME(199?, m4crjwl2b, m4crjwl2,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","Crown Jewels Mk II Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
 
-// 00 14 04 94 a8 6c c4 30 8c e8 e0 bc d4 28 4c c0 38 dc dc
-// don't read from lamp scramble, require stake
-GAME(199?, m4supbjc,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","Super Blackjack Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS ) // set stake
-GAME(199?, m4supbjca, m4supbjc,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","Super Blackjack Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS ) // set stake
-GAME(199?, m4supbjcb, m4supbjc,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","Super Blackjack Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS ) // set stake
-GAME(199?, m4supbjcc, m4supbjc,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","Super Blackjack Club (Barcrest) (MPU4) (set 4)",GAME_FLAGS ) // set stake
-GAME(199?, m4supbjcd, m4supbjc,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","Super Blackjack Club (Barcrest) (MPU4) (set 5)",GAME_FLAGS ) // set stake
 
 // won't boot with current reel setup, not even in test mode (REEL E ALM)
 // 00 a0 a8 18 f4 2c 70 60 e4 e8 58 d4 2c 50 60

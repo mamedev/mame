@@ -109,6 +109,7 @@
 	Double Diamond Club
 	Red Hot Roll Club
 	Road Hog Club
+	Super Blackjack Club
 	Take Your Pick Club
 
 
@@ -130,6 +131,7 @@
 
 INPUT_PORTS_EXTERN( mpu4 );
 INPUT_PORTS_EXTERN( grtecp );
+INPUT_PORTS_EXTERN( mpu420p );
 INPUT_PORTS_EXTERN( mpu4jackpot8tkn );
 INPUT_PORTS_EXTERN( mpu4jackpot8per );
 INPUT_PORTS_EXTERN( mpu4jackpot8tkn20p );
@@ -7439,3 +7441,56 @@ GAME_CUSTOM( 199?, m4dbldm__a,  m4dbldm,    "cdd05d.p1",    0x0000, 0x020000, CR
 GAME_CUSTOM( 199?, m4dbldm__b,  m4dbldm,    "cdd05f.p1",    0x0000, 0x020000, CRC(81914bd4) SHA1(cf286810ad6732ca1d706e70f4c2958d28cc979c), "Barcrest","Double Diamond Club (Barcrest) (MPU4) (CDD 0.5 F)" )
 // "(C)1996 BARCREST" and "CDD 0.1"
 GAME_CUSTOM( 199?, m4dbldm__c,  m4dbldm,    "cdd01.p1",     0x0000, 0x020000, CRC(e35dffde) SHA1(0bfc977f25f25785f20b510c44d2d3d79e23af8b), "Barcrest","Double Diamond Club (Barcrest) (MPU4) (CDD 0.1 TD)" )
+
+
+/*****************************************************************************************************************************************************************************
+*
+* Super Blackjack Club
+* 
+*****************************************************************************************************************************************************************************/
+
+#define M4SUPBJC_EXTRAS \
+	ROM_REGION( 0x100000, "msm6376", 0 ) \
+	ROM_LOAD( "sbjsnd1.hex", 0x000000, 0x080000, CRC(70388bec) SHA1(256fa01b57049d73e88b0bb270fccb555b12dfb7) ) \
+	ROM_LOAD( "sbjsnd2.hex", 0x080000, 0x080000, CRC(1d588554) SHA1(48c092ce83d2f881fc217a3d566e896718ad6f24) ) \
+	ROM_REGION( 0x100000, "altmsm6376", 0 ) \
+	ROM_LOAD( "sbj.s1", 0x000000, 0x080000, CRC(9bcba966) SHA1(5ced282aca9d39ebf0828aa19357026d5298e955) ) \
+	ROM_LOAD( "sbj.s2", 0x080000, 0x080000, CRC(1d588554) SHA1(48c092ce83d2f881fc217a3d566e896718ad6f24) )
+
+ROM_START( m4supbjc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sbjs.p1", 0x0000, 0x010000, CRC(f7fb2b99) SHA1(c860d3f95ee3fde02bf00b2e20eeee0ebaf01912) )
+	M4SUPBJC_EXTRAS
+ROM_END
+
+ROM_START( m4supbjca )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sbjd.p1", 0x0000, 0x010000, CRC(555361f4) SHA1(f5327b811ab3421307dc59d209a216798cd54393) )
+	M4SUPBJC_EXTRAS
+ROM_END
+
+ROM_START( m4supbjcb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sbjf.p1", 0x0000, 0x010000, CRC(7966deff) SHA1(5cdb6c80ef56b27878eb1fffd6fdf31060e56291) )
+	M4SUPBJC_EXTRAS
+ROM_END
+
+ROM_START( m4supbjcc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sbjl.p1", 0x0000, 0x010000, CRC(fc47ed74) SHA1(f29b2caac8168410e534e2f224c98dd4bbb9a7f7) )
+	M4SUPBJC_EXTRAS
+ROM_END
+
+ROM_START( m4supbjcd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "superbjclub.bin", 0x0000, 0x010000, CRC(68d11d27) SHA1(a0303f845fb5f5b396a7be3ca17a9eaf1a7baef4) )
+	M4SUPBJC_EXTRAS
+ROM_END
+
+// protecton confirmed as m574, but doesn't read from lamp scramble, require stake set
+GAME(199?, m4supbjc,  0,          mod4oki_cheatchr_m574,    mpu420p,    mpu4mod4oki_machines_state, init_m4default,  ROT0,   "Barcrest","Super Blackjack Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4supbjca, m4supbjc,   mod4oki_cheatchr_m574,    mpu420p,    mpu4mod4oki_machines_state, init_m4default,  ROT0,   "Barcrest","Super Blackjack Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4supbjcb, m4supbjc,   mod4oki_cheatchr_m574,    mpu420p,    mpu4mod4oki_machines_state, init_m4default,  ROT0,   "Barcrest","Super Blackjack Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
+GAME(199?, m4supbjcc, m4supbjc,   mod4oki_cheatchr_m574,    mpu420p,    mpu4mod4oki_machines_state, init_m4default,  ROT0,   "Barcrest","Super Blackjack Club (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
+GAME(199?, m4supbjcd, m4supbjc,   mod4oki_cheatchr_m574,    mpu420p,    mpu4mod4oki_machines_state, init_m4default,  ROT0,   "Barcrest","Super Blackjack Club (Barcrest) (MPU4) (set 5)",GAME_FLAGS )
+
