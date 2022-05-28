@@ -11,10 +11,12 @@
 #include "cpu/m68000/m68000.h"
 #include "screen.h"
 
-#include "mpu4plasma.lh"
 
+INPUT_PORTS_EXTERN( mpu4 );
 
-class mpu4plasma_state : public mpu4_state
+namespace {
+
+	class mpu4plasma_state : public mpu4_state
 {
 public:
 	mpu4plasma_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -40,7 +42,7 @@ private:
 	void mpu4plasma_map(address_map &map);
 };
 
-INPUT_PORTS_EXTERN( mpu4 );
+#include "mpu4plasma.lh"
 
 void mpu4plasma_state::mpu4plasma_map(address_map &map)
 {
@@ -188,6 +190,8 @@ ROM_START( m4elite )
 	ROM_LOAD( "e6ls.p1", 0x0000, 0x010000, CRC(ef4c0d3a) SHA1(1d9433689c457f19d31bd68df4728a87120e474a) )
 	M4ELITE_PLASMA
 ROM_END
+
+}; // anonymous namespace
 
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 
