@@ -2,11 +2,8 @@
 // copyright-holders:Wilbert Pol
 /*****************************************************************************
  *
- * Common circuitry that sits between the cassette input and the CASIN signal
- * to the SERPROC ULA (BBC) or the main system ULA (electron).
- * 
- * TODO:
- * - This should become only detection of high/low frequency.
+ * Common handling of the cassette input by 
+ * the SERPROC (BBC) and the main system ULA (electron).
  * 
  ****************************************************************************/
 
