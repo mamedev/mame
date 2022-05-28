@@ -17106,6 +17106,34 @@ ROM_START( cmpacmana )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
 
+ROM_START( cmpacmanb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c512-subboard.bin", 0x4000, 0x4000, CRC(45f8d3b5) SHA1(617c0c950c60284db890c45aaa28d034d87d2e2a) )
+	ROM_CONTINUE(                    0x0000, 0x4000 )
+	ROM_CONTINUE(                    0x8000, 0x8000 )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "c_m_pacman_rom7.u16", 0x00000,  0x8000, CRC(c53273a4) SHA1(d359e65c31ef5253f1e9a3b67db8851a8d1262d1) )
+	ROM_LOAD( "c_m_pacman_rom6.u11", 0x08000,  0x8000, CRC(013bff64) SHA1(65f2808480970a756b642ddd1a64c10b89ea3b3e) )
+	ROM_LOAD( "c_m_pacman_rom5.u4",  0x10000,  0x8000, CRC(03298f22) SHA1(32c99da82afff6d38333a9998802c497d6f49fab) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "4.u15",  0x0000,  0x2000, CRC(8607ffd9) SHA1(9bc94715554aa2473ae2ed249a47f29c7886b3dc) )
+	ROM_LOAD( "3.u10",  0x2000,  0x2000, CRC(c32367be) SHA1(ff217021b9c58e23b2226f8b0a7f5da966225715) )
+	ROM_LOAD( "2.u14",  0x4000,  0x2000, CRC(6dfcb188) SHA1(22430429c798954d9d979e62699b58feae7fdbf4) )
+	ROM_LOAD( "1.u9",   0x6000,  0x2000, CRC(9678ead2) SHA1(e80aefa98b2363fe9e6b2415762695ace272e4d3) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "8.u53",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
 
 /*
   Tetris + Cherry Master (Corsica, ver 8.01)
@@ -18654,6 +18682,37 @@ void cmaster_state::init_cmv4()
 	rom[0x020d] = 0x9b;
 }
 
+void cmaster_state::init_cmpacmanb()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	// 0x8000 - 0xffff range isn't encrypted?
+
+	for (int i = 0; i < 0x8000; i++)
+	{
+		switch (i & 0x70)
+		{
+			case 0x20:
+			case 0x30:
+			case 0x40:
+			case 0x50: BIT(rom[i], 1) ?  rom[i] = bitswap<8>(rom[i] ^ 0xac, 0, 7, 6, 3, 5, 4, 1, 2) : rom[i] = bitswap<8>(rom[i] ^ 0xb8, 6, 3, 4, 0, 2, 7, 1, 5); break;
+			default: BIT(rom[i], 2) ?  rom[i] = bitswap<8>(rom[i] ^ 0xe2, 5, 4, 0, 6, 1, 2, 7, 3) : rom[i] = bitswap<8>(rom[i] ^ 0x59, 3, 0, 1, 7, 4, 2, 5, 6); break;
+		}
+	}
+
+	static const uint8_t swap_table[0x10] = { 0x10, 0x30, 0x00, 0x20, 0x70, 0x50, 0x60, 0x40, 0x80, 0xa0, 0x90, 0xb0, 0xe0, 0xc0, 0xf0, 0xd0 };
+
+	std::vector<uint8_t> buffer(0x8000);
+	memcpy(&buffer[0], rom, 0x8000);
+
+	// swap some 0x10 blocks around..
+	for (int i = 0; i < 0x8000; i += 0x100)
+		for (int j = 0; j < 0x10; j++)
+			memcpy(rom + i + j * 0x10, &buffer[i + swap_table[j]], 0x10);
+
+	init_cm();
+}
+
 void goldstar_state::init_cmast91()
 {
 	uint8_t *rom = memregion("maincpu")->base();
@@ -19811,15 +19870,16 @@ GAME( 200?, ss2001,    0,        ss2001,   cmaster,   cmaster_state,  empty_init
 /* Stealth sets.
    These have hidden games inside that can be switched to avoid inspections, police or whatever purposes)... */
 
-/*    YEAR  NAME        PARENT    MACHINE    INPUT     STATE           INIT            ROT   COMPANY                FULLNAME                                                      FLAGS                     LAYOUT    */
-GAMEL( 198?, cmpacman,  0,        cm,        cmpacman, cmaster_state,  init_cm,        ROT0, "<unknown>",           "Super Pacman (v1.2) + Cherry Master (Corsica, v8.31, set 1)", 0,                        layout_cmpacman ) // need to press K to switch between games...
-GAMEL( 198?, cmpacmana, cmpacman, cm,        cmpacman, cmaster_state,  init_cm,        ROT0, "<unknown>",           "Super Pacman (v1.2) + Cherry Master (Corsica, v8.31, set 2)", 0,                        layout_cmpacman ) // need to press K to switch between games...
-GAMEL( 198?, cmtetris,  0,        cm,        cmtetris, cmaster_state,  init_cm,        ROT0, "<unknown>",           "Tetris + Cherry Master (Corsica, v8.01, set 1)",              0,                        layout_cmpacman ) // need to press K/L to switch between games...
-GAMEL( 198?, cmtetrsa,  0,        cm,        cmtetris, cmaster_state,  init_cm,        ROT0, "<unknown>",           "Tetris + Cherry Master (Corsica, v8.01, set 2)",              0,                        layout_cmpacman )
-GAMEL( 198?, cmtetrsb,  0,        cm,        cmtetris, cmaster_state,  init_cm,        ROT0, "<unknown>",           "Tetris + Cherry Master (+K, Canada Version, encrypted)",      MACHINE_NOT_WORKING,      layout_cmpacman ) // different Tetris game. press insert to throttle and see the attract running.
-GAMEL( 1997, crazybon,  0,        crazybon,  crazybon, goldstar_state, empty_init,     ROT0, "bootleg (Crazy Co.)", "Crazy Bonus 2002 (Ver. 1, set 1)",                            MACHINE_IMPERFECT_COLORS, layout_crazybon ) // Windows ME desktop... but not found the way to switch it.
-GAMEL( 1997, crazybona, crazybon, crazybon,  crazybon, goldstar_state, empty_init,     ROT0, "bootleg (Crazy Co.)", "Crazy Bonus 2002 (Ver. 1, set 2)",                            MACHINE_IMPERFECT_COLORS, layout_crazybon )
-GAMEL( 1997, crazybonb, crazybon, crazybonb, pkrmast,  goldstar_state, init_crazybonb, ROT0, "bootleg (TV Games)",  "Crazy Bonus 2002 (Ver. 1, set 3)",                            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS, layout_crazybon ) // F.B. & POKER 94, VER.1 in NVRAM, decryption seems ok, possibly needs proper memory map
+/*    YEAR  NAME        PARENT    MACHINE    INPUT     STATE           INIT            ROT   COMPANY                FULLNAME                                                                    FLAGS                                           LAYOUT    */
+GAMEL( 198?, cmpacman,  0,        cm,        cmpacman, cmaster_state,  init_cm,        ROT0, "<unknown>",           "Super Pacman (v1.2) + Cherry Master (Corsica, v8.31, unencrypted, set 1)", 0,                                              layout_cmpacman ) // need to press K to switch between games...
+GAMEL( 198?, cmpacmana, cmpacman, cm,        cmpacman, cmaster_state,  init_cm,        ROT0, "<unknown>",           "Super Pacman (v1.2) + Cherry Master (Corsica, v8.31, unencrypted, set 2)", 0,                                              layout_cmpacman ) // need to press K to switch between games...
+GAMEL( 198?, cmpacmanb, cmpacman, cm,        cmpacman, cmaster_state,  init_cmpacmanb, ROT0, "<unknown>",           "Super Pacman (v1.2) + Cherry Master (Corsica, v8.31, encrypted)",          0,                                              layout_cmpacman ) // need to press K to switch between games...
+GAMEL( 198?, cmtetris,  0,        cm,        cmtetris, cmaster_state,  init_cm,        ROT0, "<unknown>",           "Tetris + Cherry Master (Corsica, v8.01, set 1)",                           0,                                              layout_cmpacman ) // need to press K/L to switch between games...
+GAMEL( 198?, cmtetrsa,  0,        cm,        cmtetris, cmaster_state,  init_cm,        ROT0, "<unknown>",           "Tetris + Cherry Master (Corsica, v8.01, set 2)",                           0,                                              layout_cmpacman )
+GAMEL( 198?, cmtetrsb,  0,        cm,        cmtetris, cmaster_state,  init_cm,        ROT0, "<unknown>",           "Tetris + Cherry Master (+K, Canada Version, encrypted)",                   MACHINE_NOT_WORKING,                            layout_cmpacman ) // different Tetris game. press insert to throttle and see the attract running.
+GAMEL( 1997, crazybon,  0,        crazybon,  crazybon, goldstar_state, empty_init,     ROT0, "bootleg (Crazy Co.)", "Crazy Bonus 2002 (Ver. 1, set 1)",                                         MACHINE_IMPERFECT_COLORS,                       layout_crazybon ) // Windows ME desktop... but not found the way to switch it.
+GAMEL( 1997, crazybona, crazybon, crazybon,  crazybon, goldstar_state, empty_init,     ROT0, "bootleg (Crazy Co.)", "Crazy Bonus 2002 (Ver. 1, set 2)",                                         MACHINE_IMPERFECT_COLORS,                       layout_crazybon )
+GAMEL( 1997, crazybonb, crazybon, crazybonb, pkrmast,  goldstar_state, init_crazybonb, ROT0, "bootleg (TV Games)",  "Crazy Bonus 2002 (Ver. 1, set 3)",                                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS, layout_crazybon ) // F.B. & POKER 94, VER.1 in NVRAM, decryption seems ok, possibly needs proper memory map
 
 /* other possible stealth sets:
  - cmv4a    ---> see the 1fxx zone. put a bp in 1f9f to see the loop.
