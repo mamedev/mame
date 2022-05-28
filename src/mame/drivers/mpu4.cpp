@@ -1,52 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:James Wallace
 // thanks-to:Chris Wren, Tony Friery, MFME
-/* MPU4 hardware emulation
-  for sets see the various includes prefixed 'mpu4'
+
+/*
+	mpu4.cpp - MPU4 hardware emulation
+
+	this file contains emulation of the hardware only
+
 */
 
-/* Note 19/07/11 DH
- - added lots of sets
 
-   these are mostly unsorted and need to be split into clones
-   the original source of these was a mess, assume things to be mislabled, bad, duplicated, or otherwise
-   badly organized.  a lot of work is needed to sort them out, especially the Barcrest sets!  Some of this
-   stuff MIGHT be in the wrong driver, or missing roms (sound roms especially)
-*/
-
-/***********************************************************************************************************
-  Barcrest MPU4 highly preliminary driver.
-  MAME Driver J. Wallace and Haze
-
-  Thanks to Chris Wren and MFME for documentation.
-
-  This is the core driver, no video specific stuff should go in here.
-  This driver holds all the mechanical games.
-
-    Old logs shown here from pre-GIT days:
-     06-2011: Fixed boneheaded interface glitch that was causing samples to not be cancelled correctly.
-              Added the ability to read each segment of an LED display separately, this may be necessary for some
-              games that use them as surrogate lamp lines.
-              New persistence 'hack' to stop light flicker for the small extender.
-     05-2011: Add better OKI emulation
-     04-2011: More accurate gamball code, fixed ROM banking (Project Amber), added BwB CHR simulator (Amber)
-              This is still a hard coded system, but significantly different to Barcrest's version.
-              Started adding support for the Crystal Gaming program card, and the link keys for setting parameters.
-     03-2011: Lamp timing fixes, support for all known expansion cards added.
-     01-2011: Adding the missing 'OKI' sound card, and documented it, but it needs a 6376 rewrite.
-     09-2007: Haze: Added Deal 'Em video support.
-  03-08-2007: J Wallace: Removed audio filter for now, since sound is more accurate without them.
-                         Connect 4 now has the right sound.
-  03-07-2007: J Wallace: Several major changes, including input relabelling, and system timer improvements.
-     06-2007: Atari Ace, many cleanups and optimizations of I/O routines
-  09-06-2007: J Wallace: Fixed 50Hz detection circuit.
-  17-02-2007: J Wallace: Added Deal 'Em - still needs some work.
-  10-02-2007: J Wallace: Improved input timing.
-  30-01-2007: J Wallace: Characteriser rewritten to run the 'extra' data needed by some games.
-  24-01-2007: J Wallace: With thanks to Canonman and HIGHWAYMAN/System 80, I was able to confirm a seemingly
-              ghastly misuse of a PIA is actually on the real hardware. This fixes the meters.
-
-See http://agemame.mameworld.info/techinfo/mpu4.php for Information.
+/*
 
 --- Board Setup ---
 
@@ -249,15 +213,6 @@ To change between them, follow these instructions:
 5) Use Cancel/collect to test the sounds.
 6) To return to the game, remove the refill key and close the door
 
-TODO: - Distinguish door switches using manual
-      - Complete stubs for hoppers (needs slightly better 68681 emulation, and new 'hoppers' device emulation)
-      - It seems that the MPU4 core program relies on some degree of persistence when switching strobes and handling
-      writes to the various hardware ports. This explains the occasional lamping/LED blackout and switching bugs.
-      Ideally, this needs converting to the PWM device, but that will be a complex job with this many outputs.
-      - Fix BwB characteriser, need to be able to calculate stabiliser bytes. Anyone fancy reading 6809 source?
-      - Strange bug in Andy's Great Escape - Mystery nudge sound effect is not played, mpu4 latches in silence instead (?)
-
-      - Per game inputs not currently supported, may need to do something about DIPs, inverted lines etc.
 ***********************************************************************************************************/
 #include "emu.h"
 #include "includes/mpu4.h"
@@ -457,11 +412,6 @@ MACHINE_RESET_MEMBER(mpu4_state,mpu4)
 	m_IC23G1    = 1;
 	m_IC23G2A   = 0;
 	m_IC23G2B   = 0;
-
-	//m_prot_col  = 0;
-	//m_chr_counter    = 0;
-	//m_chr_value     = 0;
-
 
 	if (m_numbanks)
 		m_bank1->set_entry(m_numbanks);
@@ -3070,4 +3020,259 @@ void mpu4_state::mpu4crys(machine_config &config)
 	upd7759_device &upd(UPD7759(config, "upd"));
 	upd.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	upd.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
+
+void mpu4_state::init_m4debug()
+{
+	// many original barcrest / bwb sets have identification info around here
+	// this helps with sorting
+	uint8_t *src = memregion( "maincpu" )->base();
+	int size = memregion( "maincpu" )->bytes();
+
+	// m4richfm__e only has 0x004000
+	if (size < 0x10000)
+		return;
+
+	for (int j=0;j<size;j+=0x10000)
+	{
+		if (size>0x10000) printf("\nblock 0x%06x:\n",j);
+		printf("\ncopyright string:\n");
+		for (int i = 0xffe0; i<0xfff0; i++)
+		{
+			printf("%c", src[j+i]);
+		}
+		printf("\n\nidentification string:\n");
+		for (int i = 0xff28; i<0xff30; i++)
+		{
+			printf("%c", src[j+i]);
+		}
+		printf("\n");
+
+		printf("flags ENABLED\n");
+		for (int i = 0xff30; i<0xff9f; i+=2)
+		{
+			uint8_t enable = src[j+i+0];
+			uint8_t letter = src[j+i+1];
+
+			if (enable == 0x00)
+			{
+				printf("%c", letter);
+			}
+		}
+		printf("\n");
+		printf("flags DISABLED\n");
+		for (int i = 0xff30; i<0xff9f; i+=2)
+		{
+			uint8_t enable = src[j+i+0];
+			uint8_t letter = src[j+i+1];
+
+			if (enable == 0xff)
+			{
+				if (letter != 0xff)
+					printf("%c", letter);
+			}
+		}
+		printf("\n");
+
+
+	}
+}
+
+void mpu4_state::mod4oki_chr(machine_config &config)
+{
+	mod4oki(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+}
+
+void mpu4_state::mod4oki_cheatchr(machine_config &config)
+{
+	mod4oki(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+//	m_characteriser->set_lamp_table(xxx_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_tri98(machine_config &config)
+{
+	mod4oki(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::m4dtri98_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_lv(machine_config &config)
+{
+	mod4oki(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::m4lv_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_m683(machine_config &config)
+{
+	mod4oki(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::m683_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_m441(machine_config &config)
+{
+	mod4oki(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::m441_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_m462(machine_config &config)
+{
+	mod4oki(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::m462_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_wta(machine_config &config)
+{
+	mod4oki(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::wta_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_du91(machine_config &config)
+{
+	mod4oki(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::du91_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_m574(machine_config &config)
+{
+	mod4oki(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::m574_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_viva(machine_config &config)
+{
+	mod4oki(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::viva_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_m407(machine_config &config)
+{
+	mod4oki(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::m407_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_duty(machine_config &config)
+{
+	mod4oki(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::duty_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_andybt(machine_config &config)
+{
+	mod4oki(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::andybt_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_alf(machine_config &config)
+{
+	mod4oki(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::alf_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_shuffle(machine_config &config)
+{
+	mod4oki(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::shuffle_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_clbveg(machine_config &config)
+{
+	mod4oki(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::clbveg_lamp_scramble);
+}
+
+
+void mpu4_state::mod4oki_cheatchr_rr6(machine_config &config)
+{
+	mod4oki(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::rr6_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_rhm(machine_config &config)
+{
+	mod4oki(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::rhm_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_otm(machine_config &config)
+{
+	mod4oki(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::otm_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_m470(machine_config &config)
+{
+	mod4oki(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	m_characteriser->set_cpu_tag("maincpu");
+	m_characteriser->set_allow_6809_cheat(true);
+	m_characteriser->set_lamp_table(mpu4_characteriser_pal::m470_lamp_scramble);
+}
+
+void mpu4_state::init_m4_showstring()
+{
+	init_m4default();
+	init_m4debug();
+}
+
+void mpu4_state::init_m4_showstring_big()
+{
+	init_m4default_big();
+	init_m4debug();
 }

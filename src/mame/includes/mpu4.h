@@ -124,6 +124,10 @@ public:
 	 { }
 
 	void init_m4default_alt();
+	void init_m4debug();
+	void init_m4_showstring();
+	void init_m4_showstring_big();
+
 	void init_crystali();
 	void init_m4tst2();
 	void init_crystal();
@@ -162,50 +166,49 @@ public:
 	void init_m4tst();
 	void init_m_ccelbr();
 	void init_m4gambal();
-	void init_m4debug();
-	void init_m4_showstring();
 	void init_m4_showstring_mod4yam();
 	void init_m4_debug_mod4yam();
 	void init_m4_showstring_mod2();
-	void init_m4_showstring_big();
 	void init_connect4();
 	void init_m4altreels();//legacy, will be removed once things are sorted out
-	void init_m4tenten();
-	void init_m4actbnk();
 	void init_m4actclb();
 	void init_m4actpak();
 	void init_m4addr();
-	void init_m4aao();
 	void init_m4alladv();
 	void init_m4alpha();
-	void init_m4andycp();
-	void init_m4andybt();
-	void init_m4andyfh();
-	void init_m4andyge();
 	void init_m4apachg();
 
 	void bwboki(machine_config &config);
+
 	void mod2(machine_config &config);
 	void mod2_cheatchr(machine_config &config);
 	void mod2_cheatchr_shuffle(machine_config &config);
-	
 	void mod2_alt(machine_config &config);
 	void mod2_alt_cheatchr(machine_config &config);
 	void mod2_alt_cheatchr_shuffle(machine_config &config);
 
 	void mod4oki(machine_config &config);
+	void mod4oki_5r(machine_config &config);
+	void mod4oki_5r_chr(machine_config &config);
+	void mod4oki_5r_cheatchr(machine_config &config);
+	void mod4oki_5r_cheatchr_m574(machine_config &config);
+	void mod4oki_5r_cheatchr_shuffle(machine_config &config);
+	void mod4oki_5r_cheatchr_clbveg(machine_config &config);
+	void mod4oki_crmaze(machine_config &config);
+	void mod4oki_alt(machine_config &config);
+	void mod4oki_alt_cheatchr(machine_config &config);
+	void mod4oki_alt_cheatchr_alf(machine_config &config);
+	void mod4oki_alt_cheatchr_clbveg(machine_config &config);
+	void mod4oki_alt_cheatchr_m470(machine_config &config);
 	void mod4oki_chr(machine_config &config);
 	void mod4oki_cheatchr(machine_config &config);
 	void mod4oki_cheatchr_tri98(machine_config &config);
 	void mod4oki_cheatchr_lv(machine_config &config);
 	void mod4oki_cheatchr_m683(machine_config &config);
-	void mod4oki_cheatchr_otm(machine_config &config);
 	void mod4oki_cheatchr_m441(machine_config &config);
 	void mod4oki_cheatchr_m462(machine_config &config);
 	void mod4oki_cheatchr_wta(machine_config &config);
 	void mod4oki_cheatchr_du91(machine_config &config);
-	void mod4oki_cheatchr_rr6(machine_config &config);
-	void mod4oki_cheatchr_rhm(machine_config &config);
 	void mod4oki_cheatchr_m574(machine_config &config);
 	void mod4oki_cheatchr_viva(machine_config &config);
 	void mod4oki_cheatchr_m407(machine_config &config);
@@ -214,27 +217,10 @@ public:
 	void mod4oki_cheatchr_alf(machine_config &config);
 	void mod4oki_cheatchr_shuffle(machine_config &config);
 	void mod4oki_cheatchr_clbveg(machine_config &config);
+	void mod4oki_cheatchr_rr6(machine_config &config);
+	void mod4oki_cheatchr_rhm(machine_config &config);
+	void mod4oki_cheatchr_otm(machine_config &config);
 	void mod4oki_cheatchr_m470(machine_config &config);
-
-
-
-	void mod4oki_5r(machine_config &config);
-	void mod4oki_5r_chr(machine_config &config);
-	void mod4oki_5r_cheatchr(machine_config &config);
-	void mod4oki_5r_cheatchr_m574(machine_config &config);
-	void mod4oki_5r_cheatchr_shuffle(machine_config &config);
-	void mod4oki_5r_cheatchr_clbveg(machine_config &config);
-
-	void mod4oki_crmaze(machine_config &config);
-
-	void mod4oki_alt(machine_config &config);
-	void mod4oki_alt_cheatchr(machine_config &config);
-	void mod4oki_alt_cheatchr_alf(machine_config &config);
-	void mod4oki_alt_cheatchr_clbveg(machine_config &config);
-	void mod4oki_alt_cheatchr_m470(machine_config &config);
-
-
-
 
 	void mod4yam(machine_config &config);
 	void mod4yam_cheatchr(machine_config &config);
@@ -244,9 +230,7 @@ public:
 	void mod4yam_cheatchr_m407(machine_config &config);
 	void mod4yam_cheatchr_shuffle(machine_config &config);
 	void mod4yam_cheatchr_vivlv(machine_config &config);
-
 	void mod4yam_chr(machine_config &config);
-
 
 	void mpu4_common(machine_config &config);
 	void mpu4_common2(machine_config &config);
