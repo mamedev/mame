@@ -548,57 +548,41 @@ ROM_END
 ROM_START( m4eighth )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "wonder.hex", 0x0000, 0x010000, CRC(6fcaab11) SHA1(a462d4c50000e62af4c52980338cee073e4175a9) )
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "wonder.chr", 0x0000, 0x000048, CRC(df5dd758) SHA1(b8ae33480a13d621cf104da770e419b6e485bf33) )
 ROM_END
 
 ROM_START( m4eightha )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ewc02__0.3", 0x0000, 0x010000, CRC(3ea4c626) SHA1(c10b3ba1f806f9d685b9de25fab3a15cbb8e94c3) )
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "wonder.chr", 0x0000, 0x000048, CRC(df5dd758) SHA1(b8ae33480a13d621cf104da770e419b6e485bf33) )
 ROM_END
 
 ROM_START( m4eighthb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ewc05__0.3", 0x0000, 0x010000, CRC(691d2694) SHA1(08deeb25a23a65059be877d11c570db2db66564c) )
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "wonder.chr", 0x0000, 0x000048, CRC(df5dd758) SHA1(b8ae33480a13d621cf104da770e419b6e485bf33) )
 ROM_END
 
 ROM_START( m4eighthc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ewc10__0.3", 0x0000, 0x010000, CRC(7a3b03d5) SHA1(13fb31ffb17edb0502ec47488d7f6b169834b0e4) )
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "wonder.chr", 0x0000, 0x000048, CRC(df5dd758) SHA1(b8ae33480a13d621cf104da770e419b6e485bf33) )
 ROM_END
 
 ROM_START( m4eighthd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ewc10d_0.3", 0x0000, 0x010000, BAD_DUMP CRC(9131f8d4) SHA1(404ab0e359b81a26fcddaa9773ed3234dae0a754) )
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "wonder.chr", 0x0000, 0x000048, CRC(df5dd758) SHA1(b8ae33480a13d621cf104da770e419b6e485bf33) )
 ROM_END
 
 ROM_START( m4eighthe )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ewc20__0.3", 0x0000, 0x010000, CRC(1b6babd3) SHA1(7b919f48a1a0a1a5ecc930a59fd27b2f9fe7509b) )
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "wonder.chr", 0x0000, 0x000048, CRC(df5dd758) SHA1(b8ae33480a13d621cf104da770e419b6e485bf33) )
 ROM_END
 
 ROM_START( m4eighthf )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ewc20c_0.3", 0x0000, 0x010000, CRC(9f6f8836) SHA1(e519f3c42ef7f157c88e68a706a96e42a8cfba4d) )
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "wonder.chr", 0x0000, 0x000048, CRC(df5dd758) SHA1(b8ae33480a13d621cf104da770e419b6e485bf33) )
 ROM_END
 
 ROM_START( m4eighthg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ewc20d_0.3", 0x0000, 0x010000, CRC(dd26057e) SHA1(dfada02b18f748620966b351b2fe5e03af2b9c7e) )
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "wonder.chr", 0x0000, 0x000048, CRC(df5dd758) SHA1(b8ae33480a13d621cf104da770e419b6e485bf33) )
 ROM_END
 
 
@@ -1357,13 +1341,10 @@ ROM_START( m4loadmnb )
 	ROM_LOAD( "la11l.bin", 0x0000, 0x010000, CRC(2d1f8e7a) SHA1(9e5a8b7827925f757784ea4726e3c4897056cdf6) )
 ROM_END
 
-// 00 84 8C B8 74 80 1C B4 D8 74 00 D4 C8
+
 ROM_START( m4celclb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cels.p1",  0x00000, 0x10000,  CRC(19d2162f) SHA1(24fe435809352725e7614c32e2184142f355298e))
-
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "cels.chr", 0x0000, 0x000048, CRC(fe250f3a) SHA1(8b1d569a667921ba1768e7eebba81182466cfabf) )
 ROM_END
 
 ROM_START( m4centpt )
@@ -2037,7 +2018,8 @@ GAME(199?, m4loadmn,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machi
 GAME(199?, m4loadmna, m4loadmn,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Loads A Money (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
 GAME(199?, m4loadmnb, m4loadmn,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Loads A Money (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
 
-GAME(199?, m4celclb,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m_ccelbr,      ROT0,   "Barcrest","Celebration Club (Barcrest) (MPU4)",GAME_FLAGS ) // set stake
+// 00 84 8c b8 74 80 1c b4 d8 74 00 d4 c8 78 (celclb)
+GAME(199?, m4celclb,  0,          mod2_cheatchr_celclb, mpu4,            mpu4mod2_machines_state, init_m_ccelbr,      ROT0,   "Barcrest","Celebration Club (Barcrest) (MPU4)",GAME_FLAGS ) // set stake
 
 GAME(199?, m4centpt,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Centrepoint (Barcrest) (v1.3) (MPU4)",GAME_FLAGS )
 GAME(199?, m4centpta, m4centpt,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Centrepoint (Barcrest) (v1.5) (MPU4)",GAME_FLAGS )

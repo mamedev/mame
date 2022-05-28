@@ -130,13 +130,32 @@ public:
 	// games with sequence starting 00 44 44 54 34 04 54 14 34 14 20 74 04 60
 	static constexpr uint8_t clbveg_lamp_scramble[8] = { 0x00, 0x70, 0x40, 0x70, 0x50, 0x60, 0x40, 0x40 };
 
+	// games with sequence starting  00 84 C4 E4 4C 10 28 90 E8 78 34
+	static constexpr uint8_t vivlv_lamp_scramble[8] = { 0x00, 0x28, 0x00, 0x28, 0x20, 0x08, 0x00, 0x00 };
+
+	// games with sequence starting  00 84 C4 E4 4C 10 28 90 E8 78 34
+	static constexpr uint8_t celclb_lamp_scramble[8] = { 0x00, 0x50, 0x00, 0x50, 0x10, 0x40, 0x04, 0x00 };
+
+	
+
+	/***************************************************************
+
+	 Lamp data below is incorrect
+
+	***************************************************************/
+	
+
+	// these lamp values were in the Twin Timer set, which is the only game using it, but they're not used, so probably incorrect
+	static constexpr uint8_t m533_lamp_scramble[8] = { 0xFF, 0xFF, 0x10, 0x3F, 0x15, 0xFF, 0xFF, 0xFF }; 
+
 	// this sequence is used for m4oldtmr and m4tic__l, but m4oldtmr does not appear to use the lamp scramble, and the data is not valid for m4tic__l
 	// so is probably incorrect
 	// games with sequence starting 00 90 C0 54 A4 F0 64 90 E4 D4 60 B4
 	static constexpr uint8_t m470_lamp_scramble[8] = { 0xFF, 0xFF, 0x10, 0x3F, 0x15, 0xFF, 0xFF, 0xFF }; // one 'm470' set was set to all blank?
 
-	// games with sequence starting  00 84 C4 E4 4C 10 28 90 E8 78 34
-	static constexpr uint8_t vivlv_lamp_scramble[8] = { 0x00, 0x28, 0x00, 0x28, 0x20, 0x08, 0x00, 0x00 };
+	// these lamp values were in the Golden Gate set, they do not appear to be valid as Golden Gate doesn't use them and other games don't work with them
+	static constexpr uint8_t m450_lamp_scramble[8] = { 0xFF, 0xFF, 0x10, 0x3F, 0x15, 0xFF, 0xFF, 0xFF }; 
+
 
 	// games with sequence starting 00 c0 e0 b0 38 c4 f0 30 58 9c 9c 9c dc 9c dc
 	static constexpr uint8_t tentendia_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; 	// INCORRECT 
@@ -145,7 +164,12 @@ public:
 	static constexpr uint8_t jewelcrown_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; 	// INCORRECT 
 
 	// games with sequence starting 00 90 a0 34 8c 68 44 90 ac 6c 44 9c dc 5c d4 24 98 dc
-	static constexpr uint8_t magicdragon_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; 	// INCORRECT 
+	static constexpr uint8_t magicdragon_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT 
+
+	// games with sequence starting 00 50 10 24 54 00 60 50 34 30 00 74 10 04 74
+	static constexpr uint8_t premier_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT 
+
+	
 
 protected:
 	mpu4_characteriser_pal(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

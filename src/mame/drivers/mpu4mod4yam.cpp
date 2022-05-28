@@ -611,7 +611,16 @@ GAME_CUSTOM( 199?, m4sss__f,  m4sss,  "sp_10s__.1o3",     0x0000, 0x010000, CRC(
 GAME_CUSTOM( 199?, m4sss__g,  m4sss,  "sp_10sb_.1o3",     0x0000, 0x010000, CRC(2dfc3926) SHA1(b6b201c65c182f9b18a590910183ce88b245af2b), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SP101.0, set 3)" )
 GAME_CUSTOM( 199?, m4sss__h,  m4sss,  "sp_10sd_.1o3",     0x0000, 0x010000, CRC(fe5c7e3e) SHA1(f5066f1f0c2220da874cbac0ce510cbac6fff8e7), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SP101.0, set 4)" )
 
-// 00 90 18 e4 a8 3c f4 48 74 50 20 f0 18 e4 98 e4 a8 7c
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+	ROM_END \
+	GAME(year, setname, parent, mod4yam_cheatchr_m450, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
+
+// 00 90 18 e4 a8 3c f4 48 74 50 20 f0 18 e4 98 e4 a8 7c  (m450)
 // (C)1995  B.W.B. and SX5 2.0
 GAME_CUSTOM( 199?, m4sss__i,  m4sss,  "sx_05a__.2_1",     0x0000, 0x010000, CRC(ceb830a1) SHA1(c9bef44d64a64872460ae3c450533fd14c92ca43), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SX5 2.0, set 1)" )
 GAME_CUSTOM( 199?, m4sss__k,  m4sss,  "sxi05___.2_1",     0x0000, 0x010000, CRC(a804a20b) SHA1(477d2a750c0c252ffa215c3cf89916cb3a296b92), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SX5 2.0, set 2)" )
@@ -1137,9 +1146,9 @@ GAME_CUSTOM( 199?, m4shv__w,    m4shv,   "hvi05___.3o3",         0x0000, 0x01000
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4yam_cheatchr_m450, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
-// expects chr sequence starting 00 90 18 e4 a8 3c f4 48 74 50 20 f0 18 e4 98 e4  (same as some Spend Spend Spend)
+// expects chr sequence starting 00 90 18 e4 a8 3c f4 48 74 50 20 f0 18 e4 98 e4  (same as some Spend Spend Spend, m450)
 // "(C)1991 BARCREST" and "H6Y 0.3"
 GAME_CUSTOM( 199?, m4shv,       0,       "h6ys.p1",              0x0000, 0x010000, CRC(4af914ff) SHA1(3d9b7c65ec1129ee64e3f4e14e43e4c39c76166b), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3, set 1)" )
 GAME_CUSTOM( 199?, m4shv__a,    m4shv,   "h6yc.p1",              0x0000, 0x010000, CRC(8faca3bc) SHA1(9d666371f1118ccb1a94bfc4e6c79b540a84842b), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3 C)" )
@@ -1153,6 +1162,15 @@ GAME_CUSTOM( 199?, m4shv__f,    m4shv,   "hvypr206",             0x0000, 0x01000
 GAME_CUSTOM( 199?, m4shv__x,    m4shv,   "hv_05___.4n3",         0x0000, 0x010000, CRC(f607f351) SHA1(d7b779b80fa964a27b106bd9d5ca3be16a11d5e9), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 4.0, set 1)" )
 GAME_CUSTOM( 199?, m4shv__y,    m4shv,   "hv_05_d_.4n3",         0x0000, 0x010000, CRC(f4d702d7) SHA1(268c7f6443c7ae587caf5b227fcd438530a06bcc), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 4.0, set 2)" )
 GAME_CUSTOM( 199?, m4shv__z,    m4shv,   "hvi05___.4n3",         0x0000, 0x010000, CRC(38a33c2b) SHA1(21004092b81e08146291fd3a025652f0edbe47dc), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 4.0, set 3)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+	ROM_END \
+	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
 
 // expects chr sequence starting 00 14 04 54 64 14 64 14 64 54 20 74 04
  // "(C)1995  B.W.B." and "HVC 1.0"
@@ -1301,8 +1319,8 @@ GAME(198?, m4tst, 0, mod4yam, mpu4, mpu4mod4yam_machines_state, init_m4default, 
 // 00 84 94 3c ec 5c ec 50 2c 68 60 ac 74 00 ac 58 ec
 GAME(199?, m4stc,     0,        mod4yam_cheatchr_tri98, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","unknown MPU4 'STC 0.1' (Barcrest) (MPU4)",GAME_FLAGS) // Hopper
 
-// 00 84 8c b8 74 80 1c b4 d8 74 00 d4 c8 78 a4
-GAME(199?, m4joljokd, m4joljok, mod4yam_cheatchr, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Jolly Joker (Barcrest) [Dutch] (MPU4) (DJJ)",GAME_FLAGS) // Geen Tubes
+// 00 84 8c b8 74 80 1c b4 d8 74 00 d4 c8 78 a4  (celclb)
+GAME(199?, m4joljokd, m4joljok, mod4yam_cheatchr_celclb, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Jolly Joker (Barcrest) [Dutch] (MPU4) (DJJ)",GAME_FLAGS) // Geen Tubes
 
 // 00 84 a4 ac 70 80 2c c0 bc 5c 5c 5c dc 5c
 GAME(199?, m4clbshf,  0,        mod4yam_cheatchr_shuffle, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Club Shuffle (Barcrest) (MPU4)",GAME_FLAGS) // set stake (runs if you do)

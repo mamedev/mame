@@ -177,11 +177,15 @@ public:
 	void mod2_cheatchr_shuffle(machine_config &config);
 	void mod2_cheatchr_lv(machine_config &config);
 	void mod2_cheatchr_tentendia(machine_config &config);
+	void mod2_cheatchr_celclb(machine_config &config);
 
 	void mod2_alt(machine_config &config);
 	void mod2_alt_cheatchr(machine_config &config);
 	void mod2_alt_cheatchr_table(machine_config &config, const uint8_t* table);
 	void mod2_alt_cheatchr_shuffle(machine_config &config);
+	void mod2_alt_cheatchr_m450(machine_config &config);
+	void mod2_alt_cheatchr_m470(machine_config &config);
+	void mod2_alt_cheatchr_alf(machine_config &config);
 
 	void mod4oki(machine_config &config);
 	void mod4oki_5r(machine_config &config);
@@ -221,9 +225,11 @@ public:
 	void mod4oki_cheatchr_rhm(machine_config &config);
 	void mod4oki_cheatchr_otm(machine_config &config);
 	void mod4oki_cheatchr_m470(machine_config &config);
+	void mod4oki_cheatchr_m533(machine_config &config);
 	void mod4oki_cheatchr_tentendia(machine_config &config);
 	void mod4oki_cheatchr_jewelcrown(machine_config &config);
 	void mod4oki_cheatchr_magicdragon(machine_config &config);
+	void mod4oki_cheatchr_premier(machine_config &config);
 
 	void mod4yam(machine_config &config);
 	void mod4yam_cheatchr(machine_config &config);
@@ -231,12 +237,14 @@ public:
 	void mod4yam_cheatchr_tri98(machine_config &config);
 	void mod4yam_cheatchr_lv(machine_config &config);
 	void mod4yam_cheatchr_m407(machine_config &config);
+	void mod4yam_cheatchr_m450(machine_config &config);
 	void mod4yam_cheatchr_m574(machine_config &config);
 	void mod4yam_cheatchr_m683(machine_config &config);
 	void mod4yam_cheatchr_shuffle(machine_config &config);
 	void mod4yam_cheatchr_vivlv(machine_config &config);
 	void mod4yam_cheatchr_viva(machine_config &config);
 	void mod4yam_cheatchr_tentendia(machine_config &config);
+	void mod4yam_cheatchr_celclb(machine_config &config);
 	void mod4yam_chr(machine_config &config);
 
 	void mpu4_common(machine_config &config);

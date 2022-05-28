@@ -2845,6 +2845,11 @@ void mpu4_state::mod2_cheatchr_tentendia(machine_config &config)
 	mod2_cheatchr_table(config, mpu4_characteriser_pal::tentendia_lamp_scramble);
 }
 
+void mpu4_state::mod2_cheatchr_celclb(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::celclb_lamp_scramble);
+}
+
 
 // alt reel setup
 
@@ -2876,6 +2881,21 @@ void mpu4_state::mod2_alt_cheatchr(machine_config &config)
 void mpu4_state::mod2_alt_cheatchr_shuffle(machine_config &config)
 {
 	mod2_alt_cheatchr_table(config, mpu4_characteriser_pal::shuffle_lamp_scramble);
+}
+
+void mpu4_state::mod2_alt_cheatchr_m450(machine_config &config)
+{
+	mod2_alt_cheatchr_table(config, mpu4_characteriser_pal::m450_lamp_scramble);
+}
+
+void mpu4_state::mod2_alt_cheatchr_m470(machine_config &config)
+{
+	mod2_alt_cheatchr_table(config, mpu4_characteriser_pal::m470_lamp_scramble);
+}
+
+void mpu4_state::mod2_alt_cheatchr_alf(machine_config &config)
+{
+	mod2_alt_cheatchr_table(config, mpu4_characteriser_pal::alf_lamp_scramble);
 }
 
 /***********************************************************************************************
@@ -2933,6 +2953,11 @@ void mpu4_state::mod4yam_cheatchr_vivlv(machine_config &config)
 	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::vivlv_lamp_scramble);
 }
 
+void mpu4_state::mod4yam_cheatchr_celclb(machine_config &config)
+{
+	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::celclb_lamp_scramble);
+}
+
 void mpu4_state::mod4yam_cheatchr_tentendia(machine_config &config)
 {
 	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::tentendia_lamp_scramble);
@@ -2946,6 +2971,11 @@ void mpu4_state::mod4yam_cheatchr_m683(machine_config &config)
 void mpu4_state::mod4yam_cheatchr_m407(machine_config &config)
 {
 	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::m407_lamp_scramble);
+}
+
+void mpu4_state::mod4yam_cheatchr_m450(machine_config &config)
+{
+	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::m450_lamp_scramble);
 }
 
 void mpu4_state::mod4yam_cheatchr_shuffle(machine_config &config)
@@ -3102,6 +3132,12 @@ void mpu4_state::mod4oki_cheatchr_m470(machine_config &config)
 	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::m470_lamp_scramble);
 }
 
+void mpu4_state::mod4oki_cheatchr_m533(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::m533_lamp_scramble);
+}
+
+
 void mpu4_state::mod4oki_cheatchr_tentendia(machine_config &config)
 {
 	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::tentendia_lamp_scramble);
@@ -3117,6 +3153,10 @@ void mpu4_state::mod4oki_cheatchr_magicdragon(machine_config &config)
 	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::magicdragon_lamp_scramble);
 }
 
+void mpu4_state::mod4oki_cheatchr_premier(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::premier_lamp_scramble);
+}
 
 // alt reel setup
 
