@@ -123,8 +123,6 @@ void z180asci_channel_base::device_start()
 
 	save_item(NAME(m_clock_state));
 	save_item(NAME(m_tx_state));
-	save_item(NAME(m_tx_parity));
-	save_item(NAME(m_tx_bits));
 	save_item(NAME(m_tx_counter));
 	save_item(NAME(m_rx_state));
 	save_item(NAME(m_rx_parity));
@@ -148,9 +146,7 @@ void z180asci_channel_base::device_reset()
 	m_tsr = 0;
 	m_rxa = 1;
 	m_clock_state = 0;
-	m_tx_state = STATE_STOP;
-	m_tx_parity = 0;
-	m_tx_bits = 0;
+	m_tx_state = STATE_WAIT;
 	m_tx_counter = 0;
 	m_rx_state = STATE_START;
 	m_rx_parity = 0;
@@ -289,9 +285,6 @@ void z180asci_channel_base::tdr_w(uint8_t data)
 	LOG("Z180 TDR%d   wr $%02x\n", m_id, data);
 	m_asci_tdr = data;
 	m_asci_stat &= ~Z180_STAT_TDRE;
-	m_tx_bits = 0;
-	m_tx_state = STATE_START;
-	m_tsr = m_asci_tdr;
 }
 
 void z180asci_channel_base::rdr_w(uint8_t data)
@@ -385,6 +378,33 @@ DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::cka_wr )
 	}
 }
 
+void z180asci_channel_base::prepare_tsr()
+{
+	int bits = (m_asci_cntla & Z180_CNTLA_MODE_DATA) ? 8 : 7;
+	
+	m_tsr = (m_asci_cntla & Z180_CNTLA_MODE_STOPB) ? 3 : 1; // stop bit(s)
+	
+	if ((m_asci_cntlb & Z180_CNTLB_MP) || (m_asci_cntla & Z180_CNTLA_MODE_PARITY))
+	{
+		m_tsr <<= 1;
+		if (m_asci_cntlb & Z180_CNTLB_MP)
+		{
+			m_tsr |= (m_asci_cntlb & Z180_CNTLB_MPBT) ? 1 : 0;
+		}
+		else
+		{
+			uint8_t parity = 0;
+			for (int i = 0; i < bits; i++)
+				parity ^= BIT(m_asci_tdr, i);
+			if (m_asci_cntlb & Z180_CNTLB_PEO) parity ^= 1; // odd parity
+			m_tsr |= parity;
+		}
+	}
+	m_tsr <<= bits;
+	m_tsr |= m_asci_tdr;
+	m_tsr <<= 1; // start bit
+}
+
 void z180asci_channel_base::transmit_edge()
 {
 	m_tx_counter++;
@@ -395,44 +415,24 @@ void z180asci_channel_base::transmit_edge()
 	{
 		switch (m_tx_state)
 		{
-		case STATE_START:
-			output_txa(0);
-			m_tx_state = STATE_DATA;
-			m_tx_parity = 0;
-			break;
 		case STATE_DATA:
-			m_tx_bits++;
 			output_txa(BIT(m_tsr, 0));
-			m_tx_parity ^= BIT(m_tsr, 0);
 			m_tsr >>= 1;
-			if (m_tx_bits == ((m_asci_cntla & Z180_CNTLA_MODE_DATA) ? 8 : 7))
+			if (m_tsr == 0)
 			{
-				m_tx_state = (m_asci_cntlb & Z180_CNTLB_MP) ? STATE_MPB : (m_asci_cntla & Z180_CNTLA_MODE_PARITY) ? STATE_PARITY : STATE_STOP;
-				m_tx_bits = (m_asci_cntla & Z180_CNTLA_MODE_STOPB) ? 2 : 1;
+				m_asci_stat |= Z180_STAT_TDRE;
+				if (m_asci_stat & Z180_STAT_TIE)
+				{
+					m_irq = 1;
+				}
+				m_tx_state = STATE_WAIT;
 			}
 			break;
-		case Z180_CNTLB_MP:
-			m_tx_state = STATE_STOP;
-			output_txa(m_asci_cntlb & Z180_CNTLB_MPBT ? 1 : 0);
-			break;
-		case STATE_PARITY:
-			m_tx_state = STATE_STOP;
-			if (m_asci_cntlb & Z180_CNTLB_PEO) m_tx_parity ^= 1; // odd parity
-			output_txa(m_tx_parity);
-			break;
-		case STATE_STOP:
-			if (m_tx_bits)
+		case STATE_WAIT:
+			if ((m_asci_stat & Z180_STAT_TDRE) == 0)
 			{
-				m_tx_bits--;
-				if (m_tx_bits == 0)
-				{
-					output_txa(1);
-					m_asci_stat |= Z180_STAT_TDRE;
-					if (m_asci_stat & Z180_STAT_TIE)
-					{
-						m_irq = 1;
-					}
-				}
+				prepare_tsr();
+				m_tx_state = STATE_DATA;
 			}
 			break;
 		case STATE_BREAK:

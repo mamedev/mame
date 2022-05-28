@@ -66,6 +66,7 @@ protected:
 	void transmit_edge();
 	void receive_edge();
 	void set_fifo_data(uint8_t data, uint8_t error);
+	void prepare_tsr();
 
 	enum serial_state
 	{
@@ -74,7 +75,8 @@ protected:
 		STATE_MPB,
 		STATE_PARITY,
 		STATE_STOP,
-		STATE_BREAK
+		STATE_BREAK,
+		STATE_WAIT
 	};
 
 
@@ -95,7 +97,7 @@ protected:
 	uint8_t   m_asci_ext;                    // ASCI extension control register
 	PAIR16    m_asci_tc;                     // ASCI time constant
 
-	uint8_t   m_tsr;
+	uint16_t  m_tsr;
 	uint8_t   m_rsr;
 	uint8_t   m_data_fifo[4];
 	uint8_t   m_error_fifo[4];
@@ -115,8 +117,6 @@ protected:
 
 	uint8_t   m_clock_state;
 	uint8_t   m_tx_state;
-	uint8_t   m_tx_parity;
-	uint8_t   m_tx_bits;
 	uint8_t   m_tx_counter;
 	uint8_t   m_rx_state;
 	uint8_t   m_rx_parity;
