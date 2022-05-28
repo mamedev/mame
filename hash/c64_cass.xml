@@ -13143,12 +13143,14 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="spellbnd">
 		<description>Spellbound</description>
 		<year>1985</year>
+
 		<publisher>Mastertronic Added Dimension</publisher>
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="746474">
 				<rom name="spellbound side a.tap" size="746474" crc="e93aabc7" sha1="af2c9c92e1c9b5b2580e57b89c2b98b2620714f1"/>
 			</dataarea>
 		</part>
+
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="739097">
 				<rom name="spellbound side b.tap" size="739097" crc="b5fccac8" sha1="5d89eec43f411237b72a8e4d238e1db879c549e8"/>
@@ -13164,6 +13166,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="915860">
 				<rom name="Spike_in_Transilvania.tap" size="915860" crc="a5c91dd0" sha1="493313651e3dc6ddc07cf7dc86bb2bb96e064740"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spindizzy">
+		<description>Spindizzy</description>
+		<year>1986</year>
+		<publisher>Electric Dreams</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="501177">
+				<rom name="Spindizzy.tap" size="501177" crc="6357711b" sha1="d1930e5ee07d3047785ca1c8608a5ecea69412f1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13186,6 +13200,24 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="sfireace">
+		<description>Spitfire Ace</description>
+		<year>1985</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="432234">
+				<rom name="Spitfire_Ace.tap" size="432234" crc="88eb4cfa" sha1="af6f93ea04f3ae5349cd70ca5031b29a75e9bfcc"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="432234">
+				<rom name="Spitfire_Ace_a1.tap" size="432234" crc="736719c6" sha1="31f4446dbcc2f928a28744779cc62e7517efb55c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="splitpers">
 		<description>Split Personalities</description>
 		<year>1988</year>
@@ -13204,6 +13236,24 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="splitpersd" cloneof="splitpers">
+		<description>Split Personalities (Domark)</description>
+		<year>1986</year>
+		<publisher>Domark</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="680998">
+				<rom name="Split_Personalities.tap" size="680998" crc="d94c6770" sha1="cd17cd9cffd13e9112283bb536c3c9026f35d16c"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="680998">
+				<rom name="Split_Personalities_a1.tap" size="680998" crc="b5f67c85" sha1="7a242f5ff877177fe469c4b2825c421a403825ed"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spore">
 		<description>Spore</description>
 		<year>1987</year>
@@ -13212,6 +13262,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="440030">
 				<rom name="Spore.tap" size="440030" crc="6d7c3828" sha1="55dcc5a309b998b2daf1975570a039fbe3c343b3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spriteman">
+		<description>Sprite Man</description>
+		<year>1983</year>
+		<publisher>Interceptor Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="424847">
+				<rom name="Sprite_Man.tap" size="424847" crc="6267fcca" sha1="ccf5dc06456426429a10a562ce544ea789bc2931"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13230,6 +13292,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="617752">
 				<rom name="Spukschloss,_Das_a1.tap" size="617752" crc="6c3a58d0" sha1="6bda10d73a5ef14c415c4f16fb740d6484035208"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spyhunt">
+		<description>Spy Hunter</description>
+		<year>1984</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="252706">
+				<rom name="Spy_Hunter.tap" size="252706" crc="afee0b15" sha1="17ab6b0332edc8dd7116009cbba8c48f4472a736"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13282,6 +13356,30 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="stareggs">
+		<description>Star Eggs</description>
+		<year>1984</year>
+		<publisher>Mirrorsoft</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="271063">
+				<rom name="Star_Eggs.tap" size="271063" crc="abac0099" sha1="9bd9ad06418beb65e1a109eddd80212f8e7ffd86"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starraid">
+		<description>Star Raiders II: The Great Galactic Adventure Continues</description>
+		<year>1987</year>
+		<publisher>Electric Dreams</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="457791">
+				<rom name="Star_Raiders_II-_The_Great_Galactic_Adventure_Continues.tap" size="457791" crc="df3cfec8" sha1="9e9ef1d170c271d0e82d5e3f5ea5fa3402aa1e98"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rotj">
 		<description>Star Wars: Return of the Jedi</description>
 		<year>1991</year>
@@ -13312,6 +13410,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="starion">
+		<description>Starion</description>
+		<year>1985</year>
+		<publisher>Melbourne House</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="608012">
+				<rom name="Starion.tap" size="608012" crc="f2199ab3" sha1="4985386f420d7e63c72b0ea6b6a56b649e8675b3"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="starlift">
 		<description>Starlifter</description>
 		<year>1987</year>
@@ -13336,7 +13446,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
-	<software name="steel">
+	<software name="steel" supported="no"> <!-- game loads fully and displays "steel" but no music and unable to start a game -->
 		<description>Steel</description>
 		<year>1988</year>
 		<publisher>Rack It</publisher>
@@ -13344,6 +13454,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="420211">
 				<rom name="Steel.tap" size="420211" crc="0d026c76" sha1="e0132f373e788374207846238918a1be32750b62"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="steelp" cloneof="steel" supported="no"> <!-- game loads fully and displays "steel" but no music and unable to start a game -->
+		<description>Steel (Prism Leisure)</description>
+		<year>1992</year>
+		<publisher>Prism Leisure</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="462635">
+				<rom name="Steel.tap" size="462635" crc="17c8128f" sha1="a21c18703d1d8d9686e6099647c5975b2ab32b27"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13362,6 +13484,19 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="474893">
 				<rom name="Stellar_7_a1.tap" size="474893" crc="34a0bfbd" sha1="c8dda5f3ba3af0eafc4f1f39d69200e37c2f2879"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stircraz">
+		<description>Stir Crazy Featuring Bobo</description>
+		<year>1989</year>
+		<publisher>Infogrames</publisher>
+		<info name="alt_title" value="Stir Crazy"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="728126">
+				<rom name="Stir_Crazy_Featuring_Bobo.tap" size="728126" crc="706bd736" sha1="6ae73f5bcbb8287656b20d184a45e102ca24d2b1"/>
 			</dataarea>
 		</part>
 	</software>
