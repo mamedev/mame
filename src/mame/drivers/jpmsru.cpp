@@ -61,10 +61,18 @@
 #include "netlist/nl_setup.h"
 
 #include "jpmsru.lh"
-#include "j_ewn.lh"
-#include "j_ndu.lh"
 #include "j_dud.lh"
+#include "j_ewn.lh"
+#include "j_ews.lh"
+#include "j_ewsdlx.lh"
+#include "j_la.lh"
 #include "j_lan.lh"
+#include "j_lt.lh"
+#include "j_ndu.lh"
+#include "j_plus2.lh"
+#include "j_ssh.lh"
+#include "j_sup2p.lh"
+#include "j_super2.lh"
 
 #define MAIN_CLOCK 6_MHz_XTAL
 
@@ -92,6 +100,9 @@ public:
 	void ndu(machine_config &config);
 	void dud(machine_config &config);
 	void lan(machine_config &config);
+	void ews(machine_config &config);
+	void lt(machine_config &config);
+	void sup2p(machine_config &config);
 
 	void init_jpmsru();
 
@@ -121,6 +132,7 @@ private:
 	void out_payout_token_w(offs_t offset, uint8_t data);
 	template<unsigned Meter> void out_meter_w(offs_t offset, uint8_t data);
 	void out_coin_lockout_w(offs_t offset, uint8_t data);
+	void out_50p_lockout_w(offs_t offset, uint8_t data);
 
 	void jpmsru_3k_map(address_map &map);
 	void jpmsru_4k_map(address_map &map);
@@ -131,6 +143,8 @@ private:
 	void outputs_ndu(address_map &map);
 	void outputs_dud(address_map &map);
 	void outputs_lan(address_map &map);
+	void outputs_ews(address_map &map);
+	void outputs_sup2p(address_map &map);
 
 	bool m_int1;
 	bool m_int2;
@@ -164,7 +178,7 @@ private:
 void jpmsru_state::jpmsru_3k_map(address_map &map)
 {
 	map(0x0000, 0x0bff).rom();
-	map(0x0e00, 0x0eff).ram();
+	map(0x0c00, 0x0cff).mirror(0x300).ram();
 	/* Some sort of peculiar data logging system used by later JPM games.
 	   It consists of 32 bytes of memory where games write various statistics
 	   (total plays, win amount, win symbol, gamble win/lose etc.) either as numeric values
@@ -174,9 +188,11 @@ void jpmsru_state::jpmsru_3k_map(address_map &map)
 
 void jpmsru_state::jpmsru_4k_map(address_map &map)
 {
-	map(0x0000, 0x0bff).rom();
-	map(0x0c00, 0x0eff).ram();
-	map(0x0f00, 0x0fff).rom();
+	jpmsru_3k_map(map);
+
+	map(0x1000, 0x13ff).rom();
+	map(0x1400, 0x14ff).noprw(); // Unpopulated NVRAM
+	map(0x1800, 0x1bff).nopr(); // Unused ROM space, stops read spam
 }
 
 void jpmsru_state::jpmsru_io(address_map &map)
@@ -287,6 +303,39 @@ void jpmsru_state::outputs_lan(address_map &map)
 	map(0x80, 0x9f).w(FUNC(jpmsru_state::out_lamp_ext_w));
 }
 
+void jpmsru_state::outputs_ews(address_map &map)
+{
+	jpmsru_io(map);
+
+	map(0x38, 0x39).w(FUNC(jpmsru_state::out_meter_w<0>));
+	map(0x3a, 0x3b).w(FUNC(jpmsru_state::out_meter_w<1>));
+	map(0x3c, 0x3d).w(FUNC(jpmsru_state::out_meter_w<2>));
+	map(0x3e, 0x3f).w(FUNC(jpmsru_state::out_meter_w<3>));
+	map(0x40, 0x41).w(FUNC(jpmsru_state::out_meter_w<4>));
+	map(0x42, 0x4d).w(FUNC(jpmsru_state::out_disp_w));
+	map(0x4e, 0x4f).w(FUNC(jpmsru_state::out_meter_w<5>));
+	map(0x50, 0x51).w(FUNC(jpmsru_state::out_meter_w<6>));
+	map(0x54, 0x55).w(FUNC(jpmsru_state::out_50p_lockout_w));
+	map(0x6a, 0x6b).w(FUNC(jpmsru_state::out_payout_cash_w));
+	map(0x6c, 0x6d).w(FUNC(jpmsru_state::out_payout_token_w));
+	map(0x6e, 0x6f).w(FUNC(jpmsru_state::out_coin_lockout_w));
+	// Mini Logic Extension outputs, used for extra lamps
+	map(0x80, 0x9f).w(FUNC(jpmsru_state::out_lamp_ext_w));
+}
+
+void jpmsru_state::outputs_sup2p(address_map &map)
+{
+	jpmsru_io(map);
+
+	map(0x3e, 0x3f).w(FUNC(jpmsru_state::out_meter_w<0>));
+	map(0x42, 0x4d).w(FUNC(jpmsru_state::out_disp_w));
+	map(0x4e, 0x4f).w(FUNC(jpmsru_state::out_meter_w<1>));
+	map(0x50, 0x51).w(FUNC(jpmsru_state::out_meter_w<2>));
+	map(0x54, 0x55).w(FUNC(jpmsru_state::out_50p_lockout_w));
+	map(0x6a, 0x6b).w(FUNC(jpmsru_state::out_payout_cash_w));
+	map(0x6e, 0x6f).w(FUNC(jpmsru_state::out_coin_lockout_w));
+}
+
 uint8_t jpmsru_state::inputs_r(offs_t offset)
 {
 	return BIT(m_inputs[(offset & 0x18) >> 3]->read(), offset & 0x7);
@@ -356,6 +405,12 @@ void jpmsru_state::out_coin_lockout_w(offs_t offset, uint8_t data)
 	machine().bookkeeping().coin_lockout_w(0, !data);
 	machine().bookkeeping().coin_lockout_w(1, !data);
 	machine().bookkeeping().coin_lockout_w(2, !data);
+	machine().bookkeeping().coin_lockout_w(3, !data);
+}
+
+void jpmsru_state::out_50p_lockout_w(offs_t offset, uint8_t data)
+{
+	// 50p is always coin 4
 	machine().bookkeeping().coin_lockout_w(3, !data);
 }
 
@@ -502,55 +557,55 @@ static INPUT_PORTS_START( j_ewn )
 
 	PORT_START("DIP0")
 	PORT_DIPNAME( 0x0f, 0x00, "Nudge chance" )
-	PORT_DIPSETTING (   0x0f, "1%" )
-	PORT_DIPSETTING (   0x0e, "2%" )
-	PORT_DIPSETTING (   0x0d, "3%" )
-	PORT_DIPSETTING (   0x0c, "4%" )
-	PORT_DIPSETTING (   0x0b, "5%" )
-	PORT_DIPSETTING (   0x0a, "6%" )
-	PORT_DIPSETTING (   0x09, "7%" )
-	PORT_DIPSETTING (   0x00, "8%" )
-	PORT_DIPSETTING (   0x01, "9%" )
-	PORT_DIPSETTING (   0x02, "10%" )
-	PORT_DIPSETTING (   0x03, "11%" )
-	PORT_DIPSETTING (   0x04, "12%" )
-	PORT_DIPSETTING (   0x05, "13%" )
-	PORT_DIPSETTING (   0x06, "14%" )
-	PORT_DIPSETTING (   0x07, "15%" )
+	PORT_DIPSETTING(    0x0f, "1%" )
+	PORT_DIPSETTING(    0x0e, "2%" )
+	PORT_DIPSETTING(    0x0d, "3%" )
+	PORT_DIPSETTING(    0x0c, "4%" )
+	PORT_DIPSETTING(    0x0b, "5%" )
+	PORT_DIPSETTING(    0x0a, "6%" )
+	PORT_DIPSETTING(    0x09, "7%" )
+	PORT_DIPSETTING(    0x00, "8%" )
+	PORT_DIPSETTING(    0x01, "9%" )
+	PORT_DIPSETTING(    0x02, "10%" )
+	PORT_DIPSETTING(    0x03, "11%" )
+	PORT_DIPSETTING(    0x04, "12%" )
+	PORT_DIPSETTING(    0x05, "13%" )
+	PORT_DIPSETTING(    0x06, "14%" )
+	PORT_DIPSETTING(    0x07, "15%" )
 	PORT_DIPNAME( 0xf0, 0x00, "Win hold chance" )
-	PORT_DIPSETTING (   0xf0, "17%" )
-	PORT_DIPSETTING (   0xe0, "19%" )
-	PORT_DIPSETTING (   0xd0, "21%" )
-	PORT_DIPSETTING (   0xc0, "23%" )
-	PORT_DIPSETTING (   0xb0, "25%" )
-	PORT_DIPSETTING (   0xa0, "27%" )
-	PORT_DIPSETTING (   0x90, "29%" )
-	PORT_DIPSETTING (   0x00, "31%" )
-	PORT_DIPSETTING (   0x10, "33%" )
-	PORT_DIPSETTING (   0x20, "35%" )
-	PORT_DIPSETTING (   0x30, "37%" )
-	PORT_DIPSETTING (   0x40, "39%" )
-	PORT_DIPSETTING (   0x50, "41%" )
-	PORT_DIPSETTING (   0x60, "43%" )
-	PORT_DIPSETTING (   0x70, "45%" )
+	PORT_DIPSETTING(    0xf0, "17%" )
+	PORT_DIPSETTING(    0xe0, "19%" )
+	PORT_DIPSETTING(    0xd0, "21%" )
+	PORT_DIPSETTING(    0xc0, "23%" )
+	PORT_DIPSETTING(    0xb0, "25%" )
+	PORT_DIPSETTING(    0xa0, "27%" )
+	PORT_DIPSETTING(    0x90, "29%" )
+	PORT_DIPSETTING(    0x00, "31%" )
+	PORT_DIPSETTING(    0x10, "33%" )
+	PORT_DIPSETTING(    0x20, "35%" )
+	PORT_DIPSETTING(    0x30, "37%" )
+	PORT_DIPSETTING(    0x40, "39%" )
+	PORT_DIPSETTING(    0x50, "41%" )
+	PORT_DIPSETTING(    0x60, "43%" )
+	PORT_DIPSETTING(    0x70, "45%" )
 
 	PORT_START("DIP1")
 	PORT_DIPNAME( 0x0f, 0x00, "Hold chance" )
-	PORT_DIPSETTING (   0x0f, "17%" )
-	PORT_DIPSETTING (   0x0e, "19%" )
-	PORT_DIPSETTING (   0x0d, "21%" )
-	PORT_DIPSETTING (   0x0c, "23%" )
-	PORT_DIPSETTING (   0x0b, "25%" )
-	PORT_DIPSETTING (   0x0a, "27%" )
-	PORT_DIPSETTING (   0x09, "29%" )
-	PORT_DIPSETTING (   0x00, "31%" )
-	PORT_DIPSETTING (   0x01, "33%" )
-	PORT_DIPSETTING (   0x02, "35%" )
-	PORT_DIPSETTING (   0x03, "37%" )
-	PORT_DIPSETTING (   0x04, "39%" )
-	PORT_DIPSETTING (   0x05, "41%" )
-	PORT_DIPSETTING (   0x06, "43%" )
-	PORT_DIPSETTING (   0x07, "45%" )
+	PORT_DIPSETTING(    0x0f, "17%" )
+	PORT_DIPSETTING(    0x0e, "19%" )
+	PORT_DIPSETTING(    0x0d, "21%" )
+	PORT_DIPSETTING(    0x0c, "23%" )
+	PORT_DIPSETTING(    0x0b, "25%" )
+	PORT_DIPSETTING(    0x0a, "27%" )
+	PORT_DIPSETTING(    0x09, "29%" )
+	PORT_DIPSETTING(    0x00, "31%" )
+	PORT_DIPSETTING(    0x01, "33%" )
+	PORT_DIPSETTING(    0x02, "35%" )
+	PORT_DIPSETTING(    0x03, "37%" )
+	PORT_DIPSETTING(    0x04, "39%" )
+	PORT_DIPSETTING(    0x05, "41%" )
+	PORT_DIPSETTING(    0x06, "43%" )
+	PORT_DIPSETTING(    0x07, "45%" )
 	PORT_DIPNAME( 0x10, 0x00, "Store credits" )
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x10, DEF_STR(On) )
@@ -607,55 +662,55 @@ static INPUT_PORTS_START( j_ndu )
 
 	PORT_START("DIP0")
 	PORT_DIPNAME( 0x0f, 0x00, "Nudge chance" )
-	PORT_DIPSETTING (   0x0f, "1%" )
-	PORT_DIPSETTING (   0x0e, "2%" )
-	PORT_DIPSETTING (   0x0d, "3%" )
-	PORT_DIPSETTING (   0x0c, "4%" )
-	PORT_DIPSETTING (   0x0b, "5%" )
-	PORT_DIPSETTING (   0x0a, "6%" )
-	PORT_DIPSETTING (   0x09, "7%" )
-	PORT_DIPSETTING (   0x00, "8%" )
-	PORT_DIPSETTING (   0x01, "9%" )
-	PORT_DIPSETTING (   0x02, "10%" )
-	PORT_DIPSETTING (   0x03, "11%" )
-	PORT_DIPSETTING (   0x04, "12%" )
-	PORT_DIPSETTING (   0x05, "13%" )
-	PORT_DIPSETTING (   0x06, "14%" )
-	PORT_DIPSETTING (   0x07, "15%" )
+	PORT_DIPSETTING(    0x0f, "1%" )
+	PORT_DIPSETTING(    0x0e, "2%" )
+	PORT_DIPSETTING(    0x0d, "3%" )
+	PORT_DIPSETTING(    0x0c, "4%" )
+	PORT_DIPSETTING(    0x0b, "5%" )
+	PORT_DIPSETTING(    0x0a, "6%" )
+	PORT_DIPSETTING(    0x09, "7%" )
+	PORT_DIPSETTING(    0x00, "8%" )
+	PORT_DIPSETTING(    0x01, "9%" )
+	PORT_DIPSETTING(    0x02, "10%" )
+	PORT_DIPSETTING(    0x03, "11%" )
+	PORT_DIPSETTING(    0x04, "12%" )
+	PORT_DIPSETTING(    0x05, "13%" )
+	PORT_DIPSETTING(    0x06, "14%" )
+	PORT_DIPSETTING(    0x07, "15%" )
 	PORT_DIPNAME( 0xf0, 0x00, "Win hold chance" )
-	PORT_DIPSETTING (   0xf0, "17%" )
-	PORT_DIPSETTING (   0xe0, "19%" )
-	PORT_DIPSETTING (   0xd0, "21%" )
-	PORT_DIPSETTING (   0xc0, "23%" )
-	PORT_DIPSETTING (   0xb0, "25%" )
-	PORT_DIPSETTING (   0xa0, "27%" )
-	PORT_DIPSETTING (   0x90, "29%" )
-	PORT_DIPSETTING (   0x00, "31%" )
-	PORT_DIPSETTING (   0x10, "33%" )
-	PORT_DIPSETTING (   0x20, "35%" )
-	PORT_DIPSETTING (   0x30, "37%" )
-	PORT_DIPSETTING (   0x40, "39%" )
-	PORT_DIPSETTING (   0x50, "41%" )
-	PORT_DIPSETTING (   0x60, "43%" )
-	PORT_DIPSETTING (   0x70, "45%" )
+	PORT_DIPSETTING(    0xf0, "17%" )
+	PORT_DIPSETTING(    0xe0, "19%" )
+	PORT_DIPSETTING(    0xd0, "21%" )
+	PORT_DIPSETTING(    0xc0, "23%" )
+	PORT_DIPSETTING(    0xb0, "25%" )
+	PORT_DIPSETTING(    0xa0, "27%" )
+	PORT_DIPSETTING(    0x90, "29%" )
+	PORT_DIPSETTING(    0x00, "31%" )
+	PORT_DIPSETTING(    0x10, "33%" )
+	PORT_DIPSETTING(    0x20, "35%" )
+	PORT_DIPSETTING(    0x30, "37%" )
+	PORT_DIPSETTING(    0x40, "39%" )
+	PORT_DIPSETTING(    0x50, "41%" )
+	PORT_DIPSETTING(    0x60, "43%" )
+	PORT_DIPSETTING(    0x70, "45%" )
 
 	PORT_START("DIP1")
 	PORT_DIPNAME( 0x0f, 0x00, "Hold chance" )
-	PORT_DIPSETTING (   0x0f, "17%" )
-	PORT_DIPSETTING (   0x0e, "19%" )
-	PORT_DIPSETTING (   0x0d, "21%" )
-	PORT_DIPSETTING (   0x0c, "23%" )
-	PORT_DIPSETTING (   0x0b, "25%" )
-	PORT_DIPSETTING (   0x0a, "27%" )
-	PORT_DIPSETTING (   0x09, "29%" )
-	PORT_DIPSETTING (   0x00, "31%" )
-	PORT_DIPSETTING (   0x01, "33%" )
-	PORT_DIPSETTING (   0x02, "35%" )
-	PORT_DIPSETTING (   0x03, "37%" )
-	PORT_DIPSETTING (   0x04, "39%" )
-	PORT_DIPSETTING (   0x05, "41%" )
-	PORT_DIPSETTING (   0x06, "43%" )
-	PORT_DIPSETTING (   0x07, "45%" )
+	PORT_DIPSETTING(    0x0f, "17%" )
+	PORT_DIPSETTING(    0x0e, "19%" )
+	PORT_DIPSETTING(    0x0d, "21%" )
+	PORT_DIPSETTING(    0x0c, "23%" )
+	PORT_DIPSETTING(    0x0b, "25%" )
+	PORT_DIPSETTING(    0x0a, "27%" )
+	PORT_DIPSETTING(    0x09, "29%" )
+	PORT_DIPSETTING(    0x00, "31%" )
+	PORT_DIPSETTING(    0x01, "33%" )
+	PORT_DIPSETTING(    0x02, "35%" )
+	PORT_DIPSETTING(    0x03, "37%" )
+	PORT_DIPSETTING(    0x04, "39%" )
+	PORT_DIPSETTING(    0x05, "41%" )
+	PORT_DIPSETTING(    0x06, "43%" )
+	PORT_DIPSETTING(    0x07, "45%" )
 	PORT_DIPUNUSED( 0x10, 0x00 )
 	PORT_DIPNAME( 0x20, 0x00, "Use default hold/nudge chance" ) // 31% and 8%
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
@@ -705,7 +760,7 @@ static INPUT_PORTS_START( j_lan )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Nudge Reverse")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Nudge Up")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_POKER_CANCEL ) PORT_NAME("Cancel/Gamble")
 
@@ -720,6 +775,155 @@ static INPUT_PORTS_START( j_lan2 )
 	PORT_CONFNAME( 0x80, 0x80, "5p/10p jumper" )
 	PORT_CONFSETTING(    0x00, "5p" )
 	PORT_CONFSETTING(    0x80, "10p" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( j_super2 )
+	PORT_INCLUDE( j_lan )
+
+	PORT_MODIFY("IN2")
+	PORT_CONFNAME( 0x02, 0x02, "Coin tube" )
+	PORT_CONFSETTING(    0x00, "Empty" )
+	PORT_CONFSETTING(    0x02, "Full" )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("20p")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("2p")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( j_ews )
+	PORT_INCLUDE( jpmsru_inputs )
+
+	PORT_MODIFY("IN0")
+	PORT_CONFNAME( 0x80, 0x80, "5p/10p jumper" )
+	PORT_CONFSETTING(    0x00, "5p" )
+	PORT_CONFSETTING(    0x80, "10p" )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3")
+	PORT_DIPNAME( 0x08, 0x00, "Percentage Stabiliser" )
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x08, DEF_STR(On) )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Nudge Up")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Shuffle")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_POKER_CANCEL ) PORT_NAME("Cancel/Gamble")
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Feature Stop")
+	PORT_CONFNAME( 0x02, 0x02, "Coin tube" )
+	PORT_CONFSETTING(    0x00, "Empty" )
+	PORT_CONFSETTING(    0x02, "Full" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( j_ewsdlx )
+	PORT_INCLUDE( j_ews )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // No % stabiliser
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( j_ssh )
+	PORT_INCLUDE( j_ews )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) // No stake jumper
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // No % stabiliser
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("20p")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("2p")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( j_lt )
+	PORT_INCLUDE( jpmsru_inputs )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Nudge Up")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Shuffle")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_POKER_CANCEL ) PORT_NAME("Cancel/Gamble")
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Feature Stop")
+	PORT_CONFNAME( 0x02, 0x02, "Coin tube" )
+	PORT_CONFSETTING(    0x00, "Empty" )
+	PORT_CONFSETTING(    0x02, "Full" )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("10p")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p Token")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( j_plus2 )
+	PORT_INCLUDE( j_lt )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("10p")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("2p")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( j_sup2p )
+	PORT_INCLUDE( jpmsru_inputs )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 ) PORT_NAME("Nudge 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 ) PORT_NAME("Nudge 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POKER_HOLD3 ) PORT_NAME("Nudge 3")
+	PORT_DIPNAME( 0x08, 0x00, "Percentage Stabiliser" )
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x08, DEF_STR(On) )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Nudge Up")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Shuffle")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_POKER_CANCEL ) PORT_NAME("Cancel/Gamble")
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Feature Stop")
+	PORT_CONFNAME( 0x02, 0x02, "Coin tube" )
+	PORT_CONFSETTING(    0x00, "Empty" )
+	PORT_CONFSETTING(    0x02, "Full" )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("10p")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("20p")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( j_la )
+	PORT_INCLUDE( jpmsru_inputs )
+
+	PORT_MODIFY("IN0")
+	PORT_CONFNAME( 0x80, 0x80, "1p/2p jumper" )
+	PORT_CONFSETTING(    0x00, "1p" )
+	PORT_CONFSETTING(    0x80, "2p" )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Nudge Up")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_POKER_CANCEL ) PORT_NAME("Cancel/Gamble")
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Feature Stop")
+	PORT_CONFNAME( 0x02, 0x02, "Coin tube" )
+	PORT_CONFSETTING(    0x00, "Empty" )
+	PORT_CONFSETTING(    0x02, "Full" )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("5p")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("2p")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("1p")
 INPUT_PORTS_END
 
 void jpmsru_state::machine_start()
@@ -805,6 +1009,8 @@ void jpmsru_state::jpmsru_3k_busext(machine_config &config)
 void jpmsru_state::jpmsru_4k(machine_config &config)
 {
 	jpmsru_3k(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &jpmsru_state::jpmsru_4k_map);
 }
 
 // Game configs
@@ -838,6 +1044,24 @@ void jpmsru_state::lan(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &jpmsru_state::outputs_lan);
 }
 
+void jpmsru_state::ews(machine_config &config)
+{
+	jpmsru_3k(config);
+	m_maincpu->set_addrmap(AS_IO, &jpmsru_state::outputs_ews);
+}
+
+void jpmsru_state::lt(machine_config &config)
+{
+	jpmsru_4k(config);
+	m_maincpu->set_addrmap(AS_IO, &jpmsru_state::outputs_ews);
+}
+
+void jpmsru_state::sup2p(machine_config &config)
+{
+	jpmsru_3k(config);
+	m_maincpu->set_addrmap(AS_IO, &jpmsru_state::outputs_sup2p);
+}
+
 ROM_START( j_ewn )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ewn20.1", 0x0000, 0x400, CRC(e90f686b) SHA1(aec88647c6289b01149b2816845a568481b1d37f) )
@@ -859,6 +1083,13 @@ ROM_START( j_ewnb )
 	ROM_LOAD( "ewn.3", 0x0800, 0x400, CRC(bef3a938) SHA1(6a6844203c6361b65f5b07853d9dbe18a29ebc44) )
 ROM_END
 
+ROM_START( j_ewnc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ewn.1", 0x0000, 0x400, CRC(be7d3b79) SHA1(3304dcc69e93eca2e6e89df0b18afc6874ebacf0) )
+	ROM_LOAD( "ewn.2", 0x0400, 0x400, CRC(bf19cd60) SHA1(77b0b439628589cb0db1b74a760b652519c20991) )
+	ROM_LOAD( "ewn.3", 0x0800, 0x400, CRC(25138e03) SHA1(644fc6144ea74f08dc892f106ad494ba364afe86) )
+ROM_END
+
 ROM_START( j_ndu )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ndu17.1", 0x0000, 0x400, CRC(174a8519) SHA1(3d9cc2a531ff91b3313aa893a9f774eea7847b8b) )
@@ -873,6 +1104,13 @@ ROM_START( j_ndua ) // 24% hold chance instead of 26%
 	ROM_LOAD( "ndu17.3", 0x0800, 0x400, CRC(60ef9c60) SHA1(e3614407a74c9e462cdfb3275b1c99b706cd824c) )
 ROM_END
 
+ROM_START( j_ndub )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ndu.1", 0x0000, 0x400, CRC(20497d42) SHA1(3ae6bcc1cf62c2f28862d482b5425b4aea00aed5) )
+	ROM_LOAD( "ndu.2", 0x0400, 0x400, CRC(9a7a3de6) SHA1(232f8223d0b1ee2a6703590193e3d74ac9debca1) )
+	ROM_LOAD( "ndu.3", 0x0800, 0x400, CRC(012255c6) SHA1(c1303f855167bbe3d313ec440c142fd1a0253dcd) )
+ROM_END
+
 ROM_START( j_dud )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dud10.1", 0x0000, 0x400, CRC(e6cc42bc) SHA1(5f24f9fdb577a4ea4ef8d35352dd63021ebf26cd) )
@@ -885,6 +1123,13 @@ ROM_START( j_duda )
 	ROM_LOAD( "dud.1", 0x0000, 0x400, CRC(66445282) SHA1(8614b5330d72ed28141974e60a2238e003f4bce1) )
 	ROM_LOAD( "dud.2", 0x0400, 0x400, CRC(2945e808) SHA1(e306b5f9cc9f4999b9b4b8536101f2b69728f6ca) )
 	ROM_LOAD( "dud.3", 0x0800, 0x400, CRC(f4359851) SHA1(43c17c147a96aba901435154de657594fbec6008) )
+ROM_END
+
+ROM_START( j_dudb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dud12.1", 0x0000, 0x400, CRC(2720ca33) SHA1(2b50cc8c01f10b4a536361eb5da0f72602808784) )
+	ROM_LOAD( "dud12.2", 0x0400, 0x400, CRC(c87e98d9) SHA1(840f0f01aacb3df1cce4d75635de476bd615680b) )
+	ROM_LOAD( "dud12.3", 0x0800, 0x400, CRC(1ffb8513) SHA1(7d10f9303ab91b413dfc316321e12ca930880b23) )
 ROM_END
 
 ROM_START( j_dt )
@@ -909,55 +1154,101 @@ ROM_START( j_lana )
 	ROM_LOAD( "lan.3", 0x0800, 0x400, CRC(d3e76076) SHA1(1f9f96351e8bc08722dc047c8b80c4697c589939) )
 ROM_END
 
-
-ROM_START( j_ews )
+ROM_START( j_lanb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ews13c1.bin", 0x0000, 0x000400, CRC(2eec7c4d) SHA1(a1740d27e60192659392ba7602b9b62947c4f6db) )
-	ROM_LOAD( "ews13b2.bin", 0x0400, 0x000400, CRC(b84b7858) SHA1(90fd64881d52e1f4362ccbcb9434dbf7b25b97f9) )
-	ROM_LOAD( "ews13.3",     0x0800, 0x000400, CRC(4d8e197a) SHA1(1569327f0e4b5d7632658b69abf59076effb2600) )
-ROM_END
-
-ROM_START( j_ews8a )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ews8a.1", 0x0000, 0x000400, CRC(52e9709a) SHA1(0b437834f48ca7718e0b30303916eed00c7fb4c9) )
-	ROM_LOAD( "ews8a.2", 0x0400, 0x000400, CRC(ee4a4809) SHA1(292a12a5ddc5a22c8568016b34dfec7959f49027) )
-	ROM_LOAD( "ews8a.3", 0x0800, 0x000400, CRC(3700a7a3) SHA1(cf24a54e6aa3a3a86ff75f6e8bcb692d0cfd0e80) )
-ROM_END
-
-ROM_START( j_luckac )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "la1.bin", 0x0000, 0x000400, CRC(21076280) SHA1(d5cf25d289f03c743f4428273ac002df3164c344) )
-	ROM_LOAD( "la2.bin", 0x0400, 0x000400, CRC(cae10bc1) SHA1(a740946437a3b277b714f13d001783987f57bc77) )
-	ROM_LOAD( "la3.bin", 0x0800, 0x000400, CRC(cb9362ac) SHA1(a16d43ba01b24e1b515881957c1559d33a03bcc4) )
-ROM_END
-
-ROM_START( j_plus2 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "plus2_1.bin", 0x0000, 0x000400, CRC(f635174d) SHA1(9478aabc0eaa25d4ae44d2385e738584f03f6647) )
-	ROM_LOAD( "plus2_2.bin", 0x0400, 0x000400, CRC(0999d32f) SHA1(e08c852f8f3aff8ab7b73e9c0b0502ab91f9e844) )
-	ROM_LOAD( "plus2_3.bin", 0x0800, 0x000400, CRC(d3dfd6ab) SHA1(4cf0f8977fb2c023bf2ccc8d9d74352ce32206bf) )
-	ROM_LOAD( "plus2_4.bin", 0x0c00, 0x000400, CRC(8b6922b4) SHA1(7b7fc7b0708bf96846860254fea957bcbc952923) )
+	ROM_LOAD( "lan.1", 0x0000, 0x400, CRC(3c3050a9) SHA1(27bdec979410533d1b7dbd447542123eccd21607) )
+	ROM_LOAD( "lan.2", 0x0400, 0x400, CRC(c4018d6f) SHA1(c0b5a172324ab78b48329aa78bc66223cb133aa0) )
+	ROM_LOAD( "lan.3", 0x0800, 0x400, CRC(8f41078e) SHA1(f9028264688b31d7ef5f9697fc93bcf4d2131f84) )
 ROM_END
 
 ROM_START( j_super2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "super2_1.bin", 0x0000, 0x000400, CRC(a1df2719) SHA1(eed80329c14ef6c272a8c622e8a4bc7d14ac87e6) )
-	ROM_LOAD( "super2_2.bin", 0x0400, 0x000400, CRC(0fd5ddd0) SHA1(e8d31b009b29486d36d11052af857c609a7f1f84) )
-	ROM_LOAD( "super2_3.bin", 0x0800, 0x000400, CRC(ddd998d3) SHA1(5964da70ae4c2f174dc3d1494fc67579c221a7b7) )
+	ROM_LOAD( "super2.1", 0x0000, 0x400, CRC(a1df2719) SHA1(eed80329c14ef6c272a8c622e8a4bc7d14ac87e6) )
+	ROM_LOAD( "super2.2", 0x0400, 0x400, CRC(0fd5ddd0) SHA1(e8d31b009b29486d36d11052af857c609a7f1f84) )
+	ROM_LOAD( "super2.3", 0x0800, 0x400, CRC(ddd998d3) SHA1(5964da70ae4c2f174dc3d1494fc67579c221a7b7) )
 ROM_END
 
-ROM_START( j_luck2 )
+ROM_START( j_ews )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "lt_9.1", 0x0000, 0x000400, CRC(97236ce3) SHA1(f71861576f33daec3e1d371c670b535e6fd32b5e) )
-	ROM_LOAD( "lt_9.2", 0x0400, 0x000400, CRC(6e1cd083) SHA1(17edaa9880ae2a6d6d99e771e41b985527d5ed3b) )
-	ROM_LOAD( "lt_9.3", 0x0800, 0x000400, CRC(d6881e6f) SHA1(42a83f01d67a8f530ca2a10ffeff30237bdfba94) )
+	ROM_LOAD( "ews8.a1", 0x0000, 0x400, CRC(52e9709a) SHA1(0b437834f48ca7718e0b30303916eed00c7fb4c9) )
+	ROM_LOAD( "ews8.2", 0x0400, 0x400, CRC(ee4a4809) SHA1(292a12a5ddc5a22c8568016b34dfec7959f49027) )
+	ROM_LOAD( "ews8.3", 0x0800, 0x400, CRC(3700a7a3) SHA1(cf24a54e6aa3a3a86ff75f6e8bcb692d0cfd0e80) )
 ROM_END
 
-ROM_START( j_unk )
+ROM_START( j_ewsa )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "sruunk1.p1", 0x0000, 0x000400, CRC(be7d3b79) SHA1(3304dcc69e93eca2e6e89df0b18afc6874ebacf0) )
-	ROM_LOAD( "sruunk1.p2", 0x0400, 0x000400, CRC(bf19cd60) SHA1(77b0b439628589cb0db1b74a760b652519c20991) )
-	ROM_LOAD( "sruunk1.p3", 0x0800, 0x000400, CRC(25138e03) SHA1(644fc6144ea74f08dc892f106ad494ba364afe86) )
+	ROM_LOAD( "ews13.a1", 0x0000, 0x400, CRC(d02d2983) SHA1(9e9e106083dfea44228ae56e73a3fe7184fdb473) )
+	ROM_LOAD( "ews13.2", 0x0400, 0x400, CRC(6b93d262) SHA1(39fce614845ba1d59e27e678318b1a9331797a9b) )
+	ROM_LOAD( "ews13.3", 0x0800, 0x400, CRC(4d8e197a) SHA1(1569327f0e4b5d7632658b69abf59076effb2600) )
+ROM_END
+
+ROM_START( j_ewsb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ews13.c1", 0x0000, 0x400, CRC(2eec7c4d) SHA1(a1740d27e60192659392ba7602b9b62947c4f6db) )
+	ROM_LOAD( "ews13.b2", 0x0400, 0x400, CRC(b84b7858) SHA1(90fd64881d52e1f4362ccbcb9434dbf7b25b97f9) )
+	ROM_LOAD( "ews13.3", 0x0800, 0x400, CRC(4d8e197a) SHA1(1569327f0e4b5d7632658b69abf59076effb2600) )
+ROM_END
+
+ROM_START( j_ewsdlx )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ewsdlx.1", 0x0000, 0x400, CRC(b628ef7d) SHA1(cd10a0bbaefd93cfbd14f1398de2d3a528760806) )
+	ROM_LOAD( "ewsdlx.2", 0x0400, 0x400, CRC(fd36fd6a) SHA1(670418bc6a36712030a77a99c62c44e70451f30d) )
+	ROM_LOAD( "ewsdlx.3", 0x0800, 0x400, CRC(e4eed790) SHA1(64049e0a2f4ec6b72aede34cbcb0ce287844d247) )
+ROM_END
+
+ROM_START( j_ssh )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ssh.1", 0x0000, 0x400, CRC(7bbf8c00) SHA1(edb59505abeae28d3ecd9c7f8f1f49ba1eaf72ab) )
+	ROM_LOAD( "ssh.2", 0x0400, 0x400, CRC(97100cbd) SHA1(154e1348e48a4c9170c7b85e51ec8d381ea420f7) )
+	ROM_LOAD( "ssh.3", 0x0800, 0x400, CRC(a01848d7) SHA1(bd6b093655855aa4870bb319191ae690abebbece) )
+ROM_END
+
+// LUCKY TWOS REV
+ROM_START( j_lt )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "lt9.1", 0x0000, 0x400, CRC(206a7c9a) SHA1(44723d7f8428ad3f7d802b9465634d81ba8753da) )
+	ROM_LOAD( "lt9.2", 0x0400, 0x400, CRC(6e1cd083) SHA1(17edaa9880ae2a6d6d99e771e41b985527d5ed3b) )
+	ROM_LOAD( "lt9.3", 0x0800, 0x400, CRC(d6881e6f) SHA1(42a83f01d67a8f530ca2a10ffeff30237bdfba94) )
+	ROM_LOAD( "lt9.4", 0x1000, 0x400, CRC(97236ce3) SHA1(f71861576f33daec3e1d371c670b535e6fd32b5e) )
+ROM_END
+
+// LUCKY TWOS REV
+ROM_START( j_ts )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ts.1", 0x0000, 0x400, CRC(414c9541) SHA1(2351170c21c92c46f000d8bcf5a46651084e807c) )
+	ROM_LOAD( "ts.2", 0x0400, 0x400, CRC(fe245c53) SHA1(750a7b6f04ae194e3c59412d6aefc9975a7906ee) )
+	ROM_LOAD( "ts.3", 0x0800, 0x400, CRC(83cef11a) SHA1(7cc9b1ccedd2fe23fbfd7ff7ec2e3097397ca736) )
+	ROM_LOAD( "ts.4", 0x1000, 0x400, CRC(da323129) SHA1(76f68919e59093f6925842ba87062b102bccd5b9) )
+ROM_END
+
+ROM_START( j_plus2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "plus2.1", 0x0000, 0x400, CRC(f635174d) SHA1(9478aabc0eaa25d4ae44d2385e738584f03f6647) )
+	ROM_LOAD( "plus2.2", 0x0400, 0x400, CRC(0999d32f) SHA1(e08c852f8f3aff8ab7b73e9c0b0502ab91f9e844) )
+	ROM_LOAD( "plus2.3", 0x0800, 0x400, CRC(d3dfd6ab) SHA1(4cf0f8977fb2c023bf2ccc8d9d74352ce32206bf) )
+	ROM_LOAD( "plus2.4", 0x1000, 0x400, CRC(8b6922b4) SHA1(7b7fc7b0708bf96846860254fea957bcbc952923) )
+ROM_END
+
+ROM_START( j_goldn2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "goldn2.1", 0x0000, 0x400, CRC(6179002b) SHA1(a0b3311e2d2db6e88954cec681dff4ed50230826) )
+	ROM_LOAD( "goldn2.2", 0x0400, 0x400, CRC(0999d32f) SHA1(e08c852f8f3aff8ab7b73e9c0b0502ab91f9e844) )
+	ROM_LOAD( "goldn2.3", 0x0800, 0x400, CRC(d3dfd6ab) SHA1(4cf0f8977fb2c023bf2ccc8d9d74352ce32206bf) )
+	ROM_LOAD( "goldn2.4", 0x1000, 0x400, CRC(8b6922b4) SHA1(7b7fc7b0708bf96846860254fea957bcbc952923) )
+ROM_END
+
+ROM_START( j_sup2p )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sup2p.1", 0x0000, 0x400, CRC(5a7349e6) SHA1(23227892ed10b4c43e987c8448053e5fa1242d39) )
+	ROM_LOAD( "sup2p.2", 0x0400, 0x400, CRC(e0eac683) SHA1(101653ab839f961b7dfd7e530418c00d4edb7ca1) )
+	ROM_LOAD( "sup2p.3", 0x0800, 0x400, CRC(14794c2b) SHA1(2f471530d524db6bab68818138760c0c22a032d5) )
+ROM_END
+
+ROM_START( j_la )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "la.1", 0x0000, 0x400, CRC(21076280) SHA1(d5cf25d289f03c743f4428273ac002df3164c344) )
+	ROM_LOAD( "la.2", 0x0400, 0x400, CRC(cae10bc1) SHA1(a740946437a3b277b714f13d001783987f57bc77) )
+	ROM_LOAD( "la.3", 0x0800, 0x400, CRC(cb9362ac) SHA1(a16d43ba01b24e1b515881957c1559d33a03bcc4) )
 ROM_END
 
 #define GAME_FLAGS MACHINE_NOT_WORKING|MACHINE_MECHANICAL|MACHINE_REQUIRES_ARTWORK|MACHINE_IMPERFECT_SOUND|MACHINE_SUPPORTS_SAVE
@@ -965,18 +1256,26 @@ ROM_END
 GAMEL( 1979?, j_ewn,     0,        ewn,       j_ewn,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Nudger (JPM) (SRU) (revision 20, 5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_ewn )
 GAMEL( 1981?, j_ewna,    j_ewn,    ewn2,      j_ewn2,        jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Nudger (JPM) (SRU) (revision 26A, £2 Jackpot)", GAME_FLAGS, layout_j_ewn )
 GAMEL( 1981?, j_ewnb,    j_ewn,    ewn2,      j_ewn2,        jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Nudger (JPM) (SRU) (£2 Jackpot)", GAME_FLAGS, layout_j_ewn )
+GAMEL( 1979?, j_ewnc,    j_ewn,    ewn,       j_ewn,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Nudger (JPM) (SRU) (5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_ewn ) // Earlier revision
 GAMEL( 1979?, j_ndu,     0,        ndu,       j_ndu,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Nudge Double Up (JPM) (SRU) (revision 17, 5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_ndu )
 GAMEL( 1979?, j_ndua,    j_ndu,    ndu,       j_ndu,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Nudge Double Up (JPM) (SRU) (revision 17, 5p Stake, £1 Jackpot, lower %)", GAME_FLAGS, layout_j_ndu )
+GAMEL( 1979?, j_ndub,    j_ndu,    ndu,       j_ndu,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Nudge Double Up (JPM) (SRU) (5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_ndu )
 GAMEL( 1980?, j_dud,     0,        dud,       j_dud,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Nudge Double Up Deluxe (JPM) (SRU) (revision 10, 5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_dud )
 GAMEL( 1981?, j_duda,    j_dud,    dud,       j_dud2,        jpmsru_state, init_jpmsru, ROT0, "JPM", "Nudge Double Up Deluxe (JPM) (SRU) (£2 Jackpot)", GAME_FLAGS, layout_j_dud )
+GAMEL( 1981?, j_dudb,    j_dud,    dud,       j_dud2,        jpmsru_state, init_jpmsru, ROT0, "JPM", "Nudge Double Up Deluxe (JPM) (SRU) (revision 12, £2 Jackpot)", GAME_FLAGS, layout_j_dud )
 GAMEL( 1981?, j_dt,      j_dud,    dud,       j_dud2,        jpmsru_state, init_jpmsru, ROT0, "JPM", "Double Top (JPM) (SRU) (revision 13, £2 Jackpot)", GAME_FLAGS, layout_j_dud )
 GAMEL( 1980?, j_lan,     0,        lan,       j_lan,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Lite A Nudge (JPM) (SRU) (revision 17F, 5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_lan )
 GAMEL( 1981?, j_lana,    j_lan,    lan,       j_lan2,        jpmsru_state, init_jpmsru, ROT0, "JPM", "Lite A Nudge (JPM) (SRU) (£2 Jackpot)", GAME_FLAGS, layout_j_lan )
-// Unsorted
-GAMEL( 198?,  j_ews,     0,        jpmsru_3k, jpmsru_inputs, jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Shuffle (Barcrest?, set 1, revision 16)", MACHINE_IS_SKELETON_MECHANICAL, layout_jpmsru )
-GAMEL( 198?,  j_ews8a,   j_ews,    jpmsru_3k, jpmsru_inputs, jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Shuffle (Barcrest?, set 2, revision 8a)", MACHINE_IS_SKELETON_MECHANICAL, layout_jpmsru )
-GAMEL( 198?,  j_luckac,  0,        jpmsru_3k, jpmsru_inputs, jpmsru_state, init_jpmsru, ROT0, "JPM", "Lucky Aces (Unk)", MACHINE_IS_SKELETON_MECHANICAL, layout_jpmsru )
-GAMEL( 198?,  j_super2,  0,        jpmsru_3k, jpmsru_inputs, jpmsru_state, init_jpmsru, ROT0, "JPM", "Super 2 (JPM)", MACHINE_IS_SKELETON_MECHANICAL, layout_jpmsru )
-GAMEL( 198?,  j_luck2,   0,        jpmsru_4k, jpmsru_inputs, jpmsru_state, init_jpmsru, ROT0, "JPM", "Lucky 2's", MACHINE_IS_SKELETON_MECHANICAL, layout_jpmsru )
-GAMEL( 198?,  j_unk,     0,        jpmsru_4k, jpmsru_inputs, jpmsru_state, init_jpmsru, ROT0, "JPM?","unknown SRU Game (JPM?)", MACHINE_IS_SKELETON_MECHANICAL, layout_jpmsru )
-GAMEL( 198?,  j_plus2,   0,        jpmsru_4k, jpmsru_inputs, jpmsru_state, init_jpmsru, ROT0, "JPM", "Plus 2 (JPM)", MACHINE_IS_SKELETON_MECHANICAL, layout_jpmsru )
+GAMEL( 1980?, j_lanb,    j_lan,    lan,       j_lan,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Lite A Nudge (JPM) (SRU) (5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_lan )
+GAMEL( 198?,  j_super2,  j_lan,    lan,       j_super2,      jpmsru_state, init_jpmsru, ROT0, "<unknown>", "Super 2 (SRU) (2p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_super2 ) // £1/2p rebuild of Lite A Nudge
+GAMEL( 1981,  j_ews,     0,        ews,       j_ews,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Shuffle (JPM) (SRU) (revision 8A, £2 Jackpot)", GAME_FLAGS, layout_j_ews )
+GAMEL( 1981,  j_ewsa,    j_ews,    ews,       j_ews,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Shuffle (JPM) (SRU) (revision 13A, £2 Jackpot)", GAME_FLAGS, layout_j_ews )
+GAMEL( 1981,  j_ewsb,    j_ews,    ews,       j_ews,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Shuffle (JPM) (SRU) (revision 13C, £2 Jackpot)", GAME_FLAGS, layout_j_ews )
+GAMEL( 1983?, j_ewsdlx,  j_ews,    ews,       j_ewsdlx,      jpmsru_state, init_jpmsru, ROT0, "CTL", "Each Way Shuffle Deluxe (CTL) (SRU) (£3 Jackpot)", GAME_FLAGS, layout_j_ewsdlx ) // £3 rebuild of Each Way Shuffle
+GAMEL( 1983?, j_ssh,     j_ews,    ews,       j_ssh,         jpmsru_state, init_jpmsru, ROT0, "CTL", "Silver Shuffle (CTL) (SRU) (2p Stake, £1.50 Jackpot)", GAME_FLAGS, layout_j_ssh ) // £1.50/2p rebuild of Each Way Shuffle
+GAMEL( 1981,  j_lt,      0,        lt,        j_lt,          jpmsru_state, init_jpmsru, ROT0, "JPM", "Lucky 2's (JPM) (SRU) (revision 9, 10p Stake, £2 Jackpot)", GAME_FLAGS, layout_j_lt )
+GAMEL( 1982,  j_ts,      j_lt,     lt,        j_lt,          jpmsru_state, init_jpmsru, ROT0, "JPM", "Two Step (JPM) (SRU) (5p Stake, £2 Jackpot)", GAME_FLAGS, layout_j_lt )
+GAMEL( 198?,  j_plus2,   j_lt,     lt,        j_plus2,       jpmsru_state, init_jpmsru, ROT0, "CTL", "Plus 2 (CTL) (SRU) (2p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_plus2 ) // £1/2p rebuild of Lucky 2's
+GAMEL( 1983?, j_goldn2,  j_lt,     lt,        j_plus2,       jpmsru_state, init_jpmsru, ROT0, "CTL", "Golden 2's (CTL) (SRU) (2p Stake, £1.50 Jackpot)", GAME_FLAGS, layout_j_plus2 ) // £1.50 JP version of above
+GAMEL( 198?,  j_sup2p,   0,        sup2p,     j_sup2p,       jpmsru_state, init_jpmsru, ROT0, "Mdm", "Super 2p Shuffle (Mdm) (SRU) (2p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_sup2p )
+GAMEL( 1983?, j_la,      0,        lan,       j_la,          jpmsru_state, init_jpmsru, ROT0, "<unknown>", "Lucky Aces (SRU) (£1.50 Jackpot)", GAME_FLAGS, layout_j_la )
