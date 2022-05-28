@@ -1909,6 +1909,7 @@ cactusco                        // (c) 2007
 callwld                         // (c) 2007
 calyking                        // (c) 2005
 canaryrc                        // (c) 2006
+centrion                        // (c) 2007
 cmtonig                         // (c) 2005
 cinhell                         // (c) 2004
 corrida                         // (c) 2005
@@ -2077,6 +2078,7 @@ silkrda6                        // (c) 2006
 silgola6                        // (c) 2002
 skydnca6                        // (c) 2008
 spgcarn                         // (c) 1999
+spgcarnjc                       // (c) 2003
 spgcarnq                        // (c) 2001
 spgfest                         // (c) 2008
 stardrft                        // (c) 2003
@@ -14814,6 +14816,7 @@ superbon                        // bootleg
 superg                          // hack
 supergs                         // Silver Systems hack
 supergx                         // [1980] Nichibutsu
+supershp                        // bootleg
 suprheli                        // bootleg
 swarm                           // hack
 tazmania                        // (c) 1982 Stern
@@ -15766,6 +15769,7 @@ cmezspin                        // (c) 1991 Dyna Electronics
 cmfun                           // (c) 1995 Dyna Electronics
 cmpacman                        //
 cmpacmana                       //
+cmpacmanb                       //
 cmtetris                        //
 cmtetrsa                        //
 cmtetrsb                        //
@@ -19126,20 +19130,29 @@ j80wsprt3                       // Winsprint (JPM)
 j_ewn                           // Each Way Nudger (JPM)
 j_ewna                          //
 j_ewnb                          //
+j_ewnc                          //
 j_ndu                           // Nudge Double Up (JPM)
 j_ndua                          //
+j_ndub                          //
 j_dud                           // Nudge Double Up Deluxe (JPM)
 j_duda                          //
+j_dudb                          //
 j_dt                            //
 j_lan                           // Lite A Nudge (JPM)
 j_lana                          //
-j_ews                           // Each Way Shifter
-j_ews8a                         //
-j_luck2                         // Lucky Twos
-j_luckac                        // Lucky Aces
-j_plus2                         // Plus 2
+j_lanb                          //
 j_super2                        // Super 2
-j_unk                           //
+j_ews                           // Each Way Shuffle (JPM)
+j_ewsa                          //
+j_ewsb                          //
+j_ewsdlx                        // Each Way Shuffle Deluxe (CTL)
+j_ssh                           // Silver Shuffle (CTL)
+j_lt                            // Lucky 2's (JPM)
+j_ts                            //
+j_plus2                         // Plus 2 (CTL)
+j_goldn2                        // Golden 2's (CTL)
+j_sup2p                         // Super 2p Shuffle (MDM)
+j_la                            // Lucky Aces
 
 @source:jpmsys5.cpp
 cashcade                        // Cashcade (JPM)
@@ -19989,6 +20002,9 @@ skywolf2                        // bootleg
 skywolf3                        // bootleg
 sonofphx                        // bootleg
 srdmissn                        // (c) 1986 Taito Corporation
+
+@source:labtam.cpp
+labtam                          // Labtam 3000 model 3006
 
 @source:labyrunr.cpp
 labyrunr                        // GX771 (c) 1987 (Japan)
@@ -23600,6 +23616,9 @@ mice2_6502                      // (c) 1986 Microtek International, Inc.
 mice2_8085                      // (c) 1986 Microtek International, Inc.
 mice2_6809                      // (c) 1986 Microtek International, Inc.
 
+@source:miconkit.cpp
+micon2
+
 @source:micral.cpp
 micral                          //
 questarm
@@ -23618,13 +23637,15 @@ tankbatl                        // (c) 1992 Microprose Games Inc.
 dm3270                          //
 
 @source:microdar.cpp
-dibifuca                        // (c) 199? Compumatic
-dibif743                        // (c) 199? Compumatic
-dibif727                        // (c) 199? Compumatic
 cfarwest                        // (c) 1997 Compumatic
-prospdp                         // (c) 1997 Compumatic
-diolakoa                        // (c) 1997 Compumatic
-diola827                        // (c) 1997 Compumatic
+covidarts                       // (c) 1997 Covielsa
+dibifpspdp                      // (c) 1997 Compumatic / Bifuca
+dibif727                        // (c) 199? Compumatic / Bifuca
+dibif743                        // (c) 199? Compumatic / Bifuca
+dibifuca                        // (c) 199? Compumatic / Bifuca
+diola827                        // (c) 1997 Compumatic / Olakoa
+diolakoa                        // (c) 1997 Compumatic / Olakoa
+minidart                        // (c) 2009 Compumatic
 
 @source:microdec.cpp
 md2                             //
@@ -24057,9 +24078,10 @@ daytonata                       // 1994?   Kyle Hodgetts hack
 daytonagtx                      // 2004    Kyle Hodgetts hack
 desert                          // 1994.07 Desert Tank
 doa                             // 1997.01 Dead or Alive (Revision C)
-doab                            // 1996.12 Dead or Alive (Revision B)
-doaa                            // 1996.11 Dead or Alive (Revision A)
+doaa                            // 1996.12 Dead or Alive (Revision A)
 doaab                           // 1996.11 Dead or Alive (Revision A)
+doaae                           // 1996.11 Dead or Alive (Revision A)
+doab                            // 1996.12 Dead or Alive (Revision B)
 dynabb                          // 1996.08 Dynamite Baseball
 dynabb97                        // 1997.04 Dynamite Baseball 97 (Revision A)
 dynamcop                        // 1998.09 Dynamic Cop (Export)
@@ -38981,7 +39003,7 @@ simpsons4pe                     // GX072 (c) 1991 (World)
 @source:sis630.cpp
 gamecst2                        // MAME based bootleg, version 2.613
 gamecstl                        // MAME based bootleg
-shutms11						// (c) 2000
+shutms11                        // (c) 2000
 
 @source:sitcom.cpp
 sitcom                          //
@@ -41291,6 +41313,9 @@ tek4052a                        //
 tek4107a                        //
 tek4109a                        //
 
+@source:tek43xx.cpp
+tek4319                         //
+
 @source:tek440x.cpp
 tek4404                         // (c) 1984 Tektronix
 
@@ -42663,11 +42688,13 @@ invds                           // 367-382 (c) 1979 Sega
 invho2                          // 271-286 (c) 1979 Sega
 invho2a                         // 326-341 (c) 1979 Sega
 invinco                         // 310-318 (c) 1979 Sega
+nostromo                        // bootleg
 nsub                            // 268-275 (c) 1980 Sega
 pulsar                          // 790-805 (c) 1981 Sega
 safari                          // 57-66 [1977 Gremlin?]
 safaria                         // bootleg?
-samurai                         // 289-302 + upgrades (c) 1980 Sega
+samurai                         // 1217-1230 (c) Sega
+samuraij                        // 289-302 + upgrades (c) 1980 Sega
 spacetrk                        // 630-645 (c) 1980 Sega
 spacetrkc                       // (c) 1980 Sega
 sspacaho                        // ? epr00001.bin - epr00008.bin
@@ -44169,6 +44196,9 @@ psr70                           // 1985 PSR-70
 
 @source:ympsr340.cpp
 psr340                          // 1999 PSR-340
+
+@source:ymqy70.cpp
+qy70                            // 1997 QY-70
 
 @source:ymrx15.cpp
 rx15                            //

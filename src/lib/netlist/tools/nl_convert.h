@@ -23,7 +23,7 @@
 namespace netlist::convert
 {
 
-using arena = plib::aligned_arena;
+using arena = plib::aligned_arena<>;
 
 class nl_convert_base_t
 {

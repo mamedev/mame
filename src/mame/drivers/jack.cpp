@@ -1153,26 +1153,26 @@ ROM_START( zzyzzyxx2 )
 ROM_END
 
 
-ROM_START( brix )
+ROM_START( brix ) // P-1244-1A PCB
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "a",            0x0000, 0x1000, CRC(050e0d70) SHA1(f5e0ed0845443701233de194d9ce24ec35e03a27) )
-	ROM_LOAD( "b",            0x1000, 0x1000, CRC(668118ae) SHA1(688d6f79d30186bade15dbb1f08e8b25cbefa852) )
-	ROM_LOAD( "c",            0x2000, 0x1000, CRC(ff5ed6cf) SHA1(b6309ed322c2bb12626dfaca705e296723ee7e47) )
-	ROM_LOAD( "d",            0x3000, 0x1000, CRC(c3ae45a9) SHA1(879f0a495d9de855ffcbb0907b9b733ca626a7ef) )
-	ROM_LOAD( "e",            0xc000, 0x1000, CRC(def99fa9) SHA1(e28d32934e1ad31595ec6097befd8518178c9d51) )
-	ROM_LOAD( "f",            0xd000, 0x1000, CRC(dde717ed) SHA1(cf9063aa25faf2027770a4b27831e2e20d1801a0) )
-	ROM_LOAD( "g",            0xe000, 0x1000, CRC(adca02d8) SHA1(75703a6f6d8b5eeb609ed5829d12b97b62309ba4) )
-	ROM_LOAD( "h",            0xf000, 0x1000, CRC(bc3b878c) SHA1(91a5daa90a4c46a354f4ef64730b4a0a8348b6a0) )
+	ROM_LOAD( "brix_a.2f",    0x0000, 0x1000, CRC(050e0d70) SHA1(f5e0ed0845443701233de194d9ce24ec35e03a27) )
+	ROM_LOAD( "brix_b.3f",    0x1000, 0x1000, CRC(668118ae) SHA1(688d6f79d30186bade15dbb1f08e8b25cbefa852) )
+	ROM_LOAD( "brix_c.4f",    0x2000, 0x1000, CRC(ff5ed6cf) SHA1(b6309ed322c2bb12626dfaca705e296723ee7e47) )
+	ROM_LOAD( "brix_d.6f",    0x3000, 0x1000, CRC(c3ae45a9) SHA1(879f0a495d9de855ffcbb0907b9b733ca626a7ef) )
+	ROM_LOAD( "brix_e.7f",    0xc000, 0x1000, CRC(def99fa9) SHA1(e28d32934e1ad31595ec6097befd8518178c9d51) )
+	ROM_LOAD( "brix_f.7e",    0xd000, 0x1000, CRC(dde717ed) SHA1(cf9063aa25faf2027770a4b27831e2e20d1801a0) )
+	ROM_LOAD( "brix_g.6e",    0xe000, 0x1000, CRC(adca02d8) SHA1(75703a6f6d8b5eeb609ed5829d12b97b62309ba4) )
+	ROM_LOAD( "brix_h.4e",    0xf000, 0x1000, CRC(bc3b878c) SHA1(91a5daa90a4c46a354f4ef64730b4a0a8348b6a0) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "i.5a",         0x0000, 0x1000, CRC(c7742460) SHA1(1dbf0f5be1e2666feef83f256e2993a6c23d7cfc) )
-	ROM_LOAD( "j.6a",         0x1000, 0x1000, CRC(72166ccd) SHA1(4f4efcd8ed7f729f4630446607b0e9c93098aa3a) )
+	ROM_LOAD( "brix_i.5a",    0x0000, 0x1000, CRC(c7742460) SHA1(1dbf0f5be1e2666feef83f256e2993a6c23d7cfc) )
+	ROM_LOAD( "brix_j.6a",    0x1000, 0x1000, CRC(72166ccd) SHA1(4f4efcd8ed7f729f4630446607b0e9c93098aa3a) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "n",            0x0000, 0x1000, CRC(8064910e) SHA1(331048e30604ef2a0ae0d7ee5ca5c230b601aec7) )
-	ROM_LOAD( "m.1d",         0x1000, 0x1000, CRC(217b1402) SHA1(b842b2bde8ff5be6b240ccfb35c7a9f701dab5f4) )
-	ROM_LOAD( "k",            0x2000, 0x1000, CRC(c7d7e2a0) SHA1(9790e78abf4f57ddfcef8e5632699152f9440a67) )
-	ROM_LOAD( "l.1a",         0x3000, 0x1000, CRC(ab421a83) SHA1(1cc3e1bcf9e90ffbf7bfeeb0caa8a4f63b34146a) )
+	ROM_LOAD( "brix_n.1c",    0x0000, 0x1000, CRC(8064910e) SHA1(331048e30604ef2a0ae0d7ee5ca5c230b601aec7) )
+	ROM_LOAD( "brix_m.1d",    0x1000, 0x1000, CRC(217b1402) SHA1(b842b2bde8ff5be6b240ccfb35c7a9f701dab5f4) )
+	ROM_LOAD( "brix_k.1b",    0x2000, 0x1000, CRC(c7d7e2a0) SHA1(9790e78abf4f57ddfcef8e5632699152f9440a67) )
+	ROM_LOAD( "brix_l.1a",    0x3000, 0x1000, CRC(ab421a83) SHA1(1cc3e1bcf9e90ffbf7bfeeb0caa8a4f63b34146a) )
 ROM_END
 
 

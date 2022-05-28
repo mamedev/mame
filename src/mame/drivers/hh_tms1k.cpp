@@ -267,6 +267,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "mbdtower.lh" // clickable
 #include "mdndclab.lh" // clickable
 #include "merlin.lh" // clickable
+#include "mmarvin.lh" // clickable
 #include "mmerlin.lh" // clickable
 #include "monkeysee.lh"
 #include "palmf31.lh"
@@ -5202,7 +5203,7 @@ void mmarvin_state::mmarvin(machine_config &config)
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(2, 9);
 	m_display->set_segmask(1, 0xff);
-	//config.set_default_layout(layout_mmarvin);
+	config.set_default_layout(layout_mmarvin);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -14369,7 +14370,7 @@ CONS( 1980, efootb4 ,   0,         0, efootb4,   efootb4,   efootb4_state,   emp
 CONS( 1980, ebaskb2 ,   0,         0, ebaskb2,   ebaskb2,   ebaskb2_state,   empty_init, "Entex", "Electronic Basketball 2 (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, raisedvl,   0,         0, raisedvl,  raisedvl,  raisedvl_state,  empty_init, "Entex", "Raise The Devil Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1982, ebknight,   0,         0, ebknight,  raisedvl,  raisedvl_state,  empty_init, "Entex", "Black Knight Pinball (Entex)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1980, mmarvin,    0,         0, mmarvin,   mmarvin,   mmarvin_state,   empty_init, "Entex", "Musical Marvin", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+CONS( 1980, mmarvin,    0,         0, mmarvin,   mmarvin,   mmarvin_state,   empty_init, "Entex", "Musical Marvin", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1979, f2pbball,   0,         0, f2pbball,  f2pbball,  f2pbball_state,  empty_init, "Fonas", "2 Player Baseball (Fonas)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, f3in1,      0,         0, f3in1,     f3in1,     f3in1_state,     empty_init, "Fonas", "3 in 1: Football, Basketball, Soccer", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

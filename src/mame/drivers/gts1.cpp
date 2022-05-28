@@ -73,10 +73,10 @@ Z23  MM6351-IJ Personality PROM
 
 
 Status:
-- All games are playable, to an extent
+- All games are playable
 
 ToDo:
-- Hunt down the remaining CPU bugs.
+- Could be some more CPU bugs, if so hunt them down.
 - The sound-board sounds are very weird.
 - Z80-based sound board for hexagone and sahalove (no info available).
 
@@ -1065,18 +1065,18 @@ GAME(1977,  gts1,     0,      p0,  gts1,     gts1_state, empty_init, ROT0, "Gott
 GAME(19??,  sys1test, gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "System 1 Test prom",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // chimes
-GAME(1977,  cleoptra, gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Cleopatra",                            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  sinbad,   gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Sinbad",                               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  sinbadn,  sinbad, p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Sinbad (Norway)",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  jokrpokr, gts1,   p0,  jokrpokr, gts1_state, empty_init, ROT0, "Gottlieb",         "Joker Poker",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1977,  cleoptra, gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Cleopatra",                            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  sinbad,   gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Sinbad",                               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  sinbadn,  sinbad, p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Sinbad (Norway)",                      MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  jokrpokr, gts1,   p0,  jokrpokr, gts1_state, empty_init, ROT0, "Gottlieb",         "Joker Poker",                          MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // NE555 beeper
-GAME(1978,  dragon,   gts1,   p1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Dragon",                               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979,  solaride, gts1,   p1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Solar Ride",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979,  countdwn, gts1,   p1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Count-Down",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  closeenc, gts1,   p1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Close Encounters of the Third Kind",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  charlies, gts1,   p1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Charlie's Angels",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979,  pinpool,  gts1,   p1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Pinball Pool",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  dragon,   gts1,   p1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Dragon",                               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  solaride, gts1,   p1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Solar Ride",                           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  countdwn, gts1,   p1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Count-Down",                           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  closeenc, gts1,   p1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Close Encounters of the Third Kind",   MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  charlies, gts1,   p1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Charlie's Angels",                     MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  pinpool,  gts1,   p1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Pinball Pool",                         MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // sound card
 GAME(1979,  totem,    gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Totem",                                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

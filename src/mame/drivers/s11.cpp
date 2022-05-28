@@ -698,11 +698,11 @@ ROM_END
 
 
 // Pinball
-GAME( 1986, grand_l4, 0,        s11_bgs,  s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-4)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, grand_l3, grand_l4, s11_bgs,  s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-3)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, hs_l4,    0,        s11_bgs,  s11, s11_state, init_s11, ROT0, "Williams", "High Speed (L-4)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, hs_l3,    hs_l4,    s11_bgs,  s11, s11_state, init_s11, ROT0, "Williams", "High Speed (L-3)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rdkng_l4, 0,        s11_bgm,  s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-4)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rdkng_l1, rdkng_l4, s11_bgm,  s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-1)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rdkng_l2, rdkng_l4, s11_bgm,  s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-2)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rdkng_l3, rdkng_l4, s11_bgm,  s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-3)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, grand_l4, 0,        s11_bgs,  s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-4)",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, grand_l3, grand_l4, s11_bgs,  s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-3)",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, hs_l4,    0,        s11_bgs,  s11, s11_state, init_s11, ROT0, "Williams", "High Speed (L-4)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, hs_l3,    hs_l4,    s11_bgs,  s11, s11_state, init_s11, ROT0, "Williams", "High Speed (L-3)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rdkng_l4, 0,        s11_bgm,  s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-4)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rdkng_l1, rdkng_l4, s11_bgm,  s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-1)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rdkng_l2, rdkng_l4, s11_bgm,  s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-2)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rdkng_l3, rdkng_l4, s11_bgm,  s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-3)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

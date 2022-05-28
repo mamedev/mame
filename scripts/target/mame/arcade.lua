@@ -2085,9 +2085,6 @@ files {
 	MAME_DIR .. "src/mame/includes/gatron.h",
 	MAME_DIR .. "src/mame/video/gatron.cpp",
 	MAME_DIR .. "src/mame/drivers/gotya.cpp",
-	MAME_DIR .. "src/mame/includes/gotya.h",
-	MAME_DIR .. "src/mame/audio/gotya.cpp",
-	MAME_DIR .. "src/mame/video/gotya.cpp",
 	MAME_DIR .. "src/mame/drivers/sbugger.cpp",
 	MAME_DIR .. "src/mame/includes/sbugger.h",
 	MAME_DIR .. "src/mame/video/sbugger.cpp",
@@ -3851,6 +3848,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mainsnk.cpp",
 	MAME_DIR .. "src/mame/includes/mainsnk.h",
 	MAME_DIR .. "src/mame/video/mainsnk.cpp",
+	MAME_DIR .. "src/mame/drivers/miconkit.cpp",
 	MAME_DIR .. "src/mame/drivers/munchmo.cpp",
 	MAME_DIR .. "src/mame/includes/munchmo.h",
 	MAME_DIR .. "src/mame/video/munchmo.cpp",
@@ -4529,8 +4527,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/paradise.cpp",
 	MAME_DIR .. "src/mame/drivers/yunsung8.cpp",
 	MAME_DIR .. "src/mame/drivers/yunsun16.cpp",
-	MAME_DIR .. "src/mame/includes/yunsun16.h",
-	MAME_DIR .. "src/mame/video/yunsun16.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "zaccaria")

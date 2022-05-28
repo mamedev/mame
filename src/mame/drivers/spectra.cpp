@@ -314,4 +314,4 @@ ROM_END
 
 } // anonymous namespace
 
-GAME(1979,  spectra,  0,  spectra,  spectra, spectra_state, empty_init, ROT0, "Valley", "Spectra IV", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  spectra,  0,  spectra,  spectra, spectra_state, empty_init, ROT0, "Valley", "Spectra IV", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

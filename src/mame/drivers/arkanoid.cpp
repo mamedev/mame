@@ -1534,8 +1534,9 @@ void arkanoid_state::brixian(machine_config &config)
     A75 33   = PROM red Tournament
     A75 34   = PROM green Tournament
     A75 35   = PROM blue Tournament
-    A75 36   = Z80 code 1/2 (Tournament v2.0?) (NOT DUMPED)
-    A75 37   = Z80 code 2/2 (Tournament v2.0?) (NOT DUMPED)
+    A75 36   = Z80 code 1/2 (Tournament v2.0?)
+    A75 37   = Z80 code 2/2 (Tournament v2.0?)
+    A75 38   = MC68705P5 MCU code (NOT DUMPED)
 */
 
 ROM_START( arkanoid ) // v1.0 World

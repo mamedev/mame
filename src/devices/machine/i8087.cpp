@@ -4236,6 +4236,7 @@ void i8087_device::fsave(u8 modrm)
 
 	for (int i = 0; i < 8; ++i)
 		WRITE80(ea + i*10, ST(i));
+	reset();
 
 	CYCLES(67);
 }

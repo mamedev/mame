@@ -13,7 +13,6 @@
 #include "../nl_setup.h"
 #include "../nltypes.h"
 
-//#include "../plib/ppreprocessor.h"
 #include "../plib/pstream.h"
 #include "../plib/pstring.h"
 

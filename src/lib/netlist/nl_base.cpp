@@ -91,7 +91,7 @@ namespace netlist
 	, m_time(netlist_time_ext::zero())
 	, m_main_clock(nullptr)
 	, m_use_stats(false)
-	, m_queue(config::max_queue_size::value,
+	, m_queue(state.pool(), config::max_queue_size::value,
 		detail::queue_t::id_delegate(&netlist_state_t :: find_net_id, &state),
 		detail::queue_t::obj_delegate(&netlist_state_t :: net_by_id, &state))
 	{

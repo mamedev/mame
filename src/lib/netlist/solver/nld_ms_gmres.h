@@ -37,7 +37,7 @@ namespace netlist::solver
 			const solver::solver_parameters_t *params,
 			const std::size_t size)
 			: matrix_solver_direct_t<FT, SIZE>(main_solver, name, nets, params, size)
-			, m_ops(size, 0)
+			, m_ops(this->m_arena, size, 0)
 			, m_gmres(size)
 			{
 			const std::size_t iN = this->size();
@@ -81,10 +81,10 @@ namespace netlist::solver
 
 	private:
 
-		using mattype = typename plib::pmatrix_cr<FT, SIZE>::index_type;
+		using mattype = typename plib::pmatrix_cr<arena_type, FT, SIZE>::index_type;
 
 		//plib::mat_precondition_none<FT, SIZE> m_ops;
-		plib::mat_precondition_ILU<FT, SIZE> m_ops;
+		plib::mat_precondition_ILU<arena_type, FT, SIZE> m_ops;
 		//plib::mat_precondition_diag<FT, SIZE> m_ops;
 		plib::gmres_t<FT, SIZE> m_gmres;
 	};
