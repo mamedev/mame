@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder,smf
+// copyright-holders:Curt Coder,smf,Mike Naberezny
 /***************************************************************************
 
         Commodore LCD prototype
@@ -13,6 +13,7 @@
 
 
 #include "emu.h"
+#include "bus/cbmiec/cbmiec.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m6502/m65c02.h"
@@ -38,6 +39,7 @@ public:
 		m_via0(*this, "via0"),
 		m_rtc(*this, "rtc"),
 		m_centronics(*this, "centronics"),
+		m_iec(*this, CBM_IEC_TAG),
 		m_ram(*this, "ram"),
 		m_nvram(*this, "nvram"),
 		m_bankdev(*this, "bank%u", 1U),
@@ -390,8 +392,29 @@ public:
 		m_key_column = data;
 	}
 
+	uint8_t via0_pb_r()
+	{
+		uint8_t data = 0;
+
+		if (!m_iec->clk_r())
+		{
+			data |= 1<<6;
+		}
+
+		if (!m_iec->data_r())
+		{
+			data |= 1<<7;
+		}
+
+		return data;
+	}
+
 	void via0_pb_w(uint8_t data)
 	{
+		m_iec->host_atn_w(!BIT(data, 3));
+		m_iec->host_clk_w(!BIT(data, 4));
+		m_iec->host_data_w(!BIT(data, 5));
+
 		write_key_poll((data >> 0) & 1);
 		m_rtc->cs2_w((data >> 1) & 1);
 	}
@@ -491,6 +514,7 @@ private:
 	required_device<via6522_device> m_via0;
 	required_device<msm58321_device> m_rtc;
 	required_device<centronics_device> m_centronics;
+	required_device<cbm_iec_device> m_iec;
 	required_device<ram_device> m_ram;
 	required_device<nvram_device> m_nvram;
 	required_device_array<address_map_bank_device, 4> m_bankdev;
@@ -670,6 +694,7 @@ void clcd_state::clcd(machine_config &config)
 	via6522_device &via0(R65C22(config, "via0", 1000000));
 	via0.writepa_handler().set(FUNC(clcd_state::via0_pa_w));
 	via0.writepb_handler().set(FUNC(clcd_state::via0_pb_w));
+	via0.readpb_handler().set(FUNC(clcd_state::via0_pb_r));
 	via0.cb1_handler().set(FUNC(clcd_state::via0_cb1_w));
 	via0.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 
@@ -731,6 +756,8 @@ void clcd_state::clcd(machine_config &config)
 	RAM(config, "ram").set_default_size("128K").set_extra_options("32K,64K").set_default_value(0);
 
 	NVRAM(config, "nvram").set_custom_handler(FUNC(clcd_state::nvram_init));
+
+	cbm_iec_slot_device::add(config, m_iec, nullptr);
 }
 
 
