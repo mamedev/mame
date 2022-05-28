@@ -2108,8 +2108,8 @@ GAME(199?, m4casmul,  0,          mod4oki,    mpu4,    mpu4unsorted_state, init_
 
 // barcrest, to split
 
-// 00 c0 e0 b0 38 c4 f0 30 58 9c 9c 9c dc 9c dc 94 38
-GAME(199?, m4c9c,     0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","Cloud Nine Club (Barcrest) (MPU4) (CNC 2.1)",GAME_FLAGS ) // doesn't boot
+// 00 c0 e0 b0 38 c4 f0 30 58 9c 9c 9c dc 9c dc 94 38 (same as tentendia)
+GAME(199?, m4c9c,     0,          mod4oki_cheatchr_tentendia,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","Cloud Nine Club (Barcrest) (MPU4) (CNC 2.1)",GAME_FLAGS ) // doesn't boot
 
 // 00 84 94 3c ec 5c ec 50 2c 68 60 ac 74 00 ac  (just tri98)
 GAME(199?, m4ch30,    0,          mod4oki_cheatchr_tri98,    mpu4,    mpu4unsorted_state, init_m4default,  ROT0,   "Barcrest","unknown MPU4 'CH3 0.1' (Barcrest) (MPU4)",GAME_FLAGS )
@@ -2120,11 +2120,11 @@ GAME(199?, m4clbx,    0,          mod4oki_cheatchr_viva,    mpu4,    mpu4unsorte
 GAME(199?, m4clbxa,   m4clbx,     mod4oki_cheatchr_viva,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0, "Barcrest","Club X (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
 GAME(199?, m4clbxb,   m4clbx,     mod4oki_cheatchr_viva,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0, "Barcrest","Club X (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
 
-// 00 c0 e0 b0 38 c4 f0 30 58 9c 9c 9c dc 9c dc 94 38
-GAME(199?, m4ringfr,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0, "Barcrest","Ring Of Fire (Barcrest) (MPU4)",GAME_FLAGS ) // German?
+// 00 c0 e0 b0 38 c4 f0 30 58 9c 9c 9c dc 9c dc 94 38 (same as tentendia)
+GAME(199?, m4ringfr,  0,          mod4oki_cheatchr_tentendia,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0, "Barcrest","Ring Of Fire (Barcrest) (MPU4)",GAME_FLAGS ) // German?
 
-// 00 90 88 4c e0 b8 74 84 bc 74 00 b4 88 6c c0 1c f4  runs with door open, not English
-GAME(199?, m4royjwl,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big,  ROT0,   "Barcrest","Royal Jewels (Barcrest) (MPU4)",GAME_FLAGS )
+// 00 90 88 4c e0 b8 74 84 bc 74 00 b4 88 6c c0 1c f4 (same as jewel in the crown) runs with door open, not English
+GAME(199?, m4royjwl,  0,          mod4oki_cheatchr_jewelcrown,    mpu4,    mpu4unsorted_state, init_m4default_big,  ROT0,   "Barcrest","Royal Jewels (Barcrest) (MPU4)",GAME_FLAGS )
 
 // play but behavior isn't like barcrest
 // 00 24 24 2c 70 20 0c 60 3c 5c 5c 5c 7c 4c 68 40 34 38 (mod4oki_cheatchr_duty scramble)
@@ -2142,8 +2142,8 @@ GAME(199?, m4crjwl2b, m4crjwl2,   mod4oki_cheatchr_duty,    mpu4,    mpu4unsorte
 // 00 a0 a8 18 f4 2c 70 60 e4 e8 58 d4 2c 50 60  (viva_lamp_scramble)
 GAME(199?, m4maglin,  0,          mod4oki_cheatchr_viva,mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Magic Liner (Barcrest) (MPU4) (DMA2.1)",GAME_FLAGS )
 
-// 00 90 a0 34 8c 68 44 90 ac 6c 44 9c dc 5c d4 24 98 dc
-GAME(199?, m4magdrg,  0,          mod4oki_cheatchr,mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Magic Dragon (Barcrest) (MPU4) (DMD1.0)",GAME_FLAGS )
+// 00 90 a0 34 8c 68 44 90 ac 6c 44 9c dc 5c d4 24 98 dc  (same as bwb viz set)
+GAME(199?, m4magdrg,  0,          mod4oki_cheatchr_magicdragon,mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Magic Dragon (Barcrest) (MPU4) (DMD1.0)",GAME_FLAGS )
 
 GAME(199?, m4clbveg,  0,          mod4oki_alt_cheatchr_clbveg,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
 GAME(199?, m4clbvega, m4clbveg,   mod4oki_alt_cheatchr_clbveg,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (set 2)",GAME_FLAGS )

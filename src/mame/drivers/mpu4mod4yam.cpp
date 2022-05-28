@@ -598,7 +598,7 @@ GAME_CUSTOM( 199?, m4nudbnk__d,    m4nudbnk,   "sbnx.p1",  0x0000, 0x010000, CRC
 
 // boot, need proper lamp descramble
 
-// 00 a0 a8 18 f4 2c 70 60 e4 e8 58 d4 2c 50
+// 00 a0 a8 18 f4 2c 70 60 e4 e8 58 d4 2c 50 (mod4yam_cheatchr_viva)
 // (C)1995  B.W.B. and SP5 1.0
 GAME_CUSTOM( 199?, m4sss,     0,      "sp_05a__.1o3",     0x0000, 0x010000, CRC(044a0133) SHA1(7cf85cf19f5c3f588daf5c0d7efe4204d67161a2), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SP5 1.0, set 1)" )
 GAME_CUSTOM( 199?, m4sss__b,  m4sss,  "sp_05s__.1o3",     0x0000, 0x010000, CRC(2e000a62) SHA1(e60390a383388e385bbde79ca14c63e5d69a8869), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SP5 1.0, set 2)" )
@@ -1002,7 +1002,7 @@ GAME_CUSTOM( 199?, m4supst__b5, m4supst,    "supst2515",            0x0000, 0x01
 	ROM_END \
 	GAME(year, setname, parent, mod4yam_cheatchr_viva, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
-// 00 a0 a8 18 f4 2c 70 60 e4 e8 58 d4 2c 50 60 80 8c 7c (
+// 00 a0 a8 18 f4 2c 70 60 e4 e8 58 d4 2c 50 60 80 8c 7c (mod4yam_cheatchr_viva)
 GAME_CUSTOM( 199?, m4fastfw,       0,          "ffo05__1.0",   0x0000, 0x010000, CRC(8b683969) SHA1(7469b551e4d6f65550d54ee39b2bac07cf3dbd4b), "Bwb / Barcrest","Fast Forward (Barcrest) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4fastfw__a,    m4fastfw,   "ffo10__1.0",   0x0000, 0x010000, CRC(294288fd) SHA1(87d25f6333b6862fcc57a550b5cc7c0bc64e72cd), "Bwb / Barcrest","Fast Forward (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4fastfw__b,    m4fastfw,   "ffo10d_1.0",   0x0000, 0x010000, CRC(8d96f3d4) SHA1(2070a335cfa3f9de1bd9e9094d91cce81b91347d), "Bwb / Barcrest","Fast Forward (Barcrest) (MPU4) (set 3)" )
@@ -1054,9 +1054,9 @@ GAME_CUSTOM( 199?, m4vivalv__h,    m4vivalv,   "viva206",                      0
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4yam_cheatchr_tentendia, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
-// 00 c0 e0 b0 38 c4 f0 30 58 9c 9c 9c dc 9c
+// 00 c0 e0 b0 38 c4 f0 30 58 9c 9c 9c dc 9c (same as tentendia)
 // (C)1993  B.W.B. and "VL_ 2.0" - boots with cheatchr
 GAME_CUSTOM( 199?, m4vivalv__i,    m4vivalv,   "v.las vegas 6 10p 10m.bin",    0x0000, 0x010000, CRC(f09d5a2c) SHA1(6f9df58767e88a1ca7fc7dd17c618d30ab97067d), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 1)" )
 GAME_CUSTOM( 199?, m4vivalv__j,    m4vivalv,   "vv_05___.3_3",                 0x0000, 0x010000, CRC(bb8361f6) SHA1(d5f651a66be1cab3662798751a290a65c29bba64), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 2)" )
@@ -1217,7 +1217,7 @@ GAME_CUSTOM( 199?, m4hypclb__b,    m4hypclb,   "hpcfd.p1", 0x0000, 0x010000, CRC
 
 // some of these ROMs (the non-D ones?) contain a 'Barcrest Video' string, why? there's no footage to support it being a video game
 
-// 00 a0 a8 18 f4 2c 70 60 e4 e8 58 d4 2c 50 60 80 8c 7c
+// 00 a0 a8 18 f4 2c 70 60 e4 e8 58 d4 2c 50 60 80 8c 7c (mod4yam_cheatchr_viva)
 // "(C)1994  B.W.B." and "GB  5.0"
 GAME_CUSTOM( 199?, m4gbust,     0,          "gb_05___.4s3",         0x0000, 0x010000, CRC(e2227701) SHA1(271682c7bf6e0f6f49f6d6b138aa19b6ef6bc626), "Bwb","Ghost Buster (Barcrest) (MPU4) (GB 5.0)" )
 // "(C)1994  B.W.B." and "GB  4.0"

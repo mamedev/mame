@@ -2135,7 +2135,7 @@ GAME(199?, m4brktak,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machi
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod2_cheatchr, mpu4, mpu4mod2_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod2_cheatchr_tentendia, mpu4, mpu4mod2_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // sequence 00 c0 e0 b0 38 c4 f0 30 58 9c 9c 9c dc 9c dc 94  (Same as Ten Ten Do It Again)
 // "(C)1991 BARCREST" and "NN3 0.1"

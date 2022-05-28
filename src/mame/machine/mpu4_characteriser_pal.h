@@ -138,7 +138,14 @@ public:
 	// games with sequence starting  00 84 C4 E4 4C 10 28 90 E8 78 34
 	static constexpr uint8_t vivlv_lamp_scramble[8] = { 0x00, 0x28, 0x00, 0x28, 0x20, 0x08, 0x00, 0x00 };
 
-	
+	// games with sequence starting 00 c0 e0 b0 38 c4 f0 30 58 9c 9c 9c dc 9c dc
+	static constexpr uint8_t tentendia_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; 	// INCORRECT 
+
+	// games with sequence starting 00 90 88 4c e0 b8 74 84 bc 74 00 b4
+	static constexpr uint8_t jewelcrown_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; 	// INCORRECT 
+
+	// games with sequence starting 00 90 a0 34 8c 68 44 90 ac 6c 44 9c dc 5c d4 24 98 dc
+	static constexpr uint8_t magicdragon_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; 	// INCORRECT 
 
 protected:
 	mpu4_characteriser_pal(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

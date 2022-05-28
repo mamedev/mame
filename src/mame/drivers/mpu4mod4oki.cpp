@@ -4218,7 +4218,7 @@ GAME_CUSTOM( 199?, m4viz__b,  m4viz,  "viz20pv2",     0x0000, 0x010000, CRC(7e56
 		ROM_LOAD( name, offset, length, hash ) \
 		M4VIZ_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_magicdragon, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 
 // sequence 00 90 a0 34 8c 68 44 90 ac 6c 44 9c dc
@@ -5558,27 +5558,27 @@ GAME_CUSTOM( 199?, m4vegast__i,    m4vegast,   "uvsy.p1",      0x0000, 0x020000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4VEGAST_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_jewelcrown, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
 
 // requires chr sequence starting 00 90 88 4c e0 b8 74 84 bc 74 00 b4 88 6c  (Same as some Jewel in the Crown sets)
 // "(C)1993 BARCREST" and "VSG 0.4"
-GAME_CUSTOM( 199?, m4vegast__t,    m4vegast,   "vsg04s.p1",    0x0000, 0x020000, CRC(aff47295) SHA1(d249f280b721c96b7c36329e2c2bb955fa91aa59), "Barcrest","Vegas Strip (Barcrest) (MPU4) (VSG 0.4)" )
-GAME_CUSTOM( 199?, m4vegast__j,    m4vegast,   "vsg04ad.p1",   0x0000, 0x020000, CRC(d63f8f24) SHA1(f3dcd908bceb5a508927a83d23e82577e8684240), "Barcrest","Vegas Strip (Barcrest) (MPU4) (VSG 0.4 AD)" )
-GAME_CUSTOM( 199?, m4vegast__k,    m4vegast,   "vsg04b.p1",    0x0000, 0x020000, CRC(4211e2bf) SHA1(5f634d074d0f95673f734c5600ac990fb7510bdc), "Barcrest","Vegas Strip (Barcrest) (MPU4) (VSG 0.4 B)" )
-GAME_CUSTOM( 199?, m4vegast__l,    m4vegast,   "vsg04bd.p1",   0x0000, 0x020000, CRC(5b2521e1) SHA1(67d2496e7a52f9aa984d57a5b76f995506051a8c), "Barcrest","Vegas Strip (Barcrest) (MPU4) (VSG 0.4 BD)" )
-GAME_CUSTOM( 199?, m4vegast__m,    m4vegast,   "vsg04c.p1",    0x0000, 0x020000, CRC(755b5fad) SHA1(fd76ae19e3ed7ea8c138655bc45e35ab5e4947a9), "Barcrest","Vegas Strip (Barcrest) (MPU4) (VSG 0.4 C)" )
-GAME_CUSTOM( 199?, m4vegast__n,    m4vegast,   "vsg04d.p1",    0x0000, 0x020000, CRC(3f0ae9c9) SHA1(ca3ce4651fe07559d64a4a15c987ba6a5d06cc2f), "Barcrest","Vegas Strip (Barcrest) (MPU4) (VSG 0.4 D)" )
-GAME_CUSTOM( 199?, m4vegast__o,    m4vegast,   "vsg04dk.p1",   0x0000, 0x020000, CRC(11e289b7) SHA1(19a4498a85038d14c062843b86027b5bd587b750), "Barcrest","Vegas Strip (Barcrest) (MPU4) (VSG 0.4 KD)" )
-GAME_CUSTOM( 199?, m4vegast__p,    m4vegast,   "vsg04dr.p1",   0x0000, 0x020000, CRC(a2ed3286) SHA1(4a8260625281bb400e35365f34d9fc59cac53740), "Barcrest","Vegas Strip (Barcrest) (MPU4) (VSG 0.4 RD)" )
-GAME_CUSTOM( 199?, m4vegast__q,    m4vegast,   "vsg04dy.p1",   0x0000, 0x020000, CRC(9601a949) SHA1(39a06f671b8f817039b9861887dd9521e7f3acdd), "Barcrest","Vegas Strip (Barcrest) (MPU4) (VSG 0.4 YD)" )
-GAME_CUSTOM( 199?, m4vegast__r,    m4vegast,   "vsg04k.p1",    0x0000, 0x020000, CRC(08d64ae9) SHA1(5cfe1b2fe0933d06618a2c88e1a63224686e972f), "Barcrest","Vegas Strip (Barcrest) (MPU4) (VSG 0.4 K)" )
-GAME_CUSTOM( 199?, m4vegast__s,    m4vegast,   "vsg04r.p1",    0x0000, 0x020000, CRC(bbd9f1d8) SHA1(22312ff72d5b2fbe6416a7e84435e1df456a3547), "Barcrest","Vegas Strip (Barcrest) (MPU4) (VSG 0.4 R)" )
-GAME_CUSTOM( 199?, m4vegast__u,    m4vegast,   "vsg04y.p1",    0x0000, 0x020000, CRC(8f356a17) SHA1(33ac5e8a455175471466f7c7f35c66f795067bf2), "Barcrest","Vegas Strip (Barcrest) (MPU4) (VSG 0.4 Y)" )
+GAME_CUSTOM( 199?, m4vegast__t,    m4vegast,   "vsg04s.p1",    0x0000, 0x020000, CRC(aff47295) SHA1(d249f280b721c96b7c36329e2c2bb955fa91aa59), "Barcrest","Las Vegas Strip (Barcrest) (MPU4) (VSG 0.4)" )
+GAME_CUSTOM( 199?, m4vegast__j,    m4vegast,   "vsg04ad.p1",   0x0000, 0x020000, CRC(d63f8f24) SHA1(f3dcd908bceb5a508927a83d23e82577e8684240), "Barcrest","Las Vegas Strip (Barcrest) (MPU4) (VSG 0.4 AD)" )
+GAME_CUSTOM( 199?, m4vegast__k,    m4vegast,   "vsg04b.p1",    0x0000, 0x020000, CRC(4211e2bf) SHA1(5f634d074d0f95673f734c5600ac990fb7510bdc), "Barcrest","Las Vegas Strip (Barcrest) (MPU4) (VSG 0.4 B)" )
+GAME_CUSTOM( 199?, m4vegast__l,    m4vegast,   "vsg04bd.p1",   0x0000, 0x020000, CRC(5b2521e1) SHA1(67d2496e7a52f9aa984d57a5b76f995506051a8c), "Barcrest","Las Vegas Strip (Barcrest) (MPU4) (VSG 0.4 BD)" )
+GAME_CUSTOM( 199?, m4vegast__m,    m4vegast,   "vsg04c.p1",    0x0000, 0x020000, CRC(755b5fad) SHA1(fd76ae19e3ed7ea8c138655bc45e35ab5e4947a9), "Barcrest","Las Vegas Strip (Barcrest) (MPU4) (VSG 0.4 C)" )
+GAME_CUSTOM( 199?, m4vegast__n,    m4vegast,   "vsg04d.p1",    0x0000, 0x020000, CRC(3f0ae9c9) SHA1(ca3ce4651fe07559d64a4a15c987ba6a5d06cc2f), "Barcrest","Las Vegas Strip (Barcrest) (MPU4) (VSG 0.4 D)" )
+GAME_CUSTOM( 199?, m4vegast__o,    m4vegast,   "vsg04dk.p1",   0x0000, 0x020000, CRC(11e289b7) SHA1(19a4498a85038d14c062843b86027b5bd587b750), "Barcrest","Las Vegas Strip (Barcrest) (MPU4) (VSG 0.4 KD)" )
+GAME_CUSTOM( 199?, m4vegast__p,    m4vegast,   "vsg04dr.p1",   0x0000, 0x020000, CRC(a2ed3286) SHA1(4a8260625281bb400e35365f34d9fc59cac53740), "Barcrest","Las Vegas Strip (Barcrest) (MPU4) (VSG 0.4 RD)" )
+GAME_CUSTOM( 199?, m4vegast__q,    m4vegast,   "vsg04dy.p1",   0x0000, 0x020000, CRC(9601a949) SHA1(39a06f671b8f817039b9861887dd9521e7f3acdd), "Barcrest","Las Vegas Strip (Barcrest) (MPU4) (VSG 0.4 YD)" )
+GAME_CUSTOM( 199?, m4vegast__r,    m4vegast,   "vsg04k.p1",    0x0000, 0x020000, CRC(08d64ae9) SHA1(5cfe1b2fe0933d06618a2c88e1a63224686e972f), "Barcrest","Las Vegas Strip (Barcrest) (MPU4) (VSG 0.4 K)" )
+GAME_CUSTOM( 199?, m4vegast__s,    m4vegast,   "vsg04r.p1",    0x0000, 0x020000, CRC(bbd9f1d8) SHA1(22312ff72d5b2fbe6416a7e84435e1df456a3547), "Barcrest","Las Vegas Strip (Barcrest) (MPU4) (VSG 0.4 R)" )
+GAME_CUSTOM( 199?, m4vegast__u,    m4vegast,   "vsg04y.p1",    0x0000, 0x020000, CRC(8f356a17) SHA1(33ac5e8a455175471466f7c7f35c66f795067bf2), "Barcrest","Las Vegas Strip (Barcrest) (MPU4) (VSG 0.4 Y)" )
 // "(C)1993 BARCREST" and "VSG 0.3" (most of the sets with 2010 in the filenames are hacks, but this looks like a regular set?)
-GAME_CUSTOM( 199?, m4vegast__x,    m4vegast,   "vstr2010",     0x0000, 0x020000, CRC(126365e3) SHA1(1e648b7a8cb1ff49e43e2fdc30f482b2b73ed6d7), "Barcrest","Vegas Strip (Barcrest) (MPU4) (VSG 0.3)" )
+GAME_CUSTOM( 199?, m4vegast__x,    m4vegast,   "vstr2010",     0x0000, 0x020000, CRC(126365e3) SHA1(1e648b7a8cb1ff49e43e2fdc30f482b2b73ed6d7), "Barcrest","Las Vegas Strip (Barcrest) (MPU4) (VSG 0.3)" )
 
 // "(C)1993 BARCREST" and "VSG 0.3" (but doesn't boot?, bad or different protections)
-GAME_CUSTOM( 199?, m4vegast__v,    m4vegast,   "lvs",          0x0000, 0x020000, CRC(dcb0dc80) SHA1(6045b332eb4af09f6e0a669ea0b78ef4ac389ac2), "hack?","Vegas Strip (Barcrest) (MPU4) (VSG 0.3 YE, hack?)" )
+GAME_CUSTOM( 199?, m4vegast__v,    m4vegast,   "lvs",          0x0000, 0x020000, CRC(dcb0dc80) SHA1(6045b332eb4af09f6e0a669ea0b78ef4ac389ac2), "hack?","Las Vegas Strip (Barcrest) (MPU4) (VSG 0.3 YE, hack?)" )
 
 
 /*****************************************************************************************************************************************************************************
@@ -5780,7 +5780,7 @@ GAME_CUSTOM( 199?, m4buc__b,  m4buc,  "bucc15t",              0x000000, 0x020000
 		ROM_LOAD( name, offset, length, hash ) \
 		M4JWLCWN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_jewelcrown, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
 
 // sequence 00 90 88 4c e0 b8 74 84 bc 74 00 b4 (same as some Vegas Strip sets)
 // "(C)1993 BARCREST" and "CJE 1.0"
@@ -5995,7 +5995,7 @@ GAME_CUSTOM( 199?, m4berser__1,    m4berser,   "be_05a_4.1_1", 0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TTDIA_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_tentendia, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
 
 // needs chr sequence starting 00 c0 e0 b0 38 c4 f0 30 58 9c 9c 9c dc 9c dc
 // "(C)1993 BARCREST" and "TDA 0.4"

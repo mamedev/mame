@@ -2840,6 +2840,12 @@ void mpu4_state::mod2_cheatchr_lv(machine_config &config)
 	mod2_cheatchr_table(config, mpu4_characteriser_pal::m4lv_lamp_scramble);
 }
 
+void mpu4_state::mod2_cheatchr_tentendia(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::tentendia_lamp_scramble);
+}
+
+
 // alt reel setup
 
 void mpu4_state::mod2_alt(machine_config &config)
@@ -2925,6 +2931,11 @@ void mpu4_state::mod4yam_cheatchr_lv(machine_config &config)
 void mpu4_state::mod4yam_cheatchr_vivlv(machine_config &config)
 {
 	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::vivlv_lamp_scramble);
+}
+
+void mpu4_state::mod4yam_cheatchr_tentendia(machine_config &config)
+{
+	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::tentendia_lamp_scramble);
 }
 
 void mpu4_state::mod4yam_cheatchr_m683(machine_config &config)
@@ -3090,6 +3101,22 @@ void mpu4_state::mod4oki_cheatchr_m470(machine_config &config)
 {
 	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::m470_lamp_scramble);
 }
+
+void mpu4_state::mod4oki_cheatchr_tentendia(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::tentendia_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_jewelcrown(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::jewelcrown_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_magicdragon(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::magicdragon_lamp_scramble);
+}
+
 
 // alt reel setup
 
