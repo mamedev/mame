@@ -36,6 +36,9 @@
         * There existed a vertical version of Head On as well.
         * According to the manuals, Borderline has the same sound
           board as Tranquillizer Gun.
+        * The relationship between clear nostromo and startrks isn't clear:
+          is one a bootleg of the other or are both bootlegs of an unknown
+          original?
 
     Known issues/to-do's:
         * Analog sound missing in many games
@@ -4329,8 +4332,8 @@ GAME( 1981, starrkr,    brdrline, brdrline,  starrkr,   vicdual_state,   empty_i
 GAME( 1981, brdrlins,   brdrline, brdrline,  brdrline,  vicdual_state,   empty_init, ROT270, "bootleg (Sidam)",         "Borderline (Sidam bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, brdrlinb,   brdrline, brdrline,  brdrline,  vicdual_state,   empty_init, ROT270, "bootleg (Karateco)",      "Borderline (Karateco bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, brdrlinet,  brdrline, tranqgun,  tranqgun,  tranqgun_state,  empty_init, ROT270, "Sega",                    "Borderline (Tranquillizer Gun conversion)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // official factory conversion
-GAME( 198?, startrks,   0,        headons,   startrks,  vicdual_state,   empty_init, ROT0,   "bootleg (Sidam)",         "Star Trek (Head On hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 198?, nostromo,   0,        headons,   startrks,  vicdual_state,   empty_init, ROT0,   "bootleg",                 "Nostromo", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // sound board probably differs
+GAME( 198?, startrks,   nostromo, headons,   startrks,  vicdual_state,   empty_init, ROT0,   "bootleg (Sidam)",         "Star Trek (Head On hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, digger,     0,        digger,    digger,    vicdual_state,   empty_init, ROT270, "Sega",                    "Digger", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pulsar,     0,        pulsar,    pulsar,    vicdual_state,   empty_init, ROT270, "Sega",                    "Pulsar", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, heiankyo,   0,        heiankyo,  heiankyo,  vicdual_state,   empty_init, ROT270, "Denki Onkyo",             "Heiankyo Alien", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
