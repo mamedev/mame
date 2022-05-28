@@ -6,39 +6,26 @@
 //
 //============================================================
 
-#include "input_module.h"
 #include "modules/osdmodule.h"
 
 #if defined(OSD_WINDOWS)
 
-// standard windows headers
-#include <windows.h>
-#include <initguid.h>
-#include <tchar.h>
-#include <wrl/client.h>
+#include "emu.h"
 
-// undef WINNT for dinput.h to prevent duplicate definition
-#undef WINNT
-#include <dinput.h>
-#undef interface
+#include "input_dinput.h"
+
+#include "winutil.h"
 
 #include <mutex>
 
-// MAME headers
-#include "emu.h"
-#include "strconv.h"
+// standard windows headers
+#include <initguid.h>
+#include <tchar.h>
 
-// MAMEOS headers
-#include "window.h"
-#include "winutil.h"
-
-#include "input_common.h"
-#include "input_windows.h"
-#include "input_dinput.h"
-
-using namespace Microsoft::WRL;
 
 namespace {
+
+using namespace Microsoft::WRL;
 
 //============================================================
 //  dinput_joystick_pov_get_state
@@ -582,6 +569,8 @@ HRESULT dinput_api_helper::enum_attached_devices(int devclass, device_enum_inter
 }
 
 #else // defined(OSD_WINDOWS)
+
+#include "input_module.h"
 
 MODULE_NOT_SUPPORTED(keyboard_input_dinput, OSD_KEYBOARDINPUT_PROVIDER, "dinput")
 MODULE_NOT_SUPPORTED(mouse_input_dinput, OSD_MOUSEINPUT_PROVIDER, "dinput")

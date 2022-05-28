@@ -29,12 +29,13 @@ function maintargetosdoptions(_target,_subtarget)
 	end
 
 	links {
-		"dinput8",
 		"comctl32",
 		"comdlg32",
-		"psapi",
+		"dinput8",
 		"ole32",
+		"psapi",
 		"shlwapi",
+		"uuid",
 	}
 end
 

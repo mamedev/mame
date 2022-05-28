@@ -98,8 +98,6 @@ void nes_event2_device::device_start()
 
 void nes_event2_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-
 	m_tqrom_mode = false;
 	mmc3_common_initialize(0x07, 0x7f, 0);
 

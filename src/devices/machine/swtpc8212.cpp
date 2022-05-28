@@ -271,12 +271,6 @@ void swtpc8212_device::pia1_pa_w(uint8_t data)
 	m_printer_data = data;
 }
 
-int swtpc8212_device::pia1_ca1_r()
-{
-	// External parallel printer busy input.
-	return 0;
-}
-
 void swtpc8212_device::pia1_ca2_w(int state)
 {
 	// External parallel printer data ready.
@@ -538,7 +532,7 @@ void swtpc8212_device::device_add_mconfig(machine_config &config)
 	// CB2 - Handshake output?
 	PIA6821(config, m_pia1);
 	m_pia1->writepa_handler().set(FUNC(swtpc8212_device::pia1_pa_w));
-	m_pia1->readca1_handler().set(FUNC(swtpc8212_device::pia1_ca1_r));
+	m_pia1->ca1_w(0); // External parallel printer busy input.
 	m_pia1->ca2_handler().set(FUNC(swtpc8212_device::pia1_ca2_w));
 	m_pia1->readpb_handler().set_ioport("DIP_SWITCHES");
 

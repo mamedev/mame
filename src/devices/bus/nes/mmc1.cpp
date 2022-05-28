@@ -45,17 +45,17 @@ DEFINE_DEVICE_TYPE(NES_SZROM, nes_szrom_device, "nes_szrom", "NES Cart SZROM (MM
 
 
 
-nes_sxrom_device::nes_sxrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+nes_sxrom_device::nes_sxrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, type, tag, owner, clock), m_reg_write_enable(0), m_latch(0), m_count(0)
 {
 }
 
-nes_sxrom_device::nes_sxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_sxrom_device::nes_sxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_sxrom_device(mconfig, NES_SXROM, tag, owner, clock)
 {
 }
 
-nes_sorom_device::nes_sorom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_sorom_device::nes_sorom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_sxrom_device(mconfig, NES_SOROM, tag, owner, clock)
 {
 }
@@ -78,18 +78,17 @@ void nes_sxrom_device::device_start()
 
 void nes_sxrom_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-
 	m_latch = 0;
 	m_count = 0;
 	m_reg[0] = 0x0f;
-	m_reg[1] = m_reg[2] = 0;
-	m_reg[3] = m_mmc1_type == mmc1_type::MMC1C ? 0x10 : 0x00;   // WRAM disabled by default on MMC1C
+	m_reg[1] = 0;
+	m_reg[2] = 0;
+	m_reg[3] = 0;
 	m_reg_write_enable = 1;
 
-	set_nt_mirroring(PPU_MIRROR_HORZ);
 	set_chr();
 	set_prg();
+	set_mirror();
 }
 
 
@@ -139,7 +138,7 @@ void nes_sxrom_device::set_prg(int prg_base, int prg_mask)
 
 void nes_sxrom_device::set_prg()
 {
-	uint8_t prg_mode, prg_offset;
+	u8 prg_mode, prg_offset;
 
 	prg_mode = m_reg[0] & 0x0c;
 	/* prg_mode&0x8 determines bank size: 32k (if 0) or 16k (if 1)? when in 16k mode,
@@ -184,21 +183,22 @@ void nes_sxrom_device::set_chr(int chr_base, int chr_mask)
 		chr8((chr_base | (m_reg[1] & chr_mask)) >> 1, m_chr_source);
 }
 
+void nes_sxrom_device::set_mirror()
+{
+	static constexpr u8 mirr[4] = { PPU_MIRROR_LOW, PPU_MIRROR_HIGH, PPU_MIRROR_VERT, PPU_MIRROR_HORZ };
+
+	set_nt_mirroring(mirr[m_reg[0] & 0x03]);
+}
+
 // this allows for easier implementation of MMC1 subclasses
 void nes_sxrom_device::update_regs(int reg)
 {
 	switch (reg)
 	{
 		case 0:
-			switch (m_reg[0] & 0x03)
-			{
-				case 0: set_nt_mirroring(PPU_MIRROR_LOW); break;
-				case 1: set_nt_mirroring(PPU_MIRROR_HIGH); break;
-				case 2: set_nt_mirroring(PPU_MIRROR_VERT); break;
-				case 3: set_nt_mirroring(PPU_MIRROR_HORZ); break;
-			}
 			set_chr();
 			set_prg();
+			set_mirror();
 			break;
 		case 1:
 			set_chr();
@@ -213,7 +213,7 @@ void nes_sxrom_device::update_regs(int reg)
 	}
 }
 
-void nes_sxrom_device::write_h(offs_t offset, uint8_t data)
+void nes_sxrom_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("sxrom write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -254,9 +254,9 @@ void nes_sxrom_device::write_h(offs_t offset, uint8_t data)
 	}
 }
 
-void nes_sxrom_device::write_m(offs_t offset, uint8_t data)
+void nes_sxrom_device::write_m(offs_t offset, u8 data)
 {
-	uint8_t bank = BIT(m_reg[1], 2, 2);
+	u8 bank = BIT(m_reg[1], 2, 2);
 	LOG_MMC(("sxrom write_m, offset: %04x, data: %02x\n", offset, data));
 
 	if (!BIT(m_reg[3], 4) || m_mmc1_type == mmc1_type::MMC1A)  // WRAM enabled
@@ -268,9 +268,9 @@ void nes_sxrom_device::write_m(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t nes_sxrom_device::read_m(offs_t offset)
+u8 nes_sxrom_device::read_m(offs_t offset)
 {
-	uint8_t bank = BIT(m_reg[1], 2, 2);
+	u8 bank = BIT(m_reg[1], 2, 2);
 	LOG_MMC(("sxrom read_m, offset: %04x\n", offset));
 
 	if (!BIT(m_reg[3], 4) || m_mmc1_type == mmc1_type::MMC1A)  // WRAM enabled
@@ -285,9 +285,9 @@ uint8_t nes_sxrom_device::read_m(offs_t offset)
 }
 
 // SOROM has two RAM banks, the first is not battery backed up, the second is.
-void nes_sorom_device::write_m(offs_t offset, uint8_t data)
+void nes_sorom_device::write_m(offs_t offset, u8 data)
 {
-	uint8_t type = BIT(m_reg[0], 4) ? BIT(m_reg[1], 4) : BIT(m_reg[1], 3);
+	u8 type = BIT(m_reg[0], 4) ? BIT(m_reg[1], 4) : BIT(m_reg[1], 3);
 	LOG_MMC(("sorom write_m, offset: %04x, data: %02x\n", offset, data));
 
 	if (!BIT(m_reg[3], 4) || m_mmc1_type == mmc1_type::MMC1A)  // WRAM enabled
@@ -299,9 +299,9 @@ void nes_sorom_device::write_m(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t nes_sorom_device::read_m(offs_t offset)
+u8 nes_sorom_device::read_m(offs_t offset)
 {
-	uint8_t type = BIT(m_reg[0], 4) ? BIT(m_reg[1], 4) : BIT(m_reg[1], 3);
+	u8 type = BIT(m_reg[0], 4) ? BIT(m_reg[1], 4) : BIT(m_reg[1], 3);
 	LOG_MMC(("sorom read_m, offset: %04x\n", offset));
 
 	if (!BIT(m_reg[3], 4) || m_mmc1_type == mmc1_type::MMC1A)  // WRAM enabled

@@ -26,9 +26,8 @@ namespace plib {
 		return 0;
 	}
 
-	int option_bool::parse(const pstring &argument)
+	int option_bool::parse([[maybe_unused]] const pstring &argument)
 	{
-		unused_var(argument);
 		m_val = true;
 		return 0;
 	}

@@ -71,9 +71,7 @@ void cms_4080term_device::device_add_mconfig(machine_config &config)
 {
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(50);
-	m_screen->set_size(768, 312);
-	m_screen->set_visarea(0, 492 - 1, 0, 270 - 1);
+	m_screen->set_raw(12_MHz_XTAL, 768, 0, 492, 312, 0, 270);
 	m_screen->set_screen_update("ef9345", FUNC(ef9345_device::screen_update));
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_cms_4080term);

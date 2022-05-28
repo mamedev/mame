@@ -33,6 +33,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
+	virtual u32 execute_min_cycles() const noexcept override { return 2; }
+	virtual u32 execute_max_cycles() const noexcept override { return 2; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -46,12 +48,46 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 private:
+	enum class seq : u16;
+	static const seq s_inst_decode[4][256];
+
 	// register helpers
 	void debug_set_pcbase(u32 value);
-	void debug_set_pc(u32 value);
+	void set_pc(u32 value) noexcept;
 	void debug_set_ccr(u16 value);
 	u16 get_k() noexcept;
 	void set_k(u16 value) noexcept;
+	u16 get_ix(int which) const noexcept;
+	void set_ix(int which, u16 value) noexcept;
+	u8 get_xk(int which) const noexcept;
+	void set_xk(int which, u8 value) noexcept;
+	void set_a(u8 value) noexcept;
+	void set_b(u8 value) noexcept;
+
+	// arithmetic and condition code helpers
+	void set_nzv8(u8 data, bool v) noexcept;
+	void set_nzv16(u16 data, bool v) noexcept;
+	void set_z16(u16 data) noexcept;
+	u8 adc8(u8 data1, u8 data2, bool cin) noexcept;
+	u8 sbc8(u8 data1, u8 data2, bool cin) noexcept;
+	u16 adc16(u16 data1, u16 data2, bool cin) noexcept;
+	u16 sbc16(u16 data1, u16 data2, bool cin) noexcept;
+	u8 rol8(u8 data, bool cin) noexcept;
+	u16 rol16(u16 data, bool cin) noexcept;
+	u8 ror8(u8 data, bool cin) noexcept;
+	u16 ror16(u16 data, bool cin) noexcept;
+	u8 asr8(u8 data) noexcept;
+	u16 asr16(u16 data) noexcept;
+	void mulu8() noexcept;
+	void mulu16() noexcept;
+	void muls16(bool frac) noexcept;
+	void divu16(bool frac) noexcept;
+
+	// misc. execution helpers
+	void advance() noexcept;
+	void pshm_step(int n);
+	void pulm_step(int n);
+	bool cc_test(u8 cc) const noexcept;
 
 	// address spaces
 	address_space_config m_program_config;
@@ -67,8 +103,7 @@ private:
 	u16 m_d;
 	u16 m_e;
 	u8 m_ek;
-	u32 m_index_regs[3];
-	u32 m_sp;
+	u32 m_index_regs[4];
 
 	// MAC registers
 	u16 m_hr;
@@ -78,6 +113,10 @@ private:
 	u8 m_index_mask[2];
 
 	// misc. state
+	seq m_sequence;
+	u32 m_ea;
+	u16 m_tmp;
+	bool m_start;
 	s32 m_icount;
 };
 
@@ -86,6 +125,9 @@ class mc68hc16z1_device : public cpu16_device
 public:
 	// device type constructor
 	mc68hc16z1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+private:
+	void internal_map(address_map &map);
 };
 
 // device type declaration

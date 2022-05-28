@@ -132,6 +132,7 @@ TODO:
 #include "video/pwm.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
+#include "sound/flt_vol.h"
 #include "sound/spkrdev.h"
 
 #include "screen.h"
@@ -2403,7 +2404,8 @@ class cdkong_state : public hh_hmcs40_state
 {
 public:
 	cdkong_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_hmcs40_state(mconfig, type, tag)
+		hh_hmcs40_state(mconfig, type, tag),
+		m_volume(*this, "volume")
 	{ }
 
 	void cdkong(machine_config &config);
@@ -2412,15 +2414,15 @@ protected:
 	virtual void machine_start() override;
 
 private:
+	required_device<filter_volume_device> m_volume;
+
 	void update_display();
 	void plate_w(offs_t offset, u8 data);
 	void grid_w(u16 data);
 
 	void speaker_update();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
-
 	double m_speaker_volume = 0.0;
-	std::vector<double> m_speaker_levels;
 };
 
 void cdkong_state::machine_start()
@@ -2436,8 +2438,7 @@ void cdkong_state::speaker_update()
 	if (m_r[1] & 8)
 		m_speaker_volume = 1.0;
 
-	int level = (m_d & 8) ? 0x7fff : 0;
-	m_speaker->level_w(level * m_speaker_volume);
+	m_volume->flt_volume_set_volume(m_speaker_volume);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(cdkong_state::speaker_decay_sim)
@@ -2468,8 +2469,7 @@ void cdkong_state::plate_w(offs_t offset, u8 data)
 void cdkong_state::grid_w(u16 data)
 {
 	// D3: speaker out
-	m_d = data;
-	speaker_update();
+	m_speaker->level_w(BIT(data, 3));
 
 	// D4-D14: vfd grid
 	m_grid = data >> 4 & 0x7ff;
@@ -2514,15 +2514,10 @@ void cdkong_state::cdkong(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "volume", 0.25);
+	FILTER_VOLUME(config, m_volume).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	TIMER(config, "speaker_decay").configure_periodic(FUNC(cdkong_state::speaker_decay_sim), attotime::from_msec(1));
-
-	// set volume levels (set_output_gain is too slow for sub-frame intervals)
-	m_speaker_levels.resize(0x8000);
-	for (int i = 0; i < 0x8000; i++)
-		m_speaker_levels[i] = double(i) / 32768.0;
-	m_speaker->set_levels(0x8000, &m_speaker_levels[0]);
 }
 
 // roms

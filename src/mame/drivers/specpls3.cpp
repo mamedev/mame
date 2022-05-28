@@ -154,6 +154,7 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "screen.h"
 #include "softlist_dev.h"
 
+#include "formats/ipf_dsk.h"
 #include "formats/tzx_cas.h"
 
 #define VERBOSE 0
@@ -266,8 +267,6 @@ void specpls3_state::port_7ffd_w(offs_t offset, uint8_t data)
 	/* paging disabled? */
 	if (m_port_7ffd_data & 0x20) return;
 
-	if ((m_port_7ffd_data ^ data) & 0x08) m_screen->update_now();
-
 	/* store new state */
 	m_port_7ffd_data = data;
 
@@ -342,6 +341,8 @@ void specpls3_state::machine_start()
 {
 	spectrum_128_state::machine_start();
 
+	save_item(NAME(m_port_1ffd_data));
+
 	// reconfigure ROMs
 	memory_region *rom = memregion("maincpu");
 	m_bank_rom[0]->configure_entries(0, 4, rom->base() + 0x10000, 0x4000);
@@ -352,6 +353,7 @@ void specpls3_state::machine_start()
 void specpls3_state::machine_reset()
 {
 	/* Initial configuration */
+	m_port_fe_data = -1;
 	m_port_7ffd_data = 0;
 	m_port_1ffd_data = 0;
 	plus3_update_memory();
@@ -368,6 +370,19 @@ void specpls3_state::plus3_us_w(uint8_t data)
 static void specpls3_floppies(device_slot_interface &device)
 {
 	device.option_add("3ssdd", FLOPPY_3_SSDD);
+}
+
+void specpls3_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_IPF_FORMAT);
+}
+
+bool specpls3_state::is_contended(offs_t offset)
+{
+	u8 bank = m_bank_ram[3]->entry();
+	return spectrum_state::is_contended(offset)
+		|| ((offset >= 0xc000 && offset <= 0xffff) && (bank & 4)); // Memory banks 4, 5, 6 and 7 are contended
 }
 
 /* F4 Character Displayer */
@@ -410,8 +425,8 @@ void specpls3_state::spectrum_plus3(machine_config &config)
 
 	UPD765A(config, m_upd765, 16_MHz_XTAL / 4, true, false); // clocked through SED9420
 	m_upd765->us_wr_callback().set(FUNC(specpls3_state::plus3_us_w));
-	FLOPPY_CONNECTOR(config, "upd765:0", specpls3_floppies, "3ssdd", floppy_image_device::default_mfm_floppy_formats); // internal drive
-	FLOPPY_CONNECTOR(config, "upd765:1", specpls3_floppies, "3ssdd", floppy_image_device::default_mfm_floppy_formats); // external drive
+	FLOPPY_CONNECTOR(config, "upd765:0", specpls3_floppies, "3ssdd", specpls3_state::floppy_formats); // internal drive
+	FLOPPY_CONNECTOR(config, "upd765:1", specpls3_floppies, "3ssdd", specpls3_state::floppy_formats); // external drive
 
 	SOFTWARE_LIST(config, "flop_list").set_original("specpls3_flop");
 }

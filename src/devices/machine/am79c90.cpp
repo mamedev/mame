@@ -59,7 +59,7 @@ DEFINE_DEVICE_TYPE(AM79C90, am79c90_device, "am79c90", "Am79C90 C-LANCE Ethernet
 
 am7990_device_base::am7990_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_network_interface(mconfig, *this, 10.0f)
+	, device_network_interface(mconfig, *this, 10)
 	, m_intr_out_cb(*this)
 	, m_dma_in_cb(*this)
 	, m_dma_out_cb(*this)

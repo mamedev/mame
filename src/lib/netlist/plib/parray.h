@@ -52,7 +52,7 @@ namespace plib {
 	/// I consider > 10% performance difference to be a use case.
 	///
 
-	template <typename FT, int SIZE, typename ARENA = aligned_arena>
+	template <typename FT, int SIZE, typename ARENA = aligned_arena<>>
 	struct parray
 	{
 	public:

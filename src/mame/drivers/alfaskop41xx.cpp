@@ -373,7 +373,7 @@ void alfaskop4110_state::alfaskop4110(machine_config &config)
 	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	PIA6821(config, m_mic_pia, 0); // Main board PIA
-	m_mic_pia->readcb1_handler().set([this](offs_t offset) -> uint8_t { LOGMIC("<-MIC PIA: CB1 read\n"); return 0;});
+	m_mic_pia->cb1_w(0);
 	m_mic_pia->cb2_handler().set([this](offs_t offset, uint8_t data) { LOGMIC("->MIC PIA: CB2 write %d\n", data); });
 
 	/*
@@ -431,18 +431,18 @@ void alfaskop4110_state::alfaskop4110(machine_config &config)
 						return 0;
 					});
 	m_mic_pia->readpb_handler().set([this](offs_t offset) -> uint8_t { LOGMIC("<-MIC PIA: Port B read\n"); return 0;});
-	m_mic_pia->readca1_handler().set([this](offs_t offset) -> uint8_t { LOGMIC("<-MIC PIA: CA1 read\n"); return 0;});
-	m_mic_pia->readca2_handler().set([this](offs_t offset) -> uint8_t { LOGMIC("<-MIC PIA: CA2 read\n"); return 0;});
+	m_mic_pia->ca1_w(0);
+	m_mic_pia->ca2_w(0);
 
 	PIA6821(config, m_dia_pia, 0); // Display PIA, controls how the CRTC accesses memory etc
-	m_dia_pia->readcb1_handler().set([this](offs_t offset) -> uint8_t { LOGDIA("DIA PIA: CB1_r\n"); return 0;});
+	m_dia_pia->cb1_w(0);
 	m_dia_pia->cb2_handler().set([this](offs_t offset, uint8_t data) { LOGDIA("DIA PIA: CB2_w %d\n", data); });
 	m_dia_pia->writepa_handler().set([this](offs_t offset, uint8_t data) { LOGDIA("DIA PIA: PA_w %02x\n", data); });
 	m_dia_pia->writepb_handler().set([this](offs_t offset, uint8_t data) { LOGDIA("DIA PIA: PB_w %02x\n", data); });
 	m_dia_pia->readpa_handler().set([this](offs_t offset) -> uint8_t { LOGDIA("DIA PIA: PA_r\n"); return 0;});
 	m_dia_pia->readpb_handler().set([this](offs_t offset) -> uint8_t { LOGDIA("DIA PIA: PB_r\n"); return 0;});
-	m_dia_pia->readca1_handler().set([this](offs_t offset) -> uint8_t { LOGDIA("DIA PIA: CA1_r\n"); return 0;});
-	m_dia_pia->readca2_handler().set([this](offs_t offset) -> uint8_t { LOGDIA("DIA PIA: CA2_r\n"); return 0;});
+	m_dia_pia->ca1_w(0);
+	m_dia_pia->ca2_w(0);
 
 	ACIA6850(config, m_kbd_acia, 0);
 	//CLOCK(config, "acia_clock", ACIA_CLOCK).signal_handler().set(FUNC(alfaskop4110_state::write_acia_clock));

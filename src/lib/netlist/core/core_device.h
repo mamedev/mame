@@ -33,7 +33,7 @@ namespace netlist
 		{
 			gsl_Expects(m_active_outputs >= 0);
 
-			if (m_activate && m_hint_deactivate)
+			if (!m_activate.isnull() && m_hint_deactivate)
 			{
 				if (++m_active_outputs == 1)
 				{
@@ -48,7 +48,7 @@ namespace netlist
 		{
 			gsl_Expects(m_active_outputs >= 1);
 
-			if (m_activate && m_hint_deactivate)
+			if (!m_activate.isnull() && m_hint_deactivate)
 				if (--m_active_outputs == 0)
 				{
 					m_activate(false); //dec_active();
@@ -78,14 +78,15 @@ namespace netlist
 		}
 
 	protected:
-		using activate_delegate = plib::pmfp<void, bool>;
+		using activate_delegate = plib::pmfp<void (bool)>;
 
 		activate_delegate m_activate;
 
 		log_type & log();
 
 	public:
-		virtual void timestep(timestep_type ts_type, nl_fptype st) noexcept { plib::unused_var(ts_type, st); }
+		virtual void timestep([[maybe_unused]] timestep_type ts_type,
+			[[maybe_unused]] nl_fptype st) noexcept { }
 		virtual void update_terminals() noexcept { }
 
 		virtual void update_param() noexcept {}
@@ -112,7 +113,7 @@ namespace netlist
 
 		~base_device_t() noexcept override = default;
 
-		template<class O, class C, typename... Args>
+		template <class O, class C, typename... Args>
 		void create_and_register_subdevice(O& owner, const pstring &name, device_arena::unique_ptr<C> &dev, Args&&... args)
 		{
 			dev = state().make_pool_object<C>(owner, name, std::forward<Args>(args)...);

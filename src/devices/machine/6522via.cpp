@@ -559,15 +559,11 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 uint8_t via6522_device::input_pa()
 {
-	uint8_t pa = m_in_a & ~m_ddr_a;
-
-	/// TODO: REMOVE THIS
-	if (m_ddr_a != 0xff && !m_in_a_handler.isnull())
-		pa &= m_in_a_handler();
-
-	pa |= m_out_a & m_ddr_a;
-
-	return pa;
+	// HACK: port a in the real 6522 does not mask off the output pins, but you can't trust handlers.
+	if (!m_in_a_handler.isnull())
+		return (m_in_a & ~m_ddr_a & m_in_a_handler()) | (m_out_a & m_ddr_a);
+	else
+		return (m_out_a | ~m_ddr_a) & m_in_a;
 }
 
 void via6522_device::output_pa()

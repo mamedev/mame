@@ -33,7 +33,7 @@ class NETLIB_NAME(name) : public delegator_t<device_t>
 
 /// \brief Start a derived netlist device class.
 ///
-/// Used to define a derived device class based on plcass.
+/// Used to define a derived device class based on `plcass`.
 /// The simplest device without inputs or outputs would look like this:
 ///
 ///      NETLIB_OBJECT_DERIVED(some_object, parent_object)

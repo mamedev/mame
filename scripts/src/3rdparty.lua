@@ -2239,7 +2239,7 @@ project "asmjit"
 		buildoptions {
 			"-Wno-maybe-uninitialized",
 		}
-	end	
+	end
 
 	configuration { }
 

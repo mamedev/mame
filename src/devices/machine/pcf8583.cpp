@@ -314,7 +314,7 @@ WRITE_LINE_MEMBER(pcf8583_device::scl_w)
 							m_register++;
 							break;
 						}
-						
+
 						if (m_state != STATE_IDLE)
 						{
 							m_sdar = 0 ;

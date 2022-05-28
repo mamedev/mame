@@ -65,7 +65,7 @@ public:
 
 		opt_grp3(*this,     "Options for static command",   "These options apply to static command."),
 		opt_dir(*this,      "d", "dir",        "",          "output directory for the generated files."),
-		opt_out(*this,      "o", "output",     "",          "single output file for the generated code.\nEither --dir or --output can be specificied"),
+		opt_out(*this,      "o", "output",     "",          "single output file for the generated code.\nEither --dir or --output can be specified"),
 
 		opt_grp4(*this,     "Options for run command",      "These options are only used by the run command."),
 		opt_ttr (*this,     "t", "time_to_run", 1,          "time to run the emulation (seconds)"),
@@ -1319,7 +1319,9 @@ int tool_app_t::execute()
 			convert();
 		else if (cmd == "tests")
 		{
-			return PRUN_ALL_TESTS();
+			return PRUN_ALL_TESTS(opt_verb() ? ::plib::testing::loglevel::INFO
+				: opt_quiet() ? ::plib::testing::loglevel::ERROR
+				: ::plib::testing::loglevel::WARNING);
 		}
 		else
 		{

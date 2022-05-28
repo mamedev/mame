@@ -755,7 +755,7 @@ void tsconf_state::update_frame_timer()
 INTERRUPT_GEN_MEMBER(tsconf_state::tsconf_vblank_interrupt)
 {
 	update_frame_timer();
-	m_line_irq_timer->adjust(m_screen->time_until_pos(0));
+	m_line_irq_timer->adjust(attotime::zero);
 }
 
 void tsconf_state::dma_ready(int line)
@@ -763,7 +763,7 @@ void tsconf_state::dma_ready(int line)
 	if (BIT(m_regs[INT_MASK], 4))
 	{
 		m_maincpu->set_input_line_and_vector(line, ASSERT_LINE, 0xfb);
-		timer_set(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))), TIMER_IRQ_OFF, 0);
+		m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))));
 	}
 }
 
@@ -776,7 +776,7 @@ void tsconf_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 		if (BIT(m_regs[INT_MASK], 0))
 		{
 			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xff);
-			timer_set(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))), TIMER_IRQ_OFF, 0);
+			m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))));
 		}
 		break;
 	}
@@ -788,12 +788,12 @@ void tsconf_state::device_timer(emu_timer &timer, device_timer_id id, int param)
 		{
 			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xfd);
 			// Not quite precise. Scanline can't be skipped.
-			timer_set(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))), TIMER_IRQ_OFF, 0);
+			m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))));
 		}
 		if (BIT(m_regs[INT_MASK], 0) && OFFS_512(VS_INT_L) == screen_vpos && m_regs[HS_INT] == 0)
 		{
 			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xff);
-			timer_set(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))), TIMER_IRQ_OFF, 0);
+			m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))));
 		}
 
 		m_screen->update_now();

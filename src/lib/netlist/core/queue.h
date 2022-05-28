@@ -27,11 +27,11 @@ namespace netlist::detail
 {
 	// Use timed_queue_heap to use stdc++ heap functions instead of linear processing.
 	// This slows down processing by about 35% on a Kaby Lake.
-	// template <class T, bool TS>
-	// using timed_queue = plib::timed_queue_heap<T, TS>;
+	// template <class A, class T, bool TS>
+	// using timed_queue = plib::timed_queue_heap<A, T, TS>;
 
-	template <class T, bool TS>
-	using timed_queue = plib::timed_queue_linear<T, TS>;
+	template <typename A, typename T, bool TS>
+	using timed_queue = plib::timed_queue_linear<A, T, TS>;
 
 	// -----------------------------------------------------------------------------
 	// queue_t
@@ -40,19 +40,19 @@ namespace netlist::detail
 	// We don't need a thread-safe queue currently. Parallel processing of
 	// solvers will update inputs after parallel processing.
 
-	template <typename O, bool TS>
+	template <typename A, typename O, bool TS>
 	class queue_base :
-			public timed_queue<plib::pqentry_t<netlist_time_ext, O *>, false>,
+			public timed_queue<A, plib::pqentry_t<netlist_time_ext, O *>, false>,
 			public plib::state_manager_t::callback_t
 	{
 	public:
 		using entry_t = plib::pqentry_t<netlist_time_ext, O *>;
-		using base_queue = timed_queue<entry_t, false>;
-		using id_delegate = plib::pmfp<std::size_t, const O *>;
-		using obj_delegate = plib::pmfp<O *, std::size_t>;
+		using base_queue = timed_queue<A, entry_t, false>;
+		using id_delegate = plib::pmfp<std::size_t (const O *)>;
+		using obj_delegate = plib::pmfp<O * (std::size_t)>;
 
-		explicit queue_base(std::size_t size, id_delegate get_id, obj_delegate get_obj)
-		: timed_queue<plib::pqentry_t<netlist_time_ext, O *>, false>(size)
+		explicit queue_base(A &arena, std::size_t size, id_delegate get_id, obj_delegate get_obj)
+		: timed_queue<A, plib::pqentry_t<netlist_time_ext, O *>, false>(arena, size)
 		, m_qsize(0)
 		, m_times(size)
 		, m_net_ids(size)
@@ -76,9 +76,8 @@ namespace netlist::detail
 			manager.save_item(this, &m_times[0], module + "." + "times", m_times.size());
 			manager.save_item(this, &m_net_ids[0], module + "." + "names", m_net_ids.size());
 		}
-		void on_pre_save(plib::state_manager_t &manager) override
+		void on_pre_save([[maybe_unused]] plib::state_manager_t &manager) override
 		{
-			plib::unused_var(manager);
 			m_qsize = this->size();
 			for (std::size_t i = 0; i < m_qsize; i++ )
 			{
@@ -86,9 +85,8 @@ namespace netlist::detail
 				m_net_ids[i] = m_get_id(this->listptr()[i].object());
 			}
 		}
-		void on_post_load(plib::state_manager_t &manager) override
+		void on_post_load([[maybe_unused]] plib::state_manager_t &manager) override
 		{
-			plib::unused_var(manager);
 			this->clear();
 			for (std::size_t i = 0; i < m_qsize; i++ )
 			{
@@ -105,7 +103,7 @@ namespace netlist::detail
 		obj_delegate m_obj_by_id;
 	};
 
-	using queue_t = queue_base<net_t, false>;
+	using queue_t = queue_base<device_arena, net_t, false>;
 
 } // namespace netlist::detail
 

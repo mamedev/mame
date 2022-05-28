@@ -17,11 +17,9 @@
 #include "../plib/plists.h"
 #include "../plib/pstring.h"
 
-// Enable the setting below to avoid queue pushes were at execution
-// no action will be taken. This is academically cleaner, but slower than
-// allowing this to happen and filter it during during "process".
-
-#define AVOID_NOOP_QUEUE_PUSHES (0)
+#ifndef AVOID_NOOP_QUEUE_PUSHES
+#error AVOID_NOOP_QUEUE_PUSHES not defined
+#endif
 
 namespace netlist
 {
@@ -43,7 +41,7 @@ namespace netlist
 				DELIVERED
 			};
 
-			net_t(netlist_state_t &nl, const pstring &aname, core_terminal_t *railterminal = nullptr);
+			net_t(netlist_state_t &nl, const pstring &aname, core_terminal_t *rail_terminal = nullptr);
 
 			PCOPYASSIGNMOVE(net_t, delete)
 
@@ -72,12 +70,12 @@ namespace netlist
 
 				m_next_scheduled_time = exec().time() + delay;
 #if (AVOID_NOOP_QUEUE_PUSHES)
-					m_in_queue = (m_list_active.empty() ? queue_status::DELAYED_DUE_TO_INACTIVE
-						: (m_new_Q != m_cur_Q ? queue_status::QUEUED : queue_status::DELIVERED));
+				m_in_queue = (m_list_active.empty() ? queue_status::DELAYED_DUE_TO_INACTIVE
+					: (m_new_Q != m_cur_Q ? queue_status::QUEUED : queue_status::DELIVERED));
 				if (m_in_queue == queue_status::QUEUED)
 					exec().qpush(m_next_scheduled_time, this);
-					else
-						update_inputs();
+				else
+					update_inputs();
 #else
 				m_in_queue = m_list_active.empty() ? queue_status::DELAYED_DUE_TO_INACTIVE : queue_status::QUEUED;
 				if (m_in_queue == queue_status::QUEUED)
@@ -138,8 +136,8 @@ namespace netlist
 			constexpr const netlist_time_ext &next_scheduled_time() const noexcept { return m_next_scheduled_time; }
 			void set_next_scheduled_time(netlist_time_ext ntime) noexcept { m_next_scheduled_time = ntime; }
 
-			bool is_rail_net() const noexcept { return !(m_railterminal == nullptr); }
-			core_terminal_t & railterminal() const noexcept { return *m_railterminal; }
+			bool is_rail_net() const noexcept { return !(m_rail_terminal == nullptr); }
+			core_terminal_t & rail_terminal() const noexcept { return *m_rail_terminal; }
 
 			void add_to_active_list(core_terminal_t &term) noexcept
 			{
@@ -151,7 +149,7 @@ namespace netlist
 				else
 				{
 					m_list_active.push_front(&term);
-					railterminal().device().do_inc_active();
+					rail_terminal().device().do_inc_active();
 					if (m_in_queue == queue_status::DELAYED_DUE_TO_INACTIVE)
 					{
 #if (AVOID_NOOP_QUEUE_PUSHES)
@@ -189,7 +187,7 @@ namespace netlist
 						m_in_queue = queue_status::DELAYED_DUE_TO_INACTIVE;
 					}
 #endif
-					railterminal().device().do_dec_active();
+					rail_terminal().device().do_dec_active();
 				}
 			}
 
@@ -263,7 +261,7 @@ namespace netlist
 			plib::linkedlist_t<core_terminal_t> m_list_active;
 			state_var<netlist_time_ext>  m_next_scheduled_time;
 
-			core_terminal_t * m_railterminal;
+			core_terminal_t * m_rail_terminal;
 			//std::vector<core_terminal_t *> m_core_terms; // save post-start m_list ...
 
 		};
@@ -273,7 +271,7 @@ namespace netlist
 	{
 	public:
 
-		analog_net_t(netlist_state_t &nl, const pstring &aname, detail::core_terminal_t *railterminal = nullptr);
+		analog_net_t(netlist_state_t &nl, const pstring &aname, detail::core_terminal_t *rail_terminal = nullptr);
 
 		void reset() noexcept override;
 
@@ -300,7 +298,7 @@ namespace netlist
 	{
 	public:
 
-		logic_net_t(netlist_state_t &nl, const pstring &aname, detail::core_terminal_t *railterminal = nullptr);
+		logic_net_t(netlist_state_t &nl, const pstring &aname, detail::core_terminal_t *rail_terminal = nullptr);
 
 		using detail::net_t::Q;
 		using detail::net_t::initial;

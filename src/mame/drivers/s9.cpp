@@ -23,8 +23,8 @@ Here are the key codes to enable play:
 
 Game              NUM  Start game                End ball
 -----------------------------------------------------------------------------------------------
-Sorcerer          532  AD hit 1                  AD
-Space Huttle      535  ASD hit 1                 ASD
+Sorcerer          532  ASD hit 1                 ASD
+Space Shuttle     535  ASD hit 1                 ASD
 Comet             540  1                         X
 
 Status:
@@ -81,7 +81,6 @@ private:
 	void sol3_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[i] = BIT(data, i); }; // solenoids 0-7
 	u8 switch_r();
 	void switch_w(u8 data);
-	DECLARE_READ_LINE_MEMBER(pia21_ca1_r);
 	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { } // enable solenoids
 	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { } // dummy to stop error log filling up
 	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { m_comma34 = state; } // comma3&4
@@ -232,12 +231,6 @@ INPUT_CHANGED_MEMBER( s9_state::main_nmi )
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-READ_LINE_MEMBER( s9_state::pia21_ca1_r )
-{
-// sound busy
-	return 1;
-}
-
 void s9_state::sol2_w(u8 data)
 {
 	if (m_game)
@@ -376,7 +369,7 @@ void s9_state::s9(machine_config &config)
 	/* Devices */
 	PIA6821(config, m_pia21, 0);
 	m_pia21->set_port_a_input_overrides_output_mask(0xff);
-	m_pia21->readca1_handler().set(FUNC(s9_state::pia21_ca1_r));
+	m_pia21->ca1_w(1); // sound busy
 	m_pia21->writepa_handler().set("s9sound", FUNC(williams_s9_sound_device::write));
 	m_pia21->writepb_handler().set(FUNC(s9_state::sol2_w));
 	m_pia21->ca2_handler().set("s9sound", FUNC(williams_s9_sound_device::strobe));

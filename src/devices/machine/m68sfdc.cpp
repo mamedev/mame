@@ -86,7 +86,6 @@ void m68sfdc_device::device_start()
 	save_item(NAME(m_head_load));
 	save_item(NAME(m_crc));
 	save_item(NAME(m_last_crc));
-	save_item(NAME(m_pia_ca1));
 	save_item(NAME(m_pia_cb2));
 	save_item(NAME(m_reset));
 	save_item(NAME(m_enable_drive_write));
@@ -114,7 +113,6 @@ void m68sfdc_device::device_reset()
 	m_head_load = 0;
 	m_crc = 0;
 	m_last_crc = 0;
-	m_pia_ca1 = 0;
 	m_pia_cb2 = 0;
 	m_reset = 1;
 	m_enable_drive_write = 0;
@@ -170,7 +168,6 @@ void m68sfdc_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	{
 		live_sync();
 		m_pia->ca1_w(0);
-		m_pia_ca1 = 0;
 		break;
 	}
 	case TM_GEN:
@@ -386,11 +383,6 @@ void m68sfdc_device::pia_pa_w(u8 data)
 	}
 }
 
-int m68sfdc_device::pia_ca1_r()
-{
-	return m_pia_ca1;
-}
-
 void m68sfdc_device::pia_ca2_w(int state)
 {
 	if (m_floppy)
@@ -493,7 +485,6 @@ void m68sfdc_device::pia_cb2_w(int state)
 	{
 		// Trigger the timeout timer on a high to low transition of CB2
 		m_pia->ca1_w(1);
-		m_pia_ca1 = 1;
 		m_timer_timeout->reset(attotime::from_msec(800));
 	}
 	m_pia_cb2 = state;
@@ -854,7 +845,7 @@ void m68sfdc_device::device_add_mconfig(machine_config &config)
 	PIA6821(config, m_pia, 0);
 	m_pia->readpa_handler().set(FUNC(m68sfdc_device::pia_pa_r));
 	m_pia->writepa_handler().set(FUNC(m68sfdc_device::pia_pa_w));
-	m_pia->readca1_handler().set(FUNC(m68sfdc_device::pia_ca1_r));
+	m_pia->ca1_w(0);
 	m_pia->ca2_handler().set(FUNC(m68sfdc_device::pia_ca2_w));
 	m_pia->readpb_handler().set(FUNC(m68sfdc_device::pia_pb_r));
 	m_pia->writepb_handler().set(FUNC(m68sfdc_device::pia_pb_w));
