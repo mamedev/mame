@@ -96,10 +96,7 @@ void vectrex_base_state::via_w(offs_t offset, uint8_t data)
 		if (m_reset_refresh)
 			m_refresh->adjust(period, 0, period);
 		else
-			m_refresh->adjust(
-									std::min(period, m_refresh->remaining()),
-									0,
-									period);
+			m_refresh->adjust(std::min(period, m_refresh->remaining()), 0, period);
 		break;
 	}
 	m_via6522_0->write(offset, data);
@@ -238,7 +235,6 @@ void vectrex_base_state::video_start()
 	m_update_analog_timer = timer_alloc(FUNC(vectrex_base_state::update_analog), this);
 	m_update_blank_timer = timer_alloc(FUNC(vectrex_base_state::update_blank), this);
 	m_update_mux_enable_timer = timer_alloc(FUNC(vectrex_base_state::update_mux_enable), this);
-	m_update_ramp_timer = timer_alloc(FUNC(vectrex_base_state::update_ramp), this);
 
 	m_display_start = 0;
 	m_display_end = 0;
@@ -257,7 +253,8 @@ void vectrex_state::video_start()
 	m_imager_freq = 1;
 
 	m_imager_eye_timer = timer_alloc(FUNC(vectrex_state::imager_eye), this);
-	m_imager_eye_timer->adjust(attotime::from_hz(m_imager_freq), 2, attotime::from_hz(m_imager_freq));
+	m_imager_index_timer = timer_alloc(FUNC(vectrex_state::imager_index), this);
+	m_imager_index_timer->adjust(attotime::from_hz(m_imager_freq), 2, attotime::from_hz(m_imager_freq));
 
 	for (int i = 0; i < 3; i++)
 	{
@@ -365,7 +362,7 @@ void vectrex_base_state::via_pb_w(uint8_t data)
 		multiplexer((data >> 1) & 0x3);
 
 	m_via_out[PORTB] = data;
-	m_update_ramp_timer->adjust(attotime::from_nsec(ANALOG_DELAY), data & 0x80);
+	machine().scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), timer_expired_delegate(FUNC(vectrex_base_state::update_ramp), this), data & 0x80);
 }
 
 

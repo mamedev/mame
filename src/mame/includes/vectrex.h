@@ -55,6 +55,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(imager_change_color);
 	TIMER_CALLBACK_MEMBER(update_level);
 	TIMER_CALLBACK_MEMBER(imager_eye);
+	TIMER_CALLBACK_MEMBER(imager_index);
 	TIMER_CALLBACK_MEMBER(lightpen_trigger);
 	TIMER_CALLBACK_MEMBER(refresh);
 	TIMER_CALLBACK_MEMBER(zero_integrators);
@@ -88,6 +89,7 @@ protected:
 	double m_imager_freq = 0;
 	emu_timer *m_imager_color_timers[3]{};
 	emu_timer *m_imager_eye_timer = nullptr;
+	emu_timer *m_imager_index_timer = nullptr;
 	emu_timer *m_imager_level_timer = nullptr;
 	emu_timer *m_lp_t = nullptr;
 
@@ -127,7 +129,6 @@ private:
 	emu_timer *m_update_analog_timer = nullptr;
 	emu_timer *m_update_blank_timer = nullptr;
 	emu_timer *m_update_mux_enable_timer = nullptr;
-	emu_timer *m_update_ramp_timer = nullptr;
 	uint8_t m_blank = 0;
 	uint8_t m_ramp = 0;
 	int8_t m_analog[5]{};

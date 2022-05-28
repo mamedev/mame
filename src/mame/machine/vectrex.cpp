@@ -226,33 +226,37 @@ TIMER_CALLBACK_MEMBER(vectrex_base_state::update_level)
 	m_imager_pinlevel = param;
 }
 
-
 TIMER_CALLBACK_MEMBER(vectrex_base_state::imager_eye)
 {
-	double rtime = (1.0 / m_imager_freq);
-
 	if (m_imager_status > 0)
 	{
-		m_imager_status = param;
-		int coffset = param > 1 ? 3: 0;
+		const int coffset = param > 1 ? 3: 0;
+		const double rtime = (1.0 / m_imager_freq);
 
+		m_imager_status = param;
 		m_imager_color_timers[0]->adjust(attotime::from_double(rtime * m_imager_angles[0]), m_imager_colors[coffset+2]);
 		m_imager_color_timers[1]->adjust(attotime::from_double(rtime * m_imager_angles[1]), m_imager_colors[coffset+1]);
 		m_imager_color_timers[2]->adjust(attotime::from_double(rtime * m_imager_angles[2]), m_imager_colors[coffset]);
-
-		if (param == 2)
-		{
-			m_imager_eye_timer->adjust(attotime::from_double(rtime * 0.50), 1);
-
-			/* Index hole sensor is connected to IO7 which triggers also CA1 of VIA */
-			m_via6522_0->write_ca1(1);
-			m_via6522_0->write_ca1(0);
-			m_imager_pinlevel |= 0x80;
-			m_imager_level_timer->adjust(attotime::from_double(rtime / 360.0));
-		}
 	}
 }
 
+TIMER_CALLBACK_MEMBER(vectrex_base_state::imager_index)
+{
+	imager_eye(param);
+
+	if (m_imager_status > 0)
+	{
+		const double rtime = (1.0 / m_imager_freq);
+
+		m_imager_eye_timer->adjust(attotime::from_double(rtime * 0.50), 1);
+
+		/* Index hole sensor is connected to IO7 which triggers also CA1 of VIA */
+		m_via6522_0->write_ca1(1);
+		m_via6522_0->write_ca1(0);
+		m_imager_pinlevel |= 0x80;
+		m_imager_level_timer->adjust(attotime::from_double(rtime / 360.0));
+	}
+}
 
 void vectrex_base_state::psg_port_w(uint8_t data)
 {
