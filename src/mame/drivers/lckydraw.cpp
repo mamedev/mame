@@ -427,5 +427,5 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1979, lckydraw,  0,        lckydraw, lckydraw, lckydraw_state, empty_init, ROT0, "Mirco", "Lucky Draw (pinball, set 1)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, lckydrawa, lckydraw, lckydraw, lckydraw, lckydraw_state, empty_init, ROT0, "Mirco", "Lucky Draw (pinball, set 2)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, lckydraw,  0,        lckydraw, lckydraw, lckydraw_state, empty_init, ROT0, "Mirco", "Lucky Draw (pinball, set 1)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, lckydrawa, lckydraw, lckydraw, lckydraw, lckydraw_state, empty_init, ROT0, "Mirco", "Lucky Draw (pinball, set 2)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

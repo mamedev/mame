@@ -1861,7 +1861,7 @@ license:CC0
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="link - the faces of evil (usa)" sha1="e9deb9df291474b9a4db2e5ce444bb98c149faa6"/>
+				<disk name="link - the faces of evil (usa)" sha1="63c8ae61d7e98668cb8864b909c7f7377ff5fdb4"/>
 			</diskarea>
 		</part>
 	</software>

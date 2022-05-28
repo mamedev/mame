@@ -73,7 +73,7 @@ Priority word (Midres):
 
 #include <algorithm>
 
-DEFINE_DEVICE_TYPE(DECO_BAC06, deco_bac06_device, "deco_back06", "DECO BAC06 Tilemap")
+DEFINE_DEVICE_TYPE(DECO_BAC06, deco_bac06_device, "deco_bac06", "DECO BAC06 Tilemap")
 
 deco_bac06_device::deco_bac06_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, DECO_BAC06, tag, owner, clock)
