@@ -1256,7 +1256,7 @@ ROM_END
 GAMEL( 1979?, j_ewn,     0,        ewn,       j_ewn,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Nudger (JPM) (SRU) (revision 20, 5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_ewn )
 GAMEL( 1981?, j_ewna,    j_ewn,    ewn2,      j_ewn2,        jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Nudger (JPM) (SRU) (revision 26A, £2 Jackpot)", GAME_FLAGS, layout_j_ewn )
 GAMEL( 1981?, j_ewnb,    j_ewn,    ewn2,      j_ewn2,        jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Nudger (JPM) (SRU) (£2 Jackpot)", GAME_FLAGS, layout_j_ewn )
-GAMEL( 1979?, j_ewnc,    j_ewn,    ewn,       j_ewn,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Nudger (JPM) (SRU) (5p Stake, £1 Jackpot", GAME_FLAGS, layout_j_ewn ) // Earlier revision
+GAMEL( 1979?, j_ewnc,    j_ewn,    ewn,       j_ewn,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Each Way Nudger (JPM) (SRU) (5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_ewn ) // Earlier revision
 GAMEL( 1979?, j_ndu,     0,        ndu,       j_ndu,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Nudge Double Up (JPM) (SRU) (revision 17, 5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_ndu )
 GAMEL( 1979?, j_ndua,    j_ndu,    ndu,       j_ndu,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Nudge Double Up (JPM) (SRU) (revision 17, 5p Stake, £1 Jackpot, lower %)", GAME_FLAGS, layout_j_ndu )
 GAMEL( 1979?, j_ndub,    j_ndu,    ndu,       j_ndu,         jpmsru_state, init_jpmsru, ROT0, "JPM", "Nudge Double Up (JPM) (SRU) (5p Stake, £1 Jackpot)", GAME_FLAGS, layout_j_ndu )
