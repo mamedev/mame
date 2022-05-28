@@ -80115,8 +80115,8 @@ static void nl_gcr_144_double_double_fbff020f5f5d5a5(double * __restrict V, cons
 
 #endif
 
-extern const plib::static_library_symbol nl_static_solver_syms[];
-const plib::static_library_symbol nl_static_solver_syms[] = {
+extern const plib::static_library::symbol nl_static_solver_syms[];
+const plib::static_library::symbol nl_static_solver_syms[] = {
 #if !defined(__EMSCRIPTEN__)
 
 // 1942

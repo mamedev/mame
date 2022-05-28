@@ -74,7 +74,8 @@ namespace netlist::devices {
 				std::vector<pstring> inputs;
 				inputs.emplace_back("T");
 				m_vals.push_back(nlconst::zero());
-				for (int i=0; i < m_N(); i++)
+				m_I.reserve(m_N());
+				for (std::uint64_t i=0; i < m_N(); i++)
 				{
 					pstring input_name = plib::pfmt("A{1}")(i);
 					m_I.push_back(owner.template make_pool_object<analog_input_t>(*this, input_name, NETLIB_DELEGATE(fb)));
@@ -101,7 +102,7 @@ namespace netlist::devices {
 		}
 
 		using pf_type = plib::pfunction<nl_fptype>;
-		param_int_t m_N;
+		param_num_t<std::uint64_t> m_N;
 		param_str_t m_func;
 		logic_input_t m_feedback;
 		logic_output_t m_Q;
@@ -287,8 +288,9 @@ namespace netlist::devices {
 		, m_compiled(*this, "m_compiled")
 		, m_last(*this, "m_last")
 		{
+			m_I.reserve(m_N());
 			std::vector<pstring> inputs;
-			for (int i=0; i < m_N(); i++)
+			for (uint64_t i=0; i < m_N(); i++)
 			{
 				pstring input_name = plib::pfmt("A{1}")(i);
 				m_I.push_back(owner.template make_pool_object<analog_input_t>(*this, input_name, NETLIB_DELEGATE(inputs)));
@@ -320,7 +322,7 @@ namespace netlist::devices {
 
 	private:
 		using pf_type = plib::pfunction<nl_fptype>;
-		param_int_t m_N;
+		param_num_t<std::uint64_t> m_N;
 		param_str_t m_function;
 		param_fp_t m_thresh;
 		analog_output_t m_Q;

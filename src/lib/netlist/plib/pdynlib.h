@@ -18,12 +18,45 @@ namespace plib {
 	class dynamic_library_base
 	{
 	public:
+
 		explicit dynamic_library_base() : m_is_loaded(false) { }
 
 		virtual ~dynamic_library_base() = default;
 
-		PCOPYASSIGN(dynamic_library_base, delete)
-		PMOVEASSIGN(dynamic_library_base, default)
+		dynamic_library_base(const dynamic_library_base &) = delete;
+		dynamic_library_base &operator=(const dynamic_library_base &) = delete;
+
+		dynamic_library_base(dynamic_library_base &&) noexcept = default;
+		dynamic_library_base &operator=(dynamic_library_base &&) noexcept = default;
+
+		template <typename R, typename... Args>
+		class function
+		{
+		public:
+			using calltype = R(*) (Args... args);
+
+			function() : m_sym(nullptr) { }
+
+			function(dynamic_library_base &dl, const pstring &name) noexcept
+			: m_sym(dl.get_symbol<calltype>(name))
+			{
+			}
+
+			void load(dynamic_library_base &dl, const pstring &name) noexcept
+			{
+				m_sym = dl.get_symbol<calltype>(name);
+			}
+
+			R operator ()(Args&&... args) const
+			{
+				return m_sym(std::forward<Args>(args)...);
+				//return m_sym(args...);
+			}
+
+			bool resolved() const noexcept { return m_sym != nullptr; }
+		private:
+			calltype m_sym;
+		};
 
 		bool isLoaded() const { return m_is_loaded; }
 
@@ -59,16 +92,17 @@ namespace plib {
 		void *m_lib;
 	};
 
-	struct static_library_symbol
-	{
-		const char *name;
-		void       *addr;
-	};
-
 	class static_library : public dynamic_library_base
 	{
 	public:
-		explicit static_library(const static_library_symbol *symbols)
+		struct symbol
+		{
+			const char *name;
+			void       *addr;
+		};
+
+
+		explicit static_library(const symbol *symbols)
 		: m_syms(symbols)
 		{
 			if (symbols != nullptr)
@@ -78,7 +112,7 @@ namespace plib {
 	protected:
 		void *get_symbol_pointer(const pstring &name) const noexcept override
 		{
-			const static_library_symbol *p = m_syms;
+			const symbol *p = m_syms;
 			while (p->name[0] != 0)
 			{
 				if (name == pstring(p->name))
@@ -89,36 +123,7 @@ namespace plib {
 		}
 
 	private:
-		const static_library_symbol *m_syms;
-	};
-
-	template <typename R, typename... Args>
-	class dynamic_library_function
-	{
-	public:
-		using calltype = R(*) (Args... args);
-
-		dynamic_library_function() : m_sym(nullptr) { }
-
-		dynamic_library_function(dynamic_library_base &dl, const pstring &name) noexcept
-		: m_sym(dl.get_symbol<calltype>(name))
-		{
-		}
-
-		void load(dynamic_library_base &dl, const pstring &name) noexcept
-		{
-			m_sym = dl.get_symbol<calltype>(name);
-		}
-
-		R operator ()(Args&&... args) const
-		{
-			return m_sym(std::forward<Args>(args)...);
-			//return m_sym(args...);
-		}
-
-		bool resolved() const noexcept { return m_sym != nullptr; }
-	private:
-		calltype m_sym;
+		const symbol *m_syms;
 	};
 
 } // namespace plib

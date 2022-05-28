@@ -47,7 +47,7 @@
 // Specific technical terms
 // spell-checker: words rinf
 
-extern const plib::static_library_symbol nl_static_solver_syms[];
+extern const plib::static_library::symbol nl_static_solver_syms[];
 
 // Forward declarations
 
@@ -767,8 +767,8 @@ void tool_app_t::static_compile()
 		}
 
 		output_stream << "#endif\n\n";
-		output_stream << "extern const plib::static_library_symbol nl_static_solver_syms[];\n";
-		output_stream << "const plib::static_library_symbol nl_static_solver_syms[] = {\n";
+		output_stream << "extern const plib::static_library::symbol nl_static_solver_syms[];\n";
+		output_stream << "const plib::static_library::symbol nl_static_solver_syms[] = {\n";
 		output_stream << "#if !defined(__EMSCRIPTEN__)\n\n";
 		for (auto &se : sort_map)
 		{

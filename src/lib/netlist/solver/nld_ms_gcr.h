@@ -128,7 +128,7 @@ namespace netlist::solver
 		pstring static_compile_name();
 
 		mat_type mat;
-		plib::dynamic_library_function<void, FT *, fptype *, fptype *, fptype *, fptype ** > m_proc;
+		plib::dynamic_library::function<void, FT *, fptype *, fptype *, fptype *, fptype ** > m_proc;
 
 	};
 

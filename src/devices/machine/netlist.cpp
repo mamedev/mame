@@ -68,7 +68,7 @@ DEFINE_DEVICE_TYPE(NETLIST_STREAM_OUTPUT, netlist_mame_stream_output_device, "nl
 // Special netlist extension devices  ....
 // ----------------------------------------------------------------------------------------
 
-extern const plib::static_library_symbol nl_static_solver_syms[];
+extern const plib::static_library::symbol nl_static_solver_syms[];
 
 static netlist::netlist_time_ext nltime_from_attotime(attotime t)
 {

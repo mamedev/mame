@@ -114,11 +114,6 @@ namespace netlist
 		T m_param;
 	};
 
-	// FIXME: these should go as well
-	using param_logic_t = param_num_t<bool>;
-	using param_int_t = param_num_t<int>;
-	using param_fp_t = param_num_t<nl_fptype>;
-
 	// -----------------------------------------------------------------------------
 	// pointer parameter
 	// -----------------------------------------------------------------------------
@@ -331,6 +326,11 @@ namespace netlist
 	extern template class param_num_t<double>;
 	extern template class param_num_t<long double>;
 	extern template class param_num_t<bool>;
+
+	// FIXME: Should not be used as parameters. Fix later.
+	using param_logic_t = param_num_t<bool>;
+	using param_int_t = param_num_t<int>;
+	using param_fp_t = param_num_t<nl_fptype>;
 
 	extern template class param_model_t::value_base_t<float>;
 	extern template class param_model_t::value_base_t<double>;

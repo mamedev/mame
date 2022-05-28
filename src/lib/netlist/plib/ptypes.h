@@ -125,7 +125,7 @@ namespace plib
 	template <std::size_t MAJOR, std::size_t MINOR, std::size_t PL = 0>
 	struct typed_version
 	{
-		static_assert((MAJOR < 100) && (MINOR < 100) && (PL < 100), "typed_version: MAJOR, MINOR or PATCHLEVEL exceeds or equal to 100");
+		static_assert((MINOR < 100) && (PL < 100), "typed_version: MAJOR, MINOR or PATCHLEVEL exceeds or equal to 100");
 		using vmajor = std::integral_constant<std::size_t, MAJOR>;
 		using vminor = std::integral_constant<std::size_t, MINOR>;
 		using vpatchlevel = std::integral_constant<std::size_t, PL>;
@@ -163,7 +163,7 @@ namespace plib
 		using version = typed_version<__clang_major__, __clang_minor__, __clang_patchlevel__>;
 	#elif defined(__GNUC__)
 		using type = std::integral_constant<ci_compiler, ci_compiler::GCC>;
-		using version = typed_version< __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__ >;
+		using version = typed_version<__GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__>;
 	#elif defined(_MSC_VER)
 		using type = std::integral_constant<ci_compiler, ci_compiler::MSC>;
 		using version = typed_version<_MSC_VER / 100, _MSC_VER % 100>;
@@ -173,13 +173,13 @@ namespace plib
 	#endif
 	#if defined(_LIBCPP_VERSION)
 		using cpp_stdlib = std::integral_constant<ci_cpp_stdlib, ci_cpp_stdlib::LIBCPP>;
-		using cpp_stdlib_version = typed_version<(_LIBCPP_VERSION) / 1000, ((_LIBCPP_VERSION) / 100) % 10>;
+		using cpp_stdlib_version = typed_version<(_LIBCPP_VERSION) / 1000, ((_LIBCPP_VERSION) / 100) % 10, __LIBCPP_VERSION % 100>;
 	#elif defined(__GLIBCXX__)
 		using cpp_stdlib = std::integral_constant<ci_cpp_stdlib, ci_cpp_stdlib::LIBSTDCXX>;
 		using cpp_stdlib_version = typed_version<(_GLIBCXX_RELEASE), 0>;
 	#else
 		using cpp_stdlib = std::integral_constant<ci_cpp_stdlib, ci_cpp_stdlib::UNKNOWN>;
-		using cpp_stdlib_version = std::integral_constant<int, 0>;
+		using cpp_stdlib_version = typed_version<(0, 0, 0>;
 	#endif
 	#ifdef __unix__
 		using is_unix = std::integral_constant<bool, true>;
