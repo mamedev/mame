@@ -19,16 +19,16 @@ namespace netlist
 	class parser_t : public plib::token_reader_t
 	{
 	public:
-		using token_t = plib::ptokenizer::token_t;
-		using token_type = plib::ptokenizer::token_type;
-		using token_id_t = plib::ptokenizer::token_id_t;
-		using token_store = plib::ptokenizer::token_store;
+		using token_t = plib::tokenizer_t::token_t;
+		using token_type = plib::tokenizer_t::token_type;
+		using token_id_t = plib::tokenizer_t::token_id_t;
+		using token_store_t = plib::tokenizer_t::token_store_t;
 
 		parser_t(nlparse_t &setup);
 
 		bool parse(plib::istream_uptr &&strm, const pstring &nlname);
-		bool parse(const token_store &tokstor, const pstring &nlname);
-		void parse_tokens(plib::istream_uptr &&strm, token_store &tokstor);
+		bool parse(const token_store_t &store, const pstring &nlname);
+		void parse_tokens(plib::istream_uptr &&strm, token_store_t &tokstore);
 
 	protected:
 		void parse_netlist();
@@ -85,17 +85,17 @@ namespace netlist
 		token_id_t m_tok_TT_LINE;
 		token_id_t m_tok_TT_FAMILY;
 
-		plib::ptokenizer m_tokenizer;
+		plib::tokenizer_t m_tokenizer;
 		nlparse_t &m_setup;
 
-		std::unordered_map<pstring, token_store> m_local;
-		token_store *m_cur_local;
+		std::unordered_map<pstring, token_store_t> m_local;
+		token_store_t *m_cur_local;
 	};
 
 	class source_token_t : public source_netlist_t
 	{
 	public:
-		source_token_t(const pstring &name, const parser_t::token_store &store)
+		source_token_t(const pstring &name, const parser_t::token_store_t &store)
 		: m_store(store)
 		, m_name(name)
 		{
@@ -107,7 +107,7 @@ namespace netlist
 		plib::istream_uptr stream(const pstring &name) override;
 
 	private:
-		parser_t::token_store m_store;
+		parser_t::token_store_t m_store;
 		pstring m_name;
 	};
 

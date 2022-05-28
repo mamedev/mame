@@ -728,7 +728,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 // -------------------------------------------------
 
 nl_convert_eagle_t::tokenizer::tokenizer(nl_convert_eagle_t &convert)
-	: plib::ptokenizer()
+	: plib::tokenizer_t()
 	, m_convert(convert)
 {
 	this->identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-")
@@ -871,7 +871,7 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 // -------------------------------------------------
 
 nl_convert_rinf_t::tokenizer::tokenizer(nl_convert_rinf_t &convert)
-	: plib::ptokenizer()
+	: plib::tokenizer_t()
 	, m_convert(convert)
 {
 	this->identifier_chars(".abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_-")

@@ -210,13 +210,13 @@ public:
 
 	nl_convert_eagle_t() = default;
 
-	class tokenizer : public plib::ptokenizer, public plib::token_reader_t
+	class tokenizer : public plib::tokenizer_t, public plib::token_reader_t
 	{
 	public:
-		using token_t = ptokenizer::token_t;
-		using token_type = ptokenizer::token_type;
-		using token_id_t = ptokenizer::token_id_t;
-		using token_store = ptokenizer::token_store;
+		using token_t = tokenizer_t::token_t;
+		using token_type = tokenizer_t::token_type;
+		using token_id_t = tokenizer_t::token_id_t;
+		using token_store = tokenizer_t::token_store_t;
 
 		tokenizer(nl_convert_eagle_t &convert);
 
@@ -247,13 +247,13 @@ public:
 
 	nl_convert_rinf_t() = default;
 
-	class tokenizer : public plib::ptokenizer, public plib::token_reader_t
+	class tokenizer : public plib::tokenizer_t, public plib::token_reader_t
 	{
 	public:
-		using token_t = ptokenizer::token_t;
-		using token_type = ptokenizer::token_type;
-		using token_id_t = ptokenizer::token_id_t;
-		using token_store = ptokenizer::token_store;
+		using token_t = tokenizer_t::token_t;
+		using token_type = tokenizer_t::token_type;
+		using token_id_t = tokenizer_t::token_id_t;
+		using token_store = tokenizer_t::token_store_t;
 		tokenizer(nl_convert_rinf_t &convert);
 
 		token_id_t m_tok_HEA; // NOLINT

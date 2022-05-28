@@ -226,7 +226,7 @@ namespace netlist
 
 		// FIXME: used by source_t - need a different approach at some time
 		bool parse_stream(plib::istream_uptr &&in_stream, const pstring &name);
-		bool parse_tokens(const plib::detail::token_store &tokens, const pstring &name);
+		bool parse_tokens(const plib::detail::token_store_t &tokens, const pstring &name);
 
 		template <typename S, typename... Args>
 		void add_include(Args&&... args)

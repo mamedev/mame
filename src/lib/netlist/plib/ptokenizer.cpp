@@ -1,10 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Couriersud
 
+#include "ptokenizer.h"
+
 #include "palloc.h"
 #include "pstonum.h"
 #include "pstrutil.h"
-#include "ptokenizer.h"
 
 namespace plib {
 
@@ -21,7 +22,7 @@ namespace plib {
 	// A simple tokenizer
 	// ----------------------------------------------------------------------------------------
 
-	void ptokenizer::skip_eol()
+	void tokenizer_t::skip_eol()
 	{
 		pstring::value_type c = getc();
 		while (c != 0)
@@ -37,7 +38,7 @@ namespace plib {
 		}
 	}
 
-	pstring::value_type ptokenizer::getc()
+	pstring::value_type tokenizer_t::getc()
 	{
 		if (m_unget != 0)
 		{
@@ -63,10 +64,25 @@ namespace plib {
 		return c;
 	}
 
-	void ptokenizer::ungetc(pstring::value_type c)
+	void tokenizer_t::ungetc(pstring::value_type c)
 	{
 		m_unget = c;
 	}
+
+	void tokenizer_t::append_to_store(putf8_reader *reader, token_store_t &tokstor)
+	{
+		clear();
+		m_strm = reader;
+		// Process tokens into queue
+		token_t ret(token_type::UNKNOWN);
+		m_token_queue = &tokstor;
+		do {
+			ret = get_token_comment();
+			tokstor.push_back(ret);
+		} while (!ret.is_type(token_type::token_type::ENDOFFILE));
+		m_token_queue = nullptr;
+	}
+
 
 	void token_reader_t::require_token(const token_id_t &token_num)
 	{
@@ -213,7 +229,7 @@ namespace plib {
 		return ret;
 	}
 
-	token_reader_t::token_t ptokenizer::get_token_internal()
+	token_reader_t::token_t tokenizer_t::get_token_internal()
 	{
 		// skip ws
 		pstring::value_type c = getc();
@@ -308,7 +324,7 @@ namespace plib {
 		}
 	}
 
-	token_reader_t::token_t ptokenizer::get_token_comment()
+	token_reader_t::token_t tokenizer_t::get_token_comment()
 	{
 		token_t ret = get_token_internal();
 		while (true)

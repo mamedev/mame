@@ -353,7 +353,7 @@ namespace netlist
 		return false;
 	}
 
-	bool nlparse_t::parse_tokens(const plib::detail::token_store &tokens, const pstring &name)
+	bool nlparse_t::parse_tokens(const plib::detail::token_store_t &tokens, const pstring &name)
 	{
 		parser_t parser(*this);
 		return parser.parse(tokens, name);
@@ -373,7 +373,7 @@ namespace netlist
 			auto preprocessed = std::make_unique<std::stringstream>(
 					plib::ppreprocessor(m_includes, &m_defines).process(std::move(in_stream), in_stream.filename()));
 
-			parser_t::token_store &st = m_source_cache[key];
+			parser_t::token_store_t &st = m_source_cache[key];
 			parser_t parser(*this);
 			parser.parse_tokens(plib::istream_uptr(std::move(preprocessed), key), st);
 			return parser.parse(st, name);
@@ -383,7 +383,7 @@ namespace netlist
 		auto preprocessed = std::make_unique<std::stringstream>(putf8string(
 				plib::ppreprocessor(m_includes, &m_defines).process(std::move(in_stream), filename)));
 
-		parser_t::token_store st;
+		parser_t::token_store_t st;
 		parser_t parser(*this);
 		parser.parse_tokens(plib::istream_uptr(std::move(preprocessed), filename), st);
 		return parser.parse(st, name);

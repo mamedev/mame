@@ -59,7 +59,7 @@ namespace plib
 
 	namespace detail
 	{
-		class token_store;
+		class token_store_t;
 	} // namespace detail
 
 } // namespace plib

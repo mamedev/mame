@@ -67,18 +67,18 @@ parser_t::parser_t(nlparse_t &setup)
 
 bool parser_t::parse(plib::istream_uptr &&strm, const pstring &nlname)
 {
-	token_store tokstor;
+	token_store_t tokstor;
 	parse_tokens(std::move(strm), tokstor);
 	return parse(tokstor, nlname);
 }
 
-void parser_t::parse_tokens(plib::istream_uptr &&strm, token_store &tokstor)
+void parser_t::parse_tokens(plib::istream_uptr &&strm, token_store_t &tokstor)
 {
 	plib::putf8_reader u8reader(strm.release_stream());
 	m_tokenizer.append_to_store(&u8reader, tokstor);
 }
 
-bool parser_t::parse(const token_store &tokstor, const pstring &nlname)
+bool parser_t::parse(const token_store_t &tokstor, const pstring &nlname)
 {
 	set_token_source(&tokstor);
 
@@ -129,9 +129,9 @@ bool parser_t::parse(const token_store &tokstor, const pstring &nlname)
 			}
 
 			// create a new cached local store
-			m_local.emplace(name.str(), token_store());
+			m_local.emplace(name.str(), token_store_t());
 			m_cur_local = &m_local[name.str()];
-			auto sl = sourceloc();
+			auto sl = location();
 			auto li = plib::pfmt("# {1} \"{2}\"")(sl.line(), sl.file_name());
 
 			m_cur_local->push_back(token_t(token_type::LINEMARKER, li));
@@ -238,7 +238,7 @@ void parser_t::net_lib_entry(bool is_local)
 		error(MF_EXTERNAL_SOURCE_IS_LOCAL_1(name));
 
 	// FIXME: Need to pass in parameter definition FIXME: get line number right
-	m_setup.register_lib_entry(name, "", sourceloc());
+	m_setup.register_lib_entry(name, "", location());
 	require_token(m_tok_paren_right);
 }
 
@@ -292,7 +292,7 @@ void parser_t::net_truth_table_start(const pstring &nlname)
 			require_token(m_tok_paren_left);
 			require_token(m_tok_paren_right);
 			// FIXME: proper location
-			m_setup.truth_table_create(desc, def_param, sourceloc());
+			m_setup.truth_table_create(desc, def_param, location());
 			return;
 		}
 	}
