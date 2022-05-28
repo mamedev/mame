@@ -1062,6 +1062,7 @@ tec1.cpp
 tecnbras.cpp
 tek405x.cpp
 tek410x.cpp
+tek43xx.cpp
 tek440x.cpp
 tekigw.cpp
 tekxp33x.cpp
