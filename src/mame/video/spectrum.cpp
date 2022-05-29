@@ -174,7 +174,7 @@ void spectrum_state::spectrum_update_screen(screen_device &screen_d, bitmap_ind1
 		}
 		u16 y = vpos - get_screen_area().top();
 		u8 *scr = &m_screen_location[((y & 7) << 8) | ((y & 0x38) << 2) | ((y & 0xc0) << 5) | (x >> 3)];
-		u8 *attr = &m_screen_location[0x1800 + ((y & 0xf8) << 2) | (x >> 3)];
+		u8 *attr = &m_screen_location[0x1800 + (((y & 0xf8) << 2) | (x >> 3))];
 		u16 *pix = &(bitmap.pix(vpos, hpos));
 
 		while ((hpos + (chunk_right ? 0 : 4)) <= screen.right())

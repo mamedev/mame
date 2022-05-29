@@ -525,7 +525,7 @@ uint8_t spectrum_state::floating_bus_r()
 				u16 y = vpos - screen.top();
 				u16 x = (clocks >> 2) + BIT(clocks, 1);
 				data = clocks & 1
-				? m_screen_location[0x1800 + ((y & 0xf8) << 2) | x]
+				? m_screen_location[0x1800 + (((y & 0xf8) << 2) | x)]
 				: m_screen_location[((y & 7) << 8) | ((y & 0x38) << 2) | ((y & 0xc0) << 5) | x];
 			}
 		}
