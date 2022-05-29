@@ -112,7 +112,6 @@ void z180asci_channel_base::device_start()
 	save_item(NAME(m_error_fifo));
 	save_item(NAME(m_fifo_wr));
 	save_item(NAME(m_fifo_rd));
-	save_item(NAME(m_rx_error));
 
 	save_item(NAME(m_cts));
 	save_item(NAME(m_dcd));
@@ -127,7 +126,6 @@ void z180asci_channel_base::device_start()
 	save_item(NAME(m_clock_state));
 	save_item(NAME(m_tx_state));
 	save_item(NAME(m_rx_state));
-	save_item(NAME(m_rx_parity));
 	save_item(NAME(m_rx_bits));
 
 	save_item(NAME(m_rx_enabled));
@@ -160,7 +158,6 @@ void z180asci_channel_base::device_reset()
 	m_clock_state = 0;
 	m_tx_state = STATE_WAIT;
 	m_rx_state = STATE_START;
-	m_rx_parity = 0;
 	m_rx_bits = 0;
 	m_rx_enabled = true;
 
@@ -316,7 +313,7 @@ void z180asci_channel_base::rdr_w(uint8_t data)
 void z180asci_channel_base::asext_w(uint8_t data)
 {
 	if (m_asci_ext & Z180_ASEXT_BRK_EN)
-		m_tx_state = (m_asci_ext & Z180_ASEXT_BRK_SEND) ? STATE_BREAK : STATE_STOP;
+		m_tx_state = (m_asci_ext & Z180_ASEXT_BRK_SEND) ? STATE_BREAK : STATE_WAIT;
 	device_clock_changed();
 }
 
@@ -461,6 +458,46 @@ void z180asci_channel_base::transmit_edge()
 	}
 }
 
+bool z180asci_channel_base::check_received()
+{
+
+	int bits = (m_asci_cntla & Z180_CNTLA_MODE_DATA) ? 8 : 7;
+	int stop_bits = (m_asci_cntla & Z180_CNTLA_MODE_STOPB) ? 2 : 1;
+	int total_bits = bits + stop_bits + ((m_asci_cntlb & Z180_CNTLB_MP) ? 1 : (m_asci_cntla & Z180_CNTLA_MODE_PARITY) ? 1 : 0);
+	if (m_rx_bits == total_bits)
+	{
+		uint8_t rx_error = 0;
+		if (m_rsr == 0) // Break detect
+		{
+			m_asci_ext |= Z180_ASEXT_BRK_DET;
+		}
+		uint8_t stop_val = (m_asci_cntla & Z180_CNTLA_MODE_STOPB) ? 3: 1;
+		if ((m_rsr & stop_val) != stop_val)
+			rx_error |= Z180_STAT_FE;
+
+		if (m_asci_cntlb & Z180_CNTLB_MP)
+		{
+			m_asci_cntla |= ((m_rsr >> stop_bits) & 1) ? Z180_CNTLA_MPBR_EFR : 0;
+		}
+		else if (m_asci_cntla & Z180_CNTLA_MODE_PARITY)
+		{
+			uint8_t parity = 0;
+			for (int i = 0; i < bits; i++)
+				parity ^= BIT(m_rsr, i);
+			if (m_asci_cntlb & Z180_CNTLB_PEO) parity ^= 1; // odd parity
+			if (((m_rsr >> stop_bits) & 1) != parity)
+				rx_error |= Z180_STAT_PE;
+		}
+		// Skip only if MPE mode active and MPB is 0
+		if (!((m_asci_cntla & Z180_CNTLA_MPE) && ((m_asci_cntla & Z180_CNTLA_MPBR_EFR) == 0)))
+		{
+			set_fifo_data(m_rsr, rx_error);
+		}
+		return true;
+	}
+	return false;
+}
+
 void z180asci_channel_base::receive_edge()
 {
 	if (!m_rx_enabled) return;
@@ -474,8 +511,6 @@ void z180asci_channel_base::receive_edge()
 			{
 				m_rx_state = STATE_DATA;
 				m_rx_bits = 0;
-				m_rx_parity = 0;
-				m_rx_error = 0;
 				m_rsr = 0;
 				m_rx_count_to = (m_divisor == 1) ? m_divisor : (m_divisor * 3) / 2;
 				if(!(m_bit_rate.is_never()))
@@ -484,40 +519,9 @@ void z180asci_channel_base::receive_edge()
 			break;
 		case STATE_DATA:
 			m_rsr |= m_rxa << m_rx_bits;
-			m_rx_parity ^= m_rxa;
 			m_rx_bits++;
-			m_rx_count_to = m_divisor;
-			if (m_rx_bits == ((m_asci_cntla & Z180_CNTLA_MODE_DATA) ? 8 : 7))
+			if (check_received())
 			{
-				m_rx_bits = (m_asci_cntla & Z180_CNTLA_MODE_STOPB) ? 2 : 1;
-				m_rx_state = (m_asci_cntlb & Z180_CNTLB_MP) ? STATE_MPB : (m_asci_cntla & Z180_CNTLA_MODE_PARITY) ? STATE_PARITY : STATE_STOP;
-			}
-			break;
-		case STATE_MPB:
-			m_rx_state = STATE_STOP;
-			m_asci_cntla |= m_rxa ? Z180_CNTLA_MPBR_EFR : 0;
-			break;
-		case STATE_PARITY:
-			m_rx_state = STATE_STOP;
-			if (m_asci_cntlb & Z180_CNTLB_PEO) m_rx_parity ^= 1; // odd parity
-			if (m_rx_parity != m_rxa)
-				m_rx_error |= Z180_STAT_PE;
-			break;
-		case STATE_STOP:
-			if (m_rxa == 0)
-				m_rx_error |= Z180_STAT_FE;
-
-			m_rx_bits--;
-			if (m_rx_bits == 0)
-			{
-				if ((m_rsr == 0) && (m_rx_parity == 0) && (m_rxa == 0))
-					m_asci_ext |= Z180_ASEXT_BRK_DET;
-
-				// Skip only if MPE mode active and MPB is 0
-				if (!((m_asci_cntla & Z180_CNTLA_MPE) && ((m_asci_cntla & Z180_CNTLA_MPBR_EFR) == 0)))
-				{
-					set_fifo_data(m_rsr, m_rx_error);
-				}
 				m_rx_state = STATE_START;
 				m_rx_count_to = 1;
 				if(!m_sample_rate.is_never())

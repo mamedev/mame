@@ -64,16 +64,14 @@ protected:
 	void receive_edge();
 	void set_fifo_data(uint8_t data, uint8_t error);
 	void prepare_tsr();
+	bool check_received();
 
 	enum serial_state
 	{
 		STATE_START,
 		STATE_DATA,
-		STATE_MPB,
-		STATE_PARITY,
-		STATE_STOP,
-		STATE_BREAK,
-		STATE_WAIT
+		STATE_WAIT,
+		STATE_BREAK
 	};
 
 
@@ -100,10 +98,9 @@ protected:
 	PAIR16    m_asci_tc;                     // ASCI time constant
 
 	uint16_t  m_tsr;
-	uint8_t   m_rsr;
+	uint16_t  m_rsr;
 	uint8_t   m_data_fifo[4];
 	uint8_t   m_error_fifo[4];
-	uint8_t   m_rx_error;
 	uint8_t   m_fifo_wr;
 	uint8_t   m_fifo_rd;
 
@@ -120,7 +117,6 @@ protected:
 	uint8_t   m_clock_state;
 	uint8_t   m_tx_state;
 	uint8_t   m_rx_state;
-	uint8_t   m_rx_parity;
 	uint8_t   m_rx_bits;
 
 	uint8_t   m_tx_counter;
