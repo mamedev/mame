@@ -138,7 +138,7 @@ void compucolor_floppy_device::device_start()
 
 
 //-------------------------------------------------
-//  device_timer - handle timer events
+//  rxd_tick -
 //-------------------------------------------------
 
 TIMER_CALLBACK_MEMBER(compucolor_floppy_device::rxd_tick)

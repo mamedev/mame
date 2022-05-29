@@ -68,8 +68,7 @@ private:
 		LED_KANA
 	};
 
-	enum
-	{
+	enum : uint8_t {
 		BEEPER_BELL = 0x01U,
 		BEEPER_CLICK = 0x02U
 	};

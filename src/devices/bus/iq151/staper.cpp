@@ -61,7 +61,6 @@ void iq151_staper_device::device_start()
 
 void iq151_staper_device::device_reset()
 {
-	m_printer_timer->adjust(attotime::never);
 }
 
 //-------------------------------------------------

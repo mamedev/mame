@@ -217,7 +217,7 @@ void zx8302_device::device_start()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  timer events
 //-------------------------------------------------
 
 TIMER_CALLBACK_MEMBER(zx8302_device::baudx4_tick)

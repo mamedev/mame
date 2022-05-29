@@ -179,7 +179,7 @@ void ncr539x_device::dma_write_data(int bytes, uint8_t *pData)
 
 TIMER_CALLBACK_MEMBER(ncr539x_device::execute_operation)
 {
-	//printf("539X: device_timer expired, param = %d, m_command = %02x\n", param, m_command);
+	//printf("539X: m_operation_timer expired, param = %d, m_command = %02x\n", param, m_command);
 
 	// if this is a DMA command, raise DRQ now
 	if (m_command & 0x80)

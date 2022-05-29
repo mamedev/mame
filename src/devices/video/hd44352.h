@@ -44,7 +44,6 @@ private:
 	uint8_t compute_newval(uint8_t type, uint8_t oldval, uint8_t newval);
 	uint8_t get_char(uint16_t pos);
 
-	static const device_timer_id ON_TIMER = 1;
 	emu_timer *m_on_timer;
 
 	uint8_t m_video_ram[2][0x180];

@@ -112,7 +112,7 @@ DEFINE_DEVICE_TYPE(MCCS1850, mccs1850_device, "mccs1850", "MCCS1850 RTC")
 //  check_interrupt -
 //-------------------------------------------------
 
-void mccs1850_device::check_interrupt()
+inline void mccs1850_device::check_interrupt()
 {
 	uint8_t status = m_ram[REGISTER_STATUS];
 	uint8_t control = m_ram[REGISTER_CONTROL];
@@ -140,7 +140,7 @@ void mccs1850_device::check_interrupt()
 //  set_pse_line -
 //-------------------------------------------------
 
-void mccs1850_device::set_pse_line(bool state)
+inline void mccs1850_device::set_pse_line(bool state)
 {
 	m_pse = state;
 
@@ -153,7 +153,7 @@ void mccs1850_device::set_pse_line(bool state)
 //  read_register -
 //-------------------------------------------------
 
-uint8_t mccs1850_device::read_register(offs_t offset)
+inline uint8_t mccs1850_device::read_register(offs_t offset)
 {
 	switch (offset)
 	{
@@ -183,7 +183,7 @@ uint8_t mccs1850_device::read_register(offs_t offset)
 //  write_register -
 //-------------------------------------------------
 
-void mccs1850_device::write_register(offs_t offset, uint8_t data)
+inline void mccs1850_device::write_register(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

@@ -225,7 +225,6 @@ private:
 	devcb_read8 m_lightpen_button_cb;
 	devcb_read8 m_lightpen_x_cb;
 	devcb_read8 m_lightpen_y_cb;
-	emu_timer *m_lightpen_timer;
 
 	/* C64 memory access */
 	devcb_read8      m_c64_mem_r_cb;

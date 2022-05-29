@@ -112,7 +112,7 @@ attotime ttl74123_device::compute_duration()
 
 int ttl74123_device::timer_running()
 {
-	return (m_clear_timer->remaining() > attotime::zero) && (m_clear_timer->remaining() != attotime::never);
+	return m_clear_timer->remaining() > attotime::zero && !m_clear_timer->remaining().is_never();
 }
 
 

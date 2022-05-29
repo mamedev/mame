@@ -162,7 +162,7 @@ void cdp1864_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handle timer events
+//  timer events
 //-------------------------------------------------
 
 TIMER_CALLBACK_MEMBER(cdp1864_device::int_tick)

@@ -27,7 +27,7 @@ void nes_bcbattle_device::device_add_mconfig(machine_config &config)
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  scan_tick - periodic scan kludge
 //-------------------------------------------------
 
 // This part is the hacky replacement for the real Barcode unit [shared with SNES implementation]:

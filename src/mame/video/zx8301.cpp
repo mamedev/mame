@@ -155,7 +155,7 @@ void zx8301_device::device_start()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  timer events
 //-------------------------------------------------
 
 TIMER_CALLBACK_MEMBER(zx8301_device::output_vsync)

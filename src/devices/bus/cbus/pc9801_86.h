@@ -111,8 +111,6 @@ protected:
 	virtual void device_reset() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	TIMER_CALLBACK_MEMBER(dac_tick);
-
 private:
 	required_device<ym3438_device>  m_opn2c;
 

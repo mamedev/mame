@@ -168,7 +168,7 @@ void segaybd_state::machine_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handle device timers
+//  irq2_gen_tick - generate IRQ2 for the main CPU
 //-------------------------------------------------
 
 TIMER_CALLBACK_MEMBER(segaybd_state::irq2_gen_tick)

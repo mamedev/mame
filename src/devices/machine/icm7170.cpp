@@ -120,11 +120,11 @@ TIMER_CALLBACK_MEMBER(icm7170_device::clock_tick)
 		m_regs[REG_CNT_100TH_SEC] = 0;
 
 		if (m_regs[REG_COMMAND] & CMD_REG_24_HOUR)
-			LOG("device_timer %02d-%02d-%02d %02d:%02d:%02d\n",
+			LOG("clock_tick %02d-%02d-%02d %02d:%02d:%02d\n",
 				m_regs[REG_CNT_YEAR], m_regs[REG_CNT_MONTH], m_regs[REG_CNT_DAY],
 				m_regs[REG_CNT_HOURS], m_regs[REG_CNT_MINUTES], m_regs[REG_CNT_SECONDS]);
 		else
-			LOG("device_timer %02d-%02d-%02d %02d:%02d:%02d %s\n",
+			LOG("clock_tick %02d-%02d-%02d %02d:%02d:%02d %s\n",
 				m_regs[REG_CNT_YEAR], m_regs[REG_CNT_MONTH], m_regs[REG_CNT_DAY],
 				m_regs[REG_CNT_HOURS] & 0xf, m_regs[REG_CNT_MINUTES], m_regs[REG_CNT_SECONDS],
 				(m_regs[REG_CNT_HOURS] & 0x80) ? "pm" : "am");

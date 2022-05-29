@@ -230,7 +230,7 @@ TIMER_CALLBACK_MEMBER(iteagle_fpga_device::assert_vblank_irq)
 	m_fpga_regs[0x04 / 4] |= 0x00080000;
 	m_cpu->set_input_line(m_irq_num, ASSERT_LINE);
 	if (LOG_FPGA)
-		logerror("%s:fpga device_timer Setting interrupt(%i)\n", machine().describe_context(), m_irq_num);
+		logerror("%s:fpga assert_vblank_irq Setting interrupt(%i)\n", machine().describe_context(), m_irq_num);
 }
 
 WRITE_LINE_MEMBER(iteagle_fpga_device::vblank_update)

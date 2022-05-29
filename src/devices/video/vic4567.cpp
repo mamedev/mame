@@ -162,7 +162,6 @@ vic3_device::vic3_device(const machine_config &mconfig, const char *tag, device_
 	, m_lightpen_button_cb(*this)
 	, m_lightpen_x_cb(*this)
 	, m_lightpen_y_cb(*this)
-	, m_lightpen_timer(nullptr)
 	, m_c64_mem_r_cb(*this)
 {
 }
@@ -308,9 +307,6 @@ void vic3_device::device_start()
 		save_item(NAME(m_sprites[i].bitmap[6]), i);
 		save_item(NAME(m_sprites[i].bitmap[7]), i);
 	}
-
-
-	m_lightpen_timer = timer_alloc(FUNC(vic3_device::timer_timeout), this);
 }
 
 //-------------------------------------------------
@@ -1985,7 +1981,7 @@ void vic3_device::raster_interrupt_gen()
 		if (LIGHTPEN_BUTTON)
 		{
 			/* lightpen timer start */
-			m_lightpen_timer->adjust(attotime(0, 0), 1);
+			machine().scheduler().synchronize(timer_expired_delegate(FUNC(vic3_device::timer_timeout), this), 1);
 		}
 
 	}

@@ -107,7 +107,7 @@ void mc146818_device::device_reset()
 }
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  timer events
 //-------------------------------------------------
 
 TIMER_CALLBACK_MEMBER(mc146818_device::periodic_tick)

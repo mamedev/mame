@@ -375,7 +375,7 @@ void abc80_state::kbd_w(u8 data)
 //**************************************************************************
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  timer events
 //-------------------------------------------------
 
 TIMER_CALLBACK_MEMBER(abc80_state::scanline_tick)

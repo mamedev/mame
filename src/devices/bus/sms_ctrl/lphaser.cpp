@@ -183,7 +183,7 @@ int sms_light_phaser_device::bright_aim_area(int lgun_x, int lgun_y)
 			/* step 1: r^2 = dx^2 + dy^2 */
 			/* step 2: dx^2 = r^2 - dy^2 */
 			/* step 3: dx = sqrt(r^2 - dy^2) */
-			dx_radius = ceil(sqrt((float) (r_x_r - (dy * dy))));
+			dx_radius = ceil(sqrt(double(r_x_r - (dy * dy))));
 		}
 
 		aim_area.min_x = std::max(int32_t(lgun_x - dx_radius), visarea.min_x);

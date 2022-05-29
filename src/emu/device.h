@@ -468,10 +468,6 @@ constexpr auto driver_device_creator = &emu::detail::driver_tag_func<DriverClass
 class device_missing_dependencies : public emu_exception { };
 
 
-// timer IDs for devices
-typedef u32 device_timer_id;
-
-
 /// \brief Base class for devices
 ///
 /// The base class for all device implementations in MAME's modular

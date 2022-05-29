@@ -58,8 +58,8 @@
 #include "hp9895.h"
 #include "formats/hpi_dsk.h"
 
-#define LOG_LEVEL0		(1 << 1)
-#define LOG_LEVEL1      (1 << 2)
+#define LOG_LEVEL0		(0x1U << 1)
+#define LOG_LEVEL1      (0x3U << 1)
 
 #define VERBOSE (LOG_LEVEL1)
 #include "logmacro.h"
