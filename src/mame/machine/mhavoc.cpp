@@ -134,7 +134,7 @@ TIMER_CALLBACK_MEMBER(mhavoc_state::delayed_gamma_w)
 	m_gamma->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	/* the sound CPU needs to reply in 250microseconds (according to Neil Bradley) */
-	m_gamma_sync_timer->adjust(attotime::from_usec(250));
+	machine().scheduler().timer_set(attotime::from_usec(250), timer_expired_delegate());
 }
 
 

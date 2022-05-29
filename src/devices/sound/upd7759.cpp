@@ -248,10 +248,6 @@ void upd775x_device::device_start()
 	save_item(NAME(m_sample));
 	save_item(NAME(m_mode));
 	save_item(NAME(m_md));
-
-	m_sync_port_write = timer_alloc(FUNC(upd775x_device::sync_port_write), this);
-	m_sync_reset_write = timer_alloc(FUNC(upd775x_device::internal_reset_w), this);
-	m_sync_start_write = timer_alloc(FUNC(upd775x_device::internal_start_w), this);
 }
 
 void upd775x_device::device_clock_changed()
@@ -273,7 +269,6 @@ void upd7759_device::device_start()
 	m_sample_offset_shift = 1;
 
 	m_timer = timer_alloc(FUNC(upd7759_device::drq_update), this);
-	m_sync_md_write = timer_alloc(FUNC(upd7759_device::internal_md_w), this);
 
 	m_drqcallback.resolve_safe();
 }
@@ -603,7 +598,7 @@ TIMER_CALLBACK_MEMBER(upd7759_device::drq_update)
 
 WRITE_LINE_MEMBER( upd775x_device::reset_w )
 {
-	m_sync_reset_write->adjust(attotime::zero, state);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(upd775x_device::internal_reset_w), this), state);
 }
 
 TIMER_CALLBACK_MEMBER(upd775x_device::internal_reset_w)
@@ -635,7 +630,7 @@ TIMER_CALLBACK_MEMBER(upd7759_device::internal_reset_w)
 
 WRITE_LINE_MEMBER( upd775x_device::start_w )
 {
-	m_sync_start_write->adjust(attotime::zero, state);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(upd775x_device::internal_start_w), this), state);
 }
 
 void upd7759_device::internal_start_w(int state)
@@ -681,7 +676,7 @@ WRITE_LINE_MEMBER(upd7759_device::md_w)
 		m_md = state;
 		return;
 	}
-	m_sync_md_write->adjust(attotime::zero, state);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(upd7759_device::internal_md_w), this), state);
 }
 
 
@@ -712,7 +707,7 @@ TIMER_CALLBACK_MEMBER(upd7759_device::internal_md_w)
 
 void upd775x_device::port_w(u8 data)
 {
-	m_sync_port_write->adjust(attotime::zero, data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(upd775x_device::sync_port_write), this), data);
 }
 
 

@@ -121,11 +121,6 @@ protected:
 
 	// ROM access
 	int           m_md;                         // High is stand alone, low is slave.
-
-	// Sync timers
-	emu_timer *   m_sync_port_write;
-	emu_timer *   m_sync_reset_write;
-	emu_timer *   m_sync_start_write;
 };
 
 class upd7759_device : public upd775x_device
@@ -152,7 +147,6 @@ protected:
 
 	devcb_write_line m_drqcallback;
 	emu_timer *m_timer;
-	emu_timer *m_sync_md_write;
 };
 
 class upd7756_device : public upd775x_device
