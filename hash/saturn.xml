@@ -30310,7 +30310,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Atlantis - The Lost Tales v1.200 (1998)(Sega)(PAL)(M3)(Disc 1 of 2)[!]... -->
 	<!-- Identifying Atlantis - The Lost Tales v1.200 (1998)(Sega)(PAL)(M3)(Disc 2 of 2)[!]... -->
 	<software name="atlantis" supported="no">
-		<description>Atlantis - The Lost Tales (Euro)</description>
+		<description>Atlantis: The Lost Tales (Euro)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81091-50"/>
@@ -30330,7 +30330,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying 0691-Atlantis-fre-cd1... -->
 	<!-- Identifying 0691-Atlantis-fre-cd2... -->
 	<software name="atlantisf" cloneof="atlantis" supported="no">
-		<description>Atlantis: Secrets d'un monde oublié (Fra)</description>
+		<description>Atlantis : Secrets d'un monde oublié (Fra)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81091-09"/>
