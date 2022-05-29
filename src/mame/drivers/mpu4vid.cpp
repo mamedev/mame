@@ -8779,6 +8779,7 @@ GAME(  1989, v4tmach2d,   v4tmach,  mpu4_vid_cheatchr,   skiltrek, mpu4vid_state
 
 /* Quiz games - Games below are missing question ROMs */
 
+// winner takes all sequence?
 // 00 64 64 24 64 64 24 64 6c 9c bc bc a4 24 64 24 74 44 6c 94 1c ac 84 24 64 64 6c c4 24 24 64 24 24 64 74 04 6c c4 2c c4 24 64 60 24 64 64 24 64 6c 8c 8c 94 14 4c 8c 9c bc ac 8c 94 14 04 6c 00
 GAME(  1990, v4sklcsh,   v4bios,   mpu4_vid_cheatchr,   skiltrek, mpu4vid_state, init_v4barqst,  ROT0, "Barcrest","Skill Cash (v1.1) (MPU4 Video)",GAME_FLAGS )
 
@@ -8786,6 +8787,7 @@ GAME(  1990, v4sklcsh,   v4bios,   mpu4_vid_cheatchr,   skiltrek, mpu4vid_state,
 GAME(  199?, v4eyedwn,   v4bios,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_eyesdown,  ROT0, "Barcrest","Eyes Down (v1.3) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4eyedwnd,  v4eyedwn, mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_eyesdown,  ROT0, "Barcrest","Eyes Down (v1.3, Datapak) (MPU4 Video)",GAME_FLAGS )
 
+// similar to the 'Winner Takes All' sequence but not the same
 // 00 64 64 24 64 64 24 64 74 54 84 a4 24 24 64 24 e4 64 74 44 34 04 24 24 64 64 74 44 64 24 64 24 24 64 e4 24 74 44 34 14 04 64 60 24 64 64 24 64 74 04 24 e4 64 74 04 34 04 64 24 64 24 64 74 00
 GAME(  199?, v4quidgr,   v4bios,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_quidgrid,  ROT0, "Barcrest","Ten Quid Grid (v1.2) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4quidgrd,  v4quidgr, mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_quidgrid,  ROT0, "Barcrest","Ten Quid Grid (v1.2, Datapak) (MPU4 Video)",GAME_FLAGS )

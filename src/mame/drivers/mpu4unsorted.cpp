@@ -2379,11 +2379,11 @@ GAME(199?, m4holywd,  0,          mod2_cheatchr,       mpu4,    mpu4unsorted_sta
 // runs, unprotected
 GAME(199?, m4specu,   0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Speculator Club (Bwb) (MPU4)",GAME_FLAGS ) // no sound with either system
 
-// runs, scrambled lamps
-// 00 64 64 24 64 64 24 64 6c 9c bc bc a4 24
-GAME(199?, m4lazy,    0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Bwb","Lazy Bones (Bwb) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4lazya,   m4lazy,     mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Bwb","Lazy Bones (Bwb) (MPU4) (set 2)",GAME_FLAGS )
-GAME(199?, m4lazyb,   m4lazy,     mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Bwb","Lazy Bones (Bwb) (MPU4) (set 3)",GAME_FLAGS )
+// runs
+// 00 64 64 24 64 64 24 64 6c 9c bc bc a4 24 (wta)
+GAME(199?, m4lazy,    0,          mod4oki_cheatchr_wta,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Bwb","Lazy Bones (Bwb) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4lazya,   m4lazy,     mod4oki_cheatchr_wta,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Bwb","Lazy Bones (Bwb) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4lazyb,   m4lazy,     mod4oki_cheatchr_wta,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Bwb","Lazy Bones (Bwb) (MPU4) (set 3)",GAME_FLAGS )
 
 // runs if you set a stake, scrambled lamps
 // 00 bc b8 fc bc dc fc fc fc f8 d8 b8 f8 d8
@@ -2396,19 +2396,34 @@ GAME(199?, m4sunscl,  0,          mod2_cheatchr,       mpu4,    mpu4unsorted_sta
 GAME(199?, m4sunscla, m4sunscl,   mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Sunset Club (Bwb) (MPU4) (set 2)",GAME_FLAGS )
 GAME(199?, m4sunsclb, m4sunscl,   mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Sunset Club (Bwb) (MPU4) (set 3)",GAME_FLAGS )
 
+// 00 84 94 3c ec 5c ec 50 2c 68 60 ac 74 00 ac 58 ec 7c ec 58 e0 90 18 ec 54
 GAME(199?, m4bigban,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Big Bandit (Nova) (MPU4)",GAME_FLAGS ) // DM1 SW ALM
+
+// 00 88 70 14 1c c0 a4 a0 bc d4 30 14 18 d4 2c 50
 GAME(199?, m4crzcsn,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Crazy Casino (Nova) (MPU4)",GAME_FLAGS )
+
+// 00 e0 88 18 b0 48 50 60 e4 c8 58 f0 08 74 20 c0 88 3c f4 48 34
 GAME(199?, m4crzcav,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Crazy Cavern (Nova) (MPU4)",GAME_FLAGS )
+
+// 00 24 24 2c e0 b4 b8 4c e8 d8 cc f8 6c 48 68 40 a4 bc ec d0 98
 GAME(199?, m4dragon,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Dragon (Nova) (MPU4)",GAME_FLAGS )
+
+// 00 24 24 a4 4c 10 c0 0c f0 a8 98 d4 68 90 e8 18 f4 e8 f8 54
 GAME(199?, m4hilonv,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Hi Lo Casino (Nova) (MPU4)",GAME_FLAGS )
+
+// 00 44 44 c4 58 60 c0 50 8c b8 e0 dc ec b0 1c e8 38 ec bc 68 a4 58 68
 GAME(199?, m4octo,    0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Octopus (Nova) (MPU4)",GAME_FLAGS )
-GAME(199?, m4sctagt,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Nova","Secret Agent (Nova) (MPU4)",GAME_FLAGS ) // AUX2 LOCKED
 
-// Others
 
+// NETWORK FAIL ALARM (reel comms?)
+// 00 84 8c d8 74 80 4c 90 e8 78 54 60 84 2c b0 28 b0 e8 f8 34 c0 4c 90 a8
 GAME(1994, m4esctbg,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default,     ROT0, "Vifico", "Escalera Tobogan (MPU4, set 1)", GAME_FLAGS )
 GAME(1994, m4esctbga, m4esctbg,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default,     ROT0, "Vifico", "Escalera Tobogan (MPU4, set 2)", GAME_FLAGS )
 GAME(1994, m4esctbgb, m4esctbg,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default,     ROT0, "Vifico", "Escalera Tobogan (MPU4, set 3)", GAME_FLAGS )
+
+// Others
+
+GAME(199?, m4sctagt,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Nova","Secret Agent (Nova) (MPU4)",GAME_FLAGS ) // AUX2 LOCKED
 
 GAMEL(199?, m4aao,    0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4aao,     ROT0,   "Eurotek","Against All Odds (Eurotek) (MPU4)",GAME_FLAGS, layout_m4aao )
 
