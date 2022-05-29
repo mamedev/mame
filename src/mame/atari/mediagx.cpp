@@ -207,10 +207,6 @@ private:
 	uint8_t io20_r(offs_t offset);
 	void io20_w(offs_t offset, uint8_t data);
 
-	// TODO TEMP REMOVE THESE TESTING FUNCTIONS LATER
-	uint32_t getRandomVal(uint32_t);
-	void unlockRandomVal();
-
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	template <offs_t N> uint32_t speedup_r(address_space &space) { return generic_speedup(space, N); }
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_timer_callback);
@@ -640,44 +636,6 @@ void mediagx_state::io20_w(offs_t offset, uint8_t data)
 	}
 }
 
-
-///
-/// Testing Logic
-///
-uint32_t randVal 	= 0;
-uint32_t randValH = 0;
-uint32_t clocker 	= 0;
-bool active 			= false;
-uint8_t lastMp 		= 0;
-
-uint32_t mediagx_state::getRandomVal(uint32 clockDelay) {
-	uint32_t mp0 = m_ports[0].read_safe(0);
-
-	if((mp0 & 2) != lastMp && lastMp == 0) {
-		// toggle active
-		active = !active;
-		printf("Toggled %d\n", active);
-	}
-
-	lastMp = mp0 & 2;
-
-	if(active) {
-		clocker++;
-		if(clocker > clockDelay) {
-			if(randVal) {
-				randVal = 0;
-			} else {
-				randVal = rand() % 0xffffffff;
-				randValH++;
-				//randVal = randValH;
-			}
-			printf("> %08x\n", randVal);
-			clocker = 0;
-		}
-	}
-	return randVal;
-}
-
 // Takes an 8-bit input val, and converts it into an
 // appropriate output val for reading from IO 0x379 on the par port
 // Only interested in the low 4-bits
@@ -724,6 +682,9 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 
 		if(m_parport_control_reg == 0x10) {
 			// TODO something here?
+			// not really, was just testing here too
+			// mp0 = m_ports[0].read_safe(0);
+			// r |= mk_parport_outval(mp0 >> 8);
 
 		} else if(m_parport_control_reg == 0x18) {
 			// Reset internal pointer to 0
@@ -737,6 +698,11 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 				r |= 0x9000;
 			}
 
+			// don't really think this part helps, but keeping just in case...(historical)
+			// else {
+			// 	r |= mk_parport_outval(mp0 >> 8);
+			// }
+
 			// testing w/ certain 0xFF modes changing things up
 			//uint8_t nibble = m_parallel_latched;
 			//r |= ((~nibble & 0x08) << 12) | ((nibble & 0x07) << 11);
@@ -746,40 +712,98 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 			// read from port 1
 			//r |= m_ports[1]->read() << 8;
 
+			// >>>>>>> 2 LINES ADDED for testing
+			// mp0 = m_ports[0].read_safe(0);
+			// r |= mk_parport_outval(mp0 >> 0x8);
+
 		} else if(upperReg == 0x3) {
 			// TODO OLD
 			// read from port 2
 			//r |= m_ports[2]->read() << 8;
 
+			// >>>>>>> 2 LINES ADDED for testing
+			// mp0 = m_ports[0].read_safe(0);
+			// r |= mk_parport_outval(mp0 >> 0x8);
+
 		} else if(upperReg == 0x4) {
 			// TODO coin counters coming back on this...but interestingly not needed to update coins
+			// (fixed) this leads to Coin Duplication...but fixed w/ mark below
+			// VOLUME OR Gun trigger controls UP/DOWN somewhere on this somehow...very interesting
+			// 		vol value moves on its own w/out doing anything
+			/*
+			- ???? Volume Up / Down
+			- ???? Guncon shoot (unlikely) ???
+			It's very likely to be the 1st, unlikely, but possible, to be the 2nd
+			*/
+			mp0 = m_ports[0].read_safe(0);
+
+			// to avoid coin duplication
+			if (mp0 & 0x100 && !(mp0 & 0x400)) {
+				mp0 ^= 0x100;
+			}
+
+			r |= mk_parport_outval(mp0 >> 0x8);
 
 		} else if(upperReg == 0x5) {
+			// > START BUTTONS!
 			// TODO Can control watchdogged outputs here I think, kickers,
+
+			// was messing around w/ reading from port 2
 			//r |= m_ports[2]->read() << 8;
+			
+			// (fixed) Adding this in causes duplicate coin insertions and the like, but keeping it for now just in case it's doing something else too (it is, volume stuff)
+			// Volume Menu Select button? (i.e. impacts whether we can select a menu option or not, along with 0xF)
+			// 		> INTERESTING, since his should just be the start button, signals this is important in another way here maybe
+			//		> i.e., this may be a guncon or P1/P2 start helper, or even a controller
+			/*
+			- P1 Start Button
+			- ??? P2 Start Button somewhere here as well
+			*/
+			mp0 = m_ports[0].read_safe(0);
+
+			// to avoid coin duplication
+			if (mp0 & 0x100 && !(mp0 & 0x400)) {
+				mp0 ^= 0x100;
+			}
+
+			r |= mk_parport_outval(mp0 >> 0x8);
 
 		} else if(m_parport_control_reg == 0x60) {
 			// TODO Reset watchdogs?
+
 			// this might be nice to try down here?
 			// uint8_t nibble = m_parallel_latched;
+
 			// r |= ((~nibble & 0x08) << 12) | ((nibble & 0x07) << 11);
+			// this code here is not important, or at least that seems to be the case
+			//r |= mk_parport_outval(mp0 >> 0x8);
 
 			// coins & coin tracker only tripped together under 0x60
 			mp0 = m_ports[0].read_safe(0);
-			if(mp0 & 0xf0) {
-				// drop a coin in
-				// accounts for inverted upper bit
 
-				// TODO testing this real quick..., should be some other reads then?
-				//r |= mk_parport_outval(mp0 >> 0x8);
-				// TODO what it was before...
+			// keeping 0xf0 as the bitmask pushes the coin insertion to keys 5-8, which is desirable
+			if(mp0 & 0xf0) {
+			
+			// this changes coin insertion to show up on 1-5, but it doesn't block the mode interestingly enough
+			// would need to use it w/ 'mp0 >> 0x8' read below, instead of 0x1 read
+			// if(mp0) {
+				// drop a coin in
 				r |= mk_parport_outval(0x1);
+
+				// for testing...
+				// r |= mk_parport_outval(mp0 >> 0x8);
+
+				// another old testing val, can probably be tossed
 				//r |= 0x8800;
 			}
 
 		} else if(upperReg == 0xF) {
 			// TODO Internal pointer advance?
 			mp0 = m_ports[0].read_safe(0);
+
+			// i suspect this is the culprit...nope, not the case
+			//r |= mk_parport_outval(mp0 >> 0x8);
+
 			// 0b1011 1000 is our bitmask, but now I have a handy function to abstract that away from me!
 			// not below 6, but above for screen & movement?
 			// but unsure about upper bound for < 12, no movement then?
@@ -788,7 +812,16 @@ uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
 			// 11 does nothing
 			// here's what we got so far
 			// Combination of keys [1] and [3] held will lead this to do 'something', but only for the following range of 10-12, 9 too?
-			if(mp0 & 0xf00 && (m_parallel_pointer > 9 && m_parallel_pointer <= 10)) {
+			
+			if(mp0 & 0xf00 && m_parallel_pointer == 10) {
+				// Range of 10 is very important, w/out it, and w/out the below, a number of components (like volume menu access & start button pressing) don't work
+				// there's a lot at play here
+				/*
+				- Allows volume menu select
+				- Allows P1 Start Button to be pressed (likely P2 start as well)
+
+				Upper controls are co-dependent on this here as well...interesting
+				*/
 				//printf("%08x\n", mp0 >> 0x8);
 				r |= mk_parport_outval(mp0 >> 0x8); // was 0x5
 			}
@@ -862,7 +895,7 @@ void mediagx_state::parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_m
 		// Why? And then also only the low 4-bits, weird
 		// Ah, so this reads the given input for the given 'pointer', and normalizes it so it can be used below
 		// TODO can remove parallel latched if it keeps being useless
-		m_parallel_latched = (m_ports[m_parallel_pointer / 3].read_safe(0) >> (4 * (m_parallel_pointer % 3)));
+		//m_parallel_latched = (m_ports[m_parallel_pointer / 3].read_safe(0) >> (4 * (m_parallel_pointer % 3)));
 
 		// TODO try latching random stuff, what can we do?
 		//m_parallel_latched = rand() % 0x100;
@@ -874,19 +907,19 @@ void mediagx_state::parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_m
 
 		// update the control register
 		// this controls our parallel reads
-		// cuts off bit 1
+		// cuts off bit 1, serves 0b11111110
 		m_parport_control_reg = data & 0xfc;
 
 		switch (m_parport_control_reg) // data & 0xfc
 		{
 			case 0x18:
-			case 0x19:
+			//case 0x19: dropped anyways by 0xfc...
 			case 0x1a:
 			case 0x1b:
 				// 18 = reset internal pointer to 0
 				m_parallel_pointer = data & 3;
 				//printf("[%02X] Reset pointer to %d\n", data, m_parallel_pointer);
-				logerror("[%02X] Reset pointer to %d\n", data, m_parallel_pointer);
+				//logerror("[%02X] Reset pointer to %d\n", data, m_parallel_pointer);
 				break;
 
 			case 0x20:
@@ -894,7 +927,7 @@ void mediagx_state::parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_m
 			case 0x28:
 			case 0x2c:
 				//printf("[%02X] General purpose output (0x2) = x%X\n", data, data & 0x0f);
-				logerror("[%02X] General purpose output = x%X\n", data, data & 0x0f);
+				//logerror("[%02X] General purpose output = x%X\n", data, data & 0x0f);
 				break;
 
 			case 0x30:
@@ -902,7 +935,7 @@ void mediagx_state::parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_m
 			case 0x38:
 			case 0x3c:
 				//printf("[%02X] General purpose output (0x3) = x%X\n", data, data & 0x0f);
-				logerror("[%02X] General purpose output = %Xx\n", data, data & 0x0f);
+				//logerror("[%02X] General purpose output = %Xx\n", data, data & 0x0f);
 				break;
 
 			case 0x40:
@@ -910,7 +943,7 @@ void mediagx_state::parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_m
 			case 0x48:
 			case 0x4c:
 				//printf("[%02X] Coin counters = %d%d%d%d\n", data, (data >> 3) & 1, (data >> 2) & 1, (data >> 1) & 1, data & 1);
-				logerror("[%02X] Coin counters = %d%d%d%d\n", data, (data >> 3) & 1, (data >> 2) & 1, (data >> 1) & 1, data & 1);
+				//logerror("[%02X] Coin counters = %d%d%d%d\n", data, (data >> 3) & 1, (data >> 2) & 1, (data >> 1) & 1, data & 1);
 				break;
 
 			case 0x50:
@@ -918,7 +951,7 @@ void mediagx_state::parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_m
 			case 0x58:
 			case 0x5c:
 				//printf("[%02X] Kickers = %d%d\n", data, (data >> 1) & 1, data & 1);
-				logerror("[%02X] Kickers = %d%d\n", data, (data >> 1) & 1, data & 1);
+				//logerror("[%02X] Kickers = %d%d\n", data, (data >> 1) & 1, data & 1);
 				break;
 
 			case 0x60:
@@ -926,7 +959,7 @@ void mediagx_state::parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_m
 			case 0x68:
 			case 0x6c:
 				//printf("[%02X] Watchdog reset\n", data);
-				logerror("[%02X] Watchdog reset\n", data);
+				//logerror("[%02X] Watchdog reset\n", data);
 				break;
 
 			default:
@@ -934,12 +967,12 @@ void mediagx_state::parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_m
 				{
 					m_parallel_pointer++;
 					//printf("[%02X] Advance pointer to %d\n", data, m_parallel_pointer);
-					logerror("[%02X] Advance pointer to %d\n", data, m_parallel_pointer);
+					//logerror("[%02X] Advance pointer to %d\n", data, m_parallel_pointer);
 				}
 				else
 				{
 					//printf("[%02X] Unknown write\n", data);
-					logerror("[%02X] Unknown write\n", data);
+					//logerror("[%02X] Unknown write\n", data);
 				}
 				break;
 		}
@@ -954,11 +987,14 @@ void mediagx_state::parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_m
 }
 
 /* Analog Devices AD1847 Stereo DAC */
+#define AD1847_SAMPLE_DELAY 10
+#define AD1847_SAMPLE_SIZE 1000 / AD1847_SAMPLE_DELAY
 
 TIMER_DEVICE_CALLBACK_MEMBER(mediagx_state::sound_timer_callback)
 {
 	m_ad1847_sample_counter = 0;
-	timer.adjust(attotime::from_msec(10));
+	// 10 ms before was the default
+	timer.adjust(attotime::from_msec(AD1847_SAMPLE_DELAY));
 
 	m_dmadac[0]->transfer(1, 0, 1, m_dacl_ptr, m_dacl.get());
 	m_dmadac[1]->transfer(1, 0, 1, m_dacr_ptr, m_dacr.get());
@@ -1012,7 +1048,7 @@ uint32_t mediagx_state::ad1847_r(offs_t offset)
 	switch (offset)
 	{
 		case 0x14/4:
-			return ((m_ad1847_sample_rate) / 100) - m_ad1847_sample_counter;
+			return ((m_ad1847_sample_rate) / (AD1847_SAMPLE_SIZE)) - m_ad1847_sample_counter; // 1000 / 10, usually, so 100
 	}
 	return 0;
 }
@@ -1333,9 +1369,11 @@ void mediagx_state::mediagx(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	//printf("\n\n--> At the mediaxgx setup position, for refresh rate in Hz\n\n");
-	m_screen->set_refresh_hz(60);
+	m_screen->set_refresh_hz(30); // 60
+
 	m_screen->set_size(640, 480);
 	m_screen->set_visarea(0, 639, 0, 239);
+
 	m_screen->set_screen_update(FUNC(mediagx_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cga);
@@ -1471,5 +1509,5 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME( 1998, a51site4, 0       , mediagx, mediagx, mediagx_state, init_a51site4,  ROT0,   "Atari Games",  "Area 51: Site 4 (HD Rev 2.01, September 7, 1998)", MACHINE_NOT_WORKING )
+GAME( 1998, a51site4, 0       , mediagx, mediagx, mediagx_state, init_a51site4,  ROT0,   "Atari Games",  "Area 51: Site 4 (HD Rev 2.01, September 7, 1998)", 0 ) // better flags here...
 GAME( 1998, a51site4a,a51site4, mediagx, mediagx, mediagx_state, init_a51site4,  ROT0,   "Atari Games",  "Area 51: Site 4 (HD Rev 2.0, September 11, 1998)", MACHINE_NOT_WORKING )
