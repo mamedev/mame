@@ -36,30 +36,30 @@ const options_entry emu_options::s_option_entries[] =
 
 	// search path options
 	{ nullptr,                                           nullptr,     core_options::option_type::HEADER,     "CORE SEARCH PATH OPTIONS" },
-	{ OPTION_PLUGINDATAPATH,                             ".",         core_options::option_type::STRING,     "path to base folder for plugin data (read/write)" },
-	{ OPTION_MEDIAPATH ";rp;biospath;bp",                "roms",      core_options::option_type::STRING,     "path to ROM sets and hard disk images" },
-	{ OPTION_HASHPATH ";hash_directory;hash",            "hash",      core_options::option_type::STRING,     "path to software definition files" },
-	{ OPTION_SAMPLEPATH ";sp",                           "samples",   core_options::option_type::STRING,     "path to audio sample sets" },
-	{ OPTION_ARTPATH,                                    "artwork",   core_options::option_type::STRING,     "path to artwork files" },
-	{ OPTION_CTRLRPATH,                                  "ctrlr",     core_options::option_type::STRING,     "path to controller definitions" },
-	{ OPTION_INIPATH,                                    ".;ini;ini/presets",     core_options::option_type::STRING,     "path to ini files" },
-	{ OPTION_FONTPATH,                                   ".",         core_options::option_type::STRING,     "path to font files" },
-	{ OPTION_CHEATPATH,                                  "cheat",     core_options::option_type::STRING,     "path to cheat files" },
-	{ OPTION_CROSSHAIRPATH,                              "crosshair", core_options::option_type::STRING,     "path to crosshair files" },
-	{ OPTION_PLUGINSPATH,                                "plugins",   core_options::option_type::STRING,     "path to plugin files" },
-	{ OPTION_LANGUAGEPATH,                               "language",  core_options::option_type::STRING,     "path to UI translation files" },
-	{ OPTION_SWPATH,                                     "software",  core_options::option_type::STRING,     "path to loose software" },
+	{ OPTION_PLUGINDATAPATH,                             ".",         core_options::option_type::PATH,     "path to base folder for plugin data (read/write)" },
+	{ OPTION_MEDIAPATH ";rp;biospath;bp",                "roms",      core_options::option_type::MULTIPATH,     "path to ROM sets and hard disk images" },
+	{ OPTION_HASHPATH ";hash_directory;hash",            "hash",      core_options::option_type::MULTIPATH,     "path to software definition files" },
+	{ OPTION_SAMPLEPATH ";sp",                           "samples",   core_options::option_type::MULTIPATH,     "path to audio sample sets" },
+	{ OPTION_ARTPATH,                                    "artwork",   core_options::option_type::MULTIPATH,     "path to artwork files" },
+	{ OPTION_CTRLRPATH,                                  "ctrlr",     core_options::option_type::MULTIPATH,     "path to controller definitions" },
+	{ OPTION_INIPATH,                                    ".;ini;ini/presets",     core_options::option_type::MULTIPATH,     "path to ini files" },
+	{ OPTION_FONTPATH,                                   ".",         core_options::option_type::MULTIPATH,     "path to font files" },
+	{ OPTION_CHEATPATH,                                  "cheat",     core_options::option_type::MULTIPATH,     "path to cheat files" },
+	{ OPTION_CROSSHAIRPATH,                              "crosshair", core_options::option_type::MULTIPATH,     "path to crosshair files" },
+	{ OPTION_PLUGINSPATH,                                "plugins",   core_options::option_type::MULTIPATH,     "path to plugin files" },
+	{ OPTION_LANGUAGEPATH,                               "language",  core_options::option_type::MULTIPATH,     "path to UI translation files" },
+	{ OPTION_SWPATH,                                     "software",  core_options::option_type::MULTIPATH,     "path to loose software" },
 
 	// output directory options
 	{ nullptr,                                           nullptr,     core_options::option_type::HEADER,     "CORE OUTPUT DIRECTORY OPTIONS" },
-	{ OPTION_CFG_DIRECTORY,                              "cfg",       core_options::option_type::STRING,     "directory to save configurations" },
-	{ OPTION_NVRAM_DIRECTORY,                            "nvram",     core_options::option_type::STRING,     "directory to save NVRAM contents" },
-	{ OPTION_INPUT_DIRECTORY,                            "inp",       core_options::option_type::STRING,     "directory to save input device logs" },
-	{ OPTION_STATE_DIRECTORY,                            "sta",       core_options::option_type::STRING,     "directory to save states" },
-	{ OPTION_SNAPSHOT_DIRECTORY,                         "snap",      core_options::option_type::STRING,     "directory to save/load screenshots" },
-	{ OPTION_DIFF_DIRECTORY,                             "diff",      core_options::option_type::STRING,     "directory to save hard drive image difference files" },
-	{ OPTION_COMMENT_DIRECTORY,                          "comments",  core_options::option_type::STRING,     "directory to save debugger comments" },
-	{ OPTION_SHARE_DIRECTORY,                            "share",     core_options::option_type::STRING,     "directory to share with emulated machines" },
+	{ OPTION_CFG_DIRECTORY,                              "cfg",       core_options::option_type::PATH,     "directory to save configurations" },
+	{ OPTION_NVRAM_DIRECTORY,                            "nvram",     core_options::option_type::PATH,     "directory to save NVRAM contents" },
+	{ OPTION_INPUT_DIRECTORY,                            "inp",       core_options::option_type::PATH,     "directory to save input device logs" },
+	{ OPTION_STATE_DIRECTORY,                            "sta",       core_options::option_type::PATH,     "directory to save states" },
+	{ OPTION_SNAPSHOT_DIRECTORY,                         "snap",      core_options::option_type::PATH,     "directory to save/load screenshots" },
+	{ OPTION_DIFF_DIRECTORY,                             "diff",      core_options::option_type::PATH,     "directory to save hard drive image difference files" },
+	{ OPTION_COMMENT_DIRECTORY,                          "comments",  core_options::option_type::PATH,     "directory to save debugger comments" },
+	{ OPTION_SHARE_DIRECTORY,                            "share",     core_options::option_type::PATH,     "directory to share with emulated machines" },
 
 	// state/playback options
 	{ nullptr,                                           nullptr,     core_options::option_type::HEADER,     "CORE STATE/PLAYBACK OPTIONS" },
@@ -67,13 +67,13 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_AUTOSAVE,                                   "0",         core_options::option_type::BOOLEAN,    "automatically restore state on start and save on exit for supported systems" },
 	{ OPTION_REWIND,                                     "0",         core_options::option_type::BOOLEAN,    "enable rewind savestates" },
 	{ OPTION_REWIND_CAPACITY "(1-2048)",                 "100",       core_options::option_type::INTEGER,    "rewind buffer size in megabytes" },
-	{ OPTION_PLAYBACK ";pb",                             nullptr,     core_options::option_type::STRING,     "playback an input file" },
-	{ OPTION_RECORD ";rec",                              nullptr,     core_options::option_type::STRING,     "record an input file" },
+	{ OPTION_PLAYBACK ";pb",                             nullptr,     core_options::option_type::PATH,     "playback an input file" },
+	{ OPTION_RECORD ";rec",                              nullptr,     core_options::option_type::PATH,     "record an input file" },
 	{ OPTION_EXIT_AFTER_PLAYBACK,                        "0",         core_options::option_type::BOOLEAN,    "close the program at the end of playback" },
 
-	{ OPTION_MNGWRITE,                                   nullptr,     core_options::option_type::STRING,     "optional filename to write a MNG movie of the current session" },
-	{ OPTION_AVIWRITE,                                   nullptr,     core_options::option_type::STRING,     "optional filename to write an AVI movie of the current session" },
-	{ OPTION_WAVWRITE,                                   nullptr,     core_options::option_type::STRING,     "optional filename to write a WAV file of the current session" },
+	{ OPTION_MNGWRITE,                                   nullptr,     core_options::option_type::PATH,     "optional filename to write a MNG movie of the current session" },
+	{ OPTION_AVIWRITE,                                   nullptr,     core_options::option_type::PATH,     "optional filename to write an AVI movie of the current session" },
+	{ OPTION_WAVWRITE,                                   nullptr,     core_options::option_type::PATH,     "optional filename to write a WAV file of the current session" },
 	{ OPTION_SNAPNAME,                                   "%g/%i",     core_options::option_type::STRING,     "override of the default snapshot/movie naming; %g == gamename, %i == index" },
 	{ OPTION_SNAPSIZE,                                   "auto",      core_options::option_type::STRING,     "specify snapshot/movie resolution (<width>x<height>) or 'auto' to use minimal size " },
 	{ OPTION_SNAPVIEW,                                   "auto",      core_options::option_type::STRING,     "snapshot/movie view - 'auto' for default, or 'native' for per-screen pixel-aspect views" },
@@ -254,7 +254,7 @@ namespace
 		}
 
 	protected:
-		virtual void internal_set_value(std::string &&newvalue) override
+		virtual void internal_set_value(std::string &&newvalue, bool perform_substitutions) override
 		{
 			m_host.set_system_name(std::move(newvalue));
 		}
@@ -274,7 +274,7 @@ namespace
 		}
 
 	protected:
-		virtual void internal_set_value(std::string &&newvalue) override
+		virtual void internal_set_value(std::string &&newvalue, bool perform_substitutions) override
 		{
 			m_host.set_software(std::move(newvalue));
 		}
@@ -312,7 +312,7 @@ namespace
 		}
 
 	protected:
-		virtual void internal_set_value(std::string &&newvalue) override
+		virtual void internal_set_value(std::string &&newvalue, bool perform_substitutions) override
 		{
 			m_host.specify(std::move(newvalue), false);
 		}
@@ -338,7 +338,7 @@ namespace
 		}
 
 	protected:
-		virtual void internal_set_value(std::string &&newvalue) override
+		virtual void internal_set_value(std::string &&newvalue, bool perform_substitutions) override
 		{
 			m_host.specify(std::move(newvalue), false);
 		}
