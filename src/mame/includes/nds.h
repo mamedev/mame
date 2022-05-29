@@ -9,6 +9,7 @@
 #include "cpu/arm7/arm7core.h"
 #include "machine/bankdev.h"
 #include "machine/timer.h"
+#include "sound/nds_sound.h"
 
 class nds_state : public driver_device
 {
@@ -17,9 +18,10 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_arm7(*this, "arm7"),
 		m_arm9(*this, "arm9"),
-		m_firmware(*this, "firmware"),
 		m_arm7wrambnk(*this, "nds7wram"),
 		m_arm9wrambnk(*this, "nds9wram"),
+		m_nds_sound(*this, "nds_sound"),
+		m_firmware(*this, "firmware"),
 		m_arm7ram(*this, "arm7ram")
 	{ }
 
@@ -49,10 +51,14 @@ private:
 	void nds_arm7_map(address_map &map);
 	void nds_arm9_map(address_map &map);
 
+	// devices
 	required_device<arm7_cpu_device> m_arm7;
 	required_device<arm946es_cpu_device> m_arm9;
-	required_region_ptr<uint32_t> m_firmware;
 	required_device<address_map_bank_device> m_arm7wrambnk, m_arm9wrambnk;
+	required_device<nds_sound_device> m_nds_sound;
+
+	// memory regions
+	required_region_ptr<uint32_t> m_firmware;
 	required_shared_ptr<uint32_t> m_arm7ram;
 
 	enum {

@@ -296,6 +296,7 @@ SOUNDS["S_DSP"] = true
 SOUNDS["KS0164"] = true
 SOUNDS["TT5665"] = true
 --SOUNDS["RP2C33_SOUND"] = true
+--SOUNDS["NDS_SOUND"] = true
 --SOUNDS["UDA1344"] = true
 SOUNDS["SWP30"] = true
 SOUNDS["XT446"] = true
