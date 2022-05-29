@@ -186,6 +186,10 @@ Copyright (c) 2001-2009 Roger B. Dannenberg
 pugixml - a C++ XML processing library
 Copyright (c) 2006-2019 Arseny Kapoulkine
 
+RapidFuzz - Rapid fuzzy string matching in C++ using the Levenshtein Distance
+Copyright (c) 2020 Max Bachmann
+Copyright (c) 2011 Adam Cohen
+
 RapidJSON - A fast JSON parser/generator for C++ with both SAX/DOM style API
 Copyright (c) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 

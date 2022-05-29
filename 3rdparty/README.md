@@ -54,6 +54,8 @@ portmidi - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
 pugixml - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
+rapidfuzz-cpp - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
+
 rapidjson - [The MIT License (MIT)](http://opensource.org/licenses/MIT), [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause) (msinttypes), JSON license (JSON_checker)
 
 sdl2 - [zlib license](http://opensource.org/licenses/Zlib)

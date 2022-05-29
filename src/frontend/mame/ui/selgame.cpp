@@ -35,6 +35,9 @@
 #include "uiinput.h"
 #include "unicode.h"
 
+#include "rapidfuzz/fuzz.hpp"
+#include "rapidfuzz/utils.hpp"
+
 #include <cstring>
 #include <iterator>
 #include <memory>
@@ -826,41 +829,42 @@ void menu_select_game::populate_search()
 	if (m_persistent_data.is_available(system_list::AVAIL_UCS_MANUF_DFLT_DESC))
 		m_searched_fields |= system_list::AVAIL_UCS_MANUF_DFLT_DESC;
 
+	auto scorer = rapidfuzz::fuzz::CachedRatio<std::u32string>(ucs_search);
 	for (std::pair<double, std::reference_wrapper<ui_system_info const> > &info : m_searchlist)
 	{
-		info.first = 1.0;
+		info.first = 0.0;
 		ui_system_info const &sys(info.second);
 
 		// match shortnames
 		if (m_searched_fields & system_list::AVAIL_UCS_SHORTNAME)
-			info.first = util::edit_distance(ucs_search, sys.ucs_shortname);
+			info.first = scorer.ratio(sys.ucs_shortname);
 
 		// match reading
-		if (info.first && !sys.ucs_reading_description.empty())
+		if ((100.0 > info.first) && !sys.ucs_reading_description.empty())
 		{
-			info.first = (std::min)(util::edit_distance(ucs_search, sys.ucs_reading_description), info.first);
+			info.first = (std::max)(scorer.ratio(sys.ucs_reading_description), info.first);
 
 			// match "<manufacturer> <reading>"
-			if (info.first)
-				info.first = (std::min)(util::edit_distance(ucs_search, sys.ucs_manufacturer_reading_description), info.first);
+			if (100.0 > info.first)
+				info.first = (std::max)(scorer.ratio(sys.ucs_manufacturer_reading_description), info.first);
 		}
 
 		// match descriptions
-		if (info.first && (m_searched_fields & system_list::AVAIL_UCS_DESCRIPTION))
-			info.first = (std::min)(util::edit_distance(ucs_search, sys.ucs_description), info.first);
+		if ((100.0 > info.first) && (m_searched_fields & system_list::AVAIL_UCS_DESCRIPTION))
+			info.first = (std::max)(scorer.ratio(sys.ucs_description), info.first);
 
 		// match "<manufacturer> <description>"
-		if (info.first && (m_searched_fields & system_list::AVAIL_UCS_MANUF_DESC))
-			info.first = (std::min)(util::edit_distance(ucs_search, sys.ucs_manufacturer_description), info.first);
+		if ((100.0 > info.first) && (m_searched_fields & system_list::AVAIL_UCS_MANUF_DESC))
+			info.first = (std::max)(scorer.ratio(sys.ucs_manufacturer_description), info.first);
 
 		// match default description
-		if (info.first && (m_searched_fields & system_list::AVAIL_UCS_DFLT_DESC) && !sys.ucs_default_description.empty())
+		if ((100.0 > info.first) && (m_searched_fields & system_list::AVAIL_UCS_DFLT_DESC) && !sys.ucs_default_description.empty())
 		{
-			info.first = (std::min)(util::edit_distance(ucs_search, sys.ucs_default_description), info.first);
+			info.first = (std::max)(scorer.ratio(sys.ucs_default_description), info.first);
 
 			// match "<manufacturer> <default description>"
-			if (info.first && (m_searched_fields & system_list::AVAIL_UCS_MANUF_DFLT_DESC))
-				info.first = (std::min)(util::edit_distance(ucs_search, sys.ucs_manufacturer_default_description), info.first);
+			if ((100.0 > info.first) && (m_searched_fields & system_list::AVAIL_UCS_MANUF_DFLT_DESC))
+				info.first = (std::max)(scorer.ratio(sys.ucs_manufacturer_default_description), info.first);
 		}
 	}
 
@@ -868,7 +872,7 @@ void menu_select_game::populate_search()
 	std::stable_sort(
 			m_searchlist.begin(),
 			m_searchlist.end(),
-			[] (auto const &lhs, auto const &rhs) { return lhs.first < rhs.first; });
+			[] (auto const &lhs, auto const &rhs) { return lhs.first > rhs.first; });
 }
 
 

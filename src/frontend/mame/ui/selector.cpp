@@ -17,6 +17,9 @@
 #include "corestr.h"
 #include "unicode.h"
 
+#include "rapidfuzz/fuzz.hpp"
+#include "rapidfuzz/utils.hpp"
+
 
 namespace ui {
 
@@ -135,38 +138,34 @@ void menu_selector::custom_render(void *selectedref, float top, float bottom, fl
 
 void menu_selector::find_matches(const char *str)
 {
-	// allocate memory to track the penalty value
+	// allocate memory to track the ratio value
 	m_ucs_items.reserve(m_str_items.size());
-	std::vector<double> penalty(VISIBLE_GAMES_IN_SEARCH, 1.0);
+	std::vector<double> ratio(VISIBLE_ITEMS_IN_SEARCH, 0.0);
 	std::u32string const search(ustr_from_utf8(normalize_unicode(str, unicode_normalization_form::D, true)));
+	auto scorer = rapidfuzz::fuzz::CachedRatio<std::u32string>(search);
 
+	m_searchlist[0] = nullptr;
 	int index = 0;
 	for ( ; index < m_str_items.size(); ++index)
 	{
 		assert(m_ucs_items.size() >= index);
 		if (m_ucs_items.size() == index)
 			m_ucs_items.emplace_back(ustr_from_utf8(normalize_unicode(m_str_items[index], unicode_normalization_form::D, true)));
-		double const curpenalty(util::edit_distance(search, m_ucs_items[index]));
+		double const curratio(scorer.ratio(m_ucs_items[index]));
 
 		// insert into the sorted table of matches
-		for (int matchnum = VISIBLE_GAMES_IN_SEARCH - 1; matchnum >= 0; --matchnum)
+		auto pos = std::lower_bound(ratio.begin(), ratio.end(), curratio, std::greater<double>());
+		if (ratio.end() != pos)
 		{
-			// stop if we're worse than the current entry
-			if (curpenalty >= penalty[matchnum])
-				break;
-
-			// as long as this isn't the last entry, bump this one down
-			if (matchnum < VISIBLE_GAMES_IN_SEARCH - 1)
-			{
-				penalty[matchnum + 1] = penalty[matchnum];
-				m_searchlist[matchnum + 1] = m_searchlist[matchnum];
-			}
-
-			m_searchlist[matchnum] = &m_str_items[index];
-			penalty[matchnum] = curpenalty;
+			std::copy(pos, std::prev(ratio.end()), std::next(pos));
+			std::copy(
+					std::begin(m_searchlist) + std::distance(ratio.begin(), pos),
+					std::prev(std::end(m_searchlist)),
+					std::begin(m_searchlist) + std::distance(ratio.begin(), pos) + 1);
+			*pos = curratio;
+			m_searchlist[std::distance(ratio.begin(), pos)] = &m_str_items[index];
 		}
 	}
-	(index < VISIBLE_GAMES_IN_SEARCH) ? m_searchlist[index] = nullptr : m_searchlist[VISIBLE_GAMES_IN_SEARCH] = nullptr;
 }
 
 } // namespace ui

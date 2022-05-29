@@ -23,6 +23,7 @@ if (_OPTIONS["targetos"] ~= "asmjs") then
 end
 
 includedirs {
+	MAME_DIR .. "3rdparty/rapidfuzz-cpp",
 	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/emu",
 	MAME_DIR .. "src/frontend/mame",

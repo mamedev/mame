@@ -27,6 +27,9 @@
 #include "luaengine.h"
 #include "unicode.h"
 
+#include "rapidfuzz/fuzz.hpp"
+#include "rapidfuzz/utils.hpp"
+
 #include <algorithm>
 #include <iterator>
 #include <functional>
@@ -48,28 +51,29 @@ struct menu_select_software::search_item
 		, ucs_shortname(ustr_from_utf8(normalize_unicode(s.shortname, unicode_normalization_form::D, true)))
 		, ucs_longname(ustr_from_utf8(normalize_unicode(s.longname, unicode_normalization_form::D, true)))
 		, ucs_alttitles()
-		, penalty(1.0)
+		, ratio(0.0)
 	{
 		ucs_alttitles.reserve(s.alttitles.size());
 		for (std::string const &alttitle : s.alttitles)
 			ucs_alttitles.emplace_back(ustr_from_utf8(normalize_unicode(alttitle, unicode_normalization_form::D, true)));
 	}
 
-	void set_penalty(std::u32string const &search)
+	template <typename T>
+	void set_ratio(T &scorer)
 	{
-		penalty = util::edit_distance(search, ucs_shortname);
-		if (penalty)
-			penalty = (std::min)(penalty, util::edit_distance(search, ucs_longname));
+		ratio = scorer.ratio(ucs_shortname);
+		if (100.0 > ratio)
+			ratio = (std::max)(ratio, scorer.ratio(ucs_longname));
 		auto it(ucs_alttitles.begin());
-		while (penalty && (ucs_alttitles.end() != it))
-			penalty = (std::min)(penalty, util::edit_distance(search, *it++));
+		while ((100.0 > ratio) && (ucs_alttitles.end() != it))
+			ratio = (std::max)(ratio, scorer.ratio(*it++));
 	}
 
 	std::reference_wrapper<ui_software_info const> software;
 	std::u32string ucs_shortname;
 	std::u32string ucs_longname;
 	std::vector<std::u32string> ucs_alttitles;
-	double penalty;
+	double ratio;
 };
 
 
@@ -332,14 +336,15 @@ public:
 
 		// update search
 		const std::u32string ucs_search(ustr_from_utf8(normalize_unicode(search, unicode_normalization_form::D, true)));
+		auto scorer = rapidfuzz::fuzz::CachedRatio<std::u32string>(ucs_search);
 		for (search_item &entry : m_searchlist)
-			entry.set_penalty(ucs_search);
+			entry.set_ratio(scorer);
 
 		// sort according to edit distance
 		std::stable_sort(
 				m_searchlist.begin(),
 				m_searchlist.end(),
-				[] (search_item const &lhs, search_item const &rhs) { return lhs.penalty < rhs.penalty; });
+				[] (search_item const &lhs, search_item const &rhs) { return lhs.ratio > rhs.ratio; });
 
 		// return reference to search results
 		return m_searchlist;
