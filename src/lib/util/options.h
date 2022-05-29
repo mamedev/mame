@@ -280,5 +280,4 @@ struct options_entry
 	const char *                description;        // description for -showusage
 };
 
-
 #endif // MAME_LIB_UTIL_OPTIONS_H
