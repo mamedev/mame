@@ -2,16 +2,16 @@
 // copyright-holders:David Haywood
 
 /*
-	These are MPU4 based machines that are still in need of correct placement.
+    These are MPU4 based machines that are still in need of correct placement.
 
-	Some of them appear to be official Barcrest machines, and will likely end up
-	being moved to the mod2/mod4 files based on hardware types.
+    Some of them appear to be official Barcrest machines, and will likely end up
+    being moved to the mod2/mod4 files based on hardware types.
 
-	Official machines / licensed machines can typically be identified by the
-	standard Barcrest 'characteriser' protection sequence being written.
+    Official machines / licensed machines can typically be identified by the
+    standard Barcrest 'characteriser' protection sequence being written.
 
-	Other machines in this files are unofficial machines, maybe one-off units
-	that will require individual attention.
+    Other machines in this files are unofficial machines, maybe one-off units
+    that will require individual attention.
 */
 
 #include "emu.h"
@@ -197,7 +197,7 @@ ROM_START( m4ceptr )
 	ROM_LOAD( "cepsnd.p2", 0x080000, 0x080000, CRC(a82f0096) SHA1(45b6b5a2ae06b45add9cdbb9f5e6f834687b4902) )
 ROM_END
 
- 
+
 #define M4CHASEI_EXTRAS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "cha.s1", 0x000000, 0x080000, CRC(8200b6bc) SHA1(bcc4ffbddcdcc1dd994fe29e9b24e83272f59442) ) \
@@ -1016,8 +1016,8 @@ ROM_END
 
 // 00 C0 D0 38 EC 5C EC 14 68 2C 24 E8
 
-//	ROM_REGION( 0x48, "characteriser:fakechr", 0 ) // blank lamp sequence
-//	ROM_LOAD( "dtpchr.chr", 0x0000, 0x000048, CRC(7743df66) SHA1(69b1943837ccf8671861ac8ef690138b41de0e5b) )
+//  ROM_REGION( 0x48, "characteriser:fakechr", 0 ) // blank lamp sequence
+//  ROM_LOAD( "dtpchr.chr", 0x0000, 0x000048, CRC(7743df66) SHA1(69b1943837ccf8671861ac8ef690138b41de0e5b) )
 
 #define M4TBPLAY_EXTRAS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
@@ -2233,7 +2233,7 @@ GAME(199?, m4tropcld, m4tropcl,   mod2_alt_cheatchr_shuffle,   mpu4,    mpu4unso
 // 00 60 68 bc d0 2c 94 20 e4 e8 bc f0 88 34
 GAME(199?, m4holdtm,  0,          mod4oki_alt_cheatchr,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Hold Timer (Barcrest) (Dutch) (MPU4) (DHT)",GAME_FLAGS )
 GAME(199?, m4exgam,   0,          mod4oki_alt_cheatchr,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Extra Game (Fairplay - Barcrest) (MPU4)",GAME_FLAGS )
-// 00 60 68 bc d0 2c 94 20 e4 e8 bc f0 88 34 a0 
+// 00 60 68 bc d0 2c 94 20 e4 e8 bc f0 88 34 a0
 GAME(199?, m4toma,    0,          mod2_alt_cheatchr,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Tomahawk (Barcrest) (MPU4)",GAME_FLAGS )
 // 00 60 68 bc d0 2c 94 20 e4 e8 bc f0 88 34 a0 c4
 GAME(199?, m4toptim,  0,          mod4oki_alt_cheatchr,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Top Timer (Barcrest) (Dutch) (MPU4) (DTT) (set 1)",GAME_FLAGS )
@@ -2391,7 +2391,7 @@ GAME(199?, m4sunclb,  0,          mod2_cheatchr,       mpu4,    mpu4unsorted_sta
 GAME(199?, m4sunclba, m4sunclb,   mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Sun Club (Bwb) (MPU4) (set 2)",GAME_FLAGS )
 
 // REEL A ALM
-// 00 14 04 34 2c 44 34 24 3c 78 70 28 64 10 
+// 00 14 04 34 2c 44 34 24 3c 78 70 28 64 10
 GAME(199?, m4sunscl,  0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Sunset Club (Bwb) (MPU4) (set 1)",GAME_FLAGS )
 GAME(199?, m4sunscla, m4sunscl,   mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Sunset Club (Bwb) (MPU4) (set 2)",GAME_FLAGS )
 GAME(199?, m4sunsclb, m4sunscl,   mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Sunset Club (Bwb) (MPU4) (set 3)",GAME_FLAGS )
@@ -2461,7 +2461,7 @@ GAME(199?, m4barcrz,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_sta
 
 GAME(199?, m4bonzbn,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Bingo Bonanza (unknown) (MPU4?)",GAME_FLAGS )
 
-// 00 84 94 3c ec 5c ec 50 2c 68 60 ac 74 00 ac 58 ec 7c ec 58 (just tri98)  runs 
+// 00 84 94 3c ec 5c ec 50 2c 68 60 ac 74 00 ac 58 ec 7c ec 58 (just tri98)  runs
 GAME(199?, m4cld02,   0,          mod4oki_cheatchr_tri98,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","unknown MPU4 'CLD 0.2C' (MPU4?)",GAME_FLAGS )
 
 // ERROR CODE 2
@@ -2623,7 +2623,7 @@ GAME(198?, m4funh,    0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_sta
 // these are NOT Mod 2 like the m4sunset sets, so could be misidentified
 GAME(199?, m4sunseta, 0,           mod4oki_cheatchr_lv,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (B25 1.2, set 1)",GAME_FLAGS )
 GAME(199?, m4sunsetb, m4sunseta,   mod4oki_cheatchr_lv,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (B25 1.2, set 2)",GAME_FLAGS )
-// bad chr alarm, without doing standard checks, hack? 
+// bad chr alarm, without doing standard checks, hack?
 GAME(199?, m4sunsetc, m4sunseta,   mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (OSB 0.2)",GAME_FLAGS ) // might be a mod 2
 
 // REEL 1 FAULT

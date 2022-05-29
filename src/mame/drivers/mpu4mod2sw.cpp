@@ -2276,7 +2276,7 @@ GAME_CUSTOM( 199?, m4nnww2__hx2,  m4nnww2, "wink2010",     0x0000, 0x010000, CRC
 
 /*********************************************************************************************************
 
-	Sets below are NOT based on Barcrest code, and don't have Characteriser protection etc.
+    Sets below are NOT based on Barcrest code, and don't have Characteriser protection etc.
 
 *********************************************************************************************************/
 

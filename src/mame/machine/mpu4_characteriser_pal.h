@@ -71,8 +71,8 @@ public:
 
 	// m4supst__bi etc.
 	static constexpr uint8_t m4lv_lamp_scramble[9] = { 0x00, 0x18, 0x10, 0x08 ,0x00, 0x08, 0x00, 0x00 };
-	                                              //     03    EB    63    CB    C3    6B    63    43    in sunsetb (complete table?)
-    
+												  //     03    EB    63    CB    C3    6B    63    43    in sunsetb (complete table?)
+
 	// games with sequence starting 00 24 24 2C E0 B4 B8 4C E8 D8 (m4eaw__a9 etc.)
 	static constexpr uint8_t m683_lamp_scramble[8] = { 0x03, 0xAF, 0x27, 0x8F, 0x0F, 0xA7, 0x27, 0x07 };
 
@@ -81,13 +81,13 @@ public:
 
 	// games with sequence starting 00 30 20 14 2c a0 54 24 3c 9c 9c 9c
 	static constexpr uint8_t m441_lamp_scramble[8] = { 0x03, 0x3F, 0x33, 0x1F, 0x17, 0x3B, 0x33, 0x13 };
-	                                               //    00    38    30    18    14    3C    34    14
-                                                   //    00    38    30    18    10    38    30    14
+												   //    00    38    30    18    14    3C    34    14
+												   //    00    38    30    18    10    38    30    14
 
 	// games with sequence starting 00 c4 c4 44 c4 44 44 c4 cc 3c
 	// this seems to be the same sequence as the MPU4 Video game 'Strike It Lucky' where we're having to use a 4k table for the question scramble
 	static constexpr uint8_t m462_lamp_scramble[8] = { 0x03, 0xC3, 0xC7, 0x4F, 0x47, 0xE7, 0xC7, 0x47 };
-	                                               //    04    44    44    48    40    60    40    40   rhog2
+												   //    04    44    44    48    40    60    40    40   rhog2
 
 	// games with sequence starting 00 64 64 24 64 64 24 64 6C 9C BC
 	static constexpr uint8_t wta_lamp_scramble[8] = { 0x00, 0x64, 0x60, 0x28, 0x20, 0x70, 0x60, 0x20 };
@@ -95,7 +95,7 @@ public:
 
 	// games with sequence starting 00 24 24 a4 4c 10 88 50 a8 d8 9c
 	static constexpr uint8_t du91_lamp_scramble[8] = { 0x03, 0xAF, 0x27, 0x8F, 0x87, 0x2F, 0x27, 0x07 };
-	                                               //    00    28    20    08    00    28    20    00    gb006
+												   //    00    28    20    08    00    28    20    00    gb006
 
 
 	// games with sequence starting 00 90 C0 54 8C 68 24 90 CC 6C 24 9C BC 34 88 6C
@@ -109,8 +109,8 @@ public:
 
 	// games with sequence starting 00 a0 a8 18 f4 2c 70 60 e4 e8
 	static constexpr uint8_t viva_lamp_scramble[8] = { 0x03, 0xE7, 0xA3, 0xC7, 0xC3, 0xA7, 0xA3, 0xC3 };
-	                                                //   00    60    20    40    40    24    20    40   place your bets
-	
+													//   00    60    20    40    40    24    20    40   place your bets
+
 	static constexpr uint8_t m407_lamp_scramble[8] = { 0x03, 0xC7, 0x83, 0xC3, 0xC3, 0xA3, 0x83, 0xC3 };
 
 
@@ -122,7 +122,7 @@ public:
 
 	// games with sequence starting 00 50 40 90 a8 6c c4 30 c8
 	static constexpr uint8_t alf_lamp_scramble[8] = { 0x00, 0x58, 0x50, 0x1C, 0x10, 0x58, 0x50, 0x10 };
-	                                              //    03    DB    53    9B    93    5B    53    13
+												  //    03    DB    53    9B    93    5B    53    13
 
 	// games with sequence starting 00 84 A4 AC 70 80 2C C0 BC 5C
 	static constexpr uint8_t shuffle_lamp_scramble[8] = { 0x00, 0x18, 0x00, 0x18, 0x08, 0x10, 0x00, 0x00 };
@@ -145,17 +145,17 @@ public:
 	// games with sequence 00 e4 ec f8 54 08 d0 80 44 2c 58 b4 e8 b0 80
 	static constexpr uint8_t nifty_lamp_scramble[8] = { 0x03, 0xE7, 0xA7, 0x87, 0xE7, 0x07, 0xA7, 0xE7 };
 
-	
-	
+
+
 	/***************************************************************
 
 	 Lamp data below is incorrect
 
 	***************************************************************/
-	
+
 
 	// these lamp values were in the Twin Timer set, which is the only game using it, but they're not used, so probably incorrect
-	static constexpr uint8_t m533_lamp_scramble[8] = { 0xFF, 0xFF, 0x10, 0x3F, 0x15, 0xFF, 0xFF, 0xFF }; 
+	static constexpr uint8_t m533_lamp_scramble[8] = { 0xFF, 0xFF, 0x10, 0x3F, 0x15, 0xFF, 0xFF, 0xFF };
 
 	// this sequence is used for m4oldtmr and m4tic__l, but m4oldtmr does not appear to use the lamp scramble, and the data is not valid for m4tic__l
 	// so is probably incorrect
@@ -163,22 +163,22 @@ public:
 	static constexpr uint8_t m470_lamp_scramble[8] = { 0xFF, 0xFF, 0x10, 0x3F, 0x15, 0xFF, 0xFF, 0xFF }; // one 'm470' set was set to all blank?
 
 	// these lamp values were in the Golden Gate set, they do not appear to be valid as Golden Gate doesn't use them and other games don't work with them
-	static constexpr uint8_t m450_lamp_scramble[8] = { 0xFF, 0xFF, 0x10, 0x3F, 0x15, 0xFF, 0xFF, 0xFF }; 
+	static constexpr uint8_t m450_lamp_scramble[8] = { 0xFF, 0xFF, 0x10, 0x3F, 0x15, 0xFF, 0xFF, 0xFF };
 
 
 	// games with sequence starting 00 c0 e0 b0 38 c4 f0 30 58 9c 9c 9c dc 9c dc
-	static constexpr uint8_t tentendia_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; 	// INCORRECT 
+	static constexpr uint8_t tentendia_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };   // INCORRECT
 
 	// games with sequence starting 00 90 88 4c e0 b8 74 84 bc 74 00 b4
-	static constexpr uint8_t jewelcrown_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; 	// INCORRECT 
+	static constexpr uint8_t jewelcrown_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };  // INCORRECT
 
 	// games with sequence starting 00 90 a0 34 8c 68 44 90 ac 6c 44 9c dc 5c d4 24 98 dc
-	static constexpr uint8_t magicdragon_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT 
+	static constexpr uint8_t magicdragon_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 	// games with sequence starting 00 50 10 24 54 00 60 50 34 30 00 74 10 04 74
-	static constexpr uint8_t premier_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT 
+	static constexpr uint8_t premier_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	
+
 
 protected:
 	mpu4_characteriser_pal(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

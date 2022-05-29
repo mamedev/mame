@@ -3,9 +3,9 @@
 // thanks-to:Chris Wren, Tony Friery, MFME
 
 /*
-	mpu4.cpp - MPU4 hardware emulation
+    mpu4.cpp - MPU4 hardware emulation
 
-	this file contains emulation of the hardware only
+    this file contains emulation of the hardware only
 
 */
 
@@ -1881,7 +1881,7 @@ INPUT_PORTS_END
 uint8_t mpu4_state::bwb_characteriser_r(offs_t offset)
 {
 	//if (bwb_characteriser_r)
-	//	bwb_characteriser_r(offset);
+	//  bwb_characteriser_r(offset);
 
 	return 0x00;
 }
@@ -1889,7 +1889,7 @@ uint8_t mpu4_state::bwb_characteriser_r(offs_t offset)
 void mpu4_state::bwb_characteriser_w(offs_t offset, uint8_t data)
 {
 	//if (m_characteriser)
-	//	bwb_characteriser_w(offset, data);
+	//  bwb_characteriser_w(offset, data);
 }
 
 
@@ -2237,7 +2237,7 @@ void mpu4_state::init_m4default_big()
 	// some Bwb games don't work anyway tho, they seem to dislike something else
 	// about the way the regular banking behaves, not related to the CB2 stuff
 	m_bank1->set_entry(m_numbanks);
-	
+
 }
 
 
@@ -2775,7 +2775,7 @@ void mpu4_state::mpu4_common2(machine_config &config)
 }
 
 /***********************************************************************************************
- 
+
   Base config with no sound
 
 ***********************************************************************************************/
@@ -2798,7 +2798,7 @@ void mpu4_state::mpu4base(machine_config &config)
 }
 
 /***********************************************************************************************
- 
+
   Configs for Mod2
 
   TODO: mod2 should eventually become a subclass
@@ -2918,7 +2918,7 @@ void mpu4_state::mod2_alt_cheatchr_alf(machine_config &config)
 }
 
 /***********************************************************************************************
- 
+
   Configs for Mod4 with YM
 
   TODO: mod4yam should eventually become a subclass
@@ -3013,7 +3013,7 @@ void mpu4_state::mod4yam_cheatchr_viva(machine_config &config)
 }
 
 /***********************************************************************************************
- 
+
   Configs for Mod4 with OKI
 
   TODO: mod4oki should eventually become a subclass
@@ -3283,7 +3283,7 @@ void mpu4_state::mod4oki_5r_cheatchr_clbveg(machine_config &config)
 
 
 /***********************************************************************************************
- 
+
   Other configs
 
 ***********************************************************************************************/
@@ -3311,7 +3311,7 @@ void mpu4_state::mpu4crys(machine_config &config)
 }
 
 /***********************************************************************************************
- 
+
   Inits
 
 ***********************************************************************************************/

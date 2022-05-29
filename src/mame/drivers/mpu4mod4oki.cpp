@@ -7,122 +7,122 @@
 
   Currently in this file:
 
-  	Regular Machines
-	------------
+    Regular Machines
+    ------------
 
-	10 X 10
-	Action Bank
-	Andy Capp
-	Andy Capp (Dutch game)
-	Andy Loves Flo
-	Andy's Full House
-	Andy's Great Escape
-	Bagatelle
-	Berserk
-	Boulder Dash
-	Buccaneer
-	Cash Attack
-	Cash Encounters
-	Cash Lines
-	Cash Machine
-	Cloud Nine
-	Copy Cat
-	Cosmic Casino
-	Dennis The Menace
-	Duty Free
-	Duty Free (Prize version)
-	Duty Free (Showcase version)
-	Everyone's A Winner
-	Fruit & Loot (Prize version)
-	Games Bond 006
-	Give Us A Clue
-	Hi Jinx
-	High Roller (Prize version)
-	Hit The Top
-	Hot Rod
-	Jackpot Gems
-	Jackpot Gems (Classic)
-	Jewel In the Crown
-	Jolly Gems
-	Kings & Queens
-	Kings & Queens (Classic)
-	Let The Good Times Roll
-	Lucky Las Vegas
-	Lucky Las Vegas (Classic)
-	Lucky Strike
-	Lucky Strike Club
-	Luxor
-	Luxor (Prize version)
-	Mad House
-	Magnificent 7s
-	Make A Mint
-	New Hit the Top
-	Nudge Nudge Wink Wink (Classic)
-	Ooh Aah Dracula
-	Over The Moon
-	Place Your Bets
-	Pot Black
-	Prize Money
-	Prize Money (Showcase version)
-	Prize Run For Your Money
-	Ready Steady Go
-	Red Hot Roll (Classic?)
-	Rich & Famous
-	Rich & Famous (Prize version)
-	Road Hog
-	Road Hog 2 - I'm Back
-	Rocket Money
-	Rocky Horror Show
-	Run For Your Money
-	Squids In
-	Super Streak (Classic)
-	Take Your Pick
-	Ten Out Of Ten
-	Ten Ten Do It Again
-	The Crystal Dome
-	The Crystal Maze
-	The Crystal Maze (Showcase version)
-	The Streak
-	Tic Tac Toe
-	Tic Tac Toe (Classic)
-	Tic Tac Toe (Gold)
-	Top Dog
-	Top Tenner
-	Tutti Fruity
-	Up Up and Away
-	Vegas Strip
-	Viva Espana
-	Viva Espana (Prize version)
-	Viva Espana (Showcase versino)
-	Viz
-	What's On (Prize version)
-	Winner Takes All
-	Winner Takes All (Prize version)	
+    10 X 10
+    Action Bank
+    Andy Capp
+    Andy Capp (Dutch game)
+    Andy Loves Flo
+    Andy's Full House
+    Andy's Great Escape
+    Bagatelle
+    Berserk
+    Boulder Dash
+    Buccaneer
+    Cash Attack
+    Cash Encounters
+    Cash Lines
+    Cash Machine
+    Cloud Nine
+    Copy Cat
+    Cosmic Casino
+    Dennis The Menace
+    Duty Free
+    Duty Free (Prize version)
+    Duty Free (Showcase version)
+    Everyone's A Winner
+    Fruit & Loot (Prize version)
+    Games Bond 006
+    Give Us A Clue
+    Hi Jinx
+    High Roller (Prize version)
+    Hit The Top
+    Hot Rod
+    Jackpot Gems
+    Jackpot Gems (Classic)
+    Jewel In the Crown
+    Jolly Gems
+    Kings & Queens
+    Kings & Queens (Classic)
+    Let The Good Times Roll
+    Lucky Las Vegas
+    Lucky Las Vegas (Classic)
+    Lucky Strike
+    Lucky Strike Club
+    Luxor
+    Luxor (Prize version)
+    Mad House
+    Magnificent 7s
+    Make A Mint
+    New Hit the Top
+    Nudge Nudge Wink Wink (Classic)
+    Ooh Aah Dracula
+    Over The Moon
+    Place Your Bets
+    Pot Black
+    Prize Money
+    Prize Money (Showcase version)
+    Prize Run For Your Money
+    Ready Steady Go
+    Red Hot Roll (Classic?)
+    Rich & Famous
+    Rich & Famous (Prize version)
+    Road Hog
+    Road Hog 2 - I'm Back
+    Rocket Money
+    Rocky Horror Show
+    Run For Your Money
+    Squids In
+    Super Streak (Classic)
+    Take Your Pick
+    Ten Out Of Ten
+    Ten Ten Do It Again
+    The Crystal Dome
+    The Crystal Maze
+    The Crystal Maze (Showcase version)
+    The Streak
+    Tic Tac Toe
+    Tic Tac Toe (Classic)
+    Tic Tac Toe (Gold)
+    Top Dog
+    Top Tenner
+    Tutti Fruity
+    Up Up and Away
+    Vegas Strip
+    Viva Espana
+    Viva Espana (Prize version)
+    Viva Espana (Showcase versino)
+    Viz
+    What's On (Prize version)
+    Winner Takes All
+    Winner Takes All (Prize version)
 
-	Club Machines
-	------------
-	club machines have 4 reels and different gameplay compared to non-club machines
+    Club Machines
+    ------------
+    club machines have 4 reels and different gameplay compared to non-club machines
 
-	Andy's Big Time Club
-	Bank Roller Club
-	Calamari Club
-	Double Diamond Club
-	Red Hot Roll Club
-	Road Hog Club
-	Super Blackjack Club
-	Take Your Pick Club
+    Andy's Big Time Club
+    Bank Roller Club
+    Calamari Club
+    Double Diamond Club
+    Red Hot Roll Club
+    Road Hog Club
+    Super Blackjack Club
+    Take Your Pick Club
 
 
-	---------
+    ---------
 
-	many sets have the BARCREST or BWB string at FFE0 replaced with other things
-	such at 'FATHER CHRISTMAS' are these hacked / bootlegs requiring special hw?
+    many sets have the BARCREST or BWB string at FFE0 replaced with other things
+    such at 'FATHER CHRISTMAS' are these hacked / bootlegs requiring special hw?
 
-	sets with 'D' in the ident code are Datapak sets, and do not play without a datapak connected
-	sets with 'Y' seem to require the % key to be set
+    sets with 'D' in the ident code are Datapak sets, and do not play without a datapak connected
+    sets with 'Y' seem to require the % key to be set
 
-	some codes are only ever set on certain types of games, for example 'J' seems to only
-	be allowed for 'Prize' games (although isn't required)
+    some codes are only ever set on certain types of games, for example 'J' seems to only
+    be allowed for 'Prize' games (although isn't required)
 
 */
 
@@ -213,7 +213,7 @@ void mpu4mod4oki_machines_state::init_PARENTNAME()
 /*****************************************************************************************************************************************************************************
 *
 * Andy Capp
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 void mpu4mod4oki_machines_state::init_m4andycp()
@@ -368,7 +368,7 @@ GAME_CUSTOM( 1994, m4andycp10c_d,      m4andycp,   "acap_10_.4",       0x0000, 0
 /*****************************************************************************************************************************************************************************
 *
 * Andy Capp (Dutch game)
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // REEL A ERROR
@@ -393,11 +393,11 @@ GAME(199?, m4andycpdut, m4andycp, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_s
 /*****************************************************************************************************************************************************************************
 *
 * Andy Loves Flo
-* 
+*
 *****************************************************************************************************************************************************************************/
 
-//	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-//	ROM_LOAD( "alf.chr", 0x0000, 0x000048, CRC(22f09b0d) SHA1(5a612e54e0bb5ea5c35f1a7b1d7bc3cdc34e3bdd) )
+//  ROM_REGION( 0x48, "characteriser:fakechr", 0 )
+//  ROM_LOAD( "alf.chr", 0x0000, 0x000048, CRC(22f09b0d) SHA1(5a612e54e0bb5ea5c35f1a7b1d7bc3cdc34e3bdd) )
 
 
 #define M4ANDYFL_EXTRA_ROMS \
@@ -498,11 +498,11 @@ GAME_CUSTOM( 1991, m4andyflfr,     m4andyfl,    "alfr.p1",                 0x000
 /*****************************************************************************************************************************************************************************
 *
 * Duty Free
-* 
+*
 *****************************************************************************************************************************************************************************/
 
-//	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-//	ROM_LOAD( "df503s.chr", 0x0000, 0x000048, CRC(46c28f35) SHA1(e229b211180f9f7b30cd0bb9de162971d16b2d33) )
+//  ROM_REGION( 0x48, "characteriser:fakechr", 0 )
+//  ROM_LOAD( "df503s.chr", 0x0000, 0x000048, CRC(46c28f35) SHA1(e229b211180f9f7b30cd0bb9de162971d16b2d33) )
 
 #define M4DTYFRE_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
@@ -617,7 +617,7 @@ GAME_CUSTOM( 199?, m4dtyfre_h2,    m4dtyfre,   "duty2010",                 0x000
 * Showcase Duty Free
 *
 * attract mode shows 'Duty Free with Prizes'
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4SHODF_EXTRA_ROMS \
@@ -657,7 +657,7 @@ GAME_CUSTOM( 199?, m4shodf__g,  m4shodf,    "sd8y.p1",  0x0000, 0x010000, CRC(f7
 * Prize Duty Free
 *
 * attract mode shows 'Duty Free with Prizes'
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4PRZDTY_EXTRA_ROMS \
@@ -698,12 +698,12 @@ GAME_CUSTOM( 199?, m4przdty__k,    m4przdty,   "pd8y.p1",  0x0000, 0x010000, CRC
 /*****************************************************************************************************************************************************************************
 *
 * Road Hog
-* 
+*
 *****************************************************************************************************************************************************************************/
 
-//	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-//	ROM_LOAD( "rhm.chr", 0x0000, 0x000048, CRC(e8417c98) SHA1(460c43327b41c95b7d091c04dbc9ce7b2e4773f6) ) /* m4rhogr3 set? but bad lamp data? */
-//	ROM_LOAD( "rr6s.chr", 0x0000, 0x000048, CRC(ca08d53a) SHA1(b419c45f46ee352cbdb0b38a8c3fd33383b61f3a) )
+//  ROM_REGION( 0x48, "characteriser:fakechr", 0 )
+//  ROM_LOAD( "rhm.chr", 0x0000, 0x000048, CRC(e8417c98) SHA1(460c43327b41c95b7d091c04dbc9ce7b2e4773f6) ) /* m4rhogr3 set? but bad lamp data? */
+//  ROM_LOAD( "rr6s.chr", 0x0000, 0x000048, CRC(ca08d53a) SHA1(b419c45f46ee352cbdb0b38a8c3fd33383b61f3a) )
 
 
 #define M4RHOG_EXTRA_ROMS \
@@ -712,7 +712,7 @@ GAME_CUSTOM( 199?, m4przdty__k,    m4przdty,   "pd8y.p1",  0x0000, 0x010000, CRC
 	ROM_LOAD( "rr6snd.p2", 0x080000, 0x080000, CRC(e5b72ef2) SHA1(dcdfa162db8bf3f9610709b5a8f3b695f42b2371) )
 
 // 1 byte different from rr6snd.p2, found in Rocky Horror set
-//	ROM_LOAD( "rhp2snd", 0x0000, 0x080000, CRC(18112293) SHA1(b2bf838849ad1a9931c294ccc291ba2f5c5f45e9) )
+//  ROM_LOAD( "rhp2snd", 0x0000, 0x080000, CRC(18112293) SHA1(b2bf838849ad1a9931c294ccc291ba2f5c5f45e9) )
 
 
 
@@ -814,7 +814,7 @@ GAME_CUSTOM( 1991, m4rhog_h15,       m4rhog,     "rhog20_11",                0x0
 /*****************************************************************************************************************************************************************************
 *
 * Andy's Great Escape
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 void mpu4mod4oki_machines_state::init_m4andyge()
@@ -983,7 +983,7 @@ GAME_CUSTOM( 199?, m4andyge_h4,        m4andyge,   "age20_101",                0
 /*****************************************************************************************************************************************************************************
 *
 * Dennis The Menace
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // boots
@@ -1061,7 +1061,7 @@ GAME_CUSTOM( 199?, m4denmen_h3,    m4denmen,   "denm2010",                     0
 /*****************************************************************************************************************************************************************************
 *
 * The Crystal Maze
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // boots
@@ -1133,7 +1133,7 @@ GAME_CUSTOM( 199?, m4crmaze__s,    m4crmaze,   "cmaz58t",              0x0000, 0
 * Showcase Crystal Maze
 *
 * - these sets require both a Jackpot key and Stake key
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // boot as long as you set a jackpot key
@@ -1168,7 +1168,7 @@ GAME_CUSTOM( 199?, m4shocm__j,  m4shocm,    mpu4jackpot8tkn20p,    "scmk.p1",  0
 /*****************************************************************************************************************************************************************************
 *
 * Cash Machine
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // some sets boot, others need hopper
@@ -1277,7 +1277,7 @@ GAME_CUSTOM( 199?, m4cashmn__zb,   m4cashmn,   "cma15t",               0x0000, 0
 /*****************************************************************************************************************************************************************************
 *
 * Top Tenner
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4TOPTEN_EXTRA_ROMS \
@@ -1382,7 +1382,7 @@ GAME_CUSTOM( 199?, m4topten__b,    m4topten,   "topt15t",      0x0000, 0x020000,
 /*****************************************************************************************************************************************************************************
 *
 * Ten Out Of Ten
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4TOOT_EXTRA_ROMS \
@@ -1488,11 +1488,11 @@ GAME_CUSTOM( 199?, m4toot__zb,   m4toot, "tot15t",       0x0000, 0x020000, CRC(1
 /*****************************************************************************************************************************************************************************
 *
 * Everyone's A Winner
-* 
+*
 *****************************************************************************************************************************************************************************/
 
-//	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-//	ROM_LOAD( "m683.chr", 0x0000, 0x000048, CRC(cbe68b44) SHA1(60efc69eba86531f51230dee17efdbbf8917f907) )
+//  ROM_REGION( 0x48, "characteriser:fakechr", 0 )
+//  ROM_LOAD( "m683.chr", 0x0000, 0x000048, CRC(cbe68b44) SHA1(60efc69eba86531f51230dee17efdbbf8917f907) )
 
 #define M4EAW_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
@@ -1650,7 +1650,7 @@ GAME_CUSTOM( 199?, m4eaw__bx, m4eaw,  "eun01y.p1",                0x0000, 0x0100
 /*****************************************************************************************************************************************************************************
 *
 * Winner Takes All
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4WTA_EXTRA_ROMS \
@@ -1745,7 +1745,7 @@ GAME_CUSTOM( 199?, m4wta__af, m4wta,  "wta5.5n",                                
 /*****************************************************************************************************************************************************************************
 *
 * Prize Winner Takes All
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4PRZWTA_EXTRA_ROMS \
@@ -1789,7 +1789,7 @@ GAME_CUSTOM( 199?, m4przwta__k,    m4przwta,   "pw8y.p1",  0x0000, 0x020000, CRC
 /*****************************************************************************************************************************************************************************
 *
 * Let The Good Times Roll
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // Wrong Sound, Need V1
@@ -1907,7 +1907,7 @@ GAME_CUSTOM( 199?, m4goodtm__n,    m4goodtm,   "gtk02k.p1",    0x0000, 0x020000,
 	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
 
 // different protection
-// 
+//
 // no copyright string and "GTR 1.0"
 GAME_CUSTOM( 199?, m4goodtm__2,    m4goodtm,   "gtr15g",       0x0000, 0x020000, CRC(9da85042) SHA1(3148e654380f1bcca93c01a282f1c409e4f2d393), "hack","Let The Good Times Roll (Barcrest) (MPU4) (GTR 1.0, hack)" )
 // no copyright string and "GTS 0.1"
@@ -1917,7 +1917,7 @@ GAME_CUSTOM( 199?, m4goodtm__3,    m4goodtm,   "gtr15t",       0x0000, 0x020000,
 /*****************************************************************************************************************************************************************************
 *
 * Jackpot Gems
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4JPGEM_EXTRA_ROMS \
@@ -1937,7 +1937,7 @@ GAME_CUSTOM( 199?, m4goodtm__3,    m4goodtm,   "gtr15t",       0x0000, 0x020000,
 
 
 // boots to hopper error, Q to run in 'Door Open' mode
-// 
+//
 // wants chr sequence starting 00 84 94 3c ec 5c ec 50 2c 68 60 ac 74 00 ac 58 ec 7c (tri98.chr)
 // "(C)1991 BARCREST" and "CG4 0.1" (startup shows RRH 0.1)
 GAME_CUSTOM( 199?, m4jpgem__bo, m4jpgem,    "rrh01s.p1",    0x0000, 0x010000, CRC(dea2f376) SHA1(92f43c75950553d9b76af8179192d106de95fc03), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (RRH 0.1 / CG4 0.1)" )
@@ -2077,7 +2077,7 @@ GAME_CUSTOM( 199?, m4jpgem__bd, m4jpgem,    "jgu02y.p1",    0x0000, 0x010000, CR
 /*****************************************************************************************************************************************************************************
 *
 * Jackpot Gems Classic
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4JPGEMC_EXTRA_ROMS \
@@ -2126,7 +2126,7 @@ GAME_CUSTOM( 199?, m4jpgemc__w,    m4jpgemc,   "hge01y.p1",    0x0000, 0x010000,
 /*****************************************************************************************************************************************************************************
 *
 * Jolly Gems
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4JOLGEM_EXTRA_ROMS \
@@ -2226,7 +2226,7 @@ GAME_CUSTOM( 199?, m4jolgem__an,   m4jolgem,   "jgem15t",      0x0000, 0x020000,
 /*****************************************************************************************************************************************************************************
 *
 * Hit The Top
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4HITTOP_EXTRA_ROMS \
@@ -2345,11 +2345,11 @@ GAME_CUSTOM( 199?, m4hittop__2,    m4hittop,   "hit04y.p1",    0x0000, 0x010000,
 /*****************************************************************************************************************************************************************************
 *
 * Nudge Nudge Wink Wink Classic
-* 
+*
 *****************************************************************************************************************************************************************************/
 
-//	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-//	ROM_LOAD( "m574.chr", 0x0000, 0x000048, CRC(cc4b7911) SHA1(9f8a96a1f8b0f9b33b852e93483ce5c684703349) )
+//  ROM_REGION( 0x48, "characteriser:fakechr", 0 )
+//  ROM_LOAD( "m574.chr", 0x0000, 0x000048, CRC(cc4b7911) SHA1(9f8a96a1f8b0f9b33b852e93483ce5c684703349) )
 
 // 17ALM (need hopper, use Q to open door and run in demo mode)
 
@@ -2497,7 +2497,7 @@ GAME_CUSTOM( 199?, m4nnwwc__ad, m4nnww,    "cl__xb_x.2_0",     0x0000, 0x010000,
 /*****************************************************************************************************************************************************************************
 *
 * Run For Your Money
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4RFYM_EXTRA_ROMS \
@@ -2597,7 +2597,7 @@ GAME_CUSTOM( 199?, m4rfym__a1,   m4rfym, "ruty.p1",      0x0000, 0x010000, CRC(a
 
 
 // different protection
-// 
+//
 // "(C)1996  B.W.B." and "RUC 1.3" (but hack?)
 GAME_CUSTOM( 199?, m4rfym__6,    m4rfym, "rfym510l",     0x0000, 0x010000, CRC(24af47f3) SHA1(3d1ec9b013f3f7b497cfb62b42fbb2fa914b24b6), "hack","Run For Your Money (Barcrest) (MPU4) (RUC 1.3 K5, hack, set 1)" )
 GAME_CUSTOM( 199?, m4rfym__a3,   m4rfym, "rfym5.10",     0x0000, 0x010000, CRC(c2ce2cc2) SHA1(d5633e01f669ee8772ed77befa90180c6aa0111c), "hack","Run For Your Money (Barcrest) (MPU4) (RUC 1.3 K5, hack, set 2)" )
@@ -2616,7 +2616,7 @@ GAME_CUSTOM( 199?, m4rfym__7,    m4rfym, "rfym55",       0x0000, 0x010000, CRC(b
 /*****************************************************************************************************************************************************************************
 *
 * Prize Run For Your Money
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4PRZRFM_EXTRA_ROMS \
@@ -2655,7 +2655,7 @@ GAME_CUSTOM( 199?, m4przrfm__o,    m4przrfm,   "rm8y.p1",      0x0000, 0x010000,
 /*****************************************************************************************************************************************************************************
 *
 * Ready Steady Go
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4READY_EXTRA_ROMS \
@@ -2760,7 +2760,7 @@ GAME_CUSTOM( 199?, m4ready__a1, m4ready,    "rgt10dy.p1",   0x0000, 0x010000, CR
 /*****************************************************************************************************************************************************************************
 *
 * Magnificent 7s
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4MAG7S_EXTRA_ROMS \
@@ -2886,7 +2886,7 @@ GAME_CUSTOM( 199?, m4mag7s__av, m4mag7s,    "mas10w.p1",        0x0000, 0x020000
 /*****************************************************************************************************************************************************************************
 *
 * Make A Mint
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4MAKMNT_EXTRA_ROMS \
@@ -3002,11 +3002,11 @@ GAME_CUSTOM( 199?, m4makmnt__n,    m4makmnt,   "mam15t",       0x0000, 0x020000,
 /*****************************************************************************************************************************************************************************
 *
 * Viva Espana
-* 
+*
 *****************************************************************************************************************************************************************************/
 
-//	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-//	ROM_LOAD( "viva.chr", 0x0000, 0x000048, CRC(4662e1fb) SHA1(54074bcc67adedb3dc6df80bdc60e0222f934156) )
+//  ROM_REGION( 0x48, "characteriser:fakechr", 0 )
+//  ROM_LOAD( "viva.chr", 0x0000, 0x000048, CRC(4662e1fb) SHA1(54074bcc67adedb3dc6df80bdc60e0222f934156) )
 
 
 #define M4VIVAES_EXTRA_ROMS \
@@ -3108,12 +3108,12 @@ GAME_CUSTOM( 199?, m4vivaes__ac,   m4vivaes,   "ve_05a__.3_1",         0x0000, 0
 	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // unprotected (possible hacks)
- 
+
 // "(C)1995  B.W.B." and "VE5 6.0"
 GAME_CUSTOM( 199?, m4vivaes__ai,   m4vivaes,   "vesp510l",             0x0000, 0x010000, CRC(15c33530) SHA1(888625c383e52825c06cbf1e7022cd8b02bf549c), "Bwb","Viva Espana (Barcrest) (MPU4) (VE5 6.0C, set 1)" )
 GAME_CUSTOM( 199?, m4vivaes__aj,   m4vivaes,   "vesp55",               0x0000, 0x010000, CRC(9cc395ef) SHA1(d62cb55664246e3fada3d971ee317eef51739018), "Bwb","Viva Espana (Barcrest) (MPU4) (VE5 6.0C, set 2)" )
 GAME_CUSTOM( 199?, m4vivaes__ag,   m4vivaes,   "vesp5.8c",             0x0000, 0x010000, CRC(266d42cf) SHA1(b1e583652d6184db2a5f03cb7ae3f694627591c8), "Bwb","Viva Espana (Barcrest) (MPU4) (VE5 6.0C, set 3)" )
-GAME_CUSTOM( 199?, m4vivaes__ah,   m4vivaes,   "vesp5.8t",             0x0000, 0x010000, CRC(bf8c9dfa) SHA1(69f28d3ce04efdb89db688dbc2341d19c27c5ba8), "Bwb","Viva Espana (Barcrest) (MPU4) (VE5 6.0)" )																																													 // "(C)1995  B.W.B." and "VE5 5.0"
+GAME_CUSTOM( 199?, m4vivaes__ah,   m4vivaes,   "vesp5.8t",             0x0000, 0x010000, CRC(bf8c9dfa) SHA1(69f28d3ce04efdb89db688dbc2341d19c27c5ba8), "Bwb","Viva Espana (Barcrest) (MPU4) (VE5 6.0)" )                                                                                                                                                                                     // "(C)1995  B.W.B." and "VE5 5.0"
 // "(C)1995  B.W.B." and "VE5 5.0"
 GAME_CUSTOM( 199?, m4vivaes__z,    m4vivaes,   "vesp05_11",            0x0000, 0x010000, CRC(32100a2e) SHA1(bb7324267708a0c0850fb77885df9868954d86cd), "Bwb","Viva Espana (Barcrest) (MPU4) (VE5 5.0, set 1)" )
 GAME_CUSTOM( 199?, m4vivaes__ao,   m4vivaes,   "vesp_5.4",             0x0000, 0x010000, CRC(3b6762ce) SHA1(9dc53dce453a7b124ea2b65a590aff6c7d05831f), "Bwb","Viva Espana (Barcrest) (MPU4) (VE5 5.0, set 2)" )
@@ -3138,7 +3138,7 @@ GAME_CUSTOM( 199?, m4vivaes__j,    m4vivaes,   "5p5vivaespana6-0.bin", 0x0000, 0
 /*****************************************************************************************************************************************************************************
 *
 * Viva Espana Showcase
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4VIVESS_EXTRA_ROMS \
@@ -3176,7 +3176,7 @@ GAME_CUSTOM( 199?, m4vivess__p,    m4vivess,   "sesy.p1",  0x0000, 0x010000, CRC
 /*****************************************************************************************************************************************************************************
 *
 * Prize Viva Espana
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4PRZVE_EXTRA_ROMS \
@@ -3217,7 +3217,7 @@ GAME_CUSTOM( 199?, m4przve__k,  m4przve,    "pe8y.p1",  0x0000, 0x010000, CRC(c3
 /*****************************************************************************************************************************************************************************
 *
 * Pot Black
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4POTBLK_EXTRA_ROMS \
@@ -3326,7 +3326,7 @@ GAME_CUSTOM( 199?, m4potblk__b,    m4potblk,   "pb15t",        0x0000, 0x020000,
 /*****************************************************************************************************************************************************************************
 *
 * Place Your Bets
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 //ROM_REGION( 0x48, "characteriser:fakechr", 0 )
@@ -3428,7 +3428,7 @@ GAME_CUSTOM( 199?, m4placbt__z,    m4placbt,   "pyb15t",       0x0000, 0x020000,
 /*****************************************************************************************************************************************************************************
 *
 * Cloud Nine
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // ROM_REGION( 0x48, "characteriser:fakechr", 0 )
@@ -3554,7 +3554,7 @@ GAME_CUSTOM( 199?, m4c9__a1,   m4c9,   "c9o10d_1.1",   0x0000, 0x010000, CRC(6b2
 /*****************************************************************************************************************************************************************************
 *
 * Tutti Fruity
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4TUTFRT_EXTRA_ROMS \
@@ -3687,7 +3687,7 @@ GAME_CUSTOM( 199?, m4tutfrt__a5,   m4tutfrt,   "tui05___.1a3",         0x0000, 0
 /*****************************************************************************************************************************************************************************
 *
 * Cash Attack
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 
@@ -3778,7 +3778,7 @@ GAME_CUSTOM( 199?, m4cashat__k,    m4cashat,   "caa22r.p1",        0x0000, 0x020
 GAME_CUSTOM( 199?, m4cashat__m,    m4cashat,   "caa22y.p1",        0x0000, 0x020000, CRC(84d0383b) SHA1(791666ce17fd65067df446a3320efd22bce23925), "Barcrest","Cash Attack (Barcrest) (MPU4) (CAA 2.2 Y)" )
 
 // different protection
-// 
+//
 // no copyright string and "CAA 2.3"
 GAME_CUSTOM( 199?, m4cashat__0,    m4cashat,   "casattack8.bin",   0x0000, 0x020000, CRC(e29ea247) SHA1(ad00ea3bfd2eab51b20fd786cb1ce84de0d98173), "hack","Cash Attack (Barcrest) (MPU4) (CAA 2.3, hack, set 1)" )
 GAME_CUSTOM( 199?, m4cashat__1,    m4cashat,   "catt15g",          0x0000, 0x020000, CRC(3f7a8863) SHA1(df8ed393aeb3a5ec3fd5bdc01c9dbbb630e6d254), "hack","Cash Attack (Barcrest) (MPU4) (CAA 2.3, hack, set 2)" )
@@ -3789,7 +3789,7 @@ GAME_CUSTOM( 199?, m4cashat__2,    m4cashat,   "catt15t",          0x0000, 0x020
 /*****************************************************************************************************************************************************************************
 *
 * Red Hot Roll
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // This ROM was included, but it isn't an sample ROM in the correct format for this hardware
@@ -3957,7 +3957,7 @@ GAME_CUSTOM( 199?, m4rhr__8,  m4rhr,  "rhr2515",          0x0000, 0x010000, CRC(
 /*****************************************************************************************************************************************************************************
 *
 * Up Up and Away
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // Wrong Sound, Need V1
@@ -4055,7 +4055,7 @@ GAME_CUSTOM( 199?, m4uuaw__n,    m4uuaw, "uua21h.p1",    0x0000, 0x020000, CRC(1
 	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
 
 // different protection
-// 
+//
 // no copyright string and "UUA 2.0"
 GAME_CUSTOM( 199?, m4uuaw__a,    m4uuaw, "upa15g",       0x0000, 0x020000, CRC(d20b8b92) SHA1(6fcddc781c204dfd34de2c4e4ce0ec35fb3ec4e0), "hack","Up Up and Away (Barcrest) (MPU4) (UUA 2.0, hack)" )
 // no copyright string and "UPS 2.0"
@@ -4065,7 +4065,7 @@ GAME_CUSTOM( 199?, m4uuaw__b,    m4uuaw, "upa15t",       0x0000, 0x020000, CRC(8
 /*****************************************************************************************************************************************************************************
 *
 * Rich & Famous
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4RICHFM_EXTRA_ROMS \
@@ -4147,7 +4147,7 @@ GAME_CUSTOM( 199?, m4richfm__e,    m4richfm,   "rchfam8",      0x0000, 0x004000,
 /*****************************************************************************************************************************************************************************
 *
 * Prize Rich And Famous
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4PRZRF_EXTRA_ROMS \
@@ -4182,7 +4182,7 @@ GAME_CUSTOM( 199?, m4przrf__j,  m4przrf,    "pr8y.p1",  0x0000, 0x020000, CRC(87
 * Viz
 *
 * many of the Alarm messages are broken on these, showing 'Invalid Alarm' instead of the proper Alarm
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4VIZ_EXTRA_ROMS \
@@ -4242,7 +4242,7 @@ GAME_CUSTOM( 199?, m4viz__v,  m4viz,  "vii10___.1_1", 0x0000, 0x010000, CRC(92e1
 
 
 // different protection
-// 
+//
 // no copyright string and "8V1 0.6"
 GAME_CUSTOM( 199?, m4viz__j,  m4viz,  "viz208c",      0x0000, 0x010000, CRC(00a65029) SHA1(8dfb68d1a9f4cd00f239ed87a1d330ccb655c35b), "hack","Viz (Barcrest) (MPU4) (8V1 0.6 C, hack, set 1)" )
 GAME_CUSTOM( 199?, m4viz__a,  m4viz,  "viz20_101",    0x0000, 0x010000, CRC(0847b812) SHA1(6de9e9dad272932a22ebe457ac50da1126d931ea), "hack","Viz (Barcrest) (MPU4) (8V1 0.6 C, hack, set 2)" )
@@ -4254,11 +4254,11 @@ GAME_CUSTOM( 199?, m4viz__c,  m4viz,  "viz58c",       0x0000, 0x010000, CRC(95b8
 /*****************************************************************************************************************************************************************************
 *
 * Take Your Pick
-* 
+*
 *****************************************************************************************************************************************************************************/
 
-//	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-//	ROM_LOAD( "m441.chr", 0x0000, 0x000048, CRC(3ec3a5fa) SHA1(ea8c831da9944506393dd5d5f380a084fd6543b6) )
+//  ROM_REGION( 0x48, "characteriser:fakechr", 0 )
+//  ROM_LOAD( "m441.chr", 0x0000, 0x000048, CRC(3ec3a5fa) SHA1(ea8c831da9944506393dd5d5f380a084fd6543b6) )
 
 
 #define M4TAKEPK_EXTRA_ROMS \
@@ -4305,7 +4305,7 @@ GAME_CUSTOM( 199?, m4takepk__q,    m4takepk,   "tphk.p1",      0x0000, 0x020000,
 GAME_CUSTOM( 199?, m4takepk__s,    m4takepk,   "tphy.p1",      0x0000, 0x020000, CRC(f4369c0e) SHA1(d8c1fc2ede48673a1e8efaf004e3d76b62594de1), "Barcrest","Take Your Pick (Barcrest) (MPU4) (TPH 0.7 Y)" )
 
 // different protection
-// 
+//
 // no copyright string and "MAM 0.3"
 GAME_CUSTOM( 199?, m4takepk__u,    m4takepk,   "typ15r",       0x0000, 0x020000, CRC(8138c70b) SHA1(aafc805a8a56cf1722ebe0f3eba0a47f15c9049a), "hack","Take Your Pick (Barcrest) (MPU4) (MAM 0.3 C, hack)" )
 // no copyright string and "TPH 0.7"
@@ -4338,11 +4338,11 @@ GAME_CUSTOM( 199?, m4takepk__0,    m4takepk,   "typ58t",       0x0000, 0x010000,
 /*****************************************************************************************************************************************************************************
 *
 * Over The Moon
-* 
+*
 *****************************************************************************************************************************************************************************/
 
-//	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-//	ROM_LOAD( "otts.chr", 0x0000, 0x000048, CRC(2abec763) SHA1(307399724a994a5d0914a5d7e0931a5d94439a37) )
+//  ROM_REGION( 0x48, "characteriser:fakechr", 0 )
+//  ROM_LOAD( "otts.chr", 0x0000, 0x000048, CRC(2abec763) SHA1(307399724a994a5d0914a5d7e0931a5d94439a37) )
 
 
 #define M4OVERMN_EXTRA_ROMS \
@@ -4417,12 +4417,12 @@ GAME_CUSTOM( 199?, m4overmn__n,    m4overmn,   "otny.p1",  0x0000, 0x010000, CRC
 /*****************************************************************************************************************************************************************************
 *
 * Luxor
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // luxor.chr is for 1D 78 14 3C 7C 40 28 68 08 60 sequence, doesn't seem for any of these sets?
-//	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-//	ROM_LOAD( "luxor.chr", 0x0000, 0x000048, CRC(21676e79) SHA1(b8f69e9aa35be1491655c0c52df277619892bdd8) )
+//  ROM_REGION( 0x48, "characteriser:fakechr", 0 )
+//  ROM_LOAD( "luxor.chr", 0x0000, 0x000048, CRC(21676e79) SHA1(b8f69e9aa35be1491655c0c52df277619892bdd8) )
 
 #define M4LUXOR_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) /* these appear to be correct for the parent set */ \
@@ -4487,7 +4487,7 @@ GAME_CUSTOM( 199?, m4luxor__l,  m4luxor,    "lux_05_8",         0x0000, 0x010000
 /*****************************************************************************************************************************************************************************
 *
 * Prize Luxor
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4PRZLUX_EXTRA_ROMS \
@@ -4518,7 +4518,7 @@ GAME_CUSTOM( 199?, m4przlux__f,    m4przlux,   "plxy.p1",  0x0000, 0x010000, CRC
 /*****************************************************************************************************************************************************************************
 *
 * Hi Jinx
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4HIJINX_EXTRA_ROMS \
@@ -4601,7 +4601,7 @@ GAME_CUSTOM( 199?, m4hijinx__b,    m4hijinx,   "hij15t",       0x0000, 0x020000,
 /*****************************************************************************************************************************************************************************
 *
 * Cash Lines
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4CASHLN_EXTRA_ROMS \
@@ -4730,7 +4730,7 @@ GAME_CUSTOM( 199?, m4cashln__b,    m4cashln,   "cl15t",        0x0000, 0x020000,
 /*****************************************************************************************************************************************************************************
 *
 * Lucky Las Vegas
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4LUCKLV_EXTRA_ROMS \
@@ -4814,7 +4814,7 @@ GAME_CUSTOM( 199?, m4lucklv__ae,   m4lucklv,   "lluy.p1",  0x0000, 0x010000, CRC
 /*****************************************************************************************************************************************************************************
 *
 * Lucky Las Vegas Classic
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4LVLCL_EXTRA_ROMS \
@@ -4844,7 +4844,7 @@ GAME_CUSTOM( 199?, m4lvlcl__f,  m4lvlcl,    "ll__xgdx.3_1", 0x0000, 0x010000, CR
 /*****************************************************************************************************************************************************************************
 *
 * Lucky Strike
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4LUCKST_EXTRA_ROMS \
@@ -4949,7 +4949,7 @@ GAME_CUSTOM( 199?, m4luckst__b,    m4luckst,   "ls15t",                0x0000, 0
 /*****************************************************************************************************************************************************************************
 *
 * 10 X 10
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // gives Wrong Sound Need V1
@@ -5091,7 +5091,7 @@ GAME_CUSTOM( 199?, m4tenten__5,    m4tenten,   "t2504y.p1",    0x0000, 0x010000,
 /*****************************************************************************************************************************************************************************
 *
 * Andy's Full House
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 
@@ -5236,7 +5236,7 @@ GAME_CUSTOM( 199?, m4andyfh__ad,   m4andyfh,   "afuy.p1",      0x0000, 0x010000,
 /*****************************************************************************************************************************************************************************
 *
 * Boulder Dash
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4BDASH_EXTRA_ROMS \
@@ -5352,7 +5352,7 @@ GAME_CUSTOM( 199?, m4bdash__aw, m4bdash,    "bold15t",      0x0000, 0x020000, CR
 /*****************************************************************************************************************************************************************************
 *
 * Prize Money
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4PRZMON_EXTRA_ROMS \
@@ -5391,7 +5391,7 @@ GAME_CUSTOM( 199?, m4przmon__p,    m4przmon,   "fpmy.p1",      0x0000, 0x010000,
 /*****************************************************************************************************************************************************************************
 *
 * Prize Money Showcase
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4PRZMNS_EXTRA_ROMS \
@@ -5430,7 +5430,7 @@ GAME_CUSTOM( 199?, m4przmns__i,    m4przmns,   "sm8y.p1",  0x0000, 0x010000, CRC
 /*****************************************************************************************************************************************************************************
 *
 * Prize High Roller
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4PRZHR_EXTRA_ROMS \
@@ -5473,7 +5473,7 @@ GAME_CUSTOM( 199?, m4przhr__i,  m4przhr,    "pr3y.p1",  0x0000, 0x010000, CRC(81
 /*****************************************************************************************************************************************************************************
 *
 * Give Us A Clue
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4GCLUE_EXTRA_ROMS \
@@ -5523,11 +5523,11 @@ GAME_CUSTOM( 199?, m4gclue__w,  m4gclue,    "c2504y.p1",    0x0000, 0x010000, CR
 /*****************************************************************************************************************************************************************************
 *
 * Las Vegas Strip
-* 
+*
 *****************************************************************************************************************************************************************************/
 
-//	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-//	ROM_LOAD( "lasv.chr", 0x0000, 0x000048, CRC(49ec2385) SHA1(1204c532897acc953867691124fc0b700c7aed47) )
+//  ROM_REGION( 0x48, "characteriser:fakechr", 0 )
+//  ROM_LOAD( "lasv.chr", 0x0000, 0x000048, CRC(49ec2385) SHA1(1204c532897acc953867691124fc0b700c7aed47) )
 
 #define M4VEGAST_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
@@ -5589,7 +5589,7 @@ GAME_CUSTOM( 199?, m4vegast__v,    m4vegast,   "lvs",          0x0000, 0x020000,
 /*****************************************************************************************************************************************************************************
 *
 * Hot Rod
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // this is just tri98.chr with the unused lamp bits premasked?
@@ -5659,7 +5659,7 @@ GAME_CUSTOM( 199?, m4hotrod__t,    m4hotrod,   "hrod_10_.8",               0x000
 /*****************************************************************************************************************************************************************************
 *
 * Buccaneer
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4BUC_EXTRA_ROMS \
@@ -5768,7 +5768,7 @@ GAME_CUSTOM( 199?, m4buc__b,  m4buc,  "bucc15t",              0x000000, 0x020000
 /*****************************************************************************************************************************************************************************
 *
 * Jewel In the Crown
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4JWLCWN_EXTRA_ROMS \
@@ -5844,7 +5844,7 @@ GAME_CUSTOM( 199?, m4jwlcwn__z,    m4jwlcwn,   "jewel15t",     0x0000, 0x020000,
 /*****************************************************************************************************************************************************************************
 *
 * Bagatelle
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4BAGTEL_EXTRA_ROMS \
@@ -5926,7 +5926,7 @@ GAME_CUSTOM( 199?, m4bagtel__b,    m4bagtel,   "bg201dy.p1",   0x0000, 0x010000,
 /*****************************************************************************************************************************************************************************
 *
 * Berserk
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4BERSER_EXTRA_ROMS \
@@ -5984,7 +5984,7 @@ GAME_CUSTOM( 199?, m4berser__1,    m4berser,   "be_05a_4.1_1", 0x0000, 0x010000,
 /*****************************************************************************************************************************************************************************
 *
 * Ten Ten Do It Again
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // hopper error
@@ -6023,7 +6023,7 @@ GAME_CUSTOM( 199?, m4ttdia__m,  m4ttdia,    "tda04y.p1",    0x0000, 0x020000, CR
 /*****************************************************************************************************************************************************************************
 *
 * Action Bank
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 void mpu4mod4oki_machines_state::init_m4actbnk()
@@ -6094,7 +6094,7 @@ GAME_CUSTOM( 199?, m4actbnk__i,    m4actbnk,   "actad.p1", 0x0000, 0x010000, CRC
 * a version of 'The Crystal Maze' without 'The Crystal Maze' title?
 *
 * - these all require a Jackpot Key and Stake to be set, valid combinations not confirmed outside of 8GBP Token / 20p
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4CRDOME_EXTRA_ROMS \
@@ -6137,7 +6137,7 @@ GAME_CUSTOM( 199?, m4crdome__l,    m4crdome,   mpu4jackpot8tkn20p,    "cdom15r",
 /*****************************************************************************************************************************************************************************
 *
 * Rocket Money
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4ROCKMN_EXTRA_ROMS \
@@ -6178,13 +6178,13 @@ GAME_CUSTOM( 199?, m4rockmn__k,    m4rockmn,   "rok06y.p1",    0x0000, 0x020000,
 /*****************************************************************************************************************************************************************************
 *
 * Mad House
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // MUX SELECTS ALM
 
-//	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-//	ROM_LOAD( "m574.chr", 0x0000, 0x000048, CRC(cc4b7911) SHA1(9f8a96a1f8b0f9b33b852e93483ce5c684703349) )
+//  ROM_REGION( 0x48, "characteriser:fakechr", 0 )
+//  ROM_LOAD( "m574.chr", 0x0000, 0x000048, CRC(cc4b7911) SHA1(9f8a96a1f8b0f9b33b852e93483ce5c684703349) )
 
 
 #define M4MADHSE_EXTRA_ROMS \
@@ -6240,7 +6240,7 @@ GAME_CUSTOM( 199?, m4madhse__b,    m4madhse,   "mhty.p1",      0x0000, 0x010000,
 /*****************************************************************************************************************************************************************************
 *
 * New Hit the Top
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // boots, unprotected, no chr reads or lamp scramble
@@ -6274,7 +6274,7 @@ GAME_CUSTOM( 199?, m4nhtt__j,    m4nhtt, "nht01y.p1",    0x0000, 0x010000, CRC(5
 /*****************************************************************************************************************************************************************************
 *
 * Prize Fruit & Loot
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // gives 'Wrong Sound, Need V1'
@@ -6312,12 +6312,12 @@ GAME_CUSTOM( 199?, m4przfrt__l,    m4przfrt,   "pfr03o.p1",    0x0000, 0x010000,
 /*****************************************************************************************************************************************************************************
 *
 * Prize What's On
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // boots
-//	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-//	ROM_LOAD( "pwos.chr", 0x0000, 0x000048, CRC(352b86c4) SHA1(59c26a1948ffd6ecea08d8ca8e62735ec9732c0f) )
+//  ROM_REGION( 0x48, "characteriser:fakechr", 0 )
+//  ROM_LOAD( "pwos.chr", 0x0000, 0x000048, CRC(352b86c4) SHA1(59c26a1948ffd6ecea08d8ca8e62735ec9732c0f) )
 
 #define M4PRZWO_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
@@ -6347,12 +6347,12 @@ GAME_CUSTOM( 199?, m4przwo__f,  m4przwo,    "pwoy.p1",      0x0000, 0x010000, CR
 /*****************************************************************************************************************************************************************************
 *
 * Road Hog 2 - I'm Back
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 
-//	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-//	ROM_LOAD( "rh.chr", 0x0000, 0x000048, CRC(5522383a) SHA1(4413b1d68500f21f10e7cff6b2d3de7258b1b614) )
+//  ROM_REGION( 0x48, "characteriser:fakechr", 0 )
+//  ROM_LOAD( "rh.chr", 0x0000, 0x000048, CRC(5522383a) SHA1(4413b1d68500f21f10e7cff6b2d3de7258b1b614) )
 
 
 // boots
@@ -6392,14 +6392,14 @@ GAME_CUSTOM( 199?, m4rhog2__m,  m4rhog2,    "2rh06y.p1",    0x0000, 0x020000, CR
 /*****************************************************************************************************************************************************************************
 *
 * Lucky Strike Club
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // REEL A ERROR at best
 
 // just m683 with incomplete lamp data
-//	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-//	ROM_LOAD( "clu14s.chr", 0x0000, 0x000048, CRC(be933239) SHA1(52dbcbbcbfe25b6f8c186ce9af67b533c8da9a88) )
+//  ROM_REGION( 0x48, "characteriser:fakechr", 0 )
+//  ROM_LOAD( "clu14s.chr", 0x0000, 0x000048, CRC(be933239) SHA1(52dbcbbcbfe25b6f8c186ce9af67b533c8da9a88) )
 
 
 #define M4LUCKSC_EXTRA_ROMS \
@@ -6451,7 +6451,7 @@ GAME_CUSTOM( 199?, m4lucksc__l,    m4lucksc,   "lsc_.1_1",     0x0000, 0x020000,
 /*****************************************************************************************************************************************************************************
 *
 * Top Dog
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // all give ALARM 17
@@ -6507,7 +6507,7 @@ GAME_CUSTOM( 199?, m4topdog__z,    m4topdog,   "td_30btc.1_1", 0x0000, 0x010000,
 /*****************************************************************************************************************************************************************************
 *
 * Kings & Queens
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4KINGQ_EXTRA_ROMS \
@@ -6562,7 +6562,7 @@ GAME_CUSTOM( 199?, m4kingq__t,  m4kingq,    "knq2pprg.bin", 0x0000, 0x010000, CR
 /*****************************************************************************************************************************************************************************
 *
 * Kings & Queens Classic
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // Hopper error
@@ -6625,11 +6625,11 @@ GAME_CUSTOM( 199?, m4kingqc__5,    m4kingqc,   "cn_30btc.1_1", 0x0000, 0x010000,
 /*****************************************************************************************************************************************************************************
 *
 * Take Your Pick Club
-* 
+*
 *****************************************************************************************************************************************************************************/
 
-//	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-//	ROM_LOAD( "ctp13s.chr", 0x0000, 0x000048, CRC(6b8772a9) SHA1(8b92686e675b00d2c2541dd7b8055c3145283bec) )
+//  ROM_REGION( 0x48, "characteriser:fakechr", 0 )
+//  ROM_LOAD( "ctp13s.chr", 0x0000, 0x000048, CRC(6b8772a9) SHA1(8b92686e675b00d2c2541dd7b8055c3145283bec) )
 
 // Reel A Error
 
@@ -6661,7 +6661,7 @@ GAME_CUSTOM( 199?, m4typcl__d,  m4typcl,    "ntp02.p1",     0x0000, 0x020000, CR
 /*****************************************************************************************************************************************************************************
 *
 * Andy's Big Time Club
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // boots, trail lamps not working properly in layout
@@ -6700,8 +6700,8 @@ void mpu4mod4oki_machines_state::init_m4andybt()
 	//Front door code 0 Cash door code 0
 }
 
-//	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-//	ROM_LOAD( "abt18s.chr", 0x0000, 0x000048, CRC(68007536) SHA1(72f7a76a1ba1c8ac94de425892780ffe78269513) )
+//  ROM_REGION( 0x48, "characteriser:fakechr", 0 )
+//  ROM_LOAD( "abt18s.chr", 0x0000, 0x000048, CRC(68007536) SHA1(72f7a76a1ba1c8ac94de425892780ffe78269513) )
 
 #define M4ANDYBT_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
@@ -6728,7 +6728,7 @@ GAME_CUSTOM( 199?, m4andybt__c,    m4andybt,   "abt1.5",       0x0000, 0x020000,
 /*****************************************************************************************************************************************************************************
 *
 * The Streak
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // hopper error
@@ -6785,7 +6785,7 @@ GAME_CUSTOM( 199?, m4thestr__y,    m4thestr,   "ts_39b_c.1_1", 0x0000, 0x010000,
 /*****************************************************************************************************************************************************************************
 *
 * Copy Cat
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // ALARM 17
@@ -6852,7 +6852,7 @@ GAME_CUSTOM( 199?, m4cpycat__3,    m4cpycat,   "co_30_kp.4_1", 0x0000, 0x010000,
 /*****************************************************************************************************************************************************************************
 *
 * Bank Roller Club
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // some kind of error
@@ -6885,7 +6885,7 @@ GAME_CUSTOM( 199?, m4bnkrol__b,    m4bnkrol,   "br301f.p1", 0x0000, 0x020000, CR
 /*****************************************************************************************************************************************************************************
 *
 * Red Hot Roll Club
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // boots
@@ -6918,13 +6918,13 @@ GAME_CUSTOM( 199?, m4rhrcl__c,  m4rhrcl,    "rhrc.hex", 0x0000, 0x010000, CRC(e4
 /*****************************************************************************************************************************************************************************
 *
 * Road Hog Club
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // REEL A ALM
 
-//	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-//	ROM_LOAD( "rhc.chr", 0x0000, 0x000048, CRC(6ceab6b0) SHA1(04f4238ea3fcf944c97bc11031e456b851ebe917) )
+//  ROM_REGION( 0x48, "characteriser:fakechr", 0 )
+//  ROM_LOAD( "rhc.chr", 0x0000, 0x000048, CRC(6ceab6b0) SHA1(04f4238ea3fcf944c97bc11031e456b851ebe917) )
 
 
 #define M4RHOGC_EXTRA_ROMS \
@@ -6950,13 +6950,13 @@ GAME_CUSTOM( 199?, m4rhogc__b,  m4rhogc,    "rhcd.p1", 0x0000, 0x010000, CRC(7a7
 /*****************************************************************************************************************************************************************************
 *
 * Games Bond 006
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // boots
 
-//	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-//	ROM_LOAD( "006s.chr", 0x0000, 0x000048, CRC(ee3d06eb) SHA1(570a715e71d4184e4df02b7e5b68fee70e03aeb0) )
+//  ROM_REGION( 0x48, "characteriser:fakechr", 0 )
+//  ROM_LOAD( "006s.chr", 0x0000, 0x000048, CRC(ee3d06eb) SHA1(570a715e71d4184e4df02b7e5b68fee70e03aeb0) )
 
 
 #define M4GB006_EXTRA_ROMS \
@@ -6983,7 +6983,7 @@ GAME_CUSTOM( 199?, m4gb006__c,  m4gb006,    "bond20_11",    0x0000, 0x010000, CR
 /*****************************************************************************************************************************************************************************
 *
 * Cash Encounters
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // boots
@@ -7014,7 +7014,7 @@ GAME_CUSTOM( 199?, m4cshenc__d,    m4cshenc,   "ca_sjb_c.5_1", 0x0000, 0x020000,
 /*****************************************************************************************************************************************************************************
 *
 * Rocky Horror Show
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // boots
@@ -7060,7 +7060,7 @@ GAME_CUSTOM( 199?, m4rhs__l,  m4rhs,  "rocky15t",     0x0000, 0x020000, CRC(3fba
 /*****************************************************************************************************************************************************************************
 *
 * Ooh Aah Dracula
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // boots
@@ -7097,7 +7097,7 @@ GAME_CUSTOM( 199?, m4oadrac__g,    m4oadrac,   "dr__xb_x.2_1", 0x0000, 0x020000,
 /*****************************************************************************************************************************************************************************
 *
 * Tic Tac Toe
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // boots
@@ -7154,7 +7154,7 @@ GAME_CUSTOM( 199?, m4tic__r,  m4tic,  "tt_25sbc.3_1", 0x0000, 0x010000, CRC(11c0
 /*****************************************************************************************************************************************************************************
 *
 * Tic Tac Toe Classic
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // HOP COIN SENSE ALM (17)
@@ -7211,7 +7211,7 @@ GAME_CUSTOM( 199?, m4ticcla__0,    m4ticcla,   "ct_30btc.2_1", 0x0000, 0x010000,
 /*****************************************************************************************************************************************************************************
 *
 * Tic Tac Toe Gold
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // gives ALM17 (hopper?)
@@ -7241,7 +7241,7 @@ GAME_CUSTOM( 199?, m4ticglc__d,    m4ticglc,   "tg_30bgc.4_1", 0x0000, 0x010000,
 /*****************************************************************************************************************************************************************************
 *
 * Super Streak Classic
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // boots
@@ -7280,7 +7280,7 @@ GAME_CUSTOM( 199?, m4ssclas__f,    m4ssclas,   "supst20.15",   0x0000, 0x010000,
 /*****************************************************************************************************************************************************************************
 *
 * Squids In
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 
@@ -7311,13 +7311,13 @@ GAME_CUSTOM( 199?, m4squid__c,  m4squid,    "sq__xb_x.2_0", 0x0000, 0x020000, CR
 /*****************************************************************************************************************************************************************************
 *
 * Calamari Club
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // does not show anything meaningful
 
-//	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-//	ROM_LOAD( "m407.chr", 0x0000, 0x000048, CRC(fa693a0d) SHA1(601afba4a6efe8334ecc2cadfee99273a9818c1c) )
+//  ROM_REGION( 0x48, "characteriser:fakechr", 0 )
+//  ROM_LOAD( "m407.chr", 0x0000, 0x000048, CRC(fa693a0d) SHA1(601afba4a6efe8334ecc2cadfee99273a9818c1c) )
 
 
 #define M4CALAMA_EXTRA_ROMS \
@@ -7367,7 +7367,7 @@ GAME_CUSTOM( 199?, m4calama__h,    m4calama,   "calamari.cl",  0x0000, 0x020000,
 /*****************************************************************************************************************************************************************************
 *
 * Cosmic Casino
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // boots, needs proper lamp descramble
@@ -7420,7 +7420,7 @@ GAME_CUSTOM( 199?, m4coscas__a,    m4coscas,   "cosm15g",              0x0000, 0
 /*****************************************************************************************************************************************************************************
 *
 * Double Diamond Club
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 // "Wrong Sound, Need V1" but can be bypassed to boot
@@ -7451,7 +7451,7 @@ GAME_CUSTOM( 199?, m4dbldm__c,  m4dbldm,    "cdd01.p1",     0x0000, 0x020000, CR
 /*****************************************************************************************************************************************************************************
 *
 * Super Blackjack Club
-* 
+*
 *****************************************************************************************************************************************************************************/
 
 #define M4SUPBJC_EXTRAS \
