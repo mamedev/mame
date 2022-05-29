@@ -1744,7 +1744,8 @@ ROM_END
 
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 
-// 00 a0 a8 18 f4 2c 70 60 e4 e8 58 d4 00 00  unusual sequence, lots of 00
+// the challenge sequence here never sets bit 0x20
+// 00 a0 a8 18 f4 2c 70 60 e4 e8 58 d4 2c 50 60 80 8c 7c
 GAME(199?, m4rsg,     0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Ready Steady Go (Barcrest) (MPU4, Mod 2 type, V1.2)",GAME_FLAGS )
 GAME(199?, m4rsga,    m4rsg,      mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Ready Steady Go (Barcrest) (MPU4, Mod 2 type, V1.0)",GAME_FLAGS )
 
