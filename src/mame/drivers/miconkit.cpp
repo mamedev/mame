@@ -17,14 +17,14 @@ adds moving obstacles. The 3rd game in the series, Space Micon Kit, adds a 2nd
 row of bricks.
 
 Hardware notes:
-- NEC 8080A, 18.432MHz XTAL
-- NEC 8228, NEC 8255C
-- 4KB ROM (4*MB8518), 256 bytes RAM, 4KB VRAM
-- 1bpp video with color overlay, 10MHz XTAL
+- NEC D8080A-C, 18.432MHz XTAL, NEC uPB8224C (/9 divider)
+- NEC uPB8228C, NEC D8255C
+- 4KB ROM (4*MB8518), 256 bytes RAM (2*D2111AL-4)
+- 4KB VRAM (32*MB8102), 1bpp video with color overlay
+- video timing: 10MHz XTAL, h/v: ?
 - beeper
 
 TODO:
-- verify CPU clock divider
 - correct video timing
 - there's a 2-player start button on the cocktail cabinet, but where is it
   hooked up, if at all? (when inserting 2 coins, the game automatically starts)
