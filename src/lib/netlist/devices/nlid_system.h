@@ -72,9 +72,15 @@ namespace netlist::devices {
 			if (!m_func().empty())
 			{
 				std::vector<pstring> inputs;
+
+				m_I.reserve(m_N());
+				inputs.reserve(m_N() + 1);
+				m_vals.reserve(m_N() + 1);
+
+				// add time parameter to the front
 				inputs.emplace_back("T");
 				m_vals.push_back(nlconst::zero());
-				m_I.reserve(m_N());
+
 				for (std::uint64_t i=0; i < m_N(); i++)
 				{
 					pstring input_name = plib::pfmt("A{1}")(i);
@@ -288,8 +294,12 @@ namespace netlist::devices {
 		, m_compiled(*this, "m_compiled")
 		, m_last(*this, "m_last")
 		{
-			m_I.reserve(m_N());
 			std::vector<pstring> inputs;
+
+			m_I.reserve(m_N());
+			inputs.reserve(m_N());
+			m_values.reserve(m_N());
+
 			for (uint64_t i=0; i < m_N(); i++)
 			{
 				pstring input_name = plib::pfmt("A{1}")(i);

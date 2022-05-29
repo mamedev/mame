@@ -90,7 +90,8 @@ namespace plib
 	{
 		UNKNOWN,
 		LIBSTDCXX,
-		LIBCPP
+		LIBCPP,
+		MSC
 	};
 
 	enum class ci_os
@@ -177,9 +178,12 @@ namespace plib
 	#elif defined(__GLIBCXX__)
 		using cpp_stdlib = std::integral_constant<ci_cpp_stdlib, ci_cpp_stdlib::LIBSTDCXX>;
 		using cpp_stdlib_version = typed_version<(_GLIBCXX_RELEASE), 0>;
+	#elif defined(_MSC_VER)
+		using cpp_stdlib = std::integral_constant<ci_cpp_stdlib, ci_cpp_stdlib::MSC>;
+		using cpp_stdlib_version = typed_version<_MSC_VER / 100, _MSC_VER % 100>;
 	#else
 		using cpp_stdlib = std::integral_constant<ci_cpp_stdlib, ci_cpp_stdlib::UNKNOWN>;
-		using cpp_stdlib_version = typed_version<(0, 0, 0>;
+		using cpp_stdlib_version = typed_version<0, 0, 0>;
 	#endif
 	#ifdef __unix__
 		using is_unix = std::integral_constant<bool, true>;
