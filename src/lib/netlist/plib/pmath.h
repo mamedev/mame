@@ -15,7 +15,7 @@
 #include <cmath>
 #include <type_traits>
 
-// quadmath.h included by ptypes.h
+// `quadmath.h` included by `ptypes.h`
 
 namespace plib
 {

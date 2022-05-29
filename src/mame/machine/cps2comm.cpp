@@ -638,8 +638,8 @@ void cps2_comm_device::usart_control_w(offs_t offset, u16 data, u16 mem_mask)
 				LOG("%s: USART mode = 0x%02X: Synchronous, %d-bit, %s Parity, %s Sync Detect, %d Sync Characters\n",
 						machine().describe_context(),
 						m_usart_mode,
-						std::array{ 5, 6, 7, 8 }[BIT(m_usart_mode, 2, 2)],
-						std::array{ "No", "Odd", "No", "Even" }[BIT(m_usart_mode, 4, 2)],
+						std::array<int, 4>{ 5, 6, 7, 8 }[BIT(m_usart_mode, 2, 2)],
+						std::array<char const *, 4>{ "No", "Odd", "No", "Even" }[BIT(m_usart_mode, 4, 2)],
 						BIT(m_usart_mode, 6) ? "External" : "Internal",
 						BIT(m_usart_mode, 7) ? 1 : 2);
 				m_usart_control_phase = CTRL_SYNC1;
@@ -649,10 +649,10 @@ void cps2_comm_device::usart_control_w(offs_t offset, u16 data, u16 mem_mask)
 				LOG("%s: USART mode = 0x%02X: Asynchronous, x %d Clock, %d-bit, %s Parity, %s Transmit Stop Bits\n",
 						machine().describe_context(),
 						m_usart_mode,
-						std::array{ -1, 1, 16, 64 }[BIT(m_usart_mode, 0, 2)],
-						std::array{ 5, 6, 7, 8 }[BIT(m_usart_mode, 2, 2)],
-						std::array{ "No", "Odd", "No", "Even" }[BIT(m_usart_mode, 4, 2)],
-						std::array{ "Illegal", "1", "1-1/2", "2" }[BIT(m_usart_mode, 6, 2)]);
+						std::array<int, 4>{ -1, 1, 16, 64 }[BIT(m_usart_mode, 0, 2)],
+						std::array<int, 4>{ 5, 6, 7, 8 }[BIT(m_usart_mode, 2, 2)],
+						std::array<char const *, 4>{ "No", "Odd", "No", "Even" }[BIT(m_usart_mode, 4, 2)],
+						std::array<char const *, 4>{ "Illegal", "1", "1-1/2", "2" }[BIT(m_usart_mode, 6, 2)]);
 				m_usart_control_phase = CTRL_COMMAND;
 				m_usart_status |= 0x01U;
 			}
@@ -715,9 +715,9 @@ void cps2_comm_device::route_w(offs_t offset, u16 data, u16 mem_mask)
 				machine().describe_context(),
 				m_route,
 				BIT(m_route, 4) ? "low" : "high",
-				std::array{ "1", "TxD & OUT", "1",   "TxD" }[BIT(m_route, 0, 2)],
-				std::array{ "1", "IN",        "TxD", "1"   }[BIT(m_route, 0, 2)],
-				std::array{ "1", "IN",        "OUT", "IN"  }[BIT(m_route, 0, 2)]);
+				std::array<char const *, 4>{ "1", "TxD & OUT", "1",   "TxD" }[BIT(m_route, 0, 2)],
+				std::array<char const *, 4>{ "1", "IN",        "TxD", "1"   }[BIT(m_route, 0, 2)],
+				std::array<char const *, 4>{ "1", "IN",        "OUT", "IN"  }[BIT(m_route, 0, 2)]);
 	}
 }
 

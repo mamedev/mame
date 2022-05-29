@@ -4279,7 +4279,7 @@ license:CC0
 
 	<!-- PC-9821 / DOS/V hybrid -->
 	<!-- Severe graphics glitches -->
-	<software name="momagic">
+	<software name="momagic" supported="no">
 		<!--
 		Origin: redump.org
 		<rom name="Master of Magic (Japan).bin" size="62038704" crc="8069be95" sha1="91fb29b26466ce32e4229f813666700aa5af2915"/>

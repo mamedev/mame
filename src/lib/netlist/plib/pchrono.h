@@ -110,7 +110,7 @@ namespace plib {
 		#if PUSE_ACCURATE_STATS && PHAS_RDTSCP
 		//
 		// kills performance completely, but is accurate
-		// cpuid serializes, but clobbers ebx and ecx
+		// `cpuid` serializes, but clobbers ebx and ecx
 		//
 
 		struct exact_ticks : public base_ticks<exact_ticks, int64_t>
@@ -184,7 +184,7 @@ namespace plib {
 		};
 
 
-		template< typename T, bool enabled_ = true>
+		template <typename T, bool enabled_ = true>
 		struct timer
 		{
 			using type = typename T::type;
@@ -269,10 +269,10 @@ namespace plib {
 	//  Performance tracking
 	//============================================================
 
-	template<bool enabled_>
+	template <bool enabled_>
 	using pperftime_t = plib::chrono::timer<plib::chrono::exact_ticks, enabled_>;
 
-	template<bool enabled_>
+	template <bool enabled_>
 	using pperfcount_t = plib::chrono::counter<enabled_>;
 } // namespace plib
 

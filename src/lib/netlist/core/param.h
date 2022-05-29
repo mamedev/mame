@@ -55,7 +55,7 @@ namespace netlist
 
 		pstring get_initial(const core_device_t *dev, bool *found) const;
 
-		template<typename C>
+		template <typename C>
 		void set_and_update_param(C &p, const C v) noexcept
 		{
 			if (p != v)

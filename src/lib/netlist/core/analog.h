@@ -56,25 +56,25 @@ namespace netlist
 
 		/// \brief constructor
 		///
-		/// @param dev core_devict_t object owning the terminal
-		/// @param aname name of this terminal
-		/// @param otherterm pointer to the sibling terminal
-		terminal_t(core_device_t &dev, const pstring &aname, terminal_t *otherterm, nldelegate delegate);
+		/// \param dev object owning the terminal
+		/// \param aname name of this terminal
+		/// \param other_terminal pointer to the sibling terminal
+		terminal_t(core_device_t &dev, const pstring &aname, terminal_t *other_terminal, nldelegate delegate);
 
-		terminal_t(core_device_t &dev, const pstring &aname, terminal_t *otherterm,
+		terminal_t(core_device_t &dev, const pstring &aname, terminal_t *other_terminal,
 			const std::array<terminal_t *, 2> &splitterterms, nldelegate delegate);
 
 		/// \brief Returns voltage of connected net
 		///
-		/// @return voltage of net this terminal is connected to
+		/// \return voltage of net this terminal is connected to
 		nl_fptype operator ()() const  noexcept
 		{
 			return net().Q_Analog();
 		}
 
-		/// @brief sets conductivity value of this terminal
+		/// \brief sets conductivity value of this terminal
 		///
-		/// @param G Conductivity
+		/// \param G Conductivity
 		void set_conductivity(nl_fptype G) const noexcept
 		{
 			set_go_gt_I(-G, G, nlconst::zero());

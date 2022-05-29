@@ -7,14 +7,13 @@
 ///
 /// \file pdynlib.h
 ///
+/// Dynamic loading of libraries
+///
 
 #include "pstring.h"
 #include "ptypes.h"
 
 namespace plib {
-	// ----------------------------------------------------------------------------------------
-	// pdynlib: dynamic loading of libraries  ...
-	// ----------------------------------------------------------------------------------------
 
 	class dynlib_base
 	{

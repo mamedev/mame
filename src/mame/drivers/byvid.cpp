@@ -915,6 +915,6 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1982, babypac,  0,       by133,   babypac, by133_state, empty_init, ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 1)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, babypac2, babypac, by133,   babypac, by133_state, empty_init, ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 2)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, granny,   0,       granny,  granny,  by133_state, empty_init, ROT0,  "Bally",                           "Granny and the Gators", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, babypac,  0,       by133,   babypac, by133_state, empty_init, ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 1)",  MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, babypac2, babypac, by133,   babypac, by133_state, empty_init, ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 2)",  MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, granny,   0,       granny,  granny,  by133_state, empty_init, ROT0,  "Bally",                           "Granny and the Gators", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

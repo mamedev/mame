@@ -896,7 +896,7 @@ GFXDECODE_END
 void slapfght_state::perfrman(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(16'000'000)/4); // 4MHz? XTAL is known, divider is guessed
+	Z80(config, m_maincpu, 16_MHz_XTAL/4); // 4MHz? XTAL is known, divider is guessed
 	m_maincpu->set_addrmap(AS_PROGRAM, &slapfght_state::perfrman_map);
 	m_maincpu->set_addrmap(AS_IO, &slapfght_state::io_map_nomcu);
 
@@ -906,7 +906,7 @@ void slapfght_state::perfrman(machine_config &config)
 	mainlatch.q_out_cb<3>().set(FUNC(slapfght_state::irq_enable_w));
 	mainlatch.q_out_cb<6>().set(FUNC(slapfght_state::palette_bank_w));
 
-	Z80(config, m_audiocpu, XTAL(16'000'000)/8); // 2MHz? XTAL is known, divider is guessed
+	Z80(config, m_audiocpu, 16_MHz_XTAL/8); // 2MHz? XTAL is known, divider is guessed
 	m_audiocpu->set_addrmap(AS_PROGRAM, &slapfght_state::perfrman_sound_map);
 	m_audiocpu->set_periodic_int(FUNC(slapfght_state::sound_nmi), attotime::from_hz(240)); // music speed, verified
 
@@ -914,7 +914,8 @@ void slapfght_state::perfrman(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(36_MHz_XTAL/6, 388, 0, 296, 270, 0, 240);
+	// pure guesswork, hopefully we can get real values
+	m_screen->set_raw(16_MHz_XTAL/3, 344, 0, 256, 270, 0, 240);
 	m_screen->set_screen_update(FUNC(slapfght_state::screen_update_perfrman));
 	m_screen->screen_vblank().set(m_spriteram_buffer, FUNC(buffered_spriteram8_device::vblank_copy_falling));
 	m_screen->screen_vblank().append(FUNC(slapfght_state::vblank_irq));
@@ -929,12 +930,12 @@ void slapfght_state::perfrman(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &ay1(AY8910(config, "ay1", XTAL(16'000'000)/8));
+	ay8910_device &ay1(AY8910(config, "ay1", 16_MHz_XTAL/8));
 	ay1.port_a_read_callback().set_ioport("IN0");
 	ay1.port_b_read_callback().set_ioport("IN1");
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	ay8910_device &ay2(AY8910(config, "ay2", XTAL(16'000'000)/8));
+	ay8910_device &ay2(AY8910(config, "ay2", 16_MHz_XTAL/8));
 	ay2.port_a_read_callback().set_ioport("DSW1");
 	ay2.port_b_read_callback().set_ioport("DSW2");
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);

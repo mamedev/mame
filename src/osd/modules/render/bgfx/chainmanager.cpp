@@ -468,7 +468,10 @@ uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *
 
 		if (texture == nullptr)
 		{
-			bgfx_texture *texture = new bgfx_texture(full_name, dst_format, tex_width, tex_height, mem, BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT, pitch, prim.m_rowpixels, width_div_factor, width_mul_factor);
+			uint32_t flags = BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT;
+			if (!PRIMFLAG_GET_TEXWRAP(prim.m_flags))
+				flags |= BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP;
+			bgfx_texture *texture = new bgfx_texture(full_name, dst_format, tex_width, tex_height, mem, flags, pitch, prim.m_rowpixels, width_div_factor, width_mul_factor);
 			m_textures.add_provider(full_name, texture);
 
 			if (prim.m_prim->texture.palette)

@@ -1296,6 +1296,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/liberatr.cpp",
 	MAME_DIR .. "src/mame/includes/liberatr.h",
 	MAME_DIR .. "src/mame/video/liberatr.cpp",
+	MAME_DIR .. "src/mame/drivers/marblmd2.cpp",
 	MAME_DIR .. "src/mame/drivers/mediagx.cpp",
 	MAME_DIR .. "src/mame/drivers/metalmx.cpp",
 	MAME_DIR .. "src/mame/includes/metalmx.h",
@@ -2084,9 +2085,6 @@ files {
 	MAME_DIR .. "src/mame/includes/gatron.h",
 	MAME_DIR .. "src/mame/video/gatron.cpp",
 	MAME_DIR .. "src/mame/drivers/gotya.cpp",
-	MAME_DIR .. "src/mame/includes/gotya.h",
-	MAME_DIR .. "src/mame/audio/gotya.cpp",
-	MAME_DIR .. "src/mame/video/gotya.cpp",
 	MAME_DIR .. "src/mame/drivers/sbugger.cpp",
 	MAME_DIR .. "src/mame/includes/sbugger.h",
 	MAME_DIR .. "src/mame/video/sbugger.cpp",
@@ -2116,6 +2114,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/pcxt.cpp",
 	MAME_DIR .. "src/mame/drivers/quakeat.cpp",
 	MAME_DIR .. "src/mame/drivers/queen.cpp",
+	MAME_DIR .. "src/mame/drivers/sis630.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "igs")
@@ -3849,6 +3848,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mainsnk.cpp",
 	MAME_DIR .. "src/mame/includes/mainsnk.h",
 	MAME_DIR .. "src/mame/video/mainsnk.cpp",
+	MAME_DIR .. "src/mame/drivers/miconkit.cpp",
 	MAME_DIR .. "src/mame/drivers/munchmo.cpp",
 	MAME_DIR .. "src/mame/includes/munchmo.h",
 	MAME_DIR .. "src/mame/video/munchmo.cpp",
@@ -4527,8 +4527,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/paradise.cpp",
 	MAME_DIR .. "src/mame/drivers/yunsung8.cpp",
 	MAME_DIR .. "src/mame/drivers/yunsun16.cpp",
-	MAME_DIR .. "src/mame/includes/yunsun16.h",
-	MAME_DIR .. "src/mame/video/yunsun16.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "zaccaria")
@@ -4844,7 +4842,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/gambl186.cpp",
 	MAME_DIR .. "src/mame/drivers/galaxi.cpp",
 	MAME_DIR .. "src/mame/drivers/galgame.cpp",
-	MAME_DIR .. "src/mame/drivers/gamecstl.cpp",
 	MAME_DIR .. "src/mame/drivers/gamemasters.cpp",
 	MAME_DIR .. "src/mame/drivers/gammagic.cpp",
 	MAME_DIR .. "src/mame/drivers/gamtor.cpp",

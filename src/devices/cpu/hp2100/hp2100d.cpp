@@ -145,7 +145,7 @@ offs_t hp2100_disassembler::dasm_srg(std::ostream &stream, u16 inst) const
 			stream << s_shift_ops[BIT(inst, 11)][BIT(inst, 0, 3)];
 		}
 	}
-	
+
 	return 1 | flags;
 }
 
@@ -519,6 +519,111 @@ offs_t hp21mx_disassembler::dasm_mac(std::ostream &stream, u16 inst, offs_t pc, 
 				stream << "SBT";
 				return 1 | STEP_COND | SUPPORTED;
 			}
+
+		default:
+			util::stream_format(stream, "MAC %oB", inst & 05777);
+			return 1 | SUPPORTED;
+		}
+	}
+	else if ((inst & 01740) == 01700)
+	{
+		// Dynamic Mapping System
+		switch (inst & 04027)
+		{
+		case 04002:
+			stream << "MBI";
+			return 1 | SUPPORTED;
+
+		case 04003:
+			stream << "MBF";
+			return 1 | SUPPORTED;
+
+		case 04004:
+			stream << "MBW";
+			return 1 | SUPPORTED;
+
+		case 04005:
+			stream << "MWI";
+			return 1 | SUPPORTED;
+
+		case 04006:
+			stream << "MWF";
+			return 1 | SUPPORTED;
+
+		case 04007:
+			stream << "MWW";
+			return 1 | SUPPORTED;
+
+		case 0010: case 04010:
+			util::stream_format(stream, "SY%c", cab(inst));
+			return 1 | SUPPORTED;
+
+		case 0011: case 04011:
+			util::stream_format(stream, "US%c", cab(inst));
+			return 1 | SUPPORTED;
+
+		case 0012: case 0013: case 04012: case 04013:
+			util::stream_format(stream, "P%c%c", 'A' + BIT(inst, 0), cab(inst));
+			return 1 | SUPPORTED;
+
+		case 04014:
+			stream << "SSM ";
+			format_address(stream, opcodes.r16(pc + 1));
+			return 2 | SUPPORTED;
+
+		case 04015:
+			stream << "JRS ";
+			format_address(stream, opcodes.r16(pc + 1));
+			stream << ',';
+			format_address(stream, opcodes.r16(pc + 2));
+			return 3 | SUPPORTED;
+
+		case 04020:
+			stream << "XMM";
+			return 1 | SUPPORTED;
+
+		case 04021:
+			stream << "XMS";
+			return 1 | SUPPORTED;
+
+		case 0022: case 04022:
+			util::stream_format(stream, "XM%c", cab(inst));
+			return 1 | SUPPORTED;
+
+		case 0024: case 04024:
+			util::stream_format(stream, "XL%c", cab(inst));
+			return 1 | SUPPORTED;
+
+		case 0025: case 04025:
+			util::stream_format(stream, "XS%c", cab(inst));
+			return 1 | SUPPORTED;
+
+		case 0026: case 04026:
+			util::stream_format(stream, "XC%c", cab(inst));
+			return 1 | STEP_COND | SUPPORTED;
+
+		case 0027: case 04027:
+			util::stream_format(stream, "LF%c ", cab(inst));
+			format_address(stream, opcodes.r16(pc + 1));
+			return 2 | SUPPORTED;
+
+		case 0030: case 04030:
+			util::stream_format(stream, "RS%c", cab(inst));
+			return 1 | SUPPORTED;
+
+		case 0031: case 04031:
+			util::stream_format(stream, "RV%c", cab(inst));
+			return 1 | SUPPORTED;
+
+		case 04032: case 04034: case 04036:
+			util::stream_format(stream, "%cJP ", "DSU"[BIT(inst, 1, 2) - 1]);
+			format_address(stream, opcodes.r16(pc + 1));
+			return 2 | SUPPORTED;
+
+		case 04033: case 04035: case 04037:
+			util::stream_format(stream, "%cJS ", "DSU"[BIT(inst, 1, 2) - 1]);
+			format_address(stream, opcodes.r16(pc + 1));
+			return 2 | STEP_OVER | SUPPORTED;
 
 		default:
 			util::stream_format(stream, "MAC %oB", inst & 05777);

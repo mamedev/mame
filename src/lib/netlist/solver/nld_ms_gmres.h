@@ -37,7 +37,7 @@ namespace netlist::solver
 			const solver::solver_parameters_t *params,
 			const std::size_t size)
 			: matrix_solver_direct_t<FT, SIZE>(main_solver, name, nets, params, size)
-			, m_ops(size, 0)
+			, m_ops(this->m_arena, size, 0)
 			, m_gmres(size)
 			{
 			const std::size_t iN = this->size();
@@ -62,7 +62,7 @@ namespace netlist::solver
 			for (std::size_t k=0; k<iN; k++)
 			{
 				std::size_t cnt = 0;
-				for (std::size_t j=0; j< this->m_terms[k].railstart();j++)
+				for (std::size_t j=0; j< this->m_terms[k].rail_start();j++)
 				{
 					for (std::size_t i = m_ops.m_mat.row_idx[k]; i<m_ops.m_mat.row_idx[k+1]; i++)
 						if (this->m_terms[k].m_connected_net_idx[j] == static_cast<int>(m_ops.m_mat.col_idx[i]))
@@ -72,8 +72,8 @@ namespace netlist::solver
 							break;
 						}
 				}
-				nl_assert(cnt == this->m_terms[k].railstart());
-				this->m_mat_ptr[k][this->m_terms[k].railstart()] = &m_ops.m_mat.A[m_ops.m_mat.diag[k]];
+				nl_assert(cnt == this->m_terms[k].rail_start());
+				this->m_mat_ptr[k][this->m_terms[k].rail_start()] = &m_ops.m_mat.A[m_ops.m_mat.diag[k]];
 			}
 		}
 
@@ -81,10 +81,10 @@ namespace netlist::solver
 
 	private:
 
-		using mattype = typename plib::pmatrix_cr<FT, SIZE>::index_type;
+		using mattype = typename plib::pmatrix_cr<arena_type, FT, SIZE>::index_type;
 
 		//plib::mat_precondition_none<FT, SIZE> m_ops;
-		plib::mat_precondition_ILU<FT, SIZE> m_ops;
+		plib::mat_precondition_ILU<arena_type, FT, SIZE> m_ops;
 		//plib::mat_precondition_diag<FT, SIZE> m_ops;
 		plib::gmres_t<FT, SIZE> m_gmres;
 	};

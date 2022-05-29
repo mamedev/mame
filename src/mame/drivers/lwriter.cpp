@@ -196,7 +196,7 @@ private:
 	int m_print_result;
 	bool m_sbsy;
 	bool m_cbsy;
-	bool m_vsync;;
+	bool m_vsync;
 	int m_fifo_count;
 	int m_pb6_tick_count;
 	int m_vbl_count;

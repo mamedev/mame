@@ -181,7 +181,7 @@ uint8_t kminus_state::pio1_pb_r()
 
 	logerror("pio_pb_r: %02x\n", data);
 
-	return data;;
+	return data;
 }
 
 void kminus_state::pio1_pb_w(uint8_t data)

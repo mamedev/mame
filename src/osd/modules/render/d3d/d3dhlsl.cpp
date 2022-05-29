@@ -2319,7 +2319,7 @@ void shaders::init_slider_list()
 	}
 	internal_sliders.clear();
 
-	const screen_device *first_screen = screen_device_enumerator(machine->root_device()).first();;
+	const screen_device *first_screen = screen_device_enumerator(machine->root_device()).first();
 	if (first_screen == nullptr)
 	{
 		return;

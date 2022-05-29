@@ -1583,7 +1583,7 @@ void tx0_state::tx0_64kw(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tx0);
 	PALETTE(config, m_palette, FUNC(tx0_state::tx0_palette), total_colors_needed + sizeof(tx0_pens), total_colors_needed);
 
-	SOFTWARE_LIST(config, "ptp_list").set_original("tx0_ptp").set_filter("64,OLDCODE");
+	SOFTWARE_LIST(config, "ptp_list").set_original("tx0_ptp").set_filter("64");
 }
 
 void tx0_state::tx0_8kwo(machine_config &config)
@@ -1608,7 +1608,7 @@ void tx0_state::tx0_8kwo(machine_config &config)
 	/* dummy interrupt: handles input */
 	m_maincpu->set_vblank_int("screen", FUNC(tx0_state::tx0_interrupt));
 
-	SOFTWARE_LIST(config.replace(), "ptp_list").set_original("tx0_ptp").set_filter("8,OLDCODE");
+	SOFTWARE_LIST(config.replace(), "ptp_list").set_original("tx0_ptp").set_filter("8O");
 }
 
 void tx0_state::tx0_8kw(machine_config &config)
@@ -1633,7 +1633,7 @@ void tx0_state::tx0_8kw(machine_config &config)
 	/* dummy interrupt: handles input */
 	m_maincpu->set_vblank_int("screen", FUNC(tx0_state::tx0_interrupt));
 
-	SOFTWARE_LIST(config.replace(), "ptp_list").set_original("tx0_ptp").set_filter("8,NEWCODE");
+	SOFTWARE_LIST(config.replace(), "ptp_list").set_original("tx0_ptp").set_filter("8N");
 }
 
 ROM_START(tx0_64kw)

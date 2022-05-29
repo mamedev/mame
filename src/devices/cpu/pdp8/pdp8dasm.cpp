@@ -127,11 +127,17 @@ void pdp8_disassembler::dasm_memory_reference(std::ostream &stream, u16 inst, of
 		{
 			stream << "      /AUTO-INDEX";
 			if (BIT(inst, 7))
-				stream << "?"; // IM6100 does no auto-indexing in this case
+				stream << " OR CURRENT PAGE"; // IM6100 does no auto-indexing in this case
 		}
+		else if (BIT(inst, 7) && (pc & 07600) == 0)
+			stream << "      /CURRENT PAGE";
 	}
 	else
+	{
 		util::stream_format(stream, " %04o", addr);
+		if (BIT(inst, 7) && (pc & 07600) == 0)
+			stream << "        /CURRENT PAGE";
+	}
 }
 
 offs_t pdp8_disassembler::dasm_iot(std::ostream &stream, u16 dev, offs_t pc)

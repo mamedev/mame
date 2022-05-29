@@ -913,7 +913,7 @@ uint8_t rastersp_state::interrupt_ctrl_r(offs_t offset)
 
 void rastersp_state::interrupt_ctrl_w(offs_t offset, uint8_t data)
 {
-	m_interrupt_mask = data;;
+	m_interrupt_mask = data;
 }
 
 uint8_t rastersp_state::interrupt_status_r(offs_t offset)

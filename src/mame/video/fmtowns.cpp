@@ -423,7 +423,7 @@ uint8_t towns_state::towns_video_440_r(offs_t offset)
 				ret |= 0x80;
 			}
 			ret |= (m_video.towns_sprite_flag ? 0x02 : 0x00);  // Sprite drawing flag
-			ret |= (m_video.towns_sprite_page & 0x01) ? 1 : 0;;
+			ret |= m_video.towns_sprite_page & 0x01;
 			return ret;
 		case 0x10:
 			return m_video.towns_sprite_sel;

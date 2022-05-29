@@ -3,7 +3,7 @@
 /*
  * nld_7485.cpp
  *
- * FIXME: Truthtable candidate
+ * FIXME: Truth table candidate
  *
  *  DM7485: 4-bit Magnitude Comparators
  *

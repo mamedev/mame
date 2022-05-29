@@ -8755,7 +8755,7 @@ GAMEL( 199?, jolyjokrm,  jolyjokr, fw1stpal, funworld,  funworld_state, empty_in
 
 // Encrypted games...
 GAME(  1992, multiwin,   0,        multiwin, funworld,  multiwin_state, driver_init,   ROT0, "Fun World",         "Multi Win (Ver.0167, encrypted)",                 0 ) // original funworld, encrypted.
-GAME(  1991, multiwina,  multiwin, multiwina,funworld,  multiwina_state,empty_init,    ROT0, "Fun World",         "Multi Win (Ver.0091, encrypted)",                 0 ) // different encryption scheme.
+GAME(  1991, multiwina,  multiwin, multiwina,funworld,  multiwina_state,empty_init,    ROT0, "Fun World",         "Multi Win (Ver.0091, encrypted)",                 MACHINE_IMPERFECT_GRAPHICS ) // different encryption scheme, different tilemap / screen parameters
 GAME(  2001, multiwinb,  multiwin, fw2ndpal, funworld,  funworld_state, empty_init,    ROT0, "Amatic",            "Multi Win (EPM7032, encrypted)",                  MACHINE_NOT_WORKING ) // daughterboard with R65C02 + Altera EPM7032.
 GAME(  1993, powercrd,   0,        multiwina,funworld,  multiwina_state,empty_init,    ROT0, "Fun World",         "Power Card (Ver 0263, encrypted)",                0 ) // clone of Bonus Card.
 GAME(  1993, megacard,   0,        multiwina,funworld,  multiwina_state,empty_init,    ROT0, "Fun World",         "Mega Card (Ver.0210, encrypted)",                 0 )

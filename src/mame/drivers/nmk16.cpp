@@ -1075,6 +1075,14 @@ void nmk16_state::tdragonb_map(address_map &map)
 	map(0x0d0000, 0x0d07ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
 }
 
+void nmk16_state::tdragonb3_map(address_map &map)
+{
+	tdragonb_map(map);
+
+	map(0x044022, 0x044023).unmapr();
+	map(0x060000, 0x060021).lr16(NAME([] () -> u16 { return 0xee; })); // No sprites in attract mode without this. Is it actually protection? See routine at PC 260
+}
+
 void nmk16_state::tdragonb2_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
@@ -4565,6 +4573,13 @@ void nmk16_state::tdragonb(machine_config &config)    // bootleg using Raiden so
 	seibu_sound.set_rombank_tag("seibu_bank1");
 	seibu_sound.ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
 	seibu_sound.ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
+}
+
+void nmk16_state::tdragonb3(machine_config &config)
+{
+	tdragonb(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::tdragonb3_map);
 }
 
 void nmk16_state::tdragonb2(machine_config &config)
@@ -9095,7 +9110,7 @@ GAME( 1997, tomagic,   0,         tomagic,      tomagic,      nmk16_tomagic_stat
 GAME( 1990, mustangb,   mustang,  mustangb,     mustang,      nmk16_state, empty_init,           ROT0,   "bootleg",                       "US AAF Mustang (bootleg, set 1)", 0 )
 GAME( 1990, mustangb2,  mustang,  mustangb,     mustang,      nmk16_state, empty_init,           ROT0,   "bootleg (TAB Austria)",         "US AAF Mustang (TAB Austria bootleg)", 0 ) // PCB and ROMs have TAB Austria stickers
 GAME( 1991, tdragonb,   tdragon,  tdragonb,     tdragonb,     nmk16_state, init_tdragonb,        ROT270, "bootleg",                       "Thunder Dragon (bootleg with Raiden sounds, encrypted)", 0 )
-GAME( 1991, tdragonb3,  tdragon,  tdragonb,     tdragonb,     nmk16_state, empty_init,           ROT270, "bootleg",                       "Thunder Dragon (bootleg with Raiden sounds, unencrypted)", 0 )
+GAME( 1991, tdragonb3,  tdragon,  tdragonb3,    tdragonb,     nmk16_state, empty_init,           ROT270, "bootleg",                       "Thunder Dragon (bootleg with Raiden sounds, unencrypted)", 0 )
 GAME( 1992, strahljbl,  strahl,   strahljbl,    strahljbl,    nmk16_state, empty_init,           ROT0,   "bootleg",                       "Koutetsu Yousai Strahl (Japan, bootleg)", 0 )
 
 // these are bootlegs with tharrier like sound hw

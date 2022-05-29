@@ -13,7 +13,6 @@
 #include "../nl_setup.h"
 #include "../nltypes.h"
 
-//#include "../plib/ppreprocessor.h"
 #include "../plib/pstream.h"
 #include "../plib/pstring.h"
 
@@ -161,7 +160,7 @@ namespace netlist
 			return (ret != m_connected_terminals.end()) ? &ret->second : nullptr;
 		}
 
-		// get family -> truthtable
+		// get family -> truth table
 		const logic_family_desc_t *family_from_model(const pstring &model);
 
 		param_ref_t find_param(const pstring &param_in) const;
@@ -243,7 +242,7 @@ namespace netlist
 	};
 
 	// ----------------------------------------------------------------------------------------
-	// Specific netlist psource_t implementations
+	// Specific netlist `psource_t` implementations
 	// ----------------------------------------------------------------------------------------
 
 	class source_netlist_t : public plib::psource_t

@@ -33,6 +33,7 @@ CPUS["M680X0"] = true
 CPUS["F8"] = true
 CPUS["CCPU"] = true
 CPUS["MCS40"] = true
+CPUS["TMS9900"] = true
 
 --------------------------------------------------
 -- Specify all the sound cores necessary for the
@@ -108,6 +109,7 @@ MACHINES["PIT8253"] = true
 --MACHINES["BANKDEV"] = true
 MACHINES["F3853"] = true
 MACHINES["MB14241"] = true
+MACHINES["STEPPERS"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -398,12 +400,12 @@ files{
 	MAME_DIR .. "src/mame/drivers/starcrus.cpp",
 	MAME_DIR .. "src/mame/includes/starcrus.h",
 	MAME_DIR .. "src/mame/video/starcrus.cpp",
-	
+
 	MAME_DIR .. "src/mame/drivers/dragrace.cpp",
 	MAME_DIR .. "src/mame/includes/dragrace.h",
 	MAME_DIR .. "src/mame/audio/dragrace.cpp",
 	MAME_DIR .. "src/mame/video/dragrace.cpp",
-	
+
 
 	-- Skeletons ...
 	MAME_DIR .. "src/mame/drivers/a1supply.cpp",
@@ -421,6 +423,15 @@ files{
 	MAME_DIR .. "src/mame/drivers/segattl.cpp",
 	MAME_DIR .. "src/mame/drivers/taitottl.cpp",
 	MAME_DIR .. "src/mame/drivers/usbilliards.cpp",
+
+	MAME_DIR .. "src/mame/drivers/jpmsru.cpp",
+	MAME_DIR .. "src/mame/audio/nl_jpmsru.cpp",
+
+	MAME_DIR .. "src/mame/audio/fruitsamples.cpp",
+	MAME_DIR .. "src/mame/audio/fruitsamples.h",
+	MAME_DIR .. "src/mame/video/awpvid.cpp",
+	MAME_DIR .. "src/mame/video/awpvid.h",
+
 }
 end
 

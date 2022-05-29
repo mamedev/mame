@@ -3601,8 +3601,8 @@ void apple2e_state::base_map(address_map &map)
 	m_4000bank[1](0x4000, 0xbfff).rw(FUNC(apple2e_state::auxram4000_r), FUNC(apple2e_state::ram4000_w));
 	m_4000bank[2](0x4000, 0xbfff).rw(FUNC(apple2e_state::ram4000_r), FUNC(apple2e_state::auxram4000_w));
 	m_4000bank[3](0x4000, 0xbfff).rw(FUNC(apple2e_state::auxram4000_r), FUNC(apple2e_state::auxram4000_w));
-	m_4000bank[4](0x4000, 0xbfff).rw(FUNC(apple2e_state::cec4000_r), FUNC(apple2e_state::ram4000_w));
-	m_4000bank[5](0x4000, 0xbfff).rw(FUNC(apple2e_state::cec8000_r), FUNC(apple2e_state::ram8000_w));
+	m_4000bank[4](0x4000, 0x7fff).rw(FUNC(apple2e_state::cec4000_r), FUNC(apple2e_state::ram4000_w));
+	m_4000bank[4](0x8000, 0xbfff).rw(FUNC(apple2e_state::cec8000_r), FUNC(apple2e_state::ram8000_w));
 
 	map(0xc000, 0xc07f).rw(FUNC(apple2e_state::c000_r), FUNC(apple2e_state::c000_w));
 	map(0xc080, 0xc0ff).rw(FUNC(apple2e_state::c080_r), FUNC(apple2e_state::c080_w));

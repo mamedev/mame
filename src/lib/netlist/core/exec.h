@@ -44,7 +44,7 @@ namespace netlist
 
 		const detail::queue_t &queue() const noexcept { return m_queue; }
 
-		template<typename... Args>
+		template <typename... Args>
 		void qpush(Args&&...args) noexcept
 		{
 			if (config::use_queue_stats::value && m_use_stats)
@@ -70,16 +70,15 @@ namespace netlist
 		// only used by nltool to create static c-code
 		devices::nld_solver *solver() const noexcept { return m_solver; }
 
-		// force late type resolution
+		// FIXME: force late type resolution
 		template <typename X = devices::nld_solver>
-		nl_fptype gmin(X *solv = nullptr) const noexcept
+		nl_fptype gmin([[maybe_unused]] X *solver = nullptr) const noexcept
 		{
-			plib::unused_var(solv);
 			return static_cast<X *>(m_solver)->gmin();
 		}
 
-		netlist_state_t &nlstate() noexcept { return m_state; }
-		const netlist_state_t &nlstate() const noexcept { return m_state; }
+		netlist_state_t &nl_state() noexcept { return m_state; }
+		const netlist_state_t &nl_state() const noexcept { return m_state; }
 
 		log_type & log() noexcept { return m_state.log(); }
 		const log_type &log() const noexcept { return m_state.log(); }
@@ -100,7 +99,7 @@ namespace netlist
 		// mostly rw
 		//PALIGNAS(16)
 		netlist_time_ext                    m_time;
-		devices::nld_mainclock *            m_mainclock;
+		devices::nld_mainclock *            m_main_clock;
 
 		//PALIGNAS_CACHELINE()
 		//PALIGNAS(16)

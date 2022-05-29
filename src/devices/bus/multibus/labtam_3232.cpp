@@ -13,15 +13,15 @@
  */
 
 #include "emu.h"
-#include "labtam3232.h"
+#include "labtam_3232.h"
 
 #define VERBOSE 0
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(LABTAM3232, labtam3232_device, "labtam3232", "Labtam 3232")
+DEFINE_DEVICE_TYPE(LABTAM_3232, labtam_3232_device, "labtam_3232", "Labtam 3232")
 
-labtam3232_device::labtam3232_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, LABTAM3232, tag, owner, clock)
+labtam_3232_device::labtam_3232_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, LABTAM_3232, tag, owner, clock)
 	, device_multibus_interface(mconfig, *this)
 	, m_cpu(*this, "cpu")
 	, m_fpu(*this, "fpu")
@@ -32,7 +32,7 @@ labtam3232_device::labtam3232_device(machine_config const &mconfig, char const *
 {
 }
 
-ROM_START(labtam3232)
+ROM_START(labtam_3232)
 	ROM_REGION32_LE(0x10000, "eprom", 0)
 	ROM_LOAD32_BYTE("sash_0__g87.bin", 0x0000, 0x4000, CRC(31132de0) SHA1(39f7c1f146346a53c253284ba3437b5f9217f439))
 	ROM_LOAD32_BYTE("sash_1__g87.bin", 0x0001, 0x4000, CRC(09b4e8ba) SHA1(b722386fc6e4a634472d5a0501eb41e12d89f7dc))
@@ -40,24 +40,24 @@ ROM_START(labtam3232)
 	ROM_LOAD32_BYTE("sash_3__g87.bin", 0x0003, 0x4000, CRC(7817d1b8) SHA1(032df47e1ba34653b5837f68eefa3ecaac17a483))
 ROM_END
 
-static INPUT_PORTS_START(labtam3232)
+static INPUT_PORTS_START(labtam_3232)
 INPUT_PORTS_END
 
-const tiny_rom_entry *labtam3232_device::device_rom_region() const
+const tiny_rom_entry *labtam_3232_device::device_rom_region() const
 {
-	return ROM_NAME(labtam3232);
+	return ROM_NAME(labtam_3232);
 }
 
-ioport_constructor labtam3232_device::device_input_ports() const
+ioport_constructor labtam_3232_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME(labtam3232);
+	return INPUT_PORTS_NAME(labtam_3232);
 }
 
-void labtam3232_device::device_start()
+void labtam_3232_device::device_start()
 {
 }
 
-void labtam3232_device::device_reset()
+void labtam_3232_device::device_reset()
 {
 	if (!m_installed)
 	{
@@ -78,11 +78,11 @@ void labtam3232_device::device_reset()
 	m_boot.select(0);
 }
 
-void labtam3232_device::device_add_mconfig(machine_config &config)
+void labtam_3232_device::device_add_mconfig(machine_config &config)
 {
 	NS32032(config, m_cpu, 20_MHz_XTAL / 2);
-	m_cpu->set_addrmap(0, &labtam3232_device::cpu_map<0>);
-	m_cpu->set_addrmap(4, &labtam3232_device::cpu_map<4>);
+	m_cpu->set_addrmap(0, &labtam_3232_device::cpu_map<0>);
+	m_cpu->set_addrmap(4, &labtam_3232_device::cpu_map<4>);
 
 	NS32081(config, m_fpu, 20_MHz_XTAL / 2);
 	m_cpu->set_fpu(m_fpu);
@@ -94,7 +94,7 @@ void labtam3232_device::device_add_mconfig(machine_config &config)
 	m_icu->out_int().set_inputline(m_cpu, INPUT_LINE_IRQ0).invert();
 }
 
-template <unsigned ST> void labtam3232_device::cpu_map(address_map &map)
+template <unsigned ST> void labtam_3232_device::cpu_map(address_map &map)
 {
 	if (ST == 0)
 	{

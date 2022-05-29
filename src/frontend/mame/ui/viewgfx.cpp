@@ -32,12 +32,9 @@ public:
 	gfx_viewer(running_machine &machine) :
 		m_machine(machine),
 		m_palette(machine),
-		m_gfxset(machine)
+		m_gfxset(machine),
+		m_tilemap(machine)
 	{
-		uint8_t const rotate = machine.system().flags & machine_flags::MASK_ORIENTATION;
-
-		// set initial tilemap rotation to match system orientation
-		m_tilemap.m_rotate = rotate;
 	}
 
 	// copy constructor needed to make std::any happy
@@ -91,7 +88,7 @@ public:
 private:
 	enum class view
 	{
-		PALETTE,
+		PALETTE = 0,
 		GFXSET,
 		TILEMAP
 	};
@@ -206,10 +203,55 @@ private:
 			bool m_integer_scale = false;
 		};
 
-		struct devinfo
+		class devinfo
 		{
-			device_gfx_interface *m_interface = nullptr;
-			unsigned m_setcount = 0U;
+		public:
+			devinfo(device_gfx_interface &interface, device_palette_interface *first_palette, u8 rotate) :
+				m_interface(&interface),
+				m_setcount(0U)
+			{
+				for (gfx_element *gfx; (MAX_GFX_ELEMENTS > m_setcount) && ((gfx = interface.gfx(m_setcount)) != nullptr); ++m_setcount)
+				{
+					auto &set = m_sets[m_setcount];
+					if (gfx->has_palette())
+					{
+						set.m_palette = &gfx->palette();
+						set.m_color_count = gfx->colors();
+					}
+					else
+					{
+						set.m_palette = first_palette;
+						set.m_color_count = first_palette->entries() / gfx->granularity();
+						if (!set.m_color_count)
+							set.m_color_count = 1U;
+					}
+					set.m_rotate = rotate;
+				}
+			}
+
+			device_gfx_interface &interface() const noexcept
+			{
+				return *m_interface;
+			}
+
+			unsigned setcount() const noexcept
+			{
+				return m_setcount;
+			}
+
+			setinfo const &set(unsigned index) const noexcept
+			{
+				return m_sets[index];
+			}
+
+			setinfo &set(unsigned index) noexcept
+			{
+				return m_sets[index];
+			}
+
+		private:
+			device_gfx_interface *m_interface;
+			unsigned m_setcount;
 			setinfo m_sets[MAX_GFX_ELEMENTS];
 		};
 
@@ -222,35 +264,9 @@ private:
 			// iterate over graphics decoders
 			for (device_gfx_interface &interface : gfx_interface_enumerator(machine.root_device()))
 			{
-				// count exposed graphics sets
-				unsigned count = 0U;
-				while ((MAX_GFX_ELEMENTS > count) && interface.gfx(count))
-					++count;
-
 				// if there are any exposed graphics sets, add the device
-				if (count)
-				{
-					devinfo &info = m_devices.emplace_back();
-					info.m_interface = &interface;
-					info.m_setcount = count;
-					for (unsigned slot = 0U; count > slot; ++slot)
-					{
-						auto &gfx = *interface.gfx(slot);
-						if (gfx.has_palette())
-						{
-							info.m_sets[slot].m_palette = &gfx.palette();
-							info.m_sets[slot].m_color_count = gfx.colors();
-						}
-						else
-						{
-							info.m_sets[slot].m_palette = first_palette;
-							info.m_sets[slot].m_color_count = first_palette->entries() / gfx.granularity();
-							if (!info.m_sets[slot].m_color_count)
-								info.m_sets[slot].m_color_count = 1U;
-						}
-						info.m_sets[slot].m_rotate = rotate;
-					}
-				}
+				if (interface.gfx(0U))
+					m_devices.emplace_back(interface, first_palette, rotate);
 			}
 		}
 
@@ -268,7 +284,7 @@ private:
 	private:
 		bool next_group() noexcept
 		{
-			if ((m_devices[m_device].m_setcount - 1) > m_set)
+			if ((m_devices[m_device].setcount() - 1) > m_set)
 			{
 				++m_set;
 				return true;
@@ -294,7 +310,8 @@ private:
 			}
 			else if (m_device)
 			{
-				m_set = m_devices[--m_device].m_setcount - 1;
+				--m_device;
+				m_set = m_devices[m_device].setcount() - 1;
 				return true;
 			}
 			else
@@ -307,132 +324,168 @@ private:
 	class tilemap
 	{
 	public:
-		bool handle_keys(running_machine &machine, float pixelscale);
+		tilemap(running_machine &machine)
+		{
+			uint8_t const rotate = machine.system().flags & machine_flags::MASK_ORIENTATION;
+			m_info.resize(machine.tilemap().count());
+			for (auto &info : m_info)
+				info.m_rotate = rotate;
+		}
 
-		unsigned m_index = 0U;
-		int m_xoffs = 0;
-		int m_yoffs = 0;
-		unsigned m_zoom = 1U;
-		bool m_zoom_frac = false;
-		bool m_auto_zoom = true;
-		uint8_t m_rotate = 0U;
-		uint32_t m_flags = TILEMAP_DRAW_ALL_CATEGORIES;
+		unsigned index() const noexcept
+		{
+			return m_index;
+		}
+
+		float zoom_scale() const noexcept
+		{
+			auto const &info = m_info[m_index];
+			return info.m_zoom_frac ? (1.0f / float(info.m_zoom)) : float(info.m_zoom);
+		}
+
+		bool auto_zoom() const noexcept
+		{
+			return m_info[m_index].m_auto_zoom;
+		}
+
+		uint8_t rotate() const noexcept
+		{
+			return m_info[m_index].m_rotate;
+		}
+
+		uint32_t flags() const noexcept
+		{
+			return m_info[m_index].m_flags;
+		}
+
+		int xoffs() const noexcept
+		{
+			return m_info[m_index].m_xoffs;
+		}
+
+		int yoffs() const noexcept
+		{
+			return m_info[m_index].m_yoffs;
+		}
+
+		bool handle_keys(running_machine &machine, float pixelscale);
 
 	private:
 		static constexpr int MAX_ZOOM_LEVEL = 8; // maximum tilemap zoom ratio screen:native
 		static constexpr int MIN_ZOOM_LEVEL = 8; // minimum tilemap zoom ratio native:screen
 
-		bool zoom_in(float pixelscale) noexcept
+		struct info
 		{
-			if (m_auto_zoom)
+			bool zoom_in(float pixelscale) noexcept
 			{
-				// auto zoom never uses fractional factors
-				m_zoom = std::min<int>(std::lround(pixelscale) + 1, MAX_ZOOM_LEVEL);
-				m_zoom_frac = false;
-				m_auto_zoom = false;
-				return true;
-			}
-			else if (m_zoom_frac || (MAX_ZOOM_LEVEL > m_zoom))
-			{
-				if (!m_zoom_frac)
+				if (m_auto_zoom)
 				{
-					// remaining in integer zoom range
-					m_zoom++;
-				}
-				else if (m_zoom == 2)
-				{
-					// entering integer zoom range
-					m_zoom--;
+					// auto zoom never uses fractional factors
+					m_zoom = std::min<int>(std::lround(pixelscale) + 1, MAX_ZOOM_LEVEL);
 					m_zoom_frac = false;
+					m_auto_zoom = false;
+					return true;
+				}
+				else if (m_zoom_frac)
+				{
+					m_zoom--;
+					if (m_zoom == 1)
+						m_zoom_frac = false; // entering integer zoom range
+					return true;
+				}
+				else if (MAX_ZOOM_LEVEL > m_zoom)
+				{
+					m_zoom++; // remaining in integer zoom range
+					return true;
 				}
 				else
 				{
-					// remaining in fractional zoom range
-					m_zoom--;
+					return false;
 				}
-				return true;
 			}
-			else
-			{
-				return false;
-			}
-		}
 
-		bool zoom_out(float pixelscale) noexcept
-		{
-			if (m_auto_zoom)
+			bool zoom_out(float pixelscale) noexcept
 			{
-				// auto zoom never uses fractional factors
-				m_zoom = std::lround(pixelscale) - 1;
-				m_zoom_frac = !m_zoom;
-				if (m_zoom_frac)
-					m_zoom = 2;
-				m_auto_zoom = false;
-				return true;
-			}
-			else if (!m_zoom_frac || (MIN_ZOOM_LEVEL > m_zoom))
-			{
-				if (m_zoom_frac)
+				if (m_auto_zoom)
 				{
-					// remaining in fractional zoom range
-					m_zoom++;
+					// auto zoom never uses fractional factors
+					m_zoom = std::lround(pixelscale) - 1;
+					m_zoom_frac = !m_zoom;
+					if (m_zoom_frac)
+						m_zoom = 2;
+					m_auto_zoom = false;
+					return true;
 				}
-				else if (m_zoom == 1)
+				else if (!m_zoom_frac)
 				{
-					// entering fractional zoom range
-					m_zoom++;
-					m_zoom_frac = true;
+					if (m_zoom == 1)
+					{
+						m_zoom++;
+						m_zoom_frac = true; // entering fractional zoom range
+					}
+					else
+					{
+						m_zoom--; // remaining in integer zoom range
+					}
+					return true;
+				}
+				else if (MIN_ZOOM_LEVEL > m_zoom)
+				{
+					m_zoom++; // remaining in fractional zoom range
+					return true;
 				}
 				else
 				{
-					// remaining in integer zoom range
-					m_zoom--;
+					return false;
 				}
-				return true;
 			}
-			else
-			{
-				return false;
-			}
-		}
 
-		bool next_category() noexcept
-		{
-			if (TILEMAP_DRAW_ALL_CATEGORIES == m_flags)
+			bool next_category() noexcept
 			{
-				m_flags = 0U;
-				return true;
+				if (TILEMAP_DRAW_ALL_CATEGORIES == m_flags)
+				{
+					m_flags = 0U;
+					return true;
+				}
+				else if (TILEMAP_DRAW_CATEGORY_MASK > m_flags)
+				{
+					++m_flags;
+					return true;
+				}
+				else
+				{
+					return false;
+				}
 			}
-			else if (TILEMAP_DRAW_CATEGORY_MASK > m_flags)
-			{
-				++m_flags;
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
 
-		bool prev_catagory() noexcept
-		{
-			if (!m_flags)
+			bool prev_catagory() noexcept
 			{
-				m_flags = TILEMAP_DRAW_ALL_CATEGORIES;
-				return true;
+				if (!m_flags)
+				{
+					m_flags = TILEMAP_DRAW_ALL_CATEGORIES;
+					return true;
+				}
+				else if (TILEMAP_DRAW_ALL_CATEGORIES != m_flags)
+				{
+					--m_flags;
+					return true;
+				}
+				else
+				{
+					return false;
+				}
 			}
-			else if (TILEMAP_DRAW_ALL_CATEGORIES != m_flags)
-			{
-				--m_flags;
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
 
-		static int scroll_step(running_machine &machine) noexcept
+			int m_xoffs = 0;
+			int m_yoffs = 0;
+			unsigned m_zoom = 1U;
+			bool m_zoom_frac = false;
+			bool m_auto_zoom = true;
+			uint8_t m_rotate = 0U;
+			uint32_t m_flags = TILEMAP_DRAW_ALL_CATEGORIES;
+		};
+
+		static int scroll_step(running_machine &machine)
 		{
 			auto &input = machine.input();
 			if (input.code_pressed(KEYCODE_LCONTROL) || input.code_pressed(KEYCODE_RCONTROL))
@@ -442,6 +495,9 @@ private:
 			else
 				return 8;
 		}
+
+		std::vector<info> m_info;
+		unsigned m_index = 0U;
 	};
 
 	bool is_relevant() const noexcept
@@ -597,8 +653,8 @@ bool gfx_viewer::gfxset::handle_keys(running_machine &machine, int xcells, int y
 		result = true;
 
 	auto &info = m_devices[m_device];
-	auto &set = info.m_sets[m_set];
-	auto &gfx = *info.m_interface->gfx(m_set);
+	auto &set = info.set(m_set);
+	auto &gfx = *info.interface().gfx(m_set);
 
 	// handle cells per line (0/-/=)
 	if (input.pressed(IPT_UI_ZOOM_OUT) && (xcells < 128))
@@ -698,91 +754,93 @@ bool gfx_viewer::tilemap::handle_keys(running_machine &machine, float pixelscale
 		m_index--;
 		result = true;
 	}
-	if (input.pressed(IPT_UI_NEXT_GROUP) && m_index < machine.tilemap().count() - 1)
+	if (input.pressed(IPT_UI_NEXT_GROUP) && ((m_info.size() - 1) > m_index))
 	{
 		m_index++;
 		result = true;
 	}
 
+	auto &info = m_info[m_index];
+
 	// handle zoom (minus,plus)
-	if (input.pressed(IPT_UI_ZOOM_OUT) && zoom_out(pixelscale))
+	if (input.pressed(IPT_UI_ZOOM_OUT) && info.zoom_out(pixelscale))
 	{
 		result = true;
-		machine.popmessage(m_zoom_frac ? _("Zoom = 1/%1$d") : _("Zoom = %1$d"), m_zoom);
+		machine.popmessage(info.m_zoom_frac ? _("Zoom = 1/%1$d") : _("Zoom = %1$d"), info.m_zoom);
 	}
-	if (input.pressed(IPT_UI_ZOOM_IN) && zoom_in(pixelscale))
+	if (input.pressed(IPT_UI_ZOOM_IN) && info.zoom_in(pixelscale))
 	{
 		result = true;
-		machine.popmessage(m_zoom_frac ? _("Zoom = 1/%1$d") : _("Zoom = %1$d"), m_zoom);
+		machine.popmessage(info.m_zoom_frac ? _("Zoom = 1/%1$d") : _("Zoom = %1$d"), info.m_zoom);
 	}
-	if (input.pressed(IPT_UI_ZOOM_DEFAULT) && !m_auto_zoom)
+	if (input.pressed(IPT_UI_ZOOM_DEFAULT) && !info.m_auto_zoom)
 	{
-		m_auto_zoom = true;
+		info.m_auto_zoom = true;
 		machine.popmessage(_("Expand to fit"));
 	}
 
 	// handle rotation (R)
 	if (input.pressed(IPT_UI_ROTATE))
 	{
-		m_rotate = orientation_add(ROT90, m_rotate);
+		info.m_rotate = orientation_add(ROT90, info.m_rotate);
 		result = true;
 	}
 
 	// return to (0,0) (HOME)
 	if (input.pressed(IPT_UI_HOME))
 	{
-		m_xoffs = 0;
-		m_yoffs = 0;
+		info.m_xoffs = 0;
+		info.m_yoffs = 0;
 		result = true;
 	}
 
 	// handle flags (category)
-	if (input.pressed(IPT_UI_PAGE_UP) && prev_catagory())
+	if (input.pressed(IPT_UI_PAGE_UP) && info.prev_catagory())
 	{
 		result = true;
-		if (TILEMAP_DRAW_ALL_CATEGORIES == m_flags)
+		if (TILEMAP_DRAW_ALL_CATEGORIES == info.m_flags)
 			machine.popmessage("Category All");
 		else
-			machine.popmessage("Category = %d", m_flags);
+			machine.popmessage("Category = %d", info.m_flags);
 	}
-	if (input.pressed(IPT_UI_PAGE_DOWN) && next_category())
+	if (input.pressed(IPT_UI_PAGE_DOWN) && info.next_category())
 	{
 		result = true;
-		machine.popmessage("Category = %d", m_flags);
+		machine.popmessage("Category = %d", info.m_flags);
 	}
 
 	// handle navigation (up,down,left,right), taking orientation into account
 	int const step = scroll_step(machine); // this may be applied more than once if multiple directions are pressed
 	if (input.pressed_repeat(IPT_UI_UP, 4))
 	{
-		if (m_rotate & ORIENTATION_SWAP_XY)
-			m_xoffs -= (m_rotate & ORIENTATION_FLIP_Y) ? -step : step;
+		if (info.m_rotate & ORIENTATION_SWAP_XY)
+			info.m_xoffs -= (info.m_rotate & ORIENTATION_FLIP_Y) ? -step : step;
 		else
-			m_yoffs -= (m_rotate & ORIENTATION_FLIP_Y) ? -step : step;
+			info.m_yoffs -= (info.m_rotate & ORIENTATION_FLIP_Y) ? -step : step;
 		result = true;
 	}
 	if (input.pressed_repeat(IPT_UI_DOWN, 4))
 	{
-		if (m_rotate & ORIENTATION_SWAP_XY)
-			m_xoffs += (m_rotate & ORIENTATION_FLIP_Y) ? -step : step;
+		if (info.m_rotate & ORIENTATION_SWAP_XY)
+			info.m_xoffs += (info.m_rotate & ORIENTATION_FLIP_Y) ? -step : step;
 		else
-			m_yoffs += (m_rotate & ORIENTATION_FLIP_Y) ? -step : step;
+			info.m_yoffs += (info.m_rotate & ORIENTATION_FLIP_Y) ? -step : step;
 		result = true;
 	}
 	if (input.pressed_repeat(IPT_UI_LEFT, 6))
 	{
-		if (m_rotate & ORIENTATION_SWAP_XY)
-			m_yoffs -= (m_rotate & ORIENTATION_FLIP_X) ? -step : step;
+		if (info.m_rotate & ORIENTATION_SWAP_XY)
+			info.m_yoffs -= (info.m_rotate & ORIENTATION_FLIP_X) ? -step : step;
 		else
-			m_xoffs -= (m_rotate & ORIENTATION_FLIP_X) ? -step : step;
+			info.m_xoffs -= (info.m_rotate & ORIENTATION_FLIP_X) ? -step : step;
 		result = true;
 	}
 	if (input.pressed_repeat(IPT_UI_RIGHT, 6))
 	{
-		if (m_rotate & ORIENTATION_SWAP_XY)
-			m_yoffs += (m_rotate & ORIENTATION_FLIP_X) ? -step : step;
+		if (info.m_rotate & ORIENTATION_SWAP_XY)
+			info.m_yoffs += (info.m_rotate & ORIENTATION_FLIP_X) ? -step : step;
 		else
-			m_xoffs += (m_rotate & ORIENTATION_FLIP_X) ? -step : step;
+			info.m_xoffs += (info.m_rotate & ORIENTATION_FLIP_X) ? -step : step;
 		result = true;
 	}
 
@@ -792,14 +850,14 @@ bool gfx_viewer::tilemap::handle_keys(running_machine &machine, float pixelscale
 	uint32_t const mapheight = tilemap->height();
 
 	// clamp within range
-	while (m_xoffs < 0)
-		m_xoffs += mapwidth;
-	while (m_xoffs >= mapwidth)
-		m_xoffs -= mapwidth;
-	while (m_yoffs < 0)
-		m_yoffs += mapheight;
-	while (m_yoffs >= mapheight)
-		m_yoffs -= mapheight;
+	while (info.m_xoffs < 0)
+		info.m_xoffs += mapwidth;
+	while (info.m_xoffs >= mapwidth)
+		info.m_xoffs -= mapwidth;
+	while (info.m_yoffs < 0)
+		info.m_yoffs += mapheight;
+	while (info.m_yoffs >= mapheight)
+		info.m_yoffs -= mapheight;
 
 	return result;
 }
@@ -813,9 +871,9 @@ uint32_t gfx_viewer::handle_palette(mame_ui_manager &mui, render_container &cont
 	bool const indirect = m_palette.indirect();
 	unsigned const total = indirect ? palette.indirect_entries() : palette.entries();
 	rgb_t const *const raw_color = palette.palette()->entry_list_raw();
-	render_font *const ui_font = mui.get_font();
 
 	// add a half character padding for the box
+	render_font *const ui_font = mui.get_font();
 	float const aspect = m_machine.render().ui_aspect(&container);
 	float const chheight = mui.get_line_height();
 	float const chwidth = ui_font->char_width(chheight, aspect, '0');
@@ -953,8 +1011,8 @@ uint32_t gfx_viewer::handle_gfxset(mame_ui_manager &mui, render_container &conta
 {
 	// get graphics info
 	auto &info = m_gfxset.m_devices[m_gfxset.m_device];
-	auto &set = info.m_sets[m_gfxset.m_set];
-	device_gfx_interface &interface = *info.m_interface;
+	auto &set = info.set(m_gfxset.m_set);
+	device_gfx_interface &interface = info.interface();
 	gfx_element &gfx = *interface.gfx(m_gfxset.m_set);
 
 	// get some UI metrics
@@ -998,19 +1056,27 @@ uint32_t gfx_viewer::handle_gfxset(mame_ui_manager &mui, render_container &conta
 	float pixelscale = 0.0f;
 	while (xcells > 1)
 	{
-		pixelscale = (cellboxwidth / xcells) / cellxpix;
+		pixelscale = cellboxwidth / (xcells * cellxpix);
 		if (set.m_integer_scale)
 			pixelscale = std::floor(pixelscale);
 		if (0.25f <= pixelscale)
 			break;
 		xcells--;
 	}
-	set.m_columns = xcells;
+	if (0.0f == pixelscale)
+		pixelscale = cellboxwidth / (xcells * cellxpix);
 
 	// in the Y direction, we just display as many as we can
-	int const ycells = int(cellboxheight / (pixelscale * cellypix));
+	int ycells = int(cellboxheight / (pixelscale * cellypix));
+	if (!ycells)
+	{
+		ycells = 1;
+		pixelscale = cellboxheight / cellypix;
+		xcells = int(cellboxwidth / (pixelscale * cellxpix));
+	}
 
 	// now determine the actual cellbox size
+	set.m_columns = xcells;
 	cellboxwidth = std::min(cellboxwidth, xcells * pixelscale * cellxpix);
 	cellboxheight = std::min(cellboxheight, ycells * pixelscale * cellypix);
 
@@ -1036,7 +1102,7 @@ uint32_t gfx_viewer::handle_gfxset(mame_ui_manager &mui, render_container &conta
 
 	// figure out the title
 	std::ostringstream title_buf;
-	util::stream_format(title_buf, "'%s' %d/%d", interface.device().tag(), m_gfxset.m_set, info.m_setcount - 1);
+	util::stream_format(title_buf, "'%s' %d/%d", interface.device().tag(), m_gfxset.m_set, info.setcount() - 1);
 
 	// if the mouse pointer is over a pixel in a tile, add some info about the tile and pixel
 	bool found_pixel = false;
@@ -1149,10 +1215,10 @@ uint32_t gfx_viewer::handle_tilemap(mame_ui_manager &mui, render_container &cont
 	float const chwidth = ui_font->char_width(chheight, aspect, '0');
 
 	// get the size of the tilemap itself
-	tilemap_t &tilemap = *m_machine.tilemap().find(m_tilemap.m_index);
+	tilemap_t &tilemap = *m_machine.tilemap().find(m_tilemap.index());
 	uint32_t mapwidth = tilemap.width();
 	uint32_t mapheight = tilemap.height();
-	if (m_tilemap.m_rotate & ORIENTATION_SWAP_XY)
+	if (m_tilemap.rotate() & ORIENTATION_SWAP_XY)
 		std::swap(mapwidth, mapheight);
 
 	// add a half character padding for the box
@@ -1177,7 +1243,7 @@ uint32_t gfx_viewer::handle_tilemap(mame_ui_manager &mui, render_container &cont
 	int mapboxheight = mapboxbounds.height() * float(targheight);
 
 	float pixelscale;
-	if (m_tilemap.m_auto_zoom)
+	if (m_tilemap.auto_zoom())
 	{
 		// determine the maximum integral scaling factor
 		pixelscale = std::min(std::floor(mapboxwidth / mapwidth), std::floor(mapboxheight / mapheight));
@@ -1185,7 +1251,7 @@ uint32_t gfx_viewer::handle_tilemap(mame_ui_manager &mui, render_container &cont
 	}
 	else
 	{
-		pixelscale = m_tilemap.m_zoom_frac ? (1.0f / m_tilemap.m_zoom) : float(m_tilemap.m_zoom);
+		pixelscale = m_tilemap.zoom_scale();
 	}
 
 	// recompute the final box size
@@ -1206,7 +1272,7 @@ uint32_t gfx_viewer::handle_tilemap(mame_ui_manager &mui, render_container &cont
 
 	// figure out the title
 	std::ostringstream title_buf;
-	util::stream_format(title_buf, "TILEMAP %d/%d", m_tilemap.m_index + 1, m_machine.tilemap().count());
+	util::stream_format(title_buf, "TILEMAP %d/%d", m_tilemap.index() + 1, m_machine.tilemap().count());
 
 	// if the mouse pointer is over a tile, add some info about its coordinates and color
 	float mouse_x, mouse_y;
@@ -1214,14 +1280,14 @@ uint32_t gfx_viewer::handle_tilemap(mame_ui_manager &mui, render_container &cont
 	{
 		int xpixel = (mouse_x - mapboxbounds.x0) * targwidth;
 		int ypixel = (mouse_y - mapboxbounds.y0) * targheight;
-		if (m_tilemap.m_rotate & ORIENTATION_FLIP_X)
+		if (m_tilemap.rotate() & ORIENTATION_FLIP_X)
 			xpixel = (mapboxwidth - 1) - xpixel;
-		if (m_tilemap.m_rotate & ORIENTATION_FLIP_Y)
+		if (m_tilemap.rotate() & ORIENTATION_FLIP_Y)
 			ypixel = (mapboxheight - 1) - ypixel;
-		if (m_tilemap.m_rotate & ORIENTATION_SWAP_XY)
+		if (m_tilemap.rotate() & ORIENTATION_SWAP_XY)
 			std::swap(xpixel, ypixel);
-		uint32_t const col = ((std::lround(xpixel / pixelscale) + m_tilemap.m_xoffs) / tilemap.tilewidth()) % tilemap.cols();
-		uint32_t const row = ((std::lround(ypixel / pixelscale) + m_tilemap.m_yoffs) / tilemap.tileheight()) % tilemap.rows();
+		uint32_t const col = ((std::lround(xpixel / pixelscale) + m_tilemap.xoffs()) / tilemap.tilewidth()) % tilemap.cols();
+		uint32_t const row = ((std::lround(ypixel / pixelscale) + m_tilemap.yoffs()) / tilemap.tileheight()) % tilemap.rows();
 		uint8_t gfxnum;
 		uint32_t code, color;
 		tilemap.get_info_debug(col, row, gfxnum, code, color);
@@ -1231,11 +1297,11 @@ uint32_t gfx_viewer::handle_tilemap(mame_ui_manager &mui, render_container &cont
 	}
 	else
 	{
-		util::stream_format(title_buf, " %dx%d OFFS %d,%d", tilemap.width(), tilemap.height(), m_tilemap.m_xoffs, m_tilemap.m_yoffs);
+		util::stream_format(title_buf, " %dx%d OFFS %d,%d", tilemap.width(), tilemap.height(), m_tilemap.xoffs(), m_tilemap.yoffs());
 	}
 
-	if (m_tilemap.m_flags != TILEMAP_DRAW_ALL_CATEGORIES)
-		util::stream_format(title_buf, " CAT %u", m_tilemap.m_flags);
+	if (m_tilemap.flags() != TILEMAP_DRAW_ALL_CATEGORIES)
+		util::stream_format(title_buf, " CAT %u", m_tilemap.flags());
 
 	// expand the outer box to fit the title
 	std::string const title = std::move(title_buf).str();
@@ -1266,7 +1332,7 @@ uint32_t gfx_viewer::handle_tilemap(mame_ui_manager &mui, render_container &cont
 			mapboxbounds.x0, mapboxbounds.y0,
 			mapboxbounds.x1, mapboxbounds.y1,
 			rgb_t::white(), m_texture,
-			PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(m_tilemap.m_rotate));
+			PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(m_tilemap.rotate()));
 
 	// handle keyboard input
 	if (m_tilemap.handle_keys(m_machine, pixelscale))
@@ -1278,7 +1344,7 @@ uint32_t gfx_viewer::handle_tilemap(mame_ui_manager &mui, render_container &cont
 void gfx_viewer::update_gfxset_bitmap(int xcells, int ycells, gfx_element &gfx)
 {
 	auto const &info = m_gfxset.m_devices[m_gfxset.m_device];
-	auto const &set = info.m_sets[m_gfxset.m_set];
+	auto const &set = info.set(m_gfxset.m_set);
 
 	// compute the number of source pixels in a cell
 	int const cellxpix = 1 + ((set.m_rotate & ORIENTATION_SWAP_XY) ? gfx.height() : gfx.width());
@@ -1327,7 +1393,7 @@ void gfx_viewer::update_gfxset_bitmap(int xcells, int ycells, gfx_element &gfx)
 void gfx_viewer::update_tilemap_bitmap(int width, int height)
 {
 	// swap the coordinates back if they were talking about a rotated surface
-	if (m_tilemap.m_rotate & ORIENTATION_SWAP_XY)
+	if (m_tilemap.rotate() & ORIENTATION_SWAP_XY)
 		std::swap(width, height);
 
 	// reallocate the bitmap if it is too small
@@ -1337,10 +1403,10 @@ void gfx_viewer::update_tilemap_bitmap(int width, int height)
 	if (m_bitmap_dirty)
 	{
 		m_bitmap.fill(0);
-		tilemap_t &tilemap = *m_machine.tilemap().find(m_tilemap.m_index);
+		tilemap_t &tilemap = *m_machine.tilemap().find(m_tilemap.index());
 		screen_device *const first_screen = screen_device_enumerator(m_machine.root_device()).first();
 		if (first_screen)
-			tilemap.draw_debug(*first_screen, m_bitmap, m_tilemap.m_xoffs, m_tilemap.m_yoffs, m_tilemap.m_flags);
+			tilemap.draw_debug(*first_screen, m_bitmap, m_tilemap.xoffs(), m_tilemap.yoffs(), m_tilemap.flags());
 
 		// reset the texture to force an update
 		m_texture->set_bitmap(m_bitmap, m_bitmap.cliprect(), TEXFORMAT_RGB32);

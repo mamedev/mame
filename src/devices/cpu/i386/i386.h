@@ -1650,6 +1650,8 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	virtual void opcode_cpuid() override;
 };
 
 
