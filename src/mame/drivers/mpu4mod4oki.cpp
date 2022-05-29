@@ -1444,7 +1444,7 @@ GAME_CUSTOM( 199?, m4toot__ak,   m4toot, "tot06y.p1",    0x0000, 0x020000, CRC(8
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TOOT_EXTRA_ROMS_ALT \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_milclb, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
 
 // do not boot with tenoutten.chr
 
@@ -3743,7 +3743,7 @@ GAME_CUSTOM( 199?, m4cashat__z,    m4cashat,   "caa23y.p1",        0x0000, 0x020
 		ROM_LOAD( name, offset, length, hash ) \
 		M4CASHAT_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_milclb, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
 
 
 // do not boot with tri98.chr

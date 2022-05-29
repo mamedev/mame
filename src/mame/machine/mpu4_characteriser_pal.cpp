@@ -198,6 +198,8 @@ void mpu4_characteriser_pal::protection_w(uint8_t data)
 				uint8_t call = challenge_table[x];
 
 				// ignore bit 0x20 and above (see note above about alt challenge table)
+				// note, the 4k tables used by the quiz games suggest this bit DOES change the sequence
+				// at least on some of the PALs, maybe later ones had an extra input line?
 				if ((call & 0x1f) == (data & 0x1f))
 				{
 					m_prot_col = x;

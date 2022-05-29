@@ -102,7 +102,7 @@ public:
 	static constexpr uint8_t rr6_lamp_scramble[8] = { 0x00, 0x18, 0x10, 0x18, 0x10, 0x18, 0x10, 0x14 };
 
 	// games with sequence starting 00 30 20 14 64 30 44 30 64 34 00 74 20
-	static constexpr uint8_t rhm_lamp_scramble[8] = { 0x00, 0x70, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00 };
+	static constexpr uint8_t rhm_lamp_scramble[8] = { 0x00, 0x70, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00 }; // incomplete? doesn't seem correct for the lower rows of the roadhog set using it
 
 	// games with sequence starting 00 14 04 94 A8 6C C4 30 8C E8 E0 BC D4
 	static constexpr uint8_t m574_lamp_scramble[8] = { 0x03, 0x9F, 0x17, 0x9B, 0x93, 0x1F, 0x17, 0x13 };
@@ -145,7 +145,10 @@ public:
 	// games with sequence 00 e4 ec f8 54 08 d0 80 44 2c 58 b4 e8 b0 80
 	static constexpr uint8_t nifty_lamp_scramble[8] = { 0x03, 0xE7, 0xA7, 0x87, 0xE7, 0x07, 0xA7, 0xE7 };
 
+	// games with sequence 00 84 a4 e4 b0 34 54 44 d4 64 80 f4 24 80 f4 20
+	static constexpr uint8_t milclb_lamp_scramble[8] = { 0x00, 0x54, 0x00, 0x54, 0x40, 0x10, 0x00, 0x00 };
 
+	
 
 	/***************************************************************
 
