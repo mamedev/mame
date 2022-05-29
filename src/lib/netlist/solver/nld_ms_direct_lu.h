@@ -43,7 +43,7 @@ public:
 
 	unsigned N() const { if (m_N == 0) return m_dim; else return m_N; }
 
-	int vsolve_non_dynamic(bool newton_raphson);
+	int upstream_solve_non_dynamic(bool newton_raphson);
 
 protected:
 	virtual void add_term(int net_idx, terminal_t *term) override;
@@ -141,7 +141,7 @@ protected:
 	 * Don't schedule a new calculation time. The recalculation has to be
 	 * triggered by the caller after the netlist element was changed.
 	 */
-	nl_double compute_next_timestep();
+	nl_double compute_next_time_step();
 
 	template <typename T1, typename T2>
 	nl_ext_double &A(const T1 r, const T2 c) { return m_A[r][c]; }
@@ -169,9 +169,9 @@ matrix_solver_direct_t<m_N, storage_N>::~matrix_solver_direct_t()
 }
 
 template <unsigned m_N, unsigned storage_N>
-nl_double matrix_solver_direct_t<m_N, storage_N>::compute_next_timestep()
+nl_double matrix_solver_direct_t<m_N, storage_N>::compute_next_time_step()
 {
-	nl_double new_solver_timestep = m_params.m_max_timestep;
+	nl_double new_solver_time_step = m_params.m_max_time_step;
 
 	if (m_params.m_dynamic_ts)
 	{
@@ -184,29 +184,29 @@ nl_double matrix_solver_direct_t<m_N, storage_N>::compute_next_timestep()
 			analog_net_t *n = m_nets[k];
 
 			const nl_double DD_n = (n->Q_Analog() - m_last_V[k]);
-			const nl_double hn = current_timestep();
+			const nl_double hn = current_time_step();
 
 			nl_double DD2 = (DD_n / hn - n->m_DD_n_m_1 / n->m_h_n_m_1) / (hn + n->m_h_n_m_1);
-			nl_double new_net_timestep;
+			nl_double new_net_time_step;
 
 			n->m_h_n_m_1 = hn;
 			n->m_DD_n_m_1 = DD_n;
 			if (plib::abs(DD2) > NL_FCONST(1e-30)) // avoid div-by-zero
-				new_net_timestep = std::sqrt(m_params.m_dynamic_lte / plib::abs(NL_FCONST(0.5)*DD2));
+				new_net_time_step = std::sqrt(m_params.m_dynamic_lte / plib::abs(NL_FCONST(0.5)*DD2));
 			else
-				new_net_timestep = m_params.m_max_timestep;
+				new_net_time_step = m_params.m_max_time_step;
 
-			if (new_net_timestep < new_solver_timestep)
-				new_solver_timestep = new_net_timestep;
+			if (new_net_time_step < new_solver_time_step)
+				new_solver_time_step = new_net_time_step;
 		}
-		if (new_solver_timestep < m_params.m_min_timestep)
-			new_solver_timestep = m_params.m_min_timestep;
-		if (new_solver_timestep > m_params.m_max_timestep)
-			new_solver_timestep = m_params.m_max_timestep;
+		if (new_solver_time_step < m_params.m_min_time_step)
+			new_solver_time_step = m_params.m_min_time_step;
+		if (new_solver_time_step > m_params.m_max_time_step)
+			new_solver_time_step = m_params.m_max_time_step;
 	}
-	//#if (new_solver_timestep > 10.0 * hn)
-	//#    new_solver_timestep = 10.0 * hn;
-	return new_solver_timestep;
+	//#if (new_solver_time_step > 10.0 * hn)
+	//#    new_solver_time_step = 10.0 * hn;
+	return new_solver_time_step;
 }
 
 template <unsigned m_N, unsigned storage_N>
@@ -592,7 +592,7 @@ unsigned matrix_solver_direct_t<m_N, storage_N>::solve_non_dynamic(bool newton_r
 }
 
 template <unsigned m_N, unsigned storage_N>
-int matrix_solver_direct_t<m_N, storage_N>::vsolve_non_dynamic(bool newton_raphson)
+int matrix_solver_direct_t<m_N, storage_N>::upstream_solve_non_dynamic(bool newton_raphson)
 {
 	this->build_LE_A();
 	this->build_LE_RHS(m_RHS);

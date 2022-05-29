@@ -113,22 +113,22 @@ namespace netlist::devices {
 		NETLIB_CONSTRUCTOR_MODEL(CD4020, "CD4XXX")
 		, m_sub(*this, "A")
 		{
-			register_subalias("IP", "A.IP");
-			register_subalias("RESET", "A.RESET");
-			register_subalias("Q1", "A.Q1");
-			register_subalias("Q4", "A.Q4");
-			register_subalias("Q5", "A.Q5");
-			register_subalias("Q6", "A.Q6");
-			register_subalias("Q7", "A.Q7");
-			register_subalias("Q8", "A.Q8");
-			register_subalias("Q9", "A.Q9");
-			register_subalias("Q10", "A.Q10");
-			register_subalias("Q11", "A.Q11");
-			register_subalias("Q12", "A.Q12");
-			register_subalias("Q13", "A.Q13");
-			register_subalias("Q14", "A.Q14");
-			register_subalias("VDD", "A.VDD");
-			register_subalias("VSS", "A.VSS");
+			register_sub_alias("IP", "A.IP");
+			register_sub_alias("RESET", "A.RESET");
+			register_sub_alias("Q1", "A.Q1");
+			register_sub_alias("Q4", "A.Q4");
+			register_sub_alias("Q5", "A.Q5");
+			register_sub_alias("Q6", "A.Q6");
+			register_sub_alias("Q7", "A.Q7");
+			register_sub_alias("Q8", "A.Q8");
+			register_sub_alias("Q9", "A.Q9");
+			register_sub_alias("Q10", "A.Q10");
+			register_sub_alias("Q11", "A.Q11");
+			register_sub_alias("Q12", "A.Q12");
+			register_sub_alias("Q13", "A.Q13");
+			register_sub_alias("Q14", "A.Q14");
+			register_sub_alias("VDD", "A.VDD");
+			register_sub_alias("VSS", "A.VSS");
 		}
 
 		//NETLIB_RESETI() {}
@@ -142,17 +142,17 @@ namespace netlist::devices {
 		NETLIB_CONSTRUCTOR_MODEL(CD4024, "CD4XXX")
 		, m_sub(*this, "A")
 		{
-			register_subalias("IP", "A.IP");
-			register_subalias("RESET", "A.RESET");
-			register_subalias("Q1", "A.Q1");
-			register_subalias("Q2", "A.Q2");
-			register_subalias("Q3", "A.Q3");
-			register_subalias("Q4", "A.Q4");
-			register_subalias("Q5", "A.Q5");
-			register_subalias("Q6", "A.Q6");
-			register_subalias("Q7", "A.Q7");
-			register_subalias("VDD", "A.VDD");
-			register_subalias("VSS", "A.VSS");
+			register_sub_alias("IP", "A.IP");
+			register_sub_alias("RESET", "A.RESET");
+			register_sub_alias("Q1", "A.Q1");
+			register_sub_alias("Q2", "A.Q2");
+			register_sub_alias("Q3", "A.Q3");
+			register_sub_alias("Q4", "A.Q4");
+			register_sub_alias("Q5", "A.Q5");
+			register_sub_alias("Q6", "A.Q6");
+			register_sub_alias("Q7", "A.Q7");
+			register_sub_alias("VDD", "A.VDD");
+			register_sub_alias("VSS", "A.VSS");
 		}
 
 		//NETLIB_RESETI() {}

@@ -134,7 +134,7 @@ namespace netlist
 			}
 
 			constexpr const netlist_time_ext &next_scheduled_time() const noexcept { return m_next_scheduled_time; }
-			void set_next_scheduled_time(netlist_time_ext ntime) noexcept { m_next_scheduled_time = ntime; }
+			void set_next_scheduled_time(netlist_time_ext next_time) noexcept { m_next_scheduled_time = next_time; }
 
 			bool is_rail_net() const noexcept { return !(m_rail_terminal == nullptr); }
 			core_terminal_t & rail_terminal() const noexcept { return *m_rail_terminal; }
@@ -258,7 +258,7 @@ namespace netlist
 			state_var<netlist_sig_t>     m_new_Q;
 			state_var<netlist_sig_t>     m_cur_Q;
 			state_var<queue_status>      m_in_queue;
-			plib::linkedlist_t<core_terminal_t> m_list_active;
+			plib::linked_list_t<core_terminal_t> m_list_active;
 			state_var<netlist_time_ext>  m_next_scheduled_time;
 
 			core_terminal_t * m_rail_terminal;

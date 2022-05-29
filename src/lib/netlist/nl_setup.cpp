@@ -2,10 +2,10 @@
 // copyright-holders:Couriersud
 
 #include "plib/palloc.h"
+#include "core/devices.h"
 #include "core/setup.h"
 #include "devices/nlid_proxy.h"
 #include "devices/nlid_truthtable.h"
-#include "nl_base.h"
 #include "nl_errstr.h"
 #include "nl_factory.h"
 #include "nl_parser.h"
@@ -94,14 +94,14 @@ namespace netlist
 
 		m_abstract.m_device_factory.insert(m_abstract.m_device_factory.end(), {key, f});
 
-		auto paramlist = plib::psplit(f->param_desc(), ',');
+		auto parameter_list = plib::psplit(f->param_desc(), ',');
 
 		if (!params_and_connections.empty())
 		{
 			auto ptok(params_and_connections.begin());
 			auto ptok_end(params_and_connections.end());
 
-			for (const pstring &tp : paramlist)
+			for (const pstring &tp : parameter_list)
 			{
 				if (plib::startsWith(tp, "+"))
 				{
@@ -153,9 +153,9 @@ namespace netlist
 			*felem = f;
 	}
 
-	void nlparse_t::register_hint(const pstring &objname, const pstring &hintname)
+	void nlparse_t::register_hint(const pstring &object_name, const pstring &hint_name)
 	{
-		const auto name = build_fqn(objname) + hintname;
+		const auto name = build_fqn(object_name) + hint_name;
 		if (!m_abstract.m_hints.insert({name, false}).second)
 		{
 			log().fatal(MF_ADDING_HINT_1(name));
@@ -313,9 +313,9 @@ namespace netlist
 		register_source<netlist::source_proc_t>(name, func);
 	}
 
-	void nlparse_t::truthtable_create(tt_desc &desc, const pstring &def_params, plib::source_location &&loc)
+	void nlparse_t::truth_table_create(tt_desc &desc, const pstring &def_params, plib::source_location &&loc)
 	{
-		auto fac = factory::truthtable_create(desc, netlist::factory::properties(def_params, std::move(loc)));
+		auto fac = factory::truth_table_create(desc, netlist::factory::properties(def_params, std::move(loc)));
 		factory().add(std::move(fac));
 	}
 
@@ -353,16 +353,16 @@ namespace netlist
 		return false;
 	}
 
-	bool nlparse_t::parse_tokens(const plib::detail::token_store &tokens, const pstring &name)
+	bool nlparse_t::parse_tokens(const plib::detail::token_store_t &tokens, const pstring &name)
 	{
 		parser_t parser(*this);
 		return parser.parse(tokens, name);
 	}
 
-	bool nlparse_t::parse_stream(plib::istream_uptr &&istrm, const pstring &name)
+	bool nlparse_t::parse_stream(plib::istream_uptr &&in_stream, const pstring &name)
 	{
 #if 0
-		auto key = istrm.filename();
+		auto key = in_stream.filename();
 
 		if (m_source_cache.find(key) != m_source_cache.end())
 		{
@@ -371,38 +371,38 @@ namespace netlist
 		else
 		{
 			auto preprocessed = std::make_unique<std::stringstream>(
-					plib::ppreprocessor(m_includes, &m_defines).process(std::move(istrm), istrm.filename()));
+					plib::ppreprocessor(m_includes, &m_defines).process(std::move(in_stream), in_stream.filename()));
 
-			parser_t::token_store &st = m_source_cache[key];
+			parser_t::token_store_t &st = m_source_cache[key];
 			parser_t parser(*this);
 			parser.parse_tokens(plib::istream_uptr(std::move(preprocessed), key), st);
 			return parser.parse(st, name);
 		}
 #else
-		const auto filename = istrm.filename();
+		const auto filename = in_stream.filename();
 		auto preprocessed = std::make_unique<std::stringstream>(putf8string(
-				plib::ppreprocessor(m_includes, &m_defines).process(std::move(istrm), filename)));
+				plib::ppreprocessor(m_includes, &m_defines).process(std::move(in_stream), filename)));
 
-		parser_t::token_store st;
+		parser_t::token_store_t st;
 		parser_t parser(*this);
 		parser.parse_tokens(plib::istream_uptr(std::move(preprocessed), filename), st);
 		return parser.parse(st, name);
 #endif
 	}
 
-	void nlparse_t::add_define(const pstring &defstr)
+	void nlparse_t::add_define(const pstring &define)
 	{
-		auto p = defstr.find('=');
+		auto p = define.find('=');
 		if (p != pstring::npos)
-			add_define(plib::left(defstr, p), defstr.substr(p+1));
+			add_define(plib::left(define, p), define.substr(p+1));
 		else
-			add_define(defstr, "1");
+			add_define(define, "1");
 	}
 
-	void nlparse_t::register_dynamic_log_devices(const std::vector<pstring> &loglist)
+	void nlparse_t::register_dynamic_log_devices(const std::vector<pstring> &log_list)
 	{
 		log().debug("Creating dynamic logs ...");
-		for (const pstring &ll : loglist)
+		for (const pstring &ll : log_list)
 		{
 			pstring name = "log_" + ll;
 
@@ -497,8 +497,8 @@ pstring setup_t::termtype_as_str(detail::core_terminal_t &in)
 pstring setup_t::get_initial_param_val(const pstring &name, const pstring &def) const
 {
 	// When `get_intial_param_val` is called the parameter `<name>` is already registered
-	// and the value `(valstr())` is set to the default value, e.g. "74XX"
-	// If thus `$(IC5E.A.MODEL)` is given for `name=="IC5E.A.MODEL"` `valstr()` below
+	// and the value `(value_string())` is set to the default value, e.g. "74XX"
+	// If thus `$(IC5E.A.MODEL)` is given for `name=="IC5E.A.MODEL"` `value_string()` below
 	// will return the default.
 	// FIXME: It may be more explicit and stable to test if pattern==name and return
 	// `def` in this case.
@@ -525,7 +525,7 @@ pstring setup_t::get_initial_param_val(const pstring &name, const pstring &def) 
 				auto k = m_params.find(r);
 				if (k != m_params.end())
 				{
-					v = v + k->second.param().valstr();
+					v = v + k->second.param().value_string();
 					found_pat = true;
 				}
 				else
@@ -703,12 +703,12 @@ detail::core_terminal_t *setup_t::find_terminal(const pstring &terminal_in,
 
 param_ref_t setup_t::find_param(const pstring &param_in) const
 {
-	const pstring outname(resolve_alias(param_in));
-	auto ret(m_params.find(outname));
+	const pstring resolved_param_name(resolve_alias(param_in));
+	auto ret(m_params.find(resolved_param_name));
 	if (ret == m_params.end())
 	{
-		log().fatal(MF_PARAMETER_1_2_NOT_FOUND(param_in, outname));
-		throw nl_exception(MF_PARAMETER_1_2_NOT_FOUND(param_in, outname));
+		log().fatal(MF_PARAMETER_1_2_NOT_FOUND(param_in, resolved_param_name));
+		throw nl_exception(MF_PARAMETER_1_2_NOT_FOUND(param_in, resolved_param_name));
 	}
 	return ret->second;
 }
@@ -822,29 +822,29 @@ detail::core_terminal_t &setup_t::resolve_proxy(detail::core_terminal_t &term)
 
 
 //NOLINTNEXTLINE(misc-no-recursion)
-void setup_t::merge_nets(detail::net_t &thisnet, detail::net_t &othernet)
+void setup_t::merge_nets(detail::net_t &this_net, detail::net_t &other_net)
 {
 	log().debug("merging nets ...\n");
-	if (&othernet == &thisnet)
+	if (&other_net == &this_net)
 	{
-		log().warning(MW_CONNECTING_1_TO_ITSELF(thisnet.name()));
+		log().warning(MW_CONNECTING_1_TO_ITSELF(this_net.name()));
 		return; // Nothing to do
 	}
 
-	if (thisnet.is_rail_net() && othernet.is_rail_net())
+	if (this_net.is_rail_net() && other_net.is_rail_net())
 	{
-		log().fatal(MF_MERGE_RAIL_NETS_1_AND_2(thisnet.name(), othernet.name()));
-		throw nl_exception(MF_MERGE_RAIL_NETS_1_AND_2(thisnet.name(), othernet.name()));
+		log().fatal(MF_MERGE_RAIL_NETS_1_AND_2(this_net.name(), other_net.name()));
+		throw nl_exception(MF_MERGE_RAIL_NETS_1_AND_2(this_net.name(), other_net.name()));
 	}
 
-	if (othernet.is_rail_net())
+	if (other_net.is_rail_net())
 	{
 		log().debug("other net is a rail net\n");
-		merge_nets(othernet, thisnet);
+		merge_nets(other_net, this_net);
 	}
 	else
 	{
-		move_connections(othernet, thisnet);
+		move_connections(other_net, this_net);
 	}
 }
 
@@ -1548,11 +1548,11 @@ void setup_t::delete_empty_nets()
 
 void setup_t::prepare_to_run()
 {
-	pstring envlog = plib::util::environment("NL_LOGS", "");
+	pstring env_log_setting = plib::util::environment("NL_LOGS", "");
 
-	if (!envlog.empty())
+	if (!env_log_setting.empty())
 	{
-		const auto loglist(plib::psplit(envlog, ':'));
+		const auto loglist(plib::psplit(env_log_setting, ':'));
 		m_parser.register_dynamic_log_devices(loglist);
 	}
 
@@ -1584,8 +1584,8 @@ void setup_t::prepare_to_run()
 	// set default model parameters
 
 	// FIXME: this is not optimal
-	m_parser.register_model(plib::pfmt("NMOS_DEFAULT _(CAPMOD={1})")(m_netlist_params->m_mos_capmodel()));
-	m_parser.register_model(plib::pfmt("PMOS_DEFAULT _(CAPMOD={1})")(m_netlist_params->m_mos_capmodel()));
+	m_parser.register_model(plib::pfmt("NMOS_DEFAULT _(CAPMOD={1})")(m_netlist_params->m_mos_cap_model()));
+	m_parser.register_model(plib::pfmt("PMOS_DEFAULT _(CAPMOD={1})")(m_netlist_params->m_mos_cap_model()));
 
 	// create devices
 
@@ -1600,7 +1600,7 @@ void setup_t::prepare_to_run()
 		}
 	}
 
-	int errcnt(0);
+	int error_count(0);
 
 	const bool use_deactivate = m_netlist_params->m_use_deactivate();
 
@@ -1616,17 +1616,17 @@ void setup_t::prepare_to_run()
 			d.second->set_hint_deactivate(use_deactivate);
 	}
 
-	if (errcnt > 0)
+	if (error_count > 0)
 	{
-		log().fatal(MF_ERRORS_FOUND(errcnt));
-		throw nl_exception(MF_ERRORS_FOUND(errcnt));
+		log().fatal(MF_ERRORS_FOUND(error_count));
+		throw nl_exception(MF_ERRORS_FOUND(error_count));
 	}
 
 	// resolve inputs
 	resolve_inputs();
 
 	log().verbose("looking for two terms connected to rail nets ...");
-	for (auto & t : m_nlstate.get_device_list<analog::NETLIB_NAME(twoterm)>())
+	for (auto & t : m_nlstate.get_device_list<analog::NETLIB_NAME(two_terminal)>())
 	{
 		if (t->N().net().is_rail_net() && t->P().net().is_rail_net())
 		{
@@ -1665,7 +1665,7 @@ void setup_t::prepare_to_run()
 	else
 		solver->post_start();
 
-	errcnt = 0;
+	error_count = 0;
 	log().debug("Looking for unknown parameters ...\n");
 	for (auto &p : m_abstract.m_param_values)
 	{
@@ -1673,13 +1673,13 @@ void setup_t::prepare_to_run()
 		if (f == m_params.end())
 		{
 			log().error(ME_UNKNOWN_PARAMETER(p.first));
-			errcnt++;
+			error_count++;
 		}
 	}
-	if (errcnt > 0)
+	if (error_count > 0)
 	{
-		log().fatal(MF_ERRORS_FOUND(errcnt));
-		throw nl_exception(MF_ERRORS_FOUND(errcnt));
+		log().fatal(MF_ERRORS_FOUND(error_count));
+		throw nl_exception(MF_ERRORS_FOUND(error_count));
 	}
 
 	for (auto &n : m_nlstate.nets())
