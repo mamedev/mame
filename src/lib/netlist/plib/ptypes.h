@@ -174,7 +174,7 @@ namespace plib
 	#endif
 	#if defined(_LIBCPP_VERSION)
 		using cpp_stdlib = std::integral_constant<ci_cpp_stdlib, ci_cpp_stdlib::LIBCPP>;
-		using cpp_stdlib_version = typed_version<(_LIBCPP_VERSION) / 1000, ((_LIBCPP_VERSION) / 100) % 10, __LIBCPP_VERSION % 100>;
+		using cpp_stdlib_version = typed_version<(_LIBCPP_VERSION) / 1000, ((_LIBCPP_VERSION) / 100) % 10, _LIBCPP_VERSION % 100>;
 	#elif defined(__GLIBCXX__)
 		using cpp_stdlib = std::integral_constant<ci_cpp_stdlib, ci_cpp_stdlib::LIBSTDCXX>;
 		using cpp_stdlib_version = typed_version<(_GLIBCXX_RELEASE), 0>;
