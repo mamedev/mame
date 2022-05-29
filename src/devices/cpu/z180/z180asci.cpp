@@ -122,10 +122,10 @@ void z180asci_channel_base::device_start()
 	save_item(NAME(m_divisor));
 
 	save_item(NAME(m_clock_state));
-	
+
 	save_item(NAME(m_tx_counter));
 	save_item(NAME(m_tx_state));
-	
+
 	save_item(NAME(m_rx_state));
 	save_item(NAME(m_rx_bits));
 	save_item(NAME(m_rx_counter));
@@ -348,7 +348,7 @@ DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::cts_wr )
 		// For channel 1, CTS can be disabled
 		if ((m_asci_stat && Z180_STAT1_CTS1E) == 0) return;
 	}
-	else 
+	else
 	{
 		// For channel 0, high resets TDRE
 		if (m_ext && state && (m_asci_ext && Z180_ASEXT_CTS0) == 0)
@@ -410,9 +410,9 @@ DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::cka_wr )
 void z180asci_channel_base::prepare_tsr()
 {
 	int bits = (m_asci_cntla & Z180_CNTLA_MODE_DATA) ? 8 : 7;
-	
+
 	m_tsr = (m_asci_cntla & Z180_CNTLA_MODE_STOPB) ? 3 : 1; // stop bit(s)
-	
+
 	if ((m_asci_cntlb & Z180_CNTLB_MP) || (m_asci_cntla & Z180_CNTLA_MODE_PARITY))
 	{
 		m_tsr <<= 1;
