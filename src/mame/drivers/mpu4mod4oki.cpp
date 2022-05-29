@@ -2477,7 +2477,16 @@ GAME_CUSTOM( 199?, m4nnwwc__9,  m4nnww,     "cnc03s.p1",        0x0000, 0x010000
 // "(C)1991 BARCREST" and "NN4 0.1" (CN3 0.1 on startup)
 GAME_CUSTOM( 199?, m4nnww__a,   m4nnww,     "cf301s",           0x0000, 0x010000, CRC(1d8abf59) SHA1(81e47797baddd777fbbb1b1e044df1bfe3d49cb2), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CF3 0.1 / NN4 0.1)" )
 
-// sequence 00 e4 ec f8 54 08 d0 80 44 2c 58 b4
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4NNWW_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_cheatchr_nifty, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
+// sequence 00 e4 ec f8 54 08 d0 80 44 2c 58 b4  (nifty)
 // "(C)2000    BWB" and "CNN 2.0"
 GAME_CUSTOM( 199?, m4nnwwc__aa, m4nnww,    "cl__x__x.2_0",     0x0000, 0x010000, CRC(c3de4791) SHA1(220d32b961b6710d508c0c7e6b2d8e4d292746f4), "Bwb","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CNN 2.0)" )
 GAME_CUSTOM( 199?, m4nnwwc__ab, m4nnww,    "cl__x_dx.2_0",     0x0000, 0x010000, CRC(c79833f8) SHA1(b3519b55f6f2a4f081b69483ac0b8860aa8190d9), "Bwb","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (CNN 2.0 D)" )

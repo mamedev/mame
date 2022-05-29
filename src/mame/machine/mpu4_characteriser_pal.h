@@ -142,6 +142,10 @@ public:
 	// games with sequence 00 14 04 94 c8 68 a0 18 f4 8c e8 ec ac a8 6c 20 54 c4 dc
 	static constexpr uint8_t viz_lamp_scramble[8] = { 0x00, 0x50, 0x10, 0x54, 0x14, 0x50, 0x10, 0x14 };
 
+	// games with sequence 00 e4 ec f8 54 08 d0 80 44 2c 58 b4 e8 b0 80
+	static constexpr uint8_t nifty_lamp_scramble[8] = { 0x03, 0xE7, 0xA7, 0x87, 0xE7, 0x07, 0xA7, 0xE7 };
+
+	
 	
 	/***************************************************************
 

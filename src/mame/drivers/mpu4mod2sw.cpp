@@ -665,28 +665,21 @@ ROM_START( m4moneym )
 	ROM_LOAD( "moneymaker-v16.bin", 0x0000, 0x010000, CRC(77f52665) SHA1(48a67b651385834658f1acb11ccde12b73393ced) )
 ROM_END
 
-// 00 E4 EC F8 54 08 D0 80 44   same as some nudge nudge wink wink
 ROM_START( m4nifty )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nifty.hex", 0x0000, 0x010000, CRC(84931755) SHA1(b4e568e1e4c237ea3f7ca6156b8a89cb40faf425) )
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "nifty.chr", 0x0000, 0x000048, CRC(1ce9977d) SHA1(06616842d4062e3285044a9924e35faee3f8f3f5) )
 ROM_END
 
 ROM_START( m4niftya )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nf2_1.p2", 0x6000, 0x002000, CRC(fde4010e) SHA1(440c888e80bd65f4d8c4081be66ad79db8e19618) )
 	ROM_LOAD( "nf2_1c.p1", 0x8000, 0x008000, CRC(52e954a5) SHA1(c402eaaf3f482d996f9a1312f97f057627734416) )
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "nifty.chr", 0x0000, 0x000048, CRC(1ce9977d) SHA1(06616842d4062e3285044a9924e35faee3f8f3f5) )
 ROM_END
 
 ROM_START( m4niftyb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nf2_1.p2", 0x6000, 0x002000, CRC(fde4010e) SHA1(440c888e80bd65f4d8c4081be66ad79db8e19618) )
 	ROM_LOAD( "nf2_1l.p1", 0x8000, 0x008000, CRC(bb297210) SHA1(cb570a015699d396dacb9fb09397ef157ceb8c97) )
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "nifty.chr", 0x0000, 0x000048, CRC(1ce9977d) SHA1(06616842d4062e3285044a9924e35faee3f8f3f5) )
 ROM_END
 
 ROM_START( m4nudqst )
@@ -1898,10 +1891,10 @@ GAME(199?, m4mirage,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machi
 // 00 84 94 3c ec 5c ec 50 2c 68 60 ac 74 00 ac 58 ec 7c
 GAME(199?, m4moneym,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Money Maker (Barcrest) (MPU4)",GAME_FLAGS )
 
-// 00 e4 ec f8 54 08 d0 80 44 2c 58 b4 e8 b0 80
-GAME(199?, m4nifty,   0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Nifty Fifty (Barcrest) (MPU4) (NF 2.0)",GAME_FLAGS )
-GAME(199?, m4niftya,  m4nifty,    mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Nifty Fifty (Barcrest) (MPU4) (NF 2.1, set 1)",GAME_FLAGS )
-GAME(199?, m4niftyb,  m4nifty,    mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Nifty Fifty (Barcrest) (MPU4) (NF 2.1, set 2)",GAME_FLAGS )
+// 00 e4 ec f8 54 08 d0 80 44 2c 58 b4 e8 b0 80 (nifty)
+GAME(199?, m4nifty,   0,          mod2_cheatchr_nifty, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Nifty Fifty (Barcrest) (MPU4) (NF 2.0)",GAME_FLAGS )
+GAME(199?, m4niftya,  m4nifty,    mod2_cheatchr_nifty, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Nifty Fifty (Barcrest) (MPU4) (NF 2.1, set 1)",GAME_FLAGS )
+GAME(199?, m4niftyb,  m4nifty,    mod2_cheatchr_nifty, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Nifty Fifty (Barcrest) (MPU4) (NF 2.1, set 2)",GAME_FLAGS )
 
 // 00 44 44 c4 58 60 c0 50 8c b8 e0 dc ec b0 1c e8 38
 GAME(199?, m4nudqst,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Nudge Quest (Barcrest) (MPU4) (NQ 2.0)",GAME_FLAGS )
@@ -2005,8 +1998,8 @@ GAME(199?, m4bjsma,   m4bjsm,     mod2_cheatchr, mpu4,            mpu4mod2_machi
 // b8 00 00 00 00 00 00 00 00 00 00 00 00 00
 GAME(199?, m4blstbk,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Blast A Bank (Barcrest) (MPU4)",GAME_FLAGS )
 
-// 00 e4 ec f8 54 08 d0 80 44 2c 58 b4 e8 b0 80 c4 2c f8
-GAME(198?, m4supsl,   0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest",   "Supa Silva (Barcrest) (MPU4)",GAME_FLAGS )
+// 00 e4 ec f8 54 08 d0 80 44 2c 58 b4 e8 b0 80 c4 2c f8 (nifty)
+GAME(198?, m4supsl,   0,          mod2_cheatchr_nifty, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest",   "Supa Silva (Barcrest) (MPU4)",GAME_FLAGS )
 
 // 00 60 68 38 d0 2c 90 24 e4 e8 3c f0 00 00
 GAME(199?, m4wayin,   0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Way In (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
@@ -2087,8 +2080,8 @@ GAME(199?, m4c999c,   m4c999,     mod2_cheatchr, mpu4,            mpu4mod2_machi
 
 
 // GEEN TUBES (press Q to open door and 'W' to play anyway, as long as the game works and doesn't report reel errors)
-// 00 e4 ec f8 54 08 d0 80 44 2c 58 b4 e8 b0 80
-GAME(199?, m4ambass,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Ambassador (Barcrest) (DAM, Dutch) (MPU4)",GAME_FLAGS )
+// 00 e4 ec f8 54 08 d0 80 44 2c 58 b4 e8 b0 80 (nifty)
+GAME(199?, m4ambass,  0,          mod2_cheatchr_nifty, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Ambassador (Barcrest) (DAM, Dutch) (MPU4)",GAME_FLAGS )
 // 00 14 10 a0 8c c8 68 50 b0 38 64 b4 18 e4 1c
 GAME(199?, m4atlan,   0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Atlantis (Barcrest) (DAT, Dutch) (MPU4)",GAME_FLAGS )
 GAME(199?, m4tridic,  m4atlan,    mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Triple Dice (Barcrest) (Dutch) (MPU4)",GAME_FLAGS ) // == Atlantis

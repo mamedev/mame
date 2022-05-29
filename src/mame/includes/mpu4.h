@@ -181,6 +181,7 @@ public:
 	void mod2_cheatchr_andybt(machine_config &config);
 	void mod2_cheatchr_cashmx(machine_config &config);
 	void mod2_cheatchr_viz(machine_config &config);
+	void mod2_cheatchr_nifty(machine_config &config);
 
 	void mod2_alt(machine_config &config);
 	void mod2_alt_cheatchr(machine_config &config);
@@ -234,6 +235,7 @@ public:
 	void mod4oki_cheatchr_magicdragon(machine_config &config);
 	void mod4oki_cheatchr_premier(machine_config &config);
 	void mod4oki_cheatchr_viz(machine_config &config);
+	void mod4oki_cheatchr_nifty(machine_config &config);
 
 	void mod4yam(machine_config &config);
 	void mod4yam_cheatchr(machine_config &config);

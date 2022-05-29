@@ -2865,6 +2865,10 @@ void mpu4_state::mod2_cheatchr_viz(machine_config &config)
 	mod2_cheatchr_table(config, mpu4_characteriser_pal::viz_lamp_scramble);
 }
 
+void mpu4_state::mod2_cheatchr_nifty(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::nifty_lamp_scramble);
+}
 
 // alt reel setup
 
@@ -3175,6 +3179,11 @@ void mpu4_state::mod4oki_cheatchr_premier(machine_config &config)
 void mpu4_state::mod4oki_cheatchr_viz(machine_config &config)
 {
 	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::viz_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_nifty(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::nifty_lamp_scramble);
 }
 
 // alt reel setup
