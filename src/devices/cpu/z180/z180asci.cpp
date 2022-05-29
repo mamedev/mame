@@ -364,7 +364,6 @@ DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::rxa_wr )
 	m_rxa = state;
 }
 
-
 DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::cka_wr )
 {
 	// For channel 1, CKA can be disabled
@@ -522,7 +521,6 @@ void z180asci_channel_base::set_fifo_data(uint8_t data, uint8_t error)
 	{
 		m_irq = 1;
 	}
-
 }
 
 void z180asci_channel_base::output_txa(int txa)
@@ -530,7 +528,6 @@ void z180asci_channel_base::output_txa(int txa)
 	if (m_txa != txa)
 	{
 		m_txa = txa;
-
 		m_txa_handler(m_txa);
 	}
 }
