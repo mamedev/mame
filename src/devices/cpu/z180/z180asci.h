@@ -123,6 +123,10 @@ protected:
 	uint8_t   m_rx_parity;
 	uint8_t   m_rx_bits;
 
+	uint8_t   m_tx_counter;
+	uint8_t   m_rx_counter;
+	uint8_t   m_rx_count_to;
+
 	bool m_rx_enabled;
 
 	const int  m_id;

@@ -135,6 +135,10 @@ void z180asci_channel_base::device_start()
 	save_item(NAME(m_bit_rate));
 	save_item(NAME(m_sample_rate));
 
+	save_item(NAME(m_tx_counter));
+	save_item(NAME(m_rx_counter));
+	save_item(NAME(m_rx_count_to));
+
 	m_rcv_clock = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z180asci_channel_base::rcv_clock), this));
 	m_tra_clock = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z180asci_channel_base::tra_clock), this));
 
@@ -159,6 +163,10 @@ void z180asci_channel_base::device_reset()
 	m_rx_parity = 0;
 	m_rx_bits = 0;
 	m_rx_enabled = true;
+
+	m_tx_counter = 0;
+	m_rx_counter = 0;
+	m_rx_count_to = 1;
 }
 
 void z180asci_channel_base::device_clock_changed()
@@ -201,6 +209,7 @@ void z180asci_channel_base::device_clock_changed()
 
 	m_tra_clock->adjust(attotime::never);
 	m_rx_state = STATE_START;
+	m_rx_count_to = 1;
 	if(!m_sample_rate.is_never())
 		m_rcv_clock->adjust(m_sample_rate, 0, m_sample_rate);
 }
@@ -369,12 +378,25 @@ DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::cka_wr )
 	// For channel 1, CKA can be disabled
 	if (m_id && (m_asci_cntla && Z180_CNTLA1_CKA1D)) return;
 
-	if(state != m_clock_state) {
+	if(state != m_clock_state)
+	{
 		m_clock_state = state;
 		if(!state)
-			transmit_edge();
+		{
+			m_tx_counter++;
+			if (m_tx_counter != m_divisor) return;
+			m_tx_counter = 0;
+			if (m_asci_cntla & Z180_CNTLA_TE)
+				transmit_edge();
+		}
 		else
-			receive_edge();
+		{
+			m_rx_counter++;
+			if (m_rx_counter != m_rx_count_to) return;
+			m_rx_counter = 0;
+			if (m_rx_enabled && (m_asci_cntla & Z180_CNTLA_RE))
+				receive_edge();
+		}
 	}
 }
 
@@ -455,14 +477,16 @@ void z180asci_channel_base::receive_edge()
 				m_rx_parity = 0;
 				m_rx_error = 0;
 				m_rsr = 0;
+				m_rx_count_to = (m_divisor == 1) ? m_divisor : (m_divisor * 3) / 2;
 				if(!(m_bit_rate.is_never()))
-					m_rcv_clock->adjust((m_bit_rate * 3) / 2, 0, m_bit_rate);
+					m_rcv_clock->adjust((m_divisor == 1) ? m_bit_rate : (m_bit_rate * 3) / 2, 0, m_bit_rate);
 			}
 			break;
 		case STATE_DATA:
 			m_rsr |= m_rxa << m_rx_bits;
 			m_rx_parity ^= m_rxa;
 			m_rx_bits++;
+			m_rx_count_to = m_divisor;
 			if (m_rx_bits == ((m_asci_cntla & Z180_CNTLA_MODE_DATA) ? 8 : 7))
 			{
 				m_rx_bits = (m_asci_cntla & Z180_CNTLA_MODE_STOPB) ? 2 : 1;
@@ -495,6 +519,7 @@ void z180asci_channel_base::receive_edge()
 					set_fifo_data(m_rsr, m_rx_error);
 				}
 				m_rx_state = STATE_START;
+				m_rx_count_to = 1;
 				if(!m_sample_rate.is_never())
 					m_rcv_clock->adjust(m_sample_rate, 0, m_sample_rate);
 			}
