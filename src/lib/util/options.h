@@ -280,14 +280,4 @@ struct options_entry
 	const char *                description;        // description for -showusage
 };
 
-// legacy option types
-const core_options::option_type OPTION_INVALID = core_options::option_type::INVALID;
-const core_options::option_type OPTION_HEADER = core_options::option_type::HEADER;
-const core_options::option_type OPTION_COMMAND = core_options::option_type::COMMAND;
-const core_options::option_type OPTION_BOOLEAN = core_options::option_type::BOOLEAN;
-const core_options::option_type OPTION_INTEGER = core_options::option_type::INTEGER;
-const core_options::option_type OPTION_FLOAT = core_options::option_type::FLOAT;
-const core_options::option_type OPTION_STRING = core_options::option_type::STRING;
-
-
 #endif // MAME_LIB_UTIL_OPTIONS_H

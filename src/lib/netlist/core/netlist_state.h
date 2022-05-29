@@ -93,7 +93,7 @@ namespace netlist
 		log_type & log() noexcept { return m_log; }
 		const log_type &log() const noexcept { return m_log; }
 
-		plib::dynlib_base &static_solver_lib() const noexcept { return *m_lib; }
+		plib::dynamic_library_base &static_solver_lib() const noexcept { return *m_lib; }
 
 		/// \brief provide library with static solver implementations.
 		///
@@ -101,7 +101,7 @@ namespace netlist
 		/// determined by the specific use case. You can pass such a collection
 		/// of symbols with this method.
 		///
-		void set_static_solver_lib(std::unique_ptr<plib::dynlib_base> &&lib);
+		void set_static_solver_lib(std::unique_ptr<plib::dynamic_library_base> &&lib);
 
 		netlist_t &exec() noexcept { return *m_netlist; }
 		const netlist_t &exec() const noexcept { return *m_netlist; }
@@ -246,7 +246,7 @@ namespace netlist
 		device_arena                               m_pool; // must be deleted last!
 
 		device_arena::unique_ptr<netlist_t>        m_netlist;
-		std::unique_ptr<plib::dynlib_base>         m_lib;
+		std::unique_ptr<plib::dynamic_library_base>         m_lib;
 		plib::state_manager_t                      m_state;
 		log_type                                   m_log;
 

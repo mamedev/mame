@@ -196,7 +196,7 @@ namespace netlist
 		void resolve_inputs();
 		pstring resolve_alias(const pstring &name) const;
 
-		void merge_nets(detail::net_t &thisnet, detail::net_t &othernet);
+		void merge_nets(detail::net_t &this_net, detail::net_t &other_net);
 
 		void connect_terminals(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
 		void connect_input_output(detail::core_terminal_t &in, detail::core_terminal_t &out);
@@ -232,7 +232,7 @@ namespace netlist
 		std::unordered_map<pstring, detail::core_terminal_t *> m_terminals;
 		// FIXME: Limited to 3 additional terminals
 		std::unordered_map<const terminal_t *,
-			std::array<terminal_t *, 4>>   m_connected_terminals;
+			std::array<terminal_t *, 4>>                       m_connected_terminals;
 		std::unordered_map<pstring, param_ref_t>               m_params;
 		std::unordered_map<const detail::core_terminal_t *,
 			devices::nld_base_proxy *>                         m_proxies;

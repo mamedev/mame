@@ -115,8 +115,8 @@ namespace netlist::devices {
 		static constexpr const nl_fptype G_OFF = nlconst::cgmin();
 
 		logic_input_t m_I;
-		analog::NETLIB_NAME(twoterm) m_RP;
-		analog::NETLIB_NAME(twoterm) m_RN;
+		analog::NETLIB_NAME(two_terminal) m_RP;
+		analog::NETLIB_NAME(two_terminal) m_RN;
 		state_var<netlist_sig_t> m_last_state;
 	};
 

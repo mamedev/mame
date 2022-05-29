@@ -165,9 +165,9 @@ namespace netlist::solver
 				this->m_terms[i].setV(static_cast<nl_fptype>(m_last_V[i]));
 		}
 
-		netlist_time compute_next_timestep(fptype cur_ts, fptype min_ts, fptype max_ts) override
+		netlist_time compute_next_time_step(fptype cur_ts, fptype min_ts, fptype max_ts) override
 		{
-			fptype new_solver_timestep_sq(max_ts * max_ts);
+			fptype new_solver_time_step_sq(max_ts * max_ts);
 
 			for (std::size_t k = 0; k < size(); k++)
 			{
@@ -187,15 +187,15 @@ namespace netlist::solver
 				if (plib::abs(DD2) > fp_constants<fptype>::TIMESTEP_MINDIV()) // avoid div-by-zero
 				{
 					// save the sqrt for the end
-					const fptype new_net_timestep_sq = m_params.m_dynamic_lte / plib::abs(nlconst::half()*DD2);
-					new_solver_timestep_sq = std::min(new_net_timestep_sq, new_solver_timestep_sq);
+					const fptype new_net_time_step_sq = m_params.m_dynamic_lte / plib::abs(nlconst::half()*DD2);
+					new_solver_time_step_sq = std::min(new_net_time_step_sq, new_solver_time_step_sq);
 				}
 			}
 
-			new_solver_timestep_sq = std::max(plib::sqrt(new_solver_timestep_sq), min_ts);
+			new_solver_time_step_sq = std::max(plib::sqrt(new_solver_time_step_sq), min_ts);
 
 			// FIXME: Factor 2 below is important. Without, we get timing issues. This must be a bug elsewhere.
-			return std::max(netlist_time::from_fp(new_solver_timestep_sq), netlist_time::quantum() * 2);
+			return std::max(netlist_time::from_fp(new_solver_time_step_sq), netlist_time::quantum() * 2);
 		}
 
 		template <typename M>

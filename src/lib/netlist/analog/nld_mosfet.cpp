@@ -187,9 +187,9 @@ namespace analog
 	{
 	public:
 		NETLIB_CONSTRUCTOR(MOSFET)
-		, m_DG(*this, "m_DG", NETLIB_DELEGATE(termhandler))
-		, m_SG(*this, "m_SG", NETLIB_DELEGATE(termhandler))
-		, m_SD(*this, "m_SD", NETLIB_DELEGATE(termhandler))
+		, m_DG(*this, "m_DG", NETLIB_DELEGATE(terminal_handler))
+		, m_SG(*this, "m_SG", NETLIB_DELEGATE(terminal_handler))
+		, m_SD(*this, "m_SD", NETLIB_DELEGATE(terminal_handler))
 		, m_D_BD(*this, "m_D_BD")
 #if (!BODY_CONNECTED_TO_SOURCE)
 		, m_D_BS(*this, "m_D_BS")
@@ -213,10 +213,10 @@ namespace analog
 		, m_Vgd(*this, "m_Vgd", nlconst::zero())
 		, m_model_acc(m_model)
 	{
-			register_subalias("S", m_SG.P());   // Source
-			register_subalias("G", m_SG.N());   // Gate
+			register_sub_alias("S", m_SG.P());   // Source
+			register_sub_alias("G", m_SG.N());   // Gate
 
-			register_subalias("D", m_DG.P());   // Drain
+			register_sub_alias("D", m_DG.P());   // Drain
 
 			connect(m_SG.P(), m_SD.P());
 			connect(m_SG.N(), m_DG.N());
@@ -302,7 +302,7 @@ namespace analog
 		{
 			if (m_capacitor_model != 0)
 			{
-				if (ts_type == timestep_type::FORWARD)
+				if (ts_type == time_step_type::FORWARD)
 				{
 					//#const nl_nl_fptype Ugd = -m_DG.deltaV() * m_polarity; // Gate - Drain
 					//#const nl_nl_fptype Ugs = -m_SG.deltaV() * m_polarity; // Gate - Source
@@ -311,9 +311,9 @@ namespace analog
 					const nl_fptype Ubs = nlconst::zero(); // Bulk - Source == 0 if connected
 					const nl_fptype Ugb = Ugs - Ubs;
 
-					m_cap_gb.timestep(m_Cgb, Ugb, step);
-					m_cap_gs.timestep(m_Cgs, Ugs, step);
-					m_cap_gd.timestep(m_Cgd, Ugd, step);
+					m_cap_gb.time_step(m_Cgb, Ugb, step);
+					m_cap_gs.time_step(m_Cgs, Ugs, step);
+					m_cap_gd.time_step(m_Cgd, Ugd, step);
 				}
 				else
 				{
@@ -337,7 +337,7 @@ namespace analog
 			#endif
 		}
 
-		NETLIB_HANDLERI(termhandler)
+		NETLIB_HANDLERI(terminal_handler)
 		{
 			// only called if connected to a rail net ==> notify the solver to recalculate
 			auto *solv(m_SG.solver());
@@ -351,9 +351,9 @@ namespace analog
 
 	private:
 
-		nld_twoterm m_DG;
-		nld_twoterm m_SG;
-		nld_twoterm m_SD;
+		nld_two_terminal m_DG;
+		nld_two_terminal m_SG;
+		nld_two_terminal m_SD;
 
 		generic_diode<diode_e::MOS> m_D_BD;
 #if (!BODY_CONNECTED_TO_SOURCE)

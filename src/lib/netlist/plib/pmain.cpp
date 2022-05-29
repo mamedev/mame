@@ -6,8 +6,8 @@
 namespace plib {
 
 	app::app()
-	: pout(&std::cout)
-	, perr(&std::cerr)
+	: std_out(&std::cout)
+	, std_err(&std::cerr)
 	{
 
 	}
@@ -18,8 +18,8 @@ namespace plib {
 
 		if (r != argv.size())
 		{
-			this->perr("Error parsing {}\n", argv[r]);
-			this->perr(this->usage_short());
+			this->std_err("Error parsing {}\n", argv[r]);
+			this->std_err(this->usage_short());
 			return 1;
 		}
 

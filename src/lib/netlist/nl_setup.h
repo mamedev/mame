@@ -127,7 +127,7 @@ void NETLIST_NAME(name)([[maybe_unused]] netlist::nlparse_t &setup)            \
 		desc.family = x;
 
 #define TRUTHTABLE_END() \
-		setup.truthtable_create(desc, def_params, std::move(sloc)); \
+		setup.truth_table_create(desc, def_params, std::move(sloc)); \
 	NETLIST_END()
 
 #define TRUTHTABLE_ENTRY(name)                                                 \
@@ -181,7 +181,7 @@ namespace netlist
 			register_dev(classname, name, std::vector<pstring>());
 		}
 
-		void register_hint(const pstring &objname, const pstring &hintname);
+		void register_hint(const pstring &objname, const pstring &hint_name);
 
 		void register_link(const pstring &sin, const pstring &sout);
 		void register_link_arr(const pstring &terms);
@@ -213,7 +213,7 @@ namespace netlist
 
 		void register_source_proc(const pstring &name, nlsetup_func func);
 
-		void truthtable_create(tt_desc &desc, const pstring &def_params, plib::source_location &&loc);
+		void truth_table_create(tt_desc &desc, const pstring &def_params, plib::source_location &&loc);
 
 		// include other files
 
@@ -225,8 +225,8 @@ namespace netlist
 		void namespace_pop();
 
 		// FIXME: used by source_t - need a different approach at some time
-		bool parse_stream(plib::istream_uptr &&istrm, const pstring &name);
-		bool parse_tokens(const plib::detail::token_store &tokens, const pstring &name);
+		bool parse_stream(plib::istream_uptr &&in_stream, const pstring &name);
+		bool parse_tokens(const plib::detail::token_store_t &tokens, const pstring &name);
 
 		template <typename S, typename... Args>
 		void add_include(Args&&... args)
@@ -239,10 +239,10 @@ namespace netlist
 			m_defines.insert({ def, plib::ppreprocessor::define_t(def, val)});
 		}
 
-		void add_define(const pstring &defstr);
+		void add_define(const pstring &define);
 
 		// register a list of logs
-		void register_dynamic_log_devices(const std::vector<pstring> &loglist);
+		void register_dynamic_log_devices(const std::vector<pstring> &log_list);
 
 		factory::list_t &factory() noexcept;
 		const factory::list_t &factory() const noexcept;

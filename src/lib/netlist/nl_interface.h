@@ -10,8 +10,11 @@
 #ifndef NLINTERFACE_H_
 #define NLINTERFACE_H_
 
-#include "nl_base.h"
 #include "nl_setup.h"
+#include "core/analog.h"
+#include "core/device.h"
+#include "core/device_macros.h"
+#include "core/logic.h"
 #include "core/setup.h"
 
 #include <memory>

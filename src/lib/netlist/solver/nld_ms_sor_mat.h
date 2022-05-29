@@ -39,7 +39,7 @@ namespace netlist::solver
 			{
 			}
 
-		void vsolve_non_dynamic() override;
+		void upstream_solve_non_dynamic() override;
 
 	private:
 		state_var<float_type> m_omega;
@@ -50,7 +50,7 @@ namespace netlist::solver
 	// ----------------------------------------------------------------------------------------
 
 	template <typename FT, int SIZE>
-	void matrix_solver_SOR_mat_t<FT, SIZE>::vsolve_non_dynamic()
+	void matrix_solver_SOR_mat_t<FT, SIZE>::upstream_solve_non_dynamic()
 	{
 		// The matrix based code looks a lot nicer but actually is 30% slower than
 		// the optimized code which works directly on the data structures.

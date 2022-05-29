@@ -172,7 +172,7 @@ submenu::submenu(mame_ui_manager &mui, render_container &container, std::vector<
 		case option_type::EMU:
 			sm_option.entry = opts->get_entry(sm_option.name);
 			sm_option.options = opts;
-			if (sm_option.entry->type() == OPTION_STRING)
+			if (sm_option.entry->type() == core_options::option_type::STRING)
 			{
 				sm_option.value.clear();
 				std::string namestr(sm_option.entry->description());
@@ -196,7 +196,7 @@ submenu::submenu(mame_ui_manager &mui, render_container &container, std::vector<
 		case option_type::OSD:
 			sm_option.entry = opts->get_entry(sm_option.name);
 			sm_option.options = opts;
-			if (sm_option.entry->type() == OPTION_STRING)
+			if (sm_option.entry->type() == core_options::option_type::STRING)
 			{
 				sm_option.value.clear();
 				std::string descr(machine().options().get_entry(sm_option.name)->description()), delim(", ");
@@ -261,11 +261,11 @@ void submenu::handle(event const *ev)
 		case option_type::OSD:
 			switch (sm_option.entry->type())
 			{
-			case OPTION_BOOLEAN:
+			case core_options::option_type::BOOLEAN:
 				changed = true;
 				sm_option.options->set_value(sm_option.name, !strcmp(sm_option.entry->value(),"1") ? "0" : "1", OPTION_PRIORITY_CMDLINE);
 				break;
-			case OPTION_INTEGER:
+			case core_options::option_type::INTEGER:
 				if (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT)
 				{
 					changed = true;
@@ -274,7 +274,7 @@ void submenu::handle(event const *ev)
 					sm_option.options->set_value(sm_option.name, i_cur, OPTION_PRIORITY_CMDLINE);
 				}
 				break;
-			case OPTION_FLOAT:
+			case core_options::option_type::FLOAT:
 				if (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT)
 				{
 					changed = true;
@@ -305,7 +305,7 @@ void submenu::handle(event const *ev)
 					sm_option.options->set_value(sm_option.name, tmptxt.c_str(), OPTION_PRIORITY_CMDLINE);
 				}
 				break;
-			case OPTION_STRING:
+			case core_options::option_type::STRING:
 				if (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT)
 				{
 					changed = true;
@@ -362,14 +362,14 @@ void submenu::populate(float &customtop, float &custombottom)
 		case option_type::OSD:
 			switch (sm_option->entry->type())
 			{
-			case OPTION_BOOLEAN:
+			case core_options::option_type::BOOLEAN:
 				item_append_on_off(
 						_(sm_option->description),
 						sm_option->options->bool_value(sm_option->name),
 						0,
 						static_cast<void*>(&(*sm_option)));
 				break;
-			case OPTION_INTEGER:
+			case core_options::option_type::INTEGER:
 				{
 					int i_min, i_max;
 					int i_cur = atoi(sm_option->entry->value());
@@ -391,7 +391,7 @@ void submenu::populate(float &customtop, float &custombottom)
 							reinterpret_cast<void *>(&*sm_option));
 				}
 				break;
-			case OPTION_FLOAT:
+			case core_options::option_type::FLOAT:
 				{
 					float f_min, f_max;
 					float f_cur = atof(sm_option->entry->value());
@@ -414,7 +414,7 @@ void submenu::populate(float &customtop, float &custombottom)
 							reinterpret_cast<void *>(&*sm_option));
 				}
 				break;
-			case OPTION_STRING:
+			case core_options::option_type::STRING:
 				{
 					std::string v_cur(sm_option->entry->value());
 					int const cur_value = std::distance(sm_option->value.begin(), std::find(sm_option->value.begin(), sm_option->value.end(), v_cur));

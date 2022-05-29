@@ -8,6 +8,7 @@
 /// \file nld_generic_models.h
 ///
 
+#include "core/state_var.h"
 #include "nl_base.h"
 
 //
@@ -73,7 +74,7 @@ namespace netlist::analog
 			//return -m_h * cap * m_v;
 		}
 
-		void timestep(nl_fptype cap, nl_fptype v, nl_fptype step) noexcept
+		void time_step(nl_fptype cap, nl_fptype v, nl_fptype step) noexcept
 		{
 			m_h = plib::reciprocal(step);
 			m_c = cap;
@@ -85,7 +86,7 @@ namespace netlist::analog
 			// no state used
 		}
 
-		void setparams(nl_fptype gmin) noexcept { m_gmin = gmin; }
+		void set_params(nl_fptype gmin) noexcept { m_gmin = gmin; }
 
 	private:
 		state_var<nl_fptype> m_h;
@@ -113,7 +114,7 @@ namespace netlist::analog
 			return - G(cap) * m_v;
 		}
 
-		void timestep([[maybe_unused]] nl_fptype cap, nl_fptype v, nl_fptype step) noexcept
+		void time_step([[maybe_unused]] nl_fptype cap, nl_fptype v, nl_fptype step) noexcept
 		{
 			m_h = plib::reciprocal(step);
 			m_v = v;
@@ -140,7 +141,7 @@ namespace netlist::analog
 		}
 
 		// Returns { G, Ieq }
-		std::pair<nl_fptype, nl_fptype> timestep(nl_fptype cap, nl_fptype v, nl_fptype step) const noexcept
+		std::pair<nl_fptype, nl_fptype> time_step(nl_fptype cap, nl_fptype v, nl_fptype step) const noexcept
 		{
 			const nl_fptype h(plib::reciprocal(step));
 			const nl_fptype G(cap * h + m_gmin);
@@ -150,7 +151,7 @@ namespace netlist::analog
 		{
 			// this one has no state
 		}
-		void setparams(nl_fptype gmin) noexcept { m_gmin = gmin; }
+		void set_parameters(nl_fptype gmin) noexcept { m_gmin = gmin; }
 	private:
 		nl_fptype m_gmin;
 	};
@@ -170,7 +171,7 @@ namespace netlist::analog
 		}
 
 		// Returns { G, Ieq }
-		std::pair<nl_fptype, nl_fptype> timestep(nl_fptype cap, nl_fptype v, nl_fptype step) noexcept
+		std::pair<nl_fptype, nl_fptype> time_step(nl_fptype cap, nl_fptype v, nl_fptype step) noexcept
 		{
 			const nl_fptype h(plib::reciprocal(step));
 			if (m_trn == 0.0)
@@ -193,7 +194,7 @@ namespace netlist::analog
 		{
 			// this one has no state
 		}
-		void setparams(nl_fptype gmin) noexcept { m_gmin = gmin; }
+		void set_parameters(nl_fptype gmin) noexcept { m_gmin = gmin; }
 	private:
 		nl_fptype m_gmin;
 		nl_fptype m_vn;
