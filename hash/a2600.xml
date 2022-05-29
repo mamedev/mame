@@ -38,7 +38,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="elfadven">
-		<description>Elf Adventure (Prototype)</description>
+		<description>Elf Adventure (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="programmer" value="Warren Robinett" />
@@ -92,7 +92,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="2pakblaca" cloneof="2pakblac">
-		<description>2 Pak Special: Challenge + Surfing (PAL) (Alt)</description>
+		<description>2 Pak Special: Challenge + Surfing (PAL) (alt)</description>
 		<year>1990</year>
 		<publisher>HES</publisher>
 		<info name="alt_title" value="2 Pak Special - Black Label" />
@@ -267,7 +267,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="3dgensp">
-		<description>3-D Genesis (Prototype)</description>
+		<description>3-D Genesis (prototype)</description>
 		<year>1983</year>
 		<publisher>Amiga</publisher>
 		<info name="programmer" value="Jerry Lawson, Dan Mcelroy" />
@@ -281,7 +281,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="3dghostp">
-		<description>3-D Ghost Attack (Prototype)</description>
+		<description>3-D Ghost Attack (prototype)</description>
 		<year>1983</year>
 		<publisher>Amiga</publisher>
 		<info name="programmer" value="michael k. glass, jerry lawson" />
@@ -295,7 +295,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="3dhavocp">
-		<description>3-D Havoc (Prototype)</description>
+		<description>3-D Havoc (prototype)</description>
 		<year>1983</year>
 		<publisher>Amiga</publisher>
 		<info name="programmer" value="Frank Ellis, Jerry Lawson" />
@@ -323,7 +323,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="32in1p" cloneof="32in1">
-		<description>32 in 1 Console ROM (PAL) (Prototype 19890210)</description>
+		<description>32 in 1 Console ROM (PAL) (prototype 19890210)</description>
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<sharedfeat name="compatibility" value="PAL" />
@@ -336,7 +336,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="4in1">
-		<description>4 in 1 - Canyon Bomber + Home Run + Night Driver + Sky Diver (Prototype 19870219)</description>
+		<description>4 in 1 - Canyon Bomber + Home Run + Night Driver + Sky Diver (prototype 19870219)</description>
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX26137" /> <!-- Not Sure About it. -->
@@ -378,7 +378,7 @@ X-1414 : Streetracer
 
 	<!-- Known 'feature': Centipede doesn't work -->
 	<software name="8in1">
-		<description>8 in 1 - Asteroids + Centipede + BattleZone + SwordQuest - EarthWorld + SwordQuest - FireWorld + RealSports Soccer + RealSports Tennis + Yars' Revenge (Prototype 19920116)</description>
+		<description>8 in 1 - Asteroids + Centipede + BattleZone + SwordQuest - EarthWorld + SwordQuest - FireWorld + RealSports Soccer + RealSports Tennis + Yars' Revenge (prototype 19920116)</description>
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX26193" />
@@ -391,7 +391,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="ateam">
-		<description>The A-Team (Prototype 19840330)</description>
+		<description>The A-Team (prototype 19840330)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX26133" />
@@ -406,7 +406,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="ateamp1" cloneof="ateam">
-		<description>The A-Team (Prototype 19840508)</description>
+		<description>The A-Team (prototype 19840508)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX26133" />
@@ -421,7 +421,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="ateamp2" cloneof="ateam">
-		<description>The A-Team (PAL) (Prototype)</description>
+		<description>The A-Team (PAL) (prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX26133" />
@@ -643,7 +643,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="airlockp" cloneof="airlock">
-		<description>Airlock (Prototype)</description>
+		<description>Airlock (prototype)</description>
 		<year>1982</year>
 		<publisher>Data Age</publisher>
 		<info name="serial" value="DA1004" />
@@ -734,7 +734,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="alligatr">
-		<description>The Alligator People (Prototype)</description>
+		<description>The Alligator People (prototype)</description>
 		<year>1983</year>
 		<publisher>20th Century Fox</publisher>
 		<info name="programmer" value="John Russell" />
@@ -780,7 +780,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="abwerniep" cloneof="abwernie">
-		<description>Alpha Beam with Ernie (Prototype 19831222)</description>
+		<description>Alpha Beam with Ernie (prototype 19831222)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX26103" />
@@ -796,7 +796,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="abwernieep" cloneof="abwernie">
-		<description>Alpha Beam with Ernie (PAL) (Prototype 19830603)</description>
+		<description>Alpha Beam with Ernie (PAL) (prototype 19830603)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX26103" />
@@ -841,7 +841,7 @@ X-1414 : Streetracer
 
 	<software name="andrmanp">
 	<!-- No display-->
-		<description>AndroMan on the Moon (Prototype)</description>
+		<description>AndroMan on the Moon (prototype)</description>
 		<year>1984</year>
 		<publisher>Western Technologies</publisher>
 		<info name="programmer" value="Michael Case, Lenny Carlson" />
@@ -918,7 +918,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="aquaventp" cloneof="aquavent">
-		<description>Aquaventure (Prototype)</description>
+		<description>Aquaventure (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<sharedfeat name="compatibility" value="NTSC" />
@@ -1087,7 +1087,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="asterixp" cloneof="taz">
-		<description>Asterix (NTSC, Prototype)</description>
+		<description>Asterix (NTSC, prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX2696" />
@@ -1146,7 +1146,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="asteroide1" cloneof="asteroid">
-		<description>Asteroids (PAL) (Older)</description>
+		<description>Asteroids (PAL) (older)</description>
 		<!-- According to the Programmer he didn't do the title screen, so it must have been added later on by another programmer -->
 		<year>1981</year>
 		<publisher>Atari</publisher>
@@ -1202,7 +1202,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="astrblst1" cloneof="astrblst">
-		<description>Astroblast (Alt)</description>
+		<description>Astroblast (alt)</description>
 		<year>1982</year>
 		<publisher>Mattel Electronics</publisher>
 		<info name="serial" value="5666" />
@@ -1321,7 +1321,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="atlantisc" cloneof="atlantis">
-		<description>Atlantis (CCE) (Alt)</description>
+		<description>Atlantis (CCE) (alt)</description>
 		<year>1983</year>
 		<publisher>CCE</publisher>
 		<info name="serial" value="c-832" />
@@ -1691,7 +1691,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="bzonep1" cloneof="bzone">
-		<description>Battlezone (Prototype 19830502)</description>
+		<description>Battlezone (prototype 19830502)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX2681" />
@@ -1705,7 +1705,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="bzonep2" cloneof="bzone">
-		<description>Battlezone (Prototype 19830512)</description>
+		<description>Battlezone (prototype 19830512)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX2681" />
@@ -1966,7 +1966,7 @@ X-1414 : Streetracer
 	-->
 
 	<software name="decathln1" cloneof="decathln">
-		<description>The Activision Decathlon (Alt)</description>
+		<description>The Activision Decathlon (alt)</description>
 		<year>1983</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -1990,7 +1990,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="airraidse1" cloneof="airraids">
-		<description>Air Raiders (PAL) (Unknown)</description>
+		<description>Air Raiders (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -2034,7 +2034,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="asteroid1" cloneof="asteroid">
-		<description>Asteroids (Older?)</description>
+		<description>Asteroids (older?)</description>
 		<year>1981</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -2057,7 +2057,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="atomsmas">
-		<description>Atom Smasher (Prototype)</description>
+		<description>Atom Smasher (prototype)</description>
 		<year>1984</year>
 		<publisher>Video Soft</publisher>
 		<sharedfeat name="compatibility" value="NTSC" />
@@ -2070,7 +2070,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="barnstrme1" cloneof="barnstrm">
-		<description>Barnstorming (PAL) (Unknown)</description>
+		<description>Barnstorming (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -2092,7 +2092,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="berzerke1" cloneof="berzerk">
-		<description>Berzerk (PAL) (Unknown)</description>
+		<description>Berzerk (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -2103,7 +2103,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="berzerke2" cloneof="berzerk">
-		<description>Berzerk (PAL) (Unknown, Alt)</description>
+		<description>Berzerk (PAL) (anknown, alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -2127,7 +2127,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="bigbirdp1" cloneof="bigbird">
-		<description>Big Bird's Egg Catch (Prototype 19830517)</description>
+		<description>Big Bird's Egg Catch (prototype 19830517)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<!-- christopher h. omarzu -->
@@ -2140,7 +2140,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="bigbirdp2" cloneof="bigbird">
-		<description>Big Bird's Egg Catch (Prototype 19830502)</description>
+		<description>Big Bird's Egg Catch (prototype 19830502)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<!-- christopher h. omarzu -->
@@ -2153,7 +2153,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="bigbirdp3" cloneof="bigbird">
-		<description>Big Bird's Egg Catch (Prototype 19821208)</description>
+		<description>Big Bird's Egg Catch (prototype 19821208)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<!-- christopher h. omarzu -->
@@ -2188,7 +2188,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="bionicbr">
-		<description>Bionic Breakthrough (Prototype 19840622)</description>
+		<description>Bionic Breakthrough (prototype 19840622)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -2200,7 +2200,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="bionicbr1" cloneof="bionicbr">
-		<description>Bionic Breakthrough (Prototype 1984xxxx)</description>
+		<description>Bionic Breakthrough (prototype 1984xxxx)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -2248,7 +2248,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="blckjacke1" cloneof="blckjack">
-		<description>Blackjack (PAL) (Unknown)</description>
+		<description>Blackjack (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -2259,7 +2259,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="bloodyhf">
-		<description>Bloody Human Freeway (Prototype)</description>
+		<description>Bloody Human Freeway (prototype)</description>
 		<year>19??</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -2294,7 +2294,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="blueprntp" cloneof="blueprnt">
-		<description>Blueprint (Prototype)</description>
+		<description>Blueprint (prototype)</description>
 		<year>1983</year>
 		<publisher>CBS Electronics</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -2462,7 +2462,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="boggle">
-		<description>Boggle (Prototype 19780807)</description>
+		<description>Boggle (prototype 19780807)</description>
 		<year>1978</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -2509,7 +2509,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="boombang1" cloneof="crackpot">
-		<description>Boom Bang (Unknown)</description>
+		<description>Boom Bang (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="Crackpots" />
@@ -2536,7 +2536,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="boombange1" cloneof="crackpot">
-		<description>Boom Bang (PAL) (Unknown)</description>
+		<description>Boom Bang (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="Crackpots" />
@@ -2774,7 +2774,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="bbunnyp1">
-		<description>Bugs Bunny (Prototype 19830804)</description>
+		<description>Bugs Bunny (prototype 19830804)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -2786,7 +2786,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="bbunnyp2" cloneof="bbunnyp1">
-		<description>Bugs Bunny (Prototype 1983xxxx)</description>
+		<description>Bugs Bunny (prototype 1983xxxx)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -2893,7 +2893,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="cabbagep9" cloneof="cabbagep">
-		<description>Cabbage Patch Kids - Adventures in the Park (Prototype 19840524)</description>
+		<description>Cabbage Patch Kids - Adventures in the Park (prototype 19840524)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -2905,7 +2905,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="cabbagep8" cloneof="cabbagep">
-		<description>Cabbage Patch Kids - Adventures in the Park (Prototype 19840614)</description>
+		<description>Cabbage Patch Kids - Adventures in the Park (prototype 19840614)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -2917,7 +2917,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="cabbagep7" cloneof="cabbagep">
-		<description>Cabbage Patch Kids - Adventures in the Park (Prototype 198406xx)</description>
+		<description>Cabbage Patch Kids - Adventures in the Park (prototype 198406xx)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -2929,7 +2929,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="cabbagep6" cloneof="cabbagep">
-		<description>Cabbage Patch Kids - Adventures in the Park (Prototype 19840629 &amp; 19840703)</description>
+		<description>Cabbage Patch Kids - Adventures in the Park (prototype 19840629 &amp; 19840703)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -2941,7 +2941,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="cabbagep5" cloneof="cabbagep">
-		<description>Cabbage Patch Kids - Adventures in the Park (Prototype 19840727)</description>
+		<description>Cabbage Patch Kids - Adventures in the Park (prototype 19840727)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -2953,7 +2953,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="cabbagep4" cloneof="cabbagep">
-		<description>Cabbage Patch Kids - Adventures in the Park (Prototype 19840821)</description>
+		<description>Cabbage Patch Kids - Adventures in the Park (prototype 19840821)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -2965,7 +2965,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="cabbagep3" cloneof="cabbagep">
-		<description>Cabbage Patch Kids - Adventures in the Park (Prototype 19840904)</description>
+		<description>Cabbage Patch Kids - Adventures in the Park (prototype 19840904)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -2977,7 +2977,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="cabbagep2" cloneof="cabbagep">
-		<description>Cabbage Patch Kids - Adventures in the Park (Prototype 19840907)</description>
+		<description>Cabbage Patch Kids - Adventures in the Park (prototype 19840907)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -2989,7 +2989,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="cabbagep1" cloneof="cabbagep">
-		<description>Cabbage Patch Kids - Adventures in the Park (Prototype 19840913, Alt)</description>
+		<description>Cabbage Patch Kids - Adventures in the Park (prototype 19840913, alt)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -3001,7 +3001,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="cabbagep">
-		<description>Cabbage Patch Kids - Adventures in the Park (Prototype 19840913)</description>
+		<description>Cabbage Patch Kids - Adventures in the Park (prototype 19840913)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -3070,7 +3070,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="carebear">
-		<description>Care Bears (Prototype)</description>
+		<description>Care Bears (prototype)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -3125,7 +3125,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="cattrax">
-		<description>Cat Trax (Prototype)</description>
+		<description>Cat Trax (prototype)</description>
 		<year>1983</year>
 		<publisher>UA Limited</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -3136,7 +3136,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="cattrax1" cloneof="cattrax">
-		<description>Cat Trax (Prototype, Alt)</description>
+		<description>Cat Trax (prototype, alt)</description>
 		<year>1983</year>
 		<publisher>UA Limited</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -3209,7 +3209,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="centipedep" cloneof="centiped">
-		<description>Centipede (PAL) (Prototype)</description>
+		<description>Centipede (PAL) (prototype)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -3221,7 +3221,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="challeng">
-		<description>Challenge (Unknown)</description>
+		<description>Challenge (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -3277,7 +3277,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="nexare1" cloneof="nexar">
-		<description>The Challenge of.... Nexar (PAL) (Unknown)</description>
+		<description>The Challenge of.... Nexar (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -3360,7 +3360,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="cheese">
-		<description>Cheese (Prototype 19820521)</description>
+		<description>Cheese (prototype 19820521)</description>
 		<year>1982</year>
 		<publisher>Imagic</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -3424,7 +3424,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="chopcommc1" cloneof="chopcomm">
-		<description>Chopper Command (CCE, Alt)</description>
+		<description>Chopper Command (CCE, alt)</description>
 		<year>1983</year>
 		<publisher>CCE</publisher>
 		<sharedfeat name="compatibility" value="NTSC" />
@@ -3522,7 +3522,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="circusa1" cloneof="circusa">
-		<description>Circus Atari (Unknown)</description>
+		<description>Circus Atari (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -3544,7 +3544,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="circusae1" cloneof="circusa">
-		<description>Circus Atari (PAL) (Unknown)</description>
+		<description>Circus Atari (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -3599,7 +3599,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="colors">
-		<description>Colors (PAL) (Prototype)</description>
+		<description>Colors (PAL) (prototype)</description>
 		<year>1980</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -3643,7 +3643,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="combat2">
-		<description>Combat Two (Prototype)</description>
+		<description>Combat Two (prototype)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -3667,7 +3667,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="commando1" cloneof="commando">
-		<description>Commando (Alt Logo)</description>
+		<description>Commando (alt logo)</description>
 		<year>1988</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -3713,7 +3713,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="comchess">
-		<description>Computer Chess (Prototype 19780707)</description>
+		<description>Computer Chess (prototype 19780707)</description>
 		<year>1978</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -3757,7 +3757,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="condorate1" cloneof="condorat">
-		<description>Condor Attack (PAL) (Unknown)</description>
+		<description>Condor Attack (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -3768,7 +3768,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="confront">
-		<description>Confrontation (Prototype)</description>
+		<description>Confrontation (prototype)</description>
 		<year>1983</year>
 		<publisher>TY Associates</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -3791,7 +3791,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="congo1" cloneof="congo">
-		<description>Congo Bongo (Alt)</description>
+		<description>Congo Bongo (alt)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -3841,7 +3841,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="cookiemoe1" cloneof="cookiemo">
-		<description>Cookie Monster Munch (PAL) (Alt)</description>
+		<description>Cookie Monster Munch (PAL) (alt)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<!-- children's computer workshop, gary stark -->
@@ -3904,7 +3904,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="cosmarkc1" cloneof="cosmark">
-		<description>Cosmic Ark (CCE, Alt)</description>
+		<description>Cosmic Ark (CCE, alt)</description>
 		<year>1983</year>
 		<publisher>CCE</publisher>
 		<info name="serial" value="C-831" />
@@ -3943,7 +3943,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="cosmarke2" cloneof="cosmark">
-		<description>Cosmic Ark (PAL) (Unknown)</description>
+		<description>Cosmic Ark (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="PAL" />
@@ -4023,7 +4023,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="cosmcreepe1" cloneof="cosmcrep">
-		<description>Cosmic Creeps (PAL) (Unknown)</description>
+		<description>Cosmic Creeps (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -4100,7 +4100,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="cracked">
-		<description>Crack'ed (Prototype 19881128)</description>
+		<description>Crack'ed (prototype 19881128)</description>
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -4144,7 +4144,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="crackpotc1" cloneof="crackpot">
-		<description>Crackpots (CCE, Alt)</description>
+		<description>Crackpots (CCE, alt)</description>
 		<year>1983</year>
 		<publisher>CCE</publisher>
 		<info name="serial" value="C-862" />
@@ -4169,7 +4169,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="crackpote" cloneof="crackpot">
-		<description>Crackpots (PAL) (Unknown)</description>
+		<description>Crackpots (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="PAL" />
@@ -4260,7 +4260,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="xforcee1" cloneof="xforce">
-		<description>Cross Force (PAL) (Unknown)</description>
+		<description>Cross Force (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -4332,7 +4332,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="ccastlesp" cloneof="ccastles">
-		<description>Crystal Castles (Prototype 19840104)</description>
+		<description>Crystal Castles (prototype 19840104)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -4359,7 +4359,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="cubicolo">
-		<description>Cubicolor (Prototype)</description>
+		<description>Cubicolor (prototype)</description>
 		<year>1982</year>
 		<publisher>Imagic</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -4436,7 +4436,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="dancingp2" cloneof="dancingp">
-		<description>Dancing Plate (PAL) (Unknown)</description>
+		<description>Dancing Plate (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -4488,7 +4488,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="darkchamep" cloneof="darkcham">
-		<description>Dark Chambers (PAL) (Prototype)</description>
+		<description>Dark Chambers (PAL) (prototype)</description>
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -4559,7 +4559,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="defenderp" cloneof="defender">
-		<description>Defender (Prototype 19811030)</description>
+		<description>Defender (prototype 19811030)</description>
 		<year>1981</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -4603,7 +4603,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="defendere1" cloneof="defender">
-		<description>Defender (PAL) (Unknown)</description>
+		<description>Defender (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -4666,7 +4666,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="demohrbye1" cloneof="demohrby">
-		<description>Demolition Herby (PAL) (Unknown)</description>
+		<description>Demolition Herby (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -4743,7 +4743,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="demonatke1" cloneof="demonatk">
-		<description>Demon Attack (PAL) (Unknown)</description>
+		<description>Demon Attack (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -4787,7 +4787,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="depthchp">
-		<description>Depth Charge (Prototype)</description>
+		<description>Depth Charge (prototype)</description>
 		<year>1983</year>
 		<publisher>Amiga</publisher>
 		<sharedfeat name="compatibility" value="NTSC" />
@@ -4873,7 +4873,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="dsrtflcnep" cloneof="dsrtflcn">
-		<description>Desert Falcon (PAL) (Prototype 19870527)</description>
+		<description>Desert Falcon (PAL) (prototype 19870527)</description>
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -4910,7 +4910,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="diagnosp">
-		<description>Diagnostic Test Cartridge 2.0 (Prototype)</description>
+		<description>Diagnostic Test Cartridge 2.0 (prototype)</description>
 		<year>1980</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -5075,7 +5075,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="dodgeeme1" cloneof="dodgeem">
-		<description>Dodge 'Em (PAL) (Unknown)</description>
+		<description>Dodge 'Em (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -5108,7 +5108,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="donaldds">
-		<description>Donald Duck's Speedboat (Prototype 19830412)</description>
+		<description>Donald Duck's Speedboat (prototype 19830412)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -5120,7 +5120,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="donalddse" cloneof="donaldds">
-		<description>Donald Duck's Speedboat (PAL) (Prototype 19830418)</description>
+		<description>Donald Duck's Speedboat (PAL) (prototype 19830418)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -5328,7 +5328,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="dragfiree1" cloneof="dragfire">
-		<description>Dragonfire (PAL) (Unknown)</description>
+		<description>Dragonfire (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -5384,7 +5384,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="hazzardp" cloneof="hazzard">
-		<description>Dukes of Hazzard (Prototype)</description>
+		<description>Dukes of Hazzard (prototype)</description>
 		<year>1980</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -5395,7 +5395,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="dumbosfl">
-		<description>Dumbo's Flying Circus (Prototype 19850505)</description>
+		<description>Dumbo's Flying Circus (prototype 19850505)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -5419,7 +5419,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="dumbosflep" cloneof="dumbosfl">
-		<description>Dumbo's Flying Circus (PAL) (Prototype 19830711)</description>
+		<description>Dumbo's Flying Circus (PAL) (prototype 19830711)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -5431,7 +5431,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="dune">
-		<description>Dune (Prototype 19840710)</description>
+		<description>Dune (prototype 19840710)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -5443,7 +5443,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="dungeon">
-		<description>Dungeon (Prototype 19851122)</description>
+		<description>Dungeon (prototype 19851122)</description>
 		<year>1985</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -5556,7 +5556,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="elevator">
-		<description>Elevator Action (Prototype)</description>
+		<description>Elevator Action (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -5582,7 +5582,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="elkattac">
-		<description>Elk Attack (Prototype)</description>
+		<description>Elk Attack (prototype)</description>
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -5704,7 +5704,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="enduro1" cloneof="enduro">
-		<description>Enduro (Unknown)</description>
+		<description>Enduro (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -5726,7 +5726,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="enduroe1" cloneof="enduro">
-		<description>Enduro (PAL) (Unknown)</description>
+		<description>Enduro (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -5737,7 +5737,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="entity">
-		<description>The Entity (Prototype)</description>
+		<description>The Entity (prototype)</description>
 		<year>1983</year>
 		<publisher>20th Century Fox Video Games</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -5905,7 +5905,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="fastfoode1" cloneof="fastfood">
-		<description>Fast Food (PAL) (Unknown)</description>
+		<description>Fast Food (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -5931,7 +5931,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="fatalrunp" cloneof="fatalrun">
-		<description>Fatal Run (Prototype)</description>
+		<description>Fatal Run (prototype)</description>
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -6302,7 +6302,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="frogpond">
-		<description>Frog Pond (Prototype 19820827)</description>
+		<description>Frog Pond (prototype 19820827)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -6314,7 +6314,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="frogpond1" cloneof="frogpond">
-		<description>Frog Pond (Prototype 1982xxxx)</description>
+		<description>Frog Pond (prototype 1982xxxx)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -6472,7 +6472,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="frostbite1" cloneof="frostbit">
-		<description>Frostbite (PAL) (Unknown)</description>
+		<description>Frostbite (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -6516,7 +6516,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="funkyfis">
-		<description>Funky Fish (Prototype)</description>
+		<description>Funky Fish (prototype)</description>
 		<year>1983</year>
 		<publisher>UA Limited</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -6620,7 +6620,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="galaxianp1" cloneof="galaxian">
-		<description>Galaxian (Prototype 19830105)</description>
+		<description>Galaxian (prototype 19830105)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -6632,7 +6632,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="galaxianp2" cloneof="galaxian">
-		<description>Galaxian (Prototype 19830204)</description>
+		<description>Galaxian (prototype 19830204)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -6699,7 +6699,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="garfield">
-		<description>Garfield (Prototype 19840621)</description>
+		<description>Garfield (prototype 19840621)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -6837,7 +6837,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="ghostbs2a" cloneof="ghostbs2">
-		<description>Ghostbusters II (PAL) (Alt Tune)</description>
+		<description>Ghostbusters II (PAL) (alt tune)</description>
 		<year>1992</year>
 		<publisher>Salu</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -6926,7 +6926,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="gophere1" cloneof="gopher">
-		<description>Gopher (PAL) (Unknown)</description>
+		<description>Gopher (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -6970,7 +6970,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="grandprxc1" cloneof="grandprx">
-		<description>Grand Prix (CCE, Alt)</description>
+		<description>Grand Prix (CCE, alt)</description>
 		<year>1983</year>
 		<publisher>CCE</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -7003,7 +7003,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="grandprxe1" cloneof="grandprx">
-		<description>Grand Prix (PAL) (Unknown)</description>
+		<description>Grand Prix (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -7037,7 +7037,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="gravitarp" cloneof="gravitar">
-		<description>Gravitar (Prototype 19830412)</description>
+		<description>Gravitar (prototype 19830412)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -7084,7 +7084,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="gremlinsp" cloneof="gremlins">
-		<description>Gremlins (Prototype 19840312)</description>
+		<description>Gremlins (prototype 19840312)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -7107,7 +7107,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="grovermm">
-		<description>Grover's Music Maker (Prototype 19830118)</description>
+		<description>Grover's Music Maker (prototype 19830118)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<!-- stephan r. keith, preston stuart -->
@@ -7120,7 +7120,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="grovermm1" cloneof="grovermm">
-		<description>Grover's Music Maker (Prototype 19821229)</description>
+		<description>Grover's Music Maker (prototype 19821229)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<!-- stephan r. keith, preston stuart -->
@@ -7144,7 +7144,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="guardianp" cloneof="guardian">
-		<description>Guardian (Prototype)</description>
+		<description>Guardian (prototype)</description>
 		<year>1982</year>
 		<publisher>Apollo</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -7319,7 +7319,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="hauntedp" cloneof="haunted">
-		<description>Haunted House (Prototype 09-28-81)</description>
+		<description>Haunted House (prototype 09-28-81)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -7363,7 +7363,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="holeymol">
-		<description>Holey Moley (Prototype 19840229)</description>
+		<description>Holey Moley (prototype 19840229)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -7590,7 +7590,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="immiesagp" cloneof="immiesag">
-		<description>Immies &amp; Aggies - Immies and Aggies (Prototype)</description>
+		<description>Immies &amp; Aggies - Immies and Aggies (prototype)</description>
 		<year>1983</year>
 		<publisher>ZiMAG</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -7689,7 +7689,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="intsocre1" cloneof="intsocr">
-		<description>International Soccer (PAL) (Unknown)</description>
+		<description>International Soccer (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -7711,7 +7711,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="ixion">
-		<description>Ixion (Prototype)</description>
+		<description>Ixion (prototype)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -7757,7 +7757,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="jawbreake1" cloneof="jawbreak">
-		<description>Jawbreaker (PAL) (Unknown)</description>
+		<description>Jawbreaker (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -7768,7 +7768,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="jawbreake2" cloneof="jawbreak">
-		<description>Jawbreaker (PAL) (Unknown, Alt)</description>
+		<description>Jawbreaker (PAL) (unknown, alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -7825,7 +7825,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="joustp" cloneof="joust">
-		<description>Joust (Prototype 19830809)</description>
+		<description>Joust (prototype 19830809)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -7914,7 +7914,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="junglehc1" cloneof="jungleh">
-		<description>Jungle Hunt (CCE, Alt)</description>
+		<description>Jungle Hunt (CCE, alt)</description>
 		<year>1983</year>
 		<publisher>CCE</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -7938,7 +7938,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="junglehp2" cloneof="jungleh">
-		<description>Jungle Hunt (Prototype 19830203)</description>
+		<description>Jungle Hunt (prototype 19830203)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -7950,7 +7950,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="junglehp1" cloneof="jungleh">
-		<description>Jungle Hunt (Prototype 19830225)</description>
+		<description>Jungle Hunt (prototype 19830225)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -7962,7 +7962,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="kabobber">
-		<description>Kabobber (Prototype 19830725)</description>
+		<description>Kabobber (prototype 19830725)</description>
 		<year>19??</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -8006,7 +8006,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="kamikaze">
-		<description>Kamikaze Saucers (Prototype)</description>
+		<description>Kamikaze Saucers (prototype)</description>
 		<year>1983</year>
 		<publisher>Syncro</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -8075,7 +8075,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="karatee1" cloneof="karate">
-		<description>Karate (PAL) (Unknown)</description>
+		<description>Karate (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -8174,7 +8174,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="keykaperc1" cloneof="keykaper">
-		<description>Keystone Kappers (CCE, Alt)</description>
+		<description>Keystone Kappers (CCE, alt)</description>
 		<year>1983</year>
 		<publisher>CCE</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -8196,7 +8196,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="keykaper1" cloneof="keykaper">
-		<description>Keystone Kapers (Unknown)</description>
+		<description>Keystone Kapers (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -8218,7 +8218,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="keykapere1" cloneof="keykaper">
-		<description>Keystone Kapers (PAL) (Unknown)</description>
+		<description>Keystone Kapers (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -8262,7 +8262,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="kingkonge1" cloneof="kingkong">
-		<description>King Kong (PAL) (Alt)</description>
+		<description>King Kong (PAL) (alt)</description>
 		<year>1982</year>
 		<publisher>Tigervision</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -8288,7 +8288,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="klaxp1" cloneof="klax">
-		<description>Klax (Prototype 19900818)</description>
+		<description>Klax (prototype 19900818)</description>
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -8303,7 +8303,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="klaxp2" cloneof="klax">
-		<description>Klax (Prototype 19900614)</description>
+		<description>Klax (prototype 19900614)</description>
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -8375,7 +8375,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="krullp" cloneof="krull">
-		<description>Krull (Prototype 19830527)</description>
+		<description>Krull (prototype 19830527)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -8446,7 +8446,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="kwibble">
-		<description>Kwibble (Prototype)</description>
+		<description>Kwibble (prototype)</description>
 		<year>1983</year>
 		<publisher>Imagic</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -8457,7 +8457,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="kyphus">
-		<description>Kyphus (Prototype)</description>
+		<description>Kyphus (prototype)</description>
 		<year>1982</year>
 		<publisher>Apollo</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -8545,7 +8545,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="laserblsp" cloneof="laserbls">
-		<description>Laser Blast (Prototype 19800808)</description>
+		<description>Laser Blast (prototype 19800808)</description>
 		<year>1980</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -8622,7 +8622,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="lasercad">
-		<description>Lasercade (Prototype)</description>
+		<description>Lasercade (prototype)</description>
 		<year>1983</year>
 		<publisher>20th Century Fox Video Games</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -8633,7 +8633,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="laststar">
-		<description>The Last Starfighter (Prototype)</description>
+		<description>The Last Starfighter (prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -8678,7 +8678,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="lnce1" cloneof="lnc">
-		<description>Lock 'n' Chase (PAL) (Unknown)</description>
+		<description>Lock 'n' Chase (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -8700,7 +8700,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="looping">
-		<description>Looping (Prototype)</description>
+		<description>Looping (prototype)</description>
 		<year>1983</year>
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -8712,7 +8712,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="lotr">
-		<description>The Lord of the Rings - Journey to Rivendell (Prototype)</description>
+		<description>The Lord of the Rings - Journey to Rivendell (prototype)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -8724,7 +8724,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="lotr1" cloneof="lotr">
-		<description>The Lord of the Rings - Journey to Rivendell (Prototype, Alt)</description>
+		<description>The Lord of the Rings - Journey to Rivendell (prototype, alt)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -8748,7 +8748,7 @@ X-1414 : Streetracer
 
 	<software name="lostlugg1" cloneof="lostlugg">
 	<!-- This set does not have the opening scene -->
-		<description>Lost Luggage (Alt)</description>
+		<description>Lost Luggage (alt)</description>
 		<year>1981</year>
 		<publisher>Apollo</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -8792,7 +8792,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="mashc1" cloneof="mash">
-		<description>MASH (CCE, Alt)</description>
+		<description>MASH (CCE, alt)</description>
 		<year>1983</year>
 		<publisher>CCE</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -9051,7 +9051,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="mazecraz1" cloneof="mazecraz">
-		<description>Maze Craze (Unknown)</description>
+		<description>Maze Craze (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -9074,7 +9074,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="mcdonald">
-		<description>McDonald's - Golden Arches Adventure (Prototype 19830606)</description>
+		<description>McDonald's - Golden Arches Adventure (prototype 19830606)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -9108,7 +9108,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="megafrcee1" cloneof="megafrce">
-		<description>Mega Force (PAL) (Alt)</description>
+		<description>Mega Force (PAL) (alt)</description>
 		<year>1982</year>
 		<publisher>20th Century Fox Video Games</publisher>
 		<sharedfeat name="compatibility" value="PAL" />
@@ -9201,7 +9201,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="megmaniae1" cloneof="megmania">
-		<description>MegaMania (PAL) (Unknown)</description>
+		<description>MegaMania (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="PAL" />
@@ -9225,7 +9225,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="meltdown">
-		<description>Meltdown (Prototype)</description>
+		<description>Meltdown (prototype)</description>
 		<year>1983</year>
 		<publisher>20th Century Fox Video Games</publisher>
 		<sharedfeat name="compatibility" value="PAL" />
@@ -9314,7 +9314,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="millipedp1" cloneof="milliped">
-		<description>Millipede (Prototype 19840104)</description>
+		<description>Millipede (prototype 19840104)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -9329,7 +9329,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="millipedp2" cloneof="milliped">
-		<description>Millipede (Prototype 1984xxxx)</description>
+		<description>Millipede (prototype 1984xxxx)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -9360,7 +9360,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="millipedep" cloneof="milliped">
-		<description>Millipede (PAL) (Prototype)</description>
+		<description>Millipede (PAL) (prototype)</description>
 		<year>1984</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="PAL" />
@@ -9376,7 +9376,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="mindmaze">
-		<description>Mind Maze (Prototype 19841010)</description>
+		<description>Mind Maze (prototype 19841010)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -9400,7 +9400,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="mine2049p" cloneof="mine2049">
-		<description>Miner 2049er - Starring Bounty Bob (Prototype)</description>
+		<description>Miner 2049er - Starring Bounty Bob (prototype)</description>
 		<year>1982</year>
 		<publisher>Tigervision</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -9472,7 +9472,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="mineminoe1" cloneof="minemino">
-		<description>Mines of Minos (PAL) (Unknown)</description>
+		<description>Mines of Minos (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="PAL" />
@@ -9520,7 +9520,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="piggywed">
-		<description>Miss Piggy's Wedding (Prototype 19830624)</description>
+		<description>Miss Piggy's Wedding (prototype 19830624)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -9532,7 +9532,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="piggywed1" cloneof="piggywed">
-		<description>Miss Piggy's Wedding (Prototype 1983xxxx)</description>
+		<description>Miss Piggy's Wedding (prototype 1983xxxx)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -9543,7 +9543,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="piggywed2" cloneof="piggywed">
-		<description>Miss Piggy's Wedding (Prototype 1983xxxx, Alt)</description>
+		<description>Miss Piggy's Wedding (prototype 1983xxxx, alt)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -9566,7 +9566,7 @@ X-1414 : Streetracer
 
 	<software name="missile1" cloneof="missile">
 	<!-- This set does not let you enter initials -->
-		<description>Missile Command (Alt)</description>
+		<description>Missile Command (alt)</description>
 		<year>1981</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -9601,7 +9601,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="missilee1" cloneof="missile">
-		<description>Missile Command (PAL) (Unknown)</description>
+		<description>Missile Command (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="PAL" />
@@ -9660,7 +9660,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="missions1" cloneof="missions">
-		<description>Mission Survive (PAL) (Alt)</description>
+		<description>Mission Survive (PAL) (alt)</description>
 		<year>1983</year>
 		<publisher>Video Gems</publisher>
 		<sharedfeat name="compatibility" value="PAL" />
@@ -9695,7 +9695,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="monsterc">
-		<description>Monster Cise (Prototype)</description>
+		<description>Monster Cise (prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -9780,7 +9780,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="mpatrolp4" cloneof="mpatrol">
-		<description>Moon Patrol (Prototype 19830516)</description>
+		<description>Moon Patrol (prototype 19830516)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -9792,7 +9792,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="mpatrolep" cloneof="mpatrol">
-		<description>Moon Patrol (PAL) (Prototype 19830516)</description>
+		<description>Moon Patrol (PAL) (prototype 19830516)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -9804,7 +9804,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="mpatrolp3" cloneof="mpatrol">
-		<description>Moon Patrol (Prototype 19830704)</description>
+		<description>Moon Patrol (prototype 19830704)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -9816,7 +9816,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="mpatrolp2" cloneof="mpatrol">
-		<description>Moon Patrol (Prototype 19830726)</description>
+		<description>Moon Patrol (prototype 19830726)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -9828,7 +9828,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="mpatrolp1" cloneof="mpatrol">
-		<description>Moon Patrol (Prototype 19830731)</description>
+		<description>Moon Patrol (prototype 19830731)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -10069,7 +10069,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="mrpost1" cloneof="mrpost">
-		<description>Mr. Postman (Unknown)</description>
+		<description>Mr. Postman (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -10129,7 +10129,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="mspacmanp" cloneof="mspacman">
-		<description>Ms. Pac-Man (Prototype)</description>
+		<description>Ms. Pac-Man (prototype)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -10191,7 +10191,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="mysthief">
-		<description>A Mysterious Thief (Prototype)</description>
+		<description>A Mysterious Thief (prototype)</description>
 		<year>1983</year>
 		<publisher>ZiMAG</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -10202,7 +10202,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="mysthief1" cloneof="mysthief">
-		<description>A Mysterious Thief (Prototype, Alt)</description>
+		<description>A Mysterious Thief (prototype, alt)</description>
 		<year>1983</year>
 		<publisher>ZiMAG</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -10224,7 +10224,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="mysthiefc1" cloneof="mysthief">
-		<description>A Misterious Thief (Alt)</description>
+		<description>A Misterious Thief (alt)</description>
 		<year>1983</year>
 		<publisher>CCE</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -10258,7 +10258,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="namethise" cloneof="namethis">
-		<description>Name This Game (PAL) (Unknown)</description>
+		<description>Name This Game (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -10384,7 +10384,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="nutse1" cloneof="nuts">
-		<description>Nuts (PAL) (Unknown)</description>
+		<description>Nuts (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -10472,7 +10472,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="offrockt">
-		<description>Off Your Rocker (Prototype)</description>
+		<description>Off Your Rocker (prototype)</description>
 		<year>1983</year>
 		<publisher>Amiga</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -10516,7 +10516,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="oinke1" cloneof="oink">
-		<description>Oink! (PAL) (Unknown)</description>
+		<description>Oink! (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -10589,7 +10589,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="oscaracep1" cloneof="oscarace">
-		<description>Oscar's Trash Race (Prototype 19830330)</description>
+		<description>Oscar's Trash Race (prototype 19830330)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<!-- christopher h. omarzu, preston stuart, bruce williams -->
@@ -10602,7 +10602,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="oscaracep2" cloneof="oscarace">
-		<description>Oscar's Trash Race (Prototype 19821203)</description>
+		<description>Oscar's Trash Race (prototype 19821203)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<!-- christopher h. omarzu, preston stuart, bruce williams -->
@@ -10627,7 +10627,7 @@ X-1414 : Streetracer
 
 	<software name="othello1" cloneof="othello">
 	<!-- This set has no grid markers -->
-		<description>Othello (Alt)</description>
+		<description>Othello (alt)</description>
 		<year>1981</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -10650,7 +10650,7 @@ X-1414 : Streetracer
 
 	<software name="othelloe1" cloneof="othello">
 	<!-- This set has no grid markers -->
-		<description>Othello (PAL) (Alt)</description>
+		<description>Othello (PAL) (alt)</description>
 		<year>1981</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -10719,7 +10719,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="packong1" cloneof="packong">
-		<description>Pac Kong (Unknown)</description>
+		<description>Pac Kong (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -10763,7 +10763,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="pacmanc1" cloneof="pacman">
-		<description>Pac Man (CCE, Alt)</description>
+		<description>Pac Man (CCE, alt)</description>
 		<year>1983</year>
 		<publisher>CCE</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -10818,7 +10818,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="pandachs1" cloneof="pandachs">
-		<description>Panda Chase (PAL) (Unknown)</description>
+		<description>Panda Chase (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -10840,7 +10840,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="peekaboo">
-		<description>Peek-A-Boo (Prototype)</description>
+		<description>Peek-A-Boo (prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -10886,7 +10886,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="pengop" cloneof="pengo">
-		<description>Pengo (Prototype)</description>
+		<description>Pengo (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -10954,7 +10954,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="phanttnk2" cloneof="phanttnk">
-		<description>Phantom Tank (PAL) (Unknown)</description>
+		<description>Phantom Tank (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -11020,7 +11020,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="pharaoh1" cloneof="pharaoh">
-		<description>Pharaoh's Curse (PAL) (Unknown)</description>
+		<description>Pharaoh's Curse (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -11031,7 +11031,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="pharaoh2" cloneof="pharaoh">
-		<description>Pharaoh's Curse (Unknown)</description>
+		<description>Pharaoh's Curse (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -11077,7 +11077,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="phoenix1" cloneof="phoenix">
-		<description>Phoenix (Unknown)</description>
+		<description>Phoenix (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -11125,7 +11125,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="pickup">
-		<description>Pick Up (Prototype)</description>
+		<description>Pick Up (prototype)</description>
 		<year>1983</year>
 		<publisher>20th Century Fox Video Games</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -11193,7 +11193,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="pigspacep" cloneof="pigspace">
-		<description>Pigs in Space - Starring Miss Piggy (Prototype)</description>
+		<description>Pigs in Space - Starring Miss Piggy (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -11228,7 +11228,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="pitfall2a" cloneof="pitfall2">
-		<description>Pitfall II - Lost Caverns (Alt)</description>
+		<description>Pitfall II - Lost Caverns (alt)</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -11318,7 +11318,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="pitfalle1" cloneof="pitfall">
-		<description>Pitfall! - Pitfall Harry's Jungle Adventure (PAL) (Unknown)</description>
+		<description>Pitfall! - Pitfall Harry's Jungle Adventure (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -11329,7 +11329,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="pitfallp1" cloneof="pitfall">
-		<description>Pitfall! - Pitfall Harry's Jungle Adventure (Prototype)</description>
+		<description>Pitfall! - Pitfall Harry's Jungle Adventure (prototype)</description>
 		<year>1982</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -11340,7 +11340,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="pitfallp2" cloneof="pitfall">
-		<description>Pitfall! - Pitfall Harry's Jungle Adventure (Prototype, Older)</description>
+		<description>Pitfall! - Pitfall Harry's Jungle Adventure (prototype, older)</description>
 		<year>1981</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -11362,7 +11362,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="pizzachfp" cloneof="pizzachf">
-		<description>Pizza Chef - Pizza Time (Prototype)</description>
+		<description>Pizza Chef - Pizza Time (prototype)</description>
 		<year>1983</year>
 		<publisher>ZiMAG</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -11373,7 +11373,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="planapes">
-		<description>Planet of the Apes (Prototype)</description>
+		<description>Planet of the Apes (prototype)</description>
 		<year>1983</year>
 		<publisher>20th Century Fox Video Games</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -11406,7 +11406,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="ppatrolc1" cloneof="ppatrol">
-		<description>Planet Patrol (CCE, Alt)</description>
+		<description>Planet Patrol (CCE, alt)</description>
 		<year>1983</year>
 		<publisher>CCE</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -11429,7 +11429,7 @@ X-1414 : Streetracer
 
 	<software name="ppatrole1" cloneof="ppatrol">
 	<!-- This set features a different spaceship -->
-		<description>Planet Patrol - Planeten Patrouilie (PAL) (Alt)</description>
+		<description>Planet Patrol - Planeten Patrouilie (PAL) (alt)</description>
 		<year>1982</year>
 		<publisher>Spectravideo</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -11451,7 +11451,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="ppatrole2" cloneof="ppatrol">
-		<description>Planet Patrol (PAL) (Unknown)</description>
+		<description>Planet Patrol (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -11517,7 +11517,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="plaqueate1" cloneof="plaqueat">
-		<description>Plaque Attack (PAL) (Unknown)</description>
+		<description>Plaque Attack (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -11539,7 +11539,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="pleiades">
-		<description>Pleiades (Prototype)</description>
+		<description>Pleiades (prototype)</description>
 		<year>1983</year>
 		<publisher>UA Limited</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -11586,7 +11586,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="polarisp1" cloneof="polaris">
-		<description>Polaris (Prototype 19830217)</description>
+		<description>Polaris (prototype 19830217)</description>
 		<year>19??</year>
 		<publisher>Tigervision</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -11597,7 +11597,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="polarisp2" cloneof="polaris">
-		<description>Polaris (Prototype, Alt)</description>
+		<description>Polaris (prototype, alt)</description>
 		<year>1983</year>
 		<publisher>Tigervision</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -11621,7 +11621,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="polepos1" cloneof="polepos">
-		<description>Pole Position (Alt)</description>
+		<description>Pole Position (alt)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -11669,7 +11669,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="poleposp" cloneof="polepos">
-		<description>Pole Position (Prototype 19830515)</description>
+		<description>Pole Position (prototype 19830515)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -11681,7 +11681,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="polo">
-		<description>Polo (Prototype)</description>
+		<description>Polo (prototype)</description>
 		<year>1978</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -11692,7 +11692,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="pompeii">
-		<description>Pompeii (Prototype)</description>
+		<description>Pompeii (prototype)</description>
 		<year>1983</year>
 		<publisher>Apollo</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -11725,7 +11725,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="pooyane1" cloneof="pooyan">
-		<description>Pooyan (PAL) (Unknown)</description>
+		<description>Pooyan (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -11867,7 +11867,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="pyramidw1" cloneof="pyramidw">
-		<description>Pyramid War (PAL) (Alt)</description>
+		<description>Pyramid War (PAL) (alt)</description>
 		<year>19??</year>
 		<publisher>Suntek</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -11878,7 +11878,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="pyramidw2" cloneof="pyramidw">
-		<description>Pyramid War (PAL) (Alt 2)</description>
+		<description>Pyramid War (PAL) (alt 2)</description>
 		<year>19??</year>
 		<publisher>Suntek</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -11946,7 +11946,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="quadrunp2" cloneof="quadrun">
-		<description>Quadrun (Prototype 19821206)</description>
+		<description>Quadrun (prototype 19821206)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -11957,7 +11957,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="quadrunp1" cloneof="quadrun">
-		<description>Quadrun (Prototype 1983xxxx)</description>
+		<description>Quadrun (prototype 1983xxxx)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -12015,7 +12015,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="rabbittr">
-		<description>Rabbit Transit (Prototype 19830829)</description>
+		<description>Rabbit Transit (prototype 19830829)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -12038,7 +12038,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="racing1" cloneof="racing">
-		<description>Racing Car (Unknown)</description>
+		<description>Racing Car (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -12060,7 +12060,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="racquetb1" cloneof="racquetb">
-		<description>Racquetball (Alt)</description>
+		<description>Racquetball (alt)</description>
 		<year>1981</year>
 		<publisher>Apollo</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -12071,7 +12071,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="racquetb2" cloneof="racquetb">
-		<description>Racquetball (Unknown)</description>
+		<description>Racquetball (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -12093,7 +12093,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="racquetbe1" cloneof="racquetb">
-		<description>Racquetball (PAL) (Unknown)</description>
+		<description>Racquetball (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -12225,7 +12225,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="ramite1" cloneof="ramit">
-		<description>Ram It (PAL) (Unknown)</description>
+		<description>Ram It (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -12294,7 +12294,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="rsbasebp1" cloneof="rsbaseb">
-		<description>RealSports Baseball (Prototype 19820709)</description>
+		<description>RealSports Baseball (prototype 19820709)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -12306,7 +12306,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="rsbasebp2" cloneof="rsbaseb">
-		<description>RealSports Baseball (Prototype 1982xxxx)</description>
+		<description>RealSports Baseball (prototype 1982xxxx)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -12366,7 +12366,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="rsfootbp" cloneof="rsfootb">
-		<description>RealSports Football (Prototype)</description>
+		<description>RealSports Football (prototype)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -12391,7 +12391,7 @@ X-1414 : Streetracer
 
 	<software name="rssoccer1" cloneof="rssoccer">
 	<!-- This set has no opening tune -->
-		<description>RealSports Soccer - Football - RealSports Soccer (Alt)</description>
+		<description>RealSports Soccer - Football - RealSports Soccer (alt)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -12415,7 +12415,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="rssoccerp" cloneof="rssoccer">
-		<description>RealSports Soccer - Football - RealSports Soccer (Prototype)</description>
+		<description>RealSports Soccer - Football - RealSports Soccer (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -12451,7 +12451,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="rstennisp" cloneof="rstennis">
-		<description>RealSports Tennis (Prototype)</description>
+		<description>RealSports Tennis (prototype)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -12485,7 +12485,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="redvsblu">
-		<description>Red Vs. Blue - Football (Prototype)</description>
+		<description>Red Vs. Blue - Football (prototype)</description>
 		<year>1981</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -12586,7 +12586,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="riveraidc1" cloneof="riveraid">
-		<description>River Raid (CCE, Alt)</description>
+		<description>River Raid (CCE, alt)</description>
 		<year>1983</year>
 		<publisher>CCE</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -12707,7 +12707,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="riveraide1" cloneof="riveraid">
-		<description>River Raid (PAL) (Unknown)</description>
+		<description>River Raid (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -12833,7 +12833,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="roadrunp" cloneof="roadrun">
-		<description>Road Runner (Prototype 19840625)</description>
+		<description>Road Runner (prototype 19840625)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -12928,7 +12928,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="rockybul">
-		<description>Rocky &amp; Bullwinkle (Prototype 19830420)</description>
+		<description>Rocky &amp; Bullwinkle (prototype 19830420)</description>
 		<year>19??</year>
 		<publisher>M Network</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -12983,7 +12983,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="rubik3d">
-		<description>Rubik's Cube 3-D (Prototype)</description>
+		<description>Rubik's Cube 3-D (prototype)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -12994,7 +12994,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="rushhour">
-		<description>Rush Hour (Prototype)</description>
+		<description>Rush Hour (prototype)</description>
 		<year>1983</year>
 		<publisher>Commavid</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -13005,7 +13005,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="rushhour1" cloneof="rushhour">
-		<description>Rush Hour (Prototype, Alt)</description>
+		<description>Rush Hour (prototype, alt)</description>
 		<year>1983</year>
 		<publisher>Commavid</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -13016,7 +13016,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="rushhour2" cloneof="rushhour">
-		<description>Rush Hour (Prototype, Alt 2)</description>
+		<description>Rush Hour (prototype, alt 2)</description>
 		<year>1983</year>
 		<publisher>Commavid</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -13027,7 +13027,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="rushhour3" cloneof="rushhour">
-		<description>Rush Hour (Prototype, Alt 3)</description>
+		<description>Rush Hour (prototype, alt 3)</description>
 		<year>1983</year>
 		<publisher>Commavid</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -13038,7 +13038,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="rushhour4" cloneof="rushhour">
-		<description>Rush Hour (Prototype, Alt 4)</description>
+		<description>Rush Hour (prototype, alt 4)</description>
 		<year>1983</year>
 		<publisher>Commavid</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -13049,7 +13049,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="rushhour5" cloneof="rushhour">
-		<description>Rush Hour (Prototype, Alt 5)</description>
+		<description>Rush Hour (prototype, alt 5)</description>
 		<year>1983</year>
 		<publisher>Commavid</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -13060,7 +13060,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="saboteur4" cloneof="saboteur">
-		<description>Saboteur (Prototype 19830520)</description>
+		<description>Saboteur (prototype 19830520)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -13072,7 +13072,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="saboteur3" cloneof="saboteur">
-		<description>Saboteur (Prototype 19830609)</description>
+		<description>Saboteur (prototype 19830609)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -13084,7 +13084,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="saboteur2" cloneof="saboteur">
-		<description>Saboteur (Prototype 19830615)</description>
+		<description>Saboteur (prototype 19830615)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -13096,7 +13096,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="saboteur1" cloneof="saboteur">
-		<description>Saboteur (Prototype 19830902)</description>
+		<description>Saboteur (prototype 19830902)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -13108,7 +13108,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="saboteur">
-		<description>Saboteur (Prototype 19831220)</description>
+		<description>Saboteur (prototype 19831220)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -13120,7 +13120,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="savemary1" cloneof="savemary">
-		<description>Save Mary! (Prototype 19890403)</description>
+		<description>Save Mary! (prototype 19890403)</description>
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -13132,7 +13132,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="savemarye" cloneof="savemary">
-		<description>Save Mary! (PAL) (Prototype 19911024)</description>
+		<description>Save Mary! (PAL) (prototype 19911024)</description>
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -13147,7 +13147,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="savemary">
-		<description>Save Mary! (Prototype 19891121)</description>
+		<description>Save Mary! (prototype 19891121)</description>
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -13173,7 +13173,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="sos1" cloneof="sos">
-		<description>Save Our Ship (Unknown)</description>
+		<description>Save Our Ship (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -13184,7 +13184,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="savewhal">
-		<description>Save the Whales (Prototype)</description>
+		<description>Save the Whales (prototype)</description>
 		<year>1983</year>
 		<publisher>20th Century Fox Video Games</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -13250,7 +13250,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="seahawk1" cloneof="seahawk">
-		<description>Sea Hawk (Unknown)</description>
+		<description>Sea Hawk (unknown)</description>
 		<year>1987</year>
 		<publisher>Sancho</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -13283,7 +13283,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="seahunt1" cloneof="seahunt">
-		<description>Sea Hunt (Unknown)</description>
+		<description>Sea Hunt (unknown)</description>
 		<year>1987</year>
 		<publisher>Sancho</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -13338,7 +13338,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="seamonste2" cloneof="seamonst">
-		<description>Sea Monster (PAL) (Unknown)</description>
+		<description>Sea Monster (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -13371,7 +13371,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="seaquestc1" cloneof="seaquest">
-		<description>Seaquest (CCE, Alt)</description>
+		<description>Seaquest (CCE, alt)</description>
 		<year>1983</year>
 		<publisher>CCE</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -13426,7 +13426,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="seawolf3">
-		<description>Seawolf 3 (PAL) (Prototype 19810323)</description>
+		<description>Seawolf 3 (PAL) (prototype 19810323)</description>
 		<year>1983</year>
 		<publisher>Sears</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -13437,7 +13437,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="secretag">
-		<description>Secret Agent (Prototype)</description>
+		<description>Secret Agent (prototype)</description>
 		<year>1983</year>
 		<publisher>Data Age</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -13534,7 +13534,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="shootarc">
-		<description>Shooting Arcade (Prototype 19890919)</description>
+		<description>Shooting Arcade (prototype 19890919)</description>
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -13549,7 +13549,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="shootarce" cloneof="shootarc">
-		<description>Shooting Arcade (PAL) (Prototype 19900116)</description>
+		<description>Shooting Arcade (PAL) (prototype 19900116)</description>
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -13575,7 +13575,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="sinistar">
-		<description>Sinistar (Prototype 19840213)</description>
+		<description>Sinistar (prototype 19840213)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -13587,7 +13587,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="sinistar1" cloneof="sinistar">
-		<description>Sinistar (Prototype 19840123)</description>
+		<description>Sinistar (prototype 19840123)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -13599,7 +13599,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="sinistar2" cloneof="sinistar">
-		<description>Sinistar (Prototype 19840104)</description>
+		<description>Sinistar (prototype 19840104)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -13611,7 +13611,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="sinistar3" cloneof="sinistar">
-		<description>Sinistar (Prototype 1984xxxx)</description>
+		<description>Sinistar (prototype 1984xxxx)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -13781,7 +13781,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="skypatrl">
-		<description>Sky Patrol (Prototype)</description>
+		<description>Sky Patrol (prototype)</description>
 		<year>1982</year>
 		<publisher>Imagic</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -13918,7 +13918,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="snail1" cloneof="snail">
-		<description>Snail Against Squirrel (PAL) (Unknown)</description>
+		<description>Snail Against Squirrel (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -13940,7 +13940,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="sneakpeke" cloneof="sneakpek">
-		<description>Sneak 'n Peek (PAL) (Unknown)</description>
+		<description>Sneak 'n Peek (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -14023,7 +14023,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="snoopyp" cloneof="snoopy">
-		<description>Snoopy and the Red Baron (Prototype 19830527)</description>
+		<description>Snoopy and the Red Baron (prototype 19830527)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -14035,7 +14035,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="snowwhit">
-		<description>Snow White and the Seven Dwarfs (Prototype 19830209)</description>
+		<description>Snow White and the Seven Dwarfs (prototype 19830209)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -14047,7 +14047,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="snowwhit1" cloneof="snowwhit">
-		<description>Snow White and the Seven Dwarfs (Prototype 19821109)</description>
+		<description>Snow White and the Seven Dwarfs (prototype 19821109)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -14163,7 +14163,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="sorcappr1" cloneof="sorcappr">
-		<description>Sorcerer's Apprentice (Alt)</description>
+		<description>Sorcerer's Apprentice (alt)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -14187,7 +14187,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="sorcapprp" cloneof="sorcappr">
-		<description>Sorcerer's Apprentice (Prototype)</description>
+		<description>Sorcerer's Apprentice (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -14277,7 +14277,7 @@ X-1414 : Streetracer
 
 	<software name="spaceinv1" cloneof="spaceinv">
 	<!-- This set features different speed and colors -->
-		<description>Space Invaders (Alt)</description>
+		<description>Space Invaders (alt)</description>
 		<year>1980</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -14343,7 +14343,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="spacejoce1" cloneof="spacejoc">
-		<description>Space Jockey (PAL) (Unknown)</description>
+		<description>Space Jockey (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -14365,7 +14365,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="spacraid1" cloneof="spacraid">
-		<description>Space Raid (PAL) (Alt)</description>
+		<description>Space Raid (PAL) (alt)</description>
 		<year>19??</year>
 		<publisher>Suntek</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -14398,7 +14398,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="spcrobot1" cloneof="spcrobot">
-		<description>Space Robot (Unknown)</description>
+		<description>Space Robot (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -14420,7 +14420,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="spcrobote1" cloneof="spcrobot">
-		<description>Space Robot (PAL) (Unknown)</description>
+		<description>Space Robot (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -14443,7 +14443,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="shuttle1" cloneof="shuttle">
-		<description>Space Shuttle - A Journey Into Space (Alt, FE bankswitching)</description>
+		<description>Space Shuttle - A Journey Into Space (alt, FE bankswitching)</description>
 		<year>1983</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -14654,7 +14654,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="spidfghte1" cloneof="spidfght">
-		<description>Spider Fighter (PAL) (Unknown)</description>
+		<description>Spider Fighter (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -14665,7 +14665,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="spidkong">
-		<description>Spider Kong (PAL) (Unknown)</description>
+		<description>Spider Kong (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -14777,7 +14777,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="spinfire">
-		<description>Spinning Fireball (PAL) (Unknown)</description>
+		<description>Spinning Fireball (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -14788,7 +14788,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="spinfirep" cloneof="spinfire">
-		<description>Spinning Fireball - Fire Spinner - Fireball Spinner (Prototype)</description>
+		<description>Spinning Fireball - Fire Spinner - Fireball Spinner (prototype)</description>
 		<year>1983</year>
 		<publisher>ZiMAG</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -14799,7 +14799,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="spinfirep1" cloneof="spinfire">
-		<description>Spinning Fireball - Fire Spinner - Fireball Spinner (Prototype, Alt)</description>
+		<description>Spinning Fireball - Fire Spinner - Fireball Spinner (prototype, alt)</description>
 		<year>1983</year>
 		<publisher>ZiMAG</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -14932,7 +14932,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="squoosh">
-		<description>Squoosh (Prototype)</description>
+		<description>Squoosh (prototype)</description>
 		<year>1983</year>
 		<publisher>Apollo</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -14943,7 +14943,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="squoosh1" cloneof="squoosh">
-		<description>Squoosh (Prototype, Alt)</description>
+		<description>Squoosh (prototype, alt)</description>
 		<year>1983</year>
 		<publisher>Apollo</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -15009,7 +15009,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="stampedee1" cloneof="stampede">
-		<description>Stampede (PAL) (Unknown)</description>
+		<description>Stampede (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -15055,7 +15055,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="starraidp" cloneof="starraid">
-		<description>Star Raiders (Prototype)</description>
+		<description>Star Raiders (prototype)</description>
 		<year>1981</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -15145,7 +15145,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="svoyagerc1" cloneof="svoyager">
-		<description>Star Voyager (CCE, Alt)</description>
+		<description>Star Voyager (CCE, alt)</description>
 		<year>1983</year>
 		<publisher>CCE</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -15226,7 +15226,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="jediewokp" cloneof="jediewok">
-		<description>Star Wars - Return of the Jedi - Ewok Adventure (Prototype)</description>
+		<description>Star Wars - Return of the Jedi - Ewok Adventure (prototype)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<!-- larry gelberg, gary goltz -->
@@ -15265,7 +15265,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="starwarsp2" cloneof="starwars">
-		<description>Star Wars - The Arcade Game (Prototype 19840103)</description>
+		<description>Star Wars - The Arcade Game (prototype 19840103)</description>
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
 		<!-- wilfredo 'willy' aguilar, michael becker, neil mckenzie, bob smith, brad stewart -->
@@ -15277,7 +15277,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="starwarsp1" cloneof="starwars">
-		<description>Star Wars - The Arcade Game (Prototype 19840405)</description>
+		<description>Star Wars - The Arcade Game (prototype 19840405)</description>
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
 		<!-- wilfredo 'willy' aguilar, michael becker, neil mckenzie, bob smith, brad stewart -->
@@ -15290,7 +15290,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="starwarsp5" cloneof="starwars">
-		<description>Star Wars - The Arcade Game (Prototype 19831205)</description>
+		<description>Star Wars - The Arcade Game (prototype 19831205)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<!-- wilfredo 'willy' aguilar, michael becker, neil mckenzie, bob smith, brad stewart -->
@@ -15302,7 +15302,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="starwarsp4" cloneof="starwars">
-		<description>Star Wars - The Arcade Game (Prototype 19831215)</description>
+		<description>Star Wars - The Arcade Game (prototype 19831215)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<!-- wilfredo 'willy' aguilar, michael becker, neil mckenzie, bob smith, brad stewart -->
@@ -15314,7 +15314,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="starwarsp3" cloneof="starwars">
-		<description>Star Wars - The Arcade Game (Prototype 19831223)</description>
+		<description>Star Wars - The Arcade Game (prototype 19831223)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<!-- wilfredo 'willy' aguilar, michael becker, neil mckenzie, bob smith, brad stewart -->
@@ -15422,7 +15422,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="starmaste1" cloneof="starmast">
-		<description>StarMaster (PAL) (Unknown)</description>
+		<description>StarMaster (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -15455,7 +15455,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="steeplecp" cloneof="steeplec">
-		<description>Steeplechase (Prototype 19800415)</description>
+		<description>Steeplechase (prototype 19800415)</description>
 		<year>1980</year>
 		<publisher>Sears</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -15587,7 +15587,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="stuntcyc">
-		<description>Stunt Cycle (Prototype 19800721)</description>
+		<description>Stunt Cycle (prototype 19800721)</description>
 		<year>1980</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -15620,7 +15620,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="subscane" cloneof="subscan">
-		<description>Sub-Scan (PAL) (Unknown)</description>
+		<description>Sub-Scan (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -15761,7 +15761,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="sbrkout1" cloneof="sbrkout">
-		<description>Super Breakout (Alt)</description>
+		<description>Super Breakout (alt)</description>
 		<year>1981?</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -15854,7 +15854,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="ferrari1" cloneof="ferrari">
-		<description>Super-Ferrari (Unknown)</description>
+		<description>Super-Ferrari (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -16057,7 +16057,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="supermane1" cloneof="superman">
-		<description>Superman (PAL) (Unknown)</description>
+		<description>Superman (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -16068,7 +16068,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="surfsup">
-		<description>Surf's Up (Prototype)</description>
+		<description>Surf's Up (prototype)</description>
 		<year>1983</year>
 		<publisher>Amiga</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -16080,7 +16080,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="surfsup1" cloneof="surfsup">
-		<description>Surf's Up (Prototype, Alt)</description>
+		<description>Surf's Up (prototype, alt)</description>
 		<year>1983</year>
 		<publisher>Amiga</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -16136,7 +16136,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="survivalp" cloneof="survival">
-		<description>Survival Run (Prototype)</description>
+		<description>Survival Run (prototype)</description>
 		<year>1983</year>
 		<publisher>Data Age</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -16229,7 +16229,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="tacscane" cloneof="tacscan">
-		<description>Tac-Scan (PAL) (Unknown)</description>
+		<description>Tac-Scan (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -16318,7 +16318,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="targ">
-		<description>Targ (Prototype)</description>
+		<description>Targ (prototype)</description>
 		<year>1983</year>
 		<publisher>CBS Electronics</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -16340,7 +16340,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="targprac1" cloneof="targprac">
-		<description>Target Practice (Alt)</description>
+		<description>Target Practice (alt)</description>
 		<year>1983</year>
 		<publisher>CEE</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -16374,7 +16374,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="tazp1" cloneof="taz">
-		<description>Taz (Prototype 19830715)</description>
+		<description>Taz (prototype 19830715)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -16386,7 +16386,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="tazp2" cloneof="taz">
-		<description>Taz (Prototype 19830713)</description>
+		<description>Taz (prototype 19830713)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -16398,7 +16398,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="tazp3" cloneof="taz">
-		<description>Taz (Prototype 1983xxxx)</description>
+		<description>Taz (prototype 1983xxxx)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -16410,7 +16410,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="tazp4" cloneof="taz">
-		<description>Taz (Prototype 1983xxxx, Alt)</description>
+		<description>Taz (prototype 1983xxxx, alt)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -16422,7 +16422,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="tazep" cloneof="taz">
-		<description>Taz (PAL) (Prototype 19830615)</description>
+		<description>Taz (PAL) (prototype 19830615)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -16445,7 +16445,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="telepath">
-		<description>Telepathy (Prototype)</description>
+		<description>Telepathy (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -16468,7 +16468,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="tempest">
-		<description>Tempest (Prototype 19840105)</description>
+		<description>Tempest (prototype 19840105)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -16546,7 +16546,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="tennis1" cloneof="tennis">
-		<description>Tennis (Unknown)</description>
+		<description>Tennis (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -16623,7 +16623,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="thunderge" cloneof="thunderg">
-		<description>Thunderground (PAL) (Unknown)</description>
+		<description>Thunderground (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -16634,7 +16634,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="thwocker">
-		<description>Thwocker (Prototype 19840409)</description>
+		<description>Thwocker (prototype 19840409)</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -16702,7 +16702,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="timewarp1" cloneof="timewarp">
-		<description>Time Warp (Unknown)</description>
+		<description>Time Warp (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -16713,7 +16713,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="timewarpe1" cloneof="timewarp">
-		<description>Time Warp (PAL) (Unknown)</description>
+		<description>Time Warp (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -16759,7 +16759,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="tomboy">
-		<description>Tom Boy (Unknown)</description>
+		<description>Tom Boy (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -16935,7 +16935,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="tunnelrnp" cloneof="tunnelrn">
-		<description>Tunnel Runner  (Prototype)</description>
+		<description>Tunnel Runner (prototype)</description>
 		<year>1983</year>
 		<publisher>CBS Electronics</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -16971,7 +16971,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="turmoile" cloneof="turmoil">
-		<description>Turmoil (PAL) (Unknown)</description>
+		<description>Turmoil (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -17039,7 +17039,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="unkact1">
-		<description>Unknown Activision Game #1 (Prototype 19821022)</description>
+		<description>Unknown Activision Game #1 (prototype 19821022)</description>
 		<year>19??</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -17050,7 +17050,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="unkact1a" cloneof="unkact1">
-		<description>Unknown Activision Game #1 (Prototype 19821029)</description>
+		<description>Unknown Activision Game #1 (prototype 19821029)</description>
 		<year>19??</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -17061,7 +17061,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="unkact2">
-		<description>Unknown Activision Game #2 (Prototype)</description>
+		<description>Unknown Activision Game #2 (prototype)</description>
 		<year>1983</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -17072,7 +17072,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="unkuniv">
-		<description>Unknown Universal Game (Prototype)</description>
+		<description>Unknown Universal Game (prototype)</description>
 		<year>1983</year>
 		<publisher>Universal</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -17144,7 +17144,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="vanguardp" cloneof="vanguard">
-		<description>Vanguard (Prototype)</description>
+		<description>Vanguard (prototype)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -17255,7 +17255,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="videochse1" cloneof="videochs">
-		<description>Video Chess (PAL) (Unknown)</description>
+		<description>Video Chess (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -17303,7 +17303,7 @@ X-1414 : Streetracer
 
 	<software name="videolif1" cloneof="videolif">
 	<!-- This set features higher sounds -->
-		<description>Video Life (Alt)</description>
+		<description>Video Life (alt)</description>
 		<year>1981</year>
 		<publisher>CommaVid</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -17361,7 +17361,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="videopine1" cloneof="videopin">
-		<description>Video Pinball (PAL) (Unknown)</description>
+		<description>Video Pinball (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -17460,7 +17460,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="walker1" cloneof="walker">
-		<description>Walker (PAL) (Alt)</description>
+		<description>Walker (PAL) (alt)</description>
 		<year>19??</year>
 		<publisher>Suntek</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -17493,7 +17493,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="wallbrek1" cloneof="wallbrek">
-		<description>Wall Break (Unknown)</description>
+		<description>Wall Break (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -17619,7 +17619,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="wings">
-		<description>Wings (Prototype 19831010)</description>
+		<description>Wings (prototype 19831010)</description>
 		<year>1983</year>
 		<publisher>CBS Electronics</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -17633,7 +17633,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="wings1" cloneof="wings">
-		<description>Wings (Prototype 19830603)</description>
+		<description>Wings (prototype 19830603)</description>
 		<year>1983</year>
 		<publisher>CBS Electronics</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -17671,7 +17671,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="wizard">
-		<description>Wizard (Prototype)</description>
+		<description>Wizard (prototype)</description>
 		<year>1980</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -17682,7 +17682,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="wizard1" cloneof="wizard">
-		<description>Wizard (Prototype, Alt)</description>
+		<description>Wizard (prototype, alt)</description>
 		<year>1980</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -17726,7 +17726,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="wordzap1" cloneof="wordzap">
-		<description>Word Zapper (Unknown)</description>
+		<description>Word Zapper (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -17737,7 +17737,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="wordzape" cloneof="wordzap">
-		<description>Word Zapper (PAL) (Unknown)</description>
+		<description>Word Zapper (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -17748,7 +17748,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="wordsatt">
-		<description>Words-Attack (PAL) (Prototype)</description>
+		<description>Words-Attack (PAL) (prototype)</description>
 		<year>1983</year>
 		<publisher>Tang's Electronic Co.</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -17792,7 +17792,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="wormware" cloneof="wormwar">
-		<description>Worm War I (PAL) (Unknown)</description>
+		<description>Worm War I (PAL) (unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -17860,7 +17860,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="xevious">
-		<description>Xevious (Prototype 19830802)</description>
+		<description>Xevious (prototype 19830802)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -17872,7 +17872,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="xevious1" cloneof="xevious">
-		<description>Xevious (Prototype 19830525)</description>
+		<description>Xevious (prototype 19830525)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -17918,7 +17918,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="yarsrevp" cloneof="yarsrev">
-		<description>Yars' Revenge (Prototype, 09-01-81)</description>
+		<description>Yars' Revenge (prototype, 09-01-81)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -17977,7 +17977,7 @@ X-1414 : Streetracer
 	</software>
 
 	<software name="zookeeps" supported="no">
-		<description>Zoo Keeper Sounds (Prototype)</description>
+		<description>Zoo Keeper Sounds (prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
