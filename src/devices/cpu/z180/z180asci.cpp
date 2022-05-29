@@ -67,7 +67,10 @@ static constexpr u8 Z180_ASEXT1_MASK       = 0x1f;
 
 z180asci_channel_base::z180asci_channel_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const int id, const bool ext)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_brg(*this, "brg")
+	, m_rcv_clock(nullptr)
+	, m_tra_clock(nullptr)
+	, m_bit_rate(attotime::never)
+	, m_sample_rate(attotime::never)
 	, m_txa_handler(*this)
 	, m_rts_handler(*this)
 	, m_cka_handler(*this)
@@ -123,13 +126,18 @@ void z180asci_channel_base::device_start()
 
 	save_item(NAME(m_clock_state));
 	save_item(NAME(m_tx_state));
-	save_item(NAME(m_tx_counter));
 	save_item(NAME(m_rx_state));
 	save_item(NAME(m_rx_parity));
 	save_item(NAME(m_rx_bits));
-	save_item(NAME(m_rx_counter));
 
 	save_item(NAME(m_rx_enabled));
+
+	save_item(NAME(m_bit_rate));
+	save_item(NAME(m_sample_rate));
+
+	m_rcv_clock = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z180asci_channel_base::rcv_clock), this));
+	m_tra_clock = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z180asci_channel_base::tra_clock), this));
+
 }
 
 void z180asci_channel_base::device_reset()
@@ -147,18 +155,10 @@ void z180asci_channel_base::device_reset()
 	m_rxa = 1;
 	m_clock_state = 0;
 	m_tx_state = STATE_WAIT;
-	m_tx_counter = 0;
 	m_rx_state = STATE_START;
 	m_rx_parity = 0;
 	m_rx_bits = 0;
-	m_rx_counter = 0;
 	m_rx_enabled = true;
-}
-
-void z180asci_channel_base::device_add_mconfig(machine_config &config)
-{
-	CLOCK(config, m_brg, 0);
-	m_brg->signal_handler().append(*this, FUNC(z180asci_channel_base::brg_wr));
 }
 
 void z180asci_channel_base::device_clock_changed()
@@ -189,13 +189,20 @@ void z180asci_channel_base::device_clock_changed()
 	if (m_brg_divisor)
 	{
 		LOG("Z180 ASCI%d set bitrate %d\n", m_id, uint32_t(clock() / m_brg_divisor / m_divisor));
-		m_brg->set_clock(DERIVED_CLOCK(1,m_brg_divisor));
+		m_bit_rate = attotime::from_hz(clock() / m_brg_divisor / m_divisor);
+		m_sample_rate = attotime::from_hz(clock() / m_brg_divisor);
 	}
 	else
 	{
 		LOG("Z180 ASCI%d set bitrate 0, using external\n", m_id);
-		m_brg->set_clock(0);
+		m_bit_rate = attotime::never;
+		m_sample_rate = attotime::never;
 	}
+
+	m_tra_clock->adjust(attotime::never);
+	m_rx_state = STATE_START;
+	if(!m_sample_rate.is_never())
+		m_rcv_clock->adjust(m_sample_rate, 0, m_sample_rate);
 }
 
 uint8_t z180asci_channel_base::cntla_r()
@@ -285,6 +292,9 @@ void z180asci_channel_base::tdr_w(uint8_t data)
 	LOG("Z180 TDR%d   wr $%02x\n", m_id, data);
 	m_asci_tdr = data;
 	m_asci_stat &= ~Z180_STAT_TDRE;
+
+	if (!m_bit_rate.is_never())
+		m_tra_clock->adjust(m_bit_rate, 0, m_bit_rate);
 }
 
 void z180asci_channel_base::rdr_w(uint8_t data)
@@ -354,15 +364,6 @@ DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::rxa_wr )
 	m_rxa = state;
 }
 
-DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::brg_wr )
-{
-	m_cka_handler(state);
-	if (!state)
-		transmit_edge();
-	else
-		receive_edge();
-}
-
 
 DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::cka_wr )
 {
@@ -407,10 +408,6 @@ void z180asci_channel_base::prepare_tsr()
 
 void z180asci_channel_base::transmit_edge()
 {
-	m_tx_counter++;
-	if (m_tx_counter != m_divisor) return;
-	m_tx_counter = 0;
-
 	if (m_asci_cntla & Z180_CNTLA_TE)
 	{
 		switch (m_tx_state)
@@ -426,6 +423,7 @@ void z180asci_channel_base::transmit_edge()
 					m_irq = 1;
 				}
 				m_tx_state = STATE_WAIT;
+				m_tra_clock->adjust(attotime::never);
 			}
 			break;
 		case STATE_WAIT:
@@ -444,10 +442,6 @@ void z180asci_channel_base::transmit_edge()
 
 void z180asci_channel_base::receive_edge()
 {
-	m_rx_counter++;
-	if (m_rx_counter != m_divisor) return;
-	m_rx_counter = 0;
-
 	if (!m_rx_enabled) return;
 
 	if (m_asci_cntla & Z180_CNTLA_RE)
@@ -462,6 +456,8 @@ void z180asci_channel_base::receive_edge()
 				m_rx_parity = 0;
 				m_rx_error = 0;
 				m_rsr = 0;
+				if(!(m_bit_rate.is_never()))
+					m_rcv_clock->adjust((m_bit_rate * 3) / 2, 0, m_bit_rate);
 			}
 			break;
 		case STATE_DATA:
@@ -500,6 +496,8 @@ void z180asci_channel_base::receive_edge()
 					set_fifo_data(m_rsr, m_rx_error);
 				}
 				m_rx_state = STATE_START;
+				if(!m_sample_rate.is_never())
+					m_rcv_clock->adjust(m_sample_rate, 0, m_sample_rate);
 			}
 			break;
 		}

@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "machine/clock.h"
+//#include "machine/clock.h"
 
 //**************************************************************************
 //  z180asci_channel_base
@@ -58,10 +58,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_resolve_objects() override;
-	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_clock_changed() override;
-
-	DECLARE_WRITE_LINE_MEMBER( brg_wr );
 
 	void transmit_edge();
 	void receive_edge();
@@ -82,8 +79,13 @@ protected:
 
 	void output_txa(int txa);
 	void output_rts(int rts);
+	TIMER_CALLBACK_MEMBER(rcv_clock) { receive_edge(); }
+	TIMER_CALLBACK_MEMBER(tra_clock) { transmit_edge(); }
 
-	required_device<clock_device> m_brg;
+	emu_timer *m_rcv_clock;
+	emu_timer *m_tra_clock;
+	attotime m_bit_rate;
+	attotime m_sample_rate;
 
 	devcb_write_line m_txa_handler;
 	devcb_write_line m_rts_handler;
@@ -117,11 +119,9 @@ protected:
 
 	uint8_t   m_clock_state;
 	uint8_t   m_tx_state;
-	uint8_t   m_tx_counter;
 	uint8_t   m_rx_state;
 	uint8_t   m_rx_parity;
 	uint8_t   m_rx_bits;
-	uint8_t   m_rx_counter;
 
 	bool m_rx_enabled;
 
