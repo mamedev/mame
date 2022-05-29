@@ -91,7 +91,7 @@ namespace plib
 		UNKNOWN,
 		LIBSTDCXX,
 		LIBCPP,
-		MSC
+		MSVCPRT
 	};
 
 	enum class ci_os
@@ -178,9 +178,9 @@ namespace plib
 	#elif defined(__GLIBCXX__)
 		using cpp_stdlib = std::integral_constant<ci_cpp_stdlib, ci_cpp_stdlib::LIBSTDCXX>;
 		using cpp_stdlib_version = typed_version<(_GLIBCXX_RELEASE), 0>;
-	#elif defined(_MSC_VER)
-		using cpp_stdlib = std::integral_constant<ci_cpp_stdlib, ci_cpp_stdlib::MSC>;
-		using cpp_stdlib_version = typed_version<_MSC_VER / 100, _MSC_VER % 100>;
+	#elif defined(_CPPLIB_VER) && defined(_MSVC_STL_VERSION)
+		using cpp_stdlib = std::integral_constant<ci_cpp_stdlib, ci_cpp_stdlib::MSVCPRT>;
+		using cpp_stdlib_version = typed_version<_CPPLIB_VER, 0>;
 	#else
 		using cpp_stdlib = std::integral_constant<ci_cpp_stdlib, ci_cpp_stdlib::UNKNOWN>;
 		using cpp_stdlib_version = typed_version<0, 0, 0>;
