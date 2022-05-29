@@ -64,7 +64,8 @@ protected:
 	void receive_edge();
 	void set_fifo_data(uint8_t data, uint8_t error);
 	void prepare_tsr();
-	bool check_received();
+	void update_received();
+	void update_total_bits();
 
 	enum serial_state
 	{
@@ -111,7 +112,6 @@ protected:
 	uint8_t   m_rxa;
 	uint8_t   m_rts;
 
-	uint32_t  m_brg_divisor;
 	uint32_t  m_divisor;
 
 	uint8_t   m_clock_state;
@@ -122,6 +122,7 @@ protected:
 	uint8_t   m_tx_counter;
 	uint8_t   m_rx_counter;
 	uint8_t   m_rx_count_to;
+	uint8_t   m_rx_total_bits;
 
 	bool m_rx_enabled;
 

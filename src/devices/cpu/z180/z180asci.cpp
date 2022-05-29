@@ -78,7 +78,6 @@ z180asci_channel_base::z180asci_channel_base(const machine_config &mconfig, devi
 	, m_dcd(0)
 	, m_irq(0)
 	, m_rts(0)
-	, m_brg_divisor(0)
 	, m_divisor(0)
 	, m_id(id)
 	, m_ext(ext)
@@ -120,22 +119,23 @@ void z180asci_channel_base::device_start()
 	save_item(NAME(m_rxa));
 	save_item(NAME(m_rts));
 
-	save_item(NAME(m_brg_divisor));
 	save_item(NAME(m_divisor));
 
 	save_item(NAME(m_clock_state));
+	
+	save_item(NAME(m_tx_counter));
 	save_item(NAME(m_tx_state));
+	
 	save_item(NAME(m_rx_state));
 	save_item(NAME(m_rx_bits));
-
+	save_item(NAME(m_rx_counter));
+	save_item(NAME(m_rx_count_to));
+	save_item(NAME(m_rx_total_bits));
 	save_item(NAME(m_rx_enabled));
 
 	save_item(NAME(m_bit_rate));
 	save_item(NAME(m_sample_rate));
 
-	save_item(NAME(m_tx_counter));
-	save_item(NAME(m_rx_counter));
-	save_item(NAME(m_rx_count_to));
 
 	m_rcv_clock = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z180asci_channel_base::rcv_clock), this));
 	m_tra_clock = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z180asci_channel_base::tra_clock), this));
@@ -168,34 +168,35 @@ void z180asci_channel_base::device_reset()
 
 void z180asci_channel_base::device_clock_changed()
 {
+	uint32_t brg_divisor;
 	 // Divide ratio
 	m_divisor = (m_asci_ext & Z180_ASEXT_X1_BIT_CLK0) ? 1 : ((m_asci_cntlb & Z180_CNTLB_DR) ? 64 : 16);
 
 	if ((m_asci_cntlb & Z180_CNTLB_SS) == Z180_CNTLB_SS)
 	{
 		// External clock
-		m_brg_divisor = 0;
+		brg_divisor = 0;
 	}
 	else
 	{
 		if (m_asci_ext & Z180_ASEXT_BRG0_MODE)
 		{
 			// Extended boud rate generator mode
-			m_brg_divisor = m_asci_tc.w + 2;
+			brg_divisor = m_asci_tc.w + 2;
 		}
 		else
 		{
 			// Regular bitrate generator mode
-			m_brg_divisor = 1 << (m_asci_cntlb & Z180_CNTLB_SS);
-			m_brg_divisor *= ((m_asci_cntlb & Z180_CNTLB_CTS_PS) ? 30 : 10); // Prescale
+			brg_divisor = 1 << (m_asci_cntlb & Z180_CNTLB_SS);
+			brg_divisor *= ((m_asci_cntlb & Z180_CNTLB_CTS_PS) ? 30 : 10); // Prescale
 		}
 	}
 
-	if (m_brg_divisor)
+	if (brg_divisor)
 	{
-		LOG("Z180 ASCI%d set bitrate %d\n", m_id, uint32_t(clock() / m_brg_divisor / m_divisor));
-		m_bit_rate = attotime::from_hz(clock() / m_brg_divisor / m_divisor);
-		m_sample_rate = attotime::from_hz(clock() / m_brg_divisor);
+		LOG("Z180 ASCI%d set bitrate %d\n", m_id, uint32_t(clock() / brg_divisor / m_divisor));
+		m_bit_rate = attotime::from_hz(clock() / brg_divisor / m_divisor);
+		m_sample_rate = attotime::from_hz(clock() / brg_divisor);
 	}
 	else
 	{
@@ -274,6 +275,13 @@ uint8_t z180asci_channel_base::astch_r()
 	return m_asci_tc.b.h;
 }
 
+void z180asci_channel_base::update_total_bits()
+{
+	m_rx_total_bits = (m_asci_cntla & Z180_CNTLA_MODE_DATA) ? 8 : 7;
+	m_rx_total_bits += (m_asci_cntla & Z180_CNTLA_MODE_STOPB) ? 2 : 1;
+	m_rx_total_bits += (m_asci_cntlb & Z180_CNTLB_MP) ? 1 : ((m_asci_cntla & Z180_CNTLA_MODE_PARITY) ? 1 : 0);
+}
+
 void z180asci_channel_base::cntla_w(uint8_t data)
 {
 	LOG("Z180 CNTLA%d wr $%02x\n", m_id, data);
@@ -284,6 +292,7 @@ void z180asci_channel_base::cntla_w(uint8_t data)
 		m_asci_stat &= ~(Z180_STAT_OVRN | Z180_STAT_PE | Z180_STAT_FE);
 		m_asci_ext &= ~(Z180_ASEXT_BRK_DET);
 	}
+	update_total_bits();
 }
 
 void z180asci_channel_base::cntlb_w(uint8_t data)
@@ -291,6 +300,7 @@ void z180asci_channel_base::cntlb_w(uint8_t data)
 	LOG("Z180 CNTLB%d wr $%02x\n", m_id, data);
 	m_asci_cntlb = data;
 	device_clock_changed();
+	update_total_bits();
 }
 
 void z180asci_channel_base::tdr_w(uint8_t data)
@@ -458,44 +468,36 @@ void z180asci_channel_base::transmit_edge()
 	}
 }
 
-bool z180asci_channel_base::check_received()
+void z180asci_channel_base::update_received()
 {
-
-	int bits = (m_asci_cntla & Z180_CNTLA_MODE_DATA) ? 8 : 7;
+	uint8_t rx_error = 0;
 	int stop_bits = (m_asci_cntla & Z180_CNTLA_MODE_STOPB) ? 2 : 1;
-	int total_bits = bits + stop_bits + ((m_asci_cntlb & Z180_CNTLB_MP) ? 1 : (m_asci_cntla & Z180_CNTLA_MODE_PARITY) ? 1 : 0);
-	if (m_rx_bits == total_bits)
+	if (m_rsr == 0) // Break detect
 	{
-		uint8_t rx_error = 0;
-		if (m_rsr == 0) // Break detect
-		{
-			m_asci_ext |= Z180_ASEXT_BRK_DET;
-		}
-		uint8_t stop_val = (m_asci_cntla & Z180_CNTLA_MODE_STOPB) ? 3: 1;
-		if ((m_rsr & stop_val) != stop_val)
-			rx_error |= Z180_STAT_FE;
-
-		if (m_asci_cntlb & Z180_CNTLB_MP)
-		{
-			m_asci_cntla |= ((m_rsr >> stop_bits) & 1) ? Z180_CNTLA_MPBR_EFR : 0;
-		}
-		else if (m_asci_cntla & Z180_CNTLA_MODE_PARITY)
-		{
-			uint8_t parity = 0;
-			for (int i = 0; i < bits; i++)
-				parity ^= BIT(m_rsr, i);
-			if (m_asci_cntlb & Z180_CNTLB_PEO) parity ^= 1; // odd parity
-			if (((m_rsr >> stop_bits) & 1) != parity)
-				rx_error |= Z180_STAT_PE;
-		}
-		// Skip only if MPE mode active and MPB is 0
-		if (!((m_asci_cntla & Z180_CNTLA_MPE) && ((m_asci_cntla & Z180_CNTLA_MPBR_EFR) == 0)))
-		{
-			set_fifo_data(m_rsr, rx_error);
-		}
-		return true;
+		m_asci_ext |= Z180_ASEXT_BRK_DET;
 	}
-	return false;
+	uint8_t stop_val = (m_asci_cntla & Z180_CNTLA_MODE_STOPB) ? 3: 1;
+	if ((m_rsr & stop_val) != stop_val)
+		rx_error |= Z180_STAT_FE;
+
+	if (m_asci_cntlb & Z180_CNTLB_MP)
+	{
+		m_asci_cntla |= ((m_rsr >> stop_bits) & 1) ? Z180_CNTLA_MPBR_EFR : 0;
+	}
+	else if (m_asci_cntla & Z180_CNTLA_MODE_PARITY)
+	{
+		uint8_t parity = 0;
+		for (int i = 0; i < ((m_asci_cntla & Z180_CNTLA_MODE_DATA) ? 8 : 7); i++)
+			parity ^= BIT(m_rsr, i);
+		if (m_asci_cntlb & Z180_CNTLB_PEO) parity ^= 1; // odd parity
+		if (((m_rsr >> stop_bits) & 1) != parity)
+			rx_error |= Z180_STAT_PE;
+	}
+	// Skip only if MPE mode active and MPB is 0
+	if (!((m_asci_cntla & Z180_CNTLA_MPE) && ((m_asci_cntla & Z180_CNTLA_MPBR_EFR) == 0)))
+	{
+		set_fifo_data(m_rsr, rx_error);
+	}
 }
 
 void z180asci_channel_base::receive_edge()
@@ -512,20 +514,24 @@ void z180asci_channel_base::receive_edge()
 				m_rx_state = STATE_DATA;
 				m_rx_bits = 0;
 				m_rsr = 0;
-				m_rx_count_to = (m_divisor == 1) ? m_divisor : (m_divisor * 3) / 2;
 				if(!(m_bit_rate.is_never()))
 					m_rcv_clock->adjust((m_divisor == 1) ? m_bit_rate : (m_bit_rate * 3) / 2, 0, m_bit_rate);
+				else
+					m_rx_count_to = (m_divisor == 1) ? m_divisor : (m_divisor * 3) / 2;
 			}
 			break;
 		case STATE_DATA:
 			m_rsr |= m_rxa << m_rx_bits;
 			m_rx_bits++;
-			if (check_received())
+			m_rx_count_to = m_divisor;
+			if (m_rx_bits == m_rx_total_bits)
 			{
+				update_received();
 				m_rx_state = STATE_START;
-				m_rx_count_to = 1;
 				if(!m_sample_rate.is_never())
 					m_rcv_clock->adjust(m_sample_rate, 0, m_sample_rate);
+				else
+					m_rx_count_to = 1;
 			}
 			break;
 		}
