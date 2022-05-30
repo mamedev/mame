@@ -374,6 +374,29 @@ public:
 	// games with sequence starting 00 60 68 38 d0 2c 90 24 e4 e8 3c f0 88 34 20 40 e8 bc f4 28
 	static constexpr uint8_t wayin_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
+	// games with sequence starting 00 c0 c8 38 f4 4c 70 60 e4 e8 38 b4 48 34 44 
+	static constexpr uint8_t bluediamond_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+	// games with sequence starting 00 24 24 a4 68 14 c4 28 d4 8c d8 f0 0c d0 8c
+	static constexpr uint8_t wildtime_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+	// games with sequence starting  00 a0 a8 58 f4 8c d8 70 c4 e8 58 74 80 2c 94 4c
+	static constexpr uint8_t redheat_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+	// games with sequence starting 00 60 60 a0 2c 50 84 28 d4 c8 9c b4 48 94
+	static constexpr uint8_t blkcat_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+	// games with sequence starting 00 60 60 c0 4c 10 84 48 b4 a8 98 d4 2c 90
+	static constexpr uint8_t salsa_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+	// games with sequence starting 00 24 24 64 2c 30 48 30 68 58 5c 5c
+	static constexpr uint8_t goljok_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+	// games with sequence starting 00 a0 a8 1c f4 c8 1c b4 cc 5c 74 44 e0 28
+	static constexpr uint8_t blackwhite_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+	// games with sequence starting  00 c0 d0 1c ec 78 ac 30 4c 2c 24 cc 7c a4 d8
+	static constexpr uint8_t tricolor_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 protected:
 	mpu4_characteriser_pal(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

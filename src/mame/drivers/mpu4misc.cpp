@@ -26,6 +26,7 @@ public:
 ROM_START( m4bangin )
 	ROM_REGION( 0x020000, "maincpu", 0 )
 	ROM_LOAD( "bang.hex", 0x0000, 0x020000, CRC(e40f21d3) SHA1(62319967882f01bbd4d10bca52daffd2fe3ec03a) )
+
 	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
 	ROM_LOAD( "bang.chr", 0x0000, 0x000048, CRC(aacbab22) SHA1(1f394b8947486f319743c0703884ecd35214c433) )
 

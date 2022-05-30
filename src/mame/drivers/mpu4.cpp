@@ -3090,6 +3090,16 @@ void mpu4_state::mod2_cheatchr_hittop(machine_config &config)
 	mod2_cheatchr_table(config, mpu4_characteriser_pal::hittop_lamp_scramble);
 }
 
+void mpu4_state::mod2_cheatchr_tricolor(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::tricolor_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_blackwhite(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::blackwhite_lamp_scramble);
+}
+
 // alt reel setup
 
 void mpu4_state::mod2_alt(machine_config &config)
@@ -3742,6 +3752,37 @@ void mpu4_state::mod4oki_cheatchr_andycappalt(machine_config &config)
 	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::andycappalt_lamp_scramble);
 }
 
+void mpu4_state::mod4oki_cheatchr_redheat(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::redheat_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_blkcat(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::blkcat_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_salsa(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::salsa_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_goljok(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::goljok_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_blackwhite(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::blackwhite_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_tricolor(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::tricolor_lamp_scramble);
+}
+
+
 // alt reel setup
 
 void mpu4_state::mod4oki_alt(machine_config &config)
@@ -3802,6 +3843,15 @@ void mpu4_state::mod4oki_alt_cheatchr_fortune(machine_config &config)
 	mod4oki_alt_cheatchr_table(config, mpu4_characteriser_pal::fortune_lamp_scramble);
 }
 
+void mpu4_state::mod4oki_alt_cheatchr_bluediamond(machine_config &config)
+{
+	mod4oki_alt_cheatchr_table(config, mpu4_characteriser_pal::bluediamond_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_alt_cheatchr_wildtime(machine_config &config)
+{
+	mod4oki_alt_cheatchr_table(config, mpu4_characteriser_pal::wildtime_lamp_scramble);
+}
 
 // 5 reel setup
 

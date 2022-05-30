@@ -2069,8 +2069,8 @@ GAME(199?, m4tbrldx,  m4tbreel,   mod2_cheatchr_rhm, mpu4,            mpu4mod2_m
 // 00 30 10 0c 98 a8 c4 60 3c ac c4 7c b4
 GAME(199?, m4taj,     0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Taj Mahal (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
 
-// 00 c0 d0 1c ec 78 ac 30 4c 2c 24 cc 7c a4 d8 a4
-GAME(199?, m4tricol,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Tricolor (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
+// 00 c0 d0 1c ec 78 ac 30 4c 2c 24 cc 7c a4 d8 a4 (tricolor)
+GAME(199?, m4tricol,  0,          mod2_cheatchr_tricolor, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Tricolor (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
 
 // 00 14 10 a0 c4 c4 74 30 b0 70 00 b4 50 80 f4 40 94
 GAME(199?, m4twilgt,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Twilight (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
@@ -2091,8 +2091,8 @@ GAME(199?, m4bjac,    0,          mod2_cheatchr_bjac, mpu4,            mpu4mod2_
 GAME(199?, m4bjaca,   m4bjac,     mod2_cheatchr_bjac, mpu4,            mpu4mod2_machines_state, init_m4default_alt, ROT0,   "Barcrest","Blackjack Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
 
 // REEL D ALARM
-// 00 a0 a8 1c f4 c8 1c b4 cc 5c 74 44 e0 28 d0 0c d0
-GAME(199?, m421club,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","21 Club (Barcrest) [DTW, Dutch] (MPU4)",GAME_FLAGS )
+// 00 a0 a8 1c f4 c8 1c b4 cc 5c 74 44 e0 28 d0 0c d0 (blackwhite)
+GAME(199?, m421club,  0,          mod2_cheatchr_blackwhite, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","21 Club (Barcrest) [DTW, Dutch] (MPU4)",GAME_FLAGS )
 
 // REEL A ALARM
 // 00 84 94 5c ec 3c ec 30 4c 68 60 cc 7c e0 94 58 ec 7c (andybt)

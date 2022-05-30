@@ -1183,7 +1183,7 @@ GAME_CUSTOM( 199?, m4shv__z,    m4shv,   "hvi05___.4n3",         0x0000, 0x01000
 	GAME(year, setname, parent, mod4yam_cheatchr_hypvipalt, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 
-// expects chr sequence starting 00 14 04 54 64 14 64 14 64 54 20 74 04
+// expects chr sequence starting 00 14 04 54 64 14 64 14 64 54 20 74 04 (hypvipalt)
  // "(C)1995  B.W.B." and "HVC 1.0"
 GAME_CUSTOM( 199?, m4shv__g,    m4shv,   "5p4hypervyper.bin",    0x0000, 0x010000, CRC(51ac9288) SHA1(1580079b6e710506ab03e1d8a89af65cd06cedd2), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVC 1.0 C)" )
 

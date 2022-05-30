@@ -226,6 +226,8 @@ public:
 	void mod2_cheatchr_kqee2(machine_config &config);
 	void mod2_cheatchr_berseralt(machine_config &config);
 	void mod2_cheatchr_hittop(machine_config &config);
+	void mod2_cheatchr_tricolor(machine_config &config);
+	void mod2_cheatchr_blackwhite(machine_config &config);
 
 	void mod2_alt(machine_config &config);
 	void mod2_alt_cheatchr(machine_config &config);
@@ -255,6 +257,8 @@ public:
 	void mod4oki_alt_cheatchr_m400(machine_config &config);
 	void mod4oki_alt_cheatchr_pzmoney(machine_config &config);
 	void mod4oki_alt_cheatchr_fortune(machine_config &config);
+	void mod4oki_alt_cheatchr_bluediamond(machine_config &config);
+	void mod4oki_alt_cheatchr_wildtime(machine_config &config);
 
 	void mod4oki_chr(machine_config &config);
 	void mod4oki_cheatchr(machine_config &config);
@@ -334,6 +338,12 @@ public:
 	void mod4oki_cheatchr_hittopalt2(machine_config &config);
 	void mod4oki_cheatchr_andyfloalt(machine_config &config);
 	void mod4oki_cheatchr_andycappalt(machine_config &config);
+	void mod4oki_cheatchr_redheat(machine_config &config);
+	void mod4oki_cheatchr_blkcat(machine_config &config);
+	void mod4oki_cheatchr_salsa(machine_config &config);
+	void mod4oki_cheatchr_goljok(machine_config &config);
+	void mod4oki_cheatchr_blackwhite(machine_config &config);
+	void mod4oki_cheatchr_tricolor(machine_config &config);
 
 	void mod4yam(machine_config &config);
 	void mod4yam_cheatchr(machine_config &config);
