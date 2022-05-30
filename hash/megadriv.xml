@@ -10410,7 +10410,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<description>The Adventures of Batman &amp; Robin (Prototype, 19950427)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
-				<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="adventures of batman &amp; robin, the (prototype - apr 27, 1995).bin" size="2097152" crc="fdac8190" sha1="1a2bece0e3f66dcdd44b555ce45deda510b8ca3a"/>
