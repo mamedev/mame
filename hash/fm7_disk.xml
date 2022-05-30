@@ -374,9 +374,9 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="gambler">
 	<!-- Keys listed in readme are as follows:
-キー操作/ リターン:チー F1:リーチ F2:ポン F3:カン F4:和了 F10:九種九牌
-	 F5:指導機能ON/OFF F6:サウンドON/OFF F7:オープンモード F8:オートモード
-	 ESC(XM7:半角/全角):ポーズ・点数表示 HOME:捨て牌指導   -->
+	     キー操作/ リターン:チー F1:リーチ F2:ポン F3:カン F4:和了 F10:九種九牌
+	     F5:指導機能ON/OFF F6:サウンドON/OFF F7:オープンモード F8:オートモード
+	     ESC(XM7:半角/全角):ポーズ・点数表示 HOME:捨て牌指導 -->
 		<description>Gambler Jikochuushinha</description>
 		<year>1989</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
@@ -858,7 +858,7 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<!-- No sound on the FM-7, FM sound only?  -->
+	<!-- No sound on the FM-7, FM sound only? -->
 	<software name="psychwar">
 		<description>Psychic War - Cosmic Soldier 2</description>
 		<year>1988</year>

@@ -7472,7 +7472,7 @@ has been replaced with an all-zero block. -->
 
 	<!-- DOS-based games -->
 
-	<software name="2400ad" supported="no"> <!-- unemulated protection, game needs cracked exe to play ATM  -->
+	<software name="2400ad" supported="no"> <!-- unemulated protection, game needs cracked exe to play ATM -->
 		<description>2400 A.D. (set 1)</description>
 		<year>1987</year>
 		<publisher>Origin</publisher>

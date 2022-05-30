@@ -22955,7 +22955,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<!--  Both the German/French/Italian (T-9502D-87) and English/Spanish/Dutch (T-9502D-76) release share the same disc (T-9502D-50). -->
+	<!-- Both the German/French/Italian (T-9502D-87) and English/Spanish/Dutch (T-9502D-76) release share the same disc (T-9502D-50). -->
 	<software name="ncreatr2e" cloneof="ncreatr2">
 		<!--
 		<rom name="Nightmare Creatures II v1.004 (2000)(Konami)(PAL)(M4)[!].gdi" size="2867" md5="50ea8dc03d7912d790afcef93190854f" sha1="a86dbd67794c8354f65c823356385d54bafb9f4a"/>

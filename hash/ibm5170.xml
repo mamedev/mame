@@ -15562,7 +15562,7 @@ license:CC0
 	</software>
 
 	<!-- Worked until MAME 0.211. From 0.212 version, it stopped working -->
-	<!-- Seems to be an emulation issue due to the copy protection track  -->
+	<!-- Seems to be an emulation issue due to the copy protection track -->
 	<!-- Reported @MameTesters.org: entry ID 08171 -->
 	<software name="lemmings" supported="no">
 		<!-- Dumped via Kryoflux -->

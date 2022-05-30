@@ -434,7 +434,7 @@ license:CC0
 
 	<software name="aliceu" cloneof="alice">
 		<!-- Notes: GBC only -->
-		<!--    Retail cartridge of European version not yet secured    -->
+		<!-- Retail cartridge of European version not yet secured -->
 		<description>Alice in Wonderland (Europe, USA)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
@@ -2240,7 +2240,7 @@ license:CC0
 
 	<software name="bombmmxa">
 		<!-- Notes: GBC only -->
-		<!--    This was the prize for a draw contest   -->
+		<!-- This was the prize for a draw contest -->
 		<description>Bomberman Max - Ain Version (Japan)</description>
 		<year>1999</year>
 		<publisher>Hudson Soft</publisher>
@@ -2892,7 +2892,7 @@ license:CC0
 
 	<software name="carmgedd">
 		<!-- Notes: GBC only -->
-		<!--    USA cartridges have the European sticker underneath.    -->
+		<!-- USA cartridges have the European sticker underneath. -->
 		<description>Carmageddon - Carpocalypse Now (Europe, USA)</description>
 		<year>2000</year>
 		<publisher>Titus</publisher>
@@ -3323,7 +3323,7 @@ license:CC0
 
 	<software name="commandm" supported="no">
 		<!-- Notes: GBC only -->
-		<!--    The game cart includes a motion-sensor (U4) for controlling the game by moving and shaking the console. -->
+		<!-- The game cart includes a motion-sensor (U4) for controlling the game by moving and shaking the console. -->
 		<description>Command Master (Japan)</description>
 		<year>2000</year>
 		<publisher>Enix</publisher>
@@ -5739,8 +5739,8 @@ license:CC0
 
 	<software name="emperorunk" cloneof="emperor">
 		<!-- Notes: GBC only -->
-		<!--    Old dump of unknown origin  -->
-		<!--    Two different bytes in header, ends padding areas with FF   -->
+		<!-- Old dump of unknown origin -->
+		<!-- Two different bytes in header, ends padding areas with FF -->
 		<description>The Emperor's New Groove (Europe, bad dump?)</description>
 		<year>2001</year>
 		<publisher>Ubi Soft</publisher>
@@ -6029,8 +6029,8 @@ license:CC0
 
 	<software name="f1racingunk" cloneof="f1racing">
 		<!-- Notes: GBC only -->
-		<!--    Old dump of unknown origin  -->
-		<!--    One different byte in header, two different bytes in rest of the ROM    -->
+		<!-- Old dump of unknown origin -->
+		<!-- One different byte in header, two different bytes in rest of the ROM -->
 		<description>F1 Racing Championship (Europe, bad dump?)</description>
 		<year>2000</year>
 		<publisher>Ubi Soft</publisher>
@@ -6218,8 +6218,8 @@ license:CC0
 
 	<software name="flintbba" cloneof="flintbb">
 		<!-- Notes: GBC only -->
-		<!--    Old dump of unknown origin  -->
-		<!--    Possible prototype? -->
+		<!-- Old dump of unknown origin -->
+		<!-- Possible prototype? -->
 		<description>The Flintstones - Burgertime in Bedrock (Europe, prototype?)</description>
 		<year>2001</year>
 		<publisher>Swing! Entertainment Media</publisher>
@@ -7468,7 +7468,7 @@ license:CC0
 
 	<software name="gberetp1" cloneof="gberetp3">
 		<!-- Notes: GBC only -->
-		<!--    Developed without testing on real hardware, requires fixing by replacing "C0" to "E0" at offset 0x153.  -->
+		<!-- Developed without testing on real hardware, requires fixing by replacing "C0" to "E0" at offset 0x153. -->
 		<description>Green Beret (prototype 1)</description>
 		<year>2000</year>
 		<publisher>Kak</publisher>
@@ -7486,7 +7486,7 @@ license:CC0
 
 	<software name="gberetp2" cloneof="gberetp3">
 		<!-- Notes: GBC only -->
-		<!--    Developed without testing on real hardware, requires fixing by replacing "C0" to "E0" at offset 0x154.  -->
+		<!-- Developed without testing on real hardware, requires fixing by replacing "C0" to "E0" at offset 0x154. -->
 		<description>Green Beret (prototype 2)</description>
 		<year>2000</year>
 		<publisher>Kak</publisher>
@@ -8339,7 +8339,7 @@ license:CC0
 	</software>
 
 	<software name="hexcite">
-		<!--    European cartridges have USA sticker underneath.    -->
+		<!-- European cartridges have USA sticker underneath. -->
 		<description>Hexcite (Europe, USA)</description>
 		<year>1999</year>
 		<publisher>Ubi Soft</publisher>
@@ -9895,7 +9895,7 @@ license:CC0
 
 	<software name="kirbytlt" supported="no">
 		<!-- Notes: GBC only -->
-		<!--    The game cart includes a motion-sensor (U4) for controlling the game by moving and shaking the console. -->
+		<!-- The game cart includes a motion-sensor (U4) for controlling the game by moving and shaking the console. -->
 		<description>Kirby Tilt 'n' Tumble (USA)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
@@ -10185,7 +10185,7 @@ license:CC0
 
 	<software name="korokoro" cloneof="kirbytlt" supported="no">
 		<!-- Notes: GBC only -->
-		<!--    The game cart includes a motion-sensor (U4) for controlling the game by moving and shaking the console. -->
+		<!-- The game cart includes a motion-sensor (U4) for controlling the game by moving and shaking the console. -->
 		<description>Korokoro Kirby (Japan)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
@@ -10301,7 +10301,7 @@ license:CC0
 
 	<software name="lauraunk" cloneof="laura">
 		<!-- Notes: GBC only -->
-		<!--    Old dump of unknown origin  -->
+		<!-- Old dump of unknown origin -->
 		<description>Laura (Europe, prototype?)</description>
 		<year>2000</year>
 		<publisher>Ubi Soft</publisher>
@@ -11906,7 +11906,7 @@ license:CC0
 
 	<software name="mariofam">
 		<!-- Notes: GBC only -->
-		<!--    Bundled with Jaguar Sewing Machine (Nuotto Expansion)?  -->
+		<!-- Bundled with Jaguar Sewing Machine (Nuotto Expansion)? -->
 		<description>Mario Family (Japan)</description>
 		<year>2001</year>
 		<publisher>Jaguar</publisher>
@@ -13704,7 +13704,7 @@ license:CC0
 	<software name="mrdrillrjnp" cloneof="mrdrillr">
 		<!-- Notes: GBC only -->
 		<!-- NP only -->
-		<!--    Planned for physical release?   -->
+		<!-- Planned for physical release? -->
 		<description>Mr. Driller (Japan, NP)</description>
 		<year>2000</year>
 		<publisher>Namco</publisher>
@@ -14435,8 +14435,8 @@ license:CC0
 
 	<software name="networka">
 		<!-- Notes: GBC only -->
-		<!--    This game uses an accessory (same hardware as the Telefang "Power Antenna" but on differently
-		        shaped plastic case), which is just a LED light connected to the GB accessories port. -->
+		<!-- This game uses an accessory (same hardware as the Telefang "Power Antenna" but on differently
+		     shaped plastic case), which is just a LED light connected to the GB accessories port. -->
 		<description>Network Boukenki Bugsite - Alpha Version (Japan)</description>
 		<year>2001</year>
 		<publisher>Smilesoft</publisher>
@@ -14455,8 +14455,8 @@ license:CC0
 
 	<software name="networkb">
 		<!-- Notes: GBC only -->
-		<!--    This game uses an accessory (same hardware as the Telefang "Power Antenna" but on differently
-		        shaped plastic case), which is just a LED light connected to the GB accessories port. -->
+		<!-- This game uses an accessory (same hardware as the Telefang "Power Antenna" but on differently
+		     shaped plastic case), which is just a LED light connected to the GB accessories port. -->
 		<description>Network Boukenki Bugsite - Beta Version (Japan)</description>
 		<year>2001</year>
 		<publisher>Smilesoft</publisher>
@@ -15463,7 +15463,7 @@ license:CC0
 
 	<software name="pockfam2">
 		<!-- Notes: GBC only -->
-		<!--    The game cart has an integrated speaker and a replaceable battery (CR2025). -->
+		<!-- The game cart has an integrated speaker and a replaceable battery (CR2025). -->
 		<description>Pocket Family GB2 (Japan)</description>
 		<year>1999</year>
 		<publisher>Hudson Soft</publisher>
@@ -15899,7 +15899,7 @@ license:CC0
 
 	<software name="pokecrys">
 		<!-- Notes: GBC only -->
-		<!--    European version 0 does not exist   -->
+		<!-- European version 0 does not exist -->
 		<description>Pokémon - Crystal Version (Europe, USA, rev 1)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
@@ -17267,7 +17267,7 @@ license:CC0
 
 	<software name="propooluunk" cloneof="propool">
 		<!-- Notes: GBC only -->
-		<!--    Old dump of unknown origin  -->
+		<!-- Old dump of unknown origin -->
 		<description>Pro Pool (USA, prototype?)</description>
 		<year>2002</year>
 		<publisher>Codemasters</publisher>
@@ -17691,7 +17691,7 @@ license:CC0
 
 	<software name="rakuxcs">
 		<!-- Notes: GBC only -->
-		<!--    For use with Jaguar Sewing Machine (Nuotto Expansion) Model EM-2000 -->
+		<!-- For use with Jaguar Sewing Machine (Nuotto Expansion) Model EM-2000 -->
 		<description>Raku x Raku - Cut Shuu (Japan)</description>
 		<year>2000</year>
 		<publisher>Natsume</publisher>
@@ -17731,7 +17731,7 @@ license:CC0
 
 	<software name="rakuxmoj">
 		<!-- Notes: GBC only -->
-		<!--    For use with Jaguar Sewing Machine (Nuotto Expansion) Model EM-2000 -->
+		<!-- For use with Jaguar Sewing Machine (Nuotto Expansion) Model EM-2000 -->
 		<description>Raku x Raku - Moji (Japan)</description>
 		<year>2000</year>
 		<publisher>Natsume</publisher>
@@ -18832,10 +18832,10 @@ license:CC0
 
 	<software name="sakura">
 		<!-- Notes: GBC only -->
-		<!--    10 variant packs got released!
-		        This game is compatible with an external pedometer named "Pocket Sakura"
-		        (same hardware as the Pokémon Pikachu Color / Pokémon Pikachu 2 GS pedometer),
-		        which connects to the GBC via the console's IR port -->
+		<!-- 10 variant packs got released!
+		     This game is compatible with an external pedometer named "Pocket Sakura"
+		     (same hardware as the Pokémon Pikachu Color / Pokémon Pikachu 2 GS pedometer),
+		     which connects to the GBC via the console's IR port -->
 		<description>Sakura Taisen GB - Geki Hana Gumi Nyuutai! (Japan)</description>
 		<year>2000</year>
 		<publisher>Media Factory</publisher>
@@ -19127,8 +19127,8 @@ license:CC0
 	</software>
 
 	<software name="seihaiunk" cloneof="seihai">
-		<!--    Old dump of unknown origin  -->
-		<!--    Four different bytes in header  -->
+		<!-- Old dump of unknown origin -->
+		<!-- Four different bytes in header -->
 		<description>Sei Hai Densetsu (Japan, bad dump?)</description>
 		<year>2000</year>
 		<publisher>Gaps</publisher>
@@ -20163,7 +20163,7 @@ license:CC0
 	<software name="spyvsspyjanp" cloneof="spyvsspy">
 		<!-- Notes: GBC only -->
 		<!-- NP only -->
-		<!--    Planned for physical release?   -->
+		<!-- Planned for physical release? -->
 		<description>Spy vs. Spy (Japan, rev 1, NP)</description>
 		<year>1999</year>
 		<publisher>Kemco</publisher>
@@ -20519,7 +20519,7 @@ license:CC0
 	<software name="smbdxj" cloneof="smbdx">
 		<!-- Notes: GBC only -->
 		<!-- NP only -->
-		<!--    Planned for physical release?   -->
+		<!-- Planned for physical release? -->
 		<description>Super Mario Bros. Deluxe (Japan, NP)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
@@ -20539,7 +20539,7 @@ license:CC0
 	<software name="smbdxja" cloneof="smbdx">
 		<!-- Notes: GBC only -->
 		<!-- NP only -->
-		<!--    Planned for physical release?   -->
+		<!-- Planned for physical release? -->
 		<description>Super Mario Bros. Deluxe (Japan, NP, rev 1)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
@@ -20558,7 +20558,7 @@ license:CC0
 
 	<software name="smbdx">
 		<!-- Notes: GBC only -->
-		<!--    Retail cartridge of USA version not yet secured, might be unreleased    -->
+		<!-- Retail cartridge of USA version not yet secured, might be unreleased -->
 		<description>Super Mario Bros. Deluxe (Europe, USA, rev 2)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
@@ -20745,8 +20745,8 @@ license:CC0
 
 	<software name="survkidsjunk" cloneof="stranded">
 		<!-- Also released by NP in 2001-02 -->
-		<!--    Old dump of unknown origin  -->
-		<!--    Four different bytes in header  -->
+		<!-- Old dump of unknown origin -->
+		<!-- Four different bytes in header -->
 		<description>Survival Kids - Kotou no Boukensha (Japan, bad dump?)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
@@ -22267,8 +22267,8 @@ license:CC0
 	</software>
 
 	<software name="tradebat">
-		<!--    Only released on the 3DS Virtual Console?   -->
-		<!--    Planned for physical release?   -->
+		<!-- Only released on the 3DS Virtual Console? -->
+		<!-- Planned for physical release? -->
 		<description>Trade &amp; Battle Card Hero (Japan, rev 1)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
@@ -22489,7 +22489,7 @@ license:CC0
 
 	<software name="turokrag">
 		<!-- Notes: GBC only -->
-		<!--    Retail cartridge of Australian version not yet secured, does it exist?  -->
+		<!-- Retail cartridge of Australian version not yet secured, does it exist? -->
 		<description>Turok - Rage Wars (Europe, Australia, USA)</description>
 		<year>2000</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -23878,8 +23878,8 @@ license:CC0
 
 	<software name="yakouchuunk" cloneof="yakouchu">
 		<!-- Notes: GBC only -->
-		<!--    Old dump of unknown origin  -->
-		<!--    Four different bytes in header  -->
+		<!-- Old dump of unknown origin -->
+		<!-- Four different bytes in header -->
 		<description>Yakouchuu GB (Japan, bad dump?)</description>
 		<year>1999</year>
 		<publisher>Athena</publisher>
@@ -25603,7 +25603,7 @@ license:CC0
 <!-- Other Asian Pirate dumps to sort -->
 
 	<software name="188in1" supported="partial">
-	<!--    This dump comes from the "GBCK003" board that's soldered inside some GB Boy Colour units    -->
+	<!-- This dump comes from the "GBCK003" board that's soldered inside some GB Boy Colour units -->
 		<description>Color GameBoy 188 in 1 (Hong Kong)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>

@@ -4668,7 +4668,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!--  Doesn't read file ID of "Illust Gallery" / "Charactor Index" / ending(s?), [CD-Block] doesn't read root directory properly -->
+	<!-- Doesn't read file ID of "Illust Gallery" / "Charactor Index" / ending(s?), [CD-Block] doesn't read root directory properly -->
 	<software name="gunbird" supported="no">
 		<description>Gunbird (Jpn)</description>
 		<year>1995</year>
@@ -23497,7 +23497,7 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Mini CD, [CD-Block] doesn't playback in driver, expected length of 13:54 matches  -->
+	<!-- Mini CD, [CD-Block] doesn't playback in driver, expected length of 13:54 matches -->
 	<!-- TODO: comes with T-16703G main disc, according to http://redump.org/disc/9318/ should be same as T-16705G-01 minus the changed serial -->
 	<software name="fromancra" cloneof="fromancr" supported="no">
 		<description>Idol Mahjong Final Romance R Mini Drama CD (Jpn)</description>
@@ -31914,7 +31914,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Jonah Lomu Rugby v1.100 (1997)(Sports Master)(PAL)(M4)[!]... -->
 	<software name="lomu" supported="no">
 		<description>Jonah Lomu Rugby (Euro)</description>
-		<!-- or is it  Jonah Lomu Rugby (United Kingdom) [T-12003H-05]  -->
+		<!-- or is it  Jonah Lomu Rugby (United Kingdom) [T-12003H-05] -->
 		<year>1997</year>
 		<publisher>Sports Master</publisher>
 		<info name="serial" value="T-12003H-50"/>
@@ -38096,7 +38096,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying Virtua Fighter Remix v0.003 (1995)(Sega)(NTSC)(US)[!]... -->
-	<!--  [81049] / [81027] ?? -->
+	<!-- [81049] / [81027] ?? -->
 	<software name="vfremixu" cloneof="vfremix" supported="no">
 		<description>Virtua Fighter Remix</description>
 		<year>1995</year>
