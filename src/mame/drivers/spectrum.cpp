@@ -517,7 +517,7 @@ uint8_t spectrum_state::floating_bus_r()
 		u64 now = m_maincpu->total_cycles() - m_int_at;
 		u64 cf = vpos * m_screen->width() * m_maincpu->clock() / m_screen->clock() + m_contention_offset;
 		u64 ct = cf + screen.width() * m_maincpu->clock() / m_screen->clock();
-		if(cf <= now && now < ct)
+		if (cf <= now && now < ct)
 		{
 			u64 clocks = now - cf;
 			if (!BIT(clocks, 2))
@@ -525,8 +525,8 @@ uint8_t spectrum_state::floating_bus_r()
 				u16 y = vpos - screen.top();
 				u16 x = (clocks >> 2) + BIT(clocks, 1);
 				data = clocks & 1
-				? m_screen_location[0x1800 + (((y & 0xf8) << 2) | x)]
-				: m_screen_location[((y & 7) << 8) | ((y & 0x38) << 2) | ((y & 0xc0) << 5) | x];
+					? m_screen_location[0x1800 + (((y & 0xf8) << 2) | x)]
+					: m_screen_location[((y & 7) << 8) | ((y & 0x38) << 2) | ((y & 0xc0) << 5) | x];
 			}
 		}
 	}
