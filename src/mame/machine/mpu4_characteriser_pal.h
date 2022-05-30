@@ -180,6 +180,11 @@ public:
 	// games with sequence starting 00 60 60 a0 38 64 e0 30 c8 9c ac dc ec 94 d8 a4 38 ec
 	static constexpr uint8_t bjac_lamp_scramble[8] = { 0x00, 0x68, 0x60, 0x28, 0x20, 0x68, 0x60, 0x20 };
 
+	// games with sequence starting 00 88 70 14 1c c0 a4 a0 bc d4 30 14 18 d4 2c 50 1c
+	static constexpr uint8_t mag7s_lamp_scramble[8] = { 0x03, 0x9F, 0x0F, 0x17, 0x03, 0x1B, 0x8F, 0x87 };
+
+	// games with sequence starting 00 44 44 54 d0 88 38 74 d0 58
+	static constexpr uint8_t oad_lamp_scramble[8] = { 0x00, 0x50, 0x44, 0x14, 0x14, 0x44, 0x44, 0x00 };
 
 	/***************************************************************
 
@@ -257,6 +262,8 @@ public:
 	// games with sequence starting 00 c0 d0 38 ec 5c ec 14 68 2c 24 e8 74 00 e8 14
 	static constexpr uint8_t turboplay_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
+	// games with sequence starting 00 14 04 34 2c 44 34 24 3c 78 70 28 64
+	static constexpr uint8_t sunsetclub_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 	/***************************************************************
 

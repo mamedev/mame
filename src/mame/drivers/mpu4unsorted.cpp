@@ -2372,16 +2372,16 @@ GAME(199?, m4topdk,   0,          mod2_cheatchr_intcep,       mpu4,    mpu4unsor
 
 
 // REEL A ALM
-// 00 14 04 34 2c 44 34 24 3c 78 70 28 64 10
-GAME(199?, m4sunscl,  0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Sunset Club (Bwb) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4sunscla, m4sunscl,   mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Sunset Club (Bwb) (MPU4) (set 2)",GAME_FLAGS )
-GAME(199?, m4sunsclb, m4sunscl,   mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Sunset Club (Bwb) (MPU4) (set 3)",GAME_FLAGS )
+// 00 14 04 34 2c 44 34 24 3c 78 70 28 64 10 (sunsetclub)
+GAME(199?, m4sunscl,  0,          mod2_cheatchr_sunsetclub,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Sunset Club (Bwb) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4sunscla, m4sunscl,   mod2_cheatchr_sunsetclub,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Sunset Club (Bwb) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4sunsclb, m4sunscl,   mod2_cheatchr_sunsetclub,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Sunset Club (Bwb) (MPU4) (set 3)",GAME_FLAGS )
 
 // 00 84 94 3c ec 5c ec 50 2c 68 60 ac 74 00 ac 58 ec 7c ec 58 e0 90 18 ec 54 (tri98)
 GAME(199?, m4bigban,  0,          mod4oki_cheatchr_tri98,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Big Bandit (Nova) (MPU4)",GAME_FLAGS ) // DM1 SW ALM
 
-// 00 88 70 14 1c c0 a4 a0 bc d4 30 14 18 d4 2c 50
-GAME(199?, m4crzcsn,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Crazy Casino (Nova) (MPU4)",GAME_FLAGS )
+// 00 88 70 14 1c c0 a4 a0 bc d4 30 14 18 d4 2c 50 (mag7s)
+GAME(199?, m4crzcsn,  0,          mod4oki_cheatchr_mag7s,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Crazy Casino (Nova) (MPU4)",GAME_FLAGS )
 
 // 00 e0 88 18 b0 48 50 60 e4 c8 58 f0 08 74 20 c0 88 3c f4 48 34
 GAME(199?, m4crzcav,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Crazy Cavern (Nova) (MPU4)",GAME_FLAGS )

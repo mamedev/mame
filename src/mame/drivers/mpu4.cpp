@@ -3065,6 +3065,11 @@ void mpu4_state::mod2_cheatchr_kingqn(machine_config &config)
 	mod2_cheatchr_table(config, mpu4_characteriser_pal::kingqn_lamp_scramble);
 }
 
+void mpu4_state::mod2_cheatchr_sunsetclub(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::sunsetclub_lamp_scramble);
+}
+
 // alt reel setup
 
 void mpu4_state::mod2_alt(machine_config &config)
@@ -3536,6 +3541,20 @@ void mpu4_state::mod4oki_cheatchr_turboplay(machine_config &config)
 	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::turboplay_lamp_scramble);
 }
 
+void mpu4_state::mod4oki_cheatchr_sunsetclub(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::sunsetclub_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_mag7s(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::mag7s_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_oad(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::oad_lamp_scramble);
+}
 
 // alt reel setup
 
