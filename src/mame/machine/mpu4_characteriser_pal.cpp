@@ -41,7 +41,8 @@ DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_PAL_BWB, mpu4_characteriser_pal_bwb, "mpu4
 DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL45, mpu4_characteriser_bootleg45, "mpu4chrpalboot45", "Barcrest MPU4 Characteriser PAL (bootleg type 1)")
 DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL51, mpu4_characteriser_bootleg51, "mpu4chrpalboot51", "Barcrest MPU4 Characteriser PAL (bootleg type 2)")
 
-DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL_BLASTBANK, mpu4_characteriser_bootleg_blastbank, "mpu4chrpalboot_blast", "Barcrest MPU4 Characteriser PAL (Blast)")
+DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL_BLASTBANK, mpu4_characteriser_bootleg_blastbank, "mpu4chrpalboot_blast", "Barcrest MPU4 Characteriser PAL (Bank A Blast)")
+DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL_COPCASH, mpu4_characteriser_bootleg_copcash, "mpu4chrpalboot_copcash", "Barcrest MPU4 Characteriser PAL (Coppa Cash)")
 
 mpu4_characteriser_pal::mpu4_characteriser_pal(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mpu4_characteriser_pal(mconfig, MPU4_CHARACTERISER_PAL, tag, owner, clock)
@@ -567,4 +568,33 @@ void mpu4_characteriser_bootleg_blastbank::write(offs_t offset, uint8_t data)
 	logerror("%s: Characteriser write offset %02x data %02x\n", machine().describe_context(), offset, data);
 	m_prot_col = data;
 }
+
+
+mpu4_characteriser_bootleg_copcash::mpu4_characteriser_bootleg_copcash(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mpu4_characteriser_pal(mconfig, MPU4_CHARACTERISER_BOOTLEG_PAL_COPCASH, tag, owner, clock)
+{
+}
+
+uint8_t mpu4_characteriser_bootleg_copcash::read(offs_t offset)
+{
+	logerror("%s: Characteriser read offset %02x\n", machine().describe_context(), offset);
+	switch (m_prot_col)
+	{
+	case 0x00: return 0xbb;
+	case 0x01: return 0xab;
+	case 0x02: return 0x8b;
+	case 0x03: return 0x8f;
+	case 0x04: return 0x9f;
+	case 0x05: return 0xbf;
+	}
+	return 0xff;
+}
+
+void mpu4_characteriser_bootleg_copcash::write(offs_t offset, uint8_t data)
+{
+	logerror("%s: Characteriser write offset %02x data %02x\n", machine().describe_context(), offset, data);
+	m_prot_col = data;
+}
+
+
 

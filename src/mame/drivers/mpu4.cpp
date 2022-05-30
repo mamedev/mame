@@ -3106,6 +3106,36 @@ void mpu4_state::mod2_cheatchr_tribank(machine_config &config)
 	mod2_cheatchr_table(config, mpu4_characteriser_pal::tribank_lamp_scramble);
 }
 
+void mpu4_state::mod2_cheatchr_grandclub(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::grandclub_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_tajmahal(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::tajmahal_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_giant(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::giant_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_randroul(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::randroul_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_starsbars(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::starsbars_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_topgear(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::topgear_lamp_scramble);
+}
+
 void mpu4_state::mod2_cheatchr_toptake(machine_config &config)
 {
 	mod2_cheatchr_table(config, mpu4_characteriser_pal::toptake_lamp_scramble);
@@ -3119,6 +3149,16 @@ void mpu4_state::mod2_cheatchr_sunsetbalt(machine_config &config)
 void mpu4_state::mod2_cheatchr_eighth(machine_config &config)
 {
 	mod2_cheatchr_table(config, mpu4_characteriser_pal::eighth_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_pontoon(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::pontoon_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_blueflash(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::blueflash_lamp_scramble);
 }
 
 void mpu4_state::mod2_cheatchr_blackwhite(machine_config &config)
@@ -3142,6 +3182,12 @@ void mpu4_state::mod2_chr_blastbnk(machine_config &config)
 {
 	mod2(config);
 	MPU4_CHARACTERISER_BOOTLEG_PAL_BLASTBANK(config, m_characteriser, 0);
+}
+
+void mpu4_state::mod2_chr_copcash(machine_config &config)
+{
+	mod2(config);
+	MPU4_CHARACTERISER_BOOTLEG_PAL_COPCASH(config, m_characteriser, 0);
 }
 
 

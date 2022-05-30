@@ -14,6 +14,7 @@ DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_PAL_BWB, mpu4_characteriser_pal_bwb)
 DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL45, mpu4_characteriser_bootleg45)
 DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL51, mpu4_characteriser_bootleg51)
 DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL_BLASTBANK, mpu4_characteriser_bootleg_blastbank)
+DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL_COPCASH, mpu4_characteriser_bootleg_copcash)
 
 
 class mpu4_characteriser_pal : public device_t
@@ -372,6 +373,12 @@ public:
 	// games with sequence starting  00 90 84 b4 2c c0 34 a0 bc 78 70 28 e0 14 a8 4c c8 ec
 	static constexpr uint8_t eighth_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
+	// games with sequence starting 00 14 10 a0 c4 c4 74 30 b0 70 00 b4 50 80 f4 40 94
+	static constexpr uint8_t pontoon_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 30 20 50 68 24 70 60 78 5c 5c 5c 7c 54 60 10 68 6c
+	static constexpr uint8_t blueflash_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
 	/***************************************************************
 
 	 Types below have no games using lamp scramble, so data is unknown / blank
@@ -410,6 +417,24 @@ public:
 
 	// games with sequence starting 00 60 60 24 68 c0 34 44 6c 8c 9c ac d4 18 ec 90 1c
 	static constexpr uint8_t tribank_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+	// games with sequence starting 00 84 8c 3c f4 4c 34 14 54 14 40 d4 4c 70 04 d0 58 f4
+	static constexpr uint8_t grandclub_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+	// games with sequence starting 00 30 10 0c 98 a8 c4 60 3c ac c4 7c b4
+	static constexpr uint8_t tajmahal_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+	// games with sequence starting 00 24 24 64 a4 ac 78 74 e0 6c 50 c0 ac 58 74 00 a4 ec f8 94 c8
+	static constexpr uint8_t giant_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+	// games with sequence starting  00 30 10 84 e0 f0 c4 60 b4 54 80 f4 50 80 f4 40 b0 d4
+	static constexpr uint8_t randroul_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+	// games with sequence starting  00 44 44 c4 1c 24 c4 14 c8 b8 a4 dc ec b0 58 a4
+	static constexpr uint8_t starsbars_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+	// games with sequence starting 00 a0 88 18 b0 48 50 60 e4 c8 58 90
+	static constexpr uint8_t topgear_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 protected:
 	mpu4_characteriser_pal(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -512,6 +537,17 @@ public:
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;
 };
+
+class mpu4_characteriser_bootleg_copcash : public mpu4_characteriser_pal
+{
+public:
+	// construction/destruction
+	mpu4_characteriser_bootleg_copcash(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
+};
+
 
 
 #endif // MAME_MACHINE_MPU4_CHARACTERISER_PAL_H

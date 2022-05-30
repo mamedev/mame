@@ -233,10 +233,19 @@ public:
 	void mod2_cheatchr_toptake(machine_config &config);
 	void mod2_cheatchr_sunsetbalt(machine_config &config);
 	void mod2_cheatchr_eighth(machine_config &config);
+	void mod2_cheatchr_pontoon(machine_config &config);
+	void mod2_cheatchr_grandclub(machine_config &config);
+	void mod2_cheatchr_tajmahal(machine_config &config);
+	void mod2_cheatchr_giant(machine_config &config);
+	void mod2_cheatchr_randroul(machine_config &config);
+	void mod2_cheatchr_blueflash(machine_config &config);
+	void mod2_cheatchr_starsbars(machine_config &config);
+	void mod2_cheatchr_topgear(machine_config &config);
 
 	void mod2_bootleg_chr45(machine_config &config);
 	void mod2_bootleg_chr51(machine_config &config);
 	void mod2_chr_blastbnk(machine_config &config);
+	void mod2_chr_copcash(machine_config &config);
 
 	void mod2_alt(machine_config &config);
 	void mod2_alt_cheatchr(machine_config &config);
