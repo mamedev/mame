@@ -223,6 +223,9 @@ public:
 	void mod2_cheatchr_kingqn(machine_config &config);
 	void mod2_cheatchr_sunsetclub(machine_config &config);
 	void mod2_cheatchr_topaction(machine_config &config);
+	void mod2_cheatchr_kqee2(machine_config &config);
+	void mod2_cheatchr_berseralt(machine_config &config);
+	void mod2_cheatchr_hittop(machine_config &config);
 
 	void mod2_alt(machine_config &config);
 	void mod2_alt_cheatchr(machine_config &config);
@@ -312,6 +315,25 @@ public:
 	void mod4oki_cheatchr_bankrollerclub(machine_config &config);
 	void mod4oki_cheatchr_copycat(machine_config &config);
 	void mod4oki_cheatchr_thestreak(machine_config &config);
+	void mod4oki_cheatchr_kqee2(machine_config &config);
+	void mod4oki_cheatchr_kqee(machine_config &config);
+	void mod4oki_cheatchr_pfloot(machine_config &config);
+	void mod4oki_cheatchr_rockmn(machine_config &config);
+	void mod4oki_cheatchr_berseralt(machine_config &config);
+	void mod4oki_cheatchr_berseralt2(machine_config &config);
+	void mod4oki_cheatchr_bagtel(machine_config &config);
+	void mod4oki_cheatchr_bucalt(machine_config &config);
+	void mod4oki_cheatchr_hotrodalt(machine_config &config);
+	void mod4oki_cheatchr_bdash(machine_config &config);
+	void mod4oki_cheatchr_saynomore(machine_config &config);
+	void mod4oki_cheatchr_luckystrikealt(machine_config &config);
+	void mod4oki_cheatchr_hittop(machine_config &config);
+	void mod4oki_cheatchr_vivaalt(machine_config &config);
+	void mod4oki_cheatchr_mintalt(machine_config &config);
+	void mod4oki_cheatchr_hittopalt(machine_config &config);
+	void mod4oki_cheatchr_hittopalt2(machine_config &config);
+	void mod4oki_cheatchr_andyfloalt(machine_config &config);
+	void mod4oki_cheatchr_andycappalt(machine_config &config);
 
 	void mod4yam(machine_config &config);
 	void mod4yam_cheatchr(machine_config &config);
@@ -338,6 +360,7 @@ public:
 	void mod4yam_cheatchr_rr6(machine_config &config);
 	void mod4yam_cheatchr_turboplay(machine_config &config);
 	void mod4yam_cheatchr_duty(machine_config &config);
+	void mod4yam_cheatchr_saynomore(machine_config &config);
 	void mod4yam_chr(machine_config &config);
 
 	void mpu4_common(machine_config &config);

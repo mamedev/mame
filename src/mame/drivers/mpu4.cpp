@@ -3075,6 +3075,21 @@ void mpu4_state::mod2_cheatchr_topaction(machine_config &config)
 	mod2_cheatchr_table(config, mpu4_characteriser_pal::topaction_lamp_scramble);
 }
 
+void mpu4_state::mod2_cheatchr_kqee2(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::kqee2_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_berseralt(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::berseralt_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_hittop(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::hittop_lamp_scramble);
+}
+
 // alt reel setup
 
 void mpu4_state::mod2_alt(machine_config &config)
@@ -3275,6 +3290,11 @@ void mpu4_state::mod4yam_cheatchr_turboplay(machine_config &config)
 void mpu4_state::mod4yam_cheatchr_duty(machine_config &config)
 {
 	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::duty_lamp_scramble);
+}
+
+void mpu4_state::mod4yam_cheatchr_saynomore(machine_config &config)
+{
+	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::saynomore_lamp_scramble);
 }
 
 /***********************************************************************************************
@@ -3601,6 +3621,100 @@ void mpu4_state::mod4oki_cheatchr_thestreak(machine_config &config)
 	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::thestreak_lamp_scramble);
 }
 
+void mpu4_state::mod4oki_cheatchr_kqee2(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::kqee2_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_kqee(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::kqee_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_pfloot(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::pfloot_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_rockmn(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::rockmn_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_berseralt(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::berseralt_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_berseralt2(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::berseralt2_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_bagtel(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::bagtel_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_bucalt(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::bucalt_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_hotrodalt(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::hotrodalt_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_bdash(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::bdash_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_saynomore(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::saynomore_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_luckystrikealt(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::luckystrikealt_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_hittop(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::hittop_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_vivaalt(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::vivaalt_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_mintalt(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::mintalt_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_hittopalt(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::hittopalt_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_hittopalt2(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::hittopalt2_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_andyfloalt(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::andyfloalt_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_andycappalt(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::andycappalt_lamp_scramble);
+}
 
 // alt reel setup
 

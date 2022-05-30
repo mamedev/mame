@@ -258,7 +258,6 @@ ROM_START( m4c9c )
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) // should this set have an OKI?
 ROM_END
 
-// 00 44 44 54 34 04 54 14 34 14 20 74 04 60   same as some everyone's a winner sets?
 #define M4CLBVEG_EXTRAS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "cvegass1.hex", 0x0000, 0x080000, CRC(13a8c857) SHA1(c66e10bca1ad54f467b9c5eacd502c54397c09b2) ) \
@@ -2383,14 +2382,14 @@ GAME(199?, m4bigban,  0,          mod4oki_cheatchr_tri98,    mpu4,    mpu4unsort
 // 00 88 70 14 1c c0 a4 a0 bc d4 30 14 18 d4 2c 50 (mag7s)
 GAME(199?, m4crzcsn,  0,          mod4oki_cheatchr_mag7s,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Crazy Casino (Nova) (MPU4)",GAME_FLAGS )
 
-// 00 e0 88 18 b0 48 50 60 e4 c8 58 f0 08 74 20 c0 88 3c f4 48 34
-GAME(199?, m4crzcav,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Crazy Cavern (Nova) (MPU4)",GAME_FLAGS )
+// 00 e0 88 18 b0 48 50 60 e4 c8 58 f0 08 74 20 c0 88 3c f4 48 34 (bdash)
+GAME(199?, m4crzcav,  0,          mod4oki_cheatchr_bdash,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Crazy Cavern (Nova) (MPU4)",GAME_FLAGS )
 
 // 00 24 24 2c e0 b4 b8 4c e8 d8 cc f8 6c 48 68 40 a4 bc ec d0 98 (m683)
 GAME(199?, m4dragon,  0,          mod4oki_cheatchr_m683,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Dragon (Nova) (MPU4)",GAME_FLAGS )
 
-// 00 24 24 a4 4c 10 c0 0c f0 a8 98 d4 68 90 e8 18 f4 e8 f8 54
-GAME(199?, m4hilonv,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Hi Lo Casino (Nova) (MPU4)",GAME_FLAGS )
+// 00 24 24 a4 4c 10 c0 0c f0 a8 98 d4 68 90 e8 18 f4 e8 f8 54 (bagtel)
+GAME(199?, m4hilonv,  0,          mod4oki_cheatchr_bagtel,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Hi Lo Casino (Nova) (MPU4)",GAME_FLAGS )
 
 // 00 44 44 c4 58 60 c0 50 8c b8 e0 dc ec b0 1c e8 38 ec bc 68 a4 58 68 (fruitfall scramble)
 GAME(199?, m4octo,    0,          mod4oki_cheatchr_fruitfall,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Octopus (Nova) (MPU4)",GAME_FLAGS )

@@ -189,6 +189,10 @@ public:
 	// games with sequence starting 00 18 70 24 38 58 74 0c 6c 64
 	static constexpr uint8_t rhs_lamp_scramble[8] = { 0x00, 0x3C, 0x18, 0x30, 0x10, 0x3C, 0x18, 0x10 };
 
+	// games with sequence starting 10 94 1c f4 b8 74 b4 98 f4 9c f0 b8 d4 38 74 10 (unusual sequence)
+	static constexpr uint8_t rockmn_lamp_scramble[8] = { 0x10, 0x34, 0x14, 0x34, 0x30, 0x30, 0x14, 0x30 };
+
+
 	/***************************************************************
 
 	 Lamp data below is incorrect
@@ -288,6 +292,60 @@ public:
 
 	// games with sequence starting 00 30 10 0c 58 60 24 30 1c 6c 44 3c 74 00
 	static constexpr uint8_t thestreak_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 84 c4 d4 70 04 94 50 34 14 20 b4 44 a0 e4
+	static constexpr uint8_t kqee2_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 18 b0 64 38 98 b4 44 3c b4 40 3c 9c b4
+	static constexpr uint8_t kqee_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 14 10 48 38 34 58 74 58 6c 60 5c 7c 64 14
+	static constexpr uint8_t pfloot_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting  00 50 40 30 68 44 70 60 78 3c 34 28 64 10
+	static constexpr uint8_t berseralt_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 a0 e0 c4 c8 58 9c 94 6c 1c 9c 9c bc 94 6c 10
+	static constexpr uint8_t berseralt2_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 24 24 a4 4c 10 c0 0c f0 a8 98
+	static constexpr uint8_t bagtel_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 84 c4 d4 58 24 94 50 98 3c 34 18 bc 34 88 78 bc
+	static constexpr uint8_t bucalt_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 84 a4 b4 38 c4 b4 30 1c d8 d8 d8 dc
+	static constexpr uint8_t hotrodalt_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting  00 e0 88 18 b0 48 50 60 e4 c8 58 f0 08
+	static constexpr uint8_t bdash_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 44 44 4c d0 30 18 cc f8 9c 9c 9c dc 9c
+	static constexpr uint8_t saynomore_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 50 10 84 c8 a8 2c 30 94 1c e4 dc f4
+	static constexpr uint8_t luckystrikealt_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting  00 e0 a8 38 90 68 30 60 e4 e8 18 d0 6c 10 60 c4
+	static constexpr uint8_t hittop_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting   00 30 20 14 a4 b8 d4 0c e4 3c 54 84 b8 54 24 90
+	static constexpr uint8_t vivaalt_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting    00 84 a4 e4 a8 3c dc d0 6c 58 d8 d8 dc d8 d4 60
+	static constexpr uint8_t mintalt_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 24 24 34 b0 a8 58 74 b0 38 54 90
+	static constexpr uint8_t hittopalt_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 40 50 40 54 64 50 64 50 64 54 60 74 40 70 (unusual sequence)
+	static constexpr uint8_t hittopalt2_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 30 20 14 a4 f0 c4 50 a4 74 00 b4 60 10
+	static constexpr uint8_t andyfloalt_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 14 04 54 4c 20 50 44 5c 78 70 48 6c 60 14 48 2c
+	static constexpr uint8_t andycappalt_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 	/***************************************************************
 

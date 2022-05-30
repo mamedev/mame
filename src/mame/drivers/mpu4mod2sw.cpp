@@ -1723,9 +1723,9 @@ GAMEL(199?, m4alladv, 0,          mod2_cheatchr_buc, mpu4,            mpu4mod2_m
 // 00 14 04 94 a8 6c c4 30 8c e8 e0 bc d4 28 4c c0 38 (m574)
 GAME(199?, m4clbdbl,  0,          mod2_cheatchr_m574, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Club Double (Barcrest) (MPU4) (CD 1.6)",GAME_FLAGS ) // reel issues
 
-// 00 e0 a8 38 90 68 30 60 e4 e8 18 d0 00 00
-GAME(199?, m4hittp2,  m4hittop,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Hit The Top (Barcrest) (MPU4, Mod 2 type, H4T 2.0, set 1)",GAME_FLAGS )
-GAME(199?, m4hittp2a, m4hittop,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Hit The Top (Barcrest) (MPU4, Mod 2 type, H4T 2.0, set 2)",GAME_FLAGS )
+// 00 e0 a8 38 90 68 30 60 e4 e8 18 d0 00 00 (hittop)
+GAME(199?, m4hittp2,  m4hittop,   mod2_cheatchr_hittop, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Hit The Top (Barcrest) (MPU4, Mod 2 type, H4T 2.0, set 1)",GAME_FLAGS )
+GAME(199?, m4hittp2a, m4hittop,   mod2_cheatchr_hittop, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Hit The Top (Barcrest) (MPU4, Mod 2 type, H4T 2.0, set 2)",GAME_FLAGS )
 
 
 // 00 50 40 14 c4 b0 a4 30 c4 74 00 d4 e0 30 c0 34 c4 (take2)
@@ -1941,8 +1941,8 @@ GAME(199?, m4flshltd, m4flshlt,   mod2_cheatchr_graff, mpu4,            mpu4mod2
 GAME(199?, m4flshlte, m4flshlt,   mod2_cheatchr_graff, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 6)",GAME_FLAGS )
 GAME(199?, m4flshltf, m4flshlt,   mod2_cheatchr_graff, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 7)",GAME_FLAGS )
 GAME(199?, m4flshltg, m4flshlt,   mod2_cheatchr_graff, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 8)",GAME_FLAGS )
-// 00 50 40 30 68 44 70 60 78 3c 34 28 64 10 68 04 58 7c
-GAME(199?, m4flshlta, m4flshlt,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 2)",GAME_FLAGS )
+// 00 50 40 30 68 44 70 60 78 3c 34 28 64 10 68 04 58 7c (berseralt)
+GAME(199?, m4flshlta, m4flshlt,   mod2_cheatchr_berseralt, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 2)",GAME_FLAGS )
 
 // 00 30 20 50 68 24 70 60 78 5c 5c 5c 7c 54 60 10 68 6c
 GAME(199?, m4blflsh,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 1)",GAME_FLAGS )
@@ -1959,8 +1959,8 @@ GAME(199?, m4ttak,    0,          mod2_cheatchr_clbveg, mpu4,            mpu4mod
 GAME(199?, m4actbnka, m4actbnk,   mod2_cheatchr_age, mpu4jackpot8tkn, mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Action Bank (Barcrest) (Mod 2 type, AC3.0) (MPU4)",GAME_FLAGS ) // set jackpot key to 8GBP TOKEN & stake key
 GAME(199?, m4actbnkb, m4actbnk,   mod2_cheatchr_age, mpu4jackpot8tkn, mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Action Bank (Barcrest) (Mod 2 type, ACT2.0) (MPU4)",GAME_FLAGS )
 
-// 00 84 c4 d4 70 04 94 50 34 14 20 b4 44 a0 e4
-GAMEL(199?, m4actclb, 0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4actclb,      ROT0,   "Barcrest","Action Club (Barcrest) (MPU4) (1.9)",GAME_FLAGS, layout_m4actclb ) // set stake to boot
+// 00 84 c4 d4 70 04 94 50 34 14 20 b4 44 a0 e4 (kqee2)
+GAMEL(199?, m4actclb, 0,          mod2_cheatchr_kqee2, mpu4,            mpu4mod2_machines_state, init_m4actclb,      ROT0,   "Barcrest","Action Club (Barcrest) (MPU4) (1.9)",GAME_FLAGS, layout_m4actclb ) // set stake to boot
 // 00 24 24 64 2c 14 4c 14 4c 58 78 78 74 00 6c (actclba)
 GAMEL(199?, m4actclba,m4actclb,   mod2_cheatchr_actclba, mpu4,            mpu4mod2_machines_state, init_m4actclb,      ROT0,   "Barcrest","Action Club (Barcrest) (MPU4) (1.1)",GAME_FLAGS, layout_m4actclb ) //  ^^
 
