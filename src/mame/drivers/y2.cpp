@@ -26,6 +26,9 @@ ROMs are contained on a small sub-board
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class system_board_y2_state : public driver_device
 {
 public:
@@ -35,8 +38,10 @@ public:
 
 	void system_board_y2(machine_config &config);
 
-private:
+protected:
 	virtual void video_start() override;
+
+private:
 	uint32_t screen_update_system_board_y2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -102,12 +107,25 @@ ROM_START( kof2002umj )
 	ROM_LOAD( "nand08gw3b2cn6.u102", 0x00000000, 0x42000000, CRC(db931dca) SHA1(1b1fc88732944e9ede09e584c7b07e28a59df3e2) )
 ROM_END
 
+ROM_START( higurashi ) //ひぐらしの哭く頃に 雀 / Higurashi no Naku Koro NiJong - AM-Y2 ROM_V0 PCB (also has a XILINX XC2C64A etched 0012)
+	ROM_REGION( 0x10000000, "boot", 0 )
+	ROM_LOAD( "s29gl01gp11tfcr2.u103", 0x0000000, 0x8000000, CRC(1a20bb8b) SHA1(49beb0c9d3549355b55192ba4a24e3f06b750038) )
+	ROM_LOAD( "s29gl01gp11tfcr2.u104", 0x8000000, 0x8000000, CRC(ea7a4ba4) SHA1(bd801eb4b21ee1bade906a4faa172cb7eb0fd5ac) )
+
+	ROM_REGION( 0x42000000, "nand_u101", 0 )
+	ROM_LOAD( "nand08gw3b2cn6.u101", 0x00000000, 0x42000000, CRC(a1968d7d) SHA1(53621cf9ebe6b428d56630705b16e00c14dc5be9) )
+	ROM_REGION( 0x42000000, "nand_u102", 0 )
+	ROM_LOAD( "nand08gw3b2cn6.u102", 0x00000000, 0x42000000, CRC(6ba638bb) SHA1(3f92ceb5b486787e51ea7eaaa0cf49179034210e) )
+ROM_END
+
+} // anonymous namespace
+
 
 /* The title screen shows "The King of Fighters - Road to Revenge" (Chinese / English) while the speech on the title screen announcer says "The King of Fighters 2002 Unlimited Match"
    There is a PS2 version with the Unlimited Match title screen, but unless it's used for a different region the arcade doesn't show that title, only announces it. */
 GAME( 2009, kof2002um,  0,         system_board_y2, system_board_y2,  system_board_y2_state, empty_init, ROT0, "SNK Playmore / New Channel", "The King of Fighters - Fuchou Zhi Lu/Road to Revenge / The King of Fighters 2002 Unlimited Match (China)", MACHINE_IS_SKELETON ) // also Export?
 GAME( 2009, kof2002umj, kof2002um, system_board_y2, system_board_y2,  system_board_y2_state, empty_init, ROT0, "SNK Playmore",               "The King of Fighters 2002 Unlimited Match (Japan)",                                                        MACHINE_IS_SKELETON )
+GAME( 2009, higurashi,  kof2002um, system_board_y2, system_board_y2,  system_board_y2_state, empty_init, ROT0, "AQ Interactive",             "Higurashi no Naku Koro NiJong (Japan)",                                                                    MACHINE_IS_SKELETON )
 
-//ひぐらしの哭く頃に 雀/Higurashi no naku koro ni Jan
 //エヌアイン完全世界/En-Eins Perfektewelt
 //上海 臥龍天昇/Shanghai Ga ryū tenshō
