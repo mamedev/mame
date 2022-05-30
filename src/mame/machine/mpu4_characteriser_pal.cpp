@@ -41,6 +41,7 @@ DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_PAL_BWB, mpu4_characteriser_pal_bwb, "mpu4
 DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL45, mpu4_characteriser_bootleg45, "mpu4chrpalboot45", "Barcrest MPU4 Characteriser PAL (bootleg type 1)")
 DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL51, mpu4_characteriser_bootleg51, "mpu4chrpalboot51", "Barcrest MPU4 Characteriser PAL (bootleg type 2)")
 
+DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL_BLASTBANK, mpu4_characteriser_bootleg_blastbank, "mpu4chrpalboot_blast", "Barcrest MPU4 Characteriser PAL (Blast)")
 
 mpu4_characteriser_pal::mpu4_characteriser_pal(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mpu4_characteriser_pal(mconfig, MPU4_CHARACTERISER_PAL, tag, owner, clock)
@@ -52,11 +53,11 @@ mpu4_characteriser_pal::mpu4_characteriser_pal(const machine_config &mconfig, co
 mpu4_characteriser_pal::mpu4_characteriser_pal(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_current_chr_table(nullptr),
+	m_prot_col(0),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_allow_6809_cheat(false),
 	m_allow_68k_cheat(false),
 	m_current_lamp_table(nullptr),
-	m_prot_col(0),
 	m_lamp_col(0),
 	m_4krow(0),
 	m_is_4ksim(false),
@@ -501,6 +502,12 @@ uint8_t mpu4_characteriser_pal_bwb::read(offs_t offset)
 	}
 }
 
+/*
+	bootleg Characterisers
+
+	many sets have been hacked to use their own protection styles
+*/
+
 mpu4_characteriser_bootleg45::mpu4_characteriser_bootleg45(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mpu4_characteriser_pal(mconfig, MPU4_CHARACTERISER_BOOTLEG_PAL45, tag, owner, clock)
 {
@@ -533,3 +540,31 @@ void mpu4_characteriser_bootleg51::write(offs_t offset, uint8_t data)
 {
 	logerror("%s: Characteriser write offset %02x data %02x\n", machine().describe_context(), offset, data);
 }
+
+
+mpu4_characteriser_bootleg_blastbank::mpu4_characteriser_bootleg_blastbank(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mpu4_characteriser_pal(mconfig, MPU4_CHARACTERISER_BOOTLEG_PAL_BLASTBANK, tag, owner, clock)
+{
+}
+
+uint8_t mpu4_characteriser_bootleg_blastbank::read(offs_t offset)
+{
+	logerror("%s: Characteriser read offset %02x\n", machine().describe_context(), offset);
+	switch (m_prot_col)
+	{
+	case 0x00: return 0xb8;
+	case 0x01: return 0xa8;
+	case 0x02: return 0x88;
+	case 0x03: return 0x8c;
+	case 0x04: return 0x9c;
+	case 0x05: return 0xbc;
+	}
+	return 0xff;
+}
+
+void mpu4_characteriser_bootleg_blastbank::write(offs_t offset, uint8_t data)
+{
+	logerror("%s: Characteriser write offset %02x data %02x\n", machine().describe_context(), offset, data);
+	m_prot_col = data;
+}
+

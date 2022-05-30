@@ -1919,9 +1919,8 @@ GAME(199?, m4bjsm,    0,          mod2_cheatchr_sunsetb, mpu4,            mpu4mo
 // RTC BAT FAIL, before any protection check
 GAME(199?, m4bjsma,   m4bjsm,     mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Blackjack Super Multi (Barcrest) (MPU4)",GAME_FLAGS ) // complains about battery, is this a different game?
 
-// protection sequence mostly 0? (hacked, or just weak check?)
-// b8 00 00 00 00 00 00 00 00 00 00 00 00 00
-GAME(199?, m4blstbk,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Blast A Bank (Barcrest) (MPU4)",GAME_FLAGS )
+// the protection has been replaced with a check against 6 possible values
+GAME(199?, m4blstbk,  0,          mod2_chr_blastbnk, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "bootleg","Blast A Bank (Barcrest) (bootleg) (MPU4)",GAME_FLAGS )
 
 // 00 e4 ec f8 54 08 d0 80 44 2c 58 b4 e8 b0 80 c4 2c f8 (nifty)
 GAME(198?, m4supsl,   0,          mod2_cheatchr_nifty, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest",   "Supa Silva (Barcrest) (MPU4)",GAME_FLAGS )

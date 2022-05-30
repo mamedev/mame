@@ -3118,6 +3118,12 @@ void mpu4_state::mod2_bootleg_chr51(machine_config &config)
 	MPU4_CHARACTERISER_BOOTLEG_PAL51(config, m_characteriser, 0);
 }
 
+void mpu4_state::mod2_chr_blastbnk(machine_config &config)
+{
+	mod2(config);
+	MPU4_CHARACTERISER_BOOTLEG_PAL_BLASTBANK(config, m_characteriser, 0);
+}
+
 
 // alt reel setup
 

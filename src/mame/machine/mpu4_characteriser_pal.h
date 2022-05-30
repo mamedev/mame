@@ -13,6 +13,7 @@ DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_PAL, mpu4_characteriser_pal)
 DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_PAL_BWB, mpu4_characteriser_pal_bwb)
 DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL45, mpu4_characteriser_bootleg45)
 DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL51, mpu4_characteriser_bootleg51)
+DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL_BLASTBANK, mpu4_characteriser_bootleg_blastbank)
 
 
 class mpu4_characteriser_pal : public device_t
@@ -405,6 +406,7 @@ protected:
 	virtual void device_reset() override;
 
 	uint8_t* m_current_chr_table;
+	int m_prot_col;
 
 private:
 
@@ -420,7 +422,6 @@ private:
 	bool m_allow_68k_cheat;
 
 	const uint8_t* m_current_lamp_table;
-	int m_prot_col;
 	int m_lamp_col;
 	int m_4krow;
 	bool m_is_4ksim;
@@ -485,6 +486,16 @@ class mpu4_characteriser_bootleg51 : public mpu4_characteriser_pal
 public:
 	// construction/destruction
 	mpu4_characteriser_bootleg51(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
+};
+
+class mpu4_characteriser_bootleg_blastbank : public mpu4_characteriser_pal
+{
+public:
+	// construction/destruction
+	mpu4_characteriser_bootleg_blastbank(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;
