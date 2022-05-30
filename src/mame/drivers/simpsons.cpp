@@ -169,17 +169,15 @@ void simpsons_state::device_timer(emu_timer &timer, device_timer_id id, int para
 void simpsons_state::z80_arm_nmi_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	m_nmi_enabled = machine().time().as_ticks(m_audiocpu->clock());
+	m_nmi_enabled = machine().time().as_ticks(m_audiocpu->clock()); // NMI is blocked until it's finished writing
 }
 
 void simpsons_state::z80_nmi_w(int state)
 {
-	if(state && m_nmi_enabled && machine().time().as_ticks(m_audiocpu->clock()) > m_nmi_enabled + 1) {
+	if(state && m_nmi_enabled && machine().time().as_ticks(m_audiocpu->clock()) > m_nmi_enabled + 3) {
 		m_nmi_enabled = 0;
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-
-	} else
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	}
 }
 
 void simpsons_state::z80_map(address_map &map)

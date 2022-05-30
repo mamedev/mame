@@ -159,14 +159,13 @@ Player 2 and Player 1 share the same controls !
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "screen.h"
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        (18432000)
-#define SOUND_CLOCK         (10000000)
+constexpr XTAL MASTER_CLOCK        = 18.432_MHz_XTAL;
+constexpr XTAL SOUND_CLOCK         = 10_MHz_XTAL;
 
-#define PIXEL_CLOCK         (MASTER_CLOCK/3)
+constexpr XTAL PIXEL_CLOCK         = MASTER_CLOCK/3;
 
 /* H counts from 128->511, HBLANK starts at 128 and ends at 256 */
 #define HTOTAL              (384)
@@ -202,6 +201,28 @@ WRITE_LINE_MEMBER(thepit_state::nmi_mask_w)
 	m_nmi_mask = state;
 	if (!m_nmi_mask)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(thepit_state::vblank_w)
+{
+	if (state)
+	{
+		if (m_nmi_mask)
+			m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+
+		m_vsync_timer->adjust(m_screen->time_until_pos(256, 0));
+	}
+}
+
+TIMER_CALLBACK_MEMBER(thepit_state::vsync_callback)
+{
+	m_audiocpu->set_input_line(0, ASSERT_LINE);
+}
+
+IRQ_CALLBACK_MEMBER(thepit_state::vsync_int_ack)
+{
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
+	return 0xff;
 }
 
 
@@ -291,26 +312,26 @@ void thepit_state::audio_io_map(address_map &map)
 
 static INPUT_PORTS_START( in0_real)
 	PORT_START("IN0")\
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( in2_fake )
 	PORT_START("IN2")\
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( thepit )
@@ -597,14 +618,14 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( rtriv )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -648,14 +669,14 @@ static INPUT_PORTS_START( rtriv )
 	/* Since the real inputs are multiplexed, we used this fake port
 	   to read the 2nd player controls when the screen is flipped */
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -725,30 +746,28 @@ static GFXDECODE_START( gfx_suprmous )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(thepit_state::vblank_irq)
-{
-	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-}
-
 void thepit_state::thepit(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, PIXEL_CLOCK/2);     /* 3.072 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &thepit_state::thepit_main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(thepit_state::vblank_irq));
 
-	z80_device &audiocpu(Z80(config, "audiocpu", SOUND_CLOCK/4));     /* 2.5 MHz */
-	audiocpu.set_addrmap(AS_PROGRAM, &thepit_state::audio_map);
-	audiocpu.set_addrmap(AS_IO, &thepit_state::audio_io_map);
-	audiocpu.set_vblank_int("screen", FUNC(thepit_state::irq0_line_hold));
+	Z80(config, m_audiocpu, SOUND_CLOCK/4);     /* 2.5 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &thepit_state::audio_map);
+	m_audiocpu->set_addrmap(AS_IO, &thepit_state::audio_io_map);
+	m_audiocpu->set_irq_acknowledge_callback(FUNC(thepit_state::vsync_int_ack));
 
 	LS259(config, m_mainlatch); // IC42
 	m_mainlatch->q_out_cb<0>().set(FUNC(thepit_state::nmi_mask_w));
 	m_mainlatch->q_out_cb<2>().set_nop(); // marked "LOCK OUT" on Centuri schematic but never written
 	m_mainlatch->q_out_cb<3>().set(FUNC(thepit_state::sound_enable_w));
 	m_mainlatch->q_out_cb<6>().set(FUNC(thepit_state::flip_screen_x_w));
+	m_mainlatch->q_out_cb<6>().append(m_inputmux, FUNC(ls157_x2_device::select_w));
 	m_mainlatch->q_out_cb<7>().set(FUNC(thepit_state::flip_screen_y_w));
+
+	LS157_X2(config, m_inputmux); // IC5 (0-3) & IC6 (4-7)
+	m_inputmux->a_in_callback().set_ioport("IN0");
+	m_inputmux->b_in_callback().set_ioport("IN2");
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -760,6 +779,7 @@ void thepit_state::thepit(machine_config &config)
 	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	screen.set_screen_update(FUNC(thepit_state::screen_update));
 	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(thepit_state::vblank_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
