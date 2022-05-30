@@ -151,6 +151,12 @@ public:
 	// games with sequence 00 44 44 c4 58 60 c0 50 8c b8 e0 dc ec b0 1c e8 38
 	static constexpr uint8_t fruitfall_lamp_scramble[8] = { 0x03, 0xCF, 0x47, 0xCB, 0xC3, 0x4F, 0x47, 0x43 };
 
+
+	// games with sequence 00 60 68 bc d0 2c 94 20 e4 e8 bc f0 88 34 a0 c4 ec bc f4 
+	static constexpr uint8_t m400_lamp_scramble[8] = { 0x03, 0xE7, 0x43 ,0xC3, 0xC3 ,0xE3, 0x43, 0xC3 }; // does anything using this have lamp scramble or was this extracted with tests?
+
+	
+
 	/***************************************************************
 
 	 Lamp data below is incorrect
@@ -181,6 +187,9 @@ public:
 
 	// games with sequence starting 00 50 10 24 54 00 60 50 34 30 00 74 10 04 74
 	static constexpr uint8_t premier_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 a0 88 38 94 2c 30 00 e4 c8 18 b4 4c 30
+	static constexpr uint8_t squids_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 	/***************************************************************
 

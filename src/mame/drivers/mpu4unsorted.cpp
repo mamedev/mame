@@ -457,13 +457,9 @@ ROM_START( m4dracb )
 	M4DRAC_EXTRAS
 ROM_END
 
-// 00 60 68 BC D0 2C 94 20 E4 E8 BC F0  // m400?
 ROM_START( m4exgam )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "czep30.bin", 0x0000, 0x010000, CRC(4614e6f6) SHA1(5602a68e9b47394cb31bbcd49a9920e19af6242f) )
-
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "ceg.chr", 0x0000, 0x000048, CRC(f694224e) SHA1(936ab5e349fa59accbb37959cce9519fd97f3978) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
 	ROM_LOAD( "sczep.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
@@ -579,13 +575,9 @@ ROM_START( m4hirisee )
 	ROM_LOAD( "hrise206", 0x0000, 0x010000, CRC(58b4bbdd) SHA1(0b76d27147fbadba97328eb9d2dc81cff9d576e0) )
 ROM_END
 
-// 00 60 68 BC D0 2C 94 20 E4 E8 BC
 ROM_START( m4holdtm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dht10.hex", 0x0000, 0x010000, CRC(217d382b) SHA1(a27dd107c554d4787967633dff998d3962ee0ea5) )
-
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "m400.chr", 0x0000, 0x000048, CRC(8f00f720) SHA1(ea59fa2a3b016a7ae83be3caf863de87ce7aeffa) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
 	ROM_LOAD( "sun01.hex", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
@@ -968,10 +960,7 @@ ROM_START( m4toprn )
 	ROM_LOAD( "toprun_v1_2.bin", 0x8000, 0x004000, CRC(940fafa9) SHA1(2a8b669c51c8df50710bd8b552ab30a5d1a136ab) )
 ROM_END
 
-// 00 60 68 BC D0 2C 94 20 E4 E8 BC F0   m400?
 #define M4TOPTIM_EXTRAS \
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 ) \
-	ROM_LOAD( "ttimer.chr", 0x0000, 0x000048, CRC(f694224e) SHA1(936ab5e349fa59accbb37959cce9519fd97f3978) ) \
 	ROM_REGION( 0x080000, "msm6376", 0 ) \
 	ROM_LOAD( "toptimer-snd.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
 
@@ -1067,13 +1056,9 @@ ROM_START( m4twistb )
 	ROM_LOAD( "twistagain-mki-27.bin", 0x8000, 0x008000, CRC(357f7072) SHA1(8a23509fff79a83a819b27eff8de8db08c679e3f) )
 ROM_END
 
-// 00 60 68 BC D0 2C 94 20 E4 E8   m400
 ROM_START( m4univ )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dun20", 0x0000, 0x010000, CRC(6a845d4d) SHA1(82bfc3f3a0ede76a4d482efc71b0390610db7acf) )
-
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "dunchr.chr", 0x0000, 0x000048, CRC(f694224e) SHA1(936ab5e349fa59accbb37959cce9519fd97f3978) )
 
 	ROM_REGION( 0x080000, "msm6376", 0 )
 	ROM_LOAD( "sdun01.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
@@ -2230,18 +2215,18 @@ GAME(199?, m4tropclc, m4tropcl,   mod2_alt_cheatchr_shuffle,   mpu4,    mpu4unso
 GAME(199?, m4tropcld, m4tropcl,   mod2_alt_cheatchr_shuffle,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (set 5)",GAME_FLAGS )
 
 
-// 00 60 68 bc d0 2c 94 20 e4 e8 bc f0 88 34
-GAME(199?, m4holdtm,  0,          mod4oki_alt_cheatchr,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Hold Timer (Barcrest) (Dutch) (MPU4) (DHT)",GAME_FLAGS )
-GAME(199?, m4exgam,   0,          mod4oki_alt_cheatchr,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Extra Game (Fairplay - Barcrest) (MPU4)",GAME_FLAGS )
-// 00 60 68 bc d0 2c 94 20 e4 e8 bc f0 88 34 a0
-GAME(199?, m4toma,    0,          mod2_alt_cheatchr,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Tomahawk (Barcrest) (MPU4)",GAME_FLAGS )
-// 00 60 68 bc d0 2c 94 20 e4 e8 bc f0 88 34 a0 c4
-GAME(199?, m4toptim,  0,          mod4oki_alt_cheatchr,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Top Timer (Barcrest) (Dutch) (MPU4) (DTT) (set 1)",GAME_FLAGS )
-GAME(199?, m4toptima, m4toptim,   mod4oki_alt_cheatchr,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Top Timer (Barcrest) (Dutch) (MPU4) (DTT) (set 2)",GAME_FLAGS )
-// 00 60 68 bc d0 2c 94 20 e4 e8 bc f0 88 34
-GAME(199?, m4univ,    0,          mod4oki_alt_cheatchr,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Universe (Barcrest) (Dutch) (MPU4) (DUN)",GAME_FLAGS )
-// 00 60 68 bc d0 2c 94 20 e4 e8 bc f0 88
-GAME(199?, m4frtgm,   0,          mod4oki_alt_cheatchr,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Fruit Game (Barcrest) (MPU4)",GAME_FLAGS ) // SAMPLE EEPROM ALARM (and has a weird sample rom..)
+// 00 60 68 bc d0 2c 94 20 e4 e8 bc f0 88 34 (m400)
+GAME(199?, m4holdtm,  0,          mod4oki_alt_cheatchr_m400,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Hold Timer (Barcrest) (Dutch) (MPU4) (DHT)",GAME_FLAGS )
+GAME(199?, m4exgam,   0,          mod4oki_alt_cheatchr_m400,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Extra Game (Fairplay - Barcrest) (MPU4)",GAME_FLAGS )
+// 00 60 68 bc d0 2c 94 20 e4 e8 bc f0 88 34 a0 (m400)
+GAME(199?, m4toma,    0,          mod2_alt_cheatchr_m400,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Tomahawk (Barcrest) (MPU4)",GAME_FLAGS )
+// 00 60 68 bc d0 2c 94 20 e4 e8 bc f0 88 34 a0 c4 (m400)
+GAME(199?, m4toptim,  0,          mod4oki_alt_cheatchr_m400,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Top Timer (Barcrest) (Dutch) (MPU4) (DTT) (set 1)",GAME_FLAGS )
+GAME(199?, m4toptima, m4toptim,   mod4oki_alt_cheatchr_m400,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Top Timer (Barcrest) (Dutch) (MPU4) (DTT) (set 2)",GAME_FLAGS )
+// 00 60 68 bc d0 2c 94 20 e4 e8 bc f0 88 34 (m400)
+GAME(199?, m4univ,    0,          mod4oki_alt_cheatchr_m400,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Universe (Barcrest) (Dutch) (MPU4) (DUN)",GAME_FLAGS )
+// 00 60 68 bc d0 2c 94 20 e4 e8 bc f0 88 (m400)
+GAME(199?, m4frtgm,   0,          mod4oki_alt_cheatchr_m400,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Fruit Game (Barcrest) (MPU4)",GAME_FLAGS ) // SAMPLE EEPROM ALARM (and has a weird sample rom..)
 
 
 // 00 44 44 64 4c 80 70 24 6c a8 b0 38 e4 50  (same as some prize money sets)

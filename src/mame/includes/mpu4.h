@@ -187,6 +187,9 @@ public:
 	void mod2_cheatchr_viva(machine_config &config);
 	void mod2_cheatchr_m574(machine_config &config);
 	void mod2_cheatchr_crkpot(machine_config &config);
+	void mod2_cheatchr_m400(machine_config &config);
+	void mod2_cheatchr_rhm(machine_config &config);
+	void mod2_cheatchr_squids(machine_config &config);
 
 	void mod2_alt(machine_config &config);
 	void mod2_alt_cheatchr(machine_config &config);
@@ -195,6 +198,7 @@ public:
 	void mod2_alt_cheatchr_m450(machine_config &config);
 	void mod2_alt_cheatchr_m470(machine_config &config);
 	void mod2_alt_cheatchr_alf(machine_config &config);
+	void mod2_alt_cheatchr_m400(machine_config &config);
 
 	void mod4oki(machine_config &config);
 	void mod4oki_5r(machine_config &config);
@@ -211,6 +215,7 @@ public:
 	void mod4oki_alt_cheatchr_alf(machine_config &config);
 	void mod4oki_alt_cheatchr_clbveg(machine_config &config);
 	void mod4oki_alt_cheatchr_m470(machine_config &config);
+	void mod4oki_alt_cheatchr_m400(machine_config &config);
 
 	void mod4oki_chr(machine_config &config);
 	void mod4oki_cheatchr(machine_config &config);
@@ -243,6 +248,7 @@ public:
 	void mod4oki_cheatchr_nifty(machine_config &config);
 	void mod4oki_cheatchr_milclb(machine_config &config);
 	void mod4oki_cheatchr_fruitfall(machine_config &config);
+	void mod4oki_cheatchr_squids(machine_config &config);
 
 	void mod4yam(machine_config &config);
 	void mod4yam_cheatchr(machine_config &config);
@@ -258,6 +264,7 @@ public:
 	void mod4yam_cheatchr_viva(machine_config &config);
 	void mod4yam_cheatchr_tentendia(machine_config &config);
 	void mod4yam_cheatchr_celclb(machine_config &config);
+	void mod4yam_cheatchr_squids(machine_config &config);
 	void mod4yam_chr(machine_config &config);
 
 	void mpu4_common(machine_config &config);

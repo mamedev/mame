@@ -747,7 +747,7 @@ GAME_CUSTOM( 1991, m4rhogr6y_a,      m4rhog,     "rdhogvkn",                 0x0
 	ROM_END \
 	GAME(year, setname, parent, mod4oki_cheatchr_rhm, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
-// expects sequence starting 00 30 20 14 64 30 44 30 64 34 00 74 20 10
+// expects sequence starting 00 30 20 14 64 30 44 30 64 34 00 74 20 10  (rhm)
 // "(C)1995  B.W.B."  and "RO_ 3.0"
 GAME_CUSTOM( 1995, m4rhogr3,         m4rhog,     "rh5p8.bin",                0x0000, 0x010000, CRC(35d56379) SHA1(ab70ef8151823c3157cf4cc4f9b29875c6ac81cc), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 3.0)" )
 
@@ -2025,7 +2025,7 @@ GAME_CUSTOM( 199?, m4jpgem__aa, m4jpgem,    "jagy.p1",      0x0000, 0x010000, CR
 	ROM_END \
 	GAME(year, setname, parent, mod4oki_cheatchr_rhm, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
-// wants chr sequence starting 00 30 20 14 64 30 44 30 64 34 00 74 20 10 64 10 64 74 64 30  (same as BWB Road Hog set?)
+// wants chr sequence starting 00 30 20 14 64 30 44 30 64 34 00 74 20 10 64 10 64 74 64 30 (rhm) (same as BWB Road Hog set?)
 // "(C)1991 BARCREST" and "JG3 0.1"
 GAME_CUSTOM( 199?, m4jpgem__ai, m4jpgem,    "jg3s.p1",      0x0000, 0x010000, CRC(91945adc) SHA1(d80321fc4c2e67461d69df2164e3e290caa905bc), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (JG3 0.1)" )
 GAME_CUSTOM( 199?, m4jpgem__ab, m4jpgem,    "jg3ad.p1",     0x0000, 0x010000, CRC(501bb879) SHA1(a97519042b4a4ed03efbcad9f11f279184dec847), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (JG3 0.1 AD)" )
@@ -7298,9 +7298,9 @@ GAME_CUSTOM( 199?, m4ssclas__f,    m4ssclas,   "supst20.15",   0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SQUID_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_squids, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
 
-// needs chr sequence starting 00 a0 88 38 94 2c 30 00 e4 c8 18 b4
+// needs chr sequence starting 00 a0 88 38 94 2c 30 00 e4 c8 18 b4 (squids)
 // "(C)1999    BWB" and "SQ_ 2.0"
 GAME_CUSTOM( 199?, m4squid,     0,          "squidsin.bin", 0x0000, 0x020000, CRC(be369b43) SHA1(e5c7b7a858b264db2f8f726396ddeb42004d7cb9), "Bwb","Squids In (Barcrest) (MPU4) (SQ_ 2.0 C)" )
 GAME_CUSTOM( 199?, m4squid__a,  m4squid,    "sq__x_dx.2_0", 0x0000, 0x020000, CRC(2eb6c814) SHA1(070ad5cb36220daf98043f175cf67d4d584c3d01), "Bwb","Squids In (Barcrest) (MPU4) (SQ_ 2.0 CD)" )

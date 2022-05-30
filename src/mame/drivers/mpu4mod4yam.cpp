@@ -132,6 +132,14 @@ GAME_CUSTOM( 1991, m4addr6lybd,  m4addr, "a6lbdy.p1",                0x0000, 0x0
 
 // These have different lamp scrambling
 
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title,flags) \
+	ROM_START( setname ) \
+		ROM_REGION( 0x10000, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+	ROM_END \
+	GAMEL( year, setname, parent, mod4yam_cheatchr_squids, m4addr, mpu4mod4yam_machines_state, init_m4addr, ROT0, company, title, flags, layout_m4addr )
+
 // sequence 00 a0 88 38 94 2c 30 00 e4 c8 18 b4 4c 30 (same as Squids In?)
 // "(C)1993  B.W.B." and "ADD 1.0"
 GAME_CUSTOM( 199?, m4addrc__l,   m4addr, "al10",                     0x0000, 0x010000, CRC(3c3c82b6) SHA1(cc5ffdd0837c9af31d5737a70430a01d1989cdcc), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0, 1993)", GAME_FLAGS )

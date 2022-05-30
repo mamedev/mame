@@ -2895,6 +2895,21 @@ void mpu4_state::mod2_cheatchr_crkpot(machine_config &config)
 	mod2_cheatchr_table(config, mpu4_characteriser_pal::crkpot_lamp_scramble);
 }
 
+void mpu4_state::mod2_cheatchr_m400(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::m400_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_rhm(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::rhm_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_squids(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::squids_lamp_scramble);
+}
+
 // alt reel setup
 
 void mpu4_state::mod2_alt(machine_config &config)
@@ -2940,6 +2955,11 @@ void mpu4_state::mod2_alt_cheatchr_m470(machine_config &config)
 void mpu4_state::mod2_alt_cheatchr_alf(machine_config &config)
 {
 	mod2_alt_cheatchr_table(config, mpu4_characteriser_pal::alf_lamp_scramble);
+}
+
+void mpu4_state::mod2_alt_cheatchr_m400(machine_config &config)
+{
+	mod2_alt_cheatchr_table(config, mpu4_characteriser_pal::m400_lamp_scramble);
 }
 
 /***********************************************************************************************
@@ -3035,6 +3055,11 @@ void mpu4_state::mod4yam_cheatchr_m574(machine_config &config)
 void mpu4_state::mod4yam_cheatchr_viva(machine_config &config)
 {
 	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::viva_lamp_scramble);
+}
+
+void mpu4_state::mod4yam_cheatchr_squids(machine_config &config)
+{
+	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::squids_lamp_scramble);
 }
 
 /***********************************************************************************************
@@ -3221,6 +3246,10 @@ void mpu4_state::mod4oki_cheatchr_fruitfall(machine_config &config)
 	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::fruitfall_lamp_scramble);
 }
 
+void mpu4_state::mod4oki_cheatchr_squids(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::squids_lamp_scramble);
+}
 
 // alt reel setup
 
@@ -3266,6 +3295,12 @@ void mpu4_state::mod4oki_alt_cheatchr_m470(machine_config &config)
 {
 	mod4oki_alt_cheatchr_table(config, mpu4_characteriser_pal::m470_lamp_scramble);
 }
+
+void mpu4_state::mod4oki_alt_cheatchr_m400(machine_config &config)
+{
+	mod4oki_alt_cheatchr_table(config, mpu4_characteriser_pal::m400_lamp_scramble);
+}
+
 
 // 5 reel setup
 

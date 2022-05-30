@@ -290,23 +290,16 @@ ROM_START( m4sgrabb )
 ROM_END
 
 
-// 00 60 68 BC D0 2C 94 20 E4 E8 BC F0 88
 ROM_START( m4stakeu )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "su4_4.p1", 0xc000, 0x004000, CRC(e534edba) SHA1(0295013e3e9271f7e5023b8de670a4903578bf05) )
 	ROM_LOAD( "su4_4.p2", 0x8000, 0x004000, CRC(8c2e0872) SHA1(9b0f1195d740e51085007417041428b449b3ee51) )
 	ROM_LOAD( "su4_4.p3", 0x6000, 0x002000, CRC(0c25955b) SHA1(71f0ebbf088abc3ad860f9a1c7a830348a979289) )
-
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "m400.chr", 0x0000, 0x000048, CRC(8f00f720) SHA1(ea59fa2a3b016a7ae83be3caf863de87ce7aeffa) )
 ROM_END
 
 ROM_START( m4stakeua )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "stakeup.hex", 0x6000, 0x00a000, CRC(a7ac8f19) SHA1(ec87512e16ff0252012067ad655c3fcee1d2e908) ) // needs to be split
-
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "m400.chr", 0x0000, 0x000048, CRC(8f00f720) SHA1(ea59fa2a3b016a7ae83be3caf863de87ce7aeffa) )
 ROM_END
 
 void mpu4mod2_machines_state::init_m4actpak()
@@ -1741,12 +1734,22 @@ GAME(199?, m4crkpotb, m4crkpot,   mod2_cheatchr_crkpot, mpu4,            mpu4mod
 // 00 e0 8c 58 b0 68 30 64 e4 cc 58 f0 2c 50 64 c4 88 5c f4 0c 14 60 (crkpot)
 GAME(199?, m4hiroll,  0,          mod2_cheatchr_crkpot, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","High Roller (Barcrest) (MPU4)",GAME_FLAGS )
 
-// 00 60 68 bc d0 2c 94 20 e4 e8 bc f0 00 00  unusual sequence, lots of 00
-GAME(199?, m4multcl,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Multiplay Club (Barcrest) (MPU4, MP 2.8)",GAME_FLAGS )
+// the challenge sequence for this characteriser protection check never sets bit 0x20
+// 00 60 68 bc d0 2c 94 20 e4 e8 bc f0 88 34 a0 c4 ec bc f4 (m400)
+GAME(199?, m4multcl,  0,          mod2_cheatchr_m400, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Multiplay Club (Barcrest) (MPU4, MP 2.8)",GAME_FLAGS )
 
-// 00 30 20 14 64 30 44 30 64 34 00 74 20 10 64
-GAME(199?, m4clbclm,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Club Climber (Barcrest) (MPU4, C1C 3.3)",GAME_FLAGS )
-GAME(199?, m4clbclma, m4clbclm,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Club Climber (Barcrest) (MPU4, CC 4.5)",GAME_FLAGS )
+// the challenge sequence for this characteriser protection check never sets bit 0x20
+// 00 a0 88 38 94 2c 30 00 e4 c8 18 b4 4c 30 20 c0 ec 7c f4 (squids)
+GAME(199?, m4reelpk,  0,          mod2_cheatchr_squids, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Reel Poker (Barcrest) (MPU4)",GAME_FLAGS )
+
+// 00 60 68 bc d0 2c 94 20 e4 e8 bc f0 88 34 a0 c4 ec bc f4 (m400)
+GAME(199?, m4stakeu,  0,          mod2_cheatchr_m400, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Stake Up Club (Barcrest) (MPU4) (SU 4.4)",GAME_FLAGS )
+GAME(199?, m4stakeua, m4stakeu,   mod2_cheatchr_m400, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Stake Up Club (Barcrest) (MPU4) (SU 4.8)",GAME_FLAGS )
+
+
+// 00 30 20 14 64 30 44 30 64 34 00 74 20 10 64  (rhm)
+GAME(199?, m4clbclm,  0,          mod2_cheatchr_rhm, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Club Climber (Barcrest) (MPU4, C1C 3.3)",GAME_FLAGS )
+GAME(199?, m4clbclma, m4clbclm,   mod2_cheatchr_rhm, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Club Climber (Barcrest) (MPU4, CC 4.5)",GAME_FLAGS )
 
 // 00 bc b8 fc bc dc fc fc fc f8 d8 b8 00 00 00 unusual sequence, lots of 00
 GAME(199?, m4grbbnk,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Grab The Bank (Barcrest) (MPU4) (G4B 2.0)",GAME_FLAGS )
@@ -1764,9 +1767,6 @@ GAME(199?, m4sgrab,   0,          mod2_cheatchr, mpu4,            mpu4mod2_machi
 GAME(199?, m4sgraba,  m4sgrab,    mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Smash 'n' Grab (Barcrest) (MPU4) (set 1.0, set 2)",GAME_FLAGS )
 GAME(199?, m4sgrabb,  m4sgrab,    mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Smash 'n' Grab (Barcrest) (MPU4) (SAG 3.4)",GAME_FLAGS )
 
-// 00 60 68 bc d0 2c 94 20 e4 e8 bc f0 00 00
-GAME(199?, m4stakeu,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Stake Up Club (Barcrest) (MPU4) (SU 4.4)",GAME_FLAGS )
-GAME(199?, m4stakeua, m4stakeu,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Stake Up Club (Barcrest) (MPU4) (SU 4.8)",GAME_FLAGS )
 
 // crashes MAME - check init
 // 00 44 44 54 34 04 54 14 34 14 20 74 04 60 44 50 34
@@ -1883,11 +1883,9 @@ GAME(199?, m4niftyb,  m4nifty,    mod2_cheatchr_nifty, mpu4,            mpu4mod2
 // 00 44 44 c4 58 60 c0 50 8c b8 e0 dc ec b0 1c e8 38 (fruitfall scramble)
 GAME(199?, m4nudqst,  0,          mod2_cheatchr_fruitfall, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Nudge Quest (Barcrest) (MPU4) (NQ 2.0)",GAME_FLAGS )
 
-// 00 30 20 14 64 30 44 30 64 34 00 74 20 10 64 10
-GAME(199?, m4r2r,     0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Reel 2 Reel (Barcrest) (MPU4)",GAME_FLAGS )
+// 00 30 20 14 64 30 44 30 64 34 00 74 20 10 64 10  (rhm)
+GAME(199?, m4r2r,     0,          mod2_cheatchr_rhm, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Reel 2 Reel (Barcrest) (MPU4)",GAME_FLAGS )
 
-// 00 a0 88 38 94 2c 30 00 e4 c8 18 b4 00 00
-GAME(199?, m4reelpk,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Reel Poker (Barcrest) (MPU4)",GAME_FLAGS )
 
 // 00 30 20 14 2c a0 54 24 3c 9c 9c 9c bc 94 6c
 GAME(199?, m4runawy,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Runaway Trail (Barcrest) (MPU4)",GAME_FLAGS )
@@ -2122,8 +2120,8 @@ GAME(199?, m4stards,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machi
 // 00 84 8c 3c f4 4c 34 14 54 14 40 d4 4c 70 04 d0 58 f4
 GAME(199?, m4tbreel,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Turbo Reel (Barcrest) (Dutch) (MPU4) (set 1)",GAME_FLAGS )
 
-// 00 30 20 14 64 30 44 30 64 34 00 74 20 10 64 10 64 74 64 30
-GAME(199?, m4tbrldx,  m4tbreel,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Turbo Reel (Barcrest) (Dutch) (MPU4) (set 3, Deluxe?)",GAME_FLAGS )
+// 00 30 20 14 64 30 44 30 64 34 00 74 20 10 64 10 64 74 64 30 (rhm)
+GAME(199?, m4tbrldx,  m4tbreel,   mod2_cheatchr_rhm, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Turbo Reel (Barcrest) (Dutch) (MPU4) (set 3, Deluxe?)",GAME_FLAGS )
 
 // 00 30 10 0c 98 a8 c4 60 3c ac c4 7c b4
 GAME(199?, m4taj,     0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Taj Mahal (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
