@@ -1965,7 +1965,7 @@ GAMEL(199?, m4actclba,m4actclb,   mod2_cheatchr_actclba, mpu4,            mpu4mo
 GAME(199?, m4bluemn,  0,          mod2_cheatchr_lv, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Blue Moon (Barcrest) (MPU4) (BLU 2.3)",GAME_FLAGS )
 GAME(199?, m4bluemna, m4bluemn,   mod2_cheatchr_lv, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Blue Moon (Barcrest) (MPU4) (BLU 2.1)",GAME_FLAGS )
 // not using standard protection, hack?
-GAME(199?, m4bluemnb, m4bluemn,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "hack?","Blue Moon (Barcrest) (MPU4) (BLU 1.1)",GAME_FLAGS ) // bad chr, non-blanked out start of rom (hack?)
+GAME(199?, m4bluemnb, m4bluemn,   mod2_bootleg_chr51, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "hack?","Blue Moon (Barcrest) (MPU4) (BLU 1.1)",GAME_FLAGS ) // bad chr, non-blanked out start of rom (hack?)
 
 // 00 50 40 14 c4 b0 a4 30 c4 74 00 d4 e0 30 c0 34 c4 (take2)
 GAME(199?, m4take2,   0,          mod2_cheatchr_take2, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Take Two (Barcrest) (MPU4) (TTO 1.2)",GAME_FLAGS )

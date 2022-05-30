@@ -231,6 +231,7 @@ public:
 	void mod2_cheatchr_blackwhite(machine_config &config);
 
 	void mod2_bootleg_chr45(machine_config &config);
+	void mod2_bootleg_chr51(machine_config &config);
 
 	void mod2_alt(machine_config &config);
 	void mod2_alt_cheatchr(machine_config &config);
