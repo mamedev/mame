@@ -2165,8 +2165,8 @@ GAME(199?, m4joltavb, m4joltav,   mod2_cheatchr_viva, mpu4,            mpu4mod2_
 // this has a 'tri98' protection sequence check in ROM, but the code appears to have been hacked to expect a different response.
 GAME(199?, m4btclok,  0,          mod2_bootleg_chr45, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "bootleg","Beat The Clock (Barcrest) (bootleg) (MPU4)",GAME_FLAGS )
 
-// non-standard protection? hack?
-GAME(199?, m4brktak,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Break & Take (Barcrest) (MPU4)",GAME_FLAGS )
+// protection has been hacked
+GAME(199?, m4brktak,  0,          mod2_bootleg_chr45, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "bootleg","Break & Take (Barcrest) (bootleg) (MPU4)",GAME_FLAGS )
 
 
 // these were found in with mod4oki sets, but don't attempt to play samples, only use the AY
