@@ -3040,6 +3040,30 @@ void mpu4_state::mod2_cheatchr_bjac(machine_config &config)
 	mod2_cheatchr_table(config, mpu4_characteriser_pal::bjac_lamp_scramble);
 }
 
+void mpu4_state::mod2_cheatchr_phr(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::phr_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_wayin(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::wayin_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_cheryo(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::cheryo_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_cosmiccasino(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::cosmiccasino_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_kingqn(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::kingqn_lamp_scramble);
+}
 
 // alt reel setup
 
@@ -3233,6 +3257,15 @@ void mpu4_state::mod4yam_cheatchr_rr6(machine_config &config)
 	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::rr6_lamp_scramble);
 }
 
+void mpu4_state::mod4yam_cheatchr_turboplay(machine_config &config)
+{
+	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::turboplay_lamp_scramble);
+}
+
+void mpu4_state::mod4yam_cheatchr_duty(machine_config &config)
+{
+	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::duty_lamp_scramble);
+}
 
 /***********************************************************************************************
 
@@ -3477,6 +3510,32 @@ void mpu4_state::mod4oki_cheatchr_actclba(machine_config &config)
 {
 	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::actclba_lamp_scramble);
 }
+
+void mpu4_state::mod4oki_cheatchr_phr(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::phr_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_cheryo(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::cheryo_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_cosmiccasino(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::cosmiccasino_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_kingqn(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::kingqn_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_turboplay(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::turboplay_lamp_scramble);
+}
+
 
 // alt reel setup
 

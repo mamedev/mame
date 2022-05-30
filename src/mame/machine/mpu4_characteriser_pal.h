@@ -242,6 +242,22 @@ public:
 	// games with sequence starting 00 24 24 64 2c 14 4c 14 4c 58 78 78 74
 	static constexpr uint8_t actclba_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
+	// games with sequence starting 00 14 10 c0 4c 20 84 0c f0 98 e4 dc f4 08 f0 08 70 d0
+	static constexpr uint8_t phr_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 44 44 64 4c 10 28 50 68 38 34 28 70 00 6c 10 68
+	static constexpr uint8_t cheryo_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 30 10 44 70 10 44 30 54 14 40 74 10 40 34
+	static constexpr uint8_t cosmiccasino_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 84 8c 3c f4 4c 34 24 e4 ac 38 f0 0c 70 04 
+	static constexpr uint8_t kingqn_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 c0 d0 38 ec 5c ec 14 68 2c 24 e8 74 00 e8 14
+	static constexpr uint8_t turboplay_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+
 	/***************************************************************
 
 	 Types below have no games using lamp scramble, so data is unknown / blank
@@ -250,6 +266,10 @@ public:
 
 	// games with sequence starting 00 e0 8c 58 b0 68 30 64 e4 cc 58 f0 2c 50 64 c4 88 5c f4 0c
 	static constexpr uint8_t crkpot_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+	// games with sequence starting 00 60 68 38 d0 2c 90 24 e4 e8 3c f0 88 34 20 40 e8 bc f4 28
+	static constexpr uint8_t wayin_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
 
 protected:
 	mpu4_characteriser_pal(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

@@ -997,10 +997,6 @@ ROM_START( m4tropcld )
 	ROM_LOAD( "trod.p1", 0x0000, 0x010000, CRC(60c84612) SHA1(84dc8b34e41436331832c1a32ddac0fce269488a) )
 ROM_END
 
-// 00 C0 D0 38 EC 5C EC 14 68 2C 24 E8
-
-//  ROM_REGION( 0x48, "characteriser:fakechr", 0 ) // blank lamp sequence
-//  ROM_LOAD( "dtpchr.chr", 0x0000, 0x000048, CRC(7743df66) SHA1(69b1943837ccf8671861ac8ef690138b41de0e5b) )
 
 #define M4TBPLAY_EXTRAS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
@@ -2184,7 +2180,7 @@ GAME(199?, m4supbfa,  m4supbf,    mod2_alt_cheatchr,   mpu4,    mpu4unsorted_sta
 // 00 90 18 e4 a8 3c f4 48 74 50 20 f0 18 e4 98 e4 (m450)
 GAME(199?, m4gldgat,  0,          mod2_alt_cheatchr_m450,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Golden Gate (Barcrest) [DGG, Dutch] (MPU4)",GAME_FLAGS )
 
-// 00 0c 50 60 4c 10 60 0c 78 74 00 6c 38 34 48  (unique)
+// 00 0c 50 60 4c 10 60 0c 78 74 00 6c 38 34 48 
 GAME(199?, m4hirise,  0,          mod2_alt_cheatchr,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
 GAME(199?, m4hirisea, m4hirise,   mod2_alt_cheatchr,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
 GAME(199?, m4hirisec, m4hirise,   mod2_alt_cheatchr,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
@@ -2200,7 +2196,7 @@ GAME(199?, m4nspotb,  m4nspot,    mod2_cheatchr_celclb,   mpu4,    mpu4unsorted_
 
 
 
-// 00 84 a4 ac 70 80 2c c0 bc 5c 5c 5c dc 5c cc 68
+// 00 84 a4 ac 70 80 2c c0 bc 5c 5c 5c dc 5c cc 68 (shuffle)
 GAME(199?, m4tropcl,  0,          mod2_alt_cheatchr_shuffle,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
 GAME(199?, m4tropcla, m4tropcl,   mod2_alt_cheatchr_shuffle,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
 GAME(199?, m4tropclb, m4tropcl,   mod2_alt_cheatchr_shuffle,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
@@ -2231,8 +2227,8 @@ GAME(199?, m4roadrn,  0,          mod4oki_cheatchr_age,mpu4,    mpu4unsorted_sta
 // 00 84 94 5c ec 3c ec 30 4c 68 60 cc 7c (andybt scramble)
 GAME(199?, m4showtm,  0,          mod4oki_cheatchr_andybt,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Show Timer (Barcrest) (Dutch) (MPU4) (DSH1.3)",GAME_FLAGS )
 
-// 00 14 10 c0 4c 20 84 0c f0 98 e4 dc f4 (same as dutch andy capp + prize high roller)
-GAME(199?, m4steptm,  0,          mod4oki_alt_cheatchr,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Step Timer (Barcrest) (Dutch) (MPU4) (DST 1.1)",GAME_FLAGS )
+// 00 14 10 c0 4c 20 84 0c f0 98 e4 dc f4 (phr) (same as dutch andy capp + prize high roller)
+GAME(199?, m4steptm,  0,          mod4oki_cheatchr_phr,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Step Timer (Barcrest) (Dutch) (MPU4) (DST 1.1)",GAME_FLAGS )
 
 // 00 24 24 a4 68 14 c4 28 d4 8c d8 f0 0c d0 8c
 GAME(199?, m4wildtm,  0,          mod4oki_alt_cheatchr,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Wild Timer (Barcrest) (Dutch) (MPU4) (DWT 1.3)",GAME_FLAGS )
@@ -2248,15 +2244,15 @@ GAME(199?, m4fortcbb, m4fortcb,   mod4oki_alt_cheatchr_fortune,mpu4,    mpu4unso
 
 // non-english sets
 
-// 00 c0 d0 38 ec 5c ec 14 68 2c 24 e8 74 00 e8
-GAME(199?, m4magrep,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Magic Replay (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
+// 00 c0 d0 38 ec 5c ec 14 68 2c 24 e8 74 00 e8 (turboplay)
+GAME(199?, m4magrep,  0,          mod4oki_cheatchr_turboplay,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Magic Replay (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
 
 // 00 24 24 64 2c 14 4c 14 4c 58 (actclba)
 GAME(199?, m4nile,    0,          mod4oki_cheatchr_actclba,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Nile Jewels (Barcrest) (German) (MPU4) (GJN0.8)",GAME_FLAGS ) // DM1 SW ALM
 
-// 00 24 24 2c e0 b4 b8 4c e8 d8 cc f8 6c 48 68
+// 00 24 24 2c e0 b4 b8 4c e8 d8 cc f8 6c 48 68 (m683)
 GAME(199?, m4jokmil,  0,          mod4oki_cheatchr_m683,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Jokers Millennium (Barcrest) (German) (MPU4)",GAME_FLAGS ) // DM1 SW ALM
-// 00 24 24 2c e0 b4 b8 4c e8 d8 cc f8 6c 48
+// 00 24 24 2c e0 b4 b8 4c e8 d8 cc f8 6c 48 (m683)
 GAME(199?, m4jok300,  0,          mod4oki_cheatchr_m683,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Jokers 300 (Barcrest) (German?) (MPU4)",GAME_FLAGS ) // also contains crystal maze stuff??
 
 // 00 8c 64 84 84 c4 84 84 9c f4 04 cc 24 84 c4 94 54 0c  (same as v4adders?)
@@ -2314,9 +2310,9 @@ GAME(199?, m4oldtmr,  0,          mod4oki_alt_cheatchr_m470,mpu4,    mpu4unsorte
 GAME(199?, m4casot,   m4oldtmr,   mod4oki_alt_cheatchr_m470,mpu4,    mpu4unsorted_state, init_m_oldtmr,  ROT0,   "Barcrest","Old Timer (Barcrest) (Dutch, alt 'Black and White' sound roms) (DOT1.1)",GAME_FLAGS ) // uses the same program???
 GAME(199?, m4jpmcla,  m4oldtmr,   mod4oki_alt_cheatchr_m470,mpu4,    mpu4unsorted_state, init_m_oldtmr,  ROT0,   "Barcrest","Old Timer (Barcrest) (Dutch, alt 'JPM Classic' sound roms) (DOT1.1)",GAME_FLAGS ) // uses the same program???
 
-// 00 c0 d0 38 ec 5c ec 14 68 2c 24 e8 74 00 e8 14
-GAME(199?, m4tbplay,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Turbo Play (Barcrest) (Dutch) (MPU4) (DTP) (set 1)",GAME_FLAGS )
-// 00 50 40 90 a8 6c c4 30 c8 ac a4 f8 d4 28 4c 84
+// 00 c0 d0 38 ec 5c ec 14 68 2c 24 e8 74 00 e8 14 (turboplay)
+GAME(199?, m4tbplay,  0,          mod4oki_cheatchr_turboplay,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Turbo Play (Barcrest) (Dutch) (MPU4) (DTP) (set 1)",GAME_FLAGS )
+// 00 50 40 90 a8 6c c4 30 c8 ac a4 f8 d4 28 4c 84 (alf)
 GAME(199?, m4tbplaya, m4tbplay,   mod4oki_cheatchr_alf,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Turbo Play (Barcrest) (Dutch) (MPU4) (DTP) (set 2)",GAME_FLAGS )
 GAME(199?, m4tbplayb, m4tbplay,   mod4oki_cheatchr_alf,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Turbo Play (Barcrest) (Dutch) (MPU4) (DTP) (set 3)",GAME_FLAGS )
 
@@ -2390,8 +2386,8 @@ GAME(199?, m4crzcsn,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_sta
 // 00 e0 88 18 b0 48 50 60 e4 c8 58 f0 08 74 20 c0 88 3c f4 48 34
 GAME(199?, m4crzcav,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Crazy Cavern (Nova) (MPU4)",GAME_FLAGS )
 
-// 00 24 24 2c e0 b4 b8 4c e8 d8 cc f8 6c 48 68 40 a4 bc ec d0 98
-GAME(199?, m4dragon,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Dragon (Nova) (MPU4)",GAME_FLAGS )
+// 00 24 24 2c e0 b4 b8 4c e8 d8 cc f8 6c 48 68 40 a4 bc ec d0 98 (m683)
+GAME(199?, m4dragon,  0,          mod4oki_cheatchr_m683,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Dragon (Nova) (MPU4)",GAME_FLAGS )
 
 // 00 24 24 a4 4c 10 c0 0c f0 a8 98 d4 68 90 e8 18 f4 e8 f8 54
 GAME(199?, m4hilonv,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Hi Lo Casino (Nova) (MPU4)",GAME_FLAGS )

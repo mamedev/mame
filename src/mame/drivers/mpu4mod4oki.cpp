@@ -405,7 +405,7 @@ ROM_END
 
 // expects chr sequence starting 00 14 10 c0 4c 20 84 0c f0 98 e4 dc f4 08 f0  (same as some Prize High Roller sets?)
 // blank copyright  and "DAC 1.3" (6 reel game, not the same as the UK version?)
-GAME(199?, m4andycpdut, m4andycp, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, "Barcrest", "Andy Capp (Barcrest) [DAC 1.3, Dutch] (MPU4)", GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4andycpdut, m4andycp, mod4oki_cheatchr_phr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, "Barcrest", "Andy Capp (Barcrest) [DAC 1.3, Dutch] (MPU4)", GAME_FLAGS|MACHINE_NO_SOUND )
 
 
 /*****************************************************************************************************************************************************************************
@@ -464,13 +464,23 @@ GAME_CUSTOM( 1991, m4andyfluyd,    m4andyfl,    "alu03dy.p1",              0x000
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ANDYFL_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_cheryo, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
-// expects sequence 00 44 44 64 4c 10 28 50 68 38 34 28 70
+// expects sequence 00 44 44 64 4c 10 28 50 68 38 34 28 70 (cheryo)
 // "(C)1996  B.W.B."  and "AL4 2.1"
 GAME_CUSTOM( 1996, m4andyfl,       0,           "andy loves flo 05a 4 2-1",0x0000, 0x010000, CRC(773d2c6f) SHA1(944be6fff70439077a9c0d858e76806e0317585c), "Bwb", "Andy Loves Flo (Bwb / Barcrest) (MPU4) (AL4 2.1 KS)" )
 // "(C)1996  B.W.B."  and "AL_ 2.4"
 GAME_CUSTOM( 1996, m4andyfl8bs,    m4andyfl,    "al_05a__.2_1",            0x0000, 0x010000, CRC(d28849c8) SHA1(17e79f92cb3667de0be54fd4bae7f4c3a3a80aa5), "Bwb", "Andy Loves Flo (Bwb / Barcrest) (MPU4) (AL_ 2.4 KS)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( 0x10000, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4ANDYFL_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
 
 // expects sequence 00 30 20 14 a4 f0 c4 50 a4 74 00 b4 60 10
 // "(C)1991 BARCREST"  and "AL3 0.1"
@@ -3642,11 +3652,9 @@ GAME_CUSTOM( 199?, m4tutfrt__7,    m4tutfrt,   "f3u01y.p1",            0x0000, 0
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TUTFRT_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_cosmiccasino, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
-// do not boot with tri98.chr
-
-// expects chr sequence starting 00 30 10 44 70 10 44 30 54 14 40 74 10 40  (same as some 10 X 10 and Cosmic Casio sets?)
+// expects chr sequence starting 00 30 10 44 70 10 44 30 54 14 40 74 10 40 (cosmiccasino)  (same as some 10 X 10 and Cosmic Casio sets?)
 // "(C)1991 BARCREST" and "TF4 0.4" (TFT 0.4 on startup)
 GAME_CUSTOM( 199?, m4tutfrt,       0,          "tft04s.p1",            0x0000, 0x010000, CRC(c20c3589) SHA1(55d1bc5d5f4ae14acafb36bd640faaf4ffccc6eb), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TFT 0.4 / TF4 0.4)" )
 GAME_CUSTOM( 199?, m4tutfrt__ai,   m4tutfrt,   "tft04ad.p1",           0x0000, 0x010000, CRC(2994aa14) SHA1(af0e618f24cdedd14e3a347701313360d9fc73d1), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TFT 0.4 AD / TF4 0.4)" )
@@ -5075,9 +5083,9 @@ GAME_CUSTOM( 199?, m4tenten__a2,   m4tenten,   "tst01y.p1",    0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TENTEN_EXTRA_ROMS \
 	ROM_END \
-	GAMEL( year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4tenten, ROT0, company, title, GAME_FLAGS, layout_m4tenten )
+	GAMEL( year, setname, parent, mod4oki_cheatchr_cosmiccasino, mpu4, mpu4mod4oki_machines_state, init_m4tenten, ROT0, company, title, GAME_FLAGS, layout_m4tenten )
 
-// needs chr sequence starting 00 30 10 44 70 10 44 30 54 14 40 74 10 40
+// needs chr sequence starting 00 30 10 44 70 10 44 30 54 14 40 74 10 40 (cosmiccasino)
 // "(C)1991 BARCREST" and "T20 0.2"
 GAME_CUSTOM( 199?, m4tenten,       0,          "t2002s.p1",    0x0000, 0x010000, CRC(6cd9fa10) SHA1(8efe36e3fc5b709fa4363194634686d62b5d6609), "Barcrest","10 X 10 (Barcrest) (MPU4) (T20 0.2)" )
 GAME_CUSTOM( 199?, m4tenten__l,    m4tenten,   "t2002ad.p1",   0x0000, 0x010000, CRC(f7903f0d) SHA1(8a10ff31ddaad817a31d39ea9a66d4453d8767bb), "Barcrest","10 X 10 (Barcrest) (MPU4) (T20 0.2 AD)" )
@@ -5494,7 +5502,16 @@ GAME_CUSTOM( 199?, m4przhr__m,  m4przhr,    "prldk.p1", 0x0000, 0x010000, CRC(c0
 GAME_CUSTOM( 199?, m4przhr__n,  m4przhr,    "prldy.p1", 0x0000, 0x010000, CRC(15b4e8f3) SHA1(92c3be901f038a18906db674129e153ea61d70f4), "Barcrest","Prize High Roller (Barcrest) (MPU4) (PRL 0.3 YD)" )
 GAME_CUSTOM( 199?, m4przhr__o,  m4przhr,    "prlk.p1",  0x0000, 0x010000, CRC(f2be8c36) SHA1(411a5e1614a4f7963ebbb87e1a3a63209801f6da), "Barcrest","Prize High Roller (Barcrest) (MPU4) (PRL 0.3 K)" )
 
-// need chr sequence starting 00 14 10 c0 4c 20 84 0c f0 98 e4 dc f4 08
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4PRZHR_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_cheatchr_phr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
+// need chr sequence starting 00 14 10 c0 4c 20 84 0c f0 98 e4 dc f4 08 (phr)
 // "(C)1991 BARCREST" and "PR3 0.1"
 GAME_CUSTOM( 199?, m4przhr__h,  m4przhr,    "pr3s.p1",  0x0000, 0x010000, CRC(e4968894) SHA1(92b4b930f3bf370b213a72ad8328f19d5ebbd471), "Barcrest","Prize High Roller (Barcrest) (MPU4) (PR3 0.1)" )
 GAME_CUSTOM( 199?, m4przhr__a,  m4przhr,    "pr3ad.p1", 0x0000, 0x010000, CRC(8b047599) SHA1(fd2f21c2ed3e5cb4e4ace7ffa620131a1897cf92), "Barcrest","Prize High Roller (Barcrest) (MPU4) (PR3 0.1 AD)" )
@@ -6578,9 +6595,9 @@ GAME_CUSTOM( 199?, m4topdog__z,    m4topdog,   "td_30btc.1_1", 0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4KINGQ_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_kingqn, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
-// chr sequence starting 00 84 8c 3c f4 4c 34 24 e4 ac 38 f0 0c 70 04
+// chr sequence starting 00 84 8c 3c f4 4c 34 24 e4 ac 38 f0 0c 70 04 (kingqn)
 // "(C)1996  B.W.B." and "EE  2.1" (EE4 in 7-seg)
 GAME_CUSTOM( 199?, m4kingq,     0,          "ee_05a_4.2_1", 0x0000, 0x010000, CRC(8dd842b6) SHA1(1c1bcaae355ceee4d7b1572b0fa1a8b23a8afdbf), "Bwb","Kings & Queens (Barcrest) (MPU4) (EE4 2.1 K/ EE  2.1)" )
 // "(C)1996  B.W.B." and "EE  2.2" (EE8 in 7-seg)
@@ -7457,9 +7474,9 @@ GAME_CUSTOM( 199?, m4calama__h,    m4calama,   "calamari.cl",  0x0000, 0x020000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4COSCAS_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_cosmiccasino, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
 
-// needs chr sequence starting 00 30 10 44 70 10 44 30 54 14 40 74 10 40
+// needs chr sequence starting 00 30 10 44 70 10 44 30 54 14 40 74 10 40 (cosmiccasino)
 // "(C)1998  B.W.B." and "CC__3.0"
 GAME_CUSTOM( 199?, m4coscas,       0,          "cc_sj___.3s1",         0x0000, 0x020000, CRC(52c312b0) SHA1(bd5381d58b1acb7adf6857c142eae4a253081fbd), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0)" )
 GAME_CUSTOM( 199?, m4coscas__d,    m4coscas,   "cc_sj__c.3r1",         0x0000, 0x020000, CRC(44b940a6) SHA1(7e621873fcf6460f654e35cc74552e86b6253ddb), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0 C)" )

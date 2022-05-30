@@ -1697,6 +1697,13 @@ GAME(199?, m4sgrabb,  m4sgrab,    mod2_cheatchr_intcep, mpu4,            mpu4mod
 GAME(199?, m4potlck,  0,          mod2_cheatchr_graff, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Pot Luck 100 Club (Barcrest) (MPU4) (P1L 2.2)",GAME_FLAGS )
 GAME(199?, m4potlcka, m4potlck,   mod2_cheatchr_graff, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Pot Luck 100 Club (Barcrest) (MPU4) (PL 2.7)",GAME_FLAGS )
 
+// the challenge sequence for this characteriser protection check never sets bit 0x20
+// 00 60 68 38 d0 2c 90 24 e4 e8 3c f0 88 34 20 40 e8 bc f4 28
+GAME(199?, m4wayin,   0,          mod2_cheatchr_wayin, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Way In (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+// non-standard protection, hack?
+GAME(199?, m4wayina,  m4wayin,    mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "hack?","Way In (Barcrest) (MPU4) (set 2)",GAME_FLAGS ) // bad chr
+
+
 // 00 60 68 bc d0 2c 94 20 e4 e8 bc f0 88 34 a0 c4 ec bc f4 (m400)
 GAME(199?, m4stakeu,  0,          mod2_cheatchr_m400, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Stake Up Club (Barcrest) (MPU4) (SU 4.4)",GAME_FLAGS )
 GAME(199?, m4stakeua, m4stakeu,   mod2_cheatchr_m400, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Stake Up Club (Barcrest) (MPU4) (SU 4.8)",GAME_FLAGS )
@@ -1906,9 +1913,9 @@ GAME(199?, m421,      0,          mod2_cheatchr_tentendia, mpu4,            mpu4
 GAMEL(199?, m4alpha,  0,          mod2_cheatchr_m435, mpu4,            mpu4mod2_machines_state, init_m4alpha,       ROT0,   "Barcrest","Alphabet (Barcrest) [A4B 1.0] (MPU4)",GAME_FLAGS, layout_m4alpha )
 
 
-// 00 14 10 c0 4c 20 84 0c f0 98 e4 dc f4 08 f0 08 70 d0
-GAME(199?, m4bjack,   0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Black Jack (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4bjacka,  m4bjack,    mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Black Jack (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+// 00 14 10 c0 4c 20 84 0c f0 98 e4 dc f4 08 f0 08 70 d0 (phr)
+GAME(199?, m4bjack,   0,          mod2_cheatchr_phr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Black Jack (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4bjacka,  m4bjack,    mod2_cheatchr_phr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Black Jack (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
 
 // 00 60 60 c0 58 44 e0 50 a8 9c cc bc e4 50 a0 58 (sunsetb)
 GAME(199?, m4bjsm,    0,          mod2_cheatchr_sunsetb, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Blackjack Super Multi (Barcrest) (MPU4) (SM H)",GAME_FLAGS ) // reel issues
@@ -1922,10 +1929,6 @@ GAME(199?, m4blstbk,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machi
 // 00 e4 ec f8 54 08 d0 80 44 2c 58 b4 e8 b0 80 c4 2c f8 (nifty)
 GAME(198?, m4supsl,   0,          mod2_cheatchr_nifty, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest",   "Supa Silva (Barcrest) (MPU4)",GAME_FLAGS )
 
-// 00 60 68 38 d0 2c 90 24 e4 e8 3c f0 00 00
-GAME(199?, m4wayin,   0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Way In (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
-// non-standard protection, hack?
-GAME(199?, m4wayina,  m4wayin,    mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "hack?","Way In (Barcrest) (MPU4) (set 2)",GAME_FLAGS ) // bad chr
 
 
 /* Bwb */
@@ -2011,17 +2014,17 @@ GAME(199?, m4tridic,  m4atlan,    mod2_cheatchr_m533, mpu4,            mpu4mod2_
 // 00 84 c4 e4 4c 10 28 90 e8 78 34 28 b0 40 a4 (vivlv)
 GAME(199?, m4bjc,     0,          mod2_cheatchr_vivlv, mpu4,            mpu4mod2_machines_state, init_m4default_alt, ROT0,   "Barcrest","Black Jack Club (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
 
-// 00 30 10 44 70 10 44 30 54 14 40 74 10 40 34
-GAME(199?, m4exprs,   0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Express (Barcrest) (DXP, Dutch) (MPU4)",GAME_FLAGS )
+// 00 30 10 44 70 10 44 30 54 14 40 74 10 40 34 (cosmiccasino)
+GAME(199?, m4exprs,   0,          mod2_cheatchr_cosmiccasino, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Express (Barcrest) (DXP, Dutch) (MPU4)",GAME_FLAGS )
 
-// 00 14 10 c0 4c 20 84 0c f0 98 e4 dc f4 08 f0
-GAME(199?, m4brdway,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Broadway (Barcrest) (DBR, Dutch) (MPU4)",GAME_FLAGS )
+// 00 14 10 c0 4c 20 84 0c f0 98 e4 dc f4 08 f0 (phr)
+GAME(199?, m4brdway,  0,          mod2_cheatchr_phr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Broadway (Barcrest) (DBR, Dutch) (MPU4)",GAME_FLAGS )
 
 // 00 14 04 94 c8 68 a0 50 8c e8 e0 dc bc b0 4c (lv)
 GAME(199?, m4bigbn,   0,          mod2_cheatchr_lv, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Big Ben (Barcrest) (DBB, Dutch) (MPU4)",GAME_FLAGS )
 
-// 00 44 44 64 4c 10 28 50 68 38 34 28 70 00 6c 10 68
-GAME(199?, m4cheryo,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Cherryo (Barcrest) (DCH, Dutch) (MPU4)",GAME_FLAGS )
+// 00 44 44 64 4c 10 28 50 68 38 34 28 70 00 6c 10 68 (cheryo)
+GAME(199?, m4cheryo,  0,          mod2_cheatchr_cheryo, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Cherryo (Barcrest) (DCH, Dutch) (MPU4)",GAME_FLAGS )
 
 // 00 24 24 64 a4 ac 78 74 e0 6c 50 c0 ac 58 74 00 a4 ec f8 94 c8
 GAME(199?, m4giant,   0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Giant (Barcrest) (DGI, Dutch) (MPU4)",GAME_FLAGS )
@@ -2035,8 +2038,8 @@ GAME(199?, m4libty,   0,          mod2_cheatchr_crkpot, mpu4,            mpu4mod
 // 00 84 94 5c ec 3c ec 30 4c 68 60 cc 7c e0 94 58 ec 7c (andybt)
 GAME(199?, m4meglnk,  0,          mod2_cheatchr_andybt, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Megalink (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
 
-// 00 84 8c 3c f4 4c 34 24 e4 ac 38 f0 0c 70 04 e0 c8
-GAME(199?, m4multwy,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Multiway (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
+// 00 84 8c 3c f4 4c 34 24 e4 ac 38 f0 0c 70 04 e0 c8 (kingqn)
+GAME(199?, m4multwy,  0,          mod2_cheatchr_kingqn, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Multiway (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
 
 // 00 44 44 64 4c 80 70 24 6c a8 b0 38 e4 50 24 48 8c bc (pzmoney)
 GAME(199?, m4num1,    0,          mod2_cheatchr_pzmoney, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Number One (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
@@ -2127,7 +2130,7 @@ GAME(199?, m4jpjmp,   0,          mod2_cheatchr_vivlv, mpu4,            mpu4mod2
 GAME(199?, m4jpjmpa,  m4jpjmp,    mod2_cheatchr_vivlv, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Jackpot Jump (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
 
 // REEL A ALARM
-// 00 84 a4 e4 b0 34 54 44 d4 64 80 f4 24 80 f4 20
+// 00 84 a4 e4 b0 34 54 44 d4 64 80 f4 24 80 f4 20 (milclb)
 GAME(199?, m4milclb,  0,          mod2_cheatchr_milclb, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Millionaire's Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
 GAME(199?, m4milclba, m4milclb,   mod2_cheatchr_milclb, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Millionaire's Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
 GAME(199?, m4milclbb, m4milclb,   mod2_cheatchr_milclb, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Millionaire's Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS )

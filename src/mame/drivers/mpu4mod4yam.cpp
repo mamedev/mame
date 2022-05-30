@@ -578,7 +578,7 @@ GAME_CUSTOM( 199?, m4przmc__s,    m4przmc,   "mti10___.4o1", 0x0000, 0x010000, C
 
 // boot, need proper lamp descramble
 
-// 00 44 44 54 34 04 54 14 34 14 20 74 04 60 44 50
+// 00 44 44 54 34 04 54 14 34 14 20 74 04 60 44 50 (clbveg)
 // (C)1991 BARCREST and SBN 2.0
 GAME_CUSTOM( 199?, m4nudbnk,       0,          "nb6",      0x0000, 0x010000, CRC(010dd3fc) SHA1(645cbe54200a6c3327e10909b1ef3a80579e96e5), "Barcrest","Nudge Banker (Barcrest) (MPU4) (SBN 2.0X)" )
 // (C)1991 BARCREST and NBN 2.0
@@ -649,11 +649,11 @@ GAME_CUSTOM( 199?, m4sss__l,  m4sss,  "sxi10___.2_1",     0x0000, 0x010000, CRC(
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4yam_cheatchr_duty, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // boot, need proper lamp descramble
 
-// 00 24 24 2c 70 20 0c 60 3c 5c 5c 5c 7c 4c 68 40 34
+// 00 24 24 2c 70 20 0c 60 3c 5c 5c 5c 7c 4c 68 40 34 (duty)
 // (C)1991 BARCREST and PS3 0.2
 GAME_CUSTOM( 199?, m4przsss,       0,          "ps302b.p1",    0x0000, 0x010000, CRC(1749ae18) SHA1(f04f91a1d534f2d2dc844862bb21160c5903d1df), "Barcrest","Prize Spend Spend Spend (Barcrest) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4przsss__a,    m4przsss,   "ps302ad.p1",   0x0000, 0x010000, CRC(e57f52d7) SHA1(25384517b68c488acd38956aeb69dda26d63c3ca), "Barcrest","Prize Spend Spend Spend (Barcrest) (MPU4) (set 2)" )
@@ -1134,7 +1134,7 @@ GAME_CUSTOM( 199?, m4vivalv__8,    m4vivalv,   "vegas15t",                     0
 	ROM_END \
 	GAME(year, setname, parent, mod4yam_cheatchr_m407, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
-// expects chr sequence starting 00 e0 a8 38 94 48 50 60 e4 e8 58 f0
+// expects chr sequence starting 00 e0 a8 38 94 48 50 60 e4 e8 58 f0 (m407)
 // "(C)1993  B.W.B." and "HVP 3.0"
 GAME_CUSTOM( 199?, m4shv__h,    m4shv,   "hvyp10p",              0x0000, 0x010000, CRC(b4af635a) SHA1(420cdf3a6899e432d74e3b10a57414cbedc0913e), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 1)" )
 GAME_CUSTOM( 199?, m4shv__i,    m4shv,   "hv_05___.3h3",         0x0000, 0x010000, CRC(13bfa891) SHA1(ffddd14a019d52029bf8d4f680d8d05413a9f0b7), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 2)" )
@@ -1342,7 +1342,7 @@ GAME(199?, m4clbshf,  0,        mod4yam_cheatchr_shuffle, mpu4, mpu4mod4yam_mach
 // 00 50 40 14 4c 80 34 44 5c 9c 9c 9c dc 9c dc 94 (m435)
 GAME(199?, m4voodoo,  0,        mod4yam_cheatchr_m435, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Voodoo 1000 (Barcrest) (Dutch) (MPU4) (DDO 3.2)",GAME_FLAGS ) // ROL F SETUP ALM
 
-// 00 c0 d0 38 ec 5c ec 14 68 2c 24 e8 74 00 e8 14
-GAME(199?, m4graffd,  m4graff,  mod4yam_cheatchr, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Grafitti (Barcrest) [Dutch] (MPU4)",GAME_FLAGS ) // ROL D SETUP ALM
+// 00 c0 d0 38 ec 5c ec 14 68 2c 24 e8 74 00 e8 14 (turboplay)
+GAME(199?, m4graffd,  m4graff,  mod4yam_cheatchr_turboplay, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Grafitti (Barcrest) [Dutch] (MPU4)",GAME_FLAGS ) // ROL D SETUP ALM
 
 GAME(199?, m4sstrek,  m4supst,  mod4yam,          mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "bootleg","Super Streak (bootleg) (MPU4) (SS2 1.0)",GAME_FLAGS) // unprotected, no characteriser PAL required
