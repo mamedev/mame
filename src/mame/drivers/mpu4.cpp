@@ -2825,6 +2825,12 @@ void mpu4_state::mod2_cheatchr_table(machine_config &config, const uint8_t* tabl
 	m_characteriser->set_lamp_table(table);
 }
 
+void mpu4_state::mod2_chr(machine_config &config)
+{
+	mod2(config);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+}
+
 void mpu4_state::mod2_cheatchr(machine_config &config)
 {
 	mod2_cheatchr_table(config, nullptr);
@@ -3098,6 +3104,12 @@ void mpu4_state::mod2_cheatchr_tricolor(machine_config &config)
 void mpu4_state::mod2_cheatchr_blackwhite(machine_config &config)
 {
 	mod2_cheatchr_table(config, mpu4_characteriser_pal::blackwhite_lamp_scramble);
+}
+
+void mpu4_state::mod2_bootleg_chr45(machine_config &config)
+{
+	mod2(config);
+	MPU4_CHARACTERISER_BOOTLEG_PAL45(config, m_characteriser, 0);
 }
 
 // alt reel setup

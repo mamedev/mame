@@ -173,6 +173,7 @@ public:
 
 	void mod2(machine_config &config);
 	void mod2_cheatchr(machine_config &config);
+	void mod2_chr(machine_config &config);
 	void mod2_cheatchr_table(machine_config &config, const uint8_t* table);
 	void mod2_cheatchr_shuffle(machine_config &config);
 	void mod2_cheatchr_lv(machine_config &config);
@@ -228,6 +229,8 @@ public:
 	void mod2_cheatchr_hittop(machine_config &config);
 	void mod2_cheatchr_tricolor(machine_config &config);
 	void mod2_cheatchr_blackwhite(machine_config &config);
+
+	void mod2_bootleg_chr45(machine_config &config);
 
 	void mod2_alt(machine_config &config);
 	void mod2_alt_cheatchr(machine_config &config);

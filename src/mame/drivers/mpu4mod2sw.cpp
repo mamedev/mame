@@ -1635,12 +1635,9 @@ ROM_START( m4joltavb )
 	ROM_LOAD( "jto20d_1.1", 0x0000, 0x010000, CRC(dff09dfc) SHA1(c13f31f7d96075f7c94ae5e79fc1f9b8ce7e4c80) )
 ROM_END
 
-// 45 84 94 3C EC 5C EC 50 2C 68
 ROM_START( m4btclok )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "beattheclock.hex", 0x6000, 0x00a000, CRC(a0d4e463) SHA1(45d1df08bfd70caf63b14d2ccc56038ed85e23d0) )
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "btc.chr", 0x0000, 0x000048, CRC(c77e5215) SHA1(c9e26ed593840cbc47dad893ea4df476f1d69ecd) )
 ROM_END
 
 ROM_START( m4brktak )
@@ -2165,9 +2162,8 @@ GAME(199?, m4joltav,  0,          mod2_cheatchr_m574, mpu4,            mpu4mod2_
 GAME(199?, m4joltava, m4joltav,   mod2_cheatchr_viva, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Jolly Taverner (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
 GAME(199?, m4joltavb, m4joltav,   mod2_cheatchr_viva, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Jolly Taverner (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
 
-// Bad CHR Alarm
-// non-standard protection? hack? (has a fakechr rom in set though, might just be failing the cheat method)
-GAME(199?, m4btclok,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Beat The Clock (Barcrest) (MPU4)",GAME_FLAGS )
+// this has a 'tri98' protection sequence check in ROM, but the code appears to have been hacked to expect a different response.
+GAME(199?, m4btclok,  0,          mod2_bootleg_chr45, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "bootleg","Beat The Clock (Barcrest) (bootleg) (MPU4)",GAME_FLAGS )
 
 // non-standard protection? hack?
 GAME(199?, m4brktak,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Break & Take (Barcrest) (MPU4)",GAME_FLAGS )

@@ -38,6 +38,9 @@ check is bypassed. This may be something to look at for prototype ROMs and hacks
 DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_PAL, mpu4_characteriser_pal, "mpu4chrpal", "Barcrest MPU4 Characteriser PAL")
 DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_PAL_BWB, mpu4_characteriser_pal_bwb, "mpu4chrpalbwb", "Barcrest MPU4 Characteriser PAL (BWB type)")
 
+DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL45, mpu4_characteriser_bootleg45, "mpu4chrpalboot45", "Barcrest MPU4 Characteriser PAL (bootleg type)")
+
+
 mpu4_characteriser_pal::mpu4_characteriser_pal(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mpu4_characteriser_pal(mconfig, MPU4_CHARACTERISER_PAL, tag, owner, clock)
 {
@@ -497,5 +500,18 @@ uint8_t mpu4_characteriser_pal_bwb::read(offs_t offset)
 	}
 }
 
+mpu4_characteriser_bootleg45::mpu4_characteriser_bootleg45(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mpu4_characteriser_pal(mconfig, MPU4_CHARACTERISER_BOOTLEG_PAL45, tag, owner, clock)
+{
+}
 
+uint8_t mpu4_characteriser_bootleg45::read(offs_t offset)
+{
+	logerror("%s: Characteriser read offset %02x\n", machine().describe_context(), offset);
+	return 0x45;
+}
 
+void mpu4_characteriser_bootleg45::write(offs_t offset, uint8_t data)
+{
+	logerror("%s: Characteriser write offset %02x data %02x\n", machine().describe_context(), offset, data);
+}
