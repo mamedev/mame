@@ -33054,7 +33054,7 @@ Alternate board (XL-1)
 			<feature name="cart_back_label" value="920214" />
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-					<rom name="shvc-es-1.u1" size="1048576" crc="b913cdc1" sha1="cdb07b41703b22ed535fb264ceb6317effb0f837" offset="0x000000" />
+				<rom name="shvc-es-1.u1" size="1048576" crc="b913cdc1" sha1="cdb07b41703b22ed535fb264ceb6317effb0f837" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>

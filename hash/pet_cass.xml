@@ -573,7 +573,7 @@ license:CC0
 
 		<!-- pet20018 Side A: DRAW POKER 1 -->
 		<publisher>Commodore Business Machines, Inc.</publisher>
-			<part name="cass" interface="cbm_cass">
+		<part name="cass" interface="cbm_cass">
 			<dataarea name="cass" size="10220420">
 				<rom name="draw poker (1978)(commodore busines machines).wav" size="10220420" crc="82f7871d" sha1="973cdc5d8ede2dffa6fb25abfadf8b5daabe6949"/>
 			</dataarea>
