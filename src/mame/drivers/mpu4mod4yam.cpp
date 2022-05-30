@@ -666,7 +666,7 @@ GAME_CUSTOM( 199?, m4przsss__h,    m4przsss,   "ps302y.p1",    0x0000, 0x010000,
 	ROM_END \
 	GAME(year, setname, parent, mod4yam_cheatchr_m574, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
-// 00 14 04 94 a8 6c c4 30 8c e8 e0 bc d4 28 4c c0 38
+// 00 14 04 94 a8 6c c4 30 8c e8 e0 bc d4 28 4c c0 38 (m574)
 // (C)1991 BARCREST and PS8 0.1
 GAME_CUSTOM( 199?, m4przsss__i,    m4przsss,   "ps8ad.p1",     0x0000, 0x010000, CRC(48917a87) SHA1(d32ac9e30ebddb6ca1d6a7d6c38026338c6df2cd), "Barcrest","Prize Spend Spend Spend (Barcrest) (MPU4) (set 10)" )
 GAME_CUSTOM( 199?, m4przsss__j,    m4przsss,   "ps8b.p1",      0x0000, 0x010000, CRC(7633226d) SHA1(581dfb56719682a744fe2b4f63bd1c20eb943903), "Barcrest","Prize Spend Spend Spend (Barcrest) (MPU4) (set 11)" )

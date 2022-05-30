@@ -2875,6 +2875,26 @@ void mpu4_state::mod2_cheatchr_milclb(machine_config &config)
 	mod2_cheatchr_table(config, mpu4_characteriser_pal::milclb_lamp_scramble);
 }
 
+void mpu4_state::mod2_cheatchr_fruitfall(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::fruitfall_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_viva(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::viva_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_m574(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::m574_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_crkpot(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::crkpot_lamp_scramble);
+}
+
 // alt reel setup
 
 void mpu4_state::mod2_alt(machine_config &config)
@@ -3194,6 +3214,11 @@ void mpu4_state::mod4oki_cheatchr_nifty(machine_config &config)
 void mpu4_state::mod4oki_cheatchr_milclb(machine_config &config)
 {
 	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::milclb_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_fruitfall(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::fruitfall_lamp_scramble);
 }
 
 

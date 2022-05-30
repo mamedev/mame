@@ -947,7 +947,7 @@ GAME_CUSTOM( 1995, m4andygegc2d,       m4andyge,   "ag_05_d4.2_1",             0
 	GAMEL( year, setname, parent, mod4oki_5r_cheatchr_m574, grtecp, mpu4mod4oki_machines_state, init_m4andyge, ROT0, company, title, GAME_FLAGS, layout_m4andyge )
 
 
-// expects sequence starting 00 14 04 94 a8 6c c4 30 8c e8 e0 bc d4  (Same as some Andy's Full House & Lucky Las Vegas sets)
+// expects sequence starting 00 14 04 94 a8 6c c4 30 8c e8 e0 bc d4 (m574) (Same as some Andy's Full House & Lucky Las Vegas sets)
 // "(C)1994  B.W.B."  and "AG5 3.0"
 GAME_CUSTOM( 1994, m4andygeg5,         m4andyge,   "ag_05s__.3_1",             0x0000, 0x010000, CRC(c0e45872) SHA1(936ca3230cd36dd4ad2c74ea33ea469c482e5688), "Bwb","Andy's Great Escape (Bwb / Barcrest) (MPU4) (AG5 3.0)" )
 GAME_CUSTOM( 1994, m4andygeg5d,        m4andyge,   "ag_05sd_.3_1",             0x0000, 0x010000, CRC(b7fced5c) SHA1(6b359b29019bf22b2ebdd96a69f919b18935a98c), "Bwb","Andy's Great Escape (Bwb / Barcrest) (MPU4) (AG5 3.0 D)" )
@@ -2178,9 +2178,9 @@ GAME_CUSTOM( 199?, m4jolgem__al,   m4jolgem,   "gms05y.p1",    0x0000, 0x020000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4JOLGEM_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_fruitfall, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
 
-// expects sequence 00 44 44 c4 58 60 c0 50 8c b8 e0 dc ec b0 1c
+// expects sequence 00 44 44 c4 58 60 c0 50 8c b8 e0 dc ec b0 1c (fruitfall scramble)
 // "(C)1993 BARCREST" and "GEM 0.5"
 GAME_CUSTOM( 199?, m4jolgem__a,    m4jolgem,   "gem05s",       0x0000, 0x020000, CRC(b7ceafc2) SHA1(b66d846da5ff20df912d31695eaef146dbbe759e), "Barcrest","Jolly Gems (Barcrest) (MPU4) (GEM 0.5)" )
 // "(C)1993 BARCREST" and "GEM 0.6"
@@ -3094,7 +3094,7 @@ GAME_CUSTOM( 199?, m4vivaes__af,   m4vivaes,   "vei10___.4_1",         0x0000, 0
 	ROM_END \
 	GAME(year, setname, parent, mod4oki_cheatchr_m574, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
-// sequence 00 14 04 94 a8 6c c4 30 8c e8 e0 bc d4 28 4c c0 38 (Same as Andy's Full House etc.)
+// sequence 00 14 04 94 a8 6c c4 30 8c e8 e0 bc d4 28 4c c0 38 (m574)(Same as Andy's Full House etc.)
 // "(C)1995  B.W.B." and "VE5 3.0"
 GAME_CUSTOM( 199?, m4vivaes__ac,   m4vivaes,   "ve_05a__.3_1",         0x0000, 0x010000, CRC(92e0e121) SHA1(f32c8f1c8008794283bd32f9440e0a580f77b5b3), "Bwb","Viva Espana (Barcrest) (MPU4) (VE5 3.0)" ) // boots
 
@@ -5144,7 +5144,7 @@ void mpu4mod4oki_machines_state::init_m4andyfh()
 	GAMEL( year, setname, parent, mod4oki_cheatchr_m574, mpu4, mpu4mod4oki_machines_state, init_m4andyfh, ROT0, company, title, GAME_FLAGS, layout_m4andyfh )
 
 
-// needs chr sequence starting 00 14 04 94 a8 6c c4 30 8c e8 e0 bc d4
+// needs chr sequence starting 00 14 04 94 a8 6c c4 30 8c e8 e0 bc d4  (m574)
 // "(C)1991 BARCREST" and "AFH 0.1"
 GAME_CUSTOM( 199?, m4andyfh,       0,          "afhs.p1",      0x0000, 0x010000, CRC(722660ef) SHA1(e1700f4dc6d14da8e8d8402466057cfd126e067b), "Barcrest","Andy's Full House (Barcrest) (MPU4) (AFH 0.1)" )
 GAME_CUSTOM( 199?, m4andyfh__o,    m4andyfh,   "afhb.p1",      0x0000, 0x010000, CRC(899945a4) SHA1(ed4a8c9b35e3aa08ea762740a713352560490443), "Barcrest","Andy's Full House (Barcrest) (MPU4) (AFH 0.1 B)" )
@@ -6201,7 +6201,7 @@ GAME_CUSTOM( 199?, m4rockmn__k,    m4rockmn,   "rok06y.p1",    0x0000, 0x020000,
 	ROM_END \
 	GAME(year, setname, parent, mod4oki_cheatchr_m574, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
-// sequence 00 14 04 94 A8 6C C4 30 8C E8 E0 BC D4 etc.
+// sequence 00 14 04 94 A8 6C C4 30 8C E8 E0 BC D4 etc. (m574)
 
 // "(C)1993 BARCREST" and "MH5 0.2"
 GAME_CUSTOM( 199?, m4madhse,       0,          "mh502s.p1",    0x0000, 0x010000, CRC(063cc07b) SHA1(0b43a5cf6094bd8c99e4395f31ff073389dd56ce), "Barcrest","Mad House (Barcrest) (MPU4) (MH5 0.2)" )

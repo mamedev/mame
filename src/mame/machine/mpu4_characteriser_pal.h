@@ -148,7 +148,8 @@ public:
 	// games with sequence 00 84 a4 e4 b0 34 54 44 d4 64 80 f4 24 80 f4 20
 	static constexpr uint8_t milclb_lamp_scramble[8] = { 0x00, 0x54, 0x00, 0x54, 0x40, 0x10, 0x00, 0x00 };
 
-	
+	// games with sequence 00 44 44 c4 58 60 c0 50 8c b8 e0 dc ec b0 1c e8 38
+	static constexpr uint8_t fruitfall_lamp_scramble[8] = { 0x03, 0xCF, 0x47, 0xCB, 0xC3, 0x4F, 0x47, 0x43 };
 
 	/***************************************************************
 
@@ -181,7 +182,14 @@ public:
 	// games with sequence starting 00 50 10 24 54 00 60 50 34 30 00 74 10 04 74
 	static constexpr uint8_t premier_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
+	/***************************************************************
 
+	 Types below have no games using lamp scramble, so data is unknown / blank
+
+	***************************************************************/
+
+	// games with sequence starting 00 e0 8c 58 b0 68 30 64 e4 cc 58 f0 2c 50 64 c4 88 5c f4 0c
+	static constexpr uint8_t crkpot_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 protected:
 	mpu4_characteriser_pal(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

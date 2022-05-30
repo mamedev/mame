@@ -183,6 +183,10 @@ public:
 	void mod2_cheatchr_viz(machine_config &config);
 	void mod2_cheatchr_nifty(machine_config &config);
 	void mod2_cheatchr_milclb(machine_config &config);
+	void mod2_cheatchr_fruitfall(machine_config &config);
+	void mod2_cheatchr_viva(machine_config &config);
+	void mod2_cheatchr_m574(machine_config &config);
+	void mod2_cheatchr_crkpot(machine_config &config);
 
 	void mod2_alt(machine_config &config);
 	void mod2_alt_cheatchr(machine_config &config);
@@ -238,6 +242,7 @@ public:
 	void mod4oki_cheatchr_viz(machine_config &config);
 	void mod4oki_cheatchr_nifty(machine_config &config);
 	void mod4oki_cheatchr_milclb(machine_config &config);
+	void mod4oki_cheatchr_fruitfall(machine_config &config);
 
 	void mod4yam(machine_config &config);
 	void mod4yam_cheatchr(machine_config &config);

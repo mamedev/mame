@@ -2411,8 +2411,8 @@ GAME(199?, m4dragon,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_sta
 // 00 24 24 a4 4c 10 c0 0c f0 a8 98 d4 68 90 e8 18 f4 e8 f8 54
 GAME(199?, m4hilonv,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Hi Lo Casino (Nova) (MPU4)",GAME_FLAGS )
 
-// 00 44 44 c4 58 60 c0 50 8c b8 e0 dc ec b0 1c e8 38 ec bc 68 a4 58 68
-GAME(199?, m4octo,    0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Octopus (Nova) (MPU4)",GAME_FLAGS )
+// 00 44 44 c4 58 60 c0 50 8c b8 e0 dc ec b0 1c e8 38 ec bc 68 a4 58 68 (fruitfall scramble)
+GAME(199?, m4octo,    0,          mod4oki_cheatchr_fruitfall,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Octopus (Nova) (MPU4)",GAME_FLAGS )
 
 
 // NETWORK FAIL ALARM (reel comms?)
