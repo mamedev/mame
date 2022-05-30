@@ -158,6 +158,11 @@ public:
 	// games with sequence 00 bc b8 fc bc dc fc fc fc f8 d8 b8 f8 d8 fc bc fc 98 fc f8 f8
 	static constexpr uint8_t intcep_lamp_scramble[8] = { 0x00, 0x1C, 0x38, 0x78, 0x7C, 0x78, 0x38, 0x7C };	
 
+	// games with sequence 00 50 40 14 C4 B0 A4 30 C4 74 00 D4 E0 30 C0 34
+	static constexpr uint8_t take2_lamp_scramble[8] = { 0x00, 0x50, 0x50, 0x10, 0x10, 0x50, 0x50, 0x00 };	
+
+	
+
 
 	/***************************************************************
 
@@ -198,6 +203,16 @@ public:
 
 	// games with sequence starting 00 50 40 14 64 50 24 50 64 54 20 74 40 30 60 10 64
 	static constexpr uint8_t buc_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 44 44 64 4c 80 70 24 6c a8 b0 38 e4
+	static constexpr uint8_t pzmoney_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 14 10 60 54 00 24 14 70 30 00 74 10 40 34 40
+	static constexpr uint8_t fortune_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 60 60 24 e0 e8 1c 74 c4 6c 14 84 e8 1c
+	static constexpr uint8_t actionbank_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
 
 	/***************************************************************
 

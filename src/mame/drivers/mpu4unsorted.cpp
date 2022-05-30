@@ -471,6 +471,8 @@ ROM_END
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "cfosnd.p1", 0x000000, 0x080000, CRC(74bbf913) SHA1(52ddc89ab34b11ede2c0e9b9b27e119b0c1eb2d9) ) \
 	ROM_LOAD( "cfosnd.p2", 0x080000, 0x080000, CRC(1b2bb79a) SHA1(5f19ea000f34bb404ed6c8ea5ec7b809ccb1ae36) )
+
+
 ROM_START( m4fortcb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cfod.p1", 0x0000, 0x010000, CRC(9d0e2b63) SHA1(cce871d2bbe486793de5de9fadfbddf67c382e5c) )
@@ -839,9 +841,6 @@ ROM_END
 ROM_START( m4reeltm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "real.bin", 0x0000, 0x010000, CRC(5bd54924) SHA1(23fcf13c52ee7b9b39f30f999a9102171fffd642) ) // == m4wildtm
-
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "charter.chr", 0x0000, 0x000048, CRC(4ff4eda2) SHA1(092435e34d79775910316a7bed0f90c4f086e5c4) )
 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
 
@@ -2169,7 +2168,7 @@ GAME(199?, m4salsa,   0,          mod4oki_alt_cheatchr,mpu4,    mpu4unsorted_sta
 GAME(199?, m4techno,  0,          mod4oki_alt_cheatchr,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Techno Reel (Barcrest) (MPU4) (DTE) (set 1)",GAME_FLAGS )
 GAME(199?, m4technoa, m4techno,   mod4oki_alt_cheatchr,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Techno Reel (Barcrest) (MPU4) (DTE) (set 2)",GAME_FLAGS )
 
-// 00 14 10 a0 8c c8 68 50 b0 38 64 b4 18 e4 1c e4  (unique, m533)
+// 00 14 10 a0 8c c8 68 50 b0 38 64 b4 18 e4 1c e4  (m533)
 GAME(199?, m4twintm,  0,          mod4oki_cheatchr_m533,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Twin Timer (Barcrest) (MPU4) (D2T 1.1)",GAME_FLAGS )
 
 // 00 50 40 90 a8 6c c4 30 c8 ac a4 f8 d4 28 (alf scramble)
@@ -2229,25 +2228,28 @@ GAME(199?, m4univ,    0,          mod4oki_alt_cheatchr_m400,mpu4,    mpu4unsorte
 GAME(199?, m4frtgm,   0,          mod4oki_alt_cheatchr_m400,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Fruit Game (Barcrest) (MPU4)",GAME_FLAGS ) // SAMPLE EEPROM ALARM (and has a weird sample rom..)
 
 
-// 00 44 44 64 4c 80 70 24 6c a8 b0 38 e4 50  (same as some prize money sets)
-GAME(199?, m4brook,   0,          mod4oki_alt_cheatchr,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Brooklyn (Barcrest) (MPU4) (PFT 1.8)",GAME_FLAGS )
+// 00 44 44 64 4c 80 70 24 6c a8 b0 38 e4 50  (pzmoney) (same as some prize money sets)
+GAME(199?, m4brook,   0,          mod4oki_alt_cheatchr_pzmoney,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Brooklyn (Barcrest) (MPU4) (PFT 1.8)",GAME_FLAGS )
+
 // 00 c0 c8 1c f4 68 14 50 70 50 20 f0 48 34 60  (same as some andy capp sets)
 GAME(199?, m4roadrn,  0,          mod4oki_alt_cheatchr,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Road Runner (Barcrest) (Dutch) (MPU4) (DRO1.9)",GAME_FLAGS )
+
 // 00 84 94 5c ec 3c ec 30 4c 68 60 cc 7c (andybt scramble)
 GAME(199?, m4showtm,  0,          mod4oki_cheatchr_andybt,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Show Timer (Barcrest) (Dutch) (MPU4) (DSH1.3)",GAME_FLAGS )
+
 // 00 14 10 c0 4c 20 84 0c f0 98 e4 dc f4 (same as dutch andy capp + prize high roller)
 GAME(199?, m4steptm,  0,          mod4oki_alt_cheatchr,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Step Timer (Barcrest) (Dutch) (MPU4) (DST 1.1)",GAME_FLAGS )
+
 // 00 24 24 a4 68 14 c4 28 d4 8c d8 f0 0c d0 8c
 GAME(199?, m4wildtm,  0,          mod4oki_alt_cheatchr,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Wild Timer (Barcrest) (Dutch) (MPU4) (DWT 1.3)",GAME_FLAGS )
-
 
 // 00 24 24 a4 68 14 c4 28 d4 8c d8 f0 0c d0 8c
 GAME(199?, m4reeltm,  0,          mod4oki_alt_cheatchr,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Reel Timer (Barcrest) (MPU4) (DWT)",GAME_FLAGS ) // SAMPLE EEPROM ALARM
 
-// 00 14 10 60 54 00 24 14 70 30 00 74 10 40 34 40 (same as some jewel in the crown sets)
-GAME(199?, m4fortcb,  0,          mod4oki_alt_cheatchr,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS ) // INVALID ALARM
-GAME(199?, m4fortcba, m4fortcb,   mod4oki_alt_cheatchr,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS ) // INVALID ALARM
-GAME(199?, m4fortcbb, m4fortcb,   mod4oki_alt_cheatchr,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS ) // INVALID ALARM
+// 00 14 10 60 54 00 24 14 70 30 00 74 10 40 34 40 (fortune) (same as some jewel in the crown sets)
+GAME(199?, m4fortcb,  0,          mod4oki_alt_cheatchr_fortune,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS ) // INVALID ALARM
+GAME(199?, m4fortcba, m4fortcb,   mod4oki_alt_cheatchr_fortune,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS ) // INVALID ALARM
+GAME(199?, m4fortcbb, m4fortcb,   mod4oki_alt_cheatchr_fortune,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS ) // INVALID ALARM
 
 
 // non-english sets
@@ -2334,8 +2336,9 @@ GAME(199?, m4magtbo,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_sta
 // bwb/nova?
 // 00 24 24 64 2c 14 4c 14 4c 58 78 78 74
 GAME(199?, m4ordmnd,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Oriental Diamonds (Barcrest) (German) (MPU4)",GAME_FLAGS )
-// 00 14 10 60 54 00 24 14 70 30 00 74 10 40 34 40 54 (same as some jewel in the crown sets)  has lamp scramble
-GAME(199?, m4ptblkc,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Pot Black Casino (Bwb - Barcrest) (MPU4)",GAME_FLAGS )
+
+// 00 14 10 60 54 00 24 14 70 30 00 74 10 40 34 40 54 (fortune) (same as some jewel in the crown sets)  has lamp scramble
+GAME(199?, m4ptblkc,  0,          mod4oki_cheatchr_fortune,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Pot Black Casino (Bwb - Barcrest) (MPU4)",GAME_FLAGS )
 
 // badchr, non-standard protection, hack?
 GAME(199?, m4take5,   0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Take 5 (Barcrest) (MPU4)",GAME_FLAGS )

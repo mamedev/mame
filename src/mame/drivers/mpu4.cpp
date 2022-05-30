@@ -2930,6 +2930,25 @@ void mpu4_state::mod2_cheatchr_buc(machine_config &config)
 	mod2_cheatchr_table(config, mpu4_characteriser_pal::buc_lamp_scramble);
 }
 
+void mpu4_state::mod2_cheatchr_take2(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::take2_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_pzmoney(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::pzmoney_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_actionbank(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::actionbank_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_m533(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::m533_lamp_scramble);
+}
 
 // alt reel setup
 
@@ -3287,6 +3306,26 @@ void mpu4_state::mod4oki_cheatchr_buc(machine_config &config)
 	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::buc_lamp_scramble);
 }
 
+void mpu4_state::mod4oki_cheatchr_take2(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::take2_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_pzmoney(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::pzmoney_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_fortune(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::fortune_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_actionbank(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::actionbank_lamp_scramble);
+}
+
 // alt reel setup
 
 void mpu4_state::mod4oki_alt(machine_config &config)
@@ -3335,6 +3374,16 @@ void mpu4_state::mod4oki_alt_cheatchr_m470(machine_config &config)
 void mpu4_state::mod4oki_alt_cheatchr_m400(machine_config &config)
 {
 	mod4oki_alt_cheatchr_table(config, mpu4_characteriser_pal::m400_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_alt_cheatchr_pzmoney(machine_config &config)
+{
+	mod4oki_alt_cheatchr_table(config, mpu4_characteriser_pal::pzmoney_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_alt_cheatchr_fortune(machine_config &config)
+{
+	mod4oki_alt_cheatchr_table(config, mpu4_characteriser_pal::fortune_lamp_scramble);
 }
 
 
