@@ -290,15 +290,17 @@ license:CC0
 	<hash crc32="e8b130c4" name="PAM Diagnostics">
 		<extrainfo>A13MIRRORING?</extrainfo>
 	</hash>
-	<hash crc32="7ea86e87" name="PAM SALT v1.0 (1982) (Atari) (U).a52"/>
-	<manufacturer>Atari</manufacturer>
+	<hash crc32="7ea86e87" name="PAM SALT v1.0 (1982) (Atari) (U).a52">
+		<manufacturer>Atari</manufacturer>
+	</hash>
 	<hash crc32="e4f8ba8c" name="Pengo (Atari) (U)">
 		<year>1983</year>
 		<manufacturer>Atari</manufacturer>
 	</hash>
-	<hash crc32="28278cd6" name="Pete's Diagnostics (1982) (Atari) (U).a52"/>
-	<year>1982</year>
-	<manufacturer>Atari</manufacturer>
+	<hash crc32="28278cd6" name="Pete's Diagnostics (1982) (Atari) (U).a52">
+		<year>1982</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
 	<hash crc32="4b910461" name="Pitfall II - The Lost Caverns (Activision) (U)">
 		<year>1984</year>
 		<manufacturer>Activision</manufacturer>
