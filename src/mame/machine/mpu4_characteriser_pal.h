@@ -174,7 +174,12 @@ public:
 	// games with sequence 00 c0 c8 1c f4 68 14 50 70 50 20 f0 48 34 60
 	static constexpr uint8_t age_lamp_scramble[8] = { 0x00, 0x74, 0x44, 0x34, 0x14, 0x64, 0x44, 0x00 };
 
+	// games with sequence starting 00 60 60 C0 58 44 E0 50 A8 9C CC BC E4 50 A0 58
+	static constexpr uint8_t sunsetb_lamp_scramble[8] = { 0x03, 0xEB, 0x63, 0xCB, 0xC3, 0x6B, 0x63, 0x43 };
 	
+	// games with sequence starting 00 60 60 a0 38 64 e0 30 c8 9c ac dc ec 94 d8 a4 38 ec
+	static constexpr uint8_t bjac_lamp_scramble[8] = { 0x00, 0x68, 0x60, 0x28, 0x20, 0x68, 0x60, 0x20 };
+
 
 	/***************************************************************
 
@@ -227,6 +232,15 @@ public:
 
 	// games with sequence starting 00 90 88 2c e0 d8 74 84 dc 74 00 d4 c8 6c a0 58 f4 cc ec 68
 	static constexpr uint8_t toplot_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 14 04 54 c4 98 f0 48 e4 5c f0 c8 ec 68 24
+	static constexpr uint8_t luckystrike_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 18 70 44 58 30 44 18 7c 74 00 5c 7c 34 48 24 58
+	static constexpr uint8_t tictak_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 24 24 64 2c 14 4c 14 4c 58 78 78 74
+	static constexpr uint8_t actclba_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 	/***************************************************************
 

@@ -3000,6 +3000,47 @@ void mpu4_state::mod2_cheatchr_m441(machine_config &config)
 	mod2_cheatchr_table(config, mpu4_characteriser_pal::m441_lamp_scramble);
 }
 
+void mpu4_state::mod2_cheatchr_luckystrike(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::luckystrike_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_sunsetb(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::sunsetb_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_rr6(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::rr6_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_tictak(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::tictak_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_du91(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::du91_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_m450(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::m450_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_actclba(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::actclba_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_bjac(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::bjac_lamp_scramble);
+}
+
+
 // alt reel setup
 
 void mpu4_state::mod2_alt(machine_config &config)
@@ -3186,6 +3227,12 @@ void mpu4_state::mod4yam_cheatchr_age(machine_config &config)
 {
 	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::age_lamp_scramble);
 }
+
+void mpu4_state::mod4yam_cheatchr_rr6(machine_config &config)
+{
+	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::rr6_lamp_scramble);
+}
+
 
 /***********************************************************************************************
 
@@ -3416,6 +3463,20 @@ void mpu4_state::mod4oki_cheatchr_age(machine_config &config)
 	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::age_lamp_scramble);
 }
 
+void mpu4_state::mod4oki_cheatchr_luckystrike(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::luckystrike_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_tictak(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::tictak_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_actclba(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::actclba_lamp_scramble);
+}
 
 // alt reel setup
 

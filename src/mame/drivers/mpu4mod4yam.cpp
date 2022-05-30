@@ -798,9 +798,9 @@ GAME_CUSTOM( 199?, m4sayno__c,  m4sayno,    "snm 6.bin",            0x0000, 0x01
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4yam_cheatchr_rr6, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
-// 00 90 c0 54 8c 68 24 90 cc 6c 24 9c bc 34 88
+// 00 90 c0 54 8c 68 24 90 cc 6c 24 9c bc 34 88 (rr6)
 // (C)1995  B.W.B. and AE5 3.0
 GAME_CUSTOM( 199?, m4acechs__a,    m4acechs,   "ae_05a__.3_1", 0x0000, 0x010000, CRC(900e1789) SHA1(dbb13f1728d8527a7de5d257c866732adb0a95b5), "Bwb","Ace Chase (Bwb) (MPU4) (AE5 3.0, set 1)" )
 GAME_CUSTOM( 199?, m4acechs__r,    m4acechs,   "aei05___.3_1", 0x0000, 0x010000, CRC(bb84d01f) SHA1(f1653590e8cd642faf09a16c5c1b0a4b267d42e7), "Bwb","Ace Chase (Bwb) (MPU4) (AE5 3.0, set 2)" )
@@ -818,6 +818,13 @@ GAME_CUSTOM( 199?, m4acechs__o,    m4acechs,   "ae_20bt_.3_1", 0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4acechs__p,    m4acechs,   "ae_20sb_.3_1", 0x0000, 0x010000, CRC(471f2ba4) SHA1(baaf8339d8ee15365886cea2ecb36ad298975633), "Bwb","Ace Chase (Bwb) (MPU4) (AE20 3.0, set 6)" )
 GAME_CUSTOM( 199?, m4acechs__u,    m4acechs,   "aei20___.3_1", 0x0000, 0x010000, CRC(1744e7f4) SHA1(bf2f1b720a1a2610aff46a1de5c789a17828eae0), "Bwb","Ace Chase (Bwb) (MPU4) (AE20 3.0, set 7)" )
 
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+	ROM_END \
+	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // 00 50 40 14 c4 98 b4 0c e4 5c b4 8c ec
 // (C)1994  B.W.B. and AE5 2.0

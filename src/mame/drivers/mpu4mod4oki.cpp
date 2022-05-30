@@ -304,9 +304,9 @@ GAME_CUSTOM( 1991, m4andycpc5yd,       m4andycp,   "c5tdy.p1",         0x0000, 0
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ANDYCP_EXTRA_ROMS \
 	ROM_END \
-	GAMEL( year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4andycp, ROT0, company, title, GAME_FLAGS, layout_m4andycp )
+	GAMEL( year, setname, parent, mod4oki_cheatchr_actclba, mpu4, mpu4mod4oki_machines_state, init_m4andycp, ROT0, company, title, GAME_FLAGS, layout_m4andycp )
 
-// expects chr sequence starting 00 24 24 64 2c 14 4c 14 4c 58 78 78 74 00  (same as some King & Queens + Pot Black sets?)
+// expects chr sequence starting 00 24 24 64 2c 14 4c 14 4c 58 78 78 74 00 (actclba) (same as some King & Queens + Pot Black sets?)
 // "(C)1991 BARCREST"  and "AN8 0.1"
 GAME_CUSTOM( 1991, m4andycp8,          m4andycp,   "an8s.p1",          0x0000, 0x010000, CRC(14ac28da) SHA1(0b4a3f997e10573f2c4c44daac344f4be52363a0), "Barcrest", "Andy Capp (Barcrest) (MPU4) (AM8)" )
 GAME_CUSTOM( 1991, m4andycp8d,         m4andycp,   "an8d.p1",          0x0000, 0x010000, CRC(ae01af1c) SHA1(7b2305480a318648a3cc6c3bc66f21ac327e25aa), "Barcrest", "Andy Capp (Barcrest) (MPU4) (AN8 D)" ) // datapak
@@ -1978,7 +1978,7 @@ GAME_CUSTOM( 199?, m4jpgem__bp, m4jpgem,    "rrh01y.p1",    0x0000, 0x010000, CR
 	ROM_END \
 	GAME(year, setname, parent, mod4oki_cheatchr_du91, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
-// wants chr sequence starting 00 24 24 a4 4c 10 88 50 a8 d8 9c 9c bc 94 e8 50 a8 f8 bc 1c 94
+// wants chr sequence starting 00 24 24 a4 4c 10 88 50 a8 d8 9c 9c bc 94 e8 50 a8 f8 bc 1c 94 (du91)
 // "(C)1991 BARCREST" and "CG4 0.7"
 GAME_CUSTOM( 199?, m4jpgem,     0,          "cg4s.p1",      0x0000, 0x010000, CRC(f25eba0b) SHA1(250189b7fb8aa82a8696c3a0099eb13ec74eeb10), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (CG4 0.7)" )
 GAME_CUSTOM( 199?, m4jpgem__g,  m4jpgem,    "cg4ad.p1",     0x0000, 0x010000, CRC(417c98c1) SHA1(2ce23e27742c418d5ebaa0f4f0597e29955ea57d), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (CG4 0.7 AD)" )
@@ -3289,11 +3289,11 @@ GAME_CUSTOM( 199?, m4potblk__1,    m4potblk,   "pbg16y.p1",    0x0000, 0x020000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4POTBLK_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_actclba, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
 
 // do not boot with tri98
 
-// needs chr sequence starting 00 24 24 64 2c 14 4c 14 4c 58 78 78 74 00  (same sequence as m4kingqc ?)
+// needs chr sequence starting 00 24 24 64 2c 14 4c 14 4c 58 78 78 74 00 (actclba)  (same sequence as m4kingqc ?)
 // "(C)1993 BARCREST" and "PBG 1.4"
 GAME_CUSTOM( 199?, m4potblk__c,    m4potblk,   "pbg14s.p1",    0x0000, 0x020000, CRC(c9316c92) SHA1(d9248069c4702d4ce780ab82bdb783ba5aea034b), "Barcrest","Pot Black (Barcrest) (MPU4) (PBG 1.4)" )
 // "(C)1993 BARCREST" and "PBG 1.5"
@@ -3447,11 +3447,6 @@ GAME_CUSTOM( 199?, m4placbt__z,    m4placbt,   "pyb15t",       0x0000, 0x020000,
 *
 *****************************************************************************************************************************************************************************/
 
-// ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-// ROM_LOAD( "du91.chr", 0x0000, 0x000048, CRC(9724122d) SHA1(a41687eec84cad453c1a2a89317078f48ca0895f) )
-// sequence starting 00 24 24 A4 4C 10 88 50 A8 D8 9C 9C BC 94 E8 50
-// has lamp data 03 AF 27 8F 87 2F 27 07
-
 #define M4C9_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "c9s.hex", 0x0000, 0x080000, CRC(ae952e15) SHA1(a9eed61c3d65ded5e1faa67362f181393cb6339a) )
@@ -3550,11 +3545,20 @@ GAME_CUSTOM( 199?, m4c9__m,    m4c9,   "c9510y.p1",    0x0000, 0x010000, CRC(3a9
 		ROM_LOAD( name, offset, length, hash ) \
 		M4C9_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_tictak, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
-// expects chr sequence starting 00 18 70 44 58 30 44 18 7c 74 00 5c 7c 34 48 24 58 7c 7c 70 0c (same as m4bdash__ax ?)
+// expects chr sequence starting 00 18 70 44 58 30 44 18 7c 74 00 5c 7c 34 48 24 58 7c 7c 70 0c (tictak) (same as m4bdash__ax ?)
 // "(C)1991 BARCREST" and "CLN 4.0"
 GAME_CUSTOM( 199?, m4c9__n,    m4c9,   "clnv.p1",      0x0000, 0x010000, CRC(486097d8) SHA1(33e9eab0fb1c750160a8cb2b75eca73145d6956e), "Barcrest","Cloud Nine (Barcrest) (MPU4) (CLN 4.0 V)" ) // V isn't usually a valid code.. hack?
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4C9_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // expects chr sequence starting 00 e0 a8 38 90 68 30 60 e4 e8 18 d0 6c 10 60 c4
  // "(C)1993  B.W.B." and "SC9 5.0"
@@ -4923,9 +4927,9 @@ GAME_CUSTOM( 199?, m4luckst__at,   m4luckst,   "lst10y.p1",            0x0000, 0
 		ROM_LOAD( name, offset, length, hash ) \
 		M4LUCKST_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_luckystrike, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
 
-// need chr sequence starting 00 14 04 54 c4 98 f0 48 e4 5c f0 c8  (same as some Kings & Queens sets)
+// need chr sequence starting 00 14 04 54 c4 98 f0 48 e4 5c f0 c8 (luckystrike) (same as some Kings & Queens sets)
 // "(C)1993 BARCREST" and "LSS 0.6" // doesn't show the extension codes on startup
 GAME_CUSTOM( 199?, m4luckst,       0,          "lss06s.p1",            0x0000, 0x020000, CRC(b6a69478) SHA1(6b05b7f9af94a83adfdff328d4132f72a1dfb19f), "Barcrest","Lucky Strike (Barcrest) (MPU4) (LSS 0.6)" )
 GAME_CUSTOM( 199?, m4luckst__c,    m4luckst,   "lss06ad.p1",           0x0000, 0x020000, CRC(9a512ec1) SHA1(c1eb4d0f5c915f392411d0ff2c931eb22a41b3a8), "Barcrest","Lucky Strike (Barcrest) (MPU4) (LSS 0.6 AD)" )
@@ -5352,6 +5356,15 @@ GAME_CUSTOM( 199?, m4bdash__l,  m4bdash,    "bld07h.p1",    0x0000, 0x020000, CR
 GAME_CUSTOM( 199?, m4bdash__m,  m4bdash,    "bld07k.p1",    0x0000, 0x020000, CRC(01e34457) SHA1(5e9d8cb558222340df42904365ad90288ca5cdf2), "Barcrest","Boulder Dash (Barcrest) (MPU4) (BLD 0.7 K)" )
 GAME_CUSTOM( 199?, m4bdash__n,  m4bdash,    "bld07r.p1",    0x0000, 0x020000, CRC(b2ecff66) SHA1(9d8bca3e137a654d786b9257ce1206c7118ac6e0), "Barcrest","Boulder Dash (Barcrest) (MPU4) (BLD 0.7 R)" )
 GAME_CUSTOM( 199?, m4bdash__p,  m4bdash,    "bld07y.p1",    0x0000, 0x020000, CRC(860064a9) SHA1(8e13df769bde73bc5af3fa8010b39502e269f63f), "Barcrest","Boulder Dash (Barcrest) (MPU4) (BLD 0.7 Y)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4BDASH_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_cheatchr_tictak, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
 
 // needs chd sequence starting 00 18 70 44 58 30 44 18 7c 74 00 5c 7c 34  (same as one of the Cloud 9 sets?)
 // "(C)1999    BWB" and "BO_ 2.0"
@@ -6573,7 +6586,16 @@ GAME_CUSTOM( 199?, m4kingq,     0,          "ee_05a_4.2_1", 0x0000, 0x010000, CR
 // "(C)1996  B.W.B." and "EE  2.2" (EE8 in 7-seg)
 GAME_CUSTOM( 199?, m4kingq__a,  m4kingq,    "ee_05a__.2_1", 0x0000, 0x010000, CRC(36aa5fb9) SHA1(b4aaf647713e33e79be7927e5eeef240d3beedf7), "Bwb","Kings & Queens (Barcrest) (MPU4) (EE8 2.2 K / EE  2.2)" )
 
-// chr sequence starting 00 14 04 54 c4 98 f0 48 e4 5c f0 c8 ec 68 24 90 c8 ec ec   (same some Lucky Strike sets)
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4KINGQ_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_cheatchr_luckystrike, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
+// chr sequence starting 00 14 04 54 c4 98 f0 48 e4 5c f0 c8 ec 68 24 90 c8 ec ec (luckystrike)   (same some Lucky Strike sets)
 // "(C)1995  B.W.B." and "EE_ 2.0" (EE in 7-seg)
 GAME_CUSTOM( 199?, m4kingq__b,  m4kingq,    "ee_20a__.2_1", 0x0000, 0x010000, CRC(2c61341f) SHA1(76d68ae2a44087414be8be12b3824c62311721dd), "Bwb","Kings & Queens (Barcrest) (MPU4) (EE  2.0 K / EE_ 2.0)" )
 GAME_CUSTOM( 199?, m4kingq__d,  m4kingq,    "ee_20b__.2_1", 0x0000, 0x010000, CRC(2fc7c7c2) SHA1(3b8736a582009d7b1455769374342ff72026d2fa), "Bwb","Kings & Queens (Barcrest) (MPU4) (EE  2.0 B / EE_ 2.0)" )
@@ -6587,6 +6609,15 @@ GAME_CUSTOM( 199?, m4kingq__c,  m4kingq,    "ee_20a_c.1_1", 0x0000, 0x010000, CR
 GAME_CUSTOM( 199?, m4kingq__e,  m4kingq,    "ee_20b_c.1_1", 0x0000, 0x010000, CRC(70d399ab) SHA1(ca2c593151f4f852c7cb66859a12e832e53cd31f), "Bwb","Kings & Queens (Barcrest) (MPU4) (EE  1.0 B / EE  1.0)" )
 GAME_CUSTOM( 199?, m4kingq__g,  m4kingq,    "ee_20bdc.1_1", 0x0000, 0x010000, CRC(cbb8c57b) SHA1(ea165199213f95128aec95ae40799faa8c457dd3), "Bwb","Kings & Queens (Barcrest) (MPU4) (EE  1.0 BD / EE  1.0)" )
 GAME_CUSTOM( 199?, m4kingq__j,  m4kingq,    "ee_20s_c.1_1", 0x0000, 0x010000, CRC(a0c1e313) SHA1(8a088a33e51a31ff0abdb554aa4d8ce61eaf4b7d), "Bwb","Kings & Queens (Barcrest) (MPU4) (EE  1.0 CB / EE  1.0)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4KINGQ_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // chr sequence starting 00 18 b0 64 38 98 b4 44 3c b4 40 3c 9c b4
 // "(C)1995  B.W.B." and "EE_ 2.0" (EE' in 7-seg)
@@ -6622,9 +6653,9 @@ GAME_CUSTOM( 199?, m4kingq__t,  m4kingq,    "knq2pprg.bin", 0x0000, 0x010000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4KINGQC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_actclba, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
-// chr sequence starting 00 24 24 64 2c 14 4c 14 4c 58 78 78 74
+// chr sequence starting 00 24 24 64 2c 14 4c 14 4c 58 78 78 74 (actclba)
 // "(C)1996  B.W.B." and "CN4 6.0"
 GAME_CUSTOM( 199?, m4kingqc,       0,          "cn_20_b4.6_1", 0x0000, 0x010000, CRC(22d0b20c) SHA1(a7a4f60017cf62247339c9b23420d29845657895), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (CN4 / CN4 6.0 YD)" )
 GAME_CUSTOM( 199?, m4kingqc__i,    m4kingqc,   "cn_20bg4.6_1", 0x0000, 0x010000, CRC(6d4158fe) SHA1(9c12264a415601d6f28f23c1e1f6a3d97fadddba), "Bwb","Kings & Queens Classic (Barcrest) (MPU4) (CN4 / CN4 6.0 BA)" )
@@ -7015,7 +7046,7 @@ GAME_CUSTOM( 199?, m4rhogc__b,  m4rhogc,    "rhcd.p1", 0x0000, 0x010000, CRC(7a7
 	ROM_END \
 	GAME(year, setname, parent, mod4oki_cheatchr_du91, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
-// sequence 00 24 24 a4 4c 10 88 50 a8 d8 9c
+// sequence 00 24 24 a4 4c 10 88 50 a8 d8 9c (du91)
 // "(C)1993 BARCREST" and "006 0.6"
 GAME_CUSTOM( 199?, m4gb006,     0,          "006s.p1",      0x0000, 0x010000, CRC(6e750ab9) SHA1(2e1f08df7991efe450633e0bcec201e6fa7fdbaa), "Barcrest","Games Bond 006 (Barcrest) (MPU4) (006 0.6)" )
 GAME_CUSTOM( 199?, m4gb006__a,  m4gb006,    "006d.p1",      0x0000, 0x010000, CRC(7e0a4282) SHA1(8fd0cbdd9cf3ac74b7b202ce7615392c1a746906), "Barcrest","Games Bond 006 (Barcrest) (MPU4) (006 0.6 D)" )

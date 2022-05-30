@@ -208,6 +208,14 @@ public:
 	void mod2_cheatchr_magicdragon(machine_config &config);
 	void mod2_cheatchr_age(machine_config &config);
 	void mod2_cheatchr_m441(machine_config &config);
+	void mod2_cheatchr_luckystrike(machine_config &config);
+	void mod2_cheatchr_sunsetb(machine_config &config);
+	void mod2_cheatchr_rr6(machine_config &config);
+	void mod2_cheatchr_tictak(machine_config &config);
+	void mod2_cheatchr_du91(machine_config &config);
+	void mod2_cheatchr_m450(machine_config &config);
+	void mod2_cheatchr_actclba(machine_config &config);
+	void mod2_cheatchr_bjac(machine_config &config);
 
 	void mod2_alt(machine_config &config);
 	void mod2_alt_cheatchr(machine_config &config);
@@ -278,6 +286,9 @@ public:
 	void mod4oki_cheatchr_m578(machine_config &config);
 	void mod4oki_cheatchr_addr(machine_config &config);
 	void mod4oki_cheatchr_age(machine_config &config);
+	void mod4oki_cheatchr_luckystrike(machine_config &config);
+	void mod4oki_cheatchr_tictak(machine_config &config);
+	void mod4oki_cheatchr_actclba(machine_config &config);
 
 	void mod4yam(machine_config &config);
 	void mod4yam_cheatchr(machine_config &config);
@@ -301,6 +312,7 @@ public:
 	void mod4yam_cheatchr_m578(machine_config &config);
 	void mod4yam_cheatchr_addr(machine_config &config);
 	void mod4yam_cheatchr_age(machine_config &config);
+	void mod4yam_cheatchr_rr6(machine_config &config);
 	void mod4yam_chr(machine_config &config);
 
 	void mpu4_common(machine_config &config);

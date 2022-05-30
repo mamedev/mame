@@ -501,8 +501,7 @@ ROM_START( m4frtgm )
 ROM_END
 
 
-// same as some super hyper viper?
-// 00 90 18 E4 A8 3C F4 48 74 50 20 F0  (m450)
+
 ROM_START( m4gldgat )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dgg22.bin", 0x0000, 0x010000, CRC(ef8498df) SHA1(6bf164ef18445e83e4510a000bc924cbe916ad99) )
@@ -825,13 +824,9 @@ ROM_START( m4rwb )
 	ROM_LOAD( "rwb_2.snd", 0x080000, 0x080000, CRC(54a2b2fd) SHA1(25875ff873bf22df510e7a4c56c336fbabcbdedb) )
 ROM_END
 
-// 00 C0 D0 1C EC 78 AC 30 4C 2C 24
 ROM_START( m4magtbo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "crmtb14.epr", 0x0000, 0x010000, CRC(79e1746c) SHA1(794317f3aba7b1a7994cde89d81abc2b687d0821) )
-
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-	ROM_LOAD( "ctp.chr", 0x0000, 0x000048, CRC(ead61793) SHA1(f38a38601a67804111b8f8cf0a05d35ed79b7ed1) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
 	ROM_LOAD( "scrmtb.snd", 0x000000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) )
@@ -2256,8 +2251,8 @@ GAME(199?, m4fortcbb, m4fortcb,   mod4oki_alt_cheatchr_fortune,mpu4,    mpu4unso
 // 00 c0 d0 38 ec 5c ec 14 68 2c 24 e8 74 00 e8
 GAME(199?, m4magrep,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Magic Replay (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
 
-// 00 24 24 64 2c 14 4c 14 4c 58
-GAME(199?, m4nile,    0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Nile Jewels (Barcrest) (German) (MPU4) (GJN0.8)",GAME_FLAGS ) // DM1 SW ALM
+// 00 24 24 64 2c 14 4c 14 4c 58 (actclba)
+GAME(199?, m4nile,    0,          mod4oki_cheatchr_actclba,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Nile Jewels (Barcrest) (German) (MPU4) (GJN0.8)",GAME_FLAGS ) // DM1 SW ALM
 
 // 00 24 24 2c e0 b4 b8 4c e8 d8 cc f8 6c 48 68
 GAME(199?, m4jokmil,  0,          mod4oki_cheatchr_m683,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Jokers Millennium (Barcrest) (German) (MPU4)",GAME_FLAGS ) // DM1 SW ALM
@@ -2333,8 +2328,8 @@ GAME(199?, m4toprn,   0,          mod2_cheatchr,       mpu4,    mpu4unsorted_sta
 GAME(199?, m4magtbo,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Magic Turbo (Barcrest) (MPU4)",GAME_FLAGS ) // Reel A Alarm
 
 // bwb/nova?
-// 00 24 24 64 2c 14 4c 14 4c 58 78 78 74
-GAME(199?, m4ordmnd,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Oriental Diamonds (Barcrest) (German) (MPU4)",GAME_FLAGS )
+// 00 24 24 64 2c 14 4c 14 4c 58 78 78 74 (actclba)
+GAME(199?, m4ordmnd,  0,          mod4oki_cheatchr_actclba,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Oriental Diamonds (Barcrest) (German) (MPU4)",GAME_FLAGS )
 
 // 00 14 10 60 54 00 24 14 70 30 00 74 10 40 34 40 54 (fortune) (same as some jewel in the crown sets)  has lamp scramble
 GAME(199?, m4ptblkc,  0,          mod4oki_cheatchr_fortune,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Pot Black Casino (Bwb - Barcrest) (MPU4)",GAME_FLAGS )
