@@ -174,7 +174,7 @@ void simpsons_state::z80_arm_nmi_w(uint8_t data)
 
 void simpsons_state::z80_nmi_w(int state)
 {
-	if(state && m_nmi_enabled && machine().time().as_ticks(m_audiocpu->clock()) > m_nmi_enabled + 1) {
+	if(state && m_nmi_enabled && machine().time().as_ticks(m_audiocpu->clock()) > m_nmi_enabled + 3) {
 		m_nmi_enabled = 0;
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
