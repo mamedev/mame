@@ -1209,7 +1209,6 @@ Just one different byte between the three "Escalera y Tobogan" sets, at address 
  1270: 0xF6
 May be the game serial number hard-encoded on the EPROM?
 */
-// 00 84 8c d8 74 80 4c 90 e8 78 54 60 84 2c
 ROM_START( m4esctbg )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "ma-15_b-1925-94_esc_1.6a_n-1270.rom1", 0x0000, 0x10000, CRC(6fa2a0ef) SHA1(3b60b545e417a45e61e3babbe27758a053ced926) )
@@ -2121,7 +2120,7 @@ GAME(199?, m4crjwl2b, m4crjwl2,   mod4oki_cheatchr_duty,    mpu4,    mpu4unsorte
 // 00 a0 a8 18 f4 2c 70 60 e4 e8 58 d4 2c 50 60  (viva_lamp_scramble)
 GAME(199?, m4maglin,  0,          mod4oki_cheatchr_viva,mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Magic Liner (Barcrest) (MPU4) (DMA2.1)",GAME_FLAGS )
 
-// 00 90 a0 34 8c 68 44 90 ac 6c 44 9c dc 5c d4 24 98 dc  (same as bwb viz set)
+// 00 90 a0 34 8c 68 44 90 ac 6c 44 9c dc 5c d4 24 98 dc (magicdragon) (same as bwb viz set)
 GAME(199?, m4magdrg,  0,          mod4oki_cheatchr_magicdragon,mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Magic Dragon (Barcrest) (MPU4) (DMD1.0)",GAME_FLAGS )
 
 GAME(199?, m4clbveg,  0,          mod4oki_alt_cheatchr_clbveg,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
@@ -2231,8 +2230,8 @@ GAME(199?, m4frtgm,   0,          mod4oki_alt_cheatchr_m400,mpu4,    mpu4unsorte
 // 00 44 44 64 4c 80 70 24 6c a8 b0 38 e4 50  (pzmoney) (same as some prize money sets)
 GAME(199?, m4brook,   0,          mod4oki_alt_cheatchr_pzmoney,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Brooklyn (Barcrest) (MPU4) (PFT 1.8)",GAME_FLAGS )
 
-// 00 c0 c8 1c f4 68 14 50 70 50 20 f0 48 34 60  (same as some andy capp sets)
-GAME(199?, m4roadrn,  0,          mod4oki_alt_cheatchr,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Road Runner (Barcrest) (Dutch) (MPU4) (DRO1.9)",GAME_FLAGS )
+// 00 c0 c8 1c f4 68 14 50 70 50 20 f0 48 34 60 (age) (same as some andy capp sets)
+GAME(199?, m4roadrn,  0,          mod4oki_cheatchr_age,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Road Runner (Barcrest) (Dutch) (MPU4) (DRO1.9)",GAME_FLAGS )
 
 // 00 84 94 5c ec 3c ec 30 4c 68 60 cc 7c (andybt scramble)
 GAME(199?, m4showtm,  0,          mod4oki_cheatchr_andybt,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Show Timer (Barcrest) (Dutch) (MPU4) (DSH1.3)",GAME_FLAGS )
@@ -2276,7 +2275,7 @@ GAME(199?, m4crzjwlc, m4crzjwl,   mod4oki_cheatchr_tri98,    mpu4,    mpu4unsort
 GAME(199?, m4crzjwle, m4crzjwl,   mod4oki_cheatchr_tri98,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 6)",GAME_FLAGS ) // DM1 SW ALM
 GAME(199?, m4crzjwlf, m4crzjwl,   mod4oki_cheatchr_tri98,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 7)",GAME_FLAGS ) // DM1 SW ALM
 GAME(199?, m4crzjwlg, m4crzjwl,   mod4oki_cheatchr_tri98,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 8)",GAME_FLAGS ) // DM1 SW ALM
-// 00 14 04 94 c8 68 a0 50 8c e8 e0 dc bc b0 4c a0 58
+// 00 14 04 94 c8 68 a0 50 8c e8 e0 dc bc b0 4c a0 58 (lv)
 GAME(199?, m4crzjwlh, m4crzjwl,   mod4oki_cheatchr_lv, mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 9)",GAME_FLAGS ) // DM1 SW ALM
 // not standard protection
 GAME(199?, m4crzjwl,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 1)",GAME_FLAGS ) // DM1 SW ALM
@@ -2308,9 +2307,9 @@ GAME(199?, m4ceptr,   0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_sta
 // 00 60 60 a0 2c 50 84 28 d4 c8 9c b4 48 94
 GAME(199?, m4blkcat,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Black Cat (Barcrest) (Dutch) (MPU4) (DBL 1.4)",GAME_FLAGS )
 
-// 00 c0 c8 1c f4 68 14 50 70 50 20 f0 48 34 60 80
-GAME(199?, m4gnsmk,   0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Gun Smoke (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
-GAME(199?, m4blkbuld, m4blkbul,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Gun Smoke (Barcrest) (Dutch, alt sound roms) (MPU4)",GAME_FLAGS ) // not sure either set of sound roms is right
+// 00 c0 c8 1c f4 68 14 50 70 50 20 f0 48 34 60 80 (age)
+GAME(199?, m4gnsmk,   0,          mod4oki_cheatchr_age,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Gun Smoke (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4blkbuld, m4blkbul,   mod4oki_cheatchr_age,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Gun Smoke (Barcrest) (Dutch, alt sound roms) (MPU4)",GAME_FLAGS ) // not sure either set of sound roms is right
 
 // 00 a0 a8 1c f4 c8 1c b4 cc 5c 74 44 e0 28
 GAME(199?, m4blkwhd,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Black & White (Barcrest) [Dutch] (MPU4) (DBW 1.1)",GAME_FLAGS ) // Reel Error
@@ -2387,8 +2386,8 @@ GAME(199?, m4sunscl,  0,          mod2_cheatchr,       mpu4,    mpu4unsorted_sta
 GAME(199?, m4sunscla, m4sunscl,   mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Sunset Club (Bwb) (MPU4) (set 2)",GAME_FLAGS )
 GAME(199?, m4sunsclb, m4sunscl,   mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Sunset Club (Bwb) (MPU4) (set 3)",GAME_FLAGS )
 
-// 00 84 94 3c ec 5c ec 50 2c 68 60 ac 74 00 ac 58 ec 7c ec 58 e0 90 18 ec 54
-GAME(199?, m4bigban,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Big Bandit (Nova) (MPU4)",GAME_FLAGS ) // DM1 SW ALM
+// 00 84 94 3c ec 5c ec 50 2c 68 60 ac 74 00 ac 58 ec 7c ec 58 e0 90 18 ec 54 (tri98)
+GAME(199?, m4bigban,  0,          mod4oki_cheatchr_tri98,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Big Bandit (Nova) (MPU4)",GAME_FLAGS ) // DM1 SW ALM
 
 // 00 88 70 14 1c c0 a4 a0 bc d4 30 14 18 d4 2c 50
 GAME(199?, m4crzcsn,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Crazy Casino (Nova) (MPU4)",GAME_FLAGS )
@@ -2407,10 +2406,10 @@ GAME(199?, m4octo,    0,          mod4oki_cheatchr_fruitfall,    mpu4,    mpu4un
 
 
 // NETWORK FAIL ALARM (reel comms?)
-// 00 84 8c d8 74 80 4c 90 e8 78 54 60 84 2c b0 28 b0 e8 f8 34 c0 4c 90 a8
-GAME(1994, m4esctbg,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default,     ROT0, "Vifico", "Escalera Tobogan (MPU4, set 1)", GAME_FLAGS )
-GAME(1994, m4esctbga, m4esctbg,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default,     ROT0, "Vifico", "Escalera Tobogan (MPU4, set 2)", GAME_FLAGS )
-GAME(1994, m4esctbgb, m4esctbg,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default,     ROT0, "Vifico", "Escalera Tobogan (MPU4, set 3)", GAME_FLAGS )
+// 00 84 8c d8 74 80 4c 90 e8 78 54 60 84 2c b0 28 b0 e8 f8 34 c0 4c 90 a8 (m578)
+GAME(1994, m4esctbg,  0,          mod4oki_cheatchr_m578,    mpu4,    mpu4unsorted_state, init_m4default,     ROT0, "Vifico", "Escalera Tobogan (MPU4, set 1)", GAME_FLAGS )
+GAME(1994, m4esctbga, m4esctbg,   mod4oki_cheatchr_m578,    mpu4,    mpu4unsorted_state, init_m4default,     ROT0, "Vifico", "Escalera Tobogan (MPU4, set 2)", GAME_FLAGS )
+GAME(1994, m4esctbgb, m4esctbg,   mod4oki_cheatchr_m578,    mpu4,    mpu4unsorted_state, init_m4default,     ROT0, "Vifico", "Escalera Tobogan (MPU4, set 3)", GAME_FLAGS )
 
 // Others
 
@@ -2610,7 +2609,7 @@ GAME( 199?, m4mgpn,   0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_sta
 // no protection?
 GAME(198?, m4funh,    0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, 0,      "<unknown>",      "Fun House (unknown) (MPU4)", GAME_FLAGS ) // TUNE ALARM  (was in the SC1 Fun House set)
 
-// 00 14 04 94 c8 68 a0 50 8c e8 e0 dc bc b0 4c a0 58  alarm 17, runs door open (Q)
+// 00 14 04 94 c8 68 a0 50 8c e8 e0 dc bc b0 4c a0 58 (lv) alarm 17, runs door open (Q)
 // these are NOT Mod 2 like the m4sunset sets, so could be misidentified
 GAME(199?, m4sunseta, 0,           mod4oki_cheatchr_lv,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (B25 1.2, set 1)",GAME_FLAGS )
 GAME(199?, m4sunsetb, m4sunseta,   mod4oki_cheatchr_lv,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (B25 1.2, set 2)",GAME_FLAGS )

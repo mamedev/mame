@@ -2950,6 +2950,56 @@ void mpu4_state::mod2_cheatchr_m533(machine_config &config)
 	mod2_cheatchr_table(config, mpu4_characteriser_pal::m533_lamp_scramble);
 }
 
+void mpu4_state::mod2_cheatchr_toplot(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::toplot_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_m435(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::m435_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_tri98(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::m4dtri98_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_vivlv(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::vivlv_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_m578(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::m578_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_addr(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::addr_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_alf(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::alf_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_magicdragon(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::magicdragon_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_age(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::age_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_m441(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::m441_lamp_scramble);
+}
+
 // alt reel setup
 
 void mpu4_state::mod2_alt(machine_config &config)
@@ -3110,6 +3160,31 @@ void mpu4_state::mod4yam_cheatchr_graff(machine_config &config)
 void mpu4_state::mod4yam_cheatchr_clbveg(machine_config &config)
 {
 	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::clbveg_lamp_scramble);
+}
+
+void mpu4_state::mod4yam_cheatchr_toplot(machine_config &config)
+{
+	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::toplot_lamp_scramble);
+}
+
+void mpu4_state::mod4yam_cheatchr_m435(machine_config &config)
+{
+	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::m435_lamp_scramble);
+}
+
+void mpu4_state::mod4yam_cheatchr_m578(machine_config &config)
+{
+	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::m578_lamp_scramble);
+}
+
+void mpu4_state::mod4yam_cheatchr_addr(machine_config &config)
+{
+	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::addr_lamp_scramble);
+}
+
+void mpu4_state::mod4yam_cheatchr_age(machine_config &config)
+{
+	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::age_lamp_scramble);
 }
 
 /***********************************************************************************************
@@ -3326,6 +3401,22 @@ void mpu4_state::mod4oki_cheatchr_actionbank(machine_config &config)
 	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::actionbank_lamp_scramble);
 }
 
+void mpu4_state::mod4oki_cheatchr_m578(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::m578_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_addr(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::addr_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_age(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::age_lamp_scramble);
+}
+
+
 // alt reel setup
 
 void mpu4_state::mod4oki_alt(machine_config &config)
@@ -3437,7 +3528,10 @@ void mpu4_state::mod4oki_5r_cheatchr_clbveg(machine_config &config)
 	mod4oki_5r_cheatchr_table(config, mpu4_characteriser_pal::clbveg_lamp_scramble);
 }
 
-
+void mpu4_state::mod4oki_5r_cheatchr_age(machine_config &config)
+{
+	mod4oki_5r_cheatchr_table(config, mpu4_characteriser_pal::age_lamp_scramble);
+}
 /***********************************************************************************************
 
   Other configs

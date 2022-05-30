@@ -198,6 +198,16 @@ public:
 	void mod2_cheatchr_pzmoney(machine_config &config);
 	void mod2_cheatchr_actionbank(machine_config &config);
 	void mod2_cheatchr_m533(machine_config &config);
+	void mod2_cheatchr_toplot(machine_config &config);
+	void mod2_cheatchr_m435(machine_config &config);
+	void mod2_cheatchr_tri98(machine_config &config);
+	void mod2_cheatchr_vivlv(machine_config &config);
+	void mod2_cheatchr_m578(machine_config &config);
+	void mod2_cheatchr_addr(machine_config &config);
+	void mod2_cheatchr_alf(machine_config &config);
+	void mod2_cheatchr_magicdragon(machine_config &config);
+	void mod2_cheatchr_age(machine_config &config);
+	void mod2_cheatchr_m441(machine_config &config);
 
 	void mod2_alt(machine_config &config);
 	void mod2_alt_cheatchr(machine_config &config);
@@ -216,6 +226,7 @@ public:
 	void mod4oki_5r_cheatchr_m574(machine_config &config);
 	void mod4oki_5r_cheatchr_shuffle(machine_config &config);
 	void mod4oki_5r_cheatchr_clbveg(machine_config &config);
+	void mod4oki_5r_cheatchr_age(machine_config &config);
 
 	void mod4oki_alt(machine_config &config);
 	void mod4oki_alt_cheatchr(machine_config &config);
@@ -264,6 +275,9 @@ public:
 	void mod4oki_cheatchr_pzmoney(machine_config &config);
 	void mod4oki_cheatchr_fortune(machine_config &config);
 	void mod4oki_cheatchr_actionbank(machine_config &config);
+	void mod4oki_cheatchr_m578(machine_config &config);
+	void mod4oki_cheatchr_addr(machine_config &config);
+	void mod4oki_cheatchr_age(machine_config &config);
 
 	void mod4yam(machine_config &config);
 	void mod4yam_cheatchr(machine_config &config);
@@ -282,6 +296,11 @@ public:
 	void mod4yam_cheatchr_squids(machine_config &config);
 	void mod4yam_cheatchr_graff(machine_config &config);
 	void mod4yam_cheatchr_clbveg(machine_config &config);
+	void mod4yam_cheatchr_toplot(machine_config &config);
+	void mod4yam_cheatchr_m435(machine_config &config);
+	void mod4yam_cheatchr_m578(machine_config &config);
+	void mod4yam_cheatchr_addr(machine_config &config);
+	void mod4yam_cheatchr_age(machine_config &config);
 	void mod4yam_chr(machine_config &config);
 
 	void mpu4_common(machine_config &config);

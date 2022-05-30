@@ -132,8 +132,9 @@ public:
 
 	// games with sequence starting  00 84 C4 E4 4C 10 28 90 E8 78 34
 	static constexpr uint8_t vivlv_lamp_scramble[8] = { 0x00, 0x28, 0x00, 0x28, 0x20, 0x08, 0x00, 0x00 };
-
-	// games with sequence starting  00 84 C4 E4 4C 10 28 90 E8 78 34
+	                                                //    00    28    00    28    24    14    00    00   m4jpjmp has this lamp scramble for it
+													 
+	// games with sequence starting  00 84 8c b8 74 80 1c b4 d8 74 00 d4 c8 78 a4 4c e0 dc f4 88
 	static constexpr uint8_t celclb_lamp_scramble[8] = { 0x00, 0x50, 0x00, 0x50, 0x10, 0x40, 0x04, 0x00 };
 
 	// games with sequence starting 00 14 10 C0 8C A8 68 30 D0 58 E4 DC F4
@@ -161,8 +162,19 @@ public:
 	// games with sequence 00 50 40 14 C4 B0 A4 30 C4 74 00 D4 E0 30 C0 34
 	static constexpr uint8_t take2_lamp_scramble[8] = { 0x00, 0x50, 0x50, 0x10, 0x10, 0x50, 0x50, 0x00 };	
 
-	
+	// games with sequence 00 50 40 14 4C 80 34 44 5C 9C 9C 9C DC 9C DC 94
+	static constexpr uint8_t m435_lamp_scramble[8] = { 0x03, 0x5F, 0x53, 0x1F, 0x17, 0x5B, 0x53, 0x13 };	
 
+	// games with sequence 00 84 8C D8 74 80 4C 90 E8 78 54 60 84
+	static constexpr uint8_t m578_lamp_scramble[8] = { 0x00, 0x60, 0x00, 0x60, 0x40, 0x20, 0x00, 0x00 };	
+
+	// games with sequence 00 60 60 44 e0 e8 1c 74 a4 6c 14 84 e8 1c f4
+	static constexpr uint8_t addr_lamp_scramble[8] = { 0x00, 0x60, 0x60, 0x00, 0x00, 0x00, 0x00, 0x00 }; // likely incomplete
+
+	// games with sequence 00 c0 c8 1c f4 68 14 50 70 50 20 f0 48 34 60
+	static constexpr uint8_t age_lamp_scramble[8] = { 0x00, 0x74, 0x44, 0x34, 0x14, 0x64, 0x44, 0x00 };
+
+	
 
 	/***************************************************************
 
@@ -213,6 +225,8 @@ public:
 	// games with sequence starting 00 60 60 24 e0 e8 1c 74 c4 6c 14 84 e8 1c
 	static constexpr uint8_t actionbank_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
+	// games with sequence starting 00 90 88 2c e0 d8 74 84 dc 74 00 d4 c8 6c a0 58 f4 cc ec 68
+	static constexpr uint8_t toplot_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 	/***************************************************************
 
