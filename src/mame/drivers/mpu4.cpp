@@ -3101,6 +3101,26 @@ void mpu4_state::mod2_cheatchr_tricolor(machine_config &config)
 	mod2_cheatchr_table(config, mpu4_characteriser_pal::tricolor_lamp_scramble);
 }
 
+void mpu4_state::mod2_cheatchr_tribank(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::tribank_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_toptake(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::toptake_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_sunsetbalt(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::sunsetbalt_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_eighth(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::eighth_lamp_scramble);
+}
+
 void mpu4_state::mod2_cheatchr_blackwhite(machine_config &config)
 {
 	mod2_cheatchr_table(config, mpu4_characteriser_pal::blackwhite_lamp_scramble);

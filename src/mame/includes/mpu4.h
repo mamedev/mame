@@ -229,6 +229,10 @@ public:
 	void mod2_cheatchr_hittop(machine_config &config);
 	void mod2_cheatchr_tricolor(machine_config &config);
 	void mod2_cheatchr_blackwhite(machine_config &config);
+	void mod2_cheatchr_tribank(machine_config &config);
+	void mod2_cheatchr_toptake(machine_config &config);
+	void mod2_cheatchr_sunsetbalt(machine_config &config);
+	void mod2_cheatchr_eighth(machine_config &config);
 
 	void mod2_bootleg_chr45(machine_config &config);
 	void mod2_bootleg_chr51(machine_config &config);

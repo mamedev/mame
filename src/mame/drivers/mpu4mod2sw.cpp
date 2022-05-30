@@ -1778,21 +1778,21 @@ GAME(199?, m4cashzn,  0,          mod2_cheatchr_m578, mpu4,            mpu4mod2_
 GAME(199?, m4cashzna, m4cashzn,   mod2_cheatchr_m578, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Cash Zone (Barcrest) (MPU4) (CAZ 1.5)",GAME_FLAGS )
 
 // no protection, is this a barcrest?
-GAME(199?, m4copcsh,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Coppa Cash (Barcrest) (MPU4) (FC 2.0)",GAME_FLAGS )
+GAME(199?, m4copcsh,  0,          mod2, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Coppa Cash (Barcrest) (MPU4) (FC 2.0)",GAME_FLAGS )
 
 // 00 60 60 44 e0 e8 1c 74 a4 6c 14 84 e8 1c f4 08 b0 ac (addr)
 GAME(199?, m4dblup,   0,          mod2_cheatchr_addr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Double Up (Barcrest) (MPU4) (DU 1.5)",GAME_FLAGS ) // token alarm
 
 // 00 50 40 90 a8 6c c4 30 c8 ac a4 f8 d4 28 4c 84 38 dc (alf)
 GAME(199?, m4eighth,  0,          mod2_cheatchr_alf, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Eighth Wonder (Barcrest) (MPU4) (WON 2.2)",GAME_FLAGS )
-// 00 90 84 b4 2c c0 34 a0 bc 78 70 28 e0 14 a8 4c c8 ec
-GAME(199?, m4eightha, m4eighth,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Bwb","Eighth Wonder (Barcrest) (MPU4) (BEW 0.3, set 1)",GAME_FLAGS )
-GAME(199?, m4eighthb, m4eighth,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Bwb","Eighth Wonder (Barcrest) (MPU4) (BEW 0.3, set 2)",GAME_FLAGS )
-GAME(199?, m4eighthc, m4eighth,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Bwb","Eighth Wonder (Barcrest) (MPU4) (BEW 0.3, set 3)",GAME_FLAGS )
-GAME(199?, m4eighthd, m4eighth,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Bwb","Eighth Wonder (Barcrest) (MPU4) (BEW 0.3, set 4, bad?)",GAME_FLAGS )
-GAME(199?, m4eighthe, m4eighth,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Bwb","Eighth Wonder (Barcrest) (MPU4) (BEW 0.3, set 5)",GAME_FLAGS )
-GAME(199?, m4eighthf, m4eighth,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Bwb","Eighth Wonder (Barcrest) (MPU4) (BEW 0.3, set 6)",GAME_FLAGS )
-GAME(199?, m4eighthg, m4eighth,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Bwb","Eighth Wonder (Barcrest) (MPU4) (BEW 0.3, set 7)",GAME_FLAGS )
+// 00 90 84 b4 2c c0 34 a0 bc 78 70 28 e0 14 a8 4c c8 ec (eighth)
+GAME(199?, m4eightha, m4eighth,   mod2_cheatchr_eighth, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Bwb","Eighth Wonder (Barcrest) (MPU4) (BEW 0.3, set 1)",GAME_FLAGS )
+GAME(199?, m4eighthb, m4eighth,   mod2_cheatchr_eighth, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Bwb","Eighth Wonder (Barcrest) (MPU4) (BEW 0.3, set 2)",GAME_FLAGS )
+GAME(199?, m4eighthc, m4eighth,   mod2_cheatchr_eighth, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Bwb","Eighth Wonder (Barcrest) (MPU4) (BEW 0.3, set 3)",GAME_FLAGS )
+GAME(199?, m4eighthd, m4eighth,   mod2_cheatchr_eighth, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Bwb","Eighth Wonder (Barcrest) (MPU4) (BEW 0.3, set 4, bad?)",GAME_FLAGS )
+GAME(199?, m4eighthe, m4eighth,   mod2_cheatchr_eighth, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Bwb","Eighth Wonder (Barcrest) (MPU4) (BEW 0.3, set 5)",GAME_FLAGS )
+GAME(199?, m4eighthf, m4eighth,   mod2_cheatchr_eighth, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Bwb","Eighth Wonder (Barcrest) (MPU4) (BEW 0.3, set 6)",GAME_FLAGS )
+GAME(199?, m4eighthg, m4eighth,   mod2_cheatchr_eighth, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Bwb","Eighth Wonder (Barcrest) (MPU4) (BEW 0.3, set 7)",GAME_FLAGS )
 
 // 00 14 04 94 c8 68 a0 50 8c e8 e0 dc bc b0 4c a0 58 bc bc 38 (lv)
 GAME(199?, m4frtprs,  0,          mod2_cheatchr_lv, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Fruit Preserve (Barcrest) (MPU4) (F4P 1.1, set 1)",GAME_FLAGS )
@@ -1850,28 +1850,28 @@ GAME(199?, m4solsila, m4solsil,   mod2_cheatchr_luckystrike, mpu4,            mp
 GAME(199?, m4starbr,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Stars And Bars (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
 
 // 00 90 84 b4 2c c0 34 a0 bc 78 70 28 e0 14 a8 4c c8 ec
-GAME(199?, m4sunset,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BSB 0.4)",GAME_FLAGS )
-GAME(199?, m4sb5,     m4sunset,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BSB 0.3)",GAME_FLAGS )
+GAME(199?, m4sunset,  0,          mod2_cheatchr_eighth, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BSB 0.4)",GAME_FLAGS )
+GAME(199?, m4sb5,     m4sunset,   mod2_cheatchr_eighth, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BSB 0.3)",GAME_FLAGS )
 // 00 60 60 c0 58 44 e0 50 a8 9c cc bc e4 50 a0 58 ec bc (sunsetb)
 GAME(199?, m4sunsetd, m4sunset,   mod2_cheatchr_sunsetb, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SBU 2.0)",GAME_FLAGS )
-// 00 44 44 54 1c 60 50 14 1c 78 70 18 7c 70 04 58 7c 7c
-GAME(199?, m4sunsete, m4sunset,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.1)",GAME_FLAGS )
-GAME(199?, m4sunsetf, m4sunset,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.0, set 1)",GAME_FLAGS )
-GAME(199?, m4sunsetg, m4sunset,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.0, set 2)",GAME_FLAGS )
-GAME(199?, m4sunseth, m4sunset,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.0, set 3, bad)",GAME_FLAGS )
-GAME(199?, m4sunseti, m4sunset,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.0, set 4)",GAME_FLAGS )
-GAME(199?, m4sunsetj, m4sunset,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.0, set 5)",GAME_FLAGS )
+// 00 44 44 54 1c 60 50 14 1c 78 70 18 7c 70 04 58 7c 7c (sunsetbalt)
+GAME(199?, m4sunsete, m4sunset,   mod2_cheatchr_sunsetbalt, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.1)",GAME_FLAGS )
+GAME(199?, m4sunsetf, m4sunset,   mod2_cheatchr_sunsetbalt, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.0, set 1)",GAME_FLAGS )
+GAME(199?, m4sunsetg, m4sunset,   mod2_cheatchr_sunsetbalt, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.0, set 2)",GAME_FLAGS )
+GAME(199?, m4sunseth, m4sunset,   mod2_cheatchr_sunsetbalt, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.0, set 3, bad)",GAME_FLAGS )
+GAME(199?, m4sunseti, m4sunset,   mod2_cheatchr_sunsetbalt, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.0, set 4)",GAME_FLAGS )
+GAME(199?, m4sunsetj, m4sunset,   mod2_cheatchr_sunsetbalt, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (BS__ 1.0, set 5)",GAME_FLAGS )
 // 00 e0 ac 1c 90 2c 14 40 e4 ec 18 f4 68 10 40 c4
-GAME(199?, m4sunsetk, m4sunset,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.1)",GAME_FLAGS )
-GAME(199?, m4sunsetl, m4sunset,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 1)",GAME_FLAGS )
-GAME(199?, m4sunsetm, m4sunset,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 2)",GAME_FLAGS )
-GAME(199?, m4sunsetn, m4sunset,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 3)",GAME_FLAGS )
-GAME(199?, m4sunseto, m4sunset,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 4)",GAME_FLAGS )
-GAME(199?, m4sunsetp, m4sunset,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 5)",GAME_FLAGS )
-GAME(199?, m4sunsetq, m4sunset,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 6)",GAME_FLAGS )
-GAME(199?, m4sunsetr, m4sunset,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 7)",GAME_FLAGS )
-GAME(199?, m4sunsets, m4sunset,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 8)",GAME_FLAGS )
-GAME(199?, m4sunsett, m4sunset,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 9)",GAME_FLAGS )
+GAME(199?, m4sunsetk, m4sunset,   mod2_cheatchr_toptake, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.1)",GAME_FLAGS )
+GAME(199?, m4sunsetl, m4sunset,   mod2_cheatchr_toptake, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 1)",GAME_FLAGS )
+GAME(199?, m4sunsetm, m4sunset,   mod2_cheatchr_toptake, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 2)",GAME_FLAGS )
+GAME(199?, m4sunsetn, m4sunset,   mod2_cheatchr_toptake, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 3)",GAME_FLAGS )
+GAME(199?, m4sunseto, m4sunset,   mod2_cheatchr_toptake, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 4)",GAME_FLAGS )
+GAME(199?, m4sunsetp, m4sunset,   mod2_cheatchr_toptake, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 5)",GAME_FLAGS )
+GAME(199?, m4sunsetq, m4sunset,   mod2_cheatchr_toptake, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 6)",GAME_FLAGS )
+GAME(199?, m4sunsetr, m4sunset,   mod2_cheatchr_toptake, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 7)",GAME_FLAGS )
+GAME(199?, m4sunsets, m4sunset,   mod2_cheatchr_toptake, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 8)",GAME_FLAGS )
+GAME(199?, m4sunsett, m4sunset,   mod2_cheatchr_toptake, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (SB__ 1.0, set 9)",GAME_FLAGS )
 
 // 00 90 c0 54 8c 68 24 90 cc 6c 24 9c bc 34 88 6c (rr6)
 GAME(199?, m4supslt,  0,          mod2_cheatchr_rr6, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Supa Slot (Barcrest) (MPU4)",GAME_FLAGS )
@@ -1894,14 +1894,14 @@ GAME(199?, m4topacta, m4topact,   mod2_cheatchr_m441, mpu4,            mpu4mod2_
 // 00 24 24 a4 4c 10 88 50 a8 d8 9c 9c bc 94 e8 50 a8 (du91)
 GAME(199?, m4topst,   0,          mod2_cheatchr_du91, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Top Stop (Barcrest) (MPU4)",GAME_FLAGS )
 
-// 00 e0 ac 1c 90 2c 14 40 e4 ec 18 f4 00 00
-GAME(199?, m4toptak,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Top Take (Barcrest) (MPU4)",GAME_FLAGS )
+// 00 e0 ac 1c 90 2c 14 40 e4 ec 18 f4 00 00 (toptake)
+GAME(199?, m4toptak,  0,          mod2_cheatchr_toptake, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Top Take (Barcrest) (MPU4)",GAME_FLAGS )
 
-// 00 60 60 24 68 c0 34 44 6c 8c 9c ac d4 18 ec 90 1c
-GAME(199?, m4tribnk,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Triple Bank (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
+// 00 60 60 24 68 c0 34 44 6c 8c 9c ac d4 18 ec 90 1c (tribank)
+GAME(199?, m4tribnk,  0,          mod2_cheatchr_tribank, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Triple Bank (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
 
 // unprotected
-GAME(199?, m4tupen,   0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "bootleg","Tuppenny Cracker (bootleg) (MPU4)",GAME_FLAGS ) // bootleg of Barcrest game
+GAME(199?, m4tupen,   0,          mod2, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "bootleg","Tuppenny Cracker (bootleg) (MPU4)",GAME_FLAGS ) // bootleg of Barcrest game
 
 // 00 c0 e0 b0 38 c4 f0 30 58 9c 9c 9c dc 9c dc 94 38 (tentendia)
 GAME(199?, m421,      0,          mod2_cheatchr_tentendia, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Twenty One (Barcrest) (MPU4)",GAME_FLAGS ) // reel issues
@@ -2117,8 +2117,8 @@ GAME(199?, m4frtlnk,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machi
 GAME(199?, m4frtlnka, m4frtlnk,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Fruit Link Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
 
 // REEL D ALARM
-// 00 e0 ac 1c 90 2c 14 40 e4 ec 18 f4 00 00 00 (strange sequence, lots of 00s)
-GAME(199?, m4thehit,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","The Hit (Barcrest) (MPU4)",GAME_FLAGS )
+// 00 e0 ac 1c 90 2c 14 40 e4 ec 18 f4 00 00 00 (toptake) (strange sequence, lots of 00s)
+GAME(199?, m4thehit,  0,          mod2_cheatchr_toptake, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","The Hit (Barcrest) (MPU4)",GAME_FLAGS )
 
 // REEL A ALARM
 // 00 84 c4 e4 4c 10 28 90 e8 78 34 28 b0 40 a4 4c (vivlv)
