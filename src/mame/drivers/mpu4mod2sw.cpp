@@ -1889,8 +1889,8 @@ GAME(199?, m4suptwo,  0,          mod2_cheatchr_actionbank, mpu4,            mpu
 // 00 18 70 44 58 30 44 18 7c 74 00 5c 7c 34 48 24 58 (tictak)
 GAME(199?, m4tiktak,  0,          mod2_cheatchr_tictak, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Tic Tak Cash (Barcrest) (MPU4)",GAME_FLAGS )
 
-// 00 a0 b0 58 ec 3c ec 14 68 4c 4c 6c 64 80 f8 84 98
-GAME(199?, m4topact,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Top Action (Barcrest) (Dutch) (MPU4) (set 1)",GAME_FLAGS )
+// 00 a0 b0 58 ec 3c ec 14 68 4c 4c 6c 64 80 f8 84 98 (topaction)
+GAME(199?, m4topact,  0,          mod2_cheatchr_topaction, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Top Action (Barcrest) (Dutch) (MPU4) (set 1)",GAME_FLAGS )
 // 00 30 20 14 2c a0 54 24 3c 9c 9c 9c bc 94 6c 80 58 (m441)
 GAME(199?, m4topacta, m4topact,   mod2_cheatchr_m441, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Top Action (Barcrest) (Dutch) (MPU4) (set 2)",GAME_FLAGS )
 

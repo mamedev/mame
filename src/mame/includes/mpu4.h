@@ -222,6 +222,7 @@ public:
 	void mod2_cheatchr_cosmiccasino(machine_config &config);
 	void mod2_cheatchr_kingqn(machine_config &config);
 	void mod2_cheatchr_sunsetclub(machine_config &config);
+	void mod2_cheatchr_topaction(machine_config &config);
 
 	void mod2_alt(machine_config &config);
 	void mod2_alt_cheatchr(machine_config &config);
@@ -303,6 +304,14 @@ public:
 	void mod4oki_cheatchr_sunsetclub(machine_config &config);
 	void mod4oki_cheatchr_mag7s(machine_config &config);
 	void mod4oki_cheatchr_oad(machine_config &config);
+	void mod4oki_cheatchr_topaction(machine_config &config);
+	void mod4oki_cheatchr_doublediamond(machine_config &config);
+	void mod4oki_cheatchr_ttt(machine_config &config);
+	void mod4oki_cheatchr_rhs(machine_config &config);
+	void mod4oki_cheatchr_cashencounters(machine_config &config);
+	void mod4oki_cheatchr_bankrollerclub(machine_config &config);
+	void mod4oki_cheatchr_copycat(machine_config &config);
+	void mod4oki_cheatchr_thestreak(machine_config &config);
 
 	void mod4yam(machine_config &config);
 	void mod4yam_cheatchr(machine_config &config);

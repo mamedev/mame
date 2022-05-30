@@ -4870,9 +4870,9 @@ GAME_CUSTOM( 199?, m4lucklv__ae,   m4lucklv,   "lluy.p1",  0x0000, 0x010000, CRC
 		ROM_LOAD( name, offset, length, hash ) \
 		M4LVLCL_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_cashencounters, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
-// need chr sequence starting 00 44 44 c4 68 14 8c 30 8c b8 d0 a8  (Same as Cash Encounters)
+// need chr sequence starting 00 44 44 c4 68 14 8c 30 8c b8 d0 a8 (cashencounters)
 // "(C)1998    BWB" and "LLU 0.1"
 GAME_CUSTOM( 199?, m4lvlcl,     0,          "ll__x__x.1_1", 0x0000, 0x010000, CRC(1ef1c5b4) SHA1(455c147f158f8a36a9add9b984abc22af78258cf), "Bwb","Lucky Las Vegas Classic (Barcrest) (MPU4) (LLU 0.1)" )
 GAME_CUSTOM( 199?, m4lvlcl__e,  m4lvlcl,    "ll__xgdx.1_1", 0x0000, 0x010000, CRC(65824c4f) SHA1(a514e48ac0f9d4a8d7506bf6932aeee88ca17104), "Bwb","Lucky Las Vegas Classic (Barcrest) (MPU4) (LLU 0.1 AD)" )
@@ -6547,7 +6547,7 @@ GAME_CUSTOM( 199?, m4lucksc__l,    m4lucksc,   "lsc_.1_1",     0x0000, 0x020000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TOPDOG_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_copycat, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // want chr sequence starting 00 60 60 44 68 a0 54 24 6c 8c 9c cc bc c4 74 00 68 ac (same as Copy Cat?)
 // "(C)1997  B.W.B." and "TD  7.1" (Td4 in the 7-segs)
@@ -6726,9 +6726,6 @@ GAME_CUSTOM( 199?, m4kingqc__5,    m4kingqc,   "cn_30btc.1_1", 0x0000, 0x010000,
 *
 *****************************************************************************************************************************************************************************/
 
-//  ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-//  ROM_LOAD( "ctp13s.chr", 0x0000, 0x000048, CRC(6b8772a9) SHA1(8b92686e675b00d2c2541dd7b8055c3145283bec) )
-
 // Reel A Error
 
 #define M4TYPCL_EXTRA_ROMS \
@@ -6842,11 +6839,11 @@ GAME_CUSTOM( 199?, m4andybt__c,    m4andybt,   "abt1.5",       0x0000, 0x020000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4THESTR_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_thestreak, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // versioning here makes no sense, why do the higher revision numbers have earlier years?
 
-// wants chr sequence starting 00 30 10 0c 58 60 24 30 1c 6c 44 3c 74 00
+// wants chr sequence starting 00 30 10 0c 58 60 24 30 1c 6c 44 3c 74 00 (thestreak)
 // "(C)1996  B.W.B." and "TS  3.0"
 GAME_CUSTOM( 199?, m4thestr,       0,          "ts_20a_4.3_1", 0x0000, 0x010000, CRC(921b8cc3) SHA1(74143888de21aba4374d016cb4c08ae59dfa59ef), "Bwb","The Streak (Barcrest) (MPU4) (TS  3.0 K)" )
 GAME_CUSTOM( 199?, m4thestr__a,    m4thestr,   "ts_20_b4.3_1", 0x0000, 0x010000, CRC(17726c7c) SHA1(193b572b9f859f1018f1be398b35a5103622faf8), "Bwb","The Streak (Barcrest) (MPU4) (TS  3.0 YD)" )
@@ -6899,9 +6896,9 @@ GAME_CUSTOM( 199?, m4thestr__y,    m4thestr,   "ts_39b_c.1_1", 0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4CPYCAT_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_copycat, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
-// wants chr sequence starting 00 60 60 44 68 a0 54 24 6c 8c 9c cc bc c4 74 00
+// wants chr sequence starting 00 60 60 44 68 a0 54 24 6c 8c 9c cc bc c4 74 00 (copycat)
 // "(C)1997  B.W.B." and "CO  1.1"
 GAME_CUSTOM( 199?, m4cpycat,       0,          "co_20_bc.1_1", 0x0000, 0x010000, CRC(c9d3cdc1) SHA1(28265b0f95a8829efc4e346269a7af17a6abe345), "Bwb","Copy Cat (Barcrest) (MPU4) (CO  1.1 YD)" )
 GAME_CUSTOM( 199?, m4cpycat__a,    m4cpycat,   "co_20_dc.1_1", 0x0000, 0x010000, CRC(c6552f9a) SHA1(ae7ad183d2cd89bc9748dcbb3ea26832bed30009), "Bwb","Copy Cat (Barcrest) (MPU4) (CO  1.1 D)" )
@@ -6966,9 +6963,9 @@ GAME_CUSTOM( 199?, m4cpycat__3,    m4cpycat,   "co_30_kp.4_1", 0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BNKROL_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_bankrollerclub, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
 
-// wants chr sequence starting 00 8c 64 84 84 c4 84 84 9c f4 04 cc 24 84 c4 94 54  (same as v4adders?)
+// wants chr sequence starting 00 8c 64 84 84 c4 84 84 9c f4 04 cc 24 84 c4 94 54 (bankrollerclub) (same as v4adders?)
 // "(C)1996 BARCREST" and "CBR 0.5"
 GAME_CUSTOM( 199?, m4bnkrol,       0,          "cbr05s.p1", 0x0000, 0x020000, CRC(a8b53a0d) SHA1(661ab61aa8f427b92fdee02539f19e5dd2243da7), "Barcrest","Bank Roller Club (Barcrest) (MPU4) (CBR 0.5)" )
 GAME_CUSTOM( 199?, m4bnkrol__d,    m4bnkrol,   "cbr05d.p1", 0x0000, 0x020000, CRC(44cefec0) SHA1(7034c5acd44ccd3cd985ba4945c004c070a599a4), "Barcrest","Bank Roller Club (Barcrest) (MPU4) (CBR 0.5 D)" )
@@ -6987,9 +6984,6 @@ GAME_CUSTOM( 199?, m4bnkrol__b,    m4bnkrol,   "br301f.p1", 0x0000, 0x020000, CR
 *****************************************************************************************************************************************************************************/
 
 // boots
-
-//ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-//ROM_LOAD( "m462.chr", 0x0000, 0x000048, CRC(ab59f1aa) SHA1(04a7deac039bc9bc15ec07b8a4ba3bce6f4d5103) )
 
 #define M4RHRCL_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
@@ -7021,10 +7015,6 @@ GAME_CUSTOM( 199?, m4rhrcl__c,  m4rhrcl,    "rhrc.hex", 0x0000, 0x010000, CRC(e4
 
 // REEL A ALM
 
-//  ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-//  ROM_LOAD( "rhc.chr", 0x0000, 0x000048, CRC(6ceab6b0) SHA1(04f4238ea3fcf944c97bc11031e456b851ebe917) )
-
-
 #define M4RHOGC_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "rhc.s1", 0x000000, 0x080000, CRC(8840737f) SHA1(eb4a4bedfdba1b33fa74b9c2000c0d09a4cca5d7) ) \
@@ -7052,10 +7042,6 @@ GAME_CUSTOM( 199?, m4rhogc__b,  m4rhogc,    "rhcd.p1", 0x0000, 0x010000, CRC(7a7
 *****************************************************************************************************************************************************************************/
 
 // boots
-
-//  ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-//  ROM_LOAD( "006s.chr", 0x0000, 0x000048, CRC(ee3d06eb) SHA1(570a715e71d4184e4df02b7e5b68fee70e03aeb0) )
-
 
 #define M4GB006_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
@@ -7097,9 +7083,9 @@ GAME_CUSTOM( 199?, m4gb006__c,  m4gb006,    "bond20_11",    0x0000, 0x010000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4CSHENC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_cashencounters, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
 
-// wants chr sequence starting 00 44 44 c4 68 14 8c 30 8c b8 d0 a8 b4 20 4c  (same as Lucky Las Vegas)
+// wants chr sequence starting 00 44 44 c4 68 14 8c 30 8c b8 d0 a8 b4 20 4c (cashencounters)
 // "(C)1997    BWB" and "CA_ 5.0"
 GAME_CUSTOM( 199?, m4cshenc,       0,          "ca_sj__c.5_1", 0x0000, 0x020000, CRC(d9131b39) SHA1(4af89a7bc10de1406f401bede41e1bc452dbb159), "Bwb","Cash Encounters (Barcrest) (MPU4) (CA_ 5.0 C)" )
 GAME_CUSTOM( 199?, m4cshenc__a,    m4cshenc,   "ca_sj_bc.5_1", 0x0000, 0x020000, CRC(30d1fb6d) SHA1(f845bef4ad7f2f48077eed74840916e87abb24b2), "Bwb","Cash Encounters (Barcrest) (MPU4) (CA_ 5.0 YCD)" )
@@ -7118,8 +7104,6 @@ GAME_CUSTOM( 199?, m4cshenc__d,    m4cshenc,   "ca_sjb_c.5_1", 0x0000, 0x020000,
 // boots
 
 #define M4RHS_EXTRA_ROMS \
-	ROM_REGION( 0x48, "characteriser:fakechr", 0 ) \
-	ROM_LOAD( "rh.chr", 0x0000, 0x000048, CRC(6e246d8f) SHA1(c6b0dff1b918c578b76f020ff70a24ea48dbae2e) ) \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
 	ROM_LOAD( "rh___snd.1_1", 0x000000, 0x080000, CRC(ceebd8f4) SHA1(fe9f62034aae7d2ec097d80dc471a7fd27ddec8a) ) \
 	ROM_LOAD( "rh___snd.1_2", 0x080000, 0x080000, CRC(1f24cfb6) SHA1(cf1dc9d2a1c1cfb8718c89e245e9bf375fef8bfd) ) \
@@ -7131,9 +7115,9 @@ GAME_CUSTOM( 199?, m4cshenc__d,    m4cshenc,   "ca_sjb_c.5_1", 0x0000, 0x020000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RHS_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_rhs, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
 
-// sequence 00 18 70 24 38 58 74 0c 6c 64
+// sequence 00 18 70 24 38 58 74 0c 6c 64 (rhs)
 // "(C)1998  B.W.B." and "RH__4.0"
 GAME_CUSTOM( 199?, m4rhs,     0,      "rh_sj___.4s1", 0x0000, 0x020000, CRC(be6179cd) SHA1(8aefffdffb25bc4dd7d083c7027be746181c2ff9), "Bwb","Rocky Horror Show (Barcrest) (MPU4) (RH__4.0)" )
 GAME_CUSTOM( 199?, m4rhs__b,  m4rhs,  "rh_sj_b_.4s1", 0x0000, 0x020000, CRC(58a4480e) SHA1(f4ecfa1debbfa9dba75263bce2c9f66741c3466f), "Bwb","Rocky Horror Show (Barcrest) (MPU4) (RH__4.0 YD)" )
@@ -7176,7 +7160,7 @@ GAME_CUSTOM( 199?, m4rhs__l,  m4rhs,  "rocky15t",     0x0000, 0x020000, CRC(3fba
 	ROM_END \
 	GAME(year, setname, parent, mod4oki_cheatchr_oad, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
 
-// sequence 00 44 44 54 d0 88 38 74 d0 58 (oad
+// sequence 00 44 44 54 d0 88 38 74 d0 58 (oad)
 // "(C)1999    BWB" and "DR_ 2.0"
 GAME_CUSTOM( 199?, m4oadrac,       0,          "dr__x__x.2_0", 0x0000, 0x020000, CRC(4ca65bd9) SHA1(deb0a7d3596647210061b69a10fc6cdfc066538e), "Bwb","Ooh Aah Dracula (Barcrest) (MPU4) (DR_ 2.0, set 1)" )
 GAME_CUSTOM( 199?, m4oadrac__b,    m4oadrac,   "dr__x_dx.2_0", 0x0000, 0x020000, CRC(47f3ac5a) SHA1(e0413c55b897e96e32c3332dac041bc94da6dea3), "Bwb","Ooh Aah Dracula (Barcrest) (MPU4) (DR_ 2.0 D)" )
@@ -7209,9 +7193,9 @@ GAME_CUSTOM( 199?, m4oadrac__g,    m4oadrac,   "dr__xb_x.2_1", 0x0000, 0x020000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TIC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_ttt, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
-// needs chr sequence starting 00 90 a0 70 c8 2c c4 30 c8 6c 44 d8 dc 5c
+// needs chr sequence starting 00 90 a0 70 c8 2c c4 30 c8 6c 44 d8 dc 5c (ttt)
 // "(C)1995  B.W.B." and "TT_ 2.0"
 GAME_CUSTOM( 199?, m4tic,     0,      "tt_20s__.2_1", 0x0000, 0x010000, CRC(53dfefe9) SHA1(0f9fc1d65ebd7e370de6001f594616b79b2aa57e), "Bwb","Tic Tac Toe (Barcrest) (MPU4) (TT_ 2.0)" )
 GAME_CUSTOM( 199?, m4tic__h,  m4tic,  "tt_20a__.2_1", 0x0000, 0x010000, CRC(b923ac0d) SHA1(1237962af43c2c3f4ed0ad5bed21f24decfeae02), "Bwb","Tic Tac Toe (Barcrest) (MPU4) (TT_ 2.0 K)" )
@@ -7237,7 +7221,7 @@ GAME_CUSTOM( 199?, m4tic__i,  m4tic,  "tt_20s_c.1_1", 0x0000, 0x010000, CRC(65a3
 	ROM_END \
 	GAME(year, setname, parent, mod4oki_cheatchr_m470, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
-// needs chr sequence starting 00 90 c0 54 a4 f0 64 90 e4 d4 60
+// needs chr sequence starting 00 90 c0 54 a4 f0 64 90 e4 d4 60 (m470)
 // "(C)1995  B.W.B." and "TT_ 3.0"
 GAME_CUSTOM( 199?, m4tic__l,  m4tic,  "tt_25a_c.3_1", 0x0000, 0x010000, CRC(2e44c6db) SHA1(ffc96dafbcfae719c3971882e066971540fafe78), "Bwb","Tic Tac Toe (Barcrest) (MPU4) (TT_ 3.0 K)" )
 GAME_CUSTOM( 199?, m4tic__m,  m4tic,  "tt_25b_c.3_1", 0x0000, 0x010000, CRC(d393edf0) SHA1(66f17a88018fee71f3e0c7996371c9b6832ef23a), "Bwb","Tic Tac Toe (Barcrest) (MPU4) (TT_ 3.0 B)" )
@@ -7265,10 +7249,10 @@ GAME_CUSTOM( 199?, m4tic__r,  m4tic,  "tt_25sbc.3_1", 0x0000, 0x010000, CRC(11c0
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TICCLA_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_topaction, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 
-// wants chr sequence starting 00 a0 b0 58 ec 3c ec 14 68 4c 4c
+// wants chr sequence starting 00 a0 b0 58 ec 3c ec 14 68 4c 4c (topaction)
 // "(C)1996  B.W.B." and "CT4 7.0"
 GAME_CUSTOM( 199?, m4ticcla,       0,          "ct_20_b4.7_1", 0x0000, 0x010000, CRC(48b9a162) SHA1(2d19a5d6379dc93a56c920b3cd61a0d1a8c6b303), "Bwb","Tic Tac Toe Classic (Barcrest) (MPU4) (CT4 7.0 YD)" )
 GAME_CUSTOM( 199?, m4ticcla__b,    m4ticcla,   "ct_20_d4.7_1", 0x0000, 0x010000, CRC(3c7c862c) SHA1(a3577f29950e845a14ca68750d2ab6c56a395dba), "Bwb","Tic Tac Toe Classic (Barcrest) (MPU4) (CT4 7.0 D)" )
@@ -7322,9 +7306,9 @@ GAME_CUSTOM( 199?, m4ticcla__0,    m4ticcla,   "ct_30btc.2_1", 0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TICGLC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_topaction, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
-// wants chr sequence starting 00 a0 b0 58 ec 3c ec 14 68 4c 4c 6c  (same as 'Tic Tac Toe Classic' above)
+// wants chr sequence starting 00 a0 b0 58 ec 3c ec 14 68 4c 4c 6c (topaction)  (same as 'Tic Tac Toe Classic' above)
 // "(C)1998  B.W.B." and "TG  3.3"
 GAME_CUSTOM( 199?, m4ticglc,       0,          "tg_25a_c.3_1", 0x0000, 0x010000, CRC(44b2b6b0) SHA1(c2caadd68659bd474df534101e3bc13b15a43694), "Bwb","Tic Tac Toe Gold (Barcrest) (MPU4) (TG  3.3 K)" )
 // "(C)1998  B.W.B." and "TG  4.4"
@@ -7447,7 +7431,7 @@ GAME_CUSTOM( 199?, m4calama__b,    m4calama,   "ca301f.p1",    0x0000, 0x020000,
 	ROM_END \
 	GAME(year, setname, parent, mod4oki_cheatchr_andybt, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
 
-// chr sequence starting 00 84 94 5c ec 3c ec 30 4c 68 60
+// chr sequence starting 00 84 94 5c ec 3c ec 30 4c 68 60 (andybt)
 // "(C)1996 BARCREST" and "BC3 0.2"
 GAME_CUSTOM( 199?, m4calama__g,    m4calama,   "bc302s.p1",    0x0000, 0x020000, CRC(b349bd2d) SHA1(9b026bece40584c4f53c30f3dacc91942c871a9f), "Barcrest","Calamari Club (Barcrest) (MPU4) (BC3 0.2)" )
 GAME_CUSTOM( 199?, m4calama__f,    m4calama,   "bc302f.p1",    0x0000, 0x020000, CRC(4b356aca) SHA1(81ce1585f529f1717ec56ace0a4902ae901593ae), "Barcrest","Calamari Club (Barcrest) (MPU4) (BC3 0.2 F)" )
@@ -7531,9 +7515,9 @@ GAME_CUSTOM( 199?, m4coscas__a,    m4coscas,   "cosm15g",              0x0000, 0
 		ROM_LOAD( name, offset, length, hash ) \
 		M4DBLDM_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_doublediamond, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
 
-// needs chr sequence starting 00 18 c8 a4 0c 80 0c 90 34 30 00 58
+// needs chr sequence starting 00 18 c8 a4 0c 80 0c 90 34 30 00 58 (doublediamond)
 // "(C)1996 BARCREST" and "CDD 0.5"
 GAME_CUSTOM( 199?, m4dbldm,     0,          "cdd05s.p1",    0x0000, 0x020000, CRC(fc14771f) SHA1(f418af9fed331560195a694f20ef2fea27ed04b0), "Barcrest","Double Diamond Club (Barcrest) (MPU4) (CDD 0.5)" )
 GAME_CUSTOM( 199?, m4dbldm__a,  m4dbldm,    "cdd05d.p1",    0x0000, 0x020000, CRC(fc1c5e90) SHA1(c756d2ac725168af5396c8ef7550db9087a50937), "Barcrest","Double Diamond Club (Barcrest) (MPU4) (CDD 0.5 D)" )

@@ -3070,6 +3070,11 @@ void mpu4_state::mod2_cheatchr_sunsetclub(machine_config &config)
 	mod2_cheatchr_table(config, mpu4_characteriser_pal::sunsetclub_lamp_scramble);
 }
 
+void mpu4_state::mod2_cheatchr_topaction(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::topaction_lamp_scramble);
+}
+
 // alt reel setup
 
 void mpu4_state::mod2_alt(machine_config &config)
@@ -3555,6 +3560,47 @@ void mpu4_state::mod4oki_cheatchr_oad(machine_config &config)
 {
 	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::oad_lamp_scramble);
 }
+
+void mpu4_state::mod4oki_cheatchr_topaction(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::topaction_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_doublediamond(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::doublediamond_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_ttt(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::ttt_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_rhs(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::rhs_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_cashencounters(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::cashencounters_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_bankrollerclub(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::bankrollerclub_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_copycat(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::copycat_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_thestreak(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::thestreak_lamp_scramble);
+}
+
 
 // alt reel setup
 

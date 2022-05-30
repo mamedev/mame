@@ -186,6 +186,9 @@ public:
 	// games with sequence starting 00 44 44 54 d0 88 38 74 d0 58
 	static constexpr uint8_t oad_lamp_scramble[8] = { 0x00, 0x50, 0x44, 0x14, 0x14, 0x44, 0x44, 0x00 };
 
+	// games with sequence starting 00 18 70 24 38 58 74 0c 6c 64
+	static constexpr uint8_t rhs_lamp_scramble[8] = { 0x00, 0x3C, 0x18, 0x30, 0x10, 0x3C, 0x18, 0x10 };
+
 	/***************************************************************
 
 	 Lamp data below is incorrect
@@ -264,6 +267,27 @@ public:
 
 	// games with sequence starting 00 14 04 34 2c 44 34 24 3c 78 70 28 64
 	static constexpr uint8_t sunsetclub_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 a0 b0 58 ec 3c ec 14 68 4c 4c 6c 64 80 f8 84 98
+	static constexpr uint8_t topaction_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 18 c8 a4 0c 80 0c 90 34 30 00 58
+	static constexpr uint8_t doublediamond_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 90 a0 70 c8 2c c4 30 c8 6c 44 d8 dc 5c
+	static constexpr uint8_t ttt_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 44 44 c4 68 14 8c 30 8c b8 d0 a8
+	static constexpr uint8_t cashencounters_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 8c 64 84 84 c4 84 84 9c f4 04 cc 24 84 c4 94 54 (NOTE, same sequence as v4addlad, which uses 4k table)
+	static constexpr uint8_t bankrollerclub_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 60 60 44 68 a0 54 24 6c 8c 9c cc bc c4 74 00
+	static constexpr uint8_t copycat_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 30 10 0c 58 60 24 30 1c 6c 44 3c 74 00
+	static constexpr uint8_t thestreak_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 	/***************************************************************
 

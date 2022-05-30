@@ -8742,6 +8742,7 @@ GAME(  1996?,v4mated,    v4mate,   mating,     mating,   mpu4vid_state, init_mat
 /* Quiz games - Questions decoded */
 
 // the v4addlad / v4addladd sets don't do the usual protection check, but still have the device for scrambling questions
+// same sequence as bankrollerclub
 // 00 8c 64 84 84 c4 84 84 9c f4 04 cc 24 84 c4 94 54 0c 74 0c 34 04 84 84 c4 84 9c e4 84 84 84 d4 44 84 c4 84 9c e4 84 84 84 8c 60 84 84 84 84 c4 9c f4 04 cc 24 9c f4 04 94 14 44 8c 34 04 9c 00
 GAMEL(  1989, v4addlad,   v4bios,   mpu4_vid_strike,   adders,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Adders and Ladders (v2.1) (MPU4 Video)",GAME_FLAGS_OK,layout_v4addlad )
 GAMEL(  1989, v4addladd,  v4addlad, mpu4_vid_strike,   adders,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Adders and Ladders (v2.1d) (MPU4 Video)",GAME_FLAGS_OK,layout_v4addlad )

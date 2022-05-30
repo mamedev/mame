@@ -2255,10 +2255,10 @@ GAME(199?, m4jokmil,  0,          mod4oki_cheatchr_m683,    mpu4,    mpu4unsorte
 // 00 24 24 2c e0 b4 b8 4c e8 d8 cc f8 6c 48 (m683)
 GAME(199?, m4jok300,  0,          mod4oki_cheatchr_m683,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Jokers 300 (Barcrest) (German?) (MPU4)",GAME_FLAGS ) // also contains crystal maze stuff??
 
-// 00 8c 64 84 84 c4 84 84 9c f4 04 cc 24 84 c4 94 54 0c  (same as v4adders?)
-GAME(199?, m4drac,    0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Dracula (Barcrest - Nova) (German) (MPU4) (set 1)",GAME_FLAGS ) // DM1 SW ALM
-GAME(199?, m4draca,   m4drac,     mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Dracula (Barcrest - Nova) (German) (MPU4) (set 2)",GAME_FLAGS ) // DM1 SW ALM
-GAME(199?, m4dracb,   m4drac,     mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Dracula (Barcrest - Nova) (German) (MPU4) (set 3)",GAME_FLAGS ) // DM1 SW ALM
+// 00 8c 64 84 84 c4 84 84 9c f4 04 cc 24 84 c4 94 54 0c (bankrollerclub) (same as v4adders?)
+GAME(199?, m4drac,    0,          mod4oki_cheatchr_bankrollerclub,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Dracula (Barcrest - Nova) (German) (MPU4) (set 1)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4draca,   m4drac,     mod4oki_cheatchr_bankrollerclub,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Dracula (Barcrest - Nova) (German) (MPU4) (set 2)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4dracb,   m4drac,     mod4oki_cheatchr_bankrollerclub,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Dracula (Barcrest - Nova) (German) (MPU4) (set 3)",GAME_FLAGS ) // DM1 SW ALM
 
 
 // 00 84 94 3c ec 5c ec 50 2c 68 60 ac 74 00 ac 58 ec 7c (tri98)
