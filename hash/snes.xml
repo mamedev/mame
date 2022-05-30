@@ -34470,7 +34470,7 @@ List of unclassified roms
 				<rom name="accele brid (japan).sfc" size="2097152" crc="4a736c38" sha1="8c9b8623d51d646631c0e5bc592440db4cfd1eab" offset="0x000000" />
 			</dataarea>
 		</part>
-		</software>
+	</software>
 
 	<software name="acenerae">
 		<description>Ace o Nerae! (Jpn)</description>

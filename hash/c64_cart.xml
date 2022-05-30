@@ -1714,7 +1714,7 @@ license:CC0
 
 	<software name="alphazoo">
 		<description>Alphabet Zoo</description>
-			<year>1983</year>
+		<year>1983</year>
 		<publisher>Spinnaker Software</publisher>
 		<info name="serial" value="ABZ-C6" />
 		<part name="cart" interface="c64_cart">

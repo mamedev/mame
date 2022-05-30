@@ -1447,7 +1447,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-		<software name="heimdall">
+	<software name="heimdall">
 		<!-- Source: redump.org - http://redump.org/disc/21039/
 		<rom name="Heimdall (USA).cue" size="2294" crc="d9024819" md5="efe0f4d6da5b56c260bf6af3b1ccf174" sha1="66e858090085673dbfdea26d06dd354504b2296d"/>
 		<rom name="Heimdall (USA) (Track 01).bin" size="25888464" crc="38d5dd04" md5="9c9d9dae336002fc2f74c8424c7f3ee6" sha1="2f858db859baf28d8b38db72bcc0b84b04ab8fe3"/>
@@ -1561,7 +1561,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-		<software name="joemont">
+	<software name="joemont">
 		<!-- Source: redump.org - http://redump.org/disc/20227/
 		<rom name="Joe Montana's NFL Football (USA).cue" size="761" crc="981e4777" md5="2bc3110fe8d93c90d4b1d4b9e40e222e" sha1="d9d0a8b6315ffc543cf59b0449010f66d19b6be0"/>
 		<rom name="Joe Montana's NFL Football (USA) (Track 1).bin" size="181819008" crc="989d8600" md5="e363615aa4a7c10c8fae378f15563ee3" sha1="24ecd405cd234a1ded9f9a39230d63fbfb566132"/>

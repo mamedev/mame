@@ -2100,7 +2100,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-		<software name="dropzone">
+	<software name="dropzone">
 		<description>Dropzone</description>
 		<year>20??</year>
 		<publisher>Video 61</publisher>
@@ -2402,7 +2402,7 @@ Compiled by K1W1
 		<description>Final Orbit</description>
 		<year>1983</year>
 		<publisher>Sirius</publisher>
-			<info name="serial" value="3300?" />
+		<info name="serial" value="3300?" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
 			<dataarea name="rom" size="8192">
