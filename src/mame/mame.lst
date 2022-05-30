@@ -19153,6 +19153,8 @@ j_plus2                         // Plus 2 (CTL)
 j_goldn2                        // Golden 2's (CTL)
 j_sup2p                         // Super 2p Shuffle (MDM)
 j_la                            // Lucky Aces
+j_lc                            // Lucky Casino (JPM)
+j_lca                           //
 
 @source:jpmsys5.cpp
 cashcade                        // Cashcade (JPM)
