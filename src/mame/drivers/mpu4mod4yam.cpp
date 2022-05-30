@@ -19,7 +19,6 @@ public:
 	}
 
 	void init_m4addr();
-	void mod4yam_gambal(machine_config &config);
 };
 
 #include "gamball.lh"
@@ -401,16 +400,6 @@ INPUT_PORTS_START( m4gambal )
 INPUT_PORTS_END
 
 
-static uint8_t m4gambal_lamp_scramble[8] = { 0x00, 0x18, 0x08, 0x10, 0x00, 0x18, 0x08, 0x00 };
-
-void mpu4mod4yam_machines_state::mod4yam_gambal(machine_config &config)
-{
-	mod4yam(config);
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
-	m_characteriser->set_cpu_tag("maincpu");
-	m_characteriser->set_allow_6809_cheat(true);
-	m_characteriser->set_lamp_table(m4gambal_lamp_scramble);
-}
 
 
 #undef GAME_CUSTOM
@@ -419,9 +408,9 @@ void mpu4mod4yam_machines_state::mod4yam_gambal(machine_config &config)
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAMEL( year, setname, parent, mod4yam_gambal, mpu4, mpu4mod4yam_machines_state, init_m4gambal, ROT0, company, title, MACHINE_REQUIRES_ARTWORK | MACHINE_MECHANICAL, layout_gamball )
+	GAMEL( year, setname, parent, mod4yam_cheatchr_gambal, mpu4, mpu4mod4yam_machines_state, init_m4gambal, ROT0, company, title, MACHINE_REQUIRES_ARTWORK | MACHINE_MECHANICAL, layout_gamball )
 
-// 00 0c 50 90 b0 38 d4 a0
+// 00 0c 50 90 b0 38 d4 a0 (gambal)
 GAME_CUSTOM( 199?, m4gambal,       0,          "gbbx.p1",  0x0000, 0x010000, CRC(0b5adcd0) SHA1(1a198bd4a1e7d6bf4cf025c43d35aaef351415fc), "Barcrest","Gamball (Barcrest) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4gambal__a,    m4gambal,   "gabcx.p1", 0x0000, 0x010000, CRC(52c35266) SHA1(bda49005de88094fbc84621f63b33f0e0a9c0bd3), "Barcrest","Gamball (Barcrest) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4gambal__b,    m4gambal,   "gabx.p1",  0x0000, 0x010000, CRC(74a8ed7e) SHA1(7363031c8a634ac13de957c62f32611963f797bd), "Barcrest","Gamball (Barcrest) (MPU4) (set 3)" )
@@ -505,9 +494,9 @@ GAME_CUSTOM( 1995, m4montezj,   m4monte,    "mxi10___.2_1", 0x0000, 0x010000, CR
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4yam_cheatchr_montealt, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
-// 00 14 04 94 e0 74 a4 50 a4 d4 60 b4
+// 00 14 04 94 e0 74 a4 50 a4 d4 60 b4 (montealt)
 GAME_CUSTOM( 1996, m4montezc,   m4monte,    "mx_20__c.1_1", 0x0000, 0x010000, CRC(a753798d) SHA1(ae1f5f14a37dead66f6b2d075a5bfc019d59f806), "Bwb","Monte Carlo (MC  2.0 C) (Bwb) (MPU4)" )
 GAME_CUSTOM( 1996, m4montezd,   m4monte,    "mx_20a_c.1_1", 0x0000, 0x010000, CRC(9ec6f5fb) SHA1(ee181a64557053349cc8bff86bba937b191cab01), "Bwb","Monte Carlo (MC  2.0 K) (Bwb) (MPU4)" )
 GAME_CUSTOM( 1996, m4monteze,   m4monte,    "mx_20dkc.1_1", 0x0000, 0x010000, CRC(d580f742) SHA1(3c1d6aba4068d60ab53eceecf65bc920f8b5604e), "Bwb","Monte Carlo (MC  2.0 YD) (Bwb) (MPU4)" )
@@ -552,7 +541,15 @@ GAME_CUSTOM( 199?, m4przmc__m,    m4przmc,   "mt_10s__.3o3", 0x0000, 0x010000, C
 GAME_CUSTOM( 199?, m4przmc__n,    m4przmc,   "mt_10sb_.3o3", 0x0000, 0x010000, CRC(06a33d34) SHA1(5fa1269a7cf42ef14e2a19143a07bf28b38ad920), "Bwb","Prize Monte Carlo (MC103.0 YD) (Barcrest) (MPU4)" )
 GAME_CUSTOM( 199?, m4przmc__o,    m4przmc,   "mt_10sd_.3o3", 0x0000, 0x010000, CRC(42629cb1) SHA1(12f695e1f70bf93100c1af8052dcee9131711510), "Bwb","Prize Monte Carlo (MC103.0 D) (Barcrest) (MPU4)" )
 
-// needs chr sequence starting 00 50 10 a0 68 14 b0 88 bc e4 48
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+	ROM_END \
+	GAME(year, setname, parent, mod4yam_cheatchr_przmontealt, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
+// needs chr sequence starting 00 50 10 a0 68 14 b0 88 bc e4 48 (przmontealt)
 // "(C)1995  B.W.B." and "MT054.0"
 GAME_CUSTOM( 199?, m4przmc__p,    m4przmc,   "mt_05a__.4o1", 0x0000, 0x010000, CRC(637fecee) SHA1(8c970bdf703177c71dde5c774c75929ac42b6eb0), "Bwb","Prize Monte Carlo (MT054.0 K) (Barcrest) (MPU4)" )
 GAME_CUSTOM( 199?, m4przmc__q,    m4przmc,   "mti05___.4o1", 0x0000, 0x010000, CRC(0e82c258) SHA1(c4aa7d32bcd9418e2919be8be8a2f9e60d46f316), "Bwb","Prize Monte Carlo (MT054.0 C) (Barcrest) (MPU4)" )
@@ -774,7 +771,7 @@ GAME_CUSTOM( 199?, m4ra__r,    m4ra,   "redx_20_.8",   0x0000, 0x010000, CRC(b5e
 
 // boot, need proper lamp descramble
 
-// 00 44 44 4c d0 30 18 cc f8 9c 9c 9c
+// 00 44 44 4c d0 30 18 cc f8 9c 9c 9c (saynomore)
 // (C)1991 BARCREST and SNM 2.0
 GAME_CUSTOM( 199?, m4sayno,     0,          "snms.p1",              0x0000, 0x010000, CRC(be1f2222) SHA1(7d8319796e1d45a3d0246bf13b6d818f20796db3), "Barcrest","Say No More (Barcrest) (MPU4) (SNM 2.0)" )
 GAME_CUSTOM( 199?, m4sayno__d,  m4sayno,    "snmx.p1",              0x0000, 0x010000, CRC(61a78035) SHA1(1d6c553c60fee0b80e06f8421b8a3806d1f3a587), "Barcrest","Say No More (Barcrest) (MPU4) (SNM 2.0 X)" )
@@ -824,9 +821,9 @@ GAME_CUSTOM( 199?, m4acechs__u,    m4acechs,   "aei20___.3_1", 0x0000, 0x010000,
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4yam_cheatchr_acechasealt, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
-// 00 50 40 14 c4 98 b4 0c e4 5c b4 8c ec
+// 00 50 40 14 c4 98 b4 0c e4 5c b4 8c ec (acechasealt)
 // (C)1994  B.W.B. and AE5 2.0
 GAME_CUSTOM( 199?, m4acechs,       0,          "ae_05a__.2_3", 0x0000, 0x010000, CRC(c9a03623) SHA1(8daf7e71057528c481915eb8506e03ce9cf372c8), "Bwb","Ace Chase (Bwb) (MPU4) (AE5 2.0, set 1)" )
 GAME_CUSTOM( 199?, m4acechs__b,    m4acechs,   "ae_05s__.2_3", 0x0000, 0x010000, CRC(eb64ab0a) SHA1(4d4c6908c8ca8b1d3c39c8973c8386da079cbd39), "Bwb","Ace Chase (Bwb) (MPU4) (AE5 2.0, set 2)" )
@@ -1046,7 +1043,7 @@ GAME_CUSTOM( 199?, m4fastfw__f,    m4fastfw,   "fastf206",     0x0000, 0x010000,
 // This ROM was included in the sets, but it appears to be a 68k family (not plain 68000) program ROM, and has a (c)1998 MAB Systems in it, it does not belong here
 //  ROM_LOAD( "vivalasvegas4.bin", 0x0000, 0x080000, CRC(76971425) SHA1(0974a9dce51cc3dd4e26cec11a948c9c8021fde4) )
 
-// 00 84 C4 E4 4C 10 28 90 E8 78 34
+// 00 84 C4 E4 4C 10 28 90 E8 78 34 (vivlv)
 
 //  ROM_REGION( 0x48, "characteriser:fakechr", 0 ) /* from viva last vegas 'six' set */
 //  ROM_LOAD( "vlvs.chr", 0x0000, 0x000048, CRC(31acf949) SHA1(d622ea1caee968b786f3183ca44355f9db190081) )
@@ -1183,7 +1180,7 @@ GAME_CUSTOM( 199?, m4shv__z,    m4shv,   "hvi05___.4n3",         0x0000, 0x01000
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4yam_cheatchr_hypvipalt, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 
 // expects chr sequence starting 00 14 04 54 64 14 64 14 64 54 20 74 04
@@ -1345,4 +1342,5 @@ GAME(199?, m4voodoo,  0,        mod4yam_cheatchr_m435, mpu4, mpu4mod4yam_machine
 // 00 c0 d0 38 ec 5c ec 14 68 2c 24 e8 74 00 e8 14 (turboplay)
 GAME(199?, m4graffd,  m4graff,  mod4yam_cheatchr_turboplay, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Grafitti (Barcrest) [Dutch] (MPU4)",GAME_FLAGS ) // ROL D SETUP ALM
 
+// no sequence
 GAME(199?, m4sstrek,  m4supst,  mod4yam,          mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "bootleg","Super Streak (bootleg) (MPU4) (SS2 1.0)",GAME_FLAGS) // unprotected, no characteriser PAL required

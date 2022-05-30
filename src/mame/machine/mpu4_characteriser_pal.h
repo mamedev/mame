@@ -192,6 +192,9 @@ public:
 	// games with sequence starting 10 94 1c f4 b8 74 b4 98 f4 9c f0 b8 d4 38 74 10 (unusual sequence)
 	static constexpr uint8_t rockmn_lamp_scramble[8] = { 0x10, 0x34, 0x14, 0x34, 0x30, 0x30, 0x14, 0x30 };
 
+	// games with sequence starting 00 0c 50 90 b0 38 d4 a0 bc d4 30 90 38 c4 ac 70
+	static constexpr uint8_t gambal_lamp_scramble[8] = { 0x00, 0x18, 0x08, 0x10, 0x00, 0x18, 0x08, 0x00 };
+
 
 	/***************************************************************
 
@@ -346,6 +349,18 @@ public:
 
 	// games with sequence starting 00 14 04 54 4c 20 50 44 5c 78 70 48 6c 60 14 48 2c
 	static constexpr uint8_t andycappalt_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 14 04 94 e0 74 a4 50 a4 d4 60 b4
+	static constexpr uint8_t montealt_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting  00 50 10 a0 68 14 b0 88 bc e4 48
+	static constexpr uint8_t przmontealt_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting  00 50 40 14 c4 98 b4 0c e4 5c b4 8c ec
+	static constexpr uint8_t acechasealt_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 14 04 54 64 14 64 14 64 54 20 74 04
+	static constexpr uint8_t hypvipalt_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 	/***************************************************************
 

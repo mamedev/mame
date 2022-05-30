@@ -3297,6 +3297,32 @@ void mpu4_state::mod4yam_cheatchr_saynomore(machine_config &config)
 	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::saynomore_lamp_scramble);
 }
 
+void mpu4_state::mod4yam_cheatchr_gambal(machine_config &config)
+{
+	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::gambal_lamp_scramble);
+}
+
+void mpu4_state::mod4yam_cheatchr_montealt(machine_config &config)
+{
+	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::montealt_lamp_scramble);
+}
+
+void mpu4_state::mod4yam_cheatchr_przmontealt(machine_config &config)
+{
+	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::przmontealt_lamp_scramble);
+}
+
+void mpu4_state::mod4yam_cheatchr_acechasealt(machine_config &config)
+{
+	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::acechasealt_lamp_scramble);
+}
+
+void mpu4_state::mod4yam_cheatchr_hypvipalt(machine_config &config)
+{
+	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::hypvipalt_lamp_scramble);
+}
+
+
 /***********************************************************************************************
 
   Configs for Mod4 with OKI

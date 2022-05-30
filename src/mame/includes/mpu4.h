@@ -361,6 +361,11 @@ public:
 	void mod4yam_cheatchr_turboplay(machine_config &config);
 	void mod4yam_cheatchr_duty(machine_config &config);
 	void mod4yam_cheatchr_saynomore(machine_config &config);
+	void mod4yam_cheatchr_gambal(machine_config &config);
+	void mod4yam_cheatchr_montealt(machine_config &config);
+	void mod4yam_cheatchr_przmontealt(machine_config &config);
+	void mod4yam_cheatchr_acechasealt(machine_config &config);
+	void mod4yam_cheatchr_hypvipalt(machine_config &config);
 	void mod4yam_chr(machine_config &config);
 
 	void mpu4_common(machine_config &config);
