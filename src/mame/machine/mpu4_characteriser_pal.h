@@ -155,7 +155,9 @@ public:
 	// games with sequence 00 60 68 bc d0 2c 94 20 e4 e8 bc f0 88 34 a0 c4 ec bc f4 
 	static constexpr uint8_t m400_lamp_scramble[8] = { 0x03, 0xE7, 0x43 ,0xC3, 0xC3 ,0xE3, 0x43, 0xC3 }; // does anything using this have lamp scramble or was this extracted with tests?
 
-	
+	// games with sequence 00 bc b8 fc bc dc fc fc fc f8 d8 b8 f8 d8 fc bc fc 98 fc f8 f8
+	static constexpr uint8_t intcep_lamp_scramble[8] = { 0x00, 0x1C, 0x38, 0x78, 0x7C, 0x78, 0x38, 0x7C };	
+
 
 	/***************************************************************
 
@@ -190,6 +192,12 @@ public:
 
 	// games with sequence starting 00 a0 88 38 94 2c 30 00 e4 c8 18 b4 4c 30
 	static constexpr uint8_t squids_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 a0 88 38 94 2c 30 00 e4 c8 18 b4 4c 30
+	static constexpr uint8_t graff_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
+	// games with sequence starting 00 50 40 14 64 50 24 50 64 54 20 74 40 30 60 10 64
+	static constexpr uint8_t buc_lamp_scramble[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 	/***************************************************************
 

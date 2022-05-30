@@ -2249,9 +2249,6 @@ GAME(199?, m4fortcb,  0,          mod4oki_alt_cheatchr,mpu4,    mpu4unsorted_sta
 GAME(199?, m4fortcba, m4fortcb,   mod4oki_alt_cheatchr,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS ) // INVALID ALARM
 GAME(199?, m4fortcbb, m4fortcb,   mod4oki_alt_cheatchr,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS ) // INVALID ALARM
 
-// GEEN TUBES (even in test mode)
-// 00 bc b8 fc bc dc fc fc fc f8 d8 b8 00 00 very odd protection squence (starst the same as bwb sun club, then changes?)
-GAME(199?, m4topdk,   0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Top Deck (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
 
 // non-english sets
 
@@ -2371,9 +2368,15 @@ GAME(199?, m4lazya,   m4lazy,     mod4oki_cheatchr_wta,    mpu4,    mpu4unsorted
 GAME(199?, m4lazyb,   m4lazy,     mod4oki_cheatchr_wta,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Bwb","Lazy Bones (Bwb) (MPU4) (set 3)",GAME_FLAGS )
 
 // runs if you set a stake, scrambled lamps
-// 00 bc b8 fc bc dc fc fc fc f8 d8 b8 f8 d8
-GAME(199?, m4sunclb,  0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Sun Club (Bwb) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4sunclba, m4sunclb,   mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Sun Club (Bwb) (MPU4) (set 2)",GAME_FLAGS )
+// 00 bc b8 fc bc dc fc fc fc f8 d8 b8 f8 d8 (intcep)
+GAME(199?, m4sunclb,  0,          mod2_cheatchr_intcep,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Sun Club (Bwb) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4sunclba, m4sunclb,   mod2_cheatchr_intcep,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Bwb","Sun Club (Bwb) (MPU4) (set 2)",GAME_FLAGS )
+
+// GEEN TUBES (even in test mode)
+// the challenge sequence for this characteriser protection check never sets bit 0x20
+// 00 bc b8 fc bc dc fc fc fc f8 d8 b8 f8 d8 fc bc fc (intcep)
+GAME(199?, m4topdk,   0,          mod2_cheatchr_intcep,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Top Deck (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
+
 
 // REEL A ALM
 // 00 14 04 34 2c 44 34 24 3c 78 70 28 64 10

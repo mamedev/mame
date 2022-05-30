@@ -2910,6 +2910,27 @@ void mpu4_state::mod2_cheatchr_squids(machine_config &config)
 	mod2_cheatchr_table(config, mpu4_characteriser_pal::squids_lamp_scramble);
 }
 
+void mpu4_state::mod2_cheatchr_intcep(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::intcep_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_graff(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::graff_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_clbveg(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::clbveg_lamp_scramble);
+}
+
+void mpu4_state::mod2_cheatchr_buc(machine_config &config)
+{
+	mod2_cheatchr_table(config, mpu4_characteriser_pal::buc_lamp_scramble);
+}
+
+
 // alt reel setup
 
 void mpu4_state::mod2_alt(machine_config &config)
@@ -3060,6 +3081,16 @@ void mpu4_state::mod4yam_cheatchr_viva(machine_config &config)
 void mpu4_state::mod4yam_cheatchr_squids(machine_config &config)
 {
 	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::squids_lamp_scramble);
+}
+
+void mpu4_state::mod4yam_cheatchr_graff(machine_config &config)
+{
+	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::graff_lamp_scramble);
+}
+
+void mpu4_state::mod4yam_cheatchr_clbveg(machine_config &config)
+{
+	mod4yam_cheatchr_table(config, mpu4_characteriser_pal::clbveg_lamp_scramble);
 }
 
 /***********************************************************************************************
@@ -3249,6 +3280,11 @@ void mpu4_state::mod4oki_cheatchr_fruitfall(machine_config &config)
 void mpu4_state::mod4oki_cheatchr_squids(machine_config &config)
 {
 	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::squids_lamp_scramble);
+}
+
+void mpu4_state::mod4oki_cheatchr_buc(machine_config &config)
+{
+	mod4oki_cheatchr_table(config, mpu4_characteriser_pal::buc_lamp_scramble);
 }
 
 // alt reel setup

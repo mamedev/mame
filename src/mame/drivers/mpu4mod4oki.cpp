@@ -5639,7 +5639,16 @@ GAME_CUSTOM( 199?, m4hotrod__m,    m4hotrod,   "hr_10___.1o1",             0x000
 GAME_CUSTOM( 199?, m4hotrod__n,    m4hotrod,   "hr_10_d_.1o1",             0x0000, 0x010000, CRC(329409c5) SHA1(e9ba0f36048f46a381c8a408b9c1e10acea0bde3), "Bwb","Hot Rod (Barcrest) (MPU4) (HR__1.0D, set 2)" )
 GAME_CUSTOM( 199?, m4hotrod__p,    m4hotrod,   "hri10___.1o1",             0x0000, 0x010000, CRC(a855f93c) SHA1(2b63aa7c632f14457c2ae0312cef7b22bbf1df22), "Bwb","Hot Rod (Barcrest) (MPU4) (HR__1.0C, set 2)" )
 
-// requires a chr sequence starting 00 50 40 14 64 50 24 50 64 54 20 74 40
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4HOTROD_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_cheatchr_buc, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
+// requires a chr sequence starting 00 50 40 14 64 50 24 50 64 54 20 74 40 (buc)
 // "(C)1995  B.W.B." and "HRC_1.0"
 GAME_CUSTOM( 199?, m4hotrod__a,    m4hotrod,   "hot rod 5p 4 p1,27512",    0x0000, 0x010000, CRC(b6212af8) SHA1(9453c4424244895b3ad15d5fba45fe8822e7ff2b), "Bwb","Hot Rod (Barcrest) (MPU4) (HRC_1.0C)" )
 
@@ -5713,7 +5722,7 @@ GAME_CUSTOM( 199?, m4buc__ar, m4buc,  "bus02y.p1",            0x000000, 0x020000
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BUC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_cheatchr_buc, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
 
 
 // needs chr sequence starting 00 50 40 14 64 50 24 50 64 54 20 74 40 30 60

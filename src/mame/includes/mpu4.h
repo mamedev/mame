@@ -190,6 +190,10 @@ public:
 	void mod2_cheatchr_m400(machine_config &config);
 	void mod2_cheatchr_rhm(machine_config &config);
 	void mod2_cheatchr_squids(machine_config &config);
+	void mod2_cheatchr_intcep(machine_config &config);
+	void mod2_cheatchr_graff(machine_config &config);
+	void mod2_cheatchr_clbveg(machine_config &config);
+	void mod2_cheatchr_buc(machine_config &config);
 
 	void mod2_alt(machine_config &config);
 	void mod2_alt_cheatchr(machine_config &config);
@@ -249,6 +253,7 @@ public:
 	void mod4oki_cheatchr_milclb(machine_config &config);
 	void mod4oki_cheatchr_fruitfall(machine_config &config);
 	void mod4oki_cheatchr_squids(machine_config &config);
+	void mod4oki_cheatchr_buc(machine_config &config);
 
 	void mod4yam(machine_config &config);
 	void mod4yam_cheatchr(machine_config &config);
@@ -265,6 +270,8 @@ public:
 	void mod4yam_cheatchr_tentendia(machine_config &config);
 	void mod4yam_cheatchr_celclb(machine_config &config);
 	void mod4yam_cheatchr_squids(machine_config &config);
+	void mod4yam_cheatchr_graff(machine_config &config);
+	void mod4yam_cheatchr_clbveg(machine_config &config);
 	void mod4yam_chr(machine_config &config);
 
 	void mpu4_common(machine_config &config);
