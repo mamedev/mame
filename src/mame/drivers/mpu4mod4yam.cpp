@@ -172,10 +172,40 @@ GAME_CUSTOM( 1994, m4addr4_a,    m4addr, "ad_10___.4a3",             0x0000, 0x0
 GAME_CUSTOM( 1994, m4addr4c_a,   m4addr, "adi10___.4a3",             0x0000, 0x010000, CRC(2d2aa3cc) SHA1(21a7690c3fb7d158f4b4e6da63663778246ac902), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 4.0 C, set 2)", GAME_FLAGS )
 GAME_CUSTOM( 1994, m4addr4c_b,   m4addr, "adi10___.4n3",             0x0000, 0x010000, CRC(af9aad00) SHA1(09729e73f27d9ac5d6ac7171191ed76aeaac3e3d), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 4.0 C, set 3)", GAME_FLAGS )
 
+// note, these bootlegs don't match the lamp layouts compared to the original sets, is that because the layouts were made
+// around incomplete descramble data?
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title,flags) \
+	ROM_START( setname ) \
+		ROM_REGION( 0x10000, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+	ROM_END \
+	GAMEL( year, setname, parent, mod4yam_bootleg_fixedret<0x43>, m4addr, mpu4mod4yam_machines_state, init_m4addr, ROT0, company, title, flags, layout_m4addr )
+
 // These have different protection
 // "(C)1991 BARCREST" and "A6L 0.1" (but hack?)
 GAME_CUSTOM( 199?, m4addrc__b,   m4addr, "add20_101",                0x0000, 0x010000, CRC(361b7173) SHA1(dea2b1b0f5910e2fd3f45d220554f0e712dedada), "hack","Classic Adders & Ladders (Barcrest) (MPU4) (A6L 0.1, hack, set 1)", GAME_FLAGS )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title,flags) \
+	ROM_START( setname ) \
+		ROM_REGION( 0x10000, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+	ROM_END \
+	GAMEL( year, setname, parent, mod4yam_bootleg_fixedret<0x63>, m4addr, mpu4mod4yam_machines_state, init_m4addr, ROT0, company, title, flags, layout_m4addr )
+
+// "(C)1991 BARCREST" and "A6L 0.1" (but hack?)
 GAME_CUSTOM( 199?, m4addrc__k,   m4addr, "addl_20_.8",               0x0000, 0x010000, CRC(43c98f46) SHA1(0ca4a093b38fc04639e3f4bb742a8923b90d2ed1), "hack","Classic Adders & Ladders (Barcrest) (MPU4) (A6L 0.1, hack, set 2)", GAME_FLAGS )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title,flags) \
+	ROM_START( setname ) \
+		ROM_REGION( 0x10000, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+	ROM_END \
+	GAMEL( year, setname, parent, mod4yam, m4addr, mpu4mod4yam_machines_state, init_m4addr, ROT0, company, title, flags, layout_m4addr )
+
 
 // These don't boot fully (different protection?)
 // "BIG DIPPER"  and ADD 1.0
@@ -191,12 +221,6 @@ GAME_CUSTOM( 199?, m4addrc__m,   m4addr, "alad58c",                  0x0000, 0x0
 GAME_CUSTOM( 199?, m4addrc__a,   m4addr, "add10_101",                0x0000, 0x010000, CRC(af8f8b4e) SHA1(712c33ed0f425dc10b79780b0cfce0ac5768e2d5), "hack","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 C, hack, set 6)", GAME_FLAGS )
 GAME_CUSTOM( 199?, m4addrc__i,   m4addr, "addl_10_.4",               0x0000, 0x010000, CRC(c2d11126) SHA1(0eafe9dc30013ed5817ac303a4eea5ea82d62715), "hack","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 C, hack, set 7)", GAME_FLAGS )
 GAME_CUSTOM( 199?, m4addrc__j,   m4addr, "addl_10_.8",               0x0000, 0x010000, CRC(9fc82c47) SHA1(0f56afc33f09fe22afc5ec74aeb496c32f9e623c), "hack","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 C, hack, set 8)", GAME_FLAGS )
-
-// These don't boot fully (different protection?)
-// no copyright string and "NNU 5.0" (possibly a different game / unofficial upgrade)
-GAME_CUSTOM( 199?, m4addrc__e,   m4addr, "classic adders + ladders_alt",     0x0000, 0x010000, CRC(ac948903) SHA1(e07023efd7722a661a2bbf93c0a168af70ad6c20), "hack","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (NNU 5.0, hack, set 1)", GAME_FLAGS )
-GAME_CUSTOM( 199?, m4addrc__f,   m4addr, "classic adders + ladders_alt2",    0x0000, 0x010000, CRC(843ed53d) SHA1(b1dff249df37800744e3fc9c32be20a62bd130a1), "hack","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (NNU 5.0, hack, set 2)", GAME_FLAGS )
-GAME_CUSTOM( 199?, m4addrc__n,   m4addr, "nik56c",                           0x0000, 0x010000, CRC(05fa11d1) SHA1(01d3d0c504489f1513a0c3aa26e910c9604f5366), "hack","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (NNU 5.0, hack, set 3)", GAME_FLAGS )
 
 
 /*****************************************************************************************************************************************************************************
@@ -776,9 +800,27 @@ GAME_CUSTOM( 199?, m4ra__r,    m4ra,   "redx_20_.8",   0x0000, 0x010000, CRC(b5e
 GAME_CUSTOM( 199?, m4sayno,     0,          "snms.p1",              0x0000, 0x010000, CRC(be1f2222) SHA1(7d8319796e1d45a3d0246bf13b6d818f20796db3), "Barcrest","Say No More (Barcrest) (MPU4) (SNM 2.0)" )
 GAME_CUSTOM( 199?, m4sayno__d,  m4sayno,    "snmx.p1",              0x0000, 0x010000, CRC(61a78035) SHA1(1d6c553c60fee0b80e06f8421b8a3806d1f3a587), "Barcrest","Say No More (Barcrest) (MPU4) (SNM 2.0 X)" )
 
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+	ROM_END \
+	GAME(year, setname, parent, mod4yam_bootleg_fixedret<0x08>, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
+
 // no copyright string and SNM 0.5, different protection, hack?
 GAME_CUSTOM( 199?, m4sayno__a,  m4sayno,    "snm 5p.bin",           0x0000, 0x010000, CRC(4fba5c0a) SHA1(85438c531d4122bc31f59127a577dc6d71a4ba9d), "hack?","Say No More (Barcrest) (MPU4) (SNM 0.5, hack, set 1)" )
 GAME_CUSTOM( 199?, m4sayno__b,  m4sayno,    "say no more 425b.bin", 0x0000, 0x010000, CRC(2cf27394) SHA1(fb7688b7d9d2e68f0c84a57b66dd02dbbc6accc7), "hack?","Say No More (Barcrest) (MPU4) (SNM 0.5, hack, set 2)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+	ROM_END \
+	GAME(year, setname, parent, mod4yam_bootleg_fixedret<0xb0>, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
 // no copyright string and SNM 0.4, different protection, hack?
 GAME_CUSTOM( 199?, m4sayno__c,  m4sayno,    "snm 6.bin",            0x0000, 0x010000, CRC(0d14730b) SHA1(2a35d72bdcc9402b00153621ec852f902720c104), "hack?","Say No More (Barcrest) (MPU4) (SNM 0.4, hack)" )
 
@@ -1004,6 +1046,14 @@ GAME_CUSTOM( 199?, m4supst__bf, m4supst,    "stc02r.p1",            0x0000, 0x01
 GAME_CUSTOM( 199?, m4supst__bg, m4supst,    "stc02s.p1",            0x0000, 0x010000, CRC(9c50fff7) SHA1(3468340d2d04cbdecd669817f8a9c4028e301eeb), "Barcrest","Super Streak (Barcrest) (MPU4) (CS4 0.2 / STC 0.2, set 11)" )
 GAME_CUSTOM( 199?, m4supst__bh, m4supst,    "stc02y.p1",            0x0000, 0x010000, CRC(0ce65e71) SHA1(02ae1fd5a41ab5a96ddcfe1cf3e8567561291961), "Barcrest","Super Streak (Barcrest) (MPU4) (CS4 0.2 / STC 0.2, set 12)" )
 
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+	ROM_END \
+	GAME(year, setname, parent, mod4yam, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
 // different protection style
 GAME_CUSTOM( 199?, m4supst__b5, m4supst,    "supst2515",            0x0000, 0x010000, CRC(c073a249) SHA1(4ae37eb61dd5e50687f433fb89f65b97926b7358), "hack","Super Streak (Barcrest) (MPU4) (STT 0.3, hack)" )
 
@@ -1029,6 +1079,15 @@ GAME_CUSTOM( 199?, m4fastfw__b,    m4fastfw,   "ffo10d_1.0",   0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4fastfw__c,    m4fastfw,   "ffo20__1.0",   0x0000, 0x010000, CRC(9528291e) SHA1(61c0eb8ce955f708e8a68a28f253706267e28254), "Bwb / Barcrest","Fast Forward (Barcrest) (MPU4) (set 4)" )
 GAME_CUSTOM( 199?, m4fastfw__d,    m4fastfw,   "ffo20d_1.0",   0x0000, 0x010000, CRC(5bae35fe) SHA1(7e4d61ed97ddd170bd1424f34d0327093668da3f), "Bwb / Barcrest","Fast Forward (Barcrest) (MPU4) (set 5)" )
 GAME_CUSTOM( 199?, m4fastfw__e,    m4fastfw,   "ffo20dy1.0",   0x0000, 0x010000, CRC(37167d46) SHA1(94b87697615f81b746ce3bcc64fc893f865e00dc), "Bwb / Barcrest","Fast Forward (Barcrest) (MPU4) (set 6)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+	ROM_END \
+	GAME(year, setname, parent, mod4yam, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
 
 // different protection style, has (C)1993 BYTEFREE
 GAME_CUSTOM( 199?, m4fastfw__f,    m4fastfw,   "fastf206",     0x0000, 0x010000, CRC(a830b121) SHA1(0bf813ee75bd8e109e6688b91bd0983d341a6695), "hack","Fast Forward (Barcrest) (MPU4) (FFD 1.0, hack)" )

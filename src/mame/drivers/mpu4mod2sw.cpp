@@ -2209,6 +2209,38 @@ GAME_CUSTOM( 199?, m4nnww2__n,    m4nnww2, "nnuxc.p1",     0x0000, 0x010000, CRC
 GAME_CUSTOM( 199?, m4nnww2__o,    m4nnww2, "nnu40x.bin",   0x0000, 0x010000, CRC(63e3d7df) SHA1(1a5a00185ec5150f5b05765f06297d7884540aaf), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4, Mod2 type) (NNU 4.0 X)" )
 
 
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( 0x10000, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+	ROM_END \
+	GAME( year, setname, parent, mod2_bootleg_fixedret<0x06>, mpu4, mpu4mod2_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
+// These don't boot fully (different protection?)  These were in 'adders + ladders' sets but are clearly not
+// no copyright string and "NNU 5.0"
+GAME_CUSTOM( 199?, m4nnww2__hx3,   m4nnww2, "classic adders + ladders_alt",     0x0000, 0x010000, CRC(ac948903) SHA1(e07023efd7722a661a2bbf93c0a168af70ad6c20), "hack","Nudge Nudge Wink Wink (Barcrest) (MPU4, Mod2 type) (NNU 5.0, hack, set 1)")
+GAME_CUSTOM( 199?, m4nnww2__hx4,   m4nnww2, "classic adders + ladders_alt2",    0x0000, 0x010000, CRC(843ed53d) SHA1(b1dff249df37800744e3fc9c32be20a62bd130a1), "hack","Nudge Nudge Wink Wink (Barcrest) (MPU4, Mod2 type) (NNU 5.0, hack, set 2)")
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( 0x10000, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+	ROM_END \
+	GAME( year, setname, parent, mod4yam, mpu4, mpu4mod2_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS)
+
+// fails to boot even without touching protection address, maybe bad?    These were in 'adders + ladders' sets but are clearly not
+GAME_CUSTOM( 199?, m4nnww2__hx5,   m4nnww2, "nik56c",                           0x0000, 0x010000, CRC(05fa11d1) SHA1(01d3d0c504489f1513a0c3aa26e910c9604f5366), "hack","Nudge Nudge Wink Wink (Barcrest) (MPU4, Mod2 type) (NNU 5.0, hack, set 3)")
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( 0x10000, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+	ROM_END \
+	GAME( year, setname, parent, mod2_bootleg_fixedret<0x0e>, mpu4, mpu4mod2_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS)
+
 // different protection
 // no copyright string and "NNU 3.4"
 GAME_CUSTOM( 199?, m4nnww2__hx1,  m4nnww2, "nnww2010",     0x0000, 0x010000, CRC(67b1c7b5) SHA1(495e25bc2051ab78e473cd0c36e0c1825c06db14), "hack","Nudge Nudge Wink Wink (Barcrest) (MPU4, Mod2 type) (NNU 3.4, hack, set 1)" )
