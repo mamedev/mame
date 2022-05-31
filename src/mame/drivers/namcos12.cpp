@@ -1056,7 +1056,7 @@ Notes:
       -Truck Kyosokyoku (TKK2/VER.A)
             A CDROM drive and CDROM disc is also required
             The disc is labelled 'TKK2-A'
-      -TeknoWerk
+      -Tekno Werk
             A CDROM drive and CDROM disc is also required
 
 I/O Board (for use with Truck Kyosokyoku)
