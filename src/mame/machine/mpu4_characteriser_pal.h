@@ -387,6 +387,9 @@ public:
 	// games with sequence starting 00 30 20 50 68 24 70 60 78 5c 5c 5c 7c 54 60 10 68 6c
 	static constexpr uint8_t blueflash_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
+	// games with sequence starting 00 24 24 a4 1c 44 a4 14 a8 d8 cc f8 e4 14
+	static constexpr uint8_t wtaalt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
 	/***************************************************************
 
 	 Types below have no games using lamp scramble, so data is unknown / blank
