@@ -3568,18 +3568,6 @@ GAME_CUSTOM( 199?, m4c9__j,    m4c9,   "c9510k.p1",    0x0000, 0x010000, CRC(665
 GAME_CUSTOM( 199?, m4c9__k,    m4c9,   "c9510r.p1",    0x0000, 0x010000, CRC(a9f25224) SHA1(3fe4091b27a2d789a8c5d00cb4fc00289639588f), "Barcrest","Cloud Nine (Barcrest) (MPU4) (C95 1.0 R)" )
 GAME_CUSTOM( 199?, m4c9__m,    m4c9,   "c9510y.p1",    0x0000, 0x010000, CRC(3a93bc6a) SHA1(2832b48b6391746dbcea3484715dd6a169c081af), "Barcrest","Cloud Nine (Barcrest) (MPU4) (C95 1.0 Y)" )
 
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( length, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-		M4C9_EXTRA_ROMS \
-	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::tictak_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
-
-// expects chr sequence starting 00 18 70 44 58 30 44 18 7c 74 00 5c 7c 34 48 24 58 7c 7c 70 0c (tictak) (same as m4bdash__ax ?)
-// "(C)1991 BARCREST" and "CLN 4.0"
-GAME_CUSTOM( 199?, m4c9__n,    m4c9,   "clnv.p1",      0x0000, 0x010000, CRC(486097d8) SHA1(33e9eab0fb1c750160a8cb2b75eca73145d6956e), "Barcrest","Cloud Nine (Barcrest) (MPU4) (CLN 4.0 V)" ) // V isn't usually a valid code.. hack?
 
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \

@@ -1291,24 +1291,29 @@ ROM_START( m4clbcls )
 ROM_END
 
 
-ROM_START( m4c999 )
+ROM_START( m4c999c )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "c999 2p unprotected.bin", 0x0000, 0x010000, CRC(7637e074) SHA1(3b9e724cc1e657ab2a6cf6fe237f0ca43990aa53) )
 ROM_END
 
-ROM_START( m4c999a )
+ROM_START( m4c999d )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "c99910p6", 0x0000, 0x010000, CRC(e3f6710a) SHA1(d527541ec6e799c8bc12e1e31519415eaf11fbe5) )
 ROM_END
 
-ROM_START( m4c999b )
+ROM_START( m4c999a )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "c99920p2", 0x0000, 0x010000, CRC(94f8f03e) SHA1(a99c3c60f2e9c15d5dd6265cfa73fad1058ce7fa) )
 ROM_END
 
-ROM_START( m4c999c )
+ROM_START( m4c999b )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "c99920p6", 0x0000, 0x010000, CRC(f88f3bfc) SHA1(8dd1bd13645b8c3e38d45a8a6941e56d6268c21d) )
+ROM_END
+
+ROM_START( m4c999 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "clnv.p1", 0x0000, 0x010000, CRC(486097d8) SHA1(33e9eab0fb1c750160a8cb2b75eca73145d6956e) )
 ROM_END
 
 
@@ -1988,13 +1993,18 @@ GAME(199?, m4centpta, m4centpt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::act
 // 00 14 10 a0 8c c8 68 50 b0 38 64 b4 18 e4 1c e4 8c f8 (m533)
 GAME(199?, m4clbcls,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::m533_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Club Classic (Barcrest) (MPU4)",GAME_FLAGS ) // set stake (still moans tho)
 
-// strange, have lamp scramble but don't seem to be making usual protection sequence accesses?
+// V isn't usually a valid code.
+// expects chr sequence starting 00 18 70 44 58 30 44 18 7c 74 00 5c 7c 34 48 24 58 7c 7c 70 0c (tictak) (same as m4bdash__ax ?)
+GAME(199?, m4c999,   0,           mod2_cheatchr_xxxx<mpu4_characteriser_pal::tictak_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Cloud 999 (Barcrest) (MPU4) (CLN 4.0 V)",GAME_FLAGS )
+// these are bootlegs with non-standard protection
+GAME(199?, m4c999a,   m4c999,     mod2_bootleg_fixedret<0x51>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "bootleg","Cloud 999 (Barcrest) (bootleg) (MPU4) (CLN 3.6)",GAME_FLAGS )
+GAME(199?, m4c999b,   m4c999,     mod2_bootleg_fixedret<0x51>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "bootleg","Cloud 999 (Barcrest) (bootleg) (MPU4) (CLN 3.0)",GAME_FLAGS )
+// protection has been modified, lamps are still scrambled somehow?
 // OC9 (on cloud 9?)
-GAME(199?, m4c999,    0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Cloud 999 (Barcrest) (MPU4) (OC9 0.3, set 1)",GAME_FLAGS )
-GAME(199?, m4c999a,   m4c999,     mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Cloud 999 (Barcrest) (MPU4) (OC9 0.3, set 2)",GAME_FLAGS )
-// make sure these are the same
-GAME(199?, m4c999b,   m4c999,     mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Cloud 999 (Barcrest) (MPU4) (CLN 3.6)",GAME_FLAGS ) // bad chr
-GAME(199?, m4c999c,   m4c999,     mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Barcrest","Cloud 999 (Barcrest) (MPU4) (CLN 3.0)",GAME_FLAGS ) // bad chr
+GAME(199?, m4c999c,   m4c999,    mod2, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "bootleg","Cloud 999 (Barcrest) (bootleg) (MPU4) (OC9 0.3, set 1)",GAME_FLAGS )
+GAME(199?, m4c999d,   m4c999,    mod2, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "bootleg","Cloud 999 (Barcrest) (bootleg) (MPU4) (OC9 0.3, set 2)",GAME_FLAGS )
+
+
 
 
 // GEEN TUBES (press Q to open door and 'W' to play anyway, as long as the game works and doesn't report reel errors)
@@ -2111,8 +2121,8 @@ GAME(199?, m4frtflc,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::fru
 
 // REEL A ALARM
 // 00 44 44 c4 58 60 c0 50 8c b8 e0 dc ec b0 1c e8 38  (fruitfall scramble)
-GAME(199?, m4frtlnk,  0,          mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Fruit Link Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4frtlnka, m4frtlnk,   mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Fruit Link Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4frtlnk,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::fruitfall_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Fruit Link Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4frtlnka, m4frtlnk,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::fruitfall_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Fruit Link Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
 
 // REEL D ALARM
 // 00 e0 ac 1c 90 2c 14 40 e4 ec 18 f4 00 00 00 (toptake) (strange sequence, lots of 00s)
@@ -2139,7 +2149,7 @@ GAME(199?, m4bigchd,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::clb
 // 00 24 24 a4 4c 10 88 50 a8 d8 9c 9c bc 94 e8 50 a8 (du91)
 GAME(199?, m4dbl9,    0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::du91_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Double 9's (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
 // non-standard chr use, hack?
-GAME(199?, m4dbl9a,   m4dbl9,     mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "hack?","Double 9's (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4dbl9a,   m4dbl9,     mod2_bootleg_fixedret<0x51>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "hack?","Double 9's (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
 
 // 00 14 04 94 c8 68 a0 18 f4 8c e8 ec ac a8 6c 20 54 c4  (viz)
 GAME(199?, m4nick,    0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::viz_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Nickelodeon (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
