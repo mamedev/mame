@@ -3509,6 +3509,7 @@ GAME_CUSTOM( 199?, m4vivess__p,    m4vivess,   "sesy.p1",  0x0000, 0x010000, CRC
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "pessnd.p1", 0x000000, 0x080000, CRC(e7975c75) SHA1(407c3bcff29f4b6599de2c35d96f62c72a897bd1) ) \
 	ROM_LOAD( "pessnd.p2", 0x080000, 0x080000, CRC(9f22f32d) SHA1(af64f6bde0b825d474c42c56f6e2253b28d4f90f) )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -4006,6 +4007,15 @@ GAME_CUSTOM( 199?, m4tutfrt__ad,   m4tutfrt,   "tf4dy.p1",             0x0000, 0
 GAME_CUSTOM( 199?, m4tutfrt__ae,   m4tutfrt,   "tf4k.p1",              0x0000, 0x010000, CRC(1a4eb247) SHA1(f6b4c85dd8b155b672bd96ea7ee6630df773c6ca), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TF4 0.2 K)" )
 GAME_CUSTOM( 199?, m4tutfrt__ag,   m4tutfrt,   "tf4y.p1",              0x0000, 0x010000, CRC(06cd8b06) SHA1(92205e9edd42f80de67d5d6652de8ea80bc60af7), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TF4 0.2 Y)" )
 
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4TUTFRT_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
 // different protection
 // "I.G.T SUCKS" and "F2U 0.1"
 GAME_CUSTOM( 199?, m4tutfrt__at,   m4tutfrt,   "tut25.bin",            0x0000, 0x010000, CRC(c98fb5bb) SHA1(1a3bc343a38b5978a919b454e9a2e806dce7a78a), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1 B, hack, set 1)" )
@@ -4145,7 +4155,7 @@ GAME_CUSTOM( 199?, m4cashat__2,    m4cashat,   "catt15t",          0x0000, 0x020
 		ROM_LOAD( name, offset, length, hash ) \
 		M4CASHAT_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x68>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
 
 // no copyright string and "CAA 2.3"
 GAME_CUSTOM( 199?, m4cashat__0,    m4cashat,   "casattack8.bin",   0x0000, 0x020000, CRC(e29ea247) SHA1(ad00ea3bfd2eab51b20fd786cb1ce84de0d98173), "hack","Cash Attack (Barcrest) (MPU4) (CAA 2.3, hack, set 1)" )
@@ -4306,6 +4316,22 @@ GAME_CUSTOM( 199?, m4rhrc__aa,m4rhr,  "cr__x_dx.5_0",     0x0000, 0x010000, CRC(
 // "(C)1998    BWB" and "RHR 2.0"
 GAME_CUSTOM( 199?, m4rhr__a3, m4rhr,  "cr__x_dx.2_0",     0x0000, 0x010000, CRC(73fb120c) SHA1(4c0f39253dee9b528763a9cb609dec31e8529713), "Bwb","Red Hot Roll (Barcrest) (MPU4) (RHR 2.0 D)" )
 
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4RHR_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_814prot, ROT0, company, title, GAME_FLAGS )
+
+// "RONNIE   BARKER" and "RH8 0.1"
+GAME_CUSTOM( 199?, m4rhr__6,  m4rhr,  "rhr10",            0x0000, 0x010000, CRC(2a18a033) SHA1(add907c5ab155c28142dcee57825059715afd80d), "hack","Red Hot Roll (Barcrest) (MPU4) (RH8 0.1 C, hack, set 1)" )
+GAME_CUSTOM( 199?, m4rhr__7,  m4rhr,  "rhr2015",          0x0000, 0x010000, CRC(dbfd3b95) SHA1(4fc7ae32f7d76be3d3d07d627391884bd4d6de09), "hack","Red Hot Roll (Barcrest) (MPU4) (RH8 0.1 C, hack, set 2)" )
+// no copyright and "RHT 0.3"
+GAME_CUSTOM( 199?, m4rhr__8,  m4rhr,  "rhr2515",          0x0000, 0x010000, CRC(e4554c23) SHA1(6d977beb282fd638de3457e467e842ce79b5be7c), "hack","Red Hot Roll (Barcrest) (MPU4) (RHT 0.3 C, hack)" )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -4319,12 +4345,6 @@ GAME_CUSTOM( 199?, m4rhr__a3, m4rhr,  "cr__x_dx.2_0",     0x0000, 0x010000, CRC(
 
 // "(C)1998  B.W.B." and "SS2 1.0"
 GAME_CUSTOM( 199?, m4rhr__9,  m4rhr,  "rhr2pprg.bin",     0x0000, 0x010000, CRC(f97047b2) SHA1(d3ed8c93e405f9e7448b3924ff9aa84223b76046), "hack","Red Hot Roll (Barcrest) (MPU4) (SS2 1.0, hack?)" )
-// "RONNIE   BARKER" and "RH8 0.1"
-GAME_CUSTOM( 199?, m4rhr__6,  m4rhr,  "rhr10",            0x0000, 0x010000, CRC(2a18a033) SHA1(add907c5ab155c28142dcee57825059715afd80d), "hack","Red Hot Roll (Barcrest) (MPU4) (RH8 0.1 C, hack, set 1)" )
-GAME_CUSTOM( 199?, m4rhr__7,  m4rhr,  "rhr2015",          0x0000, 0x010000, CRC(dbfd3b95) SHA1(4fc7ae32f7d76be3d3d07d627391884bd4d6de09), "hack","Red Hot Roll (Barcrest) (MPU4) (RH8 0.1 C, hack, set 2)" )
-// no copyright and "RHT 0.3"
-GAME_CUSTOM( 199?, m4rhr__8,  m4rhr,  "rhr2515",          0x0000, 0x010000, CRC(e4554c23) SHA1(6d977beb282fd638de3457e467e842ce79b5be7c), "hack","Red Hot Roll (Barcrest) (MPU4) (RHT 0.3 C, hack)" )
-
 
 
 /*****************************************************************************************************************************************************************************
@@ -4513,7 +4533,7 @@ GAME_CUSTOM( 199?, m4richfm__p,    m4richfm,   "rf8c.p1",      0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RICHFM_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_812altprot, ROT0, company, title, GAME_FLAGS )
 
 
 // none of these expect standard protection, they might be hacked
@@ -4522,10 +4542,31 @@ GAME_CUSTOM( 199?, m4richfm__p,    m4richfm,   "rf8c.p1",      0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4richfm__0,    m4richfm,   "r+f5.10",      0x0000, 0x010000, CRC(45d493d0) SHA1(9a549821a005fa65c2eb8b35c5f15659bd897519), "Bwb","Rich & Famous (Barcrest) (MPU4) (RFC 1.3 K5)" )
 // "(C)1997  B.W.B." and "RF4 1.1"
 GAME_CUSTOM( 199?, m4richfm__1,    m4richfm,   "r+f5.4",       0x0000, 0x010000, CRC(0441d833) SHA1(361910fd64bc7291f6200fe354c468d16e7d6c80), "Bwb","Rich & Famous (Barcrest) (MPU4) (RF4 1.1 K5)" )
-// "(C)1997  B.W.B." and "RF8 1.2"
-GAME_CUSTOM( 199?, m4richfm__2,    m4richfm,   "r+f5.8t",      0x0000, 0x010000, CRC(525e2520) SHA1(84b2ff86d6a54ebb3bcf0138930b2619a8733161), "Bwb","Rich & Famous (Barcrest) (MPU4) (RF8 1.2 K5)" )
 // "1997  COCO" and "RF4 1.1"
 GAME_CUSTOM( 199?, m4richfm__3,    m4richfm,   "r+f55",        0x0000, 0x010000, CRC(6095a72b) SHA1(af25f7c2fb5241064ea995d35fe4fd2f242e3750), "hack","Rich & Famous (Barcrest) (MPU4) (RF4 1.1 K5, hack)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4RICHFM_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_814altprot, ROT0, company, title, GAME_FLAGS )
+
+// "(C)1997  B.W.B." and "RF8 1.2"
+GAME_CUSTOM( 199?, m4richfm__2,    m4richfm,   "r+f5.8t",      0x0000, 0x010000, CRC(525e2520) SHA1(84b2ff86d6a54ebb3bcf0138930b2619a8733161), "Bwb","Rich & Famous (Barcrest) (MPU4) (RF8 1.2 K5)" )
+
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4RICHFM_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x1d>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
 
 // different protection
 
@@ -4640,7 +4681,7 @@ GAME_CUSTOM( 199?, m4viz__v,  m4viz,  "vii10___.1_1", 0x0000, 0x010000, CRC(92e1
 		ROM_LOAD( name, offset, length, hash ) \
 		M4VIZ_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_814prot, ROT0, company, title, GAME_FLAGS )
 
 // different protection
 //
