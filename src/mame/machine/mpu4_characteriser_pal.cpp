@@ -220,7 +220,7 @@ void mpu4_characteriser_pal::protection_w(uint8_t data)
 
 
 
-void mpu4_characteriser_pal::characteriser_prot_w(uint8_t data)
+void mpu4_characteriser_pal::lamp_scramble_w(uint8_t data)
 {
 	switch (data)
 	{
@@ -257,7 +257,7 @@ void mpu4_characteriser_pal::characteriser_prot_w(uint8_t data)
 		break;
 	}
 
-	logerror("%s Characteriser characteriser_prot_w data %02X (picking column %d)\n", machine().describe_context(), data, m_lamp_col);
+	logerror("%s Characteriser lamp_scramble_w data %02X (picking column %d)\n", machine().describe_context(), data, m_lamp_col);
 }
 
 void mpu4_characteriser_pal::write(offs_t offset, uint8_t data)
@@ -269,7 +269,7 @@ void mpu4_characteriser_pal::write(offs_t offset, uint8_t data)
 		break;
 
 	case 0x02:
-		characteriser_prot_w(data);
+		lamp_scramble_w(data);
 		break;
 	}
 }
@@ -349,12 +349,12 @@ uint8_t mpu4_characteriser_pal::protection_r()
 	return ret;
 }
 
-uint8_t mpu4_characteriser_pal::characteriser_prot_r()
+uint8_t mpu4_characteriser_pal::lamp_scramble_r()
 {
 	if (!m_current_lamp_table && !m_protregion)
 	{
 		uint8_t ret = machine().rand();
-		logerror("%s: Characteriser characteriser_prot_r WITH NO TABLE (table offset %02x, returning %02x)\n", machine().describe_context(), m_lamp_col, ret);
+		logerror("%s: Characteriser lamp_scramble_r WITH NO TABLE (table offset %02x, returning %02x)\n", machine().describe_context(), m_lamp_col, ret);
 		return ret;
 	}
 	else
@@ -364,12 +364,12 @@ uint8_t mpu4_characteriser_pal::characteriser_prot_r()
 		if (m_current_lamp_table)
 		{
 			ret = m_current_lamp_table[m_lamp_col];
-			logerror("%s: Characteriser characteriser_prot_r WITH PASSED TABLE (table offset %02x, returning %02x)\n", machine().describe_context(), m_lamp_col, ret);
+			logerror("%s: Characteriser lamp_scramble_r WITH PASSED TABLE (table offset %02x, returning %02x)\n", machine().describe_context(), m_lamp_col, ret);
 		}
 		else if (m_protregion)
 		{
 			ret = m_protregion[m_lamp_col + 64];
-			logerror("%s: Characteriser characteriser_prot_r WITH FAKE ROM (table offset %02x, returning %02x)\n", machine().describe_context(), m_lamp_col, ret);
+			logerror("%s: Characteriser lamp_scramble_r WITH FAKE ROM (table offset %02x, returning %02x)\n", machine().describe_context(), m_lamp_col, ret);
 		}
 
 		return ret;
@@ -381,7 +381,7 @@ uint8_t mpu4_characteriser_pal::read(offs_t offset)
 	switch (offset)
 	{
 	case 0x00: return protection_r();
-	case 0x03: return characteriser_prot_r();
+	case 0x03: return lamp_scramble_r();
 	}
 	return 0;
 }

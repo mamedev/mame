@@ -448,9 +448,9 @@ protected:
 private:
 
 	void protection_w(uint8_t data);
-	void characteriser_prot_w(uint8_t data);
+	void lamp_scramble_w(uint8_t data);
 	uint8_t protection_r();
-	uint8_t characteriser_prot_r();
+	uint8_t lamp_scramble_r();
 
 
 	optional_device<cpu_device> m_cpu; // needed for some of the protection 'cheats'
