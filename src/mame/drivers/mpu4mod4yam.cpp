@@ -1167,10 +1167,6 @@ GAME_CUSTOM( 199?, m4vivalv__4,    m4vivalv,   "viva_05_.8",                   0
 GAME_CUSTOM( 199?, m4vivalv__5,    m4vivalv,   "viva_10_.4",                   0x0000, 0x010000, CRC(b1d5e820) SHA1(68012216d7e82168c7468d1e54c527c15d268917), "hack?","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, hack?, set 7)" )
 GAME_CUSTOM( 199?, m4vivalv__6,    m4vivalv,   "viva_10_.8",                   0x0000, 0x010000, CRC(f392c81c) SHA1(cb3320b688b315dbc226f45b78490fed439ee9a2), "hack?","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, hack ? , set 8)" )
 
-// no copyright string and VSG 0.4, bigger ROM?
-GAME_CUSTOM( 199?, m4vivalv__7,    m4vivalv,   "vegas15g",                     0x0000, 0x020000, CRC(5b804e4d) SHA1(5967b9f4e28e5a5e5e7005a29ecb30fc661800e0), "hack?","Viva Las Vegas (Barcrest) (MPU4) (VSG 0.4, hack?)" )
-// no copyright string and UVS 0.3, bigger ROM?
-GAME_CUSTOM( 199?, m4vivalv__8,    m4vivalv,   "vegas15t",                     0x0000, 0x020000, CRC(9d15f44f) SHA1(3a3f2034de9ba56cb2cb18b4898f2829a2019d4e), "hack?","Viva Las Vegas (Barcrest) (MPU4) (UVS 0.3, hack?)" )
 
 
 /*****************************************************************************************************************************************************************************

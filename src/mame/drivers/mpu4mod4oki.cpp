@@ -5656,6 +5656,22 @@ GAME_CUSTOM( 199?, m4vegast__x,    m4vegast,   "vstr2010",     0x0000, 0x020000,
 // "(C)1993 BARCREST" and "VSG 0.3" (but doesn't boot?, bad or different protections)
 GAME_CUSTOM( 199?, m4vegast__v,    m4vegast,   "lvs",          0x0000, 0x020000, CRC(dcb0dc80) SHA1(6045b332eb4af09f6e0a669ea0b78ef4ac389ac2), "hack?","Las Vegas Strip (Barcrest) (MPU4) (VSG 0.3 YE, hack?)" )
 
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4VEGAST_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x70>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
+
+
+// no copyright string and VSG 0.4
+GAME_CUSTOM( 199?, m4vegast__0,    m4vegast,   "vegas15g",                     0x0000, 0x020000, CRC(5b804e4d) SHA1(5967b9f4e28e5a5e5e7005a29ecb30fc661800e0), "bootleg","Las Vegas Strip (Barcrest) (bootleg) (MPU4) (VSG 0.4)" )
+// no copyright string and UVS 0.3
+GAME_CUSTOM( 199?, m4vegast__1,    m4vegast,   "vegas15t",                     0x0000, 0x020000, CRC(9d15f44f) SHA1(3a3f2034de9ba56cb2cb18b4898f2829a2019d4e), "bootleg","Las Vegas Strip (Barcrest) (bootleg) (MPU4) (UVS 0.3)" )
+
+
 
 /*****************************************************************************************************************************************************************************
 *

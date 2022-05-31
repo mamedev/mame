@@ -247,6 +247,13 @@ public:
 		m_characteriser->set_bootleg_fixed_return(Fixed);
 	}
 
+	template<uint8_t Fixed> void mod4oki_bootleg_fixedret(machine_config &config)
+	{
+		mod4oki(config);
+		MPU4_CHARACTERISER_BOOTLEG_PAL(config, m_characteriser, 0);
+		m_characteriser->set_bootleg_fixed_return(Fixed);
+	}
+
 	void mod2_chr_blastbnk(machine_config &config);
 	void mod2_chr_copcash(machine_config &config);
 
