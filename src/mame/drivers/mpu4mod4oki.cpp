@@ -150,6 +150,8 @@ public:
 	}
 
 	void init_m4andycp();
+	void init_m4andycp_bootleg814prot();
+
 	void init_m4andyge();
 	void init_m4tenten();
 
@@ -248,6 +250,12 @@ void mpu4mod4oki_machines_state::init_m4andycp()
 	//Volume 0 Stereo= 1
 	//Sample rate 16000
 	//Front door code 39 Cash door code 38
+}
+
+void mpu4mod4oki_machines_state::init_m4andycp_bootleg814prot()
+{
+	init_m4andycp();
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0814, 0x0814, read8m_delegate(*this, FUNC(mpu4mod4oki_machines_state::bootleg814_r)));
 }
 
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
@@ -377,6 +385,18 @@ GAME_CUSTOM( 1995, m4andycpaccsd,      m4andycp,   "ac_05_d4.2_1",     0x0000, 0
 GAME_CUSTOM( 199?, m4andycp20,         m4andycp,   "acap_20_.4",       0x0000, 0x010000, CRC(29848eed) SHA1(4096ab2f58b3293c559ff69c6f0f4d6c5dee2fd2), "hack?",    "Andy Capp (Barcrest) (MPU4) (hack?, set 1)" ) // bad chr
 GAME_CUSTOM( 199?, m4andycp20_a,       m4andycp,   "acap_20_.8",       0x0000, 0x010000, CRC(3981ec67) SHA1(ad040a4c8690d4348bfe306309df5374251f2b3e), "hack?",    "Andy Capp (Barcrest) (MPU4) (hack?, set 2)" ) // bad chr
 
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( 0x10000, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4ANDYCP_EXTRA_ROMS \
+	ROM_END \
+	GAMEL( year, setname, parent, mod4oki_bootleg_fixedret<0x1e>, mpu4, mpu4mod4oki_machines_state, init_m4andycp, ROT0, company, title, GAME_FLAGS, layout_m4andycp )
+
+// different protection
+// "95,S  ALIVE!!!" and "AND 0.3" (hack?)
+GAME_CUSTOM( 199?, m4andycp20_b,       m4andycp,   "acap20_11",        0x0000, 0x010000, CRC(799fd89e) SHA1(679016fad8b012bf6b6c617b99fd0dbe71eff562), "hack?",    "Andy Capp (Barcrest) (MPU4) (hack?, set 3)" ) // bad chr
 
 
 #undef GAME_CUSTOM
@@ -386,25 +406,36 @@ GAME_CUSTOM( 199?, m4andycp20_a,       m4andycp,   "acap_20_.8",       0x0000, 0
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ANDYCP_EXTRA_ROMS \
 	ROM_END \
-	GAMEL( year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4andycp, ROT0, company, title, GAME_FLAGS, layout_m4andycp )
+	GAMEL( year, setname, parent, mod4oki_bootleg_fixedret<0x2f>, mpu4, mpu4mod4oki_machines_state, init_m4andycp_bootleg814prot, ROT0, company, title, GAME_FLAGS, layout_m4andycp )
 
 // "FATHER CHISTMAS" and "AC5 1.0" (hack?)
 GAME_CUSTOM( 1994, m4andycpac_a,       m4andycp,   "acap_05_.8",       0x0000, 0x010000, CRC(a17dd8de) SHA1(963d39fdca7c7b54f5ecf723c982eb30a426ebae), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC5, hack?)" ) // won't boot 'FATHER CHISTMAS'
 GAME_CUSTOM( 1994, m4andycpacc_a,      m4andycp,   "acap_05_.4",       0x0000, 0x010000, CRC(ca00ee84) SHA1(f1fef3db3db5ca7f0eb72ccc1daba8446db02924), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC5 C, hack?, set 1)" ) // won't boot 'FATHER CHISTMAS'
-GAME_CUSTOM( 1994, m4andycpacc_b,      m4andycp,   "ac056c",           0x0000, 0x010000, CRC(cdeaeb06) SHA1(5bfcfba614477f4df9f4b2e56e8448eb357c554a), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC5 C, hack?, set 2)" ) // won't boot 'FATHER CHISTMAS'
 GAME_CUSTOM( 1994, m4andycpacc_c,      m4andycp,   "ac058c",           0x0000, 0x010000, CRC(15204ccc) SHA1(ade376193bc2d53dd4c824ee35fbcc16da31330a), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC5 C, hack?, set 3)" ) // won't boot 'FATHER CHISTMAS'
+
+// "FATHER CHISTMAS" and "AC5 1.0" (hack?)
+// these still have scrambled lamps?
+GAME_CUSTOM( 1994, m4andycpacc_b,      m4andycp,   "ac056c",           0x0000, 0x010000, CRC(cdeaeb06) SHA1(5bfcfba614477f4df9f4b2e56e8448eb357c554a), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC5 C, hack?, set 2)" ) // won't boot 'FATHER CHISTMAS'
 GAME_CUSTOM( 1994, m4andycpacc_d,      m4andycp,   "acap05_11",        0x0000, 0x010000, CRC(fb1533a0) SHA1(814e5dd9c4fe3baf4ea3b22c7e02e30b07bd27a1), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC5 C, hack?, set 4)" ) // won't boot 'FATHER CHISTMAS'
 GAME_CUSTOM( 1994, m4andycpacc_e,      m4andycp,   "acap55",           0x0000, 0x010000, CRC(8007c459) SHA1(b3b6213d89eb0d2cc2f7dab81e0f0f2fdd0f8776), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC5 C, hack?, set 5)" ) // won't boot 'FATHER CHISTMAS'
 // "FATHER CHISTMAS" and  "AC101.0" (hack?)
+// these still have scrambled lamps?
 GAME_CUSTOM( 1994, m4andycp10_a,       m4andycp,   "acap_10_.8",       0x0000, 0x010000, CRC(614403a7) SHA1(b627c7c3c6f9a43a0cd9e064715aeee8834c717c), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC10, hack?)" ) // won't boot  'FATHER CHISTMAS'
-GAME_CUSTOM( 1994, m4andycp10c_a,      m4andycp,   "acapp10p5.bin",    0x0000, 0x010000, CRC(de650e19) SHA1(c1b9cbad23a1eac9b3718f4f2457c97317f96be6), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC10C, hack?, set 1)" ) // won't boot 'FATHER CHISTMAS'
 GAME_CUSTOM( 1994, m4andycp10c_b,      m4andycp,   "acp8ac",           0x0000, 0x010000, CRC(d51997b5) SHA1(fe08b5a3832eeaa80f674893342c3baea1608a91), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC10C, hack?, set 2)" ) // won't boot 'FATHER CHISTMAS'
 GAME_CUSTOM( 1994, m4andycp10c_c,      m4andycp,   "acap10_11",        0x0000, 0x010000, CRC(c3a866e7) SHA1(4c18e5a26ad2885eb012fd3dd61aaf9cc7d3519a), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC10C, hack?, set 3)" ) // won't boot 'FATHER CHISTMAS'
 GAME_CUSTOM( 1994, m4andycp10c_d,      m4andycp,   "acap_10_.4",       0x0000, 0x010000, CRC(fffe742d) SHA1(f2ca45391690dc31662e2d97a3ee34473effa258), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC10C, hack?, set 4)" ) // won't boot 'FATHER CHISTMAS'
 
-// different protection
-// "95,S  ALIVE!!!" and "AND 0.3" (hack?)
-GAME_CUSTOM( 199?, m4andycp20_b,       m4andycp,   "acap20_11",        0x0000, 0x010000, CRC(799fd89e) SHA1(679016fad8b012bf6b6c617b99fd0dbe71eff562), "hack?",    "Andy Capp (Barcrest) (MPU4) (hack?, set 3)" ) // bad chr
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( 0x10000, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4ANDYCP_EXTRA_ROMS \
+	ROM_END \
+	GAMEL( year, setname, parent, mod4oki_bootleg_fixedret<0x1c>, mpu4, mpu4mod4oki_machines_state, init_m4andycp_bootleg814prot, ROT0, company, title, GAME_FLAGS, layout_m4andycp )
+
+GAME_CUSTOM( 1994, m4andycp10c_a,      m4andycp,   "acapp10p5.bin",    0x0000, 0x010000, CRC(de650e19) SHA1(c1b9cbad23a1eac9b3718f4f2457c97317f96be6), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC10C, hack?, set 1)" ) // won't boot 'FATHER CHISTMAS'
+
 
 /*****************************************************************************************************************************************************************************
 *
