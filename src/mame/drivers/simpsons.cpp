@@ -172,7 +172,7 @@ void simpsons_state::z80_arm_nmi_w(uint8_t data)
 	// 
 	// The Z80 checks if NMI has gone from high to low during the instruction, on the rising edge of CLK, at the start of the last cycle (in this case cycle 3 of the write).
 	// The circuit raises NMI when MREQ/WR goes high, on the falling edge of CLK, half way through cycle 3 of the write.
-	// NMI is then lowered when the sound chips timer output subsequently goes low.
+	// NMI is then lowered when the sound chips timer output subsequently goes from low to high.
 	//
 	// MAME instead does not emulate memory cycle timing and checks the NMI before executing an instruction,
 	// so we have to manually delay the NMI until the following HALT instruction has started.
