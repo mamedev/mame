@@ -8,8 +8,6 @@
  *  - https://arvutimuuseum.ut.ee/index.php?m=eksponaadid&id=223
  *
  * TODO:
- *  - interrupts and dma
- *  - floppy
  *  - serial
  */
 /*
@@ -210,6 +208,12 @@ ioport_constructor labtam_z80sbc_device::device_input_ports() const
 	return INPUT_PORTS_NAME(labtam_z80sbc);
 }
 
+void labtam_z80sbc_device::device_resolve_objects()
+{
+	// TODO: Multibus interrupt lines may optionally be wire-wrapped to
+	// Am9517 interrupt request inputs 0, 1, 3 or 7.
+}
+
 void labtam_z80sbc_device::device_start()
 {
 	m_ram0 = std::make_unique<u8[]>(0x10000);
@@ -246,9 +250,6 @@ void labtam_z80sbc_device::device_reset()
 		m_bus->space(AS_IO).install_write_handler(pio_select | 2, pio_select | 2, write8smo_delegate(*this, FUNC(labtam_z80sbc_device::netclr_w)));
 		m_bus->space(AS_IO).install_write_handler(pio_select | 4, pio_select | 4, write8smo_delegate(*this, FUNC(labtam_z80sbc_device::fdcattn_w)));
 		m_bus->space(AS_IO).install_read_handler(pio_select | 8, pio_select | 8, read8smo_delegate(*this, FUNC(labtam_z80sbc_device::fdcstatus_r)));
-
-		// TODO: Multibus interrupt lines may optionally be wire-wrapped to
-		// Am9517 interrupt request inputs 0, 1, 3 or 7.
 
 		m_installed = true;
 	}
@@ -345,7 +346,7 @@ void labtam_z80sbc_device::cpu_pio(address_map &map)
 	map(0x0020, 0x0020).mirror(0xff00).lw8([this](u8 data) { m_map_enabled = true; LOG("intswt 0x%02x mapnum 0x%02x (%s)\n", data, m_map_num, machine().describe_context()); }, "intswt");
 	map(0x0028, 0x0028).mirror(0xff00).lw8([this](u8 data) { m_map_enabled = true; m_map_num = data & 0x0f; LOG("mapnum 0x%02x (%s)\n", data, machine().describe_context()); }, "mapnum");
 
-	map(0x0030, 0x0033).mirror(0xff00).w(FUNC(labtam_z80sbc_device::drive_w));
+	map(0x0030, 0x0037).mirror(0xff00).w(FUNC(labtam_z80sbc_device::drive_w));
 	map(0x0038, 0x0038).mirror(0xff00).lw8([this](u8 data) { LOG("reset drive fault\n"); }, "fltrest");
 	map(0x0040, 0x0043).mirror(0xff00).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
 	map(0x0048, 0x004b).mirror(0xff00).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
@@ -358,7 +359,7 @@ void labtam_z80sbc_device::cpu_pio(address_map &map)
 	map(0x0068, 0x0068).mirror(0xff00).r(FUNC(labtam_z80sbc_device::drvstatus_r));
 
 	map(0x0070, 0x0070).select(0xff00).lr8([this](offs_t offset) { return m_map_lo[offset >> 8]; }, "maprd0");
-	map(0x0078, 0x0078).select(0xff00).lr8([this](offs_t offset) { return m_map_hi[offset >> 8]; }, "maprd1"); // TODO: code at 167c reads maprd1 lower 3 bits?
+	map(0x0078, 0x0078).select(0xff00).lr8([this](offs_t offset) { return m_map_hi[offset >> 8] | m_map_num; }, "maprd1");
 
 	map(0x0080, 0x0080).mirror(0xff00).rw(m_dma[0], FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	map(0x00a0, 0x00a0).mirror(0xff00).rw(m_dma[1], FUNC(z80dma_device::read), FUNC(z80dma_device::write));
@@ -442,18 +443,42 @@ void labtam_z80sbc_device::map_w(unsigned map_num, offs_t offset, u8 data)
 
 void labtam_z80sbc_device::drive_w(offs_t offset, u8 data)
 {
-	LOG("drive_w %s drive %d (%s)\n", data ? "select" : "deselect", offset, machine().describe_context());
-
-	if (data)
+	switch (offset)
 	{
-		m_drive = offset;
-		m_fdc->enmf_w(BIT(m_e21->read(), offset));
-		m_fdc->set_floppy(m_fdd[*m_drive]->get_device());
-	}
-	else
-	{
-		m_drive.reset();
-		m_fdc->set_floppy(nullptr);
+	case 0:
+	case 1:
+	case 2:
+	case 3:
+		if (BIT(data, 0))
+		{
+			LOG("drive_w select drive %d (%s)\n", offset, machine().describe_context());
+			m_drive = offset;
+			m_fdc->set_floppy(m_fdd[*m_drive]->get_device());
+		}
+		else
+		{
+			m_drive.reset();
+			m_fdc->set_floppy(nullptr);
+		}
+		break;
+	case 4:
+		m_fdc->dden_w(BIT(data, 0));
+		break;
+	case 5:
+		// FIXME: make side select persistent
+		if (m_drive)
+		{
+			LOG("drive_w select side %d (%s)\n", BIT(data, 0), machine().describe_context());
+			m_fdd[*m_drive]->get_device()->ss_w(BIT(data, 0));
+		}
+		break;
+	case 6:
+		// TODO: precomp
+		break;
+	case 7:
+		LOG("drive_w mini-floppy %s (%s)\n", BIT(data, 0) ? "disable" : "enable", machine().describe_context());
+		m_fdc->enmf_w(BIT(data, 0));
+		break;
 	}
 }
 

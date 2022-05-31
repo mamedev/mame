@@ -168,13 +168,21 @@ void simpsons_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 void simpsons_state::z80_arm_nmi_w(uint8_t data)
 {
+	// LD $(FA00), A takes 13 cycles. 4*M1 + 3*read + 3*read + 3*write.
+	// 
+	// The Z80 checks if NMI has gone from high to low during the instruction, on the rising edge of CLK, at the start of the last cycle (in this case cycle 3 of the write).
+	// The circuit raises NMI when MREQ/WR goes high, on the falling edge of CLK, half way through cycle 3 of the write.
+	// NMI is then lowered when the sound chips timer output subsequently goes from low to high.
+	//
+	// MAME instead does not emulate memory cycle timing and checks the NMI before executing an instruction,
+	// so we have to manually delay the NMI until the following HALT instruction has started.
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	m_nmi_enabled = machine().time().as_ticks(m_audiocpu->clock()); // NMI is blocked until it's finished writing
+	m_nmi_enabled = machine().time().as_ticks(m_audiocpu->clock()) + 3;
 }
 
 void simpsons_state::z80_nmi_w(int state)
 {
-	if(state && m_nmi_enabled && machine().time().as_ticks(m_audiocpu->clock()) > m_nmi_enabled + 3) {
+	if(state && m_nmi_enabled && machine().time().as_ticks(m_audiocpu->clock()) > m_nmi_enabled) {
 		m_nmi_enabled = 0;
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
