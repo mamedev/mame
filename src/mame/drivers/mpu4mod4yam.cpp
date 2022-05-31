@@ -1052,6 +1052,18 @@ GAME_CUSTOM( 199?, m4supst__bh, m4supst,    "stc02y.p1",            0x0000, 0x01
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
+	GAME(year, setname, parent, mod4yam, mpu4, mpu4mod4yam_machines_state, init_m4_showstring_814prot, ROT0, company, title, GAME_FLAGS )
+
+// different protection
+// was in SC2 Super Star set, but seems to fit here, ident hacked to "BILL    BIXBY" and "V1   0.1"
+GAME_CUSTOM( 199?, m4supst__b6,    m4supst,   "supst20.15",   0x0000, 0x010000, CRC(c3446ec4) SHA1(3c1ad27385547a33993a839b53873d8b92214ade), "hack","Super Streak (Barcrest) (MPU4) (hack)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+	ROM_END \
 	GAME(year, setname, parent, mod4yam, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // different protection style

@@ -4767,17 +4767,49 @@ GAME_CUSTOM( 199?, m4takepk__t,    m4takepk,   "typ15f",       0x0000, 0x020000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TAKEPK_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_chr, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent,  mod4oki_bootleg_fixedret<0x60>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // below sets are all smaller (Bwb sets / hacks of them?)
 // "(C)1997  B.W.B." and "TAC 2.3"
 GAME_CUSTOM( 199?, m4takepk__1,    m4takepk,   "typ5p10p.bin", 0x0000, 0x010000, CRC(45ddeaf4) SHA1(6db822aac402cb6772718015420c14875e74b13d), "Bwb","Take Your Pick (Barcrest) (MPU4) (TAC 2.3 K)" ) // hack?
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4TAKEPK_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x1c>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
+
 // no copyright string and "TAC 2.3"
 GAME_CUSTOM( 199?, m4takepk__v,    m4takepk,   "typ510",       0x0000, 0x010000, CRC(ebf0c71c) SHA1(6c759144aecce83f82ded8aae7c61ecec2d92fb3), "hack","Take Your Pick (Barcrest) (MPU4) (TAC 2.3, hack, set 1)" )
 GAME_CUSTOM( 199?, m4takepk__w,    m4takepk,   "typ510s",      0x0000, 0x010000, CRC(4cc6032d) SHA1(e6eaff56e39555393156aa2e56bf1c17e548bdc9), "hack","Take Your Pick (Barcrest) (MPU4) (TAC 2.3, hack, set 2)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4TAKEPK_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0xa8>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
 // no copyright string and "TA4 2.1"
 GAME_CUSTOM( 199?, m4takepk__x,    m4takepk,   "typ55",        0x0000, 0x010000, CRC(6837344f) SHA1(4d5c6ea005d0916f27a7f445b37ce9252549c61f), "hack","Take Your Pick (Barcrest) (MPU4) (TA4 2.1, hack, set 1)" )
 GAME_CUSTOM( 199?, m4takepk__y,    m4takepk,   "typ55s",       0x0000, 0x010000, CRC(05dc9b07) SHA1(9fc2c7575a704ca1252bb5c6a638e28b0324f2a6), "hack","Take Your Pick (Barcrest) (MPU4) (TA4 2.1, hack, set 2)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4TAKEPK_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
+// MUX SELECTS ALARM
 // no copyright string and "TA8 2.2"
 GAME_CUSTOM( 199?, m4takepk__z,    m4takepk,   "typ58s",       0x0000, 0x010000, CRC(56e26a42) SHA1(7add260212d3fbc8b356b58e85df8cafbef151e3), "hack","Take Your Pick (Barcrest) (MPU4) (TA8 2.2, hack, set 1)" )
 GAME_CUSTOM( 199?, m4takepk__0,    m4takepk,   "typ58t",       0x0000, 0x010000, CRC(3fbbbbc8) SHA1(9f097cbce3710a51c19ef7961f91ee6e77fc843f), "hack","Take Your Pick (Barcrest) (MPU4) (TA8 2.2, hack, set 2)" )
@@ -4788,9 +4820,6 @@ GAME_CUSTOM( 199?, m4takepk__0,    m4takepk,   "typ58t",       0x0000, 0x010000,
 * Over The Moon
 *
 *****************************************************************************************************************************************************************************/
-
-//  ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-//  ROM_LOAD( "otts.chr", 0x0000, 0x000048, CRC(2abec763) SHA1(307399724a994a5d0914a5d7e0931a5d94439a37) )
 
 
 #define M4OVERMN_EXTRA_ROMS \
@@ -4921,6 +4950,8 @@ GAME_CUSTOM( 199?, m4luxor__w,  m4luxor,    "lx_10sb_.1o1",     0x0000, 0x010000
 GAME_CUSTOM( 199?, m4luxor__x,  m4luxor,    "lx_10sd_.1o1",     0x0000, 0x010000, CRC(cc59d370) SHA1(a428d93c005b629e86810c85ea91630a354e170b), "Bwb","Luxor (Barcrest) (MPU4) (LX101.0 D)" )
 GAME_CUSTOM( 199?, m4luxor__z,  m4luxor,    "lxi10a__.1o1",     0x0000, 0x010000, CRC(17989464) SHA1(67aa9cc01d89ed4caeb33885f53dcaee762ccb6d), "Bwb","Luxor (Barcrest) (MPU4) (LX101.0 CK)" )
 
+// different protection
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -4928,22 +4959,62 @@ GAME_CUSTOM( 199?, m4luxor__z,  m4luxor,    "lxi10a__.1o1",     0x0000, 0x010000
 		ROM_LOAD( name, offset, length, hash ) \
 		M4LUXOR_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_812altprot, ROT0, company, title, GAME_FLAGS )
 
-// different protection
-
-// these ones give bad char alarm
+// lamps are still scrambled with this protection bypass
 GAME_CUSTOM( 199?, m4luxor__b,  m4luxor,    "lux10_101",        0x0000, 0x010000, CRC(8965c7be) SHA1(ca05803bc7d7a96e25dc0b025c2683b4679789fb), "Bwb / hack?","Luxor (Barcrest) (MPU4) (LX101.0, hack?, set 1)" )
 GAME_CUSTOM( 199?, m4luxor__m,  m4luxor,    "lux_10_4",         0x0000, 0x010000, CRC(122461d9) SHA1(a347c834b27a00abc1864a1e00316a491d04d84b), "Bwb / hack?","Luxor (Barcrest) (MPU4) (LX101.0, hack?, set 2)" )
 GAME_CUSTOM( 199?, m4luxor__n,  m4luxor,    "lux_10_8",         0x0000, 0x010000, CRC(544208e7) SHA1(85e2ff663b7500ee6bb0a900ee5ef48f7bf1934a), "Bwb / hack?","Luxor (Barcrest) (MPU4) (LX101.0, hack?, set 3)" )
-// no copyright string and "V1  0.6"
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4LUXOR_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_814prot, ROT0, company, title, GAME_FLAGS )
+
+// no copyright string and "V1  0.6"  hacked to say 'From EGYPT' rather than the manufacturer
 GAME_CUSTOM( 199?, m4luxor__j,  m4luxor,    "luxor.rom",        0x0000, 0x010000, CRC(55277510) SHA1(9a866c36a398df52c54b554cd8085078c1f1954b), "hack","Luxor (Barcrest) (MPU4) (V1  0.6, hack, set 1)" )
 GAME_CUSTOM( 199?, m4luxor__c,  m4luxor,    "lux208c",          0x0000, 0x010000, CRC(f57bae67) SHA1(3a2523a2121948480381f49e26e870b10d541304), "hack","Luxor (Barcrest) (MPU4) (V1  0.6, hack, set 2)" )
 GAME_CUSTOM( 199?, m4luxor__o,  m4luxor,    "lux_20.4",         0x0000, 0x010000, CRC(50b3e5cc) SHA1(ff08095c01d8eeff320b5a04fe9f7e1888690cf8), "hack","Luxor (Barcrest) (MPU4) (V1  0.6, hack, set 3)" )
 GAME_CUSTOM( 199?, m4luxor__p,  m4luxor,    "lux_20_8",         0x0000, 0x010000, CRC(6c9a7152) SHA1(e38e8452e0d3f5b0e8ac51da272ab9f2e57e1d89), "hack","Luxor (Barcrest) (MPU4) (V1  0.6, hack, set 4)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4LUXOR_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x1f>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
 // "ROBIN  HOOD" and "LX5 1.0"
 GAME_CUSTOM( 199?, m4luxor__a,  m4luxor,    "lux05_101",        0x0000, 0x010000, CRC(8f4dc4f4) SHA1(c9743a1b79b377313504296a060dff3f413a7a9d), "hack","Luxor (Barcrest) (MPU4) (LX5 1.0, hack, set 1)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4LUXOR_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x2b>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
+// "ROBIN  HOOD" and "LX5 1.0"
 GAME_CUSTOM( 199?, m4luxor__d,  m4luxor,    "lux55",            0x0000, 0x010000, CRC(997419ab) SHA1(c616a5d6cb347963e7e5c5b88912c248bae184ca), "hack","Luxor (Barcrest) (MPU4) (LX5 1.0, hack, set 2)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4LUXOR_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x2f>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
+// "ROBIN  HOOD" and "LX5 1.0"
 GAME_CUSTOM( 199?, m4luxor__e,  m4luxor,    "lux58c",           0x0000, 0x010000, CRC(da408721) SHA1(971413620d1f304a026d3adc68f6ac5c1d104e20), "hack","Luxor (Barcrest) (MPU4) (LX5 1.0, hack, set 3)" )
 GAME_CUSTOM( 199?, m4luxor__k,  m4luxor,    "lux_05_4",         0x0000, 0x010000, CRC(335503ec) SHA1(dd03096aa98e4cac9fade6e77f9f8a8ad9a64287), "hack","Luxor (Barcrest) (MPU4) (LX5 1.0, hack, set 4)" )
 GAME_CUSTOM( 199?, m4luxor__l,  m4luxor,    "lux_05_8",         0x0000, 0x010000, CRC(43a15814) SHA1(694c8c6ee695bb746391f5269f540c995fc18002), "hack","Luxor (Barcrest) (MPU4) (LX5 1.0, hack, set 5)" )
@@ -6202,10 +6273,6 @@ GAME_CUSTOM( 199?, m4hotrod,       0,          "rodk.p1",                  0x000
 GAME_CUSTOM( 199?, m4hotrod__h,    m4hotrod,   "rodc.p1",                  0x0000, 0x010000, CRC(2f6b53d3) SHA1(fa4df1e6a2f6158cbc099d7e2d5ec96355079f36), "Barcrest","Hot Rod (Barcrest) (MPU4) (ROD 0.4C)" ) // 6.00 GBP Jackpot strings
 GAME_CUSTOM( 199?, m4hotrod__i,    m4hotrod,   "roddy.p1",                 0x0000, 0x010000, CRC(53e508ac) SHA1(24df8b949211e7bc5c7b8d704562b36e52cb8d5c), "Barcrest","Hot Rod (Barcrest) (MPU4) (ROD 0.4YD)" )
 GAME_CUSTOM( 199?, m4hotrod__j,    m4hotrod,   "rods.p1",                  0x0000, 0x010000, CRC(93d73857) SHA1(dcfd1dbf368f68ba3e7aa163eedd89c68aaccec8), "Barcrest","Hot Rod (Barcrest) (MPU4) (ROD 0.4)" )
-// are these hacks? there are already equal versioned sets above, seems to be replaced text strings for Jackpot and some code mods?
-GAME_CUSTOM( 199?, m4hotrod__e,    m4hotrod,   "hrod20_11",                0x0000, 0x010000, CRC(b81a57b6) SHA1(442c119b9ed70d4da2f9082ec01e410cfee76102), "hack",    "Hot Rod (Barcrest) (MPU4) (ROD 0.4C, hack?, set 1)" ) // 10.00 GBP Jackpot strings
-GAME_CUSTOM( 199?, m4hotrod__u,    m4hotrod,   "hrod_20_.4",               0x0000, 0x010000, CRC(c58bb470) SHA1(7bb831d7b647d17eff896ccce0ab7c8cfa8179b8), "hack",    "Hot Rod (Barcrest) (MPU4) (ROD 0.4C, hack?, set 2)" ) //  4.00 GBP Jackpot strings
-GAME_CUSTOM( 199?, m4hotrod__v,    m4hotrod,   "hrod_20_.8",               0x0000, 0x010000, CRC(a2d20781) SHA1(3f1b33374ae0a61815b38ad0e57856ae16047adc), "hack",    "Hot Rod (Barcrest) (MPU4) (ROD 0.4, hack?, set 3)" )
 
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
@@ -6245,7 +6312,7 @@ GAME_CUSTOM( 199?, m4hotrod__a,    m4hotrod,   "hot rod 5p 4 p1,27512",    0x000
 		ROM_LOAD( name, offset, length, hash ) \
 		M4HOTROD_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_814prot, ROT0, company, title, GAME_FLAGS )
 
 // no copyright string and "HR__1.0", different protection
 GAME_CUSTOM( 199?, m4hotrod__b,    m4hotrod,   "hr056c",                   0x0000, 0x010000, CRC(c062f285) SHA1(917e82cadf242aa815c525ff435cd4b04ea87e39), "hack","Hot Rod (Barcrest) (MPU4) (HR__1.0, hack, set 1)" )
@@ -6257,6 +6324,20 @@ GAME_CUSTOM( 199?, m4hotrod__q,    m4hotrod,   "hrod_05_.4",               0x000
 GAME_CUSTOM( 199?, m4hotrod__r,    m4hotrod,   "hrod_05_.8",               0x0000, 0x010000, CRC(b3c9e0c9) SHA1(4a549876121dd7fc5c11d3b03322d1e5f90eaa86), "hack","Hot Rod (Barcrest) (MPU4) (HR__1.0, hack, set 7)" )
 GAME_CUSTOM( 199?, m4hotrod__s,    m4hotrod,   "hrod_10_.4",               0x0000, 0x010000, CRC(b9e84451) SHA1(7566aef1604992376010758cb079fe9da67ad454), "hack","Hot Rod (Barcrest) (MPU4) (HR__1.0, hack, set 8)" )
 GAME_CUSTOM( 199?, m4hotrod__t,    m4hotrod,   "hrod_10_.8",               0x0000, 0x010000, CRC(62ac8057) SHA1(d2085ec0f29ff85251ef2c576e828f502420839d), "hack","Hot Rod (Barcrest) (MPU4) (HR__1.0, hack, set 9)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4HOTROD_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
+// these don't want the protection device mapped
+GAME_CUSTOM( 199?, m4hotrod__e,    m4hotrod,   "hrod20_11",                0x0000, 0x010000, CRC(b81a57b6) SHA1(442c119b9ed70d4da2f9082ec01e410cfee76102), "hack",    "Hot Rod (Barcrest) (MPU4) (ROD 0.4C, hack?, set 1)" ) // 10.00 GBP Jackpot strings
+GAME_CUSTOM( 199?, m4hotrod__u,    m4hotrod,   "hrod_20_.4",               0x0000, 0x010000, CRC(c58bb470) SHA1(7bb831d7b647d17eff896ccce0ab7c8cfa8179b8), "hack",    "Hot Rod (Barcrest) (MPU4) (ROD 0.4C, hack?, set 2)" ) //  4.00 GBP Jackpot strings
+GAME_CUSTOM( 199?, m4hotrod__v,    m4hotrod,   "hrod_20_.8",               0x0000, 0x010000, CRC(a2d20781) SHA1(3f1b33374ae0a61815b38ad0e57856ae16047adc), "hack",    "Hot Rod (Barcrest) (MPU4) (ROD 0.4, hack?, set 3)" )
 
 
 /*****************************************************************************************************************************************************************************
@@ -7382,8 +7463,6 @@ void mpu4mod4oki_machines_state::init_m4andybt()
 	//Front door code 0 Cash door code 0
 }
 
-//  ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-//  ROM_LOAD( "abt18s.chr", 0x0000, 0x000048, CRC(68007536) SHA1(72f7a76a1ba1c8ac94de425892780ffe78269513) )
 
 #define M4ANDYBT_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
@@ -7666,6 +7745,7 @@ GAME_CUSTOM( 199?, m4gb006__c,  m4gb006,    "bond20_11",    0x0000, 0x010000, CR
 	ROM_REGION( 0x180000, "msm6376", 0 ) \
 	ROM_LOAD( "cesnd.p1", 0x000000, 0x080000, CRC(2a10dc1a) SHA1(f6803f6e1fee2b58fe4831f59ddc08ec02792823) ) \
 	ROM_LOAD( "cesnd.p2", 0x080000, 0x080000, CRC(6f0b75c0) SHA1(33898d75a1e51b49950d7843069066d17c4736c5) )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -7951,18 +8031,6 @@ GAME_CUSTOM( 199?, m4ssclas__d,    m4ssclas,   "cs__xb_x.5_0", 0x0000, 0x010000,
 // "(C)1998    BWB" and "CSS 2.0"
 GAME_CUSTOM( 199?, m4ssclas__a,    m4ssclas,   "cs__x_dx.2_0", 0x0000, 0x010000, CRC(ea004a13) SHA1(db9a187b0672c69a6a149ec6d1025bd6da9beccd), "Bwb","Super Streak Classic (Barcrest) (MPU4) (CSS 2.0 D)" )
 
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( length, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-		M4SSCLAS_EXTRA_ROMS \
-	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
-
-// different protection
-// was in SC2 Super Star set, but seems to fit here, ident hacked to "BILL    BIXBY" and "V1   0.1"
-GAME_CUSTOM( 199?, m4ssclas__f,    m4ssclas,   "supst20.15",   0x0000, 0x010000, CRC(c3446ec4) SHA1(3c1ad27385547a33993a839b53873d8b92214ade), "hack","Super Streak Classic (Barcrest) (MPU4) (hack C)" )
 
 
 /*****************************************************************************************************************************************************************************
