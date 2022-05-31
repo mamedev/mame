@@ -174,73 +174,63 @@ public:
 	void mod2(machine_config &config);
 	void mod2_cheatchr(machine_config &config);
 	void mod2_chr(machine_config &config);
+
+	
+	template<const uint8_t* Table> void mod2_cheatchr_xxxx(machine_config &config)
+	{
+		mod2(config);
+		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+		m_characteriser->set_cpu_tag("maincpu");
+		m_characteriser->set_allow_6809_cheat(true);
+		m_characteriser->set_lamp_table(Table);
+	}
+
+	template<const uint8_t* Table> void mod2_alt_cheatchr_xxxx(machine_config &config)
+	{
+		mod2_alt(config);
+		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+		m_characteriser->set_cpu_tag("maincpu");
+		m_characteriser->set_allow_6809_cheat(true);
+		m_characteriser->set_lamp_table(Table);
+	}
+
+	template<const uint8_t* Table> void mod4oki_cheatchr_xxxx(machine_config &config)
+	{
+		mod4oki(config);
+		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+		m_characteriser->set_cpu_tag("maincpu");
+		m_characteriser->set_allow_6809_cheat(true);
+		m_characteriser->set_lamp_table(Table);
+	}
+
+	template<const uint8_t* Table> void mod4oki_alt_cheatchr_xxxx(machine_config &config)
+	{
+		mod4oki_alt(config);
+		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+		m_characteriser->set_cpu_tag("maincpu");
+		m_characteriser->set_allow_6809_cheat(true);
+		m_characteriser->set_lamp_table(Table);
+	}
+
+	template<const uint8_t* Table> void mod4yam_cheatchr_xxxx(machine_config &config)
+	{
+		mod4yam(config);
+		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+		m_characteriser->set_cpu_tag("maincpu");
+		m_characteriser->set_allow_6809_cheat(true);
+		m_characteriser->set_lamp_table(Table);
+	}
+
+	template<const uint8_t* Table> void mod4oki_5r_cheatchr_xxxx(machine_config &config)
+	{
+		mod4oki_5r(config);
+		MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+		m_characteriser->set_cpu_tag("maincpu");
+		m_characteriser->set_allow_6809_cheat(true);
+		m_characteriser->set_lamp_table(Table);
+	}
+
 	void mod2_cheatchr_table(machine_config &config, const uint8_t* table);
-	void mod2_cheatchr_shuffle(machine_config &config);
-	void mod2_cheatchr_lv(machine_config &config);
-	void mod2_cheatchr_tentendia(machine_config &config);
-	void mod2_cheatchr_celclb(machine_config &config);
-	void mod2_cheatchr_andybt(machine_config &config);
-	void mod2_cheatchr_cashmx(machine_config &config);
-	void mod2_cheatchr_viz(machine_config &config);
-	void mod2_cheatchr_nifty(machine_config &config);
-	void mod2_cheatchr_milclb(machine_config &config);
-	void mod2_cheatchr_fruitfall(machine_config &config);
-	void mod2_cheatchr_viva(machine_config &config);
-	void mod2_cheatchr_m574(machine_config &config);
-	void mod2_cheatchr_crkpot(machine_config &config);
-	void mod2_cheatchr_m400(machine_config &config);
-	void mod2_cheatchr_rhm(machine_config &config);
-	void mod2_cheatchr_squids(machine_config &config);
-	void mod2_cheatchr_intcep(machine_config &config);
-	void mod2_cheatchr_graff(machine_config &config);
-	void mod2_cheatchr_clbveg(machine_config &config);
-	void mod2_cheatchr_buc(machine_config &config);
-	void mod2_cheatchr_take2(machine_config &config);
-	void mod2_cheatchr_pzmoney(machine_config &config);
-	void mod2_cheatchr_actionbank(machine_config &config);
-	void mod2_cheatchr_m533(machine_config &config);
-	void mod2_cheatchr_toplot(machine_config &config);
-	void mod2_cheatchr_m435(machine_config &config);
-	void mod2_cheatchr_tri98(machine_config &config);
-	void mod2_cheatchr_vivlv(machine_config &config);
-	void mod2_cheatchr_m578(machine_config &config);
-	void mod2_cheatchr_addr(machine_config &config);
-	void mod2_cheatchr_alf(machine_config &config);
-	void mod2_cheatchr_magicdragon(machine_config &config);
-	void mod2_cheatchr_age(machine_config &config);
-	void mod2_cheatchr_m441(machine_config &config);
-	void mod2_cheatchr_luckystrike(machine_config &config);
-	void mod2_cheatchr_sunsetb(machine_config &config);
-	void mod2_cheatchr_rr6(machine_config &config);
-	void mod2_cheatchr_tictak(machine_config &config);
-	void mod2_cheatchr_du91(machine_config &config);
-	void mod2_cheatchr_m450(machine_config &config);
-	void mod2_cheatchr_actclba(machine_config &config);
-	void mod2_cheatchr_bjac(machine_config &config);
-	void mod2_cheatchr_phr(machine_config &config);
-	void mod2_cheatchr_wayin(machine_config &config);
-	void mod2_cheatchr_cheryo(machine_config &config);
-	void mod2_cheatchr_cosmiccasino(machine_config &config);
-	void mod2_cheatchr_kingqn(machine_config &config);
-	void mod2_cheatchr_sunsetclub(machine_config &config);
-	void mod2_cheatchr_topaction(machine_config &config);
-	void mod2_cheatchr_kqee2(machine_config &config);
-	void mod2_cheatchr_berseralt(machine_config &config);
-	void mod2_cheatchr_hittop(machine_config &config);
-	void mod2_cheatchr_tricolor(machine_config &config);
-	void mod2_cheatchr_blackwhite(machine_config &config);
-	void mod2_cheatchr_tribank(machine_config &config);
-	void mod2_cheatchr_toptake(machine_config &config);
-	void mod2_cheatchr_sunsetbalt(machine_config &config);
-	void mod2_cheatchr_eighth(machine_config &config);
-	void mod2_cheatchr_pontoon(machine_config &config);
-	void mod2_cheatchr_grandclub(machine_config &config);
-	void mod2_cheatchr_tajmahal(machine_config &config);
-	void mod2_cheatchr_giant(machine_config &config);
-	void mod2_cheatchr_randroul(machine_config &config);
-	void mod2_cheatchr_blueflash(machine_config &config);
-	void mod2_cheatchr_starsbars(machine_config &config);
-	void mod2_cheatchr_topgear(machine_config &config);
 
 	void mod2_bootleg_chr45(machine_config &config);
 	void mod2_bootleg_chr51(machine_config &config);
@@ -250,150 +240,24 @@ public:
 	void mod2_alt(machine_config &config);
 	void mod2_alt_cheatchr(machine_config &config);
 	void mod2_alt_cheatchr_table(machine_config &config, const uint8_t* table);
-	void mod2_alt_cheatchr_shuffle(machine_config &config);
-	void mod2_alt_cheatchr_m450(machine_config &config);
-	void mod2_alt_cheatchr_m470(machine_config &config);
-	void mod2_alt_cheatchr_alf(machine_config &config);
-	void mod2_alt_cheatchr_m400(machine_config &config);
 
-	void mod4oki(machine_config &config);
 	void mod4oki_5r(machine_config &config);
 	void mod4oki_5r_chr(machine_config &config);
 	void mod4oki_5r_cheatchr(machine_config &config);
 	void mod4oki_5r_cheatchr_table(machine_config &config, const uint8_t* table);
-	void mod4oki_5r_cheatchr_m574(machine_config &config);
-	void mod4oki_5r_cheatchr_shuffle(machine_config &config);
-	void mod4oki_5r_cheatchr_clbveg(machine_config &config);
-	void mod4oki_5r_cheatchr_age(machine_config &config);
 
 	void mod4oki_alt(machine_config &config);
 	void mod4oki_alt_cheatchr(machine_config &config);
 	void mod4oki_alt_cheatchr_table(machine_config& config, const uint8_t* table);
-	void mod4oki_alt_cheatchr_alf(machine_config &config);
-	void mod4oki_alt_cheatchr_clbveg(machine_config &config);
-	void mod4oki_alt_cheatchr_m470(machine_config &config);
-	void mod4oki_alt_cheatchr_m400(machine_config &config);
-	void mod4oki_alt_cheatchr_pzmoney(machine_config &config);
-	void mod4oki_alt_cheatchr_fortune(machine_config &config);
-	void mod4oki_alt_cheatchr_bluediamond(machine_config &config);
-	void mod4oki_alt_cheatchr_wildtime(machine_config &config);
 
-	void mod4oki_chr(machine_config &config);
+	void mod4oki(machine_config &config);
 	void mod4oki_cheatchr(machine_config &config);
 	void mod4oki_cheatchr_table(machine_config &config, const uint8_t* table);
-	void mod4oki_cheatchr_tri98(machine_config &config);
-	void mod4oki_cheatchr_lv(machine_config &config);
-	void mod4oki_cheatchr_m683(machine_config &config);
-	void mod4oki_cheatchr_m441(machine_config &config);
-	void mod4oki_cheatchr_m462(machine_config &config);
-	void mod4oki_cheatchr_wta(machine_config &config);
-	void mod4oki_cheatchr_du91(machine_config &config);
-	void mod4oki_cheatchr_m574(machine_config &config);
-	void mod4oki_cheatchr_viva(machine_config &config);
-	void mod4oki_cheatchr_m407(machine_config &config);
-	void mod4oki_cheatchr_duty(machine_config &config);
-	void mod4oki_cheatchr_andybt(machine_config &config);
-	void mod4oki_cheatchr_alf(machine_config &config);
-	void mod4oki_cheatchr_shuffle(machine_config &config);
-	void mod4oki_cheatchr_clbveg(machine_config &config);
-	void mod4oki_cheatchr_rr6(machine_config &config);
-	void mod4oki_cheatchr_rhm(machine_config &config);
-	void mod4oki_cheatchr_otm(machine_config &config);
-	void mod4oki_cheatchr_m470(machine_config &config);
-	void mod4oki_cheatchr_m533(machine_config &config);
-	void mod4oki_cheatchr_tentendia(machine_config &config);
-	void mod4oki_cheatchr_jewelcrown(machine_config &config);
-	void mod4oki_cheatchr_magicdragon(machine_config &config);
-	void mod4oki_cheatchr_premier(machine_config &config);
-	void mod4oki_cheatchr_viz(machine_config &config);
-	void mod4oki_cheatchr_nifty(machine_config &config);
-	void mod4oki_cheatchr_milclb(machine_config &config);
-	void mod4oki_cheatchr_fruitfall(machine_config &config);
-	void mod4oki_cheatchr_squids(machine_config &config);
-	void mod4oki_cheatchr_buc(machine_config &config);
-	void mod4oki_cheatchr_take2(machine_config &config);
-	void mod4oki_cheatchr_pzmoney(machine_config &config);
-	void mod4oki_cheatchr_fortune(machine_config &config);
-	void mod4oki_cheatchr_actionbank(machine_config &config);
-	void mod4oki_cheatchr_m578(machine_config &config);
-	void mod4oki_cheatchr_addr(machine_config &config);
-	void mod4oki_cheatchr_age(machine_config &config);
-	void mod4oki_cheatchr_luckystrike(machine_config &config);
-	void mod4oki_cheatchr_tictak(machine_config &config);
-	void mod4oki_cheatchr_actclba(machine_config &config);
-	void mod4oki_cheatchr_phr(machine_config &config);
-	void mod4oki_cheatchr_cheryo(machine_config &config);
-	void mod4oki_cheatchr_cosmiccasino(machine_config &config);
-	void mod4oki_cheatchr_kingqn(machine_config &config);
-	void mod4oki_cheatchr_turboplay(machine_config &config);
-	void mod4oki_cheatchr_sunsetclub(machine_config &config);
-	void mod4oki_cheatchr_mag7s(machine_config &config);
-	void mod4oki_cheatchr_oad(machine_config &config);
-	void mod4oki_cheatchr_topaction(machine_config &config);
-	void mod4oki_cheatchr_doublediamond(machine_config &config);
-	void mod4oki_cheatchr_ttt(machine_config &config);
-	void mod4oki_cheatchr_rhs(machine_config &config);
-	void mod4oki_cheatchr_cashencounters(machine_config &config);
-	void mod4oki_cheatchr_bankrollerclub(machine_config &config);
-	void mod4oki_cheatchr_copycat(machine_config &config);
-	void mod4oki_cheatchr_thestreak(machine_config &config);
-	void mod4oki_cheatchr_kqee2(machine_config &config);
-	void mod4oki_cheatchr_kqee(machine_config &config);
-	void mod4oki_cheatchr_pfloot(machine_config &config);
-	void mod4oki_cheatchr_rockmn(machine_config &config);
-	void mod4oki_cheatchr_berseralt(machine_config &config);
-	void mod4oki_cheatchr_berseralt2(machine_config &config);
-	void mod4oki_cheatchr_bagtel(machine_config &config);
-	void mod4oki_cheatchr_bucalt(machine_config &config);
-	void mod4oki_cheatchr_hotrodalt(machine_config &config);
-	void mod4oki_cheatchr_bdash(machine_config &config);
-	void mod4oki_cheatchr_saynomore(machine_config &config);
-	void mod4oki_cheatchr_luckystrikealt(machine_config &config);
-	void mod4oki_cheatchr_hittop(machine_config &config);
-	void mod4oki_cheatchr_vivaalt(machine_config &config);
-	void mod4oki_cheatchr_mintalt(machine_config &config);
-	void mod4oki_cheatchr_hittopalt(machine_config &config);
-	void mod4oki_cheatchr_hittopalt2(machine_config &config);
-	void mod4oki_cheatchr_andyfloalt(machine_config &config);
-	void mod4oki_cheatchr_andycappalt(machine_config &config);
-	void mod4oki_cheatchr_redheat(machine_config &config);
-	void mod4oki_cheatchr_blkcat(machine_config &config);
-	void mod4oki_cheatchr_salsa(machine_config &config);
-	void mod4oki_cheatchr_goljok(machine_config &config);
-	void mod4oki_cheatchr_blackwhite(machine_config &config);
-	void mod4oki_cheatchr_tricolor(machine_config &config);
+	void mod4oki_chr(machine_config &config);
 
 	void mod4yam(machine_config &config);
 	void mod4yam_cheatchr(machine_config &config);
 	void mod4yam_cheatchr_table(machine_config& config, const uint8_t* table);
-	void mod4yam_cheatchr_tri98(machine_config &config);
-	void mod4yam_cheatchr_lv(machine_config &config);
-	void mod4yam_cheatchr_m407(machine_config &config);
-	void mod4yam_cheatchr_m450(machine_config &config);
-	void mod4yam_cheatchr_m574(machine_config &config);
-	void mod4yam_cheatchr_m683(machine_config &config);
-	void mod4yam_cheatchr_shuffle(machine_config &config);
-	void mod4yam_cheatchr_vivlv(machine_config &config);
-	void mod4yam_cheatchr_viva(machine_config &config);
-	void mod4yam_cheatchr_tentendia(machine_config &config);
-	void mod4yam_cheatchr_celclb(machine_config &config);
-	void mod4yam_cheatchr_squids(machine_config &config);
-	void mod4yam_cheatchr_graff(machine_config &config);
-	void mod4yam_cheatchr_clbveg(machine_config &config);
-	void mod4yam_cheatchr_toplot(machine_config &config);
-	void mod4yam_cheatchr_m435(machine_config &config);
-	void mod4yam_cheatchr_m578(machine_config &config);
-	void mod4yam_cheatchr_addr(machine_config &config);
-	void mod4yam_cheatchr_age(machine_config &config);
-	void mod4yam_cheatchr_rr6(machine_config &config);
-	void mod4yam_cheatchr_turboplay(machine_config &config);
-	void mod4yam_cheatchr_duty(machine_config &config);
-	void mod4yam_cheatchr_saynomore(machine_config &config);
-	void mod4yam_cheatchr_gambal(machine_config &config);
-	void mod4yam_cheatchr_montealt(machine_config &config);
-	void mod4yam_cheatchr_przmontealt(machine_config &config);
-	void mod4yam_cheatchr_acechasealt(machine_config &config);
-	void mod4yam_cheatchr_hypvipalt(machine_config &config);
 	void mod4yam_chr(machine_config &config);
 
 	void mpu4_common(machine_config &config);
