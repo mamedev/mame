@@ -27,7 +27,7 @@
     Cash Machine
     Cloud Nine
     Copy Cat
-    Cosmic Casino
+    Cosmic Casinos
     Dennis The Menace
     Duty Free
     Duty Free (Prize version)
@@ -370,13 +370,24 @@ GAME_CUSTOM( 1995, m4andycpaccsd,      m4andycp,   "ac_05_d4.2_1",     0x0000, 0
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ANDYCP_EXTRA_ROMS \
 	ROM_END \
-	GAMEL( year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4andycp, ROT0, company, title, GAME_FLAGS, layout_m4andycp )
+	GAMEL( year, setname, parent, mod4oki_bootleg_fixedret<0x2e>, mpu4, mpu4mod4oki_machines_state, init_m4andycp, ROT0, company, title, GAME_FLAGS, layout_m4andycp )
 
 // different protection
-// // "95,S  ALIVE!!!" and "AND 0.3" (hack?)
+// "95,S  ALIVE!!!" and "AND 0.3" (hack?)
 GAME_CUSTOM( 199?, m4andycp20,         m4andycp,   "acap_20_.4",       0x0000, 0x010000, CRC(29848eed) SHA1(4096ab2f58b3293c559ff69c6f0f4d6c5dee2fd2), "hack?",    "Andy Capp (Barcrest) (MPU4) (hack?, set 1)" ) // bad chr
 GAME_CUSTOM( 199?, m4andycp20_a,       m4andycp,   "acap_20_.8",       0x0000, 0x010000, CRC(3981ec67) SHA1(ad040a4c8690d4348bfe306309df5374251f2b3e), "hack?",    "Andy Capp (Barcrest) (MPU4) (hack?, set 2)" ) // bad chr
-GAME_CUSTOM( 199?, m4andycp20_b,       m4andycp,   "acap20_11",        0x0000, 0x010000, CRC(799fd89e) SHA1(679016fad8b012bf6b6c617b99fd0dbe71eff562), "hack?",    "Andy Capp (Barcrest) (MPU4) (hack?, set 3)" ) // bad chr
+
+
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( 0x10000, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4ANDYCP_EXTRA_ROMS \
+	ROM_END \
+	GAMEL( year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4andycp, ROT0, company, title, GAME_FLAGS, layout_m4andycp )
+
 // "FATHER CHISTMAS" and "AC5 1.0" (hack?)
 GAME_CUSTOM( 1994, m4andycpac_a,       m4andycp,   "acap_05_.8",       0x0000, 0x010000, CRC(a17dd8de) SHA1(963d39fdca7c7b54f5ecf723c982eb30a426ebae), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC5, hack?)" ) // won't boot 'FATHER CHISTMAS'
 GAME_CUSTOM( 1994, m4andycpacc_a,      m4andycp,   "acap_05_.4",       0x0000, 0x010000, CRC(ca00ee84) SHA1(f1fef3db3db5ca7f0eb72ccc1daba8446db02924), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC5 C, hack?, set 1)" ) // won't boot 'FATHER CHISTMAS'
@@ -391,6 +402,9 @@ GAME_CUSTOM( 1994, m4andycp10c_b,      m4andycp,   "acp8ac",           0x0000, 0
 GAME_CUSTOM( 1994, m4andycp10c_c,      m4andycp,   "acap10_11",        0x0000, 0x010000, CRC(c3a866e7) SHA1(4c18e5a26ad2885eb012fd3dd61aaf9cc7d3519a), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC10C, hack?, set 3)" ) // won't boot 'FATHER CHISTMAS'
 GAME_CUSTOM( 1994, m4andycp10c_d,      m4andycp,   "acap_10_.4",       0x0000, 0x010000, CRC(fffe742d) SHA1(f2ca45391690dc31662e2d97a3ee34473effa258), "hack?",    "Andy Capp (Bwb / Barcrest) (MPU4) (AC10C, hack?, set 4)" ) // won't boot 'FATHER CHISTMAS'
 
+// different protection
+// "95,S  ALIVE!!!" and "AND 0.3" (hack?)
+GAME_CUSTOM( 199?, m4andycp20_b,       m4andycp,   "acap20_11",        0x0000, 0x010000, CRC(799fd89e) SHA1(679016fad8b012bf6b6c617b99fd0dbe71eff562), "hack?",    "Andy Capp (Barcrest) (MPU4) (hack?, set 3)" ) // bad chr
 
 /*****************************************************************************************************************************************************************************
 *
@@ -535,8 +549,6 @@ GAME_CUSTOM( 1991, m4andyflfr,     m4andyfl,    "alfr.p1",                 0x000
 *
 *****************************************************************************************************************************************************************************/
 
-//  ROM_REGION( 0x48, "characteriser:fakechr", 0 )
-//  ROM_LOAD( "df503s.chr", 0x0000, 0x000048, CRC(46c28f35) SHA1(e229b211180f9f7b30cd0bb9de162971d16b2d33) )
 
 #define M4DTYFRE_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
@@ -627,6 +639,29 @@ GAME_CUSTOM( 1993, m4dtyfref8k,    m4dtyfre,   "df8k.p1",                  0x000
 GAME_CUSTOM( 1993, m4dtyfref8y,    m4dtyfre,   "df8y.p1",                  0x0000, 0x010000, CRC(cb902ef4) SHA1(efd7cb0a002aa54131725759cb73387f281f15a9), "Barcrest","Duty Free (Barcrest) (MPU4) (DF8 0.1 Y)" )
 GAME_CUSTOM( 1993, m4dtyfref8yd,   m4dtyfre,   "df8dy.p1",                 0x0000, 0x010000, CRC(0f24e42d) SHA1(1049f50bc8e0a2f7b77d8e3cdc8883b6879e5cd9), "Barcrest","Duty Free (Barcrest) (MPU4) (DF8 0.1 YD)" )
 
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( 0x10000, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4DTYFRE_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x2b>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
+// "1997  COCO"  and "DF4  4.1" (hack?)
+GAME_CUSTOM( 199?, m4dtyfre_h1,    m4dtyfre,   "dfre55",                   0x0000, 0x010000, CRC(01e7d367) SHA1(638b709e4bb997998ccc7c4ea8adc33cabf2fe36), "hack?","Duty Free (Bwb / Barcrest) (MPU4) (DF4 4.1, hack?)" ) // bad chr
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( 0x10000, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4DTYFRE_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x1d>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
+// "HI BIG BOY"  and "DFT 0.1" (hack?)
+GAME_CUSTOM( 199?, m4dtyfre_h2,    m4dtyfre,   "duty2010",                 0x0000, 0x010000, CRC(48617f20) SHA1(dd35eef2357af6f88be42bb81608696ed97522c5), "hack?","Duty Free (Barcrest) (MPU4) (DFT 0.1, hack?)" ) // bad chr
 
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
@@ -650,10 +685,6 @@ GAME_CUSTOM( 1996, m4dtyfrebwb_e,  m4dtyfre,   "4df5.4",                   0x000
 GAME_CUSTOM( 1996, m4dtyfrebwb_f,  m4dtyfre,   "df5.4",                    0x0000, 0x010000, CRC(14de7ecb) SHA1(f7445b33b2febbf93fd0398ab310ac104e79443c), "Bwb","Duty Free (Bwb / Barcrest) (MPU4) (DF4 2.1)" )
 GAME_CUSTOM( 1996, m4dtyfrebwb_g,  m4dtyfre,   "df5,2.4",                  0x0000, 0x010000, CRC(50f8566c) SHA1(364d33de4b34d0052ffc98536468c0a13f847a2a), "Bwb","Duty Free (Bwb / Barcrest) (MPU4) (DF4 1.1)" )
 GAME_CUSTOM( 1996, m4dtyfrebwb_h,  m4dtyfre,   "df5.10",                   0x0000, 0x010000, CRC(96acf53f) SHA1(1297a9162dea474079d0ea63b2b1b8e7f649230a), "Bwb","Duty Free (Bwb / Barcrest) (MPU4) (DFC 2.3)" )
-// "1997  COCO"  and "DF4  4.1" (hack?)
-GAME_CUSTOM( 199?, m4dtyfre_h1,    m4dtyfre,   "dfre55",                   0x0000, 0x010000, CRC(01e7d367) SHA1(638b709e4bb997998ccc7c4ea8adc33cabf2fe36), "hack?","Duty Free (Bwb / Barcrest) (MPU4) (DF4 4.1, hack?)" ) // bad chr
-// "HI BIG BOY"  and "DFT 0.1" (hack?)
-GAME_CUSTOM( 199?, m4dtyfre_h2,    m4dtyfre,   "duty2010",                 0x0000, 0x010000, CRC(48617f20) SHA1(dd35eef2357af6f88be42bb81608696ed97522c5), "hack?","Duty Free (Barcrest) (MPU4) (DFT 0.1, hack?)" ) // bad chr
 
 
 /*****************************************************************************************************************************************************************************
@@ -851,10 +882,20 @@ GAME_CUSTOM( 1991, m4rhog_h14,       m4rhog,     "rhog_20_.4",               0x0
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RHOG_EXTRA_ROMS \
 	ROM_END \
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x1f>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
+// "(C)1991 BARCREST"  and "RR6 1.2" custom protection
+GAME_CUSTOM( 1991, m4rhog_h15,       m4rhog,     "rhog20_11",                0x0000, 0x010000, CRC(63c80ee0) SHA1(22a3f11007acedd833af9e73e3038fb3542781fe), "hack?","Road Hog (Barcrest) (MPU4) (RR6 1.2C, hack?, set 2)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( 0x10000, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4RHOG_EXTRA_ROMS \
+	ROM_END \
 	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
-// "(C)1991 BARCREST"  and "RR6 1.2" but won't boot, and we already have valid roms above, hacked?
-GAME_CUSTOM( 1991, m4rhog_h15,       m4rhog,     "rhog20_11",                0x0000, 0x010000, CRC(63c80ee0) SHA1(22a3f11007acedd833af9e73e3038fb3542781fe), "hack?","Road Hog (Barcrest) (MPU4) (RR6 1.2C, hack?, set 2)" )
 
 // different protection
 // "HAVE A NICE DAY"  and "RO_ 2.0" (won't boot)
@@ -1126,12 +1167,23 @@ GAME_CUSTOM( 199?, m4denmendtyd,   m4denmen,   "dmtdy.p1",                     0
 		ROM_LOAD( name, offset, length, hash ) \
 		M4DENMEN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x2b>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // different protection
 
 // "(C)1993 BARCREST"  and "DMT 0.1" (but hack? similar to other DMT sets, but with extra code inserted in places etc. different chr check)
 GAME_CUSTOM( 199?, m4denmen_h1,    m4denmen,   "dtm205",                       0x0000, 0x010000, CRC(af76a460) SHA1(325021a92042c87e804bc17d6a7ccfda8bf865b8), "hack","Dennis The Menace (Barcrest) (MPU4) (DMT 0.1, hack?)" )
+
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( 0x10000, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4DENMEN_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
 // "DAFFY   DUCK"  and "V1   0.1" (display message R.E.O instead of Barcrest)
 GAME_CUSTOM( 199?, m4denmen_h2,    m4denmen,   "den20.10",                     0x0000, 0x010000, CRC(e002932d) SHA1(0a9b31c138a79695e1c1c29eee40c5a741275da6), "hack","Dennis The Menace (Barcrest) (MPU4) (V1 0.1, hack, set 1)" )
 GAME_CUSTOM( 199?, m4denmen_h3,    m4denmen,   "denm2010",                     0x0000, 0x010000, CRC(dbed5e48) SHA1(f374f01aeefca7cc19fc46c93e2ca7a10606b183), "hack","Dennis The Menace (Barcrest) (MPU4) (V1 0.1, hack, set 2)" )
@@ -5732,15 +5784,25 @@ GAME_CUSTOM( 199?, m4bdash__a4, m4bdash,    "bo__xb_x.2_1", 0x0000, 0x020000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BDASH_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x70>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
 
 
-// no copyright string and "BLD 1.0"
-GAME_CUSTOM( 199?, m4bdash__a,  m4bdash,    "bdvarg.bin",   0x0000, 0x020000, CRC(99d579e7) SHA1(afc47144e0a8d464d8547b1ad14b0a3a1c15c027), "hack","Boulder Dash (Barcrest) (MPU4) (BLD 1.0, hack)" )
 // no copyright string and "BLD 0.7"
 GAME_CUSTOM( 199?, m4bdash__av, m4bdash,    "bold15g",      0x0000, 0x020000, CRC(fa400d34) SHA1(2faeb9b880fb4980aa0d96b4b962c879498445f2), "hack","Boulder Dash (Barcrest) (MPU4) (BLD 0.7 C, hack)" )
 // no copyright string and "BLS 0.1"
 GAME_CUSTOM( 199?, m4bdash__aw, m4bdash,    "bold15t",      0x0000, 0x020000, CRC(f3f331ae) SHA1(d999c8571549d8d26b7b861299d77c7282aef700), "hack","Boulder Dash (Barcrest) (MPU4) (BLS 0.1 C, hack)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4BDASH_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x68>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
+
+// no copyright string and "BLD 1.0"
+GAME_CUSTOM( 199?, m4bdash__a,  m4bdash,    "bdvarg.bin",   0x0000, 0x020000, CRC(99d579e7) SHA1(afc47144e0a8d464d8547b1ad14b0a3a1c15c027), "hack","Boulder Dash (Barcrest) (MPU4) (BLD 1.0, hack)" )
 
 
 /*****************************************************************************************************************************************************************************
@@ -7885,7 +7947,7 @@ GAME_CUSTOM( 199?, m4calama__h,    m4calama,   "calamari.cl",  0x0000, 0x020000,
 
 /*****************************************************************************************************************************************************************************
 *
-* Cosmic Casino
+* Cosmic Casinos
 *
 *****************************************************************************************************************************************************************************/
 
@@ -7907,28 +7969,28 @@ GAME_CUSTOM( 199?, m4calama__h,    m4calama,   "calamari.cl",  0x0000, 0x020000,
 
 // needs chr sequence starting 00 30 10 44 70 10 44 30 54 14 40 74 10 40 (cosmiccasino)
 // "(C)1998  B.W.B." and "CC__3.0"
-GAME_CUSTOM( 199?, m4coscas,       0,          "cc_sj___.3s1",         0x0000, 0x020000, CRC(52c312b0) SHA1(bd5381d58b1acb7adf6857c142eae4a253081fbd), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0)" )
-GAME_CUSTOM( 199?, m4coscas__d,    m4coscas,   "cc_sj__c.3r1",         0x0000, 0x020000, CRC(44b940a6) SHA1(7e621873fcf6460f654e35cc74552e86b6253ddb), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0 C)" )
-GAME_CUSTOM( 199?, m4coscas__f,    m4coscas,   "cc_sj_b_.3s1",         0x0000, 0x020000, CRC(019f0a71) SHA1(7a97f4e89c16e25f8e7502bba37f49c8496fbb47), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0 YD)" )
-GAME_CUSTOM( 199?, m4coscas__g,    m4coscas,   "cc_sj_bc.3r1",         0x0000, 0x020000, CRC(de9bb8e1) SHA1(7974b03974531eb4b5ed865b8eeb9649c1346df4), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0 YCD)" )
-GAME_CUSTOM( 199?, m4coscas__i,    m4coscas,   "cc_sj_d_.3s1",         0x0000, 0x020000, CRC(215e12f3) SHA1(68ed9923c6fd51e9305afac9d271c7b3ce38b12f), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0 D)" )
-GAME_CUSTOM( 199?, m4coscas__j,    m4coscas,   "cc_sj_dc.3r1",         0x0000, 0x020000, CRC(00e357c3) SHA1(02bf7427899d2e536442b87d41c140ebd787a580), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0 CD)" )
-GAME_CUSTOM( 199?, m4coscas__l,    m4coscas,   "cc_sj_k_.3s1",         0x0000, 0x020000, CRC(9161912d) SHA1(d11109f4bdc1c60f4cf477e1f26556800a83abdb), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0 Y)" )
-GAME_CUSTOM( 199?, m4coscas__m,    m4coscas,   "cc_sj_kc.3r1",         0x0000, 0x020000, CRC(b0dcd41d) SHA1(6b50a5e401bf854186331673dcc0c3fc5de2991b), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0 YC)" )
-GAME_CUSTOM( 199?, m4coscas__n,    m4coscas,   "cc_sja__.3s1",         0x0000, 0x020000, CRC(1682b1d3) SHA1(24baaf789eca150f0f6fd9c510e245aa7b88cc4c), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0 K)" )
-GAME_CUSTOM( 199?, m4coscas__o,    m4coscas,   "cc_sja_c.3r1",         0x0000, 0x020000, CRC(373ff4e3) SHA1(55b7ab247863eb3c025e84782c8cab7734343077), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0 CK)" )
-GAME_CUSTOM( 199?, m4coscas__q,    m4coscas,   "cc_sjb__.3s1",         0x0000, 0x020000, CRC(5c451985) SHA1(517f634d31f7190ca6685c1037fb66a8b87effba), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0 B)" )
-GAME_CUSTOM( 199?, m4coscas__s,    m4coscas,   "cc_sjbgc.3r1",         0x0000, 0x020000, CRC(2de82f88) SHA1(5c8029d43282a014e82b4f975616ed2bbc0e5641), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0 BCAD)" )
-GAME_CUSTOM( 199?, m4coscas__t,    m4coscas,   "cc_sjbtc.3r1",         0x0000, 0x020000, CRC(976c2858) SHA1(a70a8fe51d1b9d903d099e89a40481ea6af13683), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0 BCR)" )
-GAME_CUSTOM( 199?, m4coscas__u,    m4coscas,   "cc_sjwb_.3s1",         0x0000, 0x020000, CRC(e2df8167) SHA1(c312b30402dd93c6d4a32932677430c9c996fd36), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0 YDH)" )
-GAME_CUSTOM( 199?, m4coscas__v,    m4coscas,   "cc_sjwbc.3r1",         0x0000, 0x020000, CRC(a33a59a6) SHA1(a74ffd647e8390d89df475cc3f5205462c9d93d7), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__3.0 YCDH)" )
+GAME_CUSTOM( 199?, m4coscas,       0,          "cc_sj___.3s1",         0x0000, 0x020000, CRC(52c312b0) SHA1(bd5381d58b1acb7adf6857c142eae4a253081fbd), "Bwb","Cosmic Casinos (Barcrest) (MPU4) (CC__3.0)" )
+GAME_CUSTOM( 199?, m4coscas__d,    m4coscas,   "cc_sj__c.3r1",         0x0000, 0x020000, CRC(44b940a6) SHA1(7e621873fcf6460f654e35cc74552e86b6253ddb), "Bwb","Cosmic Casinos (Barcrest) (MPU4) (CC__3.0 C)" )
+GAME_CUSTOM( 199?, m4coscas__f,    m4coscas,   "cc_sj_b_.3s1",         0x0000, 0x020000, CRC(019f0a71) SHA1(7a97f4e89c16e25f8e7502bba37f49c8496fbb47), "Bwb","Cosmic Casinos (Barcrest) (MPU4) (CC__3.0 YD)" )
+GAME_CUSTOM( 199?, m4coscas__g,    m4coscas,   "cc_sj_bc.3r1",         0x0000, 0x020000, CRC(de9bb8e1) SHA1(7974b03974531eb4b5ed865b8eeb9649c1346df4), "Bwb","Cosmic Casinos (Barcrest) (MPU4) (CC__3.0 YCD)" )
+GAME_CUSTOM( 199?, m4coscas__i,    m4coscas,   "cc_sj_d_.3s1",         0x0000, 0x020000, CRC(215e12f3) SHA1(68ed9923c6fd51e9305afac9d271c7b3ce38b12f), "Bwb","Cosmic Casinos (Barcrest) (MPU4) (CC__3.0 D)" )
+GAME_CUSTOM( 199?, m4coscas__j,    m4coscas,   "cc_sj_dc.3r1",         0x0000, 0x020000, CRC(00e357c3) SHA1(02bf7427899d2e536442b87d41c140ebd787a580), "Bwb","Cosmic Casinos (Barcrest) (MPU4) (CC__3.0 CD)" )
+GAME_CUSTOM( 199?, m4coscas__l,    m4coscas,   "cc_sj_k_.3s1",         0x0000, 0x020000, CRC(9161912d) SHA1(d11109f4bdc1c60f4cf477e1f26556800a83abdb), "Bwb","Cosmic Casinos (Barcrest) (MPU4) (CC__3.0 Y)" )
+GAME_CUSTOM( 199?, m4coscas__m,    m4coscas,   "cc_sj_kc.3r1",         0x0000, 0x020000, CRC(b0dcd41d) SHA1(6b50a5e401bf854186331673dcc0c3fc5de2991b), "Bwb","Cosmic Casinos (Barcrest) (MPU4) (CC__3.0 YC)" )
+GAME_CUSTOM( 199?, m4coscas__n,    m4coscas,   "cc_sja__.3s1",         0x0000, 0x020000, CRC(1682b1d3) SHA1(24baaf789eca150f0f6fd9c510e245aa7b88cc4c), "Bwb","Cosmic Casinos (Barcrest) (MPU4) (CC__3.0 K)" )
+GAME_CUSTOM( 199?, m4coscas__o,    m4coscas,   "cc_sja_c.3r1",         0x0000, 0x020000, CRC(373ff4e3) SHA1(55b7ab247863eb3c025e84782c8cab7734343077), "Bwb","Cosmic Casinos (Barcrest) (MPU4) (CC__3.0 CK)" )
+GAME_CUSTOM( 199?, m4coscas__q,    m4coscas,   "cc_sjb__.3s1",         0x0000, 0x020000, CRC(5c451985) SHA1(517f634d31f7190ca6685c1037fb66a8b87effba), "Bwb","Cosmic Casinos (Barcrest) (MPU4) (CC__3.0 B)" )
+GAME_CUSTOM( 199?, m4coscas__s,    m4coscas,   "cc_sjbgc.3r1",         0x0000, 0x020000, CRC(2de82f88) SHA1(5c8029d43282a014e82b4f975616ed2bbc0e5641), "Bwb","Cosmic Casinos (Barcrest) (MPU4) (CC__3.0 BCAD)" )
+GAME_CUSTOM( 199?, m4coscas__t,    m4coscas,   "cc_sjbtc.3r1",         0x0000, 0x020000, CRC(976c2858) SHA1(a70a8fe51d1b9d903d099e89a40481ea6af13683), "Bwb","Cosmic Casinos (Barcrest) (MPU4) (CC__3.0 BCR)" )
+GAME_CUSTOM( 199?, m4coscas__u,    m4coscas,   "cc_sjwb_.3s1",         0x0000, 0x020000, CRC(e2df8167) SHA1(c312b30402dd93c6d4a32932677430c9c996fd36), "Bwb","Cosmic Casinos (Barcrest) (MPU4) (CC__3.0 YDH)" )
+GAME_CUSTOM( 199?, m4coscas__v,    m4coscas,   "cc_sjwbc.3r1",         0x0000, 0x020000, CRC(a33a59a6) SHA1(a74ffd647e8390d89df475cc3f5205462c9d93d7), "Bwb","Cosmic Casinos (Barcrest) (MPU4) (CC__3.0 YCDH)" )
 // "(C)1998  B.W.B." and "CC__7.0"
-GAME_CUSTOM( 199?, m4coscas__e,    m4coscas,   "cc_sj__c.7_1",         0x0000, 0x020000, CRC(ee9e6126) SHA1(fab6fd04004acebf291544720ba06cea79d5a054), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__7.0)" )
-GAME_CUSTOM( 199?, m4coscas__h,    m4coscas,   "cc_sj_bc.7_1",         0x0000, 0x020000, CRC(afe1aac6) SHA1(fc9c69e45db6a85c45ef8d32d048e5726d7da655), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__7.0 YD)" )
-GAME_CUSTOM( 199?, m4coscas__k,    m4coscas,   "cc_sj_dc.7_1",         0x0000, 0x020000, CRC(330d68a2) SHA1(12410af5f37b26f29f5cd23606ab0e128675095a), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__7.0 D)" )
-GAME_CUSTOM( 199?, m4coscas__p,    m4coscas,   "cc_sja_c.7_1",         0x0000, 0x020000, CRC(e956898e) SHA1(f51682651520551d481360bf86eba510cd758441), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__7.0 K)" )
-GAME_CUSTOM( 199?, m4coscas__r,    m4coscas,   "cc_sjb_c.7_1",         0x0000, 0x020000, CRC(109e9ae9) SHA1(00f381beb33cae58fc3429d3501efa4a9d9f0035), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__7.0 B)" )
-GAME_CUSTOM( 199?, m4coscas__b,    m4coscas,   "cosmiccasinos15.bin",  0x0000, 0x020000, CRC(ddba1241) SHA1(7ca2928ae2ab4e323b60bb661b60681f89cc5663), "Bwb","Cosmic Casino (Barcrest) (MPU4) (CC__7.0 Y)" )
+GAME_CUSTOM( 199?, m4coscas__e,    m4coscas,   "cc_sj__c.7_1",         0x0000, 0x020000, CRC(ee9e6126) SHA1(fab6fd04004acebf291544720ba06cea79d5a054), "Bwb","Cosmic Casinos (Barcrest) (MPU4) (CC__7.0)" )
+GAME_CUSTOM( 199?, m4coscas__h,    m4coscas,   "cc_sj_bc.7_1",         0x0000, 0x020000, CRC(afe1aac6) SHA1(fc9c69e45db6a85c45ef8d32d048e5726d7da655), "Bwb","Cosmic Casinos (Barcrest) (MPU4) (CC__7.0 YD)" )
+GAME_CUSTOM( 199?, m4coscas__k,    m4coscas,   "cc_sj_dc.7_1",         0x0000, 0x020000, CRC(330d68a2) SHA1(12410af5f37b26f29f5cd23606ab0e128675095a), "Bwb","Cosmic Casinos (Barcrest) (MPU4) (CC__7.0 D)" )
+GAME_CUSTOM( 199?, m4coscas__p,    m4coscas,   "cc_sja_c.7_1",         0x0000, 0x020000, CRC(e956898e) SHA1(f51682651520551d481360bf86eba510cd758441), "Bwb","Cosmic Casinos (Barcrest) (MPU4) (CC__7.0 K)" )
+GAME_CUSTOM( 199?, m4coscas__r,    m4coscas,   "cc_sjb_c.7_1",         0x0000, 0x020000, CRC(109e9ae9) SHA1(00f381beb33cae58fc3429d3501efa4a9d9f0035), "Bwb","Cosmic Casinos (Barcrest) (MPU4) (CC__7.0 B)" )
+GAME_CUSTOM( 199?, m4coscas__b,    m4coscas,   "cosmiccasinos15.bin",  0x0000, 0x020000, CRC(ddba1241) SHA1(7ca2928ae2ab4e323b60bb661b60681f89cc5663), "Bwb","Cosmic Casinos (Barcrest) (MPU4) (CC__7.0 Y)" )
 
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
@@ -7937,14 +7999,14 @@ GAME_CUSTOM( 199?, m4coscas__b,    m4coscas,   "cosmiccasinos15.bin",  0x0000, 0
 		ROM_LOAD( name, offset, length, hash ) \
 		M4COSCAS_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x70>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
 
 
 // need different protection handling
 // no copyright string and "CC__3.0"
-GAME_CUSTOM( 199?, m4coscas__c,    m4coscas,   "cc30s.p1",             0x0000, 0x020000, CRC(e308100a) SHA1(14cb07895d17237768877dd62ba7c3fc8e5b2630), "hack","Cosmic Casino (Barcrest) (MPU4) (CC__3.0, hack)" )
+GAME_CUSTOM( 199?, m4coscas__c,    m4coscas,   "cc30s.p1",             0x0000, 0x020000, CRC(e308100a) SHA1(14cb07895d17237768877dd62ba7c3fc8e5b2630), "hack","Cosmic Casinos (Barcrest) (MPU4) (CC__3.0, hack)" )
 // no copyright string and "CC__6.0"
-GAME_CUSTOM( 199?, m4coscas__a,    m4coscas,   "cosm15g",              0x0000, 0x020000, CRC(edd01d55) SHA1(49246fa1e12ceb3297f35616cdc1cf62472a379f), "hack","Cosmic Casino (Barcrest) (MPU4) (CC__6.0, hack)" )
+GAME_CUSTOM( 199?, m4coscas__a,    m4coscas,   "cosm15g",              0x0000, 0x020000, CRC(edd01d55) SHA1(49246fa1e12ceb3297f35616cdc1cf62472a379f), "hack","Cosmic Casinos (Barcrest) (MPU4) (CC__6.0, hack)" )
 
 
 /*****************************************************************************************************************************************************************************
