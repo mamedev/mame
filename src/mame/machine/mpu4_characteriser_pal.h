@@ -11,9 +11,10 @@
 
 DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_PAL, mpu4_characteriser_pal)
 DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_PAL_BWB, mpu4_characteriser_pal_bwb)
-DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL45, mpu4_characteriser_bootleg45)
-DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL51, mpu4_characteriser_bootleg51)
-DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL11, mpu4_characteriser_bootleg11)
+
+// bootleg protections
+DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL, mpu4_characteriser_bootleg)
+
 DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL_BLASTBANK, mpu4_characteriser_bootleg_blastbank)
 DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL_COPCASH, mpu4_characteriser_bootleg_copcash)
 
@@ -53,6 +54,12 @@ public:
 	{
 		m_is_4ksim = largetable;
 	}
+
+	void set_bootleg_fixed_return(uint8_t ret)
+	{
+		m_bootlegfixedreturn = ret;
+	}
+	
 
 	virtual uint8_t read(offs_t offset);
 	virtual void write(offs_t offset, uint8_t data);
@@ -457,6 +464,7 @@ protected:
 
 	uint8_t* m_current_chr_table;
 	int m_prot_col;
+	uint8_t m_bootlegfixedreturn = 0;
 
 private:
 
@@ -521,50 +529,19 @@ public:
 
 };
 
-class mpu4_characteriser_bootleg45 : public mpu4_characteriser_pal
+class mpu4_characteriser_bootleg : public mpu4_characteriser_pal
 {
 public:
 	// construction/destruction
-	mpu4_characteriser_bootleg45(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual uint8_t read(offs_t offset) override;
-	virtual void write(offs_t offset, uint8_t data) override;
-};
-
-class mpu4_characteriser_bootleg51 : public mpu4_characteriser_pal
-{
-public:
-	// construction/destruction
-	mpu4_characteriser_bootleg51(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mpu4_characteriser_pal(mconfig, MPU4_CHARACTERISER_BOOTLEG_PAL51, tag, owner, clock)
+	mpu4_characteriser_bootleg(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: mpu4_characteriser_pal(mconfig, MPU4_CHARACTERISER_BOOTLEG_PAL, tag, owner, clock)
 	{
 	}
 
 	virtual uint8_t read(offs_t offset) override
 	{
 		logerror("%s: Characteriser read offset %02x\n", machine().describe_context(), offset);
-		return 0x51;
-	}
-
-	virtual void write(offs_t offset, uint8_t data) override
-	{
-		logerror("%s: Characteriser write offset %02x data %02x\n", machine().describe_context(), offset, data);
-	}
-};
-
-class mpu4_characteriser_bootleg11 : public mpu4_characteriser_pal
-{
-public:
-	// construction/destruction
-	mpu4_characteriser_bootleg11(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mpu4_characteriser_pal(mconfig, MPU4_CHARACTERISER_BOOTLEG_PAL11, tag, owner, clock)
-	{
-	}
-
-	virtual uint8_t read(offs_t offset) override
-	{
-		logerror("%s: Characteriser read offset %02x\n", machine().describe_context(), offset);
-		return 0x11;
+		return m_bootlegfixedreturn;
 	}
 
 	virtual void write(offs_t offset, uint8_t data) override

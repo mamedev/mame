@@ -2396,12 +2396,22 @@ GAME(199?, m4hilonv,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::
 // 00 44 44 c4 58 60 c0 50 8c b8 e0 dc ec b0 1c e8 38 ec bc 68 a4 58 68 (fruitfall scramble)
 GAME(199?, m4octo,    0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::fruitfall_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Octopus (Nova) (MPU4)",GAME_FLAGS )
 
-
 // NETWORK FAIL ALARM (reel comms?)
 // 00 84 8c d8 74 80 4c 90 e8 78 54 60 84 2c b0 28 b0 e8 f8 34 c0 4c 90 a8 (m578)
 GAME(1994, m4esctbg,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m578_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default,     ROT0, "Vifico", "Escalera Tobogan (MPU4, set 1)", GAME_FLAGS )
 GAME(1994, m4esctbga, m4esctbg,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m578_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default,     ROT0, "Vifico", "Escalera Tobogan (MPU4, set 2)", GAME_FLAGS )
 GAME(1994, m4esctbgb, m4esctbg,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m578_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default,     ROT0, "Vifico", "Escalera Tobogan (MPU4, set 3)", GAME_FLAGS )
+
+// 00 84 94 3c ec 5c ec 50 2c 68 60 ac 74 00 ac 58 ec 7c ec 58 (just tri98)  runs
+GAME(199?, m4cld02,   0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","unknown MPU4 'CLD 0.2C' (MPU4)",GAME_FLAGS )
+
+// runs, coins don't work, Dutch?
+// 00 60 60 a0 2c 50 84 28 d4 c8 9c b4 48 94 cc 98 b4 cc dc 34 c0 a8 18 f4 48 d4 c8 1c (blkcat)
+GAME(199?, m4riotrp,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::blkcat_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Rio Tropico (unknown) (MPU4)",GAME_FLAGS )
+
+// non-standard protection
+GAME(199?, m4t266,    0,          mod2_bootleg_fixedret<0x11>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "bootleg","unknown MPU4 'TTO 1.1' (bootleg) (MPU4)",GAME_FLAGS )
+
 
 // Others
 
@@ -2443,8 +2453,7 @@ GAME(199?, m4barcrz,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_sta
 
 GAME(199?, m4bonzbn,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Bingo Bonanza (unknown) (MPU4?)",GAME_FLAGS )
 
-// 00 84 94 3c ec 5c ec 50 2c 68 60 ac 74 00 ac 58 ec 7c ec 58 (just tri98)  runs
-GAME(199?, m4cld02,   0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","unknown MPU4 'CLD 0.2C' (MPU4)",GAME_FLAGS )
+
 
 // ERROR CODE 2
 GAME(199?, m4matdr,   0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Matador (unknown) (MPU4?)",GAME_FLAGS )
@@ -2458,26 +2467,21 @@ GAME(199?, m4unkjoka, m4unkjok,   mod2,       mpu4,    mpu4unsorted_state, init_
 GAME(199?, m4unkjokb, m4unkjok,   mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","unknown MPU4 'Joker' (MPU4?) (set 3)",GAME_FLAGS ) // bad chr
 GAME(199?, m4unkjokc, m4unkjok,   mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","unknown MPU4 'Joker' (MPU4?) (set 4)",GAME_FLAGS ) // bad chr
 
-// chr alarm, without doing standard check
-GAME(199?, m4remag,   0,          mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","unknown MPU4 'ZTP 0.7' (MPU4?)",GAME_FLAGS )
+// non-standard protection, "no meters" error
+GAME(199?, m4remag,   0,          mod2_bootleg_fixedret<0x19>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","unknown MPU4 'ZTP 0.7' (MPU4?)",GAME_FLAGS )
 
-// chr alarm, without doing standard check
-GAME(199?, m4rmg,     0,          mod2,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","unknown MPU4 'CTP 0.4' (MPU4?)",GAME_FLAGS )
+// non-standard protection, "no meters" error
+GAME(199?, m4rmg,     0,          mod2_bootleg_fixedret<0x6a>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","unknown MPU4 'CTP 0.4' (MPU4?)",GAME_FLAGS )
 
 // REEL 1 FAULT
 GAME(199?, m4wnud,    0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","unknown MPU4 'W Nudge' (MPU4?)",GAME_FLAGS )
 
-// non-standard protection
-GAME(199?, m4t266,    0,          mod2_bootleg_chr11,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "bootleg","unknown MPU4 'TTO 1.1' (bootleg) (MPU4)",GAME_FLAGS )
 
 // runs, no sound (missing samples?), unprotected
 GAME(199?, m4brnze,   0,          mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Bronze Voyage (unknown) (MPU4) (set 1)",GAME_FLAGS )
 GAME(199?, m4brnzea,  m4brnze,    mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Bronze Voyage (unknown) (MPU4) (set 2)",GAME_FLAGS )
 GAME(199?, m4brnzeb,  m4brnze,    mod4oki,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Bronze Voyage (unknown) (MPU4) (set 3)",GAME_FLAGS )
 
-// runs, coins don't work, Dutch?
-// 00 60 60 a0 2c 50 84 28 d4 c8 9c b4 48 94 cc 98 b4 cc dc 34 c0 a8 18 f4 48 d4 c8 1c (blkcat)
-GAME(199?, m4riotrp,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::blkcat_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Rio Tropico (unknown) (MPU4)",GAME_FLAGS )
 
 /* *if* these are MPU4 they have a different sound system at least - The copyright strings in them are 'AET' tho (Ace?) - Could be related to the Crystal stuff? */
 GAME(199?, m4sbx,     0,          mpu4crys,   mpu4,    mpu4unsorted_state, init_m_frkstn,  ROT0,   "AET/Coinworld","Super Bear X (MPU4?) (set 1)",GAME_FLAGS )

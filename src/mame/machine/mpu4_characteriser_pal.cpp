@@ -38,9 +38,7 @@ check is bypassed. This may be something to look at for prototype ROMs and hacks
 DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_PAL, mpu4_characteriser_pal, "mpu4chrpal", "Barcrest MPU4 Characteriser PAL")
 DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_PAL_BWB, mpu4_characteriser_pal_bwb, "mpu4chrpalbwb", "Barcrest MPU4 Characteriser PAL (BWB type)")
 
-DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL45, mpu4_characteriser_bootleg45, "mpu4chrpalboot45", "Barcrest MPU4 Characteriser PAL (bootleg type 1)")
-DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL51, mpu4_characteriser_bootleg51, "mpu4chrpalboot51", "Barcrest MPU4 Characteriser PAL (bootleg type 2)")
-DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL11, mpu4_characteriser_bootleg11, "mpu4chrpalboot11", "Barcrest MPU4 Characteriser PAL (bootleg type 3)")
+DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL, mpu4_characteriser_bootleg, "mpu4chrpalboot19", "Barcrest MPU4 Characteriser PAL (bootleg type)")
 
 DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL_BLASTBANK, mpu4_characteriser_bootleg_blastbank, "mpu4chrpalboot_blast", "Barcrest MPU4 Characteriser PAL (Bank A Blast)")
 DEFINE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL_COPCASH, mpu4_characteriser_bootleg_copcash, "mpu4chrpalboot_copcash", "Barcrest MPU4 Characteriser PAL (Coppa Cash)")
@@ -509,23 +507,6 @@ uint8_t mpu4_characteriser_pal_bwb::read(offs_t offset)
 
 	many sets have been hacked to use their own protection styles
 */
-
-mpu4_characteriser_bootleg45::mpu4_characteriser_bootleg45(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mpu4_characteriser_pal(mconfig, MPU4_CHARACTERISER_BOOTLEG_PAL45, tag, owner, clock)
-{
-}
-
-uint8_t mpu4_characteriser_bootleg45::read(offs_t offset)
-{
-	logerror("%s: Characteriser read offset %02x\n", machine().describe_context(), offset);
-	return 0x45;
-}
-
-void mpu4_characteriser_bootleg45::write(offs_t offset, uint8_t data)
-{
-	logerror("%s: Characteriser write offset %02x data %02x\n", machine().describe_context(), offset, data);
-}
-
 
 
 mpu4_characteriser_bootleg_blastbank::mpu4_characteriser_bootleg_blastbank(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -2843,24 +2843,6 @@ void mpu4_state::mod2_cheatchr(machine_config &config)
 	mod2_cheatchr_table(config, nullptr);
 }
 
-void mpu4_state::mod2_bootleg_chr45(machine_config &config)
-{
-	mod2(config);
-	MPU4_CHARACTERISER_BOOTLEG_PAL45(config, m_characteriser, 0);
-}
-
-void mpu4_state::mod2_bootleg_chr51(machine_config &config)
-{
-	mod2(config);
-	MPU4_CHARACTERISER_BOOTLEG_PAL51(config, m_characteriser, 0);
-}
-
-void mpu4_state::mod2_bootleg_chr11(machine_config &config)
-{
-	mod2(config);
-	MPU4_CHARACTERISER_BOOTLEG_PAL11(config, m_characteriser, 0);
-}
-
 
 void mpu4_state::mod2_chr_blastbnk(machine_config &config)
 {

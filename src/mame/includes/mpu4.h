@@ -233,9 +233,14 @@ public:
 	void mod2_cheatchr_table(machine_config &config, const uint8_t* table);
 
 	// bootleg mod2
-	void mod2_bootleg_chr45(machine_config &config);
-	void mod2_bootleg_chr51(machine_config &config);
-	void mod2_bootleg_chr11(machine_config &config);
+	template<uint8_t Fixed> void mod2_bootleg_fixedret(machine_config &config)
+	{
+		mod2(config);
+		MPU4_CHARACTERISER_BOOTLEG_PAL(config, m_characteriser, 0);
+		m_characteriser->set_bootleg_fixed_return(Fixed);
+	}
+
+
 	void mod2_chr_blastbnk(machine_config &config);
 	void mod2_chr_copcash(machine_config &config);
 

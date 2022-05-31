@@ -1962,7 +1962,7 @@ GAMEL(199?, m4actclba,m4actclb,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::act
 GAME(199?, m4bluemn,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::m4lv_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Blue Moon (Barcrest) (MPU4) (BLU 2.3)",GAME_FLAGS )
 GAME(199?, m4bluemna, m4bluemn,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::m4lv_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Blue Moon (Barcrest) (MPU4) (BLU 2.1)",GAME_FLAGS )
 // not using standard protection, hack?
-GAME(199?, m4bluemnb, m4bluemn,   mod2_bootleg_chr51, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "hack?","Blue Moon (Barcrest) (MPU4) (BLU 1.1)",GAME_FLAGS ) // bad chr, non-blanked out start of rom (hack?)
+GAME(199?, m4bluemnb, m4bluemn,   mod2_bootleg_fixedret<0x51>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "hack?","Blue Moon (Barcrest) (MPU4) (BLU 1.1)",GAME_FLAGS ) // bad chr, non-blanked out start of rom (hack?)
 
 // 00 50 40 14 c4 b0 a4 30 c4 74 00 d4 e0 30 c0 34 c4 (take2)
 GAME(199?, m4take2,   0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::take2_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Take Two (Barcrest) (MPU4) (TTO 1.2)",GAME_FLAGS )
@@ -2160,10 +2160,10 @@ GAME(199?, m4joltava, m4joltav,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::viv
 GAME(199?, m4joltavb, m4joltav,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::viva_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Jolly Taverner (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
 
 // this has a 'tri98' protection sequence check in ROM, but the code appears to have been hacked to expect a different response.
-GAME(199?, m4btclok,  0,          mod2_bootleg_chr45, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "bootleg","Beat The Clock (Barcrest) (bootleg) (MPU4)",GAME_FLAGS )
+GAME(199?, m4btclok,  0,          mod2_bootleg_fixedret<0x45>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "bootleg","Beat The Clock (Barcrest) (bootleg) (MPU4)",GAME_FLAGS )
 
 // protection has been hacked
-GAME(199?, m4brktak,  0,          mod2_bootleg_chr45, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "bootleg","Break & Take (Barcrest) (bootleg) (MPU4)",GAME_FLAGS )
+GAME(199?, m4brktak,  0,          mod2_bootleg_fixedret<0x45>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "bootleg","Break & Take (Barcrest) (bootleg) (MPU4)",GAME_FLAGS )
 
 
 // these were found in with mod4oki sets, but don't attempt to play samples, only use the AY
