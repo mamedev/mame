@@ -1241,6 +1241,10 @@ ROM_START( m4take2a )
 	ROM_LOAD( "take220p", 0x0000, 0x010000, CRC(b536311a) SHA1(234945d2419c8391307db5b5d01d228894441faf) ) // contains inaccessible data before 0x1000
 ROM_END
 
+ROM_START( m4t266 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "t2 66.bin", 0x0000, 0x010000, CRC(5c99c6bb) SHA1(7b74e0e5207c00b31cb1859e0cc458c0412a1a07) )
+ROM_END
 
 ROM_START( m4pont )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1970,9 +1974,11 @@ GAME(199?, m4bluemna, m4bluemn,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::m4l
 GAME(199?, m4bluemnb, m4bluemn,   mod2_bootleg_fixedret<0x51>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "hack?","Blue Moon (Barcrest) (MPU4) (BLU 1.1)",GAME_FLAGS ) // bad chr, non-blanked out start of rom (hack?)
 
 // 00 50 40 14 c4 b0 a4 30 c4 74 00 d4 e0 30 c0 34 c4 (take2)
-GAME(199?, m4take2,   0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::take2_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Take Two (Barcrest) (MPU4) (TTO 1.2)",GAME_FLAGS )
+GAME(199?, m4take2,   0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::take2_characteriser_prot>, mpu4,   mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Take Two (Barcrest) (MPU4) (TTO 1.2)",GAME_FLAGS )
 // not using standard protection, hack?
-GAME(199?, m4take2a,  m4take2,    mod2_cheatchr, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "hack?","Take Two (Barcrest) (MPU4) (TTO 1.1)",GAME_FLAGS ) // bad chr, non-blanked out start of rom (hack?)
+GAME(199?, m4take2a,  m4take2,    mod2_bootleg_fixedret<0x11>,                                          mpu4,   mpu4mod2_machines_state, init_m4default,     ROT0,   "bootleg","Take Two (Barcrest) (MPU4) (TTO 1.1) (set 1)",GAME_FLAGS )
+// non-standard protection
+GAME(199?, m4t266,    m4take2,    mod2_bootleg_fixedret<0x11>,                                          mpu4,   mpu4mod2_machines_state, init_m4default,     ROT0,   "bootleg","Take Two (Barcrest) (MPU4) (TTO 1.1) (set 2)",GAME_FLAGS )
 
 // 00 14 10 a0 c4 c4 74 30 b0 70 00 b4 50 80 f4 40 (pontoon)
 GAME(199?, m4pont,    0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::pontoon_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Pontoon Club (Barcrest) (MPU4) (PON 3.0)",GAME_FLAGS ) // set stake to boot

@@ -24570,7 +24570,6 @@ m4supbfa                        //
 m4surf                          // Super Surfin' (Gemini)
 m4surfa                         //
 m4surfb                         //
-m4t266                          // Unknown MPU4 'TTO 1.1'
 m4take5                         // Take 5 (Barcrest)
 m4tbplay                        // Turbo Play (Barcrest)
 m4tbplaya                       //
@@ -26261,6 +26260,7 @@ m4swpnota                       // Swap-A-Note (Barcrest)
 m4taj                           // Taj Mahal (Barcrest)
 m4take2                         // Take Two (Barcrest)
 m4take2a                        //
+m4t266                          // Unknown MPU4 'TTO 1.1'
 m4tbreel                        // Turbo Reel (Barcrest)
 m4tbrldx                        // Turbo Reel Deluxe (Barcrest)
 m4thehit                        // The Hit (Barcrest)

@@ -1734,11 +1734,6 @@ ROM_START( m4wnud )
 	ROM_LOAD( "wnudge.bin", 0x8000, 0x008000, CRC(1d935575) SHA1(c4177c41473c0fb511e0ee035961f55ad43be14d) )
 ROM_END
 
-ROM_START( m4t266 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "t2 66.bin", 0x0000, 0x010000, CRC(5c99c6bb) SHA1(7b74e0e5207c00b31cb1859e0cc458c0412a1a07) )
-ROM_END
-
 ROM_START( m4brnze )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bv25", 0x0000, 0x010000, CRC(5c66f460) SHA1(c7587a6e992549ad8814f77c65b33a17a3641431) )
@@ -2408,9 +2403,6 @@ GAME(199?, m4cld02,   0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::
 // runs, coins don't work, Dutch?
 // 00 60 60 a0 2c 50 84 28 d4 c8 9c b4 48 94 cc 98 b4 cc dc 34 c0 a8 18 f4 48 d4 c8 1c (blkcat)
 GAME(199?, m4riotrp,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::blkcat_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Rio Tropico (unknown) (MPU4)",GAME_FLAGS )
-
-// non-standard protection
-GAME(199?, m4t266,    0,          mod2_bootleg_fixedret<0x11>,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "bootleg","unknown MPU4 'TTO 1.1' (bootleg) (MPU4)",GAME_FLAGS )
 
 
 // Others
