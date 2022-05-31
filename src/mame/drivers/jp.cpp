@@ -533,8 +533,8 @@ ROM_START(aqualand)
 	ROM_LOAD("jpaq14sd", 0x68000, 0x8000, CRC(0bdcbbbd) SHA1(555d8ed846079894cfc60041fb724deeaddc4e89))
 ROM_END
 
-/** Seems like this alternate CPU ROM was for a different hardware revision, as if you use the CPU ROM from
-    'aqualand' on this machine, the "Diana Variable" locks and you cannot play, while its own ROM works OK. */
+/* Seems like this alternate CPU ROM was for a different hardware revision, as if you use the CPU ROM from
+   'aqualand' on this machine, the "Diana Variable" locks and you cannot play, while its own ROM works OK. */
 ROM_START(aqualanda)
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("aqualand_cpu_a.bin", 0x0000, 0x2000, CRC(55caa233) SHA1(84dde0bf865f3bfc9a620510a9a816f4792a6610))
