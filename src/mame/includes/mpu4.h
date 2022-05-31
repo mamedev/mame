@@ -128,6 +128,10 @@ public:
 	void init_m4_showstring();
 	void init_m4_showstring_big();
 
+	void init_m4_showstring_812prot();
+	void init_m4_showstring_814prot();
+
+
 	void init_crystali();
 	void init_m4tst2();
 	void init_crystal();
@@ -393,6 +397,8 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(pia_gb_cb2_w);
 
 	DECLARE_WRITE_LINE_MEMBER(dataport_rxd);
+	
+	uint8_t bootleg814_r(address_space &space, offs_t offset);
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<rocvfd_device> m_vfd;

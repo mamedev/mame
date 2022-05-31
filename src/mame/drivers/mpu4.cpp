@@ -3140,3 +3140,29 @@ void mpu4_state::init_m4_showstring_big()
 	init_m4default_big();
 	init_m4debug();
 }
+
+
+
+void mpu4_state::init_m4_showstring_812prot()
+{
+	init_m4_showstring();
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0812, 0x0812, read8m_delegate(*this, FUNC(mpu4_state::bootleg814_r)));
+}
+
+uint8_t mpu4_state::bootleg814_r(address_space &space, offs_t offset)
+{
+	// many bootlegs have an initial protection check reading 0x814 or 0x812
+	// if it passes, other checks are skipped.
+	//
+	// this could be a trap, maybe this one is meant to fail and the others are meant to pass
+
+	int addr = m_maincpu->state_int(M6809_PC);
+	logerror("%s: bootleg812_r / bootleg814_r offset %02x add %04x\n", machine().describe_context(), offset, addr);
+	return m_maincpu->space(AS_PROGRAM).read_byte(addr+8);
+}
+
+void mpu4_state::init_m4_showstring_814prot()
+{
+	init_m4_showstring();
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0814, 0x0814, read8m_delegate(*this, FUNC(mpu4_state::bootleg814_r)));
+}

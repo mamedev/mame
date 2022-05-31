@@ -2842,6 +2842,31 @@ GAME_CUSTOM( 199?, m4rfym__a1,   m4rfym, "ruty.p1",      0x0000, 0x010000, CRC(a
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RFYM_EXTRA_ROMS \
 	ROM_END \
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x2c>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
+// "(C)1996  B.W.B." and "RU4 1.1" (but hack?)
+GAME_CUSTOM( 199?, m4rfym__a4,   m4rfym, "rfym5.4",      0x0000, 0x010000, CRC(fe613006) SHA1(898b90893bfcb121575952c22c16570a27948bce), "hack","Run For Your Money (Barcrest) (MPU4) (RU4 1.1 K5, hack, set 1)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4RFYM_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x28>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
+// "1997  COCO" and "RU4 1.1" (hack)
+GAME_CUSTOM( 199?, m4rfym__7,    m4rfym, "rfym55",       0x0000, 0x010000, CRC(b7d638d8) SHA1(6064ceffd94ff149d8bcb117fd823de52030ac64), "hack","Run For Your Money (Barcrest) (MPU4) (RU4 1.1 K5, hack, set 2)" )
+
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4RFYM_EXTRA_ROMS \
+	ROM_END \
 	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // different protection
@@ -2849,16 +2874,12 @@ GAME_CUSTOM( 199?, m4rfym__a1,   m4rfym, "ruty.p1",      0x0000, 0x010000, CRC(a
 // "(C)1996  B.W.B." and "RUC 1.3" (but hack?)
 GAME_CUSTOM( 199?, m4rfym__6,    m4rfym, "rfym510l",     0x0000, 0x010000, CRC(24af47f3) SHA1(3d1ec9b013f3f7b497cfb62b42fbb2fa914b24b6), "hack","Run For Your Money (Barcrest) (MPU4) (RUC 1.3 K5, hack, set 1)" )
 GAME_CUSTOM( 199?, m4rfym__a3,   m4rfym, "rfym5.10",     0x0000, 0x010000, CRC(c2ce2cc2) SHA1(d5633e01f669ee8772ed77befa90180c6aa0111c), "hack","Run For Your Money (Barcrest) (MPU4) (RUC 1.3 K5, hack, set 2)" )
-// "(C)1996  B.W.B." and "RU4 1.1" (but hack?)
-GAME_CUSTOM( 199?, m4rfym__a4,   m4rfym, "rfym5.4",      0x0000, 0x010000, CRC(fe613006) SHA1(898b90893bfcb121575952c22c16570a27948bce), "hack","Run For Your Money (Barcrest) (MPU4) (RU4 1.1 K5, hack, set 1)" )
 // "(C)1996  B.W.B." and "RU8 1.2" (but hack?)
 GAME_CUSTOM( 199?, m4rfym__a5,   m4rfym, "rfym5.8t",     0x0000, 0x010000, CRC(c600718a) SHA1(168fa558f1b5b91fb805d483f3f4351ac80f90ff), "hack","Run For Your Money (Barcrest) (MPU4) (RU8 1.2 K5, hack)" )
 // "BILL AND BEN" and "V1 8 0.1" (hack)
 GAME_CUSTOM( 199?, m4rfym__4,    m4rfym, "rfym20",       0x0000, 0x010000, CRC(5e1d70e2) SHA1(2da1b8033a77d367c4b5c3d83a0e5def4e5e5d78), "hack","Run For Your Money (Barcrest) (MPU4) (V1 8 0.1 C, hack, set 1)" )
 GAME_CUSTOM( 199?, m4rfym__5,    m4rfym, "rfym2010",     0x0000, 0x010000, CRC(ec440e7e) SHA1(21f8d4708b5d779dcefcc1e921a5efe17dd6f8c7), "hack","Run For Your Money (Barcrest) (MPU4) (V1 8 0.1 C, hack, set 2)" )
 GAME_CUSTOM( 199?, m4rfym__a2,   m4rfym, "rfym20.10",    0x0000, 0x010000, CRC(947d00d2) SHA1(2c99da689541de247e35ac39eadfe070ac3196b5), "hack","Run For Your Money (Barcrest) (MPU4) (V1 8 0.1 C, hack, set 3)" )
-// "1997  COCO" and "RU4 1.1" (hack)
-GAME_CUSTOM( 199?, m4rfym__7,    m4rfym, "rfym55",       0x0000, 0x010000, CRC(b7d638d8) SHA1(6064ceffd94ff149d8bcb117fd823de52030ac64), "hack","Run For Your Money (Barcrest) (MPU4) (RU4 1.1 K5, hack, set 2)" )
 
 
 /*****************************************************************************************************************************************************************************
@@ -3417,13 +3438,24 @@ GAME_CUSTOM( 199?, m4vivaes__0,    m4vivaes,   "vesp10_11",            0x0000, 0
 		ROM_LOAD( name, offset, length, hash ) \
 		M4VIVAES_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_814prot, ROT0, company, title, GAME_FLAGS )
 
 // different protection
 
 // no copyright string and "8V1  0.3"
 GAME_CUSTOM( 199?, m4vivaes__1,    m4vivaes,   "vesp20_11",            0x0000, 0x010000, CRC(06233420) SHA1(06101dbe871617ae6ff098e070316ec98a15b704), "hack", "Viva Espana (Barcrest) (MPU4) (8V1  0.3, hack, set 1)" )
 GAME_CUSTOM( 199?, m4vivaes__an,   m4vivaes,   "vesp_20_.8",           0x0000, 0x010000, CRC(35f90f05) SHA1(0013ff32c809603efdad782306140bd7086be965), "hack", "Viva Espana (Barcrest) (MPU4) (8V1  0.3, hack, set 2)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4VIVAES_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_812prot, ROT0, company, title, GAME_FLAGS )
+
+
 // "(C)1997  CUCKOO" and "VE5 6.0" (hack)
 GAME_CUSTOM( 199?, m4vivaes__j,    m4vivaes,   "5p5vivaespana6-0.bin", 0x0000, 0x010000, CRC(adf02a7b) SHA1(2c61e175b920a67098503eb4d80b07b828c9f91d), "hack", "Viva Espana (Barcrest) (MPU4) (VE5 6.0, hack)" )
 
