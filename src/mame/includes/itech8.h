@@ -122,7 +122,6 @@ protected:
 	emu_timer *m_irq_off_timer = nullptr;
 	emu_timer *m_behind_beam_update_timer = nullptr;
 	emu_timer *m_blitter_done_timer = nullptr;
-	emu_timer *m_delayed_z80_control_timer = nullptr;
 	int m_bankxor = 0;
 
 	// common

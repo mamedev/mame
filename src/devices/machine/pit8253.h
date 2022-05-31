@@ -64,11 +64,11 @@ private:
 	uint8_t read();
 	void load_count(uint16_t newcount);
 	void readback(int command);
-	void control_w(uint8_t data) { m_control_timer->adjust(attotime::zero, data); }
+	void control_w(uint8_t data) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(pit_counter_device::control_w_deferred), this), data); }
 	TIMER_CALLBACK_MEMBER(control_w_deferred);
-	void count_w(uint8_t data) { m_count_timer->adjust(attotime::zero, data); }
+	void count_w(uint8_t data) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(pit_counter_device::count_w_deferred), this), data); }
 	TIMER_CALLBACK_MEMBER(count_w_deferred);
-	void gate_w(int state) { m_gate_timer->adjust(attotime::zero, state); }
+	void gate_w(int state) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(pit_counter_device::gate_w_deferred), this), state); }
 	TIMER_CALLBACK_MEMBER(gate_w_deferred);
 	void set_clock_signal(int state);
 	void set_clockin(double new_clockin);
@@ -83,9 +83,6 @@ private:
 	attotime m_next_update;     // time of next update
 
 	emu_timer *m_update_timer;  // MAME timer to process updates
-	emu_timer *m_control_timer;
-	emu_timer *m_count_timer;
-	emu_timer *m_gate_timer;
 
 	uint16_t m_value;           // current counter value ("CE" in Intel docs)
 	uint16_t m_latch;           // latched counter value ("OL" in Intel docs)

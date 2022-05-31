@@ -43,7 +43,7 @@ public:
 	philips_22vp931_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// input and output
-	void data_w(uint8_t data) { m_deferred_data_timer->adjust(attotime::zero, data); }
+	void data_w(uint8_t data) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(philips_22vp931_device::process_deferred_data), this), data); }
 	void reset_w(uint8_t data);
 	uint8_t data_r();
 	uint8_t ready_r() { return m_fromcontroller_pending ? CLEAR_LINE : ASSERT_LINE; }
@@ -94,7 +94,6 @@ private:
 	required_device<i8049_device> m_i8049_cpu;        // CPU index of the 8049
 	emu_timer *         m_initial_vbi_timer;
 	emu_timer *         m_process_vbi_timer;
-	emu_timer *         m_deferred_data_timer;
 	emu_timer *         m_irq_off_timer;
 	emu_timer *         m_strobe_off_timer;
 	emu_timer *         m_erp_off_timer;

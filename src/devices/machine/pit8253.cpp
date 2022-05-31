@@ -113,9 +113,6 @@ void pit8253_device::device_resolve_objects()
 void pit_counter_device::device_start()
 {
 	/* initialize timers */
-	m_control_timer = timer_alloc(FUNC(pit_counter_device::control_w_deferred), this);
-	m_count_timer = timer_alloc(FUNC(pit_counter_device::count_w_deferred), this);
-	m_gate_timer = timer_alloc(FUNC(pit_counter_device::gate_w_deferred), this);
 	m_update_timer = timer_alloc(FUNC(pit_counter_device::update_tick), this);
 	adjust_timer(attotime::never);
 

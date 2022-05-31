@@ -81,7 +81,6 @@ philips_22vp931_device::philips_22vp931_device(const machine_config &mconfig, co
 	: laserdisc_device(mconfig, PHILIPS_22VP931, tag, owner, clock),
 		m_i8049_cpu(*this, "vp931"),
 		m_process_vbi_timer(nullptr),
-		m_deferred_data_timer(nullptr),
 		m_irq_off_timer(nullptr),
 		m_strobe_off_timer(nullptr),
 		m_erp_off_timer(nullptr),
@@ -152,7 +151,6 @@ void philips_22vp931_device::device_start()
 	// allocate timers
 	m_initial_vbi_timer = timer_alloc(FUNC(philips_22vp931_device::process_vbi_data), this);
 	m_process_vbi_timer = timer_alloc(FUNC(philips_22vp931_device::process_vbi_data), this);
-	m_deferred_data_timer = timer_alloc(FUNC(philips_22vp931_device::process_deferred_data), this);
 	m_irq_off_timer = timer_alloc(FUNC(philips_22vp931_device::irq_off), this);
 	m_strobe_off_timer = timer_alloc(FUNC(philips_22vp931_device::data_strobe_off), this);
 	m_erp_off_timer = timer_alloc(FUNC(philips_22vp931_device::erp_off), this);

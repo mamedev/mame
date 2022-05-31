@@ -196,7 +196,6 @@ protected:
 	TIMER_CALLBACK_MEMBER(serout_complete_irq);
 	TIMER_CALLBACK_MEMBER(serin_ready_irq);
 	TIMER_CALLBACK_MEMBER(sync_write);
-	TIMER_CALLBACK_MEMBER(sync_noop);
 	TIMER_CALLBACK_MEMBER(sync_pot);
 	TIMER_CALLBACK_MEMBER(sync_set_irqst);
 
@@ -227,7 +226,7 @@ private:
 				if (m_parent->m_IRQEN & m_INTMask)
 				{
 					/* Exposed state has changed: This should only be updated after a resync ... */
-					m_parent->m_sync_set_irqst_timer->adjust(attotime::zero, m_INTMask);
+					m_parent->machine().scheduler().synchronize(timer_expired_delegate(FUNC(pokey_device::sync_set_irqst), m_parent), m_INTMask);
 				}
 			}
 		}
@@ -315,10 +314,6 @@ private:
 	emu_timer *m_serout_ready_timer;
 	emu_timer *m_serout_complete_timer;
 	emu_timer *m_serin_ready_timer;
-	emu_timer *m_sync_write_timer;
-	emu_timer *m_sync_noop_timer;
-	emu_timer *m_sync_pot_timer;
-	emu_timer *m_sync_set_irqst_timer;
 };
 
 

@@ -183,11 +183,7 @@ pokey_device::pokey_device(const machine_config &mconfig, const char *tag, devic
 		m_output_type(LEGACY_LINEAR),
 		m_serout_ready_timer(nullptr),
 		m_serout_complete_timer(nullptr),
-		m_serin_ready_timer(nullptr),
-		m_sync_write_timer(nullptr),
-		m_sync_noop_timer(nullptr),
-		m_sync_pot_timer(nullptr),
-		m_sync_set_irqst_timer(nullptr)
+		m_serin_ready_timer(nullptr)
 {
 }
 
@@ -268,10 +264,6 @@ void pokey_device::device_start()
 	m_serout_ready_timer = timer_alloc(FUNC(pokey_device::serout_ready_irq), this);
 	m_serout_complete_timer = timer_alloc(FUNC(pokey_device::serout_complete_irq), this);
 	m_serin_ready_timer = timer_alloc(FUNC(pokey_device::serin_ready_irq), this);
-	m_sync_write_timer = timer_alloc(FUNC(pokey_device::sync_write), this);
-	m_sync_noop_timer = timer_alloc(FUNC(pokey_device::sync_noop), this);
-	m_sync_pot_timer = timer_alloc(FUNC(pokey_device::sync_pot), this);
-	m_sync_set_irqst_timer = timer_alloc(FUNC(pokey_device::sync_set_irqst), this);
 
 	save_item(STRUCT_MEMBER(m_channel, m_borrow_cnt));
 	save_item(STRUCT_MEMBER(m_channel, m_counter));
@@ -402,11 +394,6 @@ TIMER_CALLBACK_MEMBER(pokey_device::sync_write)
 	offs_t offset = (param >> 8) & 0xff;
 	uint8_t data = param & 0xff;
 	write_internal(offset, data);
-}
-
-TIMER_CALLBACK_MEMBER(pokey_device::sync_noop)
-{
-	/* do nothing, caused by a forced resync */
 }
 
 TIMER_CALLBACK_MEMBER(pokey_device::sync_pot)
@@ -540,7 +527,7 @@ void pokey_device::step_pot()
 	}
 	// some pots latched?
 	if (upd != 0)
-		m_sync_pot_timer->adjust(attotime::zero, upd);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(pokey_device::sync_pot), this), upd);
 }
 
 /*
@@ -764,7 +751,7 @@ uint8_t pokey_device::read(offs_t offset)
 {
 	int data, pot;
 
-	m_sync_noop_timer->adjust(attotime::zero); /* force resync */
+	machine().scheduler().synchronize(); /* force resync */
 
 	switch (offset & 15)
 	{
@@ -858,7 +845,7 @@ uint8_t pokey_device::read(offs_t offset)
 
 void pokey_device::write(offs_t offset, uint8_t data)
 {
-	m_sync_write_timer->adjust(attotime::zero, (offset << 8) | data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(pokey_device::sync_write), this), (offset << 8) | data);
 }
 
 void pokey_device::write_internal(offs_t offset, uint8_t data)

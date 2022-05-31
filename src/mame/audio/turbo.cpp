@@ -116,9 +116,14 @@ void turbo_state::sound_a_w(uint8_t data)
 #else
 
 	if (((data ^ m_last_sound_a) & 0x1e) && (m_last_sound_a & 0x1e) != 0x1e)
-		m_delayed_sound_timer->adjust(attotime::from_hz(20000), data);
+	{
+		// TODO: This looks like a hack, in that it models a transport delay only when certain bits to the sound latch control change.
+		machine().scheduler().timer_set(attotime::from_hz(20000), FUNC(update_sound_a), data);
+	}
 	else
+	{
 		update_sound_a(data);
+	}
 
 	m_last_sound_a = data;
 

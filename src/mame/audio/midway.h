@@ -102,7 +102,6 @@ private:
 	optional_ioport_array<5> m_ports;
 
 	// internal state
-	emu_timer *m_synced_write_timer;
 	uint8_t m_data[4];
 	uint8_t m_status;
 	uint8_t m_14024_count;
@@ -156,7 +155,6 @@ private:
 	required_device_array<filter_biquad_device, 3> m_dac_filter;
 
 	// internal state
-	emu_timer *m_synced_write_timer;
 	uint8_t m_status;
 	uint16_t m_dacval;
 
@@ -198,7 +196,6 @@ private:
 	required_device_array<filter_biquad_device, 3> m_dac_filter;
 
 	// internal state
-	emu_timer *m_synced_write_timer;
 	uint8_t m_status;
 	uint16_t m_dacval;
 

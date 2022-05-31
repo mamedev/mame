@@ -716,7 +716,7 @@ int ef9365_device::get_char_pix(uint8_t c, int x, int y)
 			uint32_t char_base = c * 5;
 			uint32_t char_pix = (y * 5) + x;
 
-			if (BIT(m_charset[char_base + (char_pix >> 3)], 7 - (char_pix & 7)))
+			if (BIT(m_charset[char_base + (char_pix >> 3)], ~char_pix & 7))
 				return 1;
 			else
 				return 0;
@@ -765,7 +765,7 @@ int ef9365_device::draw_character(uint8_t c, bool block, bool smallblock)
 			{
 				if (block || get_char_pix(c, x_char, ((y_char_res - 1) - y_char)))
 				{
-					if (m_registers[EF936X_REG_CTRL2] & 0x04) // Italic mode
+					if (m_registers[EF936X_REG_CTRL2] & 0x04) // Oblique mode
 					{
 						for (uint16_t q = 0; q < q_factor; q++)
 						{
@@ -773,12 +773,12 @@ int ef9365_device::draw_character(uint8_t c, bool block, bool smallblock)
 							{
 								if (!(m_registers[EF936X_REG_CTRL2] & 0x08))
 								{
-									// Italic - Horizontal orientation
+									// Oblique - Horizontal orientation
 									plot(x + ((y_char * q_factor) + q) + ((x_char * p_factor) + p), y + ((y_char * q_factor) + q));
 								}
 								else
 								{
-									// Italic - Vertical orientation
+									// Oblique - Vertical orientation
 									plot(x - ((y_char * q_factor) + q), y + ((x_char * p_factor) + p) - ((((y_char_res - 1) - y_char) * q_factor) + (q_factor - q)));
 								}
 							}
@@ -976,10 +976,14 @@ void ef9365_device::ef9365_exec(uint8_t cmd)
 				break;
 			default:
 				logerror("Unemulated EF9365 cmd: %02x\n", cmd);
+				busy_cycles = 0;
 				break;
 		}
 
-		set_busy_flag(cycles_to_us(busy_cycles));
+		if (busy_cycles)
+		{
+			set_busy_flag(cycles_to_us(busy_cycles));
+		}
 	}
 	else
 	{
@@ -1106,7 +1110,7 @@ uint32_t ef9365_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 			for (int p = 0; p < nb_of_bitplanes; p++)
 			{
-				if (BIT(m_videoram->read_byte(BITPLANE_MAX_SIZE * p + (ptr >> 3)), 7 - (ptr & 7)))
+				if (BIT(m_videoram->read_byte(BITPLANE_MAX_SIZE * p + (ptr >> 3)), ~ptr & 7))
 				{
 					color_index |= 0x01 << p;
 				}

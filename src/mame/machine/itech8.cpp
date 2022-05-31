@@ -509,7 +509,7 @@ TIMER_CALLBACK_MEMBER(itech8_state::delayed_z80_control_w)
 
 void itech8_state::slikshot_z80_control_w(uint8_t data)
 {
-	m_delayed_z80_control_timer->adjust(attotime::zero, data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(itech8_state::delayed_z80_control_w), this), data);
 }
 
 

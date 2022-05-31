@@ -1787,11 +1787,11 @@ void sunplus_gcm394_base_device::checkirq6()
 
 TIMER_CALLBACK_MEMBER(sunplus_gcm394_base_device::unknown_tick)
 {
-m_7935 |= 0x0100;
-set_state_unsynced(UNSP_IRQ6_LINE, ASSERT_LINE);
-//set_state_unsynced(UNSP_IRQ4_LINE, ASSERT_LINE);
+	m_7935 |= 0x0100;
+	set_state_unsynced(UNSP_IRQ6_LINE, ASSERT_LINE);
+	//set_state_unsynced(UNSP_IRQ4_LINE, ASSERT_LINE);
 
-//  checkirq6();
+	//  checkirq6();
 }
 
 

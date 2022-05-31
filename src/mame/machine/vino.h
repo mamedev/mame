@@ -214,7 +214,7 @@ private:
 	uint32_t linear_rgb(uint32_t a, uint32_t b, float f);
 	uint32_t bilinear_pixel(float s, float t);
 	void input_pixel(int channel, int32_t &y, int32_t &u, int32_t &v);
-	TIMER_CALLBACK_MEMBER(fetch_pixel);
+	template <int Channel> TIMER_CALLBACK_MEMBER(fetch_pixel);
 	attotime calculate_field_rate(int channel);
 	attotime calculate_fetch_rate(int channel);
 

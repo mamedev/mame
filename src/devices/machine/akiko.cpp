@@ -89,7 +89,6 @@ akiko_device::akiko_device(const machine_config &mconfig, const char *tag, devic
 	, m_cdrom_toc(nullptr)
 	, m_dma_timer(nullptr)
 	, m_frame_timer(nullptr)
-	, m_delayed_cmd_timer(nullptr)
 	, m_mem_r(*this), m_mem_w(*this), m_int_w(*this)
 	, m_scl_w(*this), m_sda_r(*this), m_sda_w(*this)
 {
@@ -146,7 +145,6 @@ void akiko_device::device_start()
 	m_cdrom_toc = nullptr;
 	m_dma_timer = timer_alloc(FUNC(akiko_device::dma_proc), this);
 	m_frame_timer = timer_alloc(FUNC(akiko_device::frame_proc), this);
-	m_delayed_cmd_timer = timer_alloc(FUNC(akiko_device::cd_delayed_cmd), this);
 }
 
 //-------------------------------------------------
@@ -720,7 +718,7 @@ void akiko_device::update_cdrom()
 		{
 			m_cdrom_cmd_start = (m_cdrom_cmd_start + 3) & 0xff;
 
-			m_delayed_cmd_timer->adjust( attotime::from_msec(1), resp[0] );
+			machine().scheduler().timer_set( attotime::from_msec(1), timer_expired_delegate( FUNC( akiko_device::cd_delayed_cmd ), this ), resp[0] );
 
 			break;
 		}

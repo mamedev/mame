@@ -932,7 +932,7 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 			m_cursor_x = m_cursor_addr - m_line_address;
 
 			/* Schedule CURSOR ON signal */
-			m_cursor_timer->adjust(cclks_to_attotime(m_cursor_x));
+			m_cursor_on_timer->adjust(cclks_to_attotime(m_cursor_x));
 		}
 	}
 
@@ -953,15 +953,17 @@ TIMER_CALLBACK_MEMBER(mc6845_device::de_off_tick)
 	set_de( false );
 }
 
-TIMER_CALLBACK_MEMBER(mc6845_device::cursor_tick)
+TIMER_CALLBACK_MEMBER(mc6845_device::cursor_on)
 {
-	set_cur( (bool)param );
+	set_cur(true);
 
-	if (param)
-	{
-		/* Schedule CURSOR off signal */
-		m_cursor_timer->adjust(cclks_to_attotime(1));
-	}
+	/* Schedule CURSOR off signal */
+	m_cursor_off_timer->adjust(cclks_to_attotime(1));
+}
+
+TIMER_CALLBACK_MEMBER(mc6845_device::cursor_off)
+{
+	set_cur(false);
 }
 
 TIMER_CALLBACK_MEMBER(mc6845_device::hsync_on)
@@ -1220,7 +1222,8 @@ void mc6845_device::device_start()
 	/* create the timers */
 	m_line_timer = timer_alloc(FUNC(mc6845_device::handle_line_timer), this);
 	m_de_off_timer = timer_alloc(FUNC(mc6845_device::de_off_tick), this);
-	m_cursor_timer = timer_alloc(FUNC(mc6845_device::cursor_tick), this);
+	m_cursor_on_timer = timer_alloc(FUNC(mc6845_device::cursor_on), this);
+	m_cursor_off_timer = timer_alloc(FUNC(mc6845_device::cursor_off), this);
 	m_hsync_on_timer = timer_alloc(FUNC(mc6845_device::hsync_on), this);
 	m_hsync_off_timer = timer_alloc(FUNC(mc6845_device::hsync_off), this);
 	m_light_pen_latch_timer = timer_alloc(FUNC(mc6845_device::latch_light_pen), this);

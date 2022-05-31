@@ -170,8 +170,6 @@ t5182_device::t5182_device(const machine_config &mconfig, const char *tag, devic
 
 void t5182_device::device_start()
 {
-	m_setirq_cb = timer_alloc(FUNC(t5182_device::setirq_callback), this);
-
 	save_item(NAME(m_irqstate));
 	save_item(NAME(m_semaphore_main));
 	save_item(NAME(m_semaphore_snd));
@@ -223,25 +221,25 @@ TIMER_CALLBACK_MEMBER( t5182_device::setirq_callback )
 
 void t5182_device::sound_irq_w(uint8_t data)
 {
-	m_setirq_cb->adjust(attotime::zero, CPU_ASSERT);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(t5182_device::setirq_callback), this), CPU_ASSERT);
 }
 
 void t5182_device::ym2151_irq_ack_w(uint8_t data)
 {
-	m_setirq_cb->adjust(attotime::zero, YM2151_ACK);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(t5182_device::setirq_callback), this), YM2151_ACK);
 }
 
 void t5182_device::cpu_irq_ack_w(uint8_t data)
 {
-	m_setirq_cb->adjust(attotime::zero, CPU_CLEAR);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(t5182_device::setirq_callback), this), CPU_CLEAR);
 }
 
 WRITE_LINE_MEMBER(t5182_device::ym2151_irq_handler)
 {
 	if (state)
-		m_setirq_cb->adjust(attotime::zero, YM2151_ASSERT);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(t5182_device::setirq_callback), this), YM2151_ASSERT);
 	else
-		m_setirq_cb->adjust(attotime::zero, YM2151_CLEAR);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(t5182_device::setirq_callback), this), YM2151_CLEAR);
 }
 
 uint8_t t5182_device::sharedram_semaphore_snd_r()

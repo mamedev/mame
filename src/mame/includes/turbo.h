@@ -241,7 +241,6 @@ private:
 	uint8_t       m_collision;
 	uint8_t       m_last_analog;
 	uint8_t       m_accel;
-	emu_timer *   m_delayed_sound_timer = nullptr;
 
 	uint8_t collision_r();
 	void collision_clear_w(uint8_t data);

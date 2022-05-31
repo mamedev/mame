@@ -49,8 +49,8 @@ vino_device::vino_device(const machine_config &mconfig, const char *tag, device_
 
 void vino_device::device_start()
 {
-	m_channels[0].m_fetch_timer = timer_alloc(FUNC(vino_device::fetch_pixel), this);
-	m_channels[1].m_fetch_timer = timer_alloc(FUNC(vino_device::fetch_pixel), this);
+	m_channels[0].m_fetch_timer = timer_alloc(FUNC(vino_device::fetch_pixel<0>), this);
+	m_channels[1].m_fetch_timer = timer_alloc(FUNC(vino_device::fetch_pixel<1>), this);
 
 	save_item(NAME(m_rev_id));
 	save_item(NAME(m_control));
@@ -794,26 +794,27 @@ void vino_device::input_pixel(int channel, int32_t &y, int32_t &u, int32_t &v)
 	}
 }
 
+template <int Channel>
 TIMER_CALLBACK_MEMBER(vino_device::fetch_pixel)
 {
-	channel_t &chan = m_channels[param];
+	channel_t &chan = m_channels[Channel];
 	if (chan.m_decimation > 1 && (chan.m_field_x % chan.m_decimation) != 0)
 	{
-		count_pixel(param);
+		count_pixel(Channel);
 		return;
 	}
 	if (BIT(chan.m_frame_mask_shifter, 0))
 	{
 		int32_t y = 0, u = 0, v = 0;
-		input_pixel(param, y, u, v);
-		process_pixel(param, y, u, v);
+		input_pixel(Channel, y, u, v);
+		process_pixel(Channel, y, u, v);
 	}
 	else
 	{
-		count_pixel(param);
+		count_pixel(Channel);
 		if (chan.m_end_of_field)
 		{
-			end_of_field(param);
+			end_of_field(Channel);
 			chan.m_end_of_field = false;
 		}
 	}

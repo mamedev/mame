@@ -346,7 +346,7 @@ void netlist_mame_analog_input_device::write(const double val)
 	m_value_to_sync = val * m_mult + m_offset;
 	if (m_value_to_sync != (*m_param)())
 	{
-		m_sync_timer->adjust(attotime::zero);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(netlist_mame_analog_input_device::sync_callback), this));
 	}
 }
 
@@ -363,7 +363,7 @@ void netlist_mame_int_input_device::write(const uint32_t val)
 	if (v != (*m_param)())
 	{
 		LOGDEBUG("write %s\n", this->tag());
-		m_sync_timer->adjust(attotime::zero, v);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(netlist_mame_int_input_device::sync_callback), this), v);
 }
 }
 
@@ -373,7 +373,7 @@ void netlist_mame_logic_input_device::write(const uint32_t val)
 	if (v != (*m_param)())
 	{
 		LOGDEBUG("write %s\n", this->tag());
-		m_sync_timer->adjust(attotime::zero, v);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(netlist_mame_logic_input_device::sync_callback), this), v);
 	}
 }
 
@@ -461,7 +461,6 @@ void netlist_mame_analog_input_device::device_start()
 		// disable automatic scaling for ioports
 		m_auto_port = false;
 	}
-	m_sync_timer = timer_alloc(FUNC(netlist_mame_analog_input_device::sync_callback), this);
 }
 
 void netlist_mame_analog_input_device::validity_helper(validity_checker &valid,
@@ -609,7 +608,6 @@ void netlist_mame_int_input_device::device_start()
 	{
 		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name);
 	}
-	m_sync_timer = timer_alloc(FUNC(netlist_mame_int_input_device::sync_callback), this);
 }
 
 void netlist_mame_int_input_device::validity_helper(validity_checker &valid,
@@ -652,7 +650,6 @@ void netlist_mame_logic_input_device::device_start()
 	{
 		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name);
 	}
-	m_sync_timer = timer_alloc(FUNC(netlist_mame_logic_input_device::sync_callback), this);
 }
 
 void netlist_mame_logic_input_device::validity_helper(validity_checker &valid,
@@ -706,8 +703,6 @@ void netlist_mame_ram_pointer_device::device_start()
 	}
 
 	m_data = (*m_param)();
-
-	m_sync_timer = timer_alloc(FUNC(netlist_mame_ram_pointer_device::sync_callback), this);
 }
 
 void netlist_mame_ram_pointer_device::validity_helper(validity_checker &valid,

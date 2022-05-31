@@ -415,7 +415,6 @@ private:
 	bool   m_auto_port;
 	const char *m_param_name;
 	double m_value_to_sync;
-	emu_timer *m_sync_timer;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -517,7 +516,6 @@ private:
 	uint32_t m_mask;
 	uint32_t m_shift;
 	const char *m_param_name;
-	emu_timer *m_sync_timer;
 };
 
 
@@ -559,7 +557,6 @@ private:
 	netlist::param_num_t<bool> *m_param;
 	uint32_t m_shift;
 	const char *m_param_name;
-	emu_timer *m_sync_timer;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -589,7 +586,6 @@ private:
 	netlist::param_ptr_t *m_param;
 	const char *m_param_name;
 	uint8_t* m_data;
-	emu_timer *m_sync_timer;
 };
 
 // ----------------------------------------------------------------------------------------

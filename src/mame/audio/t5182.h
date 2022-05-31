@@ -24,11 +24,6 @@ public:
 		CPU_CLEAR
 	};
 
-	enum
-	{
-		SETIRQ_CB
-	};
-
 	void sound_irq_w(uint8_t data);
 	uint8_t sharedram_semaphore_snd_r();
 	void sharedram_semaphore_main_acquire_w(uint8_t data);
@@ -53,8 +48,7 @@ private:
 	int m_irqstate;
 	int m_semaphore_main;
 	int m_semaphore_snd;
-	emu_timer *m_setirq_cb = nullptr;
-	TIMER_CALLBACK_MEMBER( setirq_callback );
+	TIMER_CALLBACK_MEMBER(setirq_callback);
 
 	void sharedram_semaphore_snd_acquire_w(uint8_t data);
 	void sharedram_semaphore_snd_release_w(uint8_t data);

@@ -91,7 +91,7 @@ uint8_t midway_ssio_device::read()
 
 void midway_ssio_device::write(offs_t offset, uint8_t data)
 {
-	m_synced_write_timer->adjust(attotime::zero, (offset << 8) | (data & 0xff));
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(midway_ssio_device::synced_write), this), (offset << 8) | (data & 0xff));
 }
 
 
@@ -443,8 +443,6 @@ void midway_ssio_device::device_start()
 	save_item(NAME(m_mute));
 	save_item(NAME(m_overall));
 	save_item(NAME(m_duty_cycle));
-
-	m_synced_write_timer = timer_alloc(FUNC(midway_ssio_device::synced_write), this);
 }
 
 
@@ -510,7 +508,7 @@ uint8_t midway_sounds_good_device::read()
 
 void midway_sounds_good_device::write(uint8_t data)
 {
-	m_synced_write_timer->adjust(attotime::zero, data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(midway_sounds_good_device::synced_write), this), data);
 }
 
 
@@ -639,8 +637,6 @@ void midway_sounds_good_device::device_start()
 {
 	save_item(NAME(m_status));
 	save_item(NAME(m_dacval));
-
-	m_synced_write_timer = timer_alloc(FUNC(midway_sounds_good_device::synced_write), this);
 }
 
 
@@ -707,7 +703,7 @@ uint8_t midway_turbo_cheap_squeak_device::read()
 
 void midway_turbo_cheap_squeak_device::write(uint8_t data)
 {
-	m_synced_write_timer->adjust(attotime::zero, data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(midway_turbo_cheap_squeak_device::synced_write), this), data);
 }
 
 
@@ -808,8 +804,6 @@ void midway_turbo_cheap_squeak_device::device_start()
 {
 	save_item(NAME(m_status));
 	save_item(NAME(m_dacval));
-
-	m_synced_write_timer = timer_alloc(FUNC(midway_turbo_cheap_squeak_device::synced_write), this);
 }
 
 
