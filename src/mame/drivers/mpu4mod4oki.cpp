@@ -1238,34 +1238,12 @@ GAME_CUSTOM( 1993, m4crmaze__c,    m4crmaze,   "cmaze8",               0x0000, 0
 		ROM_LOAD( name, offset, length, hash ) \
 		M4CRMAZE_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4jackpot8tkn, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
-
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x70>, mpu4jackpot8tkn, mpu4mod4oki_machines_state, init_m4_showstring_big, ROT0, company, title, GAME_FLAGS )
 
 // different protection
 // no copyright string, and "CRM 3.0"
 GAME_CUSTOM( 1993, m4crmaze__m,    m4crmaze,   "crystalmaze15.bin",    0x0000, 0x020000, CRC(492440a4) SHA1(2d5fe812f1d815620f7e72333d44946b66f5c867), "hack?","The Crystal Maze (Barcrest) (MPU4) (CRM 3.0, hack?)" ) // bad chr
 
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( length, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-		M4CRMAZE_EXTRA_ROMS \
-	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4jackpot8tkn, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
-
-
-// different protection
-// roms below are a smaller size, have they been hacked to not use banking, or are they bad, they're all Bwb versions but all have the Barcrest at the end blanked out rather than replaced
-// no copyright string, and "CRC 0.7"
-GAME_CUSTOM( 199?, m4crmaze__n,    m4crmaze,   "cmaz5.10",             0x0000, 0x010000, CRC(13a64c64) SHA1(3a7c4173f99fdf1a4b5d5b627022b18eb66837ce), "Bwb / hack?","The Crystal Maze (Bwb / Barcrest) (MPU4) (CRC 0.7, hack?)" ) // bad chr
-// no copyright string, and "CRC 1.3"
-GAME_CUSTOM( 199?, m4crmaze__p,    m4crmaze,   "cmaz510",              0x0000, 0x010000, CRC(0a1d39ac) SHA1(37888bbea427e115c29253deb85ed851ff6bdfd4), "Bwb / hack?","The Crystal Maze (Bwb / Barcrest) (MPU4) (CRC 1.3, hack?)" ) // bad chr
-// no copyright string, and "CR5 1.0"
-GAME_CUSTOM( 199?, m4crmaze__o,    m4crmaze,   "cmaz5.5",              0x0000, 0x010000, CRC(1f110757) SHA1(a60bac78176dab70d68bfb2b6a44debf499c96e3), "Bwb / hack?","The Crystal Maze (Bwb / Barcrest) (MPU4) (CR5 1.0, hack?)" ) // bad chr
-// no copyright string, and "CR5 2.0"
-GAME_CUSTOM( 199?, m4crmaze__q,    m4crmaze,   "cmaz55",               0x0000, 0x010000, CRC(2c2540ce) SHA1(12163109e05fe8675bc2dbcad95f598bebec8ba3), "Bwb / hack?","The Crystal Maze (Bwb / Barcrest) (MPU4) (CR5 2.0, hack?, set 1)" ) // bad chr
-GAME_CUSTOM( 199?, m4crmaze__r,    m4crmaze,   "cmaz55v2",             0x0000, 0x010000, CRC(9a3515d6) SHA1(5edd2c67152d353a48ad2f28b685fae1e1e7fff7), "Bwb / hack?","The Crystal Maze (Bwb / Barcrest) (MPU4) (CR5 2.0, hack?, set 2)" ) // bad chr
 
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
@@ -1278,6 +1256,49 @@ GAME_CUSTOM( 199?, m4crmaze__r,    m4crmaze,   "cmaz55v2",             0x0000, 0
 
 // no copyright string, and "CR8 1.2"
 GAME_CUSTOM( 199?, m4crmaze__s,    m4crmaze,   "cmaz58t",              0x0000, 0x010000, CRC(81a2c48a) SHA1(3ea25a2863f1350054f41cb169282c592565dbcd), "Bwb / hack?","The Crystal Maze (Bwb / Barcrest) (MPU4) (CR8 1.2, hack?)" ) // bad chr
+
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4CRMAZE_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x1c>, mpu4jackpot8tkn, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
+
+// different protection
+// roms below are a smaller size, have they been hacked to not use banking, or are they bad, they're all Bwb versions but all have the Barcrest at the end blanked out rather than replaced
+// no copyright string, and "CRC 0.7"
+GAME_CUSTOM( 199?, m4crmaze__n,    m4crmaze,   "cmaz5.10",             0x0000, 0x010000, CRC(13a64c64) SHA1(3a7c4173f99fdf1a4b5d5b627022b18eb66837ce), "Bwb / hack?","The Crystal Maze (Bwb / Barcrest) (MPU4) (CRC 0.7, hack?)" ) // bad chr
+// no copyright string, and "CRC 1.3"
+GAME_CUSTOM( 199?, m4crmaze__p,    m4crmaze,   "cmaz510",              0x0000, 0x010000, CRC(0a1d39ac) SHA1(37888bbea427e115c29253deb85ed851ff6bdfd4), "Bwb / hack?","The Crystal Maze (Bwb / Barcrest) (MPU4) (CRC 1.3, hack?)" ) // bad chr
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4CRMAZE_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x2b>, mpu4jackpot8tkn, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+																																																							   // no copyright string, and "CR5 1.0"
+GAME_CUSTOM( 199?, m4crmaze__o,    m4crmaze,   "cmaz5.5",              0x0000, 0x010000, CRC(1f110757) SHA1(a60bac78176dab70d68bfb2b6a44debf499c96e3), "Bwb / hack?","The Crystal Maze (Bwb / Barcrest) (MPU4) (CR5 1.0, hack?)" ) // bad chr
+// no copyright string, and "CR5 2.0"
+GAME_CUSTOM( 199?, m4crmaze__q,    m4crmaze,   "cmaz55",               0x0000, 0x010000, CRC(2c2540ce) SHA1(12163109e05fe8675bc2dbcad95f598bebec8ba3), "Bwb / hack?","The Crystal Maze (Bwb / Barcrest) (MPU4) (CR5 2.0, hack?, set 1)" ) // bad chr
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4CRMAZE_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x28>, mpu4jackpot8tkn, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
+// no copyright string, and "CR5 2.0"
+GAME_CUSTOM( 199?, m4crmaze__r,    m4crmaze,   "cmaz55v2",             0x0000, 0x010000, CRC(9a3515d6) SHA1(5edd2c67152d353a48ad2f28b685fae1e1e7fff7), "Bwb / hack?","The Crystal Maze (Bwb / Barcrest) (MPU4) (CR5 2.0, hack?, set 2)" ) // bad chr
 
 
 /*****************************************************************************************************************************************************************************
@@ -1331,6 +1352,7 @@ GAME_CUSTOM( 199?, m4shocm__j,  m4shocm,    mpu4jackpot8tkn20p,    "scmk.p1",  0
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "cmasnd.p1", 0x000000, 0x080000, CRC(1e7e13b8) SHA1(2db5c3789ad1b9bdb59e058562bd8be181ba0259) ) \
 	ROM_LOAD( "cmasnd.p2", 0x080000, 0x080000, CRC(cce703a8) SHA1(97487f3df0724d3ee01f6f4deae126aec6d2dd68) )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -1896,6 +1918,22 @@ GAME_CUSTOM( 199?, m4wta__ab, m4wta,  "wt_05__4.1_1",                           
 // "(C)1996  B.W.B." and "WN5 3.0"
 GAME_CUSTOM( 199?, m4wta__ac, m4wta,  "wt_05__5.3_1",                             0x0000, 0x010000, CRC(8a289bbd) SHA1(8ae0858716ed6aa02f6b4f93fd367c7cee85d13a), "Bwb","Winner Takes All (Barcrest) (MPU4) (WN5 3.0 5)" )
 
+
+
+// below require different protection handling
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4WTA_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x1e>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
+// "(C)1993 BARCREST" and "WNT 0.1" // custom protection
+GAME_CUSTOM( 199?, m4wta__w,  m4wta,  "wnta2010",                                 0x0000, 0x010000, CRC(5b08faf8) SHA1(f4657041562044e17febfe77ad1f849545dcdaec), "hack","Winner Takes All (Barcrest) (MPU4) (WNT 0.1, hack)" )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -1906,10 +1944,6 @@ GAME_CUSTOM( 199?, m4wta__ac, m4wta,  "wt_05__5.3_1",                           
 	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 
-// below require different protection handling
-
-// "(C)1993 BARCREST" and "WNT 0.1" // bad char alarm, hack?
-GAME_CUSTOM( 199?, m4wta__w,  m4wta,  "wnta2010",                                 0x0000, 0x010000, CRC(5b08faf8) SHA1(f4657041562044e17febfe77ad1f849545dcdaec), "hack","Winner Takes All (Barcrest) (MPU4) (WNT 0.1, hack)" )
 // "(C)1996  B.W.B." and "WNC 1.3" // bad char alarm
 GAME_CUSTOM( 199?, m4wta__7,  m4wta,  "wta510l",                                  0x0000, 0x010000, CRC(9ce140ae) SHA1(01d53a5da0161ac4ecc861309f645d6eb47b4af5), "hack","Winner Takes All (Barcrest) (MPU4) (WNC 1.3 5, hack, set 1)" )
 GAME_CUSTOM( 199?, m4wta__ad, m4wta,  "wta5.10",                                  0x0000, 0x010000, CRC(c1ae8e9a) SHA1(66c0b200202386a10b96b7141517a52921266950), "hack","Winner Takes All (Barcrest) (MPU4) (WNC 1.3 5, hack, set 2)" )
