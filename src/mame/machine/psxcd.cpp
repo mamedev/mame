@@ -910,7 +910,14 @@ void psxcd_device::send_result(uint8_t res, uint8_t *data, int sz, int delay, ui
 	if ((next_read_event != -1) && ((systime + delay)>(next_sector_t)))
 	{
 		uint32_t hz = m_sysclock / (delay + 2000);
-		m_timers[next_read_event]->adjust(attotime::from_hz(hz), m_timers[next_read_event]->param(), attotime::never);
+		if (status & STATUS_PLAYING)
+		{
+			m_timers[next_read_event]->adjust(attotime::from_hz(hz), (next_read_event << 2) | EVENT_PLAY_SECTOR);
+		}
+		else if (status & STATUS_READING)
+		{
+			m_timers[next_read_event]->adjust(attotime::from_hz(hz), (next_read_event << 2) | EVENT_READ_SECTOR);
+		}
 	}
 
 	add_system_event(EVENT_CMD_COMPLETE, delay, prepare_result(res, data, sz, errcode));
