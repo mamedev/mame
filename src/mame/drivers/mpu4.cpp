@@ -1897,6 +1897,8 @@ uint8_t mpu4_state::characteriser_r(address_space &space, offs_t offset)
 {
 	if (m_characteriser)
 		return m_characteriser->read(offset);
+	else
+		logerror("%s: characteriser_r with no characteriser device %02x\n", machine().describe_context(), offset);
 
 	return 0x00;
 }
@@ -1905,6 +1907,8 @@ void mpu4_state::characteriser_w(offs_t offset, uint8_t data)
 {
 	if (m_characteriser)
 		m_characteriser->write(offset, data);
+	else
+		logerror("%s: characteriser_w with no characteriser device %02x %02x\n", machine().describe_context(), offset, data);
 }
 
 /* Common configurations */
@@ -2850,6 +2854,13 @@ void mpu4_state::mod2_bootleg_chr51(machine_config &config)
 	mod2(config);
 	MPU4_CHARACTERISER_BOOTLEG_PAL51(config, m_characteriser, 0);
 }
+
+void mpu4_state::mod2_bootleg_chr11(machine_config &config)
+{
+	mod2(config);
+	MPU4_CHARACTERISER_BOOTLEG_PAL11(config, m_characteriser, 0);
+}
+
 
 void mpu4_state::mod2_chr_blastbnk(machine_config &config)
 {

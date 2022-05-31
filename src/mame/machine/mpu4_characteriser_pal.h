@@ -13,6 +13,7 @@ DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_PAL, mpu4_characteriser_pal)
 DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_PAL_BWB, mpu4_characteriser_pal_bwb)
 DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL45, mpu4_characteriser_bootleg45)
 DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL51, mpu4_characteriser_bootleg51)
+DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL11, mpu4_characteriser_bootleg11)
 DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL_BLASTBANK, mpu4_characteriser_bootleg_blastbank)
 DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_BOOTLEG_PAL_COPCASH, mpu4_characteriser_bootleg_copcash)
 
@@ -436,6 +437,18 @@ public:
 	// games with sequence starting 00 a0 88 18 b0 48 50 60 e4 c8 58 90
 	static constexpr uint8_t topgear_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
+	// games with sequence starting 00 c0 c8 38 f4 8c b8 70 a4 e8 38 74 80 4c b0 0c 94
+	static constexpr uint8_t redwhite_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+	// games with sequence starting  00 50 10 a0 c4 c4 74 30 b0 34 00 f0 14 80 f4 04
+	static constexpr uint8_t techno_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+	// games with sequence starting   00 48 a0 54 2c 88 94 14 2c a4 50 24 48 a4 78 c0 70
+	static constexpr uint8_t bucksfizz_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+	// games with sequence starting 00 0c 50 60 4c 10 60 0c 78 74 00 6c 38 34 48 
+	static constexpr uint8_t hirise_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
 protected:
 	mpu4_characteriser_pal(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -522,11 +535,44 @@ class mpu4_characteriser_bootleg51 : public mpu4_characteriser_pal
 {
 public:
 	// construction/destruction
-	mpu4_characteriser_bootleg51(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mpu4_characteriser_bootleg51(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: mpu4_characteriser_pal(mconfig, MPU4_CHARACTERISER_BOOTLEG_PAL51, tag, owner, clock)
+	{
+	}
 
-	virtual uint8_t read(offs_t offset) override;
-	virtual void write(offs_t offset, uint8_t data) override;
+	virtual uint8_t read(offs_t offset) override
+	{
+		logerror("%s: Characteriser read offset %02x\n", machine().describe_context(), offset);
+		return 0x51;
+	}
+
+	virtual void write(offs_t offset, uint8_t data) override
+	{
+		logerror("%s: Characteriser write offset %02x data %02x\n", machine().describe_context(), offset, data);
+	}
 };
+
+class mpu4_characteriser_bootleg11 : public mpu4_characteriser_pal
+{
+public:
+	// construction/destruction
+	mpu4_characteriser_bootleg11(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: mpu4_characteriser_pal(mconfig, MPU4_CHARACTERISER_BOOTLEG_PAL11, tag, owner, clock)
+	{
+	}
+
+	virtual uint8_t read(offs_t offset) override
+	{
+		logerror("%s: Characteriser read offset %02x\n", machine().describe_context(), offset);
+		return 0x11;
+	}
+
+	virtual void write(offs_t offset, uint8_t data) override
+	{
+		logerror("%s: Characteriser write offset %02x data %02x\n", machine().describe_context(), offset, data);
+	}
+};
+
 
 class mpu4_characteriser_bootleg_blastbank : public mpu4_characteriser_pal
 {

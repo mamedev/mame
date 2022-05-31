@@ -232,8 +232,10 @@ public:
 
 	void mod2_cheatchr_table(machine_config &config, const uint8_t* table);
 
+	// bootleg mod2
 	void mod2_bootleg_chr45(machine_config &config);
 	void mod2_bootleg_chr51(machine_config &config);
+	void mod2_bootleg_chr11(machine_config &config);
 	void mod2_chr_blastbnk(machine_config &config);
 	void mod2_chr_copcash(machine_config &config);
 
