@@ -1069,6 +1069,26 @@ GAME_CUSTOM( 199?, m4supst__b6,    m4supst,   "supst20.15",   0x0000, 0x010000, 
 // different protection style
 GAME_CUSTOM( 199?, m4supst__b5, m4supst,    "supst2515",            0x0000, 0x010000, CRC(c073a249) SHA1(4ae37eb61dd5e50687f433fb89f65b97926b7358), "hack","Super Streak (Barcrest) (MPU4) (STT 0.3, hack)" )
 
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+	ROM_END \
+	GAME(year, setname, parent, mod4yam_bootleg_fixedret<0x74>, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
+// different protection
+
+// "(C)1998  B.W.B." and "SS2 1.0"
+GAME_CUSTOM( 199?, m4supst__b7,  m4supst,  "rhr2pprg.bin",     0x0000, 0x010000, CRC(f97047b2) SHA1(d3ed8c93e405f9e7448b3924ff9aa84223b76046), "hack","Super Streak (Barcrest) (MPU4) (SS2 1.0, hack?)" )
+
+ROM_START( m4sstrek )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "rhr2pprgpatched.bin", 0x0000, 0x010000, CRC(a0b3439d) SHA1(0976537a5170bf4c4f595f7fa04243a68f14b2ae) )
+ROM_END
+// no sequence
+GAME(199?, m4sstrek,  m4supst,  mod4yam,          mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "bootleg","Super Streak (bootleg) (MPU4) (SS2 1.0)",GAME_FLAGS) // unprotected, no characteriser PAL required
+
 
 /*****************************************************************************************************************************************************************************
 *
@@ -1362,10 +1382,6 @@ ROM_START( m4stc )
 	ROM_LOAD( "stc01s", 0x0000, 0x010000, CRC(8371bb8f) SHA1(bd60825b3f5011c218b34f00886b6b54afe61b9f) )
 ROM_END
 
-ROM_START( m4sstrek )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "rhr2pprgpatched.bin", 0x0000, 0x010000, CRC(a0b3439d) SHA1(0976537a5170bf4c4f595f7fa04243a68f14b2ae) )
-ROM_END
 
 ROM_START( m4joljokd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1409,5 +1425,3 @@ GAME(199?, m4voodoo,  0,        mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m4
 // 00 c0 d0 38 ec 5c ec 14 68 2c 24 e8 74 00 e8 14 (turboplay)
 GAME(199?, m4graffd,  m4graff,  mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::turboplay_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "Barcrest","Grafitti (Barcrest) [Dutch] (MPU4)",GAME_FLAGS ) // ROL D SETUP ALM
 
-// no sequence
-GAME(199?, m4sstrek,  m4supst,  mod4yam,          mpu4, mpu4mod4yam_machines_state, init_m4default,  ROT0,   "bootleg","Super Streak (bootleg) (MPU4) (SS2 1.0)",GAME_FLAGS) // unprotected, no characteriser PAL required

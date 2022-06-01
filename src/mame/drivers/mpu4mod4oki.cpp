@@ -3646,6 +3646,7 @@ GAME_CUSTOM( 199?, m4c9__a1,   m4c9,   "c9o10d_1.1",   0x0000, 0x010000, CRC(6b2
 *
 *****************************************************************************************************************************************************************************/
 
+// what's the difference between these sound roms, does one pair belong with the now split out m4tutbwb sets?
 #define M4TUTFRT_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "altmsm6376", 0 ) \
 	ROM_LOAD( "tftsnd02.p1", 0x000000, 0x080000, CRC(9789e60f) SHA1(7299eb4b6bb2fc90e8a36859102aad5daf66b163) ) \
@@ -3655,125 +3656,95 @@ GAME_CUSTOM( 199?, m4c9__a1,   m4c9,   "c9o10d_1.1",   0x0000, 0x010000, CRC(6b2
 	ROM_LOAD( "tfsnd2.hex", 0x080000, 0x080000, CRC(1275e528) SHA1(0c3c901cb2be1e84dba123677205108cf0388343) )
 
 #undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+#define GAME_CUSTOM(year, setname,parent, machine, inputs, init, name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TUTFRT_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME( year, setname, parent, machine, inputs, mpu4mod4oki_machines_state, init, ROT0, company, title, GAME_FLAGS )
 
 // boots to hopper error with tri98.chr
 // "(C)1991 BARCREST" and "F1U 0.1"
-GAME_CUSTOM( 199?, m4tutfrt__u,    m4tutfrt,   "f1u01s.p1",            0x0000, 0x010000, CRC(d69668d2) SHA1(86ea656a3a4d4e6701c70b5e730ae8402cd70342), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F1U 0.1)" )
-GAME_CUSTOM( 199?, m4tutfrt__k,    m4tutfrt,   "f1u01ad.p1",           0x0000, 0x010000, CRC(7573d8cf) SHA1(fe1553ca8f588554fdd495dc2f048e50e00590bb), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F1U 0.1 AD)" )
-GAME_CUSTOM( 199?, m4tutfrt__l,    m4tutfrt,   "f1u01b.p1",            0x0000, 0x010000, CRC(158d1a3a) SHA1(da80334e9982f778a908a6fe89a593863e7c763e), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F1U 0.1 B)" )
-GAME_CUSTOM( 199?, m4tutfrt__m,    m4tutfrt,   "f1u01bd.p1",           0x0000, 0x010000, CRC(9844e568) SHA1(a580176338cdeed5fb4d1744b537bde1f499293e), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F1U 0.1 BD)" )
-GAME_CUSTOM( 199?, m4tutfrt__n,    m4tutfrt,   "f1u01c.p1",            0x0000, 0x010000, CRC(4709bd66) SHA1(c15f64767315ea0434a57b9e494a9e8090f1e05a), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F1U 0.1 C)" )
-GAME_CUSTOM( 199?, m4tutfrt__o,    m4tutfrt,   "f1u01d.p1",            0x0000, 0x010000, CRC(3a3c6745) SHA1(f270bccb4bdedb5cfaf0130da6e480dc31889682), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F1U 0.1 D)" )
-GAME_CUSTOM( 199?, m4tutfrt__p,    m4tutfrt,   "f1u01dk.p1",           0x0000, 0x010000, CRC(4fa79f23) SHA1(ce9a0815d96a94d564edf5a775af94ea10070ff5), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F1U 0.1 KD)" )
-GAME_CUSTOM( 199?, m4tutfrt__q,    m4tutfrt,   "f1u01dr.p1",           0x0000, 0x010000, CRC(6fcc4d76) SHA1(27d8fdd5965ba565cb5b6113b7cba5e820650419), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F1U 0.1 RD)" )
-GAME_CUSTOM( 199?, m4tutfrt__r,    m4tutfrt,   "f1u01dy.p1",           0x0000, 0x010000, CRC(cdd43fc2) SHA1(6f4da20de3040675592b4338a1d72654800c20eb), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F1U 0.1 YD)" )
-GAME_CUSTOM( 199?, m4tutfrt__s,    m4tutfrt,   "f1u01k.p1",            0x0000, 0x010000, CRC(7e9c3110) SHA1(56ab6e5362ce8795c65d0cf11742e3ddb6d8b8a3), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F1U 0.1 K)" )
-GAME_CUSTOM( 199?, m4tutfrt__t,    m4tutfrt,   "f1u01r.p1",            0x0000, 0x010000, CRC(0e6b2132) SHA1(8757713677e2eb0400c69d3cdde6506662e0ef0b), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F1U 0.1 R)" )
-GAME_CUSTOM( 199?, m4tutfrt__v,    m4tutfrt,   "f1u01y.p1",            0x0000, 0x010000, CRC(33e7d5fd) SHA1(96f53fbb228e98ce3a848b2c72bdb8876c9de160), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F1U 0.1 Y)" )
+GAME_CUSTOM( 199?, m4tutfrt__u,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f1u01s.p1",            0x0000, 0x010000, CRC(d69668d2) SHA1(86ea656a3a4d4e6701c70b5e730ae8402cd70342), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F1U 0.1)" )
+GAME_CUSTOM( 199?, m4tutfrt__k,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f1u01ad.p1",           0x0000, 0x010000, CRC(7573d8cf) SHA1(fe1553ca8f588554fdd495dc2f048e50e00590bb), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F1U 0.1 AD)" )
+GAME_CUSTOM( 199?, m4tutfrt__l,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f1u01b.p1",            0x0000, 0x010000, CRC(158d1a3a) SHA1(da80334e9982f778a908a6fe89a593863e7c763e), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F1U 0.1 B)" )
+GAME_CUSTOM( 199?, m4tutfrt__m,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f1u01bd.p1",           0x0000, 0x010000, CRC(9844e568) SHA1(a580176338cdeed5fb4d1744b537bde1f499293e), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F1U 0.1 BD)" )
+GAME_CUSTOM( 199?, m4tutfrt__n,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f1u01c.p1",            0x0000, 0x010000, CRC(4709bd66) SHA1(c15f64767315ea0434a57b9e494a9e8090f1e05a), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F1U 0.1 C)" )
+GAME_CUSTOM( 199?, m4tutfrt__o,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f1u01d.p1",            0x0000, 0x010000, CRC(3a3c6745) SHA1(f270bccb4bdedb5cfaf0130da6e480dc31889682), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F1U 0.1 D)" )
+GAME_CUSTOM( 199?, m4tutfrt__p,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f1u01dk.p1",           0x0000, 0x010000, CRC(4fa79f23) SHA1(ce9a0815d96a94d564edf5a775af94ea10070ff5), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F1U 0.1 KD)" )
+GAME_CUSTOM( 199?, m4tutfrt__q,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f1u01dr.p1",           0x0000, 0x010000, CRC(6fcc4d76) SHA1(27d8fdd5965ba565cb5b6113b7cba5e820650419), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F1U 0.1 RD)" )
+GAME_CUSTOM( 199?, m4tutfrt__r,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f1u01dy.p1",           0x0000, 0x010000, CRC(cdd43fc2) SHA1(6f4da20de3040675592b4338a1d72654800c20eb), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F1U 0.1 YD)" )
+GAME_CUSTOM( 199?, m4tutfrt__s,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f1u01k.p1",            0x0000, 0x010000, CRC(7e9c3110) SHA1(56ab6e5362ce8795c65d0cf11742e3ddb6d8b8a3), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F1U 0.1 K)" )
+GAME_CUSTOM( 199?, m4tutfrt__t,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f1u01r.p1",            0x0000, 0x010000, CRC(0e6b2132) SHA1(8757713677e2eb0400c69d3cdde6506662e0ef0b), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F1U 0.1 R)" )
+GAME_CUSTOM( 199?, m4tutfrt__v,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f1u01y.p1",            0x0000, 0x010000, CRC(33e7d5fd) SHA1(96f53fbb228e98ce3a848b2c72bdb8876c9de160), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F1U 0.1 Y)" )
 // "(C)1991 BARCREST" and "F2U 0.1"  these were marked 'Tutti Fruity Classic' but appear to be revisions of these sets
-GAME_CUSTOM( 199?, m4tutcl,        m4tutfrt,   "f2u01s.p1",            0x0000, 0x010000, CRC(25b68f22) SHA1(7f484dbc841e1e87d9f5e322cf497b6b68e4a096), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1)" )
-GAME_CUSTOM( 199?, m4tutcl__j,     m4tutfrt,   "f2u01ad.p1",           0x0000, 0x010000, CRC(65537552) SHA1(b0a761dcc6e0a9f01cfb934b570356ca67fdd099), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1 AD)" )
-GAME_CUSTOM( 199?, m4tutcl__a,     m4tutfrt,   "f2u01b.p1",            0x0000, 0x010000, CRC(2cae37df) SHA1(5aed985476b7b747a99a4046b846ee4a359776af), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1 B)" )
-GAME_CUSTOM( 199?, m4tutcl__b,     m4tutfrt,   "f2u01bd.p1",           0x0000, 0x010000, CRC(0dd91ccf) SHA1(bcdfc39025d02e7a51f69757238dfa44fe9d3655), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1 BD)" )
-GAME_CUSTOM( 199?, m4tutcl__c,     m4tutfrt,   "f2u01c.p1",            0x0000, 0x010000, CRC(6b6d9bb9) SHA1(140e9cbb8b484116e5fb9a7670d41fb0bcb37ec0), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1 C)" )
-GAME_CUSTOM( 199?, m4tutcl__d,     m4tutfrt,   "f2u01d.p1",            0x0000, 0x010000, CRC(b477a20d) SHA1(51daf5e61a2ebcb3cb9884421b9e8f32df51ec07), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1 D)" )
-GAME_CUSTOM( 199?, m4tutcl__e,     m4tutfrt,   "f2u01dk.p1",           0x0000, 0x010000, CRC(ccd14dd3) SHA1(c93ff69e0534e8190c10e0c819ed439d4e61a472), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1 KD)" )
-GAME_CUSTOM( 199?, m4tutcl__f,     m4tutfrt,   "f2u01dr.p1",           0x0000, 0x010000, CRC(d4918506) SHA1(2081ead45ff744cafcf3c4164c86acf609e54632), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1 RD)" )
-GAME_CUSTOM( 199?, m4tutcl__g,     m4tutfrt,   "f2u01dy.p1",           0x0000, 0x010000, CRC(24dd0a73) SHA1(a75129e414dd8cbe5f6f44e39b1d3dc3d7dfafb2), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1 YD)" )
-GAME_CUSTOM( 199?, m4tutcl__h,     m4tutfrt,   "f2u01k.p1",            0x0000, 0x010000, CRC(b9cec403) SHA1(90a1f49202ea9b79e2ab097cf95cf94088c52926), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1 K)" )
-GAME_CUSTOM( 199?, m4tutcl__i,     m4tutfrt,   "f2u01r.p1",            0x0000, 0x010000, CRC(471e39d7) SHA1(874db6f2d04ed0b2c6756efba5fa1140d2fbfc58), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1 R)" )
-GAME_CUSTOM( 199?, m4tutcl__k,     m4tutfrt,   "f2u01y.p1",            0x0000, 0x010000, CRC(5a583a6f) SHA1(0421d079de12a7379c13832108e8608c9a01f41d), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1 Y)" )
+GAME_CUSTOM( 199?, m4tutcl,        m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f2u01s.p1",            0x0000, 0x010000, CRC(25b68f22) SHA1(7f484dbc841e1e87d9f5e322cf497b6b68e4a096), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1)" )
+GAME_CUSTOM( 199?, m4tutcl__j,     m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f2u01ad.p1",           0x0000, 0x010000, CRC(65537552) SHA1(b0a761dcc6e0a9f01cfb934b570356ca67fdd099), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1 AD)" )
+GAME_CUSTOM( 199?, m4tutcl__a,     m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f2u01b.p1",            0x0000, 0x010000, CRC(2cae37df) SHA1(5aed985476b7b747a99a4046b846ee4a359776af), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1 B)" )
+GAME_CUSTOM( 199?, m4tutcl__b,     m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f2u01bd.p1",           0x0000, 0x010000, CRC(0dd91ccf) SHA1(bcdfc39025d02e7a51f69757238dfa44fe9d3655), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1 BD)" )
+GAME_CUSTOM( 199?, m4tutcl__c,     m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f2u01c.p1",            0x0000, 0x010000, CRC(6b6d9bb9) SHA1(140e9cbb8b484116e5fb9a7670d41fb0bcb37ec0), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1 C)" )
+GAME_CUSTOM( 199?, m4tutcl__d,     m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f2u01d.p1",            0x0000, 0x010000, CRC(b477a20d) SHA1(51daf5e61a2ebcb3cb9884421b9e8f32df51ec07), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1 D)" )
+GAME_CUSTOM( 199?, m4tutcl__e,     m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f2u01dk.p1",           0x0000, 0x010000, CRC(ccd14dd3) SHA1(c93ff69e0534e8190c10e0c819ed439d4e61a472), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1 KD)" )
+GAME_CUSTOM( 199?, m4tutcl__f,     m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f2u01dr.p1",           0x0000, 0x010000, CRC(d4918506) SHA1(2081ead45ff744cafcf3c4164c86acf609e54632), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1 RD)" )
+GAME_CUSTOM( 199?, m4tutcl__g,     m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f2u01dy.p1",           0x0000, 0x010000, CRC(24dd0a73) SHA1(a75129e414dd8cbe5f6f44e39b1d3dc3d7dfafb2), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1 YD)" )
+GAME_CUSTOM( 199?, m4tutcl__h,     m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f2u01k.p1",            0x0000, 0x010000, CRC(b9cec403) SHA1(90a1f49202ea9b79e2ab097cf95cf94088c52926), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1 K)" )
+GAME_CUSTOM( 199?, m4tutcl__i,     m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f2u01r.p1",            0x0000, 0x010000, CRC(471e39d7) SHA1(874db6f2d04ed0b2c6756efba5fa1140d2fbfc58), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1 R)" )
+GAME_CUSTOM( 199?, m4tutcl__k,     m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f2u01y.p1",            0x0000, 0x010000, CRC(5a583a6f) SHA1(0421d079de12a7379c13832108e8608c9a01f41d), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1 Y)" )
 // "(C)1991 BARCREST" and "F3U 0.1m4tutfrt
-GAME_CUSTOM( 199?, m4tutfrt__6,    m4tutfrt,   "f3u01s.p1",            0x0000, 0x010000, CRC(dce2e5be) SHA1(3c218cdb939d5b7cc650c820737ae3ac653435ce), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F3U 0.1)" )
-GAME_CUSTOM( 199?, m4tutfrt__w,    m4tutfrt,   "f3u01ad.p1",           0x0000, 0x010000, CRC(acb1bfb3) SHA1(8aa22c45d98ecec324fa031b46689496f9a2842c), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F3U 0.1 AD)" )
-GAME_CUSTOM( 199?, m4tutfrt__x,    m4tutfrt,   "f3u01b.p1",            0x0000, 0x010000, CRC(a0d14e25) SHA1(16f2444334608702748a3b0b2556ac1a7760615a), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F3U 0.1 B)" )
-GAME_CUSTOM( 199?, m4tutfrt__y,    m4tutfrt,   "f3u01bd.p1",           0x0000, 0x010000, CRC(9aadd2f9) SHA1(4dbff4f6fd4d02778733eb846a354177f0e204a5), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F3U 0.1 BD)" )
-GAME_CUSTOM( 199?, m4tutfrt__z,    m4tutfrt,   "f3u01c.p1",            0x0000, 0x010000, CRC(a3ad34d5) SHA1(e8c435f80b4fd3f7af16f341e107a85a33f1fe1c), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F3U 0.1 C)" )
-GAME_CUSTOM( 199?, m4tutfrt__0,    m4tutfrt,   "f3u01d.p1",            0x0000, 0x010000, CRC(c6790301) SHA1(fb0b619e75e1227f4d293b613e80d8d653517eec), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F3U 0.1 D)" )
-GAME_CUSTOM( 199?, m4tutfrt__1,    m4tutfrt,   "f3u01dk.p1",           0x0000, 0x010000, CRC(ee0554fe) SHA1(12cd26d6205fec35590fd23682c578f06466eb01), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F3U 0.1 KD)" )
-GAME_CUSTOM( 199?, m4tutfrt__2,    m4tutfrt,   "f3u01dr.p1",           0x0000, 0x010000, CRC(32d761eb) SHA1(aa1098629d2a1c98c606a71a7cf0ae97f381aebe), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F3U 0.1 RD)" )
-GAME_CUSTOM( 199?, m4tutfrt__3,    m4tutfrt,   "f3u01dy.p1",           0x0000, 0x010000, CRC(3ad66969) SHA1(4c79edc52095cfa1fae8215caaaaf434cd38199d), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F3U 0.1 YD)" )
-GAME_CUSTOM( 199?, m4tutfrt__4,    m4tutfrt,   "f3u01k.p1",            0x0000, 0x010000, CRC(2b6c0f0f) SHA1(64e50adc6656225c9cdaaee64ae59cafcd1623ee), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F3U 0.1 K)" )
-GAME_CUSTOM( 199?, m4tutfrt__5,    m4tutfrt,   "f3u01r.p1",            0x0000, 0x010000, CRC(93cb1bfb) SHA1(e29439caed4a2f4512e50ff158427b61b5a9c4a9), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F3U 0.1 R)" )
-GAME_CUSTOM( 199?, m4tutfrt__7,    m4tutfrt,   "f3u01y.p1",            0x0000, 0x010000, CRC(9aae0ca2) SHA1(83192225d886848ee0320973fb9dbd85cf9045b8), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F3U 0.1 Y)" )
-
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( length, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-		M4TUTFRT_EXTRA_ROMS \
-	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
-
+GAME_CUSTOM( 199?, m4tutfrt__6,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f3u01s.p1",            0x0000, 0x010000, CRC(dce2e5be) SHA1(3c218cdb939d5b7cc650c820737ae3ac653435ce), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F3U 0.1)" )
+GAME_CUSTOM( 199?, m4tutfrt__w,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f3u01ad.p1",           0x0000, 0x010000, CRC(acb1bfb3) SHA1(8aa22c45d98ecec324fa031b46689496f9a2842c), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F3U 0.1 AD)" )
+GAME_CUSTOM( 199?, m4tutfrt__x,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f3u01b.p1",            0x0000, 0x010000, CRC(a0d14e25) SHA1(16f2444334608702748a3b0b2556ac1a7760615a), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F3U 0.1 B)" )
+GAME_CUSTOM( 199?, m4tutfrt__y,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f3u01bd.p1",           0x0000, 0x010000, CRC(9aadd2f9) SHA1(4dbff4f6fd4d02778733eb846a354177f0e204a5), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F3U 0.1 BD)" )
+GAME_CUSTOM( 199?, m4tutfrt__z,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f3u01c.p1",            0x0000, 0x010000, CRC(a3ad34d5) SHA1(e8c435f80b4fd3f7af16f341e107a85a33f1fe1c), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F3U 0.1 C)" )
+GAME_CUSTOM( 199?, m4tutfrt__0,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f3u01d.p1",            0x0000, 0x010000, CRC(c6790301) SHA1(fb0b619e75e1227f4d293b613e80d8d653517eec), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F3U 0.1 D)" )
+GAME_CUSTOM( 199?, m4tutfrt__1,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f3u01dk.p1",           0x0000, 0x010000, CRC(ee0554fe) SHA1(12cd26d6205fec35590fd23682c578f06466eb01), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F3U 0.1 KD)" )
+GAME_CUSTOM( 199?, m4tutfrt__2,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f3u01dr.p1",           0x0000, 0x010000, CRC(32d761eb) SHA1(aa1098629d2a1c98c606a71a7cf0ae97f381aebe), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F3U 0.1 RD)" )
+GAME_CUSTOM( 199?, m4tutfrt__3,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f3u01dy.p1",           0x0000, 0x010000, CRC(3ad66969) SHA1(4c79edc52095cfa1fae8215caaaaf434cd38199d), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F3U 0.1 YD)" )
+GAME_CUSTOM( 199?, m4tutfrt__4,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f3u01k.p1",            0x0000, 0x010000, CRC(2b6c0f0f) SHA1(64e50adc6656225c9cdaaee64ae59cafcd1623ee), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F3U 0.1 K)" )
+GAME_CUSTOM( 199?, m4tutfrt__5,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f3u01r.p1",            0x0000, 0x010000, CRC(93cb1bfb) SHA1(e29439caed4a2f4512e50ff158427b61b5a9c4a9), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F3U 0.1 R)" )
+GAME_CUSTOM( 199?, m4tutfrt__7,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>, mpu4, init_m4_showstring,  "f3u01y.p1",            0x0000, 0x010000, CRC(9aae0ca2) SHA1(83192225d886848ee0320973fb9dbd85cf9045b8), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F3U 0.1 Y)" )
 // expects chr sequence starting 00 30 10 44 70 10 44 30 54 14 40 74 10 40 (cosmiccasino)  (same as some 10 X 10 and Cosmic Casio sets?)
 // "(C)1991 BARCREST" and "TF4 0.4" (TFT 0.4 on startup)
-GAME_CUSTOM( 199?, m4tutfrt,       0,          "tft04s.p1",            0x0000, 0x010000, CRC(c20c3589) SHA1(55d1bc5d5f4ae14acafb36bd640faaf4ffccc6eb), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TFT 0.4 / TF4 0.4)" )
-GAME_CUSTOM( 199?, m4tutfrt__ai,   m4tutfrt,   "tft04ad.p1",           0x0000, 0x010000, CRC(2994aa14) SHA1(af0e618f24cdedd14e3a347701313360d9fc73d1), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TFT 0.4 AD / TF4 0.4)" )
-GAME_CUSTOM( 199?, m4tutfrt__aj,   m4tutfrt,   "tft04b.p1",            0x0000, 0x010000, CRC(e95eab06) SHA1(70e85e38493ac1fd30a79582bab45af5227d835a), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TFT 0.4 B / TF4 0.4)" )
-GAME_CUSTOM( 199?, m4tutfrt__ak,   m4tutfrt,   "tft04bd.p1",           0x0000, 0x010000, CRC(060d3572) SHA1(e78b6248d3aef6cd08f4b30e0b00bd4cf254e630), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TFT 0.4 BD / TF4 0.4)" )
-GAME_CUSTOM( 199?, m4tutfrt__al,   m4tutfrt,   "tft04c.p1",            0x0000, 0x010000, CRC(3499fe77) SHA1(3f82ca6d856bddf82581790c46abf725963335a0), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TFT 0.4 C / TF4 0.4)" )
-GAME_CUSTOM( 199?, m4tutfrt__am,   m4tutfrt,   "tft04d.p1",            0x0000, 0x010000, CRC(10626059) SHA1(c7b2fd2b65946fe82950ff506a56bd08b7c2ef71), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TFT 0.4 D / TF4 0.4)" )
-GAME_CUSTOM( 199?, m4tutfrt__an,   m4tutfrt,   "tft04dk.p1",           0x0000, 0x010000, CRC(40700fe2) SHA1(1f121adae094c2d11a66b5e8ae4b026e85fc7f73), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TFT 0.4 KD / TF4 0.4)" )
-GAME_CUSTOM( 199?, m4tutfrt__ao,   m4tutfrt,   "tft04dr.p1",           0x0000, 0x010000, CRC(feeb4417) SHA1(e2f2c55c48067ad67188ff5a75caa08d8726cb77), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TFT 0.4 RD / TF4 0.4)" )
-GAME_CUSTOM( 199?, m4tutfrt__ap,   m4tutfrt,   "tft04dy.p1",           0x0000, 0x010000, CRC(63806cf9) SHA1(850c707c65b8dba6b6914389d573a8b7b7b12cdb), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TFT 0.4 YD / TF4 0.4)" )
-GAME_CUSTOM( 199?, m4tutfrt__aq,   m4tutfrt,   "tft04k.p1",            0x0000, 0x010000, CRC(ffbf53e1) SHA1(a003bb5d94b43d6ae9b45c599cccb0006bd8a89a), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TFT 0.4 K / TF4 0.4)" )
-GAME_CUSTOM( 199?, m4tutfrt__ar,   m4tutfrt,   "tft04r.p1",            0x0000, 0x010000, CRC(cbf79555) SHA1(0aacb3f28984637919294a18f40858e8f46a18b3), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TFT 0.4 R / TF4 0.4)" )
-GAME_CUSTOM( 199?, m4tutfrt__as,   m4tutfrt,   "tft04y.p1",            0x0000, 0x010000, CRC(569cbdbb) SHA1(8a978dfba876e5a2e12226f5fe55c29b5f079fad), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TFT 0.4 Y / TF4 0.4)" )
+GAME_CUSTOM( 199?, m4tutfrt,       0,        mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, init_m4_showstring,  "tft04s.p1",            0x0000, 0x010000, CRC(c20c3589) SHA1(55d1bc5d5f4ae14acafb36bd640faaf4ffccc6eb), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TFT 0.4 / TF4 0.4)" )
+GAME_CUSTOM( 199?, m4tutfrt__ai,   m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, init_m4_showstring,  "tft04ad.p1",           0x0000, 0x010000, CRC(2994aa14) SHA1(af0e618f24cdedd14e3a347701313360d9fc73d1), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TFT 0.4 AD / TF4 0.4)" )
+GAME_CUSTOM( 199?, m4tutfrt__aj,   m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, init_m4_showstring,  "tft04b.p1",            0x0000, 0x010000, CRC(e95eab06) SHA1(70e85e38493ac1fd30a79582bab45af5227d835a), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TFT 0.4 B / TF4 0.4)" )
+GAME_CUSTOM( 199?, m4tutfrt__ak,   m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, init_m4_showstring,  "tft04bd.p1",           0x0000, 0x010000, CRC(060d3572) SHA1(e78b6248d3aef6cd08f4b30e0b00bd4cf254e630), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TFT 0.4 BD / TF4 0.4)" )
+GAME_CUSTOM( 199?, m4tutfrt__al,   m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, init_m4_showstring,  "tft04c.p1",            0x0000, 0x010000, CRC(3499fe77) SHA1(3f82ca6d856bddf82581790c46abf725963335a0), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TFT 0.4 C / TF4 0.4)" )
+GAME_CUSTOM( 199?, m4tutfrt__am,   m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, init_m4_showstring,  "tft04d.p1",            0x0000, 0x010000, CRC(10626059) SHA1(c7b2fd2b65946fe82950ff506a56bd08b7c2ef71), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TFT 0.4 D / TF4 0.4)" )
+GAME_CUSTOM( 199?, m4tutfrt__an,   m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, init_m4_showstring,  "tft04dk.p1",           0x0000, 0x010000, CRC(40700fe2) SHA1(1f121adae094c2d11a66b5e8ae4b026e85fc7f73), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TFT 0.4 KD / TF4 0.4)" )
+GAME_CUSTOM( 199?, m4tutfrt__ao,   m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, init_m4_showstring,  "tft04dr.p1",           0x0000, 0x010000, CRC(feeb4417) SHA1(e2f2c55c48067ad67188ff5a75caa08d8726cb77), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TFT 0.4 RD / TF4 0.4)" )
+GAME_CUSTOM( 199?, m4tutfrt__ap,   m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, init_m4_showstring,  "tft04dy.p1",           0x0000, 0x010000, CRC(63806cf9) SHA1(850c707c65b8dba6b6914389d573a8b7b7b12cdb), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TFT 0.4 YD / TF4 0.4)" )
+GAME_CUSTOM( 199?, m4tutfrt__aq,   m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, init_m4_showstring,  "tft04k.p1",            0x0000, 0x010000, CRC(ffbf53e1) SHA1(a003bb5d94b43d6ae9b45c599cccb0006bd8a89a), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TFT 0.4 K / TF4 0.4)" )
+GAME_CUSTOM( 199?, m4tutfrt__ar,   m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, init_m4_showstring,  "tft04r.p1",            0x0000, 0x010000, CRC(cbf79555) SHA1(0aacb3f28984637919294a18f40858e8f46a18b3), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TFT 0.4 R / TF4 0.4)" )
+GAME_CUSTOM( 199?, m4tutfrt__as,   m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, init_m4_showstring,  "tft04y.p1",            0x0000, 0x010000, CRC(569cbdbb) SHA1(8a978dfba876e5a2e12226f5fe55c29b5f079fad), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TFT 0.4 Y / TF4 0.4)" )
 // "(C)1991 BARCREST" and "CTU 0.1"
-GAME_CUSTOM( 199?, m4tutfrt__i,    m4tutfrt,   "ctus.p1",              0x0000, 0x010000, CRC(1b282170) SHA1(e3082aed6e96587de56c5593d32d0129c47fe667), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (CTU 0.1)" )
-GAME_CUSTOM( 199?, m4tutfrt__a,    m4tutfrt,   "ctuad.p1",             0x0000, 0x010000, CRC(0ec1661b) SHA1(162ddc30c341fd8eda8ce57a60edf06b4e39a24f), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (CTU 0.1 AD)" )
-GAME_CUSTOM( 199?, m4tutfrt__b,    m4tutfrt,   "ctub.p1",              0x0000, 0x010000, CRC(f4289621) SHA1(a4078552146c88c05845cbdcd551e4564840fea4), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (CTU 0.1 B)" )
-GAME_CUSTOM( 199?, m4tutfrt__c,    m4tutfrt,   "ctubd.p1",             0x0000, 0x010000, CRC(38dd0b51) SHA1(04df9511f366cc575a1a06d3a5d60ec0245f64a7), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (CTU 0.1 BD)" )
-GAME_CUSTOM( 199?, m4tutfrt__d,    m4tutfrt,   "ctud.p1",              0x0000, 0x010000, CRC(6033fae5) SHA1(f5bdd1821344d4546eea8caa52d76e3bd509810e), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (CTU 0.1 D)" )
-GAME_CUSTOM( 199?, m4tutfrt__e,    m4tutfrt,   "ctudk.p1",             0x0000, 0x010000, CRC(36dd1e41) SHA1(ad5ad7cae12634149d38e286e6873b81bda52871), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (CTU 0.1 KD)" )
-GAME_CUSTOM( 199?, m4tutfrt__f,    m4tutfrt,   "ctudy.p1",             0x0000, 0x010000, CRC(58c02db6) SHA1(faf85caeaa0678b5771d801cf3d9645d7767767c), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (CTU 0.1 YD)" )
-GAME_CUSTOM( 199?, m4tutfrt__g,    m4tutfrt,   "ctuk.p1",              0x0000, 0x010000, CRC(4c247447) SHA1(f5aebb4a75632c9a74dca1f3e9559399c89ac679), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (CTU 0.1 K)" )
-GAME_CUSTOM( 199?, m4tutfrt__h,    m4tutfrt,   "ctur.p1",              0x0000, 0x010000, CRC(705a2b52) SHA1(40b0738146d073f93877a15f63830ff3e07814c1), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (CTU 0.1 R)" )
-GAME_CUSTOM( 199?, m4tutfrt__j,    m4tutfrt,   "ctuy.p1",              0x0000, 0x010000, CRC(ed3103bc) SHA1(eefb72728e026fad3dd031665510ee0aba23e14b), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (CTU 0.1 Y)" )
+GAME_CUSTOM( 199?, m4tutfrt__i,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, init_m4_showstring,  "ctus.p1",              0x0000, 0x010000, CRC(1b282170) SHA1(e3082aed6e96587de56c5593d32d0129c47fe667), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (CTU 0.1)" )
+GAME_CUSTOM( 199?, m4tutfrt__a,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, init_m4_showstring,  "ctuad.p1",             0x0000, 0x010000, CRC(0ec1661b) SHA1(162ddc30c341fd8eda8ce57a60edf06b4e39a24f), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (CTU 0.1 AD)" )
+GAME_CUSTOM( 199?, m4tutfrt__b,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, init_m4_showstring,  "ctub.p1",              0x0000, 0x010000, CRC(f4289621) SHA1(a4078552146c88c05845cbdcd551e4564840fea4), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (CTU 0.1 B)" )
+GAME_CUSTOM( 199?, m4tutfrt__c,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, init_m4_showstring,  "ctubd.p1",             0x0000, 0x010000, CRC(38dd0b51) SHA1(04df9511f366cc575a1a06d3a5d60ec0245f64a7), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (CTU 0.1 BD)" )
+GAME_CUSTOM( 199?, m4tutfrt__d,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, init_m4_showstring,  "ctud.p1",              0x0000, 0x010000, CRC(6033fae5) SHA1(f5bdd1821344d4546eea8caa52d76e3bd509810e), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (CTU 0.1 D)" )
+GAME_CUSTOM( 199?, m4tutfrt__e,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, init_m4_showstring,  "ctudk.p1",             0x0000, 0x010000, CRC(36dd1e41) SHA1(ad5ad7cae12634149d38e286e6873b81bda52871), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (CTU 0.1 KD)" )
+GAME_CUSTOM( 199?, m4tutfrt__f,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, init_m4_showstring,  "ctudy.p1",             0x0000, 0x010000, CRC(58c02db6) SHA1(faf85caeaa0678b5771d801cf3d9645d7767767c), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (CTU 0.1 YD)" )
+GAME_CUSTOM( 199?, m4tutfrt__g,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, init_m4_showstring,  "ctuk.p1",              0x0000, 0x010000, CRC(4c247447) SHA1(f5aebb4a75632c9a74dca1f3e9559399c89ac679), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (CTU 0.1 K)" )
+GAME_CUSTOM( 199?, m4tutfrt__h,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, init_m4_showstring,  "ctur.p1",              0x0000, 0x010000, CRC(705a2b52) SHA1(40b0738146d073f93877a15f63830ff3e07814c1), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (CTU 0.1 R)" )
+GAME_CUSTOM( 199?, m4tutfrt__j,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, init_m4_showstring,  "ctuy.p1",              0x0000, 0x010000, CRC(ed3103bc) SHA1(eefb72728e026fad3dd031665510ee0aba23e14b), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (CTU 0.1 Y)" )
 // "(C)1991 BARCREST" and "TF4 0.2"
-GAME_CUSTOM( 199?, m4tutfrt__af,   m4tutfrt,   "tf4s.p1",              0x0000, 0x010000, CRC(2d298c58) SHA1(568c2babdb002da871df7a36d16e4f7810cac265), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TF4 0.2)" )
-GAME_CUSTOM( 199?, m4tutfrt__8,    m4tutfrt,   "tf4ad.p1",             0x0000, 0x010000, CRC(6ddc90a9) SHA1(76dd22c5e65fc46360123e200016d11a8946d2f3), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TF4 0.2 AD)" )
-GAME_CUSTOM( 199?, m4tutfrt__9,    m4tutfrt,   "tf4b.p1",              0x0000, 0x010000, CRC(c3a70eac) SHA1(ea5a39e33af96e84ce0ea184850d5f580dbf19ce), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TF4 0.2 B)" )
-GAME_CUSTOM( 199?, m4tutfrt__aa,   m4tutfrt,   "tf4bd.p1",             0x0000, 0x010000, CRC(54ae2498) SHA1(54a63a0de794eb2ce321f79b09a56485d9e77715), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TF4 0.2 BD)" )
-GAME_CUSTOM( 199?, m4tutfrt__ab,   m4tutfrt,   "tf4d.p1",              0x0000, 0x010000, CRC(d8ff9045) SHA1(ae7307212614c6f1b4e3d72d3a1ae68ca1d0b470), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TF4 0.2 D)" )
-GAME_CUSTOM( 199?, m4tutfrt__ac,   m4tutfrt,   "tf4dk.p1",             0x0000, 0x010000, CRC(a2e3b67f) SHA1(dea9958caba08b5cdec6eec9e4c17038ecb0ca55), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TF4 0.2 KD)" )
-GAME_CUSTOM( 199?, m4tutfrt__ad,   m4tutfrt,   "tf4dy.p1",             0x0000, 0x010000, CRC(ff4f26c4) SHA1(21ef226bf92deeab15c9368d707bf75b7104e7c3), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TF4 0.2 YD)" )
-GAME_CUSTOM( 199?, m4tutfrt__ae,   m4tutfrt,   "tf4k.p1",              0x0000, 0x010000, CRC(1a4eb247) SHA1(f6b4c85dd8b155b672bd96ea7ee6630df773c6ca), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TF4 0.2 K)" )
-GAME_CUSTOM( 199?, m4tutfrt__ag,   m4tutfrt,   "tf4y.p1",              0x0000, 0x010000, CRC(06cd8b06) SHA1(92205e9edd42f80de67d5d6652de8ea80bc60af7), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TF4 0.2 Y)" )
-
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( length, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-		M4TUTFRT_EXTRA_ROMS \
-	ROM_END \
-	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x58>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+GAME_CUSTOM( 199?, m4tutfrt__af,   m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, init_m4_showstring,  "tf4s.p1",              0x0000, 0x010000, CRC(2d298c58) SHA1(568c2babdb002da871df7a36d16e4f7810cac265), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TF4 0.2)" )
+GAME_CUSTOM( 199?, m4tutfrt__8,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, init_m4_showstring,  "tf4ad.p1",             0x0000, 0x010000, CRC(6ddc90a9) SHA1(76dd22c5e65fc46360123e200016d11a8946d2f3), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TF4 0.2 AD)" )
+GAME_CUSTOM( 199?, m4tutfrt__9,    m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, init_m4_showstring,  "tf4b.p1",              0x0000, 0x010000, CRC(c3a70eac) SHA1(ea5a39e33af96e84ce0ea184850d5f580dbf19ce), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TF4 0.2 B)" )
+GAME_CUSTOM( 199?, m4tutfrt__aa,   m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, init_m4_showstring,  "tf4bd.p1",             0x0000, 0x010000, CRC(54ae2498) SHA1(54a63a0de794eb2ce321f79b09a56485d9e77715), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TF4 0.2 BD)" )
+GAME_CUSTOM( 199?, m4tutfrt__ab,   m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, init_m4_showstring,  "tf4d.p1",              0x0000, 0x010000, CRC(d8ff9045) SHA1(ae7307212614c6f1b4e3d72d3a1ae68ca1d0b470), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TF4 0.2 D)" )
+GAME_CUSTOM( 199?, m4tutfrt__ac,   m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, init_m4_showstring,  "tf4dk.p1",             0x0000, 0x010000, CRC(a2e3b67f) SHA1(dea9958caba08b5cdec6eec9e4c17038ecb0ca55), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TF4 0.2 KD)" )
+GAME_CUSTOM( 199?, m4tutfrt__ad,   m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, init_m4_showstring,  "tf4dy.p1",             0x0000, 0x010000, CRC(ff4f26c4) SHA1(21ef226bf92deeab15c9368d707bf75b7104e7c3), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TF4 0.2 YD)" )
+GAME_CUSTOM( 199?, m4tutfrt__ae,   m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, init_m4_showstring,  "tf4k.p1",              0x0000, 0x010000, CRC(1a4eb247) SHA1(f6b4c85dd8b155b672bd96ea7ee6630df773c6ca), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TF4 0.2 K)" )
+GAME_CUSTOM( 199?, m4tutfrt__ag,   m4tutfrt, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::cosmiccasino_characteriser_prot>, mpu4, init_m4_showstring,  "tf4y.p1",              0x0000, 0x010000, CRC(06cd8b06) SHA1(92205e9edd42f80de67d5d6652de8ea80bc60af7), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (TF4 0.2 Y)" )
 
 // different protection
 // "I.G.T SUCKS" and "F2U 0.1"
-GAME_CUSTOM( 199?, m4tutfrt__at,   m4tutfrt,   "tut25.bin",            0x0000, 0x010000, CRC(c98fb5bb) SHA1(1a3bc343a38b5978a919b454e9a2e806dce7a78a), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1 B, hack, set 1)" )
-
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( length, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-		M4TUTFRT_EXTRA_ROMS \
-	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
-
-
+GAME_CUSTOM( 199?, m4tutfrt__at,   m4tutfrt, mod4oki_bootleg_fixedret<0x58>, mpu4, init_m4_showstring,  "tut25.bin",            0x0000, 0x010000, CRC(c98fb5bb) SHA1(1a3bc343a38b5978a919b454e9a2e806dce7a78a), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1 B, hack, set 1)" )
 // unprotected, doesn't read from chr
-GAME_CUSTOM( 199?, m4tutfrt__au,   m4tutfrt,   "tut25patched.bin",     0x0000, 0x010000, CRC(b4443cf5) SHA1(e79ec52730146f1591140555b814cbd20b5dfe78), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1 B, hack, set 2)" )
+GAME_CUSTOM( 199?, m4tutfrt__au,   m4tutfrt, mod4oki, mpu4, init_m4_showstring,  "tut25patched.bin",     0x0000, 0x010000, CRC(b4443cf5) SHA1(e79ec52730146f1591140555b814cbd20b5dfe78), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1 B, hack, set 2)" )
 
 
 
@@ -3905,7 +3876,7 @@ GAME_CUSTOM( 199?, m4cashat__0,    m4cashat,   "casattack8.bin",   0x0000, 0x020
 *
 *****************************************************************************************************************************************************************************/
 
-// This ROM was included, but it isn't an sample ROM in the correct format for this hardware
+// This ROM was included, but it isn't a sample ROM in the correct format for this hardware
 // ROM_LOAD( "redhotroll10.bin", 0x0000, 0x080000, CRC(64513503) SHA1(4233492f3f6e7ad8459f1ab733727910d3b4bcf8) ) /* not a valid OKI rom? */
 
 
@@ -4071,19 +4042,6 @@ GAME_CUSTOM( 199?, m4rhr__7,  m4rhr,  "rhr2015",          0x0000, 0x010000, CRC(
 // no copyright and "RHT 0.3"
 GAME_CUSTOM( 199?, m4rhr__8,  m4rhr,  "rhr2515",          0x0000, 0x010000, CRC(e4554c23) SHA1(6d977beb282fd638de3457e467e842ce79b5be7c), "hack","Red Hot Roll (Barcrest) (MPU4) (RHT 0.3 C, hack)" )
 
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( length, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-		M4RHR_EXTRA_ROMS \
-	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
-
-// different protection
-
-// "(C)1998  B.W.B." and "SS2 1.0"
-GAME_CUSTOM( 199?, m4rhr__9,  m4rhr,  "rhr2pprg.bin",     0x0000, 0x010000, CRC(f97047b2) SHA1(d3ed8c93e405f9e7448b3924ff9aa84223b76046), "hack","Red Hot Roll (Barcrest) (MPU4) (SS2 1.0, hack?)" )
 
 
 /*****************************************************************************************************************************************************************************
