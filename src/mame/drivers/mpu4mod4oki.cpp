@@ -701,22 +701,59 @@ GAME_CUSTOM( 199?, m4dtyfre_h2,    m4dtyfre,   "duty2010",                 0x000
 		ROM_LOAD( name, offset, length, hash ) \
 		M4DTYFRE_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_812altprot, ROT0, company, title, GAME_FLAGS )
 
 
-// none of these use standard characteriser protection, are they actually all hacks?
-
-// "(C)1996  B.W.B."  and various ident strings, none boot, bad chr
+// "(C)1996  B.W.B."  and various ident strings, are these hacks? require non-standard protection
 GAME_CUSTOM( 1996, m4dtyfrebwb,    m4dtyfre,   "4df5.10",                  0x0000, 0x010000, CRC(01c9e06f) SHA1(6d9d4a43f621c4a80259040875a1fe851459b662), "Bwb","Duty Free (Bwb / Barcrest) (MPU4) (DF10 4.3, set 1)" )
 GAME_CUSTOM( 1996, m4dtyfrebwb_a,  m4dtyfre,   "dfree510l",                0x0000, 0x010000, CRC(7cf877a9) SHA1(54a87391832a641bf5f7104968b919dbb2bfa1eb), "Bwb","Duty Free (Bwb / Barcrest) (MPU4) (DF10 4.3, set 2)" )
 GAME_CUSTOM( 1996, m4dtyfrebwb_b,  m4dtyfre,   "4df5.8t",                  0x0000, 0x010000, CRC(e8abec56) SHA1(84f6abc5e8b46c55052d308266000085374b12af), "Bwb","Duty Free (Bwb / Barcrest) (MPU4) (DF8 4.2)" )
-GAME_CUSTOM( 1996, m4dtyfrebwb_c,  m4dtyfre,   "bwb duty free 5.8.bin",    0x0000, 0x010000, CRC(c67e7315) SHA1(a70183b0937c138c96fd1a0cd5bacff1acd0cbdb), "Bwb","Duty Free (Bwb / Barcrest) (MPU4) (DF8 2.2, set 1)" )
 GAME_CUSTOM( 1996, m4dtyfrebwb_d,  m4dtyfre,   "df5,2.8t",                 0x0000, 0x010000, CRC(eb4cf0ae) SHA1(45c4e143a3e358c4bdc0c10e38039cba48a9e6dc), "Bwb","Duty Free (Bwb / Barcrest) (MPU4) (DF8 2.2, set 2)" )
-GAME_CUSTOM( 1996, m4dtyfrebwb_e,  m4dtyfre,   "4df5.4",                   0x0000, 0x010000, CRC(60e21664) SHA1(2a343f16ece19396ad41eeac8c94a23d8e648d4f), "Bwb","Duty Free (Bwb / Barcrest) (MPU4) (DF4 4.1)" )
-GAME_CUSTOM( 1996, m4dtyfrebwb_f,  m4dtyfre,   "df5.4",                    0x0000, 0x010000, CRC(14de7ecb) SHA1(f7445b33b2febbf93fd0398ab310ac104e79443c), "Bwb","Duty Free (Bwb / Barcrest) (MPU4) (DF4 2.1)" )
 GAME_CUSTOM( 1996, m4dtyfrebwb_g,  m4dtyfre,   "df5,2.4",                  0x0000, 0x010000, CRC(50f8566c) SHA1(364d33de4b34d0052ffc98536468c0a13f847a2a), "Bwb","Duty Free (Bwb / Barcrest) (MPU4) (DF4 1.1)" )
-GAME_CUSTOM( 1996, m4dtyfrebwb_h,  m4dtyfre,   "df5.10",                   0x0000, 0x010000, CRC(96acf53f) SHA1(1297a9162dea474079d0ea63b2b1b8e7f649230a), "Bwb","Duty Free (Bwb / Barcrest) (MPU4) (DFC 2.3)" )
 
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( 0x10000, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4DTYFRE_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x2e>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_812altprot, ROT0, company, title, GAME_FLAGS )
+
+GAME_CUSTOM( 1996, m4dtyfrebwb_c,  m4dtyfre,   "bwb duty free 5.8.bin",    0x0000, 0x010000, CRC(c67e7315) SHA1(a70183b0937c138c96fd1a0cd5bacff1acd0cbdb), "Bwb","Duty Free (Bwb / Barcrest) (MPU4) (DF8 2.2, set 1)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( 0x10000, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4DTYFRE_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x2f>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_812altprot, ROT0, company, title, GAME_FLAGS )
+
+GAME_CUSTOM( 1996, m4dtyfrebwb_e,  m4dtyfre,   "4df5.4",                   0x0000, 0x010000, CRC(60e21664) SHA1(2a343f16ece19396ad41eeac8c94a23d8e648d4f), "Bwb","Duty Free (Bwb / Barcrest) (MPU4) (DF4 4.1)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( 0x10000, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4DTYFRE_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x2d>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_812altprot, ROT0, company, title, GAME_FLAGS )
+
+GAME_CUSTOM( 1996, m4dtyfrebwb_f,  m4dtyfre,   "df5.4",                    0x0000, 0x010000, CRC(14de7ecb) SHA1(f7445b33b2febbf93fd0398ab310ac104e79443c), "Bwb","Duty Free (Bwb / Barcrest) (MPU4) (DF4 2.1)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( 0x10000, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4DTYFRE_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x1d>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_812altprot, ROT0, company, title, GAME_FLAGS )
+
+GAME_CUSTOM( 1996, m4dtyfrebwb_h,  m4dtyfre,   "df5.10",                   0x0000, 0x010000, CRC(96acf53f) SHA1(1297a9162dea474079d0ea63b2b1b8e7f649230a), "Bwb","Duty Free (Bwb / Barcrest) (MPU4) (DFC 2.3)" )
 
 /*****************************************************************************************************************************************************************************
 *
@@ -918,6 +955,12 @@ GAME_CUSTOM( 1991, m4rhog_h14,       m4rhog,     "rhog_20_.4",               0x0
 // "(C)1991 BARCREST"  and "RR6 1.2" custom protection
 GAME_CUSTOM( 1991, m4rhog_h15,       m4rhog,     "rhog20_11",                0x0000, 0x010000, CRC(63c80ee0) SHA1(22a3f11007acedd833af9e73e3038fb3542781fe), "hack?","Road Hog (Barcrest) (MPU4) (RR6 1.2C, hack?, set 2)" )
 
+// different protection (these have both a startup check, and 2 checks after the reels have been initialized)
+// the first check (read at 814) must pass to avoid chr alarm?  the 2nd check (usual chr address) must pass to avoid scrambled lamps
+// the 3rd check (usual chr address) must pass to not reboot?
+// if the 2nd check fails, the 3rd check never happens and the lamps just scramble. the value to pass the 3rd check is the same as required for the 2nd check?
+// the code looks more complex, so there could be other pitfalls with payout etc?
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -925,20 +968,72 @@ GAME_CUSTOM( 1991, m4rhog_h15,       m4rhog,     "rhog20_11",                0x0
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RHOG_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
-
-
-// different protection
-// "HAVE A NICE DAY"  and "RO_ 2.0" (won't boot)
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x44>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_814prot, ROT0, company, title, GAME_FLAGS )
+ 
+// "HAVE A NICE DAY"  and "RO_ 2.0"
 GAME_CUSTOM( 1994, m4rhog_h1,        m4rhog,     "road hog 5p 6.bin",        0x0000, 0x010000, CRC(b365d1f0) SHA1(af3b4f5162af6c033039a1e004bc803175a4e996), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0, hack?, set 1)" )
-GAME_CUSTOM( 1994, m4rhog_h2,        m4rhog,     "rhog05_11",                0x0000, 0x010000, CRC(8e4b14aa) SHA1(8b67b34597c0d30b0b3cf2566536c02f880a74bc), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0, hack?, set 2)" )
-GAME_CUSTOM( 1994, m4rhog_h3,        m4rhog,     "rhog55",                   0x0000, 0x010000, CRC(29395082) SHA1(538434b82e31f7e40770a9b882e54a16195ee998), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0, hack?, set 3)" )
-GAME_CUSTOM( 1994, m4rhog_h4,        m4rhog,     "rhog58c",                  0x0000, 0x010000, CRC(e02b6da6) SHA1(7d329adcac594c98685dc5404f2b9e8f717cc47f), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0, hack?, set 4)" )
 GAME_CUSTOM( 1994, m4rhog_h5,        m4rhog,     "rh056c",                   0x0000, 0x010000, CRC(073845e2) SHA1(5e6f3ccdfc346f95e5e7e955144332e727da1d9e), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0, hack?, set 5)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( 0x10000, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4RHOG_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x1c>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_814prot, ROT0, company, title, GAME_FLAGS )
+
+// "HAVE A NICE DAY"  and "RO_ 2.0"
+GAME_CUSTOM( 1994, m4rhog_h2,        m4rhog,     "rhog05_11",                0x0000, 0x010000, CRC(8e4b14aa) SHA1(8b67b34597c0d30b0b3cf2566536c02f880a74bc), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0, hack?, set 2)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( 0x10000, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4RHOG_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x28>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_814prot, ROT0, company, title, GAME_FLAGS )
+
+// "HAVE A NICE DAY"  and "RO_ 2.0"
+GAME_CUSTOM( 1994, m4rhog_h3,        m4rhog,     "rhog55",                   0x0000, 0x010000, CRC(29395082) SHA1(538434b82e31f7e40770a9b882e54a16195ee998), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0, hack?, set 3)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( 0x10000, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4RHOG_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x2c>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_814prot, ROT0, company, title, GAME_FLAGS )
+
+// "HAVE A NICE DAY"  and "RO_ 2.0"
+GAME_CUSTOM( 1994, m4rhog_h4,        m4rhog,     "rhog58c",                  0x0000, 0x010000, CRC(e02b6da6) SHA1(7d329adcac594c98685dc5404f2b9e8f717cc47f), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0, hack?, set 4)" )
 GAME_CUSTOM( 1994, m4rhog_h6,        m4rhog,     "rhog_05_.4",               0x0000, 0x010000, CRC(a75a2bd4) SHA1(d21505d27792acf8fa20a7cdc830efbe8756fe81), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0, hack?, set 6)" )
 GAME_CUSTOM( 1994, m4rhog_h7,        m4rhog,     "rhog_05_.8",               0x0000, 0x010000, CRC(5476f9b4) SHA1(fbd038e8710a79ea697d5acb482bed2f307cefbb), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0, hack?, set 7)" )
-// "HAVE A NICE DAY"  and "RO_ 1.0" (won't boot)
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( 0x10000, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4RHOG_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x1f>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_814prot, ROT0, company, title, GAME_FLAGS )
+
+// "HAVE A NICE DAY"  and "RO_ 1.0"
 GAME_CUSTOM( 1994, m4rhog_h8,        m4rhog,     "rhog10_11",                0x0000, 0x010000, CRC(83575be7) SHA1(2cb549554028f2fdc32ecfa58b786de375b8fa35), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0, hack?, set 1)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( 0x10000, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4RHOG_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x2f>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_814prot, ROT0, company, title, GAME_FLAGS )
+
+// "HAVE A NICE DAY"  and "RO_ 1.0"
 GAME_CUSTOM( 1994, m4rhog_h9,        m4rhog,     "rhog10c",                  0x0000, 0x010000, CRC(308c6d4f) SHA1(f7f8063fe8dd4ef204f225d0aa5202732ead5fa0), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0, hack?, set 2)" )
 GAME_CUSTOM( 1994, m4rhog_h10,       m4rhog,     "rhog_10_.4",               0x0000, 0x010000, CRC(8efa581c) SHA1(03c25b674cfb02792edc9ef8a76b16af31d80aae), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0, hack?, set 3)" )
 GAME_CUSTOM( 1994, m4rhog_h11,       m4rhog,     "rhog_10_.8",               0x0000, 0x010000, CRC(84d1f95d) SHA1(33f10e0e1e5abe6011b05f32f55c7dd6d3298945), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0, hack?, set 4)" )
