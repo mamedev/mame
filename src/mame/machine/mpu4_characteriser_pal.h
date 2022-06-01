@@ -179,7 +179,7 @@ public:
 	static constexpr uint8_t m578_characteriser_prot[8] = { 0x00, 0x60, 0x00, 0x60, 0x40, 0x20, 0x00, 0x00 };	
 
 	// games with sequence 00 60 60 44 e0 e8 1c 74 a4 6c 14 84 e8 1c f4
-	static constexpr uint8_t addr_characteriser_prot[8] = { 0x00, 0x60, 0x60, 0x00, 0x00, 0x00, 0x00, 0x00 }; // likely incomplete
+	static constexpr uint8_t addr_characteriser_prot[8] = { 0x00, 0x60, 0x60, 0x40, 0x40, 0x60, 0x60, 0x40 }; // based on bootleg
 
 	// games with sequence 00 c0 c8 1c f4 68 14 50 70 50 20 f0 48 34 60
 	static constexpr uint8_t age_characteriser_prot[8] = { 0x00, 0x74, 0x44, 0x34, 0x14, 0x64, 0x44, 0x00 };
