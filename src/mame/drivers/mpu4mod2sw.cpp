@@ -2264,6 +2264,26 @@ GAME_CUSTOM( 199?, m4nnww2__hx2,  m4nnww2, "wink2010",     0x0000, 0x010000, CRC
 
 /*********************************************************************************************************
 
+	unknown 'RED'
+
+*********************************************************************************************************/
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+	ROM_END \
+	GAME(year, setname, parent, mod2_bootleg_fixedret<0x13>, mpu4, mpu4mod2_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
+
+// no copyright string in header, although 1988 BARCREST string exists elsewhere
+// RED 0.4, different protection?, hack, might be a different game, has touchscreen related strings?
+GAME_CUSTOM( 199?, m4redunk,    0,   "redx_20_.8",   0x0000, 0x010000, CRC(b5e8dec5) SHA1(74777ed7f78ef7cc615beadf097380569832a75a), "bootleg","unknown Barcrest MPU4 'RED 0.4' (MPU4) (bootleg)" )
+
+
+/*********************************************************************************************************
+
     Sets below are NOT based on Barcrest code, and don't have Characteriser protection etc.
 
 *********************************************************************************************************/

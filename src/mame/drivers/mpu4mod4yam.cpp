@@ -734,13 +734,18 @@ GAME_CUSTOM( 199?, m4ra__m,    m4ra,   "ra3xr.p1",     0x0000, 0x010000, CRC(1a2
 GAME_CUSTOM( 199?, m4ra__n,    m4ra,   "ra3xs.p1",     0x0000, 0x010000, CRC(a1ba9673) SHA1(7d5441522e8676805f7e75a3d445acae83d8a03b), "Barcrest","Red Alert (Barcrest) (MPU4) (set 15)" )
 GAME_CUSTOM( 199?, m4ra__o,    m4ra,   "ra3xy.p1",     0x0000, 0x010000, CRC(3e2287de) SHA1(ba0861a0bfb6eb76f9786c0a4c098db362117618), "Barcrest","Red Alert (Barcrest) (MPU4) (set 16)" )
 
-// doesn't boot properly / different protection? hack?
-// (C)1991 BARCREST and R2T 3.1
-GAME_CUSTOM( 199?, m4ra__q,    m4ra,   "reda_20_.8",   0x0000, 0x010000, CRC(915aff5b) SHA1(e8e58c263e2bdb64a80e9355ac5e114fff1d59f8), "Barcrest","Red Alert (Barcrest) (MPU4) (set 18)" )
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+	ROM_END \
+	GAME(year, setname, parent, mod4yam_bootleg_fixedret<0x11>, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
-// no copyright string in header, although 1988 BARCREST string exists elsewhere
-// RED 0.4, different protection?, hack, might be a different game, has touchscreen related strings?
-GAME_CUSTOM( 199?, m4ra__r,    m4ra,   "redx_20_.8",   0x0000, 0x010000, CRC(b5e8dec5) SHA1(74777ed7f78ef7cc615beadf097380569832a75a), "hack","Red Alert? (Barcrest) (MPU4) (hack?)" )
+
+// doesn't boot properly / different protection? reads from 811 at start, but check doesn't matter?
+// (C)1991 BARCREST and R2T 3.1
+GAME_CUSTOM( 199?, m4ra__q,    m4ra,   "reda_20_.8",   0x0000, 0x010000, CRC(915aff5b) SHA1(e8e58c263e2bdb64a80e9355ac5e114fff1d59f8), "bootleg","Red Alert (Barcrest) (bootleg) (MPU4)" )
 
 
 /*****************************************************************************************************************************************************************************

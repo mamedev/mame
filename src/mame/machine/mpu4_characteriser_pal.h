@@ -238,7 +238,7 @@ public:
 	static constexpr uint8_t premier_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 	// games with sequence starting 00 a0 88 38 94 2c 30 00 e4 c8 18 b4 4c 30
-	static constexpr uint8_t squids_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+	static constexpr uint8_t squids_characteriser_prot[8] = { 0x00, 0x60, 0x20, 0x60, 0x40, 0x20, 0x20, 0x40 }; // match m4addr decodes for sets using this table
 
 	// games with sequence starting 00 a0 88 38 94 2c 30 00 e4 c8 18 b4 4c 30
 	static constexpr uint8_t graff_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
