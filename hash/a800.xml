@@ -2100,7 +2100,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-		<software name="dropzone">
+	<software name="dropzone">
 		<description>Dropzone</description>
 		<year>20??</year>
 		<publisher>Video 61</publisher>
@@ -2402,7 +2402,7 @@ Compiled by K1W1
 		<description>Final Orbit</description>
 		<year>1983</year>
 		<publisher>Sirius</publisher>
-			<info name="serial" value="3300?" />
+		<info name="serial" value="3300?" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_8k" />
 			<dataarea name="rom" size="8192">
@@ -4119,7 +4119,7 @@ Compiled by K1W1
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
-					<rom name="pastfinder.rom" size="16384" crc="14fddfb8" sha1="5fa7c9c35ee8b1a844222f035ab4e99a0eb7f9fd"/> <!-- Verified -->
+				<rom name="pastfinder.rom" size="16384" crc="14fddfb8" sha1="5fa7c9c35ee8b1a844222f035ab4e99a0eb7f9fd"/> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -4131,7 +4131,7 @@ Compiled by K1W1
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
-					<rom name="explorer (proto).rom" size="16384" crc="98a4e5b7" sha1="c00061d53278403e846cf3d008cbc2e2b862081e"/>
+				<rom name="explorer (proto).rom" size="16384" crc="98a4e5b7" sha1="c00061d53278403e846cf3d008cbc2e2b862081e"/>
 			</dataarea>
 		</part>
 	</software>

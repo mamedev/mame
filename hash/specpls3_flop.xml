@@ -7553,7 +7553,7 @@ license:CC0
 <!-- From "Sinclair ZX Spectrum - Games - [DSK] (TOSEC-v2018-03-24_CM).dat" -->
 	<software name="arturaa" cloneof="artura">
 	<!-- May be the same edition as the IPF -->
-	<!--    Side B has Hardball for the Amstrad CPC, was this edition accidentally sold like this?  -->
+	<!-- Side B has Hardball for the Amstrad CPC, was this edition accidentally sold like this? -->
 		<description>Artura (alt)</description>
 		<year>1989</year>
 		<publisher>Gremlin Graphics Software</publisher>

@@ -6,7 +6,7 @@ license:CC0
 <softwarelist name="adam_cart" description="Coleco Adam cartridges">
 
 	<!--
-	software name="adamdev" supported="no">
+	<software name="adamdev" supported="no">
 	    <description>ADAM Dev (Prototype)</description>
 	    <year>198?</year>
 	    <publisher>Coleco?</publisher>
