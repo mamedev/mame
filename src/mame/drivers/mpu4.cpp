@@ -3143,14 +3143,13 @@ void mpu4_state::init_m4_showstring_big()
 
 
 
+// many bootlegs have an initial protection check reading 0x814 or 0x812
+// if it passes, other checks are skipped.
+//
+// this could be a trap, maybe this one is meant to fail and the others are meant to pass
 
 uint8_t mpu4_state::bootleg814_r(address_space &space, offs_t offset)
 {
-	// many bootlegs have an initial protection check reading 0x814 or 0x812
-	// if it passes, other checks are skipped.
-	//
-	// this could be a trap, maybe this one is meant to fail and the others are meant to pass
-
 	int addr = m_maincpu->state_int(M6809_PC);
 	logerror("%s: bootleg812_r / bootleg814_r offset %02x add %04x\n", machine().describe_context(), offset, addr);
 	return m_maincpu->space(AS_PROGRAM).read_byte(addr+8);
@@ -3158,14 +3157,16 @@ uint8_t mpu4_state::bootleg814_r(address_space &space, offs_t offset)
 
 uint8_t mpu4_state::bootleg814alt_r(address_space &space, offs_t offset)
 {
-	// many bootlegs have an initial protection check reading 0x814 or 0x812
-	// if it passes, other checks are skipped.
-	//
-	// this could be a trap, maybe this one is meant to fail and the others are meant to pass
-
 	int addr = m_maincpu->state_int(M6809_PC);
 	logerror("%s: bootleg812_r / bootleg814_r offset %02x add %04x\n", machine().describe_context(), offset, addr);
 	return m_maincpu->space(AS_PROGRAM).read_byte(addr+6);
+}
+
+uint8_t mpu4_state::bootleg814alt2_r(address_space &space, offs_t offset)
+{
+	int addr = m_maincpu->state_int(M6809_PC);
+	logerror("%s: bootleg812_r / bootleg814_r offset %02x add %04x\n", machine().describe_context(), offset, addr);
+	return m_maincpu->space(AS_PROGRAM).read_byte(addr+3);
 }
 
 void mpu4_state::init_m4_showstring_812prot()
@@ -3184,6 +3185,12 @@ void mpu4_state::init_m4_showstring_812altprot()
 {
 	init_m4_showstring();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0812, 0x0812, read8m_delegate(*this, FUNC(mpu4_state::bootleg814alt_r)));
+}
+
+void mpu4_state::init_m4_showstring_812alt2prot()
+{
+	init_m4_showstring();
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0812, 0x0812, read8m_delegate(*this, FUNC(mpu4_state::bootleg814alt2_r)));
 }
 
 void mpu4_state::init_m4_showstring_814altprot()

@@ -64,7 +64,6 @@
     Pot Black
     Prize Money
     Prize Money (Showcase version)
-    Prize Run For Your Money
     Ready Steady Go
     Red Hot Roll (Classic?)
     Rich & Famous
@@ -74,6 +73,7 @@
     Rocket Money
     Rocky Horror Show
     Run For Your Money
+    Run For Your Money (Prize Version)
     Squids In
     Super Streak (Classic)
     Take Your Pick
@@ -2540,140 +2540,99 @@ GAME_CUSTOM( 199?, m4nnwwc__ad, m4nnww,    "cl__xb_x.2_0",     0x0000, 0x010000,
 	ROM_LOAD( "runsnd.p2", 0x080000, 0x080000, CRC(1c03046f) SHA1(5235b2f60f12cbee11fb5e54e1858a11a755f460) )
 
 #undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+#define GAME_CUSTOM(year, setname,parent, machine, inputs, init, name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RFYM_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m462_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME( year, setname, parent, machine, inputs, mpu4mod4oki_machines_state, init, ROT0, company, title, GAME_FLAGS )
 
 // sequence 00 c4 c4 44 c4 44 44 c4 cc 3c 5c 7c 54  (Same as some Dennis the Menace sets)
 // "(C)1993 BARCREST" and "RUN 0.5"
-GAME_CUSTOM( 199?, m4rfym,       0,      "runs.p1",      0x0000, 0x010000, CRC(e20f5a06) SHA1(f0f71f8870db7003fce96f1dfe09804cf17c3ab3), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUN 0.5)" )
-GAME_CUSTOM( 199?, m4rfym__ar,   m4rfym, "rund.p1",      0x0000, 0x010000, CRC(2be2a66d) SHA1(a66d74ccf1783912673cfcb6c1ae7fbb6d70ca0e), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUN 0.5 D)" )
-GAME_CUSTOM( 199?, m4rfym__ao,   m4rfym, "runc.p1",      0x0000, 0x010000, CRC(09f53ddf) SHA1(f46be95bfacac751102a5f4d4a0917a5e51a653e), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUN 0.5 C)" )
-GAME_CUSTOM( 199?, m4rfym__ap,   m4rfym, "rundy.p1",     0x0000, 0x010000, CRC(a6f69a24) SHA1(8370287dcc890fcb7529d3d4c7a3c2e2e688f6a8), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUN 0.5 YD)" )
-GAME_CUSTOM( 199?, m4rfym__aq,   m4rfym, "runk.p1",      0x0000, 0x010000, CRC(a2828b82) SHA1(0ae371a441df679fd9c699771ae9f58ce960d4a1), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUN 0.5 K)" )
-GAME_CUSTOM( 199?, m4rfym__as,   m4rfym, "runy.p1",      0x0000, 0x010000, CRC(0e311ab4) SHA1(c98540c07e9cc23ec70ecfbcb2f4d66f2c716fc3), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUN 0.5 Y)" )
+GAME_CUSTOM( 199?, m4rfym,       0,      mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m462_characteriser_prot>, mpu4, init_m4_showstring, "runs.p1",      0x0000, 0x010000, CRC(e20f5a06) SHA1(f0f71f8870db7003fce96f1dfe09804cf17c3ab3), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUN 0.5)" )
+GAME_CUSTOM( 199?, m4rfym__ar,   m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m462_characteriser_prot>, mpu4, init_m4_showstring, "rund.p1",      0x0000, 0x010000, CRC(2be2a66d) SHA1(a66d74ccf1783912673cfcb6c1ae7fbb6d70ca0e), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUN 0.5 D)" )
+GAME_CUSTOM( 199?, m4rfym__ao,   m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m462_characteriser_prot>, mpu4, init_m4_showstring, "runc.p1",      0x0000, 0x010000, CRC(09f53ddf) SHA1(f46be95bfacac751102a5f4d4a0917a5e51a653e), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUN 0.5 C)" )
+GAME_CUSTOM( 199?, m4rfym__ap,   m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m462_characteriser_prot>, mpu4, init_m4_showstring, "rundy.p1",     0x0000, 0x010000, CRC(a6f69a24) SHA1(8370287dcc890fcb7529d3d4c7a3c2e2e688f6a8), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUN 0.5 YD)" )
+GAME_CUSTOM( 199?, m4rfym__aq,   m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m462_characteriser_prot>, mpu4, init_m4_showstring, "runk.p1",      0x0000, 0x010000, CRC(a2828b82) SHA1(0ae371a441df679fd9c699771ae9f58ce960d4a1), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUN 0.5 K)" )
+GAME_CUSTOM( 199?, m4rfym__as,   m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m462_characteriser_prot>, mpu4, init_m4_showstring, "runy.p1",      0x0000, 0x010000, CRC(0e311ab4) SHA1(c98540c07e9cc23ec70ecfbcb2f4d66f2c716fc3), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUN 0.5 Y)" )
 // "(C)1993 BARCREST" and "APR 0.1"
-GAME_CUSTOM( 199?, m4rfym__2,    m4rfym, "aprs.p1",      0x0000, 0x010000, CRC(a114a96a) SHA1(b0a9091cac86750329513a0927dd39b76995b2f2), "Barcrest","Run For Your Money (Barcrest) (MPU4) (APR 0.1)" )
-GAME_CUSTOM( 199?, m4rfym__u,    m4rfym, "aprad.p1",     0x0000, 0x010000, CRC(936f59ac) SHA1(325708d965d56a9a7482dbeaa089ca871d5c01b5), "Barcrest","Run For Your Money (Barcrest) (MPU4) (APR 0.1 AD)" )
-GAME_CUSTOM( 199?, m4rfym__v,    m4rfym, "aprb.p1",      0x0000, 0x010000, CRC(72ad662a) SHA1(11f1695e05ecf34a58f8df3ffbc72ab2dd7d02c9), "Barcrest","Run For Your Money (Barcrest) (MPU4) (APR 0.1 B)" )
-GAME_CUSTOM( 199?, m4rfym__w,    m4rfym, "aprbd.p1",     0x0000, 0x010000, CRC(13af990d) SHA1(604d2173e3d6d25252b30b5bf386b53470c35581), "Barcrest","Run For Your Money (Barcrest) (MPU4) (APR 0.1 BD)" )
-GAME_CUSTOM( 199?, m4rfym__x,    m4rfym, "aprc.p1",      0x0000, 0x010000, CRC(fd3ece9a) SHA1(e11d1d258a415865f7477cdfddcd47e9bdb1c9b5), "Barcrest","Run For Your Money (Barcrest) (MPU4) (APR 0.1 C)" )
-GAME_CUSTOM( 199?, m4rfym__y,    m4rfym, "aprd.p1",      0x0000, 0x010000, CRC(8c19b732) SHA1(e7aeea41cf649fe2a28414ddedacdf72f56d32fe), "Barcrest","Run For Your Money (Barcrest) (MPU4) (APR 0.1 D)" )
-GAME_CUSTOM( 199?, m4rfym__z,    m4rfym, "aprdk.p1",     0x0000, 0x010000, CRC(58a41fcd) SHA1(e8c92dfb5c9662c90d363b5b7a7e0a4b4894d4cb), "Barcrest","Run For Your Money (Barcrest) (MPU4) (APR 0.1 KD)" )
-GAME_CUSTOM( 199?, m4rfym__0,    m4rfym, "aprdy.p1",     0x0000, 0x010000, CRC(9496cfad) SHA1(cb24779db99d283f1df86864886f21ad333cb98b), "Barcrest","Run For Your Money (Barcrest) (MPU4) (APR 0.1 YD)" )
-GAME_CUSTOM( 199?, m4rfym__1,    m4rfym, "aprk.p1",      0x0000, 0x010000, CRC(7277ef07) SHA1(dc509d125f8d377d4b2cb011d32be5bdba1daa17), "Barcrest","Run For Your Money (Barcrest) (MPU4) (APR 0.1 K)" )
-GAME_CUSTOM( 199?, m4rfym__3,    m4rfym, "apry.p1",      0x0000, 0x010000, CRC(bf2120bc) SHA1(473374a9510dd53e39b94bfcf1369e13647239e6), "Barcrest","Run For Your Money (Barcrest) (MPU4) (APR 0.1 Y)" )
+GAME_CUSTOM( 199?, m4rfym__2,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m462_characteriser_prot>, mpu4, init_m4_showstring, "aprs.p1",      0x0000, 0x010000, CRC(a114a96a) SHA1(b0a9091cac86750329513a0927dd39b76995b2f2), "Barcrest","Run For Your Money (Barcrest) (MPU4) (APR 0.1)" )
+GAME_CUSTOM( 199?, m4rfym__u,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m462_characteriser_prot>, mpu4, init_m4_showstring, "aprad.p1",     0x0000, 0x010000, CRC(936f59ac) SHA1(325708d965d56a9a7482dbeaa089ca871d5c01b5), "Barcrest","Run For Your Money (Barcrest) (MPU4) (APR 0.1 AD)" )
+GAME_CUSTOM( 199?, m4rfym__v,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m462_characteriser_prot>, mpu4, init_m4_showstring, "aprb.p1",      0x0000, 0x010000, CRC(72ad662a) SHA1(11f1695e05ecf34a58f8df3ffbc72ab2dd7d02c9), "Barcrest","Run For Your Money (Barcrest) (MPU4) (APR 0.1 B)" )
+GAME_CUSTOM( 199?, m4rfym__w,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m462_characteriser_prot>, mpu4, init_m4_showstring, "aprbd.p1",     0x0000, 0x010000, CRC(13af990d) SHA1(604d2173e3d6d25252b30b5bf386b53470c35581), "Barcrest","Run For Your Money (Barcrest) (MPU4) (APR 0.1 BD)" )
+GAME_CUSTOM( 199?, m4rfym__x,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m462_characteriser_prot>, mpu4, init_m4_showstring, "aprc.p1",      0x0000, 0x010000, CRC(fd3ece9a) SHA1(e11d1d258a415865f7477cdfddcd47e9bdb1c9b5), "Barcrest","Run For Your Money (Barcrest) (MPU4) (APR 0.1 C)" )
+GAME_CUSTOM( 199?, m4rfym__y,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m462_characteriser_prot>, mpu4, init_m4_showstring, "aprd.p1",      0x0000, 0x010000, CRC(8c19b732) SHA1(e7aeea41cf649fe2a28414ddedacdf72f56d32fe), "Barcrest","Run For Your Money (Barcrest) (MPU4) (APR 0.1 D)" )
+GAME_CUSTOM( 199?, m4rfym__z,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m462_characteriser_prot>, mpu4, init_m4_showstring, "aprdk.p1",     0x0000, 0x010000, CRC(58a41fcd) SHA1(e8c92dfb5c9662c90d363b5b7a7e0a4b4894d4cb), "Barcrest","Run For Your Money (Barcrest) (MPU4) (APR 0.1 KD)" )
+GAME_CUSTOM( 199?, m4rfym__0,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m462_characteriser_prot>, mpu4, init_m4_showstring, "aprdy.p1",     0x0000, 0x010000, CRC(9496cfad) SHA1(cb24779db99d283f1df86864886f21ad333cb98b), "Barcrest","Run For Your Money (Barcrest) (MPU4) (APR 0.1 YD)" )
+GAME_CUSTOM( 199?, m4rfym__1,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m462_characteriser_prot>, mpu4, init_m4_showstring, "aprk.p1",      0x0000, 0x010000, CRC(7277ef07) SHA1(dc509d125f8d377d4b2cb011d32be5bdba1daa17), "Barcrest","Run For Your Money (Barcrest) (MPU4) (APR 0.1 K)" )
+GAME_CUSTOM( 199?, m4rfym__3,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m462_characteriser_prot>, mpu4, init_m4_showstring, "apry.p1",      0x0000, 0x010000, CRC(bf2120bc) SHA1(473374a9510dd53e39b94bfcf1369e13647239e6), "Barcrest","Run For Your Money (Barcrest) (MPU4) (APR 0.1 Y)" )
 // "(C)1993 BARCREST" and "RU8 0.1"
-GAME_CUSTOM( 199?, m4rfym__am,   m4rfym, "ru8s.p1",      0x0000, 0x010000, CRC(d6ce5891) SHA1(c130e7bf614c67767c9af6f38e3cd41ce63d11ef), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU8 0.1)" )
-GAME_CUSTOM( 199?, m4rfym__ah,   m4rfym, "ru8c.p1",      0x0000, 0x010000, CRC(93290724) SHA1(37b17b08f77b308289d4392900576dc66a0377eb), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU8 0.1 C)" )
-GAME_CUSTOM( 199?, m4rfym__ai,   m4rfym, "ru8d.p1",      0x0000, 0x010000, CRC(3e7d6ebb) SHA1(a836a52aef9fe4a9021835e99109b7fefb4ead76), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU8 0.1 D)" )
-GAME_CUSTOM( 199?, m4rfym__aj,   m4rfym, "ru8dk.p1",     0x0000, 0x010000, CRC(b2983dc1) SHA1(412bf4a643c807371fa465fb5f9a85bc3e46623d), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU8 0.1 KD)" )
-GAME_CUSTOM( 199?, m4rfym__ak,   m4rfym, "ru8dy.p1",     0x0000, 0x010000, CRC(7d06cdcc) SHA1(d68f6ee59eb7689df30412288db4e9ee6c4bf178), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU8 0.1 YD)" )
-GAME_CUSTOM( 199?, m4rfym__al,   m4rfym, "ru8k.p1",      0x0000, 0x010000, CRC(42f6226e) SHA1(c4bac8efd9c17f96dd9d973e9f64c85ceeacb36b), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU8 0.1 K)" )
-GAME_CUSTOM( 199?, m4rfym__an,   m4rfym, "ru8y.p1",      0x0000, 0x010000, CRC(f1fc1e75) SHA1(f6f1008349505ee0c494fcdde27db2a15147b6cb), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU8 0.1 Y)" )
-
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( length, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-		M4RFYM_EXTRA_ROMS \
-	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
-
+GAME_CUSTOM( 199?, m4rfym__am,   m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m462_characteriser_prot>, mpu4, init_m4_showstring, "ru8s.p1",      0x0000, 0x010000, CRC(d6ce5891) SHA1(c130e7bf614c67767c9af6f38e3cd41ce63d11ef), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU8 0.1)" )
+GAME_CUSTOM( 199?, m4rfym__ah,   m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m462_characteriser_prot>, mpu4, init_m4_showstring, "ru8c.p1",      0x0000, 0x010000, CRC(93290724) SHA1(37b17b08f77b308289d4392900576dc66a0377eb), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU8 0.1 C)" )
+GAME_CUSTOM( 199?, m4rfym__ai,   m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m462_characteriser_prot>, mpu4, init_m4_showstring, "ru8d.p1",      0x0000, 0x010000, CRC(3e7d6ebb) SHA1(a836a52aef9fe4a9021835e99109b7fefb4ead76), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU8 0.1 D)" )
+GAME_CUSTOM( 199?, m4rfym__aj,   m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m462_characteriser_prot>, mpu4, init_m4_showstring, "ru8dk.p1",     0x0000, 0x010000, CRC(b2983dc1) SHA1(412bf4a643c807371fa465fb5f9a85bc3e46623d), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU8 0.1 KD)" )
+GAME_CUSTOM( 199?, m4rfym__ak,   m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m462_characteriser_prot>, mpu4, init_m4_showstring, "ru8dy.p1",     0x0000, 0x010000, CRC(7d06cdcc) SHA1(d68f6ee59eb7689df30412288db4e9ee6c4bf178), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU8 0.1 YD)" )
+GAME_CUSTOM( 199?, m4rfym__al,   m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m462_characteriser_prot>, mpu4, init_m4_showstring, "ru8k.p1",      0x0000, 0x010000, CRC(42f6226e) SHA1(c4bac8efd9c17f96dd9d973e9f64c85ceeacb36b), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU8 0.1 K)" )
+GAME_CUSTOM( 199?, m4rfym__an,   m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m462_characteriser_prot>, mpu4, init_m4_showstring, "ru8y.p1",      0x0000, 0x010000, CRC(f1fc1e75) SHA1(f6f1008349505ee0c494fcdde27db2a15147b6cb), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU8 0.1 Y)" )
 // sequence 00 84 94 5c ec 3c ec 30 4c 68 60 cc 7c  (Same as some Calamari Club, Duty Free etc.)
 // "(C)1993 BARCREST" and "AP1 0.1"
-GAME_CUSTOM( 199?, m4rfym__h,    m4rfym, "ap1s.p1",      0x0000, 0x010000, CRC(7474509c) SHA1(c87e20f10806ec87fd33f97b43b8378d304f7d67), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP1 0.1)" )
-GAME_CUSTOM( 199?, m4rfym__a,    m4rfym, "ap1ad.p1",     0x0000, 0x010000, CRC(d1adbf80) SHA1(08801f38b8ba5034fd83b53b6cfff864104525b4), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP1 0.1 AD)" )
-GAME_CUSTOM( 199?, m4rfym__b,    m4rfym, "ap1b.p1",      0x0000, 0x010000, CRC(4939f186) SHA1(389d46d603e75d3aaeeca990f4e1143c61f1565f), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP1 0.1 B)" )
-GAME_CUSTOM( 199?, m4rfym__c,    m4rfym, "ap1bd.p1",     0x0000, 0x010000, CRC(08a33b2c) SHA1(ef38e9cd0c9bc8393530e36060c803d1250c46a6), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP1 0.1 BD)" )
-GAME_CUSTOM( 199?, m4rfym__d,    m4rfym, "ap1d.p1",      0x0000, 0x010000, CRC(edef44fe) SHA1(4907804c1bebc1f13aa3eb9dad0e9189de8e9601), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP1 0.1 D)" )
-GAME_CUSTOM( 199?, m4rfym__e,    m4rfym, "ap1dk.p1",     0x0000, 0x010000, CRC(873a402c) SHA1(1315a4ad18544ca5d65526ea0f620cac528e4cad), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP1 0.1 KD)" )
-GAME_CUSTOM( 199?, m4rfym__f,    m4rfym, "ap1dy.p1",     0x0000, 0x010000, CRC(e8436c00) SHA1(1c2f171e55c3519d63d6c4dd0d56df4e1daad6af), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP1 0.1 YD)" )
-GAME_CUSTOM( 199?, m4rfym__g,    m4rfym, "ap1k.p1",      0x0000, 0x010000, CRC(9afeb1e7) SHA1(5fc5d73a2c976d227a0598fb1dd802c6336415d1), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP1 0.1 K)" )
-GAME_CUSTOM( 199?, m4rfym__i,    m4rfym, "ap1y.p1",      0x0000, 0x010000, CRC(152bf7cb) SHA1(8dd8b621f9dac430c293b29ca03814fc21a148b9), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP1 0.1 Y)" )
+GAME_CUSTOM( 199?, m4rfym__h,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "ap1s.p1",      0x0000, 0x010000, CRC(7474509c) SHA1(c87e20f10806ec87fd33f97b43b8378d304f7d67), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP1 0.1)" )
+GAME_CUSTOM( 199?, m4rfym__a,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "ap1ad.p1",     0x0000, 0x010000, CRC(d1adbf80) SHA1(08801f38b8ba5034fd83b53b6cfff864104525b4), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP1 0.1 AD)" )
+GAME_CUSTOM( 199?, m4rfym__b,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "ap1b.p1",      0x0000, 0x010000, CRC(4939f186) SHA1(389d46d603e75d3aaeeca990f4e1143c61f1565f), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP1 0.1 B)" )
+GAME_CUSTOM( 199?, m4rfym__c,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "ap1bd.p1",     0x0000, 0x010000, CRC(08a33b2c) SHA1(ef38e9cd0c9bc8393530e36060c803d1250c46a6), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP1 0.1 BD)" )
+GAME_CUSTOM( 199?, m4rfym__d,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "ap1d.p1",      0x0000, 0x010000, CRC(edef44fe) SHA1(4907804c1bebc1f13aa3eb9dad0e9189de8e9601), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP1 0.1 D)" )
+GAME_CUSTOM( 199?, m4rfym__e,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "ap1dk.p1",     0x0000, 0x010000, CRC(873a402c) SHA1(1315a4ad18544ca5d65526ea0f620cac528e4cad), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP1 0.1 KD)" )
+GAME_CUSTOM( 199?, m4rfym__f,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "ap1dy.p1",     0x0000, 0x010000, CRC(e8436c00) SHA1(1c2f171e55c3519d63d6c4dd0d56df4e1daad6af), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP1 0.1 YD)" )
+GAME_CUSTOM( 199?, m4rfym__g,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "ap1k.p1",      0x0000, 0x010000, CRC(9afeb1e7) SHA1(5fc5d73a2c976d227a0598fb1dd802c6336415d1), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP1 0.1 K)" )
+GAME_CUSTOM( 199?, m4rfym__i,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "ap1y.p1",      0x0000, 0x010000, CRC(152bf7cb) SHA1(8dd8b621f9dac430c293b29ca03814fc21a148b9), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP1 0.1 Y)" )
 // "(C)1993 BARCREST" and "AP5 0.2"
-GAME_CUSTOM( 199?, m4rfym__s,    m4rfym, "ap502s.p1",    0x0000, 0x010000, CRC(8502a09a) SHA1(e635552b7f0c7b2e142d7f4d0f1fd93edac6132d), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP5 0.2)" )
-GAME_CUSTOM( 199?, m4rfym__j,    m4rfym, "ap502ad.p1",   0x0000, 0x010000, CRC(ab059e57) SHA1(45ba91989b0fd1a44628f696b78eae2a349e3e4a), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP5 0.2 AD)" )
-GAME_CUSTOM( 199?, m4rfym__k,    m4rfym, "ap502b.p1",    0x0000, 0x010000, CRC(9ed27a6e) SHA1(2d655305a178e4ebe43f3d429dfec5a2ef6b9873), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP5 0.2 B)" )
-GAME_CUSTOM( 199?, m4rfym__l,    m4rfym, "ap502bd.p1",   0x0000, 0x010000, CRC(48e83fcd) SHA1(3e2de0416722df5004f00baae2d3f6846ff596e5), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP5 0.2 BD)" )
-GAME_CUSTOM( 199?, m4rfym__m,    m4rfym, "ap502d.p1",    0x0000, 0x010000, CRC(d0560301) SHA1(c35e97391c588f6567eeb253eb9de59bec9e1724), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP5 0.2 D)" )
-GAME_CUSTOM( 199?, m4rfym__n,    m4rfym, "ap502dk.p1",   0x0000, 0x010000, CRC(82aa8d80) SHA1(e42d10537dcc5aaae59472681b215b0eb0821c25), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP5 0.2 KD)" )
-GAME_CUSTOM( 199?, m4rfym__o,    m4rfym, "ap502dr.p1",   0x0000, 0x010000, CRC(1cfb3102) SHA1(b1d3a533de0ff93e15f7c039e75af0ef6c8eec57), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP5 0.2 RD)" )
-GAME_CUSTOM( 199?, m4rfym__p,    m4rfym, "ap502dy.p1",   0x0000, 0x010000, CRC(819019ec) SHA1(36d2093a7a592850533d4206e0c9dd28cdc17568), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP5 0.2 YD)" )
-GAME_CUSTOM( 199?, m4rfym__q,    m4rfym, "ap502k.p1",    0x0000, 0x010000, CRC(5064a894) SHA1(3e67358fe5ed9bfac05f621d7e72e5be7aae67df), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP5 0.2 K)" )
-GAME_CUSTOM( 199?, m4rfym__r,    m4rfym, "ap502r.p1",    0x0000, 0x010000, CRC(2503c7da) SHA1(2478bab8b19ab68ff01be8fae2e86e47894b3d7c), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP5 0.2 R)" )
-GAME_CUSTOM( 199?, m4rfym__t,    m4rfym, "ap502y.p1",    0x0000, 0x010000, CRC(b868ef34) SHA1(a773503afd2f59b71e0b9a7e202d3e7120ec88ff), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP5 0.2 Y)" )
+GAME_CUSTOM( 199?, m4rfym__s,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "ap502s.p1",    0x0000, 0x010000, CRC(8502a09a) SHA1(e635552b7f0c7b2e142d7f4d0f1fd93edac6132d), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP5 0.2)" )
+GAME_CUSTOM( 199?, m4rfym__j,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "ap502ad.p1",   0x0000, 0x010000, CRC(ab059e57) SHA1(45ba91989b0fd1a44628f696b78eae2a349e3e4a), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP5 0.2 AD)" )
+GAME_CUSTOM( 199?, m4rfym__k,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "ap502b.p1",    0x0000, 0x010000, CRC(9ed27a6e) SHA1(2d655305a178e4ebe43f3d429dfec5a2ef6b9873), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP5 0.2 B)" )
+GAME_CUSTOM( 199?, m4rfym__l,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "ap502bd.p1",   0x0000, 0x010000, CRC(48e83fcd) SHA1(3e2de0416722df5004f00baae2d3f6846ff596e5), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP5 0.2 BD)" )
+GAME_CUSTOM( 199?, m4rfym__m,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "ap502d.p1",    0x0000, 0x010000, CRC(d0560301) SHA1(c35e97391c588f6567eeb253eb9de59bec9e1724), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP5 0.2 D)" )
+GAME_CUSTOM( 199?, m4rfym__n,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "ap502dk.p1",   0x0000, 0x010000, CRC(82aa8d80) SHA1(e42d10537dcc5aaae59472681b215b0eb0821c25), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP5 0.2 KD)" )
+GAME_CUSTOM( 199?, m4rfym__o,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "ap502dr.p1",   0x0000, 0x010000, CRC(1cfb3102) SHA1(b1d3a533de0ff93e15f7c039e75af0ef6c8eec57), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP5 0.2 RD)" )
+GAME_CUSTOM( 199?, m4rfym__p,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "ap502dy.p1",   0x0000, 0x010000, CRC(819019ec) SHA1(36d2093a7a592850533d4206e0c9dd28cdc17568), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP5 0.2 YD)" )
+GAME_CUSTOM( 199?, m4rfym__q,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "ap502k.p1",    0x0000, 0x010000, CRC(5064a894) SHA1(3e67358fe5ed9bfac05f621d7e72e5be7aae67df), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP5 0.2 K)" )
+GAME_CUSTOM( 199?, m4rfym__r,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "ap502r.p1",    0x0000, 0x010000, CRC(2503c7da) SHA1(2478bab8b19ab68ff01be8fae2e86e47894b3d7c), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP5 0.2 R)" )
+GAME_CUSTOM( 199?, m4rfym__t,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "ap502y.p1",    0x0000, 0x010000, CRC(b868ef34) SHA1(a773503afd2f59b71e0b9a7e202d3e7120ec88ff), "Barcrest","Run For Your Money (Barcrest) (MPU4) (AP5 0.2 Y)" )
 // "(C)1993 BARCREST" and "RU5 0.1"
-GAME_CUSTOM( 199?, m4rfym__af,   m4rfym, "ru5s.p1",      0x0000, 0x010000, CRC(41795ea3) SHA1(6bfb6da6c0f7e762d628ce8a9dcdcbc3c0326ca6), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU5 0.1)" )
-GAME_CUSTOM( 199?, m4rfym__8,    m4rfym, "ru5ad.p1",     0x0000, 0x010000, CRC(1c3e1f39) SHA1(a45cdaaa875e52cf5cd5adf986c98f4a22a14785), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU5 0.1 AD)" )
-GAME_CUSTOM( 199?, m4rfym__9,    m4rfym, "ru5b.p1",      0x0000, 0x010000, CRC(41e44d37) SHA1(8eb409b96864fb0f7c3bf5c66a20a63c8cbc68af), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU5 0.1 B)" )
-GAME_CUSTOM( 199?, m4rfym__aa,   m4rfym, "ru5bd.p1",     0x0000, 0x010000, CRC(8d4db415) SHA1(b023a13f89b7e5c2f72fd213179f723621871faf), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU5 0.1 BD)" )
-GAME_CUSTOM( 199?, m4rfym__ab,   m4rfym, "ru5d.p1",      0x0000, 0x010000, CRC(fcb70a63) SHA1(df81c3c26c066c1326b20b9e0dda2863ee9635a6), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU5 0.1 D)" )
-GAME_CUSTOM( 199?, m4rfym__ac,   m4rfym, "ru5dk.p1",     0x0000, 0x010000, CRC(b4d83863) SHA1(02aebf94773d0a9454119b4ad663b6d8475fc8d3), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU5 0.1 KD)" )
-GAME_CUSTOM( 199?, m4rfym__ad,   m4rfym, "ru5dy.p1",     0x0000, 0x010000, CRC(66375af5) SHA1(0a6d10357c163e5e27e7436f8190070e36e3ef90), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU5 0.1 YD)" )
-GAME_CUSTOM( 199?, m4rfym__ae,   m4rfym, "ru5k.p1",      0x0000, 0x010000, CRC(7871c141) SHA1(e1e9d2972c87d2835b1e5a62502160cb4abb7736), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU5 0.1 K)" )
-GAME_CUSTOM( 199?, m4rfym__ag,   m4rfym, "ru5y.p1",      0x0000, 0x010000, CRC(ee217541) SHA1(68474c2e430d95ded2856183b9a02be917d092d6), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU5 0.1 Y)" )
+GAME_CUSTOM( 199?, m4rfym__af,   m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "ru5s.p1",      0x0000, 0x010000, CRC(41795ea3) SHA1(6bfb6da6c0f7e762d628ce8a9dcdcbc3c0326ca6), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU5 0.1)" )
+GAME_CUSTOM( 199?, m4rfym__8,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "ru5ad.p1",     0x0000, 0x010000, CRC(1c3e1f39) SHA1(a45cdaaa875e52cf5cd5adf986c98f4a22a14785), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU5 0.1 AD)" )
+GAME_CUSTOM( 199?, m4rfym__9,    m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "ru5b.p1",      0x0000, 0x010000, CRC(41e44d37) SHA1(8eb409b96864fb0f7c3bf5c66a20a63c8cbc68af), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU5 0.1 B)" )
+GAME_CUSTOM( 199?, m4rfym__aa,   m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "ru5bd.p1",     0x0000, 0x010000, CRC(8d4db415) SHA1(b023a13f89b7e5c2f72fd213179f723621871faf), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU5 0.1 BD)" )
+GAME_CUSTOM( 199?, m4rfym__ab,   m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "ru5d.p1",      0x0000, 0x010000, CRC(fcb70a63) SHA1(df81c3c26c066c1326b20b9e0dda2863ee9635a6), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU5 0.1 D)" )
+GAME_CUSTOM( 199?, m4rfym__ac,   m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "ru5dk.p1",     0x0000, 0x010000, CRC(b4d83863) SHA1(02aebf94773d0a9454119b4ad663b6d8475fc8d3), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU5 0.1 KD)" )
+GAME_CUSTOM( 199?, m4rfym__ad,   m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "ru5dy.p1",     0x0000, 0x010000, CRC(66375af5) SHA1(0a6d10357c163e5e27e7436f8190070e36e3ef90), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU5 0.1 YD)" )
+GAME_CUSTOM( 199?, m4rfym__ae,   m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "ru5k.p1",      0x0000, 0x010000, CRC(7871c141) SHA1(e1e9d2972c87d2835b1e5a62502160cb4abb7736), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU5 0.1 K)" )
+GAME_CUSTOM( 199?, m4rfym__ag,   m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "ru5y.p1",      0x0000, 0x010000, CRC(ee217541) SHA1(68474c2e430d95ded2856183b9a02be917d092d6), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RU5 0.1 Y)" )
 // "(C)1993 BARCREST" and "RUT 0.1"
-GAME_CUSTOM( 199?, m4rfym__a0,   m4rfym, "ruts.p1",      0x0000, 0x010000, CRC(efaf4e03) SHA1(da19d6e28a6727eb9afb69c23fd5685f0dbcc31a), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUT 0.1)" )
-GAME_CUSTOM( 199?, m4rfym__at,   m4rfym, "rutad.p1",     0x0000, 0x010000, CRC(f27090c9) SHA1(28b7bb8046f67a3f8b90069de845b0b791b57078), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUT 0.1 AD)" )
-GAME_CUSTOM( 199?, m4rfym__au,   m4rfym, "rutb.p1",      0x0000, 0x010000, CRC(cb7a74bf) SHA1(24274c7e3b40642d698f5c3a9a10cfeb23faaf1b), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUT 0.1 B)" )
-GAME_CUSTOM( 199?, m4rfym__av,   m4rfym, "rutbd.p1",     0x0000, 0x010000, CRC(19aba8f2) SHA1(cb726130837149c25adb5d87718b72259cb63a63), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUT 0.1 BD)" )
-GAME_CUSTOM( 199?, m4rfym__aw,   m4rfym, "rutd.p1",      0x0000, 0x010000, CRC(16a872bd) SHA1(47ad5eb9b473805e2eb86e0d4d9ef4b2e6e3c926), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUT 0.1 D)" )
-GAME_CUSTOM( 199?, m4rfym__ax,   m4rfym, "rutdk.p1",     0x0000, 0x010000, CRC(a8259673) SHA1(443081395ea0c1b0a07e6cd4b17670b3e01bb50f), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUT 0.1 KD)" )
-GAME_CUSTOM( 199?, m4rfym__ay,   m4rfym, "rutdy.p1",     0x0000, 0x010000, CRC(6b799f68) SHA1(87482236f1116983e80a7f190710524d3809cd3a), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUT 0.1 YD)" )
-GAME_CUSTOM( 199?, m4rfym__az,   m4rfym, "rutk.p1",      0x0000, 0x010000, CRC(20962e5e) SHA1(0be43050d403750b67c796a007b503e132014f4c), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUT 0.1 K)" )
-GAME_CUSTOM( 199?, m4rfym__a1,   m4rfym, "ruty.p1",      0x0000, 0x010000, CRC(abb708c5) SHA1(6fe3b52a0ba484576fc83ed35aefeda01d275aec), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUT 0.1 Y)" )
-
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( length, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-		M4RFYM_EXTRA_ROMS \
-	ROM_END \
-	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x2c>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
-
+GAME_CUSTOM( 199?, m4rfym__a0,   m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "ruts.p1",      0x0000, 0x010000, CRC(efaf4e03) SHA1(da19d6e28a6727eb9afb69c23fd5685f0dbcc31a), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUT 0.1)" )
+GAME_CUSTOM( 199?, m4rfym__at,   m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "rutad.p1",     0x0000, 0x010000, CRC(f27090c9) SHA1(28b7bb8046f67a3f8b90069de845b0b791b57078), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUT 0.1 AD)" )
+GAME_CUSTOM( 199?, m4rfym__au,   m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "rutb.p1",      0x0000, 0x010000, CRC(cb7a74bf) SHA1(24274c7e3b40642d698f5c3a9a10cfeb23faaf1b), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUT 0.1 B)" )
+GAME_CUSTOM( 199?, m4rfym__av,   m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "rutbd.p1",     0x0000, 0x010000, CRC(19aba8f2) SHA1(cb726130837149c25adb5d87718b72259cb63a63), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUT 0.1 BD)" )
+GAME_CUSTOM( 199?, m4rfym__aw,   m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "rutd.p1",      0x0000, 0x010000, CRC(16a872bd) SHA1(47ad5eb9b473805e2eb86e0d4d9ef4b2e6e3c926), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUT 0.1 D)" )
+GAME_CUSTOM( 199?, m4rfym__ax,   m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "rutdk.p1",     0x0000, 0x010000, CRC(a8259673) SHA1(443081395ea0c1b0a07e6cd4b17670b3e01bb50f), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUT 0.1 KD)" )
+GAME_CUSTOM( 199?, m4rfym__ay,   m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "rutdy.p1",     0x0000, 0x010000, CRC(6b799f68) SHA1(87482236f1116983e80a7f190710524d3809cd3a), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUT 0.1 YD)" )
+GAME_CUSTOM( 199?, m4rfym__az,   m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "rutk.p1",      0x0000, 0x010000, CRC(20962e5e) SHA1(0be43050d403750b67c796a007b503e132014f4c), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUT 0.1 K)" )
+GAME_CUSTOM( 199?, m4rfym__a1,   m4rfym, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::andybt_characteriser_prot>, mpu4, init_m4_showstring, "ruty.p1",      0x0000, 0x010000, CRC(abb708c5) SHA1(6fe3b52a0ba484576fc83ed35aefeda01d275aec), "Barcrest","Run For Your Money (Barcrest) (MPU4) (RUT 0.1 Y)" )
+// bootlegs
 // "(C)1996  B.W.B." and "RU4 1.1" (but hack?)
-GAME_CUSTOM( 199?, m4rfym__a4,   m4rfym, "rfym5.4",      0x0000, 0x010000, CRC(fe613006) SHA1(898b90893bfcb121575952c22c16570a27948bce), "hack","Run For Your Money (Barcrest) (MPU4) (RU4 1.1 K5, hack, set 1)" )
-
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( length, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-		M4RFYM_EXTRA_ROMS \
-	ROM_END \
-	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x28>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
-
+GAME_CUSTOM( 199?, m4rfym__a4,   m4rfym, mod4oki_bootleg_fixedret<0x2c>, mpu4, init_m4_showstring, "rfym5.4",      0x0000, 0x010000, CRC(fe613006) SHA1(898b90893bfcb121575952c22c16570a27948bce), "hack","Run For Your Money (Barcrest) (MPU4) (RU4 1.1 K5, hack, set 1)" )
 // "1997  COCO" and "RU4 1.1" (hack)
-GAME_CUSTOM( 199?, m4rfym__7,    m4rfym, "rfym55",       0x0000, 0x010000, CRC(b7d638d8) SHA1(6064ceffd94ff149d8bcb117fd823de52030ac64), "hack","Run For Your Money (Barcrest) (MPU4) (RU4 1.1 K5, hack, set 2)" )
-
-
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( length, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-		M4RFYM_EXTRA_ROMS \
-	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
-
+GAME_CUSTOM( 199?, m4rfym__7,    m4rfym, mod4oki_bootleg_fixedret<0x28>, mpu4, init_m4_showstring,  "rfym55",       0x0000, 0x010000, CRC(b7d638d8) SHA1(6064ceffd94ff149d8bcb117fd823de52030ac64), "hack","Run For Your Money (Barcrest) (MPU4) (RU4 1.1 K5, hack, set 2)" )
 // different protection
-//
-// "(C)1996  B.W.B." and "RUC 1.3" (but hack?)
-GAME_CUSTOM( 199?, m4rfym__6,    m4rfym, "rfym510l",     0x0000, 0x010000, CRC(24af47f3) SHA1(3d1ec9b013f3f7b497cfb62b42fbb2fa914b24b6), "hack","Run For Your Money (Barcrest) (MPU4) (RUC 1.3 K5, hack, set 1)" )
-GAME_CUSTOM( 199?, m4rfym__a3,   m4rfym, "rfym5.10",     0x0000, 0x010000, CRC(c2ce2cc2) SHA1(d5633e01f669ee8772ed77befa90180c6aa0111c), "hack","Run For Your Money (Barcrest) (MPU4) (RUC 1.3 K5, hack, set 2)" )
 // "(C)1996  B.W.B." and "RU8 1.2" (but hack?)
-GAME_CUSTOM( 199?, m4rfym__a5,   m4rfym, "rfym5.8t",     0x0000, 0x010000, CRC(c600718a) SHA1(168fa558f1b5b91fb805d483f3f4351ac80f90ff), "hack","Run For Your Money (Barcrest) (MPU4) (RU8 1.2 K5, hack)" )
+GAME_CUSTOM( 199?, m4rfym__a5,   m4rfym, mod4oki_bootleg_fixedret<0x2d>, mpu4, init_m4_showstring,  "rfym5.8t",     0x0000, 0x010000, CRC(c600718a) SHA1(168fa558f1b5b91fb805d483f3f4351ac80f90ff), "hack","Run For Your Money (Barcrest) (MPU4) (RU8 1.2 K5, hack)" )
+// "(C)1996  B.W.B." and "RUC 1.3" (but hack?)
+GAME_CUSTOM( 199?, m4rfym__6,    m4rfym, mod4oki, mpu4, init_m4_showstring_812alt2prot,  "rfym510l",     0x0000, 0x010000, CRC(24af47f3) SHA1(3d1ec9b013f3f7b497cfb62b42fbb2fa914b24b6), "hack","Run For Your Money (Barcrest) (MPU4) (RUC 1.3 K5, hack, set 1)" )
+GAME_CUSTOM( 199?, m4rfym__a3,   m4rfym, mod4oki, mpu4, init_m4_showstring_812alt2prot,  "rfym5.10",     0x0000, 0x010000, CRC(c2ce2cc2) SHA1(d5633e01f669ee8772ed77befa90180c6aa0111c), "hack","Run For Your Money (Barcrest) (MPU4) (RUC 1.3 K5, hack, set 2)" )
 // "BILL AND BEN" and "V1 8 0.1" (hack)
-GAME_CUSTOM( 199?, m4rfym__4,    m4rfym, "rfym20",       0x0000, 0x010000, CRC(5e1d70e2) SHA1(2da1b8033a77d367c4b5c3d83a0e5def4e5e5d78), "hack","Run For Your Money (Barcrest) (MPU4) (V1 8 0.1 C, hack, set 1)" )
-GAME_CUSTOM( 199?, m4rfym__5,    m4rfym, "rfym2010",     0x0000, 0x010000, CRC(ec440e7e) SHA1(21f8d4708b5d779dcefcc1e921a5efe17dd6f8c7), "hack","Run For Your Money (Barcrest) (MPU4) (V1 8 0.1 C, hack, set 2)" )
-GAME_CUSTOM( 199?, m4rfym__a2,   m4rfym, "rfym20.10",    0x0000, 0x010000, CRC(947d00d2) SHA1(2c99da689541de247e35ac39eadfe070ac3196b5), "hack","Run For Your Money (Barcrest) (MPU4) (V1 8 0.1 C, hack, set 3)" )
+GAME_CUSTOM( 199?, m4rfym__4,    m4rfym, mod4oki, mpu4, init_m4_showstring_814prot,  "rfym20",       0x0000, 0x010000, CRC(5e1d70e2) SHA1(2da1b8033a77d367c4b5c3d83a0e5def4e5e5d78), "hack","Run For Your Money (Barcrest) (MPU4) (V1 8 0.1 C, hack, set 1)" )
+GAME_CUSTOM( 199?, m4rfym__5,    m4rfym, mod4oki, mpu4, init_m4_showstring_814prot,  "rfym2010",     0x0000, 0x010000, CRC(ec440e7e) SHA1(21f8d4708b5d779dcefcc1e921a5efe17dd6f8c7), "hack","Run For Your Money (Barcrest) (MPU4) (V1 8 0.1 C, hack, set 2)" )
+GAME_CUSTOM( 199?, m4rfym__a2,   m4rfym, mod4oki, mpu4, init_m4_showstring_814prot,  "rfym20.10",    0x0000, 0x010000, CRC(947d00d2) SHA1(2c99da689541de247e35ac39eadfe070ac3196b5), "hack","Run For Your Money (Barcrest) (MPU4) (V1 8 0.1 C, hack, set 3)" )
 
 
 /*****************************************************************************************************************************************************************************
