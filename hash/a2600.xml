@@ -655,7 +655,7 @@ X-1414 : Streetracer
 		</part>
 	</software>
 
-		<software name="alicaben" cloneof="lilyadv">
+	<software name="alicaben" cloneof="lilyadv">
 		<description>Alices Abenteuer - Lilly Adventure</description>
 		<year>1983</year>
 		<publisher>Quelle</publisher>

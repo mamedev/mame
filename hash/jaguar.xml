@@ -105,7 +105,7 @@ Unreleased (possibly no prototypes exist):
   World Cup                           1-2?        ?               Anco Software   Sports
   Zzyorxx II                          1?          ?               Virtual Exp.    Action/Shooter
 
-  -->
+-->
 
 <softwarelist name="jaguar" description="Atari Jaguar cartridges">
 	<!-- boot OK, gameplay graphics are in shades of blue, pause message gets cut off -->

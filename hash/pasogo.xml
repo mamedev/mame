@@ -15,7 +15,7 @@ license:CC0
 
   The undumped cart numbers are KS-1005, KS-1006, KS-1007 and KS-1008
   For the remaining undumped games, the game to cart number match is unknown.
-  -->
+-->
 
 	<!-- KS-1001: Contains 8M SOP44 ROM, 62256 SOP32 RAM, Microchip 1081N (reset IC?watchdog?battery-power-switcher?) and 3V battery. -->
 	<software name="taikyoku">

@@ -416,7 +416,7 @@ Compiled by Robbbert
 	<software name="orb">
 		<description>Orb of Halucidon</description>
 		<year>1982</year>
-			<publisher>System Software</publisher>
+		<publisher>System Software</publisher>
 		<info name="serial" value="321ES" />
 		<info name="developer" value="Leo Blackman"/>
 		<info name="usage" value="In Basic, CLOAD then RUN" />

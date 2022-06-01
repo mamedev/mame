@@ -7186,7 +7186,7 @@ a certain item) -->
 		<info name="release" value="19950324"/>
 		<info name="alt_title" value="SDガンダム ウィナーズ ヒストリー"/>
 		<part name="cart" interface="gamegear_cart">
-			<!-- PCB info based on SMS Power  -->
+			<!-- PCB info based on SMS Power -->
 			<feature name="pcb" value="171-6059A" />
 			<feature name="ic1" value="MPR-17848" />
 			<dataarea name="rom" size="524288">
