@@ -3211,3 +3211,14 @@ void mpu4_state::init_m4_showstring_812prot_fixed()
 	init_m4_showstring();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0812, 0x0812, read8m_delegate(*this, FUNC(mpu4_state::characteriser_r)));
 }
+
+uint8_t mpu4_state::bootleg806_r(address_space &space, offs_t offset)
+{
+	return 0x6a;
+}
+
+void mpu4_state::init_m4_showstring_806prot()
+{
+	init_m4_showstring();
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0806, 0x0806, read8m_delegate(*this, FUNC(mpu4_state::bootleg806_r)));
+}

@@ -743,7 +743,7 @@ GAME_CUSTOM( 199?, m4ra__o,    m4ra,   "ra3xy.p1",     0x0000, 0x010000, CRC(3e2
 	GAME(year, setname, parent, mod4yam_bootleg_fixedret<0x11>, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 
-// doesn't boot properly / different protection? reads from 811 at start, but check doesn't matter?
+// different protection, also reads from 811 at start, but check doesn't matter?
 // (C)1991 BARCREST and R2T 3.1
 GAME_CUSTOM( 199?, m4ra__q,    m4ra,   "reda_20_.8",   0x0000, 0x010000, CRC(915aff5b) SHA1(e8e58c263e2bdb64a80e9355ac5e114fff1d59f8), "bootleg","Red Alert (Barcrest) (bootleg) (MPU4)" )
 
@@ -1087,10 +1087,10 @@ GAME_CUSTOM( 199?, m4fastfw__e,    m4fastfw,   "ffo20dy1.0",   0x0000, 0x010000,
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4yam_bootleg_fixedret<0x80>, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 
-// different protection style, has (C)1993 BYTEFREE
+// different protection style, has (C)1993 BYTEFREE, reads from 811 on startup, and 821 later, but only check on 806 matters?
 GAME_CUSTOM( 199?, m4fastfw__f,    m4fastfw,   "fastf206",     0x0000, 0x010000, CRC(a830b121) SHA1(0bf813ee75bd8e109e6688b91bd0983d341a6695), "hack","Fast Forward (Barcrest) (MPU4) (FFD 1.0, hack)" )
 
 
@@ -1105,74 +1105,64 @@ GAME_CUSTOM( 199?, m4fastfw__f,    m4fastfw,   "fastf206",     0x0000, 0x010000,
 
 // 00 84 C4 E4 4C 10 28 90 E8 78 34 (vivlv)
 
-//  ROM_REGION( 0x48, "characteriser:fakechr", 0 ) /* from viva last vegas 'six' set */
-//  ROM_LOAD( "vlvs.chr", 0x0000, 0x000048, CRC(31acf949) SHA1(d622ea1caee968b786f3183ca44355f9db190081) )
-
 #undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+#define GAME_CUSTOM(year, setname,parent, machine, inputs, init, name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::vivlv_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, machine, inputs, mpu4mod4yam_machines_state, init, ROT0, company, title, GAME_FLAGS )
 
 // "(C)1991 BARCREST" and "VLV 1.1"
-GAME_CUSTOM( 199?, m4vivalv,       0,          "vlvs.p1",                      0x0000, 0x010000, CRC(b7fb3e19) SHA1(c6cc4175f8c100fc37e6e7014b0744054b4e547a), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (VLV 1.1, set 7)" )
-GAME_CUSTOM( 199?, m4vivalv__a,    m4vivalv,   "vlvad.p1",                     0x0000, 0x010000, CRC(88262812) SHA1(f0a31d510c1b06af122df493585c04a49177f06d), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (VLV 1.1, set 1)" )
-GAME_CUSTOM( 199?, m4vivalv__b,    m4vivalv,   "vlvb.p1",                      0x0000, 0x010000, CRC(c4caec15) SHA1(d88c6e081a6bbdd80f773713b038293cabdeee8c), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (VLV 1.1, set 2)" )
-GAME_CUSTOM( 199?, m4vivalv__c,    m4vivalv,   "vlvc.p1",                      0x0000, 0x010000, CRC(4d651ba4) SHA1(7746656f0a9f8af8e265568f7479edef9a2247d9), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (VLV 1.1, set 3)" )
-GAME_CUSTOM( 199?, m4vivalv__d,    m4vivalv,   "vlvd.p1",                      0x0000, 0x010000, CRC(cce926c7) SHA1(8e3a0cef0cbee66d264da5d6dfc7ec2fbdcd9584), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (VLV 1.1, set 4)" )
-GAME_CUSTOM( 199?, m4vivalv__e,    m4vivalv,   "vlvdy.p1",                     0x0000, 0x010000, CRC(6e17cbc8) SHA1(5c69eda0ff6a01d9d0d434ff7ce1ac1e67b16362), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (VLV 1.1, set 5)" )
-GAME_CUSTOM( 199?, m4vivalv__f,    m4vivalv,   "vlvk.p1",                      0x0000, 0x010000, CRC(b5f2157e) SHA1(574f3e2890ac5479790ea92760c6500d37e6637d), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (VLV 1.1, set 6)" )
-GAME_CUSTOM( 199?, m4vivalv__g,    m4vivalv,   "vlvy.p1",                      0x0000, 0x010000, CRC(3211caf3) SHA1(3634ef11099c2f4938529bb262cc2556ad96a675), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (VLV 1.1, set 8)" )
+GAME_CUSTOM( 199?, m4vivalv,       0,        mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::vivlv_characteriser_prot>, mpu4, init_m4_showstring,  "vlvs.p1",                      0x0000, 0x010000, CRC(b7fb3e19) SHA1(c6cc4175f8c100fc37e6e7014b0744054b4e547a), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (VLV 1.1, set 7)" )
+GAME_CUSTOM( 199?, m4vivalv__a,    m4vivalv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::vivlv_characteriser_prot>, mpu4, init_m4_showstring,  "vlvad.p1",                     0x0000, 0x010000, CRC(88262812) SHA1(f0a31d510c1b06af122df493585c04a49177f06d), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (VLV 1.1, set 1)" )
+GAME_CUSTOM( 199?, m4vivalv__b,    m4vivalv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::vivlv_characteriser_prot>, mpu4, init_m4_showstring,  "vlvb.p1",                      0x0000, 0x010000, CRC(c4caec15) SHA1(d88c6e081a6bbdd80f773713b038293cabdeee8c), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (VLV 1.1, set 2)" )
+GAME_CUSTOM( 199?, m4vivalv__c,    m4vivalv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::vivlv_characteriser_prot>, mpu4, init_m4_showstring,  "vlvc.p1",                      0x0000, 0x010000, CRC(4d651ba4) SHA1(7746656f0a9f8af8e265568f7479edef9a2247d9), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (VLV 1.1, set 3)" )
+GAME_CUSTOM( 199?, m4vivalv__d,    m4vivalv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::vivlv_characteriser_prot>, mpu4, init_m4_showstring,  "vlvd.p1",                      0x0000, 0x010000, CRC(cce926c7) SHA1(8e3a0cef0cbee66d264da5d6dfc7ec2fbdcd9584), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (VLV 1.1, set 4)" )
+GAME_CUSTOM( 199?, m4vivalv__e,    m4vivalv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::vivlv_characteriser_prot>, mpu4, init_m4_showstring,  "vlvdy.p1",                     0x0000, 0x010000, CRC(6e17cbc8) SHA1(5c69eda0ff6a01d9d0d434ff7ce1ac1e67b16362), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (VLV 1.1, set 5)" )
+GAME_CUSTOM( 199?, m4vivalv__f,    m4vivalv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::vivlv_characteriser_prot>, mpu4, init_m4_showstring,  "vlvk.p1",                      0x0000, 0x010000, CRC(b5f2157e) SHA1(574f3e2890ac5479790ea92760c6500d37e6637d), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (VLV 1.1, set 6)" )
+GAME_CUSTOM( 199?, m4vivalv__g,    m4vivalv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::vivlv_characteriser_prot>, mpu4, init_m4_showstring,  "vlvy.p1",                      0x0000, 0x010000, CRC(3211caf3) SHA1(3634ef11099c2f4938529bb262cc2556ad96a675), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (VLV 1.1, set 8)" )
 // "(C)1991 BARCREST" and "VLV 1.0"
-GAME_CUSTOM( 199?, m4vivalv__h,    m4vivalv,   "viva206",                      0x0000, 0x010000, CRC(76ab9a5d) SHA1(455699cbc05f744eafe58881a8fb120b24cfe5c8), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (VLV 1.0)" )
-
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( length, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
-
+GAME_CUSTOM( 199?, m4vivalv__h,    m4vivalv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::vivlv_characteriser_prot>, mpu4, init_m4_showstring,  "viva206",                      0x0000, 0x010000, CRC(76ab9a5d) SHA1(455699cbc05f744eafe58881a8fb120b24cfe5c8), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (VLV 1.0)" )
 // 00 c0 e0 b0 38 c4 f0 30 58 9c 9c 9c dc 9c (same as tentendia)
 // (C)1993  B.W.B. and "VL_ 2.0" - boots with cheatchr
-GAME_CUSTOM( 199?, m4vivalv__i,    m4vivalv,   "v.las vegas 6 10p 10m.bin",    0x0000, 0x010000, CRC(f09d5a2c) SHA1(6f9df58767e88a1ca7fc7dd17c618d30ab97067d), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 1)" )
-GAME_CUSTOM( 199?, m4vivalv__j,    m4vivalv,   "vv_05___.3_3",                 0x0000, 0x010000, CRC(bb8361f6) SHA1(d5f651a66be1cab3662798751a290a65c29bba64), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 2)" )
-GAME_CUSTOM( 199?, m4vivalv__k,    m4vivalv,   "vv_05_b_.3_3",                 0x0000, 0x010000, CRC(12079321) SHA1(5b5dd55080c04393a45d3ef9c63b6fef5de9b7cd), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 3)" )
-GAME_CUSTOM( 199?, m4vivalv__l,    m4vivalv,   "vv_05_d_.3_3",                 0x0000, 0x010000, CRC(b758df52) SHA1(f4d47a93fa1b1deb84654bb2272767093f3463c2), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 4)" )
-GAME_CUSTOM( 199?, m4vivalv__m,    m4vivalv,   "vv_05_k_.3_3",                 0x0000, 0x010000, CRC(9875c59c) SHA1(c31a7fc5df8af9d931353bc095a59befe808434b), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 5)" )
-GAME_CUSTOM( 199?, m4vivalv__n,    m4vivalv,   "vv_05a__.3_3",                 0x0000, 0x010000, CRC(0f416e47) SHA1(54338fbef5f227c440c04448b51e8f0ec04a4cc7), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 6)" )
-GAME_CUSTOM( 199?, m4vivalv__o,    m4vivalv,   "vv_10___.3_3",                 0x0000, 0x010000, CRC(dc8db002) SHA1(305547b4f0b1e1bde9354e5ed9f18f99c6829cab), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 7)" )
-GAME_CUSTOM( 199?, m4vivalv__p,    m4vivalv,   "vv_10_b_.3_3",                 0x0000, 0x010000, CRC(e1c4b292) SHA1(4516c7d918935862824e206626a5a24f936ec514), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 8)" )
-GAME_CUSTOM( 199?, m4vivalv__q,    m4vivalv,   "vv_10_d_.3_3",                 0x0000, 0x010000, CRC(e9dda1ee) SHA1(6363b5b26be22cb1f5aac71e98c5e5a5064839f4), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 9)" )
-GAME_CUSTOM( 199?, m4vivalv__r,    m4vivalv,   "vv_10_k_.3_3",                 0x0000, 0x010000, CRC(70fc4c56) SHA1(02cbaadd3575ef0d9dc192aabbe39a735893a662), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 10)" )
-GAME_CUSTOM( 199?, m4vivalv__s,    m4vivalv,   "vv_10a__.3_3",                 0x0000, 0x010000, CRC(c908d65a) SHA1(5af180e697c22c27380e275d76708103e298cf41), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 11)" )
-GAME_CUSTOM( 199?, m4vivalv__t,    m4vivalv,   "vvi05___.3_3",                 0x0000, 0x010000, CRC(a5829d5c) SHA1(4cd1a2185579898db7be75f8c3f565043f0691b6), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 12)" )
+GAME_CUSTOM( 199?, m4vivalv__i,    m4vivalv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4_showstring,  "v.las vegas 6 10p 10m.bin",    0x0000, 0x010000, CRC(f09d5a2c) SHA1(6f9df58767e88a1ca7fc7dd17c618d30ab97067d), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 1)" )
+GAME_CUSTOM( 199?, m4vivalv__j,    m4vivalv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4_showstring,  "vv_05___.3_3",                 0x0000, 0x010000, CRC(bb8361f6) SHA1(d5f651a66be1cab3662798751a290a65c29bba64), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 2)" )
+GAME_CUSTOM( 199?, m4vivalv__k,    m4vivalv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4_showstring,  "vv_05_b_.3_3",                 0x0000, 0x010000, CRC(12079321) SHA1(5b5dd55080c04393a45d3ef9c63b6fef5de9b7cd), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 3)" )
+GAME_CUSTOM( 199?, m4vivalv__l,    m4vivalv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4_showstring,  "vv_05_d_.3_3",                 0x0000, 0x010000, CRC(b758df52) SHA1(f4d47a93fa1b1deb84654bb2272767093f3463c2), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 4)" )
+GAME_CUSTOM( 199?, m4vivalv__m,    m4vivalv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4_showstring,  "vv_05_k_.3_3",                 0x0000, 0x010000, CRC(9875c59c) SHA1(c31a7fc5df8af9d931353bc095a59befe808434b), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 5)" )
+GAME_CUSTOM( 199?, m4vivalv__n,    m4vivalv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4_showstring,  "vv_05a__.3_3",                 0x0000, 0x010000, CRC(0f416e47) SHA1(54338fbef5f227c440c04448b51e8f0ec04a4cc7), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 6)" )
+GAME_CUSTOM( 199?, m4vivalv__o,    m4vivalv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4_showstring,  "vv_10___.3_3",                 0x0000, 0x010000, CRC(dc8db002) SHA1(305547b4f0b1e1bde9354e5ed9f18f99c6829cab), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 7)" )
+GAME_CUSTOM( 199?, m4vivalv__p,    m4vivalv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4_showstring,  "vv_10_b_.3_3",                 0x0000, 0x010000, CRC(e1c4b292) SHA1(4516c7d918935862824e206626a5a24f936ec514), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 8)" )
+GAME_CUSTOM( 199?, m4vivalv__q,    m4vivalv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4_showstring,  "vv_10_d_.3_3",                 0x0000, 0x010000, CRC(e9dda1ee) SHA1(6363b5b26be22cb1f5aac71e98c5e5a5064839f4), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 9)" )
+GAME_CUSTOM( 199?, m4vivalv__r,    m4vivalv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4_showstring,  "vv_10_k_.3_3",                 0x0000, 0x010000, CRC(70fc4c56) SHA1(02cbaadd3575ef0d9dc192aabbe39a735893a662), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 10)" )
+GAME_CUSTOM( 199?, m4vivalv__s,    m4vivalv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4_showstring,  "vv_10a__.3_3",                 0x0000, 0x010000, CRC(c908d65a) SHA1(5af180e697c22c27380e275d76708103e298cf41), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 11)" )
+GAME_CUSTOM( 199?, m4vivalv__t,    m4vivalv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4, init_m4_showstring,  "vvi05___.3_3",                 0x0000, 0x010000, CRC(a5829d5c) SHA1(4cd1a2185579898db7be75f8c3f565043f0691b6), "Bwb","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, set 12)" )
 
-// "(C)1991 BARCREST" and "VLV 1.0" but different protection, hack? doesn't boot
-GAME_CUSTOM( 199?, m4vivalv__u,    m4vivalv,   "viva20_1.1",                   0x0000, 0x010000, CRC(80ea2429) SHA1(e5d258967340fe85dd5baf6ba16f82ce83307b68), "hack?","Viva Las Vegas (Barcrest) (MPU4) (VLV 1.0, hack?, set 1)" )
-GAME_CUSTOM( 199?, m4vivalv__v,    m4vivalv,   "viva20_11",                    0x0000, 0x010000, CRC(51b93018) SHA1(fc13179e3e1939839c3b90d7600a7eb301ea03da), "hack?","Viva Las Vegas (Barcrest) (MPU4) (VLV 1.0, hack?, set 2)" )
-GAME_CUSTOM( 199?, m4vivalv__w,    m4vivalv,   "viva_20_.4",                   0x0000, 0x010000, CRC(e1efc846) SHA1(a4bf7f5c4febe5a71a09e23876387328e1bba87b), "hack?","Viva Las Vegas (Barcrest) (MPU4) (VLV 1.0, hack?, set 3)" )
-GAME_CUSTOM( 199?, m4vivalv__x,    m4vivalv,   "viva_20_.8",                   0x0000, 0x010000, CRC(f538a1fc) SHA1(d0dbd22a1cb4b7ec5bfa304ba544806e01150662), "hack?","Viva Las Vegas (Barcrest) (MPU4) (VLV 1.0, hack?, set 4)" )
-GAME_CUSTOM( 199?, m4vivalv__y,    m4vivalv,   "vlv208ac",                     0x0000, 0x010000, CRC(416535ee) SHA1(f2b0177fecd5076d9d89c819fe9402fc944c8d77), "hack?","Viva Las Vegas (Barcrest) (MPU4) (VLV 1.0, hack?, set 5)" )
+// "(C)1991 BARCREST" and "VLV 1.0" but different protection, hacks / bootlegs
+// this one is unusual, the 2nd and 3rd checks expect different values, or you get scrambled lamps, usually they want the same
+GAME_CUSTOM( 199?, m4vivalv__u,    m4vivalv, mod4yam_bootleg_fixedret<0x5a>, mpu4, init_m4_showstring_806prot,  "viva20_1.1",                   0x0000, 0x010000, CRC(80ea2429) SHA1(e5d258967340fe85dd5baf6ba16f82ce83307b68), "hack?","Viva Las Vegas (Barcrest) (MPU4) (VLV 1.0, hack?, set 1)" )
+// these expect the same for each test
+GAME_CUSTOM( 199?, m4vivalv__w,    m4vivalv, mod4yam_bootleg_fixedret<0x6a>, mpu4, init_m4_showstring,  "viva_20_.4",                   0x0000, 0x010000, CRC(e1efc846) SHA1(a4bf7f5c4febe5a71a09e23876387328e1bba87b), "hack?","Viva Las Vegas (Barcrest) (MPU4) (VLV 1.0, hack?, set 3)" )
+GAME_CUSTOM( 199?, m4vivalv__x,    m4vivalv, mod4yam_bootleg_fixedret<0x6a>, mpu4, init_m4_showstring,  "viva_20_.8",                   0x0000, 0x010000, CRC(f538a1fc) SHA1(d0dbd22a1cb4b7ec5bfa304ba544806e01150662), "hack?","Viva Las Vegas (Barcrest) (MPU4) (VLV 1.0, hack?, set 4)" )
+GAME_CUSTOM( 199?, m4vivalv__y,    m4vivalv, mod4yam_bootleg_fixedret<0x6a>, mpu4, init_m4_showstring,  "vlv208ac",                     0x0000, 0x010000, CRC(416535ee) SHA1(f2b0177fecd5076d9d89c819fe9402fc944c8d77), "hack?","Viva Las Vegas (Barcrest) (MPU4) (VLV 1.0, hack?, set 5)" )
+GAME_CUSTOM( 199?, m4vivalv__v,    m4vivalv, mod4yam_bootleg_fixedret<0x5a>, mpu4, init_m4_showstring,  "viva20_11",                    0x0000, 0x010000, CRC(51b93018) SHA1(fc13179e3e1939839c3b90d7600a7eb301ea03da), "hack?","Viva Las Vegas (Barcrest) (MPU4) (VLV 1.0, hack?, set 2)" )
 
-// no copyright string, "VL_ 2.0", hack? doesn't boot
-GAME_CUSTOM( 199?, m4vivalv__z,    m4vivalv,   "5p5vivalasvegas6.bin",         0x0000, 0x010000, CRC(4d365b57) SHA1(69ff75ccc91f1f7b867a0914d350d1649834a48e), "hack?","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, hack?, set 1)" )
-GAME_CUSTOM( 199?, m4vivalv__0,    m4vivalv,   "viva05_11",                    0x0000, 0x010000, CRC(1e6ea483) SHA1(e6a53eb1bf3b8e661287c0d57fc6ab5ed41755a3), "hack?","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, hack?, set 2)" )
-GAME_CUSTOM( 199?, m4vivalv__1,    m4vivalv,   "viva10_11",                    0x0000, 0x010000, CRC(246a39b7) SHA1(c0f5c21374e43b42df5df0ada0967a34ecefbdb4), "hack?","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, hack?, set 3)" )
-GAME_CUSTOM( 199?, m4vivalv__2,    m4vivalv,   "viva58c",                      0x0000, 0x010000, CRC(719d0802) SHA1(ba6bd5fbf49f0ada383cb2e8faa037b78f6af587), "hack?","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, hack?, set 4)" )
-GAME_CUSTOM( 199?, m4vivalv__3,    m4vivalv,   "viva_05_.4",                   0x0000, 0x010000, CRC(b094914f) SHA1(8217b4bb7a8d55fb8e86018ffc520a63f41a79b8), "hack?","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, hack?, set 5)" )
-GAME_CUSTOM( 199?, m4vivalv__4,    m4vivalv,   "viva_05_.8",                   0x0000, 0x010000, CRC(c5c09c10) SHA1(47890d0ba1c2ca53231ac148a02f046452dce1b4), "hack?","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, hack?, set 6)" )
-GAME_CUSTOM( 199?, m4vivalv__5,    m4vivalv,   "viva_10_.4",                   0x0000, 0x010000, CRC(b1d5e820) SHA1(68012216d7e82168c7468d1e54c527c15d268917), "hack?","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, hack?, set 7)" )
-GAME_CUSTOM( 199?, m4vivalv__6,    m4vivalv,   "viva_10_.8",                   0x0000, 0x010000, CRC(f392c81c) SHA1(cb3320b688b315dbc226f45b78490fed439ee9a2), "hack?","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, hack ? , set 8)" )
+// no copyright string, "VL_ 2.0", hack
+GAME_CUSTOM( 199?, m4vivalv__z,    m4vivalv, mod4yam_bootleg_fixedret<0x38>, mpu4, init_m4_showstring_814prot,  "5p5vivalasvegas6.bin",         0x0000, 0x010000, CRC(4d365b57) SHA1(69ff75ccc91f1f7b867a0914d350d1649834a48e), "hack?","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, hack?, set 1)" )
+GAME_CUSTOM( 199?, m4vivalv__0,    m4vivalv, mod4yam_bootleg_fixedret<0x5c>, mpu4, init_m4_showstring_814prot,  "viva05_11",                    0x0000, 0x010000, CRC(1e6ea483) SHA1(e6a53eb1bf3b8e661287c0d57fc6ab5ed41755a3), "hack?","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, hack?, set 2)" )
+GAME_CUSTOM( 199?, m4vivalv__1,    m4vivalv, mod4yam_bootleg_fixedret<0x12>, mpu4, init_m4_showstring_814prot,  "viva10_11",                    0x0000, 0x010000, CRC(246a39b7) SHA1(c0f5c21374e43b42df5df0ada0967a34ecefbdb4), "hack?","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, hack?, set 3)" )
+GAME_CUSTOM( 199?, m4vivalv__2,    m4vivalv, mod4yam_bootleg_fixedret<0x28>, mpu4, init_m4_showstring_814prot,  "viva58c",                      0x0000, 0x010000, CRC(719d0802) SHA1(ba6bd5fbf49f0ada383cb2e8faa037b78f6af587), "hack?","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, hack?, set 4)" )
+GAME_CUSTOM( 199?, m4vivalv__3,    m4vivalv, mod4yam_bootleg_fixedret<0x28>, mpu4, init_m4_showstring_814prot,  "viva_05_.4",                   0x0000, 0x010000, CRC(b094914f) SHA1(8217b4bb7a8d55fb8e86018ffc520a63f41a79b8), "hack?","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, hack?, set 5)" )
+GAME_CUSTOM( 199?, m4vivalv__4,    m4vivalv, mod4yam_bootleg_fixedret<0x28>, mpu4, init_m4_showstring_814prot,  "viva_05_.8",                   0x0000, 0x010000, CRC(c5c09c10) SHA1(47890d0ba1c2ca53231ac148a02f046452dce1b4), "hack?","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, hack?, set 6)" )
+GAME_CUSTOM( 199?, m4vivalv__5,    m4vivalv, mod4yam_bootleg_fixedret<0x66>, mpu4, init_m4_showstring_814prot,  "viva_10_.4",                   0x0000, 0x010000, CRC(b1d5e820) SHA1(68012216d7e82168c7468d1e54c527c15d268917), "hack?","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, hack?, set 7)" )
+GAME_CUSTOM( 199?, m4vivalv__6,    m4vivalv, mod4yam_bootleg_fixedret<0x66>, mpu4, init_m4_showstring_814prot,  "viva_10_.8",                   0x0000, 0x010000, CRC(f392c81c) SHA1(cb3320b688b315dbc226f45b78490fed439ee9a2), "hack?","Viva Las Vegas (Bwb) (MPU4) (VL_ 2.0, hack ? , set 8)" )
 
 
 
 /*****************************************************************************************************************************************************************************
 *
-* Hyper Viper
+* Super Hyper Viper
 *
 *****************************************************************************************************************************************************************************/
 
@@ -1180,86 +1170,67 @@ GAME_CUSTOM( 199?, m4vivalv__6,    m4vivalv,   "viva_10_.8",                   0
 // Super Hyper Viper is the MPU4 version, while the original game ran on MPU3?
 
 #undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+#define GAME_CUSTOM(year, setname,parent, machine, inputs, init, name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, machine, inputs, mpu4mod4yam_machines_state, init, ROT0, company, title, GAME_FLAGS )
 
 // expects chr sequence starting 00 e0 a8 38 94 48 50 60 e4 e8 58 f0 (m407)
 // "(C)1993  B.W.B." and "HVP 3.0"
-GAME_CUSTOM( 199?, m4shv__h,    m4shv,   "hvyp10p",              0x0000, 0x010000, CRC(b4af635a) SHA1(420cdf3a6899e432d74e3b10a57414cbedc0913e), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 1)" )
-GAME_CUSTOM( 199?, m4shv__i,    m4shv,   "hv_05___.3h3",         0x0000, 0x010000, CRC(13bfa891) SHA1(ffddd14a019d52029bf8d4f680d8d05413a9f0b7), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 2)" )
-GAME_CUSTOM( 199?, m4shv__j,    m4shv,   "hv_05_d_.3h3",         0x0000, 0x010000, CRC(50c66ce8) SHA1(ef12525fc3ac82caf80326edaac81bb9fbc3245c), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 3)" )
-GAME_CUSTOM( 199?, m4shv__k,    m4shv,   "hv_10___.3h3",         0x0000, 0x010000, CRC(627caac7) SHA1(4851ce2441850743ea68ecbf89bde3f4cd6c2b4c), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 4)" )
-GAME_CUSTOM( 199?, m4shv__l,    m4shv,   "hv_10_d_.3h3",         0x0000, 0x010000, CRC(15cfa26e) SHA1(6bc3feaba65d1797b9945f23a89e983f56b13f79), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 5)" )
-GAME_CUSTOM( 199?, m4shv__m,    m4shv,   "hv_10_d_.3n3",         0x0000, 0x010000, CRC(b81f1d0a) SHA1(5fd293be2b75393069c9f5e099b4700ff930f081), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 6)" )
-GAME_CUSTOM( 199?, m4shv__n,    m4shv,   "hvi05___.3h3",         0x0000, 0x010000, CRC(6959332e) SHA1(edaa5f86ad4389b0a3bc2e6679fe8f62520be3ae), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 7)" )
-GAME_CUSTOM( 199?, m4shv__o,    m4shv,   "hvi10___.3h3",         0x0000, 0x010000, CRC(6c1b4b89) SHA1(e8eb4e689d43c5b9e8354aa7375ca3ba12ed1160), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 8)" )
-GAME_CUSTOM( 199?, m4shv__p,    m4shv,   "hvi10___.3n3",         0x0000, 0x010000, CRC(9d95cf8c) SHA1(26daf3975e1e3a605bc4392700c5470b52450d6e), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 9)" )
+GAME_CUSTOM( 199?, m4shv__h,    m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4_showstring,  "hvyp10p",              0x0000, 0x010000, CRC(b4af635a) SHA1(420cdf3a6899e432d74e3b10a57414cbedc0913e), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 1)" )
+GAME_CUSTOM( 199?, m4shv__i,    m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4_showstring,  "hv_05___.3h3",         0x0000, 0x010000, CRC(13bfa891) SHA1(ffddd14a019d52029bf8d4f680d8d05413a9f0b7), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 2)" )
+GAME_CUSTOM( 199?, m4shv__j,    m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4_showstring,  "hv_05_d_.3h3",         0x0000, 0x010000, CRC(50c66ce8) SHA1(ef12525fc3ac82caf80326edaac81bb9fbc3245c), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 3)" )
+GAME_CUSTOM( 199?, m4shv__k,    m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4_showstring,  "hv_10___.3h3",         0x0000, 0x010000, CRC(627caac7) SHA1(4851ce2441850743ea68ecbf89bde3f4cd6c2b4c), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 4)" )
+GAME_CUSTOM( 199?, m4shv__l,    m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4_showstring,  "hv_10_d_.3h3",         0x0000, 0x010000, CRC(15cfa26e) SHA1(6bc3feaba65d1797b9945f23a89e983f56b13f79), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 5)" )
+GAME_CUSTOM( 199?, m4shv__m,    m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4_showstring,  "hv_10_d_.3n3",         0x0000, 0x010000, CRC(b81f1d0a) SHA1(5fd293be2b75393069c9f5e099b4700ff930f081), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 6)" )
+GAME_CUSTOM( 199?, m4shv__n,    m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4_showstring,  "hvi05___.3h3",         0x0000, 0x010000, CRC(6959332e) SHA1(edaa5f86ad4389b0a3bc2e6679fe8f62520be3ae), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 7)" )
+GAME_CUSTOM( 199?, m4shv__o,    m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4_showstring,  "hvi10___.3h3",         0x0000, 0x010000, CRC(6c1b4b89) SHA1(e8eb4e689d43c5b9e8354aa7375ca3ba12ed1160), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 8)" )
+GAME_CUSTOM( 199?, m4shv__p,    m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4_showstring,  "hvi10___.3n3",         0x0000, 0x010000, CRC(9d95cf8c) SHA1(26daf3975e1e3a605bc4392700c5470b52450d6e), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, set 9)" )
 // "(C)1994  B.W.B." and "HVP 3.0"
-GAME_CUSTOM( 199?, m4shv__q,    m4shv,   "h.viper10p610m.bin",   0x0000, 0x010000, CRC(104b0c48) SHA1(ab4cdb596a0cfb877ed1b6bf801e4a759b53971f), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, C)" )
-GAME_CUSTOM( 199?, m4shv__r,    m4shv,   "hvyp56c",              0x0000, 0x010000, CRC(297d3cf8) SHA1(78f4de2ed69fb38b944a54d4d5927ff791e7876c), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, C, bad?)" ) // bad rom? checksum alarm
-GAME_CUSTOM( 199?, m4shv__s,    m4shv,   "hv_05___.3o3",         0x0000, 0x010000, CRC(9ae86366) SHA1(614ae0ab184645c9f568796783f29a177eda3208), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, set 1)" )
-GAME_CUSTOM( 199?, m4shv__t,    m4shv,   "hv_05_d_.3o3",         0x0000, 0x010000, CRC(87dfca0e) SHA1(3ab4105680acc46d3633a722f40ff1af0a520a7f), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, set 2)" )
-GAME_CUSTOM( 199?, m4shv__u,    m4shv,   "hv_10___.3o3",         0x0000, 0x010000, CRC(02e4d86a) SHA1(47aa83e8bcd85e8ba7fb972cdd1ead7fe21e0418), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, set 3)" )
-GAME_CUSTOM( 199?, m4shv__v,    m4shv,   "hv_10_d_.3o3",         0x0000, 0x010000, CRC(85f176b9) SHA1(30380d58bf2834829764cbdbdc7d950632e61e6d), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, set 4)" )
-GAME_CUSTOM( 199?, m4shv__w,    m4shv,   "hvi05___.3o3",         0x0000, 0x010000, CRC(cdba80a5) SHA1(6c9fac7e5ee324b18922cc7a053495f1977bcb6d), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, set 5)" )
-
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( length, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
-
+GAME_CUSTOM( 199?, m4shv__q,    m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4_showstring,  "h.viper10p610m.bin",   0x0000, 0x010000, CRC(104b0c48) SHA1(ab4cdb596a0cfb877ed1b6bf801e4a759b53971f), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, C)" )
+GAME_CUSTOM( 199?, m4shv__r,    m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4_showstring,  "hvyp56c",              0x0000, 0x010000, CRC(297d3cf8) SHA1(78f4de2ed69fb38b944a54d4d5927ff791e7876c), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, C, bad?)" ) // bad rom? checksum alarm
+GAME_CUSTOM( 199?, m4shv__s,    m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4_showstring,  "hv_05___.3o3",         0x0000, 0x010000, CRC(9ae86366) SHA1(614ae0ab184645c9f568796783f29a177eda3208), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, set 1)" )
+GAME_CUSTOM( 199?, m4shv__t,    m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4_showstring,  "hv_05_d_.3o3",         0x0000, 0x010000, CRC(87dfca0e) SHA1(3ab4105680acc46d3633a722f40ff1af0a520a7f), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, set 2)" )
+GAME_CUSTOM( 199?, m4shv__u,    m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4_showstring,  "hv_10___.3o3",         0x0000, 0x010000, CRC(02e4d86a) SHA1(47aa83e8bcd85e8ba7fb972cdd1ead7fe21e0418), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, set 3)" )
+GAME_CUSTOM( 199?, m4shv__v,    m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4_showstring,  "hv_10_d_.3o3",         0x0000, 0x010000, CRC(85f176b9) SHA1(30380d58bf2834829764cbdbdc7d950632e61e6d), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, set 4)" )
+GAME_CUSTOM( 199?, m4shv__w,    m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4_showstring,  "hvi05___.3o3",         0x0000, 0x010000, CRC(cdba80a5) SHA1(6c9fac7e5ee324b18922cc7a053495f1977bcb6d), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, set 5)" )
 // expects chr sequence starting 00 90 18 e4 a8 3c f4 48 74 50 20 f0 18 e4 98 e4  (same as some Spend Spend Spend, m450)
 // "(C)1991 BARCREST" and "H6Y 0.3"
-GAME_CUSTOM( 199?, m4shv,       0,       "h6ys.p1",              0x0000, 0x010000, CRC(4af914ff) SHA1(3d9b7c65ec1129ee64e3f4e14e43e4c39c76166b), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3, set 1)" )
-GAME_CUSTOM( 199?, m4shv__a,    m4shv,   "h6yc.p1",              0x0000, 0x010000, CRC(8faca3bc) SHA1(9d666371f1118ccb1a94bfc4e6c79b540a84842b), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3 C)" )
-GAME_CUSTOM( 199?, m4shv__b,    m4shv,   "h6yd.p1",              0x0000, 0x010000, CRC(862e7f5b) SHA1(2f5bbc31978fb9fd0ba17f0de220152da87cf06f), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3 D)" )
-GAME_CUSTOM( 199?, m4shv__c,    m4shv,   "h6yk.p1",              0x0000, 0x010000, CRC(51f43c88) SHA1(d6ee4f537d09b33e9b13c972e1bda01a28f54f8e), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3 K)" )
-GAME_CUSTOM( 199?, m4shv__d,    m4shv,   "h6yy.p1",              0x0000, 0x010000, CRC(bed4b3bb) SHA1(7c592fbc6541c03777ff0498db90c575b3193222), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3 Y)" )
-GAME_CUSTOM( 199?, m4shv__e,    m4shv,   "hyperviper.bin",       0x0000, 0x010000, CRC(8373f6a3) SHA1(79bff20ab80ffe11447595c6fe8e5ab90d432e17), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3, set 2)" ) // hack?
+GAME_CUSTOM( 199?, m4shv,    0,     mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4,  init_m4_showstring,     "h6ys.p1",              0x0000, 0x010000, CRC(4af914ff) SHA1(3d9b7c65ec1129ee64e3f4e14e43e4c39c76166b), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3, set 1)" )
+GAME_CUSTOM( 199?, m4shv__a, m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4,  init_m4_showstring,     "h6yc.p1",              0x0000, 0x010000, CRC(8faca3bc) SHA1(9d666371f1118ccb1a94bfc4e6c79b540a84842b), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3 C)" )
+GAME_CUSTOM( 199?, m4shv__b, m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4,  init_m4_showstring,     "h6yd.p1",              0x0000, 0x010000, CRC(862e7f5b) SHA1(2f5bbc31978fb9fd0ba17f0de220152da87cf06f), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3 D)" )
+GAME_CUSTOM( 199?, m4shv__c, m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4,  init_m4_showstring,     "h6yk.p1",              0x0000, 0x010000, CRC(51f43c88) SHA1(d6ee4f537d09b33e9b13c972e1bda01a28f54f8e), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3 K)" )
+GAME_CUSTOM( 199?, m4shv__d, m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4,  init_m4_showstring,     "h6yy.p1",              0x0000, 0x010000, CRC(bed4b3bb) SHA1(7c592fbc6541c03777ff0498db90c575b3193222), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3 Y)" )
+GAME_CUSTOM( 199?, m4shv__e, m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4,  init_m4_showstring,     "hyperviper.bin",       0x0000, 0x010000, CRC(8373f6a3) SHA1(79bff20ab80ffe11447595c6fe8e5ab90d432e17), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3, set 2)" ) // hack?
 // "(C)1991 BARCREST" and "H6Y 0.2"
-GAME_CUSTOM( 199?, m4shv__f,    m4shv,   "hvypr206",             0x0000, 0x010000, CRC(e1d96b8c) SHA1(e21b1bdbca1bae41f0e7274e3521f99eb984759e), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.2 Y)" )
+GAME_CUSTOM( 199?, m4shv__f, m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4,  init_m4_showstring,     "hvypr206",             0x0000, 0x010000, CRC(e1d96b8c) SHA1(e21b1bdbca1bae41f0e7274e3521f99eb984759e), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.2 Y)" )
 // "(C)1993  B.W.B." and "HVP 4.0"
-GAME_CUSTOM( 199?, m4shv__x,    m4shv,   "hv_05___.4n3",         0x0000, 0x010000, CRC(f607f351) SHA1(d7b779b80fa964a27b106bd9d5ca3be16a11d5e9), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 4.0, set 1)" )
-GAME_CUSTOM( 199?, m4shv__y,    m4shv,   "hv_05_d_.4n3",         0x0000, 0x010000, CRC(f4d702d7) SHA1(268c7f6443c7ae587caf5b227fcd438530a06bcc), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 4.0, set 2)" )
-GAME_CUSTOM( 199?, m4shv__z,    m4shv,   "hvi05___.4n3",         0x0000, 0x010000, CRC(38a33c2b) SHA1(21004092b81e08146291fd3a025652f0edbe47dc), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 4.0, set 3)" )
-
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( length, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::hypvipalt_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
-
-
+GAME_CUSTOM( 199?, m4shv__x, m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4,  init_m4_showstring,     "hv_05___.4n3",         0x0000, 0x010000, CRC(f607f351) SHA1(d7b779b80fa964a27b106bd9d5ca3be16a11d5e9), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 4.0, set 1)" )
+GAME_CUSTOM( 199?, m4shv__y, m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4,  init_m4_showstring,     "hv_05_d_.4n3",         0x0000, 0x010000, CRC(f4d702d7) SHA1(268c7f6443c7ae587caf5b227fcd438530a06bcc), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 4.0, set 2)" )
+GAME_CUSTOM( 199?, m4shv__z, m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4,  init_m4_showstring,     "hvi05___.4n3",         0x0000, 0x010000, CRC(38a33c2b) SHA1(21004092b81e08146291fd3a025652f0edbe47dc), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 4.0, set 3)" )
 // expects chr sequence starting 00 14 04 54 64 14 64 14 64 54 20 74 04 (hypvipalt)
  // "(C)1995  B.W.B." and "HVC 1.0"
-GAME_CUSTOM( 199?, m4shv__g,    m4shv,   "5p4hypervyper.bin",    0x0000, 0x010000, CRC(51ac9288) SHA1(1580079b6e710506ab03e1d8a89af65cd06cedd2), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVC 1.0 C)" )
+GAME_CUSTOM( 199?, m4shv__g, m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::hypvipalt_characteriser_prot>, mpu4,  init_m4_showstring,"5p4hypervyper.bin",    0x0000, 0x010000, CRC(51ac9288) SHA1(1580079b6e710506ab03e1d8a89af65cd06cedd2), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVC 1.0 C)" )
 
 // different protection
 // no copyright string and "HVP 3.0"
-GAME_CUSTOM( 199?, m4shv__0,    m4shv,   "hv056c",               0x0000, 0x010000, CRC(91dcef99) SHA1(8fb6245fa8731b58799c0d2edc0e6c6942984a6f), "hack","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 1)" )
-GAME_CUSTOM( 199?, m4shv__1,    m4shv,   "hv05_101",             0x0000, 0x010000, CRC(e1fa633d) SHA1(3f446c3396142631141cf85db507f3ae288847e3), "hack","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 2)" )
-GAME_CUSTOM( 199?, m4shv__2,    m4shv,   "hyp55",                0x0000, 0x010000, CRC(07bd7455) SHA1(0d0a017c90e8d28500594f55c9a60dfc08aff5c3), "hack","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 3)" )
-GAME_CUSTOM( 199?, m4shv__3,    m4shv,   "hypr58c",              0x0000, 0x010000, CRC(d6028f8f) SHA1(54a3188ddb5196808a1161a0e1e6a8c1fe8bfde3), "hack","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 4)" )
-GAME_CUSTOM( 199?, m4shv__4,    m4shv,   "hypv_05_.4",           0x0000, 0x010000, CRC(246f171c) SHA1(7bbefb0cae57cf8097aa6d033df1a428e8bfe744), "hack","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 5)" )
-GAME_CUSTOM( 199?, m4shv__5,    m4shv,   "hvip_05_.8",           0x0000, 0x010000, CRC(625f1b9d) SHA1(f8dc0cde774f3fc4fb3d66d014ad47e9576c0f44), "hack","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, hack, set 1)" )
+GAME_CUSTOM( 199?, m4shv__0,    m4shv, mod4yam_bootleg_fixedret<0xb1>, mpu4,  init_m4_showstring_814prot,  "hv056c",               0x0000, 0x010000, CRC(91dcef99) SHA1(8fb6245fa8731b58799c0d2edc0e6c6942984a6f), "hack","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 1)" )
+GAME_CUSTOM( 199?, m4shv__1,    m4shv, mod4yam_bootleg_fixedret<0x65>, mpu4,  init_m4_showstring_814prot,  "hv05_101",             0x0000, 0x010000, CRC(e1fa633d) SHA1(3f446c3396142631141cf85db507f3ae288847e3), "hack","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 2)" )
+GAME_CUSTOM( 199?, m4shv__2,    m4shv, mod4yam_bootleg_fixedret<0x15>, mpu4,  init_m4_showstring_814prot,  "hyp55",                0x0000, 0x010000, CRC(07bd7455) SHA1(0d0a017c90e8d28500594f55c9a60dfc08aff5c3), "hack","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 3)" )
+GAME_CUSTOM( 199?, m4shv__3,    m4shv, mod4yam_bootleg_fixedret<0x11>, mpu4,  init_m4_showstring_814prot,  "hypr58c",              0x0000, 0x010000, CRC(d6028f8f) SHA1(54a3188ddb5196808a1161a0e1e6a8c1fe8bfde3), "hack","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 4)" )
+GAME_CUSTOM( 199?, m4shv__4,    m4shv, mod4yam_bootleg_fixedret<0x11>, mpu4,  init_m4_showstring_814prot,  "hypv_05_.4",           0x0000, 0x010000, CRC(246f171c) SHA1(7bbefb0cae57cf8097aa6d033df1a428e8bfe744), "hack","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 5)" )
+GAME_CUSTOM( 199?, m4shv__5,    m4shv, mod4yam_bootleg_fixedret<0x11>, mpu4,  init_m4_showstring_814prot,  "hvip_05_.8",           0x0000, 0x010000, CRC(625f1b9d) SHA1(f8dc0cde774f3fc4fb3d66d014ad47e9576c0f44), "hack","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, hack, set 1)" )
 // "DICK WAS ERE" and "HVP 3.0"
-GAME_CUSTOM( 199?, m4shv__6,    m4shv,   "hv108c",               0x0000, 0x010000, CRC(4d40ebfe) SHA1(0e355fe5b185ba595c5040335956037b8ed21599), "hack","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 6)" )
-GAME_CUSTOM( 199?, m4shv__7,    m4shv,   "hv10_101",             0x0000, 0x010000, CRC(57714454) SHA1(de99f5a66081191a7280c54e875fd17cc94e111b), "hack","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 7)" )
-GAME_CUSTOM( 199?, m4shv__8,    m4shv,   "hypv_10_.4",           0x0000, 0x010000, CRC(f85d21a1) SHA1(55ed92147335a1471b7b443f68dd700f579d21f3), "hack","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 8)" )
-GAME_CUSTOM( 199?, m4shv__9,    m4shv,   "hvip_10_.8",           0x0000, 0x010000, CRC(f91d7fec) SHA1(4c8130f9ce0ee3b14744e2b3cab79d4a65767e78), "hack","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, hack, set 2)" )
+GAME_CUSTOM( 199?, m4shv__6,    m4shv, mod4yam_bootleg_fixedret<0x5b>, mpu4,  init_m4_showstring_814prot,  "hv108c",               0x0000, 0x010000, CRC(4d40ebfe) SHA1(0e355fe5b185ba595c5040335956037b8ed21599), "hack","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 6)" )
+GAME_CUSTOM( 199?, m4shv__8,    m4shv, mod4yam_bootleg_fixedret<0x5b>, mpu4,  init_m4_showstring_814prot,  "hypv_10_.4",           0x0000, 0x010000, CRC(f85d21a1) SHA1(55ed92147335a1471b7b443f68dd700f579d21f3), "hack","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 8)" )
+GAME_CUSTOM( 199?, m4shv__9,    m4shv, mod4yam_bootleg_fixedret<0x5b>, mpu4,  init_m4_showstring_814prot,  "hvip_10_.8",           0x0000, 0x010000, CRC(f91d7fec) SHA1(4c8130f9ce0ee3b14744e2b3cab79d4a65767e78), "hack","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, hack, set 2)" )
+GAME_CUSTOM( 199?, m4shv__7,    m4shv, mod4yam_bootleg_fixedret<0x6b>, mpu4,  init_m4_showstring_814prot,  "hv10_101",             0x0000, 0x010000, CRC(57714454) SHA1(de99f5a66081191a7280c54e875fd17cc94e111b), "hack","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 7)" )
 // "(C)1991 BARCREST" and "H6Y 0.3" (but hack, doesn't want usual characterizer)
-GAME_CUSTOM( 199?, m4shv__10,   m4shv,   "hv20_101",             0x0000, 0x010000, CRC(b2ab79c9) SHA1(fd097b5b062d725fa0607117d6b52be6cbf7e597), "hack","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3, hack, set 1)" )
-GAME_CUSTOM( 199?, m4shv__11,   m4shv,   "hvip_20_.8",           0x0000, 0x010000, CRC(61a608c7) SHA1(1ed98c8bd90a3a789ba00b6b39f49e3aa0fcb1ca), "hack","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3, hack, set 2)" )
-GAME_CUSTOM( 199?, m4shv__12,   m4shv,   "hypv_20_.4",           0x0000, 0x010000, CRC(27a0162b) SHA1(2d1342edbfa29c4f2ee1f1a825f3eeb0489fbaf5), "hack","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3, hack, set 3)" )
+GAME_CUSTOM( 199?, m4shv__10,   m4shv,  mod4yam_bootleg_fixedret<0x7a>, mpu4,  init_m4_showstring,  "hv20_101",             0x0000, 0x010000, CRC(b2ab79c9) SHA1(fd097b5b062d725fa0607117d6b52be6cbf7e597), "hack","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3, hack, set 1)" )
+GAME_CUSTOM( 199?, m4shv__11,   m4shv,  mod4yam_bootleg_fixedret<0x4a>, mpu4,  init_m4_showstring,  "hvip_20_.8",           0x0000, 0x010000, CRC(61a608c7) SHA1(1ed98c8bd90a3a789ba00b6b39f49e3aa0fcb1ca), "hack","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3, hack, set 2)" )
+GAME_CUSTOM( 199?, m4shv__12,   m4shv,  mod4yam_bootleg_fixedret<0x4a>, mpu4,  init_m4_showstring,  "hypv_20_.4",           0x0000, 0x010000, CRC(27a0162b) SHA1(2d1342edbfa29c4f2ee1f1a825f3eeb0489fbaf5), "hack","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3, hack, set 3)" )
 
 
 /*****************************************************************************************************************************************************************************
