@@ -5804,8 +5804,6 @@ GAME_CUSTOM( 199?, m4vegast__u,    m4vegast,   "vsg04y.p1",    0x0000, 0x020000,
 // "(C)1993 BARCREST" and "VSG 0.3" (most of the sets with 2010 in the filenames are hacks, but this looks like a regular set?)
 GAME_CUSTOM( 199?, m4vegast__x,    m4vegast,   "vstr2010",     0x0000, 0x020000, CRC(126365e3) SHA1(1e648b7a8cb1ff49e43e2fdc30f482b2b73ed6d7), "Barcrest","Las Vegas Strip (Barcrest) (MPU4) (VSG 0.3)" )
 
-// "(C)1993 BARCREST" and "VSG 0.3" (but doesn't boot?, bad or different protections)
-GAME_CUSTOM( 199?, m4vegast__v,    m4vegast,   "lvs",          0x0000, 0x020000, CRC(dcb0dc80) SHA1(6045b332eb4af09f6e0a669ea0b78ef4ac389ac2), "hack?","Las Vegas Strip (Barcrest) (MPU4) (VSG 0.3 YE, hack?)" )
 
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
