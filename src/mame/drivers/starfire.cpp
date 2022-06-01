@@ -201,7 +201,7 @@ uint8_t fireone_state::input_r(offs_t offset)
 			return m_system->read();
 		case 2:
 		{
-			uint8_t input = m_controls[m_player_select]->read();
+			const uint8_t input = m_controls[m_player_select]->read();
 			return input ^ BIT(input, 1, 5); // paddle portion is a 6-bit Gray code
 		}
 		default: return 0xff;
