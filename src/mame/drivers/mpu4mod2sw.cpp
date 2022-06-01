@@ -2007,8 +2007,8 @@ GAME(199?, m4c999a,   m4c999,     mod2_bootleg_fixedret<0x51>, mpu4,            
 GAME(199?, m4c999b,   m4c999,     mod2_bootleg_fixedret<0x51>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "bootleg","Cloud 999 (Barcrest) (bootleg) (MPU4) (CLN 3.0)",GAME_FLAGS )
 // protection has been modified, lamps are still scrambled somehow?
 // OC9 (on cloud 9?)
-GAME(199?, m4c999c,   m4c999,    mod2, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "bootleg","Cloud 999 (Barcrest) (bootleg) (MPU4) (OC9 0.3, set 1)",GAME_FLAGS )
-GAME(199?, m4c999d,   m4c999,    mod2, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "bootleg","Cloud 999 (Barcrest) (bootleg) (MPU4) (OC9 0.3, set 2)",GAME_FLAGS )
+GAME(199?, m4c999c,   m4c999,    mod2_bootleg_fixedret<0x80>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "bootleg","Cloud 999 (Barcrest) (bootleg) (MPU4) (OC9 0.3, set 1)",GAME_FLAGS )
+GAME(199?, m4c999d,   m4c999,    mod2_bootleg_fixedret<0x9a>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "bootleg","Cloud 999 (Barcrest) (bootleg) (MPU4) (OC9 0.3, set 2)",GAME_FLAGS )
 
 
 
