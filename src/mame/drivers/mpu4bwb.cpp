@@ -1272,3 +1272,29 @@ GAME_CUSTOM( 199?, m4sinbdn__c,    m4sinbdn,   "sdd__.3_0",    0x0000, 0x040000,
 GAME_CUSTOM( 199?, m4sinbdn__d,    m4sinbdn,   "sdds3__l.1w0", 0x0000, 0x040000, CRC(feedb8cf) SHA1(620b5379164d4da1200d4807199c2dc78d7d89ee), "Bwb","Sinbad (Nova) (MPU4) (set 5)" )
 GAME_CUSTOM( 199?, m4sinbdn__e,    m4sinbdn,   "sbds3__l.9_0", 0x0000, 0x040000, CRC(e425375a) SHA1(d2bdd8e768fc7764054eff574360f3cfb5f4f66d), "Bwb","Sinbad (Nova) (MPU4) (set 6)" )
 GAME_CUSTOM( 199?, m4sinbdn__f,    m4sinbdn,   "sbds3__l.aw0", 0x0000, 0x040000, CRC(c484ef9d) SHA1(62f6644b83dd6abaf80809217edf6a8230a89268), "Bwb","Sinbad (Nova) (MPU4) (set 7)" )
+
+#define M4TUTBWB_EXTRA_ROMS \
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
+	/* missing? */
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4TUTBWB_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4bwb_machines_state, init_m4default_big ,ROT0,company,title,GAME_FLAGS )
+
+// these were in with the regular Barcrest / Bwb Tutti Fruity sets, but this looks like something different, maybe a Bwn original with the same name?
+// it has a 0x3f fill near the vectors etc. which is typically associated with Bwb originals.
+GAME_CUSTOM( 199?, m4tutbwb,       0,          "tu_05___.1a3",         0x0000, 0x010000, CRC(97acc82d) SHA1(be53e60cb8a33b91a7f5556715ab4befe7170dd2), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 1)" )
+GAME_CUSTOM( 199?, m4tutbwb_a,     m4tutbwb,   "tu_05_d_.1a3",         0x0000, 0x010000, CRC(33bb3018) SHA1(2c2f49c31919682ac03e61a665ce15d835e22467), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 2)" )
+GAME_CUSTOM( 199?, m4tutbwb_b,     m4tutbwb,   "tu_10___.1a3",         0x0000, 0x010000, CRC(7878827f) SHA1(ac692ae50e63e632d45e7240c2520df83d2baaf5), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 3)" )
+GAME_CUSTOM( 199?, m4tutbwb_c,     m4tutbwb,   "tu_20___.1a3",         0x0000, 0x010000, CRC(cada1c42) SHA1(6a4048da89a0bffeebfd21549c2d9812cc275bd5), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 4)" )
+GAME_CUSTOM( 199?, m4tutbwb_d,     m4tutbwb,   "tu_20_b_.1a3",         0x0000, 0x010000, CRC(a8f1bc11) SHA1(03596171540e6490133f374cca69f4fd0359952e), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 5)" )
+GAME_CUSTOM( 199?, m4tutbwb_e,     m4tutbwb,   "tu_20_d_.1a3",         0x0000, 0x010000, CRC(6ecde477) SHA1(694296eb226c59069800d6936c9dee2623105db0), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 6)" )
+GAME_CUSTOM( 199?, m4tutbwb_f,     m4tutbwb,   "tu_20_k_.1a3",         0x0000, 0x010000, CRC(0ce64424) SHA1(7415c9de9982aa7f15f71ef791cbd8ad5a9331d3), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 7)" )
+GAME_CUSTOM( 199?, m4tutbwb_g,     m4tutbwb,   "tu_20bg_.1a3",         0x0000, 0x010000, CRC(31a6196d) SHA1(1113737dd3b209afda14ec273d923e2057ea7d99), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 8)" )
+GAME_CUSTOM( 199?, m4tutbwb_h,     m4tutbwb,   "tuf20__1.0",           0x0000, 0x010000, CRC(ddadbcb6) SHA1(2d2934ec73d979de45d0998f8975361d33358dd3), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 9)" )
+GAME_CUSTOM( 199?, m4tutbwb_i,     m4tutbwb,   "tuf20ad1.0",           0x0000, 0x010000, CRC(5a74ead3) SHA1(3216c8d0c67aaeb18f791a6e1f3f6e30145d6beb), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 10)" )
+GAME_CUSTOM( 199?, m4tutbwb_j,     m4tutbwb,   "tui05___.1a3",         0x0000, 0x010000, CRC(42e3d400) SHA1(4cf914141dfc1f88704403b467176da77369da06), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 11)" )

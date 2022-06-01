@@ -3633,18 +3633,7 @@ GAME_CUSTOM( 199?, m4c9__m,    m4c9,   "c9510y.p1",    0x0000, 0x010000, CRC(3a9
  // "(C)1993  B.W.B." and "SC9 5.0"
 GAME_CUSTOM( 199?, m4c9__a2,   m4c9,   "c9o20__1.1",   0x0000, 0x010000, CRC(e05fa532) SHA1(63d070416a4e6979302901bb33e20c994cb3723e), "Bwb","Cloud Nine (Barcrest) (MPU4) (SC9 5.0)" )
 GAME_CUSTOM( 199?, m4c9__a3,   m4c9,   "c9o20d_1.1",   0x0000, 0x010000, CRC(047b2d83) SHA1(b83f8fe6477226ef3e75f406020ea4f8b3d55c32), "Bwb","Cloud Nine (Barcrest) (MPU4) (SC9 5.0 D)" )
-
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( length, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-		M4C9_EXTRA_ROMS \
-	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
-
-
-// no copyright string and "SC9 1.0" (hack or early Bwb set?)
+// no copyright string and "SC9 1.0" (hack or early Bwb set?) (still expects regular CHR protection)
 GAME_CUSTOM( 199?, m4c9__ay,   m4c9,   "c9o02__1.1",   0x0000, 0x010000, CRC(109f7040) SHA1(3fe9da13d9746e1cdaf6dcd539e4af624d2cec71), "hack?","Cloud Nine (Barcrest) (MPU4) (SC9 1.0, hack?, set 1)" )
 GAME_CUSTOM( 199?, m4c9__az,   m4c9,   "c9o05__1.1",   0x0000, 0x010000, CRC(2c821aa8) SHA1(33fba7dea0f66e7b0251971864d5a2923f96f8cd), "hack?","Cloud Nine (Barcrest) (MPU4) (SC9 1.0, hack?, set 2)" )
 GAME_CUSTOM( 199?, m4c9__a0,   m4c9,   "c9o10__1.1",   0x0000, 0x010000, CRC(c5063185) SHA1(ca98038ccd85ebc370cacce8583ddbc1f759558d), "hack?","Cloud Nine (Barcrest) (MPU4) (SC9 1.0, hack?, set 3)" )
@@ -3767,28 +3756,25 @@ GAME_CUSTOM( 199?, m4tutfrt__ag,   m4tutfrt,   "tf4y.p1",              0x0000, 0
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TUTFRT_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x58>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // different protection
 // "I.G.T SUCKS" and "F2U 0.1"
 GAME_CUSTOM( 199?, m4tutfrt__at,   m4tutfrt,   "tut25.bin",            0x0000, 0x010000, CRC(c98fb5bb) SHA1(1a3bc343a38b5978a919b454e9a2e806dce7a78a), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1 B, hack, set 1)" )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4TUTFRT_EXTRA_ROMS \
+	ROM_END \
+	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+
+
 // unprotected, doesn't read from chr
 GAME_CUSTOM( 199?, m4tutfrt__au,   m4tutfrt,   "tut25patched.bin",     0x0000, 0x010000, CRC(b4443cf5) SHA1(e79ec52730146f1591140555b814cbd20b5dfe78), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (F2U 0.1 B, hack, set 2)" )
 
-
-// I think these might be for a different game with the same name, maybe MPU4 Video.
-// they appear to access something different at the characteriser address
-GAME_CUSTOM( 199?, m4tutfrt__av,   m4tutfrt,   "tu_05___.1a3",         0x0000, 0x010000, CRC(97acc82d) SHA1(be53e60cb8a33b91a7f5556715ab4befe7170dd2), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4tutfrt__aw,   m4tutfrt,   "tu_05_d_.1a3",         0x0000, 0x010000, CRC(33bb3018) SHA1(2c2f49c31919682ac03e61a665ce15d835e22467), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4tutfrt__ax,   m4tutfrt,   "tu_10___.1a3",         0x0000, 0x010000, CRC(7878827f) SHA1(ac692ae50e63e632d45e7240c2520df83d2baaf5), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4tutfrt__ay,   m4tutfrt,   "tu_20___.1a3",         0x0000, 0x010000, CRC(cada1c42) SHA1(6a4048da89a0bffeebfd21549c2d9812cc275bd5), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4tutfrt__az,   m4tutfrt,   "tu_20_b_.1a3",         0x0000, 0x010000, CRC(a8f1bc11) SHA1(03596171540e6490133f374cca69f4fd0359952e), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4tutfrt__a0,   m4tutfrt,   "tu_20_d_.1a3",         0x0000, 0x010000, CRC(6ecde477) SHA1(694296eb226c59069800d6936c9dee2623105db0), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4tutfrt__a1,   m4tutfrt,   "tu_20_k_.1a3",         0x0000, 0x010000, CRC(0ce64424) SHA1(7415c9de9982aa7f15f71ef791cbd8ad5a9331d3), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4tutfrt__a2,   m4tutfrt,   "tu_20bg_.1a3",         0x0000, 0x010000, CRC(31a6196d) SHA1(1113737dd3b209afda14ec273d923e2057ea7d99), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4tutfrt__a3,   m4tutfrt,   "tuf20__1.0",           0x0000, 0x010000, CRC(ddadbcb6) SHA1(2d2934ec73d979de45d0998f8975361d33358dd3), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4tutfrt__a4,   m4tutfrt,   "tuf20ad1.0",           0x0000, 0x010000, CRC(5a74ead3) SHA1(3216c8d0c67aaeb18f791a6e1f3f6e30145d6beb), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4tutfrt__a5,   m4tutfrt,   "tui05___.1a3",         0x0000, 0x010000, CRC(42e3d400) SHA1(4cf914141dfc1f88704403b467176da77369da06), "Bwb","Tutti Fruity (Bwb) (MPU4) (set 11)" )
 
 
 /*****************************************************************************************************************************************************************************
