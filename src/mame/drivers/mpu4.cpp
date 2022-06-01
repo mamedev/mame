@@ -3198,3 +3198,16 @@ void mpu4_state::init_m4_showstring_814altprot()
 	init_m4_showstring();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0814, 0x0814, read8m_delegate(*this, FUNC(mpu4_state::bootleg814alt_r)));
 }
+
+uint8_t mpu4_state::bootleg814_2d_r(address_space &space, offs_t offset)
+{
+	logerror("%s: bootleg814_2d_r offset %02x\n", machine().describe_context(), offset);
+	return 0x2d;
+}
+
+
+void mpu4_state::init_m4_showstring_812prot_fixed()
+{
+	init_m4_showstring();
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0812, 0x0812, read8m_delegate(*this, FUNC(mpu4_state::characteriser_r)));
+}
