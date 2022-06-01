@@ -800,182 +800,77 @@ GAME_CUSTOM( 199?, m4przdty__k,    m4przdty,   "pd8y.p1",  0x0000, 0x010000, CRC
 
 
 #undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+#define GAME_CUSTOM(year, setname,parent, machine, inputs, init, name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( 0x10000, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RHOG_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::rr6_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME( year, setname, parent, machine, inputs, mpu4mod4oki_machines_state, init, ROT0, company, title, GAME_FLAGS )
 
 // expects sequence starting 00 90 c0 54 8c 68 24 90 cc 6c 24 9c bc 34 88 (rr6s.chr)
 // "(C)1991 BARCREST"  and "RR6 1.2"
-GAME_CUSTOM( 1991, m4rhog,           0,          "rr6s.p1",                  0x0000, 0x010000, CRC(f978ca0b) SHA1(11eeac41f4c77b38b33baefb16dab7de1268d161), "Barcrest","Road Hog (Barcrest) (MPU4) (RR6 1.2)" )
-GAME_CUSTOM( 1991, m4rhogr6d,        m4rhog,     "rr6d.p1",                  0x0000, 0x010000, CRC(b61115ea) SHA1(92b97cc8b71eb31e8377a59344faaf0d800d1bdc), "Barcrest","Road Hog (Barcrest) (MPU4) (RR6 1.2 D)" )
-GAME_CUSTOM( 1991, m4rhogr6ad,       m4rhog,     "rr6ad.p1",                 0x0000, 0x010000, CRC(f328204d) SHA1(057f28e7eaaa372b901a76250fb7ebf4403348ad), "Barcrest","Road Hog (Barcrest) (MPU4) (RR6 1.2 AD)" )
-GAME_CUSTOM( 1991, m4rhogr6b,        m4rhog,     "rr6b.p1",                  0x0000, 0x010000, CRC(ccacd58e) SHA1(64b67e54e5568378a18ba99017078fcd4e6bc749), "Barcrest","Road Hog (Barcrest) (MPU4) (RR6 1.2 B)" )
-GAME_CUSTOM( 1991, m4rhogr6c,        m4rhog,     "rr6c.p1",                  0x0000, 0x010000, CRC(b5783c69) SHA1(38c122455bed904c9fd683be1a8508a69cbad03f), "Barcrest","Road Hog (Barcrest) (MPU4) (RR6 1.2 C)" )
-GAME_CUSTOM( 1991, m4rhogr6k,        m4rhog,     "rr6k.p1",                  0x0000, 0x010000, CRC(121d29bf) SHA1(8a6dcf345012b2c499acd32c6bb76eb81ada6fa9), "Barcrest","Road Hog (Barcrest) (MPU4) (RR6 1.2 K)" )
-GAME_CUSTOM( 1991, m4rhogr6y,        m4rhog,     "rr6y.p1",                  0x0000, 0x010000, CRC(56344b28) SHA1(7f6c740d0991a646393a47e2e85322a7c92bdd62), "Barcrest","Road Hog (Barcrest) (MPU4) (RR6 1.2 Y)" )
-GAME_CUSTOM( 1991, m4rhogr6yd,       m4rhog,     "rr6dy.p1",                 0x0000, 0x010000, CRC(0e540e0d) SHA1(a783e73822e436669c8cc1504619990725306df1), "Barcrest","Road Hog (Barcrest) (MPU4) (RR6 1.2 YD)" )
+GAME_CUSTOM( 1991, m4rhog,           0,      mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::rr6_characteriser_prot>, mpu4, init_m4_showstring,  "rr6s.p1",                  0x0000, 0x010000, CRC(f978ca0b) SHA1(11eeac41f4c77b38b33baefb16dab7de1268d161), "Barcrest","Road Hog (Barcrest) (MPU4) (RR6 1.2)" )
+GAME_CUSTOM( 1991, m4rhogr6d,        m4rhog, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::rr6_characteriser_prot>, mpu4, init_m4_showstring,  "rr6d.p1",                  0x0000, 0x010000, CRC(b61115ea) SHA1(92b97cc8b71eb31e8377a59344faaf0d800d1bdc), "Barcrest","Road Hog (Barcrest) (MPU4) (RR6 1.2 D)" )
+GAME_CUSTOM( 1991, m4rhogr6ad,       m4rhog, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::rr6_characteriser_prot>, mpu4, init_m4_showstring,  "rr6ad.p1",                 0x0000, 0x010000, CRC(f328204d) SHA1(057f28e7eaaa372b901a76250fb7ebf4403348ad), "Barcrest","Road Hog (Barcrest) (MPU4) (RR6 1.2 AD)" )
+GAME_CUSTOM( 1991, m4rhogr6b,        m4rhog, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::rr6_characteriser_prot>, mpu4, init_m4_showstring,  "rr6b.p1",                  0x0000, 0x010000, CRC(ccacd58e) SHA1(64b67e54e5568378a18ba99017078fcd4e6bc749), "Barcrest","Road Hog (Barcrest) (MPU4) (RR6 1.2 B)" )
+GAME_CUSTOM( 1991, m4rhogr6c,        m4rhog, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::rr6_characteriser_prot>, mpu4, init_m4_showstring,  "rr6c.p1",                  0x0000, 0x010000, CRC(b5783c69) SHA1(38c122455bed904c9fd683be1a8508a69cbad03f), "Barcrest","Road Hog (Barcrest) (MPU4) (RR6 1.2 C)" )
+GAME_CUSTOM( 1991, m4rhogr6k,        m4rhog, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::rr6_characteriser_prot>, mpu4, init_m4_showstring,  "rr6k.p1",                  0x0000, 0x010000, CRC(121d29bf) SHA1(8a6dcf345012b2c499acd32c6bb76eb81ada6fa9), "Barcrest","Road Hog (Barcrest) (MPU4) (RR6 1.2 K)" )
+GAME_CUSTOM( 1991, m4rhogr6y,        m4rhog, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::rr6_characteriser_prot>, mpu4, init_m4_showstring,  "rr6y.p1",                  0x0000, 0x010000, CRC(56344b28) SHA1(7f6c740d0991a646393a47e2e85322a7c92bdd62), "Barcrest","Road Hog (Barcrest) (MPU4) (RR6 1.2 Y)" )
+GAME_CUSTOM( 1991, m4rhogr6yd,       m4rhog, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::rr6_characteriser_prot>, mpu4, init_m4_showstring,  "rr6dy.p1",                 0x0000, 0x010000, CRC(0e540e0d) SHA1(a783e73822e436669c8cc1504619990725306df1), "Barcrest","Road Hog (Barcrest) (MPU4) (RR6 1.2 YD)" )
 // "(C)1991 BARCREST"  and "RR6 1.1"
-GAME_CUSTOM( 1991, m4rhogr6y_a,      m4rhog,     "rdhogvkn",                 0x0000, 0x010000, CRC(3db03ada) SHA1(9b26f466c1dc1d03edacf64cbe507e084edf5f90), "Barcrest","Road Hog (Barcrest) (MPU4) (RR6 1.1 Y)" )
-
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( 0x10000, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-		M4RHOG_EXTRA_ROMS \
-	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::rhm_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+GAME_CUSTOM( 1991, m4rhogr6y_a,      m4rhog, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::rr6_characteriser_prot>, mpu4, init_m4_showstring,  "rdhogvkn",                 0x0000, 0x010000, CRC(3db03ada) SHA1(9b26f466c1dc1d03edacf64cbe507e084edf5f90), "Barcrest","Road Hog (Barcrest) (MPU4) (RR6 1.1 Y)" )
 
 // expects sequence starting 00 30 20 14 64 30 44 30 64 34 00 74 20 10  (rhm)
 // "(C)1995  B.W.B."  and "RO_ 3.0"
-GAME_CUSTOM( 1995, m4rhogr3,         m4rhog,     "rh5p8.bin",                0x0000, 0x010000, CRC(35d56379) SHA1(ab70ef8151823c3157cf4cc4f9b29875c6ac81cc), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 3.0)" )
-
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( 0x10000, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-		M4RHOG_EXTRA_ROMS \
-	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+GAME_CUSTOM( 1995, m4rhogr3,         m4rhog, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::rhm_characteriser_prot>, mpu4, init_m4_showstring,    "rh5p8.bin",                0x0000, 0x010000, CRC(35d56379) SHA1(ab70ef8151823c3157cf4cc4f9b29875c6ac81cc), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 3.0)" )
 
 // expects sequence starting 00 50 40 90 a8 6c c4 30 c8 ac a4 (alf) (Same as some Good Times Roll and Andy Love Flo sets)
 // "(C)1994  B.W.B."  and "RO_ 2.0"
-GAME_CUSTOM( 1994, m4rhogr2,         m4rhog,     "ro_05s__.2_1",             0x0000, 0x010000, CRC(dc18f70f) SHA1(da81b8279e4f58b1447f51beb446a6007eb39df9), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0)" )
-GAME_CUSTOM( 1994, m4rhogr2d,        m4rhog,     "ro_05sd_.2_1",             0x0000, 0x010000, CRC(f230ae7e) SHA1(5525ed33d115b01722186587de20013265ac19b2), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0 D)" )
-GAME_CUSTOM( 1994, m4rhogr2c,        m4rhog,     "roi05___.2_1",             0x0000, 0x010000, CRC(85fbd24a) SHA1(653a3cf3e651d94611caacddbd0692111667424a), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0 C)" )
-GAME_CUSTOM( 1994, m4rhogr2k,        m4rhog,     "ro_05a__.2_1",             0x0000, 0x010000, CRC(67450ed1) SHA1(84cab7bb2411eb47c1336159bd1941862da59db3), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0 K)" )
-GAME_CUSTOM( 1994, m4rhogr2y,        m4rhog,     "ro_05sk_.2_1",             0x0000, 0x010000, CRC(3e1dfedd) SHA1(a750663c96060b858e194445bc1e677b49da85b8), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0 Y)" )
-GAME_CUSTOM( 1994, m4rhogr2yd,       m4rhog,     "ro_05sb_.2_1",             0x0000, 0x010000, CRC(4a33cfcf) SHA1(ac5d4873df74b521018d5eeac96fd7003ee093e8), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0 YD)" )
+GAME_CUSTOM( 1994, m4rhogr2,         m4rhog, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>, mpu4, init_m4_showstring,    "ro_05s__.2_1",             0x0000, 0x010000, CRC(dc18f70f) SHA1(da81b8279e4f58b1447f51beb446a6007eb39df9), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0)" )
+GAME_CUSTOM( 1994, m4rhogr2d,        m4rhog, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>, mpu4, init_m4_showstring,    "ro_05sd_.2_1",             0x0000, 0x010000, CRC(f230ae7e) SHA1(5525ed33d115b01722186587de20013265ac19b2), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0 D)" )
+GAME_CUSTOM( 1994, m4rhogr2c,        m4rhog, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>, mpu4, init_m4_showstring,    "roi05___.2_1",             0x0000, 0x010000, CRC(85fbd24a) SHA1(653a3cf3e651d94611caacddbd0692111667424a), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0 C)" )
+GAME_CUSTOM( 1994, m4rhogr2k,        m4rhog, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>, mpu4, init_m4_showstring,    "ro_05a__.2_1",             0x0000, 0x010000, CRC(67450ed1) SHA1(84cab7bb2411eb47c1336159bd1941862da59db3), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0 K)" )
+GAME_CUSTOM( 1994, m4rhogr2y,        m4rhog, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>, mpu4, init_m4_showstring,    "ro_05sk_.2_1",             0x0000, 0x010000, CRC(3e1dfedd) SHA1(a750663c96060b858e194445bc1e677b49da85b8), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0 Y)" )
+GAME_CUSTOM( 1994, m4rhogr2yd,       m4rhog, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>, mpu4, init_m4_showstring,    "ro_05sb_.2_1",             0x0000, 0x010000, CRC(4a33cfcf) SHA1(ac5d4873df74b521018d5eeac96fd7003ee093e8), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0 YD)" )
 // "(C)1994  B.W.B."  and "RO_ 1.0"
-GAME_CUSTOM( 1994, m4rhogr1,         m4rhog,     "ro_10s__.1_1",             0x0000, 0x010000, CRC(d140597a) SHA1(0ddf898b5db2a1cbfda84e8a63e0be3de7582cbd), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0)" )
-GAME_CUSTOM( 1994, m4rhogr1d,        m4rhog,     "ro_10sd_.1_1",             0x0000, 0x010000, CRC(3f9152f3) SHA1(97e0c0461b8d4994515ac9e20d001dc7e74042ec), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0 D)" )
-GAME_CUSTOM( 1994, m4rhogr1c,        m4rhog,     "roi10___.1_1",             0x0000, 0x010000, CRC(2f832f4b) SHA1(b9228e2585cff6d4d9df64048c77e0b9ad3e75d7), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0 C)" )
-GAME_CUSTOM( 1994, m4rhogr1k,        m4rhog,     "ro_10a__.1_1",             0x0000, 0x010000, CRC(1772bce6) SHA1(c5d0cec8e5bcfcef5003325169522f1da066354b), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0 K, set 1)" )
-GAME_CUSTOM( 1994, m4rhogr1y,        m4rhog,     "ro_10sk_.1_1",             0x0000, 0x010000, CRC(5d5118d1) SHA1(c4abc5ccdeb711b6ec2a2c82bb2f8da9d824fe4e), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0 Y)" )
-GAME_CUSTOM( 1994, m4rhogr1yd,       m4rhog,     "ro_10sb_.1_1",             0x0000, 0x010000, CRC(34febd6f) SHA1(e1d5e178771714f9633dd9782c1f9d373a9ca5e1), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0 YD)" )
-GAME_CUSTOM( 1994, m4rhogr1k_a,      m4rhog,     "rhog5p",                   0x0000, 0x010000, CRC(49b11beb) SHA1(89c2320de4b3f2ff6ba28501f88147b659f1ee20), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0 K, set 2, wrong version number?)" ) // clearly not the same version as above, more code...
-
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( 0x10000, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-		M4RHOG_EXTRA_ROMS \
-	ROM_END \
-	GAME(year, setname, parent, mod4oki, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+GAME_CUSTOM( 1994, m4rhogr1,         m4rhog, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>, mpu4, init_m4_showstring,    "ro_10s__.1_1",             0x0000, 0x010000, CRC(d140597a) SHA1(0ddf898b5db2a1cbfda84e8a63e0be3de7582cbd), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0)" )
+GAME_CUSTOM( 1994, m4rhogr1d,        m4rhog, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>, mpu4, init_m4_showstring,    "ro_10sd_.1_1",             0x0000, 0x010000, CRC(3f9152f3) SHA1(97e0c0461b8d4994515ac9e20d001dc7e74042ec), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0 D)" )
+GAME_CUSTOM( 1994, m4rhogr1c,        m4rhog, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>, mpu4, init_m4_showstring,    "roi10___.1_1",             0x0000, 0x010000, CRC(2f832f4b) SHA1(b9228e2585cff6d4d9df64048c77e0b9ad3e75d7), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0 C)" )
+GAME_CUSTOM( 1994, m4rhogr1k,        m4rhog, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>, mpu4, init_m4_showstring,    "ro_10a__.1_1",             0x0000, 0x010000, CRC(1772bce6) SHA1(c5d0cec8e5bcfcef5003325169522f1da066354b), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0 K, set 1)" )
+GAME_CUSTOM( 1994, m4rhogr1y,        m4rhog, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>, mpu4, init_m4_showstring,    "ro_10sk_.1_1",             0x0000, 0x010000, CRC(5d5118d1) SHA1(c4abc5ccdeb711b6ec2a2c82bb2f8da9d824fe4e), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0 Y)" )
+GAME_CUSTOM( 1994, m4rhogr1yd,       m4rhog, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>, mpu4, init_m4_showstring,    "ro_10sb_.1_1",             0x0000, 0x010000, CRC(34febd6f) SHA1(e1d5e178771714f9633dd9782c1f9d373a9ca5e1), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0 YD)" )
+GAME_CUSTOM( 1994, m4rhogr1k_a,      m4rhog, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>, mpu4, init_m4_showstring,    "rhog5p",                   0x0000, 0x010000, CRC(49b11beb) SHA1(89c2320de4b3f2ff6ba28501f88147b659f1ee20), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0 K, set 2, wrong version number?)" ) // clearly not the same version as above, more code...
 
 // "(C)1995  B.W.B."  and "ROC 2.0"  (bad, and possible wrong game, club version?)
-GAME_CUSTOM( 1995, m4rhog_roc,       m4rhog,     "roadhog5p4std.bin",        0x0000, 0x010000, BAD_DUMP CRC(0ff60341) SHA1(c12d5b160d9e47a6f1aa6f378c2a70186be6bdff), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (ROC 2.0, bad)" )
-
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( 0x10000, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-		M4RHOG_EXTRA_ROMS \
-	ROM_END \
-	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x2f>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+GAME_CUSTOM( 1995, m4rhog_roc,       m4rhog, mod4oki, mpu4, init_m4_showstring,   "roadhog5p4std.bin",        0x0000, 0x010000, BAD_DUMP CRC(0ff60341) SHA1(c12d5b160d9e47a6f1aa6f378c2a70186be6bdff), "Bwb","Road Hog (Bwb / Barcrest) (MPU4) (ROC 2.0, bad)" )
 
 // "(C)1991 BARCREST"  and "RR6 1.2" custom protection, hacked
-GAME_CUSTOM( 1991, m4rhog_h12,       m4rhog,     "rhog20c",                  0x0000, 0x010000, CRC(74ec16f7) SHA1(995d75b3a4e88d8a34dc395b185f728c18e00a2b), "hack?","Road Hog (Barcrest) (MPU4) (RR6 1.2?, hack?)" )
-GAME_CUSTOM( 1991, m4rhog_h13,       m4rhog,     "rhog_20_.8",               0x0000, 0x010000, CRC(3a82e4bf) SHA1(6582951c2afe14502c37460381bf4c28ec02f3c9), "hack?","Road Hog (Barcrest) (MPU4) (RR6 1.2, hack?)" )
-GAME_CUSTOM( 1991, m4rhog_h14,       m4rhog,     "rhog_20_.4",               0x0000, 0x010000, CRC(15e28457) SHA1(2a758a727a6956e3029b2026cd189f6249677c6a), "hack?","Road Hog (Barcrest) (MPU4) (RR6 1.2C, hack?, set 1)" )
-
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( 0x10000, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-		M4RHOG_EXTRA_ROMS \
-	ROM_END \
-	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x1f>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
-
+GAME_CUSTOM( 1991, m4rhog_h12,       m4rhog, mod4oki_bootleg_fixedret<0x2f>, mpu4, init_m4_showstring,    "rhog20c",                  0x0000, 0x010000, CRC(74ec16f7) SHA1(995d75b3a4e88d8a34dc395b185f728c18e00a2b), "hack?","Road Hog (Barcrest) (MPU4) (RR6 1.2?, hack?)" )
+GAME_CUSTOM( 1991, m4rhog_h13,       m4rhog, mod4oki_bootleg_fixedret<0x2f>, mpu4, init_m4_showstring,    "rhog_20_.8",               0x0000, 0x010000, CRC(3a82e4bf) SHA1(6582951c2afe14502c37460381bf4c28ec02f3c9), "hack?","Road Hog (Barcrest) (MPU4) (RR6 1.2, hack?)" )
+GAME_CUSTOM( 1991, m4rhog_h14,       m4rhog, mod4oki_bootleg_fixedret<0x2f>, mpu4, init_m4_showstring,    "rhog_20_.4",               0x0000, 0x010000, CRC(15e28457) SHA1(2a758a727a6956e3029b2026cd189f6249677c6a), "hack?","Road Hog (Barcrest) (MPU4) (RR6 1.2C, hack?, set 1)" )
 // "(C)1991 BARCREST"  and "RR6 1.2" custom protection
-GAME_CUSTOM( 1991, m4rhog_h15,       m4rhog,     "rhog20_11",                0x0000, 0x010000, CRC(63c80ee0) SHA1(22a3f11007acedd833af9e73e3038fb3542781fe), "hack?","Road Hog (Barcrest) (MPU4) (RR6 1.2C, hack?, set 2)" )
+GAME_CUSTOM( 1991, m4rhog_h15,       m4rhog, mod4oki_bootleg_fixedret<0x1f>, mpu4, init_m4_showstring,    "rhog20_11",                0x0000, 0x010000, CRC(63c80ee0) SHA1(22a3f11007acedd833af9e73e3038fb3542781fe), "hack?","Road Hog (Barcrest) (MPU4) (RR6 1.2C, hack?, set 2)" )
 
 // different protection, involving 814 and regular reads, see note at top of driver
 
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( 0x10000, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-		M4RHOG_EXTRA_ROMS \
-	ROM_END \
-	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x44>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_814prot, ROT0, company, title, GAME_FLAGS )
- 
 // "HAVE A NICE DAY"  and "RO_ 2.0"
-GAME_CUSTOM( 1994, m4rhog_h1,        m4rhog,     "road hog 5p 6.bin",        0x0000, 0x010000, CRC(b365d1f0) SHA1(af3b4f5162af6c033039a1e004bc803175a4e996), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0, hack?, set 1)" )
-GAME_CUSTOM( 1994, m4rhog_h5,        m4rhog,     "rh056c",                   0x0000, 0x010000, CRC(073845e2) SHA1(5e6f3ccdfc346f95e5e7e955144332e727da1d9e), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0, hack?, set 5)" )
-
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( 0x10000, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-		M4RHOG_EXTRA_ROMS \
-	ROM_END \
-	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x1c>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_814prot, ROT0, company, title, GAME_FLAGS )
-
+GAME_CUSTOM( 1994, m4rhog_h1,        m4rhog, mod4oki_bootleg_fixedret<0x44>, mpu4, init_m4_showstring_814prot,    "road hog 5p 6.bin",        0x0000, 0x010000, CRC(b365d1f0) SHA1(af3b4f5162af6c033039a1e004bc803175a4e996), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0, hack?, set 1)" )
+GAME_CUSTOM( 1994, m4rhog_h5,        m4rhog, mod4oki_bootleg_fixedret<0x44>, mpu4, init_m4_showstring_814prot,    "rh056c",                   0x0000, 0x010000, CRC(073845e2) SHA1(5e6f3ccdfc346f95e5e7e955144332e727da1d9e), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0, hack?, set 5)" )
 // "HAVE A NICE DAY"  and "RO_ 2.0"
-GAME_CUSTOM( 1994, m4rhog_h2,        m4rhog,     "rhog05_11",                0x0000, 0x010000, CRC(8e4b14aa) SHA1(8b67b34597c0d30b0b3cf2566536c02f880a74bc), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0, hack?, set 2)" )
-
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( 0x10000, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-		M4RHOG_EXTRA_ROMS \
-	ROM_END \
-	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x28>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_814prot, ROT0, company, title, GAME_FLAGS )
-
+GAME_CUSTOM( 1994, m4rhog_h2,        m4rhog, mod4oki_bootleg_fixedret<0x1c>, mpu4, init_m4_showstring_814prot,    "rhog05_11",                0x0000, 0x010000, CRC(8e4b14aa) SHA1(8b67b34597c0d30b0b3cf2566536c02f880a74bc), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0, hack?, set 2)" )
 // "HAVE A NICE DAY"  and "RO_ 2.0"
-GAME_CUSTOM( 1994, m4rhog_h3,        m4rhog,     "rhog55",                   0x0000, 0x010000, CRC(29395082) SHA1(538434b82e31f7e40770a9b882e54a16195ee998), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0, hack?, set 3)" )
-
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( 0x10000, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-		M4RHOG_EXTRA_ROMS \
-	ROM_END \
-	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x2c>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_814prot, ROT0, company, title, GAME_FLAGS )
-
+GAME_CUSTOM( 1994, m4rhog_h3,        m4rhog, mod4oki_bootleg_fixedret<0x28>, mpu4, init_m4_showstring_814prot,    "rhog55",                   0x0000, 0x010000, CRC(29395082) SHA1(538434b82e31f7e40770a9b882e54a16195ee998), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0, hack?, set 3)" )
 // "HAVE A NICE DAY"  and "RO_ 2.0"
-GAME_CUSTOM( 1994, m4rhog_h4,        m4rhog,     "rhog58c",                  0x0000, 0x010000, CRC(e02b6da6) SHA1(7d329adcac594c98685dc5404f2b9e8f717cc47f), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0, hack?, set 4)" )
-GAME_CUSTOM( 1994, m4rhog_h6,        m4rhog,     "rhog_05_.4",               0x0000, 0x010000, CRC(a75a2bd4) SHA1(d21505d27792acf8fa20a7cdc830efbe8756fe81), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0, hack?, set 6)" )
-GAME_CUSTOM( 1994, m4rhog_h7,        m4rhog,     "rhog_05_.8",               0x0000, 0x010000, CRC(5476f9b4) SHA1(fbd038e8710a79ea697d5acb482bed2f307cefbb), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0, hack?, set 7)" )
-
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( 0x10000, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-		M4RHOG_EXTRA_ROMS \
-	ROM_END \
-	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x1f>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_814prot, ROT0, company, title, GAME_FLAGS )
-
+GAME_CUSTOM( 1994, m4rhog_h4,        m4rhog, mod4oki_bootleg_fixedret<0x2c>, mpu4, init_m4_showstring_814prot,    "rhog58c",                  0x0000, 0x010000, CRC(e02b6da6) SHA1(7d329adcac594c98685dc5404f2b9e8f717cc47f), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0, hack?, set 4)" )
+GAME_CUSTOM( 1994, m4rhog_h6,        m4rhog, mod4oki_bootleg_fixedret<0x2c>, mpu4, init_m4_showstring_814prot,    "rhog_05_.4",               0x0000, 0x010000, CRC(a75a2bd4) SHA1(d21505d27792acf8fa20a7cdc830efbe8756fe81), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0, hack?, set 6)" )
+GAME_CUSTOM( 1994, m4rhog_h7,        m4rhog, mod4oki_bootleg_fixedret<0x2c>, mpu4, init_m4_showstring_814prot,    "rhog_05_.8",               0x0000, 0x010000, CRC(5476f9b4) SHA1(fbd038e8710a79ea697d5acb482bed2f307cefbb), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 2.0, hack?, set 7)" )
 // "HAVE A NICE DAY"  and "RO_ 1.0"
-GAME_CUSTOM( 1994, m4rhog_h8,        m4rhog,     "rhog10_11",                0x0000, 0x010000, CRC(83575be7) SHA1(2cb549554028f2fdc32ecfa58b786de375b8fa35), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0, hack?, set 1)" )
-
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( 0x10000, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-		M4RHOG_EXTRA_ROMS \
-	ROM_END \
-	GAME(year, setname, parent, mod4oki_bootleg_fixedret<0x2f>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring_814prot, ROT0, company, title, GAME_FLAGS )
-
+GAME_CUSTOM( 1994, m4rhog_h8,        m4rhog, mod4oki_bootleg_fixedret<0x1f>, mpu4, init_m4_showstring_814prot,    "rhog10_11",                0x0000, 0x010000, CRC(83575be7) SHA1(2cb549554028f2fdc32ecfa58b786de375b8fa35), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0, hack?, set 1)" )
 // "HAVE A NICE DAY"  and "RO_ 1.0"
-GAME_CUSTOM( 1994, m4rhog_h9,        m4rhog,     "rhog10c",                  0x0000, 0x010000, CRC(308c6d4f) SHA1(f7f8063fe8dd4ef204f225d0aa5202732ead5fa0), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0, hack?, set 2)" )
-GAME_CUSTOM( 1994, m4rhog_h10,       m4rhog,     "rhog_10_.4",               0x0000, 0x010000, CRC(8efa581c) SHA1(03c25b674cfb02792edc9ef8a76b16af31d80aae), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0, hack?, set 3)" )
-GAME_CUSTOM( 1994, m4rhog_h11,       m4rhog,     "rhog_10_.8",               0x0000, 0x010000, CRC(84d1f95d) SHA1(33f10e0e1e5abe6011b05f32f55c7dd6d3298945), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0, hack?, set 4)" )
+GAME_CUSTOM( 1994, m4rhog_h9,        m4rhog, mod4oki_bootleg_fixedret<0x2f>, mpu4, init_m4_showstring_814prot,    "rhog10c",                  0x0000, 0x010000, CRC(308c6d4f) SHA1(f7f8063fe8dd4ef204f225d0aa5202732ead5fa0), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0, hack?, set 2)" )
+GAME_CUSTOM( 1994, m4rhog_h10,       m4rhog, mod4oki_bootleg_fixedret<0x2f>, mpu4, init_m4_showstring_814prot,    "rhog_10_.4",               0x0000, 0x010000, CRC(8efa581c) SHA1(03c25b674cfb02792edc9ef8a76b16af31d80aae), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0, hack?, set 3)" )
+GAME_CUSTOM( 1994, m4rhog_h11,       m4rhog, mod4oki_bootleg_fixedret<0x2f>, mpu4, init_m4_showstring_814prot,    "rhog_10_.8",               0x0000, 0x010000, CRC(84d1f95d) SHA1(33f10e0e1e5abe6011b05f32f55c7dd6d3298945), "hack?","Road Hog (Bwb / Barcrest) (MPU4) (RO_ 1.0, hack?, set 4)" )
 
 
 
