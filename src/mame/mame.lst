@@ -15567,9 +15567,9 @@ goindolj                        // (c) 1987 Sun a Electronics
 goindolu                        // (c) 1987 Sun a Electronics
 homo                            // bootleg
 
-@source:gokidetor.cpp
-gokidetor                       // (c) 1992 Taito
-gokidetor2                      // (c) 1992 Taito
+@source:cucaracha.cpp
+cucaracha                       // (c) 1992 Taito
+cucaracha2                      // (c) 1992 Taito
 
 @source:goldart.cpp
 goldart
