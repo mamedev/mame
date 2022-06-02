@@ -13885,6 +13885,65 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="stormlord">
+		<description>Stormlord</description>
+		<year>1989</year>
+		<publisher>Hewson Consultants</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="864005">
+				<rom name="Stormlord.tap" size="864005" crc="88df9398" sha1="a761e9ba4f1ca17d5c408b9af70a6c562d017e40"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="864007">
+				<rom name="Stormlord_a1.tap" size="864007" crc="2f49632a" sha1="6912958b7f7376aded0c67e8dc2032ce6461a81d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssofar2">
+		<description>The Story So Far Volume II</description>
+		<year>1990</year>
+		<publisher>Elite Systems</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side A: Overlander"/>
+			<dataarea name="cass" size="889826">
+				<rom name="Story_So_Far_Vol._2,_The_Tape_1_Side_1.tap" size="889826" crc="7b10508e" sha1="36f8cbf7049fbc28b7de8dbcf7d64260ab88fd09"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side B: Hoppin' Mad"/>
+			<dataarea name="cass" size="725833">
+				<rom name="Story_So_Far_Vol._2,_The_Tape_1_Side_2.tap" size="725833" crc="29a4115a" sha1="2a21e91b45643dee07239542abc6d1e56ed308d8"/>
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side A: Beyond The Ice Palace"/>
+			<dataarea name="cass" size="721721">
+				<rom name="Story_So_Far_Vol._2,_The_Tape_2_Side_1.tap" size="721721" crc="0961797e" sha1="3e50b0c18c5b4f30aa281d6a1adf1383e5985876"/>
+			</dataarea>
+		</part>
+
+		<part name="cass4" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side B: Live and Let Die"/>
+			<dataarea name="cass" size="712270">
+				<rom name="Story_So_Far_Vol._2,_The_Tape_2_Side_2.tap" size="712270" crc="45d30e8f" sha1="c68241228c48544f0788c05f4b00af9ab42c0604"/>
+			</dataarea>
+		</part>
+
+		<part name="cass5" interface="cbm_cass">
+			<feature name="part_id" value="Tape 3 Side A: Space Harrier"/>
+			<dataarea name="cass" size="717856">
+				<rom name="Story_So_Far_Vol._2,_The_Tape_3_Side_1.tap" size="717856" crc="7791acd6" sha1="57f0facd519533627797d2b4cb23221d87f1eb81"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="stranglp">
 		<description>Strangeloop</description>
 		<year>1985</year>
@@ -13931,6 +13990,63 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 			<feature name="part_id" value="Side 2"/>
 			<dataarea name="cass" size="881224">
 				<rom name="Street_Gang_Side_2.tap" size="881224" crc="ea147c19" sha1="0346a03a5b5ad893658d2c827e4b66d8d84a4ee6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="streetha">
+		<description>Street Hassle</description>
+		<year>1987</year>
+		<publisher>Melbourne House</publisher>
+		<info name="alt_title" value="Bad Street Brawler"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="570894">
+				<rom name="Street_Hassle.tap" size="570894" crc="6ac15bf4" sha1="4b1a168a84352f3797ab4021feb9fab60115550a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssbaseba">
+		<description>Street Sports Baseball</description>
+		<year>1987</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1005098">
+				<rom name="Street_Sports_Baseball.tap" size="1005098" crc="57527fbd" sha1="c0f27cfdba149926c389361b3f50d8a4791df4c5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssbasket">
+		<description>Street Sports Basketball</description>
+		<year>1987</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1370210">
+				<rom name="Street_Sports_Basketball.tap" size="1370210" crc="c9f4ec84" sha1="5d835429ca3f50b51b2f890df6981d464733b1fa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sssoccer" supported="no"> <!-- tape loads but doesn't run (remains stuck showing light blue screen) -->
+		<description>Street Sports Soccer</description>
+		<year>1988</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1: Field 1"/>
+			<dataarea name="cass" size="950358">
+				<rom name="Street_Sports_Soccer_Side_1_(Field_1).tap" size="950358" crc="daf21181" sha1="47d02e051f6fd41baed78b767c4ad1c4566204e5"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2: Field 2"/>
+			<dataarea name="cass" size="950358">
+				<rom name="Street_Sports_Soccer_Side_2_(Field_2).tap" size="950358" crc="b4e77c94" sha1="6b4f9dfeb6aa5e99451f609b55aced0bb51935bf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14109,6 +14225,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="subterra">
+		<description>Subterranea</description>
+		<year>1992</year>
+		<publisher>Prism Leisure</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="477623">
+				<rom name="Subterranea.tap" size="477623" crc="d7c0cbbe" sha1="1684de4592443ff05fcb1acc2eb8196479857914"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sexpress">
 		<description>Suicide Express</description>
 		<year>1984</year>
@@ -14128,16 +14256,36 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<!-- Dumped by @c64tapes -->
 
 		<part name="cass1" interface="cbm_cass">
-			<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side 1"/>
 			<dataarea name="cass" size="507164">
 				<rom name="summrcka.tap" size="507164" crc="2c8bc3d7" sha1="c2f8468308b202c6b60c2beed1edf38f5a46dbff"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
-			<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side 2"/>
 			<dataarea name="cass" size="515968">
 				<rom name="summrckb.tap" size="515968" crc="e913833d" sha1="d4ad033192e4788d28574d5c45c2afde81d75121"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="summrct" cloneof="summrck">
+		<description>Summer Camp (Thalamus)</description>
+		<year>1990</year>
+		<publisher>Thalamus</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="507164">
+				<rom name="Summer_Camp_Side_1.tap" size="507164" crc="ec697206" sha1="4d784fcc28867f48d8740402073c780d4c5977b5"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="515967">
+				<rom name="Summer_Camp_Side_2.tap" size="515967" crc="2ab55a01" sha1="8d37fcc7ca501513db2624d9338ac5249e73a27d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14170,6 +14318,78 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="1463178">
 				<rom name="Summer_Games.tap" size="1463178" crc="ad0d7bde" sha1="02764d4b3db276cc347489eae2fee85571e65f3f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sumgamesu" cloneof="sumgames">
+		<description>Summer Games (U.S. Gold)</description>
+		<year>1984</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="619166">
+				<rom name="Summer_Games_Side_1.tap" size="619166" crc="a7a9c9c1" sha1="2bb4be340874740d6b9690edecd2f6aa9258e405"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="778018">
+				<rom name="Summer_Games_Side_2.tap" size="778018" crc="3d243c36" sha1="1098d68d98f570d0dfdf2ea39941dcb781d3cf0c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sumgames2">
+		<description>Summer Games II</description>
+		<year>1985</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="1466968">
+				<rom name="Summer_Games_II_Side_1.tap" size="1466968" crc="c9208be7" sha1="0084db4165c065ea46f4594239609de60202ee22"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="2243732">
+				<rom name="Summer_Games_II_Side_2.tap" size="2243732" crc="a29a8609" sha1="0d56c320b1a19836a29ec20b102a5a6279a55cf8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sumgames2r" cloneof="sumgames2">
+		<description>Summer Games II (Rushware)</description>
+		<year>1985</year>
+		<publisher>Rushware</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="1469087">
+				<rom name="Summer_Games_II_Side_1.tap" size="1469087" crc="895aaa1d" sha1="bf59c9c18d7e8f30ca7c31d0f453848b45c87b03"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="2243732">
+				<rom name="Summer_Games_II_Side_2.tap" size="2243732" crc="981febfb" sha1="29badceb1ed82e6d5de425c88fcbf6c4f68581c9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprbowl">
+		<description>Super Bowl</description>
+		<year>1986</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="611143">
+				<rom name="Super_Bowl.tap" size="611143" crc="8965c87f" sha1="0fd1b13995737e75034ac5dd43cb04768b849d73"/>
 			</dataarea>
 		</part>
 	</software>
