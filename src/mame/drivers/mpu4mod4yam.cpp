@@ -677,61 +677,44 @@ GAME_CUSTOM( 199?, m4przsss__1,    m4przsss,   "sspc.p1",      0x0000, 0x010000,
 *****************************************************************************************************************************************************************************/
 
 #undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+#define GAME_CUSTOM(year, setname,parent, machine, inputs, init, name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m683_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
-
-// boot
+	GAME(year, setname, parent, machine, inputs, mpu4mod4yam_machines_state, init, ROT0, company, title, GAME_FLAGS )
 
 // 00 24 24 2c e0 b4 b8 4c e8 d8 cc f8 6c 48 68  (m683)
 // (C)1991 BARCREST and  R2T 3.3
-GAME_CUSTOM( 199?, m4ra,       0,      "r2tx.p1",      0x0000, 0x010000, CRC(7efffe3d) SHA1(5472bc76f4450726fc49fce281a6ec69693d0923), "Barcrest","Red Alert (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4ra__a,    m4ra,   "r2txr.p1",     0x0000, 0x010000, CRC(9ff95e34) SHA1(79d19602b88e1c9d23e910332a968e6b820a39f5), "Barcrest","Red Alert (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4ra__b,    m4ra,   "ra2s.p1",      0x0000, 0x010000, CRC(cd0fd068) SHA1(a347372f7f737ca87f44e692015338831465f123), "Barcrest","Red Alert (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4ra__c,    m4ra,   "ra2x.p1",      0x0000, 0x010000, CRC(8217e235) SHA1(e17483afea2a9d9e70e88687f899e1b98b982b63), "Barcrest","Red Alert (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4ra__d,    m4ra,   "ra2xa.p1",     0x0000, 0x010000, CRC(0e6b2123) SHA1(af7c5ddddbfffef6fa5746a7b7927845457d02f8), "Barcrest","Red Alert (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4ra__e,    m4ra,   "ra2xb.p1",     0x0000, 0x010000, CRC(97fe4933) SHA1(201860b64577828547adb8a216a6a205c4a4f34b), "Barcrest","Red Alert (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4ra__f,    m4ra,   "ra2xr.p1",     0x0000, 0x010000, CRC(12e8eb9b) SHA1(2bcd2c911626a2cb2419f9540649e99d7f335b3b), "Barcrest","Red Alert (Barcrest) (MPU4) (set 7)" )
-
-// (C)1991 BARCREST and RAH 3.3
-GAME_CUSTOM( 199?, m4ra__p,    m4ra,   "rahx.p1",      0x0000, 0x010000, CRC(6887014e) SHA1(25e4c008588a219895c1b326314fd11e1f0ad35f), "Barcrest","Red Alert (Barcrest) (MPU4) (set 17)" )
-
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( length, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
-
-
-// 00 c4 e8 58 b4 4c 30 40 e4 a8 18 94 48 34  (same as m4graff)
-// (C)1991 BARCREST and RA3 0.2
-GAME_CUSTOM( 199?, m4ra__g,    m4ra,   "ra3xad.p1",    0x0000, 0x010000, CRC(75957d43) SHA1(f7d00842b8390f5464733a6fe1d61d7431a16817), "Barcrest","Red Alert (Barcrest) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4ra__h,    m4ra,   "ra3xb.p1",     0x0000, 0x010000, CRC(f37e9bd5) SHA1(584a1f6f1bfb35de813466448e35fc1251fa90bc), "Barcrest","Red Alert (Barcrest) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4ra__i,    m4ra,   "ra3xbd.p1",    0x0000, 0x010000, CRC(43891009) SHA1(5d9ebe9d48a39f0a121ae7b832b277910bfd0ad6), "Barcrest","Red Alert (Barcrest) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4ra__j,    m4ra,   "ra3xd.p1",     0x0000, 0x010000, CRC(bc59a07a) SHA1(3a8fc99690759ea376660feaf65bfda5386dcf0d), "Barcrest","Red Alert (Barcrest) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4ra__k,    m4ra,   "ra3xdr.p1",    0x0000, 0x010000, CRC(036950ba) SHA1(f0a534352b41c2762330762c3c7024d9a6d49cd4), "Barcrest","Red Alert (Barcrest) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4ra__l,    m4ra,   "ra3xdy.p1",    0x0000, 0x010000, CRC(468508d4) SHA1(ba6db1e1f7bca13b9c40173fb68418f319e2a9d8), "Barcrest","Red Alert (Barcrest) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4ra__m,    m4ra,   "ra3xr.p1",     0x0000, 0x010000, CRC(1a2b813d) SHA1(5d3b5d4ab31dd1848b3d0b2a5ff5798cc01e0c6f), "Barcrest","Red Alert (Barcrest) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4ra__n,    m4ra,   "ra3xs.p1",     0x0000, 0x010000, CRC(a1ba9673) SHA1(7d5441522e8676805f7e75a3d445acae83d8a03b), "Barcrest","Red Alert (Barcrest) (MPU4) (set 15)" )
-GAME_CUSTOM( 199?, m4ra__o,    m4ra,   "ra3xy.p1",     0x0000, 0x010000, CRC(3e2287de) SHA1(ba0861a0bfb6eb76f9786c0a4c098db362117618), "Barcrest","Red Alert (Barcrest) (MPU4) (set 16)" )
-
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( length, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-	ROM_END \
-	GAME(year, setname, parent, mod4yam_bootleg_fixedret<0x11>, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
-
-
+GAME_CUSTOM( 199?, m4ra,       0,    mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m683_characteriser_prot>, mpu4, init_m4_showstring,  "r2tx.p1",      0x0000, 0x010000, CRC(7efffe3d) SHA1(5472bc76f4450726fc49fce281a6ec69693d0923), "Barcrest","Red Alert (Barcrest) (MPU4) (R2T 3.3, set 1)" )
+GAME_CUSTOM( 199?, m4ra__a,    m4ra, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m683_characteriser_prot>, mpu4, init_m4_showstring,  "r2txr.p1",     0x0000, 0x010000, CRC(9ff95e34) SHA1(79d19602b88e1c9d23e910332a968e6b820a39f5), "Barcrest","Red Alert (Barcrest) (MPU4) (R2T 3.3, set 2)" )
+GAME_CUSTOM( 199?, m4ra__b,    m4ra, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m683_characteriser_prot>, mpu4, init_m4_showstring,  "ra2s.p1",      0x0000, 0x010000, CRC(cd0fd068) SHA1(a347372f7f737ca87f44e692015338831465f123), "Barcrest","Red Alert (Barcrest) (MPU4) (R2T 3.3, set 3)" )
+GAME_CUSTOM( 199?, m4ra__c,    m4ra, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m683_characteriser_prot>, mpu4, init_m4_showstring,  "ra2x.p1",      0x0000, 0x010000, CRC(8217e235) SHA1(e17483afea2a9d9e70e88687f899e1b98b982b63), "Barcrest","Red Alert (Barcrest) (MPU4) (R2T 3.3, set 4)" )
+GAME_CUSTOM( 199?, m4ra__d,    m4ra, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m683_characteriser_prot>, mpu4, init_m4_showstring,  "ra2xa.p1",     0x0000, 0x010000, CRC(0e6b2123) SHA1(af7c5ddddbfffef6fa5746a7b7927845457d02f8), "Barcrest","Red Alert (Barcrest) (MPU4) (R2T 3.3, set 5)" )
+GAME_CUSTOM( 199?, m4ra__e,    m4ra, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m683_characteriser_prot>, mpu4, init_m4_showstring,  "ra2xb.p1",     0x0000, 0x010000, CRC(97fe4933) SHA1(201860b64577828547adb8a216a6a205c4a4f34b), "Barcrest","Red Alert (Barcrest) (MPU4) (R2T 3.3, set 6)" )
+GAME_CUSTOM( 199?, m4ra__f,    m4ra, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m683_characteriser_prot>, mpu4, init_m4_showstring,  "ra2xr.p1",     0x0000, 0x010000, CRC(12e8eb9b) SHA1(2bcd2c911626a2cb2419f9540649e99d7f335b3b), "Barcrest","Red Alert (Barcrest) (MPU4) (R2T 3.3, set 7)" )
 // different protection, also reads from 811 at start, but check doesn't matter?
 // (C)1991 BARCREST and R2T 3.1
-GAME_CUSTOM( 199?, m4ra__q,    m4ra,   "reda_20_.8",   0x0000, 0x010000, CRC(915aff5b) SHA1(e8e58c263e2bdb64a80e9355ac5e114fff1d59f8), "bootleg","Red Alert (Barcrest) (bootleg) (MPU4)" )
+GAME_CUSTOM( 199?, m4ra__q,    m4ra, mod4yam_bootleg_fixedret<0x11>, mpu4, init_m4_showstring,  "reda_20_.8",   0x0000, 0x010000, CRC(915aff5b) SHA1(e8e58c263e2bdb64a80e9355ac5e114fff1d59f8), "bootleg","Red Alert (Barcrest) (bootleg) (MPU4) (R2T 3.1)" )
+
+// This appears to be a very different type of game based on the lamping
+// (C)1991 BARCREST and RAH 3.3
+GAME_CUSTOM( 199?, m4ra__p,    m4ra, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m683_characteriser_prot>, mpu4, init_m4_showstring,  "rahx.p1",      0x0000, 0x010000, CRC(6887014e) SHA1(25e4c008588a219895c1b326314fd11e1f0ad35f), "Barcrest","Red Alert (Barcrest) (MPU4) (RAH 3.3)" )
+
+// This also appears to be a very different type of game based on the lamping
+// 00 c4 e8 58 b4 4c 30 40 e4 a8 18 94 48 34  (same as m4graff)
+// (C)1991 BARCREST and RA3 0.2
+GAME_CUSTOM( 199?, m4ra__g,    m4ra, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4, init_m4_showstring,  "ra3xad.p1",    0x0000, 0x010000, CRC(75957d43) SHA1(f7d00842b8390f5464733a6fe1d61d7431a16817), "Barcrest","Red Alert (Barcrest) (MPU4) (RA3 0.2, set 1)" )
+GAME_CUSTOM( 199?, m4ra__h,    m4ra, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4, init_m4_showstring,  "ra3xb.p1",     0x0000, 0x010000, CRC(f37e9bd5) SHA1(584a1f6f1bfb35de813466448e35fc1251fa90bc), "Barcrest","Red Alert (Barcrest) (MPU4) (RA3 0.2, set 2)" )
+GAME_CUSTOM( 199?, m4ra__i,    m4ra, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4, init_m4_showstring,  "ra3xbd.p1",    0x0000, 0x010000, CRC(43891009) SHA1(5d9ebe9d48a39f0a121ae7b832b277910bfd0ad6), "Barcrest","Red Alert (Barcrest) (MPU4) (RA3 0.2, set 3)" )
+GAME_CUSTOM( 199?, m4ra__j,    m4ra, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4, init_m4_showstring,  "ra3xd.p1",     0x0000, 0x010000, CRC(bc59a07a) SHA1(3a8fc99690759ea376660feaf65bfda5386dcf0d), "Barcrest","Red Alert (Barcrest) (MPU4) (RA3 0.2, set 4)" )
+GAME_CUSTOM( 199?, m4ra__k,    m4ra, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4, init_m4_showstring,  "ra3xdr.p1",    0x0000, 0x010000, CRC(036950ba) SHA1(f0a534352b41c2762330762c3c7024d9a6d49cd4), "Barcrest","Red Alert (Barcrest) (MPU4) (RA3 0.2, set 5)" )
+GAME_CUSTOM( 199?, m4ra__l,    m4ra, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4, init_m4_showstring,  "ra3xdy.p1",    0x0000, 0x010000, CRC(468508d4) SHA1(ba6db1e1f7bca13b9c40173fb68418f319e2a9d8), "Barcrest","Red Alert (Barcrest) (MPU4) (RA3 0.2, set 6)" )
+GAME_CUSTOM( 199?, m4ra__m,    m4ra, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4, init_m4_showstring,  "ra3xr.p1",     0x0000, 0x010000, CRC(1a2b813d) SHA1(5d3b5d4ab31dd1848b3d0b2a5ff5798cc01e0c6f), "Barcrest","Red Alert (Barcrest) (MPU4) (RA3 0.2, set 7)" )
+GAME_CUSTOM( 199?, m4ra__n,    m4ra, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4, init_m4_showstring,  "ra3xs.p1",     0x0000, 0x010000, CRC(a1ba9673) SHA1(7d5441522e8676805f7e75a3d445acae83d8a03b), "Barcrest","Red Alert (Barcrest) (MPU4) (RA3 0.2, set 8)" )
+GAME_CUSTOM( 199?, m4ra__o,    m4ra, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4, init_m4_showstring,  "ra3xy.p1",     0x0000, 0x010000, CRC(3e2287de) SHA1(ba0861a0bfb6eb76f9786c0a4c098db362117618), "Barcrest","Red Alert (Barcrest) (MPU4) (RA3 0.2, set 9)" )
+
+
 
 
 /*****************************************************************************************************************************************************************************

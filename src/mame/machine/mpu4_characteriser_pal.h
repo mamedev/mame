@@ -286,6 +286,28 @@ public:
 	static constexpr uint8_t topaction_characteriser_prot[8] = { 0x00, 0x68, 0x20, 0x48, 0x40, 0x28, 0x20, 0x00 }; // lack of evidence, guessed based on logical lamp patterns
 
 
+	// Games with sequence starting
+	// 00 c4 e8 58 b4 4c 30 40 e4 a8 18 94 48 34 64 c4 c8 7c f4 28 30 64 c0 ac 1c d0 68 70 04 a0 e8 3c f0 0c 30 60 c0 ec 1c b0 48 54 64 80 cc 3c d4 28 74 44 a0 ac 5c 94 2c 74 00 e0 8c 3c d4 0c 74 00
+	// used by
+	// Graffiti          "GRA 2.0"
+	//                   "GRA 2.1"
+	// Red Alert         "RA3 0.2"
+	// Pot Luck 100 Club "P1L 2.2"
+    //                   " PL 2.7"
+	// Flashlite         "FLT 1.0"
+	static constexpr uint8_t graff_characteriser_prot[8] = { 0x00, 0x60, 0x40, 0x60, 0x20, 0x40, 0x40, 0x20 }; // based on logical arrangements for m4ra__g set
+
+
+	// Games with sequence starting
+	// 00 50 40 14 64 50 24 50 64 54 20 74 40 30 60 10 64 74 64 50 04 34 60 50 44 74 44 10 00 14 00 14 60 50 64 10 44 10 24 50 00 50 64 54 64 50 24 70 64 10 24 74 40 54 64 10 04 74 40 50 24 50 64 00
+	// used by
+	// Hot Rod                      "HRC_1.0"
+	// Buccaneer                    "BUG 0.4"
+	//                              "BUS 0.1"
+    // All Cash Advance             "C2B 6.0"
+	static constexpr uint8_t buc_characteriser_prot[8] = { 0x00, 0x70, 0x50, 0x30, 0x10, 0x70, 0x50, 0x10 }; // based on matching m4hotrod__a and m4buc__2 with unprotected sets
+
+
 	/***************************************************************
 
 	 Lamp data below is definitely incorrect
@@ -309,11 +331,8 @@ public:
 	// games with sequence starting 00 50 10 24 54 00 60 50 34 30 00 74 10 04 74
 	static constexpr uint8_t premier_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 a0 88 38 94 2c 30 00 e4 c8 18 b4 4c 30
-	static constexpr uint8_t graff_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 50 40 14 64 50 24 50 64 54 20 74 40 30 60 10 64
-	static constexpr uint8_t buc_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
+
 
 	// games with sequence starting 00 44 44 64 4c 80 70 24 6c a8 b0 38 e4
 	static constexpr uint8_t pzmoney_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT

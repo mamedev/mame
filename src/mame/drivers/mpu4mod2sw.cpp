@@ -1938,15 +1938,15 @@ GAME(198?, m4supsl,   0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::nif
 /* Bwb */
 
 // 00 c4 e8 58 b4 4c 30 40 e4 a8 18 94 48 34 64 c4 c8 7c f4  (graff)
-GAME(199?, m4flshlt,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4flshltb, m4flshlt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 3)",GAME_FLAGS )
-GAME(199?, m4flshltc, m4flshlt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 4)",GAME_FLAGS )
-GAME(199?, m4flshltd, m4flshlt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 5)",GAME_FLAGS )
-GAME(199?, m4flshlte, m4flshlt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 6)",GAME_FLAGS )
-GAME(199?, m4flshltf, m4flshlt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 7)",GAME_FLAGS )
-GAME(199?, m4flshltg, m4flshlt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 8)",GAME_FLAGS )
+GAME(199?, m4flshlt,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (FLT 1.0, set 1)",GAME_FLAGS )
+GAME(199?, m4flshltb, m4flshlt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (FLT 1.0, set 2)",GAME_FLAGS )
+GAME(199?, m4flshltc, m4flshlt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (FLT 1.0, set 3)",GAME_FLAGS )
+GAME(199?, m4flshltd, m4flshlt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (FLT 1.0, set 4)",GAME_FLAGS )
+GAME(199?, m4flshlte, m4flshlt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (FLT 1.0, set 5)",GAME_FLAGS )
+GAME(199?, m4flshltf, m4flshlt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (FLT 1.0, set 6)",GAME_FLAGS )
+GAME(199?, m4flshltg, m4flshlt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::graff_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (FLT 1.0, set 7)",GAME_FLAGS )
 // 00 50 40 30 68 44 70 60 78 3c 34 28 64 10 68 04 58 7c (berseralt)
-GAME(199?, m4flshlta, m4flshlt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::berseralt_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4flshlta, m4flshlt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::berseralt_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Flashlite (Bwb) (MPU4) (BFL 0.5)",GAME_FLAGS )
 
 // 00 30 20 50 68 24 70 60 78 5c 5c 5c 7c 54 60 10 68 6c (blueflash)
 GAME(199?, m4blflsh,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::blueflash_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4_showstring, ROT0,   "Bwb","Blue Flash (Bwb) (MPU4) (set 1)",GAME_FLAGS )
