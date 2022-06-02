@@ -1998,7 +1998,7 @@ GAME(199?, m4centpt,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::act
 GAME(199?, m4centpta, m4centpt,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::actionbank_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Centrepoint (Barcrest) (v1.5) (MPU4)",GAME_FLAGS )
 
 // 00 14 10 a0 8c c8 68 50 b0 38 64 b4 18 e4 1c e4 8c f8 (m533)
-GAME(199?, m4clbcls,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::m533_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Club Classic (Barcrest) (MPU4)",GAME_FLAGS ) // set stake (still moans tho)
+GAME(199?, m4clbcls,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::m533_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Club Classic (Barcrest) (MPU4) (CI  1.1)",GAME_FLAGS ) // set stake (still moans tho)
 
 // V isn't usually a valid code.
 // expects chr sequence starting 00 18 70 44 58 30 44 18 7c 74 00 5c 7c 34 48 24 58 7c 7c 70 0c (tictak) (same as m4bdash__ax ?)
@@ -2019,8 +2019,8 @@ GAME(199?, m4c999d,   m4c999,    mod2_bootleg_fixedret<0x9a>, mpu4,            m
 GAME(199?, m4ambass,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::nifty_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Ambassador (Barcrest) (DAM, Dutch) (MPU4)",GAME_FLAGS )
 
 // 00 14 10 a0 8c c8 68 50 b0 38 64 b4 18 e4 1c (m533)
-GAME(199?, m4atlan,   0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::m533_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Atlantis (Barcrest) (DAT, Dutch) (MPU4)",GAME_FLAGS )
-GAME(199?, m4tridic,  m4atlan,    mod2_cheatchr_xxxx<mpu4_characteriser_pal::m533_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Triple Dice (Barcrest) (Dutch) (MPU4)",GAME_FLAGS ) // == Atlantis
+GAME(199?, m4atlan,   0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::m533_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Atlantis (Barcrest) (Dutch) (MPU4) (DAT 1.4)",GAME_FLAGS )
+GAME(199?, m4tridic,  m4atlan,    mod2_cheatchr_xxxx<mpu4_characteriser_pal::m533_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Triple Dice (Barcrest) (Dutch) (MPU4) (DAT 1.4)",GAME_FLAGS ) // == Atlantis
 
 // 00 84 c4 e4 4c 10 28 90 e8 78 34 28 b0 40 a4 (vivlv)
 GAME(199?, m4bjc,     0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::vivlv_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default_alt, ROT0,   "Barcrest","Black Jack Club (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
@@ -2053,7 +2053,7 @@ GAME(199?, m4meglnk,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::and
 GAME(199?, m4multwy,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::kingqn_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Multiway (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
 
 // 00 44 44 64 4c 80 70 24 6c a8 b0 38 e4 50 24 48 8c bc (pzmoney)
-GAME(199?, m4num1,    0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::pzmoney_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Number One (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4num1,    0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::pzmoney_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Number One (Barcrest) (Dutch) (MPU4) (DNO 1.7)",GAME_FLAGS )
 
 // 00 44 44 54 34 04 54 14 34 14 20 74 04 60 44 50 (clbveg)
 GAME(199?, m4nudup,   0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::clbveg_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Nudge Up (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
@@ -2168,13 +2168,13 @@ GAME(199?, m4nickd,   m4nick,     mod2_cheatchr_xxxx<mpu4_characteriser_pal::viz
 GAME(199?, m4nicke,   m4nick,     mod2_bootleg_fixedret<0x1b>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "bootleg","Nickelodeon (Barcrest) (bootleg) (MPU4)",GAME_FLAGS )
 
 // 00 14 04 94 a8 6c c4 30 8c e8 e0 bc d4 28 4c c0 38 (m574)
-GAME(199?, m4joljok,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::m574_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Jolly Joker (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4joljok,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::m574_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Jolly Joker (Barcrest) (MPU4) (JOJ 1.6)",GAME_FLAGS )
 
 // 00 14 04 94 a8 6c c4 30 8c e8 e0 bc d4 28 4c  (m574)
-GAME(199?, m4joltav,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::m574_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Jolly Taverner (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4joltav,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::m574_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Jolly Taverner (Barcrest) (MPU4) (TAV 1.3)",GAME_FLAGS )
 // 00 a0 a8 18 f4 2c 70 60 e4 e8 58 d4 2c 50 60   (viva_characteriser_prot)
-GAME(199?, m4joltava, m4joltav,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::viva_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Jolly Taverner (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
-GAME(199?, m4joltavb, m4joltav,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::viva_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Jolly Taverner (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
+GAME(199?, m4joltava, m4joltav,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::viva_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Jolly Taverner (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4joltavb, m4joltav,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::viva_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Jolly Taverner (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
 
 // this has a 'tri98' protection sequence check in ROM, but the code appears to have been hacked to expect a different response.
 GAME(199?, m4btclok,  0,          mod2_bootleg_fixedret<0x45>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "bootleg","Beat The Clock (Barcrest) (bootleg) (MPU4)",GAME_FLAGS )

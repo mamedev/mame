@@ -2523,7 +2523,7 @@ void mpu4_state::mpu4_std_6reel(machine_config &config)
 	REEL(config, m_reel[4], BARCREST_48STEP_REEL, 1, 3, 0x00, 2);
 	m_reel[4]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<4>));
 	REEL(config, m_reel[5], BARCREST_48STEP_REEL, 1, 3, 0x00, 2);
-	m_reel[4]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<4>));
+	m_reel[5]->optic_handler().set(FUNC(mpu4_state::reel_optic_cb<5>));
 }
 
 void mpu4_state::mpu4_type2_6reel(machine_config &config)

@@ -5578,7 +5578,7 @@ GAME_CUSTOM( 199?, m4bdash__a,  m4bdash,    "bdvarg.bin",   0x0000, 0x020000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4PRZMON_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::pzmoney_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::pzmoney_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // needs chr sequence starting 00 44 44 64 4c 80 70 24 6c a8  (pzmoney)
 // "(C)1991 BARCREST" and "FP8 0.1"
@@ -5618,7 +5618,7 @@ GAME_CUSTOM( 199?, m4przmon__p,    m4przmon,   "fpmy.p1",      0x0000, 0x010000,
 		ROM_LOAD( name, offset, length, hash ) \
 		M4PRZMNS_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent, mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::pzmoney_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::pzmoney_characteriser_prot>, mpu4, mpu4mod4oki_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // need chr sequence starting 00 44 44 64 4c 80 70 24 6c a8 b0 38 e4  (pzmoney)
 // "(C)1991 BARCREST" and "SPM 0.2"
@@ -7836,9 +7836,9 @@ ROM_START( m4supbjcd )
 ROM_END
 
 // protecton confirmed as m574, but doesn't read from lamp scramble, require stake set
-GAME(199?, m4supbjc,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m574_characteriser_prot>,    mpu420p,    mpu4mod4oki_machines_state, init_m4default,  ROT0,   "Barcrest","Super Blackjack Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4supbjca, m4supbjc,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m574_characteriser_prot>,    mpu420p,    mpu4mod4oki_machines_state, init_m4default,  ROT0,   "Barcrest","Super Blackjack Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
-GAME(199?, m4supbjcb, m4supbjc,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m574_characteriser_prot>,    mpu420p,    mpu4mod4oki_machines_state, init_m4default,  ROT0,   "Barcrest","Super Blackjack Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
-GAME(199?, m4supbjcc, m4supbjc,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m574_characteriser_prot>,    mpu420p,    mpu4mod4oki_machines_state, init_m4default,  ROT0,   "Barcrest","Super Blackjack Club (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
-GAME(199?, m4supbjcd, m4supbjc,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m574_characteriser_prot>,    mpu420p,    mpu4mod4oki_machines_state, init_m4default,  ROT0,   "Barcrest","Super Blackjack Club (Barcrest) (MPU4) (set 5)",GAME_FLAGS )
+GAME(199?, m4supbjc,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m574_characteriser_prot>,    mpu420p,    mpu4mod4oki_machines_state, init_m4default,  ROT0,   "Barcrest","Super Blackjack Club (Barcrest) (MPU4) (SBJ 3.1, set 1)",GAME_FLAGS )
+GAME(199?, m4supbjca, m4supbjc,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m574_characteriser_prot>,    mpu420p,    mpu4mod4oki_machines_state, init_m4default,  ROT0,   "Barcrest","Super Blackjack Club (Barcrest) (MPU4) (SBJ 3.1, set 2)",GAME_FLAGS )
+GAME(199?, m4supbjcb, m4supbjc,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m574_characteriser_prot>,    mpu420p,    mpu4mod4oki_machines_state, init_m4default,  ROT0,   "Barcrest","Super Blackjack Club (Barcrest) (MPU4) (SBJ 3.1, set 3)",GAME_FLAGS )
+GAME(199?, m4supbjcc, m4supbjc,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m574_characteriser_prot>,    mpu420p,    mpu4mod4oki_machines_state, init_m4default,  ROT0,   "Barcrest","Super Blackjack Club (Barcrest) (MPU4) (SBJ 3.1, set 4)",GAME_FLAGS )
+GAME(199?, m4supbjcd, m4supbjc,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m574_characteriser_prot>,    mpu420p,    mpu4mod4oki_machines_state, init_m4default,  ROT0,   "Barcrest","Super Blackjack Club (Barcrest) (MPU4) (SBJ 2.0)",GAME_FLAGS )
 

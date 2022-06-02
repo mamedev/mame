@@ -111,8 +111,6 @@ public:
 	// games with sequence starting 00 30 20 14 64 30 44 30 64 34 00 74 20
 	static constexpr uint8_t rhm_characteriser_prot[8] = { 0x00, 0x70, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00 }; // incomplete? doesn't seem correct for the lower rows of the roadhog set using it
 
-	// games with sequence starting 00 14 04 94 A8 6C C4 30 8C E8 E0 BC D4
-	static constexpr uint8_t m574_characteriser_prot[8] = { 0x03, 0x9F, 0x17, 0x9B, 0x93, 0x1F, 0x17, 0x13 };
 
 	// games with sequence starting 00 a0 a8 18 f4 2c 70 60 e4 e8
 	static constexpr uint8_t viva_characteriser_prot[8] = { 0x03, 0xE7, 0xA3, 0xC7, 0xC3, 0xA7, 0xA3, 0xC3 };
@@ -364,7 +362,65 @@ public:
     //                   "LST 0.9"
 	// Solid Silver Club "SOS 2.2"
     // Solid Silver Club "SOS 2.1"
-	static constexpr uint8_t luckystrike_characteriser_prot[8] = { 0x00, 0x50, 0x10, 0x50, 0x50, 0x10, 0x10, 0x10 }; // INCORRECT
+	static constexpr uint8_t luckystrike_characteriser_prot[8] = { 0x00, 0x50, 0x10, 0x50, 0x50, 0x10, 0x10, 0x10 }; // Lucky Strike matches unprotected sets
+
+
+	// Games with sequence starting
+	// 00 14 04 94 A8 6C C4 30 8C E8 E0 BC D4
+	// used by
+	// Andy's Great Escape           "AG5 3.0"
+	//                               "AG__2.0"
+	// Nudge Nudge Wink Wink Classic "NN5 0.2 / NN4 0.2"
+	//                               "CN1 0.1 / NN4 0.1"
+	//                               "CNU 0.2 / NN4 0.2"
+	//                               "NN4 0.2"
+	// Viva Espana                   "VE5 3.0"
+	// Lucky Las Vegas               "LLV 0.2"
+	//                               "LL8 0.1"
+	// Andy's Full House             "AFH 0.1"
+	//                               "AF3 0.1"
+	//                               "AF8 0.1"
+	//                               "AFT 0.3"
+	//                               "CA4 0.8"
+	//                               "CAT 0.2"
+	//                               "CAU 0.1 / CA4 0.1"
+	// Mad House                     "MH5 0.2"
+	//                               "MD8 0.1"
+	//                               "MAD 0.5"
+	//                               "MHT 0.2"
+	// Super Blackjack Club          "SBJ 3.1"
+	//                               "SBJ 2.0"
+	// Prize Spend Spend Spend       "PS8 0.1"
+	//                               "SSP 0.5"
+	// Super Streak                  "SP8 0.1"
+	//                               "SPS 0.8"
+	//                               "CS4 0.7"
+	//                               "CS4 0.4 / CST 0.4"
+	//                               "CS4 0.3 / CSU 0.3"
+	// Jolly Joker                   "JOJ 1.6"
+	// Jolly Taverner                "TAV 1.3"
+	// Club Double                   " CD 1.6"
+	static constexpr uint8_t m574_characteriser_prot[8] = { 0x03, 0x9F, 0x17, 0x9B, 0x93, 0x1F, 0x17, 0x13 };
+
+	// games with sequence starting
+	// 00 44 44 64 4c 80 70 24 6c a8 b0 38 e4
+	// used by
+	// Prize Money          "FP8 0.1"
+	//                      "FPM 0.3"
+	// Prize Money Showcase "SPM 0.2"
+	//                      "SM8 0.1"
+	// Brooklyn             "PFT 1.8" (doesn't use lamp scramble)
+	// Flash Cash           " FC 1.0" (doesn't use lamp scramble)
+	// Dutch Number One     "DNO 1.7" (doesn't use lamp scramble? doesn't boot)
+	static constexpr uint8_t pzmoney_characteriser_prot[8] = { 0x00, 0x68, 0x40, 0x68, 0x60, 0x48, 0x40, 0x40 }; // based on przmoney lamp patterns
+
+	// games with sequence starting
+	// 00 14 10 a0 8c c8 68 50 b0 38 64 b4 18
+	// used by
+	// Club Classic      "CI  1.1"
+	// Dutch Atlantis    "DAT 1.4"
+	// Dutch Twin Timer  "D2T 1.1"
+	static constexpr uint8_t m533_characteriser_prot[8] = { 0x00, 0x30, 0x10, 0x20, 0x20, 0x10, 0x10, 0x00 }; // based on clbcls lamp patterns
 
 
 	/***************************************************************
@@ -372,12 +428,6 @@ public:
 	 Lamp data below is definitely incorrect
 
 	***************************************************************/
-
-	// games with sequence starting 00 14 10 a0 8c c8 68 50 b0 38 64 b4 18
-	// these lamp values were in the Twin Timer set, but they're not used, so probably incorrect
-	static constexpr uint8_t m533_characteriser_prot[8] = { 0xFF, 0xFF, 0x10, 0x3F, 0x15, 0xFF, 0xFF, 0xFF };
-
-
 
 
 
@@ -389,18 +439,11 @@ public:
 	static constexpr uint8_t premier_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 
-
-
-	// games with sequence starting 00 44 44 64 4c 80 70 24 6c a8 b0 38 e4
-	static constexpr uint8_t pzmoney_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
-
-
 	// games with sequence starting 00 60 60 24 e0 e8 1c 74 c4 6c 14 84 e8 1c
 	static constexpr uint8_t actionbank_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 	// games with sequence starting 00 90 88 2c e0 d8 74 84 dc 74 00 d4 c8 6c a0 58 f4 cc ec 68
 	static constexpr uint8_t toplot_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
-
 
 	// games with sequence starting 00 18 70 44 58 30 44 18 7c 74 00 5c 7c 34 48 24 58
 	static constexpr uint8_t tictak_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
@@ -426,10 +469,8 @@ public:
 	// games with sequence starting 00 14 04 34 2c 44 34 24 3c 78 70 28 64
 	static constexpr uint8_t sunsetclub_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-
 	// games with sequence starting 00 18 c8 a4 0c 80 0c 90 34 30 00 58
 	static constexpr uint8_t doublediamond_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
-
 
 	// games with sequence starting 00 44 44 c4 68 14 8c 30 8c b8 d0 a8
 	static constexpr uint8_t cashencounters_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
