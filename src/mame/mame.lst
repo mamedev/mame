@@ -23297,6 +23297,7 @@ mm2a                            // Mephisto MM II
 mm2b                            // Mephisto MM II
 mm2c                            // Mephisto MM II
 mm2d                            // Mephisto MM II
+mm2e                            // Mephisto MM II
 bup                             // Mephisto B&P
 bupa                            // Mephisto B&P
 mm4                             // Mephisto MM IV
@@ -35462,6 +35463,7 @@ picno2                          // Konami Picno 2 (1993)
 dumpump                         //
 fidlstix                        //
 hoopitup                        //
+hoopitup21                      //
 hoopshot                        //
 jackbean                        //
 piggypas                        //
