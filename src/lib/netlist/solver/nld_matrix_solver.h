@@ -11,8 +11,14 @@
 /// \file nld_matrix_solver.h
 ///
 
-#include "nl_base.h"
+
+#include "../core/analog.h"
+#include "../core/device.h"
+#include "../core/device_macros.h"
+#include "../core/param.h"
+
 #include "nl_errstr.h"
+#include "nltypes.h"
 #include "plib/palloc.h"
 #include "plib/penum.h"
 #include "plib/pmatrix2d.h"
@@ -136,17 +142,17 @@ namespace netlist::solver
 
 		// special
 		, m_use_gabs(parent, prefix + "USE_GABS", defaults.m_use_gabs())
-		, m_min_timestep(m_dynamic_min_ts())
+		, m_min_time_step(m_dynamic_min_ts())
 		{
-			m_max_timestep = netlist_time::from_fp(plib::reciprocal(m_freq())).as_fp<decltype(m_max_timestep)>();
+			m_max_time_step = netlist_time::from_fp(plib::reciprocal(m_freq())).as_fp<decltype(m_max_time_step)>();
 
 			if (m_dynamic_ts)
 			{
-				m_max_timestep *= 1;//NL_FCONST(1000.0);
+				m_max_time_step *= 1;//NL_FCONST(1000.0);
 			}
 			else
 			{
-				m_min_timestep = m_max_timestep;
+				m_min_time_step = m_max_time_step;
 			}
 		}
 
@@ -171,8 +177,8 @@ namespace netlist::solver
 
 		param_logic_t m_use_gabs;
 
-		nl_fptype m_min_timestep;
-		nl_fptype m_max_timestep;
+		nl_fptype m_min_time_step;
+		nl_fptype m_max_time_step;
 	};
 
 
@@ -248,7 +254,7 @@ namespace netlist::solver
 		bool updates_net(const analog_net_t *net) const noexcept;
 
 		std::size_t dynamic_device_count() const noexcept { return m_dynamic_funcs.size(); }
-		std::size_t timestep_device_count() const noexcept { return m_step_funcs.size(); }
+		std::size_t time_step_device_count() const noexcept { return m_step_funcs.size(); }
 
 		/// \brief reschedule solver execution
 		///
@@ -266,13 +272,13 @@ namespace netlist::solver
 			// this should only occur outside of execution and thus
 			// using time should be safe.
 
-			[[maybe_unused]] const netlist_time new_timestep = solve(exec().time(), "solve_now");
+			[[maybe_unused]] const netlist_time new_time_step = solve(exec().time(), "solve_now");
 
 			update_inputs();
 
-			if (timestep_device_count() > 0)
+			if (time_step_device_count() > 0)
 			{
-				this->reschedule(netlist_time::from_fp(m_params.m_dynamic_ts ? m_params.m_min_timestep : m_params.m_max_timestep));
+				this->reschedule(netlist_time::from_fp(m_params.m_dynamic_ts ? m_params.m_min_time_step : m_params.m_max_time_step));
 			}
 		}
 
@@ -280,13 +286,13 @@ namespace netlist::solver
 		void change_state(F f)
 		{
 			// We only need to update the net first if this is a time stepping net
-			if (timestep_device_count() > 0)
+			if (time_step_device_count() > 0)
 			{
-				[[maybe_unused]] const netlist_time new_timestep = solve(exec().time(), "change_state");
+				[[maybe_unused]] const netlist_time new_time_step = solve(exec().time(), "change_state");
 				update_inputs();
 			}
 			f();
-			if (timestep_device_count() > 0)
+			if (time_step_device_count() > 0)
 			{
 				PFDEBUG(printf("here2\n");)
 				this->reschedule(netlist_time::from_fp(m_params.m_min_ts_ts()));
@@ -312,8 +318,8 @@ namespace netlist::solver
 			const net_list_t &nets,
 			const solver_parameters_t *params);
 
-		virtual void vsolve_non_dynamic() = 0;
-		virtual netlist_time compute_next_timestep(fptype cur_ts, fptype min_ts, fptype max_ts) = 0;
+		virtual void upstream_solve_non_dynamic() = 0;
+		virtual netlist_time compute_next_time_step(fptype cur_ts, fptype min_ts, fptype max_ts) = 0;
 		virtual bool check_err() const = 0;
 		virtual void store() = 0;
 		virtual void backup() = 0;
@@ -351,11 +357,11 @@ namespace netlist::solver
 		void sort_terms(matrix_sort_type_e sort);
 
 		void update_dynamic() noexcept;
-		void step(timestep_type ts_type, netlist_time delta) noexcept;
+		void step(time_step_type ts_type, netlist_time delta) noexcept;
 
 		int get_net_idx(const analog_net_t *net) const noexcept;
-		std::pair<int, int> get_left_right_of_diag(std::size_t irow, std::size_t idiag);
-		fptype get_weight_around_diag(std::size_t row, std::size_t diag);
+		std::pair<int, int> get_left_right_of_diagonal(std::size_t irow, std::size_t idiag);
+		fptype get_weight_around_diagonal(std::size_t row, std::size_t diag);
 
 		void add_term(std::size_t net_idx, terminal_t *term) noexcept(false);
 
@@ -374,9 +380,9 @@ namespace netlist::solver
 		state_var<std::size_t> m_stat_vsolver_calls;
 
 		state_var<netlist_time_ext> m_last_step;
-		plib::arena_vector<arena_type, nldelegate_ts> m_step_funcs;
-		plib::arena_vector<arena_type, nldelegate_dyn> m_dynamic_funcs;
-		plib::arena_vector<arena_type, device_arena::unique_ptr<proxied_analog_output_t>> m_inps;
+		plib::arena_vector<arena_type, nl_delegate_ts> m_step_funcs;
+		plib::arena_vector<arena_type, nl_delegate_dyn> m_dynamic_funcs;
+		plib::arena_vector<arena_type, device_arena::unique_ptr<proxied_analog_output_t>> m_inputs;
 
 		std::size_t m_ops;
 

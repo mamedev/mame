@@ -1447,7 +1447,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-		<software name="heimdall">
+	<software name="heimdall">
 		<!-- Source: redump.org - http://redump.org/disc/21039/
 		<rom name="Heimdall (USA).cue" size="2294" crc="d9024819" md5="efe0f4d6da5b56c260bf6af3b1ccf174" sha1="66e858090085673dbfdea26d06dd354504b2296d"/>
 		<rom name="Heimdall (USA) (Track 01).bin" size="25888464" crc="38d5dd04" md5="9c9d9dae336002fc2f74c8424c7f3ee6" sha1="2f858db859baf28d8b38db72bcc0b84b04ab8fe3"/>
@@ -1561,7 +1561,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-		<software name="joemont">
+	<software name="joemont">
 		<!-- Source: redump.org - http://redump.org/disc/20227/
 		<rom name="Joe Montana's NFL Football (USA).cue" size="761" crc="981e4777" md5="2bc3110fe8d93c90d4b1d4b9e40e222e" sha1="d9d0a8b6315ffc543cf59b0449010f66d19b6be0"/>
 		<rom name="Joe Montana's NFL Football (USA) (Track 1).bin" size="181819008" crc="989d8600" md5="e363615aa4a7c10c8fae378f15563ee3" sha1="24ecd405cd234a1ded9f9a39230d63fbfb566132"/>
@@ -5291,7 +5291,7 @@ Requires [disc swap]
 		<rom name="Media (CD-ROM)\BC Racers (1994)(Time Warner Interactive)(US).ccd" size="2990" crc="75ef5a02" md5="6d65d70b42192358761a2ad4cdd9a31e" sha1="64317ace80a4c67052a6f6174dafd1f86fd01a84"/>
 		<rom name="Media (CD-ROM)\BC Racers (1994)(Time Warner Interactive)(US).img" size="480673536" crc="5a313588" md5="5b537f47d1b36755e2fd7cda042fee04" sha1="a3233561fb73248e3cc09b542ce045b4b15a5a4a"/>
 		<rom name="Media (CD-ROM)\BC Racers (1994)(Time Warner Interactive)(US).sub" size="19619328" crc="ec7a4537" md5="1c1ffbdeeb5ca4644036544ede3bb7df" sha1="073b4e227275b69fb97d3d4add8f2b5f162d80ac"/>
-		    -->
+		-->
 		<description>BC Racers (USA)</description>
 		<year>1994</year>
 		<publisher>Core Design</publisher>
@@ -5917,7 +5917,7 @@ Requires [disc swap]
     This game was developed for the Sega Mega-CD system by Virtual Studio and was released in Europe.
     A stateside release never happened, but in 2014 Good Deal Games released a set of reproduction disc
     made from a prototype build of the US version of the game.
-    -->
+-->
 	<!--
 	<software name="smurfs">
 	    <description>The Smurfs (USA, Prototype)</description>

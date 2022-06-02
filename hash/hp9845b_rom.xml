@@ -74,7 +74,7 @@ license:CC0
 		<info name="serial" value="09845-65518" />
 
 		<part name="rom" interface="hp9845b_rom">
-					<!-- Correct BSC is probably 0x0b (or ROM wouldn't belong to LPU)-->
+			<!-- Correct BSC is probably 0x0b (or ROM wouldn't belong to LPU)-->
 			<feature name="base" value="0x0b5000"  />
 			<dataarea name="rom" size="0x4000" width="16" endianness="big">
 				<rom name="09845-65518-11_50-reva-io_lpu.bin" size="0x2000" crc="98bd769e" sha1="8c28f838982d1b77f5b5dfd0923869bcff755a78" offset="0x0000" />

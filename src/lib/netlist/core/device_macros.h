@@ -12,10 +12,6 @@
 //  MACROS / New Syntax
 //============================================================
 
-/// \brief Construct a netlist device name
-///
-#define NETLIB_NAME(chip) nld_ ## chip
-
 /// \brief Start a netlist device class.
 ///
 /// Used to start defining a netlist device class.
@@ -131,14 +127,14 @@ class NETLIB_NAME(name) : public delegator_t<base_device_t>
 ///  \endcode
 
 #define NETLIB_IS_TIMESTEP(expr)                                               \
-	public: virtual bool is_timestep() const  noexcept override { return expr; }
+	public: virtual bool is_time_step() const  noexcept override { return expr; }
 
 /// \brief Used to implement the time stepping code.
 ///
 /// Please see \ref NETLIB_IS_TIMESTEP for an example.
 
 #define NETLIB_TIMESTEPI()                                                     \
-	public: virtual void timestep(timestep_type ts_type, nl_fptype step)  noexcept override
+	public: virtual void time_step(time_step_type ts_type, nl_fptype step)  noexcept override
 
 /// \brief Used to implement the body of the time stepping code.
 ///
@@ -149,11 +145,11 @@ class NETLIB_NAME(name) : public delegator_t<base_device_t>
 /// \param cname Name of object as given to \ref NETLIB_OBJECT
 ///
 #define NETLIB_TIMESTEP(cname)                                                 \
-	void NETLIB_NAME(cname) :: timestep(timestep_type ts_type, nl_fptype step) noexcept
+	void NETLIB_NAME(cname) :: time_step(time_step_type ts_type, nl_fptype step) noexcept
 
-#define NETLIB_DELEGATE(name) nldelegate(&this_type :: name, this)
+#define NETLIB_DELEGATE(name) nl_delegate(&this_type :: name, this)
 
-#define NETLIB_DELEGATE_NOOP() nldelegate(&core_device_t::handler_noop, static_cast<core_device_t *>(this))
+#define NETLIB_DELEGATE_NOOP() nl_delegate(&core_device_t::handler_noop, static_cast<core_device_t *>(this))
 
 #define NETLIB_UPDATE_TERMINALSI() virtual void update_terminals() noexcept override
 #define NETLIB_HANDLERI(name) void name() noexcept

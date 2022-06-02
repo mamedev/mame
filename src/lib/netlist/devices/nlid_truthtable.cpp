@@ -15,7 +15,7 @@
 namespace netlist::devices {
 
 	template<std::size_t m_NI, std::size_t m_NO>
-	class NETLIB_NAME(truthtable_t) : public device_t
+	class NETLIB_NAME(truth_table_t) : public device_t
 	{
 	public:
 
@@ -25,9 +25,9 @@ namespace netlist::devices {
 		static constexpr const std::size_t m_size = (1 << (m_num_bits));
 		static constexpr const type_t m_outmask = ((1 << m_NO) - 1);
 
-		struct truthtable_t
+		struct truth_table_t
 		{
-			truthtable_t()
+			truth_table_t()
 			: m_timing_index{0}
 			{}
 
@@ -37,9 +37,9 @@ namespace netlist::devices {
 		};
 
 		template <class C>
-		nld_truthtable_t(C &owner, const pstring &name,
+		nld_truth_table_t(C &owner, const pstring &name,
 				const pstring &model,
-				truthtable_t &ttp, const std::vector<pstring> &desc)
+				truth_table_t &ttp, const std::vector<pstring> &desc)
 		: device_t(owner, name, model)
 #if USE_TT_ALTERNATIVE
 		, m_state(*this, "m_state", 0)
@@ -49,7 +49,7 @@ namespace netlist::devices {
 		/* FIXME: the family should provide the names of the power-terminals! */
 		, m_power_pins(*this)
 		{
-			m_activate = activate_delegate(& NETLIB_NAME(truthtable_t) :: incdec_active, this);
+			m_activate = activate_delegate(& NETLIB_NAME(truth_table_t) :: incdec_active, this);
 			set_hint_deactivate(true);
 			init(desc);
 		}
@@ -117,7 +117,7 @@ namespace netlist::devices {
 		void process() noexcept
 		{
 			netlist_time_ext mt(netlist_time_ext::zero());
-			type_t nstate(0);
+			type_t new_state(0);
 			type_t ign(m_ign);
 
 			if (doOUT)
@@ -127,16 +127,16 @@ namespace netlist::devices {
 					if (ign & 1)
 						I->activate();
 				for (std::size_t i = 0; i < m_NI; i++)
-					nstate |= (m_I[i]() << i);
+					new_state |= (m_I[i]() << i);
 #else
-				nstate = m_state;
+				new_state = m_state;
 				for (std::size_t i = 0; ign != 0; ign >>= 1, ++i)
 				{
 					if (ign & 1)
 					{
-						nstate &= ~(1 << i);
+						new_state &= ~(1 << i);
 						m_I[i].activate();
-						nstate |= (m_I[i]() << i);
+						new_state |= (m_I[i]() << i);
 					}
 				}
 #endif
@@ -145,16 +145,16 @@ namespace netlist::devices {
 				for (std::size_t i = 0; i < m_NI; i++)
 				{
 					m_I[i].activate();
-					nstate |= (m_I[i]() << i);
+					new_state |= (m_I[i]() << i);
 					mt = std::max(this->m_I[i].net().next_scheduled_time(), mt);
 				}
 
-			const type_t outstate(m_ttp.m_out_state[nstate]);
-			type_t out(outstate & m_outmask);
+			const type_t output_state(m_ttp.m_out_state[new_state]);
+			type_t out(output_state & m_outmask);
 
-			m_ign = outstate >> m_NO;
+			m_ign = output_state >> m_NO;
 
-			const auto *t(&m_ttp.m_timing_index[nstate * m_NO]);
+			const auto *t(&m_ttp.m_timing_index[new_state * m_NO]);
 
 			if (doOUT)
 				//for (std::size_t i = 0; i < m_NO; ++i)
@@ -172,7 +172,7 @@ namespace netlist::devices {
 				if (ign & 1)
 					I->inactivate();
 #if USE_TT_ALTERNATIVE
-			m_state = nstate;
+			m_state = new_state;
 #endif
 		}
 
@@ -199,7 +199,7 @@ namespace netlist::devices {
 		state_var<type_t>   m_state;
 #endif
 		state_var<type_t>   m_ign;
-		const truthtable_t  m_ttp;
+		const truth_table_t  m_ttp;
 		/* FIXME: the family should provide the names of the power-terminals! */
 		nld_power_pins m_power_pins;
 	};
@@ -332,9 +332,9 @@ namespace netlist::devices {
 		size_t m_size;
 	};
 
-	struct truthtable_parser
+	struct truth_table_parser
 	{
-		truthtable_parser(unsigned NO, unsigned NI,
+		truth_table_parser(unsigned NO, unsigned NI,
 				packed_int outs, uint_least8_t *timing, netlist_time *timing_nt)
 		: m_NO(NO)
 		, m_NI(NI)
@@ -349,7 +349,7 @@ namespace netlist::devices {
 		void parse(const std::vector<pstring> &truthtable);
 
 	private:
-		void parseline(unsigned cur, std::vector<pstring> list,
+		void parse_line(unsigned cur, std::vector<pstring> list,
 				tt_bitset state, std::uint_least64_t val, std::vector<uint_least8_t> &timing_index);
 
 		tt_bitset calculate_ignored_inputs(tt_bitset state) const;
@@ -370,7 +370,7 @@ namespace netlist::devices {
 	// ----------------------------------------------------------------------------------------
 
 	template<std::size_t m_NI, std::size_t m_NO>
-	void NETLIB_NAME(truthtable_t)<m_NI, m_NO>::init(const std::vector<pstring> &desc)
+	void NETLIB_NAME(truth_table_t)<m_NI, m_NO>::init(const std::vector<pstring> &desc)
 	{
 		pstring header = desc[0];
 
@@ -386,7 +386,7 @@ namespace netlist::devices {
 		for (std::size_t i=0; i < m_NI; i++)
 		{
 			inout[i] = plib::trim(inout[i]);
-			m_I.emplace_back(*this, inout[i], nldelegate(&NETLIB_NAME(truthtable_t)<m_NI, m_NO> :: inputs, this));
+			m_I.emplace_back(*this, inout[i], nl_delegate(&NETLIB_NAME(truth_table_t)<m_NI, m_NO> :: inputs, this));
 		}
 #else
 		for (std::size_t i=0; i < m_NI; i++)
@@ -425,22 +425,22 @@ namespace netlist::devices {
 	// ----------------------------------------------------------------------------------------
 
 	template<unsigned m_NI, unsigned m_NO>
-	class netlist_factory_truthtable_t : public factory::truthtable_base_element_t
+	class netlist_factory_truth_table_t : public factory::truth_table_base_element_t
 	{
 	public:
-		netlist_factory_truthtable_t(const pstring &name,
+		netlist_factory_truth_table_t(const pstring &name,
 			factory::properties &&props)
-		: truthtable_base_element_t(name, std::move(props))
+		: truth_table_base_element_t(name, std::move(props))
 		{ }
 
 		device_arena::unique_ptr<core_device_t> make_device(device_arena &pool, netlist_state_t &anetlist, const pstring &name) override
 		{
-			using tt_type = nld_truthtable_t<m_NI, m_NO>;
+			using tt_type = nld_truth_table_t<m_NI, m_NO>;
 
 			if (!m_ttbl)
 			{
-				m_ttbl = plib::make_unique<typename nld_truthtable_t<m_NI, m_NO>::truthtable_t>(pool);
-				truthtable_parser desc_s(m_NO, m_NI,
+				m_ttbl = plib::make_unique<typename nld_truth_table_t<m_NI, m_NO>::truth_table_t>(pool);
+				truth_table_parser desc_s(m_NO, m_NI,
 						packed_int(m_ttbl->m_out_state.data(), sizeof(m_ttbl->m_out_state[0]) * 8),
 						m_ttbl->m_timing_index.data(), m_ttbl->m_timing_nt.data());
 
@@ -450,10 +450,10 @@ namespace netlist::devices {
 			return plib::make_unique<tt_type>(pool, anetlist, name, m_family_name, *m_ttbl, m_desc);
 		}
 	private:
-		device_arena::unique_ptr<typename nld_truthtable_t<m_NI, m_NO>::truthtable_t> m_ttbl;
+		device_arena::unique_ptr<typename nld_truth_table_t<m_NI, m_NO>::truth_table_t> m_ttbl;
 	};
 
-	tt_bitset truthtable_parser::calculate_ignored_inputs(tt_bitset state) const
+	tt_bitset truth_table_parser::calculate_ignored_inputs(tt_bitset state) const
 	{
 		// Determine all inputs which may be ignored ...
 		tt_bitset ignore = 0;
@@ -515,7 +515,7 @@ namespace netlist::devices {
 	// parse line
 	// ----------------------------------------------------------------------------------------
 
-	void truthtable_parser::parseline(unsigned cur, std::vector<pstring> list,
+	void truth_table_parser::parse_line(unsigned cur, std::vector<pstring> list,
 			tt_bitset state, std::uint_least64_t val, std::vector<uint_least8_t> &timing_index)
 	{
 		pstring elem = plib::trim(list[cur]);
@@ -541,28 +541,28 @@ namespace netlist::devices {
 			nl_assert_always(false, "unknown input value (not 0, 1, or X)");
 		for (std::uint_least64_t i = start; i <= end; i++)
 		{
-			tt_bitset nstate = state;
+			tt_bitset new_state = state;
 			if (i==1)
-				nstate.set(cur);
+				new_state.set(cur);
 
 			if (cur < m_num_bits - 1)
 			{
-				parseline(cur + 1, list, nstate, val, timing_index);
+				parse_line(cur + 1, list, new_state, val, timing_index);
 			}
 			else
 			{
 				// cutoff previous inputs and outputs for ignore
-				if (m_out_state[nstate] != m_out_state.mask() &&  m_out_state[nstate] != val)
+				if (m_out_state[new_state] != m_out_state.mask() &&  m_out_state[new_state] != val)
 					throw nl_exception(plib::pfmt("Error in truth table: State {1:04} already set, {2} != {3}\n")
-							.x(nstate.as_uint())(m_out_state[nstate])(val) );
-				m_out_state.set(nstate, val);
+							.x(new_state.as_uint())(m_out_state[new_state])(val) );
+				m_out_state.set(new_state, val);
 				for (std::size_t j=0; j<m_NO; j++)
-					m_timing[nstate * m_NO + j] = timing_index[j];
+					m_timing[new_state * m_NO + j] = timing_index[j];
 			}
 		}
 	}
 
-	void truthtable_parser::parse(const std::vector<pstring> &truthtable)
+	void truth_table_parser::parse(const std::vector<pstring> &truthtable)
 	{
 		unsigned line = 0;
 
@@ -613,7 +613,7 @@ namespace netlist::devices {
 				tindex.push_back(k); //[j] = k;
 			}
 
-			parseline(0, inout, 0 , val, tindex);
+			parse_line(0, inout, 0 , val, tindex);
 			if (line < truthtable.size())
 				ttline = truthtable[line];
 			else
@@ -658,7 +658,7 @@ namespace netlist::devices {
 
 namespace netlist::factory {
 
-	truthtable_base_element_t::truthtable_base_element_t(const pstring &name,
+	truth_table_base_element_t::truth_table_base_element_t(const pstring &name,
 		properties &&props)
 	: factory::element_t(name, std::move(props))
 	, m_family_name(config::DEFAULT_LOGIC_FAMILY())
@@ -666,7 +666,7 @@ namespace netlist::factory {
 	}
 
 	#define ENTRYY(n, m, s)    case (n * 100 + m): \
-		{ using xtype = devices::netlist_factory_truthtable_t<n, m>; \
+		{ using xtype = devices::netlist_factory_truth_table_t<n, m>; \
 			auto cs=s; \
 			ret = plib::make_unique<xtype, host_arena>(desc.name, std::move(cs)); } \
 			break
@@ -676,9 +676,9 @@ namespace netlist::factory {
 						ENTRYY(n, 7, s); ENTRYY(n, 8, s); ENTRYY(n, 9, s); \
 						ENTRYY(n, 10, s)
 
-	host_arena::unique_ptr<truthtable_base_element_t> truthtable_create(tt_desc &desc, properties &&props)
+	host_arena::unique_ptr<truth_table_base_element_t> truth_table_create(tt_desc &desc, properties &&props)
 	{
-		host_arena::unique_ptr<truthtable_base_element_t> ret;
+		host_arena::unique_ptr<truth_table_base_element_t> ret;
 
 		switch (desc.ni * 100 + desc.no)
 		{

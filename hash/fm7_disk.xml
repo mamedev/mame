@@ -374,9 +374,9 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="gambler">
 	<!-- Keys listed in readme are as follows:
-キー操作/ リターン:チー F1:リーチ F2:ポン F3:カン F4:和了 F10:九種九牌
-	 F5:指導機能ON/OFF F6:サウンドON/OFF F7:オープンモード F8:オートモード
-	 ESC(XM7:半角/全角):ポーズ・点数表示 HOME:捨て牌指導   -->
+	     キー操作/ リターン:チー F1:リーチ F2:ポン F3:カン F4:和了 F10:九種九牌
+	     F5:指導機能ON/OFF F6:サウンドON/OFF F7:オープンモード F8:オートモード
+	     ESC(XM7:半角/全角):ポーズ・点数表示 HOME:捨て牌指導 -->
 		<description>Gambler Jikochuushinha</description>
 		<year>1989</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
@@ -858,7 +858,7 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<!-- No sound on the FM-7, FM sound only?  -->
+	<!-- No sound on the FM-7, FM sound only? -->
 	<software name="psychwar">
 		<description>Psychic War - Cosmic Soldier 2</description>
 		<year>1988</year>
@@ -2084,7 +2084,7 @@ systems, for the moment they stay here!
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-					<rom name="game pack 1.d77" size="348848" crc="732e4275" sha1="ef1c29f4ea79bd73ec994bec103d0f65bfbf0f18" offset="0"/>
+				<rom name="game pack 1.d77" size="348848" crc="732e4275" sha1="ef1c29f4ea79bd73ec994bec103d0f65bfbf0f18" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2096,7 +2096,7 @@ systems, for the moment they stay here!
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-					<rom name="game pack 2.d77" size="348848" crc="0efd8e5d" sha1="d85f66b51bfb1e8c63a27bbeaf0d2d0fc1784304" offset="0"/>
+				<rom name="game pack 2.d77" size="348848" crc="0efd8e5d" sha1="d85f66b51bfb1e8c63a27bbeaf0d2d0fc1784304" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2108,7 +2108,7 @@ systems, for the moment they stay here!
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-					<rom name="game pack 3.d77" size="348848" crc="652a9aec" sha1="b7bfd70cbb52b086704f6a3b98556ecc83733032" offset="0"/>
+				<rom name="game pack 3.d77" size="348848" crc="652a9aec" sha1="b7bfd70cbb52b086704f6a3b98556ecc83733032" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2120,7 +2120,7 @@ systems, for the moment they stay here!
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-					<rom name="game pack 4.d77" size="348848" crc="ad232598" sha1="711552ffe2ce4439a6f389fe2d92938d268995fc" offset="0"/>
+				<rom name="game pack 4.d77" size="348848" crc="ad232598" sha1="711552ffe2ce4439a6f389fe2d92938d268995fc" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

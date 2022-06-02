@@ -137,6 +137,8 @@ void thepit_state::video_start()
 
 	m_graphics_bank = 0;    /* only used in intrepid */
 
+	m_vsync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(thepit_state::vsync_callback), this));
+
 	save_item(NAME(m_graphics_bank));
 	save_item(NAME(m_flip_x));
 	save_item(NAME(m_flip_y));
@@ -171,11 +173,10 @@ WRITE_LINE_MEMBER(thepit_state::flip_screen_x_w)
 
 	int flip = m_flip_x ? TILEMAP_FLIPX : 0;
 	if (m_flip_y)
-		flip |= TILEMAP_FLIPY ;
+		flip |= TILEMAP_FLIPY;
 
 	m_tilemap->set_flip(flip);
 	m_solid_tilemap->set_flip(flip);
-
 }
 
 
@@ -185,11 +186,10 @@ WRITE_LINE_MEMBER(thepit_state::flip_screen_y_w)
 
 	int flip = m_flip_x ? TILEMAP_FLIPX : 0;
 	if (m_flip_y)
-		flip |= TILEMAP_FLIPY ;
+		flip |= TILEMAP_FLIPY;
 
 	m_tilemap->set_flip(flip);
 	m_solid_tilemap->set_flip(flip);
-
 }
 
 
@@ -205,14 +205,7 @@ uint8_t thepit_state::input_port_0_r()
 {
 	/* Read either the real or the fake input ports depending on the
 	   horizontal flip switch. (This is how the real PCB does it) */
-	if (m_flip_x)
-	{
-		return ioport("IN2")->read();
-	}
-	else
-	{
-		return ioport("IN0")->read();
-	}
+	return ~m_inputmux->output_r();
 }
 
 
@@ -279,18 +272,10 @@ uint32_t thepit_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	const rectangle spritevisiblearea(2*8+1, 32*8-1, 2*8, 30*8-1);
 	const rectangle spritevisibleareaflipx(0*8, 30*8-2, 2*8, 30*8-1);
 
-	offs_t offs;
-
-	for (offs = 0; offs < 32; offs++)
+	for (int offs = 0; offs < 32; offs++)
 	{
-		int xshift = m_flip_x ? 128 : 0;
-		int yshift = m_flip_y ? -8 : 0;
-
-		m_tilemap->set_scrollx(offs, xshift);
-		m_solid_tilemap->set_scrollx(offs, xshift);
-
-		m_tilemap->set_scrolly(offs, yshift + m_attributesram[offs << 1]);
-		m_solid_tilemap->set_scrolly(offs, yshift + m_attributesram[offs << 1]);
+		m_tilemap->set_scrolly(offs, m_attributesram[offs << 1]);
+		m_solid_tilemap->set_scrolly(offs, m_attributesram[offs << 1]);
 	}
 
 	/* low priority tiles */
@@ -311,20 +296,13 @@ uint32_t thepit_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 uint32_t thepit_state::screen_update_desertdan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	offs_t offs;
 	const rectangle spritevisiblearea(0*8+1, 24*8-1, 2*8, 30*8-1);
 	const rectangle spritevisibleareaflipx(8*8, 32*8-2, 2*8, 30*8-1);
 
-	for (offs = 0; offs < 32; offs++)
+	for (int offs = 0; offs < 32; offs++)
 	{
-		int xshift = m_flip_x ? 128 : 0;
-		int yshift = m_flip_y ? -8 : 0;
-
-		m_tilemap->set_scrollx(offs, xshift);
-		m_solid_tilemap->set_scrollx(offs, xshift);
-
-		m_tilemap->set_scrolly(offs, yshift + m_attributesram[offs << 1]);
-		m_solid_tilemap->set_scrolly(offs, yshift + m_attributesram[offs << 1]);
+		m_tilemap->set_scrolly(offs, m_attributesram[offs << 1]);
+		m_solid_tilemap->set_scrolly(offs, m_attributesram[offs << 1]);
 	}
 
 	/* low priority tiles */

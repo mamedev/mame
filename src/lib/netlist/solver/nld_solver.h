@@ -8,8 +8,11 @@
 /// \file nld_solver.h
 ///
 
-#include "../nl_base.h"
 #include "../plib/pstream.h"
+
+#include "core/core_device.h"
+#include "core/logic.h"
+#include "core/state_var.h"
 #include "nld_matrix_solver.h"
 
 #include <map>
@@ -75,7 +78,7 @@ namespace netlist::devices
 		queue_type m_queue;
 
 		template <typename FT, int SIZE>
-		solver_ptr create_solver(std::size_t size, const pstring &solvername,
+		solver_ptr create_solver(std::size_t size, const pstring &solver_name,
 			const solver::solver_parameters_t *params,net_list_t &nets);
 
 		template <typename FT>

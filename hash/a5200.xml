@@ -175,8 +175,8 @@ Possible Undumped protos: -
 		</part>
 	</software>
 
-<!--  Barroom Baseball.  This prototype is for an standup arcade environment involving coins/timer and is based on Real Sports
-        Baseball.  While this functions in an Atari 5200 as a cartridge image, it is not a home cartridge.  Therefore, it is commented. -->
+<!-- Barroom Baseball.  This prototype is for an standup arcade environment involving coins/timer and is based on Real Sports
+     Baseball.  While this functions in an Atari 5200 as a cartridge image, it is not a home cartridge.  Therefore, it is commented. -->
 
 <!--
     <software name="barbball">

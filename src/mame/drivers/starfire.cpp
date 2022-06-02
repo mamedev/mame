@@ -123,7 +123,7 @@ void fireone_state::sound_w(offs_t offset, uint8_t data)
 		m_sound_left_torpedo->write(BIT(data, 0));
 		m_sound_left_partial_hit->write(BIT(data, 1));
 		m_sound_left_boom->write(BIT(data, 2));
-		m_player_select = BIT(~data, 3);
+		m_player_select = BIT(data, 3);
 		m_pit->write_gate0(BIT(data, 4));
 		m_pit->write_gate1(BIT(data, 5));
 		m_pit->write_gate2(BIT(data, 6));
@@ -193,18 +193,6 @@ NETDEV_ANALOG_CALLBACK_MEMBER(starfire_state::sound_out_cb)
 
 uint8_t fireone_state::input_r(offs_t offset)
 {
-	static const uint8_t s_paddle_map[64] =
-	{
-		0x00,0x01,0x03,0x02,0x06,0x07,0x05,0x04,
-		0x0c,0x0d,0x0f,0x0e,0x0a,0x0b,0x09,0x08,
-		0x18,0x19,0x1b,0x1a,0x1e,0x1f,0x1d,0x1c,
-		0x14,0x15,0x17,0x16,0x12,0x13,0x11,0x10,
-		0x30,0x31,0x33,0x32,0x36,0x37,0x35,0x34,
-		0x3c,0x3d,0x3f,0x3e,0x3a,0x3b,0x39,0x38,
-		0x28,0x29,0x2b,0x2a,0x2e,0x2f,0x2d,0x2c,
-		0x24,0x25,0x27,0x26,0x22,0x23,0x21,0x20
-	};
-
 	switch (offset & 15)
 	{
 		case 0:
@@ -214,7 +202,7 @@ uint8_t fireone_state::input_r(offs_t offset)
 		case 2:
 		{
 			const uint8_t input = m_controls[m_player_select]->read();
-			return (input & 0xc0) | s_paddle_map[input & 0x3f];
+			return input ^ BIT(input, 1, 5); // paddle portion is a 6-bit Gray code
 		}
 		default: return 0xff;
 	}
@@ -316,25 +304,25 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( fireone )
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW:!1,!2")
 	PORT_DIPSETTING(    0x03, "2 Coins/1 Player" )
 	PORT_DIPSETTING(    0x02, "2 Coins/1 or 2 Players" )
 	PORT_DIPSETTING(    0x00, "1 Coin/1 Player" )
 	PORT_DIPSETTING(    0x01, "1 Coin/1 or 2 Players" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Time" )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Game_Time ) )    PORT_DIPLOCATION("SW:!3,!4")
 	PORT_DIPSETTING(    0x00, "75 Sec" )
 	PORT_DIPSETTING(    0x04, "90 Sec" )
 	PORT_DIPSETTING(    0x08, "105 Sec" )
 	PORT_DIPSETTING(    0x0c, "120 Sec" )
-	PORT_DIPNAME( 0x30, 0x00, "Bonus difficulty" )
+	PORT_DIPNAME( 0x30, 0x00, "Bonus difficulty" )      PORT_DIPLOCATION("SW:!5,!6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW:!7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
+	PORT_SERVICE_DIPLOC(0x80, IP_ACTIVE_HIGH, "SW:!8" )
 
 	PORT_START("SYSTEM")    /* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )

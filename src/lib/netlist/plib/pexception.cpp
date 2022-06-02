@@ -96,17 +96,17 @@ namespace plib {
 	}
 
 
-	fpexception_e::fpexception_e(const pstring &text)
+	fp_exception_e::fp_exception_e(const pstring &text)
 		: pexception(pfmt("Exception error: {}")(text))
 	{
 	}
 
 
-	bool fpsignalenabler::m_enable = false; // NOLINT
+	bool fp_signal_enabler::m_enable = false; // NOLINT
 
 	//FIXME: mingw needs to be compiled with `-fnon-call-exceptions`
 
-	fpsignalenabler::fpsignalenabler(unsigned fpexceptions)
+	fp_signal_enabler::fp_signal_enabler(unsigned fpexceptions)
 	{
 	#if HAS_FEENABLE_EXCEPT
 		if (m_enable)
@@ -137,7 +137,7 @@ namespace plib {
 	#endif
 	}
 
-	fpsignalenabler::~fpsignalenabler()
+	fp_signal_enabler::~fp_signal_enabler()
 	{
 	#if HAS_FEENABLE_EXCEPT
 		if (m_enable)
@@ -153,7 +153,7 @@ namespace plib {
 	#endif
 	}
 
-	bool fpsignalenabler::supported()
+	bool fp_signal_enabler::supported()
 	{
 	#if HAS_FEENABLE_EXCEPT
 		return true;
@@ -164,7 +164,7 @@ namespace plib {
 	#endif
 	}
 
-	bool fpsignalenabler::global_enable(bool enable)
+	bool fp_signal_enabler::global_enable(bool enable)
 	{
 		bool old = m_enable;
 		m_enable = enable;

@@ -19826,7 +19826,7 @@ TODO:
 		<publisher>システムソフト (SystemSoft)</publisher>
 		<info name="alt_title" value="フィニッシュホールド２ ＴＡＧ" />
 		<info name="release" value="19960322" />
-		 <!-- 001J0283TA 100001 -->
+		<!-- 001J0283TA 100001 -->
 		<info name="usage" value="Requires HDD installation, and the serial number printed on registration card to pass the protection check. Run INST.EXE or SSHDINST.EXE from DOS." />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>

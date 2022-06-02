@@ -73,7 +73,7 @@ namespace netlist::devices
 		{
 		}
 
-		explicit nld_power_pins(device_t &owner, nldelegate delegate)
+		explicit nld_power_pins(device_t &owner, nl_delegate delegate)
 		: m_VCC(owner, owner.logic_family()->vcc_pin(), delegate)
 		, m_GND(owner, owner.logic_family()->gnd_pin(), delegate)
 		{
@@ -90,7 +90,7 @@ namespace netlist::devices
 		// Some devices like the 74LS629 have two pairs of supply pins.
 		explicit nld_power_pins(device_t &owner,
 			const pstring &vcc, const pstring &gnd,
-			nldelegate delegate)
+			nl_delegate delegate)
 		: m_VCC(owner, vcc, delegate)
 		, m_GND(owner, gnd, delegate)
 		{
@@ -120,7 +120,7 @@ namespace netlist::devices
 		NETLIB_CONSTRUCTOR(netlistparams)
 		, m_use_deactivate(*this, "USE_DEACTIVATE", false)
 		, m_startup_strategy(*this, "STARTUP_STRATEGY", 0)
-		, m_mos_capmodel(*this, "DEFAULT_MOS_CAPMODEL", 2)
+		, m_mos_cap_model(*this, "DEFAULT_MOS_CAPMODEL", 2)
 		, m_max_link_loops(*this, "MAX_LINK_RESOLVE_LOOPS", 100)
 		{
 		}
@@ -129,7 +129,7 @@ namespace netlist::devices
 	public:
 		param_logic_t m_use_deactivate;
 		param_num_t<unsigned>   m_startup_strategy;
-		param_num_t<unsigned>   m_mos_capmodel;
+		param_num_t<unsigned>   m_mos_cap_model;
 		//! How many times do we try to resolve links (connections)
 		param_num_t<unsigned>   m_max_link_loops;
 	};

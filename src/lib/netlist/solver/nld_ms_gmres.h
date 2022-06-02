@@ -50,7 +50,7 @@ namespace netlist::solver
 				terms_for_net_t & row = this->m_terms[k];
 				for (const auto &nz_j : row.m_nz)
 				{
-					fill[k][static_cast<mattype>(nz_j)] = 0;
+					fill[k][static_cast<matrix_type>(nz_j)] = 0;
 				}
 			}
 
@@ -73,15 +73,15 @@ namespace netlist::solver
 						}
 				}
 				nl_assert(cnt == this->m_terms[k].rail_start());
-				this->m_mat_ptr[k][this->m_terms[k].rail_start()] = &m_ops.m_mat.A[m_ops.m_mat.diag[k]];
+				this->m_mat_ptr[k][this->m_terms[k].rail_start()] = &m_ops.m_mat.A[m_ops.m_mat.diagonal[k]];
 			}
 		}
 
-		void vsolve_non_dynamic() override;
+		void upstream_solve_non_dynamic() override;
 
 	private:
 
-		using mattype = typename plib::pmatrix_cr<arena_type, FT, SIZE>::index_type;
+		using matrix_type = typename plib::pmatrix_cr<arena_type, FT, SIZE>::index_type;
 
 		//plib::mat_precondition_none<FT, SIZE> m_ops;
 		plib::mat_precondition_ILU<arena_type, FT, SIZE> m_ops;
@@ -94,7 +94,7 @@ namespace netlist::solver
 	// ----------------------------------------------------------------------------------------
 
 	template <typename FT, int SIZE>
-	void matrix_solver_GMRES_t<FT, SIZE>::vsolve_non_dynamic()
+	void matrix_solver_GMRES_t<FT, SIZE>::upstream_solve_non_dynamic()
 	{
 		const std::size_t iN = this->size();
 
@@ -118,7 +118,7 @@ namespace netlist::solver
 		if (gsl > iter)
 		{
 			this->m_iterative_fail++;
-			matrix_solver_direct_t<FT, SIZE>::vsolve_non_dynamic();
+			matrix_solver_direct_t<FT, SIZE>::upstream_solve_non_dynamic();
 		}
 
 	}

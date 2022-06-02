@@ -56,7 +56,7 @@ namespace netlist::devices {
 };
 
 	// -----------------------------------------------------------------------------
-	// varclock
+	// variable clock
 	// -----------------------------------------------------------------------------
 
 	NETLIB_OBJECT(varclock)
@@ -71,17 +71,24 @@ namespace netlist::devices {
 		{
 			if (!m_func().empty())
 			{
-				std::vector<pstring> inps;
-				inps.emplace_back("T");
+				std::vector<pstring> inputs;
+
+				m_I.reserve(m_N());
+				inputs.reserve(m_N() + 1);
+				m_vals.reserve(m_N() + 1);
+
+				// add time parameter to the front
+				inputs.emplace_back("T");
 				m_vals.push_back(nlconst::zero());
-				for (int i=0; i < m_N(); i++)
+
+				for (std::uint64_t i=0; i < m_N(); i++)
 				{
-					pstring inpname = plib::pfmt("A{1}")(i);
-					m_I.push_back(owner.template make_pool_object<analog_input_t>(*this, inpname, NETLIB_DELEGATE(fb)));
-					inps.push_back(inpname);
+					pstring input_name = plib::pfmt("A{1}")(i);
+					m_I.push_back(owner.template make_pool_object<analog_input_t>(*this, input_name, NETLIB_DELEGATE(fb)));
+					inputs.push_back(input_name);
 					m_vals.push_back(nlconst::zero());
 				}
-				m_compiled->compile(m_func(), inps);
+				m_compiled->compile(m_func(), inputs);
 			}
 			connect("FB", "Q");
 		}
@@ -101,7 +108,7 @@ namespace netlist::devices {
 		}
 
 		using pf_type = plib::pfunction<nl_fptype>;
-		param_int_t m_N;
+		param_num_t<std::uint64_t> m_N;
 		param_str_t m_func;
 		logic_input_t m_feedback;
 		logic_output_t m_Q;
@@ -242,12 +249,12 @@ namespace netlist::devices {
 		, m_p_ROUT(*this, "ROUT", nlconst::magic(50.0))
 
 		{
-			register_subalias("I", "m_RIN.1");
-			register_subalias("G", "m_RIN.2");
+			register_sub_alias("I", "m_RIN.1");
+			register_sub_alias("G", "m_RIN.2");
 			connect("_I", "m_RIN.1");
 
-			register_subalias("_OP", "m_ROUT.1");
-			register_subalias("Q", "m_ROUT.2");
+			register_sub_alias("_OP", "m_ROUT.1");
+			register_sub_alias("Q", "m_ROUT.2");
 			connect("_Q", "m_ROUT.1");
 		}
 
@@ -264,8 +271,8 @@ namespace netlist::devices {
 			m_Q.push(m_I());
 		}
 
-		analog::NETLIB_NAME(twoterm) m_RIN;
-		analog::NETLIB_NAME(twoterm) m_ROUT;
+		analog::NETLIB_NAME(two_terminal) m_RIN;
+		analog::NETLIB_NAME(two_terminal) m_ROUT;
 		analog_input_t m_I;
 		analog_output_t m_Q;
 
@@ -281,21 +288,26 @@ namespace netlist::devices {
 	{
 		NETLIB_CONSTRUCTOR(function)
 		, m_N(*this, "N", 1)
-		, m_func(*this, "FUNC", "A0")
+		, m_function(*this, "FUNC", "A0")
 		, m_thresh(*this, "THRESH", nlconst::zero())
 		, m_Q(*this, "Q")
 		, m_compiled(*this, "m_compiled")
 		, m_last(*this, "m_last")
 		{
-			std::vector<pstring> inps;
-			for (int i=0; i < m_N(); i++)
+			std::vector<pstring> inputs;
+
+			m_I.reserve(m_N());
+			inputs.reserve(m_N());
+			m_values.reserve(m_N());
+
+			for (uint64_t i=0; i < m_N(); i++)
 			{
-				pstring inpname = plib::pfmt("A{1}")(i);
-				m_I.push_back(owner.template make_pool_object<analog_input_t>(*this, inpname, NETLIB_DELEGATE(inputs)));
-				inps.push_back(inpname);
-				m_vals.push_back(nlconst::zero());
+				pstring input_name = plib::pfmt("A{1}")(i);
+				m_I.push_back(owner.template make_pool_object<analog_input_t>(*this, input_name, NETLIB_DELEGATE(inputs)));
+				inputs.push_back(input_name);
+				m_values.push_back(nlconst::zero());
 			}
-			m_compiled->compile(m_func(), inps);
+			m_compiled->compile(m_function(), inputs);
 		}
 
 	protected:
@@ -308,9 +320,9 @@ namespace netlist::devices {
 		{
 			for (std::size_t i = 0; i < static_cast<unsigned>(m_N()); i++)
 			{
-				m_vals[i] = (*m_I[i])();
+				m_values[i] = (*m_I[i])();
 			}
-			auto result = m_compiled->evaluate(m_vals);
+			auto result = m_compiled->evaluate(m_values);
 			if (plib::abs(m_last - result) >= m_thresh)
 			{
 				m_Q.push(result);
@@ -320,13 +332,13 @@ namespace netlist::devices {
 
 	private:
 		using pf_type = plib::pfunction<nl_fptype>;
-		param_int_t m_N;
-		param_str_t m_func;
+		param_num_t<std::uint64_t> m_N;
+		param_str_t m_function;
 		param_fp_t m_thresh;
 		analog_output_t m_Q;
 		std::vector<device_arena::unique_ptr<analog_input_t>> m_I;
 
-		pf_type::values_container m_vals;
+		pf_type::values_container m_values;
 		state_var<pf_type> m_compiled;
 		state_var<nl_fptype> m_last;
 
@@ -345,8 +357,8 @@ namespace netlist::devices {
 		, m_I(*this, "I", NETLIB_DELEGATE(input))
 		, m_last_state(*this, "m_last_state", 0)
 		{
-			register_subalias("1", "_R.1");
-			register_subalias("2", "_R.2");
+			register_sub_alias("1", "_R.1");
+			register_sub_alias("2", "_R.2");
 		}
 
 		NETLIB_RESETI()
@@ -403,9 +415,9 @@ namespace netlist::devices {
 		, m_power_pins(*this)
 		{
 			// connect and register pins
-			register_subalias("1", "_R1.1");
-			register_subalias("2", "_R1.2");
-			register_subalias("3", "_R2.2");
+			register_sub_alias("1", "_R1.1");
+			register_sub_alias("2", "_R1.2");
+			register_sub_alias("3", "_R2.2");
 			connect("_R1.2", "_R2.1");
 		}
 
@@ -550,8 +562,8 @@ namespace netlist::devices {
 		, m_dis(*this, "m_dis",m_sigma())
 		{
 
-			register_subalias("1", "m_T.1");
-			register_subalias("2", "m_T.2");
+			register_sub_alias("1", "m_T.1");
+			register_sub_alias("2", "m_T.2");
 		}
 
 	private:
@@ -569,7 +581,7 @@ namespace netlist::devices {
 			m_T.set_G_V_I(plib::reciprocal(m_RI()), nlconst::zero(), nlconst::zero());
 		}
 
-		analog::NETLIB_SUB(twoterm) m_T;
+		analog::NETLIB_SUB(two_terminal) m_T;
 		logic_input_t m_I;
 		param_fp_t m_RI;
 		param_fp_t m_sigma;

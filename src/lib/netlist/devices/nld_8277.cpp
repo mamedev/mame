@@ -84,22 +84,22 @@ namespace netlist::devices {
 		, m_last_CLKB(*this, "m_last_CLKB", 0)
 		// FIXME: needs family!
 		{
-			register_subalias("D0A", "A.D0");
-			register_subalias("D1A", "A.D1");
-			register_subalias("DSA", "A.DS");
-			register_subalias("Q7A", "A.Q7");
-			register_subalias("Q7QA", "A.Q7Q");
-			register_subalias("D0B", "B.D0");
-			register_subalias("D1B", "B.D1");
-			register_subalias("DSB", "B.DS");
-			register_subalias("Q7B", "B.Q7");
-			register_subalias("Q7QB", "B.Q7Q");
+			register_sub_alias("D0A", "A.D0");
+			register_sub_alias("D1A", "A.D1");
+			register_sub_alias("DSA", "A.DS");
+			register_sub_alias("Q7A", "A.Q7");
+			register_sub_alias("Q7QA", "A.Q7Q");
+			register_sub_alias("D0B", "B.D0");
+			register_sub_alias("D1B", "B.D1");
+			register_sub_alias("DSB", "B.DS");
+			register_sub_alias("Q7B", "B.Q7");
+			register_sub_alias("Q7QB", "B.Q7Q");
 
 			connect("A.VCC", "B.VCC");
 			connect("A.GND", "B.GND");
 
-			register_subalias("VCC", "A.VCC");
-			register_subalias("GND", "A.GND");
+			register_sub_alias("VCC", "A.VCC");
+			register_sub_alias("GND", "A.GND");
 		}
 
 		NETLIB_RESETI()

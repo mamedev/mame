@@ -119,11 +119,11 @@ public:
 	/// \param line pstring reference to the result
 	/// \returns Returns false if at end of file
 	///
-	bool readline(putf8string &line)
+	bool read_line(putf8string &line)
 	{
 		putf8string::code_t c = 0;
 		line = "";
-		if (!this->readcode(c))
+		if (!this->read_code(c))
 		{
 			return false;
 		}
@@ -133,7 +133,7 @@ public:
 				break;
 			if (c != 13) // ignore CR
 				line += putf8string(1, c);
-			if (!this->readcode(c))
+			if (!this->read_code(c))
 				break;
 		}
 		return true;
@@ -146,11 +146,11 @@ public:
 	/// \param line pstring reference to the result
 	/// \returns Returns false if at end of file
 	///
-	bool readline_lf(putf8string &line)
+	bool read_line_lf(putf8string &line)
 	{
 		putf8string::code_t c = 0;
 		line = "";
-		if (!this->readcode(c))
+		if (!this->read_code(c))
 		{
 			return false;
 		}
@@ -160,7 +160,7 @@ public:
 				line += putf8string(1, c);
 			if (c == 10)
 				break;
-			if (!this->readcode(c))
+			if (!this->read_code(c))
 				break;
 		}
 		return true;
@@ -174,7 +174,7 @@ public:
 		return (!m_strm->eof());
 	}
 
-	bool readcode(putf8string::traits_type::code_t &c)
+	bool read_code(putf8string::traits_type::code_t &c)
 	{
 		std::array<std::istream::char_type, 4> b{0};
 		if (m_strm->eof())
@@ -216,7 +216,7 @@ public:
 
 	virtual ~putf8_writer() = default;
 
-	void writeline(const pstring &line) const
+	void write_line(const pstring &line) const
 	{
 		write(line);
 		write(10);
@@ -255,7 +255,7 @@ public:
 	~putf8_fmt_writer() override = default;
 
 //protected:
-	void vdowrite(const pstring &s) const
+	void upstream_write(const pstring &s) const
 	{
 		write(s);
 	}
@@ -346,7 +346,7 @@ private:
 	std::istream &m_strm;
 };
 
-inline void copystream(std::ostream &dest, std::istream &src)
+inline void copy_stream(std::ostream &dest, std::istream &src)
 {
 	// FIXME: optimize
 	std::array<std::ostream::char_type, 1024> buf; // NOLINT(cppcoreguidelines-pro-type-member-init)
@@ -388,6 +388,8 @@ public:
 	using filename_type = std::conditional<compile_info::win32() && (!compile_info::mingw() || compile_info::version::vmajor()>=9),
 		pstring_t<pwchar_traits>, pstring_t<putf8_traits>>::type;
 
+	ofstream() : std::ofstream() {}
+
 	template <typename T>
 	explicit ofstream(const pstring_t<T> &name, ios_base::openmode mode = ios_base::out | ios_base::trunc)
 	: std::ofstream(filename_type(name).c_str(), mode)
@@ -398,6 +400,19 @@ public:
 	: std::ofstream(filename_type(putf8string(name)).c_str(), mode)
 	{
 	}
+
+	template <typename T>
+	void open(const pstring_t<T> &name, ios_base::openmode mode = ios_base::out | ios_base::trunc)
+	{
+		std::ofstream::open(filename_type(name).c_str(), mode);
+	}
+
+	template <typename T>
+	void open(const std::string &name, ios_base::openmode mode = ios_base::out | ios_base::trunc)
+	{
+		std::ofstream::open(filename_type(putf8string(name)).c_str(), mode);
+	}
+
 };
 
 

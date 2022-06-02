@@ -175,6 +175,21 @@ namespace netlist
 		owner.state().save(owner, static_cast<C &>(*this), owner.name(), name);
 	}
 
+	// -----------------------------------------------------------------------------
+	// Externals
+	// -----------------------------------------------------------------------------
+
+	extern template struct state_var<std::uint8_t>;
+	extern template struct state_var<std::uint16_t>;
+	extern template struct state_var<std::uint32_t>;
+	extern template struct state_var<std::uint64_t>;
+	extern template struct state_var<std::int8_t>;
+	extern template struct state_var<std::int16_t>;
+	extern template struct state_var<std::int32_t>;
+	extern template struct state_var<std::int64_t>;
+	extern template struct state_var<bool>;
+
+
 } // namespace netlist
 
 namespace plib

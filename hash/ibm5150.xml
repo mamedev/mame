@@ -7311,7 +7311,7 @@ has been replaced with an all-zero block. -->
 				<rom name="D6.img" size="368640" crc="e8962a7e" sha1="8dbcf2b2d3c849de88a9db5d817bffbcb3d074e0"/>
 			</dataarea>
 		</part>
-			<part name="flop7" interface="floppy_5_25">
+		<part name="flop7" interface="floppy_5_25">
 			<feature name="part_id" value="Development System volume D7"/>
 			<dataarea name="flop" size="368640">
 				<rom name="D7.img" size="368640" crc="5e734955" sha1="e925c894c0674a83185d1d2f4dcfa3834fc8aa2d"/>
@@ -7329,7 +7329,7 @@ has been replaced with an all-zero block. -->
 				<rom name="D9.img" size="368640" crc="d07dbd2c" sha1="1941e45a0a3d861222a0ada0e945a8ac69f18074"/>
 			</dataarea>
 		</part>
-			<part name="flop10" interface="floppy_5_25">
+		<part name="flop10" interface="floppy_5_25">
 			<feature name="part_id" value="Development System volume D10"/>
 			<dataarea name="flop" size="368640">
 				<rom name="D10.img" size="368640" crc="25d07207" sha1="ef25823026141ccf3d5c12a0f64e5bca7703e65a"/>
@@ -7472,7 +7472,7 @@ has been replaced with an all-zero block. -->
 
 	<!-- DOS-based games -->
 
-	<software name="2400ad" supported="no"> <!-- unemulated protection, game needs cracked exe to play ATM  -->
+	<software name="2400ad" supported="no"> <!-- unemulated protection, game needs cracked exe to play ATM -->
 		<description>2400 A.D. (set 1)</description>
 		<year>1987</year>
 		<publisher>Origin</publisher>

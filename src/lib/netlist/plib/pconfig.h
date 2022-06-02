@@ -93,14 +93,6 @@
 #define PALIGNAS(x) alignas(x)
 #endif
 
-/// \brief nvcc build flag.
-///
-/// Set this to 101 if you are building with NVIDIA nvcc 10.1
-///
-#ifndef NVCCBUILD
-#define NVCCBUILD (0)
-#endif
-
 // ============================================================
 //  Check for CPP Version
 //
@@ -123,6 +115,10 @@
 	#error c++14 not supported - you need c++17
 #elif __cplusplus == 201703L
 	// Ok
+#elif __cplusplus == 201709L
+	// Ok g++-9 -std=c++2a
+#elif __cplusplus == 202002L
+	// Ok clang++-13 -std=c++2a
 #else
 	#error "C++ version not supported"
 #endif

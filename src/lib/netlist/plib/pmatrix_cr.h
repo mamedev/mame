@@ -13,10 +13,12 @@
 #include "palloc.h"
 #include "parray.h"
 #include "pconfig.h"
-#include "pmath.h"
+#include "pexception.h"
+#include "pfmtlog.h"
 #include "pmatrix2d.h"
 #include "pomp.h"
 #include "ptypes.h"
+#include "putil.h"              // <- container::contains
 
 #include <algorithm>
 #include <array>
@@ -47,7 +49,7 @@ namespace plib
 
 		// FIXME: these should be private
 		// NOLINTNEXTLINE
-		parray<index_type, N> diag;      // diagonal index pointer n
+		parray<index_type, N> diagonal;      // diagonal index pointer n
 		// NOLINTNEXTLINE
 		parray<index_type, Np1> row_idx;      // row index pointer n + 1
 		// NOLINTNEXTLINE
@@ -58,7 +60,7 @@ namespace plib
 		std::size_t nz_num;
 
 		explicit pmatrix_cr(ARENA &arena, std::size_t n)
-		: diag(n)
+		: diagonal(n)
 		, row_idx(n+1)
 		, col_idx(n*n)
 		, A(n*n)
@@ -118,7 +120,7 @@ namespace plib
 					row_idx[i]++;
 				nz_num++;
 				if (c==r)
-					diag[r] = ri;
+					diagonal[r] = ri;
 			}
 		}
 
@@ -138,7 +140,7 @@ namespace plib
 					{
 						col_idx[nz] = narrow_cast<C>(j);
 						if (j == k)
-							diag[k] = nz;
+							diagonal[k] = nz;
 						nz++;
 					}
 			}
@@ -152,8 +154,8 @@ namespace plib
 			{
 				for (std::size_t j=k + 1; j < size(); j++)
 					if (f[j][k] < FILL_INFINITY)
-						m_nzbd.set(k, m_nzbd.colcount(k), narrow_cast<C>(j));
-				m_nzbd.set(k, m_nzbd.colcount(k), 0); // end of sequence
+						m_nzbd.set(k, m_nzbd.col_count(k), narrow_cast<C>(j));
+				m_nzbd.set(k, m_nzbd.col_count(k), 0); // end of sequence
 			}
 
 		}
@@ -232,7 +234,7 @@ namespace plib
 		}
 
 		index_type * nzbd(std::size_t row) { return m_nzbd[row]; }
-		std::size_t nzbd_count(std::size_t row) { return m_nzbd.colcount(row) - 1; }
+		std::size_t nzbd_count(std::size_t row) { return m_nzbd.col_count(row) - 1; }
 	protected:
 		// FIXME: this should be private
 		// NOLINTNEXTLINE
@@ -303,7 +305,7 @@ namespace plib
 			for (std::size_t i = 0; i < iN - 1; i++)
 			{
 				std::size_t nzbdp = 0;
-				std::size_t pi = base_type::diag[i];
+				std::size_t pi = base_type::diagonal[i];
 				auto f = reciprocal(base_type::A[pi++]);
 				const std::size_t piie = base_type::row_idx[i+1];
 
@@ -354,7 +356,7 @@ namespace plib
 					auto &i = m_ge_par[l][ll];
 					{
 						std::size_t nzbdp = 0;
-						std::size_t pi = base_type::diag[i];
+						std::size_t pi = base_type::diagonal[i];
 						const auto f = reciprocal(base_type::A[pi++]);
 						const std::size_t piie = base_type::row_idx[i+1];
 						const auto &nz = base_type::nzbd[i];
@@ -390,16 +392,16 @@ namespace plib
 		{
 			const std::size_t iN = base_type::size();
 			// row n-1
-			V[iN - 1] = RHS[iN - 1] / base_type::A[base_type::diag[iN - 1]];
+			V[iN - 1] = RHS[iN - 1] / base_type::A[base_type::diagonal[iN - 1]];
 
 			for (std::size_t j = iN - 1; j-- > 0;)
 			{
 				typename base_type::value_type tmp = 0;
-				const auto jdiag = base_type::diag[j];
+				const auto diagonal_j = base_type::diagonal[j];
 				const std::size_t e = base_type::row_idx[j+1];
-				for (std::size_t pk = jdiag + 1; pk < e; pk++)
+				for (std::size_t pk = diagonal_j + 1; pk < e; pk++)
 					tmp += base_type::A[pk] * V[base_type::col_idx[pk]];
-				V[j] = (RHS[j] - tmp) / base_type::A[jdiag];
+				V[j] = (RHS[j] - tmp) / base_type::A[diagonal_j];
 			}
 		}
 
@@ -408,16 +410,16 @@ namespace plib
 		{
 			const std::size_t iN = base_type::size();
 			// row n-1
-			V[iN - 1] = V[iN - 1] / base_type::A[base_type::diag[iN - 1]];
+			V[iN - 1] = V[iN - 1] / base_type::A[base_type::diagonal[iN - 1]];
 
 			for (std::size_t j = iN - 1; j-- > 0;)
 			{
 				typename base_type::value_type tmp = 0;
-				const auto jdiag = base_type::diag[j];
+				const auto diagonal_j = base_type::diagonal[j];
 				const std::size_t e = base_type::row_idx[j+1];
-				for (std::size_t pk = jdiag + 1; pk < e; pk++)
+				for (std::size_t pk = diagonal_j + 1; pk < e; pk++)
 					tmp += base_type::A[pk] * V[base_type::col_idx[pk]];
-				V[j] = (V[j] - tmp) / base_type::A[jdiag];
+				V[j] = (V[j] - tmp) / base_type::A[diagonal_j];
 			}
 		}
 
@@ -561,16 +563,16 @@ namespace plib
 			while (auto i = ilu_rows[p++]) // NOLINT(bugprone-infinite-loop)
 			{
 				const auto p_i_end = base_type::row_idx[i + 1];
-				// loop over all columns k left of diag in row i
-				//if (row_idx[i] < diag[i])
+				// loop over all columns k left of diagonal in row i
+				//if (row_idx[i] < diagonal[i])
 				//  printf("occ %d\n", (int)i);
-				for (auto i_k = base_type::row_idx[i]; i_k < base_type::diag[i]; i_k++)
+				for (auto i_k = base_type::row_idx[i]; i_k < base_type::diagonal[i]; i_k++)
 				{
 					const index_type k(base_type::col_idx[i_k]);
 					const index_type p_k_end(base_type::row_idx[k + 1]);
-					const typename base_type::value_type LUp_i_k = base_type::A[i_k] = base_type::A[i_k] / base_type::A[base_type::diag[k]];
+					const typename base_type::value_type LUp_i_k = base_type::A[i_k] = base_type::A[i_k] / base_type::A[base_type::diagonal[k]];
 
-					std::size_t k_j(base_type::diag[k] + 1);
+					std::size_t k_j(base_type::diagonal[k] + 1);
 					std::size_t i_j(i_k + 1);
 
 					while (i_j < p_i_end && k_j < p_k_end )  // pj = (i, j)
@@ -619,7 +621,7 @@ namespace plib
 			{
 				typename base_type::value_type tmp(0);
 				const index_type j1(base_type::row_idx[i]);
-				const index_type j2(base_type::diag[i]);
+				const index_type j2(base_type::diagonal[i]);
 
 				for (auto j = j1; j < j2; ++j )
 					tmp +=  base_type::A[j] * r[base_type::col_idx[j]];
@@ -629,7 +631,7 @@ namespace plib
 			for (std::size_t i = base_type::size(); i-- > 0; )
 			{
 				typename base_type::value_type tmp(0);
-				const index_type di(base_type::diag[i]);
+				const index_type di(base_type::diagonal[i]);
 				const index_type j2(base_type::row_idx[i+1]);
 				for (std::size_t j = di + 1; j < j2; j++ )
 					tmp += base_type::A[j] * r[base_type::col_idx[j]];

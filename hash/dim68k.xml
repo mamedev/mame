@@ -94,7 +94,7 @@ CP/M-68K Release 1.04: Disks: All (maybe others)
 		</part>
 
 		<part name="flop5" interface="floppy_5_25">
-		<!-- Disk Content: Apple ][+, Kaypro II, Z80, and IBM emulators  -->
+		<!-- Disk Content: Apple ][+, Kaypro II, Z80, and IBM emulators -->
 			<feature name="part_id" value="Apple ][+, Kaypro II, Z80, and IBM emulators"/>
 			<dataarea name="flop" size="398409">
 				<rom name="emulator.imd" size="398409" crc="0f8cfc5b" sha1="5a3653bbf8f34ddf1b85565b069716ef30ede195"/>

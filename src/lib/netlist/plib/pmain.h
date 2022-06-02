@@ -19,11 +19,11 @@
 
 #ifdef _WIN32
 #include <cwchar>
-#define PMAIN(appclass) \
-extern "C" int wmain(int argc, wchar_t *argv[]) { return plib::app::mainrun<appclass, wchar_t>(argc, argv); }
+#define PMAIN(app_class) \
+extern "C" int wmain(int argc, wchar_t *argv[]) { return plib::app::run_main<app_class, wchar_t>(argc, argv); }
 #else
-#define PMAIN(appclass) \
-int main(int argc, char **argv) { return plib::app::mainrun<appclass, char>(argc, argv); }
+#define PMAIN(app_class) \
+int main(int argc, char **argv) { return plib::app::run_main<app_class, char>(argc, argv); }
 #endif
 
 
@@ -47,11 +47,11 @@ namespace plib {
 
 		virtual int execute() = 0;
 
-		plib::putf8_fmt_writer pout;
-		plib::putf8_fmt_writer perr;
+		plib::putf8_fmt_writer std_out;
+		plib::putf8_fmt_writer std_err;
 
 		template <class C, typename T>
-		static int mainrun(int argc, T **argv)
+		static int run_main(int argc, T **argv)
 		{
 			C application;
 			return application.main_utfX(argc, argv);

@@ -117,10 +117,10 @@ namespace netlist::devices {
 		//, m_power_pins(*this)
 		{
 
-			register_subalias(pstring(D::gnd()), "RN.2");
-			register_subalias(pstring(D::vcc()), "RP.1");
-			register_subalias("C",   "RN.2");
-			register_subalias("RC",  "RN.1");
+			register_sub_alias(pstring(D::gnd()), "RN.2");
+			register_sub_alias(pstring(D::vcc()), "RP.1");
+			register_sub_alias("C",   "RN.2");
+			register_sub_alias("RC",  "RN.1");
 
 			connect("_RP_Q", "RP.I");
 			connect("_RN_Q", "RN.I");
