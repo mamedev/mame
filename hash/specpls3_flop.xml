@@ -19,13 +19,22 @@ license:CC0
 	Known undumped:
 		Ci-U-Than Trilogy-III: Chichén Itzá (likely but unconfirmed)
 		Comando Tracer (dual-system Spectrum/Amstrad release)
-		L.E.D. Storm
 		Psycho Pigs UXB
 
 	Known existing dumps not in softlist:
 		SPS IPF dump 3585	LED Storm: Lazer Enhanced Destruction
 		SPS IPF dump 3607	Rock Star Ate My Hamster
 		SPS IPF dump 3625	Tiger Road
+		
+	Need redump/verification:
+		Artura (alt) Side B
+		Comic, Arcade & Aventura Disk 1, Side B
+		Comic, Arcade & Aventura Disk 2, Side A
+		Comic, Arcade & Aventura Disk 2, Side B
+		LED Storm Rally 2011
+		NARC (Spain) Side A
+		Rescate Atlántida (alt 3) Side A
+		Simulation Hits (Spain) Side B
 
 	Observations:
 		Artura (alt) Side B has a copy of Hardball for the Amstrad CPC. Was this edition accidentally sold like this?
@@ -8065,9 +8074,24 @@ license:CC0
     </software>
 -->
 
-	<software name="ledstorm">
+	<software name="leds2011" supported="no">
 		<!-- May be the same edition as the IPF dump. -->
+		<!--
+			Uses "Alkatraz" protection.
+			Dump has a few bad sectors.
+		-->
 		<description>LED Storm Rally 2011</description>
+		<year>1988</year>
+		<publisher>Go!</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="220299">
+				<rom name="ledstorm_a.dsk" size="220299" crc="3c4c6ae6" sha1="4598e0969f047c755e03b3966ca278f7068e2bc2" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="leds2011cr" cloneof="leds2011">
+		<description>LED Storm Rally 2011 (cracked)</description>
 		<year>1988</year>
 		<publisher>Go!</publisher>
 		<part name="flop1" interface="floppy_3">
