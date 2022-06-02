@@ -41965,6 +41965,10 @@ tokims
 @source:tomcat.cpp
 tomcat                          // (proto)          (c) 1985
 
+@source:tomsadvs.cpp
+icecoldice                      // (c) ICE
+tomsadvs                        //
+
 @source:tomy_princ.cpp
 princ                           // Tomy Prin-C (Japan)
 
