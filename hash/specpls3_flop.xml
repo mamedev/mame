@@ -31,13 +31,15 @@ license:CC0
 		Comic, Arcade & Aventura Disk 1, Side B
 		Comic, Arcade & Aventura Disk 2, Side A
 		Comic, Arcade & Aventura Disk 2, Side B
-		LED Storm Rally 2011
+		LED Storm Rally 2011, Side A
+		LED Storm Rally 2011, Side B
 		NARC (Spain) Side A
 		Rescate Atlántida (alt 3) Side A
 		Simulation Hits (Spain) Side B
 
 	Observations:
 		Artura (alt) Side B has a copy of Hardball for the Amstrad CPC. Was this edition accidentally sold like this?
+		LED Storm Rally 2011 Side B has a copy of The Lords of Midnight for the Amstrad CPC. Was this edition accidentally sold like this?
 		Sootland is supposed to be compatible with the Gun-Stick light gun but has no option for it. Is there an alternate version with support for it?
 		What's the difference between the IPF dumps "Teenage Mutant Hero Turtles" and "Teenage Mutant Hero Turtles (3'')"?
 
@@ -1559,7 +1561,7 @@ license:CC0
 	<software name="arturaa" cloneof="artura">
 		<!-- May be the same edition as the IPF dump. -->
 		<!--
-			Side B has Hardball for the Amstrad CPC, was this edition accidentally sold like this?
+			Side B has a copy of Hardball for the Amstrad CPC, was this edition accidentally sold like this?
 		-->
 		<description>Artura (alt)</description>
 		<year>1989</year>
@@ -8078,7 +8080,9 @@ license:CC0
 		<!-- May be the same edition as the IPF dump. -->
 		<!--
 			Uses "Alkatraz" protection.
-			Dump has a few bad sectors.
+			Dump of Side A has a few bad sectors.
+			Dump of Side B has one bad sector.
+			Side B has a copy of The Lords of Midnight for the Amstrad CPC, was this edition accidentally sold like this?
 		-->
 		<description>LED Storm Rally 2011</description>
 		<year>1988</year>
@@ -8086,6 +8090,11 @@ license:CC0
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="220299">
 				<rom name="ledstorm_a.dsk" size="220299" crc="3c4c6ae6" sha1="4598e0969f047c755e03b3966ca278f7068e2bc2" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="157599">
+				<rom name="ledstorm_b.dsk" size="157599" crc="4725f8fc" sha1="3a2dadbbb0fc318bcf51a42ca89b2d593850807f" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
