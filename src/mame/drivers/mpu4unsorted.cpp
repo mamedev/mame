@@ -2086,7 +2086,7 @@ GAME(199?, m4clbxb,   m4clbx,     mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::
 GAME(199?, m4ringfr,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::tentendia_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0, "Barcrest","Ring Of Fire (Barcrest) (MPU4) (ROF 0.3)",GAME_FLAGS ) // German?
 
 // 00 90 88 4c e0 b8 74 84 bc 74 00 b4 88 6c c0 1c f4 (same as jewel in the crown) runs with door open, not English
-GAME(199?, m4royjwl,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::jewelcrown_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,  ROT0,   "Barcrest","Royal Jewels (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4royjwl,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::jewelcrown_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,  ROT0,   "Barcrest","Royal Jewels (Barcrest) (MPU4) (GRJ 1.4)",GAME_FLAGS )
 
 // play but behavior isn't like barcrest
 // 00 24 24 2c 70 20 0c 60 3c 5c 5c 5c 7c 4c 68 40 34 38 (mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::duty_characteriser_prot> scramble)
@@ -2233,9 +2233,9 @@ GAME(199?, m4wildtm,  0,          mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_p
 GAME(199?, m4reeltm,  0,          mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::wildtime_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Reel Timer (Barcrest) (MPU4) (DWT)",GAME_FLAGS ) // SAMPLE EEPROM ALARM
 
 // 00 14 10 60 54 00 24 14 70 30 00 74 10 40 34 40 (fortune) (same as some jewel in the crown sets)
-GAME(199?, m4fortcb,  0,          mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::fortune_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS ) // INVALID ALARM
-GAME(199?, m4fortcba, m4fortcb,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::fortune_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS ) // INVALID ALARM
-GAME(199?, m4fortcbb, m4fortcb,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::fortune_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS ) // INVALID ALARM
+GAME(199?, m4fortcb,  0,          mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::fortune_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (CFO 1.2, set 1)",GAME_FLAGS ) // INVALID ALARM
+GAME(199?, m4fortcba, m4fortcb,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::fortune_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (CFO 1.2, set 2)",GAME_FLAGS ) // INVALID ALARM
+GAME(199?, m4fortcbb, m4fortcb,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::fortune_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (CFO 1.2, set 3)",GAME_FLAGS ) // INVALID ALARM
 
 
 // non-english sets
@@ -2263,7 +2263,7 @@ GAME(199?, m4crzjwle, m4crzjwl,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::
 GAME(199?, m4crzjwlf, m4crzjwl,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 7)",GAME_FLAGS ) // DM1 SW ALM
 GAME(199?, m4crzjwlg, m4crzjwl,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4dtri98_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 8)",GAME_FLAGS ) // DM1 SW ALM
 // 00 14 04 94 c8 68 a0 50 8c e8 e0 dc bc b0 4c a0 58 (lv)
-GAME(199?, m4crzjwlh, m4crzjwl,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4lv_characteriser_prot>, mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 9)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4crzjwlh, m4crzjwl,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m4lv_characteriser_prot>, mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (CJG 0.4)",GAME_FLAGS ) // DM1 SW ALM
 // not standard protection
 GAME(199?, m4crzjwl,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 1)",GAME_FLAGS ) // DM1 SW ALM
 GAME(199?, m4crzjwla, m4crzjwl,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Crown Jewels (Barcrest) (German) (MPU4) (set 2)",GAME_FLAGS ) // DM1 SW ALM
@@ -2324,7 +2324,7 @@ GAME(199?, m4magtbo,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::
 GAME(199?, m4ordmnd,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::actclba_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Oriental Diamonds (Barcrest) (German) (MPU4)",GAME_FLAGS )
 
 // 00 14 10 60 54 00 24 14 70 30 00 74 10 40 34 40 54 (fortune) (same as some jewel in the crown sets)  has lamp scramble
-GAME(199?, m4ptblkc,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::fortune_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Pot Black Casino (Bwb - Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4ptblkc,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::fortune_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Pot Black Casino (Bwb - Barcrest) (MPU4) (PO  1.2)",GAME_FLAGS )
 
 // badchr, non-standard protection, hack?
 GAME(199?, m4take5,   0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Take 5 (Barcrest) (MPU4)",GAME_FLAGS )

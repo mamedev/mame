@@ -2032,7 +2032,7 @@ GAME(199?, m4exprs,   0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::cos
 GAME(199?, m4brdway,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::phr_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Broadway (Barcrest) (DBR, Dutch) (MPU4)",GAME_FLAGS )
 
 // 00 14 04 94 c8 68 a0 50 8c e8 e0 dc bc b0 4c (lv)
-GAME(199?, m4bigbn,   0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::m4lv_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Big Ben (Barcrest) (DBB, Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4bigbn,   0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::m4lv_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Big Ben (Barcrest) (Dutch) (MPU4) (DBB 1.2)",GAME_FLAGS )
 
 // 00 44 44 64 4c 10 28 50 68 38 34 28 70 00 6c 10 68 (cheryo)
 GAME(199?, m4cheryo,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::cheryo_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Cherryo (Barcrest) (DCH, Dutch) (MPU4)",GAME_FLAGS )

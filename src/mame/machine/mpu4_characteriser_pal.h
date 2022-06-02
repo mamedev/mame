@@ -79,9 +79,6 @@ public:
 	// these can be identified as games expecting a chr response starting with '00 84 94 3c ec 5c ec 50 2c 68 60 ac'
 	static constexpr uint8_t m4dtri98_characteriser_prot[8] = { 0x03, 0xAF, 0x87, 0xAB, 0xA3, 0x8F, 0x87, 0x83 };
 
-	// m4supst__bi etc.
-	static constexpr uint8_t m4lv_characteriser_prot[9] = { 0x00, 0x18, 0x10, 0x08 ,0x00, 0x08, 0x00, 0x00 };
-												  //     03    EB    63    CB    C3    6B    63    43    in sunsetb (complete table?)
 
 	// games with sequence starting 00 24 24 2C E0 B4 B8 4C E8 D8 (m4eaw__a9 etc.)
 	static constexpr uint8_t m683_characteriser_prot[8] = { 0x03, 0xAF, 0x27, 0x8F, 0x0F, 0xA7, 0x27, 0x07 };
@@ -308,6 +305,68 @@ public:
 	static constexpr uint8_t buc_characteriser_prot[8] = { 0x00, 0x70, 0x50, 0x30, 0x10, 0x70, 0x50, 0x10 }; // based on matching m4hotrod__a and m4buc__2 with unprotected sets
 
 
+	// Games with sequence starting
+	// 00 90 88 4c e0 b8 74 84 bc 74 00 b4
+	// used by
+	// Jewel In the Crown "CJE 1.0"
+	//                    "CJE 0.8"
+	//                    "CJH 1.0"
+	//                    "CJH 0.8"
+	// Las Vegas Strip    "VSG 0.4"
+	//                    "VSG 0.3"
+	// Royal Jewels       "GRJ 1.4"
+	static constexpr uint8_t jewelcrown_characteriser_prot[8] = { 0x00, 0x30, 0x10, 0x30, 0x10, 0x30, 0x10, 0x10 };  // matches unprotected Las Vegas Strip sets
+
+
+	// Games with sequence starting
+	// 00 14 04 94 c8 68 a0 50 8c e8 e0 dc bc b0 4c a0 58 bc bc 38 b4 48 20 14 8c ec e8 6c 24 94 40 90 4c a4 58 b8 b8 3c 38 b4 40 14 8c e8 68 24 94 cc ec e0 d0 c8 68 a8 e0 50 80 dc bc 38 b8 30 8c 00
+	// used by
+	// The Crystal Maze      "CRM 3.0"
+	//                       "CRM 2.3"
+	// Showcase Crystal Maze "SCM 0.1"
+	// Cloud Nine            "C92 1.1"
+	//                       "C92 1.0"
+	//                       "C95 1.0"
+	// Las Vegas Strip       "UVS 0.3"
+	// Prize What's On       "PWO 0.5"
+	// Carry On Joker        "COJ 2.1"
+	// Super Streak          "STT 0.3"
+	// Crown Jewels (German) "CJG 0.4"
+	// Sunset Boulevard      "B25 1.2"
+	// Dutch Big Ben         "DBB 1.2"
+	// Fruit Preserve        "F4P 1.1"
+	// Blue Moon             "BLU 2.3"
+	//                       "BLU 2.1"
+	static constexpr uint8_t m4lv_characteriser_prot[9] = { 0x00, 0x18, 0x10, 0x18 ,0x10, 0x18, 0x10, 0x10 }; // games match unprotected versions
+	//static constexpr uint8_t m4lv_characteriser_prot[9] = { 0x03, 0xEB, 0x63, 0xCB, 0xC3, 0x6B, 0x63, 0x43 };//   in sunsetb (wrong?)
+
+
+	// Games with sequence starting
+	// 00 14 10 60 54 00 24 14 70 30 00 74 10 40 34 40 54 70 70 10 20 44 14 50 30 60 34 10 00 24 14 20 14 70 70 00 34 10 60 14 00 14 70 30 70 30 60 14 70 00 24 74 10 30 60 04 24 74 10 10 60 14 70 00
+	// used by
+	// Jewel In the Crown "JCC 3.7"
+	//                    "JCC 3.3"
+	//                    "JC4 3.1"
+	//                    "JC5 1.9"
+	//                    "JC8 4.4"
+	//                    "JC8 4.2"
+	// Pot Black Casino   "PO  1.2"
+	// Fortune Club       "CFO 1.2"
+	static constexpr uint8_t fortune_characteriser_prot[8] = { 0x00, 0x70, 0x10, 0x60, 0x20, 0x50, 0x10, 0x00 }; // guessed based on lamp positions in Pot Black Casino and Jewel in the Crown
+
+
+	// Games with sequence starting
+	// 00 14 04 54 c4 98 f0 48 e4 5c f0 c8 ec 68 24
+	// used by
+	// Kings & Queens    "EE  2.0"
+    //                   "EE  1.0"
+	// Lucky Strike      "LSS 0.6"
+    //                   "LST 0.9"
+	// Solid Silver Club "SOS 2.2"
+    // Solid Silver Club "SOS 2.1"
+	static constexpr uint8_t luckystrike_characteriser_prot[8] = { 0x00, 0x50, 0x10, 0x50, 0x50, 0x10, 0x10, 0x10 }; // INCORRECT
+
+
 	/***************************************************************
 
 	 Lamp data below is definitely incorrect
@@ -322,8 +381,6 @@ public:
 
 
 
-	// games with sequence starting 00 90 88 4c e0 b8 74 84 bc 74 00 b4
-	static constexpr uint8_t jewelcrown_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };  // INCORRECT
 
 	// games with sequence starting 00 90 a0 34 8c 68 44 90 ac 6c 44 9c dc 5c d4 24 98 dc
 	static constexpr uint8_t magicdragon_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
@@ -337,8 +394,6 @@ public:
 	// games with sequence starting 00 44 44 64 4c 80 70 24 6c a8 b0 38 e4
 	static constexpr uint8_t pzmoney_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 14 10 60 54 00 24 14 70 30 00 74 10 40 34 40
-	static constexpr uint8_t fortune_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 	// games with sequence starting 00 60 60 24 e0 e8 1c 74 c4 6c 14 84 e8 1c
 	static constexpr uint8_t actionbank_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
@@ -346,8 +401,6 @@ public:
 	// games with sequence starting 00 90 88 2c e0 d8 74 84 dc 74 00 d4 c8 6c a0 58 f4 cc ec 68
 	static constexpr uint8_t toplot_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 14 04 54 c4 98 f0 48 e4 5c f0 c8 ec 68 24
-	static constexpr uint8_t luckystrike_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 	// games with sequence starting 00 18 70 44 58 30 44 18 7c 74 00 5c 7c 34 48 24 58
 	static constexpr uint8_t tictak_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT

@@ -230,13 +230,13 @@ GAME_CUSTOM( 199?, m4addrcc__d,    m4addrcc,   "adrscfm", 0x0000, 0x010000, CRC(
 	GAME(year, setname, parent, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m4lv_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // 00 14 04 94 c8 68 a0 50 8c e8 e0 dc (lv) (same as some Crystal Maze etc. sets)
-GAME_CUSTOM( 199?, m4cojok,     0,          "cojx.p1",      0x0000, 0x010000, CRC(a9c0aefb) SHA1(c5b367a01ddee2cb90e266f1e62459b9b96eb3e3), "Barcrest","Carry On Joker (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4cojok__a,  m4cojok,    "cojxb.p1",     0x0000, 0x010000, CRC(2680c84a) SHA1(6cf9bb72df41ea1389334597a772fd197aba4fc4), "Barcrest","Carry On Joker (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4cojok__b,  m4cojok,    "cojxc.p1",     0x0000, 0x010000, CRC(a67db981) SHA1(08ac65baf774c63705c3a4db36248777375404f6), "Barcrest","Carry On Joker (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4cojok__c,  m4cojok,    "cojxcd.p1",    0x0000, 0x010000, CRC(33d31701) SHA1(a7ccaa5a3b1c97cc84cdca2f77381ea4a8d743a3), "Barcrest","Carry On Joker (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4cojok__d,  m4cojok,    "cojxd.p1",     0x0000, 0x010000, CRC(97c12c95) SHA1(282dfc5bc66fd4ad57f442c3ae75f6645919352d), "Barcrest","Carry On Joker (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4cojok__e,  m4cojok,    "cojxdy.p1",    0x0000, 0x010000, CRC(4f0be63b) SHA1(d701b5c2d2c71942f8574598a4ba687f532c16a8), "Barcrest","Carry On Joker (Barcrest) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4cojok__f,  m4cojok,    "cojxy.p1",     0x0000, 0x010000, CRC(88f1b57a) SHA1(cfc98d6ec90e7c186741d62d3ec68bd350196878), "Barcrest","Carry On Joker (Barcrest) (MPU4) (set 7)" )
+GAME_CUSTOM( 199?, m4cojok,     0,          "cojx.p1",      0x0000, 0x010000, CRC(a9c0aefb) SHA1(c5b367a01ddee2cb90e266f1e62459b9b96eb3e3), "Barcrest","Carry On Joker (Barcrest) (MPU4) (COJ 2.1, set 1)" )
+GAME_CUSTOM( 199?, m4cojok__a,  m4cojok,    "cojxb.p1",     0x0000, 0x010000, CRC(2680c84a) SHA1(6cf9bb72df41ea1389334597a772fd197aba4fc4), "Barcrest","Carry On Joker (Barcrest) (MPU4) (COJ 2.1, set 2)" )
+GAME_CUSTOM( 199?, m4cojok__b,  m4cojok,    "cojxc.p1",     0x0000, 0x010000, CRC(a67db981) SHA1(08ac65baf774c63705c3a4db36248777375404f6), "Barcrest","Carry On Joker (Barcrest) (MPU4) (COJ 2.1, set 3)" )
+GAME_CUSTOM( 199?, m4cojok__c,  m4cojok,    "cojxcd.p1",    0x0000, 0x010000, CRC(33d31701) SHA1(a7ccaa5a3b1c97cc84cdca2f77381ea4a8d743a3), "Barcrest","Carry On Joker (Barcrest) (MPU4) (COJ 2.1, set 4)" )
+GAME_CUSTOM( 199?, m4cojok__d,  m4cojok,    "cojxd.p1",     0x0000, 0x010000, CRC(97c12c95) SHA1(282dfc5bc66fd4ad57f442c3ae75f6645919352d), "Barcrest","Carry On Joker (Barcrest) (MPU4) (COJ 2.1, set 5)" )
+GAME_CUSTOM( 199?, m4cojok__e,  m4cojok,    "cojxdy.p1",    0x0000, 0x010000, CRC(4f0be63b) SHA1(d701b5c2d2c71942f8574598a4ba687f532c16a8), "Barcrest","Carry On Joker (Barcrest) (MPU4) (COJ 2.1, set 6)" )
+GAME_CUSTOM( 199?, m4cojok__f,  m4cojok,    "cojxy.p1",     0x0000, 0x010000, CRC(88f1b57a) SHA1(cfc98d6ec90e7c186741d62d3ec68bd350196878), "Barcrest","Carry On Joker (Barcrest) (MPU4) (COJ 2.1, set 7)" )
 
 
 /*****************************************************************************************************************************************************************************
