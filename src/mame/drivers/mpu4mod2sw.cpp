@@ -1681,7 +1681,7 @@ GAME(199?, m4multcl,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::m40
 
 // the challenge sequence for this characteriser protection check never sets bit 0x20
 // 00 a0 88 38 94 2c 30 00 e4 c8 18 b4 4c 30 20 c0 ec 7c f4 (squids)
-GAME(199?, m4reelpk,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::squids_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Reel Poker (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4reelpk,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::squids_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Reel Poker (Barcrest) (MPU4) (R2P 3.0)",GAME_FLAGS )
 
 // the challenge sequence for this characteriser protection check never sets bit 0x20
 // 00 bc b8 fc bc dc fc fc fc f8 d8 b8 00 00 00  (intcep)
@@ -1893,10 +1893,11 @@ GAME(199?, m4suptwo,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::act
 // 00 18 70 44 58 30 44 18 7c 74 00 5c 7c 34 48 24 58 (tictak)
 GAME(199?, m4tiktak,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::tictak_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Tic Tak Cash (Barcrest) (MPU4)",GAME_FLAGS )
 
+// these have the same version number but use different protection PALs, is one modified?
 // 00 a0 b0 58 ec 3c ec 14 68 4c 4c 6c 64 80 f8 84 98 (topaction)
-GAME(199?, m4topact,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::topaction_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Top Action (Barcrest) (Dutch) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4topact,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::topaction_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Top Action (Barcrest) (Dutch) (MPU4) (TA 2.2, set 1)",GAME_FLAGS )
 // 00 30 20 14 2c a0 54 24 3c 9c 9c 9c bc 94 6c 80 58 (m441)
-GAME(199?, m4topacta, m4topact,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::m441_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Top Action (Barcrest) (Dutch) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4topacta, m4topact,   mod2_cheatchr_xxxx<mpu4_characteriser_pal::m441_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Top Action (Barcrest) (Dutch) (MPU4) (TA 2.2, set 2)",GAME_FLAGS )
 
 // 00 24 24 a4 4c 10 88 50 a8 d8 9c 9c bc 94 e8 50 a8 (du91)
 GAME(199?, m4topst,   0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::du91_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Top Stop (Barcrest) (MPU4)",GAME_FLAGS )
@@ -1911,7 +1912,7 @@ GAME(199?, m4tribnk,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::tri
 GAME(199?, m4tupen,   0,          mod2, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "bootleg","Tuppenny Cracker (bootleg) (MPU4)",GAME_FLAGS ) // bootleg of Barcrest game
 
 // 00 c0 e0 b0 38 c4 f0 30 58 9c 9c 9c dc 9c dc 94 38 (tentendia)
-GAME(199?, m421,      0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Twenty One (Barcrest) (MPU4)",GAME_FLAGS ) // reel issues
+GAME(199?, m421,      0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::tentendia_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4default,     ROT0,   "Barcrest","Twenty One (Barcrest) (MPU4) (DTO 2.0)",GAME_FLAGS ) // reel issues after a few spins
 
 // 00 50 40 14 4c 80 34 44 5c 9c 9c 9c dc 9c (m435)
 GAMEL(199?, m4alpha,  0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::m435_characteriser_prot>, mpu4,            mpu4mod2_machines_state, init_m4alpha,       ROT0,   "Barcrest","Alphabet (Barcrest) [A4B 1.0] (MPU4)",GAME_FLAGS, layout_m4alpha )

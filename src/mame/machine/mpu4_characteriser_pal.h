@@ -119,7 +119,13 @@ public:
 
 	// games with sequence starting 00 a0 a8 18 f4 2c 70 60 e4 e8
 	static constexpr uint8_t viva_characteriser_prot[8] = { 0x03, 0xE7, 0xA3, 0xC7, 0xC3, 0xA7, 0xA3, 0xC3 };
-													//   00    60    20    40    40    24    20    40   place your bets
+	// place your bets (same as above, but with unused lamp bits masked out, except for 0x24?)
+	// static constexpr uint8_t viva_characteriser_prot[8] = { 0x00, 0x60, 0x20, 0x40, 0x40, 0x24, 0x20, 0x40 };
+	// spend spend spend - This is unusual because the 2nd value DOES need to be different, bit 0x20 can't be set
+	// or the 2nd reel will be in thew wrong place.  Does this indicate the lamp reading is more complex than
+	// we believe, or are there 2 parts with the same sequence and one value different?
+	static constexpr uint8_t viva_sss_characteriser_prot[8] = { 0x00, 0x40, 0x20, 0x40, 0x40, 0x20, 0x20, 0x40 };
+
 
 	static constexpr uint8_t m407_characteriser_prot[8] = { 0x03, 0xC7, 0x83, 0xC3, 0xC3, 0xA3, 0x83, 0xC3 };
 
@@ -178,9 +184,6 @@ public:
 	// games with sequence 00 84 8C D8 74 80 4C 90 E8 78 54 60 84
 	static constexpr uint8_t m578_characteriser_prot[8] = { 0x00, 0x60, 0x00, 0x60, 0x40, 0x20, 0x00, 0x00 };	
 
-	// games with sequence 00 60 60 44 e0 e8 1c 74 a4 6c 14 84 e8 1c f4
-	static constexpr uint8_t addr_characteriser_prot[8] = { 0x00, 0x60, 0x60, 0x40, 0x40, 0x60, 0x60, 0x40 }; // based on bootleg
-
 	// games with sequence 00 c0 c8 1c f4 68 14 50 70 50 20 f0 48 34 60
 	static constexpr uint8_t age_characteriser_prot[8] = { 0x00, 0x74, 0x44, 0x34, 0x14, 0x64, 0x44, 0x00 };
 
@@ -206,27 +209,96 @@ public:
 	static constexpr uint8_t gambal_characteriser_prot[8] = { 0x00, 0x18, 0x08, 0x10, 0x00, 0x18, 0x08, 0x00 };
 
 
+	// Games with sequence starting
+	// 00 60 60 44 e0 e8 1c 74 a4 6c 14 84 e8 1c f4
+	// used by
+	// Classic Adders & Ladders  "A6L 0.1"
+	// Luxor                     "LUX 0.6"
+	// Prize Luxor (Barcrest)    "PLX 0.2"
+	// Double Up                 " DU 1.5"
+	static constexpr uint8_t addr_characteriser_prot[8] = { 0x00, 0x60, 0x60, 0x40, 0x40, 0x60, 0x60, 0x40 }; // match output of unprotected bootlegs
+
+
+	// Games with sequence starting
+	// 00 a0 88 38 94 2c 30 00 e4 c8 18 b4 4c 30
+	// used by
+	// Classic Adders & Ladders  "ADD 1.0"
+	//                           "ADD 3.0"
+	//                           "ADD 4.0"
+	//                           "ADD 5.0"
+	// Squids In                 "SQ_ 2.0"
+	// Reel Poker                "R2P 3.0" (lamp scramble not used)
+	static constexpr uint8_t squids_characteriser_prot[8] = { 0x00, 0x60, 0x20, 0x60, 0x40, 0x20, 0x20, 0x40 }; // match m4addr decodes for sets using this table
+
+
+	// Games with sequence starting
+	// 00 90 18 e4 a8 3c f4 48 74 50 20 f0 18 e4 98 e4 a8 7c f4 18 c4 c8 0c 74 10 60 d0 28 14 70 00 c0 b8 b4 68 44 d0 28 24 90 08 24 f0 78 f4 48 44 d0 78 c4 d8 e4 b8 e4 d8 c4 e8 7c d4 18 e4 98 f4 00
+	// used by
+	// Spend Spend Spend "SX5 2.0"
+	//                   "SX102.0"
+	// Super Hyper Viper "H6Y 0.3"
+	//                   "H6Y 0.2"
+	// Golden Gate       "DGG 2.2" (lamp scramble not used? currently not booting)	
+	static constexpr uint8_t m450_characteriser_prot[8] = { 0x00, 0x70, 0x10, 0x60, 0x40, 0x30, 0x10, 0x00 };
+
+
+	// Games with sequence starting
+	// 00 c0 e0 b0 38 c4 f0 30 58 9c 9c 9c dc 9c dc 94 38 dc dc 8c 3c 8c 64 c0 f0 38 9c 8c 64 d0 20 d0 68 44 c8 3c 9c 8c 3c d4 20 c0 f8 dc 9c 94 78 c4 f8 94 78 9c 8c 3c dc 94 38 9c dc 8c 74 00 d8 00
+	// used by
+	// Viva Las Vegas        "VL_ 2.0"
+	// Ten Ten Do It Again   "TDA 0.4"
+	// Cloud Nine Club       "CNC 2.1"
+	// Nudge Nudge Wink Wink "NN3 0.1"
+	// Cash Connect          "CCO 3.2"
+	// Ring Of Fire          "ROF 0.3" (lamp scramble not used)
+	// Twenty One            "DTO 2.0" (lamp scramble not used)
+	static constexpr uint8_t tentendia_characteriser_prot[8] = { 0x00, 0x58, 0x40, 0x18, 0x10, 0x48, 0x40, 0x00 };
+
+
+	// Games with sequence starting
+	// 00 90 a0 70 c8 2c c4 30 c8 6c 44 d8 dc 5c d4 60 98 dc dc 1c 54 40 10 88 ec ec 6c 84 b0 68 84 78 d4 e0 38 54 c0 38 1c d4 20 90 e8 ec 2c 84 f0 a0 f8 54 c8 ec ac 6c c4 70 c0 f8 d4 a0 70 00 d8 00
+	// used by
+	// Tic Tac Toe   "TT_ 2.0"
+	//               "TT  1.0"
+	static constexpr uint8_t ttt_characteriser_prot[8] = { 0x00, 0x58, 0x10, 0x58, 0x50, 0x18, 0x10, 0x10 }; // lack of evidence, guessed based on logical lamp pattersn
+
+
+	// Games with sequence starting
+	// 00 90 c0 54 a4 f0 64 90 e4 d4 60 b4 c0 70 80 74 a4 f4 e4 d0 64 10 20 90 e4 f4 c4 70 00 14 00 14 a0 f0 64 10 84 70 00 90 40 90 e4 f4 64 90 64 90 e4 50 24 b4 e0 d4 e4 50 04 b4 c0 d0 64 90 e4 00
+	// used by
+	// Tic Tac Toe            "TT_ 3.0"
+	// Dutch Adders & Ladders "DAL 1.2" (lamp scramble not used? currently not booting)
+	// Dutch Old Timer        "DOT 1.1" (lamp scramble not used? currently not booting)
+	static constexpr uint8_t m470_characteriser_prot[8] = { 0x00, 0x30, 0x10, 0x30, 0x10, 0x30, 0x10, 0x10 }; // lack of evidence, crafted to match ttt_characteriser_prot output
+
+
+	// Games with sequence starting
+	// 00 a0 b0 58 ec 3c ec 14 68 4c 4c 6c 64 80 f8 84 98 ec 7c 8c 5c c4 b0 30 28 6c 4c 04 a0 d0 10 40 a8 3c ec 54 60 a0 98 c4 b0 30 68 64 a8 14 68 24 e8 54 68 6c 24 e0 d0 50 40 e8 74 20 c0 b0 78 00
+	// used by
+	// Tic Tac Toe Gold    "TG  3.3"
+	//                     "TG  4.4"
+	// Tic Tac Toe Classic "CT4 7.0"
+	//                     "CT  4.0"
+	//                     "CTT 3.0" / "CT4 3.0"
+	//                     "CT  2.3"
+	//                     "CT  2.4"		 
+	// Top Action          " TA 2.2" (one set) (lamp scramble not used)
+	static constexpr uint8_t topaction_characteriser_prot[8] = { 0x00, 0x68, 0x20, 0x48, 0x40, 0x28, 0x20, 0x00 }; // lack of evidence, guessed based on logical lamp patterns
+
+
 	/***************************************************************
 
-	 Lamp data below is incorrect
+	 Lamp data below is definitely incorrect
 
 	***************************************************************/
 
-
-	// these lamp values were in the Twin Timer set, which is the only game using it, but they're not used, so probably incorrect
+	// games with sequence starting 00 14 10 a0 8c c8 68 50 b0 38 64 b4 18
+	// these lamp values were in the Twin Timer set, but they're not used, so probably incorrect
 	static constexpr uint8_t m533_characteriser_prot[8] = { 0xFF, 0xFF, 0x10, 0x3F, 0x15, 0xFF, 0xFF, 0xFF };
 
-	// this sequence is used for m4oldtmr and m4tic__l, but m4oldtmr does not appear to use the lamp scramble, and the data is not valid for m4tic__l
-	// so is probably incorrect
-	// games with sequence starting 00 90 C0 54 A4 F0 64 90 E4 D4 60 B4
-	static constexpr uint8_t m470_characteriser_prot[8] = { 0xFF, 0xFF, 0x10, 0x3F, 0x15, 0xFF, 0xFF, 0xFF }; // one 'm470' set was set to all blank?
-
-	// these lamp values were in the Golden Gate set, they do not appear to be valid as Golden Gate doesn't use them and other games don't work with them
-	static constexpr uint8_t m450_characteriser_prot[8] = { 0xFF, 0xFF, 0x10, 0x3F, 0x15, 0xFF, 0xFF, 0xFF };
 
 
-	// games with sequence starting 00 c0 e0 b0 38 c4 f0 30 58 9c 9c 9c dc 9c dc
-	static constexpr uint8_t tentendia_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };   // INCORRECT
+
 
 	// games with sequence starting 00 90 88 4c e0 b8 74 84 bc 74 00 b4
 	static constexpr uint8_t jewelcrown_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };  // INCORRECT
@@ -236,9 +308,6 @@ public:
 
 	// games with sequence starting 00 50 10 24 54 00 60 50 34 30 00 74 10 04 74
 	static constexpr uint8_t premier_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
-
-	// games with sequence starting 00 a0 88 38 94 2c 30 00 e4 c8 18 b4 4c 30
-	static constexpr uint8_t squids_characteriser_prot[8] = { 0x00, 0x60, 0x20, 0x60, 0x40, 0x20, 0x20, 0x40 }; // match m4addr decodes for sets using this table
 
 	// games with sequence starting 00 a0 88 38 94 2c 30 00 e4 c8 18 b4 4c 30
 	static constexpr uint8_t graff_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
@@ -285,14 +354,10 @@ public:
 	// games with sequence starting 00 14 04 34 2c 44 34 24 3c 78 70 28 64
 	static constexpr uint8_t sunsetclub_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 a0 b0 58 ec 3c ec 14 68 4c 4c 6c 64 80 f8 84 98
-	static constexpr uint8_t topaction_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 	// games with sequence starting 00 18 c8 a4 0c 80 0c 90 34 30 00 58
 	static constexpr uint8_t doublediamond_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
-	// games with sequence starting 00 90 a0 70 c8 2c c4 30 c8 6c 44 d8 dc 5c
-	static constexpr uint8_t ttt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
 	// games with sequence starting 00 44 44 c4 68 14 8c 30 8c b8 d0 a8
 	static constexpr uint8_t cashencounters_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
@@ -458,6 +523,10 @@ public:
 
 	// games with sequence starting 00 0c 50 60 4c 10 60 0c 78 74 00 6c 38 34 48 
 	static constexpr uint8_t hirise_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+	// games with sequence starting 00 24 24 2c b0 e0 4c 30 a8 d8 9c 9c bc 1c bc 94
+	static constexpr uint8_t nudshf_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
 
 protected:
 	mpu4_characteriser_pal(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

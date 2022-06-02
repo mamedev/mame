@@ -163,7 +163,7 @@ ROM_START( m4casmul )
 	ROM_LOAD( "casinomultiplaysnd.bin", 0x0000, 0x080000, CRC(be293e95) SHA1(bf0d419c898920a7546b542d8b205e25004ef04f) )
 ROM_END
 
-ROM_START( m4oldtmr ) // mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::m470_characteriser_prot>
+ROM_START( m4oldtmr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dot11.bin",  0x00000, 0x10000,  CRC(da095666) SHA1(bc7654dc9da1f830a43f925db8079f27e18bb61e))
 
@@ -171,7 +171,7 @@ ROM_START( m4oldtmr ) // mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::m470_
 	ROM_LOAD( "sdot01.bin", 0x0000, 0x080000, CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
 ROM_END
 
-ROM_START( m4casot ) // mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::m470_characteriser_prot>
+ROM_START( m4casot )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "casrom.bin",  0x00000, 0x10000,  CRC(da095666) SHA1(bc7654dc9da1f830a43f925db8079f27e18bb61e) ) // == old timer   (aka b&wrom.bin)
 
@@ -179,7 +179,7 @@ ROM_START( m4casot ) // mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::m470_c
 	ROM_LOAD( "cassound.bin", 0x0000, 0x080000, CRC(50450909) SHA1(181659b0594ba8d196b7130c5999c91676a363c0) ) // ( aka b&wsound.bin )
 ROM_END
 
-ROM_START( m4jpmcla ) // mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::m470_characteriser_prot>
+ROM_START( m4jpmcla )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jcv2.epr",  0x00000, 0x10000,  CRC(da095666) SHA1(bc7654dc9da1f830a43f925db8079f27e18bb61e) ) // == old timer
 
@@ -2083,7 +2083,7 @@ GAME(199?, m4clbxa,   m4clbx,     mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::
 GAME(199?, m4clbxb,   m4clbx,     mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::viva_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0, "Barcrest","Club X (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
 
 // 00 c0 e0 b0 38 c4 f0 30 58 9c 9c 9c dc 9c dc 94 38 (same as tentendia)
-GAME(199?, m4ringfr,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::tentendia_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0, "Barcrest","Ring Of Fire (Barcrest) (MPU4)",GAME_FLAGS ) // German?
+GAME(199?, m4ringfr,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::tentendia_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0, "Barcrest","Ring Of Fire (Barcrest) (MPU4) (ROF 0.3)",GAME_FLAGS ) // German?
 
 // 00 90 88 4c e0 b8 74 84 bc 74 00 b4 88 6c c0 1c f4 (same as jewel in the crown) runs with door open, not English
 GAME(199?, m4royjwl,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::jewelcrown_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,  ROT0,   "Barcrest","Royal Jewels (Barcrest) (MPU4)",GAME_FLAGS )
@@ -2130,13 +2130,13 @@ GAME(199?, m4bluedm,  0,          mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_p
 GAME(199?, m4amhiwy,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m462_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","American Highway (Barcrest) (MPU4) (DAH)",GAME_FLAGS )
 
 // 00 90 c0 54 a4 f0 64 90 e4 d4 60 b4 c0 70 80 74 (m470)
-GAME(199?, m4addrd,   m4addr,     mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::m470_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Adders & Ladders (Barcrest) (DAL, Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4addrd,   m4addr,     mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::m470_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Adders & Ladders (Barcrest) (Dutch) (MPU4) (DAL 1.2)",GAME_FLAGS )
 
-// 00 90 c0 54 a4 f0 64 90 e4 d4 60 b4 c0 70 80 74 (m470)
-GAME(199?, m4nudshf,  0,          mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::m470_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4nudshfa, m4nudshf,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::m470_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
-GAME(199?, m4nudshfb, m4nudshf,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::m470_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
-GAME(199?, m4nudshfc, m4nudshf,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::m470_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
+// 00 24 24 2c b0 e0 4c 30 a8 d8 9c 9c bc 1c bc (nudshf)
+GAME(199?, m4nudshf,  0,          mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::nudshf_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4) (NUS 3.1) (set 1)",GAME_FLAGS )
+GAME(199?, m4nudshfb, m4nudshf,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::nudshf_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4) (NUS 3.1) (set 2)",GAME_FLAGS )
+GAME(199?, m4nudshfc, m4nudshf,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::nudshf_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4) (NUS 3.1) (set 3)",GAME_FLAGS )
+GAME(199?, m4nudshfa, m4nudshf,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::nudshf_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4) (NUS 3.0)",GAME_FLAGS )
 
 // 00 a0 a8 58 f4 8c d8 70 c4 e8 58 74 80 2c 94 4c (redheat)
 GAME(199?, m4rdht,    0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::redheat_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Red Heat (Golden Nugget?) (Barcrest) (MPU4) (DRH 1.2)",GAME_FLAGS )
@@ -2303,9 +2303,9 @@ GAME(199?, m4blkbuld, m4blkbul,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::
 GAME(199?, m4blkwhd,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::blackwhite_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Black & White (Barcrest) [Dutch] (MPU4) (DBW 1.1)",GAME_FLAGS ) // Reel Error
 
 // these 3 sets are identical, just with different sound ROMs, probably hacks?
-GAME(199?, m4oldtmr,  0,          mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::m470_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m_oldtmr,  ROT0,   "Barcrest","Old Timer (Barcrest) (Dutch) (MPU4) (DOT1.1)",GAME_FLAGS )
-GAME(199?, m4casot,   m4oldtmr,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::m470_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m_oldtmr,  ROT0,   "Barcrest","Old Timer (Barcrest) (Dutch, alt 'Black and White' sound roms) (DOT1.1)",GAME_FLAGS ) // uses the same program???
-GAME(199?, m4jpmcla,  m4oldtmr,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::m470_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m_oldtmr,  ROT0,   "Barcrest","Old Timer (Barcrest) (Dutch, alt 'JPM Classic' sound roms) (DOT1.1)",GAME_FLAGS ) // uses the same program???
+GAME(199?, m4oldtmr,  0,          mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::m470_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m_oldtmr,  ROT0,   "Barcrest","Old Timer (Barcrest) (Dutch) (MPU4) (DOT 1.1)",GAME_FLAGS )
+GAME(199?, m4casot,   m4oldtmr,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::m470_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m_oldtmr,  ROT0,   "Barcrest","Old Timer (Barcrest) (Dutch, alt 'Black and White' sound roms) (DOT 1.1)",GAME_FLAGS ) // uses the same program???
+GAME(199?, m4jpmcla,  m4oldtmr,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::m470_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m_oldtmr,  ROT0,   "Barcrest","Old Timer (Barcrest) (Dutch, alt 'JPM Classic' sound roms) (DOT 1.1)",GAME_FLAGS ) // uses the same program???
 
 // 00 c0 d0 38 ec 5c ec 14 68 2c 24 e8 74 00 e8 14 (turboplay)
 GAME(199?, m4tbplay,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::turboplay_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Turbo Play (Barcrest) (Dutch) (MPU4) (DTP) (set 1)",GAME_FLAGS )

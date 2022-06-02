@@ -128,7 +128,7 @@ GAME_CUSTOM( 1991, m4addr6lybd,  m4addr, mod4yam_cheatchr_xxxx<mpu4_characterise
 // sequence 00 a0 88 38 94 2c 30 00 e4 c8 18 b4 4c 30 (same as Squids In?)
 // "(C)1993  B.W.B." and "ADD 1.0"
 GAME_CUSTOM( 199?, m4addrc__l,   m4addr, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "al10",                     0x0000, 0x010000, CRC(3c3c82b6) SHA1(cc5ffdd0837c9af31d5737a70430a01d1989cdcc), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0, 1993)", GAME_FLAGS )
-// "(C)1994  B.W.B."  and "ADD 1.0" (actually version 10?)
+// "(C)1994  B.W.B." and "ADD 1.0" (actually version 10?)
 GAME_CUSTOM( 1994, m4addr10,     m4addr, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05___.1o3",             0x0000, 0x010000, CRC(8d9e0f5d) SHA1(fecc844908876e161d0134ce3cc098e79e74e0b1), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0, set 1)", GAME_FLAGS )
 GAME_CUSTOM( 1994, m4addr10d,    m4addr, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "ad_05_d_.1o3",             0x0000, 0x010000, CRC(2d29040f) SHA1(ee2bdd5da1a7e4146419ffd8bad521a9c1b49aa2), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 D, set 1)", GAME_FLAGS )
 GAME_CUSTOM( 1994, m4addr10c,    m4addr, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::squids_characteriser_prot>, m4addr, init_m4addr, "adi05___.1o3",             0x0000, 0x010000, CRC(050764b1) SHA1(364c50e4887c9fdd7ff62e63a6be4513336b4814), "Bwb","Classic Adders & Ladders (Bwb / Barcrest) (MPU4) (ADD 1.0 C, set 1)", GAME_FLAGS )
@@ -581,45 +581,31 @@ GAME_CUSTOM( 199?, m4nudbnk__d,    m4nudbnk,   "sbnx.p1",  0x0000, 0x010000, CRC
 *****************************************************************************************************************************************************************************/
 
 #undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
+#define GAME_CUSTOM(year, setname,parent, machine, inputs, init, name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::viva_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
+	GAME(year, setname, parent, machine, inputs, mpu4mod4yam_machines_state, init, ROT0, company, title, GAME_FLAGS )
 
-// boot, need proper lamp descramble
-
-// 00 a0 a8 18 f4 2c 70 60 e4 e8 58 d4 2c 50 (mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::viva_characteriser_prot>)
+// 00 a0 a8 18 f4 2c 70 60 e4 e8 58 d4 2c 50 (viva_sss_characteriser_prot) (same sequence as viva, 2nd lamp value different?)
 // (C)1995  B.W.B. and SP5 1.0
-GAME_CUSTOM( 199?, m4sss,     0,      "sp_05a__.1o3",     0x0000, 0x010000, CRC(044a0133) SHA1(7cf85cf19f5c3f588daf5c0d7efe4204d67161a2), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SP5 1.0, set 1)" )
-GAME_CUSTOM( 199?, m4sss__b,  m4sss,  "sp_05s__.1o3",     0x0000, 0x010000, CRC(2e000a62) SHA1(e60390a383388e385bbde79ca14c63e5d69a8869), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SP5 1.0, set 2)" )
-GAME_CUSTOM( 199?, m4sss__c,  m4sss,  "sp_05sb_.1o3",     0x0000, 0x010000, CRC(c6380ef5) SHA1(673044aae9998dfe52205a5e4a3d26361f01c518), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SP5 1.0, set 3)" )
-GAME_CUSTOM( 199?, m4sss__d,  m4sss,  "sp_05sd_.1o3",     0x0000, 0x010000, CRC(31f818e1) SHA1(bbfa45ef63a73aa726a8223be234fb8ffba45e24), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SP5 1.0, set 4)" )
-
+GAME_CUSTOM( 199?, m4sss,     0,     mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::viva_sss_characteriser_prot>, mpu4,init_m4_showstring, "sp_05a__.1o3",     0x0000, 0x010000, CRC(044a0133) SHA1(7cf85cf19f5c3f588daf5c0d7efe4204d67161a2), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SP5 1.0, set 1)" )
+GAME_CUSTOM( 199?, m4sss__b,  m4sss, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::viva_sss_characteriser_prot>, mpu4,init_m4_showstring, "sp_05s__.1o3",     0x0000, 0x010000, CRC(2e000a62) SHA1(e60390a383388e385bbde79ca14c63e5d69a8869), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SP5 1.0, set 2)" )
+GAME_CUSTOM( 199?, m4sss__c,  m4sss, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::viva_sss_characteriser_prot>, mpu4,init_m4_showstring, "sp_05sb_.1o3",     0x0000, 0x010000, CRC(c6380ef5) SHA1(673044aae9998dfe52205a5e4a3d26361f01c518), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SP5 1.0, set 3)" )
+GAME_CUSTOM( 199?, m4sss__d,  m4sss, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::viva_sss_characteriser_prot>, mpu4,init_m4_showstring, "sp_05sd_.1o3",     0x0000, 0x010000, CRC(31f818e1) SHA1(bbfa45ef63a73aa726a8223be234fb8ffba45e24), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SP5 1.0, set 4)" )
 // (C)1995  B.W.B. and SP101.0
-GAME_CUSTOM( 199?, m4sss__e,  m4sss,  "sp_10a__.1o3",     0x0000, 0x010000, CRC(918c038c) SHA1(608062dc4e39c15967e16d95945b65ef7feabea2), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SP101.0, set 1)" )
-GAME_CUSTOM( 199?, m4sss__f,  m4sss,  "sp_10s__.1o3",     0x0000, 0x010000, CRC(1bc5780a) SHA1(df1b5d0d6f4751a480aef77be40fb2cfd153bf18), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SP101.0, set 2)" )
-GAME_CUSTOM( 199?, m4sss__g,  m4sss,  "sp_10sb_.1o3",     0x0000, 0x010000, CRC(2dfc3926) SHA1(b6b201c65c182f9b18a590910183ce88b245af2b), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SP101.0, set 3)" )
-GAME_CUSTOM( 199?, m4sss__h,  m4sss,  "sp_10sd_.1o3",     0x0000, 0x010000, CRC(fe5c7e3e) SHA1(f5066f1f0c2220da874cbac0ce510cbac6fff8e7), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SP101.0, set 4)" )
-
-#undef GAME_CUSTOM
-#define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
-	ROM_START( setname ) \
-		ROM_REGION( length, "maincpu", 0 ) \
-		ROM_LOAD( name, offset, length, hash ) \
-	ROM_END \
-	GAME(year, setname, parent, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
-
-
+GAME_CUSTOM( 199?, m4sss__e,  m4sss, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::viva_sss_characteriser_prot>, mpu4,init_m4_showstring, "sp_10a__.1o3",     0x0000, 0x010000, CRC(918c038c) SHA1(608062dc4e39c15967e16d95945b65ef7feabea2), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SP101.0, set 1)" )
+GAME_CUSTOM( 199?, m4sss__f,  m4sss, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::viva_sss_characteriser_prot>, mpu4,init_m4_showstring, "sp_10s__.1o3",     0x0000, 0x010000, CRC(1bc5780a) SHA1(df1b5d0d6f4751a480aef77be40fb2cfd153bf18), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SP101.0, set 2)" )
+GAME_CUSTOM( 199?, m4sss__g,  m4sss, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::viva_sss_characteriser_prot>, mpu4,init_m4_showstring, "sp_10sb_.1o3",     0x0000, 0x010000, CRC(2dfc3926) SHA1(b6b201c65c182f9b18a590910183ce88b245af2b), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SP101.0, set 3)" )
+GAME_CUSTOM( 199?, m4sss__h,  m4sss, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::viva_sss_characteriser_prot>, mpu4,init_m4_showstring, "sp_10sd_.1o3",     0x0000, 0x010000, CRC(fe5c7e3e) SHA1(f5066f1f0c2220da874cbac0ce510cbac6fff8e7), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SP101.0, set 4)" )
 // 00 90 18 e4 a8 3c f4 48 74 50 20 f0 18 e4 98 e4 a8 7c  (m450)
 // (C)1995  B.W.B. and SX5 2.0
-GAME_CUSTOM( 199?, m4sss__i,  m4sss,  "sx_05a__.2_1",     0x0000, 0x010000, CRC(ceb830a1) SHA1(c9bef44d64a64872460ae3c450533fd14c92ca43), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SX5 2.0, set 1)" )
-GAME_CUSTOM( 199?, m4sss__k,  m4sss,  "sxi05___.2_1",     0x0000, 0x010000, CRC(a804a20b) SHA1(477d2a750c0c252ffa215c3cf89916cb3a296b92), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SX5 2.0, set 2)" )
-
+GAME_CUSTOM( 199?, m4sss__i,  m4sss, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4,init_m4_showstring, "sx_05a__.2_1",     0x0000, 0x010000, CRC(ceb830a1) SHA1(c9bef44d64a64872460ae3c450533fd14c92ca43), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SX5 2.0, set 1)" )
+GAME_CUSTOM( 199?, m4sss__k,  m4sss, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4,init_m4_showstring, "sxi05___.2_1",     0x0000, 0x010000, CRC(a804a20b) SHA1(477d2a750c0c252ffa215c3cf89916cb3a296b92), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SX5 2.0, set 2)" )
 // (C)1995  B.W.B. and SX102.0
-GAME_CUSTOM( 199?, m4sss__j,  m4sss,  "sx_10a__.2_1",     0x0000, 0x010000, CRC(73e3bc13) SHA1(004097cc9cd62b8fa4c584fcb9874cf998c7b89d), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SX102.0, set 1)" )
-GAME_CUSTOM( 199?, m4sss__l,  m4sss,  "sxi10___.2_1",     0x0000, 0x010000, CRC(bbb23438) SHA1(2cc4376f6393c69c1e18ad06be18933592b6bdae), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SX102.0, set 2)" )
+GAME_CUSTOM( 199?, m4sss__j,  m4sss, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4,init_m4_showstring, "sx_10a__.2_1",     0x0000, 0x010000, CRC(73e3bc13) SHA1(004097cc9cd62b8fa4c584fcb9874cf998c7b89d), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SX102.0, set 1)" )
+GAME_CUSTOM( 199?, m4sss__l,  m4sss, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4,init_m4_showstring, "sxi10___.2_1",     0x0000, 0x010000, CRC(bbb23438) SHA1(2cc4376f6393c69c1e18ad06be18933592b6bdae), "Bwb","Spend Spend Spend (Bwb) (MPU4) (SX102.0, set 2)" )
 
 
 /*****************************************************************************************************************************************************************************
@@ -1196,6 +1182,10 @@ GAME_CUSTOM( 199?, m4shv__t,    m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_
 GAME_CUSTOM( 199?, m4shv__u,    m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4_showstring,  "hv_10___.3o3",         0x0000, 0x010000, CRC(02e4d86a) SHA1(47aa83e8bcd85e8ba7fb972cdd1ead7fe21e0418), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, set 3)" )
 GAME_CUSTOM( 199?, m4shv__v,    m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4_showstring,  "hv_10_d_.3o3",         0x0000, 0x010000, CRC(85f176b9) SHA1(30380d58bf2834829764cbdbdc7d950632e61e6d), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, set 4)" )
 GAME_CUSTOM( 199?, m4shv__w,    m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4_showstring,  "hvi05___.3o3",         0x0000, 0x010000, CRC(cdba80a5) SHA1(6c9fac7e5ee324b18922cc7a053495f1977bcb6d), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, 1994, set 5)" )
+// "(C)1993  B.W.B." and "HVP 4.0"
+GAME_CUSTOM( 199?, m4shv__x, m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4_showstring,     "hv_05___.4n3",         0x0000, 0x010000, CRC(f607f351) SHA1(d7b779b80fa964a27b106bd9d5ca3be16a11d5e9), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 4.0, set 1)" )
+GAME_CUSTOM( 199?, m4shv__y, m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4_showstring,     "hv_05_d_.4n3",         0x0000, 0x010000, CRC(f4d702d7) SHA1(268c7f6443c7ae587caf5b227fcd438530a06bcc), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 4.0, set 2)" )
+GAME_CUSTOM( 199?, m4shv__z, m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m407_characteriser_prot>, mpu4,  init_m4_showstring,     "hvi05___.4n3",         0x0000, 0x010000, CRC(38a33c2b) SHA1(21004092b81e08146291fd3a025652f0edbe47dc), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 4.0, set 3)" )
 // expects chr sequence starting 00 90 18 e4 a8 3c f4 48 74 50 20 f0 18 e4 98 e4  (same as some Spend Spend Spend, m450)
 // "(C)1991 BARCREST" and "H6Y 0.3"
 GAME_CUSTOM( 199?, m4shv,    0,     mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4,  init_m4_showstring,     "h6ys.p1",              0x0000, 0x010000, CRC(4af914ff) SHA1(3d9b7c65ec1129ee64e3f4e14e43e4c39c76166b), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3, set 1)" )
@@ -1206,10 +1196,6 @@ GAME_CUSTOM( 199?, m4shv__d, m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal
 GAME_CUSTOM( 199?, m4shv__e, m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4,  init_m4_showstring,     "hyperviper.bin",       0x0000, 0x010000, CRC(8373f6a3) SHA1(79bff20ab80ffe11447595c6fe8e5ab90d432e17), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.3, set 2)" ) // hack?
 // "(C)1991 BARCREST" and "H6Y 0.2"
 GAME_CUSTOM( 199?, m4shv__f, m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4,  init_m4_showstring,     "hvypr206",             0x0000, 0x010000, CRC(e1d96b8c) SHA1(e21b1bdbca1bae41f0e7274e3521f99eb984759e), "Barcrest","Super Hyper Viper (Barcrest) (MPU4) (H6Y 0.2 Y)" )
-// "(C)1993  B.W.B." and "HVP 4.0"
-GAME_CUSTOM( 199?, m4shv__x, m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4,  init_m4_showstring,     "hv_05___.4n3",         0x0000, 0x010000, CRC(f607f351) SHA1(d7b779b80fa964a27b106bd9d5ca3be16a11d5e9), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 4.0, set 1)" )
-GAME_CUSTOM( 199?, m4shv__y, m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4,  init_m4_showstring,     "hv_05_d_.4n3",         0x0000, 0x010000, CRC(f4d702d7) SHA1(268c7f6443c7ae587caf5b227fcd438530a06bcc), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 4.0, set 2)" )
-GAME_CUSTOM( 199?, m4shv__z, m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::m450_characteriser_prot>, mpu4,  init_m4_showstring,     "hvi05___.4n3",         0x0000, 0x010000, CRC(38a33c2b) SHA1(21004092b81e08146291fd3a025652f0edbe47dc), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVP 4.0, set 3)" )
 // expects chr sequence starting 00 14 04 54 64 14 64 14 64 54 20 74 04 (hypvipalt)
  // "(C)1995  B.W.B." and "HVC 1.0"
 GAME_CUSTOM( 199?, m4shv__g, m4shv, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::hypvipalt_characteriser_prot>, mpu4,  init_m4_showstring,"5p4hypervyper.bin",    0x0000, 0x010000, CRC(51ac9288) SHA1(1580079b6e710506ab03e1d8a89af65cd06cedd2), "Bwb","Super Hyper Viper (Barcrest) (MPU4) (HVC 1.0 C)" )
