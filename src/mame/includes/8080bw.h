@@ -104,6 +104,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(sicv_in2_control_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(invadpt2_in1_control_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(invadpt2_in2_control_r);
+	DECLARE_READ_LINE_MEMBER(cosmicmo_cab_r);
 	DECLARE_READ_LINE_MEMBER(sflush_80_r);
 
 protected:
@@ -111,7 +112,6 @@ protected:
 
 	void invadpt2_sh_port_1_w(uint8_t data);
 	void invadpt2_sh_port_2_w(uint8_t data);
-	uint8_t invrvnge_02_r();
 
 	DECLARE_MACHINE_START(extra_8080bw_vh);
 	DECLARE_MACHINE_START(extra_8080bw_sh);
@@ -160,7 +160,7 @@ private:
 	void indianbt_sh_port_2_w(uint8_t data);
 	void indianbtbr_sh_port_1_w(uint8_t data);
 	void indianbtbr_sh_port_2_w(uint8_t data);
-	uint8_t indianbtbr_01_r();
+	uint8_t indianbt_01_r();
 	void schaser_sh_port_1_w(uint8_t data);
 	void schaser_sh_port_2_w(uint8_t data);
 	uint8_t sflush_in0_r();
@@ -262,7 +262,6 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	uint8_t darthvdr_01_r();
 	void darthvdr_00_w(uint8_t data);
 	void darthvdr_08_w(uint8_t data);
 	IRQ_CALLBACK_MEMBER(darthvdr_interrupt_vector);

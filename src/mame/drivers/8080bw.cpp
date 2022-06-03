@@ -929,20 +929,11 @@ void spacecom_state::init_spacecom()
 /*                                                     */
 /*******************************************************/
 
-uint8_t _8080bw_state::invrvnge_02_r()
-{
-	uint8_t data = ioport("IN2")->read();
-	if (m_flip_screen)
-		return data;
-	else
-		return (data & 0x8f) | (ioport("IN1")->read() & 0x70);
-}
-
 void invrvnge_state::io_map(address_map &map)
 {
 	map(0x00, 0x00).portr("IN0");
 	map(0x01, 0x01).portr("IN1");
-	map(0x02, 0x02).r(FUNC(invrvnge_state::invrvnge_02_r)).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
+	map(0x02, 0x02).portr("IN2").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(invrvnge_state::port03_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
 	map(0x05, 0x05).w(FUNC(invrvnge_state::port05_w));
@@ -979,9 +970,7 @@ static INPUT_PORTS_START( invrvnge )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_2WAY
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_in1_control_r)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("IN2")
@@ -994,14 +983,18 @@ static INPUT_PORTS_START( invrvnge )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "1500" )
 	PORT_DIPSETTING(    0x08, "2000" )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_2WAY PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_in2_control_r)
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) ) // 1 play 10p, 2 play 20p, 6 play 50p
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) ) // 1 play 20p, 2 play 40p, 3 play 50p
 
-	/* Dummy port for cocktail mode */
+	// P1 controls (read via IN1, and also via IN2 on upright cabinets)
+	INVADERS_CONTROL_PORT_P1
+
+	// P2 controls on cocktail cabinet (read via IN2)
+	INVADERS_CONTROL_PORT_P2
+
+	// Dummy port for cocktail mode
 	INVADERS_CAB_TYPE_PORT
 INPUT_PORTS_END
 
@@ -1290,16 +1283,21 @@ void _8080bw_state::escmars(machine_config &config)
 /*******************************************************/
 /*                                                     */
 /* Universal "Cosmic Monsters"                         */
-/*  The dipswitches are as stated in the manual, but   */
+/*  The DIP switches are as stated in the manual, but  */
 /*  some of them are incorrect.                        */
 /*  - You need at the very least 3000 points to get    */
 /*    a bonus life.                                    */
-/*  - The cabinet switch does nothing in the cpu, it   */
+/*  - The cabinet switch does nothing in the CPU, it   */
 /*    is all done by wires.                            */
 /*                                                     */
 /*  These issues may be due to manual/romset conflicts */
 /*                                                     */
 /*******************************************************/
+
+READ_LINE_MEMBER(_8080bw_state::cosmicmo_cab_r)
+{
+	return m_cabinet_type->read();
+}
 
 static INPUT_PORTS_START( cosmicmo )
 	PORT_INCLUDE( sicv_base )
@@ -1310,21 +1308,19 @@ static INPUT_PORTS_START( cosmicmo )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x03, "5" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(_8080bw_state, cosmicmo_cab_r)
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "1500" )
 	PORT_DIPSETTING(    0x08, "2500" )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(_8080bw_state, invaders_in2_control_r)
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 
 	PORT_MODIFY(CABINET_PORT_TAG)
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // cocktail mode set via DIP switch
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:3") // put this here to avoid infinite recursion on P2 read
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
 void _8080bw_state::cosmicmo_io_map(address_map &map)
@@ -1332,7 +1328,7 @@ void _8080bw_state::cosmicmo_io_map(address_map &map)
 	map.global_mask(0x7);
 	map(0x00, 0x00).mirror(0x04).portr("IN0");
 	map(0x01, 0x01).mirror(0x04).portr("IN1");
-	map(0x02, 0x02).mirror(0x04).r(FUNC(_8080bw_state::invrvnge_02_r));
+	map(0x02, 0x02).mirror(0x04).portr("IN2");
 	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
@@ -2145,8 +2141,7 @@ static INPUT_PORTS_START( polaris )
 	PORT_DIPNAME( 0x08, 0x00, "Invincible Test" )       PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	/* The Demo Sounds dip switch does function.
-	   It allows the sonar sounds to play in demo mode. */
+	// The Demo Sounds DIP switch does function - it allows the sonar sounds to play in demo mode.
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
@@ -2409,7 +2404,7 @@ void yosakdon_state::yosakdon(machine_config &config)
 /*******************************************************/
 /*                                                     */
 /* Taito  "Indian battle"                              */
-/* In "indianbtbr", the "number of animals" dipswitch  */
+/* In "indianbtbr", the "number of animals" DIP switch */
 /*  is ineffective because they compare for 8 kills at */
 /*  0x811, which is not possible. This byte should be  */
 /*  0x03.                                              */
@@ -2422,9 +2417,7 @@ static INPUT_PORTS_START( indianbt )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_in1_control_r)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("IN2")
@@ -2437,18 +2430,24 @@ static INPUT_PORTS_START( indianbt )
 	PORT_DIPNAME( 0x08, 0x00, "Number of Catch Animals" )
 	PORT_DIPSETTING(    0x00, "6" )
 	PORT_DIPSETTING(    0x08, "3" )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_in2_control_r)
 	PORT_DIPNAME(0x80,  0x00, "Invulnerability (Cheat)")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	/* Dummy port for cocktail mode */
+	// P1 controls (read via IN1, and also via IN2 on upright cabinets)
+	INVADERS_CONTROL_PORT_P1
+
+	// P2 controls on cocktail cabinet (read via IN2)
+	INVADERS_CONTROL_PORT_P2
+
+	// Dummy port for cocktail mode
 	INVADERS_CAB_TYPE_PORT
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( indianbtbr )
+	PORT_INCLUDE( indianbt )
+
 	PORT_START("IN0")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
@@ -2462,30 +2461,14 @@ static INPUT_PORTS_START( indianbtbr )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) //Length of manufacturer's logo (0x11 or 0x16)
 
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-
-	PORT_START("IN2")
+	PORT_MODIFY("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_DIPNAME(0x08,  0x00, "Invulnerability (Cheat)")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-
-	/* Dummy port for cocktail mode */
-	INVADERS_CAB_TYPE_PORT
 INPUT_PORTS_END
 
 
@@ -2521,8 +2504,9 @@ uint8_t _8080bw_state::indianbt_r()
 	return machine().rand();
 }
 
-uint8_t _8080bw_state::indianbtbr_01_r()
+uint8_t _8080bw_state::indianbt_01_r()
 {
+	// this is a hack - how are you supposed to get the game to read P2 inputs properly?
 	uint8_t data = ioport("IN1")->read();
 	if (!m_flip_screen)
 		return data;
@@ -2533,8 +2517,8 @@ uint8_t _8080bw_state::indianbtbr_01_r()
 void _8080bw_state::indianbt_io_map(address_map &map)
 {
 	map(0x00, 0x00).r(FUNC(_8080bw_state::indianbt_r));
-	map(0x01, 0x01).portr("IN1");
-	map(0x02, 0x02).r(FUNC(_8080bw_state::invrvnge_02_r)).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
+	map(0x01, 0x01).r(FUNC(_8080bw_state::indianbt_01_r));
+	map(0x02, 0x02).portr("IN2").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::indianbt_sh_port_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
 	map(0x05, 0x05).w(FUNC(_8080bw_state::indianbt_sh_port_2_w));
@@ -2545,7 +2529,7 @@ void _8080bw_state::indianbt_io_map(address_map &map)
 void _8080bw_state::indianbtbr_io_map(address_map &map)
 {
 	map(0x00, 0x00).portr("IN0");
-	map(0x01, 0x01).r(FUNC(_8080bw_state::indianbtbr_01_r));
+	map(0x01, 0x01).r(FUNC(_8080bw_state::indianbt_01_r));
 	map(0x02, 0x02).portr("IN2").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::indianbtbr_sh_port_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
@@ -2619,7 +2603,7 @@ void _8080bw_state::steelwkr_sh_port_3_w(uint8_t data)
 void _8080bw_state::steelwkr_io_map(address_map &map)
 {
 	map(0x01, 0x01).portr("IN1");
-	map(0x02, 0x02).r(FUNC(_8080bw_state::invrvnge_02_r)).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
+	map(0x02, 0x02).portr("IN2").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::invadpt2_sh_port_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
 	map(0x05, 0x05).w(FUNC(_8080bw_state::invadpt2_sh_port_2_w));
@@ -2627,17 +2611,14 @@ void _8080bw_state::steelwkr_io_map(address_map &map)
 }
 
 static INPUT_PORTS_START( steelwkr )
-	/* PORT_START("IN0") - never read */
+	// PORT_START("IN0") - never read
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON2 )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_in1_control_r)
 
 	PORT_START("IN2")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:1,2")
@@ -2647,12 +2628,17 @@ static INPUT_PORTS_START( steelwkr )
 	PORT_DIPSETTING(    0x03, "4" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT )          PORT_DIPLOCATION("SW1:3")
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:4" )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_in2_control_r)
 
-	/* Dummy port for cocktail mode */
+	// P1 controls (read via IN1, and also via IN2 on upright cabinets)
+	INVADERS_CONTROL_PORT_P1
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1)
+
+	// P2 controls (read via IN2, and also via IN1 on upright cabinets)
+	INVADERS_CONTROL_PORT_P2
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(2)
+
+	// Dummy port for cocktail mode
 	INVADERS_CAB_TYPE_PORT
 INPUT_PORTS_END
 
@@ -2956,15 +2942,6 @@ IRQ_CALLBACK_MEMBER(darthvdr_state::darthvdr_interrupt_vector)
 	return 0xff;
 }
 
-uint8_t darthvdr_state::darthvdr_01_r()
-{
-	uint8_t data = ioport("P2")->read();
-	if (m_flip_screen)
-		return data;
-	else
-		return (data & 0xe1) | (ioport("P1")->read() & 0x0e);
-}
-
 void darthvdr_state::main_map(address_map &map)
 {
 	map(0x0000, 0x17ff).rom();
@@ -2975,7 +2952,7 @@ void darthvdr_state::main_map(address_map &map)
 void darthvdr_state::io_map(address_map &map)
 {
 	map(0x00, 0x00).portr("P1");
-	map(0x01, 0x01).r(FUNC(darthvdr_state::darthvdr_01_r));
+	map(0x01, 0x01).portr("P2");
 
 	map(0x00, 0x00).w(FUNC(darthvdr_state::darthvdr_00_w)); // flipscreen
 	map(0x04, 0x04).nopw();
@@ -2986,9 +2963,7 @@ void darthvdr_state::io_map(address_map &map)
 static INPUT_PORTS_START( darthvdr )
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_in1_control_r)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x00, "1000" )
@@ -2997,14 +2972,14 @@ static INPUT_PORTS_START( darthvdr )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPSETTING(    0x80, "6" )
+	PORT_DIPSETTING(    0x00, "3" ) PORT_CONDITION("P2", 0x10, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x80, "5" ) PORT_CONDITION("P2", 0x10, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, "4" ) PORT_CONDITION("P2", 0x10, EQUALS, 0x10)
+	PORT_DIPSETTING(    0x80, "6" ) PORT_CONDITION("P2", 0x10, EQUALS, 0x10)
 
 	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_in2_control_r)
 	PORT_DIPNAME( 0x10, 0x10, "One less life" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3017,6 +2992,12 @@ static INPUT_PORTS_START( darthvdr )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	// P1 controls (read via IN1, and also via IN2 on upright cabinets)
+	INVADERS_CONTROL_PORT_P1
+
+	// P2 controls on cocktail cabinet (read via IN2)
+	INVADERS_CONTROL_PORT_P2
 
 	// Dummy port for cocktail mode
 	INVADERS_CAB_TYPE_PORT

@@ -2488,10 +2488,7 @@ CUSTOM_INPUT_MEMBER(invaders_state::invaders_in2_control_r)
 	// upright PCB : P1 controls
 	// cocktail PCB: P2 controls
 
-	if (is_cabinet_cocktail())
-		return m_player_controls[1]->read();
-	else
-		return m_player_controls[0]->read();
+	return m_player_controls[is_cabinet_cocktail() ? 1 : 0]->read();
 }
 
 
