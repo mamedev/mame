@@ -8894,6 +8894,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="manicpie">
+		<description>Manic Pietro</description>
+		<year>2019</year>
+		<publisher>Cristian M. Gonzalez</publisher>
+		<part name="flop" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="manic pietro - zx7 (2019)(gonzalez, cristian m.)(+3)(en-es).dsk" size="194816" crc="9d8ca38c" sha1="2a4f8313a6bd6610db4e122e375ea492b29ce260"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="marauder">
 		<!-- SPS dump 3519 -->
 		<description>Marauder</description>
@@ -17550,6 +17561,17 @@ license:CC0
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="219136">
 				<rom name="tiger road.dsk" size="219136" crc="b23208db" sha1="8f026abcfa037334d0747bfc366c870c2d7fc03d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tikitaca">
+		<description>Tiki Taca</description>
+		<year>2019</year>
+		<publisher>Climacus / Errazking</publisher>
+		<part name="flop" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="tiki taca (2019)(climacus)(+3)(es)(en).dsk" size="194816" crc="f2e1d3d4" sha1="316de7cd90cb66b1094320d1d65b3fc5eb8543de"/>
 			</dataarea>
 		</part>
 	</software>
