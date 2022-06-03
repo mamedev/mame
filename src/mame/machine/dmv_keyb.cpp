@@ -165,7 +165,7 @@ INPUT_PORTS_START( dmv_keyboard )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("COL.15")
-	PORT_DIPNAME( 0x07, 0x00, "Lanuguage Code" )
+	PORT_DIPNAME( 0x07, 0x00, "Language Code" )
 	PORT_DIPSETTING(    0x00, "US English" )
 	PORT_DIPSETTING(    0x01, "UK/Int. English" )
 	PORT_DIPSETTING(    0x02, "Danish" )
