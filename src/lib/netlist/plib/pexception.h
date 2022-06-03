@@ -86,10 +86,10 @@ namespace plib {
 	// using `-fnon-call-exceptions` and sigaction to enable c++ exception supported.
 	//
 
-	class fpexception_e : public pexception
+	class fp_exception_e : public pexception
 	{
 	public:
-		explicit fpexception_e(const pstring &text);
+		explicit fp_exception_e(const pstring &text);
 	};
 
 	static constexpr unsigned FP_INEXACT = 0x0001;
@@ -101,14 +101,14 @@ namespace plib {
 
 	/// \brief Catch SIGFPE on linux for debugging purposes.
 	///
-	class fpsignalenabler
+	class fp_signal_enabler
 	{
 	public:
-		explicit fpsignalenabler(unsigned fpexceptions);
+		explicit fp_signal_enabler(unsigned fpexceptions);
 
-		PCOPYASSIGNMOVE(fpsignalenabler, delete)
+		PCOPYASSIGNMOVE(fp_signal_enabler, delete)
 
-		~fpsignalenabler();
+		~fp_signal_enabler();
 
 		/// \brief is the functionality supported.
 		///

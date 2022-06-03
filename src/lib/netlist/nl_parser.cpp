@@ -1,10 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Couriersud
 
-#include "nl_parser.h"
-#include "nl_base.h"
 #include "nl_errstr.h"
 #include "nl_factory.h"
+#include "nl_parser.h"
 #include "nl_setup.h"
 
 namespace netlist
@@ -68,18 +67,18 @@ parser_t::parser_t(nlparse_t &setup)
 
 bool parser_t::parse(plib::istream_uptr &&strm, const pstring &nlname)
 {
-	token_store tokstor;
+	token_store_t tokstor;
 	parse_tokens(std::move(strm), tokstor);
 	return parse(tokstor, nlname);
 }
 
-void parser_t::parse_tokens(plib::istream_uptr &&strm, token_store &tokstor)
+void parser_t::parse_tokens(plib::istream_uptr &&strm, token_store_t &tokstor)
 {
 	plib::putf8_reader u8reader(strm.release_stream());
 	m_tokenizer.append_to_store(&u8reader, tokstor);
 }
 
-bool parser_t::parse(const token_store &tokstor, const pstring &nlname)
+bool parser_t::parse(const token_store_t &tokstor, const pstring &nlname)
 {
 	set_token_source(&tokstor);
 
@@ -125,14 +124,14 @@ bool parser_t::parse(const token_store &tokstor, const pstring &nlname)
 			}
 			if (token.is(m_tok_TRUTHTABLE_START) && name.str() == nlname)
 			{
-				net_truthtable_start(nlname);
+				net_truth_table_start(nlname);
 				return true;
 			}
 
 			// create a new cached local store
-			m_local.emplace(name.str(), token_store());
+			m_local.emplace(name.str(), token_store_t());
 			m_cur_local = &m_local[name.str()];
-			auto sl = sourceloc();
+			auto sl = location();
 			auto li = plib::pfmt("# {1} \"{2}\"")(sl.line(), sl.file_name());
 
 			m_cur_local->push_back(token_t(token_type::LINEMARKER, li));
@@ -179,7 +178,7 @@ void parser_t::parse_netlist()
 		if (token.is(m_tok_ALIAS))
 			net_alias();
 		else if (token.is(m_tok_DIPPINS))
-			dippins();
+			dip_pins();
 		else if (token.is(m_tok_NET_C))
 			net_c();
 		else if (token.is(m_tok_FRONTIER))
@@ -187,13 +186,13 @@ void parser_t::parse_netlist()
 		else if (token.is(m_tok_PARAM))
 			netdev_param();
 		else if (token.is(m_tok_DEFPARAM))
-			netdev_defparam();
+			netdev_default_param();
 		else if (token.is(m_tok_HINT))
 			netdev_hint();
 		else if (token.is(m_tok_NET_MODEL))
 			net_model();
 		else if (token.is(m_tok_SUBMODEL))
-			net_submodel();
+			net_sub_model();
 		else if (token.is(m_tok_INCLUDE))
 			net_include();
 		else if (token.is(m_tok_LOCAL_SOURCE))
@@ -239,11 +238,11 @@ void parser_t::net_lib_entry(bool is_local)
 		error(MF_EXTERNAL_SOURCE_IS_LOCAL_1(name));
 
 	// FIXME: Need to pass in parameter definition FIXME: get line number right
-	m_setup.register_lib_entry(name, "", sourceloc());
+	m_setup.register_lib_entry(name, "", location());
 	require_token(m_tok_paren_right);
 }
 
-void parser_t::net_truthtable_start(const pstring &nlname)
+void parser_t::net_truth_table_start(const pstring &nlname)
 {
 	bool head_found(false);
 
@@ -293,7 +292,7 @@ void parser_t::net_truthtable_start(const pstring &nlname)
 			require_token(m_tok_paren_left);
 			require_token(m_tok_paren_right);
 			// FIXME: proper location
-			m_setup.truthtable_create(desc, def_param, sourceloc());
+			m_setup.truth_table_create(desc, def_param, location());
 			return;
 		}
 	}
@@ -314,7 +313,7 @@ void parser_t::net_model()
 	require_token(m_tok_paren_right);
 }
 
-void parser_t::net_submodel()
+void parser_t::net_sub_model()
 {
 	require_token(m_tok_paren_left);
 	pstring model(get_identifier());
@@ -415,7 +414,7 @@ void parser_t::net_c()
 
 }
 
-void parser_t::dippins()
+void parser_t::dip_pins()
 {
 	std::vector<pstring> pins;
 
@@ -464,7 +463,7 @@ void parser_t::netdev_param()
 	}
 }
 
-void parser_t::netdev_defparam()
+void parser_t::netdev_default_param()
 {
 	require_token(m_tok_paren_left);
 	pstring param(get_identifier());

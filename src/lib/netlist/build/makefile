@@ -290,7 +290,8 @@ gcc9:
 	$(MAKE) CC=g++-9 LD=g++-9 CEXTRAFLAGS="-march=native -Wall -pedantic -Wpedantic -fext-numeric-literals -Wsign-compare -Wextra" EXTRALIBS="-lquadmath" OBJ=obj/gcc9
 
 emsdk:
-	emmake $(MAKE) CC=emcc LD=emcc CEXTRAFLAGS="-fexceptions" LDEXTRAFLAGS="-fexceptions --emrun" OBJ=obj/emsdk EXESUFFIX=.html
+	emmake $(MAKE) CC=emcc LD=emcc CEXTRAFLAGS="-fexceptions -msimd128" LDEXTRAFLAGS="-s ALLOW_MEMORY_GROWTH=0 -s TOTAL_MEMORY=268435456 -fexceptions -msimd128 --emrun --embed-file ../../../mame/machine/nl_pongf.cpp@nl_pongf.cpp --embed-file ../../../mame/audio/nl_kidniki.cpp@nl_kidniki.cpp" OBJ=obj/emsdk EXESUFFIX=.html
+	# LDFLAGS  -s ASSERTIONS=1
 	
 clang:
 	#$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native -msse4.2 -Weverything -Wall -pedantic -Wpedantic -Wunused-private-field -Wno-padded -Wno-unused-template -Wno-missing-variable-declarations -Wno-float-equal -Wconversion -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral  -Wno-exit-time-destructors"
@@ -303,8 +304,8 @@ clang:
 		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wformat-nonliteral \
 		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override \
 		-Wno-embedded-directive \
-		-Wno-undefined-reinterpret-cast \
-		-Wunreachable-code -Wno-gnu-alignof-expression \
+		-Wno-undefined-reinterpret-cast -Wno-error=unused-macros \
+		-Wunreachable-code \
 		-Wmissing-prototypes -Wno-error=deprecated"
 
 clang-libc:
@@ -363,9 +364,9 @@ doc:
 	./nltool$(EXESUFFIX) -c docheader > ../documentation/devsyn.dox.h
 	$(DOXYGEN) doxygen.conf
 
-NLOBJS = 	$(patsubst $(SRC)%, $(OBJ)%, $(CORESOURCES:.cpp=.o))
 cspell:
-	cd .. && cspell -c build/cspell.json --no-color --relative $(patsubst $(SRC)/%, %, $(ALLHEADERS) $(ALLSOURCES)) | sed -e "s/ - Unknown/: error: Unknown/g"
+	cd .. && cspell -c build/cspell.json --no-color --locale en-GB --relative $(patsubst $(SRC)/%, %, $(ALLHEADERS) ) | sed -e "s/ - Unknown/: error: Unknown/g"
+	#cd .. && cspell -c build/cspell.json --no-color --locale en-GB --relative $(patsubst $(SRC)/%, %, $(ALLHEADERS) $(ALLSOURCES)) | sed -e "s/ - Unknown/: error: Unknown/g"
 
 #-------------------------------------------------
 # depends
@@ -392,15 +393,15 @@ endif
 # generated
 #-------------------------------------------------
 
-$(SRC)/generated/lib_entries.hxx: $(DEVSOURCES)
+$(SRC)/generated/lib_entries.hxx: create_lib_entries.py $(DEVSOURCES)
 	@echo creating $@
 	$(PYTHON) create_lib_entries.py $^ > $@
 
-$(SRC)/generated/nld_devinc.h: $(DEVSOURCES)
+$(SRC)/generated/nld_devinc.h: create_devinc.py $(DEVSOURCES)
 	@echo creating $@
 	$(PYTHON) create_devinc.py $^ > $@
 
-$(SRC)/generated/nlm_modules_lib.cpp: $(MODULESOURCES)
+$(SRC)/generated/nlm_modules_lib.cpp: create_modules.py $(MODULESOURCES)
 	@echo creating $@
 	$(PYTHON) create_modules.py $^ > $@
 

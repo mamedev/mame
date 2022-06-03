@@ -48,7 +48,7 @@ namespace netlist::analog
 {
 
 	// -----------------------------------------------------------------------------
-	// nld_twoterm
+	// nld_two_terminal
 	// -----------------------------------------------------------------------------
 
 	template <class C>
@@ -65,16 +65,16 @@ namespace netlist::analog
 		return d2;
 	}
 
-	NETLIB_BASE_OBJECT(twoterm)
+	NETLIB_BASE_OBJECT(two_terminal)
 	{
-		NETLIB_CONSTRUCTOR(twoterm)
-		, m_P(*this, "1", &m_N, NETLIB_DELEGATE(termhandler))
-		, m_N(*this, "2", &m_P, NETLIB_DELEGATE(termhandler))
+		NETLIB_CONSTRUCTOR(two_terminal)
+		, m_P(*this, "1", &m_N, NETLIB_DELEGATE(terminal_handler))
+		, m_N(*this, "2", &m_P, NETLIB_DELEGATE(terminal_handler))
 		{
 		}
 		//#NETLIB_CONSTRUCTOR_EX(twoterm, nldelegate owner_delegate)
 		template <class C>
-		NETLIB_NAME(twoterm)(C &owner, const pstring &name, nldelegate owner_delegate) \
+		NETLIB_NAME(two_terminal)(C &owner, const pstring &name, nl_delegate owner_delegate) \
 				: base_type(owner, name)
 		, m_P(owner, name + ".1", &m_N, owner_delegate)
 		, m_N(owner, name + ".2", &m_P, owner_delegate)
@@ -86,7 +86,7 @@ namespace netlist::analog
 
 	public:
 
-		NETLIB_HANDLERI(termhandler);
+		NETLIB_HANDLERI(terminal_handler);
 
 		solver::matrix_solver_t *solver() const noexcept;
 
@@ -181,7 +181,7 @@ namespace netlist::analog
 	// nld_R
 	// -----------------------------------------------------------------------------
 
-	NETLIB_OBJECT_DERIVED(R_base, twoterm)
+	NETLIB_OBJECT_DERIVED(R_base, two_terminal)
 	{
 		NETLIB_CONSTRUCTOR(R_base)
 		{
@@ -252,9 +252,9 @@ namespace netlist::analog
 		, m_DialIsLog(*this, "DIALLOG", false)
 		, m_Reverse(*this, "REVERSE", false)
 		{
-			register_subalias("1", m_R1.P());
-			register_subalias("2", m_R1.N());
-			register_subalias("3", m_R2.N());
+			register_sub_alias("1", m_R1.P());
+			register_sub_alias("2", m_R1.N());
+			register_sub_alias("3", m_R2.N());
 
 			connect(m_R2.P(), m_R1.N());
 
@@ -283,8 +283,8 @@ namespace netlist::analog
 		, m_DialIsLog(*this, "DIALLOG", false)
 		, m_Reverse(*this, "REVERSE", false)
 		{
-			register_subalias("1", m_R1.P());
-			register_subalias("2", m_R1.N());
+			register_sub_alias("1", m_R1.P());
+			register_sub_alias("2", m_R1.N());
 
 		}
 
@@ -305,7 +305,7 @@ namespace netlist::analog
 	// nld_C
 	// -----------------------------------------------------------------------------
 #if 1
-	NETLIB_OBJECT_DERIVED(C, twoterm)
+	NETLIB_OBJECT_DERIVED(C, two_terminal)
 	{
 	public:
 		NETLIB_CONSTRUCTOR(C)
@@ -317,10 +317,10 @@ namespace netlist::analog
 		NETLIB_IS_TIMESTEP(true)
 		NETLIB_TIMESTEPI()
 		{
-			if (ts_type == timestep_type::FORWARD)
+			if (ts_type == time_step_type::FORWARD)
 			{
 				// G, Ieq
-				const auto res(m_cap.timestep(m_C(), deltaV(), step));
+				const auto res(m_cap.time_step(m_C(), deltaV(), step));
 				const nl_fptype G = res.first;
 				const nl_fptype I = res.second;
 				set_mat( G, -G, -I,
@@ -332,7 +332,7 @@ namespace netlist::analog
 
 		NETLIB_RESETI()
 		{
-			m_cap.setparams(exec().gmin());
+			m_cap.set_parameters(exec().gmin());
 		}
 
 		/// \brief Set capacitance
@@ -360,10 +360,10 @@ namespace netlist::analog
 
 #else
 	// Code preserved as a basis for a current/voltage controlled capacitor
-	NETLIB_OBJECT_DERIVED(C, twoterm)
+	NETLIB_OBJECT_DERIVED(C, two_terminal)
 	{
 	public:
-		NETLIB_CONSTRUCTOR_DERIVED(C, twoterm)
+		NETLIB_CONSTRUCTOR_DERIVED(C, two_terminal)
 		, m_C(*this, "C", nlconst::magic(1e-6))
 		, m_cap(*this, "m_cap")
 		{
@@ -372,7 +372,7 @@ namespace netlist::analog
 		NETLIB_IS_TIMESTEP(true)
 		NETLIB_TIMESTEPI()
 		{
-			m_cap.timestep(m_C(), deltaV(), step);
+			m_cap.time_step(m_C(), deltaV(), step);
 			if (m_cap.type() == capacitor_e::CONSTANT_CAPACITY)
 			{
 				const nl_fptype I = m_cap.Ieq(m_C(), deltaV());
@@ -394,7 +394,7 @@ namespace netlist::analog
 		param_fp_t m_C;
 		NETLIB_RESETI()
 		{
-			m_cap.setparams(exec().gmin());
+			m_cap.set_parameters(exec().gmin());
 		}
 
 	protected:
@@ -411,7 +411,7 @@ namespace netlist::analog
 	// nld_L
 	// -----------------------------------------------------------------------------
 
-	NETLIB_OBJECT_DERIVED(L, twoterm)
+	NETLIB_OBJECT_DERIVED(L, two_terminal)
 	{
 	public:
 		NETLIB_CONSTRUCTOR(L)
@@ -503,7 +503,7 @@ namespace netlist::analog
 	// nld_D
 	// -----------------------------------------------------------------------------
 
-	NETLIB_OBJECT_DERIVED(D, twoterm)
+	NETLIB_OBJECT_DERIVED(D, two_terminal)
 	{
 	public:
 		NETLIB_CONSTRUCTOR_EX(D, const pstring &model = "D")
@@ -511,8 +511,8 @@ namespace netlist::analog
 		, m_modacc(m_model)
 		, m_D(*this, "m_D")
 		{
-			register_subalias("A", P());
-			register_subalias("K", N());
+			register_sub_alias("A", P());
+			register_sub_alias("K", N());
 		}
 
 		NETLIB_IS_DYNAMIC(true)
@@ -533,7 +533,7 @@ namespace netlist::analog
 	// nld_Z - Zener Diode
 	// -----------------------------------------------------------------------------
 
-	NETLIB_OBJECT_DERIVED(Z, twoterm)
+	NETLIB_OBJECT_DERIVED(Z, two_terminal)
 	{
 	public:
 		NETLIB_CONSTRUCTOR_EX(Z, const pstring &model = "D")
@@ -542,8 +542,8 @@ namespace netlist::analog
 		, m_D(*this, "m_D")
 		, m_R(*this, "m_R")
 		{
-			register_subalias("A", P());
-			register_subalias("K", N());
+			register_sub_alias("A", P());
+			register_sub_alias("K", N());
 		}
 
 		NETLIB_IS_DYNAMIC(true)
@@ -568,7 +568,7 @@ namespace netlist::analog
 	// netlist voltage source must have inner resistance
 	// -----------------------------------------------------------------------------
 
-	NETLIB_OBJECT_DERIVED(VS, twoterm)
+	NETLIB_OBJECT_DERIVED(VS, two_terminal)
 	{
 	public:
 		NETLIB_CONSTRUCTOR(VS)
@@ -579,8 +579,8 @@ namespace netlist::analog
 		, m_compiled(*this, "m_compiled")
 		, m_funcparam({nlconst::zero()})
 		{
-			register_subalias("P", P());
-			register_subalias("N", N());
+			register_sub_alias("P", P());
+			register_sub_alias("N", N());
 			if (!m_func().empty())
 				m_compiled->compile(m_func(), std::vector<pstring>({{pstring("T")}}));
 		}
@@ -589,7 +589,7 @@ namespace netlist::analog
 
 		NETLIB_TIMESTEPI()
 		{
-			if (ts_type == timestep_type::FORWARD)
+			if (ts_type == time_step_type::FORWARD)
 			{
 				m_t += step;
 				m_funcparam[0] = m_t;
@@ -605,7 +605,7 @@ namespace netlist::analog
 
 		NETLIB_RESETI()
 		{
-			NETLIB_NAME(twoterm)::reset();
+			NETLIB_NAME(two_terminal)::reset();
 			this->set_G_V_I(plib::reciprocal(m_R()), m_V(), nlconst::zero());
 		}
 
@@ -622,7 +622,7 @@ namespace netlist::analog
 	// nld_CS - Current source
 	// -----------------------------------------------------------------------------
 
-	NETLIB_OBJECT_DERIVED(CS, twoterm)
+	NETLIB_OBJECT_DERIVED(CS, two_terminal)
 	{
 	public:
 		NETLIB_CONSTRUCTOR(CS)
@@ -632,8 +632,8 @@ namespace netlist::analog
 		, m_compiled(*this, "m_compiled")
 		, m_funcparam({nlconst::zero()})
 		{
-			register_subalias("P", "1");
-			register_subalias("N", "2");
+			register_sub_alias("P", "1");
+			register_sub_alias("N", "2");
 			if (!m_func().empty())
 				m_compiled->compile(m_func(), std::vector<pstring>({{pstring("T")}}));
 		}
@@ -641,7 +641,7 @@ namespace netlist::analog
 		NETLIB_IS_TIMESTEP(!m_func().empty())
 		NETLIB_TIMESTEPI()
 		{
-			if (ts_type == timestep_type::FORWARD)
+			if (ts_type == time_step_type::FORWARD)
 			{
 				m_t += step;
 				m_funcparam[0] = m_t;
@@ -658,7 +658,7 @@ namespace netlist::analog
 
 		NETLIB_RESETI()
 		{
-			NETLIB_NAME(twoterm)::reset();
+			NETLIB_NAME(two_terminal)::reset();
 			const auto zero(nlconst::zero());
 			set_mat(zero, zero, -m_I(),
 					zero, zero,  m_I());

@@ -57,12 +57,12 @@ namespace plib {
 
 	void options::register_option(option_base *opt)
 	{
-		m_opts.push_back(opt);
+		m_options.push_back(opt);
 	}
 
 	void options::check_consistency()
 	{
-		for (auto &opt : m_opts)
+		for (auto &opt : m_options)
 		{
 			auto *o = dynamic_cast<option *>(opt);
 			if (o != nullptr)
@@ -200,7 +200,7 @@ namespace plib {
 		ret = split_paragraphs(description, width, 0, 0) + "\n\n";
 		ret += "Usage:\t" + usage + "\n\nOptions:\n\n";
 
-		for (const auto & optbase : m_opts )
+		for (const auto & optbase : m_options )
 		{
 			// Skip anonymous inputs which are collected in option_args
 			if (dynamic_cast<option_args *>(optbase) != nullptr)
@@ -253,7 +253,7 @@ namespace plib {
 		}
 		// FIXME: other help ...
 		pstring ex("");
-		for (const auto & optbase : m_opts )
+		for (const auto & optbase : m_options )
 		{
 			if (auto *example = dynamic_cast<option_example *>(optbase))
 			{
@@ -271,7 +271,7 @@ namespace plib {
 
 	option *options::getopt_short(const pstring &arg) const
 	{
-		for (const auto & optbase : m_opts)
+		for (const auto & optbase : m_options)
 		{
 			auto *opt = dynamic_cast<option *>(optbase);
 			if (opt != nullptr && !arg.empty() && opt->short_opt() == arg)
@@ -281,7 +281,7 @@ namespace plib {
 	}
 	option *options::getopt_long(const pstring &arg) const
 	{
-		for (const auto & optbase : m_opts)
+		for (const auto & optbase : m_options)
 		{
 			auto *opt = dynamic_cast<option *>(optbase);
 			if (opt != nullptr && !arg.empty() && opt->long_opt() == arg)

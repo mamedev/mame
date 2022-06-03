@@ -71,6 +71,10 @@ public:
 
 	void safarir(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
@@ -92,8 +96,6 @@ private:
 	void safarir_audio_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start() override;
-	virtual void video_start() override;
 	void safarir_palette(palette_device &palette) const;
 	uint32_t screen_update_safarir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void safarir_audio(machine_config &config);
@@ -324,8 +326,6 @@ void safarir_state::machine_start()
 {
 	m_ram_1 = std::make_unique<uint8_t[]>(m_ram.bytes());
 	m_ram_2 = std::make_unique<uint8_t[]>(m_ram.bytes());
-	m_port_last = 0;
-	m_port_last2 = 0;
 
 	/* setup for save states */
 	save_pointer(NAME(m_ram_1), m_ram.bytes());
@@ -503,5 +503,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, safarir, 0,        safarir, safarir, safarir_state, empty_init, ROT90, "SNK (Taito license)", "Safari Rally (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1979, safarir,  0,       safarir, safarir, safarir_state, empty_init, ROT90, "SNK (Taito license)", "Safari Rally (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1979, safarirj, safarir, safarir, safarir, safarir_state, empty_init, ROT90, "SNK",                 "Safari Rally (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

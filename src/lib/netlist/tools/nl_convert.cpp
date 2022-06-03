@@ -51,7 +51,7 @@ static lib_map_t read_lib_map(const pstring &lm)
 	reader.stream().imbue(std::locale::classic());
 	lib_map_t m;
 	putf8string line;
-	while (reader.readline(line))
+	while (reader.read_line(line))
 	{
 		std::vector<pstring> split(plib::psplit(pstring(line), ','));
 		m[plib::trim(split[0])] = { plib::trim(split[1]), plib::trim(split[2]) };
@@ -65,7 +65,7 @@ static lib_map_t read_lib_map(const pstring &lm)
 
 nl_convert_base_t::nl_convert_base_t()
 	: out(&m_buf)
-	, m_numberchars("0123456789-+Ee.")
+	, m_number_chars("0123456789-+Ee.")
 {
 	m_buf.imbue(std::locale::classic());
 	m_units = {
@@ -322,7 +322,7 @@ double nl_convert_base_t::get_sp_unit(const pstring &unit) const
 double nl_convert_base_t::get_sp_val(const pstring &sin) const
 {
 	std::size_t p = 0;
-	while (p < sin.length() && (m_numberchars.find(sin.substr(p, 1)) != pstring::npos))
+	while (p < sin.length() && (m_number_chars.find(sin.substr(p, 1)) != pstring::npos))
 		++p;
 	pstring val = plib::left(sin, p);
 	pstring unit = sin.substr(p);
@@ -593,9 +593,9 @@ void nl_convert_spice_t::process_line(const pstring &line)
 						add_term(tt[1], devname, 0);
 						add_term(tt[2], devname, 1);
 
-						pstring extranetname = devname + "net";
-						m_replace.push_back({tt[sce+i], devname + ".IP", extranetname });
-						add_term(extranetname, devname + ".IN");
+						pstring extra_net_name = devname + "net";
+						m_replace.push_back({tt[sce+i], devname + ".IP", extra_net_name });
+						add_term(extra_net_name, devname + ".IN");
 						//# add_device_extra(devname, "PARAM({}, {})", devname + ".G", tt[scoeff+i]);
 					}
 				}
@@ -728,7 +728,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 // -------------------------------------------------
 
 nl_convert_eagle_t::tokenizer::tokenizer(nl_convert_eagle_t &convert)
-	: plib::ptokenizer()
+	: plib::tokenizer_t()
 	, m_convert(convert)
 {
 	this->identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-")
@@ -871,7 +871,7 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 // -------------------------------------------------
 
 nl_convert_rinf_t::tokenizer::tokenizer(nl_convert_rinf_t &convert)
-	: plib::ptokenizer()
+	: plib::tokenizer_t()
 	, m_convert(convert)
 {
 	this->identifier_chars(".abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_-")
@@ -1016,7 +1016,7 @@ void nl_convert_rinf_t::convert(const pstring &contents)
 			if (token.is(tok.m_tok_TER))
 			{
 				token = tok.get_token();
-				while (token.is_type(plib::ptoken_reader::token_type::IDENTIFIER))
+				while (token.is_type(plib::token_reader_t::token_type::IDENTIFIER))
 				{
 					pin = tok.get_identifier_or_number();
 					add_term(net, token.str() + "." + pin);

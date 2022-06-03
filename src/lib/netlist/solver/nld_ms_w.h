@@ -77,7 +77,7 @@ namespace netlist::solver
 		void reset() override { matrix_solver_t::reset(); }
 
 	protected:
-		void vsolve_non_dynamic() override;
+		void upstream_solve_non_dynamic() override;
 
 		void LE_invert();
 
@@ -347,7 +347,7 @@ namespace netlist::solver
 	}
 
 	template <typename FT, int SIZE>
-	void matrix_solver_w_t<FT, SIZE>::vsolve_non_dynamic()
+	void matrix_solver_w_t<FT, SIZE>::upstream_solve_non_dynamic()
 	{
 		this->clear_square_mat(this->m_A);
 		this->fill_matrix_and_rhs();

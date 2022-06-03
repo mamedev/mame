@@ -11,6 +11,7 @@
 #include "palloc.h"
 #include "pconfig.h"
 #include "pexception.h"
+#include "pfmtlog.h"
 
 #include <array>
 #include <memory>
@@ -22,14 +23,14 @@
 namespace plib {
 
 	template <typename FT, int SIZE, typename ARENA>
-	struct sizeabs
+	struct parray_traits
 	{
 		static constexpr std::size_t ABS() noexcept { return (SIZE < 0) ? narrow_cast<std::size_t>(0 - SIZE) : narrow_cast<std::size_t>(SIZE); }
 		using container = typename std::array<FT, ABS()> ;
 	};
 
 	template <typename FT, typename ARENA>
-	struct sizeabs<FT, 0, ARENA>
+	struct parray_traits<FT, 0, ARENA>
 	{
 		static constexpr std::size_t ABS() noexcept { return 0; }
 		using allocator_type = typename ARENA::template allocator_type<FT, PALIGN_VECTOROPT>;
@@ -56,9 +57,9 @@ namespace plib {
 	struct parray
 	{
 	public:
-		static constexpr std::size_t SIZEABS() noexcept { return sizeabs<FT, SIZE, ARENA>::ABS(); }
+		static constexpr std::size_t SIZEABS() noexcept { return parray_traits<FT, SIZE, ARENA>::ABS(); }
 
-		using base_type = typename sizeabs<FT, SIZE, ARENA>::container;
+		using base_type = typename parray_traits<FT, SIZE, ARENA>::container;
 		using size_type = typename base_type::size_type;
 		using value_type = FT;
 		using reference =  FT &;

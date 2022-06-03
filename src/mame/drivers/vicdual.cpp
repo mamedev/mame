@@ -36,7 +36,7 @@
         * There existed a vertical version of Head On as well.
         * According to the manuals, Borderline has the same sound
           board as Tranquillizer Gun.
-        * The relationship between clear nostromo and startrks isn't clear:
+        * The relationship between nostromo and startrks isn't clear:
           is one a bootleg of the other or are both bootlegs of an unknown
           original?
 

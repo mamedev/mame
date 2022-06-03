@@ -22,6 +22,11 @@
 
 #include <memory>
 
+/// \brief Construct a netlist device name
+///
+#define NETLIB_NAME(chip) nld_ ## chip
+
+
 namespace netlist
 {
 	// -----------------------------------------------------------------------------
@@ -158,7 +163,7 @@ namespace netlist
 	///
 	/// May be either FORWARD or RESTORE
 	///
-	enum class timestep_type
+	enum class time_step_type
 	{
 		FORWARD,  ///< forward time
 		RESTORE   ///< restore state before last forward
@@ -166,9 +171,9 @@ namespace netlist
 
 	/// \brief Delegate type for device notification.
 	///
-	using nldelegate = plib::pmfp<void ()>;
-	using nldelegate_ts = plib::pmfp<void (timestep_type, nl_fptype)>;
-	using nldelegate_dyn = plib::pmfp<void ()>;
+	using nl_delegate = plib::pmfp<void ()>;
+	using nl_delegate_ts = plib::pmfp<void (time_step_type, nl_fptype)>;
+	using nl_delegate_dyn = plib::pmfp<void ()>;
 
 	namespace detail {
 

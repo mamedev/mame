@@ -15,7 +15,7 @@ namespace analog
 	// nld_twoterm
 	// ----------------------------------------------------------------------------------------
 
-	solver::matrix_solver_t * NETLIB_NAME(twoterm)::solver() const noexcept
+	solver::matrix_solver_t * NETLIB_NAME(two_terminal)::solver() const noexcept
 	{
 		auto *solv(m_P.solver());
 		if (solv != nullptr)
@@ -24,14 +24,14 @@ namespace analog
 	}
 
 
-	void NETLIB_NAME(twoterm)::solve_now() const
+	void NETLIB_NAME(two_terminal)::solve_now() const
 	{
 		auto *solv(solver());
 		if (solv != nullptr)
 			solv->solve_now();
 	}
 
-	NETLIB_HANDLER(twoterm, termhandler)
+	NETLIB_HANDLER(two_terminal, terminal_handler)
 	{
 		// only called if connected to a rail net ==> notify the solver to recalculate
 		//printf("%s update\n", this->name().c_str());
@@ -122,7 +122,7 @@ namespace analog
 
 	NETLIB_TIMESTEP(L)
 	{
-		if (ts_type == timestep_type::FORWARD)
+		if (ts_type == time_step_type::FORWARD)
 		{
 			m_last_I = m_I;
 			m_last_G = m_G;

@@ -68,7 +68,7 @@ DEFINE_DEVICE_TYPE(NETLIST_STREAM_OUTPUT, netlist_mame_stream_output_device, "nl
 // Special netlist extension devices  ....
 // ----------------------------------------------------------------------------------------
 
-extern const plib::dynlib_static_sym nl_static_solver_syms[];
+extern const plib::static_library::symbol nl_static_solver_syms[];
 
 static netlist::netlist_time_ext nltime_from_attotime(attotime t)
 {
@@ -986,7 +986,7 @@ std::unique_ptr<netlist::netlist_state_t> netlist_mame_device::base_validity_che
 			plib::plog_delegate(&validity_logger::log, &logger));
 		// enable validation mode
 
-		lnetlist->set_static_solver_lib(std::make_unique<plib::dynlib_static>(nullptr));
+		lnetlist->set_static_solver_lib(std::make_unique<plib::static_library>(nullptr));
 
 		common_dev_start(lnetlist.get());
 		lnetlist->setup().prepare_to_run();
@@ -1034,7 +1034,7 @@ void netlist_mame_device::device_start_common()
 {
 	m_netlist = std::make_unique<netlist_mame_t>(*this, "netlist");
 
-	m_netlist->set_static_solver_lib(std::make_unique<plib::dynlib_static>(nl_static_solver_syms));
+	m_netlist->set_static_solver_lib(std::make_unique<plib::static_library>(nl_static_solver_syms));
 
 	if (!machine().options().verbose())
 	{

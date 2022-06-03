@@ -17,15 +17,17 @@ adds moving obstacles. The 3rd game in the series, Space Micon Kit, adds a 2nd
 row of bricks.
 
 Hardware notes:
-- NEC 8080A, 18.432MHz XTAL
-- NEC 8228, NEC 8255C
-- 4KB ROM (4*MB8518), 256 bytes RAM, 4KB VRAM
-- 1bpp video with color overlay, 11MHz XTAL
+- NEC D8080A-C, 18.432MHz XTAL, NEC uPB8224C (/9 divider)
+- NEC uPB8228C, NEC D8255C
+- 4KB ROM (4*MB8518), 256 bytes RAM (2*D2111AL-4)
+- 4KB VRAM (32*MB8102), 1bpp video with color overlay
+- video timing: 10MHz XTAL, h/v: ?
 - beeper
 
 TODO:
-- verify CPU clock divider
 - correct video timing
+- there's a 2-player start button on the cocktail cabinet, but where is it
+  hooked up, if at all? (when inserting 2 coins, the game automatically starts)
 
 ******************************************************************************/
 
@@ -53,7 +55,8 @@ public:
 		m_screen(*this, "screen"),
 		m_vram(*this, "vram"),
 		m_beeper(*this, "beeper"),
-		m_inputs(*this, "IN.%u", 0)
+		m_inputs(*this, "IN.%u", 0),
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	void micon2(machine_config &config);
@@ -68,6 +71,7 @@ private:
 	required_shared_ptr<u8> m_vram;
 	required_device<beep_device> m_beeper;
 	required_ioport_array<5> m_inputs;
+	output_finder<2> m_lamps;
 
 	void main_map(address_map &map);
 	void io_map(address_map &map);
@@ -85,6 +89,8 @@ private:
 
 void miconkit_state::machine_start()
 {
+	m_lamps.resolve();
+
 	save_item(NAME(m_select));
 }
 
@@ -100,7 +106,7 @@ u32 miconkit_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	{
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			int pixel = BIT(m_vram[(y << 5 & 0xfe0) | (x >> 3 & 0x1f)], x & 7);
+			int pixel = BIT(m_vram[(y << 4 & 0xfe0) | (x >> 3 & 0x1f)], x & 7);
 			bitmap.pix(y, x) = pixel ? rgb_t::white() : rgb_t::black();
 		}
 	}
@@ -130,14 +136,17 @@ void miconkit_state::sound_w(u8 data)
 void miconkit_state::select_w(u8 data)
 {
 	// d0: input select
-	// other: ?
 	m_select = data & 1;
+
+	// d1: 1 player lamp
+	// d2: 2 player (cocktail) lamp
+	m_lamps[0] = BIT(data, 1);
+	m_lamps[1] = BIT(data, 2);
 }
 
 u8 miconkit_state::vblank_r()
 {
 	// d6: vblank flag
-	// other: ?
 	return ~(m_screen->vblank() << 6);
 }
 
@@ -228,8 +237,8 @@ void miconkit_state::micon2(machine_config &config)
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_size(256, 128);
-	m_screen->set_visarea(0, 240-1, 12, 128-12-1);
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 240-1, 24, 256-24-1);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_screen_update(FUNC(miconkit_state::screen_update));
 	m_screen->screen_vblank().set(m_ppi, FUNC(i8255_device::pc4_w));
@@ -247,10 +256,10 @@ void miconkit_state::micon2(machine_config &config)
 
 ROM_START( micon2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ufo_n2_0", 0x0000, 0x0400, CRC(3eb5a299) SHA1(5e7de4cb8312be8b84f7e5e035b61a6cb9798bc0) )
-	ROM_LOAD( "ufo_n2_1", 0x0400, 0x0400, CRC(e796338e) SHA1(86c5f283b4a41e19dd0b624d04e1a62ff2ffbf58) )
-	ROM_LOAD( "ufo_n2_2", 0x0800, 0x0400, CRC(bf246cd7) SHA1(147fb9b877ee108c9c09461ae7e0d72af9ab3275) )
-	ROM_LOAD( "ufo_n2_3", 0x0c00, 0x0400, CRC(0e93b4f0) SHA1(9405e85a7e005edd0043cb43ce2ef283b4c1b341) )
+	ROM_LOAD( "ufo_no_0", 0x0000, 0x0400, CRC(3eb5a299) SHA1(5e7de4cb8312be8b84f7e5e035b61a6cb9798bc0) )
+	ROM_LOAD( "ufo_no_1", 0x0400, 0x0400, CRC(e796338e) SHA1(86c5f283b4a41e19dd0b624d04e1a62ff2ffbf58) )
+	ROM_LOAD( "ufo_no_2", 0x0800, 0x0400, CRC(bf246cd7) SHA1(147fb9b877ee108c9c09461ae7e0d72af9ab3275) )
+	ROM_LOAD( "ufo_no_3", 0x0c00, 0x0400, CRC(0e93b4f0) SHA1(9405e85a7e005edd0043cb43ce2ef283b4c1b341) )
 ROM_END
 
 } // anonymous namespace

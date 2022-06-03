@@ -41,7 +41,7 @@ namespace netlist::solver
 		static constexpr const std::size_t SIZEABS = plib::parray<FT, SIZE>::SIZEABS();
 		static constexpr const std::size_t m_pitch_ABS = (((SIZEABS + 0) + 7) / 8) * 8;
 
-		void vsolve_non_dynamic() override;
+		void upstream_solve_non_dynamic() override;
 		void solve_non_dynamic();
 
 		void LE_solve();
@@ -176,7 +176,7 @@ namespace netlist::solver
 	}
 
 	template <typename FT, int SIZE>
-	void matrix_solver_direct_t<FT, SIZE>::vsolve_non_dynamic()
+	void matrix_solver_direct_t<FT, SIZE>::upstream_solve_non_dynamic()
 	{
 		// populate matrix
 		this->clear_square_mat(m_A);

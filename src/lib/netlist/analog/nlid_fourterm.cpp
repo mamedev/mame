@@ -30,10 +30,11 @@ NETLIB_RESET(VCCS)
 	m_ON1.set_go_gt(-m_mult, nlconst::zero());
 }
 
-NETLIB_HANDLER(VCCS, termhandler)
+NETLIB_HANDLER(VCCS, terminal_handler)
 {
 	solver::matrix_solver_t *solv = nullptr;
 	// only called if connected to a rail net ==> notify the solver to recalculate
+	// NOLINTNEXTLINE(bugprone-branch-clone)
 	if ((solv = m_IP.solver()) != nullptr)
 		solv->solve_now();
 	else if ((solv = m_IN.solver()) != nullptr)

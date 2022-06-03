@@ -33692,7 +33692,7 @@ license:CC0
 		<info name="release" value="2018-05-03"/>
 		<!-- Left & Right arrows or Paddle0 for controls - Select with "K" for keyboard / "P" for paddle -->
 		<!-- press SLASH "/" to fire with keyboard or use Button0 when using the paddle -->
-		<!-- "C" for continuous fire, SPACE BAR for shields, CRTL-S toggles sound on/off, ESC for pause  -->
+		<!-- "C" for continuous fire, SPACE BAR for shields, CRTL-S toggles sound on/off, ESC for pause -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -46379,7 +46379,7 @@ license:CC0
 		<year>1984</year>
 		<publisher>Epyx</publisher>
 		<info name="release" value="2016-07-26"/>
-		<!-- "Winter Games" is a 1985 sports game developed by Action Graphics.  -->
+		<!-- "Winter Games" is a 1985 sports game developed by Action Graphics. -->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
 		in the previous version not working on some machines. -->

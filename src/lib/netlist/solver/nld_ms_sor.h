@@ -40,7 +40,7 @@ namespace netlist::solver
 			{
 			}
 
-		void vsolve_non_dynamic() override;
+		void upstream_solve_non_dynamic() override;
 
 	private:
 		state_var<float_type> m_lp_fact;
@@ -53,7 +53,7 @@ namespace netlist::solver
 	///
 	///
 	template <typename FT, int SIZE>
-	void matrix_solver_SOR_t<FT, SIZE>::vsolve_non_dynamic()
+	void matrix_solver_SOR_t<FT, SIZE>::upstream_solve_non_dynamic()
 	{
 		const std::size_t iN = this->size();
 		bool resched = false;
@@ -154,7 +154,7 @@ namespace netlist::solver
 		{
 			// Fallback to direct solver ...
 			this->m_iterative_fail++;
-			matrix_solver_direct_t<FT, SIZE>::vsolve_non_dynamic();
+			matrix_solver_direct_t<FT, SIZE>::upstream_solve_non_dynamic();
 		}
 
 	}

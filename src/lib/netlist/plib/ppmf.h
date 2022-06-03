@@ -90,7 +90,7 @@ namespace plib {
 //  Macro magic
 //============================================================
 
-//#define PPMF_FORCE_TYPE 0
+//#define PPMF_FORCE_TYPE 1
 
 #ifndef PPMF_FORCE_TYPE
 #define PPMF_FORCE_TYPE -1
@@ -321,7 +321,6 @@ namespace plib {
 		static R stub(const generic_member_function* funci, mfp_generic_class* obji, Targs&&... args) noexcept(true);
 	};
 
-#if !defined(__NVCC__)
 	template<typename R, typename... Targs>
 	struct mfp_helper<ppmf_type::GNUC_PMF_CONV, R, Targs...>
 	{
@@ -346,7 +345,6 @@ namespace plib {
 		member_abi_function<mfp_generic_class>  m_resolved;
 		mfp_generic_class    *m_obj;
 	};
-#endif
 
 	template <ppmf_type PMFINTERNAL, typename R, typename... Targs>
 	using pmfp_helper_select = std::conditional<
@@ -359,6 +357,7 @@ namespace plib {
 	template<ppmf_type PMFINTERNAL, typename R, typename... Targs>
 	class pmfp_base<PMFINTERNAL, R (Targs...)> : public pmfp_helper_select<PMFINTERNAL, R, Targs...>::type
 	{
+		static_assert((compile_info::env::value != ci_env::NVCC) || (PMFINTERNAL != ppmf_type::GNUC_PMF_CONV), "GNUC_PMF_CONV not supported by nvcc");
 	public:
 		using helper = typename pmfp_helper_select<PMFINTERNAL, R, Targs...>::type;
 
@@ -538,7 +537,6 @@ namespace plib {
 		return (obj->*(*func))(std::forward<Targs>(args)...);
 	}
 
-#if !defined(__NVCC__)
 	template<typename R, typename... Targs>
 	mfp_helper<ppmf_type::GNUC_PMF_CONV, R, Targs...>::mfp_helper()
 	: m_obj(nullptr)
@@ -552,13 +550,15 @@ namespace plib {
 	template<typename O, typename F>
 	void mfp_helper<ppmf_type::GNUC_PMF_CONV, R, Targs...>::bind(O *object, F *mftp)
 	{
+		// nvcc still tries to compile the code below - even when shielded with a `if constexpr`
+#if !defined(__NVCC__)
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		member_abi_function<O> t = reinterpret_cast<member_abi_function<O>>(object->*(*mftp));
 		reinterpret_copy(t, this->m_resolved);
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 		m_obj = reinterpret_cast<mfp_generic_class *>(object);
-	}
 #endif
+	}
 
 	template<typename T>
 	template<typename O>

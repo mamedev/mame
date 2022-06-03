@@ -16,16 +16,16 @@
 
 namespace netlist::factory {
 
-	class truthtable_base_element_t : public factory::element_t
+	class truth_table_base_element_t : public factory::element_t
 	{
 	public:
-		truthtable_base_element_t(const pstring &name,properties &&props);
+		truth_table_base_element_t(const pstring &name,properties &&props);
 
 		std::vector<pstring> m_desc;
 		pstring m_family_name;
 	};
 
-	host_arena::unique_ptr<truthtable_base_element_t> truthtable_create(tt_desc &desc,
+	host_arena::unique_ptr<truth_table_base_element_t> truth_table_create(tt_desc &desc,
 		properties &&props);
 
 } // namespace netlist::factory

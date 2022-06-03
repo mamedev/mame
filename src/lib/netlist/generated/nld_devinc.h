@@ -1,3 +1,14 @@
+// license:BSD-3-Clause
+// copyright-holders:Couriersud
+
+#ifndef NLD_DEVINC_H
+#define NLD_DEVINC_H
+
+#ifndef __PLIB_PREPROCESSOR__
+
+
+#include "../nl_setup.h"
+
 // ---------------------------------------------------------------------
 // Source: ../analog/nld_bjt.cpp
 // ---------------------------------------------------------------------
@@ -1589,4 +1600,8 @@ NETLIST_EXTERNAL(ttl74xx_lib)
 // usage       : SOLVER(name, FREQ)
 #define SOLVER(...)                                                   \
 	NET_REGISTER_DEVEXT(SOLVER, __VA_ARGS__)
+
+#endif // __PLIB_PREPROCESSOR__
+
+#endif // NLD_DEVINC_H
 

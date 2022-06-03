@@ -65,7 +65,7 @@ namespace netlist::devices {
 	struct SN74LS629clk
 	{
 		SN74LS629clk(device_t &owner)
-		: m_FB(owner, "FB", nldelegate(&SN74LS629clk::fb, this))
+		: m_FB(owner, "FB", nl_delegate(&SN74LS629clk::fb, this))
 		, m_Y(owner, "Y")
 		, m_enableq(owner, "m_enableq", 0)
 		, m_out(owner, "m_out", 0)

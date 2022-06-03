@@ -38,14 +38,14 @@ namespace netlist::analog {
 		NETLIB_CONSTRUCTOR_EX(VCCS, nl_fptype ri = nlconst::magic(1e9))
 		, m_G(*this, "G", nlconst::one())
 		, m_RI(*this, "RI", ri)
-		, m_OP(*this, "OP", &m_IP, {&m_ON, &m_IN}, NETLIB_DELEGATE(termhandler))
-		, m_ON(*this, "ON", &m_IP, {&m_OP, &m_IN}, NETLIB_DELEGATE(termhandler))
-		, m_IP(*this, "IP", &m_IN, {&m_OP, &m_ON}, NETLIB_DELEGATE(termhandler))
-		, m_IN(*this, "IN", &m_IP, {&m_OP, &m_ON}, NETLIB_DELEGATE(termhandler))
-		, m_OP1(*this, "_OP1", &m_IN, NETLIB_DELEGATE(termhandler))
-		, m_ON1(*this, "_ON1", &m_IN, NETLIB_DELEGATE(termhandler))
-		//, m_IPx(*this, "_IPx", &m_OP, NETLIB_DELEGATE(termhandler))   // <= this should be NULL and terminal be filtered out prior to solving...
-		//, m_INx(*this, "_INx", &m_ON, NETLIB_DELEGATE(termhandler))   // <= this should be NULL and terminal be filtered out prior to solving...
+		, m_OP(*this, "OP", &m_IP, {&m_ON, &m_IN}, NETLIB_DELEGATE(terminal_handler))
+		, m_ON(*this, "ON", &m_IP, {&m_OP, &m_IN}, NETLIB_DELEGATE(terminal_handler))
+		, m_IP(*this, "IP", &m_IN, {&m_OP, &m_ON}, NETLIB_DELEGATE(terminal_handler))
+		, m_IN(*this, "IN", &m_IP, {&m_OP, &m_ON}, NETLIB_DELEGATE(terminal_handler))
+		, m_OP1(*this, "_OP1", &m_IN, NETLIB_DELEGATE(terminal_handler))
+		, m_ON1(*this, "_ON1", &m_IN, NETLIB_DELEGATE(terminal_handler))
+		//, m_IPx(*this, "_IPx", &m_OP, NETLIB_DELEGATE(terminal_handler))   // <= this should be NULL and terminal be filtered out prior to solving...
+		//, m_INx(*this, "_INx", &m_ON, NETLIB_DELEGATE(terminal_handler))   // <= this should be NULL and terminal be filtered out prior to solving...
 		, m_gfac(nlconst::one())
 		{
 			connect(m_OP, m_OP1);
@@ -60,7 +60,7 @@ namespace netlist::analog {
 		param_fp_t m_RI;
 
 	protected:
-		NETLIB_HANDLERI(termhandler);
+		NETLIB_HANDLERI(terminal_handler);
 		NETLIB_UPDATE_PARAMI()
 		{
 			NETLIB_NAME(VCCS)::reset();
@@ -187,8 +187,8 @@ namespace netlist::analog {
 	public:
 		NETLIB_CONSTRUCTOR(VCVS)
 		, m_RO(*this, "RO", nlconst::one())
-		, m_OP2(*this, "_OP2", &m_ON2, NETLIB_DELEGATE(termhandler))
-		, m_ON2(*this, "_ON2", &m_OP2, NETLIB_DELEGATE(termhandler))
+		, m_OP2(*this, "_OP2", &m_ON2, NETLIB_DELEGATE(terminal_handler))
+		, m_ON2(*this, "_ON2", &m_OP2, NETLIB_DELEGATE(terminal_handler))
 		{
 			connect(m_OP2, m_OP1);
 			connect(m_ON2, m_ON1);
@@ -200,9 +200,9 @@ namespace netlist::analog {
 
 	private:
 		//NETLIB_UPDATE_PARAMI();
-		NETLIB_HANDLERI(termhandler)
+		NETLIB_HANDLERI(terminal_handler)
 		{
-			NETLIB_NAME(VCCS) :: termhandler();
+			NETLIB_NAME(VCCS) :: terminal_handler();
 		}
 
 		terminal_t m_OP2;
@@ -242,8 +242,8 @@ namespace netlist::analog {
 	public:
 		NETLIB_CONSTRUCTOR_PASS(CCVS, nlconst::one())
 		, m_RO(*this, "RO", nlconst::one())
-		, m_OP2(*this, "_OP2", &m_ON2, NETLIB_DELEGATE(termhandler))
-		, m_ON2(*this, "_ON2", &m_OP2, NETLIB_DELEGATE(termhandler))
+		, m_OP2(*this, "_OP2", &m_ON2, NETLIB_DELEGATE(terminal_handler))
+		, m_ON2(*this, "_ON2", &m_OP2, NETLIB_DELEGATE(terminal_handler))
 		{
 			connect(m_OP2, m_OP1);
 			connect(m_ON2, m_ON1);
@@ -256,9 +256,9 @@ namespace netlist::analog {
 	private:
 		//NETLIB_UPDATE_PARAMI();
 
-		NETLIB_HANDLERI(termhandler)
+		NETLIB_HANDLERI(terminal_handler)
 		{
-			NETLIB_NAME(VCCS) :: termhandler();
+			NETLIB_NAME(VCCS) :: terminal_handler();
 		}
 
 		terminal_t m_OP2;

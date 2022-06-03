@@ -85,13 +85,13 @@ namespace netlist
 		log_type & log();
 
 	public:
-		virtual void timestep([[maybe_unused]] timestep_type ts_type,
+		virtual void time_step([[maybe_unused]] time_step_type ts_type,
 			[[maybe_unused]] nl_fptype st) noexcept { }
 		virtual void update_terminals() noexcept { }
 
 		virtual void update_param() noexcept {}
 		virtual bool is_dynamic() const noexcept { return false; }
-		virtual bool is_timestep() const noexcept { return false; }
+		virtual bool is_time_step() const noexcept { return false; }
 
 	private:
 		bool            m_hint_deactivate;
@@ -114,13 +114,13 @@ namespace netlist
 		~base_device_t() noexcept override = default;
 
 		template <class O, class C, typename... Args>
-		void create_and_register_subdevice(O& owner, const pstring &name, device_arena::unique_ptr<C> &dev, Args&&... args)
+		void create_and_register_sub_device(O& owner, const pstring &name, device_arena::unique_ptr<C> &dev, Args&&... args)
 		{
 			dev = state().make_pool_object<C>(owner, name, std::forward<Args>(args)...);
 		}
 
-		void register_subalias(const pstring &name, const detail::core_terminal_t &term);
-		void register_subalias(const pstring &name, const pstring &aliased);
+		void register_sub_alias(const pstring &name, const detail::core_terminal_t &term);
+		void register_sub_alias(const pstring &name, const pstring &aliased);
 
 		void connect(const pstring &t1, const pstring &t2);
 		void connect(const detail::core_terminal_t &t1, const detail::core_terminal_t &t2);
