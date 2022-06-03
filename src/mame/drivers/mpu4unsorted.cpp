@@ -2049,9 +2049,9 @@ GAME(199?, m4c9c,     0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::
 
 // corrupt vfd (bwb?)
 // 00 a0 a8 18 f4 2c 70 60 e4 e8 58 d4 2c 50 60 80  (viva_characteriser_prot)
-GAME(199?, m4clbx,    0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::viva_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0, "Barcrest","Club X (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4clbxa,   m4clbx,     mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::viva_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0, "Barcrest","Club X (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
-GAME(199?, m4clbxb,   m4clbx,     mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::viva_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0, "Barcrest","Club X (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
+GAME(199?, m4clbx,    0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::viva_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0, "Barcrest","Club X (Barcrest) (MPU4) (CLX 1.2, set 1)",GAME_FLAGS )
+GAME(199?, m4clbxa,   m4clbx,     mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::viva_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0, "Barcrest","Club X (Barcrest) (MPU4) (CLX 1.2, set 2)",GAME_FLAGS )
+GAME(199?, m4clbxb,   m4clbx,     mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::viva_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0, "Barcrest","Club X (Barcrest) (MPU4) (CLX 1.2, set 3)",GAME_FLAGS )
 
 // 00 c0 e0 b0 38 c4 f0 30 58 9c 9c 9c dc 9c dc 94 38 (same as tentendia)
 GAME(199?, m4ringfr,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::tentendia_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0, "Barcrest","Ring Of Fire (Barcrest) (MPU4) (ROF 0.3)",GAME_FLAGS ) // German?
@@ -2073,7 +2073,7 @@ GAME(199?, m4crjwl2b, m4crjwl2,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::
 
 // won't boot with current reel setup, not even in test mode (REEL E ALM)
 // 00 a0 a8 18 f4 2c 70 60 e4 e8 58 d4 2c 50 60  (viva_characteriser_prot)
-GAME(199?, m4maglin,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::viva_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Magic Liner (Barcrest) (MPU4) (DMA2.1)",GAME_FLAGS )
+GAME(199?, m4maglin,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::viva_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Magic Liner (Barcrest) (Dutch) (MPU4) (DMA 2.1)",GAME_FLAGS )
 
 // 00 90 a0 34 8c 68 44 90 ac 6c 44 9c dc 5c d4 24 98 dc (magicdragon) (same as bwb viz set)
 GAME(199?, m4magdrg,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::magicdragon_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Magic Dragon (Barcrest) (MPU4) (DMD1.0)",GAME_FLAGS )
@@ -2096,7 +2096,7 @@ GAME(199?, m4chaseig, m4chasei,   mod4oki_alt,mpu4,    mpu4unsorted_state, init_
 GAME(199?, m4bluedm,  0,          mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::bluediamond_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Blue Diamond (Barcrest) (Dutch) (MPU4) (DBD 1.0)",GAME_FLAGS )
 
 // 00 c4 c4 44 c4 44 44 c4 cc 3c 5c 7c 54 24 c4 4c (m462)
-GAME(199?, m4amhiwy,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m462_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","American Highway (Barcrest) (MPU4) (DAH)",GAME_FLAGS )
+GAME(199?, m4amhiwy,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m462_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","American Highway (Barcrest) (Dutch) (MPU4) (DAH 2.0)",GAME_FLAGS )
 
 // 00 90 c0 54 a4 f0 64 90 e4 d4 60 b4 c0 70 80 74 (m470)
 GAME(199?, m4addrd,   m4addr,     mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::m470_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Adders & Ladders (Barcrest) (Dutch) (MPU4) (DAL 1.2)",GAME_FLAGS )
@@ -2213,9 +2213,9 @@ GAME(199?, m4magrep,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::
 GAME(199?, m4nile,    0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::actclba_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Nile Jewels (Barcrest) (German) (MPU4) (GJN 0.8)",GAME_FLAGS ) // DM1 SW ALM
 
 // 00 24 24 2c e0 b4 b8 4c e8 d8 cc f8 6c 48 68 (m683)
-GAME(199?, m4jokmil,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m683_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Jokers Millennium (Barcrest) (German) (MPU4)",GAME_FLAGS ) // DM1 SW ALM
-// 00 24 24 2c e0 b4 b8 4c e8 d8 cc f8 6c 48 (m683)
-GAME(199?, m4jok300,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m683_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Jokers 300 (Barcrest) (German?) (MPU4)",GAME_FLAGS ) // also contains crystal maze stuff??
+// yes, the ingame display is 'Millenium' not 'Millennium'.  There are also strings from The Crystal Maze in the ROM, probably used as a base project?
+GAME(199?, m4jokmil,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m683_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Jokers Millenium 300 (Barcrest) (German) (MPU4) (DJO 0.1, set 1)",GAME_FLAGS ) // DM1 SW ALM
+GAME(199?, m4jok300,  m4jokmil,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m683_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Jokers Millenium 300 (Barcrest) (German) (MPU4) (DJO 0.1, set 2)",GAME_FLAGS ) // DM1 SW ALM
 
 // 00 8c 64 84 84 c4 84 84 9c f4 04 cc 24 84 c4 94 54 0c (bankrollerclub) (same as v4adders?)
 GAME(199?, m4drac,    0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::bankrollerclub_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Barcrest","Dracula (Barcrest - Nova) (German) (MPU4) (DRA 2.1)",GAME_FLAGS ) // DM1 SW ALM
@@ -2318,9 +2318,9 @@ GAME(199?, m4specu,   0,          mod2_cheatchr,       mpu4,    mpu4unsorted_sta
 
 // runs
 // 00 64 64 24 64 64 24 64 6c 9c bc bc a4 24 (wta)
-GAME(199?, m4lazy,    0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::wta_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Bwb","Lazy Bones (Bwb) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4lazya,   m4lazy,     mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::wta_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Bwb","Lazy Bones (Bwb) (MPU4) (set 2)",GAME_FLAGS )
-GAME(199?, m4lazyb,   m4lazy,     mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::wta_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Bwb","Lazy Bones (Bwb) (MPU4) (set 3)",GAME_FLAGS )
+GAME(199?, m4lazy,    0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::wta_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Bwb","Lazy Bones (Bwb) (MPU4) (LBD 1.0)",GAME_FLAGS )
+GAME(199?, m4lazya,   m4lazy,     mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::wta_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Bwb","Lazy Bones (Bwb) (MPU4) (LBD 1.2, set 1)",GAME_FLAGS )
+GAME(199?, m4lazyb,   m4lazy,     mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::wta_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big,ROT0,"Bwb","Lazy Bones (Bwb) (MPU4) (LBD 1.2, set 2)",GAME_FLAGS )
 
 // runs if you set a stake, scrambled lamps
 // 00 bc b8 fc bc dc fc fc fc f8 d8 b8 f8 d8 (intcep)
@@ -2349,7 +2349,7 @@ GAME(199?, m4crzcsn,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::
 GAME(199?, m4crzcav,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::bdash_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Crazy Cavern (Nova) (MPU4) (GCV 0.5)",GAME_FLAGS )
 
 // 00 24 24 2c e0 b4 b8 4c e8 d8 cc f8 6c 48 68 40 a4 bc ec d0 98 (m683)
-GAME(199?, m4dragon,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m683_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Dragon (Nova) (MPU4)",GAME_FLAGS )
+GAME(199?, m4dragon,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m683_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Dragon (Nova) (MPU4) (DGL 0.1)",GAME_FLAGS )
 
 // 00 24 24 a4 4c 10 c0 0c f0 a8 98 d4 68 90 e8 18 f4 e8 f8 54 (bagtel)
 GAME(199?, m4hilonv,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::bagtel_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, ROT0,   "Nova","Hi Lo Casino (Nova) (MPU4) (HNC 0.2)",GAME_FLAGS )
@@ -2552,7 +2552,7 @@ GAME(199?, m4vivalvd, m4vivalv,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::
 GAME(199?, m4prem,    0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::premier_characteriser_prot> ,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Premier (Barcrest) (Dutch) (MPU4) (DPM 1.4)",GAME_FLAGS )
 
 // 00 a0 a8 18 f4 2c 70 60 e4 e8 58 d4 2c 50 60 80 8c (viva_characteriser_prot)  Shows Barcrest on display, but in German
-GAME( 199?, m4spotln, 0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::viva_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, 0,      "Barcrest / Nova",  "Spotlight (Nova) (German) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
+GAME( 199?, m4spotln, 0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::viva_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, 0,      "Barcrest / Nova",  "Spotlight (Nova) (German) (MPU4) (GSP 0.1)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)
 
 // 00 50 40 90 a8 6c c4 30 c8 ac a4 f8 d4 28 4c 84 38 (alf scramble) can run open door, lamps scrambled
 GAME( 199?, m4goldnn, 0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::alf_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default_big, 0,      "Nova",  "Golden Years (Nova) (MPU4)",GAME_FLAGS|MACHINE_MECHANICAL|MACHINE_SUPPORTS_SAVE)

@@ -171,39 +171,155 @@ public:
 	static constexpr uint8_t m4dtri98_characteriser_prot[8] = { 0x03, 0xAF, 0x87, 0xAB, 0xA3, 0x8F, 0x87, 0x83 };
 
 
-	// games with sequence starting 00 24 24 2C E0 B4 B8 4C E8 D8 (m4eaw__a9 etc.)
+	// games with sequence starting
+	// 00 24 24 2C E0 B4 B8 4C E8 D8 (m4eaw__a9 etc.)
+	// Over The Moon               "OT8 0.1"
+	//                             "OTN 0.5"
+	// Lucky Strike Club           "CLU 1.4"
+	//                             "GLS 0.6"
+	//                             "GS3 0.1"
+	//                             "LS3 0.1"
+	// Cash Machine                "CMA 0.7"
+	//                             "CMH 0.6"
+	//                             "CMH 0.2"
+	// Everyone's A Winner         "ER8 0.1"
+	//                             "ER4 0.2"
+	//                             "CET 0.3 / ER4 0.3"
+	//                             "CEU 0.2 / ER4 0.2"
+	// Jokers Millenium 300        "DJO 0.1"
+	// Dragon (Nova)               "DGL 0.1"
+	// Red Alert                   "R2T 3.3"
+	// Red Alert                   "RAH 3.3"
 	static constexpr uint8_t m683_characteriser_prot[8] = { 0x03, 0xAF, 0x27, 0x8F, 0x0F, 0xA7, 0x27, 0x07 };
 
+
 	// games with sequence starting 00 44 44 4c e0 d4 d8 2c e8 b8 (m4overmn)
+	// Over The Moon   "OTT 0.2"
+	//                 "OTU 0.1"
 	static constexpr uint8_t otm_characteriser_prot[8] = { 0x00, 0x4C, 0x44, 0x04, 0x38, 0x74, 0x74, 0x20 };
 
-	// games with sequence starting 00 30 20 14 2c a0 54 24 3c 9c 9c 9c
+
+	// games with sequence starting
+	// 00 30 20 14 2c a0 54 24 3c 9c 9c 9c
+	// Take Your Pick Club    "CTP 1.2"
+	//                        "CTP 1.3"
+	//                        "NTP 0.2"
+	// Road Hog Club          "RHC 0.5"
+	// Andy Capp              "C2T 0.2"
+	//                        "C2T 0.1"
+	//                        "C5T 0.1"
+	// Make A Mint            "MAM 0.3"
+	//                        "MMG 0.4"
+	//                        "MMG 0.2"
+	// Take Your Pick         "TAP 0.6"
+	// Runaway Trail          "R4T 1.1"
+	//                        "R4T 1.3"
+	// Dutch Top Action       "TA 2.2" (only one set)
+	// Dutch Hold On          "DHO 2.5"
 	static constexpr uint8_t m441_characteriser_prot[8] = { 0x03, 0x3F, 0x33, 0x1F, 0x17, 0x3B, 0x33, 0x13 };
 												   //    00    38    30    18    14    3C    34    14
 												   //    00    38    30    18    10    38    30    14
 
-	// games with sequence starting 00 c4 c4 44 c4 44 44 c4 cc 3c
+
+												   // games with sequence starting 00 c4 c4 44 c4 44 44 c4 cc 3c
 	// this seems to be the same sequence as the MPU4 Video game 'Strike It Lucky' where we're having to use a 4k table for the question scramble
+	// Road Hog 2 - I'm Back    "2RH 0.6"
+	// Red Hot Roll Club        "RH2 1.1"
+	//                          "RH2 1.0"
+	// Dennis The Menace        "DM5 0.1"
+	//                          "DMT 0.1"
+	// Run For Your Money       "RUN 0.5"
+	//                          "APR 0.1"
+	//                          "RU8 0.1"
+	// Prize Run For Your Money "PRU 0.2"
+	//                          "RM8 0.1"
+	// Dutch American Highway   "DAH 2.0"
 	static constexpr uint8_t m462_characteriser_prot[8] = { 0x03, 0xC3, 0xC7, 0x4F, 0x47, 0xE7, 0xC7, 0x47 };
 												   //    04    44    44    48    40    60    40    40   rhog2
 
-	// games with sequence starting 00 64 64 24 64 64 24 64 6C 9C BC
+
+	// games with sequence starting
+	// 00 64 64 24 64 64 24 64 6C 9C BC
+	// Lucky Strike Club          "LSC 1.0"
+	// Winner Takes All           "WN5 0.1"
+	//                            "WNT 0.1"
+	// Jackpot Gems               "JGT 0.3"
+	//                            "JGU 0.2"
+	// Rich & Famous              "RAF 0.3"
+	//                            "RF8 0.1"
+	// Prize Rich & Famous        "PR8 0.1"
+	// Lazy Bones                 "LBD 1.0"
+	//                            "LBD 1.2"
 	static constexpr uint8_t wta_characteriser_prot[8] = { 0x00, 0x64, 0x60, 0x28, 0x20, 0x70, 0x60, 0x20 };
 
 
-	// games with sequence starting 00 24 24 a4 4c 10 88 50 a8 d8 9c
+	// games with sequence starting
+	// 00 24 24 a4 4c 10 88 50 a8 d8 9c
+	// Games Bond 006     "006 0.6"
+	// Jackpot Gems       "CG4 0.7"
+	//                    "CGT 0.3 / CG4 0.3"
+	//                    "CGT 0.1 / CG4 0.1"
+	//                    "CGU 0.2 / CG4 0.2"
+	//                    "JG8 0.1"
+	//                    "JAG 0.4"
+	// Double 9's         "DU9 1.0"
+	// Top Stop           "TSP 0.5"
 	static constexpr uint8_t du91_characteriser_prot[8] = { 0x03, 0xAF, 0x27, 0x8F, 0x87, 0x2F, 0x27, 0x07 };
 												   //    00    28    20    08    00    28    20    00    gb006
 
 
 	// games with sequence starting 00 90 C0 54 8C 68 24 90 CC 6C 24 9C BC 34 88 6C
+
+	// Supa Slot                "S4S 1.0"
+	// Dutch Stardust           "DSD 1.3"
+	// Road Hog                 "RR6 1.2"
+	//                          "RR6 1.1"
+	// Ace Chase                "AE5 3.0"
+	//                          "AE10 3.0"
+	//                          "AE  1.0"
+	//                          "AE20 3.0"
 	static constexpr uint8_t rr6_characteriser_prot[8] = { 0x00, 0x18, 0x10, 0x18, 0x10, 0x18, 0x10, 0x14 };
 
+
 	// games with sequence starting 00 30 20 14 64 30 44 30 64 34 00 74 20
+	// Dutch Turbo Reel Deluxe    "DTU 3.0"
+	// Club Climber               "C1C 3.3"
+	//                            "CC 4.5"
+	// Reel 2 Reel                "RR  3.0"
+	// Road Hog                   "RO_ 3.0"
+	// Jackpot Gems               "JG3 0.1"
 	static constexpr uint8_t rhm_characteriser_prot[8] = { 0x00, 0x70, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00 }; // incomplete? doesn't seem correct for the lower rows of the roadhog set using it
 
 
-	// games with sequence starting 00 a0 a8 18 f4 2c 70 60 e4 e8
+	// games with sequence starting
+	// 00 a0 a8 18 f4 2c 70 60 e4 e8
+	// Dutch Samurai                 "DSM 1.0"
+	// Jolly Taverner                "JT__ 2.0"
+	// Ready Steady Go               "RSG 1.2"
+	//                               "R4G 1.0"
+	// Stop the Clock                "SC 2.5"
+	// Viva Espana                   "EP8 0.1"
+	//                               "ESP 0.3"
+	//                               "ESP 0.2"
+	// Viva Espana Showcase          "SE8 0.1"
+	//                               "SES 0.2"
+	// Prize Viva Espana             "PES 0.4"
+	//                               "PE8 0.1"
+	// Place Your Bets               "PYB 0.6"
+	//                               "PYH 0.5"
+	// Lucky Las Vegas               "LL3 0.1"
+	//                               "LLT 0.3"
+	//                               "LLU 0.1"
+	// Fast Forward                  "SFF 3.0"
+	// Ghost Buster                  "GB 5.0"
+	//                               "GB 4.0"
+	//                               "GB 3.0"
+	//                               "GB 2.0"
+	// Spotlight (Nova) (German)     "GSP 0.1"
+	// Club X                        "CLX 1.2"
+	// Dutch Magic Liner             "DMA 2.1"
+	// Spend Spend Spend             "SP5 1.0" (uses different lamp scramble!)
+	//                               "SP101.0" (uses different lamp scramble!)
 	static constexpr uint8_t viva_characteriser_prot[8] = { 0x03, 0xE7, 0xA3, 0xC7, 0xC3, 0xA7, 0xA3, 0xC3 };
 	// place your bets (same as above, but with unused lamp bits masked out, except for 0x24?)
 	// static constexpr uint8_t viva_characteriser_prot[8] = { 0x00, 0x60, 0x20, 0x40, 0x40, 0x24, 0x20, 0x40 };
@@ -211,6 +327,7 @@ public:
 	// or the 2nd reel will be in thew wrong place.  Does this indicate the lamp reading is more complex than
 	// we believe, or are there 2 parts with the same sequence and one value different?
 	static constexpr uint8_t viva_sss_characteriser_prot[8] = { 0x00, 0x40, 0x20, 0x40, 0x40, 0x20, 0x20, 0x40 };
+
 
 
 	static constexpr uint8_t m407_characteriser_prot[8] = { 0x03, 0xC7, 0x83, 0xC3, 0xC3, 0xA3, 0x83, 0xC3 };

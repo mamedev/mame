@@ -1046,12 +1046,12 @@ GAME(199?, m4sstrek,  m4supst,  mod4yam,          mpu4, mpu4mod4yam_machines_sta
 	GAME(year, setname, parent, mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::viva_characteriser_prot>, mpu4, mpu4mod4yam_machines_state, init_m4_showstring, ROT0, company, title, GAME_FLAGS )
 
 // 00 a0 a8 18 f4 2c 70 60 e4 e8 58 d4 2c 50 60 80 8c 7c (mod4yam_cheatchr_xxxx<mpu4_characteriser_pal::viva_characteriser_prot>)
-GAME_CUSTOM( 199?, m4fastfw,       0,          "ffo05__1.0",   0x0000, 0x010000, CRC(8b683969) SHA1(7469b551e4d6f65550d54ee39b2bac07cf3dbd4b), "Bwb / Barcrest","Fast Forward (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4fastfw__a,    m4fastfw,   "ffo10__1.0",   0x0000, 0x010000, CRC(294288fd) SHA1(87d25f6333b6862fcc57a550b5cc7c0bc64e72cd), "Bwb / Barcrest","Fast Forward (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4fastfw__b,    m4fastfw,   "ffo10d_1.0",   0x0000, 0x010000, CRC(8d96f3d4) SHA1(2070a335cfa3f9de1bd9e9094d91cce81b91347d), "Bwb / Barcrest","Fast Forward (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4fastfw__c,    m4fastfw,   "ffo20__1.0",   0x0000, 0x010000, CRC(9528291e) SHA1(61c0eb8ce955f708e8a68a28f253706267e28254), "Bwb / Barcrest","Fast Forward (Barcrest) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4fastfw__d,    m4fastfw,   "ffo20d_1.0",   0x0000, 0x010000, CRC(5bae35fe) SHA1(7e4d61ed97ddd170bd1424f34d0327093668da3f), "Bwb / Barcrest","Fast Forward (Barcrest) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4fastfw__e,    m4fastfw,   "ffo20dy1.0",   0x0000, 0x010000, CRC(37167d46) SHA1(94b87697615f81b746ce3bcc64fc893f865e00dc), "Bwb / Barcrest","Fast Forward (Barcrest) (MPU4) (set 6)" )
+GAME_CUSTOM( 199?, m4fastfw,       0,          "ffo05__1.0",   0x0000, 0x010000, CRC(8b683969) SHA1(7469b551e4d6f65550d54ee39b2bac07cf3dbd4b), "Bwb / Barcrest","Fast Forward (Barcrest) (MPU4) (SFF 3.0, set 1)" )
+GAME_CUSTOM( 199?, m4fastfw__a,    m4fastfw,   "ffo10__1.0",   0x0000, 0x010000, CRC(294288fd) SHA1(87d25f6333b6862fcc57a550b5cc7c0bc64e72cd), "Bwb / Barcrest","Fast Forward (Barcrest) (MPU4) (SFF 3.0, set 2)" )
+GAME_CUSTOM( 199?, m4fastfw__b,    m4fastfw,   "ffo10d_1.0",   0x0000, 0x010000, CRC(8d96f3d4) SHA1(2070a335cfa3f9de1bd9e9094d91cce81b91347d), "Bwb / Barcrest","Fast Forward (Barcrest) (MPU4) (SFF 3.0, set 3)" )
+GAME_CUSTOM( 199?, m4fastfw__c,    m4fastfw,   "ffo20__1.0",   0x0000, 0x010000, CRC(9528291e) SHA1(61c0eb8ce955f708e8a68a28f253706267e28254), "Bwb / Barcrest","Fast Forward (Barcrest) (MPU4) (SFF 3.0, set 4)" )
+GAME_CUSTOM( 199?, m4fastfw__d,    m4fastfw,   "ffo20d_1.0",   0x0000, 0x010000, CRC(5bae35fe) SHA1(7e4d61ed97ddd170bd1424f34d0327093668da3f), "Bwb / Barcrest","Fast Forward (Barcrest) (MPU4) (SFF 3.0, set 5)" )
+GAME_CUSTOM( 199?, m4fastfw__e,    m4fastfw,   "ffo20dy1.0",   0x0000, 0x010000, CRC(37167d46) SHA1(94b87697615f81b746ce3bcc64fc893f865e00dc), "Bwb / Barcrest","Fast Forward (Barcrest) (MPU4) (SFF 3.0, set 6)" )
 
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
