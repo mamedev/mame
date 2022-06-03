@@ -773,6 +773,11 @@ public:
 	//                   "WN5 3.0"
 	static constexpr uint8_t wtaalt_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // INCORRECT
 
+	// games with sequence starting 00 60 60 24 68 c0 34 44 6c 8c 9c ac d4 18 ec 90 1c
+	// Dutch Triple Bank   "DTB 1.2"
+	static constexpr uint8_t tribank_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+
 	/***************************************************************
 
 	 Types below have no games using lamp scramble, so data is unknown / blank
@@ -808,57 +813,85 @@ public:
 	static constexpr uint8_t wildtime_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting  00 a0 a8 58 f4 8c d8 70 c4 e8 58 74 80 2c 94 4c
+	// Dutch Happy Joker   "DHJ 1.2"
+	// Dutch Red Heat      "DRH 1.2"
 	static constexpr uint8_t redheat_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting 00 60 60 a0 2c 50 84 28 d4 c8 9c b4 48 94
+	// Dutch Black Cat     "DBL 1.4"
+	// Dutch Rio Tropico   "DRT 1.0"
 	static constexpr uint8_t blkcat_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting 00 60 60 c0 4c 10 84 48 b4 a8 98 d4 2c 90
+	// Dutch Lucky Devil     "DLD 1.3"
+	// Hungarian Jolly Joker "HJJ 1.4"
+	// Dutch Ceptor          "DCE 1.0"
+	// Dutch Salsa           "DSA 1.5"
 	static constexpr uint8_t salsa_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting 00 24 24 64 2c 30 48 30 68 58 5c 5c
+	// Dutch Golden Joker    "DGJ 1.2"
 	static constexpr uint8_t goljok_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting 00 a0 a8 1c f4 c8 1c b4 cc 5c 74 44 e0 28
+	// Dutch 21 Club          "DTW 2.7"
+	// Dutch Black & White    "DBW 1.1"
 	static constexpr uint8_t blackwhite_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting  00 c0 d0 1c ec 78 ac 30 4c 2c 24 cc 7c a4 d8
+	// Magic Turbo        "XST 0.4"
+	// Dutch Tricolor     "DTC 2.5"
 	static constexpr uint8_t tricolor_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
-	// games with sequence starting 00 60 60 24 68 c0 34 44 6c 8c 9c ac d4 18 ec 90 1c
-	static constexpr uint8_t tribank_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting 00 84 8c 3c f4 4c 34 14 54 14 40 d4 4c 70 04 d0 58 f4
+	// Dutch Turbo Reel   "DTR 3.1"
+	// Grandstand Club    "G2D 4.0"
+	// Grandstand Club    " GD 1.1"
 	static constexpr uint8_t grandclub_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting 00 30 10 0c 98 a8 c4 60 3c ac c4 7c b4
+	// Dutch Taj Mahal   "DTM 1.0"
 	static constexpr uint8_t tajmahal_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting 00 24 24 64 a4 ac 78 74 e0 6c 50 c0 ac 58 74 00 a4 ec f8 94 c8
+	// Dutch Giant   "DGI 2.1"
 	static constexpr uint8_t giant_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting  00 30 10 84 e0 f0 c4 60 b4 54 80 f4 50 80 f4 40 b0 d4
+	// Dutch Random Roulette   "DRR 2.2"
 	static constexpr uint8_t randroul_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting  00 44 44 c4 1c 24 c4 14 c8 b8 a4 dc ec b0 58 a4
+	// Dutch Stars And Bars  "DSB 2.8"
 	static constexpr uint8_t starsbars_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting 00 a0 88 18 b0 48 50 60 e4 c8 58 90
+	// Top Gear (Barcrest) (MPU4) (TG4 1.1)
 	static constexpr uint8_t topgear_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting 00 c0 c8 38 f4 8c b8 70 a4 e8 38 74 80 4c b0 0c 94
+	// Dutch Red White & Blue  "DRW 1.4"
 	static constexpr uint8_t redwhite_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting  00 50 10 a0 c4 c4 74 30 b0 34 00 f0 14 80 f4 04
+	// Dutch Techno Reel  "DTE 1.3"
 	static constexpr uint8_t techno_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting   00 48 a0 54 2c 88 94 14 2c a4 50 24 48 a4 78 c0 70
+	// Bucks Fizz Club        "BUF 1.2"
+	// Super Bucks Fizz Club  "SBF 2.0"
 	static constexpr uint8_t bucksfizz_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting 00 0c 50 60 4c 10 60 0c 78 74 00 6c 38 34 48
+	// High Rise  "HII 0.3"
+	//            "HIR 3.1"
+	//            "HIR 3.0"
 	static constexpr uint8_t hirise_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// games with sequence starting 00 24 24 2c b0 e0 4c 30 a8 d8 9c 9c bc 1c bc 94
+	// Nudge Shuffle   "NUS 3.1"
+	//                 "NUS 3.0"
 	static constexpr uint8_t nudshf_characteriser_prot[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 

@@ -2122,18 +2122,18 @@ GAME(199?, m4nudshfc, m4nudshf,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal:
 GAME(199?, m4nudshfa, m4nudshf,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::nudshf_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4) (NUS 3.0)",GAME_FLAGS )
 
 // 00 a0 a8 58 f4 8c d8 70 c4 e8 58 74 80 2c 94 4c (redheat)
-GAME(199?, m4rdht,    0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::redheat_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Red Heat (Golden Nugget?) (Barcrest) (MPU4) (DRH 1.2)",GAME_FLAGS )
+GAME(199?, m4rdht,    0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::redheat_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Red Heat (Barcrest) (Dutch) (MPU4) (DRH 1.2)",GAME_FLAGS )
 
 // 00 c0 c8 38 f4 8c b8 70 a4 e8 38 74 80 4c b0 0c 94 (redwhite)
-GAME(199?, m4rwb,     0,          mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::redwhite_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Red White & Blue (Barcrest) (MPU4) (DRW)",GAME_FLAGS )
+GAME(199?, m4rwb,     0,          mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::redwhite_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Red White & Blue (Barcrest) (Dutch) (MPU4) (DRW 1.4)",GAME_FLAGS )
 
 // 00 60 60 c0 4c 10 84 48 b4 a8 98 d4 2c 90 (salsa)
-GAME(199?, m4salsa,   0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::salsa_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Salsa (Barcrest) (MPU4) (DSA)",GAME_FLAGS )
+GAME(199?, m4salsa,   0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::salsa_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Salsa (Barcrest) (Dutch) (MPU4) (DSA 1.5)",GAME_FLAGS )
 
 // REEL F ALARM
 // 00 50 10 a0 c4 c4 74 30 b0 34 00 f0 14 80 f4 04 (techno)
-GAME(199?, m4techno,  0,          mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::techno_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Techno Reel (Barcrest) (MPU4) (DTE) (set 1)",GAME_FLAGS )
-GAME(199?, m4technoa, m4techno,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::techno_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Techno Reel (Barcrest) (MPU4) (DTE) (set 2)",GAME_FLAGS )
+GAME(199?, m4techno,  0,          mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::techno_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Techno Reel (Barcrest) (Dutch) (MPU4) (DTE 1.3, set 1)",GAME_FLAGS )
+GAME(199?, m4technoa, m4techno,   mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::techno_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Techno Reel (Barcrest) (Dutch) (MPU4) (DTE 1.3, set 2)",GAME_FLAGS )
 
 // 00 14 10 a0 8c c8 68 50 b0 38 64 b4 18 e4 1c e4  (m533)
 GAME(199?, m4twintm,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::m533_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Twin Timer (Barcrest) (MPU4) (D2T 1.1)",GAME_FLAGS )
@@ -2149,24 +2149,24 @@ GAME(199?, m4calicld, m4calicl,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal:
 
 // REEL E ALARM
 // 00 48 a0 54 2c 88 94 14 2c a4 50 24 48 a4 78 c0 70 (bucksfizz)
-GAME(199?, m4bucks,   0,          mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::bucksfizz_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Bucks Fizz Club (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4bucks,   0,          mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::bucksfizz_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Bucks Fizz Club (Barcrest) (MPU4) (BUF 1.2)",GAME_FLAGS )
 
 // REEL E ALARM
 // 00 48 a0 54 2c 88 94 14 2c a4 50 24 48 a4 78 (bucksfizz)
-GAME(199?, m4supbf,   0,          mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::bucksfizz_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Super Bucks Fizz Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4supbfa,  m4supbf,    mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::bucksfizz_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Super Bucks Fizz Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4supbf,   0,          mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::bucksfizz_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Super Bucks Fizz Club (Barcrest) (MPU4) (SBF 2.0, set 1)",GAME_FLAGS )
+GAME(199?, m4supbfa,  m4supbf,    mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::bucksfizz_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Super Bucks Fizz Club (Barcrest) (MPU4) (SBF 2.0, set 2)",GAME_FLAGS )
 
 // 00 90 18 e4 a8 3c f4 48 74 50 20 f0 18 e4 98 e4 (m450)
 GAME(199?, m4gldgat,  0,          mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::m450_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Golden Gate (Barcrest) [DGG, Dutch] (MPU4)",GAME_FLAGS )
 
 // 00 0c 50 60 4c 10 60 0c 78 74 00 6c 38 34 48 (hirise)
-GAME(199?, m4hirise,  0,          mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::hirise_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4hirisea, m4hirise,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::hirise_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
-GAME(199?, m4hirisec, m4hirise,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::hirise_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
-GAME(199?, m4hirised, m4hirise,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::hirise_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
-GAME(199?, m4hirisee, m4hirise,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::hirise_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (set 5)",GAME_FLAGS )
+GAME(199?, m4hirise,  0,          mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::hirise_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (HII 0.3)",GAME_FLAGS )
+GAME(199?, m4hirisea, m4hirise,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::hirise_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (HIR 3.1, set 1)",GAME_FLAGS )
+GAME(199?, m4hirisec, m4hirise,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::hirise_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (HIR 3.1, set 2)",GAME_FLAGS )
+GAME(199?, m4hirised, m4hirise,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::hirise_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (HIR 3.1, set 3)",GAME_FLAGS )
+GAME(199?, m4hirisee, m4hirise,   mod2_alt_cheatchr_xxxx<mpu4_characteriser_pal::hirise_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (HIR 3.0)",GAME_FLAGS )
 // doesn't make protection accesses
-GAME(199?, m4hiriseb, m4hirise,   mod2_alt_cheatchr,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "hack?","High Rise (Barcrest) (MPU4) (hack?)",GAME_FLAGS )
+GAME(199?, m4hiriseb, m4hirise,   mod2_alt,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "bootleg?","High Rise (Barcrest) (MPU4) (HIR 1.5, bootleg?)",GAME_FLAGS )
 
 // 00 84 8c b8 74 80 1c b4 d8 74 00 d4 c8 78 a4  (celclb)
 GAME(199?, m4nspot,   0,          mod2_cheatchr_xxxx<mpu4_characteriser_pal::celclb_characteriser_prot>,   mpu4,    mpu4unsorted_state, init_m4altreels, ROT0,   "Barcrest","Night Spot Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
@@ -2254,17 +2254,17 @@ GAME(199?, m4vegastg, m4vegast,   mod4oki_cheatchr,    mpu4,    mpu4unsorted_sta
 
 GAME(199?, m4luckdv,  0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Lucky Devil (Barcrest) [Czech] (MPU4)",GAME_FLAGS ) // AUX2 locked
 // 00 60 60 c0 4c 10 84 48 b4 a8 98 d4 2c 90 ac (salsa)
-GAME(199?, m4luckdvd, m4luckdv,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::salsa_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Lucky Devil (Barcrest) [Dutch] (MPU4) (DLD)",GAME_FLAGS )
+GAME(199?, m4luckdvd, m4luckdv,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::salsa_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Lucky Devil (Barcrest) (Dutch) (MPU4) (DLD 1.3)",GAME_FLAGS )
 
 // not standard protection
 GAME(199?, m4luck7,   0,          mod4oki_cheatchr,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Lucky 7 (Barcrest) (Dutch) (MPU4)",GAME_FLAGS ) // '1,2' error
 
 // gives a DMD?? message if you attempt to coin it up, is there a mussing Dot Matrix Display ROM of some kind?
 // 00 60 60 c0 4c 10 84 48 b4 a8 98 d4 2c 90 ac 1c (salsa)
-GAME(199?, m4joljokh, m4joljok,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::salsa_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Jolly Joker (Barcrest) [Hungarian] (MPU4) (HJJ)",GAME_FLAGS )
+GAME(199?, m4joljokh, m4joljok,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::salsa_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Jolly Joker (Barcrest) (Hungarian) (MPU4) (HJJ 1.4)",GAME_FLAGS )
 
 // 00 a0 a8 58 f4 8c d8 70 c4 e8 58 74 80 2c 94 4c (redheat)
-GAME(199?, m4hpyjok,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::redheat_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Happy Joker (Barcrest) (Dutch) (MPU4) (DHJ1.2)",GAME_FLAGS )
+GAME(199?, m4hpyjok,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::redheat_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Happy Joker (Barcrest) (Dutch) (MPU4) (DHJ 1.2)",GAME_FLAGS )
 
 // 00 24 24 64 2c 30 48 30 68 58 5c 5c (goljok)
 GAME(199?, m4gldjok,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::goljok_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Golden Joker (Barcrest) (Dutch) (MPU4) (DGJ 1.2)",GAME_FLAGS )
@@ -2280,7 +2280,7 @@ GAME(199?, m4gnsmk,   0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::
 GAME(199?, m4blkbuld, m4blkbul,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::age_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Gun Smoke (Barcrest) (Dutch, alt sound roms) (MPU4)",GAME_FLAGS ) // not sure either set of sound roms is right
 
 // 00 a0 a8 1c f4 c8 1c b4 cc 5c 74 44 e0 28 (blackwhite)
-GAME(199?, m4blkwhd,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::blackwhite_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Black & White (Barcrest) [Dutch] (MPU4) (DBW 1.1)",GAME_FLAGS ) // Reel Error
+GAME(199?, m4blkwhd,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::blackwhite_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Black & White (Barcrest) (Dutch) (MPU4) (DBW 1.1)",GAME_FLAGS ) // Reel Error
 
 // these 3 sets are identical, just with different sound ROMs, probably hacks?
 GAME(199?, m4oldtmr,  0,          mod4oki_alt_cheatchr_xxxx<mpu4_characteriser_pal::m470_characteriser_prot>,mpu4,    mpu4unsorted_state, init_m_oldtmr,  ROT0,   "Barcrest","Old Timer (Barcrest) (Dutch) (MPU4) (DOT 1.1)",GAME_FLAGS )
@@ -2297,7 +2297,7 @@ GAME(199?, m4tbplayb, m4tbplay,   mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::
 GAME(199?, m4toprn,   0,          mod2_cheatchr,       mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Top Run (Barcrest) (Dutch) (MPU4)",GAME_FLAGS ) // unique behavior  (START UP IN countdown)
 
 // 00 c0 d0 1c ec 78 ac 30 4c 2c 24 cc 7c a4 d8 (tricolor)
-GAME(199?, m4magtbo,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::tricolor_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Magic Turbo (Barcrest) (MPU4)",GAME_FLAGS ) // Reel A Alarm
+GAME(199?, m4magtbo,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::tricolor_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Magic Turbo (Barcrest) (MPU4) (XST 0.4)",GAME_FLAGS ) // Reel A Alarm
 
 // bwb/nova?
 // 00 24 24 64 2c 14 4c 14 4c 58 78 78 74 (actclba)
@@ -2382,7 +2382,7 @@ GAME(199?, m4cld02,   0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::
 
 // runs, coins don't work, Dutch?
 // 00 60 60 a0 2c 50 84 28 d4 c8 9c b4 48 94 cc 98 b4 cc dc 34 c0 a8 18 f4 48 d4 c8 1c (blkcat)
-GAME(199?, m4riotrp,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::blkcat_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "<unknown>","Rio Tropico (unknown) (MPU4)",GAME_FLAGS )
+GAME(199?, m4riotrp,  0,          mod4oki_cheatchr_xxxx<mpu4_characteriser_pal::blkcat_characteriser_prot>,    mpu4,    mpu4unsorted_state, init_m4default, ROT0,   "Barcrest","Rio Tropico (Barcrest) (Dutch) (MPU4) (DRT 1.0)",GAME_FLAGS )
 
 
 // Others
