@@ -125,12 +125,6 @@
 #include "z80dasm.h"
 
 #define VERBOSE             0
-
-/* On an NMOS Z80, if LD A,I or LD A,R is interrupted, P/V flag gets reset,
-   even if IFF2 was set before this instruction. This issue was fixed on
-   the CMOS Z80, so until knowing (most) Z80 types on hardware, it's disabled */
-#define HAS_LDAIR_QUIRK     0
-
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
 
@@ -3228,10 +3222,7 @@ void z80_device::take_nmi()
 	/* Check if processor was halted */
 	leave_halt();
 
-#if HAS_LDAIR_QUIRK
-	/* reset parity flag after LD A,I or LD A,R */
-	if (m_after_ldair) F &= ~PF;
-#endif
+	if (m_mos_type == NMOS && m_after_ldair) F &= ~PF;
 
 	m_iff1 = 0;
 	m_r++;
@@ -3331,10 +3322,7 @@ void z80_device::take_interrupt()
 	}
 	WZ=PCD;
 
-#if HAS_LDAIR_QUIRK
-	/* reset parity flag after LD A,I or LD A,R */
-	if (m_after_ldair) F &= ~PF;
-#endif
+	if (m_mos_type == NMOS && m_after_ldair) F &= ~PF;
 }
 
 void z80_device::nomreq_ir(s8 cycles)
@@ -3384,11 +3372,10 @@ void nsc800_device::take_interrupt_nsc800()
 
 	WZ=PCD;
 
-#if HAS_LDAIR_QUIRK
-	/* reset parity flag after LD A,I or LD A,R */
-	if (m_after_ldair) F &= ~PF;
-#endif
+	if (m_mos_type == NMOS && m_after_ldair) F &= ~PF;
 }
+
+ALLOW_SAVE_TYPE(z80_device::mos_type);
 
 /****************************************************************************
  * Processor initialization
@@ -3498,6 +3485,7 @@ void z80_device::device_start()
 	save_item(NAME(m_busrq_state));
 	save_item(NAME(m_after_ei));
 	save_item(NAME(m_after_ldair));
+	save_item(NAME(m_mos_type));
 
 	/* Reset registers to their initial values */
 	PRVPC = 0;
@@ -3640,18 +3628,21 @@ void z80_device::execute_run()
 		m_after_ei = false;
 		m_after_ldair = false;
 
-		PRVPC = PCD;
-		debugger_instruction_hook(PCD);
-
-		uint8_t opcode = rop();
-
-		// when in HALT state, the fetched opcode is not dispatched (aka a NOP)
-		if (m_halt)
+		if (m_icount > 0)
 		{
-			PC--;
-			opcode = 0;
+			PRVPC = PCD;
+			debugger_instruction_hook(PCD);
+
+			uint8_t opcode = rop();
+
+			// when in HALT state, the fetched opcode is not dispatched (aka a NOP)
+			if (m_halt)
+			{
+				PC--;
+				opcode = 0;
+			}
+			EXEC(op,opcode);
 		}
-		EXEC(op,opcode);
 	} while (m_icount > 0);
 }
 
@@ -3830,6 +3821,7 @@ z80_device::z80_device(const machine_config &mconfig, device_type type, const ch
 	m_nomreq_cb(*this),
 	m_halt_cb(*this)
 {
+	m_mos_type = CMOS;
 }
 
 device_memory_interface::space_config_vector z80_device::memory_space_config() const
@@ -3855,3 +3847,11 @@ nsc800_device::nsc800_device(const machine_config &mconfig, const char *tag, dev
 }
 
 DEFINE_DEVICE_TYPE(NSC800, nsc800_device, "nsc800", "National Semiconductor NSC800")
+
+upd780_device::upd780_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: z80_device(mconfig, UPD780, tag, owner, clock)
+{
+	m_mos_type = NMOS;
+}
+
+DEFINE_DEVICE_TYPE(UPD780, upd780_device, "upd780", "NEC µPD780")

@@ -42,6 +42,15 @@ public:
 	auto halt_cb() { return m_halt_cb.bind(); }
 
 protected:
+	/* On an NMOS Z80, if LD A,I or LD A,R is interrupted, P/V flag gets reset,
+	   even if IFF2 was set before this instruction. This issue was fixed on
+	   the CMOS Z80 */
+	enum mos_type : u8
+	{
+		CMOS = 0,
+		NMOS
+	};
+
 	z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
@@ -279,6 +288,7 @@ protected:
 	int               m_wait_state;         // wait line state
 	int               m_busrq_state;        // bus request line state
 	uint8_t           m_after_ei;           /* are we in the EI shadow? */
+	mos_type          m_mos_type;
 	uint8_t           m_after_ldair;        /* same, but for LD A,I or LD A,R */
 	uint32_t          m_ea;
 
@@ -316,5 +326,12 @@ protected:
 
 DECLARE_DEVICE_TYPE(NSC800, nsc800_device)
 
+class upd780_device : public z80_device
+{
+public:
+	upd780_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+DECLARE_DEVICE_TYPE(UPD780, upd780_device)
 
 #endif // MAME_CPU_Z80_Z80_H
