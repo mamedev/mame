@@ -11667,6 +11667,10 @@ mgprem11                        // (c) 1995
 odeontw                         //
 odeontw2                        // (c) 1999
 
+@source:cucaracha.cpp
+cucaracha                       // (c) 1992 Taito
+cucaracha2                      // (c) 1992 Taito
+
 @source:cultures.cpp
 cultures                        // (c) 1994 Face
 
@@ -15566,10 +15570,6 @@ goindol                         // (c) 1987 Sun a Electronics
 goindolj                        // (c) 1987 Sun a Electronics
 goindolu                        // (c) 1987 Sun a Electronics
 homo                            // bootleg
-
-@source:gokidetor.cpp
-gokidetor                       // (c) 1992 Taito
-gokidetor2                      // (c) 1992 Taito
 
 @source:goldart.cpp
 goldart
@@ -39316,6 +39316,7 @@ ballboy3p                       // bootleg
 cookbib2                        // (c) 1996 SemiCom
 cookbib2a                       // (c) 1996 SemiCom
 cookbib2b                       // (c) 1996 SemiCom
+cookbib2c                       // (c) 1996 SemiCom
 cookbib3                        // (c) 1997 SemiCom
 finalttr                        // (c) 1993 Jeil Computer System
 honeydol                        // (c) 1995 Barko Corp
