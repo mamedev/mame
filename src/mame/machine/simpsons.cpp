@@ -100,6 +100,6 @@ void simpsons_state::machine_reset()
 	membank("bank2")->set_entry(0);
 	video_bank_select(0);
 
-	m_dma_start_timer->adjust(attotime::zero);
-	m_dma_end_timer->adjust(attotime::zero);
+	m_dma_start_timer->adjust(attotime::never);
+	m_dma_end_timer->adjust(attotime::never);
 }
