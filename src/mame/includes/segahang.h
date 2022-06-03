@@ -140,7 +140,6 @@ private:
 
 	// internal state
 	emu_timer              * m_i8751_sync_timer = nullptr;
-	emu_timer              * m_ppi_sync_timer = nullptr;
 	uint8_t                  m_adc_select = 0;
 	optional_ioport_array<4> m_adc_ports;
 	bool                     m_shadow = false;

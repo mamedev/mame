@@ -176,7 +176,6 @@ private:
 
 	// internal state
 	emu_timer              * m_i8751_sync_timer = nullptr;
-	emu_timer              * m_ppi_sync_timer = nullptr;
 	uint8_t                  m_video_control = 0;
 	uint8_t                  m_mcu_control = 0;
 	uint8_t                  m_n7751_command = 0;

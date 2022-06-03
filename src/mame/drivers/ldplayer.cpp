@@ -389,7 +389,7 @@ void pr8210_state::machine_reset()
 {
 	ldplayer_state::machine_reset();
 	m_bit_timer->adjust(attotime::zero);
-	m_bit_off_timer->adjust(attotime::zero);
+	m_bit_off_timer->adjust(attotime::never);
 }
 
 

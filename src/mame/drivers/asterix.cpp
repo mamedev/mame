@@ -73,7 +73,8 @@ TIMER_CALLBACK_MEMBER(asterix_state::audio_nmi)
 void asterix_state::sound_arm_nmi_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	m_audio_nmi_timer->adjust(attotime::from_usec(5));
+	if (!m_audio_nmi_timer->remaining().is_never())
+		m_audio_nmi_timer->adjust(attotime::from_usec(5));
 }
 
 void asterix_state::sound_irq_w(uint16_t data)

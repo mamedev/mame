@@ -276,7 +276,7 @@ void segas16a_state::standard_io_w(offs_t offset, uint16_t data, uint16_t mem_ma
 			// the port C handshaking signals control the Z80 NMI,
 			// so we have to sync whenever we access this PPI
 			if (ACCESSING_BITS_0_7)
-				m_ppi_sync_timer->adjust(attotime::zero, ((offset & 3) << 8) | (data & 0xff));
+				machine().scheduler().synchronize(timer_expired_delegate(FUNC(segas16a_state::ppi_sync), this), ((offset & 3) << 8) | (data & 0xff));
 			return;
 	}
 	//logerror("%06X:standard_io_w - unknown write access to address %04X = %04X & %04X\n", m_maincpu->state_int(STATE_GENPC), offset * 2, data, mem_mask);
@@ -612,7 +612,6 @@ void segas16a_state::machine_start()
 	m_lamps.resolve();
 
 	m_i8751_sync_timer = timer_alloc(FUNC(segas16a_state::i8751_sync), this);
-	m_ppi_sync_timer = timer_alloc(FUNC(segas16a_state::ppi_sync), this);
 }
 
 

@@ -237,7 +237,8 @@ private:
 	required_shared_ptr<uint8_t> m_sprite_enable;
 	optional_shared_ptr<uint8_t> m_characterram;
 
-	emu_timer *m_collision_latch_timer = nullptr;
+	emu_timer *m_collision_mob_timer = nullptr;
+	emu_timer *m_collision_bg_timer = nullptr;
 	uint8_t m_collision_mask = 0;
 	uint8_t m_collision_invert = 0;
 	int m_is_2bpp = 0;
@@ -1387,7 +1388,7 @@ void exidy_state::check_collision()
 
 				/* if we got one, trigger an interrupt */
 				if ((current_collision_mask & m_collision_mask) && (count++ < 128))
-					m_collision_latch_timer->adjust(m_screen->time_until_pos(org_1_x + sx, org_1_y + sy), current_collision_mask);
+					m_collision_mob_timer->adjust(m_screen->time_until_pos(org_1_x + sx, org_1_y + sy), current_collision_mask);
 			}
 
 			if (m_motion_object_2_vid.pix(sy, sx) != 0xff)
@@ -1395,7 +1396,7 @@ void exidy_state::check_collision()
 				/* check for background collision (M2CHAR) */
 				if (m_background_bitmap.pix(org_2_y + sy, org_2_x + sx) != 0)
 					if ((m_collision_mask & 0x08) && (count++ < 128))
-						m_collision_latch_timer->adjust(m_screen->time_until_pos(org_2_x + sx, org_2_y + sy), 0x08);
+						m_collision_bg_timer->adjust(m_screen->time_until_pos(org_2_x + sx, org_2_y + sy), 0x08);
 			}
 		}
 }
@@ -1436,7 +1437,8 @@ uint32_t exidy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 void exidy_state::machine_start()
 {
-	m_collision_latch_timer = timer_alloc(FUNC(exidy_state::latch_collision), this);
+	m_collision_mob_timer = timer_alloc(FUNC(exidy_state::latch_collision), this);
+	m_collision_bg_timer = timer_alloc(FUNC(exidy_state::latch_collision), this);
 }
 
 void spectar_state::machine_start()

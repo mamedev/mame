@@ -126,7 +126,6 @@ private:
 	int m_pen_y = 0;
 	emu_timer *m_refresh = nullptr;
 	emu_timer *m_zero_integrators_timer = nullptr;
-	emu_timer *m_update_analog_timer = nullptr;
 	emu_timer *m_update_blank_timer = nullptr;
 	emu_timer *m_update_mux_enable_timer = nullptr;
 	uint8_t m_blank = 0;

@@ -199,7 +199,7 @@ void segahang_state::sync_ppi_w(offs_t offset, uint8_t data)
 {
 	// the port C handshaking signals control the Z80 NMI,
 	// so we have to sync whenever we access this PPI
-	m_ppi_sync_timer->adjust(attotime::zero, ((offset & 3) << 8) | data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(segahang_state::ppi_sync), this), ((offset & 3) << 8) | data);
 }
 
 
@@ -307,7 +307,6 @@ void segahang_state::machine_start()
 	m_lamps.resolve();
 
 	m_i8751_sync_timer = timer_alloc(FUNC(segahang_state::i8751_sync), this);
-	m_ppi_sync_timer = timer_alloc(FUNC(segahang_state::ppi_sync), this);
 }
 
 

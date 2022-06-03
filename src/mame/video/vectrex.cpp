@@ -232,7 +232,6 @@ void vectrex_base_state::video_start()
 
 	m_refresh = timer_alloc(FUNC(vectrex_base_state::refresh), this);
 	m_zero_integrators_timer = timer_alloc(FUNC(vectrex_base_state::zero_integrators), this);
-	m_update_analog_timer = timer_alloc(FUNC(vectrex_base_state::update_analog), this);
 	m_update_blank_timer = timer_alloc(FUNC(vectrex_base_state::update_blank), this);
 	m_update_mux_enable_timer = timer_alloc(FUNC(vectrex_base_state::update_mux_enable), this);
 
@@ -276,7 +275,7 @@ void vectrex_state::video_start()
 
 void vectrex_base_state::multiplexer(int mux)
 {
-	m_update_analog_timer->adjust(attotime::from_nsec(ANALOG_DELAY), mux);
+	machine().scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), timer_expired_delegate(FUNC(vectrex_base_state::update_analog), this), mux);
 
 	if (mux == A_AUDIO)
 		m_dac->write(m_via_out[PORTA] ^ 0x80); // not gate shown on schematic
@@ -370,7 +369,7 @@ void vectrex_base_state::via_pa_w(uint8_t data)
 {
 	/* DAC output always goes to Y integrator */
 	m_via_out[PORTA] = data;
-	m_update_analog_timer->adjust(attotime::from_nsec(ANALOG_DELAY), A_Y);
+	machine().scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), timer_expired_delegate(FUNC(vectrex_base_state::update_analog), this), A_Y);
 
 	if (!(m_via_out[PORTB] & 0x1))
 		multiplexer((m_via_out[PORTB] >> 1) & 0x3);

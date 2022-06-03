@@ -252,7 +252,7 @@ void alto2_state::utilout_w(u16 data)
 {
 	// FIXME: write printer data
 	// printer_write();
-	m_speaker->level_w(data ^ 0xffff ? 1 : 0);
+	m_speaker->level_w(data ^ 0177777 ? 1 : 0);
 }
 
 /* ROM */
